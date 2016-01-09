@@ -1,0 +1,719 @@
+                                                                                     
+                             WELCOME TO ABACUS                                       
+                                                                                     
+               'Atomic-orbital Based Ab-initio Computation at UStc'                  
+                                                                                     
+    Version: Parallel, under ALPHA test
+    Processor Number is 1
+    Start Time is Wed Sep 30 16:29:59 2015
+                                                                                     
+ ------------------------------------------------------------------------------------
+
+ READING GENERAL INFORMATION
+                           global_out_dir = OUT.N-6-1.1/
+                           global_in_card = INPUT
+                               pseudo_dir = ./
+                              pseudo_type = upf
+                                    DRANK = 1
+                                    DSIZE = 1
+                                   DCOLOR = 1
+                                    GRANK = 1
+                                    GSIZE = 1
+Open file : INPUTw
+
+
+
+
+ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ |                                                                    |
+ | Reading atom information in unitcell:                              |
+ | From the input file and the structure file we know the number of   |
+ | different elments in this unitcell, then we list the detail        |
+ | information for each element, especially the zeta and polar atomic |
+ | orbital number for each element. The total atom number is counted. |
+ | We calculate the nearest atom distance for each atom and show the  |
+ | Cartesian and Direct coordinates for each atom. We list the file   |
+ | address for atomic orbitals and nonlocal projectors. The volume    |
+ | and the lattice vectors in real and reciprocal space is also shown.|
+ |                                                                    |
+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+ READING UNITCELL INFORMATION
+                                    ntype = 1
+                 atom label for species 1 = N
+                  lattice constant (Bohr) = 20
+              lattice constant (Angstrom) = 10.5835
+
+ READING ATOM TYPE 1
+                               atom label = N
+                      start magnetization = FALSE
+                      L=0, number of zeta = 1
+                      L=1, number of zeta = 1
+                      L=2, number of zeta = 1
+             number of atom for this type = 2
+
+                        TOTAL ATOM NUMBER = 2
+
+ Output nearest atom not considering periodic boundary condition
+  TYPE INDEX       NEAREST(Bohr)   NEAREST(Angstrom)
+     N     1                   0                   0
+     N     2                   0                   0
+
+ CARTESIAN COORDINATES ( UNIT = 20 Bohr ).
+         atom                   x                   y                   z mag
+      tauc_N1                   0                   0                   0 0
+      tauc_N2                   0                   0      0.103934978277 0
+
+ DIRECT COORDINATES
+         atom                   x                   y                   z mag
+      taud_N1                   0                   0                   0 0
+      taud_N2                   0                   0      0.103934978277 0
+
+
+                          Volume (Bohr^3) = 8000
+                             Volume (A^3) = 1185.47627437
+
+ Lattice vectors: (Cartesian coordinate: in unit of a_0)
+                   +1                  +0                  +0
+                   +0                  +1                  +0
+                   +0                  +0                  +1
+ Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)
+                   +1                  +0                  +0
+                   +0                  +1                  +0
+                   +0                  +0                  +1
+
+
+
+
+ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ |                                                                    |
+ | Reading pseudopotentials files:                                    |
+ | The pseudopotential file is in UPF format. The 'NC' indicates that |
+ | the type of pseudopotential is 'norm conserving'. Functional of    |
+ | exchange and correlation is decided by 4 given parameters in UPF   |
+ | file.  We also read in the 'core correction' if there exists.      |
+ | Also we can read the valence electrons number and the maximal      |
+ | angular momentum used in this pseudopotential. We also read in the |
+ | trail wave function, trail atomic density and local-pseudopotential|
+ | on logrithmic grid. The non-local pseudopotential projector is also|
+ | read in if there is any.                                           |
+ |                                                                    |
+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+                PAO radial cut off (Bohr) = 15
+
+ Read in pseudopotential file is N.LDA.UPF
+                     pseudopotential type = NC
+                            functional Ex = SLA
+                            functional Ec = PZ
+                          functional GCEx = NOGX
+                          functional GCEc = NOGC
+                 nonlocal core correction = 0
+                        valence electrons = 5
+                                     lmax = 1
+                           number of zeta = 2
+                     number of projectors = 1
+                           L of projector = 1
+
+ SETUP THE ELECTRONS NUMBER
+             electron number of element N = 5
+       total electron number of element N = 10
+                           occupied bands = 5
+                                   NBANDS = 8
+     initial pseudo atomic orbital number = 8
+                                   NLOCAL = 18
+ DONE : SETUP UNITCELL Time : 0.0176219940186 (SEC)
+
+
+
+
+
+ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ |                                                                    |
+ | Setup K-points                                                     |
+ | We setup the k-points according to input parameters.               |
+ | The reduced k-points are set according to symmetry operations.     |
+ | We treat the spin as another set of k-points.                      |
+ |                                                                    |
+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+
+ SETUP K-POINTS
+                                    nspin = 1
+                   Input type of k points = Monkhorst-Pack(Gamma)
+                                   nkstot = 1
+
+  KPOINTS            DIRECT_X            DIRECT_Y            DIRECT_Z              WEIGHT
+        1                   0                   0                   0                   1
+
+           k-point number in this process = 1
+       minimum distributed K point number = 1
+
+  KPOINTS         CARTESIAN_X         CARTESIAN_Y         CARTESIAN_Z              WEIGHT
+        1                   0                   0                   0                   2
+
+  KPOINTS            DIRECT_X            DIRECT_Y            DIRECT_Z              WEIGHT
+        1                   0                   0                   0                   2
+ DONE : INIT K-POINTS Time : 0.0177750587463 (SEC)
+
+
+
+
+
+ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ |                                                                    |
+ | Setup plane waves:                                                 |
+ | Use the energy cutoff and the lattice vectors to generate the      |
+ | dimensions of FFT grid. The number of FFT grid on each processor   |
+ | is 'nrxx'. The number of plane wave basis in reciprocal space is   |
+ | different for charege/potential and wave functions. We also set    |
+ | the 'sticks' for the parallel of FFT.                              |
+ |                                                                    |
+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+
+ SETUP THE PLANE WAVE BASIS
+     energy cutoff for wavefunc (unit:Ry) = 50
+            [fft grid for wave functions] = 96, 96, 96
+          [fft grid for charge/potential] = 96, 96, 96
+                      [fft grid division] = 1, 1, 1
+      [big fft grid for charge/potential] = 96, 96, 96
+                                     nbxx = 884736
+                                     nrxx = 884736
+
+ SETUP PLANE WAVES FOR CHARGE/POTENTIAL
+                    number of plane waves = 382323
+                         number of sticks = 6369
+
+ SETUP PLANE WAVES FOR WAVE FUNCTIONS
+                    number of plane waves = 47833
+                         number of sticks = 1597
+
+ PARALLEL PW FOR CHARGE/POTENTIAL
+     PROC   COLUMNS(POT)             PW
+        1           6369         382323
+ --------------- sum -------------------
+        1           6369         382323
+
+ PARALLEL PW FOR WAVE FUNCTIONS
+     PROC     COLUMNS(W)             PW
+        1           1597          47833
+ --------------- sum -------------------
+        1           1597          47833
+
+ SETUP COORDINATES OF PLANE WAVES
+              number of total plane waves = 382323
+                            number of |g| = 1691
+                                  max |g| = 2026
+                                  min |g| = 0
+ DONE : INIT PLANEWAVE Time : 10.4268500805 (SEC)
+
+                                     npwx = 47833
+
+ SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS
+ N non-local projectors:
+ projector 1 L=1
+      TOTAL NUMBER OF NONLOCAL PROJECTORS = 6
+ DONE : LOCAL POTENTIAL Time : 10.5033659935 (SEC)
+
+
+ Init Non-Local PseudoPotential table : 
+ Init Non-Local-Pseudopotential done.
+ DONE : NON-LOCAL POTENTIAL Time : 10.5188779831 (SEC)
+
+                                start_pot = atomic
+ DONE : INIT POTENTIAL Time : 10.8712 (SEC)
+
+
+ Make real space PAO into reciprocal space.
+       max mesh points in Pseudopotential = 967
+     dq(describe PAO in reciprocal space) = 0.01
+                                    max q = 712
+
+ number of pseudo atomic orbitals for N is 2
+ the unit of pseudo atomic orbital is 1, renormalize to 1
+ the unit of pseudo atomic orbital is 1, renormalize to 1
+
+ Make real space PAO into reciprocal space.
+       max mesh points in Pseudopotential = 967
+     dq(describe PAO in reciprocal space) = 0.01
+                                    max q = 712
+
+ number of pseudo atomic orbitals for N is 2
+ the unit of pseudo atomic orbital is 1, renormalize to 1
+ the unit of pseudo atomic orbital is 1, renormalize to 1
+ DONE : INIT BASIS Time : 11.7379 (SEC)
+
+ -------------------------------------------
+ -------------------------------------------
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   1--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -31.249454       1.250000
+      2     -15.074206       1.250000
+      3     -13.534199       1.250000
+      4     -13.534199       1.250000
+      5     -12.489634       1.250000
+      6      -3.678572       1.250000
+      7      -3.678572       1.250000
+      8       0.946562       1.250000
+        1       3.500000       3.230000
+
+ Density error is 0.140772872235
+                          Error Threshold = 0.010000000000
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.731910536213             -540.580375718736
+     E_Harris              -39.792512783945             -541.404911599500
+       E_band              -12.624371085810             -171.763380433466
+   E_one_elec              -82.522905860668            -1122.781735222685
+    E_Hartree              +41.010176615731             +557.972077960297
+         E_xc               -9.462459378753             -128.743364644586
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               +1.318795161735              +17.943128694422
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.512019638878               -6.966384576642
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   2--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -29.247917       2.000000
+      2     -13.909756       2.000000
+      3     -12.270011       2.000000
+      4     -12.270011       2.000000
+      5     -11.098347       2.000000
+      6      -2.563764       0.000000
+      7      -2.563764       0.000000
+      8       0.961031       0.000000
+        1       2.750000       2.690000
+
+ Density error is 0.030134482422
+                          Error Threshold = 0.001407728722
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.726166783381             -540.502227952311
+     E_Harris              -39.744117452097             -540.746459329756
+       E_band              -11.582800287588             -157.592082707229
+   E_one_elec              -82.118777427253            -1117.283285804421
+    E_Hartree              +41.898238193244             +570.054775589345
+         E_xc               -9.634100568988             -131.078662843285
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               +0.203990093873               +2.775427612234
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.474444519204               -6.455148846051
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   3--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -27.683695       2.000000
+      2     -12.907132       2.000000
+      3     -11.293469       2.000000
+      4     -11.293469       2.000000
+      5      -9.887928       2.000000
+      6      -1.693767       0.000000
+      7      -1.693767       0.000000
+      8       1.100652       0.000000
+        1       2.875000       2.750000
+
+ Density error is 0.004970402708
+                          Error Threshold = 0.000301344824
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.733406335010             -540.600727105439
+     E_Harris              -39.735035782628             -540.622896877631
+       E_band              -10.740455109009             -146.131388595738
+   E_one_elec              -81.384122301145            -1107.287790024438
+    E_Hartree              +41.737678412035             +567.870247695267
+         E_xc               -9.606522442670             -130.703443185187
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               -0.404922928974               -5.509259084897
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.438006012242               -5.959377524751
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   4--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -27.959255       2.000000
+      2     -13.072175       2.000000
+      3     -11.496380       2.000000
+      4     -11.496380       2.000000
+      5     -10.064727       2.000000
+      6      -1.865980       0.000000
+      7      -1.865980       0.000000
+      8       1.096877       0.000000
+        1       2.250000       2.330000
+
+ Density error is 0.001837504118
+                          Error Threshold = 0.000049704027
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.732580161158             -540.589486433504
+     E_Harris              -39.733680832560             -540.604461836194
+       E_band              -10.890866015198             -148.177833961253
+   E_one_elec              -81.480202316904            -1108.595025702700
+    E_Hartree              +41.529627355029             +565.039567845059
+         E_xc               -9.572063598249             -130.234606554565
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               -0.134424526776               -1.828939515113
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.443277451776               -6.031099139074
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   5--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -28.302770       2.000000
+      2     -13.292757       2.000000
+      3     -11.772505       2.000000
+      4     -11.772505       2.000000
+      5     -10.284750       2.000000
+      6      -2.107259       0.000000
+      7      -2.107259       0.000000
+      8       1.128628       0.000000
+        1       3.250000       3.060000
+
+ Density error is 0.000040376685
+                          Error Threshold = 0.000018375041
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.733050463961             -540.595885231418
+     E_Harris              -39.733064049001             -540.596070065372
+       E_band              -11.087308654568             -150.850573186835
+   E_one_elec              -81.660816324163            -1111.052405340029
+    E_Hartree              +41.542807429157             +565.218891953270
+         E_xc               -9.574291493060             -130.264918618547
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               +0.034766998361               +0.473029280072
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.447839153388               -6.093164273571
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   6--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -28.282729       2.000000
+      2     -13.277762       2.000000
+      3     -11.754631       2.000000
+      4     -11.754631       2.000000
+      5     -10.270667       2.000000
+      6      -2.091123       0.000000
+      7      -2.091123       0.000000
+      8       1.130472       0.000000
+        1       3.125000       2.970000
+
+ Density error is 0.000012903111
+                          Error Threshold = 0.000000403767
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.733055238580             -540.595950193443
+     E_Harris              -39.733059190987             -540.596003968694
+       E_band              -11.074833667377             -150.680842278565
+   E_one_elec              -81.650409857002            -1110.910818090589
+    E_Hartree              +41.548370097256             +565.294575935495
+         E_xc               -9.575594783026             -130.282650788224
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               +0.020096378448               +0.273425256059
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.447369271034               -6.086771196162
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   7--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -28.278793       2.000000
+      2     -13.267969       2.000000
+      3     -11.748478       2.000000
+      4     -11.748478       2.000000
+      5     -10.261685       2.000000
+      6      -2.083440       0.000000
+      7      -2.083440       0.000000
+      8       1.132626       0.000000
+        1       2.375000       2.430000
+
+ Density error is 0.000004906302
+                          Error Threshold = 0.000000129031
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.733052835938             -540.595917503811
+     E_Harris              -39.733055737341             -540.595956979436
+       E_band              -11.069686056505             -150.610805439614
+   E_one_elec              -81.647390553205            -1110.869738354965
+    E_Hartree              +41.558743800101             +565.435717403553
+         E_xc               -9.577373733025             -130.306854644672
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               +0.008484724448               +0.115440598457
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.447178235971               -6.084172030798
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   8--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -28.261310       2.000000
+      2     -13.256965       2.000000
+      3     -11.735068       2.000000
+      4     -11.735068       2.000000
+      5     -10.250269       2.000000
+      6      -2.071753       0.000000
+      7      -2.071753       0.000000
+      8       1.133585       0.000000
+        1       2.750000       2.680000
+
+ Density error is 0.000000226265
+                          Error Threshold = 0.000000049063
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.733053818573             -540.595930873246
+     E_Harris              -39.733053951656             -540.595932683935
+       E_band              -11.059878260768             -150.477363532780
+   E_one_elec              -81.638792905084            -1110.752761351112
+    E_Hartree              +41.558778950533             +565.436195649704
+         E_xc               -9.577277682060             -130.305547804254
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               -0.000245107704               -0.003334861401
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.446804091239               -6.079081530566
+
+ PW ALGORITHM --------------- ION=   1  ELEC=   9--------------------------------
+  K-point    CG iter num      Time(Sec)
+ Energy (eV) & Occupations  for spin=1 K-point=1
+      1     -28.259768       2.000000
+      2     -13.258059       2.000000
+      3     -11.734601       2.000000
+      4     -11.734601       2.000000
+      5     -10.251198       2.000000
+      6      -2.072034       0.000000
+      7      -2.072034       0.000000
+      8      -0.127450       0.000000
+        1       4.500000       4.000000
+
+ Density error is 0.000000010160
+                          Error Threshold = 0.000000002263
+
+       Energy                       Rydberg                            eV
+   E_KohnSham              -39.733053836472             -540.595931116776
+     E_Harris              -39.733053842730             -540.595931201920
+       E_band              -11.059811581478             -150.476456314498
+   E_one_elec              -81.638971979843            -1110.755197788202
+    E_Hartree              +41.558657561708             +565.434544070017
+         E_xc               -9.577222344080             -130.304794892407
+      E_Ewald               +9.924482925743             +135.029517493815
+      E_demet               -0.000000000000               -0.000000000000
+      E_descf               +0.000000000000               +0.000000000000
+     E_efield               +0.000000000000               +0.000000000000
+      E_Fermi               -0.516289003119               -7.024472257163
+ convergence is achieved
+ !FINAL_ETOT_IS -540.595931116776 eV
+
+ STATE ENERGY(eV) AND OCCUPATIONS. 1/1 kpoint (Cartesian) = 0.00000 0.00000 0.00000 (47833 pws)
+ [spin1_state]        1     -28.259768       2.000000
+ [spin1_state]        2     -13.258059       2.000000
+ [spin1_state]        3     -11.734601       2.000000
+ [spin1_state]        4     -11.734601       2.000000
+ [spin1_state]        5     -10.251198       2.000000
+ [spin1_state]        6      -2.072034       0.000000
+ [spin1_state]        7      -2.072034       0.000000
+ [spin1_state]        8      -0.127450       0.000000
+
+
+
+ ><><><><><><><><><><><><><><><><><><><><><><
+
+    TOTAL-FORCE (Ry/Bohr)
+
+ ><><><><><><><><><><><><><><><><><><><><><><
+
+     atom              x              y              z
+       N1              0              0      +0.051367
+       N2              0              0      -0.051367
+
+
+ ><><><><><><><><><><><><><><><><><><><><><><
+
+    TOTAL-FORCE (eV/Angstrom)
+
+ ><><><><><><><><><><><><><><><><><><><><><><
+
+     atom              x              y              z
+       N1              0              0      +1.320688
+       N2              0              0      -1.320688
+ largest force is 0, no movement is possible.
+ it may converged, otherwise no movement of atom is allowed.
+ end of geometry optimization
+                                    istep = 1
+                         update iteration = 0
+
+ CARTESIAN COORDINATES ( UNIT = 20.000000 Bohr ).
+         atom                   x                   y                   z mag
+      tauc_N1      0.000000000000      0.000000000000      0.000000000000 0.000000000000
+      tauc_N2      0.000000000000      0.000000000000      0.103934978277 0.000000000000
+
+ DIRECT COORDINATES
+         atom                   x                   y                   z mag
+      taud_N1      0.000000000000      0.000000000000      0.000000000000 0.000000000000
+      taud_N2      0.000000000000      0.000000000000      0.103934978277 0.000000000000
+
+
+ ><><><><><><><><><><><><><><><><><><><><><><
+
+ Overlap Data For Spillage Minimization
+
+ ><><><><><><><><><><><><><><><><><><><><><><
+
+ File name : INPUTs
+                                   smooth = 1
+                                    sigma = 0.100000000000
+                                     ecut = 50.000000000000
+                                     rcut = 6.000000000000
+                                tolerence = 0.000000000001
+                                    kmesh = 713
+                                       dk = 0.010000000000
+                                    rmesh = 605
+                                       dr = 0.010000000000
+                       number of k points = 1
+                          number of bands = 8
+                 number of local orbitals = 18
+           number of eigenvalues of Jl(x) = 13
+ --------------------------------------------------------
+ Print the overlap matrixs Q and S for this kpoint
+       ik     npw
+        1   47833
+ --------------------------------------------------------
+ OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS
+ Q = < J_mu, q | Psi_n, k > 
+
+    ik   Type1   Atom1       L
+     1       N       1       0
+     1       N       1       1
+     1       N       1       2
+     1       N       2       0
+     1       N       2       1
+     1       N       2       2
+ DONE : jlq3d_overlap Time : 47.456847667694 (SEC)
+
+ OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS
+ S = < J_mu,q1 | J_nu,q2 >
+
+    ik   Type1   Atom1      L1   Type2   Atom2      L2
+     1       N       1       0       N       1       0
+     1       N       1       0       N       1       1
+     1       N       1       0       N       1       2
+     1       N       1       1       N       1       0
+     1       N       1       1       N       1       1
+     1       N       1       1       N       1       2
+     1       N       1       2       N       1       0
+     1       N       1       2       N       1       1
+     1       N       1       2       N       1       2
+     1       N       1       0       N       2       0
+     1       N       1       0       N       2       1
+     1       N       1       0       N       2       2
+     1       N       1       1       N       2       0
+     1       N       1       1       N       2       1
+     1       N       1       1       N       2       2
+     1       N       1       2       N       2       0
+     1       N       1       2       N       2       1
+     1       N       1       2       N       2       2
+     1       N       2       0       N       1       0
+     1       N       2       0       N       1       1
+     1       N       2       0       N       1       2
+     1       N       2       1       N       1       0
+     1       N       2       1       N       1       1
+     1       N       2       1       N       1       2
+     1       N       2       2       N       1       0
+     1       N       2       2       N       1       1
+     1       N       2       2       N       1       2
+     1       N       2       0       N       2       0
+     1       N       2       0       N       2       1
+     1       N       2       0       N       2       2
+     1       N       2       1       N       2       0
+     1       N       2       1       N       2       1
+     1       N       2       1       N       2       2
+     1       N       2       2       N       2       0
+     1       N       2       2       N       2       1
+     1       N       2       2       N       2       2
+ DONE : Sq_overlap Time : 85.850756645203 (SEC)
+
+
+ ik=0 DONE : BASIS OVERLAP (Q and S) GENERATION. Time : 85.922075510025 (SEC)
+
+
+
+
+
+ >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+ |                                                                    |
+ | Post-processing of data:                                           |
+ | DOS (density of states) and bands will be output here.             |
+ | If atomic orbitals are used, Mulliken charge analysis can be done. |
+ | Also the .bxsf file containing fermi surface information can be    |
+ | done here.                                                         |
+ |                                                                    |
+ <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+
+
+
+
+
+  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------
+  A             DC_Driv         divide_frag         10.409         1     10.41     12.11%
+  B            PW_Basis              gen_pw          10.41         1     10.41     12.11%
+  A             DC_Driv         solve_eachf          75.50         1     75.50     87.86%
+  B            Run_Frag        frag_pw_line          75.50         1     75.50     87.86%
+  E           potential            v_of_rho           1.73        10      0.17      2.01%
+  C            wavefunc             wfcinit           0.83         1      0.83      0.96%
+  G           Hamilt_PW            cinitcgg           7.21        10      0.72      8.39%
+  H           Hamilt_PW               h_psi          25.59       299      0.09     29.79%
+  I           Hamilt_PW          add_vuspsi           0.27       299      0.00      0.31%
+  C                Ions         opt_ions_pw          34.37         1     34.37     40.00%
+  D           electrons     self_consistent          33.89         1     33.89     39.45%
+  E           electrons             c_bands          26.36         9      2.93     30.68%
+  F              Hamilt               diago          26.21         9      2.91     30.50%
+  G            Diago_CG                diag          19.75         9      2.19     22.98%
+  E              Charge             mix_rho           1.89         9      0.21      2.20%
+ ----------------------------------------------------------------------------------------
+
+ CLASS_NAME---------|NAME---------------|MEMORY(MB)--------
+                                         243.7392
+         Charge_Pulay                Rrho        54.0000
+         Charge_Pulay               dRrho        47.2500
+         Charge_Pulay                drho        47.2500
+              Use_FFT              porter        13.5000
+               Charge                 rho         6.7500
+               Charge            rho_save         6.7500
+               Charge            rho_core         6.7500
+            potential               vltot         6.7500
+            potential                  vr         6.7500
+            potential                 vrs         6.7500
+            potential                vrs1         6.7500
+            potential                vnew         6.7500
+         Charge_Pulay           rho_save2         6.7500
+             wavefunc                 evc         5.8390
+             PW_Basis           struc_fac         5.8338
+               Charge                rhog         2.9169
+               Charge           rhog_save         2.9169
+               Charge           rhog_core         2.9169
+ ----------------------------------------------------------
+
+ Start  Time  : Wed Sep 30 16:29:59 2015
+ Finish Time  : Wed Sep 30 16:31:25 2015
+ Total  Time  : 0 h 1 mins 26 secs 

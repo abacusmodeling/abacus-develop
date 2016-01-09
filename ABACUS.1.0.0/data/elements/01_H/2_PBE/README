@@ -1,0 +1,20 @@
+Important information
+
+element: H
+reference structures: dimers
+bond lengths (angstrom) :  0.6 0.75 0.9 1.2 1.5 
+recommended rcut:      low precision: 5.0 au  
+                  standard precision: 6.0 au  
+                      high precision: 8.0 au 
+
+recommended basis size:  2s1p (dzp)
+
+generating rule: level1: 1s
+                 level2: 1s1p
+ 
+test pseudo: H.PBE.UPF
+test ecut: 50 Ry
+final spillages: 5.0 au: 2.6e-03   
+                 6.0 au: 8.3e-04  
+                 8.0 au: 3.1e-04
+

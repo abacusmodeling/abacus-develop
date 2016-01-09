@@ -1,0 +1,19 @@
+ATOMIC_SPECIES
+Fe 26 Fe.LDA.UPF
+
+LATTICE_CONSTANT
+7.0
+
+LATTICE_VECTORS
+0.0 0.5 0.5
+0.5 0.0 0.5
+0.5 0.5 0.0
+
+ATOMIC_POSITIONS
+Direct  //Cartesian or Direct coordinate.
+
+Fe
+0.2     //starting magnetism
+1       //number of atoms
+0 0 0 0 0 0
+

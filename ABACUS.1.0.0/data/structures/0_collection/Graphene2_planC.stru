@@ -1,0 +1,19 @@
+ATOMIC_SPECIES
+C 12.011 C.pz-vbc.UPF
+
+LATTICE_CONSTANT
+1.8897268777  // add lattice constant(a.u.)
+
+LATTICE_VECTORS
+0.0000000000  -2.4471259347   0.0000000000
+-2.1192732240   1.2235629673   0.0000000000
+0           0           10
+			   
+ATOMIC_POSITIONS
+Direct	//Cartesian or Direct coordinate.
+
+C
+0.231	//starting magnetism
+2		//number of atoms
+0   0   0 0 0 0
+0.33333333333333333 -0.3333333333333333333 0  0 0 0

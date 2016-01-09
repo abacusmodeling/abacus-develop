@@ -1,0 +1,23 @@
+ATOMIC_SPECIES
+Ge1 72.61 Ge.pz-bhs.UPF
+Ge2 72.61 Ge.pz-bhs.UPF
+
+LATTICE_CONSTANT
+10.54	
+
+LATTICE_VECTORS
+0.0 0.5 0.5
+0.5 0.0 0.5
+0.5 0.5 0.0
+
+ATOMIC_POSITIONS
+Direct
+Ge1
+0
+1
+0.0    0.0    0.0  0 0 0
+
+Ge2
+0
+1
+0.25   0.25   0.25 0 0 0 

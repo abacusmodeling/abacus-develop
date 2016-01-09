@@ -1,0 +1,27 @@
+ATOMIC_SPECIES
+C 12.011 C.pz-vbc.UPF
+H 1.0079 H.pz-vbc.UPF
+
+LATTICE_CONSTANT
+15   // add lattice constant
+
+LATTICE_VECTORS
+1	0	0
+0	1	0
+0	0	1
+
+ATOMIC_POSITIONS
+Cartesian_angstrom_center //Cartesian or Direct coordinate.
+
+C		//Element Label
+0		//starting magnetism
+1		//number of atoms
+0	0	0	0	0	0
+
+H		//Element Label
+0.0		//starting magnetism
+4		//number of atoms   
+-0.88998	-0.62931	0			0	0	0
+0			0.62931		-0.88998	0	0	0
+0			0.62931		0.88998		0	0	0
+0.88998		-0.62931	0			0	0	0

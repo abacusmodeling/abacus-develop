@@ -1,0 +1,23 @@
+ATOMIC_SPECIES
+Mg 12 Mg.pz-bhs.UPF
+O  08 O.pz-mt.UPF
+LATTICE_CONSTANT
+8.10  // add lattice constant(a.u.)
+
+LATTICE_VECTORS
+0.0 0.5 0.5
+0.5 0.0 0.5
+0.5 0.5 0.0
+
+ATOMIC_POSITIONS
+Direct  //Cartesian or Direct coordinate.
+
+Mg
+0.0     //starting magnetism
+1       //number of atoms
+0.0     0.0     0.0     0   0   0  // crystal coor.
+
+O
+0.0     //starting magnetism
+1       //number of atoms
+0.5     0.5     0.5 0   0   0  // crystal coor.

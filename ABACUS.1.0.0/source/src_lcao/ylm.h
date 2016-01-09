@@ -1,0 +1,84 @@
+#ifndef YLM_H
+#define YLM_H
+
+#include "../src_pw/tools.h"
+
+class Ylm
+{
+	public:
+	Ylm(){};
+	~Ylm(){};
+
+	static int nlm;
+
+	// (1) for check
+	static void get_ylm_real( 
+			const int &Lmax , 
+			const Vector3<double> &vec, 
+			double ylmr[]);
+
+	// (2) for check
+	static void get_ylm_real( 
+			const int &Lmax , 
+			const Vector3<double> &vec, 
+			double ylmr[],
+			double dylmdr[][3]);
+
+	// (3) not used anymore.
+	static void rlylm(
+			const int& Lmax, // max momentum of l +1
+			const double& x,
+			const double& y,
+			const double& z,
+			double rly[]);
+
+	// (4) not used anymore.
+	static void rlylm(
+			const int& Lmax, // max momentum of l +1
+			const double& x,
+			const double& y,
+			const double& z,
+			double rly[],
+			double grly[][3]);
+	
+	// (5) used in grid integration.
+	static void sph_harm(
+			const int& Lmax,
+			const double& xdr,
+			const double& ydr,
+			const double& zdr,
+			double rly[]);
+	
+	// (6) used in getting overlap.
+	static void rl_sph_harm(
+			const int& Lmax,
+			const double& x,
+			const double& y,
+			const double& z,
+			double rly[]);
+	
+	// (6) used in getting derivative of overlap.
+	static void grad_rl_sph_harm(
+			const int& Lmax,
+			const double& x,
+			const double& y,
+			const double& z,
+			double rly[],
+			double grly[][3]);
+			
+	static void set_coefficients ();
+	static double* ylmcoef;
+	
+	static void test();
+	static void test1();
+	static void test2();
+
+	static void ZEROS(double u[], const int& n);
+
+	private:
+	static long double Fact(const int n);
+	static int Semi_Fact(const int n); 
+	static double sgn(const double x);
+};
+
+#endif

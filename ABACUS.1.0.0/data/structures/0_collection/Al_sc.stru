@@ -1,0 +1,17 @@
+ATOMIC_SPECIES
+Al 13 Al.pz-vbc.UPF
+LATTICE_CONSTANT
+5.5  // add lattice constant(a.u.)
+
+LATTICE_VECTORS
+1 0 0
+0 1 0
+0 0 1
+
+ATOMIC_POSITIONS
+Direct  //Cartesian or Direct coordinate.
+
+Al
+0.0     //starting magnetism
+1       //number of atoms
+0 0 0.5 0.0 0.0 0.0
