@@ -608,133 +608,136 @@ double Gint_Gamma::gamma_charge(void)
 {
 	TITLE("Gint_Gamma","gamma_charge");
 	timer::tick("Gint_Gamma","gamma_charge",'I');	
+	double sum = 0.0;//LiuXh 2016-01-10
 	if(max_size==0) 
 	{
-		double sum = 0.0;
-		goto ENDandRETURN;
+		//double sum = 0.0;//LiuXh 2016-01-10
+		//goto ENDandRETURN;//LiuXh 2016-01-10
 	}
-
-	// it's a uniform grid to save orbital values, so the delta_r is a constant.
-	const double delta_r = ORB.dr_uniform;
-	const Numerical_Orbital_Lm* pointer;
-
-	// allocate 1
-	int nnnmax=0;
-	for(int T=0; T<ucell.ntype; T++)
+	else//LiuXh 2016-01-10
 	{
-		nnnmax = max(nnnmax, nnn[T]);
-	}
+		// it's a uniform grid to save orbital values, so the delta_r is a constant.
+		const double delta_r = ORB.dr_uniform;
+		const Numerical_Orbital_Lm* pointer;
 	
-	double*** dr; // vectors between atom and grid: [bxyz, maxsize, 3]
-	double** distance; // distance between atom and grid: [bxyz, maxsize]
-	// set up band matrix psir_ylm and psir_DM
-	int LD_pool=max_size*ucell.nwmax;
-	int nblock;
-	int *bsize; //band size: number of columns of a band
-	int *colidx;
-	double *psir_ylm_pool, **psir_ylm;
-	double *psir_DM_pool, **psir_DM;
-
-	dr = new double**[pw.bxyz];
-	distance = new double*[pw.bxyz];
-	bsize=new int[max_size];
-	colidx=new int[max_size+1];
-	psir_ylm_pool=new double[pw.bxyz*LD_pool];
-	psir_ylm=new double *[pw.bxyz];
-	psir_DM_pool=new double[pw.bxyz*LD_pool];
-	psir_DM=new double *[pw.bxyz];
-	ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
-	ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
-	for(int i=0; i<pw.bxyz; ++i)
-	{
-		psir_ylm[i] = &psir_ylm_pool[i*LD_pool];
-		psir_DM[i] = &psir_DM_pool[i*LD_pool];
-		dr[i] = new double*[max_size];
-		distance[i] = new double[max_size];
-		ZEROS(distance[i], max_size);
-		for(int j=0; j<max_size; j++) 
+		// allocate 1
+		int nnnmax=0;
+		for(int T=0; T<ucell.ntype; T++)
 		{
-			dr[i][j] = new double[3];
-			ZEROS(dr[i][j],3);
+			nnnmax = max(nnnmax, nnn[T]);
 		}
-	}
+		
+		double*** dr; // vectors between atom and grid: [bxyz, maxsize, 3]
+		double** distance; // distance between atom and grid: [bxyz, maxsize]
+		// set up band matrix psir_ylm and psir_DM
+		int LD_pool=max_size*ucell.nwmax;
+		int nblock;
+		int *bsize; //band size: number of columns of a band
+		int *colidx;
+		double *psir_ylm_pool, **psir_ylm;
+		double *psir_DM_pool, **psir_DM;
 	
-	int *block_iw; // index of wave functions of each block;
-	block_iw=new int[max_size];
-
-	double* ylma = new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
-	ZEROS(ylma, nnnmax);
-
-	double mt[3]={0,0,0};
-	double v1 = 0.0;
-	int* vindex=new int[pw.bxyz];
-	ZEROS(vindex, pw.bxyz);
-	double phi=0.0;
-
-	const int nbx = GridT.nbx;
-	const int nby = GridT.nby;
-	const int nbz_start = GridT.nbzp_start;
-	const int nbz = GridT.nbzp;
-
-	const int ncyz = pw.ncy*pw.nczp; // mohan add 2012-03-25
-	//OUT(ofs_running, "nbx", nbx);
-	//OUT(ofs_running, "nby", nby);
-	//OUT(ofs_running, "nbz", nbz);
-	for (int i=0; i<nbx; i++)
-	{
-		const int ibx = i*pw.bx; // mohan add 2012-03-25
-		for (int j=0; j<nby; j++)
+		dr = new double**[pw.bxyz];
+		distance = new double*[pw.bxyz];
+		bsize=new int[max_size];
+		colidx=new int[max_size+1];
+		psir_ylm_pool=new double[pw.bxyz*LD_pool];
+		psir_ylm=new double *[pw.bxyz];
+		psir_DM_pool=new double[pw.bxyz*LD_pool];
+		psir_DM=new double *[pw.bxyz];
+		ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
+		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
+		for(int i=0; i<pw.bxyz; ++i)
 		{
-			const int jby = j*pw.by; // mohan add 2012-03-25
-			for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
+			psir_ylm[i] = &psir_ylm_pool[i*LD_pool];
+			psir_DM[i] = &psir_DM_pool[i*LD_pool];
+			dr[i] = new double*[max_size];
+			distance[i] = new double[max_size];
+			ZEROS(distance[i], max_size);
+			for(int j=0; j<max_size; j++) 
 			{
-				const int kbz = k*pw.bz-pw.nczp_start; //mohan add 2012-03-25
-
-				this->grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
-
-				// get the value: how many atoms has orbital value on this grid.
-				const int size = GridT.how_many_atoms[ this->grid_index ];
-				if(size==0) continue;
-				setVindex(ncyz, ibx, jby, kbz, vindex);
-				cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm);
-				cal_band_rho(size, LD_pool, block_iw, bsize, colidx, psir_ylm, psir_DM, psir_DM_pool, vindex);
-			}// k
-		}// j
-	}// i
-	
-	delete[] vindex;
-	delete[] ylma;
-	
-	delete[] block_iw;
-	//OUT(ofs_running, "block_iw deleted");
-	for(int i=0; i<pw.bxyz; i++)
-	{
-		for(int j=0; j<max_size; j++) 
-		{
-			delete[] dr[i][j];
+				dr[i][j] = new double[3];
+				ZEROS(dr[i][j],3);
+			}
 		}
-		delete[] dr[i];
-		delete[] distance[i];
-	}
-	delete[] dr;
-	delete[] distance;
-	delete[] psir_DM;
-	delete[] psir_DM_pool;
-	delete[] psir_ylm;
-	delete[] psir_ylm_pool;
-	delete[] colidx;
-	delete[] bsize;
+		
+		int *block_iw; // index of wave functions of each block;
+		block_iw=new int[max_size];
 	
-	double sum = 0.0;
-	for(int is=0; is<NSPIN; is++)
-	{
-		for (int ir=0; ir<pw.nrxx; ir++)
+		double* ylma = new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
+		ZEROS(ylma, nnnmax);
+	
+		double mt[3]={0,0,0};
+		double v1 = 0.0;
+		int* vindex=new int[pw.bxyz];
+		ZEROS(vindex, pw.bxyz);
+		double phi=0.0;
+	
+		const int nbx = GridT.nbx;
+		const int nby = GridT.nby;
+		const int nbz_start = GridT.nbzp_start;
+		const int nbz = GridT.nbzp;
+	
+		const int ncyz = pw.ncy*pw.nczp; // mohan add 2012-03-25
+		//OUT(ofs_running, "nbx", nbx);
+		//OUT(ofs_running, "nby", nby);
+		//OUT(ofs_running, "nbz", nbz);
+		for (int i=0; i<nbx; i++)
 		{
-			sum += chr.rho[is][ir];
+			const int ibx = i*pw.bx; // mohan add 2012-03-25
+			for (int j=0; j<nby; j++)
+			{
+				const int jby = j*pw.by; // mohan add 2012-03-25
+				for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
+				{
+					const int kbz = k*pw.bz-pw.nczp_start; //mohan add 2012-03-25
+	
+					this->grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
+	
+					// get the value: how many atoms has orbital value on this grid.
+					const int size = GridT.how_many_atoms[ this->grid_index ];
+					if(size==0) continue;
+					setVindex(ncyz, ibx, jby, kbz, vindex);
+					cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm);
+					cal_band_rho(size, LD_pool, block_iw, bsize, colidx, psir_ylm, psir_DM, psir_DM_pool, vindex);
+				}// k
+			}// j
+		}// i
+		
+		delete[] vindex;
+		delete[] ylma;
+		
+		delete[] block_iw;
+		//OUT(ofs_running, "block_iw deleted");
+		for(int i=0; i<pw.bxyz; i++)
+		{
+			for(int j=0; j<max_size; j++) 
+			{
+				delete[] dr[i][j];
+			}
+			delete[] dr[i];
+			delete[] distance[i];
+		}
+		delete[] dr;
+		delete[] distance;
+		delete[] psir_DM;
+		delete[] psir_DM_pool;
+		delete[] psir_ylm;
+		delete[] psir_ylm_pool;
+		delete[] colidx;
+		delete[] bsize;
+		
+		//double sum = 0.0;//LiuXh 2016-01-10
+		for(int is=0; is<NSPIN; is++)
+		{
+			for (int ir=0; ir<pw.nrxx; ir++)
+			{
+				sum += chr.rho[is][ir];
+			}
 		}
 	}
-	
-ENDandRETURN:
+		
+//ENDandRETURN:
 	//xiaohui add 'OUT_LEVEL', 2015-09-16
 	if(OUT_LEVEL != "m") OUT(ofs_running, "sum", sum);
 
