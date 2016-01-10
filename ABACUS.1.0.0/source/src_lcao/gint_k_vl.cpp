@@ -42,13 +42,15 @@ inline int find_offset(const int size, const int grid_index,
 		ofs_running << "================ BUG REPORT ===================" << endl;
 		ofs_running << " grid_index = " << grid_index << endl;
 		ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
+    	ofs_running << " find list:"<<endl;
+    	for(int* find=find_start; find < find_end; ++find)
+        	ofs_running << *find << endl;
 		ofs_running << " id2 = " << id2 << endl;
 		ofs_running << " T1=" << ucell.atoms[T1].label << " T2=" << ucell.atoms[T2].label << endl;
 		ofs_running << " size (how many atoms on this grid) = " << size << endl;
 		ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << endl;
 		ofs_running << " iat1=" << iat1 << " iat2=" << iat2 << endl;
 		ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-
 		ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << endl;
 		int bindex = 0;
 		// z is the fastest,
@@ -126,13 +128,14 @@ inline int find_offset(const int size, const int grid_index,
 }
 
 inline void cal_psir_ylm(int size, int grid_index, double delta_r,
-						double*** dr, double** distance, double* ylma,
-						int* at, int* colidx, int* block_iw, int* bsize, 
+						double** distance, double* ylma,
+						int* at, int* block_index, int* block_iw, int* block_size, 
 						bool** cal_flag, double** psir_ylm)
 {
 	const Numerical_Orbital_Lm *pointer;
 	double mt[3];
-	colidx[0]=0;
+	double dr[3];
+	block_index[0]=0;
 	for (int id=0; id<size; id++)
 	{
 		// there are two parameters we want to know here:
@@ -149,8 +152,8 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 		const int start=ucell.itiaiw2iwt(it, ia, 0);
 		block_iw[id]=GridT.trace_lo[start];
 		Atom* atom=&ucell.atoms[it];
-		bsize[id]=atom->nw;
-		colidx[id+1]=colidx[id]+atom->nw;
+		block_size[id]=atom->nw;
+		block_index[id+1]=block_index[id]+atom->nw;
 		// meshball_positions should be the bigcell position in meshball
 		// to the center of meshball.
 		// calculated in cartesian coordinates
@@ -163,17 +166,17 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 
 		for(int ib=0; ib<pw.bxyz; ib++)
 		{
-			double *p=&psir_ylm[ib][colidx[id]];
+			double *p=&psir_ylm[ib][block_index[id]];
 			// meshcell_pos: z is the fastest
-			dr[ib][id][0]=GridT.meshcell_pos[ib][0] + mt[0]; 
-			dr[ib][id][1]=GridT.meshcell_pos[ib][1] + mt[1]; 
-			dr[ib][id][2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
+			dr[0]=GridT.meshcell_pos[ib][0] + mt[0]; 
+			dr[1]=GridT.meshcell_pos[ib][1] + mt[1]; 
+			dr[2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
 
-			distance[ib][id]=std::sqrt(dr[ib][id][0]*dr[ib][id][0] + dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
-			if(distance[ib][id] > ORB.Phi[it].getRcut()) 
+			distance[ib][id]=std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
+			if(distance[ib][id] > (ORB.Phi[it].getRcut()- 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
-				ZEROS(p, bsize[id]);
+				ZEROS(p, block_size[id]);
 				continue;
 			}
 
@@ -184,9 +187,9 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 			
 			Ylm::sph_harm (	ucell.atoms[it].nwl,
-					dr[ib][id][0] / distance[ib][id],
-					dr[ib][id][1] / distance[ib][id],
-					dr[ib][id][2] / distance[ib][id],
+					dr[0] / distance[ib][id],
+					dr[1] / distance[ib][id],
+					dr[2] / distance[ib][id],
 					ylma);
 			// these parameters are about interpolation
 			// because once we know the distance from atom to grid point,
@@ -222,27 +225,13 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 
 inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index, 
 							const int ibx, const int jby, const int kbz,
-							int* bsize, int* at, int* colidx, int* block_iw,
+							int* block_size, int* at, int* block_index, int* block_iw,
 							double* vldr3, double** psir_ylm, double** psir_vlbr3, 
 							double** distance, bool** cal_flag, double* pvpR)
 {
 	char transa='N', transb='T';
 	double alpha=1, beta=1;
-	
-	bool all_out_of_range[size];
-	for(int ia=0; ia<size; ia++)
-	{
-		all_out_of_range[ia] = true;
-		for(int ib=0; ib<GridT.bxyz; ib++)
-		{
-			if(cal_flag[ib][ia])
-			{
-				all_out_of_range[ia] = false;
-			}
-		}
-	}
-	
-	int allnw=colidx[size];
+	int allnw=block_index[size];
 	for(int i=0; i<pw.bxyz; ++i)
 	{
 		for(int j=0; j<allnw; ++j)
@@ -254,9 +243,10 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 	int k=pw.bxyz;
 	for(int ia1=0; ia1<size; ++ia1)
 	{
-		if(all_out_of_range[ia1]) continue;
+		//if(all_out_of_range[ia1]) continue;
 		const int iw1_lo=block_iw[ia1];
-		int m=bsize[ia1];
+		const int idx1=block_index[ia1];
+		int m=block_size[ia1];
 		const int iat1=at[ia1];
 		const int T1 = ucell.iat2it[iat1];
 		const int mcell_index1 = GridT.bcell_start[grid_index] + ia1;
@@ -267,32 +257,25 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 		int* find_end = LNNR.find_R2[iat1] + LNNR.nad[iat1];
 		for(int ia2=0; ia2<size; ++ia2)
 		{
-			if(all_out_of_range[ia2]) continue;
-			//---------------------------------------------
-			// check if we need to calculate the big cell.
-			//---------------------------------------------
-			bool same_flag = false;
-			for(int ib=0; ib<GridT.bxyz; ++ib)
-			{
-				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-				{
-					same_flag = true;
-					break;
-				}
-			}
-			if(!same_flag) continue;
-
 			const int iat2=at[ia2];
 			const int T2 = ucell.iat2it[iat2];
-
 			if (T1 <= T2)
 			{
-				Atom *atom2 = &ucell.atoms[T2];
+    			int cal_num=0;
+    			for(int ib=0; ib<pw.bxyz; ++ib)
+    			{
+    				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+    				    ++cal_num;
+    			}
+
+    			if(cal_num==0) continue;
+    			
+    			const int iw2_lo=block_iw[ia2];
+                const int idx2=block_index[ia2];
+        		int n=block_size[ia2];
 				const int I2 = ucell.iat2ia[iat2];
 				const int mcell_index2 = GridT.bcell_start[grid_index] + ia2;
 				const int id2 = GridT.which_unitcell[mcell_index2];
-				//const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
-				//const int iw2_start = GridT.trace_lo[start2];
 				int offset;
 
 				offset=find_offset(size, grid_index, 
@@ -302,23 +285,36 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 						ia2, iat2, id2, T2, 
 						distance, find_start, find_end);
 
-				const int iatw = DM_start + LNNR.find_R2st[iat1][offset];					
-				const int iw2_lo=block_iw[ia2];
-				
-				if(iw1_lo<=iw2_lo)
-				{
-					int n=bsize[ia2];
-					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
-						&psir_vlbr3[0][colidx[ia2]], &LD_pool, 
-						&psir_ylm[0][colidx[ia1]], &LD_pool,
-						&beta, &pvpR[iatw], &n);
-						
-					//cblas_dgemm (CblasRowMajor, CblasTrans, CblasNoTrans, 
-					//			m, n, k, 1, 
-					//			&psir_ylm[0][colidx[ia1]], LD_pool, 
-					//			&psir_vlbr3[0][colidx[ia2]], LD_pool, 
-					//			1, &pvpR[iatw], atom2->nw);
+				const int iatw = DM_start + LNNR.find_R2st[iat1][offset];	
+
+			    if(cal_num>pw.bxyz/4)
+			    {
+    				if(iw1_lo<=iw2_lo)
+    				{
+    			        k=pw.bxyz;
+    					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
+    						&psir_vlbr3[0][idx2], &LD_pool, 
+    						&psir_ylm[0][idx1], &LD_pool,
+    						&beta, &pvpR[iatw], &n);
+    				}
 				}
+    			else
+    			{
+        			if(iw1_lo<=iw2_lo)
+    				{
+            			for(int ib=0; ib<pw.bxyz; ++ib)
+            			{
+                			if(cal_flag[ib][ia1]&&cal_flag[ib][ia2])
+                			{
+                    			k=1;
+            					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
+            						&psir_vlbr3[ib][idx2], &LD_pool, 
+            						&psir_ylm[ib][idx1], &LD_pool,
+            						&beta, &pvpR[iatw], &n);                    			
+                			}
+            			}
+        			}
+    			}
 			}
 		}
 	}
@@ -362,20 +358,18 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 	const int bxyz = pw.bxyz;
 	const int LD_pool=max_size*ucell.nwmax;
 	
-	double ***dr;// vectors between atom and grid: [bxyz, maxsize, 3]
 	double **distance; // distance between atom and grid: [bxyz, maxsize]
 	double *psir_ylm_pool, **psir_ylm;
 	double *psir_vlbr3_pool, **psir_vlbr3;
 	bool** cal_flag;
 	int *block_iw; // index of wave functions of each block;	
-	int *bsize; //band size: number of columns of a band
+	int *block_size; //band size: number of columns of a band
 	int *at;
-	int *colidx;
+	int *block_index;
 	double* ylma;
 	if(max_size!=0)
 	{
 		// save the small box information for a big box.
-		dr = new double**[bxyz];
 		distance = new double*[bxyz];
 		psir_ylm_pool=new double[bxyz*LD_pool];
 		ZEROS(psir_ylm_pool, bxyz*LD_pool);
@@ -385,9 +379,9 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 		psir_vlbr3=new double *[bxyz];
 		cal_flag = new bool*[bxyz];
 		block_iw=new int[max_size];
-		bsize=new int[max_size];
+		block_size=new int[max_size];
 		at=new int[max_size];
-		colidx=new int[max_size+1];		
+		block_index=new int[max_size+1];		
 
 		// mohan fix bug 2011-05-02
 		// possible number of atom configureation (l,m)
@@ -404,7 +398,6 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 		for(int i=0; i<bxyz; i++)
 		{
 			// possible max atom number in a big box.
-			dr[i] = new double*[max_size];
 			psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
 			psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
 			distance[i] = new double[max_size];
@@ -412,12 +405,6 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 
 			ZEROS(distance[i], max_size);
 			ZEROS(cal_flag[i], max_size);
-
-			for(int j=0; j<max_size; j++)
-			{
-				dr[i][j] = new double[3];
-				ZEROS(dr[i][j],3);
-			}
 		}
 	}
 	
@@ -448,9 +435,8 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 				// get the wave functions in this
 				// grid.
 				//--------------------------------- 
-				cal_psir_ylm(size, grid_index, delta_r,
-						dr, distance, ylma,
-						at, colidx, block_iw, bsize, 
+				cal_psir_ylm(size, grid_index, delta_r, distance, ylma,
+						at, block_index, block_iw, block_size, 
 						cal_flag, psir_ylm);
 
 				int bindex = 0;
@@ -475,7 +461,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 				{
 					cal_pvpR_reduced(size, LD_pool, grid_index, 
 									ibx, jby, kbz, 
-									bsize, at, colidx, block_iw, 
+									block_size, at, block_index, block_iw, 
 									vldr3, psir_ylm, psir_vlbr3, 
 									distance, cal_flag, this->pvpR_reduced);
 				}
@@ -493,15 +479,9 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 	{
 		for(int i=0; i<bxyz; i++)
 		{
-			for(int j=0; j<max_size; j++)
-			{
-				delete[] dr[i][j];
-			}
-			delete[] dr[i];
 			delete[] distance[i];
 			delete[] cal_flag[i];
 		}
-		delete[] dr;
 		delete[] distance;
 		delete[] psir_ylm;
 		delete[] psir_ylm_pool;
@@ -509,8 +489,8 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 		delete[] psir_vlbr3_pool;
 		delete[] cal_flag;
 		delete[] block_iw;
-		delete[] bsize;
-		delete[] colidx;
+		delete[] block_size;
+		delete[] block_index;
 		delete[] ylma;
 	}	
 

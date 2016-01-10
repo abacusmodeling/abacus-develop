@@ -27,14 +27,15 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
 }
 
 
-inline void cal_psir_ylm(int size, int grid_index, double delta_r,
-						double*** dr, double** distance, double* ylma,
-						int* at, int* uc, int* colidx, int* block_iw, int* bsize, 
+inline void cal_psir_ylm(int size, int grid_index, double delta_r, double* ylma,
+						int* at, int* uc, int* block_index, int* block_iw, int* block_size, 
 						bool** cal_flag, double** psir_ylm)
 {
 	const Numerical_Orbital_Lm *pointer;
 	double mt[3];
-	colidx[0]=0;
+	double dr[3];
+	double distance;
+	block_index[0]=0;
 	for (int id=0; id<size; id++)
 	{
 		// there are two parameters we want to know here:
@@ -52,8 +53,8 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 		const int start=ucell.itiaiw2iwt(it, ia, 0);
 		block_iw[id]=GridT.trace_lo[start];
 		Atom* atom=&ucell.atoms[it];
-		bsize[id]=atom->nw;
-		colidx[id+1]=colidx[id]+atom->nw;
+		block_size[id]=atom->nw;
+		block_index[id+1]=block_index[id]+atom->nw;
 		// meshball_positions should be the bigcell position in meshball
 		// to the center of meshball.
 		// calculated in cartesian coordinates
@@ -66,17 +67,17 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 
 		for(int ib=0; ib<pw.bxyz; ib++)
 		{
-			double *p=&psir_ylm[ib][colidx[id]];
+			double *p=&psir_ylm[ib][block_index[id]];
 			// meshcell_pos: z is the fastest
-			dr[ib][id][0]=GridT.meshcell_pos[ib][0] + mt[0]; 
-			dr[ib][id][1]=GridT.meshcell_pos[ib][1] + mt[1]; 
-			dr[ib][id][2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
+			dr[0]=GridT.meshcell_pos[ib][0] + mt[0]; 
+			dr[1]=GridT.meshcell_pos[ib][1] + mt[1]; 
+			dr[2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
 
-			distance[ib][id]=std::sqrt(dr[ib][id][0]*dr[ib][id][0] + dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
-			if(distance[ib][id] > ORB.Phi[it].getRcut()) 
+			distance=std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
+			if(distance > (ORB.Phi[it].getRcut() - 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
-				ZEROS(p, bsize[id]);
+				ZEROS(p, block_size[id]);
 				continue;
 			}
 
@@ -84,18 +85,18 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			
 			//if(distance[id] > GridT.orbital_rmax) continue;
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
-			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
+			if (distance < 1.0E-9) distance += 1.0E-9;
 			
 			Ylm::sph_harm (	ucell.atoms[it].nwl,
-					dr[ib][id][0] / distance[ib][id],
-					dr[ib][id][1] / distance[ib][id],
-					dr[ib][id][2] / distance[ib][id],
+					dr[0] / distance,
+					dr[1] / distance,
+					dr[2] / distance,
 					ylma);
 			// these parameters are about interpolation
 			// because once we know the distance from atom to grid point,
 			// we can get the parameters we need to do interpolation and
 			// store them first!! these can save a lot of effort.
-			const double position=distance[ib][id] / delta_r;
+			const double position=distance / delta_r;
 			const int ip=static_cast<int>(position);
 			const double dx = position - ip;
 			const double dx2 = dx * dx;
@@ -111,9 +112,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			{
 				if ( atom->iw2_new[iw] )
 				{
-					pointer=&ORB.Phi[it].PhiLN(
-							atom->iw2l[iw],
-							atom->iw2n[iw]);
+					pointer=&ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
 					phi=c1*pointer->psi_uniform[ip]+c2*pointer->dpsi_uniform[ip]
 						+ c3*pointer->psi_uniform[ip+1] + c4*pointer->dpsi_uniform[ip+1];
 				}
@@ -123,67 +122,15 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 	}// end id
 }
 
-inline void set_cal_rho(const int size, bool **cal_flag, bool **cal_rho)
-{
-	bool all_out_of_range, same_flag;
-
-	for(int ia1=0; ia1<size; ++ia1)
-	{			
-		for(int ia2=0; ia2<size; ++ia2)
-		{
-			cal_rho[ia1][ia2]=true;
-		}
-	}
-	
-	for(int ia1=0; ia1<size; ++ia1)
-	{			
-		all_out_of_range=true;
-		for(int ib=0; ib<pw.bxyz; ++ib)
-		{
-			if(cal_flag[ib][ia1])
-			{
-				all_out_of_range=false;
-				break;
-			}
-		}
-
-		if(all_out_of_range)
-		{
-			for(int ia2=0; ia2<size; ++ia2)
-			{
-				cal_rho[ia1][ia2]=false;
-				cal_rho[ia2][ia1]=false;
-			}
-		}
-		
-		for(int ia2=0; ia2<size; ++ia2)
-		{
-			same_flag=false;
-			for(int ib=0; ib<pw.bxyz; ++ib)
-			{
-				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
-				{
-					same_flag=true;
-					break;
-				}
-			}
-			if(!same_flag)
-			{
-				cal_rho[ia1][ia2]=false;
-				cal_rho[ia2][ia1]=false;
-			}
-		}
-	}	
-}
-
 inline void cal_band_rho(const int size, const int grid_index, const int LD_pool, 
-                      int* block_iw, int* bsize, int* at, int *uc, int* colidx,
+                      int* block_iw, int* block_size, int* at, int *uc, int* block_index,
                       double ** psir_ylm, double **psir_DM, double* psir_DM_pool, 
-                      int* vindex, bool **cal_rho)
+                      int* vindex, bool** cal_flag)
 {
 	char trans='N';
 	double alpha_diag=1, alpha_nondiag=2, beta=1;
 	int inc=1;
+	int cal_num;
 	
 	int iw1_lo;
 	for(int is=0; is<NSPIN; ++is)
@@ -194,6 +141,7 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 			const int iw1_lo=block_iw[ia1];
 			const int iat1=at[ia1];
 			const int id1=uc[ia1];
+			const int idx1=block_index[ia1];
 			const int R1x = GridT.ucell_index2x[id1];
 			const int R1y = GridT.ucell_index2y[id1];
 			const int R1z = GridT.ucell_index2z[id1];
@@ -201,62 +149,19 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 			int* find_start = LNNR.find_R2[iat1];
 			int* find_end = LNNR.find_R2[iat1] + LNNR.nad[iat1];
 			//ia2==ia1
-			if(cal_rho[ia1][ia1])
+			cal_num=0;
+			for(int ib=0; ib<pw.bxyz; ++ib)
+			{
+    			if(cal_flag[ib][ia1])
+    			    ++cal_num;
+			}
+			if(cal_num>pw.bxyz/4)
 			{
 				//find offset
 				const int dRx=0;
 				const int dRy=0;
 				const int dRz=0;				
 				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat1);
-				int offset = -1;
-					for(int* find=find_start; find < find_end; find++)
-					{
-						//--------------------------------------------------------------
-						// start positions of adjacent atom of 'iat'
-						//--------------------------------------------------------------
-						if( find[0] == index ) 
-						{
-							offset = find - find_start;
-							break;
-						}
-					}
-
-					if(offset == -1)
-					{					
-						cout << "== charge ==========================" << endl;
-						cout << " grid_index = " << grid_index << endl;
-	                    cout << " index = " << index << endl;
-						cout << " size1=" << ia1 << " size2=" << ia1 << endl;
-	                    cout << " iat1=" << iat1 << " iat2=" << iat1 << endl;
-	                    cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-						WARNING_QUIT("gint_k","evaluate_pDMp wrong");
-					}
-					//const int offset=AllOffset[ia1][ia2];
-					assert(offset < LNNR.nad[iat1]);
-					
-					const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];					
-					dgemm_(&trans, &trans, &bsize[ia1], &pw.bxyz, &bsize[ia1], &alpha_diag,
-						&LOC.DM_R[is][DM_start], &bsize[ia1], 
-						&psir_ylm[0][colidx[ia1]], &LD_pool,  
-						&beta, &psir_DM[0][colidx[ia1]], &LD_pool);
-			}
-			//ia2>ia1
-			for (int ia2=ia1+1; ia2<size; ++ia2)
-			{
-				if(!cal_rho[ia1][ia2]) continue;
-				const int iw2_lo=block_iw[ia2];
-				const int iat2=at[ia2];
-				const int T2 = ucell.iat2it[iat2];
-				
-				// find offset
-				const int id2=uc[ia2];
-				const int R2x = GridT.ucell_index2x[id2];
-				const int R2y = GridT.ucell_index2y[id2];
-				const int R2z = GridT.ucell_index2z[id2];
-				const int dRx = R1x - R2x;
-				const int dRy = R1y - R2y;
-				const int dRz = R1z - R2z;
-				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
 				int offset = -1;
 				for(int* find=find_start; find < find_end; find++)
 				{
@@ -269,25 +174,182 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 						break;
 					}
 				}
+
 				if(offset == -1)
 				{					
 					cout << "== charge ==========================" << endl;
 					cout << " grid_index = " << grid_index << endl;
                     cout << " index = " << index << endl;
-					cout << " size1=" << ia1 << " size2=" << ia2 << endl;
-                    cout << " iat1=" << iat1 << " iat2=" << iat2 << endl;
+					cout << " size1=" << ia1 << " size2=" << ia1 << endl;
+                    cout << " iat1=" << iat1 << " iat2=" << iat1 << endl;
                     cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-                    cout << " R1=" << R1x << " " << R1y << " " << R1z << endl;
-                    cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
 					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
-				}				
+				}
+				//const int offset=AllOffset[ia1][ia2];
 				assert(offset < LNNR.nad[iat1]);
+				
+				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];					
+				dgemm_(&trans, &trans, &block_size[ia1], &pw.bxyz, &block_size[ia1], &alpha_diag,
+					&LOC.DM_R[is][DM_start], &block_size[ia1], 
+					&psir_ylm[0][idx1], &LD_pool,  
+					&beta, &psir_DM[0][idx1], &LD_pool);
+			}
+			else if(cal_num>0)
+			{
+				//find offset
+				const int dRx=0;
+				const int dRy=0;
+				const int dRz=0;				
+				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat1);
+				int offset = -1;
+				for(int* find=find_start; find < find_end; find++)
+				{
+					//--------------------------------------------------------------
+					// start positions of adjacent atom of 'iat'
+					//--------------------------------------------------------------
+					if( find[0] == index ) 
+					{
+						offset = find - find_start;
+						break;
+					}
+				}
 
+				if(offset == -1)
+				{					
+					cout << "== charge ==========================" << endl;
+					cout << " grid_index = " << grid_index << endl;
+                    cout << " index = " << index << endl;
+					cout << " size1=" << ia1 << " size2=" << ia1 << endl;
+                    cout << " iat1=" << iat1 << " iat2=" << iat1 << endl;
+                    cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
+					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+				}
+				//const int offset=AllOffset[ia1][ia2];
+				assert(offset < LNNR.nad[iat1]);
+				
 				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
-				dgemm_(&trans, &trans, &bsize[ia2], &pw.bxyz, &bsize[ia1], &alpha_nondiag,
-					&LOC.DM_R[is][DM_start], &bsize[ia2], 
-					&psir_ylm[0][colidx[ia1]], &LD_pool,
-					&beta, &psir_DM[0][colidx[ia2]], &LD_pool);
+				for(int ib=0; ib<pw.bxyz; ++ib					)
+				{
+    				if(cal_flag[ib][ia1])
+    				{
+        				dgemv_(&trans, &block_size[ia1], &block_size[ia1], &alpha_diag,
+					            &LOC.DM_R[is][DM_start], &block_size[ia1], 
+					            &psir_ylm[ib][idx1], &inc,  
+					            &beta, &psir_DM[ib][idx1], &inc);
+    				}
+				}
+			}
+			//ia2>ia1
+			for (int ia2=ia1+1; ia2<size; ++ia2)
+			{			
+			    cal_num=0;
+    			for(int ib=0; ib<pw.bxyz; ++ib)
+    			{
+        			if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+        			    ++cal_num;
+    			}
+				if(cal_num>pw.bxyz/4)
+				{
+    				const int iw2_lo=block_iw[ia2];
+    				const int iat2=at[ia2];
+    				const int T2 = ucell.iat2it[iat2];
+    				
+    				// find offset
+    				const int id2=uc[ia2];
+			        const int idx2=block_index[ia2];
+    				const int R2x = GridT.ucell_index2x[id2];
+    				const int R2y = GridT.ucell_index2y[id2];
+    				const int R2z = GridT.ucell_index2z[id2];
+    				const int dRx = R1x - R2x;
+    				const int dRy = R1y - R2y;
+    				const int dRz = R1z - R2z;
+    				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+    				int offset = -1;
+    				for(int* find=find_start; find < find_end; find++)
+    				{
+    					//--------------------------------------------------------------
+    					// start positions of adjacent atom of 'iat'
+    					//--------------------------------------------------------------
+    					if( find[0] == index ) 
+    					{
+    						offset = find - find_start;
+    						break;
+    					}
+    				}
+    				if(offset == -1)
+    				{					
+    					cout << "== charge ==========================" << endl;
+    					cout << " grid_index = " << grid_index << endl;
+                        cout << " index = " << index << endl;
+    					cout << " size1=" << ia1 << " size2=" << ia2 << endl;
+                        cout << " iat1=" << iat1 << " iat2=" << iat2 << endl;
+                        cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
+                        cout << " R1=" << R1x << " " << R1y << " " << R1z << endl;
+                        cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
+    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    				}				
+    				assert(offset < LNNR.nad[iat1]);
+
+    				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
+    				dgemm_(&trans, &trans, &block_size[ia2], &pw.bxyz, &block_size[ia1], &alpha_nondiag,
+    					&LOC.DM_R[is][DM_start], &block_size[ia2], 
+    					&psir_ylm[0][idx1], &LD_pool,
+    					&beta, &psir_DM[0][idx2], &LD_pool);
+				}
+				else if(cal_num>0)
+				{
+    				const int iw2_lo=block_iw[ia2];
+    				const int iat2=at[ia2];
+    				const int T2 = ucell.iat2it[iat2];
+    				
+    				// find offset
+    				const int id2=uc[ia2];
+    				const int idx2=block_index[ia2];
+    				const int R2x = GridT.ucell_index2x[id2];
+    				const int R2y = GridT.ucell_index2y[id2];
+    				const int R2z = GridT.ucell_index2z[id2];
+    				const int dRx = R1x - R2x;
+    				const int dRy = R1y - R2y;
+    				const int dRz = R1z - R2z;
+    				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+    				int offset = -1;
+    				for(int* find=find_start; find < find_end; find++)
+    				{
+    					//--------------------------------------------------------------
+    					// start positions of adjacent atom of 'iat'
+    					//--------------------------------------------------------------
+    					if( find[0] == index ) 
+    					{
+    						offset = find - find_start;
+    						break;
+    					}
+    				}
+    				if(offset == -1)
+    				{					
+    					cout << "== charge ==========================" << endl;
+    					cout << " grid_index = " << grid_index << endl;
+                        cout << " index = " << index << endl;
+    					cout << " size1=" << ia1 << " size2=" << ia2 << endl;
+                        cout << " iat1=" << iat1 << " iat2=" << iat2 << endl;
+                        cout << " dR=" << dRx << " " << dRy << " " << dRz << endl;
+                        cout << " R1=" << R1x << " " << R1y << " " << R1z << endl;
+                        cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
+    					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
+    				}				
+    				assert(offset < LNNR.nad[iat1]);
+
+    				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
+    				for(int ib=0; ib<pw.bxyz; ++ib					)
+    				{
+        				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
+        				{
+            				dgemv_(&trans, &block_size[ia2], &block_size[ia1], &alpha_nondiag,
+            					&LOC.DM_R[is][DM_start], &block_size[ia2], 
+            					&psir_ylm[ib][idx1], &inc,
+            					&beta, &psir_DM[ib][idx2], &inc);
+        				}
+    				}
+				} // cal_num
 			}// ia2
 		} // ia1
 		
@@ -295,8 +357,7 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 		double *rhop = chr.rho[is];
 		for(int ib=0; ib<pw.bxyz; ++ib)
 		{
-			//double r = cblas_ddot(colidx[size], psir_ylm[ib], 1, psir_DM[ib], 1);
-			double r=ddot_(&colidx[size], psir_ylm[ib], &inc, psir_DM[ib], &inc);
+			double r=ddot_(&block_index[size], psir_ylm[ib], &inc, psir_DM[ib], &inc);
 			const int grid = vindex[ib];
 			rhop[ grid ] += r;
 		}
@@ -312,25 +373,20 @@ void Gint_k::calculate_charge(void)
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
 	const int max_size = GridT.max_atom;
 	
-	double*** dr;// vectors between atom and grid: [bxyz, maxsize, 3]
-	double** distance; // distance between atom and grid: [bxyz, maxsize]
 	double *psir_ylm_pool, **psir_ylm;
 	double *psir_DM_pool, **psir_DM;
 	int *block_iw; // index of wave functions of each block;	
-	int *bsize; //band size: number of columns of a band
+	int *block_size; //band size: number of columns of a band
 	int *at;
 	int *uc;
-	int *colidx;
+	int *block_index;
 	double* ylma;
 	int* vindex;	
 	bool** cal_flag;
-	bool** cal_rho;
 	//int** AllOffset;
 	int LD_pool=max_size*ucell.nwmax;
     if(max_size!=0)
     {
-        dr = new double**[pw.bxyz];
-        distance = new double*[pw.bxyz];
 		psir_ylm_pool=new double[pw.bxyz*LD_pool];
 		ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
 		psir_ylm=new double *[pw.bxyz];
@@ -338,10 +394,10 @@ void Gint_k::calculate_charge(void)
 		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
 		psir_DM=new double *[pw.bxyz];
 		block_iw=new int[max_size];
-		bsize=new int[max_size];
+		block_size=new int[max_size];
 		at=new int[max_size];
 		uc=new int[max_size];
-		colidx=new int[max_size+1];		
+		block_index=new int[max_size+1];		
 
 		// mohan fix bug 2011-05-02
 		int nn = 0;
@@ -359,28 +415,10 @@ void Gint_k::calculate_charge(void)
 
         for(int i=0; i<pw.bxyz; i++)
         {
-            dr[i] = new double*[max_size];
 			psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
 			psir_DM[i]=&psir_DM_pool[i*LD_pool];
-            distance[i] = new double[max_size];
             cal_flag[i] = new bool[max_size];
-
-            ZEROS(distance[i], max_size);
-
-            for(int j=0; j<max_size; j++)
-            {
-                dr[i][j] = new double[3];
-                ZEROS(dr[i][j],3);
-            }
         }
-        
-		//AllOffset=new int *[max_size];
-        cal_rho = new bool*[max_size];
-		for(int i=0; i<max_size; ++i)
-		{
-			//AllOffset[i]=new int[max_size];
-			cal_rho[i]=new bool[max_size];
-		}
     }
 	const int nbx = GridT.nbx;
 	const int nby = GridT.nby;
@@ -403,17 +441,12 @@ void Gint_k::calculate_charge(void)
 				if(size==0) continue;
 				setVindex(ncyz, ibx, jby, kbz, vindex);
 				//timer::tick("Gint_k","cal_psir_ylm",'G');
-				cal_psir_ylm(size, grid_index, delta_r,
-						dr, distance, ylma,
-						at, uc, colidx, block_iw, bsize, 
+				cal_psir_ylm(size, grid_index, delta_r, ylma,
+						at, uc, block_index, block_iw, block_size, 
 						cal_flag, psir_ylm);
 				//timer::tick("Gint_k","cal_psir_ylm",'G');
 
-				//set cal_rho
-				//timer::tick("Gint_k","set_cal_rho",'G');
-				set_cal_rho(size, cal_flag, cal_rho);
-				//timer::tick("Gint_k","set_cal_rho",'G');
-				cal_band_rho(size, grid_index, LD_pool, block_iw, bsize, at, uc, colidx, psir_ylm, psir_DM, psir_DM_pool, vindex, cal_rho);
+				cal_band_rho(size, grid_index, LD_pool, block_iw, block_size, at, uc, block_index, psir_ylm, psir_DM, psir_DM_pool, vindex, cal_flag);
 			}// int k
 		}// int j
 	} // int i
@@ -422,35 +455,20 @@ void Gint_k::calculate_charge(void)
     {
         for(int i=0; i<pw.bxyz; i++)
         {
-            for(int j=0; j<max_size; j++)
-            {
-                delete[] dr[i][j];
-            }
-            delete[] dr[i];
-            delete[] distance[i];
         	delete[] cal_flag[i];
         }
-        delete[] dr;
-        delete[] distance;
 		delete[] psir_ylm;
 		delete[] psir_ylm_pool;
 		delete[] psir_DM;
 		delete[] psir_DM_pool;
 		delete[] block_iw;
-		delete[] bsize;
+		delete[] block_size;
 		delete[] at;
-		delete[] colidx;
+		delete[] block_index;
         delete[] cal_flag;
 
 		delete[] ylma;
 		delete[] vindex;
-		for(int i=0; i<max_size; ++i)
-		{
-			//delete[] AllOffset[i];
-			delete[] cal_rho[i];
-		}
-		//delete[] AllOffset;
-		delete[] cal_rho;
     }	
 
 //	cout << " calculate the charge density from density matrix " << endl;
