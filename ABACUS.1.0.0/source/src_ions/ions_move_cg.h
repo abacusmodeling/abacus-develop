@@ -19,16 +19,15 @@ private:
 	double* pos0;
 	double* grad0;
         double* cg_grad0;
-        //double* cg_gradn;
 	double* move0;
 	double  e0;
-    // setup gradients.
+        // setup gradients.
 	void setup_cg_grad(double *grad, const double *grad0, double *cg_grad, const double *cg_grad0, const int &ncggrad);
 	void setup_move( double *move, double *cg_gradn, const double &trust_radius );
 	void setup_etot_cg(const double &energy_in, const bool sd, const bool trial);
-    void Brent(double &fa,double &fb,double &fc,double &xa,double &xb,double &xc,double &best_x,double &best_e,double &xpt);
-    void f_cal(const double *g0,const double *g1,const int &dim,double &f_value);
-    void third_order(const double &e0,const double &e1,const double &fa, const double &fb, const double x, double &best_x,double &best_e);
+        void Brent(double &fa,double &fb,double &fc,double &xa,double &xb,double &xc,double &best_x,double &xpt);
+        void f_cal(const double *g0,const double *g1,const int &dim,double &f_value);
+        void third_order(const double &e0,const double &e1,const double &fa, const double &fb, const double x, double &best_x);
 };
 
 

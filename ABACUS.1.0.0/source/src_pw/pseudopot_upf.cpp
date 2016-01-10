@@ -5,6 +5,15 @@
 //==========================================================
 #include "../src_pw/output.h"
 #include "pseudopot_upf.h"
+#include <iostream>
+#include <fstream>
+#include <math.h>
+#include <string>
+#include <sstream>
+
+int Number[2];
+
+using namespace std;
 
 Pseudopot_upf::Pseudopot_upf()
 {
@@ -59,7 +68,7 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 	if(global_pseudo_type=="upf")
 	{
 		int info = read_pseudo_upf(ifs);
-	//	this->print_pseudo_upf(ofs_running);
+		this->print_pseudo_upf(ofs_running);
 		return info;
 	}
 
@@ -70,6 +79,13 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 	//	this->print_pseudo_upf(ofs_running);
 		return info;
 	}
+        else if(global_pseudo_type=="upf201")
+        {
+                int info = read_pseudo_upf201(ifs);
+                this->print_pseudo_upf(ofs_running);
+                return info;
+        }
+
 
 
 
@@ -1089,4 +1105,674 @@ void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 	return;
 
 }
+
+
+int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
+{
+    string dummy, word;
+    int i, j, idum, ir, SG15;
+    
+        
+        while (ifs.good())
+        {
+                ifs >> dummy;
+                // We start from PP_Header
+                if(dummy=="<PP_HEADER")
+                {
+                        // Read header
+                        READ_VALUE(ifs, word);   // generated
+                        READ_VALUE(ifs, word);   // author
+                        READ_VALUE(ifs, word);   // date
+                        READ_VALUE(ifs, word);   // comment
+                        ifs >> word;   // element
+                        {
+                             if(word == "element=\"")
+                             {
+                                ifs >> word;
+                                get_char(word);
+                                this->psd = word.substr(0,Number[0]);
+                             }
+                             else
+                             {
+                                get_char(word);
+                                this->psd = word.substr(Number[0]+1,(Number[1]-Number[0]-1)); 
+                             }
+                             //cout << "psd = " << this->psd << endl;
+                        }
+
+                        ifs >> word;   // pseudo_type
+                        //cout << "word = " << word << endl;
+                        {
+                             if(word == "pseudo_type=\"")
+                             {
+                                ifs >> word;
+                                get_char(word);
+                                this->pp_type = word.substr(0,Number[0]);
+                             }
+                             else
+                             {
+                                get_char(word);
+                                this->pp_type = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+                             }
+                             //cout << "pp_type = " << this->pp_type << endl;
+                        }
+
+                             if(pp_type!="NC") 
+                             {
+                                //cout << " pp_type=" << pp_type << endl;
+                                WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
+                             }
+
+                        READ_VALUE(ifs, word);   // relativistic
+                        READ_VALUE(ifs, word);   // is_ultrasoft
+                        READ_VALUE(ifs, word);   // is_paw
+                        READ_VALUE(ifs, word);   // is_coulomb
+                        ifs >> word;   // has_so
+                             string so;
+                             //cout << "word = " << word << endl;
+                             {
+                                  if(word == "has_so=\"")
+                                  {
+                                     ifs >> word;
+                                     get_char(word);
+                                     so = word.substr(0,Number[0]);
+                                  }
+                                  else
+                                  {
+                                     get_char(word);
+                                     so = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+                                  }
+                                  //cout << "so = " << so << endl;
+                              } 
+
+                             if (so == "T")
+                             {
+                                 this->has_so = true;
+                             }
+                             else
+                             {
+                                 this->has_so = false;
+                             }
+
+                        READ_VALUE(ifs, word);   // has_wfc
+                        READ_VALUE(ifs, word);   // has_gipaw
+                        //cout << "word = " << word << endl;
+                        string nlc;
+                        char p[13] = "paw_as_gipaw";
+                        ifs >> word;             // paw_as_gipaw
+                             if(word[0] == p[0])
+                             {
+                                SG15 = 0;
+                                ifs >> word;     // core_correction
+                                //cout << "word = " << word << endl;
+                                if(word == "core_correction=\"")
+                                {
+                                     ifs >> word;
+                                     get_char(word);
+                                     nlc = word.substr(0,Number[0]);
+                                }
+                                else
+                                {
+                                     get_char(word);
+                                     nlc = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+                                }
+             
+                             }
+                             else
+                             {
+                                SG15 = 1;
+                                //cout << "word = " << word << endl;
+                                if(word == "core_correction=\"")
+                                {
+                                     ifs >> word;
+                                     get_char(word);
+                                     nlc = word.substr(0,Number[0]);
+                                }
+                                else
+                                {
+                                     get_char(word);
+                                     nlc = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+                                }
+
+                             }
+
+                             //cout << "nlc = " << nlc << endl;
+
+                             if (nlc == "T")
+                             {
+                                 this->nlcc = true;
+                             }
+                             else
+                             {
+                                 this->nlcc = false;
+                             }
+
+                        READ_VALUE(ifs, word);   // functional
+                        this->dft[0]="SLA";
+                        this->dft[1]="PZ";
+                        this->dft[2]="NOGX";
+                        this->dft[3]="NOGC";
+                        //cout << "word = " << word << endl;
+                        ifs >> word;   // zp
+                        //cout << "word = " << word << endl;
+                        {
+                             if(word == "z_valence=\"")
+                             {
+                                ifs >> word;
+                                get_char(word);
+                                this->zp = atoi(word.substr(0,Number[0]).c_str());
+                             }
+                             else
+                             {
+                                get_char(word);
+                                this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                             }
+                             //cout << "zp = " << this->zp << endl;
+                        }
+
+                        ifs >> word;   // total_psenergy
+                        //cout << "word = " << word << endl;
+                        {
+                             if(word == "total_psenergy=\"")
+                             {
+                                ifs >> word;
+                                get_char(word);
+                                this->etotps = atof(word.substr(0,Number[0]).c_str());
+                             }
+                             else
+                             {
+                                get_char(word);
+                                this->etotps = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                             }
+                             //cout << "etotps = " << this->etotps << endl;
+                        }
+                  
+                        
+                        READ_VALUE(ifs, word);   // wfc_cutoff
+                        //cout << "word = " << word << endl;
+			//	cout << "SG15 = " << SG15 << endl;
+                        if(SG15 == 0)
+                        {
+                           READ_VALUE(ifs, word); // rho_cutoff
+                           //cout << "word1sbsb = " << word << endl;
+                        }
+
+                        ifs >> word;             // lmax
+                        //cout << "word = " << word << endl;
+                        {
+                                if(word == "l_max=\"")
+                                {
+                                     ifs >> word;
+                                     get_char(word);
+                                     this->lmax = atoi(word.substr(0,Number[0]).c_str());
+                                }
+                                else
+                                {
+                                     get_char(word);
+                                     this->lmax = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                }
+
+                        }
+
+                        //cout << "lmax = " << this->lmax << endl;
+
+                        if(SG15 == 0)
+                        {
+                           READ_VALUE(ifs, word);   // l_max_rho
+                        }
+
+                        READ_VALUE(ifs, word);   // l_local
+
+                        ifs >> word;   // mesh_size
+                        //cout << "word = " << word << endl;
+                        {
+                             if(word == "mesh_size=\"")
+                             {
+                                     ifs >> word;
+                                     get_char(word);
+                                     this->mesh = atoi(word.substr(0,Number[0]).c_str());
+                             }
+                             else
+                             {
+                                     get_char(word);
+                                     this->mesh = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                             }
+                             //cout << "mesh = " << this->mesh << endl;
+                        }
+ 
+
+
+                        ifs >> word;  // number_of_wfc
+                        //cout << "word = " << word << endl;
+                        {
+                             if(word == "number_of_wfc=\"")
+                             {
+                                     ifs >> word;
+                                     get_char(word);
+                                     this->nwfc = atoi(word.substr(0,Number[0]).c_str());
+
+                             }
+                             else
+                             {
+                                     get_char(word);
+                                     this->nwfc = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                             }
+                             //cout << "nwfc = " << this->nwfc << endl;
+                        }
+                             
+                        ifs >> word;   // number_of_proj
+                        //cout << "word = " << word << endl;
+                        {
+                             if(word == "number_of_proj=\"")
+                             {
+                                     ifs >> word;
+                                     get_char(word);
+                                     this->nbeta = atoi(word.substr(0,Number[0]).c_str());
+
+                             }
+                             else
+                             {
+                                     get_char(word);
+                                     this->nbeta = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                             }
+                             //cout << "nbeta = " << this->nbeta << endl;
+                        }
+                        
+
+                        // READ Mesh
+                        if(SG15 == 0)
+                        {
+                           SCAN_BEGIN(ifs, "<PP_MESH");
+                        }
+                        else
+                        {
+                           SCAN_BEGIN(ifs, "<PP_MESH>");
+                        }
+    
+                        assert(mesh>0);
+                        if(SG15 == 0)
+                        {
+                           ifs >> word;             // dx
+                           ifs >> word;             // mesh
+                           ifs >> word;             // xmin
+                           ifs >> word;             // rmax
+                           ifs >> word;             // zmesh
+                        }
+
+                        SCAN_BEGIN(ifs, "<PP_R"); 
+                        READ_VALUE(ifs, word);    // type  size  columns
+                 
+                        delete[] r;
+                        delete[] rab;
+                        this->r = new double[mesh];
+                        this->rab = new double[mesh];
+                        ZEROS(r,mesh);
+                        ZEROS(rab,mesh);
+
+
+                        for (ir = 0;ir < mesh;ir++)
+                        {
+                             ifs >> this->r[ir];
+                        }
+                        SCAN_END(ifs, "</PP_R>");
+
+                        SCAN_BEGIN(ifs, "<PP_RAB");
+                        READ_VALUE(ifs, word);    // type size columns
+
+                        for (ir = 0;ir < mesh;ir++)
+                        {
+                             ifs >> this->rab[ir];
+                        }
+                        SCAN_END(ifs, "</PP_RAB>");
+                        SCAN_END(ifs, "</PP_MESH>");
+
+                        // READ NLCC
+                        if (this->nlcc)
+                        {
+                            SCAN_BEGIN(ifs, "<PP_NLCC");
+                            READ_VALUE(ifs, word);    // type size columns
+                            
+                            assert(mesh>0);
+                            delete[] rho_atc;
+                            this->rho_atc = new double[mesh];
+                            ZEROS(rho_atc, mesh);
+                            for (ir = 0;ir < mesh;ir++)
+                            {
+                                 ifs >> this->rho_atc[ir];
+                            }
+                            SCAN_END(ifs, "</PP_NLCC>");
+
+                        }
+
+                        // READ VLOCAL
+                        SCAN_BEGIN(ifs, "<PP_LOCAL");
+                        READ_VALUE(ifs, word);    // type size columns
+                        
+                        assert(mesh>0);
+                        delete[] vloc;
+                        this->vloc = new double[mesh];
+                        ZEROS(vloc, mesh);
+
+                        for (ir = 0;ir < mesh;ir++)
+                        {
+                             ifs >> this->vloc[ir];
+                        }
+
+                        SCAN_END(ifs, "</PP_LOCAL>");
+
+                        // READ NONLOCAL
+                        SCAN_BEGIN(ifs, "<PP_NONLOCAL>");
+
+                        delete[] kkbeta;
+                        delete[] lll;
+                        this->kkbeta = new int[nbeta];
+                        this->lll = new int[nbeta];
+                        this->beta.create(nbeta , mesh);
+                        this->dion.create(nbeta , nbeta);
+
+                        for(i=0;i<nbeta;i++)
+                        {
+                            ifs >> word;  //number
+                            ifs >> word;  //type
+                            //cout << "word = " << word << endl;
+                                 if(word == "type=\"")
+                                 {
+                                    ifs >> word;
+                                 }
+                            ifs >> word;  //size
+                            //cout << "word = " << word << endl;
+                                 if(word == "size=\"")
+                                 {
+                                    ifs >> word;
+                                 }
+
+                            ifs >> word;  //columns
+                            //cout << "word = " << word << endl;
+                                 if(word == "columns=\"")
+                                 {
+                                    ifs >> word;
+                                 }
+
+                            ifs >> word;  //index
+                            //cout << "word = " << word << endl;
+                            {
+                                 if(word == "index=\"")
+                                 {
+                                     ifs >> word;
+                                     get_char(word);
+                                     idum = atoi(word.substr(0,Number[0]).c_str());
+                                 }
+                                 else
+                                 {
+                                     get_char(word);
+                                     idum = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                 }
+                                 //cout << "idum = " << idum << endl;
+                            }
+  
+                            if(SG15 == 0)
+                            {
+                               ifs >> word;  //label
+                            }
+
+                            ifs >> word;  //angular_momentum
+                            //cout << "word = " << word << endl;
+                            {
+                                 if(word == "angular_momentum=\"")
+                                 {
+                                    ifs >> word;
+                                    get_char(word);
+                                    this->lll[i] = atoi(word.substr(0,Number[0]).c_str());
+            
+                                 }
+                                 else
+                                 {
+                                    get_char(word);
+                                    this->lll[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                 }
+                                 //cout << "lll[i] = " << this->lll[i] << endl;
+                            }
+
+                            ifs >> word;  //cutoff_radius_index
+                            //cout << "word = " << word << endl;
+                            {
+                                 if(word == "cutoff_radius_index=\"")
+                                 {
+                                    ifs >> word;
+                                    get_char(word);
+                                    this->kkbeta[i] = atoi(word.substr(0,Number[0]).c_str());
+
+                                 }
+                                 else
+                                 {
+                                    get_char(word);
+                                    this->kkbeta[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                 }
+                                 //cout << "kkbeta[i] = " << this->kkbeta[i] << endl;
+                            }
+  
+                            if(SG15 ==0) 
+                            {
+                               ifs >> word;  //cutoff_radius
+                               ifs >> word;  //ultrasoft_cutoff_radius
+                            }
+                            else
+                            {
+                                READ_VALUE(ifs, word);
+                            }
+
+                            for (ir=0;ir<mesh;ir++)
+                            {
+                                ifs >> this->beta(i, ir);
+
+                            }
+       
+                            ifs >> word;  //number
+                            //cout << "word = " << word << endl;
+
+                        }
+                        
+                        // READ DIJ
+                        SCAN_BEGIN(ifs, "<PP_DIJ");
+                        READ_VALUE(ifs, word);  // type size columns
+                        
+                        this->nd = nbeta * nbeta;
+                        for(i=0;i<nbeta;i++)
+                            for(j=0;j<nbeta;j++)
+                            {
+                                ifs >> dion(i,j);
+                            }
+                        SCAN_END(ifs, "</PP_DIJ>");
+
+                        SCAN_END(ifs, "</PP_NONLOCAL>");
+
+                        // READ PSWFC
+                        SCAN_BEGIN(ifs, "<PP_PSWFC>");
+
+                        delete[] els;
+                        delete[] lchi;
+                        delete[] oc;
+                        this->els = new string[nwfc];
+                        this->lchi = new int[nwfc];
+                        this->oc = new double[nwfc];
+                        ZEROS(lchi, nwfc); // angular momentum of each orbital
+                        ZEROS(oc, nwfc);//occupation of each orbital
+
+                        this->chi.create(this->nwfc, this->mesh);
+                        for (i=0;i<nwfc;i++)
+                        {
+                             ifs >> word;  // number
+                             ifs >> word;  // type
+                             ifs >> word;  // size 
+                             ifs >> word;  // columns
+                             ifs >> word;  // index
+                             ifs >> word;  // label
+                             //cout << "word = " << word << endl;
+                             {
+                                  get_char(word);
+                                  els[i] = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+                                  //cout << "els[i] = " << els[i] << endl;
+                              }
+
+                             ifs >> word;  // l
+                             //cout << "word = " << word << endl;
+                             {
+                                  get_char(word);
+                                  lchi[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                  //cout << "lchi[i] = " << lchi[i] << endl;
+                             }
+                      
+                             ifs >> word;  // occupation
+                             //cout << "word = " << word << endl;
+                             {
+                                  get_char(word);
+                                  oc[i] = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                  //cout << "oc[i] = " << oc[i] << endl;
+                             }
+                             
+
+                             ifs >> word; // n
+                             ifs >> word; // pseudo_energy
+                             ifs >> word; // cutoff_radius
+                             ifs >> word; // ultrasoft_cutoff_radius
+
+                             for (ir = 0;ir < mesh;ir++)
+                             {
+                                  ifs >> this->chi(i, ir);
+                             }
+                             ifs >> word;  // number
+                        }
+
+                        SCAN_END(ifs, "</PP_PSWFC>");
+
+                        // READ RHOATOM
+                        SCAN_BEGIN(ifs, "<PP_RHOATOM");
+                        READ_VALUE(ifs, word); // type size columns
+    
+                        delete[] rho_at;
+                        this->rho_at = new double[mesh];
+                        ZEROS(rho_at, mesh);
+
+                        for (ir = 0;ir < mesh;ir++)
+                        {
+                             ifs >> this->rho_at[ir];
+                        }
+                        SCAN_END(ifs, "</PP_RHOATOM>");
+
+
+                        SCAN_END(ifs, "</UPF>");
+                        break;
+                }
+        }
+    return 0;
+}
+
+
+
+void Pseudopot_upf::get_char( string ss)
+{
+    int i, q;
+    char b[1];
+    q =0;
+    strcpy(b,"\"");
+
+    for(i=0;i<200;i++)
+    {
+        if(ss[i]== b[0])
+        {
+           Number[q] = i;
+           q++;
+        }
+
+    }
+
+    return;
+}
+
+/*string Pseudopot_upf::get_string( char ss[])
+{
+    int n[2], i, q;
+    char b[1], ssss[200];
+    string sss;
+    q =0;
+    strcpy(b,"\"");
+
+    for(i=0;i<200;i++)
+    {
+        if(ss[i]== b[0])
+        {
+           n[q] = i;
+           q++;
+        }
+
+    }
+
+    for(i=0;i<(n[1]-n[0]-1);i++)
+    {
+
+        ssss[i] = ss[(n[0]+i+1)];
+    }
+    cout << "ssss = " << ssss << endl;
+    sss.assign(ssss);
+    cout << "sss = " << sss << endl;
+    return sss;
+
+}
+
+int Pseudopot_upf::get_int( char ss[])
+{
+    int n[2], i, q, m;
+    char b[1],sss[200];
+    q =0;
+    strcpy(b,"\"");
+
+    for(i=0;i<200;i++)
+    {
+        if(ss[i]== b[0])
+        {
+           n[q] = i;
+           q++;
+        }
+
+    }
+
+    for(i=0;i<(n[1]-n[0]-1);i++)
+    {
+
+        sss[i] = ss[(n[0]+i+1)];
+    }
+    m = atoi(sss);
+
+    return m;
+
+}
+
+double Pseudopot_upf::get_double( char ss[])
+{
+    int n[2], i, q;
+    double l;
+    char b[1],sss[200];
+    q =0;
+    strcpy(b,"\"");
+
+    for(i=0;i<200;i++)
+    {
+        if(ss[i]== b[0])
+        {
+           n[q] = i;
+           q++;
+        }
+
+    }
+
+    for(i=0;i<(n[1]-n[0]-1);i++)
+    {
+
+        sss[i] = ss[(n[0]+i+1)];
+    }
+    l = atof(sss);
+
+    return l;
+
+}*/
 

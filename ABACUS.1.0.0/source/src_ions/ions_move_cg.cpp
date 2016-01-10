@@ -27,7 +27,6 @@ Ions_Move_CG::Ions_Move_CG()
 	this->pos0 = new double[1];
 	this->grad0 = new double[1];
 	this->cg_grad0 = new double[1];
-        //this->cg_gradn = new double[1];
  	this->move0 = new double[1];
 }
 
@@ -36,7 +35,6 @@ Ions_Move_CG::~Ions_Move_CG()
 	delete[] pos0;
 	delete[] grad0;
 	delete[] cg_grad0;
-        //delete[] cg_gradn;
 	delete[] move0;
 }
 
@@ -47,17 +45,14 @@ void Ions_Move_CG::allocate(void)
 	delete[] pos0;
 	delete[] grad0;
 	delete[] cg_grad0;
-        //delete[] cg_gradn;
 	delete[] move0;
 	this->pos0 = new double[dim];
 	this->grad0 = new double[dim];
 	this->cg_grad0 = new double[dim];
-        //this->cg_gradn = new double[dim];
 	this->move0 = new double[dim];
 	ZEROS(pos0, dim);
 	ZEROS(grad0, dim);
 	ZEROS(cg_grad0, dim);
-        //ZEROS(cg_gradn, dim);
 	ZEROS(move0, dim);
 	this->e0 = 0.0;
 }
@@ -70,7 +65,6 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 	assert(pos0!=0);
 	assert(grad0!=0);
 	assert(cg_grad0!=0);
-        //assert(cg_gradn!=0);
 	assert(move0!=0);
 
 	static bool sd = true;                     // sd , trial are two parameters, when sd=trial=true ,a new direction begins, when sd = false trial =true 
@@ -78,7 +72,6 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
         static int ncggrad = 0;                    // minimum point in this direction.
 	static double fa,fb,fc;                    // ncggrad is a parameter to control the cg method , every ten cg direction , we change the direction back to
 	static double xa,xb,xc,xpt,steplength,fmax;  // the steepest descent method
-	double x_in;
         static int nbrent = 0;
 
 	double* pos = new double[dim];
@@ -86,7 +79,6 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
         double* cg_gradn = new double[dim];
 	double* move =new double[dim];
 	double* cg_grad = new double[dim];
-        double best_e;
 	double best_x;
         double fmin;
 
@@ -113,7 +105,6 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
         if(!(sd == true && trial == true && istep != 1))
         Ions_Move_Basic::check_converged(grad);
     
-        //cout << "converged = " << Ions_Move_Basic::converged <<endl;
         if(Ions_Move_Basic::converged)
         {
                 Ions_Move_Basic::terminate();
@@ -121,15 +112,13 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 
         else
         {
-	if(sd)
-	{
+	    if(sd)
+	    {
 	        e0=etot_in;
 
     		setup_cg_grad( grad, grad0, cg_grad, cg_grad0, ncggrad);      // we use the last direction ,the last grad and the grad now to get the direction now
                 ncggrad ++;
 
-
-                //cout << " steplength= " << steplength << endl;
                 double norm = 0.0;
                 for(int i=0; i<dim; ++i)
                 {
@@ -153,11 +142,10 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
                      cg_grad0[i] = cg_grad[i];
                 }
 
-        f_cal(move0,move0,dim,xb);                   // xb = trial steplength
-        f_cal(move0,grad,dim,fa);                    // fa is the projection force in this direction
-        //cout << "fa= " << fa << endl;
-        //cout << "mmm=" << Ions_Move_Basic::largest_grad * Ry_to_eV << endl;
-        fmax=fa;
+                f_cal(move0,move0,dim,xb);                   // xb = trial steplength
+                f_cal(move0,grad,dim,fa);                    // fa is the projection force in this direction
+        
+                fmax=fa;
 		sd=false;
 
                 if(MOVE_IONS=="cg_bfgs")
@@ -166,40 +154,31 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
                      {
                          MOVE_IONS="bfgs";
                       }
-          //            cout <<"CG_THRESHOLD="<< CG_THRESHOLD <<endl;
 
                       Ions_Move_Basic::best_xxx = steplength;
+                }
 
-                     // cout<<"best_xxx="<<" "<<Ions_Move_Basic::best_xxx<<endl;
-                      
-               }
-
-	}
+	    }
 
 
-	else
-	{
-
-	    if(trial)
+	    else
 	    {
+
+	        if(trial)
+	        {
 			double e1 = etot_in;
 
                         f_cal(move0,grad,dim,fb);
-                        //fb=fb * Ry_to_eV;
-          //              cout << "fb=" << fb <<endl;
                         f_cal(move0,move0,dim,xb);
                         
-                       if((abs(fb)<abs((fa)/10.0)))
-                       {
+                        if((abs(fb)<abs((fa)/10.0)))
+                        {
                             sd=true;
                             trial=true;
                             steplength=xb;
-            //                cout << "steplength= " <<steplength <<endl;
                             goto CG_begin;
-                       }
-
-
-
+                        }
+                        
                         double norm = 0.0;
                         for(int i=0; i<dim; ++i)
                         {
@@ -216,97 +195,76 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
                         }
 
 
-                        third_order(e0,e1,fa,fb,xb,best_x, best_e);   // cubic interpolation
-              //          cout << "best_x= " << best_x <<endl;
+                        third_order(e0,e1,fa,fb,xb,best_x);   // cubic interpolation
                         if ( best_x > 6 * xb || best_x < (-xb))
                         {
                              best_x = 6 * xb;
                         } 
 
 
-                             setup_move(move, cg_gradn, best_x);
+                        setup_move(move, cg_gradn, best_x);
                                              
-                             Ions_Move_Basic::move_atoms(move, pos);
+                        Ions_Move_Basic::move_atoms(move, pos);
 
-			     trial=false;
+		        trial=false;
 
-                             xa=0;
+                        xa=0;
 
-                             f_cal(move0,move,dim,xc);
+                        f_cal(move0,move,dim,xc);
 
-                             xc=xb+xc;
+                        xc=xb+xc;
 
-                             xpt=xc;
-                //             cout <<"xa= "<<xa <<"xb= "<<xb<<"xc= "<<xc <<"xpt= "<< xpt <<endl;
-	  }
-	  else
-	  {
+                        xpt=xc;
+	        }
+	        else
+	        {
                         double xtemp,ftemp;
                         f_cal(move0,grad,dim,fc);
-                        //fc=fc * Ry_to_eV;
-                  //      cout << "fc=" <<fc <<endl;
-           
-                    //   cout << "fmax= " <<fmax <<endl;
             
-                       fmin = abs(fc);
-                      // cout << "fmin= " << fmin <<endl;
-                       nbrent++;
-                       //cout << "nbrent = "<<nbrent<<endl;
-		       if(/*((xb-xa)<(steplength/10.0))||((xc-xb)<(steplength/10.0)) ||*/(abs(fmin)<abs((fmax)/10.0)) || (nbrent >3) )
-                       {
+                        fmin = abs(fc);
+                        nbrent++;
+		        if((abs(fmin)<abs((fmax)/10.0)) || (nbrent >3) )
+                        {
                             nbrent=0;
                             sd=true;
                             trial=true;
                             steplength=xpt;
-                         //   cout << "steplength= " <<steplength <<endl;
 	               	    goto CG_begin;
-                       }
-                       else
-                       {
-                
-                           //cout << "fa = " << fa << " fb =" << fb << " fc= " << fc << " xa = " << xa << " xb = " << xb << " xc = " << xc  << " xpt = " << xpt << endl;
-                            
-                            Brent(fa,fb,fc,xa,xb,xc,best_x,best_e,xpt);  //Brent method
-
-                           //cout << "fa = " << fa << " fb =" << fb << " fc= " << fc << " xa = " << xa << " xb = " << xb << " xc = " << xc << " best_x = " << best_x << " best_e = " <<best_e << " xpt = " << xpt << endl; 
-                        double norm = 0.0;
-                        for(int i=0; i<dim; ++i)
-                        {
-                                   norm += pow( cg_grad0[i], 2 );
                         }
-                                   norm = sqrt(norm);
-
-                        if(norm!=0.0)
+                        else
                         {
+                            Brent(fa,fb,fc,xa,xb,xc,best_x,xpt);  //Brent method
+                        
+                            double norm = 0.0;
+                            for(int i=0; i<dim; ++i)
+                            {
+                                   norm += pow( cg_grad0[i], 2 );
+                            }
+                            norm = sqrt(norm);
+
+                            if(norm!=0.0)
+                            {
                                     for(int i=0; i<dim; ++i)
                                     {
                                         cg_gradn[i] = cg_grad0[i]/norm;
                                     }
-                        }
+                            }
 
                             setup_move(move, cg_gradn, best_x);
 
                             Ions_Move_Basic::move_atoms(move, pos);
-                      }
+                        }
 
-	  }
-     }
-     }
+	        }
+           }
+      }
 
-
-     for(int ct=0;ct<dim;ct++)
-     {
-            x_in+=move[ct]*move[ct];
-     }
-
-     x_in=sqrt(x_in);
-
-     delete[] cg_grad;
-     delete[] grad;
-     delete[] cg_gradn;
-     delete[] pos;
-     delete[] move;
-     return;
+      delete[] cg_grad;
+      delete[] grad;
+      delete[] cg_gradn;
+      delete[] pos;
+      delete[] move;
+      return;
 }
 
 void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_grad, const double *cg_grad0, const int &ncggrad)
@@ -321,11 +279,9 @@ void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_g
         {
             cg_grad[i] = grad[i];
         }
-   //     cout << " enter sd " <<endl;
     }
     else
     {
-   //     cout << " enter cg " <<endl;
 	double gp_gp =0.0;//grad_p.grad_p
         double gg = 0.0; //grad.grad
         double g_gp = 0.0;//grad_p.grad
@@ -339,8 +295,6 @@ void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_g
             cgp_gp += cg_grad0[i] * grad0[i];
             cgp_g += cg_grad0[i] * grad[i];
         }
-        // cout << "gp_gp = " <<gp_gp << "gg = " <<gg <<"g_gp = "<<g_gp<<endl;
-        // cout << "cgp_gp = " <<cgp_gp <<"cgp_g = " << cgp_g <<endl;
 
         assert( g_gp != 0.0 );
         const double gamma1 = gg/gp_gp;                       //FR
@@ -348,13 +302,6 @@ void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_g
         const double gamma2 = (gg - g_gp)/ gp_gp;             //PRP
         //const double gamma = gg/cgp_gp;                      //D
         //const double gamma = -gg/(cgp_g - cgp_gp);             //D-Y
-        /*for (int i=0;i<dim;i++ )
-        {
-             cout << "grad0"<<" "<<i<<"="<<grad0[i]<<endl;
-             cout << "grad"<<" "<<i<<"="<<grad[i]<<endl; 
-        }*/
-        //cout << "gamma1 = "<<gamma1<<endl;
-        //cout << "gamma2 = "<<gamma2<<endl;
         if ( gamma1 < 0.5 )
         {
              gamma = gamma1;
@@ -364,9 +311,6 @@ void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_g
              gamma = gamma2;
         }
         
-        // cout << "g_gp = "<<g_gp <<endl;
-        //const double gamma = 0;
-        //cout << "Gamma = "<<gamma <<endl;
         for (int i=0;i<dim;i++)
         {
             // we can consider step as modified gradient.
@@ -374,64 +318,22 @@ void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_g
         }
     }
 
-
-	// normalize
-	/*double norm = 0.0;
-	for(int i=0; i<dim; ++i)
-	{
-		norm += pow( cg_grad[i], 2 );
-	}
-	norm = sqrt(norm);
-
-	if(norm!=0.0)
-	{
-		for(int i=0; i<dim; ++i)
-		{
-			cg_gradn[i] = cg_grad[i]/norm;
-		}
-	}*/
-        cg0_cg0 = 0.0;
-        for (int i=0;i<dim;i++)
-        {
-                cg0_cg0 += cg_grad0[i] * cg_grad0[i];
-        }
-
-        cg0_g =0.0;
-        for (int i=0;i<dim;i++)
-        {
-                cg0_g += cg_grad0[i] * grad[i];
-        }
-        
-        cg0_cg = 0.0;
-        for (int i=0;i<dim;i++)
-        {
-                cg0_cg += cg_grad0[i] * cg_grad[i];
-        }
-        // cout << "cg0_cg = " << cg0_cg <<" cg0_g =  " << cg0_g<<" cg0_cg0 = "<<cg0_cg0<<endl;
     return;
 }
 
-void Ions_Move_CG::third_order(const double &e0,const double &e1,const double &fa, const double &fb, const double x, double &best_x,double &best_e)
+void Ions_Move_CG::third_order(const double &e0,const double &e1,const double &fa, const double &fb, const double x, double &best_x)
 {
 	double k3,k2,k1;
 	double dmoveh,dmove1,dmove2,dmove,ecal1,ecal2;
 
-        //cout << "e0 = "<<e0<<" e1 = "<<e1<<" fa = "<<fa<<" fb = "<<fb<<endl;
 	k3=3*((fb+fa)*x-2*(e1-e0))/(x*x*x);
 	k2=(fb-fa)/x-k3*x;
 	k1=fa;
         
-        //cout <<"  k3 = " <<k3<<" k2 = " <<k2<<" k1 = " <<k1<<endl;
-
-
         dmoveh=x*fb/(fa-fb);
             dmove1=-k2*(1-sqrt(1-4*k1*k3/(k2*k2)))/(2*k3);
-          //  cout << "dmove1 = " <<(dmove1-x)<<endl;
             dmove2=-k2*(1+sqrt(1-4*k1*k3/(k2*k2)))/(2*k3);
-           // cout << "dmove2 = " <<(dmove2-x)<<endl;
 
-
-         //cout << "dmoveh = " <<dmoveh<<endl;
 
 	if((abs(k3/k1)<0.01)||((k1*k3/(k2*k2))>=0.25))   //this condition may be wrong
         {
@@ -441,42 +343,25 @@ void Ions_Move_CG::third_order(const double &e0,const double &e1,const double &f
 
         else
         {
-            /*if ( ((fa*fb)<0) || ((e0>e1)&&(abs(fa)>abs(fb))) )
-            {
-               dmove=dmoveh;
-            }
-            else
-            {*/
             dmove1=-k2*(1-sqrt(1-4*k1*k3/(k2*k2)))/(2*k3);
-           // cout << "dmove1 = " <<(dmove1-x)<<endl;
             dmove2=-k2*(1+sqrt(1-4*k1*k3/(k2*k2)))/(2*k3);
-            //cout << "dmove2 = " <<(dmove2-x)<<endl;
             ecal1=k3*dmove1*dmove1*dmove1/3+k2*dmove1*dmove1/2+k1*dmove1;
-            //cout << "ecal1 = " <<ecal1<<endl;
             ecal2=k3*dmove2*dmove2*dmove2/3+k2*dmove2*dmove2/2+k1*dmove2;
-            //cout << "ecal2 = " <<ecal2<<endl;
             if(ecal2>ecal1) 
                  dmove=dmove1-x;
             else 
                  dmove=dmove2-x;
-            //}
-            //if((dmove>(2*dmoveh))||(dmoveh>(2*dmove))||((fa*fb>0)&&(dmove<0))||((fa*fb<0)&&(dmove>0)))
-            //{
-            //     dmove=dmoveh;
-           // }*/
-            if ( k3 < 0 )
-                 dmove = dmoveh;
+            
+            if( k3 < 0 )
+                dmove = dmoveh;
        }
-
-	//xiaohui add 2014-02-20, test dmove
-	 //cout<<"dmove: "<<dmove<<endl;
 
        best_x=dmove;
 
        return;
 }
 
-void Ions_Move_CG::Brent(double &fa,double &fb,double &fc,double &xa,double &xb,double &xc,double &best_x,double &best_e,double &xpt)
+void Ions_Move_CG::Brent(double &fa,double &fb,double &fc,double &xa,double &xb,double &xc,double &best_x,double &xpt)
 {
     double dmove;
     double tmp;
@@ -501,7 +386,6 @@ void Ions_Move_CG::Brent(double &fa,double &fb,double &fc,double &xa,double &xb,
          k2=-((fb-fc)/(xb-xc)-(fa-fc)/(xa-xc))/(xa-xb);
          k1=(fa-fc)/(xa-xc)-k2*(xa+xc);
          k0=fa-k1*xa-k2*xa*xa;
-         //cout << " k2 = " << k2 <<" k1= " << k1 << " k0= " << k0 << endl;
          xnew1=(-k1-sqrt(k1*k1-4*k2*k0))/(2*k2);
          xnew2=(-k1+sqrt(k1*k1-4*k2*k0))/(2*k2);
 

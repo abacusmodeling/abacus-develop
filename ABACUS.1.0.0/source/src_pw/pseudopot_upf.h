@@ -88,7 +88,7 @@ private:
 
 	int read_pseudo_upf(ifstream &ifs);
 	int read_pseudo_vwr(ifstream &ifs);
-
+        int read_pseudo_upf201(ifstream &ifs);
 	void read_pseudo_header(ifstream &ifs);
 	void read_pseudo_mesh(ifstream &ifs);
 	void read_pseudo_nlcc(ifstream &ifs);
@@ -97,7 +97,10 @@ private:
 	void read_pseudo_pswfc(ifstream &ifs);
 	void read_pseudo_rhoatom(ifstream &ifs);
 	void read_pseudo_addinfo(ifstream &ifs);
-
+        //string get_string( char ss[]);
+        //int get_int( char ss[]);
+        //double get_double( char ss[]);
+        void get_char( string ss);
 };
 
 #endif //pseudopot_upf class
