@@ -269,7 +269,18 @@ void Forces::print(const string &name, const matrix &f, bool ry)
 				ofs_running << endl;
 			}
 
-			if(TEST_FORCE)
+			if(TEST_FORCE && ry)
+			{
+				cout << " " << setw(8) << ss.str();
+				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0);
+				else cout << setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) cout << setw(15) << f(iat,1);
+				else cout << setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) cout << setw(15) << f(iat,2);
+				else cout << setw(15) << "0";
+				cout << endl;
+			}
+			else if (TEST_FORCE)
 			{
 				cout << " " << setw(8) << ss.str();
 				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0)*fac;
@@ -701,6 +712,34 @@ void Forces::cal_force_nl(void)
 							//cf[iat*3+ipol] += ps * fac * dbb;
 						}
 					}
+
+					//if ( ucell.atoms[it].nbeta > ucell.atoms[it].lmax+1 )    //{zws add 20160110
+					//{
+					//cout << " \n multi-projector force calculation ... " << endl;
+					for (int ip=0; ip<Nprojs; ip++)
+					{
+						const int inkb = sum + ip;
+						//for (int ip2=0; ip2<Nprojs; ip2++)
+						for (int ip2=ip+1; ip2<Nprojs; ip2++)
+						{
+						//if ( ip != ip2 )
+						//{
+							const int jnkb = sum + ip2;
+							double ps = ppcell.deeq(CURRENT_SPIN, iat, ip2, ip) ;
+
+							for (int ipol=0; ipol<3; ipol++)
+							{
+								const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib)
+										+ dbecp( jnkb, ib, ipol) * conj(becp( inkb, ib) ) ).real();
+								//const double dbb = ( conj( dbecp( inkb, ib, ipol) ) * becp( jnkb, ib) ).real();
+								forcenl(iat, ipol) = forcenl(iat, ipol) - ps * fac * dbb;
+								//cf[iat*3+ipol] += ps * fac * dbb;
+							}
+						//}
+						}
+					}
+					//}    //}zws add 20160110
+
 					++iat;
 					sum+=Nprojs;
 				}
