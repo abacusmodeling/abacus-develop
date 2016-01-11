@@ -295,15 +295,18 @@ void DC_Driv::reading(void)
 
 				cout << setw(12) << ucell.atoms[it].na;
 
-				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31
-				{
-					cout << setw(12) << "PZ-LDA";
-				}
-				else
-				{
-					//cout << setw(12) << ucell.atoms[it].dft[0];
-                                        cout << setw(12) << "PBE";
-				}
+//				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
+//				{
+//					//cout << setw(12) << "PZ-LDA";
+//
+//				}
+//				else
+//				{
+//					//cout << setw(12) << ucell.atoms[it].dft[0];
+//                                        cout << setw(12) << "PBE";
+//				}
+				xcf.ostreamdft(cout); // zws add 20150108
+				//cout << " ( "  << setw(3) << xcf.iexch << setw(3) << xcf.icorr << setw(3) << xcf.igcx << setw(3) << xcf.igcc << ")";
 				cout << endl;
 			}
 

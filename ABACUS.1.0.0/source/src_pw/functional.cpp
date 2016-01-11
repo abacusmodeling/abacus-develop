@@ -203,9 +203,10 @@ void xcfunc::which_dft(const string *dft)
 //	cout << "\n igcx = " << igcx; 
 //	cout << "\n igcc = " << igcc << endl; 
 
-//		<< "  corr = " << corr[icorr]
-//		<< "  gradx = " << gradx[igcx]
-//		<< "  gradc = " << gradc[igcc];
+	//cout << "\n corr = " << exc[icorr];
+	//cout << "  corr = " << corr[icorr];
+	//cout << "  gradx = " << gradx[igcx];
+	//cout << "  gradc = " << gradc[igcc] << endl;
 	//'-'//corr (icorr) //'-'//gradx (igcx) //'-'//gradc (igcc)
 	//      WRITE( stdout,'(a)') dftout
 	return;
@@ -234,6 +235,26 @@ void xcfunc::printdft(ofstream &ofs)
 	<< "  -> " << gradx[igcx];
 	ofs	<< "\n  igcc = " << igcc
 	<< "  -> " << gradc[igcc];
+}
+
+
+void xcfunc::ostreamdft(ostream &ofs) // zws add 20150108
+{
+	if ( iexch == 1 && icorr == 1 && igcx == 0 && igcc == 0 )
+	{ 
+		ofs << "PZ-LDA";
+	}
+	else if (iexch == 1 && icorr == 4 && igcx == 3 && igcc == 4 )
+	{
+		ofs << "PBE";
+	}
+	else
+	{
+		ofs <<  exc [iexch] ;
+		ofs	<<  " " << corr[icorr] ;
+		ofs	<<  " " << gradx[igcx] ;
+		ofs	<<  " " << gradc[igcc] ;
+	}	
 }
 
 

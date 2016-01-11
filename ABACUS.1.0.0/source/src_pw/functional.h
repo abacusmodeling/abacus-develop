@@ -98,6 +98,7 @@ public:
 	// there are four values of dft.
 	void which_dft(const string *dft);
 	void printdft(ofstream &ofs);
+	void ostreamdft(ostream &ofs);  // zws add 20150108
 private:
 	void set_dft_value(int &m,const int i);
 	bool match_one(const string* dft, const string &name)const; 

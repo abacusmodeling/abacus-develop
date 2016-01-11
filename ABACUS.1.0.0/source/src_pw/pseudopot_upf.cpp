@@ -1044,6 +1044,7 @@ void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 	}
 
 	// print PP_MESH
+	/*
 	ofs.setf(ios::scientific, ios::floatfield);
 
 	for(int i=0; i<100; ++i)
@@ -1062,12 +1063,11 @@ void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 	}
 
 
-	/*
 	if (nlcc)
 	{
 		ofs << setw(25) << rho_atc[i] << endl;
 	}
-	*/
+
 
 	// PRINT PP_NONLOCAL
 	ofs << " nd: " << nd << endl;
@@ -1100,6 +1100,7 @@ void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 
 
 	ofs.unsetf(ios::scientific);
+    */
 	ofs << " End of pseudopot_upf." << endl;
 
 	return;
@@ -1165,7 +1166,15 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
                         READ_VALUE(ifs, word);   // relativistic
                         READ_VALUE(ifs, word);   // is_ultrasoft
+                        if ( word.find("\"T\"") < word.length() ) // zws add 20160108
+                        {
+                        	cout << "\n WARNING: ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED ! \n" << endl;
+                        }
                         READ_VALUE(ifs, word);   // is_paw
+                        if ( word.find("\"T\"") < word.length() )
+                        {
+                        	cout << "\n WARNING: PAW PSEUDOPOTENTIAL IS NOT SUPPORTED ! \n" << endl;
+                        }
                         READ_VALUE(ifs, word);   // is_coulomb
                         ifs >> word;   // has_so
                              string so;
@@ -1204,7 +1213,6 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              {
                                 SG15 = 0;
                                 ifs >> word;     // core_correction
-                                //cout << "word = " << word << endl;
                                 if(word == "core_correction=\"")
                                 {
                                      ifs >> word;
@@ -1216,12 +1224,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                                      get_char(word);
                                      nlc = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
                                 }
-             
+
                              }
                              else
                              {
                                 SG15 = 1;
-                                //cout << "word = " << word << endl;
                                 if(word == "core_correction=\"")
                                 {
                                      ifs >> word;
@@ -1248,11 +1255,29 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              }
 
                         READ_VALUE(ifs, word);   // functional
-                        this->dft[0]="SLA";
-                        this->dft[1]="PZ";
-                        this->dft[2]="NOGX";
-                        this->dft[3]="NOGC";
                         //cout << "word = " << word << endl;
+//                        this->dft[0]="SLA";
+//                        this->dft[1]="PZ";
+//                        this->dft[2]="NOGX";
+//                        this->dft[3]="NOGC";
+                        string funcstr;  //{ zws 01-06-16
+                        stringstream wdsstream(word);
+                        for ( int idft = 0; idft < 2; idft++)
+                        {
+                        	getline(wdsstream,funcstr,'"');
+                        }
+                        wdsstream.str("");
+                        wdsstream.clear();
+					    wdsstream << funcstr;
+					    //cout << " DFT                  : " ;
+                        for( int idft = 0; idft < 4; idft++ )
+                        {
+                        	getline(wdsstream,dft[idft],'-');
+                        	//cout << dft[idft] << " " ;
+                        }
+                        //cout << endl;  //} zws 01-06-16
+
+
                         ifs >> word;   // zp
                         //cout << "word = " << word << endl;
                         {
@@ -1287,15 +1312,15 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              //cout << "etotps = " << this->etotps << endl;
                         }
                   
-                        
-                        READ_VALUE(ifs, word);   // wfc_cutoff
-                        //cout << "word = " << word << endl;
-			//	cout << "SG15 = " << SG15 << endl;
-                        if(SG15 == 0)
+
+                        if(SG15 == 0)    //zws modify 20160108
                         {
-                           READ_VALUE(ifs, word); // rho_cutoff
-                           //cout << "word1sbsb = " << word << endl;
+                        	READ_VALUE(ifs, word);   // wfc_cutoff
+                        	//cout << "word = " << word << endl;
                         }
+                        READ_VALUE(ifs, word); // rho_cutoff
+                        //cout << "word1sbsb = " << word << endl;
+
 
                         ifs >> word;             // lmax
                         //cout << "word = " << word << endl;
@@ -1401,7 +1426,23 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
                         SCAN_BEGIN(ifs, "<PP_R"); 
                         READ_VALUE(ifs, word);    // type  size  columns
-                 
+
+                        double  rmesh0 = 1;    //{zws add  20160108
+                        int 	nmeshdel = 0;
+                        ifs >> rmesh0;
+                        if ( abs(rmesh0) < 1.0e-15 )
+                        {
+                            mesh       -= 1;
+                            nmeshdel   += 1;
+                        }
+                    	if (mesh%2 == 0)
+                    	{
+                    	    mesh     -= 1;
+                    	    nmeshdel += 1;
+                    	}    //}zws add 20160108
+                    	//cout << " nmeshdel =" << nmeshdel << endl;
+
+
                         delete[] r;
                         delete[] rab;
                         this->r = new double[mesh];
@@ -1410,15 +1451,36 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         ZEROS(rab,mesh);
 
 
-                        for (ir = 0;ir < mesh;ir++)
+                        if (nmeshdel == 0)    //{zws 20160108
                         {
-                             ifs >> this->r[ir];
+                            this->r[0] = rmesh0;
+                            for (ir = 1;ir < mesh;ir++)
+                            {
+                                ifs >> this->r[ir];
+                            }
                         }
+                        else
+                        {
+                            for ( int idel=0; idel < nmeshdel-1; idel++)
+                        	{
+                        	    double	tmpdel;
+                        	    ifs >> tmpdel;
+                        	}    //}zws add 20160108
+                            for (ir = 0;ir < mesh;ir++)
+                            {
+                                 ifs >> this->r[ir];
+                            }
+                        }    //}zws 20160108
                         SCAN_END(ifs, "</PP_R>");
 
                         SCAN_BEGIN(ifs, "<PP_RAB");
                         READ_VALUE(ifs, word);    // type size columns
 
+                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+                    	{
+                    	    double	tmpdel;
+                    	    ifs >> tmpdel;
+                    	}    //}zws add 20160108
                         for (ir = 0;ir < mesh;ir++)
                         {
                              ifs >> this->rab[ir];
@@ -1436,6 +1498,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                             delete[] rho_atc;
                             this->rho_atc = new double[mesh];
                             ZEROS(rho_atc, mesh);
+                            for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+                        	{
+                        	    double	tmpdel;
+                        	    ifs >> tmpdel;
+                        	}    //}zws add 20160108
                             for (ir = 0;ir < mesh;ir++)
                             {
                                  ifs >> this->rho_atc[ir];
@@ -1453,6 +1520,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         this->vloc = new double[mesh];
                         ZEROS(vloc, mesh);
 
+                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+                    	{
+                    	    double	tmpdel;
+                    	    ifs >> tmpdel;
+                    	}    //}zws add 20160108
                         for (ir = 0;ir < mesh;ir++)
                         {
                              ifs >> this->vloc[ir];
@@ -1561,6 +1633,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                                 READ_VALUE(ifs, word);
                             }
 
+
+                            for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+                        	{
+                        	    double	tmpdel;
+                        	    ifs >> tmpdel;
+                        	}    //}zws add 20160108
                             for (ir=0;ir<mesh;ir++)
                             {
                                 ifs >> this->beta(i, ir);
@@ -1636,6 +1714,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              ifs >> word; // cutoff_radius
                              ifs >> word; // ultrasoft_cutoff_radius
 
+
+                             for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+                         	 {
+                         	     double	tmpdel;
+                                 ifs >> tmpdel;
+                         	 }    //}zws add 20160108
                              for (ir = 0;ir < mesh;ir++)
                              {
                                   ifs >> this->chi(i, ir);
@@ -1653,6 +1737,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         this->rho_at = new double[mesh];
                         ZEROS(rho_at, mesh);
 
+                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+                        {
+                            double	tmpdel;
+                            ifs >> tmpdel;
+                        }    //}zws add 20160108
                         for (ir = 0;ir < mesh;ir++)
                         {
                              ifs >> this->rho_at[ir];

@@ -129,7 +129,7 @@ const int ndmx  = 2000;
 //==========================================================
 #ifndef __EPM
 const int lmaxx = 3;
-const int nbrx  = 4; 
+const int nbrx  = 10;
 const int lqmax = 2*lmaxx + 1;
 const int nqfx  = 8;
 #endif

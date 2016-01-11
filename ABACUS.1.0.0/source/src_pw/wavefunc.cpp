@@ -171,7 +171,7 @@ void wavefunc::wfcinit(void)
     timer::tick("wavefunc","wfcinit",'C');
 
 
-	this->init_at_1();	
+	//this->init_at_1();
     this->wfcinit_k();
 
     en.demet = 0.0;
