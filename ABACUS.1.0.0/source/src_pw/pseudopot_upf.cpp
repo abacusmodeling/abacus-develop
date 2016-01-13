@@ -1125,21 +1125,28 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         READ_VALUE(ifs, word);   // author
                         READ_VALUE(ifs, word);   // date
                         READ_VALUE(ifs, word);   // comment
-                        ifs >> word;   // element
-                        {
-                             if(word == "element=\"")
-                             {
-                                ifs >> word;
-                                get_char(word);
-                                this->psd = word.substr(0,Number[0]);
-                             }
-                             else
-                             {
-                                get_char(word);
-                                this->psd = word.substr(Number[0]+1,(Number[1]-Number[0]-1)); 
-                             }
-                             //cout << "psd = " << this->psd << endl;
-                        }
+
+                        //ifs >> word;   // element // zws comment
+                        //{
+                        //     if(word == "element=\"")
+                        //     {
+                        //        ifs >> word;
+                        //        get_char(word);
+                        //        this->psd = word.substr(0,Number[0]);
+                        //     }
+                        //     else
+                        //     {
+                        //        get_char(word);
+                        //        this->psd = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+                        //     }
+                        //     cout << "psd = " << this->psd << endl;
+                        //}
+                        READ_VALUE(ifs, word);   //zws add
+                        //cout << "word = " << word << endl;
+                        stringstream wdsstream(word);
+                        getline(wdsstream,this->psd,'"');
+                        getline(wdsstream,this->psd,'"'); //zws add end
+                        //cout << " this->psd =" << this->psd << "=" << endl;
 
                         ifs >> word;   // pseudo_type
                         //cout << "word = " << word << endl;
@@ -1261,7 +1268,9 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 //                        this->dft[2]="NOGX";
 //                        this->dft[3]="NOGC";
                         string funcstr;  //{ zws 01-06-16
-                        stringstream wdsstream(word);
+                        wdsstream.str("");
+                        wdsstream.clear();
+                        wdsstream << funcstr;
                         for ( int idft = 0; idft < 2; idft++)
                         {
                         	getline(wdsstream,funcstr,'"');
