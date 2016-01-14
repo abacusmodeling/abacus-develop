@@ -64,7 +64,7 @@ void Numerical_Nonlocal::set_type_info
 //EXPLAIN : LfromBeta
 //----------------------------------------------------------
 	this->nproj = nproj_in;
-	assert(nproj <= lmax_in+1);
+	assert(nproj <= lmax_in+1); //LiuXh 2016-01-13
 	assert(nproj >= 0);
 
 	delete[] LfromBeta;

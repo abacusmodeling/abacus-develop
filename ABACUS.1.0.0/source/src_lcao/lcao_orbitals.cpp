@@ -287,7 +287,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
 	const int nproj_allowed = atom->lmax + 1;	
-	matrix Coefficient_D_in(nproj_allowed, nproj_allowed);
+	//matrix Coefficient_D_in(nproj_allowed, nproj_allowed); //LiuXh 2016-01-14
+	matrix Coefficient_D_in(n_projectors, n_projectors); //LiuXh 2016-01-14
 
 
 	for(int p1 = 0; p1<n_projectors; p1++)
@@ -295,7 +296,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		const int lnow = atom->lll[p1];
 
 		// this will be wrong if dion is non-diagoal
-		Coefficient_D_in(lnow,lnow)=atom->dion(p1,p1);
+		//Coefficient_D_in(lnow,lnow)=atom->dion(p1,p1);//LiuXh 2016-01-14
+		Coefficient_D_in(p1,p1)=atom->dion(p1,p1);//LiuXh 2016-01-14
 
 		// only keep the nonzero part.
 		int cut_mesh = atom->mesh; 
@@ -333,7 +335,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 				
 	}
 
-	this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);
+	//this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14
+	this->Beta[it].set_type_info(it, atom->label, atom->pp_type, n_projectors, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14
 
 	delete[] tmpBeta_lm;
 

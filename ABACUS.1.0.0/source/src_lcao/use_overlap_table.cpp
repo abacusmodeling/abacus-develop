@@ -431,14 +431,16 @@ void Use_Overlap_Table::snap_psibeta(
 			{
 				case 0://calculate the overlap part.
 				{
-					nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(L0, L0);
+					//nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
+					nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
 					break;
 				}
 				case 1: //calculate the derivative part.
 				{
 					for(int jr = 0; jr < 3; jr++) 
 					{
-						nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(L0, L0);
+						//nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
+						nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
 					}
 					break;
 				}
