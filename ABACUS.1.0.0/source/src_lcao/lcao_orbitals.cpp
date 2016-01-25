@@ -149,7 +149,9 @@ void LCAO_Orbitals::Read_Orbitals(void)
 	// calculate number of k mesh according to energy cutoff.
 	// Mohan choose ecutwfc according to interpolation requirement.
 	//	cout << " ecutwfc=" << ecutwfc << endl;
-	this->kmesh = static_cast<int>( sqrt(ecutwfc) / dk )  + 4;
+	//LiuXh modified 2016-01-25
+	//this->kmesh = static_cast<int>( sqrt(ecutwfc) / dk )  + 4;
+	this->kmesh = static_cast<int>( 2 * sqrt(ecutwfc) / dk )  + 4;
 	//	this->kmesh = static_cast<int> (PI / 0.01 / 4 / this->dk);
 	if(kmesh%2==0) kmesh++;
 	OUT(ofs_running,"kmesh",kmesh);
