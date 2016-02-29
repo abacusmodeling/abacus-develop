@@ -192,7 +192,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 		case 0: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);; break;
 		case 1: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);; break;
 		case 2: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);; break;
-		case 3: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);; break;
+		case 3: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);; break;
 		case 4: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);; break;
 		default: 
 		  ofs_running << " The angular momentum should not be larger than 4 (g orbitals)." << endl;

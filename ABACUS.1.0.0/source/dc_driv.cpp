@@ -266,7 +266,7 @@ void DC_Driv::reading(void)
 					stringstream orb;
 
 					int norb = 0;
-					for(int L=0; L<=ORB.Phi[it].getLmax(); ++L)
+					/*for(int L=0; L<=ORB.Phi[it].getLmax(); ++L)
 					{
 						norb += (2*L+1)*ORB.Phi[it].getNchi(L); 
 						orb << ORB.Phi[it].getNchi(L);
@@ -278,7 +278,22 @@ void DC_Driv::reading(void)
 						else if(L==5) orb << "h";
 						else if(L==6) orb << "i";
 					}
-					orb << "-" << ORB.Phi[it].getRcut() << "au";
+					orb << "-" << ORB.Phi[it].getRcut() << "au";*/
+
+
+                                        for(int L=0; L<=ucell.atoms[it].nwl; ++L)        // pengfei Li 16-2-29
+                                        {
+                                                norb += (2*L+1)* ucell.atoms[it].l_nchi[L];
+                                                orb << ucell.atoms[it].l_nchi[L];
+                                                if(L==0) orb << "s";
+                                                else if(L==1) orb << "p";
+                                                else if(L==2) orb << "d";
+                                                else if(L==3) orb << "f";
+                                                else if(L==4) orb << "g";
+                                                else if(L==5) orb << "h";
+                                                else if(L==6) orb << "i";
+                                        }
+                                        orb << "-" << ucell.atoms[it].Rcut << "au";
 
 					if(COLOUR && MY_RANK==0)
 					{

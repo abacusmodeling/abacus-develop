@@ -13,6 +13,7 @@ Atom::Atom()
     na = 0;
     nw = 0;
     nwl = 0;
+    Rcut = 0.0; // pengfei Li 16-2-29
     type = 0;
     stapos_wf = 0;
     tau = new Vector3<double>[1];
@@ -89,6 +90,7 @@ void Atom::print_Atom(ofstream &ofs)
     OUT(ofs,"type", type);
     OUT(ofs,"na",na);
     OUT(ofs,"nwl",nwl);
+    OUT(ofs,"Rcut", Rcut); // pengfei Li 16-2-29
     OUT(ofs,"nw",nw);
     OUT(ofs,"stapos_wf",stapos_wf);
     ofs<<endl;
@@ -120,6 +122,7 @@ void Atom::bcast_atom()
     Parallel_Common::bcast_int( type );
     Parallel_Common::bcast_int( na );
     Parallel_Common::bcast_int( nwl );
+    Parallel_Common::bcast_double( Rcut ); // pengfei Li 16-2-29
     Parallel_Common::bcast_int( nw );
     Parallel_Common::bcast_int( stapos_wf );
     Parallel_Common::bcast_string( label );

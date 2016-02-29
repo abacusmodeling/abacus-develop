@@ -523,6 +523,11 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
                              }
                              assert(this->atoms[it].nwl<10);
 
+                             if (strcmp("Cutoff(a.u.)", word) == 0)         // pengfei Li 16-2-29
+                             {
+                                 READ_VALUE(ifs, this->atoms[it].Rcut);
+                             }
+
                              //cout << "atoms[it].nwl = "<<atoms[it].nwl <<endl;
                              if (strcmp("Sorbital-->", word) == 0)
                              {
