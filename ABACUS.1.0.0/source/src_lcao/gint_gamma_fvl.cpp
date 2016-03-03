@@ -113,6 +113,16 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, double r
             //
             // 'distane' variable here is the distance between
             // this grid and the atom.
+
+            //-------------------------------------------------
+            // Here we can not deal with the situation on 
+            // r = 0, so if r = 0,  r-->1e-9   
+            //-------------------------------------------------
+            if(distance < 1e-9)                            // pengfei Li 2016-3-3
+            {
+               distance = 1e-9;
+            }
+
             const double position = distance / delta_r;
             //this->iq[id] = static_cast<int>(position);
             //this->x0[id] = position - iq[id];
@@ -128,7 +138,8 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, double r
             // x3[id] = 3.0 - x0[id];
             // x12[id] = x1[id]*x2[id] / 6;
             // x03[id] = x0[id]*x3[id] / 2;
-            
+
+                       
             iq = static_cast<int>(position);
             x0 = position - iq;
             x1 = 1.0 - x0;
@@ -203,7 +214,7 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, double r
                 //special case for distance -> 0
                 //Problems Remained
                 //You have to add this two lines
-                if (distance < 1e-9)
+                /*if (distance < 1e-9)
                 {
                     // if l==0 for localized orbital,
                     // here is how we choose the 3D wave function psir_ylm,
@@ -232,11 +243,11 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, double r
                         p_dphiy[iw] = Zty * grly[idx_lm][1];
                         p_dphiz[iw] = Zty * grly[idx_lm][2];
                     } // if (ll == 0)
-                } 
+                }*/ 
                 // if r >0, here is how we choose the 3D wave function psir_ylm,
                 // and the derivative at r=0 point.
-                else
-                {
+                //else
+                //{
                     double rl;
                     rl = pow(distance, ll);
 
@@ -250,7 +261,7 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, double r
                     p_dphix[iw] = tmpdphi_rly * dr[0]  + tmprl * grly[idx_lm][0];
                     p_dphiy[iw] = tmpdphi_rly * dr[1]  + tmprl * grly[idx_lm][1];
                     p_dphiz[iw] = tmpdphi_rly * dr[2]  + tmprl * grly[idx_lm][2];
-                }// if  (distance < 1e-9)
+                //}// if  (distance < 1e-9)
             } // iw            
         }// ib
     }//!id //finish loop of calc pre-info for each adjacent atom

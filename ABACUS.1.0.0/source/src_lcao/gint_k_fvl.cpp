@@ -494,12 +494,22 @@ void Gint_k::set_ijk_atom_force(const int &grid_index, const int &size,
 			// get the 'phi' and 'dphi'.
 			Ylm::grad_rl_sph_harm(ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
 
-//			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;	
 //			Ylm::sph_harm ( ucell.atoms[it].nwl,
 //					dr[ib][id][0] / distance[ib][id],
 //					dr[ib][id][1] / distance[ib][id],
 //					dr[ib][id][2] / distance[ib][id],
 //					ylma);
+
+
+            //-------------------------------------------------
+            // Here we can not deal with the situation on
+            // r = 0, so if r = 0,  r-->1e-9
+            //-------------------------------------------------
+
+                        if (distance[ib][id] < 1e-9)    // pengfei Li add 2016-3-3
+                        {
+                            distance[ib][id] = 1e-9;
+                        }
 
 			// these parameters are about interpolation
 			// because once we know the distance from atom to grid point,
@@ -555,7 +565,7 @@ void Gint_k::set_ijk_atom_force(const int &grid_index, const int &size,
 				//Problems Remained
 				//You have to add this two lines
 				double rr = distance[ib][id];
-				if (rr < 1e-9)
+				/*if (rr < 1e-9)
 				{
 					if (ll == 0)
 					{
@@ -573,9 +583,9 @@ void Gint_k::set_ijk_atom_force(const int &grid_index, const int &size,
 						dphi_y[ib][id][iw] = Zty * grly[idx_lm][1];
 						dphi_z[ib][id][iw] = Zty * grly[idx_lm][2];
 					}
-				}
-				else
-				{
+				}*/
+				//else
+				//{
 					double rl;
 					if(ll==0)
 					{
@@ -596,7 +606,7 @@ void Gint_k::set_ijk_atom_force(const int &grid_index, const int &size,
 					dphi_x[ib][id][iw] = tmpdphi_rly * dr[ib][id][0]  + tmprl * grly[idx_lm][0];
 					dphi_y[ib][id][iw] = tmpdphi_rly * dr[ib][id][1]  + tmprl * grly[idx_lm][1];
 					dphi_z[ib][id][iw] = tmpdphi_rly * dr[ib][id][2]  + tmprl * grly[idx_lm][2];
-				}
+				//}
 			}
 		}//end ib
 	}// int id
