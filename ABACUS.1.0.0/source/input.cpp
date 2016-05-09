@@ -134,7 +134,7 @@ void Input::Default(void)
     atom_file = "";//xiaohui modify 2015-02-01
     kpoint_file = "";//xiaohui modify 2015-02-01
     pseudo_dir = "";
-    pseudo_type = "upf"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+    pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	wannier_card = "";
     epm_pseudo_card = "";
     latname = "test";

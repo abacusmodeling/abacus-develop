@@ -64,6 +64,12 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
         return 1;
     }
 
+    //cout << "global_pseudo_type =" << global_pseudo_type << endl;
+    if(global_pseudo_type=="auto") //{zws
+	{
+		int info = set_pseudo_type(fn);
+	} //}
+
 	// read in the .UPF type of pseudopotentials
 	if(global_pseudo_type=="upf")
 	{
@@ -71,7 +77,6 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 		this->print_pseudo_upf(ofs_running);
 		return info;
 	}
-
 	// read in the .vwr type of pseudopotentials
 	else if(global_pseudo_type=="vwr")
 	{
@@ -79,18 +84,75 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 	//	this->print_pseudo_upf(ofs_running);
 		return info;
 	}
-        else if(global_pseudo_type=="upf201")
-        {
-                int info = read_pseudo_upf201(ifs);
-                this->print_pseudo_upf(ofs_running);
-                return info;
-        }
+	else if(global_pseudo_type=="upf201")
+	{
+			int info = read_pseudo_upf201(ifs);
+			this->print_pseudo_upf(ofs_running);
+			return info;
+	}
 
 
 
 
 	return 0;
 }
+
+
+//----------------------------------------------------------
+// setting the type of the pseudopotential file
+//----------------------------------------------------------
+int Pseudopot_upf::set_pseudo_type(const string &fn) //{zws add
+{
+    ifstream pptype_ifs(fn.c_str(), ios::in);
+    string dummy, strversion;
+	//int ierr = 0;
+
+	if (pptype_ifs.good())
+	{
+		getline(pptype_ifs,dummy);
+		//cout << "dummy : " << dummy << endl;
+		//if ( dummy == "<PP_INFO>" )
+		//{
+		//	global_pseudo_type = "upf";
+		//}
+
+		stringstream wdsstream(dummy);
+		getline(wdsstream,strversion,'"');
+		getline(wdsstream,strversion,'"');
+		//cout << "strversi:" << strversion << endl;
+
+		if ( trim(strversion) == "2.0.1" )
+		{
+			global_pseudo_type = "upf201";
+		}
+		else
+		{
+			global_pseudo_type = "upf";
+		}
+	}
+	return 0;
+}
+
+string& Pseudopot_upf::trim(string &in_str)
+{
+    static const string deltri = " \t" ; // delete tab or space
+    string::size_type position = in_str.find_first_of(deltri, position);
+    if (position == string::npos)
+        return in_str;
+    return trim(in_str.erase(position, 1) );
+}
+
+string Pseudopot_upf::trimend(string &in_str)
+{
+    const string &deltri =" \t" ;
+    string::size_type position = in_str.find_last_not_of(deltri)+1;
+    //cout << "--" << position << "--" << endl;
+    string tmpstr=in_str.erase(position);
+    //cout << "--" << tmpstr << "--" << endl;
+    return tmpstr.erase(0,tmpstr.find_first_not_of(deltri));
+} //}zws
+
+
 
 //----------------------------------------------------------
 // This code is used to read in vwr pseudopotential format,
@@ -1126,7 +1188,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         READ_VALUE(ifs, word);   // date
                         READ_VALUE(ifs, word);   // comment
 
-                        //ifs >> word;   // element // zws comment
+                        //ifs >> word; //element //replaced with the code below
                         //{
                         //     if(word == "element=\"")
                         //     {
@@ -1141,15 +1203,13 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         //     }
                         //     cout << "psd = " << this->psd << endl;
                         //}
-                        READ_VALUE(ifs, word);   //zws add
-                        //cout << "word = " << word << endl;
+                        READ_VALUE(ifs, word);   //{zws add
                         stringstream wdsstream(word);
                         getline(wdsstream,this->psd,'"');
-                        getline(wdsstream,this->psd,'"'); //zws add end
+                        getline(wdsstream,this->psd,'"'); //}zws
                         //cout << " this->psd =" << this->psd << "=" << endl;
 
                         ifs >> word;   // pseudo_type
-                        //cout << "word = " << word << endl;
                         {
                              if(word == "pseudo_type=\"")
                              {
@@ -1175,13 +1235,14 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         READ_VALUE(ifs, word);   // is_ultrasoft
                         if ( word.find("\"T\"") < word.length() ) // zws add 20160108
                         {
-                        	cout << "\n WARNING: ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED ! \n" << endl;
+                        	cout << "\n WARNING: ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << endl;
                         }
                         READ_VALUE(ifs, word);   // is_paw
                         if ( word.find("\"T\"") < word.length() )
                         {
-                        	cout << "\n WARNING: PAW PSEUDOPOTENTIAL IS NOT SUPPORTED ! \n" << endl;
+                        	cout << "\n WARNING: PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << endl;
                         }
+
                         READ_VALUE(ifs, word);   // is_coulomb
                         ifs >> word;   // has_so
                              string so;
@@ -1267,10 +1328,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 //                        this->dft[1]="PZ";
 //                        this->dft[2]="NOGX";
 //                        this->dft[3]="NOGC";
-                        string funcstr;  //{ zws 01-06-16
+                        string funcstr;  //{zws 01-06-16
                         wdsstream.str("");
                         wdsstream.clear();
-                        wdsstream << funcstr;
+                        wdsstream << word;
                         for ( int idft = 0; idft < 2; idft++)
                         {
                         	getline(wdsstream,funcstr,'"');
@@ -1284,7 +1345,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         	getline(wdsstream,dft[idft],'-');
                         	//cout << dft[idft] << " " ;
                         }
-                        //cout << endl;  //} zws 01-06-16
+                        //cout << endl;  //}zws 01-06-16
 
 
                         ifs >> word;   // zp
@@ -1436,20 +1497,21 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         SCAN_BEGIN(ifs, "<PP_R"); 
                         READ_VALUE(ifs, word);    // type  size  columns
 
-                        double  rmesh0 = 1;    //{zws add  20160108
-                        int 	nmeshdel = 0;
-                        ifs >> rmesh0;
-                        if ( abs(rmesh0) < 1.0e-15 )
-                        {
-                            mesh       -= 1;
-                            nmeshdel   += 1;
-                        }
-                    	if (mesh%2 == 0)
-                    	{
-                    	    mesh     -= 1;
-                    	    nmeshdel += 1;
-                    	}    //}zws add 20160108
-                    	//cout << " nmeshdel =" << nmeshdel << endl;
+//                        double  rmesh0 = 1;    //{zws add160108 delete160328
+//                        int 	nmeshdel = 0;
+//                        ifs >> rmesh0;
+//                        if ( abs(rmesh0) < 1.0e-15 )
+//                        {
+//                            mesh       -= 1;
+//                            nmeshdel   += 1;
+//                        }
+//                        cout << " mesh =" << mesh << endl;
+//                    	if (mesh%2 == 0)
+//                    	{
+//                    	    mesh     -= 1;
+//                    	    nmeshdel += 1;
+//                    	}    //}zws add 20160108
+//                    	cout << " nmeshdel =" << nmeshdel << endl;
 
 
                         delete[] r;
@@ -1460,36 +1522,41 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         ZEROS(rab,mesh);
 
 
-                        if (nmeshdel == 0)    //{zws 20160108
-                        {
-                            this->r[0] = rmesh0;
-                            for (ir = 1;ir < mesh;ir++)
-                            {
-                                ifs >> this->r[ir];
-                            }
-                        }
-                        else
-                        {
-                            for ( int idel=0; idel < nmeshdel-1; idel++)
-                        	{
-                        	    double	tmpdel;
-                        	    ifs >> tmpdel;
-                        	}    //}zws add 20160108
-                            for (ir = 0;ir < mesh;ir++)
-                            {
-                                 ifs >> this->r[ir];
-                            }
-                        }    //}zws 20160108
+//                        if (nmeshdel == 0)    //{zws add160108 delete160328
+//                        {
+//                            this->r[0] = rmesh0;
+//                            for (ir = 1;ir < mesh;ir++)
+//                            {
+//                                ifs >> this->r[ir];
+//                            }
+//                        }
+//                        else
+//                        {
+//                            for ( int idel=0; idel < nmeshdel-1; idel++)
+//                        	{
+//                            	cout << "skip " << nmeshdel << "grid point(s) in PP mesh" << endl;
+//                        	    double	tmpdel;
+//                        	    ifs >> tmpdel;
+//                        	}
+//                            for (ir = 0;ir < mesh;ir++)
+//                            {
+//                                 ifs >> this->r[ir];
+//                            }
+//                        }    //}zws 20160108
+						for (ir = 0;ir < mesh;ir++)
+						{
+							 ifs >> this->r[ir];
+						}
                         SCAN_END(ifs, "</PP_R>");
 
                         SCAN_BEGIN(ifs, "<PP_RAB");
                         READ_VALUE(ifs, word);    // type size columns
 
-                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
-                    	{
-                    	    double	tmpdel;
-                    	    ifs >> tmpdel;
-                    	}    //}zws add 20160108
+//                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+//                    	{
+//                    	    double	tmpdel;
+//                    	    ifs >> tmpdel;
+//                    	}    //}zws add 20160108
                         for (ir = 0;ir < mesh;ir++)
                         {
                              ifs >> this->rab[ir];
@@ -1507,11 +1574,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                             delete[] rho_atc;
                             this->rho_atc = new double[mesh];
                             ZEROS(rho_atc, mesh);
-                            for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
-                        	{
-                        	    double	tmpdel;
-                        	    ifs >> tmpdel;
-                        	}    //}zws add 20160108
+//                            for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+//                        	{
+//                        	    double	tmpdel;
+//                        	    ifs >> tmpdel;
+//                        	}    //}zws add 20160108
                             for (ir = 0;ir < mesh;ir++)
                             {
                                  ifs >> this->rho_atc[ir];
@@ -1529,11 +1596,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         this->vloc = new double[mesh];
                         ZEROS(vloc, mesh);
 
-                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
-                    	{
-                    	    double	tmpdel;
-                    	    ifs >> tmpdel;
-                    	}    //}zws add 20160108
+//                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+//                    	{
+//                    	    double	tmpdel;
+//                    	    ifs >> tmpdel;
+//                    	}    //}zws add 20160108
                         for (ir = 0;ir < mesh;ir++)
                         {
                              ifs >> this->vloc[ir];
@@ -1643,11 +1710,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                             }
 
 
-                            for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
-                        	{
-                        	    double	tmpdel;
-                        	    ifs >> tmpdel;
-                        	}    //}zws add 20160108
+//                            for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+//                        	{
+//                        	    double	tmpdel;
+//                        	    ifs >> tmpdel;
+//                        	}    //}zws add 20160108
                             for (ir=0;ir<mesh;ir++)
                             {
                                 ifs >> this->beta(i, ir);
@@ -1724,11 +1791,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              ifs >> word; // ultrasoft_cutoff_radius
 
 
-                             for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
-                         	 {
-                         	     double	tmpdel;
-                                 ifs >> tmpdel;
-                         	 }    //}zws add 20160108
+//                             for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+//                         	 {
+//                         	     double	tmpdel;
+//                                 ifs >> tmpdel;
+//                         	 }    //}zws add 20160108
                              for (ir = 0;ir < mesh;ir++)
                              {
                                   ifs >> this->chi(i, ir);
@@ -1746,16 +1813,23 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         this->rho_at = new double[mesh];
                         ZEROS(rho_at, mesh);
 
-                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
-                        {
-                            double	tmpdel;
-                            ifs >> tmpdel;
-                        }    //}zws add 20160108
+//                        for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+//                        {
+//                            double	tmpdel;
+//                            ifs >> tmpdel;
+//                        }    //}zws add 20160108
                         for (ir = 0;ir < mesh;ir++)
                         {
                              ifs >> this->rho_at[ir];
                         }
                         SCAN_END(ifs, "</PP_RHOATOM>");
+
+
+                    	if (mesh%2 == 0) //{zws add 20160328
+                    	{
+                    	    mesh     -= 1;
+                    	}
+                    	//cout << " mesh =" << mesh << endl; //}
 
 
                         SCAN_END(ifs, "</UPF>");

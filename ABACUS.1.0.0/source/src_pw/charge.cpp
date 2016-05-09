@@ -209,6 +209,9 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 			double r2=atom->r[ir]*atom->r[ir];
 			rhoatm[ir]=atom->rho_at[ir]/FOUR_PI/r2;
 		}
+		rhoatm[0] = pow( (rhoatm[2]/rhoatm[1]), 1./(atom->r[2]-atom->r[1]) );//{zws add
+		rhoatm[0] = pow(rhoatm[0], atom->r[1]);
+		rhoatm[0] = rhoatm[1] / rhoatm[0]; //} 
 
 		double charge = 0.0;
 		Mathzone::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);

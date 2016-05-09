@@ -86,6 +86,10 @@ public:
 
 private:
 
+	int set_pseudo_type(const string &fn);
+	string& trim(string &in_str);
+	string  trimend(string &in_str);
+
 	int read_pseudo_upf(ifstream &ifs);
 	int read_pseudo_vwr(ifstream &ifs);
         int read_pseudo_upf201(ifstream &ifs);

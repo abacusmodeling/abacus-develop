@@ -155,7 +155,7 @@ void Numerical_Nonlocal_Lm::set_NL_proj(
 	this->kcut = (nk-1) * this->dk;
 
 	// (1) extra the uniform mesh
-	this->extra_uniform(dr_uniform);
+	//this->extra_uniform(dr_uniform);
 	// (2) get the beta_k
 	this->get_kradial();
 	// (3)
