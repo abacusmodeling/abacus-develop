@@ -252,6 +252,7 @@ void Atom_input::Check_Expand_Condition(void)
 
 	if(test_atom_input)OUT(ofs_running,"Radius",radius);
 
+/*2016-07-19, LiuXh
 	// the unit of extent_1DX,Y,Z is lat0.
 	// means still how far can be included now.
 	double extent_1DX = glayerX * clength0 - dmaxX;
@@ -279,7 +280,6 @@ void Atom_input::Check_Expand_Condition(void)
 	glayerX++;
 	glayerY++;
 	glayerZ++;
-
 	if(test_atom_input)
 	{
 		ofs_running << " Extend distance from the (maxX,maxY,maxZ) direct position in this unitcell: " << endl;
@@ -312,6 +312,41 @@ void Atom_input::Check_Expand_Condition(void)
 	glayerX_minus++;
 	glayerY_minus++;
 	glayerZ_minus++;
+
+	//glayerX_minus++;
+	//glayerY_minus++;
+	//glayerZ_minus++;
+2016-07-19, LiuXh*/
+	//Begin, 2016-07-19, LiuXh
+	double a23_1 = ucell.latvec.e22*ucell.latvec.e33 - ucell.latvec.e23*ucell.latvec.e32;
+	double a23_2 = ucell.latvec.e21*ucell.latvec.e33 - ucell.latvec.e23*ucell.latvec.e31;
+	double a23_3 = ucell.latvec.e21*ucell.latvec.e32 - ucell.latvec.e22*ucell.latvec.e31;
+	double a23_norm = sqrt(a23_1*a23_1 + a23_2*a23_2 + a23_3*a23_3);
+	double extend_v = a23_norm * radius;
+	double extend_d1 = extend_v/ucell.omega*ucell.lat0*ucell.lat0*ucell.lat0;
+	int extend_d11 = static_cast<int>(extend_d1);
+
+	double a31_1 = ucell.latvec.e32*ucell.latvec.e13 - ucell.latvec.e33*ucell.latvec.e12;
+	double a31_2 = ucell.latvec.e31*ucell.latvec.e13 - ucell.latvec.e33*ucell.latvec.e11;
+	double a31_3 = ucell.latvec.e31*ucell.latvec.e12 - ucell.latvec.e32*ucell.latvec.e11;
+	double a31_norm = sqrt(a31_1*a31_1 + a31_2*a31_2 + a31_3*a31_3);
+	double extend_d2 = a31_norm*radius/ucell.omega*ucell.lat0*ucell.lat0*ucell.lat0;
+	int extend_d22 = static_cast<int>(extend_d2);
+
+	double a12_1 = ucell.latvec.e12*ucell.latvec.e23 - ucell.latvec.e13*ucell.latvec.e22;
+	double a12_2 = ucell.latvec.e11*ucell.latvec.e23 - ucell.latvec.e13*ucell.latvec.e21;
+	double a12_3 = ucell.latvec.e11*ucell.latvec.e22 - ucell.latvec.e12*ucell.latvec.e21;
+	double a12_norm = sqrt(a12_1*a12_1 + a12_2*a12_2 + a12_3*a12_3);
+	double extend_d3 = a12_norm * radius/ucell.omega*ucell.lat0*ucell.lat0*ucell.lat0;
+	int extend_d33 = static_cast<int>(extend_d3);
+
+	glayerX = extend_d11 +1;
+	glayerY = extend_d22 +1;
+	glayerZ = extend_d33 +1;
+	glayerX_minus = extend_d11 +1;
+	glayerY_minus = extend_d22 +1;
+	glayerZ_minus = extend_d33 +1;
+	//End, 2016-07-19, LiuXh
 	
 	if(test_atom_input)
 	{
