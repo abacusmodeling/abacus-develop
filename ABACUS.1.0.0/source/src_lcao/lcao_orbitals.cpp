@@ -337,8 +337,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 				
 	}
 
-	//this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14
-	this->Beta[it].set_type_info(it, atom->label, atom->pp_type, n_projectors, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14
+	this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
+	//this->Beta[it].set_type_info(it, atom->label, atom->pp_type, n_projectors, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
 
 	delete[] tmpBeta_lm;
 
