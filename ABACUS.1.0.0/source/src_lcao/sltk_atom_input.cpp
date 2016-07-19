@@ -346,6 +346,12 @@ void Atom_input::Check_Expand_Condition(void)
 	glayerX_minus = extend_d11 +1;
 	glayerY_minus = extend_d22 +1;
 	glayerZ_minus = extend_d33 +1;
+        if(glayerX==1) glayerX++;
+        if(glayerY==1) glayerY++;
+        if(glayerZ==1) glayerZ++;
+        if(glayerX_minus==1) glayerX_minus++;
+        if(glayerY_minus==1) glayerY_minus++;
+        if(glayerZ_minus==1) glayerZ_minus++;
 	//End, 2016-07-19, LiuXh
 /*	
 	if(test_atom_input)
