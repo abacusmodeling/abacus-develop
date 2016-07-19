@@ -347,14 +347,14 @@ void Atom_input::Check_Expand_Condition(void)
 	glayerY_minus = extend_d22 +1;
 	glayerZ_minus = extend_d33 +1;
 	//End, 2016-07-19, LiuXh
-	
+/*	
 	if(test_atom_input)
 	{
 		ofs_running << " Extend distance from the (minX,minY,minZ) direct position in this unitcell: " << endl;
 	}
 
 	if(test_atom_input)OUT(ofs_running,"ExtentDim-",extent_1DX_minus,extent_1DY_minus,extent_1DZ_minus);
-
+*/
 //----------------------------------------------------------
 // EXPLAIN : if extent don't satisfty the searching
 // requiment, we must expand one more layer
