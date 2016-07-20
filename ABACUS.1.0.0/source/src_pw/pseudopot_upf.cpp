@@ -74,7 +74,7 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 	if(global_pseudo_type=="upf")
 	{
 		int info = read_pseudo_upf(ifs);
-		this->print_pseudo_upf(ofs_running);
+		//this->print_pseudo_upf(ofs_running);
 		return info;
 	}
 	// read in the .vwr type of pseudopotentials
@@ -86,9 +86,9 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 	}
 	else if(global_pseudo_type=="upf201")
 	{
-			int info = read_pseudo_upf201(ifs);
-			this->print_pseudo_upf(ofs_running);
-			return info;
+		int info = read_pseudo_upf201(ifs);
+		//this->print_pseudo_upf(ofs_running);
+		return info;
 	}
 
 
