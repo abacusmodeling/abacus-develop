@@ -218,7 +218,8 @@ void DC_Driv::reading(void)
 			//else if(LOCAL_BASIS==4 && LINEAR_SCALING==0) xiaohui modify 2013-09-01
 			else if(BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
 			{
-				cout << " Expand Systematically Improvable Atomic bases into plane waves" << endl;
+				//cout << " Expand Systematically Improvable Atomic bases into plane waves" << endl;
+				cout << " Expand Atomic bases into plane waves" << endl;
 			}
 			//else if(LOCAL_BASIS==0 && LINEAR_SCALING==0) xiaohui modify 2013-09-01
 			else if(BASIS_TYPE=="pw") //xiaohui add 2013-09-01
