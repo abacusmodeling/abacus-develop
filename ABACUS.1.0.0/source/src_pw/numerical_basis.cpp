@@ -389,6 +389,8 @@ void Numerical_Basis::Sq_overlap(
 	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << endl;
 	ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << endl; 
 
+	const double normalization = (4 * PI) * (4 * PI) / ucell.omega;			// Peize Lin add normalization 2015-12-29
+	
     const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
@@ -440,7 +442,7 @@ void Numerical_Basis::Sq_overlap(
                     complex<double> *sk2 = wf.get_sk(ik, T2, I2);
                     for (int l = 0; l < ucell.atoms[T1].nwl+1; l++) // 1.3
                     {
-                        complex<double> lphase = pow(IMAG_UNIT, l);
+                        complex<double> lphase = normalization * pow(IMAG_UNIT, l);			// Peize Lin add normalization 2015-12-29
                         for (int l2 = 0; l2 < ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
                             ofs_running << " " << setw(5) << ik+1
@@ -519,6 +521,8 @@ void Numerical_Basis::jlq3d_overlap(
 	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
 	ofs_running << " Q = < J_mu, q | Psi_n, k > " << endl;
 
+	const double normalization = (4 * PI) / sqrt(ucell.omega);			// Peize Lin add normalization 2015-12-29
+
     const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
@@ -553,7 +557,7 @@ void Numerical_Basis::jlq3d_overlap(
 							<< setw(8) << L
 							<< endl;
                 //OUT("l",l);
-                complex<double> lphase = pow(IMAG_UNIT, L);
+                complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < Numerical_Basis::bessel_basis.get_ecut_number(); ie++)
                 {
                     for (int ig=0; ig<np; ig++)
