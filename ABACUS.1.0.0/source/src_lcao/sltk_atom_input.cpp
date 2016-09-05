@@ -325,6 +325,8 @@ void Atom_input::Check_Expand_Condition(void)
 	double extend_v = a23_norm * radius;
 	double extend_d1 = extend_v/ucell.omega*ucell.lat0*ucell.lat0*ucell.lat0;
 	int extend_d11 = static_cast<int>(extend_d1);
+	//2016-09-05, LiuXh
+	if(extend_d1 - extend_d11 > 0.0) extend_d11 += 1;
 
 	double a31_1 = ucell.latvec.e32*ucell.latvec.e13 - ucell.latvec.e33*ucell.latvec.e12;
 	double a31_2 = ucell.latvec.e31*ucell.latvec.e13 - ucell.latvec.e33*ucell.latvec.e11;
@@ -332,6 +334,8 @@ void Atom_input::Check_Expand_Condition(void)
 	double a31_norm = sqrt(a31_1*a31_1 + a31_2*a31_2 + a31_3*a31_3);
 	double extend_d2 = a31_norm*radius/ucell.omega*ucell.lat0*ucell.lat0*ucell.lat0;
 	int extend_d22 = static_cast<int>(extend_d2);
+	//2016-09-05, LiuXh
+	if(extend_d2 - extend_d22 > 0.0) extend_d22 += 1;
 
 	double a12_1 = ucell.latvec.e12*ucell.latvec.e23 - ucell.latvec.e13*ucell.latvec.e22;
 	double a12_2 = ucell.latvec.e11*ucell.latvec.e23 - ucell.latvec.e13*ucell.latvec.e21;
@@ -339,13 +343,21 @@ void Atom_input::Check_Expand_Condition(void)
 	double a12_norm = sqrt(a12_1*a12_1 + a12_2*a12_2 + a12_3*a12_3);
 	double extend_d3 = a12_norm * radius/ucell.omega*ucell.lat0*ucell.lat0*ucell.lat0;
 	int extend_d33 = static_cast<int>(extend_d3);
+	//2016-09-05, LiuXh
+	if(extend_d3 - extend_d33 > 0.0) extend_d33 += 1;
 
 	glayerX = extend_d11 +1;
 	glayerY = extend_d22 +1;
 	glayerZ = extend_d33 +1;
-	glayerX_minus = extend_d11 +1;
-	glayerY_minus = extend_d22 +1;
-	glayerZ_minus = extend_d33 +1;
+	//Begin, 2016-09-05, LiuXh
+	//glayerX_minus = extend_d11 +1;
+	//glayerY_minus = extend_d22 +1;
+	//glayerZ_minus = extend_d33 +1;
+	glayerX_minus = extend_d11;
+	glayerY_minus = extend_d22;
+	glayerZ_minus = extend_d33;
+	//End, 2016-09-05, LiuXh
+
         if(glayerX==1) glayerX++;
         if(glayerY==1) glayerY++;
         if(glayerZ==1) glayerZ++;
