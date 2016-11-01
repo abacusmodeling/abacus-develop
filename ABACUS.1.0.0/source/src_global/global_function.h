@@ -17,7 +17,7 @@
 #include <cassert>
 
 #include "global_variable.h"
-#include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
+//#include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
 using namespace std;
 
