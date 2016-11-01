@@ -50,21 +50,23 @@ class Ylm
 			double rly[]);
 	
 	// (6) used in getting overlap.
+		// Peize Lin change rly 2016-08-26
 	static void rl_sph_harm(
 			const int& Lmax,
 			const double& x,
 			const double& y,
 			const double& z,
-			double rly[]);
+			vector<double>& rly);
 	
 	// (6) used in getting derivative of overlap.
+		// Peize Lin change rly, grly 2016-08-26
 	static void grad_rl_sph_harm(
 			const int& Lmax,
 			const double& x,
 			const double& y,
 			const double& z,
-			double rly[],
-			double grly[][3]);
+			vector<double>& rly,
+			vector<vector<double>>& grly);
 			
 	static void set_coefficients ();
 	static double* ylmcoef;

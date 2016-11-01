@@ -18,10 +18,12 @@ public:
 	/* Constructors and destructor */
 	matrix(const int nrows = 1,const int ncols = 1);
 	matrix(const matrix &m1); /* copy constructor */
+	matrix( matrix && m1 );			// Peize Lin add 2016-08-05
 	~matrix();
 
 	void create(const int nrow,const int ncol);
 	void operator=(const matrix &m1); /* Nonstandard: returns void */
+	matrix& operator=( matrix && m1 );	// Peize Lin add 2016-08-05
 
 	inline double &operator()(const int &ir,const int &ic)
 	{ return c[nc*ir + ic]; }
@@ -69,5 +71,9 @@ double trace_on(const matrix &A, const matrix &B);
 
 // mohan add 2011-01-13
 double mdot(const matrix &A, const matrix &B);
+
+// Peize Lin add 2016-09-08
+double max( const matrix & m );
+double min( const matrix & m );
 
 #endif // MATRIX_H

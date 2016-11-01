@@ -454,8 +454,9 @@ void Gint_k::set_ijk_atom_force(const int &grid_index, const int &size,
 {
 	const Numerical_Orbital_Lm* pointer;
 	double mt[3];
-	static double rly[400];
-	static double grly[400][3];
+    // Peize Lin change rly, grly 2016-08-26
+    static vector<double> rly;
+    static vector<vector<double>> grly;
 	for (int id=0; id<size; ++id)
 	{
 		// (2.1) get the atom type and atom index.

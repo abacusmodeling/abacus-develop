@@ -5,6 +5,7 @@
 #include "mpi.h"
 #endif
 #include "blas_interface.h"
+#include "../../src_global/lapack_connector.h"			// Peize Lin add 2016-08-04
 
 struct LocalMatrix
 {

@@ -56,8 +56,10 @@ void Use_Overlap_Table::gen_tables( const int &job0 )
 	//=========================================
 	//liaochen add 2010/4/29
 	Ylm::set_coefficients ();
-	// 2*lmax+1 = Lmax_used
-	int Lmax_used = MOT.init_Table_Spherical_Bessel ();
+
+	// Peize Lin update 2016-01-26
+	int Lmax_used, Lmax;
+	MOT.init_Table_Spherical_Bessel (2,1, Lmax_used, Lmax);
 	
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0);
@@ -220,9 +222,10 @@ void Use_Overlap_Table::snap_psibeta(
 	const int gindex1 = L1*L1+m1;
 	const int gindex2 = L2*L2+m2;
 
-	double rlya[400];
-	double rlyb[400];
-	double grlyb[400][3];
+	// Peize Lin change rlya, rlyb, grlyb 2016-08-26
+	vector<double> rlya;
+	vector<double> rlyb;
+	vector<vector<double>> grlyb;
 	
 	Ylm::rl_sph_harm (T1_2Lplus1-1, dRa.x, dRa.y, dRa.z, rlya);
 	if (job == 0) Ylm::rl_sph_harm (T2_2Lplus1-1, dRb.x, dRb.y, dRb.z, rlyb);
@@ -524,8 +527,9 @@ void Use_Overlap_Table::snap_psipsi(
 	const int gindex2 = L2*L2+m2;
 
 	assert(nlm < 400);
-	double rly[400];
-	double grly[400][3];
+	// Peize Lin change rly, grly 2016-08-26
+	vector<double> rly;			
+	vector<vector<double>> grly;
 	
 //	double *ylm = new double[nlm];
 //	dR = R1 - R2;

@@ -119,23 +119,46 @@ const realArray &realArray::operator=(const double &right)
 // overloaded subscript operator for const real Array
 // const reference return create an cvakue
 //********************************************************
+// Peize Lin add assert 2016-08-22
 const double &realArray::operator()
 (const int ind1,const int ind2,const int ind3)const
-{return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];}
+{
+	assert(ind1>=0);	assert(ind1<bound1);
+	assert(ind2>=0);	assert(ind2<bound2);
+	assert(ind3>=0);	assert(ind3<bound3);	
+	return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];
+}
 
 const double &realArray::operator()
 (const int ind1,const int ind2,const int ind3,const int ind4)const
-{return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];}
+{
+	assert(ind1>=0);	assert(ind1<bound1);
+	assert(ind2>=0);	assert(ind2<bound2);
+	assert(ind3>=0);	assert(ind3<bound3);
+	assert(ind4>=0);	assert(ind4<bound4);	
+	return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];
+}
 
 //********************************************************
 // overloaded subscript operator for non-const real Array
 // const reference return creates an lvakue
 //********************************************************
 double &realArray::operator()(const int ind1,const int ind2,const int ind3)
-{return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];}
+{
+	assert(ind1>=0);	assert(ind1<bound1);
+	assert(ind2>=0);	assert(ind2<bound2);
+	assert(ind3>=0);	assert(ind3<bound3);
+	return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];
+}
 
 double &realArray::operator()(const int ind1,const int ind2,const int ind3,const int ind4)
-{return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];}
+{
+	assert(ind1>=0);	assert(ind1<bound1);
+	assert(ind2>=0);	assert(ind2<bound2);
+	assert(ind3>=0);	assert(ind3<bound3);
+	assert(ind4>=0);	assert(ind4<bound4);
+	return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];
+}
 
 //****************************
 // zeroes out the whole array

@@ -128,8 +128,9 @@ void Gint_Gamma::gamma_S_T_AP(char type, const Grid_Technique &gt)
 		nnnmax = max(nnnmax, nnn[T]);
 	}
 	assert(nnnmax<400);
-	double rly[400];
-	double grly[400][3];
+	// Peize Lin change rly, grly 2016-08-26
+	vector<double> rly;
+	vector<vector<double>> grly;
 
     //arrays to store the vector potential A and position r, updated at 2012-01-05//
 	double **Aldr3 = new double *[pw.bxyz]; // bxyz*3//

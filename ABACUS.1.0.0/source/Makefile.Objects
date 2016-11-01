@@ -74,6 +74,7 @@ sph_bessel.o\
 global_variable.o \
 global_function.o \
 global_file.o \
+element_basis_index.o \
 
 OBJS_ONSCALING=sltk_grid.o\
 sltk_grid_driver.o \

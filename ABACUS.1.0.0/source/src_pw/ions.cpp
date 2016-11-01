@@ -43,8 +43,7 @@ void Ions::opt_ions_pw(void)
 		if(OUT_LEVEL=="ie")
 		{
 	
-        		//cout << " -------------------------------------------" << endl;
-			cout << " ---------------------------------------------------------" << endl;
+        	cout << " -------------------------------------------" << endl;
 			if(CALCULATION=="relax") //pengfei 2014-10-13
 			{
         		cout << " STEP OF ION RELAXATION : " << istep << endl;
@@ -57,11 +56,9 @@ void Ions::opt_ions_pw(void)
 			{
         		cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
 			}
-        		//cout << " -------------------------------------------" << endl;
-			cout << " ---------------------------------------------------------" << endl;
+        	cout << " -------------------------------------------" << endl;
 
-        		//ofs_running << " -------------------------------------------" << endl;
-			ofs_running << " ---------------------------------------------------------" << endl;
+        	ofs_running << " -------------------------------------------" << endl;
 			if(CALCULATION=="relax")
 			{
         		ofs_running << " STEP OF ION RELAXATION : " << istep << endl;
@@ -70,8 +67,7 @@ void Ions::opt_ions_pw(void)
 			{
         		ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
 			}
-        		//ofs_running << " -------------------------------------------" << endl;
-			ofs_running << " ---------------------------------------------------------" << endl;
+        	ofs_running << " -------------------------------------------" << endl;
 		}
 
 		

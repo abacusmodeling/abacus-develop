@@ -6,6 +6,7 @@
 #ifndef GLOBAL_FUNCTION_H
 #define GLOBAL_FUNCTION_H
 
+#include <vector>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -16,6 +17,7 @@
 #include <cassert>
 
 #include "global_variable.h"
+#include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
 using namespace std;
 
@@ -184,5 +186,38 @@ static inline void DCOPY( const T &a, T &b, const int &dim)
 }
 
 void BLOCK_HERE( const string &description );
+
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : VECTOR_TO_PTR
+// change vector to pointer
+// Peize Lin add 2016-02-25
+//==========================================================
+template<class T>
+static inline T * VECTOR_TO_PTR( std::vector<T> & v )
+{
+    return &(v[0]);
+}
+
+template<class T>
+static inline const T * VECTOR_TO_PTR( const std::vector<T> & v )
+{
+    return &(v[0]);
+}
+
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : TO_STRING
+// change number to string
+// example: 233 -> "233"
+// Peize Lin add 2016-07-18
+//==========================================================
+template< typename T >
+std::string TO_STRING ( const T &n )
+{
+	std::stringstream newstr;
+	newstr<<n;
+	return newstr.str();
+}
 
 #endif

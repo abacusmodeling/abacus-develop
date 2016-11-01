@@ -1064,19 +1064,21 @@ bool Input::Read(const string &fn)
 		read_value(ifs,md_tlast );
 		if(md_tfirst!=md_tlast)
 		{
-                        ifstream file1;
-                        file1.open("ChangeTemp.dat");
-                        if(file1==NULL){
-			    ofstream file;
-			    file.open("ChangeTemp.dat");
-			    for(int ii=0;ii<30;ii++)
-			    {
-			    	    file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
-                    	    }
-		   	    file.close();
-		        }
-                        else file1.close();
-                }
+			ifstream file1;
+			file1.open("ChangeTemp.dat");
+			if(!file1)						// Peize Lin fix bug 2016-08-06
+			{
+				ofstream file;
+				file.open("ChangeTemp.dat");
+				for(int ii=0;ii<30;ii++)
+				{
+					file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
+				}
+				file.close();
+			}
+			else 
+				file1.close();
+		}
 	}
 	else if (strcmp("md_dumpmdfred",word) == 0)
 	{

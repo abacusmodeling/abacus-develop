@@ -205,7 +205,7 @@ void SparseMatrix::multiply_vector(
 	return;
 }
 
-const double SparseMatrix::rate(void) const 
+double SparseMatrix::rate(void) const 
 {  
 	assert(size!=0);
 //	cout << "\n size_sparse = " << size_sparse;

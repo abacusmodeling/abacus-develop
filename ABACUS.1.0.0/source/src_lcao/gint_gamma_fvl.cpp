@@ -32,7 +32,7 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
     }
 }
 
-inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, double rly[], double grly[][3],
+inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, vector<double> &rly, vector<vector<double>> &grly,      // Peize Lin change rly, grly 2016-08-26
                         const Numerical_Orbital_Lm* pointer, 
                         int* block_index, int* block_iw, int* block_size, bool** cal_flag,
                         double** psir_ylm, double** dphix, double** dphiy, double** dphiz)
@@ -435,8 +435,9 @@ void Gint_Gamma::gamma_force(void)
     int* block_size;
     bool** cal_flag;  
 
-    double rly[400];
-    double grly[400][3];
+    // Peize Lin change rly, grly 2016-08-26
+    vector<double> rly;
+    vector<vector<double>> grly;
 
     int nnnmax=0;
     const int ncyz=pw.ncy*pw.nczp;

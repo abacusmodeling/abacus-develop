@@ -4,6 +4,7 @@
 //==========================================================
 #include "unitcell_pseudo.h"
 #include "global.h"
+#include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 UnitCell_pseudo::UnitCell_pseudo()
 {

@@ -10,6 +10,7 @@
 #include <math.h>
 #include <string>
 #include <sstream>
+#include <cstring>		// Peize Lin fix bug about strcpy 2016-08-02
 
 int Number[2];
 

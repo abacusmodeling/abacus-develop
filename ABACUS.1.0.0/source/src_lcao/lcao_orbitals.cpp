@@ -1,5 +1,6 @@
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h" // only use ucell.atoms[it]
+#include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 //==============================
 // Define a object here! 
@@ -318,7 +319,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			}
 		}
 		if(cut_mesh %2 == 0) ++cut_mesh;
-	
+
 //		cout << " cut_mesh=" << cut_mesh << endl;
 		double* beta_r = new double[cut_mesh];
 		ZEROS(beta_r, cut_mesh);
@@ -668,7 +669,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
                                 while (in.good())
                                 {
                                     in >> word;
-                                    if (strcmp(word , "END") == 0)
+                                    if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
                                     {
                                         break;
                                     }
@@ -814,7 +815,6 @@ void LCAO_Orbitals::Read_PAO(const int& it)
                 psi, // radial wave function
                 this->kmesh,
                 this->dk,
-				ucell.lat0,
 				this->dr_uniform
 				); // delta k mesh in reciprocal space
 

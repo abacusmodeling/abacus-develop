@@ -16,11 +16,11 @@ class Ions_Move_Methods
 	void allocate(void);
 	void cal_movement(const int &istep, const matrix &f, const double &etot);
 
-	const bool get_converged(void)const {return Ions_Move_Basic::converged;}
-	const double get_ediff(void)const {return Ions_Move_Basic::ediff;}
-	const double get_largest_grad(void)const {return Ions_Move_Basic::largest_grad;}
-	const double get_trust_radius(void)const {return Ions_Move_Basic::trust_radius;}
-	const double get_update_iter(void)const {return Ions_Move_Basic::update_iter;}
+	bool get_converged(void)const {return Ions_Move_Basic::converged;}
+	double get_ediff(void)const {return Ions_Move_Basic::ediff;}
+	double get_largest_grad(void)const {return Ions_Move_Basic::largest_grad;}
+	double get_trust_radius(void)const {return Ions_Move_Basic::trust_radius;}
+	double get_update_iter(void)const {return Ions_Move_Basic::update_iter;}
 
 	private:
 

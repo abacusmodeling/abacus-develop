@@ -38,6 +38,7 @@ class LCAO_Orbitals
 	const int& get_lmax(void) const {return lmax;}
 	const int& get_nchimax(void) const {return nchimax;}
 	const int& get_ntype(void) const {return ntype;}
+	const double& get_dr_uniform(void) const {return dr_uniform;}
 
 	Numerical_Orbital* Phi;
 	Numerical_Nonlocal* Beta;

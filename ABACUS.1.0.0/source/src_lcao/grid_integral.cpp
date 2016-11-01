@@ -225,15 +225,15 @@ void Grid_Integral::rho_in_small_box(void)
 				{			
 					chr.rho[0][ ijk_index[count] ] += factor *
 						Mathzone::Polynomial_Interpolation( 
-						pointer1->psi_uniform,
-						pointer1->nr_uniform,
-						pointer1->dr_uniform,
+						pointer1->getPsiuniform(),				// Peize Lin update 2016-05-14
+						pointer1->getNruniform(),
+						pointer1->getDruniform(),
 						norm1[count])
 						*						
 						Mathzone::Polynomial_Interpolation( 
-						pointer2->psi_uniform,
-						pointer2->nr_uniform,
-						pointer2->dr_uniform,
+						pointer2->getPsiuniform(),				// Peize Lin update 2016-05-14
+						pointer2->getNruniform(),
+						pointer2->getDruniform(),
 						norm2[count])
 						*
 						yy1_lm[count]
@@ -274,15 +274,15 @@ void Grid_Integral::vlocal_in_small_box(void)
 				{								
 					
 					v += 	Mathzone::Polynomial_Interpolation( 
-							pointer1->psi_uniform,
-							pointer1->nr_uniform,
-							pointer1->dr_uniform,
+							pointer1->getPsiuniform(),				// Peize Lin update 2016-05-14
+							pointer1->getNruniform(),
+							pointer1->getDruniform(),
 							norm1[count])
 							*
 							Mathzone::Polynomial_Interpolation( 
-							pointer2->psi_uniform,
-							pointer2->nr_uniform,
-							pointer2->dr_uniform,
+							pointer2->getPsiuniform(),				// Peize Lin update 2016-05-14
+							pointer2->getNruniform(),
+							pointer2->getDruniform(),
 							norm2[count])
 							*
 							yy1_lm[count]

@@ -38,5 +38,4 @@ class Inverse_Matrix_Real
 
 };
 
-
 #endif

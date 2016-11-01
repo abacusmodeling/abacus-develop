@@ -2,6 +2,7 @@
 #include "lcao_orbitals.h"
 #include "../src_global/sph_bessel.h"
 
+#include <stdexcept>
 double Make_Overlap_Table::dr = -1.0;
 
 Make_Overlap_Table::Make_Overlap_Table()
@@ -128,7 +129,7 @@ void Make_Overlap_Table::cal_ST_Phi12_R
     const int &rmesh,
     double* rs,
 	double* drs
-)
+) const
 {
 //	TITLE("Make_Overlap_Table","cal_ST_Phi12_R");
 	timer::tick("Make_Overlap_Table", "cal_ST_Phi12_R");
@@ -270,7 +271,7 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 //	delete [] jl;
 	delete [] integrated_func;
 	
-	
+
 	/*
 	double* integrated_func1 = new double[kmesh];
 	double* integrated_func2 = new double[kmesh];
@@ -1082,34 +1083,137 @@ void Make_Overlap_Table::init_NL_Opair(void)
 	return;
 }
 
-int Make_Overlap_Table::init_Table_Spherical_Bessel (void)
+// Peize Lin update 2016-01-26
+void Make_Overlap_Table::init_Lmax (const int orb_num, const int mode, int &Lmax_used, int &Lmax) const
+{
+	auto cal_Lmax_Phi = [&Lmax]()
+	{
+		//obtain maxL of all type
+		const int ntype = ORB.get_ntype();
+		for (int it = 0; it < ntype; it++)
+		{
+			const int Lmax_now = ORB.Phi[it].getLmax ();
+			Lmax = max(Lmax, Lmax_now);
+		}
+	};
+
+	auto cal_Lmax_Beta = [&Lmax]()
+	{
+		// fix bug.
+		// mohan add the nonlocal part.
+		// 2011-03-07
+		const int ntype = ORB.get_ntype();
+		for(int it=0; it< ntype; it++)
+		{
+			const int Lmax_now = ORB.Beta[it].getLmax();
+			Lmax = max(Lmax, Lmax_now);
+		}
+	};
+
+	Lmax = -1;
+	
+	switch( orb_num )
+	{
+		case 2:
+			switch( mode )
+			{
+				case 1:			// used in <Phi|Phi> or <Beta|Phi>
+					cal_Lmax_Phi();
+					cal_Lmax_Beta();
+					//use 2lmax+1 in dS
+					Lmax_used = 2*Lmax + 1;
+					break;
+//				case 2:			// used in <jY|jY>
+//					Lmax = max(Lmax, Exx_Abfs::Lmax);
+//					Lmax_used = 2*Lmax + 1;
+//					break;
+				default:
+					throw invalid_argument("Make_Overlap_Table::init_Lmax orb_num=2, mode error");
+					break;
+			}
+			break;
+		case 3:
+			switch( mode )
+			{
+//				case 1:			// used in <jY|PhiPhi>
+//					cal_Lmax_Phi();
+//					Lmax = max(Lmax, Exx_Abfs::Lmax);
+//					Lmax_used = 2*Lmax + 1;
+//					Lmax_used += Exx_Abfs::Lmax;
+//					break;
+				default:
+					throw invalid_argument("Make_Overlap_Table::init_Lmax orb_num=3, mode error");
+					break;
+			}
+			break;
+		case 4:
+			switch( mode )
+			{
+				case 1:			// used in <PhiPhi|PhiPhi>
+					cal_Lmax_Phi();
+					Lmax_used = 2*( 2*Lmax + 1 );
+					break;
+				default:
+					throw invalid_argument("Make_Overlap_Table::init_Lmax orb_num=4, mode error");
+					break;
+			}
+			break;
+		default:
+			throw invalid_argument("Make_Overlap_Table::init_Lmax orb_num error");
+			break;
+	}
+
+/*	if( mode==1 || mode==2)
+	{
+		//obtain maxL of all type
+
+		const int ntype = ORB.get_ntype();
+		for (int it = 0; it < ntype; it++)
+		{
+			const int Lmax_now = ORB.Phi[it].getLmax ();
+			Lmax = max(Lmax, Lmax_now);
+		}
+
+		if(mode==1)
+		{
+			// fix bug.
+			// mohan add the nonlocal part.
+			// 2011-03-07
+			for(int it=0; it< ntype; it++)
+			{
+				const int Lmax_now = ORB.Beta[it].getLmax();
+				Lmax = max(Lmax, Lmax_now);
+			}			
+		}
+
+		//use 2lmax+1 in dS
+		Lmax_used = 2*Lmax + 1;	
+
+		// Peize Lin add 2016-01-26
+		if(mode==2)									
+		{
+			Lmax = max(Lmax, Use_Psi3_Center2::exx_ri_lmax);
+			Lmax_used += Use_Psi3_Center2::exx_ri_lmax;
+		}			
+	}
+	else if( mode==3 )
+	{
+		Lmax = Use_Psi3_Center2::exx_ri_lmax;
+		Lmax_used = 2*Lmax + 1;
+	}*/
+
+	assert(Lmax_used >= 1);
+}
+
+// Peize Lin update 2016-01-26
+void Make_Overlap_Table::init_Table_Spherical_Bessel (const int orb_num, const int mode, int &Lmax_used, int &Lmax)
 {
 	if( this->destroy_jlx )
 	{
 		WARNING_QUIT("Make_Overlap_Table::init_Table_Spherical_Bessel","jlx has been allocated!");
 	}
 
-	//obtain maxL of all type
-	int Lmax_used = -1;
-	const int ntype = ORB.get_ntype();
-	for (int it = 0; it < ntype; it++)
-	{
-		int Lmax_now = ORB.Phi[it].getLmax ();
-		Lmax_used = max(Lmax_used, Lmax_now);
-	}
-
-	// fix bug.
-	// mohan add the nonlocal part.
-	// 2011-03-07
-	for(int it=0; it< ntype; it++)
-	{
-		int Lmax_now = ORB.Beta[it].getLmax();
-		Lmax_used = max(Lmax_used, Lmax_now);
-	}
-		
-	//use 2lmax+1 in dS
-	Lmax_used = 2*Lmax_used + 1;
-	assert(Lmax_used >= 1);
+	this->init_Lmax (orb_num,mode,Lmax_used,Lmax);		// Peize Lin add 2016-01-26
 
 	// the allocation of L need to + 1,
 	Sph_Bessel SB;
@@ -1153,8 +1257,6 @@ int Make_Overlap_Table::init_Table_Spherical_Bessel (void)
 //	OUT(ofs_running,"kmesh",kmesh);
 //	OUT(ofs_running,"Rmesh",Rmesh);
 	Memory::record ("Make_Overlap_Table", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");
-	
-	return Lmax_used;
 }
 
 void Make_Overlap_Table::Destroy_Table_Spherical_Bessel (const int& Lmax_used)

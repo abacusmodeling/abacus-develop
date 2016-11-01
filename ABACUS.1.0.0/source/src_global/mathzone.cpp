@@ -1397,6 +1397,83 @@ void Mathzone::Simpson_Integral
     return;
 }// end subroutine simpson
 
+// Peize Lin add 2016-02-14
+void Mathzone::Simpson_Integral_0toall
+(
+    const int mesh,
+    const double *func,
+    const double *rab,
+    double *asum
+)
+{
+    // asum(r) = \int_{r'=0}^{r} dr' f(r') 
+
+    const double r2=1.00/2.00, r3=1.00/3.00;
+    asum[0] = 0.00;
+    double f3 = func [0] * rab [0];
+    for( size_t i=1; i<mesh; i+=2)
+    {
+        const double f1 = f3;
+        const double f2 = func[i] * rab[i] ;
+        f3 = func[i+1] * rab[i+1] ;
+        asum[i] = asum[i-1] + r2*( f1 + f2);
+        if(i+1<mesh)
+        {
+            asum[i+1] = asum[i-1] + r3*( f1 + 4.00*f2 + f3 );
+        }
+    }
+    return;
+}
+
+// Peize Lin add 2016-02-14
+// faster but still have bug
+/*void Mathzone::Simpson_Integral_alltoinf
+(
+    const int mesh,
+    const double *func,
+    const double *rab,
+    double *asum
+)
+{
+    // asum(r) = \int_{r'=r}^{+\infty} dr' f(r') 
+    //         = \inf_{r'=r}^{mesh} dr' f(r')
+
+    const double r2=1.00/2.00, r3=1.00/3.00;
+    asum[mesh-1] = 0.00;
+    const int odd_mesh = (mesh-1)^~1;
+    double f1 = func[odd_mesh] * rab[odd_mesh];
+    for( size_t i=(mesh-3)|1; i>0; i-=2)
+    {
+        const double f3 = f1;   
+        if( i+3==mesh )
+        {
+            const double f4 = func[mesh-1] * rab[mesh-1];
+            asum[mesh-2] = r2*(f3 + f4);
+        }
+        const double f2 = func[i] * rab[i] ;
+        f1 = func[i-1] * rab[i-1] ;
+        asum[i-1] = asum[i+1] + r3*( f1 + 4.00*f2 + f3 );
+        asum[i] = asum[i-1] - r2*( f1 + f2);
+    }
+    return;
+}*/
+
+// Peize Lin add 2016-06-11
+// a little lower
+void Mathzone::Simpson_Integral_alltoinf
+(
+    const int mesh,
+    const double *func,
+    const double *rab,
+    double *asum
+)
+{
+    Mathzone::Simpson_Integral_0toall( mesh, func, rab, asum );
+    const double asum_all = asum[mesh-1];
+    for (int i = 0;i < mesh; ++i)
+        asum[i] = asum_all - asum[i];
+}
+
 void Mathzone::To_Polar_Coordinate
 (
     const double &x_cartesian,

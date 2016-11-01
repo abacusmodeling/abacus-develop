@@ -9,8 +9,10 @@ FFTW_LIB_DIR = ${FFTW_DIR}/lib
 # LAPACK/BLAS directories
 #---------------------------------------------
 #EINSTEIN
-LIBS = -L${FFTW_LIB_DIR} -lfftw -lm \
--L/public/intel/mkl/lib/intel64 -i-dynamic -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread \
+LAPACK_LIB_DIR = /public/intel/mkl/lib/intel64
+LIBS = -L${FFTW_LIB_DIR} -lfftw -lm -Wl,-rpath=${FFTW_LIB_DIR} \
+-L${LAPACK_LIB_DIR} -i-dynamic -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
+-qopenmp -lpthread \
 #-L/opt/intel/cmkl/10.2.5.035/lib/em64t -i-dynamic -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread \
 
 #NOTE by mohan
@@ -32,4 +34,4 @@ CPLUSPLUS_MPI = /public/apps/openmpi-165-intel/bin/mpicxx
 #==========================
 # OPTIMIZE OPTIONS and boost
 #==========================
-OPTS = -I. -Icommands -I/public/udata/software/boost_1_39_0/ -I${FFTW_INCLUDE} -O3 -g -rdynamic
+OPTS = -I. -Icommands -I/public/udata/software/boost_1_39_0/ -I${FFTW_INCLUDE} -O3 -g -rdynamic -std=c++11

@@ -1,4 +1,5 @@
 #include "wavefunc_in_pw.h"
+#include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_local)
 {
@@ -47,7 +48,7 @@ void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_loca
                                 while (in.good())
                                 {
                                     in >> word;
-                                    if (strcmp(word , "END") == 0)
+                                    if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
                                     {
                                         break;
                                     }

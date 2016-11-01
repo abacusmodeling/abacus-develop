@@ -17,6 +17,8 @@
 #define LAPACKCONNECTOR_HPP
 
 #include <new>
+#include <stdexcept>
+#include <iostream>
 #include "complexmatrix.h"
 #include "matrix.h"
 
@@ -60,9 +62,22 @@ extern "C"
     // mohan add dsptrf and dsptri 2010-02-03, to compute inverse real symmetry indefinit matrix.
     void spotrf_(const char* uplo,const int* n, double* A, int* lda, int *info);
     void spotri_(const char* uplo,const int* n, double* A, int* lda, int *info);
+    // Peize Lin add dsptrf and dsptri 2016-06-21, to compute inverse real symmetry indefinit matrix.
+    void dpotrf_(const char* uplo,const int* n, double* A, const int* lda, int *info);
+    void dpotri_(const char* uplo,const int* n, double* A, const int* lda, int *info);
     // mohan add zpotrf and zpotri 2010-02-03, to compute inverse complex hermit matrix.
     void zpotrf_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
     void zpotri_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
+	// Peize Lin add ?axpy 2016-08-04, to compute y=ax+y
+	void saxpy_(int *N, float *alpha, float *X, int *incX, float *Y, int *incY);
+	void daxpy_(int *N, double *alpha, double *X, int *incX, double *Y, int *incY);
+	void caxpy_(int *N, complex<float> *alpha, complex<float> *X, int *incX, complex<float> *Y, int *incY);
+	void zaxpy_(int *N, complex<double> *alpha, complex<double> *X, int *incX, complex<double> *Y, int *incY);
+	// Peize Lin add ?scal 2016-08-04, to compute x=ax
+	void sscal_(int *N, float *alpha, float *X, int *incX);
+	void dscal_(int *N, double *alpha, double *X, int *incX);
+	void cscal_(int *N, complex<float> *alpha, complex<float> *X, int *incX);
+	void zscal_(int *N, complex<double> *alpha, complex<double> *X, int *incX);
 };
 
 // Class LapackConnector provide the connector to fortran lapack routine.
@@ -90,7 +105,7 @@ private:
     double * transpose_matrix(const matrix& a, const int n, const int lda)
     {
         double * aux = new double [lda*n];
-		cout << " lda=" << lda << " n=" << n << endl;
+		std::cout << " lda=" << lda << " n=" << n << std::endl;
         for (int i=0; i<n; i++)
         {
             for (int j=0; j<lda; j++)
@@ -126,6 +141,31 @@ private:
             }
         }
     }
+	
+	// Peize Lin add 2015-12-27
+	static inline
+	char change_side(const char &side)
+	{
+		switch(side)
+		{
+			case 'L': return 'R';
+			case 'R': return 'L';
+			default: throw invalid_argument("Side must be 'L' or 'R'");
+		}		
+	}
+	
+	// Peize Lin add 2015-12-27	
+	static inline
+	char change_uplo(const char &uplo)
+	{
+		switch(uplo)
+		{
+			case 'U': return 'L';
+			case 'L': return 'U';
+			default: throw invalid_argument("Uplo must be 'U' or 'L'");
+		}		
+	}
+	
 public:
 
     static inline
@@ -345,9 +385,9 @@ public:
     void spotrf(char uplo,int n,matrix &a, int lda,int *info)
 	{
 		double *aux = LapackConnector::transpose_matrix(a, n, lda);
-		for(int i=0; i<4; i++)cout << "\n aux=" << aux[i]; 
+		for(int i=0; i<4; i++)std::cout << "\n aux=" << aux[i]; 
 		spotrf_( &uplo, &n, aux, &lda, info);
-		for(int i=0; i<4; i++)cout << "\n aux=" << aux[i]; 
+		for(int i=0; i<4; i++)std::cout << "\n aux=" << aux[i]; 
 		LapackConnector::transpose_matrix(aux, a, n, lda);
 		delete[] aux;
 		return;
@@ -357,13 +397,73 @@ public:
 	void spotri(char uplo,int n,matrix &a, int lda, int *info)
 	{
 		double *aux = LapackConnector::transpose_matrix(a, n, lda);
-		for(int i=0; i<4; i++)cout << "\n aux=" << aux[i]; 
+		for(int i=0; i<4; i++)std::cout << "\n aux=" << aux[i]; 
 		spotri_( &uplo, &n, aux, &lda, info);
-		for(int i=0; i<4; i++)cout << "\n aux=" << aux[i]; 
+		for(int i=0; i<4; i++)std::cout << "\n aux=" << aux[i]; 
 		LapackConnector::transpose_matrix(aux, a, n, lda);
 		delete[] aux;
 		return;
 	}
+
+	// Peize Lin add 2016-07-09
+	static inline
+	void dpotrf( char uplo, const int n, matrix &a, const int lda, int *info )
+	{
+		const char uplo_changed = change_uplo(uplo);
+		dpotrf_( &uplo_changed, &n, a.c, &lda, info );
+	}	
+	
+	// Peize Lin add 2016-07-09
+	static inline
+	void dpotri( char uplo, const int n, matrix &a, const int lda, int *info )
+	{
+		const char uplo_changed = change_uplo(uplo);
+		dpotri_( &uplo_changed, &n, a.c, &lda, info);		
+	}	
+	
+	// Peize Lin add 2016-08-04
+	static inline 
+	void axpy( int N,  float alpha,  float *X,  int incX, float *Y,  int incY)
+	{
+		saxpy_(&N, &alpha, X, &incX, Y, &incY);
+	}	
+	static inline 
+	void axpy( int N,  double alpha,  double *X,  int incX, double *Y,  int incY)
+	{
+		daxpy_(&N, &alpha, X, &incX, Y, &incY);
+	}	
+	static inline 
+	void axpy( int N,  complex<float> alpha,  complex<float> *X,  int incX, complex<float> *Y,  int incY)
+	{
+		caxpy_(&N, &alpha, X, &incX, Y, &incY);
+	}	
+	static inline 
+	void axpy( int N,  complex<double> alpha,  complex<double> *X,  int incX, complex<double> *Y,  int incY)
+	{
+		zaxpy_(&N, &alpha, X, &incX, Y, &incY);
+	}	
+	
+	// Peize Lin add 2016-08-04
+	static inline 
+	void scal( int N,  float alpha, float *X,  int incX)
+	{
+		sscal_(&N, &alpha, X, &incX);
+	}	
+	static inline 
+	void scal( int N,  double alpha, double *X,  int incX)
+	{
+		dscal_(&N, &alpha, X, &incX);
+	}	
+	static inline 
+	void scal( int N,  complex<float> alpha, complex<float> *X,  int incX)
+	{
+		cscal_(&N, &alpha, X, &incX);
+	}	
+	static inline 
+	void scal( int N,  complex<double> alpha, complex<double> *X,  int incX)
+	{
+		zscal_(&N, &alpha, X, &incX);
+	}	
 
 };
 #endif  // LAPACKCONNECTOR_HPP

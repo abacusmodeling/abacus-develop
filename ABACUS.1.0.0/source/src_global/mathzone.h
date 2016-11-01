@@ -139,6 +139,36 @@ public:
         const double *rab,
         double &asum
     );
+
+    // Peize Lin add 2016-02-14
+    static void Simpson_Integral_0toall
+    (
+        const int mesh,
+        const double *func,
+        const double *rab,
+        double *asum
+    );
+
+    // Peize Lin add 2016-02-14
+    static void Simpson_Integral_alltoinf
+    (
+        const int mesh,
+        const double *func,
+        const double *rab,
+        double *asum
+    );     
+	
+	// Peize Lin add 2016-08-03
+	template< typename Type >
+	static vector<Type> Pointwise_Product( const vector<Type> &f1, const vector<Type> &f2 )
+	{
+		assert(f1.size()==f2.size());
+		vector<Type> f(f1.size());
+		for( int ir=0; ir!=f.size(); ++ir )
+			f[ir] = f1[ir] * f2[ir];
+		return f;
+	}
+
 //==========================================================
 // MEMBER FUNCTION :
 // NAME : Direct_to_Cartesian

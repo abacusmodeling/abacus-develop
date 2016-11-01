@@ -51,7 +51,9 @@ class Make_Overlap_Table
 	//Sph_Bes : jlx[kmesh][Rmesh][L]
 	//L should be 2*Lmax, which is max L of all type
 	//=================================================
-	int init_Table_Spherical_Bessel (void);
+	// Peize Lin update 2016-01-26
+	void init_Lmax (const int orb_num, const int mode, int &Lmax_used, int &Lmax) const;
+	void init_Table_Spherical_Bessel (const int orb_num, const int mode, int &Lmax_used, int &Lmax);
 	void Destroy_Table_Spherical_Bessel (const int& Lmax_used);
 
 	bool destroy_jlx;
@@ -104,7 +106,7 @@ class Make_Overlap_Table
 		const Numerical_Orbital_Lm &n2,
 		const int &rmesh,
 		double *rs,
-		double *drs);
+		double *drs) const;
 
 	void cal_VNL_PhiBeta_R(
         const int &l,

@@ -253,13 +253,16 @@ bool eximport::sec_wf(ComplexMatrix *psi, const int wf_num, const string &fn)con
 		return 0;
 	}
 
-	for (int ik = 0;ik < kv.nks;ik++)
+	for (int ik = 0;ik != kv.nks;ik++)
 	{
-		for (int iw = 0;iw < wf_num;iw++)
+		for (int iw = 0;iw != wf_num;iw++)
 		{
-			for (int ig = 0;ig < kv.ngk[ik];ig++)
+			for (int ig = 0;ig != kv.ngk[ik];ig++)
 			{
-				sec >> psi[ik](iw, ig).real() >> psi[ik](iw, ig).imag();
+				// Peize Lin fix bug about rvalue 2016-08-02
+				double tmp_real, tmp_imag;
+				sec >> tmp_real >> tmp_imag ;
+				psi[ik](iw, ig) = complex<double>(tmp_real,tmp_imag);
 			}
 		}
 	}
@@ -292,7 +295,10 @@ bool eximport::sec_wf(complex < double> ***psi, const int npsi, const string &fn
 		{
 			for (int ig = 0;ig < kv.ngk[ik];ig++)
 			{
-				sec >> psi[iw][ik][ig].real() >> psi[iw][ik][ig].imag();
+				// Peize Lin fix bug about rvalue 2016-08-02
+				double tmp_real, tmp_imag;
+				sec >> tmp_real >> tmp_imag ;
+				psi[iw][ik][ig] = complex<double>(tmp_real,tmp_imag);				
 			}
 		}
 	}

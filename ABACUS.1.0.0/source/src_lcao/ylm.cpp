@@ -614,17 +614,20 @@ void Ylm::sph_harm
 	return;
 }
 
+// Peize Lin change rly 2016-08-26
 void Ylm::rl_sph_harm
 (
  	const int& Lmax, //max momentum of L
  	const double& x,
 	const double& y,
 	const double& z,
-	double rly[]
+	vector<double>& rly
 )
 {
+	rly.resize( (Lmax+1)*(Lmax+1) );
+
 	double radius2 = x*x+y*y+z*z;
-	
+
 	//begin calculation
 	/***************************
 			 L = 0
@@ -747,7 +750,6 @@ void Ylm::rl_sph_harm
 		rly[istart+2*il-1] = (bl3*rly[istart+2*il-5]-bl2*rly[istart2+2*il-5]*radius2-2.0*x*rly[istart1+2*il-3]) / bl1;
 		rly[istart+2*il] = (bl3*rly[istart+2*il-4]-bl2*rly[istart2+2*il-4]*radius2-2.0*x*rly[istart1+2*il-2]) / bl1;
 	}
-		
 			
 	return;
 }
@@ -758,10 +760,13 @@ void Ylm::grad_rl_sph_harm
  	const double& x,
 	const double& y,
 	const double& z,
-	double rly[],
-	double grly[][3]
+	vector<double>& rly,
+	vector<vector<double>>& grly
 )
 {
+	rly.resize( (Lmax+1)*(Lmax+1) );
+	grly.resize( (Lmax+1)*(Lmax+1), vector<double>(3) );
+
 	double radius2 = x*x+y*y+z*z;
 	double tx = 2.0*x;
 	double ty = 2.0*y;
@@ -1096,9 +1101,9 @@ void Ylm::test1 (void)
 	
 	int nu = 100;
 	
-	double rlya[400];
+	// Peize Lin change rlya 2016-08-26
+	vector<double> rlya;
 	double rlyb[400];
-	ZEROS( rlya, 400);
 	ZEROS( rlyb, 400);
 	
 //	Ylm::sph_harm (9, xdr, ydr, zdr, rlya);
@@ -1125,10 +1130,10 @@ void Ylm::test2 (void)
 	
 	int nu = 100;
 
-	double rlya[400];
+	vector<double> rlya;
 	double rlyb[400];
 	
-	double grlya[400][3];
+	vector<vector<double>> grlya;
 	double grlyb[400][3];
 	
 	Ylm::grad_rl_sph_harm (9, R.x, R.y, R.z, rlya, grlya);

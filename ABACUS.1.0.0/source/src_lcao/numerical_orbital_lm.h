@@ -1,12 +1,16 @@
 //=========================================================
 //AUTHOR : liaochen
 //DATE : 2008-11-12
+//UPDATE : Peize Lin change all pointer to vector 2016-05-14
 //=========================================================
 #ifndef NUMERICAL_ORBITAL_LM_H
 #define NUMERICAL_ORBITAL_LM_H
 
+#include <vector>
+using std::vector;
 #include "../src_pw/tools.h"
 #include "../src_parallel/fftw.h"
+#include "../src_global/global_function.h"
 
 //=========================================================
 //CLASS Num_orbital_lm
@@ -19,8 +23,8 @@ class Numerical_Orbital_Lm
 	friend class Numerical_Orbital;
 
 public:
-	double* psi_uniform;// mohan add 2009-5-10
-	double* dpsi_uniform; //liaochen add 2010/5/11
+	vector<double> psi_uniform;// mohan add 2009-5-10
+	vector<double> dpsi_uniform; //liaochen add 2010/5/11
 	
 	int nr_uniform;// mohan add 2009-5-10
 	double dr_uniform;// mohan add 2009-5-10
@@ -31,23 +35,6 @@ public:
 	Numerical_Orbital_Lm();
 	~Numerical_Orbital_Lm();
 
-	const int& getL() const { return angular_momentum_l; }
-	const int& getType() const { return index_atom_type; }
-	const int& getChi() const {return index_chi; }
-
-	const double* getRadial() const { return r_radial; }
-	const double& getRadial(const int ir) const { return r_radial[ir]; }
-
-	const double* getPsi() const { return psi;}
-	const double* getPsi_r() const { return psir; }
-	const double& getPsi_r(const int ir) const { return psir[ir]; }
-
-	const double& getDk()const { return dk; }
-	const double* getKpoint()const { return k_radial; }
-	const double& getKpoint(const int ik) const { return k_radial[ik]; }
-	const double* getPsi_k() const { return psik; }
-	const double& getPsi_k(const int ik) const { return psik[ik]; }
-	
 //==========================================================
 // EXPLAIN : set information about Numerical_Orbital_Lm
 // MEMBER FUNCTION :
@@ -67,8 +54,10 @@ public:
 		const int &nk_in,
 		const double &dk_in,
 
-		const double &lat0,
-		const double &dr_uniform
+		// Peize Lin delete lat0 2016-02-03
+		const double &dr_uniform,
+		
+		bool flag_plot = true				// Peize Lin add flag_plot 2016-08-31
 	);
 
 private:
@@ -91,15 +80,56 @@ private:
 	double kcut;
 	double dk;
 
-	double* r_radial; //points of r
-	double* k_radial;
+	vector<double> r_radial; //points of r
+	vector<double> k_radial;
 
-	double* rab;
+	vector<double> rab;
 
-	double* psi;//psi(r)
-	double* psir; //psi(r) * r
-	double* psik;
+	vector<double> psi;//psi(r)
+	vector<double> psir; //psi(r) * r
+	vector<double> psik;
 
+public:
+
+	const int& getL() const { return angular_momentum_l; }
+	const int& getType() const { return index_atom_type; }
+	const int& getChi() const {return index_chi; }
+
+	const double* getPsiuniform() const { return VECTOR_TO_PTR(psi_uniform); }
+
+	const double* getDpsiuniform() const { return VECTOR_TO_PTR(dpsi_uniform); }
+
+	const double* getRadial() const { return VECTOR_TO_PTR(r_radial); }
+	const vector<double>& get_r_radial() const { return r_radial; }
+	const double& getRadial(const int ir) const { return r_radial[ir]; }
+
+	const double* getRab() const { return VECTOR_TO_PTR(rab); }
+	const vector<double>& get_rab() const { return rab; }
+	const double& getRab(const int ir) const { return rab[ir]; }
+
+	const double* getPsi() const { return VECTOR_TO_PTR(psi);}
+	const double& getPsi(const int ir) const { return psi[ir];}	
+	const vector<double>& get_psi() const { return psi; }
+	const double* getPsi_r() const { return VECTOR_TO_PTR(psir); }
+	const double& getPsi_r(const int ir) const { return psir[ir]; }
+
+	const double& getDk()const { return dk; }
+	const double* getKpoint()const { return VECTOR_TO_PTR(k_radial); }
+	const double& getKpoint(const int ik) const { return k_radial[ik]; }
+	const double* getPsi_k() const { return VECTOR_TO_PTR(psik); }
+	const double& getPsi_k(const int ik) const { return psik[ik]; }
+	
+	const string& getLabel() const { return label; }
+
+	const int& getNr() const { return nr; }
+	const int& getNk() const { return nk; }
+
+	const double& getRcut() const { return rcut; }
+	const double& getKcut() const { return kcut; }
+
+	const int& getNruniform() const { return nr_uniform; }
+	const double& getDruniform() const { return dr_uniform; }
+	
 };
 
 #endif

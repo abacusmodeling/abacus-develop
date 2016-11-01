@@ -71,7 +71,7 @@ public:
 
 	const matrix convert_to_matrix(void)const;
 
-	const double rate(void) const;
+	double rate(void) const;
 
 private:
 	void init(const int row_num, const int col_num);

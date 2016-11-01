@@ -212,9 +212,9 @@ int Make_Gaunt_Table::index_func
 	const int& m3
 )
 {
-	int aux1 = l1*(l1*l1*l1+6*l1*l1+11*l1+6)/24;
-	int aux2 = l2*(l2*l2+3*l2+2)/6;
-	int aux3 = l3*(l3+1)/2;
+	const int aux1 = l1*(l1*l1*l1+6*l1*l1+11*l1+6)/24;
+	const int aux2 = l2*(l2*l2+3*l2+2)/6;
+	const int aux3 = l3*(l3+1)/2;
 	
 	return aux1 + aux2 + aux3 + m3;
 }
@@ -224,11 +224,12 @@ void Make_Gaunt_Table::init_Gaunt_CH(const int& Lmax)
 	TITLE("Make_Gaunt_Table","init_Gaunt_CH");
 	timer::tick("Make_Gaunt_Table","init_Gaunt_CH",'D');
 
-	assert(Lmax <= 6);
+//	assert(Lmax <= 6);			// Peize Lin delete 2016-08-26. why?
+
 	int L = 2*Lmax + 1;
 	
 	int Np = this->P_EL(L);
-	assert(Np <= 5000);
+//	assert(Np <= 5000);			// Peize Lin delete 2016-08-26. why?
 
 	int Eff_Np = this->EP_EL(L);
 
@@ -253,7 +254,7 @@ void Make_Gaunt_Table::init_Gaunt_CH(const int& Lmax)
 						int uplmt_m2 = l1 - m3 > l2 ? l2 : l1 - m3;
 						int dim = l2 + uplmt_m2 + 1;
 						
-						assert(dim <= 30);
+//						assert(dim <= 30);			// Peize Lin delete 2016-08-26. why?
 
 						int ic2 = 0;
 						for(int m2 = -l2; m2 <= uplmt_m2; m2++)
@@ -262,8 +263,9 @@ void Make_Gaunt_Table::init_Gaunt_CH(const int& Lmax)
 							int m1 = -m2 - m3;
 							assert(abs(m1) <= l1);
 
-							assert(ic1 < 5000);
-							assert(ic2 < 30);
+							// Peize Lin delete assert 2016-08-26
+//							assert(ic1 < 5000);
+//							assert(ic2 < 30);
 							Gaunt_CH[ic1][ic2] = Calc_Gaunt_CH(l1, m1, l2, m2, l3, m3);
 							ic2++;
 						}
@@ -376,7 +378,8 @@ double Make_Gaunt_Table::Get_Gaunt_CH
 	int ic1 = index_func(L1, L2, L3, M3);
 	int ic2 = M2 + L2;
 
-	return Gaunt_CH[ic1][ic2];
+	try{ return Gaunt_CH.at(ic1).at(ic2); }			// Peize Lin add 2016-08-26
+	catch( out_of_range ){ return 0; }
 }
 	
 //Input value
@@ -463,6 +466,7 @@ double Make_Gaunt_Table::Get_Gaunt_SH
 	timer::tick("Make_Gaunt_Table","Get_Gaunt_SH");
 }
 
+/*	// Peize Lin delete 2016-08-26
 void Make_Gaunt_Table::ZEROS()
 {
 	for(int ir = 0; ir < 5000; ir++)
@@ -474,6 +478,7 @@ void Make_Gaunt_Table::ZEROS()
 	}
 	return;
 }
+*/
 
 double Make_Gaunt_Table::Fact(const int& n)
 {

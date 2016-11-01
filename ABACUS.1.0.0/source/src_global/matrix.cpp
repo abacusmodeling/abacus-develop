@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include<limits>
 
 using namespace std;
 #include "matrix.h"
@@ -47,8 +48,11 @@ void matrix::init(const int nrows,const int ncols)
 // Free up memory for matrix
 void matrix::freemem(void)
 {
-	delete [] c;
-	c = NULL;
+	if(c)					// Peize Lin add 2016-08-05
+	{
+		delete [] c;
+		c = NULL;
+	}
 }
 
 // constructor with sizes
@@ -68,6 +72,14 @@ matrix::matrix(const matrix &m1)
 	//hermetian = m1.hermetian;
 	// Copy over m1 contents
 	for (int i = 0; i < nr*nc; i++) c[i] = m1.c[i];
+}
+
+// Peize Lin add 2016-08-05
+matrix::matrix( matrix && m1 )
+{
+	nr=m1.nr; nc=m1.nc;
+	c=m1.c;
+	m1.init(1,1);
 }
 
 //*************
@@ -102,6 +114,15 @@ void matrix::create(const int nrow,const int ncol)
 void matrix::operator=(const matrix & m1)
 {
 	for (int i = 0; i < nr*nc; i++) c[i] = m1.c[i];
+}
+
+// Peize Lin add 2016-08-05
+matrix& matrix::operator=( matrix && m1 )
+{
+	nr = m1.nr;		nc = m1.nc;
+	delete[] c;		c  = m1.c;
+	m1.init(1,1);
+	return *this;
 }
 
 /* Adding matrices, as a friend */
@@ -296,4 +317,22 @@ double mdot(const matrix &A, const matrix &B)
     return sum;
 }
 
+// Peize Lin add 2016-09-08
+double max( const matrix & m )
+{
+	double value = std::numeric_limits<double>::min();
+	for( int ir=0; ir!=m.nr; ++ir )
+		for( int ic=0; ic!=m.nc; ++ic )
+			value = std::max( value, m(ir,ic) );
+	return value;
+}
 
+// Peize Lin add 2016-09-08
+double min( const matrix & m )
+{
+	double value = std::numeric_limits<double>::max();
+	for( int ir=0; ir!=m.nr; ++ir )
+		for( int ic=0; ic!=m.nc; ++ic )
+			value = std::min( value, m(ir,ic) );
+	return value;
+}

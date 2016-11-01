@@ -20,17 +20,7 @@ Numerical_Orbital_Lm::Numerical_Orbital_Lm()
 
 	nr_uniform = 1;
 	dr_uniform = -1.0;
-	zty = 0.0;
-
-	psi_uniform = new double[1];
-	dpsi_uniform = new double[1];
-	r_radial = new double[1];
-	k_radial = new double[1];
-	rab = new double[1];
-	psi = new double[1];
-	psir = new double[1];
-	psik = new double[1];
-	
+	zty = 0.0;	
 }
 
 Numerical_Orbital_Lm::~Numerical_Orbital_Lm()
@@ -39,14 +29,6 @@ Numerical_Orbital_Lm::~Numerical_Orbital_Lm()
 	{
 		cout << " ~Numerical_Orbital_Lm()" << endl;
 	}
-	delete[] psi_uniform;
-	delete[] dpsi_uniform;
-	delete[] r_radial;
-	delete[] k_radial;
-	delete[] rab;
-	delete[] psi;
-	delete[] psir;
-	delete[] psik;
 }
 
 void Numerical_Orbital_Lm::set_orbital_info
@@ -61,8 +43,9 @@ void Numerical_Orbital_Lm::set_orbital_info
 	const double *psi_in,
 	const int &nk_in,
 	const double &dk_in,
-	const double &lat0,
-	const double &dr_uniform_in
+	// Peize Lin delete lat0 2016-02-03
+	const double &dr_uniform_in,
+	bool flag_plot				// Peize Lin add flag_plot 2016-08-31
 )
 {
     this->label = label_in;
@@ -75,7 +58,6 @@ void Numerical_Orbital_Lm::set_orbital_info
     this->nr = nr_in;
     assert(r_radial_in[nr-1]>0.0);
     assert(r_radial_in[nr-1]<50);
-    assert(lat0 > 0);
     this->rcut = r_radial_in[nr-1];
     assert(nk_in>1);
     assert(nk_in<10000);
@@ -85,19 +67,12 @@ void Numerical_Orbital_Lm::set_orbital_info
     this->dk = dk_in;
 	this->dr_uniform=dr_uniform_in;
 	
-	delete[] r_radial;
-	delete[] k_radial;
-	delete[] rab;
-	delete[] psi;
-	delete[] psir;
-	delete[] psik;
-
-	r_radial = new double[nr];
-	k_radial = new double[nk];
-	rab = new double[nr];
-	psi = new double[nr];
-	psir = new double[nr];
-	psik = new double[nk];
+	r_radial.resize(nr);
+	k_radial.resize(nk);
+	rab.resize(nr);
+	psi.resize(nr);
+	psir.resize(nr);
+	psik.resize(nk);
 
 	/***********************************************************
 	be careful! LiaoChen modify on 2010/4/21
@@ -136,7 +111,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 
 	this->cal_kradial();
 	this->norm_test();
-	this->plot();
+	if( flag_plot ) this->plot();			// Peize Lin add flag_plot 2016-08-31
 
 	return;
 }
@@ -153,22 +128,19 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 	this->dr_uniform = dr_uniform_in;
 	this->nr_uniform = static_cast<int>(rcut/dr_uniform) + 10;
 	
-	delete[] this->psi_uniform;
-	this->psi_uniform = new double[nr_uniform];
-	ZEROS (this->psi_uniform, nr_uniform);
+	this->psi_uniform.resize(nr_uniform,0);
 
 	// do interpolation here to make grid more dense
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
-		this->psi_uniform[ir] = Mathzone_Add1::Uni_RadialF(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
+		this->psi_uniform[ir] = Mathzone_Add1::Uni_RadialF(VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
 //    	this->psi_uniform[ir] = Mathzone::Polynomial_Interpolation(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
     }
 	
 	//----------------------------------------------	 
 	// calculate the dpsi_uniform
 	//----------------------------------------------	 
-	delete [] this->dpsi_uniform;	
-	this->dpsi_uniform = new double[this->nr_uniform];
+	this->dpsi_uniform.resize(this->nr_uniform);
 
 	double* y2 = new double[nr];
 
@@ -187,16 +159,18 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// new code developed by pengfei.
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Peize Lin update 2016-08-31
 	switch( this->angular_momentum_l ) // added by pengfei 13-8-8 different l has different  boundary conditions 
 	{
-		case 0: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);; break;
-		case 1: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);; break;
-		case 2: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);; break;
-		case 3: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);; break;
-		case 4: Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);; break;
+		case 0: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 1: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
+		case 2: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
+		case 3: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
+		case 4: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-		  ofs_running << " The angular momentum should not be larger than 4 (g orbitals)." << endl;
-		  exit(0);
+			ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
+			ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 
 	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);
@@ -220,12 +194,12 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 
 	//	Mathzone_Add1::SplineD2 (rad, psi_uniform, nr_uniform, 0.0, 0.0, ddpsi_uniform);
 	double* tmp = new double[nr_uniform];
-	Mathzone_Add1::Cubic_Spline_Interpolation(r_radial, psi, y2, 
-			nr, rad, nr_uniform, tmp, dpsi_uniform );
+	Mathzone_Add1::Cubic_Spline_Interpolation(VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), y2, 
+			nr, rad, nr_uniform, tmp, VECTOR_TO_PTR(dpsi_uniform) );
 
 	// calculate zty
 	// liaochen add 2010-08
-	Mathzone_Add1::Uni_Deriv_Phi (this->psi_uniform, this->nr_uniform, dr_uniform, angular_momentum_l, tmp);
+	Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(this->psi_uniform), this->nr_uniform, dr_uniform, angular_momentum_l, tmp);
 	this->zty = tmp[0]/Mathzone_Add1::factorial (angular_momentum_l);
 
 	delete [] y2;
@@ -242,30 +216,32 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 	// there may be "one grid point" more than the cutoff.
 	this->nr_uniform = static_cast<int>(rcut/dr_uniform)+10;
 
-	delete[] this->psi_uniform;
-	this->psi_uniform = new double[nr_uniform];
-	ZEROS(psi_uniform, nr_uniform);
+	this->psi_uniform.resize(nr_uniform,0);
 
-	string orbital_type;
-	switch( this->angular_momentum_l )
-	{
-		case 0: orbital_type = "s"; break;
-		case 1: orbital_type = "p"; break;
-		case 2: orbital_type = "d"; break;
-		case 3: orbital_type = "f"; break;
-		case 4: orbital_type = "g"; break;
-	}
+	string orbital_type; 
+	// Peize Lin update 2016-08-31
+	if( 0==this->angular_momentum_l )
+		orbital_type = 's';
+	else if( 1==this->angular_momentum_l )
+		orbital_type = 'p';
+	else if( 2==this->angular_momentum_l )
+		orbital_type = 'd';
+	else if( 3<=this->angular_momentum_l && this->angular_momentum_l<=6 )
+		orbital_type = 'f'+this->angular_momentum_l-3;
+	else if( 7<=this->angular_momentum_l && this->angular_momentum_l<=11 )
+		orbital_type = 'k'+this->angular_momentum_l-7;
+	else
+		orbital_type = "L" + TO_STRING(this->angular_momentum_l);
 		
 	cout << "===========================================================" << endl;
 	for(int i=0; i<nr_uniform; i++)
 	{
 		this->psi_uniform[i] = 
-			Mathzone_Add1::Uni_RadialF(this->psi, this->nr, this->rab[0], i*dr_uniform); 
+			Mathzone_Add1::Uni_RadialF(VECTOR_TO_PTR(psi), this->nr, this->rab[0], i*dr_uniform); 
 	}
 	
-	delete [] this->dpsi_uniform;
-	this->dpsi_uniform = new double[nr_uniform];
-	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
+	this->dpsi_uniform.resize(nr_uniform);
+	Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(psi_uniform), nr_uniform, dr_uniform, 1, VECTOR_TO_PTR(dpsi_uniform));
 	
 	if(MY_RANK==0)
 	{
@@ -319,7 +295,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	{
 		Mathzone::Spherical_Bessel(
 				this->nr, 
-				this->r_radial, 
+				VECTOR_TO_PTR(this->r_radial), 
 				this->k_radial[ik], 
 				this->angular_momentum_l, 
 				jl);
@@ -332,7 +308,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 		Mathzone::Simpson_Integral(
 				this->nr, 
 				integrated_func, 
-				this->rab, 
+				VECTOR_TO_PTR(this->rab), 
 				this->psik[ik]);
 
 		this->psik[ik] *= ( pref * k_radial[ik]);
@@ -362,7 +338,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 	double sumr = 0.0;
 	double sumk = 0.0;
 
-	Mathzone::Simpson_Integral(this->nr, f, this->rab, sumr);
+	Mathzone::Simpson_Integral(this->nr, f, VECTOR_TO_PTR(this->rab), sumr);
 
 	delete[] f;
 	f = new double[nk];
@@ -385,15 +361,19 @@ void Numerical_Orbital_Lm::plot(void)const
 	TITLE("Numerical_Orbital_Lm","plot");
 	
 	string orbital_type;
-	switch( this->angular_momentum_l )
-	{
-		case 0: orbital_type = "s"; break;
-		case 1: orbital_type = "p"; break;
-		case 2: orbital_type = "d"; break;
-		case 3: orbital_type = "f"; break;
-		case 4: orbital_type = "g"; break;
-		default: WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
-	}
+	// Peize Lin update 2016-08-31
+	if( 0==this->angular_momentum_l )
+		orbital_type = 's';
+	else if( 1==this->angular_momentum_l )
+		orbital_type = 'p';
+	else if( 2==this->angular_momentum_l )
+		orbital_type = 'd';
+	else if( 3<=this->angular_momentum_l && this->angular_momentum_l<=6 )
+		orbital_type = 'f' + this->angular_momentum_l - 3;
+	else if( 7<=this->angular_momentum_l && this->angular_momentum_l<=11 )
+		orbital_type = 'k' + this->angular_momentum_l - 7;
+	else
+		orbital_type = "L" + TO_STRING(this->angular_momentum_l);	
 
 	if(MY_RANK==0)
 	{

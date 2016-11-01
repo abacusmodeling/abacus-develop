@@ -6,6 +6,7 @@
 #define MAKE_GAUNT_TABLE_H
 
 #include "../src_pw/tools.h"
+#include <map>
 
 class Make_Gaunt_Table
 {
@@ -81,12 +82,13 @@ class Make_Gaunt_Table
 	// Small function
 	//========================================================
 	static int get_lm_index(const int l, const int m);
+	static int Index_M(const int& m);
 
 	private:
 	
 	//Index Function
 	//Yu's mehtod
-	void ZEROS();
+	// Peize Lin delete void ZEROS(); 2016-08-26
 	
 	int P_EL(const int& L);
 	int EP_EL(const int& L);
@@ -103,12 +105,8 @@ class Make_Gaunt_Table
 				int& l2,
 				int& m2	);
 	
-	int Index_M(const int& m);
 	//2*Lmax+1
-	//Lmax <= 6
-	//dim1 <= 5000
-	//dim2 <= 30
-	double Gaunt_CH[5000][30];
+	std::map<int,std::map<int,double>> Gaunt_CH;		// Peize Lin update 2016-08-26
 	
 	//direct integral
 	matrix Ylm_Gaunt;

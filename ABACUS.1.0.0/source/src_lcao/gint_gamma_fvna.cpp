@@ -102,8 +102,9 @@ void Gint_Gamma::gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm)
 
     //array to store spherical harmonics and its derivatives
 	assert(nnnmax<400);
-    double rly[400];
-    double grly[400][3];
+	// Peize Lin change rly, grly 2016-08-26
+    vector<double> rly;
+    vector<vector<double>> grly;
 
     double mt[3]={0,0,0};
     double *vldr3 = new double[bxyz];

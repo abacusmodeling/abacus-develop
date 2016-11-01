@@ -99,10 +99,10 @@ extern "C"
 	void dger_(int *m, int *n, double *alpha, double *x, int *incx, double *y, int *incy, double *a, int *lda);
 	void zgerc_(int *m, int *n, complex<double> *alpha,complex<double> *x, int *incx, complex<double> *y, int *incy,complex<double> *a, int *lda);
 
-	void dscal_(const int *n, const double *alpha, const double *x, const int *incx);
-	void zscal_(int *n,complex<double>  *alpha, complex<double>  *x, int *incx);
-
-	void daxpy_(const int *n, const double* sa, const double* sx, const int* incx, const double* sy, const int* incy);//mohan add 2012-03-28
+	// Peize Lin move these to src_global/lapack_connector.h 2016-08-04
+//	void dscal_(const int *n, const double *alpha, const double *x, const int *incx);
+//	void zscal_(int *n,complex<double>  *alpha, complex<double>  *x, int *incx);
+//	void daxpy_(const int *n, const double* sa, const double* sx, const int* incx, const double* sy, const int* incy);//mohan add 2012-03-28
 
 
 // performs one of the matrix-matrix operations * * C := alpha*op( A )*op( B ) + beta*C,
