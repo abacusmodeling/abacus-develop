@@ -296,3 +296,69 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	delete[] flq;
 	delete[] gk;
 }
+
+
+void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &psi, const realArray &table_local, Vector3<double> q)   // pengfei 2016-11-23
+{
+	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
+	assert(ik>=0);
+	const int npw = kv.ngk[ik];
+	const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
+	matrix ylm(total_lm, npw);
+
+	Vector3<double> *gkq = new Vector3<double>[npw];
+        
+	for(int ig=0;ig<npw;ig++)
+	{
+		gkq[ig] = wf.get_1qvec_cartesian(ik, ig) + q;
+	}
+
+	Mathzone::Ylm_Real(total_lm, npw, gkq, ylm);
+
+	int index = 0;
+	double *flq = new double[npw];
+	int iwall=0;
+	for (int it = 0;it < ucell.ntype;it++)
+	{
+		for (int ia = 0;ia < ucell.atoms[it].na;ia++)
+		{
+			complex<double> *skq = wf.get_skq(ik, it, ia, q);
+			int ic=0;
+			for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+			{
+				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
+				for(int N=0; N < ucell.atoms[it].l_nchi[L]; N++)
+				{
+					for(int ig=0; ig<npw; ig++)
+					{
+                                                if(gkq[ig].norm() * ucell.tpiba > ((NQX-4) * DQ) )
+                                                {
+                                                   flq[ig] = 0.0;
+                                                }
+                                                else
+                                                {
+						   flq[ig] = Mathzone::Polynomial_Interpolation(table_local, it, ic, NQX, DQ, gkq[ig].norm() * ucell.tpiba );
+                                                }
+					}
+
+					for(int m=0; m<2*L+1; m++)
+					{
+						const int lm = L*L+m;
+						for(int ig=0; ig<npw; ig++)
+						{
+							psi(iwall, ig) =
+							lphase * skq[ig] * ylm(lm, ig) * flq[ig];
+						}	
+						++iwall;
+					}
+					++ic;
+				}
+			}
+			delete[] skq;
+		}
+	}
+
+	assert(iwall == NLOCAL);
+	delete[] flq;
+	delete[] gkq;
+}

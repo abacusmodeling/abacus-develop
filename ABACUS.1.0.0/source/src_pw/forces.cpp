@@ -76,58 +76,55 @@ void Forces::init()
 			force(iat, ipol) = force(iat, ipol) - compen;
 		}	
 	}
-
-if(SYMMETRY)                           // pengfei 2014-10-13
-{
-    double *pos;
-    double d1,d2,d3;
-    pos = new double[ucell.nat*3];
-    ZEROS(pos, ucell.nat*3);
-    int iat = 0;
-    for(int it = 0;it < ucell.ntype;it++)
-        {
-                //Atom* atom = &ucell.atoms[it];
-                for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                {
-                        pos[3*iat  ] = ucell.atoms[it].taud[ia].x ;
-                        pos[3*iat+1] = ucell.atoms[it].taud[ia].y ;
-                        pos[3*iat+2] = ucell.atoms[it].taud[ia].z;
-                        for(int k=0; k<3; ++k)
-                        {
-                                symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
-                                symm.check_boundary( pos[iat*3+k] );
-                        }
-                        iat++;
-
-                }
-        }
-
-    for(int iat=0; iat<ucell.nat; iat++)
-    {
-                             Mathzone::Cartesian_to_Direct(force(iat,0),force(iat,1),force(iat,2),
+	
+	if(SYMMETRY)                                                                 // pengfei 2016-12-20
+	{
+		double *pos;
+		double d1,d2,d3;
+		pos = new double[ucell.nat*3];
+		ZEROS(pos, ucell.nat*3);
+		int iat = 0;
+		for(int it = 0;it < ucell.ntype;it++)
+		{
+			//Atom* atom = &ucell.atoms[it];
+			for(int ia =0;ia< ucell.atoms[it].na;ia++)
+			{
+				pos[3*iat  ] = ucell.atoms[it].taud[ia].x ;
+				pos[3*iat+1] = ucell.atoms[it].taud[ia].y ;
+				pos[3*iat+2] = ucell.atoms[it].taud[ia].z;
+				for(int k=0; k<3; ++k)
+				{
+					symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
+					symm.check_boundary( pos[iat*3+k] );
+				}
+				iat++;				
+			}
+		}
+		
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			Mathzone::Cartesian_to_Direct(force(iat,0),force(iat,1),force(iat,2),
                                         ucell.a1.x, ucell.a1.y, ucell.a1.z,
                                         ucell.a2.x, ucell.a2.y, ucell.a2.z,
                                         ucell.a3.x, ucell.a3.y, ucell.a3.z,
                                         d1,d2,d3);
-                             force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
-
-    }
-    symm.force_symmetry(force , pos);
-    for(int iat=0; iat<ucell.nat; iat++)
-    {
-                             Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
+			
+			force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
+		}
+		symm.force_symmetry(force , pos);
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
                                         ucell.a1.x, ucell.a1.y, ucell.a1.z,
                                         ucell.a2.x, ucell.a2.y, ucell.a2.z,
                                         ucell.a3.x, ucell.a3.y, ucell.a3.z,
                                         d1,d2,d3);
-                             force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
-
-    }
-
-    // cout << "nrotk =" << symm.nrotk << endl;
-   delete [] pos;
-}
-
+			force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
+		}
+		// cout << "nrotk =" << symm.nrotk << endl;
+		delete[] pos;
+		
+	}
 
  	ofs_running << setiosflags(ios::fixed) << setprecision(6) << endl;
 	if(TEST_FORCE)
@@ -139,24 +136,23 @@ if(SYMMETRY)                           // pengfei 2014-10-13
 		Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
 		if(EFIELD) Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
 	}
-    Forces::print("   TOTAL-FORCE (Ry/Bohr)", force);
-
-    if(INPUT.force_set == 1)
-    {
-       ofstream ofs("FORCE.dat");
-       if(!ofs)
-       {
-          cout << "open FORCE.dat error !" <<endl;
-       }
-
-       for(int iat=0; iat<ucell.nat; iat++)
-       {
-           ofs << "   " << force(iat,0)*Ry_to_eV / 0.529177 << "   " << force(iat,1)*Ry_to_eV / 0.529177 << "   " << force(iat,2)*Ry_to_eV / 0.529177 << endl;
-       }
-
-       ofs.close();
-    }
- 
+	
+	Forces::print("   TOTAL-FORCE (Ry/Bohr)", force);
+	
+	if(INPUT.force_set)                                                   // pengfei 2016-12-20
+	{
+		ofstream ofs("FORCE.dat");
+		if(!ofs)
+		{
+			cout << "open FORCE.dat error !" <<endl;
+		}
+		
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			ofs << "   " << force(iat,0)*Ry_to_eV / 0.529177 << "   " << force(iat,1)*Ry_to_eV / 0.529177 << "   " << force(iat,2)*Ry_to_eV / 0.529177 << endl;
+		}
+		ofs.close();
+	}
 		
 	// output force in unit eV/Angstrom
 	ofs_running << endl;

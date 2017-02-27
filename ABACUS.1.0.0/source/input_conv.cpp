@@ -10,6 +10,11 @@
 #include "src_lcao/lcao_orbitals.h"
 #include "src_pw/efield.h"
 #include "src_pw/vdwd2.h"
+#include "src_pw/chi0_hilbert.h"
+#include "src_pw/chi0_standard.h"
+#include "src_pw/epsilon0_pwscf.h"
+#include "src_pw/epsilon0_vasp.h"
+
 //xiaohui modified 2013-03-23, adding "//" before #include...
 //#include "../../src_develop/src_siao/selinv.h"
 //#include "../src_develop/src_dc/dc_info.h"
@@ -176,6 +181,90 @@ void Input_Conv::Convert(void)
 			VdwD2::period[1]=INPUT.vdwD2_period[1];
 			VdwD2::period[2]=INPUT.vdwD2_period[2];
 		}
+	}
+
+//----------------------------------------------------------
+// about spectrum                                                             // pengfei 2016-12-14
+//----------------------------------------------------------
+
+	//if( (INPUT.epsilon && (INPUT.epsilon_choice == 0)) || ((!INPUT.epsilon) && (INPUT.epsilon_choice == 0) && INPUT.kmesh_interpolation))		
+	if( (INPUT.spectral_type == "eels" && INPUT.eels_method == 0) || (INPUT.spectral_type == "None" && INPUT.eels_method == 0 && INPUT.kmesh_interpolation) )
+	{
+		if(INPUT.spectral_type == "eels")
+		{
+			chi0_hilbert.epsilon = true;
+		}
+		else if(INPUT.spectral_type == "None")
+		{
+			chi0_hilbert.epsilon = false;
+		}
+		//chi0_hilbert.epsilon = INPUT.epsilon;
+		chi0_hilbert.kernel_type = INPUT.kernel_type;
+		chi0_hilbert.system = INPUT.system;
+		chi0_hilbert.eta = INPUT.eta;
+		chi0_hilbert.domega = INPUT.domega;
+		chi0_hilbert.nomega = INPUT.nomega;
+		chi0_hilbert.dim = INPUT.ecut_chi; 
+		//chi0_hilbert.oband = INPUT.oband;
+		chi0_hilbert.q_start[0] = INPUT.q_start[0];  chi0_hilbert.q_start[1] = INPUT.q_start[1]; chi0_hilbert.q_start[2] = INPUT.q_start[2];
+		chi0_hilbert.direct[0] = INPUT.q_direct[0];  chi0_hilbert.direct[1] = INPUT.q_direct[1]; chi0_hilbert.direct[2] = INPUT.q_direct[2];
+		//chi0_hilbert.start_q = INPUT.start_q;
+		//chi0_hilbert.interval_q = INPUT.interval_q;
+		chi0_hilbert.nq = INPUT.nq;
+		chi0_hilbert.out_epsilon = INPUT.out_epsilon;
+		chi0_hilbert.out_chi = INPUT.out_chi;
+		chi0_hilbert.out_chi0 = INPUT.out_chi0;
+		chi0_hilbert.fermi_level = INPUT.fermi_level;
+		chi0_hilbert.coulomb_cutoff = INPUT.coulomb_cutoff;
+		chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
+		for(int i=0; i<100; i++)
+		{
+			chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
+		}
+		chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
+	}
+	
+	//if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
+	if( INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
+	{
+		//chi0_standard.epsilon = INPUT.epsilon;
+		chi0_standard.epsilon = true;
+		chi0_standard.system = INPUT.system;
+		chi0_standard.eta = INPUT.eta;
+		chi0_standard.domega = INPUT.domega;
+		chi0_standard.nomega = INPUT.nomega;
+		chi0_standard.dim = INPUT.ecut_chi;
+		//chi0_standard.oband = INPUT.oband;
+		chi0_standard.q_start[0] = INPUT.q_start[0];  chi0_standard.q_start[1] = INPUT.q_start[1]; chi0_standard.q_start[2] = INPUT.q_start[2];
+		chi0_standard.direct[0] = INPUT.q_direct[0];  chi0_standard.direct[1] = INPUT.q_direct[1]; chi0_standard.direct[2] = INPUT.q_direct[2];
+		//chi0_standard.start_q = INPUT.start_q;
+		//chi0_standard.interval_q = INPUT.interval_q;
+		chi0_standard.nq = INPUT.nq;
+		chi0_standard.out_epsilon = INPUT.out_epsilon;		
+	}
+	
+	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 1) )
+	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 1)
+	{
+		//epsilon0_pwscf.epsilon = INPUT.epsilon0;
+		epsilon0_pwscf.epsilon = true;
+		epsilon0_pwscf.intersmear = INPUT.eta;
+		epsilon0_pwscf.intrasmear = INPUT.intrasmear;
+		epsilon0_pwscf.domega = INPUT.domega;
+		epsilon0_pwscf.nomega = INPUT.nomega;
+		epsilon0_pwscf.shift = INPUT.shift;
+		epsilon0_pwscf.metalcalc = INPUT.metalcalc;
+		epsilon0_pwscf.degauss = INPUT.eps_degauss;
+	}
+	
+	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 0))
+	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 0)
+	{
+		//epsilon0_vasp.epsilon = INPUT.epsilon0;
+		epsilon0_vasp.epsilon = true;
+		epsilon0_vasp.domega = INPUT.domega;
+		epsilon0_vasp.nomega = INPUT.nomega;
+		epsilon0_vasp.eta = INPUT.eta;
 	}
 	
 //----------------------------------------------------------

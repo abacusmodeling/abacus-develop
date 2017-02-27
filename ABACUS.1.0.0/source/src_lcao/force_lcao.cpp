@@ -202,56 +202,55 @@ void Force_LCAO::start_force(void)
  		//xiaohui add "OUT_LEVEL", 2015-09-16
 		if(OUT_LEVEL != "m") ofs_running << " correction force for each atom along direction " << i+1 << " is " << sum/ucell.nat << endl;
     }
-
-if(SYMMETRY)      // pengfei 2014-10-13
-{
-    double *pos;
-    double d1,d2,d3;
-    pos = new double[ucell.nat*3];
-    ZEROS(pos, ucell.nat*3);
-    int iat = 0;
-    for(int it = 0;it < ucell.ntype;it++)
-        {
-                //Atom* atom = &ucell.atoms[it];
-                for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                {
-                        pos[3*iat  ] = ucell.atoms[it].taud[ia].x ;
-                        pos[3*iat+1] = ucell.atoms[it].taud[ia].y ;
-                        pos[3*iat+2] = ucell.atoms[it].taud[ia].z;
-                        for(int k=0; k<3; ++k)
-                        {
-                                symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
-                                symm.check_boundary( pos[iat*3+k] );
-                        }
-                        iat++;
-
-                }
-        }
-
-    for(int iat=0; iat<ucell.nat; iat++)
-    {
-                             Mathzone::Cartesian_to_Direct(fcs(iat,0),fcs(iat,1),fcs(iat,2),
+	
+	if(SYMMETRY)                                           // pengfei 2016-12-20
+	{
+		double *pos;
+		double d1,d2,d3;
+		pos = new double[ucell.nat*3];
+		ZEROS(pos, ucell.nat*3);
+		int iat = 0;
+		for(int it = 0;it < ucell.ntype;it++)
+		{
+			//Atom* atom = &ucell.atoms[it];
+			for(int ia =0;ia< ucell.atoms[it].na;ia++)
+			{
+				pos[3*iat  ] = ucell.atoms[it].taud[ia].x ;
+				pos[3*iat+1] = ucell.atoms[it].taud[ia].y ;
+				pos[3*iat+2] = ucell.atoms[it].taud[ia].z;
+				for(int k=0; k<3; ++k)
+				{
+					symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
+					symm.check_boundary( pos[iat*3+k] );
+				}
+				iat++;
+			}
+		}
+		
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			Mathzone::Cartesian_to_Direct(fcs(iat,0),fcs(iat,1),fcs(iat,2),
                                         ucell.a1.x, ucell.a1.y, ucell.a1.z,
                                         ucell.a2.x, ucell.a2.y, ucell.a2.z,
                                         ucell.a3.x, ucell.a3.y, ucell.a3.z,
                                         d1,d2,d3);
-                             fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
-
-    }
-    symm.force_symmetry(fcs , pos);
-    for(int iat=0; iat<ucell.nat; iat++)
-    {
-                             Mathzone::Direct_to_Cartesian(fcs(iat,0),fcs(iat,1),fcs(iat,2),
+										
+			fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
+		}
+		symm.force_symmetry(fcs , pos);
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			Mathzone::Direct_to_Cartesian(fcs(iat,0),fcs(iat,1),fcs(iat,2),
                                         ucell.a1.x, ucell.a1.y, ucell.a1.z,
                                         ucell.a2.x, ucell.a2.y, ucell.a2.z,
                                         ucell.a3.x, ucell.a3.y, ucell.a3.z,
                                         d1,d2,d3);
-                             fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
-
-    }
-    //cout << "nrotk =" << symm.nrotk << endl;
-   delete [] pos;
-}
+										
+			fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
+		}
+		//cout << "nrotk =" << symm.nrotk << endl;
+		delete[] pos;
+	}
 
 	// test
 	double** fvlocal = new double*[ucell.nat];

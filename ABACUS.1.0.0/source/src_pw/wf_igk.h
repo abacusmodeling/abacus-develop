@@ -24,6 +24,7 @@ class WF_igk
     double* get_qvec_cartesian(const int &ik);
     Vector3<double> get_1qvec_cartesian(const int ik,const int ig)const;
     complex<double>* get_sk(const int ik, const int it, const int ia)const;
+    complex<double>* get_skq(int ik, int it, int ia, Vector3<double> q);  // pengfei 2016-11-23
 
 };
 #endif

@@ -9,6 +9,9 @@ using namespace std;
 
 class Occupy
 {
+
+    friend class Chi0_hilbert;           // pengfei 2016-11-23
+
 public:
 
     Occupy();
@@ -51,6 +54,7 @@ public:
                          const matrix &tetra,double **ekb,double &ef,matrix &wg);
 
     static double wsweight(const Vector3<double> &r, Vector3<double> *rws,const int nrws);
+
 private:
 
     static void efermig(double **ekb,const int nbnd,const int nks,const double &nelec,const double *wk,

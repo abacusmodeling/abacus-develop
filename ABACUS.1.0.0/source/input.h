@@ -87,7 +87,7 @@ public:
 	int vna;				//control the vna term.
 	int grid_speed;			//1:normal 2:fast, mohan add 2012-03-29
     int force;
-    int force_set;
+    bool force_set;
     double force_thr;		// threshold of force in unit (Ry/Bohr)
 	double force_thr_ev2;	// invalid force threshold, mohan add 2011-04-17
 	bool stress;			// calculate the stress
@@ -246,6 +246,54 @@ public:
 	int vdwD2_period[3];
 	double vdwD2_radius;
 	string vdwD2_radius_unit;	//"Bohr" or "Angstrom"
+
+
+
+//==========================================================
+// spectrum
+// pengfei Li add 2016-11-23
+//==========================================================    
+        //bool     epsilon;               // calculate epsilon or not
+		string   spectral_type;          // the type of the calculated spectrum
+		int      spectral_method;        // 0: tddft(linear response)
+		int      eels_method;            // 0: hilbert_transform method; 1: standard method
+		int      absorption_method;      // 0: vasp's method  1: pwscf's method
+		//int		 epsilon_choice;         // 0: hilbert_transform method; 1: standard method
+		
+		string   kernel_type;           // the kernel type: rpa, tdlda ...
+ 
+        string system;                 // bulk or surface
+        double  eta;                   // unit(Ry)
+        double  domega;                // unit(Ry)
+        int     nomega;
+        int     ecut_chi;                   // the dimension of G 
+        //int     oband;                 // the number of "occupied" bands  
+		double  q_start[3];            // the position of the first q point in direct coordinate
+		double  q_direct[3];             // the q direction
+        //int     start_q;               // the serial number of the start qpoint
+        //int     interval_q;            // the interval of the qpoints
+        int     nq;                    // the total number of qpoints for calculation
+        bool     out_epsilon;           // output epsilon or not
+        bool     out_chi;               // output chi or not
+        bool     out_chi0;              // output chi0 or not
+        double  fermi_level;            // the change the fermi level(Ry)
+        bool     coulomb_cutoff;         // turn on or off the Coulomb_cutoff 0/1
+		
+		//bool     epsilon0;              // calculate the macroscopic dielectric constant or not
+		//double   intersmear;            // eta
+		double   intrasmear;            // Eta
+		double   shift;
+		bool     metalcalc;             // metal or not
+		double   eps_degauss;            // degauss
+		
+		//int	epsilon0_choice;             // 0: vasp's method  1: pwscf's method
+
+        bool     kmesh_interpolation;          // calculting <i,0|j,R>
+        double  qcar[100][3];          // the Cartesian position of q points(unit: 2*PI/lat0) 
+        int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
+		
+		
+
 
 	//xiaohui add 2015-09-16
 	bool input_error;

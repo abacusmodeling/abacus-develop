@@ -189,7 +189,7 @@ void Input::Default(void)
 	vna = 0;
 	grid_speed=1; //mohan add 2012-03-29
     force=0;
-    force_set=0;
+    force_set=false;
     force_thr=1.0e-3;
 	force_thr_ev2=0;
 	stress=false;
@@ -349,6 +349,50 @@ void Input::Default(void)
 	vdwD2_period[0]= vdwD2_period[1]= vdwD2_period[2]= 3;
 	vdwD2_radius=30.0/BOHR_TO_A;
 	vdwD2_radius_unit="Bohr";
+
+//-----------------------------------------------------------
+// spectrum                                                                      // pengfei Li add 2016-11-23
+//-----------------------------------------------------------
+        //epsilon=false;
+		//epsilon_choice=0;
+		spectral_type="None";
+		spectral_method=0;
+		kernel_type="rpa";
+		eels_method=0;
+		absorption_method=0;
+        system="bulk";
+        eta=0.05;
+        domega=0.01;
+        nomega=300;
+        ecut_chi=1;
+        //oband=1;
+		q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
+		q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
+        //start_q=1;
+        //interval_q=1;
+        nq=1;
+        out_epsilon=true;
+        out_chi=false;
+        out_chi0=false;
+        fermi_level=0.0;
+        coulomb_cutoff=false;
+
+        kmesh_interpolation=false;
+        for(int i=0; i<100; i++)
+        {
+            qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
+        }
+
+        lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
+		
+		//epsilon0 = false;
+		//intersmear = 0.01;
+		intrasmear = 0.0;
+		shift = 0.0;
+		metalcalc = false;
+		eps_degauss = 0.01;
+		
+		//epsilon0_choice = 0;
 
 	//xiaohui add 2015-09-16
 	input_error = 0;
@@ -1170,6 +1214,145 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, vdwD2_radius_unit);
         }
+//--------------------------------------------------------
+// epsilon           pengfei Li 2016-11-23
+//--------------------------------------------------------
+        //else if (strcmp("epsilon", word) == 0)
+        //{
+        //    read_value(ifs, epsilon);
+        //}
+        //else if (strcmp("epsilon_choice", word) == 0)
+        //{
+        //    read_value(ifs, epsilon_choice);
+        //}
+		else if (strcmp("spectral_type", word) == 0)
+        {
+            read_value(ifs, spectral_type);
+        }
+		else if (strcmp("spectral_method", word) == 0)
+        {
+            read_value(ifs, spectral_method);
+        }
+		else if (strcmp("kernel_type", word) == 0)
+        {
+            read_value(ifs, kernel_type);
+        }
+		else if (strcmp("eels_method", word) == 0)
+        {
+            read_value(ifs, eels_method);
+        }
+		else if (strcmp("absorption_method", word) == 0)
+        {
+            read_value(ifs, absorption_method);
+        }
+        else if (strcmp("system", word) == 0)
+        {
+            read_value(ifs, system);
+        }
+        else if (strcmp("eta", word) == 0)
+        {
+            read_value(ifs, eta);
+        }
+        else if (strcmp("domega", word) == 0)
+        {
+            read_value(ifs, domega);
+        }
+        else if (strcmp("nomega", word) == 0)
+        {
+            read_value(ifs, nomega);
+        }
+        else if (strcmp("ecut_chi", word) == 0)
+        {
+            read_value(ifs, ecut_chi);
+        }
+        //else if (strcmp("oband", word) == 0)
+        //{
+        //   read_value(ifs, oband);
+        //}
+        else if (strcmp("q_start", word) == 0)
+        {
+			ifs >> q_start[0]; ifs >> q_start[1]; read_value(ifs, q_start[2]);
+        }
+        else if (strcmp("q_direction", word) == 0)
+        {
+			ifs >> q_direct[0]; ifs >> q_direct[1]; read_value(ifs, q_direct[2]);
+        }				
+        //else if (strcmp("start_q", word) == 0)
+        //{
+        //    read_value(ifs, start_q);
+        //}
+        //else if (strcmp("interval_q", word) == 0)
+        //{
+        //    read_value(ifs, interval_q);
+        //}
+        else if (strcmp("nq", word) == 0)
+        {
+            read_value(ifs, nq);
+        }
+        else if (strcmp("out_epsilon", word) == 0)
+        {
+            read_value(ifs, out_epsilon);
+        }
+        else if (strcmp("out_chi", word) == 0)
+        {
+            read_value(ifs, out_chi);
+        }
+        else if (strcmp("out_chi0", word) == 0)
+        {
+            read_value(ifs, out_chi0);
+        }
+        else if (strcmp("fermi_level", word) == 0)
+        {
+            read_value(ifs, fermi_level);
+        }
+        else if (strcmp("coulomb_cutoff", word) == 0)
+        {
+            read_value(ifs, coulomb_cutoff);
+        }
+        else if (strcmp("kmesh_interpolation", word) == 0)
+        {
+            read_value(ifs, kmesh_interpolation);
+        }
+        else if (strcmp("qcar", word) == 0)
+        {
+             for(int i=0; i<nq; i++)
+             {
+                 ifs >> qcar[i][0]; ifs >> qcar[i][1]; read_value(ifs, qcar[i][2]);
+             }
+        }
+        else if (strcmp("supercell_scale", word) == 0)
+        {
+            ifs >> lcao_box[0]; ifs >> lcao_box[1];
+            read_value(ifs, lcao_box[2]);
+        }
+        //else if (strcmp("epsilon0", word) == 0)
+        //{
+        //    read_value(ifs, epsilon0);
+        //}
+        //else if (strcmp("intersmear", word) == 0)
+        //{
+        //    read_value(ifs, intersmear);
+        //}
+        else if (strcmp("intrasmear", word) == 0)
+        {
+            read_value(ifs, intrasmear);
+        }
+        else if (strcmp("shift", word) == 0)
+        {
+            read_value(ifs, shift);
+        }
+        else if (strcmp("metalcalc", word) == 0)
+        {
+            read_value(ifs, metalcalc);
+        }	
+        else if (strcmp("eps_degauss", word) == 0)
+        {
+            read_value(ifs, eps_degauss);
+        }
+        //else if (strcmp("epsilon0_choice", word) == 0)
+        //{
+        //    read_value(ifs, epsilon0_choice);
+        //}					
         else
         {
 		//xiaohui add 2015-09-15
@@ -1291,7 +1474,7 @@ void Input::Bcast()
     Parallel_Common::bcast_int( vna );
 	Parallel_Common::bcast_int( grid_speed );//mohan add 2012-03-29
     Parallel_Common::bcast_int( force );
-    Parallel_Common::bcast_int( force_set );
+    Parallel_Common::bcast_bool( force_set );
     Parallel_Common::bcast_double( force_thr);
     Parallel_Common::bcast_double( force_thr_ev2);
     Parallel_Common::bcast_bool( stress );
@@ -1435,7 +1618,54 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( vdwD2_period[2] );
 	Parallel_Common::bcast_double( vdwD2_radius );
 	Parallel_Common::bcast_string( vdwD2_radius_unit );
-	
+ 
+        // pengfei Li add 2016-11-23
+        //Parallel_Common::bcast_bool( epsilon );
+		//Parallel_Common::bcast_int( epsilon_choice );
+		Parallel_Common::bcast_string( spectral_type );
+		Parallel_Common::bcast_int( spectral_method );
+		Parallel_Common::bcast_string( kernel_type );
+		Parallel_Common::bcast_int( eels_method );
+		Parallel_Common::bcast_int( absorption_method );
+        Parallel_Common::bcast_string( system );
+        Parallel_Common::bcast_double( eta );
+        Parallel_Common::bcast_double( domega );
+        Parallel_Common::bcast_int( nomega );
+        Parallel_Common::bcast_int( ecut_chi );
+        //Parallel_Common::bcast_int( oband );
+		Parallel_Common::bcast_double( q_start[0]);
+		Parallel_Common::bcast_double( q_start[1]);
+		Parallel_Common::bcast_double( q_start[2]);
+		Parallel_Common::bcast_double( q_direct[0]);
+		Parallel_Common::bcast_double( q_direct[1]);
+		Parallel_Common::bcast_double( q_direct[2]);
+        //Parallel_Common::bcast_int( start_q );
+        //Parallel_Common::bcast_int( interval_q );
+        Parallel_Common::bcast_int( nq );
+        Parallel_Common::bcast_bool( out_epsilon );
+        Parallel_Common::bcast_bool( out_chi );
+        Parallel_Common::bcast_bool( out_chi0 );
+        Parallel_Common::bcast_double( fermi_level );
+        Parallel_Common::bcast_bool( coulomb_cutoff );
+        Parallel_Common::bcast_bool( kmesh_interpolation );
+        for(int i=0; i<100; i++)
+        {
+            Parallel_Common::bcast_double( qcar[i][0] );
+            Parallel_Common::bcast_double( qcar[i][1] );
+            Parallel_Common::bcast_double( qcar[i][2] );
+        }
+        Parallel_Common::bcast_int( lcao_box[0] );
+        Parallel_Common::bcast_int( lcao_box[1] );
+        Parallel_Common::bcast_int( lcao_box[2] );
+		//Parallel_Common::bcast_bool( epsilon0 );
+		//Parallel_Common::bcast_double( intersmear );
+		Parallel_Common::bcast_double( intrasmear );
+		Parallel_Common::bcast_double( shift );
+		Parallel_Common::bcast_bool( metalcalc );
+		Parallel_Common::bcast_double( eps_degauss );
+		
+		//Parallel_Common::bcast_int( epsilon0_choice );
+
     return;
 }
 #endif
@@ -1939,6 +2169,40 @@ void Input::Check(void)
 			WARNING_QUIT("Input","vdwD2_radius_unit must be A or Bohr");
 		}
 	}
+	
+	if(spectral_type!="None" && spectral_type!="eels" && spectral_type!="absorption")
+	{
+		WARNING_QUIT("INPUT","spectral_type must be eels or absorption !");
+	}
+
+	if(spectral_type!="None")                                                     // pengfei 2016-12-14
+	{
+		if( system!="bulk" && system!="surface")
+		{
+			WARNING_QUIT("Input","system must be bulk or surface");
+		}
+		if( kernel_type!="rpa")
+		{
+			WARNING_QUIT("Input","Now kernel_type must be rpa!");
+		}
+		if( q_start[0] == 0 && q_start[1] == 0 && q_start[2] == 0)
+		{
+			WARNING_QUIT("INPUT","Gamma point is not allowed!");
+		}
+		if( q_direct[0] == 0 && q_direct[1] == 0 && q_direct[2] == 0)
+		{
+			WARNING_QUIT("INPUT","You must choose a direction!");
+		}		
+		//if( oband > nbands)
+		//{
+		//	WARNING_QUIT("INPUT","oband must <= nbands");
+		//}
+        //        if( oband == 1)
+        //        {
+        //            oband = nbands;
+        //        }		
+	}
+
 //2015-06-15, xiaohui
         if(mixing_mode == "pulay" && mixing_gg0 > 0.0)
         {
@@ -2185,7 +2449,47 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"vdwD2_radius",vdwD2_radius,"radius cutoff for periodic structure");
 	OUTP(ofs,"vdwD2_radius_unit",vdwD2_radius_unit,"unit of radius cutoff for periodic structure");	
 	ofs << setw(20) << "vdwD2_period" << vdwD2_period[0] << " " << vdwD2_period[1] << " " << vdwD2_period[2]<< " #periods of periodic structure" << endl;
-
+	
+	
+	ofs << "\n#Parameters (16.spectrum)" << endl;              // pengfei Li add 2016-11-23
+	//OUTP(ofs,"epsilon",epsilon,"calculate epsilon or not");
+	//OUTP(ofs,"epsilon_choice",epsilon_choice,"0: hilbert_transform method; 1: standard method");
+	OUTP(ofs,"spectral_type",spectral_type,"the type of the calculated spectrum");
+	OUTP(ofs,"spectral_method",spectral_method,"0: tddft(linear response)");
+	OUTP(ofs,"kernel_type",kernel_type,"the kernel type: rpa, tdlda ...");
+	OUTP(ofs,"eels_method",eels_method,"0: hilbert_transform method; 1: standard method");
+	OUTP(ofs,"absorption_method",absorption_method,"0: vasp's method  1: pwscf's method");
+	OUTP(ofs,"system",system,"the calculate system");
+	OUTP(ofs,"eta",eta,"eta(Ry)");
+	OUTP(ofs,"domega",domega,"domega(Ry)");
+	OUTP(ofs,"nomega",nomega,"nomega");
+	OUTP(ofs,"ecut_chi",ecut_chi,"the dimension of chi matrix");
+	//OUTP(ofs,"oband",oband,"the number of occupied bands");
+	ofs << setw(20) <<"q_start"<<q_start[0]<<"   "<<q_start[1]<<"   "<<q_start[2]<<"  #the position of the first q point in direct coordinate" <<endl;
+	ofs << setw(20) <<"q_direction"<<q_direct[0]<<"   "<<q_direct[1]<<"   "<<q_direct[2]<<"  #the q direction" <<endl;
+	//OUTP(ofs,"start_q",start_q,"the serial number of the start qpoint");
+	//OUTP(ofs,"interval_q",interval_q,"the interval of the qpoints");
+	OUTP(ofs,"nq",nq,"the total number of qpoints for calculation");
+	OUTP(ofs,"out_epsilon",out_epsilon,"output epsilon or not");
+	OUTP(ofs,"out_chi",out_chi,"output chi or not");
+	OUTP(ofs,"out_chi0",out_chi0,"output chi0 or not");
+	OUTP(ofs,"fermi_level",fermi_level,"the change of the fermi_level(Ry)");
+	OUTP(ofs,"coulomb_cutoff",coulomb_cutoff," turn on the coulomb_cutoff or not");
+	OUTP(ofs,"kmesh_interpolation",kmesh_interpolation,"calculting <i,0|j,R>");
+	for(int i=0; i<nq; i++)
+	{
+		ofs << setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << endl;
+	}
+	ofs << setw(20) <<"lcao_box"<<lcao_box[0]<<"   "<<lcao_box[1]<<"   "<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<endl;
+	
+	//OUTP(ofs,"epsilon0",epsilon0,"calculate the macroscopic dielectric constant or not");
+	//OUTP(ofs,"intersmear",intersmear,"eta");
+	OUTP(ofs,"intrasmear",intrasmear,"Eta");
+	OUTP(ofs,"shift",shift,"shift");
+	OUTP(ofs,"metalcalc",metalcalc,"metal or not");
+	OUTP(ofs,"eps_degauss",eps_degauss,"degauss in calculating epsilon0");
+	
+	//OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
 	
     ofs.close();
     return;

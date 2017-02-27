@@ -12,5 +12,7 @@ namespace Wavefunc_in_pw
 	//mohan add 2010-04-20
 	double smearing(const double &energy_x,const double &ecut,const double &beta);
 	void produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi, const realArray &table_local); 
+        void produce_local_basis_q_in_pw(const int &ik,ComplexMatrix &psi, const realArray &table_local, Vector3<double> q);     // pengfei 2016-11-23
+
 };
 #endif

@@ -1514,105 +1514,84 @@ void Symmetry::rho_symmetry( double *rho,
     timer::tick("Symmetry","rho_symmetry");
 }
 
-void Symmetry::force_symmetry(matrix &force , double* pos) // pengfei 2014-10-13
+void Symmetry::force_symmetry(matrix &force , double* pos)   // pengfei 2016-12-20
 {
-     //for (int i=0;i<6;i++)
-     //cout << "pos "<<i<<" = "<<pos[i]<<endl;
-     //cout << force(0,0) <<" "<<force(0,1) <<" "<<force(0,2)<<endl;
-     double *protpos;
-     double *tot_force;
-     int *n;
-     int *start;
-     int it;
-     double diff1,diff2,diff3;
-     protpos = new double[nat*3];
-     tot_force = new double[nat*3];
-     n = new int[nat];
-     start = new int[ntype];
-     ZEROS(protpos, nat*3);
-     ZEROS(tot_force, nat*3);
-     ZEROS(n, nat);
-     start[0] = 0;
-     for (it = 0; it < ntype; ++it)
-     {
-         //Atom* atom = &ucell.atoms[it];
-         //na[it] = atom->na;
-          if ( it > 0)
-          {
-             start[it] = start[it-1] + ucell.atoms[it-1].na;
-          }
-          //cout << "na =" <<ucell.atoms[0].na<<" "<<ucell.atoms[1].na<<" "<<ucell.atoms[2].na<<endl;
-     }
-     for (int it = 0; it < ntype; it++)
-     {
-        for (int j = start[it]; j < start[it] + ucell.atoms[it].na; ++j)
-        {
-            const int xx=j*3;
-            const int yy=j*3+1;
-            const int zz=j*3+2;
-              
-           // cout << "xx = "<<xx<<" yy ="<<yy<<" zz = "<<zz<<endl;
-           // cout << "nrotk ="<<nrotk<<endl;
-            for ( int k = 0 ; k < nrotk; ++k)
-            {
-
-                  protpos[xx] = pos[xx] * gmatrix[k].e11
-                         + pos[yy] * gmatrix[k].e12
-                         + pos[zz] * gmatrix[k].e13 + gtrans[k].x;
-
-                  protpos[yy] = pos[xx] * gmatrix[k].e21
-                         + pos[yy] * gmatrix[k].e22
-                         + pos[zz] * gmatrix[k].e23 + gtrans[k].y;
-
-                  protpos[zz] = pos[xx] * gmatrix[k].e31
-                         + pos[yy] * gmatrix[k].e32
-                         + pos[zz] * gmatrix[k].e33 + gtrans[k].z;
-             //     cout << "posxx = "<<pos[xx]<<"posyy = "<<pos[yy]<<"poszz = "<<pos[zz]<<endl;
-
-                 check_translation( protpos[xx], -floor(protpos[xx]));
-                 check_boundary( protpos[xx] );
-                 check_translation( protpos[yy], -floor(protpos[yy]));
-                 check_boundary( protpos[yy] );
-                 check_translation( protpos[zz], -floor(protpos[zz]));
-                 check_boundary( protpos[zz] );
-
-        //         cout << "a" <<endl;
-                  for ( int l = start[it]; l < start[it] + ucell.atoms[it].na; ++l)
-                  {
-                        //cout << "l =" <<l<<endl;
-
-                             diff1 = check_diff( pos[l*3], protpos[xx]);
-                             diff2 = check_diff( pos[l*3+1], protpos[yy]);
-                             diff3 = check_diff( pos[l*3+2], protpos[zz]);
-                             // cout << "diff1 = "<<diff1<<" diff2 = "<<diff2<<" diff3 = "<<diff3<<endl;
-                        if ( equal(diff1,0.0) && equal(diff2,0.0) && equal(diff3,0.0))
-                        {
-                        //     cout <<"nl = " << n[l]<<endl;
-                             tot_force[l*3] = tot_force[l*3] + force(j,0) * gmatrix[k].e11 + force(j,1) * gmatrix[k].e12 + force(j,2) * gmatrix[k].e13;
-                             tot_force[l*3+1] =  tot_force[l*3+1] + force(j,0) * gmatrix[k].e21 + force(j,1) * gmatrix[k].e22 + force(j,2) * gmatrix[k].e23;
-                             tot_force[l*3+2] =  tot_force[l*3+2] + force(j,0) * gmatrix[k].e31 + force(j,1) * gmatrix[k].e32 + force(j,2) * gmatrix[k].e33;
-                             n[l]++;
-                        }
-                  }
-            }
-
-         }
-       }
-     
-     for (int it = 0; it < ntype; it++)
-     {
-        for (int j = start[it]; j < start[it] + ucell.atoms[it].na; j++)
-        { 
-           force(j,0) = tot_force[j*3]/n[j];
-           force(j,1) = tot_force[j*3+1]/n[j];
-           force(j,2) = tot_force[j*3+2]/n[j];
-        }
-     }
-   delete [] tot_force;
-   delete [] protpos;
-   delete [] n;
-   delete [] start;
-   return;
+	TITLE("Symmetry","force_symmetry");
+	double *protpos;
+	double *tot_force;
+	int *n;
+	int *start;
+	double diff1,diff2,diff3;
+	protpos = new double[nat*3]; ZEROS(protpos, nat*3);
+	tot_force = new double[nat*3]; ZEROS(tot_force, nat*3);
+	n = new int[nat]; ZEROS(n, nat);
+	start = new int[ntype]; start[0] = 0;
+	for(int it = 0; it < ntype; ++it)
+	{
+		//Atom* atom = &ucell.atoms[it];
+		//na[it] = atom->na;
+		if(it > 0)
+		{
+			start[it] = start[it-1] + ucell.atoms[it-1].na;
+		}
+		//cout << "na =" <<ucell.atoms[0].na<<" "<<ucell.atoms[1].na<<" "<<ucell.atoms[2].na<<endl;
+		
+	}
+	for(int it = 0; it < ntype; it++)
+	{
+		for(int j = start[it]; j < start[it] + ucell.atoms[it].na; ++j)
+		{
+			const int xx=j*3; const int yy=j*3+1; const int zz=j*3+2;
+			// cout << "xx = "<<xx<<" yy ="<<yy<<" zz = "<<zz<<endl;
+			// cout << "nrotk ="<<nrotk<<endl;
+			for(int k = 0 ; k < nrotk; ++k)
+			{
+				protpos[xx] = pos[xx] * gmatrix[k].e11 + pos[yy] * gmatrix[k].e12 + pos[zz] * gmatrix[k].e13 + gtrans[k].x;
+				protpos[yy] = pos[xx] * gmatrix[k].e21 + pos[yy] * gmatrix[k].e22 + pos[zz] * gmatrix[k].e23 + gtrans[k].y;
+				protpos[zz] = pos[xx] * gmatrix[k].e31 + pos[yy] * gmatrix[k].e32 + pos[zz] * gmatrix[k].e33 + gtrans[k].z;
+							    			   			
+				check_translation( protpos[xx], -floor(protpos[xx]));
+				check_boundary( protpos[xx] );
+				check_translation( protpos[yy], -floor(protpos[yy]));
+				check_boundary( protpos[yy] );
+				check_translation( protpos[zz], -floor(protpos[zz]));
+				check_boundary( protpos[zz] );
+				
+				for(int l = start[it]; l < start[it] + ucell.atoms[it].na; ++l)
+				{
+					diff1 = check_diff( pos[l*3], protpos[xx]);
+					diff2 = check_diff( pos[l*3+1], protpos[yy]);
+					diff3 = check_diff( pos[l*3+2], protpos[zz]);
+					if (equal(diff1,0.0) && equal(diff2,0.0) && equal(diff3,0.0))
+					{
+						//cout <<"nl = " << n[l]<<endl;
+						tot_force[l*3] = tot_force[l*3] + force(j,0) * gmatrix[k].e11 + force(j,1) * gmatrix[k].e12 + force(j,2) * gmatrix[k].e13;
+						tot_force[l*3+1] =  tot_force[l*3+1] + force(j,0) * gmatrix[k].e21 + force(j,1) * gmatrix[k].e22 + force(j,2) * gmatrix[k].e23;
+						tot_force[l*3+2] =  tot_force[l*3+2] + force(j,0) * gmatrix[k].e31 + force(j,1) * gmatrix[k].e32 + force(j,2) * gmatrix[k].e33;
+						n[l]++;
+					}
+				}
+				
+			}
+			
+		}
+	}
+	for(int it = 0; it < ntype; it++)
+	{
+		for(int j = start[it]; j < start[it] + ucell.atoms[it].na; j++)
+		{
+			force(j,0) = tot_force[j*3]/n[j];
+			force(j,1) = tot_force[j*3+1]/n[j];
+			force(j,2) = tot_force[j*3+2]/n[j];
+		}
+	}
+	
+	delete[] protpos;
+	delete[] tot_force;
+	delete[] n;
+	delete[] start;
+	
+	return;
 }
 
 void Symmetry::write()

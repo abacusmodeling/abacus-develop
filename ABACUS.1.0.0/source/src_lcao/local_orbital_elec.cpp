@@ -5,7 +5,7 @@
 // mohan add on test 2010-01-13
 //#include "../src_develop/src_onscaling/on_tests.h"
 #include "update_input.h"
-
+#include "../src_pw/chi0_hilbert.h"
 #include "lcao_vna.h"
 
 int Local_Orbital_Elec::iter = 0;
@@ -342,14 +342,24 @@ void Local_Orbital_Elec::scf(const int &istep)
 			// output charge density for converged,
 			// 0 means don't need to consider iter,
 			//--------------------------------------
+			if( chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
+			{
+				cout <<"eta = "<<chi0_hilbert.eta<<endl;
+				cout <<"domega = "<<chi0_hilbert.domega<<endl;
+				cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
+				cout <<"dim = "<<chi0_hilbert.dim<<endl;
+				//cout <<"oband = "<<chi0_hilbert.oband<<endl;
+				chi0_hilbert.Chi();
+			}
+			
 			for(int is=0; is<NSPIN; is++)
 			{
 				const int precision = 3;
-
-        		stringstream ssc;
-       			ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-        		chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
-
+				
+				stringstream ssc;
+				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+				chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+				
 				stringstream ssd;
 				if(GAMMA_ONLY_LOCAL)
 				{

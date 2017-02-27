@@ -16,6 +16,10 @@
 #include "algorithms.h"
 #include "symmetry_rho.h"
 #include "../src_pw/wf_io.h"
+#include "chi0_hilbert.h"            // pengfei 2016-11-23
+#include "chi0_standard.h"
+#include "epsilon0_pwscf.h"
+#include "epsilon0_vasp.h"
 
 double electrons::avg_iter = 0;
 
@@ -87,7 +91,7 @@ void electrons::self_consistent(const int &istep)
     en.ewld = en.ewald();
 
     set_ethr();
-
+    
     this->unit = 0;
 
 	if(OUT_LEVEL=="ie")
@@ -338,6 +342,36 @@ void electrons::self_consistent(const int &istep)
 			// output charge density for converged,
 			// 0 means don't need to consider iter,
 			//--------------------------------------
+			if(chi0_hilbert.epsilon)                 // pengfei 2016-11-23
+			{
+				cout <<"eta = "<<chi0_hilbert.eta<<endl;
+				cout <<"domega = "<<chi0_hilbert.domega<<endl;
+				cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
+				cout <<"dim = "<<chi0_hilbert.dim<<endl;
+				//cout <<"oband = "<<chi0_hilbert.oband<<endl;
+				chi0_hilbert.Chi();
+			}
+			
+			if(chi0_standard.epsilon)
+			{
+				cout <<"eta = "<<chi0_standard.eta<<endl;
+				cout <<"domega = "<<chi0_standard.domega<<endl;
+				cout <<"nomega = "<<chi0_standard.nomega<<endl;
+				cout <<"dim = "<<chi0_standard.dim<<endl;
+				//cout <<"oband = "<<chi0_standard.oband<<endl;
+				chi0_standard.Chi();
+			}
+			
+			if(epsilon0_pwscf.epsilon)
+			{
+				epsilon0_pwscf.Cal_epsilon0();
+			}
+			
+			if(epsilon0_vasp.epsilon)
+			{
+				epsilon0_vasp.cal_epsilon0();
+			}
+			
 			for(int is=0; is<NSPIN; is++)
 			{
         		stringstream ssc;

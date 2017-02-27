@@ -4,6 +4,7 @@
 #include "../src_pw/wavefunc_in_pw.h"
 //xiaohui add 2013 -08-01
 #include "winput.h"
+#include "chi0_hilbert.h"
 #ifdef __FP
 //#include "../src_develop/src_wannier/manipulation.h"
 #endif
@@ -282,6 +283,24 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	return;
 }
 
+
+void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double> q)   // pengfei  2016-11-23
+{
+        TITLE("wavefunc","LCAO_in_pw_k_q");
+        timer::tick("wavefunc","LCAO_in_pw_k_q",'G');
+        //assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
+        assert(BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
+
+#ifdef __FP
+
+        Wavefunc_in_pw::produce_local_basis_q_in_pw(ik, wvf, this->table_local, q);
+
+#endif
+        timer::tick("wavefunc","LCAO_in_pw_k_q",'G');
+        return;
+}
+
+
 void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k");
@@ -388,6 +407,344 @@ void wavefunc::wfcinit_k(void)
 			this->diago_PAO_in_pw_k(ik, wf.evc[ik]);
 		}
 	}
+	
+	//---------------------------------------------------
+	//  calculte the overlap <i,0 | e^{i(q+G)r} | j,R>
+	//---------------------------------------------------
+	/*cout <<"epsilon = "<<chi0_hilbert.epsilon<<endl;
+	cout <<"system = "<<chi0_hilbert.system<<endl;
+	cout <<"eta = "<<chi0_hilbert.eta<<endl;
+	cout <<"domega = "<<chi0_hilbert.domega<<endl;
+	cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
+	cout <<"dim = "<<chi0_hilbert.dim<<endl;
+	cout <<"oband = "<<chi0_hilbert.oband<<endl;
+	cout <<"start_q = "<<chi0_hilbert.start_q<<endl;
+	cout <<"interval_q = "<<chi0_hilbert.interval_q<<endl;
+	cout <<"interval_q = "<<chi0_hilbert.interval_q<<endl;
+	cout <<"out_epsilon = "<<chi0_hilbert.out_epsilon<<endl;
+	cout <<"out_chi = "<<chi0_hilbert.out_chi<<endl;
+	cout <<"out_chi0 = "<<chi0_hilbert.out_chi0<<endl;
+	cout <<"fermi_level = "<<chi0_hilbert.fermi_level<<endl;
+	cout <<"coulomb_cutoff = "<<chi0_hilbert.coulomb_cutoff<<endl;
+	cout <<"kmesh_interpolation = "<<chi0_hilbert.kmesh_interpolation<<endl;
+	cout <<"lcao_box1 = "<<chi0_hilbert.lcao_box[0]<<endl;
+	cout <<"lcao_box2 = "<<chi0_hilbert.lcao_box[1]<<endl;
+	cout <<"lcao_box3 = "<<chi0_hilbert.lcao_box[2]<<endl;
+	for(int i=0; i<100; i++)
+	{
+		cout<<"qcar["<<i<<"] = "<<chi0_hilbert.qcar[i][0]<<" "<<chi0_hilbert.qcar[i][1]<<" "<<chi0_hilbert.qcar[i][2]<<endl;
+	}
+	*/
+	
+	if((!chi0_hilbert.epsilon) && chi0_hilbert.kmesh_interpolation )    // pengfei  2016-11-23
+	{
+		chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(pw.gcars))  are the same
+		
+		// iw1->i, iw2->j, R store the positions of the neighbor unitcells that |i,0> and |j,R> have overlaps
+		R = new Vector3<int>** [NLOCAL];
+		for(int iw1=0; iw1<NLOCAL; iw1++)
+		{
+			R[iw1] = new Vector3<int>* [NLOCAL];
+			for(int iw2=0; iw2<NLOCAL; iw2++)
+			{
+				R[iw1][iw2] = new Vector3<int>[chi0_hilbert.lcao_box[0]*chi0_hilbert.lcao_box[1]*chi0_hilbert.lcao_box[2]];
+			}
+		}
+		
+		Rmax = new int* [NLOCAL];
+		for(int iw=0; iw<NLOCAL; iw++)
+		{
+			Rmax[iw] = new int[NLOCAL];
+		}
+		
+		int NR; // The Max number of the overlaps for each iw1,iw2; 
+		NR = get_R(chi0_hilbert.lcao_box[0],chi0_hilbert.lcao_box[1],chi0_hilbert.lcao_box[2]); 
+		
+		// store the overlap relationship to "nearest.dat"
+		stringstream ss;
+		ss << global_out_dir <<"nearest.dat";
+		ofstream ofs(ss.str().c_str());
+		ofs << NR << endl;
+		cout <<"NR = "<<NR<<endl;    // Max
+		for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw2=0; iw2<NLOCAL; iw2++)
+			{
+				ofs<<iw1<<"   "<<iw2<<"    "<<Rmax[iw1][iw2]<<endl;   // iw1, iw2, and how many overlaps between iw1 and iw2
+				for(int i=0; i<Rmax[iw1][iw2]; i++)
+				{
+					ofs<<R[iw1][iw2][i].x<<"  "<<R[iw1][iw2][i].y<<"  "<<R[iw1][iw2][i].z<<endl;   // positions
+				}
+			}
+		ofs.close();
+		
+		int NG = chi0_hilbert.dim;  // chi0's dimension
+		
+		complex<double> ***wanf2_q;    // <j,0 | k+G+q>
+		
+		wanf2_q = new complex<double> **[kv.nks];
+		for(int ik=0; ik<kv.nks; ik++)
+		{
+			wanf2_q[ik] = new complex<double> *[NLOCAL];
+			for(int iw=0; iw<NLOCAL; iw++)
+			{
+				wanf2_q[ik][iw] = new complex<double>[npwx];
+			}
+		}
+		
+		complex<double> overlap_aux[NLOCAL][NLOCAL][NG][NR];     // <i,0 | e^{i(q+G)r} | j,R> 
+		complex<double> overlap[NLOCAL][NLOCAL][NG][NR];
+		double overlap_aux_R[NLOCAL][NLOCAL][NG][NR];       //real part
+		double overlap_R[NLOCAL][NLOCAL][NG][NR];
+		double overlap_aux_I[NLOCAL][NLOCAL][NG][NR];       //imag part
+		double overlap_I[NLOCAL][NLOCAL][NG][NR];
+		
+		ComplexMatrix Mat;
+		Mat.create(NLOCAL,npwx);
+		Vector3<double> qg; // q+G
+		Vector3<double> gkqg, Rcar[NLOCAL][NLOCAL][NR];  // k+G+qg, Rcartesian
+		
+		for(int iw1=0;iw1<NLOCAL; iw1++)
+			for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int i=0; i<NR; i++)
+				{
+					Rcar[iw1][iw2][i].x = 0.0; Rcar[iw1][iw2][i].y = 0.0;Rcar[iw1][iw2][i].z = 0.0;
+				}
 
-    return;
+		for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int i=0; i<Rmax[iw1][iw2]; i++)
+				{
+					Rcar[iw1][iw2][i].x = ucell.latvec.e11 * R[iw1][iw2][i].x + ucell.latvec.e21 * R[iw1][iw2][i].y + ucell.latvec.e31 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].y = ucell.latvec.e12 * R[iw1][iw2][i].x + ucell.latvec.e22 * R[iw1][iw2][i].y + ucell.latvec.e32 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].z = ucell.latvec.e13 * R[iw1][iw2][i].x + ucell.latvec.e23 * R[iw1][iw2][i].y + ucell.latvec.e33 * R[iw1][iw2][i].z;
+				}
+ 
+		
+		double arg; complex<double> phase;
+		for(int iq=0; iq<chi0_hilbert.nq; iq++)
+			for(int iw1=0; iw1<NLOCAL; iw1++)
+				for(int iw2=0; iw2<NLOCAL; iw2++)
+					for(int ig=0; ig<NG; ig++)
+					{
+						ZEROS( overlap_aux[iw1][iw2][ig], NR);
+					}
+		
+		// main
+		for(int iq=0; iq<chi0_hilbert.nq; iq++)    // loop over iq 
+		{
+			for(int iw1=0; iw1<NLOCAL; iw1++)
+				for(int iw2=0; iw2<NLOCAL; iw2++)
+					for(int ig=0; ig<NG; ig++)
+					{
+						ZEROS( overlap_aux[iw1][iw2][ig], NR);
+					}
+			
+			for(int g=0; g<NG; g++)    // loop over ig
+			{
+				qg.x = chi0_hilbert.qcar[iq][0] + chi0_hilbert.all_gcar[g].x;   qg.y = chi0_hilbert.qcar[iq][1] + chi0_hilbert.all_gcar[g].y; qg.z = chi0_hilbert.qcar[iq][2] + chi0_hilbert.all_gcar[g].z;
+				cout <<"qg = "<<qg.x<<" "<<qg.y<<" "<<qg.z<<endl;
+				for(int ik=0; ik<kv.nks; ik++)
+				{
+					this->LCAO_in_pw_k_q(ik, Mat, qg);
+					for(int iw=0; iw<NLOCAL; iw++)
+						for(int ig=0; ig<kv.ngk[ik]; ig++)
+						{
+							wanf2_q[ik][iw][ig] = Mat(iw,ig);
+						}										
+				}
+				for(int iw1=0; iw1<NLOCAL; iw1++)    // loop over iw1
+					for(int iw2=0; iw2<NLOCAL; iw2++)  // loop over iw2
+					{
+						for(int ik=0;ik<kv.nks;ik++)         // loop over ik
+							for(int ig=0;ig<kv.ngk[ik];ig++)    // loop over ig
+							{
+								gkqg =  kv.kvec_c[ik] + pw.gcar[wf.igk(ik, ig)] + qg;
+								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
+								{
+									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
+									phase = complex<double>( cos(arg),  -sin(arg) );
+									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) * wanf2_q[ik][iw2][ig] * phase/kv.nks;
+								}
+							}
+						
+					}
+			}
+			
+			for(int g=0; g<NG; g++)
+				for(int iw1=0; iw1<NLOCAL; iw1++)
+					for(int iw2=0; iw2<NLOCAL; iw2++)
+						for(int ir=0; ir<NR; ir++)
+						{
+							overlap_aux_R[iw1][iw2][g][ir] = overlap_aux[iw1][iw2][g][ir].real();
+							overlap_aux_I[iw1][iw2][g][ir] = overlap_aux[iw1][iw2][g][ir].imag();
+						}
+			
+			MPI_Allreduce(overlap_aux_R,overlap_R,NLOCAL * NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+			MPI_Allreduce(overlap_aux_I,overlap_I,NLOCAL * NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+			
+			for(int g=0; g<NG; g++)
+				for(int iw1=0; iw1<NLOCAL; iw1++)
+					for(int iw2=0; iw2<NLOCAL; iw2++)
+						for(int ir=0; ir<NR; ir++)
+						{
+							overlap[iw1][iw2][g][ir] = complex<double>( overlap_R[iw1][iw2][g][ir], overlap_I[iw1][iw2][g][ir]);
+						}
+						
+			//------------------------------
+			// store the overlap in q_(iq)
+			//------------------------------
+			stringstream ss1;
+			ss1 << global_out_dir <<"q_"<<iq;
+			ofstream ofs1(ss1.str().c_str());
+			ofs1<<NG<<endl;
+			for(int g=0; g<NG; g++)
+			{
+				for(int iw1=0; iw1<NLOCAL; iw1++)
+					for(int iw2=0; iw2<NLOCAL; iw2++)
+					{
+						for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
+						{
+							ofs1<<overlap[iw1][iw2][g][ir]<<"  ";
+						}
+						ofs1<<endl;
+					}
+					ofs1<<endl; ofs1<<endl;
+			}
+			ofs1.close();
+		}
+		
+		for(int iw1=0; iw1<NLOCAL; iw1++)
+		{
+			for(int iw2=0; iw2<NLOCAL; iw2++)
+			{
+				delete[] R[iw1][iw2];
+			}
+			delete[] R[iw1];
+		}
+		delete[] R;
+		
+		for(int iw=0; iw<NLOCAL; iw++)
+		{
+			delete[] Rmax[iw];
+		}
+		delete[] Rmax;
+		
+		for(int ik=0; ik<kv.nks; ik++)
+		{
+			for(int iw=0; iw<NLOCAL; iw++)
+			{
+				delete[] wanf2_q[ik][iw];
+			}
+			delete[] wanf2_q[ik];
+		}
+		delete[] wanf2_q;
+	
+	}
+	
+	return;
 }
+
+//--------------------------------------------
+// get the nearest unitcell positions 
+// that exist overlaps between two orbitals
+// iw1 and iw2
+//--------------------------------------------
+int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
+{
+	int count;
+	Vector3<double> r,r1,r2;
+	
+	for(int iw1=0; iw1<NLOCAL; iw1++)
+		for(int iw2=0; iw2<NLOCAL; iw2++)
+		{
+			int it1 = iw2it(iw1); int ia1 = iw2ia(iw1);
+			int it2 = iw2it(iw2); int ia2 = iw2ia(iw2);
+			//cout <<"iw1= "<<iw1<<" iw2= "<<iw2<<" it1= "<<it1<<" ia1= "<<ia1<<" it2= "<<it2<<" ia2= "<<ia2<<endl;
+			count = 0;
+			
+			for(int nx=-int(ix/2);nx<=int(ix/2);nx++)
+				for(int ny=-int(iy/2);ny<=int(iy/2);ny++)
+					for(int nz=-int(iz/2);nz<=int(iz/2);nz++)
+					{
+						//cout <<"count = "<<count<<endl;
+						//cout<<"nx= "<<nx<<" ny= "<<ny<<" nz= "<<nz<<endl;
+						r1.x = ucell.atoms[it1].tau[ia1].x * ucell.lat0;
+						r1.y = ucell.atoms[it1].tau[ia1].y * ucell.lat0;
+						r1.z = ucell.atoms[it1].tau[ia1].z * ucell.lat0;
+						r2.x = (ucell.atoms[it2].tau[ia2].x + ucell.latvec.e11 * nx + ucell.latvec.e21 * ny + ucell.latvec.e31 * nz) * ucell.lat0;
+						r2.y = (ucell.atoms[it2].tau[ia2].y + ucell.latvec.e12 * nx + ucell.latvec.e22 * ny + ucell.latvec.e32 * nz) * ucell.lat0;
+						r2.z = (ucell.atoms[it2].tau[ia2].z + ucell.latvec.e13 * nx + ucell.latvec.e23 * ny + ucell.latvec.e33 * nz) * ucell.lat0;
+						r = r2 - r1;
+						double distance = sqrt(r*r);
+						if(distance < (ucell.atoms[it1].Rcut + ucell.atoms[it2].Rcut))
+						{
+							R[iw1][iw2][count].x = nx; R[iw1][iw2][count].y = ny; R[iw1][iw2][count].z = nz; 
+							//cout<<"OK "<<R[iw1][iw2][count].x<<" "<<R[iw1][iw2][count].y<<" "<<R[iw1][iw2][count].z<<endl;
+							count++;
+						}
+						//cout<<"nx= "<<nx<<" ny= "<<ny<<" nz= "<<nz<<endl;
+					}
+					Rmax[iw1][iw2] = count;
+					//cout<<"Rmax["<<iw1<<"]["<<iw2<<"] = "<<Rmax[iw1][iw2]<<endl;				
+		}
+		
+	int NR = 0;
+	for(int iw1=0;iw1<NLOCAL;iw1++)
+		for(int iw2=0;iw2<NLOCAL;iw2++)
+		{
+			if(Rmax[iw1][iw2] > NR)
+			{
+				NR = Rmax[iw1][iw2];
+			}
+		}
+			
+	return NR;
+}
+
+int wavefunc::iw2it( int iw)    // pengfei 2016-11-23
+{
+    int ic, type;
+    ic =0;
+    for(int it =0; it<ucell.ntype; it++)
+        for(int ia = 0; ia<ucell.atoms[it].na; ia++)
+        {
+            for(int L=0; L<ucell.atoms[it].nwl+1; L++)
+                for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+                {
+                    for(int i=0; i<(2*L+1); i++)
+                    {
+                        if(ic == iw)
+                        {
+                           type = it;
+                        }
+                        ic++;
+					}
+                }
+        }
+    return type;
+}
+
+int wavefunc::iw2ia( int iw)    // pengfei 2016-11-23
+{
+    int ic, na;
+    ic =0;
+    for(int it =0; it<ucell.ntype; it++)
+        for(int ia = 0; ia<ucell.atoms[it].na; ia++)
+        {
+            for(int L=0; L<ucell.atoms[it].nwl+1; L++)
+                for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+                {
+                    for(int i=0; i<(2*L+1); i++)
+                    {
+                        if(ic == iw)
+                        {
+                           na = ia;
+                        }
+                        ic++;
+                    }                    
+		}
+        }
+    return na;
+}
+
+

@@ -249,103 +249,58 @@ void Occupy::iweights
 )
 {
 	assert(is<2); //not include non-collinear yet!
-
-//	TITLE("Occupy","iweights");
-    double degspin;
-    bool conv;
-    conv = false;    //pengfei add 2015-6-3
-
-	if (is!=-1) //mohan add 2012-04-16, not sure it is correct
-	{
-		if (NSPIN==2)
+	double degspin;
+	bool conv = false;          // pengfei 2016-12-30
+	
+	degspin = (NSPIN == 2)? 1.0 : 2.0;
+	
+	assert( degspin > 0.0);
+	double ib_min = nelec/degspin;
+	
+	int ib_min1 = ( ib_min - int(ib_min) == 0) ? int(ib_min) : int(ib_min) + 1;
+	
+	for(int ik=0; ik<nks; ik++)
+		for(int ib=0; ib<nband; ib++)
 		{
-			degspin = 1.0;
+			//cout << " ekb=" << ekb[ik][ib] << endl;
+			int count =0;
+			ef = ekb[ik][ib];
+			for(int ik1=0; ik1<nks; ik1++)
+				for(int ib1=0; ib1<nband; ib1++)
+				{
+					if( ekb[ik1][ib1] < ef || ekb[ik1][ib1] == ef )
+					{
+						count++;
+					}
+				}
+				
+			//cout<<"count = "<<count<<endl;
+			if( (NSPIN == 2 && count == ib_min1 * nks/2) || (NSPIN == 1 && count == ib_min1 * nks) )
+			{
+				conv = true;
+				break;
+			}
 		}
-		else
+		
+	//cout << " ef = " <<ef <<endl;
+	
+	for(int ik=0; ik<nks; ik++)
+		for(int ib=0; ib<nband; ib++)
 		{
-			degspin = 2.0;
+			if (ekb[ik][ib] < ef)
+			{
+				wg(ik,ib) =  wk[ik];
+			}
+			else if(ekb[ik][ib] == ef)
+			{
+				wg(ik,ib) =  wk[ik] * ( ib_min + 1.0 - double(ib_min1));
+			}
+			else
+			{
+				wg(ik,ib) = 0.0;
+			}
 		}
-	}
-
-     if (NSPIN==2)
-     {
-         degspin = 1.0;
-     }
-     else
-     {
-         degspin = 2.0;
-     }
-     
-     // cout << "degspin = " << degspin <<endl;
-
-    assert( degspin > 0.0);
-    const double ib_min = nelec/degspin;
-    //cout << " ib_min = " << ib_min <<endl;
-    int ib_min1 = int(ib_min);
-    if ((double(ib_min1)-ib_min) != 0)
-    {
-        ib_min1 = ib_min1 + 1;       // pengfei added 15-3-12
-    }
-
-    //cout << " ib_min1 = " << ib_min1 <<endl;
-    for ( int ik = 0; ik <nks; ik++)
-    {
-                for (int ib = 0;ib < nband;ib++)
-                {
-   //                  cout << " ekb=" << ekb[ik][ib] << endl;
-                     int num = 0;
-                     ef = ekb[ik][ib];
-                     for ( int ik1 = 0; ik1 <nks; ik1++)
-                         for (int ib1 = 0;ib1 < nband ;ib1++)
-                         {
-                               if( ekb[ik1][ib1] < ef || ekb[ik1][ib1] == ef )
-                                   num++;
-                         }
-   //                  cout << " num = " <<num <<endl;
-                     if (NSPIN == 2)
-                     {   
-                        if (num == ib_min1 * nks/2)
-                        {
-                            ik = 100000;
-                            ib = 100000;
-                            conv = true;
-                        }
-                     }
-                     else
-                     {
-                        if (num == ib_min1 * nks)
-                        {
-                            ik = 100000;
-                            ib = 100000;
-                            conv = true;
-                        }
-
-                     }      
-                     
-                }
-    }
-    
-    // cout << " ef = " <<ef <<endl;
-    
-    for ( int ik = 0; ik <nks; ik++)
-    {
-                for (int ib = 0;ib < nband;ib++)
-                {
-                        if (ekb[ik][ib] < ef)
-                        {
-                            wg(ik,ib) =  wk[ik];
-                        }
-                        else if ( ekb[ik][ib] == ef)
-                        {
-                            wg(ik,ib) =  wk[ik] * ( ib_min + 1.0 - double(ib_min1));
-                        }
-                        else
-                        {
-                            wg(ik,ib) = 0.0;
-                        } 
-
-                }
-    }
+	
 
     /*ef = - 1.0e+20;
     for (int ik = 0;ik < nks;ik ++)
