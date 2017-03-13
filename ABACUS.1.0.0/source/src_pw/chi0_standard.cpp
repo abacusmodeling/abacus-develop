@@ -14,6 +14,7 @@
 #include "optical.h"
 #include "klist.h"
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 Chi0_standard chi0_standard;
