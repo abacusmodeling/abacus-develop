@@ -584,7 +584,7 @@ void Gint_k::folding_vl_k(const int &ik)
 					{
 						// need to get elements from the other half.
 						// I have question on this! 2011-02-22
-						tmp[j] = this->pvp[nug][mug];
+						tmp[j] = conj(this->pvp[nug][mug]);
 					}
 				}
 			}
