@@ -250,7 +250,7 @@ void Occupy::iweights
 {
 	assert(is<2); //not include non-collinear yet!
 	double degspin;
-	bool conv = false;          // pengfei 2016-12-30
+	bool conv = false;          // pengfei 2017-04-04
 	
 	degspin = (NSPIN == 2)? 1.0 : 2.0;
 	
@@ -259,8 +259,8 @@ void Occupy::iweights
 	
 	int ib_min1 = ( ib_min - int(ib_min) == 0) ? int(ib_min) : int(ib_min) + 1;
 	
-	for(int ik=0; ik<nks; ik++)
-		for(int ib=0; ib<nband; ib++)
+	for(int ik=0; ik<nks && !conv; ik++)
+		for(int ib=0; ib<nband && !conv; ib++)
 		{
 			//cout << " ekb=" << ekb[ik][ib] << endl;
 			int count =0;
@@ -278,7 +278,6 @@ void Occupy::iweights
 			if( (NSPIN == 2 && count == ib_min1 * nks/2) || (NSPIN == 1 && count == ib_min1 * nks) )
 			{
 				conv = true;
-				break;
 			}
 		}
 		
