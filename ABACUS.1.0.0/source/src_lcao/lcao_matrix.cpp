@@ -7,11 +7,13 @@ LCAO_Matrix::LCAO_Matrix()
 	Sloc = new double[1];
 	Hloc_fixed = new double[1];
 	Hloc = new double[1];
+	Sdiag = new double[1];
 
 	// for many k points
 	Sloc2 = new complex<double>[1];
 	Hloc_fixed2 = new complex<double>[1];
 	Hloc2 = new complex<double>[1];
+	Sdiag2 = new complex<double>[1];
 }
 
 LCAO_Matrix::~LCAO_Matrix()
@@ -20,11 +22,13 @@ LCAO_Matrix::~LCAO_Matrix()
     delete[] Sloc;
     delete[] Hloc_fixed;
     delete[] Hloc;
+    delete[] Sdiag;
 
     // delete matrix for many k points
     delete[] Sloc2;
     delete[] Hloc_fixed2;
     delete[] Hloc2;	
+    delete[] Sdiag2;
 }
 
 void LCAO_Matrix::divide_HS_in_frag(void)
@@ -102,10 +106,12 @@ void LCAO_Matrix::allocate_HS_gamma(const int &nloc)
 	delete[] Sloc;
 	delete[] Hloc_fixed;
 	delete[] Hloc;
+	delete[] Sdiag;
 
 	this->Sloc = new double[nloc];
 	this->Hloc_fixed = new double[nloc];
 	this->Hloc = new double[nloc];
+	this->Sdiag = new double[nloc];
 
 	ZEROS(Sloc,nloc);
 	ZEROS(Hloc_fixed,nloc);
@@ -125,10 +131,12 @@ void LCAO_Matrix::allocate_HS_k(const int &nloc)
 	delete[] Sloc2;
 	delete[] Hloc_fixed2;
 	delete[] Hloc2;
+	delete[] Sdiag2;
 
 	this->Sloc2 = new complex<double>[nloc];
 	this->Hloc_fixed2 = new complex<double>[nloc];
 	this->Hloc2 = new complex<double>[nloc];
+	this->Sdiag2 = new complex<double>[nloc];
 
 	ZEROS(Sloc2,nloc);
 	ZEROS(Hloc_fixed2,nloc);

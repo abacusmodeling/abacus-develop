@@ -142,7 +142,8 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 	
 	Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"double");
 
-	double* Stmp = new double[nloc];
+	//double* Stmp = new double[nloc];
+	double* Stmp = LM.Sdiag;
 	for(int i=0; i<nloc; i++)
 	{
 		Stmp[i] = s_mat[i];
@@ -155,7 +156,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 	//xiaohui add 'OUT_LEVEL', 2015-09-16
 	if(OUT_LEVEL != "m") OUT(ofs_running,"TIME OF DIAGO (Sec)",end1 - start1);
 
-	delete[] Stmp;
+	//delete[] Stmp;
 
 	int idsize;
 	int nprocs,myid;
@@ -229,7 +230,8 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"cdouble");
 
 	// because the output Stmp will be different from Sloc2, so we need to copy that. 
-	complex<double>* Stmp = new complex<double>[nloc];
+	//complex<double>* Stmp = new complex<double>[nloc];
+	complex<double>* Stmp = LM.Sdiag2;
 	for(int i=0; i<nloc; i++)
 	{
 		Stmp[i] = cs_mat[i];
@@ -241,7 +243,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 
 //	cout << " loc_pos=" << loc_pos << endl;
 
-	delete[] Stmp;
+	//delete[] Stmp;
 
 
 	/*

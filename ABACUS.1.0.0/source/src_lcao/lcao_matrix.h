@@ -18,6 +18,7 @@ class LCAO_Matrix
 	double* Hloc;
 	double* Sloc;
 	double* Hloc_fixed;
+	double* Sdiag; // used in pdiag_double.cpp
 	
 	//------------------------------
 	// 1. Hamiltonian(vl),
@@ -30,6 +31,7 @@ class LCAO_Matrix
 	complex<double> *Hloc2;
 	complex<double> *Sloc2;
 	complex<double> *Hloc_fixed2;
+	complex<double> *Sdiag2; // used in pdiag_double.cpp
 	
 	//------------------------------
 	// Store H(mu,nu')
