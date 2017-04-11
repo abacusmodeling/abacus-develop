@@ -644,7 +644,16 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							const int nu = ParaO.trace_loc_col[iw2_all];
 
 							if(nu<0)continue;
-							const int iic = mu*ParaO.ncol+nu;
+							//const int iic = mu*ParaO.ncol+nu;
+                            int iic;
+                            if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                            {
+                                iic=mu+nu*ParaO.nrow;
+                            }
+                            else
+                            {
+                                iic=mu*ParaO.ncol+nu;
+                            }
 
 							//########################### EXPLAIN ###############################
 							// 1. overlap matrix with k point

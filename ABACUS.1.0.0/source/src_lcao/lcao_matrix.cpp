@@ -168,16 +168,16 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
-    const int index = ir * ParaO.ncol + ic;
-	//int index;
-	//if(KS_SOLVER=="genelpa")  // save the matrix as column major format
-	//{
-	//	index=ic*ParaO.nrow+ir;
-	//}
-	//else
-	//{
-	//	index=ir*ParaO.ncol+ic;
-  	//}
+    //const int index = ir * ParaO.ncol + ic;
+	int index;
+	if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+	{
+		index=ic*ParaO.nrow+ir;
+	}
+	else
+	{
+		index=ir*ParaO.ncol+ic;
+  	}
    
    	if( index >= ParaO.nloc)
 	{
@@ -217,16 +217,16 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
-    const int index = ir * ParaO.ncol + ic;
-	//int index;
-	//if(KS_SOLVER=="genelpa")  // save the matrix as column major format
-	//{
-	//	index=ic*ParaO.nrow+ir;
-	//}
-	//else
-	//{
-	//	index=ir*ParaO.ncol+ic;
-  	//}
+    //const int index = ir * ParaO.ncol + ic;
+	int index;
+	if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+	{
+		index=ic*ParaO.nrow+ir;
+	}
+	else
+	{
+		index=ir*ParaO.ncol+ic;
+  	}
     assert(index < ParaO.nloc);
 
     if (dtype=='S')//overlap Hamiltonian.
@@ -235,13 +235,12 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
     }
     else if (dtype=='T' || dtype=='N')// kinetic and nonlocal Hamiltonian.
     {
-        this->Hloc_fixed2[index] += v;
-        //cout<<"Hloc_fixed2["<<ir<<"]["<<ic<<"]+="<<v<<endl;
+        this->Hloc_fixed2[index] += v; // because kinetic and nonlocal Hamiltonian matrices are already block-cycle staraged after caculated in lcao_nnr.cpp
+                                       // this statement will not be used.
     }
     else if (dtype=='L') // Local potential Hamiltonian.
     {
         this->Hloc2[index] += v;
-        //cout<<"Hloc2["<<ir<<"]["<<ic<<"]+="<<v<<endl;
     }
 	else
 	{
