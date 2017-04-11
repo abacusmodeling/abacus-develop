@@ -16,6 +16,12 @@ class Pdiag_Double : public Pdiag_Basic
 	int ncol;
 	int nloc;
 
+#ifdef __MPI
+    int blacs_ctxt;
+	int mpi_comm_rows, mpi_comm_cols;
+    int desc[9];
+#endif
+
 	void diago_double_begin(const int &ik, double **c, 
 		double *h_mat, double *s_mat, double *ekb);
 	

@@ -50,6 +50,7 @@ extern "C"
 
     // BLAS 
 	void dcopy_(int const *n, double *a, int const *incx, double *b, int const *incy); 
+	void zcopy_(int const *n, complex<double> *a, int const *incx, complex<double> *b, int const *incy); 
 
 	void dgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
 		const double *alpha, const double *a, const int *lda, const double *b, const int *ldb, 

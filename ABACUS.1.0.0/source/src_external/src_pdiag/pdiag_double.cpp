@@ -1,5 +1,6 @@
 /*test generalized Stardand double precision symmetric eigenproblem*/
 #include "pdiag_double.h"
+#include "blas_interface.h"
 #include "../../src_pw/occupy.h"
 #include "../../src_pw/global.h"
 //#include "../src_pw/global.h"
@@ -7,9 +8,48 @@
 #include "../../src_lcao/local_orbital_charge.h"
 
 #ifdef __MPI
+extern "C"
+{   
+    #include "Cblacs.h"
+    #include "pblas.h"
+    #include "scalapack.h"
+    #include "my_elpa.h"
+}
+#include "GenELPA.h"
 #include "pdgseps.h"
 #include "pzgseps.h"
 #endif
+
+//#include "saveMatrix.hpp"
+
+inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk, int lld, int *desc, int &mpi_comm_rows, int &mpi_comm_cols)
+{
+#ifdef __MPI
+    int my_blacs_ctxt;
+    int myprow, mypcol;
+    int *usermap=new int[nprows*npcols];
+    int info=0;
+    for(int i=0; i<nprows; ++i)
+    {
+        for(int j=0; j<npcols; ++j)
+        {
+            int pcoord[2]={i, j};
+            MPI_Cart_rank(comm_2D, pcoord, &usermap[i+j*nprows]);
+        }
+    }
+    Cblacs_get(comm_2D, 0, &my_blacs_ctxt);
+    Cblacs_gridmap(&my_blacs_ctxt, usermap, nprows, nprows, npcols);
+    Cblacs_gridinfo(my_blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
+    info=elpa_get_communicators(comm_2D, myprow, mypcol, &mpi_comm_rows, &mpi_comm_cols);
+    delete[] usermap;
+    int ISRC=0;
+    descinit_(desc, &N, &N, &nblk, &nblk, &ISRC, &ISRC, &my_blacs_ctxt, &lld, &info);
+
+    return my_blacs_ctxt;
+#else
+    return 0;
+#endif
+}
 
 Pdiag_Double::Pdiag_Double()
 {
@@ -85,7 +125,12 @@ void Pdiag_Double::divide_HS_2d
 	this->nrow = this->MatrixInfo.row_num;
 	this->ncol = this->MatrixInfo.col_num;
 	this->nloc = MatrixInfo.col_num * MatrixInfo.row_num;
-
+    
+	// init blacs context for genelpa
+    if(KS_SOLVER=="genelpa")
+    {
+        blacs_ctxt=cart2blacs(comm_2D, dim0, dim1, NLOCAL, nb, nrow, desc, mpi_comm_rows, mpi_comm_cols);
+    }
 #else // single processor used.
 	this->nb = NLOCAL;
 	this->nrow = NLOCAL;
@@ -129,6 +174,12 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 	assert(NLOCAL > 0);
 
 	char uplo='U';
+	const int inc=1;
+
+    int nprocs, myid;
+    MPI_Status status;
+    MPI_Comm_size(comm_2D, &nprocs);
+    MPI_Comm_rank(comm_2D, &myid);
 
 	// parallel diagonalize the 
 	// H | psi > = S | psi > 
@@ -142,27 +193,106 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 	
 	Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"double");
 
-	//double* Stmp = new double[nloc];
 	double* Stmp = LM.Sdiag;
-	for(int i=0; i<nloc; i++)
-	{
-		Stmp[i] = s_mat[i];
-	}
-
+	
+	//saveMatrix("h_mat", ncol, nrow, h_mat);
+	//saveMatrix("s_mat", ncol, nrow, s_mat);
 
 	double start1 = MPI_Wtime();
-	pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+    OUT(ofs_running,"start solver, KS_SOLVER",KS_SOLVER);
+    if(KS_SOLVER=="hpseps")
+    {	
+		dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
+		pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+	}// HPSEPS method
+    else if(KS_SOLVER=="genelpa")
+    {
+        int maxnloc; // maximum number of elements in local matrix
+        MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
+        MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
+        double *q=new double[nloc];
+        double *work=new double[maxnloc]; // work/buffer matrix
+        static int method;
+        bool wantEigenVector=true;
+        bool wantDebug=true;
+        int info;
+        int comm_2D_f=MPI_Comm_c2f(comm_2D);
+
+        int THIS_REAL_ELPA_KERNEL_API=12;
+        int useQR=0;						// may be changed to input parameter sometime
+
+        if(chr.new_e_iteration)
+        {
+            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+            method=0;			
+        	//dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
+            for(int i=0; i<ncol; ++i)
+                dcopy_(&nrow, &s_mat[i], &ncol, &Stmp[i*nrow], &inc);
+	        //saveMatrix("Stmp", nrow, ncol, Stmp);
+
+            info=pdDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
+                                        Stmp, eigen, q, work,
+                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
+                                        THIS_REAL_ELPA_KERNEL_API, useQR);
+            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+        }
+	    double* Htmp = new double[nloc];
+        for(int i=0; i<ncol; ++i)
+            dcopy_(&nrow, &h_mat[i], &ncol, &Htmp[i*nrow], &inc);
+	    //saveMatrix("Htmp", nrow, ncol, Htmp);
+        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
+        info=pdSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
+                          Htmp, Stmp, eigen, q, work,
+                          comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
+                          THIS_REAL_ELPA_KERNEL_API, useQR,
+                          wantEigenVector, wantDebug);
+        delete[] Htmp;
+        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
+
+        //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
+        int pos=0;
+        for(int i=0; i<myid; ++i)
+        {
+            pos+=loc_sizes[i];
+        }
+        int naroc[2]; // maximum number of row or column
+        for(int iprow=0; iprow<dim0; ++iprow)
+        {
+            for(int ipcol=0; ipcol<dim1; ++ipcol)
+            {
+                const int coord[2]={iprow, ipcol};
+                int src_rank;
+                MPI_Cart_rank(comm_2D, coord, &src_rank);
+                if(myid==src_rank)
+                {
+                    dcopy_(&nloc, q, &inc, work, &inc);
+                    naroc[0]=nrow;
+                    naroc[1]=ncol;
+                }
+                info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
+                info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+                for(int j=0; j<naroc[1]; ++j)
+                {
+                    int zcol=globalIndex(j, nb, dim1, ipcol)-pos;
+                    if(0<=zcol && zcol<loc_size)
+                    {
+                        for(int i=0; i<naroc[0]; ++i)
+                        {
+                            int zrow=globalIndex(i, nb, dim0, iprow);
+                            Z[zrow*loc_size+zcol]=work[j*naroc[0]+i];
+                        }
+                    }
+                }
+            }
+        }
+        delete[] q;
+        delete[] work;
+    } // GenELPA method		
 	double end1 = MPI_Wtime();
 	//xiaohui add 'OUT_LEVEL', 2015-09-16
 	if(OUT_LEVEL != "m") OUT(ofs_running,"TIME OF DIAGO (Sec)",end1 - start1);
 
-	//delete[] Stmp;
-
 	int idsize;
-	int nprocs,myid;
-	MPI_Status status;
-	MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
-	MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
 	if(myid <= lastband_in_proc)
 	{
@@ -215,6 +345,12 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	TITLE("Pdiag_Double","diago_complex_begin");
 
 	char uplo='U';
+	const int inc=1;
+
+    int nprocs, myid;
+    MPI_Status status;
+    MPI_Comm_size(comm_2D, &nprocs);
+    MPI_Comm_rank(comm_2D, &myid);
 
 	// parallel diagonalize the 
 	// H | psi > = S | psi > 
@@ -232,15 +368,100 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	// because the output Stmp will be different from Sloc2, so we need to copy that. 
 	//complex<double>* Stmp = new complex<double>[nloc];
 	complex<double>* Stmp = LM.Sdiag2;
-	for(int i=0; i<nloc; i++)
+	
+	//saveMatrix("ch_mat", ncol, nrow, ch_mat);
+	//saveMatrix("cs_mat", ncol, nrow, cs_mat);
+	
+	if(KS_SOLVER=="hpseps")
 	{
-		Stmp[i] = cs_mat[i];
-//		cout << " i=" << i << " Sloc2=" << cs_mat[i] << endl;
-	}
+		int nbands_tmp = NBANDS;
+		zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
+    	pzgseps(comm_2D, NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+	} // HPSEPS method
+    else if(KS_SOLVER=="genelpa")
+    {
+        int maxnloc; // maximum number of elements in local matrix
+        MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
+        MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
+        complex<double> *q=new complex<double>[nloc];
+        complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
+        static int method;
+        bool wantEigenVector=true;
+        bool wantDebug=true;
+        int info;
+        int comm_2D_f=MPI_Comm_c2f(comm_2D);
 
-	int nbands_tmp = NBANDS;
-    pzgseps(comm_2D, NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+        int THIS_REAL_ELPA_KERNEL_API=9;
 
+        if(chr.new_e_iteration)
+        {
+            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+            method=0;			
+        	//zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
+            for(int i=0; i<ncol; ++i)
+                zcopy_(&nrow, &cs_mat[i], &ncol, &Stmp[i*nrow], &inc);
+            info=pzDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
+                                        Stmp, eigen, q, work,
+                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
+                                        THIS_REAL_ELPA_KERNEL_API);
+            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+			//saveMatrix("U", nrow, ncol, Stmp);
+        }
+        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
+	    complex<double>* Htmp = new complex<double>[nloc];
+        //zcopy_(&nloc, ch_mat, &inc, Htmp, &inc);
+        for(int i=0; i<ncol; ++i)
+            zcopy_(&nrow, &ch_mat[i], &ncol, &Htmp[i*nrow], &inc);
+
+        info=pzSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
+                          Htmp, Stmp, eigen, q, work,
+                          comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
+                          THIS_REAL_ELPA_KERNEL_API,
+                          wantEigenVector, wantDebug);
+        delete[] Htmp;
+        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
+
+        //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
+        int pos=0;
+        for(int i=0; i<myid; ++i)
+        {
+            pos+=loc_sizes[i];
+        }
+        int naroc[2]; // maximum number of row or column
+        for(int iprow=0; iprow<dim0; ++iprow)
+        {
+            for(int ipcol=0; ipcol<dim1; ++ipcol)
+            {
+                const int coord[2]={iprow, ipcol};
+                int src_rank;
+                MPI_Cart_rank(comm_2D, coord, &src_rank);
+                if(myid==src_rank)
+                {
+                    zcopy_(&nloc, q, &inc, work, &inc);
+                    naroc[0]=nrow;
+                    naroc[1]=ncol;
+                }
+                info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
+                info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, comm_2D);
+                for(int j=0; j<naroc[1]; ++j)
+                {
+                    int zcol=globalIndex(j, nb, dim1, ipcol)-pos;
+                    if(0<=zcol && zcol<loc_size)
+                    {
+                        for(int i=0; i<naroc[0]; ++i)
+                        {
+                            int zrow=globalIndex(i, nb, dim0, iprow);
+                            Z[zrow*loc_size+zcol]=work[j*naroc[0]+i];
+                        }
+                    }
+                }
+            }
+        }
+        delete[] q;
+        delete[] work;
+    } // GenELPA method		
+
+	
 //	cout << " loc_pos=" << loc_pos << endl;
 
 	//delete[] Stmp;

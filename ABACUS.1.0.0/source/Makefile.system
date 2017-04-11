@@ -1,37 +1,38 @@
 #---------------------------------------------
 # FFTW directories
 #---------------------------------------------
-FFTW_DIR = /public/udata/software/fftw2
-FFTW_INCLUDE = ${FFTW_DIR}/include
-FFTW_LIB_DIR = ${FFTW_DIR}/lib
-
+FFTW_INCLUDE=/usr/include
+FFTW_LIB_DIR=/usr/lib64
+#---------------------------------------------
+# BOOST directories
+#---------------------------------------------
+BOOST_INCLUDE=/usr/include/boost
+BOOST_LIB_DIR=/usr/lib64
 #---------------------------------------------
 # LAPACK/BLAS directories
 #---------------------------------------------
-#EINSTEIN
-LAPACK_LIB_DIR = /public/intel/mkl/lib/intel64
-LIBS = -L${FFTW_LIB_DIR} -lfftw -lm -Wl,-rpath=${FFTW_LIB_DIR} \
--L${LAPACK_LIB_DIR} -i-dynamic -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
--qopenmp -lpthread \
-#-L/opt/intel/cmkl/10.2.5.035/lib/em64t -i-dynamic -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -Wl,--end-group -openmp -lpthread \
+#---------------------------------------------
+# LAPACK/BLAS directories
+#---------------------------------------------
+BLAS_LAPACK_LIB=${MKLROOT}/lib/intel64/libmkl_scalapack_lp64.a -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a ${MKLROOT}/lib/intel64/libmkl_core.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_blacs_intelmpi_lp64.a -Wl,--end-group -lpthread -lm
+# ELPA root directory, may be changed if necessary
+ELPA=/opt/elpa
+ELPA_LIB=${ELPA}/lib
+#ELPA_INCLUDE=${ELPA}/include/elpa-2016.05.004
 
-#NOTE by mohan
-#---------------------------------------------------------
-# be careful about -lmkl_intel_lp64 and -lmkl_solver_lp64
-# don't use -lmkl_intel_ilp64 and -lmkl_solver_ilp64
-# it may leads to the segmenfault of BLAS and LAPACK.
-#---------------------------------------------------------
+#---------------------------------------------
+# All libraries
+#---------------------------------------------
+LIBS = -L${FFTW_LIB_DIR} -L${ELPA_LIB} -L${BOOST_LIB_DIR} -lfftw -lelpa -lifcore -qopenmp ${BLAS_LAPACK_LIB}
+
+#---------------------------------------------
+# Compiler flags for all compilers
+#---------------------------------------------
+OPTS = -I. -Icommands -I${BOOST_INCLUDE} -I${FFTW_INCLUDE} -Ofast -xHost -diag-disable=858 -std=c++11
+#OPTS = -I. -Icommands -I${BOOST_INCLUDE} -I${FFTW_INCLUDE} -ipo -Ofast -xHost -diag-disable=858 -std=c++11
 
 #---------------------------------------------
 # C++ compiler and options
 #---------------------------------------------
-CPLUSPLUS = /public/apps/openmpi-165-intel/bin/mpicxx
-CPLUSPLUS_MPI = /public/apps/openmpi-165-intel/bin/mpicxx
-#CPLUSPLUS = /usr/mpi/intel/openmpi-1.4.1/bin/mpicxx
-#CPLUSPLUS_MPI = /usr/mpi/intel/openmpi-1.4.1/bin/mpicxx
-#F90=/share/apps/pgi/linux86-64/10.6/bin/pgf90
-
-#==========================
-# OPTIMIZE OPTIONS and boost
-#==========================
-OPTS = -I. -Icommands -I/public/udata/software/boost_1_39_0/ -I${FFTW_INCLUDE} -O3 -g -rdynamic -std=c++11
+CPLUSPLUS = mpiicc
+CPLUSPLUS_MPI = mpiicc

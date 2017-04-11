@@ -1929,6 +1929,10 @@ void Input::Check(void)
 			ofs_warning << " It's ok to use dav." << endl;
 		}
 		//if(diago_type=="hpseps") xiaohui modify 2013-09-01
+		else if(ks_solver=="genelpa") //yshen add 2016-07-20
+		{
+			WARNING_QUIT("Input","genelpa can not be used with plane wave basis."); 
+		}
 		else if(ks_solver=="hpseps") //xiaohui add 2013-09-01
 		{
 			//ofs_warning << " hpseps can't be used with plane wave basis." << endl; xiaohui modify 2013-09-04
@@ -1981,6 +1985,14 @@ void Input::Check(void)
 				WARNING_QUIT("Input","not ready for cg method in lcao ."); //xiaohui add 2013-09-04
 			}
 			//else if( diago_type == "hpseps" )
+			else if (ks_solver == "genelpa")
+			{
+#ifdef __MPI
+				ofs_warning << "genelpa is under testing" << endl;
+#else
+				WARNING_QUIT("Input","genelpa can not be used for series version.");
+#endif
+            }
 			else if (ks_solver == "hpseps")
 			{
 #ifdef __MPI
@@ -2282,7 +2294,7 @@ void Input::Print(const string &fn)const
 	
 	ofs << "\n#Parameters (3.Relaxation)" << endl;
 	//OUTP(ofs,"diago_type",DIAGO_TYPE,"cg; david; lapack; hpseps;"); xiaohui modify 2013-09-01
-	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; hpseps;");
+	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; genelpa; hpseps;");
 	OUTP(ofs,"niter",niter,"#number of electron iterations");
 	OUTP(ofs,"vna",vna,"use the vna or not");
 	OUTP(ofs,"grid_speed",grid_speed,"1:normal 2:fast");//mohan add 2012-03-29

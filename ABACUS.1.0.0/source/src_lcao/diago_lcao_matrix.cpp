@@ -89,7 +89,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(const int &ik, double** wfc)const
 */
 #ifdef __MPI
 	//else if(DIAGO_TYPE=="hpseps") xiaohui modify 2013-09-02
-	else if(KS_SOLVER=="hpseps") //xiaohui add 2013-09-02
+	else if(KS_SOLVER=="hpseps" || KS_SOLVER=="genelpa") //yshen add 7/15/2016
 	{
 		this->using_HPSEPS_double(ik, wfc);
 	}

@@ -157,6 +157,7 @@ pdiag_basic.o \
 pdiag_common.o \
 hs_matrix.o \
 subgrid_oper.o \
+GenELPA.o \
 
 OBJS_WANNIER=wan_global.o\
 bessel_basis.o\

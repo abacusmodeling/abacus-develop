@@ -39,7 +39,7 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	
 	// (1) calculate nrow, ncol, nloc.
 	//if (DIAGO_TYPE=="hpseps" || DIAGO_TYPE=="scalpack" || DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
-	if (KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" || KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" || KS_SOLVER=="selinv") //xiaohui add 2013-09-02
 	{
 		ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
 #ifdef __MPI
@@ -169,6 +169,15 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
     const int index = ir * ParaO.ncol + ic;
+	//int index;
+	//if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+	//{
+	//	index=ic*ParaO.nrow+ir;
+	//}
+	//else
+	//{
+	//	index=ir*ParaO.ncol+ic;
+  	//}
    
    	if( index >= ParaO.nloc)
 	{
@@ -209,6 +218,15 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
     const int index = ir * ParaO.ncol + ic;
+	//int index;
+	//if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+	//{
+	//	index=ic*ParaO.nrow+ir;
+	//}
+	//else
+	//{
+	//	index=ir*ParaO.ncol+ic;
+  	//}
     assert(index < ParaO.nloc);
 
     if (dtype=='S')//overlap Hamiltonian.
@@ -218,10 +236,12 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
     else if (dtype=='T' || dtype=='N')// kinetic and nonlocal Hamiltonian.
     {
         this->Hloc_fixed2[index] += v;
+        //cout<<"Hloc_fixed2["<<ir<<"]["<<ic<<"]+="<<v<<endl;
     }
     else if (dtype=='L') // Local potential Hamiltonian.
     {
         this->Hloc2[index] += v;
+        //cout<<"Hloc2["<<ir<<"]["<<ic<<"]+="<<v<<endl;
     }
 	else
 	{

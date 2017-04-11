@@ -217,7 +217,7 @@ bool print)
 	{
 		ss << "LA" << iter << "\0";
 	}
-	else if(KS_SOLVER=="hpseps")
+	else if(KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps")
 	{
 		ss << "HP" << iter << "\0";
 	}
