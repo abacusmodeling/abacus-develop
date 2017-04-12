@@ -20,8 +20,6 @@ extern "C"
 #include "pzgseps.h"
 #endif
 
-//#include "saveMatrix.hpp"
-
 inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk, int lld, int *desc, int &mpi_comm_rows, int &mpi_comm_cols)
 {
 #ifdef __MPI
@@ -199,17 +197,11 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
     OUT(ofs_running,"start solver, KS_SOLVER",KS_SOLVER);
     if(KS_SOLVER=="hpseps")
     {	
-        //char Trans='R';
-        //saveMatrix("h_mat", &Trans, ncol, nrow, h_mat);
-        //saveMatrix("s_mat", &Trans, ncol, nrow, s_mat);
 		dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
 		pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
 	}// HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
-        //char Trans='C';
-        //saveMatrix("h_mat", &Trans, ncol, nrow, h_mat);
-        //saveMatrix("s_mat", &Trans, ncol, nrow, s_mat);
         int maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
@@ -364,57 +356,32 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	
 	if(KS_SOLVER=="hpseps")
 	{
-        //char Trans='R';
-        //static int iter=0;
-        //if(iter==1)
-        //{
-        //    saveMatrix("H", &Trans, nrow, ncol, ch_mat);
-        //    saveMatrix("S", &Trans, nrow, ncol, cs_mat);
-        //}
 		int nbands_tmp = NBANDS;
 		zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
     	pzgseps(comm_2D, NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
 	} // HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
-        //char Trans='C';
-        //static int iter=0;
-        //if(iter==1)
-        //{
-        //    saveMatrix("H", &Trans, ncol, nrow, ch_mat);
-        //    saveMatrix("S", &Trans, ncol, nrow, cs_mat);
-        //}
         int maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
         complex<double> *q=new complex<double>[nloc];
         complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
-        static int method;
         bool wantEigenVector=true;
         bool wantDebug=true;
         int info;
         int comm_2D_f=MPI_Comm_c2f(comm_2D);
 
         int THIS_REAL_ELPA_KERNEL_API=9;
-
-        if(chr.new_e_iteration)
-        {
-            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
-            method=0;			
-        	zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
-            info=pzDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
-                                        Stmp, eigen, q, work,
-                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
-                                        THIS_REAL_ELPA_KERNEL_API);
-            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
-        }
-        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
-        info=pzSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
-                          ch_mat, Stmp, eigen, q, work,
-                          comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
-                          THIS_REAL_ELPA_KERNEL_API,
-                          wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
+        timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+        zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
+        int method=0;
+        info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
+                              ch_mat, Stmp, eigen, q, work,
+                              comm_2D_f, blacs_ctxt, 
+                              method, THIS_REAL_ELPA_KERNEL_API,
+                              wantEigenVector, wantDebug);
+        timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
         int pos=0;
