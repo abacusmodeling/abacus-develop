@@ -638,7 +638,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
                 delete[] ctmp;
             }
         }
-        MPI_Barrier(comm);
+        //MPI_Barrier(comm);
     }
     if(testpb)OUT(ofs_running,"Final k",k);
 /*
@@ -867,7 +867,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
                 delete[] ctmp;
             }
         }
-        MPI_Barrier(comm);
+        //MPI_Barrier(comm);
     }
     if(testpb)OUT(ofs_running,"Final k",k);
 
