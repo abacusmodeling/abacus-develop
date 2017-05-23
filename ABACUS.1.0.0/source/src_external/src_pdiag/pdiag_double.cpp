@@ -197,8 +197,10 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
     OUT(ofs_running,"start solver, KS_SOLVER",KS_SOLVER);
     if(KS_SOLVER=="hpseps")
     {	
+        timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
 		dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
 		pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+        timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
 	}// HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
@@ -218,22 +220,22 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 
         if(chr.new_e_iteration)
         {
-            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+            timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
             method=0;			
         	dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
             info=pdDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
                                         Stmp, eigen, q, work,
-                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
-                                        THIS_REAL_ELPA_KERNEL_API, useQR);
-            timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols, 
+                                        method, THIS_REAL_ELPA_KERNEL_API, useQR);
+            timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
         }
-        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
         info=pdSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
                           h_mat, Stmp, eigen, q, work,
                           comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
                           THIS_REAL_ELPA_KERNEL_API, useQR,
                           wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","pdSolveEigen2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
         int pos=0;
@@ -357,8 +359,10 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	if(KS_SOLVER=="hpseps")
 	{
 		int nbands_tmp = NBANDS;
+        timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
 		zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
     	pzgseps(comm_2D, NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
+        timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
 	} // HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
@@ -373,7 +377,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
         int comm_2D_f=MPI_Comm_c2f(comm_2D);
 
         int THIS_REAL_ELPA_KERNEL_API=9;
-        timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa",'G');
         zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
         int method=0;
         info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
@@ -381,7 +385,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
                               comm_2D_f, blacs_ctxt, 
                               method, THIS_REAL_ELPA_KERNEL_API,
                               wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","pdDecomposeRightMatrix2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa",'G');
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
         int pos=0;
@@ -461,7 +465,9 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	delete[] eigen;
 
 	// Z is delete in gath_eig
+    timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
 	this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, cc, Z, ik);
+    timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
  	//this->gath_full_eig_complex(DIAG_WORLD, NLOCAL, c, Z);
 
 	/*
