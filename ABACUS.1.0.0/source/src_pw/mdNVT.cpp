@@ -98,7 +98,7 @@ void mdnvt::runnvt(int step1){
         if(ionmbl[k].y==0)vel[k].y=0;
         if(ionmbl[k].z==0)vel[k].z=0;
       }
-      RemoveMovementOfCenterOfMass();
+      if(nfrozen==0)RemoveMovementOfCenterOfMass(); //added 20170626
       scalevel();
   }
 
@@ -181,7 +181,7 @@ void mdnvt::runnvt(int step1){
         }
     }
     // (4) Update the Non-Wrapped cartesion coordinates
-        RemoveMovementOfCenterOfMass();  
+        if(nfrozen==0)RemoveMovementOfCenterOfMass();  
         if(mdtype==2)scalevel();//choose Nose Hoover plus velocity scaling method
 	for( ii=0;ii<numIon;ii++){ 
             cartNoWrap[ii] = vel[ii]*dt +cartNoWrap[ii];
@@ -195,7 +195,13 @@ void mdnvt::runnvt(int step1){
    	for( ii=0;ii<numIon;ii++){ 
 	    	if((pow(vel[ii].x,2)+pow(vel[ii].y,2)+pow(vel[ii].z,2))>maxStep)
                 maxStep = pow(vel[ii].x,2)+pow(vel[ii].y,2)+pow(vel[ii].z,2);
-            fracStep = ionlatvec.Inverse()*vel[ii]*dt/ucell.lat0; 
+                Mathzone::Cartesian_to_Direct(vel[ii].x*dt/ucell.lat0,vel[ii].y*dt/ucell.lat0,vel[ii].z*dt/ucell.lat0,
+                                    ionlatvec.e11,ionlatvec.e12,ionlatvec.e13,
+                                    ionlatvec.e21,ionlatvec.e22,ionlatvec.e23,
+                                    ionlatvec.e31,ionlatvec.e32,ionlatvec.e33,
+                                    fracStep.x,fracStep.y,fracStep.z);
+
+//            fracStep = ionlatvec.Inverse()*vel[ii]*dt/ucell.lat0; 
             taudirac[ii] = taudirac[ii] + fracStep;
 	}
 

@@ -104,7 +104,7 @@ void mdNVE::runNVE(int step1){
         if(ionmbl[k].y==0)vel[k].y=0;
         if(ionmbl[k].z==0)vel[k].z=0;
       }
-      RemoveMovementOfCenterOfMass();
+      if(nfrozen==0)RemoveMovementOfCenterOfMass();
       scalevel();
   }
   moveatoms(step);
@@ -193,7 +193,7 @@ void mdNVE::runNVE(int step1){
      //2014/6/28
            vel[k] = vel[k] + force[k]/mass*dt/2.0;
        	} 
-        RemoveMovementOfCenterOfMass();  
+        if(nfrozen==0) RemoveMovementOfCenterOfMass();  
        for(i=0;i<numIon;i++){
            cartNoWrap[i] = vel[i]*dt + cartNoWrap[i];
 		
@@ -204,7 +204,12 @@ void mdNVE::runNVE(int step1){
        for( i = 0;i< numIon;i++){
 		if((pow(vel[i].x,2.0)+pow(vel[i].y,2.0)+pow(vel[i].z,2.0))>maxStep)
       maxStep = pow(vel[i].x,2.0)+pow(vel[i].y,2.0)+pow(vel[i].z,2.0);
-      fracStep = ionlatvec.Inverse()* vel[i]*dt/ucell.lat0;
+      Mathzone::Cartesian_to_Direct(vel[i].x*dt/ucell.lat0,vel[i].y*dt/ucell.lat0,vel[i].z*dt/ucell.lat0,
+                                    ionlatvec.e11,ionlatvec.e12,ionlatvec.e13,
+                                    ionlatvec.e21,ionlatvec.e22,ionlatvec.e23,
+                                    ionlatvec.e31,ionlatvec.e32,ionlatvec.e33,
+                                    fracStep.x,fracStep.y,fracStep.z);
+//      fracStep = ionlatvec.Inverse()* vel[i]*dt/ucell.lat0;
       taudirac[i] = taudirac[i] + fracStep;
     }
    // cout<<"dx: "<<fracStep.x<<" "<<fracStep.y<<" "<<fracStep.z<<endl;
@@ -218,6 +223,21 @@ void mdNVE::runNVE(int step1){
          PDF(step1);
          printRDF(step1);
     }*/
+
+//test
+{
+    Matrix3 a(1.1,2.2,3.3,4.4,5.1,6.2,7.3,8.4,9.9);
+//    Matrix3 a(1,0,0,0,4,0,0,0,9);
+    Vector3<double> b(1,1,1),c;
+    Mathzone::Cartesian_to_Direct(b.x,b.y,b.z,
+                        a.e11,a.e12,a.e13,
+                        a.e21,a.e22,a.e23,
+                        a.e31,a.e32,a.e33,
+                        c.x,c.y,c.z ); 
+    cout<<"test-c "<<c.x<<" "<<c.y<<" "<<c.z<<endl;
+    c = b*a.Inverse() ;
+    cout<<"test-c1 "<<c.x<<" "<<c.y<<" "<<c.z<<endl;
+}
 
     // (3.1) OFDFT optimizer: in order to calculate the force
     // Refresh the ionpositions, including the Ewald term

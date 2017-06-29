@@ -457,6 +457,11 @@ void md::RemoveMovementOfCenterOfMass(){
   // sum up the total momentum of all the atoms
   // in the system. (Px,Py,Pz) =\sum m_{i}*(vx,vy,vz)_{i}
   for(ion=0;ion<numIon;ion++){
+        if(ionmbl[ion].x==0||ionmbl[ion].y==0||ionmbl[ion].z==0)
+        {
+        continue;
+        }
+
         mass = allmass[ion];
         avgvel += mass * vel[ion];
         totMass = totMass + mass;
@@ -468,7 +473,11 @@ void md::RemoveMovementOfCenterOfMass(){
 //	cout<<"totMass: "<<totMass<<endl;
     avgvel = avgvel / totMass;
 //  cout<<setw(15)<<" Average velocity : "<<avgvel.x<<" "<< avgvel.y<<" "<< avgvel.z<<endl;
-  for(ion=0;ion<numIon;ion++){ 
+  for(ion=0;ion<numIon;ion++){
+    if(ionmbl[ion].x==0||ionmbl[ion].y==0||ionmbl[ion].z==0) 
+    {
+        continue;
+    }
     vel[ion] = vel[ion] - avgvel;
   }
   return ;
@@ -911,7 +920,7 @@ void md::connection0(){
 		for(i=0;i<na[it];i++){
                         allmass[ion]=ucell.atoms[it].mass/6.02/9.109*1e5;
 	         	ionmbl[ion]=ucell.atoms[it].mbl[i];
-                        if (ionmbl[ion].x==0) nfrozen++;
+                        if (ionmbl[ion].x==0||ionmbl[ion].y==0||ionmbl[ion].z==0) nfrozen++;
 
 			ion++;
 		}
@@ -1087,9 +1096,10 @@ void md::md_release(){
 void md::scalevel(){
    int i;
    double ke=GetAtomKE();
-   for(i=0;i<numIon;i++){
-      vel[i]*=sqrt(3*(numIon-nfrozen)*temperature/ke/2);
-   }
+   if(ke>1e-9)
+      for(i=0;i<numIon;i++){
+          vel[i]*=sqrt(3*(numIon-nfrozen)*temperature/ke/2);
+      }
    return;
 }
 /*void md::PDF(int step){ 
