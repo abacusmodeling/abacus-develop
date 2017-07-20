@@ -6,10 +6,10 @@
 //#include "../src_pw/global.h"
 //xiaohui add 2014-06-20
 #include "../../src_lcao/local_orbital_charge.h"
-
+#include "../../src_lcao/wf_local.h"
 #ifdef __MPI
 extern "C"
-{   
+{
     #include "Cblacs.h"
     #include "pblas.h"
     #include "scalapack.h"
@@ -49,13 +49,241 @@ inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk,
 #endif
 }
 
+inline int q2ZLOC_WFC(int pos, int naroc[2], int nb,
+                      int dim0, int dim1, int iprow, int ipcol,
+                      int loc_size,
+                      double* work, double* ZLOC, double** WFC)
+{
+    OUT(ofs_running,"start q2ZLOC_WFC");
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        int zcol=igcol-pos;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+            if(0<=zcol && zcol<loc_size)
+            {
+                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
+            }
+	        int mu_local=SGO.trace_lo_tot[igrow];
+            if(mu_local>=0 && igrow<NBANDS)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+        }
+    }
+    OUT(ofs_running,"WFC was done in q2ZLOC_WFC");
+    return 0;
+}
+
+inline int q2ZLOC_WFC_WFCAUG(int pos, int naroc[2], int nb,
+                             int dim0, int dim1, int iprow, int ipcol,
+                             int loc_size,
+                             double* work, double* ZLOC, double** WFC, double** WFCAUG)
+{
+	
+    stringstream ss;
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+/*        ss<<"local column "<<j<<" nb "<<nb<<" dim1 "<<dim1<<" mypcol "<<ipcol<<" global column (NBANDS) "<<igcol;
+		OUT(ofs_running,ss.str());
+		ss.str("");*/
+        if(igcol>=NBANDS) continue;
+        int zcol=igcol-pos;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+/*	        ss<<"    local row "<<i<<" nb "<<nb<<" dim0 "<<dim0<<" myprow "<<iprow<<" global row (NLOCAL)"<<igrow;
+			OUT(ofs_running,ss.str());
+			ss.str("");*/
+            if(0<=zcol && zcol<loc_size)
+            {
+                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
+            }
+	        int mu_local=SGO.trace_lo_tot[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+	        int mu_aug=LOWF.trace_aug[igrow];
+            if(mu_aug>=0)
+            {
+                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
+            }
+        }
+    }
+
+    OUT(ofs_running,"WFCAUG was done in q2ZLOC_WFC_WFCAUG");  
+    return 0;
+}
+
+inline int q2ZLOC_WFC_CTOT(int myid, int pos, int naroc[2], int nb,
+                           int dim0, int dim1, int iprow, int ipcol,
+                           int loc_size,
+                           double* work, double* ZLOC, double** WFC, double** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        int zcol=igcol-pos;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+            if(0<=zcol && zcol<loc_size)
+            {
+                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
+            }
+	        int mu_local=SGO.trace_lo_tot[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
+}
+
+inline int q2ZLOC_WFC_WFCAUG_CTOT(int myid, int pos, int naroc[2], int nb,
+                                  int dim0, int dim1, int iprow, int ipcol,
+                                  int loc_size,
+                                  double* work, double* ZLOC, double** WFC, double** WFCAUG, double** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        int zcol=igcol-pos;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+            if(0<=zcol && zcol<loc_size)
+            {
+                ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
+            }
+	        int mu_local=SGO.trace_lo_tot[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+	        int mu_aug=LOWF.trace_aug[igrow];
+            if(mu_aug>=0)
+            {
+                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
+            }
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
+}
+
+inline int q2WFC_complex(int naroc[2], int nb,
+                      	 int dim0, int dim1, int iprow, int ipcol,
+                         complex<double>* work, complex<double>** WFC)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+	        int mu_local=GridT.trace_lo[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+        }
+    }
+    return 0;
+}
+
+inline int q2WFC_WFCAUG_complex(int naroc[2], int nb,
+                                int dim0, int dim1, int iprow, int ipcol,
+                                complex<double>* work, complex<double>** WFC, complex<double>** WFCAUG)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+	        int mu_local=GridT.trace_lo[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+	        int mu_aug=LOWF.trace_aug[igrow];
+            if(mu_aug>=0)
+            {
+                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
+            }
+        }
+    }
+    return 0;
+}
+
+inline int q2WFC_CTOT_complex(int myid, int naroc[2], int nb,
+                              int dim0, int dim1, int iprow, int ipcol,
+                           	  complex<double>* work, complex<double>** WFC, complex<double>** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+	        int mu_local=GridT.trace_lo[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
+}
+
+inline int q2WFC_WFCAUG_CTOT_complex(int myid, int naroc[2], int nb,
+                                     int dim0, int dim1, int iprow, int ipcol,
+                                     complex<double>* work, complex<double>** WFC, complex<double>** WFCAUG, complex<double>** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+	        int mu_local=GridT.trace_lo[igrow];
+            if(mu_local>=0)
+            {
+                WFC[igcol][mu_local]=work[j*naroc[0]+i];
+            }
+	        int mu_aug=LOWF.trace_aug[igrow];
+            if(mu_aug>=0)
+            {
+                WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
+            }
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
+}
+
 Pdiag_Double::Pdiag_Double()
 {
 	// default value of nb is 1,
 	// but can change to larger value from input.
     nb = 1;
-	MatrixInfo.row_set = new int[1]; 
-	MatrixInfo.col_set = new int[1]; 
+	MatrixInfo.row_set = new int[1];
+	MatrixInfo.col_set = new int[1];
 }
 
 Pdiag_Double::~Pdiag_Double()
@@ -123,7 +351,7 @@ void Pdiag_Double::divide_HS_2d
 	this->nrow = this->MatrixInfo.row_num;
 	this->ncol = this->MatrixInfo.col_num;
 	this->nloc = MatrixInfo.col_num * MatrixInfo.row_num;
-    
+
 	// init blacs context for genelpa
     if(KS_SOLVER=="genelpa")
     {
@@ -152,7 +380,7 @@ void Pdiag_Double::divide_HS_2d
 	for(int i=0; i<NLOCAL; i++)
 	{
 		MatrixInfo.col_set[i]=i;
-	}	
+	}
 	MatrixInfo.col_pos=0;
 #endif
 
@@ -163,7 +391,7 @@ void Pdiag_Double::divide_HS_2d
 	return;
 }
 
-void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, 
+void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 	double* h_mat, double* s_mat, double* ekb)
 {
 #ifdef __MPI
@@ -177,10 +405,10 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
     int nprocs, myid;
     MPI_Status status;
     MPI_Comm_size(comm_2D, &nprocs);
-    MPI_Comm_rank(comm_2D, &myid);
+    MPI_Comm_rank(comm_2D, &myid);	
 
-	// parallel diagonalize the 
-	// H | psi > = S | psi > 
+	// parallel diagonalize the
+	// H | psi > = S | psi >
 	// problem.
 	int loc_pos;
 	double *eigen = new double[NLOCAL];
@@ -188,19 +416,44 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 
 	double* Z = new double[this->loc_size * NLOCAL];
 	ZEROS(Z, this->loc_size * NLOCAL);
-	
+
 	Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"double");
 
 	double* Stmp = LM.Sdiag;
-	
-	double start1 = MPI_Wtime();
+
     OUT(ofs_running,"start solver, KS_SOLVER",KS_SOLVER);
     if(KS_SOLVER=="hpseps")
-    {	
+    {
         timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
 		dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
 		pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
         timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
+
+        if(myid <= lastband_in_proc)
+        {
+            for(int i=0; i<loc_sizes[myid]; i++)
+            {
+                for(int n=0; n<NLOCAL; n++)
+                {
+                    Z_LOC[ik][n*loc_sizes[myid] + i] = Z[n*loc_sizes[myid] + i];
+                }
+            }
+        }
+
+        // the eigenvalues.
+        //xiaohui modify 2014-06-15, move to the top
+        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        delete[] eigen;
+        //=====================================
+        // gather the eigenvectors and
+        // distribute them to each processor
+        // Z is delete in gath_eig
+        //=====================================
+
+        //xiaohui modify 2014-06-18
+        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
+        this->gath_eig(DIAG_HPSEPS_WORLD, NLOCAL, wfc, Z);
+        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
 	}// HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
@@ -221,11 +474,11 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
         if(chr.new_e_iteration)
         {
             timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
-            method=0;			
+            method=0;
         	dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
             info=pdDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
                                         Stmp, eigen, q, work,
-                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols, 
+                                        comm_2D_f, mpi_comm_rows, mpi_comm_cols,
                                         method, THIS_REAL_ELPA_KERNEL_API, useQR);
             timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
         }
@@ -237,7 +490,13 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
                           wantEigenVector, wantDebug);
         timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
 
-        //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
+    	OUT(ofs_running,"K-S equation was solved by genelpa2");
+        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        delete[] eigen;
+	    OUT(ofs_running,"eigenvalues were copied to ekb");
+        // redistribute eigenvectors to wfc / wfc_aug
+
+        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
         int pos=0;
         for(int i=0; i<myid; ++i)
         {
@@ -259,74 +518,79 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
                 }
                 info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
                 info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
-                for(int j=0; j<naroc[1]; ++j)
+
+                if(this->out_lowf)
                 {
-                    int zcol=globalIndex(j, nb, dim1, ipcol)-pos;
-                    if(0<=zcol && zcol<loc_size)
+                    double **ctot;
+                    if(myid==0)
                     {
-                        for(int i=0; i<naroc[0]; ++i)
+                        ctot = new double*[NBANDS];
+                        for (int i=0; i<NBANDS; i++)
                         {
-                            int zrow=globalIndex(i, nb, dim0, iprow);
-                            Z[zrow*loc_size+zcol]=work[j*naroc[0]+i];
+                            ctot[i] = new double[NLOCAL];
+                            ZEROS(ctot[i], NLOCAL);
                         }
+                        Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
+                    }
+                    if(BFIELD)
+                    {
+                        cout << " not implement distri_lowf_aug yet." << endl;
+                        WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
+                        info=q2ZLOC_WFC_CTOT(myid, pos, naroc, nb,
+                                             dim0, dim1, iprow, ipcol, this->loc_size,
+                                             work, Z_LOC[ik], wfc, ctot);
+                    }
+                    else
+                    {
+                        info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
+                                                    dim0, dim1, iprow, ipcol, this->loc_size,
+                                                    work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
+                    }
+                    stringstream ss;
+                    ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
+                    // mohan add 2012-04-03, because we need the occupations for the
+                    // first iteration.
+                    WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
+                    if(myid==0)
+                    {
+                        for (int i=0; i<NBANDS; i++)
+                        {
+                            delete[] ctot[i];
+                        }
+                        delete[] ctot;
+                    }
+                }
+                else
+                {
+                    if(BFIELD)
+                    {
+                        cout << " not implement distri_lowf_aug yet." << endl;
+                        WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
+                        info=q2ZLOC_WFC(pos, naroc, nb,
+                                        dim0, dim1, iprow, ipcol, this->loc_size,
+                                        work, Z_LOC[ik], wfc);
+                    }
+                    else
+                    {
+                        info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
+                                               dim0, dim1, iprow, ipcol, this->loc_size,
+                                               work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
                     }
                 }
             }
         }
+
         delete[] q;
         delete[] work;
-    } // GenELPA method		
-	double end1 = MPI_Wtime();
-	//xiaohui add 'OUT_LEVEL', 2015-09-16
-	if(OUT_LEVEL != "m") OUT(ofs_running,"TIME OF DIAGO (Sec)",end1 - start1);
+        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
 
-	int idsize;
-
-	if(myid <= lastband_in_proc)
-	{
-		for(int i=0; i<loc_sizes[myid]; i++)
-		{
-			for(int n=0; n<NLOCAL; n++)
-			{
-				Z_LOC[ik][n*loc_sizes[myid] + i] = Z[n*loc_sizes[myid] + i];
-			}
-		}
-	}
-	
-	// the eigenvalues.
-	//xiaohui modify 2014-06-15, move to the top
-	for(int ib=0; ib<NBANDS; ib++)
-	{
-		ekb[ib] = eigen[ib];
-	}
-	delete[] eigen;
-
-//	cout << "\n " << setw(6) << "Band" << setw(25) << "Ry" << setw(25) << " eV" << endl;
-//	for(int ib=0; ib<NLOCAL; ib++)
-//	{
-//		cout << " " << setw(6) << ib+1 << setw(25) << eigen[ib] << setw(25)<< eigen[ib] * Ry_to_eV << endl;
-//	}
-
-	
-	//=====================================
-	// gather the eigenvectors and 
-	// distribute them to each processor
-	// Z is delete in gath_eig
-	//=====================================
-	
-	//xiaohui modify 2014-06-18
-	this->gath_eig(DIAG_HPSEPS_WORLD, NLOCAL, wfc, Z);
-
-//  not used anymore
-// 	this->gath_full_eig(DIAG_WORLD, NLOCAL, c, Z);
-
-//	ofs_running << setprecision(10);
+    } // GenELPA method
 #endif
 	return;
 }
 
 
-void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc, 
+void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	complex<double>* ch_mat, complex<double>* cs_mat, double *ekb)
 {
 #ifdef __MPI
@@ -340,8 +604,8 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
     MPI_Comm_size(comm_2D, &nprocs);
     MPI_Comm_rank(comm_2D, &myid);
 
-	// parallel diagonalize the 
-	// H | psi > = S | psi > 
+	// parallel diagonalize the
+	// H | psi > = S | psi >
 	// problem.
 	int loc_pos;
 	double *eigen = new double[NLOCAL];
@@ -350,12 +614,12 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	assert(loc_size > 0);
 	complex<double>* Z = new complex<double>[this->loc_size * NLOCAL];
 	ZEROS(Z, this->loc_size * NLOCAL);
-	
+
 	Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"cdouble");
 
-	// because the output Stmp will be different from Sloc2, so we need to copy that. 
+	// because the output Stmp will be different from Sloc2, so we need to copy that.
 	complex<double>* Stmp = LM.Sdiag2;
-	
+
 	if(KS_SOLVER=="hpseps")
 	{
 		int nbands_tmp = NBANDS;
@@ -363,6 +627,15 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 		zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
     	pzgseps(comm_2D, NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
         timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
+        // the eigenvalues.
+        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        delete[] eigen;
+
+        // Z is delete in gath_eig
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+        this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, cc, Z, ik);
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+        //this->gath_full_eig_complex(DIAG_WORLD, NLOCAL, c, Z);
 	} // HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
@@ -382,17 +655,18 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
         int method=0;
         info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
                               ch_mat, Stmp, eigen, q, work,
-                              comm_2D_f, blacs_ctxt, 
+                              comm_2D_f, blacs_ctxt,
                               method, THIS_REAL_ELPA_KERNEL_API,
                               wantEigenVector, wantDebug);
         timer::tick("Diago_LCAO_Matrix","genelpa",'G');
 
+        // the eigenvalues.
+        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        delete[] eigen;
+
+
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
-        int pos=0;
-        for(int i=0; i<myid; ++i)
-        {
-            pos+=loc_sizes[i];
-        }
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
         int naroc[2]; // maximum number of row or column
         for(int iprow=0; iprow<dim0; ++iprow)
         {
@@ -409,78 +683,69 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
                 }
                 info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
                 info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, comm_2D);
-                for(int j=0; j<naroc[1]; ++j)
+
+                if(this->out_lowf)
                 {
-                    int zcol=globalIndex(j, nb, dim1, ipcol)-pos;
-                    if(0<=zcol && zcol<loc_size)
+                    complex<double> **ctot;
+                    if(myid==0)
                     {
-                        for(int i=0; i<naroc[0]; ++i)
+                        ctot = new complex<double>*[NBANDS];
+                        for (int i=0; i<NBANDS; i++)
                         {
-                            int zrow=globalIndex(i, nb, dim0, iprow);
-                            Z[zrow*loc_size+zcol]=work[j*naroc[0]+i];
+                            ctot[i] = new complex<double>[NLOCAL];
+                            ZEROS(ctot[i], NLOCAL);
                         }
+                        Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"cdouble");
+                    }
+                    if(BFIELD)
+                    {
+		                ofs_running << " not augmented wave functions are implemented with B field" << endl;
+                        info=q2WFC_CTOT_complex(myid, naroc, nb,
+                                                dim0, dim1, iprow, ipcol,
+                                                work, cc, ctot);
+                    }
+                    else
+                    {
+                        info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
+                                                       dim0, dim1, iprow, ipcol,
+                                                       work, cc, LOWF.WFC_K_aug[ik], ctot);
+                    }
+                    stringstream ss;
+	                ss << global_out_dir << "LOWF_K_" << ik+1 << ".dat";
+                    // mohan add 2012-04-03, because we need the occupations for the
+                    // first iteration.
+                    WF_Local::write_lowf_complex( ss.str(), ctot, ik );//mohan add 2010-09-09
+                    if(myid==0)
+                    {
+                        for (int i=0; i<NBANDS; i++)
+                        {
+                            delete[] ctot[i];
+                        }
+                        delete[] ctot;
+                    }
+                }
+                else
+                {
+                    if(BFIELD)
+                    {
+		                ofs_running << " not augmented wave functions are implemented with B field" << endl;
+                        info=q2WFC_complex(naroc, nb,
+                                           dim0, dim1, iprow, ipcol,
+                                           work, cc);
+                    }
+                    else
+                    {
+                        info=q2WFC_WFCAUG_complex(naroc, nb,
+                                                  dim0, dim1, iprow, ipcol,
+                                                  work, cc, LOWF.WFC_K_aug[ik]);
                     }
                 }
             }
         }
         delete[] q;
         delete[] work;
-    } // GenELPA method		
-
-	
-//	cout << " loc_pos=" << loc_pos << endl;
-
-	//delete[] Stmp;
-
-
-	/*
-	ofs_running << "\n Z:" << endl;
-	for(int i=0; i<loc_size; i++)
-	{
-		ofs_running << " BandWaveFunc " << setw(5) << i; 
-		for(int j=0; j<NLOCAL; j++)
-		{
-			double a = norm(Z[i*NLOCAL+j]);
-			if( a < abs(1.0e-6) )
-			ofs_running << setw(15) << "0";
-			else
-			ofs_running << setw(15) << a;
-		}
-		ofs_running << endl;
-	}
-	*/
-	
-	// the eigenvalues.
-	for(int ib=0; ib<NBANDS; ib++)
-	{
-		ekb[ib] = eigen[ib];
-	}
-
-//	cout << "\n " << setw(6) << "Band" << setw(25) << "Ry" << setw(25) << " eV" << endl;
-//	for(int ib=0; ib<NBANDS; ib++)
-//	{
-//		cout << " " << setw(6) << ib+1 << setw(25) << eigen[ib] << setw(25)<< eigen[ib] * Ry_to_eV << endl;
-//	}
-
-	delete[] eigen;
-
-	// Z is delete in gath_eig
-    timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
-	this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, cc, Z, ik);
-    timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
- 	//this->gath_full_eig_complex(DIAG_WORLD, NLOCAL, c, Z);
-
-	/*
-	for(int i=0; i<NBANDS; i++)
-	{
-		cout << " Band " << i;
-		for(int j=0; j<NLOCAL; j++)
-		{
-			cout << c[i][j] << " " ;
-		}
-		cout << endl;
-	}
-	*/
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+    } // GenELPA method
 
 #endif
 	return;
@@ -552,7 +817,7 @@ void Pdiag_Double::readin(const string &fa, const string &fb, const int &nlocal_
         ofs_running << " " << setw(6) << i << setw(25) << eigen[i] << setw(25)<< eigen[i] * 13.6058 << endl;
     }
 
-	
+
 
     delete[] A;
     delete[] B;
