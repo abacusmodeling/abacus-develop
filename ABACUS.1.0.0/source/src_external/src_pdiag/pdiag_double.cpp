@@ -411,19 +411,19 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 	// H | psi > = S | psi >
 	// problem.
 	int loc_pos;
-	double *eigen = new double[NLOCAL];
-	ZEROS(eigen, NLOCAL);
-
-	double* Z = new double[this->loc_size * NLOCAL];
-	ZEROS(Z, this->loc_size * NLOCAL);
-
-	Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"double");
 
 	double* Stmp = LM.Sdiag;
 
     OUT(ofs_running,"start solver, KS_SOLVER",KS_SOLVER);
     if(KS_SOLVER=="hpseps")
     {
+        double *eigen = new double[NLOCAL];
+        ZEROS(eigen, NLOCAL);
+
+        double* Z = new double[this->loc_size * NLOCAL];
+        ZEROS(Z, this->loc_size * NLOCAL);
+
+        Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"double");
         timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
 		dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
 		pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
@@ -454,9 +454,13 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
         this->gath_eig(DIAG_HPSEPS_WORLD, NLOCAL, wfc, Z);
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
+        delete[] Z;
 	}// HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
+        double *eigen = new double[NLOCAL];
+        ZEROS(eigen, NLOCAL);
+
         int maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
@@ -608,20 +612,20 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 	// H | psi > = S | psi >
 	// problem.
 	int loc_pos;
-	double *eigen = new double[NLOCAL];
-	ZEROS(eigen, NLOCAL);
-
-	assert(loc_size > 0);
-	complex<double>* Z = new complex<double>[this->loc_size * NLOCAL];
-	ZEROS(Z, this->loc_size * NLOCAL);
-
-	Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"cdouble");
 
 	// because the output Stmp will be different from Sloc2, so we need to copy that.
 	complex<double>* Stmp = LM.Sdiag2;
 
 	if(KS_SOLVER=="hpseps")
 	{
+        double *eigen = new double[NLOCAL];
+        ZEROS(eigen, NLOCAL);
+
+        assert(loc_size > 0);
+        complex<double>* Z = new complex<double>[this->loc_size * NLOCAL];
+        ZEROS(Z, this->loc_size * NLOCAL);
+
+        Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"cdouble");
 		int nbands_tmp = NBANDS;
         timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
 		zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
@@ -635,10 +639,13 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
         this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, cc, Z, ik);
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+        delete[] Z;
         //this->gath_full_eig_complex(DIAG_WORLD, NLOCAL, c, Z);
 	} // HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
+        double *eigen = new double[NLOCAL];
+        ZEROS(eigen, NLOCAL);
         int maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
