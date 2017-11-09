@@ -1846,13 +1846,14 @@ void Pseudopot_upf::get_char( string ss)
 {
     int i, q;
     //char b[1]; //LiuXh 20171109
-    char b='\"'
+    char b='\"'; //LiuXh 20171109
     q =0;
     //strcpy(b,"\""); //LiuXh 20171109
 
     for(i=0;i<200;i++)
     {
-        if(ss[i]== b[0])
+        //if(ss[i]== b[0]) //LiuXh 20171109
+        if(ss[i]== b) //LiuXh 20171109
         {
            Number[q] = i;
            q++;
