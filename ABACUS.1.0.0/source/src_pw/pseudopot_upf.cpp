@@ -1845,9 +1845,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 void Pseudopot_upf::get_char( string ss)
 {
     int i, q;
-    char b[1];
+    //char b[1]; //LiuXh 20171109
+    char b='\"'
     q =0;
-    strcpy(b,"\"");
+    //strcpy(b,"\""); //LiuXh 20171109
 
     for(i=0;i<200;i++)
     {

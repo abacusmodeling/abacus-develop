@@ -404,10 +404,12 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 	TITLE("UnitCell_pseudo","read_atom_positions");
 
 	bool use_xyz = false;
+        /* LiuXh 20171109
 	if( SCAN_BEGIN(ifpos, "USE_XYZ") )
 	{
 		use_xyz = true;
 	}
+        */
 
 	if( SCAN_BEGIN(ifpos, "ATOMIC_POSITIONS"))
 	{

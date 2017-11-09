@@ -454,7 +454,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
         this->gath_eig(DIAG_HPSEPS_WORLD, NLOCAL, wfc, Z);
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
-        delete[] Z;
+        //delete[] Z; //LiuXh 20171109
 	}// HPSEPS method
     else if(KS_SOLVER=="genelpa")
     {
@@ -588,6 +588,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
         delete[] work;
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
 
+        delete[] Z; //LiuXh 20171109
     } // GenELPA method
 #endif
 	return;
