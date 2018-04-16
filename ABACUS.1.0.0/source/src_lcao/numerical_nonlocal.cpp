@@ -72,13 +72,16 @@ void Numerical_Nonlocal::set_type_info
 
 //2016-07-19 begin, LiuXh
 	this->Coefficient_D.create( nproj_in+1, nproj_in+1);
-	for (int L1 = 0; L1 < nproj + 1; L1++)
-	{
+        if(lmax_in > -1) //LiuXh add 20180328, fix bug of Hydrogen element with single projector pseudopot
+        { //LiuXh add 20180328
+	    for (int L1 = 0; L1 < nproj + 1; L1++)
+	    {
 		for (int L2 = 0; L2 < nproj + 1; L2++)
 		{
 			this->Coefficient_D(L1, L2) = Coefficient_D_in(L1, L2);
 		}
-	}
+	    }
+        } //LiuXh add 20180328
 //2016-07-19 end, LiuXh
 
 	delete[] LfromBeta;
