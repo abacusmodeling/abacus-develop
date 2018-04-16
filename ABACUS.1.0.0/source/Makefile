@@ -64,7 +64,7 @@ PDIAG_OBJS=$(OBJS_PDIAG)\
 # MAKING OPTIONS
 #==========================
 fp_mpi : ${FP_OBJS} ${PDIAG_MR} ${PDIAG_OBJS}$ ${HEADERS}
-	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${PDIAG_OBJS}$ ${PDIAG_MR} ${LIBS} ${LIBS_MPI} -o  ../bin/${VERSION}.mpi.1.0.0
+	${CPLUSPLUS_MPI} ${OPTS} $(FP_OBJS) ${PDIAG_OBJS}$ ${PDIAG_MR} ${LIBS} ${LIBS_MPI} -o  ../bin/${VERSION}.mpi.1.0.0
 
 fp : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp.x 
@@ -82,7 +82,7 @@ fp_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
 # rules
 #==========================
 .cpp.o:
-	${CPLUSPLUS} ${OPTS} -c ${HONG} $< -o $@
+	${CPLUSPLUS_MPI} ${OPTS} -c ${HONG} $< -o $@
 
 .PHONY:clean
 clean:
