@@ -588,8 +588,8 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
         delete[] work;
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
 
-        delete[] Stmp; //LiuXh 20171109
     } // GenELPA method
+    //delete[] Stmp; //LiuXh 20171109
 #endif
 	return;
 }
@@ -640,7 +640,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
         this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, cc, Z, ik);
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
-        delete[] Z;
+        //delete[] Z; //LiuXh 20180329, fix bug of 'double free()'
         //this->gath_full_eig_complex(DIAG_WORLD, NLOCAL, c, Z);
 	} // HPSEPS method
     else if(KS_SOLVER=="genelpa")
