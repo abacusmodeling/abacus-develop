@@ -198,6 +198,7 @@ bool kvect::read_kpoints(const string &fn)
     while (ifk.good())
     {
         ifk >> word;
+        ifk.ignore(150, '\n'); //LiuXh add 20180416, fix bug in k-point file when the first line with comments 
         if (word == "K_POINTS" || word == "KPOINTS" || word == "K" )
         {
             ierr = 1;
