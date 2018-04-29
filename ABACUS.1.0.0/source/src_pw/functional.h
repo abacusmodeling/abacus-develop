@@ -91,6 +91,12 @@ public:
 	//    igcx:  type of gradient correction on exchange
 	//    igcc:  type of gradient correction on correlations
 	// see comments above and routine "which_dft" below
+	
+	// Peize Lin add 2016-12-03
+	int iexch_now; 
+	int icorr_now;
+	int igcx_now;
+	int igcc_now;
 
 	xcfunc();
 	~xcfunc();
@@ -102,7 +108,7 @@ public:
 private:
 	void set_dft_value(int &m,const int i);
 	bool match_one(const string* dft, const string &name)const; 
-
+	void copy_to_now();	// Peize Lin add 2016-12-03
 };
 
 #endif //FUNCTION_H

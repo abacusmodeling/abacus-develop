@@ -258,9 +258,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// (8) Mix charge density
 		chr.mix_rho(dr2,0,DRHO2,iter,conv_elec);
 
-
 		// (9) Calculate new potential according to new Charge Density.
-	
 		if(conv_elec || iter==NITER)
 		{ 
 			if(pot.out_potential<0) //mohan add 2011-10-10

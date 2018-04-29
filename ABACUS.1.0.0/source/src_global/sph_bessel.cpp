@@ -16,7 +16,8 @@ Sph_Bessel::~Sph_Bessel()
 }
 
 
-void Sph_Bessel::jlx(const int &msh,	//number of grid points
+void Sph_Bessel::jlx(
+	const int &msh,	//number of grid points
 	const double *r,//radial grid
 	const double &q,	//
 	const int &l,	//angular momentum

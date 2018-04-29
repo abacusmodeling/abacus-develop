@@ -2,8 +2,10 @@
 #define MATRIX_H
 
 #ifdef _MCD_CHECK
-#include "../src_parallel/mcd.h"
+#include "src_parallel/mcd.h"
 #endif
+
+#include<ostream>
 
 class matrix
 {
@@ -22,7 +24,7 @@ public:
 	~matrix();
 
 	void create(const int nrow,const int ncol);
-	void operator=(const matrix &m1); /* Nonstandard: returns void */
+	matrix& operator=(const matrix &m1); // Peize Lin change 2018-03-12
 	matrix& operator=( matrix && m1 );	// Peize Lin add 2016-08-05
 
 	inline double &operator()(const int &ir,const int &ic)
@@ -62,6 +64,9 @@ public:
 
 	// mohan add 2011-01-13
 	void get_extreme_eigen_values(double &ev_lower, double &ev_upper) const;
+	
+	// Peize Lin add 2017-05-27
+	void reshape( const double nr_new, const double nc_new );
 };
 
 matrix transpose(matrix m);
@@ -75,5 +80,8 @@ double mdot(const matrix &A, const matrix &B);
 // Peize Lin add 2016-09-08
 double max( const matrix & m );
 double min( const matrix & m );
+
+// Peize Lin add 2016-09-08
+std::ostream & operator<<( std::ostream & os, const matrix & m );
 
 #endif // MATRIX_H

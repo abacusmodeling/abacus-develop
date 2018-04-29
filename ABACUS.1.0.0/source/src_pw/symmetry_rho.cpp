@@ -11,7 +11,7 @@ Symmetry_rho::~Symmetry_rho()
 
 }
 
-void Symmetry_rho::begin(const int &spin_now)
+void Symmetry_rho::begin(const int &spin_now) const
 {
 	assert(spin_now < 2);
 
@@ -28,7 +28,7 @@ void Symmetry_rho::begin(const int &spin_now)
 	return;
 }
 
-void Symmetry_rho::psymm(double* rho_part)
+void Symmetry_rho::psymm(double* rho_part) const
 {
 #ifdef __MPI
 	// (1) reduce all rho from the first pool.

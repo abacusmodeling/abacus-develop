@@ -209,6 +209,9 @@ void xcfunc::which_dft(const string *dft)
 	//cout << "  gradc = " << gradc[igcc] << endl;
 	//'-'//corr (icorr) //'-'//gradx (igcx) //'-'//gradc (igcc)
 	//      WRITE( stdout,'(a)') dftout
+	
+	copy_to_now();
+	
 	return;
 } // end subroutine which_dft
 
@@ -265,4 +268,13 @@ bool xcfunc::match_one(const string* dft, const string &name)const
 		if(dft[i]==name) return 1; // match one of the four string.
 	}
 	return 0; // no one match
+}
+
+// Peize Lin add 2016-12-03
+void xcfunc::copy_to_now()
+{
+	iexch_now = iexch;
+	icorr_now = icorr;
+	igcx_now  = igcx ;
+	igcc_now  = igcc ;
 }

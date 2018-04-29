@@ -18,7 +18,7 @@ Threshold_Elec::Threshold_Elec()
 	conv_elec = false; 
 };
 
-void Threshold_Elec::set_ethr(void)
+void Threshold_Elec::set_ethr(void) const
 {
     //========================================================================
     // setup ethr see setup.f90 Page 5/14

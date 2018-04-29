@@ -3,6 +3,8 @@
 //DATE : 2008-11-12
 //=========================================================
 #include "numerical_orbital_lm.h"
+#include "src_global/sph_bessel_recursive.h"
+#include "src_global/lapack_connector.h"
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
 {
@@ -40,59 +42,74 @@ void Numerical_Orbital_Lm::set_orbital_info
 	const int &nr_in,
 	const double *rab_in,
 	const double *r_radial_in,
+	const Psi_Type &psi_type,				// Peize Lin add 2017-12-12
 	const double *psi_in,
 	const int &nk_in,
 	const double &dk_in,
 	// Peize Lin delete lat0 2016-02-03
 	const double &dr_uniform_in,
-	bool flag_plot				// Peize Lin add flag_plot 2016-08-31
+	bool flag_plot,				// Peize Lin add flag_plot 2016-08-31
+	bool flag_sbpool			// Peize Lin add flag_sbpool 2017-10-02
 )
 {
-    this->label = label_in;
-    this->index_atom_type = index_atom_type_in;
-    this->angular_momentum_l = angular_momentum_l_in;
-    this->index_chi = index_chi_in;
-    assert(nr_in>=2);
-    assert(nr_in<10000);
-    assert(nr%2!=0);
-    this->nr = nr_in;
-    assert(r_radial_in[nr-1]>0.0);
-    assert(r_radial_in[nr-1]<50);
-    this->rcut = r_radial_in[nr-1];
-    assert(nk_in>1);
-    assert(nk_in<10000);
-    this->nk = nk_in;
-    assert(nk%2!=0);
-    assert(dk_in>0);
-    this->dk = dk_in;
-	this->dr_uniform=dr_uniform_in;
-	
-	r_radial.resize(nr);
-	k_radial.resize(nk);
-	rab.resize(nr);
-	psi.resize(nr);
-	psir.resize(nr);
-	psik.resize(nk);
+	copy_parameter(
+		label_in,
+		index_atom_type_in,
+		angular_momentum_l_in,
+		index_chi_in,
+		nr_in,
+		rab_in,
+		r_radial_in,
+		nk_in,
+		dk_in,
+		dr_uniform_in);
 
-	/***********************************************************
-	be careful! LiaoChen modify on 2010/4/21
-	************************************************************/
-//	this->dk = PI / rcut / 2.0;
-//	this->nk = this->nr;
-
-	for (int ir = 0; ir < nr; ir++)
+	switch(psi_type)
 	{
-		this->r_radial[ir] = r_radial_in[ir];
-		this->rab[ir] = rab_in[ir];
-		this->psi[ir] = psi_in[ir];
-		this->psir[ir] = psi[ir] * r_radial[ir]; //mohan 2010-04-19
+		case Psi_Type::Psi:
+			for (int ir = 0; ir < nr; ir++)
+			{
+				this->psi[ir] = psi_in[ir];
+				this->psir[ir] = psi[ir] * r_radial[ir]; //mohan 2010-04-19
+			}
+			break;
+		case Psi_Type::Psif:
+			for( size_t ik=0; ik!=nk; ++ik )
+			{
+				this->psif[ik] = psi_in[ik];
+				this->psik[ik] = psif[ik] * k_radial[ik];
+				this->psik2[ik] = psik[ik] * k_radial[ik];
+			}
+			break;
+		case Psi_Type::Psik:
+			psif.resize(0);
+			for( size_t ik=0; ik!=nk; ++ik )
+			{
+				this->psik[ik] = psi_in[ik];
+				this->psik2[ik] = psik[ik] * k_radial[ik];
+			}
+			break;
+		case Psi_Type::Psik2:
+			psif.resize(0);
+			psik.resize(0);
+			for( size_t ik=0; ik!=nk; ++ik )
+				this->psik2[ik] = psi_in[ik];
+			break;
+		default:
+			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
-	for (int ik = 0; ik < nk; ik++)
+	switch(psi_type)
 	{
-		this->k_radial[ik] = ik * this->dk;
+		case Psi_Type::Psif:
+		case Psi_Type::Psik:
+		case Psi_Type::Psik2:
+			if( flag_sbpool )
+				this->cal_rradial_sbpool();
+			else
+				throw domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			break;
 	}
-	this->kcut = (nk-1) * this->dk;
 
 	//liaochen modify on 2010/4/7
 	//we do SBT on regular mesh
@@ -109,11 +126,77 @@ void Numerical_Orbital_Lm::set_orbital_info
 		this->use_uniform(dr_uniform);
 	}
 
-	this->cal_kradial();
-	this->norm_test();
-	if( flag_plot ) this->plot();			// Peize Lin add flag_plot 2016-08-31
+	switch(psi_type)
+	{
+		case Psi_Type::Psi:
+			if( flag_sbpool )
+				this->cal_kradial_sbpool();
+			else
+				this->cal_kradial();
+			break;
+	}
 
-	return;
+//	this->norm_test();						// Peize Lin delete 2016-08-31
+	if( flag_plot )
+		this->plot();			// Peize Lin add flag_plot 2016-08-31
+}
+
+void Numerical_Orbital_Lm::copy_parameter(
+ 	const string &label_in,
+	const int &index_atom_type_in,
+	const int &angular_momentum_l_in,
+	const int &index_chi_in,
+	const int &nr_in,
+	const double *rab_in,
+	const double *r_radial_in,
+	const int &nk_in,
+	const double &dk_in,
+	const double &dr_uniform_in)
+{
+    this->label = label_in;
+    this->index_atom_type = index_atom_type_in;
+    this->angular_momentum_l = angular_momentum_l_in;
+    this->index_chi = index_chi_in;
+    assert(nr_in>=2);
+//  assert(nr_in<10000);									// Peize Lin delete 2017-12-03
+    assert(nr%2!=0);
+    this->nr = nr_in;
+    assert(r_radial_in[nr-1]>0.0);
+    // assert(r_radial_in[nr-1]<50);						// Peize Lin delete 2017-08-18
+    this->rcut = r_radial_in[nr-1];
+    assert(nk_in>1);
+    assert(nk_in<10000);
+    this->nk = nk_in;
+    assert(nk%2!=0);
+    assert(dk_in>0);
+    this->dk = dk_in;
+	this->dr_uniform=dr_uniform_in;
+
+	/***********************************************************
+	be careful! LiaoChen modify on 2010/4/21
+	************************************************************/
+//	this->dk = PI / rcut / 2.0;
+//	this->nk = this->nr;
+
+	r_radial.resize(nr);
+	rab.resize(nr);
+	psi.resize(nr);
+	psir.resize(nr);
+	for (int ir = 0; ir < nr; ir++)
+	{
+		this->r_radial[ir] = r_radial_in[ir];
+		this->rab[ir] = rab_in[ir];
+	}
+
+	k_radial.resize(nk);
+	psif.resize(nk);
+	psik.resize(nk);
+	psik2.resize(nk);
+	for (int ik = 0; ik < nk; ik++)
+	{
+		this->k_radial[ik] = ik * this->dk;
+	}
+	this->kcut = (nk-1) * this->dk;
 }
 
 void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
@@ -199,8 +282,11 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 
 	// calculate zty
 	// liaochen add 2010-08
-	Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(this->psi_uniform), this->nr_uniform, dr_uniform, angular_momentum_l, tmp);
-	this->zty = tmp[0]/Mathzone_Add1::factorial (angular_momentum_l);
+	if( FORCE )															// Peize Lin add if 2017-10-26
+	{
+		Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(this->psi_uniform), this->nr_uniform, dr_uniform, angular_momentum_l, tmp);
+		this->zty = tmp[0]/Mathzone_Add1::factorial (angular_momentum_l);
+	}
 
 	delete [] y2;
 	delete [] rad;
@@ -306,16 +392,153 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 		}
 
 		Mathzone::Simpson_Integral(
-				this->nr, 
-				integrated_func, 
-				VECTOR_TO_PTR(this->rab), 
-				this->psik[ik]);
-
-		this->psik[ik] *= ( pref * k_radial[ik]);
+				this->nr,
+				integrated_func,
+				VECTOR_TO_PTR(this->rab),
+				this->psif[ik]);
+		this->psif[ik] *= pref;
+		this->psik[ik] = this->psif[ik] * k_radial[ik];
+		this->psik2[ik] = this->psik[ik] * k_radial[ik];
 	}
 		
 	delete[] integrated_func;
 	delete[] jl;
+}
+
+/*
+// Peize Lin add 2017-10-02
+void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
+{
+	assert( this->nr > 0);
+	assert( this->nr_uniform > 0);
+
+	// dr must be all the same for Sph_Bessel_Recursive_Pool and Simpson_Integral
+	const double dr = this->rab[0];
+	for( size_t ir=1; ir<this->nr; ++ir )
+		assert( dr == this->rab[ir] );
+
+	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+		if( this->dk * dr == sb.get_dx() )
+		{
+			pSB = &sb;
+			break;
+		}
+	if(!pSB)
+	{
+		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+	}
+	pSB->set_dx( this->dk * dr );
+	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
+	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+
+	vector<double> integrated_func( this->nr );
+	const double pref = sqrt( 2.0 / PI );
+
+	vector<double> psir2(nr);
+	for( size_t ir=0; ir!=nr; ++ir )
+		psir2[ir] = this->psir[ir] * this->r_radial[ir];
+
+	for (int ik = 0; ik < nk; ik++)
+	{
+		const vector<double> &jlk = jl[ik];
+		for (int ir = 0; ir < nr; ir++)
+			integrated_func[ir] = psir2[ir] * jlk[ir];
+		Mathzone::Simpson_Integral(
+				this->nr,
+				VECTOR_TO_PTR(integrated_func),
+				dr,
+				this->psik[ik]);
+		this->psik[ik] *= ( pref * k_radial[ik]);
+	}
+}
+*/
+
+// Peize Lin add 2017-10-27
+void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
+{
+	assert( this->nr > 0);
+	assert( this->nr_uniform > 0);
+
+	// dr must be all the same for Sph_Bessel_Recursive_Pool
+	const double dr = this->rab[0];
+	for( size_t ir=1; ir<this->nr; ++ir )
+		assert( dr == this->rab[ir] );
+
+	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+		if( this->dk * dr == sb.get_dx() )
+		{
+			pSB = &sb;
+			break;
+		}
+	if(!pSB)
+	{
+		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+	}
+	pSB->set_dx( this->dk * dr );
+	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
+	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+
+	const double pref = sqrt( 2.0 / PI );
+
+	vector<double> r_tmp(nr);
+	for( size_t ir=0; ir!=nr; ++ir )
+		r_tmp[ir] = this->psir[ir] * this->r_radial[ir] * this->rab[ir];
+	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
+	r_tmp[0]*=one_three;	r_tmp[nr-1]*=one_three;
+	for( size_t ir=1; ir!=nr-1; ++ir )
+		r_tmp[ir] *= (ir&1) ? four_three : two_three;
+
+	for (int ik = 0; ik < nk; ik++)
+	{
+		this->psif[ik] = pref * LapackConnector::dot( this->nr, VECTOR_TO_PTR(r_tmp), 1, VECTOR_TO_PTR(jl[ik]), 1 ) ;
+		this->psik[ik] = this->psif[ik] * k_radial[ik];
+		this->psik2[ik] = this->psik[ik] * k_radial[ik];
+	}
+}
+
+// Peize Lin add 2017-12-11
+void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
+{
+	// dr must be all the same for Sph_Bessel_Recursive_Pool
+	const double dr = this->rab[0];
+	for( size_t ir=1; ir<this->nr; ++ir )
+		assert( dr == this->rab[ir] );
+
+	Sph_Bessel_Recursive::D2* pSB = nullptr;
+	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+		if( dr * dk == sb.get_dx() )
+		{
+			pSB = &sb;
+			break;
+		}
+	if(!pSB)
+	{
+		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
+		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
+	}
+	pSB->set_dx( dr * dk );
+	pSB->cal_jlx( this->angular_momentum_l, this->nr, this->nk );
+	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+
+	const double pref = sqrt(2.0/PI);
+
+	vector<double> k_tmp(nk);
+	for( size_t ik=0; ik!=nk; ++ik )
+		k_tmp[ik] = this->psik2[ik] * dk;
+	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
+	k_tmp[0]*=one_three;	k_tmp[nk-1]*=one_three;
+	for( size_t ik=1; ik!=nk-1; ++ik )
+		k_tmp[ik] *= (ik&1) ? four_three : two_three;
+
+	for( size_t ir = 0; ir!=nr; ++ir )
+	{
+		this->psi[ir] = pref * LapackConnector::dot( this->nk, VECTOR_TO_PTR(k_tmp), 1, VECTOR_TO_PTR(jl[ir]), 1 );
+		this->psir[ir] = this->psi[ir] * r_radial[ir];
+	}
 }
 
 //===============================================

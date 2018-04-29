@@ -25,6 +25,7 @@ using namespace std;
 // GLOBAL FUNCTION :
 // NAME : TITLE( title for each function )
 //==========================================================
+void TITLE(const string &class_function_name);
 void TITLE(const string &class_name,const string &function_name);
 void TITLE(ofstream &ofs,const string &class_name,const string &function_name);
 void NOTE(const string &words);

@@ -5,12 +5,15 @@
 #ifndef MAKE_OVERLAP_TABLE_H
 #define MAKE_OVERLAP_TABLE_H
 
-#include "../src_pw/tools.h"
-#include "./numerical_orbital.h"
-#include "./numerical_orbital_lm.h"
-#include "./numerical_nonlocal.h"
-#include "./numerical_nonlocal_lm.h"
-#include "./make_gaunt_table.h"
+#include "src_pw/tools.h"
+#include "src_lcao/numerical_orbital.h"
+#include "src_lcao/numerical_orbital_lm.h"
+#include "src_lcao/numerical_nonlocal.h"
+#include "src_lcao/numerical_nonlocal_lm.h"
+#include "src_lcao/make_gaunt_table.h"
+#include "src_global/sph_bessel_recursive.h"
+
+#include <set>
 
 class Make_Overlap_Table
 {
@@ -54,10 +57,8 @@ class Make_Overlap_Table
 	// Peize Lin update 2016-01-26
 	void init_Lmax (const int orb_num, const int mode, int &Lmax_used, int &Lmax) const;
 	void init_Table_Spherical_Bessel (const int orb_num, const int mode, int &Lmax_used, int &Lmax);
-	void Destroy_Table_Spherical_Bessel (const int& Lmax_used);
 
-	bool destroy_jlx;
-	double*** jlx;
+	Sph_Bessel_Recursive::D2* pSB = nullptr;				// Peize Lin add 2017-04-24, and change all jlx in this class
 
 	//==============================================
 	// make the index, in order to get the element 
@@ -107,6 +108,15 @@ class Make_Overlap_Table
 		const int &rmesh,
 		double *rs,
 		double *drs) const;
+	// Peize Lin add 2017-10-13
+	void cal_ST_Phi12_R(
+		const int &job,
+		const int &l,
+		const Numerical_Orbital_Lm &n1,
+		const Numerical_Orbital_Lm &n2,
+		const set<size_t> &radials,				// only calculate ir in radials
+		double *rs,
+		double *drs) const;
 
 	void cal_VNL_PhiBeta_R(
         const int &l,
@@ -126,6 +136,6 @@ class Make_Overlap_Table
 	double *kpoint;
 	double *r;
 	double *rab;
-	double *kab;	
+	double *kab;
 };
 #endif

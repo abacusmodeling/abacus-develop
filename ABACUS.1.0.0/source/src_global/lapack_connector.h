@@ -19,6 +19,7 @@
 #include <new>
 #include <stdexcept>
 #include <iostream>
+#include <cassert>
 #include "complexmatrix.h"
 #include "matrix.h"
 
@@ -43,6 +44,8 @@ extern "C"
 				const int* vu, const int* il, const int* iu,const double* abstol,
 				const int* m,double* w,double *z,const int *ldz,
 				double *work,int* iwork,int* ifail,int* info);
+	void dsyev_(const char* jobz,const char* uplo,const int* n,double *a,
+                const int* lda,double* w,double* work,const int* lwork, int* info);
     void zheev_(const char* jobz,const char* uplo,const int* n,complex<double> *a,
                 const int* lda,double* w,complex<double >* work,const int* lwork,
                 double* rwork,int* info);
@@ -68,16 +71,29 @@ extern "C"
     // mohan add zpotrf and zpotri 2010-02-03, to compute inverse complex hermit matrix.
     void zpotrf_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
     void zpotri_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
-	// Peize Lin add ?axpy 2016-08-04, to compute y=ax+y
-	void saxpy_(int *N, float *alpha, float *X, int *incX, float *Y, int *incY);
-	void daxpy_(int *N, double *alpha, double *X, int *incX, double *Y, int *incY);
-	void caxpy_(int *N, complex<float> *alpha, complex<float> *X, int *incX, complex<float> *Y, int *incY);
-	void zaxpy_(int *N, complex<double> *alpha, complex<double> *X, int *incX, complex<double> *Y, int *incY);
-	// Peize Lin add ?scal 2016-08-04, to compute x=ax
-	void sscal_(int *N, float *alpha, float *X, int *incX);
-	void dscal_(int *N, double *alpha, double *X, int *incX);
-	void cscal_(int *N, complex<float> *alpha, complex<float> *X, int *incX);
-	void zscal_(int *N, complex<double> *alpha, complex<double> *X, int *incX);
+	// Peize Lin add ?axpy 2016-08-04, to compute y=a*x+y
+	void saxpy_(const int *N, const float *alpha, const float *X, const int *incX, float *Y, const int *incY);
+	void daxpy_(const int *N, const double *alpha, const double *X, const int *incX, double *Y, const int *incY);
+	void caxpy_(const int *N, const complex<float> *alpha, const complex<float> *X, const int *incX, complex<float> *Y, const int *incY);
+	void zaxpy_(const int *N, const complex<double> *alpha, const complex<double> *X, const int *incX, complex<double> *Y, const int *incY);
+	// Peize Lin add ?scal 2016-08-04, to compute x=a*x
+	void sscal_(const int *N, const float *alpha, float *X, const int *incX);
+	void dscal_(const int *N, const double *alpha, double *X, const int *incX);
+	void cscal_(const int *N, const complex<float> *alpha, complex<float> *X, const int *incX);
+	void zscal_(const int *N, const complex<double> *alpha, complex<double> *X, const int *incX);
+	// Peize Lin add ?dot 2017-10-27, to compute d=x*y
+	float sdot_(const int *N, const float *X, const int *incX, const float *Y, const int *incY);
+	double ddot_(const int *N, const double *X, const int *incX, const double *Y, const int *incY);
+	// Peize Lin add ?gemm 2017-10-27, to compute C = a * A.? * B.? + b * C 
+	void sgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
+		const float *alpha, const float *a, const int *lda, const float *b, const int *ldb, 
+		const float *beta, float *c, const int *ldc);
+	void dgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
+		const double *alpha, const double *a, const int *lda, const double *b, const int *ldb, 
+		const double *beta, double *c, const int *ldc);
+	void zgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
+		const complex<double> *alpha, const complex<double> *a, const int *lda, const complex<double> *b, const int *ldb, 
+		const complex<double> *beta, complex<double> *c, const int *ldc);
 };
 
 // Class LapackConnector provide the connector to fortran lapack routine.
@@ -267,7 +283,28 @@ public:
         delete[] bux;
     }
 
-
+	// wrap function of fortran lapack routine dsyev.
+    static inline
+	void dsyev(const char jobz,const char uplo,const int n,double *a,
+			const int lda,double *w,double *work,const int lwork, int info)
+	{
+		const char uplo_changed = change_uplo(uplo);
+		dsyev_(&jobz, &uplo_changed, &n, a, &lda, w, work, &lwork, &info);
+	}
+    static inline
+	void dsyev( const char jobz, const char uplo, matrix &a, double* w, int info )		// Peize Lin update 2017-10-17
+	{
+		assert(a.nr==a.nc);
+		const char uplo_changed = change_uplo(uplo);
+		
+		double work_tmp;
+		constexpr int minus_one = -1;
+		dsyev_(&jobz, &uplo_changed, &a.nr, a.c, &a.nr, w, &work_tmp, &minus_one, &info);		// get best lwork
+		
+		const int lwork = work_tmp;
+		double work[std::max(1,lwork)];
+		dsyev_(&jobz, &uplo_changed, &a.nr, a.c, &a.nr, w, work, &lwork, &info);		
+	}
     // wrap function of fortran lapack routine zheev.
     static inline
     void zheev( const char jobz,
@@ -422,48 +459,93 @@ public:
 	}	
 	
 	// Peize Lin add 2016-08-04
+	// y=a*x+y
 	static inline 
-	void axpy( int N,  float alpha,  float *X,  int incX, float *Y,  int incY)
+	void axpy( const int N, const float alpha, const float *X, const int incX, float *Y, const int incY)
 	{
 		saxpy_(&N, &alpha, X, &incX, Y, &incY);
 	}	
 	static inline 
-	void axpy( int N,  double alpha,  double *X,  int incX, double *Y,  int incY)
+	void axpy( const int N, const double alpha, const double *X, const int incX, double *Y, const int incY)
 	{
 		daxpy_(&N, &alpha, X, &incX, Y, &incY);
 	}	
 	static inline 
-	void axpy( int N,  complex<float> alpha,  complex<float> *X,  int incX, complex<float> *Y,  int incY)
+	void axpy( const int N, const complex<float> alpha, const complex<float> *X, const int incX, complex<float> *Y, const int incY)
 	{
 		caxpy_(&N, &alpha, X, &incX, Y, &incY);
 	}	
 	static inline 
-	void axpy( int N,  complex<double> alpha,  complex<double> *X,  int incX, complex<double> *Y,  int incY)
+	void axpy( const int N, const complex<double> alpha, const complex<double> *X, const int incX, complex<double> *Y, const int incY)
 	{
 		zaxpy_(&N, &alpha, X, &incX, Y, &incY);
 	}	
 	
 	// Peize Lin add 2016-08-04
+	// x=a*x
 	static inline 
-	void scal( int N,  float alpha, float *X,  int incX)
+	void scal( const int N,  const float alpha, float *X, const int incX)
 	{
 		sscal_(&N, &alpha, X, &incX);
 	}	
 	static inline 
-	void scal( int N,  double alpha, double *X,  int incX)
+	void scal( const int N, const double alpha, double *X, const int incX)
 	{
 		dscal_(&N, &alpha, X, &incX);
 	}	
 	static inline 
-	void scal( int N,  complex<float> alpha, complex<float> *X,  int incX)
+	void scal( const int N, const complex<float> alpha, complex<float> *X, const int incX)
 	{
 		cscal_(&N, &alpha, X, &incX);
 	}	
 	static inline 
-	void scal( int N,  complex<double> alpha, complex<double> *X,  int incX)
+	void scal( const int N, const complex<double> alpha, complex<double> *X, const int incX)
 	{
 		zscal_(&N, &alpha, X, &incX);
 	}	
+	
+	// Peize Lin add 2017-10-27
+	// d=x*y
+	static inline
+	float dot( const int N, const float *X, const int incX, const float *Y, const int incY)
+	{
+		return sdot_(&N, X, &incX, Y, &incY);
+	}
+	static inline
+	double dot( const int N, const double *X, const int incX, const double *Y, const int incY)
+	{
+		return ddot_(&N, X, &incX, Y, &incY);
+	}
+	
+	// Peize Lin add 2017-10-27
+	// C = a * A.? * B.? + b * C 
+	static inline
+	void gemm(const char transa, const char transb, const int m, const int n, const int k,
+		const float alpha, const float *a, const int lda, const float *b, const int ldb, 
+		const float beta, float *c, const int ldc)
+	{
+		sgemm_(&transa, &transb, &n, &m, &k,
+			&alpha, b, &ldb, a, &lda, 
+			&beta, c, &ldc);
+	}
+	static inline
+	void gemm(const char transa, const char transb, const int m, const int n, const int k,
+		const double alpha, const double *a, const int lda, const double *b, const int ldb, 
+		const double beta, double *c, const int ldc)
+	{
+		dgemm_(&transa, &transb, &n, &m, &k,
+			&alpha, b, &ldb, a, &lda, 
+			&beta, c, &ldc);
+	}
+	static inline
+	void gemm(const char transa, const char transb, const int m, const int n, const int k,
+		const complex<double> alpha, const complex<double> *a, const int lda, const complex<double> *b, const int ldb, 
+		const complex<double> beta, complex<double> *c, const int ldc)
+	{
+		zgemm_(&transa, &transb, &n, &m, &k,
+			&alpha, b, &ldb, a, &lda, 
+			&beta, c, &ldc);
+	}
 
 };
 #endif  // LAPACKCONNECTOR_HPP

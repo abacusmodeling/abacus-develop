@@ -812,11 +812,13 @@ void LCAO_Orbitals::Read_PAO(const int& it)
                 meshr, // number of radial mesh
                 rab,
                 radial,// radial mesh value(a.u.)
+				Numerical_Orbital_Lm::Psi_Type::Psi,// psi type next
                 psi, // radial wave function
                 this->kmesh,
                 this->dk,
-				this->dr_uniform
-				); // delta k mesh in reciprocal space
+				this->dr_uniform,
+				true,
+				true); // delta k mesh in reciprocal space
 
             delete[] radial;
             delete[] rab;

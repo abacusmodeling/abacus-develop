@@ -167,44 +167,104 @@ const IntArray &IntArray::operator=(const int &value)
 //********************************************************
 const int &IntArray::operator()
 (const int ind1,const int ind2)const
-{return ptr[ ind1 * bound2 + ind2 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	return ptr[ ind1 * bound2 + ind2 ];
+}
 
 const int &IntArray::operator()
 (const int ind1,const int ind2,const int ind3)const
-{return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];
+}
 
 const int &IntArray::operator()
 (const int ind1,const int ind2,const int ind3,const int ind4)const
-{return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	assert( ind4 < bound4 );
+	return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];
+}
 
 const int &IntArray::operator()
 (const int ind1,const int ind2,const int ind3,const int ind4,const int ind5)const
-{return ptr[ (((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	assert( ind4 < bound4 );
+	assert( ind5 < bound5 );
+	return ptr[ (((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5 ];
+}
 
 const int &IntArray::operator()
 (const int ind1,const int ind2,const int ind3,const int ind4,const int ind5,const int ind6)const
-{return ptr[ ((((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5) * bound6 + ind6 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	assert( ind4 < bound4 );
+	assert( ind5 < bound5 );
+	assert( ind6 < bound6 );
+	return ptr[ ((((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5) * bound6 + ind6 ];
+}
 
 //********************************************************
 // overloaded subscript operator for non-const Int Array
 // const reference return creates an lvakue
 //********************************************************
 int &IntArray::operator()(const int ind1,const int ind2)
-{return ptr[ind1 * bound2 + ind2];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	return ptr[ind1 * bound2 + ind2];
+}
 
 int &IntArray::operator()(const int ind1,const int ind2,const int ind3)
-{return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	return ptr[ (ind1 * bound2 + ind2) * bound3 + ind3 ];
+}
 
 int &IntArray::operator()(const int ind1,const int ind2,const int ind3,const int ind4)
-{return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	assert( ind4 < bound4 );
+	return ptr[ ((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4 ];
+}
 
 int &IntArray::operator()
 (const int ind1,const int ind2,const int ind3,const int ind4,const int ind5)
-{return ptr[ (((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	assert( ind4 < bound4 );
+	assert( ind5 < bound5 );
+	return ptr[ (((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5 ];
+}
 
 int &IntArray::operator()
 (const int ind1,const int ind2,const int ind3,const int ind4,const int ind5,const int ind6)
-{return ptr[ ((((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5) * bound6 + ind6 ];}
+{
+	assert( ind1 < bound1 );
+	assert( ind2 < bound2 );
+	assert( ind3 < bound3 );
+	assert( ind4 < bound4 );
+	assert( ind5 < bound5 );
+	assert( ind6 < bound6 );
+	return ptr[ ((((ind1 * bound2 + ind2) * bound3 + ind3) * bound4 + ind4) * bound5 + ind5) * bound6 + ind6 ];
+}
 
 //****************************
 // zeroes out the whole array

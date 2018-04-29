@@ -33,28 +33,29 @@ extern "C"
 	// ldb: change with transb.
 	// if 'N', ldb >= k;
 	// if 'T' or 'C', ldb >= n;
-	void zgemm_(const char *transa,
-			const char *transb,
-			const int *m,
-			const int *n,
-			const int *k,
-			const complex<double> *alpha,
-			const complex<double> *a,
-			const int *lda,
-			const complex<double> *b,
-			const int *ldb,
-			const complex<double> *beta,
-			complex<double> *c,
-			const int *ldc);
+	// Peize Lin move zgemm_ to src_global/lapack_connector.h 2017-10-27
+	//void zgemm_(const char *transa,
+	//		const char *transb,
+	//		const int *m,
+	//		const int *n,
+	//		const int *k,
+	//		const complex<double> *alpha,
+	//		const complex<double> *a,
+	//		const int *lda,
+	//		const complex<double> *b,
+	//		const int *ldb,
+	//		const complex<double> *beta,
+	//		complex<double> *c,
+	//		const int *ldc);
 
 
     // BLAS 
 	void dcopy_(int const *n, double *a, int const *incx, double *b, int const *incy); 
 	void zcopy_(int const *n, complex<double> *a, int const *incx, complex<double> *b, int const *incy); 
 
-	void dgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
-		const double *alpha, const double *a, const int *lda, const double *b, const int *ldb, 
-		const double *beta, double *c, const int *ldc);
+	//void dgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
+	//	const double *alpha, const double *a, const int *lda, const double *b, const int *ldb, 
+	//	const double *beta, double *c, const int *ldc);
 	
 	void zhemm_(char *side, char *uplo, int *m, int *n,complex<double> *alpha,
 		complex<double> *a,  int *lda,  complex<double> *b, int *ldb, complex<double> *beta, complex<double> *c, int *ldc);
@@ -115,8 +116,9 @@ extern "C"
 
 
 	// mohan add 2012-03-27
+	// Peize Lin move these to src_global/lapack_connector.h 2017-10-27
 	//void ddot_(int *n, double *x, int *incx, double *y, int *incy, double *v);
-	double ddot_(const int *n, const double *x, const int *incx, const double *y, const int *incy);
+	//double ddot_(const int *n, const double *x, const int *incx, const double *y, const int *incy);
 
 	/*
     void zhegvx_(int const*, char*, char*, char*, int const*, double*, int const*, double*, int const*,

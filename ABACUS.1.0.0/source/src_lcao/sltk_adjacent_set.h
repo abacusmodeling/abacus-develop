@@ -71,7 +71,7 @@ public:
 	//2015-05-07
 	void delete_vector(void);
 
-	const int getLength(void) const {return length;}
+	int getLength(void) const {return length;}
 
 	static long call_times;
 	static void setDx(const int dx_in) { dx = dx_in; }

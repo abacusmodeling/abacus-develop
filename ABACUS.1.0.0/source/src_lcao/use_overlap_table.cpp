@@ -64,7 +64,6 @@ void Use_Overlap_Table::gen_tables( const int &job0 )
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0);
 	MOT.init_Table_Beta();// add 2009-5-8
-	MOT.Destroy_Table_Spherical_Bessel (Lmax_used);
 
 	//=========================================
 	// (3) make Gaunt coefficients table

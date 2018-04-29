@@ -2,6 +2,9 @@
 #define MATHZONE_H
 
 #include "realarray.h"
+#include <vector>
+#include <map>
+#include <cassert>
 using namespace std;
 
 class Mathzone
@@ -132,6 +135,7 @@ public:
     static long double Fact(const int n);
     static int Semi_Fact(const int n);
 
+	// Peize Lin accelerate 2017-10-02
     static void Simpson_Integral
     (
         const int mesh,
@@ -139,6 +143,14 @@ public:
         const double *rab,
         double &asum
     );
+	// Peize Lin accelerate 2017-10-02
+	static void Simpson_Integral
+	(
+		const int mesh,
+		const double *func,
+		const double dr,
+		double &asum
+	);
 
     // Peize Lin add 2016-02-14
     static void Simpson_Integral_0toall
@@ -254,6 +266,32 @@ public:
         double &theta,
         double &phi
     );
+	
+	
+	// coeff1 * x1 + (1-coeff1) * x2
+	// Peize Lin add 2017-08-09
+	template< typename T, typename T_coeff >
+	static T Linear_Mixing( const T & x1, const T & x2, const T_coeff & coeff1 )
+	{
+		return coeff1 * x1 + (1-coeff1) * x2;
+	}
+	template< typename T, typename T_coeff >
+	static vector<T> Linear_Mixing( const vector<T> & x1, const vector<T> & x2, const T_coeff & coeff1 )
+	{
+		assert(x1.size()==x2.size());
+		vector<T> x;
+		for( size_t i=0; i!=x1.size(); ++i )
+			x.push_back( Linear_Mixing( x1[i], x2[i], coeff1 ) );
+		return x;
+	}
+	template< typename T1, typename T2, typename T_coeff >
+	static map<T1,T2> Linear_Mixing( const map<T1,T2> & x1, const map<T1,T2> & x2, const T_coeff & coeff1 )
+	{
+		map<T1,T2> x;
+		for( const auto & x1i : x1 )
+			x.insert( make_pair( x1i.first, Linear_Mixing( x1i.second, x2.at(x1i.first), coeff1 ) ) );
+		return x;
+	}	
 
 };
 

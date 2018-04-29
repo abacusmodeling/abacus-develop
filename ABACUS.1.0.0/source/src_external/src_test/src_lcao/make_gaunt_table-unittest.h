@@ -6,8 +6,9 @@
 #ifndef MAKE_GAUNT_TABLE_UNITTEST_H
 #define MAKE_GAUNT_TABLE_UNITTEST_H
 
-#include "../../../src_lcao/make_gaunt_table.h"
-void cout_MGT ( const Make_Gaunt_Table & MGT, const int Lmax )
+#include "src_lcao/make_gaunt_table.h"
+
+static void cout_MGT ( const Make_Gaunt_Table & MGT, const int Lmax )
 {
 	for( int LA=0; LA<=Lmax; ++LA )
 	{

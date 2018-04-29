@@ -578,7 +578,7 @@ void energy::rgen(
     const Matrix3 &G,
     Vector3<double> *r,
     double *r2,
-    int &nrm)
+    int &nrm) const
 {
     //-------------------------------------------------------------------
     // generates neighbours shells (in units of alat) with length

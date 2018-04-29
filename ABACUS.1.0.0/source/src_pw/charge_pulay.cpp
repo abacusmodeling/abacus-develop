@@ -163,7 +163,6 @@ void Charge_Pulay::Pulay_mixing(void)
 		}
 		++irstep;
 		++totstep;
-		return;
 	}
 	else
 	{
@@ -255,6 +254,10 @@ void Charge_Pulay::Pulay_mixing(void)
 		{
 			this->generate_new_rho(is,irstep);
 		}
+
+		++irstep;
+		++idstep;
+		++totstep;	
 	}
 
     // output file name
@@ -271,10 +274,7 @@ void Charge_Pulay::Pulay_mixing(void)
     }
     */
 
-    ++irstep;
-	++idstep;
-	++totstep;
-    return;
+	return;		
 }
 
 void Charge_Pulay::allocate_pulay(const int &scheme)

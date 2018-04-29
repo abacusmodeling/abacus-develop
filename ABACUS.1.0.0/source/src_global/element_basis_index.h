@@ -14,14 +14,21 @@ class Element_Basis_Index
 {
 private:
 	
-	struct MN
+	struct NM
 	{
 		public:
-		size_t M;
 		size_t N;
+		size_t M;
 	};
 	
-	class Index_T: public vector<vector<vector<size_t>>>
+	class Index_TL: public vector<vector<size_t>>
+	{
+		public:
+		size_t N;
+		size_t M;
+	};
+	
+	class Index_T: public vector<Index_TL>
 	{
 		public:
 		size_t count_size;
@@ -29,10 +36,10 @@ private:
 	
 public:
 	
-	typedef vector<vector<MN>> Range; 
-	typedef vector<Index_T> Index;
+	typedef vector<vector<NM>> Range; 								// range[T][L]
+	typedef vector<Index_T> IndexLNM;								// index[T][L][N][M]
 	
-	static Index construct_index( const Range &range );
+	static IndexLNM construct_index( const Range &range );
 };
 
 #endif

@@ -74,7 +74,9 @@ mathzone_add1.o\
 integral.o \
 poission.o \
 polint.o \
-sph_bessel.o\
+sph_bessel.o \
+sph_bessel_recursive-d1.o \
+sph_bessel_recursive-d2.o \
 global_variable.o \
 global_function.o \
 global_file.o \

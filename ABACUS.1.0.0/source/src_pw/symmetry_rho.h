@@ -9,11 +9,11 @@ class Symmetry_rho
 	Symmetry_rho();
 	~Symmetry_rho();
 	
-	void begin(const int &spin_now);
+	void begin(const int &spin_now) const;
 
 	private:
 
-	void psymm(double *rho_part);
+	void psymm(double *rho_part) const;
 	
 };
 

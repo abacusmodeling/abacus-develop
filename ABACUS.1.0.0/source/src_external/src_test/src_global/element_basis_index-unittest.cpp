@@ -23,7 +23,7 @@ int main()
 		= construct_range();
 	cout<<range<<endl;
 	
-	const Element_Basis_Index::Index &&index
+	const Element_Basis_Index::IndexLNM &&index
 		= Element_Basis_Index::construct_index( range );
 	cout<<index<<endl;
 

@@ -7,7 +7,7 @@
 void gradcorr(double &etxc, double &vtxc, matrix &v)
 {
 	BLOCK_HERE("gradcorr");
-    if (xcf.igcx == 0  &&  xcf.igcc == 0)
+    if (xcf.igcx_now == 0  &&  xcf.igcc_now == 0)
     {
         return;
     }

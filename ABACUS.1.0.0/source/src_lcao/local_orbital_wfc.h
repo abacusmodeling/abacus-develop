@@ -35,7 +35,7 @@ class Local_Orbital_wfc
 	void allocate_k(const Grid_Technique &gt);
 	void aloc_gamma_wfc(const Grid_Technique &gt);
 	void set_trace_aug(const Grid_Technique &gt);
-	const bool get_allocate_aug_flag(void)const{return allocate_aug_flag;};
+	bool get_allocate_aug_flag(void)const{return allocate_aug_flag;}
 
     //=========================================
     // Init Cij, make it satisfy 2 conditions:

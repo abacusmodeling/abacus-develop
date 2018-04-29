@@ -478,10 +478,10 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 	
 	int DM_ATOM_SIZE=1;	
 	complex<double> **DM_ATOM=new complex<double> *[NSPIN];
-	for(int i=0; i<NSPIN; ++i)
+	for(int is=0; is<NSPIN; ++is)
 	{
-		DM_ATOM[i]=new complex<double>[DM_ATOM_SIZE];
-		ZEROS(DM_ATOM[i], DM_ATOM_SIZE);
+		DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
+		ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
 	}
 	for(int T1=0; T1<ucell.ntype; T1++)
 	{
@@ -500,23 +500,23 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 				if(DM_ATOM_SIZE<ng)
 				{
 					DM_ATOM_SIZE=ng;
-					for(int i=0; i<NSPIN; ++i)
-						delete[] DM_ATOM[i];
-					for(int i=0; i<NSPIN; ++i)
-						DM_ATOM[i]=new complex<double>[DM_ATOM_SIZE];
+					for(int is=0; is<NSPIN; ++is)
+						delete[] DM_ATOM[is];
+					for(int is=0; is<NSPIN; ++is)
+						DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
 				}
-				for(int i=0; i<NSPIN; ++i)
-					ZEROS(DM_ATOM[i], ng);
+				for(int is=0; is<NSPIN; ++is)
+					ZEROS(DM_ATOM[is], ng);
 				ZEROS(WFC_PHASE, NBANDS*nw1);
 				cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
 
 				++ca;
 
-				for(int i=0; i<NSPIN; ++i)
+				for(int is=0; is<NSPIN; ++is)
 				{
 					for(int iv=0; iv<ng; ++iv)
 					{
-						this->DM_R[i][gstart+iv]=DM_ATOM[i][iv].real();
+						this->DM_R[is][gstart+iv]=DM_ATOM[is][iv].real();
 					}
 				}
 			} // if gt.in_this_processor

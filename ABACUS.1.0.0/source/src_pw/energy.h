@@ -94,8 +94,8 @@ class energy
         Vector3<double> *r,
         double *r2,
         int  &nrm
-    );
-
+    ) const;
+    
     static int mxr;
 };
 

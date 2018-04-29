@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 #include "complexmatrix.h"
+#include "lapack_connector.h"
 
 int ComplexMatrix::mCount = 0;
 
@@ -49,6 +50,22 @@ ComplexMatrix::ComplexMatrix(const ComplexMatrix &m1)
 	this->init(m1.nr, m1.nc);
 	++mCount;
 	for(int i=0; i<this->size; i++) c[i] = m1.c[i];
+}
+
+// Peize Lin add 2016-08-05
+ComplexMatrix::ComplexMatrix( ComplexMatrix && m1 )
+{
+	nr=m1.nr; nc=m1.nc;
+	c=m1.c;
+	m1.init(1,1);
+}
+
+// Peize Lin add 2017-03-29
+ComplexMatrix::ComplexMatrix(const matrix &m)
+{
+	this->init(m.nr,m.nc);
+	++mCount;
+	for( int i=0; i<this->size; ++i) c[i] = m.c[i];
 }
 
 // deconstructor
@@ -106,22 +123,26 @@ ComplexMatrix operator-(const ComplexMatrix &m1, const ComplexMatrix &m2)
 // mprod = m1 * m2
 ComplexMatrix operator*(const ComplexMatrix &m1, const ComplexMatrix &m2)
 {
-	assert(m1.nc == m2.nr);	
+	assert(m1.nc == m2.nr);
 	ComplexMatrix mprod(m1.nr, m2.nc);
 
 	complex<double> z;
-	for (int i = 0;i < m1.nr;i++)
-	{
-		for (int j = 0;j < m2.nc;j++)
-		{
-			z = complex<double>(0,0);
-			for (int k = 0;k < m1.nc;k++)
-			{
-				z += m1(i, k) * m2(k, j);
-			}
-			mprod(i, j) = z;
-		}
-	}
+//	for (int i = 0;i < m1.nr;i++)
+//	{
+//		for (int j = 0;j < m2.nc;j++)
+//		{
+//			z = complex<double>(0,0);
+//			for (int k = 0;k < m1.nc;k++)
+//			{
+//				z += m1(i, k) * m2(k, j);
+//			}
+//			mprod(i, j) = z;
+//		}
+//	}
+	// Peize Lin accelerate 2017-10-27
+	LapackConnector::gemm('N', 'N', m1.nr, m2.nc, m1.nc,
+		1, m1.c, m1.nc, m2.c, m2.nc, 
+		0, mprod.c, mprod.nc);
 	return mprod;
 }
 
@@ -173,6 +194,15 @@ ComplexMatrix& ComplexMatrix::operator=(const ComplexMatrix &m)
 	return *this;
 }
 
+// Peize Lin add 2016-08-05
+ComplexMatrix& ComplexMatrix::operator=( ComplexMatrix && m )
+{
+	nr = m.nr;		nc = m.nc;
+	delete[] c;		c  = m.c;
+	m.init(1,1);
+	return *this;
+}
+
 ComplexMatrix& ComplexMatrix::operator*=(const complex<double> &s)
 {
 	for (int i = 0;i < this->size;i++) c[i] *= s;
@@ -193,6 +223,13 @@ ComplexMatrix& ComplexMatrix::operator-=(const ComplexMatrix &m)
 	return *this;
 }
 
+// Peize Lin add 2017-03-29
+matrix ComplexMatrix::real()
+{
+	matrix m(nr,nc);
+	for( int i=0; i<this->size; ++i) m.c[i] = c[i].real();
+	return m;
+}
 // Returns trace of ComplexMatrix
 complex<double> trace(const ComplexMatrix &m)
 {

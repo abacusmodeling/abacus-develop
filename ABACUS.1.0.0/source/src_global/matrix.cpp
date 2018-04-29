@@ -11,6 +11,7 @@
 
 using namespace std;
 #include "matrix.h"
+#include "lapack_connector.h"
 
 //*********************************************************
 // The init() function is the main initialization routine.
@@ -32,12 +33,14 @@ void matrix::init(const int nrows,const int ncols)
 	nc = ncols;
 	c = NULL;
 //	hermetian = 0;
-	set_new_handler(matrixAlloc);
-
+	
 	if(nr*nc == 0) c = NULL;
 	else
 	{
+		auto handler_old = set_new_handler(matrixAlloc);
 		c = new double[nrows*ncols]();
+		set_new_handler(handler_old);
+		
 		this->zero_out();
 		assert(c!=0);// terminate if memory not allocated
 	}
@@ -101,19 +104,17 @@ void matrix::create(const int nrow,const int ncol)
 	nr = nrow;
 	nc = ncol;
 	c = new double[nr * nc];
-	for(int i=0; i<nr*nc; i++)
-	{
-		c[i]=0.0;
-	}
-	return;
+	zero_out();				// Peize Lin change 2018-03-12
 }
 
-/* Assignment:  nonstandard in that it returns void.  To make it standard,
- * replace void -> matrix and uncomment the return *this; */
-
-void matrix::operator=(const matrix & m1)
+// Peize Lin change 2018-03-12
+matrix& matrix::operator=( const matrix & m1 )
 {
-	for (int i = 0; i < nr*nc; i++) c[i] = m1.c[i];
+	if( nr*nc != m1.nr*m1.nc )
+		this->create( m1.nr, m1.nc );
+	for( int i=0; i<nr*nc; ++i ) 
+		this->c[i] = m1.c[i];
+	return *this;
 }
 
 // Peize Lin add 2016-08-05
@@ -160,20 +161,23 @@ matrix operator*(const matrix &m1, const matrix &m2)
     // allocate the result and zero it out
     matrix mprod(m1.nr, m2.nc);
 
-    mprod.zero_out();
-
     // do the multiply and return
-    for (int i = 0;i < m1.nr;i++)
-    {
-        for (int j = 0;j < m2.nc;j++)
-        {
-            for (int k = 0;k < m1.nc;k++)
-            {
-                //mprod(i, j) += m2(i, k) * m1(k, j);
-                mprod(i, j) += m1(i, k) * m2(k, j);
-            }
-        }
-    }
+//    for (int i = 0;i < m1.nr;i++)
+//    {
+//        for (int j = 0;j < m2.nc;j++)
+//        {
+//            for (int k = 0;k < m1.nc;k++)
+//            {
+//                //mprod(i, j) += m2(i, k) * m1(k, j);
+//                mprod(i, j) += m1(i, k) * m2(k, j);
+//            }
+//        }
+//    }
+	
+	// Peize Lin accelerate 2017-10-27
+	LapackConnector::gemm('N', 'N', m1.nr, m2.nc, m1.nc,
+		1, m1.c, m1.nc, m2.c, m2.nc, 
+		0, mprod.c, mprod.nc);
 
 	return mprod;
 }
@@ -289,6 +293,13 @@ void matrix::get_extreme_eigen_values(double &ev_lower, double &ev_upper)const
     delete[] b;
 }
 
+// Peize Lin add 2017-05-27
+void matrix::reshape( const double nr_new, const double nc_new )
+{
+	assert( nr*nc == nr_new*nc_new );
+	nr=nr_new;
+	nc=nc_new;
+}
 
 double trace_on(const matrix &A, const matrix &B)
 {
@@ -335,4 +346,16 @@ double min( const matrix & m )
 		for( int ic=0; ic!=m.nc; ++ic )
 			value = std::min( value, m(ir,ic) );
 	return value;
+}
+
+// Peize Lin add 2016-09-08
+std::ostream & operator<<( std::ostream & os, const matrix & m )
+{
+	for( int ir=0; ir!=m.nr; ++ir )
+	{
+		for( int ic=0; ic!=m.nc; ++ic )
+			os<<m(ir,ic)<<"\t";
+		os<<std::endl;
+	}	
+	return os;
 }

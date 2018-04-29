@@ -4,6 +4,8 @@
 #include "../src_pw/global.h"
 #include "local_orbital_elec.h" //mohan add 2012-03-29
 
+#include <stdexcept>
+
 Gint_Speed::Gint_Speed()
 {
 	nov = 0;
@@ -32,6 +34,13 @@ void Gint_Speed::cal_vlocal(
 	this->gamma_vlocal();
 
     timer::tick("Gint_Speed","cal_vlocal",'J');
+	
+	// Peize Lin add 2016-12-03
+	if(5==xcf.iexch_now)
+		throw logic_error("Exx unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	else if(6==xcf.iexch_now)
+		throw logic_error("Exx unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	
     return;
 }
 

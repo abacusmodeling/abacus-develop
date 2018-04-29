@@ -8,8 +8,10 @@
 #include <complex>
 using namespace std;
 
+#include "src_global/matrix.h"
+
 #ifdef _MCD_CHECK
-#include "../src_parallel/mcd.h"
+#include "src_parallel/mcd.h"
 #endif
 
 class ComplexMatrix
@@ -31,6 +33,8 @@ public:
 	// Copy constructor
 	//==================
 	ComplexMatrix(const ComplexMatrix &m1);
+	ComplexMatrix(ComplexMatrix && m1);					// Peize Lin add 2016-08-05
+	ComplexMatrix(const matrix &m);							// Peize Lin add 2017-03-29
 	~ComplexMatrix();
 
 	//============
@@ -53,10 +57,12 @@ public:
 	friend ComplexMatrix operator*(const double &s,          const ComplexMatrix &m);
 	friend ComplexMatrix operator*(const ComplexMatrix &m,   const double &s);
 	ComplexMatrix& operator=(const ComplexMatrix &m);
+	ComplexMatrix& operator=(ComplexMatrix && m);			// Peize Lin add 2016-08-05
 	ComplexMatrix& operator*=(const complex<double> &s);
 	ComplexMatrix& operator+=(const ComplexMatrix &m);
 	ComplexMatrix& operator-=(const ComplexMatrix &m);
-
+	matrix real();						// Peize Lin add 2017-03-29
+	
 	//==================
 	// member function:
 	//==================

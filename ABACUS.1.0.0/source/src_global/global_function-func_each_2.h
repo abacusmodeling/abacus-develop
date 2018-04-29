@@ -14,7 +14,7 @@
 	const L1<L2<...<Ln<T>>...>> t_listB;
 	（其中L1、L2、...Ln为vector或map）
 可
-	FUNC_EACH_2( t_listA, t_listB, 其他参数 );
+	FUNC_EACH_2( t_listA, t_listB, func, 其他参数 );
 */
 
 

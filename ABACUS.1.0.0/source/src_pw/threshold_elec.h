@@ -15,7 +15,7 @@ protected:
 
     double dr2;
     bool conv_elec;
-    void set_ethr();
+    void set_ethr() const;
     void update_ethr(const int &iter);
     void iter_end(ofstream &ofs);
     void print_eigenvalue(ofstream &ofs);

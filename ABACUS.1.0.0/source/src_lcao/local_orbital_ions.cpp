@@ -1,13 +1,13 @@
 #include "local_orbital_ions.h"
-#include "../src_pw/global.h"
-#include "../src_parallel/parallel_orbitals.h"
-#include "sltk_atom_arrange.h"
-#include "../src_external/src_pdiag/pdiag_double.h"
-#include "lcao_nnr.h"
-#include "force_lcao.h"
-#include "istate_charge.h"
-#include "istate_envelope.h"
-#include "../src_pw/vdwd2.h"
+#include "src_pw/global.h"
+#include "src_parallel/parallel_orbitals.h"
+#include "src_lcao/sltk_atom_arrange.h"
+#include "src_external/src_pdiag/pdiag_double.h"
+#include "src_lcao/lcao_nnr.h"
+#include "src_lcao/force_lcao.h"
+#include "src_lcao/istate_charge.h"
+#include "src_lcao/istate_envelope.h"
+#include "src_pw/vdwd2.h"
 //#include "../src_siao/selinv.h" //mohan add 2012-05-13
 
 Local_Orbital_Ions::Local_Orbital_Ions()

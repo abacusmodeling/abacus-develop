@@ -161,23 +161,6 @@ Matrix3 operator *(const double &s, const Matrix3 &m)
 	               m.e31*s, m.e32*s, m.e33*s);
 }
 
-//m*u
-Vector3<double> operator *(const Matrix3 &m, const Vector3<double> &u)
-{
-	return Vector3<double>(m.e11*u.x + m.e12*u.y + m.e13*u.z,
-	                       m.e21*u.x + m.e22*u.y + m.e23*u.z,
-	                       m.e31*u.x + m.e32*u.y + m.e33*u.z);
-}
-
-//u*m
-Vector3<double> operator *(const Vector3<double> &u, const Matrix3 &m)
-{
-	return Vector3<double>(u.x*m.e11 + u.y*m.e21 + u.z*m.e31,
-	                       u.x*m.e12 + u.y*m.e22 + u.z*m.e32,
-	                       u.x*m.e13 + u.y*m.e23 + u.z*m.e33);
-}
-
-
 // whether m1==m2
 bool operator==(const Matrix3 &m1, const Matrix3 &m2)
 {

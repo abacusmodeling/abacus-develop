@@ -12,14 +12,16 @@ FFTW_LIB_DIR = ${FFTW_DIR}/lib
 #LIBS = -L${FFTW_LIB_DIR} -lfftw -lm -L${ELPA_LIB_DIR} -lelpa -lifcore -qopenmp "${BLAS_LAPACK_LIB}"
 #LIBS = -L${FFTW_LIB_DIR} -lfftw -lm -L${ELPA_LIB_DIR} -lelpa -lifcore -qopenmp "${BLAS_LAPACK_LIB}"
 LIBS = \
--qopenmp -lpthread -lifcore \
+-lifcore \
 -L${FFTW_LIB_DIR} -lfftw -lm -Wl,-rpath=${FFTW_LIB_DIR} \
 -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
--L${ELPA_LIB_DIR} -lelpa
+-L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR} 
+
+INCLUDE = -I. -Icommands -I${BOOST_DIR} -I${FFTW_INCLUDE} 
+#-I/public/intel2017/impi/2017.1.132/include64 
 
 #==========================
 # OPTIMIZE OPTIONS and boost
 #==========================
-#OPTS = -I. -Icommands -I/home/mohan/software/boost_1_39_0 -I${FFTW_INCLUDE} -O3 -g -rdynamic -std=c++11
-#OPTS = -I. -Icommands -I${BOOST_DIR} -I${FFTW_INCLUDE} -ipo -Ofast -xHost -diag-disable=858 -std=c++11
-OPTS = -I. -Icommands -I${BOOST_DIR} -I${FFTW_INCLUDE} -I/public/intel2017/impi/2017.1.132/include64 -Ofast -xHost -diag-disable=858 -std=c++11
+OPTS = ${INCLUDE} -Ofast -xHost -diag-disable=858 -std=c++11 -qopenmp -lpthread 
+OPTS_MPI = -cxx=${CPLUSPLUS}
