@@ -11,6 +11,7 @@
 #include "src_lcao/numerical_nonlocal.h"
 #include "src_lcao/numerical_nonlocal_lm.h"
 #include "src_lcao/make_gaunt_table.h"
+#include "src_lcao/center2_orb.h"
 #include "src_global/sph_bessel_recursive.h"
 
 #include <set>
@@ -136,6 +137,8 @@ class Make_Overlap_Table
 	double *kpoint;
 	double *r;
 	double *rab;
-	double *kab;
+	double *kab;	
+
+	friend class Center2_Orb::Orb11;			// Peize Lin add 2016-01-24
 };
 #endif

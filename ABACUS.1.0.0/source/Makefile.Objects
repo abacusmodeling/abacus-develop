@@ -160,6 +160,9 @@ pdiag_common.o \
 hs_matrix.o \
 subgrid_oper.o \
 GenELPA.o \
+center2_orb-orb11.o \
+center2_orb-orb21.o \
+center2_orb-orb22.o \
 
 OBJS_WANNIER=wan_global.o\
 bessel_basis.o\
