@@ -16,9 +16,14 @@ Input INPUT;
 
 Input::Input() 
 {
+	angle1 = new double[1];
+	angle2 = new double[1];
 // all values set in Default	
 }
-Input::~Input() {}
+Input::~Input() {
+	delete[] angle1;
+	delete[] angle2;
+}
 
 void Input::Init(const string &fn)
 {
@@ -235,6 +240,7 @@ void Input::Default(void)
 	vnl_in_h = 1;
 	zeeman_in_h = 1;
 	test_force = 0;
+	test_stress = 0;
     fs_ref_energy  = 0.0;
 //----------------------------------------------------------
 // iteration
@@ -325,8 +331,8 @@ void Input::Default(void)
         md_tlast=md_tfirst;
         md_dumpmdfred=1;
         md_mdoutpath="mdoutput";
-	md_domsd=1;
-        md_domsdatom=1;
+	md_domsd=0;
+        md_domsdatom=0;
         md_rstmd=0;
         md_outputstressperiod=1;
         md_fixtemperature=1;
@@ -393,6 +399,12 @@ void Input::Default(void)
 		eps_degauss = 0.01;
 		
 		//epsilon0_choice = 0;
+	//added by zhengdy-soc
+	noncolin = false;
+	lspinorb = false;
+	starting_spin_angle = false;
+	angle1[0] = 0.0;
+	angle2[0] = 0.0;
 
 	//xiaohui add 2015-09-16
 	input_error = 0;
@@ -822,6 +834,10 @@ bool Input::Read(const string &fn)
         else if (strcmp("test_force", word) == 0)
         {
             read_value(ifs, test_force);
+        }
+        else if (strcmp("test_stress", word) == 0)
+        {
+            read_value(ifs, test_stress);
         }
         else if (strcmp("fs_ref_energy_ev", word) == 0)
         {
@@ -1349,6 +1365,46 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, eps_degauss);
         }
+	else if (strcmp("noncolin", word) == 0)
+	{
+		read_value(ifs, noncolin);
+	}
+	else if (strcmp("lspinorb", word) == 0)
+	{
+		read_value(ifs, lspinorb);
+	}
+	else if (strcmp("starting_spin_angle", word) == 0)
+	{
+		read_value(ifs, starting_spin_angle);
+	}
+	else if (strcmp("angle1", word) == 0)
+	{
+		delete[] angle1;
+		if(ntype<1) angle1 = new double[1];
+		else
+		{
+			angle1 = new double[ntype];
+			ZEROS(angle1, ntype);
+			for(int i = 0;i<ntype;i++){
+				ifs>>angle1[i];
+			}
+			ifs.ignore(150, '\n');
+		}
+	}
+	else if (strcmp("angle2", word) == 0)
+	{
+		delete[] angle2;
+		if(ntype<1) angle2 = new double[1];
+		else
+		{
+			angle2 = new double[ntype];
+			ZEROS(angle2, ntype);
+			for(int i = 0;i<ntype;i++){
+				ifs>>angle2[i];
+			}
+			ifs.ignore(150, '\n');
+		}
+	}
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
@@ -1517,6 +1573,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( zeeman_in_h );
 
 	Parallel_Common::bcast_int( test_force );
+	Parallel_Common::bcast_int( test_stress );
 
     Parallel_Common::bcast_double( fs_ref_energy );
 
@@ -1663,7 +1720,15 @@ void Input::Bcast()
 		Parallel_Common::bcast_double( shift );
 		Parallel_Common::bcast_bool( metalcalc );
 		Parallel_Common::bcast_double( eps_degauss );
-		
+		Parallel_Common::bcast_bool( noncolin );
+		Parallel_Common::bcast_bool( lspinorb );
+		Parallel_Common::bcast_bool( starting_spin_angle );
+		for(int i = 0;i<ntype;i++)
+		{
+			Parallel_Common::bcast_double(angle1[i]);
+			Parallel_Common::bcast_double(angle2[i]);
+		}
+	
 		//Parallel_Common::bcast_int( epsilon0_choice );
 
     return;
@@ -2437,6 +2502,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"vnl_in_h", vnl_in_h,"calculate the nonlocal potential or not");
 	OUTP(ofs,"zeeman_in_h", zeeman_in_h,"calculate the zeeman term or not");
 	OUTP(ofs,"test_force", test_force, "test the force");
+	OUTP(ofs,"test_stress", test_stress, "test the force");
 	
 #ifdef __EPM_
 	OUTP(ofs,"fs_ref_energy",fs_ref_energy);

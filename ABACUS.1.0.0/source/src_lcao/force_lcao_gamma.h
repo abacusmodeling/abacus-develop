@@ -21,7 +21,14 @@ class Force_LCAO_gamma
 	double** ftvnl_dphi;
 	double** fvnl_dbeta;	
 	double** fvl_dphi;
-	
+
+	public:
+	//each part of stress
+	double soverlap[3][3];
+	double stvnl_dphi[3][3];
+	double svnl_dbeta[3][3];
+	double svl_dphi[3][3];	
+
 	private:
 
 	// get the ds, dt, dvnl.

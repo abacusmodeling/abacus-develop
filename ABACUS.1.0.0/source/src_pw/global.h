@@ -84,6 +84,9 @@ extern UnitCell_pseudo ucell;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
 
+//zhengdy-soc
+#include "soc.h"
+extern Soc soc;
 #ifdef __FP
 #include "../src_lcao/global_fp.h"
 #endif

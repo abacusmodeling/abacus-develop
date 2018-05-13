@@ -47,5 +47,7 @@ Symmetry symm;
 Parallel_Grid Pgrid; //mohan add 2010-06-06 
 Parallel_Kpoints Pkpoints; // mohan add 2010-06-07
 
+Soc soc;//added by zhengdy-soc
+
 #endif
 

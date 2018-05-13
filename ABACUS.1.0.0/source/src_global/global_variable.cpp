@@ -54,7 +54,7 @@ int		ATOM_DISTRIBUTION = false;
 
 //string 	DIAGO_TYPE = "cg"; xiaohui modify 2013-09-01
 int		DIAGO_PROC = 0;
-int 	DIAGO_CG_MAXITER = 20;
+int 	DIAGO_CG_MAXITER = 30;
 int		DIAGO_CG_PREC = 1; //mohan add 2012-03-31
 int 	DIAGO_DAVID_NDIM = 2;
 double 	ETHR = 1.0e-2;
@@ -193,3 +193,8 @@ int test_figure = 0;
 int test_mathzone = 0;
 int test_deconstructor = 0;
 
+//added by zhengdy-soc
+bool NONCOLIN = false;
+bool LSPINORB = false;
+bool DOMAG    = false;
+int NPOL      = 1;

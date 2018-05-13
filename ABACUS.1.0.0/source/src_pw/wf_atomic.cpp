@@ -148,8 +148,10 @@ void WF_atomic::print_PAOs(void)const
     if (MY_RANK!=0) return;
     for (int it=0; it<ucell.ntype; it++)
     {
-        for (int ic=0; ic<ucell.atoms[it].nchi ;ic++)
+        for (int icc=0; icc<ucell.atoms[it].nchi ;icc++)
         {
+            int ic = icc;
+            if(NONCOLIN) ic = icc/2;
             string orbital_type;
             if (ic == 0)  orbital_type = "S";
             else if (ic == 1) orbital_type = "P";
@@ -176,7 +178,7 @@ void WF_atomic::print_PAOs(void)const
             for (int i=0;i<ucell.atoms[it].msh;i++)
             {
                 ofs << "\n" << setw(15) << ucell.atoms[it].r[i]
-                << setw(15) << ucell.atoms[it].chi(ic,i)
+                << setw(15) << ucell.atoms[it].chi(icc,i)
                 << setw(15) << ucell.atoms[it].rab[i];
             }
             ofs.close();
@@ -231,6 +233,8 @@ void WF_atomic::atomic_wfc
     //=========================================================
     const int total_lm = (lmax_wfc + 1) * (lmax_wfc + 1);
     matrix ylm(total_lm, np);
+    complex<double> *aux = new complex<double>[np];
+    double *chiaux = new double[1];
 
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0;ig<np;ig++)
@@ -239,7 +243,6 @@ void WF_atomic::atomic_wfc
     }
     //ylm = spherical harmonics functions
     Mathzone::Ylm_Real(total_lm, np, gk, ylm);
-
     int index = 0;
     //---------------------------------------------------------
     // Calculate G space 3D wave functions
@@ -265,9 +268,9 @@ void WF_atomic::atomic_wfc
                     //  WF_atomictions for k=0 that are real in real space
                     //-----------------------------------------------------
 
-                    //---------------------------------------------------------
-                    // flq = radial fourier transform of atomic orbitals chi
-                    //---------------------------------------------------------
+                      //---------------------------------------------------------
+                      // flq = radial fourier transform of atomic orbitals chi
+                      //---------------------------------------------------------
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] =
@@ -275,8 +278,150 @@ void WF_atomic::atomic_wfc
                                                                it, iw, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
                     }
 
-                    for (int m=0; m<2*l+1; m++)
+                    if(NONCOLIN)
                     {
+                        if(ucell.atoms[it].has_so)
+                        {
+                            const double j = ucell.atoms[it].jchi[iw];
+                            if (INPUT.starting_spin_angle|| !DOMAG)
+                            {//atomic_wfc_so
+                                double fact[2];
+                                for(int m=-l-1;m<l+1;m++)
+                                {
+                                   fact[0] = soc.spinor(l,j,m,0);
+                                   fact[1] = soc.spinor(l,j,m,1);
+                                   if (fabs(fact[0])>1e-8||fabs(fact[1])>1e-8)
+                                   {
+                                      for(int is=0;is<2;is++)
+                                      {
+                                          if(fabs(fact[is])>1e-8)
+                                          {
+                                              const int ind = ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
+                                              ZEROS(aux, np);
+                                              for(int n1=0;n1<2*l+1;n1++){
+                                                 const int lm = l*l +n1;
+                                                 if(fabs(soc.rotylm[n1][ind])>1e-8)
+                                                   for(int ig=0; ig<np;ig++) 
+                                                      aux[ig] += soc.rotylm[n1][ind]* ylm(lm,ig);
+                                              }
+                                              for(int ig=0; ig<np;ig++)
+                                                 wfcatom(index, ig + wf.npwx*is ) = lphase * fact[is] * sk[ig] * aux[ig] * flq[ig];
+                                          }
+                                          else 
+                                            for(int ig=0; ig<np;ig++) wfcatom(index,ig+ wf.npwx*is) = complex<double>(0.0 , 0.0);
+                                      }//is
+                                      index++;
+                                   }//if
+                                }//m
+                            }//if
+                            else
+                            {//atomic_wfc_so_mag
+
+                              double alpha, gamma;
+                              complex<double> fup,fdown;
+                              int nc;
+                              //This routine creates two functions only in the case j=l+1/2 or exit in the other case  
+                              if(fabs(j-l+0.5<1e-4)) continue;
+                              delete[] chiaux;
+                              chiaux = new double [np];
+                              //Find the functions j= l- 1/2
+                              if(l==0) 
+                                 for(int ig=0;ig<np;ig++){
+                                    chiaux[ig] = flq[ig];
+                                 }
+                              else
+                              {
+                                 for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
+                                 {
+                                    if((ucell.atoms[it].lchi[ib] == l)&&(fabs(ucell.atoms[it].jchi[ib]-l+0.5)<1e-4))
+                                    {
+                                       nc=ib;
+                                       break;
+                                    }
+                                 }
+                                 for(int ig=0;ig<np;ig++)
+                                 {//Average the two functions
+                                    chiaux[ig] =  l * 
+                                         Mathzone::Polynomial_Interpolation(table_q,
+                                                               it, nc, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
+
+                                    chiaux[ig] += flq[ig] * (l+1.0) ;
+                                    chiaux[ig] *= 1/(2.0*l+1.0);
+                                 }
+                              }
+                              //and construct the starting wavefunctions as in the noncollinear case.
+                              alpha = soc.angle1[it];
+                              gamma = -1 * soc.angle2[it] + 0.5 * PI;
+
+                              for(int m = 0;m<2*l+1;m++)
+                              {
+                                 const int lm = l*l +m;
+                                 if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+                                 for(int ig = 0;ig<np;ig++)
+                                 {
+                                     aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
+                                 }
+                                 //rotate wfc as needed
+                                 //first rotation with angle alpha around (OX)
+                                 for(int ig = 0;ig<np;ig++)
+                                 {
+                                     fup = cos(0.5 * alpha) * aux[ig];
+                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     //build the orthogonal wfc
+                                     //first rotation with angle (alpha + PI) around (OX)
+                                     wfcatom(index,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
+                                     wfcatom(index,ig+ wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
+                                     //second rotation with angle gamma around(OZ)
+                                     fup = cos(0.5 * (alpha + PI))*aux[ig];
+                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
+                                     wfcatom(index+2*l+1,ig+ wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
+                                 }
+                                 index++;
+                              }
+                              index += 2*l +1;
+                            }
+                        }
+                        else 
+                        {//atomic_wfc_nc
+                            double alpha, gamman;
+                            complex<double> fup, fdown;
+                            alpha = soc.angle1[it];
+                            gamman = -soc.angle2[it] + 0.5*PI;
+                            for(int m = 0;m<2*l+1;m++)
+                            {
+                                const int lm = l*l +m;
+                                if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+                                for(int ig = 0;ig<np;ig++)
+                                {
+                                     aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
+                                }
+                                //rotate function
+                                //first, rotation with angle alpha around(OX)
+                                for(int ig = 0;ig<np;ig++)
+                                {
+                                     fup = cos(0.5*alpha) * aux[ig];
+                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+                                     //build the orthogonal wfc
+                                     //first rotation with angle(alpha+PI) around(OX)
+                                     wfcatom(index,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
+                                     wfcatom(index,ig+ wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
+                                     //second rotation with angle gamma around(OZ)
+                                     fup = cos(0.5 * (alpha + PI)) * aux[ig];
+                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
+                                     wfcatom(index+2*l+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
+                                     wfcatom(index+2*l+1,ig+ wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
+                                }
+                                index++;
+                            }
+                            index += 2*l+1;
+                        }
+                       // index++;
+                    }
+                    else{//LSDA and nomagnet case 
+
+                      for (int m=0; m<2*l+1; m++)
+                      {
                         const int lm = l * l + m;
                         for (int ig=0;ig<np;ig++)
                         {
@@ -289,7 +434,8 @@ void WF_atomic::atomic_wfc
 //							}
                         }
                         index++;
-                    }//end m
+                      }//end m
+                    }
                 } //end if
             } //end iw
 			delete [] sk;
@@ -304,6 +450,8 @@ void WF_atomic::atomic_wfc
     }
     delete[] flq;
     delete [] gk;
+    delete [] aux;
+    delete[] chiaux;
     timer::tick("WF_atomic","atomic_wfc");
     return;
 } //end subroutine atomic_wfc
@@ -320,6 +468,13 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
             const double rr = std::rand();
             const double arg= TWO_PI * std::rand();
             Vector3<double> v3 = kv.kvec_c[ik] + pw.gcar[this->igk(ik, ig)];
+            psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+        }
+        if(NPOL==2)for (int ig = wf.npwx;ig < wf.npwx + ng;ig++)
+        {
+            const double rr = std::rand();
+            const double arg= TWO_PI * std::rand();
+            Vector3<double> v3 = kv.kvec_c[ik] + pw.gcar[this->igk(ik, ig-wf.npwx)];
             psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
         }
     }

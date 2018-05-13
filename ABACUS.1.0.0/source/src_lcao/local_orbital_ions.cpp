@@ -5,6 +5,7 @@
 #include "src_external/src_pdiag/pdiag_double.h"
 #include "src_lcao/lcao_nnr.h"
 #include "src_lcao/force_lcao.h"
+#include "src_lcao/stress_lcao.h"
 #include "src_lcao/istate_charge.h"
 #include "src_lcao/istate_envelope.h"
 #include "src_pw/vdwd2.h"
@@ -428,11 +429,6 @@ bool Local_Orbital_Ions::force_stress(void)
     }
 	timer::tick("Local_Orbital_Ions","force_stress",'D');
 
-    if(STRESS)
-    {
-//        Stress ss;
-  //      ss.init();
-    }
 
 
 	//return 0;
@@ -443,6 +439,11 @@ bool Local_Orbital_Ions::force_stress(void)
 		Force_LCAO FL; // init the class.
 		FL.allocate (); 
 		FL.start_force();
+
+		if(STRESS)
+		{
+			FL.cal_stress();
+		}
 
         // (2) move the ions according to
 		// the algorithms of molecular dynamics.

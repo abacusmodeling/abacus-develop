@@ -78,11 +78,12 @@ void kvect::set(
 
 	ofs_running << "\n SETUP K-POINTS" << endl;
 
-    // (1) set nspin, read kpoints.
-    this->nspin = nspin_in;
+	// (1) set nspin, read kpoints.
+	this->nspin = nspin_in;
 	OUT(ofs_running,"nspin",nspin);
+	if(this->nspin==4) this->nspin = 1;//zhengdy-soc
 		
-    bool read_succesfully = this->read_kpoints(k_file_name);
+	bool read_succesfully = this->read_kpoints(k_file_name);
 #ifdef __MPI
 	Parallel_Common::bcast_bool(read_succesfully);
 #endif
@@ -107,13 +108,13 @@ void kvect::set(
 	{
 		deg = 2;
 	}
-	else if(NSPIN == 2)
+	else if(NSPIN == 2||NSPIN==4)
 	{
 		deg = 1;
 	}
 	else
 	{
-        WARNING_QUIT("kvect::set", "Only available for nspin = 1 or 2");
+        WARNING_QUIT("kvect::set", "Only available for nspin = 1 or 2 or 4");
     }
 	this->normalize_wk(deg);
 
@@ -921,6 +922,14 @@ void kvect::set_kup_and_kdw(void)
 
 		OUT(ofs_running,"nks(nspin=2)",nks);
 		OUT(ofs_running,"nkstot(nspin=2)",nkstot);
+        break;
+    case 4:
+
+        for (int ik = 0; ik < nks; ik++)
+        {
+            this->isk[ik] = 0;
+        }
+
         break;
     }
 

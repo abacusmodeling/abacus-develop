@@ -828,7 +828,7 @@ void energy::perform_dos(void)
 				ofsi << endl;
 			}*/
                         // pengfei 2015-4-1
-                        if(NSPIN == 1)
+                        if(NSPIN == 1||NSPIN == 4)
                         { 
                             for (int ik = 0;ik < kv.nks;ik++)
                             {                       
@@ -860,6 +860,8 @@ void energy::perform_dos(void)
 		}
 	}
 
+	int nspin0=1;
+	if(NSPIN==2) nspin0=2;
 
 	if(this->out_dos)
 	{
@@ -889,7 +891,7 @@ void energy::perform_dos(void)
 //		OUT(ofs_running,"maximal energy is (eV)", emax);
 
 		// output the DOS file.
-		for(int is=0; is<NSPIN; ++is)
+		for(int is=0; is<nspin0; ++is)
 		{
 			stringstream ss;
 			ss << global_out_dir << "DOS" << is+1;
@@ -1004,19 +1006,19 @@ void energy::perform_dos(void)
 			Dos::calculate_Mulliken(sp.str());
 		}
 	
-		if(NSPIN==1)
+		if(nspin0==1)
 		{
 			ofs_running << " Fermi energy is " << this->ef << " Rydberg" << endl;
 		}
-		else if(NSPIN==2)
+		else if(nspin0==2)
 		{
 			ofs_running << " Fermi energy (spin = 1) is " << this->ef_up << " Rydberg" << endl;
 			ofs_running << " Fermi energy (spin = 2) is " << this->ef_dw << " Rydberg" << endl;
 		}
 
 		int nks;
-		if(NSPIN==1) nks = kv.nkstot;
-		else if(NSPIN==2) nks = kv.nkstot/2;
+		if(nspin0==1) nks = kv.nkstot;
+		else if(nspin0==2) nks = kv.nkstot/2;
 
 
 
@@ -1030,7 +1032,7 @@ void energy::perform_dos(void)
 		
 		if(out_dos==3)
 		{
-			for(int i=0; i<NSPIN; i++)
+			for(int i=0; i<nspin0; i++)
 			{
 				stringstream ss3;
 				ss3 << global_out_dir << "Fermi_Surface_" << i << ".bxsf";
@@ -1042,12 +1044,12 @@ void energy::perform_dos(void)
         {
 
                 int nks;
-                if(NSPIN==1) nks = kv.nkstot;
-                else if(NSPIN==2) nks = kv.nkstot/2;
+                if(nspin0==1) nks = kv.nkstot;
+                else if(nspin0==2) nks = kv.nkstot/2;
 
 
 
-                for(int is=0; is<NSPIN; is++)
+                for(int is=0; is<nspin0; is++)
                 {
                         stringstream ss2;
                         ss2 << global_out_dir << "BANDS_" << is+1 << ".dat";

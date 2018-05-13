@@ -418,21 +418,21 @@ bool electrons::check_stop_now(void)
 
 void electrons::c_bands(void)
 {
-    if (test_elec) TITLE("electrons","c_bands");
+	if (test_elec) TITLE("electrons","c_bands");
 	timer::tick("electrons","c_bands",'E');
 
-    int precondition_type = 2;
+	int precondition_type = 2;
 
-    double *h_diag = new double[wf.npwx];
-	ZEROS(h_diag, wf.npwx);
+	double *h_diag = new double[wf.npwx * NPOL];//added by zhengdy-soc
+	ZEROS(h_diag, wf.npwx * NPOL);
     
 	avg_iter = 0.0;
        
 	ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
 	ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
-    for (int ik = 0;ik < kv.nks;ik++)
-    {
-        hm.init_k(ik);
+	for (int ik = 0;ik < kv.nks;ik++)
+	{
+		hm.init_k(ik);
 
 		if(DFT_FUNCTIONAL == "PBE0")
 		{
@@ -448,47 +448,58 @@ void electrons::c_bands(void)
         {
             for (int ig = 0;ig < wf.npw; ig++)
 			{
-                h_diag[ig] = max(1.0, wf.g2kin[ig]); // pwscf-2.1.2
+				h_diag[ig] = max(1.0, wf.g2kin[ig]); // pwscf-2.1.2
+				if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
 			}
         }
         else if (precondition_type==2)
         {
             for (int ig = 0;ig < wf.npw; ig++)
 			{
-                h_diag[ig] = 1 + wf.g2kin[ig] + sqrt( 1 + (wf.g2kin[ig] - 1) * (wf.g2kin[ig] - 1));
+				h_diag[ig] = 1 + wf.g2kin[ig] + sqrt( 1 + (wf.g2kin[ig] - 1) * (wf.g2kin[ig] - 1));
+				if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
 			}
         }
+	//h_diag can't be zero!  //zhengdy-soc
+	if(NPOL==2)
+	{
+		for(int ig = wf.npw;ig < wf.npwx; ig++)
+		{
+			h_diag[ig] = 1.0;
+			h_diag[ig+ wf.npwx] = 1.0;
+		}
+	}
 
-        clock_t start=clock();
+	clock_t start=clock();
 
-        //============================================================
-        // diago the hamiltonian!!
-        // In plane wave method, firstly using cinitcgg to diagnolize,
-        // then using cg method.
-        //
-        // In localized orbital presented in plane wave case,
-        // only using cinitcgg.
-        //
-        // In linear scaling method, using sparse matrix and
-        // adjacent searching code and cg method to calculate the
-        // eigenstates.
-        //=============================================================
-		double avg_iter_k = 0.0;
+	//============================================================
+	// diago the hamiltonian!!
+	// In plane wave method, firstly using cinitcgg to diagnolize,
+	// then using cg method.
+	//
+	// In localized orbital presented in plane wave case,
+	// only using cinitcgg.
+	//
+	// In linear scaling method, using sparse matrix and
+	// adjacent searching code and cg method to calculate the
+	// eigenstates.
+	//=============================================================
+	double avg_iter_k = 0.0;
         hm.diago(this->istep, this->iter, ik, h_diag, avg_iter_k);
 
 
 
-		avg_iter += avg_iter_k;
+	avg_iter += avg_iter_k;
 
-		en.print_band(ik); //mohan add 2012-04-16
+	en.print_band(ik); //mohan add 2012-04-16
 
         clock_t finish=clock();
         const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
 
-		ofs_running << " " << setw(8) 
-			<< ik+1 << setw(15) 
-			<< avg_iter_k << setw(15) << duration << endl;
+	ofs_running << " " << setw(8) 
+		<< ik+1 << setw(15) 
+		<< avg_iter_k << setw(15) << duration << endl;
     }//End K Loop
 
 	

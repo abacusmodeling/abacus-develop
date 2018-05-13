@@ -45,9 +45,11 @@ public:
 	matrix nhtoj;		// new added
 
 	realArray dvan;		//(:,:,:),  the D functions of the solid
+	ComplexArray dvan_so;	//(:,:,:),  spin-orbit case,  added by zhengdy-soc
 	realArray tab;		//(:,:,:), interpolation table for PPs
 	realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
 	realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
+	ComplexArray deeq_nc;	//(:,:,:,:), the spin-orbit case
 	realArray becsum;	//(:,:,:,:), \sum_i  f(i) <psi(i)/beta_1><beta_m/psi(i)> //used in charge
 //	realArray qq;		//(:,:,:), the q functions in the solid
 

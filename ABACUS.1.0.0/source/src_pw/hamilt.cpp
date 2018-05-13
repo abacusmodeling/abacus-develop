@@ -127,10 +127,15 @@ void Hamilt::diago(
                 }
                 Diago_CG cg;
     	
-				bool reorder = true;	
-	            cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
-                        NBANDS, precondition, ETHR,
-                        DIAGO_CG_MAXITER, reorder, notconv, avg);
+				bool reorder = true;
+				if(NPOL==1) cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
+						NBANDS, precondition, ETHR,
+						DIAGO_CG_MAXITER, reorder, notconv, avg);
+				else{
+					cg.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL,
+						NBANDS, precondition, ETHR,
+						DIAGO_CG_MAXITER, reorder, notconv, avg);
+				}
 				// P.S. : nscf is the flag about reorder.
 				// if cinitcgg is done once,
 				// we don't need to reorder the eigenvectors order.
@@ -140,10 +145,15 @@ void Hamilt::diago(
             //else if ( DIAGO_TYPE=="dav" ) xiaohui modify 2013-09-02
 	    else if(KS_SOLVER=="dav") //xiaohui add 2013-09-02
             {
-                Diago_David david;
-                david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
-                           NBANDS, precondition, DIAGO_DAVID_NDIM,
-                           ETHR, DIAGO_CG_MAXITER, notconv, avg);
+		Diago_David david;
+		if(NPOL==1) david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
+				NBANDS, precondition, DIAGO_DAVID_NDIM,
+				ETHR, DIAGO_CG_MAXITER, notconv, avg);
+		else{
+			david.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL,
+				NBANDS, precondition, DIAGO_DAVID_NDIM,
+				ETHR, DIAGO_CG_MAXITER, notconv, avg);
+		}
             }
             else
             {

@@ -69,22 +69,23 @@ void wavefunc::init(const int nks)
 		done_once = true;
 	}
 
-    TITLE("wavefunc","init");
-    this->npwx = this->setupIndGk(pw, nks);
+	TITLE("wavefunc","init");
+	this->npwx = this->setupIndGk(pw, nks);
 	OUT(ofs_running,"npwx",npwx);
 
-    assert(npwx > 0);
-    assert(nks > 0);
-    assert(NBANDS > 0);
+	assert(npwx > 0);
+	assert(nks > 0);
+	assert(NBANDS > 0);
 
-    delete[] g2kin;
-    this->g2kin = new double[npwx];   // [npw],kinetic energy
-    ZEROS(g2kin, npwx);
-    Memory::record("wavefunc","g2kin",npwx,"double");
+	delete[] g2kin;
+	this->g2kin = new double[npwx];   // [npw],kinetic energy
+	ZEROS(g2kin, npwx);
+	Memory::record("wavefunc","g2kin",npwx,"double");
 	if(test_wf)OUT(ofs_running,"g2kin allocation","Done");
 
-    // if use spin orbital, double nks to allocate evc and wanf2.
-    int prefactor = 1;
+	// if use spin orbital, do not double nks but double allocate evc and wanf2.
+	int prefactor = 1;
+	if(NONCOLIN) prefactor = NPOL;//added by zhengdy-soc
 	
 	this->ekb = new double*[nks];
 	for(int ik=0; ik<nks; ik++)
@@ -94,17 +95,17 @@ void wavefunc::init(const int nks)
 	}
 	this->allocate_ekb = true;
 	
-    this->wg.create(nks, NBANDS);	// the weight of each k point and band
-    Memory::record("wavefunc","et",nks*NBANDS,"double");
-    Memory::record("wavefunc","wg",nks*NBANDS,"double");
+	this->wg.create(nks, NBANDS);	// the weight of each k point and band
+	Memory::record("wavefunc","et",nks*NBANDS,"double");
+	Memory::record("wavefunc","wg",nks*NBANDS,"double");
 	if(test_wf)OUT(ofs_running, "et allocation","Done"); 
 	if(test_wf)OUT(ofs_running, "wg allocation","Done");
 
-    delete[] evc;
-    delete[] wanf2;
+	delete[] evc;
+	delete[] wanf2;
 
-    const int nks2 = nks * prefactor;
-    
+	const int nks2 = nks;
+
 	if(CALCULATION=="nscf" && wf.mem_saver==1)
 	{
 		// mohan add 2010-09-07
@@ -112,41 +113,41 @@ void wavefunc::init(const int nks)
 		this->evc = new ComplexMatrix[1];
 		this->wanf2 = new ComplexMatrix[1];
 		
-		evc[0].create(NBANDS*prefactor, npwx);	
+		evc[0].create(NBANDS, npwx * NPOL);//added by zhengdy-soc	
 #ifdef __FP
 		//if(LOCAL_BASIS && LINEAR_SCALING==0) xiaohui modify 2013-09-02
 		if(BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
 		{
-			wanf2[0].create(NLOCAL*prefactor, npwx);
-    		cout << " Memory for wanf2 (MB): " << 
-			Memory::record("wavefunc","wanf2",(NLOCAL*prefactor)*npwx,"complexmatrix") << endl;
+			wanf2[0].create(NLOCAL, npwx * NPOL);
+			cout << " Memory for wanf2 (MB): " << 
+				Memory::record("wavefunc","wanf2",NLOCAL*(prefactor*npwx),"complexmatrix") << endl;
 		}
 #endif	
-    	cout << " MEMORY FOR PSI (MB)  : " << 
-		Memory::record("wavefunc","evc",(NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+		cout << " MEMORY FOR PSI (MB)  : " << 
+			Memory::record("wavefunc","evc",NBANDS*(prefactor*npwx),"complexmatrix") << endl;
 	}
 	else
 	{
 		this->evc = new ComplexMatrix [nks2];
-    	this->wanf2 = new ComplexMatrix [nks2];
+		this->wanf2 = new ComplexMatrix [nks2];
 
-    	for (int ik = 0; ik < nks2; ik++)
-    	{
-        	this->evc[ik].create(NBANDS*prefactor, npwx);
+		for (int ik = 0; ik < nks2; ik++)
+		{
+			this->evc[ik].create(NBANDS, npwx * NPOL);//added by zhengdy-soc
 
 			//Mohan add 2010-1-10
 #ifdef __FP
-	    //xiaohui add 2013 -08-01 
-    	    //if (LOCAL_BASIS || winput::out_spillage==2) xiaohui modify 2013-09-02
-	    if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2) //xiaohui add 2013-09-02
-	    {
-		this->wanf2[ik].create(NLOCAL, npwx);
-	    }
+			//xiaohui add 2013 -08-01 
+			//if (LOCAL_BASIS || winput::out_spillage==2) xiaohui modify 2013-09-02
+			if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2) //xiaohui add 2013-09-02
+			{
+				this->wanf2[ik].create(NLOCAL, npwx * NPOL);//added by zhengdy-soc
+			}
 #endif	
-    	};
+		};
 
-    	cout << " MEMORY FOR PSI (MB)  : " << 
-		Memory::record("wavefunc","evc",(nks*prefactor)*(NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+		cout << " MEMORY FOR PSI (MB)  : " << 
+		Memory::record("wavefunc","evc",nks2*NBANDS*(prefactor*npwx),"complexmatrix") << endl;
 	}
 
 	if(test_wf)
@@ -158,8 +159,8 @@ void wavefunc::init(const int nks)
 			OUT(ofs_running,"wanf2 allocation","Done");
 		}
 	}
-    //showMemStats();
-    return;
+	//showMemStats();
+	return;
 }
 
 //===================================================================
@@ -316,9 +317,9 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	TITLE("wavefunc","diago_PAO_in_pw_k2");
 	// (6) Prepare for atmoic orbitals or random orbitals
 	const int starting_nw = this->get_starting_nw();
-    assert(starting_nw > 0);
+	assert(starting_nw > 0);
 
-	ComplexMatrix wfcatom(starting_nw, npwx);
+	ComplexMatrix wfcatom(starting_nw, npwx * NPOL);//added by zhengdy-soc
 	if(test_wf)OUT(ofs_running, "starting_nw", starting_nw);
 	if(start_wfc=="atomic")
 	{
@@ -357,9 +358,15 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 		for (int ig=0; ig<this->npwx; ig++)
 		{
 			wvf(ib, ig) = wfcatom(ib, ig);
+			if(NPOL==2) wvf(ib,ig + this->npwx) = wfcatom(ib,ig + this->npwx);
 		}
 	}
 
+	//added by zhengdy-soc
+	for(int i = 0;i<starting_nw;i++)
+	{
+		ekb[ik][i] = etatom[i];
+	}
 	delete[] etatom;
 }
 
@@ -407,7 +414,6 @@ void wavefunc::wfcinit_k(void)
 			this->diago_PAO_in_pw_k(ik, wf.evc[ik]);
 		}
 	}
-	
 	//---------------------------------------------------
 	//  calculte the overlap <i,0 | e^{i(q+G)r} | j,R>
 	//---------------------------------------------------

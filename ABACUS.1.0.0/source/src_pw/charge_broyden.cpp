@@ -82,7 +82,7 @@ void Charge_Broyden::mix_rho
     }
 
 	NOTE("Calculate the norm of the Residual vector: < R[rho] | R[rho_save] >");
-    dr2 = this->rhog_dot_product( this->rhog[0], this->rhog[1], this->rhog[0], this->rhog[1]);
+    dr2 = this->rhog_dot_product( this->rhog, this->rhog);
 	if(test_charge)ofs_running << " dr2 from rhog_dot_product is " << dr2 << endl;
 
 	// dr2 calculated from real space.

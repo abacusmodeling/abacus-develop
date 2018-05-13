@@ -58,6 +58,11 @@ public:
 	matrix dion;		// nl_4  //dion(nbeta,nbeta)
 						         //the D_ij factors (Ry^{-1}) of the nonlocal PP:
 						         //V_NL = \sum_{i,j} D_{i,j} |\beta_i><\beta_j|
+	//added by zhengdy-soc
+	int *nn;                // nn(nwfc) quantum number of wfc
+	double *jchi;           // jchi(nwfc) j=l+1/2 or l-1/2 of wfc
+	double *jjj;            // jjj(nbeta) j=l+1/2 or l-1/2 of beta
+
 	int  nd; 			// nl_5 // Number of nonzero Dij
 //	int  nqf;			// nl_6 // Number of expansion coefficients for q_{ij} (may be zero)
 //	int  nqlc;			// nl_7 // 2 * lmax  + 1
@@ -101,6 +106,7 @@ private:
 	void read_pseudo_pswfc(ifstream &ifs);
 	void read_pseudo_rhoatom(ifstream &ifs);
 	void read_pseudo_addinfo(ifstream &ifs);
+	void read_pseudo_so(ifstream &ifs);
         //string get_string( char ss[]);
         //int get_int( char ss[]);
         //double get_double( char ss[]);

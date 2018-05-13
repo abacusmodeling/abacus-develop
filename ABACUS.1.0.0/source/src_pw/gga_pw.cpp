@@ -8,10 +8,10 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 {
 	TITLE("GGA::gradcorr");
 	
-    if (xcf.igcx_now == 0  &&  xcf.igcc_now == 0)
-    {
-        return;
-    }
+	if (xcf.igcx_now == 0  &&  xcf.igcc_now == 0)
+	{
+		return;
+	}
 
 	bool igcc_is_lyp = false;
 	if( xcf.igcc_now == 3 || xcf.igcc_now == 7)
@@ -19,8 +19,16 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		igcc_is_lyp = true;
 	}
 
-	assert(NSPIN>0);
-	const double fac = 1.0/ NSPIN;
+	int nspin0 = NSPIN;
+	if(NSPIN==4) nspin0 =1;
+	if(NSPIN==4&&DOMAG) nspin0 = 2;
+	if(NSPIN==4)
+	{
+		if(xcf.igcx != 0  ||  xcf.igcc != 0) soc.cal_ux(ucell.ntype);
+	}
+
+	assert(nspin0>0);
+	const double fac = 1.0/ nspin0;
 
 	// doing FFT to get rho in G space: rhog1 
     chr.set_rhog(chr.rho[0], chr.rhog[0]);
@@ -40,6 +48,9 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	Vector3<double>* gdr2;
 	Vector3<double>* h1;
 	Vector3<double>* h2;
+	double* neg;
+	double** vsave;
+	double** vgg;
 	
 	// for spin unpolarized case, 
 	// calculate the gradient of (rho_core+rho) in reciprocal space.
@@ -70,6 +81,50 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		h2 = new Vector3<double>[pw.nrxx];
 		
 		GGA_PW::grad_rho( rhogsum2 , gdr2 );
+	}
+
+	if(NSPIN == 4&&DOMAG)
+	{
+		ZEROS(rhotmp1, pw.nrxx);
+		ZEROS(rhogsum1, pw.ngmc);
+		rhotmp2 = new double[pw.nrxx];
+		ZEROS(rhotmp2, pw.nrxx);
+ 		neg = new double [pw.nrxx];
+		ZEROS(neg, pw.nrxx);
+		vsave = new double* [NSPIN];
+		for(int is = 0;is<NSPIN;is++) {
+			vsave[is]= new double [pw.nrxx];
+			for(int ir =0;ir<pw.nrxx;ir++){
+				vsave[is][ir] = v(is,ir);
+				v(is,ir) = 0;
+			}
+		}
+		vgg = new double* [nspin0];
+		for(int is = 0;is<nspin0;is++)vgg[is] = new double[pw.nrxx];
+
+		noncolin_rho(rhotmp1,rhotmp2,neg);
+
+		rhogsum2 = new complex<double>[pw.ngmc];
+		ZEROS(rhogsum2, pw.ngmc);
+		chr.set_rhog(rhotmp1, rhogsum1);
+		chr.set_rhog(rhotmp2, rhogsum2);
+		for(int ir=0; ir<pw.nrxx; ir++)
+		{
+			rhotmp2[ir] += fac * chr.rho_core[ir];
+			rhotmp1[ir] += fac * chr.rho_core[ir];
+		}
+		for(int ig=0; ig<pw.ngmc; ig++)
+		{
+			rhogsum2[ig] += fac * chr.rhog_core[ig];
+			rhogsum1[ig] += fac * chr.rhog_core[ig];
+		}
+
+		gdr2 = new Vector3<double>[pw.nrxx];
+		h2 = new Vector3<double>[pw.nrxx];
+
+		GGA_PW::grad_rho( rhogsum1 , gdr1 );
+		GGA_PW::grad_rho( rhogsum2 , gdr2 );
+
 	}
 
 	// for test
@@ -115,7 +170,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	double vtxcgc = 0.0;
 	double etxcgc = 0.0;
 
-	if(NSPIN==1)
+	if(nspin0==1)
 	{
 		double segno;
 		for(int ir=0; ir<pw.nrxx; ir++)
@@ -145,7 +200,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 				}
 			} // end arho > epsr
 		}
-	}// end NSPIN == 1
+	}// end nspin0 == 1
 	else // spin polarized case
 	{
 		double v1cup = 0.0;
@@ -176,7 +231,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 				else
 				{
 					double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
-//					if(nspin==4)
+					if(NSPIN==4&&DOMAG) zeta = fabs(zeta) * neg[ir];
 					const double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
 					//XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
 					gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
@@ -220,7 +275,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	//cout << "\n etxcgc=" << etxcgc << endl;
 
 	for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] -= fac * chr.rho_core[ir];
-	if(NSPIN==2) for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] -= fac * chr.rho_core[ir];
+	if(nspin0==2) for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] -= fac * chr.rho_core[ir];
 	
 	// second term of the gradient correction :
 	// \sum_alpha (D / D r_alpha) ( D(rho*Exc)/D(grad_alpha rho) )
@@ -228,7 +283,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	// dh is in real sapce.
 	double* dh = new double[pw.nrxx];
 
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<nspin0; is++)
 	{
 		ZEROS(dh, pw.nrxx);
 		if(is==0)GGA_PW::grad_dot(h1,dh);
@@ -253,6 +308,28 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 
 	vtxc += vtxcgc;
 	etxc += etxcgc;
+
+	if(NSPIN == 4 && DOMAG)
+	{
+		for(int is=0;is<NSPIN;is++)
+		{
+			for(int ir=0;ir<pw.nrxx;ir++)
+			{
+				if(is<nspin0) vgg[is][ir] = v(is,ir);
+				v(is,ir) = vsave[is][ir];
+			}
+		}
+		for(int ir=0;ir<pw.nrxx;ir++)
+		{
+			v(0,ir) += 0.5 * (vgg[0][ir] + vgg[1][ir]);
+			double amag = sqrt(pow(chr.rho[1][ir],2)+pow(chr.rho[2][ir],2)+pow(chr.rho[3][ir],2));
+			if(amag>1e-12)
+			{
+				for(int i=1;i<4;i++)
+					v(i,ir)+= neg[ir] * 0.5 *(vgg[0][ir]-vgg[1][ir])*chr.rho[i][ir]/amag;
+			}
+		}
+	}
 	
 	// deacllocate
 	delete[] rhotmp1;
@@ -262,6 +339,18 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 
 	if(NSPIN==2)
 	{
+		delete[] rhotmp2;
+		delete[] rhogsum2;
+		delete[] gdr2;
+		delete[] h2;
+	}
+	if(NSPIN == 4 && DOMAG)
+	{
+		delete[] neg;
+		for(int i=0; i<nspin0; i++) delete[] vgg[i];
+		delete[] vgg;
+		for(int i=0; i<NSPIN; i++) delete[] vsave[i];
+		delete[] vsave;
 		delete[] rhotmp2;
 		delete[] rhogsum2;
 		delete[] gdr2;
@@ -359,3 +448,29 @@ void GGA_PW::grad_dot(const Vector3<double> *h, double *dh)
 	delete[] gaux; //mohan fix 2012-04-02
 	return;
 }
+
+void GGA_PW::noncolin_rho(double *rhoout1,double *rhoout2, double *neg)
+{
+	//this function diagonalizes the spin density matrix and gives as output the
+	//spin up and spin down components of the charge.
+	//If lsign is true up and dw are with respect to the fixed quantization axis 
+	//ux, otherwise rho + |m| is always rhoup and rho-|m| is always rhodw.
+	double amag=0;
+	for(int ir = 0;ir<pw.nrxx;ir++) neg[ir] = 1.0;
+	if(soc.lsign)
+	{
+		for(int ir = 0;ir<pw.nrxx;ir++)
+		{
+			if(chr.rho[1][ir]*soc.ux[0] + chr.rho[2][ir]*soc.ux[1] + chr.rho[3][ir]*soc.ux[2]>0) neg[ir] = 1.0;
+			else neg[ir] = -1.0;
+		}
+	}
+	for(int ir = 0;ir<pw.nrxx;ir++)
+	{
+		amag = sqrt(pow(chr.rho[1][ir],2)+pow(chr.rho[2][ir],2)+pow(chr.rho[3][ir],2));
+		rhoout1[ir] = 0.5 * (chr.rho[0][ir] + neg[ir] * amag);
+		rhoout2[ir] = 0.5 * (chr.rho[0][ir] - neg[ir] * amag);
+	}
+	return;
+}
+

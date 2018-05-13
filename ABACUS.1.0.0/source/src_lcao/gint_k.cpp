@@ -349,7 +349,253 @@ void Gint_k::folding_force(double** fvl_dphi,
 	return;
 }
 
+// fold the <phi | vl * R_beta|dphi(R_alpha)> * DM(R) to 
+// calculate the stress.
+void Gint_k::folding_stress(double** fvl_dphi, double svl_dphi[][3],
+	double* pvdpx, double* pvdpy, double* pvdpz,
+	double* pvdp11, double* pvdp22, double* pvdp33,double* pvdp12, double* pvdp13, double* pvdp23)
+{
+	TITLE("Gint_k","folding_stress");
+	timer::tick("Gint_k","folding_stress");
 
+	const int lgd = GridT.lgd;
+
+	double** ppx;
+	double** ppy;
+	double** ppz;
+
+	double** pp11;
+	double** pp22;
+	double** pp33;
+	double** pp12;
+	double** pp13;
+	double** pp23;
+
+	double r0[3],rt[3];
+
+	if(GridT.lgd>0)
+	{
+		ppx = new double*[lgd];
+		ppy = new double*[lgd];
+		ppz = new double*[lgd];
+
+		pp11 = new double*[lgd];
+		pp22 = new double*[lgd];
+		pp33 = new double*[lgd];
+		pp12 = new double*[lgd];
+		pp13 = new double*[lgd];
+		pp23 = new double*[lgd];
+
+		for(int i=0; i<lgd; i++)
+		{
+			ppx[i] = new double[lgd];
+			ppy[i] = new double[lgd];
+			ppz[i] = new double[lgd];
+			ZEROS( ppx[i], lgd);
+			ZEROS( ppy[i], lgd);
+			ZEROS( ppz[i], lgd);
+
+			pp11[i] = new double[lgd];
+			pp22[i] = new double[lgd];
+			pp33[i] = new double[lgd];
+			ZEROS( pp11[i], lgd);
+			ZEROS( pp22[i], lgd);
+			ZEROS( pp33[i], lgd);
+			pp12[i] = new double[lgd];
+			pp13[i] = new double[lgd];
+			pp23[i] = new double[lgd];
+			ZEROS( pp12[i], lgd);
+			ZEROS( pp13[i], lgd);
+			ZEROS( pp23[i], lgd);
+
+		}
+	}
+	Vector3<double> tau1, dtau;
+	for(int T1=0; T1<ucell.ntype; ++T1)
+	{
+		const Atom* atom1 = &ucell.atoms[T1];
+                
+		for (int I1 =0; I1< atom1->na; ++I1)
+		{
+			const int iat = ucell.itia2iat(T1,I1);
+			if(GridT.in_this_processor[iat])
+			{
+				assert( lgd > 0 );
+
+				const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+				// get the start positions of elements.
+				const int DM_start = LNNR.nlocstartg[iat];
+				// get the coordinates of adjacent atoms.
+				tau1 = atom1->tau[I1];
+				GridD.Find_atom(tau1);
+				// search for the adjacent atoms.
+				int nad = 0;
+				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+				{
+					// get iat2
+					const int T2 = GridD.getType(ad);
+					const int I2 = GridD.getNatom(ad);
+
+					const Vector3<double> tau2 = GridD.getAdjacentTau(ad);
+					const int iat2 = ucell.itia2iat(T2, I2);
+					if(GridT.in_this_processor[iat2])
+					{
+						Atom* atom2 = &ucell.atoms[T2];
+						dtau = GridD.getAdjacentTau(ad) - tau1;
+						double distance = dtau.norm() * ucell.lat0;
+						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+						if(distance < rcut)
+						{
+							const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+							int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+							for(int iw=0; iw<atom1->nw; iw++)
+							{
+								const int iw_all = start1+iw;
+								const int iw_local = GridT.trace_lo[iw_all];
+								// iw1_lo
+								double *vijx = ppx[iw_local];
+								double *vijy = ppy[iw_local];
+								double *vijz = ppz[iw_local];
+
+								double *vij11 = pp11[iw_local];
+								double *vij22 = pp22[iw_local];
+								double *vij33 = pp33[iw_local];
+								double *vij12 = pp12[iw_local];
+								double *vij13 = pp13[iw_local];
+								double *vij23 = pp23[iw_local];
+
+								//just fold R to normal matrix.
+								double *vRx = &pvdpx[ixxx];
+								double *vRy = &pvdpy[ixxx];
+								double *vRz = &pvdpz[ixxx];
+
+								double *vR11 = &pvdp11[ixxx]; 
+								double *vR22 = &pvdp22[ixxx];
+								double *vR33 = &pvdp33[ixxx];
+								double *vR12 = &pvdp12[ixxx]; 
+								double *vR13 = &pvdp13[ixxx];
+								double *vR23 = &pvdp23[ixxx];
+
+
+								int* iw2_lo = &GridT.trace_lo[start2];
+								int* iw2_end = iw2_lo + atom2->nw;
+
+								for(; iw2_lo<iw2_end; ++iw2_lo, ++vRx, ++vRy, ++vRz,++vR11, 
+									++vR22,++vR33,++vR12,++vR13,++vR23)
+								{
+									vijx[iw2_lo[0]] += vRx[0];
+									vijy[iw2_lo[0]] += vRy[0];
+									vijz[iw2_lo[0]] += vRz[0];
+
+									vij11[iw2_lo[0]] += vR11[0];
+									vij22[iw2_lo[0]] += vR22[0];
+									vij33[iw2_lo[0]] += vR33[0];
+									vij12[iw2_lo[0]] += vR12[0];
+									vij13[iw2_lo[0]] += vR13[0];
+									vij23[iw2_lo[0]] += vR23[0];
+
+								}
+								ixxx += atom2->nw;
+							}
+							++nad;
+						}//end distance<rcut
+					}
+				}//end ad
+			}
+		}//end ia
+	}//end it
+
+	double* tmp = new double[NLOCAL*3];
+	double* tmp1 = new double[NLOCAL*6];
+	for(int i=0; i<NLOCAL; ++i)
+	{
+		ZEROS(tmp, 3*NLOCAL);
+		ZEROS(tmp1, 6*NLOCAL);
+		const int mug = GridT.trace_lo[i];
+		// if the row element is on this processor
+		if(mug>=0)
+		{
+			//ofs_running << " i=" << i << " mug=" << mug << endl;
+			for(int j=0; j<NLOCAL; ++j)
+			{
+				const int nug = GridT.trace_lo[j];
+				// if the col element is on this process or
+				if(nug>=0)
+				{
+						const int index = 3*j;
+						tmp[index] = ppx[mug][nug];
+						tmp[index+1] = ppy[mug][nug];
+						tmp[index+2] = ppz[mug][nug];
+
+						const int index1 = 6*j;
+						tmp1[index1] = pp11[mug][nug];
+						tmp1[index1+1] = pp22[mug][nug];
+						tmp1[index1+2] = pp33[mug][nug];
+						tmp1[index1+3] = pp12[mug][nug];
+						tmp1[index1+4] = pp13[mug][nug];
+						tmp1[index1+5] = pp23[mug][nug];
+
+				}
+			}
+		}
+		// collect the matrix after folding.
+		Parallel_Reduce::reduce_double_pool( tmp, NLOCAL*3 );
+		Parallel_Reduce::reduce_double_pool( tmp1, NLOCAL*6 );
+		for (int j=0; j<NLOCAL; j++)
+		{
+			if (!ParaO.in_this_processor(i,j))
+			{
+				continue;
+			}
+			const int iat = ucell.iwt2iat[i];
+			const int index = 3*j;
+			const int index1 = 6*j;
+			fvl_dphi[iat][0] += 2.0*tmp[index];
+			fvl_dphi[iat][1] += 2.0*tmp[index+1];
+			fvl_dphi[iat][2] += 2.0*tmp[index+2];
+
+			svl_dphi[0][0] -= 2.0*tmp1[index1];
+			svl_dphi[1][1] -= 2.0*tmp1[index1+1];
+			svl_dphi[2][2] -= 2.0*tmp1[index1+2];
+			svl_dphi[0][1] -= 2.0*tmp1[index1+3];
+			svl_dphi[0][2] -= 2.0*tmp1[index1+4];
+			svl_dphi[1][2] -= 2.0*tmp1[index1+5];
+		}
+	}
+	delete[] tmp;
+	delete[] tmp1;
+	if(GridT.lgd > 0)
+	{
+		//-------------------------
+		// delete the tmp matrix.
+		//-------------------------
+		for(int i=0; i<GridT.lgd; i++)
+		{
+			delete[] ppx[i];
+			delete[] ppy[i];
+			delete[] ppz[i];
+
+			delete[] pp11[i];
+			delete[] pp22[i];
+			delete[] pp33[i];
+			delete[] pp12[i];
+			delete[] pp13[i];
+			delete[] pp23[i];
+		}
+		delete[] ppx;
+		delete[] ppy;
+		delete[] ppz;
+
+		delete[] pp11;
+		delete[] pp22;
+		delete[] pp33;
+		delete[] pp12;
+		delete[] pp13;
+		delete[] pp23;
+	}
+	timer::tick("Gint_k","folding_stress");
+	return;
+}
 
 // folding the matrix for 'ik' k-point.
 // H(k)=\sum{R} H(R)exp(ikR) 

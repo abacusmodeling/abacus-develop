@@ -343,6 +343,44 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 				}
 			}
 		}
+		else if(spin_number_need==4)
+		{
+			//noncolinear case
+			if(startmag_type == 1)
+			{
+				for (int ig = 0; ig < pw.ngmc ; ig++)
+				{
+					const complex<double> swap = pw.strucFac(it, ig)* rho_lgl[pw.ig2ngg[ig]];
+					rho_g3d(0, ig) += swap ;
+					rho_g3d(1, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+					rho_g3d(2, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+					rho_g3d(3, ig) += swap * mag.start_magnetization[it] * cos(soc.angle1[it]);
+				}
+			}
+			else if(startmag_type == 2)
+			{//zdy-warning-not-available
+				complex<double> swap = ZERO;
+				complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+				for(int ia = 0;ia<atom->na;ia++)
+				{
+					for (int ig = 0; ig < pw.ngmc ; ig++)
+					{
+						const double Gtau =
+							pw.gcar[ig].x * atom->tau[ia].x
+							+ pw.gcar[ig].y * atom->tau[ia].y
+							+ pw.gcar[ig].z * atom->tau[ia].z;
+
+						swap = exp(ci_tpi * Gtau) * rho_lgl[pw.ig2ngg[ig]];
+
+						rho_g3d(0, ig) += swap;
+						rho_g3d(1, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+						rho_g3d(2, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+						rho_g3d(3, ig) += swap * atom->mag[ia] * cos(soc.angle1[it]);
+
+					}
+				}
+			}
+		}
 		else
 		{
 			WARNING_QUIT("Charge::spin_number_need"," Either 1 or 2, check SPIN number !");
@@ -646,48 +684,96 @@ void Charge::sum_band(void)
 
 void Charge::sum_band_k(void)
 {
-    TITLE("Charge","sum_band_k");
-    en.eband = 0.0;
+	TITLE("Charge","sum_band_k");
+	en.eband = 0.0;
 
-    complex<double>* porter = UFFT.porter;
+	complex<double>* porter = UFFT.porter;
+	complex<double>* porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
 
-    for (int ik = 0;ik < kv.nks;ik++)
-    {
+	for (int ik = 0;ik < kv.nks;ik++)
+	{
 		//cout << "\n ik=" << ik;
-        if (NSPIN==2) CURRENT_SPIN = kv.isk[ik];
+		if (NSPIN==2) CURRENT_SPIN = kv.isk[ik];
 		
-        //  here we compute the band energy: the sum of the eigenvalues
-        for (int ibnd = 0;ibnd < NBANDS;ibnd++)
-        {
-            en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
+		//  here we compute the band energy: the sum of the eigenvalues
+		if(NONCOLIN)
+		{
+			for (int ibnd = 0;ibnd < NBANDS;ibnd++)
+			{
+				en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
+				ZEROS( porter, pw.nrxx );
+				for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+ 				{
+					porter[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
+				}
+				pw.FFT_wfc.FFT3D(UFFT.porter, 1);
+				if(NPOL ==2)
+				{
+					ZEROS( porter1, pw.nrxx );
+					for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+					{
+						porter1[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig + wf.npwx);
+					}
+					pw.FFT_wfc.FFT3D(porter1, 1);
+				}
+				const double w1 = wf.wg(ik, ibnd) / ucell.omega;
+
+				// Increment the charge density in chr.rho for real space
+				if (w1 != 0.0)
+				{
+					for (int ir=0; ir<pw.nrxx; ir++)
+					{
+						rho[0][ir]+=w1* (norm( porter[ir])+ norm(porter1[ir]));
+					}
+				}
+				// In this case, calculate the three components of the magnetization
+				if(DOMAG){
+					if(w1 != 0.0)
+						for(int ir= 0;ir<pw.nrxx;ir++)
+						{
+							rho[1][ir] += w1 * (porter[ir].real()* porter1[ir].real()
+								+ porter[ir].imag()* porter1[ir].imag());
+							rho[2][ir] += w1 * (porter[ir].real()* porter1[ir].imag()
+								- porter1[ir].real()* porter[ir].imag());
+							rho[3][ir] += w1 * (norm(porter[ir]) - norm(porter1[ir]));
+						}
+				}
+				else for(int is= 1;is<4;is++)
+					for(int ir = 0;ir<pw.nrxx;ir++) rho[is][ir] = 0;
+			}
+		}
+		else
+		for (int ibnd = 0;ibnd < NBANDS;ibnd++)
+		{
+			en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
 			//cout << "\n ekb = " << wf.ekb[ik][ibnd] << " wg = " << wf.wg(ik, ibnd);
 
-            ZEROS( porter, pw.nrxx );
-            for (int ig = 0;ig < kv.ngk[ik] ; ig++)
-            {
-                porter[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
-            }
-            pw.FFT_wfc.FFT3D(UFFT.porter, 1);
+			ZEROS( porter, pw.nrxx );
+			for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+			{
+				porter[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
+			}
+			pw.FFT_wfc.FFT3D(UFFT.porter, 1);
 
-            const double w1 = wf.wg(ik, ibnd) / ucell.omega;
+			const double w1 = wf.wg(ik, ibnd) / ucell.omega;
 
-            if (w1 != 0.0)
-            {
-                for (int ir=0; ir<pw.nrxx; ir++) 
+			if (w1 != 0.0)
+			{
+				for (int ir=0; ir<pw.nrxx; ir++) 
 				{
 					rho[CURRENT_SPIN][ir]+=w1* norm( porter[ir] );
 				}
-            }
-        }
-    } // END DO k_loop
+			}
+		}
+	} // END DO k_loop
 
 #ifdef __MPI
-    this->rho_mpi();
+	this->rho_mpi();
     //==================================
     // Reduce all the Energy in each cpu
     //==================================
-    en.eband /= NPROC_IN_POOL;
-    Parallel_Reduce::reduce_double_all( en.eband );
+	en.eband /= NPROC_IN_POOL;
+	Parallel_Reduce::reduce_double_all( en.eband );
 #endif
 	
 	// check how many electrons on this grid.
@@ -942,7 +1028,7 @@ void Charge::write_rho(const int &is, const int &iter, const string &fn, const i
 		else
 		{
 			ofs << "\n  " << NSPIN;
-			if(NSPIN==1)
+			if(NSPIN==1 || NSPIN == 4)
 			{
 				ofs << "\n " << en.ef << " (fermi energy)";
 			}
@@ -1157,7 +1243,7 @@ bool Charge::read_rho(const int &is, const string &fn) //add by dwan
 	}
 
 	CHECK_INT(ifs, NSPIN);
-	if(NSPIN == 1)
+	if(NSPIN == 1||NSPIN == 4)
 	{
 		READ_VALUE(ifs, en.ef);
 		ofs_running << " read in fermi energy = " << en.ef << endl;

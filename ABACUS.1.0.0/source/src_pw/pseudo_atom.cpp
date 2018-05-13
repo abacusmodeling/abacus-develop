@@ -139,7 +139,7 @@ void pseudo_atom::print_pseudo_at(ofstream &ofs)
 	out.printr1_d(ofs, " rab : ", rab, mesh);
 	out.printr1_d(ofs, " rho_atc : ", rho_atc, mesh);
 	out.printr1_d(ofs, " rho_at : ", rho_at, mesh);
-//	out.printr1_d(ofs," jchi : ", jchi, nchi);
+	out.printr1_d(ofs," jchi : ", jchi, nchi);
 	out.printrm(ofs, " chi : ", chi);
 	ofs << "\n ----------------------";
 }

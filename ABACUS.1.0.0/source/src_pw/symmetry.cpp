@@ -1594,6 +1594,54 @@ void Symmetry::force_symmetry(matrix &force , double* pos)   // pengfei 2016-12-
 	return;
 }
 
+void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
+{
+	double *tot_sigma, *temp;
+	tot_sigma = new double[9];
+	temp = new double[9];
+	ZEROS(temp, 9);
+	ZEROS(tot_sigma, 9);
+
+
+	for ( int k = 0 ; k < nrotk; ++k)
+	{
+		temp[0] = gmatrix[k].e11;
+		temp[1] = gmatrix[k].e12;
+		temp[2] = gmatrix[k].e13;
+		temp[3] = gmatrix[k].e21;
+		temp[4] = gmatrix[k].e22;
+		temp[5] = gmatrix[k].e23;
+		temp[6] = gmatrix[k].e31;
+		temp[7] = gmatrix[k].e32;
+		temp[8] = gmatrix[k].e33;
+
+		for( int i=0; i<3; i++)
+		{
+			for( int j=0; j<3; j++)
+			{
+				for( int l=0; l<3; l++)
+				{
+					for( int m=0; m<3; m++)
+					{
+						tot_sigma[i * 3 +j] += sigma[l][m] * temp[i * 3 + l] * temp[j * 3 + m];
+					}
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			sigma[i][j] = tot_sigma[i *3 + j] / nrotk;
+		}
+	}
+	delete [] tot_sigma;
+	delete [] temp;
+	return;
+}
+
 void Symmetry::write()
 {
     if (test_symmetry) TITLE("Symmetry","write");

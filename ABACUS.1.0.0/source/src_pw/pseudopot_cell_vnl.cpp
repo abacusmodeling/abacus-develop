@@ -69,10 +69,12 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		indv.create(ntype, this->nhm);
 		nhtol.create(ntype, this->nhm);
 		nhtolm.create(ntype, this->nhm);
-	//	nhtoj.create(ntype, this->nhm);
+		nhtoj.create(ntype, this->nhm);
 		deeq.create(NSPIN, ucell.nat, this->nhm, this->nhm);
+		deeq_nc.create(NSPIN, ucell.nat, this->nhm, this->nhm);
 	//	qq.create(ntype, this->nhm, this->nhm);
 		dvan.create(ntype, this->nhm, this->nhm);
+		dvan_so.create(NSPIN, ntype, this->nhm, this->nhm);
 		becsum.create(NSPIN, ucell.nat, this->nhm * (this->nhm + 1) / 2);
 	}
 	else
@@ -95,11 +97,13 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	//
 	//	nbrx is defined in constant.h
 	//  max number of beta functions
-	this->tab.create(ntype, nbrx, NQX);
+	if(!NONCOLIN) this->tab.create(ntype, nbrx, NQX);
+	else this->tab.create(ntype, nbrx_nc, NQX);
 
 	// nchix is defined in constant.h
 	// nchix : max number of atomic wavefunctions per atom
-	this->tab_at.create(ntype, nchix, NQX);
+	if(!NONCOLIN) this->tab_at.create(ntype, nchix, NQX);
+	else this->tab_at.create(ntype, nchix_nc, NQX);
 
 	if(test_pp > 1)
 	{
@@ -231,6 +235,9 @@ void pseudopot_cell_vnl::init_vnl(void)
 	//   nhtoj, indv, and if the pseudopotential is of KB type we initialize
 	// the atomic D terms
 	this->dvan.zero_out();
+	this->dvan_so.zero_out();//added by zhengdy-soc
+	soc.rot_ylm(this->lmaxkb);
+	soc.fcoef.create(ucell.ntype, this->nhm, this->nhm);
 
 	for(int it=0;it<ucell.ntype;it++)
 	{
@@ -239,12 +246,12 @@ void pseudopot_cell_vnl::init_vnl(void)
 		for (int ib=0; ib<ucell.atoms[it].nbeta; ib++)
 		{
 			const int l = ucell.atoms[it].lll [ib];
-//			const int j = static_cast<int>(ucell.atoms[it].jjj [nb]);
+			const double j = ucell.atoms[it].jjj [ib];
 			for(int m=0; m<2*l+1; m++)
 			{
 				this->nhtol(it,BetaIndex) = l;
 				this->nhtolm(it,BetaIndex) = l*l + m;
-//				nhtoj(it,BetaIndex) = j;
+				this->nhtoj(it,BetaIndex) = j;
 				this->indv(it,BetaIndex) = ib;
 				++BetaIndex;
 			}
@@ -253,6 +260,53 @@ void pseudopot_cell_vnl::init_vnl(void)
 		//    From now on the only difference between KB and US pseudopotentials
 		//    is in the presence of the q and Q functions.
 		//    Here we initialize the D of the solid
+		if(ucell.atoms[it].has_so ){
+			for(int ip=0; ip<Nprojectors; ip++)
+			{
+				const int l1 = this->nhtol (it, ip);
+				const double j1 = this->nhtoj (it, ip);
+				const int m1 = this->nhtolm (it, ip) - l1* l1;
+				const int v1 = static_cast<int>( indv(it, ip ) );
+				for(int ip2=0;ip2<Nprojectors; ip2++){
+					const int l2 = this->nhtol (it, ip2);
+					const double j2 = this->nhtoj (it, ip2);
+					const int m2 = this->nhtolm (it, ip2) - l2* l2;
+					const int v2 = static_cast<int>( indv(it, ip2 ) );
+					if(l1 == l2 && fabs(j1-j2)<1e-7){
+						for(int is1=0;is1<2;is1++){
+							for(int is2=0;is2<2;is2++){
+								complex<double> coeff = complex<double>(0.0,0.0);
+								for(int m=-l1-1;m<l1+1;m++){
+									const int mi = soc.sph_ind(l1,j1,m,is1) + this->lmaxkb ;
+									const int mj = soc.sph_ind(l2,j2,m,is2) + this->lmaxkb ;
+									coeff += soc.rotylm[m1][mi] * soc.spinor(l1,j1,m,is1)*
+										conj(soc.rotylm[m2][mj])*soc.spinor(l2,j2,m,is2);
+								}
+								soc.fcoef(it,is1,is2,ip,ip2) = coeff;
+							}
+						}
+					}
+				}
+			}
+//
+//   and calculate the bare coefficients
+//
+			for(int ip = 0;ip<Nprojectors; ++ip){
+				const int ir = static_cast<int>( indv(it, ip ) );
+				for(int ip2=0; ip2<Nprojectors; ++ip2){
+					const int is = static_cast<int>( indv(it, ip2) );
+					int ijs =0;
+					for(int is1=0;is1<2;++is1){
+						for(int is2=0;is2<2;++is2){
+							this->dvan_so(ijs,it,ip,ip2) = ucell.atoms[it].dion(ir, is) * soc.fcoef(it,is1,is2,ip,ip2);
+							++ijs;
+							if(ir != is) soc.fcoef(it,is1,is2,ip,ip2) = complex<double>(0.0,0.0);
+						}
+					}
+				}
+			}
+		}
+		else
 		for (int ip=0; ip<Nprojectors; ip++)
 		{
 			for (int ip2=0; ip2<Nprojectors; ip2++)
@@ -262,7 +316,13 @@ void pseudopot_cell_vnl::init_vnl(void)
 				{
 					const int ir = static_cast<int>( indv(it, ip ) );
 					const int is = static_cast<int>( indv(it, ip2) );
-					this->dvan(it, ip, ip2) = ucell.atoms[it].dion(ir, is);
+					if(LSPINORB){
+						this->dvan_so(0,it,ip,ip2) = ucell.atoms[it].dion(ir, is);
+						this->dvan_so(3,it,ip,ip2) = ucell.atoms[it].dion(ir, is);
+					}
+					else{
+						this->dvan(it, ip, ip2) = ucell.atoms[it].dion(ir, is);
+					}
 				}
 			} 
 		} 

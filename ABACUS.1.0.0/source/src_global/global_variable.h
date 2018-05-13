@@ -55,6 +55,12 @@ extern bool		SEARCH_PBC;			// 11.2 // mohan add 2011-03-10
 extern bool		SPARSE_MATRIX;		// 11.3 // mohan add 2009-03-13
 extern int 		ATOM_DISTRIBUTION;	// 11.4 // mohan add 2010-06-28
 
+//added by zhengdy-soc
+extern bool     NONCOLIN;
+extern bool     LSPINORB;
+extern bool     DOMAG;
+extern int      NPOL;
+
 // diagonalization (5)
 //extern string 	DIAGO_TYPE; xiaohui modify 2013-09-01			// 12 "cg","davidson","fs","hpseps"
 extern int		DIAGO_PROC;			// 12.1 number of processors used to diag.

@@ -381,7 +381,7 @@ void potential::v_xc
             } // endif
         } //enddo
     }
-    else
+    else if(NSPIN == 2)
     {
         // spin-polarized case
         neg [0] = 0;
@@ -435,7 +435,55 @@ void potential::v_xc
         } //   enddo
         if (test_potential>0) cout<<"\n End calculate Exc(r) and Vxc(r) with SPIN == 2";
 
-    } // endif
+    } // nspin 2
+	else if(NSPIN == 4)//noncollinear case added by zhengdy
+	{
+		for( ir = 0;ir<pw.nrxx; ir++)
+		{
+			double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
+
+			rhox = rho_in[0][ir] + chr.rho_core[ir];
+
+			if ( rho_in[0][ir] < 0.0 )  neg[0] -= rho_in[0][ir];
+
+			arhox = abs( rhox );
+
+			if ( arhox > vanishing_charge )
+			{
+				zeta = amag / arhox;
+
+				if ( abs( zeta ) > 1.0 )
+				{
+
+					neg[1] += 1.0 / ucell.omega;
+
+					zeta = (zeta > 0.0) ? 1.0 : (-1.0);
+
+				}//end if
+
+				XC_Functional::xc_spin( arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1] );
+
+				double vs = 0.5 * ( vx[0] + vc[0] - vx[1] - vc[1] );
+
+				v(0, ir) = e2*( 0.5 * ( vx[0] + vc[0] + vx[1] + vc[1] ) );
+
+				if ( amag > vanishing_charge )
+				{
+					for(int ipol = 1;ipol< 4;ipol++)
+					{
+						v(ipol, ir) = e2 * vs * rho_in[ipol][ir] / amag;
+
+						vtxc += v(ipol,ir) * rho_in[ipol][ir];
+
+					}//end do
+
+				}//end if
+
+				etxc += e2 * ( ex + ec ) * rhox;
+				vtxc += v(0,ir) * rho_in[0][ir];
+			}//end if
+		}//end do
+	}//end if
     // energy terms, local-density contributions
 
 
@@ -536,13 +584,19 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     //Add hartree potential to the xc potential
     //==========================================
 
-    for (int is = 0;is < NSPIN;is++)
-    {
-        for (int ir = 0;ir < pw.nrxx;ir++)
-        {
-            v(is, ir) += Porter[ir].real();
-        }
-    }
+	if(NSPIN==4)
+	for (int ir = 0;ir < pw.nrxx;ir++)
+	{
+		v(0, ir) += Porter[ir].real();
+	}
+	else
+	for (int is = 0;is < NSPIN;is++)
+	{
+		for (int ir = 0;ir < pw.nrxx;ir++)
+		{
+			v(is, ir) += Porter[ir].real();
+		}
+	}
 
 	//-------------------------------------------
 	// output the Hartree potential into a file.
@@ -745,18 +799,24 @@ const matrix &v, const int &precision, const int &hartree)const
 #endif
 void potential::set_vrs(const bool doublegrid)
 {
-    TITLE("potential","set_vrs");
-    timer::tick("potential","set_vrs");
+	TITLE("potential","set_vrs");
+	timer::tick("potential","set_vrs");
 
-    for (int is = 0;is < NSPIN;is++)
-    {
-        //=================================================================
-        // define the total local potential (external + scf) for each spin
-        //=================================================================
-        for (int i = 0;i < pw.nrxx;i++)
-        {
-            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-        }
+	for (int is = 0;is < NSPIN;is++)
+	{
+		//=================================================================
+		// define the total local potential (external + scf) for each spin
+		//=================================================================
+		if(NSPIN==4&&is>0)
+		for (int i = 0;i < pw.nrxx;i++)
+		{
+			this->vrs(is, i) = this->vr(is, i);
+		}
+		else
+		for (int i = 0;i < pw.nrxx;i++)
+		{
+			this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+		}
 
         //====================================================
         // And interpolate it on the smooth mesh if necessary
@@ -773,7 +833,7 @@ void potential::set_vrs(const bool doublegrid)
         			delete [] vrs_1d;
         		}
         */
-    }
+	}
 
 
 #ifdef __FP
@@ -794,7 +854,7 @@ void potential::set_vrs(const bool doublegrid)
 // ----------------------------------------------------------------------
 void potential::newd()
 {
-    if (test_potential) TITLE("potential","newd");
+	if (test_potential) TITLE("potential","newd");
 
     // distringuish non-local pseudopotential in REAL or RECIPROCAL space.
     // if in real space, call new_r
@@ -805,30 +865,60 @@ void potential::newd()
     //  This routine computes the integral of the effective potential with
     //  the Q function and adds it to the bare ionic D term which is used
     //  to compute the non-local term in the US scheme.
-    if (!ppcell.okvan)
-    {
-        // no ultrasoft potentials: use bare coefficients for projectors
-        // if( spin_orbital) ....
-        // else if(noncolin) ....
-        for (int iat=0; iat<ucell.nat; iat++)
-        {
-            const int it = ucell.iat2it[iat];
-            const int nht = ucell.atoms[it].nh;
-            // nht: number of beta functions per atom type
-            for (int is = 0; is < NSPIN; is++)
-            {
-                for (int ih=0; ih<nht; ih++)
-                {
-                    for (int jh=ih; jh<nht; jh++)
-                    {
-                        ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-                        ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-                    }
-                }
-            }
-        }
-        return;
-    }
+	if (!ppcell.okvan)
+	{
+		// no ultrasoft potentials: use bare coefficients for projectors
+		// if( spin_orbital) ....
+		// else if(noncolin) ....
+		for (int iat=0; iat<ucell.nat; iat++)
+		{
+			const int it = ucell.iat2it[iat];
+			const int nht = ucell.atoms[it].nh;
+			// nht: number of beta functions per atom type
+			for (int is = 0; is < NSPIN; is++)
+			{
+				for (int ih=0; ih<nht; ih++)
+				{
+					for (int jh=ih; jh<nht; jh++)
+					{
+						if(LSPINORB)
+						{
+							ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
+							ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
+						}
+						else if( NONCOLIN )
+						{
+							if(is==0)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+								ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							}
+							else if(is==1)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+								ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							}
+							else if(is==2)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+								ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							}
+							else if(is==3)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+								ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							}
+						}
+						else{
+							ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+							ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+						}
+					}
+				}
+			}
+		}
+		return;
+	}
 
     //====================
     // if use PAW method
@@ -851,7 +941,7 @@ void potential::newd()
     end IF
     */
 
-    return;
+	return;
 } // end subroutine newd
 
 void potential::print_pot(ofstream &ofs)const

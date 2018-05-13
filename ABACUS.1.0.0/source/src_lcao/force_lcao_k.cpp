@@ -69,6 +69,13 @@ void Force_LCAO_k::ftable_k (void)
         Parallel_Reduce::reduce_double_pool( this->fvnl_dbeta[iat], 3);
         Parallel_Reduce::reduce_double_pool( this->fvl_dphi[iat], 3);
     }
+    for (int ipol=0; ipol<3; ipol++)
+    {
+        Parallel_Reduce::reduce_double_pool( this->soverlap[ipol], 3);
+        Parallel_Reduce::reduce_double_pool( this->stvnl_dphi[ipol], 3);
+        Parallel_Reduce::reduce_double_pool( this->svnl_dbeta[ipol], 3);
+        Parallel_Reduce::reduce_double_pool( this->svl_dphi[ipol], 3);
+    }
 
 	// test the force.
 	/*
@@ -104,6 +111,22 @@ void Force_LCAO_k::allocate_k(void)
     ZEROS(LM.DSloc_Rz, nnr);
 	Memory::record("force_lo", "dS", nnr*3, "double");
     
+	LM.DH_r = new double [3* nnr];
+        ZEROS(LM.DH_r, 3 * nnr);
+        LM.stvnl11 = new double [nnr];
+        LM.stvnl12 = new double [nnr];
+        LM.stvnl13 = new double [nnr];
+        LM.stvnl22 = new double [nnr];
+        LM.stvnl23 = new double [nnr];
+        LM.stvnl33 = new double [nnr];
+        ZEROS(LM.stvnl11,  nnr);
+        ZEROS(LM.stvnl12,  nnr);
+        ZEROS(LM.stvnl13,  nnr);
+        ZEROS(LM.stvnl22,  nnr);
+        ZEROS(LM.stvnl23,  nnr);
+        ZEROS(LM.stvnl33,  nnr);
+        Memory::record("stress_lo", "dSR", nnr*6, "double");
+
 	//-----------------------------
 	// calculate dS = <phi | dphi> 
 	//-----------------------------
@@ -143,6 +166,7 @@ void Force_LCAO_k::finish_k(void)
     delete [] LM.DHloc_fixedR_x;
     delete [] LM.DHloc_fixedR_y;
     delete [] LM.DHloc_fixedR_z;
+    delete [] LM.DH_r;
 	return;
 }
 
@@ -371,7 +395,8 @@ void Force_LCAO_k::cal_foverlap_k(void)
     //summation \sum_{i,j} E(i,j)*dS(i,j)
     //BEGIN CALCULATION OF FORCE OF EACH ATOM
 	//--------------------------------------------
-	Vector3<double> tau1, dtau;
+	Vector3<double> tau1, dtaui, tau2;
+	double r21[3],rt[3];
 
 	Record_adj RA;
 	RA.for_2d();
@@ -379,6 +404,10 @@ void Force_LCAO_k::cal_foverlap_k(void)
 	for(int iat=0; iat<ucell.nat; ++iat)
 	{
 		ZEROS( foverlap[iat], 3);
+	}
+	for(int ipol=0; ipol<3; ++ipol)
+	{
+		ZEROS( this->soverlap[ipol], 3);
 	}
 
 	int irr = 0;
@@ -396,6 +425,23 @@ void Force_LCAO_k::cal_foverlap_k(void)
 				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 
 				Atom* atom2 = &ucell.atoms[T2];
+
+				if(STRESS){
+					tau1 = atom1->taud[I1];
+					tau2.x = atom2->taud[I2].x + RA.info[iat][cb][0];
+					tau2.y = atom2->taud[I2].y + RA.info[iat][cb][1];
+					tau2.z = atom2->taud[I2].z + RA.info[iat][cb][2];
+
+					rt[0] = ( tau2.x - tau1.x) ;
+					rt[1] = ( tau2.y - tau1.y) ;
+					rt[2] = ( tau2.z - tau1.z) ;
+					Mathzone::Direct_to_Cartesian(rt[0],rt[1],rt[2],
+								ucell.a1.x, ucell.a1.y, ucell.a1.z,
+								ucell.a2.x, ucell.a2.y, ucell.a2.z,
+								ucell.a3.x, ucell.a3.y, ucell.a3.z,
+								r21[0],r21[1],r21[2]);
+				}
+
 				for(int jj=0; jj<atom1->nw; jj++)
 				{
 					const int iw1_all = start1 + jj; 
@@ -423,6 +469,14 @@ void Force_LCAO_k::cal_foverlap_k(void)
 							this->foverlap[iat][0] -= edm2d2 * LM.DSloc_Rx[irr];
 							this->foverlap[iat][1] -= edm2d2 * LM.DSloc_Ry[irr];
 							this->foverlap[iat][2] -= edm2d2 * LM.DSloc_Rz[irr];
+							if(STRESS)
+							{
+								for(int ipol = 0;ipol<3;ipol++){
+									this->soverlap[0][ipol] += edm2d[is][irr] * LM.DSloc_Rx[irr] * r21[ipol];
+									this->soverlap[1][ipol] += edm2d[is][irr] * LM.DSloc_Ry[irr] * r21[ipol];
+									this->soverlap[2][ipol] += edm2d[is][irr] * LM.DSloc_Rz[irr] * r21[ipol];
+								}
+							}
 						}
 						++irr;
 					}// end kk
@@ -444,7 +498,15 @@ void Force_LCAO_k::cal_foverlap_k(void)
 		setw(15) << foverlap[iat][2]*fac << endl;
 	}
 	*/
-
+	if(STRESS){
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				this->soverlap[i][j] *=  ucell.lat0 / ucell.omega;
+			}
+		}
+	}
 
 	if(irr!=LNNR.nnr)
 	{
@@ -470,7 +532,8 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 	timer::tick("Force_LCAO_k","cal_ftvnl_dphi",'G');
 	
 	// get the adjacent atom's information.
-	Vector3<double> tau1, dtau;
+	Vector3<double> tau1, dtau, tau2;
+	double r21[3],rt[3];
 
 //	ofs_running << " calculate the ftvnl_dphi_k force" << endl;
 	Record_adj RA;
@@ -479,6 +542,10 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 	for(int iat=0; iat<ucell.nat; ++iat)
 	{
 		ZEROS( this->ftvnl_dphi[iat], 3);
+	}
+	for(int ipol=0; ipol<3; ++ipol)
+	{
+		ZEROS( this->stvnl_dphi[ipol], 3);
 	}
 
 	int irr = 0;
@@ -495,6 +562,21 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 				const int I2 = RA.info[iat][cb][4];
 				const int start2 = ucell.itiaiw2iwt(T2,I2,0);
 				Atom* atom2 = &ucell.atoms[T2];
+				if(STRESS){
+					tau1 = atom1->taud[I1];
+					tau2.x = atom2->taud[I2].x + RA.info[iat][cb][0];
+					tau2.y = atom2->taud[I2].y + RA.info[iat][cb][1];
+					tau2.z = atom2->taud[I2].z + RA.info[iat][cb][2];
+					rt[0] = ( tau2.x - tau1.x) ;
+					rt[1] = ( tau2.y - tau1.y) ;
+					rt[2] = ( tau2.z - tau1.z) ;
+					Mathzone::Direct_to_Cartesian(rt[0],rt[1],rt[2],
+								ucell.a1.x, ucell.a1.y, ucell.a1.z,
+								ucell.a2.x, ucell.a2.y, ucell.a2.z,
+								ucell.a3.x, ucell.a3.y, ucell.a3.z,
+								r21[0],r21[1],r21[2]);
+				}
+
 				for(int jj=0; jj<atom1->nw; ++jj)
 				{
 					const int iw1_all = start1 + jj; 
@@ -517,6 +599,15 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 							this->ftvnl_dphi[iat][0] += dm2d2 * LM.DHloc_fixedR_x[irr];
 							this->ftvnl_dphi[iat][1] += dm2d2 * LM.DHloc_fixedR_y[irr];
 							this->ftvnl_dphi[iat][2] += dm2d2 * LM.DHloc_fixedR_z[irr];
+							if(STRESS){
+								this->stvnl_dphi[0][0] += dm2d[is][irr] * LM.stvnl11[irr];
+								this->stvnl_dphi[0][1] += dm2d[is][irr] * LM.stvnl12[irr];
+								this->stvnl_dphi[0][2] += dm2d[is][irr] * LM.stvnl13[irr];
+								this->stvnl_dphi[1][1] += dm2d[is][irr] * LM.stvnl22[irr];
+								this->stvnl_dphi[1][2] += dm2d[is][irr] * LM.stvnl23[irr];
+								this->stvnl_dphi[2][2] += dm2d[is][irr] * LM.stvnl33[irr];
+
+							}
 						}
 						++irr;
 					}//end kk
@@ -529,7 +620,22 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 //	test(LM.DSloc_Rx);
 //	test(dm2d[0],"dm2d");
 
-
+	if(STRESS){
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				if(i<j) this->stvnl_dphi[j][i] = this->stvnl_dphi[i][j];
+			}
+		}
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				this->stvnl_dphi[i][j] *=  ucell.lat0 / ucell.omega;
+			}
+		}
+	}
 	//--------------------------------
 	// test the <phi|T+Vnl|dphi> force
 	//--------------------------------
@@ -621,6 +727,11 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(double** dm2d)
 	int iir = 0;
 	Vector3<double> tau1, tau2, dtau;
 	Vector3<double> tau0, dtau1, dtau2;
+
+	for(int ipol=0; ipol<3; ++ipol)
+	{
+		ZEROS( this->svnl_dbeta[ipol], 3);
+	}
 
 	double rcut;
 	double distance;
@@ -714,6 +825,14 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(double** dm2d)
 								distance2 = dtau2.norm() * ucell.lat0;
 								rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
 
+								double r0[3],r1[3];
+								r1[0] = ( tau1.x - tau0.x) ;
+								r1[1] = ( tau1.y - tau0.y) ;
+								r1[2] = ( tau1.z - tau0.z) ;
+								r0[0] = ( tau2.x - tau0.x) ;
+								r0[1] = ( tau2.y - tau0.y) ;
+								r0[2] = ( tau2.z - tau0.z) ;
+
 								if(distance1 < rcut1 && distance2 < rcut2)
 								{
 									const Atom* atom0 = &ucell.atoms[T0];
@@ -734,13 +853,39 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(double** dm2d)
 											tau0, T0
 											);
 
-									/// only one projector for each atom force.
+									double nlm1[3]={0,0,0};
+									if(STRESS){
+									UOT.snap_psibeta(
+											nlm1, 1,
+											tau1,
+											T1,
+											atom1->iw2l[ j ], // L1
+											atom1->iw2m[ j ], // m1
+											atom1->iw2n[ j ], // n1
+											tau2,
+											T2,
+											atom2->iw2l[ k ], // L2
+											atom2->iw2m[ k ], // m2
+											atom2->iw2n[ k ], // N2
+											tau0, T0
+											);
+									}
+									/// only one projector for each atom force, but another projector for stress
 									for(int is=0; is<NSPIN; ++is)
 									{
 										double dm2d2 = 2.0 * dm2d[is][iir];
 										this->fvnl_dbeta[iat0][0] -= dm2d2 * nlm[0];
 										this->fvnl_dbeta[iat0][1] -= dm2d2 * nlm[1];
 										this->fvnl_dbeta[iat0][2] -= dm2d2 * nlm[2];
+
+										if(STRESS)
+										{
+											for(int ipol=0;ipol<3;ipol++){
+												this->svnl_dbeta[0][ipol] += dm2d[is][iir] * (nlm[0] * r0[ipol] + nlm1[0] * r1[ipol]);
+												this->svnl_dbeta[1][ipol] += dm2d[is][iir] * (nlm[1] * r0[ipol] + nlm1[1] * r1[ipol]);
+												this->svnl_dbeta[2][ipol] += dm2d[is][iir] * (nlm[2] * r0[ipol] + nlm1[2] * r1[ipol]);
+											}
+										}
 									}
 
 								}// distance
@@ -756,6 +901,15 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(double** dm2d)
 
 	assert( iir == LNNR.nnr );
 
+	if(STRESS){
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				this->svnl_dbeta[i][j] *=  ucell.lat0 / ucell.omega;
+			}
+		}
+	}
 
 	timer::tick("Force_LCAO_k","cal_fvnl_dbeta_k",'G');
 	return;
@@ -797,7 +951,8 @@ void Force_LCAO_k::force_vna_k(void)
 	// calculate the force due to < phi | vlocal | dphi>
 	// fvl_dphi must be set to zero before.
 	//-----------------------------------------------------
-	UHM.GK.fvna_k_RealSpace(gtf, this->fvl_dphi);
+	if(STRESS) {UHM.GK.svna_k_RealSpace(gtf, this->fvl_dphi, this->svl_dphi);}
+	else {UHM.GK.fvna_k_RealSpace(gtf, this->fvl_dphi);}
 
 	timer::tick("Force_LCAO_k","force_vna_k",'h');
 	return;
@@ -817,7 +972,10 @@ void Force_LCAO_k::cal_fvl_dphi_k(double** dm2d)
 	{
 		ZEROS(fvl_dphi[iat],3);
 	}
-
+	for(int ipol=0; ipol<3; ++ipol)
+	{
+		ZEROS( this->svl_dphi[ipol], 3);
+	}
 
 	int istep = 1;
 	if(VNA)
@@ -842,8 +1000,6 @@ void Force_LCAO_k::cal_fvl_dphi_k(double** dm2d)
 	}
 
 
-
-
 	for(int is=0; is<NSPIN; ++is)
 	{
 		CURRENT_SPIN = is;
@@ -861,7 +1017,8 @@ void Force_LCAO_k::cal_fvl_dphi_k(double** dm2d)
 		// Grid integration here.
 		//--------------------------------
 		// fvl_dphi can not be set to zero here if Vna is used
-		UHM.GK.fvl_k_RealSpace(fvl_dphi,pot.vrs1);
+		if(STRESS) {UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,pot.vrs1);}
+		else {UHM.GK.fvl_k_RealSpace(fvl_dphi,pot.vrs1);}
 
 /*
 		   cout << " fvl_dphi" << endl;
@@ -976,6 +1133,14 @@ void Force_LCAO_k::cal_fvl_dphi_k(double** dm2d)
 	}
 	assert(irr==LNNR.nnr);
 	*/
+	if(STRESS){
+		for(int ipol=0;ipol<3;ipol++){
+			for(int jpol=0;jpol<3;jpol++){
+				if(ipol < jpol) svl_dphi[jpol][ipol] = svl_dphi[ipol][jpol];
+				svl_dphi[ipol][jpol] /= ucell.omega;
+			}
+		}
+	}
 
 	timer::tick("Force_LCAO_k","cal_fvl_dphi_k",'G');
 	return;

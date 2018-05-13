@@ -83,6 +83,16 @@ class LCAO_Matrix
 	double* DHloc_fixedR_y;
 	double* DHloc_fixedR_z;
 
+	//----------------------------------------
+	// r_mu - r_nu
+	//----------------------------------------
+	double* DH_r;//zhengdy added 2017-07                        
+	double* stvnl11;
+	double* stvnl12;
+	double* stvnl13;
+	double* stvnl22;
+	double* stvnl23;
+	double* stvnl33;
 
 	void divide_HS_in_frag(void);
 	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);

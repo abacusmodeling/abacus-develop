@@ -32,6 +32,10 @@ Pseudopot_upf::Pseudopot_upf()
 	this->rho_at = new double[1];
 	this->rho_atc = new double[1];
 
+	this->nn = new int[1];//zhengdy-soc
+	this->jchi = new double[1];
+	this->jjj = new double[1];
+
         functional_error = 0;//xiaohui add 2015-03-24
 }
 
@@ -51,6 +55,9 @@ Pseudopot_upf::~Pseudopot_upf()
 	delete [] rho_at;// psrhoatom_1
 	delete [] rho_atc;
 
+	delete [] nn;
+	delete [] jjj;
+	delete [] jchi;
 }
 
 int Pseudopot_upf::init_pseudo_reader(const string &fn)
@@ -657,10 +664,10 @@ int Pseudopot_upf::read_pseudo_upf(ifstream &ifs)
 	// Search for add_info
 	if (has_so)
 	{
-		WARNING_QUIT("read_pseudo_upf","Can't read UPF containing spin-orbital term.");
-//		SCAN_BEGIN (ifs,"<PP_INFO>", true);
-//		read_pseudo_addinfo (ifs);
-//		SCAN_END (ifs,"</PP_INFO>");
+//		WARNING_QUIT("read_pseudo_upf","Can't read UPF containing spin-orbital term.");
+		SCAN_BEGIN (ifs,"<PP_ADDINFO>");//added by zhengdy-soc
+		read_pseudo_so (ifs);
+		SCAN_END (ifs,"</PP_ADDINFO>");
 	}
 
 	ifs.clear();
@@ -1037,6 +1044,42 @@ void Pseudopot_upf::read_pseudo_rhoatom(ifstream &ifs)
 		ifs >> this->rho_at[ir];
 	}
 	return;
+}
+
+void Pseudopot_upf::read_pseudo_so(ifstream &ifs)
+{
+       //read soc info from upf, added by zhengdy-soc
+       if(!this->has_so) return;
+       delete[] nn;
+       delete[] jchi;
+       delete[] jjj;
+       this->nn = new int[nwfc];
+       this->jchi = new double[nwfc];
+       this->jjj = new double[nbeta];
+       ZEROS(nn,nwfc);
+       ZEROS(jchi,nwfc);
+       ZEROS(jjj,nbeta);
+       //RELWFC
+       for(int nw=0;nw< nwfc;nw++)
+       {
+             ifs >> this->els[nw] >>this->nn[nw] >> this->lchi[nw] >> this->jchi[nw] >> this->oc[nw];
+             if(this->lchi[nw]-this->jchi[nw]-0.5>1e-7 && this->lchi[nw]-this->jchi[nw]-0.5<1e-7)
+             {
+                  cout<<"Ignore ADDINFO section"<<endl;
+                  this->has_so = 0;
+             }
+       }
+       //RELBETA
+       for(int nb = 0;nb < nbeta;nb++)
+       {
+             ifs >> this->lll[nb] >> this->jjj[nb];
+             if(this->lll[nb]-this->jjj[nb]-0.5>1e-7 && this->lll[nb]-this->jjj[nb]-0.5<1e-7)
+             {
+                  cout<<"Ignore ADDINFO section"<<endl;
+                  this->has_so = 0;
+             }
+       }
+       return;
 }
 
 /*
@@ -1825,6 +1868,83 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         }
                         SCAN_END(ifs, "</PP_RHOATOM>");
 
+			SCAN_BEGIN(ifs, "<PP_SPIN_ORB>");
+//added by zhengdy-soc
+			delete[] this->jchi;
+			delete[] this->jjj;
+			delete[] this->nn;
+			this->jchi = new double [nwfc];
+			this->jjj = new double [nbeta];
+			this->nn = new int [nwfc];
+			ZEROS(jchi,nwfc);
+			ZEROS(jjj,nbeta);
+			ZEROS(nn,nwfc);
+			for(int round=0;round<2;round++){
+				ifs>>word;
+				if(word=="<PP_RELBETA.1")
+				{
+					for(int nb = 0;nb<nbeta;nb++)
+					{
+						if(nb!=0) ifs>>word; //RELBETA
+						ifs>>word;           //index
+						ifs>>word;           //lll
+						get_char(word);
+						this->lll[nb] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+						ifs>>word;           //jjj
+						get_char(word);
+						this->jjj[nb] = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+					}
+				}
+				else if(word=="<PP_RELWFC.1")
+				{
+					if(round==0){
+						for(int nw = 0;nw<nwfc;nw++)
+						{
+							if(nw!=0) ifs>>word;     //RELWFC
+							ifs>>word;               //index
+							ifs>>word;               //els
+							get_char(word);
+							this->els[nw]= word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+							ifs>>word;               //nn
+							get_char(word);
+							this->nn[nw]= atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+							ifs>>word;               //lchi
+							get_char(word);
+							this->lchi[nw]= atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+							ifs>>word;               //jchi
+							get_char(word);
+							this->jchi[nw]= atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+							ifs>>word;               //oc
+							get_char(word);
+							this->oc[nw]= atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+
+						}
+					}
+					else{
+						for(int nw = 0;nw<nwfc;nw++)
+						{
+							if(nw!=0) ifs>>word;//RELWFC
+							ifs>>word;          //index
+							ifs>>word;          //lchi
+							get_char(word);
+							this->lchi[nw]= atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+							ifs>>word;          //jchi
+							get_char(word);
+							this->jchi[nw]= atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+							ifs>>word;
+							get_char(word);
+							this->nn[nw]= atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+
+						}
+					}
+				}
+				else if(round==0){
+					this->has_so = 0;
+					cout<<"ignore SPIN_ORB part!"<<endl;
+					break;
+				}
+			}
+                        SCAN_END(ifs, "</PP_SPIN_ORB>");
 
                     	if (mesh%2 == 0) //{zws add 20160328
                     	{

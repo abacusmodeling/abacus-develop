@@ -128,6 +128,7 @@ public:
 	int vnl_in_h;			// calculate the T or not.
 	int zeeman_in_h;		// calculate the zeeman energy or not.
 	int test_force;			// test the force.
+	int test_stress;		// test the stress.
 //==========================================================
 // iteration
 //==========================================================
@@ -291,7 +292,13 @@ public:
         bool     kmesh_interpolation;          // calculting <i,0|j,R>
         double  qcar[100][3];          // the Cartesian position of q points(unit: 2*PI/lat0) 
         int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
-		
+	
+	//added by zhengdy-soc
+	bool noncolin;
+	bool lspinorb;
+	bool starting_spin_angle;
+	double *angle1;
+	double *angle2;
 		
 
 

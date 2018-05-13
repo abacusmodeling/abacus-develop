@@ -53,6 +53,8 @@ public:
 //  double  dx;           // the deltax of the linear mesh
 //  double *jchi;			// jchi(nwfc)
 	double *jjj;	  // total angual momentum, jjj[nbeta]
+	double *jchi;	//jchi(nwfc), added by zhengdy-soc
+	int *nn;
 
 	pseudo_h();
 	~pseudo_h();

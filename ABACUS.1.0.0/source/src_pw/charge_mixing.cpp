@@ -172,10 +172,9 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 
 
 double Charge_Mixing::rhog_dot_product(
-    const complex<double> *rhog11,
-    const complex<double> *rhog12,
-    const complex<double> *rhog21,
-    const complex<double> *rhog22) const
+	const complex<double> **rhog1,
+	const complex<double> **rhog2
+) const
 {
     TITLE("Charge_Mixing","rhog_dot_product");
 	timer::tick("Charge_Mixing","rhog_dot_product");
@@ -186,22 +185,23 @@ double Charge_Mixing::rhog_dot_product(
 
     switch ( NSPIN )
     {
-    case 1:
-        for (int ig=pw.gstart; ig<pw.ngmc; ig++)
-        {
-            sum += ( conj( rhog11[ig] )* rhog21[ig] ).real() / pw.gg[ig];
-        }
-        sum *= fac;
-        break;
+	case 1:
+		part_of_noncolin:
+		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+		{
+			sum += ( conj( rhog1[0][ig] )* rhog2[0][ig] ).real() / pw.gg[ig];
+		}
+		sum *= fac;
+		break;
 
-    case 2:
+	case 2:
 		
 		// (1) First part of density error.
-        for (int ig=pw.gstart; ig<pw.ngmc; ig++)
-        {
-            sum += ( conj( rhog11[ig]+rhog12[ig] ) * (rhog21[ig]+rhog22[ig]) ).real() / pw.gg[ig];
-        }
-        sum *= fac;
+		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+		{
+			sum += ( conj( rhog1[0][ig]+rhog1[1][ig] ) * (rhog2[0][ig]+rhog2[1][ig]) ).real() / pw.gg[ig];
+		}
+		sum *= fac;
 
 		if(GAMMA_ONLY_PW)
 		{
@@ -209,16 +209,16 @@ double Charge_Mixing::rhog_dot_product(
 		}
 
 		// (2) Second part of density error.
-        // including |G|=0 term.
+		// including |G|=0 term.
 		double sum2 = 0.0;
 		
-		sum2 += fac2 * ( conj( rhog11[0]-rhog12[0] ) * ( rhog21[0]-rhog22[0] ) ).real();
+		sum2 += fac2 * ( conj( rhog1[0][0]-rhog1[1][0] ) * ( rhog2[0][0]-rhog2[1][0] ) ).real();
 
 		double mag = 0.0;
-        for (int ig=0; ig<pw.ngmc; ig++)
-        {
-            mag += ( conj( rhog11[ig]-rhog12[ig] ) * ( rhog21[ig]-rhog22[ig] ) ).real();
-        }
+		for (int ig=0; ig<pw.ngmc; ig++)
+		{
+			mag += ( conj( rhog1[0][ig]-rhog1[1][ig] ) * ( rhog2[0][ig]-rhog2[1][ig] ) ).real();
+		}
 		mag *= fac2;
 
 		if(GAMMA_ONLY_PW);
@@ -229,10 +229,39 @@ double Charge_Mixing::rhog_dot_product(
 		//cout << " sum=" << sum << " mag=" << mag << endl;
 		sum2 += mag;
 		sum += sum2;
+		break;
 
 
-	//case 4:
-		// non-collinear spin	
+	case 4:
+		// non-collinear spin, added by zhengdy
+		if(!DOMAG) goto part_of_noncolin;
+		else
+		{
+			//another part with magnetization
+			for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+			{
+				sum += ( conj( rhog1[0][ig] )* rhog2[0][ig] ).real() / pw.gg[ig];
+			}
+			sum *= fac;
+			if(pw.gstart == 2)
+			{
+				sum += fac2 * ((conj( rhog1[1][0])*rhog2[1][0]).real() +
+					(conj( rhog1[2][0])*rhog2[2][0]).real() +
+					(conj( rhog1[3][0])*rhog2[3][0]).real());
+			}
+			double fac3 = fac2;
+			if(GAMMA_ONLY_PW)
+			{
+				fac3 *= 2.0;
+			}
+			for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+			{
+				sum += fac3 * ((conj( rhog1[1][ig])*rhog2[1][ig]).real() +
+					(conj( rhog1[2][ig])*rhog2[2][ig]).real() +
+					(conj( rhog1[3][ig])*rhog2[3][ig]).real());
+			}
+		}
+		break;
 
     }
 

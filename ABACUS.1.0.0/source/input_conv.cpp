@@ -266,6 +266,55 @@ void Input_Conv::Convert(void)
 		epsilon0_vasp.nomega = INPUT.nomega;
 		epsilon0_vasp.eta = INPUT.eta;
 	}
+
+	//added by zhengdy-soc
+	if(INPUT.noncolin)
+	{
+		NONCOLIN = true;
+		NSPIN = 4;
+		//wavefunctions are spinors with 2 components
+		NPOL = 2;
+		//set the domag variable to make a spin-orbit calculation with zero magnetization
+		if(INPUT.lspinorb)
+		{
+			LSPINORB = true;
+			DOMAG = false;
+		}
+		else{
+			LSPINORB = false;
+			DOMAG = true;
+		}
+		delete[] soc.m_loc;
+		delete[] soc.angle1;
+		delete[] soc.angle2;
+		soc.m_loc = new Vector3<double> [INPUT.ntype];
+		soc.angle1 = new double[INPUT.ntype];
+		soc.angle2 = new double[INPUT.ntype];
+		bool has_angle1=0,has_angle2=0;
+		if(sizeof(INPUT.angle1) / sizeof(INPUT.angle1[0]) == INPUT.ntype) has_angle1=1;
+		if(sizeof(INPUT.angle2) / sizeof(INPUT.angle2[0]) == INPUT.ntype) has_angle2=1;
+		for(int i = 0;i<INPUT.ntype;i++)
+		{
+			if(has_angle1)
+				soc.angle1[i] = INPUT.angle1[i];
+			else soc.angle1[i] = 0;
+			if(has_angle2)
+				soc.angle2[i] = INPUT.angle2[i];
+			else soc.angle2[i] = 0;
+#ifdef __MPI
+			Parallel_Common::bcast_double(soc.angle1[i]);
+			Parallel_Common::bcast_double(soc.angle2[i]);
+#endif
+		}
+	}
+	else{
+		LSPINORB = false;
+		NONCOLIN = false;
+		DOMAG = false;
+		NPOL = 1;
+
+		soc.m_loc = new Vector3<double> [INPUT.ntype];
+	}
 	
 //----------------------------------------------------------
 // about selinv

@@ -139,8 +139,10 @@ bool Ions::force_stress(const int &istep)
 
 	if(STRESS)
 	{
+		//calculate the stress
 		Stress ss;
-		ss.init();
+		ss.cal_stress();
+		//change the latvec
 	}
 
 	if(FORCE)

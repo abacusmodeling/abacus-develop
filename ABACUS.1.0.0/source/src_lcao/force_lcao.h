@@ -3,6 +3,7 @@
 
 #include "../src_pw/tools.h"
 #include "force_lcao_k.h"
+#include "stress_lcao.h"
 
 class Force_LCAO : private Force_LCAO_k
 {
@@ -23,6 +24,8 @@ class Force_LCAO : private Force_LCAO_k
 	void printforce_total (bool ry);
 	
 	void start_force(void);
+
+	void cal_stress(void);
 	
 	// total force
 	matrix fcs; 

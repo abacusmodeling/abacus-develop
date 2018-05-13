@@ -167,6 +167,12 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 										LM.DSloc_Rx[nnr] = olm[0];
 										LM.DSloc_Ry[nnr] = olm[1];
 										LM.DSloc_Rz[nnr] = olm[2];
+										if(STRESS)
+										{
+											LM.DH_r[nnr*3] = dtau.x;
+											LM.DH_r[nnr*3 + 1] = dtau.y;
+											LM.DH_r[nnr*3 + 2] = dtau.z;
+										}
 									}
 									else if(dtype=='T')
 									{
@@ -174,6 +180,15 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 										LM.DHloc_fixedR_x[nnr] = olm[0];
 										LM.DHloc_fixedR_y[nnr] = olm[1];
 										LM.DHloc_fixedR_z[nnr] = olm[2];
+										if(STRESS)
+										{
+											LM.stvnl11[nnr] = olm[0] * dtau.x;
+											LM.stvnl12[nnr] = olm[0] * dtau.y;
+											LM.stvnl13[nnr] = olm[0] * dtau.z;
+											LM.stvnl22[nnr] = olm[1] * dtau.y;
+											LM.stvnl23[nnr] = olm[1] * dtau.z;
+											LM.stvnl33[nnr] = olm[2] * dtau.z;
+										}
 									}
 									++nnr;
 								}

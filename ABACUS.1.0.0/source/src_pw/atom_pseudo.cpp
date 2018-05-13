@@ -75,16 +75,20 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 
 	if(MY_RANK!=0)
 	{
-//		jjj = new double [nbeta];
+		jjj = new double [nbeta];
 		els = new string[nchi];
 		lchi = new int [nchi];
 		oc = new double[nchi];
+		jchi = new double[nchi];
+		nn = new int[nchi];
 	}
 	
-//	Parallel_Common::bcast_double( jjj, nbeta );
+	Parallel_Common::bcast_double( jjj, nbeta );
 	Parallel_Common::bcast_string( els, nchi);
 	Parallel_Common::bcast_int( lchi, nchi);
 	Parallel_Common::bcast_double( oc, nchi);
+	Parallel_Common::bcast_double( jchi, nchi);
+	Parallel_Common::bcast_int( nn, nchi);
 // == end of pseudo_h
 
 // == pseudo_atom ==

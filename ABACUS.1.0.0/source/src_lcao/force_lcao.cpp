@@ -869,4 +869,11 @@ void Force_LCAO::cal_force_scc(void)
 }
 
 
+void Force_LCAO::cal_stress(void)
+{
+     Stress_LCAO SS;
+     SS.allocate();
+     SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi);
 
+    return;
+}

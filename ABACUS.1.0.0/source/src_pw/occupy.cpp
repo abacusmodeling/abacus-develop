@@ -253,6 +253,7 @@ void Occupy::iweights
 	bool conv = false;          // pengfei 2017-04-04
 	
 	degspin = (NSPIN == 2)? 1.0 : 2.0;
+	if(NSPIN == 4)degspin = 1.0;//added by zhengdy-soc
 	
 	assert( degspin > 0.0);
 	double ib_min = nelec/degspin;
@@ -275,7 +276,7 @@ void Occupy::iweights
 				}
 				
 			//cout<<"count = "<<count<<endl;
-			if( (NSPIN == 2 && count == ib_min1 * nks/2) || (NSPIN == 1 && count == ib_min1 * nks) )
+			if( (NSPIN == 2 && count == ib_min1 * nks/2) || (NSPIN == 1 && count == ib_min1 * nks) || ((NSPIN == 4) && count == ib_min1 * nks))
 			{
 				conv = true;
 			}

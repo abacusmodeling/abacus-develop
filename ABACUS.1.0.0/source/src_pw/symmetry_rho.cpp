@@ -13,7 +13,7 @@ Symmetry_rho::~Symmetry_rho()
 
 void Symmetry_rho::begin(const int &spin_now) const
 {
-	assert(spin_now < 2);
+	assert(spin_now < 4);//added by zhengdy-soc
 
 	if(!SYMMETRY) return;
 #ifdef __MPI

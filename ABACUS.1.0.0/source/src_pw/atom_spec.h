@@ -39,7 +39,9 @@ public:
     Vector3<double> *tau;// Cartesian coordinates of each atom in this type.
 	Vector3<double> *taud;// Direct coordinates of each atom in this type.
 
-    double* mag;
+	double* mag;
+	double angle1;//spin angle, added by zhengdy-soc
+	double angle2;
 
     void print_Atom(ofstream &ofs);
 #ifdef __MPI

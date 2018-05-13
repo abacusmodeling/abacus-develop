@@ -64,6 +64,11 @@ class Gint_k : public Gint_k_init
 	void folding_force(double** fvl_dphi,
 			double* pvdpx, double* pvdpy, double* pvdpz);//mohan add 2012-1-6
 
+	// folding the < dphi_0 | V * R_beta | phi_R> matrix
+	// < dphi_0i | V | phi_0j>
+	void folding_stress(double** fvl_dphi, double svl_dphi[][3],
+			double* pvdpx, double* pvdpy, double* pvdpz,
+			double* pvdp11, double* pvdp22, double* pvdp33, double* pvdp12, double* pvdp13, double* pvdp23);//zhengdy add 2016-10-18
 
 
 	//>>>>>>>>>>>>>>>>>>>>
@@ -78,6 +83,7 @@ class Gint_k : public Gint_k_init
 	//>>>>>>>>>>>>>>>>>>>>
 	// calculate the force (many k-points).
 	void fvl_k_RealSpace(double** fvl_dphi, const double* vl);//mohan add 2011-06-19
+	void svl_k_RealSpace(double** fvl_dphi, double svl_dphi[][3], const double* vl);//zhengdy add 2016-10-18
 
 
 	//>>>>>>>>>>>>>>>>>>>>
@@ -86,7 +92,7 @@ class Gint_k : public Gint_k_init
 	// calculate the force due to Vna (neutral potential),
 	// The Vna is in 1D numerical form.
 	void fvna_k_RealSpace(const Grid_Technique &gt, double** fvna_dphi);
-	
+	void svna_k_RealSpace(const Grid_Technique &gt, double** fvna_dphi, double svna_dphi[][3]);
 
 
 	// reset the spin.
@@ -181,6 +187,12 @@ class Gint_k : public Gint_k_init
 		double*** psir_ylm, bool** cal_flag, double* vldr3, double** distance,
 		double*** dphi_x, double*** dphi_y, double*** dphi_z,
 		double* pvdpx, double* pvdpy, double* pvdpz,
+		const Grid_Technique &gt);
+	void evaluate_vl_stress(const int &grid_index, const int &size, const int &i, const int &j, const int &k,
+		double*** psir_ylm, bool** cal_flag, double* vldr3, double** distance,
+		double*** dphi_x, double*** dphi_y, double*** dphi_z,
+		double* pvdpx, double* pvdpy, double* pvdpz,
+		double* pvdp11, double* pvdp22, double* pvdp33, double* pvdp12, double* pvdp13, double* pvdp23,double*** dr,
 		const Grid_Technique &gt);
 
 	private:

@@ -471,8 +471,27 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 
 			OUT(ofs_running, "atom label",atoms[it].label);
 
-			if(NSPIN==2)
+			if(NSPIN==4)//added by zhengdy-soc
 			{
+				if(NONCOLIN && LSPINORB){
+					if(fabs(mag.start_magnetization[it])>1e-6) DOMAG = true;
+				}
+				soc.m_loc[it].x = mag.start_magnetization[it] *
+						sin(soc.angle1[it]) * cos(soc.angle2[it]);
+				soc.m_loc[it].y = mag.start_magnetization[it] *
+						sin(soc.angle1[it]) * sin(soc.angle2[it]);
+				soc.m_loc[it].z = mag.start_magnetization[it] *
+						cos(soc.angle1[it]);
+
+				OUT(ofs_running, "noncollinear magnetization_x",soc.m_loc[it].x);
+				OUT(ofs_running, "noncollinear magnetization_y",soc.m_loc[it].y);
+				OUT(ofs_running, "noncollinear magnetization_z",soc.m_loc[it].z);
+
+				ZEROS(soc.ux ,3);
+			}
+			else if(NSPIN==2)
+			{
+				soc.m_loc[it].x = mag.start_magnetization[it];
 				OUT(ofs_running, "start magnetization",mag.start_magnetization[it]);
 			}
 			else if(NSPIN==1)
@@ -1197,6 +1216,7 @@ void UnitCell_pseudo::cal_nelec(void)
 	//					1.2*mag.get_nelup() , 
 	//					1.2*mag.get_neldw() ) );
 		}
+		if(NSPIN == 4) NBANDS = NBANDS * 2;//added by zhengdy-soc
 		AUTO_SET("NBANDS",NBANDS);
 	}
 	else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
@@ -1417,7 +1437,21 @@ void UnitCell_pseudo::cal_natomwfc(void)
 		{
 			if (atoms[it].oc[l] >= 0)
 			{
-				tmp += 2 * atoms[it].lchi[l] + 1;
+				if(NONCOLIN)
+				{
+					if(atoms[it].has_so)
+					{
+						tmp += 2 * atoms[it].lchi[l];
+						if(fabs(atoms[it].jchi[l] - atoms[it].lchi[l] - 0.5)<1e-6)
+						tmp += 2 ;
+					}
+					else
+					{
+						tmp += 2 * (2 * atoms[it].lchi[l] + 1);
+					}
+				}
+				else
+					tmp += 2 * atoms[it].lchi[l] + 1;
 			}
 		}
 		natomwfc += tmp * atoms[it].na;

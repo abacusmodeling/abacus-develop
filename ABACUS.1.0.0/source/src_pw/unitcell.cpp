@@ -110,6 +110,19 @@ void UnitCell::bcast_unitcell(void)
 #ifndef __EPM
     Parallel_Common::bcast_double( mag.start_magnetization, ntype );
 #endif
+    if(NSPIN != 1)
+    for(int it = 0;it<ntype;it++)
+    {
+         Parallel_Common::bcast_double( soc.m_loc[it].x );
+         Parallel_Common::bcast_double( soc.m_loc[it].y );
+         Parallel_Common::bcast_double( soc.m_loc[it].z );
+    }
+    if(NSPIN==4)
+    {
+         Parallel_Common::bcast_double( soc.ux[0] );
+         Parallel_Common::bcast_double( soc.ux[1] );
+         Parallel_Common::bcast_double( soc.ux[2] );
+    }
 
     for (int i=0;i<ntype;i++)
     {

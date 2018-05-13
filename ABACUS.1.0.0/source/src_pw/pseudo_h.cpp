@@ -13,6 +13,8 @@ pseudo_h::pseudo_h()
 	lchi = new int[1];
 	oc = new double[1];
 	jjj = new double[1];
+	jchi = new double[1];
+	nn = new int[1];
 	has_so = false;
 	zv = 0;
 }
@@ -23,6 +25,8 @@ pseudo_h::~pseudo_h()
 	delete[] lchi;
 	delete[] oc;
 	delete[] jjj;
+	delete[] jchi;
+	delete[] nn;
 }
 
 //---------------------------------------------------------------------
@@ -83,15 +87,32 @@ void pseudo_h::set_pseudo_h(const Pseudopot_upf &upf)
 	this->jjj = new double[nbeta];
 	assert(this->jjj != 0);
 
-	if (upf.has_so)
-	{
-	//	for (i = 0;i < upf.nbeta;i++)
-	//	{
-	//		this->jjj[i]  = upf.jjj [i];
-	//	}
+	delete[] nn;
+	this->nn = new int[nchi];
+	assert(this->nn != 0);
+
+	delete[] jchi;
+	this->jchi = new double[nchi];
+	assert(this->jchi != 0);
+
+	this->has_so = upf.has_so;//added by zhengdy-soc
+	if (this->has_so)
+	{ 
+		for (i = 0;i < nchi;i++){
+			this->nn[i] = upf.nn[i];
+			this->jchi[i] = upf.jchi[i];
+		}
+		for (i = 0;i < upf.nbeta;i++)
+		{
+			this->jjj[i]  = upf.jjj [i];
+		}
 	}
 	else
 	{
+		for (i = 0;i < nchi;i++){
+			this->nn[i] = 0;
+			this->jchi[i] = 0;
+		}
 		for (i = 0;i < upf.nbeta;i++)
 		{
 			this->jjj[i]  = 0;

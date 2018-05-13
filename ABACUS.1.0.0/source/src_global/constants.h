@@ -119,6 +119,7 @@ const int natx  = 1000000;
 const int nbndxx= 4000000;
 const int MAX_KPOINTS = 40000;// npk
 const int nchix = 10;
+const int nchix_nc = 20;
 const int ndmx  = 2000;
 
 //==========================================================
@@ -130,6 +131,7 @@ const int ndmx  = 2000;
 #ifndef __EPM
 const int lmaxx = 3;
 const int nbrx  = 10;
+const int nbrx_nc = 20;
 const int lqmax = 2*lmaxx + 1;
 const int nqfx  = 8;
 #endif
