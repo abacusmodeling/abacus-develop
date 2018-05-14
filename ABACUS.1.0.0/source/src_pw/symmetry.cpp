@@ -161,7 +161,7 @@ void Symmetry::analy_sys(void)
 	Symm_Other::print1(ibrav, cel_const);
 
 	this->change_lattice();
-    this->pricell();    
+    //this->pricell();         // pengfei Li 2018-05-14 
          //for( iat =0 ; iat < ucell.nat ; iat++)   
 //         cout << " newpos_now = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
 	OUT(ofs_running,"ibrav",ibrav);
@@ -1546,9 +1546,9 @@ void Symmetry::force_symmetry(matrix &force , double* pos)   // pengfei 2016-12-
 			// cout << "nrotk ="<<nrotk<<endl;
 			for(int k = 0 ; k < nrotk; ++k)
 			{
-				protpos[xx] = pos[xx] * gmatrix[k].e11 + pos[yy] * gmatrix[k].e12 + pos[zz] * gmatrix[k].e13 + gtrans[k].x;
-				protpos[yy] = pos[xx] * gmatrix[k].e21 + pos[yy] * gmatrix[k].e22 + pos[zz] * gmatrix[k].e23 + gtrans[k].y;
-				protpos[zz] = pos[xx] * gmatrix[k].e31 + pos[yy] * gmatrix[k].e32 + pos[zz] * gmatrix[k].e33 + gtrans[k].z;
+				protpos[xx] = pos[xx] * gmatrix[k].e11 + pos[yy] * gmatrix[k].e21 + pos[zz] * gmatrix[k].e31 + gtrans[k].x;
+				protpos[yy] = pos[xx] * gmatrix[k].e12 + pos[yy] * gmatrix[k].e22 + pos[zz] * gmatrix[k].e32 + gtrans[k].y;
+				protpos[zz] = pos[xx] * gmatrix[k].e13 + pos[yy] * gmatrix[k].e23 + pos[zz] * gmatrix[k].e33 + gtrans[k].z;
 							    			   			
 				check_translation( protpos[xx], -floor(protpos[xx]));
 				check_boundary( protpos[xx] );
@@ -1565,9 +1565,9 @@ void Symmetry::force_symmetry(matrix &force , double* pos)   // pengfei 2016-12-
 					if (equal(diff1,0.0) && equal(diff2,0.0) && equal(diff3,0.0))
 					{
 						//cout <<"nl = " << n[l]<<endl;
-						tot_force[l*3] = tot_force[l*3] + force(j,0) * gmatrix[k].e11 + force(j,1) * gmatrix[k].e12 + force(j,2) * gmatrix[k].e13;
-						tot_force[l*3+1] =  tot_force[l*3+1] + force(j,0) * gmatrix[k].e21 + force(j,1) * gmatrix[k].e22 + force(j,2) * gmatrix[k].e23;
-						tot_force[l*3+2] =  tot_force[l*3+2] + force(j,0) * gmatrix[k].e31 + force(j,1) * gmatrix[k].e32 + force(j,2) * gmatrix[k].e33;
+						tot_force[l*3] = tot_force[l*3] + force(j,0) * gmatrix[k].e11 + force(j,1) * gmatrix[k].e21 + force(j,2) * gmatrix[k].e31;
+						tot_force[l*3+1] =  tot_force[l*3+1] + force(j,0) * gmatrix[k].e12 + force(j,1) * gmatrix[k].e22 + force(j,2) * gmatrix[k].e32;
+						tot_force[l*3+2] =  tot_force[l*3+2] + force(j,0) * gmatrix[k].e13 + force(j,1) * gmatrix[k].e23 + force(j,2) * gmatrix[k].e33;
 						n[l]++;
 					}
 				}
