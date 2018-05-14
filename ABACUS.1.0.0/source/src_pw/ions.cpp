@@ -6,10 +6,18 @@
 #include "../src_pw/global.h" // use chr.
 #include "vdwd2.h"
 
+#include "../src_pw/pw_complement.h"
+#include "../src_pw/pw_basis.h"
+
 void Ions::opt_ions_pw(void)
 {
 	TITLE("Ions","opt_ions_pw");
 	timer::tick("Ions","opt_ions_pw",'C');
+	
+	if(STRESS)                    // pengfei Li 2018-05-14
+	{
+		LCM.allocate();
+	}
 
 	// allocation for ion movement.	
 	if(FORCE)
@@ -19,6 +27,10 @@ void Ions::opt_ions_pw(void)
 	}
 
     this->istep = 1;
+	
+	int force_step = 1;           // pengfei Li 2018-05-14
+	int stress_step = 1;
+	
 	bool stop= false;
 	
 	if(OUT_LEVEL=="i")
@@ -94,7 +106,8 @@ void Ions::opt_ions_pw(void)
 		
 		time_t eend = time(NULL);
 		time_t fstart = time(NULL);
-		stop = this->force_stress(istep);
+		//stop = this->force_stress(istep);
+		stop = this->force_stress(istep, force_step, stress_step);    // pengfei Li 2018-05-14
 		time_t fend = time(NULL);
 
 		if(OUT_LEVEL=="i")
@@ -129,7 +142,8 @@ void Ions::opt_ions_pw(void)
     return;
 }
 
-bool Ions::force_stress(const int &istep)
+//bool Ions::force_stress(const int &istep)
+bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  // pengfei Li 2018-05-14
 {
 	TITLE("Ions","force_stress");
 	if(!FORCE && !STRESS)
@@ -137,15 +151,15 @@ bool Ions::force_stress(const int &istep)
 		return 1;
 	}
 
-	if(STRESS)
-	{
+	//if(STRESS)
+	//{
 		//calculate the stress
-		Stress ss;
-		ss.cal_stress();
+		//Stress ss;
+		//ss.cal_stress();
 		//change the latvec
-	}
+	//}	
 
-	if(FORCE)
+	if(FORCE&&!STRESS)
 	{
 		// (1) calculate the force.
 		Forces fcs(ucell.nat);
@@ -187,6 +201,63 @@ bool Ions::force_stress(const int &istep)
 			// mp_bcast
 		}
 	}
+
+	static bool converged_force = false;              // pengfe Li  2018-05-14
+	static bool converged_stress = false;
+	
+	if(FORCE&&STRESS)
+	{
+		//cout<<" istep  force_step  stress_step  converged_force  converged_stress = "<<istep<<"  "<<force_step<<"  "<<stress_step<<"  "<<converged_force<<"  "<<converged_stress<<endl;
+
+		Forces fcs(ucell.nat);
+		fcs.init();
+		IMM.cal_movement(force_step, fcs.force, en.etot);
+		converged_force = IMM.get_converged();
+			
+		//cout<<"converged_force = "<<converged_force<<endl;
+		if(converged_force)
+		{
+			force_step = 1;
+
+			Stress ss;
+			ss.cal_stress();
+			matrix stress;
+			stress.create(3,3);
+				
+			for(int i=0;i<3;i++)
+				for(int j=0;j<3;j++)
+				{
+					stress(i,j) = ss.sigmatot[i][j];
+					OUT(ofs_running,"stress(i,j)", stress(i,j));
+				}
+				
+			LCM.cal_lattice_change(stress_step, stress, en.etot);
+			converged_stress = LCM.get_converged();
+			//cout <<"converged_stress = "<<converged_stress<<endl;
+			if(converged_stress)
+			{
+				return 1;
+			}
+			else
+			{
+				Run_Frag::frag_init_after_stress();
+				++stress_step;
+				return 0;
+			}
+		}
+		else
+		{
+			//stress_step = 1;
+
+			pw.setup_structure_factor();
+			CE.extrapolate_charge();
+			pot.init_pot( istep );
+			wf.wfcinit();
+			++force_step;
+			return 0;
+		}		
+	}
+
 
 	return 0;
 }

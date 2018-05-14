@@ -1,9 +1,8 @@
-#include "ions_move_cg.h"
+#include "lattice_change_cg.h"
 #include "../src_pw/global.h"
-#include "ions_move_basic.h"
-using namespace Ions_Move_Basic;
+#include "lattice_change_basic.h"
+using namespace Lattice_Change_Basic;
 
-double Ions_Move_CG::CG_THRESHOLD =-1.0;  //default is 0.5
 //=================== NOTES ========================
 // in vasp, it's like
 // contolled by POTIM.
@@ -21,46 +20,45 @@ double Ions_Move_CG::CG_THRESHOLD =-1.0;  //default is 0.5
 // the secant method and inverse quadratic interpolation
 //=================== NOTES ========================
 
-Ions_Move_CG::Ions_Move_CG()
+Lattice_Change_CG::Lattice_Change_CG()
 {
-	this->pos0 = new double[1];
+	this->lat0 = new double[1];
 	this->grad0 = new double[1];
 	this->cg_grad0 = new double[1];
  	this->move0 = new double[1];
 }
 
-Ions_Move_CG::~Ions_Move_CG()
+Lattice_Change_CG::~Lattice_Change_CG()
 {
-	delete[] pos0;
+	delete[] lat0;
 	delete[] grad0;
 	delete[] cg_grad0;
 	delete[] move0;
 }
 
-void Ions_Move_CG::allocate(void)
+void Lattice_Change_CG::allocate(void)
 {
-	TITLE("Ions_Move_CG","allocate");
-	assert( dim > 0);
-	delete[] pos0;
+	TITLE("Lattice_Change_CG","allocate");
+	delete[] lat0;
 	delete[] grad0;
 	delete[] cg_grad0;
 	delete[] move0;
-	this->pos0 = new double[dim];
+	this->lat0 = new double[dim];
 	this->grad0 = new double[dim];
 	this->cg_grad0 = new double[dim];
 	this->move0 = new double[dim];
-	ZEROS(pos0, dim);
+	ZEROS(lat0, dim);
 	ZEROS(grad0, dim);
 	ZEROS(cg_grad0, dim);
 	ZEROS(move0, dim);
-	this->e0 = 0.0;
+	this->e0 = 0.0;	
 }
 
-void Ions_Move_CG::start(const matrix& force, const double& etot_in)
+void Lattice_Change_CG::start(const matrix &stress, const double& etot_in)
 {
-	TITLE("Ions_Move_CG","start");
-	assert(dim>0);
-	assert(pos0!=0);
+	TITLE("Lattice_Change_CG","start");
+	
+	assert(lat0!=0);
 	assert(grad0!=0);
 	assert(cg_grad0!=0);
 	assert(move0!=0);
@@ -72,7 +70,7 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 	static double xa,xb,xc,xpt,steplength,fmax;  // the steepest descent method
 	static int nbrent;
 	
-	double* pos = new double[dim];
+	double* lat = new double[dim];
 	double* grad = new double[dim];
 	double* cg_gradn = new double[dim];
 	double* move =new double[dim];
@@ -82,17 +80,18 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 	
 	int flag = 0;  
 	
-	ZEROS(pos, dim);
+	ZEROS(lat, dim);
 	ZEROS(grad, dim);
+	ZEROS(cg_gradn, dim);
 	ZEROS(move, dim);
 	ZEROS(cg_grad, dim);
 	
 	CG_begin:
 	
-	if( Ions_Move_Basic::istep == 1 )
+	if( Lattice_Change_Basic::istep == 1 )
 	{
-		steplength=Ions_Move_Basic::trust_radius_ini;          // read in the init trust radius
-		//cout<<"Ions_Move_Basic::trust_radius_ini = "<<Ions_Move_Basic::trust_radius_ini<<endl;
+		steplength=Lattice_Change_Basic::lattice_change_ini;          // read in the init trust radius
+		//cout<<"Lattice_Change_Basic::lattice_change_ini = "<<Lattice_Change_Basic::lattice_change_ini<<endl;
 		sd = true;
 		trial = true;
 		ncggrad = 0;
@@ -101,22 +100,22 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 		nbrent = 0;
 	}
 	
-	Ions_Move_Basic::setup_gradient(pos, grad, force);
+	Lattice_Change_Basic::setup_gradient(lat, grad, stress);
 	// use energy_in and istep to setup etot and etot_old.
-	Ions_Move_Basic::setup_etot(etot_in, 0);
+	Lattice_Change_Basic::setup_etot(etot_in, 0);
 	// use gradient and etot and etot_old to check
 	// if the result is converged.
 	
-	//cout<<"sd = "<<sd<<"  trial = "<<trial<<"  istep = "<<istep<<endl;
-	if(flag == 0)
+	//cout<<"stress  sd = "<<sd<<"  trial = "<<trial<<"  istep = "<<istep<<endl;
+	if( flag == 0)
 	{
-		Ions_Move_Basic::check_converged(grad);
-		//cout<<"Ions_Move_Basic::converged = "<<Ions_Move_Basic::converged<<endl; 
+		Lattice_Change_Basic::check_converged(stress);
+		//cout<<"Lattice_Change_Basic::converged = "<<Lattice_Change_Basic::converged<<endl;
 	}
 	
-	if(Ions_Move_Basic::converged)
+	if(Lattice_Change_Basic::converged)
 	{
-		Ions_Move_Basic::terminate();
+		Lattice_Change_Basic::terminate();
 	}
 	else
 	{
@@ -142,7 +141,7 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 			}
 			
 			setup_move(move0, cg_gradn, steplength);                // move the atom position
-			Ions_Move_Basic::move_atoms(move0, pos); 
+			Lattice_Change_Basic::change_lattice(move0, lat); 
 			
 			for (int i=0;i<dim;i++)                                // grad0 ,cg_grad0 are used to store the grad and cg_grad for the future using
 			{
@@ -156,16 +155,7 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 			fmax=fa;
 			sd=false;
 			
-			if(MOVE_IONS=="cg_bfgs")
-			{
-				if(Ions_Move_Basic::largest_grad * Ry_to_eV / 0.529177 < CG_THRESHOLD )         // cg to bfgs  by pengfei 13-8-8
-				{
-					 MOVE_IONS="bfgs";
-				}
-				Ions_Move_Basic::best_xxx = steplength;
-			}
-			
-			Ions_Move_Basic::trust_radius_ini = xb;
+			Lattice_Change_Basic::lattice_change_ini = xb;
 		}
 		else
 		{
@@ -207,15 +197,15 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 				}
 				
 				setup_move(move, cg_gradn, best_x);
-				Ions_Move_Basic::move_atoms(move, pos);
+				Lattice_Change_Basic::change_lattice(move, lat);
 				
 				trial=false;
 				xa=0;
 				f_cal(move0,move,dim,xc);
 				xc=xb+xc;
 				xpt=xc;
-				Ions_Move_Basic::trust_radius_ini = xc;
-								
+				
+				Lattice_Change_Basic::lattice_change_ini = xc;				
 			}
 			else
 			{
@@ -265,9 +255,9 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 					}
 					
 					setup_move(move, cg_gradn, best_x);
-					Ions_Move_Basic::move_atoms(move, pos);
+					Lattice_Change_Basic::change_lattice(move, lat);
 					
-					Ions_Move_Basic::trust_radius_ini = xc;
+					Lattice_Change_Basic::lattice_change_ini = xc;
 				}	 
 			}
 		}
@@ -276,16 +266,16 @@ void Ions_Move_CG::start(const matrix& force, const double& etot_in)
 	delete[] cg_grad;
 	delete[] grad;
 	delete[] cg_gradn;
-	delete[] pos;
+	delete[] lat;
 	delete[] move;
 	
 	return;	
 }
 
-void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_grad, const double *cg_grad0, const int &ncggrad, int &flag)
+void Lattice_Change_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_grad, const double *cg_grad0, const int &ncggrad, int &flag)
 {
-	TITLE("Ions_Move_CG","setup_cg_grad");
-	assert(Ions_Move_Basic::istep > 0);
+	TITLE("Lattice_Change_CG","setup_cg_grad");
+	assert(Lattice_Change_Basic::istep > 0);
 	double gamma;
 	double cg0_cg,cg0_cg0,cg0_g;
 	
@@ -337,7 +327,7 @@ void Ions_Move_CG::setup_cg_grad(double *grad, const double *grad0, double *cg_g
 	return;
 }
 
-void Ions_Move_CG::third_order(const double &e0,const double &e1,const double &fa, const double &fb, const double x, double &best_x)
+void Lattice_Change_CG::third_order(const double &e0,const double &e1,const double &fa, const double &fb, const double x, double &best_x)
 {
 	double k3,k2,k1;
 	double dmoveh,dmove1,dmove2,dmove,ecal1,ecal2;
@@ -373,7 +363,7 @@ void Ions_Move_CG::third_order(const double &e0,const double &e1,const double &f
 	return;
 }
 
-void Ions_Move_CG::Brent(double &fa,double &fb,double &fc,double &xa,double &xb,double &xc,double &best_x,double &xpt)
+void Lattice_Change_CG::Brent(double &fa,double &fb,double &fc,double &xa,double &xb,double &xc,double &best_x,double &xpt)
 {
 	double dmove;
 	double tmp;
@@ -438,7 +428,7 @@ void Ions_Move_CG::Brent(double &fa,double &fb,double &fc,double &xa,double &xb,
 	return;
 }
 
-void Ions_Move_CG::f_cal(const double *g0,const double *g1,const int &dim,double &f_value)
+void Lattice_Change_CG::f_cal(const double *g0,const double *g1,const int &dim,double &f_value)
 {
 	double hv0,hel;
 	hel=0;
@@ -456,7 +446,7 @@ void Ions_Move_CG::f_cal(const double *g0,const double *g1,const int &dim,double
 	return;
 }	
 
-void Ions_Move_CG::setup_move( double* move, double *cg_gradn, const double &trust_radius )
+void Lattice_Change_CG::setup_move( double* move, double *cg_gradn, const double &trust_radius )
 {
 	// movement using gradient and trust_radius.
 	for(int i=0; i<dim; ++i)
@@ -465,4 +455,3 @@ void Ions_Move_CG::setup_move( double* move, double *cg_gradn, const double &tru
 	}
 	return;
 }
-

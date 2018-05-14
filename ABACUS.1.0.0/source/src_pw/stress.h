@@ -31,6 +31,7 @@ public:
 
         void print_stress(const string &name, double f[][3], const bool screen, bool ry)const;
         void printstress_total (bool ry);
+	double sigmatot[3][3];
 
 private:
        void stres_knl();
@@ -70,7 +71,6 @@ private:
        double sigmanlc[3][3];
        double sigmaewa[3][3];
        double sigmaxcc[3][3];
-       double sigmatot[3][3];
 }; 
 
 
