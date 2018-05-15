@@ -34,6 +34,7 @@ public:
 	void fft_dlay_set();
 	void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in);
 	void print_data(ofstream &print)const;
+        void fft_map_after_vc(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time); //LiuXh add 20180515
 
 	int *isind;
 	int *ismap;
@@ -62,6 +63,8 @@ private:
 	int ngm_i;
 	int ngm_i_record;
 	bool allocate_igl2g;
+        int ngm_i2; //LiuXh add 20180515
+        int ngm_i_record2; //LiuXh add 20180515
 
 };
 

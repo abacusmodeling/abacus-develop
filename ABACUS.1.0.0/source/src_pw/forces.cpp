@@ -407,7 +407,10 @@ void Forces::cal_force_ew(void)
 
     for (int ig = gstart; ig < pw.ngmc; ig++)
     {
-        aux[ig] *= exp(-1.0 * pw.gg[ig] * ucell.tpiba2 / alpha / 4.0) / (pw.gg[ig] * ucell.tpiba2);
+        if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
+        {
+            aux[ig] *= exp(-1.0 * pw.gg[ig] * ucell.tpiba2 / alpha / 4.0) / (pw.gg[ig] * ucell.tpiba2);
+        }
     }
 
     int iat = 0;

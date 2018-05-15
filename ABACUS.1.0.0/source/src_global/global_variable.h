@@ -87,6 +87,7 @@ extern int T_IN_H; // 23, calculate T in H or not.
 extern int VL_IN_H; // 24, calculate Vl in H or not.
 extern int VNL_IN_H; // 25, calculate Vnl in H or not.
 extern int ZEEMAN_IN_H; // SunZhiyuan add 
+extern double   STRESS_THR; //LiuXh add 20180515
 
 
 //========================================================================

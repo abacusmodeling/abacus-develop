@@ -139,6 +139,11 @@ void UnitCell_pseudo::setup_cell(
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
 	this->invGGT = GGT.Inverse();
+        //LiuXh add 20180515
+        this->GT0 = latvec.Inverse();
+        this->G0  = GT.Transpose();
+        this->GGT0 = G * GT;
+        this->invGGT0 = GGT.Inverse();
 
 	ofs_running << endl;
 	out.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
@@ -1577,4 +1582,54 @@ void UnitCell_pseudo::check_dtau(void)
 		}
 	}
 	return;
+}
+
+//LiuXh add a new function here,
+//20180515
+void UnitCell_pseudo::setup_cell_after_vc(
+        const string &s_pseudopot_dir,
+        const string &fn, ofstream &log)
+{
+    if(MY_RANK == 0)
+    {
+        //ifstream ifa(fn.c_str(), ios::in);
+        //this->read_atom_species_after_vc(ifa);
+    }
+
+    assert(lat0 > 0.0);
+    this->omega = abs(latvec.Det()) * this->lat0 * lat0 * lat0;
+    if(this->omega <= 0)
+    {
+        WARNING_QUIT("setup_cell_after_vc", "omega <= 0 .");
+    }
+    else
+    {
+        ofs_running << endl;
+        OUT(ofs_running, "Volume (Bohr^3)", this->omega);
+        OUT(ofs_running, "Volume (A^3))", this->omega * pow(BOHR_TO_A, 3));
+    }
+
+    //==========================================================
+    // Calculate recip. lattice vectors and dot products
+    // latvec has the unit of lat0, but G has the unit 2Pi/lat0
+    //==========================================================
+    this->GT = latvec.Inverse();
+    this->G  = GT.Transpose();
+    this->GGT = G * GT;
+    this->invGGT = GGT.Inverse();
+
+    for(int it=0; it<ucell.ntype; it++)
+    {
+        Atom* atom = &ucell.atoms[it];
+        for(int ia =0;ia< atom->na;ia++)
+        {
+            atom->tau[ia] = atom->taud[ia] * ucell.latvec;
+        }
+    }
+
+    ofs_running << endl;
+    out.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);
+    out.printM3(ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
+
+    return;
 }

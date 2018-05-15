@@ -126,6 +126,9 @@ public:
     int *ig1;        				//
     int *ig2;        				// the indices of G components
     int *ig3;        				//
+    double *gg_global0; //LiuXh add 20180515
+    int *cutgg_num_table; //LiuXh add 20180515
+    int ggchg_time_global; //LiuXh add 20180515
 
     bool doublegrid;				// .TRUE. if we use a double grid; (for USPP)
     // .FALSE., if NCPP.
@@ -135,6 +138,7 @@ public:
 
     void gen_pw(ofstream &log, const UnitCell &Ucell_in, const kvect &Klist_in);
     void setup_structure_factor(); 		// Calculate structur factors
+    void update_gvectors(ofstream &log, const UnitCell &Ucell_in); //LiuXh add 20180515
 private:
     void setup_gg();
 

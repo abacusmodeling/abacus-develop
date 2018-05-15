@@ -558,10 +558,13 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     for (int ig = pw.gstart; ig<pw.ngmc; ig++)
     {
         const int j = pw.ig2fftc[ig];
-        const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+        if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
+        {
+            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
 
-        ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-        vh_g[ig] = fac * Porter[j];
+            ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+            vh_g[ig] = fac * Porter[j];
+        }
     }
 
     Parallel_Reduce::reduce_double_pool( ehart );

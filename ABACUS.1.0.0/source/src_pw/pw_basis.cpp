@@ -33,7 +33,11 @@ PW_Basis::PW_Basis()
     ig2 = new int[1];
     ig3 = new int[1];
 
-	this->nczp_start = 0;
+    this->nczp_start = 0;
+    gg_global0 = new double[1]; //LiuXh 20180515
+    cutgg_num_table = new int[1]; //LiuXh 20180515
+    ggchg_time_global = 0; //LiuXh 20180515
+
 }
 
 PW_Basis::~PW_Basis()
@@ -48,6 +52,7 @@ PW_Basis::~PW_Basis()
     delete [] gcar_global;
     delete [] gdirect_global;
     delete [] gg_global;
+    delete [] gg_global0; //LiuXh 20180515
 
 #ifdef __MPI
     delete [] gcar;
@@ -245,6 +250,34 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 //			cout << "\n ggchg_end = " << ggchg_end;
 //			cout << "\n ggchg = " << ggchg;
         } while ( ggchg_end < ggchg );
+
+        //LiuXh add 20180515, begin
+        ggchg_time_global = ggchg_time;
+        cutgg_num_table = new int[ggchg_time_global];
+        ZEROS(cutgg_num_table, ggchg_time_global);
+        ofs_running << "\n SETUP COORDINATES OF PLANE WAVES" << endl;
+
+        double cutgg_pieces2 = 10;
+
+        const double cutgg_delta2 = ggchg / std::pow( (double)cutgg_pieces2, 2.0/3.0 );
+
+        int cutgg_num_start2 = 0;
+        double ggchg_start2 = 0.0;
+        double ggchg_end2 = 0.0;
+
+        int ggchg_time2 = 1;
+        do
+        {
+            ggchg_end2 = cutgg_delta2 * std::pow( (double)ggchg_time2, 2.0/3.0 ) ;
+            if ( ggchg_end2 > ggchg ) ggchg_end2 = ggchg;
+
+            const int cutgg_num_now2 = PW_complement::get_total_pw_number( ggchg_start2, ggchg_end2, ncx, ncy, ncz, Ucell->GGT);
+            cutgg_num_table[ggchg_time2-1] = cutgg_num_now2;
+
+            ggchg_start2 = ggchg_end2;
+            ++ggchg_time2;
+        } while ( ggchg_end2 < ggchg ); //LiuXh add 20180515, end
+
 #endif
         /*
         stringstream ss;
@@ -1017,3 +1050,76 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 }
 #endif
 
+//LiuXh add a new function here,
+//20180515
+void PW_Basis::update_gvectors(ofstream &runlog, const UnitCell &Ucell_in)
+{
+    TITLE("PW_Basis","update_gvectors");
+    timer::tick("PW_Basis","update_gvectors",'B');
+
+#ifdef __MPI
+    bool cutgg_flag = true;
+
+#else
+    bool cutgg_flag = false;
+#endif
+
+    if (cutgg_flag)
+    {
+#ifdef __MPI
+        OUT(ofs_running,"number of total plane waves",ngmc_g);
+
+        double cutgg_pieces = 10;
+
+        const double cutgg_delta = ggchg / std::pow( (double)cutgg_pieces, 2.0/3.0 );
+
+        int cutgg_num_start = 0;
+        double ggchg_start = 0.0;
+        double ggchg_end = 0.0;
+
+        int ggchg_time = 1;
+        do
+        {
+            ggchg_end = cutgg_delta * std::pow( (double)ggchg_time, 2.0/3.0 ) ;
+            if ( ggchg_end > ggchg ) ggchg_end = ggchg;
+
+            delete[] gg_global;
+            delete[] gdirect_global;
+            delete[] gcar_global;
+
+            int ii = ggchg_time-1;
+            int cutgg_num_now = cutgg_num_table[ii];
+            int cutgg_num_now2 = cutgg_num_table[ii];
+            gg_global0 = new double[cutgg_num_now2];
+            gg_global = new double[cutgg_num_now2];
+            gdirect_global = new Vector3<double>[cutgg_num_now2];
+            gcar_global = new Vector3<double>[cutgg_num_now2];
+
+            PW_complement::get_total_pw_after_vc(gg_global0, gg_global, gdirect_global, ggchg_start, ggchg_end,
+                    ncx, ncy, ncz, Ucell->GGT, Ucell->GGT0, ngmc_g);
+
+            PW_complement::setup_GVectors(Ucell->G, cutgg_num_now, gg_global, gdirect_global, gcar_global);
+
+            FFT_chg.fft_map_after_vc(this->ig2fftc, this->ngmc, cutgg_num_now, ggchg_time);
+            FFT_wfc.fft_map_after_vc(this->ig2fftw, this->ngmw, cutgg_num_now, ggchg_time);
+
+            ggchg_start = ggchg_end;
+            ++ggchg_time;
+        } while ( ggchg_end < ggchg );
+    }
+
+#endif
+
+#ifdef __MPI
+    this->get_MPI_GVectors();
+#endif
+
+    this->get_nggm(this->ngmc);
+
+    this->setup_structure_factor();
+
+    timer::tick("PW_Basis","update_gvectors",'B');
+
+
+    return;
+}

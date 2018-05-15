@@ -73,6 +73,7 @@ void Input_Conv::Convert(void)
 	GRID_SPEED = INPUT.grid_speed;		//
     FORCE = INPUT.force;				// 8.1
     FORCE_THR = INPUT.force_thr;		// 8.2
+    STRESS_THR = INPUT.stress_thr; //LiuXh add 20180515
 #ifdef __FP
 	Force_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 #endif

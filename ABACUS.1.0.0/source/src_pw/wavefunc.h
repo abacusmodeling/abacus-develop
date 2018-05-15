@@ -53,6 +53,7 @@ class wavefunc : public WF_atomic
         int get_R(int ix, int iy, int iz);     // pengfei 2016-11-23
         int iw2it( int iw);
         int iw2ia( int iw);
+    void init_after_vc(const int nks); //LiuXh 20180515
 
         private:                              // pengfei 2016-11-23
 

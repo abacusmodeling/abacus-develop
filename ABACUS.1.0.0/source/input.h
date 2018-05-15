@@ -90,6 +90,7 @@ public:
     bool force_set;
     double force_thr;		// threshold of force in unit (Ry/Bohr)
 	double force_thr_ev2;	// invalid force threshold, mohan add 2011-04-17
+    double stress_thr;      // Pengfei Li 2017-11-01 //LiuXh update 20180515
 	bool stress;			// calculate the stress
 	string ion_dynamics;		// methods to move_ion: sd, bfgs, cg...
     double cg_threshold;    // threshold when cg to bfgs, pengfei add 2011-08-15

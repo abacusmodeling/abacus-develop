@@ -529,3 +529,79 @@ void Parallel_PW::print_data(ofstream &print)const
 
 	return;
 }
+
+//LiuXh add a new function here,
+//20180515
+void Parallel_PW::fft_map_after_vc(
+        int *ig2fft, // ig2fftc for charge grid, ig2fftw for wave function grid.
+        const int ngm, // ngmc for charge grid, ngmw for wave function grid.
+        const int &ngmc_g_in, // cutgg_num
+        int ggchg_time
+)
+{
+    if(test_pw) TITLE("Parallel_PW","fft_map_after_vc");
+
+    if(!allocate_igl2g)
+    {
+        delete[] ig_l2g;
+        this->ig_l2g = new int[ngm];
+        allocate_igl2g = true;
+    }
+
+    for (int ig = 0;ig < ngmc_g_in ;ig++)
+    {
+        int m1 = (int)pw.gdirect_global[ig].x;
+        int m2 = (int)pw.gdirect_global[ig].y;
+
+        if (m1 < 0){m1 += this->n1;}
+        if (m2 < 0){m2 += this->n2;}
+
+        int mc = m2 + m1 * this->n2;
+
+        if (this->isind[mc] >= 0)
+        {
+            if (pw.gg_global0[ig] <= this->gcut)
+            {
+                this->ig_l2g[ngm_i2] = ig;
+                if(this->gcut == pw.ggchg)
+                {
+                    pw.gdirect[ngm_i2] = pw.gdirect_global[ig];
+                    pw.gcar[ngm_i2] = pw.gdirect[ngm_i2]*ucell.G;
+                    pw.gg[ngm_i2] = pw.gg_global[ig];
+                }
+                ++ngm_i2;
+            }
+        }
+    }
+
+    for (int ig=ngm_i_record2; ig<ngm_i2; ig++)
+    {
+        int x = int(pw.gdirect_global[this->ig_l2g[ig]].x);
+        int y = int(pw.gdirect_global[this->ig_l2g[ig]].y);
+        int z = int(pw.gdirect_global[this->ig_l2g[ig]].z);
+
+        if (x < 0) x += this->n1;
+        if (y < 0) y += this->n2;
+        if (z < 0) z += this->n3;
+
+        const int index_now = y+x*n2;
+
+        if(this->isind[index_now]==-1)
+        {
+            cerr<<"I don't know this grid !"<<endl;
+            cout<<setw(12)<<"xy"
+                <<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<endl;
+            cout<<setw(12)<<index_now
+                <<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<endl;
+            WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
+        }
+        ig2fft[ig] = z + this->isind[index_now] * this->n3;
+    }
+
+    ngm_i_record2 = ngm_i2;
+    if(ggchg_time == 10) {ngm_i2 = 0; ngm_i_record2 = 0;}
+
+    return;
+}
+
+

@@ -197,6 +197,7 @@ void Input::Default(void)
     force_set=false;
     force_thr=1.0e-3;
 	force_thr_ev2=0;
+    stress_thr = 1.0e-2; //LiuXh add 20180515
 	stress=false;
 	ion_dynamics="cg"; // pengfei  2014-10-13
     cg_threshold=0.5; // pengfei add 2013-08-15
@@ -694,6 +695,10 @@ bool Input::Read(const string &fn)
         else if (strcmp("force_thr_ev2", word) == 0)
         {
             read_value(ifs, force_thr_ev2);
+        }
+        else if (strcmp("stress_thr", word) == 0)
+        {
+            read_value(ifs, stress_thr);
         }
         else if (strcmp("stress", word) == 0)
         {
@@ -1533,6 +1538,7 @@ void Input::Bcast()
     Parallel_Common::bcast_bool( force_set );
     Parallel_Common::bcast_double( force_thr);
     Parallel_Common::bcast_double( force_thr_ev2);
+    Parallel_Common::bcast_double( stress_thr); //LiuXh add 20180515
     Parallel_Common::bcast_bool( stress );
     Parallel_Common::bcast_string( ion_dynamics );
     Parallel_Common::bcast_double( cg_threshold); // pengfei add 2013-08-15
@@ -2370,6 +2376,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"force_thr",force_thr,"force threshold, unit: Ry/Bohr");
 	OUTP(ofs,"force_thr_ev",force_thr*13.6058/0.529177,"force threshold, unit: eV/Angstrom");
 	OUTP(ofs,"force_thr_ev2",force_thr_ev2,"force invalid threshold, unit: eV/Angstrom");
+        OUTP(ofs,"stress_thr",stress_thr,"stress threshold"); //LiuXh add 20180515
 	OUTP(ofs,"bfgs_w1",bfgs_w1,"wolfe condition 1 for bfgs");
 	OUTP(ofs,"bfgs_w2",bfgs_w2,"wolfe condition 2 for bfgs");
 	OUTP(ofs,"trust_radius_max", trust_radius_max,"maximal trust radius, unit: Bohr");

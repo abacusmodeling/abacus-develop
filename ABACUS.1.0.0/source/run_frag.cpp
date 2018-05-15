@@ -503,4 +503,51 @@ void Run_Frag::frag_test(void)
 {
 
 }
+
+//LiuXh add a new function here,
+//which is used to do initialization after variable cell
+//20180515
+void Run_Frag::frag_init_after_vc(void)
+{
+    ucell.setup_cell_after_vc(global_pseudo_dir, global_atom_card, ofs_running);
+    DONE(ofs_running, "SETUP UNITCELL");
+
+    if(SYMMETRY)
+    {
+        symm.analy_sys();
+        DONE(ofs_running, "SYMMETRY");
+    }
+
+    kv.set_after_vc(symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec);
+    DONE(ofs_running, "INIT K-POINTS");
+
+    pw.update_gvectors(ofs_running, ucell);
+
+    pw.setup_structure_factor();
+
+    wf.init_after_vc(kv.nks);
+
+    wf.init_at_1();
+
+    ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
+    //=================================
+    // initalize local pseudopotential
+    //=================================
+    ppcell.init_vloc();
+    DONE(ofs_running,"LOCAL POTENTIAL");
+
+    //======================================
+    // Initalize non local pseudopotential
+    //======================================
+    ppcell.init_vnl();
+    DONE(ofs_running,"NON-LOCAL POTENTIAL");
+
+    pot.init_pot(0);
+
+    ofs_running << " Setup the new wave functions?" << endl;
+    wf.wfcinit();
+
+    return;
+}
+    
 #endif

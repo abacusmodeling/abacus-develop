@@ -34,6 +34,12 @@ const int &bx, const int &by, const int &bz);
 void setup_GVectors(const Matrix3& G, const int &ngmc_g, double* gg,
                     Vector3<double>* ig, Vector3<double>* g);
 
+void get_total_pw_after_vc(double* ig2sort0, double* ig2sort, Vector3<double> *igsort,
+                  const double& ggcut_start, const double& ggcut_end,
+                  const int& nx, const int& ny, const int& nz, const Matrix3& GGT, // GGT = G*GT
+                  const Matrix3& GGT0,
+                  int& ngm); // number of total plane waves.
+
 #ifndef __MPI
 
 void get_ngmw(const int &ngmc, const double& ggwfc2, const double* gg_global, int &ngmw);

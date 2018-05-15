@@ -240,7 +240,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 			}
 			else
 			{
-				Run_Frag::frag_init_after_stress();
+				Run_Frag::frag_init_after_vc();
 				++stress_step;
 				return 0;
 			}

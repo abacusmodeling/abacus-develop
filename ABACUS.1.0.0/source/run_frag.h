@@ -17,10 +17,11 @@ public:
 
 #ifdef __FP
     static void frag_init(void);
-	void frag_test(void);
+    void frag_test(void);
     void frag_pw_line(void);
     void frag_LCAO_line(void);
-	void frag_linear_scaling_line(void);
+    void frag_linear_scaling_line(void);
+    static void frag_init_after_vc(void); //LiuXh add 20180515
 #endif
 
     void pw_line(void);

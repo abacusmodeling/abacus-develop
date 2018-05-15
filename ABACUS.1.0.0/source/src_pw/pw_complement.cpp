@@ -390,3 +390,61 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
     return;
 }
 #endif
+
+//LiuXh add a new function here,
+//20180515
+void PW_complement::get_total_pw_after_vc(
+        double* gg0,
+        double* gg,
+        Vector3<double> *ig,
+        const double& ggcut_start,
+        const double& ggcut_end,
+        const int& nx,
+        const int& ny,
+        const int& nz,
+        const Matrix3& GGT, // GGT = G*GT.
+        const Matrix3& GGT0,
+        int& ngm// number of total plane waves.
+)
+{
+    if (test_pw) TITLE("PW_complement","get_total_pw");
+    timer::tick("PW_complement","get_total_pw");
+    if (ggcut_end<=0.0)
+    {
+        WARNING_QUIT("PW_complement::get_total_pw","ggcut <= 0.0");
+    }
+
+    int ibox[3]={0,0,0};
+
+    ibox[0] = int(nx / 2) + 1;
+    ibox[1] = int(ny / 2) + 1;
+    ibox[2] = int(nz / 2) + 1;
+
+    Vector3<double> f;
+    int ng = 0;
+    int ng2 = 0;
+    for (int i = -ibox[0]; i <= ibox[0]; i++)
+    {
+        for (int j = -ibox[1]; j <= ibox[1]; j++)
+        {
+            for (int k = -ibox[2]; k <= ibox[2]; k++)
+            {
+                f.x = i;
+                f.y = j;
+                f.z = k;
+                double g2 = f * (GGT0 * f);
+                double g22 = f * (GGT * f);
+                if (g2 < ggcut_end && g2 >= ggcut_start)
+                {
+                    ig[ng] = f ;
+                    gg0[ng] = g2;
+                    g2 = f * (GGT * f);
+                    gg[ng] = g2;
+                    ++ng;
+                }
+            }
+        }
+    }
+    timer::tick("PW_complement","get_total_pw");
+    return;
+}

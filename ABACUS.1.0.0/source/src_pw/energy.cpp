@@ -486,8 +486,11 @@ double energy::ewald(void)
         {
             rhon += static_cast<double>( ucell.atoms[it].zv ) * conj( pw.strucFac(it, ig));
         }
-        ewaldg += fact * abs(rhon) * abs(rhon)
-                  * exp(- pw.gg[ig] * ucell.tpiba2 / alpha / 4.0 ) / pw.gg[ig] / ucell.tpiba2;
+        if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180515
+        {
+            ewaldg += fact * abs(rhon) * abs(rhon)
+                      * exp(- pw.gg[ig] * ucell.tpiba2 / alpha / 4.0 ) / pw.gg[ig] / ucell.tpiba2;
+        }
     }
 
 

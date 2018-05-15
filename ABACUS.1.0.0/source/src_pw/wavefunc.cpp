@@ -753,4 +753,100 @@ int wavefunc::iw2ia( int iw)    // pengfei 2016-11-23
     return na;
 }
 
+//LiuXh add a new function here,
+//20180515
+void wavefunc::init_after_vc(const int nks)
+{
+    static bool done_once = false;
+    if(done_once)
+    {
+        //return; //LiuXh add 2017-12-12
+    }
+    else
+    {
+        done_once = true;
+    }
 
+    TITLE("wavefunc","init");
+    //this->npwx = this->setupIndGk(pw, nks);
+    OUT(ofs_running,"npwx",npwx);
+
+    assert(npwx > 0);
+    assert(nks > 0);
+    assert(NBANDS > 0);
+
+    delete[] g2kin;
+    this->g2kin = new double[npwx];   // [npw],kinetic energy
+    ZEROS(g2kin, npwx);
+    Memory::record("wavefunc","g2kin",npwx,"double");
+    if(test_wf)OUT(ofs_running,"g2kin allocation","Done");
+
+    int prefactor = 1;
+    this->ekb = new double*[nks];
+    for(int ik=0; ik<nks; ik++)
+    {
+        ekb[ik] = new double[NBANDS];
+        ZEROS(ekb[ik], NBANDS);
+    }
+    this->allocate_ekb = true;
+
+    this->wg.create(nks, NBANDS);       // the weight of each k point and band
+    Memory::record("wavefunc","et",nks*NBANDS,"double");
+    Memory::record("wavefunc","wg",nks*NBANDS,"double");
+    if(test_wf)OUT(ofs_running, "et allocation","Done");
+    if(test_wf)OUT(ofs_running, "wg allocation","Done");
+
+    delete[] evc;
+    delete[] wanf2;
+
+    const int nks2 = nks * prefactor;
+
+    if(CALCULATION=="nscf" && wf.mem_saver==1)
+    {
+        this->evc = new ComplexMatrix[1];
+        this->wanf2 = new ComplexMatrix[1];
+
+        evc[0].create(NBANDS*prefactor, npwx);
+#ifdef __FP
+        if(BASIS_TYPE=="lcao_in_pw")
+        {
+            wanf2[0].create(NLOCAL*prefactor, npwx);
+            cout << " Memory for wanf2 (MB): " <<
+            Memory::record("wavefunc","wanf2",(NLOCAL*prefactor)*npwx,"complexmatrix") << endl;
+        }
+#endif
+        cout << " MEMORY FOR PSI (MB)  : " <<
+        Memory::record("wavefunc","evc",(NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+    }
+    else
+    {
+        this->evc = new ComplexMatrix [nks2];
+        this->wanf2 = new ComplexMatrix [nks2];
+
+        for (int ik = 0; ik < nks2; ik++)
+        {
+            this->evc[ik].create(NBANDS*prefactor, npwx);
+
+#ifdef __FP
+            if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
+            {
+                this->wanf2[ik].create(NLOCAL, npwx);
+            }
+#endif
+        }
+
+        cout << " MEMORY FOR PSI (MB)  : " <<
+        Memory::record("wavefunc","evc",(nks*prefactor)*(NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+    }
+
+    if(test_wf)
+    {
+        OUT(ofs_running,"evc allocation","Done");
+        if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+        {
+            OUT(ofs_running,"wanf2 allocation","Done");
+        }
+    }
+
+    return;
+}

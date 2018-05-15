@@ -41,6 +41,13 @@ public:
         const Matrix3 &latvec);
 
     void ibz_kpoint( const Symmetry &symm);
+    //LiuXh add 20180515
+    void set_after_vc(
+            const Symmetry &symm,
+            const string &k_file_name,
+            const int& nspin,
+            const Matrix3 &reciprocal_vec,
+            const Matrix3 &latvec);
 
 private:
     int nspin;
@@ -72,6 +79,9 @@ private:
     // step 5
     // print k lists.
     void print_klists(ofstream &fn);
+    bool read_kpoints_after_vc(const string &fn); //LiuXh add 20180515
+    void Monkhorst_Pack_after_vc(const int *nmp_in,const double *koffset_in,const int tipo); //LiuXh add 20180515
+    void mpi_k_after_vc(); //LiuXh add 20180515
 };
 
 #endif // KVECT_H

@@ -77,6 +77,7 @@ int T_IN_H = 1; // mohan add 2010-11-28
 int VL_IN_H = 1;
 int VNL_IN_H = 1;
 int ZEEMAN_IN_H = 1;
+double  STRESS_THR = 1.0e-2; //LiuXh add 20180515
 
 //----------------------------------------------------------
 // EXPLAIN : Parallel information

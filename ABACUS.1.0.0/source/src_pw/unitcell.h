@@ -54,6 +54,11 @@ public:
 	int *iwt2iat; // iwt ==> iat.
     IntArray itia2iat;//(it, ia)==>iat, the index in nat, add 2009-3-2 by mohan
     IntArray itiaiw2iwt;//(it, ia, iw)==>iwt, the index in nwfc, add 2009-3-2 by mohan
+    //LiuXh add 20180515
+    Matrix3 G0;
+    Matrix3 GT0;
+    Matrix3 GGT0;
+    Matrix3 invGGT0;
 	
 public:
     UnitCell();

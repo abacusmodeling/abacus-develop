@@ -221,6 +221,9 @@ cal_test0.o\
 cal_test.o\
 winput.o\
 update_input.o \
+lattice_change_methods.o \
+lattice_change_cg.o \
+lattice_change_basic.o \
 
 OBJS_COMMON=atom_spec.o \
 unitcell.o \

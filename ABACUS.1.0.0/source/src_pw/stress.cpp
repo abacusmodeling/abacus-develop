@@ -441,26 +441,29 @@ void Stress::stres_har(){
         for (int ig = pw.gstart; ig<pw.ngmc; ig++)
         {
             const int j = pw.ig2fftc[ig];
-            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+            if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
+            {
+                const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
 
-            ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-//            vh_g[ig] = fac * Porter[j];
-            shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
-            g[0]=pw.gcar[ig].x;
-            g[1]=pw.gcar[ig].y;
-            g[2]=pw.gcar[ig].z;
-            //test
+                ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+//              vh_g[ig] = fac * Porter[j];
+                shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
+                g[0]=pw.gcar[ig].x;
+                g[1]=pw.gcar[ig].y;
+                g[2]=pw.gcar[ig].z;
+                //test
            
-            //   cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
-            //   cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
-            //   cout<<"Porter "<<Porter[j]<<endl;
-            //   cout<<"tpiba2 "<<ucell.tpiba2<<endl;
+                //cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
+                //cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
+                //cout<<"Porter "<<Porter[j]<<endl;
+                //cout<<"tpiba2 "<<ucell.tpiba2<<endl;
             
             
-            for(l=0;l<3;l++){
-               for(m=0;m<l+1;m++){
-                  sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
-               }
+                for(l=0;l<3;l++){
+                   for(m=0;m<l+1;m++){
+                      sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
+                   }
+                }
             }
 
         }
@@ -1364,26 +1367,29 @@ void Stress::stres_ewa(){
     complex<double> rhostar;
     double sewald;
     for(int ng=pw.gstart;ng<pw.ngmc;ng++){
-       g2 = pw.gg[ng]* ucell.tpiba2;
-       g2a = g2 /4.0/alpha;
-       rhostar=(0.0,0.0);
-       for(int it=0; it < ucell.ntype; it++){
-                for(int i=0; i<ucell.atoms[it].na; i++){
-                       arg = (pw.gcar[ng].x * ucell.atoms[it].tau[i].x + pw.gcar[ng].y * ucell.atoms[it].tau[i].y + pw.gcar[ng].z * ucell.atoms[it].tau[i].z) * (TWO_PI);
-                       rhostar = rhostar + complex<double>(ucell.atoms[it].zv * cos(arg),ucell.atoms[it].zv * sin(arg));
-                }
-       }
-       rhostar /= ucell.omega;
-       sewald = fact* (TWO_PI) * e2 * exp(-g2a) / g2 * pow(abs(rhostar),2);
-       sdewald = sdewald - sewald;
-       g[0]=pw.gcar[ng].x;
-       g[1]=pw.gcar[ng].y;
-       g[2]=pw.gcar[ng].z;
-       for(l=0;l<3;l++){
-          for(m=0;m<l+1;m++){
-             sigmaewa[l][m]+=sewald * ucell.tpiba2 * 2.0 * g[l] * g[m] / g2 * (g2a+1);
-          }
-       }
+        if(pw.gg[ng] >= 1.0e-12) //LiuXh 20180410
+        {
+            g2 = pw.gg[ng]* ucell.tpiba2;
+            g2a = g2 /4.0/alpha;
+            rhostar=(0.0,0.0);
+            for(int it=0; it < ucell.ntype; it++){
+                     for(int i=0; i<ucell.atoms[it].na; i++){
+                            arg = (pw.gcar[ng].x * ucell.atoms[it].tau[i].x + pw.gcar[ng].y * ucell.atoms[it].tau[i].y + pw.gcar[ng].z * ucell.atoms[it].tau[i].z) * (TWO_PI);
+                            rhostar = rhostar + complex<double>(ucell.atoms[it].zv * cos(arg),ucell.atoms[it].zv * sin(arg));
+                     }
+            }
+            rhostar /= ucell.omega;
+            sewald = fact* (TWO_PI) * e2 * exp(-g2a) / g2 * pow(abs(rhostar),2);
+            sdewald = sdewald - sewald;
+            g[0]=pw.gcar[ng].x;
+            g[1]=pw.gcar[ng].y;
+            g[2]=pw.gcar[ng].z;
+            for(l=0;l<3;l++){
+               for(m=0;m<l+1;m++){
+                  sigmaewa[l][m]+=sewald * ucell.tpiba2 * 2.0 * g[l] * g[m] / g2 * (g2a+1);
+               }
+            }
+        } //LiuXh 20180410
     }
 
     for(l=0;l<3;l++){
