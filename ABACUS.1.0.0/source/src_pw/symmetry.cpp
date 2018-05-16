@@ -1602,6 +1602,38 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
 	ZEROS(temp, 9);
 	ZEROS(tot_sigma, 9);
 
+	temp[0]=ucell.a1.x;
+        temp[1]=ucell.a1.y;
+        temp[2]=ucell.a1.z;
+        temp[3]=ucell.a2.x;
+        temp[4]=ucell.a2.y;
+        temp[5]=ucell.a2.z;
+        temp[6]=ucell.a3.x;
+        temp[7]=ucell.a3.y;
+        temp[8]=ucell.a3.z;
+
+        for(int i=0;i<3;i++)
+        {
+                for(int j= 0;j<3;j++)
+                {
+                        for(int k=0;k<3;k++)
+                        {
+                                for(int l=0;l<3;l++)
+                                {
+                                        tot_sigma[i*3 +j] += sigma[k][l] * temp[i*3+k] * temp[j*3+l];
+                                }
+                        }
+                }
+        }
+	for(int i=0;i<3;i++)
+	{
+		for(int j = 0;j<3;j++)
+		{
+			sigma[i][j] = tot_sigma[i*3+j];
+		}
+	}
+	ZEROS(temp, 9);
+	ZEROS(tot_sigma, 9);
 
 	for ( int k = 0 ; k < nrotk; ++k)
 	{
@@ -1637,6 +1669,48 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
 			sigma[i][j] = tot_sigma[i *3 + j] / nrotk;
 		}
 	}
+
+	ZEROS(temp, 9);
+        ZEROS(tot_sigma, 9);
+        double det = ucell.a1.x*ucell.a2.y*ucell.a3.z -
+                ucell.a1.x*ucell.a3.y*ucell.a2.z +
+                ucell.a2.x*ucell.a3.y*ucell.a1.z -
+                ucell.a2.x*ucell.a1.y*ucell.a3.z +
+                ucell.a3.x*ucell.a1.y*ucell.a2.z -
+                ucell.a3.x*ucell.a2.y*ucell.a1.z;
+        if(det == 0)det = 1;
+        temp[0] = (ucell.a2.y*ucell.a3.z - ucell.a2.z*ucell.a3.y) / det;
+        temp[1] = -(ucell.a1.y*ucell.a3.z - ucell.a1.z*ucell.a3.y) / det;
+        temp[2] = (ucell.a1.y*ucell.a2.z - ucell.a1.z*ucell.a2.y) / det;
+        temp[3] = -(ucell.a2.x*ucell.a3.z - ucell.a2.z*ucell.a3.x) / det;
+        temp[4] = (ucell.a1.x*ucell.a3.z - ucell.a1.z*ucell.a3.x) / det;
+        temp[5] = -(ucell.a1.x*ucell.a2.z - ucell.a1.z*ucell.a2.x) / det;
+        temp[6] = (ucell.a2.x*ucell.a3.y - ucell.a2.y*ucell.a3.x) / det;
+        temp[7] = -(ucell.a1.x*ucell.a3.y - ucell.a1.y*ucell.a3.x) / det;
+        temp[8] = (ucell.a1.x*ucell.a2.y - ucell.a1.y*ucell.a2.x) / det;
+
+        for(int i=0;i<3;i++)
+        {
+                for(int j= 0;j<3;j++)
+                {
+                        for(int k=0;k<3;k++)
+                        {
+                                for(int l=0;l<3;l++)
+                                {
+                                        tot_sigma[i*3 +j] += sigma[k][l] * temp[i*3+k] * temp[j*3+l];
+                                }
+                        }
+                }
+        }
+
+	for(int i=0;i<3;i++)
+	{
+		for(int j = 0;j<3;j++)
+		{
+			sigma[i][j] = tot_sigma[i*3+j];
+		}
+	}
+
 	delete [] tot_sigma;
 	delete [] temp;
 	return;

@@ -188,6 +188,7 @@ extern int test_grid;
 extern int test_grid_driver;
 extern int test_overlap;
 extern int TEST_FORCE;// mohan add 2011-03-18
+extern int TEST_STRESS;//zhengdy add 2018-05-16
 extern int test_gridt; // mohan add 2011-03-17
 //==========================================================
 // src_wannier

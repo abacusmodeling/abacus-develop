@@ -24,7 +24,10 @@ void Stress::cal_stress()
     }
     //kinetic contribution
     stres_knl();
-
+if(SYMMETRY)
+{
+    symm.stress_symmetry(sigmakin);
+}//end symmetry
     //hartree contribution
     stres_har();
 
@@ -45,6 +48,10 @@ void Stress::cal_stress()
    
     //nonlocal
     stres_nl();
+if(SYMMETRY)
+{
+    symm.stress_symmetry(sigmanlc);
+}//end symmetry
 
     for(int ipol=0;ipol<3;ipol++){
         for(int jpol=0;jpol<3;jpol++){
@@ -56,32 +63,8 @@ void Stress::cal_stress()
     
 if(SYMMETRY)                          
 {
-    double d1,d2,d3;
-
-    for(int ipol=0; ipol<3; ipol++)
-    {
-                             Mathzone::Cartesian_to_Direct(sigmatot[ipol][0],sigmatot[ipol][1],sigmatot[ipol][2],
-                                        ucell.a1.x, ucell.a1.y, ucell.a1.z,
-                                        ucell.a2.x, ucell.a2.y, ucell.a2.z,
-                                        ucell.a3.x, ucell.a3.y, ucell.a3.z,
-                                        d1,d2,d3);
-                             sigmatot[ipol][0] = d1; sigmatot[ipol][1] = d2; sigmatot[ipol][2] = d3;
-
-    }
     symm.stress_symmetry(sigmatot);
-    for(int ipol=0; ipol<3; ipol++)
-    {
-                             Mathzone::Direct_to_Cartesian(sigmatot[ipol][0],sigmatot[ipol][1],sigmatot[ipol][2],
-                                        ucell.a1.x, ucell.a1.y, ucell.a1.z,
-                                        ucell.a2.x, ucell.a2.y, ucell.a2.z,
-                                        ucell.a3.x, ucell.a3.y, ucell.a3.z,
-                                        d1,d2,d3);
-                             sigmatot[ipol][0] = d1; sigmatot[ipol][1] = d2; sigmatot[ipol][2] = d3;
-
-    }
-    // cout << "nrotk =" << symm.nrotk << endl;
-}//end symmetry
-
+}
 /*    cout<<"total stress:"<<endl;
     for(int ipol=0;ipol<3;ipol++){
        for(int jpol=0;jpol<3;jpol++){
@@ -93,7 +76,6 @@ if(SYMMETRY)
         bool ry = false;
         this->printstress_total(ry);
  
-        int TEST_STRESS = 1;
         if(TEST_STRESS) 
         {               
                 ofs_running << "\n PARTS OF STRESS: " << endl;
@@ -125,7 +107,7 @@ void Stress::print_stress(const string &name, double f[][3], const bool screen, 
          //     fac = Ry_to_eV / 0.529177;
         }
 
-        cout << setprecision(6);
+        cout << setprecision(8);
         cout << setiosflags(ios::showpos);
 
         if(screen)
@@ -168,61 +150,62 @@ void Stress::print_stress(const string &name, double f[][3], const bool screen, 
 void Stress::printstress_total (bool ry)
 {
 // zhengdy update 2016-10-08
-        double unit_transform = 1;
+	double unit_transform = 1;
 
-        if(!ry)
-        {
-                unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
-        }
+	if(!ry)
+	{
+		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+	}
 //      cout.setf(ios::fixed);
 
 
         //ofs_running << setiosflags(ios::right);
-        ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
-        NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
+	ofs_running << setprecision(8) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
+	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
 
 //        if(INPUT.stress_set == 1)
-        int TEST_STRESS = 1;
-        if(TEST_STRESS)
-        {
-           ofstream ofs("STRESS.dat");
-           if(!ofs)
-           {
-              cout << "open STRESS.dat error !" <<endl;
-           }
+	if(TEST_STRESS)
+	{
+		stringstream ss;
+		ss << global_out_dir << "STRESS.dat" ;
+		ofstream ofs( ss.str().c_str() );
+		if(!ofs)
+		{
+			cout << "open STRESS.dat error !" <<endl;
+		}
 
-           for(int i=0; i<3; i++)
-           {
-               ofs << "   " << sigmatot[i][0]*unit_transform << "   " << sigmatot[i][1]*unit_transform << "   " << sigmatot[i][2]*unit_transform << endl;
-           }
+		for(int i=0; i<3; i++)
+		{
+			ofs << "   " << sigmatot[i][0]*unit_transform << "   " << sigmatot[i][1]*unit_transform << "   " << sigmatot[i][2]*unit_transform << endl;
+		}
 
-           ofs.close();
-        }
+		ofs.close();
+	}
 
-        if(TEST_STRESS)
-        {
-                cout << setiosflags(ios::fixed) << setprecision(6);
-                cout << setiosflags(ios::showpos);
-                cout << " ------------------- TOTAL      STRESS --------------------" << endl;
-        cout << " " << setw(8) << "STRESS" << endl;
-        ofs_running << " " << setw(12) << "STRESS" << endl;
-        }
-    for (int i=0; i<3; i++)
-    {
+	if(TEST_STRESS)
+	{
+		cout << setiosflags(ios::fixed) << setprecision(6);
+		cout << setiosflags(ios::showpos);
+		cout << " ------------------- TOTAL      STRESS --------------------" << endl;
+		cout << " " << setw(8) << "STRESS" << endl;
+		ofs_running << " " << setw(12) << "STRESS" << endl;
+	}
+	for (int i=0; i<3; i++)
+	{
 
-                        if(TEST_STRESS)
-            cout << " " << setw(15) << sigmatot[i][0]*unit_transform << setw(15)
-                 << sigmatot[i][1]*unit_transform << setw(15) << sigmatot[i][2]*unit_transform << endl;
+		if(TEST_STRESS)
+			cout << " " << setw(15) << sigmatot[i][0]*unit_transform << setw(15)
+			<< sigmatot[i][1]*unit_transform << setw(15) << sigmatot[i][2]*unit_transform << endl;
 
-            ofs_running << " " << setw(15) << sigmatot[i][0]*unit_transform << setw(15)
-            << sigmatot[i][1]*unit_transform << setw(15) << sigmatot[i][2]*unit_transform << endl;
+		ofs_running << " " << setw(15) << sigmatot[i][0]*unit_transform << setw(15)
+			<< sigmatot[i][1]*unit_transform << setw(15) << sigmatot[i][2]*unit_transform << endl;
 
 
-    }
-        ofs_running << setiosflags(ios::left);
-        cout << resetiosflags(ios::showpos);
+	}
+	ofs_running << setiosflags(ios::left);
+	cout << resetiosflags(ios::showpos);
 
-    return;
+	return;
 }
 
 

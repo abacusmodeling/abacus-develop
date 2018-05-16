@@ -135,6 +135,7 @@ void Input_Conv::Convert(void)
 	VNL_IN_H = INPUT.vnl_in_h;					// 25
 	ZEEMAN_IN_H = INPUT.zeeman_in_h;			//
 	TEST_FORCE = INPUT.test_force;				// 26
+	TEST_STRESS = INPUT.test_stress;
     FS_REF_ENERGY = INPUT.fs_ref_energy; 		// 16
 //----------------------------------------------------------
 // iteration (1/3)

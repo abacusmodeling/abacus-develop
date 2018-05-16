@@ -160,6 +160,7 @@ int test_grid = 0;// 4 now
 int test_grid_driver = 0;//4 now
 int test_overlap = 0;
 int TEST_FORCE = 0;//mohan add 2011-03-18
+int TEST_STRESS = 0;//zhengdy add 2018-05-16
 int test_gridt = 0; // mohan add 2011-03-17
 //----------------------------------------------------------
 // src_wannier
