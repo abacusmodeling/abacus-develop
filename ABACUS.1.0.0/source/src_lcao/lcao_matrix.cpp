@@ -299,6 +299,64 @@ void LCAO_Matrix::set_force
 	return;
 }
 
+void LCAO_Matrix::set_stress
+(
+    const int &iw1_all,
+    const int &iw2_all,
+    const double& vx,
+    const double& vy,
+    const double& vz,
+    const char &dtype,
+    const Vector3<double> &dtau)
+{
+    // use iw1_all and iw2_all to set Hloc
+    // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
+    const int ir = ParaO.trace_loc_row[ iw1_all ];
+    const int ic = ParaO.trace_loc_col[ iw2_all ];
+    const int index = ir * ParaO.ncol + ic;
+
+	if( index >= ParaO.nloc)
+	{
+		cout << " iw1_all = " << iw1_all << endl;
+		cout << " iw2_all = " << iw2_all << endl;
+		cout << " ir = " << ir << endl;
+		cout << " ic = " << ic << endl;
+		cout << " index = " << index << endl;
+		cout << " ParaO.nloc = " << ParaO.nloc << endl;
+		WARNING_QUIT("LCAO_Matrix","set_stress");
+	}
+
+	if (dtype == 'S')
+	{
+		this->DSloc_11[index] += vx * dtau.x;
+		this->DSloc_12[index] += vx * dtau.y;
+		this->DSloc_13[index] += vx * dtau.z;
+		this->DSloc_22[index] += vy * dtau.y;
+		this->DSloc_23[index] += vy * dtau.z;
+		this->DSloc_33[index] += vz * dtau.z;
+	}
+	else if (dtype == 'T')
+	{
+		// notice, the sign is '-', minus.
+		this->DHloc_fixed_11[index] -= vx * dtau.x;
+		this->DHloc_fixed_12[index] -= vx * dtau.y;
+		this->DHloc_fixed_13[index] -= vx * dtau.z;
+		this->DHloc_fixed_22[index] -= vy * dtau.y;
+		this->DHloc_fixed_23[index] -= vy * dtau.z;
+		this->DHloc_fixed_33[index] -= vz * dtau.z;
+	}
+	else if (dtype == 'N')
+	{
+		this->DHloc_fixed_11[index] += vx * dtau.x;
+		this->DHloc_fixed_12[index] += vx * dtau.y;
+		this->DHloc_fixed_13[index] += vx * dtau.z;
+		this->DHloc_fixed_22[index] += vy * dtau.y;
+		this->DHloc_fixed_23[index] += vy * dtau.z;
+		this->DHloc_fixed_33[index] += vz * dtau.z;
+	}
+
+	return;
+}
 
 void LCAO_Matrix::zeros_HSgamma(const char &mtype)
 {

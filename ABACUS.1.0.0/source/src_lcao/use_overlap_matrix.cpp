@@ -159,6 +159,7 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 								if(GAMMA_ONLY_LOCAL)
 								{
 									LM.set_force (iw1_all, iw2_all,	olm[0], olm[1], olm[2], dtype);
+									if(STRESS) LM.set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
 								}
 								else // k point algorithm
 								{

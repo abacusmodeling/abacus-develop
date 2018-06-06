@@ -167,6 +167,12 @@ void Force_LCAO_k::finish_k(void)
     delete [] LM.DHloc_fixedR_y;
     delete [] LM.DHloc_fixedR_z;
     delete [] LM.DH_r;
+    delete [] LM.stvnl11;
+    delete [] LM.stvnl12;
+    delete [] LM.stvnl13;
+    delete [] LM.stvnl22;
+    delete [] LM.stvnl23;
+    delete [] LM.stvnl33;
 	return;
 }
 
@@ -395,8 +401,7 @@ void Force_LCAO_k::cal_foverlap_k(void)
     //summation \sum_{i,j} E(i,j)*dS(i,j)
     //BEGIN CALCULATION OF FORCE OF EACH ATOM
 	//--------------------------------------------
-	Vector3<double> tau1, dtaui, tau2;
-	double r21[3],rt[3];
+	Vector3<double> tau1, dtau, tau2;
 
 	Record_adj RA;
 	RA.for_2d();
@@ -425,22 +430,6 @@ void Force_LCAO_k::cal_foverlap_k(void)
 				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 
 				Atom* atom2 = &ucell.atoms[T2];
-
-				if(STRESS){
-					tau1 = atom1->taud[I1];
-					tau2.x = atom2->taud[I2].x + RA.info[iat][cb][0];
-					tau2.y = atom2->taud[I2].y + RA.info[iat][cb][1];
-					tau2.z = atom2->taud[I2].z + RA.info[iat][cb][2];
-
-					rt[0] = ( tau2.x - tau1.x) ;
-					rt[1] = ( tau2.y - tau1.y) ;
-					rt[2] = ( tau2.z - tau1.z) ;
-					Mathzone::Direct_to_Cartesian(rt[0],rt[1],rt[2],
-								ucell.a1.x, ucell.a1.y, ucell.a1.z,
-								ucell.a2.x, ucell.a2.y, ucell.a2.z,
-								ucell.a3.x, ucell.a3.y, ucell.a3.z,
-								r21[0],r21[1],r21[2]);
-				}
 
 				for(int jj=0; jj<atom1->nw; jj++)
 				{
@@ -472,9 +461,9 @@ void Force_LCAO_k::cal_foverlap_k(void)
 							if(STRESS)
 							{
 								for(int ipol = 0;ipol<3;ipol++){
-									this->soverlap[0][ipol] += edm2d[is][irr] * LM.DSloc_Rx[irr] * r21[ipol];
-									this->soverlap[1][ipol] += edm2d[is][irr] * LM.DSloc_Ry[irr] * r21[ipol];
-									this->soverlap[2][ipol] += edm2d[is][irr] * LM.DSloc_Rz[irr] * r21[ipol];
+									this->soverlap[0][ipol] += edm2d[is][irr] * LM.DSloc_Rx[irr] * LM.DH_r[irr * 3 + ipol];
+									this->soverlap[1][ipol] += edm2d[is][irr] * LM.DSloc_Ry[irr] * LM.DH_r[irr * 3 + ipol];
+									this->soverlap[2][ipol] += edm2d[is][irr] * LM.DSloc_Rz[irr] * LM.DH_r[irr * 3 + ipol];
 								}
 							}
 						}
@@ -532,8 +521,6 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 	timer::tick("Force_LCAO_k","cal_ftvnl_dphi",'G');
 	
 	// get the adjacent atom's information.
-	Vector3<double> tau1, dtau, tau2;
-	double r21[3],rt[3];
 
 //	ofs_running << " calculate the ftvnl_dphi_k force" << endl;
 	Record_adj RA;
@@ -562,20 +549,6 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 				const int I2 = RA.info[iat][cb][4];
 				const int start2 = ucell.itiaiw2iwt(T2,I2,0);
 				Atom* atom2 = &ucell.atoms[T2];
-				if(STRESS){
-					tau1 = atom1->taud[I1];
-					tau2.x = atom2->taud[I2].x + RA.info[iat][cb][0];
-					tau2.y = atom2->taud[I2].y + RA.info[iat][cb][1];
-					tau2.z = atom2->taud[I2].z + RA.info[iat][cb][2];
-					rt[0] = ( tau2.x - tau1.x) ;
-					rt[1] = ( tau2.y - tau1.y) ;
-					rt[2] = ( tau2.z - tau1.z) ;
-					Mathzone::Direct_to_Cartesian(rt[0],rt[1],rt[2],
-								ucell.a1.x, ucell.a1.y, ucell.a1.z,
-								ucell.a2.x, ucell.a2.y, ucell.a2.z,
-								ucell.a3.x, ucell.a3.y, ucell.a3.z,
-								r21[0],r21[1],r21[2]);
-				}
 
 				for(int jj=0; jj<atom1->nw; ++jj)
 				{
@@ -600,12 +573,12 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(double** dm2d)
 							this->ftvnl_dphi[iat][1] += dm2d2 * LM.DHloc_fixedR_y[irr];
 							this->ftvnl_dphi[iat][2] += dm2d2 * LM.DHloc_fixedR_z[irr];
 							if(STRESS){
-								this->stvnl_dphi[0][0] += dm2d[is][irr] * LM.stvnl11[irr];
-								this->stvnl_dphi[0][1] += dm2d[is][irr] * LM.stvnl12[irr];
-								this->stvnl_dphi[0][2] += dm2d[is][irr] * LM.stvnl13[irr];
-								this->stvnl_dphi[1][1] += dm2d[is][irr] * LM.stvnl22[irr];
-								this->stvnl_dphi[1][2] += dm2d[is][irr] * LM.stvnl23[irr];
-								this->stvnl_dphi[2][2] += dm2d[is][irr] * LM.stvnl33[irr];
+								this->stvnl_dphi[0][0] -= dm2d[is][irr] * LM.stvnl11[irr];
+								this->stvnl_dphi[0][1] -= dm2d[is][irr] * LM.stvnl12[irr];
+								this->stvnl_dphi[0][2] -= dm2d[is][irr] * LM.stvnl13[irr];
+								this->stvnl_dphi[1][1] -= dm2d[is][irr] * LM.stvnl22[irr];
+								this->stvnl_dphi[1][2] -= dm2d[is][irr] * LM.stvnl23[irr];
+								this->stvnl_dphi[2][2] -= dm2d[is][irr] * LM.stvnl33[irr];
 
 							}
 						}
@@ -881,9 +854,9 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(double** dm2d)
 										if(STRESS)
 										{
 											for(int ipol=0;ipol<3;ipol++){
-												this->svnl_dbeta[0][ipol] += dm2d[is][iir] * (nlm[0] * r0[ipol] + nlm1[0] * r1[ipol]);
-												this->svnl_dbeta[1][ipol] += dm2d[is][iir] * (nlm[1] * r0[ipol] + nlm1[1] * r1[ipol]);
-												this->svnl_dbeta[2][ipol] += dm2d[is][iir] * (nlm[2] * r0[ipol] + nlm1[2] * r1[ipol]);
+												this->svnl_dbeta[0][ipol] += dm2d[is][iir] * (nlm[0] * r1[ipol] + nlm1[0] * r0[ipol]);
+												this->svnl_dbeta[1][ipol] += dm2d[is][iir] * (nlm[1] * r1[ipol] + nlm1[1] * r0[ipol]);
+												this->svnl_dbeta[2][ipol] += dm2d[is][iir] * (nlm[2] * r1[ipol] + nlm1[2] * r0[ipol]);
 											}
 										}
 									}

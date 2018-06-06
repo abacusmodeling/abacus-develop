@@ -20,6 +20,7 @@ class Stress_LCAO
 	void cal_stress_scc (void);
 	void cal_stress_cc (void);
         void cal_stress_har(void);
+	void cal_stress_gradcorr(void);
 	
 	void print_stress(const string &name, double f[][3], const bool screen, bool ry)const;
 	void printstress_total (bool ry);

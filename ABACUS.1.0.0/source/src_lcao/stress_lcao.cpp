@@ -1,6 +1,8 @@
 #include "stress_lcao.h"
 #include "../src_pw/global.h"
 #include "../src_pw/vdwd2.h"
+#include "../src_pw/xc_functional.h"
+#include "../src_pw/gga_pw.h"
 
 double Stress_LCAO::stress_invalid_threshold_ev = 0.00;
 
@@ -92,7 +94,8 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 //            sigmahar[i][i] = en.ehart /ucell.omega;
 
         }
-
+	//Exchange-correlation for PBE
+	cal_stress_gradcorr();
 
 	//--------------------------------------------------------
 	// need to move atom positions here.
@@ -256,7 +259,7 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 	// print Rydberg stress or not
 	bool ry = false;
   
-        int TEST_STRESS = 1;
+//        int TEST_STRESS = 1;
 	if(TEST_STRESS)
 	{
 		ofs_running << "\n PARTS OF STRESS: " << endl;
@@ -275,7 +278,7 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 
 		this->print_stress("EWALD      STRESS",sigmaewa,TEST_STRESS,ry);
                 this->print_stress("cc      STRESS",sigmacc,TEST_STRESS,ry);
-		this->print_stress("NLCC       STRESS",sigmacc,TEST_STRESS,ry);
+//		this->print_stress("NLCC       STRESS",sigmacc,TEST_STRESS,ry);
 		this->print_stress("XC        STRESS",sigmaxc,TEST_STRESS,ry);
                 this->print_stress("TOTAL        STRESS",scs,TEST_STRESS,ry);
 	}
@@ -385,7 +388,7 @@ void Stress_LCAO::printstress_total (bool ry)
 	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
 
 //        if(INPUT.stress_set == 1)
-        int TEST_STRESS = 1;
+//        int TEST_STRESS = 1;
         if(TEST_STRESS)
         {
            ofstream ofs("STRESS.dat");
@@ -435,7 +438,7 @@ void Stress_LCAO::cal_stress_loc(void)
     timer::tick("Stress_LCAO","cal_stress_loc",'F');
 
     double *dvloc;
-    double evloc,fact;
+    double evloc,fact=1.0;
     int ng,nt,l,m,is;
 
     dvloc = new double[pw.ngmc];
@@ -466,8 +469,8 @@ void Stress_LCAO::cal_stress_loc(void)
         }
      pw.FFT_chg.FFT3D(Porter, -1);
 
-    if(INPUT.gamma_only==1) fact=2.0;
-    else fact=1.0;
+//    if(INPUT.gamma_only==1) fact=2.0;
+//    else fact=1.0;
 
     evloc=0.0;
     double g[3]={0,0,0};
@@ -586,9 +589,9 @@ void Stress_LCAO::cal_stress_ew(void)
 
     //sdewald is the diagonal term 
 
-    double fact;
-    if (INPUT.gamma_only) fact=2.0;
-    else fact=1.0;
+    double fact=1.0;
+//    if (INPUT.gamma_only) fact=2.0;
+//    else fact=1.0;
 
     double g2,g2a;
     double arg;
@@ -684,7 +687,7 @@ void Stress_LCAO::cal_stress_cc(void)
 	timer::tick("Stress_LCAO","cal_stress_cc",'E');
         
 	int nt,ng,l,m,ir;
-	double fact;
+	double fact=1.0;
 	complex<double> sigmadiag;
 	double* rhocg;
 	double g[3];
@@ -723,12 +726,6 @@ void Stress_LCAO::cal_stress_cc(void)
 	ZEROS(rhocg, pw.nggm);
 
 	sigmadiag=0.0;
-	if(INPUT.gamma_only){
-		fact=2.0;
-	}
-	else{
-		fact=1.0;
-	}
 	for(nt=0;nt<ucell.ntype;nt++){
 		if(ucell.atoms[nt].nlcc){
 			//drhoc();
@@ -897,22 +894,13 @@ void Stress_LCAO::cal_stress_har(){
 //        ehart *= 0.5 * ucell.omega;
         //psic(:)=(0.0,0.0)
 
-     if(INPUT.gamma_only){
-        for(l=0;l<3;l++){
-           for(m=0;m<3;m++){
-              sigmahar[l][m] *= e2 * FOUR_PI;
-           }
-        }
-     }
-     else{
-        for(l=0;l<3;l++){
-           for(m=0;m<3;m++){
-              sigmahar[l][m] *= 0.5 * e2 * FOUR_PI;
-           }
-        }
-     }
-     for(l=0;l<3;l++)
-        sigmahar[l][l] += en.ehart /ucell.omega;
+	for(l=0;l<3;l++){
+		for(m=0;m<3;m++){
+			sigmahar[l][m] *= 0.5 * e2 * FOUR_PI;
+		}
+	}
+	for(l=0;l<3;l++)
+		sigmahar[l][l] += en.ehart /ucell.omega;
      for(l=0;l<3;l++){
         for(m=0;m<l;m++){
            sigmahar[m][l]=sigmahar[l][m];
@@ -932,6 +920,201 @@ void Stress_LCAO::cal_stress_har(){
      }
     delete[] rho_atom;
      return;
+}
+
+void Stress_LCAO::cal_stress_gradcorr() 
+{
+     
+     if (xcf.igcx == 0  &&  xcf.igcc == 0)
+     {
+        return;
+     } 
+     double sigma_gradcorr[3][3];
+     double* p= &sigma_gradcorr[0][0];
+     for(int i=0;i<9;i++)
+        *p++ = 0;
+
+     bool igcc_is_lyp = false;
+     if( xcf.igcc == 3 || xcf.igcc == 7)
+     {
+                igcc_is_lyp = true;
+     }
+
+     assert(NSPIN>0);
+     const double fac = 1.0/ NSPIN;
+
+     // doing FFT to get rho in G space: rhog1 
+     chr.set_rhog(chr.rho[0], chr.rhog[0]);
+     if(NSPIN==2)//mohan fix bug 2012-05-28
+     {
+          chr.set_rhog(chr.rho[1], chr.rhog[1]);
+     }
+     chr.set_rhog(chr.rho_core, chr.rhog_core);
+    
+	double* rhotmp1;
+	double* rhotmp2;
+	complex<double>* rhogsum1;
+	complex<double>* rhogsum2;
+	Vector3<double>* gdr1;
+	Vector3<double>* gdr2;
+ 
+     rhotmp1 = new double[pw.nrxx];
+     rhogsum1 = new complex<double>[pw.ngmc];
+     ZEROS(rhotmp1, pw.nrxx);
+     ZEROS(rhogsum1, pw.ngmc);
+     for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = chr.rho[0][ir] + fac * chr.rho_core[ir];
+     for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = chr.rhog[0][ig] + fac * chr.rhog_core[ig];
+	gdr1 = new Vector3<double>[pw.nrxx];
+	ZEROS(gdr1, pw.nrxx);
+
+        GGA_PW::grad_rho( rhogsum1 , gdr1 );
+
+        if(NSPIN==2)
+        {
+                rhotmp2 = new double[pw.nrxx];
+                rhogsum2 = new complex<double>[pw.ngmc];
+                ZEROS(rhotmp2, pw.nrxx);
+                ZEROS(rhogsum2, pw.ngmc);
+                for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] = chr.rho[1][ir] + fac * chr.rho_core[ir];
+                for(int ig=0; ig<pw.ngmc; ig++) rhogsum2[ig] = chr.rhog[1][ig] + fac * chr.rhog_core[ig];
+
+                        gdr2 = new Vector3<double>[pw.nrxx];
+                        ZEROS(gdr2, pw.nrxx);
+
+                GGA_PW::grad_rho( rhogsum2 , gdr2 );
+        }
+        
+        const double epsr = 1.0e-6;
+        const double epsg = 1.0e-10;
+
+        double grho2a = 0.0;
+        double grho2b = 0.0;
+        double sx = 0.0;
+        double sc = 0.0;
+        double v1x = 0.0;
+        double v2x = 0.0;
+        double v1c = 0.0;
+        double v2c = 0.0;
+        double vtxcgc = 0.0;
+        double etxcgc = 0.0;
+
+        if(NSPIN==1||NSPIN==4)
+        {
+                double segno;
+                for(int ir=0; ir<pw.nrxx; ir++)
+                {
+                        const double arho = std::abs( rhotmp1[ir] );
+			if(arho > epsr)
+			{
+				grho2a = gdr1[ir].norm2();
+				if( grho2a > epsg )
+				{
+					if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
+					if( rhotmp1[ir] < 0.0 ) segno = -1.0;
+
+					XC_Functional::gcxc( arho, grho2a, sx, sc, v1x, v2x, v1c, v2c);
+					double tt[3];
+					tt[0] = gdr1[ir].x;
+					tt[1] = gdr1[ir].y;
+					tt[2] = gdr1[ir].z;
+					for(int l = 0;l< 3;l++){
+						for(int m = 0;m< l+1;m++){
+							sigma_gradcorr[l][m] += tt[l] * tt[m] * e2 * (v2x + v2c);
+						}
+					}
+				}
+			}
+		} 
+	}
+	else if(NSPIN==2)
+	{
+		double v1cup = 0.0;
+		double v1cdw = 0.0;
+		double v2cup = 0.0;
+		double v2cdw = 0.0;
+		double v1xup = 0.0;
+		double v1xdw = 0.0;
+		double v2xup = 0.0;
+		double v2xdw = 0.0;
+		double v2cud = 0.0;
+		double v2c = 0.0;
+		for(int ir=0; ir<pw.nrxx; ir++)
+		{
+			double rh = rhotmp1[ir] + rhotmp2[ir];
+			grho2a = gdr1[ir].norm2();;
+			grho2b = gdr2[ir].norm2();;
+			//XC_Functional::gcx_spin();
+			gcx_spin(rhotmp1[ir], rhotmp2[ir], grho2a, grho2b,
+				sx, v1xup, v1xdw, v2xup, v2xdw);
+
+			if(rh > epsr)
+			{
+				if(igcc_is_lyp)
+				{
+					WARNING_QUIT("stress","igcc_is_lyp is not available now.");
+				}
+				else
+				{
+					double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
+					double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
+					//XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
+					gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
+					v2cup = v2c;
+					v2cdw = v2c;
+					v2cud = v2c;
+				}
+			}
+			else
+			{
+				sc = 0.0;
+				v1cup = 0.0;
+				v1cdw = 0.0;
+				v2c = 0.0;
+				v2cup = 0.0;
+				v2cdw = 0.0;
+				v2cud = 0.0;
+			}
+			double tt1[3],tt2[3];
+			{
+				tt1[0] = gdr1[ir].x;
+				tt1[1] = gdr1[ir].y;
+				tt1[2] = gdr1[ir].z;
+				tt2[0] = gdr2[ir].x;
+				tt2[1] = gdr2[ir].y;
+				tt2[2] = gdr2[ir].z;
+			}
+			for(int l = 0;l< 3;l++){
+			    for(int m = 0;m< l+1;m++){
+				//    exchange
+				sigma_gradcorr [l][m] += tt1[l] * tt1[m] * e2 * v2xup + 
+							tt2[l] * tt2[m] * e2 * v2xdw;
+				//    correlation
+				sigma_gradcorr [l][m] += ( tt1[l] * tt1[m] * v2cup + 
+							tt2[l] * tt2[m] * v2cdw + 
+							(tt1[l] * tt2[m] +
+							tt2[l] * tt1[m] ) * v2cud ) * e2;
+			    }
+			}
+		}
+	}
+
+	for(int l = 0;l< 3;l++){
+		for(int m = 0;m< l;m++){
+			sigma_gradcorr[m][l] = sigma_gradcorr[l][m];
+		}
+	}
+	for(int l = 0;l<3;l++){
+		for(int m = 0;m<3;m++){
+			Parallel_Reduce::reduce_double_pool( sigma_gradcorr[l][m] );
+		}
+	}
+	p= &sigma_gradcorr[0][0];
+	double* p1 = &sigmaxc[0][0];
+	for(int i=0;i<9;i++){
+		*p /= pw.ncxyz ;
+		*p1++ += *p++;  
+	}
+	return;
 }
 
 

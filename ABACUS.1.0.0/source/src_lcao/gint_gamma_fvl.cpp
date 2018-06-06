@@ -35,7 +35,8 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
 inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, vector<double> &rly, vector<vector<double>> &grly,      // Peize Lin change rly, grly 2016-08-26
                         const Numerical_Orbital_Lm* pointer, 
                         int* block_index, int* block_iw, int* block_size, bool** cal_flag,
-                        double** psir_ylm, double** dphix, double** dphiy, double** dphiz)
+                        double** psir_ylm, double** dphix, double** dphiy, double** dphiz,
+			double*** drr)
 {
     block_index[0]=0;
     double mt[3]={0,0,0};
@@ -79,6 +80,10 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, vector<d
             dr[1] = GridT.meshcell_pos[ib][1] + mt[1];
             dr[2] = GridT.meshcell_pos[ib][2] + mt[2];
 
+            if(STRESS)
+            {
+                for(int i=0;i<3;i++) drr[id][ib][i] = dr[i];
+            }
             distance = std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
             if(distance > ORB.Phi[it].getRcut())
             {
@@ -269,7 +274,9 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, vector<d
 
 inline void cal_meshball_DGridV(int size, int lgd_now, int LD_pool, int* block_index, int* block_iw, int* block_size, bool** cal_flag, double* vldr3, 
                             double** psir_ylm, double** psir_vlbr3, double** dphix, double** dphiy, double** dphiz, 
-                            double** DGridV_x, double** DGridV_y, double** DGridV_z)
+                            double** DGridV_x, double** DGridV_y, double** DGridV_z,
+			double* DGridV_11, double* DGridV_12, double* DGridV_13,
+			double* DGridV_22, double* DGridV_23, double* DGridV_33, double*** drr)
 {
     char transa='N', transb='T';
     double alpha=-1.0, beta=1.0;
@@ -331,6 +338,7 @@ inline void cal_meshball_DGridV(int size, int lgd_now, int LD_pool, int* block_i
             //++cal_flag_true;
             //OUT(ofs_running,"cal_num:", cal_num);
             if (cal_num > pw.bxyz/2)
+//            if(0)
             {
                 int k=pw.bxyz;
                 // OUT(ofs_running,"ia2", ia2);
@@ -354,6 +362,15 @@ inline void cal_meshball_DGridV(int size, int lgd_now, int LD_pool, int* block_i
                     &dphiz[0][idx2], &LD_pool, 
                     &psir_vlbr3[0][idx1], &LD_pool,  
                     &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
+                if(STRESS)
+                {
+                DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][0];
+                DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][1];
+                DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][2];
+                DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][1];
+                DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][2];
+                DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][0][2];
+                }
             }
             else if (cal_num > 0)
             {
@@ -379,6 +396,15 @@ inline void cal_meshball_DGridV(int size, int lgd_now, int LD_pool, int* block_i
                             &dphiz[ib][idx2], &LD_pool, 
                             &psir_vlbr3[ib][idx1], &LD_pool,  
                             &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
+                        if(STRESS)
+                        {
+                        DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][0];
+                        DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+                        DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+                        DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+                        DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+                        DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+                        }
                     }                    
                 }
             }
@@ -406,6 +432,27 @@ void Gint_Gamma::gamma_force(void)
     double** DGridV_x = new double*[GridT.lgd];
     double** DGridV_y = new double*[GridT.lgd];
     double** DGridV_z = new double*[GridT.lgd];
+    double* DGridV_11;
+    double* DGridV_12;
+    double* DGridV_13;
+    double* DGridV_22;
+    double* DGridV_23;
+    double* DGridV_33;
+    if(STRESS)
+    {
+        DGridV_11 = new double[GridT.lgd * GridT.lgd];
+        DGridV_12 = new double[GridT.lgd * GridT.lgd];
+        DGridV_13 = new double[GridT.lgd * GridT.lgd];
+        DGridV_22 = new double[GridT.lgd * GridT.lgd];
+        DGridV_23 = new double[GridT.lgd * GridT.lgd];
+        DGridV_33 = new double[GridT.lgd * GridT.lgd];
+        ZEROS(DGridV_11, GridT.lgd * GridT.lgd);
+        ZEROS(DGridV_12, GridT.lgd * GridT.lgd);
+        ZEROS(DGridV_13, GridT.lgd * GridT.lgd);
+        ZEROS(DGridV_22, GridT.lgd * GridT.lgd);
+        ZEROS(DGridV_23, GridT.lgd * GridT.lgd);
+        ZEROS(DGridV_33, GridT.lgd * GridT.lgd);
+    }
     for (int i=0; i<GridT.lgd; ++i)
     {
         DGridV_x[i] = &DGridV_pool[i*GridT.lgd];
@@ -495,6 +542,20 @@ void Gint_Gamma::gamma_force(void)
     //for(int i=0; i<400; ++i)
     //    grly[i]=new double[3];
 
+    double ***drr;//store dr for stress calculate, added by zhengdy
+    if(STRESS)//added by zhengdy-stress
+    {
+		drr = new double**[max_size];
+		for(int id=0; id<max_size; id++)
+		{
+			drr[id] = new double*[pw.bxyz];
+			for(int ib=0; ib<pw.bxyz; ib++)
+			{
+				drr[id][ib] = new double[3];
+				ZEROS(drr[id][ib],3);
+			}
+		}
+    }
     //OUT(ofs_running,"Data were prepared");
     //timer::tick("Gint_Gamma","prepare",'J');
     for (int i=0; i< GridT.nbx; i++)
@@ -530,7 +591,7 @@ void Gint_Gamma::gamma_force(void)
                 //OUT(ofs_running,"Start cal_psir_ylm_dphi");
                 //timer::tick("Gint_Gamma","dphi",'J');
                 cal_psir_ylm_dphi(size, grid_index, delta_r, rly, grly, pointer, 
-                        block_index, block_iw, block_size, cal_flag, psir_ylm, dphix, dphiy, dphiz);
+                        block_index, block_iw, block_size, cal_flag, psir_ylm, dphix, dphiy, dphiz, drr);
                 //timer::tick("Gint_Gamma","dphi",'J');
 
 //inline void cal_meshball_DGridV(int size, int GridT.lgd, int LD_pool, int* block_index, int* block_iw, int* block_size, double* vldr3, 
@@ -541,7 +602,9 @@ void Gint_Gamma::gamma_force(void)
                 //timer::tick("Gint_Gamma","dpvp",'J');
                 cal_meshball_DGridV(size, GridT.lgd, LD_pool, block_index, block_iw, block_size, cal_flag, vldr3, 
                             psir_ylm, psir_vlbr3, dphix,  dphiy, dphiz, 
-                            DGridV_x, DGridV_y, DGridV_z);
+                            DGridV_x, DGridV_y, DGridV_z,
+                            DGridV_11, DGridV_12, DGridV_13,
+                            DGridV_22, DGridV_23, DGridV_33, drr);
                 //timer::tick("Gint_Gamma","dpvp",'J');
                 // OUT(ofs_running,"cal_meshball_DGridV was done");
             }// k
@@ -582,26 +645,59 @@ ENDandRETURN:
     double* tmpx = new double[NLOCAL];
     double* tmpy = new double[NLOCAL];
     double* tmpz = new double[NLOCAL];
-    
+    double* tmp11;
+    double* tmp12;
+    double* tmp13;
+    double* tmp22;
+    double* tmp23;
+    double* tmp33;
+    if(STRESS)
+    {
+    tmp11 = new double[NLOCAL];
+    tmp12 = new double[NLOCAL];
+    tmp13 = new double[NLOCAL];
+    tmp22 = new double[NLOCAL];
+    tmp23 = new double[NLOCAL];
+    tmp33 = new double[NLOCAL];
+    }
+
     for (int i=0; i<NLOCAL; i++)
     {
         ZEROS(tmpx, NLOCAL);
         ZEROS(tmpy, NLOCAL);
         ZEROS(tmpz, NLOCAL);
-        
+        if(STRESS)
+        {
+        ZEROS(tmp11, NLOCAL);
+        ZEROS(tmp12, NLOCAL);
+        ZEROS(tmp13, NLOCAL);
+        ZEROS(tmp22, NLOCAL);
+        ZEROS(tmp23, NLOCAL);
+        ZEROS(tmp33, NLOCAL);
+        }
+
         const int mu = GridT.trace_lo[i];
         // mohan fix bug 2010-09-05
         // lack mu>=0 and nu>=0 in previous version.
         if(mu >=0)
         {
-               for (int j=0; j<NLOCAL; j++)
-             {
+            for (int j=0; j<NLOCAL; j++)
+            {
                 const int nu = GridT.trace_lo[j];
                 if(nu>=0)
                 {
                     tmpx[j] = DGridV_x[mu][nu];
                     tmpy[j] = DGridV_y[mu][nu];
                     tmpz[j] = DGridV_z[mu][nu];
+                    if(STRESS)
+                    {
+                        tmp11[j] = DGridV_11[mu*GridT.lgd + nu];
+                        tmp12[j] = DGridV_12[mu*GridT.lgd + nu];
+                        tmp13[j] = DGridV_13[mu*GridT.lgd + nu];
+                        tmp22[j] = DGridV_22[mu*GridT.lgd + nu];
+                        tmp23[j] = DGridV_23[mu*GridT.lgd + nu];
+                        tmp33[j] = DGridV_33[mu*GridT.lgd + nu];
+                    }
                 }
             }
         }
@@ -612,6 +708,15 @@ ENDandRETURN:
         Parallel_Reduce::reduce_double_pool( tmpx, NLOCAL );
         Parallel_Reduce::reduce_double_pool( tmpy, NLOCAL );
         Parallel_Reduce::reduce_double_pool( tmpz, NLOCAL );
+        if(STRESS)
+        {
+        Parallel_Reduce::reduce_double_pool( tmp11, NLOCAL );
+        Parallel_Reduce::reduce_double_pool( tmp12, NLOCAL );
+        Parallel_Reduce::reduce_double_pool( tmp13, NLOCAL );
+        Parallel_Reduce::reduce_double_pool( tmp22, NLOCAL );
+        Parallel_Reduce::reduce_double_pool( tmp23, NLOCAL );
+        Parallel_Reduce::reduce_double_pool( tmp33, NLOCAL );
+        }
 
         for (int j=0; j<NLOCAL; j++)
         {
@@ -620,11 +725,32 @@ ENDandRETURN:
                 continue;
             }
             LM.set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
+            if(STRESS)
+            {
+                const int irr = ParaO.trace_loc_row[ i ];
+                const int icc = ParaO.trace_loc_col[ j ];
+                const int index = irr * ParaO.ncol + icc;
+                LM.DHloc_fixed_11[index] += tmp11[j];
+                LM.DHloc_fixed_12[index] += tmp12[j];
+                LM.DHloc_fixed_13[index] += tmp13[j];
+                LM.DHloc_fixed_22[index] += tmp22[j];
+                LM.DHloc_fixed_23[index] += tmp23[j];
+                LM.DHloc_fixed_33[index] += tmp33[j];
+            }
         }
     }
     delete[] tmpx;
     delete[] tmpy;
     delete[] tmpz;
+    if(STRESS)
+    {
+        delete[] tmp11;
+        delete[] tmp12;
+        delete[] tmp13;
+        delete[] tmp22;
+        delete[] tmp23;
+        delete[] tmp33;
+    }
     //OUT(ofs_running,"DGridV was reduced");
 
    //OUT(ofs_running,"Start reduce DGridV");
@@ -673,6 +799,24 @@ ENDandRETURN:
     delete [] DGridV_x;
     delete [] DGridV_y;
     delete [] DGridV_z;
+    if(STRESS)
+    {
+        delete [] DGridV_11;
+        delete [] DGridV_12;
+        delete [] DGridV_13;
+        delete [] DGridV_22;
+        delete [] DGridV_23;
+        delete [] DGridV_33;
+        for(int id=0; id<max_size; id++)
+        {
+            for(int ib=0; ib<pw.bxyz; ib++)
+            {
+                delete[] drr[id][ib];
+            }
+            delete[] drr[id];
+        }
+        delete[] drr;
+    }
     delete [] DGridV_pool;
     return;
 }

@@ -440,9 +440,11 @@ bool Local_Orbital_Ions::force_stress(void)
 		FL.allocate (); 
 		FL.start_force();
 
+		matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
+                stress_lcao.create(3,3);
 		if(STRESS)
 		{
-			FL.cal_stress();
+			FL.cal_stress(stress_lcao);
 		}
 
         // (2) move the ions according to

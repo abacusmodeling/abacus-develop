@@ -93,12 +93,26 @@ class LCAO_Matrix
 	double* stvnl22;
 	double* stvnl23;
 	double* stvnl33;
+	double* DSloc_11;
+	double* DSloc_12;
+	double* DSloc_13;
+	double* DSloc_22;
+	double* DSloc_23;
+	double* DSloc_33;
+	double* DHloc_fixed_11;
+	double* DHloc_fixed_12;
+	double* DHloc_fixed_13;
+	double* DHloc_fixed_22;
+	double* DHloc_fixed_23;
+	double* DHloc_fixed_33;
 
 	void divide_HS_in_frag(void);
 	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);
 	void set_HSk(const int &iw1_all, const int &iw2_all, const complex<double> &v, const char &dtype);
 	void set_force (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy, 
 		const double& vz, const char &dtype);
+	void set_stress (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy,
+		const double& vz, const char &dtype, const Vector3<double> &dtau);
 
 	void zeros_HSgamma(const char &mtype);
 	void zeros_HSk(const char &mtype);

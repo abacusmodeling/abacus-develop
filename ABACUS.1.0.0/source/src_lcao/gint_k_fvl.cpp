@@ -587,28 +587,18 @@ void Gint_k::evaluate_vl_stress(const int &grid_index, const int &size, const in
 						iw1py = psiy;
 						iw1pz = psiz;
 
-                                                double rn[3],rm[3];
-                                                for(int i=0; i<3; i++)
-                                                {
-                                                    rn[i] = dr[ib][ia2][i] + rt[i] * ucell.lat0;
-                                                    if(i==0) rm[0] = dr[ib][ia2][0] + (atom2->tau[I2].x - atom1->tau[I1].x) * ucell.lat0;
-                                                    else if(i==1) rm[1] = dr[ib][ia2][1] + (atom2->tau[I2].y - atom1->tau[I1].y) * ucell.lat0;
-                                                    else if(i==2) rm[2] = dr[ib][ia2][2] + (atom2->tau[I2].z - atom1->tau[I1].z) * ucell.lat0;
-                                                }
-//cout<<"dr "<<dr[ib][ia2][0]<<" "<<rt[0]*ucell.lat0<<" "<<R1x<<" "<<R2x<<" "<<ib<<" "<<ia1<<" "<<ia2<<endl; //test
-
 						for (iw1p=psi1; iw1p < end1; ++ iw1p)
 						{
 							//vpsir1 = iw1p[0] * vldr3[ib];
 							vpsir1 = iw1px[0] * vldr3[ib];
 							vpsir2 = iw1py[0] * vldr3[ib];
 							vpsir3 = iw1pz[0] * vldr3[ib];
-                                                        vpsir11 = iw1px[0] * vldr3[ib] * (rn[0]+rm[0]) * 0.5;//dr[ib][ia2][0];
-                                                        vpsir22 = iw1py[0] * vldr3[ib] * (rn[1]+rm[1]) * 0.5;//dr[ib][ia2][1];
-                                                        vpsir33 = iw1pz[0] * vldr3[ib] * (rn[2]+rm[2]) * 0.5;//dr[ib][ia2][2];
-                                                        vpsir12 = iw1px[0] * vldr3[ib] * (rn[1]+rm[1]) * 0.5;//dr[ib][ia2][1];
-                                                        vpsir13 = iw1px[0] * vldr3[ib] * (rn[2]+rm[2]) * 0.5;//dr[ib][ia2][2];
-                                                        vpsir23 = iw1py[0] * vldr3[ib] * (rn[2]+rm[2]) * 0.5;//dr[ib][ia2][2];
+                                                        vpsir11 = iw1px[0] * vldr3[ib] * dr[ib][ia1][0];
+                                                        vpsir22 = iw1py[0] * vldr3[ib] * dr[ib][ia1][1];
+                                                        vpsir33 = iw1pz[0] * vldr3[ib] * dr[ib][ia1][2];
+                                                        vpsir12 = iw1px[0] * vldr3[ib] * dr[ib][ia1][1];
+                                                        vpsir13 = iw1px[0] * vldr3[ib] * dr[ib][ia1][2];
+                                                        vpsir23 = iw1py[0] * vldr3[ib] * dr[ib][ia1][2];
 							++iw1px;
 							++iw1py;
 							++iw1pz;

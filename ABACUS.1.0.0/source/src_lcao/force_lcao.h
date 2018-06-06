@@ -25,7 +25,7 @@ class Force_LCAO : private Force_LCAO_k
 	
 	void start_force(void);
 
-	void cal_stress(void);
+	void cal_stress(matrix &stress);
 	
 	// total force
 	matrix fcs; 

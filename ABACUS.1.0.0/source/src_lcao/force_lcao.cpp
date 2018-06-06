@@ -869,11 +869,18 @@ void Force_LCAO::cal_force_scc(void)
 }
 
 
-void Force_LCAO::cal_stress(void)
+void Force_LCAO::cal_stress(matrix &stress)
 {
      Stress_LCAO SS;
      SS.allocate();
      SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi);
+	for(int i=0;i<3;i++)
+	{
+		for(int j=0;j<3;j++)
+		{
+			stress(i,j) = SS.scs[i][j];
+		}
+	}
 
     return;
 }

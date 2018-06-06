@@ -59,6 +59,13 @@ void Force_LCAO_gamma::ftable_gamma (void)
         Parallel_Reduce::reduce_double_pool( this->fvnl_dbeta[iat], 3);
         Parallel_Reduce::reduce_double_pool( this->fvl_dphi[iat], 3);
     }
+	if(STRESS)for (int ipol=0; ipol<3; ipol++)
+	{
+		Parallel_Reduce::reduce_double_pool( this->soverlap[ipol], 3);
+		Parallel_Reduce::reduce_double_pool( this->stvnl_dphi[ipol], 3);
+		Parallel_Reduce::reduce_double_pool( this->svnl_dbeta[ipol], 3);
+		Parallel_Reduce::reduce_double_pool( this->svl_dphi[ipol], 3);
+	}
 
 	// delete DSloc_x, DSloc_y, DSloc_z
 	// delete DHloc_fixed_x, DHloc_fixed_y, DHloc_fixed_z
@@ -86,6 +93,33 @@ void Force_LCAO_gamma::allocate_gamma(void)
     ZEROS(LM.DSloc_x, ParaO.nloc);
     ZEROS(LM.DSloc_y, ParaO.nloc);
     ZEROS(LM.DSloc_z, ParaO.nloc);
+	//allocate stress part in gamma_only-line, added by zhengdy-stress
+if(STRESS){
+	LM.DSloc_11 = new double [ParaO.nloc];
+	LM.DSloc_12 = new double [ParaO.nloc];
+	LM.DSloc_13 = new double [ParaO.nloc];
+	LM.DSloc_22 = new double [ParaO.nloc];
+	LM.DSloc_23 = new double [ParaO.nloc];
+	LM.DSloc_33 = new double [ParaO.nloc];
+	ZEROS(LM.DSloc_11, ParaO.nloc);
+	ZEROS(LM.DSloc_12, ParaO.nloc);
+	ZEROS(LM.DSloc_13, ParaO.nloc);
+	ZEROS(LM.DSloc_22, ParaO.nloc);
+	ZEROS(LM.DSloc_23, ParaO.nloc);
+	ZEROS(LM.DSloc_33, ParaO.nloc);
+	LM.DHloc_fixed_11 = new double [ParaO.nloc];
+	LM.DHloc_fixed_12 = new double [ParaO.nloc];
+	LM.DHloc_fixed_13 = new double [ParaO.nloc];
+	LM.DHloc_fixed_22 = new double [ParaO.nloc];
+	LM.DHloc_fixed_23 = new double [ParaO.nloc];
+	LM.DHloc_fixed_33 = new double [ParaO.nloc];
+	ZEROS (LM.DHloc_fixed_11, ParaO.nloc);
+	ZEROS (LM.DHloc_fixed_12, ParaO.nloc);
+	ZEROS (LM.DHloc_fixed_13, ParaO.nloc);
+	ZEROS (LM.DHloc_fixed_22, ParaO.nloc);
+	ZEROS (LM.DHloc_fixed_23, ParaO.nloc);
+	ZEROS (LM.DHloc_fixed_33, ParaO.nloc);
+}
     //calculate dS in LCAO basis
     // tips: build_ST_new --> ParaO.set_force 
 	UHM.UOM.build_ST_new ('S', cal_deri);
@@ -125,6 +159,21 @@ void Force_LCAO_gamma::finish_ftable_gamma(void)
     delete [] LM.DHloc_fixed_x;
     delete [] LM.DHloc_fixed_y;
     delete [] LM.DHloc_fixed_z;
+	if(STRESS)//added by zhengdy-stress
+	{
+		delete [] LM.DSloc_11;
+		delete [] LM.DSloc_12;
+		delete [] LM.DSloc_13;
+		delete [] LM.DHloc_fixed_11;
+		delete [] LM.DHloc_fixed_12;
+		delete [] LM.DHloc_fixed_13;
+		delete [] LM.DSloc_22;
+		delete [] LM.DSloc_23;
+		delete [] LM.DSloc_33;
+		delete [] LM.DHloc_fixed_22;
+		delete [] LM.DHloc_fixed_23;
+		delete [] LM.DHloc_fixed_33;
+	}
 	return;
 }
 
@@ -800,6 +849,10 @@ void Force_LCAO_gamma::cal_foverlap(void)
 	{
 		ZEROS( foverlap[iat], 3);
 	}
+	for(int ipol=0; ipol<3; ++ipol)
+	{
+		ZEROS( this->soverlap[ipol], 3);
+	}
 
 	// set energy density matrix.
 	double** edm2d = new double*[NSPIN];
@@ -859,11 +912,36 @@ void Force_LCAO_gamma::cal_foverlap(void)
 				this->foverlap[iat][0] += sum * LM.DSloc_x[index];
 				this->foverlap[iat][1] += sum * LM.DSloc_y[index];
 				this->foverlap[iat][2] += sum * LM.DSloc_z[index];
+				if(STRESS)
+				{
+					this->soverlap[0][0] += sum/2.0 * LM.DSloc_11[index];
+					this->soverlap[0][1] += sum/2.0 * LM.DSloc_12[index];
+					this->soverlap[0][2] += sum/2.0 * LM.DSloc_13[index];
+					this->soverlap[1][1] += sum/2.0 * LM.DSloc_22[index];
+					this->soverlap[1][2] += sum/2.0 * LM.DSloc_23[index];
+					this->soverlap[2][2] += sum/2.0 * LM.DSloc_33[index];	
+				}
 			}
 		}
 	}
 
-
+	if(STRESS)
+	{
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				if(i<j) this->soverlap[j][i] = this->soverlap[i][j];
+			}
+		}
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				this->soverlap[i][j] *=  ucell.lat0 / ucell.omega;
+			}
+		}
+	}
 	for(int is=0; is<NSPIN; ++is)
 	{
 		delete[] edm2d[is];
@@ -877,6 +955,10 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(double** dm2d)
 {	
 	TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
 	timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi",'G');
+	if(STRESS)for(int ipol=0; ipol<3; ++ipol)
+	{
+		ZEROS( this->stvnl_dphi[ipol], 3);
+	}
 	for(int i=0; i<NLOCAL; i++)
 	{
 		const int iat = ucell.iwt2iat[i];
@@ -900,10 +982,34 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(double** dm2d)
 				this->ftvnl_dphi[iat][0] += sum * LM.DHloc_fixed_x[index];
 				this->ftvnl_dphi[iat][1] += sum * LM.DHloc_fixed_y[index];
 				this->ftvnl_dphi[iat][2] += sum * LM.DHloc_fixed_z[index];
+				if(STRESS)
+				{
+					this->stvnl_dphi[0][0] += sum/2.0 * LM.DHloc_fixed_11[index];
+					this->stvnl_dphi[0][1] += sum/2.0 * LM.DHloc_fixed_12[index];
+					this->stvnl_dphi[0][2] += sum/2.0 * LM.DHloc_fixed_13[index];
+					this->stvnl_dphi[1][1] += sum/2.0 * LM.DHloc_fixed_22[index];
+					this->stvnl_dphi[1][2] += sum/2.0 * LM.DHloc_fixed_23[index];
+					this->stvnl_dphi[2][2] += sum/2.0 * LM.DHloc_fixed_33[index];	
+				}
 			}
 		}
 	}
-	
+	if(STRESS){
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				if(i<j) this->stvnl_dphi[j][i] = this->stvnl_dphi[i][j];
+			}
+		}
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				this->stvnl_dphi[i][j] *=  ucell.lat0 / ucell.omega;
+			}
+		}
+	}
 	timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi",'G');
 	return;
 }
@@ -972,6 +1078,19 @@ void Force_LCAO_gamma::cal_fvl_dphi(double** dm2d)
 	ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
     ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
     ZEROS (LM.DHloc_fixed_z, ParaO.nloc);
+	if(STRESS)
+	{
+		ZEROS (LM.DHloc_fixed_11, ParaO.nloc);
+		ZEROS (LM.DHloc_fixed_12, ParaO.nloc);
+		ZEROS (LM.DHloc_fixed_13, ParaO.nloc);
+		ZEROS (LM.DHloc_fixed_22, ParaO.nloc);
+		ZEROS (LM.DHloc_fixed_23, ParaO.nloc);
+		ZEROS (LM.DHloc_fixed_33, ParaO.nloc);
+		for(int ipol=0; ipol<3; ++ipol)
+		{
+			ZEROS( this->svl_dphi[ipol], 3);
+		}
+	}
 
 	//xiaohui add 'OUT_LEVEL', 2015-09-16
 	if(OUT_LEVEL != "m") OUT(ofs_running,"VNA",VNA);
@@ -1056,7 +1175,15 @@ void Force_LCAO_gamma::cal_fvl_dphi(double** dm2d)
 					this->fvl_dphi[iat][0] -= dm2d2 * ( LM.DHloc_fixed_x[index] + tmpDHx[index] );
 					this->fvl_dphi[iat][1] -= dm2d2 * ( LM.DHloc_fixed_y[index] + tmpDHy[index] );
 					this->fvl_dphi[iat][2] -= dm2d2 * ( LM.DHloc_fixed_z[index] + tmpDHz[index] );
-
+					if(STRESS)
+					{
+						this->svl_dphi[0][0] += dm2d[is][index] * LM.DHloc_fixed_11[index];
+						this->svl_dphi[0][1] += dm2d[is][index] * LM.DHloc_fixed_12[index];
+						this->svl_dphi[0][2] += dm2d[is][index] * LM.DHloc_fixed_13[index];
+						this->svl_dphi[1][1] += dm2d[is][index] * LM.DHloc_fixed_22[index];
+						this->svl_dphi[1][2] += dm2d[is][index] * LM.DHloc_fixed_23[index];
+						this->svl_dphi[2][2] += dm2d[is][index] * LM.DHloc_fixed_33[index];
+					}
 					//	cout << setw(5) << iat << setw(5) << iat2 
 					//	<< setw(5) << mu << setw(5) << nu
 					//	<< setw(15) << LM.DHloc_fixed_z[index] << endl;
@@ -1077,7 +1204,23 @@ void Force_LCAO_gamma::cal_fvl_dphi(double** dm2d)
 	// test mohan tmp
 //	test_gamma(LM.DHloc_fixed_x,"LM.DHloc_fixed_x");
 
-
+	if(STRESS)
+	{
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				if(i<j) this->svl_dphi[j][i] = this->svl_dphi[i][j];
+			}
+		}
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				this->svl_dphi[i][j] /= ucell.omega;
+			}
+		}
+	}
 
 	delete[] tmpDHx;
 	delete[] tmpDHy;
@@ -1093,6 +1236,10 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(double** dm2d)
 {
 	TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
 	timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
+	if(STRESS)for(int ipol=0; ipol<3; ++ipol)
+	{
+		ZEROS( this->svnl_dbeta[ipol], 3);
+	}
 	for(int iat=0; iat<ucell.nat; iat++)
 	{
         const int it = ucell.iat2it[iat];
@@ -1125,6 +1272,16 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(double** dm2d)
 
                 const double dist1 = (tau1-tau0).norm() * ucell.lat0;
                 const double dist2 = (tau2-tau0).norm() * ucell.lat0;
+                double r0[3],r1[3];
+		if(STRESS)
+                {
+                    r1[0] = ( tau1.x - tau0.x) ;
+                    r1[1] = ( tau1.y - tau0.y) ;
+                    r1[2] = ( tau1.z - tau0.z) ;
+                    r0[0] = ( tau2.x - tau0.x) ;
+                    r0[1] = ( tau2.y - tau0.y) ;
+                    r0[2] = ( tau2.z - tau0.z) ;
+                }
 
                 if (dist1 > Rcut_Beta + Rcut_AO1
                         || dist2 > Rcut_Beta + Rcut_AO2)
@@ -1156,6 +1313,18 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(double** dm2d)
                             atom2->iw2m[kk], // m1
                             atom2->iw2n[kk], // n1
                             tau0, it);
+						double nlm1[3] = {0,0,0};
+						if(STRESS) UOT.snap_psibeta(
+								nlm1, 1,
+								tau2, T2,
+								atom2->iw2l[kk], // L2
+								atom2->iw2m[kk], // m2
+								atom2->iw2n[kk], // N2
+								tau1, T1,
+								atom1->iw2l[jj], // L1
+								atom1->iw2m[jj], // m1
+								atom1->iw2n[jj], // n1
+								tau0, it);
 
 						const int index = mu * ParaO.ncol + nu;
 
@@ -1173,11 +1342,29 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(double** dm2d)
 						this->fvnl_dbeta[iat][1] -= sum * nlm[1];
 						this->fvnl_dbeta[iat][2] -= sum * nlm[2];
 
+						if(STRESS) 
+						{
+							for(int ipol=0;ipol<3;ipol++){
+								this->svnl_dbeta[0][ipol] -= sum/2.0 * (nlm[0] * r0[ipol] + nlm1[0] * r1[ipol])* -1;
+								this->svnl_dbeta[1][ipol] -= sum/2.0 * (nlm[1] * r0[ipol] + nlm1[1] * r1[ipol])* -1;
+								this->svnl_dbeta[2][ipol] -= sum/2.0 * (nlm[2] * r0[ipol] + nlm1[2] * r1[ipol])* -1;
+							}
+						}
                     }//!kk
                 }//!ad2
             }//!jj
         }//!ad1
     }//!iat
+	if(STRESS)
+	{
+		for(int i=0;i<3;i++)
+		{
+			for(int j=0;j<3;j++)
+			{
+				this->svnl_dbeta[i][j] *=  ucell.lat0 / ucell.omega;
+			}
+		}
+	}
 	timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 	return;
 }
