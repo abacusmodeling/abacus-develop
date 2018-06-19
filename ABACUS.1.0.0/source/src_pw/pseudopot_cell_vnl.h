@@ -60,6 +60,8 @@ public:
 	pseudopot_cell_vnl();
 	~pseudopot_cell_vnl();
 
+    double cell_factor; //LiuXh add 20180619
+
 public:
 	void init(const int ntype, const bool allocate_vkb=1);
 	void init_vnl(void);

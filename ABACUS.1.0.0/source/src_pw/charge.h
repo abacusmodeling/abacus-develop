@@ -62,6 +62,8 @@ public:
 
 	double check_ne(const double *rho_in) const;
 
+    void init_final_scf(); //LiuXh add 20180619
+
 private:
 
     void sum_band_k();
@@ -69,6 +71,7 @@ private:
     double sum_rho(void) const;
 
 	bool allocate_rho;
+bool allocate_rho_final_scf; //LiuXh add 20180606
 
 };
 

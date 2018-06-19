@@ -89,6 +89,8 @@ double Mathzone::Polynomial_Interpolation
 		cout << "\n x = " << x;
 		cout << "\n table_interval = " << table_interval;
 		cout << "\n iq=" << iq << " table_length = " << table_length << endl;
+                cout << "\n Not enough space allocated for radial FFT: try restarting with a larger cell_factor" << endl; //LiuXh add 20180619
+                cout << "\n Now cell_factor is: " << ppcell.cell_factor << endl; //LiuXh add 20180619
 	}
 	assert(iq < table_length-4);
     const double x0 = position - static_cast<double>(iq);

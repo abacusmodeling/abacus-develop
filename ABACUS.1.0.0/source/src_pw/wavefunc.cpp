@@ -59,6 +59,7 @@ void wavefunc::init_local(void)
 
 void wavefunc::init(const int nks)
 {	
+/*LiuXh modify 20180619
 	static bool done_once = false;
 	if(done_once)
 	{
@@ -68,6 +69,7 @@ void wavefunc::init(const int nks)
 	{
 		done_once = true;
 	}
+LiuXh modify 20180619*/
 
 	TITLE("wavefunc","init");
 	this->npwx = this->setupIndGk(pw, nks);

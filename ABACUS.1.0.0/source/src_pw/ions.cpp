@@ -101,6 +101,30 @@ void Ions::opt_ions_pw(void)
         }
 	
 
+    int iat=0; //LiuXh add 20180619
+    if(CALCULATION=="relax"|| CALCULATION=="md" )
+    {
+        for(int it = 0;it < ucell.ntype;it++)
+        {
+            Atom* atom = &ucell.atoms[it];
+    	for(int ia =0;ia< ucell.atoms[it].na;ia++)
+    	{
+    	    CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
+    	    CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
+    	    CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
+    	    
+    	    CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
+    	    CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
+    	    CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
+    
+    	    CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
+    	    CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
+    	    CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
+    
+    	    iat++;
+            }
+        }
+    }
 	
 
 		
@@ -131,6 +155,13 @@ void Ions::opt_ions_pw(void)
 
 		++istep;
 
+    }
+
+    if(stop && STRESS) //LiuXh add 20180619
+    {
+        FINAL_SCF = true;
+        Run_Frag::final_calculation_after_vc();
+        this->self_consistent(0);
     }
 
 	if(OUT_LEVEL=="i")
@@ -228,7 +259,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 				for(int j=0;j<3;j++)
 				{
 					stress(i,j) = ss.sigmatot[i][j];
-					OUT(ofs_running,"stress(i,j)", stress(i,j));
+					//OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
 				}
 				
 			LCM.cal_lattice_change(stress_step, stress, en.etot);
@@ -241,6 +272,12 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 			else
 			{
 				Run_Frag::frag_init_after_vc();
+                                //pot.init_pot(0);
+                                pot.init_pot(stress_step); //LiuXh add 20180619
+                                
+                                ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
+                                wf.wfcinit(); //LiuXh add 20180619
+
 				++stress_step;
 				return 0;
 			}
@@ -250,6 +287,21 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 			//stress_step = 1;
 
 			pw.setup_structure_factor();
+                        int iat=0; //LiuXh add 20180619
+                        for(int it = 0;it < ucell.ntype;it++)
+                        {
+                            Atom* atom = &ucell.atoms[it];
+                            for(int ia =0;ia< ucell.atoms[it].na;ia++)
+                            {
+                                CE.pos_next[3*iat  ] = atom->tau[ia].x*ucell.lat0;
+                        	CE.pos_next[3*iat+1] = atom->tau[ia].y*ucell.lat0;
+                        	CE.pos_next[3*iat+2] = atom->tau[ia].z*ucell.lat0;
+                        
+                                iat++;
+                            }
+                        }
+                        CE.istep = force_step;
+
 			CE.extrapolate_charge();
 			pot.init_pot( istep );
 			wf.wfcinit();

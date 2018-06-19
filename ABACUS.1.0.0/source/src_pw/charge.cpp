@@ -29,11 +29,13 @@
 Charge::Charge()
 {
 	allocate_rho = false;
+    allocate_rho_final_scf = false; //LiuXh add 20180619
 }
 
 Charge::~Charge()
 {
-	if(allocate_rho)
+	//if(allocate_rho) //LiuXh modify 20180619
+	if(allocate_rho || allocate_rho_final_scf) //LiuXh add 20180619
 	{
 		for(int i=0; i<NSPIN; i++)
 		{
@@ -46,7 +48,7 @@ Charge::~Charge()
 		delete[] rhog;
 		delete[] rho_save;
 		delete[] rhog_save;
-    	delete[] rho_core;
+    	        delete[] rho_core;
 		delete[] rhog_core;
 	}
 }
@@ -1315,4 +1317,53 @@ double Charge::check_ne(const double *rho_in) const
 	cout << " check the electrons number from rho, ne =" << ne << endl;
 	cout << setprecision(6);
 	return ne;
+}
+
+//LiuXh add 20180619
+void Charge::init_final_scf()
+{
+    if (test_charge) TITLE("Charge","init");
+
+	assert(allocate_rho_final_scf == false);
+
+    if (test_charge > 1)
+    {
+        cout << "\n spin_number = " << NSPIN
+             << " real_point_number = " << pw.nrxx;
+    }
+
+	// allocate memory
+	rho = new double*[NSPIN];
+	rhog = new complex<double>*[NSPIN];
+	rho_save = new double*[NSPIN];
+	rhog_save = new complex<double>*[NSPIN];
+
+	for(int is=0; is<NSPIN; is++)
+	{
+		rho[is] = new double[pw.nrxx];
+		rhog[is] = new complex<double>[pw.ngmc];
+		rho_save[is] = new double[pw.nrxx];
+		rhog_save[is] = new complex<double>[pw.ngmc];			
+		ZEROS(rho[is], pw.nrxx);
+		ZEROS(rhog[is], pw.ngmc);
+		ZEROS(rho_save[is], pw.nrxx);
+		ZEROS(rhog_save[is], pw.ngmc);
+	}
+
+    Memory::record("Charge","rho",NSPIN*pw.nrxx,"double");
+    Memory::record("Charge","rho_save",NSPIN*pw.nrxx,"double");
+    Memory::record("Charge","rhog",NSPIN*pw.ngmc,"double");
+    Memory::record("Charge","rhog_save",NSPIN*pw.ngmc,"double");
+
+    this->rho_core = new double[pw.nrxx]; // core charge in real space
+    ZEROS( rho_core, pw.nrxx);
+
+	this->rhog_core = new complex<double>[pw.ngmc]; // reciprocal core charge
+	ZEROS( rhog_core, pw.ngmc);
+
+    Memory::record("Charge","rho_core",pw.nrxx,"double");
+    Memory::record("Charge","rhog_core",pw.ngmc,"double");
+
+	this->allocate_rho_final_scf = true;
+    return;
 }

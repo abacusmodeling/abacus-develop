@@ -305,6 +305,8 @@ public:
 
 	//xiaohui add 2015-09-16
 	bool input_error;
+
+    double cell_factor; //LiuXh add 20180619
 	
 	private:
 //==========================================================

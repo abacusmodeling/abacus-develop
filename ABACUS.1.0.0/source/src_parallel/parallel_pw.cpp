@@ -23,6 +23,13 @@ Parallel_PW::Parallel_PW()
 
 	this->isind = new int[1];
 	this->ismap = new int[1];
+
+    this->ngm_i_number = new int[1];
+    this->ngm_i2 = 0;
+    this->ngm_i_record2 = 0;
+    this->allocate_igl2g_final_scf = false; //LiuXh add 20180619
+    this->ngm_i_final_scf = 0;
+    this->ngm_i_record_final_scf = 0;
 }
 
 Parallel_PW::~Parallel_PW()
@@ -49,6 +56,8 @@ Parallel_PW::~Parallel_PW()
 	
 	delete[] isind;
 	delete[] ismap;
+	
+delete[] ngm_i_number;
 }
 
 void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in, const int &n3_in,
@@ -85,6 +94,10 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 			ofs_running << " processor="<<ip<<" npps="<<npps[ip] << endl;
 		}
 	}
+
+delete[] this->ngm_i_number;
+this->ngm_i_number = new int[10];
+ZEROS(ngm_i_number, 10);
 
 	return;
 }
@@ -391,7 +404,8 @@ void Parallel_PW::fft_dlay_set(void)
 void Parallel_PW::fft_map(
 	int *ig2fft, // ig2fftc for charge grid, ig2fftw for wave function grid.
 	const int ngm, // ngmc for charge grid, ngmw for wave function grid.
-	const int &ngmc_g_in // cutgg_num
+	const int &ngmc_g_in, // cutgg_num
+        int ggchg_time
 )
 {
 	if(test_pw) TITLE("Parallel_PW","fft_map");
@@ -433,6 +447,7 @@ void Parallel_PW::fft_map(
 		}
 	}
 
+        ngm_i_number[ggchg_time-1] = ngm_i; //LiuXh add 20180619
 
 	/*
 	if (ngm_i != this->npw_per[rank_use])
@@ -548,60 +563,105 @@ void Parallel_PW::fft_map_after_vc(
         allocate_igl2g = true;
     }
 
-    for (int ig = 0;ig < ngmc_g_in ;ig++)
+    if(this->gcut == pw.ggchg) ngm_i2 = ngm_i_number[ggchg_time-1];
+    for (int ig = ngm_i_record2;ig < ngm_i2;ig++)
     {
-        int m1 = (int)pw.gdirect_global[ig].x;
-        int m2 = (int)pw.gdirect_global[ig].y;
-
-        if (m1 < 0){m1 += this->n1;}
-        if (m2 < 0){m2 += this->n2;}
-
-        int mc = m2 + m1 * this->n2;
-
-        if (this->isind[mc] >= 0)
+        if(this->gcut == pw.ggchg)
         {
-            if (pw.gg_global0[ig] <= this->gcut)
-            {
-                this->ig_l2g[ngm_i2] = ig;
-                if(this->gcut == pw.ggchg)
-                {
-                    pw.gdirect[ngm_i2] = pw.gdirect_global[ig];
-                    pw.gcar[ngm_i2] = pw.gdirect[ngm_i2]*ucell.G;
-                    pw.gg[ngm_i2] = pw.gg_global[ig];
-                }
-                ++ngm_i2;
-            }
+            pw.gcar[ig] = pw.gdirect[ig]*ucell.G;
+            pw.gg[ig] = pw.gcar[ig].x * pw.gcar[ig].x + pw.gcar[ig].y * pw.gcar[ig].y + pw.gcar[ig].z * pw.gcar[ig].z;
         }
     }
 
-    for (int ig=ngm_i_record2; ig<ngm_i2; ig++)
-    {
-        int x = int(pw.gdirect_global[this->ig_l2g[ig]].x);
-        int y = int(pw.gdirect_global[this->ig_l2g[ig]].y);
-        int z = int(pw.gdirect_global[this->ig_l2g[ig]].z);
 
-        if (x < 0) x += this->n1;
-        if (y < 0) y += this->n2;
-        if (z < 0) z += this->n3;
+    if(this->gcut == pw.ggchg) ngm_i_record2 = ngm_i2;
 
-        const int index_now = y+x*n2;
-
-        if(this->isind[index_now]==-1)
-        {
-            cerr<<"I don't know this grid !"<<endl;
-            cout<<setw(12)<<"xy"
-                <<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<endl;
-            cout<<setw(12)<<index_now
-                <<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<endl;
-            WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
-        }
-        ig2fft[ig] = z + this->isind[index_now] * this->n3;
-    }
-
-    ngm_i_record2 = ngm_i2;
     if(ggchg_time == 10) {ngm_i2 = 0; ngm_i_record2 = 0;}
 
     return;
 }
 
 
+void Parallel_PW::fft_map_final_scf(
+	int *ig2fft, // ig2fftc for charge grid, ig2fftw for wave function grid.
+	const int ngm, // ngmc for charge grid, ngmw for wave function grid.
+	const int &ngmc_g_in // cutgg_num
+)
+{
+	if(test_pw) TITLE("Parallel_PW","fft_map_final_scf");
+
+	// if already found all the plane waves in this process, return.
+	if(ngm_i == ngm) return;
+
+	if(!allocate_igl2g_final_scf)
+	{
+		delete[] ig_l2g;
+		this->ig_l2g = new int[ngm];
+		allocate_igl2g_final_scf = true;
+	}
+
+	for (int ig = 0;ig < ngmc_g_in ;ig++)
+	{
+		int m1 = (int)pw.gdirect_global[ig].x;
+		int m2 = (int)pw.gdirect_global[ig].y;
+
+		if (m1 < 0){m1 += this->n1;}
+		if (m2 < 0){m2 += this->n2;}
+
+		int mc = m2 + m1 * this->n2; // mohan 2009-11-09
+
+		if (this->isind[mc] >= 0)
+		{
+			if (pw.gg_global[ig] <= this->gcut)
+			{
+				this->ig_l2g[ngm_i_final_scf] = ig;
+				if(this->gcut == pw.ggchg) // for charge, not for wave functions.
+				{
+					// set 
+					pw.gdirect[ngm_i_final_scf] = pw.gdirect_global[ig];
+					pw.gcar[ngm_i_final_scf] = pw.gdirect[ngm_i_final_scf]*ucell.G;
+					pw.gg[ngm_i_final_scf] = pw.gg_global[ig];
+				}
+				++ngm_i_final_scf;
+			}
+		}
+	}
+
+	for (int ig=ngm_i_record_final_scf; ig<ngm_i_final_scf; ig++)
+	{
+		//  Mohan fix the bug 2008-4-3 17:19
+		//	ig_l2g[i] is the index of ig_global
+		//	it tells the position in ig_global
+		//  for each plane wave in local processor
+		//  The local plane wave number is ngm_i = pw.ngmc
+		//  The total plane wave number is pw.ngmc_g
+		int x = int(pw.gdirect_global[this->ig_l2g[ig]].x);
+		int y = int(pw.gdirect_global[this->ig_l2g[ig]].y);
+		int z = int(pw.gdirect_global[this->ig_l2g[ig]].z);
+
+		if (x < 0) x += this->n1;
+		if (y < 0) y += this->n2;
+		if (z < 0) z += this->n3;
+
+		const int index_now = y+x*n2;
+		
+	//	cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<endl;
+		if(this->isind[index_now]==-1)
+		{
+			cerr<<"I don't know this grid !"<<endl;
+			cout<<setw(12)<<"xy"
+				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<endl;
+			cout<<setw(12)<<index_now
+				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<endl;
+			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
+		}
+		ig2fft[ig] = z + this->isind[index_now] * this->n3;
+		//cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
+	}
+
+	ngm_i_record_final_scf = ngm_i_final_scf;
+//	cout << "\n ngm_i_record = " << ngm_i_record;
+	//cout << setw(12) << "ngm_i" << setw(12) << ngm_i << endl;
+
+	return;
+}

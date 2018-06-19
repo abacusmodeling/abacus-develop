@@ -410,6 +410,8 @@ void Input::Default(void)
 	//xiaohui add 2015-09-16
 	input_error = 0;
 	
+    cell_factor = 1.2; //LiuXh add 20180619
+
     return;
 }
 
@@ -1414,6 +1416,10 @@ bool Input::Read(const string &fn)
         //{
         //    read_value(ifs, epsilon0_choice);
         //}					
+else if (strcmp("cell_factor", word) == 0)
+{
+    read_value(ifs, cell_factor);
+}
         else
         {
 		//xiaohui add 2015-09-15
@@ -1736,6 +1742,7 @@ void Input::Bcast()
 		}
 	
 		//Parallel_Common::bcast_int( epsilon0_choice );
+    Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
 
     return;
 }

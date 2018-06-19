@@ -341,6 +341,9 @@ void Input_Conv::Convert(void)
 	MD::md_tstep=INPUT.md_tstep;
 	MD::md_delt=INPUT.md_delt;
 */
+
+    ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
+
 	timer::tick("Input_Conv","Convert",'B');
     return;
 }

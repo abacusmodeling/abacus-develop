@@ -32,7 +32,9 @@ public:
 
 	void max_pw_column(int &pw,int &max_i,int &max_j);
 	void fft_dlay_set();
-	void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in);
+	//void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in);
+    void fft_map(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time);
+    void fft_map_final_scf(int *ig2fft,const int ngm, const int &ngmc_g_in); //LiuXh add 20180619
 	void print_data(ofstream &print)const;
         void fft_map_after_vc(int *ig2fft,const int ngm, const int &ngmc_g_in, int ggchg_time); //LiuXh add 20180515
 
@@ -65,6 +67,10 @@ private:
 	bool allocate_igl2g;
         int ngm_i2; //LiuXh add 20180515
         int ngm_i_record2; //LiuXh add 20180515
+    int *ngm_i_number;
+    bool allocate_igl2g_final_scf; //LiuXh add 20180619
+    int ngm_i_final_scf;
+    int ngm_i_record_final_scf;
 
 };
 

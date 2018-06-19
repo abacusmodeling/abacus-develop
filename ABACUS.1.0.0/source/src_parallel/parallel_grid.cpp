@@ -4,11 +4,13 @@
 Parallel_Grid::Parallel_Grid()
 {
 	this->allocate = false;
+    this->allocate_final_scf = false; //LiuXh add 20180619
 }
 
 Parallel_Grid::~Parallel_Grid()
 {
-	if(this->allocate)
+	//if(this->allocate) //LiuXh modify 20180619
+	if(this->allocate || this->allocate_final_scf) //LiuXh add 20180619
 	{
 		for(int ip=0; ip<NPOOL; ip++)
 		{
@@ -311,3 +313,73 @@ void Parallel_Grid::reduce_to_fullrho(double *rhotot, double *rhoin)
 	return;
 }
 #endif
+
+void Parallel_Grid::init_final_scf(const int &ncx_in, const int &ncy_in, const int &ncz_in, const int &nczp_in, 
+const int &nrxx_in, const int &nbz_in, const int &bz_in)
+{
+
+#ifndef __MPI
+	return;
+#endif
+
+	TITLE("Parallel_Grid","init");
+	
+	this->ncx = ncx_in;
+	this->ncy = ncy_in;
+	this->ncz = ncz_in;
+	this->nczp = nczp_in;
+	this->nrxx = nrxx_in;
+	this->nbz = nbz_in;
+	this->bz = bz_in;
+
+	if(nczp<0)
+	{
+		ofs_warning << " nczp = " << nczp << endl;
+		WARNING_QUIT("Parallel_Grid::init","nczp<0");
+	}
+
+	assert(ncx > 0);
+	assert(ncy > 0);
+	assert(ncz > 0);
+
+	this->ncxy = ncx * ncy;
+	this->ncxyz = ncxy * ncz;
+
+	// (2)
+	assert(allocate_final_scf==false);
+	assert(NPOOL > 0);
+
+	this->nproc_in_pool = new int[NPOOL];
+	const int remain_pro = NPROC%NPOOL;
+	for(int i=0; i<NPOOL; i++)
+	{
+		nproc_in_pool[i] = NPROC/NPOOL;
+		if(i<remain_pro) this->nproc_in_pool[i]++;
+	}	
+
+	this->numz = new int*[NPOOL];
+	this->startz = new int*[NPOOL];
+	this->whichpro = new int*[NPOOL];
+	this->numdata = new int*[NPOOL];
+	this->startdata = new int*[NPOOL];
+
+	for(int ip=0; ip<NPOOL; ip++)
+	{
+		const int nproc = nproc_in_pool[ip];
+		this->numz[ip] = new int[nproc];
+		this->startz[ip] = new int[nproc];
+		this->whichpro[ip] = new int[this->ncz];
+		this->numdata[ip] = new int[nproc];
+		this->startdata[ip] = new int[nproc];
+		ZEROS(this->numz[ip], nproc);
+		ZEROS(this->startz[ip], nproc);
+		ZEROS(this->whichpro[ip], this->ncz);
+		ZEROS(this->numdata[ip], nproc);
+		ZEROS(this->startdata[ip], nproc);
+	}
+
+	this->allocate_final_scf = true;
+	this->z_distribution();
+	
+	return;
+}

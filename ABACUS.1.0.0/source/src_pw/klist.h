@@ -54,6 +54,8 @@ private:
     bool kc_done;
     bool kd_done;
     double koffset[3];     			// used only in automatic k-points.
+    string k_kword; //LiuXh add 20180619
+    int k_nkstot; //LiuXh add 20180619
 
     void renew( const int &kpoint_number );
 
@@ -79,9 +81,10 @@ private:
     // step 5
     // print k lists.
     void print_klists(ofstream &fn);
-    bool read_kpoints_after_vc(const string &fn); //LiuXh add 20180515
-    void Monkhorst_Pack_after_vc(const int *nmp_in,const double *koffset_in,const int tipo); //LiuXh add 20180515
+    //bool read_kpoints_after_vc(const string &fn); //LiuXh add 20180515
+    //void Monkhorst_Pack_after_vc(const int *nmp_in,const double *koffset_in,const int tipo); //LiuXh add 20180515
     void mpi_k_after_vc(); //LiuXh add 20180515
+    void set_both_kvec_after_vc(const Matrix3 &G,const Matrix3 &R);
 };
 
 #endif // KVECT_H

@@ -36,6 +36,7 @@ kvect::kvect()
     nkstot = 0;
     nkstot_ibz = 0;
 
+    k_nkstot = 0; //LiuXh add 20180619
 }
 
 kvect::~kvect()
@@ -217,8 +218,13 @@ bool kvect::read_kpoints(const string &fn)
 
     //input k-points are in 2pi/a units
     READ_VALUE(ifk, nkstot);
-	//cout << " nkstot = " << nkstot << endl;
-	READ_VALUE(ifk, kword);
+
+    this->k_nkstot = nkstot; //LiuXh add 20180619
+
+    //cout << " nkstot = " << nkstot << endl;
+    READ_VALUE(ifk, kword);
+
+    this->k_kword = kword; //LiuXh add 20180619
 
     if (nkstot > MAX_KPOINTS)
     {
@@ -709,6 +715,33 @@ void kvect::ibz_kpoint(const Symmetry &symm)
 
 void kvect::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
 {
+
+    if(FINAL_SCF) //LiuXh add 20180606
+    {
+        if(k_nkstot == 0)
+        {
+            kd_done = true;
+            kc_done = false;
+        }
+        else
+        {
+            if(k_kword == "Cartesian" || k_kword == "C")
+	    {
+	        kc_done = true;
+	        kd_done = false;
+	    }
+	    else if (k_kword == "Direct" || k_kword == "D")
+	    {
+	        kd_done = true;
+	        kc_done = false;
+	    }
+            else
+            {
+                ofs_warning << " Error : neither Cartesian nor Direct kpoint." << endl;
+            }
+        }
+    }
+
     // set cartesian k vectors.
     if (!kc_done && kd_done)
     {
@@ -990,374 +1023,20 @@ void kvect::set_after_vc(
         const Matrix3 &reciprocal_vec,
         const Matrix3 &latvec)
 {
-    TITLE("kvect", "set");
-
-    ofs_running << "\n\n\n\n";
-    ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-    ofs_running << " |                                                                    |" << endl;
-    ofs_running << " | Setup K-points                                                     |" << endl;
-    ofs_running << " | We setup the k-points according to input parameters.               |" << endl;
-    ofs_running << " | The reduced k-points are set according to symmetry operations.     |" << endl;
-    ofs_running << " | We treat the spin as another set of k-points.                      |" << endl;
-    ofs_running << " |                                                                    |" << endl;
-    ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-    ofs_running << "\n\n\n\n";
+    TITLE("kvect", "set_after_vc");
 
     ofs_running << "\n SETUP K-POINTS" << endl;
     this->nspin = nspin_in;
     OUT(ofs_running,"nspin",nspin);
 
-    bool read_succesfully = this->read_kpoints_after_vc(k_file_name);
-#ifdef __MPI
-    Parallel_Common::bcast_bool(read_succesfully);
-#endif
-
-    if(!read_succesfully)
-    {
-        WARNING_QUIT("kvect::set","Something wrong while reading KPOINTS.");
-    }
-
-    if (SYMMETRY)
-    {
-        this->ibz_kpoint(symm);
-        this->update_use_ibz();
-        this->nks = this->nkstot = this->nkstot_ibz;
-    }
-
-    this->set_both_kvec(reciprocal_vec, latvec);
-
-    int deg = 0;
-    if(NSPIN == 1)
-    {
-        deg = 2;
-    }
-    else if(NSPIN == 2)
-    {
-        deg = 1;
-    }
-    else
-    {
-        WARNING_QUIT("kvect::set", "Only available for nspin = 1 or 2");
-    }
-
-    this->normalize_wk(deg);
-
-#ifndef __EPM
-    Pkpoints.kinfo(nkstot);
-#endif
+    this->set_both_kvec_after_vc(reciprocal_vec, latvec);
+    //this->set_both_kvec(reciprocal_vec, latvec);
 
     this->mpi_k_after_vc();
 
     this->set_kup_and_kdw();
 
     this->print_klists(ofs_running);
-
-    return;
-}
-
-//LiuXh add a new function here,
-//20180515
-bool kvect::read_kpoints_after_vc(const string &fn)
-{
-    TITLE("kvect", "read_kpoints_after_vc");
-    if(MY_RANK != 0) return 1;
-
-#ifdef __FP
-    if(GAMMA_ONLY_LOCAL)
-    {
-        ofs_warning << " Auto generating k-points file: " << fn << endl;
-        ofstream ofs(fn.c_str());
-        ofs << "K_POINTS" << endl;
-        ofs << "0" << endl;
-        ofs << "Gamma" << endl;
-        ofs << "1 1 1 0 0 0" << endl;
-        ofs.close();
-    }
-#endif
-
-    ifstream ifk(fn.c_str());
-    if(!ifk)
-    {
-        ofs_warning << " Can't find File name : " << fn << endl;
-        return 0;
-    }
-
-    ifk >> setiosflags(ios::uppercase);
-
-    ifk.clear();
-    ifk.seekg(0);
-
-    string word;
-    string kword;
-
-    int ierr = 0;
-
-    ifk.rdstate();
-
-    while(ifk.good())
-    {
-        ifk >> word;
-        if(word == "K_POINTS" || word == "KPOINTS" || word == "K" )
-        {
-            ierr = 1;
-            break;
-        }
-
-        ifk.rdstate();
-    }
-
-    if (ierr == 0)
-    {
-        ofs_warning << " symbol K_POINTS not found." << endl;
-        return 0;
-    }
-
-    READ_VALUE(ifk, nkstot);
-    READ_VALUE(ifk, kword);
-
-    if(nkstot > MAX_KPOINTS)
-    {
-        ofs_warning << " nkstot > MAX_KPOINTS" << endl;
-        return 0;
-    }
-
-    int k_type = 0;
-    if (nkstot == 0)
-    {
-        if(kword == "Gamma")
-        {
-            k_type = 0;
-            OUT(ofs_running,"Input type of k points","Monkhorst-Pack(Gamma)");
-        }
-        else if (kword == "Monkhorst-Pack" || kword == "MP" || kword == "mp")
-        {
-            k_type = 1;
-            OUT(ofs_running,"Input type of k points","Monkhorst-Pack");
-        }
-        else
-        {
-            ofs_warning << " Error: neither Gamma nor Monkhorst-Pack." << endl;
-            return 0;
-        }
-
-        ifk >> nmp[0] >> nmp[1] >> nmp[2];
-
-        ifk >> koffset[0] >> koffset[1] >> koffset[2];
-        
-        this->Monkhorst_Pack_after_vc(nmp, koffset, k_type);
-    }
-    else if(nkstot > 0)
-    {
-        if(kword == "Cartesian" || kword == "C")
-        {
-            this->renew(nkstot * nspin);
-            for (int i = 0;i < nkstot;i++)
-            {
-                ifk >> kvec_c[i].x >> kvec_c[i].y >> kvec_c[i].z;
-                READ_VALUE(ifk, wk[i]);
-            }
-
-            this->kc_done = true;
-        }
-        else if (kword == "Direct" || kword == "D")
-        {
-            this->renew(nkstot * nspin);
-            for (int i = 0;i < nkstot;i++)
-            {
-                ifk >> kvec_d[i].x >> kvec_d[i].y >> kvec_d[i].z;
-                READ_VALUE(ifk, wk[i]);
-            }
-
-            this->kd_done = true;
-        }
-        else if (kword == "Line_Cartesian" )
-        {
-            if(SYMMETRY)
-            {
-                WARNING("kvect::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
-                return 0;
-            }
-
-            int nks_special = this->nkstot;
-
-            int* nkl = new int[nks_special];
-
-            double *ksx = new double[nks_special];
-            double *ksy = new double[nks_special];
-            double *ksz = new double[nks_special];
-            vector<double> kposx;
-            vector<double> kposy;
-            vector<double> kposz;
-            ZEROS(nkl, nks_special);
-
-            nkstot = 0;
-            for(int iks=0; iks<nks_special; iks++)
-            {
-                ifk >> ksx[iks];
-                ifk >> ksy[iks];
-                ifk >> ksz[iks];
-                READ_VALUE( ifk, nkl[iks] );
-                assert(nkl[iks] >= 0);
-                nkstot += nkl[iks];
-            }
-            assert( nkl[nks_special-1] == 1);
-
-            int count = 0;
-            for(int iks=1; iks<nks_special; iks++)
-            {
-                double dx = (ksx[iks] - ksx[iks-1]) / nkl[iks-1];
-                double dy = (ksy[iks] - ksy[iks-1]) / nkl[iks-1];
-                double dz = (ksz[iks] - ksz[iks-1]) / nkl[iks-1];
-                for(int is=0; is<nkl[iks-1]; is++)
-                {
-                    kvec_c[count].x = ksx[iks-1] + is*dx;
-                    kvec_c[count].y = ksy[iks-1] + is*dy;
-                    kvec_c[count].z = ksz[iks-1] + is*dz;
-                    ++count;
-                }
-            }
-
-            kvec_c[count].x = ksx[nks_special-1];
-            kvec_c[count].y = ksy[nks_special-1];
-            kvec_c[count].z = ksz[nks_special-1];
-            ++count;
-
-            assert (count == nkstot );
-
-            for(int ik=0; ik<nkstot; ik++)
-            {
-                wk[ik] = 1.0;
-            }
-
-            ofs_warning << " Error : nkstot == -1, not implemented yet." << endl;
-
-            delete[] nkl;
-            delete[] ksx;
-            delete[] ksy;
-            delete[] ksz;
-
-            this->kc_done = true;
-        }
-        else if (kword == "Line_Direct" || kword == "L" || kword == "Line" )
-        {
-            if(SYMMETRY)
-            {
-                WARNING("kvect::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
-                return 0;
-            }
-
-            int nks_special = this->nkstot;
-            int* nkl = new int[nks_special];
-
-            double *ksx = new double[nks_special];
-            double *ksy = new double[nks_special];
-            double *ksz = new double[nks_special];
-            vector<double> kposx;
-            vector<double> kposy;
-            vector<double> kposz;
-            ZEROS(nkl, nks_special);
-
-            nkstot = 0;
-            for(int iks=0; iks<nks_special; iks++)
-            {
-                ifk >> ksx[iks];
-                ifk >> ksy[iks];
-                ifk >> ksz[iks];
-                READ_VALUE( ifk, nkl[iks] );
-                assert(nkl[iks] >= 0);
-                nkstot += nkl[iks];
-            }
-            assert( nkl[nks_special-1] == 1);
-
-            this->renew(nkstot * nspin);
-
-            int count = 0;
-            for(int iks=1; iks<nks_special; iks++)
-            {
-                double dx = (ksx[iks] - ksx[iks-1]) / nkl[iks-1];
-                double dy = (ksy[iks] - ksy[iks-1]) / nkl[iks-1];
-                double dz = (ksz[iks] - ksz[iks-1]) / nkl[iks-1];
-
-                for(int is=0; is<nkl[iks-1]; is++)
-                {
-                    kvec_d[count].x = ksx[iks-1] + is*dx;
-                    kvec_d[count].y = ksy[iks-1] + is*dy;
-                    kvec_d[count].z = ksz[iks-1] + is*dz;
-                    ++count;
-                }
-            }
-
-            kvec_d[count].x = ksx[nks_special-1];
-            kvec_d[count].y = ksy[nks_special-1];
-            kvec_d[count].z = ksz[nks_special-1];
-            ++count;
-
-            assert (count == nkstot );
-
-            for(int ik=0; ik<nkstot; ik++)
-            {
-                wk[ik] = 1.0;
-            }
-
-            ofs_warning << " Error : nkstot == -1, not implemented yet." << endl;
-
-            delete[] nkl;
-            delete[] ksx;
-            delete[] ksy;
-            delete[] ksz;
-
-            this->kd_done = true;
-        }
-        else
-        {
-            ofs_warning << " Error : neither Cartesian nor Direct kpoint." << endl;
-            return 0;
-        }
-    }
-
-    this->nks = this->nkstot;
-
-    OUT(ofs_running,"nkstot",nkstot);
-
-    return 1;
-}
-
-//LiuXh add a new function here,
-//20180515
-void kvect::Monkhorst_Pack_after_vc(const int *nmp_in, const double *koffset_in, const int k_type)
-{
-    if (test_kpoint) TITLE("kvect", "Monkhorst_Pack");
-    const int mpnx = nmp_in[0];
-    const int mpny = nmp_in[1];
-    const int mpnz = nmp_in[2];
-
-    this->nkstot = mpnx * mpny * mpnz;
-
-    for (int x = 1;x <= mpnx;x++)
-    {
-        double v1 = Monkhorst_Pack_formula( k_type, koffset_in[0], x, mpnx);
-        if( abs(v1) < 1.0e-10 ) v1 = 0.0;
-        for (int y = 1;y <= mpny;y++)
-        {
-            double v2 = Monkhorst_Pack_formula( k_type, koffset_in[1], y, mpny);
-            if( abs(v2) < 1.0e-10 ) v2 = 0.0;
-            for (int z = 1;z <= mpnz;z++)
-            {
-                double v3 = Monkhorst_Pack_formula( k_type, koffset_in[2], z, mpnz);
-                if( abs(v3) < 1.0e-10 ) v3 = 0.0;
-
-                const int i = mpnx * mpny * (z - 1) + mpnx * (y - 1) + (x - 1);
-                kvec_d[i].set(v1, v2, v3);
-            }
-        }
-    }
-
-    const double weight = 1.0 / static_cast<double>(nkstot);
-    for (int ik=0; ik<nkstot; ik++)
-    {
-        wk[ik] = weight;
-    }
-    this->kd_done = true;
 
     return;
 }
@@ -1436,4 +1115,65 @@ void kvect::mpi_k_after_vc(void)
     delete[] kvec_c_aux;
     delete[] kvec_d_aux;
 #endif
+}
+
+void kvect::set_both_kvec_after_vc(const Matrix3 &G, const Matrix3 &R)
+{
+    // set cartesian k vectors.
+    kd_done = true;
+    kc_done = false;
+    if (!kc_done && kd_done)
+    {
+        for (int i = 0;i < nkstot;i++)
+        {
+//wrong!!   kvec_c[i] = G * kvec_d[i];
+// mohan fixed bug 2010-1-10
+			if( abs(kvec_d[i].x) < 1.0e-10 ) kvec_d[i].x = 0.0;
+			if( abs(kvec_d[i].y) < 1.0e-10 ) kvec_d[i].y = 0.0;
+			if( abs(kvec_d[i].z) < 1.0e-10 ) kvec_d[i].z = 0.0;
+
+			kvec_c[i] = kvec_d[i] * G;
+
+			// mohan add2012-06-10
+			if( abs(kvec_c[i].x) < 1.0e-10 ) kvec_c[i].x = 0.0;
+			if( abs(kvec_c[i].y) < 1.0e-10 ) kvec_c[i].y = 0.0;
+			if( abs(kvec_c[i].z) < 1.0e-10 ) kvec_c[i].z = 0.0;
+        }
+        kc_done = true;
+    }
+
+    // set direct k vectors
+    else if (kc_done && !kd_done)
+    {
+        Matrix3 RT = R.Transpose();
+        for (int i = 0;i < nkstot;i++)
+        {
+//			cout << " ik=" << i
+//				<< " kvec.x=" << kvec_c[i].x
+//				<< " kvec.y=" << kvec_c[i].y
+//				<< " kvec.z=" << kvec_c[i].z << endl;
+//wrong!            kvec_d[i] = RT * kvec_c[i];
+// mohan fixed bug 2011-03-07
+            kvec_d[i] = kvec_c[i] * RT;
+        }
+        kd_done = true;
+    }
+
+	ofs_running << "\n " << setw(8) << "KPOINTS" 
+	<< setw(20) << "DIRECT_X"
+	<< setw(20) << "DIRECT_Y"
+	<< setw(20) << "DIRECT_Z"
+	<< setw(20) << "WEIGHT" << endl;
+
+	for(int i=0; i<nkstot; i++)
+	{
+        ofs_running << " "
+			<< setw(8) << i+1
+             << setw(20) << this->kvec_d[i].x
+             << setw(20) << this->kvec_d[i].y
+             << setw(20) << this->kvec_d[i].z
+             << setw(20) << this->wk[i] << endl;
+	}
+
+    return;
 }

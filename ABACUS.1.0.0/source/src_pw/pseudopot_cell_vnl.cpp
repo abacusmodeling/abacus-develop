@@ -94,7 +94,8 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	//this->nqx = 10000;		// calculted in allocate_nlpot.f90
 	//NQX = this->calculate_nqx(pw.ecutwfc,DQ); //LiuXh modify 20180515
 	//NQX = this->calculate_nqx(pw.ecutwfc,DQ) + 1000; //LiuXh add 20180515
-	NQX = this->calculate_nqx(pw.ecutwfc,DQ) * 1.2; //LiuXh add 20180515
+	//NQX = this->calculate_nqx(pw.ecutwfc,DQ) * 10; //LiuXh add 20180515
+	NQX = this->calculate_nqx(pw.ecutwfc,DQ) * cell_factor; //LiuXh add 20180619
 	// nqx = (sqrt(ecutwfc)/dq+4)*cell_factor;
 	//
 	//	nbrx is defined in constant.h
@@ -176,6 +177,11 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 //				cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 //				cout << "\n gk.norm = " << gnorm;
 				
+//if(ik==0){
+//cout<<"ik: "<<ik<<endl;
+//cout<<"ig: "<<ig<<endl;
+//cout<<"gk.norm: "<<gnorm<<endl;
+//}
 				vq [ig] = Mathzone::Polynomial_Interpolation(
 						this->tab, it, nb, NQX, DQ, gnorm );
 			} // enddo

@@ -223,5 +223,6 @@ extern int test_figure;
 extern int test_mathzone;
 extern int test_deconstructor;
 
+extern bool 	FINAL_SCF; //LiuXh add 20180619
 
 #endif
