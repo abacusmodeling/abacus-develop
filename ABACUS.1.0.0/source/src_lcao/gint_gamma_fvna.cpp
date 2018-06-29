@@ -37,13 +37,20 @@ void Gint_Gamma::gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm)
     timer::tick("Gint_Gamma","gamma_force_vna",'J');
 	// gt.lgd: local grid dimension (sub-FFT-mesh).
     double** DGridV = new double*[gt.lgd];
+    double** DGridV_s;
+    if(STRESS) DGridV_s = new double*[gt.lgd];
     for (int i=0; i<gt.lgd; ++i)
     {
         DGridV[i] = new double[gt.lgd*3];
        	ZEROS(DGridV[i], 3*gt.lgd);
+        if(STRESS)
+        {
+            DGridV_s[i] = new double[gt.lgd*6];
+            ZEROS(DGridV_s[i], 6*gt.lgd);
+        }
     }
     Memory::record("Gint_Gamma","DGridV",3*gt.lgd*gt.lgd,"double");
-
+    if(STRESS) Memory::record("Gint_Gamma","DGridV_s",6*gt.lgd*gt.lgd,"double");
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = ORB.dr_uniform;
 	const Numerical_Orbital_Lm* pointer;
@@ -134,6 +141,7 @@ void Gint_Gamma::gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm)
 	double* psi1;
 	double* dphi2;
 	double* dpvp;
+        double* dpvpr;
 	double* dphi3;
 	double* phi2_end;
 	int iw1_lo;
@@ -346,6 +354,7 @@ void Gint_Gamma::gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm)
 					for (int ia2=0; ia2<size; ++ia2)
 					{
 						const int iw2_all = 3*iw0_all[ia2];
+						const int iw2_s = 6*iw0_all[ia2];
 						const int nww2 = 3*nww[ia2];
 						for(int ib=0; ib<bxyz; ++ib)
 						{
@@ -360,6 +369,7 @@ void Gint_Gamma::gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm)
 								{
 									vv = vnow * psi1[0];
 									dpvp = &DGridV[iw1_lo+iw][iw2_all];
+									if(STRESS) dpvpr = &DGridV_s[iw1_lo+iw][iw2_s];
 									dphi3 = dphi2;
 									phi2_end = dphi3 + nww2;
 									while(dphi3<phi2_end)
@@ -379,6 +389,16 @@ void Gint_Gamma::gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm)
 										dpvp[1] -= dphi3[1] * vv;
 										dpvp[2] -= dphi3[2] * vv;
 										dpvp+=3;
+										if(STRESS)
+										{
+											dpvpr[0] -= dphi3[0] * vv * dr[ib][ia2][0];
+											dpvpr[1] -= dphi3[0] * vv * dr[ib][ia2][1];
+											dpvpr[2] -= dphi3[0] * vv * dr[ib][ia2][2];
+											dpvpr[3] -= dphi3[1] * vv * dr[ib][ia2][1];
+											dpvpr[4] -= dphi3[1] * vv * dr[ib][ia2][2];
+											dpvpr[5] -= dphi3[2] * vv * dr[ib][ia2][2];
+											dpvpr+=6;
+										}
 										dphi3+=3;
 									}
 								}//iw1
@@ -524,49 +544,72 @@ void Gint_Gamma::gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm)
 	// distribution of the Hamiltonian matrix.
 	//-------------------------------------------
     double* tmp = new double[NLOCAL*3];
+    double* tmpr;
+    if(STRESS) tmpr = new double[NLOCAL*6];
     for (int i=0; i<NLOCAL; i++)
     { 
 		ZEROS(tmp, 3*NLOCAL);   
+		if(STRESS) ZEROS(tmpr, 6*NLOCAL);
 		const int mu = gt.trace_lo[i];
 		// mohan fix bug 2010-09-05
 		// lack mu>=0 and nu>=0 in previous version.
 		if(mu >=0)
 		{
-        	for (int j=0; j<NLOCAL; j++)
-       		{
+			for (int j=0; j<NLOCAL; j++)
+			{
 				const int nu = gt.trace_lo[j];
 				if(nu>=0)
 				{
-            		tmp[3*j]   = DGridV[mu][3*nu];
-            		tmp[3*j+1] = DGridV[mu][3*nu+1];
-            		tmp[3*j+2] = DGridV[mu][3*nu+2];
+					tmp[3*j]   = DGridV[mu][3*nu];
+					tmp[3*j+1] = DGridV[mu][3*nu+1];
+					tmp[3*j+2] = DGridV[mu][3*nu+2];
+					if(STRESS) 
+					{
+						tmpr[6*j]   = DGridV_s[mu][6*nu];
+						tmpr[6*j+1] = DGridV_s[mu][6*nu+1];
+						tmpr[6*j+2] = DGridV_s[mu][6*nu+2];
+						tmpr[6*j+3] = DGridV_s[mu][6*nu+3];
+						tmpr[6*j+4] = DGridV_s[mu][6*nu+4];
+						tmpr[6*j+5] = DGridV_s[mu][6*nu+5];
+					}
 				}
-        	}
+			}
 		}
 
-        Parallel_Reduce::reduce_double_pool( tmp, 3*NLOCAL );
-
+		Parallel_Reduce::reduce_double_pool( tmp, 3*NLOCAL );
+		if(STRESS) Parallel_Reduce::reduce_double_pool( tmpr, 6*NLOCAL );
 		const int i2d = ParaO.trace_loc_row[i];
 		if(i2d<0) continue;
-        for (int j=0; j<NLOCAL; j++)
-        {
+		for (int j=0; j<NLOCAL; j++)
+		{
 			const int j2d = ParaO.trace_loc_col[j];
 			if(j2d<0) continue;
 			const int index = i2d * ParaO.ncol + j2d; 
 		   	LM.DHloc_fixed_x[index] += tmp[3*j];
- 	       	LM.DHloc_fixed_y[index] += tmp[3*j+1];
-        	LM.DHloc_fixed_z[index] += tmp[3*j+2];	
+			LM.DHloc_fixed_y[index] += tmp[3*j+1];
+			LM.DHloc_fixed_z[index] += tmp[3*j+2];
+			if(STRESS)
+			{
+				LM.DHloc_fixed_11[index] += tmpr[6*j];
+				LM.DHloc_fixed_12[index] += tmpr[6*j+1];
+				LM.DHloc_fixed_13[index] += tmpr[6*j+2];
+				LM.DHloc_fixed_22[index] += tmpr[6*j+3];
+				LM.DHloc_fixed_23[index] += tmpr[6*j+4];
+				LM.DHloc_fixed_33[index] += tmpr[6*j+5];
+			}
 //            lm.set_force (i,j,tmp[j], tmp[j+1], tmp[j+2],'N');
-        }
-    }
+		}
+	}
 	delete[] tmp;
-
+	if(STRESS) delete[] tmpr;
 	//delete DGridV_x,y,z
 	for (int i=0; i<gt.lgd; ++i)
 	{
 		delete[] DGridV[i];
+		if(STRESS) delete[] DGridV_s[i];
 	}
 	delete[] DGridV;
+	if(STRESS) delete[] DGridV_s;
 
     timer::tick("Gint_Gamma","distri_fvna",'J');
     return;

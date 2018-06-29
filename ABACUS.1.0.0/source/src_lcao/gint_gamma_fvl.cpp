@@ -275,8 +275,8 @@ inline void cal_psir_ylm_dphi(int size, int grid_index, double delta_r, vector<d
 inline void cal_meshball_DGridV(int size, int lgd_now, int LD_pool, int* block_index, int* block_iw, int* block_size, bool** cal_flag, double* vldr3, 
                             double** psir_ylm, double** psir_vlbr3, double** dphix, double** dphiy, double** dphiz, 
                             double** DGridV_x, double** DGridV_y, double** DGridV_z,
-			double* DGridV_11, double* DGridV_12, double* DGridV_13,
-			double* DGridV_22, double* DGridV_23, double* DGridV_33, double*** drr)
+			double** DGridV_11, double** DGridV_12, double** DGridV_13,
+			double** DGridV_22, double** DGridV_23, double** DGridV_33, double*** drr)
 {
     char transa='N', transb='T';
     double alpha=-1.0, beta=1.0;
@@ -364,12 +364,43 @@ inline void cal_meshball_DGridV(int size, int lgd_now, int LD_pool, int* block_i
                     &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
                 if(STRESS)
                 {
-                DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][0];
-                DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][1];
-                DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][2];
-                DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][1];
-                DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][2];
-                DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][0][2];
+					k=1;
+					for(int ib=0; ib<pw.bxyz; ++ib)
+					{
+						double stress_alpha1 = alpha * drr[ia2][ib][0];
+						double stress_alpha2 = alpha * drr[ia2][ib][1];
+						double stress_alpha3 = alpha * drr[ia2][ib][2];
+						dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha1,
+							&dphix[ib][idx2], &LD_pool,
+							&psir_vlbr3[ib][idx1], &LD_pool,
+							&beta, &DGridV_11[iw1_lo][iw2_lo], &lgd_now);
+						dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
+							&dphix[ib][idx2], &LD_pool,
+							&psir_vlbr3[ib][idx1], &LD_pool,
+							&beta, &DGridV_12[iw1_lo][iw2_lo], &lgd_now);
+						dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+							&dphix[ib][idx2], &LD_pool,
+							&psir_vlbr3[ib][idx1], &LD_pool,
+							&beta, &DGridV_13[iw1_lo][iw2_lo], &lgd_now);
+						dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
+							&dphiy[ib][idx2], &LD_pool,
+							&psir_vlbr3[ib][idx1], &LD_pool,
+							&beta, &DGridV_22[iw1_lo][iw2_lo], &lgd_now);
+						dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+							&dphiy[ib][idx2], &LD_pool,
+							&psir_vlbr3[ib][idx1], &LD_pool,
+							&beta, &DGridV_23[iw1_lo][iw2_lo], &lgd_now);
+						dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+							&dphiz[ib][idx2], &LD_pool,
+							&psir_vlbr3[ib][idx1], &LD_pool,
+							&beta, &DGridV_33[iw1_lo][iw2_lo], &lgd_now);
+					}
+//                DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][0];
+//                DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][1];
+//                DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][0][2];
+//                DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][1];
+//                DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][0][2];
+//                DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][0][2];
                 }
             }
             else if (cal_num > 0)
@@ -398,12 +429,40 @@ inline void cal_meshball_DGridV(int size, int lgd_now, int LD_pool, int* block_i
                             &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
                         if(STRESS)
                         {
-                        DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][0];
-                        DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][1];
-                        DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-                        DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
-                        DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-                        DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+					double stress_alpha1 = alpha * drr[ia2][ib][0];
+					double stress_alpha2 = alpha * drr[ia2][ib][1];
+					double stress_alpha3 = alpha * drr[ia2][ib][2];
+					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha1,
+						&dphix[ib][idx2], &LD_pool,
+						&psir_vlbr3[ib][idx1], &LD_pool,
+						&beta, &DGridV_11[iw1_lo][iw2_lo], &lgd_now);
+					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
+						&dphix[ib][idx2], &LD_pool,
+						&psir_vlbr3[ib][idx1], &LD_pool,
+						&beta, &DGridV_12[iw1_lo][iw2_lo], &lgd_now);
+					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+						&dphix[ib][idx2], &LD_pool,
+						&psir_vlbr3[ib][idx1], &LD_pool,
+						&beta, &DGridV_13[iw1_lo][iw2_lo], &lgd_now);
+					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
+						&dphiy[ib][idx2], &LD_pool,
+						&psir_vlbr3[ib][idx1], &LD_pool,
+						&beta, &DGridV_22[iw1_lo][iw2_lo], &lgd_now);
+					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+						&dphiy[ib][idx2], &LD_pool,
+						&psir_vlbr3[ib][idx1], &LD_pool,
+						&beta, &DGridV_23[iw1_lo][iw2_lo], &lgd_now);
+					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+						&dphiz[ib][idx2], &LD_pool,
+						&psir_vlbr3[ib][idx1], &LD_pool,
+						&beta, &DGridV_33[iw1_lo][iw2_lo], &lgd_now);
+//                        DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][0];
+//                        DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+//                        DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+//                        DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+//                        DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+//                        DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+//cout<<"DGridV: "<<iw1_lo<<" "<<iw2_lo<<" "<<iw1_lo*GridT.lgd + iw2_lo<<" "<<DGridV_x[iw1_lo][iw2_lo]<<" "<<DGridV_y[iw1_lo][iw2_lo]<<" "<<DGridV_z[iw1_lo][iw2_lo]<<" "<<drr[ia2][0][0]<<" "<<drr[ia2][0][1]<<" "<<drr[ia2][0][2]<<endl;
                         }
                     }                    
                 }
@@ -432,26 +491,33 @@ void Gint_Gamma::gamma_force(void)
     double** DGridV_x = new double*[GridT.lgd];
     double** DGridV_y = new double*[GridT.lgd];
     double** DGridV_z = new double*[GridT.lgd];
-    double* DGridV_11;
-    double* DGridV_12;
-    double* DGridV_13;
-    double* DGridV_22;
-    double* DGridV_23;
-    double* DGridV_33;
+    double* DGridV_stress_pool;
+    double** DGridV_11;
+    double** DGridV_12;
+    double** DGridV_13;
+    double** DGridV_22;
+    double** DGridV_23;
+    double** DGridV_33;
     if(STRESS)
     {
-        DGridV_11 = new double[GridT.lgd * GridT.lgd];
-        DGridV_12 = new double[GridT.lgd * GridT.lgd];
-        DGridV_13 = new double[GridT.lgd * GridT.lgd];
-        DGridV_22 = new double[GridT.lgd * GridT.lgd];
-        DGridV_23 = new double[GridT.lgd * GridT.lgd];
-        DGridV_33 = new double[GridT.lgd * GridT.lgd];
-        ZEROS(DGridV_11, GridT.lgd * GridT.lgd);
-        ZEROS(DGridV_12, GridT.lgd * GridT.lgd);
-        ZEROS(DGridV_13, GridT.lgd * GridT.lgd);
-        ZEROS(DGridV_22, GridT.lgd * GridT.lgd);
-        ZEROS(DGridV_23, GridT.lgd * GridT.lgd);
-        ZEROS(DGridV_33, GridT.lgd * GridT.lgd);
+        DGridV_stress_pool = new double[6*DGridV_Size];
+        ZEROS(DGridV_stress_pool, 6*DGridV_Size);
+        DGridV_11 = new double*[GridT.lgd];
+        DGridV_12 = new double*[GridT.lgd];
+        DGridV_13 = new double*[GridT.lgd];
+        DGridV_22 = new double*[GridT.lgd];
+        DGridV_23 = new double*[GridT.lgd];
+        DGridV_33 = new double*[GridT.lgd];
+        for (int i=0; i<GridT.lgd; ++i)
+        {
+            DGridV_11[i] = &DGridV_stress_pool[i*GridT.lgd];
+            DGridV_12[i] = &DGridV_stress_pool[i*GridT.lgd+DGridV_Size];
+            DGridV_13[i] = &DGridV_stress_pool[i*GridT.lgd+2*DGridV_Size];
+            DGridV_22[i] = &DGridV_stress_pool[i*GridT.lgd+3*DGridV_Size];
+            DGridV_23[i] = &DGridV_stress_pool[i*GridT.lgd+4*DGridV_Size];
+            DGridV_33[i] = &DGridV_stress_pool[i*GridT.lgd+5*DGridV_Size];
+        }
+        Memory::record("Gint_Gamma","DGridV_stress",6*GridT.lgd*GridT.lgd,"double");
     }
     for (int i=0; i<GridT.lgd; ++i)
     {
@@ -691,12 +757,12 @@ ENDandRETURN:
                     tmpz[j] = DGridV_z[mu][nu];
                     if(STRESS)
                     {
-                        tmp11[j] = DGridV_11[mu*GridT.lgd + nu];
-                        tmp12[j] = DGridV_12[mu*GridT.lgd + nu];
-                        tmp13[j] = DGridV_13[mu*GridT.lgd + nu];
-                        tmp22[j] = DGridV_22[mu*GridT.lgd + nu];
-                        tmp23[j] = DGridV_23[mu*GridT.lgd + nu];
-                        tmp33[j] = DGridV_33[mu*GridT.lgd + nu];
+                        tmp11[j] = DGridV_11[mu][nu];
+                        tmp12[j] = DGridV_12[mu][nu];
+                        tmp13[j] = DGridV_13[mu][nu];
+                        tmp22[j] = DGridV_22[mu][nu];
+                        tmp23[j] = DGridV_23[mu][nu];
+                        tmp33[j] = DGridV_33[mu][nu];
                     }
                 }
             }
@@ -807,6 +873,7 @@ ENDandRETURN:
         delete [] DGridV_22;
         delete [] DGridV_23;
         delete [] DGridV_33;
+        delete [] DGridV_stress_pool;
         for(int id=0; id<max_size; id++)
         {
             for(int ib=0; ib<pw.bxyz; ib++)
