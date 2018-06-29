@@ -300,9 +300,9 @@ void WF_atomic::atomic_wfc
                                               ZEROS(aux, np);
                                               for(int n1=0;n1<2*l+1;n1++){
                                                  const int lm = l*l +n1;
-                                                 if(fabs(soc.rotylm[n1][ind])>1e-8)
+                                                 if(fabs(soc.rotylm(n1,ind))>1e-8)
                                                    for(int ig=0; ig<np;ig++) 
-                                                      aux[ig] += soc.rotylm[n1][ind]* ylm(lm,ig);
+                                                      aux[ig] += soc.rotylm(n1,ind)* ylm(lm,ig);
                                               }
                                               for(int ig=0; ig<np;ig++)
                                                  wfcatom(index, ig + wf.npwx*is ) = lphase * fact[is] * sk[ig] * aux[ig] * flq[ig];

@@ -40,6 +40,7 @@ Soc::Soc()
    m_loc = new Vector3<double> [1];
    angle1 = new double[1];
    angle2 = new double[1];
+	p_rot = new complex<double> [1];
 }
 
 Soc::~Soc()
@@ -47,35 +48,13 @@ Soc::~Soc()
    delete[] m_loc;
    delete[] angle1;
    delete[] angle2;
+	delete[] p_rot;
 //   deallocate1();
 }
 
 void Soc::init()
 {
    
-   return;
-}
-
-void Soc::deallocate1(const int lmax, const int nhm, const int nt)
-{
-   for(int i=0;i< 2 * lmax + 1; i++){
-      delete[] this->rotylm[i];
-   }
-   delete[] this->rotylm;
-
-/*   for(int i=0;i<nt;i++){
-      for(int j=0;j<2;j++){
-         for(int k=0;k<nhm;k++){
-            for(int l=0;l<nhm;l++){
-                delete[] fcoef[i][j][k][l];
-            }
-            delete[] fcoef[i][j][k];
-         }
-         delete[] fcoef[i][j];
-      }
-      delete[] fcoef[i];
-   }
-   delete[] fcoef;*/
    return;
 }
 
@@ -113,26 +92,30 @@ double Soc::spinor(const int l, const double j, const int m, const int spin)
 
 void Soc::rot_ylm(const int lmax)
 {
-   int m,n,l;
-   this->rotylm = new complex<double>* [2*lmax +1];
-   for(int i=0;i< 2 * lmax + 1; i++){
-      this->rotylm[i] = new complex<double> [2*lmax +1];
-      for(int j = 0;j< 2 * lmax + 1;j++){
-          this->rotylm[i][j] = complex<double>(0.0,0.0) ;
-      }
-   }
-   this->rotylm[0][lmax] = complex<double>(1.0, 0.0);
+	int m,n,l;
+//   this->rotylm = new complex<double>* [2*lmax +1];
+//   for(int i=0;i< 2 * lmax + 1; i++){
+//      this->rotylm[i] = new complex<double> [2*lmax +1];
+//      for(int j = 0;j< 2 * lmax + 1;j++){
+//          this->rotylm[i][j] = complex<double>(0.0,0.0) ;
+//      }
+//   }
+	this->l_max = 2 * lmax + 1;
+	delete[] p_rot;
+	this->p_rot = new complex<double> [this->l_max * this->l_max];
+	ZEROS(p_rot, this->l_max*this->l_max);
+   this->rotylm(0,lmax) = complex<double>(1.0, 0.0);
 
    l = lmax;
    for(int i=1;i<2*l+1;i += 2)
    {
       m = (i+1)/2;
       n = l-m;
-      this->rotylm[i][n] = complex<double>(pow(-1.0 , m) / sqrt(2) , 0.0);
-      this->rotylm[i+1][n] = complex<double>(0.0,-pow(-1.0 , m)/sqrt(2));
+      this->rotylm(i,n) = complex<double>(pow(-1.0 , m) / sqrt(2) , 0.0);
+      this->rotylm(i+1,n) = complex<double>(0.0,-pow(-1.0 , m)/sqrt(2));
       n = l+m;
-      this->rotylm[i][n] = complex<double>(1.0/sqrt(2), 0.0);
-      this->rotylm[i+1][n] = complex<double>(0.0, 1.0/sqrt(2));
+      this->rotylm(i,n) = complex<double>(1.0/sqrt(2), 0.0);
+      this->rotylm(i+1,n) = complex<double>(0.0, 1.0/sqrt(2));
    }
    return;
 }

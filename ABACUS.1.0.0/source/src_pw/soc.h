@@ -30,12 +30,13 @@ public:
         double spinor(const int l, const double j, const int m, const int spin);
         int sph_ind(const int l, const double j, const int m, const int spin);
         void rot_ylm(const int lmax);
-        complex<double> **rotylm;
-//        complex<double> *****fcoef;
+//        complex<double> **rotylm;
+	complex<double> *p_rot;
+	complex<double> & rotylm(const int &i1,const int &i2)
+	{ return p_rot[l_max*i1 + i2]; }
+
         Fcoef fcoef;
         
-//        void allocate_fcoef(const int nhm, const int nt);
-        void deallocate1(const int lmax, const int nhm, const int nt);
 
         Vector3<double> *m_loc;   //magnetization for each atom axis
         double *angle1;
@@ -48,5 +49,6 @@ public:
         //int npol;
 private:
         bool judge_parallel(double a[3],Vector3<double> b);
+	int l_max;
 };
 #endif
