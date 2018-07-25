@@ -525,9 +525,9 @@ void Run_Frag::frag_init_after_vc(void)
 
     pw.setup_structure_factor();
 
-    wf.init_after_vc(kv.nks);
+    if(BASIS_TYPE=="pw") wf.init_after_vc(kv.nks);
 
-    wf.init_at_1();
+    if(BASIS_TYPE=="pw") wf.init_at_1();
 
     ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
     //=================================
@@ -539,7 +539,7 @@ void Run_Frag::frag_init_after_vc(void)
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    ppcell.init_vnl();
+    if(BASIS_TYPE=="pw") ppcell.init_vnl();
     DONE(ofs_running,"NON-LOCAL POTENTIAL");
 
 /*

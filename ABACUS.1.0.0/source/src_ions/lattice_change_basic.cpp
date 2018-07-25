@@ -11,7 +11,8 @@ double Lattice_Change_Basic::ediff=0.0;
 double Lattice_Change_Basic::etot=0.0;
 double Lattice_Change_Basic::etot_p=0.0;
 
-double Lattice_Change_Basic::lattice_change_ini = 0.5; // default is 0.5
+//double Lattice_Change_Basic::lattice_change_ini = 0.5; // default is 0.5
+double Lattice_Change_Basic::lattice_change_ini = 0.01; // default is 0.5
 
 int Lattice_Change_Basic::out_stru=0;
 
@@ -84,6 +85,29 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
         ucell.GGT = ucell.G * ucell.GT;
         ucell.invGGT = ucell.GGT.Inverse();
 
+#ifdef __MPI
+    // distribute lattice vectors.
+    Parallel_Common::bcast_double(ucell.latvec.e11 );
+    Parallel_Common::bcast_double(ucell.latvec.e12 );
+    Parallel_Common::bcast_double(ucell.latvec.e13 );
+    Parallel_Common::bcast_double(ucell.latvec.e21 );
+    Parallel_Common::bcast_double(ucell.latvec.e22 );
+    Parallel_Common::bcast_double(ucell.latvec.e23 );
+    Parallel_Common::bcast_double(ucell.latvec.e31 );
+    Parallel_Common::bcast_double(ucell.latvec.e32 );
+    Parallel_Common::bcast_double(ucell.latvec.e33 );
+	
+    // distribute lattice vectors.
+    Parallel_Common::bcast_double( ucell.a1.x );
+    Parallel_Common::bcast_double( ucell.a1.y );
+    Parallel_Common::bcast_double( ucell.a1.z );
+    Parallel_Common::bcast_double( ucell.a2.x );
+    Parallel_Common::bcast_double( ucell.a2.y );
+    Parallel_Common::bcast_double( ucell.a2.z );
+    Parallel_Common::bcast_double( ucell.a3.x );
+    Parallel_Common::bcast_double( ucell.a3.y );
+    Parallel_Common::bcast_double( ucell.a3.z );
+#endif
         cout<<" LATTICE CONSTANT NEW: "<<endl;
         cout<<" "<<setprecision(12)<<ucell.latvec.e11<<"   "<<ucell.latvec.e12<<"   "<<ucell.latvec.e13<<endl;
         cout<<" "<<setprecision(12)<<ucell.latvec.e21<<"   "<<ucell.latvec.e22<<"   "<<ucell.latvec.e23<<endl;

@@ -6,6 +6,7 @@
 #include "sltk_grid.h"
 #include "sltk_atom_input.h"
 #include "../src_pw/tools.h"
+#include "../src_pw/global.h"
 //=================
 // Class AtomLink
 //=================
@@ -415,9 +416,17 @@ void Grid::In_Which_Cell(int &a, int &b, int &c, const FAtom &atom)const
 		// will make a = 2 (in fact we want 3)
 		// if a is 3.00000000000000001, it's save.
 		static double save_add = 1.0e-15; // from -8 to -15, mohan add 2012-03-22
-		a = static_cast<int>( (directx - this->d_minX) + save_add );
-		b = static_cast<int>( (directy - this->d_minY) + save_add );
-		c = static_cast<int>( (directz - this->d_minZ) + save_add );
+		//a = static_cast<int>( (directx - this->d_minX) + save_add );
+		//b = static_cast<int>( (directy - this->d_minY) + save_add );
+		//c = static_cast<int>( (directz - this->d_minZ) + save_add );
+		int now_type = atom.getType();
+		int now_number = atom.getNatom();
+		double now_x_d = ucell.atoms[now_type].taud[now_number].x;
+		double now_y_d = ucell.atoms[now_type].taud[now_number].y;
+		double now_z_d = ucell.atoms[now_type].taud[now_number].z;
+		a = static_cast<int>(directx - now_x_d - this->d_minX + 0.5 );
+                b = static_cast<int>(directy - now_y_d - this->d_minY + 0.5 );
+                c = static_cast<int>(directz - now_z_d - this->d_minZ + 0.5 );
 
 		//ofs_running << setw(8) << atom.x() << setw(8) << atom.y() << setw(8) << atom.z()
 		//<< setw(12) << directx << setw(12) << directy << setw(12) << directz

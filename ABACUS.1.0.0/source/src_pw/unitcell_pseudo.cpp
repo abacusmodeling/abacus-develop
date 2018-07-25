@@ -1624,8 +1624,25 @@ void UnitCell_pseudo::setup_cell_after_vc(
         for(int ia =0;ia< atom->na;ia++)
         {
             atom->tau[ia] = atom->taud[ia] * ucell.latvec;
+/*
+#ifdef __MPI
+Parallel_Common::bcast_double( atom->tau[ia].x );
+Parallel_Common::bcast_double( atom->tau[ia].y );
+Parallel_Common::bcast_double( atom->tau[ia].z );
+Parallel_Common::bcast_double( atom->taud[ia].x );
+Parallel_Common::bcast_double( atom->taud[ia].y );
+Parallel_Common::bcast_double( atom->taud[ia].z );
+#endif
+*/
         }
     }
+#ifdef __MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+    for (int i=0;i<ucell.ntype;i++)
+    {
+        ucell.atoms[i].bcast_atom(); // bcast tau array
+    }
+#endif
 
     ofs_running << endl;
     out.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);

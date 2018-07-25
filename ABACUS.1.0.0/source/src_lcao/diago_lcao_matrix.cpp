@@ -161,6 +161,10 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** c)
 {
 	TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
+	bool bit = false; //LiuXh, 2017-03-21
+	HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, ParaO.out_hs); //LiuXh, 2017-03-21
+	ofs_running << setprecision(6); //LiuXh, 2017-03-21
+
 	ParaO.diago_complex_begin(ik, c, LM.Hloc2, LM.Sloc2, wf.ekb[ik]);
 
 	return;

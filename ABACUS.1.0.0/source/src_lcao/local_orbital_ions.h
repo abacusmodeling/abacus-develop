@@ -10,6 +10,7 @@
 //added by daye 2014/6/19
 #include "../src_pw/mdNVT.h"
 #include "../src_pw/mdNVE.h"
+#include "../src_ions/lattice_change_methods.h"
 
 class Local_Orbital_Ions
 {
@@ -28,7 +29,9 @@ private:
 	Ions_Move_Methods IMM;
 	//MD md;
 
-	bool force_stress(void);
+	//bool force_stress(void);
+	Lattice_Change_Methods LCM;
+	bool force_stress(const int &istep, int &force_step, int &stress_step);
 	int istep;
 
 	Charge_Extra CE;

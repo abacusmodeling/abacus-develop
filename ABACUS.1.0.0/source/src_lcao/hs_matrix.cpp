@@ -268,6 +268,52 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
             g1.close();
             g2.close();
         }
+
+//LiuXH add 2015-12-17,begin
+	//int nprocs,myid;
+	//MPI_Status status;
+	//MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
+	//MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
+
+	string H_fn;
+	stringstream H_fn2;
+	H_fn2<< "data-H-"  << DRANK ;
+	H_fn=H_fn2.str();
+	ofstream ofs_H;
+	ofs_H.open(H_fn.c_str());
+	ofs_H<<setprecision(8) << setw(12);
+
+	string S_fn;
+	stringstream S_fn2;
+	S_fn2<< "data-S-"  << DRANK ;
+	S_fn=S_fn2.str();
+	ofstream ofs_S;
+	ofs_S.open(S_fn.c_str());
+	ofs_S<<setprecision(8) << setw(12);
+
+        int irr,icc;
+        for (int i=0; i<NLOCAL; i++)
+        {
+            irr = ParaO.trace_loc_row[i];
+            if (irr>=0)
+            {
+                // data collection
+                for (int j=0; j<NLOCAL; j++)
+                {
+			icc = ParaO.trace_loc_col[j];
+			if (icc>=0)
+			{
+				//if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
+				//if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
+				ofs_H << " " << H[irr*ParaO.ncol+icc];
+				ofs_S << " " << S[irr*ParaO.ncol+icc];
+			}
+		}
+		ofs_H << endl;
+		ofs_S << endl;
+	     }
+         }
+//LiuXH add 2015-12-17,end
 #else
         ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
@@ -294,4 +340,259 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     return;
 }
 
+//LiuXh, 2017-03-21
+void HS_Matrix::saving_HS_complex(complex<double> *Hloc, complex<double>* Sloc, bool bit, const int &out_hs)
+{	
+	if(out_hs==1)
+	{
+		save_HS_complex(Hloc, Sloc, bit);
+	}
+	else if(out_hs==0)
+	{
+		// do nothing.
+	}
+	else
+	{
+		WARNING("Diago_LCAO_Matrix","unrecorganized out_hs value.");
+	}
+	return;
+}
+
+//LiuXh, 2017-03-21
+void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit)
+{
+    TITLE("HS_Matrix","save_HS_bit");
+    timer::tick("HS_Matrix","save_HS_bit");
+    OUT(ofs_running,"Dimension of H and S",NLOCAL);
+
+    stringstream ssh;
+    stringstream sss;
+
+        if(bit)
+        {
+        ssh << global_out_dir << "data-H-bit";
+        sss << global_out_dir << "data-S-bit";
+        }
+        else
+        {
+        ssh << global_out_dir << "data-H";
+        sss << global_out_dir << "data-S";
+        }
+
+    if (bit)
+    {
+#ifdef __MPI
+        FILE *g1;
+        FILE *g2;
+
+        if (DRANK==0)
+        {
+            g1 = fopen(ssh.str().c_str(),"wb");
+            g2 = fopen(sss.str().c_str(),"wb");
+            fwrite(&NLOCAL,sizeof(int),1,g1);
+            fwrite(&NLOCAL,sizeof(int),1,g2);
+        }
+
+        int ir,ic;
+        for (int i=0; i<NLOCAL; i++)
+        {
+            complex<double>* lineH = new complex<double>[NLOCAL-i];
+            complex<double>* lineS = new complex<double>[NLOCAL-i];
+            ZEROS(lineH, NLOCAL-i);
+            ZEROS(lineS, NLOCAL-i);
+
+            ir = ParaO.trace_loc_row[i];
+            if (ir>=0)
+            {
+                // data collection
+                for (int j=i; j<NLOCAL; j++)
+                {
+                    ic = ParaO.trace_loc_col[j];
+                    if (ic>=0)
+                    {
+                        lineH[j-i] = H[ir*ParaO.ncol+ic];
+                        lineS[j-i] = S[ir*ParaO.ncol+ic];
+                    }
+                }
+            }
+            else
+            {
+                //do nothing
+            }
+
+            Parallel_Reduce::reduce_complex_double_pool(lineH,NLOCAL-i);
+            Parallel_Reduce::reduce_complex_double_pool(lineS,NLOCAL-i);
+
+            if (DRANK==0)
+            {
+                for (int j=i; j<NLOCAL; j++)
+                {
+                    fwrite(&lineH[j-i],sizeof(complex<double>),1,g1);
+                    fwrite(&lineS[j-i],sizeof(complex<double>),1,g2);
+                }
+            }
+            delete[] lineH;
+            delete[] lineS;
+
+            MPI_Barrier(DIAG_WORLD);
+        }
+
+        if (DRANK==0)
+        {
+            fclose(g1);
+            fclose(g2);
+        }
+#else
+        FILE *g1 = fopen(ssh.str().c_str(),"wb");
+        FILE *g2 = fopen(sss.str().c_str(),"wb");
+
+        fwrite(&NLOCAL,sizeof(int),1,g1);
+        fwrite(&NLOCAL,sizeof(int),1,g2);
+
+        for (int i=0; i<NLOCAL; i++)
+        {
+            for (int j=i; j<NLOCAL; j++)
+            {
+                fwrite(&H[i*NLOCAL+j],sizeof(complex<double>),1,g1);
+                fwrite(&S[i*NLOCAL+j],sizeof(complex<double>),1,g2);
+            }
+        }
+        fclose(g1);
+        fclose(g2);
+#endif
+    } //end bit
+    else
+    {
+#ifdef __MPI
+        ofstream g1;
+        ofstream g2;
+
+        if (DRANK==0)
+        {
+            g1.open(ssh.str().c_str());
+            g2.open(sss.str().c_str());
+            g1 << NLOCAL;
+            g2 << NLOCAL;
+        }
+
+        int ir,ic;
+        for (int i=0; i<NLOCAL; i++)
+        {
+            complex<double>* lineH = new complex<double>[NLOCAL-i];
+            complex<double>* lineS = new complex<double>[NLOCAL-i];
+            ZEROS(lineH, NLOCAL-i);
+            ZEROS(lineS, NLOCAL-i);
+
+            ir = ParaO.trace_loc_row[i];
+            if (ir>=0)
+            {
+                // data collection
+                for (int j=i; j<NLOCAL; j++)
+                {
+                    ic = ParaO.trace_loc_col[j];
+                    if (ic>=0)
+                    {
+                        lineH[j-i] = H[ir*ParaO.ncol+ic];
+                        lineS[j-i] = S[ir*ParaO.ncol+ic];
+                    }
+                }
+            }
+            else
+            {
+                //do nothing
+            }
+
+            Parallel_Reduce::reduce_complex_double_pool(lineH,NLOCAL-i);
+            Parallel_Reduce::reduce_complex_double_pool(lineS,NLOCAL-i);
+
+            if (DRANK==0)
+            {
+                for (int j=i; j<NLOCAL; j++)
+                {
+                    g1 << " " << lineH[j-i];
+                    g2 << " " << lineS[j-i];
+                }
+                g1 << endl;
+                g2 << endl;
+            }
+            delete[] lineH;
+            delete[] lineS;
+        }
+
+        if (DRANK==0);
+        {
+            g1.close();
+            g2.close();
+        }
+
+//LiuXH add 2015-12-17,begin
+        //int nprocs,myid;
+        //MPI_Status status;
+        //MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
+        //MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
+
+        string H_fn;
+        stringstream H_fn2;
+        H_fn2<< "data-H-"  << DRANK ;
+        H_fn=H_fn2.str();
+        ofstream ofs_H;
+        ofs_H.open(H_fn.c_str());
+        ofs_H<<setprecision(8) << setw(12);
+
+        string S_fn;
+        stringstream S_fn2;
+        S_fn2<< "data-S-"  << DRANK ;
+        S_fn=S_fn2.str();
+        ofstream ofs_S;
+        ofs_S.open(S_fn.c_str());
+        ofs_S<<setprecision(8) << setw(12);
+
+        int irr,icc;
+        for (int i=0; i<NLOCAL; i++)
+        {
+            irr = ParaO.trace_loc_row[i];
+            if (irr>=0)
+            {
+                // data collection
+                for (int j=0; j<NLOCAL; j++)
+                {
+                        icc = ParaO.trace_loc_col[j];
+                        if (icc>=0)
+                        {
+                                //if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
+                                //if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
+                                ofs_H << " " << H[irr*ParaO.ncol+icc];
+                                ofs_S << " " << S[irr*ParaO.ncol+icc];
+                        }
+                }
+                ofs_H << endl;
+                ofs_S << endl;
+             }
+         }
+//LiuXH add 2015-12-17,end
+#else
+        ofstream g1(ssh.str().c_str());
+        ofstream g2(sss.str().c_str());
+
+        g1 << NLOCAL;
+        g2 << NLOCAL;
+
+        for (int i=0; i<NLOCAL; i++)
+        {
+            for (int j=i; j<NLOCAL; j++)
+            {
+                g1 << " " << H[i*NLOCAL+j];
+                g2 << " " << S[i*NLOCAL+j];
+            }
+            g1 << endl;
+            g2 << endl;
+        }
+        g1.close();
+        g2.close();
+#endif
+    }
+
+    timer::tick("HS_Matrix","save_HS_bit");
+    return;
+}
 

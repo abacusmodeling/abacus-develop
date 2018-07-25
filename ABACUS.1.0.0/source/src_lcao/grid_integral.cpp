@@ -56,7 +56,8 @@ void Grid_Integral::deal_region_atoms(void)
 	{
 		for(int I1=0; I1<ucell.atoms[T1].na; I1++)
 		{
-			GridD.Find_atom(ucell.atoms[T1].tau[I1]);
+			//GridD.Find_atom(ucell.atoms[T1].tau[I1]);
+			GridD.Find_atom(ucell.atoms[T1].tau[I1], T1, I1);
 			if(test==1) cout << " T1=" << T1 << " I1=" << I1 << " adjacent number = " << GridD.getAdjacentNum()+1 << endl;
 			
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)

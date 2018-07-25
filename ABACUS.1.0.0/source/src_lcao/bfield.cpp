@@ -254,7 +254,8 @@ void Bfield::calculate_NL_B(void)
 		const Atom* atom1 = &ucell.atoms[T1];
 		for (int I1 =0; I1< atom1->na; I1++)
 		{
-			GridD.Find_atom( atom1->tau[I1] );
+			//GridD.Find_atom( atom1->tau[I1] );
+			GridD.Find_atom( atom1->tau[I1] ,T1, I1);
 			const int iat1 = ucell.itia2iat(T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 			const Vector3<double> tau1 = atom1->tau[I1];

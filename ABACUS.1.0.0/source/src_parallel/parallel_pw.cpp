@@ -591,7 +591,7 @@ void Parallel_PW::fft_map_final_scf(
 	if(test_pw) TITLE("Parallel_PW","fft_map_final_scf");
 
 	// if already found all the plane waves in this process, return.
-	if(ngm_i == ngm) return;
+	if(ngm_i_final_scf == ngm) return;
 
 	if(!allocate_igl2g_final_scf)
 	{

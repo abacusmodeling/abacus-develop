@@ -68,7 +68,8 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
         for (int I1=0; I1<atom1->na; ++I1)
         {
 			tau1 = atom1->tau[I1];
-            GridD.Find_atom(tau1);
+            //GridD.Find_atom(tau1);
+            GridD.Find_atom(tau1, T1, I1);
             for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
             {
                 const int T2 = GridD.getType(ad);
@@ -276,7 +277,8 @@ void Use_Overlap_Matrix::test_Nonlocal()
 		const Atom* atom1 = &ucell.atoms[T1];
         for (int I1 =0; I1< atom1->na; I1++)
         {
-            GridD.Find_atom( atom1->tau[I1] );
+            //GridD.Find_atom( atom1->tau[I1] );
+            GridD.Find_atom( atom1->tau[I1] ,T1, I1);
 			const int iat1 = ucell.itia2iat(T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
             tau1 = atom1->tau[I1];
@@ -410,7 +412,8 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 		const Atom* atom1 = &ucell.atoms[T1];
         for (int I1 =0; I1< atom1->na; ++I1)
         {
-            GridD.Find_atom( atom1->tau[I1] );
+            //GridD.Find_atom( atom1->tau[I1] );
+            GridD.Find_atom( atom1->tau[I1] ,T1, I1);
 			const int iat1 = ucell.itia2iat(T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
             tau1 = atom1->tau[I1];
@@ -635,7 +638,8 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 		Atom* atom0 = &ucell.atoms[T0]; 
         for (int I0 =0; I0< atom0->na; I0++)
         {
-            GridD.Find_atom( atom0->tau[I0] );
+            //GridD.Find_atom( atom0->tau[I0] );
+            GridD.Find_atom( atom0->tau[I0] ,T0, I0);
 
             //(2)
             //for each projector (T0, I0), one pair of ads are used

@@ -13,14 +13,14 @@ Grid_MeshBall::Grid_MeshBall()
 Grid_MeshBall::~Grid_MeshBall()
 {
 	// delete meshball positions.
-	if(flag_mp)
-	{
+	//if(flag_mp)
+	//{
 		for(int i=0; i<meshball_ncells; i++)
 		{
 			delete[] meshball_positions[i];
 		}
 		delete[] meshball_positions;
-	}
+	//}
 	delete[] index_ball;
 }
 
@@ -71,17 +71,17 @@ void Grid_MeshBall::init_meshball(void)
 	if(test_gridt)OUT(ofs_running, "how many cells in meshball",this->meshball_ncells);
 
 	// prepare for the second calculation.
-	if(!flag_mp)
-	{
+	//if(!flag_mp)
+	//{
 		this->meshball_positions = new double*[meshball_ncells];
 		for(int i=0; i<meshball_ncells; i++)
 		{
 			this->meshball_positions[i] = new double[3];
 		}
-		this->flag_mp = true;
+		//this->flag_mp = true;
 
 		Memory::record("init_meshball","meshball_pos",meshball_ncells*3,"double");
-	}
+	//}
 
 	delete[] index_ball;
 	this->index_ball = new int[meshball_ncells];
@@ -152,3 +152,20 @@ double Grid_MeshBall::deal_with_atom_spillage(const double *pos)
 
 	return r2;
 }
+
+//LiuXh add 2018-07-24, to do...
+/*
+void Grid_MeshBall::delete_meshball_positions(void)
+{	
+	TITLE("Grid_MeshBall","delete_meshball_positions");
+	if(flag_mp)
+	{
+		for(int i=0; i<meshball_ncells; i++)
+		{
+			delete[] meshball_positions[i];
+		}
+		delete[] meshball_positions;
+	}
+	return;
+}
+*/

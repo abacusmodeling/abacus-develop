@@ -719,7 +719,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(double** dm2d)
 		for (int I1 =0; I1< atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
-			GridD.Find_atom( tau1 );
+			//GridD.Find_atom( tau1 );
+			GridD.Find_atom( tau1 ,T1, I1);
 			const int iat = ucell.itia2iat(T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 

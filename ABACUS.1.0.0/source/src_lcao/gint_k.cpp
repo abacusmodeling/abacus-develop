@@ -228,7 +228,8 @@ void Gint_k::folding_force(double** fvl_dphi,
 				const int DM_start = LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
-				GridD.Find_atom(tau1);
+				//GridD.Find_atom(tau1);
+				GridD.Find_atom(tau1, T1, I1);
 				// search for the adjacent atoms.
 				int nad = 0;
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
@@ -427,7 +428,8 @@ void Gint_k::folding_stress(double** fvl_dphi, double svl_dphi[][3],
 				const int DM_start = LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
-				GridD.Find_atom(tau1);
+				//GridD.Find_atom(tau1);
+				GridD.Find_atom(tau1, T1, I1);
 				// search for the adjacent atoms.
 				int nad = 0;
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
@@ -695,7 +697,8 @@ void Gint_k::folding_vl_k(const int &ik)
 
 					// get the coordinates of adjacent atoms.
 					tau1 = ucell.atoms[T1].tau[I1];
-					GridD.Find_atom(tau1);	
+					//GridD.Find_atom(tau1);	
+					GridD.Find_atom(tau1, T1, I1);	
 					// search for the adjacent atoms.
 					int nad = 0;
 

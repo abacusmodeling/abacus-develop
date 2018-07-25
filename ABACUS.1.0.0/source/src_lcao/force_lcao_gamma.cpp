@@ -1177,12 +1177,12 @@ void Force_LCAO_gamma::cal_fvl_dphi(double** dm2d)
 					this->fvl_dphi[iat][2] -= dm2d2 * ( LM.DHloc_fixed_z[index] + tmpDHz[index] );
 					if(STRESS)
 					{
-						this->svl_dphi[0][0] += 2.0 * dm2d[is][index] * LM.DHloc_fixed_11[index];
-						this->svl_dphi[0][1] += 2.0 * dm2d[is][index] * LM.DHloc_fixed_12[index];
-						this->svl_dphi[0][2] += 2.0 * dm2d[is][index] * LM.DHloc_fixed_13[index];
-						this->svl_dphi[1][1] += 2.0 * dm2d[is][index] * LM.DHloc_fixed_22[index];
-						this->svl_dphi[1][2] += 2.0 * dm2d[is][index] * LM.DHloc_fixed_23[index];
-						this->svl_dphi[2][2] += 2.0 * dm2d[is][index] * LM.DHloc_fixed_33[index];
+						this->svl_dphi[0][0] += dm2d[is][index] * LM.DHloc_fixed_11[index];
+						this->svl_dphi[0][1] += dm2d[is][index] * LM.DHloc_fixed_12[index];
+						this->svl_dphi[0][2] += dm2d[is][index] * LM.DHloc_fixed_13[index];
+						this->svl_dphi[1][1] += dm2d[is][index] * LM.DHloc_fixed_22[index];
+						this->svl_dphi[1][2] += dm2d[is][index] * LM.DHloc_fixed_23[index];
+						this->svl_dphi[2][2] += dm2d[is][index] * LM.DHloc_fixed_33[index];
 					}
 					//	cout << setw(5) << iat << setw(5) << iat2 
 					//	<< setw(5) << mu << setw(5) << nu
@@ -1246,7 +1246,8 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(double** dm2d)
         const int ia = ucell.iat2ia[iat];
 		const Vector3<double> tau0 = ucell.atoms[it].tau[ia];
         //find ajacent atom of atom ia
-        GridD.Find_atom( ucell.atoms[it].tau[ia] );
+        //GridD.Find_atom( ucell.atoms[it].tau[ia] );
+        GridD.Find_atom( ucell.atoms[it].tau[ia] ,it, ia);
 
         //FOLLOWING ARE CONTRIBUTIONS FROM
         //VNL DUE TO PROJECTOR'S DISPLACEMENT

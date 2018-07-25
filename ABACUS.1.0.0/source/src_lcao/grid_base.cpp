@@ -129,7 +129,8 @@ void Grid_Base::init(
 	{
 		for(int I1=0; I1<ucell.atoms[T1].na; I1++)
 		{
-			GridD.Find_atom(ucell.atoms[T1].tau[I1]);
+			//GridD.Find_atom(ucell.atoms[T1].tau[I1]);
+			GridD.Find_atom(ucell.atoms[T1].tau[I1], T1, I1);
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
 			{
 				++tot_pairs;

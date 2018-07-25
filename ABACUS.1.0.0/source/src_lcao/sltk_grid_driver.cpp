@@ -22,7 +22,8 @@ Grid_Driver::~Grid_Driver()
 	delete [] box;
 }
 
-void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos)const
+//void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos)const
+void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
 {
 	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_atom");
 	timer::tick("Grid_Driver","Find_atom");
@@ -39,7 +40,8 @@ void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos)const
 // NAME : Locate_offset (Using Hash method to get the position)
 // NAME : Find_adjacent_Atom ( find the adjacent information)
 //----------------------------------------------------------
-	const int offset = this->Locate_offset(cartesian_pos);
+	//const int offset = this->Locate_offset(cartesian_pos);
+	const int offset = this->Locate_offset(cartesian_pos, ntype, nnumber);
 
 //	cout << "lenght in Find atom = " << atomlink[offset].fatom.getAdjacentSet()->getLength() << endl;
 
@@ -49,7 +51,8 @@ void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos)const
 	return;
 }
 
-int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos)const
+//int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos)const
+int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
 //ywcui add 08-8-4
 {
 	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Locate_offset");
@@ -62,6 +65,8 @@ int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos)const
 	temp.fatom.setX(cartesian_pos.x);
 	temp.fatom.setY(cartesian_pos.y);
 	temp.fatom.setZ(cartesian_pos.z);
+	temp.fatom.setType(ntype);
+	temp.fatom.setNatom(nnumber);
 
 //----------------------------------------------------------
 // EXPLAIN : Find the Hash number of this atom position

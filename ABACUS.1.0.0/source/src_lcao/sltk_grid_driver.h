@@ -33,7 +33,8 @@ public:
 	Grid_Driver();
 	~Grid_Driver();
 
-	void Find_atom(const Vector3<double> &cartesian_pos)const;
+	//void Find_atom(const Vector3<double> &cartesian_pos)const;
+	void Find_atom(const Vector3<double> &cartesian_posi, const int &ntype, const int &nnumber)const;
 
 //==========================================================
 // EXPLAIN : The adjacent information for the input 
@@ -61,7 +62,8 @@ private:
 // NAME : Find_adjacent_atom ( find adjacent atmos for offset)
 // NAME : Distance ( between a1 and a2)
 //==========================================================
-	int Locate_offset(const Vector3<double> &cartesian_pos)const;
+	//int Locate_offset(const Vector3<double> &cartesian_pos)const;
+	int Locate_offset(const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const;
 	void Find_adjacent_atom(const int offset, AdjacentSet* as)const;
 	double Distance(const AtomLink& a1, const Vector3<double> &adjacent_site)const;
 	double Distance(const AtomLink& a1, const AtomLink& a2)const;
