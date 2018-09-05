@@ -365,10 +365,10 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	}
 
 	//added by zhengdy-soc
-	for(int i = 0;i<starting_nw;i++)
+/*	for(int i = 0;i<starting_nw;i++)
 	{
 		ekb[ik][i] = etatom[i];
-	}
+	}*/
 	delete[] etatom;
 }
 
