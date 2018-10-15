@@ -525,9 +525,11 @@ void Run_Frag::frag_init_after_vc(void)
 
     pw.setup_structure_factor();
 
-    if(BASIS_TYPE=="pw") wf.init_after_vc(kv.nks);
-
-    if(BASIS_TYPE=="pw") wf.init_at_1();
+    if(BASIS_TYPE=="pw")
+    {
+        wf.init_after_vc(kv.nks);
+        wf.init_at_1();
+    }
 
     ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
     //=================================
@@ -539,8 +541,11 @@ void Run_Frag::frag_init_after_vc(void)
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    if(BASIS_TYPE=="pw") ppcell.init_vnl();
-    DONE(ofs_running,"NON-LOCAL POTENTIAL");
+    if(BASIS_TYPE=="pw")
+    {
+        ppcell.init_vnl();
+        DONE(ofs_running,"NON-LOCAL POTENTIAL");
+    }
 
 /*
     pot.init_pot(0);
@@ -608,13 +613,20 @@ void Run_Frag::final_calculation_after_vc(void)
     //=====================
     // init wave functions
     //=====================
-    wf.init(kv.nks);
+    if(BASIS_TYPE=="pw")
+    {
+        wf.init(kv.nks);
+    }
+    else
+    {
+        wf.init_local();
+    }
     UFFT.allocate();
 
     //=======================
     // init pseudopotential
     //=======================
-    ppcell.init(ucell.ntype);
+    if(BASIS_TYPE=="pw") ppcell.init(ucell.ntype);
     //=====================
     // init hamiltonian
     //=====================
@@ -628,24 +640,30 @@ void Run_Frag::final_calculation_after_vc(void)
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    ppcell.init_vnl();
-    DONE(ofs_running,"NON-LOCAL POTENTIAL");
+    if(BASIS_TYPE=="pw")
+    {
+        ppcell.init_vnl();
+        DONE(ofs_running,"NON-LOCAL POTENTIAL");
+    }
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
     pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
 
-    pot.newd();//once
+    if(BASIS_TYPE=="pw") pot.newd();//once
     DONE(ofs_running,"INIT POTENTIAL");
 
     //==================================================
     // create ppcell.tab_at , for trial wave functions.
     //==================================================
-    wf.init_at_1();
+    if(BASIS_TYPE=="pw") wf.init_at_1();
     //================================
     // Initial start wave functions
     //================================
-    wf.wfcinit();
-    DONE(ofs_running,"INIT BASIS");
+    if(BASIS_TYPE=="pw")
+    {
+        wf.wfcinit();
+        DONE(ofs_running,"INIT BASIS");
+    }
 }
 #endif

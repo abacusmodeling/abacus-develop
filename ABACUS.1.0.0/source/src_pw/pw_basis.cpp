@@ -697,7 +697,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
 
     for (int ig = 1; ig < ngmc_local; ig++)
     {
-        if (this->gg[ig] - tmp[ng] > eps8)
+        if (abs(this->gg[ig] - tmp[ng]) > eps8)
         {
             ng++;
             tmp[ng] = this->gg[ig];

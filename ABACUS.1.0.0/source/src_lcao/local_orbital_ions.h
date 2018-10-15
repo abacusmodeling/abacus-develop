@@ -37,6 +37,7 @@ private:
 	Charge_Extra CE;
 	//choose md ensemble, zheng daye
 	int mdtype;
+	void final_scf(void);
 
 };
 

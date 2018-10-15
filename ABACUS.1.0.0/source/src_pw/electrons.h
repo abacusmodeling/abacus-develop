@@ -53,6 +53,7 @@ private:
 
     // used in electrons()
     bool check_stop_now(void);
+    void init_mixstep_final_scf(void);
 #endif
 };
 

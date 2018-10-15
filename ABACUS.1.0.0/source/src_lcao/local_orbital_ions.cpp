@@ -417,7 +417,82 @@ void Local_Orbital_Ions::opt_ions(void)
         ofs_running << " --------------------------------------------\n\n" << endl;
     }
 
+    if(stop && STRESS)
+    {
+        final_scf();
+/*
+        FINAL_SCF = true;
+        Run_Frag::final_calculation_after_vc();
+        atom_arrange::set_sr_NL();
+        atom_arrange::search( SEARCH_RADIUS );
+        GridT.set_pbc_grid(
+            pw.ncx, pw.ncy, pw.ncz,
+            pw.bx, pw.by, pw.bz,
+            pw.nbx, pw.nby, pw.nbz,
+            pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
+
+        // (2) If k point is used here, allocate HlocR after atom_arrange.
+        if(!GAMMA_ONLY_LOCAL)
+        {
+            // For each atom, calculate the adjacent atoms in different cells 
+            // and allocate the space for H(R) and S(R).
+            LNNR.cal_nnr();
+            LM.allocate_HS_R(LNNR.nnr);
+        }
+        if(!GAMMA_ONLY_LOCAL)
+        {
+            // need to first calculae lgd.
+            // using GridT.init.
+            LNNR.cal_nnrg(GridT);
+            //mohan add 2012-06-12
+            //the pvnapR need nnrg.
+            if(VNA>0)
+            {
+                UHM.GK.allocate_pvnapR();
+            }
+        }
+
+        // (4) set the augmented orbitals index.
+        // after ParaO and GridT, 
+        // this information is used to calculate
+        // the force.
+        LOWF.set_trace_aug(GridT);
+		
+        // (5) init density kernel
+        // (6) init wave functions.
+        if(GAMMA_ONLY_LOCAL)
+        {
+            // here we reset the density matrix dimension.
+            LOC.allocate_gamma(GridT);
+            LOWF.aloc_gamma_wfc(GridT);
+        }
+        else
+        {
+            LOWF.allocate_k(GridT);
+            LOC.allocate_DM_k();
+        }
+
+        UHM.set_ion();
+
+        if(VdwD2::vdwD2)							//Peize Lin add 2014-04-04
+        {
+            VdwD2 vdw(ucell);
+            vdw.energy();
+        }
+        LOE.scf(0);
+
+        if(CALCULATION=="scf" || CALCULATION=="relax")
+        {
+            ofs_running << "\n\n --------------------------------------------" << endl;
+            ofs_running << setprecision(16);
+            ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+            ofs_running << " --------------------------------------------\n\n" << endl;
+        }
+*/
+    }
+
     hm.hon.clear_after_ions();
+
 
     timer::tick("Local_Orbital_Ions","opt_ions",'C'); 
     return;
@@ -594,4 +669,79 @@ xiaohui modify 2014-08-09*/
     return 0;
 
     timer::tick("Local_Orbital_Ions","force_stress",'D');
+}
+
+void Local_Orbital_Ions::final_scf(void)
+{
+    TITLE("Local_Orbital_Ions","final_scf"); 
+
+    FINAL_SCF = true;
+    Run_Frag::final_calculation_after_vc();
+    atom_arrange::set_sr_NL();
+    atom_arrange::search( SEARCH_RADIUS );
+    GridT.set_pbc_grid(
+        pw.ncx, pw.ncy, pw.ncz,
+        pw.bx, pw.by, pw.bz,
+        pw.nbx, pw.nby, pw.nbz,
+        pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
+
+    // (2) If k point is used here, allocate HlocR after atom_arrange.
+    if(!GAMMA_ONLY_LOCAL)
+    {
+        // For each atom, calculate the adjacent atoms in different cells 
+        // and allocate the space for H(R) and S(R).
+        LNNR.cal_nnr();
+        LM.allocate_HS_R(LNNR.nnr);
+    }
+    if(!GAMMA_ONLY_LOCAL)
+    {
+        // need to first calculae lgd.
+        // using GridT.init.
+        LNNR.cal_nnrg(GridT);
+        //mohan add 2012-06-12
+        //the pvnapR need nnrg.
+        if(VNA>0)
+        {
+            UHM.GK.allocate_pvnapR();
+        }
+    }
+
+    // (4) set the augmented orbitals index.
+    // after ParaO and GridT, 
+    // this information is used to calculate
+    // the force.
+    LOWF.set_trace_aug(GridT);
+		
+    // (5) init density kernel
+    // (6) init wave functions.
+    if(GAMMA_ONLY_LOCAL)
+    {
+        // here we reset the density matrix dimension.
+        LOC.allocate_gamma(GridT);
+        LOWF.aloc_gamma_wfc(GridT);
+    }
+    else
+    {
+        LOWF.allocate_k(GridT);
+        LOC.allocate_DM_k();
+    }
+
+    UHM.set_ion();
+
+    if(VdwD2::vdwD2)							//Peize Lin add 2014-04-04
+    {
+        VdwD2 vdw(ucell);
+        vdw.energy();
+    }
+    LOE.scf(0);
+
+    if(CALCULATION=="scf" || CALCULATION=="relax")
+    {
+        ofs_running << "\n\n --------------------------------------------" << endl;
+        ofs_running << setprecision(16);
+        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+        ofs_running << " --------------------------------------------\n\n" << endl;
+    }
+
+    return;
 }

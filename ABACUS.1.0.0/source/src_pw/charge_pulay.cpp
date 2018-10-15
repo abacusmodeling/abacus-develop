@@ -69,6 +69,7 @@ void Charge_Pulay::Pulay_mixing(void)
 	// density.
 
 	// (1) allocate 
+    if(FINAL_SCF && totstep==0) initp = false;
 	this->allocate_pulay(scheme);
 
 	// irstep: iteration step for rstep (Rrho)

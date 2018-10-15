@@ -132,6 +132,13 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// set converged threshold, 
 		// automatically updated during self consistency, only for CG.
         this->update_ethr(iter);
+        if(FINAL_SCF && iter==1)
+        {
+            init_mixstep_final_scf();
+            //chr.irstep=0;
+            //chr.idstep=0;
+            //chr.totstep=0;
+        }
 
 		// mohan update 2012-06-05
 		en.calculate_harris(1);
@@ -692,4 +699,15 @@ void Local_Orbital_Elec::cal_bands(void)
 	}
 	timer::tick("Local_Orbital_Elec","cal_bands",'E');
 	return;	
+}
+
+void Local_Orbital_Elec::init_mixstep_final_scf(void)
+{
+    TITLE("Local_Orbital_Elec","init_mixstep_final_scf");
+
+    chr.irstep=0;
+    chr.idstep=0;
+    chr.totstep=0;
+
+    return;
 }

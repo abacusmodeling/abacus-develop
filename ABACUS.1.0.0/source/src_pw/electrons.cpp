@@ -167,7 +167,16 @@ void electrons::self_consistent(const int &istep)
 		
 		//(1) set converged threshold, 
 		// automatically updated during self consistency.
-        this->update_ethr(iter);
+        //this->update_ethr(iter);
+        if(FINAL_SCF && iter==1) ETHR = 1.0e-2;
+        else this->update_ethr(iter);
+        if(FINAL_SCF && iter==1)
+        {
+            init_mixstep_final_scf();
+            //chr.irstep=0;
+            //chr.idstep=0;
+            //chr.totstep=0;
+        }
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
@@ -516,3 +525,13 @@ void electrons::c_bands(void)
     return;
 } // END SUBROUTINE c_bands_k
 
+void electrons::init_mixstep_final_scf(void)
+{
+    TITLE("electrons","init_mixstep_final_scf");
+
+    chr.irstep=0;
+    chr.idstep=0;
+    chr.totstep=0;
+
+    return;
+}
