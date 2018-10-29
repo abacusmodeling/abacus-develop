@@ -15,12 +15,13 @@ public:
 
 	static int iter;
 	static double avg_iter;
+	
+	complex<double>*** WFC_init;
 protected:
 	static int istep;
 
 private:
-	void cal_bands(void);
-	void init_mixstep_final_scf(void);
+	void cal_bands(const int &istep);
 
 
 };

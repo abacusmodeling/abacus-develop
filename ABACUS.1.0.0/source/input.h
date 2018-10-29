@@ -301,6 +301,19 @@ public:
 	double *angle1;
 	double *angle2;
 		
+//==========================================================
+// tddft
+// Fuxiang He add 2016-10-26
+//==========================================================
+	int tddft;			//calculate tddft or not
+	double td_dr2;			//threshold for electronic iteration of tddft
+	double td_dt;			//"fs"
+	double td_force_dt;			//"fs"
+	int val_elec_01;			//valence electron 01
+	int val_elec_02;			//valence electron 02
+	int val_elec_03;			//valence electron 03
+	int vext;			//add extern potential or not
+	int vext_dire;			//vext direction
 
 
 	//xiaohui add 2015-09-16

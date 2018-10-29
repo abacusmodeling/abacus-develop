@@ -71,6 +71,10 @@ extern "C"
     // mohan add zpotrf and zpotri 2010-02-03, to compute inverse complex hermit matrix.
     void zpotrf_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
     void zpotri_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
+     void zgetrf_(const int* m, const int *n, const complex<double> *A, const int *lda, int *ipiv, const int* info);
+    void zgetri_(const int* n, complex<double> *A, const int *lda, int *ipiv, complex<double> *work, int *lwork, const int *info);
+    void pdgetrf_(const int *m, const int *n, double *a, const int *ia, const int *ja, int *desca, int *ipiv, int *info);
+
 	// Peize Lin add ?axpy 2016-08-04, to compute y=a*x+y
 	void saxpy_(const int *N, const float *alpha, const float *X, const int *incX, float *Y, const int *incY);
 	void daxpy_(const int *N, const double *alpha, const double *X, const int *incX, double *Y, const int *incY);
@@ -441,6 +445,33 @@ public:
 		delete[] aux;
 		return;
 	}
+    static inline
+    void zgetrf(int m, int n, ComplexMatrix &a, const int lda, int *ipiv, int *info)
+    {
+        complex<double> *aux = LapackConnector::transpose(a, n, lda);
+        zgetrf_( &m, &n, aux, &lda, ipiv, info);
+        LapackConnector::transpose(aux, a, n, lda);
+        delete[] aux;
+                return;
+    }
+    static inline
+    void zgetri(int n, ComplexMatrix &a,  int lda, int *ipiv, complex<double> * work, int lwork, int *info)
+    {
+        complex<double> *aux = LapackConnector::transpose(a, n, lda);
+        zgetri_( &n, aux, &lda, ipiv, work, &lwork, info);
+        LapackConnector::transpose(aux, a, n, lda);
+        delete[] aux;
+        return;
+    }
+    static inline
+    void pdgetrf(int m, int n, matrix &a,int ia, int ja, int *desca, int *ipiv, int *info)
+    {
+	double *aux = LapackConnector::transpose_matrix(a, n, m);
+	pdgetrf_( &m, &n, aux, &ia, &ja, desca, ipiv, info);
+	LapackConnector::transpose_matrix(aux, a, n, m);
+	delete[] aux;
+	return;
+    }
 
 	// Peize Lin add 2016-07-09
 	static inline
@@ -450,6 +481,7 @@ public:
 		dpotrf_( &uplo_changed, &n, a.c, &lda, info );
 	}	
 	
+
 	// Peize Lin add 2016-07-09
 	static inline
 	void dpotri( char uplo, const int n, matrix &a, const int lda, int *info )

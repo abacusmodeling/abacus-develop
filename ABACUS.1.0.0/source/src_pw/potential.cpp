@@ -4,6 +4,7 @@
 #include "xc_functional.h"
 #include "gga_pw.h"
 #include "efield.h"
+#include "math.h"
 
 potential::potential()
 {
@@ -166,7 +167,8 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     //----------------------------------------------------------
     // Define the total local potential (external+scf)
     //----------------------------------------------------------
-    this->set_vrs(pw.doublegrid);
+    if(vext == 0)		this->set_vrs(pw.doublegrid);
+    else			this->set_vrs_tddft(pw.doublegrid, istep);
 
 //	figure::picture(this->vrs1,pw.ncx,pw.ncy,pw.ncz);
     timer::tick("potential","init_pot");
@@ -381,7 +383,7 @@ void potential::v_xc
             } // endif
         } //enddo
     }
-    else if(NSPIN == 2)
+    else
     {
         // spin-polarized case
         neg [0] = 0;
@@ -435,55 +437,7 @@ void potential::v_xc
         } //   enddo
         if (test_potential>0) cout<<"\n End calculate Exc(r) and Vxc(r) with SPIN == 2";
 
-    } // nspin 2
-	else if(NSPIN == 4)//noncollinear case added by zhengdy
-	{
-		for( ir = 0;ir<pw.nrxx; ir++)
-		{
-			double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
-
-			rhox = rho_in[0][ir] + chr.rho_core[ir];
-
-			if ( rho_in[0][ir] < 0.0 )  neg[0] -= rho_in[0][ir];
-
-			arhox = abs( rhox );
-
-			if ( arhox > vanishing_charge )
-			{
-				zeta = amag / arhox;
-
-				if ( abs( zeta ) > 1.0 )
-				{
-
-					neg[1] += 1.0 / ucell.omega;
-
-					zeta = (zeta > 0.0) ? 1.0 : (-1.0);
-
-				}//end if
-
-				XC_Functional::xc_spin( arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1] );
-
-				double vs = 0.5 * ( vx[0] + vc[0] - vx[1] - vc[1] );
-
-				v(0, ir) = e2*( 0.5 * ( vx[0] + vc[0] + vx[1] + vc[1] ) );
-
-				if ( amag > vanishing_charge )
-				{
-					for(int ipol = 1;ipol< 4;ipol++)
-					{
-						v(ipol, ir) = e2 * vs * rho_in[ipol][ir] / amag;
-
-						vtxc += v(ipol,ir) * rho_in[ipol][ir];
-
-					}//end do
-
-				}//end if
-
-				etxc += e2 * ( ex + ec ) * rhox;
-				vtxc += v(0,ir) * rho_in[0][ir];
-			}//end if
-		}//end do
-	}//end if
+    } // endif
     // energy terms, local-density contributions
 
 
@@ -558,13 +512,10 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     for (int ig = pw.gstart; ig<pw.ngmc; ig++)
     {
         const int j = pw.ig2fftc[ig];
-        if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
-        {
-            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+        const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
 
-            ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-            vh_g[ig] = fac * Porter[j];
-        }
+        ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+        vh_g[ig] = fac * Porter[j];
     }
 
     Parallel_Reduce::reduce_double_pool( ehart );
@@ -587,19 +538,13 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     //Add hartree potential to the xc potential
     //==========================================
 
-	if(NSPIN==4)
-	for (int ir = 0;ir < pw.nrxx;ir++)
-	{
-		v(0, ir) += Porter[ir].real();
-	}
-	else
-	for (int is = 0;is < NSPIN;is++)
-	{
-		for (int ir = 0;ir < pw.nrxx;ir++)
-		{
-			v(is, ir) += Porter[ir].real();
-		}
-	}
+    for (int is = 0;is < NSPIN;is++)
+    {
+        for (int ir = 0;ir < pw.nrxx;ir++)
+        {
+            v(is, ir) += Porter[ir].real();
+        }
+    }
 
 	//-------------------------------------------
 	// output the Hartree potential into a file.
@@ -802,24 +747,62 @@ const matrix &v, const int &precision, const int &hartree)const
 #endif
 void potential::set_vrs(const bool doublegrid)
 {
-	TITLE("potential","set_vrs");
-	timer::tick("potential","set_vrs");
+    TITLE("potential","set_vrs");
+    timer::tick("potential","set_vrs");
 
-	for (int is = 0;is < NSPIN;is++)
+    for (int is = 0;is < NSPIN;is++)
+    {
+        //=================================================================
+        // define the total local potential (external + scf) for each spin
+        //=================================================================
+        for (int i = 0;i < pw.nrxx;i++)
+        {
+            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+//	    cout <<"i: "<< i <<"	"<< "vrs: " << vrs(is,i) <<endl;
+	}
+
+	//====================================================
+        // add external linear potential, fuxiang add in 2017/05
+        //====================================================
+/*
+	if (istep >= 0)
 	{
-		//=================================================================
-		// define the total local potential (external + scf) for each spin
-		//=================================================================
-		if(NSPIN==4&&is>0)
 		for (int i = 0;i < pw.nrxx;i++)
-		{
-			this->vrs(is, i) = this->vr(is, i);
+        		{
+            		this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
 		}
-		else
-		for (int i = 0;i < pw.nrxx;i++)
+	}
+	else
+	{
+		this->vext = new double[pw.nrxx];
+		const int yz = pw.ncy*pw.nczp;
+		int index, i, j, k;
+
+		for(int ir=0; ir<pw.nrxx; ++ir)
 		{
-			this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+			index = ir;
+			i     = index / yz; // get the z, z is the fastest
+			index = index - yz * i;// get (x,y)
+			j     = index / pw.nczp;// get y
+			k     = index - pw.nczp*j + pw.nczp_start;// get x
+
+			//if (k<pw.ncx*0.1)	this->vext[ir] = -0.4*k/pw.ncx+0.05;
+			//else if (k>=pw.ncx*0.1 && k<pw.ncx*0.9)	this->vext[ir] = 0.1*k/pw.ncx;
+			//else if (k>=pw.ncx*0.9)	this->vext[ir] = -0.4*(1.0*k/pw.ncx-1)+0.05;
+
+			if (k<pw.ncx*0.05)		this->vext[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
+			else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95)	this->vext[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
+			else if (k>=pw.ncx*0.95)	this->vext[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
+		
+			this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
+
+			//cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
+			//cout << "vext: " << this->vext[ir] << endl;
+			//cout << "vrs: " << vrs(is,ir) <<endl;
 		}
+	}
+*/
+
 
         //====================================================
         // And interpolate it on the smooth mesh if necessary
@@ -836,7 +819,7 @@ void potential::set_vrs(const bool doublegrid)
         			delete [] vrs_1d;
         		}
         */
-	}
+    }
 
 
 #ifdef __FP
@@ -857,7 +840,7 @@ void potential::set_vrs(const bool doublegrid)
 // ----------------------------------------------------------------------
 void potential::newd()
 {
-	if (test_potential) TITLE("potential","newd");
+    if (test_potential) TITLE("potential","newd");
 
     // distringuish non-local pseudopotential in REAL or RECIPROCAL space.
     // if in real space, call new_r
@@ -868,60 +851,30 @@ void potential::newd()
     //  This routine computes the integral of the effective potential with
     //  the Q function and adds it to the bare ionic D term which is used
     //  to compute the non-local term in the US scheme.
-	if (!ppcell.okvan)
-	{
-		// no ultrasoft potentials: use bare coefficients for projectors
-		// if( spin_orbital) ....
-		// else if(noncolin) ....
-		for (int iat=0; iat<ucell.nat; iat++)
-		{
-			const int it = ucell.iat2it[iat];
-			const int nht = ucell.atoms[it].nh;
-			// nht: number of beta functions per atom type
-			for (int is = 0; is < NSPIN; is++)
-			{
-				for (int ih=0; ih<nht; ih++)
-				{
-					for (int jh=ih; jh<nht; jh++)
-					{
-						if(LSPINORB)
-						{
-							ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
-							ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
-						}
-						else if( NONCOLIN )
-						{
-							if(is==0)
-							{
-								ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-								ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-							}
-							else if(is==1)
-							{
-								ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-								ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-							}
-							else if(is==2)
-							{
-								ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-								ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-							}
-							else if(is==3)
-							{
-								ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-								ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-							}
-						}
-						else{
-							ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-							ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-						}
-					}
-				}
-			}
-		}
-		return;
-	}
+    if (!ppcell.okvan)
+    {
+        // no ultrasoft potentials: use bare coefficients for projectors
+        // if( spin_orbital) ....
+        // else if(noncolin) ....
+        for (int iat=0; iat<ucell.nat; iat++)
+        {
+            const int it = ucell.iat2it[iat];
+            const int nht = ucell.atoms[it].nh;
+            // nht: number of beta functions per atom type
+            for (int is = 0; is < NSPIN; is++)
+            {
+                for (int ih=0; ih<nht; ih++)
+                {
+                    for (int jh=ih; jh<nht; jh++)
+                    {
+                        ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+                        ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+                    }
+                }
+            }
+        }
+        return;
+    }
 
     //====================
     // if use PAW method
@@ -944,7 +897,7 @@ void potential::newd()
     end IF
     */
 
-	return;
+    return;
 } // end subroutine newd
 
 void potential::print_pot(ofstream &ofs)const
@@ -1154,3 +1107,142 @@ double potential::vr_ave(const int n,const int size,const double *p)
 }
 
 
+//==========================================================
+// this function aims to add external time-dependent potential (eg: linear potential)
+// used in tddft
+// fuxiang add in 2017-05
+//==========================================================
+
+void potential::set_vrs_tddft(const bool doublegrid, const int istep)
+{
+    TITLE("potential","set_vrs_tddft");
+    timer::tick("potential","set_vrs_tddft");
+
+    for (int is = 0;is < NSPIN;is++)
+    {
+	//====================================================
+        // add external linear potential, fuxiang add in 2017/05
+        //====================================================
+
+	const int timescale = 1;  // get the time that vext influences;
+	if (istep >= timescale)
+	{
+		for (int i = 0;i < pw.nrxx;i++)
+        	{
+            		this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+		}
+		cout << "vext = 0! " << endl;
+	}
+	else
+	{
+		this->vextold = new double[pw.nrxx];
+		this->vext = new double[pw.nrxx];
+		const int yz = pw.ncy*pw.nczp;
+		int index, i, j, k;
+
+		for(int ir=0; ir<pw.nrxx; ++ir)
+		{
+			index = ir;
+			i     = index / yz; // get the z, z is the fastest
+			index = index - yz * i;// get (x,y)
+			j     = index / pw.nczp;// get y
+			k     = index - pw.nczp*j + pw.nczp_start;// get x
+
+			if(vext_dire == 1)
+			{
+				if (k<pw.ncx*0.05)		this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
+				else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
+				else if (k>=pw.ncx*0.95)	this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
+			}
+			else if(vext_dire == 2)
+			{
+				if (j<pw.ncx*0.05)		this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
+				else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
+				else if (j>=pw.ncx*0.95)	this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
+			}
+			else if(vext_dire == 3)
+			{
+				if (i<pw.ncx*0.05)		this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
+				else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
+				else if (i>=pw.ncx*0.95)	this->vextold[ir] = (0.019447*(1.0*i/pw.ncx-1)-0.001069585)*ucell.lat0;
+			}
+
+			// Gauss
+/*
+			const double w = 22.13;    // eV
+			const double sigmasquare = 6836;
+			const double timecenter = 700;
+			const double timenow = (istep-timecenter)*INPUT.md_dt*41.34;
+			this->vext[ir] = this->vextold[ir]*cos(w/27.2116*timenow)*exp(-timenow*timenow*0.5/(sigmasquare))*0.25;  //0.1 is modified in 2018/1/12
+*/
+
+			//HHG of H atom
+/*
+			if(istep < 1875)
+			{
+				this->vext[ir] = this->vextold[ir]*2.74*istep/1875*cos(0.0588*istep*INPUT.md_dt*41.34);	// 2.75 is equal to E0;
+			}
+			else if(istep < 5625)
+			{
+				this->vext[ir] = this->vextold[ir]*2.74*cos(0.0588*istep*INPUT.md_dt*41.34);
+			}
+			else if(istep < 7500)
+			{
+				this->vext[ir] = this->vextold[ir]*2.74*(7500-istep)/1875*cos(0.0588*istep*INPUT.md_dt*41.34);
+			}
+*/
+
+			//HHG of H2
+
+//			const double timenow = (istep)*INPUT.md_dt*41.34;
+			//this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow);
+			//this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow)*0.01944;
+//			this->vext[ir] = this->vextold[ir]*2.74*cos(0.0428*timenow)*sin(0.00107*timenow)*sin(0.00107*timenow);
+
+						
+			this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
+
+			//cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
+			//cout << "vext: " << this->vext[ir] << endl;
+			//cout << "vrs: " << vrs(is,ir) <<endl;
+		}
+		cout << "vext is existed!" << endl;
+
+		delete[] this->vextold;
+		delete[] this->vext;
+	}
+
+
+
+        //====================================================
+        // And interpolate it on the smooth mesh if necessary
+        //====================================================
+        /*
+        		if (doublegrid)
+        		{
+        			double *vrs_1d = new double[pw.nrxx]();
+        			assert(vrs_1d != 0);
+        			dcopy(vrs, is, vrs_1d);
+        			//interpolate (vrs (1, is), vrs (1, is), - 1);
+        			interpolate(vrs_1d, vrs_1d, -1);
+        			//(vrs ( is, 0), vrs ( is, 0), - 1);
+        			delete [] vrs_1d;
+        		}
+        */
+    }
+
+
+#ifdef __FP
+	if(BFIELD)
+	{
+		if(NSPIN==2)
+		{
+			bfid.add_zeeman();
+		}
+	}
+#endif
+
+
+    timer::tick("potential","set_vrs_tddft");
+    return;
+} //end subroutine set_vrs_tddft

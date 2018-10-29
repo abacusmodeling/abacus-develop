@@ -409,6 +409,19 @@ void Input::Default(void)
 
 	//xiaohui add 2015-09-16
 	input_error = 0;
+
+//----------------------------------------------------------			//Fuxiang He add 2016-10-26
+// tddft
+//----------------------------------------------------------
+	tddft=0;
+	td_dr2 = 1e-9;
+	td_dt = 0.02;
+	td_force_dt = 0.02;
+	val_elec_01=1;
+	val_elec_02=1;
+	val_elec_03=1;
+	vext=0;
+	vext_dire=1;
 	
     cell_factor = 1.2; //LiuXh add 20180619
 
@@ -1189,6 +1202,46 @@ bool Input::Read(const string &fn)
         }
 //added by zheng daye
 //----------------------------------------------------------
+// tddft
+// Fuxiang He add 2016-10-26
+//----------------------------------------------------------
+	else if (strcmp("tddft", word) == 0)
+	{
+		read_value(ifs,tddft );
+	}
+	else if (strcmp("td_dr2", word) == 0)
+	{
+		read_value(ifs,td_dr2 );
+	}
+	else if (strcmp("td_dt", word) == 0)
+	{
+		read_value(ifs,td_dt );
+	}
+	else if (strcmp("td_force_dt", word) == 0)
+	{
+		read_value(ifs,td_force_dt );
+	}
+	else if (strcmp("val_elec_01", word) == 0)
+	{
+		read_value(ifs, val_elec_01);
+	}
+	else if (strcmp("val_elec_02", word) == 0)
+	{
+		read_value(ifs,val_elec_02 );
+	}
+	else if (strcmp("val_elec_03", word) == 0)
+	{
+		read_value(ifs,val_elec_03 );
+	}
+	else if (strcmp("vext", word) == 0)
+	{
+		read_value(ifs,vext );
+	}
+	else if (strcmp("vext_dire", word) == 0)
+	{
+		read_value(ifs,vext_dire );
+	}
+//----------------------------------------------------------
 // vdwD2
 // Peize Lin add 2014-03-31
 //----------------------------------------------------------
@@ -1687,7 +1740,16 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( vdwD2_period[2] );
 	Parallel_Common::bcast_double( vdwD2_radius );
 	Parallel_Common::bcast_string( vdwD2_radius_unit );
- 
+	// Fuxiang He add 2016-10-26
+	Parallel_Common::bcast_int(tddft);
+	Parallel_Common::bcast_int(val_elec_01);
+	Parallel_Common::bcast_int(val_elec_02);
+	Parallel_Common::bcast_int(val_elec_03);
+	Parallel_Common::bcast_double(td_dr2);
+	Parallel_Common::bcast_double(td_dt);
+	Parallel_Common::bcast_double(td_force_dt);
+	Parallel_Common::bcast_int(vext);
+	Parallel_Common::bcast_int(vext_dire);
         // pengfei Li add 2016-11-23
         //Parallel_Common::bcast_bool( epsilon );
 		//Parallel_Common::bcast_int( epsilon_choice );
@@ -2585,6 +2647,18 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"starting_spin_angle",starting_spin_angle,"starting_spin_angle");
 	
 	//OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
+
+	//Fuxiang add 2016-10-26
+	ofs << "\n#Parameters (17.tddft)" << endl;
+	OUTP(ofs,"tddft",tddft,"calculate tddft or not");
+	OUTP(ofs,"td_dr2",td_dr2,"threshold for electronic iteration of tddft");
+	OUTP(ofs,"td_dt",td_dt,"time of ion step");
+	OUTP(ofs,"td_force_dt",td_force_dt,"time of force change");
+	OUTP(ofs,"val_elec_01",val_elec_01,"val_elec_01");
+	OUTP(ofs,"val_elec_02",val_elec_02,"val_elec_02");
+	OUTP(ofs,"val_elec_03",val_elec_03,"val_elec_03");
+	OUTP(ofs,"vext",vext,"add extern potential or not");
+	OUTP(ofs,"vext_dire",vext_dire,"extern potential direction");
 	
     ofs.close();
     return;

@@ -22,6 +22,8 @@ public:
     matrix vrs;
     matrix vnew;
     double *vrs1;	// mohan add 2007-11-12
+    double *vext;		// fuxiang add 2017-05
+    double *vextold;		//fuxiang add 2018-01-15
 
 
     // member functions
@@ -48,6 +50,8 @@ public:
     // vr : Hartree potential + V_xc potential .
     // vltot : From pseudopotential .
     void set_vrs(const bool doublegrid);
+
+    void set_vrs_tddft(const bool doublegrid, const int istep);
 
     void print_pot(ofstream &ofs)const;
     double vr_ave(const int, const int, const double *) ;

@@ -319,6 +319,19 @@ void Input_Conv::Convert(void)
 	}
 	
 //----------------------------------------------------------
+// Fuxiang He add 2016-10-26
+//----------------------------------------------------------
+	tddft = INPUT.tddft;
+	td_dr2 = INPUT.td_dr2;
+	td_dt = INPUT.td_dt;
+	td_force_dt = INPUT.td_force_dt;
+	val_elec_01 = INPUT.val_elec_01;
+	val_elec_02 = INPUT.val_elec_02;
+	val_elec_03 = INPUT.val_elec_03;
+	vext = INPUT.vext;
+	vext_dire = INPUT.vext_dire;	
+
+//----------------------------------------------------------
 // about selinv
 //----------------------------------------------------------
 //xiaohui modified 2013-03-23, adding "//" before "Selinv"

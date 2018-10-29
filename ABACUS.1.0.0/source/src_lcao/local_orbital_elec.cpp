@@ -5,8 +5,10 @@
 // mohan add on test 2010-01-13
 //#include "../src_develop/src_onscaling/on_tests.h"
 #include "update_input.h"
-#include "../src_pw/chi0_hilbert.h"
+
 #include "lcao_vna.h"
+
+#include "evolve_lcao_matrix.h"
 
 int Local_Orbital_Elec::iter = 0;
 double Local_Orbital_Elec::avg_iter = 0.0; 
@@ -132,13 +134,6 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// set converged threshold, 
 		// automatically updated during self consistency, only for CG.
         this->update_ethr(iter);
-        if(FINAL_SCF && iter==1)
-        {
-            init_mixstep_final_scf();
-            //chr.irstep=0;
-            //chr.idstep=0;
-            //chr.totstep=0;
-        }
 
 		// mohan update 2012-06-05
 		en.calculate_harris(1);
@@ -149,6 +144,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// mohan add iter > 1 on 2011-04-02
 		// because the en.ekb has not value now.
 		// so the smearing can not be done.
+
 		if(iter>1)Occupy::calculate_weights();
 		
 		if(wf.start_wfc == "file")
@@ -187,12 +183,59 @@ void Local_Orbital_Elec::scf(const int &istep)
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
 				en.delta_escf();
-				pot.set_vrs(pw.doublegrid);
+				if (vext == 0)	pot.set_vrs(pw.doublegrid);
+				else		pot.set_vrs_tddft(pw.doublegrid, istep);
 			}
 		}
 
+		//fuxiang add 2016-11-1
+
+		if(iter == 1)
+		{
+			this->WFC_init = new complex<double>**[kv.nks];
+			for(int ik=0; ik<kv.nks; ik++)
+			{
+				this->WFC_init[ik] = new complex<double>*[NBANDS];
+			}
+			for(int ik=0; ik<kv.nks; ik++)
+			{
+				for(int ib=0; ib<NBANDS; ib++)
+				{
+					this->WFC_init[ik][ib] = new complex<double>[NLOCAL];
+				}
+			}
+			if(tddft==1 && istep>=1)
+			{
+				for (int ik=0; ik<kv.nks; ik++)
+				{
+					for (int ib=0; ib<NBANDS; ib++)
+					{
+						for (int i=0; i<NLOCAL; i++)
+						{
+							WFC_init[ik][ib][i] = LOWF.WFC_K[ik][ib][i];
+						}
+					}
+				}
+			}
+			else
+			{
+				for (int ik=0; ik<kv.nks; ik++)
+				{
+					for (int ib=0; ib<NBANDS; ib++)
+					{
+						for (int i=0; i<NLOCAL; i++)
+						{
+							WFC_init[ik][ib][i] = complex<double>(0.0,0.0);
+						}
+					}
+				}
+			}
+		}
+
+
 		// (1) calculate the bands.
-		cal_bands();
+
+		cal_bands(istep);
 
 //		for(int ib=0; ib<NBANDS; ++ib)
 //		{
@@ -225,10 +268,28 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		// (2)
 		chr.save_rho_before_sum_band();
-
 		
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
+
+/*		if(istep==0)
+		{
+			for (int ib=0; ib < 3; ib++)
+			{
+				wf.wg(0,ib) = 2.0;
+			}
+			wf.wg(0,3) = 1.75;
+			wf.wg(0,4) = 0.25;
+		}
+    		for (int ik = 0; ik < kv.nks; ik++)
+    		{
+        		for (int ib = 0; ib < NBANDS; ib++)
+			{
+				cout << "wf.wg(ik, ib): " << wf.wg(ik, ib) << endl;
+			}
+    		}
+*/
+
 		for(int ik=0; ik<kv.nks; ++ik)
 		{
 			en.print_band(ik);
@@ -249,6 +310,8 @@ void Local_Orbital_Elec::scf(const int &istep)
 			srho.begin(is);
 		}
 
+
+
 		// (6) compute magnetization, only for spin==2
         mag.compute_magnetization();
 
@@ -265,7 +328,9 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// (8) Mix charge density
 		chr.mix_rho(dr2,0,DRHO2,iter,conv_elec);
 
+
 		// (9) Calculate new potential according to new Charge Density.
+	
 		if(conv_elec || iter==NITER)
 		{ 
 			if(pot.out_potential<0) //mohan add 2011-10-10
@@ -330,7 +395,8 @@ void Local_Orbital_Elec::scf(const int &istep)
 		}
 
 		// (10) add Vloc to Vhxc.
-		pot.set_vrs(pw.doublegrid);
+		if(vext == 0)	pot.set_vrs(pw.doublegrid);
+		else		pot.set_vrs_tddft(pw.doublegrid, istep);
 	
 		time_finish=std::time(NULL);
 		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
@@ -347,24 +413,14 @@ void Local_Orbital_Elec::scf(const int &istep)
 			// output charge density for converged,
 			// 0 means don't need to consider iter,
 			//--------------------------------------
-			if( chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
-			{
-				cout <<"eta = "<<chi0_hilbert.eta<<endl;
-				cout <<"domega = "<<chi0_hilbert.domega<<endl;
-				cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
-				cout <<"dim = "<<chi0_hilbert.dim<<endl;
-				//cout <<"oband = "<<chi0_hilbert.oband<<endl;
-				chi0_hilbert.Chi();
-			}
-			
 			for(int is=0; is<NSPIN; is++)
 			{
 				const int precision = 3;
-				
-				stringstream ssc;
-				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-				chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
-				
+
+        		stringstream ssc;
+       			ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+        		chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+
 				stringstream ssd;
 				if(GAMMA_ONLY_LOCAL)
 				{
@@ -379,6 +435,11 @@ void Local_Orbital_Elec::scf(const int &istep)
 				stringstream ssp;
 				ssp << global_out_dir << "SPIN" << is + 1 << "_POT";
 				pot.write_potential( is, 0, ssp.str(), pot.vrs, precision );
+
+			//fuxiang add 2017-03-15
+			stringstream sse;
+			sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
+			chr.write_rho_dipole( is, 0, sse.str());
 
 			}
 			
@@ -418,7 +479,33 @@ void Local_Orbital_Elec::nscf(void)
 	cout << " NON-SELF CONSISTENT CALCULATIONS" << endl;
 	
 	time_t time_start= std::time(NULL);
-	cal_bands();
+//	complex<double>*** WFC_init;
+	this->WFC_init = new complex<double>**[kv.nks];
+	for(int ik=0; ik<kv.nks; ik++)
+	{
+		this->WFC_init[ik] = new complex<double>*[NBANDS];
+	}
+	for(int ik=0; ik<kv.nks; ik++)
+	{
+		for(int ib=0; ib<NBANDS; ib++)
+		{
+			this->WFC_init[ik][ib] = new complex<double>[NLOCAL];
+		}
+	}
+
+	for (int ik=0; ik<kv.nks; ik++)
+	{
+		for (int ib=0; ib<NBANDS; ib++)
+		{
+			for (int i=0; i<NLOCAL; i++)
+			{
+				WFC_init[ik][ib][i] = complex<double>(0.0,0.0);
+			}
+		}
+	}
+
+//	cal_bands(istep, WFC_init);
+	cal_bands(istep);
 	time_t time_finish=std::time(NULL);
 	OUT_TIME("cal_bands",time_start, time_finish);
 
@@ -447,8 +534,9 @@ void Local_Orbital_Elec::nscf(void)
 	return;
 }
 
+
 #include "../src_parallel/subgrid_oper.h"
-void Local_Orbital_Elec::cal_bands(void)
+void Local_Orbital_Elec::cal_bands(const int &istep)
 {
 	TITLE("Local_Orbital_Elec","cal_bands");
 	timer::tick("Local_Orbital_Elec","cal_bands",'E');
@@ -559,7 +647,7 @@ void Local_Orbital_Elec::cal_bands(void)
 				//	if(BFIELD)
 				//	{
 				//		//cout << " solve comlex matrix()" << endl;
-				//		DLM.solve_complex_matrix(ik, SGO.totwfc_B[0]);
+				//		DLM.solve_complex_matrix(ik, SGO.totwfc_B[0], istep);
 				//	}
 				//	else
 				//	{
@@ -633,12 +721,20 @@ void Local_Orbital_Elec::cal_bands(void)
 
 			// write the wave functions into LOWF.WFC_K[ik].
 			bool diago = true;
+			if (tddft == 1 && istep >= 1) diago = false;
 			if(diago)
 			{
 				timer::tick("Efficience","diago_k");
 				Diago_LCAO_Matrix DLM;
 				DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik]);
 				timer::tick("Efficience","diago_k");
+			}
+			else
+			{
+				timer::tick("Efficience","evolve_k");
+				Evolve_LCAO_Matrix ELM;
+				ELM.evolve_complex_matrix(ik, LOWF.WFC_K[ik], WFC_init[ik]);
+				timer::tick("Efficience","evolve_k");
 			}
 			timer::tick("Efficience","each_k");
 		}
@@ -699,15 +795,4 @@ void Local_Orbital_Elec::cal_bands(void)
 	}
 	timer::tick("Local_Orbital_Elec","cal_bands",'E');
 	return;	
-}
-
-void Local_Orbital_Elec::init_mixstep_final_scf(void)
-{
-    TITLE("Local_Orbital_Elec","init_mixstep_final_scf");
-
-    chr.irstep=0;
-    chr.idstep=0;
-    chr.totstep=0;
-
-    return;
 }

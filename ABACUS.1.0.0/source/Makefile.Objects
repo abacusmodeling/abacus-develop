@@ -145,6 +145,7 @@ lcao_nnr.o \
 istate_charge.o \
 istate_envelope.o \
 diago_lcao_matrix.o\
+evolve_lcao_matrix.o\
 bfield.o\
 ylm.o\
 force_lcao.o\

@@ -46,6 +46,7 @@ public:
     void atomic_rho(const int spin_number_need, double **rho_in)const;
     void set_rho_core(const ComplexMatrix &structure_factor);
     void write_rho(const int &is, const int &iter, const string &fn, const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
+    void write_rho_dipole(const int &is, const int &iter, const string &fn, const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
     bool read_rho(const int &is, const string &fn);//mohan add 2007-10-17
     void sum_band(void);
     void renormalize_rho(void);
