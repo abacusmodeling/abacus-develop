@@ -5,9 +5,8 @@
 // mohan add on test 2010-01-13
 //#include "../src_develop/src_onscaling/on_tests.h"
 #include "update_input.h"
-
+#include "../src_pw/chi0_hilbert.h"
 #include "lcao_vna.h"
-
 #include "evolve_lcao_matrix.h"
 
 int Local_Orbital_Elec::iter = 0;
@@ -134,6 +133,13 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// set converged threshold, 
 		// automatically updated during self consistency, only for CG.
         this->update_ethr(iter);
+        if(FINAL_SCF && iter==1)
+        {
+            init_mixstep_final_scf();
+            //chr.irstep=0;
+            //chr.idstep=0;
+            //chr.totstep=0;
+        }
 
 		// mohan update 2012-06-05
 		en.calculate_harris(1);
@@ -144,7 +150,6 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// mohan add iter > 1 on 2011-04-02
 		// because the en.ekb has not value now.
 		// so the smearing can not be done.
-
 		if(iter>1)Occupy::calculate_weights();
 		
 		if(wf.start_wfc == "file")
@@ -234,7 +239,6 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 
 		// (1) calculate the bands.
-
 		cal_bands(istep);
 
 //		for(int ib=0; ib<NBANDS; ++ib)
@@ -269,6 +273,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// (2)
 		chr.save_rho_before_sum_band();
 		
+
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
 
@@ -310,8 +315,6 @@ void Local_Orbital_Elec::scf(const int &istep)
 			srho.begin(is);
 		}
 
-
-
 		// (6) compute magnetization, only for spin==2
         mag.compute_magnetization();
 
@@ -327,7 +330,6 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		// (8) Mix charge density
 		chr.mix_rho(dr2,0,DRHO2,iter,conv_elec);
-
 
 		// (9) Calculate new potential according to new Charge Density.
 	
@@ -413,13 +415,23 @@ void Local_Orbital_Elec::scf(const int &istep)
 			// output charge density for converged,
 			// 0 means don't need to consider iter,
 			//--------------------------------------
+			if( chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
+			{
+				cout <<"eta = "<<chi0_hilbert.eta<<endl;
+				cout <<"domega = "<<chi0_hilbert.domega<<endl;
+				cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
+				cout <<"dim = "<<chi0_hilbert.dim<<endl;
+				//cout <<"oband = "<<chi0_hilbert.oband<<endl;
+				chi0_hilbert.Chi();
+			}
+
 			for(int is=0; is<NSPIN; is++)
 			{
 				const int precision = 3;
 
-        		stringstream ssc;
-       			ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-        		chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+        			stringstream ssc;
+       				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+        			chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
 
 				stringstream ssd;
 				if(GAMMA_ONLY_LOCAL)
@@ -533,7 +545,6 @@ void Local_Orbital_Elec::nscf(void)
 
 	return;
 }
-
 
 #include "../src_parallel/subgrid_oper.h"
 void Local_Orbital_Elec::cal_bands(const int &istep)
@@ -795,4 +806,15 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 	}
 	timer::tick("Local_Orbital_Elec","cal_bands",'E');
 	return;	
+}
+
+void Local_Orbital_Elec::init_mixstep_final_scf(void)
+{
+    TITLE("Local_Orbital_Elec","init_mixstep_final_scf");
+
+    chr.irstep=0;
+    chr.idstep=0;
+    chr.totstep=0;
+
+    return;
 }

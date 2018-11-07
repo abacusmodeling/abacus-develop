@@ -22,6 +22,7 @@ protected:
 
 private:
 	void cal_bands(const int &istep);
+	void init_mixstep_final_scf(void);
 
 
 };
