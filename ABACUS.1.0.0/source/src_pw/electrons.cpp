@@ -20,6 +20,7 @@
 #include "chi0_standard.h"
 #include "epsilon0_pwscf.h"
 #include "epsilon0_vasp.h"
+#include "../src_pw/toWannier90.h"
 
 double electrons::avg_iter = 0;
 
@@ -69,6 +70,13 @@ void electrons::non_self_consistent(void)
     }
 
 
+	// add by jingan in 2018.11.7
+	if(CALCULATION == "nscf" && INPUT.towannier90)
+    {
+        toWannier90 myWannier(kv.nkstot,ucell.G);
+        myWannier.init_wannier();
+    }
+	
 
     //=======================================================
     // Do a Berry phase polarization calculation if required

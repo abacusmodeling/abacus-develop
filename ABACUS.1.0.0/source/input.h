@@ -50,6 +50,8 @@ public:
 	double epm_mag_field_z;
 
     bool berry_phase;		// berry phase calculation
+	bool towannier90;       // add by jingan for wannier90
+	string NNKP;            // add by jingan for wannier90
     int efield;				// add electrical field
 	int edir;
 	double emaxpos;

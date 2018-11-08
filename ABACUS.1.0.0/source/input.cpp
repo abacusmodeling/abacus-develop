@@ -555,6 +555,14 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, berry_phase);
         }
+				else if (strcmp("towannier90", word) == 0) // add by jingan for wannier90
+		{
+			read_value(ifs, towannier90);
+		}
+		else if (strcmp("nnkpfile", word) == 0) // add by jingan for wannier90
+		{
+			read_value(ifs, NNKP);
+		}
         else if (strcmp("efield", word) == 0)// electrical field
         {
             read_value(ifs, efield);

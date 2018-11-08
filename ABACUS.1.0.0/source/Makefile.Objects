@@ -59,6 +59,7 @@ md.o\
 mdNVE.o\
 mdNVT.o\
 soc.o\
+toWannier90.o\
 
 OBJS_TOOLS=complexarray.o\
 complexmatrix.o \
