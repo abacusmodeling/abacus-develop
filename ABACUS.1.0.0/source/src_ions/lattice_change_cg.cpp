@@ -54,7 +54,7 @@ void Lattice_Change_CG::allocate(void)
 	this->e0 = 0.0;	
 }
 
-void Lattice_Change_CG::start(const matrix &stress, const double& etot_in)
+void Lattice_Change_CG::start(matrix &stress, const double& etot_in)
 {
 	TITLE("Lattice_Change_CG","start");
 	
@@ -109,7 +109,7 @@ void Lattice_Change_CG::start(const matrix &stress, const double& etot_in)
 	//cout<<"stress  sd = "<<sd<<"  trial = "<<trial<<"  istep = "<<istep<<endl;
 	if( flag == 0)
 	{
-		Lattice_Change_Basic::check_converged(stress);
+		Lattice_Change_Basic::check_converged(stress, grad);
 		//cout<<"Lattice_Change_Basic::converged = "<<Lattice_Change_Basic::converged<<endl;
 	}
 	

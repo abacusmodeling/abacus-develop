@@ -26,6 +26,7 @@ public:
     double omega;// the volume of the unit cell
 
     Matrix3 latvec; // Unitcell lattice vectors
+	int *lc;  // Change the lattice vectors or not
 	Vector3<double> a1,a2,a3; // Same as latvec, just at another form.
 	Vector3<double> latcenter; // (a1+a2+a3)/2 the center of vector
     Matrix3 latvec_supercell; // Supercell lattice vectors

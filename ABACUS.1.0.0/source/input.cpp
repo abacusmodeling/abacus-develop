@@ -199,6 +199,7 @@ void Input::Default(void)
 	force_thr_ev2=0;
     stress_thr = 1.0e-2; //LiuXh add 20180515
 	stress=false;
+	fixed_axes = "None"; // pengfei 2018-11-9
 	ion_dynamics="cg"; // pengfei  2014-10-13
     cg_threshold=0.5; // pengfei add 2013-08-15
 	out_level="ie";
@@ -727,7 +728,11 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, stress);
         }
-		else if (strcmp("move_method", word) == 0)
+        else if (strcmp("fixed_axes", word) == 0)
+        {
+            read_value(ifs, fixed_axes);
+        }
+	else if (strcmp("move_method", word) == 0)
         {
             read_value(ifs, ion_dynamics);
         }
@@ -1607,6 +1612,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double( force_thr_ev2);
     Parallel_Common::bcast_double( stress_thr); //LiuXh add 20180515
     Parallel_Common::bcast_bool( stress );
+	Parallel_Common::bcast_string( fixed_axes );
     Parallel_Common::bcast_string( ion_dynamics );
     Parallel_Common::bcast_double( cg_threshold); // pengfei add 2013-08-15
 	Parallel_Common::bcast_string( out_level);
@@ -2460,6 +2466,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"trust_radius_min", trust_radius_min,"minimal trust radius, unit: Bohr");
 	OUTP(ofs,"trust_radius_ini", trust_radius_ini,"initial trust radius, unit: Bohr");
 	OUTP(ofs,"stress",stress,"calculate the stress or not");
+	OUTP(ofs,"fixed_axes",fixed_axes,"which axes are fixed");
 	OUTP(ofs,"move_method",ion_dynamics,"bfgs; sd; cg; cg_bfgs;"); //pengfei add 2013-08-15
 	OUTP(ofs,"out_level",out_level,"ie(for electrons); i(for ions);");
 	OUTP(ofs,"out_dm",out_dm,">0 output density matrix");

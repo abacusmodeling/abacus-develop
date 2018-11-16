@@ -30,6 +30,7 @@ UnitCell::UnitCell()
 	iwt2iat = new int[1];
 
     itia2iat.create(1,1);
+	lc = new int[3];
     itiaiw2iwt.create(1,1,1);
 
     latvec = Matrix3();
@@ -79,6 +80,10 @@ void UnitCell::bcast_unitcell(void)
     Parallel_Common::bcast_double( latvec.e31 );
     Parallel_Common::bcast_double( latvec.e32 );
     Parallel_Common::bcast_double( latvec.e33 );
+
+    Parallel_Common::bcast_int( lc[0] );
+    Parallel_Common::bcast_int( lc[1] );
+    Parallel_Common::bcast_int( lc[2] );
 	
 	// distribute lattice vectors.
     Parallel_Common::bcast_double( a1.x );

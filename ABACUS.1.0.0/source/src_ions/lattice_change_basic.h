@@ -22,7 +22,7 @@ namespace Lattice_Change_Basic
 	//----------------------------------------------------------------------------
 	// setup the gradient, all the same for any geometry optimization methods.
 	//----------------------------------------------------------------------------
-	void setup_gradient(double* lat, double *grad, const matrix &stress);
+	void setup_gradient(double* lat, double *grad, matrix &stress);
 
 	//----------------------------------------------------------------------------
 	// move the atom positions, considering the periodic boundary condition. 
@@ -33,7 +33,7 @@ namespace Lattice_Change_Basic
 	// check the converged conditions ( if largest gradient is smaller than
 	// the threshold)
 	//----------------------------------------------------------------------------
-	void check_converged(const matrix &stress);
+	void check_converged(matrix &stress, double *grad);
 
 	//----------------------------------------------------------------------------
 	// terminate the geometry optimization.

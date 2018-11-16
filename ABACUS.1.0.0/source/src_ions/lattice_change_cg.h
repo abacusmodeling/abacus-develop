@@ -9,7 +9,7 @@ public:
     ~Lattice_Change_CG();
 
     void allocate(void);
-    void start(const matrix &stress, const double &etot);
+    void start(matrix &stress, const double &etot);
 
 private:
 	double* lat0;

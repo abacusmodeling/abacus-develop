@@ -94,6 +94,7 @@ public:
 	double force_thr_ev2;	// invalid force threshold, mohan add 2011-04-17
     double stress_thr;      // Pengfei Li 2017-11-01 //LiuXh update 20180515
 	bool stress;			// calculate the stress
+	string fixed_axes;              //which axes are fixed
 	string ion_dynamics;		// methods to move_ion: sd, bfgs, cg...
     double cg_threshold;    // threshold when cg to bfgs, pengfei add 2011-08-15
 	double bfgs_w1;			// wolfe condition 1	

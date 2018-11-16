@@ -14,6 +14,7 @@
 #include "src_pw/chi0_standard.h"
 #include "src_pw/epsilon0_pwscf.h"
 #include "src_pw/epsilon0_vasp.h"
+#include "src_pw/unitcell.h"
 
 //xiaohui modified 2013-03-23, adding "//" before #include...
 //#include "../../src_develop/src_siao/selinv.h"
@@ -84,6 +85,46 @@ void Input_Conv::Convert(void)
 	Ions_Move_Basic::trust_radius_ini = INPUT.trust_radius_ini;
 	Ions_Move_Basic::out_stru = INPUT.out_stru; //mohan add 2012-03-23
 	STRESS = INPUT.stress;
+        if(INPUT.fixed_axes == "None")          // pengfei Li add 2018-11-11
+        {
+                ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+        }
+	else if(INPUT.fixed_axes == "volume")
+	{
+		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+	}
+        else if(INPUT.fixed_axes == "a")
+        {
+                ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
+        }
+        else if(INPUT.fixed_axes == "b")
+        {
+                ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
+        }
+        else if(INPUT.fixed_axes == "c")
+        {
+                ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
+        }
+        else if(INPUT.fixed_axes == "ab")
+        {
+                ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
+        }
+        else if(INPUT.fixed_axes == "ac")
+        {
+                ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
+        }
+        else if(INPUT.fixed_axes == "bc")
+        {
+                ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
+        }
+        else if(INPUT.fixed_axes == "abc")
+        {
+                ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
+        }
+        else
+        {
+                WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+        }
 	MOVE_IONS = INPUT.ion_dynamics;
 	OUT_LEVEL = INPUT.out_level;
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
