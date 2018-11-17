@@ -107,6 +107,43 @@ double Mathzone::Polynomial_Interpolation
     return y;
 }
 
+double Mathzone::Polynomial_Interpolation            // pengfei Li 2018-3-23
+(
+    const realArray &table,
+    const int &dim1,
+    const int &dim2,
+	const int &dim3,
+    const int &table_length,
+    const double &table_interval,
+    const double &x				// input value
+)
+{
+//	timer::tick("Mathzone","Poly_Interpo_3");
+    assert(table_interval>0.0);
+    const double position = x / table_interval;
+    const int iq = static_cast<int>(position);
+    
+	if(iq>table_length-4)
+	{
+		cout << "\n x = " << x;
+		cout << "\n table_interval = " << table_interval;
+		cout << "\n iq=" << iq << " table_length = " << table_length << endl;
+	}
+	assert(iq < table_length-4);
+    const double x0 = position - static_cast<double>(iq);
+    const double x1 = 1.0 - x0;
+    const double x2 = 2.0 - x0;
+    const double x3 = 3.0 - x0;
+    const double y=
+        table(dim1, dim2, dim3, iq)   * x1 * x2 * x3 / 6.0 +
+        table(dim1, dim2, dim3, iq+1) * x0 * x2 * x3 / 2.0 -
+        table(dim1, dim2, dim3, iq+2) * x1 * x0 * x3 / 2.0 +
+        table(dim1, dim2, dim3, iq+3) * x1 * x2 * x0 / 6.0 ;
+
+//	timer::tick("Mathzone","Poly_Interpo_3");
+    return y;
+}
+
 double Mathzone::Polynomial_Interpolation
 (
     const double *table,

@@ -49,8 +49,9 @@ public:
 	void Chi();
 	void Parallel_G();
 	void Cal_Psi(int iq, complex<double> **psi_r);
+	void Cal_Psi_down(int iq, complex<double> **psi_r);
 	void Cal_lcao_psi();
-	void Cal_b(int iq, int ik, int iqk);
+	void Cal_b(int iq, int ik, int iqk, int ispin);
 	void Cal_b_lcao( int iq, int ik, int iqk);
 	void Cal_Chi0s(int iq);
 	void Cal_T();

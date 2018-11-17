@@ -24,11 +24,15 @@ public:
 		
 		int oband;
 		int uband;
+
+		void Cal_psi_nu(int ik);
 		
 		void cal_epsilon0();
 		void Init();
 		void Delete();
 		void Cal_b(int ik);
+		void Cal_psi(int ik);
+		void Cal_psi_nabla(int ik);
 		void Cal_epsilon0s();
 		void Cal_T();
 		void Cal_epsilon0();
@@ -40,6 +44,9 @@ private:
 		
 		bool init_finish;
 		complex<double> ***b;
+		complex<double> **psi;
+		complex<double> ***psi_nabla;
+		complex<double> ***psi_nu;
 		complex<double> **eps0s;
 		complex<double> **T;
 };

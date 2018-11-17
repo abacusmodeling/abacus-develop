@@ -7,6 +7,7 @@
 #include "pseudopot_cell_vnl.h"
 #include "tools.h"
 #include "wavefunc.h"
+#include "../src_lcao/use_overlap_table.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -383,6 +384,227 @@ void pseudopot_cell_vnl::init_vnl(void)
 	}
 	timer::tick("ppcell_vnl","init_vnl");
 	ofs_running << "\n Init Non-Local-Pseudopotential done." << endl;
+	return;
+}
+
+complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int M)   // pengfei Li  2018-3-23
+{
+	complex<double> cf;
+	if(alpha == 0)
+	{
+		cf = -sqrt(4*PI/3)*CG(lu,mu,1,1,L,M);
+	}
+	else if(alpha == 1)
+	{
+		cf = -sqrt(4*PI/3)*CG(lu,mu,1,2,L,M);
+	}
+	else if(alpha == 2)
+	{
+		cf = sqrt(4*PI/3)*CG(lu,mu,1,0,L,M);
+	}
+	else
+	{
+		WARNING_QUIT("pseudopot_cell_vnl_alpha", "alpha must be 0~2");
+	}
+	
+	return cf;
+}
+
+double pseudopot_cell_vnl::CG(int l1, int m1, int l2, int m2, int L, int M)      // pengfei Li 2018-3-23
+{
+	int dim = L*L+M;
+	int dim1 = l1*l1+m1;
+	int dim2 = l2*l2+m2;
+	
+	//double A = MGT.Gaunt_Coefficients(dim1, dim2, dim);
+	
+	return MGT.Gaunt_Coefficients(dim1, dim2, dim);
+}
+
+void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  2018-3-23
+{
+	if(test_pp) TITLE("pseudopot_cell_vnl","getvnl_alpha");
+	timer::tick("pp_cell_vnl","getvnl_alpha");
+
+	if(lmaxkb < 0) 
+	{
+		return;
+	}
+	
+	const int npw = kv.ngk[ik];
+	int ig, ia, nb, ih, lu, mu;
+
+	double *vq = new double[npw];
+	const int x1= (lmaxkb + 2)*(lmaxkb + 2);
+
+	matrix ylm(x1, npw);
+	Vector3<double> *gk = new Vector3<double>[npw];
+	for (ig = 0;ig < npw;ig++) 
+	{
+		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+	}
+
+	vkb1_alpha = new complex<double>**[3];
+	for(int i=0; i<3; i++)
+	{
+		vkb1_alpha[i] = new complex<double>*[nhm];
+		for(int j=0; j<nhm; j++)
+		{
+			vkb1_alpha[i][j] = new complex<double>[npw];
+		}
+	}	
+	
+	vkb_alpha = new complex<double>**[3];
+	for(int i=0; i<3; i++)
+	{
+		vkb_alpha[i] = new complex<double>*[nkb];
+		for(int j=0; j<nkb; j++)
+		{
+			vkb_alpha[i][j] = new complex<double>[wf.npwx];
+		}
+	}
+	
+	Mathzone::Ylm_Real(x1, npw, gk, ylm);
+
+	MGT.init_Gaunt_CH( lmaxkb + 2 );
+	MGT.init_Gaunt( lmaxkb + 2 );
+	
+	int jkb = 0;
+	for(int it = 0;it < ucell.ntype;it++)
+	{
+		if(test_pp>1) OUT("it",it);
+		// calculate beta in G-space using an interpolation table
+		const int nbeta = ucell.atoms[it].nbeta;
+		const int nh = ucell.atoms[it].nh;
+
+		if(test_pp>1) OUT("nbeta",nbeta);
+
+		for(int i=0; i<3; i++)
+			for(int j=0; j<nhm; j++)
+			{
+				ZEROS(vkb1_alpha[i][j], npw);
+			}
+			
+		for (ih = 0;ih < nh; ih++)
+		{
+			lu = static_cast<int>( nhtol(it, ih));
+			mu = static_cast<int>( nhtolm(it, ih)) - lu * lu;
+			nb = static_cast<int>( indv(it, ih));
+			
+			for (int L= abs(lu - 1); L<= (lu + 1); L++)
+			{
+				for (ig = 0;ig < npw;ig++)
+				{
+					const double gnorm = gk[ig].norm() * ucell.tpiba;
+					vq [ig] = Mathzone::Polynomial_Interpolation(
+							this->tab_alpha, it, nb, L, NQX, DQ, gnorm);
+					
+					for (int M=0; M<2*L+1; M++)
+					{
+						int lm = L*L + M;
+						for (int alpha=0; alpha<3; alpha++)
+						{
+							complex<double> c = Cal_C(alpha,lu, mu, L, M);
+							/*if(alpha == 0)
+							{
+								cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<endl;
+							}*/
+							vkb1_alpha[alpha][ih][ig] += c * vq[ig] * ylm(lm, ig) * pow( NEG_IMAG_UNIT, L);
+						}	
+					}
+				}
+			}
+		} // end nbeta
+
+		for (ia=0; ia<ucell.atoms[it].na; ia++) 
+		{
+			complex<double> *sk = wf.get_sk(ik, it, ia);
+			for (ih = 0;ih < nh;ih++)
+			{
+				for (ig = 0;ig < npw;ig++)
+				{
+					for(int alpha=0; alpha<3; alpha++)
+					{
+						vkb_alpha[alpha][jkb][ig] = vkb1_alpha[alpha][ih][ig] * sk [ig];
+					}					
+				}
+				++jkb;
+			} // end ih
+			delete [] sk;
+		} // end ia
+	} // enddo
+
+	delete [] gk;
+	delete [] vq;
+	timer::tick("pp_cell_vnl","getvnl_alpha");
+	return;
+} 
+
+void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
+{
+	if(test_pp) TITLE("pseudopot_cell_vnl","init_vnl_alpha");
+	timer::tick("ppcell_vnl","init_vnl_alpha");
+
+	for(int it=0;it<ucell.ntype;it++)
+	{
+		int BetaIndex=0;
+		const int Nprojectors = ucell.atoms[it].nh;
+		for (int ib=0; ib<ucell.atoms[it].nbeta; ib++)
+		{
+			const int l = ucell.atoms[it].lll [ib];
+			for(int m=0; m<2*l+1; m++)
+			{
+				this->nhtol(it,BetaIndex) = l;
+				this->nhtolm(it,BetaIndex) = l*l + m;
+				this->indv(it,BetaIndex) = ib;
+				++BetaIndex;
+			}
+		}
+	} 
+	const double pref = FOUR_PI / sqrt(ucell.omega);
+	this->tab_alpha.create(ucell.ntype, nbrx, lmaxkb+2, NQX);
+	this->tab_alpha.zero_out();
+	ofs_running<<"\n Init Non-Local PseudoPotential table( including L index) : ";
+	for (int it = 0;it < ucell.ntype;it++)  
+	{
+		const int nbeta = ucell.atoms[it].nbeta;
+		int kkbeta = ucell.atoms[it].kkbeta;
+
+		//mohan modify 2008-3-31
+		//mohan add kkbeta>0 2009-2-27
+		if ( (kkbeta%2 == 0) && kkbeta>0 )
+		{
+			kkbeta--;
+		}
+
+		double *jl = new double[kkbeta];
+		double *aux  = new double[kkbeta];
+
+		for (int ib = 0;ib < nbeta;ib++)
+		{
+			for (int L = 0; L <= lmaxkb+1; L++)
+			{
+				for (int iq = 0; iq < NQX; iq++)
+				{
+					const double q = iq * DQ;
+					Mathzone::Spherical_Bessel(kkbeta, ucell.atoms[it].r, q, L, jl);
+					
+					for (int ir = 0;ir < kkbeta;ir++)
+					{
+						aux[ir] = ucell.atoms[it].betar(ib, ir) * jl[ir] * 
+								  ucell.atoms[it].r[ir] * ucell.atoms[it].r[ir];
+					}
+					double vqint;
+					Mathzone::Simpson_Integral(kkbeta, aux, ucell.atoms[it].rab, vqint);
+					this->tab_alpha(it, ib, L, iq) = vqint * pref;
+				}
+			}
+		} 
+		delete[] aux;
+		delete[] jl;
+	}
+	timer::tick("ppcell_vnl","init_vnl_alpha");
+	ofs_running << "\n Init Non-Local-Pseudopotential done(including L)." << endl;
 	return;
 }
 

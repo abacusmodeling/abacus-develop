@@ -1061,6 +1061,42 @@ void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
 	return;
 }
 
+
+void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
+{
+	double phase_x, phase_xy, phase_xyz;
+	complex<double> exp_tmp;
+	for(int ib = 0; ib < NBANDS; ib++)
+	{
+		ZEROS( UFFT.porter, (pw.nrxx) );
+		for(int ig = wf.npwx; ig < wf.npwx + kv.ngk[iq] ; ig++)
+		{
+			UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig - wf.npwx)] ] = wf.evc[iq](ib,ig);
+		}
+		
+		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		int ir=0;
+		for(int ix=0; ix<pw.ncx; ix++)
+		{
+			phase_x = kv.kvec_d[iq].x*ix/pw.ncx;
+			for(int iy=0; iy<pw.ncy; iy++)
+			{
+				phase_xy = phase_x + kv.kvec_d[iq].y*iy/pw.ncy;
+				for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; iz++)
+				{
+					phase_xyz = (phase_xy + kv.kvec_d[iq].z*iz/pw.ncz) *TWO_PI;
+					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
+					psi_r[ib][ir] = UFFT.porter[ir]*exp_tmp;
+					ir++;
+				}
+					
+			}
+		}
+	}
+	
+	return;
+}
+
 //---------------------------------------------------------------------------
 //  calculation in lcao(about to do)
 //---------------------------------------------------------------------------
@@ -1190,7 +1226,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 	return;
 }
 
-void Chi0_hilbert::Cal_b(int iq, int ik, int iqk)
+void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 {
 	TITLE("Chi0_hilbert","Cal_b");
 	Vector3<double> qk;
@@ -1200,9 +1236,17 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk)
 	Vector3<double> q = kv.kvec_d[iq];
 	complex<double> exp_tmp;
 	
-	Cal_Psi(ik, psi_r1);
-	Cal_Psi(iqk, psi_r2);
-	
+	if(ispin == 0)
+	{
+		Cal_Psi(ik, psi_r1);
+		Cal_Psi(iqk, psi_r2);
+	}
+	else if(ispin == 1)
+	{
+		Cal_Psi_down(ik, psi_r1);
+		Cal_Psi_down(iqk, psi_r2);		
+	}
+
 	for(int ib1=0; ib1< oband; ib1++)
 	{
 		for(int ib2=0; ib2<NBANDS; ib2++)
@@ -1414,7 +1458,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 			int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
 			if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
 			{
-				Cal_b(iq, ik, iqk);
+				Cal_b(iq, ik, iqk, 0);
 			}
 			else
 			{
@@ -1464,7 +1508,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	//---------------------------------------------------------------------------------
 	// spin = 2 ( fermi_level != 0 haven't been tested)
 	//---------------------------------------------------------------------------------
-	else
+	else if(NSPIN == 2)
 	{
 		// spin up
 		for(int ik=0; ik<kv.nks/2; ik++)
@@ -1472,7 +1516,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 			int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
 			if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
 			{
-				Cal_b(iq, ik, iqk);
+				Cal_b(iq, ik, iqk, 0);
 			}
 			else
 			{
@@ -1526,7 +1570,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 			int iqk = Cal_iq(ik-kv.nks/2, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]) + kv.nks/2;
 			if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
 			{
-				Cal_b(iq+kv.nks/2, ik, iqk);
+				Cal_b(iq+kv.nks/2, ik, iqk, 0);
 			}
 			else
 			{
@@ -1572,6 +1616,69 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 					}
 				}
 			}			
+		}
+	}
+	else if(NSPIN == 4)
+	{
+		cout<<"NSPIN = "<<NSPIN<<endl;
+		for(int ik=0; ik<kv.nks; ik++)
+		{
+			int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
+			for(int ispin =0; ispin<2; ispin++)
+			{
+				if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+				{
+					Cal_b(iq, ik, iqk, ispin);
+				}
+				else
+				{
+					Cal_b_lcao(iq, ik, iqk);
+				}
+				cout<<"ik = "<<ik<<" ispin = "<<ispin<<endl;
+				for(int g=0; g<dim; g++)
+				{
+					cout<<"b["<<g<<"][2][3]"<<" "<<b[g][2][3]<<endl;
+				}	
+
+				for(int ib1=0; ib1<oband; ib1++)	
+				{
+					for(int ib2=0; ib2<NBANDS; ib2++)
+					{
+						delta_e = wf.ekb[iqk][ib2] - wf.ekb[ik][ib1];
+						//delta_e = Q[ik][ib2] - Q[ik][ib1];
+						if ((delta_e > 0 || delta_e == 0) && delta_e < ((nomega-1) * domega) )
+						{
+							int n = int(delta_e/domega);
+							e1 = double(n) * domega;
+							e2 = double(n+1) * domega;
+							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
+							weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/ucell.omega, 0.0);
+							for(int g0=0; g0<dim; g0++)
+							{
+								for(int g1=0; g1<dim; g1++)
+								{
+									chi0s[g1+g0*dim][n] += weight1 * b[g0][ib1][ib2] * conj(b[g1][ib1][ib2]);
+									chi0s[g1+g0*dim][n+1] += weight2 * b[g0][ib1][ib2] * conj(b[g1][ib1][ib2]);
+								}
+							}
+						}
+						else if((delta_e > ((nomega-1) * domega) || delta_e == ((nomega-1) * domega)) && delta_e < (nomega * domega))
+						{
+							int n = int(delta_e/domega);
+							e1 = double(n) * domega;
+							e2 = double(n+1) * domega;
+							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
+							for(int g0=0; g0<dim; g0++)
+							{
+								for(int g1=0; g1<dim; g1++)
+								{
+									chi0s[g1+g0*dim][n] += weight1 * b[g0][ib1][ib2] * conj(b[g1][ib1][ib2]);
+								}
+							}
+						}
+					}
+				}
+			}	
 		}
 	}
 	
