@@ -20,15 +20,6 @@ void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, matrix &str
 {
 	TITLE("Lattice_Change_Basic","setup_gradient");
 	
-	for(int i=0; i<3; i++)
-	{
-		for(int j=0; j<3; j++)
-		{
-			cout<<stress(i,j)<<"  ";
-		}
-		cout<<endl;
-	}
-	
 	if(INPUT.fixed_axes == "volume")
 	{
 		double stress_aver = (stress(0,0) + stress(1,1) + stress(2,2))/3.0;
@@ -36,15 +27,6 @@ void Lattice_Change_Basic::setup_gradient(double* lat, double *grad, matrix &str
 		stress(1,1) = stress(1,1) - stress_aver;
 		stress(2,2) = stress(2,2) - stress_aver;
 	}
-	
-	/*for(int i=0; i<3; i++)
-	{
-		for(int j=0; j<3; j++)
-		{
-			cout<<stress(i,j)<<"  ";
-		}
-		cout<<endl;
-	}*/
 	
 	lat[0] = ucell.latvec.e11 * ucell.lat0;   lat[1] = ucell.latvec.e12 * ucell.lat0; lat[2] = ucell.latvec.e13 * ucell.lat0; 
 	lat[3] = ucell.latvec.e21 * ucell.lat0;   lat[4] = ucell.latvec.e22 * ucell.lat0; lat[5] = ucell.latvec.e23 * ucell.lat0;
