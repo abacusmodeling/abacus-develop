@@ -676,6 +676,9 @@ void Stress_LCAO::cal_stress_ew(void)
 		}
 	}
 
+	delete[] r;
+	delete[] r2;
+	delete[] irr;
 	// this->print(ofs_running, "ewald stress", stression);
 	timer::tick("Force_lo","cal_stress_ew");
 
@@ -919,6 +922,8 @@ void Stress_LCAO::cal_stress_har(){
         delete[] rho_atom[is];
      }
     delete[] rho_atom;
+	delete[] psic;
+	delete[] psic0;
      return;
 }
 
@@ -1113,6 +1118,16 @@ void Stress_LCAO::cal_stress_gradcorr()
 	for(int i=0;i<9;i++){
 		*p /= pw.ncxyz ;
 		*p1++ += *p++;  
+	}
+
+	delete[] rhotmp1;
+	delete[] rhogsum1;
+	delete[] gdr1;
+	if(NSPIN==2)
+	{
+		delete[] rhotmp2;
+		delete[] rhogsum2;
+		delete[] gdr2;
 	}
 	return;
 }

@@ -690,7 +690,8 @@ void Charge::sum_band_k(void)
 	en.eband = 0.0;
 
 	complex<double>* porter = UFFT.porter;
-	complex<double>* porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
+	complex<double>* porter1;
+	if(NONCOLIN) porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
 
 	for (int ik = 0;ik < kv.nks;ik++)
 	{
@@ -768,6 +769,7 @@ void Charge::sum_band_k(void)
 			}
 		}
 	} // END DO k_loop
+	if(NONCOLIN) delete[] porter1;
 
 #ifdef __MPI
 	this->rho_mpi();

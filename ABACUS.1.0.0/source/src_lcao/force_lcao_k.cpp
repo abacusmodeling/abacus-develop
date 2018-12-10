@@ -111,21 +111,23 @@ void Force_LCAO_k::allocate_k(void)
     ZEROS(LM.DSloc_Rz, nnr);
 	Memory::record("force_lo", "dS", nnr*3, "double");
     
-	LM.DH_r = new double [3* nnr];
-        ZEROS(LM.DH_r, 3 * nnr);
-        LM.stvnl11 = new double [nnr];
-        LM.stvnl12 = new double [nnr];
-        LM.stvnl13 = new double [nnr];
-        LM.stvnl22 = new double [nnr];
-        LM.stvnl23 = new double [nnr];
-        LM.stvnl33 = new double [nnr];
-        ZEROS(LM.stvnl11,  nnr);
-        ZEROS(LM.stvnl12,  nnr);
-        ZEROS(LM.stvnl13,  nnr);
-        ZEROS(LM.stvnl22,  nnr);
-        ZEROS(LM.stvnl23,  nnr);
-        ZEROS(LM.stvnl33,  nnr);
-        Memory::record("stress_lo", "dSR", nnr*6, "double");
+	if(STRESS){
+		LM.DH_r = new double [3* nnr];
+		ZEROS(LM.DH_r, 3 * nnr);
+		LM.stvnl11 = new double [nnr];
+		LM.stvnl12 = new double [nnr];
+		LM.stvnl13 = new double [nnr];
+		LM.stvnl22 = new double [nnr];
+		LM.stvnl23 = new double [nnr];
+		LM.stvnl33 = new double [nnr];
+		ZEROS(LM.stvnl11,  nnr);
+		ZEROS(LM.stvnl12,  nnr);
+		ZEROS(LM.stvnl13,  nnr);
+		ZEROS(LM.stvnl22,  nnr);
+		ZEROS(LM.stvnl23,  nnr);
+		ZEROS(LM.stvnl33,  nnr);
+		Memory::record("stress_lo", "dSR", nnr*6, "double");
+	}
 
 	//-----------------------------
 	// calculate dS = <phi | dphi> 
@@ -166,13 +168,16 @@ void Force_LCAO_k::finish_k(void)
     delete [] LM.DHloc_fixedR_x;
     delete [] LM.DHloc_fixedR_y;
     delete [] LM.DHloc_fixedR_z;
-    delete [] LM.DH_r;
-    delete [] LM.stvnl11;
-    delete [] LM.stvnl12;
-    delete [] LM.stvnl13;
-    delete [] LM.stvnl22;
-    delete [] LM.stvnl23;
-    delete [] LM.stvnl33;
+	if(STRESS)
+	{
+		delete [] LM.DH_r;
+		delete [] LM.stvnl11;
+		delete [] LM.stvnl12;
+		delete [] LM.stvnl13;
+		delete [] LM.stvnl22;
+		delete [] LM.stvnl23;
+		delete [] LM.stvnl33;
+	}
 	return;
 }
 
