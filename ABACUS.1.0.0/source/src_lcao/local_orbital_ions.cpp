@@ -415,6 +415,24 @@ void Local_Orbital_Ions::opt_ions(void)
         ofs_running << setprecision(16);
         ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
         ofs_running << " --------------------------------------------\n\n" << endl;
+
+        if(STRESS)
+        {
+            if(stress_step==1)
+            {
+        	Force_LCAO FL;
+                matrix stress_lcao;
+                stress_lcao.create(3,3);
+                FL.cal_stress(stress_lcao);
+            }
+            double pressure = PRESSURE;
+            en.etot = en.etot + ucell.omega * pressure;
+
+            ofs_running << "\n\n --------------------------------------------" << endl;
+            ofs_running << setprecision(16);
+            ofs_running << " !FINAL_ETOT_IS (+ P*V) " << en.etot * Ry_to_eV << " eV" << endl; 
+            ofs_running << " --------------------------------------------\n\n" << endl;
+        }
     }
 
     if(stop && STRESS)

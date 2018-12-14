@@ -157,6 +157,34 @@ void Ions::opt_ions_pw(void)
 
     }
 
+    if(CALCULATION=="scf" || CALCULATION=="relax")
+    {
+        ofs_running << "\n\n --------------------------------------------" << endl;
+        ofs_running << setprecision(16);
+        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+        ofs_running << " --------------------------------------------\n\n" << endl;
+
+        if(STRESS)
+        {
+            if(stress_step==1)
+            {
+		Stress ss;
+                ss.cal_stress();
+                matrix stress;
+                stress.create(3,3);
+
+		PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
+            }
+            double pressure = PRESSURE;
+            en.etot = en.etot + ucell.omega * pressure;
+
+            ofs_running << "\n\n --------------------------------------------" << endl;
+            ofs_running << setprecision(16);
+            ofs_running << " !FINAL_ETOT_IS (+ P*V) " << en.etot * Ry_to_eV << " eV" << endl; 
+            ofs_running << " --------------------------------------------\n\n" << endl;
+        }
+    }
+
     if(stop && STRESS) //LiuXh add 20180619
     {
         FINAL_SCF = true;
@@ -254,13 +282,20 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 			ss.cal_stress();
 			matrix stress;
 			stress.create(3,3);
-				
+
+			double unit_transform = 0.0;
+			unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+			double external_stress[3] = {PRESS1,PRESS2,PRESS3};
 			for(int i=0;i<3;i++)
+			{
 				for(int j=0;j<3;j++)
 				{
 					stress(i,j) = ss.sigmatot[i][j];
 					//OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
 				}
+				stress(i,i) = ss.sigmatot[i][i] - external_stress[i]/unit_transform;
+			}
+			PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
 				
 			LCM.cal_lattice_change(stress_step, stress, en.etot);
 			converged_stress = LCM.get_converged();

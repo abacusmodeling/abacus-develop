@@ -874,13 +874,20 @@ void Force_LCAO::cal_stress(matrix &stress)
      Stress_LCAO SS;
      SS.allocate();
      SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi);
+
+    double unit_transform = 0.0;
+    unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+    double external_stress[3] = {PRESS1,PRESS2,PRESS3};
+
 	for(int i=0;i<3;i++)
 	{
 		for(int j=0;j<3;j++)
 		{
 			stress(i,j) = SS.scs[i][j];
 		}
+		stress(i,i) = SS.scs[i][i] - external_stress[i]/unit_transform;
 	}
+    PRESSURE = (SS.scs[0][0]+SS.scs[1][1]+SS.scs[2][2])/3;
 
     return;
 }

@@ -198,6 +198,9 @@ void Input::Default(void)
     force_thr=1.0e-3;
 	force_thr_ev2=0;
     stress_thr = 1.0e-2; //LiuXh add 20180515
+    press1 = 0.0;
+    press2 = 0.0;
+    press3 = 0.0;
 	stress=false;
 	fixed_axes = "None"; // pengfei 2018-11-9
 	ion_dynamics="cg"; // pengfei  2014-10-13
@@ -723,6 +726,18 @@ bool Input::Read(const string &fn)
         else if (strcmp("stress_thr", word) == 0)
         {
             read_value(ifs, stress_thr);
+        }
+        else if (strcmp("press1", word) == 0)
+        {
+            read_value(ifs, press1);
+        }
+        else if (strcmp("press2", word) == 0)
+        {
+            read_value(ifs, press2);
+        }
+        else if (strcmp("press3", word) == 0)
+        {
+            read_value(ifs, press3);
         }
         else if (strcmp("stress", word) == 0)
         {
@@ -1611,6 +1626,9 @@ void Input::Bcast()
     Parallel_Common::bcast_double( force_thr);
     Parallel_Common::bcast_double( force_thr_ev2);
     Parallel_Common::bcast_double( stress_thr); //LiuXh add 20180515
+    Parallel_Common::bcast_double( press1);
+    Parallel_Common::bcast_double( press2);
+    Parallel_Common::bcast_double( press3);
     Parallel_Common::bcast_bool( stress );
 	Parallel_Common::bcast_string( fixed_axes );
     Parallel_Common::bcast_string( ion_dynamics );
@@ -2460,6 +2478,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"force_thr_ev",force_thr*13.6058/0.529177,"force threshold, unit: eV/Angstrom");
 	OUTP(ofs,"force_thr_ev2",force_thr_ev2,"force invalid threshold, unit: eV/Angstrom");
         OUTP(ofs,"stress_thr",stress_thr,"stress threshold"); //LiuXh add 20180515
+        OUTP(ofs,"press1",press1,"target pressure, unit: KBar");
+        OUTP(ofs,"press2",press2,"target pressure, unit: KBar");
+        OUTP(ofs,"press3",press3,"target pressure, unit: KBar");
 	OUTP(ofs,"bfgs_w1",bfgs_w1,"wolfe condition 1 for bfgs");
 	OUTP(ofs,"bfgs_w2",bfgs_w2,"wolfe condition 2 for bfgs");
 	OUTP(ofs,"trust_radius_max", trust_radius_max,"maximal trust radius, unit: Bohr");

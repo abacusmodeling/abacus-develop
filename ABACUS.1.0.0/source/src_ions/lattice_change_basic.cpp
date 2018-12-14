@@ -65,10 +65,10 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 	assert(move!=NULL);
 	assert(lat!=NULL);
 
-	//cout<<" LATTICE CONSTANT  OLD:"<<endl;
-	//cout<<" "<<setprecision(12)<<ucell.latvec.e11<<"   "<<ucell.latvec.e12<<"   "<<ucell.latvec.e13<<endl;
-	//cout<<" "<<setprecision(12)<<ucell.latvec.e21<<"   "<<ucell.latvec.e22<<"   "<<ucell.latvec.e23<<endl;
-	//cout<<" "<<setprecision(12)<<ucell.latvec.e31<<"   "<<ucell.latvec.e32<<"   "<<ucell.latvec.e33<<endl;
+	cout<<" LATTICE CONSTANT  OLD:"<<endl;
+	cout<<" "<<setprecision(12)<<ucell.latvec.e11<<"   "<<ucell.latvec.e12<<"   "<<ucell.latvec.e13<<endl;
+	cout<<" "<<setprecision(12)<<ucell.latvec.e21<<"   "<<ucell.latvec.e22<<"   "<<ucell.latvec.e23<<endl;
+	cout<<" "<<setprecision(12)<<ucell.latvec.e31<<"   "<<ucell.latvec.e32<<"   "<<ucell.latvec.e33<<endl;
 	
 	if(ucell.lc[0] != 0)
 	{
@@ -129,10 +129,10 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
     Parallel_Common::bcast_double( ucell.a3.y );
     Parallel_Common::bcast_double( ucell.a3.z );
 #endif
-        //cout<<" LATTICE CONSTANT NEW: "<<endl;
-        //cout<<" "<<setprecision(12)<<ucell.latvec.e11<<"   "<<ucell.latvec.e12<<"   "<<ucell.latvec.e13<<endl;
-        //cout<<" "<<setprecision(12)<<ucell.latvec.e21<<"   "<<ucell.latvec.e22<<"   "<<ucell.latvec.e23<<endl;
-        //cout<<" "<<setprecision(12)<<ucell.latvec.e31<<"   "<<ucell.latvec.e32<<"   "<<ucell.latvec.e33<<endl;
+        cout<<" LATTICE CONSTANT NEW: "<<endl;
+        cout<<" "<<setprecision(12)<<ucell.latvec.e11<<"   "<<ucell.latvec.e12<<"   "<<ucell.latvec.e13<<endl;
+        cout<<" "<<setprecision(12)<<ucell.latvec.e21<<"   "<<ucell.latvec.e22<<"   "<<ucell.latvec.e23<<endl;
+        cout<<" "<<setprecision(12)<<ucell.latvec.e31<<"   "<<ucell.latvec.e32<<"   "<<ucell.latvec.e33<<endl;
 
 	
 	return;
@@ -143,11 +143,13 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 	TITLE("Lattice_Change_Basic","check_converged");
 
 	Lattice_Change_Basic::largest_grad = 0.0;
+	double stress_ii_max = 0.0;
 	
 	if(ucell.lc[0] == 1 && ucell.lc[1] == 1 && ucell.lc[2] == 1)
 	{
 		for(int i=0;i<3;i++)
 		{
+			if(stress_ii_max < abs(stress(i,i))) stress_ii_max = abs(stress(i,i));
 			for(int j=0;j<3;j++)
 			{
 				if(Lattice_Change_Basic::largest_grad < abs(stress(i,j)))
@@ -167,6 +169,11 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 			}
 		}
 	}
+
+	double unit_transform = 0.0;
+	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+	Lattice_Change_Basic::largest_grad = Lattice_Change_Basic::largest_grad * unit_transform;
+	stress_ii_max = stress_ii_max * unit_transform;
 	
 	if(Lattice_Change_Basic::largest_grad == 0.0)
 	{
@@ -176,7 +183,8 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 	}
 	else if(ucell.lc[0] == 1 && ucell.lc[1] == 1 && ucell.lc[2] == 1)
 	{
-		if(Lattice_Change_Basic::largest_grad < STRESS_THR)
+		//if(Lattice_Change_Basic::largest_grad < STRESS_THR)
+		if(Lattice_Change_Basic::largest_grad < STRESS_THR && stress_ii_max < STRESS_THR)
 		{
 			ofs_running << "\n Lattice relaxation is converged!" << endl;
 			ofs_running << "\n Largest gradient is = " << largest_grad << endl;

@@ -38,6 +38,10 @@ extern int		GRID_SPEED;			// 8.02 // mohan add 2012-03-29
 extern int 		FORCE;				// 8.1
 extern double	FORCE_THR;			// 8.2
 extern bool 	STRESS;				// 8.25 calcualte the stress
+extern double  PRESS1;
+extern double  PRESS2;
+extern double  PRESS3;
+extern double PRESSURE;
 extern string	MOVE_IONS;			// 8.26
 extern string	OUT_LEVEL;			// 8.27 
 

@@ -400,8 +400,10 @@ void electrons::self_consistent(const int &istep)
               	 
 			if(conv_elec)
 			{
-				ofs_running << " convergence is achieved" << endl;			
-				ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+				//ofs_running << " convergence is achieved" << endl;			
+				//ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+				ofs_running << " charge density convergence is achieved" << endl;
+                                ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
 			}
 			else
 			{
