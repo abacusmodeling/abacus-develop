@@ -71,7 +71,7 @@ void Grid_Technique::set_pbc_grid(
 	this->cal_extended_cell(this->dxe, this->dye, this->dze);
 	this->init_tau_in_bigcell();
 	// init meshball
-//this->delete_meshball_positions(); //LiuXh add 2018-07-24, to do...
+	this->delete_meshball_positions(); //LiuXh add 2018-12-14
 	this->init_meshball();
 	this->init_atoms_on_grid();	
 
