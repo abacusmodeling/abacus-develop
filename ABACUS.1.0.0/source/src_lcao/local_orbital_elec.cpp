@@ -195,7 +195,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		//fuxiang add 2016-11-1
 
-		if(iter == 1)
+		if(tddft==1 && iter == 1)
 		{
 			this->WFC_init = new complex<double>**[kv.nks];
 			for(int ik=0; ik<kv.nks; ik++)
@@ -209,7 +209,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 					this->WFC_init[ik][ib] = new complex<double>[NLOCAL];
 				}
 			}
-			if(tddft==1 && istep>=1)
+			if(istep>=1)
 			{
 				for (int ik=0; ik<kv.nks; ik++)
 				{
@@ -478,6 +478,11 @@ void Local_Orbital_Elec::scf(const int &istep)
 			timer::tick("Local_Orbital_Elec","scf",'D');
 			return;
 		}
+	}
+
+	if (tddft==1)
+	{
+		delete[] WFC_init;
 	}
 
 	timer::tick("Local_Orbital_Elec","scf",'D');
