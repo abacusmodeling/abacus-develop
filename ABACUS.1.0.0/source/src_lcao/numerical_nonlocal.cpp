@@ -28,7 +28,9 @@ void Numerical_Nonlocal::set_type_info
 	const string& type_ps_in,
 	const int& lmax_in,
 	matrix& Coefficient_D_in,
+	ComplexMatrix& Coefficient_D_in_so,
 	const int& nproj_in,
+	const int& nproj_in_so,
 	int* LfromBeta_in,
 	const Numerical_Nonlocal_Lm* Proj_in
 )
@@ -66,22 +68,73 @@ void Numerical_Nonlocal::set_type_info
 //EXPLAIN : LfromBeta
 //----------------------------------------------------------
 	this->nproj = nproj_in;
+	if(NONCOLIN){ 
+		this->nproj_soc = nproj_in_so;
+	}
 	//assert(nproj <= lmax_in+1); //LiuXh 2016-01-13, 2016-05-16
 	assert(nproj <= nproj_in+1); //LiuXh 2016-01-13, 2016-05-16
 	assert(nproj >= 0);
 
 //2016-07-19 begin, LiuXh
-	this->Coefficient_D.create( nproj_in+1, nproj_in+1);
-        if(lmax_in > -1) //LiuXh add 20180328, fix bug of Hydrogen element with single projector pseudopot
-        { //LiuXh add 20180328
-	    for (int L1 = 0; L1 < nproj + 1; L1++)
-	    {
-		for (int L2 = 0; L2 < nproj + 1; L2++)
+	if(!NONCOLIN){
+		this->Coefficient_D.create( nproj_in+1, nproj_in+1);
+		if(lmax_in > -1) //LiuXh add 20180328, fix bug of Hydrogen element with single projector pseudopot
+		{ //LiuXh add 20180328
+			for (int L1 = 0; L1 < nproj + 1; L1++)
+			{
+				for (int L2 = 0; L2 < nproj + 1; L2++)
+				{
+					this->Coefficient_D(L1, L2) = Coefficient_D_in(L1, L2);
+				}
+			}
+		} //LiuXh add 20180328
+	}
+	else//zhengdy-soc
+	{
+		this->Coefficient_D_so.create(NSPIN,  nproj_soc+1,  nproj_soc+1);
+		//this->Coefficient_D.create( nproj_soc+1, nproj_soc+1);
+		if(lmax_in > -1)
 		{
-			this->Coefficient_D(L1, L2) = Coefficient_D_in(L1, L2);
+			if(LSPINORB)
+			{
+				int is = 0;
+				for (int is1 = 0; is1 < 2; is1++)
+				{
+					for (int is2 = 0; is2 < 2; is2++)
+					{
+						for (int L1 = 0; L1 < nproj_soc; L1++)
+						{
+							for (int L2 = 0; L2 < nproj_soc; L2++)
+							{
+								this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
+							}
+						}
+						is++;
+					}
+				}
+			}
+			else
+			{
+				int is = 0;
+				for (int is1 = 0; is1 < 2; is1++)
+				{
+					for (int is2 = 0; is2 < 2; is2++)
+					{
+						for (int L1 = 0; L1 < nproj_soc; L1++)
+						{
+							for (int L2 = 0; L2 < nproj_soc; L2++)
+							{
+								if(is==1||is==2) this->Coefficient_D_so(is, L1, L2) = 0.0;
+								else this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
+							}
+						}
+						is++;
+					}
+				}
+				
+			}
 		}
-	    }
-        } //LiuXh add 20180328
+	}
 //2016-07-19 end, LiuXh
 
 	delete[] LfromBeta;

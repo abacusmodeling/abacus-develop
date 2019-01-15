@@ -44,7 +44,6 @@ LCAO_nnr::~LCAO_nnr()
 void LCAO_nnr::cal_nnr(void)
 {
 	TITLE("LCAO_nnr","cal_nnr");
-
 	delete[] nlocdim;
 	delete[] nlocstart;
 	nlocdim = new int[ucell.nat];	
@@ -67,8 +66,9 @@ void LCAO_nnr::cal_nnr(void)
 			tau1 = ucell.atoms[T1].tau[I1];
 			//GridD.Find_atom( tau1 );
 			GridD.Find_atom( tau1 ,T1, I1);
-			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+			const int start1 = ucell.itiaiw2iwt(T1, I1, 0) * NPOL;
 			this->nlocstart[iat] = nnr;
+			int nw1 = ucell.atoms[T1].nw * NPOL;
 
 			// (2) search among all adjacent atoms.
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
@@ -76,7 +76,9 @@ void LCAO_nnr::cal_nnr(void)
 				const int T2 = GridD.getType(ad);
 				const int I2 = GridD.getNatom(ad);
 				const int iat2 = ucell.itia2iat(T2, I2);
-				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+				const int start2 = ucell.itiaiw2iwt(T2, I2, 0) * NPOL;
+				int nw2 = ucell.atoms[T2].nw * NPOL;
+				//if(NONCOLIN) nw2 *= 2;
 
 				tau2 = GridD.getAdjacentTau(ad);
 
@@ -89,7 +91,7 @@ void LCAO_nnr::cal_nnr(void)
 					//--------------------------------------------------
 					// calculate how many matrix elements are in 
 					// this processor.
-					for(int ii=0; ii<ucell.atoms[T1].nw; ii++)
+					for(int ii=0; ii<nw1; ii++)
 					{
 						// the index of orbitals in this processor
 						// according to HPSEPS's division method.
@@ -97,7 +99,7 @@ void LCAO_nnr::cal_nnr(void)
 						const int mu = ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
-						for(int jj=0; jj<ucell.atoms[T2].nw; jj++)
+						for(int jj=0; jj<nw2; jj++)
 						{
 							const int iw2_all = start2 + jj;
 							const int nu = ParaO.trace_loc_col[iw2_all];
@@ -123,7 +125,7 @@ void LCAO_nnr::cal_nnr(void)
 						const int T0 = GridD.getType(ad0);
 						const int I0 = GridD.getNatom(ad0);
 						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;
 					
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1; 
@@ -136,13 +138,13 @@ void LCAO_nnr::cal_nnr(void)
 
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{
-							for(int ii=0; ii<ucell.atoms[T1].nw; ++ii)
+							for(int ii=0; ii<nw1; ++ii)
 							{
 								const int iw1_all = start1 + ii;
 								const int mu = ParaO.trace_loc_row[iw1_all];
 								if(mu<0)continue;
 
-								for(int jj=0; jj<ucell.atoms[T2].nw; ++jj)
+								for(int jj=0; jj<nw2; ++jj)
 								{
 									const int iw2_all = start2 + jj;
 									const int nu = ParaO.trace_loc_col[iw2_all];
@@ -162,7 +164,7 @@ void LCAO_nnr::cal_nnr(void)
 			}// end ad
 
 			//start position of atom[T1,I1]
-			start += ucell.atoms[T1].nw;
+			start += nw1;
 			++iat;
 		}// end I1
 	} // end T1
@@ -257,7 +259,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 			// ORB.Phi[it].getRcut = 7.0000000000000008
 						if(distance < rcut - 1.0e-15)
 						{
-							const int nelement = atom1->nw * atom2->nw;
+							const int nelement = atom1->nw * atom2->nw;//modified by zhengdy-soc, no need to double
 							this->nnrg += nelement;
 							this->nlocdimg[iat] += nelement; 
 							this->nad[iat]++;
@@ -448,7 +450,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							// find_R2st: start position of each adjacen atom.
 							if( count + 1 < nad[iat] )
 							{
-								find_R2st[iat][count+1] = find_R2st[iat][count] + ucell.atoms[T1].nw * ucell.atoms[T2].nw; 
+								find_R2st[iat][count+1] = find_R2st[iat][count] + ucell.atoms[T1].nw * ucell.atoms[T2].nw; //modified by zhengdy-soc
 							}
 							++count;
 						}
@@ -574,7 +576,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 			//GridD.Find_atom(tau1);
 			GridD.Find_atom(tau1, T1, I1);
 			Atom* atom1 = &ucell.atoms[T1];
-			const int start = ucell.itiaiw2iwt(T1,I1,0);
+			const int start = ucell.itiaiw2iwt(T1,I1,0) * NPOL;
 
 			// (2) search among all adjacent atoms.
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
@@ -598,7 +600,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 						const int T0 = GridD.getType(ad0); 
 						const int I0 = GridD.getNatom(ad0); 
 						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
@@ -621,7 +623,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 				if(adj) // mohan fix bug 2011-06-26, should not be '<='
 				{
 					// (3) calculate the nu of atom (T2, I2)
-					const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+					const int start2 = ucell.itiaiw2iwt(T2,I2,0) * NPOL;
 					//------------------------------------------------
 					// exp(k dot dR)
 					// dR is the index of box in Crystal coordinates
@@ -635,15 +637,14 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					// calculate how many matrix elements are in 
 					// this processor.
 					//--------------------------------------------------
-					for(int ii=0; ii<atom1->nw; ii++)
+					for(int ii=0; ii<atom1->nw*NPOL; ii++)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start + ii;
 						const int mu = ParaO.trace_loc_row[iw1_all];
-
 						if(mu<0)continue;
 
-						for(int jj=0; jj<atom2->nw; jj++)
+						for(int jj=0; jj<atom2->nw*NPOL; jj++)
 						{
 							int iw2_all = start2 + jj;
 							const int nu = ParaO.trace_loc_col[iw2_all];
@@ -674,8 +675,15 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							// Hloc_fixed2 is used to diagonalize (eliminate index R).
 							//###################################################################
 							
-							LM.Sloc2[iic] += LM.SlocR[index] * kphase;
-							LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;
+							if(!NONCOLIN){
+								LM.Sloc2[iic] += LM.SlocR[index] * kphase;
+								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;
+							}
+							else
+							{
+								LM.Sloc2[iic] += LM.SlocR_soc[index] * kphase;
+								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR_soc[index] * kphase;
+							}
 							++index;
 
 						}//end jj

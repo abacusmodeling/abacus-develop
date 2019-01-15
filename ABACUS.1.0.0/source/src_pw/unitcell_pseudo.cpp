@@ -96,6 +96,7 @@ void UnitCell_pseudo::setup_cell(
 #ifdef __MPI
 	Parallel_Common::bcast_bool(ok);
 	Parallel_Common::bcast_bool(ok2);
+	if(NONCOLIN) Parallel_Common::bcast_bool(DOMAG);
 #endif
 	if(!ok)
 	{
@@ -1284,7 +1285,8 @@ void UnitCell_pseudo::cal_nwfc()
 	{
 		atoms[it].stapos_wf = NLOCAL;
 		const int nlocal_it = atoms[it].nw * atoms[it].na;
-                NLOCAL += nlocal_it;
+                if(!NONCOLIN) NLOCAL += nlocal_it;
+		else NLOCAL += nlocal_it * 2;//zhengdy-soc
 //		stringstream ss1;
 //		ss1 << "number of local orbitals for species " << it;
 //		if(LOCAL_BASIS)OUT(ofs_running,ss1.str(),nlocal_it);

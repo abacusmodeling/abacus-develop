@@ -104,14 +104,14 @@ void Record_adj::for_2d(void)
 				{
 					++na_each[iat];
 
-					for(int ii=0; ii<atom1->nw; ++ii)
+					for(int ii=0; ii<atom1->nw * NPOL; ++ii)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start1 + ii;
 						const int mu = ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
-						for(int jj=0; jj<ucell.atoms[T2].nw; ++jj)
+						for(int jj=0; jj<ucell.atoms[T2].nw * NPOL; ++jj)
 						{
 							const int iw2_all = start2 + jj;
 							const int nu = ParaO.trace_loc_col[iw2_all];

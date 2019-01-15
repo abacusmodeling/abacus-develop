@@ -460,6 +460,70 @@ inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Rec
 	return;
 }
 
+//added by zhengdy-soc, for non-collinear case
+inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, Record_adj RA,
+				   const int ia1, const int iw1_lo, const int nw1, const int gstart, 
+				   complex<double> *WFC_PHASE, complex<double> **DM_ATOM)
+{
+	if(NSPIN !=4 ) WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
+	const char transa='N', transb='T';	
+	const complex<double> alpha=1, beta=1;
+	int ispin=0;
+
+	for(int is1=0;is1<2;is1++)
+	{
+		for(int is2=0;is2<2;is2++)
+		{
+			for(int ik=0; ik<kv.nks; ik++)
+			{
+				complex<double> **wfc = LOWF.WFC_K[ik];
+				int atom2start=0;
+
+				for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
+				{
+					complex<double> *DM=&DM_ATOM[ispin][atom2start];
+					const int T2 = RA.info[ia1][ia2][3];
+					const int I2 = RA.info[ia1][ia2][4];
+					Atom* atom2 = &ucell.atoms[T2];
+					const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+					const int iw2_lo=gt.trace_lo[start2] + NLOCAL/NPOL*is2;
+					const int nw2=atom2->nw;
+					complex<double> exp_R= exp( fac * (
+								kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
+								kv.kvec_d[ik].y * RA.info[ia1][ia2][1] + 
+								kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
+								) );
+			
+			//ZEROS(WFC_PHASE, NBANDS*nw1);
+					int ibStart=0;
+					int nRow=0;
+					for(int ib=0; ib<NBANDS; ++ib)
+					{
+						const double w1=wf.wg(ik,ib);
+						if(w1>0)
+						{
+							if(nRow==0) ibStart=ib;
+							const int iline=nRow*nw1;
+							complex<double> phase=exp_R*w1;
+							for(int iw1=0; iw1<nw1; ++iw1)
+								WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1 + NLOCAL/NPOL*is1]);
+							++nRow;
+						}
+						else
+							break;
+					} // ib
+					zgemm_(&transa, &transb, &nw2, &nw1, &nRow, &alpha,
+						&wfc[ibStart][iw2_lo], &gt.lgd, 
+						WFC_PHASE, &nw1,
+						&beta, DM, &nw2);			
+					atom2start+=nw1*nw2;
+				} // ia2
+			} // ik
+			ispin++;
+		}//is2
+	}//is1
+	return;
+}
 
 void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 {
@@ -508,7 +572,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 				for(int is=0; is<NSPIN; ++is)
 					ZEROS(DM_ATOM[is], ng);
 				ZEROS(WFC_PHASE, NBANDS*nw1);
-				cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+				if(!NONCOLIN)cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+				else cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
 
 				++ca;
 
@@ -1563,7 +1628,7 @@ void Local_Orbital_Charge::write_dm(const int &is, const int &iter, const string
 		  }
 
 		ofs << "\n " << NSPIN;
-		if(NSPIN==1)
+		if(NSPIN==1||NSPIN==4)
 		{
 			ofs << "\n " << en.ef << " (fermi energy)";
 		}
@@ -1762,7 +1827,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 			}
 
 			CHECK_INT(ifs, NSPIN);
-			if(NSPIN == 1)
+			if(NSPIN == 1||NSPIN == 4)
 			{
 				READ_VALUE(ifs, en.ef);
 				ofs_running << " read in fermi energy = " << en.ef << endl;
@@ -1819,7 +1884,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 	}
 
 
-	if(NSPIN==1)
+	if(NSPIN==1||NSPIN==4)
 	{
 		Parallel_Common::bcast_double(en.ef);
 	}

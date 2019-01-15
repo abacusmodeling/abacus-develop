@@ -81,10 +81,19 @@ void Gint_k::allocate_pvpR(void)
 	if(this->reduced)
 	{
 		// the number of matrix element <phi_0 | V | phi_R> is LNNR.nnrg.
-		this->pvpR_reduced = new double[LNNR.nnrg];	
-		ZEROS( pvpR_reduced, LNNR.nnrg);
-
-		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", LNNR.nnrg , "double");
+//		if(!NONCOLIN){
+		this->pvpR_reduced = new double*[NSPIN];
+		for(int is =0;is<NSPIN;is++)
+		{
+			this->pvpR_reduced[is] = new double[LNNR.nnrg];	
+			ZEROS( pvpR_reduced[is], LNNR.nnrg);
+		}
+/*		else if(NONCOLIN) 
+		{
+			this->pvpR_reduced_soc = new complex<double>[LNNR.nnrg];
+			ZEROS( pvpR_reduced_soc, LNNR.nnrg);
+		}*/
+		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", LNNR.nnrg * NSPIN , "double");
 	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
         if(OUT_LEVEL != "m") ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
         if( mem > 800 )
@@ -119,13 +128,26 @@ void Gint_k::allocate_pvpR(void)
 		// 3*3*3 = 27.
 		//----------------------------------------------
 		const int LDIM=GridT.lgd*GridT.nutot;
-		this->pvpR_pool = new double[LDIM*LDIM];
-		ZEROS(pvpR_pool, LDIM*LDIM);
-		this->pvpR = new double*[LDIM];
-		for(int i=0; i<LDIM; i++)
+//		if(!NONCOLIN)
+//		{
+			this->pvpR_pool = new double[LDIM*LDIM];
+			ZEROS(pvpR_pool, LDIM*LDIM);
+			this->pvpR = new double*[LDIM];
+			for(int i=0; i<LDIM; i++)
+			{
+				pvpR[i] = &pvpR_pool[i*LDIM];
+			}
+/*		}
+		else
 		{
-			pvpR[i] = &pvpR_pool[i*LDIM];
-		}
+			this->pvpR_pool_soc = new complex<double>[LDIM*LDIM];
+			ZEROS(pvpR_pool_soc, LDIM*LDIM);
+			this->pvpR_soc = new complex<double>*[LDIM];
+			for(int i=0; i<LDIM; i++)
+			{
+				pvpR_soc[i] = &pvpR_pool_soc[i*LDIM];
+			}
+		}*/
 	}
 
 	this->pvpR_alloc_flag = true;
@@ -162,12 +184,23 @@ void Gint_k::destroy_pvpR(void)
 	
 	if(this->reduced)
 	{
+//		if(!NONCOLIN)
+		for(int is =0;is<NSPIN;is++) delete[] pvpR_reduced[is];
 		delete[] pvpR_reduced;
+//		else delete[] pvpR_reduced_soc;
 	}	
 	else
 	{
-		delete[] pvpR;
-		delete[] pvpR_pool;
+//		if(!NONCOLIN)
+//		{
+			delete[] pvpR;
+			delete[] pvpR_pool;
+/*		}
+		else
+		{
+			delete[] pvpR_soc;
+			delete[] pvpR_pool_soc;
+		}*/
 	}
 
 	this->pvpR_alloc_flag = false;
@@ -723,7 +756,7 @@ void Gint_k::folding_vl_k(const int &ik)
 							// mohan note 2012-07-06
 							if(distance < rcut)
 							{
-								const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+								const int start2 = ucell.itiaiw2iwt(T2, I2, 0); 
 
 								// calculate the distance between iat1 and iat2.
 								// Vector3<double> dR = GridD.getAdjacentTau(ad) - tau1;
@@ -747,7 +780,7 @@ void Gint_k::folding_vl_k(const int &ik)
 									if(VNA)
 									{
 										// get the <phi | V | phi>(R) Hamiltonian.
-										double *vijR = &pvpR_reduced[ixxx];
+										double *vijR = &pvpR_reduced[0][ixxx];
 										double *vijR2 = &pvnapR_reduced[ixxx];
 										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR, ++vijR2)
 										{
@@ -757,10 +790,13 @@ void Gint_k::folding_vl_k(const int &ik)
 									else
 									{
 										// get the <phi | V | phi>(R) Hamiltonian.
-										double *vijR = &pvpR_reduced[ixxx];
+										double *vijR = &pvpR_reduced[0][ixxx];
+//										complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
 										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR)
 										{
+											//if(!NONCOLIN)
 											vij[iw2_lo[0]] += vijR[0] * phase; 
+//											else vij[iw2_lo[0]] += vijR_soc[0] * phase;
 										}
 									}
 									ixxx += atom2->nw;
@@ -866,6 +902,346 @@ void Gint_k::folding_vl_k(const int &ik)
 	timer::tick("Gint_k","Distri",'G');
 
 	timer::tick("Gint_k","folding_vl_k",'G');
+	return;
+}
+
+// folding the matrix for 'ik' k-point.
+// H(k)=\sum{R} H(R)exp(ikR) 
+// for non-collinear case  
+void Gint_k::folding_vl_k_nc(const int &ik)
+{
+	TITLE("Gint_k","folding_vl_k_nc");
+	timer::tick("Gint_k","folding_vl_k_nc",'G');
+
+	if(!pvpR_alloc_flag)
+	{
+		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
+	}
+
+	//####################### EXPLAIN #################################
+	// 1. what is GridT.lgd ?
+	// GridT.lgd is the number of orbitals in each processor according
+	// to the division of real space FFT grid.
+	// 
+	// 2. why the folding of vlocal is different from folding of 
+	// < phi_0i | T+Vnl | phi_Rj > ?
+	// Because the (i,j) is different for T+Vna and Vlocal+Vna
+	// The first part is due to 2D division of H and S matrix,
+	// The second part is due to real space division. 
+	// 
+	// here we construct a temporary matrix to store the
+	// matrix element < phi_0 | Vlocal+Vna | phi_R >
+	// Vna appears when we use it.
+	//#################################################################
+	this->ik_now = ik;
+//	complex<double>** pvp_nc[4];
+	for(int spin=0;spin<4;spin++)
+	{
+		pvp_nc[spin] = new complex<double>*[GridT.lgd];
+		for(int i=0; i<GridT.lgd; i++)
+		{
+			pvp_nc[spin][i] = new complex<double>[GridT.lgd];
+			ZEROS( this->pvp_nc[spin][i], GridT.lgd);
+		}
+	}
+
+	if(!reduced)
+	{	
+		Vector3<double> dR;
+		double arg;
+		complex<double> phase;
+		complex<double> *pp1;
+		double *pp2;
+		int count;
+		for(int k=0; k<GridT.nutot; k++)
+		{
+			const int R1x = GridT.ucell_index2x[k];
+			const int R1y = GridT.ucell_index2y[k];
+			const int R1z = GridT.ucell_index2z[k];
+
+			const int dimk = GridT.lgd*k;
+			for(int m=0; m<GridT.nutot; m++)
+			{
+				//------------------------------------------------
+				// exp(k dot dR)
+				// dR is the index of box in Crystal coordinates
+				//------------------------------------------------
+				dR.x = GridT.ucell_index2x[m] - R1x;
+				dR.y = GridT.ucell_index2y[m] - R1y;
+				dR.z = GridT.ucell_index2z[m] - R1z;
+
+				arg = (kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+				phase = complex<double>(cos(arg), sin(arg));
+				for(int i=0; i<GridT.lgd; i++)
+				{
+					pp1 = this->pvp_nc[0][i];
+					pp2 = this->pvpR[i+GridT.lgd*m];
+					count = dimk;
+					for(int j=0; j<GridT.lgd; j++)
+					{
+						// folding matrix
+						pp1[j] += pp2[count] * phase;
+						++count;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		int lgd = 0;
+		Vector3<double> tau1, dtau, dR;
+		for(int T1=0; T1<ucell.ntype; ++T1)
+		{
+			for(int I1=0; I1<ucell.atoms[T1].na; ++I1)
+			{
+				// get iat
+				const int iat = ucell.itia2iat(T1,I1);
+				// atom in this grid piece.
+				if(GridT.in_this_processor[iat])
+				{
+					Atom* atom1 = &ucell.atoms[T1];
+					const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+
+					// get the start positions of elements.
+					const int DM_start = LNNR.nlocstartg[iat];
+
+					// get the coordinates of adjacent atoms.
+					tau1 = ucell.atoms[T1].tau[I1];
+					//GridD.Find_atom(tau1);	
+					GridD.Find_atom(tau1, T1, I1);	
+					// search for the adjacent atoms.
+					int nad = 0;
+
+
+					for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
+					{
+						// get iat2
+						const int T2 = GridD.getType(ad);
+						const int I2 = GridD.getNatom(ad);
+						const int iat2 = ucell.itia2iat(T2, I2);
+
+
+						// adjacent atom is also on the grid.
+						if(GridT.in_this_processor[iat2])
+						{
+							Atom* atom2 = &ucell.atoms[T2];
+							dtau = GridD.getAdjacentTau(ad) - tau1;
+							double distance = dtau.norm() * ucell.lat0;
+							double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+
+							// for the local part, only need to calculate <phi_i | phi_j> within range
+							// mohan note 2012-07-06
+							if(distance < rcut)
+							{
+								const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+
+								// calculate the distance between iat1 and iat2.
+								// Vector3<double> dR = GridD.getAdjacentTau(ad) - tau1;
+								dR.x = GridD.getBox(ad).x;
+								dR.y = GridD.getBox(ad).y;
+								dR.z = GridD.getBox(ad).z;
+
+								// calculate the phase factor exp(ikR).
+								const double arg = (kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+								complex<double> phase = complex<double>(cos(arg), sin(arg));
+								int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+								for(int iw=0; iw<atom1->nw; iw++)
+								{
+									// iw1_lo
+									complex<double> *vij[4];
+									for(int spin=0;spin<4;spin++)
+										vij[spin] = this->pvp_nc[spin][GridT.trace_lo[start1+iw]];
+
+
+									int* iw2_lo = &GridT.trace_lo[start2];
+									int* iw2_end = iw2_lo + atom2->nw;
+
+									if(VNA)
+									{
+										// get the <phi | V | phi>(R) Hamiltonian.
+										double *vijR = &pvpR_reduced[0][ixxx];
+										double *vijR2 = &pvnapR_reduced[ixxx];
+										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR, ++vijR2)
+										{
+											vij[0][iw2_lo[0]] += ( vijR[0] + vijR2[0] ) * phase; 
+										}
+									}
+									else
+									{
+										// get the <phi | V | phi>(R) Hamiltonian.
+//										complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
+										double *vijR[4];
+										for(int spin = 0;spin<4;spin++) vijR[spin] = &pvpR_reduced[spin][ixxx];
+										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR[0], ++vijR[1],++vijR[2],++vijR[3])
+										{
+											for(int spin =0;spin<4;spin++)
+												vij[spin][iw2_lo[0]] += vijR[spin][0] * phase; 
+//											else vij[iw2_lo[0]] += vijR_soc[0] * phase;
+										}
+									}
+									ixxx += atom2->nw;
+									++lgd;
+								}
+
+								++nad;
+							}// end distane<rcut
+						}
+					}// end ad
+				}
+			}// end ia
+		}// end it
+
+		//------------------
+		// To test the pvpR
+		//------------------
+/*
+		for(int i=0; i<LNNR.nlocdimg[0]; i++)
+		{
+			const int DM_start = LNNR.nlocstartg[0];
+			const int j = i + DM_start;
+			if( abs(pvpR_reduced[j]) > 1.0e-5  )
+			{
+//				cout << " pvpR_reduced[" << i <<"] = " << pvpR_reduced[j] << endl;
+			}
+		}
+*/
+
+	}
+
+	//----------------------
+	// Print the pvp matrix
+	//----------------------
+/*
+	cout << " pvp matrix:" << endl;
+	for(int i=0; i<GridT.lgd; i++)
+	{
+		for(int j=0; j<GridT.lgd; j++)
+		{
+			cout << setw(15) << pvp[i][j].real();
+		}
+		cout << endl;
+	}
+	*/
+
+	// Distribution of data.
+	timer::tick("Gint_k","Distri",'G');
+	complex<double>* tmp;
+	for (int i=0; i<NLOCAL; i++)
+	{
+		tmp = new complex<double>[NLOCAL];
+		ZEROS(tmp, NLOCAL);
+		const int mug = GridT.trace_lo[i];
+		const int mug0 = mug/NPOL;
+		// if the row element is on this processor.
+		if (mug >= 0)
+		{
+			for (int j=0; j<NLOCAL; j++)
+			{
+				const int nug = GridT.trace_lo[j];
+				const int nug0 = nug/NPOL;
+				// if the col element is on this processor.
+				if (nug >=0)
+				{
+					if (mug <= nug)
+					{
+						// pvp is symmetric, only half is calculated.
+						//int spin=0;
+						if(i%2==0&&j%2==0)
+						{
+							//spin = 0;
+							tmp[j] = this->pvp_nc[0][mug0][nug0]+this->pvp_nc[3][mug0][nug0];
+						}	
+						else if(i%2==1&&j%2==1)
+						{
+							//spin = 3;
+							tmp[j] = this->pvp_nc[0][mug0][nug0]-this->pvp_nc[3][mug0][nug0];
+						}
+						else if(i%2==0&&j%2==1)
+						{
+							// spin = 1;
+							if(!DOMAG) tmp[j] = 0;
+							else tmp[j] = this->pvp_nc[1][mug0][nug0] - complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
+						}
+						else if(i%2==1&&j%2==0) 
+						{
+							//spin = 2;
+							if(!DOMAG) tmp[j] = 0;
+							else tmp[j] = this->pvp_nc[1][mug0][nug0] + complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
+						}
+						else
+						{
+							WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+						}
+						//tmp[j] = this->pvp[spin][mug][nug];
+					}
+					else
+					{
+						// need to get elements from the other half.
+						// I have question on this! 2011-02-22
+						if(i%2==0&&j%2==0)
+						{
+							//spin = 0;
+							tmp[j] = conj(this->pvp_nc[0][nug0][mug0]+this->pvp_nc[3][nug0][mug0]);
+						}	
+						else if(i%2==1&&j%2==1)
+						{
+							//spin = 3;
+							tmp[j] = conj(this->pvp_nc[0][nug0][mug0]-this->pvp_nc[3][nug0][mug0]);
+						}
+						else if(i%2==1&&j%2==0)
+						{
+							// spin = 1;
+							if(!DOMAG) tmp[j] = 0;
+							else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] - complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
+						}
+						else if(i%2==0&&j%2==1) 
+						{
+							//spin = 2;
+							if(!DOMAG) tmp[j] = 0;
+							else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] + complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
+						}
+						else
+						{
+							WARNING_QUIT("Gint_k::folding_vl_k_nc","index is wrong!");
+						}
+						//tmp[j] = conj(this->pvp[spin][nug][mug]);
+						
+					}
+				}
+			}
+		}
+		// collect the matrix after folding.
+		Parallel_Reduce::reduce_complex_double_pool( tmp, NLOCAL );
+
+		//-----------------------------------------------------
+		// NOW! Redistribute the Hamiltonian matrix elements
+		// according to the HPSEPS's 2D distribution methods.
+		//-----------------------------------------------------
+		for (int j=0; j<NLOCAL; j++)
+		{
+			if (!ParaO.in_this_processor(i,j))
+			{
+				continue;
+			}
+			// set the matrix value.
+			LM.set_HSk(i,j,tmp[j],'L');
+		}
+		delete[] tmp;
+	}
+
+	// delete the tmp matrix.
+	for(int spin =0;spin<4;spin++)
+	{
+		for(int i=0; i<GridT.lgd; i++)
+		{
+			delete[] this->pvp_nc[spin][i];
+		}
+		delete[] this->pvp_nc[spin];
+	}
+	timer::tick("Gint_k","Distri",'G');
+
+	timer::tick("Gint_k","folding_vl_k_nc",'G');
 	return;
 }
 

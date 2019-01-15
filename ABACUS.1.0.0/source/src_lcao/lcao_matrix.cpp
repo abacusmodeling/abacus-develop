@@ -147,17 +147,35 @@ void LCAO_Matrix::allocate_HS_k(const int &nloc)
 
 void LCAO_Matrix::allocate_HS_R(const int &nnR)
 {
-	delete[] HlocR;
-	delete[] SlocR;
-	delete[] Hloc_fixedR;	
+	if(!NONCOLIN)
+	{
+		delete[] HlocR;
+		delete[] SlocR;
+		delete[] Hloc_fixedR;	
+	
+		this->HlocR = new double[nnR];
+		this->SlocR = new double[nnR];
+		this->Hloc_fixedR = new double[nnR];
 
-	this->HlocR = new double[nnR];
-	this->SlocR = new double[nnR];
-	this->Hloc_fixedR = new double[nnR];
+		ZEROS(HlocR, nnR);
+		ZEROS(SlocR, nnR);
+		ZEROS(Hloc_fixedR, nnR);
+	}
+	else
+	{
+		delete[] HlocR_soc;
+		delete[] SlocR_soc;
+		delete[] Hloc_fixedR_soc;
 
-	ZEROS(HlocR, nnR);
-	ZEROS(SlocR, nnR);
-	ZEROS(Hloc_fixedR, nnR);
+		this->HlocR_soc = new complex<double>[nnR];
+		this->SlocR_soc = new complex<double>[nnR];
+		this->Hloc_fixedR_soc = new complex<double>[nnR];
+		
+		ZEROS(HlocR_soc, nnR);
+		ZEROS(SlocR_soc, nnR);
+		ZEROS(Hloc_fixedR_soc, nnR);
+		
+	}
 
 	return;
 }
@@ -211,7 +229,7 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
     return;
 }
 
-void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<double> &v, const char &dtype)
+void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<double> &v, const char &dtype, const int spin)
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
@@ -228,20 +246,19 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
 		index=ir*ParaO.ncol+ic;
   	}
     assert(index < ParaO.nloc);
-
-    if (dtype=='S')//overlap Hamiltonian.
-    {
-        this->Sloc2[index] += v;
-    }
-    else if (dtype=='T' || dtype=='N')// kinetic and nonlocal Hamiltonian.
-    {
-        this->Hloc_fixed2[index] += v; // because kinetic and nonlocal Hamiltonian matrices are already block-cycle staraged after caculated in lcao_nnr.cpp
-                                       // this statement will not be used.
-    }
-    else if (dtype=='L') // Local potential Hamiltonian.
-    {
-        this->Hloc2[index] += v;
-    }
+	if (dtype=='S')//overlap Hamiltonian.
+	{
+		this->Sloc2[index] += v;
+	}
+	else if (dtype=='T' || dtype=='N')// kinetic and nonlocal Hamiltonian.
+	{
+		this->Hloc_fixed2[index] += v; // because kinetic and nonlocal Hamiltonian matrices are already block-cycle staraged after caculated in lcao_nnr.cpp
+                                      // this statement will not be used.
+	}
+	else if (dtype=='L') // Local potential Hamiltonian.
+	{
+		this->Hloc2[index] += v;
+	}
 	else
 	{
 		WARNING_QUIT("LCAO_Matrix","set_HSk");
@@ -376,9 +393,18 @@ void LCAO_Matrix::zeros_HSk(const char &mtype)
 
 void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 {
-	if (mtype=='S') ZEROS(SlocR, nnr);
-	else if (mtype=='T') ZEROS(Hloc_fixedR, nnr);
-	else if (mtype=='H') ZEROS(HlocR, nnr);
+	if(!NONCOLIN)
+	{
+		if (mtype=='S') ZEROS(SlocR, nnr);
+		else if (mtype=='T') ZEROS(Hloc_fixedR, nnr);
+		else if (mtype=='H') ZEROS(HlocR, nnr);
+	}
+	else
+	{
+		if (mtype=='H') ZEROS(this->HlocR_soc, nnr);
+		else if (mtype=='S') ZEROS(this->SlocR_soc, nnr);
+		else if (mtype=='T') ZEROS(this->Hloc_fixedR_soc, nnr);
+	}
 	return;
 }
 
@@ -424,7 +450,6 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 				else if(mtype=='T') v = Hloc_fixed2[index].imag();
 				else if(mtype=='H') v = Hloc2[index].imag();
 			}
-
 			if( abs(v) > accuracy )
 			{
 				cout << setw(15) << v;

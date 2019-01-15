@@ -1925,7 +1925,12 @@ void Input::Check(void)
 		}
 		//xiaohui modify 2015-09-15, 0 -> 1
                 //force = 0;
-                force = 1;
+                if(!noncolin)
+                	force = 1;
+		else {
+			force = 0;//modified by zhengdy-soc, can't calculate force now!
+			cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<endl;
+		}
                 nstep = 1;
 
     }

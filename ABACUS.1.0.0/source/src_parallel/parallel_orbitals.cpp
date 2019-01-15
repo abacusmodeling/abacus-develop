@@ -49,6 +49,7 @@ void Parallel_Orbitals::set_trace(void)
     Memory::record("Parallel_Orbitals","trace_loc_col",NLOCAL,"int");
 
 
+cout<<__FILE__<<__LINE__<<" "<<this->nrow<<" "<<this->ncol<<endl;
 
     //if (DIAGO_TYPE=="lapack"
     //        || DIAGO_TYPE=="cg"
@@ -138,6 +139,7 @@ void Parallel_Orbitals::set_trace(void)
 		WARNING_QUIT("Parallel_Orbitals::set_trace","Check KS_SOLVER."); //xiaohui add 2013-09-02
 	}
 
+cout<<__FILE__<<__LINE__<<" "<<this->nrow<<" "<<this->ncol<<endl;
 	//---------------------------
     // print the trace for test.
 	//---------------------------

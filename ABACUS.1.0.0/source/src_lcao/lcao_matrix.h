@@ -32,7 +32,13 @@ class LCAO_Matrix
 	complex<double> *Sloc2;
 	complex<double> *Hloc_fixed2;
 	complex<double> *Sdiag2; // used in pdiag_double.cpp
-	
+	//with soc, zhengdy-soc
+/*	ComplexMatrix Hloc2_soc;
+	ComplexMatrix Sloc2_soc;
+	ComplexMatrix Hloc_fixed2_soc;
+	ComplexMatrix Sdiag2_soc;*/
+
+
 	//------------------------------
 	// Store H(mu,nu')
 	// nu' : nu in near unitcell R.
@@ -45,6 +51,11 @@ class LCAO_Matrix
 	double* HlocR;
 	double* SlocR;
 	double* Hloc_fixedR;
+	//with soc, zhengdy-soc
+	complex<double>* HlocR_soc;
+	complex<double>* SlocR_soc;
+	complex<double>* Hloc_fixedR_soc;
+	
 
 
 	//========================================
@@ -108,7 +119,7 @@ class LCAO_Matrix
 
 	void divide_HS_in_frag(void);
 	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);
-	void set_HSk(const int &iw1_all, const int &iw2_all, const complex<double> &v, const char &dtype);
+	void set_HSk(const int &iw1_all, const int &iw2_all, const complex<double> &v, const char &dtype, const int spin = 0);
 	void set_force (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy, 
 		const double& vz, const char &dtype);
 	void set_stress (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy,

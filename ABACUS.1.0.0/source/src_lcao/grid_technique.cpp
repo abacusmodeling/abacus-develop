@@ -412,9 +412,16 @@ void Grid_Technique::cal_trace_lo(void)
 			if(this->in_this_processor[iat])
 			{
 				++lnat;
-				lgd += ucell.atoms[it].nw;
+				int nw0 = ucell.atoms[it].nw;
+				if(NONCOLIN)
+				{//added by zhengdy-soc, need to be double in soc
+					nw0 *= 2;
+					lgd += nw0;
+				}
+				else
+					lgd += ucell.atoms[it].nw;
 				
-				for(int iw=0; iw<ucell.atoms[it].nw; iw++)
+				for(int iw=0; iw<nw0; iw++)
 				{
 					this->trace_lo[iw_all] = iw_local;
 					++iw_local; 
@@ -424,6 +431,7 @@ void Grid_Technique::cal_trace_lo(void)
 			else
 			{
 				iw_all += ucell.atoms[it].nw;
+				if(NONCOLIN) iw_all += ucell.atoms[it].nw;
 			}
 			++iat;
 		}

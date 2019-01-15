@@ -98,12 +98,13 @@ void Parallel_Atoms::set_trace(int *trace_loc_row, int *trace_loc_col, int &nrow
 
 	for(int it=0; it<ucell.ntype; it++)
 	{
-		const int nw = ucell.atoms[it].nw;
+		int nw = ucell.atoms[it].nw;
+		if(NONCOLIN) nw *= 2;//added by zhengdy-soc
 		for(int ia=0; ia<ucell.atoms[it].na; ia++)
 		{
 			if( this->keep_this_atom[iat] )
 			{
-				const int start = ucell.itiaiw2iwt(it, ia, 0);
+				const int start = ucell.itiaiw2iwt(it, ia, 0)*NPOL;//zhengdy-soc
 				for(int iw=0; iw<nw; iw++)
 				{
 					const int iw_all = iw+start;

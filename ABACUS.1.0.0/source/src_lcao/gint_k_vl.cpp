@@ -310,7 +310,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
             					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
             						&psir_vlbr3[ib][idx2], &LD_pool, 
             						&psir_ylm[ib][idx1], &LD_pool,
-            						&beta, &pvpR[iatw], &n);                    			
+            						&beta, &pvpR[iatw], &n);	
                 			}
             			}
         			}
@@ -320,7 +320,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 	}
 }
 
-void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
+void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const int spin)
 {
 	TITLE("Gint_k","cal_vlocal_k");
 
@@ -334,7 +334,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 		// is used to save <phi | Vl | phi>
 		if(this->reduced)
 		{
-			ZEROS(this->pvpR_reduced, LNNR.nnrg);
+			ZEROS(this->pvpR_reduced[spin], LNNR.nnrg);
 		}
 		// else one needs to consdier all cell with a vector R
 		// the number of cells is GridT.nutot,
@@ -463,7 +463,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT)
 									ibx, jby, kbz, 
 									block_size, at, block_index, block_iw, 
 									vldr3, psir_ylm, psir_vlbr3, 
-									distance, cal_flag, this->pvpR_reduced);
+									distance, cal_flag, this->pvpR_reduced[spin]);
 				}
 				else
 				{

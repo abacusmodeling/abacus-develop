@@ -161,11 +161,31 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** c)
 {
 	TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
+	//ParaO.out_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
+	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
 	HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, ParaO.out_hs); //LiuXh, 2017-03-21
 	ofs_running << setprecision(6); //LiuXh, 2017-03-21
 
 	ParaO.diago_complex_begin(ik, c, LM.Hloc2, LM.Sloc2, wf.ekb[ik]);
+	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
+	if(NONCOLIN)
+	{
+		int row = NLOCAL;
+		complex<double> tmp[row];
+		for(int ib=0; ib<NBANDS; ib++)
+		{
+			for(int iw=0; iw<row / NPOL; iw++)
+			{
+				tmp[iw] = LOWF.WFC_K[ik][ib][iw * NPOL];
+				tmp[iw + row / NPOL] = LOWF.WFC_K[ik][ib][iw * NPOL + 1];
+			}
+			for(int iw=0; iw<row; iw++)
+			{
+				LOWF.WFC_K[ik][ib][iw] = tmp[iw];
+			}
+		}
+	}
 
 	return;
 }
@@ -183,6 +203,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **cc
 	{
 		for(int j=0; j<NLOCAL; j++)
 		{
+//			cout<<"H_and_S: "<<i<<" "<<j<<" "<<LM.Hloc2[i*NLOCAL+j]<<" "<<LM.Sloc2[i*NLOCAL+j]<<endl;
 			Htmp(i,j) = LM.Hloc2[i*NLOCAL+j];
 			Stmp(i,j) = LM.Sloc2[i*NLOCAL+j];
 		}
@@ -199,14 +220,24 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **cc
 
 	ComplexMatrix hvec(NLOCAL, NBANDS);
 	hm.cdiaghg(NLOCAL, NBANDS, Htmp, Stmp, NLOCAL, en, hvec);
-	
+
+	if(!NONCOLIN)
 	for(int ib=0; ib<NBANDS; ib++)
 	{
 		for(int iw=0; iw<NLOCAL; iw++)
 		{
 			LOWF.WFC_K[ik][ib][iw] = hvec(iw,ib);
 		}
-	}	
+	}
+	else
+	for(int ib=0; ib<NBANDS; ib++)
+	{
+		for(int iw=0; iw<NLOCAL / NPOL; iw++)
+		{
+			LOWF.WFC_K[ik][ib][iw] = hvec(iw * NPOL, ib);
+			LOWF.WFC_K[ik][ib][iw + NLOCAL / NPOL] = hvec(iw * NPOL + 1, ib);
+		}
+	}
 
 	//cout << "\n Energy for k=" << ik << endl; 
 	for(int ib=0; ib<NBANDS; ib++)
@@ -224,7 +255,8 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** c)const
 	assert(NLOCAL>0);
 
 	// save H and S matrix to disk.
-	bool bit = false;
+//	bool bit = false;
+	bool bit = true;//zhengdy-soc
 	HS_Matrix::saving_HS(LM.Hloc, LM.Sloc, bit, ParaO.out_hs);
 
 	matrix Htmp(NLOCAL,NLOCAL);

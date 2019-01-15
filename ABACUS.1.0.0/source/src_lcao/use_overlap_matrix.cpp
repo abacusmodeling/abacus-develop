@@ -81,20 +81,22 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 				if(distance < rcut)
 				{
-					int iw1_all = ucell.itiaiw2iwt( T1, I1, 0); //iw1_all = combined index (it, ia, iw)
+					int iw1_all = ucell.itiaiw2iwt( T1, I1, 0) * NPOL; //iw1_all = combined index (it, ia, iw)
 
-					for(int jj=0; jj<atom1->nw; ++jj)
+					for(int jj=0; jj<atom1->nw*NPOL; ++jj)
 					{
-						const int L1 = atom1->iw2l[jj];
-						const int N1 = atom1->iw2n[jj];
-						const int m1 = atom1->iw2m[jj];
+						const int jj0 = jj/NPOL;
+						const int L1 = atom1->iw2l[jj0];
+						const int N1 = atom1->iw2n[jj0];
+						const int m1 = atom1->iw2m[jj0];
 
-						int iw2_all = ucell.itiaiw2iwt( T2, I2, 0);
-						for(int kk=0; kk<atom2->nw; ++kk)
+						int iw2_all = ucell.itiaiw2iwt( T2, I2, 0) * NPOL;//zhengdy-soc
+						for(int kk=0; kk<atom2->nw*NPOL; ++kk)
 						{
-							const int L2 = atom2->iw2l[kk];
-							const int N2 = atom2->iw2n[kk];
-							const int m2 = atom2->iw2m[kk];
+							const int kk0 = kk/NPOL;
+							const int L2 = atom2->iw2l[kk0];
+							const int N2 = atom2->iw2n[kk0];
+							const int m2 = atom2->iw2m[kk0];
 
 							// mohan add 2010-06-29
 							// this is in fact the same as in build_Nonlocal_mu,
@@ -111,11 +113,15 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 
 							olm[0] = olm[1] = olm[2] = 0.0;
 
+							complex<double> olm1[4]={ZERO, ZERO, ZERO, ZERO};
+							complex<double> *olm2 = &olm1[0];
 							if(!calc_deri)
 							{
 								UOT.snap_psipsi( olm, 0, dtype, tau1, 
 										T1, L1, m1, N1, GridD.getAdjacentTau(ad), 
-										T2, L2, m2, N2);
+										T2, L2, m2, N2,
+										olm2//for soc
+										);
 
 								if(GAMMA_ONLY_LOCAL)
 								{
@@ -141,11 +147,21 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 									// which is a 1D array.
 									if(dtype=='S')
 									{
-										LM.SlocR[nnr] = olm[0];
+										if(!NONCOLIN) LM.SlocR[nnr] = olm[0];
+										else
+										{//only has diagonal term here.
+												int is = (jj-jj0*NPOL) + (kk-kk0*NPOL)*2;
+											LM.SlocR_soc[nnr] = olm1[is];
+										}
 									}
 									else if(dtype=='T')
 									{
-										LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
+										if(!NONCOLIN) LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
+										else
+										{//only has diagonal term here.
+												int is = (jj-jj0*NPOL) + (kk-kk0*NPOL)*2;
+											LM.Hloc_fixedR_soc[nnr] = olm1[is];
+										}
 									}
 									++nnr;
 								}
@@ -202,8 +218,8 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 				}// distance
 				else if(distance>=rcut && (!GAMMA_ONLY_LOCAL))
 				{
-					int start1 = ucell.itiaiw2iwt( T1, I1, 0);
-					int start2 = ucell.itiaiw2iwt( T2, I2, 0); 
+					int start1 = ucell.itiaiw2iwt( T1, I1, 0) * NPOL;
+					int start2 = ucell.itiaiw2iwt( T2, I2, 0) * NPOL;//zhengdy-soc
 
 					bool is_adj = false;
 					for (int ad0=0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
@@ -211,7 +227,7 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 						const int T0 = GridD.getType(ad0);
 						const int I0 = GridD.getNatom(ad0);
 						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;//zhengdy-soc
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
 						double distance1 = dtau1.norm() * ucell.lat0;
@@ -229,11 +245,11 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 
 					if( is_adj )
 					{
-						for(int jj=0; jj<atom1->nw; ++jj)
+						for(int jj=0; jj<atom1->nw * NPOL; ++jj)
 						{
 							const int mu = ParaO.trace_loc_row[start1+jj];
 							if(mu<0)continue; 
-							for(int kk=0; kk<atom2->nw; ++kk)
+							for(int kk=0; kk<atom2->nw * NPOL; ++kk)
 							{
 								const int nu = ParaO.trace_loc_col[start2+kk];
 								if(nu<0)continue;
@@ -280,7 +296,7 @@ void Use_Overlap_Matrix::test_Nonlocal()
             //GridD.Find_atom( atom1->tau[I1] );
             GridD.Find_atom( atom1->tau[I1] ,T1, I1);
 			const int iat1 = ucell.itia2iat(T1, I1);
-			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+			const int start1 = ucell.itiaiw2iwt(T1, I1, 0) * NPOL;//zhengdy-soc
             tau1 = atom1->tau[I1];
 
 			// psi2
@@ -291,7 +307,7 @@ void Use_Overlap_Matrix::test_Nonlocal()
                 
 				const int I2 = GridD.getNatom(ad2);
 				const int iat2 = ucell.itia2iat(T2, I2);
-                const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                const int start2 = ucell.itiaiw2iwt(T2, I2, 0) * NPOL;//zhengdy-soc
                 tau2 = GridD.getAdjacentTau(ad2);
 
 				dtau_12 = tau2 - tau1;
@@ -300,13 +316,15 @@ void Use_Overlap_Matrix::test_Nonlocal()
 
 				if(distance >= rcut)
 				{
-					for (int j=0; j<atom1->nw; j++)
+					for (int j=0; j<atom1->nw*NPOL; j++)
 					{
+						int j0 = j/NPOL;
 						const int iw1_all = start1 + j;
 						const int mu = ParaO.trace_loc_row[iw1_all];
 						if(mu < 0)continue; 
-						for (int k=0; k<atom2->nw; k++)
+						for (int k=0; k<atom2->nw*NPOL; k++)
 						{
+							int k0 = k/NPOL;
 							const int iw2_all = start2 + k;
 							const int nu = ParaO.trace_loc_col[iw2_all];						
 							if(nu < 0)continue;
@@ -315,7 +333,7 @@ void Use_Overlap_Matrix::test_Nonlocal()
 								const int T0 = GridD.getType(ad0);
 								if( ORB.nproj[T0] == 0) continue; 
 								const int I0 = GridD.getNatom(ad0);
-								const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+								const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;//zhengdy-soc
 								tau0 = GridD.getAdjacentTau(ad0);
 
 								dtau_10 = tau0 - tau1;
@@ -332,13 +350,13 @@ void Use_Overlap_Matrix::test_Nonlocal()
 									double nlm[3]={0,0,0};
 									UOT.snap_psibeta(
 											nlm, 0, tau1, T1,
-											atom1->iw2l[ j ], // L1
-											atom1->iw2m[ j ], // m1
-											atom1->iw2n[ j ], // N1
+											atom1->iw2l[ j0 ], // L1
+											atom1->iw2m[ j0 ], // m1
+											atom1->iw2n[ j0 ], // N1
 											tau2, T2,
-											atom2->iw2l[ k ], // L2
-											atom2->iw2m[ k ], // m2
-											atom2->iw2n[ k ], // n2
+											atom2->iw2l[ k0 ], // L2
+											atom2->iw2m[ k0 ], // m2
+											atom2->iw2n[ k0 ], // n2
 											tau0, T0
 											);
 									
@@ -415,7 +433,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
             //GridD.Find_atom( atom1->tau[I1] );
             GridD.Find_atom( atom1->tau[I1] ,T1, I1);
 			const int iat1 = ucell.itia2iat(T1, I1);
-			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+			const int start1 = ucell.itiaiw2iwt(T1, I1, 0)*NPOL;//zhengdy-soc
             tau1 = atom1->tau[I1];
 
 			// psi2
@@ -426,7 +444,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
                 
 				const int I2 = GridD.getNatom(ad2);
 				const int iat2 = ucell.itia2iat(T2, I2);
-                const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                const int start2 = ucell.itiaiw2iwt(T2, I2, 0) * NPOL;//zhengdy-soc
                 tau2 = GridD.getAdjacentTau(ad2);
 
 				bool is_adj = false;
@@ -446,7 +464,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
             //            const int T0 = RA.info[iat1][ad0][3];
               //          const int I0 = RA.info[iat1][ad0][4];
                         const int iat0 = ucell.itia2iat(T0, I0);
-                        const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+                        const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;//zhengdy-soc
 
                         tau0 = GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;
@@ -471,16 +489,18 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 				{
 					// < psi1 | all projectors | psi2 >
 					// ----------------------------- enter the nnr increaing zone -------------------------
-					for (int j=0; j<atom1->nw; j++)
+					for (int j=0; j<atom1->nw*NPOL; j++)
 					{
+						const int j0 = j/NPOL;//added by zhengdy-soc
 						const int iw1_all = start1 + j;
 						const int mu = ParaO.trace_loc_row[iw1_all];
 						if(mu < 0)continue; 
 
 						// fix a serious bug: atom2[T2] -> atom2
 						// mohan 2010-12-20
-						for (int k=0; k<atom2->nw; k++)
+						for (int k=0; k<atom2->nw*NPOL; k++)
 						{
+							const int k0 = k/NPOL;
 							const int iw2_all = start2 + k;
 							const int nu = ParaO.trace_loc_col[iw2_all];						
 							if(nu < 0)continue;
@@ -495,7 +515,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 								if( ORB.nproj[T0] == 0) continue; 
 
 								const int I0 = GridD.getNatom(ad0);
-								const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+								const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;//zhengdy-soc
 								tau0 = GridD.getAdjacentTau(ad0);
 
 								dtau1 = tau0 - tau1;
@@ -511,21 +531,25 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 								{
 									const Atom* atom0 = &ucell.atoms[T0];
 									double nlm[3]={0,0,0};
+									complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
+									complex<double> *nlm2 = NULL;
+									if(NONCOLIN) nlm2 = &nlm1[0];
 									if(!calc_deri)
 									{
+										int is0 = (j-j0*NPOL) + (k-k0*NPOL)*2;
 										UOT.snap_psibeta(
 												nlm, 0, tau1, T1,
-												atom1->iw2l[ j ], // L1
-												atom1->iw2m[ j ], // m1
-												atom1->iw2n[ j ], // N1
+												atom1->iw2l[ j0 ], // L1
+												atom1->iw2m[ j0 ], // m1
+												atom1->iw2n[ j0 ], // N1
 												tau2, T2,
-												atom2->iw2l[ k ], // L2
-												atom2->iw2m[ k ], // m2
-												atom2->iw2n[ k ], // n2
-												tau0, T0
+												atom2->iw2l[ k0 ], // L2
+												atom2->iw2m[ k0 ], // m2
+												atom2->iw2n[ k0 ], // n2
+												tau0, T0,
+												nlm2, is0 //for soc
 												);
 
-							//			if(T1==0 && I1==0 && j==0 && T2==0 && I2==0 && k==0) sum += nlm[0];
 
 										if(GAMMA_ONLY_LOCAL)
 										{
@@ -545,7 +569,12 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 										}
 										else
 										{
-											LM.Hloc_fixedR[nnr] += nlm[0];
+											if(!NONCOLIN) LM.Hloc_fixedR[nnr] += nlm[0];
+											else
+											{
+												int is = (j-j0*NPOL) + (k-k0*NPOL)*2;
+												LM.Hloc_fixedR_soc[nnr] += nlm1[is];
+											}
 										}
 									}// calc_deri
 									else // calculate the derivative
@@ -556,14 +585,14 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 													nlm, 1, 
 													tau1, 
 													T1,
-													atom1->iw2l[ j ], // L1
-													atom1->iw2m[ j ], // m1
-													atom1->iw2n[ j ], // N1
+													atom1->iw2l[ j0 ], // L1
+													atom1->iw2m[ j0 ], // m1
+													atom1->iw2n[ j0 ], // N1
 													tau2, 
 													T2,
-													atom2->iw2l[ k ], // L2
-													atom2->iw2m[ k ], // m2
-													atom2->iw2n[ k ], // n2
+													atom2->iw2l[ k0 ], // L2
+													atom2->iw2m[ k0 ], // m2
+													atom2->iw2n[ k0 ], // n2
 													tau0, T0
 													);
 
@@ -579,14 +608,14 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 													nlm, 1, 
 													tau2, 
 													T2,
-													atom2->iw2l[ k ], // L2
-													atom2->iw2m[ k ], // m2
-													atom2->iw2n[ k ], // n2
+													atom2->iw2l[ k0 ], // L2
+													atom2->iw2m[ k0 ], // m2
+													atom2->iw2n[ k0 ], // n2
 													tau1, 
 													T1,
-													atom1->iw2l[ j ], // L1
-													atom1->iw2m[ j ], // m1
-													atom1->iw2n[ j ], // N1
+													atom1->iw2l[ j0 ], // L1
+													atom1->iw2m[ j0 ], // m1
+													atom1->iw2n[ j0 ], // N1
 													tau0, T0
 													);
 
@@ -648,7 +677,7 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
                 const int T1 = GridD.getType(ad);
                 const int I1 = GridD.getNatom(ad);
 				const int iat = ucell.itia2iat(T1, I1);
-                const int start = ucell.itiaiw2iwt(T1, I1, 0);
+                const int start = ucell.itiaiw2iwt(T1, I1, 0) * NPOL;//zhengdy-soc
                 const Vector3<double> tau1 = GridD.getAdjacentTau(ad);
 				const Atom* atom1 = &ucell.atoms[T1];
 
@@ -660,7 +689,7 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 				{
 					const int T2 = GridD.getType(ad2);
 					const int I2 = GridD.getNatom(ad2);
-					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+					const int start2 = ucell.itiaiw2iwt(T2, I2, 0) * NPOL;//zhengdy-soc
 					const Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &ucell.atoms[T2];
 
@@ -670,16 +699,18 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 					if(distance < rcut)
 					{
 						// ------------- enter the nnr increaing zone --------------
-						for (int j=0; j<atom1->nw; j++)
+						for (int j=0; j<atom1->nw*NPOL; j++)
 						{
+							const int j0 = j/NPOL;
 							const int iw1_all = start + j;
 							const int mu = ParaO.trace_loc_row[iw1_all];
 							if(mu < 0)continue; 
 
 							// mohan fix bug 2010-12-20
 							// atom2[T2] -> atom2.
-							for (int k=0; k<atom2->nw; k++)
+							for (int k=0; k<atom2->nw*NPOL; k++)
 							{
+								const int k0 = k/NPOL;
 								const int iw2_all = start2 + k;
 								const int nu = ParaO.trace_loc_col[iw2_all];
 								if(nu < 0)continue;
@@ -691,13 +722,13 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 								{
 									UOT.snap_psibeta(
 											nlm, 0, tau1, T1,
-											atom1->iw2l[ j ], // L1
-											atom1->iw2m[ j ], // m1
-											atom1->iw2n[ j ], // N1
+											atom1->iw2l[ j0 ], // L1
+											atom1->iw2m[ j0 ], // m1
+											atom1->iw2n[ j0 ], // N1
 											tau2, T2,
-											atom2->iw2l[ k ], // L2
-											atom2->iw2m[ k ], // m2
-											atom2->iw2n[ k ], // n2
+											atom2->iw2l[ k0 ], // L2
+											atom2->iw2m[ k0 ], // m2
+											atom2->iw2n[ k0 ], // n2
 											ucell.atoms[T0].tau[I0], T0
 											);
 
@@ -724,13 +755,13 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 								{
 									UOT.snap_psibeta(
 											nlm, 1, tau1, T1,
-											atom1->iw2l[ j ], // L1
-											atom1->iw2m[ j ], // m1
-											atom1->iw2n[ j ], // N1
+											atom1->iw2l[ j0 ], // L1
+											atom1->iw2m[ j0 ], // m1
+											atom1->iw2n[ j0 ], // N1
 											tau2, T2,
-											atom2->iw2l[ k ], // L2
-											atom2->iw2m[ k ], // m2
-											atom2->iw2n[ k ], // n2
+											atom2->iw2l[ k0 ], // L2
+											atom2->iw2m[ k0 ], // m2
+											atom2->iw2n[ k0 ], // n2
 											ucell.atoms[T0].tau[I0], T0
 											);
 

@@ -610,6 +610,17 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 					{
 						// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
 						UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
+						if(NONCOLIN && DOMAG)
+						{//added by zhengdy-soc, for non-collinear case
+							for(int is=1;is<4;is++)
+							{
+								for(int ir=0; ir<pw.nrxx; ir    ++)
+								{
+									pot.vrs1[ir] = pot.v    rs( is, ir);
+								}
+								UHM.GK.cal_vlocal_k(pot.vrs1    , GridT, is);
+							}
+						}
 					}
 					else if(VNA>1)
 					{

@@ -37,6 +37,8 @@ public:
 
 	const double& getCoefficient_D(const int& L1, const int& L2) 
 						const { return this->Coefficient_D(L1, L2); }
+	const complex<double>& getCoefficient_D_so(const int& is, const int& L1, const int& L2) 
+						const { return this->Coefficient_D_so(is, L1, L2); }
 	
 //==========================================================
 // EXPLAIN : set information about Numerical Orbital
@@ -48,13 +50,17 @@ public:
 			const string& type_ps_in,
 			const int& lmax_in,
 			matrix& Coefficient_D_in,
+			ComplexMatrix& Coefficient_D_in_so,
 			const int& nproj_in,
+			const int& nproj_in_so,
 			int* LfromBeta_in,
 			const Numerical_Nonlocal_Lm* ps_orbital_in);
 
 	Numerical_Nonlocal_Lm* Proj;// length: nproj(only store radial function )
 
 	const double& get_rcut_max(void) const { return rcut_max; }
+
+	const int& get_nproj_soc(void) const {return nproj_soc;}
 
 	private:
 	
@@ -74,6 +80,8 @@ public:
 	// each Beta may have different L.
 	int nproj;
 	int *LfromBeta;
+	int nproj_soc;//demention of D_ij^so
+	ComplexArray Coefficient_D_so;   //(:,:,:),  spin-orbit case,  added by zhengdy-soc
 };
 
 #endif

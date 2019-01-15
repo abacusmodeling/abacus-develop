@@ -290,6 +290,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
+	const int N_PROJECTORS = atom->nh;//zhengdy-soc
+cout << " number of projectros " << N_PROJECTORS << endl;
 //	cout << " number of projectros " << n_projectors << endl;
 
 	// set the nonlocal projector objects
@@ -298,54 +300,144 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	const int nproj_allowed = atom->lmax + 1;	
 	//matrix Coefficient_D_in(nproj_allowed, nproj_allowed); //LiuXh 2016-01-14
 	matrix Coefficient_D_in(n_projectors, n_projectors); //LiuXh 2016-01-14
+	ComplexMatrix Coefficient_D_in_so(N_PROJECTORS*2, N_PROJECTORS*2);//zhengdy-soc
 
-
-	for(int p1 = 0; p1<n_projectors; p1++)
+	if(!atom->has_so)
 	{
-		const int lnow = atom->lll[p1];
+		for(int p1 = 0; p1<n_projectors; p1++)
+		{
+			const int lnow = atom->lll[p1];
 
 		// this will be wrong if dion is non-diagoal
 		//Coefficient_D_in(lnow,lnow)=atom->dion(p1,p1);//LiuXh 2016-01-14
-		Coefficient_D_in(p1,p1)=atom->dion(p1,p1);//LiuXh 2016-01-14
+			Coefficient_D_in(p1,p1)=atom->dion(p1,p1);//LiuXh 2016-01-14
 
 		// only keep the nonzero part.
-		int cut_mesh = atom->mesh; 
-		for(int ir=atom->mesh-1; ir>=0; --ir)
-		{
-			if( abs( atom->betar(p1,ir) ) > 1.0e-10 )
+			int cut_mesh = atom->mesh; 
+			for(int ir=atom->mesh-1; ir>=0; --ir)
 			{
-				cut_mesh = ir; 
-				break;
+				if( abs( atom->betar(p1,ir) ) > 1.0e-10 )
+				{
+					cut_mesh = ir; 
+					break;
+				}
 			}
-		}
-		if(cut_mesh %2 == 0) ++cut_mesh;
+			if(cut_mesh %2 == 0) ++cut_mesh;
 
 //		cout << " cut_mesh=" << cut_mesh << endl;
-		double* beta_r = new double[cut_mesh];
-		ZEROS(beta_r, cut_mesh);
-		for(int ir=0; ir<cut_mesh; ++ir)
-		{
-			beta_r[ir] = atom->betar(p1,ir);
+			double* beta_r = new double[cut_mesh];
+			ZEROS(beta_r, cut_mesh);
+			for(int ir=0; ir<cut_mesh; ++ir)
+			{
+				beta_r[ir] = atom->betar(p1,ir);
+			}
+
+			tmpBeta_lm[p1].set_NL_proj(
+					atom->label,
+					it, //type
+					lnow, // angular momentum L
+					cut_mesh, // number of radial mesh
+					atom->rab,
+					atom->r, // radial mesh value (a.u.)
+					beta_r,
+					this->kmesh,
+					this->dk,
+					dr_uniform); // delta k mesh in reciprocal space
+
+			delete[] beta_r;
+				
 		}
 
-        tmpBeta_lm[p1].set_NL_proj(
-        		atom->label,
-                it, //type
-				lnow, // angular momentum L
-                cut_mesh, // number of radial mesh
-				atom->rab,
-				atom->r, // radial mesh value (a.u.)
-				beta_r,
-                this->kmesh,
-                this->dk,
-				dr_uniform); // delta k mesh in reciprocal space
-
-		delete[] beta_r;
-				
+		this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
 	}
+	else//added by zhengdy-soc
+	{
+		int lmaxkb = - 1;
+		for (int ibeta = 0; ibeta < ucell.atoms[it].nbeta; ibeta++)
+		{
+			lmaxkb = max( lmaxkb, ucell.atoms[it].lll[ibeta]);
+		}
+		soc.rot_ylm(lmaxkb);
+		soc.fcoef.create(ucell.ntype, ucell.atoms[it].nh, ucell.atoms[it].nh);
+		int ip1=0;
+		for(int p1 = 0; p1<n_projectors; p1++)//nbeta
+		{
+			const int lnow = atom->lll[p1];
+			
+			const int l1 = atom->lll[p1];
+			const double j1 = atom->jjj[p1];
+			for(int m1=0; m1<2*l1+1; m1++)
+			{
+				int ip2=0;
+				for(int p2 = 0; p2<n_projectors; p2++)
+				{
+					const int l2 = atom->lll[p2];
+					const double j2 = atom->jjj[p2];
+					for(int m2 = 0;m2<2*l2+1;m2++)
+					{
+						if(l1==l2 && fabs(j1-j2)<1e-7)
+						{
+							for(int is1=0;is1<2;is1++)
+							{
+								for(int is2=0;is2<2;is2++)
+								{
+									complex<double> coeff = complex<double>(0.0,0.0);
+									for(int m=-l1-1;m<l1+1;m++)
+									{
+										const int mi = soc.sph_ind(l1,j1,m,is1) + lmaxkb ;
+										const int mj = soc.sph_ind(l2,j2,m,is2) + lmaxkb ;
+										coeff += soc.rotylm(m1,mi) * soc.spinor(l1,j1,m,is1)*
+											conj(soc.rotylm(m2,mj))*soc.spinor(l2,j2,m,is2);
+									}
+									soc.fcoef(it,is1,is2,ip1,ip2) = coeff;
+									Coefficient_D_in_so(ip1 + N_PROJECTORS*is1, ip2 + N_PROJECTORS*is2) = atom->dion(p1,p2) * soc.fcoef(it, is1, is2, ip1, ip2);
+									if(p1 != p2) soc.fcoef(it, is1, is2, ip1, ip2) = complex<double>(0.0,0.0);
+								}
+							}
+						}
+						ip2++;
+					}
+				}
+				assert(ip2==N_PROJECTORS);
+				ip1++;
+			}
+		// only keep the nonzero part.
+			int cut_mesh = atom->mesh; 
+			for(int ir=atom->mesh-1; ir>=0; --ir)
+			{
+				if( abs( atom->betar(p1,ir) ) > 1.0e-10 )
+				{
+					cut_mesh = ir; 
+					break;
+				}
+			}
+			if(cut_mesh %2 == 0) ++cut_mesh;
 
-	this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
-	//this->Beta[it].set_type_info(it, atom->label, atom->pp_type, n_projectors, Coefficient_D_in, n_projectors, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
+//		cout << " cut_mesh=" << cut_mesh << endl;
+			double* beta_r = new double[cut_mesh];
+			ZEROS(beta_r, cut_mesh);
+			for(int ir=0; ir<cut_mesh; ++ir)
+			{
+				beta_r[ir] = atom->betar(p1,ir);
+			}
+
+			tmpBeta_lm[p1].set_NL_proj(
+					atom->label,
+					it, //type
+					lnow, // angular momentum L
+					cut_mesh, // number of radial mesh
+					atom->rab,
+					atom->r, // radial mesh value (a.u.)
+					beta_r,
+					this->kmesh,
+					this->dk,
+					dr_uniform); // delta k mesh in reciprocal space
+
+			delete[] beta_r;
+		}
+		assert(ip1==N_PROJECTORS);
+		this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, N_PROJECTORS, atom->lll, tmpBeta_lm);//zhengdy-soc 2018-09-10
+	}//end if
 
 	delete[] tmpBeta_lm;
 
@@ -455,6 +547,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 	//-------------------------------------------
 	int nproj_allowed = nlmax+1;
 	matrix Coefficient_D_in(nproj_allowed, nproj_allowed);
+	ComplexMatrix Coefficient_D_in_so(nproj_allowed*2, nproj_allowed*2);
 
 //	OUT(ofs_running,"nproj_allowed",nproj_allowed);
 
@@ -584,7 +677,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		}
 	}// end projectors.
 	
-	this->Beta[it].set_type_info(it, label, ps_type, nlmax, Coefficient_D_in, n_projectors, LfromBeta, tmpBeta_lm);
+	this->Beta[it].set_type_info(it, label, ps_type, nlmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, LfromBeta, tmpBeta_lm);
 		
 	ifs.close();
 	delete[] LfromBeta;

@@ -37,7 +37,8 @@ class Use_Overlap_Table
     	const int &I2,
     	const int &l2,
     	const int &m2,
-		const int &n2)const;
+		const int &n2,
+		complex<double> *olm1=NULL)const;
 		
 	//job = 0 for vnl matrix elements
 	//job = 1 for its derivatives
@@ -55,7 +56,9 @@ class Use_Overlap_Table
 		const int &m2,
 		const int &n2,
 		const Vector3<double> &Rnl,
-		const int &type)const;
+		const int &type,
+		complex<double> *nlm1=NULL,
+		const int is=0)const;
 
 	//------------------------------------------------------	
 	// snap_phiVna : Get Matrix Element of <phi0|VnaProj>

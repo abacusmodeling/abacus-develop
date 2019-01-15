@@ -35,7 +35,7 @@ class Gint_k : public Gint_k_init
 	// calculate the matrix elements of Hamiltonian matrix,
 	// < phi_0 | Vl + Vh + Vxc | phi_R> or if the Vna is used,
 	// < phi_0 | delta_Vh + Vxc | phi_R>.
-	void cal_vlocal_k(const double* vrs1, const Grid_Technique &gt);
+	void cal_vlocal_k(const double* vrs1, const Grid_Technique &gt, const int spin=0);
 
 
 	//>>>>>>>>>>>>>>>>>>>>
@@ -57,6 +57,7 @@ class Gint_k : public Gint_k_init
 	// V is (Vl + Vh + Vxc) if no Vna is used,
 	// and is (Vna + delta_Vh + Vxc) if Vna is used.
 	void folding_vl_k(const int &ik);
+	void folding_vl_k_nc(const int &ik);//zhengdy-soc
 
 
 	// folding the < dphi_0 | V | phi_R> matrix to 
@@ -211,7 +212,7 @@ class Gint_k : public Gint_k_init
 	//----------------------------
 	// dimension: [LNNR.nnrg] 
 	// save the < phi_0i | V | phi_Rj > in sparse H matrix.
-	double* pvpR_reduced;
+	double** pvpR_reduced;
 
 
 	//----------------------------
@@ -228,7 +229,8 @@ class Gint_k : public Gint_k_init
 	// dimension: [GridT.lgd, GridT.lgd]	
 	// used only when folding the H matrix.
 	complex<double>** pvp;
-	
+	complex<double>** pvp_nc[4];
+
 	// used only in vlocal.
 	int ik_now;
 	int spin_now;

@@ -321,7 +321,8 @@ void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 		// in LCAO basis.
 		//--------------------------
 		LM.zeros_HSR('H', LNNR.nnr);
-		this->GK.folding_vl_k(ik);
+		if(!NONCOLIN) this->GK.folding_vl_k(ik);
+		else this->GK.folding_vl_k_nc(ik);
 	}
 
 

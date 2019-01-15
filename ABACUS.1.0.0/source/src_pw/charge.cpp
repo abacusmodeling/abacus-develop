@@ -1433,7 +1433,7 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 		else
 		{
 			ofs << "\n  " << NSPIN;
-			if(NSPIN==1)
+			if(NSPIN==1||NSPIN==4)
 			{
 				ofs << "\n " << en.ef << " (fermi energy)";
 			}

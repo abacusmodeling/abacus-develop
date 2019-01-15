@@ -1,6 +1,7 @@
 #include "use_overlap_table.h"
 #include "ylm.h"
 #include "lcao_orbitals.h"
+#include "../src_pw/global.h"
 
 Use_Overlap_Table UOT;
 
@@ -95,11 +96,13 @@ void Use_Overlap_Table::snap_psibeta(
 	const int &m2,
 	const int &N2,
 	const Vector3<double> &R0,// The projector.
-	const int &T0) const
+	const int &T0,
+	complex<double> *nlm1,
+	const int is) const
 {
 	//TITLE ("Use_Overlap_Table","snap_psibeta");
 	//timer::tick ("Use_Overlap_Table","snap_psibeta");
-	
+
 	const int nproj = ORB.nproj[T0];
 	bool *calproj = new bool[nproj];
 	int* rmesh1 = new int[nproj];
@@ -237,11 +240,21 @@ void Use_Overlap_Table::snap_psibeta(
 	double v = 0.0;
 
 	// mohan update 2011-03-07
+	int n_projection =1;
+	if(NONCOLIN) n_projection = ORB.Beta[T0].get_nproj_soc();
+	complex<double> term_a_nc[n_projection], term_b_nc[n_projection];
+	if(NONCOLIN) 
+	{
+		ZEROS(term_a_nc, n_projection);
+		ZEROS(term_b_nc, n_projection);
+	}
+	int ip = -1;
 	for(int nb=0; nb<nproj; nb++)
 	{
 		if( !calproj[nb] ) continue;
 
 		const int L0 = ORB.Beta[T0].getL_Beta(nb);
+		const int next_ip = 2* L0 +1;
 	
 		// <psi1 | Beta>
 		const int Opair1 = this->MOT.NL_Opair(Tpair1, L1, N1, nb); 
@@ -251,6 +264,7 @@ void Use_Overlap_Table::snap_psibeta(
 			
 		for(int m0=0; m0<2*L0+1; m0++)
 		{
+			++ip;
 			int gindex0 = L0*L0+m0;
 			
 			//loop of {lmn}
@@ -420,7 +434,12 @@ void Use_Overlap_Table::snap_psibeta(
 			}// end L of SECOND PART
 		
 		
-		
+			//added by zhengdy-soc, store them for soc case
+			if(NONCOLIN)
+			{
+				term_a_nc[ip] = term_a;
+				term_b_nc[ip] = term_b;
+			}
 		
 		
 		
@@ -434,7 +453,15 @@ void Use_Overlap_Table::snap_psibeta(
 				case 0://calculate the overlap part.
 				{
 					//nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
-					nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+					if(!NONCOLIN) nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+					else if(nlm1!=NULL)
+					{
+							
+					}
+					else
+					{
+						WARNING_QUIT("Use_Overlap_Table::snap_psibeta","something wrong with snap_psibeta.");
+					}
 					break;
 				}
 				case 1: //calculate the derivative part.
@@ -442,7 +469,11 @@ void Use_Overlap_Table::snap_psibeta(
 					for(int jr = 0; jr < 3; jr++) 
 					{
 						//nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
-						nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+						if(!NONCOLIN) nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+						else
+						{
+							
+						}
 					}
 					break;
 				}
@@ -450,6 +481,16 @@ void Use_Overlap_Table::snap_psibeta(
 			}
 		}//!m0
 	}//!L0
+	//zhengdy-soc, calculate non-local term
+	if(NONCOLIN && nlm1!=NULL)
+	for(int p1=0;p1<n_projection;p1++)
+	{
+		for(int p2=0;p2<n_projection;p2++)
+		{
+				nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+		}
+	}
+	
 
 	delete[] calproj;
 	delete[] rmesh1;
@@ -472,7 +513,8 @@ void Use_Overlap_Table::snap_psipsi(
     const int &T2,
     const int &L2,
     const int &m2,
-    const int &N2)const
+    const int &N2,
+	complex<double> *olm1)const
 {
 	//TITLE("Use_Overlap_Table","snap_psipsi");
 	//timer::tick ("Use_Overlap_Table", "snap_psipsi");
@@ -582,8 +624,7 @@ void Use_Overlap_Table::snap_psipsi(
 			if (distance > tiny2)
 			{
 				Interp_Slm = i_exp * Mathzone::Polynomial_Interpolation(
-						MOT.Table_SR[0][dim1][dim2][L],	rmesh, MOT.dr, distance );	
-
+						MOT.Table_SR[0][dim1][dim2][L],	rmesh, MOT.dr, distance );
 				Interp_Slm /= rl;
 			}
 			else // distance = 0.0; 
@@ -622,7 +663,20 @@ void Use_Overlap_Table::snap_psipsi(
 				{
 					case 0: // calculate overlap.
 					{	
-						olm[0] += tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ;
+						if(!NONCOLIN) olm[0] += tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ;
+						else if(olm1!= NULL)
+						{
+							olm1[0] += tmpOlm0 * rly[ MGT.get_lm_index(L,m) ] ;
+							olm1[1] += 0;//tmpOlm0 * (tmp(0,0)+tmp(0,1));
+							olm1[2] += 0;//tmpOlm0 * (tmp(1,0)+tmp(1,1));
+							olm1[3] += tmpOlm0 * rly[ MGT.get_lm_index(L,m) ] ;
+							
+						}
+						else
+						{
+							WARNING_QUIT("Use_Overlap_Table::snap_psipsi","something wrong!");
+							
+						}
 					
 						/*		
 						if( abs ( tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ) > 1.0e-3 )
@@ -701,7 +755,18 @@ void Use_Overlap_Table::snap_psipsi(
 				{
 					case 0:
 					{
-						olm[0] += tmpKem0 * rly[ MGT.get_lm_index(L, m) ];
+						if(!NONCOLIN) olm[0] += tmpKem0 * rly[ MGT.get_lm_index(L, m) ];
+						else if(olm1 != NULL)
+						{
+							olm1[0] += tmpKem0 * rly[ MGT.get_lm_index(L,m) ];
+							olm1[1] += 0;//tmpKem0 * (tmp(0,0)+tmp(0,1));
+							olm1[2] += 0;//tmpKem0 * (tmp(1,0)+tmp(1,1));
+							olm1[3] += tmpKem0 * rly[ MGT.get_lm_index(L,m) ];
+						}
+						else
+						{
+							WARNING_QUIT("Use_Overlap_Table::snap_psipsi","something wrong in T.");
+						}
 						break;
 					}
 					case 1: 
@@ -768,3 +833,4 @@ void Use_Overlap_Table::snap_phiVna(
 	WARNING_QUIT("Use_Overlap_Table::snap_phiVna","not ready yet");
 	return;
 }
+
