@@ -31,6 +31,8 @@ class Force_LCAO : private Force_LCAO_k
 	matrix fcs; 
 	static double force_invalid_threshold_ev; // mohan add 2011-04-17
 
+	matrix stress_vdw;//zhengdy added for vdw-stress-part
+
 	private:
 	
 	//each part of force

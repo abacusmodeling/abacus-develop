@@ -42,7 +42,7 @@ void Stress_LCAO::allocate(void)
 #include "../src_pw/efield.h"
 #include "../src_pw/stress.h"
 // be called in : Local_Orbital_Ions::force_stress
-void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double vnl_dbeta[][3],double vl_dphi[][3])
+void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double vnl_dbeta[][3],double vl_dphi[][3], const matrix& stress_vdw)
 {
     TITLE("Stress_LCAO","start_stress");
 	timer::tick("Stress_LCAO","start_stress",'E');
@@ -139,12 +139,12 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 			+ sigmaxc[i][j]//exchange corretion stress 
                         + sigmahar[i][j];// hartree stress 
 	
-	/*		if(VdwD2::vdwD2)
+			if(VdwD2::vdwD2)
 			{
-				scs(iat,i) += VdwD2::stress_result[iat][i];
+				scs[i][j] += stress_vdw(i , j);
 			}
-			
-			if(EFIELD)
+			//cout<<__FILE__<<__LINE__<<" vdw-test: " << i<<" "<<j<<" "<< stress_vdw(i , j)<<endl;
+	/*		if(EFIELD)
 			{
 				scs(iat, i) = scs(iat, i) + sefield(iat, i);
 			}

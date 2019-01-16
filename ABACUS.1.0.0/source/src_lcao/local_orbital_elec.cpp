@@ -614,11 +614,11 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 						{//added by zhengdy-soc, for non-collinear case
 							for(int is=1;is<4;is++)
 							{
-								for(int ir=0; ir<pw.nrxx; ir    ++)
+								for(int ir=0; ir<pw.nrxx; ir++)
 								{
-									pot.vrs1[ir] = pot.v    rs( is, ir);
+									pot.vrs1[ir] = pot.vrs( is, ir);
 								}
-								UHM.GK.cal_vlocal_k(pot.vrs1    , GridT, is);
+								UHM.GK.cal_vlocal_k(pot.vrs1, GridT, is);
 							}
 						}
 					}

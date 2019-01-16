@@ -23,7 +23,7 @@ public:
 	double energy();
 	
 	static vector< vector<double> > force_result;
-	vector< vector<double> > force();
+	vector< vector<double> > force(matrix &stress_result, const bool stress_for_vdw);
 	
 private:
 	
