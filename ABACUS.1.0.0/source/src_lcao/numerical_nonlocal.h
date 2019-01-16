@@ -39,7 +39,13 @@ public:
 						const { return this->Coefficient_D(L1, L2); }
 	const complex<double>& getCoefficient_D_so(const int& is, const int& L1, const int& L2) 
 						const { return this->Coefficient_D_so(is, L1, L2); }
-	
+	const int& get_index1_soc(const int& is, const int& no)
+						const { return this->index1_soc[is][no]; }
+	const int& get_index2_soc(const int& is, const int& no)
+						const { return this->index2_soc[is][no]; }
+	const int& get_count_soc(const int& is)
+						const { return this->non_zero_count_soc[is]; }
+
 //==========================================================
 // EXPLAIN : set information about Numerical Orbital
 // why double** cannot have const in the front???
@@ -82,6 +88,8 @@ public:
 	int *LfromBeta;
 	int nproj_soc;//demention of D_ij^so
 	ComplexArray Coefficient_D_so;   //(:,:,:),  spin-orbit case,  added by zhengdy-soc
+	int non_zero_count_soc[4];
+	int *index1_soc[4], *index2_soc[4];
 };
 
 #endif

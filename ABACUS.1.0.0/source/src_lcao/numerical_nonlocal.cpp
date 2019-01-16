@@ -13,12 +13,17 @@ Numerical_Nonlocal::Numerical_Nonlocal()
 	this->LfromBeta = new int[1];
 	this->Proj = new Numerical_Nonlocal_Lm[1];
 	this->nproj = -1;
+	//zhengdy-soc, for optimize nonlocal part
+	for(int is=0;is<4;is++) this->index1_soc[is] = new int[1];
+	for(int is=0;is<4;is++) this->index2_soc[is] = new int[1];
 }
 
 Numerical_Nonlocal::~Numerical_Nonlocal()
 {
 	delete[] Proj;
 	delete[] LfromBeta;
+	for(int is=0;is<4;is++) delete[] this->index1_soc[is];
+	for(int is=0;is<4;is++) delete[] this->index2_soc[is];
 }
 
 void Numerical_Nonlocal::set_type_info
@@ -92,7 +97,15 @@ void Numerical_Nonlocal::set_type_info
 	else//zhengdy-soc
 	{
 		this->Coefficient_D_so.create(NSPIN,  nproj_soc+1,  nproj_soc+1);
-		//this->Coefficient_D.create( nproj_soc+1, nproj_soc+1);
+		//optimize
+		for(int is=0;is<4;is++)
+		{
+			this->non_zero_count_soc[is] = 0;
+			delete[] this->index1_soc[is];
+			this->index1_soc[is] = new int[nproj_soc * nproj_soc];
+			delete[] this->index2_soc[is];
+			this->index2_soc[is] = new int[nproj_soc * nproj_soc];
+		}
 		if(lmax_in > -1)
 		{
 			if(LSPINORB)
@@ -107,6 +120,12 @@ void Numerical_Nonlocal::set_type_info
 							for (int L2 = 0; L2 < nproj_soc; L2++)
 							{
 								this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
+								if(fabs(this->Coefficient_D_so(is, L1, L2).real())>eps8 || fabs(this->Coefficient_D_so(is, L1, L2).imag())>eps8)
+								{
+									this->index1_soc[is][non_zero_count_soc[is]] = L1;
+									this->index2_soc[is][non_zero_count_soc[is]] = L2;
+									this->non_zero_count_soc[is]++;	
+								}
 							}
 						}
 						is++;
@@ -124,8 +143,14 @@ void Numerical_Nonlocal::set_type_info
 						{
 							for (int L2 = 0; L2 < nproj_soc; L2++)
 							{
-								if(is==1||is==2) this->Coefficient_D_so(is, L1, L2) = 0.0;
+								if(is==1||is==2) this->Coefficient_D_so(is, L1, L2) = ZERO;
 								else this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
+								if(abs(this->Coefficient_D_so(is, L1, L2).real())>eps8 && abs(this->Coefficient_D_so(is, L1, L2).imag())>eps8)
+								{
+									this->index1_soc[is][non_zero_count_soc[is]] = L1;
+									this->index2_soc[is][non_zero_count_soc[is]] = L2;
+									this->non_zero_count_soc[is]++;	
+								}
 							}
 						}
 						is++;

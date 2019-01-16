@@ -103,6 +103,9 @@ void Use_Overlap_Table::snap_psibeta(
 	//TITLE ("Use_Overlap_Table","snap_psibeta");
 	//timer::tick ("Use_Overlap_Table","snap_psibeta");
 
+	//optimized by zhengdy-soc
+	if(NONCOLIN && ORB.Beta[T0].get_count_soc(is)==0) return;
+
 	const int nproj = ORB.nproj[T0];
 	bool *calproj = new bool[nproj];
 	int* rmesh1 = new int[nproj];
@@ -483,14 +486,21 @@ void Use_Overlap_Table::snap_psibeta(
 	}//!L0
 	//zhengdy-soc, calculate non-local term
 	if(NONCOLIN && nlm1!=NULL)
-	for(int p1=0;p1<n_projection;p1++)
 	{
-		for(int p2=0;p2<n_projection;p2++)
+		/*for(int p1=0;p1<n_projection;p1++)
 		{
+			for(int p2=0;p2<n_projection;p2++)
+			{
 				nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+			}
+		}*/
+		for(int no=0;no<ORB.Beta[T0].get_count_soc(is);no++)
+		{
+			const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
+			const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
+			nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
 		}
 	}
-	
 
 	delete[] calproj;
 	delete[] rmesh1;
