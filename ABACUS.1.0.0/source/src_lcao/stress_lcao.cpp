@@ -125,8 +125,6 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 
 	for(int i=0; i<3; i++)
         {
-	    
-
     	    for (int j=0;j<3;j++)
 	    {
         	scs[i][j] += soverlap[i][j]
@@ -143,7 +141,6 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 			{
 				scs[i][j] += stress_vdw(i , j);
 			}
-			//cout<<__FILE__<<__LINE__<<" vdw-test: " << i<<" "<<j<<" "<< stress_vdw(i , j)<<endl;
 	/*		if(EFIELD)
 			{
 				scs(iat, i) = scs(iat, i) + sefield(iat, i);

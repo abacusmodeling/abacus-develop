@@ -215,7 +215,7 @@ vector< vector<double> > VdwD2::force(matrix &stress_result, const bool stress_f
 									{
 										for(int jpol = 0;jpol<3;jpol++)
 										{
-											stress_result(ipol,jpol) -= tmp_factor* dr[ipol] *dr[jpol]/2 ;
+											stress_result(ipol,jpol) += tmp_factor* dr[ipol] *dr[jpol]/2 ;
 										}
 //										stress_result(ipol,1) += tmp_factor* (tau1.y - tau2.y);
 //										stress_result(ipol,2) += tmp_factor* (tau1.z - tau2.z);
