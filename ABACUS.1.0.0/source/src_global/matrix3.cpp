@@ -112,7 +112,7 @@ Matrix3 operator +(const Matrix3 &m1, const Matrix3 &m2)
 //m1-m2
 Matrix3 operator -(const Matrix3 &m1, const Matrix3 &m2)
 {
-	return Matrix3(m1.e11 + m2.e11,
+	return Matrix3(m1.e11 - m2.e11,				// Zujian Dai fix bug 2019-01-21
 	               m1.e12 - m2.e12,
 	               m1.e13 - m2.e13,
 	               m1.e21 - m2.e21,

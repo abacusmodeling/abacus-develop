@@ -6,11 +6,6 @@ include Makefile.vars
 FFTW_INCLUDE = ${FFTW_DIR}/include
 FFTW_LIB_DIR = ${FFTW_DIR}/lib
 
-
-#BLAS_LAPACK_LIB="${LAPACK_LIB_DIR}/libmkl_scalapack_lp64.a -Wl,--start-group ${LAPACK_LIB_DIR}/libmkl_intel_lp64.a ${LAPACK_LIB_DIR}/libmkl_core.a ${LAPACK_LIB_DIR}/libmkl_sequential.a ${LAPACK_LIB_DIR}/libmkl_blacs_intelmpi_lp64.a -Wl,--end-group -lpthread -lm"
-
-#LIBS = -L${FFTW_LIB_DIR} -lfftw -lm -L${ELPA_LIB_DIR} -lelpa -lifcore -qopenmp "${BLAS_LAPACK_LIB}"
-#LIBS = -L${FFTW_LIB_DIR} -lfftw -lm -L${ELPA_LIB_DIR} -lelpa -lifcore -qopenmp "${BLAS_LAPACK_LIB}"
 LIBS = \
 -lifcore \
 -L${FFTW_LIB_DIR} -lfftw -lm -Wl,-rpath=${FFTW_LIB_DIR} \
@@ -18,7 +13,6 @@ LIBS = \
 -L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR} 
 
 INCLUDE = -I. -Icommands -I${BOOST_DIR} -I${FFTW_INCLUDE} 
-#-I/public/intel2017/impi/2017.1.132/include64 
 
 #==========================
 # OPTIMIZE OPTIONS and boost

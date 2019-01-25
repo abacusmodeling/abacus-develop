@@ -4,14 +4,15 @@
 #include <iomanip>
 #include <cstdio>
 #include <cassert>
-
+#include <cstring>
 #include <cmath>
 #include <cstdlib>
-#include<limits>
+#include <limits>
 
 using namespace std;
 #include "matrix.h"
-#include "lapack_connector.h"
+#include "src_global/lapack_connector.h"
+#include "src_global/global_function.h"
 
 //*********************************************************
 // The init() function is the main initialization routine.
@@ -19,71 +20,83 @@ using namespace std;
 // All constructors call init()
 // ********************************************************
 
-int matrix::mCount = 0;
+//int matrix::mCount = 0;
 
 void matrixAlloc()
 {
-	cout << "\n Allocation error for Matrix " << endl;
-	abort();
+	WARNING_QUIT("matrix","Allocation error for Matrix");
 }
 
-void matrix::init(const int nrows,const int ncols)
+matrix::matrix( const int nrows, const int ncols, const bool flag_zero )
+	:nr(nrows),
+	 nc(ncols),
+	 c(nullptr)
 {
-	nr = nrows;
-	nc = ncols;
-	c = NULL;
-//	hermetian = 0;
-	
-	if(nr*nc == 0) c = NULL;
-	else
+	if( nr && nc )
 	{
 		auto handler_old = set_new_handler(matrixAlloc);
-		c = new double[nrows*ncols]();
+		c = new double[nr*nc];
 		set_new_handler(handler_old);
-		
-		this->zero_out();
-		assert(c!=0);// terminate if memory not allocated
+		if(flag_zero)	this->zero_out();
 	}
-
-	mCount++;
 }
 
-// Free up memory for matrix
-void matrix::freemem(void)
+matrix::matrix( const matrix &m_in )
+	:nr(m_in.nr),
+	 nc(m_in.nc),
+	 c(nullptr)
 {
-	if(c)					// Peize Lin add 2016-08-05
+	if( nr && nc )
 	{
-		delete [] c;
-		c = NULL;
+		auto handler_old = set_new_handler(matrixAlloc);
+		c = new double[nr*nc];
+		set_new_handler(handler_old);
+		memcpy( c, m_in.c, nr*nc*sizeof(double) );
 	}
-}
-
-// constructor with sizes
-matrix::matrix(const int nrows,const int ncols)
-{
-	this->init(nrows, ncols);
-}
-
-//******************
-//
-// Copy constructor
-//
-//******************
-matrix::matrix(const matrix &m1)
-{
-	init(m1.nr, m1.nc);
-	//hermetian = m1.hermetian;
-	// Copy over m1 contents
-	for (int i = 0; i < nr*nc; i++) c[i] = m1.c[i];
 }
 
 // Peize Lin add 2016-08-05
-matrix::matrix( matrix && m1 )
+matrix::matrix( matrix && m_in )
+	:nr(m_in.nr),
+	 nc(m_in.nc)
 {
-	nr=m1.nr; nc=m1.nc;
-	c=m1.c;
-	m1.init(1,1);
+	c = m_in.c;
+	m_in.nr = m_in.nc = 0;
+	m_in.c = nullptr;
 }
+
+// Peize Lin change 2018-07-02
+matrix& matrix::operator=( const matrix & m_in )
+{
+	this->create( m_in.nr, m_in.nc, false );
+	memcpy( c, m_in.c, nr*nc*sizeof(double) );
+	return *this;
+}
+
+// Peize Lin add 2016-08-05
+matrix& matrix::operator=( matrix && m_in )
+{
+	nr = m_in.nr;		nc = m_in.nc;
+	if(c)	delete[] c;
+	c = m_in.c;
+	m_in.nr = m_in.nc = 0;
+	m_in.c = nullptr;
+	return *this;
+}
+
+/*
+double & matrix::operator()(const int ir,const int ic)
+{
+	assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+	return c[ir*nc+ic];
+}
+
+const double & matrix::operator()(const int ir,const int ic) const
+{
+	assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+	return c[ir*nc+ic];
+}
+*/
 
 //*************
 //
@@ -92,38 +105,50 @@ matrix::matrix( matrix && m1 )
 //*************
 matrix::~matrix()
 {
-	this->freemem();
+	if(c)					// Peize Lin add 2016-08-05
+	{
+		delete [] c;
+		c = nullptr;
+	}
 }
 
 //******************************
 // reallocate memory for matrix
 //******************************
-void matrix::create(const int nrow,const int ncol)
+// Peize Lin change 2018-07-29
+void matrix::create( const int nrow, const int ncol, const bool flag_zero )
 {
-	delete [] c;
-	nr = nrow;
-	nc = ncol;
-	c = new double[nr * nc];
-	zero_out();				// Peize Lin change 2018-03-12
-}
-
-// Peize Lin change 2018-03-12
-matrix& matrix::operator=( const matrix & m1 )
-{
-	if( nr*nc != m1.nr*m1.nc )
-		this->create( m1.nr, m1.nc );
-	for( int i=0; i<nr*nc; ++i ) 
-		this->c[i] = m1.c[i];
-	return *this;
-}
-
-// Peize Lin add 2016-08-05
-matrix& matrix::operator=( matrix && m1 )
-{
-	nr = m1.nr;		nc = m1.nc;
-	delete[] c;		c  = m1.c;
-	m1.init(1,1);
-	return *this;
+	if( nrow && ncol )
+	{
+		if(c)
+		{
+			const int size=nrow*ncol;
+			if( size!=nr*nc )
+			{
+				delete[] c;
+				auto handler_old = set_new_handler(matrixAlloc);			
+				c = new double[size];
+				set_new_handler(handler_old);
+			}
+		}
+		else
+		{
+			auto handler_old = set_new_handler(matrixAlloc);
+			c = new double[nrow * ncol];
+			set_new_handler(handler_old);
+		}			
+			
+		nr = nrow;
+		nc = ncol;
+		if(flag_zero)	zero_out();				// Peize Lin change 2018-03-12
+	}
+	else
+	{
+		if(c)	delete[] c;
+		c = nullptr;
+		nr = nrow;
+		nc = ncol;
+	}
 }
 
 /* Adding matrices, as a friend */
@@ -133,7 +158,9 @@ matrix operator+(const matrix &m1, const matrix &m2)
 	assert(m2.nc == m2.nc);
 
 	matrix tm(m1);
-	for (int i = 0; i < m1.nr*m1.nc; i++) tm.c[i] += m2.c[i];
+	const int size = m1.nr*m1.nc;
+	for (int i = 0; i < size; i++) 
+		tm.c[i] += m2.c[i];
 	return tm;
 }
 
@@ -144,7 +171,9 @@ matrix operator-(const matrix &m1, const matrix &m2)
 	assert(m2.nc == m2.nc);
 
 	matrix tm(m1);
-	for(int i = 0; i < m1.nr*m1.nc; i++) tm.c[i] -= m2.c[i];
+	const int size = m1.nr*m1.nc;
+	for(int i = 0; i < size; i++) 
+		tm.c[i] -= m2.c[i];
 	return tm;
 }
 
@@ -159,26 +188,21 @@ matrix operator*(const matrix &m1, const matrix &m2)
 	assert(m1.nc == m2.nr);
 	
     // allocate the result and zero it out
-    matrix mprod(m1.nr, m2.nc);
+    matrix mprod( m1.nr, m2.nc, false );
 
     // do the multiply and return
 //    for (int i = 0;i < m1.nr;i++)
-//    {
 //        for (int j = 0;j < m2.nc;j++)
-//        {
 //            for (int k = 0;k < m1.nc;k++)
-//            {
 //                //mprod(i, j) += m2(i, k) * m1(k, j);
 //                mprod(i, j) += m1(i, k) * m2(k, j);
-//            }
-//        }
-//    }
 	
 	// Peize Lin accelerate 2017-10-27
-	LapackConnector::gemm('N', 'N', m1.nr, m2.nc, m1.nc,
+	LapackConnector::gemm(
+		'N', 'N', 
+		m1.nr, m2.nc, m1.nc,
 		1, m1.c, m1.nc, m2.c, m2.nc, 
 		0, mprod.c, mprod.nc);
-
 	return mprod;
 }
 
@@ -186,7 +210,9 @@ matrix operator*(const matrix &m1, const matrix &m2)
 matrix operator*(const double &s, const matrix &m)
 {
 	matrix sm(m);
-	for (int i = 0; i < m.nr*m.nc; i++) sm.c[i] *= s;
+	const int size=m.nr*m.nc;
+	for (int i = 0; i < size; i++) 
+		sm.c[i] *= s;
 	return sm;
 }
 
@@ -194,61 +220,58 @@ matrix operator*(const double &s, const matrix &m)
 matrix operator*(const matrix &m,const double &s)
 {
 	matrix sm(m);
-	for (int i = 0; i < m.nr*m.nc; i++)sm.c[i] *= s;
+	const int size=m.nr*m.nc;
+	for (int i = 0; i < size; i++)
+		sm.c[i] *= s;
 	return sm;
 }
 
 /* Scale a matrix in place */
 void matrix::operator*=(const double &s)
 {
-	for (int i = 0; i < nc*nr; i++) c[i] *= s;
+	const int size=nc*nr;
+	for (int i = 0; i < size; i++) 
+		c[i] *= s;
 }
 
 /* Accumulate to a matrix in place */
 void matrix::operator+=(const matrix & m)
 {
-	if (nr != m.nr || nc != m.nc)
-	{
-		cout << " void matrix::operator+=(const matrix &m) has size mismatch\n";
-		abort();
-	}
-	for (int i = 0; i < nc*nr; i++) c[i] += m.c[i];
+	assert( nr==m.nr );
+	assert( nc==m.nc );
+	const int size=nc*nr;
+	const double * const c_in = m.c;
+	for( int i = 0; i < size; ++i ) 
+		c[i] += c_in[i];
 }
 
 
 /* decumulate to a matrix in place */
 void matrix::operator-=(const matrix & m)
 {
-	if (nr != m.nr || nc != m.nc)
-	{
-		cout << "void matrix::operator-=(const matrix &m) has size mismatch\n";
-		abort();
-	}
-	for (int i = 0; i < nc*nr; i++) c[i] -= m.c[i];
+	assert( nr==m.nr );
+	assert( nc==m.nc );
+	const int size=nc*nr;
+	const double * const c_in = m.c;
+	for( int i = 0; i < size; ++i ) 
+		c[i] -= c_in[i];
 }
 
 /* zero out the matrix */
 void matrix::zero_out(void)
 {
-	for(int i = 0; i < nr*nc; i++)
-	{
+	const int size = nr*nc;
+	for(int i = 0; i < size; i++)
 		c[i] = 0.0;
-	}
-	return;
 }
 
 
-matrix transpose(matrix m)
+matrix transpose(const matrix &m)
 {
-	matrix tm(m.nc, m.nr);
-
+	matrix tm( m.nc, m.nr, false );
 	for (int i = 0;i < m.nr;i++)
-	{
 		for (int j = 0;j < m.nc;j++)
-		{
 			tm(j, i) = m(i, j);
-		}
-	}
 	return tm;
 }
 
@@ -305,12 +328,8 @@ double trace_on(const matrix &A, const matrix &B)
 {
     double tr = 0.0;
     for (int i = 0; i < A.nr; ++i)
-    {
         for (int k = 0; k < A.nc; ++k)
-        {
             tr += A(i,k) * B(k, i);
-        }
-    }
     return tr;
 }
 
@@ -318,34 +337,12 @@ double mdot(const matrix &A, const matrix &B)
 {
     assert (A.nr == B.nr);
     assert (A.nc == B.nc);
-    int size = A.nr * A.nc;
+    const int size = A.nr * A.nc;
 
     double sum = 0.0;
     for (int i = 0; i < size; ++i)
-    {
         sum += A.c[i] * B.c[i];
-    }
     return sum;
-}
-
-// Peize Lin add 2016-09-08
-double max( const matrix & m )
-{
-	double value = std::numeric_limits<double>::min();
-	for( int ir=0; ir!=m.nr; ++ir )
-		for( int ic=0; ic!=m.nc; ++ic )
-			value = std::max( value, m(ir,ic) );
-	return value;
-}
-
-// Peize Lin add 2016-09-08
-double min( const matrix & m )
-{
-	double value = std::numeric_limits<double>::max();
-	for( int ir=0; ir!=m.nr; ++ir )
-		for( int ic=0; ic!=m.nc; ++ic )
-			value = std::min( value, m(ir,ic) );
-	return value;
 }
 
 // Peize Lin add 2016-09-08
@@ -358,4 +355,39 @@ std::ostream & operator<<( std::ostream & os, const matrix & m )
 		os<<std::endl;
 	}	
 	return os;
+}
+
+// Peize Lin add 2016-09-08
+double matrix::max() const
+{
+	double value = std::numeric_limits<double>::min();
+	const int size = nr * nc;
+	for( int i=0; i<size; ++i )
+		value = std::max( value, c[i] );
+	return value;
+}
+
+// Peize Lin add 2016-09-08
+double matrix::min() const
+{
+	double value = std::numeric_limits<double>::max();
+	const int size = nr * nc;
+	for( int i=0; i<size; ++i )
+		value = std::min( value, c[i] );
+	return value;
+}
+
+// Peize Lin add 2018-07-02
+double matrix::absmax() const
+{
+	double value = std::numeric_limits<double>::min();
+	const int size = nr * nc;
+	for( int i=0; i<size; ++i )
+		value = std::max( value, std::abs(c[i]) );
+	return value;
+}
+
+double matrix::norm() const
+{
+	return LapackConnector::nrm2(nr*nc,c,1);
 }

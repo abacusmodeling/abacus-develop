@@ -347,7 +347,8 @@ cout << " number of projectros " << N_PROJECTORS << endl;
 			delete[] beta_r;
 				
 		}
-
+		
+		WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		// Peize Lin add 2019-01-23
 		this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
 	}
 	else//added by zhengdy-soc

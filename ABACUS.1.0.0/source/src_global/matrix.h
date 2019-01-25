@@ -1,11 +1,16 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+// Peize Lin update 2018-07-29
+
 #ifdef _MCD_CHECK
 #include "src_parallel/mcd.h"
 #endif
 
 #include<ostream>
+#include<cassert>
+
+#include<fstream>// test
 
 class matrix
 {
@@ -14,33 +19,33 @@ public:
 	double *c;    /* Holds the data */
 	int nr;
 	int nc;   /* Number of rows and columns */
-	int hermetian;
-	static int mCount;
 
 	/* Constructors and destructor */
-	matrix(const int nrows = 1,const int ncols = 1);
-	matrix(const matrix &m1); /* copy constructor */
+	matrix(): nr(0), nc(0), c(nullptr){}
+	matrix( const int nrows, const int ncols, const bool flag_zero=true );		// Peize Lin add flag_zero 2018-07-02
+	matrix( const matrix &m1 ); /* copy constructor */
 	matrix( matrix && m1 );			// Peize Lin add 2016-08-05
 	~matrix();
 
-	void create(const int nrow,const int ncol);
+	void create( const int nrow, const int ncol, const bool flag_zero=true );			// Peize Lin add flag_zero 2018-07-02
 	matrix& operator=(const matrix &m1); // Peize Lin change 2018-03-12
 	matrix& operator=( matrix && m1 );	// Peize Lin add 2016-08-05
 
-	inline double &operator()(const int &ir,const int &ic)
-	{ return c[nc*ir + ic]; }
+	double &operator()(const int ir,const int ic)
+	{
+//		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+		return c[ir*nc+ic];
+	}
 
-	inline const double &operator()(const int ir,const int ic)const
-	{ return c[nc*ir + ic]; }
+	const double &operator()(const int ir,const int ic) const
+	{
+//		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+		return c[ir*nc+ic];
+	}
 
 //	inline double &operator()(int i,int j) const
 //	    { return c[nc*i+j]; }
 
-	friend matrix operator+(const matrix &m1, const matrix &m2);
-	friend matrix operator-(const matrix &m1, const matrix &m2);
-	friend matrix operator*(const matrix &m1, const matrix &m2);
-	friend matrix operator*(const double &s, const matrix &m);
-	friend matrix operator*(const matrix &m, const double &s);
 	void operator*=(const double &s);
 	void operator+=(const matrix &m);
 	void operator-=(const matrix &m);
@@ -53,35 +58,31 @@ public:
 	// mohan add 2011-01-13
 	double trace_on(void) const;
 
-	/* Does the memory allocations of the constructor */
-	void init(int nrows, int ncols);
-
-	/* Free up memory */
-	void freemem(void);
-
 	/* zero out all the entries */
 	void zero_out(void);
 
-	// mohan add 2011-01-13
-	void get_extreme_eigen_values(double &ev_lower, double &ev_upper) const;
-	
-	// Peize Lin add 2017-05-27
-	void reshape( const double nr_new, const double nc_new );
+	void get_extreme_eigen_values(double &ev_lower, double &ev_upper) const;	// mohan add 2011-01-13
+
+	void reshape( const double nr_new, const double nc_new );		// Peize Lin add 2017-05-27
+
+	double max() const;					// Peize Lin add 2016-09-08
+	double min() const;					// Peize Lin add 2016-09-08
+	double absmax() const;				// Peize Lin add 2018-07-02
+
+	double norm() const;				// Peize Lin add 2018-08-12
 };
 
-matrix transpose(matrix m);
 
-// mohan add 2011-01-13
-double trace_on(const matrix &A, const matrix &B);
+matrix operator+(const matrix &m1, const matrix &m2);
+matrix operator-(const matrix &m1, const matrix &m2);
+matrix operator*(const matrix &m1, const matrix &m2);
+matrix operator*(const double &s, const matrix &m);
+matrix operator*(const matrix &m, const double &s);
 
-// mohan add 2011-01-13
-double mdot(const matrix &A, const matrix &B);
+matrix transpose(const matrix &m);
+double trace_on(const matrix &A, const matrix &B);		// mohan add 2011-01-13
+double mdot(const matrix &A, const matrix &B);			// mohan add 2011-01-13
 
-// Peize Lin add 2016-09-08
-double max( const matrix & m );
-double min( const matrix & m );
-
-// Peize Lin add 2016-09-08
-std::ostream & operator<<( std::ostream & os, const matrix & m );
+std::ostream & operator<<( std::ostream & os, const matrix & m );		// Peize Lin add 2016-09-08
 
 #endif // MATRIX_H

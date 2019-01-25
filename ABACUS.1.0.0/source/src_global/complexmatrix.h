@@ -1,6 +1,7 @@
 //==========================================================
 // Author : Lixin He, Mohan Chen
-// Last Update : 2009-3-8
+// Update : Peize Lin
+// Last Update : 2018-09-04
 //==========================================================
 #ifndef COMPLEXMATRIX_H
 #define COMPLEXMATRIX_H
@@ -24,64 +25,55 @@ public:
 	int nc;
 	int size;
 
-	//==============
-	// Constructors
-	//==============
-	ComplexMatrix(const int nrows = 1,const int ncols = 1);
-
-	//===================
-	// Copy constructor
-	//==================
+	ComplexMatrix(): nr(0), nc(0), size(0), c(nullptr){}
+	ComplexMatrix(const int nrows,const int ncols);
 	ComplexMatrix(const ComplexMatrix &m1);
-	ComplexMatrix(ComplexMatrix && m1);					// Peize Lin add 2016-08-05
+	ComplexMatrix(ComplexMatrix && m1);						// Peize Lin add 2016-08-05
 	ComplexMatrix(const matrix &m);							// Peize Lin add 2017-03-29
 	~ComplexMatrix();
+	
+	void create(const int nrow,const int ncol);
+	ComplexMatrix& operator=(const ComplexMatrix &m);
+	ComplexMatrix& operator=(ComplexMatrix && m);			// Peize Lin add 2016-08-05
 
 	//============
 	// Operators
 	//============
-	complex<double> &operator()(const int i,const int j)
+	complex<double> &operator()(const int ir,const int ic)
 	{
-		return c[nc * i + j];//mohan modify in-line 2007-10-1
+		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+		return c[ir*nc+ic];//mohan modify in-line 2007-10-1
 	}
-	const complex<double> &operator()(const int i,const int j)const
+	const complex<double> &operator()(const int ir,const int ic)const
 	{
-		return c[nc * i + j];//mohan modify in-line 2007-10-13
+		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+		return c[ir*nc+ic];//mohan modify in-line 2007-10-13
 	}
-
-	friend ComplexMatrix operator+(const ComplexMatrix &m1,  const ComplexMatrix &m2);
-	friend ComplexMatrix operator-(const ComplexMatrix &m1,  const ComplexMatrix &m2);
-	friend ComplexMatrix operator*(const ComplexMatrix &m1,  const ComplexMatrix &m2);
-	friend ComplexMatrix operator*(const complex<double> &s, const ComplexMatrix &m);
-	friend ComplexMatrix operator*(const ComplexMatrix &m,   const complex<double> &s);
-	friend ComplexMatrix operator*(const double &s,          const ComplexMatrix &m);
-	friend ComplexMatrix operator*(const ComplexMatrix &m,   const double &s);
-	ComplexMatrix& operator=(const ComplexMatrix &m);
-	ComplexMatrix& operator=(ComplexMatrix && m);			// Peize Lin add 2016-08-05
+	
 	ComplexMatrix& operator*=(const complex<double> &s);
 	ComplexMatrix& operator+=(const ComplexMatrix &m);
 	ComplexMatrix& operator-=(const ComplexMatrix &m);
-	matrix real();						// Peize Lin add 2017-03-29
+	matrix real() const;						// Peize Lin add 2017-03-29
 	
 	//==================
 	// member function:
 	//==================
-	void create(const int nrow,const int ncol);
 	void zero_out(void);
-	static int& getMCount(void){return mCount;}
 	void set_as_identity_matrix(void);
-private:
-
-	static int mCount;
-	void freemem(void);//mohan add 2007-11-20
-	void init(const int nrows,const int ncols);
 };
 
+ComplexMatrix operator+(const ComplexMatrix &m1,  const ComplexMatrix &m2);
+ComplexMatrix operator-(const ComplexMatrix &m1,  const ComplexMatrix &m2);
+ComplexMatrix operator*(const ComplexMatrix &m1,  const ComplexMatrix &m2);
+ComplexMatrix operator*(const complex<double> &s, const ComplexMatrix &m);
+ComplexMatrix operator*(const ComplexMatrix &m,   const complex<double> &s);
+ComplexMatrix operator*(const double &s,          const ComplexMatrix &m);
+ComplexMatrix operator*(const ComplexMatrix &m,   const double &s);
+	
 complex<double> trace(const ComplexMatrix &m);
-// mohan add 2008-7-1
-double abs2_row(const ComplexMatrix &m,const int ir);
-// mohan add 2008-7-1
-double abs2_column(const ComplexMatrix &m,const int ic);
+
+double abs2_row(const ComplexMatrix &m,const int ir);		// mohan add 2008-7-1
+double abs2_column(const ComplexMatrix &m,const int ic);	// mohan add 2008-7-1
 double abs2(const ComplexMatrix &m);
 double abs2(const int nmat, ComplexMatrix **m);
 

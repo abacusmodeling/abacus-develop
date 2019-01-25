@@ -6,17 +6,23 @@
 #include <cassert>
 #include <new>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include "complexmatrix.h"
 #include "lapack_connector.h"
 
-int ComplexMatrix::mCount = 0;
-
 // constructor with sizes
 ComplexMatrix::ComplexMatrix(int nrows, int ncols)
+	:nr(nrows),
+	 nc(ncols),
+	 size(nrows*ncols),
+	 c(nullptr)
 {
-	this->init(nrows, ncols);
-	++mCount;
+	if( size )
+	{
+		c = new complex<double>[size];
+		zero_out();
+	}
 }
 
 // zero out the ComplexMatrix
@@ -33,61 +39,88 @@ void need_more_memory()
 }
 */
 
-void ComplexMatrix::init(const int nrows,const int ncols)
-{
-	this->nr = nrows;
-	this->nc = ncols;
-	this->size = nr * nc;
-//	std::set_new_handler( need_more_memory );
-	this->c = new complex<double>[size];
-	assert(c != 0);
-	this->zero_out();
-}//mohan the principle:as simple as possible:modify inline 2007-10-13
-
 // Copy constructor
 ComplexMatrix::ComplexMatrix(const ComplexMatrix &m1)
+	:nr(m1.nr),
+	 nc(m1.nc),
+	 size(m1.size),
+	 c(nullptr)
 {
-	this->init(m1.nr, m1.nc);
-	++mCount;
-	for(int i=0; i<this->size; i++) c[i] = m1.c[i];
+	if(size)
+	{
+		c = new complex<double>[size];
+		memcpy( c, m1.c, size*sizeof(complex<double>) );
+	}
 }
 
 // Peize Lin add 2016-08-05
 ComplexMatrix::ComplexMatrix( ComplexMatrix && m1 )
+	:nr(m1.nr),
+	 nc(m1.nc),
+	 size(m1.size),
+	 c(m1.c)
 {
-	nr=m1.nr; nc=m1.nc;
-	c=m1.c;
-	m1.init(1,1);
+	m1.nr = m1.nc = m1.size = 0;
+	m1.c = nullptr;
 }
 
 // Peize Lin add 2017-03-29
 ComplexMatrix::ComplexMatrix(const matrix &m)
+	:nr(m.nr),
+	 nc(m.nc),
+	 size(m.nr*m.nc),
+	 c(nullptr)
 {
-	this->init(m.nr,m.nc);
-	++mCount;
-	for( int i=0; i<this->size; ++i) c[i] = m.c[i];
+	if( size )
+	{
+		c = new complex<double>[size];
+		for( int i=0; i<size; ++i)
+			c[i] = m.c[i];
+	}
 }
 
 // deconstructor
 ComplexMatrix::~ComplexMatrix()
 {
-	this->freemem();
-}
-
-// Free up memory for ComplexMatrix
-void ComplexMatrix::freemem(void)
-{
-	delete[] c;
-	c = NULL;
+	if(c)
+	{
+		delete[] c;
+		c = nullptr;
+	}
 }
 
 // reallocate memory for Complex Matrix
-void ComplexMatrix::create(const int nrow,const int ncol)
+void ComplexMatrix::create(const int nr_in,const int nc_in)
 {
-	// because c has been 'new' in  init function.
-	delete[] c;
-	this->init(nrow, ncol);
-	return;
+	if( nr_in && nc_in )
+	{
+		if(c)
+		{
+			const int size_in=nr_in*nc_in;
+			if( size_in!=nr*nc )
+			{
+				delete[] c;
+				c = new complex<double>[size_in];
+			}
+		}
+		else
+		{
+			c = new complex<double>[nr_in * nc_in];
+		}
+
+		nr = nr_in;
+		nc = nc_in;
+		size = nr*nc;
+		zero_out();
+	}
+	else
+	{
+		if(c)	delete[] c;
+		c = nullptr;
+		nr = nr_in;
+		nc = nc_in;
+		size = nr*nc;
+	}
 }
 
 void ComplexMatrix::set_as_identity_matrix()
@@ -96,24 +129,30 @@ void ComplexMatrix::set_as_identity_matrix()
 	{
 		for(int j=0; j<nc; j++)
 		{
-			if(i==j) c[nc * i + j] = complex<double>(1.0, 0.0);  
-			else c[nc * i + j] = complex<double>(0.0, 0.0); 
+			if(i==j) c[nc * i + j] = complex<double>(1.0, 0.0);
+			else c[nc * i + j] = complex<double>(0.0, 0.0);
 		}
 	}
 	return;
 }
 
-// Adding matrices, as a friend 
+// Adding matrices, as a friend
 ComplexMatrix operator+(const ComplexMatrix &m1, const ComplexMatrix &m2)
 {
+	assert(m1.nr == m2.nr);
+	assert(m2.nc == m2.nc);
+	
 	ComplexMatrix tm(m1);
 	tm+=m2;
 	return tm;
 }
 
-// Subtracting matrices, as a friend 
+// Subtracting matrices, as a friend
 ComplexMatrix operator-(const ComplexMatrix &m1, const ComplexMatrix &m2)
 {
+	assert(m1.nr == m2.nr);
+	assert(m2.nc == m2.nc);
+	
 	ComplexMatrix tm(m1);
 	tm-=m2;
 	return tm;
@@ -141,7 +180,7 @@ ComplexMatrix operator*(const ComplexMatrix &m1, const ComplexMatrix &m2)
 //	}
 	// Peize Lin accelerate 2017-10-27
 	LapackConnector::gemm('N', 'N', m1.nr, m2.nc, m1.nc,
-		1, m1.c, m1.nc, m2.c, m2.nc, 
+		1, m1.c, m1.nc, m2.c, m2.nc,
 		0, mprod.c, mprod.nc);
 	return mprod;
 }
@@ -178,28 +217,19 @@ ComplexMatrix operator*(const ComplexMatrix &m,const double &r)
 
 ComplexMatrix& ComplexMatrix::operator=(const ComplexMatrix &m)
 {
-	if(m.nr!=this->nr || m.nc!=this->nc)
-	{
-		cout << "\n row/col number can't match in ComplexMatrix '=' operator\n";
-		cout << " this nr = " << this->nr;
-		cout << " this nc = " << this->nc;
-		cout << " in nr = " << m.nr;
-		cout << " in nc = " << m.nc;
-		exit(0);
-	}
-	else {
-		this->create(m.nr, m.nc);
-	}
-	for(int i=0;i<this->size;i++) c[i] = m.c[i];
+	this->create(m.nr, m.nc);
+	memcpy( c, m.c, size*sizeof(complex<double>) );
 	return *this;
 }
 
 // Peize Lin add 2016-08-05
 ComplexMatrix& ComplexMatrix::operator=( ComplexMatrix && m )
 {
-	nr = m.nr;		nc = m.nc;
-	delete[] c;		c  = m.c;
-	m.init(1,1);
+	nr = m.nr;		nc = m.nc;		size = m.size;
+	if(c)	delete[] c;		
+	c  = m.c;
+	m.nr = m.nc = m.size = 0;
+	m.c = nullptr;
 	return *this;
 }
 
@@ -224,12 +254,13 @@ ComplexMatrix& ComplexMatrix::operator-=(const ComplexMatrix &m)
 }
 
 // Peize Lin add 2017-03-29
-matrix ComplexMatrix::real()
+matrix ComplexMatrix::real() const
 {
-	matrix m(nr,nc);
+	matrix m(nr,nc,false);
 	for( int i=0; i<this->size; ++i) m.c[i] = c[i].real();
 	return m;
 }
+
 // Returns trace of ComplexMatrix
 complex<double> trace(const ComplexMatrix &m)
 {
@@ -332,7 +363,7 @@ double abs2(const ComplexMatrix &m)
 {
 	double r=0.0;
 	complex<double> z;
-	
+
 	for (int i = 0;i < m.size;i++)
 	{
 		z = m.c[i];

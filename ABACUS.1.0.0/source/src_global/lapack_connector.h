@@ -22,6 +22,7 @@
 #include <cassert>
 #include "complexmatrix.h"
 #include "matrix.h"
+#include "src_global/global_function.h"
 
 
 extern "C"
@@ -71,7 +72,7 @@ extern "C"
     // mohan add zpotrf and zpotri 2010-02-03, to compute inverse complex hermit matrix.
     void zpotrf_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
     void zpotri_(const char* uplo,const int* n,const complex<double> *A,const int* lda,const int* info);
-     void zgetrf_(const int* m, const int *n, const complex<double> *A, const int *lda, int *ipiv, const int* info);
+    void zgetrf_(const int* m, const int *n, const complex<double> *A, const int *lda, int *ipiv, const int* info);
     void zgetri_(const int* n, complex<double> *A, const int *lda, int *ipiv, complex<double> *work, int *lwork, const int *info);
     void pdgetrf_(const int *m, const int *n, double *a, const int *ia, const int *ja, int *desca, int *ipiv, int *info);
 
@@ -98,6 +99,10 @@ extern "C"
 	void zgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
 		const complex<double> *alpha, const complex<double> *a, const int *lda, const complex<double> *b, const int *ldb, 
 		const complex<double> *beta, complex<double> *c, const int *ldc);
+	// Peize Lin add ?nrm2 2018-06-12, to compute out = ||x||_2 = \sqrt{ \sum_i x_i**2 }
+	float snrm2_( const int *N, const float *X, const int *incX );
+	double dnrm2_( const int *N, const double *X, const int *incX );
+	double dznrm2_( const int *N, const complex<double> *X, const int *incX );
 };
 
 // Class LapackConnector provide the connector to fortran lapack routine.
@@ -306,8 +311,8 @@ public:
 		dsyev_(&jobz, &uplo_changed, &a.nr, a.c, &a.nr, w, &work_tmp, &minus_one, &info);		// get best lwork
 		
 		const int lwork = work_tmp;
-		double work[std::max(1,lwork)];
-		dsyev_(&jobz, &uplo_changed, &a.nr, a.c, &a.nr, w, work, &lwork, &info);		
+		vector<double> work(std::max(1,lwork));
+		dsyev_(&jobz, &uplo_changed, &a.nr, a.c, &a.nr, w, VECTOR_TO_PTR(work), &lwork, &info);		
 	}
     // wrap function of fortran lapack routine zheev.
     static inline
@@ -516,7 +521,7 @@ public:
 	// Peize Lin add 2016-08-04
 	// x=a*x
 	static inline 
-	void scal( const int N,  const float alpha, float *X, const int incX)
+	void scal( const int N, const float alpha, float *X, const int incX)
 	{
 		sscal_(&N, &alpha, X, &incX);
 	}	
@@ -549,14 +554,14 @@ public:
 		return ddot_(&N, X, &incX, Y, &incY);
 	}
 	
-	// Peize Lin add 2017-10-27
+	// Peize Lin add 2017-10-27, fix bug trans 2019-01-17
 	// C = a * A.? * B.? + b * C 
 	static inline
 	void gemm(const char transa, const char transb, const int m, const int n, const int k,
 		const float alpha, const float *a, const int lda, const float *b, const int ldb, 
 		const float beta, float *c, const int ldc)
 	{
-		sgemm_(&transa, &transb, &n, &m, &k,
+		sgemm_(&transb, &transa, &n, &m, &k,
 			&alpha, b, &ldb, a, &lda, 
 			&beta, c, &ldc);
 	}
@@ -565,7 +570,7 @@ public:
 		const double alpha, const double *a, const int lda, const double *b, const int ldb, 
 		const double beta, double *c, const int ldc)
 	{
-		dgemm_(&transa, &transb, &n, &m, &k,
+		dgemm_(&transb, &transa, &n, &m, &k,
 			&alpha, b, &ldb, a, &lda, 
 			&beta, c, &ldc);
 	}
@@ -574,9 +579,27 @@ public:
 		const complex<double> alpha, const complex<double> *a, const int lda, const complex<double> *b, const int ldb, 
 		const complex<double> beta, complex<double> *c, const int ldc)
 	{
-		zgemm_(&transa, &transb, &n, &m, &k,
+		zgemm_(&transb, &transa, &n, &m, &k,
 			&alpha, b, &ldb, a, &lda, 
 			&beta, c, &ldc);
+	}
+
+	// Peize Lin add 2018-06-12
+	// out = ||x||_2
+	static inline
+	float nrm2( const int N, const float *X, const int incX )
+	{
+		return snrm2_( &N, X, &incX );
+	}
+	static inline
+	double nrm2( const int N, const double *X, const int incX )
+	{
+		return dnrm2_( &N, X, &incX );
+	}
+	static inline
+	double nrm2( const int N, const complex<double> *X, const int incX )
+	{
+		return dznrm2_( &N, X, &incX );
 	}
 
 };
