@@ -16,7 +16,7 @@ Local_Orbital_Charge::Local_Orbital_Charge()
 	this->init_DM_R = false;
 	out_dm = 0;
 	//xiaohui add 2014-06-19
-	//local_band = new int[1];
+	//band_local = new int[1];
 	//Z_wg = new double[1];
 	//Z_LOC = new double[1];
 }
@@ -117,7 +117,6 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 	{
 		WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
 	}
-
 	return;
 }
 
@@ -242,7 +241,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 	{
 		WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
 	}
-	 return;
+	return;
 }
 
 void Local_Orbital_Charge::sum_bands(void)
@@ -354,7 +353,7 @@ void Local_Orbital_Charge::sum_bands(void)
 		NOTE("Calculate the density matrix!");
 		this->cal_dk_k( GridT );
 	} //xiaohui add 2013-09-02. Attention...
-	 
+			
 	for(int is=0; is<NSPIN; is++)
 	{
 	 	ZEROS( chr.rho[is], pw.nrxx ); // mohan 2009-11-10
@@ -406,15 +405,11 @@ inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Rec
 {
 	const char transa='N', transb='T';	
 	const complex<double> alpha=1, beta=1;
-	int ispin=0;
 
 	for(int ik=0; ik<kv.nks; ik++)
 	{
 		complex<double> **wfc = LOWF.WFC_K[ik];
-		if(NSPIN==2) 
-		{
-			ispin = kv.isk[ik];
-		}
+		const int ispin = kv.isk[ik];
 		int atom2start=0;
 
 		for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
@@ -437,12 +432,12 @@ inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Rec
 			int nRow=0;
 			for(int ib=0; ib<NBANDS; ++ib)
 			{
-				const double w1=wf.wg(ik,ib);
-				if(w1>0)
+				const double wg_local=wf.wg(ik,ib);
+				if(wg_local>0)
 				{
 					if(nRow==0) ibStart=ib;
 					const int iline=nRow*nw1;
-					complex<double> phase=exp_R*w1;
+					complex<double> phase=exp_R*wg_local;
 					for(int iw1=0; iw1<nw1; ++iw1)
 						WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1]);
 					++nRow;
@@ -647,20 +642,10 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 //--------------------------------------------------------------
 void Local_Orbital_Charge::cal_dk_gamma(void)
 {
-	 TITLE("Local_Orbital_Charge","cal_density_kernal");
+	TITLE("Local_Orbital_Charge","cal_density_kernal");
 	timer::tick("LocalOrbital_Charge","cal_dk_gamma",'F');
 
 	assert(NSPIN==kv.nks);
-
-	//xiaohui add 2014-06-18
-	//for(int is=0; is<NSPIN; is++)
-	//{
-	//	for (int ib=0; ib<NBANDS; ib++)
-	//	{
-	//		const double w1 = wf.wg(is, ib);
-	//		ofs_running <<"w1[" <<is <<"]["<<ib <<"]: "<< w1 << endl; 
-	//	}
-	//}
 
 	if(BFIELD)
 	{
@@ -687,12 +672,12 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 						{
 							for (int ib=0; ib<NBANDS; ib++)
 							{
-								const double w1 = wf.wg(is, ib);
-								if(w1>0)
+								const double wg_local = wf.wg(is, ib);
+								if(wg_local>0)
 								{
 									// dm = \sum ( wg * c[ib][mu] * c[ib][nu] )
 									// dm saved accordint to sub-FFT box.
-									alpha[nu_local] += w1 * (conj(LOWF.WFC_GAMMA_B[is][ib][mu_local]) * LOWF.WFC_GAMMA_B[is][ib][nu_local]).real();
+									alpha[nu_local] += wg_local * (conj(LOWF.WFC_GAMMA_B[is][ib][mu_local]) * LOWF.WFC_GAMMA_B[is][ib][nu_local]).real();
 								}
 							}
 						}
@@ -702,757 +687,148 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 		}
 	}
 #ifdef __MPI //2015-09-06, xiaohui
-	else
-	{
-		for(int is=0; is<NSPIN; is++)
-		{
+	else	// Peize Lin update 2018-07-02
+	{	
+		for( int is=0; is<NSPIN; ++is )
 			for (int i=0; i<lgd_now; i++)
-			{
 				ZEROS(this->DM[is][i], lgd_now);
-			}
-		}
-		//for(int is=0; is<NSPIN; is++)
-		//{
-		//	for (int i=0; i<NLOCAL; i++)
-		//	{
-		//		ZEROS(this->DM[is][i], NLOCAL);
-		//	}
-		//}
-
-		//double **out_DM;
-		//out_DM = new double *[NSPIN];
-		//for(int is=0; is<NSPIN; is++)
-		//{
-		//	out_DM[is] = new double[NLOCAL*NLOCAL];
-		//	ZEROS(out_DM[is], NLOCAL*NLOCAL);
-		//}
 
 		int nprocs,myid;
 		MPI_Status status;
 		MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
 		MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
-		int local_band=NBANDS/DSIZE;
-	 		if (DRANK<NBANDS%DSIZE) local_band=local_band+1;
-
-		int *local_bands;
-	 		local_bands = new int[DSIZE];
-		ZEROS(local_bands, DSIZE);
-
-	 		int lastband_in_proc = 0;
-	 		int lastband_number = 0;
-	 		int count_bands = 0;
-		for (int i=0; i<DSIZE; i++)
-	 		{
-		  		if (i<NBANDS%DSIZE)
-		  		{
-							local_bands[i]=NBANDS/DSIZE+1;
-		  		}
-		  		else
-		  		{
-							local_bands[i]=NBANDS/DSIZE;
-		  		}
-		  		count_bands += local_bands[i];
-		  		if (count_bands >= NBANDS)
-		  		{
-							lastband_in_proc = i;
-							lastband_number = NBANDS - (count_bands - local_bands[i]);
-							break;
-		  		}
-	 		}
-		//double *w1 ;
-		//w1 = new double[local_band] ;
-		//ZEROS(w1, local_band);
-		double** w1;
-		w1 = new double*[NSPIN];
-		for(int is=0; is<NSPIN; is++)
+		vector<int> bands_local(DSIZE);
+		for (int id=0; id<DSIZE; id++)
+			bands_local[id] = (id<NBANDS%DSIZE) ? NBANDS/DSIZE+1 : NBANDS/DSIZE;
+		const int band_local = bands_local[DRANK];
+		
+		int lastband_in_proc = 0;
+		for (int id=0, count_bands=0; id<DSIZE; id++)
 		{
-			w1[is] = new double[local_band];
-			ZEROS(w1[is], local_band);
-		}
-
-		int total_bands = 0;
-
-		time_t time_wg2w1_start = time(NULL);
-		double Time_Wg2w1_Start = (double)clock();
-
-		int Total_Bands = 0;
-		int Nbands = -1;
-		for(int i=0; i <= lastband_in_proc; i++)
-		{
-			Nbands = local_bands[i];
-			if(myid == i)
+			count_bands += bands_local[id];
+			if (count_bands >= NBANDS)
 			{
+				lastband_in_proc = id;
+				break;
+			}
+		}
+		
+		matrix wg_local(NSPIN,band_local);
+		for(int id=0, Total_Bands=0; id <= lastband_in_proc; ++id)
+		{
+			if(myid == id)
 				for(int is=0; is<NSPIN; is++)
+					for (int ib=0; ib<bands_local[myid]; ib++)
+						wg_local(is,ib) = wf.wg(is,Total_Bands+ib);
+			Total_Bands += bands_local[id];
+		}
+
+		for( int is=0; is<NSPIN; ++is )
+		{
+			matrix Z_wg( NLOCAL, band_local );
+			if(myid <= lastband_in_proc)
+				for(int iw=0; iw<NLOCAL; iw++)
+					for(int ib=0; ib<bands_local[myid]; ib++)
+						Z_wg(iw,ib) = ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
+
+			const int row_col = (NLOCAL%300) ? NLOCAL/300+1 : NLOCAL/300;
+				
+			matrix Z_row;
+			matrix Z_col;
+			matrix rho_row_col;
+
+			for(int row_count=0; row_count<row_col; row_count++)
+			{
+				const int row_remain = ( (row_count+1)*300 <= NLOCAL )
+									 ? 300
+									 : NLOCAL - row_count*300;
+				
+				Z_row.create( row_remain, band_local, false );
+				for(int i_row=0; i_row<row_remain; i_row++)
 				{
-					for (int ib=0; ib< Nbands; ib++)
-					{
-						w1[is][ib] = wf.wg(is, ib + Total_Bands);
-					}
+					const int row_index = row_count*300 + i_row;
+					for(int ib=0; ib<band_local; ib++)
+						Z_row(i_row,ib) = Z_wg(row_index,ib);
 				}
-			}
-			Total_Bands += Nbands;
-		}
 
-		//double* Z_wg;
-		//Z_wg = new double[local_band * NLOCAL];
-		//ZEROS(Z_wg, local_band * NLOCAL);
-		double** Z_wg;
-		Z_wg = new double*[NSPIN];
-		for(int is=0; is<NSPIN; is++)
-		{
-			Z_wg[is] = new double[local_band * NLOCAL];
-			ZEROS(Z_wg[is], local_band * NLOCAL);
-		}
-
-		time_t time_Z_wg_start = time(NULL);
-		double Time_Z_Wg_Start = (double)clock();
-
-		//stringstream ss;
-		//ss<<"wavefunction_on_processor_"<<MY_RANK+1;
-		////ss<<"FULL_DM";
-		//ofstream ofs;
-		//ofs.open(ss.str().c_str());
-
-		//stringstream ss1;
-		//ss1<<"weight_on_processor_"<<MY_RANK+1;
-		////ss<<"FULL_DM";
-		//ofstream ofs1;
-		//ofs1.open(ss1.str().c_str());
-
-		if(myid <= lastband_in_proc)
-		{
-			for(int is=0; is<NSPIN; is++)
-			{
-				for(int i=0; i<local_bands[myid]; i++)
+				for(int col_count=0; col_count<row_col; col_count++)
 				{
-					//if(i != 0 && i%10 == 0) ofs1<<endl;
-					//ofs1<<w1[is][i]<<"\t";
-					for(int n=0; n<NLOCAL; n++)
+					const int col_remain = ( (col_count+1)*300 <= NLOCAL )
+										 ? 300
+										 : NLOCAL - col_count*300;
+												
+					Z_col.create( col_remain, band_local, false );
+					for(int i_col=0; i_col<col_remain; i_col++)
 					{
-						Z_wg[is][i + n*local_bands[myid]] = ParaO.Z_LOC[is][i + n*local_bands[myid]]* w1[is][i];
-						//if(n != 0 && n%10 == 0) ofs<<endl;
-						//ofs<<ParaO.Z_LOC[is][i + n*local_bands[myid]]<<"\t";
+						const int col_index = i_col +col_count*300;
+						for(int ib=0; ib<band_local; ib++)
+							Z_col(i_col,ib) = ParaO.Z_LOC[is][col_index*band_local+ib] ;
 					}
-				}
-			}
-		}
-//cout<<"Z_wg[0]: "<<ParaO.Z_LOC[0]<<"\t"<<ParaO.Z_LOC[1]<<"\t"<<ParaO.Z_LOC[2]<<endl;
-//cout<<"Z_wg[0]: "<<Z_wg[0]<<"\t"<<Z_wg[1]<<"\t"<<Z_wg[2]<<endl;
+					
+					rho_row_col.create( row_remain, col_remain, false );
+					
+					//for(int i_row=0; i_row<row_remain; i_row++)
+					//	for(int i_col=0; i_col<col_remain; i_col++)
+					//		for(int ib=0; ib<band_local; ib++)
+					//			rho_row_col(i_row,i_col) += Z_row(i_row,ib) * Z_col(i_col,ib);
+										
+					LapackConnector::gemm(
+						'N', 'T', 
+						row_remain, col_remain, band_local,
+						1, Z_row.c, band_local, Z_col.c, band_local,
+						0, rho_row_col.c, col_remain);
+					MPI_Barrier(DIAG_HPSEPS_WORLD);
+					Parallel_Reduce::reduce_double_all( rho_row_col.c, row_remain*col_remain);
 
-		//delete[] w1;
-
-		//stringstream ss;
-		////ss<<"EDM_"<<MY_RANK+1;
-		//ss<<"FULL_DM";
-		//ofstream ofs;
-		//ofs.open(ss.str().c_str());
-		////ofs<<"local_band: "<<local_band<<"\t"<<"local_bands[id]: "<<local_bands[myid]<<endl;
-
-		for(int is=0; is<NSPIN; is++)
-		{
-			delete[] w1[is];
-		}
-		delete[] w1;
-		delete[] local_bands;
-
-		time_t time_Z_wg_end = time(NULL);
-		double Time_Z_Wg_End =(double)clock();
-		double time_Z_wg = difftime(time_Z_wg_start,time_Z_wg_end);
-		//OUT_TIME("calculate Z_wg",time_wg_start,time_wg_end);
-
-		//int local_band = local_band;
-		double coll_time = 0.0;
-		double Time_Cal_Start = (double)clock();
-
-		int row_col = NLOCAL/300;
-		if(row_col >= 1)
-		{
-			//double *ZW_300;
-			//ZW_300 = new double[300*local_band];
-			////ZEROS(ZW_300, 300*local_band);
-			double** ZW_300;
-			ZW_300 = new double*[NSPIN];
-			for(int is=0; is<NSPIN; is++)
-			{
-				ZW_300[is] = new double[300 * local_band];
-				ZEROS(ZW_300[is], 300 * local_band);
-			}
-			//double *Z_300;
-			//Z_300 = new double[300*local_band];
-			////ZEROS(Z_300, 300*local_band);
-			double** Z_300;
-			Z_300 = new double*[NSPIN];
-			for(int is=0; is<NSPIN; is++)
-			{
-				Z_300[is] = new double[300 * local_band];
-				ZEROS(Z_300[is], 300 * local_band);
-			}
-
-			if(NLOCAL%300 != 0)	row_col += 1;
-			int row_global = 0;
-			int row_index = 0;
-			int col_global = 0;
-			int col_index = 0;
-			for(int row_count=1; row_count<=row_col; row_count++)
-			{
-				row_global = row_count*300;
-				if(row_global <= NLOCAL)
-				{
-					for(int is=0; is<NSPIN; is++)
+					if(GAMMA_ONLY_LOCAL)
 					{
-						//ZEROS(ZW_300, 300*local_band);
-						for(int i_row=0; i_row<300; i_row++)
-						{
-							row_index = i_row +(row_count-1)*300;
-							for(int ib=0; ib<local_band; ib++)
-							{
-								ZW_300[is][ib + i_row*local_band] = Z_wg[is][ib + row_index*local_band] ;
-							}
-						}
-					}
-					for(int col_count=1; col_count<=row_col; col_count++)
-					{
-						col_global = col_count*300;
-						if(col_global <= NLOCAL)
-						{
-							//ZEROS(Z_300, 300*local_band);
-							double **rho_300;
-							rho_300 = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
-							{
-								rho_300[is] = new double[300*300];
-								ZEROS(rho_300[is], 300*300);
-
-								for(int i_col=0; i_col<300; i_col++)
-								{
-									col_index = i_col +(col_count-1)*300;
-									for(int ib=0; ib<local_band; ib++)
-									{
-										Z_300[is][ib + i_col*local_band] = ParaO.Z_LOC[is][ib + col_index*local_band] ;
-									}
-								}
-
-								//for(int i_row=0; i_row<300; i_row++)
-								//{
-								//	for(int i_col=0; i_col<300; i_col++)
-								//	{
-								//		for(int ib=0; ib<local_band; ib++)
-								//		{
-								//			rho_300[is][i_col + i_row*300] += ZW_300[is][ib + i_row*local_band]  * Z_300[is][ib + i_col*local_band];
-								//		}
-								//	}
-								//}
-					 						double alpha=1;
-					 						double beta=0;
-					 						char transa = 'T';
-					 						char transb = 'N';
-					 						int M = 300;
-					 						int N = 300;
-					 						//int K = local_band;
-					 						////int lda = local_band;
-					 						////int ldb = local_band;
-					 						int K = local_band;
-					 						int lda = local_band;
-					 						int ldb = local_band;
-					 						int ldc = 300;
-
-								dgemm_(&transa, &transb, &M, &N, &K,
-				  								&alpha, &ZW_300[is][0], &lda, &Z_300[is][0], &ldb,
-			 									&beta, &rho_300[is][0], &ldc);
-								double Time_Coll_Start = (double)clock();
-								//MPI_Barrier(MPI_COMM_WORLD);
-								MPI_Barrier(DIAG_HPSEPS_WORLD);
-								Parallel_Reduce::reduce_double_all( rho_300[is], 300*300);
-								double Time_Coll_End = (double)clock();
-
-								//coll_time += (Time_Coll_End-Time_Coll_Start)/(CLOCKS_PER_SEC);
-								coll_time += (Time_Coll_End-Time_Coll_Start);
-								if(GAMMA_ONLY_LOCAL)
-		  							{
-									//for(int is=0; is<NSPIN; is++)
-									//{
-									for(int i_row=0; i_row<300; i_row++)
-									{
-										row_index = i_row +(row_count-1)*300;
-										int row_mu = GridT.trace_lo[row_index];
-										//if(row_mu >= 0)
-										//{
-											for(int i_col=0; i_col<300; i_col++)
-											{
-												col_index = i_col +(col_count-1)*300;
-												int col_nu = GridT.trace_lo[col_index];
-//out_DM[is][col_index + row_index*NLOCAL] = rho_300[is][i_row + i_col*300];
-												if(row_mu >= 0 && col_nu >= 0)
-												//if(col_nu >= 0)
-												{
-													//this->DM[is][row_mu][col_nu] = rho_300[i_col + i_row*300];
-													//this->DM[is][row_mu][col_nu] = rho_300[is][i_col + i_row*300];
-													this->DM[is][row_mu][col_nu] = rho_300[is][i_row + i_col*300];
-												}
-											}
-										//}
-									}
-								}
-								delete[] rho_300[is];
-							}
-							delete[] rho_300;
-						}
-						else
-						{
-							int col_remain = 0;
-							int col_index2 = 0;
-							col_remain = NLOCAL - (col_count - 1)*300;
-							//double *Z_remain = new double[col_remain * local_band];
-							//ZEROS(Z_remain, col_remain*local_band);
-							double** Z_remain;
-							Z_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
-							{
-								Z_remain[is] = new double[col_remain * local_band];
-								ZEROS(Z_remain[is], col_remain * local_band);
-							}
-
-							//double *rho_300_remain = new double[300*col_remain];
-							//ZEROS(rho_300_remain, 300*col_remain);
-							double** rho_300_remain;
-							rho_300_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
-							{
-								rho_300_remain[is] = new double[300*col_remain];
-								ZEROS(rho_300_remain[is], 300*col_remain);
-
-								for(int i_col=0; i_col<col_remain; i_col++)
-								{
-									col_index2 = i_col +(col_count-1)*300;
-									for(int ib=0; ib<local_band; ib++)
-									{
-										Z_remain[is][ib + i_col*local_band] = ParaO.Z_LOC[is][ib + col_index2*local_band] ;
-									}
-								}
-
-								//xiaohui modify 2015-03-25
-								//for(int i_row=0; i_row<300; i_row++)
-								//{
-								//	for(int i_col=0; i_col<col_remain; i_col++)
-								//	{
-								//		//for(int ib=0; ib<local_band; ib++)
-								//		for(int ib=0; ib<local_band; ib++)
-								//		{
-								//			//rho_300_remain[i_col + i_row*col_remain] += ZW_300[ib + i_row*local_band]  * Z_remain[ib + i_col*local_band];
-								//			rho_300_remain[is][i_col + i_row*col_remain] += ZW_300[is][ib + i_row*local_band]  * Z_remain[is][ib + i_col*local_band];
-								//		}
-								//	}
-								//}
-					 			double alpha=1;
-					 			double beta=0;
-					 			char transa = 'T';
-					 			char transb = 'N';
-					 			int M = 300;
-					 			int N = col_remain;
-					 			////int K = local_band;
-					 			////int lda = local_band;
-					 			////int ldb = local_band;
-					 			int K = local_band;
-					 			int lda = local_band;
-					 			int ldb = local_band;
-					 			int ldc = 300;
-					 			//int ldc = col_remain;
-
-								dgemm_(&transa, &transb, &M, &N, &K,
-				  					&alpha, &ZW_300[is][0], &lda, &Z_remain[is][0], &ldb,
-			 						&beta, &rho_300_remain[is][0], &ldc);
-								double Time_Coll_Start = (double)clock();
-								//MPI_Barrier(MPI_COMM_WORLD);
-								MPI_Barrier(DIAG_HPSEPS_WORLD);
-								Parallel_Reduce::reduce_double_all( rho_300_remain[is], 300*col_remain);
-								double Time_Coll_End = (double)clock();
-
-								//coll_time += (Time_Coll_End-Time_Coll_Start)/(CLOCKS_PER_SEC);
-								coll_time += (Time_Coll_End-Time_Coll_Start);
-//cout<<"300*col_remain time: "<<(Time_Coll_End-Time_Coll_Start)/(C
-								//MPI_Barrier(MPI_COMM_WORLD);
-								//Parallel_Reduce::reduce_double_all( rho_300_remain, 300*col_remain);
-								if(GAMMA_ONLY_LOCAL)
-		  							{
-									//for(int is=0; is<NSPIN; is++)
-									//{
-									for(int i_row=0; i_row<300; i_row++)
-									{
-										row_index = i_row +(row_count-1)*300;
-										int row_mu = GridT.trace_lo[row_index];
-										//if(row_mu >= 0)
-										//{
-											for(int i_col=0; i_col<col_remain; i_col++)
-											{
-												col_index = i_col +(col_count-1)*300;
-												int col_nu = GridT.trace_lo[col_index];
-//out_DM[is][col_index + row_index*NLOCAL] = rho_300_remain[is][i_row + i_col*300];
-												if(row_mu >= 0 && col_nu >= 0)
-												//if(col_nu >= 0)
-												{
-													//this->DM[is][row_mu][col_nu] = rho_300_remain[i_col + i_row*col_remain];
-													//this->DM[is][row_mu][col_nu] = rho_300_remain[is][i_col + i_row*col_remain];
-													this->DM[is][row_mu][col_nu] = rho_300_remain[is][i_row + i_col*300];
-												}
-											}
-										//}
-									}
-								}
-								delete[] Z_remain[is];
-								delete[] rho_300_remain[is];
-							}
-							delete[] Z_remain;
-							delete[] rho_300_remain;
-						}
-					}
-				}
-				else
-				{
-					int row_remain = 0;
-					int row_index2 = 0;
-					row_remain = NLOCAL - (row_count - 1)*300;
-					//double *Z_row_remain = new double[row_remain * local_band];
-					//ZEROS(Z_row_remain, row_remain*local_band);
-					double** Z_row_remain;
-					Z_row_remain = new double*[NSPIN];
-					for(int is=0; is<NSPIN; is++)
-					{
-						Z_row_remain[is] = new double[row_remain * local_band];
-						ZEROS(Z_row_remain[is], row_remain * local_band);
-					}
-
-					//double *rho_remain_300 = new double[row_remain*300];
-					//ZEROS(rho_remain_300, row_remain*300);
-					//double** rho_remain_300;
-					//rho_remain_300 = new double*[NSPIN];
-					for(int is=0; is<NSPIN; is++)
-					{
-						//rho_remain_300[is] = new double[row_remain * 300];
-						//ZEROS(rho_remain_300[is], row_remain * 300);
-
 						for(int i_row=0; i_row<row_remain; i_row++)
 						{
-							row_index2 = i_row +(row_count-1)*300;
-							for(int ib=0; ib<local_band; ib++)
+							const int row_index = row_count*300 + i_row;
+							const int row_mu = GridT.trace_lo[row_index];
+							if(row_mu<0)	continue;
+							for(int i_col=0; i_col<col_remain; i_col++)
 							{
-								Z_row_remain[is][ib + i_row*local_band] = Z_wg[is][ib + row_index2*local_band] ;
+								const int col_index = col_count*300 + i_col;
+								const int col_nu = GridT.trace_lo[col_index];
+								if(col_nu<0)	continue;
+								this->DM[is][row_mu][col_nu] = rho_row_col(i_row,i_col);
 							}
 						}
 					}
-
-					for(int col_count=1; col_count<=row_col; col_count++)
-					{
-						col_global = col_count*300;
-						if(col_global <= NLOCAL)
-						{
-							double** rho_remain_300;
-							rho_remain_300 = new double*[NSPIN];
-
-							for(int is=0; is<NSPIN; is++)
-							{
-								rho_remain_300[is] = new double[row_remain * 300];
-								ZEROS(rho_remain_300[is], row_remain * 300);
-
-								//ZEROS(Z_300, 300*local_band);
-								for(int i_col=0; i_col<300; i_col++)
-								{
-									col_index = i_col +(col_count-1)*300;
-									for(int ib=0; ib<local_band; ib++)
-									{
-										Z_300[is][ib + i_col*local_band] = ParaO.Z_LOC[is][ib + col_index*local_band] ;
-									}
-								}
-
-								//xiaohui modify 2015-03-25
-								//for(int i_row=0; i_row<row_remain; i_row++)
-								//{
-								//	for(int i_col=0; i_col<300; i_col++)
-								//	{
-								//		//for(int ib=0; ib<local_band; ib++)
-								//		for(int ib=0; ib<local_band; ib++)
-								//		{
-								//			rho_remain_300[is][i_col + i_row*300] += Z_row_remain[is][ib + i_row*local_band]  * Z_300[is][ib + i_col*local_band];
-								//		}
-								//	}
-								//}
-					 			double alpha=1;
-					 			double beta=0;
-					 			char transa = 'T';
-					 			char transb = 'N';
-					 			int M = row_remain;
-					 			////int M = 300;
-					 			int N = 300;
-					 			////int K = local_band;
-					 			////int lda = local_band;
-					 			////int ldb = local_band;
-					 			int K = local_band;
-					 			int lda = local_band;
-					 			int ldb = local_band;
-					 			////int ldc = 300;
-					 			int ldc = row_remain;
-
-								dgemm_(&transa, &transb, &M, &N, &K,
-				  					&alpha, &Z_row_remain[is][0], &lda, &Z_300[is][0], &ldb,
-			 						&beta, &rho_remain_300[is][0], &ldc);
-								double Time_Coll_Start = (double)clock();
-								//MPI_Barrier(MPI_COMM_WORLD);
-								MPI_Barrier(DIAG_HPSEPS_WORLD);
-								Parallel_Reduce::reduce_double_all( rho_remain_300[is], row_remain*300);
-								double Time_Coll_End = (double)clock();
-
-//cout<<"row_remain*300 time: "<<(Time_Coll_End-Time_Coll_Start)/(CLOCKS_PER_SEC)<<endl;
-								//coll_time += (Time_Coll_End-Time_Coll_Start)/(CLOCKS_PER_SEC);
-								coll_time += (Time_Coll_End-Time_Coll_Start);
-								//MPI_Barrier(MPI_COMM_WORLD);
-								//Parallel_Reduce::reduce_double_all( rho_300_remain2, row_remain*300);
-								if(GAMMA_ONLY_LOCAL)
-		  							{
-									//for(int is=0; is<NSPIN; is++)
-									//{
-										for(int i_row=0; i_row<row_remain; i_row++)
-										{
-											row_index = i_row +(row_count-1)*300;
-											int row_mu = GridT.trace_lo[row_index];
-											//if(row_mu >= 0)
-											//{
-												for(int i_col=0; i_col<300; i_col++)
-												{
-													col_index = i_col +(col_count-1)*300;
-													int col_nu = GridT.trace_lo[col_index];
-//out_DM[is][col_index + row_index*NLOCAL] = rho_remain_300[is][i_row + i_col*row_remain];
-													if(row_mu >= 0 && col_nu >= 0)
-													//if(col_nu >= 0)
-													{
-														//this->DM[is][row_mu][col_nu] = rho_300_remain2[i_col + i_row*300];
-														//this->DM[is][row_mu][col_nu] = rho_remain_300[is][i_col + i_row*300];
-														this->DM[is][row_mu][col_nu] = rho_remain_300[is][i_row + i_col*row_remain];
-													}
-												}
-											//}
-										}
-								}
-							}
-							for(int is=0; is<NSPIN; is++)
-							{
-								delete[] rho_remain_300[is];
-							}
-							delete[] rho_remain_300;
-						}
-						else
-						{
-							int col_remain = 0;
-							int col_index2 = 0;
-							col_remain = NLOCAL - (col_count - 1)*300;
-							//double *Z_col_remain = new double[col_remain * local_band];
-							//ZEROS(Z_col_remain, col_remain*local_band);
-							double** Z_col_remain;
-							Z_col_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
-							{
-								Z_col_remain[is] = new double[col_remain * local_band];
-								ZEROS(Z_col_remain[is], col_remain * local_band);
-							}
-							//double *rho_remain_remain = new double[row_remain*col_remain];
-							//ZEROS(rho_remain_remain, row_remain*col_remain);
-							double** rho_remain_remain;
-							rho_remain_remain = new double*[NSPIN];
-							for(int is=0; is<NSPIN; is++)
-							{
-								rho_remain_remain[is] = new double[row_remain * col_remain];
-								ZEROS(rho_remain_remain[is], row_remain * col_remain);
-							//2014-09-22 12:04
-								for(int i_col=0; i_col<col_remain; i_col++)
-								{
-									col_index2 = i_col +(col_count-1)*300;
-									for(int ib=0; ib<local_band; ib++)
-									{
-										Z_col_remain[is][ib + i_col*local_band] = ParaO.Z_LOC[is][ib + col_index2*local_band] ;
-									}
-								}
-
-								//for(int i_row=0; i_row<row_remain; i_row++)
-								//{
-								//	for(int i_col=0; i_col<col_remain; i_col++)
-								//	{
-										//for(int ib=0; ib<local_band; ib++)
-								//		for(int ib=0; ib<local_band; ib++)
-								//		{
-								//			rho_remain_remain[is][i_col + i_row*col_remain] += Z_row_remain[is][ib + i_row*local_band]  * Z_col_remain[is][ib + i_col*local_band];
-								//		}
-								//	}
-								//}
-					 			double alpha=1;
-					 			double beta=0;
-					 			char transa = 'T';
-					 			char transb = 'N';
-					 			////int M = 300;
-					 			int M = row_remain;
-					 			int N = col_remain;
-					 			////int K = local_band;
-					 			////int lda = local_band;
-					 			////int ldb = local_band;
-					 			int K = local_band;
-					 			int lda = local_band;
-					 			int ldb = local_band;
-					 			////int ldc = 300;
-					 			int ldc = row_remain;
-
-								dgemm_(&transa, &transb, &M, &N, &K,
-				  					&alpha, &Z_row_remain[is][0], &lda, &Z_col_remain[is][0], &ldb,
-			 						&beta, &rho_remain_remain[is][0], &ldc);
-								double Time_Coll_Start = (double)clock();
-								//MPI_Barrier(MPI_COMM_WORLD);
-								MPI_Barrier(DIAG_HPSEPS_WORLD);
-								Parallel_Reduce::reduce_double_all( rho_remain_remain[is], row_remain*col_remain);
-								double Time_Coll_End = (double)clock();
-//cout<<"row_remain*col_remain time: "<<(Time_Coll_End-Time_Coll_Start)/(CLOCKS_PER_SEC)<<endl;
-
-								//coll_time += (Time_Coll_End-Time_Coll_Start)/(CLOCKS_PER_SEC);
-								coll_time += (Time_Coll_End-Time_Coll_Start);
-								//MPI_Barrier(MPI_COMM_WORLD);
-								//Parallel_Reduce::reduce_double_all( rho_remain_remain, row_remain*col_remain);
-								if(GAMMA_ONLY_LOCAL)
-		  							{
-									//for(int is=0; is<NSPIN; is++)
-									//{
-										for(int i_row=0; i_row<row_remain; i_row++)
-										{
-											row_index = i_row +(row_count-1)*300;
-											int row_mu = GridT.trace_lo[row_index];
-											//if(row_mu >= 0)
-											//{
-												for(int i_col=0; i_col<col_remain; i_col++)
-												{
-													col_index = i_col +(col_count-1)*300;
-													int col_nu = GridT.trace_lo[col_index];
-//out_DM[is][col_index + row_index*NLOCAL] = rho_remain_remain[is][i_row + i_col*row_remain];
-													if(row_mu >= 0 && col_nu >= 0)
-													//if(col_nu >= 0)
-													{
-														//this->DM[is][row_mu][col_nu] = rho_remain_remain[i_col + i_row*col_remain];
-														//this->DM[is][row_mu][col_nu] = rho_remain_remain[is][i_col + i_row*col_remain];
-														this->DM[is][row_mu][col_nu] = rho_remain_remain[is][i_row + i_col*row_remain];
-													}
-												}
-											//}
-										}
-								}
-								delete[] Z_col_remain[is];
-								delete[] rho_remain_remain[is];
-							}
-							delete[] Z_col_remain;
-							delete[] rho_remain_remain;
-							
-						}
-					}
-					for(int is=0; is<NSPIN; is++)
-					{
-						delete[] Z_row_remain[is];
-					}
-					delete[] Z_row_remain;
-				}
-			}
-			for(int is=0; is<NSPIN; is++)
-			{
-				delete[] ZW_300[is];
-				delete[] Z_300[is];
-			}
-			delete[] ZW_300;
-			delete[] Z_300;
-		}
-		else
+				}  // end for col_count
+			}  // end for row_count
+		}  // end for is
+		
+		#if TEST_DM2D==1
 		{
-			double** rho_NLOCAL_NLOCAL;
-			rho_NLOCAL_NLOCAL = new double*[NSPIN];
-			for(int is=0; is<NSPIN; is++)
+			ofstream ofs("LOC.DM_"+TO_STRING(MY_RANK));
+			for(int is=0; is!=NSPIN; ++is)
 			{
-				rho_NLOCAL_NLOCAL[is] = new double[NLOCAL*NLOCAL];
-				ZEROS(rho_NLOCAL_NLOCAL[is], NLOCAL*NLOCAL);
-			}
-			for(int is=0; is<NSPIN; is++)
-			{
-				for(int i_row=0; i_row<NLOCAL; i_row++)
+				for(int ir=0; ir!=lgd_now; ++ir)
 				{
-					for(int i_col=0; i_col<NLOCAL; i_col++)
+					for(int ic=0; ic!=lgd_now; ++ic)
 					{
-						//for(int ib=0; ib<local_band; ib++)
-						for(int ib=0; ib<local_band; ib++)
-						{
-							//rho_300_remain[i_col + i_row*col_remain] += ZW_300[ib + i_row*local_band]  * Z_remain[ib + i_col*local_band];
-							rho_NLOCAL_NLOCAL[is][i_col + i_row*NLOCAL] += Z_wg[is][ib + i_row*local_band]  * ParaO.Z_LOC[is][ib + i_col*local_band];
-						}
+						ofs<<this->DM[is][ir][ic]<<"\t";
 					}
+					ofs<<endl;
 				}
-				double Time_Coll_Start = (double)clock();
-				MPI_Barrier(DIAG_HPSEPS_WORLD);
-				Parallel_Reduce::reduce_double_all( rho_NLOCAL_NLOCAL[is], NLOCAL*NLOCAL);
-				double Time_Coll_End = (double)clock();
-				//coll_time += (Time_Coll_End-Time_Coll_Start)/(CLOCKS_PER_SEC);
-				coll_time += (Time_Coll_End-Time_Coll_Start);
-				//MPI_Barrier(MPI_COMM_WORLD);
-				//Parallel_Reduce::reduce_double_all( rho_remain_remain, row_remain*col_remain);
-				if(GAMMA_ONLY_LOCAL)
-		  			{
-					//for(int is=0; is<NSPIN; is++)
-					//{
-					for(int i_row=0; i_row<NLOCAL; i_row++)
-					{
-						int row_mu = GridT.trace_lo[i_row];
-						//if(row_mu >= 0)
-						//{
-							for(int i_col=0; i_col<NLOCAL; i_col++)
-							{
-								int col_nu = GridT.trace_lo[i_col];
-//out_DM[is][i_col + i_row*NLOCAL] = rho_NLOCAL_NLOCAL[is][i_col + i_row*NLOCAL];
-								if(row_mu >= 0 && col_nu >= 0)
-								//if(col_nu >= 0)
-								{
-									this->DM[is][row_mu][col_nu] = rho_NLOCAL_NLOCAL[is][i_col + i_row*NLOCAL];
-								}
-							}
-						//}
-					}
-				}
-				delete[] rho_NLOCAL_NLOCAL[is];
+				ofs<<endl;
 			}
-			delete[] rho_NLOCAL_NLOCAL;
+			ofs.close();
 		}
-		//stringstream ss;
-		////ss<<"EDM_"<<MY_RANK+1;
-		//ss<<"FULL_DM";
-		//ofstream ofs;
-		//ofs.open(ss.str().c_str());
-		////ofs<<"ParaO.nrow: "<<ParaO.nrow<<"\t"<<"ParaO.ncol: "<<ParaO.ncol<<endl;
-
-		//for(int is=0; is<NSPIN; is++)
-		//{
-		//	for(int i=0; i<NLOCAL*NLOCAL; i++)
-		//	{
-		//		if(i != 0 && i%10 == 0) ofs<<endl;
-		//		ofs<<out_DM[is][i]<<"\t";
-		//	}
-		//}
-
-		for(int is=0; is<NSPIN; is++)
-		{
-			delete[] Z_wg[is];
-			//delete[] out_DM[is];
-		}
-		delete[] Z_wg;
-		//delete[] out_DM;
-	}
+		#elif TEST_DM2D==-1
+			#error "TEST_DM2D"
+		#endif		
+	}  // end if !BFIELD
 #endif //2015-09-06, xiaohui
 #ifndef __MPI //2015-09-06, xiaohui
 	else
 	{
 		for(int is=0; is<NSPIN; is++)
-		{
 			for (int i=0; i<lgd_now; i++)
-			{
 				ZEROS(this->DM[is][i], lgd_now);
-			}
-		}
 		for(int is=0; is<NSPIN; is++)
 		{
 			for (int i=0; i<NLOCAL; i++)
@@ -1470,16 +846,16 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 						{
 							for (int ib=0; ib<NBANDS; ib++)
 							{
-								const double w1 = wf.wg(is, ib);
-								//ofs_running << " w1=" << w1 << endl;
-								if(w1>0)
+								const double wg_local = wf.wg(is, ib);
+								//ofs_running << " wg_local=" << wg_local << endl;
+								if(wg_local>0)
 								{
 									// dm = \sum ( wg * c[ib][mu] * c[ib][nu] )
 									// dm saved accordint to sub-FFT box.
-									alpha[nu_local] += w1 * LOWF.WFC_GAMMA[is][ib][mu_local] 
+									alpha[nu_local] += wg_local * LOWF.WFC_GAMMA[is][ib][mu_local] 
 									* LOWF.WFC_GAMMA[is][ib][nu_local];
 
-								}//w1
+								}//wg_local
 							}//ib
 						}//nu_local
 					}//j
@@ -1488,50 +864,8 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 		}//is
 	}
 #endif //2015-09-06, xiaohui
-
-	//----------
-	// for test
-	//----------
-	/*
-	ofs_running << " WFC2 " << endl;
-	for(int i=0; i<NBANDS; ++i)
-	{
-		ofs_running << " wf.eg=" << wf.wg(0,i) << endl;
-		for(int j=0; j<NLOCAL; ++j)
-		{
-			const int mu = GridT.trace_lo[j];
-			if(mu>=0)
-			{
-				if( abs(LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
-				ofs_running << setw(5) << i+1 << setw(8) << j+1 << setw(15) << LOWF.WFC_GAMMA[0][i][mu] << endl; 
-			}
-		}
-	}
-	*/
-
-
-	// @@@@@@@
-	// test
-	// @@@@@@@
-	/*
-	ofs_running << " LOWF.DM" << endl;
-	for(int i=0; i<NBANDS; i++)
-	{
-		for(int j=0; j<NLOCAL; j++)
-		{
-			if( GridT.trace_lo[j] >= 0)
-			{
-//				if( abs(DM[0][i][j]) > 1.0e-8 )
-				{
-					ofs_running << setw(5) << i+1 << setw(8) << j+1 << setw(15) << this->DM[0][i][GridT.trace_lo[j]] << endl;
-				}
-			}
-		}
-	}
-	*/
-
 	timer::tick("LocalOrbital_Charge","cal_dk_gamma",'F');
-	 return;
+	return;
 }
 
 
