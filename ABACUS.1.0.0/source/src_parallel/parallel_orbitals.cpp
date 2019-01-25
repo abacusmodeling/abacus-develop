@@ -48,9 +48,6 @@ void Parallel_Orbitals::set_trace(void)
     Memory::record("Parallel_Orbitals","trace_loc_row",NLOCAL,"int");
     Memory::record("Parallel_Orbitals","trace_loc_col",NLOCAL,"int");
 
-
-cout<<__FILE__<<__LINE__<<" "<<this->nrow<<" "<<this->ncol<<endl;
-
     //if (DIAGO_TYPE=="lapack"
     //        || DIAGO_TYPE=="cg"
     //        || DIAGO_TYPE=="david") xiaohui modify 2013-09-02 //delete selinv here  2012-04-23
@@ -138,8 +135,7 @@ cout<<__FILE__<<__LINE__<<" "<<this->nrow<<" "<<this->ncol<<endl;
 		//WARNING_QUIT("Parallel_Orbitals::set_trace","Check diago_type."); xiaohui modify 2013-09-02
 		WARNING_QUIT("Parallel_Orbitals::set_trace","Check KS_SOLVER."); //xiaohui add 2013-09-02
 	}
-
-cout<<__FILE__<<__LINE__<<" "<<this->nrow<<" "<<this->ncol<<endl;
+	
 	//---------------------------
     // print the trace for test.
 	//---------------------------

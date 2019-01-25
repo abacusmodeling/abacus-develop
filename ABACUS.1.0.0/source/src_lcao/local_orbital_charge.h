@@ -1,8 +1,10 @@
 #ifndef LOCAL_ORBITAL_CHARGE
 #define LOCAL_ORBITAL_CHARGE
 
-#include "../src_pw/tools.h"
-#include "grid_technique.h"
+#include "src_pw/tools.h"
+#include "src_lcao/grid_technique.h"
+
+#include "src_lcao/wfc_dm_2d.h"
 
 class Local_Orbital_Charge
 {
@@ -25,6 +27,8 @@ public:
 	void write_dm(const int &is, const int &iter, const string &fn, const int &precision);
 	int out_dm; // output density matrix or not.
 	void read_dm(const int &is, const string &fn);
+	
+	Wfc_Dm_2d wfc_dm_2d;		// Peize Lin test 2019-01-16
 
 private:
 

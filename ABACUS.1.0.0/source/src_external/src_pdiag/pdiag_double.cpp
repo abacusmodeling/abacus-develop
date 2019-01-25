@@ -1,12 +1,12 @@
 /*test generalized Stardand double precision symmetric eigenproblem*/
 #include "pdiag_double.h"
 #include "blas_interface.h"
-#include "../../src_pw/occupy.h"
-#include "../../src_pw/global.h"
+#include "src_pw/occupy.h"
+#include "src_pw/global.h"
 //#include "../src_pw/global.h"
 //xiaohui add 2014-06-20
-#include "../../src_lcao/local_orbital_charge.h"
-#include "../../src_lcao/wf_local.h"
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/wf_local.h"
 #ifdef __MPI
 extern "C"
 {
@@ -27,6 +27,7 @@ inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk,
     int myprow, mypcol;
     int *usermap=new int[nprows*npcols];
     int info=0;
+	
     for(int i=0; i<nprows; ++i)
     {
         for(int j=0; j<npcols; ++j)
@@ -391,7 +392,7 @@ void Pdiag_Double::divide_HS_2d
 	return;
 }
 
-void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
+void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2d,
 	double* h_mat, double* s_mat, double* ekb)
 {
 #ifdef __MPI
@@ -464,7 +465,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
         int maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
-        double *q=new double[nloc];
+		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
         double *work=new double[maxnloc]; // work/buffer matrix
         static int method;
         bool wantEigenVector=true;
@@ -481,14 +482,14 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
             method=0;
         	dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
             info=pdDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
-                                        Stmp, eigen, q, work,
+                                        Stmp, eigen, wfc_2d.c, work,
                                         comm_2D_f, mpi_comm_rows, mpi_comm_cols,
                                         method, THIS_REAL_ELPA_KERNEL_API, useQR);
             timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
         }
         timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
         info=pdSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
-                          h_mat, Stmp, eigen, q, work,
+                          h_mat, Stmp, eigen, wfc_2d.c, work,
                           comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
                           THIS_REAL_ELPA_KERNEL_API, useQR,
                           wantEigenVector, wantDebug);
@@ -516,7 +517,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
                 MPI_Cart_rank(comm_2D, coord, &src_rank);
                 if(myid==src_rank)
                 {
-                    dcopy_(&nloc, q, &inc, work, &inc);
+                    dcopy_(&nloc, wfc_2d.c, &inc, work, &inc);
                     naroc[0]=nrow;
                     naroc[1]=ncol;
                 }
@@ -584,7 +585,6 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
             }
         }
 
-        delete[] q;
         delete[] work;
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
 
@@ -595,7 +595,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc,
 }
 
 
-void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
+void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, ComplexMatrix &wfc_2d,
 	complex<double>* ch_mat, complex<double>* cs_mat, double *ekb)
 {
 #ifdef __MPI
@@ -638,7 +638,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 
         // Z is delete in gath_eig
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
-        this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, cc, Z, ik);
+        this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, wfc, Z, ik);
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
         //delete[] Z; //LiuXh 20180329, fix bug of 'double free()'
         //this->gath_full_eig_complex(DIAG_WORLD, NLOCAL, c, Z);
@@ -650,7 +650,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
         int maxnloc; // maximum number of elements in local matrix
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
-        complex<double> *q=new complex<double>[nloc];
+		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
         complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
         bool wantEigenVector=true;
         bool wantDebug=true;
@@ -662,7 +662,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
         zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
         int method=0;
         info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
-                              ch_mat, Stmp, eigen, q, work,
+                              ch_mat, Stmp, eigen, wfc_2d.c, work,
                               comm_2D_f, blacs_ctxt,
                               method, THIS_REAL_ELPA_KERNEL_API,
                               wantEigenVector, wantDebug);
@@ -685,7 +685,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
                 MPI_Cart_rank(comm_2D, coord, &src_rank);
                 if(myid==src_rank)
                 {
-                    zcopy_(&nloc, q, &inc, work, &inc);
+                    zcopy_(&nloc, wfc_2d.c, &inc, work, &inc);
                     naroc[0]=nrow;
                     naroc[1]=ncol;
                 }
@@ -710,13 +710,13 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 		                ofs_running << " not augmented wave functions are implemented with B field" << endl;
                         info=q2WFC_CTOT_complex(myid, naroc, nb,
                                                 dim0, dim1, iprow, ipcol,
-                                                work, cc, ctot);
+                                                work, wfc, ctot);
                     }
                     else
                     {
                         info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
                                                        dim0, dim1, iprow, ipcol,
-                                                       work, cc, LOWF.WFC_K_aug[ik], ctot);
+                                                       work, wfc, LOWF.WFC_K_aug[ik], ctot);
                     }
                     stringstream ss;
 	                ss << global_out_dir << "LOWF_K_" << ik+1 << ".dat";
@@ -739,18 +739,17 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **cc,
 		                ofs_running << " not augmented wave functions are implemented with B field" << endl;
                         info=q2WFC_complex(naroc, nb,
                                            dim0, dim1, iprow, ipcol,
-                                           work, cc);
+                                           work, wfc);
                     }
                     else
                     {
                         info=q2WFC_WFCAUG_complex(naroc, nb,
                                                   dim0, dim1, iprow, ipcol,
-                                                  work, cc, LOWF.WFC_K_aug[ik]);
+                                                  work, wfc, LOWF.WFC_K_aug[ik]);
                     }
                 }
             }
         }
-        delete[] q;
         delete[] work;
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
     } // GenELPA method

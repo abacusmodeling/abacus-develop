@@ -9,7 +9,7 @@
 Diago_LCAO_Matrix::Diago_LCAO_Matrix(){}
 Diago_LCAO_Matrix::~Diago_LCAO_Matrix(){}
 
-void Diago_LCAO_Matrix::solve_complex_matrix(const int &ik, complex<double>** cc)const
+void Diago_LCAO_Matrix::solve_complex_matrix(const int &ik, complex<double>** wfc, ComplexMatrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","solve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -19,12 +19,12 @@ void Diago_LCAO_Matrix::solve_complex_matrix(const int &ik, complex<double>** cc
 	//if(DIAGO_TYPE=="lapack") xiaohui modify 2013-09-02
 	if(KS_SOLVER=="lapack") //xiaohui add 2013-09-02
 	{
-		this->using_LAPACK_complex(ik, cc);
+		this->using_LAPACK_complex(ik, wfc);
 	}
 	else
 	{
 #ifdef __MPI
-		this->using_HPSEPS_complex(ik, cc);
+		this->using_HPSEPS_complex(ik, wfc, wfc_2d);
 #else
 		WARNING_QUIT("Diago_LCAO_Matrix::solve_complex_matrix","only lapack is available!");
 #endif
@@ -39,7 +39,7 @@ void Diago_LCAO_Matrix::solve_complex_matrix(const int &ik, complex<double>** cc
 	return;
 }
 
-void Diago_LCAO_Matrix::solve_double_matrix(const int &ik, double** wfc)const
+void Diago_LCAO_Matrix::solve_double_matrix(const int &ik, double** wfc, matrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","solve_double_matrix");
 	timer::tick("Diago_LCAO_Matrix","solve_double_matrix",'F');
@@ -91,7 +91,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(const int &ik, double** wfc)const
 	//else if(DIAGO_TYPE=="hpseps") xiaohui modify 2013-09-02
 	else if(KS_SOLVER=="hpseps" || KS_SOLVER=="genelpa") //yshen add 7/15/2016
 	{
-		this->using_HPSEPS_double(ik, wfc);
+		this->using_HPSEPS_double(ik, wfc, wfc_2d);
 	}
 #endif
 	else
@@ -132,7 +132,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(const int &ik, double** wfc)const
 }
 
 #ifdef __MPI
-void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double** c)const
+void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","using_HPSEPS_double");
 
@@ -143,7 +143,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double** c)const
 
 	// Distribution of matrix for 
 	// prallel eigensolver.
-	ParaO.diago_double_begin(ik, c, LM.Hloc, LM.Sloc, wf.ekb[ik]);
+	ParaO.diago_double_begin(ik, wfc, wfc_2d, LM.Hloc, LM.Sloc, wf.ekb[ik]);
 
 	/*
 	string fh = "/home/mohan/3_my_program/1_DAPE/data/data-H32";
@@ -157,7 +157,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double** c)const
 }
 
 
-void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** c)const
+void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wfc, ComplexMatrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
@@ -167,7 +167,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** c)
 	HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, ParaO.out_hs); //LiuXh, 2017-03-21
 	ofs_running << setprecision(6); //LiuXh, 2017-03-21
 
-	ParaO.diago_complex_begin(ik, c, LM.Hloc2, LM.Sloc2, wf.ekb[ik]);
+	ParaO.diago_complex_begin(ik, wfc, wfc_2d, LM.Hloc2, LM.Sloc2, wf.ekb[ik]);
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
 	if(NONCOLIN)
 	{
@@ -191,7 +191,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** c)
 }
 #endif
 
-void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **cc)const
+void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wfc)const
 {
 	TITLE("Diago_LCAO_Matrix","using_LAPACK_complex");
 
@@ -249,7 +249,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **cc
 	return;
 }
 
-void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** c)const
+void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 {
 	TITLE("Diago_LCAO_Matrix","using_LAPACK");
 	assert(NLOCAL>0);
@@ -302,7 +302,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** c)const
 		wf.ekb[ik][i] = w[i]; 
 		for(int j=0; j<NLOCAL; j++)
 		{
-			c[i][j] = Htmp(j,i);
+			wfc[i][j] = Htmp(j,i);
 		}
 	}
 	
@@ -311,14 +311,14 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** c)const
 	// test
 	// @@@@@@@
 	/*
-	cout << "\n Lapack, c after diago:" << endl;
+	cout << "\n Lapack, wfc after diago:" << endl;
 	for(int i=0; i<NBANDS; i++)
 	{
 		cout << " Eigenvalue from LAPACK : " << setw(5) << setw(12) << wf.ekb[ik][i] << endl;
 		cout << " Eigenfunctions" << endl;
 		for(int j=0; j<NLOCAL; j++)
 		{
-			cout << setw(12) << c[i][j];
+			cout << setw(12) << wfc[i][j];
 		}
 		cout << endl;
 	}

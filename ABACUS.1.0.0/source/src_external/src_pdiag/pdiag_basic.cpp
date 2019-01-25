@@ -28,94 +28,94 @@ void Pdiag_Basic::set_parameters(void)
     TITLE("Pdiag_Basic","set_parameters");
 
     // set loc_size
-if(GAMMA_ONLY_LOCAL)//xiaohui add 2014-12-21
-{
-	loc_size=NBANDS/DSIZE;
-
-	// mohan add 2012-03-29
-	if(loc_size==0)
+	if(GAMMA_ONLY_LOCAL)//xiaohui add 2014-12-21
 	{
-		ofs_warning << " loc_size=0" << " in proc " << MY_RANK+1 << endl;
-		WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < DSIZE");
-	}
+		loc_size=NBANDS/DSIZE;
+
+		// mohan add 2012-03-29
+		if(loc_size==0)
+		{
+			ofs_warning << " loc_size=0" << " in proc " << MY_RANK+1 << endl;
+			WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < DSIZE");
+		}
 
 
 
-    if (DRANK<NBANDS%DSIZE) loc_size=loc_size+1;
-    if(testpb)OUT(ofs_running,"local size",loc_size);
+		if (DRANK<NBANDS%DSIZE) loc_size=loc_size+1;
+		if(testpb)OUT(ofs_running,"local size",loc_size);
 
-    // set loc_sizes
-    delete[] loc_sizes;
-    loc_sizes = new int[DSIZE];
-	ZEROS(loc_sizes, DSIZE);
+		// set loc_sizes
+		delete[] loc_sizes;
+		loc_sizes = new int[DSIZE];
+		ZEROS(loc_sizes, DSIZE);
 
-    this->lastband_in_proc = 0;
-    this->lastband_number = 0;
-    int count_bands = 0;
-    for (int i=0; i<DSIZE; i++)
-    {
-        if (i<NBANDS%DSIZE)
-        {
-			// mohan modify 2010-07-05
-            loc_sizes[i]=NBANDS/DSIZE+1;
-        }
-        else
-        {
-            loc_sizes[i]=NBANDS/DSIZE;
-        }
-        count_bands += loc_sizes[i];
-        if (count_bands >= NBANDS)
-        {
-            lastband_in_proc = i;
-            lastband_number = NBANDS - (count_bands - loc_sizes[i]);
-            break;
-        }
-    }
-}//xiaohui add 2014-12-21
-else//xiaohui add 2014-12-21
-{
-        loc_size=NLOCAL/DSIZE;
+		this->lastband_in_proc = 0;
+		this->lastband_number = 0;
+		int count_bands = 0;
+		for (int i=0; i<DSIZE; i++)
+		{
+			if (i<NBANDS%DSIZE)
+			{
+				// mohan modify 2010-07-05
+				loc_sizes[i]=NBANDS/DSIZE+1;
+			}
+			else
+			{
+				loc_sizes[i]=NBANDS/DSIZE;
+			}
+			count_bands += loc_sizes[i];
+			if (count_bands >= NBANDS)
+			{
+				lastband_in_proc = i;
+				lastband_number = NBANDS - (count_bands - loc_sizes[i]);
+				break;
+			}
+		}
+	}//xiaohui add 2014-12-21
+	else//xiaohui add 2014-12-21
+	{
+			loc_size=NLOCAL/DSIZE;
 
-        // mohan add 2012-03-29
-        if(loc_size==0)
-        {
-                ofs_warning << " loc_size=0" << " in proc " << MY_RANK+1 << endl;
-                WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < DSIZE");
-        }
+			// mohan add 2012-03-29
+			if(loc_size==0)
+			{
+					ofs_warning << " loc_size=0" << " in proc " << MY_RANK+1 << endl;
+					WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < DSIZE");
+			}
 
 
 
-    if (DRANK<NLOCAL%DSIZE) loc_size=loc_size+1;
-    if(testpb)OUT(ofs_running,"local size",loc_size);
+		if (DRANK<NLOCAL%DSIZE) loc_size=loc_size+1;
+		if(testpb)OUT(ofs_running,"local size",loc_size);
 
-    // set loc_sizes
-    delete[] loc_sizes;
-    loc_sizes = new int[DSIZE];
-        ZEROS(loc_sizes, DSIZE);
+		// set loc_sizes
+		delete[] loc_sizes;
+		loc_sizes = new int[DSIZE];
+			ZEROS(loc_sizes, DSIZE);
 
-    this->lastband_in_proc = 0;
-    this->lastband_number = 0;
-    int count_bands = 0;
-    for (int i=0; i<DSIZE; i++)
-    {
-        if (i<NLOCAL%DSIZE)
-        {
-                        // mohan modify 2010-07-05
-            loc_sizes[i]=NLOCAL/DSIZE+1;
-        }
-        else
-        {
-            loc_sizes[i]=NLOCAL/DSIZE;
-        }
-        count_bands += loc_sizes[i];
-        if (count_bands >= NBANDS)
-        {
-            lastband_in_proc = i;
-            lastband_number = NBANDS - (count_bands - loc_sizes[i]);
-            break;
-        }
-    }
-}//xiaohui add 2014-12-21
+		this->lastband_in_proc = 0;
+		this->lastband_number = 0;
+		int count_bands = 0;
+		for (int i=0; i<DSIZE; i++)
+		{
+			if (i<NLOCAL%DSIZE)
+			{
+							// mohan modify 2010-07-05
+				loc_sizes[i]=NLOCAL/DSIZE+1;
+			}
+			else
+			{
+				loc_sizes[i]=NLOCAL/DSIZE;
+			}
+			count_bands += loc_sizes[i];
+			if (count_bands >= NBANDS)
+			{
+				lastband_in_proc = i;
+				lastband_number = NBANDS - (count_bands - loc_sizes[i]);
+				break;
+			}
+		}
+	}//xiaohui add 2014-12-21
 
 	Z_LOC = new double*[NSPIN];
 	for(int is=0; is<NSPIN; is++)

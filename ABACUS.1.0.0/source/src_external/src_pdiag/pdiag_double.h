@@ -22,11 +22,11 @@ class Pdiag_Double : public Pdiag_Basic
     int desc[9];
 #endif
 
-	void diago_double_begin(const int &ik, double **c, 
-		double *h_mat, double *s_mat, double *ekb);
+	void diago_double_begin(const int &ik, double **wfc, matrix &wfc_2d,
+		double *h_mat, double *s_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
 	
-	void diago_complex_begin(const int &ik, complex<double> **c,
-		complex<double> *ch_mat, complex<double> *cs_mat, double *ekb);
+	void diago_complex_begin(const int &ik, complex<double> **wfc, ComplexMatrix &wfc_2d,
+		complex<double> *ch_mat, complex<double> *cs_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
 
 #ifdef __MPI
 	void readin(const string &fa, const string &fb, const int &nlocal, double *eigen, double *eigvr);

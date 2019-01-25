@@ -2,6 +2,9 @@
 #include "../src_pw/global.h"
 #include "blas_interface.h"
 
+#include "src_external/src_test/test_function.h"
+#include "src_external/src_test/src_global/complexmatrix-test.h"
+
 //#include "../src_onscaling/on_tests.h"
 //#include "../src_siao/selinv.h"
 // 2014.10.29 add memory pool for DM and DM_B by yshen
@@ -117,6 +120,8 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 	{
 		WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
 	}
+
+	wfc_dm_2d.init();		// Peize Lin test 2019-01-16
 	return;
 }
 
@@ -241,6 +246,8 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 	{
 		WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
 	}
+	
+	wfc_dm_2d.init();		// Peize Lin test 2019-01-16
 	return;
 }
 
@@ -346,6 +353,7 @@ void Local_Orbital_Charge::sum_bands(void)
 		{
 			//xiaohui modify 2014-06-18
 			this->cal_dk_gamma();//calculate the density matrix.
+			wfc_dm_2d.cal_dm();		// Peize Lin test 2019-01-16
 		}
 	}
 	else
@@ -799,28 +807,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 					}
 				}  // end for col_count
 			}  // end for row_count
-		}  // end for is
-		
-		#if TEST_DM2D==1
-		{
-			ofstream ofs("LOC.DM_"+TO_STRING(MY_RANK));
-			for(int is=0; is!=NSPIN; ++is)
-			{
-				for(int ir=0; ir!=lgd_now; ++ir)
-				{
-					for(int ic=0; ic!=lgd_now; ++ic)
-					{
-						ofs<<this->DM[is][ir][ic]<<"\t";
-					}
-					ofs<<endl;
-				}
-				ofs<<endl;
-			}
-			ofs.close();
-		}
-		#elif TEST_DM2D==-1
-			#error "TEST_DM2D"
-		#endif		
+		}  // end for is	
 	}  // end if !BFIELD
 #endif //2015-09-06, xiaohui
 #ifndef __MPI //2015-09-06, xiaohui

@@ -1,11 +1,11 @@
 #include "local_orbital_elec.h"
 #include "diago_lcao_matrix.h"
-#include "../src_pw/global.h"
-#include "../src_pw/symmetry_rho.h"
+#include "src_pw/global.h"
+#include "src_pw/symmetry_rho.h"
 // mohan add on test 2010-01-13
 //#include "../src_develop/src_onscaling/on_tests.h"
 #include "update_input.h"
-#include "../src_pw/chi0_hilbert.h"
+#include "src_pw/chi0_hilbert.h"
 #include "lcao_vna.h"
 #include "evolve_lcao_matrix.h"
 
@@ -567,7 +567,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		UHM.GK.reset_spin(start_spin);
 		UHM.GK.allocate_pvpR();
 	}
-	
+						
 	ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "Time(Sec)"<< endl;
 	ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
 	for(int ik=0; ik<kv.nks; ik++)
@@ -614,11 +614,11 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 						{//added by zhengdy-soc, for non-collinear case
 							for(int is=1;is<4;is++)
 							{
-								for(int ir=0; ir<pw.nrxx; ir    ++)
+								for(int ir=0; ir<pw.nrxx; ir++)
 								{
-									pot.vrs1[ir] = pot.v    rs( is, ir);
+									pot.vrs1[ir] = pot.vrs( is, ir);
 								}
-								UHM.GK.cal_vlocal_k(pot.vrs1    , GridT, is);
+								UHM.GK.cal_vlocal_k(pot.vrs1, GridT, is);
 							}
 						}
 					}
@@ -663,6 +663,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			//--------------------------------------
 			if(DCOLOR==0)
 			{
+				/*
 				//xiaohui modify 2013-09-02
 				//if(LINEAR_SCALING==1)
 				//{
@@ -699,6 +700,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 				//{
 				//	WARNING_QUIT("Local_Orbital_Elec::cal_bands","check LINEAR_SCALING");
 				//} xiaohui modify 2013-09-02. Attention...
+				*/
 				
 				//xiaohui add 2013-09-02
 				Diago_LCAO_Matrix DLM;
@@ -706,13 +708,13 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 				if(BFIELD)
 				{
 					//cout << " solve comlex matrix()" << endl;
-					DLM.solve_complex_matrix(ik, SGO.totwfc_B[0]);
+					DLM.solve_complex_matrix(ik, SGO.totwfc_B[0], LOC.wfc_dm_2d.wfc_k[ik]);
 				}
 				else
 				{
 					//DLM.solve_double_matrix(ik, LOWF.WFC_GAMMA[CURRENT_SPIN]);
 					// the temperary array totwfc only have one spin direction.
-					DLM.solve_double_matrix(ik, SGO.totwfc[0]);
+					DLM.solve_double_matrix(ik, SGO.totwfc[0], LOC.wfc_dm_2d.wfc_gamma[ik]);
 				} //xiaohui add 2013-09-02. Attention...
 			}
 			else
@@ -753,7 +755,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			{
 				timer::tick("Efficience","diago_k");
 				Diago_LCAO_Matrix DLM;
-				DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik]);
+				DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
 				timer::tick("Efficience","diago_k");
 			}
 			else
@@ -810,11 +812,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 
 //		ofs_running << " TIME FOR K=" << ik << ": " << duration << endl;
 	}
-
-
-
-
-
+			
 	// delete at last time.
 	if(!GAMMA_ONLY_LOCAL)
 	{
