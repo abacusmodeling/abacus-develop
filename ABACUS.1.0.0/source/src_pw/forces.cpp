@@ -22,10 +22,11 @@ void Forces::init()
 	this->cal_force_cc();
 	this->cal_force_scc();
 
+	matrix stress_vdw_pw(3,3);//.create(3,3);
 	if(VdwD2::vdwD2)													//Peize Lin add 2014-04-03
 	{
 		VdwD2 vdw(ucell);
-		vdw.force();
+		vdw.force(stress_vdw_pw, STRESS);
 	}
 	
     //impose total force = 0

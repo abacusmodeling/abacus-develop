@@ -25,7 +25,7 @@ class Stress_LCAO
 	void print_stress(const string &name, double f[][3], const bool screen, bool ry)const;
 	void printstress_total (bool ry);
 	
-	void start_stress(double overlap[][3],double tvnl_dphi[][3],double vnl_dbeta[][3],double vl_dphi[][3]);
+	void start_stress(double overlap[][3],double tvnl_dphi[][3],double vnl_dbeta[][3],double vl_dphi[][3], const matrix& stress_vdw);
 	
 	// total stress
 	double scs[3][3];

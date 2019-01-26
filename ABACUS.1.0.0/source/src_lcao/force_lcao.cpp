@@ -152,10 +152,11 @@ void Force_LCAO::start_force(void)
 	// clear the data.
 	this->fcs.zero_out();
 
+	stress_vdw.create(3,3);//zhengdy added in 2018-10-29
 	if(VdwD2::vdwD2)									//Peize Lin add 2014-04-04
 	{
 		VdwD2 vdw(ucell);
-		vdw.force();
+		vdw.force(stress_vdw, STRESS);
 	}
 	
 	
@@ -873,7 +874,7 @@ void Force_LCAO::cal_stress(matrix &stress)
 {
      Stress_LCAO SS;
      SS.allocate();
-     SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi);
+     SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi, this->stress_vdw);
 
     double unit_transform = 0.0;
     unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;

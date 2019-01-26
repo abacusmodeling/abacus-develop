@@ -163,7 +163,7 @@ double VdwD2::energy()
 	return energy;
 }
 
-vector< vector<double> > VdwD2::force()
+vector< vector<double> > VdwD2::force(matrix &stress_result, const bool stress_for_vdw)
 {
 	initset();
 
@@ -172,6 +172,7 @@ vector< vector<double> > VdwD2::force()
 	{
 		force_result[iat].assign(3,0);
 	}
+	if(stress_for_vdw) stress_result.zero_out();
 	
 	int it1, it2, ia1, ia2, ilat_loop[3], iat(0);
 	double C6_product, R0_sum, r_sqr, r, tmp_exp, tmp_factor;
@@ -207,6 +208,19 @@ vector< vector<double> > VdwD2::force()
 								force_result[iat][0] += tmp_factor* (tau1.x - tau2.x);
 								force_result[iat][1] += tmp_factor* (tau1.y - tau2.y);
 								force_result[iat][2] += tmp_factor* (tau1.z - tau2.z);
+								if(stress_for_vdw)//added by zhengdy 2018/10/28
+								{
+									double dr[3]={tau2.x - tau1.x, tau2.y - tau1.y, tau2.z - tau1.z};
+									for(int ipol = 0;ipol<3;ipol++)
+									{
+										for(int jpol = 0;jpol<3;jpol++)
+										{
+											stress_result(ipol,jpol) += tmp_factor* dr[ipol] *dr[jpol]/2 ;
+										}
+//										stress_result(ipol,1) += tmp_factor* (tau1.y - tau2.y);
+//										stress_result(ipol,2) += tmp_factor* (tau1.z - tau2.z);
+									}
+								}//end if stress
 							}
 				}
 			}
@@ -218,6 +232,13 @@ vector< vector<double> > VdwD2::force()
 		force_result[iat][0] *= scaling/ucell.lat0;
 		force_result[iat][1] *= scaling/ucell.lat0;
 		force_result[iat][2] *= scaling/ucell.lat0;
+	}
+	for(int ipol=0;ipol<3;ipol++)
+	{
+		for(int jpol=0;jpol<3;jpol++)
+		{
+			stress_result(ipol,jpol) *= scaling / ucell.omega;
+		}
 	}
 	return force_result;
 }
