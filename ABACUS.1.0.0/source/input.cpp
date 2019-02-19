@@ -152,6 +152,7 @@ void Input::Default(void)
 	npool = 1;
     epm_spin_orbital = 0;
     berry_phase = false;
+	gdir = 3;
 
     efield = 0;
 	edir = 1;
@@ -559,7 +560,11 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, berry_phase);
         }
-				else if (strcmp("towannier90", word) == 0) // add by jingan for wannier90
+		else if (strcmp("gdir", word) == 0)// berry phase calculation
+		{
+			read_value(ifs, gdir);
+		}
+		else if (strcmp("towannier90", word) == 0) // add by jingan for wannier90
 		{
 			read_value(ifs, towannier90);
 		}
@@ -1583,6 +1588,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( npool );
     Parallel_Common::bcast_int( epm_spin_orbital );
     Parallel_Common::bcast_bool( berry_phase );
+	Parallel_Common::bcast_int( gdir );
     Parallel_Common::bcast_int( efield );
     Parallel_Common::bcast_int( edir );
     Parallel_Common::bcast_double( emaxpos );

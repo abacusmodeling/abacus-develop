@@ -59,7 +59,9 @@ md.o\
 mdNVE.o\
 mdNVT.o\
 soc.o\
-toWannier90.o\
+toWannier90.o \
+unkOverlap_pw.o \
+berryphase.o \
 
 OBJS_TOOLS=complexarray.o\
 complexmatrix.o \
@@ -168,6 +170,7 @@ center2_orb-orb11.o \
 center2_orb-orb21.o \
 center2_orb-orb22.o \
 wfc_dm_2d.o \
+unkOverlap_lcao.o \
 
 OBJS_WANNIER=wan_global.o\
 bessel_basis.o\

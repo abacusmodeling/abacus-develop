@@ -19,6 +19,18 @@ extern "C"
 		const double *B, const int *IB, const int *JB, const int *DESCB,
 		const double *beta,
 		double *C, const int *IC, const int *JC, const int *DESCC);
+	void pzgemm_(
+		const char *transa, const char *transb,
+		const int *M, const int *N, const int *K,
+		const double *alpha,
+		const complex<double> *A, const int *IA, const int *JA, const int *DESCA,
+		const complex<double> *B, const int *IB, const int *JB, const int *DESCB,
+		const double *beta,
+		complex<double> *C, const int *IC, const int *JC, const int *DESCC);
+	void pzgetrf_(
+		const int *M, const int *N, 
+		complex<double> *A, const int *IA, const int *JA, const int *DESCA,
+		int *ipiv,  int *info);
 };
 
 /*

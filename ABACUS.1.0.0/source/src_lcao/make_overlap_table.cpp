@@ -1332,6 +1332,11 @@ void Make_Overlap_Table::init_Lmax (const int orb_num, const int mode, int &Lmax
 //					Lmax = max(Lmax, Exx_Abfs::Lmax);
 //					Lmax_used = 2*Lmax + 1;
 //					break;
+				case 3:                // used in berryphase by jingan
+					cal_Lmax_Phi(Lmax);
+					Lmax++;
+					Lmax_used = 2*Lmax + 1;
+					break;
 				default:
 					throw invalid_argument("Make_Overlap_Table::init_Lmax orb_num=2, mode error");
 					break;

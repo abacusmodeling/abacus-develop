@@ -21,6 +21,7 @@
 #include "epsilon0_pwscf.h"
 #include "epsilon0_vasp.h"
 #include "../src_pw/toWannier90.h"
+#include "../src_pw/berryphase.h"
 
 double electrons::avg_iter = 0;
 
@@ -81,12 +82,13 @@ void electrons::non_self_consistent(void)
     //=======================================================
     // Do a Berry phase polarization calculation if required
     //=======================================================
-    /*
-    	if (lberry)
+    
+    	if (BERRY_PHASE && SYMMETRY == 0)
     	{
-    		c_phase();
+    		berryphase bp;
+			bp.Macroscopic_polarization();
     	}
-    */
+    
 	timer::tick("electrons","non_self_consistent",'D');
     return;
 }
