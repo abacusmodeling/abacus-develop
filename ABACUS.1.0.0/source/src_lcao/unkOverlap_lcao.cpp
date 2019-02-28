@@ -27,7 +27,7 @@ unkOverlap_lcao::unkOverlap_lcao()
 		ZEROS(cal_tag[iw],NLOCAL);
 	}
 	*/
-	ofs_running << "this is unkOverlap_lcao()" << endl;
+	//ofs_running << "this is unkOverlap_lcao()" << endl;
 }
 
 unkOverlap_lcao::~unkOverlap_lcao()
@@ -51,13 +51,13 @@ unkOverlap_lcao::~unkOverlap_lcao()
 		delete cal_tag;
 	}
 	
-	ofs_running << "this is ~unkOverlap_lcao()" << endl;
+	//ofs_running << "this is ~unkOverlap_lcao()" << endl;
 }
 
 
 void unkOverlap_lcao::init()
 {	
-	cout << "unkOverlap_lcao::init start" << endl;
+	//cout << "unkOverlap_lcao::init start" << endl;
 
 	int Lmax_used, Lmax;
 
@@ -232,7 +232,7 @@ void unkOverlap_lcao::init()
 	
 
 	
-	cout << "unkOverlap_lcao::init end" << endl; 
+	//cout << "unkOverlap_lcao::init end" << endl; 
 	return;
 	
 }
@@ -438,7 +438,7 @@ void unkOverlap_lcao::cal_R_number()
 
 void unkOverlap_lcao::cal_orb_overlap()
 {
-	cout << "the cal_orb_overlap is start" << endl;
+	//cout << "the cal_orb_overlap is start" << endl;
 	psi_psi.resize(NLOCAL);
 	psi_r_psi.resize(NLOCAL);
 	for(int iw = 0; iw < NLOCAL; iw++)
@@ -481,7 +481,7 @@ void unkOverlap_lcao::cal_orb_overlap()
 		}
 	}
 	
-	cout << "the cal_orb_overlap is end" << endl;
+	//cout << "the cal_orb_overlap is end" << endl;
 	
 	return;
 }

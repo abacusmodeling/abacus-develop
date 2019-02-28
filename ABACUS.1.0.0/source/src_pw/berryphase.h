@@ -27,6 +27,7 @@ public:
 	double stringPhase(int index_str, int nbands);
 	void Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot);
 	void Macroscopic_polarization();
+	string outFormat(const double polarization, const double modulus, const Vector3<double> project);
 	
 };
 

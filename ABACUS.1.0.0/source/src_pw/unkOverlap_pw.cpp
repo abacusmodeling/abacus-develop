@@ -2,12 +2,12 @@
 
 unkOverlap_pw::unkOverlap_pw()
 {
-	ofs_running << "this is unkOverlap_pw()" << endl;
+	//ofs_running << "this is unkOverlap_pw()" << endl;
 }
 
 unkOverlap_pw::~unkOverlap_pw()
 {
-	ofs_running << "this is ~unkOverlap_pw()" << endl;
+	//ofs_running << "this is ~unkOverlap_pw()" << endl;
 }
 
 

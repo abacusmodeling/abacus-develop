@@ -7,7 +7,7 @@ berryphase::berryphase()
 
 berryphase::~berryphase()
 {
-	ofs_running << "this is ~berryphase()" << endl;
+	//ofs_running << "this is ~berryphase()" << endl;
 }
 
 void berryphase::get_occupation_bands()
@@ -180,6 +180,7 @@ void berryphase::set_kpoints(const int direction)
 	}
 
 	// test by jingan
+	/*
 	ofs_running << "direction is " << direction << endl;
 	ofs_running << "nppstr = " << nppstr << endl;
 	ofs_running << "total string is " << total_string << endl;
@@ -194,7 +195,7 @@ void berryphase::set_kpoints(const int direction)
 		}
 		
 	}
-	
+	*/
 	// test by jingan
 	
 
@@ -208,7 +209,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 	int ik_2;
 	Vector3<double> G(0.0,0.0,0.0);
 	Vector3<double> dk = kv.kvec_c[ k_index[index_str][1] ] - kv.kvec_c[ k_index[index_str][0] ];
-	ofs_running << "the string index is " << index_str << endl;
+	//ofs_running << "the string index is " << index_str << endl;
 	
 	for(int k_start = 0; k_start < (nppstr-1); k_start++)
 	{
@@ -383,7 +384,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 		phik[istring] = (theta0 + dtheta) / (2 * PI);
 		phik_ave = phik_ave + wistring[istring] * phik[istring];
 		// test by jingan
-		ofs_running << "phik[" << istring << "] = " << phik[istring] << endl;
+		//ofs_running << "phik[" << istring << "] = " << phik[istring] << endl;
 		// test by jingan
 	}
 	
@@ -414,14 +415,18 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	delete[] wistring;
 	
 	
-	ofs_running << "Berry_Phase end " << endl;
+	//ofs_running << "Berry_Phase end " << endl;
 
 }
 
 
 void berryphase::Macroscopic_polarization()
 {	
-
+	get_occupation_bands();
+	
+	if( BASIS_TYPE == "lcao" ) this->lcao_init();
+	
+	
 	ofs_running << "\n\n\n\n";
 	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
 	ofs_running << " |                                                                    |" << endl;
@@ -432,11 +437,6 @@ void berryphase::Macroscopic_polarization()
 	ofs_running << " |                                                                    |" << endl;
 	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 	ofs_running << "\n\n\n\n";
-
-	
-	get_occupation_bands();
-	
-	if( BASIS_TYPE == "lcao" ) this->lcao_init();
 	
 	
 	// ion polarization	
@@ -529,9 +529,13 @@ void berryphase::Macroscopic_polarization()
 	
 	// ion polarization	end
 	
-
-	Vector3<double> polarization_elec(0.0,0.0,0.0);	
+	// calculate Macroscopic polarization modulus because berry phase
+	int modulus;
+	if( (!lodd) && (NSPIN==1) ) modulus = 2;
+	else modulus = 1;
 	
+
+	// berry phase calculate begin	
 	switch(GDIR)
 	{
 		case 1:
@@ -542,28 +546,28 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			polarization_elec = pdl_elec_tot * ucell.a1;
 			const double rmod = ucell.a1.norm() * ucell.lat0;
-		
-			ofs_running << " Electronic Phase: " << pdl_elec_tot << endl;
-			ofs_running << "\n" << endl;
+			const double unit1 = rmod;
+			const double unit2 = rmod / ucell.omega;
+			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			
 			ofs_running << " VALUES OF POLARIZATION" << endl;
-			ofs_running << "\n" << endl;
-			ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R1 direction" << endl;
-		
+			ofs_running << endl;
+			ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[0] << endl;
+			ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
+			//ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R1 direction" << endl;
+			
+			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[0] ;
-		
-			ofs_running << " The Ionic phase is " << polarization_ion[0] << endl;
-		
-			ofs_running << " P = " << rmod * total_polarization << "   "
-						<< "(e/Omega).bohr   in " << GDIR << " direction" << endl;
-						   
-			ofs_running << " P = " << rmod * total_polarization / ucell.omega << "   "
-						<< "e/bohr^2   in " << GDIR << " direction" << endl;
-						   
-			ofs_running << " P = " << (rmod * total_polarization / ucell.omega)*(1.60097e-19/pow(5.29177e-11,2)) << "   "
-						<< "C/m^2   in " << GDIR << " direction" << endl;		
-						   
+			
+			Vector3<double> polarization_xyz = ucell.a1;
+			polarization_xyz.normalize();
+			polarization_xyz = total_polarization * polarization_xyz;
+
+			ofs_running << "\n" << "The calculated polarization direction is in R1 direction" << endl;
+			ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
+			ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
+			ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;			   
 			ofs_running << endl;
 		
 			break;
@@ -577,30 +581,30 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			polarization_elec = pdl_elec_tot * ucell.a2;
 			const double rmod = ucell.a2.norm() * ucell.lat0;
-		
-			ofs_running << " Electronic Phase: " << pdl_elec_tot << endl;
-			ofs_running << "\n" << endl;
+			const double unit1 = rmod;
+			const double unit2 = rmod / ucell.omega;
+			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			
 			ofs_running << " VALUES OF POLARIZATION" << endl;
-			ofs_running << "\n" << endl;
-			ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R2 direction" << endl;
-		
-			double total_polarization = pdl_elec_tot + polarization_ion[1] ;
-		
-			ofs_running << " The Ionic phase is " << polarization_ion[1] << endl;
-		
-			ofs_running << " P = " << rmod * total_polarization << "   "
-						<< "(e/Omega).bohr   in " << GDIR << " direction" << endl;
-						   
-			ofs_running << " P = " << rmod * total_polarization / ucell.omega << "   "
-						<< "e/bohr^2   in " << GDIR << " direction" << endl;
-						   
-			ofs_running << " P = " << (rmod * total_polarization / ucell.omega)*(1.60097e-19/pow(5.29177e-11,2)) << "   "
-						<< "C/m^2   in " << GDIR << " direction" << endl;		
-						   
 			ofs_running << endl;
+			ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[1] << endl;
+			ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
+			//ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R2 direction" << endl;
 		
+			// calculate total polarization,add electron part and ions part
+			double total_polarization = pdl_elec_tot + polarization_ion[1] ;
+			
+			Vector3<double> polarization_xyz = ucell.a2;
+			polarization_xyz.normalize();
+			polarization_xyz = total_polarization * polarization_xyz;
+		
+			ofs_running << "\n" << "The calculated polarization direction is in R2 direction" << endl;
+			ofs_running << "\n"  << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
+			ofs_running << "\n"  << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
+			ofs_running << "\n"  << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
+			ofs_running << endl;
+			
 			break;
 		
 		}
@@ -612,100 +616,50 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			polarization_elec = pdl_elec_tot * ucell.a3;
 			const double rmod = ucell.a3.norm() * ucell.lat0;
-		
-			ofs_running << " Electronic Phase: " << pdl_elec_tot << endl;
-			ofs_running << "\n" << endl;
+			const double unit1 = rmod;
+			const double unit2 = rmod / ucell.omega;
+			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			
 			ofs_running << " VALUES OF POLARIZATION" << endl;
-			ofs_running << "\n" << endl;
-			ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R3 direction" << endl;
+			ofs_running << endl;
+			ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[2] << endl;
+			ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
+			//ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R3 direction" << endl;
 		
+			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[2] ;
-		
-			ofs_running << " The Ionic phase is " << polarization_ion[2] << endl;
 			
-			ofs_running << " P = " << rmod * total_polarization << "   "
-						<< "(e/Omega).bohr   in " << GDIR << " direction" << endl;
-						   
-			ofs_running << " P = " << rmod * total_polarization / ucell.omega << "   "
-						<< "e/bohr^2   in " << GDIR << " direction" << endl;
-						   
-			ofs_running << " P = " << (rmod * total_polarization / ucell.omega)*(1.60097e-19/pow(5.29177e-11,2)) << "   "
-						<< "C/m^2   in " << GDIR << " direction" << endl;		
-						   
-			ofs_running << endl;
-		
-			break;
-		}
-		case 0:
-		{
-			double pdl_elec_tot[3];
-			int mod_elec_tot[3];
-		
-			for(int i = 1; i < 4; i++)
-			{
-				direction = i;
-				set_kpoints(direction);
-				pdl_elec_tot[i] = 0.0;
-				mod_elec_tot[i] = 0;
-				Berry_Phase(occ_nbands, pdl_elec_tot[i], mod_elec_tot[i]);
-			}
-		
-			polarization_elec =   pdl_elec_tot[0] * ucell.a1
-								+ pdl_elec_tot[1] * ucell.a2
-								+ pdl_elec_tot[2] * ucell.a3;
-							
-			const double rmod1 = ucell.a1.norm() * ucell.lat0;
-			const double rmod2 = ucell.a2.norm() * ucell.lat0;
-			const double rmod3 = ucell.a3.norm() * ucell.lat0;
-							
-			ofs_running << " Electronic Phase: " << pdl_elec_tot[0] << "   "
-												 << pdl_elec_tot[1] << "   "
-												 << pdl_elec_tot[2] << endl;
-			ofs_running << "\n" << endl;
-			ofs_running << " VALUES OF POLARIZATION" << endl;
-			ofs_running << "\n" << endl;
-			ofs_running << " the electronic part polarization is P(ele) = " << pdl_elec_tot[0] * rmod1 << "   "
-																			<< pdl_elec_tot[1] * rmod2 << "   "
-																			<< pdl_elec_tot[2] * rmod3 << "   "
-																			<< "(e/Omega).bohr   in R1,R2,R3 direction" << endl; 
-						
-			double total_polarization[3];
-			for(int i = 0; i < 3; i++)
-			{
-				total_polarization[i] = pdl_elec_tot[i] + polarization_ion[i];
-			}
-		
-			ofs_running << " The Ionic phase is " << polarization_ion[0] << polarization_ion[1] << polarization_ion[2] 
-					    << "   in R1,R2,R3 direction" << endl;
-			
-			ofs_running << " P = " << rmod1 * total_polarization[0] << "   "
-							       << rmod2 * total_polarization[1] << "   "
-							       << rmod3 * total_polarization[2] << "   "
-					               << "(e/Omega).bohr   in R1,R2,R3 direction" << endl;
-						   
-			ofs_running << " P = " << rmod1 * total_polarization[0] / ucell.omega << "   "
-								   << rmod2 * total_polarization[1] / ucell.omega << "   "
-								   << rmod3 * total_polarization[2] / ucell.omega << "   "
-							       << "e/bohr^2   in R1,R2,R3 direction" << endl;
-						   
-			ofs_running << " P = " << (rmod1 * total_polarization[0] / ucell.omega)*(1.60097e-19/pow(5.29177e-11,2)) << "   "
-							       << (rmod2 * total_polarization[1] / ucell.omega)*(1.60097e-19/pow(5.29177e-11,2)) << "   "
-							       << (rmod3 * total_polarization[2] / ucell.omega)*(1.60097e-19/pow(5.29177e-11,2)) << "   "
-							       << "C/m^2   in R1,R2,R3 direction" << endl;		
-						   
-			ofs_running << endl;
-			
-			break;
+			Vector3<double> polarization_xyz = ucell.a3;
+			polarization_xyz.normalize();
+			polarization_xyz = total_polarization * polarization_xyz;
 
+			ofs_running << "\n" << "The calculated polarization direction is in R3 direction" << endl;
+			ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
+			ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
+			ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
+			ofs_running << endl;
+		
+			break;
 		}
 	
 	}
 
-	ofs_running << "the Macroscopic_polarization is over" << endl;
+	//ofs_running << "the Macroscopic_polarization is over" << endl;
 	
 	return;
+}
+
+string berryphase::outFormat(const double polarization, const double modulus, const Vector3<double> project)
+{
+	stringstream outStr;
+	outStr << setw(12) << fixed << setprecision(7) << polarization << "  (mod " ;
+	outStr << setw(12) << fixed << setprecision(7) << modulus << ")  (";
+	outStr << setw(12) << fixed << setprecision(7) << project.x << ",";
+	outStr << setw(12) << fixed << setprecision(7) << project.y << ",";
+	outStr << setw(12) << fixed << setprecision(7) << project.z << ") ";
+	
+	return outStr.str();
 }
 
 
