@@ -457,8 +457,10 @@ void Epsilon0_pwscf:: Cal_dipole(int ik)
 				dipole_aux_core_I[i][ib1][ib2] = dipole_aux_core[i][ib1][ib2].imag();
 			}
 			
+#ifdef __MPI
 	MPI_Allreduce(dipole_aux_core_R,dipole_aux_R,3*NBANDS*NBANDS,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 	MPI_Allreduce(dipole_aux_core_I,dipole_aux_I,3*NBANDS*NBANDS,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+#endif
 	
 	for(int i=0; i<3; i++)
 		for(int ib1=0; ib1<NBANDS; ib1++)

@@ -13,17 +13,19 @@
 #define MYMATH_H
 #include "../src_pw/tools.h"
 
-#ifdef __FFTW2
-#include "../src_parallel/fftw.h"
+#if defined __FFTW2
+#include "fftw.h"
 #elif defined __FFTW3
-#include "../src_parallel/fftw3.h"
+#include "fftw3.h"
+#else
+#include <fftw3-mpi.h>
+//#include "fftw3-mpi_mkl.h"
 #endif
 
 // in mymath1.cpp
 #ifdef __FFTW3
 void fftw_zeros(fftw_complex *data,int n);
 #endif
-
 
 
 // in mymath1.cpp

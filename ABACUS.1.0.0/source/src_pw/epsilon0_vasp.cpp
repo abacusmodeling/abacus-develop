@@ -362,8 +362,10 @@ void Epsilon0_vasp:: Cal_b(int ik)
 				b_core_I[ib1][ib2][i] = b_core[ib1][ib2][i].imag();
 			}
 			
+#ifdef __MPI
 	MPI_Allreduce(b_core_R,b_R,3*oband*uband,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 	MPI_Allreduce(b_core_I,b_I,3*oband*uband,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+#endif
 	
 	for(int ib1=0; ib1<oband; ib1++)
 		for(int ib2=0; ib2<uband; ib2++)
@@ -473,8 +475,10 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 				psi_nu_core_I[ib][ikb][i] = psi_nu_core[ib][ikb][i].imag();
 			}	
 			
+#ifdef __MPI
 	MPI_Allreduce(psi_nu_core_R,psi_nu_R,4*NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 	MPI_Allreduce(psi_nu_core_I,psi_nu_I,4*NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+#endif
 
 	for(int ib=0; ib<NBANDS; ib++)
 		for(int ikb=0; ikb<ppcell.nkb; ikb++)

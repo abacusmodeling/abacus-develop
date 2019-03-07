@@ -1,6 +1,23 @@
 #include "mathzone_add1.h"
 #include "../src_pw/tools.h"
-#include "../src_parallel/fftw.h"
+
+#if defined __FFTW2
+#include "fftw.h"
+#elif defined __FFTW3
+#include "fftw3.h"
+#define c_re(c) ((c)[0])
+#define c_im(c) ((c)[1])
+#else
+#include <fftw3-mpi.h>
+//#include "fftw3-mpi_mkl.h"
+#define c_re(c) ((c)[0])
+#define c_im(c) ((c)[1])
+#endif
+typedef fftw_complex FFTW_COMPLEX;
+
+//#include <unistd.h>
+//#include <fstream>
+//#include <string>
 
 bool Mathzone_Add1::flag_jlx_expand_coef = false;
 double** Mathzone_Add1::c_ln_c = new double*[1];
@@ -1292,49 +1309,98 @@ void Mathzone_Add1::Uni_Deriv_Phi
 )
 {
 	timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
-	int FFT_NR = 2*mesh-1;
+	int FFT_NR = 2*mesh-1;  // FFT_NR = 16019
+	// cout << "\n mesh=" << mesh << ", radf[8010]=" << radf[8010] <<  ", radf[8009]=" << radf[8009] ;
+	// mesh=8010, radf[8010]=4.396478951532926e-01, radf[8009]=0.000000000000000e+00
 
 	fftw_complex fft_phir[FFT_NR], fft_phik[FFT_NR];
 	fftw_complex fft_ndphik[FFT_NR], fft_ndphir[FFT_NR];
 	fftw_plan p1;
 	fftw_plan p2;
 
-	//CAREFUL: POINT 0 is OF GOOD IMPORTANCE	
-	for (int ir = 0; ir < FFT_NR/2; ++ir)
+	////CAREFUL: POINT 0 is OF GOOD IMPORTANCE	
+	//for (int ir = 0; ir < FFT_NR/2; ++ir)
+	//{
+		//fft_phir[ir].re = radf[ir];
+		//fft_phir[ir].im = 0.0;
+	//}
+
+	//for (int ir = FFT_NR/2; ir < FFT_NR; ++ir)
+	//{
+		//int jr = FFT_NR - ir;
+		//fft_phir[ir].re = radf[jr];
+		//fft_phir[ir].im = 0.0;
+	//}
+	//
+	// second call: different value at [8010]; FFT_NR = 16019, FFT_NR/2=8009 :: 
+	// CAREFUL: POINT 0 is OF GOOD IMPORTANCE	
+	for (int ir = 0; ir < FFT_NR/2; ++ir)	   // ik = 0    1    ... 8008
 	{
-		fft_phir[ir].re = radf[ir];
-		fft_phir[ir].im = 0.0;
+		c_re(fft_phir[ir]) = radf[ir];
+		c_im(fft_phir[ir]) = 0.0;
 	}
 
-	for (int ir = FFT_NR/2; ir < FFT_NR; ++ir)
+	for (int ir = FFT_NR/2; ir < FFT_NR; ++ir) // ir = 8009 8010 ... 16018
 	{
-		int jr = FFT_NR - ir;
-		fft_phir[ir].re = radf[jr];
-		fft_phir[ir].im = 0.0;
+		//int jr = FFT_NR - ir ;			   // jr = 8010 8009 ... 1  
+		int jr = FFT_NR - ir -1 ;			//     ->  8009 8008 ... 0
+		c_re(fft_phir[ir]) = radf[jr];
+		c_im(fft_phir[ir]) = 0.0;
 	}
 
-	//FFTW
+	// FFTW
+#if defined __FFTW3
+	//cout << "\n Call FFTW3 ";
+	p1 = fftw_plan_dft_1d(FFT_NR, fft_phir, fft_phik, FFTW_FORWARD, FFTW_ESTIMATE);
+	fftw_execute(p1);
+	//fftw_destroy_plan(p1);
+#elif defined __FFTW2
+	//cout << "\n Call FFTW2 ";
 	p1 = fftw_create_plan(FFT_NR, FFTW_FORWARD, FFTW_ESTIMATE);
 	fftw_one(p1, fft_phir, fft_phik);
+	//fftw_destroy_plan(p1);
+#endif
+
 	
 	double dk_uniform = TWO_PI / FFT_NR / dr;
 	
-	for (int ik = 0; ik < FFT_NR/2; ik++)
+	//for (int ik = 0; ik < FFT_NR/2; ik++)
+	//{
+		//double kp = ik * dk_uniform;
+		//fft_ndphik[ik].re = pow(kp, nd) * fft_phik[ik].re;
+		//fft_ndphik[ik].im = 0.0;
+	//}
+	
+	//for (int ik = FFT_NR/2; ik < FFT_NR; ik++)
+	//{
+		//double kp = -(FFT_NR - ik)* dk_uniform;
+		//fft_ndphik[ik].re = pow(kp, nd) * fft_phik[ik].re;
+		//fft_ndphik[ik].im = 0.0;
+	//}
+
+	for (int ik = 0; ik < FFT_NR/2; ik++)				// ik = 0    1    ... 8008
 	{
 		double kp = ik * dk_uniform;
-		fft_ndphik[ik].re = pow(kp, nd) * fft_phik[ik].re;
-		fft_ndphik[ik].im = 0.0;
+		c_re(fft_ndphik[ik]) = pow(kp, nd) * c_re(fft_phik[ik]);
+		c_im(fft_ndphik[ik]) = 0.0;
 	}
-	
-	for (int ik = FFT_NR/2; ik < FFT_NR; ik++)
+	for (int ik = FFT_NR/2; ik < FFT_NR; ik++)			// ik = 8009 8010 ... 16018
 	{
-		double kp = -(FFT_NR - ik)* dk_uniform;
-		fft_ndphik[ik].re = pow(kp, nd) * fft_phik[ik].re;
-		fft_ndphik[ik].im = 0.0;
+		//double kp = -(FFT_NR - ik )* dk_uniform;		//(...)  = 8010 8009 ... 1  
+		double kp = -(FFT_NR - ik -1)* dk_uniform;		//(...) -> 8009 8008 ... 0
+		c_re(fft_ndphik[ik]) = pow(kp, nd) * c_re(fft_phik[ik]);
+		c_im(fft_ndphik[ik]) = 0.0;
 	}
 
+#if defined __FFTW3
+	p2 = fftw_plan_dft_1d(FFT_NR, fft_ndphik, fft_ndphir, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_execute(p2);
+	//fftw_destroy_plan(p2);
+#elif defined __FFTW2
 	p2 = fftw_create_plan(FFT_NR, FFTW_BACKWARD, FFTW_ESTIMATE);
 	fftw_one(p2, fft_ndphik, fft_ndphir);
+	//fftw_destroy_plan(p2);
+#endif
 
 	bool is_re;
 	double fac;
@@ -1362,9 +1428,9 @@ void Mathzone_Add1::Uni_Deriv_Phi
 	for (int ir = 0; ir < mesh; ir++)
 	{
 		if (is_re)
-			phind[ir] = fac * fft_ndphir[ir].re / FFT_NR;
+			phind[ir] = fac * c_re(fft_ndphir[ir]) / FFT_NR;
 		else
-			phind[ir] = fac * fft_ndphir[ir].im / FFT_NR;
+			phind[ir] = fac * c_im(fft_ndphir[ir]) / FFT_NR;
 	}
 	
 	fftw_destroy_plan (p1);

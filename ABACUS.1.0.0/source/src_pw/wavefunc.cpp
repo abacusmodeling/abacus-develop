@@ -587,8 +587,10 @@ void wavefunc::wfcinit_k(void)
 							overlap_aux_I[iw1][iw2][g][ir] = overlap_aux[iw1][iw2][g][ir].imag();
 						}
 			
+#ifdef __MPI
 			MPI_Allreduce(overlap_aux_R,overlap_R,NLOCAL * NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 			MPI_Allreduce(overlap_aux_I,overlap_I,NLOCAL * NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+#endif
 			
 			for(int g=0; g<NG; g++)
 				for(int iw1=0; iw1<NLOCAL; iw1++)

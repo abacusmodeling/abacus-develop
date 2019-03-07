@@ -4,7 +4,15 @@
 #include "../src_pw/tools.h"
 #include "parallel_pw.h"
 
+#if defined __FFTW2
 #include "fftw.h"
+#elif defined __FFTW3
+#include "fftw3.h"
+#else
+#include <fftw3-mpi.h>
+//#include "fftw3-mpi_mkl.h"
+#endif
+typedef fftw_complex FFTW_COMPLEX;
 
 class FFT: public Parallel_PW
 {
@@ -39,6 +47,7 @@ private:
 	void fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out);
 	void scatter(complex<double> *psi, const int sign);
 	complex<double> *aux;
+	complex<double> *aux4plan;
 	fftw_plan planplus_x;
 	fftw_plan planplus_y; // mohan fix bug 2009-10-10
 	fftw_plan planplus_z;
@@ -58,8 +67,14 @@ private:
 	int *sum;
 #else
 	void SFFT3D(complex<double> *data, const int sign);
+
+#if defined __FFTW2
 	fftwnd_plan plus_plan;
 	fftwnd_plan minus_plan;
+#elif defined __FFTW3
+	fftw_plan plus_plan;
+	fftw_plan minus_plan;
+#endif
 #endif
 };
 

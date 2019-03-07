@@ -311,7 +311,9 @@ void Chi0_standard::Parallel_G()
 	ZEROS( num_Gvector_dis, DSIZE);
 	ZEROS( num_Gvector_core, DSIZE);
 	
+#ifdef __MPI
 	MPI_Allgather( &pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
+#endif
 	
 	memset(num_G_dis,0,DSIZE*sizeof(int));
 	for(int i=0; i<DSIZE; i++)
@@ -334,8 +336,10 @@ void Chi0_standard::Parallel_G()
 		Gvec_core[3*g0] = pw.gcar[g0].x; Gvec_core[3*g0+1] = pw.gcar[g0].y; Gvec_core[3*g0+2] = pw.gcar[g0].z;
 	}
 	
+#ifdef __MPI
 	MPI_Allgatherv( G_r_core, pw.ngmc, MPI_DOUBLE, G_r, num_G_core, num_G_dis, MPI_DOUBLE, POOL_WORLD);
 	MPI_Allgatherv( Gvec_core, 3*pw.ngmc, MPI_DOUBLE, Gvec, num_Gvector_core, num_Gvector_dis, MPI_DOUBLE, POOL_WORLD);
+#endif
 	
 	double t1; int t2;
 	for(int i=0;i<pw.ngmc_g;i++)
@@ -587,7 +591,9 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 				b_core[g0] = UFFT.porter[ pw.ig2fftc[g0] ];
 			}
 			
+#ifdef __MPI
 			MPI_Allgatherv( b_core, pw.ngmc, mpicomplex, b_summary, num_G_core, num_G_dis, mpicomplex, POOL_WORLD);
+#endif
 			
 			for(int i=0;i<pw.ngmc_g;i++)
 			{

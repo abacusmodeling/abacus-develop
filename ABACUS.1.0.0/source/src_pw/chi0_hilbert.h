@@ -7,11 +7,11 @@
 #include "../input_conv.h"
 #include "wavefunc.h"
 #include "../src_parallel/parallel_global.h"
-#if defined __FFTW2
-#include "../src_parallel/fftw.h"
-#elif defined __FFTW3
-#include "../src_parallel/fftw3.h"
-#endif
+//#if defined __FFTW2
+//#include "../src_parallel/fftw.h"
+//#elif defined __FFTW3
+//#include "../src_parallel/fftw3.h"
+//#endif
 
 class Chi0_hilbert 
 {

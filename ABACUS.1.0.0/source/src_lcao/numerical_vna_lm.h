@@ -2,7 +2,7 @@
 #define NUMERICAL_VNA_LM_H
 
 #include "../src_pw/tools.h"
-#include "../src_parallel/fftw.h"
+//#include "../src_parallel/fftw.h"
 
 //=========================================================
 //CLASS Numerical_Vna_Lm
