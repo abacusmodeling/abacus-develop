@@ -15,14 +15,14 @@ VPATH=./src_global\
 # Define HONG
 #==========================
 #(1)no mpi
-HONG_SER = -D__FP -D__FFTW2 
-HONG_SER_SELINV = -D__FP -D__FFTW2 -D__SELINV
-HONG_GDB = -g -D__FP -D__FFTW2
+HONG_SER = -D__FP ${HONG_FFTW} 
+HONG_SER_SELINV = -D__FP ${HONG_FFTW} -D__SELINV
+HONG_GDB = -g -D__FP ${HONG_FFTW}
 #(2)mpi
-HONG_MPI = -D__FP -D__FFTW2 -D__MPI 
-HONG_MPI_SELINV = -D__FP -D__FFTW3 -D__MPI -D__SELINV -DMETIS
+HONG_MPI = -D__FP ${HONG_FFTW} -D__MPI 
+HONG_MPI_SELINV = -D__FP ${HONG_FFTW} -D__MPI -D__SELINV -DMETIS
 #(3)memory
-HONG_MEM = -D__FFTW2 -D__FP -D_MCD_CHECK -DWIN32 -DMCD_VERBOSE
+HONG_MEM = ${HONG_FFTW} -D__FP -D_MCD_CHECK -DWIN32 -DMCD_VERBOSE
 
 #!!!!!!!!!!!!!!!!!!!! CHANE HERE IF YOU LIKE !!!!!!!!!!!!!!
 #! change series version or parallel version~~~

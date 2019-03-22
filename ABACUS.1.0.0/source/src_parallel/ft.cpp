@@ -17,6 +17,7 @@ FFT::FFT()
 #ifdef __MPI
 	this->plane = new int[1];
 	this->aux = new complex<double>[1];
+	this->aux4plan = new complex<double>[1];
 	
 	this->sentc = new int[1];
 	this->sdis = new int[1];
@@ -33,6 +34,8 @@ FFT::~FFT()
 #if defined __MPI
 	delete[] plane;
 	delete[] aux;
+	delete[] aux4plan;
+
 	
 	delete[] sentc;
 	delete[] sdis;
@@ -46,13 +49,13 @@ FFT::~FFT()
 
 void FFT::FFT3D(complex<double> *psi,const int sign)
 {
-	timer::tick("FFT","FFT3D");
+	timer::tick("FFT","FFT3D",'X');
 #ifdef __MPI
 	P3DFFT(psi,sign);
 #else
 	SFFT3D(psi,sign);
 #endif
-	timer::tick("FFT","FFT3D");
+	timer::tick("FFT","FFT3D",'X');
 	return;
 }
 
@@ -84,20 +87,21 @@ void FFT::setupFFT3D(const int nx, const int ny, const int nz)
 
 void FFT::setupFFT3D_2()
 {
-	timer::tick("FFT","setupFFT3D_2");
+	//timer::tick("FFT","setupFFT3D_2");
 	
 #if defined __FFTW2
 	this->plus_plan  = fftw3d_create_plan
 	(
 		this->plan_nx,this->plan_ny,this->plan_nz,
-		FFTW_BACKWARD, FFTW_MEASURE | FFTW_IN_PLACE | FFTW_THREADSAFE | FFTW_USE_WISDOM
+		FFTW_BACKWARD, FFTW_ESTIMATE | FFTW_IN_PLACE | FFTW_THREADSAFE | FFTW_USE_WISDOM
 	);
 	this->minus_plan = fftw3d_create_plan
 	(
 		this->plan_nx,this->plan_ny,this->plan_nz,
-		FFTW_FORWARD, FFTW_MEASURE | FFTW_IN_PLACE | FFTW_THREADSAFE | FFTW_USE_WISDOM
+		FFTW_FORWARD, FFTW_ESTIMATE | FFTW_IN_PLACE | FFTW_THREADSAFE | FFTW_USE_WISDOM
 	);
 #elif defined __FFTW3
+	delete[] aux4plan; 
 	this->aux4plan = new complex<double>[this->nxx];
 	//fftw_complex *psiout;
 	//psiout = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * this->nxx );
@@ -110,13 +114,13 @@ void FFT::setupFFT3D_2()
 	//this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(psi),  psiout,
 	//this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(psi),  reinterpret_cast<fftw_complex*>(psi) ,
 		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(psi),
-		FFTW_BACKWARD, FFTW_MEASURE // FFTW_ESTIMATE //FFTW_MEASURE
+		FFTW_BACKWARD, FFTW_ESTIMATE // FFTW_ESTIMATE //FFTW_MEASURE
 	);
 	//cout << "\n sign = -1, R->K space \n";
 	this->minus_plan = fftw_plan_dft_3d
 	(
 		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(psi),
-		FFTW_FORWARD, FFTW_MEASURE  // FFTW_ESTIMATE FFTW_MEASURE
+		FFTW_FORWARD, FFTW_ESTIMATE  // FFTW_ESTIMATE FFTW_MEASURE
 	);
 
 	//cout << "\n --- after plan" ;
@@ -130,7 +134,7 @@ void FFT::setupFFT3D_2()
 		cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
 	}
 	this->FFTWsetupwasdone = true;
-	timer::tick("FFT","setupFFT3D_2");
+	//timer::tick("FFT","setupFFT3D_2");
 	return;
 }
 void FFT::SFFT3D(complex<double> *psi, const int sign)
@@ -141,8 +145,6 @@ void FFT::SFFT3D(complex<double> *psi, const int sign)
 		this->setupFFT3D_2();
 	}
 	
-	timer::tick("FFT","FFT3D");
-
 	if (sign == 1)// K-->R space
 	{
 #if defined __FFTW2
@@ -167,7 +169,6 @@ void FFT::SFFT3D(complex<double> *psi, const int sign)
 		}
 	}
 
-	timer::tick("FFT","FFT3D");
 	return;
 }
 
@@ -175,7 +176,7 @@ void FFT::SFFT3D(complex<double> *psi, const int sign)
 #elif defined __MPI
 void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nxx_in,const bool in_pool2)
 {
-	timer::tick("FFT","Setup_MPI_FFT3D");
+	//timer::tick("FFT","Setup_MPI_FFT3D");
 	
 	if(test_fft) TITLE("FFT","setup_MPI_FFT3D");
 	this->plan_nx = nx;
@@ -287,6 +288,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	cout << " rank_use = " << rank_use << "\n";
 	cout << "\n ---------------------- ::setup_MPI_FFT3D" << endl;
 	*/
+	delete[] aux4plan; 
 	this->aux4plan = new complex<double>[this->nxx];
 	//
 	//		                            (rank, *n,				howmany, *in,		   		      *inembed, istride, idist,
@@ -347,7 +349,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 	this->FFTWsetupwasdone = 1;
 
-	timer::tick("FFT","Setup_MPI_FFT3D");
+	//timer::tick("FFT","Setup_MPI_FFT3D");
 
 	if(test_fft)cout << "\n FFTW setup done";
 	return;
@@ -357,14 +359,14 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 void FFT::P3DFFT(complex<double> *psi, const int sign)
 {
 	
-	timer::tick("FFT","P3DFFT_Init");
+	//timer::tick("FFT","P3DFFT_Init");
 
 	ZEROS(this->aux, this->nxx);
 
 	// number of z in this cpu.
 	const int npps_now = this->npps[rank_use];
 
-	timer::tick("FFT","P3DFFT_Init");
+	//timer::tick("FFT","P3DFFT_Init");
 
 	// G --> real space
 	if (sign == 1)
@@ -375,7 +377,7 @@ void FFT::P3DFFT(complex<double> *psi, const int sign)
 		// the result is recorded in aux.
 		this->scatter(psi, sign);
 		
-		timer::tick("FFT","P3DFFT_Map+");
+		//timer::tick("FFT","P3DFFT_Map+");
 		ZEROS(psi, this->nxx);
 		int ii = 0;
 		for (int ip = 0;ip < nproc_use;ip++)
@@ -396,7 +398,7 @@ void FFT::P3DFFT(complex<double> *psi, const int sign)
 				ii++;
 			}
 		}
-		timer::tick("FFT","P3DFFT_Map+");
+		//timer::tick("FFT","P3DFFT_Map+");
 
 		this->fftxy(psi, sign);
 	}
@@ -405,7 +407,7 @@ void FFT::P3DFFT(complex<double> *psi, const int sign)
 		this->fftxy(psi, sign);
 		int sticknow = 0;
 		
-		timer::tick("FFT","P3DFFT_Map-");
+		//timer::tick("FFT","P3DFFT_Map-");
 		for (int ip = 0;ip < nproc_use;ip++)
 		{
 			for (int j = 0;j < nst_per[ip];j++)
@@ -421,7 +423,7 @@ void FFT::P3DFFT(complex<double> *psi, const int sign)
 				sticknow++;
 			}
 		}
-		timer::tick("FFT","P3DFFT_Map-");
+		//timer::tick("FFT","P3DFFT_Map-");
 
 		this->scatter(psi, sign);
 		this->fftz(aux, sign, psi);
@@ -432,7 +434,7 @@ void FFT::P3DFFT(complex<double> *psi, const int sign)
 
 void FFT::fftxy(complex<double> *psi, const int sign)
 {
-	timer::tick("FFT","fftxy");
+	//timer::tick("FFT","fftxy");
 
 	// Number of z in this cpu. 
 	int np = this->npps[rank_use];
@@ -519,13 +521,13 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 		}
 	}
 	
-	timer::tick("FFT","fftxy");
+	//timer::tick("FFT","fftxy");
 	return;
 }
 
 void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out)
 {
-	timer::tick("FFT","fftz");
+	//timer::tick("FFT","fftz");
 	// number of sticks in this process.
 	int ns = this->nst_per[rank_use];
 
@@ -535,8 +537,8 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 		// only do ns * plan_nz(element number) fft .
 #ifdef __FFTW3
 		//		                            (rank, *n,				 howmany, *in,					  *inembed, istride, idist,
-		this->planplus_z = fftw_plan_many_dft( 1, &plan_ny, 		 ns,	  (fftw_complex *)psi_in, &plan_ny, 1,       plan_nz,
-				(fftw_complex *)psi_in, &plan_ny, 1,		 plan_nz, FFTW_BACKWARD,	FFTW_ESTIMATE   );
+		//this->planplus_z = fftw_plan_many_dft( 1, &plan_ny, 		 ns,	  (fftw_complex *)psi_in, &plan_ny, 1,       plan_nz,
+		//		(fftw_complex *)psi_in, &plan_ny, 1,		 plan_nz, FFTW_BACKWARD,	FFTW_ESTIMATE   );
 		//      *out, 					*onembed, ostride, odist,	  sign, 		 	unsigned flags
 		//fftw_execute( this->planplus_z );
 		//fftw_destroy_plan ( this->planplus_z );
@@ -573,7 +575,7 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 		}
 	}
 
-	timer::tick("FFT","fftz");
+	//timer::tick("FFT","fftz");
 	return;
 }
 
@@ -581,7 +583,7 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 
 void FFT::scatter(complex<double> *psi, int sign)
 {
-	timer::tick("FFT","scatter");
+	//timer::tick("FFT","scatter");
 
 	int ns = nst_per[rank_use];
 	int nz = this->plan_nz;
@@ -660,7 +662,7 @@ void FFT::scatter(complex<double> *psi, int sign)
 		}
 	}
 
-	timer::tick("FFT","scatter");
+	//timer::tick("FFT","scatter");
 	return;
 }
 #endif // __MPI

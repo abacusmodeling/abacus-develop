@@ -3,6 +3,7 @@ include Makefile.vars
 #---------------------------------------------
 # FFTW directories
 #---------------------------------------------
+HONG_FFTW = -D__FFTW3
 FFTW_INCLUDE = ${FFTW_DIR}/include
 FFTW_LIB_DIR = ${FFTW_DIR}/lib
 # or

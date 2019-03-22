@@ -278,7 +278,7 @@ void timer::print_all(ofstream &ofs)
 			continue;
 		}
 
-		if( level[k] > 'N' ) continue;
+		if( level[k] > 'X' ) continue;
 
 
 		const long double spend_time = cpu_second[k];
