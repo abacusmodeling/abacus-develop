@@ -19,6 +19,7 @@ void berryphase::get_occupation_bands()
 	}
 	
 	occ_nbands = (int) occupied_bands;
+	if(occ_nbands > NBANDS) WARNING_QUIT("berryphase::get_occupation_bands","you set the band numer is not enough for berryphase, please add bands number.");
 	//ofs_running << "the berryphase's occ_nbands is " << occ_nbands << endl;
 }
 
@@ -55,7 +56,7 @@ void berryphase::set_kpoints(const int direction)
 		}
 		
 		
-		for(int istring = 0; istring < num_string; istring++)
+		for(int istring = 0; istring < total_string; istring++)
 		{
 			k_index[istring].resize(mp_x+1); // 加 1 代表着每条string是从k=0到k=G	
 		}
@@ -101,7 +102,7 @@ void berryphase::set_kpoints(const int direction)
 			k_index.resize(total_string);
 		}
 	
-		for(int istring = 0; istring < num_string; istring++)
+		for(int istring = 0; istring < total_string; istring++)
 		{
 			k_index[istring].resize(mp_y+1); // 加 1 代表着每条string是从k=0到k=G	
 		}
@@ -147,7 +148,7 @@ void berryphase::set_kpoints(const int direction)
 			k_index.resize(total_string);
 		}
 		
-		for(int istring = 0; istring < num_string; istring++)
+		for(int istring = 0; istring < total_string; istring++)
 		{
 			k_index[istring].resize(mp_z+1); // 加 1 代表着每条string是从k=0到k=G
 		}
@@ -397,12 +398,12 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 		pdl_elec_tot = phik_ave;
 	}
 	
-	if(NSPIN = 1)
+	if(NSPIN == 1)  // remap to [-1,1]
 	{
 		pdl_elec_tot = pdl_elec_tot - 2.0 * round(pdl_elec_tot/2.0);
 		mod_elec_tot = 2;
 	}
-	else if( NSPIN == 2 || NSPIN == 4 )
+	else if( NSPIN == 2 || NSPIN == 4 )  // remap to [-0.5,0.5]
 	{
 		pdl_elec_tot = pdl_elec_tot - 1.0 * round(pdl_elec_tot/1.0);
 		mod_elec_tot = 1;
@@ -534,6 +535,10 @@ void berryphase::Macroscopic_polarization()
 	if( (!lodd) && (NSPIN==1) ) modulus = 2;
 	else modulus = 1;
 	
+	// test by jingan
+	//ofs_running << "ion polarization end" << endl;
+	// test by jingan
+
 
 	// berry phase calculate begin	
 	switch(GDIR)
