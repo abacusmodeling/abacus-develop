@@ -53,6 +53,7 @@ public:
 	int gdir;               // berry phase calculation
 	bool towannier90;       // add by jingan for wannier90
 	string NNKP;            // add by jingan for wannier90
+	string wannier_spin;    // add by jingan for wannier90
     int efield;				// add electrical field
 	int edir;
 	double emaxpos;

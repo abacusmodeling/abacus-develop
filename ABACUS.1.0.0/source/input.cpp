@@ -572,6 +572,10 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, NNKP);
 		}
+		else if (strcmp("wannier_spin", word) == 0) // add by jingan for wannier90
+		{
+			read_value(ifs, wannier_spin);
+		}
         else if (strcmp("efield", word) == 0)// electrical field
         {
             read_value(ifs, efield);
