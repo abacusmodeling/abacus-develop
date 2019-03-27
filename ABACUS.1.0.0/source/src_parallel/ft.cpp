@@ -4,6 +4,8 @@
 //#include "../src_algorithms/mymath.h"
 //#include "fftw.h"
 
+//#include <unistd.h>
+
 FFT::FFT()
 {
 	//TITLE("FFT","FFT");
@@ -49,13 +51,39 @@ FFT::~FFT()
 
 void FFT::FFT3D(complex<double> *psi,const int sign)
 {
+	/*
+	cout << "\n\n do fft3d()  "; // << psi[0] << endl;
+	cout << "psi size = " << sizeof(psi) << " " << sizeof( psi[0] ) ;
+	cout.setf(ios::right);
+	cout.setf(ios::scientific);
+	cout.precision(15);
+	cout << "\n before FFTW, dim: " << plan_nx <<"*"<< plan_ny <<"*"<< plan_nz <<"="<< plan_nx*plan_ny*plan_nz  << "|" << this->nxx << endl;
+	for(int i=0; i<3 ; i++) cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	cout << "\n ... " ;
+	for(int i=nxx-3; i<(nxx) ; i++) cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	cout << endl;
+	*/
+
 	timer::tick("FFT","FFT3D",'X');
+
 #ifdef __MPI
 	P3DFFT(psi,sign);
+
 #else
 	SFFT3D(psi,sign);
 #endif
+
 	timer::tick("FFT","FFT3D",'X');
+
+	/*
+	cout << "\n\n after FFTW:  \n ";
+	for(int i=0; i<3 ; i++) 			cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	cout << "\n ... " ;
+	for(int i=nxx-3; i<(nxx) ; i++)  cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	cout << "\n ---------------------- :FFT3D sign: " << sign << endl;
+	sleep(5);
+	*/
+
 	return;
 }
 
@@ -74,6 +102,7 @@ void FFT::FFT3D(matrix &psi, const int sign)
 
 
 #ifndef __MPI
+
 void FFT::setupFFT3D(const int nx, const int ny, const int nz)
 {
 	if(test_fft) TITLE("FFT","setupFFT3D");
@@ -90,6 +119,7 @@ void FFT::setupFFT3D_2()
 	//timer::tick("FFT","setupFFT3D_2");
 	
 #if defined __FFTW2
+
 	this->plus_plan  = fftw3d_create_plan
 	(
 		this->plan_nx,this->plan_ny,this->plan_nz,
@@ -100,9 +130,12 @@ void FFT::setupFFT3D_2()
 		this->plan_nx,this->plan_ny,this->plan_nz,
 		FFTW_FORWARD, FFTW_ESTIMATE | FFTW_IN_PLACE | FFTW_THREADSAFE | FFTW_USE_WISDOM
 	);
+
 #elif defined __FFTW3
+
 	delete[] aux4plan; 
 	this->aux4plan = new complex<double>[this->nxx];
+
 	//fftw_complex *psiout;
 	//psiout = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * this->nxx );
 	//std::complex<double>* psiout = new std::complex<double>[this->nxx];
@@ -123,10 +156,6 @@ void FFT::setupFFT3D_2()
 		FFTW_FORWARD, FFTW_ESTIMATE  // FFTW_ESTIMATE FFTW_MEASURE
 	);
 
-	//cout << "\n --- after plan" ;
-	//for(int i=0; i<3 ; i++) 			cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
-	//cout << "\n ... " ;
-	//for(int i=nxx-3; i< (nxx+1) ; i++)  cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
 #endif
 
 	if (!this->plus_plan || !this->minus_plan)
@@ -134,9 +163,12 @@ void FFT::setupFFT3D_2()
 		cout << "\nCan't create plans for FFTW in setupFFT3D()\n\n";
 	}
 	this->FFTWsetupwasdone = true;
+
 	//timer::tick("FFT","setupFFT3D_2");
+
 	return;
 }
+
 void FFT::SFFT3D(complex<double> *psi, const int sign)
 {
 	if(!FFTWsetupwasdone) 
@@ -147,21 +179,25 @@ void FFT::SFFT3D(complex<double> *psi, const int sign)
 	
 	if (sign == 1)// K-->R space
 	{
+
 #if defined __FFTW2
 		fftwnd(this->plus_plan, 1, (FFTW_COMPLEX *)psi, 1, 0, NULL, 0, 0);
 #elif defined __FFTW3
 		//fftw_execute( this->plus_plan);
 		fftw_execute_dft( this->plus_plan, (FFTW_COMPLEX *)psi, (FFTW_COMPLEX *)psi);
-#endif		
+#endif
+
 	}
 	else if (sign == -1)// R-->K space
 	{
+
 #if defined __FFTW2
 		fftwnd( this->minus_plan, 1, (FFTW_COMPLEX *)psi, 1, 0, NULL, 0, 0);
 #elif defined __FFTW3
 		//fftw_execute( this->minus_plan);
 		fftw_execute_dft( this->minus_plan, (FFTW_COMPLEX *)psi, (FFTW_COMPLEX *)psi);
-#endif	
+#endif
+
 		for (int i = 0; i < this->nxx; i++)
 		{
 			psi[i] *= this->scale_xyz;
@@ -174,6 +210,7 @@ void FFT::SFFT3D(complex<double> *psi, const int sign)
 
 
 #elif defined __MPI
+
 void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nxx_in,const bool in_pool2)
 {
 	//timer::tick("FFT","Setup_MPI_FFT3D");
@@ -197,12 +234,14 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 		this->rank_use = MY_RANK;
 		this->nproc_use = NPROC;
 	}
-/*
+
+	/*
 	cout << "\n nx = " << this->plan_nx;
 	cout << "\n ny = " << this->plan_ny;
 	cout << "\n nz = " << this->plan_nz;
 	cout << "\n nxx = " << this->nxx;
-*/
+	*/
+
 	delete[] plane;
 	this->plane = new int[nx];// number of y-z plane
 	ZEROS(plane, nx);
@@ -278,50 +317,52 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 
 #if defined __FFTW3
+
 	int np = this->npps[rank_use];
 	int npy = np * this->plan_ny;
 	int ns = this->nst_per[rank_use];
 	/*
+	cout << " rank_use = " << rank_use << "\n";
+	cout << " ns  = " << ns  << "\n";
 	cout << " np  = " << np  << "\n";
 	cout << " npy = " << npy << "\n";
-	cout << " ns  = " << ns  << "\n";
-	cout << " rank_use = " << rank_use << "\n";
-	cout << "\n ---------------------- ::setup_MPI_FFT3D" << endl;
 	*/
+
 	delete[] aux4plan; 
 	this->aux4plan = new complex<double>[this->nxx];
-	//
-	//		                            (rank, *n,				howmany, *in,		   		      *inembed, istride, idist,
-	this->planplus_x  = fftw_plan_many_dft( 1, &plan_ny, 		npy,	 (fftw_complex *)aux4plan, &plan_ny, npy,     1,
-			(fftw_complex *)aux4plan, &plan_ny, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );  // FFTW_ESTIMATE FFTW_MEASURE
-	//      *out,				 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
 
-	//		                            (rank, *n,				howmany, *in,						 *inembed, istride, idist,
-	this->planplus_y = fftw_plan_many_dft( 1, &plan_ny, 		np,		 (fftw_complex*)&aux4plan[i*npy], &plan_ny, np,      1,
-			(fftw_complex*)&aux4plan[i*npy], &plan_ny, np,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
-	//       *out, 						*onembed, ostride,	odist,	 sign, 		 	unsigned flags
+	//		                             (rank, *n,			howmany, *in,				  			  *inembed, istride, idist,
+	this->planplus_x  = fftw_plan_many_dft(  1, &plan_nx,	npy,	 (fftw_complex *)aux4plan, 		  &plan_nx, npy,     1,
+			(fftw_complex *)aux4plan, 	 &plan_nx, npy,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+	//      *out,				 		 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
 
-	//		                            (rank, *n,				howmany, *in,				  *inembed, istride, idist,
-	this->planminus_x  = fftw_plan_many_dft( 1, &plan_ny, 		npy,	 (fftw_complex *)aux4plan, &plan_ny, npy,     1,
-			(fftw_complex *)aux4plan, &plan_ny, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-	//      *out, 				 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
+	//		                             (rank, *n,			howmany, *in,						 	  *inembed, istride, idist,
+	this->planplus_y  = fftw_plan_many_dft(  1, &plan_ny,	np,		 (fftw_complex*)&aux4plan[i*npy], &plan_ny, np,      1,
+		(fftw_complex*)&aux4plan[i*npy], &plan_ny, np,		1,		 FFTW_BACKWARD,	FFTW_MEASURE   );
+	//	*out, 							 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
 
-	//		                            (rank, *n,				howmany, *in,						 *inembed, istride, idist,
-	this->planminus_y = fftw_plan_many_dft( 1, &plan_ny, 		np,		 (fftw_complex*)&aux4plan[i*npy], &plan_ny, np,     1,
-			(fftw_complex*)&aux4plan[i*npy], &plan_ny, np,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
-	//       *out, 						*onembed, ostride,	odist,	 sign, 		 	unsigned flags
+	//		                             (rank, *n,			howmany, *in,			  				  *inembed, istride, idist,
+	this->planminus_x = fftw_plan_many_dft(  1, &plan_nx, 	npy, 	 (fftw_complex *)aux4plan,		  &plan_nx, npy,     1,
+			(fftw_complex *)aux4plan, 	 &plan_nx, npy,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+	//      *out, 				 		 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
 
-	//		                            (rank, *n,				 howmany, *in,					  *inembed, istride, idist,
-	this->planplus_z = fftw_plan_many_dft( 1, &plan_ny, 		 ns,	  (fftw_complex *)aux4plan, &plan_ny, 1,       plan_nz,
-			(fftw_complex *)aux4plan, &plan_ny, 1,		 plan_nz, FFTW_BACKWARD,	FFTW_MEASURE   );
-	//      *out, 					*onembed, ostride, odist,	  sign, 		 	unsigned flags
+	//		                             (rank, *n,			howmany, *in,							  *inembed, istride, idist,
+	this->planminus_y = fftw_plan_many_dft(  1, &plan_ny, 	np,		 (fftw_complex*)&aux4plan[i*npy], &plan_ny, np,     1,
+		(fftw_complex*)&aux4plan[i*npy], &plan_ny, np,		1,		 FFTW_FORWARD,	FFTW_MEASURE   );
+	//	*out, 							 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
 
-	//		                            (rank, *n,				 howmany, *in,					  *inembed, istride, idist,
-	this->planminus_z = fftw_plan_many_dft( 1, &plan_ny, 		 ns,	  (fftw_complex *)aux4plan, &plan_ny, 1,       plan_nz,
-			(fftw_complex *)aux4plan, &plan_ny, 1,		 plan_nz, FFTW_FORWARD,	FFTW_MEASURE   );
-	//       *out, 					*onembed, ostride, odist,	  sign, 		 	unsigned flags
+	//		                             (rank, *n,			howmany, *in,					    	  *inembed, istride, idist,
+	this->planplus_z  = fftw_plan_many_dft(  1, &plan_nz,	ns,		 (fftw_complex *)aux4plan,  	  &plan_nz, 1,       plan_nz,
+			(fftw_complex *)aux4plan, 	 &plan_nz, 1,		plan_nz, FFTW_BACKWARD,	FFTW_MEASURE   );
+	//      *out, 						 *onembed, ostride,  odist,	 sign, 		 	unsigned flags
+
+	//		                             (rank, *n,			howmany, *in,					    	  *inembed, istride, idist,
+	this->planminus_z = fftw_plan_many_dft(  1, &plan_nz,	ns,		 (fftw_complex *)aux4plan,  	  &plan_nz, 1,       plan_nz,
+			(fftw_complex *)aux4plan, 	 &plan_nz, 1,	    plan_nz, FFTW_FORWARD,	FFTW_MEASURE   );
+	//      *out, 						 *onembed, ostride,  odist,	 sign, 		 	unsigned flags
 
 #elif defined __FFTW2
+
 	this->planplus_x = fftw_create_plan(plan_nx, FFTW_BACKWARD, FFTW_MEASURE | FFTW_IN_PLACE |
 	                                  FFTW_THREADSAFE | FFTW_USE_WISDOM);
 
@@ -339,6 +380,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 	this->planminus_z = fftw_create_plan(plan_nz, FFTW_FORWARD, FFTW_MEASURE | FFTW_IN_PLACE |
 	                                   FFTW_THREADSAFE | FFTW_USE_WISDOM);
+
 #endif
 
 	if (!planplus_x ||!planplus_y ||!planplus_z || !planminus_x || !planminus_y|| !planminus_z )
@@ -444,35 +486,42 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 
 	if (sign == 1)
 	{
+
+		//cout << "np+  = " << np << endl;
+		//cout << "npy+ = " << npy << endl;
+		//cout << "plan_nx+ = " << plan_nx << endl;
+
 		for (int i=0; i<this->plan_nx; i++)
 		{
 //			if (this->plane[i] != 0)
 //			{
-#ifdef __FFTW3
-				//		                            (rank, *n,				howmany, *in,						 *inembed, istride, idist,
+#if defined __FFTW3
+				//		                             (rank, *n,				howmany, *in,						 *inembed, istride, idist,
 				//this->planplus_y = fftw_plan_many_dft( 1, &plan_ny, 		np,		 (fftw_complex*)&psi[i*npy], &plan_ny, np,      1,
 				//		(fftw_complex*)&psi[i*npy], &plan_ny, np,		1,		 FFTW_BACKWARD,	FFTW_ESTIMATE   );
 				//       *out, 						*onembed, ostride,	odist,	 sign, 		 	unsigned flags
 				//fftw_execute( this->planplus_y );
 				//fftw_destroy_plan ( this->planplus_y );
 				fftw_execute_dft( this->planplus_y, (fftw_complex*)&psi[i*npy], (fftw_complex*)&psi[i*npy] );
+				//fftw_execute_dft( this->planminus_y, (fftw_complex*)&psi[i*npy], (fftw_complex*)&psi[i*npy] );
 
-#else
+#elif defined __FFTW2
 				fftw(planplus_y, np, (fftw_complex*)&psi[i*npy], np, 1, NULL, 0, 0);
+				//fftw(planminus_y, np, (fftw_complex*)&psi[i*npy], np, 1, NULL, 0, 0);
 #endif
 //			}
 		}
 
-#ifdef __FFTW3
+#if defined __FFTW3
 				//		                            (rank, *n,				howmany, *in,				  *inembed, istride, idist,
-				//this->planplus_x  = fftw_plan_many_dft( 1, &plan_ny, 		npy,	 (fftw_complex *)psi, &plan_ny, npy,     1,
-				//		(fftw_complex *)psi, &plan_ny, npy,		1,		 FFTW_BACKWARD,	FFTW_ESTIMATE   );
+				//this->planplus_x  = fftw_plan_many_dft( 1, &plan_nx, 		npy,	 (fftw_complex *)psi, &plan_nx, npy,     1,
+				//		(fftw_complex *)psi, &plan_nx, npy,		1,		 FFTW_BACKWARD,	FFTW_ESTIMATE   );
 				//      *out,				 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
 				//fftw_execute( this->planplus_x );
 				//fftw_destroy_plan ( this->planplus_x );
 				fftw_execute_dft( this->planplus_x, (fftw_complex *)psi, (fftw_complex *)psi);
 
-#else
+#elif defined __FFTW2
 				fftw(planplus_x, npy, (fftw_complex *)psi, npy, 1, NULL, 0, 0);
 #endif
 
@@ -480,17 +529,21 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 	else if (sign == -1)
 	{
 
-#ifdef __FFTW3
-		//		                            (rank, *n,				howmany, *in,				  *inembed, istride, idist,
-		//this->planminus_x  = fftw_plan_many_dft( 1, &plan_ny, 		npy,	 (fftw_complex *)psi, &plan_ny, npy,     1,
-		//		(fftw_complex *)psi, &plan_ny, npy,		1,		 FFTW_FORWARD,	FFTW_ESTIMATE   );
-		//      *out, 				 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
-		//fftw_execute( this->planminus_x );
-		//fftw_destroy_plan ( this->planminus_x );
-		fftw_execute_dft( this->planminus_x, (fftw_complex *)psi, (fftw_complex *)psi);
+		//cout << "np-  = " << np << endl;
+		//cout << "npy- = " << npy << endl;
+		//cout << "plan_nx- = " << plan_nx << endl;
 
-#else
-		fftw(planminus_x, npy, (fftw_complex *)psi, npy, 1, NULL, 0, 0);
+#if defined __FFTW3
+				//		                               (rank, *n,				howmany, *in,			  *inembed, istride, idist,
+				//this->planminus_x  = fftw_plan_many_dft( 1, &plan_nx, 		npy, (fftw_complex *)psi, &plan_nx, npy,     1,
+				//		(fftw_complex *)psi, &plan_nx, npy,		1,		 FFTW_FORWARD,	FFTW_ESTIMATE   );
+				//      *out, 				 *onembed, ostride,	odist,	 sign, 		 	unsigned flags
+				//fftw_execute( this->planminus_x );
+				//fftw_destroy_plan ( this->planminus_x );
+				fftw_execute_dft( this->planminus_x, (fftw_complex *)psi, (fftw_complex *)psi);
+
+#elif defined __FFTW2
+				fftw(planminus_x, npy, (fftw_complex *)psi, npy, 1, NULL, 0, 0);
 #endif
 
 		for (int i = 0;i <this->plan_nx;i++)
@@ -498,23 +551,22 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 //			if (this->plane[i] != 0)
 //			{
 
-#ifdef __FFTW3
-				//		                            (rank, *n,				howmany, *in,						 *inembed, istride, idist,
-				//this->planminus_y = fftw_plan_many_dft( 1, &plan_ny, 		np,		 (fftw_complex*)&psi[i*npy], &plan_ny, np,     1,
+#if defined __FFTW3
+				//		                              (rank, *n,	   howmany, *in,						*inembed, istride, idist,
+				//this->planminus_y = fftw_plan_many_dft( 1, &plan_ny, 		np,	(fftw_complex*)&psi[i*npy], &plan_ny, np,     1,
 				//		(fftw_complex*)&psi[i*npy], &plan_ny, np,		1,		 FFTW_FORWARD,	FFTW_ESTIMATE   );
 				//       *out, 						*onembed, ostride,	odist,	 sign, 		 	unsigned flags
 				//fftw_execute( this->planminus_y );
 				//fftw_destroy_plan ( this->planminus_y );
 				fftw_execute_dft( this->planminus_y, (fftw_complex*)&psi[i*npy], (fftw_complex*)&psi[i*npy]);
 
-#else
+#elif defined __FFTW2
 				fftw(planminus_y, np, (fftw_complex *) &psi[i*npy], np, 1, NULL, 0, 0);
 //				fftw(planminus_y, np, (fftw_complex *) &psi[i*npy], np, plan_nx, NULL, 0, 0);
 #endif
-
-
 //			}
 		}
+
 		for (int i = 0;i < plan_nx*npy;i++)
 		{
 			psi[i] *= scale_xy;
@@ -525,6 +577,8 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 	return;
 }
 
+
+
 void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out)
 {
 	//timer::tick("FFT","fftz");
@@ -533,18 +587,21 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 
 	if (sign == 1)
 	{
-
+		// cout << "ns+ = " << ns << endl;
 		// only do ns * plan_nz(element number) fft .
-#ifdef __FFTW3
-		//		                            (rank, *n,				 howmany, *in,					  *inembed, istride, idist,
-		//this->planplus_z = fftw_plan_many_dft( 1, &plan_ny, 		 ns,	  (fftw_complex *)psi_in, &plan_ny, 1,       plan_nz,
-		//		(fftw_complex *)psi_in, &plan_ny, 1,		 plan_nz, FFTW_BACKWARD,	FFTW_ESTIMATE   );
+
+#if defined __FFTW3
+		//		                             (rank, *n,				 howmany, *in,					  *inembed, istride, idist,
+		//this->planplus_z = fftw_plan_many_dft( 1, &plan_nz, 		 ns,	  (fftw_complex *)psi_in, &plan_nz, 1,       plan_nz,
+		//		(fftw_complex *)psi_in, &plan_nz, 1,		 plan_nz, FFTW_BACKWARD,	FFTW_ESTIMATE   );
 		//      *out, 					*onembed, ostride, odist,	  sign, 		 	unsigned flags
 		//fftw_execute( this->planplus_z );
 		//fftw_destroy_plan ( this->planplus_z );
 		fftw_execute_dft( this->planplus_z, (fftw_complex *)psi_in, (fftw_complex *)psi_in );
 
-#else
+#elif defined __FFTW2
+		//this->planplus_z = fftw_create_plan(plan_nz, FFTW_BACKWARD, FFTW_MEASURE | FFTW_IN_PLACE |
+		//                                  FFTW_THREADSAFE | FFTW_USE_WISDOM);
 		fftw(planplus_z, ns, (fftw_complex *)psi_in, 1, plan_nz, NULL, 0, 0);
 #endif
 
@@ -556,16 +613,18 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 	else if (sign == -1)
 	{
 
-#ifdef __FFTW3
-		//		                            (rank, *n,				 howmany, *in,					  *inembed, istride, idist,
-		//this->planminus_z = fftw_plan_many_dft( 1, &plan_ny, 		 ns,	  (fftw_complex *)psi_in, &plan_ny, 1,       plan_nz,
-		//		(fftw_complex *)psi_in, &plan_ny, 1,		 plan_nz, FFTW_FORWARD,	FFTW_ESTIMATE   );
+		// cout << "ns- = " << ns << endl;
+
+#if defined __FFTW3
+		//		                              (rank, *n,			 howmany, *in,					  *inembed, istride, idist,
+		//this->planminus_z = fftw_plan_many_dft( 1, &plan_nz, 		 ns,	  (fftw_complex *)psi_in, &plan_nz, 1,       plan_nz,
+		//		(fftw_complex *)psi_in, &plan_nz, 1,	   plan_nz, FFTW_FORWARD,	FFTW_ESTIMATE   );
 		//       *out, 					*onembed, ostride, odist,	  sign, 		 	unsigned flags
 		//fftw_execute( this->planminus_z );
 		//fftw_destroy_plan ( this->planminus_z );
 		fftw_execute_dft( this->planminus_z, (fftw_complex *)psi_in, (fftw_complex *)psi_in );
 
-#else
+#elif defined __FFTW2
 		fftw(planminus_z, ns, (fftw_complex *)psi_in, 1, plan_nz, NULL, 0, 0);
 #endif
 
