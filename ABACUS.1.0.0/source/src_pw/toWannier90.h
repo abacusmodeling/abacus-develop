@@ -79,6 +79,7 @@ public:
 	void writeUNK(const ComplexMatrix *wfc_pw);
 	void ToRealSpace(const int &ik, const int &ib, const ComplexMatrix *evc, complex<double> *psir, const Vector3<double> G);
 	complex<double> unkdotb(const complex<double> *psir, const int ikb, const int bandindex, const ComplexMatrix *wfc_pw);
+	complex<double> unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ComplexMatrix *wfc_pw);
 	complex<double> gamma_only_cal(const int &ib_L, const int &ib_R, const ComplexMatrix *wfc_pw, const Vector3<double> G);
 	
 	// lcao²¿·Ö

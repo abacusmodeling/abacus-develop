@@ -1,4 +1,4 @@
-ABACUS to wannier90 step (just for pw basis now and only use one processor to run):
+ABACUS to wannier90 step :
 	1. you need a wannier90 input file "seedname.win". then,you should run "wannier90 -pp seedname.win" and you will get "seedname.nnkp" file that is the necessary file for ABACUS.
 	2. Prepare ABACUS's input file, structure file, kpt file, pseudopotential file, seedname.nnkp file. especially pay attention to kpt file in nscf calculation.
 	3. first, you should do scf calculation, just like you always do. this step doesn't need seedname.nnkp file. second, you should do nscf calculation,the kpt file is similar to "begin kpoints ..." in the seedname.win file.

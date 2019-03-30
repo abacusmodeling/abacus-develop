@@ -153,6 +153,9 @@ void Input::Default(void)
     epm_spin_orbital = 0;
     berry_phase = false;
 	gdir = 3;
+	towannier90 = false;
+	NNKP = "seedname.nnkp";
+	wannier_spin = "up";
 
     efield = 0;
 	edir = 1;
@@ -1593,6 +1596,9 @@ void Input::Bcast()
     Parallel_Common::bcast_int( epm_spin_orbital );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );
+	Parallel_Common::bcast_bool(towannier90);
+	Parallel_Common::bcast_string(NNKP);
+	Parallel_Common::bcast_string(wannier_spin);
     Parallel_Common::bcast_int( efield );
     Parallel_Common::bcast_int( edir );
     Parallel_Common::bcast_double( emaxpos );

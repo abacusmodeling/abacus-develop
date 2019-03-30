@@ -9,6 +9,7 @@
 #include "lcao_vna.h"
 #include "evolve_lcao_matrix.h"
 #include "../src_pw/berryphase.h"
+#include "../src_pw/toWannier90.h"
 
 int Local_Orbital_Elec::iter = 0;
 double Local_Orbital_Elec::avg_iter = 0.0; 
@@ -547,6 +548,13 @@ void Local_Orbital_Elec::nscf(void)
         //    cout << " spin" << kv.isk[ik]+1 << "final_state " << ib+1 << " " << wf.ekb[ik][ib] * Ry_to_eV << " " << wf.wg(ik, ib)*kv.nks << endl;
         }
 		ofs_running << endl;
+    }
+	
+	// add by jingan in 2018.11.7
+	if(CALCULATION == "nscf" && INPUT.towannier90)
+    {
+        toWannier90 myWannier(kv.nkstot,ucell.G);
+        myWannier.init_wannier();
     }
 	
 	// add by jingan
