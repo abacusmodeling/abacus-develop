@@ -353,7 +353,8 @@ void Local_Orbital_Charge::sum_bands(void)
 		{
 			//xiaohui modify 2014-06-18
 			this->cal_dk_gamma();//calculate the density matrix.
-			wfc_dm_2d.cal_dm();		// Peize Lin test 2019-01-16
+			if(KS_SOLVER=="genelpa")		// Peize Lin test 2019-01-16
+				wfc_dm_2d.cal_dm();
 		}
 	}
 	else
