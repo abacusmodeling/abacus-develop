@@ -330,8 +330,9 @@ void Local_Orbital_Ions::opt_ions(void)
                 }
             }
         }
-/*LiuXh modify, 20180626
-        if(FORCE || CALCULATION=="md" )
+///*LiuXh modify, 20180626
+        //if(FORCE || CALCULATION=="md" )
+        if(CALCULATION=="md" )
         {
             //xiaohui add CE.istep = istep 2014-07-07
             CE.istep = istep;
@@ -349,7 +350,7 @@ void Local_Orbital_Ions::opt_ions(void)
                 pot.init_pot( istep );
             }
         }
-*/
+//*/
 
 
 
