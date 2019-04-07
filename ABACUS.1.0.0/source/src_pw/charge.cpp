@@ -104,8 +104,9 @@ void Charge::init()
 double Charge::sum_rho(void) const
 {
     double sum_rho = 0.0;
-    	
-	for(int is=0; is<NSPIN; is++)
+    int nspin0 = 1;
+    if(NSPIN==2) nspin0 = NSPIN;	
+	for(int is=0; is<nspin0; is++)
 	{
 		for(int ir=0; ir<pw.nrxx; ir++) 
 		{
@@ -189,6 +190,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 			}
 		}
 	}
+	if(NONCOLIN) startmag_type = 1;//zhengdy-soc, type 2 is still wrong.
 	OUT(ofs_warning,"startmag_type",startmag_type);
 
 
@@ -385,7 +387,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 		}
 		else
 		{
-			WARNING_QUIT("Charge::spin_number_need"," Either 1 or 2, check SPIN number !");
+			WARNING_QUIT("Charge::spin_number_need"," Either 1 or 2 or 4, check SPIN number !");
 		}
 	}
 
@@ -451,7 +453,9 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 
 
 	double ne_tot = 0.0;
-	for(int is=0; is<spin_number_need; ++is)
+	int spin0=1;
+	if(spin_number_need == 2) spin0 = spin_number_need;
+	for(int is=0; is<spin0; ++is)
 	{
 		ofs_warning << "\n SETUP ATOMIC RHO FOR SPIN " << is+1 << endl;
 		OUT(ofs_warning,"Electron number from rho",ne[is]);
@@ -734,9 +738,9 @@ void Charge::sum_band_k(void)
 					if(w1 != 0.0)
 						for(int ir= 0;ir<pw.nrxx;ir++)
 						{
-							rho[1][ir] += w1 * (porter[ir].real()* porter1[ir].real()
+							rho[1][ir] += w1 * 2.0 * (porter[ir].real()* porter1[ir].real()
 								+ porter[ir].imag()* porter1[ir].imag());
-							rho[2][ir] += w1 * (porter[ir].real()* porter1[ir].imag()
+							rho[2][ir] += w1 * 2.0 * (porter[ir].real()* porter1[ir].imag()
 								- porter1[ir].real()* porter[ir].imag());
 							rho[3][ir] += w1 * (norm(porter[ir]) - norm(porter1[ir]));
 						}

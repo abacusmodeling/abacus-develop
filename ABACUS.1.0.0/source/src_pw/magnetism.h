@@ -15,6 +15,7 @@ public:
 
     // tot_magnetization : majority spin - minority spin (nelup - neldw).
     double tot_magnetization;
+    double tot_magnetization_nc[3];
     double abs_magnetization;
 
 	// nelup and neldw is different only the magnetism is fixed,

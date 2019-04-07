@@ -53,16 +53,20 @@ void Magnetism::compute_magnetization()
 	// noncolliear :
 	else if(NSPIN==4)
 	{
-		/*
-		this->tot_magnetization_nc = ;
+		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] = 0.00;
 		this->abs_magnetization = 0.00;
-
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for (int ir=0; ir<pw.nrxx; ir++)
 		{
-			double mag = std::sqrt( chr.rho[1][ir]*chr.rho[1][ir] +
-			chr.rho[2][ir]*chr.rho[2][ir] + chr.rho[3][ir]*chr.rho[3][ir] );
+			double diff = sqrt(pow(chr.rho[1][ir], 2) + pow(chr.rho[2][ir], 2) +pow(chr.rho[3][ir], 2));
+ 
+			for(int i=0;i<3;i++)this->tot_magnetization_nc[i] += chr.rho[i+1][ir];
+			this->abs_magnetization += abs(diff);
+		}
+		Parallel_Reduce::reduce_double_pool( this->tot_magnetization_nc, 3 );
+		Parallel_Reduce::reduce_double_pool( this->abs_magnetization );
 
-		*/
+		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= ucell.omega / pw.ncxyz;
+		this->abs_magnetization *= ucell.omega / pw.ncxyz;
 	}
 
     return;

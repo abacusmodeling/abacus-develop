@@ -97,7 +97,9 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 
 		// mohan fix bug 2011-07-07
 		// set pseudopotentials.
-		for(int is=0; is<NSPIN; ++is)
+		int nspin0=NSPIN;//zhengdy-soc, pauli matrix, just index 0 has vlocal term.
+		if(NSPIN==4) nspin0=1;
+		for(int is=0; is<nspin0; ++is)
 		{
 			for(int ir=0; ir<pw.nrxx; ++ir)
 			{
@@ -360,7 +362,7 @@ void potential::v_xc
     int neg [3];
 
     double vanishing_charge = 1.0e-10;
-    if (NSPIN == 1)
+    if (NSPIN == 1 || ( NSPIN ==4 && !DOMAG))
     {
         // spin-unpolarized case
         // for parallel : ncxyz change ==> nrxx
@@ -529,13 +531,15 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
 
     //  Hartree potential VH(r) from n(r)
     ZEROS( Porter, pw.nrxx );
-	for(int is=0; is<NSPIN; is++)
-	{
-    	for (int ir=0; ir<pw.nrxx; ir++) 
-		{
-			Porter[ir] += complex<double>( rho[is][ir], 0.0 );
-		}
-	}
+    int nspin0 = 1;
+    if(NSPIN==2)nspin0 = NSPIN;
+    for(int is=0; is<nspin0; is++)
+    {
+        for (int ir=0; ir<pw.nrxx; ir++) 
+        {
+            Porter[ir] += complex<double>( rho[is][ir], 0.0 );
+        }
+    }
 
     //=============================
     //  bring rho (aux) to G space

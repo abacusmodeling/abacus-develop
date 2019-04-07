@@ -342,10 +342,10 @@ void Input_Conv::Convert(void)
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
 			if(has_angle1)
-				soc.angle1[i] = INPUT.angle1[i];
+				soc.angle1[i] = INPUT.angle1[i]/180*PI;
 			else soc.angle1[i] = 0;
 			if(has_angle2)
-				soc.angle2[i] = INPUT.angle2[i];
+				soc.angle2[i] = INPUT.angle2[i]/180*PI;
 			else soc.angle2[i] = 0;
 #ifdef __MPI
 			Parallel_Common::bcast_double(soc.angle1[i]);

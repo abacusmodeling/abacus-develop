@@ -257,6 +257,12 @@ bool print)
 					cout<<setw(10)<<mag.tot_magnetization;
 					cout<<setw(10)<<mag.abs_magnetization;
 				}
+				else if(NONCOLIN && DOMAG)
+				{
+					cout << setprecision(2);
+					cout<<setw(10)<<mag.tot_magnetization_nc[0]<<setw(10)<<mag.tot_magnetization_nc[1]<<setw(10)<<mag.tot_magnetization_nc[2];
+					cout<<setw(10)<<mag.abs_magnetization;
+				}
 				if(dr2>1.0)
 				{
 					// 31 is red
@@ -750,6 +756,15 @@ double energy::delta_e(void)
         }
 
     }
+    else if(NSPIN == 4)
+    {
+        for (int ir=0; ir<pw.nrxx; ir++)
+        {
+            deband_aux -= chr.rho[1][ir] * pot.vr(1, ir);
+            deband_aux -= chr.rho[2][ir] * pot.vr(2, ir);
+            deband_aux -= chr.rho[3][ir] * pot.vr(3, ir);
+        }
+    }
 
 #ifdef __MPI
     MPI_Allreduce(&deband_aux,&deband0,1,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
@@ -785,6 +800,15 @@ void energy::delta_escf(void)
         for (int ir=0; ir<pw.nrxx; ir++)
         {
             this->descf -= ( chr.rho[1][ir] - chr.rho_save[1][ir] ) * pot.vr(1, ir);
+        }
+    }
+    if (NSPIN==4)
+    {
+        for(int ir=0; ir<pw.nrxx; ir++)
+        {
+            this->descf -= ( chr.rho[1][ir] - chr.rho_save[1][ir] ) * pot.vr(1, ir);
+            this->descf -= ( chr.rho[2][ir] - chr.rho_save[2][ir] ) * pot.vr(2, ir);
+            this->descf -= ( chr.rho[3][ir] - chr.rho_save[3][ir] ) * pot.vr(3, ir);
         }
     }
 
