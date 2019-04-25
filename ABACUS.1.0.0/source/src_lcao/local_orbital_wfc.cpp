@@ -9,6 +9,7 @@ Local_Orbital_wfc::Local_Orbital_wfc()
 	allocate_aug_flag = false;
 	trace_aug = new int[1];	
 	wfck_flag = false;	
+	complex_flag = false;
 }
 
 Local_Orbital_wfc::~Local_Orbital_wfc()
@@ -115,9 +116,15 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		this->wfck_flag = true;
 	}
 	
+	if(this->complex_flag)
+	{
+		delete[] this->WFC_K_POOL;
+		this->complex_flag = false;
+	}
 	// allocate the second part.
 	//if(gt.lgd != 0) xiaohui modify 2015-02-04, fixed memory bug
-	if(gt.lgd != 0 && this->complex_flag == false)
+	//if(gt.lgd != 0 && this->complex_flag == false)
+	if(gt.lgd != 0)
 	{
 		//cout<<"gt.lgd="<<gt.lgd<<" ; NLOCAL="<<NLOCAL<<endl; //delete 2015-09-06, xiaohui
 		const int page=NBANDS*gt.lgd;
