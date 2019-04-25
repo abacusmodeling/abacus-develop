@@ -80,6 +80,12 @@ void Local_Orbital_Ions::opt_ions(void)
                 cout << " RELAX IONS : " << istep << endl;
                 //cout << " ---------------------------------------------------------" << endl;
             }
+            else if(CALCULATION=="cell-relax")
+            {
+                cout << " RELAX CELL : " << stress_step << endl;
+                cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
+                //cout << " ---------------------------------------------------------" << endl;
+            }
             else if(CALCULATION=="scf")
             {
                 cout << " SELF-CONSISTENT : " << endl;
@@ -101,6 +107,12 @@ void Local_Orbital_Ions::opt_ions(void)
             if(CALCULATION=="relax")
             {
                 ofs_running << " RELAX IONS : " << istep << endl;
+                ofs_running << " ---------------------------------------------------------" << endl;
+            }
+            else if(CALCULATION=="cell-relax")
+            {
+                ofs_running << " RELAX CELL : " << stress_step << endl;
+                ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
                 ofs_running << " ---------------------------------------------------------" << endl;
             }
             else if(CALCULATION=="scf")
@@ -239,7 +251,7 @@ void Local_Orbital_Ions::opt_ions(void)
         }
 		
         // (10) self consistent
-        if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+        if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
         {
             LOE.scf(istep-1);
         }
@@ -267,7 +279,7 @@ void Local_Orbital_Ions::opt_ions(void)
         int iat=0;
         //xiaohui modify 2015-09-30
         //if(FORCE || CALCULATION=="md" )
-        if(CALCULATION=="relax"|| CALCULATION=="md" )
+        if(CALCULATION=="relax"|| CALCULATION=="md" || CALCULATION=="cell-relax")
         {
             for(int it = 0;it < ucell.ntype;it++)
             {
@@ -306,7 +318,7 @@ void Local_Orbital_Ions::opt_ions(void)
         }
 
         time_t fstart = time(NULL);
-        if (CALCULATION=="scf" || CALCULATION=="relax")
+        if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
             //stop = this->force_stress();
             stop = this->force_stress(istep, force_step, stress_step);
@@ -440,7 +452,7 @@ void Local_Orbital_Ions::opt_ions(void)
 
     if(stop && STRESS)
     {
-//       final_scf();
+//        final_scf();
 /*
         FINAL_SCF = true;
         Run_Frag::final_calculation_after_vc();
@@ -568,15 +580,15 @@ bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &st
 
         //xiaohui add CALCULATION==relax 2015-09-30
         //if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
-        if(CALCULATION=="relax") IMM.cal_movement(istep, istep, FL.fcs, en.etot);
+        if(CALCULATION=="relax") 
+        {
+            IMM.cal_movement(istep, istep, FL.fcs, en.etot);
 
-        if(IMM.get_converged() || (istep==NSTEP))
-        {
-            return 1;
-        }
-        else
-        {
-            if(FORCE || CALCULATION=="md" )
+            if(IMM.get_converged() || (istep==NSTEP))
+            {
+                return 1;
+            }
+            else
             {
                 CE.istep = istep;
                 CE.extrapolate_charge();
@@ -592,6 +604,10 @@ bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &st
             }
 
             return 0;
+        }
+        else
+        {
+            return 1;
         }
 
         // mohan update 2013-04-11
@@ -622,6 +638,39 @@ xiaohui modify 2014-08-09*/
     static bool converged_force = false;
     static bool converged_stress = false;
 
+    if(!FORCE&&STRESS)
+    {
+        Force_LCAO FL; // init the class.
+		matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
+		stress_lcao.create(3,3);
+		FL.cal_stress(stress_lcao);
+
+#ifdef __MPI
+		atom_arrange::delete_vector( SEARCH_RADIUS );
+#endif
+		if(CALCULATION=="cell-relax")
+		{
+           	LCM.cal_lattice_change(stress_step, stress_lcao, en.etot);
+           	converged_stress = LCM.get_converged();
+           	if(converged_stress)
+           	{
+               	return 1;
+           	}
+           	else
+           	{
+               	Run_Frag::frag_init_after_vc();
+               	pot.init_pot(stress_step);
+
+               	++stress_step;
+               	return 0;
+           	}
+		}
+        else
+        {
+            return 1;
+        }
+	}
+
     if(FORCE&&STRESS)
     {
         Force_LCAO FL; // init the class.
@@ -631,46 +680,51 @@ xiaohui modify 2014-08-09*/
 //#ifdef __MPI
         atom_arrange::delete_vector( SEARCH_RADIUS );
 //#endif
-
         
         //if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
-        //if(CALCULATION=="relax") IMM.cal_movement(force_step, FL.fcs, en.etot);
-        if(CALCULATION=="relax") IMM.cal_movement(istep, force_step, FL.fcs, en.etot);
-
-        if(IMM.get_converged())
+        if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
-            force_step = 1;
+            IMM.cal_movement(istep, force_step, FL.fcs, en.etot);
 
-            matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
-            stress_lcao.create(3,3);
-            FL.cal_stress(stress_lcao);
+            if(IMM.get_converged())
+            {
+                force_step = 1;
 
-            LCM.cal_lattice_change(stress_step, stress_lcao, en.etot);
-            converged_stress = LCM.get_converged();
+                matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
+                stress_lcao.create(3,3);
+                FL.cal_stress(stress_lcao);
+
+			    if(CALCULATION=="cell-relax")
+			    {
+            	    LCM.cal_lattice_change(stress_step, stress_lcao, en.etot);
+            	    converged_stress = LCM.get_converged();
+            	    if(converged_stress)
+            	    {
+                	    return 1;
+            	    }
+            	    else
+            	    {
+                	    Run_Frag::frag_init_after_vc();
+                	    pot.init_pot(stress_step);
+
+                	    ++stress_step;
+                	    return 0;
+                    }
+                }
+                else
+                {
+                    return 1;
+                }
 
 #ifdef __MPI
             //atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
-            if(converged_stress)
-            {
-                return 1;
             }
             else
             {
-                Run_Frag::frag_init_after_vc();
-                pot.init_pot(stress_step);
-
-                ++stress_step;
-                return 0;
-            }
-        }
-        else
-        {
 #ifdef __MPI
             //atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
-            if(FORCE || CALCULATION=="md" )
-            {
                 //CE.istep = istep;
                 CE.istep = force_step;
                 CE.extrapolate_charge();
@@ -683,9 +737,17 @@ xiaohui modify 2014-08-09*/
                 {
                     pot.init_pot( istep );
                 }
+                ++force_step;
+                return 0;
             }
-            ++force_step;
-            return 0;
+        }
+        else
+        {
+            matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
+            stress_lcao.create(3,3);
+            FL.cal_stress(stress_lcao);
+
+            return 1;
         }
     }
 

@@ -792,7 +792,7 @@ void Stress_LCAO::cal_stress_har(){
 
 
      double** rho_atom = new double*[NSPIN];
-     cout<<"NSPIN "<<NSPIN<<endl;
+     //cout<<"NSPIN "<<NSPIN<<endl;
      for(int is=0; is<NSPIN; is++)
      {
         rho_atom[is] = new double[pw.nrxx];

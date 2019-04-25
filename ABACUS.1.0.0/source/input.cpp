@@ -714,10 +714,10 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, grid_speed);
         }
-        /*else if (strcmp("force", word) == 0)
+        else if (strcmp("force", word) == 0)
         {
             read_value(ifs, force);
-        }*/
+        }
         else if (strcmp("force_set", word) == 0)
         {
             read_value(ifs, force_set);
@@ -1941,12 +1941,14 @@ void Input::Check(void)
 		}
 		//xiaohui modify 2015-09-15, 0 -> 1
                 //force = 0;
+/*
                 if(!noncolin)
                 	force = 1;
 		else {
 			force = 0;//modified by zhengdy-soc, can't calculate force now!
 			cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<endl;
 		}
+*/
                 nstep = 1;
 
     }
@@ -2029,6 +2031,11 @@ void Input::Check(void)
 	{
 		CALCULATION = "md"; 
 		force = 1;
+	}
+	else if(calculation == "cell-relax") // mohan add 2011-11-04
+	{
+		force = 1;
+		stress = 1;
 	}
 	else if(calculation == "test")
 	{
