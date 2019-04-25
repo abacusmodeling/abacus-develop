@@ -33,11 +33,13 @@ void Ions_Move_Methods::allocate()
 	return;
 }
 
-void Ions_Move_Methods::cal_movement(const int &istep, const matrix &f, const double &etot)
+//void Ions_Move_Methods::cal_movement(const int &istep, const matrix &f, const double &etot)
+void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, const matrix &f, const double &etot)
 {
 	TITLE("Ions_Move_Methods","init");
 
-	Ions_Move_Basic::istep = istep;
+	//Ions_Move_Basic::istep = istep;
+    Ions_Move_Basic::istep = force_step;
 
 	if(MOVE_IONS=="bfgs")
 	{

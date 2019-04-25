@@ -236,7 +236,8 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		//}
 		//else	
 		//{
-			IMM.cal_movement(istep, fcs.force, en.etot);
+			//IMM.cal_movement(istep, fcs.force, en.etot);
+			IMM.cal_movement(istep, istep, fcs.force, en.etot);
 			converged = IMM.get_converged();
 		//}
 
@@ -274,7 +275,8 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 
 		Forces fcs(ucell.nat);
 		fcs.init();
-		IMM.cal_movement(force_step, fcs.force, en.etot);
+		//IMM.cal_movement(force_step, fcs.force, en.etot);
+		IMM.cal_movement(istep, force_step, fcs.force, en.etot);
 		converged_force = IMM.get_converged();
 			
 		//cout<<"converged_force = "<<converged_force<<endl;

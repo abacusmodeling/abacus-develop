@@ -14,7 +14,8 @@ class Ions_Move_Methods
 	~Ions_Move_Methods();
 
 	void allocate(void);
-	void cal_movement(const int &istep, const matrix &f, const double &etot);
+	//void cal_movement(const int &istep, const matrix &f, const double &etot);
+	void cal_movement(const int &istep, const int &force_step, const matrix &f, const double &etot);
 
 	bool get_converged(void)const {return Ions_Move_Basic::converged;}
 	double get_ediff(void)const {return Ions_Move_Basic::ediff;}

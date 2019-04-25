@@ -567,7 +567,8 @@ bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &st
 #endif //2015-10-01, xiaohui
 
         //xiaohui add CALCULATION==relax 2015-09-30
-        if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
+        //if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
+        if(CALCULATION=="relax") IMM.cal_movement(istep, istep, FL.fcs, en.etot);
 
         if(IMM.get_converged() || (istep==NSTEP))
         {
@@ -633,7 +634,8 @@ xiaohui modify 2014-08-09*/
 
         
         //if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
-        if(CALCULATION=="relax") IMM.cal_movement(force_step, FL.fcs, en.etot);
+        //if(CALCULATION=="relax") IMM.cal_movement(force_step, FL.fcs, en.etot);
+        if(CALCULATION=="relax") IMM.cal_movement(istep, force_step, FL.fcs, en.etot);
 
         if(IMM.get_converged())
         {
