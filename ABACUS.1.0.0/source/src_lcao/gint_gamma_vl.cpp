@@ -24,13 +24,15 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
 	}
 }
 
-inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi, 
-						double* mt, double*** dr, double** distance, 
-						const Numerical_Orbital_Lm* pointer, double* ylma,
-						int* colidx, int* block_iw, int* bsize, 
-						double** psir_ylm)
+inline void cal_psir_ylm(int size, int grid_index, double delta_r,
+						double** distance, double* ylma,
+						int* at, int* block_index, int* block_iw, int* block_size, 
+						int** cal_flag, double** psir_ylm)
 {
-	colidx[0]=0;
+	const Numerical_Orbital_Lm *pointer;
+	double mt[3];
+	double dr[3];
+	block_index[0]=0;
 	for (int id=0; id<size; id++)
 	{
 		// there are two parameters we want to know here:
@@ -39,15 +41,16 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi,
 		const int mcell_index=GridT.bcell_start[grid_index] + id;
 		const int imcell=GridT.which_bigcell[mcell_index];
 
-		int iat=GridT.which_atom[mcell_index];
-
-		const int it=ucell.iat2it[ iat ];
-		const int ia=ucell.iat2ia[ iat ];
+		const int iat=GridT.which_atom[mcell_index];
+		at[id]=iat;
+		
+		const int it=ucell.iat2it[iat];
+		const int ia=ucell.iat2ia[iat];
 		const int start=ucell.itiaiw2iwt(it, ia, 0);
 		block_iw[id]=GridT.trace_lo[start];
 		Atom* atom=&ucell.atoms[it];
-		bsize[id]=atom->nw;
-		colidx[id+1]=colidx[id]+atom->nw;
+		block_size[id]=atom->nw;
+		block_index[id+1]=block_index[id]+atom->nw;
 		// meshball_positions should be the bigcell position in meshball
 		// to the center of meshball.
 		// calculated in cartesian coordinates
@@ -60,47 +63,47 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi,
 
 		for(int ib=0; ib<pw.bxyz; ib++)
 		{
-			double *p=&psir_ylm[ib][colidx[id]];
+			double *p=&psir_ylm[ib][block_index[id]];
 			// meshcell_pos: z is the fastest
-			dr[ib][id][0]=GridT.meshcell_pos[ib][0] + mt[0]; 
-			dr[ib][id][1]=GridT.meshcell_pos[ib][1] + mt[1]; 
-			dr[ib][id][2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
+			dr[0]=GridT.meshcell_pos[ib][0] + mt[0]; 
+			dr[1]=GridT.meshcell_pos[ib][1] + mt[1]; 
+			dr[2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
 
-			distance[ib][id]=std::sqrt(dr[ib][id][0]*dr[ib][id][0] + dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
-			if(distance[ib][id] > ORB.Phi[it].getRcut()) 
+			distance[ib][id]=std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
+			if(distance[ib][id] > (ORB.Phi[it].getRcut()- 1.0e-15)) 
 			{
-				ZEROS(p, bsize[id]);
+				cal_flag[ib][id]=0;
+				ZEROS(p, block_size[id]);
 				continue;
 			}
+
+			cal_flag[ib][id]=1;
 			
 			//if(distance[id] > GridT.orbital_rmax) continue;
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 			
 			Ylm::sph_harm (	ucell.atoms[it].nwl,
-					dr[ib][id][0] / distance[ib][id],
-					dr[ib][id][1] / distance[ib][id],
-					dr[ib][id][2] / distance[ib][id],
+					dr[0] / distance[ib][id],
+					dr[1] / distance[ib][id],
+					dr[2] / distance[ib][id],
 					ylma);
 			// these parameters are about interpolation
 			// because once we know the distance from atom to grid point,
 			// we can get the parameters we need to do interpolation and
 			// store them first!! these can save a lot of effort.
 			const double position=distance[ib][id] / delta_r;
-			int ip;
-			double dx, dx2, dx3;
-			double c1, c2, c3, c4;
+			const int ip=static_cast<int>(position);
+			const double dx = position - ip;
+			const double dx2 = dx * dx;
+			const double dx3 = dx2 * dx;
 
-			ip=static_cast<int>(position);
-			dx=position - ip;
-			dx2=dx * dx;
-			dx3=dx2 * dx;
+			const double c3 = 3.0*dx2-2.0*dx3;
+			const double c1 = 1.0-c3;
+			const double c2 = (dx-2.0*dx2+dx3)*delta_r;
+			const double c4 = (dx3-dx2)*delta_r;
 
-			c3=3.0*dx2-2.0*dx3;
-			c1=1.0-c3;
-			c2=(dx-2.0*dx2+dx3)*delta_r;
-			c4=(dx3-dx2)*delta_r;
-
+			double phi=0;
 			for (int iw=0; iw< atom->nw; ++iw, ++p)
 			{
 				if ( atom->iw2_new[iw] )
@@ -112,28 +115,41 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi,
 						+ c3*pointer->psi_uniform[ip+1] + c4*pointer->dpsi_uniform[ip+1];
 				}
 				*p=phi * ylma[atom->iw2_ylm[iw]];
-			}
+			} // end iw
 		}// end ib
 	}// end id
 }
 
 inline void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize, int* colidx, 
-							double* vldr3, double** psir_ylm, double** psir_vlbr3, 
+							int** cal_flag, double* vldr3, double** psir_ylm, double** psir_vlbr3, 
 							int* vindex, int lgd_now, double** GridVlocal)
 {
 	char transa='N', transb='T';
 	double alpha=1, beta=1;
 	
 	int allnw=colidx[size];
-	for(int i=0; i<pw.bxyz; ++i)
+	for(int ib=0; ib<pw.bxyz; ++ib)
 	{
-		for(int j=0; j<allnw; ++j)
-		{
-			psir_vlbr3[i][j]=psir_ylm[i][j]*vldr3[i];
-		}
+        for(int ia=0; ia<size; ++ia)
+        {
+            if(cal_flag[ib][ia]>0)
+            {
+                for(int i=colidx[ia]; i<colidx[ia+1]; ++i)
+                {
+                    psir_vlbr3[ib][i]=psir_ylm[ib][i]*vldr3[ib];
+                }
+            }
+            else
+            {
+                for(int i=colidx[ia]; i<colidx[ia+1]; ++i)
+                {
+                    psir_vlbr3[ib][i]=0;
+                }
+            }
+            
+        }
 	}
 
-	int k=pw.bxyz;
 	for(int ia1=0; ia1<size; ++ia1)
 	{
 		const int iw1_lo=block_iw[ia1];
@@ -143,11 +159,55 @@ inline void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize
 			const int iw2_lo=block_iw[ia2];
 			if(iw1_lo<=iw2_lo)
 			{
-				int n=bsize[ia2];				
-				dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
-					&psir_vlbr3[0][colidx[ia2]], &LD_pool, 
-					&psir_ylm[0][colidx[ia1]], &LD_pool,  
-					&beta, &GridVlocal[iw1_lo][iw2_lo], &lgd_now);
+                int first_ib=0, last_ib=0;
+                for(int ib=0; ib<pw.bxyz; ++ib)
+                {
+                    if(cal_flag[ib][ia1]>0 && cal_flag[ib][ia2]>0)
+                    {
+                        first_ib=ib;
+                        break;
+                    }
+                }
+                for(int ib=pw.bxyz-1; ib>=0; --ib)
+                {
+                    if(cal_flag[ib][ia1]>0 && cal_flag[ib][ia2]>0)
+                    {
+                        last_ib=ib+1;
+                        break;
+                    }
+                }
+                int ib_length=last_ib-first_ib;
+                if(ib_length<=0) continue;
+
+                int cal_pair_num=0;
+                for(int ib=first_ib; ib<last_ib; ++ib)
+                {
+                    cal_pair_num+=cal_flag[ib][ia1]*cal_flag[ib][ia2];
+                }
+                
+                int n=bsize[ia2];
+                if(cal_pair_num>ib_length/4)
+                {
+                    dgemm_(&transa, &transb, &n, &m, &ib_length, &alpha,
+                        &psir_vlbr3[first_ib][colidx[ia2]], &LD_pool, 
+                        &psir_ylm[first_ib][colidx[ia1]], &LD_pool,  
+                        &beta, &GridVlocal[iw1_lo][iw2_lo], &lgd_now);
+                }
+                else
+                {
+                    for(int ib=first_ib; ib<last_ib; ++ib)
+                    {
+                        if(cal_flag[ib][ia1]>0 && cal_flag[ib][ia2]>0)
+                        {
+                            int k=1;
+                            dgemm_(&transa, &transb, &n, &m, &k, &alpha,
+                                &psir_vlbr3[ib][colidx[ia2]], &LD_pool, 
+                                &psir_ylm[ib][colidx[ia1]], &LD_pool,  
+                                &beta, &GridVlocal[iw1_lo][iw2_lo], &lgd_now);
+                        }
+                    }
+                }
+                
 			}
 		}
 	}
@@ -659,7 +719,6 @@ void Gint_Gamma::gamma_vlocal(void)
 
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
 	const double delta_r=ORB.dr_uniform;
-	const Numerical_Orbital_Lm *pointer;
 
 	// allocate 1
 	int nnnmax=0;
@@ -672,18 +731,18 @@ void Gint_Gamma::gamma_vlocal(void)
 	double** distance; // distance between atom and grid: [bxyz, maxsize]
 	int LD_pool;
 	int nblock;
-	int *bsize; //band size: number of columns of a band
-	int *colidx;
+	int *block_size; //band size: number of columns of a band
+	int *block_index;
 	double *psir_ylm_pool, **psir_ylm;
 	double *psir_vlbr3_pool, **psir_vlbr3;
+    int *at;
+    int **cal_flag;
 	
 	double* ylma;
 
-	double mt[3]={0,0,0};
 	double *vldr3;
 	double v1=0.0;
 	int* vindex;
-	double phi=0.0;
 
 	const int nbx=GridT.nbx;
 	const int nby=GridT.nby;
@@ -715,28 +774,24 @@ void Gint_Gamma::gamma_vlocal(void)
 	ZEROS(vindex, pw.bxyz);
 	
 	LD_pool=max_size*ucell.nwmax;
-	dr=new double**[pw.bxyz];
 	distance=new double*[pw.bxyz];
-	bsize=new int[max_size];
-	colidx=new int[max_size+1];
+    block_size=new int[max_size];
+    block_index=new int[max_size+1];
+    at=new int[max_size];
 	psir_ylm_pool=new double[pw.bxyz*LD_pool];
 	psir_ylm=new double *[pw.bxyz];
 	ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
 	psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
 	psir_vlbr3=new double *[pw.bxyz];
 	ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
+    cal_flag=new int*[pw.bxyz];
 	for(int i=0; i<pw.bxyz; i++)
 	{
-		dr[i]=new double*[max_size];
 		distance[i]=new double[max_size];
 		psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
 		psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
 		ZEROS(distance[i], max_size);
-		for(int j=0; j<max_size; j++) 
-		{
-			dr[i][j]=new double[3];
-			ZEROS(dr[i][j],3);
-		}
+        cal_flag[i]=new int[max_size];
 	}
 
 	int *block_iw; // index of wave functions of each block;
@@ -769,14 +824,14 @@ void Gint_Gamma::gamma_vlocal(void)
 				}
 				
 				//OUT(ofs_running, "vldr3 was inited");
-				//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
-				cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm);
-				//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, i, j, k);
-				//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
-				//OUT(ofs_running, "psir_ylm was calculated");
-				//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
-				cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
-				//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
+                timer::tick("Gint_Gamma","psir_vlocal",'J');
+                cal_psir_ylm(size, this->grid_index, delta_r, distance, ylma,
+                        at, block_index, block_iw, block_size, 
+                        cal_flag, psir_ylm);
+                timer::tick("Gint_Gamma","psir_vlocal",'J');
+				timer::tick("Gint_Gamma","meshball_vlocal",'J');
+				cal_meshball_vlocal(size, LD_pool, block_iw, block_size, block_index, cal_flag, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
+				timer::tick("Gint_Gamma","meshball_vlocal",'J');
 				//OUT(ofs_running, "GridVlocal was calculated");
 			}// k
 		}// j
@@ -784,25 +839,22 @@ void Gint_Gamma::gamma_vlocal(void)
 	
 	for(int i=0; i<pw.bxyz; i++)
 	{
-		for(int j=0; j<max_size; j++) 
-		{
-			delete[] dr[i][j];
-		}
-		delete[] dr[i];
+        delete[] cal_flag[i];
 		delete[] distance[i];
 	}
+    delete[] cal_flag;
 	delete[] vindex;
 	delete[] ylma;
 	delete[] vldr3;	
 	delete[] block_iw;
-	delete[] dr;
 	delete[] distance;
 	delete[] psir_vlbr3;
 	delete[] psir_vlbr3_pool;
 	delete[] psir_ylm;
 	delete[] psir_ylm_pool;
-	delete[] colidx;
-	delete[] bsize;
+    delete[] block_index;
+    delete[] block_size;
+    delete[] at;
 	//OUT(ofs_running, "temp variables are deleted");
 
 ENDandRETURN:	

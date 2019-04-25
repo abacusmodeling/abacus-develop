@@ -48,6 +48,10 @@ extern "C"
 	//		complex<double> *c,
 	//		const int *ldc);
 
+	void dsymv_(const char *uplo, const int *n, 
+		const double *alpha, const double *a, const int *lda, 
+		const double *x, const int *incx, 
+		const double *beta, double *y, const int *incy);
 
     // BLAS 
 	void dcopy_(int const *n, double *a, int const *incx, double *b, int const *incy); 
