@@ -417,6 +417,7 @@ void Local_Orbital_Ions::opt_ions(void)
         ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
         ofs_running << " --------------------------------------------\n\n" << endl;
 
+/*
         if(STRESS)
         {
             if(stress_step==1)
@@ -434,11 +435,12 @@ void Local_Orbital_Ions::opt_ions(void)
             ofs_running << " !FINAL_ETOT_IS (+ P*V) " << en.etot * Ry_to_eV << " eV" << endl; 
             ofs_running << " --------------------------------------------\n\n" << endl;
         }
+*/
     }
 
     if(stop && STRESS)
     {
-        final_scf();
+//       final_scf();
 /*
         FINAL_SCF = true;
         Run_Frag::final_calculation_after_vc();

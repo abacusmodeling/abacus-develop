@@ -164,6 +164,7 @@ void Ions::opt_ions_pw(void)
         ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
         ofs_running << " --------------------------------------------\n\n" << endl;
 
+/*
         if(STRESS)
         {
             if(stress_step==1)
@@ -183,14 +184,17 @@ void Ions::opt_ions_pw(void)
             ofs_running << " !FINAL_ETOT_IS (+ P*V) " << en.etot * Ry_to_eV << " eV" << endl; 
             ofs_running << " --------------------------------------------\n\n" << endl;
         }
+*/
     }
 
+/*
     if(stop && STRESS) //LiuXh add 20180619
     {
         FINAL_SCF = true;
         Run_Frag::final_calculation_after_vc();
         this->self_consistent(0);
     }
+*/
 
 	if(OUT_LEVEL=="i")
 	{
