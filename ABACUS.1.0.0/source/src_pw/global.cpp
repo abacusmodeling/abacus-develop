@@ -47,6 +47,8 @@ Symmetry symm;
 Parallel_Grid Pgrid; //mohan add 2010-06-06 
 Parallel_Kpoints Pkpoints; // mohan add 2010-06-07
 
+Vdwd2 vdwd2(ucell);	// Peize Lin add 2019-04-26
+
 Soc soc;//added by zhengdy-soc
 
 #endif

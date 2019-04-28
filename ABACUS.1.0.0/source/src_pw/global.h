@@ -32,6 +32,7 @@
 #include "../src_pw/output.h"
 #include "magnetism.h"
 #include "exx_pw.h"
+#include "vdwd2.h"
 
 #include "../src_parallel/ft.h"
 
@@ -83,6 +84,8 @@ extern Magnetism mag;
 extern UnitCell_pseudo ucell;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
+
+extern Vdwd2 vdwd2;		// Peize Lin add 2019-04-26
 
 //zhengdy-soc
 #include "soc.h"

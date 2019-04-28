@@ -23,10 +23,9 @@ void Forces::init()
 	this->cal_force_scc();
 
 	matrix stress_vdw_pw(3,3);//.create(3,3);
-	if(VdwD2::vdwD2)													//Peize Lin add 2014-04-03
+	if(vdwd2.vdwD2)													//Peize Lin add 2014-04-03, update 2019-04-26
 	{
-		VdwD2 vdw(ucell);
-		vdw.force(stress_vdw_pw, STRESS);
+		vdwd2.force(stress_vdw_pw, STRESS);
 	}
 	
     //impose total force = 0
@@ -55,9 +54,15 @@ void Forces::init()
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);
 
-				if(VdwD2::vdwD2)											//Peize Lin add 2014-04-03
+				if(vdwd2.vdwD2)											//Peize Lin add 2014-04-03, update 2019-04-26
 				{
-					force(iat,ipol) = force(iat, ipol) + VdwD2::force_result[iat][ipol];
+					switch(ipol)
+					{
+						case 0:	force(iat,ipol) += vdwd2.force_result[iat].x;	break;
+						case 1:	force(iat,ipol) += vdwd2.force_result[iat].y;	break;
+						case 2:	force(iat,ipol) += vdwd2.force_result[iat].z;	break;
+					}
+					
 				}
 					
 				if(EFIELD)

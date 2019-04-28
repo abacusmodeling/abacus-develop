@@ -8,7 +8,6 @@
 #include "src_lcao/stress_lcao.h"
 #include "src_lcao/istate_charge.h"
 #include "src_lcao/istate_envelope.h"
-#include "src_pw/vdwd2.h"
 //#include "../src_siao/selinv.h" //mohan add 2012-05-13
 
 Local_Orbital_Ions::Local_Orbital_Ions()
@@ -244,10 +243,9 @@ void Local_Orbital_Ions::opt_ions(void)
         // (9) S, T, Vnl, Vna matrix.
         UHM.set_ion();
 
-        if(VdwD2::vdwD2)							//Peize Lin add 2014-04-04
+        if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
         {
-            VdwD2 vdw(ucell);
-            vdw.energy();
+            vdwd2.energy();
         }
 		
         // (10) self consistent
@@ -507,10 +505,9 @@ void Local_Orbital_Ions::opt_ions(void)
 
         UHM.set_ion();
 
-        if(VdwD2::vdwD2)							//Peize Lin add 2014-04-04
+        if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
         {
-            VdwD2 vdw(ucell);
-            vdw.energy();
+            vdwd2.energy();
         }
         LOE.scf(0);
 
@@ -813,10 +810,9 @@ void Local_Orbital_Ions::final_scf(void)
 
     UHM.set_ion();
 
-    if(VdwD2::vdwD2)							//Peize Lin add 2014-04-04
+    if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
     {
-        VdwD2 vdw(ucell);
-        vdw.energy();
+        vdwd2.energy();
     }
     LOE.scf(0);
 

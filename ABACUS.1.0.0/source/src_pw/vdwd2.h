@@ -1,65 +1,52 @@
 //==========================================================
 // AUTHOR : Peize Lin
 // DATE : 2014-04-25
+// UPDATE : 2019-04-26
 //==========================================================
 #ifndef VDWD2_H
 #define VDWD2_H
-#include"../input_conv.h"
-#include"unitcell_pseudo.h"
-#include"../src_global/vector3.h"
-#include<cmath>
+#include"input_conv.h"
+#include"src_pw/unitcell_pseudo.h"
+#include"src_global/vector3.h"
 #include<string>
 #include<vector>
 
-class VdwD2
+class Vdwd2
 {
 public:
 
-	VdwD2( const UnitCell_pseudo &unitcell);
+	Vdwd2( const UnitCell_pseudo &unitcell);
 
-	static bool vdwD2;	
+	bool vdwD2;	
 	
-	static double energy_result;
+	double energy_result;
 	double energy();
 	
-	static vector< vector<double> > force_result;
-	vector< vector<double> > force(matrix &stress_result, const bool stress_for_vdw);
+	std::vector<Vector3<double>> force_result;
+	const std::vector<Vector3<double>> &force(matrix &stress_result, const bool stress_for_vdw);
 	
 private:
 	
-	static double scaling;
-	static double damping;
+	double scaling;
+	double damping;
 	
-	static string model;
-	static double radius;
-	static int period[3];
+	std::string model;
+	double radius;
+	Vector3<int> period;
 	
-	static const double C6_tmp[];
-	static vector<double> C6;
-	static void C6_input(string &file, string &unit);
-	static const double R0_tmp[];
-	static vector<double> R0;
-	static void R0_input(string &file, string &unit);	
+	map<std::string,double> C6;
+	map<std::string,double> R0;
+	void init_C6();
+	void init_R0();
+	void C6_input(const std::string &file, const std::string &unit);
+	void R0_input(const std::string &file, const std::string &unit);	
 
-	const UnitCell_pseudo &ucell;	
-	static vector<int> atom_kind;	
-	static void atomkind (const UnitCell_pseudo &unitcell);
+	const UnitCell_pseudo &ucell;
 
-	static bool init_set;	
+	bool init_set;	
 	void initset();
-	
-	inline Vector3<double> period_atom_tau( Vector3<double> &tau1, int *lat_loop);
 	
 	friend void Input_Conv::Convert();
 };
-
-inline Vector3<double> VdwD2::period_atom_tau ( Vector3<double> &tau, int *lat_loop )
-{
-	Vector3<double> true_tau;
-	true_tau.x = tau.x + lat_loop[0] * ucell.latvec.e11 + lat_loop[1] * ucell.latvec.e21 + lat_loop[2] * ucell.latvec.e31 ;
-	true_tau.y = tau.y + lat_loop[0] * ucell.latvec.e12 + lat_loop[1] * ucell.latvec.e22 + lat_loop[2] * ucell.latvec.e32 ;
-	true_tau.z = tau.z + lat_loop[0] * ucell.latvec.e13 + lat_loop[1] * ucell.latvec.e23 + lat_loop[2] * ucell.latvec.e33 ;
-	return true_tau;
-}
 
 #endif

@@ -361,7 +361,7 @@ void Input::Default(void)
 	vdwD2_R0_file="default";
 	vdwD2_R0_unit="A";
 	vdwD2_model="radius";
-	vdwD2_period[0]= vdwD2_period[1]= vdwD2_period[2]= 3;
+	vdwD2_period = {3,3,3};
 	vdwD2_radius=30.0/BOHR_TO_A;
 	vdwD2_radius_unit="Bohr";
 
@@ -1319,8 +1319,8 @@ bool Input::Read(const string &fn)
         }
         else if (strcmp("vdwd2_period", word) == 0)
         {
-			ifs>> vdwD2_period[0]>> vdwD2_period[1];
-            read_value(ifs, vdwD2_period[2]);
+			ifs >> vdwD2_period.x >> vdwD2_period.y;
+            read_value(ifs, vdwD2_period.z);
         }
         else if (strcmp("vdwd2_radius", word) == 0)
         {
@@ -1783,9 +1783,9 @@ void Input::Bcast()
 	Parallel_Common::bcast_string( vdwD2_R0_file );
 	Parallel_Common::bcast_string( vdwD2_R0_unit );
 	Parallel_Common::bcast_string( vdwD2_model );
-	Parallel_Common::bcast_int( vdwD2_period[0] );
-	Parallel_Common::bcast_int( vdwD2_period[1] );
-	Parallel_Common::bcast_int( vdwD2_period[2] );
+	Parallel_Common::bcast_int( vdwD2_period.x );
+	Parallel_Common::bcast_int( vdwD2_period.y );
+	Parallel_Common::bcast_int( vdwD2_period.z );
 	Parallel_Common::bcast_double( vdwD2_radius );
 	Parallel_Common::bcast_string( vdwD2_radius_unit );
 	// Fuxiang He add 2016-10-26
@@ -2368,7 +2368,7 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("Input","vdwD2_model must be radius or period");
 		}
-		if( (vdwD2_period[0]<=0) || (vdwD2_period[1]<=0) || (vdwD2_period[2]<=0) )
+		if( (vdwD2_period.x<=0) || (vdwD2_period.y<=0) || (vdwD2_period.z<=0) )
 		{
 			WARNING_QUIT("Input","vdwD2_period <= 0 is not allowd");
 		}
@@ -2666,7 +2666,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"vdwD2_model",vdwD2_model,"expression model of periodic structure, radius or period");
 	OUTP(ofs,"vdwD2_radius",vdwD2_radius,"radius cutoff for periodic structure");
 	OUTP(ofs,"vdwD2_radius_unit",vdwD2_radius_unit,"unit of radius cutoff for periodic structure");	
-	ofs << setw(20) << "vdwD2_period" << vdwD2_period[0] << " " << vdwD2_period[1] << " " << vdwD2_period[2]<< " #periods of periodic structure" << endl;
+	ofs << setw(20) << "vdwD2_period" << vdwD2_period.x << " " << vdwD2_period.y << " " << vdwD2_period.z<< " #periods of periodic structure" << endl;
 	
 	
 	ofs << "\n#Parameters (16.spectrum)" << endl;              // pengfei Li add 2016-11-23

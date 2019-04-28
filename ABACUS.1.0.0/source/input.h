@@ -253,7 +253,7 @@ public:
 	string vdwD2_R0_file;
 	string vdwD2_R0_unit;		//"Bohr" or "Angstrom"
 	string vdwD2_model;			//"period" or "radius"
-	int vdwD2_period[3];
+	Vector3<int> vdwD2_period;
 	double vdwD2_radius;
 	string vdwD2_radius_unit;	//"Bohr" or "Angstrom"
 

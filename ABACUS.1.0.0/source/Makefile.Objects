@@ -51,6 +51,7 @@ stress.o\
 myfunc1.o\
 myfunc2.o\
 vdwd2.o\
+vdwd2-parameters.o\
 chi0_hilbert.o\
 chi0_standard.o\
 epsilon0_pwscf.o\

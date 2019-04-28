@@ -1,6 +1,5 @@
 #include "force_lcao.h"
 #include "../src_pw/global.h"
-#include "../src_pw/vdwd2.h"
 
 double Force_LCAO::force_invalid_threshold_ev = 0.00;
 
@@ -153,10 +152,9 @@ void Force_LCAO::start_force(void)
 	this->fcs.zero_out();
 
 	stress_vdw.create(3,3);//zhengdy added in 2018-10-29
-	if(VdwD2::vdwD2)									//Peize Lin add 2014-04-04
+	if(vdwd2.vdwD2)									//Peize Lin add 2014-04-04, update 2019-04-26
 	{
-		VdwD2 vdw(ucell);
-		vdw.force(stress_vdw, STRESS);
+		vdwd2.force(stress_vdw, STRESS);
 	}
 	
 	
@@ -182,9 +180,15 @@ void Force_LCAO::start_force(void)
 			+ fcc[iat][i] //nonlinear core correction force (pw)
 			+ fscc[iat][i];//self consistent corretion force (pw)
 	
-			if(VdwD2::vdwD2)											//Peize Lin add 2014-04-04
+			if(vdwd2.vdwD2)											//Peize Lin add 2014-04-04, update 2019-04-26
 			{
-				fcs(iat,i) += VdwD2::force_result[iat][i];
+				switch(i)
+				{
+					case 0:	fcs(iat,i) += vdwd2.force_result[iat].x;	break;
+					case 1:	fcs(iat,i) += vdwd2.force_result[iat].y;	break;
+					case 2:	fcs(iat,i) += vdwd2.force_result[iat].z;	break;
+				}
+				
 			}
 			
 			if(EFIELD)

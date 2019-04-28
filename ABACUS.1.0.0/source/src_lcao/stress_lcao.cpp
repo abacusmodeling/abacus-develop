@@ -1,6 +1,5 @@
 #include "stress_lcao.h"
 #include "../src_pw/global.h"
-#include "../src_pw/vdwd2.h"
 #include "../src_pw/xc_functional.h"
 #include "../src_pw/gga_pw.h"
 
@@ -109,10 +108,9 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 //		this->stable_k();
 	}
 
-/*	if(VdwD2::vdwD2)									//Peize Lin add 2014-04-04
+/*	if(vdwd2.vdwD2)									//Peize Lin add 2014-04-04, update 2019-04-26
 	{
-		VdwD2 vdw(ucell);
-		vdw.stress();
+		vdwd2.stress();
 	}
 */	
 	
@@ -137,7 +135,7 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 			+ sigmaxc[i][j]//exchange corretion stress 
                         + sigmahar[i][j];// hartree stress 
 	
-			if(VdwD2::vdwD2)
+			if(vdwd2.vdwD2)			// Peize Lin update 2019-04-26
 			{
 				scs[i][j] += stress_vdw(i , j);
 			}

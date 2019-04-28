@@ -11,15 +11,16 @@ FFTW_LIB_DIR = ${FFTW_DIR}/lib
 #FFTW_LIB_DIR = $(MKLROOT)/lib/intel64
 
 #LIBS = \
-#-lifcore \
-#-L${FFTW_LIB_DIR} -lfftw -lm -Wl,-rpath=${FFTW_LIB_DIR} \
-#-L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group#-Wl,-rpath=${LAPACK_LIB_DIR} \
+#-lifcore -lm \
+#-L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR} \
+#-L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
 #-L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR} 
 
 LIBS = \
--L${FFTW_LIB_DIR}  -lfftw3   -L${ELPA_LIB_DIR} -lelpa \
--L${MKLROOT}/lib/intel64 -lmkl_scalapack_lp64 -lmkl_cdft_core -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_blacs_intelmpi_lp64 -liomp5 -lpthread -lm -ldl
-
+-liomp5 -lpthread -lm -ldl \
+-L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR} \
+-L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_scalapack_lp64 -lmkl_cdft_core -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
+-L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR}
 
 INCLUDE = -I. -Icommands -I${BOOST_DIR} -I${FFTW_INCLUDE} 
 #-I${MKLROOT}/include

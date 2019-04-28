@@ -95,10 +95,9 @@ void Ions::opt_ions_pw(void)
 		
 		
 		
-		if(VdwD2::vdwD2)											//Peize Lin add 2014-04-03
+		if(vdwd2.vdwD2)											//Peize Lin add 2014-04-03, update 2019-04-26
 		{
-			VdwD2 vdw(ucell);
-			vdw.energy();
+			vdwd2.energy();
 		}
 		
         if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")  // pengfei 2014-10-13

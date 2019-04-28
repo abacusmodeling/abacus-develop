@@ -5,10 +5,10 @@
 
 #ifndef ELEMENT_NAME_H
 #define ELEMENT_NAME_H
+#include<vector>
 #include<string>
-using std::string ;
 
-const string element_name_tmp[] = {
+const std::vector<std::string> element_name = {
 "H"	,
 "He"	,
 "Li"	,
@@ -128,7 +128,5 @@ const string element_name_tmp[] = {
 "Uus"	,
 "Uuo"	
 };
-
-const vector<string> element_name( element_name_tmp, element_name_tmp+ sizeof(element_name_tmp)/sizeof(string) );
 
 #endif

@@ -8,7 +8,6 @@
 #include "energy.h"
 #include "algorithms.h"
 #include "mymath.h"
-#include "vdwd2.h"
 //#include "../src_develop/src_siao/selinv.h"
 
 int energy::mxr = 50;
@@ -66,9 +65,9 @@ void energy::calculate_etot(void)
 	this->etot = eband + deband + (etxc - etxcc) + ewld +
 	ehart + demet + descf + exx + Efield::etotefield;
 
-	if(VdwD2::vdwD2) 									//Peize Lin add 2014-04-03
+	if(vdwd2.vdwD2) 									//Peize Lin add 2014-04-03, update 2019-04-26
 	{
-		this->etot += VdwD2::energy_result;
+		this->etot += vdwd2.energy_result;
 	}
 	
 /*
@@ -116,9 +115,9 @@ bool print)
 		this->print_format("E_demet",demet); //mohan add 2011-12-02
 		this->print_format("E_descf",descf);
 		this->print_format("E_efield",Efield::etotefield);
-		if(VdwD2::vdwD2)					//Peize Lin add 2014-04
+		if(vdwd2.vdwD2)					//Peize Lin add 2014-04, update 2019-04-26
 		{
-			this->print_format("E_vdwD2",VdwD2::energy_result);
+			this->print_format("E_vdwD2",vdwd2.energy_result);
 		}
 //		this->print_format("e_exx",exx);
 	}

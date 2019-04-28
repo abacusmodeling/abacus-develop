@@ -204,29 +204,19 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------	
 	if(INPUT.vdwD2)
 	{
-		VdwD2::vdwD2 = INPUT.vdwD2;
-		VdwD2::scaling = INPUT.vdwD2_scaling;
-		VdwD2::damping = INPUT.vdwD2_d;
-		VdwD2::C6_input(INPUT.vdwD2_C6_file, INPUT.vdwD2_C6_unit);
-		VdwD2::R0_input(INPUT.vdwD2_R0_file, INPUT.vdwD2_R0_unit);
-		VdwD2::model=INPUT.vdwD2_model;
+		vdwd2.vdwD2 = INPUT.vdwD2;
+		vdwd2.scaling = INPUT.vdwD2_scaling;
+		vdwd2.damping = INPUT.vdwD2_d;
+		vdwd2.C6_input(INPUT.vdwD2_C6_file, INPUT.vdwD2_C6_unit);
+		vdwd2.R0_input(INPUT.vdwD2_R0_file, INPUT.vdwD2_R0_unit);
+		vdwd2.model = INPUT.vdwD2_model;
 		if(INPUT.vdwD2_model=="radius")
-		{
 			if(INPUT.vdwD2_radius_unit=="Bohr")
-			{
-				VdwD2::radius = INPUT.vdwD2_radius;
-			}
+				vdwd2.radius = INPUT.vdwD2_radius;
 			else
-			{
-				VdwD2::radius = INPUT.vdwD2_radius * BOHR_TO_A;			
-			}
-		}
+				vdwd2.radius = INPUT.vdwD2_radius * BOHR_TO_A;
 		else if(INPUT.vdwD2_model=="period")
-		{
-			VdwD2::period[0]=INPUT.vdwD2_period[0];
-			VdwD2::period[1]=INPUT.vdwD2_period[1];
-			VdwD2::period[2]=INPUT.vdwD2_period[2];
-		}
+			vdwd2.period = INPUT.vdwD2_period;
 	}
 
 //----------------------------------------------------------
