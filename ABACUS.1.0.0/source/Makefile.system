@@ -1,32 +1,41 @@
 include Makefile.vars
 
-#---------------------------------------------
-# FFTW directories
-#---------------------------------------------
+#==========================
+# LIB and INCLUDE
+#==========================
 HONG_FFTW = -D__FFTW3
-FFTW_INCLUDE = ${FFTW_DIR}/include
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
 FFTW_LIB_DIR = ${FFTW_DIR}/lib
 # or
-#FFTW_INCLUDE = $(MKLROOT)/include/fftw
+#FFTW_INCLUDE_DIR = $(MKLROOT)/include/fftw
 #FFTW_LIB_DIR = $(MKLROOT)/lib/intel64
 
-#LIBS = \
-#-lifcore -lm \
-#-L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR} \
-#-L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
-#-L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR} 
+BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
 
+LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
+LAPACK_LIB_DIR = ${LAPACK_DIR}/lib/intel64
+
+ELPA_LIB_DIR   = ${ELPA_DIR}/lib								
+
+#==========================
+# LIBS and INCLUDES
+#==========================
 LIBS = \
--liomp5 -lpthread -lm -ldl \
+-lifcore -lm \
 -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR} \
--L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_scalapack_lp64 -lmkl_cdft_core -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
+-L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
 -L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR}
 
-INCLUDE = -I. -Icommands -I${BOOST_DIR} -I${FFTW_INCLUDE} 
-#-I${MKLROOT}/include
+#LIBS = \
+#-liomp5 -lpthread -lm -ldl \
+#-L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR} \
+#-L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_scalapack_lp64 -lmkl_cdft_core -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR} \
+#-L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR}
+
+INCLUDE = -I. -Icommands -I${BOOST_INCLUDE_DIR} -I${FFTW_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR}
 
 #==========================
-# OPTIMIZE OPTIONS and boost
+# OPTIMIZE OPTIONS
 #==========================
-OPTS = ${INCLUDE} -Ofast -xHost -diag-disable=858 -std=c++11 -qopenmp -lpthread 
+OPTS = ${INCLUDE} -Ofast -xHost -std=c++11 -simd -lpthread -march=native -m64 -qopenmp -Werror -Wall -pedantic
 OPTS_MPI = -cxx=${CPLUSPLUS}

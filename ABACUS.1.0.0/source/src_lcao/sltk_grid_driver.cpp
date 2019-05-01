@@ -88,7 +88,8 @@ int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos, const int &
 		}
 	}
 
-	WARNING_QUIT("Locate_Atom", "something wrong!");
+	throw runtime_error("Locate_Atom wrong. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));		// Peize Lin update 2019-05-01
+	//	WARNING_QUIT("Locate_Atom", "something wrong!");
 }
 
 void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const

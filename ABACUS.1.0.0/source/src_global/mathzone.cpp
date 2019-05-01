@@ -259,7 +259,7 @@ double Mathzone::Polynomial_Interpolation_xy
 }
 
 
-double Mathzone::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, double *ryp)
+void Mathzone::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, double *ryp)
 {
     const int XMIN = 2.0;
     const double FPMIN = 1.0e-30;

@@ -1236,10 +1236,10 @@ bool Input::Read(const string &fn)
 	{
 		read_value(ifs,md_ediffg );
 	}
-        else if (strcmp("md_msdstarttime",word) == 0)
-        {
-                 read_value(ifs,md_msdstartTime );
-        }
+	else if (strcmp("md_msdstarttime",word) == 0)
+	{
+		read_value(ifs,md_msdstartTime );
+	}
 //added by zheng daye
 //----------------------------------------------------------
 // tddft

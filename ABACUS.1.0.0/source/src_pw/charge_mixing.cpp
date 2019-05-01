@@ -172,8 +172,8 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 
 
 double Charge_Mixing::rhog_dot_product(
-	const complex<double> **rhog1,
-	const complex<double> **rhog2
+	const complex<double>*const*const rhog1,
+	const complex<double>*const*const rhog2
 ) const
 {
     TITLE("Charge_Mixing","rhog_dot_product");

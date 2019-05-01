@@ -861,13 +861,13 @@ int pdlarrv_mpi(int *il, int *iu, int *n, double *vl, double *vu, double *d__,
 					}
 					/*                 here ends the code for the current child */
 
-					L139:
+					// L139:		// Peize Lin delete 2019-05-01
 					/*                 Proceed to any remaining child nodes */
 					newfst = j + 1;
 					if (newfst > *dou) {
 						break;
 					}
-					L140: ;
+					// L140: ;		// Peize Lin delete 2019-05-01
 				}
 				/* L150: */
 			}

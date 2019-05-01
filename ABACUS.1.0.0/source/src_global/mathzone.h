@@ -110,7 +110,7 @@ public:
 private:
 
     static double Spherical_Bessel_7(const int n, const double &x);
-    static double BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, double *ryp);
+    static void BESSJY(double x, double xnu, double *rj, double *ry, double *rjp, double *ryp);	// Peize Lin change double to void 2019-05-01
     static void BESCHB(double x, double *gam1, double *gam2, double *gampl, double *gammi);
     static double CHEBEV(double a, double b, double c[], int m, double x);
     static int IMAX(int a, int b);

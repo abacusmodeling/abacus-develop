@@ -46,7 +46,7 @@ class Charge_Mixing: public Charge
 	
 	// tools
 	void set_rhor(complex<double> *rhog, double *rho)const;
-	double rhog_dot_product(const complex<double> **rhog1,const complex<double> **rhog2) const;
+	double rhog_dot_product(const complex<double>*const*const rhog1, const complex<double>*const*const rhog2) const;		// Peize Lin add const 2019-05-01
 	
 };
 

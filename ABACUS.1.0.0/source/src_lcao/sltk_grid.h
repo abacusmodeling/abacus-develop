@@ -99,7 +99,8 @@ public:
 
 	// Inner Function
 protected:
-	AtomLink* const getHashCode(const FAtom &atom)const;
+	AtomLink* getHashCode(const FAtom &atom)const;		// Peize Lin delete const 2018-07-14
+//	AtomLink* const getHashCode(const FAtom &atom)const;
 	AtomLink* atomlink;
 	AtomLink* cordon_p;// Warning! A guard! Don't delete it!
 
@@ -123,12 +124,13 @@ private:
 //==========================================================
 //
 //==========================================================
-	AtomLink* const Build_Cache(const Atom_input &input) throw(std::out_of_range, std::logic_error);
+	AtomLink* Build_Cache(const Atom_input &input);		// Peize Lin delete const and throw(std::out_of_range, std::logic_error) 2018-07-14
+//	AtomLink* const Build_Cache(const Atom_input &input) throw(std::out_of_range, std::logic_error);
 	bool Push(const FAtom& atom);
 	void In_Which_Cell(int &a, int &b, int &c, const FAtom &atom)const;
 	void Build_Cell(void);
 	void Build_Hash_Table(AtomLink* const pointCache);
-	void Fold_Hash_Table(void) throw(std::logic_error);
+	void Fold_Hash_Table(void);		// Peize Lin delete const and throw(std::logic_error) 2018-07-14
 	static int Hash_one_hit;
 
 //==========================================================

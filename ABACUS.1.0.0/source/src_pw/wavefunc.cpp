@@ -207,7 +207,8 @@ int wavefunc::get_starting_nw(void)const
 {
     if (start_wfc == "file")
     {
-        WARNING_QUIT("wfcinit_k","\n start_ wfc from file: not implemented yet!");
+		throw runtime_error("wavefunc::get_starting_nw. start_ wfc from file: not implemented yet! "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
+        //WARNING_QUIT("wfcinit_k","\n start_ wfc from file: not implemented yet!");
         //**********************************************************************
         // ... read the wavefunction into memory (if it is not done in c_bands)
         //**********************************************************************
@@ -233,7 +234,8 @@ int wavefunc::get_starting_nw(void)const
     }
     else
     {
-        WARNING_QUIT("get_starting_nw","Don't know what to do! Please Check source code!");
+		throw runtime_error("wavefunc::get_starting_nw. Don't know what to do! Please Check source code! "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)); 	// Peize Lin change 2019-05-01
+        //WARNING_QUIT("get_starting_nw","Don't know what to do! Please Check source code!");
     }
 }
 

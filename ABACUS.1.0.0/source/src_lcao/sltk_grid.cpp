@@ -311,8 +311,7 @@ bool Grid::Push(const FAtom &atom)
 }
 
 
-AtomLink* const Grid::Build_Cache(const Atom_input &input)
-throw(std::out_of_range, std::logic_error)
+AtomLink* Grid::Build_Cache(const Atom_input &input)
 {
 	if (test_grid)TITLE(ofs_running, "Grid", "Build_Cache");
 	AtomLink* const start = new AtomLink[natom+1];
@@ -478,7 +477,7 @@ void Grid::In_Which_Cell(int &a, int &b, int &c, const FAtom &atom)const
 	return;
 }
 
-AtomLink* const Grid::getHashCode(const FAtom& atom)const
+AtomLink* Grid::getHashCode(const FAtom& atom)const
 {
 	int a, b, c;
 	this->In_Which_Cell(a, b, c, atom);
@@ -546,7 +545,7 @@ void Grid::Build_Hash_Table(AtomLink* const pointCache)
 	return;
 }
 
-void Grid::Fold_Hash_Table()throw(std::logic_error)
+void Grid::Fold_Hash_Table()
 {
 	TITLE("SLTK_Grid", "Fold_Hash_Table");
 
@@ -578,7 +577,7 @@ void Grid::Fold_Hash_Table()throw(std::logic_error)
 			tmp[++top] = ptr;
 		}
 
-		AtomLink* const pop()
+		AtomLink* pop()		// Peize Lin delete const 2019-05-01
 		{
 			assert(top > -1);
 			return tmp[top--];

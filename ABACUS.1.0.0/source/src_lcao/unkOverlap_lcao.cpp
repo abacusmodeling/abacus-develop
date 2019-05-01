@@ -778,11 +778,10 @@ complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int ik_R, 
 
 void unkOverlap_lcao::test()
 {
-	
 	this->init();
 	this->cal_R_number();
 	this->cal_orb_overlap();
-	//*
+
 	for(int ik = 0; ik < kv.nkstot; ik++)
 	{
 		for(int ib = 0; ib < NBANDS; ib++)
@@ -791,8 +790,7 @@ void unkOverlap_lcao::test()
 				ofs_running << "the global lcao wfc : ik = " << ik << "  ib = " << ib << "  iw = " << iw << "  valuse = " << lcao_wfc_global[ik][ib][iw] << endl;
 			}
 	}
-	//*/
-	
+
 	/*
 	for(int iw1 = 0; iw1 < NLOCAL; iw1++)
 	{
@@ -803,8 +801,7 @@ void unkOverlap_lcao::test()
 			ofs_running << "the cal_tag is not 0: " << iw1 << "  " << iw2 << endl;
 		}
 	}
-	//*/
-	
+	*/
 	/*
 	const int index_1 = 3;
 	const int index_2 = 4;
@@ -815,26 +812,24 @@ void unkOverlap_lcao::test()
 			cout << "the R is " << orb1_orb2_R[index_1][index_2][iR].x << "," << orb1_orb2_R[index_1][index_2][iR].y << "," << orb1_orb2_R[index_1][index_2][iR].z << " and overlap is " << psi_psi[index_1][index_2][iR] << endl;
 	}
 	
-	*//*
+	*/
+	/*
 	Vector3<double> dk = kv.kvec_c[0] - kv.kvec_c[0];
 	ofs_running << "(" << 0 << "," << 0 << ") = " << abs(this->unkdotp_LCAO(0,0,0,0,dk)) << endl;
+	*/
 	/*
 	Vector3<double> dk = kv.kvec_c[0] - kv.kvec_c[0];
 	for(int ib = 0; ib < NBANDS; ib++)
 		for(int ib2 = 0; ib2 < NBANDS; ib2++)
 			ofs_running << "(" << ib2 << "," << ib << ") = " << abs(this->unkdotp_LCAO(0,0,ib2,ib,dk)) << endl;
-		
-	
+	*/	
 	/*
 	double result = 0;
 	for(int iw = 0; iw < NLOCAL; iw++)
 	{
 		cout << "the wfc 11 is " << LOWF.WFC_K[11][13][iw] << " and the 23 is " << LOWF.WFC_K[23][13][iw] << endl;
 	}
-	//*/
-	
-	
-	
+	*/
 }
 
 

@@ -192,7 +192,7 @@ void electrons::self_consistent(const int &istep)
 		// use 'rho(in)' and 'v_h and v_xc'(in)
 		en.calculate_harris(1);
 	
-		first_iter_again:
+		// first_iter_again:					// Peize Lin delete 2019-05-01
 		
 		//(2) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.

@@ -238,7 +238,7 @@ void Gint_Speed::gamma_vlocal(void)
 
 	}//end NOV
 
-jump:
+//jump:			// Peize Lin delete 2019-05-01
 
 	//----------------------------
 	// PART4
