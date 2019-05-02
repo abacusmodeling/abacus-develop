@@ -59,6 +59,7 @@ epsilon0_vasp.o\
 md.o\
 mdNVE.o\
 mdNVT.o\
+exx_lip.o\
 soc.o\
 toWannier90.o \
 unkOverlap_pw.o \
@@ -167,9 +168,38 @@ pdiag_common.o \
 hs_matrix.o \
 subgrid_oper.o \
 GenELPA.o \
+conv_coulomb_pot.o \
+conv_coulomb_pot_k.o \
 center2_orb-orb11.o \
 center2_orb-orb21.o \
 center2_orb-orb22.o \
+abfs.o \
+abfs-vector3_order.o \
+exx_abfs.o \
+exx_abfs-abfs_index.o \
+exx_abfs-dm.o \
+exx_abfs-inverse_matrix_double.o \
+exx_abfs-jle.o \
+exx_abfs-io.o \
+exx_abfs-construct_orbs.o \
+exx_abfs-matrix_orbs11.o \
+exx_abfs-matrix_orbs21.o \
+exx_abfs-matrix_orbs22.o \
+exx_abfs-matrix_lcaoslcaos_lcaoslcaos.o \
+exx_abfs-pca.o \
+exx_abfs-parallel-communicate-allreduce.o \
+exx_abfs-parallel-communicate-dm.o \
+exx_abfs-parallel-communicate-dm-allreduce.o \
+exx_abfs-parallel-communicate-dm2.o \
+exx_abfs-parallel-communicate-hexx.o \
+exx_abfs-parallel-communicate-hexx-allreduce.o \
+exx_abfs-parallel-distribute-htime.o \
+exx_abfs-parallel-distribute-kmeans.o \
+exx_abfs-screen-schwarz.o \
+exx_abfs-screen-cauchy.o \
+exx_lcao.o \
+exx_opt_orb.o \
+exx_opt_orb-print.o \
 wfc_dm_2d.o \
 unkOverlap_lcao.o \
 
@@ -213,6 +243,7 @@ charge_broyden.o \
 charge_extra.o \
 gga_pw.o \
 potential.o \
+potential_libxc.o \
 efield.o \
 magnetism.o\
 optical.o\

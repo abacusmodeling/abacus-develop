@@ -27,7 +27,6 @@ inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk,
     int myprow, mypcol;
     int *usermap=new int[nprows*npcols];
     int info=0;
-	
     for(int i=0; i<nprows; ++i)
     {
         for(int j=0; j<npcols; ++j)
@@ -476,7 +475,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
         int THIS_REAL_ELPA_KERNEL_API=12;
         int useQR=0;						// may be changed to input parameter sometime
 
-        if(chr.new_e_iteration)
+        if(chr.get_new_e_iteration())
         {
             timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
             method=0;

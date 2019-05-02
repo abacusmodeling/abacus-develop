@@ -168,6 +168,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	ofs_running << setprecision(6); //LiuXh, 2017-03-21
 
 	ParaO.diago_complex_begin(ik, wfc, wfc_2d, LM.Hloc2, LM.Sloc2, wf.ekb[ik]);
+
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
 	if(NONCOLIN)
 	{
@@ -203,7 +204,6 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	{
 		for(int j=0; j<NLOCAL; j++)
 		{
-//			cout<<"H_and_S: "<<i<<" "<<j<<" "<<LM.Hloc2[i*NLOCAL+j]<<" "<<LM.Sloc2[i*NLOCAL+j]<<endl;
 			Htmp(i,j) = LM.Hloc2[i*NLOCAL+j];
 			Stmp(i,j) = LM.Sloc2[i*NLOCAL+j];
 		}
@@ -222,22 +222,22 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	hm.cdiaghg(NLOCAL, NBANDS, Htmp, Stmp, NLOCAL, en, hvec);
 
 	if(!NONCOLIN)
-	for(int ib=0; ib<NBANDS; ib++)
-	{
-		for(int iw=0; iw<NLOCAL; iw++)
+		for(int ib=0; ib<NBANDS; ib++)
 		{
-			LOWF.WFC_K[ik][ib][iw] = hvec(iw,ib);
+			for(int iw=0; iw<NLOCAL; iw++)
+			{
+				LOWF.WFC_K[ik][ib][iw] = hvec(iw,ib);
+			}
 		}
-	}
 	else
-	for(int ib=0; ib<NBANDS; ib++)
-	{
-		for(int iw=0; iw<NLOCAL / NPOL; iw++)
+		for(int ib=0; ib<NBANDS; ib++)
 		{
-			LOWF.WFC_K[ik][ib][iw] = hvec(iw * NPOL, ib);
-			LOWF.WFC_K[ik][ib][iw + NLOCAL / NPOL] = hvec(iw * NPOL + 1, ib);
+			for(int iw=0; iw<NLOCAL / NPOL; iw++)
+			{
+				LOWF.WFC_K[ik][ib][iw] = hvec(iw * NPOL, ib);
+				LOWF.WFC_K[ik][ib][iw + NLOCAL / NPOL] = hvec(iw * NPOL + 1, ib);
+			}
 		}
-	}
 
 	//cout << "\n Energy for k=" << ik << endl; 
 	for(int ib=0; ib<NBANDS; ib++)

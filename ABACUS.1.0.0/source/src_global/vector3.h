@@ -22,6 +22,7 @@ public:
 	T z;
 	
 	Vector3(const T &x1 = 0,const T &y1 = 0,const T &z1 = 0) :x(x1),y(y1),z(z1){};
+	Vector3(const Vector3<T> &v) :x(v.x),y(v.y),z(v.z){};		// Peize Lin add 2018-07-16
 	void set(const T &x1, const T &y1,const T &z1) { x = x1; y = y1; z = z1; }
 
 	Vector3<T>& operator =(const Vector3<T> &u) { x=u.x; y=u.y; z=u.z;     return *this; }

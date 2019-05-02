@@ -1,8 +1,8 @@
 #include "make_overlap_table.h"
 #include "lcao_orbitals.h"
-#include "../src_global/sph_bessel.h"
 
 #include <stdexcept>
+#include "exx_abfs.h"
 double Make_Overlap_Table::dr = -1.0;
 
 Make_Overlap_Table::Make_Overlap_Table()
@@ -1328,10 +1328,10 @@ void Make_Overlap_Table::init_Lmax (const int orb_num, const int mode, int &Lmax
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;
-//				case 2:			// used in <jY|jY> or <Abfs|Abfs>
-//					Lmax = max(Lmax, Exx_Abfs::Lmax);
-//					Lmax_used = 2*Lmax + 1;
-//					break;
+				case 2:			// used in <jY|jY> or <Abfs|Abfs>
+					Lmax = max(Lmax, Exx_Abfs::Lmax);
+					Lmax_used = 2*Lmax + 1;
+					break;
 				case 3:                // used in berryphase by jingan
 					cal_Lmax_Phi(Lmax);
 					Lmax++;
@@ -1345,12 +1345,12 @@ void Make_Overlap_Table::init_Lmax (const int orb_num, const int mode, int &Lmax
 		case 3:
 			switch( mode )
 			{
-//				case 1:			// used in <jY|PhiPhi> or <Abfs|PhiPhi>
-//					cal_Lmax_Phi(Lmax);
-//					Lmax_used = 2*Lmax + 1;
-//					Lmax = max(Lmax, Exx_Abfs::Lmax);
-//					Lmax_used += Exx_Abfs::Lmax;
-//					break;
+				case 1:			// used in <jY|PhiPhi> or <Abfs|PhiPhi>
+					cal_Lmax_Phi(Lmax);
+					Lmax_used = 2*Lmax + 1;
+					Lmax = max(Lmax, Exx_Abfs::Lmax);
+					Lmax_used += Exx_Abfs::Lmax;
+					break;
 				default:
 					throw invalid_argument("Make_Overlap_Table::init_Lmax orb_num=3, mode error");
 					break;

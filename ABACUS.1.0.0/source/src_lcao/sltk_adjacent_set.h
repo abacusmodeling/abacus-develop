@@ -31,8 +31,7 @@ private:
 // throw the exception "out_of_range".
 //==========================================================
 	static
-	void assertCoordinateIsRight(const int x, const int y, const int z, const char* const s)
-	throw(std::out_of_range);
+	void assertCoordinateIsRight(const int x, const int y, const int z, const char* const s);	// Peize Lin delete throw(std::out_of_range) 2018-07-14
 
 //==========================================================
 // MEMBER VARIABLE :

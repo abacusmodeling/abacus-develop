@@ -8,7 +8,12 @@
 #include "src_lcao/stress_lcao.h"
 #include "src_lcao/istate_charge.h"
 #include "src_lcao/istate_envelope.h"
+#include "src_pw/vdwd2.h"
+#include "src_global/global_function.h"
 //#include "../src_siao/selinv.h" //mohan add 2012-05-13
+
+#include "src_lcao/exx_abfs.h"
+#include "src_lcao/exx_opt_orb.h"
 
 Local_Orbital_Ions::Local_Orbital_Ions()
 {}
@@ -246,32 +251,76 @@ void Local_Orbital_Ions::opt_ions(void)
         if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
         {
             vdwd2.energy();
-        }
-		
-        // (10) self consistent
-        if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
-        {
-            LOE.scf(istep-1);
-        }
-        else if (CALCULATION=="nscf")
-        {
-            LOE.nscf();
-        }
-        else if (CALCULATION=="istate")
-        {
-            IState_Charge ISC;
-            ISC.begin();	
-        }
-        else if (CALCULATION=="ienvelope")
-        {
-            IState_Envelope IEP;
-            IEP.begin();
-        }
-        else
-        {
-            WARNING_QUIT("Local_Orbital_Ions::opt_ions","What's the CALCULATION.");
-        }
-        time_t eend = time(NULL);
+		}
+
+		// (10) self consistent
+		if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+		{
+			//Peize Lin add 2016-12-03
+			switch(exx_lcao.info.hybrid_type)
+			{
+				case Exx_Global::Hybrid_Type::HF:
+				case Exx_Global::Hybrid_Type::PBE0:
+				case Exx_Global::Hybrid_Type::HSE:
+					exx_lcao.cal_exx_ions();
+					break;
+				case Exx_Global::Hybrid_Type::No:
+				case Exx_Global::Hybrid_Type::Generate_Matrix:
+					break;
+				default:
+					throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			}
+			
+			if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
+			{
+				LOE.scf(istep-1);
+			}
+			else if( Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type )
+			{
+				Exx_Opt_Orb exx_opt_orb;
+				exx_opt_orb.generate_matrix();
+			}
+			else	// Peize Lin add 2016-12-03
+			{
+				if( exx_global.info.separate_loop )
+				{
+					for( size_t hybrid_step=0; hybrid_step!=exx_global.info.hybrid_step; ++hybrid_step )
+					{
+						LOE.scf(istep-1);
+
+						if( Local_Orbital_Elec::iter==1 || hybrid_step==exx_global.info.hybrid_step-1 )		// exx converge
+							break;
+						exx_global.info.set_xcfunc(xcf);							
+						exx_lcao.cal_exx_elec();						
+					}
+				}
+				else
+				{
+					LOE.scf(istep-1);
+					exx_global.info.set_xcfunc(xcf);
+					LOE.scf(istep-1);
+				}
+			}
+		}
+		else if (CALCULATION=="nscf")
+		{
+			LOE.nscf();
+		}
+		else if (CALCULATION=="istate")
+		{
+			IState_Charge ISC;
+			ISC.begin();
+		}
+		else if (CALCULATION=="ienvelope")
+		{
+			IState_Envelope IEP;
+			IEP.begin();
+		}
+		else
+		{
+			WARNING_QUIT("Local_Orbital_Ions::opt_ions","What's the CALCULATION.");
+		}
+		time_t eend = time(NULL);
 
         //xiaohui add 2014-07-07, for second-order extrapolation
         int iat=0;
@@ -400,7 +449,7 @@ void Local_Orbital_Ions::opt_ions(void)
         //if(DIAGO_TYPE=="selinv")
         //{
         //    cout << " number of selected inversion: " << Selinv::niter_ion << endl;
-	//    Selinv::niter_ion = 0;
+		//    Selinv::niter_ion = 0;
         //}
 
 //#ifdef __MPI //2015-09-06, xiaohui
@@ -432,7 +481,7 @@ void Local_Orbital_Ions::opt_ions(void)
         {
             if(stress_step==1)
             {
-        	Force_LCAO FL;
+        		Force_LCAO FL;
                 matrix stress_lcao;
                 stress_lcao.create(3,3);
                 FL.cal_stress(stress_lcao);
@@ -522,7 +571,6 @@ void Local_Orbital_Ions::opt_ions(void)
     }
 
     hm.hon.clear_after_ions();
-
 
     timer::tick("Local_Orbital_Ions","opt_ions",'C'); 
     return;

@@ -22,6 +22,9 @@ public:
 	//				"oep"    Optimized Effective Potential  iexch=4
 	//				"hf"     Hartree-Fock                   iexch=5
 	//				"pb0x"   PBE0                           iexch=6
+	//				"b3lpx"  B3LYP                          iexch=7
+	//				"kzk"    Finite-size corrections        iexch=8
+	//				"hsex"   HSE06                          iexch=9
 	//
 	// Correlation: "noc"    none                           icorr=0
 	//              "pz"     Perdew-Zunger                  icorr=1 (default)
@@ -44,6 +47,10 @@ public:
 	//              "optx"   Handy's exchange functional    igcx =6
 	//				"meta"   meta-gga                       igcx =7
 	//				"pb0x"   PBE0                           igcx =8
+	//				"b3lp"   B3LYP                          igcx =9
+	//				"psx"    PBEsol exchange                igcx =10
+	//				"wcx"    Wu-Cohen                       igcx =11
+	//				"hsex"   HSE06                          igcx =12
 	//
 	// Gradient Correction on Correlation:
 	//              "nogc"   none                           igcc =0 (default)
@@ -55,20 +62,27 @@ public:
 	//				"meta"   meta-gga                       igcc =6				
 	//
 	// Special cases:
-	//              "bp"   = "b88+p86"         = Becke-Perdew grad.corr.
-	//              "pw91" = "pw +ggx+ggc"     = PW91 (aka GGA)
-	//              "blyp" = "sla+b88+lyp+blyp"= BLYP
-	//              "pbe"  = "sla+pw+pbx+pbc"  = PBE
-	//              "revpbe"="sla+pw+rpb+pbc"  = revPBE (Zhang-Yang)
-	//              "hcth" = "nox+noc+hcth+hcth"=HCTH/120
-	//              "olyp" = "nox+lyp+optx+blyp" ////// UNTESTED //////
-
+	//              "bp"    = "b88+p86"           = Becke-Perdew grad.corr.
+	//              "pw91"  = "pw +ggx+ggc"       = PW91 (aka GGA)
+	//              "blyp"  = "sla+b88+lyp+blyp"  = BLYP
+	//              "pbe"   = "sla+pw+pbx+pbc"    = PBE
+	//              "revpbe"= "sla+pw+rpb+pbc"    = revPBE (Zhang-Yang)
+	//              "pbesol"= "sla+pw+psx+psc"    = PBEsol
+	//              "hcth"  = "nox+noc+hcth+hcth" = HCTH/120
+	//              "olyp"  = "nox+lyp+optx+blyp"!!! UNTESTED !!!
+	//              "tpss"  = "sla+pw+meta+meta"  = TPSS Meta-GGA
+	//              "wc"    = "sla+pw+wcx+pbc"    = Wu-Cohen
+	//              "pbe0"  = "pb0x+pw+pb0x+pbc"  = PBE0
+	//              "b3lyp" = "b3lp+vwn+b3lp+b3lp"= B3LYP
+	//              "hse"   = "hsex+pw+hsex+pbc"  = HSE	
+	
+	
 	// References:
 	//              pz      J.P.Perdew and A.Zunger, PRB 23, 5048 (1981)
 	//              vwn     S.H.Vosko, L.Wilk, M.Nusair, Can.J.Phys. 58,1200(1980)
-	//				wig     E.P.Wigner, Trans. Faraday Soc. 34, 67 (1938)
-	//				hl      L.Hedin and B.I.Lundqvist, J. Phys. C4, 2064 (1971)
-	//				gl      O.Gunnarsson and B.I.Lundqvist, PRB 13, 4274 (1976)
+	//				wig		E.P.Wigner, Trans. Faraday Soc. 34, 67 (1938)
+	//				hl		L.Hedin and B.I.Lundqvist, J. Phys. C4, 2064 (1971)
+	//				gl		O.Gunnarsson and B.I.Lundqvist, PRB 13, 4274 (1976)
 	//              pw      J.P.Perdew and Y.Wang, PRB 45, 13244 (1992)
 	//              obpz    G.Ortiz and P.Ballone, PRB 50, 1391 (1994)
 	//              obpw    as above
@@ -76,10 +90,17 @@ public:
 	//              p86     J.P.Perdew, PRB 33, 8822 (1986)
 	//              pbe     J.P.Perdew, K.Burke, M.Ernzerhof, PRL 77, 3865 (1996)
 	//              pw91    J.P.Perdew and Y. Wang, PRB 46, 6671 (1992)
-	//              blyp     C.Lee, W.Yang, R.G.Parr, PRB 37, 785 (1988)
+	//              blyp    C.Lee, W.Yang, R.G.Parr, PRB 37, 785 (1988)
 	//              hcth    Handy et al, JCP 109, 6264 (1998)
 	//              olyp    Handy et al, JCP 116, 5411 (2002)
 	//              revPBE  Zhang and Yang, PRL 80, 890 (1998)
+	//				meta    J.Tao, J.P.Perdew, V.N.Staroverov, G.E. Scuseria,PRL 91, 146401 (2003)
+	//				kzk     H.Kwee, S. Zhang, H. Krakauer, PRL 100, 126404 (2008)
+	//				pbe0    J.P.Perdew, M. Ernzerhof, K.Burke, JCP 105, 9982 (1996)
+	//				b3lyp   P.J. Stephens,F.J. Devlin,C.F. Chabalowski,M.J. Frisch J.Phys.Chem 98, 11623 (1994)
+	//				pbesol	J.P. Perdew et al., PRL 100, 136406 (2008)
+	//				wc		Z. Wu and R. E. Cohen, PRB 73, 235116 (2006)
+	//              hse     Paier J, Marsman M, Hummer K, et al, JPC 124(15): 154709 (2006)
 
 	int iexch; 
 	int icorr;
@@ -109,6 +130,7 @@ private:
 	void set_dft_value(int &m,const int i);
 	bool match_one(const string* dft, const string &name)const; 
 	void copy_to_now();	// Peize Lin add 2016-12-03
+	void hybrid_first();	// Peize Lin add 2016-12-03
 };
 
 #endif //FUNCTION_H

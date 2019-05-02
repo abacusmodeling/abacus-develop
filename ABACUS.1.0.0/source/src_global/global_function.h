@@ -17,7 +17,7 @@
 #include <cassert>
 
 #include "global_variable.h"
-//#include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
+#include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
 using namespace std;
 
@@ -219,6 +219,46 @@ std::string TO_STRING ( const T &n )
 	std::stringstream newstr;
 	newstr<<n;
 	return newstr.str();
+}
+
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : MAP_EXIST
+// find whether exists the map index
+// if exist return the ptr called, else return nullptr
+// example: map_exist(ms,i,j,k) -> try to find ms[i][j][k]
+// Peize Lin add 2018-07-16
+//==========================================================
+template< typename T_map, typename T_key1  >
+inline void* MAP_EXIST( T_map &ms, const T_key1 &key1 )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return static_cast<void*>(&ms1->second);
+}
+
+template< typename T_map, typename T_key1, typename... T_key_tail >
+inline void* MAP_EXIST( T_map &ms, const T_key1 &key1, const T_key_tail&... key_tail )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return MAP_EXIST( ms1->second, key_tail... );
+}
+
+template< typename T_map, typename T_key1  >
+inline const void* MAP_EXIST( const T_map &ms, const T_key1 &key1 )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return static_cast<const void*>(&ms1->second);
+}
+
+template< typename T_map, typename T_key1, typename... T_key_tail >
+inline const void* MAP_EXIST( const T_map &ms, const T_key1 &key1, const T_key_tail&... key_tail )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return MAP_EXIST( ms1->second, key_tail... );
 }
 
 #endif

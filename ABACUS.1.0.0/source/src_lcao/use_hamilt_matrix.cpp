@@ -89,7 +89,7 @@ void Use_Hamilt_Matrix::set_ion(void)
 	return;
 }
 
-void Use_Hamilt_Matrix::calculate_Hgamma(void)
+void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-12-03
 {
 	TITLE("Use_Hamilt_Matrix","calculate_Hgamma");
 	timer::tick("Use_Hamilt_Matrix","cal_Hgamma",'F');
@@ -148,6 +148,14 @@ void Use_Hamilt_Matrix::calculate_Hgamma(void)
 				//------------------------------------------------
 				LCAO_Vna::smooth_vl1();
 			}
+			
+			// Peize Lin add 2016-12-03
+			if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+				exx_lcao.add_Hexx(ik,1);
+			else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+			else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
 		}
 
 		time_t time_vlocal_end = time(NULL);
@@ -323,6 +331,14 @@ void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 		LM.zeros_HSR('H', LNNR.nnr);
 		if(!NONCOLIN) this->GK.folding_vl_k(ik);
 		else this->GK.folding_vl_k_nc(ik);
+
+		// Peize Lin add 2016-12-03
+		if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+			exx_lcao.add_Hexx(ik,1);
+		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+			exx_lcao.add_Hexx(ik,0.25);
+		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+			exx_lcao.add_Hexx(ik,0.25);
 	}
 
 

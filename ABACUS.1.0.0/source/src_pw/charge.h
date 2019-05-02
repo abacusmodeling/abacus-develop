@@ -72,7 +72,7 @@ private:
     double sum_rho(void) const;
 
 	bool allocate_rho;
-bool allocate_rho_final_scf; //LiuXh add 20180606
+	bool allocate_rho_final_scf; //LiuXh add 20180606
 
 };
 

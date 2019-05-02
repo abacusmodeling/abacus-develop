@@ -101,7 +101,7 @@ void electrons::self_consistent(const int &istep)
     en.ewld = en.ewald();
 
     set_ethr();
-    
+
     this->unit = 0;
 
 	if(OUT_LEVEL=="ie")
@@ -169,8 +169,8 @@ void electrons::self_consistent(const int &istep)
 		<< "  ELEC=" << setw(4) << iter 
 		<< "--------------------------------\n";
 		// mohan add 2010-07-16
-		if(iter==1) chr.new_e_iteration = true;
-		else chr.new_e_iteration = false;
+		if(iter==1)	chr.set_new_e_iteration(true);
+		else		chr.set_new_e_iteration(false);
 
 		// record the start time.
         start=std::clock();
@@ -193,6 +193,17 @@ void electrons::self_consistent(const int &istep)
 		en.calculate_harris(1);
 	
 		// first_iter_again:					// Peize Lin delete 2019-05-01
+		
+		// calculate exact-exchange
+		switch(xcf.iexch_now)						// Peize Lin add 2019-03-09
+		{
+			case 5:    case 6:   case 9:
+				if( !exx_global.info.separate_loop )				
+				{
+					exx_lip.cal_exx();			
+				}
+				break;
+		}
 		
 		//(2) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
@@ -225,11 +236,13 @@ void electrons::self_consistent(const int &istep)
 		// calculate the new eband here.
         chr.sum_band();
 
+		// add exx
+		en.set_exx();		// Peize Lin add 2019-03-09
+		
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
 		// mohan add 2009-01-23
 		en.calculate_harris(2);
-
 
 		Symmetry_rho srho;
 		for(int is=0; is<NSPIN; is++)
@@ -246,7 +259,7 @@ void electrons::self_consistent(const int &istep)
         en.deband = en.delta_e();
 
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
-	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
+		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
         {
             chr.mix_rho(dr2,0,DRHO2,iter,conv_elec);
         }
@@ -320,9 +333,9 @@ void electrons::self_consistent(const int &istep)
 			// mohan fix bug 2012-06-05,
 			// the new potential V(PL)+V(H)+V(xc)
             pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
-	    //cout<<"Exc = "<<en.etxc<<endl;
+			//cout<<"Exc = "<<en.etxc<<endl;
             //( vnew used later for scf correction to the forces )
-	    pot.vnew = pot.vr - pot.vnew;
+			pot.vnew = pot.vr - pot.vnew;
             en.descf = 0.0;
         }
 		
@@ -345,8 +358,8 @@ void electrons::self_consistent(const int &istep)
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
 		}
 
-	if(vext == 0)	pot.set_vrs(pw.doublegrid);
-	else		pot.set_vrs_tddft(pw.doublegrid, istep);
+		if(vext == 0)	pot.set_vrs(pw.doublegrid);
+		else		pot.set_vrs_tddft(pw.doublegrid, istep);
         //pot.set_vrs(pw.doublegrid);
         //print_eigenvalue(ofs_running);
 		en.calculate_etot();
@@ -355,7 +368,7 @@ void electrons::self_consistent(const int &istep)
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-	en.print_etot(conv_elec, istep, iter, dr2, duration, ETHR, avg_iter);	
+		en.print_etot(conv_elec, istep, iter, dr2, duration, ETHR, avg_iter);	
 
         if (conv_elec || iter==NITER)
         {
@@ -405,7 +418,7 @@ void electrons::self_consistent(const int &istep)
 				//ofs_running << " convergence is achieved" << endl;			
 				//ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
 				ofs_running << " charge density convergence is achieved" << endl;
-                                ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+                ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
 			}
 			else
 			{
@@ -483,46 +496,46 @@ void electrons::c_bands(void)
 				if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
 			}
         }
-	//h_diag can't be zero!  //zhengdy-soc
-	if(NPOL==2)
-	{
-		for(int ig = wf.npw;ig < wf.npwx; ig++)
+		//h_diag can't be zero!  //zhengdy-soc
+		if(NPOL==2)
 		{
-			h_diag[ig] = 1.0;
-			h_diag[ig+ wf.npwx] = 1.0;
+			for(int ig = wf.npw;ig < wf.npwx; ig++)
+			{
+				h_diag[ig] = 1.0;
+				h_diag[ig+ wf.npwx] = 1.0;
+			}
 		}
-	}
 
-	clock_t start=clock();
+		clock_t start=clock();
 
-	//============================================================
-	// diago the hamiltonian!!
-	// In plane wave method, firstly using cinitcgg to diagnolize,
-	// then using cg method.
-	//
-	// In localized orbital presented in plane wave case,
-	// only using cinitcgg.
-	//
-	// In linear scaling method, using sparse matrix and
-	// adjacent searching code and cg method to calculate the
-	// eigenstates.
-	//=============================================================
-	double avg_iter_k = 0.0;
+		//============================================================
+		// diago the hamiltonian!!
+		// In plane wave method, firstly using cinitcgg to diagnolize,
+		// then using cg method.
+		//
+		// In localized orbital presented in plane wave case,
+		// only using cinitcgg.
+		//
+		// In linear scaling method, using sparse matrix and
+		// adjacent searching code and cg method to calculate the
+		// eigenstates.
+		//=============================================================
+		double avg_iter_k = 0.0;
         hm.diago(this->istep, this->iter, ik, h_diag, avg_iter_k);
 
 
 
-	avg_iter += avg_iter_k;
+		avg_iter += avg_iter_k;
 
-	en.print_band(ik); //mohan add 2012-04-16
+		en.print_band(ik); //mohan add 2012-04-16
 
         clock_t finish=clock();
         const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
 
-	ofs_running << " " << setw(8) 
-		<< ik+1 << setw(15) 
-		<< avg_iter_k << setw(15) << duration << endl;
+		ofs_running << " " << setw(8) 
+			<< ik+1 << setw(15) 
+			<< avg_iter_k << setw(15) << duration << endl;
     }//End K Loop
 
 	

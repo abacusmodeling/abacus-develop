@@ -48,7 +48,7 @@ Charge::~Charge()
 		delete[] rhog;
 		delete[] rho_save;
 		delete[] rhog_save;
-    	        delete[] rho_core;
+    	delete[] rho_core;
 		delete[] rhog_core;
 	}
 }
@@ -1491,9 +1491,9 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 	ofs << " " << "dipole_elec_x: " << dipole_elec_x << " " << "dipole_elec_y: " << dipole_elec_y << "dipole_elec_z: " << dipole_elec_z;
 #else
 	double dipole_elec_x=0.0, dipole_elec_y=0.0, dipole_elec_z=0.0;
-	cout << "pw.nrxx: " << pw.nrxx <<endl;
-	cout << "pw.ncxyz: " << pw.ncxyz <<endl;
-	cout << "ucell.omega: " << ucell.omega <<endl;
+//	cout << "pw.nrxx: " << pw.nrxx <<endl;
+//	cout << "pw.ncxyz: " << pw.ncxyz <<endl;
+//	cout << "ucell.omega: " << ucell.omega <<endl;
 
 //	for(int ir=0; ir<pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
 //	ofs_running << "\n RANK_IN_POOL = " << RANK_IN_POOL;
@@ -1624,9 +1624,9 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 		dipole_elec_x *= ucell.omega / static_cast<double>( pw.ncxyz );
 		dipole_elec_y *= ucell.omega / static_cast<double>( pw.ncxyz );
 		dipole_elec_z *= ucell.omega / static_cast<double>( pw.ncxyz );
-		cout << setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<endl;
-		cout << setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<endl;
-		cout << setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<endl;
+//		cout << setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<endl;
+//		cout << setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<endl;
+//		cout << setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<endl;
 
 	
 		ofs << " " << "dipole_elec_x: " << dipole_elec_x << endl;

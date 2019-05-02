@@ -50,15 +50,15 @@ class wavefunc : public WF_atomic
 	void prepare_k(void);
 	void diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf);
 
-        int get_R(int ix, int iy, int iz);     // pengfei 2016-11-23
-        int iw2it( int iw);
-        int iw2ia( int iw);
+    int get_R(int ix, int iy, int iz);     // pengfei 2016-11-23
+    int iw2it( int iw);
+    int iw2ia( int iw);
     void init_after_vc(const int nks); //LiuXh 20180515
 
-        private:                              // pengfei 2016-11-23
+    private:                              // pengfei 2016-11-23
 
-        Vector3<int> ***R;
-        int ** Rmax;
+    Vector3<int> ***R;
+    int ** Rmax;
 
 
 };

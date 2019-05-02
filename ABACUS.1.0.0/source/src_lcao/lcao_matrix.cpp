@@ -408,66 +408,83 @@ void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 	return;
 }
 
-void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &accuracy)
+// Peize Lin add vtype='A' 2018-11-30
+void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &accuracy, ostream &os)
 {
 	TITLE("LCAO_Matrix","print_HSk");
-	if(mtype=='S') cout << "Sloc2 matrix" << endl;
-	else if(mtype=='T') cout << "Hloc_fixed2 matrix" << endl;
-	else if(mtype=='H') cout << "Hloc matrix" << endl;
+	if(mtype=='S') os << "Sloc2 matrix" << endl;
+	else if(mtype=='T') os << "Hloc_fixed2 matrix" << endl;
+	else if(mtype=='H') os << "Hloc2 matrix" << endl;
 	else
 	{
 		WARNING_QUIT("LCAO_Matrix::print_HSk","Check input parameter: mtype.");
 	}
 
-	if(vtype=='C') cout << " Output norm."  << endl;
-	else if(vtype=='R') cout << " Output real part."  << endl;
-	else if(vtype=='I') cout << " Output imag part."  << endl;
+	if(vtype=='C') os << " Output norm."  << endl;
+	else if(vtype=='R') os << " Output real part."  << endl;
+	else if(vtype=='I') os << " Output imag part."  << endl;
+	else if(vtype=='A') os << " Output complex." << endl;
 
 
-	cout << setprecision(8) << endl;
+	os << setprecision(8) << endl;
 	for(int i=0; i<ParaO.nrow; i++)
 	{
-		cout << " " ;
+		os << " " ;
 		for(int j=0; j<ParaO.ncol; j++)
 		{
 			const int index = i * ParaO.ncol + j;
-			double v=-888.888;//wrong number
-			if(vtype=='R')
+			if(vtype=='A')
 			{
-				if(mtype=='S') v = Sloc2[index].real();
-				else if(mtype=='T') v = Hloc_fixed2[index].real();
-				else if(mtype=='H') v = Hloc2[index].real();
-			}
-			else if(vtype=='C')
-			{
-				if(mtype=='S') v = sqrt( norm ( Sloc2[index] ) );
-				else if(mtype=='T') v = sqrt( norm ( Hloc_fixed2[index] ) );
-				else if(mtype=='H') v = sqrt( norm ( Hloc2[index] ) );
-			}
-			else if(vtype=='I')
-			{
-				if(mtype=='S') v = Sloc2[index].imag();
-				else if(mtype=='T') v = Hloc_fixed2[index].imag();
-				else if(mtype=='H') v = Hloc2[index].imag();
-			}
-			if( abs(v) > accuracy )
-			{
-				cout << setw(15) << v;
+				complex<double> v;
+				if(mtype=='S')	v = Sloc2[index];
+				else if(mtype=='T') v = Hloc_fixed2[index];
+				else if(mtype=='H') v = Hloc2[index];
+				auto threshold = [accuracy]( const double v ){ return abs(v)>accuracy ? v : 0.0; };
+				os << '(' << threshold(v.real()) << ',' << threshold(v.imag()) << "\t";
 			}
 			else
 			{
-				cout << setw(15) << "0"; 
+				double v=-888.888;//wrong number
+				if(vtype=='R')
+				{
+					if(mtype=='S') v = Sloc2[index].real();
+					else if(mtype=='T') v = Hloc_fixed2[index].real();
+					else if(mtype=='H') v = Hloc2[index].real();
+				}
+				else if(vtype=='C')
+				{
+					if(mtype=='S') v = sqrt( norm ( Sloc2[index] ) );
+					else if(mtype=='T') v = sqrt( norm ( Hloc_fixed2[index] ) );
+					else if(mtype=='H') v = sqrt( norm ( Hloc2[index] ) );
+				}
+				else if(vtype=='I')
+				{
+					if(mtype=='S') v = Sloc2[index].imag();
+					else if(mtype=='T') v = Hloc_fixed2[index].imag();
+					else if(mtype=='H') v = Hloc2[index].imag();
+				}
+
+				if( abs(v) > accuracy )
+				{
+	//				os << setw(15) << v;
+					os << v << "\t";
+				}
+				else
+				{
+	//				os << setw(15) << "0"; 
+					os << "0" << "\t"; 
+				}
 			}
 		}
-		cout << endl;
+		os << endl;
 	}
-	cout << endl;
-	cout << setprecision(6) << endl;
+	os << endl;
+	os << setprecision(6) << endl;
 	return;
 }
 
 
-void LCAO_Matrix::print_HSgamma(const char &mtype)
+void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 {
 	TITLE("Parallel_Orbitals","print_HSgamma");
 
@@ -479,8 +496,8 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 	{
 		if(!BFIELD)
 		{
-			cout << setprecision(8);
-			cout << " print Sloc" << endl;
+			os << setprecision(8);
+			os << " print Sloc" << endl;
 			for(int i=0; i<NLOCAL; ++i)
 			{
 				for(int j=0; j<NLOCAL; ++j)
@@ -488,14 +505,14 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 					double v = Sloc[i*ParaO.ncol+j];
 					if( abs(v) > 1.0e-8)
 					{
-						cout << setw(15) << v;
+						os << setw(15) << v;
 					}
 					else
 					{
-						cout << setw(15) << "0";
+						os << setw(15) << "0";
 					}
 				}//end j
-				cout << endl;
+				os << endl;
 			}//end i
 		}
 
@@ -513,7 +530,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 		   << setw(10) << Sloc[i * this->ncol + j] << endl;
 		   }
 		   }
-		cout << "\n Smatrix" << endl;
+		os << "\n Smatrix" << endl;
 		//ofs_running << setprecision(5) << endl;
 
 		for(int i=0; i<ParaO.nrow; i++)
@@ -593,7 +610,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 
 		if(!BFIELD)
 		{
-			cout << " print Hloc_fixed" << endl;
+			os << " print Hloc_fixed" << endl;
 			for(int i=0; i<NLOCAL; ++i)
 			{
 				for(int j=0; j<NLOCAL; ++j)
@@ -601,14 +618,14 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 					double v = Hloc_fixed[i*ParaO.ncol+j];
 					if( abs(v) > 1.0e-8)
 					{
-						cout << setw(15) << v;
+						os << setw(15) << v;
 					}
 					else
 					{
-						cout << setw(15) << "0";
+						os << setw(15) << "0";
 					}
 				}//end j
-				cout << endl;
+				os << endl;
 			}//end i
 		}
 	}
@@ -617,7 +634,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 
 		if(!BFIELD)
 		{
-			cout << " print Hloc" << endl;
+			os << " print Hloc" << endl;
 			for(int i=0; i<NLOCAL; ++i)
 			{
 				for(int j=0; j<NLOCAL; ++j)
@@ -625,14 +642,14 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 					double v = Hloc[i*ParaO.ncol+j];
 					if( abs(v) > 1.0e-8)
 					{
-						cout << setw(15) << v;
+						os << setw(15) << v;
 					}
 					else
 					{
-						cout << setw(15) << "0";
+						os << setw(15) << "0";
 					}
 				}//end j
-				cout << endl;
+				os << endl;
 			}//end i
 		}
 

@@ -5,6 +5,7 @@
 #include "gga_pw.h"
 #include "efield.h"
 #include "math.h"
+#include "potential_libxc.h"
 
 potential::potential()
 {
@@ -270,8 +271,12 @@ void potential::v_of_rho
 //----------------------------------------------------------
 //  calculate the exchange-correlation potential
 //----------------------------------------------------------
+	
+	#ifdef TEST_LIBXC
+    Potential_Libxc::v_xc(rho_in, etxc, vtxc, v_in);
+	#else
     this->v_xc(rho_in, etxc, vtxc, v_in);
-
+	#endif
 
 //----------------------------------------------------------
 //  calculate the Hartree potential
@@ -594,10 +599,10 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     //==========================================
 
 	if(NSPIN==4)
-	for (int ir = 0;ir < pw.nrxx;ir++)
-	{
-		v(0, ir) += Porter[ir].real();
-	}
+		for (int ir = 0;ir < pw.nrxx;ir++)
+		{
+			v(0, ir) += Porter[ir].real();
+		}
 	else
     	for (int is = 0;is < NSPIN;is++)
     	{
@@ -816,17 +821,17 @@ void potential::set_vrs(const bool doublegrid)
         //=================================================================
         // define the total local potential (external + scf) for each spin
         //=================================================================
-	if(NSPIN==4&&is>0)
-	for (int i = 0;i < pw.nrxx;i++)
-	{
-		this->vrs(is, i) = this->vr(is, i);
-	}
-	else        
-	for (int i = 0;i < pw.nrxx;i++)
-        {
-            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-//	    cout <<"i: "<< i <<"	"<< "vrs: " << vrs(is,i) <<endl;
-	}
+		if(NSPIN==4&&is>0)
+			for (int i = 0;i < pw.nrxx;i++)
+			{
+				this->vrs(is, i) = this->vr(is, i);
+			}
+		else        
+			for (int i = 0;i < pw.nrxx;i++)
+	        {
+	            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+	//	    	cout <<"i: "<< i <<"	"<< "vrs: " << vrs(is,i) <<endl;
+			}
 
 	//====================================================
         // add external linear potential, fuxiang add in 2017/05
@@ -934,38 +939,38 @@ void potential::newd()
                 {
                     for (int jh=ih; jh<nht; jh++)
                     {
-				if(LSPINORB)
-				{
-					ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
-					ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
-				}
-				else if( NONCOLIN )
-				{
-					if(is==0)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-						ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-					}
-					else if(is==1)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-						ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-					}
-					else if(is==2)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-						ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-					}
-					else if(is==3)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-						ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-					}
-				}
-				else{
-					ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-					ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-				}
+						if(LSPINORB)
+						{
+							ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
+							ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
+						}
+						else if( NONCOLIN )
+						{
+							if(is==0)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+								ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							}
+							else if(is==1)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+								ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							}
+							else if(is==2)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+								ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							}
+							else if(is==3)
+							{
+								ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+								ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							}
+						}
+						else{
+							ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+							ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+						}
                     }
                 }
             }

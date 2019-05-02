@@ -129,8 +129,8 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		// mohan add 2010-07-16
 		// used for pulay mixing.
-		if(iter==1) chr.new_e_iteration = true;
-		else chr.new_e_iteration = false;
+		if(iter==1)	chr.set_new_e_iteration(true);
+		else		chr.set_new_e_iteration(false);
 
 		// set converged threshold, 
 		// automatically updated during self consistency, only for CG.
@@ -196,7 +196,6 @@ void Local_Orbital_Elec::scf(const int &istep)
 		}
 
 		//fuxiang add 2016-11-1
-
 		if(tddft==1 && iter == 1)
 		{
 			this->WFC_init = new complex<double>**[kv.nks];
@@ -237,9 +236,19 @@ void Local_Orbital_Elec::scf(const int &istep)
 					}
 				}
 			}
-		}
-
-
+		}	
+		
+		// calculate exact-exchange
+		switch(xcf.iexch_now)						// Peize Lin add 2018-10-30
+		{
+			case 5:    case 6:   case 9:
+				if( !exx_global.info.separate_loop )				
+				{
+					exx_lcao.cal_exx_elec();
+				}
+				break;
+		}		
+		
 		// (1) calculate the bands.
 		cal_bands(istep);
 
@@ -275,28 +284,8 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// (2)
 		chr.save_rho_before_sum_band();
 		
-
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
-
-/*		if(istep==0)
-		{
-			for (int ib=0; ib < 3; ib++)
-			{
-				wf.wg(0,ib) = 2.0;
-			}
-			wf.wg(0,3) = 1.75;
-			wf.wg(0,4) = 0.25;
-		}
-    		for (int ik = 0; ik < kv.nks; ik++)
-    		{
-        		for (int ib = 0; ib < NBANDS; ib++)
-			{
-				cout << "wf.wg(ik, ib): " << wf.wg(ik, ib) << endl;
-			}
-    		}
-*/
-
 		for(int ik=0; ik<kv.nks; ++ik)
 		{
 			en.print_band(ik);
@@ -305,6 +294,9 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// if selinv is used, we need this to calculate the charge
 		// using density matrix.
 		LOC.sum_bands();
+
+		// add exx
+		en.set_exx();		// Peize Lin add 2016-12-03
 
 		// (4) mohan add 2010-06-24
 		// using new charge density.
@@ -431,9 +423,9 @@ void Local_Orbital_Elec::scf(const int &istep)
 			{
 				const int precision = 3;
 
-        			stringstream ssc;
-       				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-        			chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+        		stringstream ssc;
+       			ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+        		chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
 
 				stringstream ssd;
 				if(GAMMA_ONLY_LOCAL)
@@ -450,10 +442,10 @@ void Local_Orbital_Elec::scf(const int &istep)
 				ssp << global_out_dir << "SPIN" << is + 1 << "_POT";
 				pot.write_potential( is, 0, ssp.str(), pot.vrs, precision );
 
-			//fuxiang add 2017-03-15
-			stringstream sse;
-			sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
-			chr.write_rho_dipole( is, 0, sse.str());
+				//fuxiang add 2017-03-15
+				stringstream sse;
+				sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
+				chr.write_rho_dipole( is, 0, sse.str());
 
 			}
 			
@@ -523,6 +515,15 @@ void Local_Orbital_Elec::nscf(void)
 		}
 	}
 
+	switch(exx_lcao.info.hybrid_type)			// Peize Lin add 2018-08-14
+	{
+		case Exx_Global::Hybrid_Type::HF:
+		case Exx_Global::Hybrid_Type::PBE0:
+		case Exx_Global::Hybrid_Type::HSE:
+			exx_lcao.cal_exx_elec_nscf();
+			break;
+	}
+
 //	cal_bands(istep, WFC_init);
 	cal_bands(istep);
 	time_t time_finish=std::time(NULL);
@@ -583,7 +584,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		UHM.GK.reset_spin(start_spin);
 		UHM.GK.allocate_pvpR();
 	}
-						
+
 	ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "Time(Sec)"<< endl;
 	ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
 	for(int ik=0; ik<kv.nks; ik++)
@@ -666,9 +667,10 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		// (3) folding matrix, 
 		// and diagonalize the H matrix (T+Vl+Vnl).
 		//--------------------------------------------
+
 		if(GAMMA_ONLY_LOCAL)
 		{
-			UHM.calculate_Hgamma();
+			UHM.calculate_Hgamma(ik);						// Peize Lin add ik 2016-12-03
 
 			// SGO: sub_grid_operation
 			SGO.cal_totwfc();

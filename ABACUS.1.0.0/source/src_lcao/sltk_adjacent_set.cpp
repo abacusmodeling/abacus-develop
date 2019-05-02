@@ -67,7 +67,6 @@ void AdjacentSet::set
 }
 
 void AdjacentSet::assertCoordinateIsRight(const int x, const int y, const int z, const char* const s)
-throw(std::out_of_range)
 {
 	/*	if (x > 1 || x < -1 || y > 1 || y < -1 || z > 1 || z < -1)
 		{

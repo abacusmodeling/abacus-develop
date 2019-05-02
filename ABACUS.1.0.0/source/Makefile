@@ -20,7 +20,7 @@ HONG_SER_SELINV = -D__FP ${HONG_FFTW} -D__SELINV
 HONG_GDB = -g -D__FP ${HONG_FFTW}
 #(2)mpi
 HONG_MPI = -D__FP ${HONG_FFTW} -D__MPI 
-HONG_MPI_SELINV = -D__FP ${HONG_FFTW} -D__MPI -D__SELINV -DMETIS
+HONG_MPI_SELINV = -D__FP ${HONG_FFTW} -D__MPI -D__SELINV -DMETIS -DMKL_ILP64 -DEXX_DM=2 -DTEST_LIBXC=0 -DTEST_EXX_LCAO=0 -DTEST_EXX_RADIAL=1
 #(3)memory
 HONG_MEM = ${HONG_FFTW} -D__FP -D_MCD_CHECK -DWIN32 -DMCD_VERBOSE
 
@@ -33,12 +33,9 @@ HONG=${HONG_MPI_SELINV}
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-#OPTS = -I/global/u2/m/mohan/software/boost_1_39_0/ -I../src_siao/
-#OPTS = -I/home/xiaohui/lib/boost_1_39_0/ -O3
-#OPTS = -I/home/mohan/software/boost_1_39_0/ -O3
 #(1)gdb
 #xiaohui modify 2013-12-27
-OPTS_GDB = -g -W -I/home/mohan/software/boost_1_39_0/ 
+OPTS_GDB = -g -W -I${BOOST_INCLUDE_DIR}
 #(2)gprof
 #POTS = -pg
 
@@ -63,8 +60,8 @@ PDIAG_OBJS=$(OBJS_PDIAG)\
 #==========================
 # MAKING OPTIONS
 #==========================
-fp_mpi : ${FP_OBJS} ${PDIAG_MR} ${PDIAG_OBJS}$ ${HEADERS}
-	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi.1.0.0_new
+fp_mpi : ${FP_OBJS} ${PDIAG_MR} ${PDIAG_OBJS} ${HEADERS}
+	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi.1.0.0_exx
 
 fp : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp.x 

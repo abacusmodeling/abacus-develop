@@ -44,6 +44,7 @@ LCAO_nnr::~LCAO_nnr()
 void LCAO_nnr::cal_nnr(void)
 {
 	TITLE("LCAO_nnr","cal_nnr");
+
 	delete[] nlocdim;
 	delete[] nlocstart;
 	nlocdim = new int[ucell.nat];	

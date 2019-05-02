@@ -117,8 +117,8 @@ void Hamilt::diago(
         int notconv = 0;
         do
         {	
-	    //if ( DIAGO_TYPE=="cg" ) xiaohui modify 2013-09-02
-	    if(KS_SOLVER=="cg") //xiaohui add 2013-09-02
+	   		//if ( DIAGO_TYPE=="cg" ) xiaohui modify 2013-09-02
+	   		if(KS_SOLVER=="cg") //xiaohui add 2013-09-02
             {			
                 if ( iter > 0 || istep > 0 ||  ntry > 0)
                 {
@@ -143,23 +143,23 @@ void Hamilt::diago(
 				// we need to reorder the eigenvectors.
             }
             //else if ( DIAGO_TYPE=="dav" ) xiaohui modify 2013-09-02
-	    else if(KS_SOLVER=="dav") //xiaohui add 2013-09-02
-            {
-		Diago_David david;
-		if(NPOL==1) david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
-				NBANDS, precondition, DIAGO_DAVID_NDIM,
-				ETHR, DIAGO_CG_MAXITER, notconv, avg);
-		else{
-			david.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL,
-				NBANDS, precondition, DIAGO_DAVID_NDIM,
-				ETHR, DIAGO_CG_MAXITER, notconv, avg);
-		}
-            }
-            else
-            {
+	   		else if(KS_SOLVER=="dav") //xiaohui add 2013-09-02
+        	{
+				Diago_David david;
+				if(NPOL==1) david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
+						NBANDS, precondition, DIAGO_DAVID_NDIM,
+						ETHR, DIAGO_CG_MAXITER, notconv, avg);
+				else{
+					david.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL,
+						NBANDS, precondition, DIAGO_DAVID_NDIM,
+						ETHR, DIAGO_CG_MAXITER, notconv, avg);
+				}
+        	}
+        	else
+        	{
                 //WARNING_QUIT("calculate_bands","Check DIAGO_TYPE !"); xiaohui modify 2013-09-02
-		WARNING_QUIT("calculate_bands","Check KS_SOLVER !"); //xiaohui add 2013-09-02
-            }
+				WARNING_QUIT("calculate_bands","Check KS_SOLVER !"); //xiaohui add 2013-09-02
+        	}
             avg_iter += avg;
             ++ntry;
         }

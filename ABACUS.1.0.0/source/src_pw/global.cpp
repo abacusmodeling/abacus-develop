@@ -18,6 +18,8 @@ energy en;
 wavefunc wf;
 Hamilt hm;
 Exx_pw exxpw;
+Exx_Global exx_global;
+Exx_Lip exx_lip(exx_global.info);
 
 #ifdef __EPM
 

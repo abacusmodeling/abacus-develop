@@ -6,8 +6,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "../src_global/global_variable.h"
-#include "../src_global/global_function.h"
+#include "src_global/global_variable.h"
+#include "src_global/global_function.h"
 #include "pw_basis.h"
 #include "energy.h"
 #include "occupy.h"
@@ -29,10 +29,12 @@
 #include "use_fft.h"
 #include "klist.h"
 //#include "../src_develop/src_wannier/wan_global.h"
-#include "../src_pw/output.h"
+#include "output.h"
 #include "magnetism.h"
-#include "exx_pw.h"
 #include "vdwd2.h"
+#include "exx_pw.h"
+#include "exx_global.h"
+#include "exx_lip.h"
 
 #include "../src_parallel/ft.h"
 
@@ -49,6 +51,8 @@ extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;
 extern Exx_pw exxpw;
+extern Exx_Global exx_global;
+extern Exx_Lip exx_lip;
 
 // if define epm.
 #ifdef __EPM

@@ -1,0 +1,200 @@
+#include "exx_abfs-screen-schwarz.h"
+#include "src_pw/global.h"
+#include "src_global/lapack_connector.h"
+#include <cassert>
+#include <limits>
+#include <thread>
+#include <mkl_service.h>
+
+#include "src_external/src_test/src_lcao/exx_abfs-screen-test.h"
+#include "src_external/src_test/src_lcao/exx_lcao-test.h"
+//double Exx_Abfs::Screen::Schwarz::num_screen = 0;
+//double Exx_Abfs::Screen::Schwarz::num_cal = 0;
+	
+void Exx_Abfs::Screen::Schwarz::init(
+	const bool flag_screen_schwarz_in,
+	const double threshold_in )
+{
+	flag_screen_schwarz = flag_screen_schwarz_in;
+	threshold = threshold_in * threshold_in;
+}
+
+
+void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
+	const set<size_t> &atom_centres,
+	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
+	const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
+	const Element_Basis_Index::IndexLNM &index_abfs,
+	const Element_Basis_Index::IndexLNM &index_lcaos,
+	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
+	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
+	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
+{
+	if(!flag_screen_schwarz)	return;
+	TITLE("Exx_Abfs::Screen::Schwarz::cal_max_pair_fock");
+	
+	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
+	const vector<size_t> atom_centers_v( atom_centres.begin(), atom_centres.end() );
+	
+	// pre-cal Vws on same atom, speed up DPcal_V()
+	vector<shared_ptr<matrix>> Vs_same_atom(ucell.ntype);
+	for(size_t it=0; it!=ucell.ntype; ++it)
+		Vs_same_atom[it] = Abfs::DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true,Vws );	
+	
+	const int mkl_threads = mkl_get_max_threads();
+	mkl_set_num_threads(1);
+	
+	atomic<size_t> i_atom_centre = 0;
+	atomic_flag lock_max_pair_fock = ATOMIC_FLAG_INIT;
+	
+	vector<std::thread> ts;
+	for( int it=0; it<mkl_threads-1; ++it )
+		ts.push_back( std::thread(
+			&Exx_Abfs::Screen::Schwarz::cal_max_pair_fock_thread, this, 
+			std::cref(atom_centers_v), std::cref(m_abfs_abfs), std::cref(m_abfslcaos_lcaos), 
+			std::cref(index_abfs), std::cref(index_lcaos), std::cref(Born_von_Karman_period),
+			std::ref(Cws), std::ref(Vws), std::cref(adjs),
+			std::ref(i_atom_centre), std::ref(lock_max_pair_fock) ) );
+	cal_max_pair_fock_thread( 
+			atom_centers_v, m_abfs_abfs, m_abfslcaos_lcaos,
+			index_abfs, index_lcaos, Born_von_Karman_period,
+			Cws, Vws, adjs,
+			i_atom_centre, lock_max_pair_fock);
+	for( std::thread & ti : ts )
+		ti.join();
+	
+	mkl_set_num_threads(mkl_threads);
+	
+	Vs_same_atom.clear();
+	Abfs::delete_empty_ptrs( Vws );
+	
+//test_screen("schwarz-max_pair_fock.dat",max_pair_fock);
+}
+	
+void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock_thread(
+	const vector<size_t> &atom_centres,
+	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
+	const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
+	const Element_Basis_Index::IndexLNM &index_abfs,
+	const Element_Basis_Index::IndexLNM &index_lcaos,
+	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
+	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
+	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Vws,
+	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> &adjs,
+	atomic<size_t> &i_atom_centre,
+	atomic_flag &lock_max_pair_fock)
+{
+	TITLE("Exx_Abfs::Screen::Schwarz::cal_max_pair_fock_thread");
+	
+	// m_out( i1, i2, i3 ) = m_in( i2, i1, i3 )
+	auto change_matrix_order =[]( const matrix &m_in, const size_t n1 ) -> matrix
+	{
+		assert( m_in.nr%n1 == 0 );
+		matrix m_out( m_in.nr, m_in.nc, false );
+		const size_t n2  = m_in.nr/n1, 
+					 n3  = m_in.nc, 
+					 n13 = n1*n3;
+		const auto length = n3*sizeof(double);
+		double * m_out_ptr = m_out.c;
+		for( size_t i1=0; i1!=n1; ++i1 )
+		{
+			const double * m_in_ptr = m_in.c + i1*n3;
+			for( size_t i2=0; i2!=n2; ++i2, m_in_ptr+=n13, m_out_ptr+=n3 )
+				memcpy( m_out_ptr, m_in_ptr, length );
+		}
+		return m_out;
+	};
+	
+	// max_i m(i,i)
+	auto max_diagnal = []( const matrix & m ) -> double
+	{
+		assert(m.nr==m.nc);
+		double diagnal = -std::numeric_limits<double>::max();
+		for( size_t i=0; i!=m.nr; ++i )
+			diagnal = max( diagnal, m(i,i) );
+		return diagnal;
+	};
+	
+	// m * m.T
+	auto m_mT = []( const matrix & m1, const matrix & m2 ) -> matrix
+	{
+		assert( m1.nc == m2.nc );
+		matrix mm( m1.nr, m2.nr, false );
+		LapackConnector::gemm( 'N','T', m1.nr,m2.nr,m1.nc, 1, m1.c,m1.nc, m2.c,m2.nc, 0, mm.c,mm.nc );
+		return mm;
+	};
+		
+	while(true)
+	{
+		const size_t i_atom_centre_now = i_atom_centre++;
+		if( i_atom_centre_now >= atom_centres.size() )	return;
+		
+		map<size_t,map<Abfs::Vector3_Order<int>,double>> max_pair_fock_thread;
+		
+		const size_t iat1 = atom_centres[i_atom_centre_now];
+		const size_t it1 = ucell.iat2it[iat1];
+		const size_t ia1 = ucell.iat2ia[iat1];
+		const Abfs::Vector3_Order<double> tau1( ucell.atoms[it1].tau[ia1] );
+		
+		const map<size_t,vector<Abfs::Vector3_Order<int>>> adj = adjs[iat1];
+		for( const auto & atom2 : adj )
+		{
+			const int iat2 = atom2.first;
+			const int it2 = ucell.iat2it[iat2];
+			const int ia2 = ucell.iat2ia[iat2];
+			const Abfs::Vector3_Order<double> tau2( ucell.atoms[it2].tau[ia2] );
+			
+			map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> pair_fock_s;
+			for( const Vector3<int> &box2 : atom2.second )
+			{
+				const Abfs::Vector3_Order<double> R = -tau1+(tau2+box2*ucell.latvec);
+				
+				const matrix C_12 = *Abfs::DPcal_C( it1,it2,R,  m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false,Cws,Vws );
+				const matrix C_21 = change_matrix_order( 
+					*Abfs::DPcal_C( it2,it1,-R, m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false,Cws,Vws ),
+					index_lcaos[it1].count_size);
+				
+				const matrix V_11 = *Abfs::DPcal_V(it1,it1,{0,0,0},m_abfs_abfs,index_abfs,0,false,Vws);
+				const matrix V_12 = *Abfs::DPcal_V(it1,it2,R,      m_abfs_abfs,index_abfs,0,false,Vws);
+				const matrix V_21 = *Abfs::DPcal_V(it2,it1,-R,     m_abfs_abfs,index_abfs,0,false,Vws);
+				const matrix V_22 = *Abfs::DPcal_V(it2,it2,{0,0,0},m_abfs_abfs,index_abfs,0,false,Vws);
+				
+				pair_fock_s[box2] = make_shared<matrix>(
+					  m_mT( C_12 * V_11, C_12 )
+					+ m_mT( C_12 * V_12, C_21 )
+					+ m_mT( C_21 * V_21, C_12 )
+					+ m_mT( C_21 * V_22, C_21 ));
+			}
+			
+			const map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> pair_fock_ps = Abfs::cal_mps( Born_von_Karman_period, pair_fock_s );
+
+			for( const auto & pair_fock_p : pair_fock_ps )
+			{
+				const Abfs::Vector3_Order<int> & box2 = pair_fock_p.first;
+				max_pair_fock_thread[iat2][box2] = max_diagnal(*pair_fock_p.second);
+			}
+		}
+		
+		while( lock_max_pair_fock.test_and_set() );
+		max_pair_fock[iat1] = std::move(max_pair_fock_thread);
+		lock_max_pair_fock.clear();
+	}
+}
+
+bool Exx_Abfs::Screen::Schwarz::screen(
+	const size_t iat1, const size_t iat2, const size_t iat3, const size_t iat4,
+	const Abfs::Vector3_Order<int> & box3, const Abfs::Vector3_Order<int> & box4 ) const
+{
+	if(!flag_screen_schwarz)
+		return false;
+	if( max_pair_fock.at(iat1).at(iat3).at(box3) * max_pair_fock.at(iat2).at(iat4).at(box4) > threshold )
+	{
+//		num_cal += 1;
+		return false;
+	}
+	else
+	{
+//		num_screen += 1;
+		return true;
+	}
+}

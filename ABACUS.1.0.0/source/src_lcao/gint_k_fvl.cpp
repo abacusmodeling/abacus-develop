@@ -593,12 +593,12 @@ void Gint_k::evaluate_vl_stress(const int &grid_index, const int &size, const in
 							vpsir1 = iw1px[0] * vldr3[ib];
 							vpsir2 = iw1py[0] * vldr3[ib];
 							vpsir3 = iw1pz[0] * vldr3[ib];
-                                                        vpsir11 = iw1px[0] * vldr3[ib] * dr[ib][ia1][0];
-                                                        vpsir22 = iw1py[0] * vldr3[ib] * dr[ib][ia1][1];
-                                                        vpsir33 = iw1pz[0] * vldr3[ib] * dr[ib][ia1][2];
-                                                        vpsir12 = iw1px[0] * vldr3[ib] * dr[ib][ia1][1];
-                                                        vpsir13 = iw1px[0] * vldr3[ib] * dr[ib][ia1][2];
-                                                        vpsir23 = iw1py[0] * vldr3[ib] * dr[ib][ia1][2];
+                            vpsir11 = iw1px[0] * vldr3[ib] * dr[ib][ia1][0];
+                            vpsir22 = iw1py[0] * vldr3[ib] * dr[ib][ia1][1];
+                            vpsir33 = iw1pz[0] * vldr3[ib] * dr[ib][ia1][2];
+                            vpsir12 = iw1px[0] * vldr3[ib] * dr[ib][ia1][1];
+                            vpsir13 = iw1px[0] * vldr3[ib] * dr[ib][ia1][2];
+                            vpsir23 = iw1py[0] * vldr3[ib] * dr[ib][ia1][2];
 							++iw1px;
 							++iw1py;
 							++iw1pz;
@@ -624,12 +624,12 @@ void Gint_k::evaluate_vl_stress(const int &grid_index, const int &size, const in
 							pvp2 = &pvdpy[iww];
 							pvp3 = &pvdpz[iww];
 
-                                                        pvp11 = &pvdp11[iww]; //zhengdy add 2017/3/28
-                                                        pvp22 = &pvdp22[iww];
-                                                        pvp33 = &pvdp33[iww];
-                                                        pvp12 = &pvdp12[iww]; 
-                                                        pvp13 = &pvdp13[iww];
-                                                        pvp23 = &pvdp23[iww];
+                            pvp11 = &pvdp11[iww]; //zhengdy add 2017/3/28
+                            pvp22 = &pvdp22[iww];
+                            pvp33 = &pvdp33[iww];
+                            pvp12 = &pvdp12[iww]; 
+                            pvp13 = &pvdp13[iww];
+                            pvp23 = &pvdp23[iww];
 							//------------------------------------
 							// circle for wave functions of atom 2.
 							//------------------------------------
@@ -655,15 +655,15 @@ void Gint_k::evaluate_vl_stress(const int &grid_index, const int &size, const in
 
 						// bug here!!!!!!!!!!!!!!!!!!!!!!!!!!!
 						// DM(R) * psi1(r) * v(r) * psi2_R(r)
-									pvp1[0] += dmR2[0] * vpsir1 * iw2p[0];
-									pvp2[0] += dmR2[0] * vpsir2 * iw2p[0];
-									pvp3[0] += dmR2[0] * vpsir3 * iw2p[0];
-                                                                        pvp11[0] += dmR2[0] * vpsir11 * iw2p[0] ;
-                                                                        pvp22[0] += dmR2[0] * vpsir22 * iw2p[0] ;
-                                                                        pvp33[0] += dmR2[0] * vpsir33 * iw2p[0] ;
-                                                                        pvp12[0] += dmR2[0] * vpsir12 * iw2p[0] ;
-                                                                        pvp13[0] += dmR2[0] * vpsir13 * iw2p[0] ;
-                                                                        pvp23[0] += dmR2[0] * vpsir23 * iw2p[0] ;
+								pvp1[0] += dmR2[0] * vpsir1 * iw2p[0];
+								pvp2[0] += dmR2[0] * vpsir2 * iw2p[0];
+								pvp3[0] += dmR2[0] * vpsir3 * iw2p[0];
+                                pvp11[0] += dmR2[0] * vpsir11 * iw2p[0] ;
+                                pvp22[0] += dmR2[0] * vpsir22 * iw2p[0] ;
+                                pvp33[0] += dmR2[0] * vpsir33 * iw2p[0] ;
+                                pvp12[0] += dmR2[0] * vpsir12 * iw2p[0] ;
+                                pvp13[0] += dmR2[0] * vpsir13 * iw2p[0] ;
+                                pvp23[0] += dmR2[0] * vpsir23 * iw2p[0] ;
 //								pvp1[0] += vpsir1 * iw2p[0];
 //								pvp2[0] += vpsir2 * iw2p[0];
 //								pvp3[0] += vpsir3 * iw2p[0];
@@ -677,12 +677,12 @@ void Gint_k::evaluate_vl_stress(const int &grid_index, const int &size, const in
 								++pvp1;
 								++pvp2;
 								++pvp3;
-                                                                ++pvp11;
-                                                                ++pvp22;
-                                                                ++pvp33;
-                                                                ++pvp12;
-                                                                ++pvp13;
-                                                                ++pvp23;
+                                ++pvp11;
+                                ++pvp22;
+                                ++pvp33;
+                                ++pvp12;
+                                ++pvp13;
+                                ++pvp23;
 						//density matrix
 								++dmR2;
 							}

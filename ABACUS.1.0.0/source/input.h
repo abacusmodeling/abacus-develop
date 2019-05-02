@@ -309,6 +309,37 @@ public:
 	double *angle1;
 	double *angle2;
 		
+
+//==========================================================
+// exx
+// Peize Lin add 2018-06-20
+//==========================================================		
+	string exx_hybrid_type;		// "no", "hf", "pbe0", "hse"
+
+	double exx_hybrid_alpha;
+	double exx_hse_omega;
+	
+	bool exx_separate_loop;		// 0 or 1
+	int exx_hybrid_step;
+	
+	double exx_lambda;
+	
+	double exx_pca_threshold;
+	double exx_c_threshold;
+	double exx_v_threshold;
+	double exx_dm_threshold;
+	double exx_schwarz_threshold;
+	double exx_cauchy_threshold;
+	
+	string exx_distribute_type;
+	
+	string exx_h_mixing_mode;	// "no", "plain"
+	double exx_h_mixing_beta;
+	
+	int exx_opt_orb_lmax;
+	double exx_opt_orb_ecut;
+	double exx_opt_orb_tolerence;
+	
 //==========================================================
 // tddft
 // Fuxiang He add 2016-10-26
@@ -322,7 +353,6 @@ public:
 	int val_elec_03;			//valence electron 03
 	int vext;			//add extern potential or not
 	int vext_dire;			//vext direction
-
 
 	//xiaohui add 2015-09-16
 	bool input_error;

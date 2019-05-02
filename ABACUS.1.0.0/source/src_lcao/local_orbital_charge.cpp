@@ -2,9 +2,6 @@
 #include "../src_pw/global.h"
 #include "blas_interface.h"
 
-#include "src_external/src_test/test_function.h"
-#include "src_external/src_test/src_global/complexmatrix-test.h"
-
 //#include "../src_onscaling/on_tests.h"
 //#include "../src_siao/selinv.h"
 // 2014.10.29 add memory pool for DM and DM_B by yshen
@@ -362,7 +359,7 @@ void Local_Orbital_Charge::sum_bands(void)
 		NOTE("Calculate the density matrix!");
 		this->cal_dk_k( GridT );
 	} //xiaohui add 2013-09-02. Attention...
-			
+
 	for(int is=0; is<NSPIN; is++)
 	{
 	 	ZEROS( chr.rho[is], pw.nrxx ); // mohan 2009-11-10
@@ -697,7 +694,12 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 	}
 #ifdef __MPI //2015-09-06, xiaohui
 	else	// Peize Lin update 2018-07-02
-	{	
+	{
+		#if EXX_DM==2
+		if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
+			exx_lcao.DM_para.clear_DMr();
+		#endif
+	
 		for( int is=0; is<NSPIN; ++is )
 			for (int i=0; i<lgd_now; i++)
 				ZEROS(this->DM[is][i], lgd_now);
@@ -806,9 +808,14 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 							}
 						}
 					}
+						
+					#if EXX_DM==2
+					if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
+						exx_lcao.DM_para.set_DM_gamma( rho_row_col, is, {row_count*300,col_count*300} );
+					#endif
 				}  // end for col_count
 			}  // end for row_count
-		}  // end for is	
+		}  // end for is
 	}  // end if !BFIELD
 #endif //2015-09-06, xiaohui
 #ifndef __MPI //2015-09-06, xiaohui

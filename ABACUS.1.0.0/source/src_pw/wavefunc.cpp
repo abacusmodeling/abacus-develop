@@ -418,6 +418,7 @@ void wavefunc::wfcinit_k(void)
 			this->diago_PAO_in_pw_k(ik, wf.evc[ik]);
 		}
 	}
+	
 	//---------------------------------------------------
 	//  calculte the overlap <i,0 | e^{i(q+G)r} | j,R>
 	//---------------------------------------------------
@@ -573,7 +574,7 @@ void wavefunc::wfcinit_k(void)
 								{
 									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
 									phase = complex<double>( cos(arg),  -sin(arg) );
-									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) * wanf2_q[ik][iw2][ig] * phase/kv.nks;
+									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) * wanf2_q[ik][iw2][ig] * phase/static_cast<double>(kv.nks);		// Peize Lin add static_cast 2018-07-14
 								}
 							}
 						

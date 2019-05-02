@@ -1,5 +1,6 @@
 #include "force_lcao.h"
-#include "../src_pw/global.h"
+#include "src_pw/global.h"
+#include "src_pw/potential_libxc.h"
 
 double Force_LCAO::force_invalid_threshold_ev = 0.00;
 
@@ -676,7 +677,11 @@ void Force_LCAO::cal_force_cc(void)
 	timer::tick("Force_LCAO","cal_force_cc",'E');
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
+	#ifdef TEST_LIBXC
+	Potential_Libxc::v_xc(chr.rho, en.etxc, en.vtxc, vxc);
+	#else
     pot.v_xc(chr.rho, en.etxc, en.vtxc, vxc);
+	#endif
 
     complex<double> * psiv = new complex<double> [pw.nrxx];
     ZEROS(psiv, pw.nrxx);

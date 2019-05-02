@@ -140,11 +140,11 @@ void UnitCell_pseudo::setup_cell(
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
 	this->invGGT = GGT.Inverse();
-        //LiuXh add 20180515
-        this->GT0 = latvec.Inverse();
-        this->G0  = GT.Transpose();
-        this->GGT0 = G * GT;
-        this->invGGT0 = GGT.Inverse();
+    //LiuXh add 20180515
+    this->GT0 = latvec.Inverse();
+    this->G0  = GT.Transpose();
+    this->GGT0 = G * GT;
+    this->invGGT0 = GGT.Inverse();
 
 	ofs_running << endl;
 	out.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
@@ -352,6 +352,22 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 		}
 	}	
 #endif
+
+	// Peize Lin add 2016-09-23
+	if( Exx_Global::Hybrid_Type::HF   == exx_lcao.info.hybrid_type || 
+	    Exx_Global::Hybrid_Type::PBE0 == exx_lcao.info.hybrid_type || 
+		Exx_Global::Hybrid_Type::HSE  == exx_lcao.info.hybrid_type )
+	{
+		if( SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
+		{
+			for(int i=0; i<ntype; i++)
+			{
+				string ofile;
+				ifa >> ofile;
+				exx_lcao.info.files_abfs.push_back(ofile);
+			}
+		}
+	}
 
 	//==========================
 	// read in lattice constant
@@ -1285,7 +1301,7 @@ void UnitCell_pseudo::cal_nwfc()
 	{
 		atoms[it].stapos_wf = NLOCAL;
 		const int nlocal_it = atoms[it].nw * atoms[it].na;
-                if(!NONCOLIN) NLOCAL += nlocal_it;
+        if(!NONCOLIN) NLOCAL += nlocal_it;
 		else NLOCAL += nlocal_it * 2;//zhengdy-soc
 //		stringstream ss1;
 //		ss1 << "number of local orbitals for species " << it;
@@ -1307,7 +1323,9 @@ void UnitCell_pseudo::cal_nwfc()
 	// mohan add 2010-09-26
 	assert(NLOCAL>0);
 	delete[] iwt2iat;
+	delete[] iwt2iw;
 	this->iwt2iat = new int[NLOCAL];
+	this->iwt2iw = new int[NLOCAL];
 
 	this->itia2iat.create(ntype, namax);
 	this->itiaiw2iwt.create(ntype, namax, nwmax);
@@ -1323,6 +1341,7 @@ void UnitCell_pseudo::cal_nwfc()
 			{
 				this->itiaiw2iwt(it, ia, iw) = iwt;
 				this->iwt2iat[iwt] = iat;
+				this->iwt2iw[iwt] = iw;
 				++iwt;
 			}
 			++iat;

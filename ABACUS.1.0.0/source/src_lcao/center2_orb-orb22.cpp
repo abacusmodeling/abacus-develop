@@ -22,8 +22,6 @@ Center2_Orb::Orb22::Orb22(
 
 void Center2_Orb::Orb22::init_radial_table()
 {
-	TITLE("Center2_Orb::Orb22::init_radial_table");
-	
 	const Numerical_Orbital_Lm & nB_short = (nB1.getNr()<=nB2.getNr()) ? nB1 : nB2;
 	
 	vector<double> nB_tmp(nB_short.getNr());
@@ -31,7 +29,7 @@ void Center2_Orb::Orb22::init_radial_table()
 	{
 		nB_tmp[ir] = nB1.getPsi(ir) * nB2.getPsi(ir);
 	}	
-	
+
 	const int LB1 = nB1.getL();
 	const int LB2 = nB2.getL();
 	for( int LB = abs(LB1-LB2); LB<=LB1+LB2; ++LB)
@@ -63,8 +61,6 @@ void Center2_Orb::Orb22::init_radial_table()
 
 void Center2_Orb::Orb22::init_radial_table( const set<size_t> &radials )
 {
-	TITLE("Center2_Orb::Orb22::init_radial_table");
-	
 	const Numerical_Orbital_Lm & nB_short = (nB1.getNr()<=nB2.getNr()) ? nB1 : nB2;
 	
 	vector<double> nB_tmp(nB_short.getNr());
@@ -106,8 +102,6 @@ double Center2_Orb::Orb22::cal_overlap(
 	const Vector3<double> &RA, const Vector3<double> &RB,
 	const int &mA1, const int &mA2, const int &mB1, const int &mB2) const
 {
-	TITLE("Center2_Orb::Orb22::cal_overlap");
-	
 	const int LB1 = nB1.getL();
 	const int LB2 = nB2.getL();
 

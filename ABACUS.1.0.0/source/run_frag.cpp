@@ -123,6 +123,21 @@ void Run_Frag::pw_line(void)
     // Initial start wave functions
     //================================
     wf.wfcinit();
+	
+	switch(exx_global.info.hybrid_type)					// Peize Lin add 2019-03-09
+	{
+		case Exx_Global::Hybrid_Type::HF:
+		case Exx_Global::Hybrid_Type::PBE0:
+		case Exx_Global::Hybrid_Type::HSE:
+			exx_lip.init(&kv, &wf, &pw, &UFFT, &ucell);
+			break;
+		case Exx_Global::Hybrid_Type::No:
+			break;
+		case Exx_Global::Hybrid_Type::Generate_Matrix:
+		default:
+			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	}		
+	
     DONE(ofs_running,"INIT BASIS");
     //=========================================================
     //
@@ -227,6 +242,19 @@ void Run_Frag::frag_LCAO_line(void)
     // declration
     enum use_wf_coef {SOME_PW, ALL_LO};
     use_wf_coef uoc = ALL_LO;
+	
+	// Peize Lin add 2018-11-30
+	if(CALCULATION=="nscf")
+	{
+		switch(exx_global.info.hybrid_type)
+		{
+			case Exx_Global::Hybrid_Type::HF:
+			case Exx_Global::Hybrid_Type::PBE0:
+			case Exx_Global::Hybrid_Type::HSE:
+				exx_global.info.set_xcfunc(xcf);
+				break;
+		}
+	}
 
     switch (uoc)
     {
@@ -258,6 +286,24 @@ void Run_Frag::frag_LCAO_line(void)
         DONE(ofs_running,"INIT SOME_PW");
         break;
     }
+	
+    // Peize Lin 2016-12-03
+	if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
+	{
+		switch(exx_global.info.hybrid_type)
+		{
+			case Exx_Global::Hybrid_Type::HF:
+			case Exx_Global::Hybrid_Type::PBE0:
+			case Exx_Global::Hybrid_Type::HSE:
+				exx_lcao.init();
+				break;
+			case Exx_Global::Hybrid_Type::No:
+			case Exx_Global::Hybrid_Type::Generate_Matrix:
+				break;
+			default:
+				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+		}
+	}
 
 	Local_Orbital_Ions ions;
 	ions.opt_ions();
@@ -340,6 +386,20 @@ void Run_Frag::frag_pw_line(void)
     // Initial start wave functions
     //================================
    	wf.wfcinit();
+	
+	switch(exx_global.info.hybrid_type)				// Peize Lin add 2019-03-09
+	{
+		case Exx_Global::Hybrid_Type::HF:
+		case Exx_Global::Hybrid_Type::PBE0:
+		case Exx_Global::Hybrid_Type::HSE:
+			exx_lip.init(&kv, &wf, &pw, &UFFT, &ucell);
+			break;
+		case Exx_Global::Hybrid_Type::No:
+			break;
+		case Exx_Global::Hybrid_Type::Generate_Matrix:
+		default:
+			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	}
 
     //if (winput::before_iter)
     //{
@@ -377,7 +437,7 @@ void Run_Frag::frag_pw_line(void)
             {
                 wf.wanf2[ik].create(NLOCAL, wf.npwx);
                 //if ( LOCAL_BASIS == 3 || LOCAL_BASIS == 0 ) xiaohui modify 2013-09-01
-		if(BASIS_TYPE=="pw") //xiaohui add 2013-09-01. Attention! "LOCAL_BASIS==3"???
+				if(BASIS_TYPE=="pw") //xiaohui add 2013-09-01. Attention! "LOCAL_BASIS==3"???
                 {
 					cout << " ik=" << ik + 1 << endl;
 

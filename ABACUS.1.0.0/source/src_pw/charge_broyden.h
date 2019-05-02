@@ -42,8 +42,6 @@ class Charge_Broyden: public Charge_Pulay
 	matrix betabar; // (dstep, dstep)
 	matrix* Zmk;
 	matrix* Zmk_old;
-
-
 };
 
 #endif

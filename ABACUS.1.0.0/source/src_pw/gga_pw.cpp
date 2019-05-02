@@ -9,9 +9,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	TITLE("GGA::gradcorr");
 	
 	if (xcf.igcx_now == 0  &&  xcf.igcc_now == 0)
-	{
 		return;
-	}
 
 	bool igcc_is_lyp = false;
 	if( xcf.igcc_now == 3 || xcf.igcc_now == 7)
@@ -186,7 +184,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 					if( rhotmp1[ir] < 0.0 ) segno = -1.0;
 					
 					XC_Functional::gcxc( arho, grho2a, sx, sc, v1x, v2x, v1c, v2c);
-					
+
 					// first term of the gradient correction:
 					// D(rho*Exc)/D(rho)
 					v(0, ir) += e2 * ( v1x + v1c );
@@ -251,7 +249,6 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 				v2cud = 0.0;
 			}
 
-
 			// first term of the gradient correction : D(rho*Exc)/D(rho)
 			v(0,ir) = v(0,ir) + e2 * ( v1xup + v1cup );
 			v(1,ir) = v(1,ir) + e2 * ( v1xdw + v1cdw );
@@ -300,7 +297,6 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 			for(int ir=0; ir<pw.nrxx; ir++)
 				sum += dh[ir] * rhotmp2[ir];
 		
-
 		vtxcgc -= sum;
 	}
 

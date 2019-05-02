@@ -14,6 +14,7 @@
 #include "src_lcao/lcao_orbitals.h"
 #include "src_lcao/use_overlap_table.h"
 #include "src_parallel/subgrid_oper.h"
+#include "src_lcao/exx_lcao.h"
 
 extern Grid_Driver GridD;
 extern Parallel_Atoms ParaA;
@@ -23,6 +24,7 @@ extern Local_Orbital_Charge LOC;
 extern LCAO_Matrix LM;
 extern Use_Hamilt_Matrix UHM;
 extern SubGrid_oper SGO; //mohan add 2012-01-12
+extern Exx_Lcao exx_lcao; // Peize Lin add 2016-12-03
 #endif
 
 #endif

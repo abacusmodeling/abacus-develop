@@ -20,7 +20,7 @@ class Use_Hamilt_Matrix
 	void calculate_Hk( const int &ik);
 	
 	// used for Gamma only Hamiltonian matrix.
-	void calculate_Hgamma(void);
+	void calculate_Hgamma( const int &ik );						// Peize Lin add ik 2016-12-03
 
 	// used for gamma only algorithms.
 	Gint_Gamma GG;

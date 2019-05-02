@@ -160,8 +160,9 @@ void Hamilt_PW::cinitcgg(
 	for(int i=0; i<nstart; i++)
 	{
 		if(NPOL==2)
-		p[i] = new complex<double>[wf.npwx*NPOL];
-		else p[i] = new complex<double>[wf.npwx];
+			p[i] = new complex<double>[wf.npwx*NPOL];
+		else
+			p[i] = new complex<double>[wf.npwx];
 	}
 
 	for(int i=0; i<nstart; i++)
@@ -221,6 +222,23 @@ void Hamilt_PW::cinitcgg(
         }
     } // enddo
 	
+	// Peize Lin add 2019-03-09
+	if("lcao_in_pw"==BASIS_TYPE)
+	{
+		auto add_Hexx = [&](const double alpha)
+		{
+			for (int m=0; m<nstart; ++m)
+				for (int n=0; n<nstart; ++n)
+					hc(m,n) += alpha * exx_lip.get_exx_matrix()[ik][m][n];
+		};
+		if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+			add_Hexx(1);
+		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+			add_Hexx(exx_global.info.hybrid_alpha);
+		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+			add_Hexx(exx_global.info.hybrid_alpha);		
+	}
+	
 	delete[] hpsi;
 	delete[] spsi;
 
@@ -242,6 +260,16 @@ void Hamilt_PW::cinitcgg(
 
     hm.cdiaghg(nstart, n_band, hc, sc, nstart, en, hvec);
 
+	if("lcao_in_pw"==BASIS_TYPE)			// Peize Lin add 2019-03-09
+		switch(exx_global.info.hybrid_type)
+		{
+			case Exx_Global::Hybrid_Type::HF:
+			case Exx_Global::Hybrid_Type::PBE0:
+			case Exx_Global::Hybrid_Type::HSE:
+				exx_lip.k_pack->hvec_array[ik] = hvec;
+				break;
+		}
+		
 	//cout << "\n <2>  pw.gcar[0] = " << " " << pw.gcar[0].x << " " << pw.gcar[0].y << " " << pw.gcar[0].z << endl; 
     //=======================
     //diagonize the H-matrix
@@ -572,15 +600,15 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
             {
                 for (int ip2=0; ip2<Nprojs; ip2++)
                 {
-			if(!NONCOLIN)
-				this->Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
-			else
-			{
-				this->Ps[sum+ ip2*2] += ppcell.deeq_nc(0, iat, ip2, ip) * becp[sum+ip*2]
-							+ppcell.deeq_nc(1, iat, ip2, ip) * becp[sum+ip*2+1];
-				this->Ps[sum+ ip2*2+1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp[sum+ip*2]
-							+ppcell.deeq_nc(3, iat, ip2, ip) * becp[sum+ip*2+1];
-			}
+					if(!NONCOLIN)
+						this->Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
+					else
+					{
+						this->Ps[sum+ ip2*2] += ppcell.deeq_nc(0, iat, ip2, ip) * becp[sum+ip*2]
+									+ppcell.deeq_nc(1, iat, ip2, ip) * becp[sum+ip*2+1];
+						this->Ps[sum+ ip2*2+1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp[sum+ip*2]
+									+ppcell.deeq_nc(3, iat, ip2, ip) * becp[sum+ip*2+1];
+					}
                 }// end ih
             }//end jh
 		if(!NONCOLIN) sum += Nprojs;
@@ -602,31 +630,31 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
 
 	// use simple method.
 	if(!NONCOLIN)
-	for(int i=0; i<ppcell.nkb; i++)
-	{
-		complex<double>* p = &ppcell.vkb(i,0);
-		complex<double>* p_end = p + wf.npw;
-		complex<double>* hp = hpsi_in;
-		complex<double>* psp = &Ps[i];
-		for (;p<p_end;++p,++hp)
+		for(int i=0; i<ppcell.nkb; i++)
 		{
-			hp[0] += psp[0] * p[0];
+			complex<double>* p = &ppcell.vkb(i,0);
+			complex<double>* p_end = p + wf.npw;
+			complex<double>* hp = hpsi_in;
+			complex<double>* psp = &Ps[i];
+			for (;p<p_end;++p,++hp)
+			{
+				hp[0] += psp[0] * p[0];
+			}
 		}
-	}
 	else
-	for(int i=0; i<ppcell.nkb; i++)
-	{
-		complex<double>* p = &ppcell.vkb(i,0);
-		complex<double>* p_end = p + wf.npw;
-		complex<double>* hp = hpsi_in;
-		complex<double>* hp1 = hpsi_in + wf.npwx;
-		complex<double>* psp = &Ps[i*2];
-		for (;p<p_end;p++,++hp,++hp1)
+		for(int i=0; i<ppcell.nkb; i++)
 		{
-			hp[0] += psp[0] * (p[0]);
-			hp1[0] += psp[1] * (p[0]);
+			complex<double>* p = &ppcell.vkb(i,0);
+			complex<double>* p_end = p + wf.npw;
+			complex<double>* hp = hpsi_in;
+			complex<double>* hp1 = hpsi_in + wf.npwx;
+			complex<double>* psp = &Ps[i*2];
+			for (;p<p_end;p++,++hp,++hp1)
+			{
+				hp[0] += psp[0] * (p[0]);
+				hp1[0] += psp[1] * (p[0]);
+			}
 		}
-	}
 
 //	zgemm('N', 'N', 1, wf.npw, ppcell.nkb, ONE, this->Ps , 1, ppcell.vkb,
 //	      ppcell.nkb, ONE, hpsi , 1);

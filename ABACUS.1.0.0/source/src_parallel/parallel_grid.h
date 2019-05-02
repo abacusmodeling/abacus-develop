@@ -13,7 +13,7 @@ class Parallel_Grid
 	~Parallel_Grid();
 	
 	void init(const int &ncx, const int &ncy, const int &ncz, const int &nczp, const int &nrxx, const int &nbz, const int &bz);
-void init_final_scf(const int &ncx, const int &ncy, const int &ncz, const int &nczp, const int &nrxx, const int &nbz, const int &bz); //LiuXh add 20180606
+	void init_final_scf(const int &ncx, const int &ncy, const int &ncz, const int &nczp, const int &nrxx, const int &nbz, const int &bz); //LiuXh add 20180606
 
 #ifdef __MPI	
 	void zpiece_to_all(double *zpiece, const int &iz, double *rho);

@@ -15,6 +15,7 @@
 #include "src_pw/epsilon0_pwscf.h"
 #include "src_pw/epsilon0_vasp.h"
 #include "src_pw/unitcell.h"
+#include "src_lcao/exx_abfs-jle.h"
 
 //xiaohui modified 2013-03-23, adding "//" before #include...
 //#include "../../src_develop/src_siao/selinv.h"
@@ -88,46 +89,46 @@ void Input_Conv::Convert(void)
 	Ions_Move_Basic::trust_radius_ini = INPUT.trust_radius_ini;
 	Ions_Move_Basic::out_stru = INPUT.out_stru; //mohan add 2012-03-23
 	STRESS = INPUT.stress;
-        if(INPUT.fixed_axes == "None")          // pengfei Li add 2018-11-11
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
-        }
+    if(INPUT.fixed_axes == "None")          // pengfei Li add 2018-11-11
+    {
+            ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+    }
 	else if(INPUT.fixed_axes == "volume")
 	{
 		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
 	}
-        else if(INPUT.fixed_axes == "a")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
-        }
-        else if(INPUT.fixed_axes == "b")
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
-        }
-        else if(INPUT.fixed_axes == "c")
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
-        }
-        else if(INPUT.fixed_axes == "ab")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
-        }
-        else if(INPUT.fixed_axes == "ac")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
-        }
-        else if(INPUT.fixed_axes == "bc")
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
-        }
-        else if(INPUT.fixed_axes == "abc")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
-        }
-        else
-        {
-                WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
-        }
+    else if(INPUT.fixed_axes == "a")
+    {
+            ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
+    }
+    else if(INPUT.fixed_axes == "b")
+    {
+            ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
+    }
+    else if(INPUT.fixed_axes == "c")
+    {
+            ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
+    }
+    else if(INPUT.fixed_axes == "ab")
+    {
+            ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
+    }
+    else if(INPUT.fixed_axes == "ac")
+    {
+            ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
+    }
+    else if(INPUT.fixed_axes == "bc")
+    {
+            ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
+    }
+    else if(INPUT.fixed_axes == "abc")
+    {
+            ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
+    }
+    else
+    {
+            WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+    }
 	MOVE_IONS = INPUT.ion_dynamics;
 	OUT_LEVEL = INPUT.out_level;
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
@@ -388,6 +389,50 @@ void Input_Conv::Convert(void)
 	MD::md_tstep=INPUT.md_tstep;
 	MD::md_delt=INPUT.md_delt;
 */
+
+//----------------------------------------------------------
+// about exx									//Peize Lin add 2018-06-20
+//----------------------------------------------------------	
+	if(INPUT.exx_hybrid_type=="no")
+	{
+		exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+	}
+	else
+	{
+		if(INPUT.exx_hybrid_type=="hf")
+			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+		else if(INPUT.exx_hybrid_type=="pbe0")
+			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+		else if(INPUT.exx_hybrid_type=="hse")
+			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+		else if(INPUT.exx_hybrid_type=="opt_orb")
+			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
+		exx_global.info.hybrid_alpha    = INPUT.exx_hybrid_alpha      ;
+		exx_global.info.hse_omega       = INPUT.exx_hse_omega         ;
+		exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
+		exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
+		exx_lip.info.lambda             = INPUT.exx_lambda            ;
+		exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
+		exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
+		exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
+		exx_lcao.info.dm_threshold      = INPUT.exx_dm_threshold      ;
+		exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold ;
+		exx_lcao.info.cauchy_threshold  = INPUT.exx_cauchy_threshold  ;
+		if(INPUT.exx_distribute_type=="htime")
+			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
+		else if(INPUT.exx_distribute_type=="kmeans")
+			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans;
+		if(INPUT.exx_h_mixing_mode=="no")
+			exx_lcao.info.H_mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
+		else if(INPUT.exx_h_mixing_mode=="plain")
+			exx_lcao.info.H_mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Plain;
+		else if(INPUT.exx_h_mixing_mode=="pulay")
+			exx_lcao.info.H_mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Pulay;
+		exx_lcao.info.H_mixing_beta = INPUT.exx_h_mixing_beta;
+		Exx_Abfs::Jle::Lmax      = INPUT.exx_opt_orb_lmax;
+		Exx_Abfs::Jle::Ecut_exx  = INPUT.exx_opt_orb_ecut;
+		Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
+	}
 
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 

@@ -97,52 +97,52 @@ bool print)
 
 	ofs_running << "\n Density error is " << dr2 << endl;
 
- if(OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
- {
-	//if(!LOCAL_BASIS)OUT(ofs_running,"Error Threshold",ethr); xiaohui modify 2013-09-02
-	if(BASIS_TYPE=="pw")OUT(ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
-
-	if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == NITER) )	
+	if(OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
 	{
-		ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
-		this->print_format("E_KohnSham",etot);
-		this->print_format("E_Harris",etot_harris);
-		this->print_format("E_band",eband);
-		this->print_format("E_one_elec",eband+deband);
-		this->print_format("E_Hartree",ehart);
-		this->print_format("E_xc",etxc-etxcc);
-		this->print_format("E_Ewald",ewld);
-		this->print_format("E_demet",demet); //mohan add 2011-12-02
-		this->print_format("E_descf",descf);
-		this->print_format("E_efield",Efield::etotefield);
-		if(vdwd2.vdwD2)					//Peize Lin add 2014-04, update 2019-04-26
+		//if(!LOCAL_BASIS)OUT(ofs_running,"Error Threshold",ethr); xiaohui modify 2013-09-02
+		if(BASIS_TYPE=="pw")OUT(ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
+
+		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == NITER) )	
 		{
-			this->print_format("E_vdwD2",vdwd2.energy_result);
+			ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
+			this->print_format("E_KohnSham",etot);
+			this->print_format("E_Harris",etot_harris);
+			this->print_format("E_band",eband);
+			this->print_format("E_one_elec",eband+deband);
+			this->print_format("E_Hartree",ehart);
+			this->print_format("E_xc",etxc-etxcc);
+			this->print_format("E_Ewald",ewld);
+			this->print_format("E_demet",demet); //mohan add 2011-12-02
+			this->print_format("E_descf",descf);
+			this->print_format("E_efield",Efield::etotefield);
+			if(vdwd2.vdwD2)					//Peize Lin add 2014-04, update 2019-04-26
+			{
+				this->print_format("E_vdwD2",vdwd2.energy_result);
+			}
+			this->print_format("E_exx",exx);
 		}
-//		this->print_format("e_exx",exx);
-	}
-	else
-	{
-		ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
-		this->print_format("E_KohnSham",etot);
-		this->print_format("E_Harris",etot_harris);
-	}
+		else
+		{
+			ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
+			this->print_format("E_KohnSham",etot);
+			this->print_format("E_Harris",etot_harris);
+		}
 
-	if(TWO_EFERMI)
-	{
-		this->print_format("E_Fermi_up",ef_up);
-		this->print_format("E_Fermi_dw",ef_dw);
-	}
-	else
-	{
-		this->print_format("E_Fermi",this->ef);
-	}
- }//xiaohui add "OUT_LEVEL", 2015-09-16
+		if(TWO_EFERMI)
+		{
+			this->print_format("E_Fermi_up",ef_up);
+			this->print_format("E_Fermi_dw",ef_dw);
+		}
+		else
+		{
+			this->print_format("E_Fermi",this->ef);
+		}
+	}//xiaohui add "OUT_LEVEL", 2015-09-16
 
-        if (iter_in == 1)   // pengfei Li added 2015-1-31
-        {
-            this->etot_old = this->etot;
-        }
+	if (iter_in == 1)   // pengfei Li added 2015-1-31
+	{
+		this->etot_old = this->etot;
+	}
 	
 	// for test, output eigenvalues.
 	/*
@@ -772,6 +772,10 @@ double energy::delta_e(void)
 #endif
 
     deband0 *= ucell.omega / pw.ncxyz;
+	
+	// \int rho(r) v_{exx}(r) dr = 2 E_{exx}[rho]
+	deband0 -= 2*exx;				// Peize Lin add 2017-10-16
+	
     return deband0;
 } // end subroutine delta_e
 #endif
@@ -1134,4 +1138,24 @@ void energy::print_band(const int &ik)
 		}
 	}
 	return;
+}
+
+// Peize Lin add 2016-12-03
+void energy::set_exx()
+{
+	auto exx_energy = []() -> double
+	{
+		if("lcao_in_pw"==BASIS_TYPE)
+			return exx_lip.get_exx_energy();
+		else if("lcao"==BASIS_TYPE)
+			return exx_lcao.get_energy();
+		else
+			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	};
+	if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+		this->exx = exx_energy();
+	else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+		this->exx = exx_global.info.hybrid_alpha * exx_energy();
+	else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+		this->exx = exx_global.info.hybrid_alpha * exx_energy();
 }

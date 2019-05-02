@@ -285,14 +285,14 @@ void Input::Default(void)
     out_potential = 0;
     out_wf = false;
 	out_dos = 0;
-        out_band = 0;
+    out_band = 0;
 	out_hs = 0;
 	out_lowf = false;
 	out_alllog = false;
 	dos_emin_ev = -15;//(ev)
 	dos_emax_ev = 15;//(ev)
 	dos_edelta_ev = 0.01;//(ev)
-        b_coef = 0.07;
+    b_coef = 0.07;
 //----------------------------------------------------------
 // LCAO 
 //----------------------------------------------------------
@@ -329,25 +329,25 @@ void Input::Default(void)
 	md_delt=1.0;
 */
 //md and related parameters(added by zheng da ye)
-        md_mdtype=1;
-        md_tauthermo=0;
-        md_taubaro=0;
-        md_dt=-1;
-        md_nresn=3;
-        md_nyosh=3;
-        md_qmass=1;
-        md_tfirst=0;         //kelvin
-        md_tlast=md_tfirst;
-        md_dumpmdfred=1;
-        md_mdoutpath="mdoutput";
+    md_mdtype=1;
+    md_tauthermo=0;
+    md_taubaro=0;
+    md_dt=-1;
+    md_nresn=3;
+    md_nyosh=3;
+    md_qmass=1;
+    md_tfirst=0;         //kelvin
+    md_tlast=md_tfirst;
+    md_dumpmdfred=1;
+    md_mdoutpath="mdoutput";
 	md_domsd=0;
-        md_domsdatom=0;
-        md_rstmd=0;
-        md_outputstressperiod=1;
-        md_fixtemperature=1;
-        md_ediff=1e-4;
+    md_domsdatom=0;
+    md_rstmd=0;
+    md_outputstressperiod=1;
+    md_fixtemperature=1;
+    md_ediff=1e-4;
 	md_ediffg=1e-3;
-        md_msdstartTime=1;
+    md_msdstartTime=1;
 //end of zhengdaye's add.
 
 //----------------------------------------------------------
@@ -368,46 +368,76 @@ void Input::Default(void)
 //-----------------------------------------------------------
 // spectrum                                                                      // pengfei Li add 2016-11-23
 //-----------------------------------------------------------
-        //epsilon=false;
-		//epsilon_choice=0;
-		spectral_type="None";
-		spectral_method=0;
-		kernel_type="rpa";
-		eels_method=0;
-		absorption_method=0;
-        system="bulk";
-        eta=0.05;
-        domega=0.01;
-        nomega=300;
-        ecut_chi=1;
-        //oband=1;
-		q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
-		q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
-        //start_q=1;
-        //interval_q=1;
-        nq=1;
-        out_epsilon=true;
-        out_chi=false;
-        out_chi0=false;
-        fermi_level=0.0;
-        coulomb_cutoff=false;
+    //epsilon=false;
+	//epsilon_choice=0;
+	spectral_type="None";
+	spectral_method=0;
+	kernel_type="rpa";
+	eels_method=0;
+	absorption_method=0;
+    system="bulk";
+    eta=0.05;
+    domega=0.01;
+    nomega=300;
+    ecut_chi=1;
+    //oband=1;
+	q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
+	q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
+    //start_q=1;
+    //interval_q=1;
+    nq=1;
+    out_epsilon=true;
+    out_chi=false;
+    out_chi0=false;
+    fermi_level=0.0;
+    coulomb_cutoff=false;
 
-        kmesh_interpolation=false;
-        for(int i=0; i<100; i++)
-        {
-            qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
-        }
+    kmesh_interpolation=false;
+    for(int i=0; i<100; i++)
+    {
+        qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
+    }
 
-        lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
+    lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
 		
-		//epsilon0 = false;
-		//intersmear = 0.01;
-		intrasmear = 0.0;
-		shift = 0.0;
-		metalcalc = false;
-		eps_degauss = 0.01;
+	//epsilon0 = false;
+	//intersmear = 0.01;
+	intrasmear = 0.0;
+	shift = 0.0;
+	metalcalc = false;
+	eps_degauss = 0.01;
 		
-		//epsilon0_choice = 0;
+	//epsilon0_choice = 0;
+
+//----------------------------------------------------------
+// exx										//Peize Lin add 2018-06-20
+//----------------------------------------------------------		
+	exx_hybrid_type = "no";
+
+	exx_hybrid_alpha = 0.25;
+	exx_hse_omega = 0.11;
+		
+	exx_separate_loop = true;
+	exx_hybrid_step = 100;
+		
+	exx_lambda = 0.3;
+		
+	exx_pca_threshold = 0;
+	exx_c_threshold = 0;
+	exx_v_threshold = 0;
+	exx_dm_threshold = 0;
+	exx_schwarz_threshold = 0;
+	exx_cauchy_threshold = 0;
+		
+	exx_distribute_type = "htime";
+		
+	exx_h_mixing_mode = "no";
+	exx_h_mixing_beta = 0.7;
+		
+	exx_opt_orb_lmax = 0;
+	exx_opt_orb_ecut = 0.0;
+	exx_opt_orb_tolerence = 0.0;
+
 	//added by zhengdy-soc
 	noncolin = false;
 	lspinorb = false;
@@ -759,7 +789,7 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, fixed_axes);
         }
-	else if (strcmp("move_method", word) == 0)
+		else if (strcmp("move_method", word) == 0)
         {
             read_value(ifs, ion_dynamics);
         }
@@ -1147,372 +1177,452 @@ bool Input::Read(const string &fn)
         }
 */
 //added begin by zheng daye
-	else if (strcmp("md_mdtype",word) == 0)
-	{
-		read_value(ifs, md_mdtype);
-	}
-	else if (strcmp("md_tauthermo",word) == 0)
-	{
-		read_value(ifs, md_tauthermo);
-	}
-	else if (strcmp("md_taubaro",word) == 0)
-	{
-		read_value(ifs,md_taubaro );
-	}
-	else if (strcmp("md_dt",word) == 0)
-	{
-		read_value(ifs, md_dt);
-	}
-	else if (strcmp("md_nresn",word) == 0)
-	{
-		read_value(ifs,md_nresn );
-	}
-	else if (strcmp("md_nyosh",word) == 0)
-	{
-		read_value(ifs, md_nyosh);
-	}
-	else if (strcmp("md_qmass",word) == 0)
-	{
-		read_value(ifs,md_qmass );
-	}
-	else if (strcmp("md_tfirst",word) == 0)
-	{
-		read_value(ifs, md_tfirst);
-	}
-	else if (strcmp("md_tlast",word) == 0)
-	{
-		read_value(ifs,md_tlast );
-		if(md_tfirst!=md_tlast)
+		else if (strcmp("md_mdtype",word) == 0)
 		{
-			ifstream file1;
-			file1.open("ChangeTemp.dat");
-			if(!file1)						// Peize Lin fix bug 2016-08-06
-			{
-				ofstream file;
-				file.open("ChangeTemp.dat");
-				for(int ii=0;ii<30;ii++)
-				{
-					file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
-				}
-				file.close();
-			}
-			else 
-				file1.close();
+			read_value(ifs, md_mdtype);
 		}
-	}
-	else if (strcmp("md_dumpmdfred",word) == 0)
-	{
-		read_value(ifs, md_dumpmdfred);
-	}
-	else if (strcmp("md_mdoutpath",word) == 0)
-	{
-		read_value(ifs,md_mdoutpath );
-	}
-	else if (strcmp("md_domsd",word) == 0)
-	{
-		read_value(ifs, md_domsd);
-	}
-	else if (strcmp("md_domsdatom",word) == 0)
-	{
-		read_value(ifs, md_domsdatom);
-	}
-	else if (strcmp("md_rstmd",word) == 0)
-	{
-		read_value(ifs,md_rstmd );
-	}
-	else if (strcmp("md_outputstressperiod",word) == 0)
-	{
-		read_value(ifs,md_outputstressperiod );
-	}
-	else if (strcmp("md_fixtemperature",word) == 0)
-	{
-		read_value(ifs,md_fixtemperature );
-	}
-	else if (strcmp("md_ediff",word) == 0)
-	{
-		read_value(ifs,md_ediff );
-	}
-	else if (strcmp("md_ediffg",word) == 0)
-	{
-		read_value(ifs,md_ediffg );
-	}
-	else if (strcmp("md_msdstarttime",word) == 0)
-	{
-		read_value(ifs,md_msdstartTime );
-	}
+		else if (strcmp("md_tauthermo",word) == 0)
+		{
+			read_value(ifs, md_tauthermo);
+		}
+		else if (strcmp("md_taubaro",word) == 0)
+		{
+			read_value(ifs,md_taubaro );
+		}
+		else if (strcmp("md_dt",word) == 0)
+		{
+			read_value(ifs, md_dt);
+		}
+		else if (strcmp("md_nresn",word) == 0)
+		{
+			read_value(ifs,md_nresn );
+		}
+		else if (strcmp("md_nyosh",word) == 0)
+		{
+			read_value(ifs, md_nyosh);
+		}
+		else if (strcmp("md_qmass",word) == 0)
+		{
+			read_value(ifs,md_qmass );
+		}
+		else if (strcmp("md_tfirst",word) == 0)
+		{
+			read_value(ifs, md_tfirst);
+		}
+		else if (strcmp("md_tlast",word) == 0)
+		{
+			read_value(ifs,md_tlast );
+			if(md_tfirst!=md_tlast)
+			{
+				ifstream file1;
+				file1.open("ChangeTemp.dat");
+				if(!file1)						// Peize Lin fix bug 2016-08-06
+				{
+					ofstream file;
+					file.open("ChangeTemp.dat");
+					for(int ii=0;ii<30;ii++)
+					{
+						file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
+					}
+					file.close();
+				}
+				else 
+					file1.close();
+			}
+		}
+		else if (strcmp("md_dumpmdfred",word) == 0)
+		{
+			read_value(ifs, md_dumpmdfred);
+		}
+		else if (strcmp("md_mdoutpath",word) == 0)
+		{
+			read_value(ifs,md_mdoutpath );
+		}
+		else if (strcmp("md_domsd",word) == 0)
+		{
+			read_value(ifs, md_domsd);
+		}
+		else if (strcmp("md_domsdatom",word) == 0)
+		{
+			read_value(ifs, md_domsdatom);
+		}
+		else if (strcmp("md_rstmd",word) == 0)
+		{
+			read_value(ifs,md_rstmd );
+		}
+		else if (strcmp("md_outputstressperiod",word) == 0)
+		{
+			read_value(ifs,md_outputstressperiod );
+		}
+		else if (strcmp("md_fixtemperature",word) == 0)
+		{
+			read_value(ifs,md_fixtemperature );
+		}
+		else if (strcmp("md_ediff",word) == 0)
+		{
+			read_value(ifs,md_ediff );
+		}
+		else if (strcmp("md_ediffg",word) == 0)
+		{
+			read_value(ifs,md_ediffg );
+		}
+		else if (strcmp("md_msdstarttime",word) == 0)
+		{
+			read_value(ifs,md_msdstartTime );
+		}
 //added by zheng daye
 //----------------------------------------------------------
 // tddft
 // Fuxiang He add 2016-10-26
 //----------------------------------------------------------
-	else if (strcmp("tddft", word) == 0)
-	{
-		read_value(ifs,tddft );
-	}
-	else if (strcmp("td_dr2", word) == 0)
-	{
-		read_value(ifs,td_dr2 );
-	}
-	else if (strcmp("td_dt", word) == 0)
-	{
-		read_value(ifs,td_dt );
-	}
-	else if (strcmp("td_force_dt", word) == 0)
-	{
-		read_value(ifs,td_force_dt );
-	}
-	else if (strcmp("val_elec_01", word) == 0)
-	{
-		read_value(ifs, val_elec_01);
-	}
-	else if (strcmp("val_elec_02", word) == 0)
-	{
-		read_value(ifs,val_elec_02 );
-	}
-	else if (strcmp("val_elec_03", word) == 0)
-	{
-		read_value(ifs,val_elec_03 );
-	}
-	else if (strcmp("vext", word) == 0)
-	{
-		read_value(ifs,vext );
-	}
-	else if (strcmp("vext_dire", word) == 0)
-	{
-		read_value(ifs,vext_dire );
-	}
+		else if (strcmp("tddft", word) == 0)
+		{
+			read_value(ifs,tddft );
+		}
+		else if (strcmp("td_dr2", word) == 0)
+		{
+			read_value(ifs,td_dr2 );
+		}
+		else if (strcmp("td_dt", word) == 0)
+		{
+			read_value(ifs,td_dt );
+		}
+		else if (strcmp("td_force_dt", word) == 0)
+		{
+			read_value(ifs,td_force_dt );
+		}
+		else if (strcmp("val_elec_01", word) == 0)
+		{
+			read_value(ifs, val_elec_01);
+		}
+		else if (strcmp("val_elec_02", word) == 0)
+		{
+			read_value(ifs,val_elec_02 );
+		}
+		else if (strcmp("val_elec_03", word) == 0)
+		{
+			read_value(ifs,val_elec_03 );
+		}
+		else if (strcmp("vext", word) == 0)
+		{
+			read_value(ifs,vext );
+		}
+		else if (strcmp("vext_dire", word) == 0)
+		{
+			read_value(ifs,vext_dire );
+		}
 //----------------------------------------------------------
 // vdwD2
 // Peize Lin add 2014-03-31
 //----------------------------------------------------------
-        else if (strcmp("vdwd2", word) == 0)
-        {
-            read_value(ifs, vdwD2);
-        }
-        else if (strcmp("vdwd2_scaling", word) == 0)
-        {
-            read_value(ifs, vdwD2_scaling);
-        }
-        else if (strcmp("vdwd2_d", word) == 0)
-        {
-            read_value(ifs, vdwD2_d);
-        }		
-        else if (strcmp("vdwd2_c6_file", word) == 0)
-        {
-            read_value(ifs, vdwD2_C6_file);
-        }
-        else if (strcmp("vdwd2_c6_unit", word) == 0)
-        {
-            read_value(ifs, vdwD2_C6_unit);
-        }
-        else if (strcmp("vdwd2_r0_file", word) == 0)
-        {
-            read_value(ifs, vdwD2_R0_file);
-        }
-        else if (strcmp("vdwd2_r0_unit", word) == 0)
-        {
-            read_value(ifs, vdwD2_R0_unit);
-        }
-        else if (strcmp("vdwd2_model", word) == 0)
-        {
-            read_value(ifs, vdwD2_model);
-        }
-        else if (strcmp("vdwd2_period", word) == 0)
-        {
+	    else if (strcmp("vdwd2", word) == 0)
+	    {
+	        read_value(ifs, vdwD2);
+	    }
+	    else if (strcmp("vdwd2_scaling", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_scaling);
+	    }
+	    else if (strcmp("vdwd2_d", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_d);
+	    }		
+	    else if (strcmp("vdwd2_c6_file", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_C6_file);
+	    }
+	    else if (strcmp("vdwd2_c6_unit", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_C6_unit);
+	    }
+	    else if (strcmp("vdwd2_r0_file", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_R0_file);
+	    }
+	    else if (strcmp("vdwd2_r0_unit", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_R0_unit);
+	    }
+	    else if (strcmp("vdwd2_model", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_model);
+	    }
+	    else if (strcmp("vdwd2_period", word) == 0)
+	    {
 			ifs >> vdwD2_period.x >> vdwD2_period.y;
-            read_value(ifs, vdwD2_period.z);
-        }
-        else if (strcmp("vdwd2_radius", word) == 0)
-        {
-            read_value(ifs, vdwD2_radius);
-        }
-        else if (strcmp("vdwd2_radius_unit", word) == 0)
-        {
-            read_value(ifs, vdwD2_radius_unit);
-        }
+	        read_value(ifs, vdwD2_period.z);
+	    }
+	    else if (strcmp("vdwd2_radius", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_radius);
+	    }
+	    else if (strcmp("vdwd2_radius_unit", word) == 0)
+	    {
+	        read_value(ifs, vdwD2_radius_unit);
+	    }
 //--------------------------------------------------------
 // epsilon           pengfei Li 2016-11-23
 //--------------------------------------------------------
-        //else if (strcmp("epsilon", word) == 0)
-        //{
-        //    read_value(ifs, epsilon);
-        //}
-        //else if (strcmp("epsilon_choice", word) == 0)
-        //{
-        //    read_value(ifs, epsilon_choice);
-        //}
+	    //else if (strcmp("epsilon", word) == 0)
+	    //{
+	    //    read_value(ifs, epsilon);
+	    //}
+	    //else if (strcmp("epsilon_choice", word) == 0)
+	    //{
+	    //    read_value(ifs, epsilon_choice);
+	    //}
 		else if (strcmp("spectral_type", word) == 0)
-        {
-            read_value(ifs, spectral_type);
-        }
+	    {
+	        read_value(ifs, spectral_type);
+	    }
 		else if (strcmp("spectral_method", word) == 0)
-        {
-            read_value(ifs, spectral_method);
-        }
+	    {
+	        read_value(ifs, spectral_method);
+	    }
 		else if (strcmp("kernel_type", word) == 0)
-        {
-            read_value(ifs, kernel_type);
-        }
+	    {
+	        read_value(ifs, kernel_type);
+	    }
 		else if (strcmp("eels_method", word) == 0)
-        {
-            read_value(ifs, eels_method);
-        }
+	    {
+	        read_value(ifs, eels_method);
+	    }
 		else if (strcmp("absorption_method", word) == 0)
-        {
-            read_value(ifs, absorption_method);
-        }
-        else if (strcmp("system", word) == 0)
-        {
-            read_value(ifs, system);
-        }
-        else if (strcmp("eta", word) == 0)
-        {
-            read_value(ifs, eta);
-        }
-        else if (strcmp("domega", word) == 0)
-        {
-            read_value(ifs, domega);
-        }
-        else if (strcmp("nomega", word) == 0)
-        {
-            read_value(ifs, nomega);
-        }
-        else if (strcmp("ecut_chi", word) == 0)
-        {
-            read_value(ifs, ecut_chi);
-        }
-        //else if (strcmp("oband", word) == 0)
-        //{
-        //   read_value(ifs, oband);
-        //}
-        else if (strcmp("q_start", word) == 0)
-        {
+	    {
+	        read_value(ifs, absorption_method);
+	    }
+	    else if (strcmp("system", word) == 0)
+	    {
+	        read_value(ifs, system);
+	    }
+	    else if (strcmp("eta", word) == 0)
+	    {
+	        read_value(ifs, eta);
+	    }
+	    else if (strcmp("domega", word) == 0)
+	    {
+	        read_value(ifs, domega);
+	    }
+	    else if (strcmp("nomega", word) == 0)
+	    {
+	        read_value(ifs, nomega);
+	    }
+	    else if (strcmp("ecut_chi", word) == 0)
+	    {
+	        read_value(ifs, ecut_chi);
+	    }
+	    //else if (strcmp("oband", word) == 0)
+	    //{
+	    //   read_value(ifs, oband);
+	    //}
+	    else if (strcmp("q_start", word) == 0)
+	    {
 			ifs >> q_start[0]; ifs >> q_start[1]; read_value(ifs, q_start[2]);
-        }
-        else if (strcmp("q_direction", word) == 0)
-        {
+	    }
+	    else if (strcmp("q_direction", word) == 0)
+	    {
 			ifs >> q_direct[0]; ifs >> q_direct[1]; read_value(ifs, q_direct[2]);
-        }				
-        //else if (strcmp("start_q", word) == 0)
-        //{
-        //    read_value(ifs, start_q);
-        //}
-        //else if (strcmp("interval_q", word) == 0)
-        //{
-        //    read_value(ifs, interval_q);
-        //}
-        else if (strcmp("nq", word) == 0)
+	    }				
+	    //else if (strcmp("start_q", word) == 0)
+	    //{
+	    //    read_value(ifs, start_q);
+	    //}
+	    //else if (strcmp("interval_q", word) == 0)
+	    //{
+	    //    read_value(ifs, interval_q);
+	    //}
+	    else if (strcmp("nq", word) == 0)
+	    {
+	        read_value(ifs, nq);
+	    }
+	    else if (strcmp("out_epsilon", word) == 0)
+	    {
+	        read_value(ifs, out_epsilon);
+	    }
+	    else if (strcmp("out_chi", word) == 0)
+	    {
+	        read_value(ifs, out_chi);
+	    }
+	    else if (strcmp("out_chi0", word) == 0)
+	    {
+	        read_value(ifs, out_chi0);
+	    }
+	    else if (strcmp("fermi_level", word) == 0)
+	    {
+	        read_value(ifs, fermi_level);
+	    }
+	    else if (strcmp("coulomb_cutoff", word) == 0)
+	    {
+	        read_value(ifs, coulomb_cutoff);
+	    }
+	    else if (strcmp("kmesh_interpolation", word) == 0)
+	    {
+	        read_value(ifs, kmesh_interpolation);
+	    }
+	    else if (strcmp("qcar", word) == 0)
+	    {
+	         for(int i=0; i<nq; i++)
+	         {
+	             ifs >> qcar[i][0]; ifs >> qcar[i][1]; read_value(ifs, qcar[i][2]);
+	         }
+	    }
+	    else if (strcmp("supercell_scale", word) == 0)
+	    {
+	        ifs >> lcao_box[0]; ifs >> lcao_box[1];
+	        read_value(ifs, lcao_box[2]);
+	    }
+	    //else if (strcmp("epsilon0", word) == 0)
+	    //{
+	    //    read_value(ifs, epsilon0);
+	    //}
+	    //else if (strcmp("intersmear", word) == 0)
+	    //{
+	    //    read_value(ifs, intersmear);
+	    //}
+	    else if (strcmp("intrasmear", word) == 0)
+	    {
+	        read_value(ifs, intrasmear);
+	    }
+	    else if (strcmp("shift", word) == 0)
+	    {
+	        read_value(ifs, shift);
+	    }
+	    else if (strcmp("metalcalc", word) == 0)
+	    {
+	        read_value(ifs, metalcalc);
+	    }	
+	    else if (strcmp("eps_degauss", word) == 0)
+	    {
+	        read_value(ifs, eps_degauss);
+	    }
+	    //else if (strcmp("epsilon0_choice", word) == 0)
+	    //{
+	    //    read_value(ifs, epsilon0_choice);
+	    //}					
+//----------------------------------------------------------
+// exx
+// Peize Lin add 2018-06-20
+//----------------------------------------------------------
+        else if (strcmp("exx_hybrid_type", word) == 0)
         {
-            read_value(ifs, nq);
+            read_value(ifs, exx_hybrid_type);
+        }		
+        else if (strcmp("exx_hybrid_alpha", word) == 0)
+        {
+            read_value(ifs, exx_hybrid_alpha);
+        }		
+        else if (strcmp("exx_hse_omega", word) == 0)
+        {
+            read_value(ifs, exx_hse_omega);
+        }		
+        else if (strcmp("exx_separate_loop", word) == 0)
+        {
+            read_value(ifs, exx_separate_loop);
+        }		
+        else if (strcmp("exx_hybrid_step", word) == 0)
+        {
+            read_value(ifs, exx_hybrid_step);
+        }		
+        else if (strcmp("exx_lambda", word) == 0)
+        {
+            read_value(ifs, exx_lambda);
+        }		
+        else if (strcmp("exx_pca_threshold", word) == 0)
+        {
+            read_value(ifs, exx_pca_threshold);
+        }		
+        else if (strcmp("exx_c_threshold", word) == 0)
+        {
+            read_value(ifs, exx_c_threshold);
+        }			
+        else if (strcmp("exx_v_threshold", word) == 0)
+        {
+            read_value(ifs, exx_v_threshold);
+        }			
+        else if (strcmp("exx_dm_threshold", word) == 0)
+        {
+            read_value(ifs, exx_dm_threshold);
+        }		
+        else if (strcmp("exx_schwarz_threshold", word) == 0)
+        {
+            read_value(ifs, exx_schwarz_threshold);
+        }		
+        else if (strcmp("exx_cauchy_threshold", word) == 0)
+        {
+            read_value(ifs, exx_cauchy_threshold);
+        }		
+        else if (strcmp("exx_distribute_type", word) == 0)
+        {
+            read_value(ifs, exx_distribute_type);
         }
-        else if (strcmp("out_epsilon", word) == 0)
+        else if (strcmp("exx_h_mixing_mode", word) == 0)
         {
-            read_value(ifs, out_epsilon);
+            read_value(ifs, exx_h_mixing_mode);
         }
-        else if (strcmp("out_chi", word) == 0)
+        else if (strcmp("exx_h_mixing_beta", word) == 0)
         {
-            read_value(ifs, out_chi);
+            read_value(ifs, exx_h_mixing_beta);
+        }		
+        else if (strcmp("exx_opt_orb_lmax", word) == 0)
+        {
+            read_value(ifs, exx_opt_orb_lmax);
         }
-        else if (strcmp("out_chi0", word) == 0)
+        else if (strcmp("exx_opt_orb_ecut", word) == 0)
         {
-            read_value(ifs, out_chi0);
+            read_value(ifs, exx_opt_orb_ecut);
         }
-        else if (strcmp("fermi_level", word) == 0)
+        else if (strcmp("exx_opt_orb_tolerence", word) == 0)
         {
-            read_value(ifs, fermi_level);
+            read_value(ifs, exx_opt_orb_tolerence);
         }
-        else if (strcmp("coulomb_cutoff", word) == 0)
-        {
-            read_value(ifs, coulomb_cutoff);
-        }
-        else if (strcmp("kmesh_interpolation", word) == 0)
-        {
-            read_value(ifs, kmesh_interpolation);
-        }
-        else if (strcmp("qcar", word) == 0)
-        {
-             for(int i=0; i<nq; i++)
-             {
-                 ifs >> qcar[i][0]; ifs >> qcar[i][1]; read_value(ifs, qcar[i][2]);
-             }
-        }
-        else if (strcmp("supercell_scale", word) == 0)
-        {
-            ifs >> lcao_box[0]; ifs >> lcao_box[1];
-            read_value(ifs, lcao_box[2]);
-        }
-        //else if (strcmp("epsilon0", word) == 0)
-        //{
-        //    read_value(ifs, epsilon0);
-        //}
-        //else if (strcmp("intersmear", word) == 0)
-        //{
-        //    read_value(ifs, intersmear);
-        //}
-        else if (strcmp("intrasmear", word) == 0)
-        {
-            read_value(ifs, intrasmear);
-        }
-        else if (strcmp("shift", word) == 0)
-        {
-            read_value(ifs, shift);
-        }
-        else if (strcmp("metalcalc", word) == 0)
-        {
-            read_value(ifs, metalcalc);
-        }	
-        else if (strcmp("eps_degauss", word) == 0)
-        {
-            read_value(ifs, eps_degauss);
-        }
-	else if (strcmp("noncolin", word) == 0)
-	{
-		read_value(ifs, noncolin);
-	}
-	else if (strcmp("lspinorb", word) == 0)
-	{
-		read_value(ifs, lspinorb);
-	}
-	else if (strcmp("starting_spin_angle", word) == 0)
-	{
-		read_value(ifs, starting_spin_angle);
-	}
-	else if (strcmp("angle1", word) == 0)
-	{
-		delete[] angle1;
-		if(ntype<1) angle1 = new double[1];
-		else
+		else if (strcmp("noncolin", word) == 0)
 		{
-			angle1 = new double[ntype];
-			ZEROS(angle1, ntype);
-			for(int i = 0;i<ntype;i++){
-				ifs>>angle1[i];
-			}
-			ifs.ignore(150, '\n');
+			read_value(ifs, noncolin);
 		}
-	}
-	else if (strcmp("angle2", word) == 0)
-	{
-		delete[] angle2;
-		if(ntype<1) angle2 = new double[1];
-		else
+		else if (strcmp("lspinorb", word) == 0)
 		{
-			angle2 = new double[ntype];
-			ZEROS(angle2, ntype);
-			for(int i = 0;i<ntype;i++){
-				ifs>>angle2[i];
-			}
-			ifs.ignore(150, '\n');
+			read_value(ifs, lspinorb);
 		}
-	}
+		else if (strcmp("starting_spin_angle", word) == 0)
+		{
+			read_value(ifs, starting_spin_angle);
+		}
+		else if (strcmp("angle1", word) == 0)
+		{
+			delete[] angle1;
+			if(ntype<1) angle1 = new double[1];
+			else
+			{
+				angle1 = new double[ntype];
+				ZEROS(angle1, ntype);
+				for(int i = 0;i<ntype;i++){
+					ifs>>angle1[i];
+				}
+				ifs.ignore(150, '\n');
+			}
+		}
+		else if (strcmp("angle2", word) == 0)
+		{
+			delete[] angle2;
+			if(ntype<1) angle2 = new double[1];
+			else
+			{
+				angle2 = new double[ntype];
+				ZEROS(angle2, ntype);
+				for(int i = 0;i<ntype;i++){
+					ifs>>angle2[i];
+				}
+				ifs.ignore(150, '\n');
+			}
+		}
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
         //}					
-else if (strcmp("cell_factor", word) == 0)
-{
-    read_value(ifs, cell_factor);
-}
+		else if (strcmp("cell_factor", word) == 0)
+		{
+			read_value(ifs, cell_factor);
+		}
         else
         {
 		//xiaohui add 2015-09-15
@@ -1798,58 +1908,82 @@ void Input::Bcast()
 	Parallel_Common::bcast_double(td_force_dt);
 	Parallel_Common::bcast_int(vext);
 	Parallel_Common::bcast_int(vext_dire);
-        // pengfei Li add 2016-11-23
-        //Parallel_Common::bcast_bool( epsilon );
-		//Parallel_Common::bcast_int( epsilon_choice );
-		Parallel_Common::bcast_string( spectral_type );
-		Parallel_Common::bcast_int( spectral_method );
-		Parallel_Common::bcast_string( kernel_type );
-		Parallel_Common::bcast_int( eels_method );
-		Parallel_Common::bcast_int( absorption_method );
-        Parallel_Common::bcast_string( system );
-        Parallel_Common::bcast_double( eta );
-        Parallel_Common::bcast_double( domega );
-        Parallel_Common::bcast_int( nomega );
-        Parallel_Common::bcast_int( ecut_chi );
-        //Parallel_Common::bcast_int( oband );
-		Parallel_Common::bcast_double( q_start[0]);
-		Parallel_Common::bcast_double( q_start[1]);
-		Parallel_Common::bcast_double( q_start[2]);
-		Parallel_Common::bcast_double( q_direct[0]);
-		Parallel_Common::bcast_double( q_direct[1]);
-		Parallel_Common::bcast_double( q_direct[2]);
-        //Parallel_Common::bcast_int( start_q );
-        //Parallel_Common::bcast_int( interval_q );
-        Parallel_Common::bcast_int( nq );
-        Parallel_Common::bcast_bool( out_epsilon );
-        Parallel_Common::bcast_bool( out_chi );
-        Parallel_Common::bcast_bool( out_chi0 );
-        Parallel_Common::bcast_double( fermi_level );
-        Parallel_Common::bcast_bool( coulomb_cutoff );
-        Parallel_Common::bcast_bool( kmesh_interpolation );
-        for(int i=0; i<100; i++)
-        {
-            Parallel_Common::bcast_double( qcar[i][0] );
-            Parallel_Common::bcast_double( qcar[i][1] );
-            Parallel_Common::bcast_double( qcar[i][2] );
-        }
-        Parallel_Common::bcast_int( lcao_box[0] );
-        Parallel_Common::bcast_int( lcao_box[1] );
-        Parallel_Common::bcast_int( lcao_box[2] );
-		//Parallel_Common::bcast_bool( epsilon0 );
-		//Parallel_Common::bcast_double( intersmear );
-		Parallel_Common::bcast_double( intrasmear );
-		Parallel_Common::bcast_double( shift );
-		Parallel_Common::bcast_bool( metalcalc );
-		Parallel_Common::bcast_double( eps_degauss );
-		Parallel_Common::bcast_bool( noncolin );
-		Parallel_Common::bcast_bool( lspinorb );
-		Parallel_Common::bcast_bool( starting_spin_angle );
-		for(int i = 0;i<ntype;i++)
-		{
-			Parallel_Common::bcast_double(angle1[i]);
-			Parallel_Common::bcast_double(angle2[i]);
-		}
+    // pengfei Li add 2016-11-23
+    //Parallel_Common::bcast_bool( epsilon );
+	//Parallel_Common::bcast_int( epsilon_choice );
+	Parallel_Common::bcast_string( spectral_type );
+	Parallel_Common::bcast_int( spectral_method );
+	Parallel_Common::bcast_string( kernel_type );
+	Parallel_Common::bcast_int( eels_method );
+	Parallel_Common::bcast_int( absorption_method );
+    Parallel_Common::bcast_string( system );
+    Parallel_Common::bcast_double( eta );
+    Parallel_Common::bcast_double( domega );
+    Parallel_Common::bcast_int( nomega );
+    Parallel_Common::bcast_int( ecut_chi );
+    //Parallel_Common::bcast_int( oband );
+	Parallel_Common::bcast_double( q_start[0]);
+	Parallel_Common::bcast_double( q_start[1]);
+	Parallel_Common::bcast_double( q_start[2]);
+	Parallel_Common::bcast_double( q_direct[0]);
+	Parallel_Common::bcast_double( q_direct[1]);
+	Parallel_Common::bcast_double( q_direct[2]);
+    //Parallel_Common::bcast_int( start_q );
+    //Parallel_Common::bcast_int( interval_q );
+    Parallel_Common::bcast_int( nq );
+    Parallel_Common::bcast_bool( out_epsilon );
+    Parallel_Common::bcast_bool( out_chi );
+    Parallel_Common::bcast_bool( out_chi0 );
+    Parallel_Common::bcast_double( fermi_level );
+    Parallel_Common::bcast_bool( coulomb_cutoff );
+    Parallel_Common::bcast_bool( kmesh_interpolation );
+    for(int i=0; i<100; i++)
+    {
+        Parallel_Common::bcast_double( qcar[i][0] );
+        Parallel_Common::bcast_double( qcar[i][1] );
+        Parallel_Common::bcast_double( qcar[i][2] );
+    }
+    Parallel_Common::bcast_int( lcao_box[0] );
+    Parallel_Common::bcast_int( lcao_box[1] );
+    Parallel_Common::bcast_int( lcao_box[2] );
+	//Parallel_Common::bcast_bool( epsilon0 );
+	//Parallel_Common::bcast_double( intersmear );
+	Parallel_Common::bcast_double( intrasmear );
+	Parallel_Common::bcast_double( shift );
+	Parallel_Common::bcast_bool( metalcalc );
+	Parallel_Common::bcast_double( eps_degauss );
+		
+	//Parallel_Common::bcast_int( epsilon0_choice );
+
+
+	// Peize Lin add 2018-06-20
+	Parallel_Common::bcast_string( exx_hybrid_type );		
+	Parallel_Common::bcast_double( exx_hybrid_alpha );		
+	Parallel_Common::bcast_double( exx_hse_omega );		
+	Parallel_Common::bcast_bool( exx_separate_loop );		
+	Parallel_Common::bcast_int( exx_hybrid_step );		
+	Parallel_Common::bcast_double( exx_lambda );		
+	Parallel_Common::bcast_double( exx_pca_threshold );		
+	Parallel_Common::bcast_double( exx_c_threshold );		
+	Parallel_Common::bcast_double( exx_v_threshold );		
+	Parallel_Common::bcast_double( exx_dm_threshold );		
+	Parallel_Common::bcast_double( exx_schwarz_threshold );		
+	Parallel_Common::bcast_double( exx_cauchy_threshold );		
+	Parallel_Common::bcast_string( exx_distribute_type );
+	Parallel_Common::bcast_string( exx_h_mixing_mode );		
+	Parallel_Common::bcast_double( exx_h_mixing_beta );
+	Parallel_Common::bcast_int( exx_opt_orb_lmax );
+	Parallel_Common::bcast_double( exx_opt_orb_ecut );
+	Parallel_Common::bcast_double( exx_opt_orb_tolerence );
+		
+	Parallel_Common::bcast_bool( noncolin );	
+	Parallel_Common::bcast_bool( lspinorb );
+	Parallel_Common::bcast_bool( starting_spin_angle );
+	for(int i = 0;i<ntype;i++)
+	{
+		Parallel_Common::bcast_double(angle1[i]);
+		Parallel_Common::bcast_double(angle2[i]);
+	}
 	
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
@@ -1940,11 +2074,12 @@ void Input::Check(void)
 			AUTO_SET("mem_savre","0");
 		}
 		//xiaohui modify 2015-09-15, 0 -> 1
-                //force = 0;
+        //force = 0;
 /*
-                if(!noncolin)
-                	force = 1;
-		else {
+		if(!noncolin)
+        	force = 1;
+		else 
+		{
 			force = 0;//modified by zhengdy-soc, can't calculate force now!
 			cout<<"sorry, can't calculate force with soc now, would be implement in next version!"<<endl;
 		}
@@ -2415,6 +2550,49 @@ void Input::Check(void)
         //        }		
 	}
 
+	if(exx_hybrid_type!="no" && exx_hybrid_type!="hf" && exx_hybrid_type!="pbe0" && exx_hybrid_type!="hse" && exx_hybrid_type!="opt_orb")
+	{
+		WARNING_QUIT("INPUT","exx_hybrid_type must be no or hf or pbe0 or hse or opt_orb");
+	}
+	if(exx_hybrid_type=="hf" || exx_hybrid_type=="pbe0" || exx_hybrid_type=="hse")
+	{
+		if(exx_hybrid_alpha<0 || exx_hybrid_alpha>1)
+		{
+			WARNING_QUIT("INPUT","must 0 < exx_hybrid_alpha < 1");
+		}
+		if(exx_hybrid_step<=0)
+		{
+			WARNING_QUIT("INPUT","must exx_hybrid_step > 0");
+		}
+		if(exx_distribute_type!="htime" && exx_distribute_type!="kmeans")
+		{
+			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans");
+		}
+		if(exx_h_mixing_mode!="no" && exx_h_mixing_mode!="plain" && exx_h_mixing_mode!="pulay")
+		{
+			WARNING_QUIT("INPUT","exx_h_mixing_mode must be no, plain or pulay");
+		}
+		if(exx_h_mixing_beta<0 || exx_h_mixing_beta>1)
+		{
+			WARNING_QUIT("INPUT","must 0 < exx_h_mixing_beta < 1");
+		}
+	}
+	if(exx_hybrid_type=="opt_orb")
+	{
+		if(exx_opt_orb_lmax<0)
+		{
+			WARNING_QUIT("INPUT","exx_opt_orb_lmax must >=0");
+		}
+		if(exx_opt_orb_ecut<0)
+		{
+			WARNING_QUIT("INPUT","exx_opt_orb_ecut must >=0");
+		}
+		if(exx_opt_orb_tolerence<0)
+		{
+			WARNING_QUIT("INPUT","exx_opt_orb_tolerence must >=0");
+		}
+	}
+	
 //2015-06-15, xiaohui
         if(mixing_mode == "pulay" && mixing_gg0 > 0.0)
         {
@@ -2711,6 +2889,26 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"starting_spin_angle",starting_spin_angle,"starting_spin_angle");
 	
 	//OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
+	
+	ofs << "\n#Parameters (17.exx)" << endl;												//Peize Lin add 2018-06-20
+	OUTP(ofs,"exx_hybrid_type",exx_hybrid_type,"no, hf, pbe0, hse or opt_orb");
+	OUTP(ofs,"exx_hybrid_alpha",exx_hybrid_alpha,"");
+	OUTP(ofs,"exx_hse_omega",exx_hse_omega,"");
+	OUTP(ofs,"exx_separate_loop",exx_separate_loop,"0 or 1");
+	OUTP(ofs,"exx_hybrid_step",exx_hybrid_step,"");
+	OUTP(ofs,"exx_lambda",exx_lambda,"");
+	OUTP(ofs,"exx_pca_threshold",exx_pca_threshold,"");
+	OUTP(ofs,"exx_c_threshold",exx_c_threshold,"");
+	OUTP(ofs,"exx_v_threshold",exx_v_threshold,"");
+	OUTP(ofs,"exx_dm_threshold",exx_dm_threshold,"");
+	OUTP(ofs,"exx_schwarz_threshold",exx_schwarz_threshold,"");
+	OUTP(ofs,"exx_cauchy_threshold",exx_cauchy_threshold,"");
+	OUTP(ofs,"exx_distribute_type",exx_distribute_type,"htime or kmeans");
+	OUTP(ofs,"exx_h_mixing_mode",exx_h_mixing_mode,"no, plain or pulay");
+	OUTP(ofs,"exx_h_mixing_beta",exx_h_mixing_beta,"");
+	OUTP(ofs,"exx_opt_orb_lmax",exx_opt_orb_lmax,"");
+	OUTP(ofs,"exx_opt_orb_ecut",exx_opt_orb_ecut,"");
+	OUTP(ofs,"exx_opt_orb_tolerence",exx_opt_orb_tolerence,"");
 
 	//Fuxiang add 2016-10-26
 	ofs << "\n#Parameters (17.tddft)" << endl;

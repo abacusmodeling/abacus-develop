@@ -3,6 +3,8 @@
 
 #include<sstream>
 #include<fstream>
+#include<vector>
+#include<set>
 #include<string>
 #include<mpi.h>
 #include<sys/time.h>
@@ -27,6 +29,23 @@ static std::ostream & operator<<( std::ostream & os, const std::vector<T> &v )
 {
 	for( const T &i : v )
 		os<<i<<std::endl;
+	return os;
+}
+
+// Peize Lin add 2016-06-06
+template<typename T>
+static std::ostream & operator<<( std::ostream & os, const std::set<T> &v )
+{
+	for( const T &i : v )
+		os<<i<<std::endl;
+	return os;
+}
+
+// Peize Lin add 2016-06-06
+template<typename T1,typename T2>
+static std::ostream & operator<<( std::ostream & os, const std::pair<T1,T2> &p )
+{
+	os<<p.first<<"\t"<<p.second<<std::endl;
 	return os;
 }
 

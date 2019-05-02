@@ -96,6 +96,8 @@ class energy
         int  &nrm
     ) const;
     
+    void set_exx();       // Peize Lin add 2016-12-03
+    
     static int mxr;
 };
 

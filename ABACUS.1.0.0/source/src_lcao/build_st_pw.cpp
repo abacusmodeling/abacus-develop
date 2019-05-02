@@ -90,10 +90,10 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 						v += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig) * wf.g2kin[ig];
 					}
 					if(NONCOLIN)
-					for (int ig = 0; ig < kv.ngk[ik]; ig++)
-					{
-						v += conj(wf.wanf2[ik](mu, ig + wf.npwx)) * wf.wanf2[ik](nu, ig + wf.npwx) * wf.g2kin[ig];
-					}
+						for (int ig = 0; ig < kv.ngk[ik]; ig++)
+						{
+							v += conj(wf.wanf2[ik](mu, ig + wf.npwx)) * wf.wanf2[ik](nu, ig + wf.npwx) * wf.g2kin[ig];
+						}
 					
 	//				cout << "i=" << i << " j=" << j << " v=" << v << endl;
 					//-----------------------------------------
@@ -130,48 +130,49 @@ void Build_ST_pw::set_local(const int &ik)
 
 	for(int i=0; i<NLOCAL; i++)
 	{
-		if(!NONCOLIN){
-		for(int ig=0; ig<npw; ig++)
+		if(!NONCOLIN)
 		{
-			psi_one[ig] = wf.wanf2[ik](i, ig);
-		}
-
-		ZEROS( psic, pw.nrxxs);
-		// (1) set value
-		for (int ig=0; ig< npw; ig++)
-		{
-			psic[ fft_index[ig]  ] = psi_one[ig];
-		}
-
-		// (2) fft to real space and doing things.
-		pw.FFT_wfc.FFT3D( psic, 1);
-		for (int ir=0; ir< pw.nrxx; ir++)
-		{
-			psic[ir] *= pot.vrs1[ir];
-		}
-
-		// (3) fft back to G space.
-		pw.FFT_wfc.FFT3D( psic, -1);
-
-		for(int ig=0; ig<npw; ig++)
-		{
-			hpsi[ig] = psic[ fft_index[ig] ];
-		}
-
-		for(int j=i; j<NLOCAL; j++)
-		{
-			complex<double> v = ZERO;
 			for(int ig=0; ig<npw; ig++)
 			{
-				v += conj( wf.wanf2[ik](j,ig) ) * hpsi[ig];
+				psi_one[ig] = wf.wanf2[ik](i, ig);
 			}
-//			vij(j, i) = v;
-			LM.set_HSk(j,i,v,'L');
-			if(i!=j)
+
+			ZEROS( psic, pw.nrxxs);
+			// (1) set value
+			for (int ig=0; ig< npw; ig++)
 			{
-				LM.set_HSk(i,j,conj(v),'L');
+				psic[ fft_index[ig]  ] = psi_one[ig];
 			}
-		}
+
+			// (2) fft to real space and doing things.
+			pw.FFT_wfc.FFT3D( psic, 1);
+			for (int ir=0; ir< pw.nrxx; ir++)
+			{
+				psic[ir] *= pot.vrs1[ir];
+			}
+
+			// (3) fft back to G space.
+			pw.FFT_wfc.FFT3D( psic, -1);
+
+			for(int ig=0; ig<npw; ig++)
+			{
+				hpsi[ig] = psic[ fft_index[ig] ];
+			}
+
+			for(int j=i; j<NLOCAL; j++)
+			{
+				complex<double> v = ZERO;
+				for(int ig=0; ig<npw; ig++)
+				{
+					v += conj( wf.wanf2[ik](j,ig) ) * hpsi[ig];
+				}
+	//			vij(j, i) = v;
+				LM.set_HSk(j,i,v,'L');
+				if(i!=j)
+				{
+					LM.set_HSk(i,j,conj(v),'L');
+				}
+			}
 		}
 		else//noncolinear case
 		{

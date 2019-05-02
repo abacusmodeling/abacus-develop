@@ -291,7 +291,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
 	const int N_PROJECTORS = atom->nh;//zhengdy-soc
-cout << " number of projectros " << N_PROJECTORS << endl;
+	cout << " number of projectros " << N_PROJECTORS << endl;
 //	cout << " number of projectros " << n_projectors << endl;
 
 	// set the nonlocal projector objects
@@ -760,14 +760,14 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 			int meshr_read;
 			if(MY_RANK==0)    //pengfei 2014-10-13
 			{
-                                while (in.good())
-                                {
-                                    in >> word;
-                                    if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
-                                    {
-                                        break;
-                                    }
-                                }
+				while (in.good())
+				{
+					in >> word;
+					if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
+					{
+						break;
+					}
+				}
 
 				CHECK_NAME(in, "Mesh");
 				in >> meshr;
