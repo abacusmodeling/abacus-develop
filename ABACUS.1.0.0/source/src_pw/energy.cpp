@@ -469,7 +469,6 @@ double energy::ewald(void)
         ewaldg = 0.0;
     }
 
-
 	// in plane wave basis, only use k=0 point is not 
 	// called "gamma_only", only if the wave functions
 	// are stored as double type, the gamma_only = true. 
@@ -498,7 +497,6 @@ double energy::ewald(void)
         }
     }
 
-
     ewaldg = FOUR_PI / ucell.omega * ewaldg;
 
 //	cout << "\n ewaldg = " << ewaldg;
@@ -515,7 +513,7 @@ double energy::ewald(void)
     // R-space sum here (only done for the processor that contains G=0)
     ewaldr = 0.0;
     if (pw.gstart == 1)
-    {
+    {	
         rmax = 4.0 / sqrt(alpha) / ucell.lat0;
 		if(test_energy)OUT(ofs_running,"rmax(unit lat0)",rmax);
         // with this choice terms up to ZiZj*erfc(4) are counted (erfc(4)=2x10^-8

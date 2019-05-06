@@ -5,6 +5,7 @@
 #include "src_global/complexmatrix.h"
 #include "../src_global/complexmatrix-test.h"
 #include "../src_global/matrix-test.h"
+#include<map>
 #include<string>
 #include<memory>
 #include<fstream>
@@ -22,6 +23,12 @@ inline double time_during ( const timeval &t_start )
 	gettimeofday( &t_end, NULL );
 	return time_during(t_start,t_end);
 };
+inline double time_cut(timeval &t)
+{
+	const double t_delta = time_during(t);
+	gettimeofday(&t, NULL );
+	return t_delta;
+}
 
 
 

@@ -39,7 +39,7 @@ gettimeofday( &t_start, NULL);
 	MOT.init_Table_Spherical_Bessel (2, mode, Lmax_used, Lmax);
 //	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1
 //	MOT.Destroy_Table_Spherical_Bessel (Lmax_used);				// why?
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOTinit_Table_Spherical_Bessel\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.init_Table_Spherical_Bessel\t"<<time_during(t_start)<<endl;
 
 	//=========================================
 	// (2) init Ylm Coef
@@ -123,7 +123,7 @@ ofs.close();
 }
 
 void Exx_Abfs::Matrix_Orbs11::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
-{
+{	
 ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
@@ -131,32 +131,28 @@ gettimeofday( &t_start, NULL);
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
 		{
-			set<size_t> radials;
-			for( const double &R : RsB.second )
+			if( auto* const center2_orb11_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb11>>>>*const>(
+						MAP_EXIST(center2_orb11_s, RsA.first, RsB.first)) )
 			{
-				const double position = R * ucell.lat0 / MOT.dr;
-				const size_t iq = static_cast<size_t>(position);
-				for( size_t i=0; i!=4; ++i )
-					radials.insert(iq+i);
+timeval t_small;
+gettimeofday(&t_small, NULL);
+				set<size_t> radials;
+				for( const double &R : RsB.second )
+				{
+					const double position = R * ucell.lat0 / MOT.dr;
+					const size_t iq = static_cast<size_t>(position);
+					for( size_t i=0; i!=4; ++i )
+						radials.insert(iq+i);
+				}
+ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
+gettimeofday(&t_small, NULL);
+				for( auto &coC : *center2_orb11_sAB )
+					for( auto &coD : coC.second )
+						for( auto &coE : coD.second )
+							for( auto &coF : coE.second )
+								coF.second.init_radial_table(radials);
+ofs<<time_during(t_small)<<endl;
 			}
-			
-			#if TEST_EXX_LCAO==1
-			{
-				static int i=0;
-				ofstream ofs("Matrix_Orbs_Orbs_radials_"+TO_STRING(i++));
-				for( const auto r : radials )
-					ofs<<r<<endl;
-				ofs.close();
-			}
-			#elif TEST_EXX_LCAO==-1
-				#error "TEST_EXX_LCAO"
-			#endif
-			
-			for( auto &coC : center2_orb11_s.at(RsA.first).at(RsB.first) )
-				for( auto &coD : coC.second )
-					for( auto &coE : coD.second )
-						for( auto &coF : coE.second )
-							coF.second.init_radial_table(radials);
 		}
 ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial_table\t"<<time_during(t_start)<<endl;
 ofs.close();

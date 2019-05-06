@@ -10,7 +10,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 	vector<Cluster> clusters(Nc+1);						// clusters[Nc] just for atoms init
 	vector<Atom> atoms(ucell.nat);
 	
-ofstream ofs_mpi("kmeans_"+TO_STRING(Nc)+"_"+TO_STRING(MY_RANK),ofstream::app);
+ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(Nc)+"_"+TO_STRING(MY_RANK),ofstream::app);
 	
 	auto init = [&]() -> void
 	{

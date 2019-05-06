@@ -17,6 +17,8 @@
 
 void Exx_Opt_Orb::generate_matrix() const
 {
+ofstream ofs_mpi(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+
 	TITLE("Exx_Opt_Orb::generate_matrix");
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
@@ -39,9 +41,9 @@ void Exx_Opt_Orb::generate_matrix() const
 	const Element_Basis_Index::Range    range_jys = Exx_Abfs::Abfs_Index::construct_range( jle.jle );
 	const Element_Basis_Index::IndexLNM index_jys = Element_Basis_Index::construct_index( range_jys );
 
-cout<<range_lcaos<<endl;
-cout<<range_abfs<<endl;
-cout<<range_jys<<endl;
+ofs_mpi<<range_lcaos<<endl;
+ofs_mpi<<range_abfs<<endl;
+ofs_mpi<<range_jys<<endl;
 
 	map<size_t,map<size_t,set<double>>> radial_R = get_radial_R();
 #if TEST_EXX_RADIAL==2
@@ -90,7 +92,7 @@ cout<<range_jys<<endl;
 #if TEST_EXX_RADIAL>=1
 	m_abfs_abfs.init_radial_table(radial_R);
 #else
-	m_abfs_abfs.init_radial_table(radial_R);
+	m_abfs_abfs.init_radial_table();
 #endif
 
 	Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;

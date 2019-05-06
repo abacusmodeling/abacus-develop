@@ -530,9 +530,8 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<endl;
 	};
 
 	#if TEST_EXX_LCAO==1
-		//print_psi2("r_abfs",abfs);
-		print_psi2("r_abfs_ccp",abfs_ccp);
-		//print_psi2("r_abfs_ccp_k",abfs_ccp_k);
+		print_psi2(test_dir.matrix+"r_abfs_"+TO_STRING(MY_RANK),abfs);
+		print_psi2(test_dir.matrix+"r_abfs_ccp_"+TO_STRING(MY_RANK),abfs_ccp);
 	#elif TEST_EXX_LCAO==-1
 		#error
 	#endif
@@ -745,12 +744,12 @@ ofs_mpi<<"sizeof_Vws:\t"<<get_sizeof(Vws)<<endl;
 ofs_mpi.close();
 
 	#if TEST_EXX_LCAO==1
-		ofs_matrixes("Cws.dat",Cws);
-		ofs_matrixes("Vws.dat",Vws);
-		ofs_matrixes("Cs.dat",Cs);
-		ofs_matrixes("Cps.dat",Cps);
-		ofs_matrixes("Vs.dat",Vs);
-		ofs_matrixes("Vps.dat",Vps);
+		ofs_matrixes(test_dir.matrix+"Cws_"+TO_STRING(MY_RANK),Cws);
+		ofs_matrixes(test_dir.matrix+"Vws_"+TO_STRING(MY_RANK),Vws);
+		ofs_matrixes(test_dir.matrix+"Cs_"+TO_STRING(MY_RANK),Cs);
+		ofs_matrixes(test_dir.matrix+"Cps_"+TO_STRING(MY_RANK),Cps);
+		ofs_matrixes(test_dir.matrix+"Vs_"+TO_STRING(MY_RANK),Vs);
+		ofs_matrixes(test_dir.matrix+"Vps_"+TO_STRING(MY_RANK),Vps);
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -1131,6 +1130,7 @@ gettimeofday( &t_start, NULL);
 		}
 	}
 ofs_mpi<<"TIME@ radial_R_C\t"<<time_during(t_start)<<endl;
+print_radial_R(ofs_mpi);
 
 	#if TEST_EXX_LCAO==1
 		ofs_C.close();
@@ -1178,6 +1178,7 @@ gettimeofday( &t_start, NULL);
 		}
 	}
 ofs_mpi<<"TIME@ radial_R_V\t"<<time_during(t_start)<<endl;
+print_radial_R(ofs_mpi);
 	#if TEST_EXX_LCAO==1
 		ofs_V.close();
 	#elif TEST_EXX_LCAO==-1

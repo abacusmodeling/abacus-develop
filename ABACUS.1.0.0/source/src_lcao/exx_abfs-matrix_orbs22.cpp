@@ -150,24 +150,32 @@ gettimeofday( &t_start, NULL);
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
 		{
-			set<size_t> radials;
-			for( const double &R : RsB.second )
+			if( auto* center2_orb22_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb22>>>>>>>>*>(
+						MAP_EXIST(center2_orb22_s, RsA.first, RsB.first)) )
 			{
-				const double position = R * ucell.lat0 / MOT.dr;
-				const size_t iq = static_cast<size_t>(position);
-				for( size_t i=0; i!=4; ++i )
-					radials.insert(iq+i);
+timeval t_small;
+gettimeofday(&t_small, NULL);
+				set<size_t> radials;
+				for( const double &R : RsB.second )
+				{
+					const double position = R * ucell.lat0 / MOT.dr;
+					const size_t iq = static_cast<size_t>(position);
+					for( size_t i=0; i!=4; ++i )
+						radials.insert(iq+i);
+				}
+ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
+gettimeofday(&t_small, NULL);
+				for( auto &coC : *center2_orb22_sAB )
+					for( auto &coD : coC.second )
+						for( auto &coE : coD.second )
+							for( auto &coF : coE.second )
+								for( auto &coG : coF.second )
+									for( auto &coH : coG.second )
+										for( auto &coI : coH.second )
+											for( auto &coJ : coI.second )
+												coJ.second.init_radial_table(radials);
+ofs<<time_during(t_small)<<endl;
 			}
-
-			for( auto &coC : center2_orb22_s.at(RsA.first).at(RsB.first) )
-				for( auto &coD : coC.second )
-					for( auto &coE : coD.second )
-						for( auto &coF : coE.second )
-							for( auto &coG : coF.second )
-								for( auto &coH : coG.second )
-									for( auto &coI : coH.second )
-										for( auto &coJ : coI.second )
-											coJ.second.init_radial_table(radials);
 		}
 ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table\t"<<time_during(t_start)<<endl;
 ofs.close();

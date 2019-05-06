@@ -20,6 +20,7 @@ Threshold_Elec::Threshold_Elec()
 
 void Threshold_Elec::set_ethr(void) const
 {
+	TITLE("Threshold_Elec","set_ethr");
     //========================================================================
     // setup ethr see setup.f90 Page 5/14
     // setup ethr, the convergence threshold for eigenvalues

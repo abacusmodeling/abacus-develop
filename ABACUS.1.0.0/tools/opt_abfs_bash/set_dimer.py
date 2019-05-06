@@ -88,8 +88,8 @@ def cal_ABACUS(T1,T2,i_dis):
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
 				#PBS -q batch
-				#PBS -l nodes=1:ppn=4
-				#PBS -l walltime=24:00:00
+				#PBS -l nodes=1:ppn=1
+				#PBS -l walltime=1:00:00
 				#PBS -o job.log
 				#PBS -e job.err
 				ulimit -s unlimited
@@ -102,7 +102,7 @@ def cal_ABACUS(T1,T2,i_dis):
 	if utils.sub=="qsub":
 		os.system("qsub sub.sh")
 	elif utils.sub=="tianh2":
-		os.system(f'yhrun -n 1 -c 4 {info["ABACUS"]} >Log.txt')
+		os.system(f'yhrun -n 1 -c 1 {info["ABACUS"]} >Log.txt')
 	os.chdir("../")
 
 # dis_opt[T1,T2] = [..., dis, ...]		

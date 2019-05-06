@@ -41,8 +41,7 @@ def set_input(folders_matrix):
 			"weight":	[weight for weight,nbands in folders_matrix.values()],
 			"Rcut":		read_stru.get_Rcut(),
 			"dr":		{T:utils.dr for T in Ts},
-			"Ecut":		{T:Ecut for T in Ts},
-			"TSrate":	0.000001
+			"Ecut":		{T:Ecut for T in Ts}
 		},
 		"C_init_info":{ "init_from_file": False },
 		"V_info":
@@ -63,7 +62,7 @@ def cal(input):
 				#!/bin/bash
 				#PBS -q batch
 				#PBS -l nodes=1:ppn=1
-				#PBS -l walltime=24:00:00
+				#PBS -l walltime=2:00:00
 				#PBS -o job.log
 				#PBS -e job.err
 				ulimit -s unlimited

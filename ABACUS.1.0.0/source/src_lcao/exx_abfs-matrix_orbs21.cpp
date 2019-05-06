@@ -148,39 +148,37 @@ void Exx_Abfs::Matrix_Orbs21::init_radial_table( const map<size_t,map<size_t,set
 {
 ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
 timeval t_start;
-gettimeofday( &t_start, NULL);
+gettimeofday(&t_start, NULL);
 
 	TITLE("Exx_Abfs::Matrix_Orbs21","init_radial_table_Rs");
 
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
 		{
-			set<size_t> radials;
-			for( const double &R : RsB.second )
+			if( auto* const center2_orb21_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb21>>>>>>*const>(
+						MAP_EXIST(center2_orb21_s, RsA.first, RsB.first)) )
 			{
-				const double position = R * ucell.lat0 / MOT.dr;
-				const size_t iq = static_cast<size_t>(position);
-				for( size_t i=0; i!=4; ++i )
-					radials.insert(iq+i);
+timeval t_small;
+gettimeofday(&t_small, NULL);
+				set<size_t> radials;
+				for( const double &R : RsB.second )
+				{
+					const double position = R * ucell.lat0 / MOT.dr;
+					const size_t iq = static_cast<size_t>(position);
+					for( size_t i=0; i!=4; ++i )
+						radials.insert(iq+i);
+				}
+ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
+gettimeofday(&t_small, NULL);
+				for( auto &coC : *center2_orb21_sAB )
+					for( auto &coD : coC.second )
+						for( auto &coE : coD.second )
+							for( auto &coF : coE.second )
+								for( auto &coG : coF.second )
+									for( auto &coH : coG.second )
+										coH.second.init_radial_table(radials);
+ofs<<time_during(t_small)<<endl;
 			}
-
-			#if TEST_EXX_LCAO==1
-				static int i=0;
-				ofstream ofs("Matrix_Orbsorbs_Orbs_radials_"+TO_STRING(i++));
-				for( const auto r : radials )
-					ofs<<r<<endl;
-				ofs.close();
-			#elif TEST_EXX_LCAO==-1
-				#error "TEST_EXX_LCAO"
-			#endif
-
-			for( auto &coC : center2_orb21_s.at(RsA.first).at(RsB.first) )
-				for( auto &coD : coC.second )
-					for( auto &coE : coD.second )
-						for( auto &coF : coE.second )
-							for( auto &coG : coF.second )
-								for( auto &coH : coG.second )
-									coH.second.init_radial_table(radials);
 		}
 ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial_table\t"<<time_during(t_start)<<endl;
 ofs.close();

@@ -13,6 +13,8 @@
 // Peize Lin test
 #include<iostream>
 #include<sys/time.h>
+#include"src_external/src_test/src_lcao/exx_lcao-test.h"
+#include"src_lcao/global_fp.h"
 using namespace std;
 
 vector<Sph_Bessel_Recursive::D2> Sph_Bessel_Recursive_Pool::D2::sb_pool;
@@ -46,20 +48,12 @@ void Sph_Bessel_Recursive::D2::cal_jlx_0( const int l_size, const size_t ix1_siz
 	for( int l=0; l!=l_size; ++l )
 	{
 		const double jlx0 = (0==l) ? 1.0 : 0.0;
-		
+
 		if( jlx[l].size()<ix1_size )
-			jlx[l].resize(ix1_size);
-		for( size_t ix1=0; ix1!=ix1_size; ++ix1 )
-		{
-			if( jlx[l][ix1].size()<1 )
-				jlx[l][ix1].resize(1);
-			jlx[l][ix1][0] = jlx0;
-		}
+			jlx[l].resize(ix1_size,vector<double>(1,jlx0));
 		
 		if( jlx[l][0].size()<ix2_size )
-			jlx[l][0].resize(ix2_size);
-		for( size_t ix2=0; ix2!=ix2_size; ++ix2 )
-			jlx[l][0][ix2] = jlx0;
+			jlx[l][0].resize(ix2_size,jlx0);
 	}
 }
 
