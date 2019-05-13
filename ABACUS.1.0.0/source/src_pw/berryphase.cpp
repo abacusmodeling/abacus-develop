@@ -433,8 +433,8 @@ void berryphase::Macroscopic_polarization()
 	ofs_running << " |                                                                    |" << endl;
 	ofs_running << " | POLARIZATION CALCULATION:                                          |" << endl;
 	ofs_running << " |                  Modern Theory of Polarization                     |" << endl;
-	ofs_running << " | calculate the Macroscopic polarization of a periodic solid which   |" << endl;
-	ofs_running << " | is insulor by using Berry Phase method.                            |" << endl;
+	ofs_running << " | calculate the Macroscopic polarization of a crystalline insulator  |" << endl;
+	ofs_running << " | by using Berry Phase method.                                       |" << endl;
 	ofs_running << " |                                                                    |" << endl;
 	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 	ofs_running << "\n\n\n\n";

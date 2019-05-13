@@ -1080,7 +1080,7 @@ void energy::perform_dos(void)
                         stringstream ss2;
                         ss2 << global_out_dir << "BANDS_" << is+1 << ".dat";
                         ofs_running << "\n Output bands in file: " << ss2.str() << endl;
-                        Dos::nscf_band(is, ss2.str(), nks, NBANDS, this->ef, wf.ekb);
+                        Dos::nscf_band(is, ss2.str(), nks, NBANDS, this->ef*0, wf.ekb);
                 }
 
         }
