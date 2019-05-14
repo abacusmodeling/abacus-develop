@@ -15,7 +15,7 @@ BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
 LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
 LAPACK_LIB_DIR = ${LAPACK_DIR}/lib/intel64
 
-ELPA_LIB_DIR   = ${ELPA_DIR}/lib								
+ELPA_LIB_DIR = ${ELPA_DIR}/lib
 
 #==========================
 # LIBS and INCLUDES

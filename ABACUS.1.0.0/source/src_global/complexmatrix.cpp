@@ -12,7 +12,7 @@
 #include "lapack_connector.h"
 
 // constructor with sizes
-ComplexMatrix::ComplexMatrix(int nrows, int ncols)
+ComplexMatrix::ComplexMatrix(const int nrows, const int ncols, const bool flag_zero)
 	:nr(nrows),
 	 nc(ncols),
 	 size(nrows*ncols),
@@ -21,7 +21,7 @@ ComplexMatrix::ComplexMatrix(int nrows, int ncols)
 	if( size )
 	{
 		c = new complex<double>[size];
-		zero_out();
+		if(flag_zero)	zero_out();
 	}
 }
 
@@ -90,7 +90,7 @@ ComplexMatrix::~ComplexMatrix()
 }
 
 // reallocate memory for Complex Matrix
-void ComplexMatrix::create(const int nr_in,const int nc_in)
+void ComplexMatrix::create(const int nr_in, const int nc_in, const bool flag_zero)
 {
 	if( nr_in && nc_in )
 	{
@@ -111,7 +111,7 @@ void ComplexMatrix::create(const int nr_in,const int nc_in)
 		nr = nr_in;
 		nc = nc_in;
 		size = nr*nc;
-		zero_out();
+		if(flag_zero)	zero_out();
 	}
 	else
 	{
@@ -217,7 +217,7 @@ ComplexMatrix operator*(const ComplexMatrix &m,const double &r)
 
 ComplexMatrix& ComplexMatrix::operator=(const ComplexMatrix &m)
 {
-	this->create(m.nr, m.nc);
+	this->create(m.nr, m.nc, false);
 	memcpy( c, m.c, size*sizeof(complex<double>) );
 	return *this;
 }
@@ -385,26 +385,22 @@ double abs2(const int nmat, ComplexMatrix **m)
 
 ComplexMatrix transpose(const ComplexMatrix &m, const bool &conjugate)
 {
-	ComplexMatrix tm(m.nc, m.nr);
+	ComplexMatrix tm(m.nc, m.nr, false);
 	if(conjugate)
-	{
 		for (int i = 0;i < m.nr;i++)
-		{
 			for (int j = 0;j < m.nc;j++)
-			{
 				tm(j, i) = conj ( m(i, j) );
-			}
-		}
-	}
 	else
-	{
 		for (int i = 0;i < m.nr;i++)
-		{
 			for (int j = 0;j < m.nc;j++)
-			{
 				tm(j, i) = m(i, j);
-			}
-		}
-	}
 	return tm;
+}
+
+ComplexMatrix conj(const ComplexMatrix &m)
+{
+	ComplexMatrix cm( m.nr, m.nc, false );
+	for(int i=0; i!=m.size; ++i)
+		cm.c[i] = conj(m.c[i]);
+	return cm;
 }

@@ -26,13 +26,13 @@ public:
 	int size;
 
 	ComplexMatrix(): nr(0), nc(0), size(0), c(nullptr){}
-	ComplexMatrix(const int nrows,const int ncols);
+	ComplexMatrix(const int nrows,const int ncols,const bool flag_zero=true);		// Peize Lin add flag_zero 2019-05-13
 	ComplexMatrix(const ComplexMatrix &m1);
 	ComplexMatrix(ComplexMatrix && m1);						// Peize Lin add 2016-08-05
 	ComplexMatrix(const matrix &m);							// Peize Lin add 2017-03-29
 	~ComplexMatrix();
 	
-	void create(const int nrow,const int ncol);
+	void create(const int nrow,const int ncol,const bool flag_zero=true);		// Peize Lin add flag_zero 2019-05-13
 	ComplexMatrix& operator=(const ComplexMatrix &m);
 	ComplexMatrix& operator=(ComplexMatrix && m);			// Peize Lin add 2016-08-05
 
@@ -78,6 +78,7 @@ double abs2(const ComplexMatrix &m);
 double abs2(const int nmat, ComplexMatrix **m);
 
 ComplexMatrix transpose(const ComplexMatrix &m, const bool &conjugate);
+ComplexMatrix conj(const ComplexMatrix &m);						// Peize Lin add 2019-05-13
 
 void scale_accumulate(
 		const complex<double> &s, 
