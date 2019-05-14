@@ -11,7 +11,12 @@ def cal_pw():
 		os.mkdir(folder)
 		os.chdir(folder)
 		print_file_pw(info,distance)
-		os.system("qsub sub.sh")
+		if utils.sub=="qsub":
+			os.system("qsub sub.sh")
+		elif utils.sub=="bsub":
+			os.system("bsub < sub.sh")
+		else:
+			raise KeyError("utils.sub = ",utils.sub)		
 		os.chdir("../")
 		
 def cal_opt():
@@ -20,6 +25,12 @@ def cal_opt():
 	os.chdir("opt_orb")
 	print_file_opt(info,dis)
 	os.system("qsub sub.sh")
+	if utils.sub=="qsub":
+		os.system("qsub sub.sh")
+	elif utils.sub=="bsub":
+		os.system("bsub < sub.sh")
+	else:
+		raise KeyError("utils.sub = ",utils.sub)
 	os.chdir("../")
 		
 if __name__=="__main__":

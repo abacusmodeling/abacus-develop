@@ -48,10 +48,22 @@ def cal():
 				EXEC={info["ABACUS"]}
 				mpirun -n 1 $EXEC
 				"""))
+	elif utils.sub=="bsub":
+		with open(f"{utils.folder_exx}/sub.sh","w") as file:
+			file.write(textwrap.dedent(f"""\
+				#!/bin/sh
+				#BSUB -q renxg
+				#BSUB -o job.log -e job.err
+				#BSUB -n 6
+				export OMP_NUM_THREADS=6
+				mpirun -n 1 {info['ABACUS']}
+				"""))
 
 	os.chdir(utils.folder_exx)
 	if utils.sub=="qsub":
 		os.system("qsub sub.sh")
+	elif utils.sub=="bsub":
+		os.system(f"bsub < sub.sh")		
 	elif utils.sub=="tianhe2":
 		os.system(f'yhrun -N 1 -n 1 -c 24 -t 1440 {info["ABACUS"]} >Log.txt 2>&1 &')
 	else:

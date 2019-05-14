@@ -98,19 +98,34 @@ def print_file_pw(info,dis):
 
 
 
-	with open("sub.sh","w") as file:
-		file.write(textwrap.dedent(f"""\
-			#!/bin/bash
-			#PBS -q batch
-			#PBS -l nodes={info["exe"]["qsub"][0]}:ppn={info["exe"]["qsub"][1]}
-			#PBS -l walltime=1:00:00
-			#PBS -o job.log
-			#PBS -e job.err
-			ulimit -s unlimited
-			cd $PBS_O_WORKDIR
-			EXEC={info["exe"]["exe_pw"]}
-			mpirun -n {info["exe"]["qsub"][0]*info["exe"]["qsub"][1]} $EXEC
-			"""))
+	elif utils.sub=="qsub":
+		with open("sub.sh","w") as file:
+			file.write(textwrap.dedent(f"""\
+				#!/bin/bash
+				#PBS -q batch
+				#PBS -l nodes={info["exe"]["qsub"][0]}:ppn={info["exe"]["qsub"][1]}
+				#PBS -l walltime=1:00:00
+				#PBS -o job.log
+				#PBS -e job.err
+				ulimit -s unlimited
+				cd $PBS_O_WORKDIR
+				EXEC={info["exe"]["exe_pw"]}
+				mpirun -n {info["exe"]["qsub"][0]*info["exe"]["qsub"][1]} $EXEC
+				"""))
+	elif utils.sub=="bsub":
+		with open("sub.sh","w") as file:
+			core = info["exe"]["qsub"][0]*info["exe"]["qsub"][1]
+			file.write(textwrap.dedent(f"""\
+				#!/bin/sh
+				#BSUB -q renxg
+				#BSUB -o job.log -e job.err
+				#BSUB -n {core}
+				export OMP_NUM_THREADS=1
+				EXEC={info["exe"]["exe_pw"]}
+				mpirun -n {core} $EXEC
+				"""))
+	else:
+		raise KeyError("utils.sub = ",utils.sub)
 
 
 
@@ -141,16 +156,30 @@ def print_file_opt(info,dis):
 		file.write(json.dumps(input,indent=4))
 		
 		
-	with open("sub.sh","w") as file:
-		file.write(textwrap.dedent(f"""\
-			#!/bin/bash
-			#PBS -q batch
-			#PBS -l nodes=1:ppn=1
-			#PBS -l walltime=1:00:00
-			#PBS -o job.log
-			#PBS -e job.err
-			ulimit -s unlimited
-			cd $PBS_O_WORKDIR
-			EXEC={info["exe"]["exe_orbital"]}
-			python3 $EXEC
-			"""))
+	elif utils.sub=="qsub":
+		with open("sub.sh","w") as file:
+			file.write(textwrap.dedent(f"""\
+				#!/bin/bash
+				#PBS -q batch
+				#PBS -l nodes=1:ppn=1
+				#PBS -l walltime=1:00:00
+				#PBS -o job.log
+				#PBS -e job.err
+				ulimit -s unlimited
+				cd $PBS_O_WORKDIR
+				EXEC={info["exe"]["exe_orbital"]}
+				python3 $EXEC
+				"""))
+	elif utils.sub=="bsub":
+		with open("sub.sh","w") as file:
+			file.write(textwrap.dedent(f"""\
+				#!/bin/sh
+				#BSUB -q renxg
+				#BSUB -o job.log -e job.err
+				#BSUB -n 1
+				export OMP_NUM_THREADS=1
+				EXEC={info["exe"]["exe_orbital"]}
+				python3 $EXEC
+				"""))
+	else:
+		raise KeyError("utils.sub = ",utils.sub)

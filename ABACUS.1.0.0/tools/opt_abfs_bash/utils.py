@@ -8,7 +8,7 @@ def read_info(flag=True):
 		"ABACUS":"dir/ABACUS/ABACUS.mpi.1.0.0",
 		"opt_orb":"dir/opt_orb/main.py",
 		"Nu":[7,10,8,3,1],
-		"dimer_num":5,
+		"dimer_num":5
 	}
 	"""
 	with open("info","r") as file:

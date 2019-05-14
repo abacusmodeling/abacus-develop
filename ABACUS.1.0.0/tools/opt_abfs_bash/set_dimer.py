@@ -97,10 +97,23 @@ def cal_ABACUS(T1,T2,i_dis):
 				EXEC={info["ABACUS"]}
 				mpirun -n 1 $EXEC
 				"""))
+	elif utils.sub=="bsub":
+		with open(f"{folder}/sub.sh","w") as file:
+			file.write(textwrap.dedent(f"""\
+				#!/bin/sh
+				#BSUB -q renxg
+				#BSUB -o job.log -e job.err
+				#BSUB -n 1
+				export OMP_NUM_THREADS=1
+				EXEC={info["ABACUS"]}
+				mpirun -n 1 $EXEC
+				"""))
 
 	os.chdir(folder)
 	if utils.sub=="qsub":
 		os.system("qsub sub.sh")
+	elif utils.sub=="bsub":
+		os.system("bsub < sub.sh")		
 	elif utils.sub=="tianh2":
 		os.system(f'yhrun -n 1 -c 1 {info["ABACUS"]} >Log.txt')
 	os.chdir("../")
