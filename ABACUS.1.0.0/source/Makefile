@@ -83,4 +83,4 @@ fp_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
 
 .PHONY:clean
 clean:
-	$(RM) *.o ../bin/ABACUS*
+	$(RM) *.o

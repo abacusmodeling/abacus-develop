@@ -2599,6 +2599,50 @@ void Input::Check(void)
                  WARNING("Input","To use pulay-kerker mixing method, please set mixing_type=pulay-kerker");
         }
 	
+	if(berry_phase)
+	{
+		if(basis_type == "pw")
+		{
+			if( !(calculation=="nscf") )
+				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
+		}
+		else if(basis_type == "lcao" && ks_solver == "genelpa")
+		{
+			if( !(calculation=="nscf") )
+				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
+		}
+		else
+		{
+			WARNING_QUIT("Input","calculate berry phase, please set basis_type = pw or lcao");
+		}
+		
+		if( !(gdir==1||gdir==2||gdir==3) )
+		{
+			WARNING_QUIT("Input","calculate berry phase, please set gdir = 1 or 2 or 3");
+		}
+	}
+	
+	if(towannier90)
+	{
+		if(basis_type == "pw" || basis_type == "lcao")
+		{
+			if( !(calculation=="nscf") )
+				WARNING_QUIT("Input","to use towannier90, please set calculation = nscf");
+		}
+		else
+		{
+			WARNING_QUIT("Input","to use towannier90, please set basis_type = pw or lcao");
+		}
+		
+		if(nspin == 2)
+		{
+			if( !(wannier_spin=="up"||wannier_spin=="down") )
+			{
+				WARNING_QUIT("Input","to use towannier90, please set wannier_spin = up or down");
+			}
+		}
+	}
+	
     return;
 }
 
@@ -2921,6 +2965,13 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"val_elec_03",val_elec_03,"val_elec_03");
 	OUTP(ofs,"vext",vext,"add extern potential or not");
 	OUTP(ofs,"vext_dire",vext_dire,"extern potential direction");
+	
+	ofs << "\n#Parameters (18.berry_wannier)" << endl;
+	OUTP(ofs,"berry_phase",berry_phase,"calculate berry phase or not");
+	OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice vector");
+	OUTP(ofs,"towannier90",towannier90,"use wannier90 code interface or not");
+	OUTP(ofs,"nnkpfile",NNKP,"the wannier90 code nnkp file name");
+	OUTP(ofs,"wannier_spin",wannier_spin,"calculate spin in wannier90 code interface");
 	
     ofs.close();
     return;
