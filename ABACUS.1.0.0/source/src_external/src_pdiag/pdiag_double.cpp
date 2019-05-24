@@ -55,7 +55,7 @@ inline int q2ZLOC_WFC(int pos, int naroc[2], int nb,
                       int loc_size,
                       double* work, double* ZLOC, double** WFC)
 {
-    OUT(ofs_running,"start q2ZLOC_WFC");
+    //OUT(ofs_running,"start q2ZLOC_WFC");
     for(int j=0; j<naroc[1]; ++j)
     {
         int igcol=globalIndex(j, nb, dim1, ipcol);
@@ -75,7 +75,7 @@ inline int q2ZLOC_WFC(int pos, int naroc[2], int nb,
             }
         }
     }
-    OUT(ofs_running,"WFC was done in q2ZLOC_WFC");
+    //OUT(ofs_running,"WFC was done in q2ZLOC_WFC");
     return 0;
 }
 
@@ -117,7 +117,7 @@ inline int q2ZLOC_WFC_WFCAUG(int pos, int naroc[2], int nb,
         }
     }
 
-    OUT(ofs_running,"WFCAUG was done in q2ZLOC_WFC_WFCAUG");  
+    //OUT(ofs_running,"WFCAUG was done in q2ZLOC_WFC_WFCAUG");  
     return 0;
 }
 
