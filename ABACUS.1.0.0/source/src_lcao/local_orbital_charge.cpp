@@ -351,7 +351,7 @@ void Local_Orbital_Charge::sum_bands(void)
 			//xiaohui modify 2014-06-18
 			this->cal_dk_gamma();//calculate the density matrix.
 			if(KS_SOLVER=="genelpa")		// Peize Lin test 2019-01-16
-				wfc_dm_2d.cal_dm();
+				wfc_dm_2d.cal_dm(wf.wg);
 		}
 	}
 	else
@@ -359,7 +359,7 @@ void Local_Orbital_Charge::sum_bands(void)
 		NOTE("Calculate the density matrix!");
 		this->cal_dk_k( GridT );
 		if(KS_SOLVER=="genelpa")		// Peize Lin test 2019-05-15
-			wfc_dm_2d.cal_dm();
+			wfc_dm_2d.cal_dm(wf.wg);
 	} //xiaohui add 2013-09-02. Attention...
 
 	for(int is=0; is<NSPIN; is++)
