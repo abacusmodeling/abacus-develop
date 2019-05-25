@@ -39,8 +39,6 @@ class Pdiag_Double : public Pdiag_Basic
 #endif
 	);
 
-	private:
-
 #ifdef __MPI
 	MPI_Comm comm_2D;
 #endif

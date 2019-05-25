@@ -4,6 +4,15 @@
 #include "../src_pw/global.h"
 #include "blas_interface.h"
 
+//#include <vector>
+
+extern "C"
+{
+    void Cblacs_gridinfo(int icontxt, int* nprow, int *npcol, int *myprow, int *mypcol);
+    void Cblacs_pinfo(int *myid, int *nprocs);
+    void Cblacs_pcoord(int icontxt, int pnum, int *prow, int *pcol);
+}
+
 inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, 
 					int* vindex)
 {				
@@ -213,6 +222,161 @@ inline void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize
 	}
 }
 
+inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
+{
+    int iblock, gIndex;
+    iblock=localIndex/nblk;
+    gIndex=(iblock*nprocs+myproc)*nblk+localIndex%nblk;
+    return gIndex;
+    //return (localIndex/nblk*nprocs+myproc)*nblk+localIndex%nblk;
+}
+
+inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
+{
+    myproc=int((globalIndex%(nblk*nprocs))/nblk);
+    return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
+}
+
+inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
+                              int& sender_index_size, int*& sender_local_index, 
+                              int*& sender_size_process, int*& sender_displacement_process, 
+                              int& sender_size, double*& sender_buffer,
+                              int& receiver_index_size, int*& receiver_global_index, 
+                              int*& receiver_size_process, int*& receiver_displacement_process, 
+                              int& receiver_size, double*& receiver_buffer)
+{
+    // setup blacs parameters
+    int nprows, npcols, nprocs;
+    int myprow, mypcol, myproc;
+    Cblacs_gridinfo(blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
+    Cblacs_pinfo(&myproc, &nprocs);
+    
+    // init data arrays
+    int current_sender_index_size=GridT.lgd*GridT.lgd*2;
+    if(current_sender_index_size > sender_index_size)
+    {
+        sender_index_size=current_sender_index_size;
+        // OUT(ofs_running, "sender_index_size:", sender_index_size);
+        delete[] sender_local_index;
+        sender_local_index=new int[sender_index_size];
+    }
+
+    static bool FIRST_RUN=true;
+    if(FIRST_RUN)
+    {
+        FIRST_RUN=false;
+        delete[] sender_size_process;
+        sender_size_process=new int[nprocs];
+        delete[] sender_displacement_process;
+        sender_displacement_process=new int[nprocs];
+
+        delete[] receiver_size_process;
+        receiver_size_process=new int[nprocs];
+        delete[] receiver_displacement_process;
+        receiver_displacement_process=new int[nprocs];
+    }
+
+    // build the local index to be sent to other process (sender_local_index),
+    //       the global index to be received from other process (receiver_global_index),
+    //       the send/receive size/displacement for data exchange by MPI_Alltoall
+    int *sender_global_index=new int[current_sender_index_size];
+
+    int pos=0;
+    sender_size_process[0]=0;
+    for(int iproc=0; iproc<nprocs; ++iproc)
+    {
+        sender_displacement_process[iproc]=pos;
+     
+        int iprow, ipcol;
+        Cblacs_pcoord(blacs_ctxt, iproc, &iprow, &ipcol);
+        
+        // find out the global index and local index of elements in each process based on 2D block cyclic distribution
+        for(int irow=0, grow=0; grow<NLOCAL; ++irow)
+        {
+            grow=globalIndex(irow, nblk, nprows, iprow);
+            int lrow=GridT.trace_lo[grow];
+            if(lrow < 0 || grow >= NLOCAL) continue;
+            for(int icol=0, gcol=0; gcol<NLOCAL; ++icol)
+            {
+                gcol=globalIndex(icol,nblk, npcols, ipcol);
+                int lcol=GridT.trace_lo[gcol];
+                if(lcol < 0 || gcol >= NLOCAL) continue;
+                // if(pos<0 || pos >= current_sender_index_size)
+                // {
+                //     OUT(ofs_running, "pos error, pos:", pos);
+                //     OUT(ofs_running, "irow:", irow);
+                //     OUT(ofs_running, "icol:", icol);
+                //     OUT(ofs_running, "grow:", grow);
+                //     OUT(ofs_running, "gcol:", gcol);
+                //     OUT(ofs_running, "lrow:", grow);
+                //     OUT(ofs_running, "lcol:", gcol);
+                // }
+                sender_global_index[pos]=grow;
+                sender_global_index[pos+1]=gcol;
+                sender_local_index[pos]=lrow;
+                sender_local_index[pos+1]=lcol;
+                pos+=2;
+            }
+        }
+        sender_size_process[iproc]=pos-sender_displacement_process[iproc];
+    }
+   
+    MPI_Alltoall(sender_size_process, 1, MPI_INT, 
+                 receiver_size_process, 1, MPI_INT, comm_2D);
+
+    int current_receiver_index_size=receiver_size_process[0];
+    receiver_displacement_process[0]=0;
+    for(int i=1; i<nprocs; ++i)
+    {
+        current_receiver_index_size+=receiver_size_process[i];
+        receiver_displacement_process[i]=receiver_displacement_process[i-1]+receiver_size_process[i-1];
+    }
+
+    if(current_receiver_index_size > receiver_index_size)
+    {
+        receiver_index_size=current_receiver_index_size;
+        // OUT(ofs_running, "receiver_index_size:", receiver_index_size);
+        delete[] receiver_global_index;
+        receiver_global_index=new int[receiver_index_size];
+    }
+
+    // send the global index in sendBuffer to recvBuffer
+    MPI_Alltoallv(sender_global_index, sender_size_process, sender_displacement_process, MPI_INT, 
+                  receiver_global_index, receiver_size_process, receiver_displacement_process, MPI_INT, comm_2D);
+    
+    delete [] sender_global_index;
+
+    // the sender_size_process, sender_displacement_process, receiver_size_process, 
+    // and receiver_displacement_process will be used in transfer sender_buffer, which
+    // is half size of sender_global_index
+    // we have to rebuild the size and displacement for each process
+    for (int iproc=0; iproc < nprocs; ++iproc)
+    {
+        sender_size_process[iproc]=sender_size_process[iproc]/2;
+        sender_displacement_process[iproc]=sender_displacement_process[iproc]/2;
+        receiver_size_process[iproc]=receiver_size_process[iproc]/2;
+        receiver_displacement_process[iproc]=receiver_displacement_process[iproc]/2;
+    }
+    
+    int current_sender_size=current_sender_index_size/2;
+    if(current_sender_size > sender_size)
+    {
+        sender_size=current_sender_size;
+        // OUT(ofs_running, "sender_size:", sender_size);
+        delete[] sender_buffer;
+        sender_buffer=new double[sender_size];
+    }
+    int current_receiver_size=current_receiver_index_size/2;
+    if(current_receiver_size > receiver_size)
+    {
+        receiver_size=current_receiver_size;
+        // OUT(ofs_running, "receiver_size:", receiver_size);
+        delete[] receiver_buffer;
+        receiver_buffer=new double[receiver_size];
+    }
+
+    return 0;
+}
 
 void Gint_Gamma::cal_vlocal(
 	const double* vlocal_in)
@@ -857,74 +1021,84 @@ void Gint_Gamma::gamma_vlocal(void)
     delete[] at;
 	//OUT(ofs_running, "temp variables are deleted");
 
-ENDandRETURN:	
-	timer::tick("Gint_Gamma","gamma_vlocal",'K');
-	//timer::tick("Gint_Gamma","distri_vl",'K');
-#ifdef __MPI
-	MPI_Barrier(MPI_COMM_WORLD);
-#endif
-	//OUT(ofs_running, "gather all vlocal, job", job);
-	if (job==cal_local)
-	{
-		double* tmp;
-		for (int i=0; i<NLOCAL; i++)
-		{
-			tmp=new double[NLOCAL];
-			ZEROS(tmp, NLOCAL);
-			const int mu=GridT.trace_lo[i];
-			if (mu >= 0)
-			{
-				for (int j=0; j<NLOCAL; j++)
-				{
-					const int nu=GridT.trace_lo[j];
-					if (nu >=0)
-					{
-						if (mu <= nu)
-						{
-							tmp[j]=GridVlocal[mu][nu];
-						}
-						else
-						{
-							tmp[j]=GridVlocal[nu][mu];
-						}
-					}
-				}
-			}
-			Parallel_Reduce::reduce_double_grid( tmp, NLOCAL );
-			//OUT(ofs_running, "reduce_double_grid ok");
-			Parallel_Reduce::reduce_double_diag( tmp, NLOCAL );
-			//OUT(ofs_running, "reduce_double_diag ok");
-			for (int j=0; j<NLOCAL; j++)
-			{
-				if (!ParaO.in_this_processor(i,j))
-				{
-					continue;
-				}
-			
-				// mohan update 2011-04-15	
-				if(BFIELD)
-				{
-					LM.set_HSk(i,j,complex<double>(tmp[j],0.0),'L');
-					//OUT(ofs_running, "LM.set_HSk ok, j", j);
-				}
-				else
-				{
-					LM.set_HSgamma(i,j,tmp[j],'L');
-					//OUT(ofs_running, "LM.set_HSgamma ok, j", j);
-				}
-			}
-			delete[] tmp;
-			//OUT(ofs_running, "reduce vlocal ok, i",i);
-		}
-	}
-	//timer::tick("Gint_Gamma","distri_vl",'K');
+ENDandRETURN:    
+    timer::tick("Gint_Gamma","gamma_vlocal",'K');
+    MPI_Barrier(MPI_COMM_WORLD);
+    timer::tick("Gint_Gamma","distri_vl",'K');
 
-	//OUT(ofs_running, "reduce all vlocal ok,");
-	if(perform_gint)
-	{
-		delete[] GridVlocal_pool;
-		delete[] GridVlocal;
-	}
-	//OUT(ofs_running, "ALL GridVlocal was calculated");
-	return;
+    // setup send buffer and receive buffer size
+    // OUT(ofs_running, "Start transforming vlocal from grid distribute to 2D block");
+    if(chr.new_e_iteration)
+    {
+        timer::tick("Gint_Gamma","distri_vl_index",'K');
+        // OUT(ofs_running, "Setup Buffer Parameters");
+        // inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
+        //                             int& sender_index_size, int*& sender_local_index, 
+        //                             int*& sender_size_process, int*& sender_displacement_process, 
+        //                             int& sender_size, double*& sender_buffer,
+        //                             int& receiver_index_size, int*& receiver_global_index, 
+        //                             int*& receiver_size_process, int*& receiver_displacement_process, 
+        //                             int& receiver_size, double*& receiver_buffer)
+        setBufferParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb,
+                           ParaO.sender_index_size, ParaO.sender_local_index, 
+                           ParaO.sender_size_process, ParaO.sender_displacement_process, 
+                           ParaO.sender_size, ParaO.sender_buffer,
+                           ParaO.receiver_index_size, ParaO.receiver_global_index, 
+                           ParaO.receiver_size_process, ParaO.receiver_displacement_process, 
+                           ParaO.receiver_size, ParaO.receiver_buffer);
+        OUT(ofs_running, "vlocal exchange index is built");
+        OUT(ofs_running, "buffer size(M):", (ParaO.sender_size+ParaO.receiver_size)*sizeof(double)/1024/1024);
+        OUT(ofs_running, "buffer index size(M):", (ParaO.sender_index_size+ParaO.receiver_index_size)*sizeof(int)/1024/1024);
+        timer::tick("Gint_Gamma","distri_vl_index",'K');
+    }
+
+    // OUT(ofs_running, "Start data transforming");
+    timer::tick("Gint_Gamma","distri_vl_value",'K');
+    // put data to send buffer
+    for(int i=0; i<ParaO.sender_index_size; i+=2)
+    {
+        // const int idxGrid=ParaO.sender_local_index[i];
+        // const int icol=idxGrid%lgd_now; 
+        // const int irow=(idxGrid-icol)/lgd_now;
+        const int irow=ParaO.sender_local_index[i];
+        const int icol=ParaO.sender_local_index[i+1];
+        if(irow<=icol)
+            ParaO.sender_buffer[i/2]=GridVlocal[irow][icol];
+        else
+            ParaO.sender_buffer[i/2]=GridVlocal[icol][irow];
+    }
+    // OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
+
+    // use mpi_alltoall to get local data
+    MPI_Alltoallv(ParaO.sender_buffer, ParaO.sender_size_process, ParaO.sender_displacement_process, MPI_DOUBLE, 
+                  ParaO.receiver_buffer, ParaO.receiver_size_process, ParaO.receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
+    // OUT(ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
+    // put local data to H matrix
+    for(int i=0; i<ParaO.receiver_index_size; i+=2)
+    {
+        // int g_col=ParaO.receiver_global_index[i]%NLOCAL;
+        // int g_row=(ParaO.receiver_global_index[i]-g_col)/NLOCAL;
+        const int g_row=ParaO.receiver_global_index[i];
+        const int g_col=ParaO.receiver_global_index[i+1];
+        // if(g_col<0 || g_col>=NLOCAL||g_row<0 || g_row>=NLOCAL) 
+        // {
+        //     OUT(ofs_running, "index error, i:", i);
+        //     OUT(ofs_running, "index：", ParaO.receiver_global_index[i]);
+        //     OUT(ofs_running, "g_col:", g_col);
+        //     OUT(ofs_running, "g_col:", g_col);
+        // }
+        LM.set_HSgamma(g_row,g_col,ParaO.receiver_buffer[i/2],'L');
+    }
+    // OUT(ofs_running, "received vlocal data are put in to H")
+    timer::tick("Gint_Gamma","distri_vl_value",'K');
+    timer::tick("Gint_Gamma","distri_vl",'K');
+
+    //OUT(ofs_running, "reduce all vlocal ok,");
+    if(perform_gint)
+    {
+        delete[] GridVlocal_pool;
+        delete[] GridVlocal;
+    }
+    //OUT(ofs_running, "ALL GridVlocal was calculated");
+    return;
 }
