@@ -19,7 +19,8 @@ public:
 	std::vector<ComplexMatrix> dm_k;		// dm_k[ik](iw1,iw2);
 	
 	void init();
-	void cal_dm();
+	void cal_dm(const matrix &wg);			// wg(ik,ib)
+		// dm = wfc.T * wg * wfc.conj()
 };
 
 #endif
