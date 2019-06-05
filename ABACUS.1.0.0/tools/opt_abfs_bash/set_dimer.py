@@ -6,27 +6,28 @@ import pprint
 import textwrap
 import utils
 import collections
+import pathlib
 from sklearn.cluster import KMeans
 import read_stru
 
 def cal_ABACUS(T1,T2,i_dis):
-	folder = utils.folder_name(T1,T2,i_dis)
-	os.mkdir(folder)
+	folder = pathlib.Path(utils.folder_name(T1,T2,i_dis)).resolve()
+	folder.mkdir(parents=True,exist_ok=False)
 	
 	
-	with open(f"{folder}/INPUT","w") as file:
+	with open(folder/"INPUT","w") as file:
 		info = utils.read_info()
 		input_dict = read_stru.get_input_dict()
 		input_dict["ntype"] = 1 if T1==T2 else 2
 		input_dict["exx_hybrid_type"] = 'opt_orb'
-		input_dict["nbands"] = utils.nband * (1 if abs(i_dis)<1E-10 else 2)
+		input_dict["nbands"] = (read_stru.get_nw()[T1] if abs(i_dis)<1E-10 else read_stru.get_nw()[T1]+read_stru.get_nw()[T2])
 		input_dict["nspin"] = 1
 		input_dict["gamma_only"] = 1
 		input_dict["pseudo_dir"] = os.path.abspath(input_dict.get("pseudo_dir",r"./"))
 		input_dict["exx_opt_orb_lmax"] = len(info["Nu"])-1
 		read_stru.print_input(file,input_dict)
 		
-	with open(f"{folder}/STRU","w") as file:
+	with open(folder/"STRU","w") as file:
 		Ts = (T1,) if T1==T2 else (T1,T2)
 		file.write("ATOMIC_SPECIES\n")
 		pseudo_path = read_stru.get_pseudo_path()
@@ -74,7 +75,7 @@ def cal_ABACUS(T1,T2,i_dis):
 				{i_dis} 0 0 0 0 0
 				"""))
 
-	with open(f"{folder}/KPT","w") as file:
+	with open(folder/"KPT","w") as file:
 		file.write(textwrap.dedent(f"""\
 			K_POINTS
 			0
@@ -84,7 +85,7 @@ def cal_ABACUS(T1,T2,i_dis):
 
 	info = utils.read_info()
 	if utils.sub=="qsub":
-		with open(f"{folder}/sub.sh","w") as file:
+		with open(folder/"sub.sh","w") as file:
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
 				#PBS -q batch
@@ -98,7 +99,7 @@ def cal_ABACUS(T1,T2,i_dis):
 				mpirun -n 1 $EXEC
 				"""))
 	elif utils.sub=="bsub":
-		with open(f"{folder}/sub.sh","w") as file:
+		with open(folder/"sub.sh","w") as file:
 			file.write(textwrap.dedent(f"""\
 				#!/bin/sh
 				#BSUB -q renxg

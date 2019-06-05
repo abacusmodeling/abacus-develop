@@ -3,19 +3,26 @@ import numpy as np
 import itertools
 import numba
 import functools
+import operator
 import os
 import collections
 import decimal
 import json
 import utils
 
+def skip_notes(line):
+	line = re.compile(r"#.*").sub("",line)
+	line = re.compile(r"//.*").sub("",line)
+	line = line.strip()
+	return line
+
 @functools.lru_cache(maxsize=None)
 def get_input_dict():
 	input_dict = dict()
 	with open("INPUT","r") as file:
 		for line in file:
-			line = line.strip()
-			if not line or line.startswith("#") or line=="INPUT_PARAMETERS":
+			line = skip_notes(line)
+			if not line or line=="INPUT_PARAMETERS":
 				continue
 			label, value = re.compile(r"\s+").split( line, maxsplit=1 )
 			input_dict[label] = value
@@ -41,7 +48,7 @@ def search_in_input(label):
 def get_k():
 	with open("KPT","r") as file:
 		utils.search_sentence(file,"Gamma")
-		return list(map(int,file.readline().split()[:3]))
+		return list(map(int,skip_notes(file.readline()).split()[:3]))
 
 @functools.lru_cache(maxsize=None)
 def get_T():
@@ -50,7 +57,7 @@ def get_T():
 	with open("STRU","r") as file:
 		utils.search_sentence(file,"ATOMIC_SPECIES")
 		for it in range(ntype):
-			line = file.readline()
+			line = skip_notes(file.readline())
 			T.append(line.split()[0])
 	return T
 
@@ -62,7 +69,8 @@ def get_Rcut():
 	for T in Ts:
 		with open(lcao_path[T],"r") as file:
 			for line in file:
-				if line.strip().startswith("Radius Cutoff(a.u.)"):
+				line = skip_notes(line)
+				if line.startswith("Radius Cutoff(a.u.)"):
 					Rcut[T] = float(line.split()[-1])
 					break
 	return Rcut
@@ -74,7 +82,7 @@ def get_pseudo_path():
 	with open("STRU","r") as file:
 		utils.search_sentence(file,"ATOMIC_SPECIES")
 		for T in Ts:
-			path[T] = file.readline().split()[-1]
+			path[T] = skip_notes(file.readline()).split()[-1]
 	return path
 	
 @functools.lru_cache(maxsize=None)
@@ -84,24 +92,44 @@ def get_lcao_path():
 	with open("STRU","r") as file:
 		utils.search_sentence(file,"NUMERICAL_ORBITAL")
 		for T in Ts:
-			path[T] = os.path.abspath(file.readline().strip())
+			path[T] = os.path.abspath(skip_notes(file.readline()))
 	return path
 	
 @functools.lru_cache(maxsize=None)
 def get_lattice():
 	with open("STRU","r") as file:
 		utils.search_sentence(file,"LATTICE_CONSTANT")
-		lat0 = float(file.readline().split()[0])
+		lat0 = float(skip_notes(file.readline()).split()[0])
 	with open("STRU","r") as file:
 		utils.search_sentence(file,"LATTICE_VECTORS")
 		lat_vec = []
 		for i in range(3):
-			lat_vec.append(list(map(float,file.readline().split())))
+			lat_vec.append(list(map(float,skip_notes(file.readline()).split())))
 		lat_vec = np.array(lat_vec)
 	with open("STRU","r") as file:
 		utils.search_sentence(file,"ATOMIC_POSITIONS")
-		position = file.readline().strip()
+		position = skip_notes(file.readline())
 	return lat0, lat_vec, position
+	
+@functools.lru_cache(maxsize=None)
+def get_lcao():
+	lcao = collections.defaultdict(list)
+	lcao_path = get_lcao_path()
+	for T in lcao_path:
+		with open(lcao_path[T],"r") as file:
+			for line in file:
+				line = skip_notes(line)
+				if line.startswith("Number of"):
+					lcao[T].append(int(line.split()[-1]))
+	return dict(lcao)
+	
+@functools.lru_cache(maxsize=None)
+def get_nw():
+	nw = dict()
+	lcao = get_lcao()
+	for T in lcao:
+		nw[T] = functools.reduce(operator.add,((2*l+1)*n for l,n in enumerate(lcao[T])))
+	return nw
 
 # R[T] = [..., [xi,yi,zi], ...]
 def get_R():
@@ -111,10 +139,10 @@ def get_R():
 		for T in Ts:
 			utils.search_sentence(file,T)
 			utils.ignore_lines(file,1)
-			na = int(file.readline().split()[0])
+			na = int(skip_notes(file.readline()).split()[0])
 			R_tmp = []
 			for i in range(na):
-				R_tmp.append(list(map(float,file.readline().split()[:3])))
+				R_tmp.append(list(map(float,skip_notes(file.readline()).split()[:3])))
 			R[T] = np.array(R_tmp)
 	return R
 

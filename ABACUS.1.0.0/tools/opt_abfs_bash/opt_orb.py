@@ -2,11 +2,12 @@ import json
 import os
 import re
 import textwrap
+import pathlib
 import read_stru
 import utils
 
 def cp_matrix(folders_matrix):
-	os.mkdir(utils.folder_opt+"/"+utils.folder_opt_matrix)
+	pathlib.Path(utils.folder_opt+"/"+utils.folder_opt_matrix).mkdir(parents=True,exist_ok=False)
 	folders_same_atom = set()
 	for folder_matrix in folders_matrix:
 		T1,T2 = folder_matrix.split("_")[0].split("-")
@@ -86,7 +87,7 @@ def cal(input):
 	os.chdir("../")
 		
 def all():
-	os.mkdir(utils.folder_opt)
+	pathlib.Path(utils.folder_opt).mkdir(parents=True,exist_ok=False)
 	with open("folders","r") as file:
 		folders_matrix = json.loads(file.read())
 	cp_matrix(folders_matrix.keys())

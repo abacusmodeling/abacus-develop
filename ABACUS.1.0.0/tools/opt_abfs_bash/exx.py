@@ -1,11 +1,12 @@
 import os
 import re
 import textwrap
+import pathlib
 import utils
 import read_stru
 
 def cal():
-	os.mkdir(utils.folder_exx)
+	pathlib.Path(utils.folder_exx).mkdir(parents=True,exist_ok=False)
 	
 	os.system(f"cp INPUT {utils.folder_exx}/")
 	os.system(f"cp KPT {utils.folder_exx}/")

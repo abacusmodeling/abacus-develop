@@ -29,7 +29,6 @@ def floatlist_str(l):
 
 sub = "qsub"
 dr = 0.01
-nband = 8
 def folder_name(T1,T2,i_dis):
 	return f"{T1}-{T2}_{i_dis}"
 try:

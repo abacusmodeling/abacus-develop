@@ -1,5 +1,6 @@
 import os
 import sys
+import pathlib
 from read_info import read_info
 from print_file import print_file_pw, print_file_opt
 from dis import dis
@@ -8,7 +9,7 @@ def cal_pw():
 	info = read_info("info.json")
 	for distance in dis[info["input"]["element"]]:
 		folder = f'{info["input"]["element"]}-{info["input"]["rcut"]}-{distance}'
-		os.mkdir(folder)
+		pathlib.Path(folder).mkdir(parents=True,exist_ok=False)
 		os.chdir(folder)
 		print_file_pw(info,distance)
 		if utils.sub=="qsub":
@@ -21,7 +22,7 @@ def cal_pw():
 		
 def cal_opt():
 	info = read_info("info.json")
-	os.mkdir("opt_orb")
+	pathlib.Path("opt_orb").mkdir(parents=True,exist_ok=False)
 	os.chdir("opt_orb")
 	print_file_opt(info,dis)
 	os.system("qsub sub.sh")
