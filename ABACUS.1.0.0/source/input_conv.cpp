@@ -391,6 +391,7 @@ void Input_Conv::Convert(void)
 
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
+    NEW_DM=INPUT.newDM;  // Shen Yu add 2019/5/9
 	timer::tick("Input_Conv","Convert",'B');
     return;
 }

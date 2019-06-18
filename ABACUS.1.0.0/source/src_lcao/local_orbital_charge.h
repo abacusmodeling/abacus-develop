@@ -50,6 +50,23 @@ private:
 	// these variables are memory pool for DM series matrixes, so that these matrixes will be storaged continuously in the memory.
 	double **DM_pool;
 	complex<double> **DM_B_pool;
+	
+	// Buffer parameters for tranforming 2D block-cyclic distributed DM matrix 
+	// to grid distributed DM matrix
+    int *sender_2D_index;
+    int sender_size;
+    int *sender_size_process;
+    int *sender_displacement_process;
+    double* sender_buffer;
+
+    int *receiver_local_index;
+    int receiver_size;
+    int *receiver_size_process;
+    int *receiver_displacement_process;
+    double* receiver_buffer;
+
+    int setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk);
+    void cal_dk_gamma_from_2D(void);
 };
 
 #endif

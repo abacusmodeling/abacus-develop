@@ -216,3 +216,5 @@ bool DOMAG    = false;
 int NPOL      = 1;
 
 bool FINAL_SCF = false; //LiuXh add 20180619
+
+int NEW_DM=0;  // Shen Yu add 2019/5/9

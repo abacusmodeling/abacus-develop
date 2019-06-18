@@ -432,6 +432,8 @@ void Input::Default(void)
 	vext_dire=1;
 	
     cell_factor = 1.2; //LiuXh add 20180619
+    
+    newDM=0; // Shen Yu add 2019/5/9
 
     return;
 }
@@ -1509,10 +1511,14 @@ bool Input::Read(const string &fn)
         //{
         //    read_value(ifs, epsilon0_choice);
         //}					
-else if (strcmp("cell_factor", word) == 0)
-{
-    read_value(ifs, cell_factor);
-}
+	else if (strcmp("cell_factor", word) == 0)
+	{
+    	read_value(ifs, cell_factor);
+	}
+    else if (strcmp("newdm", word) == 0)
+    {
+        read_value(ifs, newDM);
+    }
         else
         {
 		//xiaohui add 2015-09-15
@@ -1853,6 +1859,7 @@ void Input::Bcast()
 	
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
+    Parallel_Common::bcast_int( newDM ); // Shen Yu add 2019/5/9
 
     return;
 }
