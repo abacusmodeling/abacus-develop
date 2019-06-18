@@ -202,7 +202,8 @@ void Run_Frag::frag_init(void)
 		}
 		else
 		{
-			OUT(ofs_running,"NLOCAL",NLOCAL);
+			//OUT(ofs_running,"NLOCAL",NLOCAL);
+			OUT(ofs_running,"NBASE",NLOCAL);
 			OUT(ofs_running,"NBANDS",NBANDS);
 		}
 	}

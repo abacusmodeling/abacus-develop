@@ -1940,7 +1940,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				}
 				else if(round==0){
 					this->has_so = 0;
-					cout<<"ignore SPIN_ORB part!"<<endl;
+//					cout<<"ignore SPIN_ORB part!"<<endl;
 					break;
 				}
 			}

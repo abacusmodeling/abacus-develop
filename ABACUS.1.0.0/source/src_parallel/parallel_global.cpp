@@ -200,6 +200,8 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 				cout << " *            'Atomic-orbital Based Ab-initio            *" << endl; 
 				cout << " *                  Computation at UStc'                 *" << endl;
 				cout << " *                                                       *" << endl;
+                cout << " *          Website: http://abacus.ustc.edu.cn/          *" << endl;
+                cout << " *                                                       *" << endl;
 				cout << " *********************************************************" << endl;
 
 				//cout << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;

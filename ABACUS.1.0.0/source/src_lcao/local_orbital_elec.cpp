@@ -90,7 +90,17 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 	for(Local_Orbital_Elec::iter=1; iter<=NITER; iter++)
 	{
-		if(CALCULATION=="scf" || CALCULATION=="relax")
+        if(CALCULATION=="scf")
+        {
+            ofs_running
+            << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
+            << "--------------------------------\n";
+
+            ofs_warning
+            << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
+            << "--------------------------------\n";
+        }
+        else if(CALCULATION=="relax" || CALCULATION=="cell-relax")
 		{
 			ofs_running 
 			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1 

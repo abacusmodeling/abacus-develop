@@ -65,10 +65,12 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 	assert(move!=NULL);
 	assert(lat!=NULL);
 
+/*
 	cout<<" LATTICE CONSTANT  OLD:"<<endl;
 	cout<<" "<<setprecision(12)<<ucell.latvec.e11<<"   "<<ucell.latvec.e12<<"   "<<ucell.latvec.e13<<endl;
 	cout<<" "<<setprecision(12)<<ucell.latvec.e21<<"   "<<ucell.latvec.e22<<"   "<<ucell.latvec.e23<<endl;
 	cout<<" "<<setprecision(12)<<ucell.latvec.e31<<"   "<<ucell.latvec.e32<<"   "<<ucell.latvec.e33<<endl;
+*/
 	
 	if(ucell.lc[0] != 0)
 	{
@@ -129,10 +131,12 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
     Parallel_Common::bcast_double( ucell.a3.y );
     Parallel_Common::bcast_double( ucell.a3.z );
 #endif
+/*
         cout<<" LATTICE CONSTANT NEW: "<<endl;
         cout<<" "<<setprecision(12)<<ucell.latvec.e11<<"   "<<ucell.latvec.e12<<"   "<<ucell.latvec.e13<<endl;
         cout<<" "<<setprecision(12)<<ucell.latvec.e21<<"   "<<ucell.latvec.e22<<"   "<<ucell.latvec.e23<<endl;
         cout<<" "<<setprecision(12)<<ucell.latvec.e31<<"   "<<ucell.latvec.e32<<"   "<<ucell.latvec.e33<<endl;
+*/
 
 	
 	return;

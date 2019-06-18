@@ -93,7 +93,9 @@ void Input::Init(const string &fn)
 	ofs_running << "                                                                                     " << endl;
 	ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
 	ofs_running << "                                                                                     " << endl;
-    	ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl; 
+    ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl;
+    ofs_running << "                                                                                     " << endl;
+    ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << endl;
 	ofs_running << "                                                                                     " << endl;
 
 	ofs_running << setiosflags(ios::right);
@@ -101,7 +103,8 @@ void Input::Init(const string &fn)
 
 
 #ifdef __MPI
-	ofs_running << "    Version: Parallel, under ALPHA test" << endl;
+	//ofs_running << "    Version: Parallel, under ALPHA test" << endl;
+    ofs_running << "    Version: Parallel, v2.0.0" << endl;
 	ofs_running << "    Processor Number is " << NPROC << endl;
 	TITLE("Input","init");
 	TITLE("Input","Bcast");
@@ -2203,7 +2206,7 @@ void Input::Check(void)
 			else if (ks_solver == "genelpa")
 			{
 #ifdef __MPI
-				ofs_warning << "genelpa is under testing" << endl;
+//				ofs_warning << "genelpa is under testing" << endl;
 #else
 				WARNING_QUIT("Input","genelpa can not be used for series version.");
 #endif
