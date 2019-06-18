@@ -224,21 +224,6 @@ void mdNVE::runNVE(int step1){
          printRDF(step1);
     }*/
 
-//test
-{
-    Matrix3 a(1.1,2.2,3.3,4.4,5.1,6.2,7.3,8.4,9.9);
-//    Matrix3 a(1,0,0,0,4,0,0,0,9);
-    Vector3<double> b(1,1,1),c;
-    Mathzone::Cartesian_to_Direct(b.x,b.y,b.z,
-                        a.e11,a.e12,a.e13,
-                        a.e21,a.e22,a.e23,
-                        a.e31,a.e32,a.e33,
-                        c.x,c.y,c.z ); 
-    cout<<"test-c "<<c.x<<" "<<c.y<<" "<<c.z<<endl;
-    c = b*a.Inverse() ;
-    cout<<"test-c1 "<<c.x<<" "<<c.y<<" "<<c.z<<endl;
-}
-
     // (3.1) OFDFT optimizer: in order to calculate the force
     // Refresh the ionpositions, including the Ewald term
     // and the local pseudopotentials term.

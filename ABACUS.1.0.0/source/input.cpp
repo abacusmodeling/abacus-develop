@@ -336,7 +336,7 @@ void Input::Default(void)
         md_nresn=3;
         md_nyosh=3;
         md_qmass=1;
-        md_tfirst=0;         //kelvin
+        md_tfirst=-1;         //kelvin
         md_tlast=md_tfirst;
         md_dumpmdfred=1;
         md_mdoutpath="mdoutput";
@@ -1184,23 +1184,6 @@ bool Input::Read(const string &fn)
 	else if (strcmp("md_tlast",word) == 0)
 	{
 		read_value(ifs,md_tlast );
-		if(md_tfirst!=md_tlast)
-		{
-			ifstream file1;
-			file1.open("ChangeTemp.dat");
-			if(!file1)						// Peize Lin fix bug 2016-08-06
-			{
-				ofstream file;
-				file.open("ChangeTemp.dat");
-				for(int ii=0;ii<30;ii++)
-				{
-					file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
-				}
-				file.close();
-			}
-			else 
-				file1.close();
-		}
 	}
 	else if (strcmp("md_dumpmdfred",word) == 0)
 	{
@@ -2038,6 +2021,31 @@ void Input::Check(void)
 	{
 		CALCULATION = "md"; 
 		force = 1;
+        if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
+
+        //deal with input parameters , 2019-04-30
+        if(basis_type == "pw" ) WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
+        if(md_dt == -1) WARNING_QUIT("Input::Check","time interval of MD calculation should be set!");
+        if(md_tfirst == -1) WARNING_QUIT("Input::Check","temperature of MD calculation should be set!");
+        if(md_tlast  == -1) md_tlast = md_tfirst;
+        if(md_tfirst!=md_tlast)
+        {
+            ifstream file1;
+            file1.open("ChangeTemp.dat");
+            if(!file1)                      // Peize Lin fix bug 2016-08-06
+           {
+                ofstream file;
+                file.open("ChangeTemp.dat");
+                for(int ii=0;ii<30;ii++)
+                {
+                    file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
+                }
+                file.close();
+            }
+            else
+                file1.close();
+        }
+
 	}
 	else if(calculation == "cell-relax") // mohan add 2011-11-04
 	{
