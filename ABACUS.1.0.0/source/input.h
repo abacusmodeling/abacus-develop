@@ -146,6 +146,7 @@ public:
     int nstep;				// number of max ionic iter
 	int out_stru;			// outut stru file each ion step
 	string out_level;		// control the output information.
+    bool out_md_control;            // internal parameter , added by zhengdy 2019-04-07
 //==========================================================
 // occupation
 //==========================================================

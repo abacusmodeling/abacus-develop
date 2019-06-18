@@ -213,6 +213,7 @@ void Input::Default(void)
 	ion_dynamics="cg"; // pengfei  2014-10-13
     cg_threshold=0.5; // pengfei add 2013-08-15
 	out_level="ie";
+    out_md_control = false;
 	bfgs_w1 = 0.01;		// mohan add 2011-03-13
 	bfgs_w2 = 0.5;
 	trust_radius_max = 0.8; // bohr
@@ -775,6 +776,7 @@ bool Input::Read(const string &fn)
         else if (strcmp("out_level", word) == 0)
         {
             read_value(ifs, out_level);
+            out_md_control = true;
         }
         else if (strcmp("bfgs_w1", word) == 0)
         {
@@ -1642,6 +1644,7 @@ void Input::Bcast()
     Parallel_Common::bcast_string( ion_dynamics );
     Parallel_Common::bcast_double( cg_threshold); // pengfei add 2013-08-15
 	Parallel_Common::bcast_string( out_level);
+    Parallel_Common::bcast_bool( out_md_control);
     Parallel_Common::bcast_double( bfgs_w1);
     Parallel_Common::bcast_double( bfgs_w2);
     Parallel_Common::bcast_double( trust_radius_max);
