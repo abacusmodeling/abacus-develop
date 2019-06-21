@@ -31,5 +31,5 @@ INCLUDES = -I. -Icommands -I${BOOST_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFT
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-OPTS     = ${INCLUDES} -Ofast -xHost -std=c++11 -simd -march=native -m64 -qopenmp -Werror -Wall -pedantic
+OPTS     = ${INCLUDES} -Ofast -g -traceback -xHost -std=c++11 -simd -march=native -m64 -qopenmp -Werror -Wall -pedantic
 OPTS_MPI = -cxx=${CPLUSPLUS}
