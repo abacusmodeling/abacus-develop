@@ -216,10 +216,14 @@ bool print)
 	{
 		ss << "LA" << iter << "\0";
 	}
-	else if(KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps")
+    else if(KS_SOLVER=="hpseps")
 	{
 		ss << "HP" << iter << "\0";
 	}
+    else if(KS_SOLVER=="genelpa")
+    {
+        ss << "GE" << iter << "\0";
+    }
 	else if(KS_SOLVER=="dav")
 	{
 		ss << "DA" << iter << "\0";
@@ -825,17 +829,20 @@ void energy::perform_dos(void)
 	TITLE("energy","perform_dos");
 
 
-	ofs_running << "\n\n\n\n";
-	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " | Post-processing of data:                                           |" << endl;
-	ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
-	ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
-	ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
-	ofs_running << " | done here.                                                         |" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-	ofs_running << "\n\n\n\n";
+    if(out_dos !=0 || out_band !=0)
+    {
+        ofs_running << "\n\n\n\n";
+        ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+        ofs_running << " |                                                                    |" << endl;
+        ofs_running << " | Post-processing of data:                                           |" << endl;
+        ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
+        ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
+        ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
+        ofs_running << " | done here.                                                         |" << endl;
+        ofs_running << " |                                                                    |" << endl;
+        ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        ofs_running << "\n\n\n\n";
+    }
 
 
 	if(MY_RANK==0)

@@ -1070,8 +1070,8 @@ void md::printpos(string file,int iter){
           string file2=file+".cif";
 
           //xiaohui add 'OUT_LEVEL', 2015-09-16
-          if(OUT_LEVEL != "m") ucell.print_tau();
-          if(OUT_LEVEL != "m") ucell.print_cell_xyz(file1);
+          if(OUT_LEVEL == "i"||OUT_LEVEL == "ie") ucell.print_tau();
+          if(OUT_LEVEL == "i"||OUT_LEVEL == "ie") ucell.print_cell_xyz(file1);
           ucell.print_cell_cif(file2);
           stringstream ss;
 

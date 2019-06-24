@@ -146,6 +146,7 @@ public:
     int nstep;				// number of max ionic iter
 	int out_stru;			// outut stru file each ion step
 	string out_level;		// control the output information.
+    bool out_md_control;            // internal parameter , added by zhengdy 2019-04-07
 //==========================================================
 // occupation
 //==========================================================
@@ -358,6 +359,17 @@ public:
 	bool input_error;
 
     double cell_factor; //LiuXh add 20180619
+	
+//==========================================================
+// new DM algorithm test
+// add by Shen Yu @ 2019/5/9
+// newDM values:
+//  0: not use new DM algorithm; 
+//  1: use new DM algorithm and show no debug information
+//  2: use new DM algorithm and only show key debug information
+//  3: use new DM algorithm and show all detail debug information
+//==========================================================
+    int newDM; 
 	
 	private:
 //==========================================================

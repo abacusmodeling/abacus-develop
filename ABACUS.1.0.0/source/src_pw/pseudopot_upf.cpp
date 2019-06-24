@@ -1251,7 +1251,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         stringstream wdsstream(word);
                         getline(wdsstream,this->psd,'"');
                         getline(wdsstream,this->psd,'"'); //}zws
-                        //cout << " this->psd =" << this->psd << "=" << endl;
+                        //cout << " this->psd = " << this->psd << endl;
 
                         ifs >> word;   // pseudo_type
                         {
@@ -1317,11 +1317,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
                         READ_VALUE(ifs, word);   // has_wfc
                         READ_VALUE(ifs, word);   // has_gipaw
-                        //cout << "word = " << word << endl;
                         string nlc;
-                        char p[13] = "paw_as_gipaw";
-                        ifs >> word;             // paw_as_gipaw
-                             if(word[0] == p[0])
+                        //char p[13] = "paw_as_gipaw";
+                        ifs >> word;             // paw_as_gipaw?
+                        //cout << "word.substr(0,30) = " << word.substr(0,30) << "."<< endl;
+                             if( word.substr(0,13) == "paw_as_gipaw" )
                              {
                                 SG15 = 0;
                                 ifs >> word;     // core_correction
@@ -1340,7 +1340,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              }
                              else
                              {
-                                SG15 = 1;
+                                SG15 = 1; // Generated using ONCVPSP code by D. R. Hamann, SG15 DOJO
                                 if(word == "core_correction=\"")
                                 {
                                      ifs >> word;
@@ -1750,7 +1750,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                             }
                             else
                             {
-                                READ_VALUE(ifs, word);
+                                READ_VALUE(ifs, word); // cutoff_radius
                             }
 
 
@@ -1779,6 +1779,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                             for(j=0;j<nbeta;j++)
                             {
                                 ifs >> dion(i,j);
+								if ( i != j  && dion(i,j) != 0.0 )
+								{
+									cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << endl;
+									exit(1);
+								}
                             }
                         SCAN_END(ifs, "</PP_DIJ>");
 
@@ -1796,6 +1801,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         ZEROS(lchi, nwfc); // angular momentum of each orbital
                         ZEROS(oc, nwfc);//occupation of each orbital
 
+                        //cout << "word = nwfc mesh " << this->nwfc << " " << this->mesh << endl;
                         this->chi.create(this->nwfc, this->mesh);
                         for (i=0;i<nwfc;i++)
                         {
@@ -1804,38 +1810,76 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              ifs >> word;  // size 
                              ifs >> word;  // columns
                              ifs >> word;  // index
+
+                             ifs >> word;  // occupation
+                             {
+                                 if(word == "occupation=\"")
+                                 {
+                                    ifs >> word;
+                                    word = "\"" + word ;
+                                 }
+                                 get_char(word);
+                                 oc[i] = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                 //cout << "oc[i] = " << oc[i] << endl;
+                             }
+
+                             ifs >> word;  // pseudo_energy
+                             //cout << "word = " << word << endl;
+                             {
+                                 if(word == "pseudo_energy=\"")
+                                 {
+                                    ifs >> word;
+                                    word = "\"" + word ;
+                                 }
+                                 get_char(word);
+                                 //cout << "word pseudo_energy = " << word << endl;
+                             }
+
                              ifs >> word;  // label
                              //cout << "word = " << word << endl;
                              {
-                                  get_char(word);
-                                  els[i] = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
-                                  //cout << "els[i] = " << els[i] << endl;
-                              }
+                                 if(word == "label=\"")
+                                 {
+                                    ifs >> word;
+                                    word = "\"" + word ;
+                                 }
+                                 get_char(word);
+                                 els[i] = word.substr(Number[0]+1,(Number[1]-Number[0]-1));
+                                 //cout << "els[i] = " << els[i] << endl;
+                             }
+
 
                              ifs >> word;  // l
                              //cout << "word = " << word << endl;
                              {
-                                  get_char(word);
-                                  lchi[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                                  //cout << "lchi[i] = " << lchi[i] << endl;
+                                 if(word == "l=\"")
+                                 {
+                                    ifs >> word;
+                                    word = "\"" + word ;
+                                 }
+                                 get_char(word);
+                                 lchi[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                 //cout << "lchi[i] = " << lchi[i] << " \n" << endl;
                              }
-                      
-                             ifs >> word;  // occupation
-                             //cout << "word = " << word << endl;
+
+                             ifs >> word; // >
+                             if ( word !=  ">" )
                              {
-                                  get_char(word);
-                                  oc[i] = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                                  //cout << "oc[i] = " << oc[i] << endl;
+                            	 cout << " error: bad end while reading CHI" << i <<  " of PSWFC" << endl;
+                            	 exit(1);
                              }
-                             
 
-                             ifs >> word; // n
-                             ifs >> word; // pseudo_energy
-                             ifs >> word; // cutoff_radius
-                             ifs >> word; // ultrasoft_cutoff_radius
+                             //ifs >> word; // n
+                             //cout << "word n = " << word << endl;
+                             //ifs >> word; // pseudo_energy
+                             //cout << "word pseudo_energy = " << word << endl;
+                             //ifs >> word; // cutoff_radius
+                             //cout << "word cutoff_radius = " << word << endl;
+                             //ifs >> word; // ultrasoft_cutoff_radius
+                             //cout << "word ultrasoft_cutoff_radius = " << word << endl;
 
 
-//                             for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
+//                           for ( int idel=0; idel < nmeshdel; idel++)    //{zws add 20160108
 //                         	 {
 //                         	     double	tmpdel;
 //                                 ifs >> tmpdel;
@@ -1940,7 +1984,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				}
 				else if(round==0){
 					this->has_so = 0;
-					cout<<"ignore SPIN_ORB part!"<<endl;
+//					cout<<"ignore SPIN_ORB part!"<<endl;
 					break;
 				}
 			}

@@ -93,7 +93,9 @@ void Input::Init(const string &fn)
 	ofs_running << "                                                                                     " << endl;
 	ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
 	ofs_running << "                                                                                     " << endl;
-    	ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl; 
+    ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl;
+    ofs_running << "                                                                                     " << endl;
+    ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << endl;
 	ofs_running << "                                                                                     " << endl;
 
 	ofs_running << setiosflags(ios::right);
@@ -101,7 +103,8 @@ void Input::Init(const string &fn)
 
 
 #ifdef __MPI
-	ofs_running << "    Version: Parallel, under ALPHA test" << endl;
+	//ofs_running << "    Version: Parallel, under ALPHA test" << endl;
+    ofs_running << "    Version: Parallel, v2.0.0" << endl;
 	ofs_running << "    Processor Number is " << NPROC << endl;
 	TITLE("Input","init");
 	TITLE("Input","Bcast");
@@ -210,6 +213,7 @@ void Input::Default(void)
 	ion_dynamics="cg"; // pengfei  2014-10-13
     cg_threshold=0.5; // pengfei add 2013-08-15
 	out_level="ie";
+    out_md_control = false;
 	bfgs_w1 = 0.01;		// mohan add 2011-03-13
 	bfgs_w2 = 0.5;
 	trust_radius_max = 0.8; // bohr
@@ -329,17 +333,17 @@ void Input::Default(void)
 	md_delt=1.0;
 */
 //md and related parameters(added by zheng da ye)
-    md_mdtype=1;
-    md_tauthermo=0;
-    md_taubaro=0;
-    md_dt=-1;
-    md_nresn=3;
-    md_nyosh=3;
-    md_qmass=1;
-    md_tfirst=0;         //kelvin
-    md_tlast=md_tfirst;
-    md_dumpmdfred=1;
-    md_mdoutpath="mdoutput";
+	md_mdtype=1;
+	md_tauthermo=0;
+	md_taubaro=0;
+	md_dt=-1;
+	md_nresn=3;
+	md_nyosh=3;
+	md_qmass=1;
+	md_tfirst=-1;         //kelvin
+	md_tlast=md_tfirst;
+	md_dumpmdfred=1;
+	md_mdoutpath="mdoutput";
 	md_domsd=0;
     md_domsdatom=0;
     md_rstmd=0;
@@ -462,6 +466,8 @@ void Input::Default(void)
 	vext_dire=1;
 	
     cell_factor = 1.2; //LiuXh add 20180619
+    
+    newDM=0; // Shen Yu add 2019/5/9
 
     return;
 }
@@ -800,6 +806,7 @@ bool Input::Read(const string &fn)
         else if (strcmp("out_level", word) == 0)
         {
             read_value(ifs, out_level);
+            out_md_control = true;
         }
         else if (strcmp("bfgs_w1", word) == 0)
         {
@@ -1212,23 +1219,6 @@ bool Input::Read(const string &fn)
 		else if (strcmp("md_tlast",word) == 0)
 		{
 			read_value(ifs,md_tlast );
-			if(md_tfirst!=md_tlast)
-			{
-				ifstream file1;
-				file1.open("ChangeTemp.dat");
-				if(!file1)						// Peize Lin fix bug 2016-08-06
-				{
-					ofstream file;
-					file.open("ChangeTemp.dat");
-					for(int ii=0;ii<30;ii++)
-					{
-						file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
-					}
-					file.close();
-				}
-				else 
-					file1.close();
-			}
 		}
 		else if (strcmp("md_dumpmdfred",word) == 0)
 		{
@@ -1618,23 +1608,27 @@ bool Input::Read(const string &fn)
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
-        //}					
+        //}
 		else if (strcmp("cell_factor", word) == 0)
 		{
 			read_value(ifs, cell_factor);
 		}
+		else if (strcmp("newdm", word) == 0)
+		{
+			read_value(ifs, newDM);
+		}
         else
         {
-		//xiaohui add 2015-09-15
-		if(word[0] != '#' && word[0] != '/')
-		{
-			input_error = 1;
-			cout<<" THE PARAMETER NAME '" << word << "' IS NOT USED!" << endl;
-		}
+			//xiaohui add 2015-09-15
+			if(word[0] != '#' && word[0] != '/')
+			{
+				input_error = 1;
+				cout<<" THE PARAMETER NAME '" << word << "' IS NOT USED!" << endl;
+			}
 // mohan screen this 2012-06-30
-//            cout << " THE PARAMETER NAME '" << word
-//               << "' IS NOT USED!" << endl;
-            ifs.ignore(150, '\n');
+//			cout << " THE PARAMETER NAME '" << word
+//			<< "' IS NOT USED!" << endl;
+			ifs.ignore(150, '\n');
         }
 
         ifs.rdstate();
@@ -1667,16 +1661,16 @@ bool Input::Read(const string &fn)
 			break;
         }
     }
-        if (basis_type == "pw")  // pengfei Li add 2015-1-31
-        {
-            gamma_only = 0;
-            //cout << "gamma_only =" << gamma_only << endl;
-        }
-        else if ((basis_type == "lcao" || basis_type == "lcao_in_pw")&&(gamma_only == 1))
-        {
-            gamma_only_local = 1;
-            //cout << "gamma_only_local =" << gamma_only_local << endl;
-        }
+	if (basis_type == "pw")  // pengfei Li add 2015-1-31
+	{
+		gamma_only = 0;
+		//cout << "gamma_only =" << gamma_only << endl;
+	}
+	else if ((basis_type == "lcao" || basis_type == "lcao_in_pw")&&(gamma_only == 1))
+	{
+		gamma_only_local = 1;
+		//cout << "gamma_only_local =" << gamma_only_local << endl;
+	}
 
     return true;
 }//end read_parameters
@@ -1760,6 +1754,7 @@ void Input::Bcast()
     Parallel_Common::bcast_string( ion_dynamics );
     Parallel_Common::bcast_double( cg_threshold); // pengfei add 2013-08-15
 	Parallel_Common::bcast_string( out_level);
+    Parallel_Common::bcast_bool( out_md_control);
     Parallel_Common::bcast_double( bfgs_w1);
     Parallel_Common::bcast_double( bfgs_w2);
     Parallel_Common::bcast_double( trust_radius_max);
@@ -1987,6 +1982,7 @@ void Input::Bcast()
 	
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
+    Parallel_Common::bcast_int( newDM ); // Shen Yu add 2019/5/9
 
     return;
 }
@@ -2166,6 +2162,31 @@ void Input::Check(void)
 	{
 		CALCULATION = "md"; 
 		force = 1;
+        if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
+
+        //deal with input parameters , 2019-04-30
+        if(basis_type == "pw" ) WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
+        if(md_dt == -1) WARNING_QUIT("Input::Check","time interval of MD calculation should be set!");
+        if(md_tfirst == -1) WARNING_QUIT("Input::Check","temperature of MD calculation should be set!");
+        if(md_tlast  == -1) md_tlast = md_tfirst;
+        if(md_tfirst!=md_tlast)
+        {
+            ifstream file1;
+            file1.open("ChangeTemp.dat");
+            if(!file1)                      // Peize Lin fix bug 2016-08-06
+           {
+                ofstream file;
+                file.open("ChangeTemp.dat");
+                for(int ii=0;ii<30;ii++)
+                {
+                    file<<md_tfirst+(md_tlast-md_tfirst)/double(30)*double(ii+1)<<" ";
+                }
+                file.close();
+            }
+            else
+                file1.close();
+        }
+
 	}
 	else if(calculation == "cell-relax") // mohan add 2011-11-04
 	{
@@ -2323,7 +2344,7 @@ void Input::Check(void)
 			else if (ks_solver == "genelpa")
 			{
 #ifdef __MPI
-				ofs_warning << "genelpa is under testing" << endl;
+//				ofs_warning << "genelpa is under testing" << endl;
 #else
 				WARNING_QUIT("Input","genelpa can not be used for series version.");
 #endif

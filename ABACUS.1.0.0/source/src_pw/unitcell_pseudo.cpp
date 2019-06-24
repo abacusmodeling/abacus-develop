@@ -998,61 +998,83 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 
 void UnitCell_pseudo::print_tau(void)const
 {
-	TITLE("UnitCell_pseudo","print_tau");
-	ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << ucell.lat0 << " Bohr )." << endl;
-	ofs_running << setw(13) << " atom" 
-	<< setw(20) << "x" 
-	<< setw(20) << "y" 
-	<< setw(20) << "z" 
-	<< " mag"
-	<< endl;
-	ofs_running << setprecision(12);
+    TITLE("UnitCell_pseudo","print_tau");
+    if(Coordinate == "Cartesian" || Coordinate == "Cartesian_angstrom")
+    {
+        ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << ucell.lat0 << " Bohr )." << endl;
+        ofs_running << setw(13) << " atom"
+        //<< setw(20) << "x" 
+        //<< setw(20) << "y" 
+        //<< setw(20) << "z" 
+        //<< " mag"
+        << setw(20) << "x"
+        << setw(20) << "y"
+        << setw(20) << "z"
+        << setw(20) << "mag"
+        << endl;
+        ofs_running << setprecision(12);
 
-	int iat=0;
-	for(int it=0; it<ucell.ntype; it++)
-	{
-		for (int ia = 0; ia < ucell.atoms[it].na; ia++)
-		{
-			stringstream ss;
-			ss << "tauc_" << ucell.atoms[it].label << ia+1;
-			
-			ofs_running << " " << setw(12) << ss.str() 
-			<< setw(20) << atoms[it].tau[ia].x 
-			<< setw(20) << atoms[it].tau[ia].y 
-			<< setw(20) << atoms[it].tau[ia].z 
-			<< " " << atoms[it].mag[ia]
-			<< endl;
+        int iat=0;
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+            {
+                stringstream ss;
+                ss << "tauc_" << ucell.atoms[it].label << ia+1;
 
-			++iat;
-		}
-	}
-	
-	ofs_running << "\n DIRECT COORDINATES" << endl;
-	ofs_running << setw(13) << " atom" 
-	<< setw(20) << "x" 
-	<< setw(20) << "y" 
-	<< setw(20) << "z"
-	<< " mag"  
-	<< endl;
-	
-	iat=0;
-	for(int it=0; it<ucell.ntype; it++)
-	{
-		for (int ia = 0; ia < ucell.atoms[it].na; ia++)
-		{
-			stringstream ss;
-			ss << "taud_" << ucell.atoms[it].label << ia+1;
-			
-			ofs_running << " " << setw(12) << ss.str() 
-			<< setw(20) << atoms[it].taud[ia].x 
-			<< setw(20) << atoms[it].taud[ia].y 
-			<< setw(20) << atoms[it].taud[ia].z 
-			<< " " << atoms[it].mag[ia]
-			<< endl;
+                ofs_running << " " << setw(12) << ss.str()
+                //<< setw(20) << atoms[it].tau[ia].x 
+                //<< setw(20) << atoms[it].tau[ia].y
+                //<< setw(20) << atoms[it].tau[ia].z
+                //<< " " << atoms[it].mag[ia]
+                << setw(20) << atoms[it].tau[ia].x
+                << setw(20) << atoms[it].tau[ia].y
+                << setw(20) << atoms[it].tau[ia].z
+                << setw(20) << atoms[it].mag[ia]
+                << endl;
 
-			++iat;
-		}
-	}
+                ++iat;
+            }
+        }
+    }
+
+    if(Coordinate == "Direct")
+    {
+        ofs_running << "\n DIRECT COORDINATES" << endl;
+        ofs_running << setw(13) << " atom"
+        //<< setw(20) << "x"
+        //<< setw(20) << "y"
+        //<< setw(20) << "z"
+        //<< " mag"
+        << setw(20) << "x"
+        << setw(20) << "y"
+        << setw(20) << "z"
+        << setw(20) << "mag"
+        << endl;
+
+        int iat=0;
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+            {
+                stringstream ss;
+                ss << "taud_" << ucell.atoms[it].label << ia+1;
+
+                ofs_running << " " << setw(12) << ss.str()
+                //<< setw(20) << atoms[it].taud[ia].x
+                //<< setw(20) << atoms[it].taud[ia].y
+                //<< setw(20) << atoms[it].taud[ia].z
+                //<< " " << atoms[it].mag[ia]
+                << setw(20) << atoms[it].taud[ia].x
+                << setw(20) << atoms[it].taud[ia].y
+                << setw(20) << atoms[it].taud[ia].z
+                << setw(20) << atoms[it].mag[ia]
+                << endl;
+
+                ++iat;
+            }
+        }
+    }
 
 	ofs_running << endl;
 	return;

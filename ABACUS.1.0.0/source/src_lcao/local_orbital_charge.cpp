@@ -5,6 +5,16 @@
 //#include "../src_onscaling/on_tests.h"
 //#include "../src_siao/selinv.h"
 // 2014.10.29 add memory pool for DM and DM_B by yshen
+
+// Shen Yu add 2019/5/9
+extern "C"
+{
+    void Cblacs_gridinfo(int icontxt, int* nprow, int *npcol, int *myprow, int *mypcol);
+    void Cblacs_pinfo(int *myid, int *nprocs);
+    void Cblacs_pcoord(int icontxt, int pnum, int *prow, int *pcol);
+    int Cblacs_pnum(int icontxt, int prow, int pcol);
+}
+
 Local_Orbital_Charge::Local_Orbital_Charge()
 {
 	// for gamma algorithms.
@@ -19,6 +29,13 @@ Local_Orbital_Charge::Local_Orbital_Charge()
 	//band_local = new int[1];
 	//Z_wg = new double[1];
 	//Z_LOC = new double[1];
+    sender_2D_index = new int[1];
+    sender_size_process = new int[1];
+    sender_displacement_process = new int[1];
+
+    receiver_local_index = new int[1];
+    receiver_size_process = new int[1];
+    receiver_displacement_process = new int[1];
 }
 
 Local_Orbital_Charge::~Local_Orbital_Charge()
@@ -45,6 +62,13 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 			}
 			delete[] DM;
 			delete[] DM_pool;
+            delete[] sender_2D_index;
+            delete[] sender_size_process;
+            delete[] sender_displacement_process;
+
+            delete[] receiver_local_index;
+            delete[] receiver_size_process;
+            delete[] receiver_displacement_process;
 		}
 	 }
 
@@ -120,6 +144,191 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
 	wfc_dm_2d.init();		// Peize Lin test 2019-01-16
 	return;
+}
+
+// setup buffer parameters for tranforming 2D block-cyclic distributed DM matrix 
+inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
+{
+    int iblock, gIndex;
+    iblock=localIndex/nblk;
+    gIndex=(iblock*nprocs+myproc)*nblk+localIndex%nblk;
+    return gIndex;
+    //return (localIndex/nblk*nprocs+myproc)*nblk+localIndex%nblk;
+}
+
+inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
+{
+    myproc=int((globalIndex%(nblk*nprocs))/nblk);
+    return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
+}
+
+
+
+int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk)
+{
+    OUT(ofs_running,"enter setAlltoallvParameter, nblk", nblk);
+    timer::tick("LCAO_Charge","newDM_index",'F');
+    // setup blacs parameters
+    int nprows, npcols, nprocs;
+    int myprow, mypcol, myproc;
+    Cblacs_gridinfo(blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
+    Cblacs_pinfo(&myproc, &nprocs);
+    // OUT(ofs_running,"nprocs",nprocs);
+    // init data arrays
+    delete[] sender_size_process;
+    sender_size_process=new int[nprocs];
+    delete[] sender_displacement_process;
+    sender_displacement_process=new int[nprocs];
+
+    // OUT(ofs_running,"lgd_now",lgd_now);
+    
+    receiver_size=lgd_now*lgd_now;
+    receiver_size_process=new int[nprocs];
+    delete[] receiver_displacement_process;
+    receiver_displacement_process=new int[nprocs];
+    delete[] receiver_local_index;
+    receiver_local_index=new int[receiver_size];
+    delete[] receiver_buffer;
+    receiver_buffer=new double[receiver_size];
+    
+    int *trace_2D_row=new int[lgd_now];
+    int *trace_2D_col=new int[lgd_now];
+    int *trace_2D_prow=new int[lgd_now];
+    int *trace_2D_pcol=new int[lgd_now];
+    //int *trace_global=new int[lgd_now];
+
+    int *nRow_in_proc=new int[nprows];
+    int *nCol_in_proc=new int[npcols];
+
+    // OUT(ofs_running,"nprows",nprows);
+    // OUT(ofs_running,"npcols",npcols);
+
+    for(int i=0; i<nprows; ++i)
+    {
+        nRow_in_proc[i]=0;
+    }
+    for(int i=0; i<npcols; ++i)
+    {
+        nCol_in_proc[i]=0;
+    }
+
+    // count the number of elements to be received from each process
+    for(int iGlobal=0; iGlobal<NLOCAL; ++iGlobal)
+    {
+        int iLocalGrid=GridT.trace_lo[iGlobal];
+        if(iLocalGrid>=0)
+        {
+            //trace_global[iLocalGrid]=iGlobal;
+            int p;
+            trace_2D_row[iLocalGrid]=localIndex(iGlobal, nblk, nprows, p);
+            trace_2D_prow[iLocalGrid]=p;
+            nRow_in_proc[trace_2D_prow[iLocalGrid]]++;
+            trace_2D_col[iLocalGrid]=localIndex(iGlobal, nblk, npcols, p);
+            trace_2D_pcol[iLocalGrid]=p;
+            nCol_in_proc[trace_2D_pcol[iLocalGrid]]++;
+        }
+    }
+    // OUT(ofs_running,"NLOCAL",NLOCAL);
+    receiver_displacement_process[0]=0;
+    // OUT(ofs_running,"receiver_displacement_process[0]",receiver_displacement_process[0]);
+    for(int pnum=0; pnum<nprocs; ++pnum)
+    {
+        int prow, pcol;
+        Cblacs_pcoord(blacs_ctxt, pnum, &prow, &pcol);
+        receiver_size_process[pnum]=nRow_in_proc[prow]*nCol_in_proc[pcol];
+        if(NEW_DM>1)
+        {
+            OUT(ofs_running,"pnum",pnum);
+            OUT(ofs_running,"prow",prow);
+            OUT(ofs_running,"pcol",pcol);
+            OUT(ofs_running,"nRow_in_proc",nRow_in_proc[prow]);
+            OUT(ofs_running,"nCol_in_proc",nCol_in_proc[pcol]);
+        }
+        if(pnum>0)
+        {
+            receiver_displacement_process[pnum]=receiver_displacement_process[pnum-1]+receiver_size_process[pnum-1];
+        }
+    }
+    // OUT(ofs_running,"last receiver_size_process",receiver_size_process[nprocs-1]);
+    
+    // build the index to be received
+    int* pos=new int[nprocs];
+    int *receiver_2D_index=new int[receiver_size];
+    for(int i=0; i<nprocs; ++i)
+    {
+        pos[i]=receiver_displacement_process[i];
+    }
+    for(int i=0; i<lgd_now; ++i)
+    {
+        int src_row=trace_2D_row[i];
+        int src_prow=trace_2D_prow[i];
+        for(int j=0; j<lgd_now; ++j)
+        {
+            int src_col=trace_2D_col[j];
+            int src_idx=src_row*NLOCAL+src_col; // leanding dimension is set to NLOCAL for all processes
+
+            int src_pcol=trace_2D_pcol[j];
+            int src_proc=Cblacs_pnum(blacs_ctxt, src_prow, src_pcol);
+
+            receiver_2D_index[pos[src_proc]]=src_idx;
+            receiver_local_index[pos[src_proc]]=i*lgd_now+j;
+            ++pos[src_proc];
+        }
+    }
+    // OUT(ofs_running,"last receiver_2D_index",receiver_2D_index[lgd_now*lgd_now-1]);
+    delete[] pos;
+    delete[] trace_2D_row;
+    delete[] trace_2D_col;
+    delete[] trace_2D_prow;
+    delete[] trace_2D_pcol;
+    //delete[] trace_global;
+    delete[] nRow_in_proc;
+    delete[] nCol_in_proc;
+    
+    // send number of elements to be sent via MPI_Alltoall
+    MPI_Alltoall(receiver_size_process, 1, MPI_INT,
+                 sender_size_process, 1, MPI_INT, comm_2D);
+    
+    // OUT(ofs_running,"last sender_size_process",sender_size_process[nprocs-1]);
+    // setup sender buffer
+    sender_size=sender_size_process[0];
+    sender_displacement_process[0]=0;
+    for(int i=1; i<nprocs; ++i)
+    {
+        sender_size+=sender_size_process[i];
+        sender_displacement_process[i]=sender_displacement_process[i-1]+sender_size_process[i-1];
+    }
+    
+    // OUT(ofs_running,"sender_size",sender_size);
+    delete[] sender_2D_index;
+    sender_2D_index=new int[sender_size];
+    delete[] sender_buffer;
+    sender_buffer=new double[sender_size];
+
+    // send the index of the elements to be received via MPI_Alltoall
+    MPI_Alltoallv(receiver_2D_index, receiver_size_process, receiver_displacement_process, MPI_INT,
+                  sender_2D_index, sender_size_process, sender_displacement_process, MPI_INT, comm_2D);
+
+
+    if(NEW_DM>1)
+    {
+        ofs_running<<"receiver_size is "<<receiver_size<<" ; receiver_size of each process is:\n";
+        for(int i=0; i<nprocs; ++i)
+        {
+            ofs_running<<receiver_size_process[i]<<" ";
+        }
+        ofs_running<<endl;
+        ofs_running<<"sender_size is "<<sender_size<<" ; sender_size of each process is:\n";
+        for(int i=0; i<nprocs; ++i)
+        {
+            ofs_running<<sender_size_process[i]<<" ";
+        }
+        ofs_running<<endl;
+    }
+    // OUT(ofs_running,"last sender_2D_index",sender_2D_index[lgd_now*lgd_now-1]);
+    delete[] receiver_2D_index;
+    timer::tick("LCAO_Charge","newDM_index",'F');
+    return 0;
 }
 
 // allocate density kernel may change once the ion
@@ -227,6 +436,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 				{
 					DM[is][i] = &DM_pool[is][i*lgd_now];
 				}
+                setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
 				Memory::record("LocalOrbital_Charge","Density_Kernal",NSPIN*lgd_now*lgd_now,"double");
 			}
 		}
@@ -346,13 +556,20 @@ void Local_Orbital_Charge::sum_bands(void)
 		{
 			//density matrix has already been calcualted.
 		}
-		else
-		{
-			//xiaohui modify 2014-06-18
-			this->cal_dk_gamma();//calculate the density matrix.
-			if(KS_SOLVER=="genelpa")		// Peize Lin test 2019-01-16
-				wfc_dm_2d.cal_dm(wf.wg);
-		}
+        else if(KS_SOLVER=="genelpa")
+        {
+            if(NEW_DM>0)
+            {
+                //density matrix has already been calcualted.
+                wfc_dm_2d.cal_dm(wf.wg);        // Peize Lin test 2019-01-16
+                this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
+            }
+            else
+            {
+                //xiaohui modify 2014-06-18
+                this->cal_dk_gamma();//calculate the density matrix.
+            }
+        }
 	}
 	else
 	{
@@ -623,6 +840,121 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 	return;
 }
 
+// calculate the grid distributed DM matrix from 2D block-cyclic distributed DM matrix
+// transform dm_gamma[is].c to this->DM[is]
+void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
+{
+    timer::tick("LCAO_Charge","newDM",'F');
+    OUT(ofs_running,"cal_dk_gamma_from_2D, NSPIN", NSPIN);
+    for(int is=0; is<NSPIN; ++is)
+    {
+        if(NEW_DM>1)
+        // outputDM( ParaO.blacs_ctxt, ParaO.nb);
+        {
+            // int myid;
+            // MPI_Comm_rank(MPI_COMM_WORLD, &myid);
+            // if(myid==0)
+            // {
+            //     ofs_running<<"DM[0][0:1][0:1] before send:"<<endl;
+            //     ofs_running<<"DM(0,0)"<<wfc_dm_2d.dm_gamma[is](0,0)<<" ";
+            //     ofs_running<<"DM(0,1)"<<wfc_dm_2d.dm_gamma[is](1,0)<<endl;
+            //     ofs_running<<"DM(1,0)"<<wfc_dm_2d.dm_gamma[is](0,1)<<" ";
+            //     ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<endl;
+            // }
+            ofs_running<<"2D block parameters:\n"<<"nblk: "<<ParaO.nb<<endl;
+            ofs_running<<"DM in 2D format:\n_________________________________________\n";
+            for(int i=0; i<wfc_dm_2d.dm_gamma[is].nr; ++i)
+            {
+                for(int j=0; j<wfc_dm_2d.dm_gamma[is].nc; ++j)
+                {
+                    ofs_running<<wfc_dm_2d.dm_gamma[is](i,j)<<" ";
+                }
+                ofs_running<<endl;
+            }
+            ofs_running<<"=========================================\n";
+        }
+        // put data from dm_gamma[is] to sender index
+        int nNONZERO=0;
+        for(int i=0; i<sender_size; ++i)
+        {
+            const int idx=sender_2D_index[i];
+            const int icol=idx%NLOCAL;
+            const int irow=(idx-icol)/NLOCAL;
+            // sender_buffer[i]=wfc_dm_2d.dm_gamma[is](irow,icol);
+            sender_buffer[i]=wfc_dm_2d.dm_gamma[is](icol,irow); // sender_buffer is clomun major, 
+                                                                // so the row and column index should be switched
+            if(sender_buffer[i]!=0) ++nNONZERO;
+        }
+        if(NEW_DM>1) 
+        {
+            OUT(ofs_running,"number of non-zero elements in sender_buffer",nNONZERO);
+            OUT(ofs_running,"sender_size",sender_size);
+            OUT(ofs_running,"last sender_buffer",sender_buffer[sender_size-1]);
+        }
+        // transform data via MPI_Alltoallv
+        MPI_Alltoallv(sender_buffer, sender_size_process, sender_displacement_process, MPI_DOUBLE,
+                      receiver_buffer, receiver_size_process, receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
+        // put data from receiver buffer to this->DM[is]
+        nNONZERO=0;
+        // init DM[is]
+        /*for(int i=0; i<lgd_now; ++i)
+        {
+            for(int j=0; j<lgd_now; ++j)
+            {
+                DM[is][i][j]=0;
+            }
+        }*/
+        for(int i=0; i<receiver_size; ++i)
+        {
+            const int idx=receiver_local_index[i];
+            const int icol=idx%lgd_now;
+            const int irow=(idx-icol)/lgd_now;
+            DM[is][irow][icol]=receiver_buffer[i];
+            //DM[is][icol][irow]=receiver_buffer[i];
+            if(receiver_buffer[i]!=0) ++nNONZERO;
+        }
+        if(NEW_DM>1)
+        {
+            OUT(ofs_running,"number of non-zero elements in receiver_buffer",nNONZERO);
+            OUT(ofs_running,"receiver_size",receiver_size);
+            OUT(ofs_running,"last receiver_buffer",receiver_buffer[receiver_size-1]);
+            // ofs_running<<"DM[0][0:1][0:1] after receiver:"<<endl;
+            // int idx0=GridT.trace_lo[0];
+            // int idx1=GridT.trace_lo[1];
+            // if(idx0>=0)
+            // {
+            //     ofs_running<<"DM(0,0)"<<DM[0][idx0][idx0]<<" ";
+            // }
+            // if(idx0>=0 && idx1>=0)
+            // {
+            //     ofs_running<<"DM(0,1)"<<DM[0][idx0][idx1]<<endl;
+            //     ofs_running<<"DM(1,0)"<<DM[0][idx1][idx0]<<" ";
+            // }
+            // if(idx1>=0)
+            // {
+            //     ofs_running<<"DM(1,1)"<<DM[0][idx1][idx1]<<endl;
+            // }
+            //ofs_running<<DM[0][0][0]<<" "<<DM[0][0][1]<<endl;
+            //ofs_running<<DM[0][1][0]<<" "<<DM[0][1][1]<<endl;
+            ofs_running<<"DM in local grid:\n_________________________________________\n";
+            for(int i=0; i<NLOCAL; ++i)
+            {
+                int ii=GridT.trace_lo[i];
+                if(ii < 0) continue;
+                for(int j=0; j<NLOCAL; ++j)
+                {
+                    int jj=GridT.trace_lo[j];
+                    if(jj<0) continue;
+                    ofs_running<<DM[is][ii][jj]<<" ";
+                }
+                ofs_running<<endl;
+            }
+            ofs_running<<"=========================================\n";
+        }
+    }
+    timer::tick("LCAO_Charge","newDM",'F');
+}
+//-------------------------------------------------------------
 //-------------------------------------------------------------
 // NOTE:
 // How to improve the speed of calculation of density matrix.
@@ -817,7 +1149,23 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 					#endif
 				}  // end for col_count
 			}  // end for row_count
-		}  // end for is
+            ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<endl;
+            int idx0=GridT.trace_lo[0];
+            int idx1=GridT.trace_lo[1];
+            if(idx0>=0)
+            {
+                ofs_running<<"DM(0,0)"<<DM[is][idx0][idx0]<<"\t";
+            }
+            if(idx0>=0 && idx1>=0)
+            {
+                ofs_running<<"DM(0,1)"<<DM[is][idx0][idx1]<<endl;
+                ofs_running<<"DM(1,0)"<<DM[is][idx1][idx0]<<"\t";
+            }
+            if(idx1>=0)
+            {
+                ofs_running<<"DM(1,1)"<<DM[is][idx1][idx1]<<endl;
+            }
+		}  // end for is	
 	}  // end if !BFIELD
 #endif //2015-09-06, xiaohui
 #ifndef __MPI //2015-09-06, xiaohui

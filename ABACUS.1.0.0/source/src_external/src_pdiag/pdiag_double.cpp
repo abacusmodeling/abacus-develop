@@ -498,87 +498,91 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
         dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
         delete[] eigen;
 	    OUT(ofs_running,"eigenvalues were copied to ekb");
-        // redistribute eigenvectors to wfc / wfc_aug
+        if(NEW_DM==0)
+        {
+            //convert wave function to band distribution and calculate the density matrix in the tranditional way
+            // redistribute eigenvectors to wfc / wfc_aug
 
-        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
-        int pos=0;
-        for(int i=0; i<myid; ++i)
-        {
-            pos+=loc_sizes[i];
-        }
-        int naroc[2]; // maximum number of row or column
-        for(int iprow=0; iprow<dim0; ++iprow)
-        {
-            for(int ipcol=0; ipcol<dim1; ++ipcol)
+            timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
+            int pos=0;
+            for(int i=0; i<myid; ++i)
             {
-                const int coord[2]={iprow, ipcol};
-                int src_rank;
-                MPI_Cart_rank(comm_2D, coord, &src_rank);
-                if(myid==src_rank)
+                pos+=loc_sizes[i];
+            }
+            int naroc[2]; // maximum number of row or column
+            for(int iprow=0; iprow<dim0; ++iprow)
+            {
+                for(int ipcol=0; ipcol<dim1; ++ipcol)
                 {
-                    dcopy_(&nloc, wfc_2d.c, &inc, work, &inc);
-                    naroc[0]=nrow;
-                    naroc[1]=ncol;
-                }
-                info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
-                info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+                    const int coord[2]={iprow, ipcol};
+                    int src_rank;
+                    MPI_Cart_rank(comm_2D, coord, &src_rank);
+                    if(myid==src_rank)
+                    {
+                        dcopy_(&nloc, wfc_2d.c, &inc, work, &inc);
+                        naroc[0]=nrow;
+                        naroc[1]=ncol;
+                    }
+                    info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
+                    info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
 
-                if(this->out_lowf)
-                {
-                    double **ctot;
-                    if(myid==0)
+                    if(this->out_lowf)
                     {
-                        ctot = new double*[NBANDS];
-                        for (int i=0; i<NBANDS; i++)
+                        double **ctot;
+                        if(myid==0)
                         {
-                            ctot[i] = new double[NLOCAL];
-                            ZEROS(ctot[i], NLOCAL);
+                            ctot = new double*[NBANDS];
+                            for (int i=0; i<NBANDS; i++)
+                            {
+                                ctot[i] = new double[NLOCAL];
+                                ZEROS(ctot[i], NLOCAL);
+                            }
+                            Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
                         }
-                        Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
-                    }
-                    if(BFIELD)
-                    {
-                        cout << " not implement distri_lowf_aug yet." << endl;
-                        WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
-                        info=q2ZLOC_WFC_CTOT(myid, pos, naroc, nb,
-                                             dim0, dim1, iprow, ipcol, this->loc_size,
-                                             work, Z_LOC[ik], wfc, ctot);
+                        if(BFIELD)
+                        {
+                            cout << " not implement distri_lowf_aug yet." << endl;
+                            WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
+                            info=q2ZLOC_WFC_CTOT(myid, pos, naroc, nb,
+                                                dim0, dim1, iprow, ipcol, this->loc_size,
+                                                work, Z_LOC[ik], wfc, ctot);
+                        }
+                        else
+                        {
+                            info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
+                                                        dim0, dim1, iprow, ipcol, this->loc_size,
+                                                        work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
+                        }
+                        stringstream ss;
+                        ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
+                        // mohan add 2012-04-03, because we need the occupations for the
+                        // first iteration.
+                        WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
+                        if(myid==0)
+                        {
+                            for (int i=0; i<NBANDS; i++)
+                            {
+                                delete[] ctot[i];
+                            }
+                            delete[] ctot;
+                        }
                     }
                     else
                     {
-                        info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-                                                    dim0, dim1, iprow, ipcol, this->loc_size,
-                                                    work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
-                    }
-                    stringstream ss;
-                    ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
-                    // mohan add 2012-04-03, because we need the occupations for the
-                    // first iteration.
-                    WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
-                    if(myid==0)
-                    {
-                        for (int i=0; i<NBANDS; i++)
+                        if(BFIELD)
                         {
-                            delete[] ctot[i];
+                            cout << " not implement distri_lowf_aug yet." << endl;
+                            WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
+                            info=q2ZLOC_WFC(pos, naroc, nb,
+                                            dim0, dim1, iprow, ipcol, this->loc_size,
+                                            work, Z_LOC[ik], wfc);
                         }
-                        delete[] ctot;
-                    }
-                }
-                else
-                {
-                    if(BFIELD)
-                    {
-                        cout << " not implement distri_lowf_aug yet." << endl;
-                        WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
-                        info=q2ZLOC_WFC(pos, naroc, nb,
-                                        dim0, dim1, iprow, ipcol, this->loc_size,
-                                        work, Z_LOC[ik], wfc);
-                    }
-                    else
-                    {
-                        info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-                                               dim0, dim1, iprow, ipcol, this->loc_size,
-                                               work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
+                        else
+                        {
+                            info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
+                                                dim0, dim1, iprow, ipcol, this->loc_size,
+                                                work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
+                        }
                     }
                 }
             }
@@ -586,7 +590,6 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
 
         delete[] work;
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
-
     } // GenELPA method
     //delete[] Stmp; //LiuXh 20171109
 #endif
@@ -660,31 +663,16 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
         timer::tick("Diago_LCAO_Matrix","genelpa",'G');
         zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
         int method=0;
-        // info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
-        //                      ch_mat, Stmp, eigen, wfc_2d.c, work,
-        //                      comm_2D_f, blacs_ctxt,
-        //                      method, THIS_REAL_ELPA_KERNEL_API,
-        //                      wantEigenVector, wantDebug);
-        // timer::tick("Diago_LCAO_Matrix","genelpa",'G');
-        timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
-        info=pzDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
-                                    Stmp, eigen, wfc_2d.c, work,
-                                    comm_2D_f, mpi_comm_rows, mpi_comm_cols,
-                                    method, THIS_REAL_ELPA_KERNEL_API);
-        timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
-        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
-        info=pzSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
-                    ch_mat, Stmp, eigen, wfc_2d.c, work,
-                    comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
-                    THIS_REAL_ELPA_KERNEL_API,
-                    wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
+        info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
+                              ch_mat, Stmp, eigen, wfc_2d.c, work,
+                              comm_2D_f, blacs_ctxt,
+                              method, THIS_REAL_ELPA_KERNEL_API,
+                              wantEigenVector, wantDebug);
+        timer::tick("Diago_LCAO_Matrix","genelpa",'G');
 
         // the eigenvalues.
         dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
         delete[] eigen;
-        timer::tick("Diago_LCAO_Matrix","genelpa",'G');
-
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');

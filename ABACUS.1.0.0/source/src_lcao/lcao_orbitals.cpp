@@ -291,7 +291,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
 	const int N_PROJECTORS = atom->nh;//zhengdy-soc
-	cout << " number of projectros " << N_PROJECTORS << endl;
+//cout << " number of projectros " << N_PROJECTORS << endl;
 //	cout << " number of projectros " << n_projectors << endl;
 
 	// set the nonlocal projector objects

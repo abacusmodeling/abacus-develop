@@ -17,7 +17,7 @@ move_method         cg
 smearing            gaussian
 sigma               0.02
 #Parameters (3.PW)
-ecutwfc             16
+ecutwfc             30
 dr2                 1e-5
 niter		    100
 
@@ -29,14 +29,4 @@ charge_extrap       second-order
 md_mdtype          1
 md_dt              1
 md_tfirst          1373
-md_mdoutpath       mdtest
 md_rstmd           0
-md_fixtemperature  20000
-md_nresn           3
-md_nyosh           3
-md_qmass           1
-md_tlast           1373
-md_dumpmdfred      1
-md_domsd           1
-md_domsdatom       1
-md_outputstressperiod    0

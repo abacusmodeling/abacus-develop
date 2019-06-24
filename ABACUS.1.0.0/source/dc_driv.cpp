@@ -100,7 +100,7 @@ void DC_Driv::reading(void)
 
 
 
-	if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="nscf"
+    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax" || CALCULATION=="nscf"
 	        || CALCULATION=="istate" || CALCULATION=="ienvelope"
 	        || CALCULATION=="md") //pengfei 2014-10-13
 	{
@@ -116,8 +116,13 @@ void DC_Driv::reading(void)
 		}
 		if(CALCULATION=="relax") //add 4 lines 2015-09-06, xiaohui
 		{
-			cout << " This calculation is structure relaxation" << endl;
+            //cout << " This calculation is structure relaxation" << endl;
+            cout << " This calculation is ion relaxation" << endl;
 		}
+        if(CALCULATION=="cell-relax")
+        {
+            cout << " This calculation is cell relaxation" << endl;
+        }
 		if(CALCULATION=="md") //add 4 lines 2015-09-06, xiaohui
 		{
 			cout << " This calculation is molecular dynamics" << endl;
@@ -142,7 +147,7 @@ void DC_Driv::reading(void)
 		// TITLE
 		cout << " " << setw(8) << "SPIN"
 		     << setw(16) << "KPOINTS"
-		     << setw(12) << "PROCESSOR";
+		     << setw(12) << "PROCESSORS";
 
 		//if(LOCAL_BASIS==4) xiaohui modify 2013-09-01
 		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
