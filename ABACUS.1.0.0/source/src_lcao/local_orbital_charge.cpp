@@ -439,7 +439,6 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 				{
 					DM[is][i] = &DM_pool[is][i*lgd_now];
 				}
-                setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
 				Memory::record("LocalOrbital_Charge","Density_Kernal",NSPIN*lgd_now*lgd_now,"double");
 			}
 		}
@@ -457,6 +456,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 		WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
 	}
 	
+    if(!BFIELD) setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
 	wfc_dm_2d.init();		// Peize Lin test 2019-01-16
 	return;
 }
