@@ -253,15 +253,6 @@ inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
     Cblacs_pinfo(&myproc, &nprocs);
     
     // init data arrays
-    int current_sender_index_size=GridT.lgd*GridT.lgd*2;
-    if(current_sender_index_size > sender_index_size)
-    {
-        sender_index_size=current_sender_index_size;
-        // OUT(ofs_running, "sender_index_size:", sender_index_size);
-        delete[] sender_local_index;
-        sender_local_index=new int[sender_index_size];
-    }
-
     static bool FIRST_RUN=true;
     if(FIRST_RUN)
     {
@@ -280,7 +271,11 @@ inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
     // build the local index to be sent to other process (sender_local_index),
     //       the global index to be received from other process (receiver_global_index),
     //       the send/receive size/displacement for data exchange by MPI_Alltoall
-    int *sender_global_index=new int[current_sender_index_size];
+    sender_index_size=GridT.lgd*GridT.lgd*2;
+    delete[] sender_local_index;
+    sender_local_index=new int[sender_index_size];
+
+    int *sender_global_index=new int[sender_index_size];
 
     int pos=0;
     sender_size_process[0]=0;
@@ -325,21 +320,15 @@ inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
     MPI_Alltoall(sender_size_process, 1, MPI_INT, 
                  receiver_size_process, 1, MPI_INT, comm_2D);
 
-    int current_receiver_index_size=receiver_size_process[0];
+    receiver_index_size=receiver_size_process[0];
     receiver_displacement_process[0]=0;
     for(int i=1; i<nprocs; ++i)
     {
-        current_receiver_index_size+=receiver_size_process[i];
+        receiver_index_size+=receiver_size_process[i];
         receiver_displacement_process[i]=receiver_displacement_process[i-1]+receiver_size_process[i-1];
     }
-
-    if(current_receiver_index_size > receiver_index_size)
-    {
-        receiver_index_size=current_receiver_index_size;
-        // OUT(ofs_running, "receiver_index_size:", receiver_index_size);
-        delete[] receiver_global_index;
-        receiver_global_index=new int[receiver_index_size];
-    }
+	delete[] receiver_global_index;
+	receiver_global_index=new int[receiver_index_size];
 
     // send the global index in sendBuffer to recvBuffer
     MPI_Alltoallv(sender_global_index, sender_size_process, sender_displacement_process, MPI_INT, 
@@ -359,22 +348,13 @@ inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
         receiver_displacement_process[iproc]=receiver_displacement_process[iproc]/2;
     }
     
-    int current_sender_size=current_sender_index_size/2;
-    if(current_sender_size > sender_size)
-    {
-        sender_size=current_sender_size;
-        // OUT(ofs_running, "sender_size:", sender_size);
-        delete[] sender_buffer;
-        sender_buffer=new double[sender_size];
-    }
-    int current_receiver_size=current_receiver_index_size/2;
-    if(current_receiver_size > receiver_size)
-    {
-        receiver_size=current_receiver_size;
-        // OUT(ofs_running, "receiver_size:", receiver_size);
-        delete[] receiver_buffer;
-        receiver_buffer=new double[receiver_size];
-    }
+    sender_size=sender_index_size/2;
+	delete[] sender_buffer;
+	sender_buffer=new double[sender_size];
+
+    receiver_size=receiver_index_size/2;
+	delete[] receiver_buffer;
+	receiver_buffer=new double[receiver_size];
 
     return 0;
 }
