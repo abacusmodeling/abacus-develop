@@ -1,5 +1,6 @@
 from util import *
 import torch
+import numpy as np
 
 def random_C_init(info):
 	""" C[it][il][ie,iu] """
@@ -7,8 +8,7 @@ def random_C_init(info):
 	for it in info.Nt_all:
 		C[it] = ND_list(info.Nl[it])
 		for il in range(info.Nl[it]):
-			C_tmp = torch.randn( info.Ne[it], info.Nu[it][il] )*2-1					#[-1,1]
-			C[it][il] = torch.autograd.Variable( C_tmp, requires_grad = True )
+			C[it][il] = torch.tensor(np.random.uniform(-1,1, (info.Ne[it], info.Nu[it][il])), dtype=torch.float32, requires_grad=True)
 	return C
 	
 	
@@ -62,7 +62,7 @@ def write_C(file_name,info,C):
 					print("\tType\tL\tZeta-Orbital", file=file)
 					print(f"\t  {info.Nt_all.index(it)+1} \t{il}\t    {iu+1}", file=file)
 					for ie in range(C_tl.size()[0]):
-						print("\t", C_tl.data[ie,iu], file=file)
+						print("\t", C_tl[ie,iu].item(), file=file)
 		print("</Coefficient>", file=file)
 	
 	

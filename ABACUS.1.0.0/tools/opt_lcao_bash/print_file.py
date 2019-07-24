@@ -144,7 +144,7 @@ def print_file_opt(info,dis):
 				"Rcut":		{info["input"]["element"] : info["input"]["rcut"]},
 				"dr":		{info["input"]["element"] : utils.dr},
 				"Ecut":		{info["input"]["element"] : info["input"]["ecut"]},
-				"lr":		0.01
+				"lr":		utils.lr
 			},
 			"C_init_info": {
 				"init_from_file":	False

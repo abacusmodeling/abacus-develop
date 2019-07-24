@@ -20,7 +20,7 @@ def generate_orbital(info,C,E,Rcut,dr):
 				for ir in range(Nr):
 					r = ir * dr[it]
 					for ie in range(info.Ne[it]):
-						orb[it][il][iu][ir] += C[it][il].data[ie,iu] * spherical_jn(il,E[it].data[il,ie]*r)
+						orb[it][il][iu][ir] += C[it][il][ie,iu].item() * spherical_jn(il,E[it][il,ie].item()*r)
 	return orb
 						
 						
@@ -76,5 +76,5 @@ def set_E(info,Rcut):
 	eigenvalue = { it:find_eigenvalue(info.Nl[it],info.Ne[it]) for it in info.Nt_all }
 	E = dict()
 	for it in Rcut:
-		E[it] = torch.autograd.Variable(torch.from_numpy(( eigenvalue[it]/Rcut[it] ).astype("float32")))
+		E[it] = torch.from_numpy(( eigenvalue[it]/Rcut[it] ).astype("float32"))
 	return E

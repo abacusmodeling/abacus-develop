@@ -97,7 +97,7 @@ class Opt_Orbital:
 						Q_s[it] = torch_complex.cat(Q_ts)
 					# Q_cat[it*il*ia*im*iu]
 					Q_cat = torch_complex.cat(list(Q_s.values()))
-					V_s[ib] = torch_complex.dot( Q_cat.conj(), torch_complex.mv( S_I, Q_cat ) ).real
+					V_s[ib] = torch_complex.dot( Q_cat.conj(), torch_complex.mv( S_I, Q_cat ) ).real.view(-1)
 				# V[ist][ib]
 				V[ist] = torch.cat(V_s)
 			else:
@@ -121,16 +121,16 @@ class Opt_Orbital:
 	
 	def cal_T(self,C,E):
 		""" T = 0.5* sum_{it,il,iu} sum_{ie} ( E[it][il,ie] * C[it][il][ie,iu] )**2 """
-		T = torch.autograd.Variable(torch.zeros(1))
+		T = torch.zeros(1)
 		num = 0
 		for it,C_t in C.items():
 			for il,C_tl in enumerate(C_t):
 				for iu in range(C_tl.size()[1]):
-					T_tlu = torch.autograd.Variable(torch.zeros(1))
+					T_tlu = torch.zeros(1)
 					Z_tlu = 0
 					for ie in range(C_tl.size()[0]):
 						T_tlu = T_tlu + ( E[it][il,ie] * C_tl[ie,iu] )**2
-						Z_tlu = Z_tlu + E[it].data[il,ie]**2
+						Z_tlu = Z_tlu + E[it][il,ie].item()**2
 					T = T + T_tlu/Z_tlu
 				num += C_tl.size()[1]
 		T = 0.5 * T / num

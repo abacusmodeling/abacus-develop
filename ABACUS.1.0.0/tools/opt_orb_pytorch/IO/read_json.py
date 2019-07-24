@@ -54,6 +54,7 @@ def read_json(file_name):
 	Rcut	{"S":10, "O":10}
 	dr		{"S":0.01, "O":0.01}
 	Ecut	{"S":100, "O":100}
+	lr		0.01
 	Nl		{"S":2, "O":2}
 	Nst		3
 	Nt		[["S"], ["S","O"], ["S","O"]]

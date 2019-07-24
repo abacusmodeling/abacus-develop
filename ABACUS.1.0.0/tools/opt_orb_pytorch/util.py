@@ -29,8 +29,6 @@ def change_to_cuda(s):
 		return {i:change_to_cuda(x) for i,x in s.items()}
 	elif isinstance(s,torch.Tensor):
 		return s.cuda()
-	elif isinstance(s,torch.autograd.Variable):
-		return s.cuda()
 	elif isinstance(s,torch_complex.ComplexTensor):
 		return torch_complex.ComplexTensor( change_to_cuda(s.real), change_to_cuda(s.imag) ) 
 	else:
