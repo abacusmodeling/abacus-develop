@@ -104,9 +104,6 @@ public:
 		double cauchy_threshold = 0;
 		
 		Exx_Lcao::Distribute_Type distribute_type;
-		
-		Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode H_mixing_mode;
-		double H_mixing_beta;
 
 		Exx_Info( const Exx_Global::Exx_Info &info_global );
 	};

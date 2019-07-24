@@ -435,9 +435,6 @@ void Input::Default(void)
 		
 	exx_distribute_type = "htime";
 		
-	exx_h_mixing_mode = "no";
-	exx_h_mixing_beta = 0.7;
-		
 	exx_opt_orb_lmax = 0;
 	exx_opt_orb_ecut = 0.0;
 	exx_opt_orb_tolerence = 0.0;
@@ -1545,14 +1542,6 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, exx_distribute_type);
         }
-        else if (strcmp("exx_h_mixing_mode", word) == 0)
-        {
-            read_value(ifs, exx_h_mixing_mode);
-        }
-        else if (strcmp("exx_h_mixing_beta", word) == 0)
-        {
-            read_value(ifs, exx_h_mixing_beta);
-        }		
         else if (strcmp("exx_opt_orb_lmax", word) == 0)
         {
             read_value(ifs, exx_opt_orb_lmax);
@@ -1965,8 +1954,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( exx_schwarz_threshold );		
 	Parallel_Common::bcast_double( exx_cauchy_threshold );		
 	Parallel_Common::bcast_string( exx_distribute_type );
-	Parallel_Common::bcast_string( exx_h_mixing_mode );		
-	Parallel_Common::bcast_double( exx_h_mixing_beta );
 	Parallel_Common::bcast_int( exx_opt_orb_lmax );
 	Parallel_Common::bcast_double( exx_opt_orb_ecut );
 	Parallel_Common::bcast_double( exx_opt_orb_tolerence );
@@ -2589,14 +2576,6 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans");
 		}
-		if(exx_h_mixing_mode!="no" && exx_h_mixing_mode!="plain" && exx_h_mixing_mode!="pulay")
-		{
-			WARNING_QUIT("INPUT","exx_h_mixing_mode must be no, plain or pulay");
-		}
-		if(exx_h_mixing_beta<0 || exx_h_mixing_beta>1)
-		{
-			WARNING_QUIT("INPUT","must 0 < exx_h_mixing_beta < 1");
-		}
 	}
 	if(exx_hybrid_type=="opt_orb")
 	{
@@ -2969,8 +2948,6 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"exx_schwarz_threshold",exx_schwarz_threshold,"");
 	OUTP(ofs,"exx_cauchy_threshold",exx_cauchy_threshold,"");
 	OUTP(ofs,"exx_distribute_type",exx_distribute_type,"htime or kmeans");
-	OUTP(ofs,"exx_h_mixing_mode",exx_h_mixing_mode,"no, plain or pulay");
-	OUTP(ofs,"exx_h_mixing_beta",exx_h_mixing_beta,"");
 	OUTP(ofs,"exx_opt_orb_lmax",exx_opt_orb_lmax,"");
 	OUTP(ofs,"exx_opt_orb_ecut",exx_opt_orb_ecut,"");
 	OUTP(ofs,"exx_opt_orb_tolerence",exx_opt_orb_tolerence,"");

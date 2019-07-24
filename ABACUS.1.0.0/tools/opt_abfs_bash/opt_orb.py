@@ -42,7 +42,8 @@ def set_input(folders_matrix):
 			"weight":	[weight for weight,nbands in folders_matrix.values()],
 			"Rcut":		read_stru.get_Rcut(),
 			"dr":		{T:utils.dr for T in Ts},
-			"Ecut":		{T:Ecut for T in Ts}
+			"Ecut":		{T:Ecut for T in Ts},
+			"lr":		0.01
 		},
 		"C_init_info":{ "init_from_file": False },
 		"V_info":
@@ -68,6 +69,7 @@ def cal(input):
 				#PBS -e job.err
 				ulimit -s unlimited
 				cd $PBS_O_WORKDIR
+				export OMP_NUM_THREADS=1
 				EXEC={info["opt_orb"]}
 				python3 -u $EXEC
 				"""))

@@ -30,7 +30,8 @@ def read_json(file_name):
 			"weight":	[2,3,1.5],
 			"Rcut":		{"S":10,"O":10},
 			"dr":		{"S":0.01,"O":0.01},
-			"Ecut":		{"S":100,"O":100}
+			"Ecut":		{"S":100,"O":100},
+			"lr":		0.01
 		},
 		"C_init_info":
 		{

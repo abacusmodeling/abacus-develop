@@ -39,7 +39,7 @@ def cal():
 		with open(f"{utils.folder_exx}/sub.sh","w") as file:
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
-				#PBS -q batch
+				#PBS -q gold5120
 				#PBS -l nodes=1:ppn=28
 				#PBS -l walltime=24:00:00
 				#PBS -o job.log
@@ -47,7 +47,7 @@ def cal():
 				ulimit -s unlimited
 				cd $PBS_O_WORKDIR
 				EXEC={info["ABACUS"]}
-				mpirun -n 1 $EXEC
+				mpirun -n 1 -env OMP_NUM_THREADS=28 $EXEC
 				"""))
 	elif utils.sub=="bsub":
 		with open(f"{utils.folder_exx}/sub.sh","w") as file:
@@ -56,8 +56,7 @@ def cal():
 				#BSUB -q renxg
 				#BSUB -o job.log -e job.err
 				#BSUB -n 6
-				export OMP_NUM_THREADS=6
-				mpirun -n 1 {info['ABACUS']}
+				mpirun -n 1 -env OMP_NUM_THREADS=6 {info['ABACUS']}
 				"""))
 
 	os.chdir(utils.folder_exx)

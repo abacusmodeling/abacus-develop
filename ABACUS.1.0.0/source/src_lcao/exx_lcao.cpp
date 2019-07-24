@@ -430,8 +430,21 @@ gettimeofday( &t_start_all, NULL);
 //	DM.flag_mix = info.separate_loop ? false : true;
 //	DM.flag_mix = false;		// Peize Lin test
 
-	Hexx_para.mixing_mode = info.H_mixing_mode;
-	Hexx_para.mixing_beta = info.H_mixing_beta;
+	if(exx_global.info.separate_loop)
+	{
+		Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
+		Hexx_para.mixing_beta = 0;
+	}
+	else
+	{
+		if("plain"==chr.mixing_mode)
+			Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Plain;
+		else if("pulay"==chr.mixing_mode)
+			Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Pulay;
+		else
+			throw invalid_argument("exx mixing error. exx_separate_loop==false, mixing_mode!=plain or pulay");
+		Hexx_para.mixing_beta = chr.mixing_beta;
+	}
 
 gettimeofday( &t_start, NULL);
 	this->lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
@@ -1317,8 +1330,11 @@ gettimeofday( &t_start_all, NULL);
 
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR_tmp(NSPIN);
 	
-	while(const size_t i_atom_pair_now = i_atom_pair++ < atom_pairs_core.size() )
+	while(true)
 	{
+		const size_t i_atom_pair_now = i_atom_pair++;
+		if( i_atom_pair_now >= atom_pairs_core.size() )		break;
+		
 		const size_t iat1 = atom_pairs_core[i_atom_pair_now].first;
 		const size_t iat2 = atom_pairs_core[i_atom_pair_now].second;
 		

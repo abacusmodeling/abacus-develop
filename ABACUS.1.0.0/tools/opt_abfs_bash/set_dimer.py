@@ -88,7 +88,7 @@ def cal_ABACUS(T1,T2,i_dis):
 		with open(folder/"sub.sh","w") as file:
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
-				#PBS -q batch
+				#PBS -q gold5120
 				#PBS -l nodes=1:ppn=1
 				#PBS -l walltime=1:00:00
 				#PBS -o job.log
@@ -96,7 +96,7 @@ def cal_ABACUS(T1,T2,i_dis):
 				ulimit -s unlimited
 				cd $PBS_O_WORKDIR
 				EXEC={info["ABACUS"]}
-				mpirun -n 1 $EXEC
+				mpirun -n 1 -env OMP_NUM_THREADS=1 $EXEC
 				"""))
 	elif utils.sub=="bsub":
 		with open(folder/"sub.sh","w") as file:
@@ -105,9 +105,8 @@ def cal_ABACUS(T1,T2,i_dis):
 				#BSUB -q renxg
 				#BSUB -o job.log -e job.err
 				#BSUB -n 1
-				export OMP_NUM_THREADS=1
 				EXEC={info["ABACUS"]}
-				mpirun -n 1 $EXEC
+				mpirun -n 1 -env OMP_NUM_THREADS=1 $EXEC
 				"""))
 
 	os.chdir(folder)

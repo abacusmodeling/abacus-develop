@@ -61,7 +61,7 @@ opt_orb = opt_orbital.Opt_Orbital()
 #opt_orb_old = opt_orbital_old.Opt_Orbital()
 
 #opt = torch.optim.Adam(sum( ([c.real,c.imag] for c in sum(C,[])), []), lr=1e-1, eps=1e-8)
-opt = torch.optim.Adam( sum(C.values(),[]), lr=1E-2, eps=1e-20)
+opt = torch.optim.Adam( sum(C.values(),[]), lr=info.lr, eps=1e-20)
 
 with open("Spillage.dat","w") as S_file:
 
