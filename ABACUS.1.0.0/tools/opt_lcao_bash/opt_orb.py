@@ -4,6 +4,7 @@ import pathlib
 from read_info import read_info
 from print_file import print_file_pw, print_file_opt
 from dis import dis
+import utils
 
 def cal_pw():
 	info = read_info("info.json")
@@ -25,7 +26,6 @@ def cal_opt():
 	pathlib.Path("opt_orb").mkdir(parents=True,exist_ok=False)
 	os.chdir("opt_orb")
 	print_file_opt(info,dis)
-	os.system("qsub sub.sh")
 	if utils.sub=="qsub":
 		os.system("qsub sub.sh")
 	elif utils.sub=="bsub":

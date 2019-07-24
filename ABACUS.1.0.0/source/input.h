@@ -334,9 +334,6 @@ public:
 	
 	string exx_distribute_type;
 	
-	string exx_h_mixing_mode;	// "no", "plain"
-	double exx_h_mixing_beta;
-	
 	int exx_opt_orb_lmax;
 	double exx_opt_orb_ecut;
 	double exx_opt_orb_tolerence;

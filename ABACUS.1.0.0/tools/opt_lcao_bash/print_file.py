@@ -98,11 +98,12 @@ def print_file_pw(info,dis):
 
 
 
-	elif utils.sub=="qsub":
+	if utils.sub=="qsub":
 		with open("sub.sh","w") as file:
+			core = info["exe"]["qsub"][0]*info["exe"]["qsub"][1]
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
-				#PBS -q batch
+				#PBS -q gold5120
 				#PBS -l nodes={info["exe"]["qsub"][0]}:ppn={info["exe"]["qsub"][1]}
 				#PBS -l walltime=1:00:00
 				#PBS -o job.log
@@ -110,7 +111,7 @@ def print_file_pw(info,dis):
 				ulimit -s unlimited
 				cd $PBS_O_WORKDIR
 				EXEC={info["exe"]["exe_pw"]}
-				mpirun -n {info["exe"]["qsub"][0]*info["exe"]["qsub"][1]} $EXEC
+				mpirun -n {core} -env OMP_NUM_THREADS=1 $EXEC
 				"""))
 	elif utils.sub=="bsub":
 		with open("sub.sh","w") as file:
@@ -120,9 +121,8 @@ def print_file_pw(info,dis):
 				#BSUB -q renxg
 				#BSUB -o job.log -e job.err
 				#BSUB -n {core}
-				export OMP_NUM_THREADS=1
 				EXEC={info["exe"]["exe_pw"]}
-				mpirun -n {core} $EXEC
+				mpirun -n {core} -env OMP_NUM_THREADS=1 $EXEC
 				"""))
 	else:
 		raise KeyError("utils.sub = ",utils.sub)
@@ -143,7 +143,8 @@ def print_file_opt(info,dis):
 				"weight":	[1] * len(dis[info["input"]["element"]]),
 				"Rcut":		{info["input"]["element"] : info["input"]["rcut"]},
 				"dr":		{info["input"]["element"] : utils.dr},
-				"Ecut":		{info["input"]["element"] : info["input"]["ecut"]}
+				"Ecut":		{info["input"]["element"] : info["input"]["ecut"]},
+				"lr":		utils.lr
 			},
 			"C_init_info": {
 				"init_from_file":	False
@@ -156,17 +157,18 @@ def print_file_opt(info,dis):
 		file.write(json.dumps(input,indent=4))
 		
 		
-	elif utils.sub=="qsub":
+	if utils.sub=="qsub":
 		with open("sub.sh","w") as file:
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
-				#PBS -q batch
+				#PBS -q gold5120
 				#PBS -l nodes=1:ppn=1
 				#PBS -l walltime=1:00:00
 				#PBS -o job.log
 				#PBS -e job.err
 				ulimit -s unlimited
 				cd $PBS_O_WORKDIR
+				export OMP_NUM_THREADS=1
 				EXEC={info["exe"]["exe_orbital"]}
 				python3 $EXEC
 				"""))

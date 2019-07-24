@@ -422,13 +422,6 @@ void Input_Conv::Convert(void)
 			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
 		else if(INPUT.exx_distribute_type=="kmeans")
 			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans;
-		if(INPUT.exx_h_mixing_mode=="no")
-			exx_lcao.info.H_mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
-		else if(INPUT.exx_h_mixing_mode=="plain")
-			exx_lcao.info.H_mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Plain;
-		else if(INPUT.exx_h_mixing_mode=="pulay")
-			exx_lcao.info.H_mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Pulay;
-		exx_lcao.info.H_mixing_beta = INPUT.exx_h_mixing_beta;
 		Exx_Abfs::Jle::Lmax      = INPUT.exx_opt_orb_lmax;
 		Exx_Abfs::Jle::Ecut_exx  = INPUT.exx_opt_orb_ecut;
 		Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
