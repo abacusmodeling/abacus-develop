@@ -52,7 +52,7 @@ public:
 	
 private:
 	
-	int rmesh_times = 1;				// Peize Lin test
+	double rmesh_times;
 	int kmesh_times = 4;				// Peize Lin test
 	
 #if EXX_DM==1

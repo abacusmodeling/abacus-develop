@@ -148,7 +148,7 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 	const vector<Vector3_Order<int>> &Coulomb_potential_boxes,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Element_Basis_Index::IndexLNM &index_abfs,
-	const int rmesh_times,
+	const double rmesh_times,
 	const double threshold,
 	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {

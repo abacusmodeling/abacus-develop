@@ -2,21 +2,35 @@
 #define CONV_COULOMB_POT_K_H
 
 #include<vector>
-#include<limits>
+#include<map>
+#include<string>
 
 class Conv_Coulomb_Pot_K
 {
 public:
 
-	enum class Ccp_Type{ Ccp, Hse };
+	enum class Ccp_Type{		//  parameter:
+		Ccp,					//
+		Hse};					//  	"hse_omega"
 	
-	template<typename T> static T cal_orbs_ccp(
+	template<typename T> static T cal_orbs_ccp_rmesh(
 		const T & orbs,
 		const Ccp_Type &ccp_type,
-		const double rmesh_times = 1,
-		const double omega = std::numeric_limits<double>::min(),
-		const double Rcut = std::numeric_limits<double>::max());
+		const std::map<std::string,double> &parameter,
+		double &rmesh_times);
 	
+private:
+
+	template<typename T> static T cal_orbs_ccp(
+		const T &orbs,
+		const Ccp_Type &ccp_type,
+		const std::map<std::string,double> &parameter,
+		const double rmesh_times);
+		
+	template< typename T > static double get_rmesh_proportion(
+		const T &orbs,
+		const double psi_threshold);
+		
 private:
 
 	static std::vector<double> cal_psi_ccp( const std::vector<double> & psif );

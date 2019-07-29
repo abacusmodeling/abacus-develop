@@ -25,11 +25,10 @@ std::vector<double> Conv_Coulomb_Pot_K::cal_psi_hse(
 
 template<>
 Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
-	const Numerical_Orbital_Lm & orbs,
+	const Numerical_Orbital_Lm &orbs,
 	const Ccp_Type &ccp_type,
-	const double rmesh_times,
-	const double omega,
-	const double Rcut)
+	const std::map<std::string,double> &parameter,
+	const double rmesh_times)
 {
 	std::vector<double> psik2_ccp;
 	switch(ccp_type)
@@ -37,7 +36,7 @@ Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		case Ccp_Type::Ccp:
 			psik2_ccp = cal_psi_ccp( orbs.get_psif() );		break;
 		case Ccp_Type::Hse:
-			psik2_ccp = cal_psi_hse( orbs.get_psif(), orbs.get_k_radial(), omega );		break;
+			psik2_ccp = cal_psi_hse( orbs.get_psif(), orbs.get_k_radial(), parameter.at("hse_omega") );		break;
 		default:
 			throw( TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );		break;
 	}
@@ -72,4 +71,17 @@ Numerical_Orbital_Lm Conv_Coulomb_Pot_K::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		false,
 		true);
 	return orbs_ccp;
+}
+
+template<>
+double Conv_Coulomb_Pot_K::get_rmesh_proportion(
+	const Numerical_Orbital_Lm &orbs,
+	const double psi_threshold)
+{
+	for(int ir=orbs.getNr()-1; ir>=0; --ir)
+	{
+		if(std::abs(orbs.getPsi(ir))>=psi_threshold)
+			return static_cast<double>(ir)/orbs.getNr();
+	}
+	throw runtime_error("psi_threshold too small. "+TO_STRING(__FILE__)+TO_STRING(__LINE__));
 }

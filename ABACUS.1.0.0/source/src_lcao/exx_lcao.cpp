@@ -54,8 +54,7 @@ static matrix transform (
 
 // Peize Lin test
 Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
-	:rmesh_times(10),
-	 kmesh_times(4),
+	:kmesh_times(4),
 	 info(info_global)
 {	
 	auto test_gemm = []()
@@ -517,13 +516,14 @@ gettimeofday( &t_start, NULL);
 	{
 		case Exx_Global::Hybrid_Type::HF:
 		case Exx_Global::Hybrid_Type::PBE0:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, this->rmesh_times );		break;
+			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, this->rmesh_times );		break;
 		case Exx_Global::Hybrid_Type::HSE:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, this->rmesh_times, info.hse_omega );	break;
+			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, this->rmesh_times );	break;
 		default:
 			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 	}
-ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"rmesh_times:\t"<<rmesh_times<<endl;
 
 	auto print_psik = [](
 		const string & file_name,
@@ -1089,7 +1089,6 @@ timeval t_start;
 			os<<"("<<a.first<<","<<a.second<<")"<<"\t";
 		os<<endl;
 	};
-	print_atom(ofs_mpi);
 	auto print_radial_R = [&](ostream &os)
 	{
 		os<<"radial_R"<<endl;
@@ -1143,7 +1142,6 @@ gettimeofday( &t_start, NULL);
 		}
 	}
 ofs_mpi<<"TIME@ radial_R_C\t"<<time_during(t_start)<<endl;
-print_radial_R(ofs_mpi);
 
 	#if TEST_EXX_LCAO==1
 		ofs_C.close();
@@ -1191,7 +1189,6 @@ gettimeofday( &t_start, NULL);
 		}
 	}
 ofs_mpi<<"TIME@ radial_R_V\t"<<time_during(t_start)<<endl;
-print_radial_R(ofs_mpi);
 	#if TEST_EXX_LCAO==1
 		ofs_V.close();
 	#elif TEST_EXX_LCAO==-1
