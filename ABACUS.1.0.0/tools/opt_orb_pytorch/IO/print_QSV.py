@@ -3,7 +3,7 @@ def print_V(V,file_name):
 	with open(file_name,"w") as file:
 		for V_s in V:
 			for V_sb in V_s:
-				print(1-V_sb.data[0],end="\t",file=file)
+				print(1-V_sb.item(),end="\t",file=file)
 			print(file=file)
 			
 def print_S(S,file_name):
@@ -14,8 +14,8 @@ def print_S(S,file_name):
 				for il1,S_ttl in enumerate(S_tt):
 					for il2,S_ttll in enumerate(S_ttl):
 						print(ist,it1,it2,il1,il2,file=file)
-						print(S_ttll.real.data.numpy(),file=file)
-						print(S_ttll.imag.data.numpy(),"\n",file=file)
+						print(S_ttll.real.numpy(),file=file)
+						print(S_ttll.imag.numpy(),"\n",file=file)
 						
 def print_Q(Q,file_name):
 	""" Q[ist][it][il][ib,ia*im*iu] """
@@ -24,6 +24,6 @@ def print_Q(Q,file_name):
 			for it,Q_st in Q_s.items():
 				for il,Q_stl in enumerate(Q_st):
 					print(ist,it,il,file=file)
-					print(Q_stl.real.data.numpy(),file=file)
-					print(Q_stl.imag.data.numpy(),"\n",file=file)
+					print(Q_stl.real.numpy(),file=file)
+					print(Q_stl.imag.numpy(),"\n",file=file)
 					

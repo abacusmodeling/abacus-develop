@@ -4,7 +4,6 @@ import IO.func_C
 import IO.read_json
 import IO.print_orbital
 import opt_orbital
-#import opt_orbital_old
 import orbital
 import torch
 import numpy as np
@@ -18,10 +17,6 @@ file_list, info, C_init_info, V_info = IO.read_json.read_json("input.json")
 QI,SI,VI = IO.read_QSV.read_file(info,file_list,V_info)
 print(info)
 
-#print("QI:\t",QI)
-#print("SI:\t",SI)
-#print("VI:\t",VI)
-
 if C_init_info["init_from_file"]:
 	C = IO.func_C.read_C_init( C_init_info["C_init_file"], info )
 else:
@@ -29,39 +24,9 @@ else:
 E = orbital.set_E(info,info.Rcut)
 orbital.normalize( orbital.generate_orbital(info,C,E,info.Rcut,info.dr), info.dr,C,flag_norm_C=True)
 
-"""
-Q = opt_orb.cal_Q(QI,C,info)
-S = opt_orb.cal_S(SI,C,info)
-V = opt_orb.cal_V(Q,S,info)
-IO.print_QSV.print_Q(Q,"Q.dat")
-IO.print_QSV.print_Q(QI,"QI.dat")
-IO.print_QSV.print_S(S,"S.dat")
-IO.print_QSV.print_S(SI,"SI.dat")
-IO.print_QSV.print_V(V,"V.dat")
-
-Spillage = V_true-sum((sum(Vi[:info.Nb_true[ist]]) for ist,Vi in enumerate(V) ))/sum(info.Nb_true,0)
-T = opt_orb.cal_T(C,E)
-Loss = Spillage + 0.01*T
-
-orb = orbital.generate_orbital(info,C,E,info.Rcut,info.dr)
-orbital.smooth_orbital(orb,info.Rcut,info.dr,0.1)
-orbital.orth(orb,info.dr)
-IO.print_orbital.print_orbital(orb)
-IO.print_orbital.print_orbital_plot(orb,info.Rcut,info.dr)
-
-with open("Spillage.dat","w") as S_file, open("C.dat","w") as C_file:
-	print(Spillage.data[0],T.data[0],Loss.data[0],file=S_file)
-	print(C,file=C_file)
-	print("time:\t",time.time()-time_start)
-
-exit()
-"""
-
-
 opt_orb = opt_orbital.Opt_Orbital()
-#opt_orb_old = opt_orbital_old.Opt_Orbital()
 
-#opt = torch.optim.Adam(sum( ([c.real,c.imag] for c in sum(C,[])), []), lr=1e-1, eps=1e-8)
+#opt = torch.optim.Adam(sum( ([c.real,c.imag] for c in sum(C,[])), []), lr=info.lr, eps=1e-8)
 opt = torch.optim.Adam( sum(C.values(),[]), lr=info.lr, eps=1e-20)
 
 with open("Spillage.dat","w") as S_file:
@@ -71,31 +36,7 @@ with open("Spillage.dat","w") as S_file:
 	for i in range(20000):
 		Q = opt_orb.cal_Q(QI,C,info)
 		S = opt_orb.cal_S(SI,C,info)
-		V = opt_orb.cal_V(Q,S,info,V_info)
-#		V_old = opt_orb_old.cal_V(Q,S,info)
-
-		"""
-		with open("V_old.dat","w") as file:
-			for v_old in V_old:
-				for vi in v_old:
-					print(vi.data[0],end="\t",file=file)
-				print(file=file)
-		with open("V.dat","w") as file:
-			for v in V:
-				for i in range(v.size()[0]):
-					for j in range(v.size()[1]):
-						print(v.data[i,j],end="\t",file=file)
-					print(file=file)
-				print(file=file)
-		with open("VI.dat","w") as file:
-			for v in VI:
-				for i in range(v.size()[0]):
-					for j in range(v.size()[1]):
-						print(v.data[i,j],end="\t",file=file)
-					print(file=file)
-				print(file=file)
-		"""
-				
+		V = opt_orb.cal_V(Q,S,info,V_info)				
 
 		V_delta = ( torch.abs(VIi-Vi) for VIi,Vi in zip(VI,V) )		# abs or **2?
 		if V_info["same_band"]:
@@ -106,9 +47,9 @@ with open("Spillage.dat","w") as S_file:
 		if not "TSrate" in vars():	TSrate = torch.abs(0.002*Spillage/T).data[0]
 		Loss = Spillage + TSrate*T
 
-		print(Spillage.data[0],T.data[0],Loss.data[0],file=S_file)
-		if Loss.data[0] < loss_old:
-			loss_old = Loss.data[0]
+		print(Spillage.item(),T.item(),Loss.item(),file=S_file)
+		if Loss.item() < loss_old:
+			loss_old = Loss.item()
 			C_old = IO.func_C.copy_C(C,info)
 			flag_finish = 0
 		else:
