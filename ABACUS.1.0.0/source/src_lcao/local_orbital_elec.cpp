@@ -289,6 +289,17 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
 
+		if (ocp == 1)
+		{
+			for (int ik=0; ik<kv.nks; ik++)
+			{
+				for (int ib=0; ib<NBANDS; ib++)
+				{
+					wf.wg(ik,ib)=ocp_kb[ik*NBANDS+ib];
+				}
+			}
+		}
+
 /*		if(istep==0)
 		{
 			for (int ib=0; ib < 3; ib++)

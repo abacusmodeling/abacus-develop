@@ -92,6 +92,9 @@ int val_elec_02 =1;
 int val_elec_03 =1;
 int vext =0;
 int vext_dire=1;
+int ocp=0;
+int ocp_n=0;
+double ocp_kb[10000];
 
 //----------------------------------------------------------
 // EXPLAIN : Parallel information

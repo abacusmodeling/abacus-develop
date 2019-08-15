@@ -103,6 +103,9 @@ extern int val_elec_03;
 extern int vext;
 extern int vext_dire;
 
+extern int ocp;
+extern int ocp_n;
+extern double ocp_kb[10000];
 
 //========================================================================
 // EXPLAIN : Parallel information
