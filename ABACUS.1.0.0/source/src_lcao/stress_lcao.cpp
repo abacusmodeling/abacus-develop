@@ -113,7 +113,11 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 		vdwd2.stress();
 	}
 */	
-	
+/*	if(vdwd3.vdwD3)									//jiyy add 2019-05-18
+	{
+		vdwd3.stress();
+	}
+*/	
 /*	matrix sefield;
 	if(EFIELD)
 	{
@@ -139,6 +143,10 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 			{
 				scs[i][j] += stress_vdw(i , j);
 			}
+			if(vdwd3.vdwD3)			// jiyy add 2019-05-18
+			{
+				scs[i][j] += stress_vdw(i , j);
+			}   
 	/*		if(EFIELD)
 			{
 				scs(iat, i) = scs(iat, i) + sefield(iat, i);

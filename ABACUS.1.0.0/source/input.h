@@ -241,7 +241,7 @@ public:
 	double md_ediffg;             //parameter for constraining max force change
         int md_msdstartTime;            //choose which step that msd be calculated 
 //end of zhengdaye's add
-//==========================================================
+/* //==========================================================
 // vdwD2
 // Peize Lin add 2014-03-31
 //==========================================================
@@ -255,8 +255,29 @@ public:
 	string vdwD2_model;			//"period" or "radius"
 	Vector3<int> vdwD2_period;
 	double vdwD2_radius;
-	string vdwD2_radius_unit;	//"Bohr" or "Angstrom"
+	string vdwD2_radius_unit;	//"Bohr" or "Angstrom" */
 
+//==========================================================
+// vdw
+//Peize Lin add 2014-03-31, jiyy update 2019-08-01
+//==========================================================
+    string vdw_method;          //the method of vdw calculation                 
+    string vdw_s6;              //scale parameter 
+	string vdw_s8;              //scale parameter 
+	string vdw_a1;             //damping function parameter 
+	string vdw_a2;             //damping function parameter 
+	double vdw_d;               //damping function parameter d
+	bool vdw_abc;               //third-order term?
+    string vdw_radius;          //cutoff radius for pair interactions
+	string vdw_radius_unit;	    //"Bohr" or "Angstrom"
+	double vdw_cn_thr;          //cutoff radius for calculating the coordination number
+	string vdw_cn_thr_unit;     //"Bohr" or "Angstrom"
+	string vdw_C6_file;
+	string vdw_C6_unit;		    //"Bohr" or "Angstrom"
+	string vdw_R0_file;
+	string vdw_R0_unit;		    //"Bohr" or "Angstrom"
+	string vdw_model;			//"period" or "radius"
+	Vector3<int> vdw_period;
 
 
 //==========================================================
@@ -341,6 +362,7 @@ public:
 //==========================================================
     bool Read(const string &fn);
     void Default(void);
+	void Default_2(void);    //jiyy add 2019-08-04											  
     void Check(void);
 #ifdef __MPI
     void Bcast(void);

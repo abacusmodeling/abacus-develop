@@ -1,6 +1,7 @@
 #include "forces.h"
 #include "global.h"
 #include "vdwd2.h"
+#include "vdwd3.h"				  
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -27,7 +28,10 @@ void Forces::init()
 	{
 		vdwd2.force(stress_vdw_pw, STRESS);
 	}
-	
+	if(vdwd3.vdwD3)													//jiyy add 2019-05-18
+	{
+		vdwd3.force(stress_vdw_pw, STRESS);
+	}
     //impose total force = 0
     int iat = 0;
 
@@ -64,6 +68,15 @@ void Forces::init()
 					}
 					
 				}
+				if(vdwd3.vdwD3)											//jiyy add 2019-05-18
+				{
+					switch(ipol)
+					{
+						case 0:	force(iat,ipol) += vdwd3.force_result[iat][0];	break;
+						case 1:	force(iat,ipol) += vdwd3.force_result[iat][1];	break;
+						case 2:	force(iat,ipol) += vdwd3.force_result[iat][2];	break;
+					}
+				}																													   
 					
 				if(EFIELD)
 				{

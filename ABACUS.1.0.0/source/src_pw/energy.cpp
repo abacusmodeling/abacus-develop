@@ -69,6 +69,10 @@ void energy::calculate_etot(void)
 	{
 		this->etot += vdwd2.energy_result;
 	}
+	if(vdwd3.vdwD3) 									//jiyy add 2019-05-18
+	{
+		this->etot += vdwd3.energy_result;
+	}																			  
 	
 /*
 	cout << resetiosflags(ios::scientific) << endl;
@@ -118,6 +122,10 @@ bool print)
 		if(vdwd2.vdwD2)					//Peize Lin add 2014-04, update 2019-04-26
 		{
 			this->print_format("E_vdwD2",vdwd2.energy_result);
+		}
+        if(vdwd3.vdwD3)					//jiyy add 2019-05
+		{
+			this->print_format("E_vdwD3",vdwd3.energy_result);
 		}
 //		this->print_format("e_exx",exx);
 	}

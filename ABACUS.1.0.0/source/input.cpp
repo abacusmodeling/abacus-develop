@@ -31,6 +31,7 @@ void Input::Init(const string &fn)
     this->Default();
 
     bool success = this->Read(fn);
+	this->Default_2();			   
 
 //xiaohui add 2015-09-16
 #ifdef __MPI
@@ -350,7 +351,7 @@ void Input::Default(void)
         md_msdstartTime=1;
 //end of zhengdaye's add.
 
-//----------------------------------------------------------
+/* //----------------------------------------------------------
 // vdwD2									//Peize Lin add 2014-03-31, update 2015-09-30
 //----------------------------------------------------------
 	vdwD2=false;
@@ -363,7 +364,28 @@ void Input::Default(void)
 	vdwD2_model="radius";
 	vdwD2_period = {3,3,3};
 	vdwD2_radius=30.0/BOHR_TO_A;
-	vdwD2_radius_unit="Bohr";
+	vdwD2_radius_unit="Bohr"; */
+
+//----------------------------------------------------------
+// vdw									//jiyy add 2019-08-04
+//----------------------------------------------------------
+    vdw_method="none";
+	vdw_s6="default";
+	vdw_s8="default";
+	vdw_a1="default";
+	vdw_a2="default";
+	vdw_d=20;
+	vdw_abc=false;
+	vdw_radius="default";
+	vdw_radius_unit="Bohr";
+	vdw_cn_thr=40.0;
+	vdw_cn_thr_unit="Bohr";
+	vdw_C6_file="default";
+	vdw_C6_unit="Jnm6/mol";
+	vdw_R0_file="default";
+	vdw_R0_unit="A";
+	vdw_model="radius";
+	vdw_period = {3,3,3};
 
 //-----------------------------------------------------------
 // spectrum                                                                      // pengfei Li add 2016-11-23
@@ -1281,7 +1303,7 @@ bool Input::Read(const string &fn)
 	{
 		read_value(ifs,vext_dire );
 	}
-//----------------------------------------------------------
+/* //----------------------------------------------------------
 // vdwD2
 // Peize Lin add 2014-03-31
 //----------------------------------------------------------
@@ -1329,7 +1351,80 @@ bool Input::Read(const string &fn)
         else if (strcmp("vdwd2_radius_unit", word) == 0)
         {
             read_value(ifs, vdwD2_radius_unit);
+        } */
+//----------------------------------------------------------
+// vdw
+// jiyy add 2019-08-04
+//----------------------------------------------------------
+        else if (strcmp("vdw_method", word) == 0)
+        {
+            read_value(ifs, vdw_method);
         }
+        else if (strcmp("vdw_s6", word) == 0)
+        {
+            read_value(ifs, vdw_s6);
+        }
+		else if (strcmp("vdw_s8", word) == 0)
+        {
+            read_value(ifs, vdw_s8);
+        }
+		else if (strcmp("vdw_a1", word) == 0)
+        {
+            read_value(ifs, vdw_a1);
+        }
+		else if (strcmp("vdw_a2", word) == 0)
+        {
+            read_value(ifs, vdw_a2);
+        }
+		else if (strcmp("vdw_d", word) == 0)
+        {
+            read_value(ifs, vdw_d);
+        }	
+        else if (strcmp("vdw_abc", word) == 0)
+        {
+            read_value(ifs, vdw_abc);
+        }
+        else if (strcmp("vdw_radius", word) == 0)
+        {
+            read_value(ifs, vdw_radius);
+        }
+        else if (strcmp("vdw_radius_unit", word) == 0)
+        {
+            read_value(ifs, vdw_radius_unit);
+        }	
+        else if (strcmp("vdw_cn_thr", word) == 0)
+        {
+            read_value(ifs, vdw_cn_thr);
+        }
+        else if (strcmp("vdw_cn_thr_unit", word) == 0)
+        {
+            read_value(ifs, vdw_cn_thr_unit);
+        }		
+        else if (strcmp("vdw_c6_file", word) == 0)
+        {
+            read_value(ifs, vdw_C6_file);
+        }
+        else if (strcmp("vdw_c6_unit", word) == 0)
+        {
+            read_value(ifs, vdw_C6_unit);
+        }
+        else if (strcmp("vdw_r0_file", word) == 0)
+        {
+            read_value(ifs, vdw_R0_file);
+        }
+        else if (strcmp("vdw_r0_unit", word) == 0)
+        {
+            read_value(ifs, vdw_R0_unit);
+        }
+        else if (strcmp("vdw_model", word) == 0)
+        {
+            read_value(ifs, vdw_model);
+        }
+        else if (strcmp("vdw_period", word) == 0)
+        {
+			ifs >> vdw_period.x >> vdw_period.y;
+            read_value(ifs, vdw_period.z);
+        } 
 //--------------------------------------------------------
 // epsilon           pengfei Li 2016-11-23
 //--------------------------------------------------------
@@ -1571,6 +1666,68 @@ else if (strcmp("cell_factor", word) == 0)
     return true;
 }//end read_parameters
 
+void Input::Default_2(void)          //jiyy add 2019-08-04
+{
+//==========================================================
+// vdw
+//jiyy add 2019-08-04
+//==========================================================
+	if(vdw_s6=="default")
+	{
+		if(vdw_method=="d2")
+		{
+			vdw_s6="0.75";
+		}
+		else if(vdw_method=="d3_0" || vdw_method=="d3_bj")
+		{
+			vdw_s6="1.0";
+		}
+	}
+	if(vdw_s8=="default")
+	{
+		if(vdw_method=="d3_0")
+		{
+			vdw_s8="0.722";
+		}
+		else if(vdw_method=="d3_bj")
+		{
+			vdw_s8="0.7875";
+		}
+	}
+	if(vdw_a1=="default")
+	{
+		if(vdw_method=="d3_0")
+		{
+			vdw_a1="1.217";
+		}
+		else if(vdw_method=="d3_bj")
+		{
+			vdw_a1="0.4289";
+		}
+	}
+	if(vdw_a2=="default")
+	{
+		if(vdw_method=="d3_0")
+		{
+			vdw_a2="1.0";
+		}
+		else if(vdw_method=="d3_bj")
+		{
+			vdw_a2="4.4407";
+		}
+	}
+	if(vdw_radius=="default")
+	{
+		if(vdw_method=="d2")
+		{
+			vdw_radius="56.6918";
+		}
+		else if(vdw_method=="d3_0" || vdw_method=="d3_bj")
+		{
+			vdw_radius="95";
+		}
+	}
+}		  
 #ifdef __MPI
 void Input::Bcast()
 {
@@ -1774,7 +1931,7 @@ void Input::Bcast()
         Parallel_Common::bcast_double(md_ediff);
         Parallel_Common::bcast_double(md_ediffg);
         Parallel_Common::bcast_int(md_msdstartTime);
-	// Peize Lin add 2014-04-07
+/* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );
 	Parallel_Common::bcast_double( vdwD2_d );
@@ -1787,7 +1944,27 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( vdwD2_period.y );
 	Parallel_Common::bcast_int( vdwD2_period.z );
 	Parallel_Common::bcast_double( vdwD2_radius );
-	Parallel_Common::bcast_string( vdwD2_radius_unit );
+	Parallel_Common::bcast_string( vdwD2_radius_unit ); */
+// jiyy add 2019-08-04
+	Parallel_Common::bcast_string( vdw_method );
+	Parallel_Common::bcast_string( vdw_s6 );
+	Parallel_Common::bcast_string( vdw_s8 );
+	Parallel_Common::bcast_string( vdw_a1 );
+	Parallel_Common::bcast_string( vdw_a2 );
+	Parallel_Common::bcast_double( vdw_d );
+	Parallel_Common::bcast_bool( vdw_abc );
+	Parallel_Common::bcast_string( vdw_radius );
+	Parallel_Common::bcast_string( vdw_radius_unit );
+	Parallel_Common::bcast_double( vdw_cn_thr );
+	Parallel_Common::bcast_string( vdw_cn_thr_unit );
+	Parallel_Common::bcast_string( vdw_C6_file );
+	Parallel_Common::bcast_string( vdw_C6_unit );
+	Parallel_Common::bcast_string( vdw_R0_file );
+	Parallel_Common::bcast_string( vdw_R0_unit );
+	Parallel_Common::bcast_string( vdw_model );
+	Parallel_Common::bcast_int( vdw_period.x );
+	Parallel_Common::bcast_int( vdw_period.y );
+	Parallel_Common::bcast_int( vdw_period.z );
 	// Fuxiang He add 2016-10-26
 	Parallel_Common::bcast_int(tddft);
 	Parallel_Common::bcast_int(val_elec_01);
@@ -2354,6 +2531,7 @@ void Input::Check(void)
 		AUTO_SET("lcao_ecut",ecutwfc);
 	}
 
+/* 
 	if(vdwD2)														//Peize Lin add 2-14-04-05, update 2015-09-30
 	{
 		if( (vdwD2_C6_unit!="Jnm6/mol") && (vdwD2_C6_unit!="eVA6") )
@@ -2379,6 +2557,42 @@ void Input::Check(void)
 		if( (vdwD2_radius_unit!="A") && (vdwD2_radius_unit!="Bohr") )
 		{
 			WARNING_QUIT("Input","vdwD2_radius_unit must be A or Bohr");
+		}
+	} */
+	
+	if(vdw_method=="d2" || vdw_method=="d3_0" || vdw_method=="d3_bj")														//jiyy add 2019-08-04
+	{
+		if( (vdw_C6_unit!="Jnm6/mol") && (vdw_C6_unit!="eVA6") )
+		{
+			WARNING_QUIT("Input","vdw_C6_unit must be Jnm6/mol or eVA6");
+		}
+		if( (vdw_R0_unit!="A") && (vdw_R0_unit!="Bohr") )
+		{
+			WARNING_QUIT("Input","vdw_R0_unit must be A or Bohr");
+		}
+		if( (vdw_model!="radius") && (vdw_model!="period") )
+		{
+			WARNING_QUIT("Input","vdw_model must be radius or period");
+		}
+		if( (vdw_period.x<=0) || (vdw_period.y<=0) || (vdw_period.z<=0) )
+		{
+			WARNING_QUIT("Input","vdw_period <= 0 is not allowd");
+		}
+		if( std::stod(vdw_radius)<=0 )
+		{
+			WARNING_QUIT("Input","vdw_radius <= 0 is not allowd");
+		}
+		if( (vdw_radius_unit!="A") && (vdw_radius_unit!="Bohr") )
+		{
+			WARNING_QUIT("Input","vdw_radius_unit must be A or Bohr");
+		}
+		if( vdw_cn_thr<=0 )
+		{
+			WARNING_QUIT("Input","vdw_cn_thr <= 0 is not allowd");
+		}
+		if( (vdw_cn_thr_unit!="A") && (vdw_cn_thr_unit!="Bohr") )
+		{
+			WARNING_QUIT("Input","vdw_cn_thr_unit must be A or Bohr");
 		}
 	}
 	
@@ -2699,7 +2913,7 @@ void Input::Print(const string &fn)const
 //	OUTP(ofs,"berry_phase",berry_phase);
 //	OUTP(ofs,"lda_plus_u",lda_plus_u);
 	
-	ofs << "\n#Parameters (15.vdw-D2)" << endl;												//Peize Lin add 2014-04-05, update 2015-09-30
+/* 	ofs << "\n#Parameters (15.vdw-D2)" << endl;												//Peize Lin add 2014-04-05, update 2015-09-30
 	OUTP(ofs,"vdwD2",vdwD2,"calculate vdw-D2 or not");
 	OUTP(ofs,"vdwD2_scaling",vdwD2_scaling,"scaling of vdw-D2");
 	OUTP(ofs,"vdwD2_d",vdwD2_d,"damping parameter");
@@ -2710,7 +2924,27 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"vdwD2_model",vdwD2_model,"expression model of periodic structure, radius or period");
 	OUTP(ofs,"vdwD2_radius",vdwD2_radius,"radius cutoff for periodic structure");
 	OUTP(ofs,"vdwD2_radius_unit",vdwD2_radius_unit,"unit of radius cutoff for periodic structure");	
-	ofs << setw(20) << "vdwD2_period" << vdwD2_period.x << " " << vdwD2_period.y << " " << vdwD2_period.z<< " #periods of periodic structure" << endl;
+	ofs << setw(20) << "vdwD2_period" << vdwD2_period.x << " " << vdwD2_period.y << " " << vdwD2_period.z<< " #periods of periodic structure" << endl; */
+	
+	ofs << "\n#Parameters (15.VdW Correction)" << endl;								
+//jiyy add 2019-08-04
+	OUTP(ofs,"vdw_method",vdw_method,"the method of calculating vdw (none ; d2 ; d3_0 ; d3_bj");
+	OUTP(ofs,"vdw_s6",vdw_s6,"scale parameter of d2/d3_0/d3_bj");
+    OUTP(ofs,"vdw_s8",vdw_s8,"scale parameter of d3_0/d3_bj");
+    OUTP(ofs,"vdw_a1",vdw_a1,"damping parameter of d3_0/d3_bj");
+    OUTP(ofs,"vdw_a2",vdw_a2,"damping parameter of d3_bj");
+    OUTP(ofs,"vdw_d",vdw_d,"damping parameter of d2");		
+    OUTP(ofs,"vdw_abc",vdw_abc,"third-order term?");
+	OUTP(ofs,"vdw_C6_file",vdw_C6_file,"filename of C6");
+    OUTP(ofs,"vdw_C6_unit",vdw_C6_unit,"unit of C6, Jnm6/mol or eVA6");
+    OUTP(ofs,"vdw_R0_file",vdw_R0_file,"filename of R0");
+    OUTP(ofs,"vdw_R0_unit",vdw_R0_unit,"unit of R0, A or Bohr");
+	OUTP(ofs,"vdw_model",vdw_model,"expression model of periodic structure, radius or period");
+    OUTP(ofs,"vdw_radius",vdw_radius,"radius cutoff for periodic structure");
+    OUTP(ofs,"vdw_radius_unit",vdw_radius_unit,"unit of radius cutoff for periodic structure");
+    OUTP(ofs,"vdw_cn_thr",vdw_cn_thr,"radius cutoff for cn");
+    OUTP(ofs,"vdw_cn_thr_unit",vdw_cn_thr_unit,"unit of cn_thr, Bohr or Angstrom");
+	ofs << setw(20) << "vdw_period" << vdw_period.x << " " << vdw_period.y << " " << vdw_period.z<< " #periods of periodic structure" << endl;
 	
 	
 	ofs << "\n#Parameters (16.spectrum)" << endl;              // pengfei Li add 2016-11-23
