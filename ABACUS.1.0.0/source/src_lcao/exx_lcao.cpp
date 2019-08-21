@@ -516,9 +516,9 @@ gettimeofday( &t_start, NULL);
 	{
 		case Exx_Global::Hybrid_Type::HF:
 		case Exx_Global::Hybrid_Type::PBE0:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, this->rmesh_times );		break;
+			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, info.ccp_threshold, this->rmesh_times );		break;
 		case Exx_Global::Hybrid_Type::HSE:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, this->rmesh_times );	break;
+			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_threshold, this->rmesh_times );	break;
 		default:
 			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 	}
@@ -580,7 +580,7 @@ gettimeofday( &t_start, NULL);
 	m_abfs_abfs.init( 2, this->kmesh_times, (1+this->rmesh_times)/2.0 );
 ofs_mpi<<"TIME@ m_abfs_abfs.init\t"<<time_during(t_start)<<endl;
 gettimeofday( &t_start, NULL);
-	m_abfs_abfs.init_radial( abfs, abfs_ccp );
+	m_abfs_abfs.init_radial( abfs_ccp, abfs );
 ofs_mpi<<"TIME@ m_abfs_abfs.init_radial\t"<<time_during(t_start)<<endl;
 //gettimeofday( &t_start, NULL);
 //	m_abfs_abfs.init_radial_table();

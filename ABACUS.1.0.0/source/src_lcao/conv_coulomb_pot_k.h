@@ -17,6 +17,7 @@ public:
 		const T & orbs,
 		const Ccp_Type &ccp_type,
 		const std::map<std::string,double> &parameter,
+		const double psi_threshold,
 		double &rmesh_times);
 	
 private:

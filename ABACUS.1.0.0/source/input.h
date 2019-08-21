@@ -331,6 +331,7 @@ public:
 	double exx_dm_threshold;
 	double exx_schwarz_threshold;
 	double exx_cauchy_threshold;
+	double exx_ccp_threshold;
 	
 	string exx_distribute_type;
 	

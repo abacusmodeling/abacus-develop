@@ -432,6 +432,7 @@ void Input::Default(void)
 	exx_dm_threshold = 0;
 	exx_schwarz_threshold = 0;
 	exx_cauchy_threshold = 0;
+	exx_ccp_threshold = 1E-8;
 		
 	exx_distribute_type = "htime";
 		
@@ -1537,6 +1538,10 @@ bool Input::Read(const string &fn)
         else if (strcmp("exx_cauchy_threshold", word) == 0)
         {
             read_value(ifs, exx_cauchy_threshold);
+        }		
+        else if (strcmp("exx_ccp_threshold", word) == 0)
+        {
+            read_value(ifs, exx_ccp_threshold);
         }		
         else if (strcmp("exx_distribute_type", word) == 0)
         {
@@ -2947,6 +2952,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"exx_dm_threshold",exx_dm_threshold,"");
 	OUTP(ofs,"exx_schwarz_threshold",exx_schwarz_threshold,"");
 	OUTP(ofs,"exx_cauchy_threshold",exx_cauchy_threshold,"");
+	OUTP(ofs,"exx_ccp_threshold",exx_ccp_threshold,"");
 	OUTP(ofs,"exx_distribute_type",exx_distribute_type,"htime or kmeans");
 	OUTP(ofs,"exx_opt_orb_lmax",exx_opt_orb_lmax,"");
 	OUTP(ofs,"exx_opt_orb_ecut",exx_opt_orb_ecut,"");

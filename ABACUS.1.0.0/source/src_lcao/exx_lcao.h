@@ -102,6 +102,7 @@ public:
 		double dm_threshold = 0;
 		double schwarz_threshold = 0;
 		double cauchy_threshold = 0;
+		double ccp_threshold = 0;
 		
 		Exx_Lcao::Distribute_Type distribute_type;
 

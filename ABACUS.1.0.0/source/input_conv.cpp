@@ -418,6 +418,7 @@ void Input_Conv::Convert(void)
 		exx_lcao.info.dm_threshold      = INPUT.exx_dm_threshold      ;
 		exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold ;
 		exx_lcao.info.cauchy_threshold  = INPUT.exx_cauchy_threshold  ;
+		exx_lcao.info.ccp_threshold     = INPUT.exx_ccp_threshold     ;
 		if(INPUT.exx_distribute_type=="htime")
 			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
 		else if(INPUT.exx_distribute_type=="kmeans")

@@ -83,5 +83,5 @@ double Conv_Coulomb_Pot_K::get_rmesh_proportion(
 		if(std::abs(orbs.getPsi(ir))>=psi_threshold)
 			return static_cast<double>(ir)/orbs.getNr();
 	}
-	throw runtime_error("psi_threshold too small. "+TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	return 0.0;
 }
