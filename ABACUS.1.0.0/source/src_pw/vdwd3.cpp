@@ -192,7 +192,8 @@ void Vdwd3::initset()
 
 double Vdwd3::energy()
 {
-	initset();
+	TITLE("Vdwd3","energy");
+    initset();
     double xyz[ucell.nat][3];
 	int iz[ucell.nat];
 	
@@ -211,7 +212,8 @@ double Vdwd3::energy()
 
 vector< vector<double> > Vdwd3::force(matrix &stress_result, const bool stress_for_vdw)
 {
-	initset();
+	TITLE("Vdwd3","force");
+    initset();
 	double xyz[ucell.nat][3];
 	int iz[ucell.nat];
 	XYZ(ucell,xyz,iz);
