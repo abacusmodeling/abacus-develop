@@ -28,7 +28,7 @@ template<typename T>
 static std::ostream & operator<<( std::ostream & os, const std::vector<T> &v )
 {
 	for( const T &i : v )
-		os<<i<<std::endl;
+		os<<i<<"\t";
 	return os;
 }
 
@@ -45,7 +45,7 @@ static std::ostream & operator<<( std::ostream & os, const std::set<T> &v )
 template<typename T1,typename T2>
 static std::ostream & operator<<( std::ostream & os, const std::pair<T1,T2> &p )
 {
-	os<<p.first<<"\t"<<p.second<<std::endl;
+	os<<"("<<p.first<<","<<p.second<<")";
 	return os;
 }
 

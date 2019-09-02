@@ -2,7 +2,9 @@
 #include "src_pw/global.h"
 #include <random>
 
-vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom> 
+#include "src_external/src_test/test_function.h"
+
+pair< vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom>, vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> >
 Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 {
 	TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::cluster");
@@ -139,14 +141,14 @@ ofs_mpi<<endl;
 
 	init();
 	while( update() );
-	return atoms;
+	return {atoms,clusters};
 	
 ofs_mpi.close();
 }
 
 
 vector<pair<size_t,size_t>> 
-Exx_Abfs::Parallel::Distribute::Kmeans::distribute( const MPI_Comm & mpi_comm, const int multiple_core )
+Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( const MPI_Comm & mpi_comm, const int multiple_core )
 {
 	TITLE("Exx_Abfs::Parallel::Distribute::Kmeans::distribute");
 	
@@ -154,10 +156,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute( const MPI_Comm & mpi_comm, c
 	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
 	const int comm_size_nominal = comm_size * multiple_core;
-	
-//for( int N=2; N<=20; ++N )
-//	cluster(N);
-	
+		
 	{
 		auto classify_atom = []( const int Ng, const vector<Atom> &atoms ) -> vector<vector<size_t>>
 		{
@@ -189,7 +188,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute( const MPI_Comm & mpi_comm, c
 		{
 											
 			vector<pair<size_t,size_t>> rank_work;
-			const vector<Atom> atoms = cluster(Ng);
+			const vector<Atom> atoms = cluster(Ng).first;
 			const vector<vector<size_t>> clusters_atoms = classify_atom(Ng,atoms);
 			for( size_t ig1=0, rank_tmp=0; ig1<Ng; ++ig1 )
 				for( size_t ig2=ig1; ig2<Ng; ++ig2, ++rank_tmp )
@@ -238,16 +237,99 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute( const MPI_Comm & mpi_comm, c
 		
 		if(N1==N2)
 		{
-			const vector<Atom> atoms = cluster(N1);
+			const vector<Atom> atoms = cluster(N1).first;
 			return f(atoms,atoms);
 		}
 		else
 		{
-			const vector<Atom> atoms1 = cluster(N1);
-			const vector<Atom> atoms2 = cluster(N2);
+			const vector<Atom> atoms1 = cluster(N1).first;
+			const vector<Atom> atoms2 = cluster(N2).first;
 			return f(atoms1,atoms2);
 		}
 	}
- 
-				 
+}
+
+
+vector<pair<size_t,size_t>> 
+Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi_comm, const double rmesh_times )
+{
+	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );
+	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
+ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream::app);
+
+	auto classify_atom = []( const int Ng, const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom> &atoms ) -> vector<vector<size_t>>
+	{
+		vector<vector<size_t>> clusters_atoms(Ng);
+		for( size_t iat=0; iat<atoms.size(); ++iat )
+			clusters_atoms[atoms[iat].center].push_back(iat);
+		return clusters_atoms;
+	};	
+	vector<Vector3<int>> boxes;
+	for(const int ix:{-1,0,1})
+		for(const int iy:{-1,0,1})
+			for(const int iz:{-1,0,1})
+				boxes.push_back({ix,iy,iz});
+	
+	const auto atoms_clusters_tmp = Exx_Abfs::Parallel::Distribute::Kmeans::cluster(comm_size);
+	const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom> &atoms = atoms_clusters_tmp.first;
+	const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> &clusters = atoms_clusters_tmp.second;
+	const vector<vector<size_t>> clusters_atoms = classify_atom(comm_size,atoms);
+	
+for(const auto cluster_atoms : clusters_atoms)
+	ofs_mpi<<cluster_atoms<<endl;
+	
+	vector<pair<size_t,size_t>> rank_work;
+	for(const size_t iat1 : clusters_atoms[my_rank])
+	{
+		const int it1 = ucell.iat2it[iat1];
+		const Vector3<double> tau1 = ucell.atoms[it1].tau[ucell.iat2ia[iat1]];
+		const int ic1 = atoms[iat1].center;
+		for(size_t iat2=0; iat2!=ucell.nat; ++iat2)
+		{
+			const int it2 = ucell.iat2it[iat2];
+			const Vector3<double> tau2 = ucell.atoms[it2].tau[ucell.iat2ia[iat2]];
+			const int ic2 = atoms[iat2].center;
+			
+			double R_min = std::numeric_limits<double>::max();
+			Vector3<double> tau2_box2_min;
+			Vector3<int> box2_min;			// test
+			for(const Vector3<int> box2 : boxes)
+			{
+				const Vector3<double> tau2_box2 = tau2 + box2 * ucell.latvec;
+				const double R = (-tau1 + tau2_box2).norm();
+				if(R<R_min)
+																	  
+				{
+					R_min = R;
+					tau2_box2_min = tau2_box2;
+					box2_min = box2;
+				}
+			}
+			
+			if(R_min < ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut() &&
+			   R_min < ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times )
+			{
+ofs_mpi<<iat1<<"\t"<<iat2<<"\t"<<box2_min<<"\t"<<R_min<<endl;
+				if(ic1==ic2)
+				{
+					if(iat1<=iat2)
+						rank_work.push_back({iat1,iat2});
+				}
+				else
+				{
+					const Vector3<double> middle = (tau1 + tau2_box2_min)/2.0;
+					if( (middle-clusters[ic1].tau).norm() < (middle-clusters[ic2].tau).norm() )
+						rank_work.push_back({iat1,iat2});
+					else if( (middle-clusters[ic1].tau).norm() == (middle-clusters[ic2].tau).norm() )
+						if(iat1<iat2)
+							rank_work.push_back({iat1,iat2});
+				}
+		   
+			}
+		}
+	}
+  
+ofs_mpi<<rank_work<<endl;
+ofs_mpi.close();
+	return rank_work;
 }

@@ -2577,9 +2577,9 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("INPUT","must exx_hybrid_step > 0");
 		}
-		if(exx_distribute_type!="htime" && exx_distribute_type!="kmeans")
+		if(exx_distribute_type!="htime" && exx_distribute_type!="kmeans2" && exx_distribute_type!="kmeans1")
 		{
-			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans");
+			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
 		}
 	}
 	if(exx_hybrid_type=="opt_orb")
