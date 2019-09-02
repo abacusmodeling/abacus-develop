@@ -25,9 +25,9 @@ public:
 	Matrix_Wrapper( const Matrix_Wrapper &m ): nr(m.nr), nc(m.nc), c(m.c){}
 	Matrix_Wrapper( Matrix_Wrapper &m ): nr(m.nr), nc(m.nc), c(m.c){}
 	Matrix_Wrapper( Matrix_Wrapper &&m ): nr(m.nr), nc(m.nc), c(m.c){}
-	inline Matrix_Wrapper&operator=( const Matrix_Wrapper&m ){ nr=m.nr; nc=m.nc; c=m.c; };
-	inline Matrix_Wrapper&operator=( Matrix_Wrapper&m ){ nr=m.nr; nc=m.nc; c=m.c; };
-	inline Matrix_Wrapper&operator=( Matrix_Wrapper&&m ){ nr=m.nr; nc=m.nc; c=m.c; };
+	inline Matrix_Wrapper&operator=( const Matrix_Wrapper&m ){ nr=m.nr; nc=m.nc; c=m.c; return *this; };
+	inline Matrix_Wrapper&operator=( Matrix_Wrapper&m ){ nr=m.nr; nc=m.nc; c=m.c; return *this; };
+	inline Matrix_Wrapper&operator=( Matrix_Wrapper&&m ){ nr=m.nr; nc=m.nc; c=m.c; return *this; };
 };
 
 
