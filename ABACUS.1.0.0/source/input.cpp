@@ -2953,7 +2953,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"exx_schwarz_threshold",exx_schwarz_threshold,"");
 	OUTP(ofs,"exx_cauchy_threshold",exx_cauchy_threshold,"");
 	OUTP(ofs,"exx_ccp_threshold",exx_ccp_threshold,"");
-	OUTP(ofs,"exx_distribute_type",exx_distribute_type,"htime or kmeans");
+	OUTP(ofs,"exx_distribute_type",exx_distribute_type,"htime or kmeans1 or kmeans2");
 	OUTP(ofs,"exx_opt_orb_lmax",exx_opt_orb_lmax,"");
 	OUTP(ofs,"exx_opt_orb_ecut",exx_opt_orb_ecut,"");
 	OUTP(ofs,"exx_opt_orb_tolerence",exx_opt_orb_tolerence,"");

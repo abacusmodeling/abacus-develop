@@ -681,7 +681,7 @@ gettimeofday( &t_start, NULL);
 		switch(this->info.distribute_type)
 		{
 			case Exx_Lcao::Distribute_Type::Htime:
-				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Htime::distribute( Born_von_Karman_period );	break;
+				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Htime::distribute( Born_von_Karman_period, rmesh_times );	break;
 			case Exx_Lcao::Distribute_Type::Kmeans2:
 				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( MPI_COMM_WORLD );	break;
 			case Exx_Lcao::Distribute_Type::Kmeans1:
@@ -1046,9 +1046,10 @@ gettimeofday( &t_start, NULL);
 	energy *= 2.0/NSPIN;			// ?
 	energy /= 2;					// /2 for Ry
 	
-ofs_mpi<<"TIME@ Exx_Lcao::cal_energy_cal\t"<<time_during(t_start)<<endl;	
-ofs_mpi.close();
+ofs_mpi<<"TIME@ Exx_Lcao::cal_energy_cal\t"<<time_during(t_start)<<endl;
 	Parallel_Reduce::reduce_double_all(energy);
+ofs_mpi<<"E_exx\t"<<energy<<endl;
+ofs_mpi.close();
 	return energy;
 }
 
@@ -1186,8 +1187,12 @@ gettimeofday( &t_start, NULL);
 				#error "TEST_EXX_LCAO"
 			#endif
 
-			radial_R[it1][it2].insert( delta_R );
-			radial_R[it2][it1].insert( delta_R );
+			if( delta_R*ucell.lat0 < ORB.Phi[it1].getRcut()*rmesh_times + ORB.Phi[it2].getRcut() &&
+				delta_R*ucell.lat0 < ORB.Phi[it1].getRcut() + ORB.Phi[it2].getRcut()*rmesh_times )
+			{
+				radial_R[it1][it2].insert( delta_R );
+				radial_R[it2][it1].insert( delta_R );
+			}
 		}
 	}
 ofs_mpi<<"TIME@ radial_R_V\t"<<time_during(t_start)<<endl;

@@ -21,11 +21,11 @@ realArray::realArray(const int d1,const int d2,const int d3)
 	bound3 = (d3 <= 0) ? 1 : d3;
 	bound4 = 0;
 
-	set_new_handler(realArrayAlloc);
-
 	size = bound1 * bound2 * bound3 ;	//* sizeof(float);
 
+	auto handler_old = set_new_handler(realArrayAlloc);
 	ptr = new double[size];
+	set_new_handler(handler_old);
 	zero_out();
 	assert(ptr != 0);
 
@@ -40,11 +40,11 @@ realArray::realArray(const int d1,const int d2,const int d3,const int d4)
 	bound3 = (d3 <= 0) ? 1 : d3;
 	bound4 = (d4 <= 0) ? 1 : d4;
 
-	set_new_handler(realArrayAlloc);
-
 	size = bound1 * bound2 * bound3 * bound4 ;	//* sizeof(float);
 
+	auto handler_old = set_new_handler(realArrayAlloc);
 	ptr = new double[size];
+	set_new_handler(handler_old);
 	zero_out();
 
 	++arrayCount;

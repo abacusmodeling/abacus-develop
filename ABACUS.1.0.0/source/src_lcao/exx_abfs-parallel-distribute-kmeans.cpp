@@ -12,21 +12,21 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 	vector<Cluster> clusters(Nc+1);						// clusters[Nc] just for atoms init
 	vector<Atom> atoms(ucell.nat);
 	
-ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(Nc)+"_"+TO_STRING(MY_RANK),ofstream::app);
+//ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(Nc)+"_"+TO_STRING(MY_RANK),ofstream::app);
 	
 	auto init = [&]() -> void
 	{
-ofs_mpi<<Nc<<endl;
+//ofs_mpi<<Nc<<endl;
 		const double volumn = abs(ucell.a1.norm()*ucell.a2.norm()*ucell.a3.norm());
-ofs_mpi<<volumn<<endl;
+//ofs_mpi<<volumn<<endl;
 		const double rate = pow(Nc/volumn,1.0/3.0);
-ofs_mpi<<rate<<endl;
-ofs_mpi<<ucell.a1<<"\t"<<ucell.a2<<"\t"<<ucell.a3<<endl;
-ofs_mpi<<ucell.a1.norm()<<"\t"<<ucell.a2.norm()<<"\t"<<ucell.a3.norm()<<endl;
+//ofs_mpi<<rate<<endl;
+//ofs_mpi<<ucell.a1<<"\t"<<ucell.a2<<"\t"<<ucell.a3<<endl;
+//ofs_mpi<<ucell.a1.norm()<<"\t"<<ucell.a2.norm()<<"\t"<<ucell.a3.norm()<<endl;
 		const int Nx = ceil(ucell.a1.norm()*rate);
 		const int Ny = ceil(ucell.a2.norm()*rate);
 		const int Nz = ceil(ucell.a3.norm()*rate);
-ofs_mpi<<Nx<<"\t"<<Ny<<"\t"<<Nz<<endl;
+//ofs_mpi<<Nx<<"\t"<<Ny<<"\t"<<Nz<<endl;
 
 		vector<bool> flag_is_center(Nx*Ny*Nz,true);
 		for( int ic_big=Nc/2; ic_big<Nc/2+(Nx*Ny*Nz-Nc); ++ic_big )
@@ -38,9 +38,9 @@ ofs_mpi<<Nx<<"\t"<<Ny<<"\t"<<Nz<<endl;
 //		std::shuffle( flag_is_center.begin(), flag_is_center.end(), std::default_random_engine(Nc*Nx*Ny*Nz) );	// Nc*Nx*Ny*Nz is just a seed, for all thread be the same
 
 		
-for( int ic_big=0; ic_big<flag_is_center.size(); ++ic_big )
-	ofs_mpi<<flag_is_center[ic_big]<<"\t";
-ofs_mpi<<endl;
+//for( int ic_big=0; ic_big<flag_is_center.size(); ++ic_big )
+//	ofs_mpi<<flag_is_center[ic_big]<<"\t";
+//ofs_mpi<<endl;
 		
 		Vector3<double> taud_max = {0,0,0},
 		                taud_min = {1,1,1};
@@ -58,7 +58,7 @@ ofs_mpi<<endl;
 			(taud_max.x-taud_min.x)/Nx,
 			(taud_max.y-taud_min.y)/Ny,
 			(taud_max.z-taud_min.z)/Nz);
-ofs_mpi<<taud_min<<"\t"<<taud_max<<"\t"<<taud_delta<<"\t"<<endl;			
+//ofs_mpi<<taud_min<<"\t"<<taud_max<<"\t"<<taud_delta<<"\t"<<endl;			
 		
 		for( int ix=0,ic=0,ic_big=0; ix<Nx; ++ix )
 			for( int iy=0; iy<Ny; ++iy )
@@ -93,12 +93,12 @@ ofs_mpi<<taud_min<<"\t"<<taud_max<<"\t"<<taud_delta<<"\t"<<endl;
 			atoms[iat].center = Nc;
 			atoms[iat].distance = std::numeric_limits<double>::max();
 		}
-for( int ic=0; ic<Nc; ++ic )
-	ofs_mpi<<clusters[ic].tau<<"\t";
-ofs_mpi<<endl;
-for( int iat=0; iat<ucell.nat; ++iat )
-	ofs_mpi<<atoms[iat].center<<"\t";
-ofs_mpi<<endl;		
+//for( int ic=0; ic<Nc; ++ic )
+//	ofs_mpi<<clusters[ic].tau<<"\t";
+//ofs_mpi<<endl;
+//for( int iat=0; iat<ucell.nat; ++iat )
+//	ofs_mpi<<atoms[iat].center<<"\t";
+//ofs_mpi<<endl;		
 	};
 							
 							
@@ -129,12 +129,12 @@ ofs_mpi<<endl;
 		for( Cluster & cluster : clusters )
 			cluster.tau = cluster.tau_sum / static_cast<double>(cluster.size);
 		
-for( int ic=0; ic<Nc; ++ic )
-	ofs_mpi<<clusters[ic].tau<<"\t";
-ofs_mpi<<endl;
-for( int iat=0; iat<ucell.nat; ++iat )
-	ofs_mpi<<atoms[iat].center<<"\t";
-ofs_mpi<<endl;
+//for( int ic=0; ic<Nc; ++ic )
+//	ofs_mpi<<clusters[ic].tau<<"\t";
+//ofs_mpi<<endl;
+//for( int iat=0; iat<ucell.nat; ++iat )
+//	ofs_mpi<<atoms[iat].center<<"\t";
+//ofs_mpi<<endl;
 
 		return flag_atom_move;	
 	};
@@ -143,7 +143,7 @@ ofs_mpi<<endl;
 	while( update() );
 	return {atoms,clusters};
 	
-ofs_mpi.close();
+//ofs_mpi.close();
 }
 
 
@@ -255,7 +255,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi
 {
 	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
-ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream::app);
+//ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream::app);
 
 	auto classify_atom = []( const int Ng, const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom> &atoms ) -> vector<vector<size_t>>
 	{
@@ -275,8 +275,8 @@ ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream
 	const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> &clusters = atoms_clusters_tmp.second;
 	const vector<vector<size_t>> clusters_atoms = classify_atom(comm_size,atoms);
 	
-for(const auto cluster_atoms : clusters_atoms)
-	ofs_mpi<<cluster_atoms<<endl;
+//for(const auto cluster_atoms : clusters_atoms)
+//	ofs_mpi<<cluster_atoms<<endl;
 	
 	vector<pair<size_t,size_t>> rank_work;
 	for(const size_t iat1 : clusters_atoms[my_rank])
@@ -298,7 +298,6 @@ for(const auto cluster_atoms : clusters_atoms)
 				const Vector3<double> tau2_box2 = tau2 + box2 * ucell.latvec;
 				const double R = (-tau1 + tau2_box2).norm();
 				if(R<R_min)
-																	  
 				{
 					R_min = R;
 					tau2_box2_min = tau2_box2;
@@ -309,7 +308,7 @@ for(const auto cluster_atoms : clusters_atoms)
 			if(R_min < ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut() &&
 			   R_min < ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times )
 			{
-ofs_mpi<<iat1<<"\t"<<iat2<<"\t"<<box2_min<<"\t"<<R_min<<endl;
+//ofs_mpi<<iat1<<"\t"<<iat2<<"\t"<<box2_min<<"\t"<<R_min<<endl;
 				if(ic1==ic2)
 				{
 					if(iat1<=iat2)
@@ -329,7 +328,7 @@ ofs_mpi<<iat1<<"\t"<<iat2<<"\t"<<box2_min<<"\t"<<R_min<<endl;
 		}
 	}
   
-ofs_mpi<<rank_work<<endl;
-ofs_mpi.close();
+//ofs_mpi<<rank_work<<endl;
+//ofs_mpi.close();
 	return rank_work;
 }

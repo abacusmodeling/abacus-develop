@@ -4,7 +4,8 @@
 #include "src_lcao/abfs.h"
 #include <algorithm>
 
-vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute( const Abfs::Vector3_Order<int> & Born_von_Karman_period )
+vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute( 
+	const Abfs::Vector3_Order<int> & Born_von_Karman_period, const double rmesh_times )
 {
 	TITLE("Exx_Abfs::Parallel::distribute");
 	const vector<size_t> Nadj = cal_Nadj(Born_von_Karman_period);
@@ -12,7 +13,7 @@ vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute( c
 //for( const size_t & i : Nadj )
 //	cout<<i<<endl;
 
-	const vector<pair<size_t,pair<size_t,size_t>>> pair_costs = cal_pair_costs(Nadj);
+	const vector<pair<size_t,pair<size_t,size_t>>> pair_costs = cal_pair_costs(Nadj,rmesh_times);
 	
 //for( const auto & i : pair_costs )
 //	cout<<i.first<<"\t"<<i.second.first<<"\t"<<i.second.second<<endl;
@@ -50,13 +51,39 @@ vector<size_t> Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj( const Abfs::Vect
 }
 
 // { Ni*Nj, {i,j} }
-vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs( const vector<size_t> &Nadj )
+vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs( 
+	const vector<size_t> &Nadj, const double rmesh_times )
 {
 	TITLE("Exx_Abfs::Parallel::cal_pair_costs");
+	
+	vector<Vector3<int>> boxes;
+	for(const int ix:{-1,0,1})
+		for(const int iy:{-1,0,1})
+			for(const int iz:{-1,0,1})
+				boxes.push_back({ix,iy,iz});
+			
+	auto neighbour = [&](const size_t iat1, const size_t iat2) -> bool
+	{
+		const int it1 = ucell.iat2it[iat1];
+		const int it2 = ucell.iat2it[iat2];
+		const Vector3<double> tau1 = ucell.atoms[it1].tau[ucell.iat2ia[iat1]];
+		const Vector3<double> tau2 = ucell.atoms[it2].tau[ucell.iat2ia[iat2]];
+		double R_min = std::numeric_limits<double>::max();
+		for(const Vector3<int> box2 : boxes)
+		{
+			const double R = (-tau1 + tau2 + box2 * ucell.latvec).norm();
+			if(R<R_min)
+				R_min = R;
+		}
+		return R_min < ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut() &&
+			   R_min < ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times;
+	};
+			
 	vector<pair<size_t,pair<size_t,size_t>>> pair_costs;
 	for( size_t iat1=0; iat1<ucell.nat; ++iat1 )
 		for( size_t iat2=iat1; iat2<ucell.nat; ++iat2 )
-			pair_costs.push_back( {Nadj[iat1]*Nadj[iat2], {iat1,iat2} } );
+			if(neighbour(iat1,iat2))
+				pair_costs.push_back( {Nadj[iat1]*Nadj[iat2], {iat1,iat2} } );
 		
 	auto comp = []( 
 		const pair<size_t,pair<size_t,size_t>> & pair_cost1, 

@@ -195,7 +195,7 @@ double Charge_Mixing::rhog_dot_product(
 		break;
 
 	case 2:
-		
+	{	
 		// (1) First part of density error.
 		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
 		{
@@ -230,7 +230,7 @@ double Charge_Mixing::rhog_dot_product(
 		sum2 += mag;
 		sum += sum2;
 		break;
-
+	}
 
 	case 4:
 		// non-collinear spin, added by zhengdy
