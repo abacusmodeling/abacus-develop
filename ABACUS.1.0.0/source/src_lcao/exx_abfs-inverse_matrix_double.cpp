@@ -15,8 +15,6 @@ void Exx_Abfs::Inverse_Matrix_Double::init(const int &dim_in)
 
 void Exx_Abfs::Inverse_Matrix_Double::cal_inverse( const Method &method )
 {
-	TITLE("Exx_Abfs::Inverse_Matrix_Double::cal_inverse");
-	
 	#if TEST_EXX_LCAO==1
 		static int i=0;
 		ofstream ofs("inverse_matrix_"+TO_STRING(i));
@@ -36,8 +34,6 @@ void Exx_Abfs::Inverse_Matrix_Double::cal_inverse( const Method &method )
 
 void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 {
-	TITLE("Exx_Abfs::Inverse_Matrix_Double::using_dpotrf");
-	
 	LapackConnector::dpotrf('U',dim,A,dim,&info);
 
 	if(info!=0)
@@ -61,8 +57,6 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 
 void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condition_number )
 {
-	TITLE("Exx_Abfs::Inverse_Matrix_Double::using_dsyev");
-	
 	vector<double> eigen_value(A.nr);
 	LapackConnector::dsyev('V','U',A,VECTOR_TO_PTR(eigen_value),info);
 	

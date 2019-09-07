@@ -264,8 +264,6 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const Element_Basis_Index::IndexLNM &index_B,
 	const Matrix_Order &matrix_order) const
 {
-	TITLE("Exx_Abfs::Matrix_Orbs21","cal_overlap_matrix");
-
 	matrix m;
 	switch(matrix_order)
 	{
@@ -341,8 +339,6 @@ vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const Element_Basis_Index::IndexLNM &index_A2,
 	const Element_Basis_Index::IndexLNM &index_B) const
 {
-	TITLE("Exx_Abfs::Matrix_Orbs21","cal_overlap_matrix");
-
 	matrix m_A2B_A1( index_A2[TA].count_size*index_B[TB].count_size, index_A1[TA].count_size );
 	matrix m_BA2_A1( index_B[TB].count_size*index_A2[TA].count_size, index_A1[TA].count_size );
 
