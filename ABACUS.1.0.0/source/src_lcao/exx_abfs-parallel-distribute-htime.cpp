@@ -5,33 +5,30 @@
 #include <algorithm>
 
 vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute( 
-	const Abfs::Vector3_Order<int> & Born_von_Karman_period, const double rmesh_times )
+	const Abfs::Vector3_Order<int> & Born_von_Karman_period,
+	const double rmesh_times )
 {
+//ofstream ofs("htime_"+TO_STRING(MY_RANK));
+//ofs<<rmesh_times<<endl;
+
 	TITLE("Exx_Abfs::Parallel::distribute");
 	const vector<size_t> Nadj = cal_Nadj(Born_von_Karman_period);
+//ofs<<Nadj<<endl;
 
-//for( const size_t & i : Nadj )
-//	cout<<i<<endl;
-
-	const vector<pair<size_t,pair<size_t,size_t>>> pair_costs = cal_pair_costs(Nadj,rmesh_times);
-	
-//for( const auto & i : pair_costs )
-//	cout<<i.first<<"\t"<<i.second.first<<"\t"<<i.second.second<<endl;
+	const vector<pair<size_t,pair<size_t,size_t>>> pair_costs = cal_pair_costs(Nadj, rmesh_times);
+//ofs<<pair_costs<<endl;
 	
 	const vector<vector<pair<size_t,size_t>>> rank_work = cal_rank_work(pair_costs);
-	
 //for( size_t irank=0; irank!=rank_work.size(); ++irank )
-//{
-//	cout<<irank<<endl;
-//	for( const auto & work : rank_work[irank] )
-//		cout<<"\t"<<work.first<<"\t"<<work.second<<endl;
-//}	
+//	ofs<<irank<<"\t"<<rank_work[irank]<<endl;
+//ofs.close();
 	
 	return rank_work[MY_RANK];
 }
 
 // Nadj[iat]
-vector<size_t> Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj( const Abfs::Vector3_Order<int> & Born_von_Karman_period )
+vector<size_t> Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj( 
+	const Abfs::Vector3_Order<int> & Born_von_Karman_period )
 {
 	TITLE("Exx_Abfs::Parallel::cal_Nadj");
 	vector<size_t> Nadj(ucell.nat);
@@ -52,38 +49,37 @@ vector<size_t> Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj( const Abfs::Vect
 
 // { Ni*Nj, {i,j} }
 vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs( 
-	const vector<size_t> &Nadj, const double rmesh_times )
+	const vector<size_t> &Nadj, 
+	const double rmesh_times )
 {
 	TITLE("Exx_Abfs::Parallel::cal_pair_costs");
-	
-	vector<Vector3<int>> boxes;
-	for(const int ix:{-1,0,1})
-		for(const int iy:{-1,0,1})
-			for(const int iz:{-1,0,1})
-				boxes.push_back({ix,iy,iz});
 			
-	auto neighbour = [&](const size_t iat1, const size_t iat2) -> bool
+	const vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(rmesh_times);
+	auto neighbour = [&](const size_t iat1, const size_t iat2) -> int
 	{
 		const int it1 = ucell.iat2it[iat1];
 		const int it2 = ucell.iat2it[iat2];
 		const Vector3<double> tau1 = ucell.atoms[it1].tau[ucell.iat2ia[iat1]];
 		const Vector3<double> tau2 = ucell.atoms[it2].tau[ucell.iat2ia[iat2]];
-		double R_min = std::numeric_limits<double>::max();
-		for(const Vector3<int> box2 : boxes)
+		const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
+		int Nadj_box = 0;
+		for(const Vector3<int> box2 : Coulomb_potential_boxes)
 		{
 			const double R = (-tau1 + tau2 + box2 * ucell.latvec).norm();
-			if(R<R_min)
-				R_min = R;
+			if(R*ucell.lat0 < Rcut)
+				++Nadj_box;
 		}
-		return R_min < ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut() &&
-			   R_min < ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times;
+		return Nadj_box;
 	};
 			
 	vector<pair<size_t,pair<size_t,size_t>>> pair_costs;
 	for( size_t iat1=0; iat1<ucell.nat; ++iat1 )
 		for( size_t iat2=iat1; iat2<ucell.nat; ++iat2 )
-			if(neighbour(iat1,iat2))
-				pair_costs.push_back( {Nadj[iat1]*Nadj[iat2], {iat1,iat2} } );
+		{
+			const int Nadj_box = neighbour(iat1,iat2);
+			if(Nadj_box)
+				pair_costs.push_back( {Nadj[iat1]*Nadj[iat2]*Nadj_box, {iat1,iat2} } );
+		}
 		
 	auto comp = []( 
 		const pair<size_t,pair<size_t,size_t>> & pair_cost1, 
@@ -93,7 +89,8 @@ vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::
 	return pair_costs;
 }
 
-vector<vector<pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work( const vector<pair<size_t,pair<size_t,size_t>>> & pair_costs )
+vector<vector<pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work( 
+	const vector<pair<size_t,pair<size_t,size_t>>> & pair_costs )
 {
 	TITLE("Exx_Abfs::Parallel::cal_rank_work");
 	vector<pair<size_t,size_t>> rank_cost(NPROC);				// rank_cost[i] = { irank, cost }

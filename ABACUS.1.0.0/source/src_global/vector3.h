@@ -36,8 +36,8 @@ public:
 
 	T norm2(void) const	{ return x*x + y*y + z*z; }
 	T norm(void) const	{ return sqrt(norm2()); }
-	void normalize(void){ const T m=norm(); x/=m; y/=m; z/=m; }
-	void reverse(void)	{ x=-x; y=-y; z=-z; }
+	Vector3<T>& normalize(void){ const T m=norm(); x/=m; y/=m; z/=m; return *this; }	// Peize Lin update return 2019-09-08
+	Vector3<T>& reverse(void){ x=-x; y=-y; z=-z; return *this; }						// Peize Lin update return 2019-09-08
 
 	void print(void)const ;		// mohan add 2009-11-29
 };

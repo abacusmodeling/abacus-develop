@@ -1958,6 +1958,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( exx_dm_threshold );		
 	Parallel_Common::bcast_double( exx_schwarz_threshold );		
 	Parallel_Common::bcast_double( exx_cauchy_threshold );		
+	Parallel_Common::bcast_double( exx_ccp_threshold );		
 	Parallel_Common::bcast_string( exx_distribute_type );
 	Parallel_Common::bcast_int( exx_opt_orb_lmax );
 	Parallel_Common::bcast_double( exx_opt_orb_ecut );

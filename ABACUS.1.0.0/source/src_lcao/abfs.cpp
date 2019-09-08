@@ -145,7 +145,6 @@ cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
 
 map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Vs(
 	const vector<pair<size_t,size_t>> &atom_pairs,
-	const vector<Vector3_Order<int>> &Coulomb_potential_boxes,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Element_Basis_Index::IndexLNM &index_abfs,
 	const double rmesh_times,
@@ -153,6 +152,7 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
 	TITLE("Abfs","cal_Vs");	
+	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = get_Coulomb_potential_boxes(rmesh_times);
 	map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> Vs;
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
@@ -164,18 +164,19 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 		const size_t ia2 = ucell.iat2ia[iat2];
 		const Vector3_Order<double> tau1 = ucell.atoms[it1].tau[ia1];
 		const Vector3_Order<double> tau2 = ucell.atoms[it2].tau[ia2];
+		const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
 		
 		for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
 		{
 			const Vector3_Order<double> delta_R = -tau1+tau2+(box2*ucell.latvec);
-			if( delta_R.norm()*ucell.lat0 > ORB.Phi[it1].getRcut()*rmesh_times + ORB.Phi[it2].getRcut() )
-				continue;
+			if( delta_R.norm()*ucell.lat0 < Rcut )
+			{
 //cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*ucell.lat0<<"\t"<<ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut()<<endl;
-			
-			Vs[iat1][iat2][box2] = DPcal_V( 
-				it1, it2, delta_R, 
-				m_abfs_abfs, index_abfs, 
-				threshold, true, Vws );
+				Vs[iat1][iat2][box2] = DPcal_V( 
+					it1, it2, delta_R, 
+					m_abfs_abfs, index_abfs, 
+					threshold, true, Vws );
+			}
 		}
 	}
 	Abfs::delete_threshold_ptrs( Vs, threshold );
@@ -456,6 +457,20 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 	a1Rs_a2s.clear();
 	
 	return a1Rs_a2Rs;
+}
+
+vector<Abfs::Vector3_Order<int>> Abfs::get_Coulomb_potential_boxes( const double rmesh_times )
+{
+	vector<Vector3_Order<int>> Coulomb_potential_boxes;
+	const double Rcut = ORB.get_Rmax() * rmesh_times;
+	const int nx = std::ceil(Rcut/std::abs((ucell.a2^ucell.a3).normalize()*ucell.a1*ucell.lat0));
+	const int ny = std::ceil(Rcut/std::abs((ucell.a1^ucell.a3).normalize()*ucell.a2*ucell.lat0));
+	const int nz = std::ceil(Rcut/std::abs((ucell.a1^ucell.a2).normalize()*ucell.a3*ucell.lat0));
+	for(int x=-nx; x<=nx; ++x)
+		for(int y=-ny; y<=ny; ++y)
+			for(int z=-nz; z<=nz; ++z)
+				Coulomb_potential_boxes.push_back({x,y,z});
+	return Coulomb_potential_boxes;
 }
 
 shared_ptr<matrix> Abfs::cal_I( const shared_ptr<matrix> &m )

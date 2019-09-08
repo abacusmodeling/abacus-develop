@@ -82,7 +82,6 @@ private:
 	vector<pair<size_t,size_t>> atom_pairs_core_origin;
 	vector<pair<size_t,size_t>> atom_pairs_core;
 	set<pair<size_t,size_t>> H_atom_pairs_core;
-	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes;
 	Abfs::Vector3_Order<int> Born_von_Karman_period;
 
 	Exx_Abfs::Screen::Schwarz schwarz;

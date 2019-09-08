@@ -255,7 +255,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi
 {
 	int comm_size;	MPI_Comm_size( mpi_comm, &comm_size );
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
-//ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream::app);
+ofstream ofs_mpi(exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank),ofstream::app);
 
 	auto classify_atom = []( const int Ng, const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom> &atoms ) -> vector<vector<size_t>>
 	{
@@ -275,8 +275,10 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi
 	const vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> &clusters = atoms_clusters_tmp.second;
 	const vector<vector<size_t>> clusters_atoms = classify_atom(comm_size,atoms);
 	
-//for(const auto cluster_atoms : clusters_atoms)
-//	ofs_mpi<<cluster_atoms<<endl;
+for(const auto cluster_atoms : clusters_atoms)
+	ofs_mpi<<cluster_atoms<<endl;
+for(const auto cluster : clusters)
+	ofs_mpi<<cluster.tau<<endl;
 	
 	vector<pair<size_t,size_t>> rank_work;
 	for(const size_t iat1 : clusters_atoms[my_rank])
@@ -296,7 +298,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi
 			for(const Vector3<int> box2 : boxes)
 			{
 				const Vector3<double> tau2_box2 = tau2 + box2 * ucell.latvec;
-				const double R = (-tau1 + tau2_box2).norm();
+				const double R = (-tau1+tau2_box2).norm();
 				if(R<R_min)
 				{
 					R_min = R;
@@ -304,31 +306,39 @@ Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( const MPI_Comm & mpi
 					box2_min = box2;
 				}
 			}
-			
-			if(R_min < ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut() &&
-			   R_min < ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times )
+
+			const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
+			if(R_min*ucell.lat0<Rcut)
 			{
-//ofs_mpi<<iat1<<"\t"<<iat2<<"\t"<<box2_min<<"\t"<<R_min<<endl;
 				if(ic1==ic2)
 				{
 					if(iat1<=iat2)
+					{
 						rank_work.push_back({iat1,iat2});
+					}
 				}
 				else
 				{
+					constexpr double epsilon = 1E-8;
 					const Vector3<double> middle = (tau1 + tau2_box2_min)/2.0;
-					if( (middle-clusters[ic1].tau).norm() < (middle-clusters[ic2].tau).norm() )
+					if( (middle-clusters[ic1].tau).norm() < (middle-clusters[ic2].tau-box2_min*ucell.latvec).norm() - epsilon )
+					{
 						rank_work.push_back({iat1,iat2});
-					else if( (middle-clusters[ic1].tau).norm() == (middle-clusters[ic2].tau).norm() )
+					}
+					else if( std::abs( (middle-clusters[ic1].tau).norm() - (middle-clusters[ic2].tau-box2_min*ucell.latvec).norm() )<=epsilon )
+					{
 						if(iat1<iat2)
+						{
 							rank_work.push_back({iat1,iat2});
+						}
+					}
 				}
 		   
 			}
 		}
 	}
   
-//ofs_mpi<<rank_work<<endl;
-//ofs_mpi.close();
+ofs_mpi<<rank_work<<endl;
+ofs_mpi.close();
 	return rank_work;
 }

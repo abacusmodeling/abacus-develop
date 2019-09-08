@@ -22,9 +22,9 @@ void Exx_Abfs::Matrix_Orbs11::init(
 	// (1) MOT: make overlap table.
 	//=========================================
 
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);	
-timeval t_start;	
-gettimeofday( &t_start, NULL);
+//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);	
+//timeval t_start;	
+//gettimeofday( &t_start, NULL);
 	MOT.allocate(
 		ORB.get_ntype(),							// number of atom types
 		std::max( ORB.get_lmax(), Exx_Abfs::Lmax ),	// max L used to calculate overlap
@@ -33,39 +33,39 @@ gettimeofday( &t_start, NULL);
 		ORB.get_dR(),								// delta R, for making radial table
 //		ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
 		ORB.get_dk());											// Peize Lin change 2017-04-16
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.allocate\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.allocate\t"<<time_during(t_start)<<endl;
 	int Lmax_used, Lmax;
-gettimeofday( &t_start, NULL);
+//gettimeofday( &t_start, NULL);
 	MOT.init_Table_Spherical_Bessel (2, mode, Lmax_used, Lmax);
 //	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1
 //	MOT.Destroy_Table_Spherical_Bessel (Lmax_used);				// why?
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.init_Table_Spherical_Bessel\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.init_Table_Spherical_Bessel\t"<<time_during(t_start)<<endl;
 
 	//=========================================
 	// (2) init Ylm Coef
 	//=========================================
 	//liaochen add 2010/4/29
-gettimeofday( &t_start, NULL);
+//gettimeofday( &t_start, NULL);
 	Ylm::set_coefficients ();
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::Ylm\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::Ylm\t"<<time_during(t_start)<<endl;
 	
 	//=========================================
 	// (3) make Gaunt coefficients table
 	//=========================================
-gettimeofday( &t_start, NULL);
+//gettimeofday( &t_start, NULL);
 	MGT.init_Gaunt_CH( Lmax );
 	MGT.init_Gaunt( Lmax );
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MGT\t"<<time_during(t_start)<<endl;
-ofs.close();
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MGT\t"<<time_during(t_start)<<endl;
+//ofs.close();
 }
 
 void Exx_Abfs::Matrix_Orbs11::init_radial(
 	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A, 
 	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_B)
 { 
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
-timeval t_start;
-gettimeofday( &t_start, NULL);
+//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+//timeval t_start;
+//gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","init_radial");
 	for( size_t TA = 0; TA!=orb_A.size(); ++TA )
 		for( size_t TB=0; TB!=orb_B.size(); ++TB )
@@ -78,17 +78,17 @@ gettimeofday( &t_start, NULL);
 									orb_A[TA][LA][NA], 
 									orb_B[TB][LB][NB],
 									MOT, MGT)));
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial\t"<<time_during(t_start)<<endl;
-ofs.close();
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial\t"<<time_during(t_start)<<endl;
+//ofs.close();
 }
 
 void Exx_Abfs::Matrix_Orbs11::init_radial(
 	const LCAO_Orbitals &orb_A, 
 	const LCAO_Orbitals &orb_B)
 { 
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
-timeval t_start;
-gettimeofday( &t_start, NULL);
+//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+//timeval t_start;
+//gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","init_radial");
 	for( size_t TA = 0; TA!=orb_A.get_ntype(); ++TA )
 		for( size_t TB=0; TB!=orb_B.get_ntype(); ++TB )
@@ -101,15 +101,15 @@ gettimeofday( &t_start, NULL);
 									orb_A.Phi[TA].PhiLN(LA,NA),								
 									orb_B.Phi[TB].PhiLN(LB,NB),
 									MOT, MGT)));
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial\t"<<time_during(t_start)<<endl;
-ofs.close();
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial\t"<<time_during(t_start)<<endl;
+//ofs.close();
 }
 
 void Exx_Abfs::Matrix_Orbs11::init_radial_table()
 {
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
-timeval t_start;
-gettimeofday( &t_start, NULL);
+//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+//timeval t_start;
+//gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","init_radial_table");
 	for( auto &coA : center2_orb11_s )
 		for( auto &coB : coA.second )
@@ -118,15 +118,15 @@ gettimeofday( &t_start, NULL);
 					for( auto &coE : coD.second )
 						for( auto &coF : coE.second )
 							coF.second.init_radial_table();
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial_table\t"<<time_during(t_start)<<endl;
-ofs.close();
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial_table\t"<<time_during(t_start)<<endl;
+//ofs.close();
 }
 
 void Exx_Abfs::Matrix_Orbs11::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
 {	
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
-timeval t_start;
-gettimeofday( &t_start, NULL);
+//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+//timeval t_start;
+//gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","init_radial_table_Rs");
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
@@ -134,8 +134,8 @@ gettimeofday( &t_start, NULL);
 			if( auto* const center2_orb11_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb11>>>>*const>(
 						MAP_EXIST(center2_orb11_s, RsA.first, RsB.first)) )
 			{
-timeval t_small;
-gettimeofday(&t_small, NULL);
+//timeval t_small;
+//gettimeofday(&t_small, NULL);
 				set<size_t> radials;
 				for( const double &R : RsB.second )
 				{
@@ -144,18 +144,18 @@ gettimeofday(&t_small, NULL);
 					for( size_t i=0; i!=4; ++i )
 						radials.insert(iq+i);
 				}
-ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
-gettimeofday(&t_small, NULL);
+//ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
+//gettimeofday(&t_small, NULL);
 				for( auto &coC : *center2_orb11_sAB )
 					for( auto &coD : coC.second )
 						for( auto &coE : coD.second )
 							for( auto &coF : coE.second )
 								coF.second.init_radial_table(radials);
-ofs<<time_during(t_small)<<endl;
+//ofs<<time_during(t_small)<<endl;
 			}
 		}
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial_table\t"<<time_during(t_start)<<endl;
-ofs.close();
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial_table\t"<<time_during(t_start)<<endl;
+//ofs.close();
 }
 
 /*

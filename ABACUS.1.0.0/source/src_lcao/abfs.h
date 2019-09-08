@@ -33,7 +33,6 @@ public:
 	// Vws[it1,0][it2,R]
 	static map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> cal_Vs(
 		const vector<pair<size_t,size_t>> &atom_pairs,
-		const vector<Vector3_Order<int>> &Coulomb_potential_boxes,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Element_Basis_Index::IndexLNM &index_abfs,
 		const double rmesh_times,
@@ -80,6 +79,7 @@ public:
 	static map<size_t,vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &iat );
 	static vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> get_adjs();
 	static set<pair<size_t,size_t>> get_H_pairs_core( const vector<pair<size_t,size_t>> &atom_pairs );
+	static vector<Vector3_Order<int>> get_Coulomb_potential_boxes( const double rmesh_times );
 
 	static shared_ptr<matrix> cal_I( const shared_ptr<matrix> &m );
 	static vector<vector<shared_ptr<matrix>>> cal_I( const vector<vector<shared_ptr<matrix>>> &ms );

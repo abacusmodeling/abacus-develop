@@ -17,7 +17,7 @@ public:
 		: Orb22( nA1_in, nA2_in, nB1_in, nB2_in, MOT_in, MGT_in ){}
 
 	void init_radial_table();
-	Orb22_Ccp &set_rmesh_times( double rmesh_times_in ){ rmesh_times = rmesh_times; return *this; }
+	Orb22_Ccp &set_rmesh_times( double rmesh_times_in ){ rmesh_times = rmesh_times_in; return *this; }
 private:
 	double rmesh_times = 1.0;
 };

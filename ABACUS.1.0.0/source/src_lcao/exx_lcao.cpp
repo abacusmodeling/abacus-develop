@@ -596,12 +596,6 @@ ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial\t"<<time_during(t_start)<<endl;
 //	m_abfslcaos_lcaos.init_radial_table();
 //ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<endl;
 
-	// Peize Lin test 2017-03-27
-	const int N_Coulomb_potential=10;
-	for( int x=-N_Coulomb_potential; x<=N_Coulomb_potential; ++x )
-		for( int y=-N_Coulomb_potential; y<=N_Coulomb_potential; ++y )
-			for( int z=-N_Coulomb_potential; z<=N_Coulomb_potential; ++z )
-				Coulomb_potential_boxes.push_back({x,y,z});
 	Born_von_Karman_period = Vector3<int>{kv.nmp[0],kv.nmp[1],kv.nmp[2]};
 ofs_mpi<<"TIME@ Exx_Lcao::init\t"<<time_during(t_start_all)<<endl;
 ofs_mpi.close();
@@ -710,15 +704,17 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ init_radial_table_ions\t"<<time_during(t_start)<<endl;
 
 gettimeofday( &t_start, NULL);
-	Vs = Abfs::cal_Vs( atom_pairs_core_origin, Coulomb_potential_boxes, m_abfs_abfs, index_abfs, rmesh_times, info.v_threshold, Vws );
+	Vs = Abfs::cal_Vs( atom_pairs_core_origin, m_abfs_abfs, index_abfs, rmesh_times, info.v_threshold, Vws );
 ofs_mpi<<"TIME@ Abfs::cal_Vs\t"<<time_during(t_start)<<endl;
 	Abfs::delete_empty_ptrs( Vws );
 gettimeofday( &t_start, NULL);
 	Vps = Abfs::cal_mps( Born_von_Karman_period, Vs );
 ofs_mpi<<"TIME@ Abfs::cal_Vps\t"<<time_during(t_start)<<endl;
 	atom_pairs_core = Abfs::get_atom_pair(Vps);
+ofs_mpi<<"atom_pairs_core\t"<<atom_pairs_core.size()<<endl;
 
 	const set<size_t> atom_centres_core = cal_atom_centres_core(atom_pairs_core);
+ofs_mpi<<"atom_centres_core\t"<<atom_centres_core.size()<<endl;
 
 gettimeofday( &t_start, NULL);
 	H_atom_pairs_core = Abfs::get_H_pairs_core( atom_pairs_core );
@@ -1166,6 +1162,7 @@ ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<en
 		#error "TEST_EXX_LCAO"
 	#endif
 gettimeofday( &t_start, NULL);
+	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(rmesh_times);
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs_core )
 	{
 		const size_t iat1 = atom_pair.first;
@@ -1176,6 +1173,7 @@ gettimeofday( &t_start, NULL);
 		const size_t ia2 = ucell.iat2ia[iat2];
 		const Vector3<double> &tau1 = ucell.atoms[it1].tau[ia1];
 		const Vector3<double> &tau2 = ucell.atoms[it2].tau[ia2];
+		const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
 
 		for( const Vector3<int> &box2 : Coulomb_potential_boxes )
 		{
@@ -1187,8 +1185,7 @@ gettimeofday( &t_start, NULL);
 				#error "TEST_EXX_LCAO"
 			#endif
 
-			if( delta_R*ucell.lat0 < ORB.Phi[it1].getRcut()*rmesh_times + ORB.Phi[it2].getRcut() &&
-				delta_R*ucell.lat0 < ORB.Phi[it1].getRcut() + ORB.Phi[it2].getRcut()*rmesh_times )
+			if( delta_R*ucell.lat0 < Rcut )
 			{
 				radial_R[it1][it2].insert( delta_R );
 				radial_R[it2][it1].insert( delta_R );
