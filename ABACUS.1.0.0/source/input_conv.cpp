@@ -371,7 +371,7 @@ void Input_Conv::Convert(void)
 	{
 		ocp_kb[i] = INPUT.ocp_kb[i];
 	}
-
+                 mulliken = INPUT. mulliken;//qifeng add 2019/9/10
 //----------------------------------------------------------
 // about selinv
 //----------------------------------------------------------

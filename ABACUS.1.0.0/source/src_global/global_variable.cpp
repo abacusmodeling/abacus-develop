@@ -95,7 +95,7 @@ int vext_dire=1;
 int ocp=0;
 int ocp_n=0;
 double ocp_kb[10000];
-
+int  mulliken=0;//qifeng add 2019/9/10
 //----------------------------------------------------------
 // EXPLAIN : Parallel information
 // GLOBAL VARIABLES :

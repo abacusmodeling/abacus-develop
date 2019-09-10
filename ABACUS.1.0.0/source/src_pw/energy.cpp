@@ -9,6 +9,7 @@
 #include "algorithms.h"
 #include "mymath.h"
 //#include "../src_develop/src_siao/selinv.h"
+#include "../src_lcao/Mulliken_Charge.h"
 
 int energy::mxr = 50;
 
@@ -892,6 +893,13 @@ void energy::perform_dos(void)
 			ofsi.close();
 		}
 	}
+                // mulliken charge analysis
+		if(mulliken == 1)
+		{
+		Mulliken_Charge   MC;
+                                MC.stdout_mulliken();			
+                                 }//qifeng add 2019/9/10
+
 
 	int nspin0=1;
 	if(NSPIN==2) nspin0=2;

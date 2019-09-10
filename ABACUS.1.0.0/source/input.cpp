@@ -448,6 +448,7 @@ void Input::Default(void)
     cell_factor = 1.2; //LiuXh add 20180619
     
     newDM=0; // Shen Yu add 2019/5/9
+         mulliken=0;// qi feng add 2019/9/10
 
     return;
 }
@@ -1452,6 +1453,10 @@ bool Input::Read(const string &fn)
              }
 		read_value(ifs, ocp_kb[ocp_n-1]);
         }
+                else if (strcmp("mulliken", word) == 0)
+                {
+                    read_value(ifs, mulliken);
+                 }//qifeng add 2019/9/10
 
         else if (strcmp("supercell_scale", word) == 0)
         {
@@ -1861,6 +1866,7 @@ void Input::Bcast()
         {
             Parallel_Common::bcast_double( ocp_kb[i] );
         }
+                Parallel_Common::bcast_int( mulliken);//qifeng add 2019/9/10
         Parallel_Common::bcast_int( lcao_box[0] );
         Parallel_Common::bcast_int( lcao_box[1] );
         Parallel_Common::bcast_int( lcao_box[2] );
@@ -2803,7 +2809,7 @@ void Input::Print(const string &fn)const
 		ofs << setw(20) <<"ocp_kb" << ocp_kb[i]<< endl;
 	}
 	ofs << setw(20) <<"lcao_box"<<lcao_box[0]<<"   "<<lcao_box[1]<<"   "<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<endl;
-	
+	OUTP(ofs," mulliken", mulliken," mulliken  charge or not");//qifeng add 2019/9/10
 	//OUTP(ofs,"epsilon0",epsilon0,"calculate the macroscopic dielectric constant or not");
 	//OUTP(ofs,"intersmear",intersmear,"eta");
 	OUTP(ofs,"intrasmear",intrasmear,"Eta");
