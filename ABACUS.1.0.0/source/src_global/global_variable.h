@@ -63,6 +63,7 @@ extern int 		ATOM_DISTRIBUTION;	// 11.4 // mohan add 2010-06-28
 extern bool     NONCOLIN;
 extern bool     LSPINORB;
 extern bool     DOMAG;
+extern bool     DOMAG_Z;
 extern int      NPOL;
 
 // diagonalization (5)

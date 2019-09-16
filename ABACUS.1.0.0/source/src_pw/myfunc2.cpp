@@ -192,7 +192,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
 
 //
 //-----------------------------------------------------------------------
-void gcc_spin(double rho, double zeta, double grho, double &sc,
+void gcc_spin(double rho, double &zeta, double grho, double &sc,
               double &v1cup, double &v1cdw, double &v2c)
 {
     //-------------------------------------------------------------------
@@ -219,7 +219,7 @@ void gcc_spin(double rho, double zeta, double grho, double &sc,
 
     double x;
 
-    if (abs(zeta) > 1.0)
+    if (abs(zeta) - 1.0 > small)
     {
         sc = 0.00;
         v1cup = 0.00;
@@ -553,7 +553,7 @@ void pbec_spin(double rho, double zeta, double grho, const int &iflag, double &s
     double ga, be[3];//mohan add
     // parameter :
     ga = 0.0310910;
-    be[1] = 0.0667250;
+    be[1] = 0.06672455060314922;//zhengdy add 2019-09-12, ensure same parameter with pwscf
 	be[2] = 0.0460000;//mohan add 2012-05-28
     double third, pi34, xkf, xks;
     // parameter :

@@ -135,7 +135,8 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 	int iw1_lo;
 	for(int is=0; is<NSPIN; ++is)
 	{
-		if(NONCOLIN && !DOMAG && (is==1||is==2)) continue;//zhengdy-soc, didn't count the noncollinear case now, but need to fix next. 
+//		if(NONCOLIN && !DOMAG && (is==1||is==2)) continue;//zhengdy-soc 
+//		if(NONCOLIN && !(DOMAG||DOMAG_Z) && is==3) continue;//zhengdy-soc 
 		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
 		for (int ia1=0; ia1<size; ++ia1)
 		{
@@ -354,9 +355,8 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 			}// ia2
 		} // ia1
 		
-		// calculate rho	
+		// calculate rho
 		double *rhop = chr.rho[is];
-		if(NONCOLIN) rhop = chr.rho[0];
 		for(int ib=0; ib<pw.bxyz; ++ib)
 		{
 			double r=ddot_(&block_index[size], psir_ylm[ib], &inc, psir_DM[ib], &inc);

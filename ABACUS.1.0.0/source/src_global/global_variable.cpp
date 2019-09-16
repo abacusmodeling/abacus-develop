@@ -216,6 +216,7 @@ int test_deconstructor = 0;
 bool NONCOLIN = false;
 bool LSPINORB = false;
 bool DOMAG    = false;
+bool DOMAG_Z  = false;
 int NPOL      = 1;
 
 bool FINAL_SCF = false; //LiuXh add 20180619

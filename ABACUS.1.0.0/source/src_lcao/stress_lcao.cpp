@@ -447,14 +447,6 @@ void Stress_LCAO::cal_stress_loc(void)
        }
     }
 
-    double** rho_atom = new double*[NSPIN];
-     for(int is=0; is<NSPIN; is++)
-     {
-        rho_atom[is] = new double[pw.nrxx];
-        ZEROS(rho_atom[is], pw.nrxx);
-     }
-
-     chr.atomic_rho(NSPIN,rho_atom);
      complex<double> *Porter = UFFT.porter;
 
      ZEROS( Porter, pw.nrxx );
@@ -531,11 +523,6 @@ void Stress_LCAO::cal_stress_loc(void)
                }
     }
     delete[] dvloc;
-    for(int is=0; is<NSPIN; is++)
-     {
-        delete[] rho_atom[is];
-     }
-    delete[] rho_atom;
     delete[] vg;
 
 
@@ -792,25 +779,6 @@ void Stress_LCAO::cal_stress_har(){
 
 
 
-     double** rho_atom = new double*[NSPIN];
-     //cout<<"NSPIN "<<NSPIN<<endl;
-     for(int is=0; is<NSPIN; is++)
-     {
-        rho_atom[is] = new double[pw.nrxx];
-        ZEROS(rho_atom[is], pw.nrxx);
-     }
-
-     chr.atomic_rho(NSPIN,rho_atom);
-     for(int is=0; is<NSPIN; is++)
-                {
-                        for(int ir=0; ir<pw.nrxx; ir++)
-                        {
-                                rho_atom[is][ir] = chr.rho[is][ir];
-//  rho_atom[is][ir] = chr.rho[is][ir] - rho_atom[is][ir];
-                        }
-                }
-
-
      complex<double> *Porter = UFFT.porter;
 
     //  Hartree potential VH(r) from n(r)
@@ -819,7 +787,7 @@ void Stress_LCAO::cal_stress_har(){
         {
         for (int ir=0; ir<pw.nrxx; ir++)
                 {
-                        Porter[ir] += complex<double>( rho_atom[is][ir], 0.0 );
+                        Porter[ir] += complex<double>( chr.rho[is][ir], 0.0 );
                 }
         }
      //=============================
@@ -915,11 +883,6 @@ void Stress_LCAO::cal_stress_har(){
      }
 
      delete[] vh_g;
-     for(int is=0; is<NSPIN; is++)
-     {
-        delete[] rho_atom[is];
-     }
-    delete[] rho_atom;
 	delete[] psic;
 	delete[] psic0;
      return;

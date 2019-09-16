@@ -283,7 +283,7 @@ void WF_atomic::atomic_wfc
                         if(ucell.atoms[it].has_so)
                         {
                             const double j = ucell.atoms[it].jchi[iw];
-                            if (INPUT.starting_spin_angle|| !DOMAG)
+                            if (INPUT.starting_spin_angle|| !(DOMAG||DOMAG_Z))
                             {//atomic_wfc_so
                                 double fact[2];
                                 for(int m=-l-1;m<l+1;m++)

@@ -647,7 +647,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 					{
 						// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
 						UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-						if(NONCOLIN && DOMAG)
+						if(NONCOLIN) //&& DOMAG)
 						{//added by zhengdy-soc, for non-collinear case
 							for(int is=1;is<4;is++)
 							{

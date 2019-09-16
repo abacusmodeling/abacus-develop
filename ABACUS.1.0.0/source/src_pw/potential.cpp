@@ -362,7 +362,7 @@ void potential::v_xc
     int neg [3];
 
     double vanishing_charge = 1.0e-10;
-    if (NSPIN == 1 || ( NSPIN ==4 && !DOMAG))
+    if (NSPIN == 1 || ( NSPIN ==4 && !DOMAG && !DOMAG_Z))
     {
         // spin-unpolarized case
         // for parallel : ncxyz change ==> nrxx

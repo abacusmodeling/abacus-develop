@@ -67,6 +67,8 @@ void Magnetism::compute_magnetization()
 
 		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= ucell.omega / pw.ncxyz;
 		this->abs_magnetization *= ucell.omega / pw.ncxyz;
+		ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
+		OUT(ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 	}
 
     return;
