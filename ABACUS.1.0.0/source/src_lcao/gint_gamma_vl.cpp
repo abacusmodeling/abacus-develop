@@ -253,20 +253,15 @@ inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
     Cblacs_pinfo(&myproc, &nprocs);
     
     // init data arrays
-    static bool FIRST_RUN=true;
-    if(FIRST_RUN)
-    {
-        FIRST_RUN=false;
-        delete[] sender_size_process;
-        sender_size_process=new int[nprocs];
-        delete[] sender_displacement_process;
-        sender_displacement_process=new int[nprocs];
+    delete[] sender_size_process;
+    sender_size_process=new int[nprocs];
+    delete[] sender_displacement_process;
+    sender_displacement_process=new int[nprocs];
 
-        delete[] receiver_size_process;
-        receiver_size_process=new int[nprocs];
-        delete[] receiver_displacement_process;
-        receiver_displacement_process=new int[nprocs];
-    }
+    delete[] receiver_size_process;
+    receiver_size_process=new int[nprocs];
+    delete[] receiver_displacement_process;
+    receiver_displacement_process=new int[nprocs];
 
     // build the local index to be sent to other process (sender_local_index),
     //       the global index to be received from other process (receiver_global_index),
