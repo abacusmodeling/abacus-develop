@@ -1249,6 +1249,7 @@ void UnitCell_pseudo::cal_nelec(void)
                              //if (NBANDS > NLOCAL)
                              //    NBANDS = NLOCAL;
                          }
+                         NBANDS = NBANDS>6 ? NBANDS : 6 ; 
 
 	//		NBANDS = static_cast<int>( Mathzone::Max3( 1.2*occupied_bands, 
 	//					1.2*mag.get_nelup() , 
