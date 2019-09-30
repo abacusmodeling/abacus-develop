@@ -19,7 +19,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 
 	int nspin0 = NSPIN;
 	if(NSPIN==4) nspin0 =1;
-	if(NSPIN==4&&DOMAG) nspin0 = 2;
+	if(NSPIN==4&&(DOMAG||DOMAG_Z)) nspin0 = 2;
 	if(NSPIN==4)
 	{
 		if(xcf.igcx != 0  ||  xcf.igcc != 0) soc.cal_ux(ucell.ntype);
@@ -81,7 +81,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		GGA_PW::grad_rho( rhogsum2 , gdr2 );
 	}
 
-	if(NSPIN == 4&&DOMAG)
+	if(NSPIN == 4&&(DOMAG||DOMAG_Z))
 	{
 		ZEROS(rhotmp1, pw.nrxx);
 		ZEROS(rhogsum1, pw.ngmc);
@@ -229,7 +229,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 				else
 				{
 					double zeta = ( rhotmp1[ir] - rhotmp2[ir] ) / rh;
-					if(NSPIN==4&&DOMAG) zeta = fabs(zeta) * neg[ir];
+					if(NSPIN==4&&(DOMAG||DOMAG_Z)) zeta = fabs(zeta) * neg[ir];
 					const double grh2 = (gdr1[ir]+gdr2[ir]).norm2();
 					//XC_Functional::gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
 					gcc_spin(rh, zeta, grh2, sc, v1cup, v1cdw, v2c);
@@ -305,7 +305,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	vtxc += vtxcgc;
 	etxc += etxcgc;
 
-	if(NSPIN == 4 && DOMAG)
+	if(NSPIN == 4 && (DOMAG||DOMAG_Z))
 	{
 		for(int is=0;is<NSPIN;is++)
 		{
@@ -340,7 +340,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		delete[] gdr2;
 		delete[] h2;
 	}
-	if(NSPIN == 4 && DOMAG)
+	if(NSPIN == 4 && (DOMAG||DOMAG_Z))
 	{
 		delete[] neg;
 		for(int i=0; i<nspin0; i++) delete[] vgg[i];

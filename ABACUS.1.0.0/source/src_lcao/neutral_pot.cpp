@@ -144,7 +144,7 @@ void Neutral_Pot::uniform_Vna(const int &it, const double &dr_in )
 	// mohan note: 2011-05-23,
 	// if rcut > 15, check pseudo_atom.cpp, 
 	// the readin radius must be larger.
-	assert(rcut < 15);
+	assert(rcut <= 15);
 
 	OUT(ofs_running,"radius cutoff of Vna (Bohr)",rcut);
 	OUT(ofs_running,"threshold of Vna",threshold);

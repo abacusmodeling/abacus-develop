@@ -267,11 +267,9 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 			int ic=0;
 			for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
 			{
-cout<<"L_and_nwl: "<<L<<" "<<ucell.atoms[it].nwl<<endl;
 				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
 				for(int N=0; N < ucell.atoms[it].l_nchi[L]; N++)
 				{
-cout<<"N: "<<N<<" "<<ucell.atoms[it].l_nchi[L]<<endl;
 //					ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << endl;
 					
 					for(int ig=0; ig<npw; ig++)
@@ -289,7 +287,7 @@ cout<<"N: "<<N<<" "<<ucell.atoms[it].l_nchi[L]<<endl;
 							if(ucell.atoms[it].has_so)
 							{
 								const double j = abs(double(L+is_N) - 0.5);
-								if (INPUT.starting_spin_angle|| !DOMAG)
+								if (INPUT.starting_spin_angle|| !(DOMAG||DOMAG_Z))
 								{//atomic_wfc_so
 									for(int m=0; m<2*L+1; m++)
 									{
@@ -524,7 +522,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 							if(ucell.atoms[it].has_so)
 							{
 								const double j = double(L+is_N) - 0.5;
-								if (INPUT.starting_spin_angle|| !DOMAG)
+                            if (INPUT.starting_spin_angle|| !(DOMAG||DOMAG_Z))
 								{//atomic_wfc_so
 									double fact[2];
 									for(int m=-L-1;m<L+1;m++)

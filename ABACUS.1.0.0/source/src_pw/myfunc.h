@@ -19,7 +19,7 @@ void optx(double rho, double grho, double &sx, double &v1x, double &v2x);
 void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
               double &sx, double &v1xup, double &v1xdw, double &v2xup,
               double &v2xdw);
-void gcc_spin(double rho, double zeta, double grho, double &sc,
+void gcc_spin(double rho, double &zeta, double grho, double &sc,
               double &v1cup, double &v1cdw, double &v2c);
 void becke88_spin(double rho, double grho, double &sx, double &v1x,
                   double &v2x);

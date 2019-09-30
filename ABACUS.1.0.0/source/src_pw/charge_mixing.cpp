@@ -234,7 +234,7 @@ double Charge_Mixing::rhog_dot_product(
 
 	case 4:
 		// non-collinear spin, added by zhengdy
-		if(!DOMAG) goto part_of_noncolin;
+		if(!DOMAG&&!DOMAG_Z) goto part_of_noncolin;
 		else
 		{
 			//another part with magnetization

@@ -92,7 +92,10 @@ int val_elec_02 =1;
 int val_elec_03 =1;
 int vext =0;
 int vext_dire=1;
-
+int ocp=0;
+int ocp_n=0;
+double ocp_kb[10000];
+int  mulliken=0;//qifeng add 2019/9/10
 //----------------------------------------------------------
 // EXPLAIN : Parallel information
 // GLOBAL VARIABLES :
@@ -213,6 +216,7 @@ int test_deconstructor = 0;
 bool NONCOLIN = false;
 bool LSPINORB = false;
 bool DOMAG    = false;
+bool DOMAG_Z  = false;
 int NPOL      = 1;
 
 bool FINAL_SCF = false; //LiuXh add 20180619

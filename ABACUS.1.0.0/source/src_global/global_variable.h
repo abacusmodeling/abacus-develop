@@ -63,6 +63,7 @@ extern int 		ATOM_DISTRIBUTION;	// 11.4 // mohan add 2010-06-28
 extern bool     NONCOLIN;
 extern bool     LSPINORB;
 extern bool     DOMAG;
+extern bool     DOMAG_Z;
 extern int      NPOL;
 
 // diagonalization (5)
@@ -103,7 +104,10 @@ extern int val_elec_03;
 extern int vext;
 extern int vext_dire;
 
-
+extern int ocp;
+extern int ocp_n;
+extern double ocp_kb[10000];
+extern int  mulliken;//qifeng add 2019/9/10
 //========================================================================
 // EXPLAIN : Parallel information
 // GLOBAL VARIABLES :

@@ -207,7 +207,7 @@ void Soc::cal_ux(const int ntype)
        {
             ux[i] *= 1/sqrt(uxmod);
        }
-       cout<<"    Fixed quantization axis for GGA: "<<setw(10)<<ux[0]<<"  "<<setw(10)<<ux[1]<<"  "<<setw(10)<<ux[2]<<endl;
+//       cout<<"    Fixed quantization axis for GGA: "<<setw(10)<<ux[0]<<"  "<<setw(10)<<ux[1]<<"  "<<setw(10)<<ux[2]<<endl;
    }
    return;
 }

@@ -358,23 +358,6 @@ void Stress::stres_har(){
         }
      }*/
      
-     double** rho_atom = new double*[NSPIN];
-     for(int is=0; is<NSPIN; is++)
-     {
-        rho_atom[is] = new double[pw.nrxx];
-        ZEROS(rho_atom[is], pw.nrxx);
-     }
-
-     chr.atomic_rho(NSPIN,rho_atom);
-     for(int is=0; is<NSPIN; is++)
-                {
-                        for(int ir=0; ir<pw.nrxx; ir++)
-                        {
-                                rho_atom[is][ir] = chr.rho[is][ir];                           
-//  rho_atom[is][ir] = chr.rho[is][ir] - rho_atom[is][ir];
-                        }
-                }
-
                    
      complex<double> *Porter = UFFT.porter;
 
@@ -384,7 +367,7 @@ void Stress::stres_har(){
         {
         for (int ir=0; ir<pw.nrxx; ir++)
                 {
-                        Porter[ir] += complex<double>( rho_atom[is][ir], 0.0 );
+                        Porter[ir] += complex<double>( chr.rho[is][ir], 0.0 );
                 }
         }
      //=============================
@@ -505,11 +488,6 @@ void Stress::stres_har(){
      }
      
      delete[] vh_g;
-     for(int is=0; is<NSPIN; is++)
-     {
-        delete[] rho_atom[is];
-     }
-    delete[] rho_atom;
 	delete[] psic;
 	delete[] psic0;
      return;
@@ -530,14 +508,6 @@ void Stress::stres_loc()
        }
     }*/
 
-    double** rho_atom = new double*[NSPIN];
-     for(int is=0; is<NSPIN; is++)
-     {
-        rho_atom[is] = new double[pw.nrxx];
-        ZEROS(rho_atom[is], pw.nrxx);
-     }
-
-     chr.atomic_rho(NSPIN,rho_atom);
 
      complex<double> *Porter = UFFT.porter;
      
@@ -632,11 +602,6 @@ void Stress::stres_loc()
   
     //mp_sum(  sigmaloc, intra_bgrp_comm )
     delete[] dvloc;
-    for(int is=0; is<NSPIN; is++)
-     {
-        delete[] rho_atom[is];
-     }
-    delete[] rho_atom;
     delete[] vg; 
     return;
 }

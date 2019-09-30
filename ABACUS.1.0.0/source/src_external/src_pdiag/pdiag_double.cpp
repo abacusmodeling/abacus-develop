@@ -663,12 +663,25 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
         timer::tick("Diago_LCAO_Matrix","genelpa",'G');
         zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
         int method=0;
-        info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
-                              ch_mat, Stmp, eigen, wfc_2d.c, work,
-                              comm_2D_f, blacs_ctxt,
-                              method, THIS_REAL_ELPA_KERNEL_API,
-                              wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","genelpa",'G');
+        //info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
+        //                      ch_mat, Stmp, eigen, wfc_2d.c, work,
+        //                      comm_2D_f, blacs_ctxt,
+        //                      method, THIS_REAL_ELPA_KERNEL_API,
+        //                      wantEigenVector, wantDebug);
+        //timer::tick("Diago_LCAO_Matrix","genelpa",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
+        info=pzDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
+                                    Stmp, eigen, wfc_2d.c, work,
+                                    comm_2D_f, mpi_comm_rows, mpi_comm_cols,
+                                    method, THIS_REAL_ELPA_KERNEL_API);
+        timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
+        info=pzSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
+                    ch_mat, Stmp, eigen, wfc_2d.c, work,
+                    comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
+                    THIS_REAL_ELPA_KERNEL_API,
+                    wantEigenVector, wantDebug);
+        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
 
         // the eigenvalues.
         dcopy_(&NBANDS, eigen, &inc, ekb, &inc);

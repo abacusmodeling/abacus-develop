@@ -797,11 +797,25 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 
                 ++ca;
 
-                for(int is=0; is<NSPIN; ++is)
+                if(!NONCOLIN)
                 {
+                    for(int is=0; is<NSPIN; ++is)
+                    {
+                        for(int iv=0; iv<ng; ++iv)
+                        {
+                            this->DM_R[is][gstart+iv]=DM_ATOM[is][iv].real();
+                        }
+                    }
+                }
+                else
+                {//zhengdy-soc
                     for(int iv=0; iv<ng; ++iv)
                     {
-                        this->DM_R[is][gstart+iv]=DM_ATOM[is][iv].real();
+                        //note: storage nondiagonal term as Re[] and Im[] respectly;
+                        this->DM_R[0][gstart+iv]=DM_ATOM[0][iv].real() + DM_ATOM[3][iv].real();
+                        this->DM_R[1][gstart+iv]=DM_ATOM[1][iv].real() + DM_ATOM[2][iv].real();
+                        this->DM_R[2][gstart+iv]=DM_ATOM[1][iv].imag() - DM_ATOM[2][iv].imag();
+                        this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
                     }
                 }
             } // if gt.in_this_processor

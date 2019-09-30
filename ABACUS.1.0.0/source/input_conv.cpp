@@ -366,6 +366,13 @@ void Input_Conv::Convert(void)
 	vext = INPUT.vext;
 	vext_dire = INPUT.vext_dire;	
 
+	ocp = INPUT.ocp;
+	ocp_n = INPUT.ocp_n;	
+	for(int i=0; i<10000; i++)
+	{
+		ocp_kb[i] = INPUT.ocp_kb[i];
+	}
+                 mulliken = INPUT. mulliken;//qifeng add 2019/9/10
 //----------------------------------------------------------
 // about selinv
 //----------------------------------------------------------

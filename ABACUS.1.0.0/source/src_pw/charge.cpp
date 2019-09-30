@@ -356,9 +356,16 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 				{
 					const complex<double> swap = pw.strucFac(it, ig)* rho_lgl[pw.ig2ngg[ig]];
 					rho_g3d(0, ig) += swap ;
-					rho_g3d(1, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
-					rho_g3d(2, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
-					rho_g3d(3, ig) += swap * mag.start_magnetization[it] * cos(soc.angle1[it]);
+					if(DOMAG)
+					{
+						rho_g3d(1, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+						rho_g3d(2, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+						rho_g3d(3, ig) += swap * mag.start_magnetization[it] * cos(soc.angle1[it]);
+					}
+					else if(DOMAG_Z)
+					{
+						rho_g3d(3, ig) += swap * mag.start_magnetization[it];
+					}
 				}
 			}
 			else if(startmag_type == 2)
@@ -377,10 +384,16 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 						swap = exp(ci_tpi * Gtau) * rho_lgl[pw.ig2ngg[ig]];
 
 						rho_g3d(0, ig) += swap;
-						rho_g3d(1, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
-						rho_g3d(2, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
-						rho_g3d(3, ig) += swap * atom->mag[ia] * cos(soc.angle1[it]);
-
+						if(DOMAG)
+						{
+							rho_g3d(1, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+							rho_g3d(2, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+							rho_g3d(3, ig) += swap * atom->mag[ia] * cos(soc.angle1[it]);
+						}
+						else if(DOMAG_Z)
+						{
+							rho_g3d(3, ig) += swap * atom->mag[ia];
+						}
 					}
 				}
 			}
@@ -742,6 +755,15 @@ void Charge::sum_band_k(void)
 								+ porter[ir].imag()* porter1[ir].imag());
 							rho[2][ir] += w1 * 2.0 * (porter[ir].real()* porter1[ir].imag()
 								- porter1[ir].real()* porter[ir].imag());
+							rho[3][ir] += w1 * (norm(porter[ir]) - norm(porter1[ir]));
+						}
+				}
+				else if(DOMAG_Z){
+					if(w1 != 0.0)
+						for(int ir= 0;ir<pw.nrxx;ir++)
+						{
+							rho[1][ir] = 0;
+							rho[2][ir] = 0;
 							rho[3][ir] += w1 * (norm(porter[ir]) - norm(porter1[ir]));
 						}
 				}
