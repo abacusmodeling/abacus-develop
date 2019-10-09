@@ -1801,14 +1801,25 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         ZEROS(lchi, nwfc); // angular momentum of each orbital
                         ZEROS(oc, nwfc);//occupation of each orbital
 
-                        //cout << "word = nwfc mesh " << this->nwfc << " " << this->mesh << endl;
+                        //cout << " nwfc = " << this->nwfc << ", mesh = " << this->mesh << endl;
                         this->chi.create(this->nwfc, this->mesh);
                         for (i=0;i<nwfc;i++)
                         {
                              ifs >> word;  // number
+                             //cout << " word (number) = " << word << endl;
                              ifs >> word;  // type
                              ifs >> word;  // size 
+                             //cout << " word (size) = " << word << endl;
+                             {
+                                 if(word == "size=\"")
+                                 {
+                                    ifs >> word;
+                                    word = "\"" + word ;
+                                 }
+                             }
+                             //cout << " word (size) = " << word << endl;
                              ifs >> word;  // columns
+                             //cout << " word (columns) = " << word << endl;
                              ifs >> word;  // index
 
                              ifs >> word;  // occupation
@@ -1824,7 +1835,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              }
 
                              ifs >> word;  // pseudo_energy
-                             //cout << "word = " << word << endl;
+                             //cout << " word (pseudo) = " << word << endl;
                              {
                                  if(word == "pseudo_energy=\"")
                                  {
@@ -1850,7 +1861,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
 
                              ifs >> word;  // l
-                             //cout << "word = " << word << endl;
+                             //cout << " word (l) = " << word << endl;
                              {
                                  if(word == "l=\"")
                                  {
@@ -1859,10 +1870,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                                  }
                                  get_char(word);
                                  lchi[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                                 //cout << "lchi[i] = " << lchi[i] << " \n" << endl;
+                                 //cout << " lchi[i] = " << lchi[i] << endl;
                              }
 
                              ifs >> word; // >
+                             //cout << " word (>) = " << word << endl;
                              if ( word !=  ">" )
                              {
                             	 cout << " error: bad end while reading CHI" << i <<  " of PSWFC" << endl;
