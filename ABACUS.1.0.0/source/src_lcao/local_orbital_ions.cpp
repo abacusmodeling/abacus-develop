@@ -8,6 +8,8 @@
 #include "src_lcao/stress_lcao.h"
 #include "src_lcao/istate_charge.h"
 #include "src_lcao/istate_envelope.h"
+#include "../src_lcao/hs_matrix.h"
+#include "src_lcao/cal_r_overlap_R.h"
 //#include "../src_siao/selinv.h" //mohan add 2012-05-13
 
 Local_Orbital_Ions::Local_Orbital_Ions()
@@ -314,6 +316,8 @@ void Local_Orbital_Ions::opt_ions(void)
 
             //MD.runMD(istep);//we need this total form
         }
+
+        if(ParaO.out_hsR) this->output_HS_R(); //LiuXh add 2019-07-15
 
         time_t fstart = time(NULL);
         if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
@@ -824,5 +828,66 @@ void Local_Orbital_Ions::final_scf(void)
         ofs_running << " --------------------------------------------\n\n" << endl;
     }
 
+    return;
+}
+
+void Local_Orbital_Ions::output_HS_R(void)
+{
+    TITLE("Local_Orbital_Ions","output_HS_R"); 
+    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
+	
+	// add by jingan for out r_R matrix 2019.8.14
+	if(INPUT.out_r_matrix)
+	{
+		cal_r_overlap_R r_matrix;
+		r_matrix.init();
+		r_matrix.out_r_overlap_R(NSPIN);
+	}
+
+    if(NSPIN==1||NSPIN==4)
+    {
+        UHM.calculate_STN_R();
+        UHM.GK.cal_vlocal_R(0);
+        UHM.GK.distribute_pvpR_tr();
+        HS_Matrix::save_HSR_tr(0);
+    }
+    ///*
+    else if(NSPIN==2)
+    {
+        UHM.calculate_STN_R();
+        for(int ik=0; ik<kv.nks; ik++)
+        {
+            if(ik==0 || ik==kv.nks/2)
+            {
+                if(NSPIN==2)CURRENT_SPIN = kv.isk[ik];
+                for(int ir=0; ir<pw.nrxx; ir++)
+                {
+                    pot.vrs1[ir] = pot.vrs( CURRENT_SPIN, ir);
+                }
+        	    	
+                if(!GAMMA_ONLY_LOCAL)
+                {
+                    if(VL_IN_H)
+                    {
+                        if(VNA==0)
+                        {
+                            //UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
+                            UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
+                        }
+                    }
+                }
+                UHM.GK.cal_vlocal_R(CURRENT_SPIN);
+                UHM.GK.distribute_pvpR_tr();
+                HS_Matrix::save_HSR_tr(CURRENT_SPIN);
+            }
+        }
+    }
+    //*/
+    if(!GAMMA_ONLY_LOCAL) //LiuXh 20181011
+    {
+        UHM.GK.destroy_pvpR();
+    } //LiuXh 20181011
+
+    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
     return;
 }

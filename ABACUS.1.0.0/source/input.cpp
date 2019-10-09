@@ -291,6 +291,8 @@ void Input::Default(void)
 	out_dos = 0;
         out_band = 0;
 	out_hs = 0;
+	out_hs2 = 0; //LiuXh add 2019-07-15
+	out_r_matrix = 0; // jingan add 2019-8-14
 	out_lowf = false;
 	out_alllog = false;
 	dos_emin_ev = -15;//(ev)
@@ -1047,6 +1049,15 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, out_hs);
         }
+	//LiuXh add 2019-07-15
+	else if (strcmp("out_hs2", word) == 0)
+	{
+	    read_value(ifs, out_hs2);
+	}
+	else if (strcmp("out_r", word) == 0)
+	{
+	    read_value(ifs, out_r_matrix);
+	}
         else if (strcmp("out_lowf", word) == 0)
         {
             read_value(ifs, out_lowf);
@@ -1744,6 +1755,8 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
 	Parallel_Common::bcast_int( out_hs );
+	Parallel_Common::bcast_int( out_hs2 ); //LiuXh add 2019-07-15
+	Parallel_Common::bcast_int( out_r_matrix ); // jingan add 2019-8-14
 	Parallel_Common::bcast_bool( out_lowf );
 	Parallel_Common::bcast_bool( out_alllog );
 

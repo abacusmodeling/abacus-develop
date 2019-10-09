@@ -21,6 +21,7 @@ class Use_Hamilt_Matrix
 	
 	// used for Gamma only Hamiltonian matrix.
 	void calculate_Hgamma(void);
+    void calculate_STN_R(void); //LiuXh add 2019-07-15
 
 	// used for gamma only algorithms.
 	Gint_Gamma GG;

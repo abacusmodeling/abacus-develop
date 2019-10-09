@@ -289,19 +289,19 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 
 			    if(cal_num>pw.bxyz/4)
 			    {
-    				if(iw1_lo<=iw2_lo)
-    				{
+    				//if(iw1_lo<=iw2_lo)
+    				//{
     			        k=pw.bxyz;
     					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
     						&psir_vlbr3[0][idx2], &LD_pool, 
     						&psir_ylm[0][idx1], &LD_pool,
     						&beta, &pvpR[iatw], &n);
-    				}
+    				//}
 				}
     			else
     			{
-        			if(iw1_lo<=iw2_lo)
-    				{
+        			//if(iw1_lo<=iw2_lo)
+    				//{
             			for(int ib=0; ib<pw.bxyz; ++ib)
             			{
                 			if(cal_flag[ib][ia1]&&cal_flag[ib][ia2])
@@ -313,7 +313,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
             						&beta, &pvpR[iatw], &n);	
                 			}
             			}
-        			}
+        			//}
     			}
 			}
 		}

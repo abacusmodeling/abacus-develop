@@ -16,6 +16,7 @@ class Parallel_Orbitals : public Pdiag_Double
     int* trace_loc_row;
     int* trace_loc_col;
     int out_hs; // mohan add 2010-09-02
+    int out_hsR; // LiuXh add 2019-07-16
 
     void set_trace(void);
 

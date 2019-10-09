@@ -453,6 +453,7 @@ void Input_Conv::Convert_FP(void)
 #ifdef __FP
 	LOC.out_dm = INPUT.out_dm;
 	ParaO.out_hs = INPUT.out_hs;
+	ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
 	ParaO.out_lowf = INPUT.out_lowf;
 #endif
 

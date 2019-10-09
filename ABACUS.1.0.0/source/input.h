@@ -179,6 +179,8 @@ public:
 	int out_dos;			// dos calculation. mohan add 20090909
         int out_band;                   // band calculation pengfei 2014-10-13
 	int out_hs;			// output H matrix and S matrix in local basis.
+	int out_hs2;			//LiuXh add 2019-07-16, output H(R) matrix and S(R) matrix in local basis.
+	int out_r_matrix;   // jingan add 2019-8-14, output r(R) matrix.
 	bool out_lowf;			// output the wave functions in local basis.
 	bool out_alllog; 		// output all logs.
 	double dos_emin_ev;

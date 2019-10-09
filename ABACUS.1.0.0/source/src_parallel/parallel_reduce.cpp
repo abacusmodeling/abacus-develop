@@ -155,6 +155,18 @@ void Parallel_Reduce::reduce_complex_double_all(complex<double> &object)
     return;
 }
 
+//LiuXh add 2019-07-16
+void Parallel_Reduce::reduce_complex_double_all(complex <double> *object, const int n)
+{
+#ifdef __MPI
+	complex<double> *swap = new complex<double>[n];
+	for(int i=0;i<n;i++) swap[i] = object[i];
+	MPI_Allreduce(swap, object, n, mpicomplex, myOp, POOL_WORLD);
+	delete[] swap;
+#endif
+	return;
+}
+
 void Parallel_Reduce::reduce_complex_double_pool(complex<double> &object)
 {
 #ifdef __MPI

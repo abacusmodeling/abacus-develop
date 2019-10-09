@@ -96,6 +96,14 @@ public:
 	double vec3[3];
 	double lat_now;
 	bool init_cell_flag;
+    //LiuXh add 2019-07-15
+    const double& getD_minX(void) const {return d_minX;}
+    const double& getD_minY(void) const {return d_minY;}
+    const double& getD_minZ(void) const {return d_minZ;}
+
+    const int& getCellX(void) const {return dx;}
+    const int& getCellY(void) const {return dy;}
+    const int& getCellZ(void) const {return dz;}
 
 	// Inner Function
 protected:

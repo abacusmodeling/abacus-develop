@@ -596,3 +596,216 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
     return;
 }
 
+//void HS_Matrix::save_HSR_tr(const int Rx, const int Ry, const int Rz, const double *H, const double *S)
+void HS_Matrix::save_HSR_tr(const int current_spin)
+//void HS_Matrix::save_HSR_tr(void)
+{
+    TITLE("HS_Matrix","save_HSR_tr");
+    timer::tick("HS_Matrix","save_HSR_tr");
+
+    stringstream ssh;
+    stringstream sss;
+
+    ssh << global_out_dir << "data-HR-tr_SPIN"<<current_spin;
+    sss << global_out_dir << "data-SR-tr_SPIN"<<current_spin;
+    //ssh << global_out_dir << "data-HR-tr_SPIN";
+    //sss << global_out_dir << "data-SR-tr_SPIN";
+
+#ifdef __MPI
+    ofstream g1;
+    ofstream g2;
+
+    if(DRANK==0)
+    {
+        g1.open(ssh.str().c_str());
+        g2.open(sss.str().c_str());
+        g1 << "Matrix Dimension of H(R): "<<NLOCAL<<endl;
+        g2 << "Matrix Dimension of S(R): "<<NLOCAL<<endl;
+    }
+
+    int R_x = GridD.getCellX();
+    int R_y = GridD.getCellY();
+    int R_z = GridD.getCellZ();
+
+//cout<<"R_x: "<<R_x<<endl;
+//cout<<"R_y: "<<R_y<<endl;
+//cout<<"R_z: "<<R_z<<endl;
+
+    double R_minX = GridD.getD_minX();
+    double R_minY = GridD.getD_minY();
+    double R_minZ = GridD.getD_minZ();
+
+    int dRx, dRy, dRz;
+
+    for(int ix=0; ix<R_x; ix++)
+    {
+        int dRx = ix + R_minX;
+        for(int iy=0; iy<R_y; iy++)
+        {
+            int dRy = iy + R_minY;
+            for(int iz=0; iz<R_z; iz++)
+            {
+                int dRz = iz + R_minZ;
+//cout<<"dRx: "<<dRx<<endl;
+//cout<<"dRy: "<<dRy<<endl;
+//cout<<"dRz: "<<dRz<<endl;
+                int ir,ic;
+                for(int i=0; i<NLOCAL; i++)
+                {
+                    //double* lineH = new double[NLOCAL-i];
+                    //double* lineS = new double[NLOCAL-i];
+                    double* lineH;
+                    double* lineS;
+                    complex<double>* lineH_soc;
+                    complex<double>* lineS_soc;
+                    if(!NONCOLIN)
+                    {
+                        lineH = new double[NLOCAL];
+                        lineS = new double[NLOCAL];
+                        ZEROS(lineH, NLOCAL);
+                        ZEROS(lineS, NLOCAL);
+                    }
+                    else
+                    {
+                        lineH_soc = new complex<double>[NLOCAL];
+                        lineS_soc = new complex<double>[NLOCAL];
+                        ZEROS(lineH_soc, NLOCAL);
+                        ZEROS(lineS_soc, NLOCAL);
+                    }
+                    //ZEROS(lineH, NLOCAL-i);
+                    //ZEROS(lineS, NLOCAL-i);
+                    //ZEROS(lineH, NLOCAL);
+                    //ZEROS(lineS, NLOCAL);
+
+                    ir = ParaO.trace_loc_row[i];
+                    if(ir>=0)
+                    {
+                        //for(int j=i; j<NLOCAL; j++)
+                        for(int j=0; j<NLOCAL; j++)
+                        {
+                            ic = ParaO.trace_loc_col[j];
+                            if(ic>=0)
+                            {
+                                //lineH[j-i] = H[ir*ParaO.ncol+ic];
+                                //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                                int iic;
+                                if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                                {
+                                    iic=ir+ic*ParaO.nrow;
+                                }
+                                else
+                                {
+                                    iic=ir*ParaO.ncol+ic;
+                                }
+                                if(!NONCOLIN)
+                                {
+                                    lineH[j] = LM.HR_tr[ix][iy][iz][iic];
+                                    lineS[j] = LM.SlocR_tr[ix][iy][iz][iic];
+                                }
+                                else
+                                {
+                                    lineH_soc[j] = LM.HR_tr_soc[ix][iy][iz][iic];
+                                    lineS_soc[j] = LM.SlocR_tr_soc[ix][iy][iz][iic];
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //do nothing
+                    }
+
+                    //Parallel_Reduce::reduce_double_all(lineH,NLOCAL-i);
+                    //Parallel_Reduce::reduce_double_all(lineS,NLOCAL-i);
+                    if(!NONCOLIN)
+                    {
+                        Parallel_Reduce::reduce_double_all(lineH,NLOCAL);
+                        Parallel_Reduce::reduce_double_all(lineS,NLOCAL);
+                    }
+                    else
+                    {
+                        Parallel_Reduce::reduce_complex_double_all(lineH_soc,NLOCAL);
+                        Parallel_Reduce::reduce_complex_double_all(lineS_soc,NLOCAL);
+                    }
+
+                    if(DRANK==0)
+                    {
+                        //for(int j=i; j<NLOCAL; j++)
+                        for(int j=0; j<NLOCAL; j++)
+                        {
+                            if(i==0 && j==0)
+                            {
+                                g1 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
+                                g2 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
+                            }
+                            //g1 << " " << lineH[j-i];
+                            //g2 << " " << lineS[j-i];
+                            if(!NONCOLIN)
+                            {
+                                if(abs(lineH[j]) < 1.0e-12) lineH[j]=0.0;
+                                if(abs(lineS[j]) < 1.0e-12) lineS[j]=0.0;
+                                g1 << " " << lineH[j];
+                                g2 << " " << lineS[j];
+                            }
+                            else
+                            {
+				if(abs(lineH_soc[j].real()) < 1.0e-12) lineH_soc[j]= complex<double> (0.0, lineH_soc[j].imag());
+                                if(abs(lineH_soc[j].imag()) < 1.0e-12) lineH_soc[j]= complex<double> (lineH_soc[j].real(), 0.0);
+                                if(abs(lineS_soc[j].real()) < 1.0e-12) lineS_soc[j]= complex<double> (0.0, lineS_soc[j].imag());
+                                if(abs(lineS_soc[j].imag()) < 1.0e-12) lineS_soc[j]= complex<double> (lineS_soc[j].real() , 0.0);
+                                g1 << " " << lineH_soc[j];
+                                g2 << " " << lineS_soc[j];
+                            }
+                        }
+                        g1 << endl;
+                        g2 << endl;
+                    }
+                    if(!NONCOLIN)
+                    {
+                        delete[] lineH;
+                        delete[] lineS;
+                    }
+                    else
+                    {
+                        delete[] lineH_soc;
+                        delete[] lineS_soc;
+                    }
+                }
+/*
+                if(DRANK==0);
+                {
+                    g1.close();
+                    g2.close();
+                }
+*/
+            }
+        }
+    }
+    if(DRANK==0);
+    {
+        g1.close();
+        g2.close();
+    }
+
+#else
+    ofstream g1(ssh.str().c_str());
+    ofstream g2(sss.str().c_str());
+
+    g1 << NLOCAL;
+    g2 << NLOCAL;
+
+    for (int i=0; i<NLOCAL; i++)
+    {
+        for (int j=i; j<NLOCAL; j++)
+        {
+            g1 << " " << H[i*NLOCAL+j];
+            g2 << " " << S[i*NLOCAL+j];
+        }
+    }
+    g1.close();
+    g2.close();
+#endif
+
+    timer::tick("HS_Matrix","save_HSR_tr");
+    return;
+}

@@ -172,6 +172,7 @@ center2_orb-orb21.o \
 center2_orb-orb22.o \
 wfc_dm_2d.o \
 unkOverlap_lcao.o \
+cal_r_overlap_R.o \
 
 OBJS_WANNIER=wan_global.o\
 bessel_basis.o\

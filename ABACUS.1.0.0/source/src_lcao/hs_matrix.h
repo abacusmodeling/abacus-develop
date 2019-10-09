@@ -10,6 +10,7 @@ namespace HS_Matrix
 
 	void save_HS(const double *H, const double *S, bool bit);
 	void save_HS_complex(const complex<double> *H, const complex<double> *S, bool bit);
+	void save_HSR_tr(const int current_spin); //LiuXh add 2019-07-15
 
 	void save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_H, const int *rowind_H, 
 		const double *nzval_H, const double *nzval_S, bool bit);

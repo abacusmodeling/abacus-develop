@@ -851,10 +851,12 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 	}
 			
 	// delete at last time.
+	/*LiuXh modify 2019-07-15
 	if(!GAMMA_ONLY_LOCAL)
 	{
 		UHM.GK.destroy_pvpR();
 	}
+	LiuXh modify 2019-07-15*/
 	timer::tick("Local_Orbital_Elec","cal_bands",'E');
 	return;	
 }

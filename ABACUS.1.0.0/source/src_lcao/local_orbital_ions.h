@@ -21,6 +21,7 @@ public:
 	Local_Orbital_Elec LOE;
 
 	void opt_ions(void);
+	void output_HS_R(void); //LiuXh add 2019-07-15
 	//2014-06-06, xiaohui
         mdnvt MDNVT ;
         mdNVE MDNVE ;
