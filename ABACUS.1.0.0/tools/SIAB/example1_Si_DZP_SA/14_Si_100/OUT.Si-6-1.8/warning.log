@@ -1,0 +1,19 @@
+ AUTO_SET ks_solver to cg
+ AUTO_SET lcao_ecut to 100
+ In SCAN_BEGIN, can't find: NUMERICAL_ORBITAL block.
+ In SCAN_BEGIN, can't find: <PP_SPIN_ORB> block.
+ In SCAN_END, can't find: </PP_SPIN_ORB> block.
+ In SCAN_END, can't find: </UPF> block.
+                            startmag_type = 1
+                       charge from rho_at = 3.95377
+                         charge should be = 4
+ Warning: negative or imaginary starting charge :  neg = -0.00203825 ima = 3.95917e-15 SPIN = 0
+
+ SETUP ATOMIC RHO FOR SPIN 1
+                 Electron number from rho = 8
+           total electron number from rho = 8
+                                should be = 8
+                 charge before normalized = 7.99999999999982
+                  charge after normalized = 8
+ in Hamilt_PW::just_ddot, sometimes zdotc is not available due to GNU compiler!!!
+ So here I use simple for cicle to replace zdotc, but it will affect the speed.
