@@ -57,5 +57,13 @@ static double cal_time( const timeval &t_begin )
 	return (double)(t_end.tv_sec-t_begin.tv_sec) + (double)(t_end.tv_usec-t_begin.tv_usec)/1000000.0;
 }
 
+// Peize Lin add 2016-10-10
+static double cut_time( timeval &t )
+{
+	const double time = cal_time(t);
+	gettimeofday( &t, NULL);
+	return time;
+}
+
 
 #endif		// TEST_FUNCTION_H

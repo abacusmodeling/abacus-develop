@@ -86,7 +86,7 @@ void Potential_Libxc::v_xc(
 				process_vsigma();
 				break;
 			default:
-				throw domain_error("func.info->family ="+TO_STRING(func.info->family)+" unfinished "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw domain_error("func.info->family ="+TO_STRING(func.info->family)+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 				break;
 		}
 
@@ -147,7 +147,7 @@ std::vector<XC(func_type)> Potential_Libxc::init_func()
 	};
 	
 	if( 6==xcf.iexch_now && 8==xcf.igcx_now && 4==xcf.icorr_now && 4==xcf.igcc_now )
-	{	
+	{
 		add_func( XC_HYB_GGA_XC_PBEH );		
 		double parameter_hse[3] = { exx_global.info.hybrid_alpha, exx_global.info.hse_omega, exx_global.info.hse_omega };
 		xc_func_set_ext_params(&funcs.back(), parameter_hse);
@@ -166,14 +166,14 @@ std::vector<XC(func_type)> Potential_Libxc::init_func()
 	else if( 1==xcf.iexch_now && 3==xcf.igcx_now )
 		add_func( XC_GGA_X_PBE );
 	else
-		throw domain_error("iexch="+TO_STRING(xcf.iexch_now)+", igcx="+TO_STRING(xcf.igcx_now)+" unfinished");
+		throw domain_error("iexch="+TO_STRING(xcf.iexch_now)+", igcx="+TO_STRING(xcf.igcx_now)+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
 	if( 1==xcf.icorr_now && 0==xcf.igcc_now )
 		add_func( XC_LDA_C_PZ );
 	else if( 4==xcf.icorr_now && 4==xcf.igcc_now )
 		add_func( XC_GGA_C_PBE );
 	else
-		throw domain_error("icorr="+TO_STRING(xcf.icorr_now)+", igcc="+TO_STRING(xcf.igcc_now)+" unfinished");
+		throw domain_error("icorr="+TO_STRING(xcf.icorr_now)+", igcc="+TO_STRING(xcf.igcc_now)+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
 	return funcs;
 }
@@ -267,7 +267,7 @@ Potential_Libxc::cal_input(
 				cal_sigma();
 				break;
 			default:
-				throw domain_error("func.info->family ="+TO_STRING(func.info->family)+" unfinished "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+				throw domain_error("func.info->family ="+TO_STRING(func.info->family)+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 				break;
 		}
 	}

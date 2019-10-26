@@ -137,6 +137,31 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 			print_matrix(m1,m2,m3);
 		}
 	};
+
+	auto test_gemm_2 = []()
+	{
+		constexpr int S=10000;
+		constexpr int N=1000;
+		matrix m1(N,N), m2(N,N), m3(N,N);	
+		timeval time;		
+		gettimeofday(&time, NULL);
+		
+		for(int s=0; s<S; ++s)
+			LapackConnector::gemm('N', 'N', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+		cout<<"NN\t"<<cut_time(time)<<endl;
+		
+		for(int s=0; s<S; ++s)
+			LapackConnector::gemm('N', 'T', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+		cout<<"NT\t"<<cut_time(time)<<endl;
+		
+		for(int s=0; s<S; ++s)
+			LapackConnector::gemm('T', 'N', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+		cout<<"TN\t"<<cut_time(time)<<endl;
+		
+		for(int s=0; s<S; ++s)
+			LapackConnector::gemm('T', 'T', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
+		cout<<"TT\t"<<cut_time(time)<<endl;
+	};
 }
 
 Exx_Lcao::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
