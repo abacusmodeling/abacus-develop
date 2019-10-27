@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <pthread.h>
 
 class Abfs
 {
@@ -61,6 +62,8 @@ public:
 		const Element_Basis_Index::IndexLNM &index_lcaos,
 		const double threshold,
 		const bool writable,
+		pthread_rwlock_t &rwlock_Cw,
+		pthread_rwlock_t &rwlock_Vw,
 		map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
 		map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws );
 
@@ -73,6 +76,7 @@ public:
 		const Element_Basis_Index::IndexLNM &index_abfs,
 		const double threshold,
 		const bool writable,
+		pthread_rwlock_t &rwlock_Vw,
 		map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws );		
 		
 //	static map<size_t,vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &T, const Vector3<double> &tau_cartesian );

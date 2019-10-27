@@ -5,9 +5,11 @@
 #include "exx_abfs-inverse_matrix_double.h"
 #include "src_pw/global.h"
 #include "src_global/global_function.h"
+#include <omp.h>
+#include <mkl_service.h>
 
 #include <fstream>		// Peize Lin test
-#include<iomanip>		// Peize Lin test
+#include <iomanip>		// Peize Lin test
 #include "src_external/src_test/src_global/matrix-test.h"		// Peize Lin test
 
 map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Cs(
@@ -21,21 +23,30 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
 	TITLE("Abfs","cal_Cs");
+	pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
+	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
+	
+	const vector<size_t> atom_centres_vector( atom_centres.begin(), atom_centres.end() );
+	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs = get_adjs();
 	
 	// pre-cal Vws on same atom, speed up DPcal_V() in DPcal_C()
 	vector<shared_ptr<matrix>> Vs_same_atom(ucell.ntype);
 	for(size_t it=0; it!=ucell.ntype; ++it)
-		Vs_same_atom[it] = DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true,Vws );
+		Vs_same_atom[it] = DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true, rwlock_Vw,Vws );
+	
+	const int mkl_threads = mkl_get_max_threads();
+	mkl_set_num_threads(1);
 	
 	map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> Cs;
-	for( const int iat1 : atom_centres )
+	#pragma omp parallel for
+	for( int i_iat1=0; i_iat1<atom_centres_vector.size(); ++i_iat1 )
 	{
+		const size_t iat1 = atom_centres_vector[i_iat1];
 		const size_t it1 = ucell.iat2it[iat1];
 		const size_t ia1 = ucell.iat2ia[iat1];
 		const Vector3_Order<double> tau1( ucell.atoms[it1].tau[ia1] );
 		
-		const map<size_t,vector<Abfs::Vector3_Order<int>>> adjs = get_adjs(iat1);
-		for( const auto & atom2 : adjs )
+		for( const auto & atom2 : adjs[iat1] )
 		{
 			const int iat2 = atom2.first;
 			const int it2 = ucell.iat2it[iat2];
@@ -43,17 +54,22 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 			const Vector3_Order<double> tau2( ucell.atoms[it2].tau[ia2] );
 			for( const Vector3<int> &box2 : atom2.second )
 			{
-//cout<<"cal_Cs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
-				Cs[iat1][iat2][box2] = DPcal_C( 
+//				cout<<"cal_Cs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
+				const shared_ptr<matrix> C = DPcal_C( 
 					it1, it2, -tau1+tau2+(box2*ucell.latvec), 
 					m_abfs_abfs, m_abfslcaos_lcaos, index_abfs, index_lcaos, 
-					threshold, true, Cws, Vws );
+					threshold, true, rwlock_Cw, rwlock_Vw, Cws, Vws );
+				#pragma omp critical(Abfs_cal_Cs)
+				Cs[iat1][iat2][box2] = C;
 			}
 		}
 	}
+	mkl_set_num_threads(mkl_threads);
 	Abfs::delete_threshold_ptrs( Cs, threshold );
 	Vs_same_atom.clear();
 	Abfs::delete_empty_ptrs( Vws );
+	pthread_rwlock_destroy(&rwlock_Cw);
+	pthread_rwlock_destroy(&rwlock_Vw);
 	return Cs;
 }
 
@@ -151,13 +167,16 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 	const double threshold,
 	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
-	TITLE("Abfs","cal_Vs");	
+	TITLE("Abfs","cal_Vs");
+	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = get_Coulomb_potential_boxes(rmesh_times);
+
 	map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> Vs;
-	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
+	#pragma omp parallel for
+	for( int i_atom_pair=0; i_atom_pair<atom_pairs.size(); ++i_atom_pair )
 	{
-		const size_t iat1 = atom_pair.first;
-		const size_t iat2 = atom_pair.second;
+		const size_t iat1 = atom_pairs[i_atom_pair].first;
+		const size_t iat2 = atom_pairs[i_atom_pair].second;
 		const size_t it1 = ucell.iat2it[iat1];
 		const size_t ia1 = ucell.iat2ia[iat1];
 		const size_t it2 = ucell.iat2it[iat2];
@@ -171,15 +190,18 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 			const Vector3_Order<double> delta_R = -tau1+tau2+(box2*ucell.latvec);
 			if( delta_R.norm()*ucell.lat0 < Rcut )
 			{
-//cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*ucell.lat0<<"\t"<<ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut()<<endl;
-				Vs[iat1][iat2][box2] = DPcal_V( 
+//				cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*ucell.lat0<<"\t"<<ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut()<<endl;
+				const shared_ptr<matrix> V = DPcal_V( 
 					it1, it2, delta_R, 
 					m_abfs_abfs, index_abfs, 
-					threshold, true, Vws );
+					threshold, true, rwlock_Vw, Vws );
+				#pragma omp critical(Abfs_cal_Vs)
+				Vs[iat1][iat2][box2] = V;
 			}
 		}
 	}
 	Abfs::delete_threshold_ptrs( Vs, threshold );
+	pthread_rwlock_destroy(&rwlock_Vw);
 	return Vs;
 }
 
@@ -251,6 +273,8 @@ shared_ptr<matrix> Abfs::DPcal_C(
 	const Element_Basis_Index::IndexLNM &index_lcaos,
 	const double threshold,
 	const bool writable,
+	pthread_rwlock_t &rwlock_Cw,
+	pthread_rwlock_t &rwlock_Vw,
 	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
 	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
@@ -269,21 +293,29 @@ shared_ptr<matrix> Abfs::DPcal_C(
 	// 根据后续情况选择权衡。
 	
 //	TITLE("Abfs","DPcal_C");
+	pthread_rwlock_rdlock(&rwlock_Cw);
 	const weak_ptr<matrix> * const Cws_ptr   = static_cast<const weak_ptr<matrix> * const>( MAP_EXIST( Cws, it1, it2, R ) );
+	pthread_rwlock_unlock(&rwlock_Cw);
+	
 	if( Cws_ptr && !Cws_ptr->expired() )
-		return Cws[it1][it2][R].lock();
+		return Cws_ptr->lock();
 	else
 	{
-//cout<<"DPcal_C\t"<<it1<<"\t"<<it2<<"\t"<<R<<endl;
+//		cout<<"DPcal_C\t"<<it1<<"\t"<<it2<<"\t"<<R<<endl;
 		if( (Vector3<double>(0,0,0)==R) && (it1==it2) )
 		{
 			const shared_ptr<matrix> A = 
 				make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix( it1,it2,0,0,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1 ) );
-			const shared_ptr<matrix> V = DPcal_V(it1,it2,{0,0,0},m_abfs_abfs,index_abfs,0,false,Vws);
+			const shared_ptr<matrix> V = DPcal_V(it1,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
 			const shared_ptr<matrix> L = cal_I(V);
 			shared_ptr<matrix> C = make_shared<matrix>( 0.5 * *A * *L );
 			if(C->absmax()<=threshold)	C->create(0,0);
-			if(writable)	Cws[it1][it2][R] = C;
+			if(writable)
+			{
+				pthread_rwlock_wrlock(&rwlock_Cw);
+				Cws[it1][it2][R] = C;
+				pthread_rwlock_unlock(&rwlock_Cw);
+			}
 			return C;
 		}
 		else
@@ -292,10 +324,10 @@ shared_ptr<matrix> Abfs::DPcal_C(
 				{ make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it1,it2,0,R ,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1) ) ,
 				  make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it2,it1,0,-R,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::BA2_A1) ) };
 			
-			const shared_ptr<matrix> V_00 = DPcal_V(it1,it1,{0,0,0},m_abfs_abfs,index_abfs,0,false,Vws);
-			const shared_ptr<matrix> V_01 = DPcal_V(it1,it2,R,      m_abfs_abfs,index_abfs,0,false,Vws);
-			const shared_ptr<matrix> V_10 = DPcal_V(it2,it1,-R,     m_abfs_abfs,index_abfs,0,false,Vws);
-			const shared_ptr<matrix> V_11 = DPcal_V(it2,it2,{0,0,0},m_abfs_abfs,index_abfs,0,false,Vws);
+			const shared_ptr<matrix> V_00 = DPcal_V(it1,it1,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const shared_ptr<matrix> V_01 = DPcal_V(it1,it2,R,       m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const shared_ptr<matrix> V_10 = DPcal_V(it2,it1,-R,      m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+			const shared_ptr<matrix> V_11 = DPcal_V(it2,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
 			const vector<vector<shared_ptr<matrix>>> V = 
 				{{ V_00, V_01 },
 				 { V_10, V_11 }};
@@ -304,7 +336,12 @@ shared_ptr<matrix> Abfs::DPcal_C(
 
 			shared_ptr<matrix> C = make_shared<matrix>( *A[0] * *L[0][0] + *A[1] * *L[1][0] );
 			if(C->absmax()<=threshold)	C->create(0,0);
-			if(writable)	Cws[it1][it2][R] = C;
+			if(writable)
+			{
+				pthread_rwlock_wrlock(&rwlock_Cw);
+				Cws[it1][it2][R] = C;
+				pthread_rwlock_unlock(&rwlock_Cw);
+			}
 			return C;
 		}
 	}
@@ -318,27 +355,40 @@ shared_ptr<matrix> Abfs::DPcal_V(
 	const Element_Basis_Index::IndexLNM &index_abfs,
 	const double threshold,
 	const bool writable,
+	pthread_rwlock_t &rwlock_Vw,
 	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws)
 {
 //	TITLE("Abfs","DPcal_V");
-	
+	pthread_rwlock_rdlock(&rwlock_Vw);
 	const weak_ptr<matrix> * const Vws12_ptr = static_cast<const weak_ptr<matrix> * const>( MAP_EXIST( Vws, it1, it2, R ) );
 	const weak_ptr<matrix> * const Vws21_ptr = static_cast<const weak_ptr<matrix> * const>( MAP_EXIST( Vws, it2, it1, -R ) );
+	pthread_rwlock_unlock(&rwlock_Vw);
+	
 	if( Vws12_ptr && !Vws12_ptr->expired() )
 		return Vws12_ptr->lock();
 	else if( Vws21_ptr && !Vws21_ptr->expired() )
 	{
 		shared_ptr<matrix> VT = make_shared<matrix>( transpose(*Vws21_ptr->lock()) );
 		if(VT->absmax()<=threshold)	VT->create(0,0);
-		if(writable)	Vws[it1][it2][R] = VT;
+		if(writable)
+		{
+			pthread_rwlock_wrlock(&rwlock_Vw);
+			Vws[it1][it2][R] = VT;
+			pthread_rwlock_unlock(&rwlock_Vw);
+		}
 		return VT;
 	}
 	else
 	{
-//cout<<"DPcal_V\t"<<it1<<"\t"<<it2<<"\t"<<R<<endl;
+//		cout<<"DPcal_V\t"<<it1<<"\t"<<it2<<"\t"<<R<<endl;
 		shared_ptr<matrix> V = make_shared<matrix>( m_abfs_abfs.cal_overlap_matrix(it1,it2,0,R,index_abfs,index_abfs) );
 		if(V->absmax()<=threshold)	V->create(0,0);
-		if(writable)	Vws[it1][it2][R] = V;
+		if(writable)
+		{
+			pthread_rwlock_wrlock(&rwlock_Vw);
+			Vws[it1][it2][R] = V;
+			pthread_rwlock_unlock(&rwlock_Vw);
+		}
 		return V;
 	}
 }

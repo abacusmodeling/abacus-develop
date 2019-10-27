@@ -32,11 +32,13 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 {
 	if(!flag_screen_schwarz)	return;
 	TITLE("Exx_Abfs::Screen::Schwarz::cal_max_pair_fock");
+	pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
+	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	
 	// pre-cal Vws on same atom, speed up DPcal_V()
 	vector<shared_ptr<matrix>> Vs_same_atom(ucell.ntype);
 	for(size_t it=0; it!=ucell.ntype; ++it)
-		Vs_same_atom[it] = Abfs::DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true,Vws );	
+		Vs_same_atom[it] = Abfs::DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true, rwlock_Vw,Vws );	
 	
 	// m_out( i1, i2, i3 ) = m_in( i2, i1, i3 )
 	auto change_matrix_order =[]( const matrix &m_in, const size_t n1 ) -> matrix
@@ -100,15 +102,15 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 				else
 				{
 					const Abfs::Vector3_Order<double> R = -tau1+tau2+box2*ucell.latvec;
-					const matrix C_12 = *Abfs::DPcal_C( it1,it2,R,  m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false,Cws,Vws );
+					const matrix C_12 = *Abfs::DPcal_C( it1,it2,R,  m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false, rwlock_Cw,rwlock_Vw,Cws,Vws );
 					const matrix C_21 = change_matrix_order( 
-						*Abfs::DPcal_C( it2,it1,-R, m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false,Cws,Vws ),
+						*Abfs::DPcal_C( it2,it1,-R, m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false, rwlock_Cw,rwlock_Vw,Cws,Vws ),
 						index_lcaos[it1].count_size);
 					
-					const matrix V_11 = *Abfs::DPcal_V(it1,it1,{0,0,0},m_abfs_abfs,index_abfs,0,false,Vws);
-					const matrix V_12 = *Abfs::DPcal_V(it1,it2,R,      m_abfs_abfs,index_abfs,0,false,Vws);
-					const matrix V_21 = *Abfs::DPcal_V(it2,it1,-R,     m_abfs_abfs,index_abfs,0,false,Vws);
-					const matrix V_22 = *Abfs::DPcal_V(it2,it2,{0,0,0},m_abfs_abfs,index_abfs,0,false,Vws);
+					const matrix V_11 = *Abfs::DPcal_V(it1,it1,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+					const matrix V_12 = *Abfs::DPcal_V(it1,it2,R,       m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+					const matrix V_21 = *Abfs::DPcal_V(it2,it1,-R,      m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
+					const matrix V_22 = *Abfs::DPcal_V(it2,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
 					
 					pair_fock_s[box2] = make_shared<matrix>(
 						  m_mT( C_12 * V_11, C_12 )
@@ -130,6 +132,8 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 	
 	Vs_same_atom.clear();
 	Abfs::delete_empty_ptrs( Vws );
+	pthread_rwlock_destroy(&rwlock_Cw);
+	pthread_rwlock_destroy(&rwlock_Vw);
 		
 //test_screen("schwarz-max_pair_fock.dat",max_pair_fock);
 }

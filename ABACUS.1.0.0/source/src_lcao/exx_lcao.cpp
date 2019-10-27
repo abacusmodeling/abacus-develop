@@ -636,6 +636,9 @@ ofs_mpi.close();
 		m_abfslcaos_lcaos.init( 1, this->kmesh_times, 1 );
 		m_abfslcaos_lcaos.init_radial( abfs, lcaos, lcaos );
 		m_abfslcaos_lcaos.init_radial_table();
+		
+		pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
+		pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 
 		map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Cws;
 		map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Vws;
@@ -649,9 +652,14 @@ ofs_mpi.close();
 			index_lcaos,
 			0,
 			true,
+			rwlock_Cw,
+			rwlock_Vw,
 			Cws,
 			Vws);
 		cout<<*C<<endl;
+		
+		pthread_rwlock_destroy(&rwlock_Cw);
+		pthread_rwlock_destroy(&rwlock_Vw);
 	};
 
 	auto overlap_test = [&]()
