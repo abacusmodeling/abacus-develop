@@ -564,7 +564,9 @@ void Local_Orbital_Charge::sum_bands(void)
             if(NEW_DM>0)
             {
                 //density matrix has already been calcualted.
+                timer::tick("LCAO_Charge","cal_dm_2d",'F');
                 wfc_dm_2d.cal_dm(wf.wg);        // Peize Lin test 2019-01-16
+                timer::tick("LCAO_Charge","cal_dm_2d",'F');
                 this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
             }
             else
@@ -861,7 +863,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 // transform dm_gamma[is].c to this->DM[is]
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
-    timer::tick("LCAO_Charge","newDM",'F');
+    //timer::tick("LCAO_Charge","newDM",'F');
+    timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
     OUT(ofs_running,"cal_dk_gamma_from_2D, NSPIN", NSPIN);
     for(int is=0; is<NSPIN; ++is)
     {
@@ -969,7 +972,8 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             ofs_running<<"=========================================\n";
         }
     }
-    timer::tick("LCAO_Charge","newDM",'F');
+    //timer::tick("LCAO_Charge","newDM",'F');
+    timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
 }
 //-------------------------------------------------------------
 //-------------------------------------------------------------

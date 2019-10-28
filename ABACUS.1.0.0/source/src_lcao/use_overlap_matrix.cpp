@@ -405,7 +405,7 @@ void Use_Overlap_Matrix::test_Nonlocal()
 void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 {
     TITLE("Use_Overlap_Matrix","build_Nonlocal_mu");
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_mu");
+    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_mu",'G');
 
 	// < phi1 | beta > < beta | phi2 >
 	// phi1 is within the unitcell.
@@ -652,7 +652,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 
 //	cout << " build_Nonlocal_mu done" << endl;
 
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_mu");
+    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_mu",'G');
 	return;
 }
 
@@ -660,7 +660,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 {
     TITLE("Use_Overlap_Matrix","build_Nonlocal_beta");
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_beta");
+    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_beta",'G');
 
     for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
@@ -802,7 +802,7 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
         }// end I0
     }// end T0
 
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_beta");
+    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_beta",'G');
     return;
 }
 
