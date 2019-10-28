@@ -501,6 +501,7 @@ bool Input::Read(const string &fn)
     while (ifs.good())
     {
         ifs >> word1;
+        if(ifs.eof()) break;
         strtolower(word1, word);
 
 //----------------------------------------------------------
