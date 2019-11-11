@@ -171,6 +171,10 @@ void Force_LCAO::start_force(void)
 	{
 		vdwd2.force(stress_vdw, STRESS);
 	}
+	if(vdwd3.vdwD3)									//jiyy add 2019-05-18
+	{
+		vdwd3.force(stress_vdw, STRESS);
+	}																			 
 	
 	
 	matrix fefield;
@@ -202,6 +206,16 @@ void Force_LCAO::start_force(void)
 					case 0:	fcs(iat,i) += vdwd2.force_result[iat].x;	break;
 					case 1:	fcs(iat,i) += vdwd2.force_result[iat].y;	break;
 					case 2:	fcs(iat,i) += vdwd2.force_result[iat].z;	break;
+				}
+				
+			}
+	        if(vdwd3.vdwD3)											//jiyy add 2019-05-18
+			{
+				switch(i)
+				{
+					case 0:	fcs(iat,i) += vdwd3.force_result[iat][0];	break;
+					case 1:	fcs(iat,i) += vdwd3.force_result[iat][1];	break;
+					case 2:	fcs(iat,i) += vdwd3.force_result[iat][2];	break;
 				}
 				
 			}

@@ -5,6 +5,7 @@
 #include "algorithms.h"
 #include "../src_pw/global.h" // use chr.
 #include "vdwd2.h"
+#include "vdwd3.h"
 
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
@@ -99,6 +100,10 @@ void Ions::opt_ions_pw(void)
 		{
 			vdwd2.energy();
 		}
+		if(vdwd3.vdwD3)											//jiyy add 2019-05-18
+		{
+			vdwd3.energy();
+		}																										 
 		
         if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")  // pengfei 2014-10-13
         {

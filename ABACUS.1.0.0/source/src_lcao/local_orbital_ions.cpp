@@ -249,6 +249,10 @@ void Local_Orbital_Ions::opt_ions(void)
         {
             vdwd2.energy();
         }
+		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+        {
+            vdwd3.energy();
+        }															
 		
         // (10) self consistent
         if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
@@ -513,6 +517,10 @@ void Local_Orbital_Ions::opt_ions(void)
         {
             vdwd2.energy();
         }
+		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+        {
+            vdwd3.energy();
+        } 
         LOE.scf(0);
 
         if(CALCULATION=="scf" || CALCULATION=="relax")
@@ -818,6 +826,10 @@ void Local_Orbital_Ions::final_scf(void)
     {
         vdwd2.energy();
     }
+	if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+    {
+        vdwd3.energy();
+    }											  
     LOE.scf(0);
 
     if(CALCULATION=="scf" || CALCULATION=="relax")
