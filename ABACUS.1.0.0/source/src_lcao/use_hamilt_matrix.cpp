@@ -488,7 +488,7 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
             //GridD.Find_atom(tau1);
             GridD.Find_atom(tau1, T1, I1);
             Atom* atom1 = &ucell.atoms[T1];
-            const int start = ucell.itiaiw2iwt(T1,I1,0) * NPOL;
+            const int start = ucell.itiaiw2iwt(T1,I1,0);
 
             for(int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
             {
@@ -511,7 +511,7 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
                         const int T0 = GridD.getType(ad0);
                         const int I0 = GridD.getNatom(ad0);
                         const int iat0 = ucell.itia2iat(T0, I0);
-                        const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;
+                        const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
                         tau0 = GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;
@@ -533,7 +533,7 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
 
                 if(adj)
                 {
-                    const int start2 = ucell.itiaiw2iwt(T2,I2,0) * NPOL;
+                    const int start2 = ucell.itiaiw2iwt(T2,I2,0);
 
                     Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z);
                     R_x = (int) (dR.x - R_minX);

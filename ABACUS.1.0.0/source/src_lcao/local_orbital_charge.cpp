@@ -711,7 +711,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, 
                     const int I2 = RA.info[ia1][ia2][4];
                     Atom* atom2 = &ucell.atoms[T2];
                     const int start2 = ucell.itiaiw2iwt(T2,I2,0);
-                    const int iw2_lo=gt.trace_lo[start2] + NLOCAL/NPOL*is2;
+                    const int iw2_lo=gt.trace_lo[start2]/NPOL + GridT.lgd/NPOL*is2;
                     const int nw2=atom2->nw;
                     complex<double> exp_R= exp( fac * (
                                 kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
@@ -783,7 +783,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 const int start1 = ucell.itiaiw2iwt(T1,I1,0);
                 const int gstart = LNNR.nlocstartg[iat];
                 const int ng = LNNR.nlocdimg[iat];
-                const int iw1_lo=gt.trace_lo[start1];
+                const int iw1_lo=gt.trace_lo[start1]/NPOL;
                 const int nw1=atom1->nw;
 
                 if(DM_ATOM_SIZE<ng)

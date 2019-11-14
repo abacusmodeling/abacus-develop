@@ -1052,10 +1052,10 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 									// iw1_lo
 									complex<double> *vij[4];
 									for(int spin=0;spin<4;spin++)
-										vij[spin] = this->pvp_nc[spin][GridT.trace_lo[start1+iw]];
+										vij[spin] = this->pvp_nc[spin][GridT.trace_lo[start1]/NPOL + iw];
 
 
-									int* iw2_lo = &GridT.trace_lo[start2];
+									int* iw2_lo = &GridT.trace_lo[start2]/NPOL;
 									int* iw2_end = iw2_lo + atom2->nw;
 
 									if(VNA)
@@ -1989,7 +1989,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
             if(GridT.in_this_processor[iat])
             {
                 Atom* atom1 = &ucell.atoms[T1];
-                const int start1 = ucell.itiaiw2iwt(T1, I1, 0) * NPOL;
+                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 
                 const int DM_start = LNNR.nlocstartg[iat];
                 tau1 = ucell.atoms[T1].tau[I1];
@@ -2012,7 +2012,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 
                         if(distance < rcut)
                         {
-                            const int start2 = ucell.itiaiw2iwt(T2, I2, 0) * NPOL;
+                            const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 
                             dR.x = GridD.getBox(ad).x;
                             dR.y = GridD.getBox(ad).y;

@@ -51,7 +51,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double* ylma,
 		const int it=ucell.iat2it[iat];
 		const int ia=ucell.iat2ia[iat];
 		const int start=ucell.itiaiw2iwt(it, ia, 0);
-		block_iw[id]=GridT.trace_lo[start];
+		block_iw[id]=GridT.trace_lo[start]/NPOL;
 		Atom* atom=&ucell.atoms[it];
 		block_size[id]=atom->nw;
 		block_index[id+1]=block_index[id]+atom->nw;
@@ -628,14 +628,14 @@ void Gint_k::evaluate_pDMp(const int &grid_index, const int &size,
 							end1 = psi1 + nw1;
 							end2 = psi2 + nw2;
 							
-							iw1_lo = GridT.trace_lo[start1];
+							iw1_lo = GridT.trace_lo[start1]/NPOL;
 							ixxx2 = ixxx;
 							//------------------------------------
 							// circle for wave functions of atom 1.
 							//------------------------------------
 							for (iw1p=psi1; iw1p<end1; ++iw1p)
 							{
-								iw2_lo = GridT.trace_lo[start2];
+								iw2_lo = GridT.trace_lo[start2]/NPOL;
 								// 2.0 counts for the undiagonalized part
 								psi1_2 = 2.0 * iw1p[0];
 								//------------------------------------

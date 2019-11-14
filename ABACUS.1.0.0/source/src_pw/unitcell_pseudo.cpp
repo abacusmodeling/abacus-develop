@@ -1352,7 +1352,7 @@ void UnitCell_pseudo::cal_nwfc()
 		{
 			this->itia2iat(it, ia) = iat;
 			this->iat2ia[iat] = ia;
-			for(int iw=0; iw<atoms[it].nw; iw++)
+			for(int iw=0; iw<atoms[it].nw * NPOL; iw++)
 			{
 				this->itiaiw2iwt(it, ia, iw) = iwt;
 				this->iwt2iat[iwt] = iat;
