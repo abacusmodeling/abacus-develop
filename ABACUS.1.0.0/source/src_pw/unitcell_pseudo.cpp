@@ -1343,7 +1343,7 @@ void UnitCell_pseudo::cal_nwfc()
 	this->iwt2iat = new int[NLOCAL];
 
 	this->itia2iat.create(ntype, namax);
-	this->itiaiw2iwt.create(ntype, namax, nwmax);
+	this->itiaiw2iwt.create(ntype, namax, nwmax*NPOL);
 	int iat=0;
 	int iwt=0;
 	for(int it = 0;it < ntype;it++)
