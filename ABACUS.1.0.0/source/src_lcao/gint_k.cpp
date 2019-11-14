@@ -1055,8 +1055,8 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 										vij[spin] = this->pvp_nc[spin][GridT.trace_lo[start1]/NPOL + iw];
 
 
-									int* iw2_lo = &GridT.trace_lo[start2]/NPOL;
-									int* iw2_end = iw2_lo + atom2->nw;
+									int iw2_lo = GridT.trace_lo[start2]/NPOL;
+									int iw2_end = iw2_lo + atom2->nw;
 
 									if(VNA)
 									{
@@ -1065,7 +1065,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 										double *vijR2 = &pvnapR_reduced[ixxx];
 										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR, ++vijR2)
 										{
-											vij[0][iw2_lo[0]] += ( vijR[0] + vijR2[0] ) * phase; 
+											vij[0][iw2_lo] += ( vijR[0] + vijR2[0] ) * phase; 
 										}
 									}
 									else
@@ -1077,7 +1077,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR[0], ++vijR[1],++vijR[2],++vijR[3])
 										{
 											for(int spin =0;spin<4;spin++)
-												vij[spin][iw2_lo[0]] += vijR[spin][0] * phase; 
+												vij[spin][iw2_lo] += vijR[spin][0] * phase; 
 //											else vij[iw2_lo[0]] += vijR_soc[0] * phase;
 										}
 									}
