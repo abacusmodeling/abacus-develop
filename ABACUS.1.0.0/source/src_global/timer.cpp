@@ -1,8 +1,10 @@
 //==========================================================
 // AUTHOR : fangwei , mohan
-// DATE : 2008-11-06
+// DATE : 2008-11-06,
+// UPDATE : Peize Lin at 2019-11-21
 //==========================================================
 #include "timer.h"
+#include<vector>
 
 #ifdef __MPI
 #include "mpi.h"
@@ -14,41 +16,14 @@ using namespace std;
 // EXPLAIN :   
 //----------------------------------------------------------
 bool timer::disabled = false;
-int timer::n_clock = 100;
 int timer::n_now = 0;
-int timer::start_flag = -1;
-double* timer::cpu_second;
-double* timer::cpu_start;
-string* timer::name;
-string* timer::class_name;
-int* timer::calls;
-char* timer::level; //mohan add 2012-01-10
-bool timer::delete_flag=false;
-
-timer::timer()
-{
-};
-
-timer::~timer()
-{
-};
+map<string,map<string,timer::Timer_One>> timer::timer_pool;
 
 void timer::finish(ofstream &ofs,const bool print_flag)
 {
 	timer::tick("","total");
 	if(print_flag)
-	{
 		print_all( ofs );
-	}
-	if(delete_flag)
-	{
-		delete[] cpu_second;
-		delete[] cpu_start;
-		delete[] name;
-		delete[] class_name;
-		delete[] calls;
-		delete[] level;
-	}
 }
 
 //----------------------------------------------------------
@@ -56,152 +31,63 @@ void timer::finish(ofstream &ofs,const bool print_flag)
 //----------------------------------------------------------
 void timer::start(void)
 {
-	cpu_second = new double[n_clock]();
-	cpu_start = new double[n_clock]();
-	name = new string[n_clock]();
-	class_name = new string[n_clock]();
-	calls = new int[n_clock]();
-	level = new char[n_clock]();
-
-	delete_flag = true;
-
-	for (int i = 0; i < n_clock; i++)
-	{
-		cpu_start[i] = (double)start_flag;
-		name[i]= "\0";
-		class_name[i]= "\0";
-		calls[i] = 0;
-		level[i] = 'Z';
-	}
-
 	// first init ,then we can use tick
 	timer::tick("","total");
-	return;
 }
 
 double timer::cpu_time(void)
 {
-	clock_t t1 = 0;
 //----------------------------------------------------------
 // EXPLAIN : here static is important !!
 // only first call can let t0 = 0,clock begin
 // when enter this function second time , t0 > 0
 //----------------------------------------------------------
-	static clock_t t0 = 0;
-	if (t0 == 0) 
-	{
-		t0 = clock();
-	}
-	t1 = clock() - t0;
-
-	if(t1 < 0) return 0; // mohan add, abandon the cross point time 2^32 ~ -2^32 .
-	else return (double)t1/CLOCKS_PER_SEC;
+	static clock_t t0 = clock();
+	const clock_t t1 = clock() - t0;
+	return (t1<0) ? 0 : (double)t1/CLOCKS_PER_SEC;
+		// mohan add, abandon the cross point time 2^32 ~ -2^32 .
 }
 
-void timer::tick(const string &tagc,const string &tag,char level_in)
+void timer::tick(const string &class_name,const string &name,char level_in)
 {
 //----------------------------------------------------------
 // EXPLAIN : if timer is disabled , return
 //----------------------------------------------------------
-	if (disabled) 
-	{
+	if (disabled)
 		return;
-	}
-
-	int find_clock=0;//counter
-//----------------------------------------------------------
-// EXPLAIN :  find if the tag has been used 
-//----------------------------------------------------------
-	for(find_clock=0; find_clock<n_now; find_clock++)
-	{
-		if (tag == name[find_clock] && tagc == class_name[find_clock]) 
-		{
-			break;
-		}
-	}
-
-//----------------------------------------------------------
-// EXPLAIN : if it's a new tag; add a new tag to list;
-// add this new tag to name list;
-//----------------------------------------------------------
-	if (find_clock == n_now)
-	{
-		n_now++;
-		name[find_clock] = tag;
-		class_name[find_clock] = tagc;
-	}
-
-//----------------------------------------------------------
-// EXPLAIN : if exceed the the uplimits of list 
-//----------------------------------------------------------
-	if (n_now >= n_clock) 
-	{
-		cout << "\nError! Too many timer!";
-		return;
-	}
+	
+	Timer_One &timer_one = timer_pool[class_name][name];
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
 // NAME : cpu_time
 //
-// EXPLAIN : start_flag is minus 1, 
-// so if cpu_start == start_flag,means a new clock counting
-// begin, hence we record the start time of this clock 
-// counting , if cpu_start != start_flag, means it's
-// the end of this counting, so we add the time during
-// this two 'time point'  to the clock time storage.
+// EXPLAIN :
+// if start_flag == true,means a new clock counting begin,
+// hence we record the start time of this clock counting.
+// if start_flag == false, means it's the end of this counting,
+// so we add the time during this two 'time point'  to the clock time storage.
 //----------------------------------------------------------
-	if (cpu_start[find_clock] == start_flag )
+	if(timer_one.start_flag)
 	{
 #ifdef __MPI
-		cpu_start[find_clock] = MPI_Wtime();
+		timer_one.cpu_start = MPI_Wtime();
 #else
-		cpu_start[find_clock] = cpu_time();
+		timer_one.cpu_start = cpu_time();
 #endif
-		calls[find_clock]++;
-		level[find_clock]=level_in;
+		++timer_one.calls;
+		timer_one.level = level_in;
+		timer_one.start_flag = false;
 	}
 	else
 	{
 #ifdef __MPI
-		cpu_second[find_clock] += MPI_Wtime() - cpu_start[find_clock];
+		timer_one.cpu_second += MPI_Wtime() - timer_one.cpu_start;
 #else
-		cpu_second[find_clock] += cpu_time() - cpu_start[find_clock];
+		timer_one.cpu_second += cpu_time() - timer_one.cpu_start;
 #endif
-		cpu_start[find_clock] = start_flag;
+		timer_one.start_flag = true;
 	}
-	return;
-}
-
-
-
-void timer::enable(void)
-{
-	disabled = false;
-	return;
-}
-
-void timer::disable(void)
-{
-	disabled = true;
-	return;
-}
-
-double timer::print(const string &tag)
-{
-	int index = 0;
-	for(int i=0; i<n_now; i++)
-	{
-		if (tag == name[i]) 
-		{
-			index = i;
-			break;
-		}
-	}
-//	cout << "\n " << name[i] 
-//		 << " time : " 
-//		 << cpu_second[i] << " (sec)" << endl;
-	return cpu_second[index];
 }
 
 long double timer::print_until_now(void)
@@ -210,9 +96,68 @@ long double timer::print_until_now(void)
 	timer::tick("","total");
 	// start again
 	timer::tick("","total");
-	return print("total");
+	return timer_pool[""]["total"].cpu_second;
 }
 
+void timer::print_all(ofstream &ofs)
+{
+	constexpr double small = 0.1; // cpu = 10^6
+	// if want to print > 1s , set small = 10^6
+	
+	vector<pair<pair<string,string>,Timer_One>> timer_pool_order;
+	for(auto &timer_pool_A : timer_pool)
+	{
+		const string class_name = timer_pool_A.first;
+		for(auto &timer_pool_B : timer_pool_A.second)
+		{
+			const string name = timer_pool_B.first;
+			const Timer_One timer_one = timer_pool_B.second;
+			if(timer_pool_order.size() < timer_one.order+1)
+				timer_pool_order.resize(timer_one.order+1);
+			timer_pool_order[timer_one.order] = {{class_name, name}, timer_one};
+		}
+	}
+	
+	cout << setprecision(2);
+	ofs << setprecision(3);
+	cout<<"\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << endl;
+	ofs <<"\n\n\n\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << endl;
+	for(auto &timer_pool_order_A : timer_pool_order)
+	{
+		const string &class_name = timer_pool_order_A.first.first;
+		const string &name = timer_pool_order_A.first.second;
+		const Timer_One &timer_one = timer_pool_order_A.second;
+		
+		if(timer_one.cpu_second < small)
+			continue;
+		if(timer_one.level > 'X')
+			continue;
+		
+		ofs  << " " 
+			 << setw(2)  << timer_one.level
+			 << setw(20) << class_name
+			 << setw(20) << name
+			 << setw(15) << timer_one.cpu_second
+			 << setw(10) << timer_one.calls
+			 << setw(10) << setprecision(2) << timer_one.cpu_second/timer_one.calls
+			 << setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << endl;
+
+		cout << resetiosflags(ios::scientific);
+		
+		cout << " " 
+			 << setw(2)  << timer_one.level
+			 << setw(20) << class_name
+			 << setw(20) << name
+			 << setw(15) << timer_one.cpu_second
+			 << setw(10) << timer_one.calls
+			 << setw(10) << setprecision(2) << timer_one.cpu_second/timer_one.calls
+			 << setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << endl;		
+	}
+	cout<<" ----------------------------------------------------------------------------------------"<<endl;
+	ofs <<" ----------------------------------------------------------------------------------------"<<endl;
+}
+
+/*
 void timer::print_all(ofstream &ofs)
 {
 //	cout<<"\n timer::print_all()"<<endl;
@@ -312,3 +257,4 @@ void timer::print_all(ofstream &ofs)
 	delete[] print_flag;
 	return;
 }
+*/

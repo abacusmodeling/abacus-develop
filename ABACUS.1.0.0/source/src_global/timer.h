@@ -1,6 +1,7 @@
 //==========================================================
 // AUTHOR : fangwei , mohan
 // DATE : 2008-11-06
+// UPDATE : Peize Lin at 2019-11-21
 //==========================================================
 #ifndef TIMER_H
 #define TIMER_H
@@ -11,6 +12,7 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+#include <map>
 using namespace std;
 
 //==========================================================
@@ -19,10 +21,19 @@ using namespace std;
 //==========================================================
 class timer
 {
-	timer();
-	~timer();
-
 	public:
+	
+	struct Timer_One
+	{
+		double cpu_start;
+		double cpu_second = 0.0;
+		int calls = 0;
+		int order = n_now++;
+		char level;
+		bool start_flag = true;
+	};
+	
+	static map<string,map<string,Timer_One>> timer_pool;
 //==========================================================
 // MEMBER FUNCTIONS :
 // NAME : tick(use twice at a time)
@@ -30,7 +41,6 @@ class timer
 // NAME : finish
 // NAME : enable
 // NAME : disable
-// NAME : print
 // NAME : print_all
 //==========================================================
 	static void tick(const string &class_name_in,const string &name_in,char level_in='Z');
@@ -38,43 +48,27 @@ class timer
 	static void start(void);
 	static void finish(ofstream &ofs,const bool print_flag = 1);
 
-	static void enable(void);
-	static void disable(void);
+	static void enable(void){ disabled = false; }
+	static void disable(void){ disabled = true; }
 
 	static void print_all(ofstream &ofs);
 	static long double print_until_now(void);
-	static double print(const string &name_in);
 
 	private:
 
 //==========================================================
 // MEMBER VARIABLES : 
 // NAME : disabled(if disabled , timer can't work)
-// NAME : n_clock(uplimit number of clock numbers)
 // NAME : n_now(the index of clocks) 
-// NAME : start_flag
-// NAME : cpu_start
-// NAME : cput_second(record cpu time)
-// NAME : name(record clock name)
-// NAME : class_name(record another name for clock)
 //==========================================================
 	static bool disabled;
-	static int n_clock;
 	static int n_now;
-	static int start_flag;
-	static double *cpu_start;
-	static double *cpu_second;
-	static string *name;
-	static string *class_name;
-	static int *calls; 
-	static char *level; // mohan add 2012-01-10
 
 //==========================================================
 // MEMBER FUNCTIONS :
 // NAME : cpu_time(calculate time)
 //==========================================================
 	static double cpu_time(void);
-	static bool delete_flag;
 
 };
 #endif
