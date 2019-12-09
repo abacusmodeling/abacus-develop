@@ -114,7 +114,6 @@ static void ofs_matrixes( const string & file_name, const ComplexMatrix & ms, co
 	ofs.close();
 }
 
-
 /*
 template<typename T1, typename T2, typename T3, typename M>
 static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,weak_ptr<M>>>> & ms, const bool flag_print_content=true )

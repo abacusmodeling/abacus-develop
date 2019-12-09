@@ -29,7 +29,7 @@ public:
 	ComplexMatrix(const int nrows,const int ncols,const bool flag_zero=true);		// Peize Lin add flag_zero 2019-05-13
 	ComplexMatrix(const ComplexMatrix &m1);
 	ComplexMatrix(ComplexMatrix && m1);						// Peize Lin add 2016-08-05
-	ComplexMatrix(const matrix &m);							// Peize Lin add 2017-03-29
+	explicit ComplexMatrix(const matrix &m);							// Peize Lin add 2017-03-29
 	~ComplexMatrix();
 	
 	void create(const int nrow,const int ncol,const bool flag_zero=true);		// Peize Lin add flag_zero 2019-05-13

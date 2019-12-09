@@ -336,9 +336,9 @@ void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 		if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
 			exx_lcao.add_Hexx(ik,1);
 		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
-			exx_lcao.add_Hexx(ik,0.25);
+			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
 		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
-			exx_lcao.add_Hexx(ik,0.25);
+			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
 	}
 
 

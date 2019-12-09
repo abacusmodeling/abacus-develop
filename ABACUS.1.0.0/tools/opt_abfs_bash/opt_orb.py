@@ -62,7 +62,7 @@ def cal(input):
 		with open(f"{utils.folder_opt}/sub.sh","w") as file:
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
-				#PBS -q batch
+				#PBS -q gold5120
 				#PBS -l nodes=1:ppn=1
 				#PBS -l walltime=2:00:00
 				#PBS -o job.log

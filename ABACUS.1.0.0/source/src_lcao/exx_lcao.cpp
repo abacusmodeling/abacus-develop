@@ -56,7 +56,7 @@ static matrix transform (
 Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 	:kmesh_times(4),
 	 info(info_global)
-{	
+{
 	auto test_gemm = []()
 	{
 		auto init_matrix = [](const int nr, const int nc, const double add) -> matrix
@@ -803,8 +803,8 @@ void Exx_Lcao::cal_exx_elec()
 {
 	TITLE("Exx_Lcao","cal_exx_elec");
 
+static int istep=0;
 	#if TEST_EXX_LCAO==1
-		static int istep=0;
 	//	ofs_matrixes("Cws_"+TO_STRING(istep)+"_before.dat",Cws);
 	//	ofs_matrixes("Vws_"+TO_STRING(istep)+"_before.dat",Vws);
 	//	ofs_matrixes("Cs_"+TO_STRING(istep)+"_before.dat",Cs);
@@ -871,119 +871,165 @@ ofs_mpi.close();
 		ofs_matrixes("DMk_"+TO_STRING(istep)+".dat",DM.DMk);
 		ofs_matrixes("DMr_"+TO_STRING(istep)+".dat",DM.DMr);
 		ofs_matrixes("Hexx_"+TO_STRING(istep)+".dat",Hexx);
+	#elif TEST_EXX_LCAO==-1
+		#error "TEST_EXX_LCAO"
+	#endif
 
-		auto print_LOCDM = []()
+	auto print_LOCDM = [&]()
+	{
+		if(GAMMA_ONLY_LOCAL)
 		{
-			if(GAMMA_ONLY_LOCAL)
-			{
-				ofstream ofs("LOC.DM.dat",ofstream::app);
-				const int it1=0, it2=0;
-				for( size_t ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
-					for( size_t ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
-						for( size_t is=0; is!=NSPIN; ++is )
+			ofstream ofs("LOC.DM.dat",ofstream::app);
+			const int it1=0, it2=0;
+			for( size_t ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
+				for( size_t ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
+					for( size_t is=0; is!=NSPIN; ++is )
+					{
+						ofs<<"@\t"<<ia1<<"\t"<<ia2<<"\t"<<is<<endl;
+						for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
 						{
-							ofs<<"@\t"<<ia1<<"\t"<<ia2<<"\t"<<is<<endl;
-							for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
-							{
-								for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
-									ofs<<LOC.DM[is][ucell.itiaiw2iwt(it1,ia1,iw1)][ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
-								ofs<<endl;
-							}
+							for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
+								ofs<<LOC.DM[is][ucell.itiaiw2iwt(it1,ia1,iw1)][ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
 							ofs<<endl;
 						}
-				ofs.close();
-			}
-			else
+						ofs<<endl;
+					}
+			ofs.close();
+		}
+		else
+		{
+			throw logic_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			/*
+			static int istep=0;
+			for( size_t is=0; is!=NSPIN; ++is )
 			{
-				throw logic_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-				/*
-				static int istep=0;
-				for( size_t is=0; is!=NSPIN; ++is )
+				ofstream ofs("LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
+				for(int T1=0; T1<ucell.ntype; T1++)
 				{
-					ofstream ofs("LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
-					for(int T1=0; T1<ucell.ntype; T1++)
+					for(int I1=0; I1<ucell.atoms[T1].na; I1++)
 					{
-						for(int I1=0; I1<ucell.atoms[T1].na; I1++)
-						{
-							const int iat1 = ucell.itia2iat(T1,I1);
+						const int iat1 = ucell.itia2iat(T1,I1);
 
-							int iv=0;
-							for( const auto & atom2 : adjs )
+						int iv=0;
+						for( const auto & atom2 : adjs )
+						{
+							const size_t iat2 = atom2.first;
+							for( const Abfs::Vector3_Order<int> & box2 : atom2.second )
 							{
-								const size_t iat2 = atom2.first;
-								for( const Abfs::Vector3_Order<int> & box2 : atom2.second )
+								ofs<<"@\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
+								for( int iw1=0; iw1!=ucell.atoms[T1].nw; ++iw1 )
 								{
-									ofs<<"@\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
-									for( int iw1=0; iw1!=ucell.atoms[T1].nw; ++iw1 )
+									for( int iw2=0; iw2!=ucell.atoms[ucell.iat2it[iat2]].nw; ++iw2 )
 									{
-										for( int iw2=0; iw2!=ucell.atoms[ucell.iat2it[iat2]].nw; ++iw2 )
-										{
-											ofs<<LOC.DM_R[is][LNNR.nlocstartg[iat1]+iv]<<"\t";
-											++iv;
-										}
-										ofs<<endl;
+										ofs<<LOC.DM_R[is][LNNR.nlocstartg[iat1]+iv]<<"\t";
+										++iv;
 									}
 									ofs<<endl;
 								}
+								ofs<<endl;
 							}
 						}
 					}
-					ofs.close();
 				}
-				*/
+				ofs.close();
 			}
-		};
-	#elif TEST_EXX_LCAO==-1
-		#error "TEST_EXX_LCAO"
-	#endif
-
-	#if TEST_EXX_LCAO==1
-		auto print_WFC = []()
+			*/
+		}
+	};
+	
+	auto print_WFC = [&]()
+	{
+		if( GAMMA_ONLY_LOCAL )
 		{
-			if( GAMMA_ONLY_LOCAL )
+			for( size_t ik=0; ik!=kv.nks; ++ik )
 			{
-				for( size_t ik=0; ik!=kv.nks; ++ik )
+				ofstream ofs("LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				for( size_t ib=0; ib!=NBANDS; ++ib )
 				{
-					ofstream ofs("LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
-					for( size_t ib=0; ib!=NBANDS; ++ib )
-					{
-						for( size_t iwt=0; iwt!=NLOCAL; ++iwt )
-							ofs<<LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
-						ofs<<endl;
-					}
-					ofs.close();
+					for( size_t iwt=0; iwt!=NLOCAL; ++iwt )
+						ofs<<LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
+					ofs<<endl;
 				}
+				ofs.close();
 			}
-			else
+		}
+		else
+		{
+			for( size_t ik=0; ik!=kv.nks; ++ik )
 			{
-				for( size_t ik=0; ik!=kv.nks; ++ik )
+				ofstream ofs("LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				for( size_t ib=0; ib!=NBANDS; ++ib )
 				{
-					ofstream ofs("LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
-					for( size_t ib=0; ib!=NBANDS; ++ib )
-					{
-						for( size_t iwt=0; iwt!=NLOCAL; ++iwt )
-							ofs<<LOWF.WFC_K[ik][ib][iwt]<<"\t";
-						ofs<<endl;
-					}
-					ofs.close();
+					for( size_t iwt=0; iwt!=NLOCAL; ++iwt )
+						ofs<<LOWF.WFC_K[ik][ib][iwt]<<"\t";
+					ofs<<endl;
 				}
+				ofs.close();
 			}
-		};
-		print_WFC();
-	#elif TEST_EXX_LCAO==-1
-		#error "TEST_EXX_LCAO"
-	#endif
+		}
+	};
 
+	auto print_Hexx=[&]()		// Peize Lin test 2019-11-14
+	{
+		if(GAMMA_ONLY_LOCAL)
+		{
+			for(int is=0; is<NSPIN; ++is)
+			{		
+				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(MY_RANK));
+				ofs<<exx_lcao.Hexx_para.HK_Gamma_m2D[is]<<endl;
+			}
+		}
+		else
+		{
+			for(int ik=0; ik<kv.nks; ++ik)
+			{
+				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(MY_RANK));
+				ofs<<exx_lcao.Hexx_para.HK_K_m2D[ik]<<endl;
+			}
+		}
+	};
+
+	auto print_wfc=[&]()		// Peize Lin test 2019-11-14
+	{
+		if(GAMMA_ONLY_LOCAL)
+		{
+			for(int is=0; is<NSPIN; ++is)
+			{		
+				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(MY_RANK));
+				ofs<<LOC.wfc_dm_2d.wfc_gamma[is]<<endl;
+			}
+		}
+		else
+		{
+			for(int ik=0; ik<kv.nks; ++ik)
+			{
+				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(MY_RANK));
+				ofs<<LOC.wfc_dm_2d.wfc_gamma[ik]<<endl;
+			}
+		}
+	};
+
+	auto print_ekb=[&]()		// Peize Lin test 2019-11-14
+	{
+		for(int ik=0; ik<kv.nks; ++ik)
+		{
+			ofstream ofs("ekb_"+TO_STRING(ik)+"_"+TO_STRING(MY_RANK), ofstream::app);
+			for(int ib=0; ib<NBANDS; ++ib)
+				ofs<<wf.ekb[ik][ib]<<"\t";
+			ofs<<endl;
+		}
+	};	
+	
 	#if TEST_EXX_LCAO==1
 	//	ofs_matrixes("Cws_"+TO_STRING(istep)+"_end.dat",Cws);
 	//	ofs_matrixes("Vws_"+TO_STRING(istep)+"_end.dat",Vws);
 	//	ofs_matrixes("Cs_"+TO_STRING(istep)+"_end.dat",Cs);
 	//	ofs_matrixes("Vs_"+TO_STRING(istep)+"_end.dat",Vs);
 	//	ofs_matrixes("Vps_"+TO_STRING(istep)+"_end.dat",Vps);
-		++istep;
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
+++istep;
 
 //	cout<<"screen.schwarz"<<endl;
 //	cout<<Exx_Abfs::Screen::Schwarz::num_screen<<"\t"

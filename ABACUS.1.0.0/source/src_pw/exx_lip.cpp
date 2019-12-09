@@ -95,19 +95,17 @@ cout_t("sum_all",t_sum_all);
 
 	auto print_Hexxk = [&]()
 	{
-		ofstream ofs("Hexxk_"+TO_STRING(MY_RANK));
+		static int istep=1;
 		for(int ik=0; ik!=kv.nks; ++ik)
 		{
-			ofs<<"@\t"<<ik<<endl;
+			ofstream ofs("Hexxk_"+TO_STRING(istep++)+"_"+TO_STRING(ik)+"_"+TO_STRING(MY_RANK));
 			for(int i=0; i!=NLOCAL; ++i)
 			{
 				for(int j=0; j!=NLOCAL; ++j)
 					ofs<<exx_matrix[ik][i][j]<<"\t";
 				ofs<<endl;
 			}
-			ofs<<endl;
 		};
-		ofs.close();
 	};
 }
 

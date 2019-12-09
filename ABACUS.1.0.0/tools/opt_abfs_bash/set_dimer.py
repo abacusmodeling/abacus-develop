@@ -90,7 +90,7 @@ def cal_ABACUS(T1,T2,i_dis):
 				#!/bin/bash
 				#PBS -q gold5120
 				#PBS -l nodes=1:ppn=1
-				#PBS -l walltime=1:00:00
+				#PBS -l walltime=12:00:00
 				#PBS -o job.log
 				#PBS -e job.err
 				ulimit -s unlimited
