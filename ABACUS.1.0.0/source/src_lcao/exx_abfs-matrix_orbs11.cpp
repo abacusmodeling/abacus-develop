@@ -124,9 +124,9 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table()
 
 void Exx_Abfs::Matrix_Orbs11::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
 {	
-//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
-//timeval t_start;
-//gettimeofday( &t_start, NULL);
+ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+timeval t_start;
+gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","init_radial_table_Rs");
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
@@ -134,8 +134,8 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table( const map<size_t,map<size_t,set
 			if( auto* const center2_orb11_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb11>>>>*const>(
 						MAP_EXIST(center2_orb11_s, RsA.first, RsB.first)) )
 			{
-//timeval t_small;
-//gettimeofday(&t_small, NULL);
+timeval t_small;
+gettimeofday(&t_small, NULL);
 				set<size_t> radials;
 				for( const double &R : RsB.second )
 				{
@@ -144,18 +144,18 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table( const map<size_t,map<size_t,set
 					for( size_t i=0; i!=4; ++i )
 						radials.insert(iq+i);
 				}
-//ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
-//gettimeofday(&t_small, NULL);
+ofs<<"\t"<<RsA.first<<"\t"<<RsB.first<<"\t"<<time_during(t_small)<<"\t"<<flush;
+gettimeofday(&t_small, NULL);
 				for( auto &coC : *center2_orb11_sAB )
 					for( auto &coD : coC.second )
 						for( auto &coE : coD.second )
 							for( auto &coF : coE.second )
 								coF.second.init_radial_table(radials);
-//ofs<<time_during(t_small)<<endl;
+ofs<<time_during(t_small)<<endl;
 			}
 		}
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial_table\t"<<time_during(t_start)<<endl;
-//ofs.close();
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init_radial_table_Rs\t"<<time_during(t_start)<<endl;
+ofs.close();
 }
 
 /*

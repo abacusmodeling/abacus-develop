@@ -5,6 +5,7 @@
 #include "numerical_orbital_lm.h"
 #include "src_global/sph_bessel_recursive.h"
 #include "src_global/lapack_connector.h"
+#include<omp.h>
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
 {
@@ -214,9 +215,11 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 	this->psi_uniform.resize(nr_uniform,0);
 
 	// do interpolation here to make grid more dense
+	#pragma omp parallel for schedule(static)
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
-		this->psi_uniform[ir] = Mathzone_Add1::Uni_RadialF(VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
+		const double psi_uniform_tmp  = Mathzone_Add1::Uni_RadialF(VECTOR_TO_PTR(this->psi), this->nr, this->rab[0], ir * dr_uniform); 
+		this->psi_uniform[ir] = psi_uniform_tmp;
 //    	this->psi_uniform[ir] = Mathzone::Polynomial_Interpolation(this->psi, this->nr, this->rab[0], ir * dr_uniform); 
     }
 	
@@ -492,11 +495,13 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	for( size_t ir=1; ir!=nr-1; ++ir )
 		r_tmp[ir] *= (ir&1) ? four_three : two_three;
 
+	#pragma omp parallel for schedule(static)
 	for (int ik = 0; ik < nk; ik++)
 	{
-		this->psif[ik] = pref * LapackConnector::dot( this->nr, VECTOR_TO_PTR(r_tmp), 1, VECTOR_TO_PTR(jl[ik]), 1 ) ;
-		this->psik[ik] = this->psif[ik] * k_radial[ik];
-		this->psik2[ik] = this->psik[ik] * k_radial[ik];
+		const double psi_f_tmp = pref * LapackConnector::dot( this->nr, VECTOR_TO_PTR(r_tmp), 1, VECTOR_TO_PTR(jl[ik]), 1 ) ;
+		this->psif[ik] = psi_f_tmp;
+		this->psik[ik] = psi_f_tmp * k_radial[ik];
+		this->psik2[ik] = psi_f_tmp * k_radial[ik];
 	}
 }
 

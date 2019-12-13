@@ -177,7 +177,7 @@ gettimeofday(&t_small, NULL);
 ofs<<time_during(t_small)<<endl;
 			}
 		}
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table_Rs\t"<<time_during(t_start)<<endl;
 ofs.close();
 }
 
