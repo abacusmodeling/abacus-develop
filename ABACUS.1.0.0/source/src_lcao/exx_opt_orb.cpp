@@ -14,20 +14,26 @@
 #include "src_external/src_test/src_lcao/exx_abfs-unittest.h"
 #include "src_external/src_test/src_lcao/exx_lcao-test.h"
 #include "src_external/src_test/src_global/element_basis_index-test.h"
+#include "src_external/src_test/test_function.h"
 
 void Exx_Opt_Orb::generate_matrix() const
 {
 ofstream ofs_mpi(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
 
 	TITLE("Exx_Opt_Orb::generate_matrix");
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, exx_lcao.info.pca_threshold );
 
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+	
 	Exx_Abfs::Jle jle;
 	jle.init_jle( this->kmesh_times );
 
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+	
 	Exx_Abfs::Lmax = Exx_Abfs::Jle::Lmax;
 	for( size_t T=0; T!=abfs.size(); ++T )
 		Exx_Abfs::Lmax = std::max( Exx_Abfs::Lmax, static_cast<int>(abfs[T].size())-1 );
@@ -51,91 +57,111 @@ ofs_mpi<<range_jys<<endl;
 		for(const auto & rA : radial_R)
 			for(const auto & rB : rA.second)
 			{
-				cout<<rA.first<<"\t"<<rB.first<<":\t";
+				ofs_mpi<<rA.first<<"\t"<<rB.first<<":\t";
 				for(const auto & rC : rB.second)
-					cout<<rC<<"\t";
-				cout<<endl;
+					ofs_mpi<<rC<<"\t";
+				ofs_mpi<<endl;
 			}
 	}
 #endif
 
-	Exx_Abfs::Matrix_Orbs22 m_lcaoslcaos_lcaoslcaos;
-	m_lcaoslcaos_lcaoslcaos.init( 1, this->kmesh_times, 1 );
-	m_lcaoslcaos_lcaoslcaos.init_radial( lcaos, lcaos, lcaos, lcaos );
-#if TEST_EXX_RADIAL>=1
-	m_lcaoslcaos_lcaoslcaos.init_radial_table(radial_R);
-#else
-	m_lcaoslcaos_lcaoslcaos.init_radial_table();
-#endif
-
-	Exx_Abfs::Matrix_Orbs21 m_jyslcaos_lcaos;
-	m_jyslcaos_lcaos.init( 1, this->kmesh_times, 1 );
-	m_jyslcaos_lcaos.init_radial( jle.jle, lcaos, lcaos );
-#if TEST_EXX_RADIAL>=1
-	m_jyslcaos_lcaos.init_radial_table(radial_R);
-#else
-	m_jyslcaos_lcaos.init_radial_table();
-#endif
-
-	Exx_Abfs::Matrix_Orbs11 m_jys_jys;
-	m_jys_jys.init( 2, this->kmesh_times, 1 );
-	m_jys_jys.init_radial( jle.jle, jle.jle );
-#if TEST_EXX_RADIAL>=1
-	m_jys_jys.init_radial_table(radial_R);
-#else
-	m_jys_jys.init_radial_table();
-#endif
-
-	Exx_Abfs::Matrix_Orbs11 m_abfs_abfs;
-	m_abfs_abfs.init( 2, this->kmesh_times, 1 );
-	m_abfs_abfs.init_radial( abfs, abfs );
-#if TEST_EXX_RADIAL>=1
-	m_abfs_abfs.init_radial_table(radial_R);
-#else
-	m_abfs_abfs.init_radial_table();
-#endif
-
-	Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;
-	m_abfslcaos_lcaos.init( 1, this->kmesh_times, 1 );
-	m_abfslcaos_lcaos.init_radial( abfs, lcaos, lcaos );
-#if TEST_EXX_RADIAL>=1
-	m_abfslcaos_lcaos.init_radial_table(radial_R);
-#else
-	m_abfslcaos_lcaos.init_radial_table();
-#endif
-
-	Exx_Abfs::Matrix_Orbs11 m_jys_abfs;
-	m_jys_abfs.init( 2, this->kmesh_times, 1 );
-	m_jys_abfs.init_radial( jle.jle, abfs );
-#if TEST_EXX_RADIAL>=1
-	m_jys_abfs.init_radial_table(radial_R);
-#else
-	m_jys_abfs.init_radial_table();
-#endif
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 	// < lcaos lcaos | lcaos lcaos >
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
-		ms_lcaoslcaos_lcaoslcaos = m_lcaoslcaos_lcaoslcaos.cal_overlap_matrix( index_lcaos, index_lcaos, index_lcaos, index_lcaos);
+	const auto ms_lcaoslcaos_lcaoslcaos = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> 
+	{
+		Exx_Abfs::Matrix_Orbs22 m_lcaoslcaos_lcaoslcaos;
+		m_lcaoslcaos_lcaoslcaos.init( 1, this->kmesh_times, 1 );
+		m_lcaoslcaos_lcaoslcaos.init_radial( lcaos, lcaos, lcaos, lcaos );
+		#if TEST_EXX_RADIAL>=1
+		m_lcaoslcaos_lcaoslcaos.init_radial_table(radial_R);
+		#else
+		m_lcaoslcaos_lcaoslcaos.init_radial_table();
+		#endif
+		return m_lcaoslcaos_lcaoslcaos.cal_overlap_matrix( index_lcaos, index_lcaos, index_lcaos, index_lcaos);
+	}();
+	
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 	// < lcaos lcaos | jys >
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
-		ms_lcaoslcaos_jys = m_jyslcaos_lcaos.cal_overlap_matrix( index_jys, index_lcaos, index_lcaos );
+	const auto ms_lcaoslcaos_jys = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+	{
+		Exx_Abfs::Matrix_Orbs21 m_jyslcaos_lcaos;
+		m_jyslcaos_lcaos.init( 1, this->kmesh_times, 1 );
+		m_jyslcaos_lcaos.init_radial( jle.jle, lcaos, lcaos );
+		#if TEST_EXX_RADIAL>=1
+		m_jyslcaos_lcaos.init_radial_table(radial_R);
+		#else
+		m_jyslcaos_lcaos.init_radial_table();
+		#endif
+		return m_jyslcaos_lcaos.cal_overlap_matrix( index_jys, index_lcaos, index_lcaos );
+	}();
+
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 	// < jys | jys >
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
-		ms_jys_jys = m_jys_jys.cal_overlap_matrix( index_jys, index_jys );
+	const auto ms_jys_jys = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	{
+		Exx_Abfs::Matrix_Orbs11 m_jys_jys;
+		m_jys_jys.init( 2, this->kmesh_times, 1 );
+		m_jys_jys.init_radial( jle.jle, jle.jle );
+		#if TEST_EXX_RADIAL>=1
+		m_jys_jys.init_radial_table(radial_R);
+		#else
+		m_jys_jys.init_radial_table();
+		#endif
+		return m_jys_jys.cal_overlap_matrix( index_jys, index_jys );
+	}();
+
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 	// < abfs | abfs >
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
-		ms_abfs_abfs = m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
+	const auto ms_abfs_abfs = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	{
+		Exx_Abfs::Matrix_Orbs11 m_abfs_abfs;
+		m_abfs_abfs.init( 2, this->kmesh_times, 1 );
+		m_abfs_abfs.init_radial( abfs, abfs );
+		#if TEST_EXX_RADIAL>=1
+		m_abfs_abfs.init_radial_table(radial_R);
+		#else
+		m_abfs_abfs.init_radial_table();
+		#endif
+		return m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
+	}();
+
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 	// < lcaos lcaos | abfs >
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
-		ms_lcaoslcaos_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
+	const auto ms_lcaoslcaos_abfs = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+	{
+		Exx_Abfs::Matrix_Orbs21 m_abfslcaos_lcaos;
+		m_abfslcaos_lcaos.init( 1, this->kmesh_times, 1 );
+		m_abfslcaos_lcaos.init_radial( abfs, lcaos, lcaos );
+		#if TEST_EXX_RADIAL>=1
+		m_abfslcaos_lcaos.init_radial_table(radial_R);
+		#else
+		m_abfslcaos_lcaos.init_radial_table();
+		#endif
+		return m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
+	}();
+
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 	// < jys | abfs >
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
-		ms_jys_abfs = m_jys_abfs.cal_overlap_matrix( index_jys, index_abfs );
+	const auto ms_jys_abfs = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	{
+		Exx_Abfs::Matrix_Orbs11 m_jys_abfs;
+		m_jys_abfs.init( 2, this->kmesh_times, 1 );
+		m_jys_abfs.init_radial( jle.jle, abfs );
+		#if TEST_EXX_RADIAL>=1
+		m_jys_abfs.init_radial_table(radial_R);
+		#else
+		m_jys_abfs.init_radial_table();
+		#endif
+		return m_jys_abfs.cal_overlap_matrix( index_jys, index_abfs );
+	}();
+
+ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 ofs_matrixes(exx_lcao.test_dir.matrix+"ms_jys_jys",ms_jys_jys);
 ofs_matrixes(exx_lcao.test_dir.matrix+"ms_lcaoslcaos_jys",ms_lcaoslcaos_jys);

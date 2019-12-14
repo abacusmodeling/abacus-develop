@@ -16,7 +16,7 @@ static void MPI_RANK_OFSTREAM( const std::string& file_name, std::stringstream &
 	int my_rank;	MPI_Comm_rank(MPI_COMM_WORLD,&my_rank);	
 	file<<file_name<<"_"<<my_rank;
 	
-	std::ofstream ofs(file.str().c_str(), ofstream::app);
+	std::ofstream ofs(file.str().c_str(), std::ofstream::app);
 	ofs<<content.str();
 	
 	content.str("");
@@ -65,5 +65,21 @@ static double cut_time( timeval &t )
 	return time;
 }
 
+// Peize Lin add 2019-12-12
+static vector<double> get_memory(const int N)
+{
+	vector<double> m;
+	string s;
+	ifstream ifs("/proc/meminfo");
+	ifs>>s>>s;
+	m.push_back(stoi(s)/1024);
+	for(int i=1; i<N; ++i)
+	{
+		ifs>>s>>s>>s;
+		m.push_back(stoi(s)/1024);
+	}
+	ifs.close();
+	return m;
+}
 
 #endif		// TEST_FUNCTION_H
