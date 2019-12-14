@@ -501,7 +501,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 		const double psi_f_tmp = pref * LapackConnector::dot( this->nr, VECTOR_TO_PTR(r_tmp), 1, VECTOR_TO_PTR(jl[ik]), 1 ) ;
 		this->psif[ik] = psi_f_tmp;
 		this->psik[ik] = psi_f_tmp * k_radial[ik];
-		this->psik2[ik] = psi_f_tmp * k_radial[ik];
+		this->psik2[ik] = this->psik[ik] * k_radial[ik];
 	}
 }
 
