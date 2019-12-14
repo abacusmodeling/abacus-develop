@@ -12,6 +12,12 @@ public:
 	enum class Ccp_Type{		//  parameter:
 		Ccp,					//
 		Hse};					//  	"hse_omega"
+
+	template<typename T> static T cal_orbs_ccp(
+		const T &orbs,
+		const Ccp_Type &ccp_type,
+		const std::map<std::string,double> &parameter,
+		const double rmesh_times);
 	
 	template<typename T> static T cal_orbs_ccp_rmesh(
 		const T & orbs,
@@ -21,12 +27,6 @@ public:
 		double &rmesh_times);
 	
 private:
-
-	template<typename T> static T cal_orbs_ccp(
-		const T &orbs,
-		const Ccp_Type &ccp_type,
-		const std::map<std::string,double> &parameter,
-		const double rmesh_times);
 		
 	template< typename T > static double get_rmesh_proportion(
 		const T &orbs,

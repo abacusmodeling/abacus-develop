@@ -433,6 +433,7 @@ void Input::Default(void)
 	exx_schwarz_threshold = 0;
 	exx_cauchy_threshold = 0;
 	exx_ccp_threshold = 1E-8;
+	exx_ccp_rmesh_times = 10;
 		
 	exx_distribute_type = "htime";
 		
@@ -1575,6 +1576,10 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, exx_ccp_threshold);
         }		
+        else if (strcmp("exx_ccp_rmesh_times", word) == 0)
+        {
+            read_value(ifs, exx_ccp_rmesh_times);
+        }		
         else if (strcmp("exx_distribute_type", word) == 0)
         {
             read_value(ifs, exx_distribute_type);
@@ -1998,6 +2003,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( exx_schwarz_threshold );		
 	Parallel_Common::bcast_double( exx_cauchy_threshold );		
 	Parallel_Common::bcast_double( exx_ccp_threshold );		
+	Parallel_Common::bcast_double( exx_ccp_rmesh_times );		
 	Parallel_Common::bcast_string( exx_distribute_type );
 	Parallel_Common::bcast_int( exx_opt_orb_lmax );
 	Parallel_Common::bcast_double( exx_opt_orb_ecut );
@@ -2617,6 +2623,10 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("INPUT","must exx_hybrid_step > 0");
 		}
+		if(exx_ccp_rmesh_times<1)
+		{
+			WARNING_QUIT("INPUT","must exx_ccp_rmesh_times >= 1");
+		}
 		if(exx_distribute_type!="htime" && exx_distribute_type!="kmeans2" && exx_distribute_type!="kmeans1")
 		{
 			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
@@ -2999,6 +3009,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"exx_schwarz_threshold",exx_schwarz_threshold,"");
 	OUTP(ofs,"exx_cauchy_threshold",exx_cauchy_threshold,"");
 	OUTP(ofs,"exx_ccp_threshold",exx_ccp_threshold,"");
+	OUTP(ofs,"exx_ccp_rmesh_times",exx_ccp_rmesh_times,"");
 	OUTP(ofs,"exx_distribute_type",exx_distribute_type,"htime or kmeans1 or kmeans2");
 	OUTP(ofs,"exx_opt_orb_lmax",exx_opt_orb_lmax,"");
 	OUTP(ofs,"exx_opt_orb_ecut",exx_opt_orb_ecut,"");

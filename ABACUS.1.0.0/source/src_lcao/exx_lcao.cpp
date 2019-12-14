@@ -529,7 +529,7 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<endl;
 		ofs.close();
 	};
 
-//	Conv_Coulomb_Pot::cal_orbs_ccp( abfs, abfs_ccp, this->rmesh_times, 1 );
+//	Conv_Coulomb_Pot::cal_orbs_ccp( abfs, abfs_ccp, info.ccp_rmesh_times, 1 );
 //{
 //	ofstream ofs("exx_lcao"+TO_STRING(MY_RANK));
 //	ofs<<static_cast<std::underlying_type<Exx_Lcao::Hybrid_Type>::type>(exx_lcao.info.hybrid_type)<<endl;
@@ -541,14 +541,13 @@ gettimeofday( &t_start, NULL);
 	{
 		case Exx_Global::Hybrid_Type::HF:
 		case Exx_Global::Hybrid_Type::PBE0:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, info.ccp_threshold, this->rmesh_times );		break;
+			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Ccp, {}, info.ccp_rmesh_times );		break;
 		case Exx_Global::Hybrid_Type::HSE:
-			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_threshold, this->rmesh_times );	break;
+			abfs_ccp = Conv_Coulomb_Pot_K::cal_orbs_ccp( this->abfs, Conv_Coulomb_Pot_K::Ccp_Type::Hse, {{"hse_omega",info.hse_omega}}, info.ccp_rmesh_times );	break;
 		default:
 			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 	}
-ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp_rmesh\t"<<time_during(t_start)<<endl;
-ofs_mpi<<"rmesh_times:\t"<<rmesh_times<<endl;
+ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<endl;
 
 	auto print_psik = [](
 		const string & file_name,
@@ -602,7 +601,7 @@ ofs_mpi<<range_abfs<<endl;
 	};
 
 gettimeofday( &t_start, NULL);
-	m_abfs_abfs.init( 2, this->kmesh_times, (1+this->rmesh_times)/2.0 );
+	m_abfs_abfs.init( 2, this->kmesh_times, (1+info.ccp_rmesh_times)/2.0 );
 ofs_mpi<<"TIME@ m_abfs_abfs.init\t"<<time_during(t_start)<<endl;
 gettimeofday( &t_start, NULL);
 	m_abfs_abfs.init_radial( abfs_ccp, abfs );
@@ -708,11 +707,11 @@ gettimeofday( &t_start, NULL);
 		switch(this->info.distribute_type)
 		{
 			case Exx_Lcao::Distribute_Type::Htime:
-				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Htime::distribute( Born_von_Karman_period, rmesh_times );	break;
+				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Htime::distribute( Born_von_Karman_period, info.ccp_rmesh_times );	break;
 			case Exx_Lcao::Distribute_Type::Kmeans2:
 				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( MPI_COMM_WORLD );	break;
 			case Exx_Lcao::Distribute_Type::Kmeans1:
-				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( MPI_COMM_WORLD, rmesh_times );	break;
+				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( MPI_COMM_WORLD, info.ccp_rmesh_times );	break;
 			default:
 				throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));  break;
 				//throw domain_error(TO_STRING(static_cast<std::underlying_type<Exx_Lcao::Distribute_Type>::type>(info.distribute_type))+"\t"+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
@@ -737,7 +736,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ init_radial_table_ions\t"<<time_during(t_start)<<endl;
 
 gettimeofday( &t_start, NULL);
-	Vs = Abfs::cal_Vs( atom_pairs_core_origin, m_abfs_abfs, index_abfs, rmesh_times, info.v_threshold, Vws );
+	Vs = Abfs::cal_Vs( atom_pairs_core_origin, m_abfs_abfs, index_abfs, info.ccp_rmesh_times, info.v_threshold, Vws );
 ofs_mpi<<"TIME@ Abfs::cal_Vs\t"<<time_during(t_start)<<endl;
 	Abfs::delete_empty_ptrs( Vws );
 gettimeofday( &t_start, NULL);
@@ -1241,7 +1240,7 @@ ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<en
 		#error "TEST_EXX_LCAO"
 	#endif
 gettimeofday( &t_start, NULL);
-	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(rmesh_times);
+	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(info.ccp_rmesh_times);
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs_core )
 	{
 		const size_t iat1 = atom_pair.first;
@@ -1252,7 +1251,7 @@ gettimeofday( &t_start, NULL);
 		const size_t ia2 = ucell.iat2ia[iat2];
 		const Vector3<double> &tau1 = ucell.atoms[it1].tau[ia1];
 		const Vector3<double> &tau2 = ucell.atoms[it2].tau[ia2];
-		const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
+		const double Rcut = std::min( ORB.Phi[it1].getRcut()*info.ccp_rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*info.ccp_rmesh_times );
 
 		for( const Vector3<int> &box2 : Coulomb_potential_boxes )
 		{

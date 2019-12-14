@@ -52,7 +52,6 @@ public:
 	
 private:
 	
-	double rmesh_times;
 	int kmesh_times = 4;				// Peize Lin test
 	
 #if EXX_DM==1
@@ -102,6 +101,7 @@ public:
 		double schwarz_threshold = 0;
 		double cauchy_threshold = 0;
 		double ccp_threshold = 0;
+		double ccp_rmesh_times = 10;
 		
 		Exx_Lcao::Distribute_Type distribute_type;
 
