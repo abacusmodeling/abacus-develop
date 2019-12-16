@@ -2627,7 +2627,7 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("INPUT","must exx_ccp_rmesh_times >= 1");
 		}
-		if(exx_distribute_type!="htime" && exx_distribute_type!="kmeans2" && exx_distribute_type!="kmeans1")
+		if(exx_distribute_type!="htime" && exx_distribute_type!="kmeans2" && exx_distribute_type!="kmeans1" && exx_distribute_type!="order")
 		{
 			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
 		}

@@ -433,6 +433,8 @@ void Input_Conv::Convert(void)
 			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans2;
 		else if(INPUT.exx_distribute_type=="kmeans1")
 			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans1;
+		else if(INPUT.exx_distribute_type=="order")
+			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
 		Exx_Abfs::Jle::Lmax      = INPUT.exx_opt_orb_lmax;
 		Exx_Abfs::Jle::Ecut_exx  = INPUT.exx_opt_orb_ecut;
 		Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;

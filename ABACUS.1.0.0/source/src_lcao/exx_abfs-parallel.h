@@ -12,6 +12,7 @@ class Exx_Abfs::Parallel
 		public:
 		class Htime;
 		class Kmeans;
+		class Order;
 	};
 	
 	class Communicate

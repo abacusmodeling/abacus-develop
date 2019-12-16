@@ -195,6 +195,7 @@ exx_abfs-parallel-communicate-hexx.o \
 exx_abfs-parallel-communicate-hexx-allreduce.o \
 exx_abfs-parallel-distribute-htime.o \
 exx_abfs-parallel-distribute-kmeans.o \
+exx_abfs-parallel-distribute-order.o \
 exx_abfs-screen-schwarz.o \
 exx_abfs-screen-cauchy.o \
 exx_lcao.o \

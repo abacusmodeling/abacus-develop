@@ -45,7 +45,7 @@ private:
 	void init_radial_table_ions( const set<size_t> &atom_centres_core, const vector<pair<size_t,size_t>> &atom_pairs_core );
 		
 public:
-	enum class Distribute_Type {Htime,Kmeans2,Kmeans1};
+	enum class Distribute_Type {Htime,Kmeans2,Kmeans1,Order};
 	
 public:
 	double get_energy() const { return energy; }

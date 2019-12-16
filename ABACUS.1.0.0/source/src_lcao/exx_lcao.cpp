@@ -18,6 +18,7 @@
 #include "exx_abfs-parallel.h"
 #include "exx_abfs-parallel-distribute-htime.h"
 #include "exx_abfs-parallel-distribute-kmeans.h"
+#include "exx_abfs-parallel-distribute-order.h"
 
 #include <thread>
 #include <mkl_service.h>
@@ -712,6 +713,8 @@ gettimeofday( &t_start, NULL);
 				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans2( MPI_COMM_WORLD );	break;
 			case Exx_Lcao::Distribute_Type::Kmeans1:
 				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Kmeans::distribute_kmeans1( MPI_COMM_WORLD, info.ccp_rmesh_times );	break;
+			case Exx_Lcao::Distribute_Type::Order:
+				atom_pairs_core_origin = Exx_Abfs::Parallel::Distribute::Order::distribute( info.ccp_rmesh_times );	break;
 			default:
 				throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));  break;
 				//throw domain_error(TO_STRING(static_cast<std::underlying_type<Exx_Lcao::Distribute_Type>::type>(info.distribute_type))+"\t"+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
