@@ -1217,7 +1217,7 @@ void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 {
     string dummy, word;
-    int i, j, idum, ir, SG15;
+    int i, j, idum, ir, ONCVPSP;
     
         
         while (ifs.good())
@@ -1323,7 +1323,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         //cout << "word.substr(0,30) = " << word.substr(0,30) << "."<< endl;
                              if( word.substr(0,13) == "paw_as_gipaw" )
                              {
-                                SG15 = 0;
+                                ONCVPSP = 0;
                                 ifs >> word;     // core_correction
                                 if(word == "core_correction=\"")
                                 {
@@ -1340,7 +1340,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                              }
                              else
                              {
-                                SG15 = 1; // Generated using ONCVPSP code by D. R. Hamann, SG15 DOJO
+                                ONCVPSP = 1; // Generated using ONCVPSP code by D. R. Hamann, SG15 DOJO
                                 if(word == "core_correction=\"")
                                 {
                                      ifs >> word;
@@ -1392,134 +1392,182 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         //cout << endl;  //}zws 01-06-16
 
 
-                        ifs >> word;   // zp
-                        //cout << "word = " << word << endl;
+                        //getline(ifs, word);
+                        //cout << "word       = " << word << endl;
+                        do  // zws begin from cutoff (rho/wfc) 
                         {
-                             if(word == "z_valence=\"")
-                             {
-                                ifs >> word;
-                                get_char(word);
-                                this->zp = atoi(word.substr(0,Number[0]).c_str());
-                             }
-                             else
-                             {
-                                get_char(word);
-                                this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                             }
-                             //cout << "zp = " << this->zp << endl;
-                        }
+                            getline(ifs, word);
+                            //cout << "word       = " << word << endl;
+                            word.erase(0,word.find_first_not_of(" ") );
+                            word.erase(word.find_last_not_of(" ")+1 );
+                            //word = trim(word);
+                            //cout << "trim(word) = " << word << endl;
+                            get_char(word);
+                            //cout << " Number = " << Number[0] << ", " << Number[1] << endl;
+                            //cout << word.substr(0,Number[0])  << "__" << word.substr(Number[0]+1, Number[1]-Number[0]-1) << endl;
+                            dummy = word.substr(0,Number[0]) ;
+                            //cout << " dummy = " << dummy << endl;
+                            if      ( dummy == "z_valence=" ) {
+                                     this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                     //cout << "zp = " << this->zp << endl;
+                            }
+                            else if ( dummy == "total_psenergy=" ) {
+                                     this->etotps = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                     //cout << "etotps = " << this->etotps << endl;
+                            }
+                            else if ( dummy == "rho_cutoff=" ){
+                                     //cout << " rho_cutoff = " << word.substr(Number[0]+1, Number[1]-Number[0]-1) << endl;
+                            }
+                            else if ( dummy == "wfc_cutoff=" ) {
+                                     //cout << " wfc_cutoff = " << word.substr(Number[0]+1, Number[1]-Number[0]-1) << endl;
+                            }
+                            else if ( dummy == "l_max=" ) {
+                                     this->lmax = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                            }
+                            else if ( dummy == "mesh_size=" ) {
+                                     this->mesh = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                            }
+                            else if ( dummy == "number_of_wfc=" ) {
+                                     this->nwfc = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                            }
+                            else if ( dummy == "number_of_proj=" ) {
+                                     this->nbeta = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                            }
+                            //break;
 
-                        ifs >> word;   // total_psenergy
-                        //cout << "word = " << word << endl;
-                        {
-                             if(word == "total_psenergy=\"")
-                             {
-                                ifs >> word;
-                                get_char(word);
-                                this->etotps = atof(word.substr(0,Number[0]).c_str());
-                             }
-                             else
-                             {
-                                get_char(word);
-                                this->etotps = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                             }
-                             //cout << "etotps = " << this->etotps << endl;
-                        }
+                        }while( word.substr(word.length()-1, 1) !=">" ); 
+                        //cout << "word.substr(word.length()-1, 1)=" <<  word.substr(word.length()-1, 1)  << endl;
+                        //exit(0);
+
+
+                        //ifs >> word;   // zp
+                        ////cout << "word = " << word << endl;
+                        //{
+                        //     if(word == "z_valence=\"")
+                        //     {
+                        //        ifs >> word;
+                        //        get_char(word);
+                        //        this->zp = atoi(word.substr(0,Number[0]).c_str());
+                        //     }
+                        //     else
+                        //     {
+                        //        get_char(word);
+                        //        this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                        //     }
+                        //     //cout << "zp = " << this->zp << endl;
+                        //}
+
+                        //ifs >> word;   // total_psenergy
+                        //{
+                        //     if(word == "total_psenergy=\"")
+                        //     {
+                        //        ifs >> word;
+                        //        get_char(word);
+                        //        this->etotps = atof(word.substr(0,Number[0]).c_str());
+                        //     }
+                        //     else
+                        //     {
+                        //        get_char(word);
+                        //        this->etotps = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                        //     }
+                        //     //cout << "etotps = " << this->etotps << endl;
+                        //}
+                        ////cout << " word (total_psenergy) = " << word << endl;
                   
 
-                        if(SG15 == 0)    //zws modify 20160108
-                        {
-                        	READ_VALUE(ifs, word);   // wfc_cutoff
-                        	//cout << "word = " << word << endl;
-                        }
-                        READ_VALUE(ifs, word); // rho_cutoff
-                        //cout << "word1sbsb = " << word << endl;
+                        //if(ONCVPSP == 0)    //zws modify 20160108
+                        //{
+                        //	READ_VALUE(ifs, word);   // wfc_cutoff
+                        //	//cout << "word = " << word << endl;
+                        //}
+                        //READ_VALUE(ifs, word); // rho_cutoff
+                        //cout << "word (cutoff) = " << word << endl;
 
 
-                        ifs >> word;             // lmax
-                        //cout << "word = " << word << endl;
-                        {
-                                if(word == "l_max=\"")
-                                {
-                                     ifs >> word;
-                                     get_char(word);
-                                     this->lmax = atoi(word.substr(0,Number[0]).c_str());
-                                }
-                                else
-                                {
-                                     get_char(word);
-                                     this->lmax = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                                }
+                        //ifs >> word;             // lmax
+                        ////cout << "word (lmax) = " << word << endl;
+                        //{
+                        //        if(word == "l_max=\"")
+                        //        {
+                        //             ifs >> word;
+                        //             get_char(word);
+                        //             this->lmax = atoi(word.substr(0,Number[0]).c_str());
+                        //        }
+                        //        else
+                        //        {
+                        //             get_char(word);
+                        //             this->lmax = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                        //        }
 
-                        }
+                        //}
 
-                        //cout << "lmax = " << this->lmax << endl;
+                        ////cout << "lmax = " << this->lmax << endl;
 
-                        if(SG15 == 0)
-                        {
-                           READ_VALUE(ifs, word);   // l_max_rho
-                        }
+                        //if(ONCVPSP == 0)
+                        //{
+                        //   READ_VALUE(ifs, word);   // l_max_rho
+                        //}
 
-                        READ_VALUE(ifs, word);   // l_local
+                        //READ_VALUE(ifs, word);   // l_local
 
-                        ifs >> word;   // mesh_size
-                        //cout << "word = " << word << endl;
-                        {
-                             if(word == "mesh_size=\"")
-                             {
-                                     ifs >> word;
-                                     get_char(word);
-                                     this->mesh = atoi(word.substr(0,Number[0]).c_str());
-                             }
-                             else
-                             {
-                                     get_char(word);
-                                     this->mesh = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                             }
-                             //cout << "mesh = " << this->mesh << endl;
-                        }
+                        //ifs >> word;   // mesh_size
+                        ////cout << "word (mesh) = " << word << endl;
+                        //{
+                        //     if(word == "mesh_size=\"")
+                        //     {
+                        //             ifs >> word;
+                        //             get_char(word);
+                        //             this->mesh = atoi(word.substr(0,Number[0]).c_str());
+                        //     }
+                        //     else
+                        //     {
+                        //             get_char(word);
+                        //             this->mesh = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                        //     }
+                        //     //cout << "mesh = " << this->mesh << endl;
+                        //}
  
 
 
-                        ifs >> word;  // number_of_wfc
-                        //cout << "word = " << word << endl;
-                        {
-                             if(word == "number_of_wfc=\"")
-                             {
-                                     ifs >> word;
-                                     get_char(word);
-                                     this->nwfc = atoi(word.substr(0,Number[0]).c_str());
+                        //ifs >> word;  // number_of_wfc
+                        ////cout << "word = " << word << endl;
+                        //{
+                        //     if(word == "number_of_wfc=\"")
+                        //     {
+                        //             ifs >> word;
+                        //             get_char(word);
+                        //             this->nwfc = atoi(word.substr(0,Number[0]).c_str());
 
-                             }
-                             else
-                             {
-                                     get_char(word);
-                                     this->nwfc = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                             }
-                             //cout << "nwfc = " << this->nwfc << endl;
-                        }
-                             
-                        ifs >> word;   // number_of_proj
-                        //cout << "word = " << word << endl;
-                        {
-                             if(word == "number_of_proj=\"")
-                             {
-                                     ifs >> word;
-                                     get_char(word);
-                                     this->nbeta = atoi(word.substr(0,Number[0]).c_str());
+                        //     }
+                        //     else
+                        //     {
+                        //             get_char(word);
+                        //             this->nwfc = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                        //     }
+                        //     //cout << "nwfc = " << this->nwfc << endl;
+                        //}
+                        //     
+                        //ifs >> word;   // number_of_proj
+                        ////cout << "word = " << word << endl;
+                        //{
+                        //     if(word == "number_of_proj=\"")
+                        //     {
+                        //             ifs >> word;
+                        //             get_char(word);
+                        //             this->nbeta = atoi(word.substr(0,Number[0]).c_str());
 
-                             }
-                             else
-                             {
-                                     get_char(word);
-                                     this->nbeta = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-                             }
-                             //cout << "nbeta = " << this->nbeta << endl;
-                        }
+                        //     }
+                        //     else
+                        //     {
+                        //             get_char(word);
+                        //             this->nbeta = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                        //     }
+                        //     //cout << "nbeta = " << this->nbeta << endl;
+                        //}
                         
 
                         // READ Mesh
-                        if(SG15 == 0)
+                        if(ONCVPSP == 0)
                         {
                            SCAN_BEGIN(ifs, "<PP_MESH");
                         }
@@ -1529,7 +1577,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                         }
     
                         assert(mesh>0);
-                        if(SG15 == 0)
+                        if(ONCVPSP == 0)
                         {
                            ifs >> word;             // dx
                            ifs >> word;             // mesh
@@ -1702,7 +1750,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                                  //cout << "idum = " << idum << endl;
                             }
   
-                            if(SG15 == 0)
+                            if(ONCVPSP == 0)
                             {
                                ifs >> word;  //label
                             }
@@ -1743,7 +1791,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                                  //cout << "kkbeta[i] = " << this->kkbeta[i] << endl;
                             }
   
-                            if(SG15 ==0) 
+                            if(ONCVPSP ==0) 
                             {
                                ifs >> word;  //cutoff_radius
                                ifs >> word;  //ultrasoft_cutoff_radius
@@ -2015,7 +2063,6 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
         }
     return 0;
 }
-
 
 
 void Pseudopot_upf::get_char( string ss)
