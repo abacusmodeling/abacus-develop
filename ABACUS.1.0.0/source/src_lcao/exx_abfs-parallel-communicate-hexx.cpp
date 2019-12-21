@@ -30,8 +30,14 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 			global_out_dir+"HR_exx_"+TO_STRING(MY_RANK));
 	else
 	{
-		Allreduce allreduce(MPI_COMM_WORLD,HR_exx);
-		HR_a2D = allreduce.exx_to_a2D();
+		#if EXX_H_COMM==1
+			Allreduce allreduce(MPI_COMM_WORLD,HR_exx);
+			HR_a2D = allreduce.exx_to_a2D();
+		#elif EXX_H_COMM==2
+			HR_a2D = allreduce2.exx_to_a2D(HR_exx);
+		#else
+			#error "EXX_H_COMM"
+		#endif
 	}
 	if(io_HR_a2D.second)
 		Exx_Abfs::IO::output_binary( HR_a2D, global_out_dir+"HR_exx_"+TO_STRING(MY_RANK) );

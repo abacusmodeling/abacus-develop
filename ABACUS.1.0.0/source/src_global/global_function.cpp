@@ -23,7 +23,7 @@ using namespace std;
 //==========================================================
 void TITLE(const string &class_function_name)
 {
-	return;//no output
+//	return;//no output
     cout<<" ==> "<<class_function_name<<endl;
 	if(ofs_running) // mohan add 2009-08-25 in case the function called before allocate ofs_running
 	{
@@ -33,7 +33,7 @@ void TITLE(const string &class_function_name)
 
 void TITLE(const string &class_name,const string &function_name)
 {
-	return;//no output
+//	return;//no output
     cout<<" ==> "<<class_name<<"::"<<function_name<<endl;
 	if(ofs_running) // mohan add 2009-08-25 in case the function called before allocate ofs_running
 	{
@@ -441,4 +441,26 @@ void OUT_TIME(const string &name, time_t &start, time_t &end)
 		ofs_warning << " -------------------------------------------------------" << endl;
 		ofs_warning << setprecision(6);
 	}
+}
+
+size_t MemAvailable()
+{
+	size_t mem_sum = 0;
+	int i=0;
+	ifstream ifs("/proc/meminfo");
+	while(ifs.good())
+	{
+		string label, size, kB;
+		ifs>>label>>size>>kB;
+		if(label=="MemAvailable:")
+			return std::stol(size);
+		else if(label=="MemFree:" || label=="Buffers:" || label=="Cached:")
+		{
+			mem_sum += std::stol(size);
+			++i;
+		}
+		if(i==3)
+			return mem_sum;
+	}
+	throw runtime_error("read /proc/meminfo error in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 }

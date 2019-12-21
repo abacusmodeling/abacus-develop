@@ -475,12 +475,13 @@ gettimeofday( &t_start, NULL);
 	this->lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::change_orbs\t"<<time_during(t_start)<<endl;
 
+ofs_mpi<<info.files_abfs<<endl;
 	Exx_Abfs::IO::bcast( info.files_abfs, 0, MPI_COMM_WORLD );
+ofs_mpi<<info.files_abfs<<endl;
 
 gettimeofday( &t_start, NULL);
 	const vector<vector<vector<Numerical_Orbital_Lm>>>
 		abfs_same_atom = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, info.pca_threshold );		// Peize Lin test
-ofs_mpi<<info.files_abfs<<endl;
 	if(info.files_abfs.empty())
 		this->abfs = abfs_same_atom;
 	else
@@ -776,6 +777,10 @@ ofs_mpi<<"TIME@ cauchy::init\t"<<time_during(t_start)<<endl;
 
 	#if EXX_DM==2
 	DM_para.init( H_atom_pairs_core, info.dm_threshold );
+	#endif
+	
+	#if EXX_H_COMM==2
+	Hexx_para.allreduce2.init(MPI_COMM_WORLD, H_atom_pairs_core);
 	#endif
 	
 ofs_mpi<<"TIME@ Exx_Lcao::cal_exx_ions\t"<<time_during(t_start_all)<<endl;

@@ -261,4 +261,13 @@ inline const void* MAP_EXIST( const T_map &ms, const T_key1 &key1, const T_key_t
 	return MAP_EXIST( ms1->second, key_tail... );
 }
 
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : MemAvailable
+// read /proc/meminfo
+// unit: kB
+// Peize Lin add 2019-12-21
+//==========================================================
+size_t MemAvailable();
+
 #endif

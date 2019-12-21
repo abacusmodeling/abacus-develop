@@ -193,6 +193,7 @@ exx_abfs-parallel-communicate-dm-allreduce.o \
 exx_abfs-parallel-communicate-dm2.o \
 exx_abfs-parallel-communicate-hexx.o \
 exx_abfs-parallel-communicate-hexx-allreduce.o \
+exx_abfs-parallel-communicate-hexx-allreduce2.o \
 exx_abfs-parallel-distribute-htime.o \
 exx_abfs-parallel-distribute-kmeans.o \
 exx_abfs-parallel-distribute-order.o \
