@@ -7,6 +7,7 @@
 #define GLOBAL_FUNCTION_H
 
 #include <vector>
+#include <valarray>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -199,9 +200,19 @@ static inline T * VECTOR_TO_PTR( std::vector<T> & v )
 {
     return &(v[0]);
 }
+template<class T>
+static inline T * VECTOR_TO_PTR( std::valarray<T> & v )
+{
+    return &(v[0]);
+}
 
 template<class T>
 static inline const T * VECTOR_TO_PTR( const std::vector<T> & v )
+{
+    return &(v[0]);
+}
+template<class T>
+static inline const T * VECTOR_TO_PTR( const std::valarray<T> & v )
 {
     return &(v[0]);
 }

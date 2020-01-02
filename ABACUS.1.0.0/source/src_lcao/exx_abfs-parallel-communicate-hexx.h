@@ -7,6 +7,7 @@
 #include "src_global/complexmatrix.h"
 #include "src_lcao/abfs-vector3_order.h"
 #include <vector>
+#include <valarray>
 #include <map>
 #include <deque>
 #include <mpi.h>
@@ -84,7 +85,7 @@ private:
 			const MPI_Comm &mpi_comm_in,
 			const set<pair<size_t,size_t>> &H_atom_pairs_core);
 		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> exx_to_a2D(
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local);
+			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;
 
 	private:
 		enum class Flag_Send {undo, begin_oar, finish_oar, begin_isend, finish_isend};
@@ -96,33 +97,27 @@ private:
 			const vector<pair<vector<bool>,vector<bool>>> &atom_in_2D_list) const;
 		void init_elec(
 			vector<atomic<Flag_Send>> &flags_send,
-			vector<atomic<Flag_Recv>> &flags_recv);
-		void send_data_process(
-			const int rank_send_now,
-			const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-			vector<boost::mpi::packed_oarchive*> &oarps_isend,
-			vector<atomic<Flag_Send>> &flags_send);
-		void recv_data_process(
-			const int rank_recv,
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
-			vector<boost::mpi::packed_iarchive*> &iarps_irecv,
-			vector<atomic<Flag_Recv>> &flags_recv,
-			atomic_flag &lock_insert);
+			vector<atomic<Flag_Recv>> &flags_recv) const;
 		bool finish_judge(
 			const vector<atomic<Flag_Send>> &flags_send,
 			const vector<atomic<Flag_Recv>> &flags_recv) const;
 		bool memory_enough(
 			const int rank_send_next,
 			const vector<atomic<Flag_Send>> &flags_send) const;
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper(
+		void send_data_process(
 			const int rank_send_now,
-			const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;
+			const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
+			vector<valarray<double>> &oars_isend,
+			vector<atomic<Flag_Send>> &flags_send) const;
+		void recv_data_process(
+			const int rank_recv,
+			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
+			vector<valarray<double>> &iarps_irecv,
+			vector<atomic<Flag_Recv>> &flags_recv,
+			atomic_flag &lock_insert) const;			
 		void insert_data(
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all);
-		void insert_data(
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank,
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all);
+			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
+			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const;
 
 	private:
 		MPI_Comm mpi_comm;
