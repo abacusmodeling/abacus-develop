@@ -11,7 +11,7 @@ vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute(
 //ofstream ofs("htime_"+TO_STRING(MY_RANK));
 //ofs<<rmesh_times<<endl;
 
-	TITLE("Exx_Abfs::Parallel::distribute");
+	TITLE("Exx_Abfs::Parallel::Distribute::Htime::distribute");
 	const vector<size_t> Nadj = cal_Nadj(Born_von_Karman_period);
 //ofs<<Nadj<<endl;
 
@@ -30,7 +30,7 @@ vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute(
 vector<size_t> Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj( 
 	const Abfs::Vector3_Order<int> & Born_von_Karman_period )
 {
-	TITLE("Exx_Abfs::Parallel::cal_Nadj");
+	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_Nadj");
 	vector<size_t> Nadj(ucell.nat);
 	for( size_t iat=0; iat!=ucell.nat; ++iat )
 	{
@@ -52,7 +52,7 @@ vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::
 	const vector<size_t> &Nadj, 
 	const double rmesh_times )
 {
-	TITLE("Exx_Abfs::Parallel::cal_pair_costs");
+	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_pair_costs");
 			
 	const vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(rmesh_times);
 	auto neighbour = [&](const size_t iat1, const size_t iat2) -> int
@@ -92,7 +92,7 @@ vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::
 vector<vector<pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work( 
 	const vector<pair<size_t,pair<size_t,size_t>>> & pair_costs )
 {
-	TITLE("Exx_Abfs::Parallel::cal_rank_work");
+	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work");
 	vector<pair<size_t,size_t>> rank_cost(NPROC);				// rank_cost[i] = { irank, cost }
 	for( size_t irank=0; irank!=NPROC; ++irank )
 		rank_cost[irank] = { irank, 0 };

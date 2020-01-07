@@ -23,7 +23,7 @@ using namespace std;
 //==========================================================
 void TITLE(const string &class_function_name)
 {
-//	return;//no output
+	return;//no output
     cout<<" ==> "<<class_function_name<<endl;
 	if(ofs_running) // mohan add 2009-08-25 in case the function called before allocate ofs_running
 	{
@@ -33,7 +33,7 @@ void TITLE(const string &class_function_name)
 
 void TITLE(const string &class_name,const string &function_name)
 {
-//	return;//no output
+	return;//no output
     cout<<" ==> "<<class_name<<"::"<<function_name<<endl;
 	if(ofs_running) // mohan add 2009-08-25 in case the function called before allocate ofs_running
 	{
