@@ -78,7 +78,8 @@ ofs<<range_abfs<<endl;
 		for( size_t L=0; L!=abfs[T].size(); ++L )
 		{
 //ofs<<"get_sub_matrix:"<<endl<<get_sub_matrix( A, T, L, range_abfs, index_abfs )<<endl;
-			const matrix A_sub = get_column_mean0_matrix( get_sub_matrix( A, T, L, range_abfs, index_abfs ) );
+//			const matrix A_sub = get_column_mean0_matrix( get_sub_matrix( A, T, L, range_abfs, index_abfs ) );
+			const matrix A_sub = get_sub_matrix( A, T, L, range_abfs, index_abfs );
 //ofs<<"A_sub:"<<endl<<A_sub<<endl;
 //ofs<<"transpose:"<<endl<<transpose(A_sub)<<endl;
 //ofs<<"mul:"<<endl<<transpose(A_sub) * A_sub<<endl;

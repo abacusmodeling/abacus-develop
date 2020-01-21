@@ -163,6 +163,23 @@ Exx_Lcao::Exx_Lcao( const Exx_Global::Exx_Info &info_global )
 			LapackConnector::gemm('T', 'T', N, N, N, 1, m1.c, N, m2.c, N, 0, m3.c, N);
 		cout<<"TT\t"<<cut_time(time)<<endl;
 	};
+
+	auto test_gemm_3 = []()
+	{
+		double s=0;
+		const int M=1;
+		for(int N=1; N<=4096; N*=2)
+		{
+			matrix a(N,N), b(N,N);
+			timeval t;	gettimeofday(&t,NULL);
+			for(int m=0; m<M; ++m)
+			{
+				matrix c = a * b;
+				s+=c(0,0);
+			}
+			cout<<N<<"\t"<<cal_time(t)<<"\t"<<s<<endl;
+		}
+	};
 }
 
 Exx_Lcao::Exx_Info::Exx_Info( const Exx_Global::Exx_Info &info_global )
