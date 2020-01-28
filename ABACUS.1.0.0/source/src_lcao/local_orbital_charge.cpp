@@ -711,7 +711,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, 
                     const int I2 = RA.info[ia1][ia2][4];
                     Atom* atom2 = &ucell.atoms[T2];
                     const int start2 = ucell.itiaiw2iwt(T2,I2,0);
-                    const int iw2_lo=gt.trace_lo[start2]/NPOL + GridT.lgd/NPOL*is2;
+                    const int iw2_lo=gt.trace_lo[start2]/NPOL + gt.lgd/NPOL*is2;
                     const int nw2=atom2->nw;
                     complex<double> exp_R= exp( fac * (
                                 kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
@@ -731,7 +731,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, 
                             const int iline=nRow*nw1;
                             complex<double> phase=exp_R*w1;
                             for(int iw1=0; iw1<nw1; ++iw1)
-                                WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1 + NLOCAL/NPOL*is1]);
+                                WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1 + gt.lgd/NPOL*is1]);
                             ++nRow;
                         }
                         else
