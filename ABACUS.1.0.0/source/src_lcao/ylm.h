@@ -2,6 +2,7 @@
 #define YLM_H
 
 #include "../src_pw/tools.h"
+#include <vector>
 
 class Ylm
 {
@@ -69,7 +70,7 @@ class Ylm
 			vector<vector<double>>& grly);
 			
 	static void set_coefficients ();
-	static double* ylmcoef;
+	static std::vector<double> ylmcoef;
 	
 	static void test();
 	static void test1();

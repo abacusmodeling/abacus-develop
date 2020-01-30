@@ -29,16 +29,16 @@ Local_Orbital_Charge::Local_Orbital_Charge()
     this->init_DM_R = false;
     out_dm = 0;
     //xiaohui add 2014-06-19
-    //band_local = new int[1];
-    //Z_wg = new double[1];
-    //Z_LOC = new double[1];
-    sender_2D_index = new int[1];
-    sender_size_process = new int[1];
-    sender_displacement_process = new int[1];
+    //band_local = nullptr;
+    //Z_wg = nullptr;
+    //Z_LOC = nullptr;
+    sender_2D_index = nullptr;
+    sender_size_process = nullptr;
+    sender_displacement_process = nullptr;
 
-    receiver_local_index = new int[1];
-    receiver_size_process = new int[1];
-    receiver_displacement_process = new int[1];
+    receiver_local_index = nullptr;
+    receiver_size_process = nullptr;
+    receiver_displacement_process = nullptr;
 }
 
 Local_Orbital_Charge::~Local_Orbital_Charge()

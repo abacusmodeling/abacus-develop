@@ -20,8 +20,8 @@ typedef fftw_complex FFTW_COMPLEX;
 //#include <string>
 
 bool Mathzone_Add1::flag_jlx_expand_coef = false;
-double** Mathzone_Add1::c_ln_c = new double*[1];
-double** Mathzone_Add1::c_ln_s = new double*[1];
+double** Mathzone_Add1::c_ln_c = nullptr;
+double** Mathzone_Add1::c_ln_s = nullptr;
 
 Mathzone_Add1::Mathzone_Add1()
 {

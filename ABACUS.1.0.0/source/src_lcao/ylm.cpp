@@ -2,7 +2,7 @@
 
 using namespace std;
 int Ylm::nlm = 0;
-double* Ylm::ylmcoef = new double[100];
+vector<double> Ylm::ylmcoef(100);
 
 // here Lmax == max angular momentum + 1
 void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[] )

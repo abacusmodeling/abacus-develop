@@ -7,7 +7,7 @@ Local_Orbital_wfc::Local_Orbital_wfc()
 {
 	allocate_flag = false;
 	allocate_aug_flag = false;
-	trace_aug = new int[1];	
+	trace_aug = nullptr;	
 	wfck_flag = false;	
 	complex_flag = false;
 }

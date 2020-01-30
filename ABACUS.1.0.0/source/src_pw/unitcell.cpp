@@ -25,9 +25,9 @@ UnitCell::UnitCell()
     namax = 0;
     nwmax = 0;
 
-    iat2it = new int[1];
-    iat2ia = new int[1];
-	iwt2iat = new int[1];
+    iat2it = nullptr;
+    iat2ia = nullptr;
+	iwt2iat = nullptr;
 
     itia2iat.create(1,1);
 	lc = new int[3];
@@ -55,6 +55,7 @@ UnitCell::~UnitCell()
     delete[] iat2it;
     delete[] iat2ia;
 	delete[] iwt2iat;
+	delete[] lc;
 }
 
 
