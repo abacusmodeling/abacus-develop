@@ -541,7 +541,7 @@ void Numerical_Basis::jlq3d_overlap(
 	<< endl;
 
     double *flq = new double[np];
-    complex<double> overlapQ = ZERO;
+    //complex<double> overlapQ = ZERO;
     for (int T1 = 0; T1 < ucell.ntype; T1++)
     {
         //OUT("T1",T1);
@@ -644,7 +644,7 @@ void Numerical_Basis::numerical_atomic_wfc(
 
     Mathzone::Ylm_Real(total_lm, np, gk, ylm);
 
-    int index = 0;
+    //int index = 0;
     double *flq = new double[np];
     for (int it = 0; it < ucell.ntype; it++)
     {

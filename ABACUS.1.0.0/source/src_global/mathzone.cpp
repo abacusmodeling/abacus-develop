@@ -925,17 +925,15 @@ void Mathzone::rlylm
 		ZEROS(zdep[il], 20);
 	}
 
-	double z2, z3, z4, z5;
-	z2 = z * z;
-	z3 = z2 * z;
-	z4 = z3 * z;
-	z5 = z4 * z;
+	double z2 = z * z;
+	double z3 = z2 * z;
+	double z4 = z3 * z;
+	//double z5 = z4 * z;
 	
-	double r, r2, r3, r4;
-	r = sqrt(x*x + y*y + z*z);
-	r2 = r * r;
-	r3 = r2 * r;
-	r4 = r3 * r;
+	double r = sqrt(x*x + y*y + z*z);
+	double r2 = r * r;
+	double r3 = r2 * r;
+	double r4 = r3 * r;
 	
 	for(int il = 0; il < lmax + 1; il++)
 	{
@@ -1533,7 +1531,7 @@ void Mathzone::Simpson_Integral_0toall
     const double r2=1.00/2.00, r3=1.00/3.00;
     asum[0] = 0.00;
     double f3 = func [0] * rab [0];
-    for( size_t i=1; i<mesh; i+=2)
+    for( int i=1; i<mesh; i+=2)
     {
         const double f1 = f3;
         const double f2 = func[i] * rab[i] ;

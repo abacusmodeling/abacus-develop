@@ -103,7 +103,7 @@ extern "C"
 	float snrm2_( const int *N, const float *X, const int *incX );
 	double dnrm2_( const int *N, const double *X, const int *incX );
 	double dznrm2_( const int *N, const complex<double> *X, const int *incX );
-};
+}
 
 // Class LapackConnector provide the connector to fortran lapack routine.
 // The entire function in this class are static and inline function.

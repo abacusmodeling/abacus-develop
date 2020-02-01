@@ -162,8 +162,8 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
     TITLE("Charge","atomic_rho");
     timer::tick("Charge","atomic_rho");
 
-    double rho_at = 0.0;
-    double x = 0.0;
+    //double rho_at = 0.0;
+    //double x = 0.0;
 
 	assert(ucell.meshx>0);
     double *rho1d = new double[ucell.meshx];
@@ -445,7 +445,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
         ima = ima / (double)pw.ncxyz * ucell.omega;
 		sumrea = sumrea / (double)pw.ncxyz * ucell.omega;
 
-        if ((neg < -1.0e-4) && (is == 0 || NSPIN == 2) || ima > 1.0e-4)
+        if( ((neg<-1.0e-4) && (is==0||NSPIN==2)) || ima>1.0e-4)
         {
             ofs_warning << " Warning: negative or imaginary starting charge : " ;
             ofs_warning << " neg = " << neg
@@ -511,7 +511,7 @@ void Charge::set_rho_core(
 {
     TITLE("Charge","set_rho_core");
     timer::tick("Charge","set_rho_core");
-    double eps = 1.e-10;
+    //double eps = 1.e-10;
     en.etxcc = 0.0;
 //----------------------------------------------------------
 // LOCAL VARIABLES :
@@ -519,12 +519,12 @@ void Charge::set_rho_core(
 // counter on atomic types
 // counter on g vectors
 //----------------------------------------------------------
-    int ir = 0;
-    int it = 0;
-    int ig = 0;
+    //int ir = 0;
+    //int it = 0;
+    //int ig = 0;
 
     bool bl = false;
-    for (it = 0; it<ucell.ntype; it++)
+    for (int it = 0; it<ucell.ntype; it++)
     {
 //----------------------------------------------------------
 // USE GLOBAL CLASS VARIABLE :
@@ -586,7 +586,7 @@ void Charge::set_rho_core(
     // test on the charge and computation of the core energy
     double rhoima = 0.0;
     double rhoneg = 0.0;
-    for (ir = 0; ir < pw.nrxx; ir++)
+    for (int ir = 0; ir < pw.nrxx; ir++)
     {
         rhoneg += min(0.0, UFFT.porter[ir].real());
         rhoima += abs(UFFT.porter[ir].imag());
@@ -707,7 +707,7 @@ void Charge::sum_band_k(void)
 	en.eband = 0.0;
 
 	complex<double>* porter = UFFT.porter;
-	complex<double>* porter1;
+	complex<double>* porter1 = nullptr;
 	if(NONCOLIN) porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
 
 	for (int ik = 0;ik < kv.nks;ik++)
@@ -1563,7 +1563,7 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 		}
 
 		
-		int count=0;
+		//int count=0;
 		int nxy = pw.ncx * pw.ncy;
 		double* zpiece = new double[nxy];
 
@@ -1655,7 +1655,7 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 		ofs << " " << "dipole_elec_y: " << dipole_elec_y << endl;
 		ofs << " " << "dipole_elec_z: " << dipole_elec_z << endl;
 
-		double dipole_ion_x=0.0, dipole_ion_y=0.0, dipole_ion_z=0.0, dipole_sum=0.0;
+		double dipole_ion_x=0.0, dipole_ion_y=0.0, dipole_ion_z=0.0;	// dipole_sum=0.0;
 		if(ucell.ntype == 1)
 		{
 			for(int ia=0; ia<ucell.atoms[0].na; ia++)

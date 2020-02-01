@@ -16,9 +16,9 @@ class matrix
 {
 	/* data */
 public:
-	double *c;    /* Holds the data */
-	int nr;
-	int nc;   /* Number of rows and columns */
+	int nr=0;
+	int nc=0;   /* Number of rows and columns */
+	double *c=nullptr;    /* Holds the data */
 
 	/* Constructors and destructor */
 	matrix(): nr(0), nc(0), c(nullptr){}

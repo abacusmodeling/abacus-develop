@@ -27,8 +27,8 @@ class timer
 	{
 		double cpu_start;
 		double cpu_second = 0.0;
-		int calls = 0;
-		int order = n_now++;
+		size_t calls = 0;
+		size_t order = n_now++;
 		char level;
 		bool start_flag = true;
 	};
@@ -62,7 +62,7 @@ class timer
 // NAME : n_now(the index of clocks) 
 //==========================================================
 	static bool disabled;
-	static int n_now;
+	static size_t n_now;
 
 //==========================================================
 // MEMBER FUNCTIONS :

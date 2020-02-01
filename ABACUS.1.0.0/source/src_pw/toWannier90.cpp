@@ -206,6 +206,7 @@ void toWannier90::read_nnkp()
 		int numkpt_nnkp;
 		if(NSPIN == 1 || NSPIN == 4) numkpt_nnkp = kv.nkstot;
 		else if(NSPIN == 2) numkpt_nnkp = kv.nkstot/2;
+		else throw runtime_error("numkpt_nnkp uninitialized in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		
 		for(int ik = 0; ik < numkpt_nnkp; ik++)
 		{
@@ -1586,7 +1587,7 @@ complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, co
 	for (int ig = 0; ig < kv.ngk[0]; ig++)
 	{
 		//result = result + conj(psir_2[ pw.ig2fftw[wf.igk(0,ig)] ]) * wfc_pw[0](ib_R,ig) + psir[ pw.ig2fftw[ wf.igk(0,ig)] ] * conj(wfc_pw[0](ib_R,ig));
-		complex<double> tem = complex<double>( abs(wfc_pw[0](ib_R,ig)), 0.0 );
+		//complex<double> tem = complex<double>( abs(wfc_pw[0](ib_R,ig)), 0.0 );
 		result = result +  conj(psir[ pw.ig2fftw[ wf.igk(0,ig)] ]);// * tem;
 	}
 	

@@ -133,7 +133,7 @@ extern "C"
 //		complex<double> const*, int const*, complex<double> const*, int const*, 
 //		complex<double> const*, complex<double> const*, int const*);
 
-};
+}
 
 #endif
 

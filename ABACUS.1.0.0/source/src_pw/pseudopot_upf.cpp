@@ -75,7 +75,7 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
     //cout << "global_pseudo_type =" << global_pseudo_type << endl;
     if(global_pseudo_type=="auto") //{zws
 	{
-		int info = set_pseudo_type(fn);
+		set_pseudo_type(fn);
 	} //}
 
 	// read in the .UPF type of pseudopotentials
@@ -854,7 +854,8 @@ void Pseudopot_upf::read_pseudo_local(ifstream &ifs)
 
 void Pseudopot_upf::read_pseudo_nl(ifstream &ifs)
 {
-	int nb, mb, n, ir, idum, ldum, lp, i, ikk;
+//	int nb, mb, n, ir, idum, ldum, lp, i, ikk;
+	int nb, mb, ir, idum;
 
 	if (nbeta == 0)
 	{
@@ -1217,7 +1218,8 @@ void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 {
     string dummy, word;
-    int i, j, idum, ir, ONCVPSP;
+    //int i, j, idum, ir, ONCVPSP;
+    int i, j, ir, ONCVPSP;
     
         
         while (ifs.good())
@@ -1740,12 +1742,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
                                  {
                                      ifs >> word;
                                      get_char(word);
-                                     idum = atoi(word.substr(0,Number[0]).c_str());
+                                     //idum = atoi(word.substr(0,Number[0]).c_str());
                                  }
                                  else
                                  {
                                      get_char(word);
-                                     idum = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
+                                     //idum = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
                                  }
                                  //cout << "idum = " << idum << endl;
                             }

@@ -209,7 +209,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
         // get cutgg_delta from input.
 //		OUT(ofs_running,"cutgg_delta",cutgg_delta);
 
-        int cutgg_num_start = 0;
+        //int cutgg_num_start = 0;
         double ggchg_start = 0.0;
         double ggchg_end = 0.0;
 
@@ -277,7 +277,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
             const double cutgg_delta2 = ggchg / std::pow( (double)cutgg_pieces2, 2.0/3.0 );
 
-            int cutgg_num_start2 = 0;
+            //int cutgg_num_start2 = 0;
             double ggchg_start2 = 0.0;
             double ggchg_end2 = 0.0;
 
@@ -813,7 +813,7 @@ void PW_Basis::setup_structure_factor(void)
 
 //	ofs.close();
 
-    int i,j,ng;
+    int i,j; //ng;
     this->eigts1.create(Ucell->nat, 2*this->ncx + 1);
     this->eigts2.create(Ucell->nat, 2*this->ncy + 1);
     this->eigts3.create(Ucell->nat, 2*this->ncz + 1);
@@ -862,7 +862,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 
     // time count the number of sticks in charge grid.
     int time=0;
-    int sum_ngmc_g=0;
+    //int sum_ngmc_g=0;
     // circle of charge sticks.
     while (time<FFT_chg.nst)
     {
@@ -947,11 +947,11 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 				const int ngrid = this->nx*this->ny*FFT_chg.npps[ip2];
 				const int non_zero_grid = FFT_chg.nst_per[ip2]*this->nz;
 
-				const int npw1 = FFT_chg.npw_per[ip1];
+				//const int npw1 = FFT_chg.npw_per[ip1];
 				const int npw2 = FFT_chg.npw_per[ip2];
 
-				const int nst1 = FFT_chg.nst_per[ip1];
-				const int nst2 = FFT_chg.nst_per[ip2];
+				//const int nst1 = FFT_chg.nst_per[ip1];
+				//const int nst2 = FFT_chg.nst_per[ip2];
 
                 if (npw2 < pw_tmp)
                 {
@@ -1100,7 +1100,7 @@ void PW_Basis::update_gvectors(ofstream &runlog, const UnitCell &Ucell_in)
 
         const double cutgg_delta = ggchg / std::pow( (double)cutgg_pieces, 2.0/3.0 );
 
-        int cutgg_num_start = 0;
+        //int cutgg_num_start = 0;
         double ggchg_start = 0.0;
         double ggchg_end = 0.0;
 

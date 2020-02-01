@@ -40,17 +40,17 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		
 	// sum up (rho_core+rho) for each spin in real space
 	// and reciprocal space.
-	double* rhotmp1;
-	double* rhotmp2;
-	complex<double>* rhogsum1;
-	complex<double>* rhogsum2;
-	Vector3<double>* gdr1;
-	Vector3<double>* gdr2;
-	Vector3<double>* h1;
-	Vector3<double>* h2;
-	double* neg;
-	double** vsave;
-	double** vgg;
+	double* rhotmp1 = nullptr;
+	double* rhotmp2 = nullptr;
+	complex<double>* rhogsum1 = nullptr;
+	complex<double>* rhogsum2 = nullptr;
+	Vector3<double>* gdr1 = nullptr;
+	Vector3<double>* gdr2 = nullptr;
+	Vector3<double>* h1 = nullptr;
+	Vector3<double>* h2 = nullptr;
+	double* neg = nullptr;
+	double** vsave = nullptr;
+	double** vgg = nullptr;
 	
 	// for spin unpolarized case, 
 	// calculate the gradient of (rho_core+rho) in reciprocal space.

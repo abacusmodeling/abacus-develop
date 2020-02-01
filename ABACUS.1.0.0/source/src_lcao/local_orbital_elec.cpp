@@ -41,15 +41,24 @@ void Local_Orbital_Elec::scf(const int &istep)
 	{
 		if(COLOUR && MY_RANK==0)
 		{
-			printf( " \e[33m%-7s\e[0m", "ITER");	
-			printf( "\e[33m%-15s\e[0m", "ETOT(Ry)");	
+			//printf( " \e[33m%-7s\e[0m", "ITER");	
+			//printf( "\e[33m%-15s\e[0m", "ETOT(Ry)");	
+			//if(NSPIN==2)
+			//{
+			//	printf( "\e[33m%-10s\e[0m", "TMAG");	
+			//	printf( "\e[33m%-10s\e[0m", "AMAG");	
+			//}
+			//printf( "\e[33m%-14s\e[0m", "DRHO2");	
+			//printf( "\e[33m%-15s\e[0m", "ETOT(eV)");
+			printf( " [33m%-7s[0m", "ITER");	
+			printf( "[33m%-15s[0m", "ETOT(Ry)");	
 			if(NSPIN==2)
 			{
-				printf( "\e[33m%-10s\e[0m", "TMAG");	
-				printf( "\e[33m%-10s\e[0m", "AMAG");	
+				printf( "[33m%-10s[0m", "TMAG");	
+				printf( "[33m%-10s[0m", "AMAG");	
 			}
-			printf( "\e[33m%-14s\e[0m", "DRHO2");	
-			printf( "\e[33m%-15s\e[0m", "ETOT(eV)");	
+			printf( "[33m%-14s[0m", "DRHO2");	
+			printf( "[33m%-15s[0m", "ETOT(eV)");	
 			//printf( "\e[33m%-11s\e[0m", "BAND(Ry)");	
 			//printf( "\e[33m%-11s\e[0m", "H(Ry)");	
 			//printf( "\e[33m%-11s\e[0m", "EXC(Ry)");	
@@ -125,7 +134,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 			<< "--------------------------------\n";
 		}
 
-		time_t time_start, time_finish;
+		//time_t time_start, time_finish;
 		clock_t clock_start;
 
 		string ufile = "CHANGE";
@@ -133,7 +142,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		UI.init(ufile);
 			
 		
-		time_start= std::time(NULL);
+		//time_start= std::time(NULL);
 		clock_start = std::clock();
 		conv_elec = false;//mohan add 2008-05-25
 
@@ -423,7 +432,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		if(vext == 0)	pot.set_vrs(pw.doublegrid);
 		else		pot.set_vrs_tddft(pw.doublegrid, istep);
 	
-		time_finish=std::time(NULL);
+		//time_finish=std::time(NULL);
 		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
 
 		// (11) calculate the total energy.
@@ -674,7 +683,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 
 
 		// some preparation
-		clock_t start=clock();
+		//clock_t start=clock();
 //		cout << " init s matrix = " << UHM.init_s << endl;
 		if(!UHM.init_s)
     	{

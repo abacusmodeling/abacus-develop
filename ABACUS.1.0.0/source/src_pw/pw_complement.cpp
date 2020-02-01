@@ -145,7 +145,7 @@ void PW_complement::get_FFT_dimension(
         int n2 = 0;
         int n3 = 0;
         int n5 = 0;
-        int n7 = 0;
+        //int n7 = 0;
         bool done_factoring = false;
 	
 		// mohan add 2011-04-22
@@ -422,7 +422,7 @@ void PW_complement::get_total_pw_after_vc(
 
     Vector3<double> f;
     int ng = 0;
-    int ng2 = 0;
+    //int ng2 = 0;
     for (int i = -ibox[0]; i <= ibox[0]; i++)
     {
         for (int j = -ibox[1]; j <= ibox[1]; j++)
@@ -433,7 +433,7 @@ void PW_complement::get_total_pw_after_vc(
                 f.y = j;
                 f.z = k;
                 double g2 = f * (GGT0 * f);
-                double g22 = f * (GGT * f);
+                //double g22 = f * (GGT * f);
                 if (g2 < ggcut_end && g2 >= ggcut_start)
                 {
                     ig[ng] = f ;

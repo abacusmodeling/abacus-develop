@@ -221,7 +221,8 @@ bool Update_input::Read(const string &fn)
         {
             read_value(ifs, out_lowf);
 #ifdef __FP
-			if(out_lowf!=out_lowf)
+			//if(out_lowf!=out_lowf)
+			if(out_lowf!=ParaO.out_lowf)		// Peize Lin change out_lowf to ParaO.out_lowf at 2020.01.31
 			{
 				this->change(ofs_warning,"out_lowf",ParaO.out_lowf,out_lowf);
 				ParaO.out_lowf = this->out_lowf;

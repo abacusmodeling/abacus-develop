@@ -74,7 +74,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 			}
 			break;
 		case Psi_Type::Psif:
-			for( size_t ik=0; ik!=nk; ++ik )
+			for( int ik=0; ik!=nk; ++ik )
 			{
 				this->psif[ik] = psi_in[ik];
 				this->psik[ik] = psif[ik] * k_radial[ik];
@@ -83,7 +83,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 			break;
 		case Psi_Type::Psik:
 			psif.resize(0);
-			for( size_t ik=0; ik!=nk; ++ik )
+			for( int ik=0; ik!=nk; ++ik )
 			{
 				this->psik[ik] = psi_in[ik];
 				this->psik2[ik] = psik[ik] * k_radial[ik];
@@ -92,7 +92,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 		case Psi_Type::Psik2:
 			psif.resize(0);
 			psik.resize(0);
-			for( size_t ik=0; ik!=nk; ++ik )
+			for( int ik=0; ik!=nk; ++ik )
 				this->psik2[ik] = psi_in[ik];
 			break;
 		default:
@@ -109,6 +109,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 			else
 				throw domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 			break;
+		default:	break;
 	}
 
 	//liaochen modify on 2010/4/7
@@ -134,6 +135,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 			else
 				this->cal_kradial();
 			break;
+		default:	break;
 	}
 
 //	this->norm_test();						// Peize Lin delete 2016-08-31
@@ -463,7 +465,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 
 	// dr must be all the same for Sph_Bessel_Recursive_Pool
 	const double dr = this->rab[0];
-	for( size_t ir=1; ir<this->nr; ++ir )
+	for( int ir=1; ir<this->nr; ++ir )
 		assert( dr == this->rab[ir] );
 
 	Sph_Bessel_Recursive::D2* pSB = nullptr;
@@ -485,11 +487,11 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	const double pref = sqrt( 2.0 / PI );
 
 	vector<double> r_tmp(nr);
-	for( size_t ir=0; ir!=nr; ++ir )
+	for( int ir=0; ir!=nr; ++ir )
 		r_tmp[ir] = this->psir[ir] * this->r_radial[ir] * this->rab[ir];
 	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
 	r_tmp[0]*=one_three;	r_tmp[nr-1]*=one_three;
-	for( size_t ir=1; ir!=nr-1; ++ir )
+	for( int ir=1; ir!=nr-1; ++ir )
 		r_tmp[ir] *= (ir&1) ? four_three : two_three;
 
 	for (int ik = 0; ik < nk; ik++)
@@ -505,7 +507,7 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 {
 	// dr must be all the same for Sph_Bessel_Recursive_Pool
 	const double dr = this->rab[0];
-	for( size_t ir=1; ir<this->nr; ++ir )
+	for( int ir=1; ir<this->nr; ++ir )
 		assert( dr == this->rab[ir] );
 
 	Sph_Bessel_Recursive::D2* pSB = nullptr;
@@ -527,14 +529,14 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 	const double pref = sqrt(2.0/PI);
 
 	vector<double> k_tmp(nk);
-	for( size_t ik=0; ik!=nk; ++ik )
+	for( int ik=0; ik!=nk; ++ik )
 		k_tmp[ik] = this->psik2[ik] * dk;
 	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
 	k_tmp[0]*=one_three;	k_tmp[nk-1]*=one_three;
-	for( size_t ik=1; ik!=nk-1; ++ik )
+	for( int ik=1; ik!=nk-1; ++ik )
 		k_tmp[ik] *= (ik&1) ? four_three : two_three;
 
-	for( size_t ir = 0; ir!=nr; ++ir )
+	for( int ir = 0; ir!=nr; ++ir )
 	{
 		this->psi[ir] = pref * LapackConnector::dot( this->nk, VECTOR_TO_PTR(k_tmp), 1, VECTOR_TO_PTR(jl[ir]), 1 );
 		this->psir[ir] = this->psi[ir] * r_radial[ir];
@@ -548,8 +550,8 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 void Numerical_Orbital_Lm::norm_test(void)const
 {
 //	TITLE(ofs_onscaling, "Numerical_Orbital_Lm", "norm_test");
-	double asum_r = 0.0;
-	double asum_k = 0.0;
+	//double asum_r = 0.0;
+	//double asum_k = 0.0;
 
 	// note here psir = psi * r
 	double *f = new double[nr];
@@ -559,7 +561,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 	}
 
 	double sumr = 0.0;
-	double sumk = 0.0;
+	//double sumk = 0.0;
 
 	Mathzone::Simpson_Integral(this->nr, f, VECTOR_TO_PTR(this->rab), sumr);
 

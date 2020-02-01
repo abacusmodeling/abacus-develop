@@ -19,9 +19,22 @@ Atom_input::Atom_input
 )
 		:d_amount(amount),
 		d_amount_expand(amount),
-		d_current(0),
 		periodic_boundary(boundary_in),
 		radius(radius_in),
+		expand_flag(false),
+		glayerX(1),
+		glayerX_minus(0),
+		glayerY(1),
+		glayerY_minus(0),
+		glayerZ(1),
+		glayerZ_minus(0),
+		x_min_expand(0),
+		y_min_expand(0),
+		z_min_expand(0),
+		x_max_expand(0),
+		y_max_expand(0),
+		z_max_expand(0),
+		d_current(0),
 //----------------------------------------------------------
 // WARNING :
 // Please be very very careful!
@@ -29,20 +42,7 @@ Atom_input::Atom_input
 // don't change it !!
 //----------------------------------------------------------
 		type(0),
-		natom(-1),
-		glayerX(1),
-		glayerY(1),
-		glayerZ(1),
-		glayerX_minus(0),
-		glayerY_minus(0),
-		glayerZ_minus(0),
-		expand_flag(false),
-		x_min_expand(0),
-		y_min_expand(0),
-		z_min_expand(0),
-		x_max_expand(0),
-		y_max_expand(0),
-		z_max_expand(0)
+		natom(-1)
 {
 	TITLE("Atom_input", "Atom_input");
 

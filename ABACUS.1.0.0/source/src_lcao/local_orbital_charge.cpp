@@ -2,9 +2,6 @@
 #include "../src_pw/global.h"
 #include "blas_interface.h"
 
-#include "src_external/src_test/test_function.h"
-#include "src_external/src_test/src_global/complexmatrix-test.h"
-
 //#include "../src_onscaling/on_tests.h"
 //#include "../src_siao/selinv.h"
 // 2014.10.29 add memory pool for DM and DM_B by yshen
@@ -754,7 +751,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 {
     TITLE("Local_Orbital_Charge","cal_dk_k");
     timer::tick("LCAO_Charge","cal_dk_k",'F');  
-    int nnrg = 0;
+    //int nnrg = 0;
     Vector3<double> tau1, dtau;
         
     Record_adj RA;
@@ -1055,7 +1052,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
                 ZEROS(this->DM[is][i], lgd_now);
 
         int nprocs,myid;
-        MPI_Status status;
+        //MPI_Status status;
         MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
         MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 

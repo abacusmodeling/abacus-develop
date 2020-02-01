@@ -103,8 +103,8 @@ void Chi0_hilbert::Chi()
 	}
 		
 	int icount = 0;
-	int qc[kv.nks]; 
-	double ql[kv.nks];
+	std::vector<int> qc(kv.nks); 			// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<double> ql(kv.nks);			// Peize Lin change ptr to vector at 2020.01.31
 	int total_icount=0;
 	int temp1; double temp2;
 	
@@ -1128,7 +1128,9 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		}
 	}
 	
-	complex<double> phase[NLOCAL][NLOCAL][NR];
+	vector<vector<vector<complex<double>>>> phase(NLOCAL,
+		vector<vector<complex<double>>>(NLOCAL,
+			vector<complex<double>>(NR)));	// Peize Lin change ptr to vector at 2020.01.31
 	
 	int MR = 0;
 	for(int iw1=0; iw1<NLOCAL; iw1++)
@@ -1171,7 +1173,12 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		}
 	}*/
 
-	complex<double> left[oband][MR], right[MR][NBANDS], b_single[oband][NBANDS]; 
+	vector<vector<complex<double>>> left(oband,
+		vector<complex<double>>(MR));				// Peize Lin change ptr to vector at 2020.01.31
+	vector<vector<complex<double>>> right(MR,
+		vector<complex<double>>(NBANDS));			// Peize Lin change ptr to vector at 2020.01.31
+	vector<vector<complex<double>>> b_single(oband,
+		vector<complex<double>>(NBANDS)); 			// Peize Lin change ptr to vector at 2020.01.31
 	for(int ig=0; ig<dim; ig++)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
@@ -1216,7 +1223,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		int lda =NBANDS;
 		int ldb = MR;
 		int ldc =NBANDS;
-		zgemm_(&transa, &transb, &M, &N, &K, &alpha, right[0], &lda, left[0], &ldb, &beta,  b_single[0], &ldc);
+		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(right[0]), &lda, VECTOR_TO_PTR(left[0]), &ldb, &beta,  VECTOR_TO_PTR(b_single[0]), &ldc);
 		
 		for(int ib1=0; ib1<oband; ib1++)
 		{
@@ -1715,7 +1722,12 @@ void Chi0_hilbert::Cal_T()
 void Chi0_hilbert::Cal_Chi0()
 {
 	TITLE("Chi0_hilbert","Cal_Chi0");
-	complex<double> chi0s2[dim*dim][nomega],T2[nomega][nomega],chi02[dim*dim][nomega];
+	vector<vector<complex<double>>> chi0s2(dim*dim,
+		vector<complex<double>>(nomega));			// Peize Lin change ptr to vector at 2020.01.31
+	vector<vector<complex<double>>> T2(nomega,
+		vector<complex<double>>(nomega));			// Peize Lin change ptr to vector at 2020.01.31
+	vector<vector<complex<double>>> chi02(dim*dim,
+		vector<complex<double>>(nomega));			// Peize Lin change ptr to vector at 2020.01.31
 	for(int i=0;i<dim*dim;i++)
 	{
 		for(int j=0;j<nomega;j++)
@@ -1746,7 +1758,7 @@ void Chi0_hilbert::Cal_Chi0()
 	int ldb =nomega;
 	int ldc =nomega;
 	
-	zgemm_(&transa, &transb, &M, &N, &K, &alpha, T2[0], &lda, chi0s2[0], &ldb, &beta, chi02[0], &ldc);
+	zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(T2[0]), &lda, VECTOR_TO_PTR(chi0s2[0]), &ldb, &beta, VECTOR_TO_PTR(chi02[0]), &ldc);
 	
 	for(int i=0;i<dim*dim;i++)
 	{
@@ -1786,7 +1798,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 {
 	TITLE("Chi0_hilbert","Cal_Chi");
 	double q = sqrt(((kv.kvec_c[iq])*(TWO_PI/ucell.lat0)).norm2());
-	complex<double> gather_chi[nomega];
+	vector<complex<double>> gather_chi(nomega);			// Peize Lin change ptr to vector at 2020.01.31
 	for(int i=0; i<nomega; i++)
 	{
 		for(int g0=0; g0<dim; g0++)
@@ -1973,7 +1985,7 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 // calculate (1 -vx) matrix
 void Chi0_hilbert::Cal_Rpa(int iq)
 {
-	double rc3, rc, factor, qg;
+	//double rc3, rc, factor, qg;
 	//-------------------------------------------------------------
 	//  Coulomb   4PI/|q+G|^2
 	//-------------------------------------------------------------
@@ -2108,7 +2120,7 @@ double Chi0_hilbert::qg2( int iq, int g0)
 //-------------------------------------------------------------
 int Chi0_hilbert::Cinv(int n, complex<double>** a)
 {
-	int i,j,k,l,u,v,w;
+	int i,j,k;	//l,u,v,w;
 	double p,q,s,d,b,m;
 	complex<double> t;
 	int *is, *js;
@@ -2152,7 +2164,7 @@ int Chi0_hilbert::Cinv(int n, complex<double>** a)
 			}
 		}
 		
-		l=k*n+k;
+		//l=k*n+k;
 		a[k][k] = complex<double>( a[k][k].real()/d, -a[k][k].imag()/d);
 		
 		for (j=0; j<=n-1; j++)

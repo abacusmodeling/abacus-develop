@@ -10,9 +10,9 @@
 #include<cmath>
 
 Vdwd2::Vdwd2( const UnitCell_pseudo &unitcell):
+	energy_result(0),
 	ucell(unitcell),
-	init_set(false),
-	energy_result(0)
+	init_set(false)
 {
 	init_C6();
 	init_R0();

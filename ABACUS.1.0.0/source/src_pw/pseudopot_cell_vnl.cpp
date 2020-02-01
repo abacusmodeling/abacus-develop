@@ -269,23 +269,29 @@ void pseudopot_cell_vnl::init_vnl(void)
 		//    From now on the only difference between KB and US pseudopotentials
 		//    is in the presence of the q and Q functions.
 		//    Here we initialize the D of the solid
-		if(ucell.atoms[it].has_so ){
+		if(ucell.atoms[it].has_so )
+		{
 			for(int ip=0; ip<Nprojectors; ip++)
 			{
 				const int l1 = this->nhtol (it, ip);
 				const double j1 = this->nhtoj (it, ip);
 				const int m1 = this->nhtolm (it, ip) - l1* l1;
-				const int v1 = static_cast<int>( indv(it, ip ) );
-				for(int ip2=0;ip2<Nprojectors; ip2++){
+				//const int v1 = static_cast<int>( indv(it, ip ) );
+				for(int ip2=0;ip2<Nprojectors; ip2++)
+				{
 					const int l2 = this->nhtol (it, ip2);
 					const double j2 = this->nhtoj (it, ip2);
 					const int m2 = this->nhtolm (it, ip2) - l2* l2;
-					const int v2 = static_cast<int>( indv(it, ip2 ) );
-					if(l1 == l2 && fabs(j1-j2)<1e-7){
-						for(int is1=0;is1<2;is1++){
-							for(int is2=0;is2<2;is2++){
+					//const int v2 = static_cast<int>( indv(it, ip2 ) );
+					if(l1 == l2 && fabs(j1-j2)<1e-7)
+					{
+						for(int is1=0;is1<2;is1++)
+						{
+							for(int is2=0;is2<2;is2++)
+							{
 								complex<double> coeff = complex<double>(0.0,0.0);
-								for(int m=-l1-1;m<l1+1;m++){
+								for(int m=-l1-1;m<l1+1;m++)
+								{
 									const int mi = soc.sph_ind(l1,j1,m,is1) + this->lmaxkb ;
 									const int mj = soc.sph_ind(l2,j2,m,is2) + this->lmaxkb ;
 									coeff += soc.rotylm(m1,mi) * soc.spinor(l1,j1,m,is1)*
@@ -548,7 +554,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 	for(int it=0;it<ucell.ntype;it++)
 	{
 		int BetaIndex=0;
-		const int Nprojectors = ucell.atoms[it].nh;
+		//const int Nprojectors = ucell.atoms[it].nh;
 		for (int ib=0; ib<ucell.atoms[it].nbeta; ib++)
 		{
 			const int l = ucell.atoms[it].lll [ib];

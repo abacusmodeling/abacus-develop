@@ -108,7 +108,7 @@ void IntArray::create(const int d1,const int d2,const int d3,const int d4,const 
 	size = d1 * d2 * d3 * d4 * d5 * d6;assert(size>0);
 	dim = 6;
 	bound1 = d1;bound2 = d2;bound3 = d3;bound4 = d4;bound5 = d5;bound6 = d6;
-	if(ptr!=NULL)delete[] ptr; ptr = new int[size];
+	delete[] ptr; ptr = new int[size];
 	assert(ptr != 0);zero_out();
 }
 
@@ -117,7 +117,7 @@ void IntArray::create(const int d1,const int d2,const int d3,const int d4,const 
 	size = d1 * d2 * d3 * d4 * d5;assert(size>0);
 	dim = 5;
 	bound1 = d1;bound2 = d2;bound3 = d3;bound4 = d4;bound5 = d5;
-	if(ptr!=NULL)delete[] ptr; ptr = new int[size];
+	delete[] ptr; ptr = new int[size];
 	assert(ptr != 0);zero_out();
 }
 
@@ -126,7 +126,7 @@ void IntArray::create(const int d1,const int d2,const int d3,const int d4)
 	size = d1 * d2 * d3 * d4;assert(size>0);
 	dim = 4;
 	bound1 = d1;bound2 = d2;bound3 = d3;bound4 = d4;
-	if(ptr!=NULL)delete[] ptr; ptr = new int[size];
+	delete[] ptr; ptr = new int[size];
 	assert(ptr != 0);zero_out();
 }
 
@@ -135,7 +135,7 @@ void IntArray::create(const int d1,const int d2,const int d3)
 	size = d1 * d2 * d3;assert(size>0);
 	dim = 3;
 	bound1 = d1;bound2 = d2;bound3 = d3;bound4 = 1;
-	if(ptr!=NULL)delete [] ptr;ptr = new int[size];
+	delete [] ptr;ptr = new int[size];
 	assert(ptr != 0);zero_out();
 }
 
@@ -144,7 +144,7 @@ void IntArray::create(const int d1, const int d2)
 	size = d1 * d2;assert(size>0);
 	dim = 2;
 	bound1 = d1;bound2 = d2;bound3 = bound4 = 1;
-	if(ptr!=NULL)delete[] ptr;ptr = new int[size];
+	delete[] ptr;ptr = new int[size];
 	assert(ptr !=0 );zero_out();
 }
 

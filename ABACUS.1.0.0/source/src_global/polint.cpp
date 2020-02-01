@@ -28,12 +28,12 @@ double Polint::Lagrange3
 	double c0, c1, c2, c3;
 	double d01, d02, d03, d12, d13, d23;
 
-	int i, ns;
-	for(i = 0; i < n-1; i++)
-	{
-		if(xp >= xa[i] && xp <= xa[i+1]) ns = i;
-	}
-	if(ns > n-4) ns = n-4;
+	int ns = 0;				// Peize Lin add initialization for compiler warning at 2020.01.31
+	for(int i = 0; i < n-1; i++)
+		if(xp >= xa[i] && xp <= xa[i+1])
+			ns = i;
+	if(ns > n-4)
+		ns = n-4;
 	
 	x0 = xa[ns];
 	x1 = xa[ns+1];

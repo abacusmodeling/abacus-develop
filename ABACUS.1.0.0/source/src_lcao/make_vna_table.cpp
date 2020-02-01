@@ -200,8 +200,8 @@ void Make_Vna_Table::init_Table_Chi(void)
 							assert( rmesh < this->Rmesh );
 
 							//not all L in T12_2Lplus1 would function
-							const int SL = abs(L1-L2);
-							const int AL = L1+L2;
+							//const int SL = abs(L1-L2);
+							//const int AL = L1+L2;
 
 							for (int L=0; L < T12_2Lplus1 ; L++)
 							{

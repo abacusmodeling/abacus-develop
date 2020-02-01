@@ -172,7 +172,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	if(NONCOLIN)
 	{
 		int row = GridT.lgd;
-		complex<double> tmp[row];
+		vector<complex<double>> tmp(row);
 		for(int ib=0; ib<NBANDS; ib++)
 		{
 			for(int iw=0; iw<row / NPOL; iw++)

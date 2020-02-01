@@ -40,7 +40,7 @@ const vector<vector<vector<double>>> & Sph_Bessel_Recursive::D2::cal_jlx( const 
 
 void Sph_Bessel_Recursive::D2::cal_jlx_0( const int l_size, const size_t ix1_size, const size_t ix2_size )
 {
-	if(jlx.size()<l_size)
+	if(jlx.size() < static_cast<size_t>(l_size))
 		jlx.resize(l_size);
 	
 	for( int l=0; l!=l_size; ++l )
@@ -65,7 +65,7 @@ void Sph_Bessel_Recursive::D2::cal_jlx_0( const int l_size, const size_t ix1_siz
 
 void Sph_Bessel_Recursive::D2::cal_jlx_smallx( const int l_size, const size_t ix1_size, const size_t ix2_size )
 {
-	if(jlx.size()<l_size)
+	if(jlx.size() < static_cast<size_t>(l_size))
 		jlx.resize(l_size);
 	
 	for( int l=0; l!=l_size; ++l )
@@ -92,7 +92,7 @@ void Sph_Bessel_Recursive::D2::cal_jlx_smallx( const int l_size, const size_t ix
 
 void Sph_Bessel_Recursive::D2::cal_jlx_recursive( const int l_size, const size_t ix1_size, const size_t ix2_size )
 {
-	if(jlx.size()<l_size)
+	if(jlx.size() < static_cast<size_t>(l_size))
 		jlx.resize(l_size);
 	
 	for( int l=0; l!=l_size; ++l )

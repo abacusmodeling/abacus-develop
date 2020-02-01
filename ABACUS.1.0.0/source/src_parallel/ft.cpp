@@ -247,7 +247,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	ZEROS(plane, nx);
 
 	// Searching in all y-z planes
-	int i, j;
+	int i;
 
 	for (int ip=0; ip<nproc_use; ip++)
 	{
@@ -583,7 +583,9 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 {
 	//timer::tick("FFT","fftz");
 	// number of sticks in this process.
+#if defined __FFTW2
 	int ns = this->nst_per[rank_use];
+#endif
 
 	if (sign == 1)
 	{

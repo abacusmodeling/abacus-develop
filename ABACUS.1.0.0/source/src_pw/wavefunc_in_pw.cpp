@@ -5,7 +5,7 @@ void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_loca
 {
 	TITLE("Wavefunc_in_pw","make_table_q");
 
-	if( fn.size() != ucell.ntype )
+	if( fn.size() != static_cast<size_t>(ucell.ntype) )
 	{
 		WARNING_QUIT("Wavefunc_in_pw::make_table_q","maybe NUMERICAL_ORBITAL is not read in, please check.");
 	}
@@ -123,7 +123,7 @@ void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_loca
 				Wavefunc_in_pw::integral(meshr, psir, radial, rab, L, table);
 				for(int iq=0; iq<NQX; iq++)
 				{
-					double energy_q = pow(iq * DQ,2);
+					//double energy_q = pow(iq * DQ,2);
 					table_local(it,ic,iq) = table[iq];//* Wavefunc_in_pw::smearing(energy_q,150,0.666666);
 				}
 				delete[] table;
@@ -256,7 +256,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	
 	Mathzone::Ylm_Real(total_lm, npw, gk, ylm);
 
-	int index = 0;
+	//int index = 0;
 	double *flq = new double[npw];
 	int iwall=0;
 	for (int it = 0;it < ucell.ntype;it++)
@@ -346,7 +346,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 
                               double alpha, gamma;
                               complex<double> fup,fdown;
-                              int nc;
+                              //int nc;
                               //This routine creates two functions only in the case j=l+1/2 or exit in the other case  
                               if(fabs(j-L+0.5<1e-4)) continue;
                               delete[] chiaux;
@@ -489,7 +489,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 
 	Mathzone::Ylm_Real(total_lm, npw, gkq, ylm);
 
-	int index = 0;
+	//int index = 0;
 	double *flq = new double[npw];
 	int iwall=0;
 	for (int it = 0;it < ucell.ntype;it++)
@@ -560,7 +560,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 
                               double alpha, gamma;
                               complex<double> fup,fdown;
-                              int nc;
+                              //int nc;
                               //This routine creates two functions only in the case j=l+1/2 or exit in the other case  
                               if(fabs(j-L+0.5<1e-4)) continue;
                               delete[] chiaux;

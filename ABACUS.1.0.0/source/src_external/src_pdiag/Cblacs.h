@@ -45,4 +45,4 @@ extern "C"
     // Combine
 //void Cdgamx2d(int icontxt, int scope, int top, int m, int n, 
 //              double *a, int lda, int *ra, int *ca, int rcflag, int rdest, int cdest);
-};
+}

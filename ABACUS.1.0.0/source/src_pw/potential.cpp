@@ -546,12 +546,12 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     //=============================
     pw.FFT_chg.FFT3D(Porter, -1);
 
-	double charge;
-	if (pw.gstart == 1)
-	{
-		charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
-	}
-//	OUT(ofs_running, "v_h charge", charge);
+	//double charge;
+	//if (pw.gstart == 1)
+	//{
+	//	charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
+	//}
+	//OUT(ofs_running, "v_h charge", charge);
 
     //=======================================================
     // calculate hartree potential in G-space (NB: V(G=0)=0 )

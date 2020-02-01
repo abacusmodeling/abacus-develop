@@ -472,7 +472,7 @@ void Charge_Extra::find_alpha_and_beta()
 		int iat=0;
 		for(int it = 0;it < ucell.ntype;it++)
 		{
-			Atom* atom = &ucell.atoms[it];
+			//Atom* atom = &ucell.atoms[it];
 			for(int ia =0;ia< ucell.atoms[it].na;ia++)
 			{
 				a11 += (pos_now[3*iat  ] - pos_old1[3*iat  ]) * (pos_now[3*iat  ] - pos_old1[3*iat  ]) + 

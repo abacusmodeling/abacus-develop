@@ -39,7 +39,8 @@ void Efield::add_efield(double* rho, double* v_in)
 	}
 	else
 	{
-		WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
+		throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		//WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
 	}
 //	cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << endl;
 
@@ -120,7 +121,7 @@ void Efield::add_efield(double* rho, double* v_in)
 		std::sqrt(avec[0]*avec[0]+avec[1]*avec[1]+avec[2]*avec[2]));
 
 	const double vamp = e2*(eamp-tot_dipole)*length;
-	const double fac = ucell.omega/FOUR_PI;
+	//const double fac = ucell.omega/FOUR_PI;
 
 //	cout << " Elec. dipole = " << e_dipole << " (Ry au), also = " 
 //	<< e_dipole * debye << " (debye)" << endl; 
@@ -145,8 +146,8 @@ void Efield::add_efield(double* rho, double* v_in)
 	// Saw\left( \frac{k}{nr3} \right) \frac{alat}{bmod}
 	//-----------------------------------------------------------
 
-	int i,j,k,index,index0;
-	double sawarg,value;
+	int i,j,k,index;	//index0;
+	double value;
 
 	if(MY_RANK==0)
 	{
@@ -158,12 +159,13 @@ void Efield::add_efield(double* rho, double* v_in)
 		if(edir==1) npoi = pw.ncx;
 		else if(edir == 2) npoi = pw.ncy;
 		else if(edir == 3) npoi = pw.ncz;
+		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
 		for(int ip=0; ip<npoi; ++ip)
 		{
-			sawarg = (double)ip/(double)npoi;
+			const double sawarg = (double)ip/(double)npoi;
 			value = e2 * (eamp - tot_dipole) *
-			saw(emaxpos, eopreg, sawarg) * (ucell.lat0/bmod);
+				saw(emaxpos, eopreg, sawarg) * (ucell.lat0/bmod);
 			ofs << ip << " " << value << endl;
 		}
 		ofs.close();
@@ -179,9 +181,11 @@ void Efield::add_efield(double* rho, double* v_in)
 		j     = index / pw.nczp;// get y
 		k 	  = index - pw.nczp*j + pw.nczp_start;// get x
 
+		double sawarg;
 		if (edir == 1) sawarg = (double)i/(double)pw.ncx;
 		else if (edir == 2) sawarg = (double)j/(double)pw.ncy;
 		else if (edir == 3) sawarg = (double)k/(double)pw.ncz;
+		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
      	value = e2 * (eamp - tot_dipole) * 
 			saw(emaxpos, eopreg, sawarg) * (ucell.lat0/bmod);

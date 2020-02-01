@@ -75,7 +75,7 @@ void zaxpy(int n, double alpha, complex < double> *x, int incx, complex < double
     {
         y[iy] += alpha * x[ix];
     }
-};
+}
 
 
 //-------------------------------------------------------------
@@ -814,17 +814,15 @@ void zgemm(char tra,
            int ldc)
 {
 	TITLE("myfunc5","zgemm1");
-    int nra, nca, nrb, ncb, nrc, ncc ;
-    nra = 1,   	  nca = k;
-    nrb = b.nr,   ncb = b.nc;
-    nrc = 1,      ncc = n;
+    //int nra=1;
+	int nca=k;
+	int nrb=b.nr;
+	int ncb=b.nc;
+	int nrc=1;
+	int ncc=n;
 
-    double alpha0[2], beta0[2];
-    alpha0[0] = alpha.real();
-    alpha0[1] = alpha.imag();
-
-    beta0[0] = beta.real();
-    beta0[1] = beta.imag();
+    //double alpha0[2] = {alpha.real(), alpha.imag()};
+	//double beta0[2] = {beta.real(), beta.imag()};
 
     double *aux, *bux, *cux; //HLX: bug fixed on 12/20/2006
     aux = new double[2*nca];
@@ -893,17 +891,15 @@ void zgemm(char tra,
            int ldc)
 {
     TITLE("myfunc5","zgemm2");
-    int nra, nca, nrb, ncb, nrc, ncc ;
-    nra = 1,   	nca = k;
-    nrb = b.nr,   ncb = b.nc;
-    nrc = c.nr,   ncc = c.nc;
+    //int nra = 1;
+	int nca = k;
+	int nrb = b.nr;
+	int ncb = b.nc;
+	int nrc = c.nr;
+	int ncc = c.nc;
 
-    double alpha0[2], beta0[2];
-    alpha0[0] = alpha.real();
-    alpha0[1] = alpha.imag();
-
-    beta0[0] = beta.real();
-    beta0[1] = beta.imag();
+	//double alpha0[2] = {alpha.real(), alpha.imag()};
+	//double beta0[2] = {beta.real(), beta.imag()};
 
     double *aux, *bux, *cux; //HLX: bug fixed on 12/20/2006
     aux = new double[2*nca];
@@ -983,12 +979,8 @@ void zgemm(char tra,
     nrb = b.nr,   ncb = b.nc;
     nrc = c.nr,   ncc = c.nc;
 
-    double alpha0[2], beta0[2];
-    alpha0[0] = alpha.real();
-    alpha0[1] = alpha.imag();
-
-    beta0[0] = beta.real();
-    beta0[1] = beta.imag();
+	//double alpha0[2] = {alpha.real(), alpha.imag()};
+	//double beta0[2] = {beta.real(), beta.imag()};
 
     double *aux, *bux, *cux; //HLX: bug fixed on 12/20/2006
     aux = new double[2*nra*nca];
@@ -1090,8 +1082,6 @@ int ILAENV(int ispec, char *name, char *opts,
     return nb;
 }
 
-;//end ILAENV
-
 void ZHPEV(int ,
            complex < double> *hp,
            double *e,
@@ -1102,7 +1092,7 @@ void ZHPEV(int ,
            int naux)
 {
     cout << "\n do nothing, in ZHPEV() ";
-};
+}
 
 complex < double> ZDOTU(int nstart,
                         complex < double>,
@@ -1126,7 +1116,7 @@ void zgemv(char ,
            ComplexMatrix work, int)
 {
     cout << "\n do nothing, in dgemv () ";
-};
+}
 
 /*
 void ZHEGVX(int itype,

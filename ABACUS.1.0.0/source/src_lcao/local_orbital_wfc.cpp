@@ -138,7 +138,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 				//cout<<"ik="<<ik<<" ib="<<ib<<endl<<"WFC_K address: "<<WFC_K[ik][ib]<<" WFC_K_POOL address: "<<&WFC_K_POOL[ik*page+ib*gt.lgd]<<endl;
 			}
 			//cout<<"set WFC_K pointer success, ik: "<<ik<<endl;
-			const double mem = Memory::record("LocalOrbital_Coef","WFC_K",NBANDS*NLOCAL,"cdouble");
+			Memory::record("LocalOrbital_Coef","WFC_K",NBANDS*NLOCAL,"cdouble");
 			//OUT(ofs_running,"MemoryForWaveFunctions (MB)",mem);
 			//cout<<"WFC_K["<<ik<<"] use "<<mem<<" MB"<<endl;
 			this->complex_flag = true;
@@ -266,7 +266,7 @@ void Local_Orbital_wfc::aloc_gamma_wfc(const Grid_Technique &gt)
 					this->WFC_GAMMA_B[is][ib] = new complex<double>[gt.lgd];
 					ZEROS(this->WFC_GAMMA_B[is][ib],gt.lgd);
 				}
-				double mem = Memory::record("LocalOrbital_Coef","WFC_GAMMA_B",NSPIN*NBANDS*NLOCAL,"cdouble");
+				Memory::record("LocalOrbital_Coef","WFC_GAMMA_B",NSPIN*NBANDS*NLOCAL,"cdouble");
 				allocate_flag = true;
 			}
 		}
@@ -279,7 +279,7 @@ void Local_Orbital_wfc::aloc_gamma_wfc(const Grid_Technique &gt)
 					this->WFC_GAMMA[is][ib] = new double[gt.lgd];
 					ZEROS(this->WFC_GAMMA[is][ib],gt.lgd);
 				}
-				double mem = Memory::record("LocalOrbital_Coef","WFC_GAMMA",NSPIN*NBANDS*NLOCAL,"double");
+				Memory::record("LocalOrbital_Coef","WFC_GAMMA",NSPIN*NBANDS*NLOCAL,"double");
 				allocate_flag = true;
 			}
 		}
@@ -510,7 +510,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 					ZEROS(this->WFC_GAMMA_aug[is][i], daug);
 				}
 			}
-			double mem = Memory::record("LocalOrbital_Coef","WFC_GAMMA_aug",NSPIN*NBANDS*daug,"double");
+			Memory::record("LocalOrbital_Coef","WFC_GAMMA_aug",NSPIN*NBANDS*daug,"double");
 		}
 		else // mohan add 2012-01-08
 		{

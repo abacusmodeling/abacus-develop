@@ -137,7 +137,7 @@ inline void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize
 	char transa='N', transb='T';
 	double alpha=1, beta=1;
 	
-	int allnw=colidx[size];
+	//int allnw=colidx[size];
 	for(int ib=0; ib<pw.bxyz; ++ib)
 	{
         for(int ia=0; ia<size; ++ia)
@@ -394,7 +394,7 @@ void Gint_Gamma::gamma_vlocal_B(void)
     latvec3[2]=ucell.latvec.e33*ucell.lat0;
 
 
-    complex<double>** GridVlocal;
+    complex<double>** GridVlocal = nullptr;
     bool perform_gint=true;
 
     const int lgd_now=GridT.lgd;
@@ -414,7 +414,7 @@ void Gint_Gamma::gamma_vlocal_B(void)
     }
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r=ORB.dr_uniform;
-    const Numerical_Orbital_Lm* pointer;
+    const Numerical_Orbital_Lm* pointer = nullptr;
 
     // allocate 1
     int nnnmax=0;
@@ -423,10 +423,10 @@ void Gint_Gamma::gamma_vlocal_B(void)
         nnnmax=max(nnnmax, nnn[T]);
     }
 
-    double*** dr; // vectors between atom and grid: [bxyz, maxsize, 3]
-    double** distance; // distance between atom and grid: [bxyz, maxsize]
-    double*** psir_ylm;
-    bool** cal_flag;
+    double*** dr = nullptr; // vectors between atom and grid: [bxyz, maxsize, 3]
+    double** distance = nullptr; // distance between atom and grid: [bxyz, maxsize]
+    double*** psir_ylm = nullptr;
+    bool** cal_flag = nullptr;
     if(max_size!=0)
     {
         dr=new double**[pw.bxyz];
@@ -507,7 +507,7 @@ void Gint_Gamma::gamma_vlocal_B(void)
                     int iat=GridT.which_atom[mcell_index];
 
                     const int it=ucell.iat2it[ iat ];
-                    const int ia=ucell.iat2ia[ iat ];
+                    //const int ia=ucell.iat2ia[ iat ];
 
                     // meshball_positions should be the bigcell position in meshball
                     // to the center of meshball.
@@ -852,14 +852,14 @@ void Gint_Gamma::gamma_vlocal(void)
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
 
     bool perform_gint=true;
-    double *GridVlocal_pool;
-    double **GridVlocal;
+    double *GridVlocal_pool = nullptr;
+    double **GridVlocal = nullptr;
     
     //OUT(ofs_running, "start calculate gamma_vlocal");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r=ORB.dr_uniform;
-    const Numerical_Orbital_Lm *pointer;
+    const Numerical_Orbital_Lm *pointer = nullptr;
 
     // allocate 1
     int nnnmax=0;
@@ -868,22 +868,24 @@ void Gint_Gamma::gamma_vlocal(void)
         nnnmax=max(nnnmax, nnn[T]);
     }
 
-    double*** dr; // vectors between atom and grid: [bxyz, maxsize, 3]
-    double** distance; // distance between atom and grid: [bxyz, maxsize]
+    double*** dr = nullptr; // vectors between atom and grid: [bxyz, maxsize, 3]
+    double** distance = nullptr; // distance between atom and grid: [bxyz, maxsize]
     int LD_pool;
-    int nblock;
-    int *bsize; //band size: number of columns of a band
-    int *colidx;
-    double *psir_ylm_pool, **psir_ylm;
-    double *psir_vlbr3_pool, **psir_vlbr3;
-	int **cal_flag;
+    //int nblock;
+    int *bsize = nullptr; //band size: number of columns of a band
+    int *colidx = nullptr;
+    double *psir_ylm_pool = nullptr;
+	double **psir_ylm = nullptr;
+    double *psir_vlbr3_pool = nullptr;
+	double **psir_vlbr3 = nullptr;
+	int **cal_flag = nullptr;
     
-    double* ylma;
+    double* ylma = nullptr;
 
     double mt[3]={0,0,0};
-    double *vldr3;
-    double v1=0.0;
-    int* vindex;
+    double *vldr3 = nullptr;
+    //double v1=0.0;
+    int* vindex = nullptr;
     double phi=0.0;
 
     const int nbx=GridT.nbx;
@@ -893,125 +895,126 @@ void Gint_Gamma::gamma_vlocal(void)
 
     const int ncyz=pw.ncy*pw.nczp;
 
-    const int lgd_now=GridT.lgd;    
-    if(max_size<=0 || lgd_now <= 0) 
-    {
+    const int lgd_now=GridT.lgd;
+	if(max_size>0 && lgd_now>0)					// Peize Lin delete goto at 2020.01.31
+	{
+		GridVlocal_pool=new double [lgd_now*lgd_now];
+		ZEROS(GridVlocal_pool, lgd_now*lgd_now);
+		GridVlocal=new double*[lgd_now];
+		for (int i=0; i<lgd_now; i++)
+		{
+			GridVlocal[i]=&GridVlocal_pool[i*lgd_now];
+		}
+		Memory::record("Gint_Gamma","GridVlocal",lgd_now*lgd_now,"double");
+		
+		 ylma=new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
+		ZEROS(ylma, nnnmax);
+		vldr3=new double[pw.bxyz];
+		vindex=new int[pw.bxyz];
+		ZEROS(vldr3, pw.bxyz);
+		ZEROS(vindex, pw.bxyz);
+		
+		LD_pool=max_size*ucell.nwmax;
+		dr=new double**[pw.bxyz];
+		distance=new double*[pw.bxyz];
+		bsize=new int[max_size];
+		colidx=new int[max_size+1];
+		psir_ylm_pool=new double[pw.bxyz*LD_pool];
+		psir_ylm=new double *[pw.bxyz];
+		ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
+		psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
+		psir_vlbr3=new double *[pw.bxyz];
+		ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
+		cal_flag=new int*[pw.bxyz];
+		for(int i=0; i<pw.bxyz; i++)
+		{
+			dr[i]=new double*[max_size];
+			distance[i]=new double[max_size];
+			psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
+			psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
+			ZEROS(distance[i], max_size);
+			for(int j=0; j<max_size; j++) 
+			{
+				dr[i][j]=new double[3];
+				ZEROS(dr[i][j],3);
+			}
+			cal_flag[i]=new int[max_size];
+		}
+
+		int *block_iw; // index of wave functions of each block;
+		block_iw=new int[max_size];
+			
+		for (int i=0; i< nbx; i++)
+		{
+			const int ibx=i*pw.bx;
+			for (int j=0; j<nby; j++)
+			{
+				const int jby=j*pw.by; 
+				for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
+				{
+					//OUT(ofs_running, "====================");
+					//OUT(ofs_running, "i", i);
+					//OUT(ofs_running, "j", j);
+					//OUT(ofs_running, "k", k);
+					this->grid_index=(k-nbz_start) + j * nbz + i * nby * nbz;
+
+					// get the value: how many atoms has orbital value on this grid.
+					const int size=GridT.how_many_atoms[ this->grid_index ];
+					if(size==0) continue;
+					const int kbz=k*pw.bz-pw.nczp_start;
+					setVindex(ncyz, ibx, jby, kbz, vindex);
+					//OUT(ofs_running, "vindex was set");
+					// extract the local potentials.
+					for(int ib=0; ib<pw.bxyz; ib++)
+					{
+						vldr3[ib]=this->vlocal[vindex[ib]] * this->vfactor;
+					}
+					
+					//OUT(ofs_running, "vldr3 was inited");
+					//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
+					cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
+					//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, i, j, k);
+					//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
+					//OUT(ofs_running, "psir_ylm was calculated");
+					//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
+					//cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
+					cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, cal_flag, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
+					//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
+					//OUT(ofs_running, "GridVlocal was calculated");
+				}// k
+			}// j
+		}// i
+		
+		for(int i=0; i<pw.bxyz; i++)
+		{
+			for(int j=0; j<max_size; j++) 
+			{
+				delete[] dr[i][j];
+			}
+			delete[] dr[i];
+			delete[] distance[i];
+			delete[] cal_flag[i];
+		}
+		delete[] cal_flag;
+		delete[] vindex;
+		delete[] ylma;
+		delete[] vldr3;    
+		delete[] block_iw;
+		delete[] dr;
+		delete[] distance;
+		delete[] psir_vlbr3;
+		delete[] psir_vlbr3_pool;
+		delete[] psir_ylm;
+		delete[] psir_ylm_pool;
+		delete[] colidx;
+		delete[] bsize;
+		OUT(ofs_running, "temp variables are deleted");		
+	}
+	else
+	{
         perform_gint=false;
-        goto ENDandRETURN;
-    }
-    GridVlocal_pool=new double [lgd_now*lgd_now];
-    ZEROS(GridVlocal_pool, lgd_now*lgd_now);
-    GridVlocal=new double*[lgd_now];
-    for (int i=0; i<lgd_now; i++)
-    {
-        GridVlocal[i]=&GridVlocal_pool[i*lgd_now];
-    }
-    Memory::record("Gint_Gamma","GridVlocal",lgd_now*lgd_now,"double");
-    
-     ylma=new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
-    ZEROS(ylma, nnnmax);
-    vldr3=new double[pw.bxyz];
-    vindex=new int[pw.bxyz];
-    ZEROS(vldr3, pw.bxyz);
-    ZEROS(vindex, pw.bxyz);
-    
-    LD_pool=max_size*ucell.nwmax;
-    dr=new double**[pw.bxyz];
-    distance=new double*[pw.bxyz];
-    bsize=new int[max_size];
-    colidx=new int[max_size+1];
-    psir_ylm_pool=new double[pw.bxyz*LD_pool];
-    psir_ylm=new double *[pw.bxyz];
-    ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
-    psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
-    psir_vlbr3=new double *[pw.bxyz];
-    ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
-	cal_flag=new int*[pw.bxyz];
-    for(int i=0; i<pw.bxyz; i++)
-    {
-        dr[i]=new double*[max_size];
-        distance[i]=new double[max_size];
-        psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
-        psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
-        ZEROS(distance[i], max_size);
-        for(int j=0; j<max_size; j++) 
-        {
-            dr[i][j]=new double[3];
-            ZEROS(dr[i][j],3);
-        }
-		cal_flag[i]=new int[max_size];
-    }
-
-    int *block_iw; // index of wave functions of each block;
-    block_iw=new int[max_size];
-        
-    for (int i=0; i< nbx; i++)
-    {
-        const int ibx=i*pw.bx;
-        for (int j=0; j<nby; j++)
-        {
-            const int jby=j*pw.by; 
-            for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
-            {
-                //OUT(ofs_running, "====================");
-                //OUT(ofs_running, "i", i);
-                //OUT(ofs_running, "j", j);
-                //OUT(ofs_running, "k", k);
-                this->grid_index=(k-nbz_start) + j * nbz + i * nby * nbz;
-
-                // get the value: how many atoms has orbital value on this grid.
-                const int size=GridT.how_many_atoms[ this->grid_index ];
-                if(size==0) continue;
-                const int kbz=k*pw.bz-pw.nczp_start;
-                setVindex(ncyz, ibx, jby, kbz, vindex);
-                //OUT(ofs_running, "vindex was set");
-                // extract the local potentials.
-                for(int ib=0; ib<pw.bxyz; ib++)
-                {
-                    vldr3[ib]=this->vlocal[vindex[ib]] * this->vfactor;
-                }
-                
-                //OUT(ofs_running, "vldr3 was inited");
-                //timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
-                cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
-                //cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, i, j, k);
-                //timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
-                //OUT(ofs_running, "psir_ylm was calculated");
-                //timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
-                //cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
-                cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, cal_flag, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
-                //timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
-                //OUT(ofs_running, "GridVlocal was calculated");
-            }// k
-        }// j
-    }// i
-    
-    for(int i=0; i<pw.bxyz; i++)
-    {
-        for(int j=0; j<max_size; j++) 
-        {
-            delete[] dr[i][j];
-        }
-        delete[] dr[i];
-        delete[] distance[i];
-		delete[] cal_flag[i];
-    }
-	delete[] cal_flag;
-    delete[] vindex;
-    delete[] ylma;
-    delete[] vldr3;    
-    delete[] block_iw;
-    delete[] dr;
-    delete[] distance;
-    delete[] psir_vlbr3;
-    delete[] psir_vlbr3_pool;
-    delete[] psir_ylm;
-    delete[] psir_ylm_pool;
-    delete[] colidx;
-    delete[] bsize;
-    OUT(ofs_running, "temp variables are deleted");
-
-ENDandRETURN:    
+	}
+   
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
     MPI_Barrier(MPI_COMM_WORLD);
     timer::tick("Gint_Gamma","distri_vl",'K');

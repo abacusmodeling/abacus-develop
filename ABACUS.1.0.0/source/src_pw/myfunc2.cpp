@@ -93,6 +93,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
         if (rhoup > small && sqrt(abs(grhoup2)) > small)
         {
             //XC_Functional::ggax(2.0 * rhoup, 4.0 * grhoup2, sxup, v1xup, v2xup);
+			throw runtime_error("sxup, v1xup, v2xup uninitialized in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
         }
         else
         {
@@ -104,6 +105,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
         if (rhodw > small && sqrt(abs(grhodw2)) > small)
         {
             //XC_Functional::ggax(2.0 * rhodw, 4.0 * grhodw2, sxdw, v1xdw, v2xdw);
+			throw runtime_error("sxdw, v1xdw, v2xdw uninitialized in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
         }
         else
         {
@@ -478,7 +480,7 @@ void ggac_spin(double rho, double zeta, double grho, double &sc,
     // xkf=(9 pi/4)^(1/3), xks= sqrt(4/pi)
     double kf, ks, rs, rs2, rs3, ec, vcup, vcdw, t, expe, af, y,
     xy, qy, s1, h0, ddh0, ee, cn, dcn, cna, dcna, cnb, dcnb, h1, dh1,
-    ddh1, fz, fz2, fz3, fz4, dfz, bfup, bfdw, dh0up, dh0dw, dh0zup,
+    ddh1, fz, fz2, fz3, fz4, dfz, bfup, dh0up, dh0zup, //bfdw, dh0dw,
     dh0zdw, dh1zup, dh1zdw;
 
     rs = pi34 / pow(rho, third);
@@ -498,7 +500,7 @@ void ggac_spin(double rho, double zeta, double grho, double &sc,
     expe = exp(- 2.0 * al * ec / (fz3 * be * be));
     af = 2.0 * al / be * (1.0 / (expe - 1.0));
     bfup = expe * (vcup - ec) / fz3;
-    bfdw = expe * (vcdw - ec) / fz3;
+    //bfdw = expe * (vcdw - ec) / fz3;
     y = af * t * t;
     xy = (1.0 + y) / (1.0 + y + y * y);
     qy = y * y * (2.0 + y) / (1.0 + y + y * y) ;	//**2;
@@ -507,8 +509,8 @@ void ggac_spin(double rho, double zeta, double grho, double &sc,
     h0 = fz3 * be * be / (2.0 * al) * log(s1);
     dh0up = be * t * t * fz3 / s1 * (- 7.0 / 3.0 * xy - qy *
                                      (af * bfup / be - 7.0 / 3.0));
-    dh0dw = be * t * t * fz3 / s1 * (- 7.0 / 3.0 * xy - qy *
-                                     (af * bfdw / be - 7.0 / 3.0));
+    //dh0dw = be * t * t * fz3 / s1 * (- 7.0 / 3.0 * xy - qy *
+    //                                 (af * bfdw / be - 7.0 / 3.0));
     dh0zup = (3.0 * h0 / fz - be * t * t * fz2 / s1 * (2.0 * xy -
               qy * (3.0 * af * expe * ec / fz3 / be + 2.0))) * dfz * (1.0 -
                       zeta);
@@ -565,7 +567,7 @@ void pbec_spin(double rho, double zeta, double grho, const int &iflag, double &s
     // pi34=(3/4pi)^(1/3), xkf=(9 pi/4)^(1/3), xks= sqrt(4/pi)
     double kf, ks, rs, ec, vcup, vcdw, t, expe, af, y, xy, qy,
     s1, h0, ddh0;
-    double fz, fz2, fz3, fz4, dfz, bfup, bfdw, dh0up, dh0dw, dh0zup, dh0zdw;
+    double fz, fz2, fz3, dfz, bfup, bfdw, dh0up, dh0dw, dh0zup, dh0zdw; // fz4
 
     rs = pi34 / pow(rho, third);
 	XC_Functional::pw_spin(rs, zeta, ec, vcup, vcdw); //mohan fix bug 2012-05-28
@@ -575,7 +577,7 @@ void pbec_spin(double rho, double zeta, double grho, const int &iflag, double &s
                      2.0 / 3.0)));
     fz2 = fz * fz;
     fz3 = fz2 * fz;
-    fz4 = fz3 * fz;
+    //fz4 = fz3 * fz;
     dfz = (pow((1.0 + zeta) , (- 1.0 / 3.0)) - pow((1.0 - zeta) , (-
             1.0 / 3.0))) / 3.0;
     t = sqrt(grho) / (2.0 * fz * ks * rho);
