@@ -33,6 +33,7 @@ private:
 	template<typename T>
 	T pulay_mixing( const T &H_pulay_old, deque<T> &H_seq, const T &H_new );
 
+	#if EXX_H_COMM==1
 	class Allreduce
 	{
 	public:
@@ -77,7 +78,7 @@ private:
 		vector<atomic<int>*> flags_ask_atom;
 		boost::dynamic_bitset<> flags_recv_data;
 	};
-	
+	#elif EXX_H_COMM==2
 	class Allreduce2
 	{
 	public:
@@ -128,6 +129,7 @@ private:
 		vector<size_t> send_size_list;
 		size_t recv_size;
 	};
+	#endif
 
 public:
 	vector<matrix>        HK_Gamma_m2D;

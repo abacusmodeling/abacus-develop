@@ -22,6 +22,7 @@ public:
 	void test_abfs2() const;
 	void cal_exx() const;
 	
+	class Util;
 	class Abfs_Index;
 	class Jle;
 	class Inverse_Matrix_Double;

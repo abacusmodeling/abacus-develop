@@ -20,8 +20,11 @@ class Exx_Abfs::Parallel
 		public:
 		class Allreduce;
 		class Hexx;
+		#if EXX_DM==1
 		class DM;
+		#elif EXX_DM==2
 		class DM2;
+		#endif
 	};
 };
 

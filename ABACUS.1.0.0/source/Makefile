@@ -61,7 +61,7 @@ PDIAG_OBJS=$(OBJS_PDIAG)\
 # MAKING OPTIONS
 #==========================
 fp_mpi : ${FP_OBJS} ${PDIAG_MR} ${PDIAG_OBJS} ${HEADERS}
-	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi.1.0.0_exx_Hmpi
+	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi.1.0.0_exx_noboost
 
 fp : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp.x 

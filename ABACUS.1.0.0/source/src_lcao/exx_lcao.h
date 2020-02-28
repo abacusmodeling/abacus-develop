@@ -7,13 +7,17 @@
 #include "src_lcao/exx_abfs-matrix_orbs21.h" 
 #include "src_lcao/exx_abfs-dm.h"
 #include "src_lcao/exx_abfs-parallel-communicate-hexx.h"
-#include "src_lcao/exx_abfs-parallel-communicate-dm.h"
-#include "src_lcao/exx_abfs-parallel-communicate-dm2.h"
 #include "src_lcao/exx_abfs-screen-schwarz.h"
 #include "src_lcao/exx_abfs-screen-cauchy.h"
 #include "src_global/element_basis_index.h"
 #include "src_pw/functional.h"
 #include "src_pw/exx_global.h"
+
+#if EXX_DM==1
+#include "src_lcao/exx_abfs-parallel-communicate-dm.h"
+#elif EXX_DM==2
+#include "src_lcao/exx_abfs-parallel-communicate-dm2.h"
+#endif
 
 #include<set>
 #include<vector>

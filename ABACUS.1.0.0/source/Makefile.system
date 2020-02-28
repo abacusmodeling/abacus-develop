@@ -4,8 +4,8 @@ include Makefile.vars
 # LIB and INCLUDE
 #==========================
 BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
-BOOST_LIB_DIR     = ${BOOST_DIR}/lib
-BOOST_LIB         = -L${BOOST_LIB_DIR} -lboost_serialization -lboost_mpi -Wl,-rpath=${BOOST_LIB_DIR}
+#BOOST_LIB_DIR     = ${BOOST_DIR}/lib
+#BOOST_LIB         = -L${BOOST_LIB_DIR} -lboost_serialization -lboost_mpi -Wl,-rpath=${BOOST_LIB_DIR}
 
 LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
 LAPACK_LIB_DIR     = ${LAPACK_DIR}/lib/intel64
@@ -29,7 +29,7 @@ LIBXC_LIB         = -L${LIBXC_LIB_DIR} -lxc -Wl,-rpath=${LIBXC_LIB_DIR}
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread ${BOOST_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
+LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
 #LIBS = -liomp5 -lpthread -lm -ldl ${BOOST_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
 
 INCLUDES = -I. -Icommands -I${BOOST_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFTW_INCLUDE_DIR} -I${LIBXC_INCLUDE_DIR}

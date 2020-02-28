@@ -2,12 +2,12 @@
 #include <stdexcept>
 
 #include "exx_abfs-io.h"
-#include "exx_abfs-io-template.h"
 #include "exx_abfs-jle.h"
 #include "exx_abfs-abfs_index.h"
-#include "../src_pw/global.h"
-#include "lcao_orbitals.h"
-#include "../src_global/global_function.h"
+#include "src_pw/global.h"
+#include "src_lcao/lcao_orbitals.h"
+#include "src_global/global_function.h"
+
 
 vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	const LCAO_Orbitals &orbs,

@@ -14,7 +14,8 @@
 #include "exx_abfs-abfs_index.h"
 #include "exx_abfs-screen-schwarz.h"
 #include "exx_abfs-io.h"
-#include "exx_abfs-io-template.h"
+//#include "exx_abfs-io-template.h"
+#include "exx_abfs-util.h"
 #include "exx_abfs-parallel.h"
 #include "exx_abfs-parallel-distribute-htime.h"
 #include "exx_abfs-parallel-distribute-kmeans.h"
@@ -493,7 +494,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::change_orbs\t"<<time_during(t_start)<<endl;
 
 ofs_mpi<<info.files_abfs<<endl;
-	Exx_Abfs::IO::bcast( info.files_abfs, 0, MPI_COMM_WORLD );
+	Exx_Abfs::Util::bcast( info.files_abfs, 0, MPI_COMM_WORLD );
 ofs_mpi<<info.files_abfs<<endl;
 
 gettimeofday( &t_start, NULL);
