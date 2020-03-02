@@ -3,8 +3,10 @@
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
 #include "blas_interface.h"
+#include <mkl_service.h>
 
-inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
+//inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
+void Gint_Gamma::setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const
 {
     int bindex = 0;
     // z is the fastest, 
@@ -23,7 +25,8 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
     }
 }
 
-inline void cal_psir_ylm(int size, int grid_index, double delta_r,
+//inline void cal_psir_ylm(int size, int grid_index, double delta_r,
+void Gint_Gamma::cal_psir_ylm_rho(int size, int grid_index, double delta_r,
 						double** distance, double* ylma,
 						int* at, int* block_index, int* block_iw, int* block_size, 
 						int** cal_flag, double** psir_ylm)
@@ -120,7 +123,8 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 }
 
 // can be done by GPU
-inline void cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, int* colidx,
+//inline void cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, int* colidx,
+void Gint_Gamma::cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, int* colidx,
                         int** cal_flag, double ** psir_ylm, double **psir_DM, 
                         double* psir_DM_pool, int* vindex)
 {
@@ -279,6 +283,7 @@ double Gint_Gamma::cal_rho(void)
     this->save_atoms_on_grid(GridT);
 
     double ne = 0.0;
+omp_init_lock(&lock);
     if(BFIELD)
     {
         this->gamma_charge_B();
@@ -287,6 +292,7 @@ double Gint_Gamma::cal_rho(void)
     {
         ne = this->gamma_charge();
     }
+omp_destroy_lock(&lock);
     timer::tick("Gint_Gamma","cal_rho",'F');
     return ne;
 }
@@ -495,7 +501,7 @@ double Gint_Gamma::gamma_charge_B(void)
                     }// end ib
                 }// end id
 
-                setVindex(ncyz, ibx, jby, kbz, vindex);
+                this->setVindex(ncyz, ibx, jby, kbz, vindex);
                 /*
                 int bindex = 0;
                 // z is the fastest,
@@ -705,16 +711,26 @@ double Gint_Gamma::gamma_charge(void)
     }
     else//LiuXh 2016-01-10
     {
+        const int mkl_threads = mkl_get_max_threads();
+        mkl_set_num_threads(1);
+        //ofs_running<<__FILE__<<__LINE__<<endl;
+#pragma omp parallel
+{
+        ofstream ofs("cal_vlocal_"+TO_STRING(MY_RANK)+"_"+TO_STRING(omp_get_thread_num()));
+        ofs<<"@/t"<<__LINE__<<endl;
+
         // it's a uniform grid to save orbital values, so the delta_r is a constant.
         const double delta_r = ORB.dr_uniform;
     
+        //if(omp_get_thread_num() == 0) ofs_running<<__FILE__<<__LINE__<<endl;
+
         // allocate 1
         int nnnmax=0;
         for(int T=0; T<ucell.ntype; T++)
         {
             nnnmax = max(nnnmax, nnn[T]);
         }
-        
+
         double** distance; // distance between atom and grid: [bxyz, maxsize]
         // set up band matrix psir_ylm and psir_DM
         int LD_pool=max_size*ucell.nwmax;
@@ -729,7 +745,7 @@ double Gint_Gamma::gamma_charge(void)
         distance = new double*[pw.bxyz];
         block_size=new int[max_size];
         block_index=new int[max_size+1];
-		at=new int[max_size];
+        at=new int[max_size];
         psir_ylm_pool=new double[pw.bxyz*LD_pool];
         psir_ylm=new double *[pw.bxyz];
         psir_DM_pool=new double[pw.bxyz*LD_pool];
@@ -737,6 +753,9 @@ double Gint_Gamma::gamma_charge(void)
         ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
         ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
         cal_flag=new int*[pw.bxyz];
+
+        //ofs<<"@/t"<<__LINE__<<endl;
+
         for(int i=0; i<pw.bxyz; ++i)
         {
             psir_ylm[i] = &psir_ylm_pool[i*LD_pool];
@@ -765,6 +784,9 @@ double Gint_Gamma::gamma_charge(void)
         //OUT(ofs_running, "nbx", nbx);
         //OUT(ofs_running, "nby", nby);
         //OUT(ofs_running, "nbz", nbz);
+
+
+#pragma omp for
         for (int i=0; i<nbx; i++)
         {
             const int ibx = i*pw.bx; // mohan add 2012-03-25
@@ -775,16 +797,19 @@ double Gint_Gamma::gamma_charge(void)
                 {
                     const int kbz = k*pw.bz-pw.nczp_start; //mohan add 2012-03-25
     
-                    this->grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
+                    //this->grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
+                    const int grid_index_thread = (k-nbz_start) + j * nbz + i * nby * nbz;
     
                     // get the value: how many atoms has orbital value on this grid.
-                    const int size = GridT.how_many_atoms[ this->grid_index ];
+                    //const int size = GridT.how_many_atoms[ this->grid_index ];
+                    const int size = GridT.how_many_atoms[ grid_index_thread ];
                     if(size==0) continue;
-                    setVindex(ncyz, ibx, jby, kbz, vindex);
+                    this->setVindex(ncyz, ibx, jby, kbz, vindex);
                     // cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm);
                     
                     timer::tick("Gint_Gamma","rho_psir_ylm",'J');
-                    cal_psir_ylm(size, this->grid_index, delta_r, distance, ylma,
+                    //cal_psir_ylm(size, this->grid_index, delta_r, distance, ylma,
+                    this->cal_psir_ylm_rho(size, grid_index_thread, delta_r, distance, ylma,
                             at, block_index, block_iw, block_size, 
                             cal_flag, psir_ylm);
                     timer::tick("Gint_Gamma","rho_psir_ylm",'J');
@@ -797,7 +822,8 @@ double Gint_Gamma::gamma_charge(void)
                 }// k
             }// j
         }// i
-        
+
+///*
         delete[] vindex;
         delete[] ylma;
         
@@ -808,7 +834,7 @@ double Gint_Gamma::gamma_charge(void)
             delete[] cal_flag[i];
             delete[] distance[i];
         }
-		delete[] cal_flag;
+        delete[] cal_flag;
         delete[] distance;
         delete[] psir_DM;
         delete[] psir_DM_pool;
@@ -817,7 +843,8 @@ double Gint_Gamma::gamma_charge(void)
         delete[] block_index;
         delete[] block_size;
         delete[] at;
-        
+//*/
+}
         //double sum = 0.0;//LiuXh 2016-01-10
         for(int is=0; is<NSPIN; is++)
         {
@@ -826,6 +853,7 @@ double Gint_Gamma::gamma_charge(void)
                 sum += chr.rho[is][ir];
             }
         }
+        mkl_set_num_threads(mkl_threads);
     }
         
 //ENDandRETURN:
