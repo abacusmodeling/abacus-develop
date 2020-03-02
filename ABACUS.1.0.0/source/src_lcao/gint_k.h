@@ -15,11 +15,14 @@ class Gint_k : public Gint_k_init
 
 	// allocate the <phi_0 | V | phi_R> matrix element.
 	void allocate_pvpR(void);
+	void allocate_pvpR_tr(void); //LiuXh add 2019-07-15
 
 
 	// destroy the temporary <phi_0 | V | phi_R> matrix element.
 	void destroy_pvpR(void);
-
+	//LiuXh add 2019-07-15
+	void destroy_pvpR_tr(void);
+	void distribute_pvpR_tr(void);
 
 	// allocate the <phi_0 | Vna | phi_R> matrix element.
 	void allocate_pvnapR(void);
@@ -37,6 +40,7 @@ class Gint_k : public Gint_k_init
 	// < phi_0 | delta_Vh + Vxc | phi_R>.
 	void cal_vlocal_k(const double* vrs1, const Grid_Technique &gt, const int spin=0);
 
+	void cal_vlocal_R(const int current_spin); //LiuXh add 2019-07-15
 
 	//>>>>>>>>>>>>>>>>>>>>
 	// drive routine 
@@ -206,6 +210,8 @@ class Gint_k : public Gint_k_init
 	double* pvpR_pool;
 	double** pvpR;
 
+	double***** pvpR_tr; //LiuXh add 2019-07-15
+	complex<double>***** pvpR_tr_soc; //LiuXh add 2019-07-15
 
 	//----------------------------
 	// key variable 

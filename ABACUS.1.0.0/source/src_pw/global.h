@@ -32,6 +32,7 @@
 #include "output.h"
 #include "magnetism.h"
 #include "vdwd2.h"
+#include "vdwd3.h"	
 #include "exx_pw.h"
 #include "exx_global.h"
 #include "exx_lip.h"
@@ -90,6 +91,7 @@ extern Parallel_Grid Pgrid;
 extern Parallel_Kpoints Pkpoints;
 
 extern Vdwd2 vdwd2;		// Peize Lin add 2019-04-26
+extern Vdwd3 vdwd3;		// jiyy add 2019-05-18																										 
 
 //zhengdy-soc
 #include "soc.h"

@@ -86,6 +86,7 @@ void Vdwd2::initset()
 
 double Vdwd2::energy()
 {
+    TITLE("Vdwd2","energy");
 	initset();
 
 	energy_result = 0;
@@ -125,6 +126,7 @@ double Vdwd2::energy()
 
 const std::vector<Vector3<double>> &Vdwd2::force(matrix &stress_result, const bool stress_for_vdw)
 {
+    TITLE("Vdwd2","force");
 	initset();
 
 	force_result.clear();

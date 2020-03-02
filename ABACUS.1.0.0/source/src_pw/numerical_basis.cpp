@@ -357,7 +357,7 @@ void Numerical_Basis::output_overlap_Q(
             for (int i=0; i<dim; i++)
             {
                 if ( count%4==0 ) ofs << "\n";
-                ofs << " " << Qtmp1[i] << " " << Qtmp2[i];
+                ofs <<"  "<<"  "<<Qtmp1[i]<<"  "<<"  "<<Qtmp2[i];//add more " ", with 1 " ", sometime got 1.96752959e-36-3.20651912e-20, can't be reproduced. 
                 ++count;
             }
             // end data writing.

@@ -8,8 +8,10 @@
 #include "src_lcao/stress_lcao.h"
 #include "src_lcao/istate_charge.h"
 #include "src_lcao/istate_envelope.h"
-#include "src_pw/vdwd2.h"
 #include "src_global/global_function.h"
+#include "src_lcao/hs_matrix.h"
+#include "src_lcao/cal_r_overlap_R.h"
+
 //#include "../src_siao/selinv.h" //mohan add 2012-05-13
 
 #include "src_lcao/exx_abfs.h"
@@ -251,10 +253,14 @@ void Local_Orbital_Ions::opt_ions(void)
         if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
         {
             vdwd2.energy();
-		}
-
-		// (10) self consistent
-		if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+        }
+		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+        {
+            vdwd3.energy();
+        }
+		
+        // (10) self consistent
+        if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
 		{
 			//Peize Lin add 2016-12-03
 			switch(exx_lcao.info.hybrid_type)
@@ -363,6 +369,8 @@ void Local_Orbital_Ions::opt_ions(void)
 
             //MD.runMD(istep);//we need this total form
         }
+
+        if(ParaO.out_hsR) this->output_HS_R(); //LiuXh add 2019-07-15
 
         time_t fstart = time(NULL);
         if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
@@ -558,6 +566,10 @@ void Local_Orbital_Ions::opt_ions(void)
         {
             vdwd2.energy();
         }
+		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+        {
+            vdwd3.energy();
+        } 
         LOE.scf(0);
 
         if(CALCULATION=="scf" || CALCULATION=="relax")
@@ -862,6 +874,10 @@ void Local_Orbital_Ions::final_scf(void)
     {
         vdwd2.energy();
     }
+	if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+    {
+        vdwd3.energy();
+    }											  
     LOE.scf(0);
 
     if(CALCULATION=="scf" || CALCULATION=="relax")
@@ -872,5 +888,66 @@ void Local_Orbital_Ions::final_scf(void)
         ofs_running << " --------------------------------------------\n\n" << endl;
     }
 
+    return;
+}
+
+void Local_Orbital_Ions::output_HS_R(void)
+{
+    TITLE("Local_Orbital_Ions","output_HS_R"); 
+    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
+	
+	// add by jingan for out r_R matrix 2019.8.14
+	if(INPUT.out_r_matrix)
+	{
+		cal_r_overlap_R r_matrix;
+		r_matrix.init();
+		r_matrix.out_r_overlap_R(NSPIN);
+	}
+
+    if(NSPIN==1||NSPIN==4)
+    {
+        UHM.calculate_STN_R();
+        UHM.GK.cal_vlocal_R(0);
+        UHM.GK.distribute_pvpR_tr();
+        HS_Matrix::save_HSR_tr(0);
+    }
+    ///*
+    else if(NSPIN==2)
+    {
+        UHM.calculate_STN_R();
+        for(int ik=0; ik<kv.nks; ik++)
+        {
+            if(ik==0 || ik==kv.nks/2)
+            {
+                if(NSPIN==2)CURRENT_SPIN = kv.isk[ik];
+                for(int ir=0; ir<pw.nrxx; ir++)
+                {
+                    pot.vrs1[ir] = pot.vrs( CURRENT_SPIN, ir);
+                }
+        	    	
+                if(!GAMMA_ONLY_LOCAL)
+                {
+                    if(VL_IN_H)
+                    {
+                        if(VNA==0)
+                        {
+                            //UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
+                            UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
+                        }
+                    }
+                }
+                UHM.GK.cal_vlocal_R(CURRENT_SPIN);
+                UHM.GK.distribute_pvpR_tr();
+                HS_Matrix::save_HSR_tr(CURRENT_SPIN);
+            }
+        }
+    }
+    //*/
+    if(!GAMMA_ONLY_LOCAL) //LiuXh 20181011
+    {
+        UHM.GK.destroy_pvpR();
+    } //LiuXh 20181011
+
+    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
     return;
 }

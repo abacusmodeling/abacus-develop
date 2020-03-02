@@ -474,3 +474,130 @@ void Use_Hamilt_Matrix::calculate_STNR_k(void)
 }
 
 
+void Use_Hamilt_Matrix::calculate_STN_R(void)
+{
+    TITLE("Use_Hamilt_Matrix","calculate_STN_R");
+
+    int iat = 0;
+    int index = 0;
+    Vector3<double> dtau, tau1, tau2;
+    Vector3<double> dtau1, dtau2, tau0;
+
+    LM.allocate_Hloc_fixedR_tr();
+    LM.allocate_HR_tr();
+    LM.allocate_SlocR_tr();
+
+    double R_minX = GridD.getD_minX();
+    double R_minY = GridD.getD_minY();
+    double R_minZ = GridD.getD_minZ();
+
+    int R_x;
+    int R_y;
+    int R_z;
+
+    for(int T1 = 0; T1 < ucell.ntype; ++T1)
+    {
+        Atom* atom1 = &ucell.atoms[T1];
+        for(int I1 = 0; I1 < atom1->na; ++I1)
+        {
+            tau1 = atom1->tau[I1];
+            //GridD.Find_atom(tau1);
+            GridD.Find_atom(tau1, T1, I1);
+            Atom* atom1 = &ucell.atoms[T1];
+            const int start = ucell.itiaiw2iwt(T1,I1,0);
+
+            for(int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+            {
+                const int T2 = GridD.getType(ad);
+                const int I2 = GridD.getNatom(ad);
+                Atom* atom2 = &ucell.atoms[T2];
+
+                tau2 = GridD.getAdjacentTau(ad);
+                dtau = tau2 - tau1;
+                double distance = dtau.norm() * ucell.lat0;
+                double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+
+                bool adj = false;
+
+                if(distance < rcut) adj = true;
+                else if(distance >= rcut)
+                {
+                    for(int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+                    {
+                        const int T0 = GridD.getType(ad0);
+                        const int I0 = GridD.getNatom(ad0);
+                        const int iat0 = ucell.itia2iat(T0, I0);
+                        const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+
+                        tau0 = GridD.getAdjacentTau(ad0);
+                        dtau1 = tau0 - tau1;
+                        dtau2 = tau0 - tau2;
+
+                        double distance1 = dtau1.norm() * ucell.lat0;
+                        double distance2 = dtau2.norm() * ucell.lat0;
+
+                        double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
+                        double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+
+                        if( distance1 < rcut1 && distance2 < rcut2 )
+                        {
+                            adj = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(adj)
+                {
+                    const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+
+                    Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z);
+                    R_x = (int) (dR.x - R_minX);
+                    R_y = (int) (dR.y - R_minY);
+                    R_z = (int) (dR.z - R_minZ);
+
+                    for(int ii=0; ii<atom1->nw*NPOL; ii++)
+                    {
+                        const int iw1_all = start + ii;
+                        const int mu = ParaO.trace_loc_row[iw1_all];
+
+                        if(mu<0)continue;
+
+                        for(int jj=0; jj<atom2->nw*NPOL; jj++)
+                        {
+                            int iw2_all = start2 + jj;
+                            const int nu = ParaO.trace_loc_col[iw2_all];
+
+                            if(nu<0)continue;
+
+                            int iic;
+                            if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                            {
+                                iic=mu+nu*ParaO.nrow;
+                            }
+                            else
+                            {
+                                iic=mu*ParaO.ncol+nu;
+                            }
+
+                            if(!NONCOLIN)
+                            {
+                                LM.SlocR_tr[R_x][R_y][R_z][iic] = LM.SlocR[index];
+                                LM.Hloc_fixedR_tr[R_x][R_y][R_z][iic] = LM.Hloc_fixedR[index];
+                            }
+                            else
+                            {
+                                LM.SlocR_tr_soc[R_x][R_y][R_z][iic] = LM.SlocR_soc[index];
+                                LM.Hloc_fixedR_tr_soc[R_x][R_y][R_z][iic] = LM.Hloc_fixedR_soc[index];
+                            }
+
+                            ++index;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return;
+}

@@ -67,7 +67,7 @@ void LCAO_nnr::cal_nnr(void)
 			tau1 = ucell.atoms[T1].tau[I1];
 			//GridD.Find_atom( tau1 );
 			GridD.Find_atom( tau1 ,T1, I1);
-			const int start1 = ucell.itiaiw2iwt(T1, I1, 0) * NPOL;
+			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 			this->nlocstart[iat] = nnr;
 			int nw1 = ucell.atoms[T1].nw * NPOL;
 
@@ -77,7 +77,7 @@ void LCAO_nnr::cal_nnr(void)
 				const int T2 = GridD.getType(ad);
 				const int I2 = GridD.getNatom(ad);
 				const int iat2 = ucell.itia2iat(T2, I2);
-				const int start2 = ucell.itiaiw2iwt(T2, I2, 0) * NPOL;
+				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 				int nw2 = ucell.atoms[T2].nw * NPOL;
 				//if(NONCOLIN) nw2 *= 2;
 
@@ -126,7 +126,7 @@ void LCAO_nnr::cal_nnr(void)
 						const int T0 = GridD.getType(ad0);
 						const int I0 = GridD.getNatom(ad0);
 						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;
+						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 					
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1; 
@@ -577,7 +577,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 			//GridD.Find_atom(tau1);
 			GridD.Find_atom(tau1, T1, I1);
 			Atom* atom1 = &ucell.atoms[T1];
-			const int start = ucell.itiaiw2iwt(T1,I1,0) * NPOL;
+			const int start = ucell.itiaiw2iwt(T1,I1,0);
 
 			// (2) search among all adjacent atoms.
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
@@ -601,7 +601,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 						const int T0 = GridD.getType(ad0); 
 						const int I0 = GridD.getNatom(ad0); 
 						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0) * NPOL;
+						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
@@ -624,7 +624,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 				if(adj) // mohan fix bug 2011-06-26, should not be '<='
 				{
 					// (3) calculate the nu of atom (T2, I2)
-					const int start2 = ucell.itiaiw2iwt(T2,I2,0) * NPOL;
+					const int start2 = ucell.itiaiw2iwt(T2,I2,0);
 					//------------------------------------------------
 					// exp(k dot dR)
 					// dR is the index of box in Crystal coordinates

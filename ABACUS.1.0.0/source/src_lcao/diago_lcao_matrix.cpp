@@ -172,7 +172,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
 	if(NONCOLIN)
 	{
-		int row = NLOCAL;
+		int row = GridT.lgd;
 		complex<double> tmp[row];
 		for(int ib=0; ib<NBANDS; ib++)
 		{

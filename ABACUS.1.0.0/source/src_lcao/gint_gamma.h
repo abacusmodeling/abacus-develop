@@ -9,6 +9,7 @@
 #include "grid_base_beta.h"
 #include "grid_technique.h"
 #include "lcao_matrix.h"
+#include <omp.h>
 //=========================================================
 //CLASS  Grid_Integral_Beta
 //Note : Integral On 3D Grids, different from Grid_Integral
@@ -39,6 +40,7 @@ private:
 	double* x12;
 	double* x03;
 	int *iq;
+omp_lock_t lock;
 
 	void save_atoms_on_grid(const Grid_Technique &gt);
 	
@@ -108,6 +110,18 @@ private:
 
     complex<double> Add_AA(complex<double> phase, double AAdr,
 			double psi1, double psi2);
+
+void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize, int* colidx, 
+        int** cal_flag, double* vldr3, double** psir_ylm, double** psir_vlbr3, 
+        int* vindex, int lgd_now, double** GridVlocal);
+void cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, int* colidx,
+                        int** cal_flag, double ** psir_ylm, double **psir_DM,
+                        double* psir_DM_pool, int* vindex);
+void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const;
+void cal_psir_ylm_rho(int size, int grid_index, double delta_r,
+        double** distance, double* ylma,
+        int* at, int* block_index, int* block_iw, int* block_size, 
+        int** cal_flag, double** psir_ylm);
 
 
 public:

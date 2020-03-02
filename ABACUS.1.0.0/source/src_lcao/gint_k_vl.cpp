@@ -150,7 +150,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 		const int it=ucell.iat2it[iat];
 		const int ia=ucell.iat2ia[iat];
 		const int start=ucell.itiaiw2iwt(it, ia, 0);
-		block_iw[id]=GridT.trace_lo[start];
+		block_iw[id]=GridT.trace_lo[start]/NPOL;
 		Atom* atom=&ucell.atoms[it];
 		block_size[id]=atom->nw;
 		block_index[id+1]=block_index[id]+atom->nw;
@@ -289,19 +289,19 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 
 			    if(cal_num>pw.bxyz/4)
 			    {
-    				if(iw1_lo<=iw2_lo)
-    				{
+    				//if(iw1_lo<=iw2_lo)
+    				//{
     			        k=pw.bxyz;
     					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
     						&psir_vlbr3[0][idx2], &LD_pool, 
     						&psir_ylm[0][idx1], &LD_pool,
     						&beta, &pvpR[iatw], &n);
-    				}
+    				//}
 				}
     			else
     			{
-        			if(iw1_lo<=iw2_lo)
-    				{
+        			//if(iw1_lo<=iw2_lo)
+    				//{
             			for(int ib=0; ib<pw.bxyz; ++ib)
             			{
                 			if(cal_flag[ib][ia1]&&cal_flag[ib][ia2])
@@ -313,7 +313,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
             						&beta, &pvpR[iatw], &n);	
                 			}
             			}
-        			}
+        			//}
     			}
 			}
 		}
@@ -539,7 +539,7 @@ void Gint_k::evaluate_pvpR_reduced(
         const int T1 = ucell.iat2it[iat];
         const int I1 = ucell.iat2ia[iat];
         const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
-		const int iw1_start = gt.trace_lo[start1];
+		const int iw1_start = gt.trace_lo[start1]/NPOL;
         Atom *atom1 = &ucell.atoms[T1];
 	
         //~~~~~~~~~~~~~~~~
@@ -582,7 +582,7 @@ void Gint_k::evaluate_pvpR_reduced(
                 Atom *atom2 = &ucell.atoms[T2];
                 const int I2 = ucell.iat2ia[iat2];
                 const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
-				const int iw2_start = gt.trace_lo[start2];
+				const int iw2_start = gt.trace_lo[start2]/NPOL;
 
 	            //~~~~~~~~~~~~~~~~
                 // get cell R2.
@@ -807,11 +807,11 @@ void Gint_k::evaluate_pvpR_full(const int &grid_index, const int &size, double**
 						double *psi1 = psir_ylm[ib][ia1];
 						double *psi2 = psir_ylm[ib][ia2];
 						
-						int iw1_lo = GridT.trace_lo[start1];
+						int iw1_lo = GridT.trace_lo[start1]/NPOL;
 						for (int iw=0; iw< atom1->nw; iw++)
 						{
 							const double vpsir1 = psi1[iw] * vldr3[ib];
-							int iw2_lo = GridT.trace_lo[start2];
+							int iw2_lo = GridT.trace_lo[start2]/NPOL;
 							double *ppp = this->pvpR[iw1_lo + dim1];
 							double *pppp = &ppp[iw2_lo+dim2];
 							double *pppp_end = &ppp[iw2_lo+dim2] + atom2->nw;

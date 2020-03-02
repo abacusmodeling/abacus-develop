@@ -10,6 +10,7 @@
 #include "src_lcao/lcao_orbitals.h"
 #include "src_pw/efield.h"
 #include "src_pw/vdwd2.h"
+#include "src_pw/vdwd3.h"
 #include "src_pw/chi0_hilbert.h"
 #include "src_pw/chi0_standard.h"
 #include "src_pw/epsilon0_pwscf.h"
@@ -200,7 +201,7 @@ void Input_Conv::Convert(void)
 	//DC_Info::dcny = INPUT.dc_ny;
 	//DC_Info::dcnz = INPUT.dc_nz;
 
-//----------------------------------------------------------
+/* //----------------------------------------------------------
 // about vdwD2									//Peize Lin add 2014-03-31
 //----------------------------------------------------------	
 	if(INPUT.vdwD2)
@@ -218,8 +219,70 @@ void Input_Conv::Convert(void)
 				vdwd2.radius = INPUT.vdwD2_radius * BOHR_TO_A;
 		else if(INPUT.vdwD2_model=="period")
 			vdwd2.period = INPUT.vdwD2_period;
+	} */
+//----------------------------------------------------------
+// about vdw									//jiyy add 2019-08-04
+//----------------------------------------------------------	
+	if(INPUT.vdw_method=="d2")
+	{
+		vdwd2.vdwD2 = true;
+		vdwd2.scaling = std::stod(INPUT.vdw_s6);
+		vdwd2.damping = INPUT.vdw_d;
+		vdwd2.C6_input(INPUT.vdw_C6_file, INPUT.vdw_C6_unit);
+		vdwd2.R0_input(INPUT.vdw_R0_file, INPUT.vdw_R0_unit);
+		vdwd2.model = INPUT.vdw_model;
+		if(INPUT.vdw_model=="radius")
+			if(INPUT.vdw_radius_unit=="Bohr")
+				vdwd2.radius = std::stod(INPUT.vdw_radius);
+			else
+				vdwd2.radius = std::stod(INPUT.vdw_radius) * BOHR_TO_A;
+		else if(INPUT.vdw_model=="period")
+			vdwd2.period = INPUT.vdw_period;
 	}
-
+    if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
+    {
+		vdwd3.vdwD3 = true;
+		vdwd3.s6 = std::stod(INPUT.vdw_s6);
+		vdwd3.s18 = std::stod(INPUT.vdw_s8);
+		vdwd3.rs6 = std::stod(INPUT.vdw_a1);
+		vdwd3.rs18 = std::stod(INPUT.vdw_a2);					
+		vdwd3.abc = INPUT.vdw_abc;
+		if(INPUT.vdw_method=="d3_0")
+		{
+			vdwd3.version = 1;
+		}
+		if(INPUT.vdw_method=="d3_bj")
+		{
+			vdwd3.version = 2;
+		}
+		vdwd3.model = INPUT.vdw_model;
+		if(INPUT.vdw_model=="radius")
+	    {
+			if(INPUT.vdw_radius_unit=="Bohr")
+			{
+			    vdwd3.rthr2 = pow(std::stod(INPUT.vdw_radius),2);
+			}
+			else
+			{
+				vdwd3.rthr2 = pow((std::stod(INPUT.vdw_radius) * BOHR_TO_A),2);       
+			}
+		    if(INPUT.vdw_cn_thr_unit=="Bohr")
+			{
+			    vdwd3.cn_thr2 = pow(INPUT.vdw_cn_thr,2);
+			}
+			else
+			{  
+				vdwd3.cn_thr2 = pow((INPUT.vdw_cn_thr * BOHR_TO_A),2);			
+			}
+		}
+		else if(INPUT.vdw_model=="period")
+		{
+			vdwd3.rep_vdw[0] = INPUT.vdw_period.x;
+			vdwd3.rep_vdw[1] = INPUT.vdw_period.y;
+			vdwd3.rep_vdw[2] = INPUT.vdw_period.z;
+		}
+	}
+    
 //----------------------------------------------------------
 // about spectrum                                                             // pengfei 2016-12-14
 //----------------------------------------------------------
@@ -497,6 +560,7 @@ void Input_Conv::Convert_FP(void)
 #ifdef __FP
 	LOC.out_dm = INPUT.out_dm;
 	ParaO.out_hs = INPUT.out_hs;
+	ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
 	ParaO.out_lowf = INPUT.out_lowf;
 #endif
 

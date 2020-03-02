@@ -104,7 +104,7 @@ void Parallel_Atoms::set_trace(int *trace_loc_row, int *trace_loc_col, int &nrow
 		{
 			if( this->keep_this_atom[iat] )
 			{
-				const int start = ucell.itiaiw2iwt(it, ia, 0)*NPOL;//zhengdy-soc
+				const int start = ucell.itiaiw2iwt(it, ia, 0);
 				for(int iw=0; iw<nw; iw++)
 				{
 					const int iw_all = iw+start;

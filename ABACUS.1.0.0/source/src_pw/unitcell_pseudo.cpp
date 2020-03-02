@@ -1361,7 +1361,7 @@ void UnitCell_pseudo::cal_nwfc()
 	this->iwt2iw = new int[NLOCAL];
 
 	this->itia2iat.create(ntype, namax);
-	this->itiaiw2iwt.create(ntype, namax, nwmax);
+	this->itiaiw2iwt.create(ntype, namax, nwmax*NPOL);
 	int iat=0;
 	int iwt=0;
 	for(int it = 0;it < ntype;it++)
@@ -1370,7 +1370,7 @@ void UnitCell_pseudo::cal_nwfc()
 		{
 			this->itia2iat(it, ia) = iat;
 			this->iat2ia[iat] = ia;
-			for(int iw=0; iw<atoms[it].nw; iw++)
+			for(int iw=0; iw<atoms[it].nw * NPOL; iw++)
 			{
 				this->itiaiw2iwt(it, ia, iw) = iwt;
 				this->iwt2iat[iwt] = iat;

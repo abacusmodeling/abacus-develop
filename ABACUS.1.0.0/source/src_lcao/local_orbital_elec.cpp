@@ -436,6 +436,9 @@ void Local_Orbital_Elec::scf(const int &istep)
 	
 		time_finish=std::time(NULL);
 		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
+double duration_time = difftime(time_finish, time_start);
+cout<<"Time_clock\t"<<"Time_time"<<endl;
+cout<<duration<<"\t"<<duration_time<<endl;
 
 		// (11) calculate the total energy.
 		en.calculate_etot();
@@ -872,10 +875,12 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 	}
 			
 	// delete at last time.
+	/*LiuXh modify 2019-07-15
 	if(!GAMMA_ONLY_LOCAL)
 	{
 		UHM.GK.destroy_pvpR();
 	}
+	LiuXh modify 2019-07-15*/
 	timer::tick("Local_Orbital_Elec","cal_bands",'E');
 	return;	
 }

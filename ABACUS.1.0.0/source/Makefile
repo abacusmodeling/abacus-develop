@@ -80,6 +80,8 @@ fp_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
 #==========================
 .cpp.o:
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} $< -o $@
+.f.o:
+	${FORTRAN} ${OPTS} -c ${HONG} $< -o $@	 
 
 .PHONY:clean
 clean:

@@ -561,7 +561,9 @@ void Local_Orbital_Charge::sum_bands(void)
             if(NEW_DM>0)
             {
                 //density matrix has already been calcualted.
+                timer::tick("LCAO_Charge","cal_dm_2d",'F');
                 wfc_dm_2d.cal_dm(wf.wg);        // Peize Lin test 2019-01-16
+                timer::tick("LCAO_Charge","cal_dm_2d",'F');
                 this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
             }
             else
@@ -706,7 +708,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, 
                     const int I2 = RA.info[ia1][ia2][4];
                     Atom* atom2 = &ucell.atoms[T2];
                     const int start2 = ucell.itiaiw2iwt(T2,I2,0);
-                    const int iw2_lo=gt.trace_lo[start2] + NLOCAL/NPOL*is2;
+                    const int iw2_lo=gt.trace_lo[start2]/NPOL + GridT.lgd/NPOL*is2;
                     const int nw2=atom2->nw;
                     complex<double> exp_R= exp( fac * (
                                 kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
@@ -778,7 +780,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 const int start1 = ucell.itiaiw2iwt(T1,I1,0);
                 const int gstart = LNNR.nlocstartg[iat];
                 const int ng = LNNR.nlocdimg[iat];
-                const int iw1_lo=gt.trace_lo[start1];
+                const int iw1_lo=gt.trace_lo[start1]/NPOL;
                 const int nw1=atom1->nw;
 
                 if(DM_ATOM_SIZE<ng)
@@ -858,7 +860,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 // transform dm_gamma[is].c to this->DM[is]
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
-    timer::tick("LCAO_Charge","newDM",'F');
+    //timer::tick("LCAO_Charge","newDM",'F');
+    timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
     OUT(ofs_running,"cal_dk_gamma_from_2D, NSPIN", NSPIN);
     for(int is=0; is<NSPIN; ++is)
     {
@@ -966,7 +969,8 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             ofs_running<<"=========================================\n";
         }
     }
-    timer::tick("LCAO_Charge","newDM",'F');
+    //timer::tick("LCAO_Charge","newDM",'F');
+    timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
 }
 //-------------------------------------------------------------
 //-------------------------------------------------------------

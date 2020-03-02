@@ -55,7 +55,13 @@ class LCAO_Matrix
 	complex<double>* HlocR_soc;
 	complex<double>* SlocR_soc;
 	complex<double>* Hloc_fixedR_soc;
-	
+	//LiuXh add 2019-07-15
+	double ****Hloc_fixedR_tr;
+	double ****SlocR_tr;
+	double ****HR_tr;
+	complex<double> ****Hloc_fixedR_tr_soc;
+	complex<double> ****SlocR_tr_soc;
+	complex<double> ****HR_tr_soc;	
 
 
 	//========================================
@@ -124,6 +130,8 @@ class LCAO_Matrix
 		const double& vz, const char &dtype);
 	void set_stress (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy,
 		const double& vz, const char &dtype, const Vector3<double> &dtau);
+	void set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const double &v);
+	void set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const complex<double> &v); //LiuXh add 2019-07-16
 
 	void zeros_HSgamma(const char &mtype);
 	void zeros_HSk(const char &mtype);
@@ -139,6 +147,11 @@ class LCAO_Matrix
 	void allocate_HS_k(const int &nloc);
 
 	void output_HSk(const char &mtype, string &fn);
+	//LiuXh add 2019-07-15
+	void allocate_Hloc_fixedR_tr(void);
+	void allocate_HR_tr(void);
+	void allocate_SlocR_tr(void);
+	void destroy_Hloc_fixedR_tr(void);
 
 };
 

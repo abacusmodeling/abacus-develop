@@ -1,0 +1,3 @@
+WANNIER_PARAMETERS
+rcut 10
+out_spillage 2
