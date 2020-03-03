@@ -5,7 +5,7 @@
 #include "grid_technique.h"
 #include "ylm.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 //#include <mkl_cblas.h>
 
 inline int find_offset(const int size, const int grid_index, 

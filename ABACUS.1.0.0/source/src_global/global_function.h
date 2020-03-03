@@ -129,23 +129,23 @@ void DONE(ofstream &ofs,const string &description, bool only_rank0 = false);
 // NAME : ZEROS
 // set elements of u as zero which u is 1_d complex array
 //==========================================================
-template<class T>
-inline void ZEROS(complex<T> *u,const int n)
+template<class T, class TI>
+inline void ZEROS(complex<T> *u,const TI n)		// Peize Lin change int to TI at 2020.03.03
 {
-    assert(n!=0);
+    assert(n>=0);
     assert(u!=0);
-    for (int i=0;i<n;i++)
+    for (TI i=0;i<n;i++)
     {
         u[i] = complex<T>(0.0,0.0);
     }
     return;
 }
 
-template<class T>
-inline void ZEROS(T *u,const int n)
+template<class T, class TI>
+inline void ZEROS(T *u,const TI n)		// Peize Lin change int to TI at 2020.03.03
 {
     assert(n>=0);
-    for (int i=0;i<n;i++)
+    for (TI i=0;i<n;i++)
     {
         u[i] = 0;
     }

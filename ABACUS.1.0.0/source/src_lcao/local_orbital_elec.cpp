@@ -148,8 +148,8 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		// mohan add 2010-07-16
 		// used for pulay mixing.
-		if(iter==1) chr.new_e_iteration = true;
-		else chr.new_e_iteration = false;
+		if(iter==1) chr.set_new_e_iteration(true);
+		else chr.set_new_e_iteration(false);
 
 		// set converged threshold, 
 		// automatically updated during self consistency, only for CG.

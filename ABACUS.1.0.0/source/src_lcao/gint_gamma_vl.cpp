@@ -2,7 +2,7 @@
 #include "grid_technique.h"
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 
 //#include <vector>
 
@@ -1021,7 +1021,7 @@ void Gint_Gamma::gamma_vlocal(void)
 
     // setup send buffer and receive buffer size
     // OUT(ofs_running, "Start transforming vlocal from grid distribute to 2D block");
-    if(chr.new_e_iteration)
+    if(chr.get_new_e_iteration())
     {
         timer::tick("Gint_Gamma","distri_vl_index",'K');
         // OUT(ofs_running, "Setup Buffer Parameters");

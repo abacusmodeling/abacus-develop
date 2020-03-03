@@ -1,6 +1,6 @@
 /*test generalized Stardand double precision symmetric eigenproblem*/
 #include "pdiag_double.h"
-#include "blas_interface.h"
+#include "src_global/lapack_connector.h"
 #include "src_pw/occupy.h"
 #include "src_pw/global.h"
 //#include "../src_pw/global.h"
@@ -18,6 +18,7 @@ extern "C"
 #include "GenELPA.h"
 #include "pdgseps.h"
 #include "pzgseps.h"
+#include "src_global/lapack_connector.h"
 #endif
 
 inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk, int lld, int *desc, int &mpi_comm_rows, int &mpi_comm_cols)
@@ -27,7 +28,6 @@ inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk,
     int myprow, mypcol;
     int *usermap=new int[nprows*npcols];
     int info=0;
-	
     for(int i=0; i<nprows; ++i)
     {
         for(int j=0; j<npcols; ++j)
@@ -426,7 +426,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
 
         Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"double");
         timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
-		dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
+		LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
 		pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
         timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
 
@@ -443,7 +443,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
 
         // the eigenvalues.
         //xiaohui modify 2014-06-15, move to the top
-        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        LapackConnector::copy(NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
         //=====================================
         // gather the eigenvectors and
@@ -462,9 +462,9 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
         double *eigen = new double[NLOCAL];
         ZEROS(eigen, NLOCAL);
 
-        int maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
-        MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
+        long maxnloc; // maximum number of elements in local matrix
+        MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
+        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
 		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
         double *work=new double[maxnloc]; // work/buffer matrix
         static int method;
@@ -476,11 +476,11 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
         int THIS_REAL_ELPA_KERNEL_API=12;
         int useQR=0;						// may be changed to input parameter sometime
 
-        if(chr.new_e_iteration)
+        if(chr.get_new_e_iteration())
         {
             timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
             method=0;
-        	dcopy_(&nloc, s_mat, &inc, Stmp, &inc);
+        	LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
             info=pdDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
                                         Stmp, eigen, wfc_2d.c, work,
                                         comm_2D_f, mpi_comm_rows, mpi_comm_cols,
@@ -496,7 +496,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
         timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
 
     	OUT(ofs_running,"K-S equation was solved by genelpa2");
-        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        LapackConnector::copy(NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 	    OUT(ofs_running,"eigenvalues were copied to ekb");
         if(NEW_DM==0)
@@ -520,7 +520,7 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
                     MPI_Cart_rank(comm_2D, coord, &src_rank);
                     if(myid==src_rank)
                     {
-                        dcopy_(&nloc, wfc_2d.c, &inc, work, &inc);
+                        LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
                         naroc[0]=nrow;
                         naroc[1]=ncol;
                     }
@@ -632,11 +632,11 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
         Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"cdouble");
 		int nbands_tmp = NBANDS;
         timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
-		zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
+		LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
     	pzgseps(comm_2D, NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
         timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
         // the eigenvalues.
-        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        LapackConnector::copy(NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         // Z is delete in gath_eig
@@ -650,9 +650,9 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
     {
         double *eigen = new double[NLOCAL];
         ZEROS(eigen, NLOCAL);
-        int maxnloc; // maximum number of elements in local matrix
-        MPI_Reduce(&nloc, &maxnloc, 1, MPI_INT, MPI_MAX, 0, comm_2D);
-        MPI_Bcast(&maxnloc, 1, MPI_INT, 0, comm_2D);
+        long maxnloc; // maximum number of elements in local matrix
+        MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
+        MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
 		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
         complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
         bool wantEigenVector=true;
@@ -662,7 +662,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
 
         int THIS_REAL_ELPA_KERNEL_API=9;
         timer::tick("Diago_LCAO_Matrix","genelpa",'G');
-        zcopy_(&nloc, cs_mat, &inc, Stmp, &inc);
+        LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
         int method=0;
         //info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
         //                      ch_mat, Stmp, eigen, wfc_2d.c, work,
@@ -685,7 +685,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
         timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
 
         // the eigenvalues.
-        dcopy_(&NBANDS, eigen, &inc, ekb, &inc);
+        LapackConnector::copy(NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
@@ -700,7 +700,7 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
                 MPI_Cart_rank(comm_2D, coord, &src_rank);
                 if(myid==src_rank)
                 {
-                    zcopy_(&nloc, wfc_2d.c, &inc, work, &inc);
+                    LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
                     naroc[0]=nrow;
                     naroc[1]=ncol;
                 }
@@ -809,7 +809,7 @@ void Pdiag_Double::readin(const string &fa, const string &fb, const int &nlocal_
     ofs_running << " loc_size = " << loc_size;
 
     /*Distribute the matrix*/
-    const int nloc = MatrixInfo.col_num * MatrixInfo.row_num;
+    const long nloc = MatrixInfo.col_num * MatrixInfo.row_num;
 
     double *A = new double[nloc];
     double *B = new double[nloc];

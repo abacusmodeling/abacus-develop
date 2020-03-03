@@ -143,8 +143,8 @@ class LCAO_Matrix
 	void update_Hloc2(void);
 
 	void allocate_HS_R(const int &nnr);
-	void allocate_HS_gamma(const int &nloc);
-	void allocate_HS_k(const int &nloc);
+	void allocate_HS_gamma(const long &nloc);
+	void allocate_HS_k(const long &nloc);
 
 	void output_HSk(const char &mtype, string &fn);
 	//LiuXh add 2019-07-15

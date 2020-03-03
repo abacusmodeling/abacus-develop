@@ -1,6 +1,6 @@
 #include "local_orbital_charge.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 
 //#include "../src_onscaling/on_tests.h"
 //#include "../src_siao/selinv.h"

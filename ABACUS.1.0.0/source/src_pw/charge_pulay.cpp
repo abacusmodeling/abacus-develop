@@ -278,6 +278,18 @@ void Charge_Pulay::Pulay_mixing(void)
 	return;		
 }
 
+void Charge_Pulay::set_new_e_iteration( const bool new_e_iteration_in )		// Peize Lin add 2018-11-01
+{
+	this->new_e_iteration = new_e_iteration_in;
+	
+	if(this->new_e_iteration)
+	{
+		irstep = 0;
+		idstep = 0;
+		totstep = 0;
+	}	
+}																									
+
 void Charge_Pulay::allocate_pulay(const int &scheme)
 {
 	//cout << "\n initp = " << initp << endl;

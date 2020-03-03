@@ -20,8 +20,9 @@
 #include <stdexcept>
 #include <iostream>
 #include <cassert>
-#include "complexmatrix.h"
 #include "matrix.h"
+#include "complexmatrix.h"
+#include "blas_connector.h"
 #include "src_global/global_function.h"
 
 
@@ -76,29 +77,6 @@ extern "C"
     void zgetri_(const int* n, complex<double> *A, const int *lda, int *ipiv, complex<double> *work, int *lwork, const int *info);
     void pdgetrf_(const int *m, const int *n, double *a, const int *ia, const int *ja, int *desca, int *ipiv, int *info);
 
-	// Peize Lin add ?axpy 2016-08-04, to compute y=a*x+y
-	void saxpy_(const int *N, const float *alpha, const float *X, const int *incX, float *Y, const int *incY);
-	void daxpy_(const int *N, const double *alpha, const double *X, const int *incX, double *Y, const int *incY);
-	void caxpy_(const int *N, const complex<float> *alpha, const complex<float> *X, const int *incX, complex<float> *Y, const int *incY);
-	void zaxpy_(const int *N, const complex<double> *alpha, const complex<double> *X, const int *incX, complex<double> *Y, const int *incY);
-	// Peize Lin add ?scal 2016-08-04, to compute x=a*x
-	void sscal_(const int *N, const float *alpha, float *X, const int *incX);
-	void dscal_(const int *N, const double *alpha, double *X, const int *incX);
-	void cscal_(const int *N, const complex<float> *alpha, complex<float> *X, const int *incX);
-	void zscal_(const int *N, const complex<double> *alpha, complex<double> *X, const int *incX);
-	// Peize Lin add ?dot 2017-10-27, to compute d=x*y
-	float sdot_(const int *N, const float *X, const int *incX, const float *Y, const int *incY);
-	double ddot_(const int *N, const double *X, const int *incX, const double *Y, const int *incY);
-	// Peize Lin add ?gemm 2017-10-27, to compute C = a * A.? * B.? + b * C 
-	void sgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
-		const float *alpha, const float *a, const int *lda, const float *b, const int *ldb, 
-		const float *beta, float *c, const int *ldc);
-	void dgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
-		const double *alpha, const double *a, const int *lda, const double *b, const int *ldb, 
-		const double *beta, double *c, const int *ldc);
-	void zgemm_(const char *transa, const char *transb, const int *m, const int *n, const int *k,
-		const complex<double> *alpha, const complex<double> *a, const int *lda, const complex<double> *b, const int *ldb, 
-		const complex<double> *beta, complex<double> *c, const int *ldc);
 	// Peize Lin add ?nrm2 2018-06-12, to compute out = ||x||_2 = \sqrt{ \sum_i x_i**2 }
 	float snrm2_( const int *N, const float *X, const int *incX );
 	double dnrm2_( const int *N, const double *X, const int *incX );
@@ -601,6 +579,17 @@ public:
 	{
 		return dznrm2_( &N, X, &incX );
 	}
+	
+	static inline
+	void copy(const long n, const double *a, const int incx, double *b, const int incy)
+	{
+		dcopy_(&n, a, &incx, b, &incy);
+	}
+	static inline
+	void copy(const long n, const complex<double> *a, const int incx, complex<double> *b, const int incy)
+	{
+		zcopy_(&n, a, &incx, b, &incy);
+	}	
 
 };
 #endif  // LAPACKCONNECTOR_HPP

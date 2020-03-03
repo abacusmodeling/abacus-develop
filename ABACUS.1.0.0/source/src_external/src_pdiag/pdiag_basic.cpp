@@ -2,6 +2,7 @@
 #include "../../src_parallel/parallel_common.h"
 #include "../../src_pw/global.h"
 #include "../../src_lcao/wf_local.h"
+#include "src_global/lapack_connector.h"
 
 Pdiag_Basic::Pdiag_Basic()
 {
@@ -435,7 +436,7 @@ void Pdiag_Basic::data_distribution(
             const int incx = 1;
             if (iarow==0&&iacol==0)
             {
-                dcopy_(&LM.col_num,val,&incx,&A[ai*LM.col_num],&incx);
+                LapackConnector::copy(LM.col_num,val,incx,&A[ai*LM.col_num],incx);
                 for (int i=1; i<dim[1]; i++)
                 {
 //					ofs_running << " send to processor " << iarow*dim[1]+i << endl;

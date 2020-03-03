@@ -3,7 +3,7 @@
 #include "global.h"
 #include "algorithms.h"
 #include "hamilt_pw.h"
-#include "../src_external/src_pdiag/blas_interface.h"
+#include "src_global/blas_connector.h"
 #include "optical.h" // only get judgement to calculate optical matrix or not.
 
 #ifdef __EPM

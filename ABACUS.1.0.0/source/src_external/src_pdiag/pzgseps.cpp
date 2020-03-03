@@ -1,6 +1,7 @@
 //column-circle decomposition
 #include "pzgseps.h"
 #include "../../src_parallel/parallel_reduce.h"
+#include "src_global/lapack_connector.h"
 
 #include "pzheg2st.h"
 #include "pdstebz.h"
@@ -89,8 +90,8 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 //	for (i=0;i<n;i++)
 //		printf("\neigen[%d]=%lf,diag[%d]=%lf,off_diag[%d]=%lf ",i,eigen[i],i,diag[i],i,off_diag[i]);
 
-	dcopy_(&n,diag,&incx,D,&incx);
-	dcopy_(&n,off_diag,&incx,E,&incx);
+	LapackConnector::copy(n,diag,incx,D,incx);
+	LapackConnector::copy(n,off_diag,incx,E,incx);
 
 	pdstebz(comm_2D,diag,off_diag,eigen,n);
 

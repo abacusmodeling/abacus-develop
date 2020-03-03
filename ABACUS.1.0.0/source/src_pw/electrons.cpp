@@ -169,8 +169,8 @@ void electrons::self_consistent(const int &istep)
 		<< "  ELEC=" << setw(4) << iter 
 		<< "--------------------------------\n";
 		// mohan add 2010-07-16
-		if(iter==1) chr.new_e_iteration = true;
-		else chr.new_e_iteration = false;
+		if(iter==1) chr.set_new_e_iteration(true);
+		else chr.set_new_e_iteration(false);
 
 		// record the start time.
         start=std::clock();
