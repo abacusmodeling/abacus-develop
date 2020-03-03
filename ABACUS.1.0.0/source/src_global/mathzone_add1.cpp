@@ -21,8 +21,8 @@ typedef fftw_complex FFTW_COMPLEX;
 #include <omp.h>
 
 bool Mathzone_Add1::flag_jlx_expand_coef = false;
-double** Mathzone_Add1::c_ln_c = new double*[1];
-double** Mathzone_Add1::c_ln_s = new double*[1];
+double** Mathzone_Add1::c_ln_c = nullptr;
+double** Mathzone_Add1::c_ln_s = nullptr;
 
 Mathzone_Add1::Mathzone_Add1()
 {
@@ -336,7 +336,7 @@ void Mathzone_Add1::Sph_Bes (double x, int lmax, double *sb, double *dsb)
 	timer::tick("Mathzone_Add1","Spherical_Bessel");
 	
   	int m, n, nmax;
-  	double j0, j1, j0p, j1p, sf, tmp, si, co, ix, ix2;
+  	double j0, j1, sf, tmp, si, co, ix;	// j0p, j1p, ix2
 
   	if (x < 0.0)
 	{
@@ -399,7 +399,7 @@ void Mathzone_Add1::Sph_Bes (double x, int lmax, double *sb, double *dsb)
     	si = sin(x);
   	  	co = cos(x);
     	ix = 1.0/x;
-    	ix2 = ix*ix;
+    	//ix2 = ix*ix;
     	j0 = si*ix;
     	j1 = si*ix*ix - co*ix;
 
@@ -542,10 +542,9 @@ void Mathzone_Add1::Sbt_new
 		
 		//coef for interpolation
 		int ct = 0;
-		double ft_save, dft_save;
 
-		ft_save = fourier_cosine_transform (fr2, r, mshr, dr, k[0]);
-		dft_save = -fourier_sine_transform (fr3, r, mshr, dr, k[0]);
+		double ft_save = fourier_cosine_transform (fr2, r, mshr, dr, k[0]);
+		double dft_save = -fourier_sine_transform (fr3, r, mshr, dr, k[0]);
 		
 		for (int ik = 0; ik < mshk-1; ik++)
 		{
@@ -555,16 +554,13 @@ void Mathzone_Add1::Sbt_new
 			double ft1 = fourier_cosine_transform (fr2, r, mshr, dr, k[ik+1]);
 			double dft1 = -fourier_sine_transform (fr3, r, mshr, dr, k[ik+1]);
 
-			double d2k, d3k;
-			d2k = dk*dk;
-			d3k = d2k*dk;
-
-			double c0, c1, c2, c3;
+			//double d2k = dk*dk;
+			//double d3k = d2k*dk;
 				
-			c0 = ft0;
-			c1 = dft0;
-			c2 = 3.0*(ft1-ft0)/dk/dk-(dft1+2.0*dft0)/dk;
-			c3 = (-2.0*(ft1-ft0)/dk+(dft1+dft0))/dk/dk;
+			double c0 = ft0;
+			double c1 = dft0;
+			double c2 = 3.0*(ft1-ft0)/dk/dk-(dft1+2.0*dft0)/dk;
+			double c3 = (-2.0*(ft1-ft0)/dk+(dft1+dft0))/dk/dk;
 				
 			double k2 = k[ik]*k[ik];
 			double k3 = k2*k[ik];
@@ -1229,8 +1225,8 @@ double Mathzone_Add1::Uni_RadialF
 
   	if (newr < 0.0)
   	{  
-		cout << " newr should >= 0" << endl;
-	  	QUIT ();
+		throw runtime_error("newr should >= 0. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+
   	}
   	else if ( rmax <= newr	) 
 	{

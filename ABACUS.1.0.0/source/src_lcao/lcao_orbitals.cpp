@@ -297,7 +297,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	const int nproj_allowed = atom->lmax + 1;	
+	//const int nproj_allowed = atom->lmax + 1;	
 	//matrix Coefficient_D_in(nproj_allowed, nproj_allowed); //LiuXh 2016-01-14
 	matrix Coefficient_D_in(n_projectors, n_projectors); //LiuXh 2016-01-14
 	ComplexMatrix Coefficient_D_in_so(N_PROJECTORS*2, N_PROJECTORS*2);//zhengdy-soc

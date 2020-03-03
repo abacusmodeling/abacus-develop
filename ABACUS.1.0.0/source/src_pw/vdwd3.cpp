@@ -6,14 +6,14 @@
 #include<algorithm>
 
 Vdwd3::Vdwd3( const UnitCell_pseudo &unitcell):
-        ucell(unitcell),
-		init_set(false),
+	    energy_result(0),
 		noabc(true),
+		alp(14.0),
 		max_elem(94),
 		maxc(5),
 		nline(32385),
-		alp(14.0),
-	    energy_result(0)
+        ucell(unitcell),
+		init_set(false)
 {	
 	disp = 0.0;
 	init_C6_tmp();

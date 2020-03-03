@@ -40,7 +40,7 @@ const vector<vector<double>> & Sph_Bessel_Recursive::D1::cal_jlx( const int lmax
 
 void Sph_Bessel_Recursive::D1::cal_jlx_0( const int l_size )
 {
-	if(jlx.size()<l_size)
+	if(jlx.size() < static_cast<size_t>(l_size))
 		jlx.resize(l_size);
 	
 	for( int l=0; l!=l_size; ++l )
@@ -58,12 +58,11 @@ void Sph_Bessel_Recursive::D1::cal_jlx_0( const int l_size )
 
 void Sph_Bessel_Recursive::D1::cal_jlx_smallx( const int l_size, const size_t ix_size )
 {
-	if(jlx.size()<l_size)
+	if(jlx.size() < static_cast<size_t>(l_size))
 		jlx.resize(l_size);
 	
 	for( int l=0; l!=l_size; ++l )
 	{
-timeval t_start; gettimeofday( &t_start, NULL);
 		if(jlx[l].size()<ix_size)
 		{
 			const double coeff = sqrt(PI)/tgamma(l+1.5)/pow(2,l+1);
@@ -71,7 +70,6 @@ timeval t_start; gettimeofday( &t_start, NULL);
 			
 			const size_t ix_size_begin = static_cast<int>(jlx[l].size());
 			const size_t ix_size_end = min( ix_size, static_cast<size_t>(smallx_range/dx) );
-cout<<l<<"\t"<<coeff<<"\t"<<smallx_range<<"\t"<<ix_size_end<<endl;
 			if(jlx[l].size()<ix_size_end)
 			{
 				jlx[l].resize(ix_size_end);
@@ -82,19 +80,16 @@ cout<<l<<"\t"<<coeff<<"\t"<<smallx_range<<"\t"<<ix_size_end<<endl;
 				}
 			}
 		}
-timeval t_end; gettimeofday( &t_end, NULL);
-cout<<"TIME@Sph_Bessel_Recursive::cal_jlx_smallx"<<"\t"<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<endl;
 	}	
 }
 
 void Sph_Bessel_Recursive::D1::cal_jlx_recursive( const int l_size, const size_t ix_size )
 {
-	if(jlx.size()<l_size)
+	if(jlx.size() < static_cast<size_t>(l_size))
 		jlx.resize(l_size);
 	
 	for( int l=0; l!=l_size; ++l )
 	{
-timeval t_start; gettimeofday( &t_start, NULL);
 		if(jlx[l].size()<ix_size)
 		{
 			const size_t ix_size_begin = static_cast<int>(jlx[l].size());
@@ -125,8 +120,6 @@ timeval t_start; gettimeofday( &t_start, NULL);
 					break;
 			}
 		}
-timeval t_end; gettimeofday( &t_end, NULL);
-cout<<"TIME@Sph_Bessel_Recursive::cal_jlx_recursive"<<"\t"<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<endl;
 	}
 }
 

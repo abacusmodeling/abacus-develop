@@ -126,8 +126,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     if (bit)
     {
 #ifdef __MPI
-        FILE *g1;
-        FILE *g2;
+        FILE *g1 = nullptr;
+        FILE *g2 = nullptr;
 
         if (DRANK==0)
         {
@@ -263,7 +263,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
             delete[] lineS;
         }
 
-        if (DRANK==0);
+        //if (DRANK==0);
+        if (DRANK==0)		// Peize Lin delete ; at 2020.01.31
         {
             g1.close();
             g2.close();
@@ -382,8 +383,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
     if (bit)
     {
 #ifdef __MPI
-        FILE *g1;
-        FILE *g2;
+        FILE *g1 = nullptr;
+        FILE *g2 = nullptr;
 
         if (DRANK==0)
         {
@@ -519,7 +520,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
             delete[] lineS;
         }
 
-        if (DRANK==0);
+        //if (DRANK==0);
+        if (DRANK==0)			// Peize Lin delete ; at 2020.01.31
         {
             g1.close();
             g2.close();
@@ -635,7 +637,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     double R_minY = GridD.getD_minY();
     double R_minZ = GridD.getD_minZ();
 
-    int dRx, dRy, dRz;
+    //int dRx, dRy, dRz;
 
     for(int ix=0; ix<R_x; ix++)
     {
@@ -654,10 +656,10 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                 {
                     //double* lineH = new double[NLOCAL-i];
                     //double* lineS = new double[NLOCAL-i];
-                    double* lineH;
-                    double* lineS;
-                    complex<double>* lineH_soc;
-                    complex<double>* lineS_soc;
+                    double* lineH = nullptr;
+                    double* lineS = nullptr;
+                    complex<double>* lineH_soc = nullptr;
+                    complex<double>* lineS_soc = nullptr;
                     if(!NONCOLIN)
                     {
                         lineH = new double[NLOCAL];
@@ -781,7 +783,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
             }
         }
     }
-    if(DRANK==0);
+    //if(DRANK==0);
+    if(DRANK==0)				// Peize Lin delete ; at 2020.01.31
     {
         g1.close();
         g2.close();

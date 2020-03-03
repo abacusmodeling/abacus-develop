@@ -52,7 +52,7 @@ void Center2_Orb::Orb11::init_radial_table( const set<size_t> &radials )
 	const int LA = nA.getL();
 	const int LB = nB.getL();
 	
-	const int rmesh = MOT.get_rmesh(nA.getRcut(),nB.getRcut());
+	const size_t rmesh = MOT.get_rmesh(nA.getRcut(),nB.getRcut());
 	
 	set<size_t> radials_used;
 	for( const size_t &ir : radials )

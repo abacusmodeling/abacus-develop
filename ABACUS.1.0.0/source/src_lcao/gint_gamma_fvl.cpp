@@ -2,7 +2,7 @@
 #include "grid_technique.h"
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 
 void Gint_Gamma::cal_force(const double* vlocal_in)
 {

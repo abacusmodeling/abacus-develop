@@ -295,8 +295,8 @@ void XC_Functional::slater_rxc(const double &rs, double &ex, double &vx)
 {
 	static const double pi = 3.14159265358979;
     const double trd = 1.0 / 3.0;
-    const double ftrd = 4.0 / 3.0;
-    const double tftm = pow(2.0, ftrd) - 2.0;
+    //const double ftrd = 4.0 / 3.0;
+    //const double tftm = pow(2.0, ftrd) - 2.0;
     const double a0 = pow((4.0 / (9.0 * pi)), trd);
     // X-alpha parameter:
     const double alp = 2 * trd;
@@ -574,12 +574,12 @@ void XC_Functional::pw_spin( const double &rs, const double &zeta,
     const double b2 = 3.58760;
     const double b3 = 1.63820;
     const double b4 = 0.492940;
-    const double c0 = a;
-    const double c1 = 0.0466440;
-    const double c2 = 0.006640;
-    const double c3 = 0.010430;
-    const double d0 = 0.43350;
-    const double d1 = 1.44080;
+    //const double c0 = a;
+    //const double c1 = 0.0466440;
+    //const double c2 = 0.006640;
+    //const double c3 = 0.010430;
+    //const double d0 = 0.43350;
+    //const double d1 = 1.44080;
 	// polarized parameters
     const double ap = 0.0155450;
     const double a1p = 0.205480;
@@ -587,12 +587,12 @@ void XC_Functional::pw_spin( const double &rs, const double &zeta,
     const double b2p = 6.19770;
     const double b3p = 3.36620;
     const double b4p = 0.625170;
-    const double c0p = ap;
-    const double c1p = 0.0255990;
-    const double c2p = 0.003190;
-    const double c3p = 0.003840;
-    const double d0p = 0.32870;
-    const double d1p = 1.76970;
+    //const double c0p = ap;
+    //const double c1p = 0.0255990;
+    //const double c2p = 0.003190;
+    //const double c3p = 0.003840;
+    //const double d0p = 0.32870;
+    //const double d1p = 1.76970;
 	// antiferro
     const double aa = 0.0168870;
     const double a1a = 0.111250;
@@ -600,12 +600,12 @@ void XC_Functional::pw_spin( const double &rs, const double &zeta,
     const double b2a = 3.62310;
     const double b3a = 0.880260;
     const double b4a = 0.496710;
-    const double c0a = aa;
-    const double c1a = 0.0354750;
-    const double c2a = 0.001880;
-    const double c3a = 0.005210;
-    const double d0a = 0.22400;
-    const double d1a = 0.39690;
+    //const double c0a = aa;
+    //const double c1a = 0.0354750;
+    //const double c2a = 0.001880;
+    //const double c3a = 0.005210;
+    //const double d0a = 0.22400;
+    //const double d1a = 0.39690;
 
 	const double fz0 = 1.7099210;
 	double rs12, rs32, rs2, zeta2, zeta3, zeta4, fz, dfz;
@@ -1066,7 +1066,7 @@ void XC_Functional::wcx(const double &rho,const double &grho, double &sx, double
   // exchange energy gradient part
   double dxunif, dfx, f1, f2, f3, dfx1, x1, x2, x3, dxds1, dxds2, dxds3;
   // numerical coefficients (NB: c2=(3 pi^2)^(1/3) )
-  double third, c1, c2, c5, c6, teneightyone;
+  double third, c1, c2, c5, teneightyone;	// c6
   
   third = 1.0/3.0;
   c1 = 0.75/PI;

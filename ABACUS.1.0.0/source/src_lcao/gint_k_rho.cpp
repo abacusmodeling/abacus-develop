@@ -5,7 +5,7 @@
 #include "grid_technique.h"
 #include "ylm.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 
 inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
 {				

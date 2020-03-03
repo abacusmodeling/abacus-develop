@@ -168,7 +168,8 @@ void DC_Driv::reading(void)
 			if(COLOUR && MY_RANK==0)
 			{
 				// red
-				printf( "\e[31m%-16s\e[0m", "Gamma");
+				//printf( "\e[31m%-16s\e[0m", "Gamma");
+				printf( "[31m%-16s[0m", "Gamma");
 			}
 			else
 			{
@@ -180,7 +181,8 @@ void DC_Driv::reading(void)
 			if(COLOUR && MY_RANK==0)
 			{
 				// zi
-				printf( "\e[35m%-16d\e[0m", kv.nkstot);
+				//printf( "\e[35m%-16d\e[0m", kv.nkstot);
+				printf( "[35m%-16d[0m", kv.nkstot);
 			}
 			else
 			{
@@ -213,7 +215,8 @@ void DC_Driv::reading(void)
 			if(COLOUR && MY_RANK==0)
 			{
 				string a = "Use Systematically Improvable Atomic bases";
-				printf( " \e[36m%-45s\e[0m\n", a.c_str());
+				//printf( " \e[36m%-45s\e[0m\n", a.c_str());
+				printf( " [36m%-45s[0m\n", a.c_str());
 			}
 			else
 			{
@@ -259,7 +262,8 @@ void DC_Driv::reading(void)
 		{
 			if(COLOUR && MY_RANK==0)
 			{
-				printf( " \e[36m%-8s\e[0m", ucell.atoms[it].label.c_str());
+				//printf( " \e[36m%-8s\e[0m", ucell.atoms[it].label.c_str());
+				printf( " [36m%-8s[0m", ucell.atoms[it].label.c_str());
 			}
 			else
 			{
@@ -303,8 +307,10 @@ void DC_Driv::reading(void)
 
 				if(COLOUR && MY_RANK==0)
 				{
-					printf( "\e[36m%-16s\e[0m", orb.str().c_str());
-					printf( "\e[36m%-12d\e[0m", norb);
+					//printf( "\e[36m%-16s\e[0m", orb.str().c_str());
+					//printf( "\e[36m%-12d\e[0m", norb);
+					printf( "[36m%-16s[0m", orb.str().c_str());
+					printf( "[36m%-12d[0m", norb);
 				}
 				else
 				{

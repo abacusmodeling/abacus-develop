@@ -864,8 +864,8 @@ bool UnitCell_pseudo::check_tau(void)const
 		for(int I1=0; I1< this->atoms[T1].na; I1++)
 		{	
 			double shortest_norm = 10000.0; // a large number
-			int nearest_atom_type = 0;
-			int nearest_atom_index = 0;
+			//int nearest_atom_type = 0;
+			//int nearest_atom_index = 0;
 			for(int T2=0; T2<this->ntype; T2++)
 			{
 				for(int I2=0; I2<this->atoms[T2].na; I2++)
@@ -873,8 +873,8 @@ bool UnitCell_pseudo::check_tau(void)const
 					if(T1==T2 && I1==I2)
 					{
 						shortest_norm = 0.0;
-						nearest_atom_type = T1;
-						nearest_atom_index = I2;
+						//nearest_atom_type = T1;
+						//nearest_atom_index = I2;
 						// self atom
 					}
 					else
@@ -884,8 +884,8 @@ bool UnitCell_pseudo::check_tau(void)const
 						if( shortest_norm > norm )
 						{
 							shortest_norm = norm;
-							nearest_atom_type = T2;
-							nearest_atom_index = I2;
+							//nearest_atom_type = T2;
+							//nearest_atom_index = I2;
 						}
 						if( norm < tolerence_bohr ) // unit is Bohr
 						{	

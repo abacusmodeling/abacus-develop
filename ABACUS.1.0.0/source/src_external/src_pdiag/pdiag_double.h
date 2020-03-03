@@ -14,7 +14,7 @@ class Pdiag_Double : public Pdiag_Basic
 
 	int nrow;
 	int ncol;
-	int nloc;
+	long nloc;
 
 #ifdef __MPI
     int blacs_ctxt;

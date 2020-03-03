@@ -2,7 +2,7 @@
 #include "grid_technique.h"
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 #include <mkl_service.h>
 
 //inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
@@ -337,10 +337,10 @@ double Gint_Gamma::gamma_charge_B(void)
         nnnmax = max(nnnmax, nnn[T]);
     }
 
-    double*** dr; // vectors between atom and grid: [bxyz, maxsize, 3]
-    double** distance; // distance between atom and grid: [bxyz, maxsize]
-    double*** psir_ylm;
-    bool** cal_flag;
+    double*** dr = nullptr; // vectors between atom and grid: [bxyz, maxsize, 3]
+    double** distance = nullptr; // distance between atom and grid: [bxyz, maxsize]
+    double*** psir_ylm = nullptr;
+    bool** cal_flag = nullptr;
     if(max_size!=0)
     {
         dr = new double**[pw.bxyz];
@@ -367,6 +367,10 @@ double Gint_Gamma::gamma_charge_B(void)
             }
         }
     }
+	else
+	{
+		throw runtime_error("may error without new ptr? "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));    // Peize Lin add at 2020.01.30
+	}
 
     double* ylma = new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
     ZEROS(ylma, nnnmax);
@@ -410,7 +414,7 @@ double Gint_Gamma::gamma_charge_B(void)
                     int iat = GridT.which_atom[mcell_index];
 
                     const int it = ucell.iat2it[ iat ];
-                    const int ia = ucell.iat2ia[ iat ];
+                    //const int ia = ucell.iat2ia[ iat ];
 
                     // meshball_positions should be the bigcell position in meshball
                     // to the center of meshball.
@@ -734,7 +738,7 @@ double Gint_Gamma::gamma_charge(void)
         double** distance; // distance between atom and grid: [bxyz, maxsize]
         // set up band matrix psir_ylm and psir_DM
         int LD_pool=max_size*ucell.nwmax;
-        int nblock;
+        //int nblock;
         int *block_size; //band size: number of columns of a band
         int *at;
         int *block_index;
@@ -771,7 +775,7 @@ double Gint_Gamma::gamma_charge(void)
         double* ylma = new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
         ZEROS(ylma, nnnmax);
     
-        double v1 = 0.0;
+        //double v1 = 0.0;
         int* vindex=new int[pw.bxyz];
         ZEROS(vindex, pw.bxyz);
     

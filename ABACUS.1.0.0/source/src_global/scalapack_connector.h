@@ -40,7 +40,7 @@ extern "C"
 		const int *M, const int *N, 
 		complex<double> *A, const int *IA, const int *JA, const int *DESCA,
 		int *ipiv,  int *info);
-};
+}
 
 /*
 class ScalapackConnector

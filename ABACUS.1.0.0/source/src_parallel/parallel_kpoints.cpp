@@ -185,7 +185,7 @@ void Parallel_Kpoints::get_startk_pool(const int &nkstot)
 {
     delete[] startk_pool;
     startk_pool = new int[NPOOL];
-    const int remain = nkstot%NPOOL;
+    //const int remain = nkstot%NPOOL;
 
     startk_pool[0] = 0;
     for (int i=1; i<NPOOL; i++)

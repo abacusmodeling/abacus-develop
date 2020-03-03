@@ -16,7 +16,7 @@ using namespace std;
 // EXPLAIN :   
 //----------------------------------------------------------
 bool timer::disabled = false;
-int timer::n_now = 0;
+size_t timer::n_now = 0;
 map<string,map<string,timer::Timer_One>> timer::timer_pool;
 
 void timer::finish(ofstream &ofs,const bool print_flag)

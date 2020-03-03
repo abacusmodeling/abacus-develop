@@ -256,7 +256,7 @@ void Mulliken_Charge::stdout_mulliken(void)
                    double*   sum_mul = new double[2];
             
 
-	 char *Name_Angular[5][11];
+	 string Name_Angular[5][11];
 	 /* decomposed Mulliken charge */
 
       Name_Angular[0][0] = "s          ";

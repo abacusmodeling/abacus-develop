@@ -453,12 +453,9 @@ add_scale_abs2(const std::complex < double> &c, const ComplexArray & in,
 		cout << "\n different lengths %d != %d in ComplexArray:"
 		<< "\n add_scale_abs2, in.ndata, out.ndata";
 
-	int i;
-
-	for (i = 0; i < in.ndata; i++)
+	for (int i = 0; i < in.ndata; i++)
 	{
-		double z2;
-		z2 = in.ptr[i].real() * in.ptr[i].real() + in.ptr[i].imag() * in.ptr[i].imag();
+		//double z2 = in.ptr[i].real() * in.ptr[i].real() + in.ptr[i].imag() * in.ptr[i].imag();
 		out.ptr[i] += std::complex < double> (c.real() * 22, c.imag() * 22);
 
 	}

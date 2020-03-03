@@ -216,7 +216,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma_B(void)
 
 	LM.zeros_HSk('T');
 
-	time_t time_vnl_start = time(NULL);
+	//time_t time_vnl_start = time(NULL);
 	if(VNL_IN_H)
 	{
 		bfid.cal_A_of_Atom();
@@ -225,9 +225,9 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma_B(void)
 		// calculate nonlocal
 		bfid.calculate_NL_B();
 	}
-	time_t time_vnl_end = time(NULL);
+	//time_t time_vnl_end = time(NULL);
 
-	time_t time_t_start = time(NULL);
+	//time_t time_t_start = time(NULL);
 	if(T_IN_H)
 	{
 		// calculate T
@@ -241,7 +241,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma_B(void)
 		}
 //		LM.print_HSk('T','R');
 	}
-	time_t time_t_end = time(NULL);
+	//time_t time_t_end = time(NULL);
 	return;
 }
 
@@ -478,7 +478,7 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
 {
     TITLE("Use_Hamilt_Matrix","calculate_STN_R");
 
-    int iat = 0;
+    //int iat = 0;
     int index = 0;
     Vector3<double> dtau, tau1, tau2;
     Vector3<double> dtau1, dtau2, tau0;
@@ -525,9 +525,9 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
                     for(int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
                     {
                         const int T0 = GridD.getType(ad0);
-                        const int I0 = GridD.getNatom(ad0);
-                        const int iat0 = ucell.itia2iat(T0, I0);
-                        const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+                        //const int I0 = GridD.getNatom(ad0);
+                        //const int iat0 = ucell.itia2iat(T0, I0);
+                        //const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
                         tau0 = GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;

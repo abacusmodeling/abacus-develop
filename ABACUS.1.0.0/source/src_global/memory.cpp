@@ -32,7 +32,7 @@ Memory::~Memory()
 {
 }
 
-double Memory::calculate_mem(const int &n_in,const string &type)
+double Memory::calculate_mem(const long &n_in,const string &type)
 {
 	double n = static_cast<double>(n_in);
 	double mem = 0.0;
@@ -90,7 +90,7 @@ double Memory::record
 (
  	const string &class_name_in,
 	const string &name_in,
-	const int &n_in,
+	const long &n_in,
 	const string &type,
 	const bool accumulate
 )

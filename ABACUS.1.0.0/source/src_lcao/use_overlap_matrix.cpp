@@ -225,9 +225,9 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 					for (int ad0=0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
 					{
 						const int T0 = GridD.getType(ad0);
-						const int I0 = GridD.getNatom(ad0);
-						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int I0 = GridD.getNatom(ad0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
 						double distance1 = dtau1.norm() * ucell.lat0;
@@ -295,7 +295,7 @@ void Use_Overlap_Matrix::test_Nonlocal()
         {
             //GridD.Find_atom( atom1->tau[I1] );
             GridD.Find_atom( atom1->tau[I1] ,T1, I1);
-			const int iat1 = ucell.itia2iat(T1, I1);
+			//const int iat1 = ucell.itia2iat(T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
             tau1 = atom1->tau[I1];
 
@@ -306,7 +306,7 @@ void Use_Overlap_Matrix::test_Nonlocal()
 				const Atom* atom2 = &ucell.atoms[T2];
                 
 				const int I2 = GridD.getNatom(ad2);
-				const int iat2 = ucell.itia2iat(T2, I2);
+				//const int iat2 = ucell.itia2iat(T2, I2);
                 const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
                 tau2 = GridD.getAdjacentTau(ad2);
 
@@ -332,8 +332,8 @@ void Use_Overlap_Matrix::test_Nonlocal()
 							{
 								const int T0 = GridD.getType(ad0);
 								if( ORB.nproj[T0] == 0) continue; 
-								const int I0 = GridD.getNatom(ad0);
-								const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+								//const int I0 = GridD.getNatom(ad0);
+								//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 								tau0 = GridD.getAdjacentTau(ad0);
 
 								dtau_10 = tau0 - tau1;
@@ -432,7 +432,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
         {
             //GridD.Find_atom( atom1->tau[I1] );
             GridD.Find_atom( atom1->tau[I1] ,T1, I1);
-			const int iat1 = ucell.itia2iat(T1, I1);
+			//const int iat1 = ucell.itia2iat(T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
             tau1 = atom1->tau[I1];
 
@@ -443,7 +443,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 				const Atom* atom2 = &ucell.atoms[T2];
                 
 				const int I2 = GridD.getNatom(ad2);
-				const int iat2 = ucell.itia2iat(T2, I2);
+				//const int iat2 = ucell.itia2iat(T2, I2);
                 const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
                 tau2 = GridD.getAdjacentTau(ad2);
 
@@ -460,11 +460,11 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
                     for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
                     {
 						const int T0 = GridD.getType(ad0);
-						const int I0 = GridD.getNatom(ad0);
-            //            const int T0 = RA.info[iat1][ad0][3];
-              //          const int I0 = RA.info[iat1][ad0][4];
-                        const int iat0 = ucell.itia2iat(T0, I0);
-                        const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int I0 = GridD.getNatom(ad0);
+						//const int T0 = RA.info[iat1][ad0][3];
+						//const int I0 = RA.info[iat1][ad0][4];
+                        //const int iat0 = ucell.itia2iat(T0, I0);
+                        //const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
                         tau0 = GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;
@@ -514,8 +514,8 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 								// mohan add 2010-12-19
 								if( ORB.nproj[T0] == 0) continue; 
 
-								const int I0 = GridD.getNatom(ad0);
-								const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+								//const int I0 = GridD.getNatom(ad0);
+								//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 								tau0 = GridD.getAdjacentTau(ad0);
 
 								dtau1 = tau0 - tau1;
@@ -529,7 +529,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 
 								if(distance1 < rcut1 && distance2 < rcut2)
 								{
-									const Atom* atom0 = &ucell.atoms[T0];
+									//const Atom* atom0 = &ucell.atoms[T0];
 									double nlm[3]={0,0,0};
 									complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
 									complex<double> *nlm2 = NULL;

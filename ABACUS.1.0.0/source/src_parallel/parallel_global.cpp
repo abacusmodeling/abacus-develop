@@ -61,8 +61,8 @@ void Parallel_Global::split_diag_world(const int &diag_np)
 
 	// color: same color will stay in same group.
 	// key: rank in each fragment group.
-	int color;
-	int key;
+	int color = -1;		// Peize Lin add initialization for compiler warning at 2020.01.31
+	int key = -1;		// Peize Lin add initialization for compiler warning at 2020.01.31
 	
 	int np_now = 0;
 	for(int i=0; i<diag_np; ++i)
@@ -116,8 +116,8 @@ void Parallel_Global::split_grid_world(const int &diag_np)
 
 	// color: same color will stay in same group.
 	// key: rank in each fragment group.
-	int color;
-	int key;
+	int color = -1;		// Peize Lin add initialization for compiler warning at 2020.01.31
+	int key = -1;		// Peize Lin add initialization for compiler warning at 2020.01.31
 	
 	int np_now = 0;
 	for(int i=0; i<diag_np; ++i)

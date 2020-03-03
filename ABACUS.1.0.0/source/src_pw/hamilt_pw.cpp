@@ -3,7 +3,7 @@
 #include "global.h"
 #include "algorithms.h"
 #include "hamilt_pw.h"
-#include "../src_external/src_pdiag/blas_interface.h"
+#include "src_global/blas_connector.h"
 #include "optical.h" // only get judgement to calculate optical matrix or not.
 
 #ifdef __EPM
@@ -182,9 +182,8 @@ void Hamilt_PW::cinitcgg(
 		}
 	}
 
-    int i,j;
-	int incx = 1;
-	int incy = 1; 
+	//int incx = 1;
+	//int incy = 1; 
     // Set up the Hamiltonian and Overlap matrix
 //    timer::tick("Hamilt_PW","construct_HS");
 	const int npw = kv.ngk[ik];
@@ -211,7 +210,7 @@ void Hamilt_PW::cinitcgg(
         if (m+1<nstart)
         {
 	//		timer::tick("Hamilt_PW","zdotc");
-            for (j = m + 1;j < nstart;j++)
+            for (int j = m + 1;j < nstart;j++)
             {
                 hc(j,m) = this->just_ddot(dmin, p[j], hpsi);
                 sc(j,m) = this->just_ddot(dmin, p[j], spsi);
@@ -935,8 +934,8 @@ complex<double> Hamilt_PW::just_ddot(
 )const
 {
 	complex<double> result = ZERO;
-	const int incx = 1;
-	const int incy = 1;
+	//const int incx = 1;
+	//const int incy = 1;
 	// mohan add 2010-10-11
 //	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy);  
 

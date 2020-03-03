@@ -27,7 +27,7 @@ public:
 	(
 	 	const string &class_name,
 		const string &name,
-		const int &n,
+		const long &n,
 		const string &type,
 		const bool accumulate = false
 	);
@@ -36,7 +36,7 @@ public:
 	static void finish(ofstream &ofs);
 	static void print_all(ofstream &ofs);
 	static void print(const int find_in);
-	static double calculate_mem(const int &n,const string &type);
+	static double calculate_mem(const long &n,const string &type);
 
 private:
 

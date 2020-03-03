@@ -158,8 +158,8 @@ void Numerical_Vna_Lm::cal_kradial(void)
 void Numerical_Vna_Lm::norm_test(void)const
 {
 //	TITLE(ofs_onscaling, "Numerical_Vna_Lm", "norm_test");
-	double asum_r = 0.0;
-	double asum_k = 0.0;
+	//double asum_r = 0.0;
+	//double asum_k = 0.0;
 
 	// note here psir = psi * r
 	double *f = new double[nr];
@@ -169,7 +169,7 @@ void Numerical_Vna_Lm::norm_test(void)const
 	}
 
 	double sumr = 0.0;
-	double sumk = 0.0;
+	//double sumk = 0.0;
 
 	Mathzone::Simpson_Integral(this->nr, f, this->rab, sumr);
 

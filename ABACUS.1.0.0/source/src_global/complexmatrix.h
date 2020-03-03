@@ -20,10 +20,10 @@ class ComplexMatrix
 
 public:
 
-	complex<double> *c;
-	int nr;
-	int nc;
-	int size;
+	int nr=0;
+	int nc=0;
+	int size=0;
+	complex<double> *c=nullptr;
 
 	ComplexMatrix(): nr(0), nc(0), size(0), c(nullptr){}
 	ComplexMatrix(const int nrows,const int ncols,const bool flag_zero=true);		// Peize Lin add flag_zero 2019-05-13

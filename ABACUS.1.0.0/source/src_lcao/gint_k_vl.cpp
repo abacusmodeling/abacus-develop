@@ -5,7 +5,7 @@
 #include "grid_technique.h"
 #include "ylm.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 //#include <mkl_cblas.h>
 
 inline int find_offset(const int size, const int grid_index, 
@@ -43,8 +43,8 @@ inline int find_offset(const int size, const int grid_index,
 		ofs_running << " grid_index = " << grid_index << endl;
 		ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
     	ofs_running << " find list:"<<endl;
-    	for(int* find=find_start; find < find_end; ++find)
-        	ofs_running << *find << endl;
+		for(int* find=find_start; find < find_end; ++find)
+			ofs_running << *find << endl;
 		ofs_running << " id2 = " << id2 << endl;
 		ofs_running << " T1=" << ucell.atoms[T1].label << " T2=" << ucell.atoms[T2].label << endl;
 		ofs_running << " size (how many atoms on this grid) = " << size << endl;
@@ -56,13 +56,13 @@ inline int find_offset(const int size, const int grid_index,
 		// z is the fastest,
 		for(int ii=0; ii<bx; ii++)
 		{
-			const int iii = ibx + ii;
+			//const int iii = ibx + ii;
 			for(int jj=0; jj<by; jj++)
 			{
-				const int jjj = jby + jj;
+				//const int jjj = jby + jj;
 				for(int kk=0; kk<bz; kk++)
 				{
-					const int kkk = kbz + kk;
+					//const int kkk = kbz + kk;
 					if(distance[bindex][ia1] < ORB.Phi[T1].getRcut() )
 					{
 						ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
@@ -88,13 +88,13 @@ inline int find_offset(const int size, const int grid_index,
 		// z is the fastest,
 		for(int ii=0; ii<bx; ii++)
 		{
-			const int iii = ibx + ii;
+			//const int iii = ibx + ii;
 			for(int jj=0; jj<by; jj++)
 			{
-				const int jjj = jby + jj;
+				//const int jjj = jby + jj;
 				for(int kk=0; kk<bz; kk++)
 				{
-					const int kkk = kbz + kk;
+					//const int kkk = kbz + kk;
 					if(distance[bindex][ia2] < ORB.Phi[T2].getRcut() )//mohan T1->T2
 					{
 						ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 
@@ -244,7 +244,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 	for(int ia1=0; ia1<size; ++ia1)
 	{
 		//if(all_out_of_range[ia1]) continue;
-		const int iw1_lo=block_iw[ia1];
+		//const int iw1_lo=block_iw[ia1];
 		const int idx1=block_index[ia1];
 		int m=block_size[ia1];
 		const int iat1=at[ia1];
@@ -270,10 +270,10 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 
     			if(cal_num==0) continue;
     			
-    			const int iw2_lo=block_iw[ia2];
+    			//const int iw2_lo=block_iw[ia2];
                 const int idx2=block_index[ia2];
         		int n=block_size[ia2];
-				const int I2 = ucell.iat2ia[iat2];
+				//const int I2 = ucell.iat2ia[iat2];
 				const int mcell_index2 = GridT.bcell_start[grid_index] + ia2;
 				const int id2 = GridT.which_unitcell[mcell_index2];
 				int offset;
@@ -358,15 +358,17 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	const int bxyz = pw.bxyz;
 	const int LD_pool=max_size*ucell.nwmax;
 	
-	double **distance; // distance between atom and grid: [bxyz, maxsize]
-	double *psir_ylm_pool, **psir_ylm;
-	double *psir_vlbr3_pool, **psir_vlbr3;
-	bool** cal_flag;
-	int *block_iw; // index of wave functions of each block;	
-	int *block_size; //band size: number of columns of a band
-	int *at;
-	int *block_index;
-	double* ylma;
+	double **distance = nullptr; // distance between atom and grid: [bxyz, maxsize]
+	double *psir_ylm_pool = nullptr;
+	double **psir_ylm = nullptr;
+	double *psir_vlbr3_pool = nullptr;
+	double **psir_vlbr3 = nullptr;
+	bool** cal_flag = nullptr;
+	int *block_iw = nullptr; // index of wave functions of each block;	
+	int *block_size = nullptr; //band size: number of columns of a band
+	int *at = nullptr;
+	int *block_index = nullptr;
+	double* ylma = nullptr;
 	if(max_size!=0)
 	{
 		// save the small box information for a big box.
@@ -406,6 +408,10 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 			ZEROS(distance[i], max_size);
 			ZEROS(cal_flag[i], max_size);
 		}
+	}
+	else
+	{
+		throw runtime_error("may error without new ptr? "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	// Peize Lin add at 2020.01.30
 	}
 	
 	assert(this->ncxyz!=0);
@@ -638,9 +644,9 @@ void Gint_k::evaluate_pvpR_reduced(
 						{
 							for(int kk=0; kk<gt.bz; kk++)
 							{
-								const int iii = i*gt.bx + ii;
-								const int jjj = j*gt.by + jj;
-								const int kkk = k*gt.bz + kk;
+								//const int iii = i*gt.bx + ii;
+								//const int jjj = j*gt.by + jj;
+								//const int kkk = k*gt.bz + kk;
 								if(distance[bindex][ia1] < ORB.Phi[T1].getRcut() )
 								{
 									ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
@@ -671,9 +677,9 @@ void Gint_k::evaluate_pvpR_reduced(
 						{
 							for(int kk=0; kk<gt.bz; kk++)
 							{
-								const int iii = i*gt.bx + ii;
-								const int jjj = j*gt.by + jj;
-								const int kkk = k*gt.bz + kk;
+								//const int iii = i*gt.bx + ii;
+								//const int jjj = j*gt.by + jj;
+								//const int kkk = k*gt.bz + kk;
 								if(distance[bindex][ia2] < ORB.Phi[T2].getRcut() )//mohan T1->T2
 								{
 									ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 

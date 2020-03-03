@@ -1,4 +1,5 @@
 #include "pzhetrd.h"
+#include "src_global/lapack_connector.h"
 
 void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
              complex<double> *A,double *diag,double *off_diag,complex<double> *norm,char uplo)
@@ -600,8 +601,8 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 	// {
 	//     printf("diag[%d]=%lf,dg[%d]=%lf,off_diag[%d]=%lf,z[%d]=%lf\n ",haha,diag[haha],haha,dg[haha],haha,off_diag[haha],haha,z[haha]);
 	// }  
-	dcopy_(&N,dg,&indx,diag,&indy);
-	dcopy_(&N,z,&indx,off_diag,&indy);
+	LapackConnector::copy(N,dg,indx,diag,indy);
+	LapackConnector::copy(N,z,indx,off_diag,indy);
 	//  for(int haha=0;haha<N;haha++)
 	//  {
 	//     printf("diag[%d]=%lf,dg[%d]=%lf,off_diag[%d]=%lf,z[%d]=%lf\n ",haha,diag[haha],haha,dg[haha],haha,off_diag[haha],haha,z[haha]);

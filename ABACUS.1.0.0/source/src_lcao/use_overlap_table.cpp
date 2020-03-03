@@ -197,10 +197,10 @@ void Use_Overlap_Table::snap_psibeta(
 	
 	//UNIT VECTOR
 			
-	double unit_vec_dRa[3];
-	unit_vec_dRa[0] = dRa.x;
-	unit_vec_dRa[1] = dRa.y;
-	unit_vec_dRa[2] = dRa.z;
+	//double unit_vec_dRa[3];
+	//unit_vec_dRa[0] = dRa.x;
+	//unit_vec_dRa[1] = dRa.y;
+	//unit_vec_dRa[2] = dRa.z;
 	
 	double unit_vec_dRb[3];
 	unit_vec_dRb[0] = dRb.x;
@@ -240,24 +240,20 @@ void Use_Overlap_Table::snap_psibeta(
 	// sum_{L0}sum_{m0}
 	// 			D_{L0,L0} <psi1_{L1,N1}|Beta_{L0,m0}><Beta_{L0,m0}|psi2_{L2,N2}>
 	//==============================================================================
-	double v = 0.0;
+	//double v = 0.0;
 
 	// mohan update 2011-03-07
 	int n_projection =1;
 	if(NONCOLIN) n_projection = ORB.Beta[T0].get_nproj_soc();
-	complex<double> term_a_nc[n_projection], term_b_nc[n_projection];
-	if(NONCOLIN) 
-	{
-		ZEROS(term_a_nc, n_projection);
-		ZEROS(term_b_nc, n_projection);
-	}
+	vector<complex<double>> term_a_nc(n_projection,{0,0});		// Peize Lin change ptr to vector at 2020.01.31
+	vector<complex<double>> term_b_nc(n_projection,{0,0});		// Peize Lin change ptr to vector at 2020.01.31
 	int ip = -1;
 	for(int nb=0; nb<nproj; nb++)
 	{
 		if( !calproj[nb] ) continue;
 
 		const int L0 = ORB.Beta[T0].getL_Beta(nb);
-		const int next_ip = 2* L0 +1;
+		//const int next_ip = 2* L0 +1;
 	
 		// <psi1 | Beta>
 		const int Opair1 = this->MOT.NL_Opair(Tpair1, L1, N1, nb); 

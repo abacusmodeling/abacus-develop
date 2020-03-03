@@ -77,9 +77,9 @@ void Record_adj::for_2d(void)
 					for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
 					{
 						const int T0 = GridD.getType(ad0);
-						const int I0 = GridD.getNatom(ad0);
-						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int I0 = GridD.getNatom(ad0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
@@ -180,9 +180,9 @@ void Record_adj::for_2d(void)
 					for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
 					{
 						const int T0 = GridD.getType(ad0);
-						const int I0 = GridD.getNatom(ad0);
-						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int I0 = GridD.getNatom(ad0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
@@ -270,7 +270,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 					const int iat2 = ucell.itia2iat(T2, I2);
 					if(gt.in_this_processor[iat2])
 					{
-						Atom* atom2 = &ucell.atoms[T2];
+						//Atom* atom2 = &ucell.atoms[T2];
 						tau2 = GridD.getAdjacentTau(ad);
 						dtau = tau2 - tau1;
 						double distance = dtau.norm() * ucell.lat0;
@@ -359,7 +359,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 					// key of this function
 					if(gt.in_this_processor[iat2])
 					{
-						Atom* atom2 = &ucell.atoms[T2];
+						//Atom* atom2 = &ucell.atoms[T2];
 						tau2 = GridD.getAdjacentTau(ad);
 						dtau = tau2 - tau1;
 						double distance = dtau.norm() * ucell.lat0;

@@ -116,7 +116,7 @@ int pdSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
 {
     int info;
     int mpi_comm_rows, mpi_comm_cols;
-    int nprows, npcols, myprow, mypcol, nblk;
+    int nprows, npcols, myprow, mypcol;	// nblk;
 
     #ifdef _DEBUG
         int myid;
@@ -171,7 +171,7 @@ int pdSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
 {
     int info;
     int mpi_comm_rows, mpi_comm_cols;
-    int nprows, npcols, myprow, mypcol, nblk;
+    int nprows, npcols, myprow, mypcol;	// nblk;
 
     #ifdef _DEBUG
         int myid;
@@ -299,7 +299,7 @@ int pdDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
 {
     int info=0; // for elpa functions, 1 is for success, 0 is for failure
     int wantDebug=false;
-    int allinfo=0;
+    //int allinfo=0;
 
     #ifdef _DEBUG
         int myid;
@@ -378,9 +378,9 @@ int pdCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
     int info, allinfo;
     int my_blacs_ctxt;
     int nprows, npcols, myprow, mypcol, nblk;
-    char transa, transb, side, uplo, diag;
+    char uplo;	//transa, transb, side, diag;
     int isrc=1, jsrc=1;
-    double alpha, beta;
+    //double alpha, beta;
     int lda;
 
     #ifdef _DEBUG
@@ -1039,7 +1039,7 @@ int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
 {
     int info;
     int mpi_comm_rows, mpi_comm_cols;
-    int nprows, npcols, myprow, mypcol, nblk;
+    int nprows, npcols, myprow, mypcol;	// nblk;
 
     #ifdef _DEBUG
         int myid;
@@ -1094,7 +1094,7 @@ int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
 {
     int info;
     int mpi_comm_rows, mpi_comm_cols;
-    int nprows, npcols, myprow, mypcol, nblk;
+    int nprows, npcols, myprow, mypcol;	// nblk;
 
     #ifdef _DEBUG
         int myid;
@@ -1222,7 +1222,7 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
 {
     int info=0; // for elpa functions, 1 is for success, 0 is for failure
     int wantDebug=false;
-    int allinfo=0;
+    //int allinfo=0;
 
     #ifdef _DEBUG
         int myid;

@@ -1,6 +1,6 @@
 #include "local_orbital_charge.h"
 #include "../src_pw/global.h"
-#include "blas_interface.h"
+#include "src_global/blas_connector.h"
 
 //#include "../src_onscaling/on_tests.h"
 //#include "../src_siao/selinv.h"
@@ -26,16 +26,16 @@ Local_Orbital_Charge::Local_Orbital_Charge()
     this->init_DM_R = false;
     out_dm = 0;
     //xiaohui add 2014-06-19
-    //band_local = new int[1];
-    //Z_wg = new double[1];
-    //Z_LOC = new double[1];
-    sender_2D_index = new int[1];
-    sender_size_process = new int[1];
-    sender_displacement_process = new int[1];
+    //band_local = nullptr;
+    //Z_wg = nullptr;
+    //Z_LOC = nullptr;
+    sender_2D_index = nullptr;
+    sender_size_process = nullptr;
+    sender_displacement_process = nullptr;
 
-    receiver_local_index = new int[1];
-    receiver_size_process = new int[1];
-    receiver_displacement_process = new int[1];
+    receiver_local_index = nullptr;
+    receiver_size_process = nullptr;
+    receiver_displacement_process = nullptr;
 }
 
 Local_Orbital_Charge::~Local_Orbital_Charge()
@@ -708,7 +708,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, 
                     const int I2 = RA.info[ia1][ia2][4];
                     Atom* atom2 = &ucell.atoms[T2];
                     const int start2 = ucell.itiaiw2iwt(T2,I2,0);
-                    const int iw2_lo=gt.trace_lo[start2]/NPOL + GridT.lgd/NPOL*is2;
+                    const int iw2_lo=gt.trace_lo[start2]/NPOL + gt.lgd/NPOL*is2;
                     const int nw2=atom2->nw;
                     complex<double> exp_R= exp( fac * (
                                 kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
@@ -728,7 +728,7 @@ inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, 
                             const int iline=nRow*nw1;
                             complex<double> phase=exp_R*w1;
                             for(int iw1=0; iw1<nw1; ++iw1)
-                                WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1 + NLOCAL/NPOL*is1]);
+                                WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1 + gt.lgd/NPOL*is1]);
                             ++nRow;
                         }
                         else
@@ -751,7 +751,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 {
     TITLE("Local_Orbital_Charge","cal_dk_k");
     timer::tick("LCAO_Charge","cal_dk_k",'F');  
-    int nnrg = 0;
+    //int nnrg = 0;
     Vector3<double> tau1, dtau;
         
     Record_adj RA;
@@ -1057,7 +1057,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
                 ZEROS(this->DM[is][i], lgd_now);
 
         int nprocs,myid;
-        MPI_Status status;
+        //MPI_Status status;
         MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
         MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 

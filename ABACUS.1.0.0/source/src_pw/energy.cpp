@@ -282,7 +282,8 @@ bool print)
 		{
 			if(MY_RANK==0)
 			{
-				printf( "\e[36m%-15f\e[0m", en.etot);	
+				//printf( "\e[36m%-15f\e[0m", en.etot);	
+				printf( "[36m%-15f[0m", en.etot);	
 				if(NSPIN==2)
 				{
 					cout << setprecision(2);
@@ -298,15 +299,18 @@ bool print)
 				if(dr2>1.0)
 				{
 					// 31 is red
-					printf( "\e[31m%-14e\e[0m", dr2);
+					//printf( "\e[31m%-14e\e[0m", dr2);
+					printf( "[31m%-14e[0m", dr2);
 				}
 				else
 				{
 					// 32 is green
-					printf( "\e[32m%-14e\e[0m", dr2);
+					//printf( "\e[32m%-14e\e[0m", dr2);
+					printf( "[32m%-14e[0m", dr2);
 				}
 				// 34 is blue
-				printf( "\e[36m%-15f\e[0m", en.etot*Ry_to_eV);	
+				//printf( "\e[36m%-15f\e[0m", en.etot*Ry_to_eV);	
+				printf( "[36m%-15f[0m", en.etot*Ry_to_eV);	
 				cout << setprecision(3);
 	//			cout << setw(11) << en.eband;
 	//			cout << setw(11) << en.ehart;
@@ -430,11 +434,11 @@ double energy::ewald(void)
 // Calculates Ewald energy with both G- and R-space terms.
 // Determines optimal alpha. Should hopefully work for any structure.
 //----------------------------------------------------------
-    int ng=0;
+    //int ng=0;
     int nr=0;
     int na=0;
     int nb=0;
-    int nt=0;
+    //int nt=0;
     int nrm=0;
 
     double ewaldg=0.0;
@@ -1073,10 +1077,10 @@ void energy::perform_dos(void)
                                                const int NB= i+1;
                    	                      
                                     const double one_float=1.0, zero_float=0.0;
-			           const int one_int=1;
-                                   const int two_int=2;
+							const int one_int=1;
+                                //   const int two_int=2;
 
-			const char T_char='T',N_char='N',U_char='U';
+			const char T_char='T';		// N_char='N',U_char='U'
 			     
 			
                                                             
@@ -1242,7 +1246,7 @@ void energy::perform_dos(void)
                                    ofstream out(as.str().c_str());
                                     for (int n=0; n<npoints+1; ++n)
                                      {         double y=0.0;
-                                               double en=emin + n * de_ev;
+                                               //double en=emin + n * de_ev;
                                                        y =  ADOS[is][i][n];
                                        //out <<  "            " << en << "                " << y << endl;
                                        out << "                " << y << endl;
@@ -1250,7 +1254,7 @@ void energy::perform_dos(void)
                                  out.close();
                                }
                          }
-                                                  char *Name_Angular[5][11];
+                                                  string Name_Angular[5][11];
 	 /* decomposed Mulliken charge */
 
       Name_Angular[0][0] = "s          ";
@@ -1325,7 +1329,7 @@ void energy::perform_dos(void)
                                                                                                                                                     
                                                                               for (int mul=0; mul<ucell.atoms[t].l_nchi[l]; mul++)
                                                                               {
-                                                                                   int n = ucell.atoms[t].l_nchi[l];
+                                                                                   //int n = ucell.atoms[t].l_nchi[l];
                                                                                  for (int m=0; m<(2*l+1); m++)
                                                                                 {   
                                                                                                                                                                       for (int n=0; n<npoints+1; ++n) 
@@ -1566,9 +1570,9 @@ void energy::perform_dos(void)
 			ofs_running << " Fermi energy (spin = 2) is " << this->ef_dw << " Rydberg" << endl;
 		}
 
-		int nks;
-		if(nspin0==1) nks = kv.nkstot;
-		else if(nspin0==2) nks = kv.nkstot/2;
+		//int nks;
+		//if(nspin0==1) nks = kv.nkstot;
+		//else if(nspin0==2) nks = kv.nkstot/2;
 
 
 

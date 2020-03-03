@@ -2,7 +2,7 @@
 
 using namespace std;
 int Ylm::nlm = 0;
-double* Ylm::ylmcoef = new double[100];
+vector<double> Ylm::ylmcoef(100);
 
 // here Lmax == max angular momentum + 1
 void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[] )
@@ -50,7 +50,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	assert(Lmax <= 20);
 
 	int m;
-	double x1, x2;
+	double x1;	// x2;
 	int lm = -1; // must initialized!
 	for (int l=0; l<Lmax; l++)
 	{
@@ -132,7 +132,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}
 
-	double x1, x2;
+	//double x1, x2;
 
 	double cost = 0.0; // must initialized.
 	double sint = 0.0;
@@ -363,17 +363,15 @@ void Ylm::rlylm
 //		ZEROS(zdep[il], 20);
 //	}
 
-	double z2, z3, z4, z5;
-	z2 = z * z;
-	z3 = z2 * z;
-	z4 = z3 * z;
-	z5 = z4 * z;
+	double z2 = z * z;
+	double z3 = z2 * z;
+	double z4 = z3 * z;
+	//double z5 = z4 * z;
 	
-	double r, r2, r3, r4;
-	r = sqrt(x*x + y*y + z*z);
-	r2 = r * r;
-	r3 = r2 * r;
-	r4 = r3 * r;
+	double r = sqrt(x*x + y*y + z*z);
+	double r2 = r * r;
+	double r3 = r2 * r;
+	double r4 = r3 * r;
 	
 	for(int il = 0; il < MaxL+1; il++)
 	{
@@ -1128,7 +1126,7 @@ void Ylm::test2 (void)
 	Vector3<double> R (0.1,-0.2,0.5);
 	Ylm::set_coefficients();
 	
-	int nu = 100;
+	//int nu = 100;
 
 	vector<double> rlya;
 	double rlyb[400];
@@ -1316,17 +1314,15 @@ void Ylm::rlylm
 		ZEROS(Gz_dep[il], 20);
 	}
 
-	double z2, z3, z4, z5;
-	z2 = z * z;
-	z3 = z2 * z;
-	z4 = z3 * z;
-	z5 = z4 * z;
+	double z2 = z * z;
+	double z3 = z2 * z;
+	double z4 = z3 * z;
+	//double z5 = z4 * z;
 	
-	double r, r2, r3, r4;
-	r = sqrt(x*x + y*y + z*z);
-	r2 = r * r;
-	r3 = r2 * r;
-	r4 = r3 * r;
+	double r = sqrt(x*x + y*y + z*z);
+	double r2 = r * r;
+	double r3 = r2 * r;
+	double r4 = r3 * r;
 	
 	for(int il = 0; il < MaxL+1; il++)
 	{

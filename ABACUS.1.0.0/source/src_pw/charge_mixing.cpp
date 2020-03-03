@@ -134,7 +134,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
     this->set_rhog(rho_save, rhog);
 
     // (2) set up filter
-    const double a = 0.8; // suggested by VASP.
+    //const double a = 0.8; // suggested by VASP.
 
 	// mohan fixed bug 2010/03/25
 	// suggested by VASP, 1.5(angstrom^-1) is always satisfied.
@@ -182,59 +182,64 @@ double Charge_Mixing::rhog_dot_product(
     static const double fac2 = e2 * FOUR_PI / (TWO_PI * TWO_PI);
 
     double sum = 0.0;
-
-    switch ( NSPIN )
-    {
-	case 1:
-		part_of_noncolin:
+	
+	auto part_of_noncolin = [&]()			// Peize Lin change goto to function at 2020.01.31
+	{
 		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
 		{
 			sum += ( conj( rhog1[0][ig] )* rhog2[0][ig] ).real() / pw.gg[ig];
 		}
 		sum *= fac;
+	};
+
+    switch ( NSPIN )
+    {
+	case 1:
+		part_of_noncolin();
 		break;
 
 	case 2:
-	{	
-		// (1) First part of density error.
-		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
 		{
-			sum += ( conj( rhog1[0][ig]+rhog1[1][ig] ) * (rhog2[0][ig]+rhog2[1][ig]) ).real() / pw.gg[ig];
+			// (1) First part of density error.
+			for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+			{
+				sum += ( conj( rhog1[0][ig]+rhog1[1][ig] ) * (rhog2[0][ig]+rhog2[1][ig]) ).real() / pw.gg[ig];
+			}
+			sum *= fac;
+
+			if(GAMMA_ONLY_PW)
+			{
+				sum *= 2.0;
+			}
+
+			// (2) Second part of density error.
+			// including |G|=0 term.
+			double sum2 = 0.0;
+
+			sum2 += fac2 * ( conj( rhog1[0][0]-rhog1[1][0] ) * ( rhog2[0][0]-rhog2[1][0] ) ).real();
+
+			double mag = 0.0;
+			for (int ig=0; ig<pw.ngmc; ig++)
+			{
+				mag += ( conj( rhog1[0][ig]-rhog1[1][ig] ) * ( rhog2[0][ig]-rhog2[1][ig] ) ).real();
+			}
+			mag *= fac2;
+
+			//if(GAMMA_ONLY_PW);
+			if(GAMMA_ONLY_PW)			// Peize Lin delete ; 2020.01.31
+			{
+				mag *= 2.0;
+			}
+
+			//cout << " sum=" << sum << " mag=" << mag << endl;
+			sum2 += mag;
+			sum += sum2;
+			break;
 		}
-		sum *= fac;
-
-		if(GAMMA_ONLY_PW)
-		{
-			sum *= 2.0;
-		}
-
-		// (2) Second part of density error.
-		// including |G|=0 term.
-		double sum2 = 0.0;
-		
-		sum2 += fac2 * ( conj( rhog1[0][0]-rhog1[1][0] ) * ( rhog2[0][0]-rhog2[1][0] ) ).real();
-
-		double mag = 0.0;
-		for (int ig=0; ig<pw.ngmc; ig++)
-		{
-			mag += ( conj( rhog1[0][ig]-rhog1[1][ig] ) * ( rhog2[0][ig]-rhog2[1][ig] ) ).real();
-		}
-		mag *= fac2;
-
-		if(GAMMA_ONLY_PW);
-		{
-			mag *= 2.0;
-		}
-
-		//cout << " sum=" << sum << " mag=" << mag << endl;
-		sum2 += mag;
-		sum += sum2;
-		break;
-	}
-
 	case 4:
 		// non-collinear spin, added by zhengdy
-		if(!DOMAG&&!DOMAG_Z) goto part_of_noncolin;
+		if(!DOMAG&&!DOMAG_Z)
+			part_of_noncolin();
 		else
 		{
 			//another part with magnetization
@@ -262,7 +267,6 @@ double Charge_Mixing::rhog_dot_product(
 			}
 		}
 		break;
-
     }
 
     Parallel_Reduce::reduce_double_pool( sum );
@@ -271,10 +275,10 @@ double Charge_Mixing::rhog_dot_product(
 
 	sum *= ucell.omega * 0.5;
 
-	bool dft_is_meta = false;
-	bool lda_plus_u = false;
-	bool okpaw = false;
-	bool dipfield = false;
+	//bool dft_is_meta = false;
+	//bool lda_plus_u = false;
+	//bool okpaw = false;
+	//bool dipfield = false;
 
 //	if(dft_is_meta) sum += tauk_ddot();
 //	if(lda_pluse_u) sum += ns_ddot();

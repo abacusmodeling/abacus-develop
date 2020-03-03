@@ -16,7 +16,7 @@ Threshold_Elec::Threshold_Elec()
 { 
 	dr2 = 0.0; 
 	conv_elec = false; 
-};
+}
 
 void Threshold_Elec::set_ethr(void) const
 {

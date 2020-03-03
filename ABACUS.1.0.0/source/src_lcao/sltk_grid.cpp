@@ -318,7 +318,7 @@ AtomLink* Grid::Build_Cache(const Atom_input &input)
 	Memory::record("grid", "AtomLink", natom, "AtomLink");
 
 	// the pointer stay at the end of atom.
-	const AtomLink* const end = start + natom + 1;
+	//const AtomLink* const end = start + natom + 1;
 
 	AtomLink* current = start;
 
@@ -414,7 +414,7 @@ void Grid::In_Which_Cell(int &a, int &b, int &c, const FAtom &atom)const
 		// for example, if a is 2.999999999999999999, the int command
 		// will make a = 2 (in fact we want 3)
 		// if a is 3.00000000000000001, it's save.
-		static double save_add = 1.0e-15; // from -8 to -15, mohan add 2012-03-22
+		//static double save_add = 1.0e-15; // from -8 to -15, mohan add 2012-03-22
 		//a = static_cast<int>( (directx - this->d_minX) + save_add );
 		//b = static_cast<int>( (directy - this->d_minY) + save_add );
 		//c = static_cast<int>( (directz - this->d_minZ) + save_add );

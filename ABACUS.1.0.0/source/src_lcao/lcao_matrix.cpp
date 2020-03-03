@@ -96,7 +96,7 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	return;
 }
 
-void LCAO_Matrix::allocate_HS_gamma(const int &nloc)
+void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 {
 	TITLE("LCAO_Matrix","allocate_HS_gamma");
 
@@ -121,7 +121,7 @@ void LCAO_Matrix::allocate_HS_gamma(const int &nloc)
 }
 
 
-void LCAO_Matrix::allocate_HS_k(const int &nloc)
+void LCAO_Matrix::allocate_HS_k(const long &nloc)
 {
 	TITLE("LCAO_Matrix","allocate_HS_k");
 
@@ -187,7 +187,7 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
     //const int index = ir * ParaO.ncol + ic;
-	int index;
+	long index;
 	if(KS_SOLVER=="genelpa")  // save the matrix as column major format
 	{
 		index=ic*ParaO.nrow+ir;
@@ -236,7 +236,7 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
     //const int index = ir * ParaO.ncol + ic;
-	int index;
+	long index;
 	if(KS_SOLVER=="genelpa")  // save the matrix as column major format
 	{
 		index=ic*ParaO.nrow+ir;
@@ -280,7 +280,7 @@ void LCAO_Matrix::set_force
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
-    const int index = ir * ParaO.ncol + ic;
+    const long index = ir * ParaO.ncol + ic;
 	
 	if( index >= ParaO.nloc)
 	{
@@ -330,7 +330,7 @@ void LCAO_Matrix::set_stress
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
-    const int index = ir * ParaO.ncol + ic;
+    const long index = ir * ParaO.ncol + ic;
 
 	if( index >= ParaO.nloc)
 	{
@@ -695,7 +695,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 // becareful! Update Hloc, we add new members to it.
 void LCAO_Matrix::update_Hloc(void)
 {
-	for (int i=0; i<ParaO.nloc; i++)
+	for (long i=0; i<ParaO.nloc; i++)
 	{
 		Hloc[i] += Hloc_fixed[i];
 	}
@@ -704,7 +704,7 @@ void LCAO_Matrix::update_Hloc(void)
 
 void LCAO_Matrix::update_Hloc2(void)
 {
-	for (int i=0; i<ParaO.nloc; i++)
+	for (long i=0; i<ParaO.nloc; i++)
 	{
 		Hloc2[i] += Hloc_fixed2[i];
 	}
@@ -976,7 +976,7 @@ void LCAO_Matrix::set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const i
 
 //cout<<"ir: "<<ir<<endl;
 //cout<<"ic: "<<ic<<endl;
-    int index;
+    long index;
     if(KS_SOLVER=="genelpa")
     {
         index=ic*ParaO.nrow+ir;
@@ -1011,7 +1011,7 @@ void LCAO_Matrix::set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, con
 
 //cout<<"ir: "<<ir<<endl;
 //cout<<"ic: "<<ic<<endl;
-    int index;
+    long index;
     if(KS_SOLVER=="genelpa")
     {
         index=ic*ParaO.nrow+ir;

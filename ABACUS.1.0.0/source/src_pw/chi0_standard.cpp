@@ -15,6 +15,7 @@
 #include "klist.h"
 #include <iostream>
 #include <cstring>
+#include <vector>
 using namespace std;
 
 Chi0_standard chi0_standard;
@@ -70,8 +71,8 @@ void Chi0_standard:: Chi()
 
 	
 	int icount = 0;
-	int qc[kv.nks]; 
-	double ql[kv.nks];
+	std::vector<int> qc(kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<double> ql(kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
 	int total_icount=0;
 	int temp1; double temp2;
 	
@@ -447,7 +448,7 @@ void Chi0_standard:: Init()
 void Chi0_standard::Delete()
 {
 	TITLE("Chi0_standard","Delete");
-	if(init_finish = true)
+	if(init_finish == true)				// Peize Lin change = to == at 2020.01.31
 	{
 		delete[] b_core;
 		delete[] b_summary;
@@ -662,7 +663,9 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		Cal_weight(iq, ik, omega);
 		Cal_last();
 		Cal_first();
-		complex<double> A1[dim][oband*NBANDS],B1[oband*NBANDS][dim],C[dim][dim];
+		std::vector<std::vector<complex<double>>> A1(dim, std::vector<complex<double>>(oband*NBANDS));       // Peize Lin change ptr to vector at 2020.01.31
+		std::vector<std::vector<complex<double>>> B1(oband*NBANDS, std::vector<complex<double>>(dim));       // Peize Lin change ptr to vector at 2020.01.31
+		std::vector<std::vector<complex<double>>> C(dim, std::vector<complex<double>>(dim));                 // Peize Lin change ptr to vector at 2020.01.31
 		
 		for(int g0=0; g0<dim; g0++)
 			for(int ib=0; ib<(oband*NBANDS); ib++)
@@ -686,7 +689,7 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		int lda = dim;
 		int ldb = oband*NBANDS;
 		int ldc = dim;
-		zgemm_(&transa, &transb, &M, &N, &K, &alpha, B1[0], &lda, A1[0], &ldb, &beta, C[0], &ldc);
+		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(B1[0]), &lda, VECTOR_TO_PTR(A1[0]), &ldb, &beta, VECTOR_TO_PTR(C[0]), &ldc);
 		
 		for(int g0=0; g0<dim; g0++)
 			for(int g1=0; g1<dim; g1++)

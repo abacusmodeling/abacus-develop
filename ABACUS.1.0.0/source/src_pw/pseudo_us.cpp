@@ -19,7 +19,7 @@ pseudo_us::~pseudo_us()
 void pseudo_us::set_pseudo_us(const Pseudopot_upf &upf)
 {
 //	cout << "\n === set_pseudo_us() === ";
-	int i;
+	//int i;
 
 	this->set_pseudo_nc(upf);
 

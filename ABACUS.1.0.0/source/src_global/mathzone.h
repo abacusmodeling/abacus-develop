@@ -17,11 +17,10 @@ public:
     template<class T>
     static T Max3(const T &a,const T &b,const T &c)
     {
-        T v;
-        if (a>=b && a>=c) v = a;
-        else if (b>=a && b>=c) v = b;
-        else if (c>=a && c>=b) v = c;
-        return v;
+        if (a>=b && a>=c) return a;
+        else if (b>=a && b>=c) return b;
+        else if (c>=a && c>=b) return c;
+		else throw runtime_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
     }
 
     // be careful, this can only be used for plane wave

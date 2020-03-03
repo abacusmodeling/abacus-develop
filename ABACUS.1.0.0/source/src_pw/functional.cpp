@@ -36,7 +36,7 @@ void xcfunc::which_dft(const string *dft)
 	const int ngcx = 10; // number of gradient correction for exchange functional
 	const int ngcc = 8; // number of gradient correction for correlation functional
 
-	int l=0;
+	//int l=0;
 	int i=0;
 	int notset = -1;
 
