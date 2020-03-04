@@ -409,10 +409,6 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 			ZEROS(cal_flag[i], max_size);
 		}
 	}
-	else
-	{
-		throw runtime_error("may error without new ptr? "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	// Peize Lin add at 2020.01.30
-	}
 	
 	assert(this->ncxyz!=0);
 	const double dv = ucell.omega/this->ncxyz;
