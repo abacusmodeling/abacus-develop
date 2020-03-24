@@ -2423,9 +2423,11 @@ void Input::Check(void)
 			if(ks_solver == "default")
 			{
 				//diago_type = "hpseps";
-				ks_solver = "hpseps";
+				//ks_solver = "hpseps";
+				ks_solver = "genelpa";
 				//AUTO_SET("diago_type","hpseps");
-				AUTO_SET("ks_solver","hpseps");
+				//AUTO_SET("ks_solver","hpseps");
+				AUTO_SET("ks_solver","genelpa");
 			}
 			//else if(diago_type == "cg" )
 			else if (ks_solver == "cg")
