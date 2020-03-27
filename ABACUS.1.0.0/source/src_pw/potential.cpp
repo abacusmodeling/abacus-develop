@@ -11,7 +11,7 @@ potential::potential()
     this->test = 0;
     vltot = new double[1];
     vrs1 = new double[1];
-	this->out_potential = 0;
+    this->out_potential = 0;
 }
 
 potential::~potential()
@@ -59,99 +59,98 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     TITLE("potential","init_pot");
     timer::tick("potential","init_pot");
 
-	assert(istep>=0);
+    assert(istep>=0);
 
-	//ofs_running << " istep=" << istep << " delta_vh=" << delta_vh << " vna=" << vna << endl;
+    //ofs_running << " istep=" << istep << " delta_vh=" << delta_vh << " vna=" << vna << endl;
 
-	vrs.zero_out();
+    vrs.zero_out();
 
-	// mohan fix bug 2011-07-08
-	// the vltot should and must be zero here.
-	ZEROS(this->vltot, pw.nrxx);
+    // mohan fix bug 2011-07-08
+    // the vltot should and must be zero here.
+    ZEROS(this->vltot, pw.nrxx);
 
-	// vna use this line to get delta_vh and V_Efield to do grid integration.
-	// if detal_vh is set to 1, then local pseudopotential is not added.
-	if(delta_vh) 
-	{
-		if(EFIELD && !DIPOLE)
-		{
-			Efield EFID;
-			// in fact, chr.rho is not used here.
-			// if charge correction due to Efield is considered,
-			// the structure here need to be updated.
+    // vna use this line to get delta_vh and V_Efield to do grid integration.
+    // if detal_vh is set to 1, then local pseudopotential is not added.
+    if(delta_vh) 
+    {
+        if(EFIELD && !DIPOLE)
+        {
+            Efield EFID;
+            // in fact, chr.rho is not used here.
+            // if charge correction due to Efield is considered,
+            // the structure here need to be updated.
 
-			static bool first = true;
-			if(first)
-			{
-				cout << " ADD THE EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
-				first = false;
-			}
-			EFID.add_efield(chr.rho[0], this->vltot);	
-		}
-	}
-	else
-	{
-		// (1) local part of pseudopotentials.
-		// set vltot
-		this->set_local(this->vltot);
+            static bool first = true;
+            if(first)
+            {
+                cout << " ADD THE EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
+                first = false;
+            }
+            EFID.add_efield(chr.rho[0], this->vltot);	
+        }
+    }
+    else
+    {
+        // (1) local part of pseudopotentials.
+        // set vltot
+        this->set_local(this->vltot);
 
-		// mohan fix bug 2011-07-07
-		// set pseudopotentials.
-		int nspin0=NSPIN;//zhengdy-soc, pauli matrix, just index 0 has vlocal term.
-		if(NSPIN==4) nspin0=1;
-		for(int is=0; is<nspin0; ++is)
-		{
-			for(int ir=0; ir<pw.nrxx; ++ir)
-			{
-				this->vrs(is,ir) = this->vltot[ir];	
-			}
-		}
+        // mohan fix bug 2011-07-07
+        // set pseudopotentials.
+        int nspin0=NSPIN;//zhengdy-soc, pauli matrix, just index 0 has vlocal term.
+        if(NSPIN==4) nspin0=1;
+        for(int is=0; is<nspin0; ++is)
+        {
+            for(int ir=0; ir<pw.nrxx; ++ir)
+            {
+                this->vrs(is,ir) = this->vltot[ir];	
+            }
+        }
     	// (2) core correction potential.
-		chr.set_rho_core( pw.strucFac );
+        chr.set_rho_core( pw.strucFac );
 
-		//if(vna==1)return; // tmp by mohan
-	}
+        //if(vna==1)return; // tmp by mohan
+    }
 
+    if(istep==0)//not begin to do ion relaxation.
+    {
+        OUT(ofs_running,"start_pot",start_pot);
 
-	if(istep==0)//not begin to do ion relaxation.
-	{
-		OUT(ofs_running,"start_pot",start_pot);
-
-		cout << " START POTENTIAL      : " << start_pot << endl;
-		if (this->start_pot == "atomic")//mohan add 2007-10-17
-		{
-			start_from_atomic:
-			chr.atomic_rho(NSPIN, chr.rho);
-		}
-		else if (this->start_pot == "file")
-		{
-			ofs_running << " try to start potential from file : ";
-			for(int is=0; is<NSPIN; is++)
-			{
-				stringstream ssc;
-				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-				ofs_running << ssc.str() << endl;
-				// mohan update 2012-02-10
-				if(chr.read_rho( is, ssc.str() )) 
-				{
-					ofs_running << " Read in the charge density: " << ssc.str() << endl;
-				}
-				else
-				{
-					ofs_running << " Start charge density from atomic charge density." << endl;
-					goto start_from_atomic;
-				}
-			}
-		}
-		else
-		{
-			WARNING_QUIT("potential::init_pot","start_pot is wrong!");
-		}
-	}
-	else
-	{
-		// the extrapolation part moves to ions.cpp.
-	}
+        cout << " START POTENTIAL      : " << start_pot << endl;
+        if (this->start_pot == "atomic")//mohan add 2007-10-17
+        {
+            start_from_atomic:
+            chr.atomic_rho(NSPIN, chr.rho);
+        }
+        else if (this->start_pot == "file")
+        {
+            ofs_running << " try to start potential from file : ";
+            for(int is=0; is<NSPIN; is++)
+            {
+                stringstream ssc;
+                ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+                ofs_running << ssc.str() << endl;
+                // mohan update 2012-02-10
+                if(chr.read_rho( is, ssc.str() )) 
+                {
+                    ofs_running << " Read in the charge density: " << ssc.str() << endl;
+                }
+                else
+                {
+                    ofs_running << " Start charge density from atomic charge density." << endl;
+                    goto start_from_atomic;
+                }
+            }
+        }
+        else
+        {
+            WARNING_QUIT("potential::init_pot","start_pot is wrong!");
+        }
+    }
+    else
+    {
+        // the extrapolation part moves to ions.cpp.
+    }
 
     chr.renormalize_rho();
 
@@ -169,10 +168,10 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     //----------------------------------------------------------
     // Define the total local potential (external+scf)
     //----------------------------------------------------------
-    if(vext == 0)		this->set_vrs(pw.doublegrid);
-    else			this->set_vrs_tddft(pw.doublegrid, istep);
+    if(vext == 0) this->set_vrs(pw.doublegrid);
+    else this->set_vrs_tddft(pw.doublegrid, istep);
 
-//	figure::picture(this->vrs1,pw.ncx,pw.ncy,pw.ncz);
+    //figure::picture(this->vrs1,pw.ncx,pw.ncy,pw.ncz);
     timer::tick("potential","init_pot");
     return;
 }
@@ -186,7 +185,7 @@ void potential::set_local(double* vl_pseudo)const
 {
     TITLE("potential","set_local");
     timer::tick("potential","set_local");
-	
+
     complex<double> *vg = new complex<double>[pw.ngmc];
     ZEROS( vg, pw.ngmc );
     for (int it=0; it<ucell.ntype; it++)
@@ -200,23 +199,23 @@ void potential::set_local(double* vl_pseudo)const
     UFFT.ToRealSpace(vg, vl_pseudo); 
     delete[] vg;
 
-	if(EFIELD && !DIPOLE)
-	{
-		Efield EFID;
-		// in fact, chr.rho is not used here.
-		// if charge correction due to Efield is considered,
-		// the structure here need to be updated.
+    if(EFIELD && !DIPOLE)
+    {
+        Efield EFID;
+        // in fact, chr.rho is not used here.
+        // if charge correction due to Efield is considered,
+        // the structure here need to be updated.
 
-		static bool first = true;
-		if(first)
-		{
-			cout << " ADD THE EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
-			first = false;
-		}
-		EFID.add_efield(chr.rho[0], vl_pseudo);	
-	}
+        static bool first = true;
+        if(first)
+        {
+            cout << " ADD THE EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
+            first = false;
+        }
+        EFID.add_efield(chr.rho[0], vl_pseudo);	
+    }
 
-	//ofs_running <<" set local pseudopotential done." << endl;
+    //ofs_running <<" set local pseudopotential done." << endl;
     timer::tick("potential","set_local");
     return;
 }
@@ -229,113 +228,111 @@ void potential::set_local(double* vl_pseudo)const
 //==========================================================
 void potential::v_of_rho
 (
-	double **rho_in,
+    double **rho_in,
     double &ehart,
     double &etxc,
     double &vtxc,
     matrix &v_in,
-	const bool delta_vh,
-	const bool vna
+    const bool delta_vh,
+    const bool vna
 )
 {
     TITLE("potential","v_of_rho");
     v_in.zero_out();
 
-	if(vna)
-	{
-		timer::tick("potential","vna_h");
-		double** rho_atom = new double*[NSPIN];
-		for(int is=0; is<NSPIN; is++)
+    if(vna)
+    {
+        timer::tick("potential","vna_h");
+        double** rho_atom = new double*[NSPIN];
+        for(int is=0; is<NSPIN; is++)
         {
             rho_atom[is] = new double[pw.nrxx];
             ZEROS(rho_atom[is], pw.nrxx);
         }
 
-		chr.atomic_rho(NSPIN,rho_atom);
+        chr.atomic_rho(NSPIN,rho_atom);
 
-		this->v_h(NSPIN, ehart, v_in, rho_atom);
+        this->v_h(NSPIN, ehart, v_in, rho_atom);
 
-		for(int is=0; is<NSPIN; is++)
-		{
-			delete[] rho_atom[is];
-		}
-		delete[] rho_atom;
+        for(int is=0; is<NSPIN; is++)
+        {
+            delete[] rho_atom[is];
+        }
+        delete[] rho_atom;
 
-		timer::tick("potential","vna_h");
-		return;
-	}
+        timer::tick("potential","vna_h");
+        return;
+    }
 
-	timer::tick("potential","v_of_rho",'E');
+    timer::tick("potential","v_of_rho",'E');
 
 //----------------------------------------------------------
 //  calculate the exchange-correlation potential
 //----------------------------------------------------------
     this->v_xc(rho_in, etxc, vtxc, v_in);
 
-
 //----------------------------------------------------------
 //  calculate the Hartree potential
 //----------------------------------------------------------
     if(delta_vh)
-	{
-		//--------------------------------------------
-		// get the atomic charge on real space grid.	
-		//--------------------------------------------
-		double** rho_atom = new double*[NSPIN];
-		for(int is=0; is<NSPIN; is++)
-		{
-			rho_atom[is] = new double[pw.nrxx];
-			ZEROS(rho_atom[is], pw.nrxx);
-		}
-		
-		chr.atomic_rho(NSPIN,rho_atom);
+    {
+        //--------------------------------------------
+        // get the atomic charge on real space grid.	
+        //--------------------------------------------
+        double** rho_atom = new double*[NSPIN];
+        for(int is=0; is<NSPIN; is++)
+        {
+            rho_atom[is] = new double[pw.nrxx];
+            ZEROS(rho_atom[is], pw.nrxx);
+        }
 
-		//--------------------------------------------
-		// get the delta atomic charge on real space
-		// grid.
-		//--------------------------------------------
-		for(int is=0; is<NSPIN; is++)
-		{
-			for(int ir=0; ir<pw.nrxx; ir++)
-			{
-				rho_atom[is][ir] = rho_in[is][ir] - rho_atom[is][ir];
-			}
-		}
-		
-		//--------------------------------------------
-		// get the potential from the delta charge
-		//--------------------------------------------
-		this->v_h(NSPIN, ehart, v_in, rho_atom);
+        chr.atomic_rho(NSPIN,rho_atom);
 
-		for(int is=0; is<NSPIN; is++)
-		{
-			delete[] rho_atom[is];
-		}
-		delete[] rho_atom;
-	}
-	else
-	{
-		this->v_h(NSPIN, ehart, v_in, rho_in);
-	}
+        //--------------------------------------------
+        // get the delta atomic charge on real space
+        // grid.
+        //--------------------------------------------
+        for(int is=0; is<NSPIN; is++)
+        {
+            for(int ir=0; ir<pw.nrxx; ir++)
+            {
+                rho_atom[is][ir] = rho_in[is][ir] - rho_atom[is][ir];
+            }
+        }
 
-	// mohan add 2011-06-20
-	if(EFIELD && DIPOLE)
-	{
-		Efield EFID;
-		for (int is = 0;is < NSPIN;is++)
-		{
-			EFID.add_efield(rho_in[is], &v_in.c[is*pw.nrxx]);
-		}
-	}
+        //--------------------------------------------
+        // get the potential from the delta charge
+        //--------------------------------------------
+        this->v_h(NSPIN, ehart, v_in, rho_atom);
+
+        for(int is=0; is<NSPIN; is++)
+        {
+            delete[] rho_atom[is];
+        }
+        delete[] rho_atom;
+    }
+    else
+    {
+        this->v_h(NSPIN, ehart, v_in, rho_in);
+    }
+
+    // mohan add 2011-06-20
+    if(EFIELD && DIPOLE)
+    {
+        Efield EFID;
+        for (int is = 0;is < NSPIN;is++)
+        {
+            EFID.add_efield(rho_in[is], &v_in.c[is*pw.nrxx]);
+        }
+    }
     timer::tick("potential","v_of_rho",'E');
     return;
 } //end subroutine v_of_rho
 
-
 //--------------------------------------------------------------------
 void potential::v_xc
 (
-	double **rho_in,
+    double **rho_in,
     double &etxc,
     double &vtxc,
     matrix &v)
@@ -347,7 +344,7 @@ void potential::v_xc
     vtxc = 0.0;
 
     // the square of the e charge
-	// in Rydeberg unit, so * 2.0.
+    // in Rydeberg unit, so * 2.0.
     double e2 = 2.0;
 
     double rhox = 0.0;
@@ -375,10 +372,10 @@ void potential::v_xc
             {
                 // call
                 XC_Functional::xc(arhox, ex, ec, vx[0], vc[0]);
-//				if(ir<10)
-//				{
-//					cout << "\n ir = " << ir << " ex = " << ex << " ec = " << ec;
-//				}
+                //if(ir<10)
+                //{
+                //    cout << "\n ir = " << ir << " ex = " << ex << " ec = " << ec;
+                //}
                 v(0,ir) = e2 * (vx[0] + vc[0]);
                 etxc += e2 * (ex + ec) * rhox;
                 vtxc += v(0, ir) * rho_in[0][ir];
@@ -422,10 +419,10 @@ void potential::v_xc
                 // call
                 XC_Functional::xc_spin(arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1]);
 
-//				if(ir<10)
-//				{
-//					cout << "\n ir = " << ir << " ex = " << ex << " ec = " << ec;
-//				}
+                //if(ir<10)
+                //{
+                //    cout << "\n ir = " << ir << " ex = " << ex << " ec = " << ec;
+                //}
 
                 for (is = 0;is < NSPIN;is++)
                 {
@@ -440,60 +437,52 @@ void potential::v_xc
         if (test_potential>0) cout<<"\n End calculate Exc(r) and Vxc(r) with SPIN == 2";
 
     } // nspin 2
-	else if(NSPIN == 4)//noncollinear case added by zhengdy
-	{
-		for( ir = 0;ir<pw.nrxx; ir++)
-		{
-			double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
+    else if(NSPIN == 4)//noncollinear case added by zhengdy
+    {
+        for( ir = 0;ir<pw.nrxx; ir++)
+        {
+            double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
 
-			rhox = rho_in[0][ir] + chr.rho_core[ir];
+            rhox = rho_in[0][ir] + chr.rho_core[ir];
 
-			if ( rho_in[0][ir] < 0.0 )  neg[0] -= rho_in[0][ir];
+            if ( rho_in[0][ir] < 0.0 )  neg[0] -= rho_in[0][ir];
 
-			arhox = abs( rhox );
+            arhox = abs( rhox );
 
-			if ( arhox > vanishing_charge )
-			{
-				zeta = amag / arhox;
+            if ( arhox > vanishing_charge )
+            {
+                zeta = amag / arhox;
 
-				if ( abs( zeta ) > 1.0 )
-				{
+                if ( abs( zeta ) > 1.0 )
+                {
+                    neg[1] += 1.0 / ucell.omega;
 
-					neg[1] += 1.0 / ucell.omega;
+                    zeta = (zeta > 0.0) ? 1.0 : (-1.0);
+                }//end if
 
-					zeta = (zeta > 0.0) ? 1.0 : (-1.0);
+                XC_Functional::xc_spin( arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1] );
 
-				}//end if
+                double vs = 0.5 * ( vx[0] + vc[0] - vx[1] - vc[1] );
+                v(0, ir) = e2*( 0.5 * ( vx[0] + vc[0] + vx[1] + vc[1] ) );
 
-				XC_Functional::xc_spin( arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1] );
-
-				double vs = 0.5 * ( vx[0] + vc[0] - vx[1] - vc[1] );
-
-				v(0, ir) = e2*( 0.5 * ( vx[0] + vc[0] + vx[1] + vc[1] ) );
-
-				if ( amag > vanishing_charge )
-				{
-					for(int ipol = 1;ipol< 4;ipol++)
-					{
-						v(ipol, ir) = e2 * vs * rho_in[ipol][ir] / amag;
-
-						vtxc += v(ipol,ir) * rho_in[ipol][ir];
-
-					}//end do
-
-				}//end if
-
-				etxc += e2 * ( ex + ec ) * rhox;
-				vtxc += v(0,ir) * rho_in[0][ir];
-			}//end if
-		}//end do
-	}//end if
+                if ( amag > vanishing_charge )
+                {
+                    for(int ipol = 1;ipol< 4;ipol++)
+                    {
+                        v(ipol, ir) = e2 * vs * rho_in[ipol][ir] / amag;
+                        vtxc += v(ipol,ir) * rho_in[ipol][ir];
+                    }//end do
+                }//end if
+                etxc += e2 * ( ex + ec ) * rhox;
+                vtxc += v(0,ir) * rho_in[0][ir];
+            }//end if
+        }//end do
+    }//end if
     // energy terms, local-density contributions
 
-
     // add gradient corrections (if any)
-	// mohan modify 2009-12-15
-	GGA_PW::gradcorr(etxc, vtxc, v);
+    // mohan modify 2009-12-15
+    GGA_PW::gradcorr(etxc, vtxc, v);
 
     // parallel code : collect vtxc,etxc
     // mohan add 2008-06-01
@@ -546,12 +535,12 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     //=============================
     pw.FFT_chg.FFT3D(Porter, -1);
 
-	//double charge;
-	//if (pw.gstart == 1)
-	//{
-	//	charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
-	//}
-	//OUT(ofs_running, "v_h charge", charge);
+    //double charge;
+    //if (pw.gstart == 1)
+    //{
+    //    charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
+    //}
+    //OUT(ofs_running, "v_h charge", charge);
 
     //=======================================================
     // calculate hartree potential in G-space (NB: V(G=0)=0 )
@@ -566,17 +555,17 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
         const int j = pw.ig2fftc[ig];
         if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
         {
-        	const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
 
-        	ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-        	vh_g[ig] = fac * Porter[j];
+            ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+            vh_g[ig] = fac * Porter[j];
         }
     }
 
     Parallel_Reduce::reduce_double_pool( ehart );
     ehart *= 0.5 * ucell.omega;
 
-	//cout << " ehart=" << ehart << endl;
+    //cout << " ehart=" << ehart << endl;
 
     ZEROS(Porter, pw.nrxx);
 
@@ -593,40 +582,40 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
     //Add hartree potential to the xc potential
     //==========================================
 
-	if(NSPIN==4)
-	for (int ir = 0;ir < pw.nrxx;ir++)
-	{
-		v(0, ir) += Porter[ir].real();
-	}
-	else
-    	for (int is = 0;is < NSPIN;is++)
-    	{
-        	for (int ir = 0;ir < pw.nrxx;ir++)
-        	{
-            		v(is, ir) += Porter[ir].real();
-        	}
-    	}
+    if(NSPIN==4)
+    for (int ir = 0;ir < pw.nrxx;ir++)
+    {
+        v(0, ir) += Porter[ir].real();
+    }
+    else
+    for (int is = 0;is < NSPIN;is++)
+    {
+        for (int ir = 0;ir < pw.nrxx;ir++)
+        {
+            v(is, ir) += Porter[ir].real();
+        }
+    }
 
-	//-------------------------------------------
-	// output the Hartree potential into a file.
-	//-------------------------------------------
-	if(out_potential==-2)
-	{
-		cout << " output VH" << endl;
-		int is = 0;
-		int iter = 0;
-		int precision = 3;
-		string fn = "VH.dat";
-		stringstream ss;
-		ss << global_out_dir << fn;
-		matrix v;
-		v.create(1,pw.nrxx);
-		for(int ir=0; ir<pw.nrxx; ++ir)
-		{
-			v(0,ir) = Porter[ir].real();
-		}
-		this->write_potential( is, iter, ss.str(), v, precision, 1 );
-	}
+    //-------------------------------------------
+    // output the Hartree potential into a file.
+    //-------------------------------------------
+    if(out_potential==-2)
+    {
+        cout << " output VH" << endl;
+        int is = 0;
+        int iter = 0;
+        int precision = 3;
+        string fn = "VH.dat";
+        stringstream ss;
+        ss << global_out_dir << fn;
+        matrix v;
+        v.create(1,pw.nrxx);
+        for(int ir=0; ir<pw.nrxx; ++ir)
+        {
+            v(0,ir) = Porter[ir].real();
+        }
+        this->write_potential( is, iter, ss.str(), v, precision, 1 );
+    }
 
     timer::tick("potential","v_hartree");
     delete[] vh_g;
@@ -637,59 +626,58 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
 void potential::write_potential(const int &is, const int &iter, const string &fn, 
 const matrix &v, const int &precision, const int &hartree)const
 {
-	TITLE("potential","write_potential");
+    TITLE("potential","write_potential");
 
-	if(out_potential==0) 
-	{
-		return;
-	}
-	else if(out_potential<0)
-	{
-		if(hartree==0) return;
-	}
-	else if(iter % out_potential != 0)
-	{
-		return;
-	}
-	timer::tick("potential","write_potential");
+    if(out_potential==0) 
+    {
+        return;
+    }
+    else if(out_potential<0)
+    {
+        if(hartree==0) return;
+    }
+    else if(iter % out_potential != 0)
+    {
+        return;
+    }
+    timer::tick("potential","write_potential");
 
-	ofstream ofs;
+    ofstream ofs;
 
-	if(MY_RANK==0)
-	{
-		ofs.open( fn.c_str() );
-		ofs << pw.ncx << " " << pw.ncy << " " << pw.ncz;
-    	ofs << setprecision(precision);
-		ofs << scientific; 
-		if(!ofs)
-		{
-			WARNING("potential::write_potential","Can't create VHartree File!");
-		}
-	}	
-	
+    if(MY_RANK==0)
+    {
+        ofs.open( fn.c_str() );
+        ofs << pw.ncx << " " << pw.ncy << " " << pw.ncz;
+        ofs << setprecision(precision);
+        ofs << scientific; 
+        if(!ofs)
+        {
+            WARNING("potential::write_potential","Can't create VHartree File!");
+        }
+    }	
 
 #ifndef __MPI
-	int count=0;
-	for(int k=0; k<pw.ncz; k++)
-	{
-		ofs << "\n" << k << " iz";
-		double value = 0.0;
-		double ave = 0.0;
-		for(int j=0; j<pw.ncy; j++)
-		{
-			for(int i=0; i<pw.ncx; i++)
-			{
-				if(count%8==0) ofs << "\n";
-				value = v(is, i*pw.ncy*pw.ncz + j*pw.ncz + k);
-				ofs << " " << value;
-				ave += value;
-				++count;
-			}
-		}
-		ofs << "\n" << ave/pw.ncx/pw.ncy << " average";
-	}
+    int count=0;
+    for(int k=0; k<pw.ncz; k++)
+    {
+        ofs << "\n" << k << " iz";
+        double value = 0.0;
+        double ave = 0.0;
+        for(int j=0; j<pw.ncy; j++)
+        {
+            for(int i=0; i<pw.ncx; i++)
+            {
+                if(count%8==0) ofs << "\n";
+                value = v(is, i*pw.ncy*pw.ncz + j*pw.ncz + k);
+                ofs << " " << value;
+                ave += value;
+                ++count;
+            }
+        }
+        ofs << "\n" << ave/pw.ncx/pw.ncy << " average";
+    }
 #else
-	MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD);
     // only do in the first pool.
     if(MY_POOL==0)
     {
@@ -729,70 +717,70 @@ const matrix &v, const int &precision, const int &hartree)const
                     break;
                 }
             }
-//          ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
+            //ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
         }
-		int count=0;
-		int nxy = pw.ncx * pw.ncy;
-		double* zpiece = new double[nxy];
-		// save the rho one z by one z.
-		for(int iz=0; iz<pw.ncz; iz++)
-		{
-			ofs_running << "\n" << iz << " iz";
-			// tag must be different for different iz.
-			ZEROS(zpiece, nxy);
-			int tag = iz;
-			MPI_Status ierror;
+        int count=0;
+        int nxy = pw.ncx * pw.ncy;
+        double* zpiece = new double[nxy];
+        // save the rho one z by one z.
+        for(int iz=0; iz<pw.ncz; iz++)
+        {
+            ofs_running << "\n" << iz << " iz";
+            // tag must be different for different iz.
+            ZEROS(zpiece, nxy);
+            int tag = iz;
+            MPI_Status ierror;
 
-			// case 1: the first part of rho in processor 0.
-			if(which_ip[iz] == 0 && RANK_IN_POOL ==0)
-			{
-				for(int ir=0; ir<nxy; ir++)
-				{
-					zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[RANK_IN_POOL] );
-					//ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
-				}
-			}
-			// case 2: > first part rho: send the rho to
-			// processor 0.
-			else if(which_ip[iz] == RANK_IN_POOL )
-			{
-				for(int ir=0; ir<nxy; ir++)
-				{
-					zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[RANK_IN_POOL]);
-				}
-				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
-			}
+            // case 1: the first part of rho in processor 0.
+            if(which_ip[iz] == 0 && RANK_IN_POOL ==0)
+            {
+                for(int ir=0; ir<nxy; ir++)
+                {
+                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[RANK_IN_POOL] );
+                    //ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+                }
+            }
+            // case 2: > first part rho: send the rho to
+            // processor 0.
+            else if(which_ip[iz] == RANK_IN_POOL )
+            {
+                for(int ir=0; ir<nxy; ir++)
+                {
+                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[RANK_IN_POOL]);
+                }
+                MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
+            }
 
-			// case 2: > first part rho: processor 0 receive the rho
-			// from other processors
-			else if(RANK_IN_POOL==0)
-			{
-				MPI_Recv(zpiece, nxy, MPI_DOUBLE, which_ip[iz], tag, POOL_WORLD, &ierror);
-				//                  ofs_running << "\n Receieve First number = " << zpiece[0];
-			}
+            // case 2: > first part rho: processor 0 receive the rho
+            // from other processors
+            else if(RANK_IN_POOL==0)
+            {
+                MPI_Recv(zpiece, nxy, MPI_DOUBLE, which_ip[iz], tag, POOL_WORLD, &ierror);
+                //ofs_running << "\n Receieve First number = " << zpiece[0];
+            }
 
-			// write data
-			if(MY_RANK==0)
-			{
-				//  ofs << "\niz=" << iz;
-				double ave = 0.0;
-				for(int ir=0; ir<nxy; ir++)
-				{
-					if(count%8==0) ofs << "\n";
-					ofs << " " << zpiece[ir];
-					ave += zpiece[ir];
-					++count;
-				}
-				ofs << "\n" << ave/nxy << " average"; 
-			}
-		}
-		delete[] zpiece;
+            // write data
+            if(MY_RANK==0)
+            {
+                //ofs << "\niz=" << iz;
+                double ave = 0.0;
+                for(int ir=0; ir<nxy; ir++)
+                {
+                    if(count%8==0) ofs << "\n";
+                    ofs << " " << zpiece[ir];
+                    ave += zpiece[ir];
+                    ++count;
+                }
+                ofs << "\n" << ave/nxy << " average"; 
+            }
+        }
+        delete[] zpiece;
     }
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
     if(MY_RANK==0) ofs.close();
-	timer::tick("potential","write_potential");
-	return;
+    timer::tick("potential","write_potential");
+    return;
 }
 
 //==========================================================
@@ -819,86 +807,83 @@ void potential::set_vrs(const bool doublegrid)
 	if(NSPIN==4&&is>0)
 	for (int i = 0;i < pw.nrxx;i++)
 	{
-		this->vrs(is, i) = this->vr(is, i);
+            this->vrs(is, i) = this->vr(is, i);
 	}
 	else        
 	for (int i = 0;i < pw.nrxx;i++)
         {
             this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-//	    cout <<"i: "<< i <<"	"<< "vrs: " << vrs(is,i) <<endl;
+            //cout <<"i: "<< i <<"	"<< "vrs: " << vrs(is,i) <<endl;
 	}
 
-	//====================================================
+        //====================================================
         // add external linear potential, fuxiang add in 2017/05
         //====================================================
 /*
-	if (istep >= 0)
-	{
-		for (int i = 0;i < pw.nrxx;i++)
-        		{
-            		this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-		}
-	}
-	else
-	{
-		this->vext = new double[pw.nrxx];
-		const int yz = pw.ncy*pw.nczp;
-		int index, i, j, k;
+        if (istep >= 0)
+        {
+            for (int i = 0;i < pw.nrxx;i++)
+            {
+                this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+            }
+        }
+        else
+        {
+            this->vext = new double[pw.nrxx];
+            const int yz = pw.ncy*pw.nczp;
+            int index, i, j, k;
 
-		for(int ir=0; ir<pw.nrxx; ++ir)
-		{
-			index = ir;
-			i     = index / yz; // get the z, z is the fastest
-			index = index - yz * i;// get (x,y)
-			j     = index / pw.nczp;// get y
-			k     = index - pw.nczp*j + pw.nczp_start;// get x
+            for(int ir=0; ir<pw.nrxx; ++ir)
+            {
+                index = ir;
+                i     = index / yz; // get the z, z is the fastest
+                index = index - yz * i;// get (x,y)
+                j     = index / pw.nczp;// get y
+                k     = index - pw.nczp*j + pw.nczp_start;// get x
 
-			//if (k<pw.ncx*0.1)	this->vext[ir] = -0.4*k/pw.ncx+0.05;
-			//else if (k>=pw.ncx*0.1 && k<pw.ncx*0.9)	this->vext[ir] = 0.1*k/pw.ncx;
-			//else if (k>=pw.ncx*0.9)	this->vext[ir] = -0.4*(1.0*k/pw.ncx-1)+0.05;
+                //if (k<pw.ncx*0.1) this->vext[ir] = -0.4*k/pw.ncx+0.05;
+                //else if (k>=pw.ncx*0.1 && k<pw.ncx*0.9) this->vext[ir] = 0.1*k/pw.ncx;
+                //else if (k>=pw.ncx*0.9) this->vext[ir] = -0.4*(1.0*k/pw.ncx-1)+0.05;
 
-			if (k<pw.ncx*0.05)		this->vext[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
-			else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95)	this->vext[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
-			else if (k>=pw.ncx*0.95)	this->vext[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
-		
-			this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
+                if (k<pw.ncx*0.05) this->vext[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
+                else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) this->vext[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
+                else if (k>=pw.ncx*0.95) this->vext[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
 
-			//cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
-			//cout << "vext: " << this->vext[ir] << endl;
-			//cout << "vrs: " << vrs(is,ir) <<endl;
-		}
-	}
+                this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
+
+                //cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
+                //cout << "vext: " << this->vext[ir] << endl;
+                //cout << "vrs: " << vrs(is,ir) <<endl;
+            }
+        }
 */
-
 
         //====================================================
         // And interpolate it on the smooth mesh if necessary
         //====================================================
         /*
-        		if (doublegrid)
-        		{
-        			double *vrs_1d = new double[pw.nrxx]();
-        			assert(vrs_1d != 0);
-        			dcopy(vrs, is, vrs_1d);
-        			//interpolate (vrs (1, is), vrs (1, is), - 1);
-        			interpolate(vrs_1d, vrs_1d, -1);
-        			//(vrs ( is, 0), vrs ( is, 0), - 1);
-        			delete [] vrs_1d;
-        		}
+        if (doublegrid)
+        {
+            double *vrs_1d = new double[pw.nrxx]();
+            assert(vrs_1d != 0);
+            dcopy(vrs, is, vrs_1d);
+            //interpolate (vrs (1, is), vrs (1, is), - 1);
+            interpolate(vrs_1d, vrs_1d, -1);
+            //(vrs ( is, 0), vrs ( is, 0), - 1);
+            delete [] vrs_1d;
+        }
         */
     }
 
-
 #ifdef __FP
-	if(BFIELD)
-	{
-		if(NSPIN==2)
-		{
-			bfid.add_zeeman();
-		}
-	}
+    if(BFIELD)
+    {
+        if(NSPIN==2)
+        {
+            bfid.add_zeeman();
+        }
+    }
 #endif
-
 
     timer::tick("potential","set_vrs");
     return;
@@ -934,38 +919,38 @@ void potential::newd()
                 {
                     for (int jh=ih; jh<nht; jh++)
                     {
-				if(LSPINORB)
-				{
-					ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
-					ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
-				}
-				else if( NONCOLIN )
-				{
-					if(is==0)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-						ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-					}
-					else if(is==1)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-						ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-					}
-					else if(is==2)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-						ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-					}
-					else if(is==3)
-					{
-						ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-						ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-					}
-				}
-				else{
-					ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-					ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-				}
+                        if(LSPINORB)
+                        {
+                            ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
+                            ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
+                        }
+                        else if( NONCOLIN )
+                        {
+                            if(is==0)
+                            {
+                                ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+                                ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+                            }
+                            else if(is==1)
+                            {
+                                ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+                                ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+                            }
+                            else if(is==2)
+                            {
+                                ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+                                ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+                            }
+                            else if(is==3)
+                            {
+                                ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+                                ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+                            }
+                        }
+                        else{
+                            ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+                            ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+                        }
                     }
                 }
             }
@@ -1014,178 +999,178 @@ void potential::print_pot(ofstream &ofs)const
 // from mix_potential.f90
 //-----------------------------------------------------------------------
 void potential::mix_potential (int ndim, double *vout, double *vin, double alphamix,
-			   double &dr2, double tr2, int iter, int n_iter, string filename,
-			   bool &conv)
+                           double &dr2, double tr2, int iter, int n_iter, string filename,
+                           bool &conv)
 {
-	cout << "\n ==== mix_potential() ==== ";
-	//-----------------------------------------------------------------------
-	//
-	// Modified Broyden"s method for potential/charge density mixing
-	//             D.D.Johnson, PRB 38, 12807 (1988)
-	// On input :
-	//    ndim      dimension of arrays vout, vin
-	//    vout      output potential/rho at current iteration
-	//    vin       potential/rho at previous iteration
-	//    alphamix  mixing factor (0 < alphamix <= 1)
-	//    tr2       threshold for selfconsistency
-	//    iter      current iteration number
-	//    n_iter    number of iterations used in the mixing
-	//    filename  if present save previous iterations on file "filename"
-	//              otherwise keep everything in memory
-	// On output:
-	//    dr2       [(vout-vin)/ndim]^2
-	//    vin       mixed potential
-	//    vout      vout-vin
-	//    conv      true if dr2 <= tr2
+    cout << "\n ==== mix_potential() ==== ";
+    //-----------------------------------------------------------------------
+    //
+    // Modified Broyden"s method for potential/charge density mixing
+    //             D.D.Johnson, PRB 38, 12807 (1988)
+    // On input :
+    //    ndim      dimension of arrays vout, vin
+    //    vout      output potential/rho at current iteration
+    //    vin       potential/rho at previous iteration
+    //    alphamix  mixing factor (0 < alphamix <= 1)
+    //    tr2       threshold for selfconsistency
+    //    iter      current iteration number
+    //    n_iter    number of iterations used in the mixing
+    //    filename  if present save previous iterations on file "filename"
+    //              otherwise keep everything in memory
+    // On output:
+    //    dr2       [(vout-vin)/ndim]^2
+    //    vin       mixed potential
+    //    vout      vout-vin
+    //    conv      true if dr2 <= tr2
 
-	//   First the dummy variables
-	// character (len=42) :: filename
-	// integer :: ndim, iter, n_iter
-	// real(kind=DP) :: vout (ndim), vin (ndim), alphamix, dr2, tr2
-	// logical :: conv
+    //   First the dummy variables
+    // character (len=42) :: filename
+    // integer :: ndim, iter, n_iter
+    // real(kind=DP) :: vout (ndim), vin (ndim), alphamix, dr2, tr2
+    // logical :: conv
 
-	//   Here the local variables
+    //   Here the local variables
 
-	// max number of iterations used in mixing: n_iter must be .le. maxter
-	// parameter :
-	int maxter = 8;
+    // max number of iterations used in mixing: n_iter must be .le. maxter
+    // parameter :
+    int maxter = 8;
 
-	int n, i, j, *iwork, info, iter_used,
-       ipos, inext, ndimtot;
-	iwork = new int[maxter];
-	assert(iwork != 0);
-	// work space containing info from previous iterations:
-	// must be kept in memory and saved between calls if filename=' '
+    int n, i, j, *iwork, info, iter_used,
+    ipos, inext, ndimtot;
+    iwork = new int[maxter];
+    assert(iwork != 0);
+    // work space containing info from previous iterations:
+    // must be kept in memory and saved between calls if filename=' '
 
-	// allocatable, save ::
-	matrix  df, dv ;
-	double *vinsave, *ework;
-	ework = new double[maxter];
-	assert(ework != 0);
-	matrix beta (maxter, maxter);
-	double gamma, norm;
+    // allocatable, save ::
+    matrix  df, dv ;
+    double *vinsave, *ework;
+    ework = new double[maxter];
+    assert(ework != 0);
+    matrix beta (maxter, maxter);
+    double gamma, norm;
 
-	// adjustable parameters as suggested in the original paper
-	double *w, w0;
-	w = new double[maxter];
-	// data :
-	w0 = 0.010 ;
-	// w / maxter * 1.0 / ?
+    // adjustable parameters as suggested in the original paper
+    double *w, w0;
+    w = new double[maxter];
+    // data :
+    w0 = 0.010 ;
+    // w / maxter * 1.0 / ?
 
-	double *work;
-	work = new double[maxter];//?
-	assert(work != 0);
-	start_clock ("mix_pot");
+    double *work;
+    work = new double[maxter];//?
+    assert(work != 0);
+    start_clock ("mix_pot");
 
-	if (iter < 1)
-		cout << "\n mix_potential, iter is wrong";
-	if (nmix > maxter)
-		cout << "\n mix_potential, nmix too big";
-	if (ndim <= 0)
-		cout << "\n mix_potential, ndim <= 0";
+    if (iter < 1)
+        cout << "\n mix_potential, iter is wrong";
+    if (nmix > maxter)
+        cout << "\n mix_potential, nmix too big";
+    if (ndim <= 0)
+        cout << "\n mix_potential, ndim <= 0";
 
-	for(n=0;n<ndim;n++){ //	do n = 1, ndim
-		vout [n] -= vin [n];
-	} //  enddo
-	// dr2 = dnrm2 (ndim, vout, 1) **2;
-	dr2 = dnrm2 (ndim, vout, 1) ;
-	dr2 *= dr2;
-	ndimtot = ndim;
+    for(n=0;n<ndim;n++){ //	do n = 1, ndim
+        vout [n] -= vin [n];
+    } //  enddo
+    // dr2 = dnrm2 (ndim, vout, 1) **2;
+    dr2 = dnrm2 (ndim, vout, 1) ;
+    dr2 *= dr2;
+    ndimtot = ndim;
 #ifdef __PARA
-	reduce (1, dr2);
-	ireduce (1, ndimtot);
+    reduce (1, dr2);
+    ireduce (1, ndimtot);
 #endif
-	dr2 = (sqrt (dr2) / ndimtot);	// **2;
-	dr2 *= dr2;
-	conv_elec = dr2 < tr2;
-	if (iter == 1){
-		matrix df( nmix, ndim );
-		matrix dv( nmix, ndim );
-	} //  endif
-	if (conv_elec) {
-		dv.freemem();
-		df.freemem();
-		stop_clock ("mix_pot");
-		return;
-	} // endif
-	vinsave = new double [ndim];
+    dr2 = (sqrt (dr2) / ndimtot);	// **2;
+    dr2 *= dr2;
+    conv_elec = dr2 < tr2;
+    if (iter == 1){
+        matrix df( nmix, ndim );
+        matrix dv( nmix, ndim );
+    } //  endif
+    if (conv_elec) {
+        dv.freemem();
+        df.freemem();
+        stop_clock ("mix_pot");
+        return;
+    } // endif
+    vinsave = new double [ndim];
 
-	// iter_used = iter-1  if iter <= n_iter
-	// iter_used = n_iter  if iter >  n_iter
+    // iter_used = iter-1  if iter <= n_iter
+    // iter_used = n_iter  if iter >  n_iter
     iter_used = (iter - 1 < nmix)?(iter-1):nmix;	// min
-	// ipos is the position in which results from the present iteraction
-	// are stored. ipos=iter-1 until ipos=n_iter, then back to 1,2,...
+    // ipos is the position in which results from the present iteraction
+    // are stored. ipos=iter-1 until ipos=n_iter, then back to 1,2,...
 
-	ipos = iter - 1 - ( (iter - 2) / nmix) * nmix;
-	if (iter > 1){
-		for(n=0;n<ndim;n++){ //  do n = 1, ndim
-			df (ipos, n) = vout [n] - df (ipos, n);
-			dv (ipos, n) = vin  [n] - dv (ipos, n);
-		} //  enddo
-		// norm = (dnrm2 (ndim, df (1, ipos), 1) ) **2;
-		norm = dnrm2 (df,ipos);
-		norm *= norm;
+    ipos = iter - 1 - ( (iter - 2) / nmix) * nmix;
+    if (iter > 1){
+        for(n=0;n<ndim;n++){ //  do n = 1, ndim
+            df (ipos, n) = vout [n] - df (ipos, n);
+            dv (ipos, n) = vin  [n] - dv (ipos, n);
+        } //  enddo
+        // norm = (dnrm2 (ndim, df (1, ipos), 1) ) **2;
+        norm = dnrm2 (df,ipos);
+        norm *= norm;
 #ifdef __PARA
-		reduce (1, norm);
+        reduce (1, norm);
 #endif
-		norm = sqrt (norm);
-		dscal (1.0 / norm, df,ipos);	// dscal(ndim,1.0/norm,df (1, ipos), 1);
-		dscal (1.0 / norm, dv,ipos);	// dscal(ndim,1.0/norm,dv (1, ipos), 1);
-	} //  endif
+        norm = sqrt (norm);
+        dscal (1.0 / norm, df,ipos);	// dscal(ndim,1.0/norm,df (1, ipos), 1);
+        dscal (1.0 / norm, dv,ipos);	// dscal(ndim,1.0/norm,dv (1, ipos), 1);
+    } //  endif
 
-	dcopy (ndim, vin, 1, vinsave, 1);
+    dcopy (ndim, vin, 1, vinsave, 1);
 
-	for(i=0;i<iter_used;i++){ // do i = 1, iter_used
-		for(j=i+1;j<iter_used;j++){ //  do j = i + 1, iter_used
-			beta (i, j) = w [i] * w [j] * ddot (df,j, df,i);
-							//ddot(ndim, df (1, j), 1, df (1, i), 1);
+    for(i=0;i<iter_used;i++){ // do i = 1, iter_used
+        for(j=i+1;j<iter_used;j++){ //  do j = i + 1, iter_used
+            beta (i, j) = w [i] * w [j] * ddot (df,j, df,i);
+                            //ddot(ndim, df (1, j), 1, df (1, i), 1);
 #ifdef __PARA
-			reduce (1, beta (i, j) );
+            reduce (1, beta (i, j) );
 #endif
-		} // enddo
-		beta (i, i) = w0 * w0 + w [i] * w[i];
-	} // enddo
+        } // enddo
+        beta (i, i) = w0 * w0 + w [i] * w[i];
+    } // enddo
 
-	dsytrf ('U', iter_used, beta, maxter, iwork, work, maxter, info);
-	cout << "\n broyden, factorization, info: "
-		<< info;
-	dsytri ('U', iter_used, beta, maxter, iwork, work, info);
-	cout << "\n broyden, dsytri, info : "
-		<< info;
-	for(i=0;i<iter_used;i++){ // do i = 1, iter_used
-		for(j=i+1;j<iter_used;j++){ // do j = i + 1, iter_used
-			beta (j, i) = beta (i, j);
-		} //enddo
-	} //  enddo
-	for(i=0;i<iter;i++){ // do i = 1, iter_used;
-		work [i] = ddot (df,i,vout);	//ddot(ndim,df (1, i), 1, vout, 1);
-	} // enddo
+    dsytrf ('U', iter_used, beta, maxter, iwork, work, maxter, info);
+    cout << "\n broyden, factorization, info: "
+        << info;
+    dsytri ('U', iter_used, beta, maxter, iwork, work, info);
+    cout << "\n broyden, dsytri, info : "
+        << info;
+    for(i=0;i<iter_used;i++){ // do i = 1, iter_used
+        for(j=i+1;j<iter_used;j++){ // do j = i + 1, iter_used
+            beta (j, i) = beta (i, j);
+        } //enddo
+    } //  enddo
+    for(i=0;i<iter;i++){ // do i = 1, iter_used;
+        work [i] = ddot (df,i,vout);	//ddot(ndim,df (1, i), 1, vout, 1);
+    } // enddo
 #ifdef __PARA
-	reduce (iter_used, work);
+    reduce (iter_used, work);
 #endif
-	for(n=0;n<ndim;n++){ // do n = 1, ndim
-		vin [n] = vin [n] + mixing_beta * vout [n];
-	} // enddo
-	for(i=0;i<iter_used;i++){ // do i = 1, iter_used
-		gamma = 0.0;
-		for(j=0;j<iter_used;j++){ // do j = 1, iter_used
-			gamma = gamma + beta (i, j) * w [j] * work [j];
-		} // enddo
-		for(n=0;n<ndim;n++){ // do n = 1, ndim
-			vin [n] = vin [n] - w [i] * gamma * (mixing_beta * df (i, n) +
-				dv (i, n) );
-		} // enddo
-	} // enddo
+    for(n=0;n<ndim;n++){ // do n = 1, ndim
+        vin [n] = vin [n] + mixing_beta * vout [n];
+    } // enddo
+    for(i=0;i<iter_used;i++){ // do i = 1, iter_used
+        gamma = 0.0;
+        for(j=0;j<iter_used;j++){ // do j = 1, iter_used
+            gamma = gamma + beta (i, j) * w [j] * work [j];
+        } // enddo
+        for(n=0;n<ndim;n++){ // do n = 1, ndim
+            vin [n] = vin [n] - w [i] * gamma * (mixing_beta * df (i, n) +
+                dv (i, n) );
+        } // enddo
+    } // enddo
 
-	inext = iter - ( (iter - 1) / nmix) * nmix;
-//	dcopy (ndim, vout,    df,inext);	//df(1, inext), 1);
-	dcopy (vout,    df, inext);	//df(1, inext), 1);
-//	dcopy (ndim, vinsave, dv,inext);	//dv(1, inext), 1);
-	dcopy (vinsave, dv, inext);	//dv(1, inext), 1);
+    inext = iter - ( (iter - 1) / nmix) * nmix;
+    //dcopy (ndim, vout,    df,inext);	//df(1, inext), 1);
+    dcopy (vout,    df, inext);	//df(1, inext), 1);
+    //dcopy (ndim, vinsave, dv,inext);	//dv(1, inext), 1);
+    dcopy (vinsave, dv, inext);	//dv(1, inext), 1);
 
-	delete [] vinsave;
-	stop_clock ("mix_pot");
-	return;
+    delete [] vinsave;
+    stop_clock ("mix_pot");
+    return;
 } //end subroutine mix_potential
 */
 
@@ -1217,128 +1202,123 @@ void potential::set_vrs_tddft(const bool doublegrid, const int istep)
 
     for (int is = 0;is < NSPIN;is++)
     {
-	//====================================================
+        //====================================================
         // add external linear potential, fuxiang add in 2017/05
         //====================================================
 
-	const int timescale = 1;  // get the time that vext influences;
-	if (istep >= timescale)
-	{
-		for (int i = 0;i < pw.nrxx;i++)
-        	{
-            		this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-		}
-		cout << "vext = 0! " << endl;
-	}
-	else
-	{
-		this->vextold = new double[pw.nrxx];
-		this->vext = new double[pw.nrxx];
-		const int yz = pw.ncy*pw.nczp;
-		int index, i, j, k;
+        const int timescale = 1;  // get the time that vext influences;
+        if (istep >= timescale)
+        {
+            for (int i = 0;i < pw.nrxx;i++)
+            {
+                this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+            }
+            cout << "vext = 0! " << endl;
+        }
+        else
+        {
+            this->vextold = new double[pw.nrxx];
+            this->vext = new double[pw.nrxx];
+            const int yz = pw.ncy*pw.nczp;
+            int index, i, j, k;
 
-		for(int ir=0; ir<pw.nrxx; ++ir)
-		{
-			index = ir;
-			i     = index / yz; // get the z, z is the fastest
-			index = index - yz * i;// get (x,y)
-			j     = index / pw.nczp;// get y
-			k     = index - pw.nczp*j + pw.nczp_start;// get x
+            for(int ir=0; ir<pw.nrxx; ++ir)
+            {
+                index = ir;
+                i     = index / yz; // get the z, z is the fastest
+                index = index - yz * i;// get (x,y)
+                j     = index / pw.nczp;// get y
+                k     = index - pw.nczp*j + pw.nczp_start;// get x
 
-			if(vext_dire == 1)
-			{
-				if (k<pw.ncx*0.05)		this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
-				else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
-				else if (k>=pw.ncx*0.95)	this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
-			}
-			else if(vext_dire == 2)
-			{
-				if (j<pw.ncx*0.05)		this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
-				else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
-				else if (j>=pw.ncx*0.95)	this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
-			}
-			else if(vext_dire == 3)
-			{
-				if (i<pw.ncx*0.05)		this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
-				else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
-				else if (i>=pw.ncx*0.95)	this->vextold[ir] = (0.019447*(1.0*i/pw.ncx-1)-0.001069585)*ucell.lat0;
-			}
+                if(vext_dire == 1)
+                {
+                    if (k<pw.ncx*0.05) this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
+                    else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
+                    else if (k>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
+                }
+                else if(vext_dire == 2)
+                {
+                    if (j<pw.ncx*0.05) this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
+                    else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
+                    else if (j>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
+                }
+                else if(vext_dire == 3)
+                {
+                    if (i<pw.ncx*0.05) this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
+                    else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95) this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
+                    else if (i>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*i/pw.ncx-1)-0.001069585)*ucell.lat0;
+                }
 
-			// Gauss
+                // Gauss
 /*
-			const double w = 22.13;    // eV
-			const double sigmasquare = 6836;
-			const double timecenter = 700;
-			const double timenow = (istep-timecenter)*INPUT.md_dt*41.34;
-			this->vext[ir] = this->vextold[ir]*cos(w/27.2116*timenow)*exp(-timenow*timenow*0.5/(sigmasquare))*0.25;  //0.1 is modified in 2018/1/12
+                const double w = 22.13;    // eV
+                const double sigmasquare = 6836;
+                const double timecenter = 700;
+                const double timenow = (istep-timecenter)*INPUT.md_dt*41.34;
+                this->vext[ir] = this->vextold[ir]*cos(w/27.2116*timenow)*exp(-timenow*timenow*0.5/(sigmasquare))*0.25;  //0.1 is modified in 2018/1/12
 */
 
-			//HHG of H atom
+                //HHG of H atom
 /*
-			if(istep < 1875)
-			{
-				this->vext[ir] = this->vextold[ir]*2.74*istep/1875*cos(0.0588*istep*INPUT.md_dt*41.34);	// 2.75 is equal to E0;
-			}
-			else if(istep < 5625)
-			{
-				this->vext[ir] = this->vextold[ir]*2.74*cos(0.0588*istep*INPUT.md_dt*41.34);
-			}
-			else if(istep < 7500)
-			{
-				this->vext[ir] = this->vextold[ir]*2.74*(7500-istep)/1875*cos(0.0588*istep*INPUT.md_dt*41.34);
-			}
+                if(istep < 1875)
+                {
+                    this->vext[ir] = this->vextold[ir]*2.74*istep/1875*cos(0.0588*istep*INPUT.md_dt*41.34);	// 2.75 is equal to E0;
+                }
+                else if(istep < 5625)
+                {
+                    this->vext[ir] = this->vextold[ir]*2.74*cos(0.0588*istep*INPUT.md_dt*41.34);
+                }
+                else if(istep < 7500)
+                {
+                    this->vext[ir] = this->vextold[ir]*2.74*(7500-istep)/1875*cos(0.0588*istep*INPUT.md_dt*41.34);
+                }
 */
 
-			//HHG of H2
+                //HHG of H2
 
-//			const double timenow = (istep)*INPUT.md_dt*41.34;
-			//this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow);
-			//this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow)*0.01944;
-//			this->vext[ir] = this->vextold[ir]*2.74*cos(0.0428*timenow)*sin(0.00107*timenow)*sin(0.00107*timenow);
+                //const double timenow = (istep)*INPUT.md_dt*41.34;
+                //this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow);
+                //this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow)*0.01944;
+                //this->vext[ir] = this->vextold[ir]*2.74*cos(0.0428*timenow)*sin(0.00107*timenow)*sin(0.00107*timenow);
 
-						
-			this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
+                this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
 
-			//cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
-			//cout << "vext: " << this->vext[ir] << endl;
-			//cout << "vrs: " << vrs(is,ir) <<endl;
-		}
-		cout << "vext is existed!" << endl;
+                //cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
+                //cout << "vext: " << this->vext[ir] << endl;
+                //cout << "vrs: " << vrs(is,ir) <<endl;
+            }
+            cout << "vext is existed!" << endl;
 
-		delete[] this->vextold;
-		delete[] this->vext;
-	}
-
-
+            delete[] this->vextold;
+            delete[] this->vext;
+        }
 
         //====================================================
         // And interpolate it on the smooth mesh if necessary
         //====================================================
         /*
-        		if (doublegrid)
-        		{
-        			double *vrs_1d = new double[pw.nrxx]();
-        			assert(vrs_1d != 0);
-        			dcopy(vrs, is, vrs_1d);
-        			//interpolate (vrs (1, is), vrs (1, is), - 1);
-        			interpolate(vrs_1d, vrs_1d, -1);
-        			//(vrs ( is, 0), vrs ( is, 0), - 1);
-        			delete [] vrs_1d;
-        		}
+        if (doublegrid)
+        {
+            double *vrs_1d = new double[pw.nrxx]();
+            assert(vrs_1d != 0);
+            dcopy(vrs, is, vrs_1d);
+            //interpolate (vrs (1, is), vrs (1, is), - 1);
+            interpolate(vrs_1d, vrs_1d, -1);
+            //(vrs ( is, 0), vrs ( is, 0), - 1);
+            delete [] vrs_1d;
+        }
         */
     }
 
-
 #ifdef __FP
-	if(BFIELD)
-	{
-		if(NSPIN==2)
-		{
-			bfid.add_zeeman();
-		}
-	}
+    if(BFIELD)
+    {
+        if(NSPIN==2)
+        {
+            bfid.add_zeeman();
+        }
+    }
 #endif
-
 
     timer::tick("potential","set_vrs_tddft");
     return;
