@@ -458,6 +458,23 @@ void Input_Conv::Convert(void)
 	MD::md_tstep=INPUT.md_tstep;
 	MD::md_delt=INPUT.md_delt;
 */
+//----------------------------------------------------------
+// about restart									//Peize Lin add 2020-04-04
+//----------------------------------------------------------	
+	if(INPUT.restart_save)
+	{
+		if(true)
+			restart.info_save.mode = "charge";
+		else
+			restart.info_save.mode = "H";
+	}
+	if(INPUT.restart_load)
+	{
+		if(true)
+			restart.info_load.mode = "charge";
+		else
+			restart.info_load.mode = "H";
+	}
 
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 

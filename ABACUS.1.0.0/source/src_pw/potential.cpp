@@ -146,6 +146,14 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
         {
             WARNING_QUIT("potential::init_pot","start_pot is wrong!");
         }
+		
+		// Peize Lin add 2020.04.04
+		if("charge"==restart.info_load.mode && !restart.info_load.finish)
+		{
+			for(int is=0; is<NSPIN; ++is)
+				restart.load_disk(is);
+			restart.info_load.finish = true;
+		}
     }
     else
     {
