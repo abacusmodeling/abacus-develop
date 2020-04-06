@@ -379,6 +379,13 @@ public:
 	int val_elec_03;			//valence electron 03
 	int vext;			//add extern potential or not
 	int vext_dire;			//vext direction
+	
+//==========================================================
+// restart
+// Peize Lin add 2020-04-04
+//==========================================================
+	bool restart_save;
+	bool restart_load;
 
 	//xiaohui add 2015-09-16
 	bool input_error;

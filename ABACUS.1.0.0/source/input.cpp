@@ -502,6 +502,12 @@ void Input::Default(void)
     
     newDM=0; // Shen Yu add 2019/5/9
          mulliken=0;// qi feng add 2019/9/10
+		 
+//----------------------------------------------------------			//Peize Lin add 2020-04-04
+// restart
+//----------------------------------------------------------
+	restart_save = false;
+	restart_load = false;
 
     return;
 }
@@ -1101,15 +1107,15 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, out_hs);
         }
-        //LiuXh add 2019-07-15
-        else if (strcmp("out_hs2", word) == 0)
-        {
-            read_value(ifs, out_hs2);
-        }
-        else if (strcmp("out_r", word) == 0)
-        {
-            read_value(ifs, out_r_matrix);
-        }
+		//LiuXh add 2019-07-15
+		else if (strcmp("out_hs2", word) == 0)
+		{
+			read_value(ifs, out_hs2);
+		}
+		else if (strcmp("out_r", word) == 0)
+		{
+			read_value(ifs, out_r_matrix);
+		}
         else if (strcmp("out_lowf", word) == 0)
         {
             read_value(ifs, out_lowf);
@@ -1309,47 +1315,47 @@ bool Input::Read(const string &fn)
 // tddft
 // Fuxiang He add 2016-10-26
 //----------------------------------------------------------
-        else if (strcmp("tddft", word) == 0)
-        {
-            read_value(ifs,tddft );
-        }
-        else if (strcmp("td_dr2", word) == 0)
-        {
-            read_value(ifs,td_dr2 );
-        }
-        else if (strcmp("td_dt", word) == 0)
-        {
-            read_value(ifs,td_dt );
-        }
-        else if (strcmp("td_force_dt", word) == 0)
-        {
-            read_value(ifs,td_force_dt );
-        }
-        else if (strcmp("val_elec_01", word) == 0)
-        {
-            read_value(ifs, val_elec_01);
-        }
-        else if (strcmp("val_elec_02", word) == 0)
-        {
-            read_value(ifs,val_elec_02 );
-        }
-        else if (strcmp("val_elec_03", word) == 0)
-        {
-            read_value(ifs,val_elec_03 );
-        }
-        else if (strcmp("vext", word) == 0)
-        {
-            read_value(ifs,vext );
-        }
-        else if (strcmp("vext_dire", word) == 0)
-        {
-            read_value(ifs,vext_dire );
-        }
+		else if (strcmp("tddft", word) == 0)
+		{
+			read_value(ifs,tddft );
+		}
+		else if (strcmp("td_dr2", word) == 0)
+		{
+			read_value(ifs,td_dr2 );
+		}
+		else if (strcmp("td_dt", word) == 0)
+		{
+			read_value(ifs,td_dt );
+		}
+		else if (strcmp("td_force_dt", word) == 0)
+		{
+			read_value(ifs,td_force_dt );
+		}
+		else if (strcmp("val_elec_01", word) == 0)
+		{
+			read_value(ifs, val_elec_01);
+		}
+		else if (strcmp("val_elec_02", word) == 0)
+		{
+			read_value(ifs,val_elec_02 );
+		}
+		else if (strcmp("val_elec_03", word) == 0)
+		{
+			read_value(ifs,val_elec_03 );
+		}
+		else if (strcmp("vext", word) == 0)
+		{
+			read_value(ifs,vext );
+		}
+		else if (strcmp("vext_dire", word) == 0)
+		{
+			read_value(ifs,vext_dire );
+		}
 /* //----------------------------------------------------------
 // vdwD2
 // Peize Lin add 2014-03-31
 //----------------------------------------------------------
-	    else if (strcmp("vdwd2", word) == 0)
+        else if (strcmp("vdwd2", word) == 0)
 	    {
 	        read_value(ifs, vdwD2);
 	    }
@@ -1466,6 +1472,17 @@ bool Input::Read(const string &fn)
         {
 			ifs >> vdw_period.x >> vdw_period.y;
             read_value(ifs, vdw_period.z);
+        }
+//--------------------------------------------------------
+// restart           Peize Lin 2020-04-04
+//--------------------------------------------------------		
+        else if (strcmp("restart_save", word) == 0)
+        {
+            read_value(ifs, restart_save);
+        }
+        else if (strcmp("restart_load", word) == 0)
+        {
+            read_value(ifs, restart_load);
         }
 //--------------------------------------------------------
 // epsilon           pengfei Li 2016-11-23
@@ -1587,13 +1604,12 @@ bool Input::Read(const string &fn)
              {
                  ifs >> ocp_kb[i]; 
              }
-		read_value(ifs, ocp_kb[ocp_n-1]);
+			read_value(ifs, ocp_kb[ocp_n-1]);
         }
-                else if (strcmp("mulliken", word) == 0)
-                {
-                    read_value(ifs, mulliken);
-                 }//qifeng add 2019/9/10
-
+		else if (strcmp("mulliken", word) == 0)
+		{
+			read_value(ifs, mulliken);
+		}//qifeng add 2019/9/10
 	    else if (strcmp("supercell_scale", word) == 0)
 	    {
 	        ifs >> lcao_box[0]; ifs >> lcao_box[1];
@@ -1746,7 +1762,7 @@ bool Input::Read(const string &fn)
         //else if (strcmp("epsilon0_choice", word) == 0)
         //{
         //    read_value(ifs, epsilon0_choice);
-        //}
+        //}					
 		else if (strcmp("cell_factor", word) == 0)
 		{
 			read_value(ifs, cell_factor);
@@ -1799,6 +1815,7 @@ bool Input::Read(const string &fn)
 			break;
         }
     }
+	
 	if (basis_type == "pw")  // pengfei Li add 2015-1-31
 	{
 		gamma_only = 0;
@@ -2212,6 +2229,8 @@ void Input::Bcast()
 		//Parallel_Common::bcast_int( epsilon0_choice );
     Parallel_Common::bcast_double( cell_factor); //LiuXh add 20180619
     Parallel_Common::bcast_int( newDM ); // Shen Yu add 2019/5/9
+    Parallel_Common::bcast_bool( restart_save ); // Peize Lin add 2020.04.04
+    Parallel_Common::bcast_bool( restart_load ); // Peize Lin add 2020.04.04
 
     return;
 }
@@ -2557,9 +2576,11 @@ void Input::Check(void)
 			if(ks_solver == "default")
 			{
 				//diago_type = "hpseps";
-				ks_solver = "hpseps";
+				//ks_solver = "hpseps";
+				ks_solver = "genelpa";
 				//AUTO_SET("diago_type","hpseps");
-				AUTO_SET("ks_solver","hpseps");
+				//AUTO_SET("ks_solver","hpseps");
+				AUTO_SET("ks_solver","genelpa");
 			}
 			//else if(diago_type == "cg" )
 			else if (ks_solver == "cg")
@@ -2988,7 +3009,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"out_potential",out_potential,"output realspace potential");
 	OUTP(ofs,"out_wf",out_wf,"output wave functions");
 	OUTP(ofs,"out_dos",out_dos,"output energy and dos");
-        OUTP(ofs,"out_band",out_band,"output energy and band structure");
+	OUTP(ofs,"out_band",out_band,"output energy and band structure");
+	OUTP(ofs,"restart_save",restart_save,"print to disk every step for restart");
+	OUTP(ofs,"restart_load",restart_load,"restart from disk");
 //	OUTP(ofs,"ecutrho",ecutrho);
 //	OUTP(ofs,"ncx",ncx);
 //	OUTP(ofs,"ncy",ncy);

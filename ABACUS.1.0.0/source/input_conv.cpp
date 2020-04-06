@@ -459,6 +459,38 @@ void Input_Conv::Convert(void)
 	MD::md_tstep=INPUT.md_tstep;
 	MD::md_delt=INPUT.md_delt;
 */
+//----------------------------------------------------------
+// about restart									//Peize Lin add 2020-04-04
+//----------------------------------------------------------	
+	if(INPUT.restart_save)
+	{
+		restart.folder = global_out_dir + "restart/";
+		const string command0 =  "test -d " + restart.folder + " || mkdir " + restart.folder;
+		if(MY_RANK==0)
+			system( command0.c_str() );
+		if(true)
+		{
+			restart.info_save.save_charge = true;
+		}
+		else
+		{
+			restart.info_save.save_charge = true;
+			restart.info_save.save_H = true;
+		}
+	}
+	if(INPUT.restart_load)
+	{
+		restart.folder = global_out_dir + "restart/";
+		if(true)
+		{
+			restart.info_load.load_charge = true;
+		}
+		else
+		{
+			restart.info_load.load_charge = true;
+			restart.info_load.load_H = true;
+		}
+	}
 
 //----------------------------------------------------------
 // about exx									//Peize Lin add 2018-06-20
