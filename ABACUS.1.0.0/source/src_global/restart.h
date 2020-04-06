@@ -8,26 +8,31 @@ class Restart
 public:
 	struct Info_Save
 	{
-		std::string mode = "no";
+		bool save_charge = false;
+		bool save_H = false;
 	};
 	Info_Save info_save;
 	
 	struct Info_Load
 	{
-		std::string mode = "no";
-		bool finish = false;
-		bool exx = false;
+		bool load_charge = false;
+		bool load_charge_finish = false;
+		bool load_H = false;
+		bool load_H_finish = false;
+		bool restart_exx = false;
 	};
 	Info_Load info_load;
 	
-	void save_disk(const int i);
-	void load_disk(const int i);
+	std::string folder;
+	
+	void save_disk(const std::string mode, const int i) const;
+	void load_disk(const std::string mode, const int i) const;
 	
 private:
-	void write_file1(const std::string &file_name, const void*const ptr, const size_t size);
-	void read_file1(const std::string &file_name, void*const ptr, const size_t size);
-	void write_file2(const std::string &file_name, const void*const ptr, const size_t size);
-	void read_file2(const std::string &file_name, void*const ptr, const size_t size);
+	void write_file1(const std::string &file_name, const void*const ptr, const size_t size) const;
+	void read_file1(const std::string &file_name, void*const ptr, const size_t size) const;
+	void write_file2(const std::string &file_name, const void*const ptr, const size_t size) const;
+	void read_file2(const std::string &file_name, void*const ptr, const size_t size) const;
 };
 
 #endif

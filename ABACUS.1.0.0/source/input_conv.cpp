@@ -463,17 +463,32 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------	
 	if(INPUT.restart_save)
 	{
+		restart.folder = global_out_dir + "restart/";
+		const string command0 =  "test -d " + restart.folder + " || mkdir " + restart.folder;
+		if(MY_RANK==0)
+			system( command0.c_str() );
 		if(true)
-			restart.info_save.mode = "charge";
+		{
+			restart.info_save.save_charge = true;
+		}
 		else
-			restart.info_save.mode = "H";
+		{
+			restart.info_save.save_charge = true;
+			restart.info_save.save_H = true;
+		}
 	}
 	if(INPUT.restart_load)
 	{
+		restart.folder = global_out_dir + "restart/";
 		if(true)
-			restart.info_load.mode = "charge";
+		{
+			restart.info_load.load_charge = true;
+		}
 		else
-			restart.info_load.mode = "H";
+		{
+			restart.info_load.load_charge = true;
+			restart.info_load.load_H = true;
+		}
 	}
 
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619

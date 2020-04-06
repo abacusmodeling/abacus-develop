@@ -364,9 +364,9 @@ void Local_Orbital_Elec::scf(const int &istep)
 		chr.mix_rho(dr2,0,DRHO2,iter,conv_elec);
 		
 		// Peize Lin add 2020.04.04
-		if("charge" == restart.info_save.mode)
+		if(restart.info_save.save_charge)
 			for(int is=0; is<NSPIN; ++is)
-				restart.save_disk(is);
+				restart.save_disk("charge", is);
 
 		// (9) Calculate new potential according to new Charge Density.
 	
@@ -706,14 +706,14 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			UHM.calculate_Hgamma();
 			
 			// Peize Lin add at 2020.04.04
-			if("H"==restart.info_load.mode && !restart.info_load.finish)
+			if(restart.info_load.load_H && !restart.info_load.load_H_finish)
 			{
-				restart.load_disk(ik);
-				restart.info_load.finish = true;
+				restart.load_disk("H", ik);
+				restart.info_load.load_H_finish = true;
 			}			
-			if("H"==restart.info_save.mode)
+			if(restart.info_save.save_H)
 			{
-				restart.save_disk(ik);
+				restart.save_disk("H", ik);
 			}
 
 			// SGO: sub_grid_operation
@@ -811,14 +811,14 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			timer::tick("Efficience","H_k");
 			
 			// Peize Lin add at 2020.04.04
-			if("H"==restart.info_load.mode && !restart.info_load.finish)
+			if(restart.info_load.load_H && !restart.info_load.load_H_finish)
 			{
-				restart.load_disk(ik);
-				restart.info_load.finish = true;
+				restart.load_disk("H", ik);
+				restart.info_load.load_H_finish = true;
 			}			
-			if("H"==restart.info_save.mode)
+			if(restart.info_save.save_H)
 			{
-				restart.save_disk(ik);
+				restart.save_disk("H", ik);
 			}
 
 			// write the wave functions into LOWF.WFC_K[ik].

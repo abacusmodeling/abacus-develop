@@ -148,11 +148,11 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
         }
 		
 		// Peize Lin add 2020.04.04
-		if("charge"==restart.info_load.mode && !restart.info_load.finish)
+		if(restart.info_load.load_charge && !restart.info_load.load_charge_finish)
 		{
 			for(int is=0; is<NSPIN; ++is)
-				restart.load_disk(is);
-			restart.info_load.finish = true;
+				restart.load_disk("charge", is);
+			restart.info_load.load_charge_finish = true;
 		}
     }
     else
