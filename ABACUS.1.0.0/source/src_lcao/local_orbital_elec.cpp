@@ -346,6 +346,15 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		// add exx
 		en.set_exx();		// Peize Lin add 2016-12-03
+		
+		// Peize Lin add 2020.04.04
+		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type)
+			if(restart.info_load.load_H && restart.info_load.load_H_finish && !restart.info_load.restart_exx)
+			{
+				exx_global.info.set_xcfunc(xcf);							
+				exx_lcao.cal_exx_elec();			
+				restart.info_load.restart_exx = true;
+			}
 
 		// (4) mohan add 2010-06-24
 		// using new charge density.

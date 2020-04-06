@@ -468,7 +468,7 @@ void Input_Conv::Convert(void)
 		const string command0 =  "test -d " + restart.folder + " || mkdir " + restart.folder;
 		if(MY_RANK==0)
 			system( command0.c_str() );
-		if(true)
+		if(INPUT.exx_hybrid_type=="no")
 		{
 			restart.info_save.save_charge = true;
 		}
@@ -481,7 +481,7 @@ void Input_Conv::Convert(void)
 	if(INPUT.restart_load)
 	{
 		restart.folder = global_out_dir + "restart/";
-		if(true)
+		if(INPUT.exx_hybrid_type=="no")
 		{
 			restart.info_load.load_charge = true;
 		}

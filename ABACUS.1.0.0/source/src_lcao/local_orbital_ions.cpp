@@ -288,21 +288,20 @@ void Local_Orbital_Ions::opt_ions(void)
 			}
 			else	// Peize Lin add 2016-12-03
 			{
+				LOE.scf(istep-1);
 				if( exx_global.info.separate_loop )
 				{
 					for( size_t hybrid_step=0; hybrid_step!=exx_global.info.hybrid_step; ++hybrid_step )
 					{
-						LOE.scf(istep-1);
-
-						if( Local_Orbital_Elec::iter==1 || hybrid_step==exx_global.info.hybrid_step-1 )		// exx converge
-							break;
 						exx_global.info.set_xcfunc(xcf);							
-						exx_lcao.cal_exx_elec();						
+						exx_lcao.cal_exx_elec();
+						LOE.scf(istep-1);	
+						if(LOE.iter==1)		// exx converge
+							break;					
 					}
 				}
 				else
 				{
-					LOE.scf(istep-1);
 					exx_global.info.set_xcfunc(xcf);
 					LOE.scf(istep-1);
 				}
