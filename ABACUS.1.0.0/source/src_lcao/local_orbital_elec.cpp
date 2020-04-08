@@ -490,6 +490,14 @@ void Local_Orbital_Elec::scf(const int &istep)
 			sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
 			chr.write_rho_dipole( is, 0, sse.str());
 
+				if(pot.out_potential == 2)
+				{
+					stringstream ssp;
+					stringstream ssp_ave;
+					ssp << global_out_dir << "SPIN" << is + 1 << "_ESP";
+					ssp_ave << global_out_dir << "SPIN" << is + 1 << "_ESP_AVE";
+					pot.write_elecstat_pot(is, ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+				}
 			}
 			
 			iter_end(ofs_running);

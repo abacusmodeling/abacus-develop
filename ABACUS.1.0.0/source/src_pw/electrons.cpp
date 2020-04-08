@@ -393,6 +393,14 @@ void electrons::self_consistent(const int &istep)
                 stringstream ssc;
                 ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
                 chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+                if(pot.out_potential == 2)
+                {
+                    stringstream ssp;
+                    stringstream ssp_ave;
+                    ssp << global_out_dir << "SPIN" << is + 1 << "_ESP";
+                    ssp_ave << global_out_dir << "SPIN" << is + 1 << "_ESP_AVE";
+                    pot.write_elecstat_pot(is, ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+                }
             }
 
             if(conv_elec)
