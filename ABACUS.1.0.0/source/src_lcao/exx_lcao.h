@@ -25,7 +25,7 @@
 #include<deque>
 #include<memory>
 #include<limits>
-#include<atomic>
+#include<omp.h>
 
 class Exx_Lcao
 {
@@ -40,10 +40,6 @@ public:
 	void add_Hexx(const size_t ik, const double alpha) const;
 private:
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> cal_Hexx() const;
-	void cal_Hexx_thread(
-		atomic<size_t> & i_atom_pair,
-		atomic_flag & Hexx_lock,
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> & HexxR) const;
 	double cal_energy(
 		const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const;
 	void init_radial_table_ions( const set<size_t> &atom_centres_core, const vector<pair<size_t,size_t>> &atom_pairs_core );
