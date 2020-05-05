@@ -27,8 +27,10 @@ static void MPI_RANK_OFSTREAM( const std::string& file_name, std::stringstream &
 template<typename T>
 static std::ostream & operator<<( std::ostream & os, const std::vector<T> &v )
 {
+	os<<"[";
 	for( const T &i : v )
 		os<<i<<"\t";
+	os<<"]";
 	return os;
 }
 
@@ -36,8 +38,19 @@ static std::ostream & operator<<( std::ostream & os, const std::vector<T> &v )
 template<typename T>
 static std::ostream & operator<<( std::ostream & os, const std::set<T> &v )
 {
+	os<<"(";
 	for( const T &i : v )
-		os<<i<<std::endl;
+		os<<i<<"\t";
+	os<<")";
+	return os;
+}
+
+// Peize Lin add 2016-06-06
+template<typename T1, typename T2>
+static std::ostream & operator<<( std::ostream & os, const std::map<T1,T2> &v )
+{
+	for( const auto &i : v )
+		os<<"{"<<i.first<<":"<<i.second<<"}"<<"\t";
 	return os;
 }
 
@@ -45,7 +58,7 @@ static std::ostream & operator<<( std::ostream & os, const std::set<T> &v )
 template<typename T1,typename T2>
 static std::ostream & operator<<( std::ostream & os, const std::pair<T1,T2> &p )
 {
-	os<<"("<<p.first<<","<<p.second<<")";
+	os<<"<"<<p.first<<","<<p.second<<">";
 	return os;
 }
 

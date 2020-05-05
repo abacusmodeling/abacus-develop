@@ -24,6 +24,8 @@ class Exx_Abfs::Parallel
 		class DM;
 		#elif EXX_DM==2
 		class DM2;
+		#elif EXX_DM==3
+		class DM3;
 		#endif
 	};
 };

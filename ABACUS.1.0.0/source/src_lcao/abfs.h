@@ -82,16 +82,20 @@ public:
 //	static map<size_t,vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &T, const Vector3<double> &tau_cartesian );
 	static map<size_t,vector<Abfs::Vector3_Order<int>>> get_adjs( const size_t &iat );
 	static vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> get_adjs();
+	static map<set<size_t>,set<size_t>> get_H_pairs_core_group( const vector<pair<size_t,size_t>> &atom_pairs );
 	static set<pair<size_t,size_t>> get_H_pairs_core( const vector<pair<size_t,size_t>> &atom_pairs );
 	static vector<Vector3_Order<int>> get_Coulomb_potential_boxes( const double rmesh_times );
+	static vector<Vector3_Order<int>> get_Born_von_Karmen_boxes( const Abfs::Vector3_Order<int> &Born_von_Karman_period );
 
 	static shared_ptr<matrix> cal_I( const shared_ptr<matrix> &m );
 	static vector<vector<shared_ptr<matrix>>> cal_I( const vector<vector<shared_ptr<matrix>>> &ms );
 	
 	template<typename T1,typename T2,typename T3,typename T4>
 	static void delete_empty_ptrs( map<T1,map<T2,map<T3,weak_ptr<T4>>>> &ptrs );
-	template<typename T1,typename T2,typename T3,typename T4>
-	static void delete_threshold_ptrs( map<T1,map<T2,map<T3,shared_ptr<T4>>>> &ptrs, const double threshold);
+	template<typename T1,typename T2,typename T3,typename Tmatrix>
+	static void delete_threshold_ptrs( map<T1,map<T2,map<T3,shared_ptr<Tmatrix>>>> &ptrs, const double threshold);
+	template<typename T1,typename T2,typename T3,typename Tmatrix>
+	static void delete_threshold_ptrs( map<T1,map<T2,map<T3,Tmatrix>>> &ptrs, const double threshold);
 
 	template<typename T1, typename T2, typename Tother>
 	static vector<pair<T1,T2>> get_atom_pair(const map<T1,map<T2,Tother>> &m);

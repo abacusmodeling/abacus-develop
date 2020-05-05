@@ -96,7 +96,7 @@ private:
 		vector<size_t> get_send_size_list(
 			const set<pair<size_t,size_t>> &H_atom_pairs_core,
 			const vector<pair<vector<bool>,vector<bool>>> &atom_in_2D_list) const;
-		void init_elec(
+		void init_flags(
 			vector<atomic<Flag_Send>> &flags_send,
 			vector<atomic<Flag_Recv>> &flags_recv) const;
 		bool finish_judge(

@@ -795,6 +795,8 @@ ofs_mpi<<"TIME@ cauchy::init\t"<<time_during(t_start)<<endl;
 
 	#if EXX_DM==2
 	DM_para.init( H_atom_pairs_core, info.dm_threshold );
+	#elif EXX_DM==3
+	DM_para.allreduce.init( MPI_COMM_WORLD, Abfs::get_H_pairs_core_group( atom_pairs_core ) );
 	#endif
 	
 	#if EXX_H_COMM==2
@@ -853,6 +855,10 @@ ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<endl;
 gettimeofday( &t_start, NULL);
 	if(!GAMMA_ONLY_LOCAL)
 		this->DM_para.cal_DM_k( Born_von_Karman_period, H_atom_pairs_core, info.dm_threshold );
+ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<endl;
+#elif EXX_DM==3
+gettimeofday( &t_start, NULL);
+	this->DM_para.cal_DM(info.dm_threshold);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<endl;
 #endif
 

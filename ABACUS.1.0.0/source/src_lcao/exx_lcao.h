@@ -17,6 +17,8 @@
 #include "src_lcao/exx_abfs-parallel-communicate-dm.h"
 #elif EXX_DM==2
 #include "src_lcao/exx_abfs-parallel-communicate-dm2.h"
+#elif EXX_DM==3
+#include "src_lcao/exx_abfs-parallel-communicate-dm3.h"
 #endif
 
 #include<set>
@@ -58,6 +60,8 @@ private:
 	Exx_Abfs::Parallel::Communicate::DM DM_para;
 #elif EXX_DM==2
 	Exx_Abfs::Parallel::Communicate::DM2 DM_para;
+#elif EXX_DM==3
+	Exx_Abfs::Parallel::Communicate::DM3 DM_para;
 #endif
 	Exx_Abfs::Parallel::Communicate::Hexx Hexx_para;
 	double energy = 0.0;

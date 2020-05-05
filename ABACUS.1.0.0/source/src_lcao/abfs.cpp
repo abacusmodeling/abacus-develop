@@ -11,6 +11,7 @@
 #include <fstream>		// Peize Lin test
 #include <iomanip>		// Peize Lin test
 #include "src_external/src_test/src_global/matrix-test.h"		// Peize Lin test
+#include"src_external/src_test/test_function.h"
 
 map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Cs(
 	const set<size_t> &atom_centres,
@@ -455,9 +456,53 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 }
 */
 
+map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const vector<pair<size_t,size_t>> &atom_pairs )
+{
+	TITLE("Abfs","get_H_pairs_core_group");
+	
+	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
+	
+	auto get_set_adjs = [&adjs]( const set<size_t> &as ) -> set<size_t>
+	{
+		set<size_t> aRs;
+		for( const size_t a : as )
+			for( const auto &aR : adjs[a] )
+				aRs.insert(aR.first);
+		return aRs;
+	};
+	
+	// {(0,1),(3,5),(0,4),(7,8),(6,5)}
+	const vector<pair<size_t,size_t>> & a1_a2 = atom_pairs;
+	
+	// => {1:{0}, 5:{3,6}, 4:{0}, 8:{7}}
+	map<size_t,set<size_t>> a2_a1s;
+	for( const auto & a1_a2_i : a1_a2 )
+		a2_a1s[ a1_a2_i.second ].insert( a1_a2_i.first );
+	
+	// => {{0}:{1,4}, {3,6}:{5}, {7}:{8}}
+	map<set<size_t>,set<size_t>> a1s_a2s;
+	for( const auto & a2_a1s_i : a2_a1s )
+		a1s_a2s[ a2_a1s_i.second ].insert( a2_a1s_i.first );
+	a2_a1s.clear();
+	
+	// => {R(0):R(1)UR(4), R(3)UR(6):R(5), R(7):R(8)}
+	// imaging R(0)==R(3)UR(6):   
+	// => {R(0):R(1)UR(4)UR(5), R(7):R(8)}
+	map<set<size_t>,set<size_t>> a1Rs_a2s;
+	for( const auto & a1s_a2s_i : a1s_a2s )
+	{
+		const set<size_t> a1Rs_i = get_set_adjs(a1s_a2s_i.first);
+		const set<size_t> a2Rs_i = get_set_adjs(a1s_a2s_i.second);
+		a1Rs_a2s[a1Rs_i].insert(a2Rs_i.begin(), a2Rs_i.end());
+	}
+	a1s_a2s.clear();
+	
+	return a1Rs_a2s;
+}
+
 set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t>> &atom_pairs )
 {
-	TITLE("Exx_Lcao","allocate_Hexx");
+	TITLE("Exx_Lcao","get_H_pairs_core");
 	
 	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
@@ -521,6 +566,16 @@ vector<Abfs::Vector3_Order<int>> Abfs::get_Coulomb_potential_boxes( const double
 			for(int z=-nz; z<=nz; ++z)
 				Coulomb_potential_boxes.push_back({x,y,z});
 	return Coulomb_potential_boxes;
+}
+
+vector<Abfs::Vector3_Order<int>> Abfs::get_Born_von_Karmen_boxes( const Abfs::Vector3_Order<int> &Born_von_Karman_period )
+{
+	vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
+	for( int ix=0; ix<Born_von_Karman_period.x; ++ix )
+		for( int iy=0; iy<Born_von_Karman_period.y; ++iy )
+			for( int iz=0; iz<Born_von_Karman_period.z; ++iz )
+				Born_von_Karman_boxes.push_back( Abfs::Vector3_Order<int>{ix,iy,iz} % Born_von_Karman_period );
+	return Born_von_Karman_boxes;
 }
 
 shared_ptr<matrix> Abfs::cal_I( const shared_ptr<matrix> &m )

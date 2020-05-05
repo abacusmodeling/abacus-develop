@@ -38,7 +38,7 @@ timeval t_all;	gettimeofday(&t_all,NULL);
 
 	vector<atomic<Flag_Send>> flags_send(comm_sz);
 	vector<atomic<Flag_Recv>> flags_recv(comm_sz);
-	init_elec(flags_send, flags_recv);
+	init_flags(flags_send, flags_recv);
 //ofs<<__LINE__<<endl;
 
 	vector<valarray<double>> oarps_isend(comm_sz);
@@ -209,7 +209,7 @@ vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_
 	return send_size_list;
 }
 
-void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init_elec(
+void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init_flags(
 	vector<atomic<Flag_Send>> &flags_send,
 	vector<atomic<Flag_Recv>> &flags_recv) const
 {
