@@ -28,6 +28,7 @@ public:
 	Make_Overlap_Table MOT;
 	Make_Gaunt_Table MGT;
 	Numerical_Orbital_Lm orb_r;
+	vector<vector<vector<Numerical_Orbital_Lm>>> orbital_phi;
 	
 	int R_x_num;
     int R_y_num;
@@ -38,6 +39,14 @@ public:
 	
 	Vector3<double> ****psi_r_psi;
 	bool allocate_psi_r_psi = false;
+
+	map<size_t,
+		map<size_t,
+			map<size_t,
+				map<size_t,
+					map<size_t,
+						map<size_t,
+						Center2_Orb::Orb11>>>>>> center2_orb11;
 	
 	map<size_t,
 		map<size_t,

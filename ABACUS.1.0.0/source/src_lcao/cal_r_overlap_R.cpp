@@ -65,7 +65,25 @@ void cal_r_overlap_R::init()
 	MGT.init_Gaunt_CH( Lmax );
 	MGT.init_Gaunt( Lmax );	
 
-	const int T = 0;  // arbitrary atom type 
+	int T = 0;  // atom type
+	int mat_Nr = ORB.Phi[0].PhiLN(0,0).getNr();
+	for(int it = 0; it < ucell.ntype; it++)
+	{
+		int count_Nr = ORB.Phi[it].PhiLN(0,0).getNr();
+		if(count_Nr > mat_Nr) 
+		{
+			mat_Nr = count_Nr;
+			T = it;
+		}
+	}
+
+//	int new_kmesh = ORB.Phi[T].PhiLN(0,0).getNk() * 4;
+//  if(new_kmesh%2 == 0) new_kmesh++;
+
+	int new_kmesh = ORB.Phi[T].PhiLN(0,0).getNk();
+//	cout << "new_kmesh = " << new_kmesh << endl;
+
+
 	orb_r.set_orbital_info(
 	ORB.Phi[T].PhiLN(0,0).getLabel(),  //atom label
 	T,    //atom type
@@ -76,12 +94,47 @@ void cal_r_overlap_R::init()
 	ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial mesh value(a.u.)
 	Numerical_Orbital_Lm::Psi_Type::Psi,
 	ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial wave function
-	ORB.Phi[T].PhiLN(0,0).getNk(),
+	new_kmesh,
 	ORB.Phi[T].PhiLN(0,0).getDk(),
 	ORB.Phi[T].PhiLN(0,0).getDruniform(),
 	false,
 	true);
-	
+
+/*
+	orbital_phi.resize(ucell.ntype);
+	for(int it = 0; it < ucell.ntype; it++)
+	{
+		orbital_phi[it].resize(ORB.Phi[it].getLmax()+1);
+		for(int iL = 0; iL <= ORB.Phi[it].getLmax(); iL++)
+		{	
+			orbital_phi[it][iL].resize(ORB.Phi[it].getNchi(iL));
+			for(int iN = 0; iN < ORB.Phi[it].getNchi(iL); iN++)
+			{
+				orbital_phi[it][iL][iN].set_orbital_info(
+					ORB.Phi[it].PhiLN(iL,iN).getLabel(),  //atom label
+					ORB.Phi[it].PhiLN(iL,iN).getType(),    //atom type
+					ORB.Phi[it].PhiLN(iL,iN).getL(),    //angular momentum L
+					ORB.Phi[it].PhiLN(iL,iN).getChi(),    //number of orbitals of this L , just N
+					ORB.Phi[it].PhiLN(iL,iN).getNr(),  //number of radial mesh
+					ORB.Phi[it].PhiLN(iL,iN).getRab(), //the mesh interval in radial mesh 
+					ORB.Phi[it].PhiLN(iL,iN).getRadial(),  // radial mesh value(a.u.)
+					Numerical_Orbital_Lm::Psi_Type::Psi,
+					ORB.Phi[it].PhiLN(iL,iN).getPsi(),  // radial wave function
+					new_kmesh,
+					ORB.Phi[it].PhiLN(iL,iN).getDk(),
+					ORB.Phi[it].PhiLN(iL,iN).getDruniform(),
+					false,
+					true);
+					
+				//cout << "getDk:   " << ORB.Phi[it].PhiLN(iL,iN).getDk() << endl;
+				//cout << "getDruniform:   " << ORB.Phi[it].PhiLN(iL,iN).getDruniform() << endl; 
+				//cout << "getNk:   " << ORB.Phi[it].PhiLN(iL,iN).getNk() << endl; 
+			} 
+		}
+	}
+
+*/
+
 	for(int TA = 0; TA < ucell.ntype; TA++)
 	{
 		for (int TB = 0;  TB < ucell.ntype; TB++)
@@ -94,18 +147,63 @@ void cal_r_overlap_R::init()
 					{
 						for (int NB = 0; NB < ORB.Phi[TB].getNchi(LB); ++NB)
 						{
-							center2_orb21_r[TA][TB][LA][NA][LB].insert( 
-								make_pair(NB, Center2_Orb::Orb21(
-									ORB.Phi[TA].PhiLN(LA,NA),	
-									orb_r,									
-									ORB.Phi[TB].PhiLN(LB,NB),
-									MOT, MGT)));
+							//center2_orb11[TA][TB][LA][NA][LB].insert( 
+							//	make_pair(NB, Center2_Orb::Orb11(
+							//		orbital_phi[TA][LA][NA],									
+							//		orbital_phi[TB][LB][NB],
+							//		MOT, MGT)));
+
+							 center2_orb11[TA][TB][LA][NA][LB].insert( 
+							 	make_pair(NB, Center2_Orb::Orb11(
+							 		ORB.Phi[TA].PhiLN(LA,NA),								
+							 		ORB.Phi[TB].PhiLN(LB,NB),
+							 		MOT, MGT)));
 						}
 					}
 				}
 			}
 		}
 	}
+
+	for(int TA = 0; TA < ucell.ntype; TA++)
+	{
+		for (int TB = 0;  TB < ucell.ntype; TB++)
+		{
+			for (int LA=0; LA <= ORB.Phi[TA].getLmax() ; LA++)
+			{
+				for (int NA = 0; NA < ORB.Phi[TA].getNchi(LA); ++NA)
+				{
+					for (int LB = 0; LB <= ORB.Phi[TB].getLmax(); ++LB)
+					{
+						for (int NB = 0; NB < ORB.Phi[TB].getNchi(LB); ++NB)
+						{
+							//center2_orb21_r[TA][TB][LA][NA][LB].insert( 
+							//	make_pair(NB, Center2_Orb::Orb21(
+							//		orbital_phi[TA][LA][NA],	
+							//		orb_r,									
+							//		orbital_phi[TB][LB][NB],
+							//		MOT, MGT)));
+
+							 center2_orb21_r[TA][TB][LA][NA][LB].insert( 
+							 	make_pair(NB, Center2_Orb::Orb21(
+							 		ORB.Phi[TA].PhiLN(LA,NA),	
+							 		orb_r,									
+							 		ORB.Phi[TB].PhiLN(LB,NB),
+							 		MOT, MGT)));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for( auto &co1 : center2_orb11 )
+		for( auto &co2 : co1.second )
+			for( auto &co3 : co2.second )
+				for( auto &co4 : co3.second )
+					for( auto &co5 : co4.second )
+						for( auto &co6 : co5.second )
+							co6.second.init_radial_table();
 	
 	for( auto &co1 : center2_orb21_r )
 		for( auto &co2 : co1.second )
@@ -120,7 +218,7 @@ void cal_r_overlap_R::init()
 
 
 void cal_r_overlap_R::out_r_overlap_R(const int nspin)
-{
+{	
 	Vector3<double> tau1, tau2, dtau;
 	Vector3<double> origin_point(0.0,0.0,0.0);
 
@@ -128,76 +226,59 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
     int R_y;
     int R_z;
 	
-	for (int T1 = 0; T1 < ucell.ntype; ++T1)
-	{
-		Atom* atom1 = &ucell.atoms[T1];
-		for (int I1 = 0; I1 < atom1->na; ++I1)
-		{
-			tau1 = atom1->tau[I1];
-			GridD.Find_atom(tau1, T1, I1);			
-			
-			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
-			{
-				const int T2 = GridD.getType(ad);
-				const int I2 = GridD.getNatom(ad);
-				Atom* atom2 = &ucell.atoms[T2];
-				const int R_direct_x = GridD.getBox(ad).x;
-				const int R_direct_y = GridD.getBox(ad).y;
-				const int R_direct_z = GridD.getBox(ad).z;
-				
-				R_x = R_direct_x - R_minX;
-				R_y = R_direct_y - R_minY;
-				R_z = R_direct_z - R_minZ;
-				
-			
-				tau2 = GridD.getAdjacentTau(ad);
-				dtau = tau2 - tau1;
-				double distance = dtau.norm() * ucell.lat0;
-				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
-				if(distance < rcut - 1.0e-15)
-				{
-					Vector3<double> R_car = R_direct_x * ucell.a1 + 
-											R_direct_y * ucell.a2 +
-											R_direct_z * ucell.a3;
-					
-					for(int iw1 = 0; iw1 < atom1->nw; iw1++)
-					{			
-						for(int iw2 = 0; iw2 < atom2->nw; iw2++)
-						{
-							int orb_index_in_NLOCAL_1 = ucell.itiaiw2iwt( T1, I1, iw1 );
-							int orb_index_in_NLOCAL_2 = ucell.itiaiw2iwt( T2, I2, iw2 );
-							
-							int irow = ParaO.trace_loc_row[orb_index_in_NLOCAL_1];
-							int icol = ParaO.trace_loc_col[orb_index_in_NLOCAL_2];
-							
-							if(irow >= 0 && icol >= 0)
-							{
-								int atomType1 = iw2it(orb_index_in_NLOCAL_1);  int ia1 = iw2ia(orb_index_in_NLOCAL_1);  int N1 = iw2iN(orb_index_in_NLOCAL_1);  int L1 = iw2iL(orb_index_in_NLOCAL_1);  int m1 = iw2im(orb_index_in_NLOCAL_1); 
-								int atomType2 = iw2it(orb_index_in_NLOCAL_2);  int ia2 = iw2ia(orb_index_in_NLOCAL_2);  int N2 = iw2iN(orb_index_in_NLOCAL_2);  int L2 = iw2iL(orb_index_in_NLOCAL_2);  int m2 = iw2im(orb_index_in_NLOCAL_2);
+	for(int ix = 0; ix < R_x_num; ix++)
+    {
+        int dRx = ix + R_minX;
+        for(int iy = 0; iy < R_y_num; iy++)
+        {
+            int dRy = iy + R_minY;
+            for(int iz = 0; iz < R_z_num; iz++)
+            {
+                int dRz = iz + R_minZ;	
 
-								Vector3<double> r_distance = ( ucell.atoms[atomType2].tau[ia2] - ucell.atoms[atomType1].tau[ia1] + R_car ) * ucell.lat0;							
-															
-								double overlap_x = -1 * sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 1, m2 ); // m = 1
-								double overlap_y = -1 * sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 2, m2 ); // m = -1
-								double overlap_z =      sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 0, m2 ); // m =0
-								
-								int icc = irow + icol * ParaO.nrow;
-								psi_r_psi[R_x][R_y][R_z][icc] = Vector3<double>( overlap_x,overlap_y,overlap_z );
-								
-							}
-							
-						} // end iw2
-						
-					} // end iw1
-					
-				}
+				Vector3<double> R_car = Vector3<double>(dRx,dRy,dRz) * ucell.latvec;
 				
-			} //  end ad
-			
-		} // end I1
-		
-	} // end T1
-	
+				int ir,ic;
+				for(int orb_index_in_NLOCAL_1 = 0; orb_index_in_NLOCAL_1 < NLOCAL; orb_index_in_NLOCAL_1++)
+				{
+					ir = ParaO.trace_loc_row[orb_index_in_NLOCAL_1];	
+					if(ir >= 0)
+					{
+						for(int orb_index_in_NLOCAL_2 = 0; orb_index_in_NLOCAL_2 < NLOCAL; orb_index_in_NLOCAL_2++)
+						{							
+							ic = ParaO.trace_loc_col[orb_index_in_NLOCAL_2];
+							if(ic >= 0)
+							{
+								int icc = ir + ic * ParaO.nrow;
+								
+								int orb_index_row = orb_index_in_NLOCAL_1 / NPOL;
+								int orb_index_col = orb_index_in_NLOCAL_2 / NPOL;
+								
+								// soc中非对角项为零，两个对角项相同
+								int new_index = orb_index_in_NLOCAL_1 - NPOL*orb_index_row + (orb_index_in_NLOCAL_2 - NPOL*orb_index_col)*NPOL;
+								
+								if(new_index == 0 || new_index == 3)
+								{
+									int atomType1 = iw2it(orb_index_row);  int ia1 = iw2ia(orb_index_row);  int N1 = iw2iN(orb_index_row);  int L1 = iw2iL(orb_index_row);  int m1 = iw2im(orb_index_row); 
+									int atomType2 = iw2it(orb_index_col);  int ia2 = iw2ia(orb_index_col);  int N2 = iw2iN(orb_index_col);  int L2 = iw2iL(orb_index_col);  int m2 = iw2im(orb_index_col);
+									Vector3<double> r_distance = ( ucell.atoms[atomType2].tau[ia2] - ucell.atoms[atomType1].tau[ia1] + R_car ) * ucell.lat0;	
+									double overlap_o = center2_orb11[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, m2 );
+									double overlap_x = -1 * sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 1, m2 ); // m = 1
+									double overlap_y = -1 * sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 2, m2 ); // m = -1
+									double overlap_z =      sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 0, m2 ); // m = 0									
+									psi_r_psi[ix][iy][iz][icc] = Vector3<double>( overlap_x,overlap_y,overlap_z ) + ucell.atoms[atomType1].tau[ia1] * ucell.lat0 * overlap_o;
+								}
+								else
+								{
+									psi_r_psi[ix][iy][iz][icc] = Vector3<double>(0.0,0.0,0.0);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	// out r_overlap_R file
 	ofstream out_r;
@@ -243,6 +324,7 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 								liner_x[j] = psi_r_psi[ix][iy][iz][iic].x;
 								liner_y[j] = psi_r_psi[ix][iy][iz][iic].y;
 								liner_z[j] = psi_r_psi[ix][iy][iz][iic].z;
+					
 							}
 						}
 					}
@@ -260,19 +342,17 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 								out_r << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
 							}
 							
-							out_r << "(" << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_x[j]
-							      << "," << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_y[j]
-								  << "," << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_z[j]
-								  << ") "; 							
+							out_r << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_x[j] << " "
+							      << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_y[j] << " "
+								  << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_z[j] << " "
+								  << endl;
 						}
 						
-						out_r << endl;
 					}
 					
 					delete[] liner_x;
 					delete[] liner_y;
 					delete[] liner_z;
-					
 				
 				}
 				

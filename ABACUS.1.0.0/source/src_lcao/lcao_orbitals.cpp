@@ -159,6 +159,10 @@ void LCAO_Orbitals::Read_Orbitals(void)
 	{
 		this->kmesh = static_cast<int>( sqrt(ecutwfc) / dk )  + 4;
 	}
+
+	// jingan add for calculate r(R) matrix
+	if(INPUT.out_r_matrix) kmesh = kmesh * 4;
+
 	//	this->kmesh = static_cast<int> (PI / 0.01 / 4 / this->dk);
 	if(kmesh%2==0) kmesh++;
 	OUT(ofs_running,"kmesh",kmesh);
