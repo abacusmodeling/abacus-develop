@@ -37,7 +37,8 @@ void Numerical_Nonlocal::set_type_info
 	const int& nproj_in,
 	const int& nproj_in_so,
 	int* LfromBeta_in,
-	const Numerical_Nonlocal_Lm* Proj_in
+	const Numerical_Nonlocal_Lm* Proj_in,
+	const bool has_so
 )
 {
 	if (type_in < 0 || type_in > 2)
@@ -73,7 +74,7 @@ void Numerical_Nonlocal::set_type_info
 //EXPLAIN : LfromBeta
 //----------------------------------------------------------
 	this->nproj = nproj_in;
-	if(NONCOLIN){ 
+	if(has_so){ 
 		this->nproj_soc = nproj_in_so;
 	}
 	//assert(nproj <= lmax_in+1); //LiuXh 2016-01-13, 2016-05-16
@@ -81,7 +82,7 @@ void Numerical_Nonlocal::set_type_info
 	assert(nproj >= 0);
 
 //2016-07-19 begin, LiuXh
-	if(!NONCOLIN){
+	if(!has_so){
 		this->Coefficient_D.create( nproj_in+1, nproj_in+1);
 		if(lmax_in > -1) //LiuXh add 20180328, fix bug of Hydrogen element with single projector pseudopot
 		{ //LiuXh add 20180328
@@ -139,13 +140,14 @@ void Numerical_Nonlocal::set_type_info
 				{
 					for (int is2 = 0; is2 < 2; is2++)
 					{
+						if(is>=NSPIN) break;
 						for (int L1 = 0; L1 < nproj_soc; L1++)
 						{
 							for (int L2 = 0; L2 < nproj_soc; L2++)
 							{
 								if(is==1||is==2) this->Coefficient_D_so(is, L1, L2) = ZERO;
 								else this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
-								if(abs(this->Coefficient_D_so(is, L1, L2).real())>eps8 && abs(this->Coefficient_D_so(is, L1, L2).imag())>eps8)
+								if(abs(this->Coefficient_D_so(is, L1, L2).real())>eps8 || abs(this->Coefficient_D_so(is, L1, L2).imag())>eps8)
 								{
 									this->index1_soc[is][non_zero_count_soc[is]] = L1;
 									this->index2_soc[is][non_zero_count_soc[is]] = L2;

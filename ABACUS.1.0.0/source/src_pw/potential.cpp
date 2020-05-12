@@ -135,6 +135,38 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
                 {
                     ofs_running << " Read in the charge density: " << ssc.str() << endl;
                 }
+		else if(is>0 && NSPIN==4)
+		{
+			if(PRENSPIN == 1)
+			{//read only up+down , others set to zero.
+				ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
+				for(int ir=0;ir<pw.nrxx;ir++)
+					chr.rho[is][ir] = 0.0;
+			}
+			else if(PRENSPIN == 2)
+			{//read up and down , then rearrange them.
+				if(is==1) WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
+				if(is==2) 
+				{
+					ofs_running << " Didn't read in the charge density but would rearrange it later. "<< endl;
+				}
+				if(is==3)
+				{
+					ofs_running << " rearrange charge density " << endl;
+					for(int ir=0;ir<pw.nrxx;ir++)
+					{
+						chr.rho[3][ir] = chr.rho[0][ir] - chr.rho[1][ir];
+						chr.rho[0][ir] = chr.rho[0][ir] + chr.rho[1][ir];
+						chr.rho[1][ir] = 0.0;
+						chr.rho[2][ir] = 0.0;
+					}
+				}
+			}
+			else
+			{
+				WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
+			}
+		}
                 else
                 {
                     ofs_running << " Start charge density from atomic charge density." << endl;

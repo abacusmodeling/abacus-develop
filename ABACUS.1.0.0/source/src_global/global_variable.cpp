@@ -218,6 +218,7 @@ bool LSPINORB = false;
 bool DOMAG    = false;
 bool DOMAG_Z  = false;
 int NPOL      = 1;
+int PRENSPIN  = 1;
 
 bool FINAL_SCF = false; //LiuXh add 20180619
 

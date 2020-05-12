@@ -1245,7 +1245,7 @@ void UnitCell_pseudo::cal_nelec(void)
                          NBANDS = static_cast<int>(1.2*occupied_bands); // pengfei 2014-10-13
                          if (NSPIN == 2)
                          {
-                             NBANDS = static_cast<int>(2*occupied_bands + 2);
+                             NBANDS = static_cast<int>(1.2*occupied_bands); //zhengdy 2020-05-12
                              //if (NBANDS > NLOCAL)
                              //    NBANDS = NLOCAL;
                          }

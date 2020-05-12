@@ -105,6 +105,8 @@ void Use_Overlap_Table::snap_psibeta(
 
 	//optimized by zhengdy-soc
 	if(NONCOLIN && ORB.Beta[T0].get_count_soc(is)==0) return;
+	bool has_so = 0;
+	if(ORB.Beta[T0].get_count_soc(0)>0 ) has_so = 1;
 
 	const int nproj = ORB.nproj[T0];
 	bool *calproj = new bool[nproj];
@@ -244,7 +246,7 @@ void Use_Overlap_Table::snap_psibeta(
 
 	// mohan update 2011-03-07
 	int n_projection =1;
-	if(NONCOLIN) n_projection = ORB.Beta[T0].get_nproj_soc();
+	if(has_so) n_projection = ORB.Beta[T0].get_nproj_soc();
 	vector<complex<double>> term_a_nc(n_projection,{0,0});		// Peize Lin change ptr to vector at 2020.01.31
 	vector<complex<double>> term_b_nc(n_projection,{0,0});		// Peize Lin change ptr to vector at 2020.01.31
 	int ip = -1;
@@ -434,7 +436,7 @@ void Use_Overlap_Table::snap_psibeta(
 		
 		
 			//added by zhengdy-soc, store them for soc case
-			if(NONCOLIN)
+			if(has_so)
 			{
 				term_a_nc[ip] = term_a;
 				term_b_nc[ip] = term_b;
@@ -452,15 +454,15 @@ void Use_Overlap_Table::snap_psibeta(
 				case 0://calculate the overlap part.
 				{
 					//nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
-					if(!NONCOLIN) nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
-					else if(nlm1!=NULL)
+					if(!has_so) nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+/*					else if(nlm1!=NULL)
 					{
 							
 					}
 					else
 					{
 						WARNING_QUIT("Use_Overlap_Table::snap_psibeta","something wrong with snap_psibeta.");
-					}
+					}*/
 					break;
 				}
 				case 1: //calculate the derivative part.
@@ -468,7 +470,7 @@ void Use_Overlap_Table::snap_psibeta(
 					for(int jr = 0; jr < 3; jr++) 
 					{
 						//nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
-						if(!NONCOLIN) nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+						if(!has_so) nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
 						else
 						{
 							
@@ -481,7 +483,7 @@ void Use_Overlap_Table::snap_psibeta(
 		}//!m0
 	}//!L0
 	//zhengdy-soc, calculate non-local term
-	if(NONCOLIN && nlm1!=NULL)
+	if(has_so)
 	{
 		/*for(int p1=0;p1<n_projection;p1++)
 		{
@@ -490,13 +492,25 @@ void Use_Overlap_Table::snap_psibeta(
 				nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
 			}
 		}*/
-		for(int no=0;no<ORB.Beta[T0].get_count_soc(is);no++)
+		switch (job)
 		{
-			const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
-			const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
-			nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+			case 0://overlap part
+				for(int no=0;no<ORB.Beta[T0].get_count_soc(is);no++)
+				{
+					const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
+					const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
+					if(NONCOLIN && nlm1!=NULL)
+						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+					else if(!NONCOLIN)
+						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
+					else
+						WARNING_QUIT("Use_Overlap_Table::snap_psibeta","Conflict! Didn't count non-local part");
+				}
+				break;
+			case 1://need to be added later
+			{break;}
+			default: break;
 		}
-	}
 
 	delete[] calproj;
 	delete[] rmesh1;

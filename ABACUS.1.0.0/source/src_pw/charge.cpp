@@ -1272,7 +1272,11 @@ bool Charge::read_rho(const int &is, const string &fn) //add by dwan
 		}
 	}
 
-	CHECK_INT(ifs, NSPIN);
+	if(NSPIN != 4) CHECK_INT(ifs, NSPIN);
+	else
+	{
+		READ_VALUE(ifs, PRENSPIN);
+	}
 	if(NSPIN == 1||NSPIN == 4)
 	{
 		READ_VALUE(ifs, en.ef);
