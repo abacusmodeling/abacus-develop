@@ -511,6 +511,7 @@ void Use_Overlap_Table::snap_psibeta(
 			{break;}
 			default: break;
 		}
+	}
 
 	delete[] calproj;
 	delete[] rmesh1;
