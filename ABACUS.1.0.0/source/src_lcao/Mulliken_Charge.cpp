@@ -185,7 +185,7 @@ void Mulliken_Charge::cal_mulliken(void)
                                                                                   mug[j] = mud[0](ic,ir)*M.wfc_k[ik](ic,ir);
                                                                                   const double x = mug[j].real();
                                                                                         MecMulP[is][j] +=x*wf.wg(ik,i);
-                                                                                                                                                                                 cout<< x <<endl;                                                                                                                                                                                                    // cout <<   wavog[j] << endl; 
+                                                                                                                                                                                                                                                                                                                                                                                   // cout <<   wavog[j] << endl; 
 	                                                                   }
                                                                 }                             
                                                                                         
@@ -313,8 +313,9 @@ void Mulliken_Charge::stdout_mulliken(void)
 	   fout << setw(29) << "multiple" <<endl;
 	 
                                                        num = 0;
+                                                                                               int   lm = ucell.atoms[t].nwl;
 
-	                                      for (l=0; l<=ucell.lmax; l++)
+	                                      for (l=0; l<=lm; l++)
                                                       {             
                                                                if (NSPIN==1){
 	                                              sum_l[0] = 0.0;

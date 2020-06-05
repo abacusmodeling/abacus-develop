@@ -1231,7 +1231,7 @@ void energy::perform_dos(void)
                                                                           {
                                          for (int n=0; n<npoints+1; ++n)
                                         {
-                                                                                           cout << __FILE__<<__LINE__ << endl;
+                                                                                           
 
                                               out <<setw(13)<< pdos[0](w,n)<<endl;
                                         }//n
