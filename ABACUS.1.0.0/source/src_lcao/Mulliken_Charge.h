@@ -29,7 +29,7 @@ public:
                              double**  MecMulP ;
 	          double***  ADecMulP ;
 		                 Wfc_Dm_2d M;
-                              std::vector<ComplexMatrix> mud;
+                              
                               							  
 							  complex<double>       *mug  ;
 

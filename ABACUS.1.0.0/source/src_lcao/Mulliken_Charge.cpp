@@ -38,14 +38,27 @@
 Mulliken_Charge::Mulliken_Charge()
 {
    M.init();
-                                                        for(int in=0;in<kv.nks;in++)
-		                        {
+     if(GAMMA_ONLY_LOCAL)
+  {
+             for(int in=0;in<NSPIN;in++)
+           {
+
+              M.wfc_gamma[in]=LOC.wfc_dm_2d.wfc_gamma[in];
+              }
+
+   }
+       else 
+        {
+                                                
+       for(int in=0;in<kv.nks;in++)
+            {
     
-                                                                  M.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
-                                }
+           M.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
+      }
+       }
+
                      
-                                                                mud.resize(1);
-                           mud[0].create(ParaO.ncol,ParaO.nrow);
+                                                                
                                                      
                                                       mug = new  complex<double>   [NLOCAL];
 
@@ -109,7 +122,75 @@ delete[] mug;
 void Mulliken_Charge::cal_mulliken(void)
 {
 	TITLE("Mulliken_Charge","cal_mulliken");
-            atom_arrange::set_sr_NL();
+            
+
+	  for(int is=0; is<NSPIN; ++is)
+        {
+                      if(GAMMA_ONLY_LOCAL)
+	      {
+                                                                                        
+
+                                            std::vector<matrix>   mud;
+                                              mud.resize(1);
+                           mud[0].create(ParaO.ncol,ParaO.nrow);
+       
+
+                                    matrix Dwf = M.wfc_gamma[is];
+                            for (int i=0; i<NBANDS; ++i)		  
+	         {     
+                                                 ZEROS(mug, NLOCAL);
+                                                 const int NB= i+1;
+                   	                
+                                    const double one_float=1.0, zero_float=0.0;
+		const int one_int=1;
+                              
+
+			const char T_char='T';		
+                                                pdgemv_(
+				&T_char,
+				&NLOCAL,&NLOCAL,
+				&one_float,
+				LM.Sloc, &one_int, &one_int, ParaO.desc,
+				Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+                                                                &zero_float,
+				mud[0].c, &one_int, &NB, ParaO.desc,
+                                                                &one_int);
+                             
+                                        
+         
+                                                             
+                                                                 for (int j=0; j<NLOCAL; ++j)
+                                                                {
+                                                                                                                                                  
+                                                                           if ( ParaO.in_this_processor(j,i) )
+                                                                          {
+                                         
+                                                                                const int ir = ParaO.trace_loc_row[j];
+                                                                                const int ic = ParaO.trace_loc_col[i];
+                                                                                 
+                                                                                  mug[j] = mud[0](ic,ir)*M.wfc_gamma[is](ic,ir);
+                                                                                                                                                                    
+                                                                                  const double x = mug[j].real();
+                                                                                                                                                                   
+                                                                                        MecMulP[is][j] +=x*wf.wg(0,i);
+                                                                                    
+                                                                                                                                                                                                                                 
+	                                                             }
+                                                                } 
+                            
+    
+                                          
+			 }//ib
+                                           }//if
+ 
+                              else
+                                  {   
+                                                                              
+
+                                                                              std::vector<ComplexMatrix> mud;
+                                              mud.resize(1);
+                           mud[0].create(ParaO.ncol,ParaO.nrow);
+                                                      atom_arrange::set_sr_NL();
 		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
                    hm.hon.set_orb_tables();
 		LM.allocate_HS_R(LNNR.nnr);
@@ -117,8 +198,6 @@ void Mulliken_Charge::cal_mulliken(void)
                                 UHM.UOM.calculate_S_no();
 		UHM.UOM.build_ST_new('S', false);
 
-	  for(int is=0; is<NSPIN; ++is)
-        {
                                                                                                                       
 
                       for(int ik=0;ik<kv.nks;ik++)
@@ -127,7 +206,8 @@ void Mulliken_Charge::cal_mulliken(void)
 			if(is == kv.isk[ik])
 			{
 				
-                              
+                             
+
 				LM.allocate_HS_k(ParaO.nloc);
 				LM.zeros_HSk('S');
 				LNNR.folding_fixedH(ik);
@@ -194,8 +274,8 @@ void Mulliken_Charge::cal_mulliken(void)
                                                                                                     		
 			}//if                       
 		}//ik
-                                     
-                                        MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
+                }//else                     
+               MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
                                       
          if(MY_RANK == 0)
         {
