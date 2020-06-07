@@ -963,22 +963,35 @@ void energy::perform_dos(void)
 //		OUT(ofs_running,"minimal energy is (eV)", emin);
 //		OUT(ofs_running,"maximal energy is (eV)", emax);
 //  output the PDOS file.////qifeng-2019-01-21
- 		atom_arrange::set_sr_NL();
-		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+// 		atom_arrange::set_sr_NL();
+//		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
  const double de_ev = this->dos_edelta_ev;
                                                            
 							
 
                       const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
                             int NUM=NLOCAL*(npoints+1);
-                                                     
-                            Wfc_Dm_2d D;
-                                                      D.init();
-                                                        for(int in=0;in<kv.nks;in++)
-		                        {
+                                           Wfc_Dm_2d D;
+                            D.init();
+     if(GAMMA_ONLY_LOCAL)
+  {
+             for(int in=0;in<NSPIN;in++)
+           {
+
+              D.wfc_gamma[in]=LOC.wfc_dm_2d.wfc_gamma[in];
+              }
+
+   }
+       else 
+        {
+                                                
+       for(int in=0;in<kv.nks;in++)
+            {
     
-                                                                  D.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
-                                }
+           D.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
+      }
+       }
+                          
                                
 
  
@@ -1000,40 +1013,94 @@ void energy::perform_dos(void)
                                pdos[is].create(NLOCAL,np,true);
                            
                        }
-                               
-                    
     
-                         
- 
-                                           
-
-               
                         double a = bcoeff;
                  double b =  sqrt(3.1415926)*a;                                         
-                 hm.hon.set_orb_tables();
+                
+							  complex<double>       *waveg  =  new  complex<double>   [NLOCAL];
+
+                                                                                                              double*  Gauss = new double  [np];
+           
+        for(int is=0; is<nspin0; ++is)
+        {
+            if(GAMMA_ONLY_LOCAL)
+	      {
+                                                                                        
+
+                                            std::vector<matrix>   Mulk;
+                                              Mulk.resize(1);
+                           Mulk[0].create(ParaO.ncol,ParaO.nrow);
+       
+
+                                    matrix Dwf = D.wfc_gamma[is];
+                            for (int i=0; i<NBANDS; ++i)		  
+	                            {     
+                                        ZEROS(waveg, NLOCAL);
+                                          cout<<"charge9"<<endl;                  
+                                            ZEROS(Gauss,np);
+                                               for (int n=0; n<npoints+1; ++n)		  
+	                                   {  
+                             double en=emin+n * de_ev;
+                                        double en0=wf.ekb[0][i]*Ry_to_eV;
+		                        double de = en-en0;
+                                        double de2 = de * de;
+		                        Gauss[n] = kv.wk[0]*exp(-de2/a/a)/b;
+                                           }
+         
+                                                 const int NB= i+1;
+                   	                
+                                    const double one_float=1.0, zero_float=0.0;
+		const int one_int=1;
+                              
+
+			const char T_char='T';		
+                                                pdgemv_(
+				&T_char,
+				&NLOCAL,&NLOCAL,
+				&one_float,
+				LM.Sloc, &one_int, &one_int, ParaO.desc,
+				Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+                                                                &zero_float,
+				Mulk[0].c, &one_int, &NB, ParaO.desc,
+                                                                &one_int);
+                             
+                                        
+                                                                 for (int j=0; j<NLOCAL; ++j)
+                                                                {
+                                                                                                                                                  
+                                                                           if ( ParaO.in_this_processor(j,i) )
+                                                                          {
+                                         
+                                                                                const int ir = ParaO.trace_loc_row[j];
+                                                                                const int ic = ParaO.trace_loc_col[i];
+                                                                                 waveg[j] = Mulk[0](ic,ir)*D.wfc_gamma[is](ic,ir);
+                                                                                  const double x = waveg[j].real();
+                                                                             LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
+                                                                                  
+                                                                                    
+                                                                                                                                                                                                                                 
+	                                                             }
+                                                                } 
+                            
+                                          
+			 }//ib
+                                           }//if
+ 
+                              else
+                                                        {
+                                  atom_arrange::set_sr_NL();
+		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+
+                                                                             hm.hon.set_orb_tables();
 		LM.allocate_HS_R(LNNR.nnr);
 		LM.zeros_HSR('S', LNNR.nnr);
                                 UHM.UOM.calculate_S_no();
 		UHM.UOM.build_ST_new('S', false);
-    
-
-	
-                 std::vector<ComplexMatrix> Mulk;
+                                 std::vector<ComplexMatrix> Mulk;
                            Mulk.resize(1);
                            Mulk[0].create(ParaO.ncol,ParaO.nrow);
-                                                     
-                                                      
-							  
-							  complex<double>       *waveg  =  new  complex<double>   [NLOCAL];
 
-                                                                                                              double*  Gauss = new double  [np];
-                                     
-                                       
-
-        for(int is=0; is<nspin0; ++is)
-        {
-                                                                                                                      
-
+                     
                       for(int ik=0;ik<kv.nks;ik++)
 		{
 
@@ -1045,21 +1112,15 @@ void energy::perform_dos(void)
 				LM.zeros_HSk('S');
 				LNNR.folding_fixedH(ik);
                               
-                              
-                       
+                                     
                                  ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
 
-             
-
-             for (int i=0; i<NBANDS; ++i)		  
+                          for (int i=0; i<NBANDS; ++i)		  
 	         {     
-                                                                                                                   
-                                                         
-                                                                                                                
-                                                                                                                 ZEROS(waveg, NLOCAL);
+                      
+                                      ZEROS(waveg, NLOCAL);
                                                                                                              
-                                           
-                                                                                                               
+                                                                                                                                    
                                                                                   ZEROS(Gauss,np);
                                                for (int n=0; n<npoints+1; ++n)		  
 	                                   {  
@@ -1070,20 +1131,13 @@ void energy::perform_dos(void)
 		                        Gauss[n] = kv.wk[ik]*exp(-de2/a/a)/b;
                                            }
                                         
- 
-
-                                               const int NB= i+1;
+                                                const int NB= i+1;
                    	                      
                                     const double one_float=1.0, zero_float=0.0;
 							const int one_int=1;
                                 //   const int two_int=2;
-
 			const char T_char='T';		// N_char='N',U_char='U'
-			     
 			
-                                                            
-
-                                                                
                                                 pzgemv_(
 				&T_char,
 				&NLOCAL,&NLOCAL,
@@ -1108,7 +1162,7 @@ void energy::perform_dos(void)
                                                                                   waveg[j] = Mulk[0](ic,ir)*D.wfc_k[ik](ic,ir);
                                                                                   const double x = waveg[j].real();
                                                                              LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
-                                                                                                                                                                                                      // cout <<   wavog[j] << endl; 
+                                                                                                                                                                                                      
 	                                                                   }
                                                                 }                             
                                                                                         
@@ -1117,6 +1171,14 @@ void energy::perform_dos(void)
                                                                                                     		
 			}//if                       
 		}//ik
+ #ifdef __MPI
+	atom_arrange::delete_vector( SEARCH_RADIUS );
+#endif
+	hm.hon.clear_after_ions();
+                                }//else
+
+         
+                                                     
               MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
            
                        

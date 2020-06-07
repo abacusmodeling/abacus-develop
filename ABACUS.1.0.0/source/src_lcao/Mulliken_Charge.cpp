@@ -274,6 +274,11 @@ void Mulliken_Charge::cal_mulliken(void)
                                                                                                     		
 			}//if                       
 		}//ik
+  #ifdef __MPI
+	atom_arrange::delete_vector( SEARCH_RADIUS );
+#endif
+	hm.hon.clear_after_ions();
+
                 }//else                     
                MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
                                       
