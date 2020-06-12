@@ -1036,7 +1036,7 @@ void energy::perform_dos(void)
                             for (int i=0; i<NBANDS; ++i)		  
 	                            {     
                                         ZEROS(waveg, NLOCAL);
-                                          cout<<"charge9"<<endl;                  
+                                                            
                                             ZEROS(Gauss,np);
                                                for (int n=0; n<npoints+1; ++n)		  
 	                                   {  
@@ -1342,12 +1342,6 @@ void energy::perform_dos(void)
  
 }       
 delete[] pdos;
-                                                                    
-
-#ifdef __MPI
-	atom_arrange::delete_vector( SEARCH_RADIUS );
-#endif
-	hm.hon.clear_after_ions();
 
 		// output the DOS file.
 		for(int is=0; is<nspin0; ++is)
