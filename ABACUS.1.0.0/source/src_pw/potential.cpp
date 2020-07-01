@@ -687,6 +687,34 @@ const matrix &v, const int &precision, const int &hartree)const
     if(MY_RANK==0)
     {
         ofs.open( fn.c_str() );
+
+        ofs << ucell.latName << endl;//1
+        ofs << " " << ucell.lat0 * 0.529177 << endl;
+        ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
+        ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
+        ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            ofs << " " << ucell.atoms[it].label;
+        }
+        ofs << endl;
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            ofs << " " << ucell.atoms[it].na;
+        }
+        ofs << endl;
+        ofs << "Direct" << endl;
+
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            for(int ia=0; ia<ucell.atoms[it].na; ia++)
+            {
+                ofs << " " << ucell.atoms[it].taud[ia].x
+                    << " " << ucell.atoms[it].taud[ia].y
+                    << " " << ucell.atoms[it].taud[ia].z << endl;
+            }
+        }
         ofs << pw.ncx << " " << pw.ncy << " " << pw.ncz;
         ofs << setprecision(precision);
         ofs << scientific; 
@@ -765,7 +793,7 @@ const matrix &v, const int &precision, const int &hartree)const
         // save the rho one z by one z.
         for(int iz=0; iz<pw.ncz; iz++)
         {
-            ofs_running << "\n" << iz << " iz";
+            //ofs_running << "\n" << iz << " iz"; //LiuXh modify 20200624
             // tag must be different for different iz.
             ZEROS(zpiece, nxy);
             int tag = iz;
@@ -1364,7 +1392,7 @@ void potential::set_vrs_tddft(const bool doublegrid, const int istep)
     return;
 } //end subroutine set_vrs_tddft
 
-void potential::write_elecstat_pot(const int &is, const string &fn, const string &fn_ave)
+void potential::write_elecstat_pot(const string &fn, const string &fn_ave)
 {
     TITLE("potential","write_elecstat_pot");
     timer::tick("potential","write_elecstat_pot");
@@ -1375,9 +1403,15 @@ void potential::write_elecstat_pot(const int &is, const string &fn, const string
 
     complex<double> *Porter = UFFT.porter;
     ZEROS( Porter, pw.nrxx );
-    for (int ir=0; ir<pw.nrxx; ir++) 
+    
+    int nspin0 = 1;
+    if(NSPIN==2) nspin0 = NSPIN;
+    for(int is=0; is<nspin0; is++)
     {
-        Porter[ir] += complex<double>( chr.rho[is][ir], 0.0 );
+        for(int ir=0; ir<pw.nrxx; ir++)
+        {
+            Porter[ir] += complex<double>( chr.rho[is][ir], 0.0 );
+        }
     }
 
     //=============================
@@ -1391,7 +1425,7 @@ void potential::write_elecstat_pot(const int &is, const string &fn, const string
     complex<double> *vh_g  = new complex<double>[pw.ngmc];
     ZEROS(vh_g, pw.ngmc);
 
-    for (int ig = pw.gstart; ig<pw.ngmc; ig++)
+    for(int ig = pw.gstart; ig<pw.ngmc; ig++)
     {
         const int j = pw.ig2fftc[ig];
         if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
@@ -1430,6 +1464,51 @@ void potential::write_elecstat_pot(const int &is, const string &fn, const string
     {
         ofs.open( fn.c_str() );
         ofs_ave.open( fn_ave.c_str() );
+
+        ofs << ucell.latName << endl;//1
+        ofs << " " << ucell.lat0 * 0.529177 << endl;
+        ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
+        ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
+        ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+
+        ofs_ave << ucell.latName << endl;//1
+        ofs_ave << " " << ucell.lat0 * 0.529177 << endl;
+        ofs_ave << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
+        ofs_ave << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
+        ofs_ave << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            ofs << " " << ucell.atoms[it].label;
+            ofs_ave << " " << ucell.atoms[it].label;
+        }
+        ofs << endl;
+        ofs_ave << endl;
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            ofs << " " << ucell.atoms[it].na;
+            ofs_ave << " " << ucell.atoms[it].na;
+        }
+        ofs << endl;
+        ofs << "Direct" << endl;
+
+        ofs_ave << endl;
+        ofs_ave << "Direct" << endl;
+
+        for(int it=0; it<ucell.ntype; it++)
+        {
+            for(int ia=0; ia<ucell.atoms[it].na; ia++)
+            {
+                ofs << " " << ucell.atoms[it].taud[ia].x
+                    << " " << ucell.atoms[it].taud[ia].y
+                    << " " << ucell.atoms[it].taud[ia].z << endl;
+
+                ofs_ave << " " << ucell.atoms[it].taud[ia].x
+                    << " " << ucell.atoms[it].taud[ia].y
+                    << " " << ucell.atoms[it].taud[ia].z << endl;
+            }
+        }
+
         ofs << pw.ncx << " " << pw.ncy << " " << pw.ncz;
         ofs_ave << pw.ncx << " " << pw.ncy << " " << pw.ncz;
 

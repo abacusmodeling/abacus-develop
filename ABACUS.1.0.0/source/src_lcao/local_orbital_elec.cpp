@@ -428,9 +428,12 @@ void Local_Orbital_Elec::scf(const int &istep)
 			}
 			LOC.write_dm( is, iter, ssd.str(), precision );
 
+			//LiuXh modify 20200701
+			/*
 			stringstream ssp;
 			ssp << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_POT";
 			pot.write_potential( is, iter, ssp.str(), pot.vr, precision );
+			*/
 		}
 
 		// (10) add Vloc to Vhxc.
@@ -481,23 +484,20 @@ void Local_Orbital_Elec::scf(const int &istep)
 				}
 				LOC.write_dm( is, 0, ssd.str(), precision );
 
-				stringstream ssp;
-				ssp << global_out_dir << "SPIN" << is + 1 << "_POT";
-				pot.write_potential( is, 0, ssp.str(), pot.vrs, precision );
-
-			//fuxiang add 2017-03-15
-			stringstream sse;
-			sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
-			chr.write_rho_dipole( is, 0, sse.str());
-
-				if(pot.out_potential == 2)
+				if(pot.out_potential == 1) //LiuXh add 20200701
 				{
 					stringstream ssp;
-					stringstream ssp_ave;
-					ssp << global_out_dir << "SPIN" << is + 1 << "_ESP";
-					ssp_ave << global_out_dir << "SPIN" << is + 1 << "_ESP_AVE";
-					pot.write_elecstat_pot(is, ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+					ssp << global_out_dir << "SPIN" << is + 1 << "_POT";
+					pot.write_potential( is, 0, ssp.str(), pot.vrs, precision );
 				}
+
+				//LiuXh modify 20200701
+				/*
+				//fuxiang add 2017-03-15
+				stringstream sse;
+				sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
+				chr.write_rho_dipole( is, 0, sse.str());
+				*/
 			}
 			
 			iter_end(ofs_running);

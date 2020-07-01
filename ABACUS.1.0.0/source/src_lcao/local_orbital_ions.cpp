@@ -321,6 +321,15 @@ void Local_Orbital_Ions::opt_ions(void)
             //MD.runMD(istep);//we need this total form
         }
 
+        if(pot.out_potential == 2)
+        {
+            stringstream ssp;
+            stringstream ssp_ave;
+            ssp << global_out_dir << "ElecStaticPot";
+            ssp_ave << global_out_dir << "ElecStaticPot_AVE";
+            pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+        }
+
         if(ParaO.out_hsR) this->output_HS_R(); //LiuXh add 2019-07-15
 
         time_t fstart = time(NULL);
