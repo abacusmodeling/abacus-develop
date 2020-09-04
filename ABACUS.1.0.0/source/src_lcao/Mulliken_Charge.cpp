@@ -332,9 +332,9 @@ void Mulliken_Charge::stdout_mulliken(void)
       Name_Angular[1][1] = "py         ";
       Name_Angular[1][2] = "pz         ";
       Name_Angular[2][0] = "d3z^2-r^2  ";
-      Name_Angular[2][1] = "dx^2-y^2   ";
-      Name_Angular[2][2] = "dxy        ";
-      Name_Angular[2][3] = "dxz        ";
+      Name_Angular[2][1] = "dxy        ";
+      Name_Angular[2][2] = "dxz        ";
+      Name_Angular[2][3] = "dx^2-y^2   ";
       Name_Angular[2][4] = "dyz        ";
       Name_Angular[3][0] = "f5z^2-3r^2 ";
       Name_Angular[3][1] = "f5xz^2-xr^2";

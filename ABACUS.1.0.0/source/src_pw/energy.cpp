@@ -970,7 +970,7 @@ void energy::perform_dos(void)
 							
 
                       const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
-                            int NUM=NLOCAL*(npoints+1);
+                            int NUM=NLOCAL*npoints;
                                            Wfc_Dm_2d D;
                             D.init();
      if(GAMMA_ONLY_LOCAL)
@@ -995,7 +995,7 @@ void energy::perform_dos(void)
                                
 
  
-                      const int np=npoints+1;
+                      const int np=npoints;
                                             matrix*  pdosk = new matrix[nspin0];
                    
                         for(int is=0; is<nspin0; ++is)
@@ -1015,7 +1015,8 @@ void energy::perform_dos(void)
                        }
     
                         double a = bcoeff;
-                 double b =  sqrt(3.1415926)*a;                                         
+                                                doube   c=2*3.141592653;
+                 double b =  sqrt(c)*a;                                         
                 
 							  complex<double>       *waveg  =  new  complex<double>   [NLOCAL];
 
@@ -1038,12 +1039,12 @@ void energy::perform_dos(void)
                                         ZEROS(waveg, NLOCAL);
                                                             
                                             ZEROS(Gauss,np);
-                                               for (int n=0; n<npoints+1; ++n)		  
+                                               for (int n=0; n<npoints; ++n)		  
 	                                   {  
                              double en=emin+n * de_ev;
                                         double en0=wf.ekb[0][i]*Ry_to_eV;
 		                        double de = en-en0;
-                                        double de2 = de * de;
+                                        double de2 = 0.5*de * de;
 		                        Gauss[n] = kv.wk[0]*exp(-de2/a/a)/b;
                                            }
          
@@ -1122,12 +1123,12 @@ void energy::perform_dos(void)
                                                                                                              
                                                                                                                                     
                                                                                   ZEROS(Gauss,np);
-                                               for (int n=0; n<npoints+1; ++n)		  
+                                               for (int n=0; n<npoints; ++n)		  
 	                                   {  
                              double en=emin+n * de_ev;
                                         double en0=wf.ekb[ik][i]*Ry_to_eV;
 		                        double de = en-en0;
-                                        double de2 = de * de;
+                                        double de2 = 0.5*de * de;
 		                        Gauss[n] = kv.wk[ik]*exp(-de2/a/a)/b;
                                            }
                                         
@@ -1193,7 +1194,7 @@ void energy::perform_dos(void)
                      if (NSPIN==1)
                      {
 
-               for (int n=0; n<npoints+1; ++n)
+               for (int n=0; n<npoints; ++n)
                { double y=0.0;
                     double en=emin + n * de_ev;
                     for (int i=0; i<NLOCAL; i++)
@@ -1206,7 +1207,7 @@ void energy::perform_dos(void)
                       }
                    else if (NSPIN==2)
                     {
-                           for (int n=0; n<npoints+1; ++n)
+                           for (int n=0; n<npoints; ++n)
                            { double y=0.0;
                                 double z=0.0;
                                  double en=emin + n * de_ev;
@@ -1231,9 +1232,9 @@ void energy::perform_dos(void)
       Name_Angular[1][1] = "py         ";
       Name_Angular[1][2] = "pz         ";
       Name_Angular[2][0] = "d3z^2-r^2  ";
-      Name_Angular[2][1] = "dx^2-y^2   ";
-      Name_Angular[2][2] = "dxy        ";
-      Name_Angular[2][3] = "dxz        ";
+      Name_Angular[2][1] = "dxy        ";
+      Name_Angular[2][2] = "dxz        ";
+      Name_Angular[2][3] = "dx^2-y^2   ";
       Name_Angular[2][4] = "dyz        ";
       Name_Angular[3][0] = "f5z^2-3r^2 ";
       Name_Angular[3][1] = "f5xz^2-xr^2";
@@ -1261,7 +1262,7 @@ void energy::perform_dos(void)
                                     out << "<"<<"norbitals"<<">" <<setw(2) <<NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< endl;
                                     out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<endl;
 
-                                   for (int n=0; n<npoints+1; ++n)
+                                   for (int n=0; n<npoints; ++n)
                                    { double y=0.0;
                                   double en=emin + n * de_ev;
                                      out <<setw(20)<< en << endl;
@@ -1291,7 +1292,7 @@ void energy::perform_dos(void)
                                           out << "<"<<"data"<<">" <<endl;
                                                                           if (NSPIN==1)
                                                                           {
-                                         for (int n=0; n<npoints+1; ++n)
+                                         for (int n=0; n<npoints; ++n)
                                         {
                                                                                            
 
@@ -1300,7 +1301,7 @@ void energy::perform_dos(void)
                                                                            }
                                                                                           else if (NSPIN==2)
                                                                                           {
-                                                                                                    for (int n=0; n<npoints+1; ++n)
+                                                                                                    for (int n=0; n<npoints; ++n)
                                                                                                     {
                                                                                                               out <<setw(20)<< pdos[0](w,n)<< setw(30)<< pdos[1](w,n)<<endl;
                                                                                                     }//n
