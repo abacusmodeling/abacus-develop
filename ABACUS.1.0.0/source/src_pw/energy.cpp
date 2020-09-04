@@ -1015,7 +1015,7 @@ void energy::perform_dos(void)
                        }
     
                         double a = bcoeff;
-                                                doube   c=2*3.141592653;
+                                                double   c=2*3.141592653;
                  double b =  sqrt(c)*a;                                         
                 
 							  complex<double>       *waveg  =  new  complex<double>   [NLOCAL];
