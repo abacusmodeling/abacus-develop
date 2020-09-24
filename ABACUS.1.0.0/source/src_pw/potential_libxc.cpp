@@ -1,3 +1,4 @@
+#ifdef TEST_LIBXC
 #include "potential_libxc.h"
 #include "src_pw/global.h"
 #include "src_lcao/global_fp.h"
@@ -288,3 +289,4 @@ Potential_Libxc::cal_input(
 	
 	return std::make_tuple( rho, sigma, gdr );
 }
+#endif
