@@ -716,7 +716,7 @@ double Gint_Gamma::gamma_charge(void)
         //ofs_running<<__FILE__<<__LINE__<<endl;
 #pragma omp parallel
 {
-        ofstream ofs("cal_vlocal_"+TO_STRING(MY_RANK)+"_"+TO_STRING(omp_get_thread_num()));
+        ofstream ofs("gint_gamma_rho_"+TO_STRING(MY_RANK)+"_"+TO_STRING(omp_get_thread_num()));
         ofs<<"@/t"<<__LINE__<<endl;
 
         // it's a uniform grid to save orbital values, so the delta_r is a constant.
