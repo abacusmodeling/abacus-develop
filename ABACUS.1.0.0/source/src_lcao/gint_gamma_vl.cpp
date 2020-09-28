@@ -853,7 +853,7 @@ void Gint_Gamma::gamma_vlocal_B(void)
 // so it should be done very efficiently, very carefully.
 // I might repeat again to emphasize this: need to optimize
 // this code very efficiently, very carefully.
-void Gint_Gamma::gamma_vlocal(void)
+void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
