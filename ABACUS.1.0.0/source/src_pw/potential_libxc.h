@@ -1,3 +1,4 @@
+#ifdef TEST_LIBXC
 #ifndef POTENTIAL_LIBXC_H
 #define POTENTIAL_LIBXC_H
 
@@ -25,4 +26,5 @@ class Potential_Libxc
 		const double * const * const rho_in );
 };
 
+#endif
 #endif
