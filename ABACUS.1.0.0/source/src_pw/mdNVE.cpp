@@ -120,6 +120,17 @@ void mdNVE::runNVE(int step1){
 
   // Set up forces 
   callforce();
+	if(STRESS)
+	{
+		cout<<"output Pressure for check!"<<endl;
+		double press;
+		for(int i=0;i<3;i++)
+			press += stress_lcao(i,i)/3;
+		press += twiceKE/3/ucell.omega; //output virtual press = 2/3*Ek/V + sum(sigma[i][i])/3
+		double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8 ;
+		cout<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<endl;
+	}
+  
   for(k=0;k<numIon;k++){
         if(ionmbl[k].x==0)force[k].x=0;
         if(ionmbl[k].y==0)force[k].y=0;

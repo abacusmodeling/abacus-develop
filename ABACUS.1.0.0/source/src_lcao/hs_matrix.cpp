@@ -3,54 +3,54 @@
 #include "../src_lcao/local_orbital_elec.h"
 
 void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, bool bit, const int &out_hs)
-{	
-	if(out_hs==1)
-	{
-		save_HS(Hloc, Sloc, bit);
-	}
-	else if(out_hs==2)
-	{
-		save_HS(Hloc, Sloc, bit);
-	}
-	else if(out_hs==3)
-	{
-		//please call individually
-	}
-	else if(out_hs==0)
-	{
-		// do nothing.
-	}
-	else
-	{
-		WARNING("Diago_LCAO_Matrix","unrecorganized out_hs value.");
-	}
-	return;
+{   
+    if(out_hs==1)
+    {
+        save_HS(Hloc, Sloc, bit);
+    }
+    else if(out_hs==2)
+    {
+        save_HS(Hloc, Sloc, bit);
+    }
+    else if(out_hs==3)
+    {
+        //please call individually
+    }
+    else if(out_hs==0)
+    {
+        // do nothing.
+    }
+    else
+    {
+        WARNING("Diago_LCAO_Matrix","unrecorganized out_hs value.");
+    }
+    return;
 }
 
 
 void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_H, const int *rowind_H, 
-	const double *nzval_H, const double *nzval_S, bool bit)
+        const double *nzval_H, const double *nzval_S, bool bit)
 {
-	TITLE("HS_Matrix","save_HS_ccf");
+    TITLE("HS_Matrix","save_HS_ccf");
 
-	if(DRANK!=0)return;
-	
-	stringstream ssh;
-	stringstream sss;
-	if(bit)
-	{
-		ssh << global_out_dir << "H_bit.ccf";
-		sss << global_out_dir << "S_bit.ccf";
-	}
-	else
-	{
-		ssh << global_out_dir << "H" << Local_Orbital_Elec::iter << "_" << iter+1 << ".ccf";
-		sss << global_out_dir << "S" << Local_Orbital_Elec::iter << "_" << iter+1 << ".ccf";
-	}
+    if(DRANK!=0)return;
+    
+    stringstream ssh;
+    stringstream sss;
+    if(bit)
+    {
+        ssh << global_out_dir << "H_bit.ccf";
+        sss << global_out_dir << "S_bit.ccf";
+    }
+    else
+    {
+        ssh << global_out_dir << "H" << Local_Orbital_Elec::iter << "_" << iter+1 << ".ccf";
+        sss << global_out_dir << "S" << Local_Orbital_Elec::iter << "_" << iter+1 << ".ccf";
+    }
 
-	if(bit)
-	{
-	    FILE *g1 = fopen(ssh.str().c_str(),"wb");
+    if(bit)
+    {
+        FILE *g1 = fopen(ssh.str().c_str(),"wb");
         FILE *g2 = fopen(sss.str().c_str(),"wb");
 
         fwrite(&NLOCAL,sizeof(int),1,g1);
@@ -60,45 +60,45 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
 
         fclose(g1);
         fclose(g2);
-	}
+    }
 
-		
-	if(!bit)
-	{
-		ofstream g1(ssh.str().c_str());
+        
+    if(!bit)
+    {
+        ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
 
         g1 << NLOCAL << " " << Hnnz << endl;
         g2 << NLOCAL << " " << Hnnz << endl;
 
-		for(int i=0; i<NLOCAL+1; ++i)
-		{
-			g1 << colptr_H[i] << " ";
-			g2 << colptr_H[i] << " ";
-		}
-		g1 << endl;
-		g2 << endl;
+        for(int i=0; i<NLOCAL+1; ++i)
+        {
+            g1 << colptr_H[i] << " ";
+            g2 << colptr_H[i] << " ";
+        }
+        g1 << endl;
+        g2 << endl;
 
-		for(int i=0; i<Hnnz; ++i)
-		{
-			g1 << rowind_H[i] << " ";
-			g2 << rowind_H[i] << " ";
-		}
-		g1 << endl;
-		g2 << endl;
+        for(int i=0; i<Hnnz; ++i)
+        {
+            g1 << rowind_H[i] << " ";
+            g2 << rowind_H[i] << " ";
+        }
+        g1 << endl;
+        g2 << endl;
 
-		for(int i=0; i<Hnnz; ++i)
-		{
-			g1 << nzval_H[i] << " ";
-			g2 << nzval_S[i] << " ";
-		}
-		g1 << endl;
-		g2 << endl;
+        for(int i=0; i<Hnnz; ++i)
+        {
+            g1 << nzval_H[i] << " ";
+            g2 << nzval_S[i] << " ";
+        }
+        g1 << endl;
+        g2 << endl;
 
         g1.close();
         g2.close();
-	}
-	return;
+    }
+    return;
 }
 
 // mohan add 2010/3/20, output H and S matrix, convinence for diagonalization
@@ -112,16 +112,16 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     stringstream ssh;
     stringstream sss;
 
-	if(bit)
-	{
-    	ssh << global_out_dir << "data-H-bit";
-    	sss << global_out_dir << "data-S-bit";
-	}
-	else 
-	{
-    	ssh << global_out_dir << "data-H";
-    	sss << global_out_dir << "data-S";
-	}
+    if(bit)
+    {
+        ssh << global_out_dir << "data-H-bit";
+        sss << global_out_dir << "data-S-bit";
+    }
+    else 
+    {
+        ssh << global_out_dir << "data-H";
+        sss << global_out_dir << "data-S";
+    }
 
     if (bit)
     {
@@ -154,8 +154,19 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                     ic = ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
-                        lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        int iic;
+                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        {
+                            iic=ir+ic*ParaO.nrow;
+                        }
+                        else
+                        {
+                            iic=ir*ParaO.ncol+ic;
+                        }
+                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        lineH[j-i] = H[iic];
+                        lineS[j-i] = S[iic];
                     }
                 }
             }
@@ -236,8 +247,19 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                     ic = ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
-                        lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        int iic;
+                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        {
+                            iic=ir+ic*ParaO.nrow;
+                        }
+                        else
+                        {
+                            iic=ir*ParaO.ncol+ic;
+                        }
+                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        lineH[j-i] = H[iic];
+                        lineS[j-i] = S[iic];
                     }
                 }
             }
@@ -264,33 +286,33 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         }
 
         //if (DRANK==0);
-        if (DRANK==0)		// Peize Lin delete ; at 2020.01.31
+        if (DRANK==0)       // Peize Lin delete ; at 2020.01.31
         {
             g1.close();
             g2.close();
         }
 
-//LiuXH add 2015-12-17,begin
-	//int nprocs,myid;
-	//MPI_Status status;
-	//MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
-	//MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
+/*LiuXH add 2015-12-17,begin
+    //int nprocs,myid;
+    //MPI_Status status;
+    //MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
+    //MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
-	string H_fn;
-	stringstream H_fn2;
-	H_fn2<< "data-H-"  << DRANK ;
-	H_fn=H_fn2.str();
-	ofstream ofs_H;
-	ofs_H.open(H_fn.c_str());
-	ofs_H<<setprecision(8) << setw(12);
+    string H_fn;
+    stringstream H_fn2;
+    H_fn2<< "data-H-"  << DRANK ;
+    H_fn=H_fn2.str();
+    ofstream ofs_H;
+    ofs_H.open(H_fn.c_str());
+    ofs_H<<setprecision(8) << setw(12);
 
-	string S_fn;
-	stringstream S_fn2;
-	S_fn2<< "data-S-"  << DRANK ;
-	S_fn=S_fn2.str();
-	ofstream ofs_S;
-	ofs_S.open(S_fn.c_str());
-	ofs_S<<setprecision(8) << setw(12);
+    string S_fn;
+    stringstream S_fn2;
+    S_fn2<< "data-S-"  << DRANK ;
+    S_fn=S_fn2.str();
+    ofstream ofs_S;
+    ofs_S.open(S_fn.c_str());
+    ofs_S<<setprecision(8) << setw(12);
 
         int irr,icc;
         for (int i=0; i<NLOCAL; i++)
@@ -301,20 +323,20 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                 // data collection
                 for (int j=0; j<NLOCAL; j++)
                 {
-			icc = ParaO.trace_loc_col[j];
-			if (icc>=0)
-			{
-				//if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
-				//if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
-				ofs_H << " " << H[irr*ParaO.ncol+icc];
-				ofs_S << " " << S[irr*ParaO.ncol+icc];
-			}
-		}
-		ofs_H << endl;
-		ofs_S << endl;
-	     }
+            icc = ParaO.trace_loc_col[j];
+            if (icc>=0)
+            {
+                //if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
+                //if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
+                ofs_H << " " << H[irr*ParaO.ncol+icc];
+                ofs_S << " " << S[irr*ParaO.ncol+icc];
+            }
+        }
+        ofs_H << endl;
+        ofs_S << endl;
          }
-//LiuXH add 2015-12-17,end
+         }
+//LiuXH add 2015-12-17,end*/
 #else
         ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
@@ -343,20 +365,20 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 
 //LiuXh, 2017-03-21
 void HS_Matrix::saving_HS_complex(complex<double> *Hloc, complex<double>* Sloc, bool bit, const int &out_hs)
-{	
-	if(out_hs==1)
-	{
-		save_HS_complex(Hloc, Sloc, bit);
-	}
-	else if(out_hs==0)
-	{
-		// do nothing.
-	}
-	else
-	{
-		WARNING("Diago_LCAO_Matrix","unrecorganized out_hs value.");
-	}
-	return;
+{   
+    if(out_hs==1)
+    {
+        save_HS_complex(Hloc, Sloc, bit);
+    }
+    else if(out_hs==0)
+    {
+        // do nothing.
+    }
+    else
+    {
+        WARNING("Diago_LCAO_Matrix","unrecorganized out_hs value.");
+    }
+    return;
 }
 
 //LiuXh, 2017-03-21
@@ -411,8 +433,19 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                     ic = ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
-                        lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        int iic;
+                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        {
+                            iic=ir+ic*ParaO.nrow;
+                        }
+                        else
+                        {
+                            iic=ir*ParaO.ncol+ic;
+                        }
+                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        lineH[j-i] = H[iic];
+                        lineS[j-i] = S[iic];
                     }
                 }
             }
@@ -493,8 +526,19 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                     ic = ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
-                        lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        int iic;
+                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        {
+                            iic=ir+ic*ParaO.nrow;
+                        }
+                        else
+                        {
+                            iic=ir*ParaO.ncol+ic;
+                        }
+                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        lineH[j-i] = H[iic];
+                        lineS[j-i] = S[iic];
                     }
                 }
             }
@@ -521,13 +565,13 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         }
 
         //if (DRANK==0);
-        if (DRANK==0)			// Peize Lin delete ; at 2020.01.31
+        if (DRANK==0)           // Peize Lin delete ; at 2020.01.31
         {
             g1.close();
             g2.close();
         }
 
-//LiuXH add 2015-12-17,begin
+/*LiuXH add 2015-12-17,begin
         //int nprocs,myid;
         //MPI_Status status;
         //MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
@@ -571,7 +615,7 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                 ofs_S << endl;
              }
          }
-//LiuXH add 2015-12-17,end
+//LiuXH add 2015-12-17,end*/
 #else
         ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
@@ -751,7 +795,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                             }
                             else
                             {
-				if(abs(lineH_soc[j].real()) < 1.0e-12) lineH_soc[j]= complex<double> (0.0, lineH_soc[j].imag());
+                if(abs(lineH_soc[j].real()) < 1.0e-12) lineH_soc[j]= complex<double> (0.0, lineH_soc[j].imag());
                                 if(abs(lineH_soc[j].imag()) < 1.0e-12) lineH_soc[j]= complex<double> (lineH_soc[j].real(), 0.0);
                                 if(abs(lineS_soc[j].real()) < 1.0e-12) lineS_soc[j]= complex<double> (0.0, lineS_soc[j].imag());
                                 if(abs(lineS_soc[j].imag()) < 1.0e-12) lineS_soc[j]= complex<double> (lineS_soc[j].real() , 0.0);
@@ -784,7 +828,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
         }
     }
     //if(DRANK==0);
-    if(DRANK==0)				// Peize Lin delete ; at 2020.01.31
+    if(DRANK==0)                // Peize Lin delete ; at 2020.01.31
     {
         g1.close();
         g2.close();

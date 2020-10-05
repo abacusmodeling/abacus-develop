@@ -969,6 +969,12 @@ void md::callforce(){
 #ifdef __MPI //2015-10-01, xiaohui
         atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif //2015-10-01, xiaohui
+	if(STRESS)
+	{
+	//	matrix stress_lcao;//this is the stress matrix same as src_p    w/ion.cpp
+                stress_lcao.create(3,3);
+                FL.cal_stress(stress_lcao);
+	}
 	return;
 }
 void md::moveatoms(int step){

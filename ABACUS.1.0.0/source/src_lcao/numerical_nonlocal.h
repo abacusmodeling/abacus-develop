@@ -60,7 +60,8 @@ public:
 			const int& nproj_in,
 			const int& nproj_in_so,
 			int* LfromBeta_in,
-			const Numerical_Nonlocal_Lm* ps_orbital_in);
+			const Numerical_Nonlocal_Lm* ps_orbital_in,
+			const bool has_so);
 
 	Numerical_Nonlocal_Lm* Proj;// length: nproj(only store radial function )
 

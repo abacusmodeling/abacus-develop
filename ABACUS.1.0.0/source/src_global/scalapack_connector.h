@@ -35,6 +35,14 @@ extern "C"
 		const complex<double> *B, const int *IB, const int *JB, const int *DESCB, const int *K, 
                                            const double *beta,
 		complex<double> *C, const int *IC, const int *JC, const int *DESCC,const int *L);
+                                void pdgemv_(
+		const char *transa,
+		const int *M, const int *N,
+		const double *alpha,
+		const double *A, const int *IA, const int *JA, const int *DESCA,
+		const double *B, const int *IB, const int *JB, const int *DESCB, const int *K, 
+                                           const double *beta,
+		double *C, const int *IC, const int *JC, const int *DESCC,const int *L);
 
 	void pzgetrf_(
 		const int *M, const int *N, 

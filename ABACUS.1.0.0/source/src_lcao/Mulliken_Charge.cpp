@@ -37,11 +37,32 @@
 
 Mulliken_Charge::Mulliken_Charge()
 {
-                        
+   M.init();
+     if(GAMMA_ONLY_LOCAL)
+  {
+             for(int in=0;in<NSPIN;in++)
+           {
+
+              M.wfc_gamma[in]=LOC.wfc_dm_2d.wfc_gamma[in];
+              }
+
+   }
+       else 
+        {
+                                                
+       for(int in=0;in<kv.nks;in++)
+            {
+    
+           M.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
+      }
+       }
+
+                     
+                                                                
+                                                     
+                                                      mug = new  complex<double>   [NLOCAL];
 
 
-                Mullik.resize(NSPIN);
-                                Mulliken.resize(kv.nks);
                 DecMulP = new double* [NSPIN];
 		for(int is=0; is<NSPIN; ++is)
 		{
@@ -72,6 +93,7 @@ Mulliken_Charge::Mulliken_Charge()
 Mulliken_Charge::~Mulliken_Charge()
 {  
 
+delete[] mug;
 
        for(int is=0; is<NSPIN; ++is)
 		{
@@ -100,119 +122,165 @@ Mulliken_Charge::~Mulliken_Charge()
 void Mulliken_Charge::cal_mulliken(void)
 {
 	TITLE("Mulliken_Charge","cal_mulliken");
-	 // if(GAMMA_ONLY_LOCAL)
-         // {    
-              for(int is=0; is!=NSPIN; ++is)
-             {
-                                if(GAMMA_ONLY_LOCAL)
-	                {
-                Mullik[is].create(ParaO.ncol,ParaO.nrow);
-                     const double one_float=1.0, zero_float=0.0;
-		     const int one_int=1;
-		     const char N_char='N', T_char='T';    
-                                     pdgemm_(
-				&N_char, &T_char,
-				&NLOCAL, &NLOCAL, &NLOCAL,
-				&one_float,
-				LOC.wfc_dm_2d.dm_gamma[is].c, &one_int, &one_int, ParaO.desc,
-				LM.Sloc, &one_int, &one_int, ParaO.desc,
-				&zero_float,
-				Mullik[is].c, &one_int, &one_int, ParaO.desc);
-                                                               // DecMulP[is](NLOCAL,0.0);
-                              for (int i=0; i<NLOCAL; ++i)
-                             {
-                                   if ( ParaO.in_this_processor(i,i) )
-                                  {
-                                         const int ir = ParaO.trace_loc_row[i];
-                                         const int ic = ParaO.trace_loc_col[i];
-                                         MecMulP[is][i] = Mullik[is] (ic,ir ); 
-                                 }
-	                     }
-                      
-                                             // MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
-                                            }//if
-                                                         else
-                                                        {
-                                                                                                                                           hm.hon.set_orb_tables(); 
-                                                                      atom_arrange::set_sr_NL();
-		                                     atom_arrange::search( SEARCH_RADIUS );
-                                                                      LM.allocate_HS_R(LNNR.nnr);
-		                                       LM.zeros_HSR('S', LNNR.nnr);
-                                                                      UHM.UOM.calculate_S_no();
-		                                       UHM.UOM.build_ST_new('S', false);
+            
 
-                                                                 std::vector<ComplexMatrix> dmk;
-                                                                 dmk.resize(kv.nks);
-                                                               //   std::vector<ComplexMatrix> PDOS_k;
-                                                                //  PDOS_k.resize(kv.nks);
-                                       for(int ik=0;ik<kv.nks;ik++)
-		      {
+	  for(int is=0; is<NSPIN; ++is)
+        {
+                      if(GAMMA_ONLY_LOCAL)
+	      {
+                                                                                        
+
+                                            std::vector<matrix>   mud;
+                                              mud.resize(1);
+                           mud[0].create(ParaO.ncol,ParaO.nrow);
+       
+
+                                    matrix Dwf = M.wfc_gamma[is];
+                            for (int i=0; i<NBANDS; ++i)		  
+	         {     
+                                                 ZEROS(mug, NLOCAL);
+                                                 const int NB= i+1;
+                   	                
+                                    const double one_float=1.0, zero_float=0.0;
+		const int one_int=1;
+                              
+
+			const char T_char='T';		
+                                                pdgemv_(
+				&T_char,
+				&NLOCAL,&NLOCAL,
+				&one_float,
+				LM.Sloc, &one_int, &one_int, ParaO.desc,
+				Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+                                                                &zero_float,
+				mud[0].c, &one_int, &NB, ParaO.desc,
+                                                                &one_int);
+                             
+                                        
+         
+                                                             
+                                                                 for (int j=0; j<NLOCAL; ++j)
+                                                                {
+                                                                                                                                                  
+                                                                           if ( ParaO.in_this_processor(j,i) )
+                                                                          {
+                                         
+                                                                                const int ir = ParaO.trace_loc_row[j];
+                                                                                const int ic = ParaO.trace_loc_col[i];
+                                                                                 
+                                                                                  mug[j] = mud[0](ic,ir)*M.wfc_gamma[is](ic,ir);
+                                                                                                                                                                    
+                                                                                  const double x = mug[j].real();
+                                                                                                                                                                   
+                                                                                        MecMulP[is][j] +=x*wf.wg(0,i);
+                                                                                    
+                                                                                                                                                                                                                                 
+	                                                             }
+                                                                } 
+                            
+    
+                                          
+			 }//ib
+                                           }//if
+ 
+                              else
+                                  {   
+                                                                              
+
+                                                                              std::vector<ComplexMatrix> mud;
+                                              mud.resize(1);
+                           mud[0].create(ParaO.ncol,ParaO.nrow);
+                                                      atom_arrange::set_sr_NL();
+		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+                   hm.hon.set_orb_tables();
+		LM.allocate_HS_R(LNNR.nnr);
+		LM.zeros_HSR('S', LNNR.nnr);
+                                UHM.UOM.calculate_S_no();
+		UHM.UOM.build_ST_new('S', false);
+
+                                                                                                                      
+
+                      for(int ik=0;ik<kv.nks;ik++)
+		{
+
 			if(is == kv.isk[ik])
 			{
+				
+                             
+
 				LM.allocate_HS_k(ParaO.nloc);
 				LM.zeros_HSk('S');
 				LNNR.folding_fixedH(ik);
+                              
+                              
+                       
+                                 ComplexMatrix Dwf = conj(M.wfc_k[ik]);
+
+             
+
+             for (int i=0; i<NBANDS; ++i)		  
+	         {     
+                                                                                                                   
+                                                         
+                                                                                                                 ZEROS(mug, NLOCAL);
+                                                                                                                                                                                                                              
+                                           
+                                                                                                               
+                                                                                                                         
  
 
-                                                                std::vector<double> wg_local(ParaO.ncol,0.0);
-			for(int ib_global=0; ib_global!=NLOCAL; ++ib_global)
-			{
-				const int ib_local = ParaO.trace_loc_col[ib_global];
-				if(ib_local>=0)
-					wg_local[ib_local] = wf.wg(ik,ib_global);
-			}
-			
-			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			//matrix wg_wfc(wfc_gamma[is]);
-                                                ComplexMatrix wg_wfck = LOC.wfc_dm_2d.wfc_k[ik];
+                                               const int NB= i+1;
+                   	                      
+                                    const double one_float=1.0, zero_float=0.0;
+							const int one_int=1;
+                                //   const int two_int=2;
 
-			for(int ir=0; ir!=wg_wfck.nr; ++ir)
-				LapackConnector::scal( wg_wfck.nc, wg_local[ir], wg_wfck.c+ir*wg_wfck.nc, 1 );
+			const char T_char='T';		// N_char='N',U_char='U'
+			     
 			
-			// C++: dm(iw1,iw2) = wfc(ib,iw1) * wg_wfc(ib,iw2)
-			const double one_float=1.0, zero_float=0.0;
-			const int one_int=1;
-			const char N_char='N',C_char='C';
-			dmk[ik].create(LOC.wfc_dm_2d.wfc_k[ik].nr,LOC.wfc_dm_2d.wfc_k[ik].nc);
-                                                Mulliken[ik].create(ParaO.ncol,ParaO.nrow);
-			pzgemm_(
-				&N_char, &C_char,
-				&NLOCAL, &NLOCAL, &NLOCAL,
+                                                          
+
+                                                                
+                                                pzgemv_(
+				&T_char,
+				&NLOCAL,&NLOCAL,
 				&one_float,
-				wg_wfck.c, &one_int, &one_int, ParaO.desc,
-				LOC.wfc_dm_2d.wfc_k[ik].c, &one_int, &one_int, ParaO.desc,
-				&zero_float,
-				dmk[ik].c, &one_int, &one_int, ParaO.desc); 
-                                               pzgemm_(
-				&N_char, &N_char,
-				&NLOCAL, &NLOCAL, &NLOCAL,
-				&one_float,
-				dmk[ik].c, &one_int, &one_int, ParaO.desc,
 				LM.Sloc2, &one_int, &one_int, ParaO.desc,
-				&zero_float,
-				 Mulliken[ik].c, &one_int, &one_int, ParaO.desc);  
-                                            for (int j=0; j<NLOCAL; ++j)
-                                         {
-                                                    if ( ParaO.in_this_processor(j,j) )
-                                                  {
-                                                                complex<double> h  = 0.0;
-                                                                const int ir = ParaO.trace_loc_row[j];
-                                                                const int ic = ParaO.trace_loc_col[j];
-                                                                h =  Mulliken[ik] (ic,ir ); 
-                                                             // MecMulP[is][j] += kv.wk[ik]*h.real();
-                                                              MecMulP[is][j] += h.real();
-                                                  }
-	                         }
-                                    }//if
-                                              }//k
-                                             #ifdef __MPI
-	                       atom_arrange::delete_vector( SEARCH_RADIUS );
-                                            #endif
-	                      hm.hon.clear_after_ions();
+				Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+                                &zero_float,
+				mud[0].c, &one_int, &NB, ParaO.desc,
+                                                                &one_int);
+                             
+                                                 
+                                                             
+                                                                 for (int j=0; j<NLOCAL; ++j)
+                                                                {
+                                                                                                                                                  
+                                                                           if ( ParaO.in_this_processor(j,i) )
+                                                                          {
+                                         
+                                                                                const int ir = ParaO.trace_loc_row[j];
+                                                                                const int ic = ParaO.trace_loc_col[i];
+                                                                                 
+                                                                                  mug[j] = mud[0](ic,ir)*M.wfc_k[ik](ic,ir);
+                                                                                  const double x = mug[j].real();
+                                                                                        MecMulP[is][j] +=x*wf.wg(ik,i);
+                                                                                                                                                                                                                                                                                                                                                                                   // cout <<   wavog[j] << endl; 
+	                                                                   }
+                                                                }                             
+                                                                                        
+                                                                 
+			 }//ib
+                                                                                                    		
+			}//if                       
+		}//ik
+  #ifdef __MPI
+	atom_arrange::delete_vector( SEARCH_RADIUS );
+#endif
+	hm.hon.clear_after_ions();
 
-                                      }//else
-                                      
-                                        MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
+                }//else                     
+               MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
                                       
          if(MY_RANK == 0)
         {
@@ -264,9 +332,9 @@ void Mulliken_Charge::stdout_mulliken(void)
       Name_Angular[1][1] = "py         ";
       Name_Angular[1][2] = "pz         ";
       Name_Angular[2][0] = "d3z^2-r^2  ";
-      Name_Angular[2][1] = "dx^2-y^2   ";
-      Name_Angular[2][2] = "dxy        ";
-      Name_Angular[2][3] = "dxz        ";
+      Name_Angular[2][1] = "dxy        ";
+      Name_Angular[2][2] = "dxz        ";
+      Name_Angular[2][3] = "dx^2-y^2   ";
       Name_Angular[2][4] = "dyz        ";
       Name_Angular[3][0] = "f5z^2-3r^2 ";
       Name_Angular[3][1] = "f5xz^2-xr^2";
@@ -330,8 +398,9 @@ void Mulliken_Charge::stdout_mulliken(void)
 	   fout << setw(29) << "multiple" <<endl;
 	 
                                                        num = 0;
+                                                                                               int   lm = ucell.atoms[t].nwl;
 
-	                                      for (l=0; l<=ucell.lmax; l++)
+	                                      for (l=0; l<=lm; l++)
                                                       {             
                                                                if (NSPIN==1){
 	                                              sum_l[0] = 0.0;

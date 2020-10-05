@@ -4,7 +4,6 @@
 #include "../src_pw/global.h"
 #include "src_global/blas_connector.h"
 #include <mkl_service.h>
-
 //#include <vector>
 
 extern "C"
@@ -854,7 +853,7 @@ void Gint_Gamma::gamma_vlocal_B(void)
 // so it should be done very efficiently, very carefully.
 // I might repeat again to emphasize this: need to optimize
 // this code very efficiently, very carefully.
-void Gint_Gamma::gamma_vlocal(void)
+void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
@@ -869,108 +868,84 @@ void Gint_Gamma::gamma_vlocal(void)
     const int mkl_threads = mkl_get_max_threads();
     mkl_set_num_threads(1);
 
-    //ofs_running<<__FILE__<<__LINE__<<endl;
 
 	#pragma omp parallel
-	{
-	    //ofstream ofs("cal_vlocal_"+TO_STRING(MY_RANK)+"_"+TO_STRING(omp_get_thread_num()));
-	    //ofs<<"@/t"<<__LINE__<<endl;
-	    const int lgd_now=GridT.lgd; 
-	    if(max_size<=0 || lgd_now <= 0) 
-	    {
-	        //perform_gint=false;
-	    } 
-		else
+	{		
+		//OUT(ofs_running, "start calculate gamma_vlocal");
+
+		// it's a uniform grid to save orbital values, so the delta_r is a constant.
+		const double delta_r=ORB.dr_uniform;
+		const Numerical_Orbital_Lm *pointer;
+
+		// allocate 1
+		int nnnmax=0;
+		for(int T=0; T<ucell.ntype; T++)
+			nnnmax=max(nnnmax, nnn[T]);
+
+		//int nblock;
+
+		double mt[3]={0,0,0};
+		//double v1=0.0;
+		double phi=0.0;
+
+		const int nbx=GridT.nbx;
+		const int nby=GridT.nby;
+		const int nbz_start=GridT.nbzp_start;
+		const int nbz=GridT.nbzp;
+
+		const int ncyz=pw.ncy*pw.nczp;
+
+		const int lgd_now=GridT.lgd;    
+		if(max_size>0 && lgd_now>0)
 		{
-			//bool perform_gint=true;
-			double *GridVlocal_pool = nullptr;
-			double **GridVlocal_thread = nullptr;
-		
-			//OUT(ofs_running, "start calculate gamma_vlocal");
-
-			// it's a uniform grid to save orbital values, so the delta_r is a constant.
-			const double delta_r=ORB.dr_uniform;
-			const Numerical_Orbital_Lm *pointer = nullptr;
-
-			// allocate 1
-			int nnnmax=0;
-			for(int T=0; T<ucell.ntype; T++)
-			{
-				nnnmax=max(nnnmax, nnn[T]);
-			}
-
-			double*** dr = nullptr; // vectors between atom and grid: [bxyz, maxsize, 3]
-			double** distance = nullptr; // distance between atom and grid: [bxyz, maxsize]
-			int LD_pool;
-			//int nblock;
-			int *bsize = nullptr; //band size: number of columns of a band
-			int *colidx = nullptr;
-			double *psir_ylm_pool = nullptr;
-			double **psir_ylm = nullptr;
-			double *psir_vlbr3_pool = nullptr;
-			double **psir_vlbr3 = nullptr;
-			int **cal_flag = nullptr;
-		
-			double* ylma = nullptr;
-
-			double mt[3]={0,0,0};
-			double *vldr3 = nullptr;
-			//double v1=0.0;
-			int* vindex = nullptr;
-			double phi=0.0;
-
-			const int nbx=GridT.nbx;
-			const int nby=GridT.nby;
-			const int nbz_start=GridT.nbzp_start;
-			const int nbz=GridT.nbzp;
-
-			const int ncyz=pw.ncy*pw.nczp;
-	  
-			GridVlocal_pool=new double [lgd_now*lgd_now];
+			double *GridVlocal_pool=new double [lgd_now*lgd_now];
 			ZEROS(GridVlocal_pool, lgd_now*lgd_now);
-			GridVlocal_thread=new double*[lgd_now];
+			double **GridVlocal_thread=new double*[lgd_now];
 			for (int i=0; i<lgd_now; i++)
-			{
 				GridVlocal_thread[i]=&GridVlocal_pool[i*lgd_now];
-			}
 			Memory::record("Gint_Gamma","GridVlocal",lgd_now*lgd_now,"double");
 
-			ylma=new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
+			double* ylma=new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
 			ZEROS(ylma, nnnmax);
-			vldr3=new double[pw.bxyz];
-			vindex=new int[pw.bxyz];
+			double *vldr3=new double[pw.bxyz];
 			ZEROS(vldr3, pw.bxyz);
+			int* vindex=new int[pw.bxyz];
 			ZEROS(vindex, pw.bxyz);
 
-			LD_pool=max_size*ucell.nwmax;
-			dr=new double**[pw.bxyz];
-			distance=new double*[pw.bxyz];
-			bsize=new int[max_size];
-			colidx=new int[max_size+1];
-			psir_ylm_pool=new double[pw.bxyz*LD_pool];
-			psir_ylm=new double *[pw.bxyz];
-			ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
-			psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
-			psir_vlbr3=new double *[pw.bxyz];
-			ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
-			cal_flag=new int*[pw.bxyz];
+			int LD_pool=max_size*ucell.nwmax;
+			double*** dr=new double**[pw.bxyz]; // vectors between atom and grid: [bxyz, maxsize, 3]
 			for(int i=0; i<pw.bxyz; i++)
 			{
 				dr[i]=new double*[max_size];
-				distance[i]=new double[max_size];
-				psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
-				psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
-				ZEROS(distance[i], max_size);
 				for(int j=0; j<max_size; j++) 
 				{
 					dr[i][j]=new double[3];
 					ZEROS(dr[i][j],3);
-				}
-				cal_flag[i]=new int[max_size];
+				}				
 			}
+			double** distance=new double*[pw.bxyz]; // distance between atom and grid: [bxyz, maxsize]
+			for(int i=0; i<pw.bxyz; i++)
+			{
+				distance[i]=new double[max_size];
+				ZEROS(distance[i], max_size);
+			}
+			int *bsize=new int[max_size];	 //band size: number of columns of a band
+			int *colidx=new int[max_size+1];
+			double *psir_ylm_pool=new double[pw.bxyz*LD_pool];
+			double **psir_ylm=new double *[pw.bxyz];
+			for(int i=0; i<pw.bxyz; i++)
+				psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
+			ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
+			double *psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
+			double **psir_vlbr3=new double *[pw.bxyz];
+			for(int i=0; i<pw.bxyz; i++)
+				psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
+			ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
+			int **cal_flag=new int*[pw.bxyz];
+			for(int i=0; i<pw.bxyz; i++)
+				cal_flag[i]=new int[max_size];
 
-			int *block_iw; // index of wave functions of each block;
-			block_iw=new int[max_size];
+			int *block_iw = new int[max_size]; // index of wave functions of each block;
 
 			#pragma omp for
 			for (int i=0; i< nbx; i++)
@@ -981,7 +956,6 @@ void Gint_Gamma::gamma_vlocal(void)
 					const int jby=j*pw.by; 
 					for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
 					{
-						//ofs<<i<<"\t"<<j<<"\t"<<k<<endl;
 						//OUT(ofs_running, "====================");
 						//OUT(ofs_running, "i", i);
 						//OUT(ofs_running, "j", j);
@@ -1019,13 +993,10 @@ void Gint_Gamma::gamma_vlocal(void)
 			}// i
 
 			#pragma omp critical(cal_vl)
-			//ofs<<"@/t"<<__LINE__<<endl;
-			for (int i=0; i<lgd_now; i++)
 			{
-				for (int j=0; j<lgd_now; j++)
-				{
-					GridVlocal[i][j] += GridVlocal_thread[i][j];
-				}
+				for (int i=0; i<lgd_now; i++)
+					for (int j=0; j<lgd_now; j++)
+						GridVlocal[i][j] += GridVlocal_thread[i][j];
 			}
 			
 			delete[] GridVlocal_thread;
@@ -1033,33 +1004,33 @@ void Gint_Gamma::gamma_vlocal(void)
 
 			for(int i=0; i<pw.bxyz; i++)
 			{
-				for(int j=0; j<max_size; j++) 
-				{
+				for(int j=0; j<max_size; j++)
 					delete[] dr[i][j];
-				}
 				delete[] dr[i];
-				delete[] distance[i];
-				delete[] cal_flag[i];
 			}
+			delete[] dr;
+			for(int i=0; i<pw.bxyz; i++)
+				delete[] distance[i];
+			delete[] distance;
+			for(int i=0; i<pw.bxyz; i++)
+				delete[] cal_flag[i];
 			delete[] cal_flag;
 			delete[] vindex;
 			delete[] ylma;
 			delete[] vldr3;    
 			delete[] block_iw;
-			delete[] dr;
-			delete[] distance;
 			delete[] psir_vlbr3;
 			delete[] psir_vlbr3_pool;
 			delete[] psir_ylm;
 			delete[] psir_ylm_pool;
 			delete[] colidx;
-			delete[] bsize;			
-		}
-	}
+			delete[] bsize;
+		} // end of if(max_size>0 && lgd_now>0)
+	} // end of #pragma omp parallel
 
     mkl_set_num_threads(mkl_threads);
-	OUT(ofs_running, "temp variables are deleted");
-	
+
+    OUT(ofs_running, "temp variables are deleted");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
     MPI_Barrier(MPI_COMM_WORLD);
     timer::tick("Gint_Gamma","distri_vl",'K');
@@ -1130,15 +1101,12 @@ void Gint_Gamma::gamma_vlocal(void)
     // OUT(ofs_running, "received vlocal data are put in to H")
     timer::tick("Gint_Gamma","distri_vl_value",'K');
     timer::tick("Gint_Gamma","distri_vl",'K');
-ofs_running<<__LINE__<<endl;
     //OUT(ofs_running, "reduce all vlocal ok,");
-/*
-    if(perform_gint)
-    {
-        delete[] GridVlocal_pool;
-        delete[] GridVlocal;
-    }
-*/
-    //OUT(ofs_running, "ALL GridVlocal was calculated");
+
+	for (int i=0; i<GridT.lgd; i++)
+		delete[] GridVlocal[i];
+	delete[] GridVlocal;
+
+	//OUT(ofs_running, "ALL GridVlocal was calculated");
     return;
 }

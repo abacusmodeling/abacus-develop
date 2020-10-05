@@ -167,7 +167,14 @@ void Ions::opt_ions_pw(void)
         }
     }
 	
-
+    if(pot.out_potential == 2)
+    {
+        stringstream ssp;
+        stringstream ssp_ave;
+        ssp << global_out_dir << "ElecStaticPot";
+        ssp_ave << global_out_dir << "ElecStaticPot_AVE";
+        pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+    }
 		
 		time_t eend = time(NULL);
 		time_t fstart = time(NULL);

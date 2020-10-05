@@ -234,29 +234,7 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 
     if(SYMMETRY)
     {
-	double d1,d2,d3;
-
-	for(int ipol=0; ipol<3; ipol++)
-	{
-		Mathzone::Cartesian_to_Direct(scs[ipol][0],scs[ipol][1],scs[ipol][2],
-					ucell.a1.x, ucell.a1.y, ucell.a1.z,
-					ucell.a2.x, ucell.a2.y, ucell.a2.z,
-					ucell.a3.x, ucell.a3.y, ucell.a3.z,
-					d1,d2,d3);
-		scs[ipol][0] = d1; scs[ipol][1] = d2; scs[ipol][2] = d3;
-
-	}
 	symm.stress_symmetry(scs);
-	for(int ipol=0; ipol<3; ipol++)
-	{
-		Mathzone::Direct_to_Cartesian(scs[ipol][0],scs[ipol][1],scs[ipol][2],
-					ucell.a1.x, ucell.a1.y, ucell.a1.z,
-					ucell.a2.x, ucell.a2.y, ucell.a2.z,
-					ucell.a3.x, ucell.a3.y, ucell.a3.z,
-					d1,d2,d3);
-		scs[ipol][0] = d1; scs[ipol][1] = d2; scs[ipol][2] = d3;
-
-	}
     }//end symmetry
 
 	// print Rydberg stress or not
@@ -395,21 +373,6 @@ void Stress_LCAO::printstress_total (bool ry)
 
 //        if(INPUT.stress_set == 1)
 //        int TEST_STRESS = 1;
-        if(TEST_STRESS)
-        {
-           ofstream ofs("STRESS.dat");
-           if(!ofs)
-           {
-              cout << "open STRESS.dat error !" <<endl;
-           }
-
-           for(int i=0; i<3; i++)
-           {
-               ofs << "   " << scs[i][0]*unit_transform << "   " << scs[i][1]*unit_transform << "   " << scs[i][2]*unit_transform << endl;
-           }
-
-           ofs.close();
-        }
 
  	if(TEST_STRESS) 
 	{

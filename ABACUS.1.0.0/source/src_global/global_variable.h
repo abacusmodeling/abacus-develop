@@ -60,11 +60,12 @@ extern bool		SPARSE_MATRIX;		// 11.3 // mohan add 2009-03-13
 extern int 		ATOM_DISTRIBUTION;	// 11.4 // mohan add 2010-06-28
 
 //added by zhengdy-soc
-extern bool     NONCOLIN;
-extern bool     LSPINORB;
-extern bool     DOMAG;
-extern bool     DOMAG_Z;
-extern int      NPOL;
+extern bool     NONCOLIN; //0 : collinear ; 1 : non-collinear
+extern bool     LSPINORB; //0 : no soc ; 1 : has soc
+extern bool     DOMAG;    //1 : calculate the magnetism with x, y, z component
+extern bool     DOMAG_Z;  //1 : constrain the magnetism to z axis
+extern int      NPOL;     //1 : no soc; 2 : has soc
+extern int      PRENSPIN; //NSPIN used before, for restart with soc
 
 // diagonalization (5)
 //extern string 	DIAGO_TYPE; xiaohui modify 2013-09-01			// 12 "cg","davidson","fs","hpseps"

@@ -25,14 +25,17 @@ public:
 
 	 Mulliken_Charge();
 	~Mulliken_Charge();
-              
-            double**  DecMulP ;
+              double**  DecMulP ;
+                             double**  MecMulP ;
 	          double***  ADecMulP ;
-		  std::vector<matrix> Mullik;
-                         double**  MecMulP ;
-                     std::vector<ComplexMatrix> Mulliken;
-                      //PDOS_k.resize(kv.nks);
-                         
+		                 Wfc_Dm_2d M;
+                              
+                              							  
+							  complex<double>       *mug  ;
+
+                                                                                                             
+
+                                  
                      
                                  
 	 void  cal_mulliken(void);

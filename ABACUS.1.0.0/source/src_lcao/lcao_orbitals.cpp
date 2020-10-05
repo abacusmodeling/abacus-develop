@@ -159,6 +159,10 @@ void LCAO_Orbitals::Read_Orbitals(void)
 	{
 		this->kmesh = static_cast<int>( sqrt(ecutwfc) / dk )  + 4;
 	}
+
+	// jingan add for calculate r(R) matrix
+	if(INPUT.out_r_matrix) kmesh = kmesh * 4;
+
 	//	this->kmesh = static_cast<int> (PI / 0.01 / 4 / this->dk);
 	if(kmesh%2==0) kmesh++;
 	OUT(ofs_running,"kmesh",kmesh);
@@ -349,7 +353,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		}
 		
 		WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		// Peize Lin add 2019-01-23
-		this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, atom->lll, tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
+		this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, atom->lll, tmpBeta_lm, 0);//LiuXh 2016-01-14, 2016-07-19
 	}
 	else//added by zhengdy-soc
 	{
@@ -437,7 +441,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			delete[] beta_r;
 		}
 		assert(ip1==N_PROJECTORS);
-		this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, N_PROJECTORS, atom->lll, tmpBeta_lm);//zhengdy-soc 2018-09-10
+		this->Beta[it].set_type_info(it, atom->label, atom->pp_type, atom->lmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, N_PROJECTORS, atom->lll, tmpBeta_lm, 1);//zhengdy-soc 2018-09-10
 	}//end if
 
 	delete[] tmpBeta_lm;
@@ -678,7 +682,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		}
 	}// end projectors.
 	
-	this->Beta[it].set_type_info(it, label, ps_type, nlmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, LfromBeta, tmpBeta_lm);
+	this->Beta[it].set_type_info(it, label, ps_type, nlmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, LfromBeta, tmpBeta_lm, ucell.atoms[it].has_so);
 		
 	ifs.close();
 	delete[] LfromBeta;

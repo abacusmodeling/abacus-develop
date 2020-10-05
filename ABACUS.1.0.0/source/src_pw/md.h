@@ -88,6 +88,8 @@ public:
         const static double fundamentalTime;
         double rdf[100];
         int step_rst; 
+
+	matrix stress_lcao;
 };
 
 /*class mdmd:public md{

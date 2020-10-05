@@ -965,26 +965,39 @@ void energy::perform_dos(void)
 //		OUT(ofs_running,"minimal energy is (eV)", emin);
 //		OUT(ofs_running,"maximal energy is (eV)", emax);
 //  output the PDOS file.////qifeng-2019-01-21
- 		atom_arrange::set_sr_NL();
-		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+// 		atom_arrange::set_sr_NL();
+//		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
  const double de_ev = this->dos_edelta_ev;
                                                            
 							
 
                       const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
-                            int NUM=NLOCAL*(npoints+1);
-                                                     
-                            Wfc_Dm_2d D;
-                                                      D.init();
-                                                        for(int in=0;in<kv.nks;in++)
-		                        {
+                            int NUM=NLOCAL*npoints;
+                                           Wfc_Dm_2d D;
+                            D.init();
+     if(GAMMA_ONLY_LOCAL)
+  {
+             for(int in=0;in<NSPIN;in++)
+           {
+
+              D.wfc_gamma[in]=LOC.wfc_dm_2d.wfc_gamma[in];
+              }
+
+   }
+       else 
+        {
+                                                
+       for(int in=0;in<kv.nks;in++)
+            {
     
-                                                                  D.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
-                                }
+           D.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
+      }
+       }
+                          
                                
 
  
-                      const int np=npoints+1;
+                      const int np=npoints;
                                             matrix*  pdosk = new matrix[nspin0];
                    
                         for(int is=0; is<nspin0; ++is)
@@ -1002,40 +1015,95 @@ void energy::perform_dos(void)
                                pdos[is].create(NLOCAL,np,true);
                            
                        }
-                               
-                    
     
-                         
- 
-                                           
-
-               
                         double a = bcoeff;
-                 double b =  sqrt(3.1415926)*a;                                         
-                 hm.hon.set_orb_tables();
+                                                double   c=2*3.141592653;
+                 double b =  sqrt(c)*a;                                         
+                
+							  complex<double>       *waveg  =  new  complex<double>   [NLOCAL];
+
+                                                                                                              double*  Gauss = new double  [np];
+           
+        for(int is=0; is<nspin0; ++is)
+        {
+            if(GAMMA_ONLY_LOCAL)
+	      {
+                                                                                        
+
+                                            std::vector<matrix>   Mulk;
+                                              Mulk.resize(1);
+                           Mulk[0].create(ParaO.ncol,ParaO.nrow);
+       
+
+                                    matrix Dwf = D.wfc_gamma[is];
+                            for (int i=0; i<NBANDS; ++i)		  
+	                            {     
+                                        ZEROS(waveg, NLOCAL);
+                                                            
+                                            ZEROS(Gauss,np);
+                                               for (int n=0; n<npoints; ++n)		  
+	                                   {  
+                             double en=emin+n * de_ev;
+                                        double en0=wf.ekb[0][i]*Ry_to_eV;
+		                        double de = en-en0;
+                                        double de2 = 0.5*de * de;
+		                        Gauss[n] = kv.wk[0]*exp(-de2/a/a)/b;
+                                           }
+         
+                                                 const int NB= i+1;
+                   	                
+                                    const double one_float=1.0, zero_float=0.0;
+		const int one_int=1;
+                              
+
+			const char T_char='T';		
+                                                pdgemv_(
+				&T_char,
+				&NLOCAL,&NLOCAL,
+				&one_float,
+				LM.Sloc, &one_int, &one_int, ParaO.desc,
+				Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+                                                                &zero_float,
+				Mulk[0].c, &one_int, &NB, ParaO.desc,
+                                                                &one_int);
+                             
+                                        
+                                                                 for (int j=0; j<NLOCAL; ++j)
+                                                                {
+                                                                                                                                                  
+                                                                           if ( ParaO.in_this_processor(j,i) )
+                                                                          {
+                                         
+                                                                                const int ir = ParaO.trace_loc_row[j];
+                                                                                const int ic = ParaO.trace_loc_col[i];
+                                                                                 waveg[j] = Mulk[0](ic,ir)*D.wfc_gamma[is](ic,ir);
+                                                                                  const double x = waveg[j].real();
+                                                                             LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
+                                                                                  
+                                                                                    
+                                                                                                                                                                                                                                 
+	                                                             }
+                                                                } 
+                            
+                                          
+			 }//ib
+                                           }//if
+ 
+                              else
+                                                        {
+                                  atom_arrange::set_sr_NL();
+		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+
+                                                                             hm.hon.set_orb_tables();
 		LM.allocate_HS_R(LNNR.nnr);
 		LM.zeros_HSR('S', LNNR.nnr);
                                 UHM.UOM.calculate_S_no();
 		UHM.UOM.build_ST_new('S', false);
-    
-
-	
-                 std::vector<ComplexMatrix> Mulk;
+                                 std::vector<ComplexMatrix> Mulk;
                            Mulk.resize(1);
                            Mulk[0].create(ParaO.ncol,ParaO.nrow);
-                                                     
-                                                      complex<double>   *wave = new  complex<double>   [NLOCAL];
-							  
-							  complex<double>       *waveg  =  new  complex<double>   [NLOCAL];
 
-                                                                                                              double*  Gauss = new double  [np];
-                                     
-                                       
-
-        for(int is=0; is<nspin0; ++is)
-        {
-                                                                                                                      
-
+                     
                       for(int ik=0;ik<kv.nks;ik++)
 		{
 
@@ -1047,45 +1115,32 @@ void energy::perform_dos(void)
 				LM.zeros_HSk('S');
 				LNNR.folding_fixedH(ik);
                               
-                              
-                       
+                                     
                                  ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
 
-             
-
-             for (int i=0; i<NBANDS; ++i)		  
+                          for (int i=0; i<NBANDS; ++i)		  
 	         {     
-                                                                                                                   
-                                                         
-                                                                                                                 ZEROS(wave, NLOCAL);
-                                                                                                                 ZEROS(waveg, NLOCAL);
+                      
+                                      ZEROS(waveg, NLOCAL);
                                                                                                              
-                                           
-                                                                                                               
+                                                                                                                                    
                                                                                   ZEROS(Gauss,np);
-                                               for (int n=0; n<npoints+1; ++n)		  
+                                               for (int n=0; n<npoints; ++n)		  
 	                                   {  
                              double en=emin+n * de_ev;
                                         double en0=wf.ekb[ik][i]*Ry_to_eV;
 		                        double de = en-en0;
-                                        double de2 = de * de;
+                                        double de2 = 0.5*de * de;
 		                        Gauss[n] = kv.wk[ik]*exp(-de2/a/a)/b;
                                            }
                                         
- 
-
-                                               const int NB= i+1;
+                                                const int NB= i+1;
                    	                      
                                     const double one_float=1.0, zero_float=0.0;
 							const int one_int=1;
                                 //   const int two_int=2;
-
 			const char T_char='T';		// N_char='N',U_char='U'
-			     
 			
-                                                            
-
-                                                                
                                                 pzgemv_(
 				&T_char,
 				&NLOCAL,&NLOCAL,
@@ -1110,7 +1165,7 @@ void energy::perform_dos(void)
                                                                                   waveg[j] = Mulk[0](ic,ir)*D.wfc_k[ik](ic,ir);
                                                                                   const double x = waveg[j].real();
                                                                              LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
-                                                                                                                                                                                                      // cout <<   wavog[j] << endl; 
+                                                                                                                                                                                                      
 	                                                                   }
                                                                 }                             
                                                                                         
@@ -1119,141 +1174,58 @@ void energy::perform_dos(void)
                                                                                                     		
 			}//if                       
 		}//ik
+ #ifdef __MPI
+	atom_arrange::delete_vector( SEARCH_RADIUS );
+#endif
+	hm.hon.clear_after_ions();
+                                }//else
+
+         
+                                                     
               MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
-           //delete[] pdosk;
+           
                        
 	}//is                                              
          delete[] pdosk;                                               
-         delete[] wave;
          delete[] waveg;
-                                                                                    
-                                
-
-		                     
-
-			                                                                                                                                                                        
-
-			                                                                       
-
-
-
- 
-//#ifdef __MPI
-	//atom_arrange::delete_vector( SEARCH_RADIUS );
-//#endif
-//	hm.hon.clear_after_ions();
  if(MY_RANK == 0)
  {
-           stringstream as;
-		    as << global_out_dir << "C";
-                                   ofstream out(as.str().c_str());
-          
-
-          //double t=0.0;
-         for (int is=0; is<nspin0; is++)
-         { 
-                                   stringstream ps;
-		    ps << global_out_dir << "TDOS" << is+1;
+         {  stringstream ps;
+		    ps << global_out_dir << "TDOS";
                                    ofstream out(ps.str().c_str());
+                     if (NSPIN==1)
+                     {
 
-               for (int n=0; n<npoints+1; ++n)
+               for (int n=0; n<npoints; ++n)
                { double y=0.0;
                     double en=emin + n * de_ev;
                     for (int i=0; i<NLOCAL; i++)
                     {
-                                   y +=  pdos[is](i,n);
+                                   y +=  pdos[0](i,n);
                     }  
-                          // dos[is][n]=y;
-                          // t +=y;
-                          out <<  "            " << en << "                  " << y << endl;
-               }
-         
-            // t *=  de_ev;
-            // out <<t<< endl;
-                 out.close();
-                  }
-                                                                 double***  ADOS = new double**[nspin0];
-		for(int is=0; is<nspin0; is++)
-		{
-			ADOS[is] = new double*[ucell.nat];
-                                                    for (int i=0; i<ucell.nat; i++)
-			    {
-			ADOS[is][i] = new double[npoints+1];
-			               ZEROS(ADOS[is][i],npoints+1 );
-                                                   }
-                                }
-                                          
-                                 double****   ADecMulP = new double***[nspin0];
-		for(int is=0; is<nspin0; is++)
-		{
-			ADecMulP[is] = new double**[ucell.nat];
-                                                               for (int i=0; i<ucell.nat; i++)
-			{
-				ADecMulP[is][i] = new double*[(2*ucell.lmax+1)*(2*ucell.lmax+1)*ucell.nmax];
-                                                                     for (int j=0; j<(2*ucell.lmax+1)*(2*ucell.lmax+1)*ucell.nmax; j++)
-                                                                     {
-                                                                              ADecMulP[is][i][j] = new double[npoints+1];
-			               ZEROS(ADecMulP[is][i][j],npoints+1 );
-                                                                      }
-                                                              }
-                                          }
-                            for(int is=0; is<nspin0; is++)
-                            {	
-                              for (int i=0; i<ucell.nat; i++)
-	                                              {   
-                                                                          int a = ucell.iat2ia[i];
-		                                         int t = ucell.iat2it[i];
-		                                        Atom* atom1 = &ucell.atoms[t];
-	                                                        for(int j=0; j<atom1->nw; ++j)
-	                                                        {
-		                                                int k = ucell.itiaiw2iwt(t,a,j);
-                                                                               for (int n=0; n<npoints+1; ++n) 
-                                                                                {   
+                          
+                          out <<setw(20)<< en <<setw(30)<< y << endl;
+                    }
+                      }
+                   else if (NSPIN==2)
+                    {
+                           for (int n=0; n<npoints; ++n)
+                           { double y=0.0;
+                                double z=0.0;
+                                 double en=emin + n * de_ev;
+                                  for (int i=0; i<NLOCAL; i++)
+                                  {
+                                   y +=  pdos[0](i,n);
+                                   z +=  pdos[1](i,n);
 
-			                               ADecMulP[is][i][j][n] = pdos[is](k,n);
-                                                                                }
-                                                                                                  }
-                                                                                         }
-                                                                               }
-                                               
-	                                          for(int is=0; is<nspin0; is++)
-                              {	
-                                 for (int i=0; i<ucell.nat; i++)
-	                             {   
-                                                  int a = ucell.iat2ia[i];
-		                                  int t = ucell.iat2it[i];
-		                                  Atom* atom1 = &ucell.atoms[t];
-                                                                        for (int n=0; n<npoints+1; ++n) 
-                                                                        {   
-                                                                                double z=0.0;
-                                                                               for(int j=0; j<atom1->nw; ++j)
-	                                       {
-		                                 int k = ucell.itiaiw2iwt(t,a,j);
-                                                                                       z += pdos[is](k,n);
-		                                        }
-                                              ADOS[is][i][n] =  z;
-                                                                                               }
-                                      }
-                                   }
-                                                                     delete[] pdos;
-                         for (int is=0; is<nspin0; is++)
-                         { 
-                              for (int i=0; i<ucell.nat; i++)
-	                             {
-                                         int   t = ucell.iat2it[i];
-                                         stringstream as;
-		    as << global_out_dir <<  i   << ucell.atoms[t].label << ".DOS" << is+1;
-                                   ofstream out(as.str().c_str());
-                                    for (int n=0; n<npoints+1; ++n)
-                                     {         double y=0.0;
-                                               //double en=emin + n * de_ev;
-                                                       y =  ADOS[is][i][n];
-                                       //out <<  "            " << en << "                " << y << endl;
-                                       out << "                " << y << endl;
-                                      }
-                                 out.close();
-                               }
-                         }
+                                   }  
+                          
+                                     out <<setw(20)<< en <<setw(30)<< y << setw(30)<< z<< endl;
+                           }
+                       }
+               out.close();
+        }
+
                                                   string Name_Angular[5][11];
 	 /* decomposed Mulliken charge */
 
@@ -1262,9 +1234,9 @@ void energy::perform_dos(void)
       Name_Angular[1][1] = "py         ";
       Name_Angular[1][2] = "pz         ";
       Name_Angular[2][0] = "d3z^2-r^2  ";
-      Name_Angular[2][1] = "dx^2-y^2   ";
-      Name_Angular[2][2] = "dxy        ";
-      Name_Angular[2][3] = "dxz        ";
+      Name_Angular[2][1] = "dxy        ";
+      Name_Angular[2][2] = "dxz        ";
+      Name_Angular[2][3] = "dx^2-y^2   ";
       Name_Angular[2][4] = "dyz        ";
       Name_Angular[3][0] = "f5z^2-3r^2 ";
       Name_Angular[3][1] = "f5xz^2-xr^2";
@@ -1282,167 +1254,97 @@ void energy::perform_dos(void)
       Name_Angular[4][6] = "g7         ";
       Name_Angular[4][7] = "g8         ";
       Name_Angular[4][8] = "g9         ";
-         //cout << __FILE__<<__LINE__ << endl;
+                        
+                                                {stringstream as;
+	                                 as << global_out_dir << "PDOS";
+                                                 ofstream out(as.str().c_str());
+ 	
+                                    out << "<"<<"pdos"<<">" <<endl;
+                                    out << "<"<<"nspin"<<">" << NSPIN<< "<"<<"/"<<"nspin"<<">"<< endl;
+                                    out << "<"<<"norbitals"<<">" <<setw(2) <<NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< endl;
+                                    out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<endl;
 
-                                                            /*for(int is=0; is<nspin0; is++)
-                              {	
-                                 for (int i=0; i<ucell.nat; i++)
-	                             {   
-                                                 //  int a = ucell.iat2ia[i];
-		                                  int t = ucell.iat2it[i];
-		                                  Atom* atom1 = &ucell.atoms[t];
-                                                                               for(int j=0; j<atom1->nw; ++j)
-	                                                               {
-			                                               const int L1 = atom1->iw2l[j];
-			                                               const int N1 = atom1->iw2n[j];
-			                                                const int m1 = atom1->iw2m[j];
-                                                                                                stringstream as;
-		                                                                as << global_out_dir  <<  is+1  << ucell.atoms[t].label <<  i << ".PDOS" << N1 << Name_Angular[L1][m1];
-                                                                                                ofstream out(as.str().c_str());
+                                   for (int n=0; n<npoints; ++n)
+                                   { double y=0.0;
+                                  double en=emin + n * de_ev;
+                                     out <<setw(20)<< en << endl;
+                                  }
+                                                                     out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<endl;
+                                  for (int i=0; i<ucell.nat; i++)
+	                          {   
+                                       int a = ucell.iat2ia[i];
+		                       int t = ucell.iat2it[i];
+		                       Atom* atom1 = &ucell.atoms[t];
+                                      for(int j=0; j<atom1->nw; ++j)
+	                              {
+			                   const int L1 = atom1->iw2l[j];
+			                   const int N1 = atom1->iw2n[j];
+			                  const int m1 = atom1->iw2m[j];
+                                          const int w = ucell.itiaiw2iwt(t, a, j);
 
-                                                          for (int n=0; n<npoints+1; ++n) 
-                                                                                        {   double y=0.0;
-                                                                                              
-                                                                                                 y =  ADecMulP[is][i][j][n];
-                                                                                                     out << "                " << y << endl;
-                                                                                         }
-                                                                                                                                                                                   out.close();  
-                                                                                                        }
-                                                                                               }
-                                                                                }*/
-                                                                  int num;
-                                                                   
-                                                                                                                                      double* p = new double[npoints+1];
-                                                                                                                                                                          
-                                                                   for(int is=0; is<nspin0; is++)
-                                                                  {	
-                                                                      for (int i=0; i<ucell.nat; i++)
-                                                                      { 
-                                                                                  num = 0;
-                                                                                                                                                            int t = ucell.iat2it[i];  
-                                                                         for (int l=0; l<=ucell.lmax; l++)
-                                                                        {
-                                                                                                                                                               ZEROS(p,npoints+1 );
-                                                                                                                                                                   stringstream as;
-		                                                                as << global_out_dir  <<  is+1  << ucell.atoms[t].label<< i << ".PDOS" << l;
-                                                                                                ofstream out(as.str().c_str());
-                                                                                                                                                    
-                                                                              for (int mul=0; mul<ucell.atoms[t].l_nchi[l]; mul++)
-                                                                              {
-                                                                                   //int n = ucell.atoms[t].l_nchi[l];
-                                                                                 for (int m=0; m<(2*l+1); m++)
-                                                                                {   
-                                                                                                                                                                      for (int n=0; n<npoints+1; ++n) 
-                                                                                                                                                                     {   
+                                          //out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<endl;
+                                          out << "<"<<"orbital" <<endl;
+                                          out <<setw(6)<< "index"<<"="<<"\""<<setw(40) <<w+1<<"\""<<endl;
+                                          out <<setw(5)<< "atom"<<"_"<<"index"<<"="<<"\""<<setw(40) <<i+1<<"\""<<endl;
+                                       out <<setw(8)<< "species"<<"="<<"\""<<ucell.atoms[t].label<<"\""<<endl;
+                                          out<<setw(2)<< "l"<<"="<<"\""<<setw(40)<<L1<<"\""<<endl;
+                                         out <<setw(2)<< "m"<<"="<<"\""<<setw(40)<<m1<<"\""<<endl;
+                                         out <<setw(2)<< "z"<<"="<<"\""<<setw(40)<<N1+1<<"\""<<endl;
+                                         out << ">" <<endl;
+                                          out << "<"<<"data"<<">" <<endl;
+                                                                          if (NSPIN==1)
+                                                                          {
+                                         for (int n=0; n<npoints; ++n)
+                                        {
+                                                                                           
+
+                                              out <<setw(13)<< pdos[0](w,n)<<endl;
+                                        }//n
+                                                                           }
+                                                                                          else if (NSPIN==2)
+                                                                                          {
+                                                                                                    for (int n=0; n<npoints; ++n)
+                                                                                                    {
+                                                                                                              out <<setw(20)<< pdos[0](w,n)<< setw(30)<< pdos[1](w,n)<<endl;
+                                                                                                    }//n
+                                                                                          }
+
+                                                                                out << "<"<<"/"<<"data"<<">" <<endl;
+
+                                                                      }//j
+                               }//i
+                                                               out << "<"<<"/"<<"orbital"<<">" <<endl;
+                                                               out << "<"<<"/"<<"pdos"<<">" <<endl;
+                                out.close();}
+                               {  stringstream os;
+		   os<<global_out_dir<<"Orbital";
+                   ofstream out(os.str().c_str());
+                                      out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<endl;
+
+                                
+                                for (int i=0; i<ucell.nat; i++)
+		{
+			int   t = ucell.iat2it[i];
+			Atom* atom1 = &ucell.atoms[t];  
+		  for(int j=0; j<atom1->nw; ++j)
+	                  {
+			const int L1 = atom1->iw2l[j];
+			const int N1 = atom1->iw2n[j];
+			const int m1 = atom1->iw2m[j];
+			out <<setw(5) << i << setw(8) << ucell.atoms[t].label <<setw(5)<<L1<<setw(5) <<m1<<setw(5)<<N1+1<<setw(15)<< Name_Angular[L1][m1] << endl;
+		  }
+		}
+                                                                out <<endl<<endl;
+                                out <<setw(5)<< "io"<<setw(2)<<"="<<setw(2)<<"Orbital index in supercell"<<endl;
+                               out <<setw(5)<< "spec"<<setw(2)<<"="<<setw(2)<<"Atomic species label"<<endl;
+                                 out <<setw(5)<< "l"<<setw(2)<<"="<<setw(2)<<"Angular mumentum quantum number"<<endl;
+                                  out <<setw(5)<< "m"<<setw(2)<<"="<<setw(2)<<"Magnetic quantum number"<<endl;
+                                    out <<setw(5)<< "z"<<setw(2)<<"="<<setw(2)<<"Zeta index of orbital"<<endl;
+                                    out <<setw(5)<< "sym"<<setw(2)<<"="<<setw(2)<<"Symmetry name of real orbital"<<endl;
+                                          out.close();}
  
-                                                                                                                                                                        p[n] +=  ADecMulP[is][i][num][n];
-                                                                                                                                                                                                                               //   num++;
-                                                                                                                                                                                                                            }
-                                                                                                                                                                                                                          num++;
-                                                                                                                                                                                                                    } 
-                                                                                                                                                                                                              }
-                                                                                                                                                                                                              for (int n=0; n<npoints+1; ++n) 
-                                                                                                                                                                                                             {   
- 
-                                                                                                                                                                                                                   out << "                " <<  p[n] << endl;  
-                                                                                                                                                                                                             }
-                                                                                                                                                                                                            out.close(); 
-
-                                                                                                                                                                                                 }
-                                                                                                                                                                                        }
-                                                                                                                                                                                }
-                                                                                                                                                                                delete[] p; 
-                                                                                                                                                        
-                                                                                                                     
-                                                          int nu;
-                                                     
-                                                          double* g = new double[npoints+1];
-                                                         for(int is=0; is<nspin0; is++)
-                                                         {	
-                                                             for (int i=0; i<ucell.nat; i++)
-                                                             { 
-                                                                       nu = 0;
-                                                                 int t = ucell.iat2it[i];  
-                                                                 for (int l=0; l<=ucell.lmax; l++)
-                                                                {
-                                                                       
-                                                                                                                                                                                                                           
-                                                                        int d = ucell.atoms[t].l_nchi[l];
-                                                                  
-                                                                                   
-                                                                            for (int m=0; m<(2*l+1); m++)
-                                                                            {   ZEROS(g,npoints+1 );
-                                                                                                                                                           for (int n=0; n<npoints+1; ++n) 
-                                                                                                                                                          {   
- 
-                                                                               for (int x=0; x<d; x++)
-                                                                                                {   
-                                                                                 
-                                                                                     
- 
-                                                                                     g[n] +=  ADecMulP[is][i][m+nu+x*(2*l+1)][n];
-                                                                                             
-                                                                               }
-                                                                                                                                                         }
-                                                                                                                                                          
-                                                                                                                                                                 stringstream as;
-		                                                                                                                                 as << global_out_dir  <<  is+1  << ucell.atoms[t].label<< i << ".PDOS" <<Name_Angular[l][m] ;
-                                                                                                                                                                 ofstream out(as.str().c_str());
-
-                                                                                                                                                                for (int n=0; n<npoints+1; ++n) 
-                                                                                                                                                               {   
- 
-                                                                                                                                                                         out << "                " <<  g[n] << endl;  
-                                                                                                                                                                  }
-                                                                                                                                                                  out.close(); 
-                                                                          } 
-                                                                         nu += d*(2*l+1);
-
-                                                                }
-                                                                   }
-                                                        }
-                                                                                                                delete[] g;
-                                                                                                                                    
-                                                                                                                                                                             
- 
-
-
-                                                                                               
-
-                                                    
-
-              
-               for (int is=0; is<nspin0; is++)
-	       {
-                                     for (int i=0; i<ucell.nat; i++)
-	                    {
-                   delete[] ADOS[is][i]; 
-	                     }
-	                     delete[] ADOS[is];
-               }
-                   delete[] ADOS; 
-                                  for(int is=0; is<nspin0; is++)
-		  {
-                                            for (int i=0; i<ucell.nat; i++)
-                                            {
-                                                                    for (int j=0; j<(2*ucell.lmax+1)*(2*ucell.lmax+1)*ucell.nmax; j++)
-                                                                     {
-                                                                               delete[]     ADecMulP[is][i][j];
-                                                                        }
-
-                                                                        delete[]     ADecMulP[is][i];
-                                                          }
-                                            delete[]     ADecMulP[is];
-                                              }
-                                               delete[]     ADecMulP; 
 }       
-//delete[] pdos;
-                                                                    
-
-#ifdef __MPI
-	atom_arrange::delete_vector( SEARCH_RADIUS );
-#endif
-	hm.hon.clear_after_ions();
+delete[] pdos;
 
 		// output the DOS file.
 		for(int is=0; is<nspin0; ++is)
