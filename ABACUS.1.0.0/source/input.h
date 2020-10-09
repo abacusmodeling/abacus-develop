@@ -6,6 +6,7 @@
 #define INPUT_H
 
 #include <string>
+#include <vector>
 using namespace std;
 
 //==========================================================
@@ -325,8 +326,9 @@ public:
         bool     kmesh_interpolation;          // calculting <i,0|j,R>
         double  qcar[100][3];          // the Cartesian position of q points(unit: 2*PI/lat0) 
         int ocp;
-        int ocp_n;
-        double  ocp_kb[10000];
+        //int ocp_n;
+        string ocp_set;
+        //double  ocp_kb[10000];
         int     lcao_box[3];           // the scale for searching the existence of the overlap <i,0|j,R>
 	int    mulliken;//qifeng add 2019-9-10
 	//added by zhengdy-soc

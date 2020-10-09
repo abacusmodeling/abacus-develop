@@ -463,11 +463,12 @@ void Input::Default(void)
 // constrained DFT
 //----------------------------------------------------------
 	ocp = 0;
-	ocp_n = 0;
-	for(int i=0; i<10000; i++)
-	{
-		ocp_kb[i] = 0.0;
-	}
+	//ocp_n = 0;
+	ocp_set = "none";
+	//for(int i=0; i<10000; i++)
+	//{
+	//	ocp_kb[i] = 0.0;
+	//}
 	
     cell_factor = 1.2; //LiuXh add 20180619
     
@@ -1565,7 +1566,11 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, ocp);
         }
-        else if (strcmp("ocp_n", word) == 0)
+		else if (strcmp("ocp_set", word) == 0)
+        {
+            getline(ifs, ocp_set);
+        }
+        /* else if (strcmp("ocp_n", word) == 0)
         {
             read_value(ifs, ocp_n);
         }
@@ -1576,7 +1581,7 @@ bool Input::Read(const string &fn)
                  ifs >> ocp_kb[i]; 
              }
 			read_value(ifs, ocp_kb[ocp_n-1]);
-        }
+        } */
 		else if (strcmp("mulliken", word) == 0)
 		{
 			read_value(ifs, mulliken);
@@ -2069,11 +2074,12 @@ void Input::Bcast()
             Parallel_Common::bcast_double( qcar[i][2] );
         }
 	Parallel_Common::bcast_int(ocp);
-	Parallel_Common::bcast_int(ocp_n);
-        for(int i=0; i<10000; i++)
-        {
-            Parallel_Common::bcast_double( ocp_kb[i] );
-        }
+	//Parallel_Common::bcast_int(ocp_n);
+	Parallel_Common::bcast_string(ocp_set);
+        // for(int i=0; i<10000; i++)
+        // {
+            // Parallel_Common::bcast_double( ocp_kb[i] );
+        // }
                 Parallel_Common::bcast_int( mulliken);//qifeng add 2019/9/10
         Parallel_Common::bcast_int( lcao_box[0] );
         Parallel_Common::bcast_int( lcao_box[1] );
@@ -3074,11 +3080,12 @@ void Input::Print(const string &fn)const
 		ofs << setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << endl;
 	}
 	OUTP(ofs,"ocp",ocp,"change occupation or not");
-	OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
-	for(int i=0; i<ocp_n; i++)
-	{
-		ofs << setw(20) <<"ocp_kb" << ocp_kb[i]<< endl;
-	}
+	OUTP(ofs,"ocp_set",ocp_set,"set occupation");
+	//OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
+	// for(int i=0; i!=ocp_n; i++)
+	// {
+		// ofs << setw(20) <<"ocp_kb" << ocp_kb[i]<< endl;
+	// }
 	ofs << setw(20) <<"lcao_box"<<lcao_box[0]<<"   "<<lcao_box[1]<<"   "<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<endl;
 	OUTP(ofs," mulliken", mulliken," mulliken  charge or not");//qifeng add 2019/9/10
 	//OUTP(ofs,"epsilon0",epsilon0,"calculate the macroscopic dielectric constant or not");
