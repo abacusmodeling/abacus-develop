@@ -1,4 +1,3 @@
-#include <regex>
 #include "src_pw/global.h"
 #include "src_pw/tools.h"
 #include "input.h"
@@ -427,46 +426,14 @@ void Input_Conv::Convert(void)
 	val_elec_02 = INPUT.val_elec_02;
 	val_elec_03 = INPUT.val_elec_03;
 	vext = INPUT.vext;
-	vext_dire = INPUT.vext_dire;
-
-	auto set_ocp_kb = [](string &ocp_set, vector<double> &ocp_kb)   // jiyy add 2020.10.07
-	{
-		int count = 0;
-		smatch results;
-        string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
-        regex r(pattern);
-		
-		string::const_iterator iterStart = ocp_set.begin();
-        string::const_iterator iterEnd = ocp_set.end();
-        string temp;
-        while (regex_search(iterStart, iterEnd, results, r))
-        {
-                temp = results[0];
-                smatch sub_res;
-                string sub_pattern("\\*");
-                regex sub_r(sub_pattern);
-                if(regex_search(temp, sub_res, sub_r) != 0)
-                {
-                        int num = stoi(sub_res.prefix());
-                        double occ = stof(sub_res.suffix());
-                        vector<double> ocp_temp(num, occ);
-                        const vector<double>::iterator dest = ocp_kb.begin()+count;
-                        auto ret = copy(ocp_temp.begin(), ocp_temp.end(), dest);
-                        count += num;
-                }
-                else
-                {
-                        ocp_kb[count] = stof(temp);
-                        count += 1;
-                }
-                iterStart = results[0].second;
-        }
-	};
+	vext_dire = INPUT.vext_dire;	
 
 	ocp = INPUT.ocp;
-	//ocp_n = INPUT.ocp_n;
-	ocp_set = INPUT.ocp_set;
-	set_ocp_kb(ocp_set, ocp_kb);
+	ocp_n = INPUT.ocp_n;	
+	for(int i=0; i<10000; i++)
+	{
+		ocp_kb[i] = INPUT.ocp_kb[i];
+	}
                  mulliken = INPUT. mulliken;//qifeng add 2019/9/10
 //----------------------------------------------------------
 // about selinv

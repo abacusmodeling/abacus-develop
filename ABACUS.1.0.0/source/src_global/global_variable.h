@@ -5,7 +5,6 @@
 #ifndef GLOBAL_VARIABLE_H
 #define GLOBAL_VARIABLE_H
 
-#include <vector>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -107,10 +106,8 @@ extern int vext;
 extern int vext_dire;
 
 extern int ocp;
-//extern int ocp_n;
-extern string ocp_set;
-extern vector<double> ocp_kb;
-//extern double ocp_kb[10000];
+extern int ocp_n;
+extern double ocp_kb[10000];
 extern int  mulliken;//qifeng add 2019/9/10
 //========================================================================
 // EXPLAIN : Parallel information
