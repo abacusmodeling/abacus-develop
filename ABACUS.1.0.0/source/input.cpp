@@ -1569,6 +1569,7 @@ bool Input::Read(const string &fn)
 		else if (strcmp("ocp_set", word) == 0)
 		{
 			getline(ifs, ocp_set);
+			ifs.ignore(150, '\n');
 		}
         // else if (strcmp("ocp_n", word) == 0)
         // {

@@ -427,45 +427,66 @@ void Input_Conv::Convert(void)
 	val_elec_03 = INPUT.val_elec_03;
 	vext = INPUT.vext;
 	vext_dire = INPUT.vext_dire;	
-    
-	auto set_ocp_kb = [](string &ocp_set, vector<double> &ocp_kb)   // jiyy add 2020.10.07
-    {
-        int count = 0;
-        smatch results;
-        string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
-        regex r(pattern);
-
-        string::const_iterator iterStart = ocp_set.begin();
-        string::const_iterator iterEnd = ocp_set.end();
-        string temp;
-        while (regex_search(iterStart, iterEnd, results, r))
-        {
-                temp = results[0];
-                smatch sub_res;
-                string sub_pattern("\\*");
-                regex sub_r(sub_pattern);
-                if(regex_search(temp, sub_res, sub_r) != 0)
-                {
-                        int num = stoi(sub_res.prefix());
-                        double occ = stof(sub_res.suffix());
-                        vector<double> ocp_temp(num, occ);
-                        const vector<double>::iterator dest = ocp_kb.begin()+count;
-                        auto ret = copy(ocp_temp.begin(), ocp_temp.end(), dest);
-                        count += num;
-                }
-                else
-                {
-                        ocp_kb[count] = stof(temp);
-                        count += 1;
-                }
-                iterStart = results[0].second;
-        }
-    };
 	
 	ocp = INPUT.ocp;
      //ocp_n = INPUT.ocp_n;
     ocp_set = INPUT.ocp_set;
-    set_ocp_kb(ocp_set, ocp_kb);
+    if(ocp == 1)       // jiyy add 2020.10.11
+	{
+		int count = 0;
+		string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
+		vector<string> str;
+		string::size_type pos1, pos2;
+		string c = " ";
+		pos2 = ocp_set.find(c);
+		pos1 = 0;
+		while(string::npos != pos2)
+		{
+			str.push_back(ocp_set.substr(pos1, pos2-pos1));
+ 
+			pos1 = pos2 + c.size();
+			pos2 = ocp_set.find(c, pos1);
+		}
+		if(pos1 != ocp_set.length())
+			str.push_back(ocp_set.substr(pos1));
+
+		regex_t reg;
+		regcomp(&reg, pattern.c_str(), REG_EXTENDED);
+		regmatch_t pmatch[1];
+		const size_t nmatch=1;
+		cout<<"str0:"<<str[0]<<"str1:"<<str[1]<<endl;
+		for(int i=0; i<str.size(); ++i)
+		{
+			if(str[i] == "") 
+				continue;
+			int status = regexec(&reg, str[i].c_str(), nmatch, pmatch, 0);
+			string sub_str = "";
+			for(int j=pmatch[0].rm_so; j!=pmatch[0].rm_eo; ++j)
+			{
+				sub_str += str[i][j];
+			}
+			string sub_pattern("\\*");
+			regex_t sub_reg;
+			regcomp(&sub_reg, sub_pattern.c_str(), REG_EXTENDED);
+			regmatch_t sub_pmatch[1];
+			const size_t sub_nmatch=1;
+			if(regexec(&sub_reg, sub_str.c_str(), sub_nmatch, sub_pmatch, 0) == 0)
+			{
+				int pos = sub_str.find("*");
+				int num = stoi(sub_str.substr(0, pos));
+				double occ = stof(sub_str.substr(pos+1, sub_str.size()));
+				vector<double> ocp_temp(num, occ);
+				const vector<double>::iterator dest = ocp_kb.begin()+count;
+				copy(ocp_temp.begin(), ocp_temp.end(), dest);
+				count += num;
+			}
+			else
+			{
+				ocp_kb[count] = stof(sub_str);
+				count += 1;
+			}
+		}
+	}
 		
     mulliken = INPUT. mulliken;//qifeng add 2019/9/10
 //----------------------------------------------------------
