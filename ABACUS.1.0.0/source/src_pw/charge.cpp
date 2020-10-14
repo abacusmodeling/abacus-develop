@@ -317,8 +317,12 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 				for (int ig = 0; ig < pw.ngmc ; ig++)
 				{
 					const complex<double> swap = pw.strucFac(it, ig)* rho_lgl[pw.ig2ngg[ig]];
-					rho_g3d(0, ig) += swap * mag.nelup_percent(it);
-					rho_g3d(1, ig) += swap * mag.neldw_percent(it);
+					//rho_g3d(0, ig) += swap * mag.nelup_percent(it);
+					//rho_g3d(1, ig) += swap * mag.neldw_percent(it);
+                                        const double up = 0.5 * ( 1 + mag.start_magnetization[it] / atom->zv );
+                                        const double dw = 0.5 * ( 1 - mag.start_magnetization[it] / atom->zv );
+                                        rho_g3d(0, ig) += swap * up;
+                                        rho_g3d(1, ig) += swap * dw;
 				}
 			}
 			// mohan add 2011-06-14
@@ -328,8 +332,10 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 				complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
 				for (int ia = 0; ia < atom->na; ia++)
 				{
-					const double up = 0.5 * ( 1 + atom->mag[ia] );
-					const double dw = 0.5 * ( 1 - atom->mag[ia] );
+					//const double up = 0.5 * ( 1 + atom->mag[ia] );
+					//const double dw = 0.5 * ( 1 - atom->mag[ia] );
+					const double up = 0.5 * ( 1 + atom->mag[ia] / atom->zv );
+					const double dw = 0.5 * ( 1 - atom->mag[ia] / atom->zv );
 					//cout << " atom " << ia << " up=" << up << " dw=" << dw << endl;
 
 					for (int ig = 0; ig < pw.ngmc ; ig++)
@@ -358,13 +364,17 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 					rho_g3d(0, ig) += swap ;
 					if(DOMAG)
 					{
-						rho_g3d(1, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
-						rho_g3d(2, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
-						rho_g3d(3, ig) += swap * mag.start_magnetization[it] * cos(soc.angle1[it]);
+						//rho_g3d(1, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+						//rho_g3d(2, ig) += swap * mag.start_magnetization[it] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+						//rho_g3d(3, ig) += swap * mag.start_magnetization[it] * cos(soc.angle1[it]);
+						rho_g3d(1, ig) += swap * (mag.start_magnetization[it] / atom->zv) * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+						rho_g3d(2, ig) += swap * (mag.start_magnetization[it] / atom->zv) * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+						rho_g3d(3, ig) += swap * (mag.start_magnetization[it] / atom->zv) * cos(soc.angle1[it]);
 					}
 					else if(DOMAG_Z)
 					{
-						rho_g3d(3, ig) += swap * mag.start_magnetization[it];
+						//rho_g3d(3, ig) += swap * mag.start_magnetization[it];
+						rho_g3d(3, ig) += swap * (mag.start_magnetization[it] / atom->zv);
 					}
 				}
 			}
@@ -386,13 +396,17 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 						rho_g3d(0, ig) += swap;
 						if(DOMAG)
 						{
-							rho_g3d(1, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
-							rho_g3d(2, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
-							rho_g3d(3, ig) += swap * atom->mag[ia] * cos(soc.angle1[it]);
+							//rho_g3d(1, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+							//rho_g3d(2, ig) += swap * atom->mag[ia] * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+							//rho_g3d(3, ig) += swap * atom->mag[ia] * cos(soc.angle1[it]);
+							rho_g3d(1, ig) += swap * (atom->mag[ia] / atom->zv) * sin(soc.angle1[it]) * cos(soc.angle2[it]);
+							rho_g3d(2, ig) += swap * (atom->mag[ia] / atom->zv) * sin(soc.angle1[it]) * sin(soc.angle2[it]);
+							rho_g3d(3, ig) += swap * (atom->mag[ia] / atom->zv) * cos(soc.angle1[it]);
 						}
 						else if(DOMAG_Z)
 						{
-							rho_g3d(3, ig) += swap * atom->mag[ia];
+							//rho_g3d(3, ig) += swap * atom->mag[ia];
+							rho_g3d(3, ig) += swap * (atom->mag[ia] / atom->zv);
 						}
 					}
 				}
