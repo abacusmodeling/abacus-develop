@@ -454,7 +454,6 @@ void Input_Conv::Convert(void)
 		regcomp(&reg, pattern.c_str(), REG_EXTENDED);
 		regmatch_t pmatch[1];
 		const size_t nmatch=1;
-		cout<<"str0:"<<str[0]<<"str1:"<<str[1]<<endl;
 		for(int i=0; i<str.size(); ++i)
 		{
 			if(str[i] == "") 
