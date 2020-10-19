@@ -727,7 +727,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 							string mags;
 							std::getline( ifpos, mags );
 							// change string to double.
-							atoms[it].mag[ia] = std::atof(mags.c_str());
+							//atoms[it].mag[ia] = std::atof(mags.c_str());
+							atoms[it].mag[ia] = 0.0;
 						}
 					}
 					else
@@ -737,7 +738,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 						string mags;
 						std::getline( ifpos, mags );
 						// change string to double.
-						atoms[it].mag[ia] = std::atof(mags.c_str());
+						//atoms[it].mag[ia] = std::atof(mags.c_str());
+						atoms[it].mag[ia] = 0.0;
 					}	
 
 					if(Coordinate=="Direct")
@@ -1040,7 +1042,8 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].tau[ia].x
                 << setw(20) << atoms[it].tau[ia].y
                 << setw(20) << atoms[it].tau[ia].z
-                << setw(20) << atoms[it].mag[ia]
+                //<< setw(20) << atoms[it].mag[ia]
+                << setw(20) << mag.start_magnetization[it]
                 << endl;
 
                 ++iat;
@@ -1078,7 +1081,8 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].taud[ia].x
                 << setw(20) << atoms[it].taud[ia].y
                 << setw(20) << atoms[it].taud[ia].z
-                << setw(20) << atoms[it].mag[ia]
+                //<< setw(20) << atoms[it].mag[ia]
+                << setw(20) << mag.start_magnetization[it]
                 << endl;
 
                 ++iat;

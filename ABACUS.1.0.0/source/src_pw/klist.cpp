@@ -1034,7 +1034,7 @@ void kvect::set_after_vc(
 
     this->mpi_k_after_vc();
 
-    this->set_kup_and_kdw();
+    this->set_kup_and_kdw_after_vc();
 
     this->print_klists(ofs_running);
 
@@ -1177,3 +1177,56 @@ void kvect::set_both_kvec_after_vc(const Matrix3 &G, const Matrix3 &R)
 
     return;
 }
+
+void kvect::set_kup_and_kdw_after_vc(void)
+{
+    TITLE("kvect", "setup_kup_and_kdw_after_vc");
+
+    //=========================================================================
+    // on output: the number of points is doubled and xk and wk in the
+    // first (nks/2) positions correspond to up spin
+    // those in the second (nks/2) ones correspond to down spin
+    //=========================================================================
+    switch (nspin)
+    {
+    case 1:
+
+        for (int ik = 0; ik < nks; ik++)
+        {
+            this->isk[ik] = 0;
+        }
+
+        break;
+
+    case 2:
+
+        for (int ik = 0; ik < nks; ik++)
+        {
+            this->kvec_c[ik+nks] = kvec_c[ik];
+            this->kvec_d[ik+nks] = kvec_d[ik];
+            this->wk[ik+nks]     = wk[ik];
+            this->isk[ik]        = 0;
+            this->isk[ik+nks]    = 1;
+        }
+
+        this->nks *= 2;
+        //this->nkstot *= 2;
+
+        OUT(ofs_running,"nks(nspin=2)",nks);
+        OUT(ofs_running,"nkstot(nspin=2)",nkstot);
+
+        break;
+
+    case 4:
+
+        for (int ik = 0; ik < nks; ik++)
+        {
+            this->isk[ik] = 0;
+        }
+
+        break;
+
+    }
+
+    return;
+} // end subroutine set_kup_and_kdw

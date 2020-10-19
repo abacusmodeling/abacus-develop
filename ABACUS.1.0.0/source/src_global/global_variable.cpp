@@ -2,6 +2,7 @@
 // AUTHOR : mohan
 // DATE : 2008-11-07
 //==========================================================
+#include <vector>
 #include <string>
 #include <fstream>
 #include <fstream>
@@ -93,8 +94,10 @@ int val_elec_03 =1;
 int vext =0;
 int vext_dire=1;
 int ocp=0;
-int ocp_n=0;
-double ocp_kb[10000];
+string ocp_set = "none";
+vector<double> ocp_kb(10000);
+//int ocp_n=0;
+//double ocp_kb[10000];
 int  mulliken=0;//qifeng add 2019/9/10
 //----------------------------------------------------------
 // EXPLAIN : Parallel information
