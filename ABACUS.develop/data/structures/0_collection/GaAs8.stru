@@ -1,0 +1,30 @@
+ATOMIC_SPECIES
+Ga 69.72   Ga.pz-bhs.UPF
+As 74.9216 As.pz-bhs.UPF
+
+LATTICE_CONSTANT
+10.5  // add lattice constant(a.u.)
+
+LATTICE_VECTORS
+1 0 0 // first vector
+0 1 0 // second vector
+0 0 1 // third vector
+
+ATOMIC_POSITIONS
+Direct	//Cartesian or Direct coordinate.
+
+Ga      //Element Label
+0.231	//starting magnetism
+4		//number of atoms
+0.0 0.0 0.0 0 0 0  // crystal coor.
+0.5 0.5 0.0 0 0 0
+0.5 0.0 0.5 0 0 0
+0.0 0.5 0.5 0 0 0
+
+As      //Element Label
+0.43	//starting magnetism
+4		//number of atoms
+0.75 0.75 0.25 0 0 0
+0.75 0.25 0.75 0 0 0
+0.25 0.75 0.75 0 0 0
+0.25 0.25 0.25 0 0 0  

@@ -1,0 +1,17 @@
+ATOMIC_SPECIES
+Na 11 Na.pz-n-vbc.UPF
+LATTICE_CONSTANT
+7.738  // add lattice constant(a.u.)
+
+LATTICE_VECTORS
+-0.5 0.5 0.5
+0.5 -0.5 0.5
+0.5 0.5 -0.5
+
+ATOMIC_POSITIONS
+Direct  //Cartesian or Direct coordinate.
+
+Na
+0.0     //starting magnetism
+1       //number of atoms
+0.00 0.00 0.00  0 0 0

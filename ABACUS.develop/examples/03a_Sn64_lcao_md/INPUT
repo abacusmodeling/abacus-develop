@@ -1,0 +1,32 @@
+INPUT_PARAMETERS
+#Parameters (1.General)
+pseudo_dir          ./ 
+ntype               1
+nbands              600
+pseudo_type         upf
+gamma_only          1
+
+#Parameters (2.Methods)
+calculation         md
+symmetry            0
+
+nstep               10
+out_level           m
+move_method         cg
+
+smearing            gaussian
+sigma               0.02
+#Parameters (3.PW)
+ecutwfc             30
+dr2                 1e-5
+niter		    100
+
+#Parameters (5.LCAO)
+basis_type          lcao
+mixing_beta         0.4
+charge_extrap       second-order
+ 
+md_mdtype          1
+md_dt              1
+md_tfirst          1373
+md_rstmd           0

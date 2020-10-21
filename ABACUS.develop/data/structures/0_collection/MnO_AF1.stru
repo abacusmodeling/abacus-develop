@@ -1,0 +1,32 @@
+ATOMIC_SPECIES
+O  8  O.pz-mt.UPF #label; mass; pseudo_file
+Mn1 25 25_Mn.ncpp.UPF #label; mass; pseudo_file
+Mn2 25 25_Mn.ncpp.UPF #label; mass; pseudo_file
+
+LATTICE_CONSTANT
+4.3  // add lattice constant
+
+LATTICE_VECTORS
+1.0  1.0   0.0
+1.0  -1.0  0.0
+0.0  0.0   2.0
+
+ATOMIC_POSITIONS
+Direct //Cartesian or Direct coordinate.
+
+O #label
+0.0 #magnetism
+2 #number of atom
+0.5 0.5 0.0 0 0 0
+0.0 0.0 0.5 0 0 0
+
+Mn1 #label
+0.5 #magnetism
+1 #number of atoms
+0.0 0.0 0.0 0 0 0
+
+Mn2 #label
+-0.5 #magnetism
+1 #number of atoms
+0.5 0.5 0.5 0 0 0
+

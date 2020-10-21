@@ -1,0 +1,26 @@
+ATOMIC_SPECIES
+Ga 31 Ga.pz-bhs.UPF
+As 33 As.pz-bhs.UPF
+
+NUMERICAL_ORBITAL
+
+LATTICE_CONSTANT
+10.5  // add lattice constant(a.u.)
+
+LATTICE_VECTORS
+0.0 0.5 0.5
+0.5 0.0 0.5
+0.5 0.5 0.0
+
+ATOMIC_POSITIONS
+Cartesian  //Cartesian or Direct coordinate.
+
+Ga
+0.0     //starting magnetism
+1       //number of atoms
+0 0 0.00 0 0 0
+
+As
+0.0		//starting magnetism
+1
+0.25 0.25 0.25 0 0 0
