@@ -105,7 +105,7 @@ void Input::Init(const string &fn)
 
 #ifdef __MPI
 	//ofs_running << "    Version: Parallel, under ALPHA test" << endl;
-    ofs_running << "    Version: Parallel, v2.0.0" << endl;
+    ofs_running << "    Version: Parallel, in development" << endl;
 	ofs_running << "    Processor Number is " << NPROC << endl;
 	TITLE("Input","init");
 	TITLE("Input","Bcast");
