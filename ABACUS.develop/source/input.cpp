@@ -2627,10 +2627,13 @@ void Input::Check(void)
 		WARNING_QUIT("Input","bz is too large!");
 	}	
 
-	if(lcao_ecut == 0) 
+	if(basis_type=="lcao")
 	{
-		lcao_ecut = ecutwfc; 
-		AUTO_SET("lcao_ecut",ecutwfc);
+		if(lcao_ecut == 0) 
+		{
+			lcao_ecut = ecutwfc; 
+			AUTO_SET("lcao_ecut",ecutwfc);
+		}
 	}
 
 /* 

@@ -65,8 +65,8 @@ void UnitCell_pseudo::setup_cell(
 			ofs_running << " | orbital number for each element. The total atom number is counted. |" << endl;
 			ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << endl;
 			ofs_running << " | Cartesian and Direct coordinates for each atom. We list the file   |" << endl;
-			ofs_running << " | address for atomic orbitals and nonlocal projectors. The volume    |" << endl;
-			ofs_running << " | and the lattice vectors in real and reciprocal space is also shown.|" << endl;
+			ofs_running << " | address for atomic orbitals. The volume and the lattice vectors    |" << endl;
+			ofs_running << " | in real and reciprocal space is also shown.                        |" << endl;
 			ofs_running << " |                                                                    |" << endl;
 			ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 			ofs_running << "\n\n\n\n";
@@ -319,40 +319,43 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 	}
 
 #ifdef __FP
-	if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
+	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 	{
-		ORB.read_in_flag = true;
-		for(int i=0; i<ntype; i++)
+		if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
 		{
-			string ofile;
+			ORB.read_in_flag = true;
+			for(int i=0; i<ntype; i++)
+			{
+				string ofile;
 
-			//-----------------------------------
-			// Turn off the read in NONLOCAL file
-			// function since 2013-08-02 by mohan
-			//-----------------------------------
-			//string nfile;
+				//-----------------------------------
+				// Turn off the read in NONLOCAL file
+				// function since 2013-08-02 by mohan
+				//-----------------------------------
+				//string nfile;
 
-			ifa >> ofile;
-			//-----------------------------------
-			// Turn off the read in NONLOCAL file
-			// function since 2013-08-02 by mohan
-			//-----------------------------------
-			//READ_VALUE(ifa, nfile);
-			
-			ORB.orbital_file.push_back(ofile);
+				ifa >> ofile;
+				//-----------------------------------
+				// Turn off the read in NONLOCAL file
+				// function since 2013-08-02 by mohan
+				//-----------------------------------
+				//READ_VALUE(ifa, nfile);
+				
+				ORB.orbital_file.push_back(ofile);
 
-			//-----------------------------------
-			// Turn off the read in NONLOCAL file
-			// function since 2013-08-02 by mohan
-			//-----------------------------------
-			//ORB.nonlocal_file.push_back(nfile);
+				//-----------------------------------
+				// Turn off the read in NONLOCAL file
+				// function since 2013-08-02 by mohan
+				//-----------------------------------
+				//ORB.nonlocal_file.push_back(nfile);
 
-//			ofs_running << " For atom type " << i + 1 << endl;
-//		    ofs_running << " Read in numerical orbitals from file " << ofile << endl;
-//		    ofs_running << " Read in nonlocal projectors from file " << nfile << endl;
-			
-		}
-	}	
+//				ofs_running << " For atom type " << i + 1 << endl;
+//			    ofs_running << " Read in numerical orbitals from file " << ofile << endl;
+//			    ofs_running << " Read in nonlocal projectors from file " << nfile << endl;
+				
+			}
+		}	
+	}
 #endif
 
 	//==========================
@@ -842,10 +845,10 @@ bool UnitCell_pseudo::check_tau(void)const
 	double norm = 0.0;
 	double tolerence_bohr = 1.0e-3;
 
-	ofs_running << "\n Output nearest atom not considering periodic boundary condition" << endl;
-	ofs_running << " " << setw(5) << "TYPE" << setw(6) << "INDEX" 
-	<< setw(20) << "NEAREST(Bohr)" 
-	<< setw(20) << "NEAREST(Angstrom)" << endl; 
+	//ofs_running << "\n Output nearest atom not considering periodic boundary condition" << endl;
+	//ofs_running << " " << setw(5) << "TYPE" << setw(6) << "INDEX" 
+	//<< setw(20) << "NEAREST(Bohr)" 
+	//<< setw(20) << "NEAREST(Angstrom)" << endl; 
 	for(int T1=0; T1< this->ntype; T1++)
 	{
 		for(int I1=0; I1< this->atoms[T1].na; I1++)
@@ -885,9 +888,9 @@ bool UnitCell_pseudo::check_tau(void)const
 					}
 				}
 			}
-			ofs_running << " " << setw(5) << atoms[T1].label << setw(6) << I1+1 
-			<< setw(20) << shortest_norm  
-			<< setw(20) << shortest_norm * BOHR_TO_A << endl;
+			//ofs_running << " " << setw(5) << atoms[T1].label << setw(6) << I1+1 
+			//<< setw(20) << shortest_norm  
+			//<< setw(20) << shortest_norm * BOHR_TO_A << endl;
 		}
 	}
 
