@@ -652,8 +652,8 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		UHM.GK.allocate_pvpR();
 	}
 						
-	ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "Time(Sec)"<< endl;
-	ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
+	//ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "Time(Sec)"<< endl;
+	//ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
 	for(int ik=0; ik<kv.nks; ik++)
 	{	
 		//cout << " ik=" << ik+1 << " spin=" << kv.isk[ik] << endl;
@@ -683,7 +683,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			}
 			else
 			{
-				ofs_running << " (spin change)" << endl;
+				//ofs_running << " (spin change)" << endl;
 				UHM.GK.reset_spin( CURRENT_SPIN );
 			
 				// if you change the place of the following code,
@@ -938,7 +938,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		const double duration = static_cast<double>(finish_nscf - start_nscf) / CLOCKS_PER_SEC;
 
 
-		ofs_running << setw(8) << ik+1 << setw(15) << duration << endl;
+		//ofs_running << setw(8) << ik+1 << setw(15) << duration << endl;
 
 //		ofs_running << " TIME FOR K=" << ik << ": " << duration << endl;
 	}
