@@ -481,6 +481,15 @@ void Input::Default(void)
 	restart_save = false;
 	restart_load = false;
 
+//==========================================================
+//    DFT+U     Xin Qu added on 2020-10-29
+//==========================================================
+    dft_plus_u = false;                    // 1:DFT+U correction; 0：standard DFT calcullation
+	yukawa_potential = false;
+	double_counting = 1; 
+	omc = false;
+	dftu_type = 2;
+
     return;
 }
 
@@ -1668,6 +1677,22 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, newDM);
 		}
+//----------------------------------------------------------------------------------
+//         Xin Qu added on 2020-10-29 for DFT+U
+//----------------------------------------------------------------------------------		
+		else if(strcmp("dft_plus_u",word)==0)
+		{
+			ifs >> dft_plus_u;
+		}
+		else if(strcmp("dftu_type",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("yukawa_potential",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("hubbard_u",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("hund_j",word)==0) ifs.ignore(150,'\n');
+	 	else if(strcmp("double_counting",word)==0) ifs.ignore(150,'\n');
+        else if(strcmp("orbital_corr",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("omc",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("yukawa_lambda",word)==0) ifs.ignore(150,'\n');
+//---------------------------------------------------------------------------------
         else
         {
 			//xiaohui add 2015-09-15
@@ -1712,6 +1737,133 @@ bool Input::Read(const string &fn)
 			break;
         }
     }
+
+//----------------------------------------------------------
+//       DFT+U    Xin Qu  added on 2020-10-29
+//----------------------------------------------------------
+    hubbard_u= new double [ntype];
+	for(int i=0; i<ntype; i++)
+	{						
+		hubbard_u[i] = 0.0;				
+	}
+
+	hund_j= new double [ntype];	
+	for(int i=0; i<ntype; i++)
+	{						
+		hund_j[i] = 0.0;				
+	}
+
+	orbital_corr= new int [ntype];
+	for(int i=0; i<ntype; i++)
+	{						
+		orbital_corr[i] = -1;				
+	}
+
+	if(dft_plus_u)
+	{
+		ifs.clear();
+    	ifs.seekg(0);  //move to the beginning of the file
+    	ifs.rdstate(); 
+    	while (ifs.good())
+    	{
+  			ifs >> word1;
+  			strtolower(word1, word);     //convert uppercase string to lower case; word1 --> word
+	
+			if(strcmp("dftu_type",word)==0)
+			{	
+				ifs >> dftu_type;								
+			}
+			else if(strcmp("yukawa_potential", word)==0)
+			{
+				ifs >> yukawa_potential;
+			} 
+			else if (strcmp("yukawa_lambda",word)==0)
+			{							
+				ifs >> yukawa_lambda;			
+			}
+			else if(strcmp("double_counting",word)==0)
+			{
+				ifs >> double_counting;
+			}
+			else if(strcmp("hubbard_u",word)==0)
+			{
+				for(int i=0; i<ntype; i++)
+				{		
+					ifs >> hubbard_u[i];				
+					hubbard_u[i] /= Ry_to_eV;				
+				}
+			} 
+			else if (strcmp("hund_j",word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{			
+					ifs >> hund_j[i];
+					hund_j[i] /= Ry_to_eV;				
+				}		
+			}
+			else if(strcmp("orbital_corr", word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{			
+					ifs >> orbital_corr[i];								
+				}		
+			}
+			else if(strcmp("omc",word)==0)
+			{
+				ifs >> omc;
+			}
+			else
+			{
+				ifs.ignore(150, '\n');
+			}
+
+			if (ifs.eof() != 0)
+  			{
+				break;
+  			}       
+		}
+		
+		for(int i=0; i<ntype; i++)
+		{		
+
+			if(hubbard_u[i]<-1.0e-3)
+			{
+				cout << " WRONG ARGUMENTS OF hubbard_u " << endl;
+				exit(0);
+			}
+
+			if(hund_j[i]<-1.0e-3)
+			{
+				cout << " WRONG ARGUMENTS OF hund_j " << endl;
+				exit(0);
+			}
+
+			if( (orbital_corr[i]==-1) && (orbital_corr[i]==0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
+			{
+				cout << " WRONG ARGUMENTS OF orbital_corr " << endl;
+				exit(0);
+			}
+		}
+
+		dft_plus_u = 0;		
+		for(int i=0; i<ntype; i++)
+		{
+			if(orbital_corr[i] != -1) dft_plus_u = 1;
+		}
+
+		if(strcmp("lcao", basis_type.c_str())!=0)
+		{
+			cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << endl;
+			exit(0);
+		}
+
+		if(strcmp("genelpa", ks_solver.c_str())!=0)
+		{
+			cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << endl;
+			exit(0);
+		}
+
+	}
 	
 	if (basis_type == "pw")  // pengfei Li add 2015-1-31
 	{
@@ -2105,6 +2257,29 @@ void Input::Bcast()
     Parallel_Common::bcast_int( newDM ); // Shen Yu add 2019/5/9
     Parallel_Common::bcast_bool( restart_save ); // Peize Lin add 2020.04.04
     Parallel_Common::bcast_bool( restart_load ); // Peize Lin add 2020.04.04
+
+//-----------------------------------------------------------------------------------
+//DFT+U (added by Quxin 2020-10-29)
+//-----------------------------------------------------------------------------------
+    Parallel_Common::bcast_bool( dft_plus_u );
+	Parallel_Common::bcast_bool( yukawa_potential );
+	Parallel_Common::bcast_bool( omc );
+	Parallel_Common::bcast_int(dftu_type);
+	Parallel_Common::bcast_int(double_counting);
+	Parallel_Common::bcast_double(yukawa_lambda);
+	if(MY_RANK!=0)
+	{
+		hubbard_u = new double [this->ntype];
+		hund_j = new double [this->ntype];
+		orbital_corr = new int [this->ntype];
+	}
+	
+	for(int i =0; i<this->ntype; i++)
+	{
+		Parallel_Common::bcast_double(hubbard_u[i]);
+		Parallel_Common::bcast_double(hund_j[i]);
+		Parallel_Common::bcast_int(orbital_corr[i]);
+	}
 
     return;
 }

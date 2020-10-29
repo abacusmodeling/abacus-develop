@@ -1,5 +1,6 @@
 #include "force_lcao.h"
 #include "../src_pw/global.h"
+#include "dftu.h"  //Quxin add for DFT+U on 20201029
 
 double Force_LCAO::force_invalid_threshold_ev = 0.00;
 
@@ -198,6 +199,8 @@ void Force_LCAO::start_force(void)
 			+ fewalds[iat][i] // ewald force (pw)
 			+ fcc[iat][i] //nonlinear core correction force (pw)
 			+ fscc[iat][i];//self consistent corretion force (pw)
+
+            if(INPUT.dft_plus_u) fcs(iat, i) += dftu.force_dftu.at(iat).at(i);  //Force contribution from DFT+U, Quxin add on 20201029
 	
 			if(vdwd2.vdwD2)											//Peize Lin add 2014-04-04, update 2019-04-26
 			{
@@ -918,10 +921,17 @@ void Force_LCAO::cal_stress(matrix &stress)
 		for(int j=0;j<3;j++)
 		{
 			stress(i,j) = SS.scs[i][j];
+
+            //quxin added for DFT+U; stress contribution from DFT+U
+            if(INPUT.dft_plus_u) if(i!=j) stress(i,j) += dftu.stress_dftu.at(i).at(j);          
 		}
 		stress(i,i) = SS.scs[i][i] - external_stress[i]/unit_transform;
+
+        if(INPUT.dft_plus_u) stress(i,i) += dftu.stress_dftu.at(i).at(i);
 	}
     PRESSURE = (SS.scs[0][0]+SS.scs[1][1]+SS.scs[2][2])/3;
+
+    if(INPUT.dft_plus_u) PRESSURE += (dftu.stress_dftu.at(0).at(0) + dftu.stress_dftu.at(1).at(1) + dftu.stress_dftu.at(2).at(2))/3.0;
 
     return;
 }

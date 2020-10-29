@@ -1,5 +1,6 @@
 #include "force_lcao_k.h"
 #include "../src_pw/global.h"
+#include "dftu.h"  //Quxin add for DFT+U on 20201029
 
 Force_LCAO_k::Force_LCAO_k ()
 {
@@ -45,6 +46,13 @@ void Force_LCAO_k::ftable_k (void)
 
 	// 
 	this->cal_ftvnl_dphi_k(dm2d);
+
+	//Quxin add for DFT+U on 20201029
+	if(INPUT.dft_plus_u) 
+	{
+		dftu.force_stress();
+		dftu.erase_force_stress();
+	}
 
 	// ---------------------------------------
 	// doing on the real space grid.

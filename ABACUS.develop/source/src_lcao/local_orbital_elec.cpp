@@ -10,6 +10,7 @@
 #include "evolve_lcao_matrix.h"
 #include "../src_pw/berryphase.h"
 #include "../src_pw/toWannier90.h"
+#include "dftu.h"   //Quxin add for DFT+U on 202011029
 
 int Local_Orbital_Elec::iter = 0;
 double Local_Orbital_Elec::avg_iter = 0.0; 
@@ -141,7 +142,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		Update_input UI;
 		UI.init(ufile);
 			
-		
+		if(INPUT.dft_plus_u) dftu.iter_dftu = iter;
 		//time_start= std::time(NULL);
 		clock_start = std::clock();
 		conv_elec = false;//mohan add 2008-05-25
@@ -258,7 +259,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 			}
 		}
 
-
+		if(INPUT.dft_plus_u) dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
 		// (1) calculate the bands.
 		cal_bands(istep);
 
@@ -335,6 +336,16 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// if selinv is used, we need this to calculate the charge
 		// using density matrix.
 		LOC.sum_bands();
+
+		// if DFT+U calculation is needed, this function will calculate the local occupation number matrix and energy correction
+		if(INPUT.dft_plus_u)
+		{
+			if(GAMMA_ONLY_LOCAL) dftu.cal_occup_m_gamma(iter);
+			else dftu.cal_occup_m_k(iter);
+
+		 	dftu.cal_energy_correction(istep);
+			dftu.output();
+		}
 
 		// (4) mohan add 2010-06-24
 		// using new charge density.
@@ -466,6 +477,17 @@ void Local_Orbital_Elec::scf(const int &istep)
 				cout <<"dim = "<<chi0_hilbert.dim<<endl;
 				//cout <<"oband = "<<chi0_hilbert.oband<<endl;
 				chi0_hilbert.Chi();
+			}
+
+			//quxin add for DFT+U for nscf calculation
+			if(INPUT.dft_plus_u)
+			{
+				if(chr.out_charge)
+				{
+					stringstream sst; 
+					sst << global_out_dir << "onsite.dm"; 
+					dftu.write_occup_m( sst.str() );		
+				}
 			}
 
 			for(int is=0; is<NSPIN; is++)
@@ -715,6 +737,18 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		if(GAMMA_ONLY_LOCAL)
 		{
 			UHM.calculate_Hgamma();
+
+			// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
+			if(INPUT.dft_plus_u) 
+			{
+			 	dftu.cal_eff_pot_mat(ik, istep);
+
+				const int spin = kv.isk[ik];
+				for(int irc=0; irc<ParaO.nloc; irc++)
+				{
+					LM.Hloc[irc] += dftu.pot_eff_gamma.at(spin).at(irc);
+				}
+			}
 			
 			// Peize Lin add at 2020.04.04
 			if(restart.info_load.load_H && !restart.info_load.load_H_finish)
@@ -819,6 +853,18 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			timer::tick("Efficience","each_k");
 			timer::tick("Efficience","H_k");
 			UHM.calculate_Hk(ik);
+
+			// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
+			if(INPUT.dft_plus_u)
+			{		
+			 	dftu.cal_eff_pot_mat(ik, istep);
+
+				for(int irc=0; irc<ParaO.nloc; irc++)
+				{
+					LM.Hloc2[irc] += dftu.pot_eff_k.at(ik).at(irc);
+				}							
+			}
+
 			timer::tick("Efficience","H_k");
 			
 			// Peize Lin add at 2020.04.04

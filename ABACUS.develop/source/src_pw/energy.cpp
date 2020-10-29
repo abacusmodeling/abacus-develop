@@ -19,7 +19,7 @@
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
 #include "../src_lcao/lcao_matrix.h"
-
+#include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
 
 #include "../src_lcao/global_fp.h"
 #include "../src_lcao/wfc_dm_2d.h"
@@ -73,6 +73,8 @@ void energy::calculate_harris(const int &flag)
 	{
 		this->etot_harris = eband + deband_harris + (etxc - etxcc) + ewld 
 		+ ehart + demet + exx + Efield::etotefield;
+
+        if(INPUT.dft_plus_u) this->etot_harris += dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
 	}
 	
 	return;
@@ -93,7 +95,10 @@ void energy::calculate_etot(void)
 	if(vdwd3.vdwD3) 									//jiyy add 2019-05-18
 	{
 		this->etot += vdwd3.energy_result;
-	}																			  
+	}			
+
+    //Quxin adds for DFT+U energy correction on 20201029
+    if(INPUT.dft_plus_u) this->etot += dftu.EU;																	  
 	
 /*
 	cout << resetiosflags(ios::scientific) << endl;
