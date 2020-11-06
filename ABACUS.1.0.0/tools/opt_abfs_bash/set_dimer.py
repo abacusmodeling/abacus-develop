@@ -25,7 +25,7 @@ def cal_ABACUS(T1,T2,i_dis):
 		input_dict["gamma_only"] = 1
 		input_dict["pseudo_dir"] = os.path.abspath(input_dict.get("pseudo_dir",r"./"))
 		input_dict["exx_opt_orb_lmax"] = len(info["Nu"])-1
-		read_stru.print_input(file,input_dict)
+		read_stru.print_input(file,input_dict,0)
 		
 	with open(folder/"STRU","w") as file:
 		Ts = (T1,) if T1==T2 else (T1,T2)

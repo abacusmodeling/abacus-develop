@@ -28,10 +28,12 @@ def get_input_dict():
 			input_dict[label] = value
 	return input_dict
 
-def print_input(file,input_dict):
+def print_input(file,input_dict,tag=0):
 	print("INPUT_PARAMETERS",file=file)
 	max_len = max([len(label) for label in input_dict])			
 	for label,value in input_dict.items():
+		if tag==0 and label in ["nelec", "ocp", "ocp_set"]:
+			continue
 		print( label, " "*(max_len-len(label)+4), value, file=file)
 	
 	
