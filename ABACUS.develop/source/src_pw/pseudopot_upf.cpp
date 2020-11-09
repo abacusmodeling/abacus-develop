@@ -2201,8 +2201,8 @@ int Pseudopot_upf::average_p()
 		int ind=0, ind1=0;
 		if(l != 0)
 		{
-			cout<<this->jjj[old_nbeta] <<" "<< this->lll[old_nbeta]<<" "<<abs(this->jjj[old_nbeta] - this->lll[old_nbeta] + 0.5)<<endl;
-			cout<<this->jjj[old_nbeta+1] <<" "<< this->lll[old_nbeta+1]<<" "<<abs(this->jjj[old_nbeta+1] - this->lll[old_nbeta+1] + 0.5)<<endl;
+//			cout<<this->jjj[old_nbeta] <<" "<< this->lll[old_nbeta]<<" "<<abs(this->jjj[old_nbeta] - this->lll[old_nbeta] + 0.5)<<endl;
+//			cout<<this->jjj[old_nbeta+1] <<" "<< this->lll[old_nbeta+1]<<" "<<abs(this->jjj[old_nbeta+1] - this->lll[old_nbeta+1] + 0.5)<<endl;
 			if(abs(this->jjj[old_nbeta] - this->lll[old_nbeta] + 0.5) < 1e-6)
 			{
 				if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]-0.5)>1e-6) 
