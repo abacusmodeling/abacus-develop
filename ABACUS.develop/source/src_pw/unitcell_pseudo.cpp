@@ -1110,18 +1110,23 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 		Pseudopot_upf upf;
 	
 		// mohan update 2010-09-12	
-		int error = 0;
+		int error = 0, error_ap = 0;
 		
 		if(MY_RANK==0)
 		{
 			pp_address = pp_dir + this->pseudo_fn[i];
 			//error = upf.read_pseudo_upf( pp_address ); xiaohui modify 2013-06-23
 			error = upf.init_pseudo_reader( pp_address ); //xiaohui add 2013-06-23
+			//average pseudopotential if needed
+			error_ap = upf.average_p(); //added by zhengdy 2020-10-20
 		}
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
+		Parallel_Common::bcast_int(error_ap);
 #endif
+
+		if(error_ap) WARNING_QUIT("UnitCell_pseudo::read_pseudopot","error when average the pseudopotential.");
 
 		if(error==1)
 		{
