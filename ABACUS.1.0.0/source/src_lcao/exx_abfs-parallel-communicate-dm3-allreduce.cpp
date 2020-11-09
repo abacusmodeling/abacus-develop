@@ -172,10 +172,15 @@ vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_ato
 	for(int iwt=0; iwt<NLOCAL; ++iwt)
 	{
 		const int iat = ucell.iwt2iat[iwt];
-		if(ParaO.trace_loc_row[iwt]>=0)
-			atom_in_2D[iat].first = true;
-		if(ParaO.trace_loc_col[iwt]>=0)
-			atom_in_2D[iat].second = true;
+		if(KS_SOLVER=="genelpa")
+		{
+			if(ParaO.trace_loc_col[iwt]>=0)
+				atom_in_2D[iat].first = true;
+			if(ParaO.trace_loc_row[iwt]>=0)
+				atom_in_2D[iat].second = true;
+		}
+		else
+			throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 	return atom_in_2D;
 }
