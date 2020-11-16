@@ -1,3 +1,4 @@
+ #include<complex>
  /*! \brief C old, deprecated interface, will be deleted. Use "elpa_get_communicators"
  *
  * \param mpi_comm_word    MPI global communicator (in)
@@ -70,7 +71,7 @@
  *
  *  \result                     int: 1 if error occured, otherwise 0
  */
- int elpa_solve_evp_complex_1stage(int na, int nev, double _Complex *a, int lda, double *ev, double _Complex *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols);
+ int elpa_solve_evp_complex_1stage(int na, int nev, std::complex<double> *a, int lda, double *ev, std::complex<double> *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols);
  /*! \brief C interface to solve the real eigenvalue problem with 2-stage solver
  *
  *  \param  na                        Order of matrix a
@@ -121,7 +122,7 @@
  *
  *  \result                     int: 1 if error occured, otherwise 0
  */
- int elpa_solve_evp_complex_2stage(int na, int nev, double _Complex *a, int lda, double *ev, double _Complex *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int mpi_comm_all, int THIS_COMPLEX_ELPA_KERNEL_API);
+ int elpa_solve_evp_complex_2stage(int na, int nev, std::complex<double> *a, int lda, double *ev, std::complex<double> *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int mpi_comm_all, int THIS_COMPLEX_ELPA_KERNEL_API);
  /*! \brief C interface to driver function "elpa_solve_evp_real"
  *
  *  \param  na                        Order of matrix a
@@ -180,7 +181,7 @@
  *
  *  \result                     int: 1 if error occured, otherwise 0
  */
- int elpa_solve_evp_complex(int na, int nev, double _Complex *a, int lda, double *ev, double _Complex *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int mpi_comm_all, int THIS_COMPLEX_ELPA_KERNEL_API, char *method);
+ int elpa_solve_evp_complex(int na, int nev, std::complex<double> *a, int lda, double *ev, std::complex<double> *q, int ldq, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int mpi_comm_all, int THIS_COMPLEX_ELPA_KERNEL_API, char *method);
  /*! \brief  C interface to solve tridiagonal eigensystem with divide and conquer method
  *\details
 
@@ -269,7 +270,7 @@
  *\param ldcCols               columns of matrix c
  *\result success              int reports success (1) or failure (0)
  */
- int elpa_mult_ah_b_complex(char uplo_a, char uplo_c, int na, int ncb, double _Complex *a, int lda, double _Complex *b, int ldb, int nblk, int mpi_comm_rows, int mpi_comm_cols, double _Complex *c, int ldc);
+ int elpa_mult_ah_b_complex(char uplo_a, char uplo_c, int na, int ncb, std::complex<double> *a, int lda, std::complex<double> *b, int ldb, int nblk, int mpi_comm_rows, int mpi_comm_cols, std::complex<double> *c, int ldc);
  /*! \brief  C interface to elpa_invert_trm_real: Inverts a upper triangular matrix
  *\details
  *\param  na                   Order of matrix
@@ -301,7 +302,7 @@
  *\param wantDebug             int more debug information on failure if 1, else 0
  *\result succes               int reports success (1) or failure (0)
  */
- int elpa_invert_trm_complex(int na, double _Complex *a, int lda, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int wantDebug);
+ int elpa_invert_trm_complex(int na, std::complex<double> *a, int lda, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int wantDebug);
  /*! \brief  elpa_cholesky_real: Cholesky factorization of a real symmetric matrix
  *\details
 
@@ -336,4 +337,4 @@
  *\param wantDebug             int more debug information on failure, if 1, else 0
  *\result succes               int reports success (1) or failure (0)
  */
- int elpa_cholesky_complex(int na, double _Complex *a, int lda, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int wantDebug);
+ int elpa_cholesky_complex(int na, std::complex<double> *a, int lda, int nblk, int matrixCols, int mpi_comm_rows, int mpi_comm_cols, int wantDebug);

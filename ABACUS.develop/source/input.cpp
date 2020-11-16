@@ -2585,6 +2585,10 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("Input","genelpa can not be used with plane wave basis."); 
 		}
+		else if(ks_solver=="scalapack_gvx") //Peize Lin add 2020.11.14
+		{
+			WARNING_QUIT("Input","scalapack_gvx can not be used with plane wave basis."); 
+		}
 		else if(ks_solver=="hpseps") //xiaohui add 2013-09-01
 		{
 			//ofs_warning << " hpseps can't be used with plane wave basis." << endl; xiaohui modify 2013-09-04
@@ -2645,6 +2649,14 @@ void Input::Check(void)
 //				ofs_warning << "genelpa is under testing" << endl;
 #else
 				WARNING_QUIT("Input","genelpa can not be used for series version.");
+#endif
+            }
+			else if (ks_solver == "scalapack_gvx")
+			{
+#ifdef __MPI
+				ofs_warning << "scalapack_gvx is under testing" << endl;
+#else
+				WARNING_QUIT("Input","scalapack_gvx can not be used for series version.");
 #endif
             }
 			else if (ks_solver == "hpseps")
@@ -2922,7 +2934,7 @@ void Input::Check(void)
 			if( !(calculation=="nscf") )
 				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
 		}
-		else if(basis_type == "lcao" && ks_solver == "genelpa")
+		else if(basis_type == "lcao" && (ks_solver == "genelpa" || ks_solver == "scalapack_gvx"))
 		{
 			if( !(calculation=="nscf") )
 				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
@@ -3034,7 +3046,7 @@ void Input::Print(const string &fn)const
 	
 	ofs << "\n#Parameters (3.Relaxation)" << endl;
 	//OUTP(ofs,"diago_type",DIAGO_TYPE,"cg; david; lapack; hpseps;"); xiaohui modify 2013-09-01
-	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; genelpa; hpseps;");
+	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; genelpa; hpseps; scalapack_gvx");
 	OUTP(ofs,"niter",niter,"#number of electron iterations");
 	OUTP(ofs,"vna",vna,"use the vna or not");
 	OUTP(ofs,"grid_speed",grid_speed,"1:normal 2:fast");//mohan add 2012-03-29
@@ -3065,7 +3077,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"basis_type",basis_type,"PW; LCAO in pw; LCAO"); //xiaohui add 2013-09-01
 	//OUTP(ofs,"linear_scaling",linear_scaling,"0:PW 1:LCAO 2:DMM"); xiaohui modify 2013-09-01
 	//if(diago_type=="HPSEPS") xiaohui modify 2013-09-01
-	if(ks_solver=="HPSEPS") //xiaohui add 2013-09-01
+	if(ks_solver=="HPSEPS" || ks_solver=="genelpa" || ks_solver=="scalapack_gvx") //xiaohui add 2013-09-01
 	{
 		OUTP(ofs,"nb2d",nb2d,"2d distribution of atoms");
 	}

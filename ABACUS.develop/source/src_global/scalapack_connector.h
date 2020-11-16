@@ -1,6 +1,8 @@
 #ifndef SCALAPACK_CONNECTOR_H
 #define SCALAPACK_CONNECTOR_H
 
+#include <complex>
+
 extern "C"
 {
 	void blacs_gridinit_( int *ictxt, const char *order, const int *nprow, const int *npcol );
@@ -10,6 +12,29 @@ extern "C"
 		int *desc, 
 		const int *m, const int *n, const int *mb, const int *nb, const int *irsrc, const int *icsrc, 
 		const int *ictxt, const int *lld, int *info);
+
+	void pdpotrf_(char *uplo, int *n, double *a, int *ia, int *ja, int *desca, int *info);
+//	void pzpotrf_(char *uplo, int *n, double _Complex *a, int *ia, int *ja, int *desca, int *info);
+	void pzpotrf_(char *uplo, int *n, std::complex<double> *a, int *ia, int *ja, int *desca, int *info);
+
+	void pdtran_(int *m , int *n ,
+		double *alpha , double *a , int *ia , int *ja , int *desca ,
+		double *beta ,  double *c , int *ic , int *jc , int *descc );
+
+	void pzgemv_(
+		const char *transa,
+		const int *M, const int *N,
+		const double *alpha,
+		const std::complex<double> *A, const int *IA, const int *JA, const int *DESCA,
+		const std::complex<double> *B, const int *IB, const int *JB, const int *DESCB, const int *K, 
+		const double *beta, std::complex<double> *C, const int *IC, const int *JC, const int *DESCC,const int *L);
+	void pdgemv_(
+		const char *transa,
+		const int *M, const int *N,
+		const double *alpha,
+		const double *A, const int *IA, const int *JA, const int *DESCA,
+		const double *B, const int *IB, const int *JB, const int *DESCB, const int *K, 
+		const double *beta, double *C, const int *IC, const int *JC, const int *DESCC,const int *L);
 	// C = a * A.? * B.? + b * C
 	void pdgemm_(
 		const char *transa, const char *transb,
@@ -23,31 +48,34 @@ extern "C"
 		const char *transa, const char *transb,
 		const int *M, const int *N, const int *K,
 		const double *alpha,
-		const complex<double> *A, const int *IA, const int *JA, const int *DESCA,
-		const complex<double> *B, const int *IB, const int *JB, const int *DESCB,
+		const std::complex<double> *A, const int *IA, const int *JA, const int *DESCA,
+		const std::complex<double> *B, const int *IB, const int *JB, const int *DESCB,
 		const double *beta,
-		complex<double> *C, const int *IC, const int *JC, const int *DESCC);
-                void pzgemv_(
-		const char *transa,
-		const int *M, const int *N,
-		const double *alpha,
-		const complex<double> *A, const int *IA, const int *JA, const int *DESCA,
-		const complex<double> *B, const int *IB, const int *JB, const int *DESCB, const int *K, 
-                                           const double *beta,
-		complex<double> *C, const int *IC, const int *JC, const int *DESCC,const int *L);
-                                void pdgemv_(
-		const char *transa,
-		const int *M, const int *N,
-		const double *alpha,
-		const double *A, const int *IA, const int *JA, const int *DESCA,
-		const double *B, const int *IB, const int *JB, const int *DESCB, const int *K, 
-                                           const double *beta,
-		double *C, const int *IC, const int *JC, const int *DESCC,const int *L);
+		std::complex<double> *C, const int *IC, const int *JC, const int *DESCC);
+	void pdsymm_(char *side , char *uplo , int *m , int *n ,
+		double *alpha , double *a , int *ia , int *ja , int *desca ,
+		double *b , int *ib , int *jb , int *descb ,
+		double *beta ,  double *c , int *ic , int *jc , int *descc );
+	void pdtrmm_(char *side , char *uplo , char *transa , char *diag , int *m , int *n ,
+		double *alpha , double *a , int *ia , int *ja , int *desca ,
+		double *b , int *ib , int *jb , int *descb );
+//	void pztrmm_(char *side , char *uplo , char *transa , char *diag , int *m , int *n ,
+//		double *alpha , double _Complex *a , int *ia , int *ja , int *desca ,
+//		double _Complex *b , int *ib , int *jb , int *descb );
+	void pztrmm_(char *side , char *uplo , char *transa , char *diag , int *m , int *n ,
+		double *alpha , std::complex<double> *a , int *ia , int *ja , int *desca ,
+		std::complex<double> *b , int *ib , int *jb , int *descb );
 
 	void pzgetrf_(
 		const int *M, const int *N, 
-		complex<double> *A, const int *IA, const int *JA, const int *DESCA,
+		std::complex<double> *A, const int *IA, const int *JA, const int *DESCA,
 		int *ipiv,  int *info);
+
+	void pdsygvx_(const int* itype, const char* jobz, const char* range, const char* uplo,
+		const int* n, double* A, const int* ia, const int* ja, const int*desca, double* B, const int* ib, const int* jb, const int*descb,
+		const double* vl, const double* vu, const int* il, const int* iu,
+		const double* abstol, int* m, int* nz, double* w, const double*orfac, double* Z, const int* iz, const int* jz, const int*descz,
+		double* work, int* lwork, int*iwork, int*liwork, int* ifail, int*iclustr, double*gap, int* info);
 }
 
 /*

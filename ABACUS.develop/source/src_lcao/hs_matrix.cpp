@@ -155,7 +155,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
                             iic=ir+ic*ParaO.nrow;
                         }
@@ -248,7 +248,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
                             iic=ir+ic*ParaO.nrow;
                         }
@@ -391,16 +391,16 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
     stringstream ssh;
     stringstream sss;
 
-        if(bit)
-        {
-        ssh << global_out_dir << "data-H-bit";
-        sss << global_out_dir << "data-S-bit";
-        }
-        else
-        {
-        ssh << global_out_dir << "data-H";
-        sss << global_out_dir << "data-S";
-        }
+    if(bit)
+    {
+    ssh << global_out_dir << "data-H-bit";
+    sss << global_out_dir << "data-S-bit";
+    }
+    else
+    {
+    ssh << global_out_dir << "data-H";
+    sss << global_out_dir << "data-S";
+    }
 
     if (bit)
     {
@@ -434,7 +434,7 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
                             iic=ir+ic*ParaO.nrow;
                         }
@@ -527,7 +527,7 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                     if (ic>=0)
                     {
                         int iic;
-                        if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
                             iic=ir+ic*ParaO.nrow;
                         }
@@ -735,7 +735,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                                 //lineH[j-i] = H[ir*ParaO.ncol+ic];
                                 //lineS[j-i] = S[ir*ParaO.ncol+ic];
                                 int iic;
-                                if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                                if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                                 {
                                     iic=ir+ic*ParaO.nrow;
                                 }

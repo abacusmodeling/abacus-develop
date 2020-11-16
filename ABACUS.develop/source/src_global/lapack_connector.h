@@ -39,6 +39,12 @@ extern "C"
 	void dsygv_(const int* itype, const char* jobz,const char* uplo, const int* n,
 				double* a,const int* lda,double* b,const int* ldb,
 	 			double* w,double* work,int* lwork,int* info);
+    // Peize Lin add dsygvx 2020.11.11, to compute the selected eigenvalues of a generalized symmetric/Hermitian matrix.
+	void dsygvx_(const int* itype, const char* jobz, const char* range, const char* uplo,
+                const int* n, double* A, const int* lda, double* B, const int* ldb,
+                const double* vl, const double* vu, const int* il, const int* iu,
+                const double* abstol, int* m, double* w, double* Z, const int* ldz, 
+                double* work, int* lwork, int*iwork, int* ifail, int* info);
 	// mohan add sspgvx 2010-03-21, to compute the selected eigenvalues of a generalized symmetric/Hermitian 
 	// definite generalized problems. 
 	void sspgvx_(const int* itype, const char* jobz,const char* range,const char* uplo,

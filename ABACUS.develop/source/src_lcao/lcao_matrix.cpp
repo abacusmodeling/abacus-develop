@@ -39,7 +39,7 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	
 	// (1) calculate nrow, ncol, nloc.
 	//if (DIAGO_TYPE=="hpseps" || DIAGO_TYPE=="scalpack" || DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
-	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" || KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" || KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx") //xiaohui add 2013-09-02
 	{
 		ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
 #ifdef __MPI
@@ -188,7 +188,7 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
     const int ic = ParaO.trace_loc_col[ iw2_all ];
     //const int index = ir * ParaO.ncol + ic;
 	long index;
-	if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+	if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
 	{
 		index=ic*ParaO.nrow+ir;
 	}
@@ -237,7 +237,7 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
     const int ic = ParaO.trace_loc_col[ iw2_all ];
     //const int index = ir * ParaO.ncol + ic;
 	long index;
-	if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+	if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
 	{
 		index=ic*ParaO.nrow+ir;
 	}
@@ -960,7 +960,7 @@ void LCAO_Matrix::set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const i
 //cout<<"ir: "<<ir<<endl;
 //cout<<"ic: "<<ic<<endl;
     long index;
-    if(KS_SOLVER=="genelpa")
+    if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
     {
         index=ic*ParaO.nrow+ir;
 //cout<<"index: "<<index<<endl;
@@ -995,7 +995,7 @@ void LCAO_Matrix::set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, con
 //cout<<"ir: "<<ir<<endl;
 //cout<<"ic: "<<ic<<endl;
     long index;
-    if(KS_SOLVER=="genelpa")
+    if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
     {
         index=ic*ParaO.nrow+ir;
 //cout<<"index: "<<index<<endl;

@@ -656,7 +656,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							if(nu<0)continue;
 							//const int iic = mu*ParaO.ncol+nu;
                             int iic;
-                            if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                            if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
                                 iic=mu+nu*ParaO.nrow;
                             }

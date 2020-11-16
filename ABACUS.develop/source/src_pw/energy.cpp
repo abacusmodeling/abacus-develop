@@ -241,31 +241,24 @@ bool print)
 	//	}
 	//} xiaohui modify 2013-09-02
 
-	//xiaohui add 2013-09-02
+	//xiaohui add 2013-09-02, Peize Lin update 2020.11.14
+    string label;
 	if(KS_SOLVER=="cg")
-	{
-		ss << "CG" << iter << "\0";
-	}
+		label = "CG";
 	else if (KS_SOLVER=="lapack")
-	{
-		ss << "LA" << iter << "\0";
-	}
+		label = "LA";
     else if(KS_SOLVER=="hpseps")
-	{
-		ss << "HP" << iter << "\0";
-	}
+		label = "HP";
     else if(KS_SOLVER=="genelpa")
-    {
-        ss << "GE" << iter << "\0";
-    }
+        label = "GE";
 	else if(KS_SOLVER=="dav")
-	{
-		ss << "DA" << iter << "\0";
-	}
+		label = "DA";
+    else if(KS_SOLVER=="scalapack_gvx")
+        label = "GV";
 	else
-	{
 		WARNING_QUIT("Energy","print_etot");
-	} //xiaohui add 2013-09-02
+    ss << label << iter;
+	//xiaohui add 2013-09-02
 
 	bool scientific=true;
 	int prec = 6;

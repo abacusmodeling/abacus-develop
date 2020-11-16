@@ -67,10 +67,11 @@
 #include <mpi.h>
 extern "C"
 {
-    #include "pblas.h"
+//    #include "pblas.h"
     #include "Cblacs.h"
-    #include "scalapack.h"
+//    #include "scalapack.h"
     #include "my_elpa.h"
+	#include "src_global/scalapack_connector.h"
 }
 #include "GenELPA.h"
 
@@ -1310,7 +1311,6 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
     char uplo;
     int isrc=1, jsrc=1;
     int lda;
-    double _Complex *bb=reinterpret_cast<double _Complex*>(b);
 
     #ifdef _DEBUG
         int myid;
@@ -1337,7 +1337,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
             t=-1;
             timer(myid, "pzpotrf_", method, "1", t);
         #endif
-        pzpotrf_(&uplo, &nFull, bb, &isrc, &jsrc, desc, &info);
+        pzpotrf_(&uplo, &nFull, b, &isrc, &jsrc, desc, &info);
         #ifdef _DEBUG
             timer(myid, "pzpotrf_", method, "1", t);
         #endif
@@ -1356,7 +1356,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
                     t=-1;
                     timer(myid, "elpa_cholesky_complex", method, "1", t);
                 #endif
-                info=elpa_cholesky_complex(nFull, bb, narows, nblk, nacols, mpi_comm_rows, mpi_comm_cols, wantDebug);
+                info=elpa_cholesky_complex(nFull, b, narows, nblk, nacols, mpi_comm_rows, mpi_comm_cols, wantDebug);
                 #ifdef _DEBUG
                     timer(myid, "elpa_cholesky_complex", method, "1", t);
                 #endif
@@ -1377,7 +1377,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
             timer(myid, "elpa_cholesky_complex", method, "1", t);
         #endif
         wantDebug=true;
-        info=elpa_cholesky_complex(nFull, bb, narows, nblk, nacols, mpi_comm_rows, mpi_comm_cols, wantDebug);
+        info=elpa_cholesky_complex(nFull, b, narows, nblk, nacols, mpi_comm_rows, mpi_comm_cols, wantDebug);
         #ifdef _DEBUG
             timer(myid, "elpa_cholesky_complex", method, "1", t);
         #endif
@@ -1397,7 +1397,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
                     t=-1;
                     timer(myid, "pzpotrf_", method, "1", t);
                 #endif
-                pzpotrf_(&uplo, &nFull, bb, &isrc, &jsrc, desc, &info);
+                pzpotrf_(&uplo, &nFull, b, &isrc, &jsrc, desc, &info);
                 #ifdef _DEBUG
                     timer(myid, "pzpotrf_", method, "1", t);
                 #endif
@@ -1438,7 +1438,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
         t=-1;
         timer(myid, "elpa_invert_trm_complex", method, "3", t);
     #endif
-    info=elpa_invert_trm_complex(nFull, bb, lda, nblk, nacols, mpi_comm_rows, mpi_comm_cols, wantDebug);
+    info=elpa_invert_trm_complex(nFull, b, lda, nblk, nacols, mpi_comm_rows, mpi_comm_cols, wantDebug);
     #ifdef _DEBUG
         timer(myid, "elpa_invert_trm_complex", method, "3", t);
     #endif
@@ -1463,9 +1463,6 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
     int isrc=1, jsrc=1;
     double alpha, beta;
     int lda;
-    double _Complex *bb=reinterpret_cast<double _Complex*>(b);
-    double _Complex *qq=reinterpret_cast<double _Complex*>(q);
-    double _Complex *ww=reinterpret_cast<double _Complex*>(work);
 
     #ifdef _DEBUG
         int myid;
@@ -1490,7 +1487,7 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         t=-1;
         timer(myid, "elpa_solve_evp_complex_1stage", method, "1", t);
     #endif
-    info=elpa_solve_evp_complex_1stage(nFull, nFull, bb, lda, ev, qq, lda, nblk,
+    info=elpa_solve_evp_complex_1stage(nFull, nFull, b, lda, ev, q, lda, nblk,
                                nacols, mpi_comm_rows, mpi_comm_cols);
     #ifdef _DEBUG
         timer(myid, "elpa_solve_evp_complex_1stage", method, "1", t);
@@ -1512,7 +1509,7 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         int eidx=globalIndex(i, nblk, npcols, mypcol);
         double ev_sqrt=ev[eidx]>DBL_MIN?1.0/sqrt(ev[eidx]):0;
         for(int j=0; j<narows; ++j)
-            ww[i*lda+j]=qq[i*lda+j]*ev_sqrt;
+            work[i*lda+j]=q[i*lda+j]*ev_sqrt;
     }
     #ifdef _DEBUG
         timer(myid, "q*ev", method, "2", t);
@@ -1527,9 +1524,9 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         timer(myid, "pzgemm_", method, "3", t);
     #endif
     pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-            &alpha, ww, &isrc, &jsrc, desc,
-                    qq, &isrc, &jsrc, desc,
-            &beta,  bb, &isrc, &jsrc, desc);
+            &alpha, work, &isrc, &jsrc, desc,
+                    q, &isrc, &jsrc, desc,
+            &beta,  b, &isrc, &jsrc, desc);
     #ifdef _DEBUG
         timer(myid, "pzgemm_", method, "3", t);
     #endif
@@ -1548,9 +1545,6 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
     int isrc=1, jsrc=1;
     double alpha, beta;
     int lda;
-    double _Complex *bb=reinterpret_cast<double _Complex*>(b);
-    double _Complex *qq=reinterpret_cast<double _Complex*>(q);
-    double _Complex *ww=reinterpret_cast<double _Complex*>(work);
 
     #ifdef _DEBUG
         int myid;
@@ -1575,7 +1569,7 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         t=-1;
         timer(myid, "elpa_solve_evp_complex_2stage", method, "1", t);
     #endif
-    info=elpa_solve_evp_complex_2stage(nFull, nFull, bb, lda, ev, qq, lda, nblk, nacols,
+    info=elpa_solve_evp_complex_2stage(nFull, nFull, b, lda, ev, q, lda, nblk, nacols,
                                     mpi_comm_rows, mpi_comm_cols, mpi_comm_world,
                                     THIS_REAL_ELPA_KERNEL_API);
     #ifdef _DEBUG
@@ -1599,7 +1593,7 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         //double ev_sqrt=1.0/sqrt(ev[eidx]);
         double ev_sqrt=ev[eidx]>DBL_MIN?1.0/sqrt(ev[eidx]):0;
         for(int j=0; j<narows; ++j)
-            ww[i*lda+j]=qq[i*lda+j]*ev_sqrt;
+            work[i*lda+j]=q[i*lda+j]*ev_sqrt;
     }
     #ifdef _DEBUG
         timer(myid, "q*ev", method, "2", t);
@@ -1614,9 +1608,9 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         timer(myid, "pzgemm_", method, "3", t);
     #endif
     pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-            &alpha, ww, &isrc, &jsrc, desc,
-                    qq, &isrc, &jsrc, desc,
-            &beta,  bb, &isrc, &jsrc, desc);
+            &alpha, work, &isrc, &jsrc, desc,
+                    q, &isrc, &jsrc, desc,
+            &beta,  b, &isrc, &jsrc, desc);
     #ifdef _DEBUG
         timer(myid, "pzgemm_", method, "3", t);
     #endif
@@ -1635,10 +1629,6 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
     int isrc=1, jsrc=1;
     double alpha, beta;
     int lda;
-    double _Complex *aa=reinterpret_cast<double _Complex*>(a);
-    double _Complex *bb=reinterpret_cast<double _Complex*>(b);
-    double _Complex *qq=reinterpret_cast<double _Complex*>(q);
-    double _Complex *ww=reinterpret_cast<double _Complex*>(work);
 
     #ifdef _DEBUG
         int myid;
@@ -1669,9 +1659,9 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "4", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, aa, &isrc, &isrc, desc,
-                        bb, &isrc, &isrc, desc,
-                &beta,  ww, &isrc, &isrc, desc);
+                &alpha, a, &isrc, &isrc, desc,
+                        b, &isrc, &isrc, desc,
+                &beta,  work, &isrc, &isrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "4", t);
         #endif
@@ -1685,9 +1675,9 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "5", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, bb, &isrc, &isrc, desc,
-                        ww, &isrc, &isrc, desc,
-                &beta,  aa, &isrc, &isrc, desc);
+                &alpha, b, &isrc, &isrc, desc,
+                        work, &isrc, &isrc, desc,
+                &beta,  a, &isrc, &isrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "5", t);
         #endif
@@ -1696,7 +1686,7 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
             t=-1;
             timer(myid, "elpa_solve_evp_complex_1stage", method, "6", t);
         #endif
-        info=elpa_solve_evp_complex_1stage(nFull, nev, aa, lda, ev, qq, lda, nblk,
+        info=elpa_solve_evp_complex_1stage(nFull, nev, a, lda, ev, q, lda, nblk,
                                            nacols, mpi_comm_rows, mpi_comm_cols);
         #ifdef _DEBUG
             timer(myid, "elpa_solve_evp_complex_1stage", method, "6", t);
@@ -1718,8 +1708,8 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
                 timer(myid, "pztrmm_", method, "7", t);
             #endif
             pztrmm_(&side, &uplo, &transa,  &diag, &nFull, &nFull,
-                    &alpha, bb, &isrc, &jsrc, desc,
-                            qq, &isrc, &jsrc, desc);
+                    &alpha, b, &isrc, &jsrc, desc,
+                            q, &isrc, &jsrc, desc);
             #ifdef _DEBUG
                 timer(myid, "pztrmm_", method, "7", t);
             #endif
@@ -1737,9 +1727,9 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "4", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, bb, &isrc, &jsrc, desc,
-                        aa, &isrc, &jsrc, desc,
-                &beta,  ww, &isrc, &jsrc, desc);
+                &alpha, b, &isrc, &jsrc, desc,
+                        a, &isrc, &jsrc, desc,
+                &beta,  work, &isrc, &jsrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "4", t);
         #endif
@@ -1749,9 +1739,9 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "5", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, bb, &isrc, &jsrc, desc,
-                        ww, &isrc, &jsrc, desc,
-                &beta,  aa, &isrc, &jsrc, desc);
+                &alpha, b, &isrc, &jsrc, desc,
+                        work, &isrc, &jsrc, desc,
+                &beta,  a, &isrc, &jsrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "5", t);
         #endif
@@ -1760,7 +1750,7 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
             t=-1;
             timer(myid, "elpa_solve_evp_complex_1stage", method, "6", t);
         #endif
-        info=elpa_solve_evp_complex_1stage(nFull, nFull, aa, lda, ev, ww, lda, nblk,
+        info=elpa_solve_evp_complex_1stage(nFull, nFull, a, lda, ev, work, lda, nblk,
                                            nacols, mpi_comm_rows, mpi_comm_cols);
         #ifdef _DEBUG
             timer(myid, "elpa_solve_evp_complex_1stage", method, "6", t);
@@ -1780,9 +1770,9 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
                 timer(myid, "pzgemm_", method, "4", t);
             #endif
             pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                    &alpha, bb, &isrc, &jsrc, desc,
-                            ww, &isrc, &jsrc, desc,
-                    &beta,  qq, &isrc, &jsrc, desc);
+                    &alpha, b, &isrc, &jsrc, desc,
+                            work, &isrc, &jsrc, desc,
+                    &beta,  q, &isrc, &jsrc, desc);
             #ifdef _DEBUG
                 timer(myid, "pzgemm_", method, "4", t);
             #endif
@@ -1810,10 +1800,6 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
     int isrc=1, jsrc=1;
     double alpha, beta;
     int lda;
-    double _Complex *aa=reinterpret_cast<double _Complex*>(a);
-    double _Complex *bb=reinterpret_cast<double _Complex*>(b);
-    double _Complex *qq=reinterpret_cast<double _Complex*>(q);
-    double _Complex *ww=reinterpret_cast<double _Complex*>(work);
 
     #ifdef _DEBUG
         int myid;
@@ -1844,9 +1830,9 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "4", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, aa, &isrc, &isrc, desc,
-                        bb, &isrc, &isrc, desc,
-                &beta,  ww, &isrc, &isrc, desc);
+                &alpha, a, &isrc, &isrc, desc,
+                        b, &isrc, &isrc, desc,
+                &beta,  work, &isrc, &isrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "4", t);
         #endif
@@ -1860,9 +1846,9 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "5", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, bb, &isrc, &isrc, desc,
-                        ww, &isrc, &isrc, desc,
-                &beta,  aa, &isrc, &isrc, desc);
+                &alpha, b, &isrc, &isrc, desc,
+                        work, &isrc, &isrc, desc,
+                &beta,  a, &isrc, &isrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "5", t);
         #endif
@@ -1871,7 +1857,7 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
             t=-1;
             timer(myid, "elpa_solve_evp_complex_2stage", method, "6", t);
         #endif
-        info=elpa_solve_evp_complex_2stage(nFull, nev, aa, lda, ev, qq, lda, nblk, nacols,
+        info=elpa_solve_evp_complex_2stage(nFull, nev, a, lda, ev, q, lda, nblk, nacols,
                                         mpi_comm_rows, mpi_comm_cols, mpi_comm_world,
                                         THIS_REAL_ELPA_KERNEL_API);
         #ifdef _DEBUG
@@ -1894,8 +1880,8 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
                 timer(myid, "pztrmm_", method, "7", t);
             #endif
             pztrmm_(&side, &uplo, &transa,  &diag, &nFull, &nFull,
-                    &alpha, bb, &isrc, &jsrc, desc,
-                            qq, &isrc, &jsrc, desc);
+                    &alpha, b, &isrc, &jsrc, desc,
+                            q, &isrc, &jsrc, desc);
             #ifdef _DEBUG
                 timer(myid, "pztrmm_", method, "7", t);
             #endif
@@ -1913,9 +1899,9 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "4", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, bb, &isrc, &jsrc, desc,
-                        aa, &isrc, &jsrc, desc,
-                &beta,  ww, &isrc, &jsrc, desc);
+                &alpha, b, &isrc, &jsrc, desc,
+                        a, &isrc, &jsrc, desc,
+                &beta,  work, &isrc, &jsrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "4", t);
         #endif
@@ -1925,9 +1911,9 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
             timer(myid, "pzgemm_", method, "5", t);
         #endif
         pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                &alpha, bb, &isrc, &jsrc, desc,
-                        ww, &isrc, &jsrc, desc,
-                &beta,  aa, &isrc, &jsrc, desc);
+                &alpha, b, &isrc, &jsrc, desc,
+                        work, &isrc, &jsrc, desc,
+                &beta,  a, &isrc, &jsrc, desc);
         #ifdef _DEBUG
             timer(myid, "pzgemm_", method, "5", t);
         #endif
@@ -1936,7 +1922,7 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
             t=-1;
             timer(myid, "elpa_solve_evp_complex_2stage", method, "6", t);
         #endif
-        info=elpa_solve_evp_complex_2stage(nFull, nev, aa, lda, ev, ww, lda, nblk, nacols,
+        info=elpa_solve_evp_complex_2stage(nFull, nev, a, lda, ev, work, lda, nblk, nacols,
                                            mpi_comm_rows, mpi_comm_cols, mpi_comm_world,
                                            THIS_REAL_ELPA_KERNEL_API);
         #ifdef _DEBUG
@@ -1957,9 +1943,9 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
                 timer(myid, "pzgemm_", method, "7", t);
             #endif
             pzgemm_(&transa, &transb, &nFull, &nFull, &nFull,
-                    &alpha, bb, &isrc, &jsrc, desc,
-                            ww, &isrc, &jsrc, desc,
-                    &beta,  qq, &isrc, &jsrc, desc);
+                    &alpha, b, &isrc, &jsrc, desc,
+                            work, &isrc, &jsrc, desc,
+                    &beta,  q, &isrc, &jsrc, desc);
             #ifdef _DEBUG
                 timer(myid, "pzgemm_", method, "7", t);
             #endif

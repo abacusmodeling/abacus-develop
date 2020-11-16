@@ -43,6 +43,15 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 		for(int ik=0; ik!=kv.nks; ++ik)
 			cal_dm(wg,ik);
 	}
+	
+	#ifdef TEST_DIAG
+	{
+		static int istep=0;
+		ofstream ofs("dm_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+		ofs<<dm_gamma<<endl;
+		++istep;
+	}
+	#endif
 }
 
 void Wfc_Dm_2d::cal_dm(const matrix &wg, const int ik)
