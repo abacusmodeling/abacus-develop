@@ -934,6 +934,13 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		UHM.GK.destroy_pvpR();
 	}
 	LiuXh modify 2019-07-15*/
+	if(!GAMMA_ONLY_LOCAL)
+	{
+		if(!ParaO.out_hsR)
+		{
+			UHM.GK.destroy_pvpR();
+		}
+	}
 	timer::tick("Local_Orbital_Elec","cal_bands",'E');
 	return;	
 }

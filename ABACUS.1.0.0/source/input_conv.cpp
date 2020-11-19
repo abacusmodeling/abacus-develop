@@ -428,14 +428,67 @@ void Input_Conv::Convert(void)
 	val_elec_03 = INPUT.val_elec_03;
 	vext = INPUT.vext;
 	vext_dire = INPUT.vext_dire;	
-
+	
 	ocp = INPUT.ocp;
-	ocp_n = INPUT.ocp_n;	
-	for(int i=0; i<10000; i++)
+     //ocp_n = INPUT.ocp_n;
+    ocp_set = INPUT.ocp_set;
+    if(ocp == 1)       // jiyy add 2020.10.11
 	{
-		ocp_kb[i] = INPUT.ocp_kb[i];
+		int count = 0;
+		string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
+		vector<string> str;
+		string::size_type pos1, pos2;
+		string c = " ";
+		pos2 = ocp_set.find(c);
+		pos1 = 0;
+		while(string::npos != pos2)
+		{
+			str.push_back(ocp_set.substr(pos1, pos2-pos1));
+ 
+			pos1 = pos2 + c.size();
+			pos2 = ocp_set.find(c, pos1);
+		}
+		if(pos1 != ocp_set.length())
+			str.push_back(ocp_set.substr(pos1));
+
+		regex_t reg;
+		regcomp(&reg, pattern.c_str(), REG_EXTENDED);
+		regmatch_t pmatch[1];
+		const size_t nmatch=1;
+		for(int i=0; i<str.size(); ++i)
+		{
+			if(str[i] == "") 
+				continue;
+			int status = regexec(&reg, str[i].c_str(), nmatch, pmatch, 0);
+			string sub_str = "";
+			for(int j=pmatch[0].rm_so; j!=pmatch[0].rm_eo; ++j)
+			{
+				sub_str += str[i][j];
+			}
+			string sub_pattern("\\*");
+			regex_t sub_reg;
+			regcomp(&sub_reg, sub_pattern.c_str(), REG_EXTENDED);
+			regmatch_t sub_pmatch[1];
+			const size_t sub_nmatch=1;
+			if(regexec(&sub_reg, sub_str.c_str(), sub_nmatch, sub_pmatch, 0) == 0)
+			{
+				int pos = sub_str.find("*");
+				int num = stoi(sub_str.substr(0, pos));
+				double occ = stof(sub_str.substr(pos+1, sub_str.size()));
+				vector<double> ocp_temp(num, occ);
+				const vector<double>::iterator dest = ocp_kb.begin()+count;
+				copy(ocp_temp.begin(), ocp_temp.end(), dest);
+				count += num;
+			}
+			else
+			{
+				ocp_kb[count] = stof(sub_str);
+				count += 1;
+			}
+		}
 	}
-                 mulliken = INPUT. mulliken;//qifeng add 2019/9/10
+		
+    mulliken = INPUT. mulliken;//qifeng add 2019/9/10
 //----------------------------------------------------------
 // about selinv
 //----------------------------------------------------------

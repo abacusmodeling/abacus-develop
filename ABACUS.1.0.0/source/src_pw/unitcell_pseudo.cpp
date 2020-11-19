@@ -274,9 +274,10 @@ void UnitCell_pseudo::setup_cell(
 		xcf.which_dft(atoms[it].dft);
 	}
 
-	this->cal_nelec();
+	//this->cal_nelec();
 	this->cal_natomwfc();
 	this->cal_nwfc();
+	this->cal_nelec();
 	this->cal_meshx();
 
 //	stringstream ss;
@@ -727,7 +728,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 							string mags;
 							std::getline( ifpos, mags );
 							// change string to double.
-							atoms[it].mag[ia] = std::atof(mags.c_str());
+							//atoms[it].mag[ia] = std::atof(mags.c_str());
+							atoms[it].mag[ia] = 0.0;
 						}
 					}
 					else
@@ -737,7 +739,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 						string mags;
 						std::getline( ifpos, mags );
 						// change string to double.
-						atoms[it].mag[ia] = std::atof(mags.c_str());
+						//atoms[it].mag[ia] = std::atof(mags.c_str());
+						atoms[it].mag[ia] = 0.0;
 					}	
 
 					if(Coordinate=="Direct")
@@ -1040,7 +1043,8 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].tau[ia].x
                 << setw(20) << atoms[it].tau[ia].y
                 << setw(20) << atoms[it].tau[ia].z
-                << setw(20) << atoms[it].mag[ia]
+                //<< setw(20) << atoms[it].mag[ia]
+                << setw(20) << mag.start_magnetization[it]
                 << endl;
 
                 ++iat;
@@ -1078,7 +1082,8 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].taud[ia].x
                 << setw(20) << atoms[it].taud[ia].y
                 << setw(20) << atoms[it].taud[ia].z
-                << setw(20) << atoms[it].mag[ia]
+                //<< setw(20) << atoms[it].mag[ia]
+                << setw(20) << mag.start_magnetization[it]
                 << endl;
 
                 ++iat;
@@ -1250,28 +1255,22 @@ void UnitCell_pseudo::cal_nelec(void)
 	
 	if(NBANDS == 0)
 	{
-		// mohan add 2011-03-31
-		NBANDS = int( Mathzone::Max3( occupied_bands , mag.get_nelup() , mag.get_neldw() )  + 1.0e-6);
-		if( Occupy::gauss() || Occupy::tetra() )
+		if(NSPIN == 1)
 		{
-			//========================================================
-			// max function can only be used for bool,double,int,float
-			// otherwise it's a bug
-			//=========================================================
-                         NBANDS = static_cast<int>(1.2*occupied_bands); // pengfei 2014-10-13
-                         if (NSPIN == 2)
-                         {
-                             NBANDS = static_cast<int>(1.2*occupied_bands); //zhengdy 2020-05-12
-                             //if (NBANDS > NLOCAL)
-                             //    NBANDS = NLOCAL;
-                         }
-                         NBANDS = NBANDS>6 ? NBANDS : 6 ; 
-
-	//		NBANDS = static_cast<int>( Mathzone::Max3( 1.2*occupied_bands, 
-	//					1.2*mag.get_nelup() , 
-	//					1.2*mag.get_neldw() ) );
+			int nbands1 = static_cast<int>(occupied_bands) + 10;
+			int nbands2 = static_cast<int>(1.2 * occupied_bands);
+			NBANDS = max(nbands1, nbands2);
 		}
-		if(NSPIN == 4) NBANDS = NBANDS * 2;//added by zhengdy-soc
+		else if (NSPIN ==2 || NSPIN == 4)
+		{
+			int nbands3 = nelec + 20;
+			int nbands4 = 1.2 * nelec;
+			NBANDS = max(nbands3, nbands4);
+		}
+                if (NBANDS > NLOCAL)
+                {
+                    NBANDS = NLOCAL;
+                }
 		AUTO_SET("NBANDS",NBANDS);
 	}
 	else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
@@ -1285,6 +1284,10 @@ void UnitCell_pseudo::cal_nelec(void)
 		if(NBANDS < mag.get_neldw() ) 
 		{
 			WARNING_QUIT("unitcell","Too few spin down bands!");
+		}
+		if (NBANDS > NLOCAL)
+		{
+			WARNING_QUIT("unitcell","Too many bands! NBANDS > NBASIS.");
 		}
 	}
 
