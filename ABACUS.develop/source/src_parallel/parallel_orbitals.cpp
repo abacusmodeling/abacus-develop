@@ -119,7 +119,7 @@ void Parallel_Orbitals::set_trace(void)
 #ifdef __MPI
     //else if (DIAGO_TYPE=="scalpack"
     //         || DIAGO_TYPE=="hpseps" || DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
-    else if(KS_SOLVER=="scalpack" || KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+    else if(KS_SOLVER=="scalpack" || KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx") //xiaohui add 2013-09-02
     {
         // set the row index.
         //ofs_running << " nrow=" << nrow << endl;

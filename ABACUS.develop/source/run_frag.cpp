@@ -15,6 +15,7 @@
 //#include "src_develop/src_wannier/wannier.h"
 #include "src_pw/optical.h"
 #include "src_pw/cal_test.h"
+#include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 
 Run_Frag::Run_Frag(){}
 Run_Frag::~Run_Frag(){}
@@ -305,6 +306,9 @@ void Run_Frag::frag_LCAO_line(void)
 				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 	}
+
+    //Quxin added for DFT+U
+	if(INPUT.dft_plus_u) dftu.init();
 
 	Local_Orbital_Ions ions;
 	ions.opt_ions();

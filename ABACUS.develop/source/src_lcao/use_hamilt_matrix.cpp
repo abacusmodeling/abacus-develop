@@ -571,7 +571,7 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
                             if(nu<0)continue;
 
                             int iic;
-                            if(KS_SOLVER=="genelpa")  // save the matrix as column major format
+                            if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
                                 iic=mu+nu*ParaO.nrow;
                             }

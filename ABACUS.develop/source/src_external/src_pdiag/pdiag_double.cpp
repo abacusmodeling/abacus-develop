@@ -11,15 +11,18 @@
 extern "C"
 {
     #include "Cblacs.h"
-    #include "pblas.h"
-    #include "scalapack.h"
+//    #include "pblas.h"
+//    #include "scalapack.h"
     #include "my_elpa.h"
+	#include "src_global/scalapack_connector.h"
 }
 #include "GenELPA.h"
 #include "pdgseps.h"
 #include "pzgseps.h"
 #include "src_global/lapack_connector.h"
 #endif
+
+#include "src_external/src_test/test_function.h"
 
 inline int cart2blacs(MPI_Comm comm_2D, int nprows, int npcols, int N, int nblk, int lld, int *desc, int &mpi_comm_rows, int &mpi_comm_cols)
 {
@@ -354,7 +357,7 @@ void Pdiag_Double::divide_HS_2d
 	this->nloc = MatrixInfo.col_num * MatrixInfo.row_num;
 
 	// init blacs context for genelpa
-    if(KS_SOLVER=="genelpa")
+    if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
     {
         blacs_ctxt=cart2blacs(comm_2D, dim0, dim1, NLOCAL, nb, nrow, desc, mpi_comm_rows, mpi_comm_cols);
     }
@@ -395,6 +398,49 @@ void Pdiag_Double::divide_HS_2d
 void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2d,
 	double* h_mat, double* s_mat, double* ekb)
 {
+	#ifdef TEST_DIAG
+	{
+		static int istep = 0;
+		auto print_matrix_C = [&](const string &file_name, double*m)
+		{
+			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+			for(int ic=0; ic<ParaO.ncol; ++ic)
+			{
+				for(int ir=0; ir<ParaO.nrow; ++ir)
+				{
+					const int index=ic*ParaO.nrow+ir;
+					if(abs(m[index])>1E-10)
+						ofs<<m[index]<<"\t";
+					else
+						ofs<<0<<"\t";
+				}
+				ofs<<endl;
+			}
+		};
+		auto print_matrix_F = [&](const string &file_name, double*m)
+		{
+			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+			for(int ir=0; ir<ParaO.nrow; ++ir)
+			{
+				for(int ic=0; ic<ParaO.ncol; ++ic)
+				{
+					const int index=ic*ParaO.nrow+ir;
+					if(abs(m[index])>1E-10)
+						ofs<<m[index]<<"\t";
+					else
+						ofs<<0<<"\t";
+				}
+				ofs<<endl;
+			}
+		};
+		print_matrix_F("H_gamma", h_mat);
+		print_matrix_F("S_gamma", s_mat);
+		print_matrix_C("H_gamma", h_mat);
+		print_matrix_C("S_gamma", s_mat);
+		++istep;
+	}
+	#endif
+	
 #ifdef __MPI
 	TITLE("Pdiag_Double","diago_begin");
 	assert(this->loc_size > 0);
@@ -592,8 +638,132 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
         delete[] work;
         timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
     } // GenELPA method
+	else if(KS_SOLVER=="lapack_gv")
+	{
+		wfc_2d.create(this->ncol, this->nrow, false);
+		memcpy( wfc_2d.c, h_mat, sizeof(double)*this->ncol*this->nrow );
+		matrix s_tmp(this->ncol, this->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
+		vector<double> ekb_tmp(NLOCAL,0);
+		
+		const char jobz='V', uplo='U';
+		const int itype=1;
+		int lwork=-1, info=0;
+		vector<double> work(1,0);
+		dsygv_(&itype, &jobz, &uplo, &NLOCAL, wfc_2d.c, &NLOCAL, s_tmp.c, &NLOCAL, ekb_tmp.data(), work.data(), &lwork, &info);
+		if(info)
+			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		lwork = work[0];
+		work.resize(lwork);
+		dsygv_(&itype, &jobz, &uplo, &NLOCAL, wfc_2d.c, &NLOCAL, s_tmp.c, &NLOCAL, ekb_tmp.data(), work.data(), &lwork, &info);
+		if(info)
+			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		memcpy( ekb, ekb_tmp.data(), sizeof(double)*NBANDS ); 
+		
+		if(NEW_DM==0)
+			throw domain_error("NEW_DM must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	}
+	else if(KS_SOLVER=="lapack_gvx")
+	{
+		matrix h_tmp(this->ncol, this->nrow, false);
+		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
+		matrix s_tmp(this->ncol, this->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
+		wfc_2d.create(this->ncol, this->nrow, false);
+		
+		const char jobz='V', range='I', uplo='U';
+		const int itype=1, il=1, iu=NBANDS;
+		int M=0, lwork=-1, info=0;
+		const double abstol=0;
+		vector<double> work(1,0);
+		vector<int> iwork(5*NLOCAL,0);
+		vector<int> ifail(NLOCAL,0);
+		dsygvx_(&itype, &jobz, &range, &uplo,
+			&NLOCAL, h_tmp.c, &NLOCAL, s_tmp.c, &NLOCAL, NULL, NULL, &il, &iu, &abstol,
+			&M, ekb, wfc_2d.c, &NLOCAL, work.data(), &lwork, iwork.data(), ifail.data(), &info);
+		if(info)
+			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		lwork = work[0];
+		work.resize(lwork);
+		dsygvx_(&itype, &jobz, &range, &uplo,
+			&NLOCAL, h_tmp.c, &NLOCAL, s_tmp.c, &NLOCAL, NULL, NULL, &il, &iu, &abstol,
+			&M, ekb, wfc_2d.c, &NLOCAL, work.data(), &lwork, iwork.data(), ifail.data(), &info);
+		if(info)
+			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		if(M!=NBANDS)
+			throw runtime_error("M="+TO_STRING(M)+". NBANDS="+TO_STRING(NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		
+		if(NEW_DM==0)
+			throw domain_error("NEW_DM must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	}
+	else if(KS_SOLVER=="scalapack_gvx")
+	{
+		matrix h_tmp(this->ncol, this->nrow, false);
+		memcpy( h_tmp.c, h_mat, sizeof(double)*this->ncol*this->nrow );
+		matrix s_tmp(this->ncol, this->nrow, false);
+		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
+		wfc_2d.create(this->ncol, this->nrow, false);
+		
+		const char jobz='V', range='I', uplo='U';
+		const int itype=1, il=1, iu=NBANDS, one=1;
+		int M=0, NZ=0, lwork=-1, liwork=-1, info=0;
+		const double abstol=0, orfac=-1;
+		vector<double> work(1,0);
+		vector<int> iwork(1,0);
+		vector<int> ifail(NLOCAL,0);
+		vector<int> iclustr(2*DSIZE);
+		vector<double> gap(DSIZE);
+		
+		pdsygvx_(&itype, &jobz, &range, &uplo,
+			&NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
+			NULL, NULL, &il, &iu, &abstol,
+			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
+			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+		ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<endl;
+		lwork = work[0];
+		work.resize(lwork,0);
+		liwork = iwork[0];
+		iwork.resize(liwork,0);
+		pdsygvx_(&itype, &jobz, &range, &uplo,
+			&NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
+			NULL, NULL, &il, &iu, &abstol,
+			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
+			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+		ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<endl;
+
+		if(info)
+			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		if(M!=NBANDS)
+			throw runtime_error("M="+TO_STRING(M)+". NBANDS="+TO_STRING(NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		if(M!=NZ)
+			throw runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		
+		if(NEW_DM==0)
+			throw domain_error("NEW_DM must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	}	
     //delete[] Stmp; //LiuXh 20171109
 #endif
+
+	#ifdef TEST_DIAG
+	{
+		static int istep = 0;
+		{
+			ofstream ofs("ekb_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+			for(int ib=0; ib<NBANDS; ++ib)
+				ofs<<ekb[ib]<<endl;
+		}
+		{
+			ofstream ofs("wfc-C_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+			ofs<<wfc_2d<<endl;
+		}
+		{
+			ofstream ofs("wfc-F_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+			ofs<<transpose(wfc_2d)<<endl;
+		}
+		++istep;
+	}
+	#endif
+
 	return;
 }
 

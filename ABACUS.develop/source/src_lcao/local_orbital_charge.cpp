@@ -556,7 +556,7 @@ void Local_Orbital_Charge::sum_bands(void)
         {
             //density matrix has already been calcualted.
         }
-        else if(KS_SOLVER=="genelpa")
+        else if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
         {
             if(NEW_DM>0)
             {
@@ -577,7 +577,7 @@ void Local_Orbital_Charge::sum_bands(void)
     {
         NOTE("Calculate the density matrix!");
         this->cal_dk_k( GridT );
-        if(KS_SOLVER=="genelpa")        // Peize Lin test 2019-05-15
+        if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
             wfc_dm_2d.cal_dm(wf.wg);
     } //xiaohui add 2013-09-02. Attention...
             

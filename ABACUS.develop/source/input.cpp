@@ -510,6 +510,15 @@ void Input::Default(void)
 	restart_save = false;
 	restart_load = false;
 
+//==========================================================
+//    DFT+U     Xin Qu added on 2020-10-29
+//==========================================================
+    dft_plus_u = false;                    // 1:DFT+U correction; 0：standard DFT calcullation
+	yukawa_potential = false;
+	double_counting = 1; 
+	omc = false;
+	dftu_type = 2;
+
     return;
 }
 
@@ -1777,6 +1786,22 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, newDM);
 		}
+//----------------------------------------------------------------------------------
+//         Xin Qu added on 2020-10-29 for DFT+U
+//----------------------------------------------------------------------------------		
+		else if(strcmp("dft_plus_u",word)==0)
+		{
+			ifs >> dft_plus_u;
+		}
+		else if(strcmp("dftu_type",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("yukawa_potential",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("hubbard_u",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("hund_j",word)==0) ifs.ignore(150,'\n');
+	 	else if(strcmp("double_counting",word)==0) ifs.ignore(150,'\n');
+        else if(strcmp("orbital_corr",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("omc",word)==0) ifs.ignore(150,'\n');
+		else if(strcmp("yukawa_lambda",word)==0) ifs.ignore(150,'\n');
+//---------------------------------------------------------------------------------
         else
         {
 			//xiaohui add 2015-09-15
@@ -1821,6 +1846,133 @@ bool Input::Read(const string &fn)
 			break;
         }
     }
+
+//----------------------------------------------------------
+//       DFT+U    Xin Qu  added on 2020-10-29
+//----------------------------------------------------------
+    hubbard_u= new double [ntype];
+	for(int i=0; i<ntype; i++)
+	{						
+		hubbard_u[i] = 0.0;				
+	}
+
+	hund_j= new double [ntype];	
+	for(int i=0; i<ntype; i++)
+	{						
+		hund_j[i] = 0.0;				
+	}
+
+	orbital_corr= new int [ntype];
+	for(int i=0; i<ntype; i++)
+	{						
+		orbital_corr[i] = -1;				
+	}
+
+	if(dft_plus_u)
+	{
+		ifs.clear();
+    	ifs.seekg(0);  //move to the beginning of the file
+    	ifs.rdstate(); 
+    	while (ifs.good())
+    	{
+  			ifs >> word1;
+  			strtolower(word1, word);     //convert uppercase string to lower case; word1 --> word
+	
+			if(strcmp("dftu_type",word)==0)
+			{	
+				ifs >> dftu_type;								
+			}
+			else if(strcmp("yukawa_potential", word)==0)
+			{
+				ifs >> yukawa_potential;
+			} 
+			else if (strcmp("yukawa_lambda",word)==0)
+			{							
+				ifs >> yukawa_lambda;			
+			}
+			else if(strcmp("double_counting",word)==0)
+			{
+				ifs >> double_counting;
+			}
+			else if(strcmp("hubbard_u",word)==0)
+			{
+				for(int i=0; i<ntype; i++)
+				{		
+					ifs >> hubbard_u[i];				
+					hubbard_u[i] /= Ry_to_eV;				
+				}
+			} 
+			else if (strcmp("hund_j",word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{			
+					ifs >> hund_j[i];
+					hund_j[i] /= Ry_to_eV;				
+				}		
+			}
+			else if(strcmp("orbital_corr", word)==0)
+			{
+				for(int i=0;i<ntype;i++)
+				{			
+					ifs >> orbital_corr[i];								
+				}		
+			}
+			else if(strcmp("omc",word)==0)
+			{
+				ifs >> omc;
+			}
+			else
+			{
+				ifs.ignore(150, '\n');
+			}
+
+			if (ifs.eof() != 0)
+  			{
+				break;
+  			}       
+		}
+		
+		for(int i=0; i<ntype; i++)
+		{		
+
+			if(hubbard_u[i]<-1.0e-3)
+			{
+				cout << " WRONG ARGUMENTS OF hubbard_u " << endl;
+				exit(0);
+			}
+
+			if(hund_j[i]<-1.0e-3)
+			{
+				cout << " WRONG ARGUMENTS OF hund_j " << endl;
+				exit(0);
+			}
+
+			if( (orbital_corr[i]==-1) && (orbital_corr[i]==0) && (orbital_corr[i]!=1) && (orbital_corr[i]!=2) && (orbital_corr[i]!=3) )
+			{
+				cout << " WRONG ARGUMENTS OF orbital_corr " << endl;
+				exit(0);
+			}
+		}
+
+		dft_plus_u = 0;		
+		for(int i=0; i<ntype; i++)
+		{
+			if(orbital_corr[i] != -1) dft_plus_u = 1;
+		}
+
+		if(strcmp("lcao", basis_type.c_str())!=0)
+		{
+			cout << " WRONG ARGUMENTS OF basis_type, only lcao is support " << endl;
+			exit(0);
+		}
+
+		if(strcmp("genelpa", ks_solver.c_str())!=0)
+		{
+			cout << " WRONG ARGUMENTS OF ks_solver in DFT+U routine, only genelpa is support " << endl;
+			exit(0);
+		}
+
+	}
 	
 	if (basis_type == "pw")  // pengfei Li add 2015-1-31
 	{
@@ -2239,6 +2391,29 @@ void Input::Bcast()
     Parallel_Common::bcast_bool( restart_save ); // Peize Lin add 2020.04.04
     Parallel_Common::bcast_bool( restart_load ); // Peize Lin add 2020.04.04
 
+//-----------------------------------------------------------------------------------
+//DFT+U (added by Quxin 2020-10-29)
+//-----------------------------------------------------------------------------------
+    Parallel_Common::bcast_bool( dft_plus_u );
+	Parallel_Common::bcast_bool( yukawa_potential );
+	Parallel_Common::bcast_bool( omc );
+	Parallel_Common::bcast_int(dftu_type);
+	Parallel_Common::bcast_int(double_counting);
+	Parallel_Common::bcast_double(yukawa_lambda);
+	if(MY_RANK!=0)
+	{
+		hubbard_u = new double [this->ntype];
+		hund_j = new double [this->ntype];
+		orbital_corr = new int [this->ntype];
+	}
+	
+	for(int i =0; i<this->ntype; i++)
+	{
+		Parallel_Common::bcast_double(hubbard_u[i]);
+		Parallel_Common::bcast_double(hund_j[i]);
+		Parallel_Common::bcast_int(orbital_corr[i]);
+	}
+
     return;
 }
 #endif
@@ -2544,6 +2719,10 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("Input","genelpa can not be used with plane wave basis."); 
 		}
+		else if(ks_solver=="scalapack_gvx") //Peize Lin add 2020.11.14
+		{
+			WARNING_QUIT("Input","scalapack_gvx can not be used with plane wave basis."); 
+		}
 		else if(ks_solver=="hpseps") //xiaohui add 2013-09-01
 		{
 			//ofs_warning << " hpseps can't be used with plane wave basis." << endl; xiaohui modify 2013-09-04
@@ -2604,6 +2783,14 @@ void Input::Check(void)
 //				ofs_warning << "genelpa is under testing" << endl;
 #else
 				WARNING_QUIT("Input","genelpa can not be used for series version.");
+#endif
+            }
+			else if (ks_solver == "scalapack_gvx")
+			{
+#ifdef __MPI
+				ofs_warning << "scalapack_gvx is under testing" << endl;
+#else
+				WARNING_QUIT("Input","scalapack_gvx can not be used for series version.");
 #endif
             }
 			else if (ks_solver == "hpseps")
@@ -2761,10 +2948,13 @@ void Input::Check(void)
 		WARNING_QUIT("Input","bz is too large!");
 	}	
 
-	if(lcao_ecut == 0) 
+	if(basis_type=="lcao")
 	{
-		lcao_ecut = ecutwfc; 
-		AUTO_SET("lcao_ecut",ecutwfc);
+		if(lcao_ecut == 0) 
+		{
+			lcao_ecut = ecutwfc; 
+			AUTO_SET("lcao_ecut",ecutwfc);
+		}
 	}
 
 /* 
@@ -2917,7 +3107,7 @@ void Input::Check(void)
 			if( !(calculation=="nscf") )
 				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
 		}
-		else if(basis_type == "lcao" && ks_solver == "genelpa")
+		else if(basis_type == "lcao" && (ks_solver == "genelpa" || ks_solver == "scalapack_gvx"))
 		{
 			if( !(calculation=="nscf") )
 				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
@@ -3029,7 +3219,7 @@ void Input::Print(const string &fn)const
 	
 	ofs << "\n#Parameters (3.Relaxation)" << endl;
 	//OUTP(ofs,"diago_type",DIAGO_TYPE,"cg; david; lapack; hpseps;"); xiaohui modify 2013-09-01
-	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; genelpa; hpseps;");
+	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; genelpa; hpseps; scalapack_gvx");
 	OUTP(ofs,"niter",niter,"#number of electron iterations");
 	OUTP(ofs,"vna",vna,"use the vna or not");
 	OUTP(ofs,"grid_speed",grid_speed,"1:normal 2:fast");//mohan add 2012-03-29
@@ -3060,7 +3250,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"basis_type",basis_type,"PW; LCAO in pw; LCAO"); //xiaohui add 2013-09-01
 	//OUTP(ofs,"linear_scaling",linear_scaling,"0:PW 1:LCAO 2:DMM"); xiaohui modify 2013-09-01
 	//if(diago_type=="HPSEPS") xiaohui modify 2013-09-01
-	if(ks_solver=="HPSEPS") //xiaohui add 2013-09-01
+	if(ks_solver=="HPSEPS" || ks_solver=="genelpa" || ks_solver=="scalapack_gvx") //xiaohui add 2013-09-01
 	{
 		OUTP(ofs,"nb2d",nb2d,"2d distribution of atoms");
 	}
