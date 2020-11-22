@@ -14,7 +14,7 @@ def cal():
 	with open(f"{utils.folder_exx}/INPUT","w") as file:
 		input_dict = read_stru.get_input_dict()
 		input_dict["pseudo_dir"] = os.path.abspath(input_dict.get("pseudo_dir",r"./"))
-		read_stru.print_input(file,input_dict)
+		read_stru.print_input(file,input_dict,1)
 	
 	with open("STRU","r") as file:
 		strus = re.compile("LATTICE_CONSTANT").split(file.read())
@@ -40,14 +40,14 @@ def cal():
 			file.write(textwrap.dedent(f"""\
 				#!/bin/bash
 				#PBS -q gold5120
-				#PBS -l nodes=1:ppn=28
-				#PBS -l walltime=24:00:00
+				#PBS -l nodes=2:ppn=28
+				#PBS -l walltime=99:99:99
 				#PBS -o job.log
 				#PBS -e job.err
 				ulimit -s unlimited
 				cd $PBS_O_WORKDIR
 				EXEC={info["ABACUS"]}
-				mpirun -n 1 -env OMP_NUM_THREADS=28 $EXEC
+				mpirun -n 2 -env OMP_NUM_THREADS=28 $EXEC
 				"""))
 	elif utils.sub=="bsub":
 		with open(f"{utils.folder_exx}/sub.sh","w") as file:
@@ -56,7 +56,7 @@ def cal():
 				#BSUB -q renxg
 				#BSUB -o job.log -e job.err
 				#BSUB -n 6
-				mpirun -n 1 -env OMP_NUM_THREADS=6 {info['ABACUS']}
+				mpirun -n 2 -env OMP_NUM_THREADS=28 {info['ABACUS']}
 				"""))
 
 	os.chdir(utils.folder_exx)
