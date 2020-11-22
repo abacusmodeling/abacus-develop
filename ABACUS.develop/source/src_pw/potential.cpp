@@ -507,10 +507,13 @@ void potential::v_xc
                 }//end if
 
                 XC_Functional::xc_spin( arhox, zeta, ex, ec, vx[0], vx[1], vc[0], vc[1] );
+				
+                etxc += e2 * ( ex + ec ) * rhox;
+
+                v(0, ir) = e2*( 0.5 * ( vx[0] + vc[0] + vx[1] + vc[1] ) );
+                vtxc += v(0,ir) * rho_in[0][ir];
 
                 double vs = 0.5 * ( vx[0] + vc[0] - vx[1] - vc[1] );
-                v(0, ir) = e2*( 0.5 * ( vx[0] + vc[0] + vx[1] + vc[1] ) );
-
                 if ( amag > vanishing_charge )
                 {
                     for(int ipol = 1;ipol< 4;ipol++)
@@ -519,8 +522,6 @@ void potential::v_xc
                         vtxc += v(ipol,ir) * rho_in[ipol][ir];
                     }//end do
                 }//end if
-                etxc += e2 * ( ex + ec ) * rhox;
-                vtxc += v(0,ir) * rho_in[0][ir];
             }//end if
         }//end do
     }//end if

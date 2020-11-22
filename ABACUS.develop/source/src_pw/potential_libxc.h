@@ -4,6 +4,8 @@
 
 #include "src_global/matrix.h"
 #include "src_global/vector3.h"
+#include "src_global/global_variable.h"
+#include "src_global/global_function.h"
 #include <xc.h>
 #include <vector>
 #include <tuple>
@@ -24,6 +26,13 @@ class Potential_Libxc
 	cal_input( 
 		const std::vector<XC(func_type)> &funcs, 
 		const double * const * const rho_in );
+
+	static int nspin0()
+	{
+		if     (NSPIN==1 || (NSPIN==4 && (!DOMAG && !DOMAG_Z)))		return 1;
+		else if(NSPIN==2 || (NSPIN==4 && ( DOMAG ||  DOMAG_Z)))		return 2;
+		else throw runtime_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	}
 };
 
 #endif
