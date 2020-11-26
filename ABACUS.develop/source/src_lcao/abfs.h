@@ -92,10 +92,18 @@ public:
 	
 	template<typename T1,typename T2,typename T3,typename T4>
 	static void delete_empty_ptrs( map<T1,map<T2,map<T3,weak_ptr<T4>>>> &ptrs );
-	template<typename T1,typename T2,typename T3,typename Tmatrix>
-	static void delete_threshold_ptrs( map<T1,map<T2,map<T3,shared_ptr<Tmatrix>>>> &ptrs, const double threshold);
-	template<typename T1,typename T2,typename T3,typename Tmatrix>
-	static void delete_threshold_ptrs( map<T1,map<T2,map<T3,Tmatrix>>> &ptrs, const double threshold);
+//	template<typename T1,typename T2,typename T3,typename Tmatrix>
+//	static void delete_threshold_ptrs( map<T1,map<T2,map<T3,shared_ptr<Tmatrix>>>> &ptrs, const double threshold);
+//	template<typename T1,typename T2,typename T3,typename Tmatrix>
+//	static void delete_threshold_ptrs( map<T1,map<T2,map<T3,Tmatrix>>> &ptrs, const double threshold);
+	template<typename Tkey,typename Tmatrix>
+	static void delete_threshold_ptrs( map<Tkey,Tmatrix> &ptrs, const double threshold );
+	template<typename Tkey,typename Tmatrix>
+	static void delete_threshold_ptrs( map<Tkey,shared_ptr<Tmatrix>> &ptrs, const double threshold );
+	template<typename Tkey1,typename Tkey2,typename Tvalue>
+	static void delete_threshold_ptrs( map<Tkey1,map<Tkey2,Tvalue>> &ptrs, const double threshold );
+//	template<typename Tkey,typename Tvalue>
+//	static void delete_threshold_ptrs( map<Tkey,Tvalue> &ptrs, const double threshold );
 
 	template<typename T1, typename T2, typename Tother>
 	static vector<pair<T1,T2>> get_atom_pair(const map<T1,map<T2,Tother>> &m);

@@ -24,6 +24,39 @@ void Abfs::delete_empty_ptrs( map<T1,map<T2,map<T3,weak_ptr<Tmatrix>>>> &ptrs )
 	}
 }
 
+template<typename Tkey,typename Tmatrix>
+void Abfs::delete_threshold_ptrs( map<Tkey,Tmatrix> &ptrs, const double threshold )
+{
+	for( auto iter=ptrs.begin(); iter!=ptrs.end(); )
+	{
+		if( iter->second.absmax()<=threshold )	ptrs.erase(iter++);
+		else	++iter;
+	}
+}
+
+template<typename Tkey,typename Tmatrix>
+void Abfs::delete_threshold_ptrs( map<Tkey,shared_ptr<Tmatrix>> &ptrs, const double threshold )
+{
+	for( auto iter=ptrs.begin(); iter!=ptrs.end(); )
+	{
+		if( iter->second->absmax()<=threshold )	ptrs.erase(iter++);
+		else	++iter;
+	}
+}
+
+
+template<typename Tkey1,typename Tkey2,typename Tvalue>
+void Abfs::delete_threshold_ptrs( map<Tkey1,map<Tkey2,Tvalue>> &ptrs, const double threshold )
+{
+	for( auto iter=ptrs.begin(); iter!=ptrs.end(); )
+	{
+		delete_threshold_ptrs(iter->second, threshold);
+		if( iter->second.empty() )	ptrs.erase(iter++);
+		else	++iter;
+	}
+}
+
+/*
 template<typename T1,typename T2,typename T3,typename Tmatrix>
 void Abfs::delete_threshold_ptrs( map<T1,map<T2,map<T3,shared_ptr<Tmatrix>>>> &ptrs, const double threshold)
 {
@@ -65,6 +98,7 @@ void Abfs::delete_threshold_ptrs( map<T1,map<T2,map<T3,Tmatrix>>> &ptrs, const d
 		else	++iter1;
 	}
 }
+*/
 
 template<typename T1, typename T2, typename Tother>
 vector<pair<T1,T2>> Abfs::get_atom_pair(const map<T1,map<T2,Tother>> &m)

@@ -29,7 +29,7 @@ static std::ostream & operator<<( std::ostream & os, const std::vector<T> &v )
 {
 	os<<"[";
 	for( const T &i : v )
-		os<<i<<"\t";
+		os<<i<<endl;
 	os<<"]";
 	return os;
 }
@@ -50,7 +50,8 @@ template<typename T1, typename T2>
 static std::ostream & operator<<( std::ostream & os, const std::map<T1,T2> &v )
 {
 	for( const auto &i : v )
-		os<<"{"<<i.first<<":"<<i.second<<"}"<<"\t";
+//		os<<"{"<<i.first<<":"<<i.second<<"}"<<"\t";
+		os<<i.first<<endl<<i.second<<endl;
 	return os;
 }
 

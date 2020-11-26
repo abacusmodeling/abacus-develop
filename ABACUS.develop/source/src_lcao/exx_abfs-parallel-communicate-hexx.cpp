@@ -13,12 +13,19 @@
 #endif
 
 #include "src_external/src_test/src_lcao/exx_lcao-test.h"
+#include "src_external/src_test/test_function.h"
 //#include <gperftools/profiler.h>
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D( 
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HR_exx,
 	const pair<bool,bool> &io_HR_a2D )
 {
+	/*{
+		static int istep=0;
+		ofstream ofs("HR_exx_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofs<<HR_exx<<endl;
+	}*/
+
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D");
 	
 //ofstream ofs_time("time_"+TO_STRING(MY_RANK),ofstream::app);
@@ -57,72 +64,30 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 		#endif
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D\t"<<time_during(t_start)<<endl;
 //ofs_matrixes( exx_lcao.test_dir+"test-HR_a2D_"+TO_STRING(MY_RANK), HR_a2D );
+
+	/*{
+		static int istep=0;
+		ofstream ofs("HR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofs<<HR_a2D<<endl;
+	}*/
+
 	if(GAMMA_ONLY_LOCAL)
-	{
-		HK_Gamma_m2D.resize(NSPIN);
-		HK_Gamma_m2D_pulay_seq.resize(NSPIN);
-		for( size_t is=0; is!=NSPIN; ++is )
-		{
-//gettimeofday( &t_start, NULL);
-			const map<size_t,map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[is]);
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<endl;
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(is)+"_"+TO_STRING(MY_RANK), HK_a2D );
-//gettimeofday( &t_start, NULL);
-			switch(mixing_mode)
-			{
-				case Mixing_Mode::No:
-					HK_Gamma_m2D[is] = a2D_to_m2D(HK_a2D);	break;
-				case Mixing_Mode::Plain:
-					if( HK_Gamma_m2D[is].nr && HK_Gamma_m2D[is].nc )
-						HK_Gamma_m2D[is] = (1-mixing_beta) * HK_Gamma_m2D[is] + mixing_beta * a2D_to_m2D(HK_a2D);
-					else
-						HK_Gamma_m2D[is] = a2D_to_m2D(HK_a2D);
-					break;
-				case Mixing_Mode::Pulay:
-					HK_Gamma_m2D[is] = pulay_mixing( HK_Gamma_m2D[is], HK_Gamma_m2D_pulay_seq[is], a2D_to_m2D(HK_a2D) );
-					break;
-				default:
-					throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
-			}
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<endl;
-		}
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_Gamma_m2D_"+TO_STRING(MY_RANK), HK_Gamma_m2D );
-	}
+		Ra2D_to_Km2D_mixing(HR_a2D, HK_Gamma_m2D, HK_Gamma_m2D_pulay_seq);
 	else
-	{
-		HK_K_m2D.resize(kv.nks);
-		HK_K_m2D_pulay_seq.resize(kv.nks);
-		for( size_t ik=0; ik!=kv.nks; ++ik )
-		{
-//gettimeofday( &t_start, NULL);	
-			const map<size_t,map<size_t,ComplexMatrix>> HK_a2D = R_to_K(HR_a2D[kv.isk[ik]],ik);
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<endl;
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(ik)+"_"+TO_STRING(MY_RANK), HK_a2D );
-//gettimeofday( &t_start, NULL);	
-			switch(mixing_mode)
-			{
-				case Mixing_Mode::No:
-					HK_K_m2D[ik] = a2D_to_m2D(HK_a2D);	break;
-				case Mixing_Mode::Plain:
-					if( HK_K_m2D[ik].nr && HK_K_m2D[ik].nc )
-						HK_K_m2D[ik] = (1-mixing_beta) * HK_K_m2D[ik] + mixing_beta * a2D_to_m2D(HK_a2D);
-					else
-						HK_K_m2D[ik] = a2D_to_m2D(HK_a2D);
-					break;
-				case Mixing_Mode::Pulay:
-					HK_K_m2D[ik] = pulay_mixing( HK_K_m2D[ik], HK_K_m2D_pulay_seq[ik], a2D_to_m2D(HK_a2D) );
-					break;	
-				default:
-					throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
-			}
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<endl;
-		}
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_K_m2D_"+TO_STRING(MY_RANK), HK_K_m2D );
-	}
+		Ra2D_to_Km2D_mixing(HR_a2D, HK_K_m2D, HK_K_m2D_pulay_seq);
+
+	/*{
+		static int istep=0;
+		ofstream ofs("HK_m2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		if(GAMMA_ONLY_LOCAL)
+			ofs<<HK_Gamma_m2D<<endl;
+		else
+			ofs<<HK_K_m2D<<endl;
+	}*/
 //ofs_time.close();
 }
 
-
+/*
 map<size_t,map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
 	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR) const
 {
@@ -141,8 +106,9 @@ map<size_t,map<size_t,matrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K(
 	}
 	return HK;
 }
+*/
 
-
+/*
 map<size_t,map<size_t,ComplexMatrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_to_K( 
 	const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR,
 	const size_t ik) const
@@ -170,6 +136,5 @@ map<size_t,map<size_t,ComplexMatrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_t
 	}
 	return HK;
 }
-
-
+*/
 
