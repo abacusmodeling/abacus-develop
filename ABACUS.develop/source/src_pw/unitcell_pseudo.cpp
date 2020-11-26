@@ -1265,7 +1265,8 @@ void UnitCell_pseudo::cal_nelec(void)
                 }
 		AUTO_SET("NBANDS",NBANDS);
 	}
-	else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+	//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+	else
 	{
 		if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
 		if(NBANDS < mag.get_nelup() ) 
