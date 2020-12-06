@@ -26,16 +26,18 @@ LIBXC_INCLUDE_DIR = ${LIBXC_DIR}/include
 LIBXC_LIB_DIR     = ${LIBXC_DIR}/lib
 LIBXC_LIB         = -L${LIBXC_LIB_DIR} -lxc -Wl,-rpath=${LIBXC_LIB_DIR}
 
+#CEREAL_INCLUDE_DIR = ${CEREAL_DIR}/include
+
 #==========================
 # LIBS and INCLUDES
 #==========================
 LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
 #LIBS = -liomp5 -lpthread -lm -ldl ${BOOST_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
 
-INCLUDES = -I. -Icommands -I${BOOST_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFTW_INCLUDE_DIR} -I${LIBXC_INCLUDE_DIR}
+INCLUDES = -I. -Icommands -I${BOOST_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFTW_INCLUDE_DIR} -I${LIBXC_INCLUDE_DIR} #-I${CEREAL_INCLUDE_DIR}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-OPTS     = ${INCLUDES} -Ofast -g -traceback -xHost -std=c++11 -simd -march=native -m64 -qopenmp -Werror -Wall -pedantic
+OPTS     = ${INCLUDES} -Ofast -traceback -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
 OPTS_MPI = -cxx=${CPLUSPLUS}

@@ -35,7 +35,6 @@ public:
 		const vector<string> &files_abfs,
 		const double kmesh_times=1 );				// close dK, keep Kcut
 		
-	#ifdef USE_BOOST_SERIALIZATION
 	template<typename T>
 	static void output_binary( const T &data, const string &file_name );
 	template<typename T>
@@ -46,7 +45,6 @@ public:
 	static T input_text( const string &file_name );
 	template<typename T>
 	static void bcast( T &data, const int rank_src, MPI_Comm mpi_comm );
-	#endif
 	
 private:
 	static vector<vector<Numerical_Orbital_Lm>> construct_abfs_T(

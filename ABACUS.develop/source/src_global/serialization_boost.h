@@ -1,5 +1,5 @@
-#ifndef BOOST_SERIALIZATION_H
-#define BOOST_SERIALIZATION_H
+#ifndef SERIALIZATION_BOOST_H
+#define SERIALIZATION_BOOST_H
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>

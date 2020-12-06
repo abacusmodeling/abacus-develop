@@ -8,9 +8,7 @@
 #include "exx_abfs-parallel-communicate-allreduce-template.h"
 #endif
 
-#ifdef USE_BOOST_SERIALIZATION
 #include "exx_abfs-io-template.h"
-#endif
 
 #include "src_external/src_test/src_lcao/exx_lcao-test.h"
 //#include <gperftools/profiler.h>
@@ -32,12 +30,8 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 //gettimeofday( &t_start, NULL);
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HR_a2D;
 	if(io_HR_a2D.first)
-		#ifdef USE_BOOST_SERIALIZATION
-			HR_a2D = Exx_Abfs::IO::input_binary<vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>>(
-				global_out_dir+"HR_exx_"+TO_STRING(MY_RANK));
-		#else
-			throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
-		#endif
+		HR_a2D = Exx_Abfs::IO::input_binary<vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>>(
+			global_out_dir+"HR_exx_"+TO_STRING(MY_RANK));
 	else
 	{
 		#if EXX_H_COMM==1
@@ -50,11 +44,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 		#endif
 	}
 	if(io_HR_a2D.second)
-		#ifdef USE_BOOST_SERIALIZATION
-			Exx_Abfs::IO::output_binary( HR_a2D, global_out_dir+"HR_exx_"+TO_STRING(MY_RANK) );
-		#else
-			throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
-		#endif
+		Exx_Abfs::IO::output_binary( HR_a2D, global_out_dir+"HR_exx_"+TO_STRING(MY_RANK) );
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D\t"<<time_during(t_start)<<endl;
 //ofs_matrixes( exx_lcao.test_dir+"test-HR_a2D_"+TO_STRING(MY_RANK), HR_a2D );
 	if(GAMMA_ONLY_LOCAL)
