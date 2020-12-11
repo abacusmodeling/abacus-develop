@@ -771,6 +771,59 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
 void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, ComplexMatrix &wfc_2d,
 	complex<double>* ch_mat, complex<double>* cs_mat, double *ekb)
 {
+    #ifdef TEST_DIAG
+   	{
+		static int istep = 0;
+		auto print_matrix_C = [&](const string &file_name, complex<double>*m)
+		{
+			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+			for(int ic=0; ic<ParaO.ncol; ++ic)
+			{
+				for(int ir=0; ir<ParaO.nrow; ++ir)
+				{
+					const int index=ic*ParaO.nrow+ir;
+					if(std::norm(m[index])>1E-10)
+                    {
+                        if(std::imag(m[index])>1E-10)
+                            ofs<<m[index]<<"\t";
+                        else
+                            ofs<<std::real(m[index])<<"\t";
+                    }
+					else
+						ofs<<0<<"\t";
+				}
+				ofs<<endl;
+			}
+		};
+		auto print_matrix_F = [&](const string &file_name, complex<double>*m)
+		{
+			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
+			for(int ir=0; ir<ParaO.nrow; ++ir)
+			{
+				for(int ic=0; ic<ParaO.ncol; ++ic)
+				{
+					const int index=ic*ParaO.nrow+ir;
+					if(std::norm(m[index])>1E-10)
+                    {
+                        if(std::imag(m[index])>1E-10)
+                            ofs<<m[index]<<"\t";
+                        else
+                            ofs<<std::real(m[index])<<"\t";
+                    }
+					else
+						ofs<<0<<"\t";
+				}
+				ofs<<endl;
+			}
+		};
+		print_matrix_F("H_gamma", ch_mat);
+		print_matrix_F("S_gamma", cs_mat);
+		print_matrix_C("H_gamma", ch_mat);
+		print_matrix_C("S_gamma", cs_mat);
+		++istep;
+	}
+    #endif
+
 #ifdef __MPI
 	TITLE("Pdiag_Double","diago_complex_begin");
 

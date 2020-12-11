@@ -1,13 +1,13 @@
 #include "exx_abfs-parallel-communicate-dm3.h"
+#include "exx_abfs-parallel-communicate-dm3-template.h"
 #include "src_pw/global.h"
 #include "src_lcao/global_fp.h"
-#include "src_global/matrix.h"
-#include "src_global/complexmatrix.h"
 #include "src_lcao/abfs-template.h"
 
 #include "src_external/src_test/test_function.h"
+#include "src_external/src_test/src_global/complexmatrix-test.h"
 
-
+/*
 template<> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
 Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<matrix> &DK_2D, const double threshold_D) const
 {
@@ -42,10 +42,18 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<matrix> &DK_2D, const 
 	}
 	return DR_a2D;
 }
+*/
 
+/*
 template<> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
 Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D, const double threshold_D) const
 {
+	{
+		static int istep=0;
+		ofstream ofs("DK_2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofs<<DK_2D<<endl;
+	}
+	
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 	const double SPIN_multiple = 0.5*NSPIN;
 	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{kv.nmp[0],kv.nmp[1],kv.nmp[2]};
@@ -76,9 +84,15 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 	}
 	for(auto &DR_a2D_is : DR_a2D)
 		Abfs::delete_threshold_ptrs(DR_a2D_is,threshold_D);
+	
+	{
+		static int istep=0;
+		ofstream ofs("DR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofs<<DR_a2D<<endl;
+	}	
 	return DR_a2D;
 }
-
+*/
 
 
 void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
@@ -88,4 +102,10 @@ void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 		? K_to_R(LOC.wfc_dm_2d.dm_gamma, threshold_D)
 		: K_to_R(LOC.wfc_dm_2d.dm_k, threshold_D);
 	DMr = allreduce.a2D_to_exx(DR_a2D);
+
+	/*{
+		static int istep=0;
+		ofstream ofs("DMr_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofs<<DMr<<endl;
+	}*/	
 }

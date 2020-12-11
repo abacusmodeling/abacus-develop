@@ -19,8 +19,10 @@ public:
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DMr;
 
 private:
-	template<typename M> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
-		K_to_R(const vector<M> &DK_2D, const double threshold_D) const;
+	template<typename Tmatrix> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
+		K_to_R(const vector<Tmatrix> &DK_2D, const double threshold_D) const;
+	const matrix &D_phase( const matrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const;	
+	matrix D_phase( const ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const;	
 //	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
 //		allreduce(const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &DR_a2D);
 

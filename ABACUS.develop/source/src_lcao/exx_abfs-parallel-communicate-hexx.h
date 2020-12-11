@@ -23,15 +23,25 @@ public:
 		const pair<bool,bool> &io_HR_a2D );
 
 private:
-	map<size_t,map<size_t,matrix>> R_to_K(
-		map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR) const;
-	map<size_t,map<size_t,ComplexMatrix>> R_to_K(
-		const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR,
-		const size_t ik) const;
-	template< typename T >
-	T a2D_to_m2D( const map<size_t,map<size_t,T>> & H_a2D ) const;
+//	map<size_t,map<size_t,matrix>> R_to_K(
+//		map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR) const;
+//	map<size_t,map<size_t,ComplexMatrix>> R_to_K(
+//		const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & HR,
+//		const size_t ik) const;
+//	template< typename T >
+//	T a2D_to_m2D( const map<size_t,map<size_t,T>> & H_a2D ) const;
 	template<typename T>
-	T pulay_mixing( const T &H_pulay_old, deque<T> &H_seq, const T &H_new );
+	inline T H_phase(matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const;
+	template<typename Tmatrix>
+	Tmatrix Ra2D_to_Km2D(
+		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D, const int ik) const;
+	template<typename Tmatrix>
+	void Ra2D_to_Km2D_mixing(
+		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D,
+		vector<Tmatrix> &HK_m2D,
+		vector<deque<Tmatrix>> &HK_m2D_pulay_seq) const;
+	template<typename T>
+	T pulay_mixing( const T &H_pulay_old, deque<T> &H_seq, const T &H_new ) const;
 
 	#if EXX_H_COMM==1
 	class Allreduce

@@ -1149,7 +1149,8 @@ gettimeofday( &t_start, NULL);
 			}
 		}
 	}
-	energy *= 2.0/NSPIN;			// ?
+	const map<int,double> SPIN_multiple = {{1,2}, {2,1}, {4,1}};							// ???
+	energy *= SPIN_multiple.at(NSPIN);			// ?
 	energy /= 2;					// /2 for Ry
 	
 ofs_mpi<<"TIME@ Exx_Lcao::cal_energy_cal\t"<<time_during(t_start)<<endl;

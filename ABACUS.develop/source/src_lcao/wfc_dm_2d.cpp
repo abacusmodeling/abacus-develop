@@ -11,6 +11,7 @@
 #include "src_pw/global.h"
 
 #include "src_external/src_test/test_function.h"
+#include "src_external/src_test/src_global/complexmatrix-test.h"
 
 void Wfc_Dm_2d::init()
 {
@@ -28,6 +29,17 @@ void Wfc_Dm_2d::init()
 
 void Wfc_Dm_2d::cal_dm(const matrix &wg)
 {
+	#ifdef TEST_DIAG
+	{
+		static int istep=0;
+		ofstream ofs("wfc_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		if(GAMMA_ONLY_LOCAL)
+			ofs<<wfc_gamma<<endl;
+		else
+			ofs<<wfc_k<<endl;
+	}
+	#endif
+	
 	// dm = wfc.T * wg * wfc.conj()
 	// dm[ik](iw1,iw2) = \sum_{ib} wfc[ik](ib,iw1).T * wg(ik,ib) * wfc[ik](ib,iw2).conj()
 	assert(wg.nc<=NLOCAL);
@@ -48,8 +60,10 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	{
 		static int istep=0;
 		ofstream ofs("dm_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
-		ofs<<dm_gamma<<endl;
-		++istep;
+		if(GAMMA_ONLY_LOCAL)
+			ofs<<dm_gamma<<endl;
+		else
+			ofs<<dm_k<<endl;
 	}
 	#endif
 }
