@@ -5,6 +5,7 @@
 
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
+#include <cereal/types/set.hpp>
 
 #include "src_global/vector3.h"
 #include "src_lcao/abfs-vector3_order.h"

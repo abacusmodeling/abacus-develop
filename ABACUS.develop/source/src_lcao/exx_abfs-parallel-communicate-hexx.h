@@ -102,7 +102,7 @@ private:
 		enum class Flag_Send {undo, begin_oar, finish_oar, begin_isend, finish_isend};
 		enum class Flag_Recv {undo, begin_irecv, begin_iar, finish_iar};
 		
-		vector<pair<vector<bool>,vector<bool>>> get_atom_in_2D_list() const;
+		//vector<pair<vector<bool>,vector<bool>>> get_atom_in_2D_list() const;
 		vector<size_t> get_send_size_list(
 			const set<pair<size_t,size_t>> &H_atom_pairs_core,
 			const vector<pair<vector<bool>,vector<bool>>> &atom_in_2D_list) const;

@@ -865,13 +865,13 @@ ofs_mpi<<"TIME@ Exx_Lcao::cal_DM\t"<<time_during(t_start)<<endl;
 gettimeofday( &t_start, NULL);
 	cauchy.cal_norm_D_max( DM_para.DMr );
 ofs_mpi<<"TIME@ cauchy.cal_norm_D_max\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"sizeof_DM\t"<<get_sizeof(DM_para.DMr)<<endl;
 
 gettimeofday( &t_start, NULL);
 	// HexxR[is][iat1][iat2][box2]
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR = cal_Hexx();
 ofs_mpi<<"TIME@ Exx_Lcao::cal_Hexx\t"<<time_during(t_start)<<endl;
 
-ofs_mpi<<"sizeof_DM\t"<<get_sizeof(DM_para.DMr)<<endl;
 ofs_mpi<<"sizeof_HexxR\t"<<get_sizeof(HexxR)<<endl;
 
 gettimeofday( &t_start, NULL);

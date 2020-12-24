@@ -191,6 +191,7 @@ exx_abfs-matrix_orbs21.o \
 exx_abfs-matrix_orbs22.o \
 exx_abfs-matrix_lcaoslcaos_lcaoslcaos.o \
 exx_abfs-pca.o \
+exx_abfs-parallel-communicate-function.o \
 exx_abfs-parallel-communicate-dm3.o \
 exx_abfs-parallel-communicate-dm3-allreduce.o \
 exx_abfs-parallel-communicate-hexx.o \

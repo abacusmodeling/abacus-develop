@@ -1,4 +1,5 @@
 #include "exx_abfs-parallel-communicate-hexx.h"
+#include "exx_abfs-parallel-communicate-function.h"
 
 #include "src_pw/global.h"
 #include "src_lcao/global_fp.h"
@@ -19,7 +20,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	MPI_Comm_size(mpi_comm, &comm_sz);
 	MPI_Comm_rank(mpi_comm, &my_rank);
 	
-	atom_in_2D_list = get_atom_in_2D_list();
+	atom_in_2D_list = Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(mpi_comm);
 	send_size_list = get_send_size_list(H_atom_pairs_core, atom_in_2D_list);
 	recv_size = ParaO.nrow * ParaO.ncol * sizeof(double);
 }
@@ -157,36 +158,6 @@ ofs<<"wait_thread\t"<<cut_time(t)<<endl;
 	
 ofs<<"all\t\t"<<cal_time(t_all)<<endl;
 	return data_all;
-}
-
-vector<pair<vector<bool>,vector<bool>>>
-Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_atom_in_2D_list() const
-{
-	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_atom_in_2D_list");
-	
-	bool atom_in_2D[ucell.nat*2];
-	for(int i=0; i<ucell.nat*2; ++i)
-		atom_in_2D[i]=false;
-	for(int iwt=0; iwt<NLOCAL; ++iwt)
-	{
-		const int iat = ucell.iwt2iat[iwt];
-		if( ParaO.trace_loc_row[iwt]>=0 )
-			atom_in_2D[iat] = true;
-		if( ParaO.trace_loc_col[iwt]>=0 )
-			atom_in_2D[ucell.nat+iat] = true;
-	}
-	
-	bool atom_in_2D_list_tmp[ucell.nat*2*comm_sz];
-	if(MPI_Allgather( atom_in_2D, ucell.nat*2, MPI_BYTE, atom_in_2D_list_tmp, ucell.nat*2, MPI_BYTE, mpi_comm )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-
-	vector<pair<vector<bool>,vector<bool>>> atom_in_2D_list(comm_sz, {vector<bool>(ucell.nat),vector<bool>(ucell.nat)});
-	for(int rank=0; rank<comm_sz; ++rank)
-		for(int iat=0; iat<ucell.nat; ++iat)
-		{
-			atom_in_2D_list[rank].first[iat] = atom_in_2D_list_tmp[rank*ucell.nat*2+iat];
-			atom_in_2D_list[rank].second[iat] = atom_in_2D_list_tmp[rank*ucell.nat*2+ucell.nat+iat];
-		}	
-	return atom_in_2D_list;
 }
 
 // the upper limit of size sended to each process

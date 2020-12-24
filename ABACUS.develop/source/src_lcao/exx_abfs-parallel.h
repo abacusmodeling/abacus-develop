@@ -19,6 +19,7 @@ class Exx_Abfs::Parallel
 	{
 		public:
 		class Allreduce;
+		class Function;
 		class Hexx;
 		#if EXX_DM==1
 		class DM;

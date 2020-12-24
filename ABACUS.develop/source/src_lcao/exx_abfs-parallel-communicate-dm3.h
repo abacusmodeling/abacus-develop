@@ -36,7 +36,7 @@ private:
 				vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;
 
 		private:
-			vector<map<size_t,shared_ptr<set<size_t>>>> H_atom_pairs_group_rank;	//H_atom_pairs_group_rank[rank][iat1][iat2]
+			vector<map<size_t,set<size_t>>> H_atom_pairs_group_rank;	//H_atom_pairs_group_rank[rank][iat1][iat2]
 			vector<size_t> send_size_list;
 			size_t recv_size;
 
@@ -47,12 +47,11 @@ private:
 			enum class Flag_Send {undo, begin_oar, finish_oar, begin_isend, finish_isend};
 			enum class Flag_Recv {undo, begin_irecv, begin_iar, finish_iar};
 
-			vector<pair<bool,bool>> get_atom_in_2D() const;
-			vector<map<size_t,shared_ptr<set<size_t>>>> get_H_atom_pairs_group_rank(
-				const map<set<size_t>,set<size_t>> &H_atom_pairs_group,
-				const vector<pair<bool,bool>> &atom_in_2D) const;
+			//vector<pair<bool,bool>> get_atom_in_2D() const;
+			vector<map<size_t,set<size_t>>> get_H_atom_pairs_group_rank(
+				const map<set<size_t>,set<size_t>> &H_atom_pairs_group) const;
 			void get_send_recv_size(
-				const vector<map<size_t,shared_ptr<set<size_t>>>> &H_atom_pairs_group_rank,
+				const vector<map<size_t,set<size_t>>> &H_atom_pairs_group_rank,
 				const map<set<size_t>,set<size_t>> &H_atom_pairs_group,
 				vector<size_t> &send_size_list, size_t &recv_size) const;
 			void init_flags(
