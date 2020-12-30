@@ -278,7 +278,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 						it, ic, NQX, DQ, gk[ig].norm() * ucell.tpiba );
 					}
 
-					if(NONCOLIN)
+					if(NSPIN==4)
 					{
 /*						for(int is_N = 0; is_N < 2; is_N++)*/  //for rotate base
 						for(int is_N = 0; is_N < 1; is_N++)
@@ -516,7 +516,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 					}
 
 
-					if(NONCOLIN)
+					if(NSPIN==4)
                     {
 					for(int is_N = 0; is_N < 2; is_N++)
 					{

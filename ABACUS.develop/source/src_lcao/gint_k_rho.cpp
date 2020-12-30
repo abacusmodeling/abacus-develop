@@ -135,8 +135,6 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 	int iw1_lo;
 	for(int is=0; is<NSPIN; ++is)
 	{
-//		if(NONCOLIN && !DOMAG && (is==1||is==2)) continue;//zhengdy-soc 
-//		if(NONCOLIN && !(DOMAG||DOMAG_Z) && is==3) continue;//zhengdy-soc 
 		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
 		for (int ia1=0; ia1<size; ++ia1)
 		{

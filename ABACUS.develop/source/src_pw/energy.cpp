@@ -288,7 +288,7 @@ bool print)
 					cout<<setw(10)<<mag.tot_magnetization;
 					cout<<setw(10)<<mag.abs_magnetization;
 				}
-				else if(NONCOLIN && (DOMAG||DOMAG_Z))
+				else if(NSPIN==4 && NONCOLIN)
 				{
 					cout << setprecision(2);
 					cout<<setw(10)<<mag.tot_magnetization_nc[0]<<setw(10)<<mag.tot_magnetization_nc[1]<<setw(10)<<mag.tot_magnetization_nc[2];

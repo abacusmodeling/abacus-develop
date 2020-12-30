@@ -226,7 +226,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 				{
 					
 					
-					if(!NONCOLIN)
+					if(NSPIN!=4)
 					{
 						if ( k_start == (nppstr-2) )
 						{
@@ -298,7 +298,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 		}
 		else if(BASIS_TYPE=="lcao")
 		{
-			if(!NONCOLIN)
+			if(NSPIN!=4)
 			{
 				//complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
 				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);

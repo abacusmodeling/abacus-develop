@@ -147,7 +147,7 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 									// which is a 1D array.
 									if(dtype=='S')
 									{
-										if(!NONCOLIN) LM.SlocR[nnr] = olm[0];
+										if(NSPIN!=4) LM.SlocR[nnr] = olm[0];
 										else
 										{//only has diagonal term here.
 												int is = (jj-jj0*NPOL) + (kk-kk0*NPOL)*2;
@@ -156,7 +156,7 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 									}
 									else if(dtype=='T')
 									{
-										if(!NONCOLIN) LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
+										if(NSPIN!=4) LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
 										else
 										{//only has diagonal term here.
 												int is = (jj-jj0*NPOL) + (kk-kk0*NPOL)*2;
@@ -533,7 +533,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 									double nlm[3]={0,0,0};
 									complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
 									complex<double> *nlm2 = NULL;
-									if(NONCOLIN) nlm2 = &nlm1[0];
+									if(NSPIN==4) nlm2 = &nlm1[0];
 									if(!calc_deri)
 									{
 										int is0 = (j-j0*NPOL) + (k-k0*NPOL)*2;
@@ -569,7 +569,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 										}
 										else
 										{
-											if(!NONCOLIN) LM.Hloc_fixedR[nnr] += nlm[0];
+											if(NSPIN!=4) LM.Hloc_fixedR[nnr] += nlm[0];
 											else
 											{
 												int is = (j-j0*NPOL) + (k-k0*NPOL)*2;

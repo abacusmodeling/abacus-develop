@@ -413,7 +413,7 @@ void Grid_Technique::cal_trace_lo(void)
 			{
 				++lnat;
 				int nw0 = ucell.atoms[it].nw;
-				if(NONCOLIN)
+				if(NSPIN==4)
 				{//added by zhengdy-soc, need to be double in soc
 					nw0 *= 2;
 					lgd += nw0;
@@ -431,7 +431,7 @@ void Grid_Technique::cal_trace_lo(void)
 			else
 			{
 				iw_all += ucell.atoms[it].nw;
-				if(NONCOLIN) iw_all += ucell.atoms[it].nw;
+				if(NSPIN==4) iw_all += ucell.atoms[it].nw;
 			}
 			++iat;
 		}

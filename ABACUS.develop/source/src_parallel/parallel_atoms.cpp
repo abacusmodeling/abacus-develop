@@ -99,7 +99,7 @@ void Parallel_Atoms::set_trace(int *trace_loc_row, int *trace_loc_col, int &nrow
 	for(int it=0; it<ucell.ntype; it++)
 	{
 		int nw = ucell.atoms[it].nw;
-		if(NONCOLIN) nw *= 2;//added by zhengdy-soc
+		if(NSPIN==4) nw *= 2;//added by zhengdy-soc
 		for(int ia=0; ia<ucell.atoms[it].na; ia++)
 		{
 			if( this->keep_this_atom[iat] )

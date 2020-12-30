@@ -96,8 +96,8 @@ void UnitCell_pseudo::setup_cell(
 #ifdef __MPI
 	Parallel_Common::bcast_bool(ok);
 	Parallel_Common::bcast_bool(ok2);
-	if(NONCOLIN) Parallel_Common::bcast_bool(DOMAG);
-	if(NONCOLIN) Parallel_Common::bcast_bool(DOMAG_Z);
+	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG);
+	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG_Z);
 #endif
 	if(!ok)
 	{
@@ -484,10 +484,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 
 			if(NSPIN==4)//added by zhengdy-soc
 			{
-				if(NONCOLIN && LSPINORB){
-					if(fabs(mag.start_magnetization[it])>1e-6) DOMAG_Z = true;
-				}
-				if(DOMAG)
+				if(NONCOLIN)
 				{
 					soc.m_loc[it].x = mag.start_magnetization[it] *
 							sin(soc.angle1[it]) * cos(soc.angle2[it]);
@@ -496,7 +493,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					soc.m_loc[it].z = mag.start_magnetization[it] *
 							cos(soc.angle1[it]);
 				}
-				else if(DOMAG_Z)
+				else
 				{
 					soc.m_loc[it].x = 0;
 					soc.m_loc[it].y = 0;
@@ -1330,7 +1327,7 @@ void UnitCell_pseudo::cal_nwfc()
 	{
 		atoms[it].stapos_wf = NLOCAL;
 		const int nlocal_it = atoms[it].nw * atoms[it].na;
-                if(!NONCOLIN) NLOCAL += nlocal_it;
+                if(NSPIN!=4) NLOCAL += nlocal_it;
 		else NLOCAL += nlocal_it * 2;//zhengdy-soc
 //		stringstream ss1;
 //		ss1 << "number of local orbitals for species " << it;
@@ -1489,7 +1486,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 		{
 			if (atoms[it].oc[l] >= 0)
 			{
-				if(NONCOLIN)
+				if(NSPIN==4)
 				{
 					if(atoms[it].has_so)
 					{

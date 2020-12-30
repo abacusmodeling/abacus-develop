@@ -190,7 +190,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 			}
 		}
 	}
-	if(NONCOLIN) startmag_type = 1;//zhengdy-soc, type 2 is still wrong.
+	if(NSPIN==4) startmag_type = 1;//zhengdy-soc, type 2 is still wrong.
 	OUT(ofs_warning,"startmag_type",startmag_type);
 
 
@@ -722,7 +722,7 @@ void Charge::sum_band_k(void)
 
 	complex<double>* porter = UFFT.porter;
 	complex<double>* porter1 = nullptr;
-	if(NONCOLIN) porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
+	if(NSPIN==4) porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
 
 	for (int ik = 0;ik < kv.nks;ik++)
 	{
@@ -730,7 +730,7 @@ void Charge::sum_band_k(void)
 		if (NSPIN==2) CURRENT_SPIN = kv.isk[ik];
 		
 		//  here we compute the band energy: the sum of the eigenvalues
-		if(NONCOLIN)
+		if(NSPIN==4)
 		{
 			for (int ibnd = 0;ibnd < NBANDS;ibnd++)
 			{
@@ -809,7 +809,7 @@ void Charge::sum_band_k(void)
 			}
 		}
 	} // END DO k_loop
-	if(NONCOLIN) delete[] porter1;
+	if(NSPIN==4) delete[] porter1;
 
 #ifdef __MPI
 	this->rho_mpi();

@@ -367,52 +367,45 @@ void Input_Conv::Convert(void)
 	}
 
 	//added by zhengdy-soc
-	if(INPUT.noncolin)
+	if(NSPIN == 4)
 	{
-		NONCOLIN = true;
-		NSPIN = 4;
+		NONCOLIN = INPUT.noncolin;
 		//wavefunctions are spinors with 2 components
 		NPOL = 2;
 		//set the domag variable to make a spin-orbit calculation with zero magnetization
-		if(INPUT.lspinorb)
+		if(NONCOLIN)
 		{
-			LSPINORB = true;
-			DOMAG = false;
+			DOMAG = true;
+			DOMAG_Z = false;
 		}
 		else{
-			LSPINORB = false;
-			DOMAG = true;
+			DOMAG = false;
+			DOMAG_Z = true;
 		}
+		LSPINORB = INPUT.lspinorb;
+
 		delete[] soc.m_loc;
 		delete[] soc.angle1;
 		delete[] soc.angle2;
 		soc.m_loc = new Vector3<double> [INPUT.ntype];
 		soc.angle1 = new double[INPUT.ntype];
 		soc.angle2 = new double[INPUT.ntype];
-		bool has_angle1=0,has_angle2=0;
-		if(sizeof(INPUT.angle1) / sizeof(INPUT.angle1[0]) == INPUT.ntype) has_angle1=1;
-		if(sizeof(INPUT.angle2) / sizeof(INPUT.angle2[0]) == INPUT.ntype) has_angle2=1;
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
-			if(has_angle1)
-				soc.angle1[i] = INPUT.angle1[i]/180*PI;
-			else soc.angle1[i] = 0;
-			if(has_angle2)
-				soc.angle2[i] = INPUT.angle2[i]/180*PI;
-			else soc.angle2[i] = 0;
-#ifdef __MPI
-			Parallel_Common::bcast_double(soc.angle1[i]);
-			Parallel_Common::bcast_double(soc.angle2[i]);
-#endif
+			soc.angle1[i] = INPUT.angle1[i]/180*PI;
+			soc.angle2[i] = INPUT.angle2[i]/180*PI;
 		}
+#ifdef __MPI
+//			Parallel_Common::bcast_double(soc.angle1[i]);
+//			Parallel_Common::bcast_double(soc.angle2[i]);
+#endif
 	}
 	else{
 		LSPINORB = false;
 		NONCOLIN = false;
 		DOMAG = false;
+		DOMAG_Z = false;
 		NPOL = 1;
-
-		soc.m_loc = new Vector3<double> [INPUT.ntype];
 	}
 	
 //----------------------------------------------------------

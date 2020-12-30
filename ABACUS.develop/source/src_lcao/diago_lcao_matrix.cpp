@@ -169,7 +169,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 
 	ParaO.diago_complex_begin(ik, wfc, wfc_2d, LM.Hloc2, LM.Sloc2, wf.ekb[ik]);
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
-	if(NONCOLIN)
+	if(NSPIN==4)
 	{
 		int row = GridT.lgd;
 		vector<complex<double>> tmp(row);
@@ -221,7 +221,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	ComplexMatrix hvec(NLOCAL, NBANDS);
 	hm.cdiaghg(NLOCAL, NBANDS, Htmp, Stmp, NLOCAL, en, hvec);
 
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	for(int ib=0; ib<NBANDS; ib++)
 	{
 		for(int iw=0; iw<NLOCAL; iw++)

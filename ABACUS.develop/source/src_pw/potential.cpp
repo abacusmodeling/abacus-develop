@@ -992,7 +992,7 @@ void potential::newd()
                             ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
                             ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
                         }
-                        else if( NONCOLIN )
+                        else if( NSPIN==4 )
                         {
                             if(is==0)
                             {

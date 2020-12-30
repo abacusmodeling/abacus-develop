@@ -321,7 +321,7 @@ void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 		// in LCAO basis.
 		//--------------------------
 		LM.zeros_HSR('H', LNNR.nnr);
-		if(!NONCOLIN) this->GK.folding_vl_k(ik);
+		if(NSPIN!=4) this->GK.folding_vl_k(ik);
 		else this->GK.folding_vl_k_nc(ik);
 	}
 
@@ -564,7 +564,7 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
                                 iic=mu*ParaO.ncol+nu;
                             }
 
-                            if(!NONCOLIN)
+                            if(NSPIN!=4)
                             {
                                 LM.SlocR_tr[R_x][R_y][R_z][iic] = LM.SlocR[index];
                                 LM.Hloc_fixedR_tr[R_x][R_y][R_z][iic] = LM.Hloc_fixedR[index];

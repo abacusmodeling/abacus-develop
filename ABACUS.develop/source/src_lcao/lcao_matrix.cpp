@@ -147,7 +147,7 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 
 void LCAO_Matrix::allocate_HS_R(const int &nnR)
 {
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		delete[] HlocR;
 		delete[] SlocR;
@@ -393,7 +393,7 @@ void LCAO_Matrix::zeros_HSk(const char &mtype)
 
 void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 {
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		if (mtype=='S') ZEROS(SlocR, nnr);
 		else if (mtype=='T') ZEROS(Hloc_fixedR, nnr);
@@ -727,7 +727,7 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         Hloc_fixedR_tr = new double***[R_x];
         //HR_tr = new double***[R_x];
@@ -802,7 +802,7 @@ void LCAO_Matrix::allocate_HR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         HR_tr = new double***[R_x];
         for(int ix=0; ix<R_x; ix++)
@@ -851,7 +851,7 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         SlocR_tr = new double***[R_x];
         for(int ix=0; ix<R_x; ix++)
@@ -900,7 +900,7 @@ void LCAO_Matrix::destroy_Hloc_fixedR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         for(int ix=0; ix<R_x; ix++)
         {

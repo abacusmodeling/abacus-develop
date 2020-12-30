@@ -439,7 +439,6 @@ void Input::Default(void)
 	//added by zhengdy-soc
 	noncolin = false;
 	lspinorb = false;
-	starting_spin_angle = false;
 	angle1[0] = 0.0;
 	angle2[0] = 0.0;
 
@@ -1633,10 +1632,6 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, lspinorb);
 		}
-		else if (strcmp("starting_spin_angle", word) == 0)
-		{
-			read_value(ifs, starting_spin_angle);
-		}
 		else if (strcmp("angle1", word) == 0)
 		{
 			delete[] angle1;
@@ -2245,11 +2240,33 @@ void Input::Bcast()
 		Parallel_Common::bcast_double( eps_degauss );
 		Parallel_Common::bcast_bool( noncolin );
 		Parallel_Common::bcast_bool( lspinorb );
-		Parallel_Common::bcast_bool( starting_spin_angle );
-		for(int i = 0;i<ntype;i++)
+		if(noncolin)
 		{
-			Parallel_Common::bcast_double(angle1[i]);
-			Parallel_Common::bcast_double(angle2[i]);
+			if(MY_RANK==0)
+			{
+				if((sizeof(angle1) / sizeof(angle1[0]) != this->ntype)){
+					delete[] angle1;
+					angle1 = new double [this->ntype];
+					ZEROS(angle1, this->ntype);
+				}
+				if(sizeof(angle2) / sizeof(angle2[0]) != this->ntype){
+					delete[] angle2;
+					angle2 = new double [this->ntype];
+					ZEROS(angle2, this->ntype);
+				}
+			}
+			if(MY_RANK!=0)
+			{
+				delete[] angle1;
+				angle1 = new double [this->ntype];
+				delete[] angle2;
+				angle2 = new double [this->ntype];
+			}
+			for(int i = 0;i<this->ntype;i++)
+			{
+				Parallel_Common::bcast_double(angle1[i]);
+				Parallel_Common::bcast_double(angle2[i]);
+			}
 		}
 	
 		//Parallel_Common::bcast_int( epsilon0_choice );
@@ -3005,7 +3022,7 @@ void Input::Print(const string &fn)const
 #endif
 	OUTP(ofs,"calculation",calculation,"test; scf; relax; nscf; ienvelope; istate;");
 	OUTP(ofs,"ntype",ntype,"atom species number");
-	OUTP(ofs,"nspin",nspin,"1: single spin; 2: up and down spin;");
+	OUTP(ofs,"nspin",nspin,"1: single spin; 2: up and down spin; 4: noncollinear spin");
 	OUTP(ofs,"nbands",nbands,"number of bands");
 	OUTP(ofs,"nbands_istate",nbands_istate,"number of bands around Fermi level for istate calulation");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	

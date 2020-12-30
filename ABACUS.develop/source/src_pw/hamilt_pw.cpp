@@ -187,7 +187,7 @@ void Hamilt_PW::cinitcgg(
 //    timer::tick("Hamilt_PW","construct_HS");
 	const int npw = kv.ngk[ik];
 	int dmin,dmax;
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		dmin= npw;
 		dmax = wf.npwx;
@@ -434,7 +434,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
     int j = 0;
     int ig= 0;
 
-	if(!NONCOLIN) ZEROS(hpsi, wf.npw);
+	if(NSPIN!=4) ZEROS(hpsi, wf.npw);
 	else ZEROS(hpsi, wf.npwx * NPOL);//added by zhengdy-soc
 
 	//------------------------------------
@@ -447,7 +447,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 			hpsi[ig] = wf.g2kin[ig] * psi_in[ig];
 		}
 		//added by zhengdy-soc
-		if(NONCOLIN){
+		if(NSPIN==4){
 			for (ig = wf.npwx;ig < wf.npw + wf.npwx;ig++)
 			{
 				hpsi[ig] = wf.g2kin[ig - wf.npwx] * psi_in[ig];
@@ -460,7 +460,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 	//------------------------------------
 	if(VL_IN_H)
 	{
-		if(!NONCOLIN){
+		if(NSPIN!=4){
 			ZEROS( UFFT.porter, pw.nrxxs);
 			UFFT.RoundTrip( psi_in, pot.vrs1, GR_index, UFFT.porter );
 
@@ -523,7 +523,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 				for (;p<p_end;++p,++psip)
 				{
 //					becp[i] += psi_in[j]* conj( ppcell.vkb(i,j) );
-					if(!NONCOLIN) becp[i] += psip[0]* conj( p[0] );
+					if(NSPIN!=4) becp[i] += psip[0]* conj( p[0] );
 					else{
 						becp[i*2] += psip[0]* conj( p[0] );
 						becp[i*2+1] += psip[wf.npwx]* conj( p[0] );
@@ -571,7 +571,7 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
             {
                 for (int ip2=0; ip2<Nprojs; ip2++)
                 {
-			if(!NONCOLIN)
+			if(NSPIN!=4)
 				this->Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
 			else
 			{
@@ -582,7 +582,7 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
 			}
                 }// end ih
             }//end jh
-		if(!NONCOLIN) sum += Nprojs;
+		if(NSPIN!=4) sum += Nprojs;
 		else sum += 2 * Nprojs;
 		++iat;
         } //end na
@@ -600,7 +600,7 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
 
 
 	// use simple method.
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	for(int i=0; i<ppcell.nkb; i++)
 	{
 		complex<double>* p = &ppcell.vkb(i,0);

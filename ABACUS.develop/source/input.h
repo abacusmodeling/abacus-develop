@@ -333,7 +333,7 @@ public:
 	//added by zhengdy-soc
 	bool noncolin;
 	bool lspinorb;
-	bool starting_spin_angle;
+//	bool starting_spin_angle;
 	double *angle1;
 	double *angle2;
 		

@@ -794,12 +794,12 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 for(int is=0; is<NSPIN; ++is)
                     ZEROS(DM_ATOM[is], ng);
                 ZEROS(WFC_PHASE, NBANDS*nw1);
-                if(!NONCOLIN)cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+                if(NSPIN!=4)cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
                 else cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
 
                 ++ca;
 
-                if(!NONCOLIN)
+                if(NSPIN!=4)
                 {
                     for(int is=0; is<NSPIN; ++is)
                     {
@@ -815,18 +815,18 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                     {
                         //note: storage nondiagonal term as Re[] and Im[] respectly;
                         this->DM_R[0][gstart+iv]=DM_ATOM[0][iv].real() + DM_ATOM[3][iv].real();
-			if(DOMAG){
+			if(NONCOLIN){//DOMAG
                             this->DM_R[1][gstart+iv]=DM_ATOM[1][iv].real() + DM_ATOM[2][iv].real();
                             this->DM_R[2][gstart+iv]=DM_ATOM[1][iv].imag() - DM_ATOM[2][iv].imag();
                             this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
 			}
-			else if(DOMAG_Z)
+			else if(!NONCOLIN)//DOMAG_Z
 			{
                             this->DM_R[1][gstart+iv]= 0.0;
                             this->DM_R[1][gstart+iv]= 0.0;
                             this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
 			}
-			else
+			else//soc with no mag 
                         {
                             this->DM_R[1][gstart+iv]= 0.0;
                             this->DM_R[2][gstart+iv]= 0.0;

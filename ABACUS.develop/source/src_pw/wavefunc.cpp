@@ -87,7 +87,7 @@ LiuXh modify 20180619*/
 
 	// if use spin orbital, do not double nks but double allocate evc and wanf2.
 	int prefactor = 1;
-	if(NONCOLIN) prefactor = NPOL;//added by zhengdy-soc
+	if(NSPIN==4) prefactor = NPOL;//added by zhengdy-soc
 	
 	this->ekb = new double*[nks];
 	for(int ik=0; ik<nks; ik++)

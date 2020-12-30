@@ -153,7 +153,7 @@ void toWannier90::read_nnkp()
 		//if( (kv.nkstot == 1) && (kv.kvec_d[0] == my_gamma_point) ) gamma_only_wannier = true;
 	} 
 	
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		if( SCAN_BEGIN(nnkp_read,"projections") )
 		{
