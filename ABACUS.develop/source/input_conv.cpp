@@ -367,6 +367,9 @@ void Input_Conv::Convert(void)
 	}
 
 	//added by zhengdy-soc
+	if(INPUT.noncolin||INPUT.lspinorb) {
+		NSPIN = 4;
+	}
 	if(NSPIN == 4)
 	{
 		NONCOLIN = INPUT.noncolin;

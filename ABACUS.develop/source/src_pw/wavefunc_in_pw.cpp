@@ -287,7 +287,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 							if(ucell.atoms[it].has_so)
 							{
 								const double j = abs(double(L+is_N) - 0.5);
-								if (INPUT.starting_spin_angle|| !(DOMAG||DOMAG_Z))
+								if (!(DOMAG||DOMAG_Z))
 								{//atomic_wfc_so
 									for(int m=0; m<2*L+1; m++)
 									{
@@ -305,59 +305,23 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 										}	
 										iwall+=2;
 									}
-								
-
-					                                /*double fact[2];
-									for(int m=-L-1;m<L+1;m++)
-                                					{
-                                						fact[0] = soc.spinor(L,j,m,0);
-                                   						fact[1] = soc.spinor(L,j,m,1);
-                                   						if (fabs(fact[0])>1e-8||fabs(fact[1])>1e-8)
-                                   						{
-                                      							for(int is=0;is<2;is++)
-                                      							{
-                                          							if(fabs(fact[is])>1e-8)
-                                          //if(1)
-                                          							{
-                                              								const int ind = ppcell.lmaxkb + soc.sph_ind(L,j,m,is);
-                                              								ZEROS(aux, npw);
-                                              								for(int n1=0;n1<2*L+1;n1++){
-                                                 								const int lm = L*L +n1;
-                                                 								if(fabs(soc.rotylm(n1,ind))>1e-8)
-                                                   								for(int ig=0; ig<npw;ig++) 
-                                                      									aux[ig] += soc.rotylm(n1,ind)* ylm(lm,ig);
-                                              								}
-													const int lm = L*L + m + L + 1;
-                                              								for(int ig=0; ig<npw;ig++)
-													{
-                                                								psi(iwall, ig + wf.npwx*is ) = lphase * fact[is] * sk[ig] * aux[ig] * flq[ig];
-													}
-                                          							}
-                                          							else 
-                                            							for(int ig=0; ig<npw;ig++) psi(iwall,ig+ wf.npwx*is) = complex<double>(0.0 , 0.0);
-                                      							}//is
-											cout<<"iwall: "<<iwall<<" "<<L<<endl;
-                                      							iwall++;
-                                   						}//if
-                                					}//m*/
-                            				}//if
-                            else
-                            {//atomic_wfc_so_mag
-
-                              double alpha, gamma;
-                              complex<double> fup,fdown;
+								}//if
+								else
+								{//atomic_wfc_so_mag
+									double alpha, gamma;
+									complex<double> fup,fdown;
                               //int nc;
                               //This routine creates two functions only in the case j=l+1/2 or exit in the other case  
-                              if(fabs(j-L+0.5<1e-4)) continue;
-                              delete[] chiaux;
-                              chiaux = new double [npw];
+									if(fabs(j-L+0.5<1e-4)) continue;
+									delete[] chiaux;
+									chiaux = new double [npw];
                               //Find the functions j= l- 1/2
-                              if(L==0) 
-                                 for(int ig=0;ig<npw;ig++){
-                                    chiaux[ig] = flq[ig];
-                                 }
-                              else
-                              {
+									if(L==0) 
+									for(int ig=0;ig<npw;ig++){
+										chiaux[ig] = flq[ig];
+									}
+									else
+									{
                                  /*for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
                                  {
                                     if((ucell.atoms[it].lchi[ib] == L)&&(fabs(ucell.atoms[it].jjj[ib]-L+0.5)<1e-4))
@@ -366,16 +330,16 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
                                        break;
                                     }
                                  }*/
-                                 for(int ig=0;ig<npw;ig++)
-                                 {//Average the two functions
-                                    chiaux[ig] =  L * 
-                                         Mathzone::Polynomial_Interpolation(table_local,
-                                                               it, ic, NQX, DQ, gk[ig].norm() * ucell.tpiba );
+										for(int ig=0;ig<npw;ig++)
+										{//Average the two functions
+											chiaux[ig] =  L * 
+												Mathzone::Polynomial_Interpolation(table_local,
+												it, ic, NQX, DQ, gk[ig].norm() * ucell.tpiba );
 
-                                    chiaux[ig] += flq[ig] * (L+1.0) ;
-                                    chiaux[ig] *= 1/(2.0*L+1.0);
-                                 }
-                              }
+											chiaux[ig] += flq[ig] * (L+1.0) ;
+											chiaux[ig] *= 1/(2.0*L+1.0);
+										}
+									}
                               //and construct the starting wavefunctions as in the noncollinear case.
                               alpha = soc.angle1[it];
                               gamma = -1 * soc.angle2[it] + 0.5 * PI;
@@ -524,7 +488,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
                         if(ucell.atoms[it].has_so)
                         {
                             const double j = double(L+is_N) - 0.5;
-                            if (INPUT.starting_spin_angle|| !(DOMAG||DOMAG_Z))
+                            if ( !(DOMAG||DOMAG_Z))
                             {//atomic_wfc_so
                                 double fact[2];
                                 for(int m=-L-1;m<L+1;m++)

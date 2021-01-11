@@ -3304,7 +3304,6 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"eps_degauss",eps_degauss,"degauss in calculating epsilon0");
 	OUTP(ofs,"noncolin",noncolin,"using non-collinear-spin");
 	OUTP(ofs,"lspinorb",lspinorb,"consider the spin-orbit interaction");
-	OUTP(ofs,"starting_spin_angle",starting_spin_angle,"starting_spin_angle");
 	
 	//OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
 
