@@ -111,10 +111,10 @@ public:
     //==================
     //  void set_nggm()
     //==================
-    int nggm;          				// =ngl(PWSCF);
+    int nggm;          				// =ngl(another dft code);
     // number of |G| shells (i.e., how many different |G|s)
     double *ggs;         			// store the |G|^2 for each shell
-    int *ig2ngg;        			//=*igtong1 (pWSCF)
+    int *ig2ngg;        			//=*igtong1 (another dft code)
     // G -> correspondence shells of G
     // end charge grids
 

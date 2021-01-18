@@ -684,7 +684,7 @@ void Charge::non_linear_core_correction
     else
     {
         // here the case where the charge is in analytic form,
-        // check old version before 2008-12-9 or see pwscf
+        // check old version before 2008-12-9
     }
     return;
 }

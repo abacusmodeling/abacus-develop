@@ -464,7 +464,7 @@ void electrons::c_bands(void)
         {
             for (int ig = 0;ig < wf.npw; ig++)
             {
-                h_diag[ig] = max(1.0, wf.g2kin[ig]); // pwscf-2.1.2
+                h_diag[ig] = max(1.0, wf.g2kin[ig]);
                 if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
             }
         }

@@ -14,7 +14,7 @@ http://abacus.ustc.edu.cn
 
 "SIA" stands for "Systematically Improvable Atomic orbitals generator"
 
-COPYRIGHT 2015, the ABACUS team, Key Laboratory of Quantum Information,
+COPYRIGHT 2018, the ABACUS team, Key Laboratory of Quantum Information,
 University of Science and Technology
 
 
@@ -27,16 +27,10 @@ Email: helx@ustc.edu.cn
 
 
 ---------------------------------------------------------------------
-There are generally 5 directories in this package.
+There are generally 4 directories in this package.
 
 bin:
 Contains some executable files.
-
-data:
-Contains some basic data you may use in the calculation. It further includes two subdirectorie:
-1. elements: pseudopotential files of a selected set of elements, ORBITAL_INPUT and reference
-   and reference basis set.
-2. structures: various structures.
 
 examples:
 Contains test examples.
@@ -54,8 +48,15 @@ Currently ABACUS provides the following features and functionalities:
 (DFT) with local-density or generalized gradient approximations (LDA/GGAs).
 2. Brillouin zone sampling using the Monkhorst-Pack special k-points.
 3. Geometry relaxation with both Conjugated Gradient (CG) and BroydenFletcherGoldfarbShanno (BFGS) methods.
-4. Semi-empirical van der Waals energy correction using the Grimme DFT-D2 scheme.
+4. Semi-empirical van der Waals energy correction using the Grimme DFT-D2/D3 scheme.
 5. NVT molecular dynamics simulation using the Nose-Hoover thermostat. 
+6. Stress calculation and cell relaxation.
+7. Electric polarization calculation using Berry Phase theory.
+8. Interface to the Wannier90 package.
+9. Real-time time dependent density functional theory (TDDFT).
+10. Electrostatic potential.
+11. Mulliken charge analysis.
+12. Projected density of states (PDOS).
 
 ---------------------------------------------------------------------
 The developers of ABACUS include
@@ -67,11 +68,16 @@ Advisor:
 Developers:
 
 Now:
-Mohan Chen		2006~ (Concerns all the codes)
-Pengfei Li              2012~ (Orbital gereneration, CG, Symmetry, test)
-Xiaohui Liu             2012~ (Speed up, charge extrapolation, MD, test)
-Peize Lin               2013~ (vdwD2)
-Daye Zheng              2013~ (MD)
+Mohan Chen      2006~ (Setting up the infrastructure of the codes)
+Xiaohui Liu             2012~ (Overall structure, code optimization, charge extrapolation, MD, test)
+Yu Shen                 2016~ (Interface to the ELPA library, performance optimization, efficient parallelization)
+Weishuai Zhang          2016~ (Pseudoptential and numerical orbital basis generation)
+Pengfei Li              2012~ (Orbital generation, CG, Symmetry, test)
+Peize Lin               2013~ (vdwD2, hybrid functional)
+Daye Zheng              2013~ (MD, stress tensor)
+Fuxiang He              2015~ (TDDFT)
+Gan  Jin                2016~ (Berry phase, interface to Wannier90)
+Yuyang Ji               2019~ (vdwD3, hybrid functional)
 
 Former:
 Jie Liu 		2007~2008 (Makefile, Speed up using C++)

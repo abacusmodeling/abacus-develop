@@ -736,7 +736,7 @@ double &sx, double &v1x, double &v2x)
     const double c5 = 4.0 * third;
     // parameters of the functional
     double k[3] = { 0.8040, 1.24500, 0.8040 };
-    const double mu[3] = {0.2195149727645171, 0.2195149727645171, 0.12345679012345679012} ;//modified by zhengdy, to ensure the same parameters with pwscf.
+    const double mu[3] = {0.2195149727645171, 0.2195149727645171, 0.12345679012345679012} ;//modified by zhengdy, to ensure the same parameters with another dft code.
 
     const double agrho = sqrt(grho);
     const double kf = c2 * pow(rho, third);
