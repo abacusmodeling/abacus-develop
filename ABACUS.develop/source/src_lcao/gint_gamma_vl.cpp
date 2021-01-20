@@ -866,7 +866,7 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
     }
 
     const int mkl_threads = mkl_get_max_threads();
-    mkl_set_num_threads(1);
+	mkl_set_num_threads(std::max(1,mkl_threads/GridT.nbx));		// Peize Lin update 2021.01.20
 
 
 	#pragma omp parallel

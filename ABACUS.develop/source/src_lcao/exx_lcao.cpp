@@ -1333,7 +1333,7 @@ ofs_mpi.close();
 vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::cal_Hexx() const
 {
 	const int mkl_threads = mkl_get_max_threads();
-	mkl_set_num_threads(1);
+	mkl_set_num_threads(std::max(1UL,mkl_threads/atom_pairs_core.size()));
 	
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR(NSPIN);
 	omp_lock_t Hexx_lock;
