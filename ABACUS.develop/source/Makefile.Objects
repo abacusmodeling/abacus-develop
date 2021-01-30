@@ -181,6 +181,7 @@ cal_r_overlap_R.o \
 OBJS_WANNIER=wan_global.o\
 bessel_basis.o\
 numerical_basis.o\
+numerical_descriptor.o\
 wavefunc_in_pw.o\
 
 OBJS_EPM=run_epm.o\

@@ -287,6 +287,10 @@ void Input::Default(void)
 	charge_extrap = "atomic";//xiaohui modify 2015-02-01
     out_charge = 0;
 	out_dm = 0;
+
+	out_descriptor = 0; // caoyu added 2020-11-24, mohan added 2021-01-03
+	lmax_descriptor = 2; // mohan added 2021-01-03
+
     out_potential = 0;
     out_wf = false;
 	out_dos = 0;
@@ -1064,6 +1068,14 @@ bool Input::Read(const string &fn)
         else if (strcmp("out_dm", word) == 0)
         {
             read_value(ifs, out_dm);
+        }
+        else if (strcmp("out_descriptor", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
+        {
+            read_value(ifs, out_descriptor);
+        }
+        else if (strcmp("lmax_descriptor", word) == 0)// mohan added 2021-01-03
+        {
+            read_value(ifs, lmax_descriptor);
         }
         else if (strcmp("out_potential", word) == 0)
         {
@@ -2078,6 +2090,9 @@ void Input::Bcast()
     Parallel_Common::bcast_string( charge_extrap );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( out_charge );
     Parallel_Common::bcast_int( out_dm );
+    Parallel_Common::bcast_int( out_descriptor ); // caoyu added 2020-11-24, mohan modified 2021-01-03
+    Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
+
     Parallel_Common::bcast_int( out_potential );
     Parallel_Common::bcast_bool( out_wf );
 	Parallel_Common::bcast_int( out_dos );
@@ -3088,6 +3103,8 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"move_method",ion_dynamics,"bfgs; sd; cg; cg_bfgs;"); //pengfei add 2013-08-15
 	OUTP(ofs,"out_level",out_level,"ie(for electrons); i(for ions);");
 	OUTP(ofs,"out_dm",out_dm,">0 output density matrix");
+	OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");//caoyu added 2020-11-24, mohan added 2021-01-03
+	OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");//caoyu added 2020-11-24, mohan added 2021-01-03
 
 	ofs << "\n#Parameters (4.LCAO)" << endl;
 	//OUTP(ofs,"local_basis",local_basis,"0:PW; 1:LO in pw; 4:LCAO"); xiaohui modify 2013-09-01

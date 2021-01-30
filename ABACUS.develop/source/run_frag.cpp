@@ -134,6 +134,9 @@ void Run_Frag::pw_line(void)
     Ions ions;
 	ions.opt_ions_pw();
 
+
+
+
     //if (MLWF_FLAG)
     //{
     //    mlwf_optimize op;
@@ -363,6 +366,15 @@ void Run_Frag::frag_pw_line(void)
 //	{
     Ions ions;
     ions.opt_ions_pw();
+
+
+    // caoyu added 2020-11-24, mohan updated 2021-01-03
+    if(BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
+    {
+        Numerical_Descriptor nc;
+        nc.output_descriptor(wf.evc, INPUT.lmax_descriptor);
+        DONE(ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
+    }
 
 //	}
     //if (LOCAL_BASIS==0 && winput::out_spillage) xiaohui modify 2013-09-01

@@ -388,6 +388,13 @@ public:
 	//The two parameters below are not usable currently
 	int dftu_type;                  //1:rotationally invarient formalism; 2:simplified form(default)
 	int double_counting;            // 1:FLL(fully localized limit)(default); 2:AMF(around mean field)
+
+
+	// for deepks
+    int out_descriptor; // output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
+	int lmax_descriptor; // lmax used in descriptor, mohan added 2021-01-03
+
+
 	private:
 //==========================================================
 // MEMBER FUNCTIONS :
