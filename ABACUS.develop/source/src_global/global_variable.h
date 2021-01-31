@@ -93,7 +93,6 @@ extern bool GAMMA_ONLY_PW; // mohan add 2012-06-05
 extern int T_IN_H; // 23, calculate T in H or not.
 extern int VL_IN_H; // 24, calculate Vl in H or not.
 extern int VNL_IN_H; // 25, calculate Vnl in H or not.
-extern int ZEEMAN_IN_H; // SunZhiyuan add 
 extern double   STRESS_THR; //LiuXh add 20180515
 
 extern int tddft;	//fuxiang add 2016-10-27
@@ -159,25 +158,12 @@ extern string	global_atom_card;
 extern string 	global_kpoint_card;
 extern string	global_wannier_card;
 
-//#ifndef __EPM
 extern string	global_pseudo_dir;
 extern string   global_pseudo_type; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
-//#else
-extern string	global_epm_pseudo_card;
-//#endif
-
 extern string 	global_out_dir;
 
 extern ofstream ofs_running;
 extern ofstream ofs_warning;
-
-#ifdef __EPM
-extern int EPM_SPIN_ORBITAL;
-extern bool EPM_ZEEMAN;
-extern double EPM_MAG_FIELD_X;
-extern double EPM_MAG_FIELD_Y;
-extern double EPM_MAG_FIELD_Z;
-#endif
 
 //==========================================================
 // EXPLAIN : test level for each class
@@ -226,18 +212,12 @@ extern int test_setout;
 //==========================================================
 // src_epm || src_pseudo
 //==========================================================
-#ifdef __EPM
-extern int test_epm;
-extern int test_epm_unitcell;
-extern int test_epm_nscf;
-#else
 extern int test_pseudo_cell;
 extern int test_pp;
 extern int test_kmesh;
 extern int test_mlwf_overlap;
 extern int test_mlwf_optimize;
 extern int test_ion_dynamics;
-#endif
 //==========================================================
 // src_tools
 //==========================================================
@@ -245,7 +225,7 @@ extern int test_figure;
 extern int test_mathzone;
 extern int test_deconstructor;
 
-extern bool 	FINAL_SCF; //LiuXh add 20180619
+extern bool FINAL_SCF; //LiuXh add 20180619
 extern int NEW_DM;  // Shen Yu add 2019/5/9
 
 #endif

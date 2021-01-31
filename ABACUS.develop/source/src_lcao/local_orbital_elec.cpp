@@ -770,37 +770,9 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			//--------------------------------------
 			if(DCOLOR==0)
 			{
-				/*
-				//xiaohui modify 2013-09-02
-				//if(LINEAR_SCALING==1)
-				//{
-				//	Diago_LCAO_Matrix DLM;
-				//	// write the wave functions into LOWF.WFC_GAMMA.
+				// this part can only be used with linear-scaling methods
+				// --mohan 2021-01-30
 
-
-				//	// mohan add 2011-04-15
-				//	//DLM.solve_double_matrix(ik, LOWF.WFC_GAMMA[CURRENT_SPIN]);
-				//	// the temperary array totwfc only have one spin direction.
-				//	DLM.solve_double_matrix(ik, SGO.totwfc[0]);
-				//}
-				//else if(LINEAR_SCALING==2)
-				//{	
-				//	if(NURSE)
-				//	{
-				//		// the full matrix method.
-				//		//ON.run_gamma(ik);
-				//	}
-				//	else
-				//	{
-				//		//ON.run_gamma_sparse(ik);
-				//	}
-				//}
-				//else
-				//{
-				//	WARNING_QUIT("Local_Orbital_Elec::cal_bands","check LINEAR_SCALING");
-				//} xiaohui modify 2013-09-02. Attention...
-				*/
-				
 				//xiaohui add 2013-09-02
 				Diago_LCAO_Matrix DLM;
 

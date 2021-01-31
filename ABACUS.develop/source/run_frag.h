@@ -20,7 +20,7 @@ public:
 	
 	// perform Linear Combination of Atomic Orbitals (LCAO) calculations
     void LCAO_line(void);
-\
+
 	// perform plane wave basis calculations
     void plane_wave_line(void);
 

@@ -17,7 +17,11 @@
 Run_Frag::Run_Frag(){}
 Run_Frag::~Run_Frag(){}
 
-
+// * initialize the NPOOL for k-points
+// * initialize the input parameters for wannier functions
+// * setup the unit cell
+// * symmetry analysis
+// * setup the k-points according to symmetry annalysis
 void Run_Frag::init(void)
 {
 	TITLE("Run_Frag","init");
