@@ -5,36 +5,36 @@
 #include "src_lcao/global_fp.h"
 #include "src_pw/global.h"
 
-DC_Driv::DC_Driv()
-{}
+DC_Driv::DC_Driv(){}
 
-DC_Driv::~DC_Driv()
-{}
+
+DC_Driv::~DC_Driv(){}
+
 
 void DC_Driv::init()
 {
 	TITLE("DC_Driv","init");
 
-	time_t  time_start = std::time(NULL);
+	time_t time_start = std::time(NULL);
 
 	timer::start();
 
-	// read the parameters.
+
+	// (1) read the parameters.
 	this->reading();
 
-#ifdef __FP
-	// divide the system into fragments.
-	this->divide_frag();
 
-	// setup the information for each fragment.
-	this->setup_frag();
-#endif
+	// (2) prepare plane wave basis sets 
+	this->prepare();
 
-	// solve each fragment.
-	this->solve_eachf();
+
+	// (3) welcome to the atomic world
+	this->welcome_to_atomic_world();
+
 
 	time_t	time_finish= std::time(NULL);
 
+	// print out information before ABACUS ends
 	cout << "\n START  Time  : " << ctime(&time_start);
 	cout << " FINISH Time  : " << ctime(&time_finish);
 	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
@@ -56,14 +56,22 @@ void DC_Driv::init()
 	return;
 }
 
+
 void DC_Driv::reading(void)
 {
 	timer::tick("DC_Driv","reading",'A');
+
+	// reading input files from the 'INPUT' object
+	// the 'INPUT'  is global and can be used anywhere,
+	// although I suggest you keep the parameters to be as
+	// local as possible -- mohan 2021-01-31
 	INPUT.Init( global_in_card );
 	Input_Conv::Convert();
 	Input_Conv::Convert_FP();
 
-
+	// there is a 'DIAGONALIZATION' world I define when I was young
+	// the 'DIAGO' world only uses computational resources that 
+	// are needed for diagonalization of the Hamiltionian -- mohan 2021-01-31
 	Parallel_Global::split_diag_world(DIAGO_PROC);
 	Parallel_Global::split_grid_world(DIAGO_PROC);
 	OUT(ofs_running,"DRANK",DRANK+1);
@@ -72,26 +80,32 @@ void DC_Driv::reading(void)
 	OUT(ofs_running,"GRANK",GRANK+1);
 	OUT(ofs_running,"GSIZE",GSIZE);
 
+	// call frag_init
 	Run_Frag::frag_init();
-	//if(LOCAL_BASIS==4 && LINEAR_SCALING) xiaohui modify 2013-09-01
 
+
+	// for LCAO basis, reading the orbitals and construct
+	// the interpolation tables.
 	if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
 	{
-
 		// read orbital information.
-		// init overlap matrix table.
-		// init kinetical matrix element table.
-		// init non-local pseudopotential matrix element table.
+		// init overlap matrix table, which is 'S Table'
+		// init kinetical matrix element table, which is 'T Table'
+		// init non-local pseudopotential matrix element table, which is 'NL Table'
 		hm.hon.set_orb_tables();
 
-		LM.divide_HS_in_frag(); //add 2015-09-06, xiaohui
-	} //add 2015-09-06, xiaohui
+		// xiaohui add 2015-09-06
+		// (1) divide the H and S matrix into each CPU, count the dimensions
+		// (2) set the 'trace' between local H/S and global H/S 
+		// (2) allocate the needed H and S memory
+		LM.divide_HS_in_frag(); 
+	}
 
 
 
     if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax" || CALCULATION=="nscf"
 	        || CALCULATION=="istate" || CALCULATION=="ienvelope"
-	        || CALCULATION=="md") //pengfei 2014-10-13
+	        || CALCULATION=="md") //pengfei add 2014-10-13
 	{
 		//LM.divide_HS_in_frag(); //move it above 2015-09-06, xiaohui
 		cout << " ---------------------------------------------------------" << endl;
@@ -374,25 +388,20 @@ void DC_Driv::reading(void)
 	return;
 }
 
+
 #include "src_pw/cal_test.h"
 #include "src_pw/cal_test0.h"
-//#include "../src_develop/src_dc/dc_info.h"
 void DC_Driv::divide_frag(void)
 {
 	TITLE("DC_Driv","divide_frag");
 	timer::tick("DC_Driv","divide_frag",'A');
 
-	// (1) Init the plane wave.
+	// (1) Initalize the plane wave basis set
 	pw.gen_pw(ofs_running, ucell, kv);
 	DONE(ofs_running,"INIT PLANEWAVE");
 	cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
 	cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
 
-	//bool test_dc = false;
-	//if(test_dc)
-	//{
-	//	DC_Info::divide_fragments(ucell);
-	//}
 
 	// mohan add 2010-10-10, just to test the symmetry of a variety
 	// of systems.
@@ -415,16 +424,11 @@ void DC_Driv::divide_frag(void)
 	return;
 }
 
-void DC_Driv::setup_frag(void)
-{
-	TITLE("DC_Driv","setup_frag");
 
-}
-
-void DC_Driv::solve_eachf(void)
+void DC_Driv::solve(void)
 {
-	TITLE("DC_Driv","solve_eachf");
-	timer::tick("DC_Driv","solve_eachf",'A');
+	TITLE("DC_Driv","solve");
+	timer::tick("DC_Driv","solve",'A');
 
 
 	Run_Frag RF;
