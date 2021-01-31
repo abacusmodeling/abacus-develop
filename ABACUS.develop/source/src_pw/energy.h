@@ -51,7 +51,6 @@ class energy
     double etxc;           // the exchange and correlation energy
     double vtxc;           // another exchange-correlation energy
     double etxcc;          // the nlcc exchange and correlation
-	double exx;            // the exact exchange energy.
 
     double ewld;           // the ewald energy
 	double alpha;		   // the coefficient of ewald method

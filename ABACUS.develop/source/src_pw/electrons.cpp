@@ -153,12 +153,6 @@ void electrons::self_consistent(const int &istep)
     // }
     // ###
 
-    // start the Exx calculation
-    if(DFT_FUNCTIONAL == "PBE0")
-    {
-        exxpw.init(true);
-    }
-
     for (this->iter = 1;iter <= NITER;iter++)
     {
         ofs_running 
@@ -195,12 +189,6 @@ void electrons::self_consistent(const int &istep)
         // output the new eigenvalues and wave functions.
         this->c_bands();
 
-        // mohan add 2010-07-22	
-        if(DFT_FUNCTIONAL == "PBE0")
-        {
-            exxpw.get_exx2();
-        }
-	
         if (check_stop_now()) return;
 
         en.eband  = 0.0;
@@ -449,11 +437,6 @@ void electrons::c_bands(void)
     for (int ik = 0;ik < kv.nks;ik++)
     {
         hm.init_k(ik);
-
-        if(DFT_FUNCTIONAL == "PBE0")
-        {
-            exxpw.ik_now = ik;
-        }
 
         //===========================================
         // Conjugate-Gradient diagonalization

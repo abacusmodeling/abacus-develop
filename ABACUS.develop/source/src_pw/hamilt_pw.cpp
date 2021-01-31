@@ -537,12 +537,6 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 		}
 	}
 
-	// mohan add 2010-07-22
-	if( DFT_FUNCTIONAL == "PBE0" )
-	{
-		//exxpw.vxx_psi(psi_in, hpsi);
-	}
-
     timer::tick("Hamilt_PW","h_psi",'H');
     return;
 }

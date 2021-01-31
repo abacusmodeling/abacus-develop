@@ -56,7 +56,6 @@ $(OBJS_CG)\
 $(OBJS_WANNIER)\
 $(OBJS_COMMON)\
 $(OBJS_MLWF)\
-$(OBJS_EXX)\
 main.o\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})

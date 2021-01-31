@@ -47,7 +47,6 @@ energy::energy()
     this->etxc   = 0;          // the exchange and correlation energy
     this->vtxc   = 0;          // another exchange-correlation energy
     this->etxcc  = 0;          // the nlcc exchange and correlation
-	this->exx    = 0;          // the exact exchange energy.
 
     this->ewld   = 0;          // the ewald energy
     this->demet  = 0;          // correction for metals
@@ -72,7 +71,7 @@ void energy::calculate_harris(const int &flag)
 	else if(flag==2)
 	{
 		this->etot_harris = eband + deband_harris + (etxc - etxcc) + ewld 
-		+ ehart + demet + exx + Efield::etotefield;
+		+ ehart + demet + Efield::etotefield;
 
         if(INPUT.dft_plus_u) this->etot_harris += dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
 	}
@@ -86,7 +85,7 @@ void energy::calculate_etot(void)
 	TITLE("energy","calculate_etot");
 	//cout << "\n demet in etot = " << demet << endl;
 	this->etot = eband + deband + (etxc - etxcc) + ewld +
-	ehart + demet + descf + exx + Efield::etotefield;
+	ehart + demet + descf + Efield::etotefield;
 
 	if(vdwd2.vdwD2) 									//Peize Lin add 2014-04-03, update 2019-04-26
 	{
@@ -110,7 +109,6 @@ void energy::calculate_etot(void)
 	cout << " ehart=" << ehart << endl;
 	cout << " demet=" << demet << endl;
 	cout << " descf=" << descf << endl;
-	cout << " exx=" << exx << endl;
 	cout << " efiled=" << Efield::etotefield << endl;
 	*/
 }
@@ -153,7 +151,6 @@ bool print)
 		{
 			this->print_format("E_vdwD3",vdwd3.energy_result);
 		}
-//		this->print_format("e_exx",exx);
 	}
 	else
 	{
