@@ -676,7 +676,7 @@ xiaohui modify 2014-08-09*/
            	}
            	else
            	{
-               	Run_Frag::frag_init_after_vc();
+               	Run_Frag::init_after_vc();
                	pot.init_pot(stress_step);
 
                	++stress_step;
@@ -722,7 +722,7 @@ xiaohui modify 2014-08-09*/
             	    }
             	    else
             	    {
-                	    Run_Frag::frag_init_after_vc();
+                	    Run_Frag::init_after_vc();
                 	    pot.init_pot(stress_step);
 
                 	    ++stress_step;

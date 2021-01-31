@@ -3,167 +3,33 @@
 // DATE : 2008-11-06
 //==========================================================
 #include "run_frag.h"
-
 #include "src_pw/global.h"
 #include "input.h"
 #include "src_pw/algorithms.h"
-//#include "./src_tools/gauss_PAO.h"
-//#include "src_develop/src_wannier/manipulation.h"
 #include "src_pw/pseudopot_cell_us.h"
-//#include "src_develop/src_wannier/mlwf_optimize.h"
-//#include "src_develop/src_wannier/wan_global.h"
-//#include "src_develop/src_wannier/wannier.h"
 #include "src_pw/optical.h"
 #include "src_pw/cal_test.h"
 #include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
+#include "src_pw/winput.h"
+#include "src_lcao/sltk_atom_arrange.h"
+#include "src_lcao/local_orbital_ions.h"
 
 Run_Frag::Run_Frag(){}
 Run_Frag::~Run_Frag(){}
 
-void Run_Frag::pw_line(void)
+
+void Run_Frag::init(void)
 {
-	TITLE("Run_Frag","pw_line");
+	TITLE("Run_Frag","init");
+	timer::tick("Run_Frag","init",'B');
 
 #ifdef __MPI
-    // after read in NPOOL, divide the NPROC processprs
-    // into NPOOL.
-    Pkpoints.init();
-#endif
-
-    //xiaohui modify 2013-09-01
-    //if (LOCAL_BASIS!=0)
-    //{
-    //    ofs_warning << "\n LOCAL_BASIS = " << LOCAL_BASIS << endl;
-    //    WARNING_QUIT("Run_Frag::pw_pure_line","LOCAL_BASIS can only be 0");
-    //}
-    //if (LINEAR_SCALING!=0)
-    //{
-    //    WARNING_QUIT("Run_Frag::pw_pure_line","LINEAR_SCALING can only be 0");
-    //} xiaohui modify 2013-09-01
-
-    // (2)
-    ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
-    DONE(ofs_running, "SETUP UNITCELL");
-	// (3)
-    stringstream ss1;
-    ss1 << global_out_dir << global_in_card;
-    INPUT.Print( ss1.str() );
-    DONE(ofs_running,"READING CARDS");
-    // (4)
-    if (SYMMETRY)
-    {
-        symm.analy_sys();
-        DONE(ofs_running, "SYMMETRY");
-    }
-    kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
-    DONE(ofs_running,"INIT K-POINTS");
-
-    if (CALCULATION == "test")
-    {
-        return;
-    }
-
-    //=====================================
-    // Second Part :
-    // set up grid for FFT
-    // Sort out G vector in 1-d array
-    //=====================================
-    pw.gen_pw(ofs_running, ucell, kv);
-
-//	showMemStats();
-
-    DONE(ofs_running,"INIT PLANEWAVE");
-
-    Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp, pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
-
-    //cout<<"\n----------------------  4.pot_init -----------------------------"<<endl;
-    //=====================
-    // init potential
-    //=====================
-    chr.init();
-    pot.init(pw.nrxx);
-    //=====================
-    // init wave functions
-    //=====================
-    wf.init(kv.nks);
-	UFFT.allocate();
-    //=======================
-    // init pseudopotential
-    //=======================
-    ppcell.init(ucell.ntype);
-    //=====================
-    // init hamiltonian
-    //=====================
-    hm.init();
-    DONE(ofs_running,"CHARGE, POTENTIAL, WAVE FUNCTIONS ALLOCATION");
-    //=================================
-    // initalize local pseudopotential
-    //=================================
-    ppcell.init_vloc();
-    DONE(ofs_running,"LOCAL POTENTIAL");
-    //======================================
-    // Initalize non local pseudopotential
-    //======================================
-    ppcell.init_vnl();
-    DONE(ofs_running,"NON-LOCAL POTENTIAL");
-    //=========================================================
-    // calculate the total local pseudopotential in real space
-    //=========================================================
-    pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
-
-    pot.newd();//once
-    DONE(ofs_running,"INIT POTENTIAL");
-
-    //==================================================
-    // create ppcell.tab_at , for trial wave functions.
-    //==================================================
-
-    wf.init_at_1();
-
-    //================================
-    // Initial start wave functions
-    //================================
-    wf.wfcinit();
-    DONE(ofs_running,"INIT BASIS");
-    //=========================================================
-    //
-    //  Third Part: Electronic structure calculation begin!
-    //
-    //=========================================================
-    //
-    Ions ions;
-	ions.opt_ions_pw();
-
-
-
-
-    //if (MLWF_FLAG)
-    //{
-    //    mlwf_optimize op;
-    //    op.wannierise();
-    //}
-
-	en.perform_dos();
-
-    return;
-}
-
-#ifdef __FP
-#include "src_pw/winput.h"
-#include "src_lcao/sltk_atom_arrange.h"
-#include "src_lcao/local_orbital_ions.h"
-void Run_Frag::frag_init(void)
-{
-	TITLE("Run_Frag","frag_init");
-	timer::tick("Run_Frag","frag_init",'B');
-
-#ifdef __MPI
-    // If k point number > 1, After reading in NPOOL, 
+    // (1) If k point number > 1, After reading in NPOOL, 
 	// divide the NPROC processprs into NPOOL.
     Pkpoints.init();
 #endif
 
-    // (3) Read in parameters about wannier functions.
+    // (2) Read in parameters about wannier functions.
     winput::Init( global_wannier_card );
 
     //xiaohui move 3 lines, 2015-09-30
@@ -171,34 +37,32 @@ void Run_Frag::frag_init(void)
     //ss2 << global_out_dir << "INPUTw";
     //winput::Print( ss2.str() );
 
-    // (4) Print the parameters into INPUT file.
+    // (3) Print the parameters into INPUT file.
     stringstream ss1;
     ss1 << global_out_dir << global_in_card;
     INPUT.Print( ss1.str() );
     //DONE(ofs_running,"READING CARDS");
 
-    // (5) Setup the unitcell.
+    // (4) Setup the unitcell.
     ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
     DONE(ofs_running, "SETUP UNITCELL");
 
-    // (6) symmetry analysize.
+    // (5) symmetry analysize.
     if (SYMMETRY)
     {
         symm.analy_sys();
         DONE(ofs_running, "SYMMETRY");
     }
     
-	// (7) Setup the k points according to symmetry.
+	// (6) Setup the k points according to symmetry.
 	kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
     DONE(ofs_running,"INIT K-POINTS");
 	
-	// (8) About Wannier functions, not used now.
-    //wannier::init_dir( ofs_running );
 
-	// (9) check the number of basis
+	// (7) check the number of basis, the warning should be moved to 
+	// other places -- mohan 2021-01-30
 	// mohan add 2011-01-5
-	//if( LOCAL_BASIS ) xiaohui modify 2013-09-01
-	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01. Attention! Maybe there is some problem.
+	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") 
 	{
 		if( NLOCAL < NBANDS )
 		{
@@ -212,20 +76,21 @@ void Run_Frag::frag_init(void)
 		}
 	}
 
-	timer::tick("Run_Frag","frag_init",'B');
+	timer::tick("Run_Frag","init",'B');
     return;
 }
 
-void Run_Frag::frag_LCAO_line(void)
+
+void Run_Frag::LCAO_line(void)
 {
-    TITLE("Run_Frag","frag_lcao_line");
-	timer::tick("Run_Frag","frag_LCAO_line",'B');
+    TITLE("Run_Frag","lcao_line");
+	timer::tick("Run_Frag","LCAO_line",'B');
 	
-	// (2) Init the charge density.
+	// (1) Init the charge density.
     chr.init();
     DONE(ofs_running,"INIT CHARGE");
 
-	// (3) Init the potential.
+	// (2) Init the potential.
     pot.init(pw.nrxx);
     DONE(ofs_running,"INIT POTENTIAL");
 
@@ -233,75 +98,74 @@ void Run_Frag::frag_LCAO_line(void)
     enum use_wf_coef {SOME_PW, ALL_LO};
     use_wf_coef uoc = ALL_LO;
 
-    switch (uoc)
-    {
-    case ALL_LO:
-		// (4) Init the local wave functions.
-        wf.init_local();
-		// (5) Init the FFT.
-		UFFT.allocate();
-        // (6) Init the hamiltonian. 
-		// first0 stands for nkb, but no used.
-        // second0 stands for no use hpw.init()
-        hm.init(0);
-		// (7) Init the local part of NC pseudopotential.
-        ppcell.init_vloc();
-		// (8) Init the potential.
-        pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
-        break;
-    case SOME_PW:
-        wf.init(kv.nks);
-		UFFT.allocate();
-        ppcell.init(ucell.ntype);
-        hm.init();
-        ppcell.init_vloc();
-        ppcell.init_vnl();
-        pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
-        pot.newd();//once
-        DONE(ofs_running,"INIT POTENTIAL");
-        wf.wfcinit();
-        DONE(ofs_running,"INIT SOME_PW");
-        break;
-    }
+	switch (uoc)
+	{
+		case ALL_LO:
+			// (4) Init the local wave functions.
+			wf.init_local();
+			// (5) Init the FFT.
+			UFFT.allocate();
+			// (6) Init the hamiltonian. 
+			// first0 stands for nkb, but no used.
+			// second0 stands for no use hpw.init()
+			hm.init(0);
+			// (7) Init the local part of NC pseudopotential.
+			ppcell.init_vloc();
+			// (8) Init the potential.
+			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
+			break;
+		case SOME_PW:
+			wf.init(kv.nks);
+			UFFT.allocate();
+			ppcell.init(ucell.ntype);
+			hm.init();
+			ppcell.init_vloc();
+			ppcell.init_vnl();
+			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
+			pot.newd();//once
+			DONE(ofs_running,"INIT POTENTIAL");
+			wf.wfcinit();
+			DONE(ofs_running,"INIT SOME_PW");
+			break;
+	}
 
-    //Quxin added for DFT+U
-	if(INPUT.dft_plus_u) dftu.init();
+    // Quxin added for DFT+U
+	if(INPUT.dft_plus_u) 
+	{
+		dftu.init();
+	}
 
 	Local_Orbital_Ions ions;
 	ions.opt_ions();
 	en.perform_dos();
 
-	timer::tick("Run_Frag","frag_LCAO_line",'B');
+	timer::tick("Run_Frag","LCAO_line",'B');
     return;
 }
 
-void Run_Frag::frag_pw_line(void)
+
+
+void Run_Frag::plane_wave_line(void)
 {
-    TITLE("Run_Frag","frag_pw_line");
-	timer::tick("Run_Frag","frag_pw_line",'B');
+    TITLE("Run_Frag","plane_wave_line");
+	timer::tick("Run_Frag","plane_wave_line",'B');
 
 //----------------------------------------------------------
-// preprocess part, consist of :
-// 1 print out copyright informations: version,authors, ...
-// 2 read in initial data:
+// 1 read in initial data:
 //   a lattice structure:atom_species,atom_positions,lattice vector
 //   b k_points
 //   c pseudopotential
-// 3 setup planeware basis, FFT,structure factor, ...
-// 4 initialize local and nonlocal pseudopotential in G_space
-// 5 initialize charge desity and warefunctios in G_space
+// 2 setup planeware basis, FFT,structure factor, ...
+// 3 initialize local and nonlocal pseudopotential in G_space
+// 4 initialize charge desity and warefunctios in G_space
 //----------------------------------------------------------
-
-    //if (winput::begin_stop_flag)
-    //{
-    //    wannier::begin_stop();
-    //}
 
     //=====================
     // init potential
     //=====================
     chr.init();
     pot.init(pw.nrxx);
+
     //=====================
     // init wave functions
     //=====================
@@ -312,21 +176,25 @@ void Run_Frag::frag_pw_line(void)
     // init pseudopotential
     //=======================
     ppcell.init(ucell.ntype);
+
     //=====================
     // init hamiltonian
     //=====================
     hm.init();
 //  DONE(ofs_running,"CHARGE, POTENTIAL, WAVE FUNCTINOS ALLOCATION");
+
     //=================================
     // initalize local pseudopotential
     //=================================
     ppcell.init_vloc();
     DONE(ofs_running,"LOCAL POTENTIAL");
+
     //======================================
     // Initalize non local pseudopotential
     //======================================
     ppcell.init_vnl();
     DONE(ofs_running,"NON-LOCAL POTENTIAL");
+
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
@@ -339,36 +207,22 @@ void Run_Frag::frag_pw_line(void)
     // create ppcell.tab_at , for trial wave functions.
     //==================================================
     wf.init_at_1();
-    //==================================
-    // Initial localized wave functions
-    //==================================
-    //if (LOCAL_BASIS == 1) wannier::running( ofs_running );
 
     //================================
     // Initial start wave functions
     //================================
    	wf.wfcinit();
 
-    //if (winput::before_iter)
-    //{
-    //    wannier::running( ofs_running ) ;
-    //    return;
-    //}
 
     DONE(ofs_running,"INIT BASIS");
-    //=========================================================
-    //
-    //	Third Part: Electronic structure calculation begin!
-    //
-    //=========================================================
-    //
-//	if(SCF || (!SCF && LOCAL_BASIS==0) )
-//	{
+
+	// ion optimization begins
+	// electron density optimization is included in ion optimization
     Ions ions;
     ions.opt_ions_pw();
 
 
-    // caoyu added 2020-11-24, mohan updated 2021-01-03
+    // caoyu add 2020-11-24, mohan updat 2021-01-03
     if(BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
     {
         Numerical_Descriptor nc;
@@ -376,8 +230,7 @@ void Run_Frag::frag_pw_line(void)
         DONE(ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
-//	}
-    //if (LOCAL_BASIS==0 && winput::out_spillage) xiaohui modify 2013-09-01
+
     if(BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
     {
         //cout << "\n Output Spillage Information : " << endl;
@@ -394,7 +247,7 @@ void Run_Frag::frag_pw_line(void)
             {
                 wf.wanf2[ik].create(NLOCAL, wf.npwx);
                 //if ( LOCAL_BASIS == 3 || LOCAL_BASIS == 0 ) xiaohui modify 2013-09-01
-		if(BASIS_TYPE=="pw") //xiaohui add 2013-09-01. Attention! "LOCAL_BASIS==3"???
+				if(BASIS_TYPE=="pw") //xiaohui add 2013-09-01. Attention! "LOCAL_BASIS==3"???
                 {
 					cout << " ik=" << ik + 1 << endl;
 
@@ -420,6 +273,7 @@ void Run_Frag::frag_pw_line(void)
             //Spillage sp;
             //sp.get_both(NBANDS, NLOCAL, wf.wanf2, wf.evc);
         }
+
         // output overlap
         if ( winput::out_spillage <= 2 )
         {
@@ -429,36 +283,25 @@ void Run_Frag::frag_pw_line(void)
         }
     }
 
-    //if (winput::end_flag)
-    //{
-    //    wannier::end();
-    //}
-    //if (winput::after_iter)
-    //{
-    //    wannier::running( ofs_running );
-    //}//mohan
-	//if (Optical::opt_epsilon2 && LINEAR_SCALING==0 ) xiaohui modify 2013-09-01
-	if(Optical::opt_epsilon2 && (BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-01. Attention! Maybe there is some problem.
+
+	//xiaohui add 2013-09-01. Attention! Maybe there is some problem.
+	if(Optical::opt_epsilon2 && (BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw"))
 	{
 		Optical opt;
 		opt.cal_epsilon2(NBANDS);
 	}
-    //if (MLWF_FLAG)
-    //{
-        //mlwf_optimize op;
-        //op.wannierise();
-        //DONE(ofs_running,"MAXIMALLY LOCALIZED WANNIER FUNCTIONS");
-    //}
 
+	// compute density of states
 	en.perform_dos();
 
-	timer::tick("Run_Frag","frag_pw_line",'B');
+	timer::tick("Run_Frag","plane_wave_line",'B');
     return;
 }
 
-void Run_Frag::frag_linear_scaling_line(void)
+
+void Run_Frag::linear_scaling_line(void)
 {
-	TITLE("Run_Frag","frag_linear_scaling_line");
+	TITLE("Run_Frag","linear_scaling_line");
 
     // (2) Init the charge density.
     chr.init();
@@ -516,16 +359,14 @@ void Run_Frag::frag_linear_scaling_line(void)
     return;
 }
 
-void Run_Frag::frag_test(void)
-{
-
-}
 
 //LiuXh add a new function here,
 //which is used to do initialization after variable cell
 //20180515
-void Run_Frag::frag_init_after_vc(void)
+void Run_Frag::init_after_vc(void)
 {
+	TITLE("Run_Frag","init_after_vc");
+
     ucell.setup_cell_after_vc(global_pseudo_dir, global_atom_card, ofs_running);
     DONE(ofs_running, "SETUP UNITCELL");
 
@@ -574,6 +415,7 @@ void Run_Frag::frag_init_after_vc(void)
     return;
 }
     
+
 //LiuXh add a new function here,
 //which is used to do initialization after variable cell
 //20180619
@@ -683,4 +525,3 @@ void Run_Frag::final_calculation_after_vc(void)
         DONE(ofs_running,"INIT BASIS");
     }
 }
-#endif

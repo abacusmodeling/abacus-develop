@@ -28,8 +28,8 @@ void DC_Driv::init()
 	this->prepare();
 
 
-	// (3) welcome to the atomic world
-	this->welcome_to_atomic_world();
+	// (3) welcome to the atomic world!
+	this->atomic_world();
 
 
 	time_t	time_finish= std::time(NULL);
@@ -80,12 +80,19 @@ void DC_Driv::reading(void)
 	OUT(ofs_running,"GRANK",GRANK+1);
 	OUT(ofs_running,"GSIZE",GSIZE);
 
+	//----------------------------------
 	// call frag_init
-	Run_Frag::frag_init();
+	// * divide the k-points into NPOOL
+	// * setup the unit cell
+	// * do symmetry analysis
+	// * setup the k-points
+	//----------------------------------
+	Run_Frag::init();
 
 
 	// for LCAO basis, reading the orbitals and construct
 	// the interpolation tables.
+	// this part should be moved somewher else -- mohan 2021-01-30
 	if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
 	{
 		// read orbital information.
@@ -101,8 +108,8 @@ void DC_Driv::reading(void)
 		LM.divide_HS_in_frag(); 
 	}
 
-
-
+	
+	// the following printing information should be moved to somewhere else -- mohan 2021-01-30
     if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax" || CALCULATION=="nscf"
 	        || CALCULATION=="istate" || CALCULATION=="ienvelope"
 	        || CALCULATION=="md") //pengfei add 2014-10-13
@@ -340,47 +347,12 @@ void DC_Driv::reading(void)
 			cout << endl;
 		}
 
-
-
-
-
-
-
 		cout << " ---------------------------------------------------------" << endl;
 		cout << " Initial plane wave basis and FFT box" << endl;
 		cout << " ---------------------------------------------------------" << endl;
 
-
 //			cout << " GRID_SPEED           : " << GRID_SPEED << endl;
 	}
-
-
-	//} //delete 2015-09-06, xiaohui
-	/*
-		else if(BASIS_TYPE=="pw") //2015-09-06, xiaohui
-		{
-			cout << " " << setw(8) << "ELEMENT";
-			cout << setw(12) << "NATOM";
-			cout << setw(12) << "XC";
-			cout << endl;
-			for(int it=0; it<ucell.ntype; ++it)
-			{
-				cout << " " << setw(8) << ucell.atoms[it].label;
-				cout << setw(12) << ucell.atoms[it].na;
-				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31
-				{
-					//cout << " XC FUNCTIONAL      : " << "PZ-LDA" << endl;
-					cout << setw(12) << "PZ-LDA";
-				}
-				else
-				{
-					//cout << " XC FUNCTIONAL      : " << "PBE" << endl;
-					cout << setw(12) << "PZ-LDA";
-				}
-			}
-			cout<<endl;
-		}
-	*/
 
 
 
@@ -391,10 +363,10 @@ void DC_Driv::reading(void)
 
 #include "src_pw/cal_test.h"
 #include "src_pw/cal_test0.h"
-void DC_Driv::divide_frag(void)
+void DC_Driv::prepare(void)
 {
-	TITLE("DC_Driv","divide_frag");
-	timer::tick("DC_Driv","divide_frag",'A');
+	TITLE("DC_Driv","prepare");
+	timer::tick("DC_Driv","prepare",'A');
 
 	// (1) Initalize the plane wave basis set
 	pw.gen_pw(ofs_running, ucell, kv);
@@ -420,59 +392,29 @@ void DC_Driv::divide_frag(void)
 	Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp, pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 
-	timer::tick("DC_Driv","divide_frag",'A');
+	timer::tick("DC_Driv","prepare",'A');
 	return;
 }
 
 
-void DC_Driv::solve(void)
+void DC_Driv::atomic_world(void)
 {
-	TITLE("DC_Driv","solve");
-	timer::tick("DC_Driv","solve",'A');
-
+	TITLE("DC_Driv","atomic_world");
+	timer::tick("DC_Driv","atomic_world",'A');
 
 	Run_Frag RF;
 
-
-#ifdef __FP
-
-	//xiaohui modify 2013-09-01
-	//if(LINEAR_SCALING==-1)
-	//{
-	//    RF.frag_test();
-	//}
-	//else if (LINEAR_SCALING==0)
-	//{
-	//    RF.frag_pw_line();
-	//}
-	//else if (LINEAR_SCALING==1)
-	//{
-	//    RF.frag_LCAO_line();
-	//}
-	//else if (LINEAR_SCALING==2)
-	//{
-	//    RF.frag_linear_scaling_line();
-	//}
 	//xiaohui add 2013-09-01
 	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
 	{
-		RF.frag_pw_line();
+		RF.plane_wave_line();
 	}
 	else if(BASIS_TYPE=="lcao")
 	{
-		RF.frag_LCAO_line();
+		RF.LCAO_line();
 	}
 
-#else
-
-	// if use plane wave basis,
-	// the plane wave basis is generated in pw_line.
-	RF.pw_line();
-
-#endif
-
-
-	timer::tick("DC_Driv","solve_eachf",'A');
+	timer::tick("DC_Driv","atomic_world",'A');
 	timer::finish( ofs_running );
 
 	Memory::print_all( ofs_running ) ;

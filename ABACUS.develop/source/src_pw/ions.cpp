@@ -331,7 +331,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             }
             else
             {
-                Run_Frag::frag_init_after_vc();
+                Run_Frag::init_after_vc();
                 //pot.init_pot(0);
                 pot.init_pot(stress_step); //LiuXh add 20180619
                 ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
@@ -393,7 +393,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                     }
                     else
                     {
-                        Run_Frag::frag_init_after_vc();
+                        Run_Frag::init_after_vc();
                         //pot.init_pot(0);
                         pot.init_pot(stress_step); //LiuXh add 20180619
 

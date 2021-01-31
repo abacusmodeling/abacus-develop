@@ -23,7 +23,7 @@ class DC_Driv
 	void prepare();
 
 	// do stuff, have fun!
-	void welcome_to_atomic_world();
+	void atomic_world();
 
 
 };
