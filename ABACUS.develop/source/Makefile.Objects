@@ -120,11 +120,9 @@ gint_gamma_vl.o\
 gint_gamma_rho.o\
 gint_gamma_mull.o\
 gint_gamma_env.o \
-gint_gamma_bfield.o\
 gint_gamma_fvna.o\
 gint_gamma_vna.o\
 gint_gamma_vna_d.o\
-gint_gamma_stap.o\
 gint_k.o\
 gint_k_init.o\
 gint_k_vl.o\
@@ -154,7 +152,6 @@ istate_charge.o \
 istate_envelope.o \
 diago_lcao_matrix.o\
 evolve_lcao_matrix.o\
-bfield.o\
 ylm.o\
 force_lcao.o\
 force_lcao_gamma.o\
@@ -183,24 +180,6 @@ bessel_basis.o\
 numerical_basis.o\
 numerical_descriptor.o\
 wavefunc_in_pw.o\
-
-OBJS_EPM=run_epm.o\
-potential_epm.o\
-atom_epm.o\
-unitcell_epm.o\
-so_common.o\
-so_pw.o\
-so_smallbox.o\
-fft_smallbox.o\
-eigen_common.o\
-zeeman.o\
-epm_cg.o\
-epm_fs.o\
-fs_cg.o\
-fs_dav.o\
-nscf_epm.o\
-input.o \
-main.o \
 
 OBJS_PARALLEL=parallel_global.o\
 parallel_kpoints.o\

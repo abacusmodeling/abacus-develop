@@ -59,7 +59,6 @@ energy::~energy()
 
 #include "efield.h"
 
-#ifndef __EPM
 void energy::calculate_harris(const int &flag)
 {
 //	TITLE("energy","calculate_harris");
@@ -78,7 +77,6 @@ void energy::calculate_harris(const int &flag)
 	
 	return;
 }
-#endif
 
 void energy::calculate_etot(void)
 {
@@ -767,7 +765,6 @@ void energy::rgen(
     return;
 } //end subroutine rgen
 
-#ifndef __EPM
 // from ddelta_e.f90
 double energy::delta_e(void)
 {
@@ -806,12 +803,9 @@ double energy::delta_e(void)
     deband0 *= ucell.omega / pw.ncxyz;
     return deband0;
 } // end subroutine delta_e
-#endif
 
 
-#ifdef __EPM
 
-#else
 void energy::delta_escf(void)
 {
 	TITLE("energy","delta_escf");
@@ -848,7 +842,6 @@ void energy::delta_escf(void)
     this->descf *= ucell.omega / pw.ncxyz;
     return;
 }
-#endif
 
 void energy::perform_dos(void)
 {

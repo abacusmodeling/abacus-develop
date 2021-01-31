@@ -19,11 +19,7 @@ using namespace std;
 namespace Input_Conv
 {
     void Convert(void);
-#ifdef __EPM
-    void Convert_EPM(void);
-#else
     void Convert_FP(void);
-#endif
 }
 
 

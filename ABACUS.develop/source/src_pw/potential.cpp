@@ -859,9 +859,6 @@ const matrix &v, const int &precision, const int &hartree)const
 // contributions.
 //==========================================================
 // from set_vrs.f90
-#ifdef __FP
-#include "../src_lcao/bfield.h"
-#endif
 void potential::set_vrs(const bool doublegrid)
 {
     TITLE("potential","set_vrs");
@@ -943,15 +940,6 @@ void potential::set_vrs(const bool doublegrid)
         */
     }
 
-#ifdef __FP
-    if(BFIELD)
-    {
-        if(NSPIN==2)
-        {
-            bfid.add_zeeman();
-        }
-    }
-#endif
 
     timer::tick("potential","set_vrs");
     return;
@@ -1378,15 +1366,6 @@ void potential::set_vrs_tddft(const bool doublegrid, const int istep)
         */
     }
 
-#ifdef __FP
-    if(BFIELD)
-    {
-        if(NSPIN==2)
-        {
-            bfid.add_zeeman();
-        }
-    }
-#endif
 
     timer::tick("potential","set_vrs_tddft");
     return;

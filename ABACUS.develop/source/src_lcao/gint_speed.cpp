@@ -291,14 +291,7 @@ void Gint_Speed::gamma_vlocal(void)
                 }
 			
 				// mohan update 2011-04-15	
-				if(BFIELD)
-				{
-					LM.set_HSk(i,j,complex<double>(tmp[j],0.0),'L');
-				}
-				else
-				{
-                	LM.set_HSgamma(i,j,tmp[j],'L');
-				}
+               	LM.set_HSgamma(i,j,tmp[j],'L');
             }
             delete[] tmp;
         }

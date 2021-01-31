@@ -76,10 +76,6 @@ void Grid_Technique::set_pbc_grid(
 	this->init_atoms_on_grid();	
 
 	this->cal_trace_lo();
-	if(BFIELD)
-	{
-		this->cal_trace_beta();//add by sunzhiyuan
-	}
 	timer::tick("Grid_Technique","init",'D');
 	return;
 }

@@ -1,11 +1,5 @@
 #include "dc_driv.h"
-
-#ifdef __EPM
-#include "../src_epm/run_epm.h"
-#else
 #include "run_frag.h"
-#endif
-
 #include "input.h"
 #include "input_conv.h"
 #include "src_lcao/global_fp.h"
@@ -67,13 +61,8 @@ void DC_Driv::reading(void)
 	timer::tick("DC_Driv","reading",'A');
 	INPUT.Init( global_in_card );
 	Input_Conv::Convert();
-#ifdef __EPM
-	Input_Conv::Convert_EPM();
-#else
 	Input_Conv::Convert_FP();
-#endif
 
-#ifdef __FP
 
 	Parallel_Global::split_diag_world(DIAGO_PROC);
 	Parallel_Global::split_grid_world(DIAGO_PROC);
@@ -378,7 +367,6 @@ void DC_Driv::reading(void)
 			cout<<endl;
 		}
 	*/
-#endif
 
 
 
@@ -438,12 +426,6 @@ void DC_Driv::solve_eachf(void)
 	TITLE("DC_Driv","solve_eachf");
 	timer::tick("DC_Driv","solve_eachf",'A');
 
-#ifdef __EPM
-
-	Run_EPM re;
-	re.epm_line();
-
-#else
 
 	Run_Frag RF;
 
@@ -485,7 +467,6 @@ void DC_Driv::solve_eachf(void)
 
 #endif
 
-#endif
 
 	timer::tick("DC_Driv","solve_eachf",'A');
 	timer::finish( ofs_running );

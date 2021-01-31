@@ -540,12 +540,8 @@ void eximport::out_input(ofstream &out_data)
 			 << setw(20) << pw.ny 
 			 << setw(20) << pw.nz 
 			 << setw(20) << pw.nxyz << endl;//1.6
-#ifndef __EPM
 	out_data << setw(20) << pot.startingpot << endl;//1.7
 	out_data << setw(20) << chr.mixing_beta << endl;//1.8
-#else
-	out_data << setw(20) << "EPM" << endl;
-#endif
 */
 	out_data << "\n<HEADER>"<<endl;			//1.0
 
@@ -712,9 +708,7 @@ void eximport::out_energy(ofstream &out_data)
 	out_data << setw(20) << en.eband << endl;				//6.4
 	out_data << setw(20) << en.eband + en.deband << endl;   //6.5
 	out_data << setw(20) << en.ehart << endl;               //6.6
-#ifndef __EPM
 	out_data << setw(20) << en.etxc - en.etxcc << endl;     //6.7
-#endif
 	out_data << setw(20) << en.ewld << endl;                //6.8
 }
 
@@ -727,22 +721,16 @@ void eximport::in_energy(ifstream &in)
 		cout << "== wrong in in_energy ===" << endl;
 		exit(0);
 	}
-#ifndef __EPM
 	in >> iter;//6.1
-#endif
 	in >> etot;//6.2
 	in >> eband;//6.4
 	in >> one_electron;//6.5
 	in >> hartree;//6.6
-#ifndef __EPM
 	in >> xc;//6.7
-#endif
 	in >> ewald;//6.8
 }
 
 #ifdef __MPI
-#ifdef __EPM
-#else
 void eximport::in_charge_mpi(const string &dir)
 {
 	cout << "\n ==> eximport::in_charge()" << endl;
@@ -846,7 +834,6 @@ void eximport::out_charge_mpi(const string &dir,double* rho_in)
 	return;
 }
 #endif
-#endif
 
 //********************************
 // charge
@@ -854,7 +841,6 @@ void eximport::out_charge_mpi(const string &dir,double* rho_in)
 void eximport::out_charge(ofstream &out_data)
 {
 	/*
-#ifndef __EPM
 	ofs_running << "\n Output charge file." << endl;
 	out_data << setw(20) << "CHARGE" << endl;	//7.0
 	out_data << setw(20) << pw.omega << endl;	//7.1
@@ -875,7 +861,6 @@ void eximport::out_charge(ofstream &out_data)
 		out_data << endl;
 	}
 	return;
-#endif
 	*/
 }
 
@@ -906,7 +891,6 @@ void eximport::in_charge(ifstream &in)
 
 void eximport::nscf_chgfile(const string &chg_file)
 {
-#ifndef __EPM
 	/*
 	cout<<"\n ==> eximport::nscf_chgfile()";
 	cout<<"       file_name : "<<chg_file<<endl;
@@ -946,6 +930,5 @@ void eximport::nscf_chgfile(const string &chg_file)
 	}
 	in.close();
 	*/
-#endif
 }
 

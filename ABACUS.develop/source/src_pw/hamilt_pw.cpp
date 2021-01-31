@@ -17,13 +17,8 @@ Hamilt_PW::Hamilt_PW()
     hpsi = new complex<double>[1];
     spsi = new complex<double>[1];
     GR_index = new int[1];
-
-#ifndef __EPM
     Bec = new complex<double>[1];
     Ps = new complex<double>[1];
-#else
-    GR_index2 = new int[1];
-#endif
 }
 
 Hamilt_PW::~Hamilt_PW()
@@ -35,12 +30,8 @@ Hamilt_PW::~Hamilt_PW()
     delete[] hpsi;
     delete[] spsi;
     delete[] GR_index;
-#ifndef __EPM
     delete[] Bec;
     delete[] Ps;
-#else
-    delete[] GR_index2;
-#endif
 }
 
 #ifdef __EPM
@@ -52,22 +43,18 @@ void Hamilt_PW::init()
 	delete[] hpsi;
 	delete[] spsi;
 	delete[] GR_index;
-	delete[] GR_index2;
 
 	this->hpsi = new complex<double>[wf.npwx];
 	this->spsi = new complex<double>[wf.npwx];
 	this->GR_index = new int[nrxxs];
-	this->GR_index2= new int[nrxxs];
 
 	OUT(ofs_running,"hpsi allocation = ","Done");
 	OUT(ofs_running,"spsi allocation = ","Done");
 	OUT(ofs_running,"GR_index allocation = ","Done");
-	OUT(ofs_running,"GR_index2 allocation = ","Done");
 
 	ZEROS(hpsi,wf.npwx);
 	ZEROS(spsi,wf.npwx);
 	ZEROS(GR_index,wf.npwx);
-	ZEROS(GR_index2,wf.npwx);
 
 	return;
 }
@@ -123,13 +110,6 @@ void Hamilt_PW::init_k(const int ik)
     {
         this->GR_index[ig] = pw.ig2fftw[ wf.igk(ik, ig) ];
     }
-
-#ifdef __EPM
-    for ( int ig=0; ig< wf.npw;ig++)
-    {
-        this->GR_index2[ig] = pw.ig2ngg[ wf.igk(ik, ig) ];
-    }
-#endif
     return;
 }
 

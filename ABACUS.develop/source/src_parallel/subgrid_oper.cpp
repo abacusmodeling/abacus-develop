@@ -211,76 +211,39 @@ void SubGrid_oper::cal_totwfc()
 		}
 
 
-		if(!BFIELD)
+		this->totwfc = new double**[1];
+		for(int is=0; is<1; ++is)
 		{
-			this->totwfc = new double**[1];
-			for(int is=0; is<1; ++is)
+			this->totwfc[is] = new double*[NBANDS];
+			for(int ib=0; ib<NBANDS; ++ib)
 			{
-				this->totwfc[is] = new double*[NBANDS];
-				for(int ib=0; ib<NBANDS; ++ib)
-				{
-					this->totwfc[is][ib] = new double[lgd];	
-					ZEROS(totwfc[is][ib], lgd);
+				this->totwfc[is][ib] = new double[lgd];	
+				ZEROS(totwfc[is][ib], lgd);
 
-					// mohan update 2012-02-10
-					//if(DIAGO_TYPE!="cg") xiaohui modify 2013-09-02
-					if(KS_SOLVER!="cg") //xiaohui add 2013-09-02
-					{	
-						for(int i=0; i<NLOCAL; ++i)
+				// mohan update 2012-02-10
+				//if(DIAGO_TYPE!="cg") xiaohui modify 2013-09-02
+				if(KS_SOLVER!="cg") //xiaohui add 2013-09-02
+				{	
+					for(int i=0; i<NLOCAL; ++i)
+					{
+						if(occupy[i])
 						{
-							if(occupy[i])
+							if(ib==i)
 							{
-								if(ib==i)
-								{
-									totwfc[is][ib][trace_lo_tot[i]] = 1.0;
-								}
+								totwfc[is][ib][trace_lo_tot[i]] = 1.0;
 							}
-						}
-					}
-					else //use cg method
-					{
-						// bug: dimension of WFC_GAMMA is smaller than totwfc
-						for(int i=0; i<lgd; ++i)
-						{
-							this->totwfc[is][ib][i] = LOWF.WFC_GAMMA[CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
-						}
-					}
-				}	
-			}
-		}
-		else
-		{
-			this->totwfc_B = new complex<double>**[1];
-			for(int is=0; is<1; ++is)
-			{
-				this->totwfc_B[is] = new complex<double>*[NBANDS];
-				for(int ib=0; ib<NBANDS; ++ib)
-				{
-					this->totwfc_B[is][ib] = new complex<double>[lgd];
-					ZEROS(totwfc_B[is][ib], lgd);
-					//if(DIAGO_TYPE!="cg") xiaohui modify 2013-09-02
-					if(KS_SOLVER!="cg") //xiaohui add 2013-09-02
-					{
-						for(int i=0; i<NLOCAL; ++i)
-						{
-							if(occupy[i])
-							{
-								if(ib==i)
-								{
-									this->totwfc_B[is][ib][trace_lo_tot[i]] = ONE;
-								}
-							}
-						}
-					}
-					else
-					{
-						for(int i=0; i<lgd; ++i)
-						{
-							this->totwfc_B[is][ib][i] = LOWF.WFC_GAMMA_B[CURRENT_SPIN][ib][i];
 						}
 					}
 				}
-			}
+				else //use cg method
+				{
+					// bug: dimension of WFC_GAMMA is smaller than totwfc
+					for(int i=0; i<lgd; ++i)
+					{
+						this->totwfc[is][ib][i] = LOWF.WFC_GAMMA[CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
+					}
+				}
+			}	
 		}
 
 		allocate_totwfc = true;
@@ -494,240 +457,3 @@ void SubGrid_oper::dis_subwfc()
 	return;
 }
 
-
-
-
-void SubGrid_oper::dis_subwfc_complex()
-{
-	TITLE("SubGrid_oper","dis_subwfc_complex");
-
-#ifdef __MPI
-
-//	cout << " distribute the wave functions " << endl;
-
-	//------------------------------------------
-	// bcast the eigenvalues
-	//------------------------------------------
-	for(int ik=0; ik<kv.nks; ++ik)
-	{
-		MPI_Bcast(wf.ekb[ik], NBANDS, MPI_DOUBLE, 0, GRID_WORLD);
-	}	
-
-	MPI_Status status;
-
-	for(int i=0; i<GSIZE; ++i)
-	{
-		if(GRANK==0)
-		{
-			if(i==0)
-			{
-				//---------------------------------------------
-				// Transfer the data from totwfc to WFC_GAMMA.
-				//---------------------------------------------
-				for(int iw=0; iw<NLOCAL; ++iw)
-				{
-					const int mu1 = GridT.trace_lo[iw];
-					if(mu1 >= 0)
-					{
-						const int mu2 = this->trace_lo_tot[iw];
-
-						for(int ib=0; ib<NBANDS; ++ib)
-						{
-							LOWF.WFC_GAMMA_B[CURRENT_SPIN][ib][mu1] = this->totwfc_B[0][ib][mu2];
-						}//ib
-					}//mu1>=0
-				}//iw
-			}//i
-			else
-			{
-				int tag;
-				// receive trace_lo2
-				tag = i * 10;
-				int* trace_lo2 = new int[NLOCAL];
-				MPI_Recv(trace_lo2, NLOCAL, MPI_INT, i, tag, GRID_WORLD, &status);
-
-/*
-				ofs_running << " Proc " << i << endl;
-				for(int i=0; i<NLOCAL; ++i)
-				{
-					ofs_running << setw(5) << i << setw(10) << trace_lo2[i] << endl;
-				}
-				*/
-
-				// receive lgd2
-				int lgd2 = 0;
-				tag = i * 10 + 1;
-				MPI_Recv(&lgd2, 1, MPI_INT, i, tag, GRID_WORLD, &status);
-
-//				ofs_running << " receive=" << tag << endl;
-				
-				// send csend
-				complex<double>* csend = new complex<double>[NBANDS*lgd2];
-				ZEROS(csend, NBANDS*lgd2);
-
-				for (int iw=0; iw<NLOCAL; iw++)
-				{
-					const int mu1 = trace_lo2[iw];
-					if (mu1>=0)
-					{
-						const int mu2 = this->trace_lo_tot[iw]; 
-						if(mu2<0)
-						{
-							ofs_running << " iw = " << iw << endl;
-							ofs_running << " GridT.trace_lo=" << mu1 << endl;
-							ofs_running << " trace_lo_tot=" << mu2 << endl;
-							assert(mu2>=0);
-						}
-
-						for (int ib=0; ib<NBANDS; ib++)
-						{
-							csend[mu1*NBANDS+ib] = this->totwfc_B[0][ib][mu2];
-						}
-					}
-				}
-
-				tag = i * 10 + 2;
-//				ofs_running << " send=" << tag << endl;
-				MPI_Send(csend,NBANDS*lgd2,mpicomplex,i,tag,GRID_WORLD);
-//				ofs_running << " send done." << endl;
-
-				delete[] csend;
-				delete[] trace_lo2;
-			}
-		}//GRANK=0
-		else if(i==GRANK)
-		{
-			int tag;
-			// send trace_lo
-			tag = GRANK * 10;
-			MPI_Send(GridT.trace_lo, NLOCAL, MPI_INT, 0, tag, GRID_WORLD);
-
-			//ofs_running << " send1." << endl;
-
-			// send GridT.lgd
-			tag = GRANK * 10 + 1;
-			MPI_Send(&GridT.lgd, 1, MPI_INT, 0, tag, GRID_WORLD);
-
-			//ofs_running << " send2." << endl;
-
-			// receive c
-			complex<double>* crecv = new complex<double>[NBANDS*GridT.lgd];
-			ZEROS(crecv, NBANDS*GridT.lgd);
-
-			tag = GRANK * 10 + 2;
-//			ofs_running << " receive=" << tag << endl;
-			MPI_Recv(crecv, NBANDS*GridT.lgd, mpicomplex, 0, tag, GRID_WORLD, &status);
-//			ofs_running << " receive done." << endl;
-
-
-			for(int ib=0; ib<NBANDS; ++ib)
-			{
-				for (int mu=0; mu<GridT.lgd; ++mu)
-				{
-					LOWF.WFC_GAMMA_B[CURRENT_SPIN][ib][mu] = crecv[mu*NBANDS+ib];
-				}
-			}
-
-			delete[] crecv;
-		}
-		MPI_Barrier(GRID_WORLD);
-	}//end i
-
-
-	//-------------------
-	// Test
-	//-------------------
-	/*
-	ofs_running << " WFC GAMMA B" << " CURRENT_SPIN=" << CURRENT_SPIN << endl;
-	for(int i=0; i<NBANDS; ++i)
-	{
-		for(int j=0; j<NLOCAL; ++j)
-		{
-			const int mu = GridT.trace_lo[j];
-			if(mu>=0)
-			{
-				//				if( abs(LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
-				ofs_running << setw(5) << i+1 << setw(8) << j+1 
-					<< setw(15) << LOWF.WFC_GAMMA_B[CURRENT_SPIN][i][mu] << endl; 
-			}
-		}
-	}
-	*/
-
-#endif //mohan fix bug 2012-02-04
-
-	if(GRANK==0)
-	{
-		// 1 spin because it can not be calculated two spin
-		// at the same time.
-		for(int is=0; is<1; ++is)
-		{
-			for(int ib=0; ib<NBANDS; ++ib)
-			{
-				if(allocate_totwfc)
-				{
-					delete[] this->totwfc_B[is][ib];
-				}
-			}
-			delete[] this->totwfc_B[is];
-		}
-		delete[] this->totwfc_B;
-		this->allocate_totwfc = false;
-	}
-	return;
-}
-
-
-
-/*
-void SubGrid_oper::distri_lowf_aug(double **ctot, double **c_aug)
-{
-    TITLE("WF_Local","distri_lowf_aug");
-
-#ifdef __MPI
-    MPI_Status status;
-
-	//-------------------------------------------------
-	// Do the distribution of augmented wave functions
-	// for each of the processors
-	//-------------------------------------------------
-    for (int i=0; i<DSIZE; i++)
-    {
-		//----------------------------------------
-		// Rank 0 processor, very special.
-		//----------------------------------------
-        if (DRANK==0)
-        {
-            if (i==0)
-            {
-				//-------------------------------------
-                // get the wave functions from 'ctot',
-                // save them in the matrix 'c_aug'.
-				//-------------------------------------
-                for (int iw=0; iw<NLOCAL; iw++)
-                {
-					const int mu = LOWF.trace_aug[iw];
-					if( mu < 0 ) continue;
-					for (int ib=0; ib<NBANDS; ib++)
-					{
-						c_aug[ib][mu] = ctot[ib][iw];
-					}
-				}
-			}
-            else
-            {
-				// send the needed data to processor 'i'
-                int tag;
-                // (1) receive 'trace_lo2'
-                tag = i * 3;
-                int* tmp_trace = new int[NLOCAL];
-                MPI_Recv(tmp_trace, NLOCAL, MPI_INT, i, tag, DIAG_WORLD, &status);
-
-//				ofs_running << " Recv trace from pro " << i << endl; 
-
-                // (2) receive daug
-                tag = i * 3 + 1;
-                int daug = 0;
-                MPI_Recv(&daug, 1, MPI_INT, i, tag, DIAG_WORLD, &status);
-
-*/

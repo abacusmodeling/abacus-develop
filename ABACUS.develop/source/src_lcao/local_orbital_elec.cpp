@@ -779,17 +779,9 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 
 
 				//	// mohan add 2011-04-15
-				//	if(BFIELD)
-				//	{
-				//		//cout << " solve comlex matrix()" << endl;
-				//		DLM.solve_complex_matrix(ik, SGO.totwfc_B[0], istep);
-				//	}
-				//	else
-				//	{
-				//		//DLM.solve_double_matrix(ik, LOWF.WFC_GAMMA[CURRENT_SPIN]);
-				//		// the temperary array totwfc only have one spin direction.
-				//		DLM.solve_double_matrix(ik, SGO.totwfc[0]);
-				//	}
+				//	//DLM.solve_double_matrix(ik, LOWF.WFC_GAMMA[CURRENT_SPIN]);
+				//	// the temperary array totwfc only have one spin direction.
+				//	DLM.solve_double_matrix(ik, SGO.totwfc[0]);
 				//}
 				//else if(LINEAR_SCALING==2)
 				//{	
@@ -812,17 +804,9 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 				//xiaohui add 2013-09-02
 				Diago_LCAO_Matrix DLM;
 
-				if(BFIELD)
-				{
-					//cout << " solve comlex matrix()" << endl;
-					DLM.solve_complex_matrix(ik, SGO.totwfc_B[0], LOC.wfc_dm_2d.wfc_k[ik]);
-				}
-				else
-				{
-					//DLM.solve_double_matrix(ik, LOWF.WFC_GAMMA[CURRENT_SPIN]);
-					// the temperary array totwfc only have one spin direction.
-					DLM.solve_double_matrix(ik, SGO.totwfc[0], LOC.wfc_dm_2d.wfc_gamma[ik]);
-				} //xiaohui add 2013-09-02. Attention...
+				//DLM.solve_double_matrix(ik, LOWF.WFC_GAMMA[CURRENT_SPIN]);
+				// the temperary array totwfc only have one spin direction.
+				DLM.solve_double_matrix(ik, SGO.totwfc[0], LOC.wfc_dm_2d.wfc_gamma[ik]);
 			}
 			else
 			{
@@ -838,14 +822,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			MPI_Barrier(MPI_COMM_WORLD);
 #endif
 			// distribute the wave functions again.
-			if(!BFIELD)
-			{
-				SGO.dis_subwfc();
-			}
-			else
-			{
-				SGO.dis_subwfc_complex();
-			}	
+			SGO.dis_subwfc();
 		}//end gamma
 		// with k points
 		else

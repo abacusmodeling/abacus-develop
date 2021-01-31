@@ -167,14 +167,6 @@ void Input::Default(void)
 	eopreg = 0.1;
 	eamp = 0.001; // (a.u. = 51.44 * 10^10 V/m )
 
-	bfield = 0;
-	bfield_teslax = 0.0;
-	bfield_teslay = 0.0;
-	bfield_teslaz = 0.0;
-	bfield_gauge_x = 0.0;
-	bfield_gauge_y = 0.0;
-	bfield_gauge_z = 0.0;
-	
 	opt_epsilon2 = false;//mohan add 2010-03-24
 	opt_nbands = 0;
     lda_plus_u = false;
@@ -659,34 +651,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("eamp", word) == 0)// electrical field amplitute
         {
             read_value(ifs, eamp);
-        }
-        else if (strcmp("bfield", word) == 0)// magnetic B field
-        {
-            read_value(ifs, bfield);
-        }
-        else if (strcmp("bfield_teslax", word) == 0)// magnetic Bx field
-        {
-            read_value(ifs, bfield_teslax);
-        }
-        else if (strcmp("bfield_teslay", word) == 0)// magnetic By field
-        {
-            read_value(ifs, bfield_teslay);
-        }
-        else if (strcmp("bfield_teslaz", word) == 0)// magnetic Bz field
-        {
-            read_value(ifs, bfield_teslaz);
-        }
-        else if (strcmp("bfield_gauge_x", word) == 0)// origin of magnetic Bz field
-        {
-            read_value(ifs, bfield_gauge_x);
-        }
-        else if (strcmp("bfield_gauge_y", word) == 0)// origin of magnetic Bz field
-        {
-            read_value(ifs, bfield_gauge_y);
-        }
-        else if (strcmp("bfield_gauge_z", word) == 0)// origin of magnetic Bz field
-        {
-            read_value(ifs, bfield_gauge_z);
         }
         else if (strcmp("opt_epsilon2", word) == 0)// optical field
         {
@@ -1983,13 +1947,6 @@ void Input::Bcast()
     Parallel_Common::bcast_double( eamp );
 
 
-    Parallel_Common::bcast_int( bfield );
-    Parallel_Common::bcast_double( bfield_teslax );
-    Parallel_Common::bcast_double( bfield_teslay );
-    Parallel_Common::bcast_double( bfield_teslaz );
-    Parallel_Common::bcast_double( bfield_gauge_x );//sunzhiyuan
-    Parallel_Common::bcast_double( bfield_gauge_y );
-    Parallel_Common::bcast_double( bfield_gauge_z );
     Parallel_Common::bcast_bool( opt_epsilon2 );
     Parallel_Common::bcast_int( opt_nbands );
     Parallel_Common::bcast_bool( lda_plus_u );
@@ -3031,10 +2988,6 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"pseudo_type",global_pseudo_type,"the type pseudo files"); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	OUTP(ofs,"dft_functional",dft_functional,"exchange correlation functional"); // xiaohui add 2015-03-24
 //	OUTP(ofs,"wannier_card",wannier_card,"not used now");
-#ifdef __EPM
-	OUTP(ofs,"epm_pseudo_card",epm_pseudo_card,"name of empirical pseudo");
-	OUTP(ofs,"epm_spin_orbital",epm_spin_orbital,"spin orbital in emprical pseudo");
-#endif
 	OUTP(ofs,"calculation",calculation,"test; scf; relax; nscf; ienvelope; istate;");
 	OUTP(ofs,"ntype",ntype,"atom species number");
 	OUTP(ofs,"nspin",nspin,"1: single spin; 2: up and down spin; 4: noncollinear spin");
@@ -3210,16 +3163,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"eamp",eamp,"amplitute of the efield, unit is a.u.");
 	OUTP(ofs,"eamp_v",eamp*51.44,"amplitute of the efield, unit is V/A");
 
-	ofs << "\n#Parameters (12.Bfield)" << endl;
-	OUTP(ofs,"bfield",bfield,"add magnetic field");
-	OUTP(ofs,"bfield_teslax",bfield_teslax,"magnetic field strength");
-	OUTP(ofs,"bfield_teslay",bfield_teslay,"magnetic field strength");
-	OUTP(ofs,"bfield_teslaz",bfield_teslaz,"magnetic field strength");
-	OUTP(ofs,"bfield_gauge_x",bfield_gauge_x,"magnetic field gauge origin");
-	OUTP(ofs,"bfield_gauge_y",bfield_gauge_y,"magnetic field gauge origin");
-	OUTP(ofs,"bfield_gauge_z",bfield_gauge_z,"magnetic field gauge origin");
-
-	ofs << "\n#Parameters (13.Test)" << endl;
+	ofs << "\n#Parameters (12.Test)" << endl;
 	OUTP(ofs,"out_alllog",out_alllog,"output information for each processor, when parallel");
 	OUTP(ofs,"nurse", nurse,"for coders");
 	OUTP(ofs,"colour", colour,"for coders, make their live colourful");
@@ -3230,11 +3174,8 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"test_force", test_force, "test the force");
 	OUTP(ofs,"test_stress", test_stress, "test the force");
 	
-#ifdef __EPM_
-	OUTP(ofs,"fs_ref_energy",fs_ref_energy);
-#endif	
 
-	ofs << "\n#Parameters (14.Other Methods)" << endl;
+	ofs << "\n#Parameters (13.Other Methods)" << endl;
 	OUTP(ofs,"mlwf_flag",mlwf_flag,"turn MLWF on or off");
 	OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
 	OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
@@ -3254,7 +3195,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"vdwD2_radius_unit",vdwD2_radius_unit,"unit of radius cutoff for periodic structure");	
 	ofs << setw(20) << "vdwD2_period" << vdwD2_period.x << " " << vdwD2_period.y << " " << vdwD2_period.z<< " #periods of periodic structure" << endl; */
 	
-	ofs << "\n#Parameters (15.VdW Correction)" << endl;								
+	ofs << "\n#Parameters (14.VdW Correction)" << endl;								
 //jiyy add 2019-08-04
 	OUTP(ofs,"vdw_method",vdw_method,"the method of calculating vdw (none ; d2 ; d3_0 ; d3_bj");
 	OUTP(ofs,"vdw_s6",vdw_s6,"scale parameter of d2/d3_0/d3_bj");
@@ -3275,7 +3216,7 @@ void Input::Print(const string &fn)const
 	ofs << setw(20) << "vdw_period" << vdw_period.x << " " << vdw_period.y << " " << vdw_period.z<< " #periods of periodic structure" << endl;
 	
 	
-	ofs << "\n#Parameters (16.spectrum)" << endl;              // pengfei Li add 2016-11-23
+	ofs << "\n#Parameters (15.spectrum)" << endl;              // pengfei Li add 2016-11-23
 	//OUTP(ofs,"epsilon",epsilon,"calculate epsilon or not");
 	//OUTP(ofs,"epsilon_choice",epsilon_choice,"0: hilbert_transform method; 1: standard method");
 	OUTP(ofs,"spectral_type",spectral_type,"the type of the calculated spectrum");

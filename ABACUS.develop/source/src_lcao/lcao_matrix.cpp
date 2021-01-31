@@ -76,16 +76,7 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	// (3) allocate matrix.
 	if(GAMMA_ONLY_LOCAL)
 	{
-		if(BFIELD)
-		{
-			// if b field is chosen,
-			// the hamiltonian is complex<double>.
-			allocate_HS_k(ParaO.nloc);	
-		}
-		else
-		{
-			allocate_HS_gamma(ParaO.nloc);
-		}
+		allocate_HS_gamma(ParaO.nloc);
 	}
 	else
 	{
@@ -477,27 +468,24 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 	ofs_running << " element number = " << ParaO.ncol << endl;
 	if (mtype=='S')
 	{
-		if(!BFIELD)
+		cout << setprecision(8);
+		cout << " print Sloc" << endl;
+		for(int i=0; i<NLOCAL; ++i)
 		{
-			cout << setprecision(8);
-			cout << " print Sloc" << endl;
-			for(int i=0; i<NLOCAL; ++i)
+			for(int j=0; j<NLOCAL; ++j)
 			{
-				for(int j=0; j<NLOCAL; ++j)
+				double v = Sloc[i*ParaO.ncol+j];
+				if( abs(v) > 1.0e-8)
 				{
-					double v = Sloc[i*ParaO.ncol+j];
-					if( abs(v) > 1.0e-8)
-					{
-						cout << setw(15) << v;
-					}
-					else
-					{
-						cout << setw(15) << "0";
-					}
-				}//end j
-				cout << endl;
-			}//end i
-		}
+					cout << setw(15) << v;
+				}
+				else
+				{
+					cout << setw(15) << "0";
+				}
+			}//end j
+			cout << endl;
+		}//end i
 
 		/*
 		   ofs_running << " " << setw(10) << "LocalRow" << setw(10) << "LocalCol"
@@ -591,50 +579,44 @@ void LCAO_Matrix::print_HSgamma(const char &mtype)
 		}
 		*/
 
-		if(!BFIELD)
+		cout << " print Hloc_fixed" << endl;
+		for(int i=0; i<NLOCAL; ++i)
 		{
-			cout << " print Hloc_fixed" << endl;
-			for(int i=0; i<NLOCAL; ++i)
+			for(int j=0; j<NLOCAL; ++j)
 			{
-				for(int j=0; j<NLOCAL; ++j)
+				double v = Hloc_fixed[i*ParaO.ncol+j];
+				if( abs(v) > 1.0e-8)
 				{
-					double v = Hloc_fixed[i*ParaO.ncol+j];
-					if( abs(v) > 1.0e-8)
-					{
-						cout << setw(15) << v;
-					}
-					else
-					{
-						cout << setw(15) << "0";
-					}
-				}//end j
-				cout << endl;
-			}//end i
-		}
+					cout << setw(15) << v;
+				}
+				else
+				{
+					cout << setw(15) << "0";
+				}
+			}//end j
+			cout << endl;
+		}//end i
 	}
 	if (mtype=='H')
 	{
 
-		if(!BFIELD)
+		cout << " print Hloc" << endl;
+		for(int i=0; i<NLOCAL; ++i)
 		{
-			cout << " print Hloc" << endl;
-			for(int i=0; i<NLOCAL; ++i)
+			for(int j=0; j<NLOCAL; ++j)
 			{
-				for(int j=0; j<NLOCAL; ++j)
+				double v = Hloc[i*ParaO.ncol+j];
+				if( abs(v) > 1.0e-8)
 				{
-					double v = Hloc[i*ParaO.ncol+j];
-					if( abs(v) > 1.0e-8)
-					{
-						cout << setw(15) << v;
-					}
-					else
-					{
-						cout << setw(15) << "0";
-					}
-				}//end j
-				cout << endl;
-			}//end i
-		}
+					cout << setw(15) << v;
+				}
+				else
+				{
+					cout << setw(15) << "0";
+				}
+			}//end j
+			cout << endl;
+		}//end i
 
 	/*
 		ofs_running << " " << setw(10) << "LocalRow" << setw(10) << "LocalCol"

@@ -2,14 +2,8 @@
 #define ATOM_H
 
 #include "tools.h"
-
-#ifdef __EPM
-#include "../src_epm/atom_epm.h"
-class Atom: public Atom_epm
-#else
 #include "atom_pseudo.h"
 class Atom: public Atom_pseudo
-#endif
 {
 public:
 

@@ -150,22 +150,14 @@ void Atom::bcast_atom()
         Parallel_Common::bcast_double( mag[i] );
     }
 
-#ifdef __EPM
-    bcast_atom_epm( na );
-#else
     bcast_atom_pseudo( na );
-#endif
 
     return;
 }
 
 void Atom::bcast_atom2()
 {
-#ifdef __EPM
-
-#else
     bcast_atom_pseudo2();
-#endif
 }
 
 #endif

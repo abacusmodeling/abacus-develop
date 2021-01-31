@@ -13,9 +13,6 @@ public:
     electrons();
     ~electrons();
 
-#ifdef __EPM
-
-#else
 public:
 
     //==========================================================
@@ -33,12 +30,6 @@ public:
     int unit;
     double delta_total_energy;
 
-//	bool lscf;       // if .TRUE. the calculation is selfconsistent
-//	bool lmd;        // if .TRUE. the calculation is a dynamics
-//	bool lpath;      // if .TRUE. the calculation is a path optimizations
-//	bool tefield;    // if .TRUE. a finite electric field is added to the
-//	double etotefield;	// energy correction due to the field
-
 protected:
     void self_consistent(const int &istep);
     void non_self_consistent(void);
@@ -54,7 +45,6 @@ private:
     // used in electrons()
     bool check_stop_now(void);
     void init_mixstep_final_scf(void);
-#endif
 };
 
-#endif// ELECTRONS
+#endif

@@ -59,13 +59,6 @@ public:
 	double emaxpos;
 	double eopreg;
 	double eamp;
-	int bfield;				// add magnetic field
-	double bfield_teslax;	//
-	double bfield_teslay;	//
-	double bfield_teslaz;	//
-	double bfield_gauge_x;  // add by sunzhuyuan,
-	double bfield_gauge_y;
-	double bfield_gauge_z;
 	bool opt_epsilon2;		// true : calculate the dielectric functions
 	int  opt_nbands;		// number of bands for optical transition matrix
     bool lda_plus_u;		// true : lda plus u calculation

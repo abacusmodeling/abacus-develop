@@ -11,7 +11,6 @@ class Local_Orbital_wfc
 	~Local_Orbital_wfc();
 
 	double*** WFC_GAMMA; // [NSPIN, NBANDS, NLOCAL]
-	complex<double>*** WFC_GAMMA_B; // WFC_GAMMA for B field calculation.
 
 	// used to generate density matrix: LOC.DM_R,
 	// which is used to calculate the charge density. 
