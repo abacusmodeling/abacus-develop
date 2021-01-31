@@ -295,7 +295,7 @@ pzt2s.o\
 pdtrsm.o\
 pzhtrsm.o\
 
-PDIAG_MR=dcopy.o\
+PDIAG_MR_0=dcopy.o\
 dlae2.o\
 dlaebz.o\
 dlaev2.o\

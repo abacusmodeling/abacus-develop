@@ -1,4 +1,5 @@
-# Makefile for plane wave basis code.
+# This is the Makefile of ABACUS
+
 include Makefile.system
 include Makefile.Objects
 
@@ -45,7 +46,7 @@ OPTS_GDB = -g -W -I/home/mohan/software/boost_1_39_0/
 #==========================
 # OBJECTS NEEDED
 #==========================
-FP_OBJS=$(OBJS_OTHER)\
+FP_OBJS_0=$(OBJS_OTHER)\
 $(OBJS_FIRST_PRINCIPLE)\
 $(OBJS_PARALLEL)\
 $(OBJS_TOOLS) \
@@ -56,15 +57,17 @@ $(OBJS_WANNIER)\
 $(OBJS_COMMON)\
 $(OBJS_MLWF)\
 $(OBJS_EXX)\
-main.o \
+main.o\
 
-PDIAG_OBJS=$(OBJS_PDIAG)\
+FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
+PDIAG_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${OBJS_PDIAG})
+PDIAG_MR=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PDIAG_MR_0})
 
 #==========================
 # MAKING OPTIONS
 #==========================
-fp_mpi : ${FP_OBJS} ${PDIAG_MR} ${PDIAG_OBJS}$ ${HEADERS}
-	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi.1.0.0
+fp_mpi : ${FP_OBJS} ${PDIAG_OBJS} ${PDIAG_MR} ${HEADERS}
+	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi
 
 fp : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp.x 
@@ -81,11 +84,11 @@ fp_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
 #==========================
 # rules
 #==========================
-.cpp.o:
+${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} $< -o $@
-.f.o:
-	${FORTRAN} ${OPTS} -c ${HONG} $< -o $@	 
+${OBJ_DIR}/%.o:%.f
+	${FORTRAN} -c ${HONG} $< -o $@	 
 
 .PHONY:clean
 clean:
-	$(RM) *.o ../bin/ABACUS*
+	$(RM)  ${OBJ_DIR}/*.o ../bin/ABACUS*
