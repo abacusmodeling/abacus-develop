@@ -76,14 +76,14 @@ void IState_Envelope::begin(void)
 			for(int is=0; is<NSPIN; ++is)
 			{
 				cout << " Perform envelope function for band " << ib+1 << endl;
-				ZEROS(chr.rho[is],pw.nrxx);	
-				UHM.GG.cal_env( LOWF.WFC_GAMMA[is][ib], chr.rho[is] );
-				chr.save_rho_before_sum_band(); //xiaohui add 2014-12-09
+				ZEROS(CHR.rho[is],pw.nrxx);	
+				UHM.GG.cal_env( LOWF.WFC_GAMMA[is][ib], CHR.rho[is] );
+				CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 				stringstream ss;
 				ss << global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
 				// 0 means definitely output charge density.
 				bool for_plot = true;
-				chr.write_rho( is, 0, ss.str(), 3, for_plot );
+				CHR.write_rho( is, 0, ss.str(), 3, for_plot );
 			}
 		}
 	}

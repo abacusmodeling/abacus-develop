@@ -3,15 +3,11 @@
 
 #include "tools.h"
 
-//#if defined __FFTW2
-//#include "../src_parallel/fftw.h"
-//#elif defined __FFTW3
-//#include "../src_parallel/fftw3.h"
-//#endif
-
 class Hamilt_PW
 {
+
 public:
+
     Hamilt_PW();
     ~Hamilt_PW();
 

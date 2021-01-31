@@ -261,7 +261,7 @@ void Gint_Gamma::cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, 
         // calculate rho    
         //xiaohui move 2015-09-25, fix lcao+k bug;
         //timer::tick("Gint_Gamma","cal_band_rho",'J');    
-        double *rhop = chr.rho[is];
+        double *rhop = CHR.rho[is];
         for(int ib=0; ib<pw.bxyz; ++ib)
         {
             //double r = cblas_ddot(colidx[size], psir_ylm[ib], 1, psir_DM[ib], 1);
@@ -431,7 +431,7 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
 		
         for(int is=0; is<NSPIN; is++)
             for (int ir=0; ir<pw.nrxx; ir++)
-                sum += chr.rho[is][ir];
+                sum += CHR.rho[is][ir];
 			
         mkl_set_num_threads(mkl_threads);
     } // end of if(max_size)

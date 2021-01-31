@@ -140,7 +140,7 @@ void Charge_Extra::allocate(void)
 			// first value from charge density.
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
-				rho_ion[i][is][ir] = chr.rho[is][ir];	
+				rho_ion[i][is][ir] = CHR.rho[is][ir];	
 			}
 		}
 	}	
@@ -194,13 +194,13 @@ void Charge_Extra::extrapolate_charge()
 			// (1) save the current charge density.
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
-				rho_tmp[ir] = chr.rho[is][ir];	
+				rho_tmp[ir] = CHR.rho[is][ir];	
 			} 
 			
 			// (2) prepare charge density for the next ion iteration.
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
-				chr.rho[is][ir] = 2.0*rho_tmp[ir] - this->rho_ion[0][is][ir];
+				CHR.rho[is][ir] = 2.0*rho_tmp[ir] - this->rho_ion[0][is][ir];
 			}
 
 			// (3) save the current charge density for next step.
@@ -220,7 +220,7 @@ void Charge_Extra::extrapolate_charge()
 	{
 		// start from atomic charge density.
 		// worst method ever!
-		chr.atomic_rho(NSPIN, chr.rho);
+		CHR.atomic_rho(NSPIN, CHR.rho);
 	}
 xiaohui modify 2015-02-01*/
 	//else if(pot.extra_pot == 4)
@@ -237,7 +237,7 @@ xiaohui modify 2015-02-01*/
 			// should not do this after grid_technique is done!.
 //			for(int is=0; is<NSPIN; is++)
 //			{
-//				ZEROS(chr.rho[is], pw.nrxx);
+//				ZEROS(CHR.rho[is], pw.nrxx);
 //			}
 // 			UHM.GG.cal_rho();
 		}
@@ -262,12 +262,12 @@ xiaohui modify 2015-02-01*/
 			ZEROS(rho_atom_new[is], pw.nrxx);
 			//ZEROS(delta_rho[is], pw.nrxx);
 		}
-		chr.atomic_rho(NSPIN,rho_atom_old);
+		CHR.atomic_rho(NSPIN,rho_atom_old);
 		for(int is=0; is<NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
-				delta_rho[is][ir] = chr.rho[is][ir] - rho_atom_old[is][ir];
+				delta_rho[is][ir] = CHR.rho[is][ir] - rho_atom_old[is][ir];
 			}
 		}
 
@@ -276,12 +276,12 @@ xiaohui modify 2015-02-01*/
 		pw.setup_structure_factor();
 
 		//xiaohui add 2014-05-03
-		chr.atomic_rho(NSPIN,rho_atom_new);
+		CHR.atomic_rho(NSPIN,rho_atom_new);
 		for(int is=0; is<NSPIN; is++)
                 {
                 	for(int ir=0; ir<pw.nrxx; ir++)
                         {
-                        	chr.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
+                        	CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
                         }
                 }
 		for(int is=0; is<NSPIN; is++)
@@ -322,13 +322,13 @@ xiaohui modify 2015-02-01*/
 			//ZEROS(delta_rho2[is], pw.nrxx);
 			//ZEROS(delta_rho[is], pw.nrxx);
 		}
-		chr.atomic_rho(NSPIN,rho_atom_old);
+		CHR.atomic_rho(NSPIN,rho_atom_old);
 		for(int is=0; is<NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
 				delta_rho2[is][ir] = delta_rho1[is][ir];
-				delta_rho1[is][ir] = chr.rho[is][ir] - rho_atom_old[is][ir];
+				delta_rho1[is][ir] = CHR.rho[is][ir] - rho_atom_old[is][ir];
 				delta_rho[is][ir] = 2*delta_rho1[is][ir] - delta_rho2[is][ir];
 			}
 		}
@@ -338,18 +338,18 @@ xiaohui modify 2015-02-01*/
 		pw.setup_structure_factor();
 
 		//xiaohui add 2014-05-07
-		chr.atomic_rho(NSPIN,rho_atom_new);
+		CHR.atomic_rho(NSPIN,rho_atom_new);
 		for(int is=0; is<NSPIN; is++)
                 {
                 	for(int ir=0; ir<pw.nrxx; ir++)
                         {
 				if(istep == 1)
 				{
-                        		chr.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
+                        		CHR.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
 				}
 				else
 				{
-                        		chr.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
+                        		CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
 				}
                         }
                 }
@@ -391,7 +391,7 @@ xiaohui modify 2015-02-01*/
 			//ZEROS(delta_rho[is], pw.nrxx);
 		}
 
-		chr.atomic_rho(NSPIN,rho_atom_old);
+		CHR.atomic_rho(NSPIN,rho_atom_old);
 
 		find_alpha_and_beta();
 		//cout<<"alpha= "<<alpha<<endl;
@@ -403,7 +403,7 @@ xiaohui modify 2015-02-01*/
 			{
 				delta_rho3[is][ir] = delta_rho2[is][ir];
 				delta_rho2[is][ir] = delta_rho1[is][ir];
-				delta_rho1[is][ir] = chr.rho[is][ir] - rho_atom_old[is][ir];
+				delta_rho1[is][ir] = CHR.rho[is][ir] - rho_atom_old[is][ir];
 				delta_rho[is][ir] = delta_rho1[is][ir] + 
 							alpha * (delta_rho1[is][ir] - delta_rho2[is][ir]) +
 								beta * (delta_rho2[is][ir] - delta_rho3[is][ir]);
@@ -415,23 +415,23 @@ xiaohui modify 2015-02-01*/
 		pw.setup_structure_factor();
 
 		//xiaohui add 2014-05-07
-		chr.atomic_rho(NSPIN,rho_atom_new);
+		CHR.atomic_rho(NSPIN,rho_atom_new);
 		for(int is=0; is<NSPIN; is++)
                 {
                 	for(int ir=0; ir<pw.nrxx; ir++)
                         {
 				if(istep == 1)
 				{
-                        		chr.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
+                        		CHR.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
 				}
 				else if(istep == 2)
 				{
 					delta_rho[is][ir] = 2*delta_rho1[is][ir] - delta_rho2[is][ir];
-					chr.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
+					CHR.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
 				}
 				else
 				{
-                        		chr.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
+                        		CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
 				}
                         }
                 }

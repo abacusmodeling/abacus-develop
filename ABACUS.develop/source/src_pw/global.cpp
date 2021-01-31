@@ -22,11 +22,10 @@ Hamilt hm;
 UnitCell_pseudo ucell;
 pseudopot_cell_vnl ppcell;
 xcfunc xcf;
-Charge_Broyden chr;
+Charge_Broyden CHR;
 Magnetism mag;
 
 potential pot;
-electrons elec;
 Symmetry symm;
 Parallel_Grid Pgrid; //mohan add 2010-06-06 
 Parallel_Kpoints Pkpoints; // mohan add 2010-06-07

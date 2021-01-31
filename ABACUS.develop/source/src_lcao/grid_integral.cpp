@@ -224,7 +224,7 @@ void Grid_Integral::rho_in_small_box(void)
 			{
 				if ( this->norm1[count] < this->Rcut1 && this->norm2[count] < this->Rcut2)
 				{			
-					chr.rho[0][ ijk_index[count] ] += factor *
+					CHR.rho[0][ ijk_index[count] ] += factor *
 						Mathzone::Polynomial_Interpolation( 
 						pointer1->getPsiuniform(),				// Peize Lin update 2016-05-14
 						pointer1->getNruniform(),

@@ -91,7 +91,7 @@ void Run_Frag::LCAO_line(void)
 	timer::tick("Run_Frag","LCAO_line",'B');
 	
 	// (1) Init the charge density.
-    chr.init();
+    CHR.init();
     DONE(ofs_running,"INIT CHARGE");
 
 	// (2) Init the potential.
@@ -167,7 +167,7 @@ void Run_Frag::plane_wave_line(void)
     //=====================
     // init potential
     //=====================
-    chr.init();
+    CHR.init();
     pot.init(pw.nrxx);
 
     //=====================
@@ -308,7 +308,7 @@ void Run_Frag::linear_scaling_line(void)
 	TITLE("Run_Frag","linear_scaling_line");
 
     // (2) Init the charge density.
-    chr.init();
+    CHR.init();
     DONE(ofs_running,"INIT CHARGE");
 
     // (3) Init the potential.
@@ -471,7 +471,7 @@ void Run_Frag::final_calculation_after_vc(void)
     //=====================
     // init potential
     //=====================
-    chr.init_final_scf();
+    CHR.init_final_scf();
     pot.init(pw.nrxx);
     //=====================
     // init wave functions

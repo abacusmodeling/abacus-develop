@@ -46,6 +46,7 @@ atom_pseudo.o\
 unitcell_pseudo.o\
 threshold_elec.o\
 electrons.o \
+electrons_stochastic.o\
 forces.o\
 stress.o\
 myfunc1.o\
@@ -235,6 +236,7 @@ inverse_matrix.o \
 energy.o \
 wavefunc.o\
 wf_io.o \
+rwstream.o\
 wf_atomic.o \
 wf_igk.o \
 use_fft.o\

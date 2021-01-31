@@ -538,7 +538,7 @@ void Local_Orbital_Charge::sum_bands(void)
             
     for(int is=0; is<NSPIN; is++)
     {
-        ZEROS( chr.rho[is], pw.nrxx ); // mohan 2009-11-10
+        ZEROS( CHR.rho[is], pw.nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------
@@ -573,7 +573,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
     //BLOCK_HERE("sum_bands::before renormalize rho");  
 
-     chr.renormalize_rho();
+     CHR.renormalize_rho();
 
     timer::tick("Local_Orbital_Cha","sum_bands",'E');
      return;

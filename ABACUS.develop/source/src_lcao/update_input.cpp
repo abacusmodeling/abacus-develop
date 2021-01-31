@@ -147,10 +147,10 @@ bool Update_input::Read(const string &fn)
         else if (strcmp("mixing_beta", word) == 0)
         {
             read_value(ifs, mixing_beta);
-			if(mixing_beta!=chr.mixing_beta)
+			if(mixing_beta!=CHR.mixing_beta)
 			{
-				this->change(ofs_warning,"mixing_beta",chr.mixing_beta,mixing_beta);
-    			chr.mixing_beta = mixing_beta;
+				this->change(ofs_warning,"mixing_beta",CHR.mixing_beta,mixing_beta);
+    			CHR.mixing_beta = mixing_beta;
 			}
         }
 		// 8
@@ -187,10 +187,10 @@ bool Update_input::Read(const string &fn)
         else if (strcmp("out_charge", word) == 0)
         {
             read_value(ifs, out_charge);
-			if(out_charge!=chr.out_charge)
+			if(out_charge!=CHR.out_charge)
 			{
-				this->change(ofs_warning,"out_charge",chr.out_charge,out_charge);
-    			chr.out_charge = this->out_charge;
+				this->change(ofs_warning,"out_charge",CHR.out_charge,out_charge);
+    			CHR.out_charge = this->out_charge;
 			}
         }
 		// 11
@@ -270,10 +270,10 @@ void Update_input::Bcast()
     Parallel_Common::bcast_double( DRHO2 );
     Parallel_Common::bcast_int( NITER );
     Parallel_Common::bcast_int( NSTEP );
-    Parallel_Common::bcast_double( chr.mixing_beta );
+    Parallel_Common::bcast_double( CHR.mixing_beta );
     Parallel_Common::bcast_int( en.printe );
     Parallel_Common::bcast_string( pot.extra_pot );//xiaohui modify 2015-02-01
-    Parallel_Common::bcast_int( chr.out_charge );
+    Parallel_Common::bcast_int( CHR.out_charge );
     Parallel_Common::bcast_int( LOC.out_dm );
 	Parallel_Common::bcast_int( en.out_dos );
 	Parallel_Common::bcast_int( ParaO.out_lowf );

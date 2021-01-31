@@ -15,14 +15,12 @@
 #include "../run_frag.h"
 #include "charge_broyden.h"
 #include "potential.h"
-#include "electrons.h"
 #include "functional.h"
 #include "hamilt.h"
 #include "ions.h"
 #include "wavefunc.h"
 #include "use_fft.h"
 #include "klist.h"
-//#include "../src_develop/src_wannier/wan_global.h"
 #include "../src_pw/output.h"
 #include "magnetism.h"
 #include "vdwd2.h"
@@ -50,9 +48,8 @@ extern Hamilt hm;
 #include "../src_parallel/parallel_kpoints.h"
 extern pseudopot_cell_vnl ppcell;
 extern xcfunc xcf;
-extern Charge_Broyden chr;
+extern Charge_Broyden CHR;
 extern potential pot;
-extern electrons elec;
 //extern wannier wan;
 extern Symmetry symm;
 extern Magnetism mag;

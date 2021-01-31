@@ -222,7 +222,7 @@ void Local_Orbital_Ions::opt_ions(void)
         {
             for(int is=0; is<NSPIN; is++)
             {
-                ZEROS(chr.rho[is], pw.nrxx);
+                ZEROS(CHR.rho[is], pw.nrxx);
                 stringstream ssd;
                 ssd << global_out_dir << "SPIN" << is + 1 << "_DM" ;
                 // reading density matrix,
@@ -238,7 +238,7 @@ void Local_Orbital_Ions::opt_ions(void)
             {
                 UHM.GK.calculate_charge();	
             }
-            chr.renormalize_rho();
+            CHR.renormalize_rho();
             pot.init_pot( istep-1 );
         }
 

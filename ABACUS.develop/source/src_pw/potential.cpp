@@ -76,7 +76,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
         if(EFIELD && !DIPOLE)
         {
             Efield EFID;
-            // in fact, chr.rho is not used here.
+            // in fact, CHR.rho is not used here.
             // if charge correction due to Efield is considered,
             // the structure here need to be updated.
 
@@ -86,7 +86,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
                 cout << " ADD THE EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
                 first = false;
             }
-            EFID.add_efield(chr.rho[0], this->vltot);	
+            EFID.add_efield(CHR.rho[0], this->vltot);	
         }
     }
     else
@@ -107,7 +107,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
             }
         }
     	// (2) core correction potential.
-        chr.set_rho_core( pw.strucFac );
+        CHR.set_rho_core( pw.strucFac );
 
         //if(vna==1)return; // tmp by mohan
     }
@@ -120,7 +120,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
         if (this->start_pot == "atomic")//mohan add 2007-10-17
         {
             start_from_atomic:
-            chr.atomic_rho(NSPIN, chr.rho);
+            CHR.atomic_rho(NSPIN, CHR.rho);
         }
         else if (this->start_pot == "file")
         {
@@ -131,7 +131,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
                 ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
                 ofs_running << ssc.str() << endl;
                 // mohan update 2012-02-10
-                if(chr.read_rho( is, ssc.str() )) 
+                if(CHR.read_rho( is, ssc.str() )) 
                 {
                     ofs_running << " Read in the charge density: " << ssc.str() << endl;
                 }
@@ -141,7 +141,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 			{//read only up+down , others set to zero.
 				ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
 				for(int ir=0;ir<pw.nrxx;ir++)
-					chr.rho[is][ir] = 0.0;
+					CHR.rho[is][ir] = 0.0;
 			}
 			else if(PRENSPIN == 2)
 			{//read up and down , then rearrange them.
@@ -155,10 +155,10 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 					ofs_running << " rearrange charge density " << endl;
 					for(int ir=0;ir<pw.nrxx;ir++)
 					{
-						chr.rho[3][ir] = chr.rho[0][ir] - chr.rho[1][ir];
-						chr.rho[0][ir] = chr.rho[0][ir] + chr.rho[1][ir];
-						chr.rho[1][ir] = 0.0;
-						chr.rho[2][ir] = 0.0;
+						CHR.rho[3][ir] = CHR.rho[0][ir] - CHR.rho[1][ir];
+						CHR.rho[0][ir] = CHR.rho[0][ir] + CHR.rho[1][ir];
+						CHR.rho[1][ir] = 0.0;
+						CHR.rho[2][ir] = 0.0;
 					}
 				}
 			}
@@ -192,7 +192,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
         // the extrapolation part moves to ions.cpp.
     }
 
-    chr.renormalize_rho();
+    CHR.renormalize_rho();
 
     //-------------------------------------------------------
     // Here we computer the potential which correspond
@@ -203,7 +203,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     //   delta_vh = 1: get the delta Hartree potential.
     //   delta_vh = 0: get the full Hartree potential.
     //--------------------------------------------------------
-    this->v_of_rho( chr.rho, en.ehart, en.etxc, en.vtxc, vr, delta_vh, vna);
+    this->v_of_rho( CHR.rho, en.ehart, en.etxc, en.vtxc, vr, delta_vh, vna);
 
     //----------------------------------------------------------
     // Define the total local potential (external+scf)
@@ -242,7 +242,7 @@ void potential::set_local(double* vl_pseudo)const
     if(EFIELD && !DIPOLE)
     {
         Efield EFID;
-        // in fact, chr.rho is not used here.
+        // in fact, CHR.rho is not used here.
         // if charge correction due to Efield is considered,
         // the structure here need to be updated.
 
@@ -252,7 +252,7 @@ void potential::set_local(double* vl_pseudo)const
             cout << " ADD THE EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
             first = false;
         }
-        EFID.add_efield(chr.rho[0], vl_pseudo);	
+        EFID.add_efield(CHR.rho[0], vl_pseudo);	
     }
 
     //ofs_running <<" set local pseudopotential done." << endl;
@@ -290,7 +290,7 @@ void potential::v_of_rho
             ZEROS(rho_atom[is], pw.nrxx);
         }
 
-        chr.atomic_rho(NSPIN,rho_atom);
+        CHR.atomic_rho(NSPIN,rho_atom);
 
         this->v_h(NSPIN, ehart, v_in, rho_atom);
 
@@ -326,7 +326,7 @@ void potential::v_of_rho
             ZEROS(rho_atom[is], pw.nrxx);
         }
 
-        chr.atomic_rho(NSPIN,rho_atom);
+        CHR.atomic_rho(NSPIN,rho_atom);
 
         //--------------------------------------------
         // get the delta atomic charge on real space
@@ -406,7 +406,7 @@ void potential::v_xc
         // 2008-06-01 mohan
         for (int ir = 0;ir < pw.nrxx;ir++)
         {
-            rhox = rho_in[0][ir] + chr.rho_core[ir];
+            rhox = rho_in[0][ir] + CHR.rho_core[ir];
             arhox = abs(rhox);
             if (arhox > vanishing_charge)
             {
@@ -433,7 +433,7 @@ void potential::v_xc
         if (test_potential>0) cout<<"\n Begin calculate Exc(r) and Vxc(r)";
         for (ir = 0;ir < pw.nrxx;ir++)
         {
-            rhox = rho_in[0][ir] + rho_in[1][ir] + chr.rho_core[ir]; //HLX(05-29-06): bug fixed
+            rhox = rho_in[0][ir] + rho_in[1][ir] + CHR.rho_core[ir]; //HLX(05-29-06): bug fixed
             arhox = abs(rhox);
 
             if (arhox > vanishing_charge)
@@ -483,7 +483,7 @@ void potential::v_xc
         {
             double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
 
-            rhox = rho_in[0][ir] + chr.rho_core[ir];
+            rhox = rho_in[0][ir] + CHR.rho_core[ir];
 
             if ( rho_in[0][ir] < 0.0 )  neg[0] -= rho_in[0][ir];
 
@@ -1389,7 +1389,7 @@ void potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     {
         for(int ir=0; ir<pw.nrxx; ir++)
         {
-            Porter[ir] += complex<double>( chr.rho[is][ir], 0.0 );
+            Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
         }
     }
 

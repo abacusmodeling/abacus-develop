@@ -149,8 +149,8 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		// mohan add 2010-07-16
 		// used for pulay mixing.
-		if(iter==1) chr.set_new_e_iteration(true);
-		else chr.set_new_e_iteration(false);
+		if(iter==1) CHR.set_new_e_iteration(true);
+		else CHR.set_new_e_iteration(false);
 
 		// set converged threshold, 
 		// automatically updated during self consistency, only for CG.
@@ -158,9 +158,9 @@ void Local_Orbital_Elec::scf(const int &istep)
         if(FINAL_SCF && iter==1)
         {
             init_mixstep_final_scf();
-            //chr.irstep=0;
-            //chr.idstep=0;
-            //chr.totstep=0;
+            //CHR.irstep=0;
+            //CHR.idstep=0;
+            //CHR.totstep=0;
         }
 
 		// mohan update 2012-06-05
@@ -208,7 +208,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 				// so be careful here, make sure
 				// rho1 and rho2 are the same rho.
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-				pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+				pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
 				en.delta_escf();
 				if (vext == 0)	pot.set_vrs(pw.doublegrid);
 				else		pot.set_vrs_tddft(pw.doublegrid, istep);
@@ -293,7 +293,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		}
 
 		// (2)
-		chr.save_rho_before_sum_band();
+		CHR.save_rho_before_sum_band();
 		
 
 		// (3) sum bands to calculate charge density
@@ -364,7 +364,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// resume codes!
 		//-------------------------------------------------------------------------
 		//this->LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
-		//chr.sum_band(); use local orbital in plane wave basis to calculate bands.
+		//CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
 		// but must has evc first!
 		//-------------------------------------------------------------------------
 
@@ -372,7 +372,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		en.deband = en.delta_e();
 
 		// (8) Mix charge density
-		chr.mix_rho(dr2,0,DRHO2,iter,conv_elec);
+		CHR.mix_rho(dr2,0,DRHO2,iter,conv_elec);
 		
 		// Peize Lin add 2020.04.04
 		if(restart.info_save.save_charge)
@@ -392,7 +392,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		if(!conv_elec)
 		{
 			// option 1
-			pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+			pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
 			en.delta_escf();
 
 			// option 2
@@ -401,16 +401,16 @@ void Local_Orbital_Elec::scf(const int &istep)
 			// use real E_tot functional.
 			//------------------------------
 			/*
-			pot.v_of_rho(chr.rho_save, en.ehart, en.etxc, en.vtxc, pot.vr);
+			pot.v_of_rho(CHR.rho_save, en.ehart, en.etxc, en.vtxc, pot.vr);
 			en.calculate_etot();
 			en.print_etot(conv_elec, istep, iter, dr2, 0.0, ETHR, avg_iter,0);
-			pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+			pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
 			en.delta_escf();
 			*/
 		}
 		else
 		{
-			pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vnew);
+			pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vnew);
 			//(used later for scf correction to the forces )
 			pot.vnew -= pot.vr;
 			en.descf = 0.0;
@@ -425,7 +425,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 			
 			stringstream ssc;
 			ssc << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-			chr.write_rho( is, iter, ssc.str(), precision );//mohan add 2007-10-17
+			CHR.write_rho( is, iter, ssc.str(), precision );//mohan add 2007-10-17
 
 			stringstream ssd;
 
@@ -482,7 +482,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 			//quxin add for DFT+U for nscf calculation
 			if(INPUT.dft_plus_u)
 			{
-				if(chr.out_charge)
+				if(CHR.out_charge)
 				{
 					stringstream sst; 
 					sst << global_out_dir << "onsite.dm"; 
@@ -496,7 +496,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 
         			stringstream ssc;
        				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-        			chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+        			CHR.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
 
 				stringstream ssd;
 				if(GAMMA_ONLY_LOCAL)
@@ -521,7 +521,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 				//fuxiang add 2017-03-15
 				stringstream sse;
 				sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
-				chr.write_rho_dipole( is, 0, sse.str());
+				CHR.write_rho_dipole( is, 0, sse.str());
 				*/
 			}
 			
@@ -914,9 +914,9 @@ void Local_Orbital_Elec::init_mixstep_final_scf(void)
 {
     TITLE("Local_Orbital_Elec","init_mixstep_final_scf");
 
-    chr.irstep=0;
-    chr.idstep=0;
-    chr.totstep=0;
+    CHR.irstep=0;
+    CHR.idstep=0;
+    CHR.totstep=0;
 
     return;
 }

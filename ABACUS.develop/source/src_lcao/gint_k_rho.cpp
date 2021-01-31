@@ -354,7 +354,7 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 		} // ia1
 		
 		// calculate rho
-		double *rhop = chr.rho[is];
+		double *rhop = CHR.rho[is];
 		for(int ib=0; ib<pw.bxyz; ++ib)
 		{
 			double r=ddot_(&block_index[size], psir_ylm[ib], &inc, psir_DM[ib], &inc);
@@ -680,7 +680,7 @@ void Gint_k::evaluate_pDMp(const int &grid_index, const int &size,
 	{
 		for(int ib=0; ib<pw.bxyz; ib++)
 		{
-			chr.rho[is][vindex[ib]] += tchg[is][ib];
+			CHR.rho[is][vindex[ib]] += tchg[is][ib];
 		}
 	}
 

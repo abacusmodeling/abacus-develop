@@ -144,7 +144,7 @@ double Gint_Speed::gamma_charge(void)
 									   */
 								}
 							}
-							chr.rho[CURRENT_SPIN][ig] += sum;
+							CHR.rho[CURRENT_SPIN][ig] += sum;
 						}
 					}// jr
 				}// i
@@ -166,7 +166,7 @@ double Gint_Speed::gamma_charge(void)
 	{
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{
-			sum += chr.rho[is][ir];
+			sum += CHR.rho[is][ir];
 		}
 	}
 #ifdef __MPI

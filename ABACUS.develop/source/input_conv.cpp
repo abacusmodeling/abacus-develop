@@ -579,8 +579,8 @@ void Input_Conv::Convert_FP(void)
 //----------------------------------------------------------
 // charge mixing(3/3)
 //----------------------------------------------------------
-    //chr.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim);
-    chr.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
+    //CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim);
+    CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
 
 //----------------------------------------------------------
 // iteration (2/3)
@@ -593,7 +593,7 @@ void Input_Conv::Convert_FP(void)
 //----------------------------------------------------------
     pot.start_pot = INPUT.start_pot;
 	pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
-    chr.out_charge = INPUT.out_charge;
+    CHR.out_charge = INPUT.out_charge;
 	pot.out_potential = INPUT.out_potential;
     wf.out_wf = INPUT.out_wf;
 	en.out_dos = INPUT.out_dos;
