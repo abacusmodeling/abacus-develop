@@ -26,6 +26,7 @@
 #include "vdwd2.h"
 #include "vdwd3.h"				
 #include "src_global/restart.h" 
+#include "soc.h"
 
 #include "../src_parallel/ft.h"
 
@@ -50,21 +51,15 @@ extern pseudopot_cell_vnl ppcell;
 extern xcfunc xcf;
 extern Charge_Broyden CHR;
 extern potential pot;
-//extern wannier wan;
 extern Symmetry symm;
 extern Magnetism mag;
 extern UnitCell_pseudo ucell;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
-
 extern Vdwd2 vdwd2;		// Peize Lin add 2019-04-26
 extern Vdwd3 vdwd3;		// jiyy add 2019-05-18		
-
 extern Restart restart;	// Peize Lin add 2020.04.04  																								 
-
-//zhengdy-soc
-#include "soc.h"
-extern Soc soc;
+extern Soc soc; // zhengdy-soc
 
 #include "../src_lcao/global_fp.h"
 

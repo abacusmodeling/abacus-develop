@@ -10,6 +10,7 @@
 #include "../src_pw/optical.h"
 #include "../src_lcao/force_lcao.h"
 #include "../src_lcao/local_orbital_charge.h"
+#include "global_fp.h" // mohan update 2021-01-30
 
 Update_input::Update_input() {}
 Update_input::~Update_input() {}

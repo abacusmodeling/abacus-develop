@@ -4,6 +4,8 @@
 #include "sltk_atom_arrange.h"
 #include "lcao_vna.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Use_Hamilt_Matrix::Use_Hamilt_Matrix()
 { 
     init_s = false;

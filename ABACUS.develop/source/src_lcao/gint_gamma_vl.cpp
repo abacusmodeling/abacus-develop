@@ -4,6 +4,8 @@
 #include "../src_pw/global.h"
 #include "src_global/blas_connector.h"
 #include <mkl_service.h>
+
+#include "global_fp.h" // mohan add 2021-01-30
 //#include <vector>
 
 extern "C"

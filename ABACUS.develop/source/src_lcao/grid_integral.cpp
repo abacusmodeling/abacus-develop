@@ -3,6 +3,8 @@
 #include "ylm.h"
 #include "lcao_orbitals.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 
 // use density kernel(density matrix) to calcualte the density 
 // on real space grid.

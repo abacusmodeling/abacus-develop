@@ -4,6 +4,8 @@
 #include "sltk_grid.h"
 #include "sltk_grid_driver.h"
 
+#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
+
 
 atom_arrange::atom_arrange()
 {

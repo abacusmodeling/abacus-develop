@@ -1,6 +1,8 @@
 #include "grid_technique.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Grid_Technique GridT;
 
 Grid_Technique::Grid_Technique()

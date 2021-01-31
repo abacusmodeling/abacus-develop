@@ -262,7 +262,7 @@ void Chi0_standard:: Chi()
 			Cal_rpa(iq);
 			Cal_chi();
 			cout<<"chi iq= "<<iq<<" omega= "<<omega<<"  "<<chi[0][0].real()<<" "<<chi[0][0].imag()<<endl;
-			cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*Pi/q/q*chi[0][0].real()<<" "<<8*Pi/q/q*chi[0][0].imag()<<endl;
+			cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*PI/q/q*chi[0][0].real()<<" "<<8*PI/q/q*chi[0][0].imag()<<endl;
 			gather[count] = -8*PI/q/q*chi[0][0].imag();		
 			count++;
 		}

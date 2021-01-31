@@ -3,6 +3,8 @@
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_Gamma::cal_vna_d(const Grid_Technique &gt, const double* vrs1,
 const char &matrix_type)
 {

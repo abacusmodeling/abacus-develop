@@ -4,6 +4,8 @@
 //#include "../src_develop/src_wannier/manipulation.h"
 #include "lcao_nnr.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Use_Overlap_Matrix::Use_Overlap_Matrix()
 {}
 

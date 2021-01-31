@@ -5,6 +5,8 @@
 #include "src_global/blas_connector.h"
 #include <mkl_service.h>
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 //inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
 void Gint_Gamma::setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const
 {
