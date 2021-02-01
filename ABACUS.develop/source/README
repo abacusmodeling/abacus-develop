@@ -1,0 +1,12 @@
+
+Currently we are working on:
+1) fix the parallel bug when using plane wave basis (pw is not enough)
+2) SDFT
+3) DeepKS
+
+-----------------------------------------------------------------------
+
+The code should be reconstructed with the following details:
+
+1) the TDDFT module should be relocated.
+2) the inclusion of files in vdw3 should be changed.

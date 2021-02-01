@@ -208,15 +208,20 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     //----------------------------------------------------------
     // Define the total local potential (external+scf)
     //----------------------------------------------------------
-    if(vext == 0) this->set_vrs(pw.doublegrid);
-    else this->set_vrs_tddft(pw.doublegrid, istep);
+    if(vext == 0) 
+	{
+		this->set_vrs(pw.doublegrid);
+	}
+    else 
+		this->set_vrs_tddft(pw.doublegrid, istep);
+	}
 
     //figure::picture(this->vrs1,pw.ncx,pw.ncy,pw.ncz);
     timer::tick("potential","init_pot");
     return;
 }
 
-// from setlocal.f90
+
 //==========================================================
 // This routine computes the local potential in real space
 // vltot(ir)
@@ -227,7 +232,9 @@ void potential::set_local(double* vl_pseudo)const
     timer::tick("potential","set_local");
 
     complex<double> *vg = new complex<double>[pw.ngmc];
+
     ZEROS( vg, pw.ngmc );
+
     for (int it=0; it<ucell.ntype; it++)
     {
         for (int ig=0; ig<pw.ngmc; ig++)
@@ -237,6 +244,7 @@ void potential::set_local(double* vl_pseudo)const
     }
 
     UFFT.ToRealSpace(vg, vl_pseudo); 
+
     delete[] vg;
 
     if(EFIELD && !DIPOLE)

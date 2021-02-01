@@ -14,11 +14,21 @@ using namespace std;
 
 class PW_Basis
 {
-public:
+	public:
 
+    PW_Basis();
+    ~PW_Basis();
+
+	// pointer for UnitCell
 	const UnitCell *Ucell;
+
+	// pointer for K-point list
 	const kvect *Klist;
+
+	// FFT grid for charge density
 	FFT FFT_chg;
+
+	// FFT grid for wave functions
 	FFT FFT_wfc;
 
     void set
@@ -36,21 +46,23 @@ public:
 		const int &by_in,
 		const int &bz_in
     );
-    //====================
-    //Part1:Energy cutoff
-    //====================
+
+    //======================
+    // Part1:Energy cutoff
+    //======================
     bool gamma_only;				// only half G are used.
-    double wfac;
+    double wfac;					// weighting factor
     double ecutwfc;					// Energy cutoff for wavefunctions.
     double ecutrho; 				// Energy cutoff for charge/potential.
 
-    double ggpsi; 					// planewave cut off for the wavefunctions, unit (2*PI/lat0)^2
     // ggpsi=2*Ecut*(lat0*lat0)/(4.0*PI*PI);
+    // in NCPP,  ggchg=ggfft
+    // in USPP (double grids), ggchg=4*ggfft
+    double ggpsi; 					// planewave cut off for the wavefunctions, unit (2*PI/lat0)^2
     double ggwfc;					// ggwav;(=G2max);/ G^2 cutoff for wave function FFT box, unit (2*PI/a0)^2,
     double ggwfc2;					// ggwav=wfact*ggpsi, default value: wfact=4.0
     double ggchg;   				// G^2 cutoff for supporting charge density,
-    // in NCPP,  ggchg=ggfft
-    // USPP (double grids), ggchg=4*ggfft
+
     //===============
     // FFT_dimension
     //===============
@@ -65,9 +77,9 @@ public:
 
     ComplexMatrix strucFac;			// StrucFac (ntype,ngmax)
 
-    //========================================
-    //Part2:Wave function(G vectors,FFT box)
-    //========================================
+    //=========================================
+    // Part2: Wave function(G vectors,FFT box)
+    //=========================================
     int nrxxs;
     int ngmw;						//(= ngmax) / num. of G vectors within ggfft
     /*** mohan add 2008-3-25 ***/
@@ -75,19 +87,16 @@ public:
     //ig2fftw= new int [ngmw] for wave functions
     //ig2fftw[ng] -> the coordinates in FFT box
 
-    //=============================================
-    //Part3:Charge & Potential (G vectors,FFT box)
-    //=============================================
+    //===============================================
+    // Part3: Charge & Potential (G vectors,FFT box)
+    //===============================================
     // G vectors, FFT box related to charge density and potentials etc.
-    //fft grid for charge density, potentials etc.
-    //this grid equal to the wave function grid
-    //when only NCPPs are used
-    //(doublegrid=.false.)
+    // fft grid for charge density, potentials etc.
+    // this grid equal to the wave function grid
     int nrxx;						//for parallel,local FFT grid dimension
     int nrxx_start;                 //for parallel,local FFT grid dimension
     int ngmc;       				// new, num. of G vectors within ggchg,
     int ngmc_g;						// mohan add 2008-4-2
-    // ngmc global (for parrel)
     int *ig2fftc;					//(=*ind_FFT) //1D G vector -> charge/potential FFT
     //ig2fftc= new int [ngmc] for wave functions
     //ig2fftc[ng] -> the coordinates in FFT box
@@ -109,7 +118,7 @@ public:
     //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
 
     //==================
-    //  void set_nggm()
+    // void set_nggm()
     //==================
     int nggm;          				// =ngl(another dft code);
     // number of |G| shells (i.e., how many different |G|s)
@@ -123,9 +132,11 @@ public:
     ComplexMatrix eigts1;   		//
     ComplexMatrix eigts2;   		//the phases e^{-iG*tau_s}
     ComplexMatrix eigts3;   		//
+
     int *ig1;        				//
     int *ig2;        				// the indices of G components
     int *ig3;        				//
+
     double *gg_global0; //LiuXh add 20180515
     int *cutgg_num_table; //LiuXh add 20180515
     int ggchg_time_global; //LiuXh add 20180515
@@ -133,25 +144,28 @@ public:
     bool doublegrid;				// .TRUE. if we use a double grid; (for USPP)
     // .FALSE., if NCPP.
 
-    PW_Basis();
-    ~PW_Basis();
-
     void gen_pw(ofstream &log, const UnitCell &Ucell_in, const kvect &Klist_in);
+
     void setup_structure_factor(); 		// Calculate structur factors
+
     void update_gvectors(ofstream &log, const UnitCell &Ucell_in); //LiuXh add 20180515
-private:
+
+	private:
+
     void setup_gg();
 
     void setup_FFT_dimension(); 		// set up FFT dimensions
 
-private:
-
 #ifdef __MPI
     void divide_fft_grid();
+
     void get_MPI_GVectors();
+
     void columns_and_pw_distribution_2();
 #else
+
     void get_GVectors();
+
 #endif
 
     void get_nggm(const int ngmc_local);

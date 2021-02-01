@@ -90,11 +90,11 @@ void Run_Frag::LCAO_line(void)
     TITLE("Run_Frag","lcao_line");
 	timer::tick("Run_Frag","LCAO_line",'B');
 	
-	// (1) Init the charge density.
+	// (1) Inititlize the charge density.
     CHR.init();
     DONE(ofs_running,"INIT CHARGE");
 
-	// (2) Init the potential.
+	// (2) Initializee the potential.
     pot.init(pw.nrxx);
     DONE(ofs_running,"INIT POTENTIAL");
 
