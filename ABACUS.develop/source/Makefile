@@ -65,19 +65,44 @@ PDIAG_MR=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PDIAG_MR_0})
 #==========================
 # MAKING OPTIONS
 #==========================
-fp_mpi : ${FP_OBJS} ${PDIAG_OBJS} ${PDIAG_MR} ${HEADERS}
+fp_mpi : 
+	@ make init
+	@ make -j $(NP) parallel
+
+fp : 
+	@ make init
+	@ make -j $(NP) serial
+
+fp_gbd : 
+	@ make init
+	@ make -j $(NP) serial_gbd
+
+fp_gprof : 
+	@ make init
+	@ make -j $(NP) serial_gprof
+
+fp_mem : 
+	@ make init
+	@ make -j $(NP) serial_mem
+
+init :
+	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
+	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
+	@ if [ ! -d ../bin ]; then mkdir ../bin; fi
+
+parallel : ${FP_OBJS} ${PDIAG_OBJS} ${PDIAG_MR} ${HEADERS}
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi
 
-fp : ${FP_OBJS} ${HEADERS} 
+serial : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp.x 
 
-fp_gdb : ${FP_OBJS} ${HEADERS}
+serial_gdb : ${FP_OBJS} ${HEADERS}
 	${CPLUSPLUS} ${OPTS_GDB} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp_gdb.x
 
-fp_gprof : ${FP_OBJS} ${HEADERS} 
+serial_gprof : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp_gprof.x 
 
-fp_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
+serial_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
 	${CPLUSPLUS} $(FP_OBJS) ../src_parallel/mcd.o ${LIBS} -o ${VERSION}.fp_mem.x
 
 #==========================
@@ -90,4 +115,5 @@ ${OBJ_DIR}/%.o:%.f
 
 .PHONY:clean
 clean:
-	$(RM)  ${OBJ_DIR}/*.o ../bin/ABACUS*
+	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
+	@ if [ -d ../bin ]; then rm -rf ../bin; fi
