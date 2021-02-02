@@ -43,13 +43,13 @@ void Hamilt_PW::init(void)
 
     this->hpsi = new complex<double> [wf.npwx * NPOL];
     this->spsi = new complex<double> [wf.npwx * NPOL];
-    this->GR_index = new int[pw.nrxxs];
+    this->GR_index = new int[pw.nrxx];
     this->Bec = new complex<double> [ppcell.nkb];
     this->Ps  = new complex<double> [ppcell.nkb * NPOL];
 
     ZEROS(this->hpsi,wf.npwx * NPOL);
     ZEROS(this->spsi,wf.npwx * NPOL);
-    ZEROS(this->GR_index, pw.nrxxs);
+    ZEROS(this->GR_index, pw.nrxx);
 //    ofs_running << "\n Hamiltonian allocate done."<<endl;
     return;
 }
@@ -408,7 +408,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 	if(VL_IN_H)
 	{
 		if(NSPIN!=4){
-			ZEROS( UFFT.porter, pw.nrxxs);
+			ZEROS( UFFT.porter, pw.nrxx);
 			UFFT.RoundTrip( psi_in, pot.vrs1, GR_index, UFFT.porter );
 
 			for (j = 0;j < wf.npw;j++)
@@ -418,9 +418,9 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 		}
 		else
 		{
-			complex<double>* porter1 = new complex<double>[pw.nrxxs];
-			ZEROS( UFFT.porter, pw.nrxxs);
-			ZEROS( porter1, pw.nrxxs);
+			complex<double>* porter1 = new complex<double>[pw.nrxx];
+			ZEROS( UFFT.porter, pw.nrxx);
+			ZEROS( porter1, pw.nrxx);
 			for (int ig=0; ig< wf.npw; ig++)
 			{
 				UFFT.porter[ GR_index[ig]  ] = psi_in[ig];

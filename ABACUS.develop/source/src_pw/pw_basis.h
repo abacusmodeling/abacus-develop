@@ -80,7 +80,6 @@ class PW_Basis
     //=========================================
     // Part2: Wave function(G vectors,FFT box)
     //=========================================
-    int nrxxs;
     int ngmw;						//(= ngmax) / num. of G vectors within ggfft
     /*** mohan add 2008-3-25 ***/
     int *ig2fftw;					//(=*ind_FFT) /1D G vector -> for wave function FFT

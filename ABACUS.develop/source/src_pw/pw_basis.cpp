@@ -308,10 +308,10 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
 #ifdef __MPI
         this->get_MPI_GVectors();
-        //cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxxs << endl;
+        //cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxx << endl;
         //cout<<" UNIFORM GRID DIM     : "<<this->ncx<<" * "<<this->ncy<<" * "<<this->ncz << "," << this->nrxx  << endl;
 
-        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxxs,1);
+        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
 #endif
     }
@@ -343,7 +343,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
         this->get_MPI_GVectors();
 
-        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxxs,1);
+        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
 #else
         this->get_GVectors();
@@ -481,14 +481,12 @@ void PW_Basis::setup_FFT_dimension(void)
 // set nczp
 // set nbxx
 // set nrxx
-// set nrxxs
 void PW_Basis::divide_fft_grid(void)
 {
     TITLE("PW_Basis","divide_fft_grid");
 
     //----------------------------------------------
     // set charge/potential grid : nrxx
-    // and smooth grid : nrxxs
     //----------------------------------------------
     const int remain_planes = this->nbz%NPROC_IN_POOL;
     this->nbzp = this->nbz/NPROC_IN_POOL;
@@ -502,7 +500,6 @@ void PW_Basis::divide_fft_grid(void)
 
 	this->nbxx = nbzp*this->nbx*this->nby;
     this->nrxx = nczp*this->ncx*this->ncy;
-	this->nrxxs = this->nrxx;
 
     //=====================================
     // set nrxx_start
@@ -527,7 +524,6 @@ void PW_Basis::divide_fft_grid(void)
 	if(test_pw)OUT(ofs_running,"nbzp_start",nbzp);
 	OUT(ofs_running,"nbxx",nbxx);
 	OUT(ofs_running,"nrxx",nrxx);
-	if(test_pw)OUT(ofs_running,"nrxxs",nrxxs);
 	if(test_pw)OUT(ofs_running,"nrxx_start",nrxx_start);
 	if(test_pw)OUT(ofs_running,"nbxx_start",nbxx_start);
 
@@ -629,7 +625,6 @@ void PW_Basis::get_GVectors(void)
     timer::tick("PW_Basis","get_GVectors");
 
     this->nrxx = this->ncxyz;
-    this->nrxxs = this->nxyz;
     this->ngmc=this->ngmc_g;
 
     //************************************************************

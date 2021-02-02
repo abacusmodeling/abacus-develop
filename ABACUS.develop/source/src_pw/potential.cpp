@@ -213,6 +213,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 		this->set_vrs(pw.doublegrid);
 	}
     else 
+	{
 		this->set_vrs_tddft(pw.doublegrid, istep);
 	}
 

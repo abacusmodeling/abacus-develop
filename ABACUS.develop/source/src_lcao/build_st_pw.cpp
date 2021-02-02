@@ -138,7 +138,7 @@ void Build_ST_pw::set_local(const int &ik)
 			psi_one[ig] = wf.wanf2[ik](i, ig);
 		}
 
-		ZEROS( psic, pw.nrxxs);
+		ZEROS( psic, pw.nrxx);
 		// (1) set value
 		for (int ig=0; ig< npw; ig++)
 		{
@@ -189,8 +189,8 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_down[ig] = wf.wanf2[ik](i, ig+ wf.npwx);
 			}
 
-			ZEROS( psic, pw.nrxxs);
-			ZEROS( psic1, pw.nrxxs);
+			ZEROS( psic, pw.nrxx);
+			ZEROS( psic1, pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{
