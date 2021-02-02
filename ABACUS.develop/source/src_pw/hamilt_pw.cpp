@@ -6,10 +6,6 @@
 #include "src_global/blas_connector.h"
 #include "optical.h" // only get judgement to calculate optical matrix or not.
 
-#ifdef __EPM
-#include "../src_epm/nscf_epm.h"
-#endif
-
 int Hamilt_PW::moved = 0;
 
 Hamilt_PW::Hamilt_PW()
@@ -34,31 +30,7 @@ Hamilt_PW::~Hamilt_PW()
     delete[] Ps;
 }
 
-#ifdef __EPM
-void Hamilt_PW::init()
-{
-	TITLE("Hamilt_PW","init");
-	const int nrxxs = pw.nrxxs;
 
-	delete[] hpsi;
-	delete[] spsi;
-	delete[] GR_index;
-
-	this->hpsi = new complex<double>[wf.npwx];
-	this->spsi = new complex<double>[wf.npwx];
-	this->GR_index = new int[nrxxs];
-
-	OUT(ofs_running,"hpsi allocation = ","Done");
-	OUT(ofs_running,"spsi allocation = ","Done");
-	OUT(ofs_running,"GR_index allocation = ","Done");
-
-	ZEROS(hpsi,wf.npwx);
-	ZEROS(spsi,wf.npwx);
-	ZEROS(GR_index,wf.npwx);
-
-	return;
-}
-#else
 void Hamilt_PW::init(void)
 {
     if (test_hm) TITLE("Hamilt_PW","init");
@@ -81,7 +53,7 @@ void Hamilt_PW::init(void)
 //    ofs_running << "\n Hamiltonian allocate done."<<endl;
     return;
 }
-#endif
+
 
 void Hamilt_PW::init_k(const int ik)
 {
@@ -378,11 +350,7 @@ void Hamilt_PW::cinitcgg(
 void Hamilt_PW::h_1psi( const int npw_in, const complex < double> *psi,
                         complex<double> *hpsi, complex < double> *spsi)
 {
-#ifdef __EPM
-    nscf_epm::hpsi(psi, hpsi);
-#else
     this->h_psi(psi, hpsi);
-#endif
 
     for (int i=0;i<npw_in;i++)
     {
@@ -406,7 +374,6 @@ void Hamilt_PW::s_1psi
 }
 
 
-#ifndef __EPM
 void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 {
     timer::tick("Hamilt_PW","h_psi",'H');
@@ -520,9 +487,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
     timer::tick("Hamilt_PW","h_psi",'H');
     return;
 }
-#endif
 
-#ifndef __EPM
 void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
 {
     timer::tick("Hamilt_PW","add_vuspsi",'I');
@@ -606,7 +571,6 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
     timer::tick("Hamilt_PW","add_vuspsi",'I');
     return;
 }
-#endif
 
 void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nband, double *em, double *err)
 {

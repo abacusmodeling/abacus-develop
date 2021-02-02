@@ -80,11 +80,12 @@ class energy
 
 	void print_format(const string &name, const double &value);
 
-#ifndef __EPM
 	void calculate_harris(const int &flag); //mohan add 2012-06-05
+
     double delta_e(void);
+
     void delta_escf(void);
-#endif
+
     void rgen(
         const Vector3<double> &dtau,
         const double &rmax,

@@ -13,7 +13,9 @@ class Parallel_Grid
 	~Parallel_Grid();
 	
 	void init(const int &ncx, const int &ncy, const int &ncz, const int &nczp, const int &nrxx, const int &nbz, const int &bz);
-void init_final_scf(const int &ncx, const int &ncy, const int &ncz, const int &nczp, const int &nrxx, const int &nbz, const int &bz); //LiuXh add 20180606
+
+	void init_final_scf(const int &ncx, const int &ncy, const int &ncz, 
+		const int &nczp, const int &nrxx, const int &nbz, const int &bz); //LiuXh add 20180606
 
 #ifdef __MPI	
 	void zpiece_to_all(double *zpiece, const int &iz, double *rho);
@@ -37,7 +39,7 @@ void init_final_scf(const int &ncx, const int &ncy, const int &ncz, const int &n
 	int ncz;
 	int ncxy;
 	int ncxyz;
-	int nczp; // different processor has different value.
+	int nczp; // different processors have different values.
 	int nrxx;
 	int nbz;
 	int bz;

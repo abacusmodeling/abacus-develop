@@ -20,10 +20,8 @@ void Symmetry_rho::begin(const int &spin_now) const
 	// parallel version
 	psymm(CHR.rho[spin_now]);
 #else
-#ifndef __EPM
 	// series version.
 	symm.rho_symmetry(CHR.rho[spin_now], pw.ncx, pw.ncy, pw.ncz);
-#endif
 #endif
 	return;
 }
