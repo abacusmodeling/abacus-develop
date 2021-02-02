@@ -19,6 +19,8 @@ class DC_Driv
 	// reading the parameters
 	void reading();
 
+    void prepare();
+
 	// do stuff, have fun!
 	void atomic_world();
 

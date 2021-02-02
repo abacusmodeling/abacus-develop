@@ -1,5 +1,6 @@
 #include "dc_driv.h"
-#include "run_frag.h"
+#include "run_pw.h"
+#include "run_lcao.h"
 #include "input.h"
 #include "input_conv.h"
 #include "src_lcao/global_fp.h"
@@ -8,6 +9,7 @@
 
 #include "src_pw/cal_test.h"
 #include "src_pw/cal_test0.h"
+#include "src_pw/winput.h"
 
 DC_Driv::DC_Driv(){}
 
@@ -89,7 +91,7 @@ void DC_Driv::reading(void)
 	// * do symmetry analysis
 	// * setup the k-points
 	//----------------------------------
-	Run_Frag::init();
+	this->prepare();
 
 
 	// for LCAO basis, reading the orbitals and construct
@@ -153,16 +155,16 @@ void DC_Driv::atomic_world(void)
 	TITLE("DC_Driv","atomic_world");
 	timer::tick("DC_Driv","atomic_world",'A');
 
-	Run_Frag RF;
-
 	//xiaohui add 2013-09-01
 	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
 	{
-		RF.plane_wave_line();
+		Run_pw rp;
+		rp.plane_wave_line();
 	}
 	else if(BASIS_TYPE=="lcao")
 	{
-		RF.LCAO_line();
+		Run_lcao rl;
+		rl.lcao_line();
 	}
 
 	timer::tick("DC_Driv","atomic_world",'A');
@@ -173,3 +175,70 @@ void DC_Driv::atomic_world(void)
 	return;
 }
 
+
+// * initialize the NPOOL for k-points
+// * initialize the input parameters for wannier functions
+// * setup the unit cell
+// * symmetry analysis
+// * setup the k-points according to symmetry annalysis
+void DC_Driv::prepare(void)
+{
+	TITLE("Run_Frag","init");
+	timer::tick("Run_Frag","init",'B');
+
+#ifdef __MPI
+    // (1) If k point number > 1, After reading in NPOOL, 
+	// divide the NPROC processprs into NPOOL.
+    Pkpoints.init();
+#endif
+
+    // (2) Read in parameters about wannier functions.
+    winput::Init( global_wannier_card );
+
+    //xiaohui move 3 lines, 2015-09-30
+    //stringstream ss2;
+    //ss2 << global_out_dir << "INPUTw";
+    //winput::Print( ss2.str() );
+
+    // (3) Print the parameters into INPUT file.
+    stringstream ss1;
+    ss1 << global_out_dir << global_in_card;
+    INPUT.Print( ss1.str() );
+    //DONE(ofs_running,"READING CARDS");
+
+    // (4) Setup the unitcell.
+    ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
+    DONE(ofs_running, "SETUP UNITCELL");
+
+    // (5) symmetry analysize.
+    if (SYMMETRY)
+    {
+        symm.analy_sys();
+        DONE(ofs_running, "SYMMETRY");
+    }
+    
+	// (6) Setup the k points according to symmetry.
+	kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
+    DONE(ofs_running,"INIT K-POINTS");
+	
+
+	// (7) check the number of basis, the warning should be moved to 
+	// other places -- mohan 2021-01-30
+	// mohan add 2011-01-5
+	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") 
+	{
+		if( NLOCAL < NBANDS )
+		{
+			WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
+		}
+		else
+		{
+			//OUT(ofs_running,"NLOCAL",NLOCAL);
+			OUT(ofs_running,"NBASE",NLOCAL);
+			OUT(ofs_running,"NBANDS",NBANDS);
+		}
+	}
+
+	timer::tick("Run_Frag","init",'B');
+    return;
+}

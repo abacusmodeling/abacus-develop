@@ -29,7 +29,9 @@ cg_precon.o\
 OBJS_DC=dc_driv.o\
 input.o \
 input_conv.o\
-run_frag.o\
+run_pw.o\
+run_lcao.o\
+run_linearscaling.o\
 
 OBJS_PW_BASIC=functional.o \
 xc_functional.o\

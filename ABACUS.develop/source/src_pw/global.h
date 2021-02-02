@@ -12,7 +12,7 @@
 #include "energy.h"
 #include "occupy.h"
 #include "pseudopot_cell_vnl.h"
-#include "../run_frag.h"
+#include "../run_pw.h"
 #include "charge_broyden.h"
 #include "potential.h"
 #include "functional.h"
