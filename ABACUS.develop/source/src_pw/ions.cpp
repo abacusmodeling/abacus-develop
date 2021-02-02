@@ -9,6 +9,7 @@
 
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
+#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 
 void Ions::opt_ions_pw(void)
 {
@@ -306,7 +307,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             }
             else
             {
-                Run_Frag::init_after_vc();
+                Variable_Cell::init_after_vc();
                 //pot.init_pot(0);
                 pot.init_pot(stress_step); //LiuXh add 20180619
                 ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
@@ -368,7 +369,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                     }
                     else
                     {
-                        Run_Frag::init_after_vc();
+                        Variable_Cell::init_after_vc();
                         //pot.init_pot(0);
                         pot.init_pot(stress_step); //LiuXh add 20180619
 

@@ -28,12 +28,6 @@ public:
 	// useless now
     void linear_scaling_line(void);
 
-
-    static void init_after_vc(void); //LiuXh add 20180515
-
-
-    static void final_calculation_after_vc(void); //LiuXh add 20180619
-
 };
 
 #endif

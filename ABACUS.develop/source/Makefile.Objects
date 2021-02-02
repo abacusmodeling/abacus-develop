@@ -218,6 +218,7 @@ update_input.o \
 lattice_change_methods.o \
 lattice_change_cg.o \
 lattice_change_basic.o \
+variable_cell.o\
 dftu.o\
 lscc.o\
 
