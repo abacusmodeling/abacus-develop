@@ -10,3 +10,9 @@ The code should be reconstructed with the following details:
 
 1) the TDDFT module should be relocated.
 2) the inclusion of files in vdw3 should be changed.
+
+
+-----------------------------------------------------------------------
+Unitesets should include
+1) initialization after cell variation
+2) 
