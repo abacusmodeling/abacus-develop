@@ -145,7 +145,6 @@ void Input::Default(void)
     pseudo_dir = "";
     pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	wannier_card = "";
-    epm_pseudo_card = "";
     latname = "test";
     //xiaohui modify 2015-09-15, relax -> scf
     //calculation = "relax";
@@ -154,7 +153,6 @@ void Input::Default(void)
     nbands = 0;
 	nbands_istate = 5;
 	npool = 1;
-    epm_spin_orbital = 0;
     berry_phase = false;
 	gdir = 3;
 	towannier90 = false;
@@ -564,10 +562,6 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, wannier_card);
 		}
-        else if (strcmp("epm_pseudo_card",word) == 0 )
-        {
-            read_value(ifs, epm_pseudo_card);
-        }
         else if (strcmp("latname", word) == 0)// which material
         {
             read_value(ifs, latname);
@@ -591,26 +585,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("npool", word) == 0)// number of pools
         {
             read_value(ifs, npool);
-        }
-        else if (strcmp("epm_spin_orbital", word) == 0)
-        {
-            read_value(ifs, epm_spin_orbital);
-        }
-        else if (strcmp("epm_zeeman", word) == 0)
-        {
-            read_value(ifs, epm_zeeman);
-        }
-        else if (strcmp("epm_mag_field_x", word) == 0)
-        {
-            read_value(ifs, epm_mag_field_x);
-        }
-        else if (strcmp("epm_mag_field_y", word) == 0)
-        {
-            read_value(ifs, epm_mag_field_y);
-        }
-        else if (strcmp("epm_mag_field_z", word) == 0)
-        {
-            read_value(ifs, epm_mag_field_z);
         }
         else if (strcmp("berry_phase", word) == 0)// berry phase calculation
         {
@@ -1927,14 +1901,12 @@ void Input::Bcast()
     Parallel_Common::bcast_string( pseudo_type ); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
     Parallel_Common::bcast_string( kpoint_file );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_string( wannier_card );
-    Parallel_Common::bcast_string( epm_pseudo_card );
     Parallel_Common::bcast_string( latname );
     Parallel_Common::bcast_string( calculation );
     Parallel_Common::bcast_int( ntype );
     Parallel_Common::bcast_int( nbands );
     Parallel_Common::bcast_int( nbands_istate );
 	Parallel_Common::bcast_int( npool );
-    Parallel_Common::bcast_int( epm_spin_orbital );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );
 	Parallel_Common::bcast_bool(towannier90);

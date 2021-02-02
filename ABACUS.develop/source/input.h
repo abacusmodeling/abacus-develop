@@ -8,46 +8,41 @@
 #include <string>
 using namespace std;
 
-//==========================================================
-// CLASS :
-// NAME : Input(readin "input_parameters" from "in_data" dir)
-//==========================================================
 class Input
 {
-public:
+	public:
     
 	Input();
     ~Input();
+
     void Init(const string &fn);
+
     void Print(const string &fn)const;
+
 	void close_log(void)const;
 
-	int npool;
+	int npool; // ecch pool is for one k point
 
-//==========================================================
-// MEMBER VARIABLES :
-// main parameters
-//==========================================================
     string suffix;			// suffix of out put dir
     string atom_file;		//xiaohui modify 2015-02-01
     string pseudo_dir;      // dir of pseudopotential
     
     string pseudo_type;     // the type of pseudopotential, mohan add 2013-05-20, we can accept
-			    // UPF format (default) and vwr format. (xiaohui add 2013-06-23)
+			    			// UPF format (default) and vwr format. (xiaohui add 2013-06-23)
+
     string kpoint_file;		//xiaohui modify 2015-02-01
 	string wannier_card;	// input card for wannier functions.
-    string epm_pseudo_card; //
     string latname;			// lattice name
+
     string calculation;		// "scf" : self consistent calculation.
-    // "nscf" : non-self consistent calculation.
+						    // "nscf" : non-self consistent calculation.
+
     int ntype;				// number of atom types
+
     int nbands;				// number of bands
+
 	int nbands_istate;		// number of bands around fermi level for istate calculation.
-    int epm_spin_orbital;	// 0: no so effect; 1: plane wave; 2: small box
-	bool epm_zeeman;
-	double epm_mag_field_x;
-	double epm_mag_field_y;
-	double epm_mag_field_z;
+
 
     bool berry_phase;		// berry phase calculation
 	int gdir;               // berry phase calculation
