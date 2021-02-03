@@ -245,7 +245,6 @@ void Input::Default(void)
 	zeeman_in_h = 1;
 	test_force = 0;
 	test_stress = 0;
-    fs_ref_energy  = 0.0;
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
@@ -898,15 +897,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("test_stress", word) == 0)
         {
             read_value(ifs, test_stress);
-        }
-        else if (strcmp("fs_ref_energy_ev", word) == 0)
-        {
-            read_value(ifs, fs_ref_energy);
-			fs_ref_energy = fs_ref_energy / Ry_to_eV; 
-        }
-        else if (strcmp("fs_ref_energy_ry", word) == 0)
-        {
-            read_value(ifs, fs_ref_energy);
         }
 //----------------------------------------------------------
 // iteration
@@ -1994,8 +1984,6 @@ void Input::Bcast()
 
 	Parallel_Common::bcast_int( test_force );
 	Parallel_Common::bcast_int( test_stress );
-
-    Parallel_Common::bcast_double( fs_ref_energy );
 
     Parallel_Common::bcast_double( dr2 );
     Parallel_Common::bcast_int( niter );

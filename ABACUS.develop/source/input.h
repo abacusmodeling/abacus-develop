@@ -21,53 +21,45 @@ class Input
 
 	void close_log(void)const;
 
-	int npool; // ecch pool is for one k point
+//==========================================================
+// directories of files 
+//==========================================================
 
     string suffix;			// suffix of out put dir
-    string atom_file;		//xiaohui modify 2015-02-01
-    string pseudo_dir;      // dir of pseudopotential
-    
-    string pseudo_type;     // the type of pseudopotential, mohan add 2013-05-20, we can accept
+    string atom_file;		// file contains atomic positions -- xiaohui modify 2015-02-01
+    string pseudo_dir;      // directory of pseudopotential
+    string pseudo_type;     // the type of pseudopotential, mohan add 2013-05-20, ABACUS supports
 			    			// UPF format (default) and vwr format. (xiaohui add 2013-06-23)
-
-    string kpoint_file;		//xiaohui modify 2015-02-01
+    string kpoint_file;		// file contains k-points -- xiaohui modify 2015-02-01
 	string wannier_card;	// input card for wannier functions.
     string latname;			// lattice name
 
+
     string calculation;		// "scf" : self consistent calculation.
 						    // "nscf" : non-self consistent calculation.
-
+							// "relax" : cell relaxations
     int ntype;				// number of atom types
-
     int nbands;				// number of bands
-
 	int nbands_istate;		// number of bands around fermi level for istate calculation.
 
+    bool symmetry;			// turn on symmetry or not
+	int npool; 				// ecch pool is for one k point
 
     bool berry_phase;		// berry phase calculation
-
 	int gdir;               // berry phase calculation
 
 	bool towannier90;       // add by jingan for wannier90
-
 	string NNKP;            // add by jingan for wannier90
-
 	string wannier_spin;    // add by jingan for wannier90
 
     int efield;				// add electrical field
-
 	int edir;
-
 	double emaxpos;
-
 	double eopreg;
-
 	double eamp;
 
 	bool opt_epsilon2;		// true : calculate the dielectric functions
-
 	int  opt_nbands;		// number of bands for optical transition matrix
-
     bool lda_plus_u;		// true : lda plus u calculation
 
 //==========================================================
@@ -75,28 +67,19 @@ class Input
 //==========================================================
 
     string dft_functional;	// input DFT functional.
-
-	int nspin;			// LDA ; LSDA ; non-linear spin
-
+	int nspin;				// LDA ; LSDA ; non-linear spin
     double nelec;			// total number of electrons
-
     int lmaxmax;
-
     double tot_magnetization;
 
 //==========================================================
-// new function
+// LCAO parameters 
 //==========================================================
 
 	string basis_type; //xiaohui add 2013-09-01, for structural adjustment
-
 	string ks_solver; //xiaohui add 2013-09-01
-
     bool sparse_matrix;
-
 	int atom_distribution;
-
-    bool symmetry;				//
 
 	bool mlwf_flag;
 
@@ -113,29 +96,21 @@ class Input
 	double force_thr_ev2;	// invalid force threshold, mohan add 2011-04-17
 
     double stress_thr;      // Pengfei Li 2017-11-01 //LiuXh update 20180515
-
     double press1;
-
     double press2;
-
     double press3;
-
 	bool stress;			// calculate the stress
 
 	string fixed_axes;              //which axes are fixed
-
 	string ion_dynamics;		// methods to move_ion: sd, bfgs, cg...
 
     double cg_threshold;    // threshold when cg to bfgs, pengfei add 2011-08-15
 
 	double bfgs_w1;			// wolfe condition 1	
-
 	double bfgs_w2;			// wolfe condition 2
 
 	double trust_radius_max;	// trust radius max
-
 	double trust_radius_min;	// trust radius min
-
 	double trust_radius_ini;	// initial move
 
 //==========================================================
@@ -143,35 +118,24 @@ class Input
 //==========================================================
 
     bool gamma_only;		// for plane wave.
-
 	bool gamma_only_local;	// for local orbitals.
 
     double ecutwfc;			// energy cutoff for wavefunctions
-
     double ecutrho;			// energy cutoff for charge/potential
 
     int ncx,ncy,ncz;		// three dimension of FFT charge/grid
-
     int nx,ny,nz;			// three dimension of FFT wavefunc
-
 	int bx,by,bz;			// big mesh ball. mohan add 2011-04-21 
 
 //==========================================================
 // technique 
 //==========================================================
 
-    //string diago_type; xiaohui modify 2013-09-01		// "cg","davidson","fs"
 	int diago_proc;			// the number of procs used to diag. mohan add 2012-01-13
-
     int diago_cg_maxiter;
-
 	int diago_cg_prec;		// mohan add 2012-03-31
-
     int diago_david_ndim;
-
     double ethr;			// used in cg method
-
-    double fs_ref_energy;	// folded-spectrum reference energy
 
 	int nb2d;				// matrix 2d division.
 
