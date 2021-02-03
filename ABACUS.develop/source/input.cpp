@@ -242,7 +242,6 @@ void Input::Default(void)
 	t_in_h = 1;
 	vl_in_h = 1;
 	vnl_in_h = 1;
-	zeeman_in_h = 1;
 	test_force = 0;
 	test_stress = 0;
 //----------------------------------------------------------
@@ -300,12 +299,6 @@ void Input::Default(void)
 	lcao_dk = 0.01;
 	lcao_dr = 0.01;
 	lcao_rmax = 30; // (a.u.)
-//----------------------------------------------------------
-// Divide and Conqure
-//----------------------------------------------------------
-	dc_nx = 1;
-	dc_ny = 1;
-	dc_nz = 1;
 //----------------------------------------------------------
 // Selinv 
 //----------------------------------------------------------
@@ -886,10 +879,6 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, vnl_in_h);
         }
-        else if (strcmp("zeeman_in_h", word) == 0)
-        {
-            read_value(ifs, zeeman_in_h);
-        }
         else if (strcmp("test_force", word) == 0)
         {
             read_value(ifs, test_force);
@@ -1080,19 +1069,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("lcao_rmax", word) == 0)
         {
             read_value(ifs, lcao_rmax);
-        }
-// Divide&Conqure
-        else if (strcmp("dc_nx", word) == 0)
-        {
-            read_value(ifs, dc_nx);
-        }
-        else if (strcmp("dc_ny", word) == 0)
-        {
-            read_value(ifs, dc_ny);
-        }
-        else if (strcmp("dc_nz", word) == 0)
-        {
-            read_value(ifs, dc_nz);
         }
         else if (strcmp("selinv_npole", word) == 0)
         {
@@ -1980,7 +1956,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( t_in_h );
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );
-	Parallel_Common::bcast_int( zeeman_in_h );
 
 	Parallel_Common::bcast_int( test_force );
 	Parallel_Common::bcast_int( test_stress );
@@ -2030,11 +2005,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( lcao_dk );
 	Parallel_Common::bcast_double( lcao_dr );
 	Parallel_Common::bcast_double( lcao_rmax );
-
-	// mohan add 2011-06-12
-	Parallel_Common::bcast_int( dc_nx );
-	Parallel_Common::bcast_int( dc_ny );
-	Parallel_Common::bcast_int( dc_nz );
 
 	// mohan add 2011-09-28
 	Parallel_Common::bcast_int( selinv_npole);
@@ -3130,7 +3100,6 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"t_in_h", t_in_h,"calculate the kinetic energy or not");
 	OUTP(ofs,"vl_in_h", vl_in_h,"calculate the local potential or not");
 	OUTP(ofs,"vnl_in_h", vnl_in_h,"calculate the nonlocal potential or not");
-	OUTP(ofs,"zeeman_in_h", zeeman_in_h,"calculate the zeeman term or not");
 	OUTP(ofs,"test_force", test_force, "test the force");
 	OUTP(ofs,"test_stress", test_stress, "test the force");
 	

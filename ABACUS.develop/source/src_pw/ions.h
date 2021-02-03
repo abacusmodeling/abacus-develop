@@ -2,7 +2,7 @@
 #define IONS_H
 
 #include "electrons.h"
-#include "electrons_stochastic.h" //mohan added 2021-01-28
+#include "electrons_sto.h" //mohan added 2021-01-28
 #include "tools.h"
 #include "../src_ions/ions_move_methods.h"
 #include "../src_ions/lattice_change_methods.h"

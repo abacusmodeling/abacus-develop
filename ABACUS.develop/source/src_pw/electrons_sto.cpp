@@ -1,6 +1,6 @@
 #include "tools.h"
 #include "global.h"
-#include "electrons_stochastic.h" 
+#include "electrons_sto.h" 
 #include "algorithms.h"
 #include "symmetry_rho.h"
 #include "../src_pw/wf_io.h"

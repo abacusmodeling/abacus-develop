@@ -1,5 +1,5 @@
-#ifndef INCLUDE_ELECTRONS_STOCHASTIC_H
-#define INCLUDE_ELECTRONS_STOCHASTIC_H
+#ifndef INCLUDE_ELECTRONS_STO_H
+#define INCLUDE_ELECTRONS_STO_H
 
 #include "tools.h"
 #include "threshold_elec.h"
@@ -15,11 +15,12 @@ class Electrons_Stochastic: private Threshold_Elec
 
     // constructor and deconstructor
     Electrons_Stochastic();
+
     ~Electrons_Stochastic();
 
     int iter;
+
     static double avg_iter;
-    int test;
 
     void scf_stochastic(const int &istep);
 
