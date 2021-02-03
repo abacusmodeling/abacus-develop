@@ -25,7 +25,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, complex<double>** 
 		this->using_LAPACK_complex(ik, cc, cc_init);
 #endif
 */
-		this-> using_LAPACK_complex(ik, cc, cc_init);
+		this->using_LAPACK_complex(ik, cc, cc_init);
 	}
 	else
 	{

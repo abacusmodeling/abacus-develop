@@ -322,8 +322,15 @@ void Electrons::self_consistent(const int &istep)
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
-        if(vext == 0) pot.set_vrs(pw.doublegrid);
-        else pot.set_vrs_tddft(pw.doublegrid, istep);
+        if(vext == 0) 
+		{
+			pot.set_vrs();
+		}
+        else 
+		{
+			pot.set_vrs_tddft(istep);
+		}
+
         //pot.set_vrs(pw.doublegrid);
         //print_eigenvalue(ofs_running);
         en.calculate_etot();

@@ -4,10 +4,14 @@
 #include "tools.h"
 #include "threshold_elec.h"
 
+//----------------------------------------------
+// methods based on stochastic wave functions
+//----------------------------------------------
+
 class Electrons_Stochastic: private Threshold_Elec
 {
 
-public:
+	public:
 
     // constructor and deconstructor
     Electrons_Stochastic();
@@ -16,11 +20,10 @@ public:
     int iter;
     static double avg_iter;
     int test;
-    int unit;
 
     void scf_stochastic(const int &istep);
 
-private:
+	private:
 
     void c_bands(const int &istep);
 

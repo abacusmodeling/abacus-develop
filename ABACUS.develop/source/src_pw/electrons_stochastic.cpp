@@ -23,8 +23,6 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
 
     set_ethr();
     
-    this->unit = 0;
-
 	if(OUT_LEVEL=="ie")
 	{
 		cout << setprecision(12);
@@ -62,12 +60,18 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
     for (this->iter = 1;iter <= NITER;iter++)
     {
 		ofs_running 
-		<< "\n PW ALGORITHM --------------- ION=" << setw(4) << istep + 1
+		<< "\n PW-STOCHASTIC ALGO --------- ION=" << setw(4) << istep + 1
 		<< "  ELEC=" << setw(4) << iter 
 		<< "--------------------------------\n";
 		
-		if(iter==1) CHR.new_e_iteration = true;
-		else CHR.new_e_iteration = false;
+		if(iter==1) 
+		{
+			CHR.new_e_iteration = true;
+        }
+		else 
+		{
+			CHR.new_e_iteration = false;
+		}
 
 		// record the start time.
         start=std::clock();
@@ -75,8 +79,15 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
 		//(1) set converged threshold, 
 		// automatically updated during self consistency.
         //this->update_ethr(iter);
-        if(FINAL_SCF && iter==1) ETHR = 1.0e-2;
-        else this->update_ethr(iter);
+        if(FINAL_SCF && iter==1) 
+		{
+			ETHR = 1.0e-2;
+		}
+        else 
+		{
+			this->update_ethr(iter);
+        }
+
         if(FINAL_SCF && iter==1)
         {
             CHR.irstep=0;
@@ -133,53 +144,46 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
         en.deband = en.delta_e();
 	
 	
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
-        {
-            CHR.mix_rho(dr2,0,DRHO2,iter,conv_elec);
-        }
-        else
-        {
-			// tr2_min used only in first scf iteraton
-			double diago_error = 0.0;
-			if(iter==1) 
+		// tr2_min used only in first scf iteraton
+		double diago_error = 0.0;
+		if(iter==1) 
+		{
+			// if 'dr2 < ETHR * nelec' happen,
+			// in other word, 'dr2 < diago_error'
+			// we update ETHR.
+			diago_error = ETHR*std::max(1.0, ucell.nelec);
+		}
+
+		// if converged is achieved, or the self-consistent error(dr2)
+		// is samller than the estimated error due to diagonalization(diago_error)
+		// rhoin and rho are unchanged:
+		// rhoin contain the input charge density and 
+		// rho contain the output charge density.
+		// in other cases rhoin contains the mixed charge density
+		// (the new input density) while rho is unchanged.
+		CHR.mix_rho(dr2,diago_error,DRHO2,iter,conv_elec);
+
+		//			if(MY_RANK==0)
+		//			{
+		//				ofs_mix << setw(5) << iter << setw(20) << dr2 << endl; 
+		//			}
+
+		if (iter==1)
+		{
+			if (dr2 < diago_error)
 			{
-				// if 'dr2 < ETHR * nelec' happen,
-				// in other word, 'dr2 < diago_error'
-				// we update ETHR.
-				diago_error = ETHR*std::max(1.0, ucell.nelec);
+				ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
+
+				WARNING("scf","Threshold on eigenvalues was too large.");
+				ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << endl;
+
+				// update ETHR.
+				ofs_running << " Origin ETHR = " << ETHR << endl;
+				ETHR = dr2 / ucell.nelec;
+				ofs_running << " New    ETHR = " << ETHR << endl;
+				//                  goto first_iter_again;
 			}
-			
-			// if converged is achieved, or the self-consistent error(dr2)
-			// is samller than the estimated error due to diagonalization(diago_error)
-			// rhoin and rho are unchanged:
-			// rhoin contain the input charge density and 
-			// rho contain the output charge density.
-			// in other cases rhoin contains the mixed charge density
-			// (the new input density) while rho is unchanged.
-            CHR.mix_rho(dr2,diago_error,DRHO2,iter,conv_elec);
-
-//			if(MY_RANK==0)
-//			{
-//				ofs_mix << setw(5) << iter << setw(20) << dr2 << endl; 
-//			}
-
-            if (iter==1)
-            {
-                if (dr2 < diago_error)
-                {
-                    ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
-					
-					WARNING("scf","Threshold on eigenvalues was too large.");
-					ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << endl;
-
-					// update ETHR.
-					ofs_running << " Origin ETHR = " << ETHR << endl;
-                    ETHR = dr2 / ucell.nelec;
-					ofs_running << " New    ETHR = " << ETHR << endl;
-//                  goto first_iter_again;
-                }
-            }
-        }
+		}
 
         if (!conv_elec)
         {
@@ -205,7 +209,7 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
 
 			// the new potential V(PL)+V(H)+V(xc)
             pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
-	    	//cout<<"Exc = "<<en.etxc<<endl;
+
             //( vnew used later for scf correction to the forces )
 	    	pot.vnew = pot.vr - pot.vnew;
             en.descf = 0.0;
@@ -218,6 +222,7 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
 		stringstream ssgk;
 		ssgk << global_out_dir << "GKK.dat";
             
+
 		// output for tmp.
 		for(int is=0; is<NSPIN; is++)
 		{
@@ -235,7 +240,10 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
 		}
 
-		if(vext == 0) pot.set_vrs(pw.doublegrid);
+		if(vext == 0) 
+		{
+			pot.set_vrs();
+		}
         
         //print_eigenvalue(ofs_running);
 		en.calculate_etot();
@@ -307,6 +315,7 @@ void Electrons_Stochastic::c_bands(const int &istep)
        
 	ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
 	ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
+
 	for (int ik = 0;ik < kv.nks;ik++)
 	{
 		hm.init_k(ik);
@@ -320,7 +329,7 @@ void Electrons_Stochastic::c_bands(const int &istep)
         {
             for (int ig = 0;ig < wf.npw; ig++)
 			{
-				h_diag[ig] = max(1.0, wf.g2kin[ig]); // pwscf-2.1.2
+				h_diag[ig] = max(1.0, wf.g2kin[ig]);
 				if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
 			}
         }
@@ -332,57 +341,60 @@ void Electrons_Stochastic::c_bands(const int &istep)
 				if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
 			}
         }
-	//h_diag can't be zero!  //zhengdy-soc
-	if(NPOL==2)
-	{
-		for(int ig = wf.npw;ig < wf.npwx; ig++)
+		//h_diag can't be zero!  //zhengdy-soc
+		if(NPOL==2)
 		{
-			h_diag[ig] = 1.0;
-			h_diag[ig+ wf.npwx] = 1.0;
+			for(int ig = wf.npw;ig < wf.npwx; ig++)
+			{
+				h_diag[ig] = 1.0;
+				h_diag[ig+ wf.npwx] = 1.0;
+			}
 		}
-	}
 
-	clock_t start=clock();
+		clock_t start=clock();
 
-	//============================================================
-	// diago the hamiltonian!!
-	// In plane wave method, firstly using cinitcgg to diagnolize,
-	// then using cg method.
-	//
-	// In localized orbital presented in plane wave case,
-	// only using cinitcgg.
-	//
-	// In linear scaling method, using sparse matrix and
-	// adjacent searching code and cg method to calculate the
-	// eigenstates.
-	//=============================================================
-	double avg_iter_k = 0.0;
-    hm.diago(istep, this->iter, ik, h_diag, avg_iter_k);
-
-
-	avg_iter += avg_iter_k;
-
-	en.print_band(ik);
-
-	clock_t finish=clock();
-	const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
+		//============================================================
+		// diago the hamiltonian!!
+		// In plane wave method, firstly using cinitcgg to diagnolize,
+		// then using cg method.
+		//
+		// In localized orbital presented in plane wave case,
+		// only using cinitcgg.
+		//
+		// In linear scaling method, using sparse matrix and
+		// adjacent searching code and cg method to calculate the
+		// eigenstates.
+		//=============================================================
+		double avg_iter_k = 0.0;
+		hm.diago(istep, this->iter, ik, h_diag, avg_iter_k);
 
 
-	ofs_running << " " << setw(8) 
-				<< ik+1 << setw(15) 
-				<< avg_iter_k << setw(15) << duration << endl;
+		avg_iter += avg_iter_k;
+
+		en.print_band(ik);
+
+		clock_t finish=clock();
+		const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
+
+
+		ofs_running << " " << setw(8) 
+			<< ik+1 << setw(15) 
+			<< avg_iter_k << setw(15) << duration << endl;
 	}//End K Loop
 
 
 	if(BASIS_TYPE=="pw")
 	{
-			//		ofs_running << " avg_iteri " << avg_iter << endl;
-			Parallel_Reduce::reduce_double_allpool(avg_iter); //mohan fix bug 2012-06-05
-			//		ofs_running << " avg_iter_after " << avg_iter << endl;
-			avg_iter /= static_cast<double>(kv.nkstot);
+		//		ofs_running << " avg_iteri " << avg_iter << endl;
+		Parallel_Reduce::reduce_double_allpool(avg_iter); //mohan fix bug 2012-06-05
+		//		ofs_running << " avg_iter_after " << avg_iter << endl;
+		avg_iter /= static_cast<double>(kv.nkstot);
 	}
+
 	delete [] h_diag;
+
 	timer::tick("Elec_Stochastic","c_bands",'E');
+
 	return;
 } 
 

@@ -49,10 +49,10 @@ class potential
     // vrs = vr + vltotK
     // vr : Hartree potential + V_xc potential .
     // vltot : From pseudopotential .
-    void set_vrs(const bool doublegrid);
+    void set_vrs(void);
 
 	// I guess this is done by Fuxiang He, -- mohan 2021-02-01
-    void set_vrs_tddft(const bool doublegrid, const int istep);
+    void set_vrs_tddft(const int istep);
 
     void print_pot(ofstream &ofs)const;
     double vr_ave(const int, const int, const double *) ;

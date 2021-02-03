@@ -409,12 +409,6 @@ void PW_Basis::setup_gg(void)
 
 	OUT(ofs_running,"energy cutoff for wavefunc (unit:Ry)",ecutwfc);
 
-    this->doublegrid = false;
-    if (ggwfc != ggchg)
-    {
-        doublegrid = true;
-        ofs_running << "Double grid is used."<<endl;
-    }
     return;
 }
 

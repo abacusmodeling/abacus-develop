@@ -210,11 +210,11 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     //----------------------------------------------------------
     if(vext == 0) 
 	{
-		this->set_vrs(pw.doublegrid);
+		this->set_vrs();
 	}
     else 
 	{
-		this->set_vrs_tddft(pw.doublegrid, istep);
+		this->set_vrs_tddft(istep);
 	}
 
     //figure::picture(this->vrs1,pw.ncx,pw.ncy,pw.ncz);
@@ -868,7 +868,7 @@ const matrix &v, const int &precision, const int &hartree)const
 // contributions.
 //==========================================================
 // from set_vrs.f90
-void potential::set_vrs(const bool doublegrid)
+void potential::set_vrs(void)
 {
     TITLE("potential","set_vrs");
     timer::tick("potential","set_vrs");
@@ -932,21 +932,6 @@ void potential::set_vrs(const bool doublegrid)
         }
 */
 
-        //====================================================
-        // And interpolate it on the smooth mesh if necessary
-        //====================================================
-        /*
-        if (doublegrid)
-        {
-            double *vrs_1d = new double[pw.nrxx]();
-            assert(vrs_1d != 0);
-            dcopy(vrs, is, vrs_1d);
-            //interpolate (vrs (1, is), vrs (1, is), - 1);
-            interpolate(vrs_1d, vrs_1d, -1);
-            //(vrs ( is, 0), vrs ( is, 0), - 1);
-            delete [] vrs_1d;
-        }
-        */
     }
 
 
@@ -1260,7 +1245,7 @@ double potential::vr_ave(const int n,const int size,const double *p)
 // fuxiang add in 2017-05
 //==========================================================
 
-void potential::set_vrs_tddft(const bool doublegrid, const int istep)
+void potential::set_vrs_tddft(const int istep)
 {
     TITLE("potential","set_vrs_tddft");
     timer::tick("potential","set_vrs_tddft");
@@ -1357,22 +1342,6 @@ void potential::set_vrs_tddft(const bool doublegrid, const int istep)
             delete[] this->vextold;
             delete[] this->vext;
         }
-
-        //====================================================
-        // And interpolate it on the smooth mesh if necessary
-        //====================================================
-        /*
-        if (doublegrid)
-        {
-            double *vrs_1d = new double[pw.nrxx]();
-            assert(vrs_1d != 0);
-            dcopy(vrs, is, vrs_1d);
-            //interpolate (vrs (1, is), vrs (1, is), - 1);
-            interpolate(vrs_1d, vrs_1d, -1);
-            //(vrs ( is, 0), vrs ( is, 0), - 1);
-            delete [] vrs_1d;
-        }
-        */
     }
 
 

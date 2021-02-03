@@ -210,13 +210,18 @@ void Local_Orbital_Elec::scf(const int &istep)
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
 				en.delta_escf();
-				if (vext == 0)	pot.set_vrs(pw.doublegrid);
-				else		pot.set_vrs_tddft(pw.doublegrid, istep);
+				if (vext == 0)	
+				{
+					pot.set_vrs();
+				}
+				else		
+				{
+					pot.set_vrs_tddft(istep);
+				}
 			}
 		}
 
 		//fuxiang add 2016-11-1
-
 		if(tddft==1 && iter == 1)
 		{
 			this->WFC_init = new complex<double>**[kv.nks];
@@ -448,8 +453,14 @@ void Local_Orbital_Elec::scf(const int &istep)
 		}
 
 		// (10) add Vloc to Vhxc.
-		if(vext == 0)	pot.set_vrs(pw.doublegrid);
-		else		pot.set_vrs_tddft(pw.doublegrid, istep);
+		if(vext == 0)	
+		{
+			pot.set_vrs();
+		}
+		else		
+		{
+			pot.set_vrs_tddft(istep);
+		}
 	
 		//time_finish=std::time(NULL);
 		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
