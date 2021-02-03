@@ -2,12 +2,12 @@
 #define IONS_H
 
 #include "electrons.h"
-#include "electrons_sto.h" //mohan added 2021-01-28
 #include "tools.h"
 #include "../src_ions/ions_move_methods.h"
 #include "../src_ions/lattice_change_methods.h"
 #include "charge_extra.h"
 //#include "../src_develop/src_md/md.h"
+#include "sto_elec.h" //mohan added 2021-01-28
 
 class Ions
 {
@@ -24,7 +24,7 @@ private:
     Electrons elec;
 
 	// mohan add for stochastic wave functions
-	Electrons_Stochastic elec_sto;	
+	Stochastic_Elec elec_sto;	
 
 	// mohan add 2021-01-28
 	// mohan moved this variable from electrons.h to ions.h

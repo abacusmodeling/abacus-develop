@@ -1,22 +1,22 @@
 #include "tools.h"
 #include "global.h"
-#include "electrons_sto.h" 
+#include "sto_elec.h" 
 #include "algorithms.h"
 #include "symmetry_rho.h"
 #include "../src_pw/wf_io.h"
 
-double Electrons_Stochastic::avg_iter = 0;
+double Stochastic_Elec::avg_iter = 0;
 
-Electrons_Stochastic::Electrons_Stochastic()
+Stochastic_Elec::Stochastic_Elec()
 {
 }
 
-Electrons_Stochastic::~Electrons_Stochastic()
+Stochastic_Elec::~Stochastic_Elec()
 {
 }
 
 
-void Electrons_Stochastic::scf_stochastic(const int &istep)
+void Stochastic_Elec::scf_stochastic(const int &istep)
 {
 	timer::tick("Elec_Stochastic","scf_stochastic",'D');
     en.ewld = en.ewald();
@@ -288,7 +288,7 @@ void Electrons_Stochastic::scf_stochastic(const int &istep)
 } // end electrons
 
 
-bool Electrons_Stochastic::check_stop_now(void)
+bool Stochastic_Elec::check_stop_now(void)
 {
     bool check_stop_now = false;
 
@@ -301,7 +301,7 @@ bool Electrons_Stochastic::check_stop_now(void)
 } 
 
 
-void Electrons_Stochastic::c_bands(const int &istep)
+void Stochastic_Elec::c_bands(const int &istep)
 {
 	if (test_elec) TITLE("electrons","c_bands");
 	timer::tick("Elec_Stochastic","c_bands",'E');

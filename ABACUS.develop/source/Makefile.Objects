@@ -48,7 +48,6 @@ atom_pseudo.o\
 unitcell_pseudo.o\
 threshold_elec.o\
 electrons.o \
-electrons_sto.o\
 forces.o\
 stress.o\
 myfunc1.o\
@@ -69,6 +68,11 @@ soc.o\
 toWannier90.o \
 unkOverlap_pw.o \
 berryphase.o \
+sto_elec.o\
+sto_wf.o\
+sto_iter.o\
+sto_hchi.o\
+sto_che.o\
 
 OBJS_TOOLS=complexarray.o\
 complexmatrix.o \
@@ -241,7 +245,6 @@ wavefunc.o\
 wf_io.o \
 rwstream.o\
 wf_atomic.o \
-wf_sto.o \
 wf_igk.o \
 use_fft.o\
 klist.o  \

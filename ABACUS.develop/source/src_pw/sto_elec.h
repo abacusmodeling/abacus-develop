@@ -1,22 +1,22 @@
-#ifndef INCLUDE_ELECTRONS_STO_H
-#define INCLUDE_ELECTRONS_STO_H
+#ifndef INCLUDE_STO_ELEC_H
+#define INCLUDE_STO_ELEC_H
 
 #include "tools.h"
 #include "threshold_elec.h"
+#include "sto_wf.h"
 
 //----------------------------------------------
 // methods based on stochastic wave functions
 //----------------------------------------------
 
-class Electrons_Stochastic: private Threshold_Elec
+class Stochastic_Elec: private Threshold_Elec
 {
 
 	public:
 
     // constructor and deconstructor
-    Electrons_Stochastic();
-
-    ~Electrons_Stochastic();
+    Stochastic_Elec();
+    ~Stochastic_Elec();
 
     int iter;
 
@@ -25,6 +25,8 @@ class Electrons_Stochastic: private Threshold_Elec
     void scf_stochastic(const int &istep);
 
 	private:
+
+	Stochastic_WF swf;
 
     void c_bands(const int &istep);
 
