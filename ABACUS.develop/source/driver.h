@@ -2,15 +2,15 @@
 // AUTHOR : mohan
 // DATE : 2011-06-12
 //==========================================================
-#ifndef DC_DRIV_H
-#define DC_DRIV_H
+#ifndef DRIVER_H
+#define DRIVER_H
 
-class DC_Driv
+class Driver
 {
 	public:
 	
-	DC_Driv();
-	~DC_Driv();
+	Driver();
+	~Driver();
 
 	void init();
 
@@ -18,8 +18,6 @@ class DC_Driv
 
 	// reading the parameters
 	void reading();
-
-    void prepare();
 
 	// do stuff, have fun!
 	void atomic_world();

@@ -20,7 +20,9 @@ Input::Input()
 	angle2 = new double[1];
 // all values set in Default	
 }
-Input::~Input() {
+
+Input::~Input() 
+{
 	delete[] angle1;
 	delete[] angle2;
 }
@@ -58,39 +60,10 @@ void Input::Init(const string &fn)
 // OTHRE CLASS MEMBER FUNCTION :
 // NAME : Run::make_dir( dir name : OUT.suffix)
 //----------------------------------------------------------
-    //Global_File::make_dir_out( this->suffix , this->calculation, MY_RANK, this->linear_scaling, this->out_alllog); xiaohui modify 2013-09-01, delete "this->linear_scaling"
 	Global_File::make_dir_out( this->suffix , this->calculation, MY_RANK, this->out_alllog); //xiaohui add 2013-09-01
 	Check();
 
 	time_t  time_now = time(NULL);
-	//xiaohui modify 2015-03-25
-	/*
-	ofs_running << " ------------------------------------------------------------------------------------" << endl;
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << "                                              ############                           " << endl; 
-	ofs_running << "                                            ##################                       " << endl;
-	ofs_running << "                                          #####     ####  #####                      " << endl;         
-	ofs_running << "                                         ###        ##########                       " << endl;         
-	ofs_running << "   #####            #####   ##############            ###### ###   ############      " << endl;         
-	ofs_running << "  ########       ######### #################         ####    ####  ################  " << endl;         
-	ofs_running << "  ###########  ###### #### ####       #######       ####     ####             ###### " << endl;         
-	ofs_running << "  ####   ##########   #### ####        ######      ####      ####    #########  #### " << endl;          
-	ofs_running << "  ####      ####      #### ####  ###########      ####       ####  ###########  #### " << endl;         
-	ofs_running << "  ####                #### #####  #####          ####        ####  ####         #### " << endl;         
-	ofs_running << "  ####                ####  ################    ####         ####  ################# " << endl;         
-	ofs_running << "  ####                ####    ##############   ####          ####    ############### " << endl;         
-	ofs_running << "                                             #####                                   " << endl;         
-	ofs_running << "                                          ######                                     " << endl;         
-	ofs_running << "                                        ####                                         " << endl; 
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << " ------------------------------------------------------------------------------------" << endl;
-
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << "                             WELCOME TO MESIA                                        " << endl;
-	ofs_running << "                                                                                     " << endl;
-    	ofs_running << "   'Massive Electronic simulation based on Systematically Improvable Atomic bases'   " << endl; 
-	ofs_running << "                                                                                     " << endl;
-	*/
 	ofs_running << "                                                                                     " << endl;
 	ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
 	ofs_running << "                                                                                     " << endl;
@@ -101,7 +74,6 @@ void Input::Init(const string &fn)
 
 	ofs_running << setiosflags(ios::right);
                                                                                                                              
-
 
 #ifdef __MPI
 	//ofs_running << "    Version: Parallel, under ALPHA test" << endl;
@@ -321,27 +293,27 @@ void Input::Default(void)
 	md_tstep=1; //reduec md_delt every md_tstep step.
 	md_delt=1.0;
 */
-//md and related parameters(added by zheng da ye)
-        md_mdtype=1;
-        md_tauthermo=0;
-        md_taubaro=0;
-        md_dt=-1;
-        md_nresn=3;
-        md_nyosh=3;
-        md_qmass=1;
-        md_tfirst=-1;         //kelvin
-        md_tlast=md_tfirst;
-        md_dumpmdfred=1;
-        md_mdoutpath="mdoutput";
+	//md and related parameters(added by zheng da ye)
+	md_mdtype=1;
+	md_tauthermo=0;
+	md_taubaro=0;
+	md_dt=-1;
+	md_nresn=3;
+	md_nyosh=3;
+	md_qmass=1;
+	md_tfirst=-1;         //kelvin
+	md_tlast=md_tfirst;
+	md_dumpmdfred=1;
+	md_mdoutpath="mdoutput";
 	md_domsd=0;
-        md_domsdatom=0;
-        md_rstmd=0;
-        md_outputstressperiod=1;
-        md_fixtemperature=1;
-        md_ediff=1e-4;
+	md_domsdatom=0;
+	md_rstmd=0;
+	md_outputstressperiod=1;
+	md_fixtemperature=1;
+	md_ediff=1e-4;
 	md_ediffg=1e-3;
-        md_msdstartTime=1;
-//end of zhengdaye's add.
+	md_msdstartTime=1;
+	//end of zhengdaye's add.
 
 /* //----------------------------------------------------------
 // vdwD2									//Peize Lin add 2014-03-31, update 2015-09-30
@@ -382,46 +354,46 @@ void Input::Default(void)
 //-----------------------------------------------------------
 // spectrum                                                                      // pengfei Li add 2016-11-23
 //-----------------------------------------------------------
-        //epsilon=false;
-		//epsilon_choice=0;
-		spectral_type="None";
-		spectral_method=0;
-		kernel_type="rpa";
-		eels_method=0;
-		absorption_method=0;
-        system="bulk";
-        eta=0.05;
-        domega=0.01;
-        nomega=300;
-        ecut_chi=1;
-        //oband=1;
-		q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
-		q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
-        //start_q=1;
-        //interval_q=1;
-        nq=1;
-        out_epsilon=true;
-        out_chi=false;
-        out_chi0=false;
-        fermi_level=0.0;
-        coulomb_cutoff=false;
+//epsilon=false;
+//epsilon_choice=0;
+	spectral_type="None";
+	spectral_method=0;
+	kernel_type="rpa";
+	eels_method=0;
+	absorption_method=0;
+	system="bulk";
+	eta=0.05;
+	domega=0.01;
+	nomega=300;
+	ecut_chi=1;
+	//oband=1;
+	q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
+	q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
+	//start_q=1;
+	//interval_q=1;
+	nq=1;
+	out_epsilon=true;
+	out_chi=false;
+	out_chi0=false;
+	fermi_level=0.0;
+	coulomb_cutoff=false;
 
-        kmesh_interpolation=false;
-        for(int i=0; i<100; i++)
-        {
-            qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
-        }
+	kmesh_interpolation=false;
+	for(int i=0; i<100; i++)
+	{
+		qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
+	}
 
-        lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
-		
-		//epsilon0 = false;
-		//intersmear = 0.01;
-		intrasmear = 0.0;
-		shift = 0.0;
-		metalcalc = false;
-		eps_degauss = 0.01;
-		
-		//epsilon0_choice = 0;
+	lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
+
+	//epsilon0 = false;
+	//intersmear = 0.01;
+	intrasmear = 0.0;
+	shift = 0.0;
+	metalcalc = false;
+	eps_degauss = 0.01;
+
+	//epsilon0_choice = 0;
 	//added by zhengdy-soc
 	noncolin = false;
 	lspinorb = false;

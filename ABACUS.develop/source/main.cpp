@@ -2,7 +2,7 @@
 // AUTHOR : mohan
 // DATE : 2008-11-10
 //==========================================================
-#include "dc_driv.h"
+#include "driver.h"
 #include "src_parallel/parallel_global.h"
 #include "src_global/global_variable.h"
 #include <ctime>
@@ -18,7 +18,7 @@ int main(int argc, char **argv)
 void calculate()
 {
 	// divide and conqure (DC) starts here,
-	DC_Driv DD;
+	Driver DD;
 	DD.init();
 
 #ifdef __MPI

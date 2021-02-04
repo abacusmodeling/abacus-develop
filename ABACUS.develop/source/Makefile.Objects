@@ -26,7 +26,7 @@ chem_pot.o\
 cg_lcao.o\
 cg_precon.o\
 
-OBJS_DC=dc_driv.o\
+OBJS_DC=driver.o\
 input.o \
 input_conv.o\
 run_pw.o\
