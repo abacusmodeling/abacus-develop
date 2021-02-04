@@ -561,14 +561,7 @@ void Input_Conv::Convert(void)
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
     NEW_DM=INPUT.newDM;  // Shen Yu add 2019/5/9
-	timer::tick("Input_Conv","Convert",'B');
-    return;
-}
 
-void Input_Conv::Convert_FP(void) 
-{
-    TITLE("Input","Convert_FP");
-	timer::tick("Input_Conv","Convert_FP",'B');
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 2/16 )
 //----------------------------------------------------------
@@ -618,7 +611,7 @@ void Input_Conv::Convert_FP(void)
 	ORB.dR = INPUT.lcao_dr;
 	ORB.Rmax = INPUT.lcao_rmax; 
 
-	timer::tick("Input_Conv","Convert_FP",'B');
+	timer::tick("Input_Conv","Convert",'B');
     return;
 }
 

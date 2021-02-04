@@ -16,10 +16,10 @@
 
 using namespace std;
 
+
 namespace Input_Conv
 {
     void Convert(void);
-    void Convert_FP(void);
 }
 
 

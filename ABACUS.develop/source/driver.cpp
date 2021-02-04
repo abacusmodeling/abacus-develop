@@ -6,7 +6,6 @@
 #include "src_lcao/global_fp.h"
 #include "src_pw/global.h"
 #include "src_global/print_info.h"
-
 #include "src_pw/cal_test.h"
 #include "src_pw/cal_test0.h"
 #include "src_pw/winput.h"
@@ -21,11 +20,6 @@ void Driver::init()
 {
 	TITLE("Driver","init");
 
-	time_t time_start = std::time(NULL);
-
-	timer::start();
-
-
 	// (1) read the input parameters.
 	this->reading();
 
@@ -34,25 +28,7 @@ void Driver::init()
 	this->atomic_world();
 
 
-	time_t	time_finish= std::time(NULL);
-
-	// print out information before ABACUS ends
-	cout << "\n START  Time  : " << ctime(&time_start);
-	cout << " FINISH Time  : " << ctime(&time_finish);
-	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
-	cout << " SEE INFORMATION IN : "<<global_out_dir<<endl;
-
-	ofs_running << "\n Start  Time  : " << ctime(&time_start);
-	ofs_running << " Finish Time  : " << ctime(&time_finish);
-
-	double total_time = difftime(time_finish, time_start);
-	int hour = total_time / 3600;
-	int mins = ( total_time - 3600 * hour ) / 60;
-	int secs = total_time - 3600 * hour - 60 * mins ;
-	ofs_running << " Total  Time  : " << hour << " h "
-	            << mins << " mins "
-	            << secs << " secs "<< endl;
-
+	// (3) close all of the running logs 
 	INPUT.close_log();
 
 	return;
@@ -65,19 +41,15 @@ void Driver::reading(void)
 
 //---------------------------------------------------------------------------------
 
-	// reading input files from the 'INPUT' object
-	// the 'INPUT'  is global and can be used anywhere,
+	// (1) read INPUT 
 	// although I suggest you keep the parameters to be as
 	// local as possible -- mohan 2021-01-31
 	INPUT.Init( global_in_card );
 
-	// copy the variables from INPUT to each class
+	// (2) copy the variables from INPUT to each class
 	Input_Conv::Convert();
-	Input_Conv::Convert_FP();
 
-	// there is a 'DIAGONALIZATION' world I define when I was young
-	// the 'DIAGO' world only uses computational resources that 
-	// are needed for diagonalization of the Hamiltionian -- mohan 2021-01-31
+	// (3) define the 'DIAGONALIZATION' world in MPI
 	Parallel_Global::split_diag_world(DIAGO_PROC);
 	Parallel_Global::split_grid_world(DIAGO_PROC);
 	OUT(ofs_running,"DRANK",DRANK+1);
@@ -86,22 +58,12 @@ void Driver::reading(void)
 	OUT(ofs_running,"GRANK",GRANK+1);
 	OUT(ofs_running,"GSIZE",GSIZE);
 
-
-
-//---------------------------------------------------------------------------------
-// * initialize the NPOOL for k-points
-// * initialize the input parameters for wannier functions
-// * setup the unit cell
-// * symmetry analysis
-// * setup the k-points according to symmetry annalysis
-
 #ifdef __MPI
-    // (1) If k point number > 1, After reading in NPOOL, 
-	// divide the NPROC processprs into NPOOL.
+    // (4)  divide the NPROC processors into NPOOL for k-points parallelization.
     Pkpoints.init();
 #endif
 
-    // (2) Read in parameters about wannier functions.
+    // (5) Read in parameters about wannier functions.
     winput::Init( global_wannier_card );
 
     //xiaohui move 3 lines, 2015-09-30
