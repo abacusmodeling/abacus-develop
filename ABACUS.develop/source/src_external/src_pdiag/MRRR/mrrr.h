@@ -13,6 +13,7 @@
 #define max(a,b) ((a) >= (b) ? (a) : (b))
 #define dmin(a,b) (double)min(a,b)
 #define dmax(a,b) (double)max(a,b)
+#define dlamch dlamch_
 
 extern "C" double dlamch(char *);
 /*

@@ -3,6 +3,8 @@
 
 #include "tools.h"
 
+//qianrui 2021-2-4
+
 //----------------------------------------------
 // Generate stochastic wave functions 
 //----------------------------------------------
@@ -16,11 +18,13 @@ class Stochastic_WF
     ~Stochastic_WF();
 
 
-	void allocate_chi();
+	void init();
+	void calculate_chi();
 
 
 	// ComplexMatrix may not be a best filetype to store the electronic wave functions
-    ComplexMatrix *chi;  // stochastic wavefunctions in the PW basis
+    ComplexMatrix* chi0;  // origin stochastic wavefunctions in real space
+	ComplexMatrix* chi;	 // stochastic wavefunctions after orthogonalized with KS wavefunctions
 
 	int nchi;
 
@@ -31,8 +35,7 @@ class Stochastic_WF
 	protected:
 
 
-    // Calculate random wave functions as stochastic wave functions
-    void random(ComplexMatrix &chi);
+
 
 	// check the properties of chi
     void check_chi(const ComplexMatrix *chi)const;

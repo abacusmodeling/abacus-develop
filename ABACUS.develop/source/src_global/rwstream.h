@@ -56,13 +56,11 @@ Rwstream& operator>>(Rwstream& rstream,T& data)
 	int n=sizeof(data)/sizeof(T);
 	size_t ch;
     ch=fread(&data,size,n,rstream.fileptr);
-#ifdef __JUG
 	if(ch<n)
 	{
 		cout<<"Error in Rwstream: Some data didn't be read."<<endl;
     	exit(0);
 	}
-#endif
 	return rstream;
 }
 
@@ -89,13 +87,11 @@ void rwread(Rwstream& rstream,T* &data,int n)
 	int size=sizeof(T);
 	size_t ch;
     ch=fread(data,size,n,rstream.fileptr);
-#ifdef __JUG
     if(ch<n) 
     {
         cout<<"Error in Rwstream: Some dynamic memory didn't be read."<<endl;
         exit(0);
     }
-#endif
     return;
 }	
 

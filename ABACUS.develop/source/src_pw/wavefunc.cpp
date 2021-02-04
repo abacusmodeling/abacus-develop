@@ -573,7 +573,7 @@ void wavefunc::wfcinit_k(void)
 								{
 									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
 									phase = complex<double>( cos(arg),  -sin(arg) );
-									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) * wanf2_q[ik][iw2][ig] * phase/kv.nks;
+									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) * wanf2_q[ik][iw2][ig] * phase/double(kv.nks);
 								}
 							}
 						
