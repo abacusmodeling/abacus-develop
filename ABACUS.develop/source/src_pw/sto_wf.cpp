@@ -1,40 +1,40 @@
 #include "sto_wf.h"
 #include "global.h"
 
+
 Stochastic_WF::Stochastic_WF()
 {
     chi  = new ComplexMatrix[1];
+    chi0  = new ComplexMatrix[1];
 }
 
 Stochastic_WF::~Stochastic_WF()
 { 
     delete[] chi;
+    delete[] chi0;
 }
 
-void Stochastic_WF::allocate_chi()
+void Stochastic_WF::init()
 {
-
-
-}
-
-
-// update the function to generate random wave functions as stochastic wave functions.
-void Stochastic_WF::random(ComplexMatrix &chi)
-{
-	int ik=0; // only supports gamma-only case now
-
-    const int ng = kv.ngk[ik];
-
-    for (int iw = 0 ;iw < this->nchi;iw++)
+    int nrxx = 1;
+    complex<double> ui(0,1);
+    
+    delete[] chi0;
+    //We temporarily init one group of orbitals for all k points.
+    //This save memories.
+    chi0 = new ComplexMatrix[1]; 
+    chi0[0].create(nchi,nrxx,0);
+    //init with random number
+    for(int i=0; i<chi0[0].size; i++)
     {
-        for (int ig = 0;ig < ng;ig++)
-        {
-  //          const double rr = std::rand();
-  //          const double arg= TWO_PI * std::rand();
-  //          Vector3<double> v3 = kv.kvec_c[ik] + pw.gcar[this->igk(ik, ig)];
-  //          psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
-        }
+        chi0[0].c[i]=exp(2*PI*rand()*ui);
     }
+
+    delete[] chi;
+    int nkk = 1; // We temporarily use gamma k point.
+    chi = new ComplexMatrix[nkk];
     return;
 }
+
+
 
