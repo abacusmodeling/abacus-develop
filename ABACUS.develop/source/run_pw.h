@@ -17,7 +17,7 @@ public:
     ~Run_pw();
 
 	// perform plane wave basis calculations
-    void plane_wave_line(void);
+    static void plane_wave_line(void);
 
 };
 

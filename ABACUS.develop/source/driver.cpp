@@ -177,16 +177,20 @@ void Driver::atomic_world(void)
 	TITLE("Driver","atomic_world");
 	timer::tick("Driver","atomic_world",'A');
 
-	//xiaohui add 2013-09-01
+
+	//--------------------------------------------------
+	// choose basis sets:
+	// pw: plane wave basis set
+	// lcao_in_pw: LCAO expaned by plane wave basis set
+	// lcao: linear combination of atomic orbitals
+	//--------------------------------------------------
 	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
 	{
-		Run_pw rp;
-		rp.plane_wave_line();
+		Run_pw::plane_wave_line();
 	}
 	else if(BASIS_TYPE=="lcao")
 	{
-		Run_lcao rl;
-		rl.lcao_line();
+		Run_lcao::lcao_line();
 	}
 
 	timer::tick("Driver","atomic_world",'A');

@@ -31,7 +31,6 @@ input.o \
 input_conv.o\
 run_pw.o\
 run_lcao.o\
-run_linearscaling.o\
 
 OBJS_PW_BASIC=functional.o \
 xc_functional.o\
