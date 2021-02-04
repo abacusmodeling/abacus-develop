@@ -10,7 +10,8 @@ The code should be reconstructed with the following details:
 
 1) the TDDFT module should be relocated.
 2) the inclusion of files in vdw3 should be changed.
-
+3) Is is necessary to include <mkl_service.h>
+4) There is a segmental fault when use ABACUS compiled with gnu-mpich
 
 -----------------------------------------------------------------------
 Unitesets should include
