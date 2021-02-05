@@ -22,6 +22,7 @@ class Stochastic_Hchi
     // constructor and deconstructor
     Stochastic_Hchi();
     ~Stochastic_Hchi();
+	void Hchi();
 
 	private:
 

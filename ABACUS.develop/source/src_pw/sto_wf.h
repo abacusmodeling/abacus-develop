@@ -23,10 +23,12 @@ class Stochastic_WF
 
 
 	// ComplexMatrix may not be a best filetype to store the electronic wave functions
-    ComplexMatrix* chi0;  // origin stochastic wavefunctions in real space
-	ComplexMatrix* chi;	 // stochastic wavefunctions after orthogonalized with KS wavefunctions
+    ComplexMatrix* chi0;  	// origin stochastic wavefunctions in real space
+	ComplexMatrix* chi;	 	// stochastic wavefunctions after orthogonalized with KS wavefunctions
 
-	int nchi;
+	int nchi; 				// Total number of stochatic obitals
+	int nchip; 				// The number of stochatic obitals in current process 
+	
 
 	int nbands_diag; // number of bands obtained from diagonalization
 
