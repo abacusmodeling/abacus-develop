@@ -39,6 +39,7 @@ extern kvect kv;
 extern output out;
 
 extern PW_Basis pw;
+extern Stochastic_WF STO_WF; //qianrui add 2021-2-5
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;

@@ -15,6 +15,7 @@ class Stochastic_Chebychev
     // constructor and deconstructor
     Stochastic_Chebychev();
     ~Stochastic_Chebychev();
+    int norder;
 
 	private:
 

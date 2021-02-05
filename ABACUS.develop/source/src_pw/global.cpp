@@ -15,6 +15,7 @@ FFT fftwan;
 output out;
 
 PW_Basis pw;
+Stochastic_WF STO_WF;
 energy en;
 wavefunc wf;
 Hamilt hm;

@@ -2,7 +2,7 @@
 #define STOCHASTIC_WF_H
 
 #include "tools.h"
-
+#include "sto_che.h"
 //qianrui 2021-2-4
 
 //----------------------------------------------
@@ -25,10 +25,10 @@ class Stochastic_WF
 	// ComplexMatrix may not be a best filetype to store the electronic wave functions
     ComplexMatrix* chi0;  	// origin stochastic wavefunctions in real space
 	ComplexMatrix* chi;	 	// stochastic wavefunctions after orthogonalized with KS wavefunctions
-
+	Stochastic_Chebychev sto_che;
 	int nchi; 				// Total number of stochatic obitals
 	int nchip; 				// The number of stochatic obitals in current process 
-	
+	int nche_sto;			// number of orders for Chebyshev expansion 
 
 	int nbands_diag; // number of bands obtained from diagonalization
 

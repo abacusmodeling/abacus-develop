@@ -123,7 +123,9 @@ void Input::Default(void)
     calculation = "scf";
     ntype = 0;
     nbands = 0;
+	nbands_sto = 0;
 	nbands_istate = 5;
+	nche_sto = 0;
 	npool = 1;
     berry_phase = false;
 	gdir = 3;
@@ -542,9 +544,17 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, nbands);
         }
+		else if (strcmp("nbands_sto", word) == 0)//number of stochastic bands
+        {
+            read_value(ifs, nbands_sto);
+        }
         else if (strcmp("nbands_istate", word) == 0)// number of atom bands
         {
             read_value(ifs, nbands_istate);
+        }
+		else if (strcmp("nche_sto", word) == 0)// Chebyshev expansion order
+        {
+            read_value(ifs, nche_sto);
         }
         else if (strcmp("npool", word) == 0)// number of pools
         {
@@ -1843,7 +1853,9 @@ void Input::Bcast()
     Parallel_Common::bcast_string( calculation );
     Parallel_Common::bcast_int( ntype );
     Parallel_Common::bcast_int( nbands );
+	Parallel_Common::bcast_int( nbands_sto );
     Parallel_Common::bcast_int( nbands_istate );
+	Parallel_Common::bcast_int( nche_sto );
 	Parallel_Common::bcast_int( npool );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );
@@ -2894,7 +2906,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"ntype",ntype,"atom species number");
 	OUTP(ofs,"nspin",nspin,"1: single spin; 2: up and down spin; 4: noncollinear spin");
 	OUTP(ofs,"nbands",nbands,"number of bands");
+	OUTP(ofs,"nbands_sto",nbands_sto,"number of stochastic bands");
 	OUTP(ofs,"nbands_istate",nbands_istate,"number of bands around Fermi level for istate calulation");
+	OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
         //OUTP(ofs,"lmax1",lmax1,"lmax");

@@ -50,6 +50,8 @@ void Input_Conv::Convert(void)
 	NPOOL = INPUT.npool; 				// mohan add 2010-06-09
 	CALCULATION = INPUT.calculation;	// 2
     BERRY_PHASE = INPUT.berry_phase;	// 3
+	STO_WF.nchi = INPUT.nbands_sto;		// qianrui add 2021-2-5
+	STO_WF.nche_sto = INPUT.nche_sto;
 
 
 	EFIELD = INPUT.efield;
