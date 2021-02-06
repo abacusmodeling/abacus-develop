@@ -132,14 +132,25 @@ void DFTU::init()
 
 				for(int n=0; n<N; n++)
 				{
-					locale.at(iat).at(l).at(n).resize(2);
-					locale_save.at(iat).at(l).at(n).resize(2);
+					if(NSPIN==1 || NSPIN==2)
+					{
+						locale.at(iat).at(l).at(n).resize(2);
+						locale_save.at(iat).at(l).at(n).resize(2);
 
-					locale.at(iat).at(l).at(n).at(0).create(2*l+1, 2*l+1);
-					locale.at(iat).at(l).at(n).at(1).create(2*l+1, 2*l+1);
+						locale.at(iat).at(l).at(n).at(0).create(2*l+1, 2*l+1);
+						locale.at(iat).at(l).at(n).at(1).create(2*l+1, 2*l+1);
 
-					locale_save.at(iat).at(l).at(n).at(0).create(2*l+1, 2*l+1);
-					locale_save.at(iat).at(l).at(n).at(1).create(2*l+1, 2*l+1);												
+						locale_save.at(iat).at(l).at(n).at(0).create(2*l+1, 2*l+1);
+						locale_save.at(iat).at(l).at(n).at(1).create(2*l+1, 2*l+1);
+					}
+					else if(NSPIN==4) //SOC
+					{
+						locale.at(iat).at(l).at(n).resize(1);
+						locale_save.at(iat).at(l).at(n).resize(1);
+
+						locale.at(iat).at(l).at(n).at(0).create((2*l+1)*NPOL, (2*l+1)*NPOL);
+						locale_save.at(iat).at(l).at(n).at(0).create((2*l+1)*NPOL, (2*l+1)*NPOL);
+					}												
 				}
 			}
 
@@ -268,8 +279,15 @@ void DFTU::cal_occup_m_k(const int iter)
 
 				for(int n=0; n<N; n++)
 				{						
-					locale_save.at(iat).at(l).at(n).at(0) = locale.at(iat).at(l).at(n).at(0);
-					locale_save.at(iat).at(l).at(n).at(1) = locale.at(iat).at(l).at(n).at(1);
+					if(NSPIN==4)
+					{
+						locale_save.at(iat).at(l).at(n).at(0) = locale.at(iat).at(l).at(n).at(0);
+					}
+					else if(NSPIN==1 || NSPIN==2)
+					{
+						locale_save.at(iat).at(l).at(n).at(0) = locale.at(iat).at(l).at(n).at(0);
+						locale_save.at(iat).at(l).at(n).at(1) = locale.at(iat).at(l).at(n).at(1);
+					}
 				}
 			}			
 		}
@@ -359,12 +377,19 @@ void DFTU::cal_occup_m_k(const int iter)
 				 	// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
 					// set the local occupation mumber matrix of spin up and down zeros					
-					locale.at(iat).at(l).at(n).at(0).zero_out();
-					locale.at(iat).at(l).at(n).at(1).zero_out();
+					if(NSPIN==1 || NSPIN==2)
+					{
+						locale.at(iat).at(l).at(n).at(0).zero_out();
+						locale.at(iat).at(l).at(n).at(1).zero_out();
+					}
+					else if(NSPIN==4)
+					{
+						locale.at(iat).at(l).at(n).at(0).zero_out();
+					}
 
 					vector<ComplexMatrix> loc_occup_m;
 					vector<ComplexMatrix> loc_occup_m_tmp;
-					if(NSPIN==1)
+					if(NSPIN==1 || NSPIN==4)
 					{
 						loc_occup_m.resize(1);
 						loc_occup_m_tmp.resize(1);
@@ -372,7 +397,7 @@ void DFTU::cal_occup_m_k(const int iter)
 						loc_occup_m.at(0).create((2*l+1)*NPOL, (2*l+1)*NPOL);
 						loc_occup_m_tmp.at(0).create((2*l+1)*NPOL, (2*l+1)*NPOL);
 					}
-					else if(NSPIN==2 || NSPIN==4)
+					else if(NSPIN==2)
 					{
 						loc_occup_m.resize(2);
 						loc_occup_m_tmp.resize(2);
@@ -404,54 +429,26 @@ void DFTU::cal_occup_m_k(const int iter)
 									const int irc = nu*ParaO.nrow + mu;
 									const int irc_prime = mu_prime*ParaO.nrow + nu_prime;
 
-									// const int m0_all = m0 + ipol0*(2*l+1);
-									// const int m1_all = m1 + ipol1*(2*l+1);
+									const int m0_all = m0 + ipol0*(2*l+1);
+									const int m1_all = m1 + ipol1*(2*l+1);
 
 									if( (nu>=0) && (mu>=0) )
 									{	
-										if(NSPIN==1 || NSPIN==2)
+										for(int ik=0; ik<kv.nks; ik++)
 										{
-											for(int ik=0; ik<kv.nks; ik++)
-											{
-												const int spin = kv.isk[ik];
+											const int spin = kv.isk[ik];
 
-												loc_occup_m_tmp.at(spin)(m0, m1) += srho.at(ik).at(irc)/4.0;
-											}
-										}	
-										else if(NSPIN==4)//SOC
-										{
-											if(ipol0==ipol1)
-											{
-												const int spin = ipol0;
-												for(int ik=0; ik<kv.nks; ik++)
-												{
-													loc_occup_m_tmp.at(spin)(m0, m1) += srho.at(ik).at(irc)/4.0;
-												} 
-											}
+											loc_occup_m_tmp.at(spin)(m0_all, m1_all) += srho.at(ik).at(irc)/4.0;
 										}												
 									}
 
 									if( (nu_prime>=0) && (mu_prime>=0) )
 									{
-										if(NSPIN==1 || NSPIN==2)
+										for(int ik=0; ik<kv.nks; ik++)
 										{
-											for(int ik=0; ik<kv.nks; ik++)
-											{
-												const int spin = kv.isk[ik];
-
-												loc_occup_m_tmp.at(spin)(m0, m1) += std::conj(srho.at(ik).at(irc_prime))/4.0;
-											}
-										}
-										else if(NSPIN==4) //SOC
-										{
-											if(ipol0==ipol1)
-											{
-												const int spin = ipol0;
-												for(int ik=0; ik<kv.nks; ik++)
-												{
-													loc_occup_m_tmp.at(spin)(m0, m1) += std::conj(srho.at(ik).at(irc_prime))/4.0;
-												}
-											}
+											const int spin = kv.isk[ik];
+											
+											loc_occup_m_tmp.at(spin)(m0_all, m1_all) += std::conj(srho.at(ik).at(irc_prime))/4.0;
 										}
 									}								
 								}//ipol1										
@@ -459,16 +456,16 @@ void DFTU::cal_occup_m_k(const int iter)
 						}//ipol0
 					}//m0
 					
-					for(int m0=0; m0<2*l+1; m0++)
+					for(int m0=0; m0<(2*l+1)*NPOL; m0++)
 					{
-						for(int m1=0; m1<2*l+1; m1++)
+						for(int m1=0; m1<(2*l+1)*NPOL; m1++)
 						{
-							if(NSPIN==1 )
+							if(NSPIN==1 || NSPIN==4)
 							{
 								MPI_Allreduce( &loc_occup_m_tmp.at(0)(m0,m1), &loc_occup_m.at(0)(m0,m1), 1,
 												MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD );
 							}
-							else if(NSPIN==2 || NSPIN==4)
+							else if(NSPIN==2)
 							{
 								MPI_Allreduce( &loc_occup_m_tmp.at(0)(m0,m1), &loc_occup_m.at(0)(m0,m1), 1,
 												MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD );
@@ -510,12 +507,21 @@ void DFTU::cal_occup_m_k(const int iter)
 
 					case 4: //SOC
 						for(int m0=0; m0<2*l+1; m0++)
-						{							
-							for(int m1=0; m1<2*l+1; m1++)
-							{								
-								locale.at(iat).at(l).at(n).at(0)(m0, m1) = loc_occup_m.at(0)(m0, m1).real() + loc_occup_m.at(0)(m1, m0).real();	
-								locale.at(iat).at(l).at(n).at(1)(m0, m1) = loc_occup_m.at(1)(m0, m1).real() + loc_occup_m.at(1)(m1, m0).real();																		
-							}										
+						{
+							for(int ipol0=0; ipol0<NPOL; ipol0++)
+							{
+								const int m0_all = m0 + (2*l+1)*ipol0;
+								
+								for(int m1=0; m1<2*l+1; m1++)
+								{
+									for(int ipol1=0; ipol1<NPOL; ipol1++)
+									{
+										const int m1_all = m1 + (2*l+1)*ipol1;
+
+										locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all) = loc_occup_m.at(0)(m0_all, m1_all).real() + loc_occup_m.at(0)(m1_all, m0_all).real();										
+									}
+								}	
+							}		
 						}
 						break;
 
@@ -767,7 +773,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 						{
 							for(int is=0; is<NSPIN; is++)
 							{
-								MPI_Allreduce( &loc_occup_m_tmp.at(is)(m0,m1), &loc_occup_m.at(0)(m0,m1), 1,
+								MPI_Allreduce( &loc_occup_m_tmp.at(is)(m0,m1), &loc_occup_m.at(is)(m0,m1), 1,
 												MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 							}
 							
@@ -797,7 +803,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
-									locale.at(iat).at(l).at(n).at(is)(m0,m1) = loc_occup_m.at(0)(m0,m1) + loc_occup_m.at(0)(m1,m0);
+									locale.at(iat).at(l).at(n).at(is)(m0,m1) = loc_occup_m.at(is)(m0,m1) + loc_occup_m.at(is)(m1,m0);
 								}					
 							}
 						}
@@ -867,16 +873,39 @@ void DFTU::write_occup_m(const string &fn)
 
 					ofdftu << "zeta" << "  " << n << endl;
 					
-					for(int is=0; is<2; is++)
+					if(NSPIN==1 || NSPIN==2)
 					{
-						ofdftu << "spin" << "  " << is << endl;
+						for(int is=0; is<2; is++)
+						{
+							ofdftu << "spin" << "  " << is << endl;
+							for(int m0=0; m0<2*l+1; m0++)
+							{
+								for(int m1=0; m1<2*l+1; m1++)
+								{
+									ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
+								}
+								ofdftu << endl;
+							}
+						}
+					}
+					else if(NSPIN==4) //SOC
+					{
 						for(int m0=0; m0<2*l+1; m0++)
 						{
-							for(int m1=0; m1<2*l+1; m1++)
+							for(int ipol0=0; ipol0<NPOL; ipol0++)
 							{
-								ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
-							}
-							ofdftu << endl;
+								const int m0_all = m0 + (2*l+1)*ipol0;
+
+								for(int m1=0; m1<2*l+1; m1++)
+								{
+									for(int ipol1=0; ipol1<NPOL; ipol1++)
+									{
+										int m1_all = m1 + (2*l+1)*ipol1;
+										ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
+									}
+								}
+								ofdftu << endl;
+							}							
 						}
 					}					
 				}//n
@@ -906,7 +935,7 @@ void DFTU::read_occup_m(const string &fn)
 		{
 			if(INPUT.omc) 
 			{
-				cout << "DFTU::read_occup_m. Can not find the file intial_oneite.dm . Please check your intial_onsite.dm" << endl;
+				cout << "DFTU::read_occup_m. Can not find the file initial_onsite.dm . Please check your initial_onsite.dm" << endl;
 			}
 		}
 		exit(0);
@@ -966,30 +995,55 @@ void DFTU::read_occup_m(const string &fn)
 							ifdftu >> zeta;
 							ifdftu.ignore(150, '\n');
 							
-							for(int is=0; is<2; is++)
+							if(NSPIN==1 || NSPIN==2)
 							{
-								ifdftu >> word;
-								if(strcmp("spin", word) == 0)
-								{								
-									ifdftu >> spin;
-									ifdftu.ignore(150, '\n');
+								for(int is=0; is<2; is++)
+								{
+									ifdftu >> word;
+									if(strcmp("spin", word) == 0)
+									{								
+										ifdftu >> spin;
+										ifdftu.ignore(150, '\n');
 
-									double value = 0.0;
-									for(int m0=0; m0<2*L+1; m0++)
-									{
-										for(int m1=0; m1<2*L+1; m1++)
-										{							
-											ifdftu >> value;
-											locale.at(iat).at(L).at(zeta).at(spin)(m0, m1) = value;						 	
+										double value = 0.0;
+										for(int m0=0; m0<2*L+1; m0++)
+										{
+											for(int m1=0; m1<2*L+1; m1++)
+											{							
+												ifdftu >> value;
+												locale.at(iat).at(L).at(zeta).at(spin)(m0, m1) = value;						 	
+											}
+											ifdftu.ignore(150, '\n');											
 										}
-										ifdftu.ignore(150, '\n');											
 									}
+									else
+									{								
+										cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+										exit(0);
+									}	
 								}
-								else
-								{								
-									cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
-									exit(0);
-								}	
+							}
+							else if(NSPIN==4) //SOC
+							{
+								double value = 0.0;
+								for(int m0=0; m0<2*L+1; m0++)
+								{
+									for(int ipol0=0; ipol0<NPOL; ipol0++)
+									{
+										const int m0_all = m0 + (2*L+1)*ipol0;
+
+										for(int m1=0; m1<2*L+1; m1++)
+										{		
+											for(int ipol1=0; ipol1<NPOL; ipol1++)	
+											{		
+												int m1_all = m1 + (2*L+1)*ipol1;	
+												ifdftu >> value;
+												locale.at(iat).at(L).at(zeta).at(0)(m0_all, m1_all) = value;		
+											}				 	
+										}
+										ifdftu.ignore(150, '\n');
+									}											
+								}
 							}																																		
 						}
 						else
@@ -1054,15 +1108,38 @@ void DFTU::local_occup_bcast()
 					// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
 										
-					for(int spin=0; spin<2; spin++)
+					if(NSPIN==1 || NSPIN==2)
 					{
-					   for(int m0=0; m0<2*l+1; m0++)
-					   {
-						   for(int m1=0; m1<2*l+1; m1++)
+						for(int spin=0; spin<2; spin++)
+						{
+						   for(int m0=0; m0<2*l+1; m0++)
 						   {
-								MPI_Bcast(&locale.at(iat).at(l).at(n).at(spin)(m0, m1), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+							   for(int m1=0; m1<2*l+1; m1++)
+							   {
+									MPI_Bcast(&locale.at(iat).at(l).at(n).at(spin)(m0, m1), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+							   }
 						   }
-					   }
+						}
+					}
+					else if(NSPIN==4) //SOC
+					{
+						for(int m0=0; m0<2*L+1; m0++)
+						{
+							for(int ipol0=0; ipol0<NPOL; ipol0++)
+							{
+								const int m0_all = m0 + (2*L+1)*ipol0;
+
+								for(int m1=0; m1<2*L+1; m1++)
+								{		
+									for(int ipol1=0; ipol1<NPOL; ipol1++)	
+									{		
+										int m1_all = m1 + (2*L+1)*ipol1;	
+										
+										MPI_Bcast(&locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all), 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);		
+									}				 	
+								}
+							}											
+						}
 					}					
 				}
 			}
@@ -1121,21 +1198,50 @@ void DFTU::cal_energy_correction(const int istep)
 					}
 					else if(cal_type==3) //simplified formalism and FLL double counting
 					{	
-						for(int spin=0; spin<2; spin++)
+						if(NSPIN==1 || NSPIN==2)
+						{
+							for(int spin=0; spin<2; spin++)
+							{
+								double nm_trace = 0.0;
+								double nm2_trace = 0.0;
+
+								for(int m0=0; m0<2*l+1; m0++)
+								{
+								 	nm_trace += this->locale.at(iat).at(l).at(n).at(spin)(m0, m0);
+									for(int m1=0; m1<2*l+1; m1++)
+									{
+										nm2_trace += this->locale.at(iat).at(l).at(n).at(spin)(m0,m1)*this->locale.at(iat).at(l).at(n).at(spin)(m1,m0);
+									}
+								}
+								if(Yukawa) this->EU += 0.5*(this->U_Yukawa.at(T).at(l).at(n) - this->J_Yukawa.at(T).at(l).at(n))*(nm_trace - nm2_trace);
+								else this->EU += 0.5*(this->U[T] - this->J[T])*(nm_trace - nm2_trace);	
+							}
+						}
+						else if(NSPIN==4) //SOC
 						{
 							double nm_trace = 0.0;
 							double nm2_trace = 0.0;
 
 							for(int m0=0; m0<2*l+1; m0++)
 							{
-							 	nm_trace += this->locale.at(iat).at(l).at(n).at(spin)(m0, m0);
-								for(int m1=0; m1<2*l+1; m1++)
+								for(int ipol0=0; ipol0<NPOL; ipol0++)
 								{
-									nm2_trace += this->locale.at(iat).at(l).at(n).at(spin)(m0,m1)*this->locale.at(iat).at(l).at(n).at(spin)(m1,m0);
+							 		const int m0_all = m0 + (2*l+1)*ipol0;
+									nm_trace += this->locale.at(iat).at(l).at(n).at(0)(m0_all, m0_all);
+
+									for(int m1=0; m1<2*l+1; m1++)
+									{
+										for(int ipol1=0; ipol1<NPOL; ipol1++)
+										{
+											int m1_all = m1 + (2*l+1)*ipol1;
+
+											nm2_trace += this->locale.at(iat).at(l).at(n).at(0)(m0_all,m1_all)*this->locale.at(iat).at(l).at(n).at(0)(m1_all, m0_all);
+										}
+									}
 								}
 							}
 							if(Yukawa) this->EU += 0.5*(this->U_Yukawa.at(T).at(l).at(n) - this->J_Yukawa.at(T).at(l).at(n))*(nm_trace - nm2_trace);
-							else this->EU += 0.5*(this->U[T] - this->J[T])*(nm_trace - nm2_trace);	
+							else this->EU += 0.5*(this->U[T] - this->J[T])*(nm_trace - nm2_trace);
 						}
 						
 					}
@@ -1146,16 +1252,34 @@ void DFTU::cal_energy_correction(const int istep)
 
 					//calculate the double counting term included in eband													
 					for(int m1=0; m1<2*l+1; m1++)
-					{						
-						for(int m2=0; m2<2*l+1; m2++)
-						{								
-							for(int is=0; is<2; is++)
-							{
-								double VU = 0.0;
-								VU = get_onebody_eff_pot(T, iat, l, n, is, m1, m2, cal_type, 0);
-								EU_dc += VU*this->locale.at(iat).at(l).at(n).at(is)(m1,m2);
-							}					
-						}						
+					{
+						for(int ipol1=0; ipol1<NPOL; ipol1++)
+						{
+							const int m1_all = m1 + ipol1*(2*l+1);
+							for(int m2=0; m2<2*l+1; m2++)
+							{	
+								for(int ipol2=0; ipol2<NPOL; ipol2++)
+								{
+									const int m2_all = m2 + ipol2*(2*l+1);
+
+									if(NSPIN==1 || NSPIN==2)
+									{
+										for(int is=0; is<2; is++)
+										{
+											double VU = 0.0;
+											VU = get_onebody_eff_pot(T, iat, l, n, is, m1_all, m2_all, cal_type, 0);
+											EU_dc += VU*this->locale.at(iat).at(l).at(n).at(is)(m1_all,m2_all);
+										}
+									}	
+									else if(NSPIN==4) //SOC
+									{										
+										double VU = 0.0;
+										VU = get_onebody_eff_pot(T, iat, l, n, 0, m1_all, m2_all, cal_type, 0);
+										EU_dc += VU*this->locale.at(iat).at(l).at(n).at(0)(m1_all,m2_all);										
+									}
+								}					
+							}	
+						}
 					}						
 				}//end n
 			}//end L
@@ -1194,6 +1318,8 @@ void DFTU::cal_eff_pot_mat(const int ik, const int istep)
 
  	if((CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
 	
+	int spin = kv.isk[ik];
+
 	if(GAMMA_ONLY_LOCAL) ZEROS(VECTOR_TO_PTR(this->pot_eff_gamma.at(kv.isk[ik])), ParaO.nloc);
 	else ZEROS(VECTOR_TO_PTR(this->pot_eff_k.at(ik)), ParaO.nloc);
 
@@ -1322,21 +1448,12 @@ void DFTU::cal_eff_pot_mat(const int ik, const int istep)
 
 				// if(m1==m2 && iwt1==iwt2) delta.at(irc) = 1.0;
 
-				if(NSPIN==1 || NSPIN==2)
-				{
-					int spin = kv.isk[ik];
-					double val = get_onebody_eff_pot(T1, iat1, L1, n1, spin, m1, m2, cal_type, 1);
-					VU.at(irc) = complex<double>(val, 0.0);	
-				}
-				else if(NSPIN==4) //SOC
-				{
-					if(ipol1==ipol2)
-					{
-						int spin = ipol1;
-						double val = get_onebody_eff_pot(T1, iat1, L1, n1, spin, m1, m2, cal_type, 1);
-						VU.at(irc) = complex<double>(val, 0.0);
-					}
-				}
+				int m1_all = m1 + (2*L1+1)*ipol1;
+				int m2_all = m2 + (2*L2+1)*ipol2;
+
+				double val = get_onebody_eff_pot(T1, iat1, L1, n1, spin, m1_all, m2_all, cal_type, 1);
+
+				VU.at(irc) = complex<double>(val, 0.0);
 			}
 		}
 		vector<complex<double>> potm_tmp(ParaO.nloc, complex<double>(0.0, 0.0));
@@ -2853,16 +2970,39 @@ void DFTU::output()
 
 					ofs_running << "   zeta" << " " << n << endl;
 					
-					for(int is=0; is<2; is++)
+					if(NSPIN==1 || NSPIN==2)
 					{
-						ofs_running << "spin" << "  " << is << endl;
+						for(int is=0; is<2; is++)
+						{
+							ofs_running << "spin" << "  " << is << endl;
+							for(int m0=0; m0<2*l+1; m0++)
+							{
+								for(int m1=0; m1<2*l+1; m1++)
+								{
+									ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
+								}
+								ofs_running << endl;
+							}
+						}	
+					}
+					else if(NSPIN==4) //SOC
+					{
 						for(int m0=0; m0<2*l+1; m0++)
 						{
-							for(int m1=0; m1<2*l+1; m1++)
+							for(int ipol0=0; ipol0<NPOL; ipol0++)
 							{
-								ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
-							}
-							ofs_running << endl;
+								const int m0_all = m0 + (2*l+1)*ipol0;
+
+								for(int m1=0; m1<2*l+1; m1++)
+								{
+									for(int ipol1=0; ipol1<NPOL; ipol1++)
+									{
+										int m1_all = m1 + (2*l+1)*ipol1;
+										ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
+									}
+								}
+								ofs_running << endl;
+							}							
 						}
 					}					
 				}//n
