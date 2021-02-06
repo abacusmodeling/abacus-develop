@@ -56,12 +56,12 @@ Charge_Extra::~Charge_Extra()
 		delete[] delta_rho[is];
 		//xiaohui add 2014-05-10, for second-order extrapolation
 		delete[] delta_rho3[is];
-         }	
-	 delete[] delta_rho1;
-	 delete[] delta_rho2;
- 	 delete[] delta_rho;
-	 //xiaohui add 2014-05-10, for second-order extrapolation
-	 delete[] delta_rho3;
+	}	
+	delete[] delta_rho1;
+	delete[] delta_rho2;
+	delete[] delta_rho;
+	//xiaohui add 2014-05-10, for second-order extrapolation
+	delete[] delta_rho3;
 
 	//xiaohui add 2014-05-10, for second-order extrapolation
 	delete[] pos_old1;
@@ -278,23 +278,23 @@ xiaohui modify 2015-02-01*/
 		//xiaohui add 2014-05-03
 		CHR.atomic_rho(NSPIN,rho_atom_new);
 		for(int is=0; is<NSPIN; is++)
-                {
-                	for(int ir=0; ir<pw.nrxx; ir++)
-                        {
-                        	CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
-                        }
-                }
+		{
+			for(int ir=0; ir<pw.nrxx; ir++)
+			{
+				CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
+			}
+		}
 		for(int is=0; is<NSPIN; is++)
-               	{
-                       	delete[] rho_atom_old[is];
+		{
+			delete[] rho_atom_old[is];
 			delete[] rho_atom_new[is];
 			//delete[] delta_rho[is];
-                }	
-               	delete[] rho_atom_old;
+		}	
+		delete[] rho_atom_old;
 		delete[] rho_atom_new;
 		//delete[] delta_rho;
 		//cout<<"atomic extrapolation finish"<<endl;
-		
+
 	}
 	//xiaohui add 2014-05-07, "first-order" extrapolation
 	else if(pot.extra_pot == "first-order")
@@ -340,28 +340,28 @@ xiaohui modify 2015-02-01*/
 		//xiaohui add 2014-05-07
 		CHR.atomic_rho(NSPIN,rho_atom_new);
 		for(int is=0; is<NSPIN; is++)
-                {
-                	for(int ir=0; ir<pw.nrxx; ir++)
-                        {
+		{
+			for(int ir=0; ir<pw.nrxx; ir++)
+			{
 				if(istep == 1)
 				{
-                        		CHR.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
+					CHR.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
 				}
 				else
 				{
-                        		CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
+					CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
 				}
-                        }
-                }
+			}
+		}
 		for(int is=0; is<NSPIN; is++)
-               	{
-                       	delete[] rho_atom_old[is];
+		{
+			delete[] rho_atom_old[is];
 			delete[] rho_atom_new[is];
-                }	
-               	delete[] rho_atom_old;
+		}	
+		delete[] rho_atom_old;
 		delete[] rho_atom_new;
 		//cout<<"first-order extrapolation finish"<<endl;
-		
+
 	}
 
 	//xiaohui add 2014-05-10, "second-order" extrapolation
@@ -417,12 +417,12 @@ xiaohui modify 2015-02-01*/
 		//xiaohui add 2014-05-07
 		CHR.atomic_rho(NSPIN,rho_atom_new);
 		for(int is=0; is<NSPIN; is++)
-                {
-                	for(int ir=0; ir<pw.nrxx; ir++)
-                        {
+		{
+			for(int ir=0; ir<pw.nrxx; ir++)
+			{
 				if(istep == 1)
 				{
-                        		CHR.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
+					CHR.rho[is][ir] = delta_rho1[is][ir] + rho_atom_new[is][ir];
 				}
 				else if(istep == 2)
 				{
@@ -431,16 +431,16 @@ xiaohui modify 2015-02-01*/
 				}
 				else
 				{
-                        		CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
+					CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
 				}
-                        }
-                }
+			}
+		}
 		for(int is=0; is<NSPIN; is++)
-               	{
-                       	delete[] rho_atom_old[is];
+		{
+			delete[] rho_atom_old[is];
 			delete[] rho_atom_new[is];
-                }	
-               	delete[] rho_atom_old;
+		}	
+		delete[] rho_atom_old;
 		delete[] rho_atom_new;
 		//cout<<"second-order extrapolation finish"<<endl;
 	}

@@ -45,7 +45,8 @@ void Local_Orbital_Ions::opt_ions(void)
         CE.allocate();
     }
 
-    if(STRESS)                    // pengfei Li 2018-05-14
+	// pengfei Li 2018-05-14
+    if(STRESS)
     {
         LCM.allocate();
     }
