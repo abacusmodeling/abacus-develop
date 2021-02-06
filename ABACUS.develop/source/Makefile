@@ -1,4 +1,5 @@
-# Makefile for plane wave basis code.
+# This is the Makefile of ABACUS
+
 include Makefile.system
 include Makefile.Objects
 
@@ -42,7 +43,7 @@ OPTS_GDB = -g -W -I${BOOST_INCLUDE_DIR}
 #==========================
 # OBJECTS NEEDED
 #==========================
-FP_OBJS=$(OBJS_OTHER)\
+FP_OBJS_0=$(OBJS_OTHER)\
 $(OBJS_FIRST_PRINCIPLE)\
 $(OBJS_PARALLEL)\
 $(OBJS_TOOLS) \
@@ -52,37 +53,64 @@ $(OBJS_CG)\
 $(OBJS_WANNIER)\
 $(OBJS_COMMON)\
 $(OBJS_MLWF)\
-$(OBJS_EXX)\
-main.o \
+main.o\
 
-PDIAG_OBJS=$(OBJS_PDIAG)\
+FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
+PDIAG_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${OBJS_PDIAG})
+PDIAG_MR=$(patsubst %.o, ${OBJ_DIR}/%.o, ${PDIAG_MR_0})
 
 #==========================
 # MAKING OPTIONS
 #==========================
-fp_mpi : ${FP_OBJS} ${PDIAG_MR} ${PDIAG_OBJS} ${HEADERS}
-	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi.1.0.0_exx
+fp_mpi : 
+	@ make init
+	@ make -j $(NP) parallel
 
-fp : ${FP_OBJS} ${HEADERS} 
+fp : 
+	@ make init
+	@ make -j $(NP) serial
+
+fp_gbd : 
+	@ make init
+	@ make -j $(NP) serial_gbd
+
+fp_gprof : 
+	@ make init
+	@ make -j $(NP) serial_gprof
+
+fp_mem : 
+	@ make init
+	@ make -j $(NP) serial_mem
+
+init :
+	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
+	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
+	@ if [ ! -d ../bin ]; then mkdir ../bin; fi
+
+parallel : ${FP_OBJS} ${PDIAG_OBJS} ${PDIAG_MR} ${HEADERS}
+	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} $(FP_OBJS) ${PDIAG_OBJS} ${PDIAG_MR} ${LIBS} -o  ../bin/${VERSION}.mpi
+
+serial : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp.x 
 
-fp_gdb : ${FP_OBJS} ${HEADERS}
+serial_gdb : ${FP_OBJS} ${HEADERS}
 	${CPLUSPLUS} ${OPTS_GDB} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp_gdb.x
 
-fp_gprof : ${FP_OBJS} ${HEADERS} 
+serial_gprof : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp_gprof.x 
 
-fp_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
+serial_mem : ${FP_OBJS} ../src_parallel/mcd.o ${HEADERS}
 	${CPLUSPLUS} $(FP_OBJS) ../src_parallel/mcd.o ${LIBS} -o ${VERSION}.fp_mem.x
 
 #==========================
 # rules
 #==========================
-.cpp.o:
+${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} $< -o $@
-.f.o:
-	${FORTRAN} ${OPTS} -c ${HONG} $< -o $@	 
+${OBJ_DIR}/%.o:%.f
+	${FORTRAN} -c ${HONG} $< -o $@	 
 
 .PHONY:clean
 clean:
-	$(RM) *.o
+	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
+	@ if [ -d ../bin ]; then rm -rf ../bin; fi

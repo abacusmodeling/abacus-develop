@@ -1,6 +1,8 @@
 #include "grid_technique.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Grid_Technique GridT;
 
 Grid_Technique::Grid_Technique()
@@ -76,10 +78,6 @@ void Grid_Technique::set_pbc_grid(
 	this->init_atoms_on_grid();	
 
 	this->cal_trace_lo();
-	if(BFIELD)
-	{
-		this->cal_trace_beta();//add by sunzhiyuan
-	}
 	timer::tick("Grid_Technique","init",'D');
 	return;
 }
@@ -413,7 +411,7 @@ void Grid_Technique::cal_trace_lo(void)
 			{
 				++lnat;
 				int nw0 = ucell.atoms[it].nw;
-				if(NONCOLIN)
+				if(NSPIN==4)
 				{//added by zhengdy-soc, need to be double in soc
 					nw0 *= 2;
 					lgd += nw0;
@@ -431,7 +429,7 @@ void Grid_Technique::cal_trace_lo(void)
 			else
 			{
 				iw_all += ucell.atoms[it].nw;
-				if(NONCOLIN) iw_all += ucell.atoms[it].nw;
+				if(NSPIN==4) iw_all += ucell.atoms[it].nw;
 			}
 			++iat;
 		}

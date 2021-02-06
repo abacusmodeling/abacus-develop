@@ -126,20 +126,20 @@ void IState_Charge::begin(void)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<NSPIN; is++)
 			{
-				ZEROS( chr.rho[is], pw.nrxx );
+				ZEROS( CHR.rho[is], pw.nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 
 			// band.
    			UHM.GG.cal_rho();
-			chr.save_rho_before_sum_band(); //xiaohui add 2014-12-09
+			CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			stringstream ss;
 			ss << global_out_dir << "BAND" << ib + 1 << "_CHG";
 			// 0 means definitely output charge density.
 			for(int is=0; is<NSPIN; is++)
 			{
 				bool for_plot = true;
-				chr.write_rho( is, 0, ss.str(), 3, for_plot );
+				CHR.write_rho( is, 0, ss.str(), 3, for_plot );
 			}
 		}
 	}

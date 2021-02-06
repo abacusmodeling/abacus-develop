@@ -21,13 +21,10 @@ pseudo_atom::~pseudo_atom()
 void pseudo_atom::set_pseudo_at(const Pseudopot_upf &upf)
 {
 	//-----------------------------------------------------------------
-	//   set "is"-th pseudopotential using the Unified Pseudopotential Format
-	//   dummy argument ( upf ) - convert and copy to internal PWscf variables
 
 	set_pseudo_h(upf);
 	int i, ir, j;
 
-	// this value '10.0 a.u.' is consistent with PWscf.3.2.1 version.
 	// mohan 2009-12-15
 	// mohan update again 2011-05-23, 
 	// in order to calculate more accurate Vna.

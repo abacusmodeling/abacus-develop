@@ -31,6 +31,7 @@ LCAO_Matrix::~LCAO_Matrix()
     delete[] Sdiag2;
 }
 
+
 void LCAO_Matrix::divide_HS_in_frag(void)
 {
 	TITLE("LCAO_Matrix","divide_HS_in_frag");
@@ -38,7 +39,6 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	ofs_running << "\n SETUP THE DIVISION OF H/S MATRIX" << endl;
 	
 	// (1) calculate nrow, ncol, nloc.
-	//if (DIAGO_TYPE=="hpseps" || DIAGO_TYPE=="scalpack" || DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
 	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" || KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx") //xiaohui add 2013-09-02
 	{
 		ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
@@ -48,25 +48,29 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 		WARNING_QUIT("LCAO_Matrix::init","diago_type = 'HPSEPS' is not available for series version.\n You can use 'LAPACK' instead.");
 #endif
 	}
-    	//else if (DIAGO_TYPE == "canonical"
-        //    	|| DIAGO_TYPE == "trace_resetting"
-        //    	|| DIAGO_TYPE == "trace_correcting") xiaohui modify 2013-09-02
 	else if(KS_SOLVER == "canonical"
 		|| KS_SOLVER == "trace_resetting"
-		|| KS_SOLVER == "trace_correcting") //xiaohui add 2013-09-02
+		|| KS_SOLVER == "trace_correcting") 
 	{
+		//-------------------------------------------------------------------------------------
+		// This part is intended for linear-scaling solver for KS matrix utilizing 
+		// the sparse matrices. The developments of these parts need to have efficient
+		// algorithms to design, distribute (parallel), and operate sprase Hamiltionian 
+		// matrix (H), sparse density matrix (DM), and sparse overlap matrix (S),etc.  
+		// in localized basis sets -- mohan 2021-01-31
+		//-------------------------------------------------------------------------------------
 		ofs_running << " divide the H&S matrix according to atoms." << endl;
 		// done nothing.
 		// the nloc is calculated in "ParaA.set_trace"
 	}
 	else
 	{
+		// the full matrix
 		ParaO.nloc = NLOCAL * NLOCAL;
 	}
 
 
-	// (2) set the trace, then we 
-	// can calculate the nnr.
+	// (2) set the trace, then we can calculate the nnr.
 	// for 2d: calculate ParaO.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
 	ParaO.set_trace();
@@ -76,16 +80,7 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	// (3) allocate matrix.
 	if(GAMMA_ONLY_LOCAL)
 	{
-		if(BFIELD)
-		{
-			// if b field is chosen,
-			// the hamiltonian is complex<double>.
-			allocate_HS_k(ParaO.nloc);	
-		}
-		else
-		{
-			allocate_HS_gamma(ParaO.nloc);
-		}
+		allocate_HS_gamma(ParaO.nloc);
 	}
 	else
 	{
@@ -96,6 +91,7 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	return;
 }
 
+
 void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 {
 	TITLE("LCAO_Matrix","allocate_HS_gamma");
@@ -103,6 +99,9 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 	OUT(ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
 
+	// because we initilize in the constructor function
+	// with dimension '1', so here we reconstruct these
+	// matrices
 	delete[] Sloc;
 	delete[] Hloc_fixed;
 	delete[] Hloc;
@@ -116,6 +115,7 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 	ZEROS(Sloc,nloc);
 	ZEROS(Hloc_fixed,nloc);
 	ZEROS(Hloc,nloc);
+	ZEROS(Sdiag,nloc); // mohan add 2021-01-30
 
 	return;
 }
@@ -128,6 +128,9 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 	OUT(ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
 
+	// because we initilize in the constructor function
+	// with dimension '1', so here we reconstruct these
+	// matrices
 	delete[] Sloc2;
 	delete[] Hloc_fixed2;
 	delete[] Hloc2;
@@ -147,7 +150,7 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 
 void LCAO_Matrix::allocate_HS_R(const int &nnR)
 {
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		delete[] HlocR;
 		delete[] SlocR;
@@ -393,7 +396,7 @@ void LCAO_Matrix::zeros_HSk(const char &mtype)
 
 void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 {
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		if (mtype=='S') ZEROS(SlocR, nnr);
 		else if (mtype=='T') ZEROS(Hloc_fixedR, nnr);
@@ -494,27 +497,24 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 	ofs_running << " element number = " << ParaO.ncol << endl;
 	if (mtype=='S')
 	{
-		if(!BFIELD)
+		os << setprecision(8);
+		os << " print Sloc" << endl;
+		for(int i=0; i<NLOCAL; ++i)
 		{
-			os << setprecision(8);
-			os << " print Sloc" << endl;
-			for(int i=0; i<NLOCAL; ++i)
+			for(int j=0; j<NLOCAL; ++j)
 			{
-				for(int j=0; j<NLOCAL; ++j)
+				double v = Sloc[i*ParaO.ncol+j];
+				if( abs(v) > 1.0e-8)
 				{
-					double v = Sloc[i*ParaO.ncol+j];
-					if( abs(v) > 1.0e-8)
-					{
-						os << setw(15) << v;
-					}
-					else
-					{
-						os << setw(15) << "0";
-					}
-				}//end j
-				os << endl;
-			}//end i
-		}
+					os << setw(15) << v;
+				}
+				else
+				{
+					os << setw(15) << "0";
+				}
+			}//end j
+			os << endl;
+		}//end i
 
 		/*
 		   ofs_running << " " << setw(10) << "LocalRow" << setw(10) << "LocalCol"
@@ -608,50 +608,44 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 		}
 		*/
 
-		if(!BFIELD)
+		os << " print Hloc_fixed" << endl;
+		for(int i=0; i<NLOCAL; ++i)
 		{
-			os << " print Hloc_fixed" << endl;
-			for(int i=0; i<NLOCAL; ++i)
+			for(int j=0; j<NLOCAL; ++j)
 			{
-				for(int j=0; j<NLOCAL; ++j)
+				double v = Hloc_fixed[i*ParaO.ncol+j];
+				if( abs(v) > 1.0e-8)
 				{
-					double v = Hloc_fixed[i*ParaO.ncol+j];
-					if( abs(v) > 1.0e-8)
-					{
-						os << setw(15) << v;
-					}
-					else
-					{
-						os << setw(15) << "0";
-					}
-				}//end j
-				os << endl;
-			}//end i
-		}
+					os << setw(15) << v;
+				}
+				else
+				{
+					os << setw(15) << "0";
+				}
+			}//end j
+			os << endl;
+		}//end i
 	}
 	if (mtype=='H')
 	{
 
-		if(!BFIELD)
+		os << " print Hloc" << endl;
+		for(int i=0; i<NLOCAL; ++i)
 		{
-			os << " print Hloc" << endl;
-			for(int i=0; i<NLOCAL; ++i)
+			for(int j=0; j<NLOCAL; ++j)
 			{
-				for(int j=0; j<NLOCAL; ++j)
+				double v = Hloc[i*ParaO.ncol+j];
+				if( abs(v) > 1.0e-8)
 				{
-					double v = Hloc[i*ParaO.ncol+j];
-					if( abs(v) > 1.0e-8)
-					{
-						os << setw(15) << v;
-					}
-					else
-					{
-						os << setw(15) << "0";
-					}
-				}//end j
-				os << endl;
-			}//end i
-		}
+					os << setw(15) << v;
+				}
+				else
+				{
+					os << setw(15) << "0";
+				}
+			}//end j
+			os << endl;
+		}//end i
 
 	/*
 		ofs_running << " " << setw(10) << "LocalRow" << setw(10) << "LocalCol"
@@ -744,7 +738,7 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         Hloc_fixedR_tr = new double***[R_x];
         //HR_tr = new double***[R_x];
@@ -819,7 +813,7 @@ void LCAO_Matrix::allocate_HR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         HR_tr = new double***[R_x];
         for(int ix=0; ix<R_x; ix++)
@@ -868,7 +862,7 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         SlocR_tr = new double***[R_x];
         for(int ix=0; ix<R_x; ix++)
@@ -917,7 +911,7 @@ void LCAO_Matrix::destroy_Hloc_fixedR_tr(void)
     int R_y = GridD.getCellY();
     int R_z = GridD.getCellZ();
 
-    if(!NONCOLIN)
+    if(NSPIN!=4)
     {
         for(int ix=0; ix<R_x; ix++)
         {

@@ -362,14 +362,14 @@ void Stress::stres_har(){
      complex<double> *Porter = UFFT.porter;
 
     //  Hartree potential VH(r) from n(r)
-    ZEROS( Porter, pw.nrxx );
-        for(int is=0; is<NSPIN; is++)
-        {
-        for (int ir=0; ir<pw.nrxx; ir++)
-                {
-                        Porter[ir] += complex<double>( chr.rho[is][ir], 0.0 );
-                }
-        }
+	 ZEROS( Porter, pw.nrxx );
+	 for(int is=0; is<NSPIN; is++)
+	 {
+		 for (int ir=0; ir<pw.nrxx; ir++)
+		 {
+			 Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+		 }
+	 }
      //=============================
     //  bring rho (aux) to G space
     //=============================
@@ -380,7 +380,7 @@ void Stress::stres_har(){
         ZEROS( psic0, pw.nrxx);
         for(int is=0; is<NSPIN; is++)
         {
-            daxpy (pw.nrxx, 1.0, chr.rho[is],1,psic0,2 );
+            daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
             for (int ir=0; ir<pw.nrxx; ir++)
             {
                 psic[ir] = complex<double>(psic0[ir], 0.0);
@@ -516,7 +516,7 @@ void Stress::stres_loc()
         {
         for (int ir=0; ir<pw.nrxx; ir++)
                 {
-                        Porter[ir] += complex<double>(chr.rho[is][ir], 0.0 );
+                        Porter[ir] += complex<double>(CHR.rho[is][ir], 0.0 );
                 }
         }
      pw.FFT_chg.FFT3D(Porter, -1);
@@ -526,7 +526,7 @@ void Stress::stres_loc()
         ZEROS( psic0, pw.nrxx);
         for(int is=0; is<NSPIN; is++)
         {
-            daxpy (pw.nrxx, 1.0, chr.rho[is],1,psic0,2 );
+            daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
             for (int ir=0; ir<pw.nrxx; ir++)
             {
                 psic[ir] = complex<double>(psic0[ir], 0.0);
@@ -1440,12 +1440,12 @@ void Stress::stres_gradcorr()
      const double fac = 1.0/ NSPIN;
 
      // doing FFT to get rho in G space: rhog1 
-     chr.set_rhog(chr.rho[0], chr.rhog[0]);
+     CHR.set_rhog(CHR.rho[0], CHR.rhog[0]);
      if(NSPIN==2)//mohan fix bug 2012-05-28
      {
-          chr.set_rhog(chr.rho[1], chr.rhog[1]);
+          CHR.set_rhog(CHR.rho[1], CHR.rhog[1]);
      }
-     chr.set_rhog(chr.rho_core, chr.rhog_core);
+     CHR.set_rhog(CHR.rho_core, CHR.rhog_core);
     
 	double* rhotmp1;
 	double* rhotmp2;
@@ -1458,8 +1458,8 @@ void Stress::stres_gradcorr()
      rhogsum1 = new complex<double>[pw.ngmc];
      ZEROS(rhotmp1, pw.nrxx);
      ZEROS(rhogsum1, pw.ngmc);
-     for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = chr.rho[0][ir] + fac * chr.rho_core[ir];
-     for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = chr.rhog[0][ig] + fac * chr.rhog_core[ig];
+     for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = CHR.rho[0][ir] + fac * CHR.rho_core[ir];
+     for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = CHR.rhog[0][ig] + fac * CHR.rhog_core[ig];
 	gdr1 = new Vector3<double>[pw.nrxx];
 	ZEROS(gdr1, pw.nrxx);
 
@@ -1471,8 +1471,8 @@ void Stress::stres_gradcorr()
                 rhogsum2 = new complex<double>[pw.ngmc];
                 ZEROS(rhotmp2, pw.nrxx);
                 ZEROS(rhogsum2, pw.ngmc);
-                for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] = chr.rho[1][ir] + fac * chr.rho_core[ir];
-                for(int ig=0; ig<pw.ngmc; ig++) rhogsum2[ig] = chr.rhog[1][ig] + fac * chr.rhog_core[ig];
+                for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] = CHR.rho[1][ir] + fac * CHR.rho_core[ir];
+                for(int ig=0; ig<pw.ngmc; ig++) rhogsum2[ig] = CHR.rhog[1][ig] + fac * CHR.rhog_core[ig];
 
                         gdr2 = new Vector3<double>[pw.nrxx];
                         ZEROS(gdr2, pw.nrxx);
@@ -1642,7 +1642,7 @@ void Stress::stres_cc()
            
     //recalculate the exchange-correlation potential
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(chr.rho, en.etxc, en.vtxc, vxc);
+    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
 
     complex<double> * psic = new complex<double> [pw.nrxx];
     ZEROS(psic, pw.nrxx);
@@ -1675,7 +1675,7 @@ void Stress::stres_cc()
     for(nt=0;nt<ucell.ntype;nt++){
         if(ucell.atoms[nt].nlcc){
         //drhoc();
-        chr.non_linear_core_correction(
+        CHR.non_linear_core_correction(
                 ppcell.numeric,
                 ucell.atoms[nt].msh,
                 ucell.atoms[nt].r,

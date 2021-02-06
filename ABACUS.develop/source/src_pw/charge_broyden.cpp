@@ -6,6 +6,7 @@ Charge_Broyden::Charge_Broyden()
 {
 	initb = false;	
 }
+
 Charge_Broyden::~Charge_Broyden()
 {
     if (initb)

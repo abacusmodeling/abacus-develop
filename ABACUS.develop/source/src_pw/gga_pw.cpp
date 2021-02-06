@@ -29,12 +29,12 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	const double fac = 1.0/ nspin0;
 
 	// doing FFT to get rho in G space: rhog1 
-    chr.set_rhog(chr.rho[0], chr.rhog[0]);
+    CHR.set_rhog(CHR.rho[0], CHR.rhog[0]);
 	if(NSPIN==2)//mohan fix bug 2012-05-28
 	{
-		chr.set_rhog(chr.rho[1], chr.rhog[1]);
+		CHR.set_rhog(CHR.rho[1], CHR.rhog[1]);
 	}
-    chr.set_rhog(chr.rho_core, chr.rhog_core);
+    CHR.set_rhog(CHR.rho_core, CHR.rhog_core);
 		
 	// sum up (rho_core+rho) for each spin in real space
 	// and reciprocal space.
@@ -56,8 +56,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	rhogsum1 = new complex<double>[pw.ngmc];
 	ZEROS(rhotmp1, pw.nrxx);
 	ZEROS(rhogsum1, pw.ngmc);
-	for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = chr.rho[0][ir] + fac * chr.rho_core[ir];
-	for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = chr.rhog[0][ig] + fac * chr.rhog_core[ig];
+	for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = CHR.rho[0][ir] + fac * CHR.rho_core[ir];
+	for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = CHR.rhog[0][ig] + fac * CHR.rhog_core[ig];
 
 	gdr1 = new Vector3<double>[pw.nrxx];
 	h1 = new Vector3<double>[pw.nrxx];
@@ -72,8 +72,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		rhogsum2 = new complex<double>[pw.ngmc];
 		ZEROS(rhotmp2, pw.nrxx);
 		ZEROS(rhogsum2, pw.ngmc);
-		for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] = chr.rho[1][ir] + fac * chr.rho_core[ir];
-		for(int ig=0; ig<pw.ngmc; ig++) rhogsum2[ig] = chr.rhog[1][ig] + fac * chr.rhog_core[ig];
+		for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] = CHR.rho[1][ir] + fac * CHR.rho_core[ir];
+		for(int ig=0; ig<pw.ngmc; ig++) rhogsum2[ig] = CHR.rhog[1][ig] + fac * CHR.rhog_core[ig];
 
 		gdr2 = new Vector3<double>[pw.nrxx];
 		h2 = new Vector3<double>[pw.nrxx];
@@ -104,17 +104,17 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 
 		rhogsum2 = new complex<double>[pw.ngmc];
 		ZEROS(rhogsum2, pw.ngmc);
-		chr.set_rhog(rhotmp1, rhogsum1);
-		chr.set_rhog(rhotmp2, rhogsum2);
+		CHR.set_rhog(rhotmp1, rhogsum1);
+		CHR.set_rhog(rhotmp2, rhogsum2);
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
-			rhotmp2[ir] += fac * chr.rho_core[ir];
-			rhotmp1[ir] += fac * chr.rho_core[ir];
+			rhotmp2[ir] += fac * CHR.rho_core[ir];
+			rhotmp1[ir] += fac * CHR.rho_core[ir];
 		}
 		for(int ig=0; ig<pw.ngmc; ig++)
 		{
-			rhogsum2[ig] += fac * chr.rhog_core[ig];
-			rhogsum1[ig] += fac * chr.rhog_core[ig];
+			rhogsum2[ig] += fac * CHR.rhog_core[ig];
+			rhogsum1[ig] += fac * CHR.rhog_core[ig];
 		}
 
 		gdr2 = new Vector3<double>[pw.nrxx];
@@ -193,7 +193,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 					// D(rho*Exc) / D(|grad rho|) * (grad rho) / |grad rho|
 					h1[ir] = e2 * ( v2x + v2c ) * gdr1[ir];
 					
-					vtxcgc += e2*( v1x + v1c ) * ( rhotmp1[ir] - chr.rho_core[ir] );
+					vtxcgc += e2*( v1x + v1c ) * ( rhotmp1[ir] - CHR.rho_core[ir] );
 					etxcgc += e2*( sx + sc ) * segno;
 				}
 			} // end arho > epsr
@@ -259,8 +259,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 			h1[ir] = e2 * ( ( v2xup + v2cup ) * gdr1[ir] + v2cud * gdr2[ir] );
 			h2[ir] = e2 * ( ( v2xdw + v2cdw ) * gdr2[ir] + v2cud * gdr1[ir] );
 
-			vtxcgc = vtxcgc + e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - chr.rho_core[ir] * fac );
-			vtxcgc = vtxcgc + e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - chr.rho_core[ir] * fac );
+			vtxcgc = vtxcgc + e2 * ( v1xup + v1cup ) * ( rhotmp1[ir] - CHR.rho_core[ir] * fac );
+			vtxcgc = vtxcgc + e2 * ( v1xdw + v1cdw ) * ( rhotmp2[ir] - CHR.rho_core[ir] * fac );
 			etxcgc = etxcgc + e2 * ( sx + sc );
 			
 
@@ -271,8 +271,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	//cout << "\n vtxcgc=" << vtxcgc;
 	//cout << "\n etxcgc=" << etxcgc << endl;
 
-	for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] -= fac * chr.rho_core[ir];
-	if(nspin0==2) for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] -= fac * chr.rho_core[ir];
+	for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] -= fac * CHR.rho_core[ir];
+	if(nspin0==2) for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] -= fac * CHR.rho_core[ir];
 	
 	// second term of the gradient correction :
 	// \sum_alpha (D / D r_alpha) ( D(rho*Exc)/D(grad_alpha rho) )
@@ -318,11 +318,11 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		for(int ir=0;ir<pw.nrxx;ir++)
 		{
 			v(0,ir) += 0.5 * (vgg[0][ir] + vgg[1][ir]);
-			double amag = sqrt(pow(chr.rho[1][ir],2)+pow(chr.rho[2][ir],2)+pow(chr.rho[3][ir],2));
+			double amag = sqrt(pow(CHR.rho[1][ir],2)+pow(CHR.rho[2][ir],2)+pow(CHR.rho[3][ir],2));
 			if(amag>1e-12)
 			{
 				for(int i=1;i<4;i++)
-					v(i,ir)+= neg[ir] * 0.5 *(vgg[0][ir]-vgg[1][ir])*chr.rho[i][ir]/amag;
+					v(i,ir)+= neg[ir] * 0.5 *(vgg[0][ir]-vgg[1][ir])*CHR.rho[i][ir]/amag;
 			}
 		}
 	}
@@ -457,15 +457,15 @@ void GGA_PW::noncolin_rho(double *rhoout1,double *rhoout2, double *neg)
 	{
 		for(int ir = 0;ir<pw.nrxx;ir++)
 		{
-			if(chr.rho[1][ir]*soc.ux[0] + chr.rho[2][ir]*soc.ux[1] + chr.rho[3][ir]*soc.ux[2]>0) neg[ir] = 1.0;
+			if(CHR.rho[1][ir]*soc.ux[0] + CHR.rho[2][ir]*soc.ux[1] + CHR.rho[3][ir]*soc.ux[2]>0) neg[ir] = 1.0;
 			else neg[ir] = -1.0;
 		}
 	}
 	for(int ir = 0;ir<pw.nrxx;ir++)
 	{
-		amag = sqrt(pow(chr.rho[1][ir],2)+pow(chr.rho[2][ir],2)+pow(chr.rho[3][ir],2));
-		rhoout1[ir] = 0.5 * (chr.rho[0][ir] + neg[ir] * amag);
-		rhoout2[ir] = 0.5 * (chr.rho[0][ir] - neg[ir] * amag);
+		amag = sqrt(pow(CHR.rho[1][ir],2)+pow(CHR.rho[2][ir],2)+pow(CHR.rho[3][ir],2));
+		rhoout1[ir] = 0.5 * (CHR.rho[0][ir] + neg[ir] * amag);
+		rhoout2[ir] = 0.5 * (CHR.rho[0][ir] - neg[ir] * amag);
 	}
 	return;
 }

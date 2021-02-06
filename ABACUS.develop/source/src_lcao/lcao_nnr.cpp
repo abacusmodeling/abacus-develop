@@ -80,7 +80,6 @@ void LCAO_nnr::cal_nnr(void)
 				const int iat2 = ucell.itia2iat(T2, I2);
 				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 				int nw2 = ucell.atoms[T2].nw * NPOL;
-				//if(NONCOLIN) nw2 *= 2;
 
 				tau2 = GridD.getAdjacentTau(ad);
 
@@ -680,7 +679,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							// Hloc_fixed2 is used to diagonalize (eliminate index R).
 							//###################################################################
 							
-							if(!NONCOLIN){
+							if(NSPIN!=4){
 								LM.Sloc2[iic] += LM.SlocR[index] * kphase;
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;
 

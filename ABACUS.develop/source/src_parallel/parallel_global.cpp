@@ -230,7 +230,8 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	// mohan 2011-03-15
     if (MY_RANK != 0 ) 
     {
-        cout.rdbuf(NULL);
+        //cout.rdbuf(NULL);
+		cout.setstate(ios::failbit);//qianrui modify 2020-10-14
     }
 	// end test
 	

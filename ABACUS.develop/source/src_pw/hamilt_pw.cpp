@@ -6,10 +6,6 @@
 #include "src_global/blas_connector.h"
 #include "optical.h" // only get judgement to calculate optical matrix or not.
 
-#ifdef __EPM
-#include "../src_epm/nscf_epm.h"
-#endif
-
 int Hamilt_PW::moved = 0;
 
 Hamilt_PW::Hamilt_PW()
@@ -17,13 +13,8 @@ Hamilt_PW::Hamilt_PW()
     hpsi = new complex<double>[1];
     spsi = new complex<double>[1];
     GR_index = new int[1];
-
-#ifndef __EPM
     Bec = new complex<double>[1];
     Ps = new complex<double>[1];
-#else
-    GR_index2 = new int[1];
-#endif
 }
 
 Hamilt_PW::~Hamilt_PW()
@@ -35,43 +26,11 @@ Hamilt_PW::~Hamilt_PW()
     delete[] hpsi;
     delete[] spsi;
     delete[] GR_index;
-#ifndef __EPM
     delete[] Bec;
     delete[] Ps;
-#else
-    delete[] GR_index2;
-#endif
 }
 
-#ifdef __EPM
-void Hamilt_PW::init()
-{
-	TITLE("Hamilt_PW","init");
-	const int nrxxs = pw.nrxxs;
 
-	delete[] hpsi;
-	delete[] spsi;
-	delete[] GR_index;
-	delete[] GR_index2;
-
-	this->hpsi = new complex<double>[wf.npwx];
-	this->spsi = new complex<double>[wf.npwx];
-	this->GR_index = new int[nrxxs];
-	this->GR_index2= new int[nrxxs];
-
-	OUT(ofs_running,"hpsi allocation = ","Done");
-	OUT(ofs_running,"spsi allocation = ","Done");
-	OUT(ofs_running,"GR_index allocation = ","Done");
-	OUT(ofs_running,"GR_index2 allocation = ","Done");
-
-	ZEROS(hpsi,wf.npwx);
-	ZEROS(spsi,wf.npwx);
-	ZEROS(GR_index,wf.npwx);
-	ZEROS(GR_index2,wf.npwx);
-
-	return;
-}
-#else
 void Hamilt_PW::init(void)
 {
     if (test_hm) TITLE("Hamilt_PW","init");
@@ -84,17 +43,17 @@ void Hamilt_PW::init(void)
 
     this->hpsi = new complex<double> [wf.npwx * NPOL];
     this->spsi = new complex<double> [wf.npwx * NPOL];
-    this->GR_index = new int[pw.nrxxs];
+    this->GR_index = new int[pw.nrxx];
     this->Bec = new complex<double> [ppcell.nkb];
     this->Ps  = new complex<double> [ppcell.nkb * NPOL];
 
     ZEROS(this->hpsi,wf.npwx * NPOL);
     ZEROS(this->spsi,wf.npwx * NPOL);
-    ZEROS(this->GR_index, pw.nrxxs);
+    ZEROS(this->GR_index, pw.nrxx);
 //    ofs_running << "\n Hamiltonian allocate done."<<endl;
     return;
 }
-#endif
+
 
 void Hamilt_PW::init_k(const int ik)
 {
@@ -123,13 +82,6 @@ void Hamilt_PW::init_k(const int ik)
     {
         this->GR_index[ig] = pw.ig2fftw[ wf.igk(ik, ig) ];
     }
-
-#ifdef __EPM
-    for ( int ig=0; ig< wf.npw;ig++)
-    {
-        this->GR_index2[ig] = pw.ig2ngg[ wf.igk(ik, ig) ];
-    }
-#endif
     return;
 }
 
@@ -188,7 +140,7 @@ void Hamilt_PW::cinitcgg(
 //    timer::tick("Hamilt_PW","construct_HS");
 	const int npw = kv.ngk[ik];
 	int dmin,dmax;
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		dmin= npw;
 		dmax = wf.npwx;
@@ -426,11 +378,7 @@ void Hamilt_PW::cinitcgg(
 void Hamilt_PW::h_1psi( const int npw_in, const complex < double> *psi,
                         complex<double> *hpsi, complex < double> *spsi)
 {
-#ifdef __EPM
-    nscf_epm::hpsi(psi, hpsi);
-#else
     this->h_psi(psi, hpsi);
-#endif
 
     for (int i=0;i<npw_in;i++)
     {
@@ -454,7 +402,6 @@ void Hamilt_PW::s_1psi
 }
 
 
-#ifndef __EPM
 void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 {
     timer::tick("Hamilt_PW","h_psi",'H');
@@ -462,7 +409,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
     int j = 0;
     int ig= 0;
 
-	if(!NONCOLIN) ZEROS(hpsi, wf.npw);
+	if(NSPIN!=4) ZEROS(hpsi, wf.npw);
 	else ZEROS(hpsi, wf.npwx * NPOL);//added by zhengdy-soc
 
 	//------------------------------------
@@ -475,7 +422,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 			hpsi[ig] = wf.g2kin[ig] * psi_in[ig];
 		}
 		//added by zhengdy-soc
-		if(NONCOLIN){
+		if(NSPIN==4){
 			for (ig = wf.npwx;ig < wf.npw + wf.npwx;ig++)
 			{
 				hpsi[ig] = wf.g2kin[ig - wf.npwx] * psi_in[ig];
@@ -488,8 +435,8 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 	//------------------------------------
 	if(VL_IN_H)
 	{
-		if(!NONCOLIN){
-			ZEROS( UFFT.porter, pw.nrxxs);
+		if(NSPIN!=4){
+			ZEROS( UFFT.porter, pw.nrxx);
 			UFFT.RoundTrip( psi_in, pot.vrs1, GR_index, UFFT.porter );
 
 			for (j = 0;j < wf.npw;j++)
@@ -499,9 +446,9 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 		}
 		else
 		{
-			complex<double>* porter1 = new complex<double>[pw.nrxxs];
-			ZEROS( UFFT.porter, pw.nrxxs);
-			ZEROS( porter1, pw.nrxxs);
+			complex<double>* porter1 = new complex<double>[pw.nrxx];
+			ZEROS( UFFT.porter, pw.nrxx);
+			ZEROS( porter1, pw.nrxx);
 			for (int ig=0; ig< wf.npw; ig++)
 			{
 				UFFT.porter[ GR_index[ig]  ] = psi_in[ig];
@@ -551,7 +498,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 				for (;p<p_end;++p,++psip)
 				{
 //					becp[i] += psi_in[j]* conj( ppcell.vkb(i,j) );
-					if(!NONCOLIN) becp[i] += psip[0]* conj( p[0] );
+					if(NSPIN!=4) becp[i] += psip[0]* conj( p[0] );
 					else{
 						becp[i*2] += psip[0]* conj( p[0] );
 						becp[i*2+1] += psip[wf.npwx]* conj( p[0] );
@@ -565,18 +512,10 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 		}
 	}
 
-	// mohan add 2010-07-22
-	if( DFT_FUNCTIONAL == "PBE0" )
-	{
-		//exxpw.vxx_psi(psi_in, hpsi);
-	}
-
     timer::tick("Hamilt_PW","h_psi",'H');
     return;
 }
-#endif
 
-#ifndef __EPM
 void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
 {
     timer::tick("Hamilt_PW","add_vuspsi",'I');
@@ -599,18 +538,18 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
             {
                 for (int ip2=0; ip2<Nprojs; ip2++)
                 {
-					if(!NONCOLIN)
-						this->Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
-					else
-					{
-						this->Ps[sum+ ip2*2] += ppcell.deeq_nc(0, iat, ip2, ip) * becp[sum+ip*2]
-									+ppcell.deeq_nc(1, iat, ip2, ip) * becp[sum+ip*2+1];
-						this->Ps[sum+ ip2*2+1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp[sum+ip*2]
-									+ppcell.deeq_nc(3, iat, ip2, ip) * becp[sum+ip*2+1];
-					}
+			if(NSPIN!=4)
+				this->Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
+			else
+			{
+				this->Ps[sum+ ip2*2] += ppcell.deeq_nc(0, iat, ip2, ip) * becp[sum+ip*2]
+							+ppcell.deeq_nc(1, iat, ip2, ip) * becp[sum+ip*2+1];
+				this->Ps[sum+ ip2*2+1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp[sum+ip*2]
+							+ppcell.deeq_nc(3, iat, ip2, ip) * becp[sum+ip*2+1];
+			}
                 }// end ih
             }//end jh
-		if(!NONCOLIN) sum += Nprojs;
+		if(NSPIN!=4) sum += Nprojs;
 		else sum += 2 * Nprojs;
 		++iat;
         } //end na
@@ -628,39 +567,38 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
 
 
 	// use simple method.
-	if(!NONCOLIN)
-		for(int i=0; i<ppcell.nkb; i++)
+	if(NSPIN!=4)
+	for(int i=0; i<ppcell.nkb; i++)
+	{
+		complex<double>* p = &ppcell.vkb(i,0);
+		complex<double>* p_end = p + wf.npw;
+		complex<double>* hp = hpsi_in;
+		complex<double>* psp = &Ps[i];
+		for (;p<p_end;++p,++hp)
 		{
-			complex<double>* p = &ppcell.vkb(i,0);
-			complex<double>* p_end = p + wf.npw;
-			complex<double>* hp = hpsi_in;
-			complex<double>* psp = &Ps[i];
-			for (;p<p_end;++p,++hp)
-			{
-				hp[0] += psp[0] * p[0];
-			}
+			hp[0] += psp[0] * p[0];
 		}
+	}
 	else
-		for(int i=0; i<ppcell.nkb; i++)
+	for(int i=0; i<ppcell.nkb; i++)
+	{
+		complex<double>* p = &ppcell.vkb(i,0);
+		complex<double>* p_end = p + wf.npw;
+		complex<double>* hp = hpsi_in;
+		complex<double>* hp1 = hpsi_in + wf.npwx;
+		complex<double>* psp = &Ps[i*2];
+		for (;p<p_end;p++,++hp,++hp1)
 		{
-			complex<double>* p = &ppcell.vkb(i,0);
-			complex<double>* p_end = p + wf.npw;
-			complex<double>* hp = hpsi_in;
-			complex<double>* hp1 = hpsi_in + wf.npwx;
-			complex<double>* psp = &Ps[i*2];
-			for (;p<p_end;p++,++hp,++hp1)
-			{
-				hp[0] += psp[0] * (p[0]);
-				hp1[0] += psp[1] * (p[0]);
-			}
+			hp[0] += psp[0] * (p[0]);
+			hp1[0] += psp[1] * (p[0]);
 		}
+	}
 
 //	zgemm('N', 'N', 1, wf.npw, ppcell.nkb, ONE, this->Ps , 1, ppcell.vkb,
 //	      ppcell.nkb, ONE, hpsi , 1);
     timer::tick("Hamilt_PW","add_vuspsi",'I');
     return;
 }
-#endif
 
 void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nband, double *em, double *err)
 {

@@ -22,13 +22,6 @@ void Hamilt_Linear::set_orb_tables(void)
     TITLE("Hamilt_Linear","set_orb_tables");
 	timer::tick("Hamilt_Linear","set_orb_tables",'B');
     
-	//xiaohui modify 2013-09-02
-	//if(!LINEAR_SCALING) 
-	//{
-	//	timer::tick("Hamilt_Linear","set_orb_tables",'B');
-	//	return; //mohan add 2009-12-22
-	//} xiaohui modify 2013-09-02. Attention...
-	
 	//=============================================================================
     // (1) FUNCTION : use 'info' to generate 'Numerical Orbital'
     // (1) RESULT : We have 'Numerical Orbital' for calculate S-table and T-table.

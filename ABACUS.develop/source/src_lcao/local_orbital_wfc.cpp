@@ -3,6 +3,8 @@
 #include "../src_pw/algorithms.h"
 #include "../src_lcao/wf_local.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Local_Orbital_wfc::Local_Orbital_wfc()
 {
 	allocate_flag = false;
@@ -17,30 +19,15 @@ Local_Orbital_wfc::~Local_Orbital_wfc()
 	// used for gamma
 	if(allocate_flag)
 	{
-		if(BFIELD)
+		for(int is=0; is<NSPIN; is++)
 		{
-			for(int is=0; is<NSPIN; is++)
+			for(int i=0; i<NBANDS; i++) 
 			{
-				for(int i=0; i<NBANDS; i++) 
-				{
-					delete[] this->WFC_GAMMA_B[is][i];
-				}
-				delete[] this->WFC_GAMMA_B[is];
+				delete[] this->WFC_GAMMA[is][i];
 			}
-			delete[] this->WFC_GAMMA_B;
+			delete[] this->WFC_GAMMA[is];
 		}
-		else
-		{
-			for(int is=0; is<NSPIN; is++)
-			{
-				for(int i=0; i<NBANDS; i++) 
-				{
-					delete[] this->WFC_GAMMA[is][i];
-				}
-				delete[] this->WFC_GAMMA[is];
-			}
-			delete[] this->WFC_GAMMA;
-		}
+		delete[] this->WFC_GAMMA;
 	}
 
 	// used for force
@@ -206,24 +193,11 @@ void Local_Orbital_wfc::aloc_gamma_wfc(const Grid_Technique &gt)
 	// mohan add 2010-07-01
 	if(allocate_flag)
 	{
-		if(BFIELD)
+		for(int is=0; is<NSPIN; is++)
 		{
-			for(int is=0; is<NSPIN; is++)
+			for(int ib=0; ib<NBANDS; ib++)
 			{
-				for(int ib=0; ib<NBANDS; ib++)
-				{
-					delete[] this->WFC_GAMMA_B[is][ib];
-				}
-			}
-		}
-		else
-		{
-			for(int is=0; is<NSPIN; is++)
-			{
-				for(int ib=0; ib<NBANDS; ib++)
-				{
-					delete[] this->WFC_GAMMA[is][ib];
-				}
+				delete[] this->WFC_GAMMA[is][ib];
 			}
 		}
 		allocate_flag = false;
@@ -233,21 +207,10 @@ void Local_Orbital_wfc::aloc_gamma_wfc(const Grid_Technique &gt)
 	static bool first = true;
 	if(first)
 	{
-		if(BFIELD)
+		this->WFC_GAMMA = new double**[NSPIN];
+		for(int is=0; is<NSPIN; is++)
 		{
-			this->WFC_GAMMA_B = new complex<double>**[NSPIN];
-			for(int is=0; is<NSPIN; is++)
-			{
-				this->WFC_GAMMA_B[is] = new complex<double>*[NBANDS];
-			}
-		}
-		else
-		{
-			this->WFC_GAMMA = new double**[NSPIN];
-			for(int is=0; is<NSPIN; is++)
-			{
-				this->WFC_GAMMA[is] = new double*[NBANDS];
-			}
+			this->WFC_GAMMA[is] = new double*[NBANDS];
 		}
 		first=false;
 	}
@@ -257,107 +220,55 @@ void Local_Orbital_wfc::aloc_gamma_wfc(const Grid_Technique &gt)
 	{
     	// Create wave functions(Coefficients) in local basis.
     	// Same as evc in plane wave basis.
-		if(BFIELD)
+		for(int is=0; is<NSPIN; is++)
 		{
-			for(int is=0; is<NSPIN; is++)
+			for(int ib=0; ib<NBANDS; ib++)
 			{
-				for(int ib=0; ib<NBANDS; ib++)
-				{
-					this->WFC_GAMMA_B[is][ib] = new complex<double>[gt.lgd];
-					ZEROS(this->WFC_GAMMA_B[is][ib],gt.lgd);
-				}
-				Memory::record("LocalOrbital_Coef","WFC_GAMMA_B",NSPIN*NBANDS*NLOCAL,"cdouble");
-				allocate_flag = true;
+				this->WFC_GAMMA[is][ib] = new double[gt.lgd];
+				ZEROS(this->WFC_GAMMA[is][ib],gt.lgd);
 			}
-		}
-		else
-		{
-			for(int is=0; is<NSPIN; is++)
-			{
-				for(int ib=0; ib<NBANDS; ib++)
-				{
-					this->WFC_GAMMA[is][ib] = new double[gt.lgd];
-					ZEROS(this->WFC_GAMMA[is][ib],gt.lgd);
-				}
-				Memory::record("LocalOrbital_Coef","WFC_GAMMA",NSPIN*NBANDS*NLOCAL,"double");
-				allocate_flag = true;
-			}
+			Memory::record("LocalOrbital_Coef","WFC_GAMMA",NSPIN*NBANDS*NLOCAL,"double");
+			allocate_flag = true;
 		}
 	}
 
 	OUT(ofs_running,"start_wfc",wf.start_wfc);
 	if(wf.start_wfc == "atomic" )
 	{
-		// Bfield
-		if(BFIELD)
+		for(int is=0; is<NSPIN; is++)
 		{
-			for(int is=0; is<NSPIN; is++)
+			for(int i=0; i<NBANDS; i++)
 			{
-				for(int i=0; i<NBANDS; i++)
+				for(int j=0; j<NLOCAL; j++)
 				{
-					for(int j=0; j<NLOCAL; j++)
+					if(i==j)
 					{
-						if(i==j)
+						const int mu = gt.trace_lo[j];
+						if(mu>=0)
 						{
-							const int mu = gt.trace_lo[j];
-							if(mu>=0)
-							{
-								// be careful! std::rand must be translated to double!
-								// c[i][j] = static_cast<double>( std::rand() ) / RAND_MAX ;
+							// be careful! std::rand must be translated to double!
+							//								this->WFC_GAMMA[is][i][mu] = static_cast<double>( std::rand() ) / RAND_MAX ;
 
-								// mohan modify 2010-07-02
-								this->WFC_GAMMA_B[is][i][mu] = complex<double>(1.0, 0.0);
-							}
+							// mohan modify 2010-07-02
+							this->WFC_GAMMA[is][i][mu] = 1.0;
 						}
-					}// j
-				}// i
-			}// is
-		}
-		// no Bfield
-		else
-		{
-			for(int is=0; is<NSPIN; is++)
-			{
-				for(int i=0; i<NBANDS; i++)
-				{
-					for(int j=0; j<NLOCAL; j++)
-					{
-						if(i==j)
-						{
-							const int mu = gt.trace_lo[j];
-							if(mu>=0)
-							{
-								// be careful! std::rand must be translated to double!
-//								this->WFC_GAMMA[is][i][mu] = static_cast<double>( std::rand() ) / RAND_MAX ;
+					}
+				}// j
+			}// i
+		}// is
 
-								// mohan modify 2010-07-02
-								this->WFC_GAMMA[is][i][mu] = 1.0;
-							}
-						}
-					}// j
-				}// i
-			}// is
-		}
 //		cout << " set LCAO wave fuctions to unit." << endl;
 	}
 	else if(wf.start_wfc == "file")
 	{
 		int error;
-		if(BFIELD)
+		for(int is=0; is<NSPIN; ++is)
 		{
-			cout << " not implemented read_lowf for B field yet." << endl;
-			WARNING_QUIT("Local_Orbital_wfc::aloc_gamma_wfc","not implement yet");
-		}
-		else
-		{
-			for(int is=0; is<NSPIN; ++is)
-			{
-				CURRENT_SPIN = is;
-				
-				// read in the wave functions from file and then
-				// distribute it.
-				error = WF_Local::read_lowf( this->WFC_GAMMA[is] );
-			}
+			CURRENT_SPIN = is;
+
+			// read in the wave functions from file and then
+			// distribute it.
+			error = WF_Local::read_lowf( this->WFC_GAMMA[is] );
 		}
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);

@@ -21,7 +21,6 @@ public:
 	//liaochen modify on 2010-3-23 
 	//change its state from private to public
 	double*** DM;	
-	complex<double>*** DM_B; //density matrix in B field, Zhiyuan add 2012-01-13//
 	double** DM_R;
 
 	void write_dm(const int &is, const int &iter, const string &fn, const int &precision);

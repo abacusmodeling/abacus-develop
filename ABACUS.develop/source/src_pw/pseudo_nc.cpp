@@ -18,8 +18,6 @@ pseudo_nc::~pseudo_nc()
 void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 {
 	//-----------------------------------------------------------------
-	//   set "is"-th pseudopotential using the Unified Pseudopotential Format
-	//   dummy argument ( upf ) - convert and copy to internal PWscf variables
 
 	int i, nb;
 

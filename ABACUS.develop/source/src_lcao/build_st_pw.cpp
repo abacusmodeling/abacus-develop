@@ -1,6 +1,8 @@
 #include "build_st_pw.h"
 #include "../src_pw/global.h"
 
+#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
+
 Build_ST_pw::Build_ST_pw()
 {
 
@@ -29,7 +31,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					const int nu = ParaO.trace_loc_col[j];
 					if(nu < 0)continue;
 					
-					if(!NONCOLIN)
+					if(NSPIN!=4)
 					{
 						complex<double> v = ZERO;
 						for (int ig = 0; ig < kv.ngk[ik]; ig++) 
@@ -89,11 +91,11 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					{
 						v += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig) * wf.g2kin[ig];
 					}
-					if(NONCOLIN)
-						for (int ig = 0; ig < kv.ngk[ik]; ig++)
-						{
-							v += conj(wf.wanf2[ik](mu, ig + wf.npwx)) * wf.wanf2[ik](nu, ig + wf.npwx) * wf.g2kin[ig];
-						}
+					if(NSPIN==4)
+					for (int ig = 0; ig < kv.ngk[ik]; ig++)
+					{
+						v += conj(wf.wanf2[ik](mu, ig + wf.npwx)) * wf.wanf2[ik](nu, ig + wf.npwx) * wf.g2kin[ig];
+					}
 					
 	//				cout << "i=" << i << " j=" << j << " v=" << v << endl;
 					//-----------------------------------------
@@ -130,14 +132,14 @@ void Build_ST_pw::set_local(const int &ik)
 
 	for(int i=0; i<NLOCAL; i++)
 	{
-		if(!NONCOLIN)
+		if(NSPIN!=4)
 		{
 			for(int ig=0; ig<npw; ig++)
 			{
 				psi_one[ig] = wf.wanf2[ik](i, ig);
 			}
 
-			ZEROS( psic, pw.nrxxs);
+			ZEROS( psic, pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{
@@ -188,8 +190,8 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_down[ig] = wf.wanf2[ik](i, ig+ wf.npwx);
 			}
 
-			ZEROS( psic, pw.nrxxs);
-			ZEROS( psic1, pw.nrxxs);
+			ZEROS( psic, pw.nrxx);
+			ZEROS( psic1, pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{

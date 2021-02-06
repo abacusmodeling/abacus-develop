@@ -4,6 +4,8 @@
 #include "../src_pw/global.h"
 #include "lcao_nnr.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_k::cal_vna_d(const Grid_Technique &gt, const double* vrs1, const char &matrix_type)
 {
 

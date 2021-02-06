@@ -4,6 +4,8 @@
 #include "../src_pw/global.h"
 #include "src_global/blas_connector.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_Gamma::cal_force(const double* vlocal_in)
 {
     timer::tick("Gint_Gamma","cal_force",'H');

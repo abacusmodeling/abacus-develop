@@ -4,6 +4,8 @@
 #include "../src_pw/global.h"
 #include "local_orbital_elec.h" //mohan add 2012-03-29
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 
 double Gint_Speed::cal_rho(void)
 {
@@ -144,7 +146,7 @@ double Gint_Speed::gamma_charge(void)
 									   */
 								}
 							}
-							chr.rho[CURRENT_SPIN][ig] += sum;
+							CHR.rho[CURRENT_SPIN][ig] += sum;
 						}
 					}// jr
 				}// i
@@ -166,7 +168,7 @@ double Gint_Speed::gamma_charge(void)
 	{
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{
-			sum += chr.rho[is][ir];
+			sum += CHR.rho[is][ir];
 		}
 	}
 #ifdef __MPI

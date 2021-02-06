@@ -24,8 +24,15 @@ Parallel_Grid::~Parallel_Grid()
 	}
 }
 
-void Parallel_Grid::init(const int &ncx_in, const int &ncy_in, const int &ncz_in, const int &nczp_in, 
-const int &nrxx_in, const int &nbz_in, const int &bz_in)
+
+void Parallel_Grid::init(
+	const int &ncx_in, 
+	const int &ncy_in, 
+	const int &ncz_in, 
+	const int &nczp_in, 
+	const int &nrxx_in, 
+	const int &nbz_in, 
+	const int &bz_in)
 {
 
 #ifndef __MPI

@@ -620,7 +620,7 @@ void Exx_Lip::exx_energy_cal()
 
 void Exx_Lip::write_q_pack() const
 {
-    if (chr.out_charge==0)
+    if (CHR.out_charge==0)
 		return;
 
 	if(!RANK_IN_POOL)

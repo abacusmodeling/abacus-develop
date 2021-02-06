@@ -33,7 +33,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
     if (!Numerical_Basis::init_label)
     {
         // 1 stands for : start_from_file
-        Numerical_Basis::bessel_basis.init( 1, pw.ecutwfc, ucell.ntype );
+        Numerical_Basis::bessel_basis.init( 1, pw.ecutwfc, ucell.ntype, ucell.lmax );
         Numerical_Basis::init_mu_index();
         Numerical_Basis::init_label = true;
     }
@@ -41,11 +41,11 @@ void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
     return;
 }
 
+
 // The function is called in run_fp.cpp.
 void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
 {
     TITLE("Numerical_Basis","output_overlap");
-
     NEW_PART("Overlap Data For Spillage Minimization");
     
 	//---------------------------------------------------------
@@ -55,7 +55,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     if (!Numerical_Basis::init_label)
     {
         // 0 stands for : 'Faln' is not used.
-        Numerical_Basis::bessel_basis.init( 0, pw.ecutwfc, ucell.ntype );
+        Numerical_Basis::bessel_basis.init( 0, pw.ecutwfc, ucell.ntype, ucell.lmax );
         Numerical_Basis::init_mu_index();
         Numerical_Basis::init_label = true;
     }
@@ -357,7 +357,7 @@ void Numerical_Basis::output_overlap_Q(
             for (int i=0; i<dim; i++)
             {
                 if ( count%4==0 ) ofs << "\n";
-                ofs <<"  "<<"  "<<Qtmp1[i]<<"  "<<"  "<<Qtmp2[i];//add more " ", with 1 " ", sometime got 1.96752959e-36-3.20651912e-20, can't be reproduced. 
+                ofs << " " << Qtmp1[i] << " " << Qtmp2[i];
                 ++count;
             }
             // end data writing.
@@ -541,7 +541,7 @@ void Numerical_Basis::jlq3d_overlap(
 	<< endl;
 
     double *flq = new double[np];
-    //complex<double> overlapQ = ZERO;
+    complex<double> overlapQ = ZERO;
     for (int T1 = 0; T1 < ucell.ntype; T1++)
     {
         //OUT("T1",T1);
@@ -597,6 +597,7 @@ void Numerical_Basis::jlq3d_overlap(
 
 void Numerical_Basis::init_mu_index(void)
 {
+	ofs_running << " Initialize the mu index" << endl;
     Numerical_Basis::mu_index = new IntArray[ucell.ntype];
 
     int mu = 0;
@@ -607,6 +608,13 @@ void Numerical_Basis::init_mu_index(void)
             ucell.atoms[it].nwl+1,
             ucell.nmax,
             2*(ucell.atoms[it].nwl+1)+1); // m ==> 2*l+1
+
+		// mohan added 2021-01-03
+		ofs_running << "Type " << it+1 
+		<< " number_of_atoms " << ucell.atoms[it].na
+		<< " number_of_L " << ucell.atoms[it].nwl+1
+		<< " number_of_n " << ucell.nmax
+		<< " number_of_m " << 2*(ucell.atoms[it].nwl+1)+1 << endl;
 
         for (int ia=0; ia<ucell.atoms[it].na; ia++)
         {
@@ -644,7 +652,7 @@ void Numerical_Basis::numerical_atomic_wfc(
 
     Mathzone::Ylm_Real(total_lm, np, gk, ylm);
 
-    //int index = 0;
+    int index = 0;
     double *flq = new double[np];
     for (int it = 0; it < ucell.ntype; it++)
     {

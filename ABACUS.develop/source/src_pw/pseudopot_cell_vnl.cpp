@@ -101,12 +101,12 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	//
 	//	nbrx is defined in constant.h
 	//  max number of beta functions
-	if(!NONCOLIN) this->tab.create(ntype, nbrx, NQX);
+	if(NSPIN!=4) this->tab.create(ntype, nbrx, NQX);
 	else this->tab.create(ntype, nbrx_nc, NQX);
 
 	// nchix is defined in constant.h
 	// nchix : max number of atomic wavefunctions per atom
-	if(!NONCOLIN) this->tab_at.create(ntype, nchix, NQX);
+	if(NSPIN!=4) this->tab_at.create(ntype, nchix, NQX);
 	else this->tab_at.create(ntype, nchix_nc, NQX);
 
 	if(test_pp > 1)

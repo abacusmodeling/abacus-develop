@@ -3,15 +3,11 @@
 
 #include "tools.h"
 
-//#if defined __FFTW2
-//#include "../src_parallel/fftw.h"
-//#elif defined __FFTW3
-//#include "../src_parallel/fftw3.h"
-//#endif
-
 class Hamilt_PW
 {
+
 public:
+
     Hamilt_PW();
     ~Hamilt_PW();
 
@@ -52,9 +48,7 @@ public:
         complex<double> *hpsi,
         complex<double> *spsi);
 
-#ifndef __EPM
     void h_psi( const complex<double> *psi, complex<double> *hpsi);
-#endif
 
     void s_1psi(
         const int npw,
@@ -65,7 +59,6 @@ public:
     double ddot_real( const int& npw, const complex<double>* psi_L, const complex<double>* psi_R)const;
 
     int *GR_index;
-    int *GR_index2;
 
     complex<double> *psi_one;
 
@@ -76,10 +69,7 @@ public:
     complex<double> *Bec;
     complex<double> *Ps;
 
-#ifndef __EPM
     void add_vuspsi(complex<double> *hpsi, const complex<double> *becp);
-#endif
-
 
 
     complex<double> ddot( const int& npw,
@@ -96,4 +86,4 @@ public:
                           const complex<double> *psik )const ;
 };
 
-#endif // HERMIT_H
+#endif 

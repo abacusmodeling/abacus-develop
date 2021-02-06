@@ -11,12 +11,6 @@ Hamilt::~Hamilt()
 	}
 }
 
-#ifdef __EPM
-void Hamilt::init(void)
-{
-    this->hpw.init();
-}
-#else
 void Hamilt::init(const bool use_pw)
 {
     if (test_hm)TITLE("Hamilt","init");
@@ -27,7 +21,6 @@ void Hamilt::init(const bool use_pw)
     }
     return;
 }
-#endif
 
 void Hamilt::init_k(const int ik)
 {
@@ -274,8 +267,6 @@ void Hamilt::h_1psi(const int dim,const complex<double> *psi,complex<double> *hp
     //if (LINEAR_SCALING) xiaohui modify 2013-09-02
     if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02. Attention! Maybe this change is not reasonable.
     {
-#ifndef __EPM
-#ifdef __FP
         timer::tick("Hamilt","Sparse_SH");
         double *psi_real = new double[dim];
         double *hpsi_real = new double[dim];
@@ -286,8 +277,8 @@ void Hamilt::h_1psi(const int dim,const complex<double> *psi,complex<double> *hp
         for (int i=0; i<dim; i++) spsi_real[i] = spsi[i].real();
 
 		WARNING_QUIT("no sparse anymore","haha");
-//        this->hon.UHM.Sparse_H.multiply_vector(psi_real, hpsi_real);
-//        this->hon.UOM.Sparse_S.multiply_vector(psi_real, spsi_real);
+//      this->hon.UHM.Sparse_H.multiply_vector(psi_real, hpsi_real);
+//      this->hon.UOM.Sparse_S.multiply_vector(psi_real, spsi_real);
 
         for (int i=0; i<dim; i++) spsi[i] = complex<double>( spsi_real[i], 0.0 );
         for (int i=0; i<dim; i++) hpsi[i] = complex<double>( hpsi_real[i], 0.0 );
@@ -296,8 +287,6 @@ void Hamilt::h_1psi(const int dim,const complex<double> *psi,complex<double> *hp
         delete[] hpsi_real;
         delete[] spsi_real;
         timer::tick("Hamilt","Sparse_SH");
-#endif
-#endif
     }
     else
     {
@@ -311,8 +300,6 @@ void Hamilt::s_1psi(const int dim, const complex<double> *psi, complex<double> *
     //if (LINEAR_SCALING) xiaohui modify 2013-09-02
     if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02. Attention! Maybe this change is not reasonable.
     {
-#ifndef __EPM
-#ifdef __FP
         timer::tick("Hamilt","Sparse_S");
         double *psi_real = new double[dim];
         double *spsi_real = new double[dim];
@@ -331,8 +318,6 @@ void Hamilt::s_1psi(const int dim, const complex<double> *psi, complex<double> *
         delete[] psi_real;
         delete[] spsi_real;
         timer::tick("Hamilt","Sparse_S");
-#endif
-#endif
     }
     else
     {
@@ -341,13 +326,11 @@ void Hamilt::s_1psi(const int dim, const complex<double> *psi, complex<double> *
     return;
 }
 
-#ifndef __EPM
 void Hamilt::h_psi( const int dim, const complex<double> *psi, complex<double> *hpsi)
 {
     //if (LINEAR_SCALING) xiaohui modify 2013-09-02
     if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02. Attention! Maybe this change is not reasonable.
     {
-#ifdef __FP
         timer::tick("Hamilt","Sparse_H");
         double *psi_real = new double[dim];
         double *hpsi_real = new double[dim];
@@ -363,7 +346,6 @@ void Hamilt::h_psi( const int dim, const complex<double> *psi, complex<double> *
         delete[] psi_real;
         delete[] hpsi_real;
         timer::tick("Hamilt","Sparse_H");
-#endif
     }
     else
     {
@@ -371,7 +353,6 @@ void Hamilt::h_psi( const int dim, const complex<double> *psi, complex<double> *
     }
     return;
 }
-#endif
 
 void Hamilt::cdiaghg(
 	const int nstart,

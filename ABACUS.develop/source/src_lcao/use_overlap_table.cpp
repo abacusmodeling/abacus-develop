@@ -104,7 +104,7 @@ void Use_Overlap_Table::snap_psibeta(
 	//timer::tick ("Use_Overlap_Table","snap_psibeta");
 
 	//optimized by zhengdy-soc
-	if(NONCOLIN && ORB.Beta[T0].get_count_soc(is)==0) return;
+	if(NSPIN==4 && ORB.Beta[T0].get_count_soc(is)==0) return;
 	bool has_so = 0;
 	if(ORB.Beta[T0].get_count_soc(0)>0 ) has_so = 1;
 
@@ -499,9 +499,9 @@ void Use_Overlap_Table::snap_psibeta(
 				{
 					const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
 					const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
-					if(NONCOLIN && nlm1!=NULL)
+					if(NSPIN==4 && nlm1!=NULL)
 						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
-					else if(!NONCOLIN)
+					else if(NSPIN!=4)
 						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
 					else
 						WARNING_QUIT("Use_Overlap_Table::snap_psibeta","Conflict! Didn't count non-local part");
@@ -684,7 +684,7 @@ void Use_Overlap_Table::snap_psipsi(
 				{
 					case 0: // calculate overlap.
 					{	
-						if(!NONCOLIN) olm[0] += tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ;
+						if(NSPIN!=4) olm[0] += tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ;
 						else if(olm1!= NULL)
 						{
 							olm1[0] += tmpOlm0 * rly[ MGT.get_lm_index(L,m) ] ;
@@ -776,7 +776,7 @@ void Use_Overlap_Table::snap_psipsi(
 				{
 					case 0:
 					{
-						if(!NONCOLIN) olm[0] += tmpKem0 * rly[ MGT.get_lm_index(L, m) ];
+						if(NSPIN!=4) olm[0] += tmpKem0 * rly[ MGT.get_lm_index(L, m) ];
 						else if(olm1 != NULL)
 						{
 							olm1[0] += tmpKem0 * rly[ MGT.get_lm_index(L,m) ];

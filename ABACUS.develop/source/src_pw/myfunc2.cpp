@@ -1,11 +1,3 @@
-/*********************************************************
-// Copyright (C) 2001 PWSCF group
-// This file is distributed under the terms of the
-// GNU General Public License. See the file `License'
-// in the root directory of the present distribution,
-// or http://www.gnu.org/copyleft/gpl.txt .
-**********************************************************/
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -555,7 +547,7 @@ void pbec_spin(double rho, double zeta, double grho, const int &iflag, double &s
     double ga, be[3];//mohan add
     // parameter :
     ga = 0.0310910;
-    be[1] = 0.06672455060314922;//zhengdy add 2019-09-12, ensure same parameter with pwscf
+    be[1] = 0.06672455060314922;//zhengdy add 2019-09-12, ensure same parameter with another dft code.
 	be[2] = 0.0460000;//mohan add 2012-05-28
     double third, pi34, xkf, xks;
     // parameter :

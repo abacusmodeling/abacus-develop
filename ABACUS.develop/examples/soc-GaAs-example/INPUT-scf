@@ -3,7 +3,7 @@ INPUT_PARAMETERS
 suffix			test
 pseudo_dir          ./
 ntype               2
-nbands              40
+nbands              35
 pseudo_type         upf201
 gamma_only          0
 
@@ -11,9 +11,7 @@ gamma_only          0
 calculation         scf
 symmetry             0
 
-test_force          1
 nstep               1
-force_thr_ev        0.001
 out_level           ie
 move_method           cg
 out_charge          1
@@ -28,8 +26,9 @@ dr2                 1e-8
 niter               100
 ethr                0.00001
 #stress              1
-noncolin             1
+#noncolin             1
 lspinorb             1
+nspin		     4
 
 #Parameters (LCAO)
 basis_type pw

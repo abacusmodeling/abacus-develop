@@ -480,13 +480,13 @@ gettimeofday( &t_start_all, NULL);
 	}
 	else
 	{
-		if("plain"==chr.mixing_mode)
+		if("plain"==CHR.mixing_mode)
 			Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Plain;
-		else if("pulay"==chr.mixing_mode)
+		else if("pulay"==CHR.mixing_mode)
 			Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::Pulay;
 		else
 			throw invalid_argument("exx mixing error. exx_separate_loop==false, mixing_mode!=plain or pulay");
-		Hexx_para.mixing_beta = chr.mixing_beta;
+		Hexx_para.mixing_beta = CHR.mixing_beta;
 	}
 
 gettimeofday( &t_start, NULL);
@@ -879,7 +879,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_energy\t"<<time_during(t_start)<<endl;
 
 gettimeofday( &t_start, NULL);
-	Hexx_para.Rexx_to_Km2D( HexxR, {pot.start_pot=="file",chr.out_charge} );
+	Hexx_para.Rexx_to_Km2D( HexxR, {pot.start_pot=="file",CHR.out_charge} );
 ofs_mpi<<"TIME@ Hexx_para.Rexx_to_Km2D\t"<<time_during(t_start)<<endl;
 
 ofs_mpi<<"sizeof_Hexx2D\t"<<get_sizeof(Hexx_para.HK_Gamma_m2D)+get_sizeof(Hexx_para.HK_K_m2D)<<endl;
@@ -1075,7 +1075,7 @@ ofs_mpi.close();
 void Exx_Lcao::cal_exx_elec_nscf()
 {
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR;
-	Hexx_para.Rexx_to_Km2D( HexxR, {pot.start_pot=="file",chr.out_charge} );
+	Hexx_para.Rexx_to_Km2D( HexxR, {pot.start_pot=="file",CHR.out_charge} );
 }
 
 /*

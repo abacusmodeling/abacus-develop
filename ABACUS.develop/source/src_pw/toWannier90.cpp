@@ -1,4 +1,5 @@
 #include "toWannier90.h"
+#include "../src_lcao/global_fp.h" // mohan add 2021-01-30, this module should be modified
  
 
 
@@ -153,7 +154,7 @@ void toWannier90::read_nnkp()
 		//if( (kv.nkstot == 1) && (kv.kvec_d[0] == my_gamma_point) ) gamma_only_wannier = true;
 	} 
 	
-	if(!NONCOLIN)
+	if(NSPIN!=4)
 	{
 		if( SCAN_BEGIN(nnkp_read,"projections") )
 		{

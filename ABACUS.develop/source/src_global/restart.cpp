@@ -38,7 +38,7 @@ void Restart::read_file2(const std::string &file_name, void*const ptr, const siz
 void Restart::save_disk(const std::string mode, const int i) const
 {
 	if("charge"==mode)
-		write_file2(folder+"charge_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), chr.rho[i], pw.nrxx*sizeof(double));
+		write_file2(folder+"charge_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], pw.nrxx*sizeof(double));
 	if("H"==mode)
 	{
 		if(GAMMA_ONLY_LOCAL)
@@ -51,7 +51,7 @@ void Restart::save_disk(const std::string mode, const int i) const
 void Restart::load_disk(const std::string mode, const int i) const
 {
 	if("charge"==mode)
-		read_file2(folder+"charge_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), chr.rho[i], pw.nrxx*sizeof(double));
+		read_file2(folder+"charge_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], pw.nrxx*sizeof(double));
 	if("H"==mode)
 	{
 		if(GAMMA_ONLY_LOCAL)

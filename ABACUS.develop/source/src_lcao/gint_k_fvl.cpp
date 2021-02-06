@@ -2,6 +2,8 @@
 #include "../src_pw/global.h"
 #include "lcao_nnr.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_k::fvl_k_RealSpace(double** fvl_dphi, const double *vl)
 {
 	TITLE("Gint_k","cal_force");

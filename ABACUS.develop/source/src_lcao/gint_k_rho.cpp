@@ -7,6 +7,8 @@
 #include "../src_pw/global.h"
 #include "src_global/blas_connector.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
 {				
 	int bindex = 0;
@@ -135,8 +137,6 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 	int iw1_lo;
 	for(int is=0; is<NSPIN; ++is)
 	{
-//		if(NONCOLIN && !DOMAG && (is==1||is==2)) continue;//zhengdy-soc 
-//		if(NONCOLIN && !(DOMAG||DOMAG_Z) && is==3) continue;//zhengdy-soc 
 		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
 		for (int ia1=0; ia1<size; ++ia1)
 		{
@@ -356,7 +356,7 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 		} // ia1
 		
 		// calculate rho
-		double *rhop = chr.rho[is];
+		double *rhop = CHR.rho[is];
 		for(int ib=0; ib<pw.bxyz; ++ib)
 		{
 			double r=ddot_(&block_index[size], psir_ylm[ib], &inc, psir_DM[ib], &inc);
@@ -682,7 +682,7 @@ void Gint_k::evaluate_pDMp(const int &grid_index, const int &size,
 	{
 		for(int ib=0; ib<pw.bxyz; ib++)
 		{
-			chr.rho[is][vindex[ib]] += tchg[is][ib];
+			CHR.rho[is][vindex[ib]] += tchg[is][ib];
 		}
 	}
 

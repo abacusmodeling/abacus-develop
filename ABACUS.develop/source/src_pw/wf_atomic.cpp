@@ -151,7 +151,7 @@ void WF_atomic::print_PAOs(void)const
         for (int icc=0; icc<ucell.atoms[it].nchi ;icc++)
         {
             int ic = icc;
-            if(NONCOLIN) ic = icc/2;
+            if(NSPIN==4) ic = icc/2;
             string orbital_type;
             if (ic == 0)  orbital_type = "S";
             else if (ic == 1) orbital_type = "P";
@@ -278,12 +278,12 @@ void WF_atomic::atomic_wfc
                                                                it, iw, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
                     }
 
-                    if(NONCOLIN)
+                    if(NSPIN==4)
                     {
                         if(ucell.atoms[it].has_so)
                         {
                             const double j = ucell.atoms[it].jchi[iw];
-                            if (INPUT.starting_spin_angle|| !(DOMAG||DOMAG_Z))
+                            if ( !(DOMAG||DOMAG_Z))
                             {//atomic_wfc_so
                                 double fact[2];
                                 for(int m=-l-1;m<l+1;m++)

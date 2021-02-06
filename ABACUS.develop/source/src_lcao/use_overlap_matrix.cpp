@@ -4,6 +4,8 @@
 //#include "../src_develop/src_wannier/manipulation.h"
 #include "lcao_nnr.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Use_Overlap_Matrix::Use_Overlap_Matrix()
 {}
 
@@ -125,20 +127,12 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 
 								if(GAMMA_ONLY_LOCAL)
 								{
-									if(BFIELD)
-									{
-										LM.set_HSk(iw1_all, iw2_all, complex<double>(olm[0],0.0), dtype);
-									}
-									else
-									{
-										// mohan add 2010-06-29
-										// set the value in Hloc and Sloc
-										// according to trace_loc_row and trace_loc_col
-										// the last paramete: 1 for Sloc, 2 for Hloc
-										// and 3 for Hloc_fixed.
-										LM.set_HSgamma(iw1_all, iw2_all, olm[0], dtype);
-									}	
-
+									// mohan add 2010-06-29
+									// set the value in Hloc and Sloc
+									// according to trace_loc_row and trace_loc_col
+									// the last paramete: 1 for Sloc, 2 for Hloc
+									// and 3 for Hloc_fixed.
+									LM.set_HSgamma(iw1_all, iw2_all, olm[0], dtype);
 								}
 								else // k point algorithm
 								{
@@ -147,7 +141,7 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 									// which is a 1D array.
 									if(dtype=='S')
 									{
-										if(!NONCOLIN) LM.SlocR[nnr] = olm[0];
+										if(NSPIN!=4) LM.SlocR[nnr] = olm[0];
 										else
 										{//only has diagonal term here.
 												int is = (jj-jj0*NPOL) + (kk-kk0*NPOL)*2;
@@ -156,7 +150,7 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 									}
 									else if(dtype=='T')
 									{
-										if(!NONCOLIN) LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
+										if(NSPIN!=4) LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
 										else
 										{//only has diagonal term here.
 												int is = (jj-jj0*NPOL) + (kk-kk0*NPOL)*2;
@@ -533,7 +527,7 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 									double nlm[3]={0,0,0};
 									complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
 									complex<double> *nlm2 = NULL;
-									if(NONCOLIN) nlm2 = &nlm1[0];
+									if(NSPIN==4) nlm2 = &nlm1[0];
 									if(!calc_deri)
 									{
 										int is0 = (j-j0*NPOL) + (k-k0*NPOL)*2;
@@ -556,20 +550,13 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 											// mohan add 2010-12-20
 											if( nlm[0]!=0.0 )
 											{
-												if(BFIELD)
-												{
-													LM.set_HSk(iw1_all,iw2_all,complex<double>(nlm[0],0.0),'N');
-												}
-												else
-												{
-													//ofs_running << setw(10) << iw1_all << setw(10) << iw2_all << setw(20) << nlm[0] << endl; 
-													LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
-												}
+												//ofs_running << setw(10) << iw1_all << setw(10) << iw2_all << setw(20) << nlm[0] << endl; 
+												LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
 											}
 										}
 										else
 										{
-											if(!NONCOLIN) LM.Hloc_fixedR[nnr] += nlm[0];
+											if(NSPIN!=4) LM.Hloc_fixedR[nnr] += nlm[0];
 											else
 											{
 												int is = (j-j0*NPOL) + (k-k0*NPOL)*2;
@@ -734,14 +721,7 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 
 									if(GAMMA_ONLY_LOCAL)
 									{
-										if(BFIELD)
-										{
-											LM.set_HSk(iw1_all,iw2_all,complex<double>(nlm[0],0.0),'N');
-										}
-										else
-										{
-											LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
-										}
+										LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
 									}
 									else
 									{

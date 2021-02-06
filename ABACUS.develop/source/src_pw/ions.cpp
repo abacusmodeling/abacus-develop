@@ -9,6 +9,7 @@
 
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
+#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 
 void Ions::opt_ions_pw(void)
 {
@@ -93,23 +94,25 @@ void Ions::opt_ions_pw(void)
         	ofs_running << " -------------------------------------------" << endl;
 		}
 
-		
-		
-		
-		if(vdwd2.vdwD2)											//Peize Lin add 2014-04-03, update 2019-04-26
+			
+		if(vdwd2.vdwD2)		//Peize Lin add 2014-04-03, update 2019-04-26
 		{
 			vdwd2.energy();
 		}
-		if(vdwd3.vdwD3)											//jiyy add 2019-05-18
+		if(vdwd3.vdwD3)		//jiyy add 2019-05-18
 		{
 			vdwd3.energy();
 		}																										 
-		
+
+
+		// mohan added eiter to count for the electron iteration number, 2021-01-28
+		int eiter=0;		
         if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")  // pengfei 2014-10-13
         {
 			if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
 			{			
-				this->self_consistent(istep-1);
+				elec.self_consistent(istep-1);
+				eiter = elec.iter;
 			}
 			else if( Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type )
 			{
@@ -121,8 +124,9 @@ void Ions::opt_ions_pw(void)
 				{
 					for( size_t hybrid_step=0; hybrid_step!=exx_global.info.hybrid_step; ++hybrid_step )
 					{
-						this->self_consistent(istep-1);
-						if( electrons::iter==1 || hybrid_step==exx_global.info.hybrid_step-1 )		// exx converge
+						elec.self_consistent(istep-1);
+						eiter += elec.iter;
+						if( elec.iter==1 || hybrid_step==exx_global.info.hybrid_step-1 )		// exx converge
 							break;
 						exx_global.info.set_xcfunc(xcf);							
 						exx_lip.cal_exx();
@@ -130,60 +134,71 @@ void Ions::opt_ions_pw(void)
 				}
 				else
 				{
-					this->self_consistent(istep-1);	
+					elec.self_consistent(istep-1);	
+					eiter += elec.iter;
 					exx_global.info.set_xcfunc(xcf);
-					this->self_consistent(istep-1);
+					elec.self_consistent(istep-1);
+					eiter += elec.iter;
 				}
 			}
         }
         else if(CALCULATION=="nscf")
         {
-            this->non_self_consistent();
+            elec.non_self_consistent(istep-1);
+			eiter = elec.iter;
         }
+		// mohan added 2021-01-28, perform stochastic calculations
+		else if(CALCULATION=="scf-sto" || CALCULATION=="relax-sto" || CALCULATION=="md-sto")
+		{
+			elec_sto.scf_stochastic(istep-1);
+			eiter = elec_sto.iter;
+		}
 	
 
-    int iat=0; //LiuXh add 20180619
-    if(CALCULATION=="relax"|| CALCULATION=="md" || CALCULATION=="cell-relax")
-    {
-        for(int it = 0;it < ucell.ntype;it++)
-        {
-            Atom* atom = &ucell.atoms[it];
-    	for(int ia =0;ia< ucell.atoms[it].na;ia++)
-    	{
-    	    CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
-    	    CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
-    	    CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
-    	    
-    	    CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
-    	    CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
-    	    CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
-    
-    	    CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-    	    CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-    	    CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
-    
-    	    iat++;
-            }
-        }
-    }
-	
-    if(pot.out_potential == 2)
-    {
-        stringstream ssp;
-        stringstream ssp_ave;
-        ssp << global_out_dir << "ElecStaticPot";
-        ssp_ave << global_out_dir << "ElecStaticPot_AVE";
-        pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
-    }
-		
+		int iat=0; //LiuXh add 20180619
+		if(CALCULATION=="relax"|| CALCULATION=="md" || CALCULATION=="cell-relax")
+		{
+			for(int it = 0;it < ucell.ntype;it++)
+			{
+				Atom* atom = &ucell.atoms[it];
+				for(int ia =0;ia< ucell.atoms[it].na;ia++)
+				{
+					CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
+					CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
+					CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
+
+					CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
+					CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
+					CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
+
+					CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
+					CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
+					CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
+
+					iat++;
+				}
+			}
+		}
+
+		if(pot.out_potential == 2)
+		{
+			stringstream ssp;
+			stringstream ssp_ave;
+			ssp << global_out_dir << "ElecStaticPot";
+			ssp_ave << global_out_dir << "ElecStaticPot_AVE";
+			pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+		}
+
 		time_t eend = time(NULL);
 		time_t fstart = time(NULL);
-		//stop = this->force_stress(istep);
+
+
         if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
 			stop = this->force_stress(istep, force_step, stress_step);    // pengfei Li 2018-05-14
 		}
 		time_t fend = time(NULL);
+
 
 		if(OUT_LEVEL=="i")
 		{
@@ -193,7 +208,7 @@ void Ions::opt_ions_pw(void)
 			ss << MOVE_IONS << istep;
 			
 			cout << " " << setw(7) << ss.str() 
-			<< setw(5) << this->iter 
+			<< setw(5) << eiter 
 			<< setw(15) << setprecision(6) << en.etot * Ry_to_eV 
 			<< setw(15) << IMM.get_ediff() * Ry_to_eV
 			<< setprecision(3)
@@ -214,38 +229,8 @@ void Ions::opt_ions_pw(void)
         ofs_running << setprecision(16);
         ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
         ofs_running << " --------------------------------------------\n\n" << endl;
-
-/*
-        if(STRESS)
-        {
-            if(stress_step==1)
-            {
-		Stress ss;
-                ss.cal_stress();
-                matrix stress;
-                stress.create(3,3);
-
-		PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
-            }
-            double pressure = PRESSURE;
-            en.etot = en.etot + ucell.omega * pressure;
-
-            ofs_running << "\n\n --------------------------------------------" << endl;
-            ofs_running << setprecision(16);
-            ofs_running << " !FINAL_ETOT_IS (+ P*V) " << en.etot * Ry_to_eV << " eV" << endl; 
-            ofs_running << " --------------------------------------------\n\n" << endl;
-        }
-*/
     }
 
-/*
-    if(stop && STRESS) //LiuXh add 20180619
-    {
-        FINAL_SCF = true;
-        Run_Frag::final_calculation_after_vc();
-        this->self_consistent(0);
-    }
-*/
 
 	if(OUT_LEVEL=="i")
 	{
@@ -256,22 +241,16 @@ void Ions::opt_ions_pw(void)
     return;
 }
 
-//bool Ions::force_stress(const int &istep)
+
 bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  // pengfei Li 2018-05-14
 {
 	TITLE("Ions","force_stress");
+
 	if(!FORCE && !STRESS)
 	{
 		return 1;
 	}
 
-	//if(STRESS)
-	//{
-		//calculate the stress
-		//Stress ss;
-		//ss.cal_stress();
-		//change the latvec
-	//}	
 
 	if(FORCE&&!STRESS)
 	{
@@ -358,7 +337,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             }
             else
             {
-                Run_Frag::frag_init_after_vc();
+                Variable_Cell::init_after_vc();
                 //pot.init_pot(0);
                 pot.init_pot(stress_step); //LiuXh add 20180619
                 ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
@@ -420,7 +399,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                     }
                     else
                     {
-                        Run_Frag::frag_init_after_vc();
+                        Variable_Cell::init_after_vc();
                         //pot.init_pot(0);
                         pot.init_pot(stress_step); //LiuXh add 20180619
 
@@ -490,18 +469,3 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 }
 
 
-void Ions::extrapolate_wfcs()
-{
-    TITLE("Ions","extrapolate_wfcs");
-    // wave function extrapolation:
-    // wfc_order = 0 nothing is done
-    // wfc_order = 2 first order extrapolation:
-    // |psi(t+dt)> = 2*|psi(t)> - |psi(t-dt)>
-    // wfc_order = 3 second order extrapolation:
-    // |psi(t+dt)> = |psi(t)> +
-    // + alpha0*( |psi(t)> - |psi(t-dt)> )
-    // + beta0* ( |psi(t-dt)> - |psi(t-2*dt)> )
-
-
-    return;
-}

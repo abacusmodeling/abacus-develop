@@ -231,7 +231,7 @@ Potential_Libxc::cal_input(
 			{
 				for( size_t is=0; is!=nspin0(); ++is )
 					for( size_t ir=0; ir!=pw.nrxx; ++ir )
-						rho[ir*nspin0()+is] = rho_in[is][ir] + 1.0/nspin0()*chr.rho_core[ir];
+						rho[ir*nspin0()+is] = rho_in[is][ir] + 1.0/nspin0()*CHR.rho_core[ir];
 			}
 			else
 			{
@@ -241,8 +241,8 @@ Potential_Libxc::cal_input(
 				{
 					const double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
 					const double neg = (soc.lsign && rho_in[1][ir]*soc.ux[0]+rho_in[2][ir]*soc.ux[1]+rho_in[3][ir]*soc.ux[2]<=0) ? -1 : 1;
-					rho[ir*2]   = 0.5 * (rho_in[0][ir] + neg * amag) + 0.5 * chr.rho_core[ir];
-					rho[ir*2+1] = 0.5 * (rho_in[0][ir] - neg * amag) + 0.5 * chr.rho_core[ir];
+					rho[ir*2]   = 0.5 * (rho_in[0][ir] + neg * amag) + 0.5 * CHR.rho_core[ir];
+					rho[ir*2+1] = 0.5 * (rho_in[0][ir] - neg * amag) + 0.5 * CHR.rho_core[ir];
 				}
 			}
 		}
@@ -260,7 +260,7 @@ Potential_Libxc::cal_input(
 				for(int ir=0; ir<pw.nrxx; ++ir)
 					rhor[ir] = rho[ir*nspin0()+is];
 				vector<complex<double>> rhog(pw.ngmc);
-				chr.set_rhog(rhor.data(), rhog.data());
+				CHR.set_rhog(rhor.data(), rhog.data());
 
 				gdr[is].resize(pw.nrxx);
 				GGA_PW::grad_rho(rhog.data(), gdr[is].data());

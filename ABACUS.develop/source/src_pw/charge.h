@@ -7,10 +7,11 @@
 
 #include "tools.h"
 #include "../src_parallel/parallel_global.h"
+
 //==========================================================
-// Charge is the key value of all physics properties !
-// So write this class carefully.
+// Electron Charge Density 
 //==========================================================
+
 class Charge
 {
 public:

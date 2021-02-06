@@ -112,7 +112,7 @@ const double epsg  = 1.0e-10;
 // NAME : nchix( max number of atomic wavefunctions per atom)
 // NAME : ndmx( max number of points in the atomic radial mesh)
 //==========================================================
-const int nspinx= 2;
+const int nspinx= 4;
 const int ntypx = 50;
 const int npsx  = ntypx;
 const int natx  = 1000000;

@@ -2,8 +2,9 @@
 #include "use_hamilt_matrix.h"
 #include "build_st_pw.h"
 #include "sltk_atom_arrange.h"
-#include "bfield.h"
 #include "lcao_vna.h"
+
+#include "global_fp.h" // mohan add 2021-01-30
 
 Use_Hamilt_Matrix::Use_Hamilt_Matrix()
 { 
@@ -41,14 +42,7 @@ void Use_Hamilt_Matrix::set_ion(void)
 		}
 	
 		// calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
-		if(!BFIELD)
-		{
-	    	this->calculate_STNR_gamma();	
-		}
-		else
-		{
-			this->calculate_STNR_gamma_B();
-		}
+	    this->calculate_STNR_gamma();	
 
 		// vna only need to do once, you can check this in lcao_vna.cpp
 		if(VNA>=1)
@@ -95,14 +89,7 @@ void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik
 	timer::tick("Use_Hamilt_Matrix","cal_Hgamma",'F');
 
 	// Set the matrix 'H' to zero.
-	if(BFIELD)
-	{
-		LM.zeros_HSk('H'); // 3 stands for Hloc.
-	}
-	else
-	{
-		LM.zeros_HSgamma('H'); // 3 stands for Hloc.
-	}
+	LM.zeros_HSgamma('H'); // 3 stands for Hloc.
 
 	bool local_pw = false;
 
@@ -163,33 +150,16 @@ void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik
 	}
 
 	//add T+VNL+Vl matrix.
-	if(BFIELD)
-	{
-		LM.update_Hloc2();
-	}
-	else
-	{
-		LM.update_Hloc();
-	}
+	LM.update_Hloc();
 
 	//@@@@@@@
 	//test
 	//@@@@@@@
 	if(NURSE)
 	{
-		if(BFIELD)
-		{
-			LM.print_HSk('S');
-			LM.print_HSk('T');
-			LM.print_HSk('H','R'); // 
-			LM.print_HSk('H','I'); // 
-		}
-		else
-		{
-			LM.print_HSgamma('S'); // S
-			LM.print_HSgamma('T');
-			LM.print_HSgamma('H');
-		}
+		LM.print_HSgamma('S'); // S
+		LM.print_HSgamma('T');
+		LM.print_HSgamma('H');
 	//	WARNING_QUIT("Use_Hamilt_Matrix::calculate_Hgamma","print the H,S matrix");
 //		QUIT();
 	}
@@ -199,51 +169,6 @@ void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik
 	return;
 }
 
-
-void Use_Hamilt_Matrix::calculate_STNR_gamma_B(void)
-{
-	TITLE("Use_Hamilt_Matrix","calculate_STNR_gamma_B");
-
-	// s matrix
-	bfid.cal_A_of_Atom();
-	bfid.make_table();
-	LM.zeros_HSk('S');
-
-	// calculate overlap 
-	this->GG.cal_S_T_AP('S', GridT);
-	//this->UOM.calculate_S_no();	
-//	LM.print_HSk('S','R');
-
-	LM.zeros_HSk('T');
-
-	//time_t time_vnl_start = time(NULL);
-	if(VNL_IN_H)
-	{
-		bfid.cal_A_of_Atom();
-		// calculate A 
-		this->GG.cal_S_T_AP('A', GridT);
-		// calculate nonlocal
-		bfid.calculate_NL_B();
-	}
-	//time_t time_vnl_end = time(NULL);
-
-	//time_t time_t_start = time(NULL);
-	if(T_IN_H)
-	{
-		// calculate T
-		if(T_IN_H==1)
-		{
-			UOM.calculate_T_no();
-		}
-		else if(T_IN_H==2)
-		{
-			this->GG.cal_S_T_AP('T', GridT);
-		}
-//		LM.print_HSk('T','R');
-	}
-	//time_t time_t_end = time(NULL);
-	return;
-}
 
 
 void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
@@ -329,7 +254,7 @@ void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 		// in LCAO basis.
 		//--------------------------
 		LM.zeros_HSR('H', LNNR.nnr);
-		if(!NONCOLIN) this->GK.folding_vl_k(ik);
+		if(NSPIN!=4) this->GK.folding_vl_k(ik);
 		else this->GK.folding_vl_k_nc(ik);
 
 		// Peize Lin add 2016-12-03
@@ -580,7 +505,7 @@ void Use_Hamilt_Matrix::calculate_STN_R(void)
                                 iic=mu*ParaO.ncol+nu;
                             }
 
-                            if(!NONCOLIN)
+                            if(NSPIN!=4)
                             {
                                 LM.SlocR_tr[R_x][R_y][R_z][iic] = LM.SlocR[index];
                                 LM.Hloc_fixedR_tr[R_x][R_y][R_z][iic] = LM.Hloc_fixedR[index];

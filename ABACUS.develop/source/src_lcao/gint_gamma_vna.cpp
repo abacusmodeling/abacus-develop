@@ -3,6 +3,8 @@
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_Gamma::cal_vna(
     const double* vlocal_in)
 {
@@ -461,14 +463,7 @@ void Gint_Gamma::gamma_vna(void)
 				// save the matrix in Local potential Hamiltonian.
 				// LM.Hloc2 (complex) for Bfield, but save in
 				// LM.Hloc (double) for gamma.
-				if(BFIELD)
-				{
-					LM.set_HSk(i,j,complex<double>(tmp[j],0.0),'L');
-				}
-				else
-				{
-                	LM.set_HSgamma(i,j,tmp[j],'L');
-				}
+                LM.set_HSgamma(i,j,tmp[j],'L');
             }
             delete[] tmp;
         }

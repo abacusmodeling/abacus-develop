@@ -704,7 +704,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                     double* lineS = nullptr;
                     complex<double>* lineH_soc = nullptr;
                     complex<double>* lineS_soc = nullptr;
-                    if(!NONCOLIN)
+                    if(NSPIN!=4)
                     {
                         lineH = new double[NLOCAL];
                         lineS = new double[NLOCAL];
@@ -743,7 +743,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                                 {
                                     iic=ir*ParaO.ncol+ic;
                                 }
-                                if(!NONCOLIN)
+                                if(NSPIN!=4)
                                 {
                                     lineH[j] = LM.HR_tr[ix][iy][iz][iic];
                                     lineS[j] = LM.SlocR_tr[ix][iy][iz][iic];
@@ -763,7 +763,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
 
                     //Parallel_Reduce::reduce_double_all(lineH,NLOCAL-i);
                     //Parallel_Reduce::reduce_double_all(lineS,NLOCAL-i);
-                    if(!NONCOLIN)
+                    if(NSPIN!=4)
                     {
                         Parallel_Reduce::reduce_double_all(lineH,NLOCAL);
                         Parallel_Reduce::reduce_double_all(lineS,NLOCAL);
@@ -786,7 +786,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                             }
                             //g1 << " " << lineH[j-i];
                             //g2 << " " << lineS[j-i];
-                            if(!NONCOLIN)
+                            if(NSPIN!=4)
                             {
                                 if(abs(lineH[j]) < 1.0e-12) lineH[j]=0.0;
                                 if(abs(lineS[j]) < 1.0e-12) lineS[j]=0.0;
@@ -806,7 +806,7 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                         g1 << endl;
                         g2 << endl;
                     }
-                    if(!NONCOLIN)
+                    if(NSPIN!=4)
                     {
                         delete[] lineH;
                         delete[] lineS;

@@ -29,10 +29,12 @@ class Charge_Pulay: public Charge_Mixing
 	const bool &get_new_e_iteration(){ return new_e_iteration; }
 	void set_new_e_iteration( const bool new_e_iteration_in );			
 
-	protected:
 
 	// mohan add 2010-07-16
 	bool new_e_iteration;
+
+	protected:
+
 	
 	// Pulay mixing method.
 	void Pulay_mixing();

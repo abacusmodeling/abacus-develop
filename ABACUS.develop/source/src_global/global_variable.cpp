@@ -137,17 +137,6 @@ string	global_out_dir;
 ofstream ofs_running;
 ofstream ofs_warning;
 
-#ifdef __EPM
-int EPM_SPIN_ORBITAL = false; 
-// 0 stands for no spin-orbital coupling;
-// 1 stands for plane wave method;
-// 2 stands for small-box technique;
-bool EPM_ZEEMAN = false;
-double EPM_MAG_FIELD_X = 0.0;
-double EPM_MAG_FIELD_Y = 0.0;
-double EPM_MAG_FIELD_Z = 0.0;
-#endif
-
 //----------------------------------------------------------
 // EXPLAIN : test level for each class
 //----------------------------------------------------------

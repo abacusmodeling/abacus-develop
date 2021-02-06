@@ -3,6 +3,7 @@
 // DATE : 2008-11-10
 //==========================================================
 #include "unitcell_pseudo.h"
+#include "../src_lcao/lcao_orbitals.h" // to use 'ORB' -- mohan 2021-01-30
 #include "global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
@@ -96,8 +97,8 @@ void UnitCell_pseudo::setup_cell(
 #ifdef __MPI
 	Parallel_Common::bcast_bool(ok);
 	Parallel_Common::bcast_bool(ok2);
-	if(NONCOLIN) Parallel_Common::bcast_bool(DOMAG);
-	if(NONCOLIN) Parallel_Common::bcast_bool(DOMAG_Z);
+	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG);
+	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG_Z);
 #endif
 	if(!ok)
 	{
@@ -318,7 +319,6 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 		}
 	}
 
-#ifdef __FP
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 	{
 		if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
@@ -356,7 +356,6 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 			}
 		}	
 	}
-#endif
 
 	// Peize Lin add 2016-09-23
 	if( Exx_Global::Hybrid_Type::HF   == exx_lcao.info.hybrid_type || 
@@ -500,10 +499,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 
 			if(NSPIN==4)//added by zhengdy-soc
 			{
-				if(NONCOLIN && LSPINORB){
-					if(fabs(mag.start_magnetization[it])>1e-6) DOMAG_Z = true;
-				}
-				if(DOMAG)
+				if(NONCOLIN)
 				{
 					soc.m_loc[it].x = mag.start_magnetization[it] *
 							sin(soc.angle1[it]) * cos(soc.angle2[it]);
@@ -512,7 +508,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					soc.m_loc[it].z = mag.start_magnetization[it] *
 							cos(soc.angle1[it]);
 				}
-				else if(DOMAG_Z)
+				else
 				{
 					soc.m_loc[it].x = 0;
 					soc.m_loc[it].y = 0;
@@ -1281,7 +1277,8 @@ void UnitCell_pseudo::cal_nelec(void)
                 }
 		AUTO_SET("NBANDS",NBANDS);
 	}
-	else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+	//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+	else
 	{
 		if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
 		if(NBANDS < mag.get_nelup() ) 
@@ -1345,7 +1342,7 @@ void UnitCell_pseudo::cal_nwfc()
 	{
 		atoms[it].stapos_wf = NLOCAL;
 		const int nlocal_it = atoms[it].nw * atoms[it].na;
-        if(!NONCOLIN) NLOCAL += nlocal_it;
+                if(NSPIN!=4) NLOCAL += nlocal_it;
 		else NLOCAL += nlocal_it * 2;//zhengdy-soc
 //		stringstream ss1;
 //		ss1 << "number of local orbitals for species " << it;
@@ -1507,7 +1504,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 		{
 			if (atoms[it].oc[l] >= 0)
 			{
-				if(NONCOLIN)
+				if(NSPIN==4)
 				{
 					if(atoms[it].has_so)
 					{

@@ -4,6 +4,8 @@
 #include "../src_pw/global.h"
 #include "local_orbital_elec.h" //mohan add 2012-03-29
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 #include <stdexcept>
 
 Gint_Speed::Gint_Speed()
@@ -291,14 +293,7 @@ void Gint_Speed::gamma_vlocal(void)
                 }
 			
 				// mohan update 2011-04-15	
-				if(BFIELD)
-				{
-					LM.set_HSk(i,j,complex<double>(tmp[j],0.0),'L');
-				}
-				else
-				{
-                	LM.set_HSgamma(i,j,tmp[j],'L');
-				}
+               	LM.set_HSgamma(i,j,tmp[j],'L');
             }
             delete[] tmp;
         }
