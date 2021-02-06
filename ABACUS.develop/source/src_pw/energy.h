@@ -9,7 +9,8 @@
 class energy
 {
 	public:
-	friend class electrons; 
+	friend class Electrons; 
+	friend class Electrons_Stochastic;//mohan add 2021-01-31 
 	friend class Local_Orbital_Elec;
 	friend class Local_Orbital_Charge;
 	friend class Threshold_Elec;
@@ -51,7 +52,6 @@ class energy
     double etxc;           // the exchange and correlation energy
     double vtxc;           // another exchange-correlation energy
     double etxcc;          // the nlcc exchange and correlation
-	double exx;            // the exact exchange energy.
 
     double ewld;           // the ewald energy
 	double alpha;		   // the coefficient of ewald method
@@ -80,11 +80,12 @@ class energy
 
 	void print_format(const string &name, const double &value);
 
-#ifndef __EPM
 	void calculate_harris(const int &flag); //mohan add 2012-06-05
+
     double delta_e(void);
+
     void delta_escf(void);
-#endif
+
     void rgen(
         const Vector3<double> &dtau,
         const double &rmax,

@@ -10,6 +10,7 @@
 #include "src_lcao/istate_envelope.h"
 #include "../src_lcao/hs_matrix.h"
 #include "src_lcao/cal_r_overlap_R.h"
+#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 //#include "../src_siao/selinv.h" //mohan add 2012-05-13
 
 Local_Orbital_Ions::Local_Orbital_Ions()
@@ -222,7 +223,7 @@ void Local_Orbital_Ions::opt_ions(void)
         {
             for(int is=0; is<NSPIN; is++)
             {
-                ZEROS(chr.rho[is], pw.nrxx);
+                ZEROS(CHR.rho[is], pw.nrxx);
                 stringstream ssd;
                 ssd << global_out_dir << "SPIN" << is + 1 << "_DM" ;
                 // reading density matrix,
@@ -238,7 +239,7 @@ void Local_Orbital_Ions::opt_ions(void)
             {
                 UHM.GK.calculate_charge();	
             }
-            chr.renormalize_rho();
+            CHR.renormalize_rho();
             pot.init_pot( istep-1 );
         }
 
@@ -470,7 +471,7 @@ void Local_Orbital_Ions::opt_ions(void)
 //        final_scf();
 /*
         FINAL_SCF = true;
-        Run_Frag::final_calculation_after_vc();
+        Variable_Cell::final_calculation_after_vc();
         atom_arrange::set_sr_NL();
         atom_arrange::search( SEARCH_RADIUS );
         GridT.set_pbc_grid(
@@ -676,7 +677,7 @@ xiaohui modify 2014-08-09*/
            	}
            	else
            	{
-               	Run_Frag::frag_init_after_vc();
+               	Variable_Cell::init_after_vc();
                	pot.init_pot(stress_step);
 
                	++stress_step;
@@ -722,7 +723,7 @@ xiaohui modify 2014-08-09*/
             	    }
             	    else
             	    {
-                	    Run_Frag::frag_init_after_vc();
+                	    Variable_Cell::init_after_vc();
                 	    pot.init_pot(stress_step);
 
                 	    ++stress_step;
@@ -779,7 +780,7 @@ void Local_Orbital_Ions::final_scf(void)
     TITLE("Local_Orbital_Ions","final_scf"); 
 
     FINAL_SCF = true;
-    Run_Frag::final_calculation_after_vc();
+    Variable_Cell::final_calculation_after_vc();
     atom_arrange::set_sr_NL();
     atom_arrange::search( SEARCH_RADIUS );
     GridT.set_pbc_grid(

@@ -1,108 +1,22 @@
-#include "dc_driv.h"
+#include "print_info.h"
+#include "global_variable.h"
+//#include "../input.h"
+//#include "../input_conv.h"
+//#include "../src_lcao/global_fp.h"
+#include "../src_pw/global.h"
 
-#ifdef __EPM
-#include "../src_epm/run_epm.h"
-#else
-#include "run_frag.h"
-#endif
+Print_Info::Print_Info(){}
 
-#include "input.h"
-#include "input_conv.h"
-#include "src_lcao/global_fp.h"
-#include "src_pw/global.h"
+Print_Info::~Print_Info(){}
 
-DC_Driv::DC_Driv()
-{}
 
-DC_Driv::~DC_Driv()
-{}
-
-void DC_Driv::init()
+void Print_Info::screen_output(void)
 {
-	TITLE("DC_Driv","init");
-
-	time_t  time_start = std::time(NULL);
-
-	timer::start();
-
-	// read the parameters.
-	this->reading();
-
-#ifdef __FP
-	// divide the system into fragments.
-	this->divide_frag();
-
-	// setup the information for each fragment.
-	this->setup_frag();
-#endif
-
-	// solve each fragment.
-	this->solve_eachf();
-
-	time_t	time_finish= std::time(NULL);
-
-	cout << "\n START  Time  : " << ctime(&time_start);
-	cout << " FINISH Time  : " << ctime(&time_finish);
-	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
-	cout << " SEE INFORMATION IN : "<<global_out_dir<<endl;
-
-	ofs_running << "\n Start  Time  : " << ctime(&time_start);
-	ofs_running << " Finish Time  : " << ctime(&time_finish);
-
-	double total_time = difftime(time_finish, time_start);
-	int hour = total_time / 3600;
-	int mins = ( total_time - 3600 * hour ) / 60;
-	int secs = total_time - 3600 * hour - 60 * mins ;
-	ofs_running << " Total  Time  : " << hour << " h "
-	            << mins << " mins "
-	            << secs << " secs "<< endl;
-
-	INPUT.close_log();
-
-	return;
-}
-
-void DC_Driv::reading(void)
-{
-	timer::tick("DC_Driv","reading",'A');
-	INPUT.Init( global_in_card );
-	Input_Conv::Convert();
-#ifdef __EPM
-	Input_Conv::Convert_EPM();
-#else
-	Input_Conv::Convert_FP();
-#endif
-
-#ifdef __FP
-
-	Parallel_Global::split_diag_world(DIAGO_PROC);
-	Parallel_Global::split_grid_world(DIAGO_PROC);
-	OUT(ofs_running,"DRANK",DRANK+1);
-	OUT(ofs_running,"DSIZE",DSIZE);
-	OUT(ofs_running,"DCOLOR",DCOLOR+1);
-	OUT(ofs_running,"GRANK",GRANK+1);
-	OUT(ofs_running,"GSIZE",GSIZE);
-
-	Run_Frag::frag_init();
-	//if(LOCAL_BASIS==4 && LINEAR_SCALING) xiaohui modify 2013-09-01
-
-	if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
-	{
-
-		// read orbital information.
-		// init overlap matrix table.
-		// init kinetical matrix element table.
-		// init non-local pseudopotential matrix element table.
-		hm.hon.set_orb_tables();
-
-		LM.divide_HS_in_frag(); //add 2015-09-06, xiaohui
-	} //add 2015-09-06, xiaohui
-
-
-
+	
+	// the following printing information should be moved to somewhere else -- mohan 2021-01-30
     if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax" || CALCULATION=="nscf"
 	        || CALCULATION=="istate" || CALCULATION=="ienvelope"
-	        || CALCULATION=="md") //pengfei 2014-10-13
+	        || CALCULATION=="md") //pengfei add 2014-10-13
 	{
 		//LM.divide_HS_in_frag(); //move it above 2015-09-06, xiaohui
 		cout << " ---------------------------------------------------------" << endl;
@@ -337,161 +251,12 @@ void DC_Driv::reading(void)
 			cout << endl;
 		}
 
-
-
-
-
-
-
 		cout << " ---------------------------------------------------------" << endl;
 		cout << " Initial plane wave basis and FFT box" << endl;
 		cout << " ---------------------------------------------------------" << endl;
 
-
 //			cout << " GRID_SPEED           : " << GRID_SPEED << endl;
 	}
 
-
-	//} //delete 2015-09-06, xiaohui
-	/*
-		else if(BASIS_TYPE=="pw") //2015-09-06, xiaohui
-		{
-			cout << " " << setw(8) << "ELEMENT";
-			cout << setw(12) << "NATOM";
-			cout << setw(12) << "XC";
-			cout << endl;
-			for(int it=0; it<ucell.ntype; ++it)
-			{
-				cout << " " << setw(8) << ucell.atoms[it].label;
-				cout << setw(12) << ucell.atoms[it].na;
-				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31
-				{
-					//cout << " XC FUNCTIONAL      : " << "PZ-LDA" << endl;
-					cout << setw(12) << "PZ-LDA";
-				}
-				else
-				{
-					//cout << " XC FUNCTIONAL      : " << "PBE" << endl;
-					cout << setw(12) << "PZ-LDA";
-				}
-			}
-			cout<<endl;
-		}
-	*/
-#endif
-
-
-
-	timer::tick("DC_Driv","reading",'A');
 	return;
 }
-
-#include "src_pw/cal_test.h"
-#include "src_pw/cal_test0.h"
-//#include "../src_develop/src_dc/dc_info.h"
-void DC_Driv::divide_frag(void)
-{
-	TITLE("DC_Driv","divide_frag");
-	timer::tick("DC_Driv","divide_frag",'A');
-
-	// (1) Init the plane wave.
-	pw.gen_pw(ofs_running, ucell, kv);
-	DONE(ofs_running,"INIT PLANEWAVE");
-	cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
-	cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
-
-	//bool test_dc = false;
-	//if(test_dc)
-	//{
-	//	DC_Info::divide_fragments(ucell);
-	//}
-
-	// mohan add 2010-10-10, just to test the symmetry of a variety
-	// of systems.
-	//xiaohui modified 2013-03-23,adding "/*"
-	if(CALCULATION == "test")
-	{
-		Cal_Test::adjacent_atoms();
-		//Cal_Test::sparsity();
-		Cal_Test::test_memory();
-		QUIT();
-	}
-
-	// mohan add 2010-09-13
-	// init the grid, then the charge
-	// on grid can be distributed.
-	Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp, pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
-
-
-	timer::tick("DC_Driv","divide_frag",'A');
-	return;
-}
-
-void DC_Driv::setup_frag(void)
-{
-	TITLE("DC_Driv","setup_frag");
-
-}
-
-void DC_Driv::solve_eachf(void)
-{
-	TITLE("DC_Driv","solve_eachf");
-	timer::tick("DC_Driv","solve_eachf",'A');
-
-#ifdef __EPM
-
-	Run_EPM re;
-	re.epm_line();
-
-#else
-
-	Run_Frag RF;
-
-
-#ifdef __FP
-
-	//xiaohui modify 2013-09-01
-	//if(LINEAR_SCALING==-1)
-	//{
-	//    RF.frag_test();
-	//}
-	//else if (LINEAR_SCALING==0)
-	//{
-	//    RF.frag_pw_line();
-	//}
-	//else if (LINEAR_SCALING==1)
-	//{
-	//    RF.frag_LCAO_line();
-	//}
-	//else if (LINEAR_SCALING==2)
-	//{
-	//    RF.frag_linear_scaling_line();
-	//}
-	//xiaohui add 2013-09-01
-	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
-	{
-		RF.frag_pw_line();
-	}
-	else if(BASIS_TYPE=="lcao")
-	{
-		RF.frag_LCAO_line();
-	}
-
-#else
-
-	// if use plane wave basis,
-	// the plane wave basis is generated in pw_line.
-	RF.pw_line();
-
-#endif
-
-#endif
-
-	timer::tick("DC_Driv","solve_eachf",'A');
-	timer::finish( ofs_running );
-
-	Memory::print_all( ofs_running ) ;
-
-	return;
-}
-

@@ -95,9 +95,9 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 		}
 	}
 
-delete[] this->ngm_i_number;
-this->ngm_i_number = new int[10];
-ZEROS(ngm_i_number, 10);
+	delete[] this->ngm_i_number;
+	this->ngm_i_number = new int[10];
+	ZEROS(ngm_i_number, 10);
 
 	return;
 }

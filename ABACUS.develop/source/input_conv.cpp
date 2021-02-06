@@ -4,11 +4,14 @@
 #include "input_conv.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_pw/optical.h"
-#include "src_lcao/bfield.h"
 #include "src_lcao/force_lcao.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/lcao_orbitals.h"
 #include "src_pw/efield.h"
+#include "src_lcao/global_fp.h"
+
+// those included filese below this comment should not appear here
+// mohan 2021-01-30  
 #include "src_pw/vdwd2.h"
 #include "src_pw/vdwd3.h"
 #include "src_pw/chi0_hilbert.h"
@@ -35,17 +38,21 @@ void Input_Conv::Convert(void)
     if(INPUT.kpoint_file!= "")global_kpoint_card = INPUT.kpoint_file;//xiaohui modify 2015-02-01
     if(INPUT.pseudo_dir != "")global_pseudo_dir = INPUT.pseudo_dir + "/"; // mohan add slash 2013-04-13 (xiaohui add 2013-06-23)
     global_pseudo_type = INPUT.pseudo_type; // mohan add this on 2013-05-20 (xiaohui add 2013-06-23)
-    global_epm_pseudo_card = INPUT.epm_pseudo_card;
 	ucell.latName = INPUT.latname; 
 	ucell.ntype = INPUT.ntype;
 	ucell.nelec = INPUT.nelec;
 //        ucell.lmaxmax = INPUT.lmaxmax;
+
+
 //	calculation : 2
     NBANDS = INPUT.nbands;				// 1
     NBANDS_ISTATE = INPUT.nbands_istate;// 1
 	NPOOL = INPUT.npool; 				// mohan add 2010-06-09
 	CALCULATION = INPUT.calculation;	// 2
     BERRY_PHASE = INPUT.berry_phase;	// 3
+	STO_WF.nchi = INPUT.nbands_sto;		// qianrui add 2021-2-5
+	STO_WF.nche_sto = INPUT.nche_sto;
+
 
 	EFIELD = INPUT.efield;
 	Efield::edir = INPUT.edir;
@@ -53,85 +60,80 @@ void Input_Conv::Convert(void)
 	Efield::eopreg = INPUT.eopreg;
 	Efield::eamp = INPUT.eamp;
 
-#ifdef __FP
-	BFIELD = INPUT.bfield; // mohan add 2011-04-08
-	bfid.tesla_x = INPUT.bfield_teslax;
-	bfid.tesla_y = INPUT.bfield_teslay;
-	bfid.tesla_z = INPUT.bfield_teslaz;
-	bfid.Gauge_Origin_x = INPUT.bfield_gauge_x;
-	bfid.Gauge_Origin_y = INPUT.bfield_gauge_y;
-	bfid.Gauge_Origin_z = INPUT.bfield_gauge_z;
-	bfid.convert(); //Zhiyuan add at 2011-12-26, for converting unit to Rydberg
-	bfid.check();
-#endif
 
 	Optical::opt_epsilon2=INPUT.opt_epsilon2;	// mohan add 2010-03-24	
 	Optical::opt_nbands=INPUT.opt_nbands;		// number of bands for optical transition.	
+
 	LDA_PLUS_U = INPUT.lda_plus_u;		// 5
 	DFT_FUNCTIONAL = INPUT.dft_functional;	// 6.5
     NSPIN = INPUT.nspin;				// 7
     CURRENT_SPIN = 0;					// 8
+
 	VNA = INPUT.vna;
 	GRID_SPEED = INPUT.grid_speed;		//
     FORCE = INPUT.force;				// 8.1
     FORCE_THR = INPUT.force_thr;		// 8.2
+
     STRESS_THR = INPUT.stress_thr; //LiuXh add 20180515
     PRESS1 = INPUT.press1;
     PRESS2 = INPUT.press2;
     PRESS3 = INPUT.press3;
-#ifdef __FP
 	Force_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
-#endif
+
 	BFGS_Basic::w1 = INPUT.bfgs_w1;
 	BFGS_Basic::w2 = INPUT.bfgs_w2;
+
 	Ions_Move_Basic::trust_radius_max = INPUT.trust_radius_max;
 	Ions_Move_Basic::trust_radius_min = INPUT.trust_radius_min;
 	Ions_Move_Basic::trust_radius_ini = INPUT.trust_radius_ini;
 	Ions_Move_Basic::out_stru = INPUT.out_stru; //mohan add 2012-03-23
+
 	STRESS = INPUT.stress;
-        if(INPUT.fixed_axes == "None")          // pengfei Li add 2018-11-11
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
-        }
+
+	if(INPUT.fixed_axes == "None")          // pengfei Li add 2018-11-11
+	{
+		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+	}
 	else if(INPUT.fixed_axes == "volume")
 	{
 		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
 	}
-        else if(INPUT.fixed_axes == "a")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
-        }
-        else if(INPUT.fixed_axes == "b")
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
-        }
-        else if(INPUT.fixed_axes == "c")
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
-        }
-        else if(INPUT.fixed_axes == "ab")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
-        }
-        else if(INPUT.fixed_axes == "ac")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
-        }
-        else if(INPUT.fixed_axes == "bc")
-        {
-                ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
-        }
-        else if(INPUT.fixed_axes == "abc")
-        {
-                ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
-        }
-        else
-        {
-                WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
-        }
+	else if(INPUT.fixed_axes == "a")
+	{
+		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
+	}
+	else if(INPUT.fixed_axes == "b")
+	{
+		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
+	}
+	else if(INPUT.fixed_axes == "c")
+	{
+		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
+	}
+	else if(INPUT.fixed_axes == "ab")
+	{
+		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
+	}
+	else if(INPUT.fixed_axes == "ac")
+	{
+		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
+	}
+	else if(INPUT.fixed_axes == "bc")
+	{
+		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
+	}
+	else if(INPUT.fixed_axes == "abc")
+	{
+		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
+	}
+	else
+	{
+		WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
+	}
 	MOVE_IONS = INPUT.ion_dynamics;
 	OUT_LEVEL = INPUT.out_level;
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
+
 //----------------------------------------------------------
 // new function (5/5)
 //----------------------------------------------------------
@@ -145,6 +147,7 @@ void Input_Conv::Convert(void)
 	SEARCH_PBC = INPUT.search_pbc;					// 11.2
     SPARSE_MATRIX = INPUT.sparse_matrix;			// 11.3
 	ATOM_DISTRIBUTION = INPUT.atom_distribution;	// 11.4
+
 //----------------------------------------------------------
 // planewave (8/8)
 //----------------------------------------------------------
@@ -178,10 +181,9 @@ void Input_Conv::Convert(void)
 	T_IN_H = INPUT.t_in_h;						// 23
 	VL_IN_H = INPUT.vl_in_h;					// 24
 	VNL_IN_H = INPUT.vnl_in_h;					// 25
-	ZEEMAN_IN_H = INPUT.zeeman_in_h;			//
 	TEST_FORCE = INPUT.test_force;				// 26
 	TEST_STRESS = INPUT.test_stress;
-    FS_REF_ENERGY = INPUT.fs_ref_energy; 		// 16
+
 //----------------------------------------------------------
 // iteration (1/3)
 //----------------------------------------------------------
@@ -194,7 +196,6 @@ void Input_Conv::Convert(void)
     wf.start_wfc = INPUT.start_wfc;
 	wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
 	en.printe    = INPUT.printe; // mohan add 2011-03-16
-
 
 	//DC_Info::dcnx = INPUT.dc_nx;
 	//DC_Info::dcny = INPUT.dc_ny;
@@ -231,12 +232,20 @@ void Input_Conv::Convert(void)
 		vdwd2.R0_input(INPUT.vdw_R0_file, INPUT.vdw_R0_unit);
 		vdwd2.model = INPUT.vdw_model;
 		if(INPUT.vdw_model=="radius")
+		{
 			if(INPUT.vdw_radius_unit=="Bohr")
+			{
 				vdwd2.radius = std::stod(INPUT.vdw_radius);
+			}
 			else
+			{
 				vdwd2.radius = std::stod(INPUT.vdw_radius) * BOHR_TO_A;
+			}
+		}
 		else if(INPUT.vdw_model=="period")
+		{
 			vdwd2.period = INPUT.vdw_period;
+		}
 	}
     if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
     {
@@ -305,8 +314,15 @@ void Input_Conv::Convert(void)
 		chi0_hilbert.nomega = INPUT.nomega;
 		chi0_hilbert.dim = INPUT.ecut_chi; 
 		//chi0_hilbert.oband = INPUT.oband;
-		chi0_hilbert.q_start[0] = INPUT.q_start[0];  chi0_hilbert.q_start[1] = INPUT.q_start[1]; chi0_hilbert.q_start[2] = INPUT.q_start[2];
-		chi0_hilbert.direct[0] = INPUT.q_direct[0];  chi0_hilbert.direct[1] = INPUT.q_direct[1]; chi0_hilbert.direct[2] = INPUT.q_direct[2];
+
+		chi0_hilbert.q_start[0] = INPUT.q_start[0];  
+		chi0_hilbert.q_start[1] = INPUT.q_start[1]; 
+		chi0_hilbert.q_start[2] = INPUT.q_start[2];
+
+		chi0_hilbert.direct[0] = INPUT.q_direct[0]; 
+		chi0_hilbert.direct[1] = INPUT.q_direct[1]; 
+		chi0_hilbert.direct[2] = INPUT.q_direct[2];
+
 		//chi0_hilbert.start_q = INPUT.start_q;
 		//chi0_hilbert.interval_q = INPUT.interval_q;
 		chi0_hilbert.nq = INPUT.nq;
@@ -318,9 +334,13 @@ void Input_Conv::Convert(void)
 		chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
 		for(int i=0; i<100; i++)
 		{
-			chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
+			chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; 
+			chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; 
+			chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
 		}
-		chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
+		chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; 
+		chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
+		chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
 	}
 	
 	//if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
@@ -543,25 +563,7 @@ void Input_Conv::Convert(void)
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
     NEW_DM=INPUT.newDM;  // Shen Yu add 2019/5/9
-	timer::tick("Input_Conv","Convert",'B');
-    return;
-}
 
-#ifdef __EPM
-// last step in Input.init()
-void Input_Conv::Convert_EPM(void)
-{
-    TITLE("Input","Convert_EPM");
-
-    EPM_SPIN_ORBITAL = epm_spin_orbital;
-
-    return;
-}
-#else
-void Input_Conv::Convert_FP(void) 
-{
-    TITLE("Input","Convert_FP");
-	timer::tick("Input_Conv","Convert_FP",'B');
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 2/16 )
 //----------------------------------------------------------
@@ -575,8 +577,8 @@ void Input_Conv::Convert_FP(void)
 //----------------------------------------------------------
 // charge mixing(3/3)
 //----------------------------------------------------------
-    //chr.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim);
-    chr.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
+    //CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim);
+    CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
 
 //----------------------------------------------------------
 // iteration (2/3)
@@ -589,23 +591,20 @@ void Input_Conv::Convert_FP(void)
 //----------------------------------------------------------
     pot.start_pot = INPUT.start_pot;
 	pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
-    chr.out_charge = INPUT.out_charge;
+    CHR.out_charge = INPUT.out_charge;
 	pot.out_potential = INPUT.out_potential;
     wf.out_wf = INPUT.out_wf;
 	en.out_dos = INPUT.out_dos;
-        en.out_band = INPUT.out_band;
-#ifdef __FP
+    en.out_band = INPUT.out_band;
 	LOC.out_dm = INPUT.out_dm;
 	ParaO.out_hs = INPUT.out_hs;
 	ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
 	ParaO.out_lowf = INPUT.out_lowf;
-#endif
 
 	en.dos_emin_ev = INPUT.dos_emin_ev;
 	en.dos_emax_ev = INPUT.dos_emax_ev;
 	en.dos_edelta_ev = INPUT.dos_edelta_ev;
-        en.bcoeff = INPUT.b_coef;
-#ifdef __FP
+    en.bcoeff = INPUT.b_coef;
 //----------------------------------------------------------
 // About LCAO
 //----------------------------------------------------------
@@ -613,10 +612,8 @@ void Input_Conv::Convert_FP(void)
 	ORB.dk = INPUT.lcao_dk;
 	ORB.dR = INPUT.lcao_dr;
 	ORB.Rmax = INPUT.lcao_rmax; 
-#endif
 
-	timer::tick("Input_Conv","Convert_FP",'B');
+	timer::tick("Input_Conv","Convert",'B');
     return;
 }
-#endif
 

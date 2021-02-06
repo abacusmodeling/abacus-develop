@@ -3,6 +3,7 @@
 // DATE : 2008-11-10
 //==========================================================
 #include "unitcell_pseudo.h"
+#include "../src_lcao/lcao_orbitals.h" // to use 'ORB' -- mohan 2021-01-30
 #include "global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
@@ -318,7 +319,6 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 		}
 	}
 
-#ifdef __FP
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 	{
 		if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
@@ -356,7 +356,6 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 			}
 		}	
 	}
-#endif
 
 	//==========================
 	// read in lattice constant

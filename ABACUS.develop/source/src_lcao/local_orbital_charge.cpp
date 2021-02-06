@@ -42,35 +42,22 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 {
     // with gamma point only
      if (this->init_DM)
-     {
-        if(BFIELD)
-        {
-            for (int is=0; is<NSPIN; is++)
-            {
-                delete[] DM_B[is];
-                delete[] DM_B_pool[is];
-            }
-            delete[] DM_B;
-            delete[] DM_B_pool;
-        }
-        else
-        {
-            for (int is=0; is<NSPIN; is++)
-            {
-                delete[] DM[is];
-                delete[] DM_pool[is];
-            }
-            delete[] DM;
-            delete[] DM_pool;
-            delete[] sender_2D_index;
-            delete[] sender_size_process;
-            delete[] sender_displacement_process;
+	 {
+		 for (int is=0; is<NSPIN; is++)
+		 {
+			 delete[] DM[is];
+			 delete[] DM_pool[is];
+		 }
+		 delete[] DM;
+		 delete[] DM_pool;
+		 delete[] sender_2D_index;
+		 delete[] sender_size_process;
+		 delete[] sender_displacement_process;
 
-            delete[] receiver_local_index;
-            delete[] receiver_size_process;
-            delete[] receiver_displacement_process;
-        }
-     }
+		 delete[] receiver_local_index;
+		 delete[] receiver_size_process;
+		 delete[] receiver_displacement_process;
+	 }
 
     // with k points
     if (this->init_DM_R)
@@ -375,71 +362,37 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
     // mohan add 2010-07-01
     if(this->init_DM)
     {
-        if(BFIELD)
-        {
-            assert(lgd_last > 0);
-            for (int is=0; is<NSPIN; is++)
-            {
-                delete[] DM_B[is];
-                delete[] DM_B_pool[is];
-            }
-            delete[] DM_B;
-            delete[] DM_B_pool;
-        }
-        else
-        {
-            assert(lgd_last > 0);
-            for (int is=0; is<NSPIN; is++)
-            {
-                delete[] DM[is];
-                delete[] DM_pool[is];
-            }
-            delete[] DM;
-            delete[] DM_pool;
-        }
-        init_DM = false;
+		assert(lgd_last > 0);
+		for (int is=0; is<NSPIN; is++)
+		{
+			delete[] DM[is];
+			delete[] DM_pool[is];
+		}
+		delete[] DM;
+		delete[] DM_pool;
+		init_DM = false;
     }
 
-     assert(lgd_now <= NLOCAL);
+    assert(lgd_now <= NLOCAL);
 
     // mohan update 2010-09-06
     if(lgd_now > 0)
     {
-        if(BFIELD)
-        {
-            this->DM_B = new complex<double> **[NSPIN];
-            this->DM_B_pool = new complex<double> *[NSPIN];
-            for(int is=0; is<NSPIN; is++)
-            {
-                this->DM_B_pool[is]=new complex<double> [lgd_now*lgd_now];
-                ZEROS(DM_B_pool[is], lgd_now*lgd_now);
-                 this->DM_B[is] = new complex<double>*[lgd_now];
+		this->DM = new double**[NSPIN];
+		this->DM_pool = new double *[NSPIN];
+		for(int is=0; is<NSPIN; is++)
+		{
+			this->DM_pool[is]=new double [lgd_now*lgd_now];
+			ZEROS(DM_pool[is], lgd_now*lgd_now);
+			this->DM[is] = new double*[lgd_now];
 
-                 for (int i=0; i<lgd_now; i++)
-                 {
-                    DM_B[is][i] = &DM_B_pool[is][i*lgd_now];
-                 }
-                 Memory::record("LocalOrbital_Charge","Density_Kernal",NSPIN*lgd_now*lgd_now,"complex<double>");
-            }
-        }
-        else
-        {
-            this->DM = new double**[NSPIN];
-            this->DM_pool = new double *[NSPIN];
-            for(int is=0; is<NSPIN; is++)
-            {
-                this->DM_pool[is]=new double [lgd_now*lgd_now];
-                ZEROS(DM_pool[is], lgd_now*lgd_now);
-                this->DM[is] = new double*[lgd_now];
-
-                for (int i=0; i<lgd_now; i++)
-                {
-                    DM[is][i] = &DM_pool[is][i*lgd_now];
-                }
-                Memory::record("LocalOrbital_Charge","Density_Kernal",NSPIN*lgd_now*lgd_now,"double");
-            }
-        }
-        this->init_DM = true;
+			for (int i=0; i<lgd_now; i++)
+			{
+				DM[is][i] = &DM_pool[is][i*lgd_now];
+			}
+			Memory::record("LocalOrbital_Charge","Density_Kernal",NSPIN*lgd_now*lgd_now,"double");
+		}
+		this->init_DM = true;
         this->lgd_last = lgd_now;
         //xiaohui add 'OUT_LEVEL', 2015-09-16
         if(OUT_LEVEL != "m") ofs_running << " allocate DM , the dimension is " << lgd_now << endl;
@@ -453,8 +406,10 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
         WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
     }
     
-    if(!BFIELD) setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
+    setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
+
     wfc_dm_2d.init();       // Peize Lin test 2019-01-16
+
     return;
 }
 
@@ -583,7 +538,7 @@ void Local_Orbital_Charge::sum_bands(void)
             
     for(int is=0; is<NSPIN; is++)
     {
-        ZEROS( chr.rho[is], pw.nrxx ); // mohan 2009-11-10
+        ZEROS( CHR.rho[is], pw.nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------
@@ -618,7 +573,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
     //BLOCK_HERE("sum_bands::before renormalize rho");  
 
-     chr.renormalize_rho();
+     CHR.renormalize_rho();
 
     timer::tick("Local_Orbital_Cha","sum_bands",'E');
      return;
@@ -1019,176 +974,135 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
     assert(NSPIN==kv.nks);
 
-    if(BFIELD)
-    {
-        for(int is=0; is<NSPIN; is++)
-        {
-            for (int i=0; i<lgd_now; i++)
-            {
-                ZEROS(this->DM_B[is][i], lgd_now);
-            }
-        }
-        for(int is=0; is<NSPIN; is++)
-        {
-            for (int i=0; i<NLOCAL; i++)
-            {
-                const int mu_local = GridT.trace_lo[i];
-                if ( mu_local >= 0)
-                {
-                    // set a pointer.
-                    complex<double> *alpha = this->DM_B[is][mu_local];
-                    for (int j=i; j<NLOCAL; j++)
-                    {
-                        const int nu_local = GridT.trace_lo[j];
-                        if ( nu_local >= 0)
-                        {
-                            for (int ib=0; ib<NBANDS; ib++)
-                            {
-                                const double wg_local = wf.wg(is, ib);
-                                if(wg_local>0)
-                                {
-                                    // dm = \sum ( wg * c[ib][mu] * c[ib][nu] )
-                                    // dm saved accordint to sub-FFT box.
-                                    alpha[nu_local] += wg_local * (conj(LOWF.WFC_GAMMA_B[is][ib][mu_local]) * LOWF.WFC_GAMMA_B[is][ib][nu_local]).real();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 #ifdef __MPI //2015-09-06, xiaohui
-    else    // Peize Lin update 2018-07-02
-    {   
-        for( int is=0; is<NSPIN; ++is )
-            for (int i=0; i<lgd_now; i++)
-                ZEROS(this->DM[is][i], lgd_now);
+	// Peize Lin update 2018-07-02
+	for( int is=0; is<NSPIN; ++is )
+		for (int i=0; i<lgd_now; i++)
+			ZEROS(this->DM[is][i], lgd_now);
 
-        int nprocs,myid;
-        //MPI_Status status;
-        MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
-        MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
+	int nprocs,myid;
+	//MPI_Status status;
+	MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
+	MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
-        vector<int> bands_local(DSIZE);
-        for (int id=0; id<DSIZE; id++)
-            bands_local[id] = (id<NBANDS%DSIZE) ? NBANDS/DSIZE+1 : NBANDS/DSIZE;
-        const int band_local = bands_local[DRANK];
-        
-        int lastband_in_proc = 0;
-        for (int id=0, count_bands=0; id<DSIZE; id++)
-        {
-            count_bands += bands_local[id];
-            if (count_bands >= NBANDS)
-            {
-                lastband_in_proc = id;
-                break;
-            }
-        }
-        
-        matrix wg_local(NSPIN,band_local);
-        for(int id=0, Total_Bands=0; id <= lastband_in_proc; ++id)
-        {
-            if(myid == id)
-                for(int is=0; is<NSPIN; is++)
-                    for (int ib=0; ib<bands_local[myid]; ib++)
-                        wg_local(is,ib) = wf.wg(is,Total_Bands+ib);
-            Total_Bands += bands_local[id];
-        }
+	vector<int> bands_local(DSIZE);
+	for (int id=0; id<DSIZE; id++)
+		bands_local[id] = (id<NBANDS%DSIZE) ? NBANDS/DSIZE+1 : NBANDS/DSIZE;
+	const int band_local = bands_local[DRANK];
 
-        for( int is=0; is<NSPIN; ++is )
-        {
-            matrix Z_wg( NLOCAL, band_local );
-            if(myid <= lastband_in_proc)
-                for(int iw=0; iw<NLOCAL; iw++)
-                    for(int ib=0; ib<bands_local[myid]; ib++)
-                        Z_wg(iw,ib) = ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
+	int lastband_in_proc = 0;
+	for (int id=0, count_bands=0; id<DSIZE; id++)
+	{
+		count_bands += bands_local[id];
+		if (count_bands >= NBANDS)
+		{
+			lastband_in_proc = id;
+			break;
+		}
+	}
 
-            const int row_col = (NLOCAL%300) ? NLOCAL/300+1 : NLOCAL/300;
-                
-            matrix Z_row;
-            matrix Z_col;
-            matrix rho_row_col;
+	matrix wg_local(NSPIN,band_local);
+	for(int id=0, Total_Bands=0; id <= lastband_in_proc; ++id)
+	{
+		if(myid == id)
+			for(int is=0; is<NSPIN; is++)
+				for (int ib=0; ib<bands_local[myid]; ib++)
+					wg_local(is,ib) = wf.wg(is,Total_Bands+ib);
+		Total_Bands += bands_local[id];
+	}
 
-            for(int row_count=0; row_count<row_col; row_count++)
-            {
-                const int row_remain = ( (row_count+1)*300 <= NLOCAL )
-                                     ? 300
-                                     : NLOCAL - row_count*300;
-                
-                Z_row.create( row_remain, band_local, false );
-                for(int i_row=0; i_row<row_remain; i_row++)
-                {
-                    const int row_index = row_count*300 + i_row;
-                    for(int ib=0; ib<band_local; ib++)
-                        Z_row(i_row,ib) = Z_wg(row_index,ib);
-                }
+	for( int is=0; is<NSPIN; ++is )
+	{
+		matrix Z_wg( NLOCAL, band_local );
+		if(myid <= lastband_in_proc)
+			for(int iw=0; iw<NLOCAL; iw++)
+				for(int ib=0; ib<bands_local[myid]; ib++)
+					Z_wg(iw,ib) = ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
 
-                for(int col_count=0; col_count<row_col; col_count++)
-                {
-                    const int col_remain = ( (col_count+1)*300 <= NLOCAL )
-                                         ? 300
-                                         : NLOCAL - col_count*300;
-                                                
-                    Z_col.create( col_remain, band_local, false );
-                    for(int i_col=0; i_col<col_remain; i_col++)
-                    {
-                        const int col_index = i_col +col_count*300;
-                        for(int ib=0; ib<band_local; ib++)
-                            Z_col(i_col,ib) = ParaO.Z_LOC[is][col_index*band_local+ib] ;
-                    }
-                    
-                    rho_row_col.create( row_remain, col_remain, false );
-                    
-                    //for(int i_row=0; i_row<row_remain; i_row++)
-                    //  for(int i_col=0; i_col<col_remain; i_col++)
-                    //      for(int ib=0; ib<band_local; ib++)
-                    //          rho_row_col(i_row,i_col) += Z_row(i_row,ib) * Z_col(i_col,ib);
-                                        
-                    LapackConnector::gemm(
-                        'N', 'T', 
-                        row_remain, col_remain, band_local,
-                        1, Z_row.c, band_local, Z_col.c, band_local,
-                        0, rho_row_col.c, col_remain);
-                    MPI_Barrier(DIAG_HPSEPS_WORLD);
-                    Parallel_Reduce::reduce_double_all( rho_row_col.c, row_remain*col_remain);
+		const int row_col = (NLOCAL%300) ? NLOCAL/300+1 : NLOCAL/300;
 
-                    if(GAMMA_ONLY_LOCAL)
-                    {
-                        for(int i_row=0; i_row<row_remain; i_row++)
-                        {
-                            const int row_index = row_count*300 + i_row;
-                            const int row_mu = GridT.trace_lo[row_index];
-                            if(row_mu<0)    continue;
-                            for(int i_col=0; i_col<col_remain; i_col++)
-                            {
-                                const int col_index = col_count*300 + i_col;
-                                const int col_nu = GridT.trace_lo[col_index];
-                                if(col_nu<0)    continue;
-                                this->DM[is][row_mu][col_nu] = rho_row_col(i_row,i_col);
-                            }
-                        }
-                    }
-                }  // end for col_count
-            }  // end for row_count
-            ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<endl;
-            int idx0=GridT.trace_lo[0];
-            int idx1=GridT.trace_lo[1];
-            if(idx0>=0)
-            {
-                ofs_running<<"DM(0,0)"<<DM[is][idx0][idx0]<<"\t";
-            }
-            if(idx0>=0 && idx1>=0)
-            {
-                ofs_running<<"DM(0,1)"<<DM[is][idx0][idx1]<<endl;
-                ofs_running<<"DM(1,0)"<<DM[is][idx1][idx0]<<"\t";
-            }
-            if(idx1>=0)
-            {
-                ofs_running<<"DM(1,1)"<<DM[is][idx1][idx1]<<endl;
-            }
-        }  // end for is    
-    }  // end if !BFIELD
+		matrix Z_row;
+		matrix Z_col;
+		matrix rho_row_col;
+
+		for(int row_count=0; row_count<row_col; row_count++)
+		{
+			const int row_remain = ( (row_count+1)*300 <= NLOCAL )
+				? 300
+				: NLOCAL - row_count*300;
+
+			Z_row.create( row_remain, band_local, false );
+			for(int i_row=0; i_row<row_remain; i_row++)
+			{
+				const int row_index = row_count*300 + i_row;
+				for(int ib=0; ib<band_local; ib++)
+					Z_row(i_row,ib) = Z_wg(row_index,ib);
+			}
+
+			for(int col_count=0; col_count<row_col; col_count++)
+			{
+				const int col_remain = ( (col_count+1)*300 <= NLOCAL )
+					? 300
+					: NLOCAL - col_count*300;
+
+				Z_col.create( col_remain, band_local, false );
+				for(int i_col=0; i_col<col_remain; i_col++)
+				{
+					const int col_index = i_col +col_count*300;
+					for(int ib=0; ib<band_local; ib++)
+						Z_col(i_col,ib) = ParaO.Z_LOC[is][col_index*band_local+ib] ;
+				}
+
+				rho_row_col.create( row_remain, col_remain, false );
+
+				//for(int i_row=0; i_row<row_remain; i_row++)
+				//  for(int i_col=0; i_col<col_remain; i_col++)
+				//      for(int ib=0; ib<band_local; ib++)
+				//          rho_row_col(i_row,i_col) += Z_row(i_row,ib) * Z_col(i_col,ib);
+
+				LapackConnector::gemm(
+						'N', 'T', 
+						row_remain, col_remain, band_local,
+						1, Z_row.c, band_local, Z_col.c, band_local,
+						0, rho_row_col.c, col_remain);
+				MPI_Barrier(DIAG_HPSEPS_WORLD);
+				Parallel_Reduce::reduce_double_all( rho_row_col.c, row_remain*col_remain);
+
+				if(GAMMA_ONLY_LOCAL)
+				{
+					for(int i_row=0; i_row<row_remain; i_row++)
+					{
+						const int row_index = row_count*300 + i_row;
+						const int row_mu = GridT.trace_lo[row_index];
+						if(row_mu<0)    continue;
+						for(int i_col=0; i_col<col_remain; i_col++)
+						{
+							const int col_index = col_count*300 + i_col;
+							const int col_nu = GridT.trace_lo[col_index];
+							if(col_nu<0)    continue;
+							this->DM[is][row_mu][col_nu] = rho_row_col(i_row,i_col);
+						}
+					}
+				}
+			}  // end for col_count
+		}  // end for row_count
+		ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<endl;
+		int idx0=GridT.trace_lo[0];
+		int idx1=GridT.trace_lo[1];
+		if(idx0>=0)
+		{
+			ofs_running<<"DM(0,0)"<<DM[is][idx0][idx0]<<"\t";
+		}
+		if(idx0>=0 && idx1>=0)
+		{
+			ofs_running<<"DM(0,1)"<<DM[is][idx0][idx1]<<endl;
+			ofs_running<<"DM(1,0)"<<DM[is][idx1][idx0]<<"\t";
+		}
+		if(idx1>=0)
+		{
+			ofs_running<<"DM(1,1)"<<DM[is][idx1][idx1]<<endl;
+		}
+	}  // end for is    
 #endif //2015-09-06, xiaohui
 #ifndef __MPI //2015-09-06, xiaohui
     else

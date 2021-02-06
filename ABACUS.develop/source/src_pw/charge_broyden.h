@@ -12,6 +12,7 @@
 //===================================
 #include "tools.h"
 #include "charge_pulay.h"
+
 class Charge_Broyden: public Charge_Pulay
 {
 	public:
@@ -21,7 +22,6 @@ class Charge_Broyden: public Charge_Pulay
     void mix_rho(double &dr2,const double &tr2_min,
                  const double &tr2,const int &iter,
                  bool &converged);// mix rho
-
 
 	private:
 
@@ -33,8 +33,6 @@ class Charge_Broyden: public Charge_Pulay
 	void generate_Zmk(const int &totstep, const int &irstep, const int &idstep, const int &is);
 	void generate_new_broyden_rho(const int &is, const int &irstep);
 
-
-
 	bool initb; // b stands for Broyden algorithms.
 	double w0;
 	double* w;
@@ -42,8 +40,6 @@ class Charge_Broyden: public Charge_Pulay
 	matrix betabar; // (dstep, dstep)
 	matrix* Zmk;
 	matrix* Zmk_old;
-
-
 };
 
 #endif

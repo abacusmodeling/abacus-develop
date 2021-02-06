@@ -3,6 +3,8 @@
 #include "ylm.h"
 #include "lcao_orbitals.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 
 // use density kernel(density matrix) to calcualte the density 
 // on real space grid.
@@ -224,7 +226,7 @@ void Grid_Integral::rho_in_small_box(void)
 			{
 				if ( this->norm1[count] < this->Rcut1 && this->norm2[count] < this->Rcut2)
 				{			
-					chr.rho[0][ ijk_index[count] ] += factor *
+					CHR.rho[0][ ijk_index[count] ] += factor *
 						Mathzone::Polynomial_Interpolation( 
 						pointer1->getPsiuniform(),				// Peize Lin update 2016-05-14
 						pointer1->getNruniform(),

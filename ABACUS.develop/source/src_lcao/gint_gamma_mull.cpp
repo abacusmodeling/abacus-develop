@@ -3,6 +3,8 @@
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_Gamma::cal_mulliken(double** mulliken)
 {
     TITLE("Gint_Gamma","cal_mulliken");
@@ -230,7 +232,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 
 							for(int is=0; is<NSPIN; is++)
 							{
-								double *rhop = chr.rho[is];
+								double *rhop = CHR.rho[is];
 								for (int ib=0; ib<pw.bxyz; ib++)
 								{
 									if(cal_flag[ib][ia1] && cal_flag[ib][ia2])

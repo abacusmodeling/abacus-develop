@@ -1,6 +1,8 @@
 #include "grid_bigcell.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Grid_BigCell::Grid_BigCell()
 {
 	this->flag_tib = false;

@@ -1,7 +1,7 @@
 //==========================================================
 // AUTHOR : mohan
 // DATE : 2009-3-29
-// Last Modify : 2009-08-28
+// Last Modify : 2021-01-04
 //==========================================================
 #ifndef BESSEL_BASIS_H
 #define BESSEL_BASIS_H
@@ -17,11 +17,20 @@ public:
 	Bessel_Basis();
 	~Bessel_Basis();
 
+	//--------------------------------------------------------------------------
 	// used for a specific group of C4 coefficients.
+	// mohan updated 2021-01-04, 
+	// mohan added a new input parameter lmax_in,
+	// if we only generate numerical atomic orbitals based on
+	// spherical Bessel functions, lmax_in = ucell.lmax
+	// However, if we want to generate spherical Bessel functions for descriptor,
+	// then the lmax_in is controlled by user.
+	//--------------------------------------------------------------------------
 	void init( 
 		const bool start_from_file,
 		const double &ecutwfc,
 		const int &ntype,
+		const int &lmax_in,
 		const double &dk = 0.01,
 		const double &dr = 0.01);
 

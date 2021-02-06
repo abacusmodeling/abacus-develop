@@ -15,6 +15,7 @@
 #include "optical.h"
 #include "klist.h"
 #include <iostream>
+#include "../src_lcao/global_fp.h"
 using namespace std;
 
 Chi0_hilbert chi0_hilbert;

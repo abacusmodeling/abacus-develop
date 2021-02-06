@@ -18,6 +18,7 @@ void Bessel_Basis::init(
 	const bool start_from_file,
 	const double &ecutwfc,
 	const int &ntype,
+	const int &lmax_in,
 	const double &dk,
 	const double &dr)
 {
@@ -42,7 +43,7 @@ void Bessel_Basis::init(
 	//------------------
 	// Making a table
 	//------------------
-	this->init_TableOne( this->smooth, this->sigma, ecutwfc, rcut, dr, Dk, ucell.lmax, Ecut_number, tolerence);
+	this->init_TableOne( this->smooth, this->sigma, ecutwfc, rcut, dr, Dk, lmax_in, Ecut_number, tolerence);
 
 //-----------------------------------------------
 // for test.
@@ -56,14 +57,14 @@ void Bessel_Basis::init(
 	if( start_from_file )	
 	{
 		// setup C4
-		this->allocate_C4(ntype, ucell.lmax, ucell.nmax, Ecut_number);
+		this->allocate_C4(ntype, lmax_in, ucell.nmax, Ecut_number);
 
 		// check tolerence
 		this->readin_C4("INPUTs", ntype, ecut, rcut, Ecut_number, tolerence);
 #ifdef __MPI
 		Parallel_Common::bcast_double( C4.ptr, C4.getSize() );
 #endif
-		this->init_Faln(ntype, ucell.lmax, ucell.nmax, Ecut_number);
+		this->init_Faln(ntype, lmax_in, ucell.nmax, Ecut_number);
 	}
 
 	return;

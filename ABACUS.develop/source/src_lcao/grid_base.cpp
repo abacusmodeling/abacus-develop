@@ -3,6 +3,8 @@
 #include "ylm.h"
 #include "lcao_orbitals.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Grid_Base::Grid_Base()
 { 
 	this->Rcut_max = new double[1];

@@ -7,10 +7,11 @@
 
 #include "tools.h"
 #include "../src_parallel/parallel_global.h"
+
 //==========================================================
-// Charge is the key value of all physics properties !
-// So write this class carefully.
+// Electron Charge Density 
 //==========================================================
+
 class Charge
 {
 public:
@@ -72,7 +73,7 @@ private:
     double sum_rho(void) const;
 
 	bool allocate_rho;
-bool allocate_rho_final_scf; //LiuXh add 20180606
+	bool allocate_rho_final_scf; //LiuXh add 20180606
 
 };
 

@@ -4,7 +4,7 @@
 
 class potential
 {
-public:
+	public:
 
     // constructor and deconstructor
     potential();
@@ -49,9 +49,10 @@ public:
     // vrs = vr + vltotK
     // vr : Hartree potential + V_xc potential .
     // vltot : From pseudopotential .
-    void set_vrs(const bool doublegrid);
+    void set_vrs(void);
 
-    void set_vrs_tddft(const bool doublegrid, const int istep);
+	// I guess this is done by Fuxiang He, -- mohan 2021-02-01
+    void set_vrs_tddft(const int istep);
 
     void print_pot(ofstream &ofs)const;
     double vr_ave(const int, const int, const double *) ;
@@ -67,13 +68,13 @@ public:
 	void write_potential(const int &is, const int &iter, const string &fn,
 		const matrix &v, const int &precision, const int &hartree = 0)const;
     void write_elecstat_pot(const string &fn, const string &fn_ave);
-private:
+	
+	private:
 
     // use fft to set vltot.
     // do once in demo.cpp
     void set_local(double *vl_pseudo)const;
     void v_h( int nspin, double &ehart, matrix &v, double** rho);
-
 
     int test;
 };

@@ -40,7 +40,9 @@ private:
 	double* x12;
 	double* x03;
 	int *iq;
-omp_lock_t lock;
+
+	// peize add, I guess, mohan add 2021-01-31
+	omp_lock_t lock;
 
 	void save_atoms_on_grid(const Grid_Technique &gt);
 	
@@ -58,16 +60,8 @@ omp_lock_t lock;
 	void gamma_vlocal(void);  
 
 
-	// for calculation of pVp under B field.
-	void gamma_vlocal_B(void);  
-
-
 	// for calculation of charege 
 	double gamma_charge(void);
-
-	
-	// for calculatin of charge under B field
-	double gamma_charge_B(void); //mohan add 2012-04-19
 
 
 	// for calculation of Mulliken charge.
@@ -76,10 +70,6 @@ omp_lock_t lock;
 
 	// for calculation of envelope functions.
 	void gamma_envelope(const double* wfc, double* rho);// mohan add 2011-07-01
-
-
-	// for calculation of < beta_i | phi_j> under magnetic B field.
-	void grid_integration_vnl(complex<double> **Tab);  
 
 
 	// for calculatin of < dphi_i | Vlocal | phi_j > for foce calculation
@@ -92,33 +82,17 @@ omp_lock_t lock;
 	void gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm);
 
 
-	// for claculation of terms under B field,
-	void gamma_S_T_AP(char type, const Grid_Technique &gt);// sun zhiyuan add 2012-01-03//
-
-
-    //To be used in cal_S_T_AP(), zhiyuan add 2011-01-06//
-    complex<double> Add_S(complex<double> phase, double psi1, double psi2);
-
-    complex<double> Add_T(complex<double> phase, double A1[3], double A2[3], 
-			double dphi1x,double dphi1y,double dphi1z,
-			double dphi2x,double dphi2y,double dphi2z, 
-			double psi1, double psi2);
-
-    complex<double> Add_AP(complex<double> phase, double Aldr3[3],double A2[3],
-			double dphi2x,double dphi2y,double dphi2z,
-			double psi1, double psi2);
-
-    complex<double> Add_AA(complex<double> phase, double AAdr,
-			double psi1, double psi2);
-
-void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize, int* colidx, 
+	void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize, int* colidx, 
         int** cal_flag, double* vldr3, double** psir_ylm, double** psir_vlbr3, 
         int* vindex, int lgd_now, double** GridVlocal);
-void cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, int* colidx,
+
+	void cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, int* colidx,
                         int** cal_flag, double ** psir_ylm, double **psir_DM,
                         double* psir_DM_pool, int* vindex);
-void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const;
-void cal_psir_ylm_rho(int size, int grid_index, double delta_r,
+
+	void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const;
+
+	void cal_psir_ylm_rho(int size, int grid_index, double delta_r,
         double** distance, double* ylma,
         int* at, int* block_index, int* block_iw, int* block_size, 
         int** cal_flag, double** psir_ylm);

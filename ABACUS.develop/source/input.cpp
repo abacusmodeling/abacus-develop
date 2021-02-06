@@ -20,7 +20,9 @@ Input::Input()
 	angle2 = new double[1];
 // all values set in Default	
 }
-Input::~Input() {
+
+Input::~Input() 
+{
 	delete[] angle1;
 	delete[] angle2;
 }
@@ -58,39 +60,10 @@ void Input::Init(const string &fn)
 // OTHRE CLASS MEMBER FUNCTION :
 // NAME : Run::make_dir( dir name : OUT.suffix)
 //----------------------------------------------------------
-    //Global_File::make_dir_out( this->suffix , this->calculation, MY_RANK, this->linear_scaling, this->out_alllog); xiaohui modify 2013-09-01, delete "this->linear_scaling"
 	Global_File::make_dir_out( this->suffix , this->calculation, MY_RANK, this->out_alllog); //xiaohui add 2013-09-01
 	Check();
 
 	time_t  time_now = time(NULL);
-	//xiaohui modify 2015-03-25
-	/*
-	ofs_running << " ------------------------------------------------------------------------------------" << endl;
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << "                                              ############                           " << endl; 
-	ofs_running << "                                            ##################                       " << endl;
-	ofs_running << "                                          #####     ####  #####                      " << endl;         
-	ofs_running << "                                         ###        ##########                       " << endl;         
-	ofs_running << "   #####            #####   ##############            ###### ###   ############      " << endl;         
-	ofs_running << "  ########       ######### #################         ####    ####  ################  " << endl;         
-	ofs_running << "  ###########  ###### #### ####       #######       ####     ####             ###### " << endl;         
-	ofs_running << "  ####   ##########   #### ####        ######      ####      ####    #########  #### " << endl;          
-	ofs_running << "  ####      ####      #### ####  ###########      ####       ####  ###########  #### " << endl;         
-	ofs_running << "  ####                #### #####  #####          ####        ####  ####         #### " << endl;         
-	ofs_running << "  ####                ####  ################    ####         ####  ################# " << endl;         
-	ofs_running << "  ####                ####    ##############   ####          ####    ############### " << endl;         
-	ofs_running << "                                             #####                                   " << endl;         
-	ofs_running << "                                          ######                                     " << endl;         
-	ofs_running << "                                        ####                                         " << endl; 
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << " ------------------------------------------------------------------------------------" << endl;
-
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << "                             WELCOME TO MESIA                                        " << endl;
-	ofs_running << "                                                                                     " << endl;
-    	ofs_running << "   'Massive Electronic simulation based on Systematically Improvable Atomic bases'   " << endl; 
-	ofs_running << "                                                                                     " << endl;
-	*/
 	ofs_running << "                                                                                     " << endl;
 	ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
 	ofs_running << "                                                                                     " << endl;
@@ -101,7 +74,6 @@ void Input::Init(const string &fn)
 
 	ofs_running << setiosflags(ios::right);
                                                                                                                              
-
 
 #ifdef __MPI
 	//ofs_running << "    Version: Parallel, under ALPHA test" << endl;
@@ -145,16 +117,16 @@ void Input::Default(void)
     pseudo_dir = "";
     pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	wannier_card = "";
-    epm_pseudo_card = "";
     latname = "test";
     //xiaohui modify 2015-09-15, relax -> scf
     //calculation = "relax";
     calculation = "scf";
     ntype = 0;
     nbands = 0;
+	nbands_sto = 0;
 	nbands_istate = 5;
+	nche_sto = 0;
 	npool = 1;
-    epm_spin_orbital = 0;
     berry_phase = false;
 	gdir = 3;
 	towannier90 = false;
@@ -167,14 +139,6 @@ void Input::Default(void)
 	eopreg = 0.1;
 	eamp = 0.001; // (a.u. = 51.44 * 10^10 V/m )
 
-	bfield = 0;
-	bfield_teslax = 0.0;
-	bfield_teslay = 0.0;
-	bfield_teslaz = 0.0;
-	bfield_gauge_x = 0.0;
-	bfield_gauge_y = 0.0;
-	bfield_gauge_z = 0.0;
-	
 	opt_epsilon2 = false;//mohan add 2010-03-24
 	opt_nbands = 0;
     lda_plus_u = false;
@@ -252,10 +216,8 @@ void Input::Default(void)
 	t_in_h = 1;
 	vl_in_h = 1;
 	vnl_in_h = 1;
-	zeeman_in_h = 1;
 	test_force = 0;
 	test_stress = 0;
-    fs_ref_energy  = 0.0;
 //----------------------------------------------------------
 // iteration
 //----------------------------------------------------------
@@ -287,6 +249,10 @@ void Input::Default(void)
 	charge_extrap = "atomic";//xiaohui modify 2015-02-01
     out_charge = 0;
 	out_dm = 0;
+
+	out_descriptor = 0; // caoyu added 2020-11-24, mohan added 2021-01-03
+	lmax_descriptor = 2; // mohan added 2021-01-03
+
     out_potential = 0;
     out_wf = false;
 	out_dos = 0;
@@ -307,12 +273,6 @@ void Input::Default(void)
 	lcao_dk = 0.01;
 	lcao_dr = 0.01;
 	lcao_rmax = 30; // (a.u.)
-//----------------------------------------------------------
-// Divide and Conqure
-//----------------------------------------------------------
-	dc_nx = 1;
-	dc_ny = 1;
-	dc_nz = 1;
 //----------------------------------------------------------
 // Selinv 
 //----------------------------------------------------------
@@ -335,27 +295,27 @@ void Input::Default(void)
 	md_tstep=1; //reduec md_delt every md_tstep step.
 	md_delt=1.0;
 */
-//md and related parameters(added by zheng da ye)
-        md_mdtype=1;
-        md_tauthermo=0;
-        md_taubaro=0;
-        md_dt=-1;
-        md_nresn=3;
-        md_nyosh=3;
-        md_qmass=1;
-        md_tfirst=-1;         //kelvin
-        md_tlast=md_tfirst;
-        md_dumpmdfred=1;
-        md_mdoutpath="mdoutput";
+	//md and related parameters(added by zheng da ye)
+	md_mdtype=1;
+	md_tauthermo=0;
+	md_taubaro=0;
+	md_dt=-1;
+	md_nresn=3;
+	md_nyosh=3;
+	md_qmass=1;
+	md_tfirst=-1;         //kelvin
+	md_tlast=md_tfirst;
+	md_dumpmdfred=1;
+	md_mdoutpath="mdoutput";
 	md_domsd=0;
-        md_domsdatom=0;
-        md_rstmd=0;
-        md_outputstressperiod=1;
-        md_fixtemperature=1;
-        md_ediff=1e-4;
+	md_domsdatom=0;
+	md_rstmd=0;
+	md_outputstressperiod=1;
+	md_fixtemperature=1;
+	md_ediff=1e-4;
 	md_ediffg=1e-3;
-        md_msdstartTime=1;
-//end of zhengdaye's add.
+	md_msdstartTime=1;
+	//end of zhengdaye's add.
 
 /* //----------------------------------------------------------
 // vdwD2									//Peize Lin add 2014-03-31, update 2015-09-30
@@ -396,46 +356,46 @@ void Input::Default(void)
 //-----------------------------------------------------------
 // spectrum                                                                      // pengfei Li add 2016-11-23
 //-----------------------------------------------------------
-        //epsilon=false;
-		//epsilon_choice=0;
-		spectral_type="None";
-		spectral_method=0;
-		kernel_type="rpa";
-		eels_method=0;
-		absorption_method=0;
-        system="bulk";
-        eta=0.05;
-        domega=0.01;
-        nomega=300;
-        ecut_chi=1;
-        //oband=1;
-		q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
-		q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
-        //start_q=1;
-        //interval_q=1;
-        nq=1;
-        out_epsilon=true;
-        out_chi=false;
-        out_chi0=false;
-        fermi_level=0.0;
-        coulomb_cutoff=false;
+//epsilon=false;
+//epsilon_choice=0;
+	spectral_type="None";
+	spectral_method=0;
+	kernel_type="rpa";
+	eels_method=0;
+	absorption_method=0;
+	system="bulk";
+	eta=0.05;
+	domega=0.01;
+	nomega=300;
+	ecut_chi=1;
+	//oband=1;
+	q_start[0]=0.1; q_start[1]=0.1; q_start[2]=0.1;
+	q_direct[0]=1; q_direct[1]=0; q_direct[2]=0;
+	//start_q=1;
+	//interval_q=1;
+	nq=1;
+	out_epsilon=true;
+	out_chi=false;
+	out_chi0=false;
+	fermi_level=0.0;
+	coulomb_cutoff=false;
 
-        kmesh_interpolation=false;
-        for(int i=0; i<100; i++)
-        {
-            qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
-        }
+	kmesh_interpolation=false;
+	for(int i=0; i<100; i++)
+	{
+		qcar[i][0] = 0.0; qcar[i][1] = 0.0; qcar[i][2] = 0.0;
+	}
 
-        lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
-		
-		//epsilon0 = false;
-		//intersmear = 0.01;
-		intrasmear = 0.0;
-		shift = 0.0;
-		metalcalc = false;
-		eps_degauss = 0.01;
-		
-		//epsilon0_choice = 0;
+	lcao_box[0] = 10; lcao_box[1] = 10; lcao_box[2] = 10;
+
+	//epsilon0 = false;
+	//intersmear = 0.01;
+	intrasmear = 0.0;
+	shift = 0.0;
+	metalcalc = false;
+	eps_degauss = 0.01;
+
+	//epsilon0_choice = 0;
 	//added by zhengdy-soc
 	noncolin = false;
 	lspinorb = false;
@@ -568,10 +528,6 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, wannier_card);
 		}
-        else if (strcmp("epm_pseudo_card",word) == 0 )
-        {
-            read_value(ifs, epm_pseudo_card);
-        }
         else if (strcmp("latname", word) == 0)// which material
         {
             read_value(ifs, latname);
@@ -588,33 +544,21 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, nbands);
         }
+		else if (strcmp("nbands_sto", word) == 0)//number of stochastic bands
+        {
+            read_value(ifs, nbands_sto);
+        }
         else if (strcmp("nbands_istate", word) == 0)// number of atom bands
         {
             read_value(ifs, nbands_istate);
         }
+		else if (strcmp("nche_sto", word) == 0)// Chebyshev expansion order
+        {
+            read_value(ifs, nche_sto);
+        }
         else if (strcmp("npool", word) == 0)// number of pools
         {
             read_value(ifs, npool);
-        }
-        else if (strcmp("epm_spin_orbital", word) == 0)
-        {
-            read_value(ifs, epm_spin_orbital);
-        }
-        else if (strcmp("epm_zeeman", word) == 0)
-        {
-            read_value(ifs, epm_zeeman);
-        }
-        else if (strcmp("epm_mag_field_x", word) == 0)
-        {
-            read_value(ifs, epm_mag_field_x);
-        }
-        else if (strcmp("epm_mag_field_y", word) == 0)
-        {
-            read_value(ifs, epm_mag_field_y);
-        }
-        else if (strcmp("epm_mag_field_z", word) == 0)
-        {
-            read_value(ifs, epm_mag_field_z);
         }
         else if (strcmp("berry_phase", word) == 0)// berry phase calculation
         {
@@ -655,34 +599,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("eamp", word) == 0)// electrical field amplitute
         {
             read_value(ifs, eamp);
-        }
-        else if (strcmp("bfield", word) == 0)// magnetic B field
-        {
-            read_value(ifs, bfield);
-        }
-        else if (strcmp("bfield_teslax", word) == 0)// magnetic Bx field
-        {
-            read_value(ifs, bfield_teslax);
-        }
-        else if (strcmp("bfield_teslay", word) == 0)// magnetic By field
-        {
-            read_value(ifs, bfield_teslay);
-        }
-        else if (strcmp("bfield_teslaz", word) == 0)// magnetic Bz field
-        {
-            read_value(ifs, bfield_teslaz);
-        }
-        else if (strcmp("bfield_gauge_x", word) == 0)// origin of magnetic Bz field
-        {
-            read_value(ifs, bfield_gauge_x);
-        }
-        else if (strcmp("bfield_gauge_y", word) == 0)// origin of magnetic Bz field
-        {
-            read_value(ifs, bfield_gauge_y);
-        }
-        else if (strcmp("bfield_gauge_z", word) == 0)// origin of magnetic Bz field
-        {
-            read_value(ifs, bfield_gauge_z);
         }
         else if (strcmp("opt_epsilon2", word) == 0)// optical field
         {
@@ -945,10 +861,6 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, vnl_in_h);
         }
-        else if (strcmp("zeeman_in_h", word) == 0)
-        {
-            read_value(ifs, zeeman_in_h);
-        }
         else if (strcmp("test_force", word) == 0)
         {
             read_value(ifs, test_force);
@@ -956,15 +868,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("test_stress", word) == 0)
         {
             read_value(ifs, test_stress);
-        }
-        else if (strcmp("fs_ref_energy_ev", word) == 0)
-        {
-            read_value(ifs, fs_ref_energy);
-			fs_ref_energy = fs_ref_energy / Ry_to_eV; 
-        }
-        else if (strcmp("fs_ref_energy_ry", word) == 0)
-        {
-            read_value(ifs, fs_ref_energy);
         }
 //----------------------------------------------------------
 // iteration
@@ -1065,6 +968,14 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, out_dm);
         }
+        else if (strcmp("out_descriptor", word) == 0) // caoyu added 2020-11-24, mohan modified 2021-01-03
+        {
+            read_value(ifs, out_descriptor);
+        }
+        else if (strcmp("lmax_descriptor", word) == 0)// mohan added 2021-01-03
+        {
+            read_value(ifs, lmax_descriptor);
+        }
         else if (strcmp("out_potential", word) == 0)
         {
             read_value(ifs, out_potential);
@@ -1140,19 +1051,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("lcao_rmax", word) == 0)
         {
             read_value(ifs, lcao_rmax);
-        }
-// Divide&Conqure
-        else if (strcmp("dc_nx", word) == 0)
-        {
-            read_value(ifs, dc_nx);
-        }
-        else if (strcmp("dc_ny", word) == 0)
-        {
-            read_value(ifs, dc_ny);
-        }
-        else if (strcmp("dc_nz", word) == 0)
-        {
-            read_value(ifs, dc_nz);
         }
         else if (strcmp("selinv_npole", word) == 0)
         {
@@ -1951,14 +1849,14 @@ void Input::Bcast()
     Parallel_Common::bcast_string( pseudo_type ); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
     Parallel_Common::bcast_string( kpoint_file );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_string( wannier_card );
-    Parallel_Common::bcast_string( epm_pseudo_card );
     Parallel_Common::bcast_string( latname );
     Parallel_Common::bcast_string( calculation );
     Parallel_Common::bcast_int( ntype );
     Parallel_Common::bcast_int( nbands );
+	Parallel_Common::bcast_int( nbands_sto );
     Parallel_Common::bcast_int( nbands_istate );
+	Parallel_Common::bcast_int( nche_sto );
 	Parallel_Common::bcast_int( npool );
-    Parallel_Common::bcast_int( epm_spin_orbital );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );
 	Parallel_Common::bcast_bool(towannier90);
@@ -1971,13 +1869,6 @@ void Input::Bcast()
     Parallel_Common::bcast_double( eamp );
 
 
-    Parallel_Common::bcast_int( bfield );
-    Parallel_Common::bcast_double( bfield_teslax );
-    Parallel_Common::bcast_double( bfield_teslay );
-    Parallel_Common::bcast_double( bfield_teslaz );
-    Parallel_Common::bcast_double( bfield_gauge_x );//sunzhiyuan
-    Parallel_Common::bcast_double( bfield_gauge_y );
-    Parallel_Common::bcast_double( bfield_gauge_z );
     Parallel_Common::bcast_bool( opt_epsilon2 );
     Parallel_Common::bcast_int( opt_nbands );
     Parallel_Common::bcast_bool( lda_plus_u );
@@ -2049,12 +1940,9 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( t_in_h );
 	Parallel_Common::bcast_int( vl_in_h );
 	Parallel_Common::bcast_int( vnl_in_h );
-	Parallel_Common::bcast_int( zeeman_in_h );
 
 	Parallel_Common::bcast_int( test_force );
 	Parallel_Common::bcast_int( test_stress );
-
-    Parallel_Common::bcast_double( fs_ref_energy );
 
     Parallel_Common::bcast_double( dr2 );
     Parallel_Common::bcast_int( niter );
@@ -2078,6 +1966,9 @@ void Input::Bcast()
     Parallel_Common::bcast_string( charge_extrap );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( out_charge );
     Parallel_Common::bcast_int( out_dm );
+    Parallel_Common::bcast_int( out_descriptor ); // caoyu added 2020-11-24, mohan modified 2021-01-03
+    Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
+
     Parallel_Common::bcast_int( out_potential );
     Parallel_Common::bcast_bool( out_wf );
 	Parallel_Common::bcast_int( out_dos );
@@ -2098,11 +1989,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( lcao_dk );
 	Parallel_Common::bcast_double( lcao_dr );
 	Parallel_Common::bcast_double( lcao_rmax );
-
-	// mohan add 2011-06-12
-	Parallel_Common::bcast_int( dc_nx );
-	Parallel_Common::bcast_int( dc_ny );
-	Parallel_Common::bcast_int( dc_nz );
 
 	// mohan add 2011-09-28
 	Parallel_Common::bcast_int( selinv_npole);
@@ -3016,15 +2902,13 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"pseudo_type",global_pseudo_type,"the type pseudo files"); // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	OUTP(ofs,"dft_functional",dft_functional,"exchange correlation functional"); // xiaohui add 2015-03-24
 //	OUTP(ofs,"wannier_card",wannier_card,"not used now");
-#ifdef __EPM
-	OUTP(ofs,"epm_pseudo_card",epm_pseudo_card,"name of empirical pseudo");
-	OUTP(ofs,"epm_spin_orbital",epm_spin_orbital,"spin orbital in emprical pseudo");
-#endif
 	OUTP(ofs,"calculation",calculation,"test; scf; relax; nscf; ienvelope; istate;");
 	OUTP(ofs,"ntype",ntype,"atom species number");
 	OUTP(ofs,"nspin",nspin,"1: single spin; 2: up and down spin; 4: noncollinear spin");
 	OUTP(ofs,"nbands",nbands,"number of bands");
+	OUTP(ofs,"nbands_sto",nbands_sto,"number of stochastic bands");
 	OUTP(ofs,"nbands_istate",nbands_istate,"number of bands around Fermi level for istate calulation");
+	OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
         //OUTP(ofs,"lmax1",lmax1,"lmax");
@@ -3088,6 +2972,8 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"move_method",ion_dynamics,"bfgs; sd; cg; cg_bfgs;"); //pengfei add 2013-08-15
 	OUTP(ofs,"out_level",out_level,"ie(for electrons); i(for ions);");
 	OUTP(ofs,"out_dm",out_dm,">0 output density matrix");
+	OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");//caoyu added 2020-11-24, mohan added 2021-01-03
+	OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");//caoyu added 2020-11-24, mohan added 2021-01-03
 
 	ofs << "\n#Parameters (4.LCAO)" << endl;
 	//OUTP(ofs,"local_basis",local_basis,"0:PW; 1:LO in pw; 4:LCAO"); xiaohui modify 2013-09-01
@@ -3193,31 +3079,18 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"eamp",eamp,"amplitute of the efield, unit is a.u.");
 	OUTP(ofs,"eamp_v",eamp*51.44,"amplitute of the efield, unit is V/A");
 
-	ofs << "\n#Parameters (12.Bfield)" << endl;
-	OUTP(ofs,"bfield",bfield,"add magnetic field");
-	OUTP(ofs,"bfield_teslax",bfield_teslax,"magnetic field strength");
-	OUTP(ofs,"bfield_teslay",bfield_teslay,"magnetic field strength");
-	OUTP(ofs,"bfield_teslaz",bfield_teslaz,"magnetic field strength");
-	OUTP(ofs,"bfield_gauge_x",bfield_gauge_x,"magnetic field gauge origin");
-	OUTP(ofs,"bfield_gauge_y",bfield_gauge_y,"magnetic field gauge origin");
-	OUTP(ofs,"bfield_gauge_z",bfield_gauge_z,"magnetic field gauge origin");
-
-	ofs << "\n#Parameters (13.Test)" << endl;
+	ofs << "\n#Parameters (12.Test)" << endl;
 	OUTP(ofs,"out_alllog",out_alllog,"output information for each processor, when parallel");
 	OUTP(ofs,"nurse", nurse,"for coders");
 	OUTP(ofs,"colour", colour,"for coders, make their live colourful");
 	OUTP(ofs,"t_in_h", t_in_h,"calculate the kinetic energy or not");
 	OUTP(ofs,"vl_in_h", vl_in_h,"calculate the local potential or not");
 	OUTP(ofs,"vnl_in_h", vnl_in_h,"calculate the nonlocal potential or not");
-	OUTP(ofs,"zeeman_in_h", zeeman_in_h,"calculate the zeeman term or not");
 	OUTP(ofs,"test_force", test_force, "test the force");
 	OUTP(ofs,"test_stress", test_stress, "test the force");
 	
-#ifdef __EPM_
-	OUTP(ofs,"fs_ref_energy",fs_ref_energy);
-#endif	
 
-	ofs << "\n#Parameters (14.Other Methods)" << endl;
+	ofs << "\n#Parameters (13.Other Methods)" << endl;
 	OUTP(ofs,"mlwf_flag",mlwf_flag,"turn MLWF on or off");
 	OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
 	OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
@@ -3237,7 +3110,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"vdwD2_radius_unit",vdwD2_radius_unit,"unit of radius cutoff for periodic structure");	
 	ofs << setw(20) << "vdwD2_period" << vdwD2_period.x << " " << vdwD2_period.y << " " << vdwD2_period.z<< " #periods of periodic structure" << endl; */
 	
-	ofs << "\n#Parameters (15.VdW Correction)" << endl;								
+	ofs << "\n#Parameters (14.VdW Correction)" << endl;								
 //jiyy add 2019-08-04
 	OUTP(ofs,"vdw_method",vdw_method,"the method of calculating vdw (none ; d2 ; d3_0 ; d3_bj");
 	OUTP(ofs,"vdw_s6",vdw_s6,"scale parameter of d2/d3_0/d3_bj");
@@ -3258,7 +3131,7 @@ void Input::Print(const string &fn)const
 	ofs << setw(20) << "vdw_period" << vdw_period.x << " " << vdw_period.y << " " << vdw_period.z<< " #periods of periodic structure" << endl;
 	
 	
-	ofs << "\n#Parameters (16.spectrum)" << endl;              // pengfei Li add 2016-11-23
+	ofs << "\n#Parameters (15.spectrum)" << endl;              // pengfei Li add 2016-11-23
 	//OUTP(ofs,"epsilon",epsilon,"calculate epsilon or not");
 	//OUTP(ofs,"epsilon_choice",epsilon_choice,"0: hilbert_transform method; 1: standard method");
 	OUTP(ofs,"spectral_type",spectral_type,"the type of the calculated spectrum");

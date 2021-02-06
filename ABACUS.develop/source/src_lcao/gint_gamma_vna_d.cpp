@@ -3,6 +3,8 @@
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_Gamma::cal_vna_d(const Grid_Technique &gt, const double* vrs1,
 const char &matrix_type)
 {
@@ -436,17 +438,10 @@ void Gint_Gamma::gamma_vna_d(const Grid_Technique &gt, const char &matrix_type)
                 }
 			
 				// mohan update 2011-04-15	
-				if(BFIELD)
-				{
-					LM.set_HSk(i,j,complex<double>(tmp[j],0.0),matrix_type);
-				}
-				else
-				{
-					//change L to T, which is two different matrix.
-					// L : local
-					// T : T, Vnl, Vna
-                	LM.set_HSgamma(i,j,tmp[j],matrix_type);
-				}
+				//change L to T, which is two different matrix.
+				// L : local
+				// T : T, Vnl, Vna
+               	LM.set_HSgamma(i,j,tmp[j],matrix_type);
             }
             delete[] tmp;
         }

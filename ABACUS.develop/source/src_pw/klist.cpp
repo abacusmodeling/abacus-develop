@@ -122,9 +122,8 @@ void kvect::set(
     // It's very important in parallel case,
     // firstly do the mpi_k() and then
     // do set_kup_and_kdw()
-#ifndef __EPM
 	Pkpoints.kinfo(nkstot);
-#endif
+
     this->mpi_k();//2008-4-29
 
     this->set_kup_and_kdw();

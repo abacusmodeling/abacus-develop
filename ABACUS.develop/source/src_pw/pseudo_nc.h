@@ -18,7 +18,9 @@
 
 class pseudo_nc: public pseudo_vl
 {
-public:
+
+	public:
+
 	// <PP_BETA>
 	int *lll;       // lll(nbeta), angular momentum of the beta function
 	int kkbeta;		// kkbeta(nbeta), point where the beta are zero

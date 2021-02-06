@@ -26,10 +26,11 @@ chem_pot.o\
 cg_lcao.o\
 cg_precon.o\
 
-OBJS_DC=dc_driv.o\
+OBJS_DC=driver.o\
 input.o \
 input_conv.o\
-run_frag.o\
+run_pw.o\
+run_lcao.o\
 
 OBJS_PW_BASIC=functional.o \
 xc_functional.o\
@@ -66,6 +67,11 @@ soc.o\
 toWannier90.o \
 unkOverlap_pw.o \
 berryphase.o \
+sto_elec.o\
+sto_wf.o\
+sto_iter.o\
+sto_hchi.o\
+sto_che.o\
 
 OBJS_TOOLS=complexarray.o\
 complexmatrix.o \
@@ -77,6 +83,7 @@ sparsematrix.o\
 export.o\
 timer.o\
 memory.o\
+print_info.o\
 mathzone.o\
 mathzone_add1.o\
 integral.o \
@@ -120,11 +127,9 @@ gint_gamma_vl.o\
 gint_gamma_rho.o\
 gint_gamma_mull.o\
 gint_gamma_env.o \
-gint_gamma_bfield.o\
 gint_gamma_fvna.o\
 gint_gamma_vna.o\
 gint_gamma_vna_d.o\
-gint_gamma_stap.o\
 gint_k.o\
 gint_k_init.o\
 gint_k_vl.o\
@@ -154,7 +159,6 @@ istate_charge.o \
 istate_envelope.o \
 diago_lcao_matrix.o\
 evolve_lcao_matrix.o\
-bfield.o\
 ylm.o\
 force_lcao.o\
 force_lcao_gamma.o\
@@ -181,25 +185,8 @@ cal_r_overlap_R.o \
 OBJS_WANNIER=wan_global.o\
 bessel_basis.o\
 numerical_basis.o\
+numerical_descriptor.o\
 wavefunc_in_pw.o\
-
-OBJS_EPM=run_epm.o\
-potential_epm.o\
-atom_epm.o\
-unitcell_epm.o\
-so_common.o\
-so_pw.o\
-so_smallbox.o\
-fft_smallbox.o\
-eigen_common.o\
-zeeman.o\
-epm_cg.o\
-epm_fs.o\
-fs_cg.o\
-fs_dav.o\
-nscf_epm.o\
-input.o \
-main.o \
 
 OBJS_PARALLEL=parallel_global.o\
 parallel_kpoints.o\
@@ -236,6 +223,7 @@ update_input.o \
 lattice_change_methods.o \
 lattice_change_cg.o \
 lattice_change_basic.o \
+variable_cell.o\
 dftu.o\
 lscc.o\
 
@@ -254,6 +242,7 @@ inverse_matrix.o \
 energy.o \
 wavefunc.o\
 wf_io.o \
+rwstream.o\
 wf_atomic.o \
 wf_igk.o \
 use_fft.o\
@@ -266,9 +255,6 @@ symm_book.o \
 symm_other.o \
 eximport.o \
 Mulliken_Charge.o\
-
-OBJS_EXX=exx_pw.o\
-exx_div.o\
 
 #OBJS_MLWF=mlwf_kmesh.o\
 mlwf_overlap.o\
@@ -294,7 +280,7 @@ pzt2s.o\
 pdtrsm.o\
 pzhtrsm.o\
 
-PDIAG_MR=dcopy.o\
+PDIAG_MR_0=dcopy.o\
 dlae2.o\
 dlaebz.o\
 dlaev2.o\

@@ -6,6 +6,8 @@
 #include "ylm.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Gint_k::Gint_k()
 {
 	ik_now = 0;	

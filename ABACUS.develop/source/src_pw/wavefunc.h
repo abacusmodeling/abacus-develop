@@ -21,7 +21,7 @@ class wavefunc : public WF_atomic
     void init_local(void);
 #endif
 
-    bool out_wf;
+    int out_wf; //qianrui modify 2020-10-19
 
     // et    : (nks,nbnd),eigenvalues of the hamiltonian
     // wg	 : the weight of each k point and band

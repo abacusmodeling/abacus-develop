@@ -521,7 +521,7 @@ void Force_LCAO::cal_force_loc(void)
     {
         for (int ir=0; ir<pw.nrxx; ir++)
         {
-            aux[ir] += complex<double>( chr.rho[is][ir], 0.0 );
+            aux[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
         }
     }
 
@@ -708,7 +708,7 @@ void Force_LCAO::cal_force_cc(void)
 	timer::tick("Force_LCAO","cal_force_cc",'E');
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(chr.rho, en.etxc, en.vtxc, vxc);
+    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
 
     complex<double> * psiv = new complex<double> [pw.nrxx];
     ZEROS(psiv, pw.nrxx);
@@ -739,7 +739,7 @@ void Force_LCAO::cal_force_cc(void)
         if (ucell.atoms[T1].nlcc)
         {
             //call drhoc
-            chr.non_linear_core_correction(
+            CHR.non_linear_core_correction(
                 ppcell.numeric,
                 ucell.atoms[T1].msh,
                 ucell.atoms[T1].r,

@@ -7,6 +7,7 @@
 class WF_igk 
 {
 	public:
+
     WF_igk();
     ~WF_igk();
 

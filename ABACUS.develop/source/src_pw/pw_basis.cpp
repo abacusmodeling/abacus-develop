@@ -181,8 +181,6 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 	//{
 	//	ofs_running << " Turn on the cutgg function." << endl;
 	//}
-
-
 #else
 	// mohan update 2011-09-21
 	this->nbzp=nbz; //nbz shoud equal nz for single proc.
@@ -310,10 +308,10 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
 #ifdef __MPI
         this->get_MPI_GVectors();
-        //cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxxs << endl;
+        //cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxx << endl;
         //cout<<" UNIFORM GRID DIM     : "<<this->ncx<<" * "<<this->ncy<<" * "<<this->ncz << "," << this->nrxx  << endl;
 
-        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxxs,1);
+        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
 #endif
     }
@@ -345,7 +343,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
         this->get_MPI_GVectors();
 
-        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxxs,1);
+        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
 #else
         this->get_GVectors();
@@ -358,11 +356,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
     this->get_nggm(this->ngmc);
 
-#ifdef __EPM // needs in EPM because spin-orbital must use it.
-    if (EPM_SPIN_ORBITAL) this->setup_structure_factor();
-#else
     this->setup_structure_factor();
-#endif
 
 //	this->printPW("src_check/check_pw.txt");
     timer::tick("PW_Basis","gen_pw",'B');
@@ -415,12 +409,6 @@ void PW_Basis::setup_gg(void)
 
 	OUT(ofs_running,"energy cutoff for wavefunc (unit:Ry)",ecutwfc);
 
-    this->doublegrid = false;
-    if (ggwfc != ggchg)
-    {
-        doublegrid = true;
-        ofs_running << "Double grid is used."<<endl;
-    }
     return;
 }
 
@@ -480,19 +468,24 @@ void PW_Basis::setup_FFT_dimension(void)
     return;
 }
 
-#ifdef __MPI
 
+#ifdef __MPI
+// FUNCTION: 
+// set nbzp: how many planes in this processor
+// set nczp
+// set nbxx
+// set nrxx
 void PW_Basis::divide_fft_grid(void)
 {
     TITLE("PW_Basis","divide_fft_grid");
+
     //----------------------------------------------
     // set charge/potential grid : nrxx
-    // and smooth grid : nrxxs
-	// nczp: how many planes in this process.
     //----------------------------------------------
     const int remain_planes = this->nbz%NPROC_IN_POOL;
     this->nbzp = this->nbz/NPROC_IN_POOL;
-    if (RANK_IN_POOL < remain_planes)
+    
+	if (RANK_IN_POOL < remain_planes)
     {
         nbzp++;
     }
@@ -501,7 +494,7 @@ void PW_Basis::divide_fft_grid(void)
 
 	this->nbxx = nbzp*this->nbx*this->nby;
     this->nrxx = nczp*this->ncx*this->ncy;
-	this->nrxxs = this->nrxx;
+
     //=====================================
     // set nrxx_start
     //=====================================
@@ -525,7 +518,6 @@ void PW_Basis::divide_fft_grid(void)
 	if(test_pw)OUT(ofs_running,"nbzp_start",nbzp);
 	OUT(ofs_running,"nbxx",nbxx);
 	OUT(ofs_running,"nrxx",nrxx);
-	if(test_pw)OUT(ofs_running,"nrxxs",nrxxs);
 	if(test_pw)OUT(ofs_running,"nrxx_start",nrxx_start);
 	if(test_pw)OUT(ofs_running,"nbxx_start",nbxx_start);
 
@@ -627,7 +619,6 @@ void PW_Basis::get_GVectors(void)
     timer::tick("PW_Basis","get_GVectors");
 
     this->nrxx = this->ncxyz;
-    this->nrxxs = this->nxyz;
     this->ngmc=this->ngmc_g;
 
     //************************************************************

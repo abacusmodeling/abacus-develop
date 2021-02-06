@@ -3,6 +3,8 @@
 #include "lcao_orbitals.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 void Gint_Gamma::cal_force_vna(const double* vlocal_in, const Grid_Technique &gt, LCAO_Matrix &lm)
 {
 	timer::tick("Gint_Gamma","cal_force_vna",'I');

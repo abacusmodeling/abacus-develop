@@ -9,6 +9,7 @@
 
 #include "../src_pw/myfunc.h"
 #include "numerical_basis.h"
+#include "numerical_descriptor.h" // mohan added 2021-01-04
 #include "bessel_basis.h"
 //#include "../src_algorithms/spillage.h"
 //#include "../src_algorithms/mymath.h"

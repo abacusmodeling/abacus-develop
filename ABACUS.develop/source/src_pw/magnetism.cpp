@@ -20,11 +20,11 @@ void Magnetism::compute_magnetization()
         this->tot_magnetization = 0.00;
         this->abs_magnetization = 0.00;
 
-		//chr.check_ne(chr.rho[0]);
-		//chr.check_ne(chr.rho[1]);
+		//CHR.check_ne(CHR.rho[0]);
+		//CHR.check_ne(CHR.rho[1]);
         for (int ir=0; ir<pw.nrxx; ir++)
         {
-            double diff = chr.rho[0][ir] - chr.rho[1][ir];
+            double diff = CHR.rho[0][ir] - CHR.rho[1][ir];
             this->tot_magnetization += diff;
             this->abs_magnetization += abs(diff);
         }
@@ -57,9 +57,9 @@ void Magnetism::compute_magnetization()
 		this->abs_magnetization = 0.00;
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{
-			double diff = sqrt(pow(chr.rho[1][ir], 2) + pow(chr.rho[2][ir], 2) +pow(chr.rho[3][ir], 2));
+			double diff = sqrt(pow(CHR.rho[1][ir], 2) + pow(CHR.rho[2][ir], 2) +pow(CHR.rho[3][ir], 2));
  
-			for(int i=0;i<3;i++)this->tot_magnetization_nc[i] += chr.rho[i+1][ir];
+			for(int i=0;i<3;i++)this->tot_magnetization_nc[i] += CHR.rho[i+1][ir];
 			this->abs_magnetization += abs(diff);
 		}
 		Parallel_Reduce::reduce_double_pool( this->tot_magnetization_nc, 3 );

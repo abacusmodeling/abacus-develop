@@ -18,12 +18,10 @@ void Symmetry_rho::begin(const int &spin_now) const
 	if(!SYMMETRY) return;
 #ifdef __MPI
 	// parallel version
-	psymm(chr.rho[spin_now]);
+	psymm(CHR.rho[spin_now]);
 #else
-#ifndef __EPM
 	// series version.
-	symm.rho_symmetry(chr.rho[spin_now], pw.ncx, pw.ncy, pw.ncz);
-#endif
+	symm.rho_symmetry(CHR.rho[spin_now], pw.ncx, pw.ncy, pw.ncz);
 #endif
 	return;
 }
