@@ -25,8 +25,7 @@ class Stochastic_Elec: private Threshold_Elec
     void scf_stochastic(const int &istep);
 
 	private:
-
-	Stochastic_WF swf;
+    Stochastic_WF swf;
 
     void c_bands(const int &istep);
 

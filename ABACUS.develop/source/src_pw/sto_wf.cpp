@@ -20,6 +20,10 @@ void Stochastic_WF::init()
     int nrxx;
     int nx,ny,nz;
 
+    //distribute nchi for each process
+    nchip = int(nchi/NPROC_IN_POOL);
+    if(RANK_IN_POOL < nchi%NPROC_IN_POOL) ++nchip;
+
     complex<double> ui(0,1);
     
     delete[] chi0;
