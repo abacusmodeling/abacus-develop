@@ -767,7 +767,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 						{
 							for(int is=0; is<NSPIN; is++)
 							{
-								MPI_Allreduce( &loc_occup_m_tmp.at(is)(m0,m1), &loc_occup_m.at(0)(m0,m1), 1,
+								MPI_Allreduce( &loc_occup_m_tmp.at(is)(m0,m1), &loc_occup_m.at(is)(m0,m1), 1,
 												MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 							}
 							
@@ -797,7 +797,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
-									locale.at(iat).at(l).at(n).at(is)(m0,m1) = loc_occup_m.at(0)(m0,m1) + loc_occup_m.at(0)(m1,m0);
+									locale.at(iat).at(l).at(n).at(is)(m0,m1) = loc_occup_m.at(is)(m0,m1) + loc_occup_m.at(is)(m1,m0);
 								}					
 							}
 						}
