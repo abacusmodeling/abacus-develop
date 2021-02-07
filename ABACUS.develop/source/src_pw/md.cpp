@@ -9,101 +9,114 @@
 #include"../input.h"
 #include"../src_lcao/local_orbital_ions.h"
 #include "../src_lcao/sltk_atom_arrange.h" //2015-10-01, xiaohui
-md::md(int n){
-	xLogS=0; // thermostat's position
-        vLogS=0 ;// thermostat's speed
-        tauthermo = 0;  // The thermostat fluctuation period, for Al fcc at 300K ~ 1000fs
-        taubaro   = 0 ; // The barostat   fluctuation period, for Al fcc at 300K ~ 500 fs
-        Qmass      = -1;  // Inertia of extended system variable
-        dt         = -1; // Time increment (hbar/E_hartree)
-        temperature= -1;  //Temperature (in Hartree, 1 Hartree ~ 3E5 K)
-        doMSD = 1;   // compute the mean square displacement.
-        doMSDAtom = 1;        // compute the mean square displacement for each atom.
-        msdstartTime = 1;   //beyond this time, msd is going to be computed
-        diffuCoeff    = 0;
-    	nResn=3;   // Coarseness of Trotter factorization of Nose-Hoover thermostat
-        nYosh=3;  // Order of thermostat scheme corresponding with "intCoeff"
-        outputstressperiod = 1 ;// The period to output stress
-        dumpmdfreq = 1  ;       // The period to dump MD information for monitoring and restarting MD
-        fixTemperature = 1;       // The period to read in new temperature during MD run.
-        rstMD = 0  ;// 1 : restart MD, vel.restart and ion.restart files will be read
-                               // 0 : not restart from ion and vel files
-                               // -n: restart from vel.n and ion.n in directory
-                               // "md_output_path"
 
-        startStep=0 ;// the first step number of MD
-        velRescale = 0 ;// whether to rescale velocities at the first step
-    	mdoutputpath="mdDataOut";
-        step_rst=0;
-    	numIon=ucell.nat;
-	    ntype=ucell.ntype;
+md::md(int n)
+{
+	xLogS=0; // thermostat's position
+	vLogS=0 ;// thermostat's speed
+	tauthermo = 0;  // The thermostat fluctuation period, for Al fcc at 300K ~ 1000fs
+	taubaro   = 0 ; // The barostat   fluctuation period, for Al fcc at 300K ~ 500 fs
+	Qmass      = -1;  // Inertia of extended system variable
+	dt         = -1; // Time increment (hbar/E_hartree)
+	temperature= -1;  //Temperature (in Hartree, 1 Hartree ~ 3E5 K)
+	doMSD = 1;   // compute the mean square displacement.
+	doMSDAtom = 1;        // compute the mean square displacement for each atom.
+	msdstartTime = 1;   //beyond this time, msd is going to be computed
+	diffuCoeff    = 0;
+	nResn=3;   // Coarseness of Trotter factorization of Nose-Hoover thermostat
+	nYosh=3;  // Order of thermostat scheme corresponding with "intCoeff"
+	outputstressperiod = 1 ;// The period to output stress
+	dumpmdfreq = 1  ;       // The period to dump MD information for monitoring and restarting MD
+	fixTemperature = 1;       // The period to read in new temperature during MD run.
+	rstMD = 0  ;// 1 : restart MD, vel.restart and ion.restart files will be read
+	// 0 : not restart from ion and vel files
+	// -n: restart from vel.n and ion.n in directory
+	// "md_output_path"
+
+	startStep=0 ;// the first step number of MD
+	velRescale = 0 ;// whether to rescale velocities at the first step
+	mdoutputpath="mdDataOut";
+	step_rst=0;
+	numIon=ucell.nat;
+	ntype=ucell.ntype;
 };
-void md::md_allocate(){
-    	na=new int[ntype];
-        if (!MY_RANK){
-            stringstream ssc;
-            ssc << global_out_dir << "MD_OUT";
-    	    out.open(ssc.str().c_str());
-        }
-    	for(int i=0;i<ntype;i++){
-	    	na[i]=ucell.atoms[i].na;
-		} 
-		ionlatvec=ucell.latvec;
-                msd=new double[ntype];
-		vel=new Vector3<double>[numIon];
-		cartNoWrap=new Vector3<double>[numIon];
-		taudirac=new Vector3<double>[numIon];
-		allmass=new double[numIon];
-		ionmbl=new Vector3<int>[numIon];
-		force=new Vector3<double>[numIon];
-	return;	
+
+void md::md_allocate()
+{
+	na=new int[ntype];
+	if (!MY_RANK)
+	{
+		stringstream ssc;
+		ssc << global_out_dir << "MD_OUT";
+		out.open(ssc.str().c_str());
 	}
+	for(int i=0;i<ntype;i++)
+	{
+		na[i]=ucell.atoms[i].na;
+	} 
+	ionlatvec=ucell.latvec;
+	msd=new double[ntype];
+	vel=new Vector3<double>[numIon];
+	cartNoWrap=new Vector3<double>[numIon];
+	taudirac=new Vector3<double>[numIon];
+	allmass=new double[numIon];
+	ionmbl=new Vector3<int>[numIon];
+	force=new Vector3<double>[numIon];
+	return;	
+}
+
 const double md::fundamentalTime = 2.418884326505e-17;
-void md::initMD(){
+
+void md::initMD(void)
+{
+
 	mdtype=INPUT.md_mdtype;
 
+	mdenergy=en.etot/2;
 
-		mdenergy=en.etot/2;
-	    
-		Qmass=INPUT.md_qmass/6.02/9.109*1e5;
-	        dt=INPUT.md_dt/fundamentalTime/1e15;
-	        temperature=INPUT.md_tfirst/3.1577464e5;
-	        rstMD=INPUT.md_rstmd;
+	Qmass=INPUT.md_qmass/6.02/9.109*1e5;
+	dt=INPUT.md_dt/fundamentalTime/1e15;
+	temperature=INPUT.md_tfirst/3.1577464e5;
+	rstMD=INPUT.md_rstmd;
 
-		nResn=INPUT.md_nresn;
-		nYosh=INPUT.md_nyosh;
-		dumpmdfreq=INPUT.md_dumpmdfred;
-		fixTemperature=INPUT.md_fixtemperature;
-		ediff=INPUT.md_ediff;
-		ediffg=INPUT.md_ediffg;
-		doMSD=INPUT.md_domsd;
-		doMSDAtom=INPUT.md_domsdatom;
-	        mdoutputpath=INPUT.md_mdoutpath;
-                msdstartTime=INPUT.md_msdstartTime;
-           
-		if(rstMD==0){
-                     connection0();
-                     connection1();
+	nResn=INPUT.md_nresn;
+	nYosh=INPUT.md_nyosh;
+	dumpmdfreq=INPUT.md_dumpmdfred;
+	fixTemperature=INPUT.md_fixtemperature;
+	ediff=INPUT.md_ediff;
+	ediffg=INPUT.md_ediffg;
+	doMSD=INPUT.md_domsd;
+	doMSDAtom=INPUT.md_domsdatom;
+	mdoutputpath=INPUT.md_mdoutpath;
+	msdstartTime=INPUT.md_msdstartTime;
+
+	if(rstMD==0)
+	{
+		connection0();
+		connection1();
 		//A fresh new MD: Do not restart MD
-                     InitVelocity() ;
-                      // Initialize thermostat, and barostat
-                     xLogS = 0.0 ;      // position of thermostat
-                     vLogS = 0.0;        // velocity of thermostat
-		
-                }
-                else if ( rstMD>0 ){
-                     connection0();
-                     connection1();
-                      InitVelocity() ;
-			if(!RestartMD()){
-				cout<<"error in restart MD!"<<endl;
-				return;
-			}
-		        connection2();
+		InitVelocity() ;
+		// Initialize thermostat, and barostat
+		xLogS = 0.0 ;      // position of thermostat
+		vLogS = 0.0;        // velocity of thermostat
+	}
+	else if( rstMD>0 )
+	{
+		connection0();
+		connection1();
+		InitVelocity() ;
+		if(!RestartMD()){
+			cout<<"error in restart MD!"<<endl;
+			return;
 		}
-                if(Qmass==0)Qmass=dt*fundamentalTime*1e15/6.02/9.109*1e5;
+		connection2();
+	}
+	if(Qmass==0)
+	{
+		Qmass=dt*fundamentalTime*1e15/6.02/9.109*1e5;
+	}
 
-	   return;
+	return;
 }
 	
 /*void md::runMD(int step1){
@@ -112,183 +125,208 @@ void md::initMD(){
        return;
 }*///we need this form
 
-bool  md::RestartMD(){
-        int i;
-        double *vell=new double[numIon*3];
-        double *cart=new double[numIon*3];
-        double *dira=new double[numIon*3];
- if (!MY_RANK){
-        stringstream ssc;
-        ssc << global_out_dir << "Restart_md.dat";
-        ifstream file(ssc.str().c_str());
+bool md::RestartMD(void)
+{
+	int i;
+	double *vell=new double[numIon*3];
+	double *cart=new double[numIon*3];
+	double *dira=new double[numIon*3];
 
-	if(!file){
-		cout<<"please ensure whether 'Restart_md.dat' exists"<<endl;
-		exit(0);
-	}
-    if (file.good())
-    {
-        file.ignore(11, '\n');
-    }
+	if (!MY_RANK)
+	{
+		stringstream ssc;
+		ssc << global_out_dir << "Restart_md.dat";
+		ifstream file(ssc.str().c_str());
 
+		if(!file)
+		{
+			cout<<"please ensure whether 'Restart_md.dat' exists"<<endl;
+			exit(0);
+		}
+	    if (file.good())
+	    {
+	        file.ignore(11, '\n');
+	    }
 //----------------------------------------------------------
 // main parameters
 //----------------------------------------------------------
-	       file.ignore(7, '\n');
-                file>>xLogS;
-               file.get();	file.ignore(7, '\n');
-                file>>vLogS;
-               file.get();	file.ignore(23, '\n');
-                for(i = 0;i<numIon*3;i++){
-                        file>>vell[i];
-                }
-                /*file.get();	file.ignore(17, '\n');
-                for(i=0;i<numIon*3;i++){
-                        file>>cart[i];
-                }
-                file.get();	file.ignore(13, '\n');
-                for(i=0;i<numIon*3;i++){
-                        file>>dira[i];
-		}*/
-                file.get();     file.ignore(6, '\n');
-                file>>step_rst;
-           	file.close();
-           }
+		file.ignore(7, '\n');
+		file>>xLogS;
+		file.get();	file.ignore(7, '\n');
+		file>>vLogS;
+		file.get();	file.ignore(23, '\n');
+		for(i = 0;i<numIon*3;i++)
+		{
+			file>>vell[i];
+		}
+		/*file.get();	file.ignore(17, '\n');
+		  for(i=0;i<numIon*3;i++){
+		  file>>cart[i];
+		  }
+		  file.get();	file.ignore(13, '\n');
+		  for(i=0;i<numIon*3;i++){
+		  file>>dira[i];
+		  }*/
+		file.get();     
+		file.ignore(6, '\n');
+		file>>step_rst;
+		file.close();
+	}
+
 //2015-09-05, xiaohui
 #ifdef __MPI
-               MPI_Bcast(&xLogS,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-                MPI_Bcast(&vLogS,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-                 MPI_Bcast(&step_rst,1,MPI_INT,0,MPI_COMM_WORLD);
-                 MPI_Bcast(vell,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
-           //      MPI_Bcast(cart,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
-           //      MPI_Bcast(dira,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	MPI_Bcast(&xLogS,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	MPI_Bcast(&vLogS,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	MPI_Bcast(&step_rst,1,MPI_INT,0,MPI_COMM_WORLD);
+	MPI_Bcast(vell,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	//      MPI_Bcast(cart,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	//      MPI_Bcast(dira,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
-           for(i=0;i<numIon;i++){
-                vel[i].x=vell[i*3];
-                vel[i].y=vell[i*3+1];
-                vel[i].z=vell[i*3+2];
-           //     cartNoWrap[i].x=cart[i*3];
-           //     cartNoWrap[i].y=cart[i*3+1];
-           //     cartNoWrap[i].z=cart[i*3+2];
-           //     taudirac[i].x=dira[i*3];
-           //     taudirac[i].y=dira[i*3+1];
-           //     taudirac[i].z=dira[i*3+2];
-           }
+
+	for(i=0;i<numIon;i++)
+	{
+		vel[i].x=vell[i*3];
+		vel[i].y=vell[i*3+1];
+		vel[i].z=vell[i*3+2];
+		//     cartNoWrap[i].x=cart[i*3];
+		//     cartNoWrap[i].y=cart[i*3+1];
+		//     cartNoWrap[i].z=cart[i*3+2];
+		//     taudirac[i].x=dira[i*3];
+		//     taudirac[i].y=dira[i*3+1];
+		//     taudirac[i].z=dira[i*3+2];
+	}
+
 	// DEBUG
-  //int debug = 0;
-  //if (debug) {
-  //  cout<<" dump cell + ion infomation file to -> echo_md_restart.dat, for debug purpose. "<<endl;
-//	fstream debugfile;
-//	debugfile.open("echo_md_restart.dat");
-  //  debugfile<<"  "<<endl;
-    //debugfile<<"cellReal[0] = "<<a.latvec.e11<<" "<<a.latvec.e12<<" "<<a.latvec.e13<<endl;
-    //debugfile<<"cellReal[1] = "<< a.latvec.e21<<" "<<a.latvec.e22<<" "<<a.latvec.e23<<endl;
-    //debugfile<<"cellReal[2] = "<< a.latvec.e31<<" "<<a.latvec.e32<<" "<<a.latvec.e33<<endl;
-    //debugfile<<"ION FRACTIONAL COORDINATES:"<<endl;
-    //for(ii=0;ii<numIon;ii++){
-    //  debugfile<<taudirac[ii].x<<" "<<taudirac[ii].y<<" "<<taudirac[ii].z<<endl;
-    //}
-    //debugfile<<"ION VELOCITIES:"<<endl;
-    //for( ii=0;ii<ionIon;ii++){
-     // debugfile<<vel[ii].x<<" "<<vel[ii].y<<" "<<vel[ii].z<<endl;
-//	}
-  //  debugfile.close();
-  //}
-  // END DEBUG
-        if(vell!=NULL)delete []vell;
-        if(cart!=NULL)delete []cart;
-        if(dira!=NULL)delete []dira;
+	//int debug = 0;
+	//if (debug) {
+	//  cout<<" dump cell + ion infomation file to -> echo_md_restart.dat, for debug purpose. "<<endl;
+	//	fstream debugfile;
+	//	debugfile.open("echo_md_restart.dat");
+	//  debugfile<<"  "<<endl;
+	//debugfile<<"cellReal[0] = "<<a.latvec.e11<<" "<<a.latvec.e12<<" "<<a.latvec.e13<<endl;
+	//debugfile<<"cellReal[1] = "<< a.latvec.e21<<" "<<a.latvec.e22<<" "<<a.latvec.e23<<endl;
+	//debugfile<<"cellReal[2] = "<< a.latvec.e31<<" "<<a.latvec.e32<<" "<<a.latvec.e33<<endl;
+	//debugfile<<"ION FRACTIONAL COORDINATES:"<<endl;
+	//for(ii=0;ii<numIon;ii++){
+	//  debugfile<<taudirac[ii].x<<" "<<taudirac[ii].y<<" "<<taudirac[ii].z<<endl;
+	//}
+	//debugfile<<"ION VELOCITIES:"<<endl;
+	//for( ii=0;ii<ionIon;ii++){
+	// debugfile<<vel[ii].x<<" "<<vel[ii].y<<" "<<vel[ii].z<<endl;
+	//	}
+	//  debugfile.close();
+	//}
+  	// END DEBUG
+
+	if(vell!=NULL)delete []vell;
+	if(cart!=NULL)delete []cart;
+	if(dira!=NULL)delete []dira;
+
 	return true;
 }
-void md::mstout(int step){
-//this function used for outputting the information of restart file
-         bool pass;
-         pass = 0;
 
 
-         if (dumpmdfreq==1||step==1||( dumpmdfreq > 1&& step%dumpmdfreq==0 ) )
-             pass =1;
-         if (!pass) return;
+void md::mstout(int step)
+{
+	//this function used for outputting the information of restart file
+	bool pass;
+	pass = 0;
 
-        int i;
-      if(!MY_RANK){
-        stringstream ssc;
-        ssc << global_out_dir << "Restart_md.dat";
-	ofstream file(ssc.str().c_str());
-	file<<"MD_RESTART"<<endl;
-	file<<"xLogS: "<<setprecision (12)<<xLogS<<endl;
-	file<<"vLogS: "<<setprecision (12)<<vLogS<<endl;
-	file<<"ION_VELOCITIES_(a.u.): "<<endl;
-	for( i=0;i<numIon;i++){
-		file<<setprecision (12)<<vel[i].x<<" "<<setprecision (12)<<vel[i].y<<" "<<setprecision (12)<<vel[i].z<<endl;
+
+	if (dumpmdfreq==1||step==1||( dumpmdfreq > 1&& step%dumpmdfreq==0 ) )
+		pass =1;
+	if (!pass) return;
+
+	int i;
+	if(!MY_RANK)
+	{
+		stringstream ssc;
+		ssc << global_out_dir << "Restart_md.dat";
+		ofstream file(ssc.str().c_str());
+		file<<"MD_RESTART"<<endl;
+		file<<"xLogS: "<<setprecision (12)<<xLogS<<endl;
+		file<<"vLogS: "<<setprecision (12)<<vLogS<<endl;
+		file<<"ION_VELOCITIES_(a.u.): "<<endl;
+		for( i=0;i<numIon;i++)
+		{
+			file<<setprecision (12)<<vel[i].x
+			<<" "<<setprecision (12)
+			<<vel[i].y<<" "<<setprecision (12)<<vel[i].z<<endl;
+		}
+
+		/*	file<<"CARTESIAN_COORD: "<<endl;
+			for(i=0;i<numIon;i++){
+			file<<cartNoWrap[i].x<<" "<<cartNoWrap[i].y<<" "<<cartNoWrap[i].z<<endl;
+			}
+			file<<"DIRAC_COORD: "<<endl;
+			for(i=0;i<numIon;i++){
+			file<<taudirac[i].x<<" "<<taudirac[i].y<<" "<<taudirac[i].z<<endl;
+			}*/
+		file<<"step: "<<step<<endl;                
+		file.close();
 	}
-/*	file<<"CARTESIAN_COORD: "<<endl;
-	for(i=0;i<numIon;i++){
-		file<<cartNoWrap[i].x<<" "<<cartNoWrap[i].y<<" "<<cartNoWrap[i].z<<endl;
-	}
-	file<<"DIRAC_COORD: "<<endl;
-	for(i=0;i<numIon;i++){
-		file<<taudirac[i].x<<" "<<taudirac[i].y<<" "<<taudirac[i].z<<endl;
-	}*/
-        file<<"step: "<<step<<endl;                
-	file.close();
-      }
+
 	return;
 }
-double md::GetAtomKE(){
+
+double md::GetAtomKE()
+{
 //---------------------------------------------------------------------------
 // DESCRIPTION:
 //   This function calculates the classical kinetic energy of a group of atoms.
 //----------------------------------------------------------------------------
-  //!>> EXTERNAL VARIABLES <<!
-  //vel[3][size(cell%ionTable,1)]  ! Velocities of atoms
-  // ke ! kinetic energy we want.
+//!>> EXTERNAL VARIABLES <<!
+//vel[3][size(cell%ionTable,1)]  ! Velocities of atoms
+// ke ! kinetic energy we want.
 
-  //!>> INTERIOR VARIABLES <<!
-  double mass;
-  int it,ii,ion;
-  
-  //!>> INITIALIZATION <<!
-  //!>> FUNCTION BODY <<!
-  double ke = 0.0;
+//!>> INTERIOR VARIABLES <<!
+	double mass;
+	int it,ii,ion;
 
-//  WRITE(outputUnit,*) "velocities"
-  // kinetic energy = \sum_{i} 1/2*m_{i}*(vx^2+vy^2+vz^2)
-  for(ion=0;ion<numIon;ion++){
-         mass = allmass[ion];
-         ke +=   0.5 * mass * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
-//    WRITE(outputUnit,*) vel(1,ion), vel(2,ion), vel(3,ion)
-  }
-  //cout<<"in GetAtomKE KE="<< ke<<endl;
-  return ke;
+	//!>> INITIALIZATION <<!
+	//!>> FUNCTION BODY <<!
+	double ke = 0.0;
+
+	//  WRITE(outputUnit,*) "velocities"
+	// kinetic energy = \sum_{i} 1/2*m_{i}*(vx^2+vy^2+vz^2)
+	for(ion=0;ion<numIon;ion++){
+		mass = allmass[ion];
+		ke +=   0.5 * mass * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
+		//    WRITE(outputUnit,*) vel(1,ion), vel(2,ion), vel(3,ion)
+	}
+	//cout<<"in GetAtomKE KE="<< ke<<endl;
+	return ke;
 }
-void md::MakeIntCoeff(){
+
+
+void md::MakeIntCoeff()
+{
 //---------------------------------------------------------------------------
 // DESCRIPTION:
 //  Initialize the Yoshida/Suzuki coefficient
 //----------------------------------------------------------------------------
+	// nYosh ! approximation order
+	int i;
+	switch (nYosh)
+	{
+		case 1:
+			intCoeff[0] = 1.0;
+			break;
+		case 3:
+			for(i=0;i<3;i++)intCoeff[i] = 1.0/(2.0-pow(2,1/3.0));
+			intCoeff[1] = 1.0 - 2.0*intCoeff[1];
+			break;
+		case 5:
+			for(i=0;i<5;i++)intCoeff[i] = 1.0/(4.0-pow(4,1/3.0));
+			intCoeff[2] = 1.0 - 4.0*intCoeff[2];
+			break;
+		default:
+			cout<<"ERROR: NYOSH MUST BE 1, 3, or 5.  STOPPING."<<endl;
+			exit(0);
+	}
 
-  // nYosh ! approximation order
-      int i;
-	  switch (nYosh){
-	  case 1:
-      intCoeff[0] = 1.0;
-	  break;
-	  case 3:
-      for(i=0;i<3;i++)intCoeff[i] = 1.0/(2.0-pow(2,1/3.0));
-      intCoeff[1] = 1.0 - 2.0*intCoeff[1];
-	  break;
-	  case 5:
-      for(i=0;i<5;i++)intCoeff[i] = 1.0/(4.0-pow(4,1/3.0));
-      intCoeff[2] = 1.0 - 4.0*intCoeff[2];
-	  break;
-    default:
-      cout<<"ERROR: NYOSH MUST BE 1, 3, or 5.  STOPPING."<<endl;
-	  exit(0);
-  }
-
-  return;
-  }
+	return;
+}
 
 
 //  double md::InitRandomSeed(){
@@ -298,64 +336,74 @@ void md::MakeIntCoeff(){
 //----------------------------------------------------------------------------
 
   //}//don't know whether it is necessary,so I neglect it.
-void md::InitVelocity(){
-      if(!MY_RANK){ //xiaohui add 2015-09-25
-        srand(time(0));
-      int iy=rand()%21,im=rand()%11,id=rand()%21,ih=rand()%31,in=rand()%61,is=rand()%41;
-	int jy=rand()%21,jm=rand()%11,jd=rand()%21,jh=rand()%31,jn=rand()%61,js=rand()%41;
-     //    int iy=13,im=10,id=1,ih=21,in=54,is=23;
-      //  int jy=14,jm=6,jd=19,jh=4,jn=29,js=32;
-	long int i,j;
-	long int i0,i1,i2,j0,j1,j2;
-	long int a=16807,m=2147483647,q=127773,r=2836;
-	long int M;  
-	double x,y,u,v;
-	i=iy+70*(im+12*(id+31*(ih+23*(in+59*is))));				//initial the seeds
-	j=jy+70*(jm+12*(jd+31*(jh+23*(jn+59*js))));	
-	i0=a*(i%q)-r*((i-i%q)/q);
-	j0=a*(j%q)-r*((j-j%q)/q);
-	if(i0>=0)	i1=i0;  	else i1=i0+m;	
-	i0=a*(j%q)-r*((j-j%q)/q);
-	if(j0>=0)	j1=j0;  	else j1=j0+m;	
-	for(M=0;M<3*numIon;){	
-	    i0=a*(i1%q)-r*((i1-i1%q)/q);                        
-     	if(i0>=0)	i2=i0;  
-		else i2=i0+m;									
-		u=((double)i1)/((double)m);		       //first ramdon number        
-		i1=i2;
-		j0=a*(j1%q)-r*((j1-j1%q)/q);
-     	if(j0>=0)	j2=j0;  
-		else j2=j0+m;										
-		v=((double)j1)/((double)m);		        //second ramdon number
-		j1=j2;
-		x=tan(PI*(u-0.5));
-		y=1.6*v/(PI*(x*x+1.0));
-		if(y<=(1.0/sqrt(2.0*PI)*exp(-0.5*x*x))){
-			if(M<numIon) vel[M].x=x;
-			else if(M<2*numIon) vel[M-numIon].y=x;
-			else vel[M-2*numIon].z=x;
-                       // cout<<"this vel is:"<<x<<endl;
-                        M++;
+void md::InitVelocity(void)
+{
+	if(!MY_RANK)
+	{ //xiaohui add 2015-09-25
+		srand(time(0));
+		int iy=rand()%21,im=rand()%11,id=rand()%21,ih=rand()%31,in=rand()%61,is=rand()%41;
+		int jy=rand()%21,jm=rand()%11,jd=rand()%21,jh=rand()%31,jn=rand()%61,js=rand()%41;
+		//    int iy=13,im=10,id=1,ih=21,in=54,is=23;
+		//  int jy=14,jm=6,jd=19,jh=4,jn=29,js=32;
+		long int i,j;
+		long int i0,i1,i2,j0,j1,j2;
+		long int a=16807,m=2147483647,q=127773,r=2836;
+		long int M;  
+		double x,y,u,v;
+		i=iy+70*(im+12*(id+31*(ih+23*(in+59*is))));				//initial the seeds
+		j=jy+70*(jm+12*(jd+31*(jh+23*(jn+59*js))));	
+		i0=a*(i%q)-r*((i-i%q)/q);
+		j0=a*(j%q)-r*((j-j%q)/q);
+		if(i0>=0)	i1=i0;  	else i1=i0+m;	
+		i0=a*(j%q)-r*((j-j%q)/q);
+		if(j0>=0)	j1=j0;  	else j1=j0+m;	
+		for(M=0;M<3*numIon;)
+		{	
+			i0=a*(i1%q)-r*((i1-i1%q)/q);                        
+			if(i0>=0)	i2=i0;  
+			else i2=i0+m;									
+			u=((double)i1)/((double)m);		       //first ramdon number        
+			i1=i2;
+			j0=a*(j1%q)-r*((j1-j1%q)/q);
+			if(j0>=0)	j2=j0;  
+			else j2=j0+m;										
+			v=((double)j1)/((double)m);		        //second ramdon number
+			j1=j2;
+			x=tan(PI*(u-0.5));
+			y=1.6*v/(PI*(x*x+1.0));
+			if(y<=(1.0/sqrt(2.0*PI)*exp(-0.5*x*x)))
+			{
+				if(M<numIon) vel[M].x=x;
+				else if(M<2*numIon) vel[M-numIon].y=x;
+				else vel[M-2*numIon].z=x;
+				// cout<<"this vel is:"<<x<<endl;
+				M++;
+			}
 		}
-	}
-      
-        int ion;
-        for(ion=0;ion<numIon;ion++){
-                     vel[ion]/=sqrt(allmass[ion]*9.01938e-31);
-             
-        }
-        for(ion=0;ion<numIon;ion++){
-               vel[ion]*=sqrt(temperature/K_BOLTZMAN_AU * K_BOLTZMAN_SI);
-               vel[ion]*= fundamentalTime/BOHR_RADIUS_SI;
-//rescale the velocities to a.u.
-        }
-      } //xiaohui add 2 lines 2015-09-25, bcast vel
-//2015-09-25, xiaohui
+
+		int ion;
+		for(ion=0;ion<numIon;ion++)
+		{
+			vel[ion]/=sqrt(allmass[ion]*9.01938e-31);
+		}
+
+		for(ion=0;ion<numIon;ion++)
+		{
+			vel[ion]*=sqrt(temperature/K_BOLTZMAN_AU * K_BOLTZMAN_SI);
+			vel[ion]*= fundamentalTime/BOHR_RADIUS_SI;
+			//rescale the velocities to a.u.
+		}
+	} //xiaohui add 2 lines 2015-09-25, bcast vel
+
+	//2015-09-25, xiaohui
 #ifdef __MPI
-      MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	MPI_Bcast(vel,numIon*3,MPI_DOUBLE,0,MPI_COMM_WORLD);
 #endif
-        return;
+
+    return;
 }
+
+
 /*void md::InitVelocity(){
 //----------------------------------------------------------------------------
 // DESCRIPTION:
@@ -435,7 +483,10 @@ void md::InitVelocity(){
   }
 }
 */
-void md::RemoveMovementOfCenterOfMass(){
+
+
+void md::RemoveMovementOfCenterOfMass(void)
+{
 //---------------------------------------------------------------------------
 // DESCRIPTION:
 //    Compute the velocity for the center of mass, and remove it

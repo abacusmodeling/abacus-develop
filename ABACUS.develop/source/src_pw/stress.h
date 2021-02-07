@@ -4,7 +4,7 @@
 #include "tools.h"
 
 //-------------------------------------------------------------------
-// mohan note: 2021-02-07
+// mohan reconstruction note: 2021-02-07
 // the stress code needs reconstructions (by Daye Zheng)
 // 1) add explanations for each function, each variable, for 
 // main procedures, make the code readable
@@ -20,9 +20,25 @@
 // term, +U? exx? may have other stress terms.
 // 5) delete useless comments and tests, if you have a useless code,
 // please explicitly explain why you want to keep the test
+// 6) format should be beautiful! code should be readable like a 
+// note (let readers be comfortable)
 //-------------------------------------------------------------------
 
+//----------------------------------------------------------------
+// compute the stress terms in terms of the plane wave basis set
+// the stress terms include: 
+// 1) the stress from the electron kinetic energy 
+// 2) the stress from the local pseudopotentials
+// 3) the stress from the non-local pseudopotentials
+// 4) the stress from the Hartree term
+// 5) the stress from the non-linear core correction (if any)
+// 6) the strees from the exchange-correlation functional term
+// 7) the stress from the ewald term (ion-ion intraction under 
+//		periodic boundary conditions). 
+// 8) the stress from ionic contributions (for molecular dynamics)
+//----------------------------------------------------------------
 using namespace std;
+
 class Stress
 {
 	public: 
