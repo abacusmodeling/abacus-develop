@@ -13,7 +13,10 @@ Stochastic_Chebychev::Stochastic_Chebychev()
 
 Stochastic_Chebychev::~Stochastic_Chebychev()
 {
-    fftw_destroy_plan(plancoef);
+    if(initplan)
+    {
+        fftw_destroy_plan(plancoef);
+    }
     delete [] coef;
     delete [] ccoef;
 }

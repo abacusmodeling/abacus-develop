@@ -14,7 +14,10 @@ Stochastic_Hchi::Stochastic_Hchi()
 
 Stochastic_Hchi::~Stochastic_Hchi()
 {
-	fftw_destroy_plan(pf);
+	if(initplan)
+	{
+		fftw_destroy_plan(pf);
+	}
 	delete[] tmpchi1;
 	delete[] tmpchi2;
 }
