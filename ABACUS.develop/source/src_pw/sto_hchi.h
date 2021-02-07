@@ -21,7 +21,14 @@ class Stochastic_Hchi
     // constructor and deconstructor
     Stochastic_Hchi();
     ~Stochastic_Hchi();
-	void Hchi();
+	void init();
+	int nrxx;
+	int nx,ny,nz;
+	fftw_plan pf,pb;
+	bool initplan,initchi;
+	complex<double> *tmpchi1,*tmpchi2;
+	void Hchi(complex<double>* chiin, complex<double> *chiout);
+	
 	
 
 	private:
