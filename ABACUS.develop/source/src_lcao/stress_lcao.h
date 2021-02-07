@@ -2,7 +2,6 @@
 #define STRESS_LCAO_H
 
 #include "../src_pw/tools.h"
-
 #include "../src_pw/stress.h" //test
 
 class Stress_LCAO
@@ -19,18 +18,20 @@ class Stress_LCAO
 	void cal_stress_ew (void);
 	void cal_stress_scc (void);
 	void cal_stress_cc (void);
-        void cal_stress_har(void);
+	void cal_stress_har(void);
 	void cal_stress_gradcorr(void);
-	
+
 	void print_stress(const string &name, double f[][3], const bool screen, bool ry)const;
 	void printstress_total (bool ry);
 	
-	void start_stress(double overlap[][3],double tvnl_dphi[][3],double vnl_dbeta[][3],double vl_dphi[][3], const matrix& stress_vdw);
+	void start_stress(double overlap[][3], double tvnl_dphi[][3],
+		double vnl_dbeta[][3],double vl_dphi[][3], const matrix& stress_vdw);
 	
 	// total stress
 	double scs[3][3];
 
-        static double stress_invalid_threshold_ev;
+    static double stress_invalid_threshold_ev;
+
 	private:
 	
 	//each part of stress
@@ -38,17 +39,17 @@ class Stress_LCAO
 	double sigmaewa[3][3]; 
 	double sigmacc[3][3];
 	double sigmaxc[3][3];
-        double sigmahar[3][3];
-        //each part of stress
-        //only calculated in force_lcao part
-        double soverlap[3][3];
-        double stvnl_dphi[3][3];
-        double svnl_dbeta[3][3];
-        double svl_dphi[3][3];
+	double sigmahar[3][3];
+	//each part of stress
+	//only calculated in force_lcao part
+	double soverlap[3][3];
+	double stvnl_dphi[3][3];
+	double svnl_dbeta[3][3];
+	double svl_dphi[3][3];
 
-        bool allocate_flag;
+	bool allocate_flag;
 	double output_acc; // control the accuracy
-   
-        Stress str;    //test
+
+	Stress str;    //test
 };
 #endif

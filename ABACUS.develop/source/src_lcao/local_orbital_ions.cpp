@@ -52,6 +52,7 @@ void Local_Orbital_Ions::opt_ions(void)
 	// pengfei Li 2018-05-14
     if(STRESS)
     {
+		// allocate arrays related to changes of lattice vectors
         LCM.allocate();
     }
 
@@ -60,11 +61,15 @@ void Local_Orbital_Ions::opt_ions(void)
     {
         mdtype= INPUT.md_mdtype;//control md
 
-        if(mdtype==1||mdtype==2) {
+		// NVT ensemble
+        if(mdtype==1||mdtype==2) 
+		{
             MDNVT.md_allocate();
             MDNVT.initMD();
         }
-        else if(mdtype==0){
+		// NVE ensemble
+        else if(mdtype==0)
+		{
             MDNVE.md_allocate();
             MDNVE.initMD();
         }
@@ -80,23 +85,19 @@ void Local_Orbital_Ions::opt_ions(void)
         if(OUT_LEVEL=="ie" || OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
         {
             //add 2015-09-06, xiaohui
-            //cout << " -------------------------------------------" << endl;
             cout << " ---------------------------------------------------------" << endl;
             if(CALCULATION=="relax") 
             {
                 cout << " RELAX IONS : " << istep << endl;
-                //cout << " ---------------------------------------------------------" << endl;
             }
             else if(CALCULATION=="cell-relax")
             {
                 cout << " RELAX CELL : " << stress_step << endl;
                 cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                //cout << " ---------------------------------------------------------" << endl;
             }
             else if(CALCULATION=="scf")
             {
                 cout << " SELF-CONSISTENT : " << endl;
-                //cout << " ---------------------------------------------------------" << endl;
             }
             else if(CALCULATION=="md") //xiaohui add 2015-09-15
             {
@@ -104,12 +105,9 @@ void Local_Orbital_Ions::opt_ions(void)
                 {
                     cout<<" Molecular Dynamics (NVT) STEP "<< MDNVT.step_rst + istep<<endl;
                 }
-                //cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
             }
-            //cout << " -------------------------------------------" << endl;
             cout << " ---------------------------------------------------------" << endl;
 
-            //ofs_running << " -------------------------------------------" << endl;
             ofs_running << " ---------------------------------------------------------" << endl;
             if(CALCULATION=="relax")
             {
@@ -127,21 +125,6 @@ void Local_Orbital_Ions::opt_ions(void)
                 ofs_running << " SELF-CONSISTENT" << endl;
                 ofs_running << " ---------------------------------------------------------" << endl;
             }
-            //else if(CALCULATION=="md")
-            //{
-            //    ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            //}
-            //ofs_running << " -------------------------------------------" << endl;
-            //ofs_running << " ---------------------------------------------------------" << endl;
-
-            /* delete 2015-09-06, xiaohui
-            cout << " ---------------------------------------------------------" << endl;
-            cout << " RELAX IONS : " << istep<< endl;
-            cout << " ---------------------------------------------------------" << endl;
-            ofs_running << " ---------------------------------------------------------" << endl;
-            ofs_running << " RELAX IONS: " << istep<< endl;
-            ofs_running << " ---------------------------------------------------------" << endl;
-            */
         }
 
         // (1) Find adjacent atoms for each atom.
@@ -149,14 +132,11 @@ void Local_Orbital_Ions::opt_ions(void)
         atom_arrange::search( SEARCH_RADIUS );
         //DONE(ofs_running,"SEARCH ADJACENT ATOMS");
 
-        // (3) Periodic condition search
-        // for each grid.
+        // (3) Periodic condition search for each grid.
         // here 0 means GridT is not used for Vna.
         // mohan add Vna 2012-06-13
-        // because it must be consistent with 
-        // gtf in lcao_vna.
-        // here VNA means considering the radius
-        // cutoff VNA.
+        // because it must be consistent with gtf in lcao_vna.
+        // here VNA means considering the radius cutoff VNA.
         GridT.set_pbc_grid(
             pw.ncx, pw.ncy, pw.ncz,
             pw.bx, pw.by, pw.bz,
@@ -170,12 +150,11 @@ void Local_Orbital_Ions::opt_ions(void)
             // and allocate the space for H(R) and S(R).
             LNNR.cal_nnr();
             LM.allocate_HS_R(LNNR.nnr);
-        }
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            // need to first calculae lgd.
+            
+			// need to first calculae lgd.
             // using GridT.init.
             LNNR.cal_nnrg(GridT);
+
             //mohan add 2012-06-12
             //the pvnapR need nnrg.
             if(VNA>0)
@@ -251,11 +230,13 @@ void Local_Orbital_Ions::opt_ions(void)
         // (9) S, T, Vnl, Vna matrix.
         UHM.set_ion();
 
-        if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
+		// Peize Lin add 2014-04-04, update 2019-04-26
+        if(vdwd2.vdwD2)
         {
             vdwd2.energy();
         }
-		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+		// jiyy add 2019-05-18
+		else if(vdwd3.vdwD3)
         {
             vdwd3.energy();
         }
@@ -360,10 +341,22 @@ void Local_Orbital_Ions::opt_ions(void)
         //cout<<"CALCULATION:"<<CALCULATION<<endl;
         if(CALCULATION=="md")
         {  
-            if(mdtype==1||mdtype==2)   MDNVT.runnvt(istep);
-            else if(mdtype==0)  MDNVE.runNVE(istep);
-            if((mdtype==1||mdtype==2)&&(istep==NSTEP||stop))MDNVT.md_release();
-            if(mdtype==0&&(istep==NSTEP||stop))MDNVE.md_release();
+            if(mdtype==1||mdtype==2)   
+			{
+				MDNVT.runnvt(istep);
+			}
+            else if(mdtype==0)  
+			{
+				MDNVE.runNVE(istep);
+			}
+            if((mdtype==1||mdtype==2)&&(istep==NSTEP||stop))
+			{
+				MDNVT.md_release();
+			}
+            if(mdtype==0&&(istep==NSTEP||stop))
+			{
+				MDNVE.md_release();
+			}
             //xiaohui move this line 2015-09-15
             //cout<<"return to main function:"<<endl;
 
@@ -379,7 +372,10 @@ void Local_Orbital_Ions::opt_ions(void)
             pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        if(ParaO.out_hsR) this->output_HS_R(); //LiuXh add 2019-07-15
+        if(ParaO.out_hsR) 
+		{
+			this->output_HS_R(); //LiuXh add 2019-07-15
+		}
 
         time_t fstart = time(NULL);
         if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
@@ -406,7 +402,8 @@ void Local_Orbital_Ions::opt_ions(void)
                 }
             }
         }
-///*LiuXh modify, 20180626
+		
+		///*LiuXh modify, 20180626
         //if(FORCE || CALCULATION=="md" )
         if(CALCULATION=="md" )
         {
@@ -426,8 +423,6 @@ void Local_Orbital_Ions::opt_ions(void)
                 pot.init_pot( istep );
             }
         }
-//*/
-
 
 
         // need to destroy the <phi_0i | Vna | phi_Rj> matrix.
@@ -843,10 +838,8 @@ void Local_Orbital_Ions::final_scf(void)
         // and allocate the space for H(R) and S(R).
         LNNR.cal_nnr();
         LM.allocate_HS_R(LNNR.nnr);
-    }
-    if(!GAMMA_ONLY_LOCAL)
-    {
-        // need to first calculae lgd.
+        
+		// need to first calculae lgd.
         // using GridT.init.
         LNNR.cal_nnrg(GridT);
         //mohan add 2012-06-12
