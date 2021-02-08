@@ -257,6 +257,8 @@ lattice_change_cg.o \
 lattice_change_basic.o \
 variable_cell.o\
 dftu.o\
+dftu_yukawa.o\
+dftu_relax.o\
 lscc.o\
 
 OBJS_COMMON=atom_spec.o \
