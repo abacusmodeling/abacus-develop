@@ -296,16 +296,6 @@ void DFTU_RELAX::cal_force_k(vector<vector<complex<double>>> &VU)
 		}
 	}
 
-	if(MY_RANK==0)
-	{
-		ofstream of_fdftu("force_dftu.dat", ios_base::app);
-		for(int iat=0; iat<ucell.nat; iat++)
-		{
-			of_fdftu << "atom" << iat << "  force_x= " << "(" << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(0).real() << " i" << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(0).imag()
-			<< ")  force_y= " << "(" << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(1).real() << " i" << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(1).imag()
-			<< ")  force_z= " << "(" << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(2).real() << " i" << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(2).imag() << ")" << endl;								
-		}
-	}
 
 	return;
 }
@@ -397,17 +387,6 @@ void DFTU_RELAX::cal_stress_k(vector<vector<complex<double>>> &VU)
 
 			complex<double> tmp;
 			MPI_Allreduce(&stmp, &tmp, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-			
-			if(MY_RANK==0)
-			{
-				ofstream of_s("stress_test.dat", ios_base::app);
-				
-				of_s << "(" << fixed << setprecision(9) << setw(12) << tmp.real() << " i" << fixed << setprecision(9) << setw(12) << tmp.imag() << ")       ";
-	
-				of_s << endl;
-			}
-				
 						
 			count++;
 		}//end dim2
@@ -429,22 +408,6 @@ void DFTU_RELAX::cal_stress_k(vector<vector<complex<double>>> &VU)
 			this->stress_dftu.at(i).at(j) *=  ucell.lat0 / ucell.omega;
 		}
 	}
-
-	/*
-	if(MY_RANK==0)
-	{
-		ofstream of_sdftu("stress_dftu.dat", ios_base::app);
-		for(int dim1=0; dim1<3; dim1++)
-		{
-			for(int dim2=0; dim2<3; dim2++)
-			{
-				of_sdftu << fixed << setprecision(9) << setw(12) << this->stress_dftu.at(dim1).at(dim2) << "    ";
-			}
-			of_sdftu << endl;
-		}
-		of_sdftu << endl;			
-	}
-	*/
 
 	return;
 }
@@ -609,16 +572,6 @@ void DFTU_RELAX::cal_force_gamma(vector<vector<double>> &VU)
 			this->force_dftu.at(iat).at(dim) = tmp;
 		}
 
-		if(MY_RANK==0)
-		{
-			ofstream of_fdftu("force_dftu.dat");
-			for(int iat=0; iat<ucell.nat; iat++)
-			{
-				of_fdftu << "atom" << iat << "  force_x= " << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(0)
-				<< "  force_y= " << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(1) 
-				<< "  force_z= " << fixed << setprecision(9) << setw(12) << ftmp.at(iat).at(2) << endl;								
-			}
-		}	
 	}
 
 	return;
@@ -730,32 +683,6 @@ void DFTU_RELAX::cal_stress_gamma(vector<vector<double>> &VU)
 			this->stress_dftu.at(i).at(j) *=  ucell.lat0 / ucell.omega;
 		}
 	}
-
-	/*
-	if(MY_RANK==0)
-	{
-		ofstream of_fdftu("force_dftu.dat");
-		for(int iat=0; iat<ucell.nat; iat++)
-		{
-			of_fdftu << "atom" << iat << "  force_x=" << "" << fixed << setprecision(9) << setw(12) << this->force_dftu.at(iat).at(0)
-			<< "  force_y=" <<  fixed << setprecision(9) << setw(12) << this->force_dftu.at(iat).at(1) 
-			<< "  force_z=" << fixed << setprecision(9) << setw(12) << this->force_dftu.at(iat).at(2) << endl;								
-		}
-
-		if(STRESS)
-		{
-			ofstream of_sdftu("stress_dftu.dat");
-			for(int dim0=0; dim0<3; dim0++)
-			{
-				for(int dim1=0; dim1<3; dim1++)
-				{
-					of_sdftu << fixed << setprecision(9) << setw(12) << this->stress_dftu.at(dim0).at(dim1) << "     ";
-				}
-				of_sdftu << endl;
-			}
-		}
-	}
-	*/
 
 	return;
 }

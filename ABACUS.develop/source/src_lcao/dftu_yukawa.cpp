@@ -57,53 +57,8 @@ void DFTU_Yukawa::cal_yukawa_lambda()
 	
 	this->lambda = val2/val1;
 
-	double lambda1 = this->lambda;
-
-
 	//rescaling
 	this->lambda /= 1.6;
-
-	/*
-	double Nval = 0.0;
-	double ele_cor = 0.0;
-	for(int T=0; T<ucell.ntype; T++)
-	{
-		const int L = INPUT.orbital_corr[T];
-		const int N = ucell.atoms[T].l_nchi[L];
-		Nval += ucell.atoms[T].na*ucell.atoms[T].zv;
-
-		if(L==-1) continue;	
-
-		for(int I=0; I<ucell.atoms[T].na; I++)
-		{
-			const int iat = ucell.itia2iat(T, I);
-			
-			for(int n=0; n<N; n++)
-			{
-				for(int m=0; m<2*L+1; m++)
-				{					
-					for(int is=0; is<2; is++)
-					{
-						ele_cor += this->locale.at(iat).at(L).at(n).at(is)(m,m);
-					}											
-				}
-			}
-		}
-	}
-	*/
-
-	double rho_remain = (Nval-Nc)/ucell.omega;
-	double lambda2 = 2*pow(3*rho_remain/PI, (double)1.0/6.0);
-	
-	if(MY_RANK==0)
-	{
-		ofstream ofs_lambda("lambda.dat", ios_base::app);
-
-		ofs_lambda << "All valence electrons.   lambda=" << fixed << setw(8) << setprecision(4) << lambda1 << endl;
-		ofs_lambda << "Subtracting correltaed electrons from valence electrons.   lambda=" << fixed << setw(8) << setprecision(4) << lambda2 << endl;
-		ofs_lambda << endl;
-	}
-
 
 	return;
 }
@@ -260,37 +215,6 @@ void DFTU_Yukawa::cal_slater_UJ(const int istep, const int iter)
 
 		}//end L			 	
 	}// end T
-
-	if(MY_RANK==0 && Yukawa)
-	{
-		ofstream of_UJ("Yukawa_UJ.dat", ios_base::app);
-		of_UJ << "ISTEP= " << istep << "  ITER= " << iter << endl;
-		of_UJ << "Lambda= " << this->lambda << endl;
-
-		for(int T=0; T<ucell.ntype; T++)
-		{			
-			const int NL = ucell.atoms[T].nwl + 1;
-
-			for(int L=0; L<NL; L++)
-			{
-				const int N = ucell.atoms[T].l_nchi[L];
-
-				if(L>=INPUT.orbital_corr[T] && INPUT.orbital_corr[T]!=-1)
-				{
- if(L!=INPUT.orbital_corr[T]) continue;
-					for(int n=0; n<N; n++)
-					{
- if(n!=0) continue;						
-						double Ueff = (this->U_Yukawa.at(T).at(L).at(n) - this->J_Yukawa.at(T).at(L).at(n))*Ry_to_eV;
-						of_UJ << "atom type=" << T << "  L=" << L << "  chi=" << n << endl;
-						of_UJ << "U[" << n << "]=" << this->U_Yukawa.at(T).at(L).at(n)*Ry_to_eV << "    " << "J[" << n << "]=" << this->J_Yukawa.at(T).at(L).at(n)*Ry_to_eV
-						<< "    Ueff[" << n << "]=" << Ueff << endl;
-						of_UJ << endl; 
-					}
-				}
-			}
-		}
-	}
 		
 	return;
 }
