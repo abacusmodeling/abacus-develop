@@ -26,9 +26,6 @@
 #include "use_overlap_table.h"
 #include "../src_pw/charge.h"
 
-
-
-
 DFTU dftu;
 
 DFTU::DFTU(){}
