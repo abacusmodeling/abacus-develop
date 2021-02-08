@@ -19,6 +19,10 @@ Use_Hamilt_Matrix::~Use_Hamilt_Matrix()
 	}
 }
 
+//--------------------------------------------
+// In set_ion, the 'calculate_STNR_gamma' or 
+// 'calculate_STNR_k' functions are called
+//--------------------------------------------
 void Use_Hamilt_Matrix::set_ion(void)
 {
 	TITLE("Use_Hamilt_Matrix","set_ion");
@@ -52,7 +56,7 @@ void Use_Hamilt_Matrix::set_ion(void)
 			lv.dense_vna(matrix_type); 
 		}
 	}
-	else
+	else // multiple k-points
 	{
 		// calculate the 'S', 'T' and 'Vnl' matrix for k-points algorithms.
 		this->calculate_STNR_k();
@@ -138,11 +142,17 @@ void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik
 			
 			// Peize Lin add 2016-12-03
 			if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+			{
 				exx_lcao.add_Hexx(ik,1);
+			}
 			else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+			{
 				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+			}
 			else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+			{
 				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+			}
 		}
 
 		time_t time_vlocal_end = time(NULL);
@@ -152,9 +162,8 @@ void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik
 	//add T+VNL+Vl matrix.
 	LM.update_Hloc();
 
-	//@@@@@@@
+
 	//test
-	//@@@@@@@
 	if(NURSE)
 	{
 		LM.print_HSgamma('S'); // S
@@ -177,15 +186,15 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 
 	OUT(ofs_running,"gamma_only_local",GAMMA_ONLY_LOCAL);
 
-
 	// must be done after "setup_this_ion_iter"
 	// because some basic parameters should be initialized
 	// in UHM.GG.init();
 
 	LM.zeros_HSgamma('S');    	
-	this->UOM.calculate_S_no();	
-	//LM.print_HSgamma('S');
 
+	this->UOM.calculate_S_no();	
+
+	//LM.print_HSgamma('S');
 
 	//-------------------------------------
 	// test using plane wave calculations.
@@ -219,7 +228,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 	}
 	time_t time_t_end = time(NULL);
 
-//	ofs_running << " T+Vnl matrix" << endl;
+	//	ofs_running << " T+Vnl matrix" << endl;
 	//LM.print_HSgamma('T');
 
 	OUT_TIME("kinetical matrix",time_t_start, time_t_end);
@@ -227,6 +236,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 
 	return;
 }
+
 
 #include "lcao_nnr.h"
 // be called in Local_Orbital_Elec::cal_bands(). 
@@ -254,16 +264,29 @@ void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 		// in LCAO basis.
 		//--------------------------
 		LM.zeros_HSR('H', LNNR.nnr);
-		if(NSPIN!=4) this->GK.folding_vl_k(ik);
-		else this->GK.folding_vl_k_nc(ik);
+
+		if(NSPIN!=4) 
+		{
+			this->GK.folding_vl_k(ik);
+		}
+		else 
+		{
+			this->GK.folding_vl_k_nc(ik);
+		}
 
 		// Peize Lin add 2016-12-03
 		if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+		{
 			exx_lcao.add_Hexx(ik,1);
+		}
 		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+		{
 			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+		}
 		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+		{
 			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+		}
 	}
 
 

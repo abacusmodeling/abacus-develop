@@ -20,8 +20,7 @@
 // term, +U? exx? may have other stress terms.
 // 5) delete useless comments and tests, if you have a useless code,
 // please explicitly explain why you want to keep the test
-// 6) format should be beautiful! code should be readable like a 
-// note (let readers be comfortable)
+// 6) the codes should be written as clear as possibel,
 //-------------------------------------------------------------------
 
 //----------------------------------------------------------------
@@ -36,6 +35,8 @@
 // 7) the stress from the ewald term (ion-ion intraction under 
 //		periodic boundary conditions). 
 // 8) the stress from ionic contributions (for molecular dynamics)
+// 9) the stress from DFT+U 
+// 10) the stress from vdW
 //----------------------------------------------------------------
 using namespace std;
 

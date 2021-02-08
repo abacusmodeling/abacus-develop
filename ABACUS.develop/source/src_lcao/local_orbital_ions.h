@@ -15,7 +15,8 @@
 class Local_Orbital_Ions
 {
 
-public:
+	public:
+
 	Local_Orbital_Ions();
 	~Local_Orbital_Ions();
 
@@ -29,6 +30,7 @@ public:
 	mdNVE MDNVE ;
 
 	private:
+
 	Ions_Move_Methods IMM;
 
 	//bool force_stress(void);

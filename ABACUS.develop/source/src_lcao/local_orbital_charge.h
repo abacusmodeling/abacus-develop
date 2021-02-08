@@ -14,6 +14,9 @@ public:
 	Local_Orbital_Charge();
 	~Local_Orbital_Charge();
 
+	// mohan added 2021-02-08
+	void allocate_dm_wfc(const Grid_Technique &gt);
+
 	void allocate_gamma(const Grid_Technique &gt);
 	void allocate_DM_k(void);
 	void sum_bands(void);

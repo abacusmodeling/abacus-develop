@@ -87,6 +87,28 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
 */
 }
 
+
+
+void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
+{
+    TITLE("Local_Orbital_Charge","allocate_dm_wfc");
+
+	if(GAMMA_ONLY_LOCAL)
+	{
+		// here we reset the density matrix dimension.
+		this->allocate_gamma(gt);
+		LOWF.aloc_gamma_wfc(gt);
+	}
+	else
+	{
+		LOWF.allocate_k(gt);
+		this->allocate_DM_k();
+	}
+
+	return;
+}
+
+
 #include "lcao_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
 {

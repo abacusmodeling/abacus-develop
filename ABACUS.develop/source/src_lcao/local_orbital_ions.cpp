@@ -154,13 +154,6 @@ void Local_Orbital_Ions::opt_ions(void)
 			// need to first calculae lgd.
             // using GridT.init.
             LNNR.cal_nnrg(GridT);
-
-            //mohan add 2012-06-12
-            //the pvnapR need nnrg.
-            if(VNA>0)
-            {
-                UHM.GK.allocate_pvnapR();
-            }
         }
 
         // (4) set the augmented orbitals index.
@@ -171,17 +164,7 @@ void Local_Orbital_Ions::opt_ions(void)
 		
         // (5) init density kernel
         // (6) init wave functions.
-        if(GAMMA_ONLY_LOCAL)
-        {
-            // here we reset the density matrix dimension.
-            LOC.allocate_gamma(GridT);
-            LOWF.aloc_gamma_wfc(GridT);
-        }
-        else
-        {
-            LOWF.allocate_k(GridT);
-            LOC.allocate_DM_k();
-        }
+		LOC.allocate_dm_wfc(GridT);
 
         //======================================
         // do the charge extrapolation before
@@ -227,7 +210,7 @@ void Local_Orbital_Ions::opt_ions(void)
             pot.init_pot( istep-1 );
         }
 
-        // (9) S, T, Vnl, Vna matrix.
+        // (9) compute S, T, Vnl, Vna matrix.
         UHM.set_ion();
 
 		// Peize Lin add 2014-04-04, update 2019-04-26
@@ -241,8 +224,9 @@ void Local_Orbital_Ions::opt_ions(void)
             vdwd3.energy();
         }
 		
-        // (10) self consistent
-        if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
+        // (10) self consistent calculations for electronic ground state
+        if (CALCULATION=="scf" || CALCULATION=="md" 
+			|| CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
 		{
 			//Peize Lin add 2016-12-03
 			switch(exx_lcao.info.hybrid_type)
@@ -259,6 +243,7 @@ void Local_Orbital_Ions::opt_ions(void)
 					throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 			}
 			
+			// No exx
 			if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
 			{
 				LOE.scf(istep-1);
@@ -425,15 +410,6 @@ void Local_Orbital_Ions::opt_ions(void)
         }
 
 
-        // need to destroy the <phi_0i | Vna | phi_Rj> matrix.
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            //mohan add 2012-06-12
-            if(VNA>0)
-            {
-                UHM.GK.destroy_pvnapR();
-            }
-        }
 
         if(OUT_LEVEL=="i")
         {
@@ -509,82 +485,6 @@ void Local_Orbital_Ions::opt_ions(void)
 */
     }
 
-    if(stop && STRESS)
-    {
-//        final_scf();
-/*
-        FINAL_SCF = true;
-        Variable_Cell::final_calculation_after_vc();
-        atom_arrange::set_sr_NL();
-        atom_arrange::search( SEARCH_RADIUS );
-        GridT.set_pbc_grid(
-            pw.ncx, pw.ncy, pw.ncz,
-            pw.bx, pw.by, pw.bz,
-            pw.nbx, pw.nby, pw.nbz,
-            pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
-
-        // (2) If k point is used here, allocate HlocR after atom_arrange.
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            // For each atom, calculate the adjacent atoms in different cells 
-            // and allocate the space for H(R) and S(R).
-            LNNR.cal_nnr();
-            LM.allocate_HS_R(LNNR.nnr);
-        }
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            // need to first calculae lgd.
-            // using GridT.init.
-            LNNR.cal_nnrg(GridT);
-            //mohan add 2012-06-12
-            //the pvnapR need nnrg.
-            if(VNA>0)
-            {
-                UHM.GK.allocate_pvnapR();
-            }
-        }
-
-        // (4) set the augmented orbitals index.
-        // after ParaO and GridT, 
-        // this information is used to calculate
-        // the force.
-        LOWF.set_trace_aug(GridT);
-		
-        // (5) init density kernel
-        // (6) init wave functions.
-        if(GAMMA_ONLY_LOCAL)
-        {
-            // here we reset the density matrix dimension.
-            LOC.allocate_gamma(GridT);
-            LOWF.aloc_gamma_wfc(GridT);
-        }
-        else
-        {
-            LOWF.allocate_k(GridT);
-            LOC.allocate_DM_k();
-        }
-
-        UHM.set_ion();
-
-        if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
-        {
-            vdwd2.energy();
-        }
-		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
-        {
-            vdwd3.energy();
-        } 
-        LOE.scf(0);
-
-        if(CALCULATION=="scf" || CALCULATION=="relax")
-        {
-            ofs_running << "\n\n --------------------------------------------" << endl;
-            ofs_running << setprecision(16);
-            ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
-            ofs_running << " --------------------------------------------\n\n" << endl;
-        }
-*/
-    }
 
     hm.hon.clear_after_ions();
 
@@ -842,12 +742,6 @@ void Local_Orbital_Ions::final_scf(void)
 		// need to first calculae lgd.
         // using GridT.init.
         LNNR.cal_nnrg(GridT);
-        //mohan add 2012-06-12
-        //the pvnapR need nnrg.
-        if(VNA>0)
-        {
-            UHM.GK.allocate_pvnapR();
-        }
     }
 
     // (4) set the augmented orbitals index.

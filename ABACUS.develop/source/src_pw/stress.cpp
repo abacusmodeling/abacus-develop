@@ -182,7 +182,9 @@ void Stress::printstress_total (bool ry)
 
 		for(int i=0; i<3; i++)
 		{
-			ofs << "   " << sigmatot[i][0]*unit_transform << "   " << sigmatot[i][1]*unit_transform << "   " << sigmatot[i][2]*unit_transform << endl;
+			ofs << "   " << sigmatot[i][0]*unit_transform 
+			<< "   " << sigmatot[i][1]*unit_transform 
+			<< "   " << sigmatot[i][2]*unit_transform << endl;
 		}
 
 		ofs.close();
@@ -1320,7 +1322,8 @@ void Stress::stres_ewa(){
 
     double alpha=2.9;
     double upperbound;
-    do{
+    do
+	{
        alpha-=0.1;
        if(alpha==0.0)
           WARNING_QUIT("stres_ew", "optimal alpha not found");
@@ -1331,7 +1334,8 @@ void Stress::stres_ewa(){
     //G-space sum here
     //Determine if this processor contains G=0 and set the constant term 
     double sdewald; 
-    if(pw.gstart == 1){
+    if(pw.gstart == 1)
+	{
        sdewald = (TWO_PI) * e2 / 4.0 / alpha * pow(charge/ucell.omega,2);
     }
     else {

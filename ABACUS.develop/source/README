@@ -12,6 +12,8 @@ The code should be reconstructed with the following details:
 2) the inclusion of files in vdw3 should be changed.
 3) Is is necessary to include <mkl_service.h>
 4) There is a segmental fault when use ABACUS compiled with gnu-mpich
+5) solve the memory problem regarding gamma wave functions in LCAO
+6) delete VNA codes
 
 -----------------------------------------------------------------------
 Unitesets should include

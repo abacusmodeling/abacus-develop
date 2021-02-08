@@ -21,6 +21,7 @@ class Use_Hamilt_Matrix
 	
 	// used for Gamma only Hamiltonian matrix.
 	void calculate_Hgamma( const int &ik );						// Peize Lin add ik 2016-12-03
+
     void calculate_STN_R(void); //LiuXh add 2019-07-15
 
 	// used for gamma only algorithms.
@@ -41,7 +42,9 @@ class Use_Hamilt_Matrix
 
 	// used for gamma only algorithms.
 	void calculate_STNR_gamma(void);
+
 	void calculate_STNR_gamma_B(void); //mohan add 2012-04-14
+
 	void calculate_STNR_k(void);
 
 };
