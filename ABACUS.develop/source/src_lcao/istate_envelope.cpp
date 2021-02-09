@@ -77,7 +77,18 @@ void IState_Envelope::begin(void)
 			{
 				cout << " Perform envelope function for band " << ib+1 << endl;
 				ZEROS(CHR.rho[is],pw.nrxx);	
-				UHM.GG.cal_env( LOWF.WFC_GAMMA[is][ib], CHR.rho[is] );
+
+
+				//---------------------------------------------------------
+				// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+				// we need to fix this function in near future.
+				// -- mohan add 2021-02-09
+				//---------------------------------------------------------
+				WARNING_QUIT("IState_Charge::idmatrix","need to update LOWF.WFC_GAMMA");
+
+				//UHM.GG.cal_env( LOWF.WFC_GAMMA[is][ib], CHR.rho[is] );
+
+
 				CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 				stringstream ss;
 				ss << global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";

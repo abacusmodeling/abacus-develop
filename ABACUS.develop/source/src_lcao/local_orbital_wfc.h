@@ -11,8 +11,6 @@ class Local_Orbital_wfc
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
 
-	double*** WFC_GAMMA; // [NSPIN, NBANDS, NLOCAL]
-
 	// used to generate density matrix: LOC.DM_R,
 	// which is used to calculate the charge density. 
 	// which is got after the diagonalization of 
@@ -33,7 +31,6 @@ class Local_Orbital_wfc
 	int daug;
 
 	void allocate_k(const Grid_Technique &gt);
-	void aloc_gamma_wfc(const Grid_Technique &gt);
 	void set_trace_aug(const Grid_Technique &gt);
 	bool get_allocate_aug_flag(void)const{return allocate_aug_flag;}
 
@@ -42,7 +39,7 @@ class Local_Orbital_wfc
     // (1) Unit
     // (2) Orthogonal <i|S|j>= \delta{ij}
     //=========================================
-	void init_Cij(const bool change_c = 1);
+	// void init_Cij(const bool change_c = 1);
 	bool get_allocate_flag(void)const{return allocate_flag;}	
 	
 	private:
@@ -51,7 +48,6 @@ class Local_Orbital_wfc
 	bool complex_flag;
 	bool allocate_flag;
 	bool allocate_aug_flag;
-	int check_orthogonal(double *psi, double *sc, const int &is);
 
 };
 

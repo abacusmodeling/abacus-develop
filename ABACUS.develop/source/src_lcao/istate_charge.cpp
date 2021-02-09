@@ -167,8 +167,14 @@ void IState_Charge::idmatrix(const int &ib)
 					const int nu_local = GridT.trace_lo[j];
 					if ( nu_local >= 0)
 					{
+						//---------------------------------------------------------
+						// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+						// we need to fix this function in near future.
+						// -- mohan add 2021-02-09
+						//---------------------------------------------------------
+						WARNING_QUIT("IState_Charge::idmatrix","need to update LOWF.WFC_GAMMA");
 						// 2 stands for degeneracy.
-						alpha[nu_local] += 2.0 * LOWF.WFC_GAMMA[is][ib][mu_local] * LOWF.WFC_GAMMA[is][ib][nu_local];
+						//alpha[nu_local] += 2.0 * LOWF.WFC_GAMMA[is][ib][mu_local] * LOWF.WFC_GAMMA[is][ib][nu_local];
 					}
 				}
 			}

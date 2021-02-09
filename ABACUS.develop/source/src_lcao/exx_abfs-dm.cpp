@@ -109,9 +109,23 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 					for( size_t ib=0; ib!=NBANDS; ++ib )
 					{
 						if( GAMMA_ONLY_LOCAL )
-							DMk_raw[iat1][iat2][ik](iw1,iw2) += wf.wg(ik,ib) * LOWF.WFC_GAMMA[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)] * LOWF.WFC_GAMMA[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)];
+						{
+							//---------------------------------------------------------
+							// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+							// we need to fix this function in near future.
+							// -- mohan add 2021-02-09
+							//---------------------------------------------------------
+							WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update LOWF.WFC_GAMMA");
+//							DMk_raw[iat1][iat2][ik](iw1,iw2) += wf.wg(ik,ib) 
+//								* LOWF.WFC_GAMMA[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)] 
+//								* LOWF.WFC_GAMMA[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)];
+						}
 						else
-							DMk_raw[iat1][iat2][ik](iw1,iw2) += wf.wg(ik,ib) * LOWF.WFC_K[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)] * conj(LOWF.WFC_K[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)]);
+						{
+							DMk_raw[iat1][iat2][ik](iw1,iw2) += wf.wg(ik,ib) 
+								* LOWF.WFC_K[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)] 
+								* conj(LOWF.WFC_K[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)]);
+						}
 					}
 				}
 			}

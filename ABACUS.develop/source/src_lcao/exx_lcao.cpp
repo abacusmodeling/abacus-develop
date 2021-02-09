@@ -978,7 +978,15 @@ ofs_mpi.close();
 				for( size_t ib=0; ib!=NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=NLOCAL; ++iwt )
-						ofs<<LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
+					{
+						//---------------------------------------------------------
+						// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+						// we need to fix this function in near future.
+						// -- mohan add 2021-02-09
+						//---------------------------------------------------------
+						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update LOWF.WFC_GAMMA");
+						//ofs<<LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
+					}
 					ofs<<endl;
 				}
 				ofs.close();

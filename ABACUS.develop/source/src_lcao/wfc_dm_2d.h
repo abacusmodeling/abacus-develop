@@ -12,7 +12,9 @@
 
 class Wfc_Dm_2d
 {
-public:
+
+	public:
+
 	std::vector<matrix> wfc_gamma;			// wfc_gamma[is](ib,iw);
 	std::vector<ComplexMatrix> wfc_k;		// wfc_k[ik](ib,iw);
 	std::vector<matrix> dm_gamma;			// dm_gamma[is](iw1,iw2);

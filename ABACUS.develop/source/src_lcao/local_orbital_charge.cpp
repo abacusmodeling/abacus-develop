@@ -97,7 +97,6 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 	{
 		// here we reset the density matrix dimension.
 		this->allocate_gamma(gt);
-		LOWF.aloc_gamma_wfc(gt);
 	}
 	else
 	{

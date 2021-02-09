@@ -86,39 +86,39 @@ private:
 
 	bool init_finish;
 
-        complex<double> *b_core;
-        int *num_G_core;
-        int *num_G_dis;
-        complex<double> *b_summary;
-        complex<double> *b_order;
-        double *G_r_core;
-        int *num_Gvector_core;
-        int *num_Gvector_dis;
-        int *flag;
-        double *G_r;
-        double *Gvec_core;
-        double *Gvec;
-        double **cweight;
-        complex<double> **psi_r1;
-        complex<double> **psi_r2;
-        complex<double> ***b;
-        complex<double> **chi0s;
-        complex<double> **chi0_gg;
-        complex<double> **T;
-		complex<double> **kernel;
-        complex<double> **rpa;
+	complex<double> *b_core;
+	int *num_G_core;
+	int *num_G_dis;
+	complex<double> *b_summary;
+	complex<double> *b_order;
+	double *G_r_core;
+	int *num_Gvector_core;
+	int *num_Gvector_dis;
+	int *flag;
+	double *G_r;
+	double *Gvec_core;
+	double *Gvec;
+	double **cweight;
+	complex<double> **psi_r1;
+	complex<double> **psi_r2;
+	complex<double> ***b;
+	complex<double> **chi0s;
+	complex<double> **chi0_gg;
+	complex<double> **T;
+	complex<double> **kernel;
+	complex<double> **rpa;
 
-        int *flag1;
-        double **para_g;
-        complex<double> **chi0_para;
-        complex<double> **rpa1;
-        complex<double> **chi_para;
- 
-        Vector3<int> ***R; 
-        Vector3<double> ***Rcar; 
-        int ** Rmax;
-        int NR;
-        complex<double> ****overlap;
+	int *flag1;
+	double **para_g;
+	complex<double> **chi0_para;
+	complex<double> **rpa1;
+	complex<double> **chi_para;
+
+	Vector3<int> ***R; 
+	Vector3<double> ***Rcar; 
+	int ** Rmax;
+	int NR;
+	complex<double> ****overlap;
 };
 
 extern Chi0_hilbert chi0_hilbert;

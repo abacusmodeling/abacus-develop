@@ -45,15 +45,13 @@ void potential::init(const int nrxx)
     return;
 }
 
-// from PW/potinit.f90
 //----------------------------------------------------------
 //  EXPLAIN :
-//  This routine initializes the self consistent potential
-//  in the array vr
+//  Initializes the self consistent potential in the array vr
 //  if 'delta_vh=0' & 'vna=1', then 
 //  the final potential: atom Hartree + Local pp = Vna
 //  else if 'delta_vh=1' & 'vna=0', then
-//  the final potential: remain Hartree potential.
+//  the final potential: the remaining Hartree potential.
 //----------------------------------------------------------
 void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 {
@@ -113,7 +111,9 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
         //if(vna==1)return; // tmp by mohan
     }
 
-    if(istep==0)//not begin to do ion relaxation.
+	// before ion relaxation
+	// need reconstruction -- mohan add 2021-02-09
+    if(istep==0)
     {
         OUT(ofs_running,"start_pot",start_pot);
 
@@ -135,40 +135,43 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
                 if(CHR.read_rho( is, ssc.str() )) 
                 {
                     ofs_running << " Read in the charge density: " << ssc.str() << endl;
-                }
-		else if(is>0 && NSPIN==4)
-		{
-			if(PRENSPIN == 1)
-			{//read only up+down , others set to zero.
-				ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
-				for(int ir=0;ir<pw.nrxx;ir++)
-					CHR.rho[is][ir] = 0.0;
-			}
-			else if(PRENSPIN == 2)
-			{//read up and down , then rearrange them.
-				if(is==1) WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
-				if(is==2) 
-				{
-					ofs_running << " Didn't read in the charge density but would rearrange it later. "<< endl;
 				}
-				if(is==3)
+				else if(is>0 && NSPIN==4)
 				{
-					ofs_running << " rearrange charge density " << endl;
-					for(int ir=0;ir<pw.nrxx;ir++)
+					if(PRENSPIN == 1)
+					{//read only up+down , others set to zero.
+						ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
+						for(int ir=0;ir<pw.nrxx;ir++)
+							CHR.rho[is][ir] = 0.0;
+					}
+					else if(PRENSPIN == 2)
+					{//read up and down , then rearrange them.
+						if(is==1) 
+						{
+							WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
+						}
+						else if(is==2) 
+						{
+							ofs_running << " Didn't read in the charge density but would rearrange it later. "<< endl;
+						}
+						else if(is==3)
+						{
+							ofs_running << " rearrange charge density " << endl;
+							for(int ir=0;ir<pw.nrxx;ir++)
+							{
+								CHR.rho[3][ir] = CHR.rho[0][ir] - CHR.rho[1][ir];
+								CHR.rho[0][ir] = CHR.rho[0][ir] + CHR.rho[1][ir];
+								CHR.rho[1][ir] = 0.0;
+								CHR.rho[2][ir] = 0.0;
+							}
+						}
+					}
+					else
 					{
-						CHR.rho[3][ir] = CHR.rho[0][ir] - CHR.rho[1][ir];
-						CHR.rho[0][ir] = CHR.rho[0][ir] + CHR.rho[1][ir];
-						CHR.rho[1][ir] = 0.0;
-						CHR.rho[2][ir] = 0.0;
+						WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
 					}
 				}
-			}
-			else
-			{
-				WARNING_QUIT("potential::init_pot","Incomplete charge density file!");
-			}
-		}
-                else
+				else
                 {
                     ofs_running << " Start charge density from atomic charge density." << endl;
                     goto start_from_atomic;
@@ -184,7 +187,9 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 		if(restart.info_load.load_charge && !restart.info_load.load_charge_finish)
 		{
 			for(int is=0; is<NSPIN; ++is)
+			{
 				restart.load_disk("charge", is);
+			}
 			restart.info_load.load_charge_finish = true;
 		}
     }
@@ -207,7 +212,8 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     this->v_of_rho( CHR.rho, en.ehart, en.etxc, en.vtxc, vr, delta_vh, vna);
 
     //----------------------------------------------------------
-    // Define the total local potential (external+scf)
+    // Define the total local potential (external+scf) in DFT
+	// Define TDDFT potential, by Fuxiang He
     //----------------------------------------------------------
     if(vext == 0) 
 	{

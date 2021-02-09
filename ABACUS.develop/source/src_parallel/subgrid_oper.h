@@ -15,16 +15,12 @@ class SubGrid_oper
 	// calculate the total wfc
 	// occupations 
 	//---------------------------
-	void cal_totwfc();
-
 
 	//---------------------------
 	// distribute the total wfc
 	// into each proc of grid
 	// group
 	//---------------------------
-	void dis_subwfc();
-	void dis_subwfc_complex();
 
 	int* trace_lo_tot;
 	double*** totwfc;

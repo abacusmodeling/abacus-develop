@@ -477,9 +477,12 @@ void Chi0_hilbert::Chi()
 				{
 					for(int i=0; i<Rmax[iw1][iw2]; i++)
 					{
-						Rcar[iw1][iw2][i].x = ucell.latvec.e11 * R[iw1][iw2][i].x + ucell.latvec.e21 * R[iw1][iw2][i].y + ucell.latvec.e31 * R[iw1][iw2][i].z;
-						Rcar[iw1][iw2][i].y = ucell.latvec.e12 * R[iw1][iw2][i].x + ucell.latvec.e22 * R[iw1][iw2][i].y + ucell.latvec.e32 * R[iw1][iw2][i].z;
-						Rcar[iw1][iw2][i].z = ucell.latvec.e13 * R[iw1][iw2][i].x + ucell.latvec.e23 * R[iw1][iw2][i].y + ucell.latvec.e33 * R[iw1][iw2][i].z;
+						Rcar[iw1][iw2][i].x = ucell.latvec.e11 * R[iw1][iw2][i].x 
+						+ ucell.latvec.e21 * R[iw1][iw2][i].y + ucell.latvec.e31 * R[iw1][iw2][i].z;
+						Rcar[iw1][iw2][i].y = ucell.latvec.e12 * R[iw1][iw2][i].x 
+						+ ucell.latvec.e22 * R[iw1][iw2][i].y + ucell.latvec.e32 * R[iw1][iw2][i].z;
+						Rcar[iw1][iw2][i].z = ucell.latvec.e13 * R[iw1][iw2][i].x 
+						+ ucell.latvec.e23 * R[iw1][iw2][i].y + ucell.latvec.e33 * R[iw1][iw2][i].z;
 					}
 				}
 			}
@@ -1224,7 +1227,8 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		int lda =NBANDS;
 		int ldb = MR;
 		int ldc =NBANDS;
-		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(right[0]), &lda, VECTOR_TO_PTR(left[0]), &ldb, &beta,  VECTOR_TO_PTR(b_single[0]), &ldc);
+		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(right[0]), &lda, 
+			VECTOR_TO_PTR(left[0]), &ldb, &beta,  VECTOR_TO_PTR(b_single[0]), &ldc);
 		
 		for(int ib1=0; ib1<oband; ib1++)
 		{

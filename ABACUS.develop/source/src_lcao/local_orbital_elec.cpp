@@ -804,7 +804,8 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			}
 
 			// SGO: sub_grid_operation
-			SGO.cal_totwfc();
+			// mohan comment out 2021-02-09
+			// SGO.cal_totwfc();
 
 
 			//--------------------------------------
@@ -836,7 +837,8 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			MPI_Barrier(MPI_COMM_WORLD);
 #endif
 			// distribute the wave functions again.
-			SGO.dis_subwfc();
+			// delete the function -- mohan 2021-02-09
+			// SGO.dis_subwfc();
 		}//end gamma
 		// with k points
 		else

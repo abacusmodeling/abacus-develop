@@ -162,30 +162,21 @@ void Local_Orbital_Ions::opt_ions(void)
         // the force.
         LOWF.set_trace_aug(GridT);
 		
-        // (5) init density kernel
-        // (6) init wave functions.
+        // (5) init density kernel and wave functions.
 		LOC.allocate_dm_wfc(GridT);
 
         //======================================
         // do the charge extrapolation before
         // the density matrix is regenerated.
         // mohan add 2011-04-08
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // once the atom is move out of this processor,
-        // the density matrix will not map
-        // the 'moved' atom configuration,
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // because once atoms are moving out of this processor,
+        // the density matrix will not map the new atomic configuration,
         //======================================
-        // HOWEVER, I ACTUALLY FOUND THIS IS 
-        // A BUG, BECAUSE THE INDEX GridT.trace_lo
+        // THIS IS A BUG, BECAUSE THE INDEX GridT.trace_lo
         // HAS BEEN REGENERATED, SO WE NEED TO
-        // REALLOCATE THE DENSITY MATRIX FIRST,
-        // THEN WE CAN READ IN DENSITY MATRIX,
-        // AND USE DENSITY MATRIX TO DO 
-        // RHO CALCULATION.
-        // -- mohan 2013-03-31
+        // REALLOCATE DENSITY MATRIX FIRST, THEN READ IN DENSITY MATRIX,
+        // AND USE DENSITY MATRIX TO DO RHO CALCULATION.-- mohan 2013-03-31
         //======================================
-        //if(pot.extra_pot==4 && istep>1)
         if(pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
         {
             for(int is=0; is<NSPIN; is++)
@@ -197,16 +188,20 @@ void Local_Orbital_Ions::opt_ions(void)
                 LOC.read_dm(is, ssd.str() );
             }
 
+			// calculate the charge density
             if(GAMMA_ONLY_LOCAL)
             {
-                // and then construct the new density.
                 UHM.GG.cal_rho();
             }
             else
             {
                 UHM.GK.calculate_charge();	
             }
+
+			// renormalize the charge density
             CHR.renormalize_rho();
+
+			// initialize the potential
             pot.init_pot( istep-1 );
         }
 
@@ -756,7 +751,6 @@ void Local_Orbital_Ions::final_scf(void)
     {
         // here we reset the density matrix dimension.
         LOC.allocate_gamma(GridT);
-        LOWF.aloc_gamma_wfc(GridT);
     }
     else
     {

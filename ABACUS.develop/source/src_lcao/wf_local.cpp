@@ -252,7 +252,8 @@ int WF_Local::read_lowf(double **c)
 	if(error==3) return 3;
 
 	// mohan add 2012-02-15,
-	SGO.cal_totwfc();
+	// mohan comment out 2021-02-09
+	//SGO.cal_totwfc();
 
 	// distri_lowf need all processors.
 	// otherwise, read in sucessfully.
@@ -264,7 +265,8 @@ int WF_Local::read_lowf(double **c)
 	// mohan add 2012-02-15,
 	// still have bugs, but can solve it later.
 	// distribute the wave functions again.
-	SGO.dis_subwfc();
+	// mohan comment out 2021-02-09
+	// SGO.dis_subwfc();
 
     if (MY_RANK==0)
     {
