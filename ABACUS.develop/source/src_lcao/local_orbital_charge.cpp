@@ -769,11 +769,18 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                         DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
                 }
                 for(int is=0; is<NSPIN; ++is)
+				{
                     ZEROS(DM_ATOM[is], ng);
+				}
                 ZEROS(WFC_PHASE, NBANDS*nw1);
-                if(NSPIN!=4)cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
-                else cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
-
+                if(NSPIN!=4)
+				{
+					cal_DM_ATOM(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+				}
+                else 
+				{
+					cal_DM_ATOM_nc(gt, fac, RA, ca, iw1_lo, nw1, gstart, WFC_PHASE, DM_ATOM);
+				}
                 ++ca;
 
                 if(NSPIN!=4)
@@ -790,27 +797,27 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 {//zhengdy-soc
                     for(int iv=0; iv<ng; ++iv)
                     {
-                        //note: storage nondiagonal term as Re[] and Im[] respectly;
-                        this->DM_R[0][gstart+iv]=DM_ATOM[0][iv].real() + DM_ATOM[3][iv].real();
-			if(NONCOLIN){//DOMAG
-                            this->DM_R[1][gstart+iv]=DM_ATOM[1][iv].real() + DM_ATOM[2][iv].real();
-                            this->DM_R[2][gstart+iv]=DM_ATOM[1][iv].imag() - DM_ATOM[2][iv].imag();
-                            this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
-			}
-			else if(!NONCOLIN)//DOMAG_Z
-			{
-                            this->DM_R[1][gstart+iv]= 0.0;
-                            this->DM_R[1][gstart+iv]= 0.0;
-                            this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
-			}
-			else//soc with no mag 
-                        {
-                            this->DM_R[1][gstart+iv]= 0.0;
-                            this->DM_R[2][gstart+iv]= 0.0;
-                            this->DM_R[3][gstart+iv]= 0.0;
-                        }
-                    }
-                }
+						//note: storage nondiagonal term as Re[] and Im[] respectly;
+						this->DM_R[0][gstart+iv]=DM_ATOM[0][iv].real() + DM_ATOM[3][iv].real();
+						if(NONCOLIN){//DOMAG
+							this->DM_R[1][gstart+iv]=DM_ATOM[1][iv].real() + DM_ATOM[2][iv].real();
+							this->DM_R[2][gstart+iv]=DM_ATOM[1][iv].imag() - DM_ATOM[2][iv].imag();
+							this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
+						}
+						else if(!NONCOLIN)//DOMAG_Z
+						{
+							this->DM_R[1][gstart+iv]= 0.0;
+							this->DM_R[1][gstart+iv]= 0.0;
+							this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
+						}
+						else//soc with no mag 
+						{
+							this->DM_R[1][gstart+iv]= 0.0;
+							this->DM_R[2][gstart+iv]= 0.0;
+							this->DM_R[3][gstart+iv]= 0.0;
+						}
+					}
+				}
             } // if gt.in_this_processor
         }// I1
     }// T1
@@ -839,10 +846,14 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     }
 */
     for(int i=0; i<NSPIN; ++i)
+	{
         delete[] DM_ATOM[i];
+	}
     delete[] DM_ATOM;
     delete[] WFC_PHASE;
+
     RA.delete_grid();//xiaohui add 2015-02-04
+
     timer::tick("LCAO_Charge","cal_dk_k",'F');  
     return;
 }
@@ -1113,14 +1124,21 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 				}
 						
 				#if EXX_DM==2
-				if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
+				if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
+					|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
+					|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
+				{
 					exx_lcao.DM_para.set_DM_gamma( rho_row_col, is, {row_count*300,col_count*300} );
+				}
 				#endif				
 			}  // end for col_count
 		}  // end for row_count
+
 		ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<endl;
+
 		int idx0=GridT.trace_lo[0];
 		int idx1=GridT.trace_lo[1];
+
 		if(idx0>=0)
 		{
 			ofs_running<<"DM(0,0)"<<DM[is][idx0][idx0]<<"\t";
@@ -1140,8 +1158,12 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
     else
     {
         for(int is=0; is<NSPIN; is++)
+		{
             for (int i=0; i<lgd_now; i++)
+			{
                 ZEROS(this->DM[is][i], lgd_now);
+			}
+		}
         for(int is=0; is<NSPIN; is++)
         {
             for (int i=0; i<NLOCAL; i++)
@@ -1220,82 +1242,82 @@ void Local_Orbital_Charge::write_dm(const int &is, const int &iter, const string
 {
     TITLE("Local_Orbital_Charge","write_dm");
 
-     if (out_dm==0)
-     {
-          return;
-     }
-     else if(iter % out_dm != 0)
-     {
-          return; 
-     }
-    timer::tick("Local_Orbital_Charge","write_dm");
+	if (out_dm==0)
+	{
+		return;
+	}
+	else if(iter % out_dm != 0)
+	{
+		return; 
+	}
+	timer::tick("Local_Orbital_Charge","write_dm");
 
-     time_t start, end;
-     ofstream ofs;
+	time_t start, end;
+	ofstream ofs;
 
-     if(MY_RANK==0)
-     {
-          start = time(NULL);
+	if(MY_RANK==0)
+	{
+		start = time(NULL);
 
-          ofs.open(fn.c_str());
-          if (!ofs)
-          {
-                WARNING("Charge::write_rho","Can't create Charge File!");
-          }
+		ofs.open(fn.c_str());
+		if (!ofs)
+		{
+			WARNING("Charge::write_rho","Can't create Charge File!");
+		}
 
-          //ofs_running << "\n Output charge file." << endl;
+		//ofs_running << "\n Output charge file." << endl;
 
-          ofs << ucell.latName << endl;//1
-          ofs << " " << ucell.lat0 * BOHR_TO_A << endl;
-          ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-          ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-          ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
-          for(int it=0; it<ucell.ntype; it++)
-          {
-                ofs << " " << ucell.atoms[it].label;
-          }
-          ofs << endl;
-          for(int it=0; it<ucell.ntype; it++)
-          {
-                ofs << " " << ucell.atoms[it].na;
-          }
-          ofs << endl;
-          ofs << "Direct" << endl;
+		ofs << ucell.latName << endl;//1
+		ofs << " " << ucell.lat0 * BOHR_TO_A << endl;
+		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
+		ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
+		ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+		for(int it=0; it<ucell.ntype; it++)
+		{
+			ofs << " " << ucell.atoms[it].label;
+		}
+		ofs << endl;
+		for(int it=0; it<ucell.ntype; it++)
+		{
+			ofs << " " << ucell.atoms[it].na;
+		}
+		ofs << endl;
+		ofs << "Direct" << endl;
 
-          for(int it=0; it<ucell.ntype; it++)
-          {
-            Atom* atom = &ucell.atoms[it];
-            ofs << setprecision(15);
-                for(int ia=0; ia<ucell.atoms[it].na; ia++)
-                {
-                     ofs << " " << atom->taud[ia].x
-                          << " " << atom->taud[ia].y
-                          << " " << atom->taud[ia].z << endl;
-                }
-          }
+		for(int it=0; it<ucell.ntype; it++)
+		{
+			Atom* atom = &ucell.atoms[it];
+			ofs << setprecision(15);
+			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			{
+				ofs << " " << atom->taud[ia].x
+					<< " " << atom->taud[ia].y
+					<< " " << atom->taud[ia].z << endl;
+			}
+		}
 
-        ofs << "\n " << NSPIN;
-        if(NSPIN==1||NSPIN==4)
-        {
-            ofs << "\n " << en.ef << " (fermi energy)";
-        }
-        else if(NSPIN==2)
-        {
-            if(is==0)ofs << "\n " << en.ef_up << " (fermi energy for spin=1)";
-            else if(is==1)ofs << "\n " << en.ef_dw << " (fermi energy for spin=2)";
-        }
-        else
-        {
-            WARNING_QUIT("write_rho","check nspin!");
-        }
+		ofs << "\n " << NSPIN;
+		if(NSPIN==1||NSPIN==4)
+		{
+			ofs << "\n " << en.ef << " (fermi energy)";
+		}
+		else if(NSPIN==2)
+		{
+			if(is==0)ofs << "\n " << en.ef_up << " (fermi energy for spin=1)";
+			else if(is==1)ofs << "\n " << en.ef_dw << " (fermi energy for spin=2)";
+		}
+		else
+		{
+			WARNING_QUIT("write_rho","check nspin!");
+		}
 
-    
-        ofs << "\n  " << NLOCAL << " " << NLOCAL << endl;
 
-          ofs << setprecision(precision);
-          ofs << scientific;
+		ofs << "\n  " << NLOCAL << " " << NLOCAL << endl;
 
-     }
+		ofs << setprecision(precision);
+		ofs << scientific;
+
+	}
 
     //ofs << "\n " << GAMMA_ONLY_LOCAL << " (GAMMA ONLY LOCAL)" << endl;
 #ifndef __MPI
@@ -1397,13 +1419,13 @@ void Local_Orbital_Charge::write_dm(const int &is, const int &iter, const string
         WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif
-     if(MY_RANK==0)
-     {
-          end = time(NULL);
-          OUT_TIME("write_rho",start,end);
-          ofs.close();
-     }
-    timer::tick("Local_Orbital_Charge","write_dm");
+	if(MY_RANK==0)
+	{
+		end = time(NULL);
+		OUT_TIME("write_rho",start,end);
+		ofs.close();
+	}
+	timer::tick("Local_Orbital_Charge","write_dm");
 
     return;
 }

@@ -168,17 +168,19 @@ void Force_LCAO::start_force(void)
 	// clear the data.
 	this->fcs.zero_out();
 
-	stress_vdw.create(3,3);//zhengdy added in 2018-10-29
-	if(vdwd2.vdwD2)									//Peize Lin add 2014-04-04, update 2019-04-26
+	// zhengdy added in 2018-10-29
+	stress_vdw.create(3,3);
+	// Peize Lin add 2014-04-04, update 2019-04-26
+	if(vdwd2.vdwD2)
 	{
 		vdwd2.force(stress_vdw, STRESS);
 	}
-	if(vdwd3.vdwD3)									//jiyy add 2019-05-18
+	// jiyy add 2019-05-18
+	else if(vdwd3.vdwD3)
 	{
 		vdwd3.force(stress_vdw, STRESS);
 	}																			 
-	
-	
+		
 	matrix fefield;
 	if(EFIELD)
 	{
@@ -201,9 +203,14 @@ void Force_LCAO::start_force(void)
 			+ fcc[iat][i] //nonlinear core correction force (pw)
 			+ fscc[iat][i];//self consistent corretion force (pw)
 
-            if(INPUT.dft_plus_u) fcs(iat, i) += dftu.force_dftu.at(iat).at(i);  //Force contribution from DFT+U, Quxin add on 20201029
+			// Force contribution from DFT+U, Quxin add on 20201029
+            if(INPUT.dft_plus_u) 
+			{
+				fcs(iat, i) += dftu.force_dftu.at(iat).at(i);
+			}
 	
-			if(vdwd2.vdwD2)											//Peize Lin add 2014-04-04, update 2019-04-26
+			// Peize Lin add 2014-04-04, update 2019-04-261
+			if(vdwd2.vdwD2)
 			{
 				switch(i)
 				{
@@ -213,7 +220,8 @@ void Force_LCAO::start_force(void)
 				}
 				
 			}
-	        if(vdwd3.vdwD3)											//jiyy add 2019-05-18
+			// jiyy add 2019-05-18
+	        if(vdwd3.vdwD3)
 			{
 				switch(i)
 				{
@@ -238,10 +246,16 @@ void Force_LCAO::start_force(void)
 		}
 
  		//xiaohui add "OUT_LEVEL", 2015-09-16
-		if(OUT_LEVEL != "m") ofs_running << " correction force for each atom along direction " << i+1 << " is " << sum/ucell.nat << endl;
+		if(OUT_LEVEL != "m") 
+		{
+			ofs_running << " correction force for each atom along direction " 
+				<< i+1 << " is " << sum/ucell.nat << endl;
+		}
     }
 	
-	if(SYMMETRY)                                           // pengfei 2016-12-20
+
+	// pengfei 2016-12-20
+	if(SYMMETRY)
 	{
 		double *pos;
 		double d1,d2,d3;
@@ -250,7 +264,6 @@ void Force_LCAO::start_force(void)
 		int iat = 0;
 		for(int it = 0;it < ucell.ntype;it++)
 		{
-			//Atom* atom = &ucell.atoms[it];
 			for(int ia =0;ia< ucell.atoms[it].na;ia++)
 			{
 				pos[3*iat  ] = ucell.atoms[it].taud[ia].x ;

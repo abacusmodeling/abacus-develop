@@ -7,6 +7,7 @@
 class Local_Orbital_wfc
 {
 	public:
+
 	Local_Orbital_wfc();
 	~Local_Orbital_wfc();
 
