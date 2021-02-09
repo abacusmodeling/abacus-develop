@@ -10,6 +10,9 @@
 #include "../src_pw/berryphase.h"
 #include "../src_pw/toWannier90.h"
 #include "dftu.h"   //Quxin add for DFT+U on 202011029
+#include "LCAO_cbands_k.h"
+#include "LCAO_cbands_gamma.h"
+#include "LCAO_evolve.h"
 
 int Local_Orbital_Elec::iter = 0;
 double Local_Orbital_Elec::avg_iter = 0.0; 
@@ -283,7 +286,23 @@ void Local_Orbital_Elec::scf(const int &istep)
 		}
 
 		// (1) calculate the bands.
-		cal_bands(istep);
+		// mohan add 2021-02-09
+		if(GAMMA_ONLY_LOCAL)
+		{
+			LCAO_cbands_gamma::cal_bands(istep, UHM);
+		}
+		else
+		{
+			if(tddft)
+			{
+				LCAO_evolve::evolve_psi(istep, UHM, this->WFC_init);
+			}
+			else
+			{
+				LCAO_cbands_k::cal_bands(istep, UHM);
+			}
+		}
+
 
 //		for(int ib=0; ib<NBANDS; ++ib)
 //		{
@@ -635,7 +654,23 @@ void Local_Orbital_Elec::nscf(void)
 			break;
 	}
 
-	cal_bands(istep);
+	// mohan add 2021-02-09
+	if(GAMMA_ONLY_LOCAL)
+	{
+		LCAO_cbands_gamma::cal_bands(istep, UHM);
+	}
+	else
+	{
+		if(tddft)
+		{
+			LCAO_evolve::evolve_psi(istep, UHM, this->WFC_init);
+		}
+		else
+		{
+			LCAO_cbands_k::cal_bands(istep, UHM);
+		}
+	}
+
 	time_t time_finish=std::time(NULL);
 	OUT_TIME("cal_bands",time_start, time_finish);
 
@@ -683,210 +718,6 @@ void Local_Orbital_Elec::nscf(void)
 	return;
 }
 
-#include "../src_parallel/subgrid_oper.h"
-void Local_Orbital_Elec::cal_bands(const int &istep)
-{
-	TITLE("Local_Orbital_Elec","cal_bands");
-	timer::tick("Local_Orbital_Elec","cal_bands",'E');
-
-	if(GAMMA_ONLY_LOCAL)
-	{
-		assert(NSPIN == kv.nks);
-	}
-	else
-	{
-		int start_spin = -1;
-		UHM.GK.reset_spin(start_spin);
-		UHM.GK.allocate_pvpR();
-	}
-						
-
-	// pool parallization in future -- mohan note 2021-02-09
-	for(int ik=0; ik<kv.nks; ik++)
-	{	
-		//-----------------------------------------
-		//(1) prepare data for this k point.
-		// copy the local potential from array.
-		//-----------------------------------------
-		if(NSPIN==2) 
-		{
-			CURRENT_SPIN = kv.isk[ik];
-		}
-		wf.npw = kv.ngk[ik];
-		for(int ir=0; ir<pw.nrxx; ir++)
-		{
-			pot.vrs1[ir] = pot.vrs( CURRENT_SPIN, ir);
-		}
-		
-		//--------------------------------------------
-		//(2) check if we need to calculate 
-		// pvpR = < phi0 | v(spin) | phiR> for a new spin.
-		//--------------------------------------------
-		if(!GAMMA_ONLY_LOCAL)
-		{
-			if(CURRENT_SPIN == UHM.GK.get_spin() )
-			{
-				//ofs_running << " Same spin, same vlocal integration." << endl;
-			}
-			else
-			{
-				//ofs_running << " (spin change)" << endl;
-				UHM.GK.reset_spin( CURRENT_SPIN );
-			
-				// if you change the place of the following code,
-				// rememeber to delete the #include	
-				if(VL_IN_H)
-				{
-					// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-					UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-					// added by zhengdy-soc, for non-collinear case
-					// integral 4 times, is there any method to simplify?
-					if(NSPIN==4)
-					{
-						for(int is=1;is<4;is++)
-						{
-							for(int ir=0; ir<pw.nrxx; ir++)
-							{
-								pot.vrs1[ir] = pot.vrs( is, ir);
-							}
-							UHM.GK.cal_vlocal_k(pot.vrs1, GridT, is);
-						}
-					}
-				}
-			}
-		}
-
-
-		if(!UHM.init_s)
-    	{
-    	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
-    	}
-
-		//--------------------------------------------
-		// (3) folding matrix, 
-		// and diagonalize the H matrix (T+Vl+Vnl).
-		//--------------------------------------------
-
-		if(GAMMA_ONLY_LOCAL)
-		{
-			// Peize Lin add ik 2016-12-03
-			UHM.calculate_Hgamma(ik);
-
-			// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
-			if(INPUT.dft_plus_u) 
-			{
-			 	dftu.cal_eff_pot_mat(ik, istep);
-
-				const int spin = kv.isk[ik];
-				for(int irc=0; irc<ParaO.nloc; irc++)
-				{
-					LM.Hloc[irc] += dftu.pot_eff_gamma.at(spin).at(irc);
-				}
-			}
-			
-			// Peize Lin add at 2020.04.04
-			if(restart.info_load.load_H && !restart.info_load.load_H_finish)
-			{
-				restart.load_disk("H", ik);
-				restart.info_load.load_H_finish = true;
-			}			
-			if(restart.info_save.save_H)
-			{
-				restart.save_disk("H", ik);
-			}
-
-			// SGO: sub_grid_operation
-			SGO.cal_totwfc();
-
-			//--------------------------------------
-			// DIAG GROUP OPERATION HERE
-			//--------------------------------------
-			if(DCOLOR==0)
-			{
-				Diago_LCAO_Matrix DLM;
-				// the temperary array totwfc only have one spin direction.
-				DLM.solve_double_matrix(ik, SGO.totwfc[0], LOC.wfc_dm_2d.wfc_gamma[ik]);
-			}
-			else
-			{
-#ifdef __MPI
-				ofs_running << " no diagonalization." << endl;
-#else
-				cout << " DCOLOR=" << DCOLOR << endl;
-				WARNING_QUIT("Local_Orbital_Elec::cal_bands","no diagonalization");
-#endif
-
-			}
-#ifdef __MPI
-			MPI_Barrier(MPI_COMM_WORLD);
-#endif
-			// distribute the wave functions again.
-			// delete the function -- mohan 2021-02-09
-			SGO.dis_subwfc();
-		}//end gamma
-		// with k points
-		else
-		{
-			timer::tick("Efficience","each_k");
-			timer::tick("Efficience","H_k");
-			UHM.calculate_Hk(ik);
-
-			// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
-			if(INPUT.dft_plus_u)
-			{		
-			 	dftu.cal_eff_pot_mat(ik, istep);
-
-				for(int irc=0; irc<ParaO.nloc; irc++)
-				{
-					LM.Hloc2[irc] += dftu.pot_eff_k.at(ik).at(irc);
-				}							
-			}
-
-			timer::tick("Efficience","H_k");
-			
-			// Peize Lin add at 2020.04.04
-			if(restart.info_load.load_H && !restart.info_load.load_H_finish)
-			{
-				restart.load_disk("H", ik);
-				restart.info_load.load_H_finish = true;
-			}			
-			if(restart.info_save.save_H)
-			{
-				restart.save_disk("H", ik);
-			}
-
-			// write the wave functions into LOWF.WFC_K[ik].
-			bool diago = true;
-			if (tddft == 1 && istep >= 1) diago = false;
-			if(diago)
-			{
-				timer::tick("Efficience","diago_k");
-				Diago_LCAO_Matrix DLM;
-				DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
-				timer::tick("Efficience","diago_k");
-			}
-			else
-			{
-				timer::tick("Efficience","evolve_k");
-				Evolve_LCAO_Matrix ELM;
-				ELM.evolve_complex_matrix(ik, LOWF.WFC_K[ik], WFC_init[ik]);
-				timer::tick("Efficience","evolve_k");
-			}
-			timer::tick("Efficience","each_k");
-		}
-	}
-			
-	// LiuXh modify 2019-07-15*/
-	if(!GAMMA_ONLY_LOCAL)
-	{
-		if(!ParaO.out_hsR)
-		{
-			UHM.GK.destroy_pvpR();
-		}
-	}
-	timer::tick("Local_Orbital_Elec","cal_bands",'E');
-	return;	
-}
 
 void Local_Orbital_Elec::init_mixstep_final_scf(void)
 {
