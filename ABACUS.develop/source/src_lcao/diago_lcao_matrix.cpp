@@ -44,88 +44,27 @@ void Diago_LCAO_Matrix::solve_double_matrix(const int &ik, double** wfc, matrix 
 	TITLE("Diago_LCAO_Matrix","solve_double_matrix");
 	timer::tick("Diago_LCAO_Matrix","solve_double_matrix",'F');
 	time_t time_start = time(NULL);
-//	ofs_running << " Start Time : " << ctime(&time_start);
 
-	// mohan test the combination of hpseps and cg.
-
-
-	//DIAGO_TYPE="hpseps";
-	/*
-	static int count = 1;
-	if(count < 2)
-	{
-		cout << " first step is hpseps! " << endl;
-		DIAGO_TYPE="hpseps";
-	}
-	else
-	{
-		DIAGO_TYPE="cg";
-	}
-	++count;
-	*/
 	
-	//if(DIAGO_TYPE=="lapack") xiaohui modify 2013-09-02
 	if(KS_SOLVER=="lapack") //xiaohui add 2013-09-02
 	{
 		this->using_LAPACK(ik, wfc);
 	}
-/*
-#ifdef __SELINV
-	//xiaohui modified 2013-03-23
-	else if(DIAGO_TYPE=="selinv") //mohan add 2011-09
-	{
-		Selinv SV;
-		// job=1: density matrix for charge density.
-		// job=2: density matrix for force.
-		// job=3: energy density matrix for force.
-		int job = 1;
-		SV.using_SELINV(ik, job, LM.Hloc, LM.Sloc);
-	}
-#endif
-	else if(DIAGO_TYPE=="cg")
-	{
-		this->using_CG(ik, wfc);
-	}
-*/
 #ifdef __MPI
-	//else if(DIAGO_TYPE=="hpseps") xiaohui modify 2013-09-02
-	else if(KS_SOLVER=="hpseps" || KS_SOLVER=="genelpa"|| KS_SOLVER=="scalapack_gvx") //yshen add 7/15/2016
+	// yshen add 7/15/2016
+	else if(KS_SOLVER=="hpseps" || KS_SOLVER=="genelpa"|| KS_SOLVER=="scalapack_gvx")
 	{
 		this->using_HPSEPS_double(ik, wfc, wfc_2d);
 	}
 #endif
 	else
 	{
-		//cout << " Diago_LCAO_Matrix, diago_type = " << DIAGO_TYPE << endl; xiaohui modify 2013-09-02
-		cout << " Diago_LCAO_Matrix, diago_type = " << KS_SOLVER << endl; //xiaohui add 2013-09-02
-		//WARNING_QUIT("Diago_LCAO_Matrix::init","Check DIAGO_TYPE."); xiaohui modify 2013-09-02
-		WARNING_QUIT("Diago_LCAO_Matrix::init","Check KS_SOLVER."); //xiaohui add 2013-09-02
+		cout << " Diago_LCAO_Matrix, diago_type = " << KS_SOLVER << endl; 
+		WARNING_QUIT("Diago_LCAO_Matrix::init","Check KS_SOLVER.");
 	}
 	time_t time_end = time(NULL);
-//	ofs_running << " End   Time : " << ctime(&time_end);
-//	ofs_running << " FINAL Time : " << difftime(time_end, time_start) << " (SEC)" << endl;
 
 	OUT_TIME("diago(double)",time_start, time_end);
-
-	/*
-	ofs_running << "\n Output c:" << endl;
-	for(int i=0; i<NLOCAL; i++)
-	{
-		for(int j=0; j<NLOCAL; j++)
-		{
-//			ofs_running << " " << setw(8) << i << setw(8) << j << setw(25) << c[i][j] << endl;
-			if( abs(c[i][j]) > 1.0e-5 )
-			{ 
-				ofs_running << setw(20) << c[i][j];		
-			}
-			else
-			{
-				ofs_running << setw(20) << "0";
-			}	
-		}
-		ofs_running << endl;
-	}
-	*/
 
 	timer::tick("Diago_LCAO_Matrix","solve_double_matrix",'F');
 	return;
@@ -222,6 +161,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	hm.cdiaghg(NLOCAL, NBANDS, Htmp, Stmp, NLOCAL, en, hvec);
 
 	if(NSPIN!=4)
+	{
 		for(int ib=0; ib<NBANDS; ib++)
 		{
 			for(int iw=0; iw<NLOCAL; iw++)
@@ -229,7 +169,9 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 				LOWF.WFC_K[ik][ib][iw] = hvec(iw,ib);
 			}
 		}
+	}
 	else
+	{
 		for(int ib=0; ib<NBANDS; ib++)
 		{
 			for(int iw=0; iw<NLOCAL / NPOL; iw++)
@@ -238,6 +180,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 				LOWF.WFC_K[ik][ib][iw + NLOCAL / NPOL] = hvec(iw * NPOL + 1, ib);
 			}
 		}
+	}
 
 	//cout << "\n Energy for k=" << ik << endl; 
 	for(int ib=0; ib<NBANDS; ib++)

@@ -16,7 +16,9 @@ public:
 	static int iter;
 	static double avg_iter;
 	
+	
 	complex<double>*** WFC_init;
+
 protected:
 	static int istep;
 

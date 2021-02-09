@@ -220,7 +220,10 @@ void Local_Orbital_Elec::scf(const int &istep)
 			}
 		}
 
-		//fuxiang add 2016-11-1
+		// fuxiang add 2016-11-1
+		// need reconstruction in near future -- mohan 2021-02-09
+		// the initialization of wave functions should be moved to 
+		// somewhere else
 		if(tddft==1 && iter == 1)
 		{
 			this->WFC_init = new complex<double>**[kv.nks];
@@ -274,7 +277,11 @@ void Local_Orbital_Elec::scf(const int &istep)
 				break;
 		}		
 		
-		if(INPUT.dft_plus_u) dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
+		if(INPUT.dft_plus_u) 
+		{
+			dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
+		}
+
 		// (1) calculate the bands.
 		cal_bands(istep);
 
@@ -287,7 +294,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		// only deal with charge density after both wavefunctions.
 		// are calculated.
 		//-----------------------------------------------------------
-		if(GAMMA_ONLY_LOCAL && NSPIN == 2 && CURRENT_SPIN == 0)continue;
+		if(GAMMA_ONLY_LOCAL && NSPIN == 2 && CURRENT_SPIN == 0) continue;
 
 
 		if(conv_elec) 
@@ -324,23 +331,6 @@ void Local_Orbital_Elec::scf(const int &istep)
 			}
 		}
 
-/*		if(istep==0)
-		{
-			for (int ib=0; ib < 3; ib++)
-			{
-				wf.wg(0,ib) = 2.0;
-			}
-			wf.wg(0,3) = 1.75;
-			wf.wg(0,4) = 0.25;
-		}
-    		for (int ik = 0; ik < kv.nks; ik++)
-    		{
-        		for (int ib = 0; ib < NBANDS; ib++)
-			{
-				cout << "wf.wg(ik, ib): " << wf.wg(ik, ib) << endl;
-			}
-    		}
-*/
 
 		for(int ik=0; ik<kv.nks; ++ik)
 		{
@@ -352,17 +342,25 @@ void Local_Orbital_Elec::scf(const int &istep)
 		LOC.sum_bands();
 
 		// add exx
-		en.set_exx();		// Peize Lin add 2016-12-03
+		// Peize Lin add 2016-12-03
+		en.set_exx();
 		
 		// Peize Lin add 2020.04.04
-		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type)
+		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
+			|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
+			|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type)
+		{
 			if(restart.info_load.load_H && restart.info_load.load_H_finish && !restart.info_load.restart_exx)
 			{
 				exx_global.info.set_xcfunc(xcf);							
 				exx_lcao.cal_exx_elec();			
 				restart.info_load.restart_exx = true;
 			}
-		// if DFT+U calculation is needed, this function will calculate the local occupation number matrix and energy correction
+		}
+
+
+		// if DFT+U calculation is needed, this function will calculate 
+		// the local occupation number matrix and energy correction
 		if(INPUT.dft_plus_u)
 		{
 			if(GAMMA_ONLY_LOCAL) dftu.cal_occup_m_gamma(iter);
@@ -388,8 +386,8 @@ void Local_Orbital_Elec::scf(const int &istep)
 
 		// resume codes!
 		//-------------------------------------------------------------------------
-		//this->LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
-		//CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
+		// this->LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
+		// CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
 		// but must has evc first!
 		//-------------------------------------------------------------------------
 
@@ -401,8 +399,12 @@ void Local_Orbital_Elec::scf(const int &istep)
 		
 		// Peize Lin add 2020.04.04
 		if(restart.info_save.save_charge)
+		{
 			for(int is=0; is<NSPIN; ++is)
+			{
 				restart.save_disk("charge", is);
+			}
+		}
 
 		// (9) Calculate new potential according to new Charge Density.
 	
@@ -525,9 +527,9 @@ void Local_Orbital_Elec::scf(const int &istep)
 			{
 				const int precision = 3;
 
-        			stringstream ssc;
-       				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-        			CHR.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+				stringstream ssc;
+				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+				CHR.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
 
 				stringstream ssd;
 				if(GAMMA_ONLY_LOCAL)
@@ -581,6 +583,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 		}
 	}
 
+	// fuxiang add, should be reconstructed in near future -- mohan note 2021-02-09
 	if (tddft==1)
 	{
 		delete[] WFC_init;
@@ -590,6 +593,7 @@ void Local_Orbital_Elec::scf(const int &istep)
 	return;
 }
 
+
 void Local_Orbital_Elec::nscf(void)
 {
 	TITLE("Local_Orbital_Elec","nscf");
@@ -597,7 +601,7 @@ void Local_Orbital_Elec::nscf(void)
 	cout << " NON-SELF CONSISTENT CALCULATIONS" << endl;
 	
 	time_t time_start= std::time(NULL);
-//	complex<double>*** WFC_init;
+
 	this->WFC_init = new complex<double>**[kv.nks];
 	for(int ik=0; ik<kv.nks; ik++)
 	{
@@ -631,7 +635,6 @@ void Local_Orbital_Elec::nscf(void)
 			break;
 	}
 
-//	cal_bands(istep, WFC_init);
 	cal_bands(istep);
 	time_t time_finish=std::time(NULL);
 	OUT_TIME("cal_bands",time_start, time_finish);
@@ -648,12 +651,17 @@ void Local_Orbital_Elec::nscf(void)
         }
         //out.printV3(ofs_running, kv.kvec_c[ik]);
 
-		ofs_running << " k-points" << ik+1 << "(" << kv.nkstot << "): " << kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z << endl;
+		ofs_running << " k-points" 
+			<< ik+1 << "(" << kv.nkstot << "): " 
+			<< kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z << endl;
 
         for (int ib = 0; ib < NBANDS; ib++)
         {			
-            ofs_running << " spin" << kv.isk[ik]+1 << "final_state " << ib+1 << " " << wf.ekb[ik][ib] * Ry_to_eV << " " << wf.wg(ik, ib)*kv.nks << endl;
-        //    cout << " spin" << kv.isk[ik]+1 << "final_state " << ib+1 << " " << wf.ekb[ik][ib] * Ry_to_eV << " " << wf.wg(ik, ib)*kv.nks << endl;
+            ofs_running << " spin" << kv.isk[ik]+1 
+			<< "final_state " << ib+1 << " " 
+			<< wf.ekb[ik][ib] * Ry_to_eV << " " << wf.wg(ik, ib)*kv.nks << endl;
+        //    cout << " spin" << kv.isk[ik]+1 << "final_state " 
+		//    << ib+1 << " " << wf.ekb[ik][ib] * Ry_to_eV << " " << wf.wg(ik, ib)*kv.nks << endl;
         }
 		ofs_running << endl;
     }
@@ -692,18 +700,18 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		UHM.GK.allocate_pvpR();
 	}
 						
-	//ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "Time(Sec)"<< endl;
-	//ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
+
+	// pool parallization in future -- mohan note 2021-02-09
 	for(int ik=0; ik<kv.nks; ik++)
 	{	
-		//cout << " ik=" << ik+1 << " spin=" << kv.isk[ik] << endl;
-		//out.printV3(kv.kvec_c[ik]);
-		
 		//-----------------------------------------
 		//(1) prepare data for this k point.
 		// copy the local potential from array.
 		//-----------------------------------------
-		if(NSPIN==2)CURRENT_SPIN = kv.isk[ik];
+		if(NSPIN==2) 
+		{
+			CURRENT_SPIN = kv.isk[ik];
+		}
 		wf.npw = kv.ngk[ik];
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
@@ -712,8 +720,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		
 		//--------------------------------------------
 		//(2) check if we need to calculate 
-		// pvpR = < phi0 | v(spin) | phiR> for
-		// a new spin.
+		// pvpR = < phi0 | v(spin) | phiR> for a new spin.
 		//--------------------------------------------
 		if(!GAMMA_ONLY_LOCAL)
 		{
@@ -732,8 +739,10 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 				{
 					// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
 					UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-					if(NSPIN==4)//integral 4 times, is there any method to simplify?
-					{//added by zhengdy-soc, for non-collinear case
+					// added by zhengdy-soc, for non-collinear case
+					// integral 4 times, is there any method to simplify?
+					if(NSPIN==4)
+					{
 						for(int is=1;is<4;is++)
 						{
 							for(int ir=0; ir<pw.nrxx; ir++)
@@ -748,15 +757,10 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 		}
 
 
-		// some preparation
-		//clock_t start=clock();
-//		cout << " init s matrix = " << UHM.init_s << endl;
 		if(!UHM.init_s)
     	{
     	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
     	}
-
-		clock_t start_nscf=clock();
 
 		//--------------------------------------------
 		// (3) folding matrix, 
@@ -765,7 +769,8 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 
 		if(GAMMA_ONLY_LOCAL)
 		{
-			UHM.calculate_Hgamma(ik);							// Peize Lin add ik 2016-12-03
+			// Peize Lin add ik 2016-12-03
+			UHM.calculate_Hgamma(ik);
 
 			// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 			if(INPUT.dft_plus_u) 
@@ -791,21 +796,14 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			}
 
 			// SGO: sub_grid_operation
-			 SGO.cal_totwfc();
-
+			SGO.cal_totwfc();
 
 			//--------------------------------------
 			// DIAG GROUP OPERATION HERE
 			//--------------------------------------
 			if(DCOLOR==0)
 			{
-				// this part can only be used with linear-scaling methods
-				// --mohan 2021-01-30
-
-				//xiaohui add 2013-09-02
 				Diago_LCAO_Matrix DLM;
-
-				//DLM.solve_double_matrix(ik, LOWF.WFC_GAMMA[CURRENT_SPIN]);
 				// the temperary array totwfc only have one spin direction.
 				DLM.solve_double_matrix(ik, SGO.totwfc[0], LOC.wfc_dm_2d.wfc_gamma[ik]);
 			}
@@ -876,59 +874,9 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			}
 			timer::tick("Efficience","each_k");
 		}
-
-
-//		cout << " In Local_Orbital_Elec" << endl;
-//		for(int ie=0; ie<NBANDS; ie++)
-//		{
-//			cout << " e[" << ie << "]=" << wf.ekb[ik][ie] * Ry_to_eV<< endl;
-//		}
-
-		//BLOCK_HERE("Bands after diagonalization");
-
-		/* 
-		 * test : use Cij to and evc to calculate new evc
-		 bool use_blas = true;
-		 if(use_blas)
-		 {
-		// do evc(NBANDS, npwx) = ONE * Cij(NBANDS, NLOCAL) * wf.wanf2[0](NLOCAL, npwx) + ZERO
-		zgemm('N', // op( Cij ) = Cij
-		'N',  // op( wf.wanf2[0] ) = wf.wanf2[0]
-		NBANDS, // row of evc
-		kv.ngk[0], // column of evc
-		NLOCAL, // between Cij and wf.wanf2[0]
-		ONE, // see formula
-		this->LOWF.c,
-		NBANDS, // row of op( Cij ), if 'T' or 'C', in fact this means the column number
-		wf.wanf2[0],
-		NLOCAL, // row of op( wf.wanf2[0] )
-		ZERO, // see formula
-		wf.evc[0],
-		NBANDS // first dimension of evc
-		);
-		}
-		else
-		{
-		wf.evc[0] = this->LOWF.c * wf.wanf2[0];
-		}
-		 */
-
-		clock_t finish_nscf=clock();
-		const double duration = static_cast<double>(finish_nscf - start_nscf) / CLOCKS_PER_SEC;
-
-
-		//ofs_running << setw(8) << ik+1 << setw(15) << duration << endl;
-
-//		ofs_running << " TIME FOR K=" << ik << ": " << duration << endl;
 	}
 			
-	// delete at last time.
-	/*LiuXh modify 2019-07-15
-	if(!GAMMA_ONLY_LOCAL)
-	{
-		UHM.GK.destroy_pvpR();
-	}
-	LiuXh modify 2019-07-15*/
+	// LiuXh modify 2019-07-15*/
 	if(!GAMMA_ONLY_LOCAL)
 	{
 		if(!ParaO.out_hsR)
