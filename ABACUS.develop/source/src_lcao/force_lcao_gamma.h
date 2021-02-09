@@ -53,7 +53,6 @@ class Force_LCAO_gamma
 	void DerivT_PW (void);
 
 	void average_force(double* fm);
-	void cal_fvna(LCAO_Matrix &LM); // mohan add 2011-05-23
 
 	void test_gamma(double* mm, const string &name);
 	

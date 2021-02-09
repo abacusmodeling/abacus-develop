@@ -569,14 +569,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
     if(GAMMA_ONLY_LOCAL)
     {
-        if(GRID_SPEED==1)
-        {
-                UHM.GG.cal_rho();
-        }
-        else if(GRID_SPEED==2)
-        {
-            UHM.GS.cal_rho();
-        }
+        UHM.GG.cal_rho();
     }
     else
     {

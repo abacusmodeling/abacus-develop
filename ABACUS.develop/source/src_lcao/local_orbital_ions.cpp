@@ -136,12 +136,11 @@ void Local_Orbital_Ions::opt_ions(void)
         // here 0 means GridT is not used for Vna.
         // mohan add Vna 2012-06-13
         // because it must be consistent with gtf in lcao_vna.
-        // here VNA means considering the radius cutoff VNA.
         GridT.set_pbc_grid(
             pw.ncx, pw.ncy, pw.ncz,
             pw.bx, pw.by, pw.bz,
             pw.nbx, pw.nby, pw.nbz,
-            pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
+            pw.nbxx, pw.nbzp_start, pw.nbzp);
 
         // (2) If k point is used here, allocate HlocR after atom_arrange.
         if(!GAMMA_ONLY_LOCAL)
@@ -724,7 +723,7 @@ void Local_Orbital_Ions::final_scf(void)
         pw.ncx, pw.ncy, pw.ncz,
         pw.bx, pw.by, pw.bz,
         pw.nbx, pw.nby, pw.nbz,
-        pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
+        pw.nbxx, pw.nbzp_start, pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
     if(!GAMMA_ONLY_LOCAL)
@@ -819,11 +818,8 @@ void Local_Orbital_Ions::output_HS_R(void)
                 {
                     if(VL_IN_H)
                     {
-                        if(VNA==0)
-                        {
-                            //UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-                            UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
-                        }
+						//UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
+						UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
                     }
                 }
                 UHM.GK.cal_vlocal_R(CURRENT_SPIN);

@@ -35,21 +35,19 @@ void Use_Overlap_Table::gen_tables( const int &job0 )
 	MOT.init_NL_Tpair();
 	MOT.init_NL_Opair(); // add 2009-5-8
 
+	// mohan comment out 2021-02-09
 	// if we decompose the VNA into projectors,
 	// we need to prepare for the vna table.
-	if(VNA==-1)
-	{
-		MVT.allocate(
-			ORB.get_ntype(),// number of atom types
-        	ORB.get_lmax(),// max L used to calculate overlap
-        	ORB.get_kmesh(), // kpoints, for integration in k space
-        	ORB.get_Rmax(),// max value of radial table
-        	ORB.get_dR(),// delta R, for making radial table
-        	ORB.get_dk() ); // delta k, for integration in k space
-
-
-	
-	}
+	//if(VNA==-1)
+	//{
+	//	MVT.allocate(
+	//		ORB.get_ntype(),// number of atom types
+    //   	ORB.get_lmax(),// max L used to calculate overlap
+    //    	ORB.get_kmesh(), // kpoints, for integration in k space
+    //    	ORB.get_Rmax(),// max value of radial table
+    //    	ORB.get_dR(),// delta R, for making radial table
+    //    	ORB.get_dk() ); // delta k, for integration in k space
+	//}
 
 
 	//=========================================
@@ -816,42 +814,4 @@ double Use_Overlap_Table::get_distance( const Vector3<double> &R1, const Vector3
 	return dR.norm() * this->lat0;	
 }
 
-void Use_Overlap_Table::snap_phiVna(
-	double VnaMat[],
-	const int& job,
-	const Vector3<double> &Rv,
-	const int& itv,
-	const int& l1,
-	const int& m1,
-	const int& n1,
-	const Vector3<double> &Ru,
-	const int& itu,
-	const int& l2,
-	const int& m2,
-	const int& n2,
-	const Vector3<double> &Rvna,
-	const int& itvna) const
-{
-	cout << " snap phiVna " << endl;
-
-
-
-	int lmax = 2;
-	int nzeta = 1;
-	for(int L0=0; L0<=lmax; ++L0)	
-	{
-		for(int m0=0; m0<2*L0+1; ++m0)
-		{
-			for(int N0=0; N0<nzeta; ++N0)
-			{
-				
-					
-		
-				
-			}		
-		}
-	}
-	WARNING_QUIT("Use_Overlap_Table::snap_phiVna","not ready yet");
-	return;
-}
 

@@ -10,7 +10,6 @@
 #include "numerical_orbital.h"
 #include "numerical_orbital_lm.h"
 #include "numerical_nonlocal.h"
-#include "neutral_pot.h"
 
 class LCAO_Orbitals
 {
@@ -42,7 +41,6 @@ class LCAO_Orbitals
 
 	Numerical_Orbital* Phi;
 	Numerical_Nonlocal* Beta;
-	Neutral_Pot* Vna;
 	
 	// init in input.cpp
 	double ecutwfc;

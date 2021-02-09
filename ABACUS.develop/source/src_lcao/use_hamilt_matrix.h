@@ -4,7 +4,6 @@
 #include "../src_pw/tools.h"
 #include "use_overlap_matrix.h"
 #include "gint_gamma.h"
-#include "gint_speed.h" //mohan add 2012-03-29
 #include "gint_k.h"
 #include "grid_integral.h"
 
@@ -26,8 +25,6 @@ class Use_Hamilt_Matrix
 
 	// used for gamma only algorithms.
 	Gint_Gamma GG;
-	// fast grid integration, mohan add 2012-03-29
-	Gint_Speed GS;
 
 	// used for k-dependent grid integration.
 	Gint_k GK;

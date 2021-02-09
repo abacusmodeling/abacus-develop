@@ -902,48 +902,6 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(double** dm2d)
 	return;
 }
 
-void Force_LCAO_k::force_vna_k(void)
-{
-	TITLE("Force_LCAO_k","force_vna_k");
-	timer::tick("Force_LCAO_k","force_vna_k",'h');
-
-	int istep=1;
-	bool delta_vh=0;
-	bool vna=1;
-	
-	// for test
-	bool test_G_vna = false;
-
-	if(test_G_vna)
-	{
-		pot.init_pot(istep, delta_vh, vna);
-		for(int ir=0; ir<pw.nrxx; ir++)
-		{
-			pot.vrs1[ir] = pot.vrs(CURRENT_SPIN, ir);
-		}
-	}
-
-	int dense=VNA;
-	
-	Grid_Technique gtf;
-	gtf.set_pbc_grid(
-	pw.ncx*dense,pw.ncy*dense,pw.ncz*dense,
-	pw.bx*dense,pw.by*dense,pw.bz*dense,
-	pw.nbx,pw.nby,pw.nbz,
-	pw.nbxx,pw.nbzp_start,pw.nbzp,
-	vna);
-
-	
-	//-----------------------------------------------------
-	// calculate the force due to < phi | vlocal | dphi>
-	// fvl_dphi must be set to zero before.
-	//-----------------------------------------------------
-	if(STRESS) {UHM.GK.svna_k_RealSpace(gtf, this->fvl_dphi, this->svl_dphi);}
-	else {UHM.GK.fvna_k_RealSpace(gtf, this->fvl_dphi);}
-
-	timer::tick("Force_LCAO_k","force_vna_k",'h');
-	return;
-}
 
 // calculate the force due to < phi | Vlocal | dphi >
 void Force_LCAO_k::cal_fvl_dphi_k(double** dm2d)
@@ -965,26 +923,9 @@ void Force_LCAO_k::cal_fvl_dphi_k(double** dm2d)
 	}
 
 	int istep = 1;
-	if(VNA)
-	{
-		// calculate the force contribution from Vna.
-		for(int is=0; is<NSPIN; ++is)
-		{
-			CURRENT_SPIN = is;
-			force_vna_k();
-		}
 
-		// calculate the Vlocal-Vna potential.
-		bool delta_vh = 1;
-		// vna = 0 means Vna is not considered here.
-		bool vna = 0;
-		pot.init_pot(istep, delta_vh, vna);
-	}
-	else
-	{
-		// not use Vna potential.
-		pot.init_pot(istep);
-	}
+	// if Vna potential is not used.
+	pot.init_pot(istep);
 
 
 	for(int is=0; is<NSPIN; ++is)

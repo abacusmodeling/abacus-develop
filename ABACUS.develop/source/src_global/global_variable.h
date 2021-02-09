@@ -34,8 +34,6 @@ extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8
 
-extern int 		VNA;				// 8.01 // mohan add 2011-05-27
-extern int		GRID_SPEED;			// 8.02 // mohan add 2012-03-29
 extern int 		FORCE;				// 8.1
 extern double	FORCE_THR;			// 8.2
 extern bool 	STRESS;				// 8.25 calcualte the stress

@@ -12,7 +12,6 @@ LCAO_Orbitals::LCAO_Orbitals()
 	this->nchimax = 0;// this initialzied must specified
 	this->Phi = new Numerical_Orbital[1];	
 	this->Beta = new Numerical_Nonlocal[1];
-	this->Vna = new Neutral_Pot[1];
 
 	this->nproj = new int[1];
 	this->nprojmax = 0;
@@ -28,7 +27,6 @@ LCAO_Orbitals::~LCAO_Orbitals()
 	}
 	delete[] Phi;
 	delete[] Beta;
-	delete[] Vna;
 	delete[] nproj;
 }
 
@@ -169,15 +167,6 @@ void LCAO_Orbitals::Read_Orbitals(void)
 	//-----------------------------------------------------------------
 
 
-
-
-
-
-
-
-
-
-
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	//~~~~~~~~~~~~~~~~~~~~~~   1    ~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Read in numerical atomic orbitals for each atom type.
@@ -188,16 +177,6 @@ void LCAO_Orbitals::Read_Orbitals(void)
 	{
 		this->Read_PAO(it);	
 	}
-
-
-
-
-
-
-
-
-
-
 
 	
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -237,43 +216,6 @@ void LCAO_Orbitals::Read_Orbitals(void)
 
 	this->set_nl_index();
 	ofs_running << " max number of nonlocal projetors among all species is " << nprojmax << endl; 
-
-
-
-
-
-
-
-
-
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	//~~~~~~~~~~~~~~~~~~~~~~   3    ~~~~~~~~~~~~~~~~~~~~~~~~~
-	// Setup one dimensional neutral potential for each
-	// element. Vna = Vl_pseudo + Vh_atomic
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-
-	delete[] this->Vna;
-	this->Vna = new Neutral_Pot[ucell.ntype];
-
-	for(int it=0; it<ucell.ntype; it++)
-	{
-		Vna[it].setup_Vna(it);
-		Vna[it].uniform_Vna(it, dr_uniform);
-
-		if(VNA==-1)
-		{
-			Vna[it].init_proj( this->Phi[it], dr_uniform );
-		}
-	}
-
-
-
-
-
-
-
 
 
 

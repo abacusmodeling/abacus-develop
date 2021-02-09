@@ -110,11 +110,8 @@ void Print_Info::screen_output(void)
 		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
 		{
 			cout << setw(12) << NLOCAL;
-
-			if(VNA==0)
-				cout << setw(12) << "No";
-			else if(VNA>0)
-				cout << setw(12) << "Yes";
+			// print VNA: no, should delete in future -- mohan 2021-02-09
+			cout << setw(12) << "No";
 		}
 
 		cout << endl;

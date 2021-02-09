@@ -7,7 +7,6 @@
 
 #include "../src_pw/tools.h"
 #include "make_overlap_table.h"
-#include "make_vna_table.h"
 #include "make_gaunt_table.h"
 #include "ylm.h"
 
@@ -15,7 +14,6 @@ class Use_Overlap_Table
 {
 	public:
 
-	friend class Use_Vna_Table;
 	friend class Hamilt_Linear;
 	
 	Use_Overlap_Table();
@@ -60,30 +58,14 @@ class Use_Overlap_Table
 		complex<double> *nlm1=NULL,
 		const int is=0)const;
 
-	//------------------------------------------------------	
-	// snap_phiVna : Get Matrix Element of <phi0|VnaProj>
-	//------------------------------------------------------	
-	void snap_phiVna(
-			double VnaMat[],
-			const int &job,
-			const Vector3<double> &Rv,
-			const int &itv,
-			const int &l1,
-			const int &m1,
-			const int &n1,
-			const Vector3<double> &Ru,
-			const int &itu,
-			const int &l2,
-			const int &m2,
-			const int &n2,
-			const Vector3<double> &Rvna,
-			const int &itvna) const;
 
-	Make_Overlap_Table MOT;
-	Make_Vna_Table MVT;
 	// set as public because in hamilt_linear, 
 	// we need to destroy the tables: SR,TR,NR
 	// after ionic optimization is done.
+	Make_Overlap_Table MOT;
+
+	// if we want to add table for descriptors,
+	// we should consider here -- mohan 2021-02-09
 
 	private:
 

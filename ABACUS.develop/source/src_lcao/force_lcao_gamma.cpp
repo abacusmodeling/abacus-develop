@@ -1129,39 +1129,6 @@ void Force_LCAO_gamma::test_gamma(double* mm, const string &name)
     return;
 }
 
-void Force_LCAO_gamma::cal_fvna(LCAO_Matrix &LM)
-{
-    TITLE("Force_LCAO_gamma","cal_fvna");
-    timer::tick("Force_LCAO_gamma","cal_fvna",'H');
-    int istep=1;    
-    bool delta_vh = 0;
-    bool vna = 1; // tmp by mohan
-
-    int dense = VNA;
-    OUT(ofs_running,"dense grid for VNA force",dense);
-    Grid_Technique gtf;
-    gtf.set_pbc_grid(
-    pw.ncx*dense,pw.ncy*dense,pw.ncz*dense,
-    pw.bx*dense,pw.by*dense,pw.bz*dense,
-    pw.nbx,pw.nby,pw.nbz,
-    pw.nbxx,pw.nbzp_start,pw.nbzp,
-    vna);
-
-//--------------------------------------------------------
-// The neutral potential can be only used when vna = 1,
-// then to be used to check if the real space neutral
-// potential is correct
-//--------------------------------------------------------
-//  pot.init_pot(istep, delta_vh, vna);
-//  for(int ir=0; ir<pw.nrxx; ir++)
-//  {
-//      pot.vrs1[ir] = pot.vrs(CURRENT_SPIN, ir);
-//  }
-
-    UHM.GG.cal_force_vna(pot.vrs1, gtf, LM);
-    timer::tick("Force_LCAO_gamma","cal_fvna",'H');
-    return;
-}
 
 void Force_LCAO_gamma::cal_fvl_dphi(double** dm2d)
 {   
@@ -1185,16 +1152,6 @@ void Force_LCAO_gamma::cal_fvl_dphi(double** dm2d)
         }
     }
 
-    //xiaohui add 'OUT_LEVEL', 2015-09-16
-    if(OUT_LEVEL != "m") OUT(ofs_running,"VNA",VNA);
-
-    //===================================
-    // the neutral potential part.  
-    //===================================
-    if(VNA)
-    {
-        this->cal_fvna(LM);
-    }
 
     double* tmpDHx = new double[ParaO.nloc];
     double* tmpDHy = new double[ParaO.nloc];
@@ -1216,19 +1173,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(double** dm2d)
     //calculate <dphi | VL | phi>
 
     int istep = 1;
-    if(VNA)
-    {
-        // calculate the (delta_Vh + Vxc)
-        bool delta_vh = 1;
-        bool vna = 0;
-        // istep must set to 1, other wise the charge
-        // density may be changed!
-        pot.init_pot(istep, delta_vh, vna);
-    }
-    else
-    {
-        pot.init_pot(istep);
-    }
+    pot.init_pot(istep);
 
     for(int is=0; is<NSPIN; ++is)
     {
@@ -1577,15 +1522,6 @@ void Force_LCAO_gamma::cal_fvl_dphi(const std::vector<matrix> &dm2d)
         }
     }
 
-    if(OUT_LEVEL != "m") OUT(ofs_running,"VNA",VNA);
-
-    //===================================
-    // the neutral potential part.  
-    //===================================
-    if(VNA)
-    {
-        this->cal_fvna(LM);
-    }
 
     double* tmpDHx = new double[ParaO.nloc];
     double* tmpDHy = new double[ParaO.nloc];
@@ -1607,19 +1543,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(const std::vector<matrix> &dm2d)
     //calculate <dphi | VL | phi>
 
     int istep = 1;
-    if(VNA)
-    {
-        // calculate the (delta_Vh + Vxc)
-        bool delta_vh = 1;
-        bool vna = 0;
-        // istep must set to 1, other wise the charge
-        // density may be changed!
-        pot.init_pot(istep, delta_vh, vna);
-    }
-    else
-    {
-        pot.init_pot(istep);
-    }
+    pot.init_pot(istep);
 
     for(int is=0; is<NSPIN; ++is)
     {

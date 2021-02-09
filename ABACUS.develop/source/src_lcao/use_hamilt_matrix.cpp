@@ -2,8 +2,6 @@
 #include "use_hamilt_matrix.h"
 #include "build_st_pw.h"
 #include "sltk_atom_arrange.h"
-#include "lcao_vna.h"
-
 #include "global_fp.h" // mohan add 2021-01-30
 
 Use_Hamilt_Matrix::Use_Hamilt_Matrix()
@@ -30,31 +28,12 @@ void Use_Hamilt_Matrix::set_ion(void)
 	if(GAMMA_ONLY_LOCAL)
 	{
 		// mohan add 2012-03-29
-		if(GRID_SPEED==1)
-		{
-			// calculate the grid integration of 'Vl' matrix for gamma algorithms.
-			this->GG.prepare(ucell.latvec, ucell.lat0);
-		}
-		else if(GRID_SPEED==2)
-		{
-			this->GG.prepare(ucell.latvec, ucell.lat0);
-			this->GS.prepare(ucell.latvec, ucell.lat0);
-		}
-		else
-		{
-			WARNING_QUIT("Use_Hamilt_Matrix::set_ion","GRID_SPEED should be 1 or 2");
-		}
+		// calculate the grid integration of 'Vl' matrix for gamma algorithms.
+		this->GG.prepare(ucell.latvec, ucell.lat0);
 	
 		// calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
 	    this->calculate_STNR_gamma();	
 
-		// vna only need to do once, you can check this in lcao_vna.cpp
-		if(VNA>=1)
-		{
-			LCAO_Vna lv;
-			const char matrix_type='T';
-			lv.dense_vna(matrix_type); 
-		}
 	}
 	else // multiple k-points
 	{
@@ -64,18 +43,6 @@ void Use_Hamilt_Matrix::set_ion(void)
 		// calculate the grid integration of 'Vl' matrix for l-points algorithms.
 		this->GK.init(pw.nbx, pw.nby, pw.nbzp, pw.nbzp_start, pw.ncxyz);
 
-		// do real space grid integration.
-		if(VNA>=1)
-		{
-			LCAO_Vna lv;
-			const char matrix_type='T';
-			lv.dense_vna(matrix_type);
-		}
-		else if(VNA==-1)
-		{
-			LCAO_Vna lv;
-			lv.two_center_vna();
-		}
 	}
 
 	// initial the overlap matrix is done.	
@@ -112,34 +79,8 @@ void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik
 		// calculate the 'Vl' matrix using gamma-algorithms.
 		if(VL_IN_H)
 		{	
-			if(VNA==0)
-			{
-				if(GRID_SPEED==1)
-				{
-					this->GG.cal_vlocal(pot.vrs1);
-				}
-				else if(GRID_SPEED==2)
-				{
-					this->GS.cal_vlocal(pot.vrs1);
-				}
-			}
-			else if(VNA>1)
-			{
-				//------------------------------------------------
-				// calculate the Vna from dense grid integration.
-				//------------------------------------------------
-				LCAO_Vna lv;
-				lv.smooth_vl2();
-				//LCAO_Vna::real_space_vna();
-			}
-			else if(VNA==1)
-			{
-				//------------------------------------------------
-				// calculat the Vna from normal real space grid.
-				//------------------------------------------------
-				LCAO_Vna::smooth_vl1();
-			}
-			
+			this->GG.cal_vlocal(pot.vrs1);
+
 			// Peize Lin add 2016-12-03
 			if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
 			{

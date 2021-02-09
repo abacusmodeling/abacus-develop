@@ -6,7 +6,6 @@
 //#include "../src_develop/src_onscaling/on_tests.h"
 #include "update_input.h"
 #include "src_pw/chi0_hilbert.h"
-#include "lcao_vna.h"
 #include "evolve_lcao_matrix.h"
 #include "../src_pw/berryphase.h"
 #include "../src_pw/toWannier90.h"
@@ -731,30 +730,18 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 				// rememeber to delete the #include	
 				if(VL_IN_H)
 				{
-					if(VNA==0)
-					{
-						// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-						UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-						if(NSPIN==4)//integral 4 times, is there any method to simplify?
-						{//added by zhengdy-soc, for non-collinear case
-							for(int is=1;is<4;is++)
+					// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
+					UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
+					if(NSPIN==4)//integral 4 times, is there any method to simplify?
+					{//added by zhengdy-soc, for non-collinear case
+						for(int is=1;is<4;is++)
+						{
+							for(int ir=0; ir<pw.nrxx; ir++)
 							{
-								for(int ir=0; ir<pw.nrxx; ir++)
-								{
-									pot.vrs1[ir] = pot.vrs( is, ir);
-								}
-								UHM.GK.cal_vlocal_k(pot.vrs1, GridT, is);
+								pot.vrs1[ir] = pot.vrs( is, ir);
 							}
+							UHM.GK.cal_vlocal_k(pot.vrs1, GridT, is);
 						}
-					}
-					else if(VNA>1)
-					{
-						LCAO_Vna lv;
-						lv.smooth_vl2();
-					}
-					else if(VNA==1)
-					{
-						LCAO_Vna::smooth_vl1();
 					}
 				}
 			}

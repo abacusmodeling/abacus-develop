@@ -70,8 +70,6 @@ void Input_Conv::Convert(void)
     NSPIN = INPUT.nspin;				// 7
     CURRENT_SPIN = 0;					// 8
 
-	VNA = INPUT.vna;
-	GRID_SPEED = INPUT.grid_speed;		//
     FORCE = INPUT.force;				// 8.1
     FORCE_THR = INPUT.force_thr;		// 8.2
 
