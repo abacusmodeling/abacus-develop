@@ -791,8 +791,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 			}
 
 			// SGO: sub_grid_operation
-			// mohan comment out 2021-02-09
-			// SGO.cal_totwfc();
+			 SGO.cal_totwfc();
 
 
 			//--------------------------------------
@@ -825,7 +824,7 @@ void Local_Orbital_Elec::cal_bands(const int &istep)
 #endif
 			// distribute the wave functions again.
 			// delete the function -- mohan 2021-02-09
-			// SGO.dis_subwfc();
+			SGO.dis_subwfc();
 		}//end gamma
 		// with k points
 		else

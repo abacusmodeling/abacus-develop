@@ -108,7 +108,6 @@ sltk_atom_input.o\
 orbital_information_0.o\
 make_gaunt_table.o\
 make_overlap_table.o\
-make_vna_table.o\
 use_overlap_table.o\
 use_overlap_matrix.o\
 use_hamilt_matrix.o\
@@ -119,36 +118,24 @@ grid_meshcell.o\
 grid_bigcell.o\
 grid_meshball.o\
 grid_integral.o\
-gint_speed.o\
-gint_speed2.o\
-gint_speed_rho.o\
 gint_gamma.o\
 gint_gamma_fvl.o\
 gint_gamma_vl.o\
 gint_gamma_rho.o\
 gint_gamma_mull.o\
 gint_gamma_env.o \
-gint_gamma_fvna.o\
-gint_gamma_vna.o\
-gint_gamma_vna_d.o\
 gint_k.o\
 gint_k_init.o\
 gint_k_vl.o\
 gint_k_rho.o\
 gint_k_fvl.o\
-gint_k_fvna.o\
-gint_k_vna.o\
-gint_k_vna_d.o\
 grid_base.o\
 grid_base_beta.o\
 lcao_orbitals.o\
-lcao_vna.o\
-neutral_pot.o \
 numerical_orbital.o\
 numerical_orbital_lm.o\
 numerical_nonlocal.o\
 numerical_nonlocal_lm.o\
-numerical_vna_lm.o\
 local_orbital_wfc.o\
 local_orbital_elec.o\
 local_orbital_ions.o\
