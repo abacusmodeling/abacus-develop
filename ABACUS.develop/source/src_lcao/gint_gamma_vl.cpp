@@ -389,6 +389,7 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
 
+
     double ** GridVlocal = new double*[GridT.lgd];
     for (int i=0; i<GridT.lgd; i++)
     {
@@ -433,7 +434,9 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			ZEROS(GridVlocal_pool, lgd_now*lgd_now);
 			double **GridVlocal_thread=new double*[lgd_now];
 			for (int i=0; i<lgd_now; i++)
+			{
 				GridVlocal_thread[i]=&GridVlocal_pool[i*lgd_now];
+			}
 			Memory::record("Gint_Gamma","GridVlocal",lgd_now*lgd_now,"double");
 
 			double* ylma=new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
@@ -465,16 +468,22 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			double *psir_ylm_pool=new double[pw.bxyz*LD_pool];
 			double **psir_ylm=new double *[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
+			{
 				psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
+			}
 			ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
 			double *psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
 			double **psir_vlbr3=new double *[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
+			{
 				psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
+			}
 			ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
 			int **cal_flag=new int*[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
+			{
 				cal_flag[i]=new int[max_size];
+			}
 
 			int *block_iw = new int[max_size]; // index of wave functions of each block;
 
@@ -509,14 +518,19 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 
 						//OUT(ofs_running, "vldr3 was inited");
 						//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
-						//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
-						cal_psir_ylm(size, grid_index_thread, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
-						//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, i, j, k);
+						//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, 
+						// distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
+						cal_psir_ylm(size, grid_index_thread, delta_r, phi, mt, dr, 
+						distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
+						//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, 
+						// distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, i, j, k);
 						//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
 						//OUT(ofs_running, "psir_ylm was calculated");
 						//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
-						//cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
-						cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, cal_flag, vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal_thread);
+						//cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, 
+						// vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
+						cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, cal_flag, 
+						vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal_thread);
 						//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
 						//OUT(ofs_running, "GridVlocal was calculated");
 					}// k
@@ -526,8 +540,12 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			#pragma omp critical(cal_vl)
 			{
 				for (int i=0; i<lgd_now; i++)
+				{
 					for (int j=0; j<lgd_now; j++)
+					{
 						GridVlocal[i][j] += GridVlocal_thread[i][j];
+					}
+				}
 			}
 			
 			delete[] GridVlocal_thread;
@@ -536,15 +554,21 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			for(int i=0; i<pw.bxyz; i++)
 			{
 				for(int j=0; j<max_size; j++)
+				{
 					delete[] dr[i][j];
+				}
 				delete[] dr[i];
 			}
 			delete[] dr;
 			for(int i=0; i<pw.bxyz; i++)
+			{
 				delete[] distance[i];
+			}
 			delete[] distance;
 			for(int i=0; i<pw.bxyz; i++)
+			{
 				delete[] cal_flag[i];
+			}
 			delete[] cal_flag;
 			delete[] vindex;
 			delete[] ylma;
@@ -603,16 +627,23 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
         const int irow=ParaO.sender_local_index[i];
         const int icol=ParaO.sender_local_index[i+1];
         if(irow<=icol)
+		{
             ParaO.sender_buffer[i/2]=GridVlocal[irow][icol];
+		}
         else
+		{
             ParaO.sender_buffer[i/2]=GridVlocal[icol][irow];
+		}
     }
-    // OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
+     OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
 
     // use mpi_alltoall to get local data
     MPI_Alltoallv(ParaO.sender_buffer, ParaO.sender_size_process, ParaO.sender_displacement_process, MPI_DOUBLE, 
-                  ParaO.receiver_buffer, ParaO.receiver_size_process, ParaO.receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
-    // OUT(ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
+                  ParaO.receiver_buffer, ParaO.receiver_size_process, 
+					ParaO.receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
+
+     OUT(ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
+
     // put local data to H matrix
     for(int i=0; i<ParaO.receiver_index_size; i+=2)
     {
@@ -629,13 +660,16 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
         // }
         LM.set_HSgamma(g_row,g_col,ParaO.receiver_buffer[i/2],'L');
     }
+
     // OUT(ofs_running, "received vlocal data are put in to H")
     timer::tick("Gint_Gamma","distri_vl_value",'K');
     timer::tick("Gint_Gamma","distri_vl",'K');
     //OUT(ofs_running, "reduce all vlocal ok,");
 
 	for (int i=0; i<GridT.lgd; i++)
+	{
 		delete[] GridVlocal[i];
+	}
 	delete[] GridVlocal;
 
 	//OUT(ofs_running, "ALL GridVlocal was calculated");
