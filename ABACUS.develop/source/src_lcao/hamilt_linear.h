@@ -8,8 +8,7 @@
 #include "../src_pw/tools.h"
 #include "../src_pw/algorithms.h"
 
-#include "use_overlap_table.h" // (2)
-#include "local_orbital_pairs.h" // (5) pairs basis
+#include "use_overlap_table.h" 
 #include "../src_external/src_pdiag/pdiag_double.h"
 
 class Hamilt_Linear
@@ -44,6 +43,5 @@ public:
         double *en// band energy
     );
 
-	Local_Orbital_Pairs pairs;
 };
 #endif
