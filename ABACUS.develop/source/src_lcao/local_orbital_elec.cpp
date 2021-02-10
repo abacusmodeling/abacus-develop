@@ -9,8 +9,8 @@
 //
 #include "../src_global/sltk_atom_arrange.h"
 #include "src_lcao/lcao_nnr.h"
-#include "istate_charge.h"
-#include "istate_envelope.h"
+#include "../src_io/istate_charge.h"
+#include "../src_io/istate_envelope.h"
 #include "ELEC_scf.h"
 #include "ELEC_nscf.h"
 #include "ELEC_cbands_gamma.h"

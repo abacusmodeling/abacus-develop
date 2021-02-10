@@ -3,14 +3,10 @@
 #include "../src_pw/tools.h"
 
 IState_Envelope::IState_Envelope()
-{
-
-}
+{}
 
 IState_Envelope::~IState_Envelope()
-{
-
-}
+{}
 
 
 void IState_Envelope::begin(void)

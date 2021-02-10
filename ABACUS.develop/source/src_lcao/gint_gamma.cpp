@@ -76,5 +76,3 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 
     return;
 }
-
-

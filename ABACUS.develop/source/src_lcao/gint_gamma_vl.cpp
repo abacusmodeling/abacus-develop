@@ -45,7 +45,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi,
     for (int id=0; id<size; id++)
     {
         // there are two parameters we want to know here:
-        // in which bigcell of the meshball the atom in?
+        // in which bigcell of the meshball the atom is in?
         // what's the cartesian coordinate of the bigcell?
         const int mcell_index=GridT.bcell_start[grid_index] + id;
         const int imcell=GridT.which_bigcell[mcell_index];
@@ -77,7 +77,10 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi,
             dr[ib][id][1]=GridT.meshcell_pos[ib][1] + mt[1]; 
             dr[ib][id][2]=GridT.meshcell_pos[ib][2] + mt[2];     
 
-            distance[ib][id]=std::sqrt(dr[ib][id][0]*dr[ib][id][0] + dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
+            distance[ib][id]=std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
+			+ dr[ib][id][1]*dr[ib][id][1] 
+			+ dr[ib][id][2]*dr[ib][id][2]);
+
             //if(distance[ib][id] > ORB.Phi[it].getRcut()) 
             if(distance[ib][id] > (ORB.Phi[it].getRcut()- 1.0e-15))
             {
@@ -97,10 +100,10 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi,
                     dr[ib][id][1] / distance[ib][id],
                     dr[ib][id][2] / distance[ib][id],
                     ylma);
-            // these parameters are about interpolation
-            // because once we know the distance from atom to grid point,
-            // we can get the parameters we need to do interpolation and
-            // store them first!! these can save a lot of effort.
+            // these parameters are related to interpolation
+            // because once the distance from atom to grid point is known,
+            // we can obtain the parameters for interpolation and
+            // store them first! these operations save lots of efforts.
             const double position=distance[ib][id] / delta_r;
             int ip;
             double dx, dx2, dx3;
@@ -412,7 +415,9 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 		// allocate 1
 		int nnnmax=0;
 		for(int T=0; T<ucell.ntype; T++)
+		{
 			nnnmax=max(nnnmax, nnn[T]);
+		}
 
 		//int nblock;
 
