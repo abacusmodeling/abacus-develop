@@ -4,7 +4,7 @@
 #include "exx_abfs.h"
 
 #include<vector>
-#include "numerical_orbital_lm.h"
+#include "ORB_atomic_lm.h"
 
 class Exx_Abfs::Jle
 {

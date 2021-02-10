@@ -1,6 +1,6 @@
 #include "gint_gamma.h"
 #include "grid_technique.h"
-#include "lcao_orbitals.h"
+#include "ORB_read.h"
 #include "../src_pw/global.h"
 
 void Gint_Gamma::cal_env(const double* wfc, double* rho)

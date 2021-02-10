@@ -130,11 +130,11 @@ gint_k_rho.o\
 gint_k_fvl.o\
 grid_base.o\
 grid_base_beta.o\
-lcao_orbitals.o\
-numerical_orbital.o\
-numerical_orbital_lm.o\
-numerical_nonlocal.o\
-numerical_nonlocal_lm.o\
+ORB_read.o\
+ORB_atomic.o\
+ORB_atomic_lm.o\
+ORB_nonlocal.o\
+ORB_nonlocal_lm.o\
 local_orbital_wfc.o\
 local_orbital_elec.o\
 ELEC_cbands_k.o\

@@ -2,7 +2,7 @@
 #define GINT_K_H
 
 #include "gint_k_init.h"
-#include "numerical_orbital_lm.h"
+#include "ORB_atomic_lm.h"
 #include "grid_technique.h"
 //#include "lcao_matrix.h"
 

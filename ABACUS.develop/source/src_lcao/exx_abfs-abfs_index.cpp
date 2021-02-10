@@ -1,5 +1,5 @@
 #include "exx_abfs-abfs_index.h"
-#include "lcao_orbitals.h"
+#include "ORB_read.h"
 
 Element_Basis_Index::Range
 	Exx_Abfs::Abfs_Index::construct_range( const LCAO_Orbitals &orb )

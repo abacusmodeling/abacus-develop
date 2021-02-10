@@ -4,7 +4,7 @@
 #include "exx_abfs.h"
 
 #include <limits>
-#include "numerical_orbital_lm.h"
+#include "ORB_atomic_lm.h"
 
 class LCAO_Orbitals;
 

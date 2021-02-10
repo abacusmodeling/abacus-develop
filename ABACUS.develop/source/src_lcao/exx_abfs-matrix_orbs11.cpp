@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <set>
 #include "src_pw/global.h"
-#include "src_lcao/lcao_orbitals.h"
+#include "src_lcao/ORB_read.h"
 #include "src_lcao/ylm.h"
 #include "src_global/global_function.h"
 

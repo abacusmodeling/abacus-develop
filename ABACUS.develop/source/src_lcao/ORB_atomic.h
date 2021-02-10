@@ -7,7 +7,7 @@
 #define NUMERICAL_ORBITAL_H
 
 #include "../src_pw/tools.h"
-#include "numerical_orbital_lm.h"
+#include "ORB_atomic_lm.h"
 
 //=========================================================
 //CLASS  Num_Orbital

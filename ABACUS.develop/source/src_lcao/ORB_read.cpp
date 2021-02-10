@@ -1,4 +1,4 @@
-#include "lcao_orbitals.h"
+#include "ORB_read.h"
 #include "../src_pw/global.h" // only use ucell.atoms[it]
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 

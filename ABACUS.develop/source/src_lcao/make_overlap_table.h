@@ -6,12 +6,12 @@
 #define MAKE_OVERLAP_TABLE_H
 
 #include "src_pw/tools.h"
-#include "src_lcao/numerical_orbital.h"
-#include "src_lcao/numerical_orbital_lm.h"
-#include "src_lcao/numerical_nonlocal.h"
-#include "src_lcao/numerical_nonlocal_lm.h"
-#include "src_lcao/make_gaunt_table.h"
-#include "src_lcao/center2_orb.h"
+#include "ORB_atomic.h"
+#include "ORB_atomic_lm.h"
+#include "ORB_nonlocal.h"
+#include "ORB_nonlocal_lm.h"
+#include "make_gaunt_table.h"
+#include "center2_orb.h"
 #include "src_global/sph_bessel_recursive.h"
 
 #include <set>

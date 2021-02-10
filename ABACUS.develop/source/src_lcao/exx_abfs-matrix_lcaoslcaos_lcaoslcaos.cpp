@@ -1,7 +1,7 @@
 #include "exx_abfs-matrix_lcaoslcaos_lcaoslcaos.h"
 
 #include "../src_pw/global.h"
-#include "lcao_orbitals.h"
+#include "ORB_read.h"
 #include "ylm.h"
 
 #include "../src_external/src_test/test_function.h"			// Peize Lin test 2016-04-05

@@ -2,7 +2,7 @@
 //AUTHOR : liaochen
 //DATE : 2008-03-04
 //=========================================================
-#include "numerical_nonlocal_lm.h"
+#include "ORB_nonlocal_lm.h"
 #include "../src_pw/global.h"
 
 Numerical_Nonlocal_Lm::Numerical_Nonlocal_Lm()

@@ -2,7 +2,7 @@
 //AUTHOR : liaochen
 //DATE : 2008-11-12
 //=========================================================
-#include "numerical_orbital.h"
+#include "ORB_atomic.h"
 
 Vector3<double> Numerical_Orbital::R1;
 Vector3<double> Numerical_Orbital::R2;

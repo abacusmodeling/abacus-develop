@@ -6,7 +6,7 @@
 #include "src_pw/optical.h"
 #include "src_lcao/force_lcao.h"
 #include "src_lcao/local_orbital_charge.h"
-#include "src_lcao/lcao_orbitals.h"
+#include "src_lcao/ORB_read.h"
 #include "src_pw/efield.h"
 #include "src_lcao/global_fp.h"
 

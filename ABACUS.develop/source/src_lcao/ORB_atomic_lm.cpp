@@ -2,10 +2,10 @@
 //AUTHOR : liaochen, mohan
 //DATE : 2008-11-12
 //=========================================================
-#include "numerical_orbital_lm.h"
+#include "ORB_atomic_lm.h"
 #include "src_global/sph_bessel_recursive.h"
 #include "src_global/lapack_connector.h"
-#include<omp.h>
+#include <omp.h>
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
 {

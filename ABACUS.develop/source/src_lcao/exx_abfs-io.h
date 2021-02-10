@@ -5,7 +5,7 @@
 
 #include <map>
 #include <vector>
-#include "src_lcao/numerical_orbital_lm.h"
+#include "src_lcao/ORB_atomic_lm.h"
 #include "src_global/matrix.h"
 #include "src_global/element_basis_index.h"
 

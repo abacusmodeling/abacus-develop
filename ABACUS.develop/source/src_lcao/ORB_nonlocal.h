@@ -6,7 +6,7 @@
 #define NUMERICAL_NONLOCAL_H
 
 #include "../src_pw/tools.h"
-#include "numerical_nonlocal_lm.h"
+#include "ORB_nonlocal_lm.h"
 //=========================================================
 //CLASS  Numerical_Nonlocal
 //Note : contain nonlocal ps(:pseudopotential) information 

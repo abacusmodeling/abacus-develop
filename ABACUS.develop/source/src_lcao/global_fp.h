@@ -10,7 +10,7 @@
 #include "src_lcao/lcao_matrix.h"
 #include "src_lcao/use_overlap_matrix.h"
 #include "src_lcao/use_hamilt_matrix.h" 
-#include "src_lcao/lcao_orbitals.h"
+#include "src_lcao/ORB_read.h"
 #include "src_lcao/ORB_gen_tables.h"
 #include "src_parallel/subgrid_oper.h"
 #include "src_lcao/exx_lcao.h"

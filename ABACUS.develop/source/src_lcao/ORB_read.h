@@ -7,9 +7,9 @@
 #define LCAO_ORBITALS_H
 
 #include "../src_pw/tools.h"
-#include "numerical_orbital.h"
-#include "numerical_orbital_lm.h"
-#include "numerical_nonlocal.h"
+#include "ORB_atomic.h"
+#include "ORB_atomic_lm.h"
+#include "ORB_nonlocal.h"
 
 class LCAO_Orbitals
 {

@@ -2,7 +2,7 @@
 //AUTHOR : liaochen
 //DATE : 2008-03-04
 //=========================================================
-#include "numerical_nonlocal.h"
+#include "ORB_nonlocal.h"
 
 Numerical_Nonlocal::Numerical_Nonlocal()
 {

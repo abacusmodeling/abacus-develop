@@ -14,8 +14,8 @@ using std::set;
 
 #include "../src_lcao/make_overlap_table.h"
 #include "../src_lcao/make_gaunt_table.h"
-#include "../src_lcao/numerical_orbital_lm.h"
-#include "../src_lcao/lcao_orbitals.h"
+#include "../src_lcao/ORB_atomic_lm.h"
+#include "../src_lcao/ORB_read.h"
 #include "../src_global/vector3.h"
 #include "../src_lcao/ylm.h"
 #include "../src_lcao/global_fp.h"

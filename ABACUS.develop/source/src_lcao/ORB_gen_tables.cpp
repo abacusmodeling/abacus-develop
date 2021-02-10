@@ -1,6 +1,6 @@
 #include "ORB_gen_tables.h"
 #include "ylm.h"
-#include "lcao_orbitals.h"
+#include "ORB_read.h"
 #include "../src_pw/global.h"
 
 Use_Overlap_Table UOT;
