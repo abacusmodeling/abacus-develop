@@ -17,8 +17,8 @@
 #include "ELEC_cbands_k.h"
 #include "ELEC_evolve.h"
 //
-#include "src_lcao/exx_abfs.h"
-#include "src_lcao/exx_opt_orb.h"
+#include "src_ri/exx_abfs.h"
+#include "src_ri/exx_opt_orb.h"
 
 
 void Local_Orbital_Elec::solve_elec_stru(const int &istep)

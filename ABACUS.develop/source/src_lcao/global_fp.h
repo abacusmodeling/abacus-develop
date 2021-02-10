@@ -13,7 +13,7 @@
 #include "src_lcao/ORB_read.h"
 #include "src_lcao/ORB_gen_tables.h"
 #include "src_parallel/subgrid_oper.h"
-#include "src_lcao/exx_lcao.h"
+#include "src_ri/exx_lcao.h"
 
 extern Grid_Driver GridD;
 extern Parallel_Atoms ParaA;

@@ -13,7 +13,7 @@
 // Peize Lin test
 #include<iostream>
 #include<sys/time.h>
-#include"src_external/src_test/src_lcao/exx_lcao-test.h"
+#include"src_external/src_test/src_ri/exx_lcao-test.h"
 #include"src_lcao/global_fp.h"
 using namespace std;
 

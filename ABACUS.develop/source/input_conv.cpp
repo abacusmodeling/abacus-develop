@@ -19,7 +19,7 @@
 #include "src_pw/epsilon0_pwscf.h"
 #include "src_pw/epsilon0_vasp.h"
 #include "src_pw/unitcell.h"
-#include "src_lcao/exx_abfs-jle.h"
+#include "src_ri/exx_abfs-jle.h"
 
 //xiaohui modified 2013-03-23, adding "//" before #include...
 //#include "../../src_develop/src_siao/selinv.h"

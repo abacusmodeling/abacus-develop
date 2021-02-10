@@ -12,8 +12,8 @@
 //===================================
 #include "tools.h"
 #include "charge_mixing.h"
-#include "src_lcao/exx_abfs-dm.h"
-#include "src_lcao/exx_abfs-parallel-communicate-hexx.h"
+#include "src_ri/exx_abfs-dm.h"
+#include "src_ri/exx_abfs-parallel-communicate-hexx.h"
 
 class Charge_Pulay: public Charge_Mixing
 {

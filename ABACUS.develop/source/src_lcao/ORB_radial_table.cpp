@@ -2,7 +2,8 @@
 #include "ORB_read.h"
 
 #include <stdexcept>
-#include "exx_abfs.h"
+#include "../src_ri/exx_abfs.h"
+
 double Make_Overlap_Table::dr = -1.0;
 
 Make_Overlap_Table::Make_Overlap_Table()
@@ -142,23 +143,40 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 	{
 		case 1: // calculate overlap
 			if( !n1.get_psif().empty() && !n2.get_psi_k2().empty() )
+			{
 				for (int ik = 0; ik < kmesh; ik++)
+				{
 					k1_dot_k2[ik] = n1.getPsif(ik) * n2.getPsi_k2(ik);
+				}
+			}
 			else if( !n1.get_psi_k().empty() && !n2.get_psi_k().empty() )
+			{
 				for (int ik = 0; ik < kmesh; ik++)
+				{
 					k1_dot_k2[ik] = n1.getPsi_k(ik) * n2.getPsi_k(ik);
+				}
+			}
 			else if( !n1.get_psi_k2().empty() && !n2.get_psif().empty() )
+			{
 				for (int ik = 0; ik < kmesh; ik++)
+				{
 					k1_dot_k2[ik] = n1.getPsi_k2(ik) * n2.getPsif(ik);
+				}
+			}
 			break;
+
 		case 2: // calculate kinetic energy
 			for (int ik = 0; ik < kmesh; ik++)
+			{
 				k1_dot_k2[ik] = n1.getPsi_k2(ik) * n2.getPsi_k2(ik);
+			}
 			break;
 	}
 	
 	for (int ik = 0; ik < kmesh; ik++)
+	{
 		k1_dot_k2_dot_kpoint[ik] = k1_dot_k2[ik] * this->kpoint[ik];
+	}
 
 //	Mathzone_Add1::Sbt_new (3, l, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 2, rs);
 //	for (int ir = 0; ir < rmesh; ir++) rs[ir] *= FOUR_PI;
@@ -214,7 +232,9 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		
 		const vector<double> &jl_r = jl[ir];
 		for (int ik=0; ik<kmesh; ++ik)
+		{
 			integrated_func[ik] = jl_r[ik] * k1_dot_k2[ik];
+		}
 		// Call simpson integration
 		double temp = 0.0;
 		Mathzone::Simpson_Integral(kmesh,integrated_func,dk,temp);
@@ -263,11 +283,19 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		const vector<double> &jlp1_r = jlp1[ir];
 		const double fac = l/(l+1.0);
 		if( l==0 )
+		{
 			for (int ik=0; ik<kmesh; ++ik)
+			{
 				integrated_func[ik] = jlp1_r[ik] * k1_dot_k2_dot_kpoint[ik];
+			}
+		}
 		else
+		{
 			for (int ik=0; ik<kmesh; ++ik)
+			{
 				integrated_func[ik] = (jlp1_r[ik]-fac*jlm1_r[ik]) * k1_dot_k2_dot_kpoint[ik];
+			}
+		}
 //		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		Mathzone::Simpson_Integral(kmesh,integrated_func,dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
@@ -444,25 +472,41 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 	{
 		case 1: // calculate overlap
 			if( !n1.get_psif().empty() && !n2.get_psi_k2().empty() )
+			{
 				for (int ik = 0; ik < kmesh; ik++)
+				{
 					k1_dot_k2[ik] = n1.getPsif(ik) * n2.getPsi_k2(ik);
+				}
+			}
 			else if( !n1.get_psi_k().empty() && !n2.get_psi_k().empty() )
+			{
 				for (int ik = 0; ik < kmesh; ik++)
+				{
 					k1_dot_k2[ik] = n1.getPsi_k(ik) * n2.getPsi_k(ik);
+				}
+			}
 			else if( !n1.get_psi_k2().empty() && !n2.get_psif().empty() )
+			{
 				for (int ik = 0; ik < kmesh; ik++)
+				{
 					k1_dot_k2[ik] = n1.getPsi_k2(ik) * n2.getPsif(ik);
+				}
+			}
 			break;
+
 		case 2: // calculate kinetic energy
 			for (int ik = 0; ik < kmesh; ik++)
+			{
 				k1_dot_k2[ik] = n1.getPsi_k2(ik) * n2.getPsi_k2(ik);
+			}
 			break;
 	}
 	
 	vector<double> k1_dot_k2_dot_kpoint(kmesh);
 	for (int ik = 0; ik < kmesh; ik++)
+	{
 		k1_dot_k2_dot_kpoint[ik] = k1_dot_k2[ik] * this->kpoint[ik];
-
+	}
 
 	vector<double> integrated_func(kmesh);
 	
@@ -479,7 +523,9 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		
 		const vector<double> &jl_r = jl[ir];
 		for (int ik=0; ik<kmesh; ++ik)
+		{
 			integrated_func[ik] = jl_r[ik] * k1_dot_k2[ik];
+		}
 		double temp = 0.0;
 //		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
@@ -489,11 +535,19 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		const vector<double> &jlp1_r = jlp1[ir];
 		const double fac = l/(l+1.0);
 		if( l==0 )
+		{
 			for (int ik=0; ik<kmesh; ++ik)
+			{
 				integrated_func[ik] = jlp1_r[ik] * k1_dot_k2_dot_kpoint[ik];
+			}
+		}
 		else
+		{
 			for (int ik=0; ik<kmesh; ++ik)
+			{
 				integrated_func[ik] = (jlp1_r[ik]-fac*jlm1_r[ik]) * k1_dot_k2_dot_kpoint[ik];
+			}
+		}
 //		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
@@ -505,7 +559,9 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		if( radials.find(0)!=radials.end() )
 		{
 			for (int ik = 0; ik < kmesh; ik++)
+			{
 				integrated_func[ik] = k1_dot_k2[ik] * pow (kpoint[ik], l);
+			}
 			double temp = 0.0;
 	//		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
 			Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
@@ -600,7 +656,9 @@ void Make_Overlap_Table::cal_VNL_PhiBeta_R(
 //			Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l-1, jl);
 					
 			for (int ik = 0; ik < kmesh; ik++)
+			{
 				integrated_func[ik] = jlm1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
+			}
 
 			Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp1);
 		}
@@ -609,7 +667,9 @@ void Make_Overlap_Table::cal_VNL_PhiBeta_R(
 //		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l+1, jl);
 				
 		for (int ik = 0; ik < kmesh; ik++)
+		{
 			integrated_func[ik] = jlp1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
+		}
 		
 		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp2);
 		
