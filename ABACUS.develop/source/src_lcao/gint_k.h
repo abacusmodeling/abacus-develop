@@ -4,7 +4,7 @@
 #include "gint_k_init.h"
 #include "ORB_atomic_lm.h"
 #include "grid_technique.h"
-//#include "lcao_matrix.h"
+//#include "LCAO_matrix.h"
 
 class Gint_k : public Gint_k_init
 {

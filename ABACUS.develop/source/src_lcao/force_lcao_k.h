@@ -2,7 +2,7 @@
 #define FORCE_LCAO_K_H
 
 #include "../src_pw/tools.h"
-#include "lcao_matrix.h" 
+#include "LCAO_matrix.h" 
 #include "force_lcao_gamma.h"
 
 class Force_LCAO_k : public Force_LCAO_gamma

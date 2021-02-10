@@ -9,18 +9,13 @@
 
 ***********************************************************************/
 
-//#include "../src_pw/global.h"
 #include "mulliken_charge.h"
 #include "../src_lcao/local_orbital_charge.h"
-//#include "../src_lcao/sltk_grid_driver.h"
-#include "use_overlap_matrix.h"
+#include "LCAO_gen_fixedH.h"
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
-#include "../src_lcao/lcao_matrix.h"
 #include "global_fp.h"
-//#include "../src_develop/src_wannier/manipulation.h"
-//#include "lcao_nnr.h"
-#include "lcao_matrix.h"
+#include "LCAO_matrix.h"
 #include "../src_lcao/global_fp.h"
 #include "../src_lcao/wfc_dm_2d.h"
 #include "../src_global/lapack_connector.h"
@@ -30,7 +25,7 @@
 #include <vector>
 #include <mpi.h>
 #include "../src_global/sltk_atom_arrange.h"
-#include "../src_lcao/lcao_nnr.h"
+#include "../src_lcao/LCAO_nnr.h"
 
 
 

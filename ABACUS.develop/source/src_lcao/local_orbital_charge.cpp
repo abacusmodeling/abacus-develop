@@ -108,7 +108,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 }
 
 
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
 {
      TITLE("Local_Orbital_Charge","allocate_k");

@@ -1,4 +1,4 @@
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 #include "../src_pw/global.h"
 #include "record_adj.h" //mohan add 2012-07-06
 #include "dftu.h"       //quxin add 2020-10-29
@@ -565,7 +565,10 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 //	RA.for_2d();
 
 	//Quxin added for DFT+U calculation
- 	if(INPUT.dft_plus_u) ZEROS( VECTOR_TO_PTR(dftu.Sm_k.at(ik)), ParaO.nloc);
+ 	if(INPUT.dft_plus_u) 
+	{
+		ZEROS( VECTOR_TO_PTR(dftu.Sm_k.at(ik)), ParaO.nloc);
+	}
 
 	int iat = 0;
 	int index = 0;
@@ -679,7 +682,8 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							// Hloc_fixed2 is used to diagonalize (eliminate index R).
 							//###################################################################
 							
-							if(NSPIN!=4){
+							if(NSPIN!=4)
+							{
 								LM.Sloc2[iic] += LM.SlocR[index] * kphase;
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;
 
@@ -692,7 +696,10 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR_soc[index] * kphase;
 
 								//quxin added for DFT+U calculation
-							 	if(INPUT.dft_plus_u) dftu.Sm_k.at(ik).at(iic) += LM.SlocR_soc[index] * kphase;
+							 	if(INPUT.dft_plus_u) 
+								{
+									dftu.Sm_k.at(ik).at(iic) += LM.SlocR_soc[index] * kphase;
+								}
 							}
 							++index;
 

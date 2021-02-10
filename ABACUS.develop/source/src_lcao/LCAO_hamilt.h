@@ -2,7 +2,7 @@
 #define USE_HAMILT_MATRIX_H
 
 #include "../src_pw/tools.h"
-#include "use_overlap_matrix.h"
+#include "LCAO_gen_fixedH.h"
 #include "gint_gamma.h"
 #include "gint_k.h"
 #include "grid_integral.h"

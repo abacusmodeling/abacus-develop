@@ -1,6 +1,6 @@
 #include "../src_pw/tools.h"
 #include "gint_k.h"
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 #include "ORB_read.h"
 #include "grid_technique.h"
 #include "ylm.h"

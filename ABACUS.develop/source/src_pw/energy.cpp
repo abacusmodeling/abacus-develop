@@ -9,16 +9,14 @@
 #include "algorithms.h"
 #include "mymath.h"
 #include "../src_lcao/mulliken_charge.h"
-#include "../src_lcao/lcao_nnr.h"
-#include  "../src_lcao/use_overlap_matrix.h"    
+#include "../src_lcao/LCAO_nnr.h"
+#include "../src_lcao/LCAO_gen_fixedH.h"    
 #include "../src_global/sltk_atom_arrange.h"//qifeng-2019-01-21
 #include "../src_lcao/local_orbital_charge.h"
-
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
-#include "../src_lcao/lcao_matrix.h"
+#include "../src_lcao/LCAO_matrix.h"
 #include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
-
 #include "../src_lcao/global_fp.h"
 #include "../src_lcao/wfc_dm_2d.h"
 #include "../src_global/lapack_connector.h"

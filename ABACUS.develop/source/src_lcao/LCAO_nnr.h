@@ -1,11 +1,12 @@
-#ifndef LCAO_NNR
-#define LCAO_NNR
+#ifndef LCAO_NNR_H
+#define LCAO_NNR_H
 
 #include "grid_technique.h"
 
 class LCAO_nnr
 {
 	public:
+
 	LCAO_nnr();
 	~LCAO_nnr();	
 	

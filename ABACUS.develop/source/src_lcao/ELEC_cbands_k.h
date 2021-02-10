@@ -2,7 +2,7 @@
 #define ELEC_CBANDS_K_H
 
 #include "../src_pw/tools.h"
-#include "use_hamilt_matrix.h"
+#include "LCAO_hamilt.h"
 
 //-----------------------------------------------------------
 // mohan add 2021-02-09

@@ -105,8 +105,6 @@ sltk_atom_arrange.o\
 sltk_atom.o\
 sltk_adjacent_set.o\
 sltk_atom_input.o\
-use_overlap_matrix.o\
-use_hamilt_matrix.o\
 build_st_pw.o\
 grid_technique.o\
 grid_meshk.o\
@@ -146,12 +144,14 @@ ELEC_nscf.o\
 local_orbital_ions.o\
 local_orbital_charge.o\
 record_adj.o\
-lcao_matrix.o\
-lcao_nnr.o \
 istate_charge.o \
 istate_envelope.o \
-diago_lcao_matrix.o\
-evolve_lcao_matrix.o\
+LCAO_gen_fixedH.o\
+LCAO_hamilt.o\
+LCAO_matrix.o\
+LCAO_nnr.o \
+LCAO_diago.o\
+LCAO_evolve.o\
 ylm.o\
 force_lcao.o\
 force_lcao_gamma.o\

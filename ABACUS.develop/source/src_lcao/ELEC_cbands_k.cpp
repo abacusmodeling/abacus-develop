@@ -1,9 +1,9 @@
 #include "ELEC_cbands_k.h"
 #include "local_orbital_elec.h"
-#include "diago_lcao_matrix.h"
+#include "LCAO_diago.h"
 #include "src_pw/global.h"
 #include "src_pw/symmetry_rho.h"
-#include "evolve_lcao_matrix.h"
+#include "LCAO_evolve.h"
 #include "dftu.h"
 
 ELEC_cbands_k::ELEC_cbands_k(){};

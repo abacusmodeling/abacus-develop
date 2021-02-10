@@ -20,7 +20,7 @@
 #include "../src_global/lapack_connector.h"
 #include "../src_pw/inverse_matrix.h"
 #include "local_orbital_ions.h"
-#include "lcao_matrix.h"
+#include "LCAO_matrix.h"
 #include "../src_pw/magnetism.h"
 #include "ORB_gen_tables.h"
 #include "../src_pw/charge.h"

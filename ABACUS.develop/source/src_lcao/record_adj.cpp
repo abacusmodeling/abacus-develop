@@ -26,7 +26,7 @@ void Record_adj::delete_grid(void)
 // This will record the orbitals according to
 // HPSEPS's 2D block division.
 //--------------------------------------------
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 void Record_adj::for_2d(void)
 {
 	TITLE("Record_adj","for_2d");

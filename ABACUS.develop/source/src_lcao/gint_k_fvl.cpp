@@ -1,6 +1,6 @@
 #include "gint_k.h"
 #include "../src_pw/global.h"
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
 

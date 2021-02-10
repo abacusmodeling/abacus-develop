@@ -18,7 +18,7 @@
 #include "global_fp.h"
 #include "../src_global/global_function.h"
 #include "local_orbital_ions.h"
-#include "lcao_matrix.h"
+#include "LCAO_matrix.h"
 
 
 extern "C"

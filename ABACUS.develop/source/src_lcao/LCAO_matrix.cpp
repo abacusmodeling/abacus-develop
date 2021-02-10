@@ -1,4 +1,4 @@
-#include "lcao_matrix.h"
+#include "LCAO_matrix.h"
 #include "global_fp.h"
 
 LCAO_Matrix::LCAO_Matrix()

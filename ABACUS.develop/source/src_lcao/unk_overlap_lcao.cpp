@@ -1,5 +1,5 @@
 #include "unk_overlap_lcao.h"
-#include "../src_lcao/lcao_nnr.h"
+#include "../src_lcao/LCAO_nnr.h"
 #include "ctime"
 #include "src_global/scalapack_connector.h"
 

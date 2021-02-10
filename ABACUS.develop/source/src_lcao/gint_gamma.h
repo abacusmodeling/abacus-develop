@@ -8,7 +8,7 @@
 #include "../src_pw/tools.h"
 #include "grid_base_beta.h"
 #include "grid_technique.h"
-#include "lcao_matrix.h"
+#include "LCAO_matrix.h"
 #include <omp.h>
 
 //=========================================================

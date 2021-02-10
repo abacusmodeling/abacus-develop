@@ -1,5 +1,5 @@
 #include "../src_pw/global.h"
-#include "use_hamilt_matrix.h"
+#include "LCAO_hamilt.h"
 #include "build_st_pw.h"
 #include "../src_global/sltk_atom_arrange.h"
 #include "global_fp.h" // mohan add 2021-01-30
@@ -179,7 +179,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 }
 
 
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 // be called in Local_Orbital_Elec::cal_bands(). 
 void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 {

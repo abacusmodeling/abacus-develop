@@ -10,7 +10,7 @@ Force_LCAO_k::~Force_LCAO_k ()
 {
 }
 
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 // be called in Force_LCAO::start_force_calculation
 void Force_LCAO_k::ftable_k (void)
 {
@@ -190,7 +190,7 @@ void Force_LCAO_k::finish_k(void)
 }
 
 #include "record_adj.h"
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 {
 	TITLE("Force_LCAO_k","set_EDM_k");

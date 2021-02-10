@@ -2,7 +2,7 @@
 #include "src_pw/global.h"
 #include "src_parallel/parallel_orbitals.h"
 #include "src_external/src_pdiag/pdiag_double.h"
-#include "lcao_nnr.h"
+#include "LCAO_nnr.h"
 #include "force_lcao.h"
 #include "stress_lcao.h"
 #include "src_global/global_function.h"
