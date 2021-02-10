@@ -66,7 +66,7 @@ mdNVT.o\
 exx_lip.o\
 soc.o\
 toWannier90.o \
-unkOverlap_pw.o \
+unk_overlap_pw.o \
 berryphase.o \
 sto_elec.o\
 sto_wf.o\
@@ -105,10 +105,9 @@ sltk_atom_arrange.o\
 sltk_atom.o\
 sltk_adjacent_set.o\
 sltk_atom_input.o\
-orbital_information_0.o\
 make_gaunt_table.o\
 make_overlap_table.o\
-use_overlap_table.o\
+ORB_gen_tables.o\
 use_overlap_matrix.o\
 use_hamilt_matrix.o\
 build_st_pw.o\
@@ -201,7 +200,7 @@ exx_lcao.o \
 exx_opt_orb.o \
 exx_opt_orb-print.o \
 wfc_dm_2d.o \
-unkOverlap_lcao.o \
+unk_overlap_lcao.o \
 cal_r_overlap_R.o \
 
 OBJS_WANNIER=wan_global.o\
@@ -279,7 +278,7 @@ symmetry_rho.o \
 symm_book.o \
 symm_other.o \
 eximport.o \
-Mulliken_Charge.o\
+mulliken_charge.o\
 
 #OBJS_MLWF=mlwf_kmesh.o\
 mlwf_overlap.o\

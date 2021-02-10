@@ -8,10 +8,8 @@
 #include "energy.h"
 #include "algorithms.h"
 #include "mymath.h"
-//#include "../src_develop/src_siao/selinv.h"
-#include "../src_lcao/Mulliken_Charge.h"
+#include "../src_lcao/mulliken_charge.h"
 #include "../src_lcao/lcao_nnr.h"
-//#include "../src_lcao/Mulliken_Charge.h"
 #include  "../src_lcao/use_overlap_matrix.h"    
 #include "../src_global/sltk_atom_arrange.h"//qifeng-2019-01-21
 #include "../src_lcao/local_orbital_charge.h"

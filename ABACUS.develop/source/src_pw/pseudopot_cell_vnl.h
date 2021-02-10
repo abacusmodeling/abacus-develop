@@ -7,7 +7,7 @@
 
 #include "tools.h"
 #include "pseudopot_cell_vl.h"
-#include "../src_lcao/use_overlap_table.h"
+#include "../src_lcao/ORB_gen_tables.h"
 
 //==========================================================
 // CLASS : 

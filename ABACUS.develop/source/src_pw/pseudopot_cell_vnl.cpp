@@ -7,7 +7,7 @@
 #include "pseudopot_cell_vnl.h"
 #include "tools.h"
 #include "wavefunc.h"
-#include "../src_lcao/use_overlap_table.h"
+#include "../src_lcao/ORB_gen_tables.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {

@@ -5,7 +5,7 @@
 #define USE_OVERLAP_MATRIX_H
 
 #include "../src_pw/tools.h"
-#include "use_overlap_table.h"
+#include "ORB_gen_tables.h"
 #include "../src_global/sltk_grid_driver.h"
 
 class Use_Overlap_Matrix

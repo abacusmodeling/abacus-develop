@@ -23,7 +23,7 @@
 #include "local_orbital_ions.h"
 #include "lcao_matrix.h"
 #include "../src_pw/magnetism.h"
-#include "use_overlap_table.h"
+#include "ORB_gen_tables.h"
 #include "../src_pw/charge.h"
 
 DFTU dftu;

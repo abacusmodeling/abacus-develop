@@ -8,7 +8,7 @@
 #include "../src_pw/tools.h"
 #include "../src_pw/algorithms.h"
 
-#include "use_overlap_table.h" 
+#include "ORB_gen_tables.h"
 #include "../src_external/src_pdiag/pdiag_double.h"
 
 class Hamilt_Linear

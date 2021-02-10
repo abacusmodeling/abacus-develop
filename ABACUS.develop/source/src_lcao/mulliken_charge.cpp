@@ -10,7 +10,7 @@
 ***********************************************************************/
 
 //#include "../src_pw/global.h"
-#include "Mulliken_Charge.h"
+#include "mulliken_charge.h"
 #include "../src_lcao/local_orbital_charge.h"
 //#include "../src_lcao/sltk_grid_driver.h"
 #include "use_overlap_matrix.h"

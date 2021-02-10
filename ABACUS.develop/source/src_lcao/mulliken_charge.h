@@ -3,7 +3,7 @@
 
 //#include "../src_pw/tools.h"
 #include "../src_pw/tools.h"
-#include "use_overlap_table.h"
+#include "ORB_gen_tables.h"
 #include "../src_global/sltk_grid_driver.h"
 #include "lcao_matrix.h"
 #include "lcao_matrix.h"
