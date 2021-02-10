@@ -3,8 +3,8 @@
 #include "exx_abfs.h"
 #include "exx_opt_orb.h"
 #include "global_fp.h"
-#include "LCAO_cbands_gamma.h"
-#include "LCAO_cbands_k.h"
+#include "ELEC_cbands_gamma.h"
+#include "ELEC_cbands_k.h"
 #include "../src_pw/berryphase.h"
 #include "../src_pw/toWannier90.h"
 
@@ -36,11 +36,11 @@ void ELEC_nscf::nscf(Use_Hamilt_Matrix &uhm)
 	int istep=0; 
 	if(GAMMA_ONLY_LOCAL)
 	{
-		LCAO_cbands_gamma::cal_bands(istep, uhm);
+		ELEC_cbands_gamma::cal_bands(istep, uhm);
 	}
 	else
 	{
-		LCAO_cbands_k::cal_bands(istep, uhm);
+		ELEC_cbands_k::cal_bands(istep, uhm);
 	}
 
 	time_t time_finish=std::time(NULL);

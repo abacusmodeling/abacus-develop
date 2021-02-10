@@ -2,15 +2,15 @@
 // Author: Lixin He,mohan
 // DATE : 2008-11-6
 //==========================================================
-#include "../src_pw/global.h"
-#include "../src_pw/tools.h"
-#include "../input.h"
-#include "update_input.h"
-#include "../src_ions/ions_move_basic.h"
-#include "../src_pw/optical.h"
-#include "../src_lcao/force_lcao.h"
-#include "../src_lcao/local_orbital_charge.h"
-#include "global_fp.h" // mohan update 2021-01-30
+#include "input_update.h"
+#include "src_pw/global.h"
+#include "src_pw/tools.h"
+#include "input.h"
+#include "src_ions/ions_move_basic.h"
+#include "src_pw/optical.h"
+#include "src_lcao/force_lcao.h"
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/global_fp.h" // mohan update 2021-01-30
 
 Update_input::Update_input() {}
 Update_input::~Update_input() {}

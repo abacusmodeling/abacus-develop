@@ -4,10 +4,10 @@
 #include "src_pw/symmetry_rho.h"
 #include "dftu.h"
 #include "evolve_lcao_matrix.h"
-#include "LCAO_cbands_k.h"
-#include "LCAO_cbands_gamma.h"
-#include "LCAO_evolve.h"
-#include "update_input.h"
+#include "ELEC_cbands_k.h"
+#include "ELEC_cbands_gamma.h"
+#include "ELEC_evolve.h"
+#include "input_update.h"
 
 ELEC_scf::ELEC_scf(){}
 ELEC_scf::~ELEC_scf(){}
@@ -264,17 +264,17 @@ void ELEC_scf::scf(const int &istep)
 		// mohan add 2021-02-09
 		if(GAMMA_ONLY_LOCAL)
 		{
-			LCAO_cbands_gamma::cal_bands(istep, UHM);
+			ELEC_cbands_gamma::cal_bands(istep, UHM);
 		}
 		else
 		{
 			if(tddft)
 			{
-				LCAO_evolve::evolve_psi(istep, UHM, this->WFC_init);
+				ELEC_evolve::evolve_psi(istep, UHM, this->WFC_init);
 			}
 			else
 			{
-				LCAO_cbands_k::cal_bands(istep, UHM);
+				ELEC_cbands_k::cal_bands(istep, UHM);
 			}
 		}
 

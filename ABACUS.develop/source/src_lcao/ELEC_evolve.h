@@ -1,5 +1,5 @@
-#ifndef LCAO_EVOLVE_H
-#define LCAO_EVOLVE_H
+#ifndef ELEC_EVOLVE_H
+#define ELEC_EVOLVE_H
 
 #include "../src_pw/tools.h"
 #include "use_hamilt_matrix.h"
@@ -11,15 +11,15 @@
 // k is the index for the points in the first Brillouin zone
 //-----------------------------------------------------------
 
-class LCAO_evolve
+class ELEC_evolve
 {
 
 	friend class ELEC_scf;
 
 	public:
 
-	LCAO_evolve();
-	~LCAO_evolve();
+	ELEC_evolve();
+	~ELEC_evolve();
 
 	private:
 

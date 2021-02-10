@@ -1,5 +1,5 @@
-#ifndef LCAO_CBANDS_K_H
-#define LCAO_CBANDS_K_H
+#ifndef ELEC_CBANDS_GAMMA_H
+#define ELEC_CBANDS_GAMMA_H
 
 #include "../src_pw/tools.h"
 #include "use_hamilt_matrix.h"
@@ -8,20 +8,20 @@
 // mohan add 2021-02-09
 // This class is used to calculate the band structures
 // (eigenvalues and eigen wave functions) of the 
-// Kohn-Sham equation in terms of the multiple k points
+// Kohn-Sham equation in terms of the gamma-only k-point
 // k is the index for the points in the first Brillouin zone
 //-----------------------------------------------------------
 
-class LCAO_cbands_k
+class ELEC_cbands_gamma
 {
 
-	friend class ELEC_scf;
-	friend class ELEC_nscf;
+	friend class ELEC_scf; 
+	friend class ELEC_nscf; 
 
 	public:
 
-	LCAO_cbands_k();
-	~LCAO_cbands_k();
+	ELEC_cbands_gamma();
+	~ELEC_cbands_gamma();
 
 
 	private:

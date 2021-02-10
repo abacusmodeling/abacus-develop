@@ -1,4 +1,4 @@
-#include "LCAO_cbands_gamma.h"
+#include "ELEC_cbands_gamma.h"
 #include "local_orbital_elec.h"
 #include "diago_lcao_matrix.h"
 #include "src_pw/global.h"
@@ -7,14 +7,14 @@
 #include "dftu.h"
 
 
-LCAO_cbands_gamma::LCAO_cbands_gamma(){};
-LCAO_cbands_gamma::~LCAO_cbands_gamma(){};
+ELEC_cbands_gamma::ELEC_cbands_gamma(){};
+ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 
 
-void LCAO_cbands_gamma::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
+void ELEC_cbands_gamma::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 {
-	TITLE("LCAO_cbands_gamma","cal_bands");
-	timer::tick("LCAO_cband_gamma","cal_bands",'E');
+	TITLE("ELEC_cbands_gamma","cal_bands");
+	timer::tick("ELEC_cband_gamma","cal_bands",'E');
 
 	assert(NSPIN == kv.nks);
 						
@@ -101,7 +101,7 @@ void LCAO_cbands_gamma::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 		SGO.dis_subwfc();
 	}// end k points
 			
-	timer::tick("LCAO_cband_gamma","cal_bands",'E');
+	timer::tick("ELEC_cband_gamma","cal_bands",'E');
 	return;	
 }
 

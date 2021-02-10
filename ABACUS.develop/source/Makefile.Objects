@@ -138,9 +138,9 @@ numerical_nonlocal.o\
 numerical_nonlocal_lm.o\
 local_orbital_wfc.o\
 local_orbital_elec.o\
-LCAO_cbands_k.o\
-LCAO_cbands_gamma.o\
-LCAO_evolve.o\
+ELEC_cbands_k.o\
+ELEC_cbands_gamma.o\
+ELEC_evolve.o\
 ELEC_scf.o\
 ELEC_nscf.o\
 local_orbital_ions.o\
@@ -243,7 +243,7 @@ occupy.o\
 cal_test0.o\
 cal_test.o\
 winput.o\
-update_input.o \
+input_update.o\
 lattice_change_methods.o \
 lattice_change_cg.o \
 lattice_change_basic.o \

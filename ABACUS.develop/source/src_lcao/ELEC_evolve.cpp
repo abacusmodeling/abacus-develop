@@ -1,4 +1,4 @@
-#include "LCAO_cbands_k.h"
+#include "ELEC_evolve.h"
 #include "local_orbital_elec.h"
 #include "diago_lcao_matrix.h"
 #include "src_pw/global.h"
@@ -6,14 +6,14 @@
 #include "evolve_lcao_matrix.h"
 #include "dftu.h"
 
-LCAO_cbands_k::LCAO_cbands_k(){};
-LCAO_cbands_k::~LCAO_cbands_k(){};
+ELEC_evolve::ELEC_evolve(){};
+ELEC_evolve::~ELEC_evolve(){};
 
-
-void LCAO_cbands_k::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
+// this routine only serves for TDDFT using LCAO basis set
+void ELEC_evolve::evolve_psi(const int &istep, Use_Hamilt_Matrix &uhm, complex<double> ***wfc)
 {
-	TITLE("LCAO_cbands_k","cal_bands");
-	timer::tick("LCAO_cbands_k","cal_bands",'E');
+	TITLE("ELEC_evolve","eveolve_psi");
+	timer::tick("ELEC_evolve","evolve_psi",'E');
 
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
@@ -46,27 +46,21 @@ void LCAO_cbands_k::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 		}
 		else
 		{
-			//ofs_running << " (spin change)" << endl;
 			uhm.GK.reset_spin( CURRENT_SPIN );
 
-			// if you change the place of the following code,
-			// rememeber to delete the #include	
-			if(VL_IN_H)
+			// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
+			uhm.GK.cal_vlocal_k(pot.vrs1,GridT);
+			// added by zhengdy-soc, for non-collinear case
+			// integral 4 times, is there any method to simplify?
+			if(NSPIN==4)
 			{
-				// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-				uhm.GK.cal_vlocal_k(pot.vrs1,GridT);
-				// added by zhengdy-soc, for non-collinear case
-				// integral 4 times, is there any method to simplify?
-				if(NSPIN==4)
+				for(int is=1;is<4;is++)
 				{
-					for(int is=1;is<4;is++)
+					for(int ir=0; ir<pw.nrxx; ir++)
 					{
-						for(int ir=0; ir<pw.nrxx; ir++)
-						{
-							pot.vrs1[ir] = pot.vrs( is, ir);
-						}
-						uhm.GK.cal_vlocal_k(pot.vrs1, GridT, is);
+						pot.vrs1[ir] = pot.vrs(is, ir);
 					}
+					uhm.GK.cal_vlocal_k(pot.vrs1, GridT, is);
 				}
 			}
 		}
@@ -83,8 +77,6 @@ void LCAO_cbands_k::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 		//--------------------------------------------
 
 		// with k points
-		timer::tick("Efficience","each_k");
-		timer::tick("Efficience","H_k");
 		uhm.calculate_Hk(ik);
 
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
@@ -98,8 +90,6 @@ void LCAO_cbands_k::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 			}							
 		}
 
-		timer::tick("Efficience","H_k");
-
 		// Peize Lin add at 2020.04.04
 		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
 		{
@@ -111,13 +101,22 @@ void LCAO_cbands_k::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 			restart.save_disk("H", ik);
 		}
 
-		// write the wave functions into LOWF.WFC_K[ik].
-		timer::tick("Efficience","diago_k");
-		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
-		timer::tick("Efficience","diago_k");
-
-		timer::tick("Efficience","each_k");
+		bool diago = true;
+		if (istep >= 1) diago = false;
+		if(diago)
+		{
+			timer::tick("Efficience","diago_k");
+			Diago_LCAO_Matrix DLM;
+			DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
+			timer::tick("Efficience","diago_k");
+		}
+		else
+		{
+			timer::tick("Efficience","evolve_k");
+			Evolve_LCAO_Matrix ELM;
+			ELM.evolve_complex_matrix(ik, LOWF.WFC_K[ik], wfc[ik]);
+			timer::tick("Efficience","evolve_k");
+		}
 	} // end k
 			
 	// LiuXh modify 2019-07-15*/
@@ -126,7 +125,7 @@ void LCAO_cbands_k::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 		uhm.GK.destroy_pvpR();
 	}
 
-	timer::tick("LCAO_cbands_k","cal_bands",'E');
+	timer::tick("ELEC_evolve","evolve_psi",'E');
 	return;	
 }
 
