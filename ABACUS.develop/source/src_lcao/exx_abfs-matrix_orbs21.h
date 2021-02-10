@@ -14,8 +14,8 @@ using std::map;
 using std::set;
 
 #include "exx_abfs.h"
-#include "make_overlap_table.h"
-#include "make_gaunt_table.h"
+#include "ORB_radial_table.h"
+#include "ORB_gaunt_table.h"
 #include "center2_orb-orb21.h"
 
 class LCAO_Orbitals;

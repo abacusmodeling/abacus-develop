@@ -1,4 +1,4 @@
-#include "make_gaunt_table.h"
+#include "ORB_gaunt_table.h"
 
 Make_Gaunt_Table::Make_Gaunt_Table(){}
 Make_Gaunt_Table::~Make_Gaunt_Table(){}

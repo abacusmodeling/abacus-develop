@@ -105,9 +105,6 @@ sltk_atom_arrange.o\
 sltk_atom.o\
 sltk_adjacent_set.o\
 sltk_atom_input.o\
-make_gaunt_table.o\
-make_overlap_table.o\
-ORB_gen_tables.o\
 use_overlap_matrix.o\
 use_hamilt_matrix.o\
 build_st_pw.o\
@@ -135,6 +132,9 @@ ORB_atomic.o\
 ORB_atomic_lm.o\
 ORB_nonlocal.o\
 ORB_nonlocal_lm.o\
+ORB_gaunt_table.o\
+ORB_radial_table.o\
+ORB_gen_tables.o\
 local_orbital_wfc.o\
 local_orbital_elec.o\
 ELEC_cbands_k.o\

@@ -6,8 +6,8 @@
 #define USE_OVERLAP_TABLE_H
 
 #include "../src_pw/tools.h"
-#include "make_overlap_table.h"
-#include "make_gaunt_table.h"
+#include "ORB_radial_table.h"
+#include "ORB_gaunt_table.h"
 #include "ylm.h"
 
 class Use_Overlap_Table
