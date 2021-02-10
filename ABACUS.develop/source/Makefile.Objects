@@ -189,8 +189,7 @@ wfc_dm_2d.o \
 unk_overlap_lcao.o \
 cal_r_overlap_R.o \
 
-OBJS_WANNIER=wan_global.o\
-bessel_basis.o\
+OBJS_WANNIER=bessel_basis.o\
 numerical_basis.o\
 numerical_descriptor.o\
 wavefunc_in_pw.o\

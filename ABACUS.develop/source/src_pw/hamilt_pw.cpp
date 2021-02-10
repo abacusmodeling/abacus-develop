@@ -4,7 +4,7 @@
 #include "algorithms.h"
 #include "hamilt_pw.h"
 #include "src_global/blas_connector.h"
-#include "optical.h" // only get judgement to calculate optical matrix or not.
+#include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
 
 int Hamilt_PW::moved = 0;
 

@@ -3,7 +3,8 @@
 #endif
 #include <cstring>
 #include <iostream>
-#include "wan_global.h"
+#include "winput.h"
+#include "global.h"
 
 
 string winput::target;//add 2008-06-04

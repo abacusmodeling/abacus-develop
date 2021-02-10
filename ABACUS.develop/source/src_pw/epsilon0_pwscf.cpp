@@ -10,7 +10,7 @@
 #include "algorithms.h"
 #include "hamilt_pw.h"
 #include "../src_pw/wavefunc_in_pw.h"
-#include "optical.h"
+#include "src_io/optical.h"
 #include "epsilon0_pwscf.h"
 #include <iostream>
 #include <math.h>

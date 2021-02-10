@@ -2,7 +2,7 @@
 // AUTHOR : mohan
 // DATE : 2008-11-5
 //==========================================================
-#include "../src_pw/wan_global.h"
+#include "../src_pw/global.h"
 #include "eximport.h"
 
 eximport::eximport()

@@ -8,8 +8,8 @@
 #include "chi0_standard.h"
 #include "epsilon0_pwscf.h"
 #include "epsilon0_vasp.h"
-#include "../src_pw/to_wannier90.h"
-#include "../src_pw/berryphase.h"
+#include "../src_io/to_wannier90.h"
+#include "../src_io/berryphase.h"
 
 double Electrons::avg_iter = 0;
 

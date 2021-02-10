@@ -1,6 +1,6 @@
 #include "optical.h"
-#include "tools.h"
-#include "global.h"
+#include "../src_pw/tools.h"
+#include "../src_pw/global.h"
 
 bool Optical::opt_epsilon2 = false;
 int  Optical::opt_nbands = 0;

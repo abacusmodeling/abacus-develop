@@ -7,7 +7,7 @@
 #include "input.h"
 #include "src_pw/algorithms.h"
 #include "src_pw/pseudopot_cell_us.h"
-#include "src_pw/optical.h"
+#include "src_io/optical.h"
 #include "src_pw/cal_test.h"
 #include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 #include "src_pw/winput.h"

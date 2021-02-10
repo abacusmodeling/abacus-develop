@@ -5,8 +5,8 @@
 #include "global_fp.h"
 #include "ELEC_cbands_gamma.h"
 #include "ELEC_cbands_k.h"
-#include "../src_pw/berryphase.h"
-#include "../src_pw/to_wannier90.h"
+#include "../src_io/berryphase.h"
+#include "../src_io/to_wannier90.h"
 
 ELEC_nscf::ELEC_nscf(){}
 ELEC_nscf::~ELEC_nscf(){}
