@@ -1,5 +1,3 @@
-//#include "../mymath.h"
-//#include "../output.h"
 #include "global.h"
 #include "pseudopot_cell_us.h"
 #include "tools.h"

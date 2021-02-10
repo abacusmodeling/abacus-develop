@@ -9,22 +9,8 @@
 # machine specific and depend on the local installation.  Hence the name.
 #
 
-#xiaohui modify 2015-03-25
-#VERSION = MESIA-ALPHA
 VERSION = ABACUS
 HEADERS = *.h
-
-#xiaohui modified 2013-03-23, adding "#" before OBJS_SELINV
-#OBJS_SELINV=selinv.o\
-cal_reduce_rho.o\
-getpolef.o\
-siao_interf.o\
-trace_rho_hs.o\
-chem_pot.o\
-
-#OBJS_CG=hpsi_ao.o\
-cg_lcao.o\
-cg_precon.o\
 
 OBJS_DC=driver.o\
 input.o \
@@ -52,10 +38,10 @@ stress.o\
 myfunc1.o\
 myfunc2.o\
 vdwd2.o\
-vdwd2-parameters.o\
+vdwd2_parameters.o\
 dftd3_subroutine.o\
 vdwd3.o\
-vdwd3-parameters.o\
+vdwd3_parameters.o\
 chi0_hilbert.o\
 chi0_standard.o\
 epsilon0_pwscf.o\
@@ -65,7 +51,7 @@ mdNVE.o\
 mdNVT.o\
 exx_lip.o\
 soc.o\
-toWannier90.o \
+to_wannier90.o \
 unk_overlap_pw.o \
 berryphase.o \
 sto_elec.o\

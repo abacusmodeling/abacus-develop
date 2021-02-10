@@ -5,7 +5,7 @@
 #include "input_conv.h"
 #include "src_lcao/global_fp.h"
 #include "src_pw/global.h"
-#include "src_global/print_info.h"
+#include "src_io/print_info.h"
 #include "src_pw/cal_test.h"
 #include "src_pw/cal_test0.h"
 #include "src_pw/winput.h"

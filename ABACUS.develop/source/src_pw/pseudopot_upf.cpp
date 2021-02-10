@@ -1,9 +1,8 @@
-/* pseudopot_upf.cpp   */
 //==========================================================
 // Author: Lixin He,mohan
 // DATE : 2009-02-26
 //==========================================================
-#include "../src_pw/output.h"
+#include "../src_io/output.h"
 #include "pseudopot_upf.h"
 #include <iostream>
 #include <fstream>

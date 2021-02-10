@@ -6,7 +6,7 @@
 #include "ELEC_cbands_gamma.h"
 #include "ELEC_cbands_k.h"
 #include "../src_pw/berryphase.h"
-#include "../src_pw/toWannier90.h"
+#include "../src_pw/to_wannier90.h"
 
 ELEC_nscf::ELEC_nscf(){}
 ELEC_nscf::~ELEC_nscf(){}

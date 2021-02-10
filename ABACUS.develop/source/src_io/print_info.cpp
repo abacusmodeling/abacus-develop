@@ -1,8 +1,5 @@
 #include "print_info.h"
-#include "global_variable.h"
-//#include "../input.h"
-//#include "../input_conv.h"
-//#include "../src_lcao/global_fp.h"
+#include "../src_global/global_variable.h"
 #include "../src_pw/global.h"
 
 Print_Info::Print_Info(){}

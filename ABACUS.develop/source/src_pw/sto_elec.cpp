@@ -3,7 +3,7 @@
 #include "sto_elec.h" 
 #include "algorithms.h"
 #include "symmetry_rho.h"
-#include "../src_pw/wf_io.h"
+#include "../src_io/wf_io.h"
 
 double Stochastic_Elec::avg_iter = 0;
 

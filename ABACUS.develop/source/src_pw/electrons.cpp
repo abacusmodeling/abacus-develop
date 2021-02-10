@@ -3,12 +3,12 @@
 #include "electrons.h"
 #include "algorithms.h"
 #include "symmetry_rho.h"
-#include "../src_pw/wf_io.h"
+#include "../src_io/wf_io.h"
 #include "chi0_hilbert.h"            // pengfei 2016-11-23
 #include "chi0_standard.h"
 #include "epsilon0_pwscf.h"
 #include "epsilon0_vasp.h"
-#include "../src_pw/toWannier90.h"
+#include "../src_pw/to_wannier90.h"
 #include "../src_pw/berryphase.h"
 
 double Electrons::avg_iter = 0;

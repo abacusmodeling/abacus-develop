@@ -6,13 +6,13 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include "../run_pw.h"
 #include "src_global/global_variable.h"
 #include "src_global/global_function.h"
 #include "pw_basis.h"
 #include "energy.h"
 #include "occupy.h"
 #include "pseudopot_cell_vnl.h"
-#include "../run_pw.h"
 #include "charge_broyden.h"
 #include "potential.h"
 #include "functional.h"
@@ -21,7 +21,7 @@
 #include "wavefunc.h"
 #include "use_fft.h"
 #include "klist.h"
-#include "../src_pw/output.h"
+#include "../src_io/output.h"
 #include "magnetism.h"
 #include "vdwd2.h"
 #include "vdwd3.h"	
@@ -29,7 +29,6 @@
 #include "exx_global.h"
 #include "exx_lip.h"
 #include "soc.h"
-
 #include "../src_parallel/ft.h"
 
 //==========================================================
