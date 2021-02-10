@@ -21,29 +21,23 @@
 
 class Mulliken_Charge
 {
-public:
+	public:
 
-	 Mulliken_Charge();
+	Mulliken_Charge();
 	~Mulliken_Charge();
-              double**  DecMulP ;
-                             double**  MecMulP ;
-	          double***  ADecMulP ;
-		                 Wfc_Dm_2d M;
-                              
-                              							  
-							  complex<double>       *mug  ;
 
-                                                                                                             
+	double**  DecMulP ;
+	double**  MecMulP ;
+	double***  ADecMulP ;
+	Wfc_Dm_2d M;
 
-                                  
-                     
-                                 
-	 void  cal_mulliken(void);
+	complex<double> *mug;
 
-	void   stdout_mulliken(void);
-	
+	void cal_mulliken(void);
 
-private:
+	void stdout_mulliken(void);
+
+	private:
 
 };
 #endif
