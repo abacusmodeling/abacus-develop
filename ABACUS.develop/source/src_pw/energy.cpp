@@ -1002,8 +1002,6 @@ void energy::perform_dos(void)
 		MC.stdout_mulliken();			
 	}//qifeng add 2019/9/10
 
-
-
 	int nspin0=1;
 	if(NSPIN==2) nspin0=2;
 
@@ -1085,12 +1083,12 @@ void energy::perform_dos(void)
 		}
 
 		double a = bcoeff;
-		double   c=2*3.141592653;
-		double b =  sqrt(c)*a;                                         
+		double c=2*3.141592653;
+		double b = sqrt(c)*a;                                         
 
-		complex<double>       *waveg  =  new  complex<double>   [NLOCAL];
+		complex<double>*waveg = new complex<double>[NLOCAL];
 
-		double*  Gauss = new double  [np];
+		double*Gauss = new double[np];
 
 		for(int is=0; is<nspin0; ++is)
 		{
@@ -1133,7 +1131,6 @@ void energy::perform_dos(void)
 							Mulk[0].c, &one_int, &NB, ParaO.desc,
 							&one_int);
 
-
 					for (int j=0; j<NLOCAL; ++j)
 					{
 
@@ -1145,22 +1142,17 @@ void energy::perform_dos(void)
 							waveg[j] = Mulk[0](ic,ir)*D.wfc_gamma[is](ic,ir);
 							const double x = waveg[j].real();
 							LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
-
-
-
 						}
 					} 
-
-
 				}//ib
 			}//if
-
 			else
 			{
 				atom_arrange::set_sr_NL();
 				atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
 
-				hm.hon.set_orb_tables();
+				// mohan update 2021-02-10
+				hm.orb_con.set_orb_tables();
 				LM.allocate_HS_R(LNNR.nnr);
 				LM.zeros_HSR('S', LNNR.nnr);
 				UHM.UOM.calculate_S_no();
@@ -1243,14 +1235,11 @@ void energy::perform_dos(void)
 #ifdef __MPI
 				atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
-				hm.hon.clear_after_ions();
+				// mohan update 2021-02-10
+				hm.orb_con.clear_after_ions();
 			}//else
 
-
-
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
-
-
 	 }//is                                              
 	 delete[] pdosk;                                               
 	 delete[] waveg;
@@ -1397,7 +1386,9 @@ void energy::perform_dos(void)
 					 const int L1 = atom1->iw2l[j];
 					 const int N1 = atom1->iw2n[j];
 					 const int m1 = atom1->iw2m[j];
-					 out <<setw(5) << i << setw(8) << ucell.atoms[t].label <<setw(5)<<L1<<setw(5) <<m1<<setw(5)<<N1+1<<setw(15)<< Name_Angular[L1][m1] << endl;
+					 out <<setw(5) << i << setw(8) 
+						<< ucell.atoms[t].label <<setw(5)
+							<<L1<<setw(5) <<m1<<setw(5)<<N1+1<<setw(15)<< Name_Angular[L1][m1] << endl;
 				 }
 			 }
 			 out <<endl<<endl;
@@ -1562,25 +1553,25 @@ void energy::perform_dos(void)
 			}
 		}
 	}
-        if(this->out_band) //pengfei 2014-10-13
-        {
+	if(this->out_band) //pengfei 2014-10-13
+	{
 
-                int nks;
-                if(nspin0==1) nks = kv.nkstot;
-                else if(nspin0==2) nks = kv.nkstot/2;
+		int nks;
+		if(nspin0==1) nks = kv.nkstot;
+		else if(nspin0==2) nks = kv.nkstot/2;
 
 
 
-                for(int is=0; is<nspin0; is++)
-                {
-                        stringstream ss2;
-                        ss2 << global_out_dir << "BANDS_" << is+1 << ".dat";
-                        ofs_running << "\n Output bands in file: " << ss2.str() << endl;
-                        Dos::nscf_band(is, ss2.str(), nks, NBANDS, this->ef*0, wf.ekb);
-                }
+		for(int is=0; is<nspin0; is++)
+		{
+			stringstream ss2;
+			ss2 << global_out_dir << "BANDS_" << is+1 << ".dat";
+			ofs_running << "\n Output bands in file: " << ss2.str() << endl;
+			Dos::nscf_band(is, ss2.str(), nks, NBANDS, this->ef*0, wf.ekb);
+		}
 
-        }
-
+	}
+	return;
 }
 
 

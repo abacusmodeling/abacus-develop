@@ -10,14 +10,18 @@
 #include "ORB_gaunt_table.h"
 #include "ylm.h"
 
-class Use_Overlap_Table
+//------------------------------------
+// used to be 'Use_Overlap_Table',
+// now the name is 'ORB_gen_tables'
+//------------------------------------
+class ORB_gen_tables
 {
 	public:
 
-	friend class Hamilt_Linear;
+	friend class ORB_control;
 	
-	Use_Overlap_Table();
-	~Use_Overlap_Table();
+	ORB_gen_tables();
+	~ORB_gen_tables();
 
 	void gen_tables( const int &job0 );
 	void set_unit( const double &v ){lat0=v;}
@@ -77,6 +81,6 @@ class Use_Overlap_Table
 
 };
 
-extern Use_Overlap_Table UOT;
+extern ORB_gen_tables UOT;
 
 #endif

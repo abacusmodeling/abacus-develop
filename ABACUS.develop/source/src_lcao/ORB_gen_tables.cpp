@@ -1,18 +1,19 @@
+#include "../src_pw/global.h"
+#include "ORB_read.h"
 #include "ORB_gen_tables.h"
 #include "ylm.h"
-#include "ORB_read.h"
-#include "../src_pw/global.h"
 
-Use_Overlap_Table UOT;
+// here is a member of ORB_gen_tables class
+ORB_gen_tables UOT;
 
-Use_Overlap_Table::Use_Overlap_Table(){}
-Use_Overlap_Table::~Use_Overlap_Table(){}
+ORB_gen_tables::ORB_gen_tables(){}
+ORB_gen_tables::~ORB_gen_tables(){}
 
 // call in hamilt_linear::init_before_ions.
-void Use_Overlap_Table::gen_tables( const int &job0 )
+void ORB_gen_tables::gen_tables( const int &job0 )
 {
-	TITLE("Use_Overlap_Table","gen_tables");
-	timer::tick("Use_Overlap_Table","gen_tables",'C');
+	TITLE("ORB_gen_tables","gen_tables");
+	timer::tick("ORB_gen_tables","gen_tables",'C');
 
 	ofs_running << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
 	
@@ -76,11 +77,11 @@ void Use_Overlap_Table::gen_tables( const int &job0 )
 
 
 
-	timer::tick("Use_Overlap_Table","gen_tables",'C');
+	timer::tick("ORB_gen_tables","gen_tables",'C');
 	return;
 }
 
-void Use_Overlap_Table::snap_psibeta(
+void ORB_gen_tables::snap_psibeta(
 	double nlm[],
 	const int& job,
 	const Vector3<double> &R1,
@@ -98,8 +99,8 @@ void Use_Overlap_Table::snap_psibeta(
 	complex<double> *nlm1,
 	const int is) const
 {
-	//TITLE ("Use_Overlap_Table","snap_psibeta");
-	//timer::tick ("Use_Overlap_Table","snap_psibeta");
+	//TITLE ("ORB_gen_tables","snap_psibeta");
+	//timer::tick ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
 	if(NSPIN==4 && ORB.Beta[T0].get_count_soc(is)==0) return;
@@ -459,7 +460,7 @@ void Use_Overlap_Table::snap_psibeta(
 					}
 					else
 					{
-						WARNING_QUIT("Use_Overlap_Table::snap_psibeta","something wrong with snap_psibeta.");
+						WARNING_QUIT("ORB_gen_tables::snap_psibeta","something wrong with snap_psibeta.");
 					}*/
 					break;
 				}
@@ -502,7 +503,7 @@ void Use_Overlap_Table::snap_psibeta(
 					else if(NSPIN!=4)
 						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
 					else
-						WARNING_QUIT("Use_Overlap_Table::snap_psibeta","Conflict! Didn't count non-local part");
+						WARNING_QUIT("ORB_gen_tables::snap_psibeta","Conflict! Didn't count non-local part");
 				}
 				break;
 			case 1://need to be added later
@@ -515,11 +516,11 @@ void Use_Overlap_Table::snap_psibeta(
 	delete[] rmesh1;
 	delete[] rmesh2;
 
-//	timer::tick("Use_Overlap_Table","snap_psibeta");
+//	timer::tick("ORB_gen_tables","snap_psibeta");
 	return;
 }
 
-void Use_Overlap_Table::snap_psipsi(
+void ORB_gen_tables::snap_psipsi(
 	double olm[],
 	const int &job, //0, 1
 	const char &dtype, // derivative type: S or T
@@ -535,11 +536,11 @@ void Use_Overlap_Table::snap_psipsi(
     const int &N2,
 	complex<double> *olm1)const
 {
-	//TITLE("Use_Overlap_Table","snap_psipsi");
-	//timer::tick ("Use_Overlap_Table", "snap_psipsi");
+	//TITLE("ORB_gen_tables","snap_psipsi");
+	//timer::tick ("ORB_gen_tables", "snap_psipsi");
 	if(job != 0 && job != 1)
 	{
-		WARNING_QUIT("Use_Overlap_Table::snap_psipsi","job must be equal to 0 or 1!");
+		WARNING_QUIT("ORB_gen_tables::snap_psipsi","job must be equal to 0 or 1!");
 	}
 	
 	Numerical_Orbital::set_position(R1, R2);
@@ -693,7 +694,7 @@ void Use_Overlap_Table::snap_psipsi(
 						}
 						else
 						{
-							WARNING_QUIT("Use_Overlap_Table::snap_psipsi","something wrong!");
+							WARNING_QUIT("ORB_gen_tables::snap_psipsi","something wrong!");
 							
 						}
 					
@@ -784,7 +785,7 @@ void Use_Overlap_Table::snap_psipsi(
 						}
 						else
 						{
-							WARNING_QUIT("Use_Overlap_Table::snap_psipsi","something wrong in T.");
+							WARNING_QUIT("ORB_gen_tables::snap_psipsi","something wrong in T.");
 						}
 						break;
 					}
@@ -803,11 +804,11 @@ void Use_Overlap_Table::snap_psipsi(
 		}// end T: :
 		break;
 	}
-//	timer::tick ("Use_Overlap_Table", "snap_psipsi");
+//	timer::tick ("ORB_gen_tables", "snap_psipsi");
 	return;
 }
 
-double Use_Overlap_Table::get_distance( const Vector3<double> &R1, const Vector3<double> &R2)const
+double ORB_gen_tables::get_distance( const Vector3<double> &R1, const Vector3<double> &R2)const
 {
 	assert( this->lat0 > 0.0);
 	Vector3<double> dR = R1 - R2;

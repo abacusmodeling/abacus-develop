@@ -1,26 +1,26 @@
 #include "../src_pw/tools.h"
 #include "../src_pw/global.h"
-#include "hamilt_linear.h"
+#include "ORB_control.h"
 #include "src_global/sltk_atom_arrange.h"
 #include "ORB_gen_tables.h"
 #include "grid_integral.h"
 #include "build_st_pw.h"
 
-Hamilt_Linear::Hamilt_Linear()
+ORB_control::ORB_control()
 {}
 
-Hamilt_Linear::~Hamilt_Linear()
+ORB_control::~ORB_control()
 {
 	if(test_deconstructor)
 	{
-		cout << " ~Hamilt_Linear()" << endl;
+		cout << " ~ORB_control()" << endl;
 	}
 }
 
-void Hamilt_Linear::set_orb_tables(void)
+void ORB_control::set_orb_tables(void)
 {
-    TITLE("Hamilt_Linear","set_orb_tables");
-	timer::tick("Hamilt_Linear","set_orb_tables",'B');
+    TITLE("ORB_control","set_orb_tables");
+	timer::tick("ORB_control","set_orb_tables",'B');
     
 	//=============================================================================
     // (1) FUNCTION : use 'info' to generate 'Numerical Orbital'
@@ -30,7 +30,7 @@ void Hamilt_Linear::set_orb_tables(void)
 
 	if(CALCULATION=="test")
 	{
-		timer::tick("Hamilt_Linear","set_orb_tables",'B');
+		timer::tick("ORB_control","set_orb_tables",'B');
 		return;
 	}
 
@@ -49,13 +49,13 @@ void Hamilt_Linear::set_orb_tables(void)
     UOT.set_unit(ucell.lat0);
 
 
-	timer::tick("Hamilt_Linear","set_orb_tables",'B');
+	timer::tick("ORB_control","set_orb_tables",'B');
     return;
 }
 
-void Hamilt_Linear::clear_after_ions()
+void ORB_control::clear_after_ions()
 {
-    TITLE("Hamilt_Linear","clear_after_ions");
+    TITLE("ORB_control","clear_after_ions");
     UOT.MOT.Destroy_Table();
     UOT.MOT.Destroy_Table_Beta();
     return;

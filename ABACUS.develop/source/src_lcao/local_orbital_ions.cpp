@@ -308,8 +308,8 @@ void Local_Orbital_Ions::opt_ions(void)
 */
     }
 
-
-    hm.hon.clear_after_ions();
+	// mohan update 2021-02-10
+    hm.orb_con.clear_after_ions();
 
     timer::tick("Local_Orbital_Ions","opt_ions",'C'); 
     return;

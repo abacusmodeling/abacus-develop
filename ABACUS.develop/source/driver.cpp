@@ -123,7 +123,7 @@ void Driver::reading(void)
 		// init overlap matrix table, which is 'S Table'
 		// init kinetical matrix element table, which is 'T Table'
 		// init non-local pseudopotential matrix element table, which is 'NL Table'
-		hm.hon.set_orb_tables();
+		hm.orb_con.set_orb_tables();
 
 		// xiaohui add 2015-09-06
 		// (1) divide the H and S matrix into each CPU, count the dimensions

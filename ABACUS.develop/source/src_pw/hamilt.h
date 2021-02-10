@@ -2,11 +2,7 @@
 #define HAMILT_H
 
 #include "tools.h"
-
-#ifdef __FP
-#include "../src_lcao/hamilt_linear.h"
-#endif
-
+#include "../src_lcao/ORB_control.h"
 #include "hamilt_pw.h"
 
 class Hamilt
@@ -41,7 +37,10 @@ public:
     void h_psi( const int dim, const complex<double> *psi,complex<double> *hpsi);
 
     Hamilt_PW hpw;
-    Hamilt_Linear hon;
+	
+	// mohan update 2021-02-10
+	ORB_control orb_con;
+
 private:
 
     bool test_exit_cond( const int &ntry, const int &notconv);

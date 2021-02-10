@@ -174,7 +174,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			mud[0].create(ParaO.ncol,ParaO.nrow);
 			atom_arrange::set_sr_NL();
 			atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
-			hm.hon.set_orb_tables();
+			hm.orb_con.set_orb_tables();
 			LM.allocate_HS_R(LNNR.nnr);
 			LM.zeros_HSR('S', LNNR.nnr);
 			UHM.UOM.calculate_S_no();
@@ -241,7 +241,7 @@ void Mulliken_Charge::cal_mulliken(void)
 #ifdef __MPI
 			atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
-			hm.hon.clear_after_ions();
+			hm.orb_con.clear_after_ions();
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
