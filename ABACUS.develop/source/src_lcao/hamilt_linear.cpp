@@ -1,7 +1,7 @@
 #include "../src_pw/tools.h"
 #include "../src_pw/global.h"
 #include "hamilt_linear.h"
-#include "sltk_atom_arrange.h"
+#include "src_global/sltk_atom_arrange.h"
 #include "use_overlap_table.h"
 #include "grid_integral.h"
 #include "build_st_pw.h"

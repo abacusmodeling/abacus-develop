@@ -1,7 +1,7 @@
 #include "pdiag_basic.h"
 #include "../../src_parallel/parallel_common.h"
 #include "../../src_pw/global.h"
-#include "../../src_lcao/wf_local.h"
+#include "../../src_io/wf_local.h"
 #include "src_global/lapack_connector.h"
 
 Pdiag_Basic::Pdiag_Basic()

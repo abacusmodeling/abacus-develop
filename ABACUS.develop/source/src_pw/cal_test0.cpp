@@ -1,7 +1,7 @@
 #include "global.h"
 #include "tools.h"
 #include "cal_test0.h"
-#include "../src_lcao/sltk_atom_arrange.h"
+#include "../src_global/sltk_atom_arrange.h"
 //xiaohui modified 2013-03-23, adding "//" before #include...
 //#include "../src_develop/src_siao/trace_rho_hs.h"
 

@@ -1,14 +1,3 @@
-// =============================================================================
-//                          C++ Header File
-// Project:         Find Adjacent Atom
-// File:            grid_driver.hpp
-// Principal Class:	grid_driver
-// Author:          ywcui
-// Comment:
-// Warning:
-// Start time:      2008-11-10
-// Last modified:
-// =============================================================================
 #ifndef GRID_DRIVER_H
 #define GRID_DRIVER_H
 

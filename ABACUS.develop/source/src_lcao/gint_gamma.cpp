@@ -1,7 +1,7 @@
 #include "gint_gamma.h"
 #include "../src_pw/global.h"
 #include "ylm.h"
-#include "sltk_atom_arrange.h"
+#include "../src_global/sltk_atom_arrange.h"
 
 Gint_Gamma::Gint_Gamma()
 {

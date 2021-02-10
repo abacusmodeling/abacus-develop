@@ -3,7 +3,6 @@
 
 #include "../src_pw/tools.h"
 #include "../src_pw/threshold_elec.h"
-#include "hs_matrix.h"
 
 //-----------------------------------------------------------
 // mohan add 2021-02-09

@@ -29,7 +29,7 @@
 #include "../src_global/complexmatrix.h"
 #include <vector>
 #include <mpi.h>
-#include "../src_lcao/sltk_atom_arrange.h"
+#include "../src_global/sltk_atom_arrange.h"
 #include "../src_lcao/lcao_nnr.h"
 
 

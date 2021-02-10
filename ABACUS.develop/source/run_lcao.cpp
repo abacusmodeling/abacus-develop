@@ -11,7 +11,7 @@
 #include "src_pw/cal_test.h"
 #include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 #include "src_pw/winput.h"
-#include "src_lcao/sltk_atom_arrange.h"
+#include "src_global/sltk_atom_arrange.h"
 #include "src_lcao/local_orbital_ions.h"
 
 Run_lcao::Run_lcao(){}

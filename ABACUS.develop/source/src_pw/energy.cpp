@@ -13,7 +13,7 @@
 #include "../src_lcao/lcao_nnr.h"
 //#include "../src_lcao/Mulliken_Charge.h"
 #include  "../src_lcao/use_overlap_matrix.h"    
-#include "../src_lcao/sltk_atom_arrange.h"//qifeng-2019-01-21
+#include "../src_global/sltk_atom_arrange.h"//qifeng-2019-01-21
 #include "../src_lcao/local_orbital_charge.h"
 
 #include "../src_pw/global.h"

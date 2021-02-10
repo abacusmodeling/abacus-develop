@@ -1,7 +1,7 @@
 #include "../src_pw/global.h"
 #include "use_hamilt_matrix.h"
 #include "build_st_pw.h"
-#include "sltk_atom_arrange.h"
+#include "../src_global/sltk_atom_arrange.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
 Use_Hamilt_Matrix::Use_Hamilt_Matrix()

@@ -6,13 +6,13 @@
 #include "force_lcao.h"
 #include "stress_lcao.h"
 #include "src_global/global_function.h"
-#include "hs_matrix.h"
+#include "../src_io/hs_matrix.h"
 #include "src_lcao/cal_r_overlap_R.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "src_lcao/exx_abfs.h"
 #include "src_lcao/exx_opt_orb.h"
 #include "ELEC_scf.h"
-#include "src_lcao/sltk_atom_arrange.h"
+#include "src_global/sltk_atom_arrange.h"
 
 Local_Orbital_Ions::Local_Orbital_Ions()
 {}

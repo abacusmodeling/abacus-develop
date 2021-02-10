@@ -7,7 +7,7 @@
 #include "evolve_lcao_matrix.h"
 #include "dftu.h"
 //
-#include "sltk_atom_arrange.h"
+#include "../src_global/sltk_atom_arrange.h"
 #include "src_lcao/lcao_nnr.h"
 #include "istate_charge.h"
 #include "istate_envelope.h"

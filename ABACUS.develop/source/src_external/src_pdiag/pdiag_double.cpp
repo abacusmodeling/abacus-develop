@@ -6,7 +6,7 @@
 //#include "../src_pw/global.h"
 //xiaohui add 2014-06-20
 #include "src_lcao/local_orbital_charge.h"
-#include "src_lcao/wf_local.h"
+#include "src_io/wf_local.h"
 #ifdef __MPI
 extern "C"
 {

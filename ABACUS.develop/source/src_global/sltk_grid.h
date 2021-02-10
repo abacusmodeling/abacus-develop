@@ -8,7 +8,7 @@
 
 #include <stdexcept>
 #include <boost/functional/hash/hash.hpp>
-#include "util.h"
+#include "sltk_util.h"
 #include "sltk_atom.h"
 #include "sltk_atom_input.h"
 #include "../src_pw/tools.h"

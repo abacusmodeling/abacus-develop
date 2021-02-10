@@ -6,7 +6,7 @@
 #ifndef INCLUDE_FATOM
 #define INCLUDE_FATOM
 
-#include "util.h"
+#include "sltk_util.h"
 #include "sltk_adjacent_set.h"
 
 class AdjacentSet;
