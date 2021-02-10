@@ -13,7 +13,9 @@
 
 class Hamilt_Linear
 {
-public:
+
+	public:
+
     Hamilt_Linear();
     ~Hamilt_Linear();
 

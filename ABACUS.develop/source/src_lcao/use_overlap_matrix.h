@@ -13,8 +13,10 @@ class Use_Overlap_Matrix
 	friend class Force_LCAO_gamma;
 	friend class Force_LCAO_k;
 	friend class energy;//qifeng 2019/9/10
-        friend class  Mulliken_Charge;//qifeng  2019/9/10
+	friend class Mulliken_Charge;//qifeng  2019/9/10
+
 	public:
+
 	Use_Overlap_Matrix();
 	~Use_Overlap_Matrix();
 

@@ -14,17 +14,22 @@
 class LCAO_Orbitals
 {
 	public:
+
 	LCAO_Orbitals();
 	~LCAO_Orbitals();
 
 	void Read_Orbitals(void);
+
 	void Read_PAO(const int& it);
 
 	// in order to get rid of the .NONLOCAL file.
 	void Set_NonLocal(const int &it, int &n_projectors);
+
 	// read in the NONLOCAL projector from file.
 	void Read_NonLocal(const int& it, int &n_projectors);
+
 	void set_nl_index(void);
+
 #ifdef __MPI
 	void bcast_files(void);
 #endif

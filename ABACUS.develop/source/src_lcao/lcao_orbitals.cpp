@@ -19,6 +19,7 @@ LCAO_Orbitals::LCAO_Orbitals()
 
 	this->dr_uniform = 0.001;
 }
+
 LCAO_Orbitals::~LCAO_Orbitals()
 {
 	if(test_deconstructor)
