@@ -15,7 +15,8 @@
 class LCAO_cbands_k
 {
 
-	friend class Local_Orbital_Elec;
+	friend class ELEC_scf;
+	friend class ELEC_nscf;
 
 	public:
 

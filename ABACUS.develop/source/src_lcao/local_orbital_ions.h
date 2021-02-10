@@ -4,10 +4,7 @@
 #include "local_orbital_elec.h"
 #include "../src_ions/ions_move_methods.h"
 #include "../src_pw/charge_extra.h"
-//#include "../src_develop/src_md/md.h"
-//2014-06-06, xiaohui
 #include "../src_pw/md.h"
-//added by daye 2014/6/19
 #include "../src_pw/mdNVT.h"
 #include "../src_pw/mdNVE.h"
 #include "../src_ions/lattice_change_methods.h"

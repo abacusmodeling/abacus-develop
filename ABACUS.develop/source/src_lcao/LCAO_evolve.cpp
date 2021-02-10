@@ -61,7 +61,7 @@ void LCAO_evolve::evolve_psi(const int &istep, Use_Hamilt_Matrix &uhm, complex<d
 					{
 						for(int ir=0; ir<pw.nrxx; ir++)
 						{
-							pot.vrs1[ir] = pot.vrs( is, ir);
+							pot.vrs1[ir] = pot.vrs(is, ir);
 						}
 						uhm.GK.cal_vlocal_k(pot.vrs1, GridT, is);
 					}

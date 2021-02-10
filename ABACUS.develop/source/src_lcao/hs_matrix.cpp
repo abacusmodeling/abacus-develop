@@ -1,6 +1,6 @@
 #include "hs_matrix.h"
 #include "../src_pw/global.h"
-#include "../src_lcao/local_orbital_elec.h"
+#include "ELEC_scf.h"
 
 void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, bool bit, const int &out_hs)
 {   
@@ -28,6 +28,7 @@ void HS_Matrix::saving_HS(const double *Hloc, const double* Sloc, bool bit, cons
 }
 
 
+/*
 void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_H, const int *rowind_H, 
         const double *nzval_H, const double *nzval_S, bool bit)
 {
@@ -37,6 +38,7 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
     
     stringstream ssh;
     stringstream sss;
+
     if(bit)
     {
         ssh << global_out_dir << "H_bit.ccf";
@@ -44,8 +46,9 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
     }
     else
     {
-        ssh << global_out_dir << "H" << Local_Orbital_Elec::iter << "_" << iter+1 << ".ccf";
-        sss << global_out_dir << "S" << Local_Orbital_Elec::iter << "_" << iter+1 << ".ccf";
+		// mohan update 2021-02-10
+        ssh << global_out_dir << "H" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
+        sss << global_out_dir << "S" << ELEC_scf::iter << "_" << iter+1 << ".ccf";
     }
 
     if(bit)
@@ -100,6 +103,7 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
     }
     return;
 }
+*/
 
 // mohan add 2010/3/20, output H and S matrix, convinence for diagonalization
 // test or save the middle information for next start.

@@ -141,6 +141,8 @@ local_orbital_elec.o\
 LCAO_cbands_k.o\
 LCAO_cbands_gamma.o\
 LCAO_evolve.o\
+ELEC_scf.o\
+ELEC_nscf.o\
 local_orbital_ions.o\
 local_orbital_charge.o\
 record_adj.o\

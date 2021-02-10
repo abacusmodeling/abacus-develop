@@ -14,7 +14,7 @@
 class LCAO_evolve
 {
 
-	friend class Local_Orbital_Elec;
+	friend class ELEC_scf;
 
 	public:
 
