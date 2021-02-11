@@ -49,7 +49,6 @@ class Force_LCAO_gamma
 	void cal_fvnl_dbeta(const std::vector<matrix> &dm2d);
 	void cal_fvl_dphi(const std::vector<matrix> &dm2d);
 
-	void DerivS_PW (void);
 	void DerivT_PW (void);
 
 	void average_force(double* fm);

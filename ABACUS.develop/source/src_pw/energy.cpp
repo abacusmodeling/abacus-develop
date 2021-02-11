@@ -1153,8 +1153,8 @@ void energy::perform_dos(void)
 				hm.orb_con.set_orb_tables();
 				LM.allocate_HS_R(LNNR.nnr);
 				LM.zeros_HSR('S', LNNR.nnr);
-				UHM.UOM.calculate_S_no();
-				UHM.UOM.build_ST_new('S', false);
+				UHM.genH.calculate_S_no();
+				UHM.genH.build_ST_new('S', false);
 				std::vector<ComplexMatrix> Mulk;
 				Mulk.resize(1);
 				Mulk[0].create(ParaO.ncol,ParaO.nrow);

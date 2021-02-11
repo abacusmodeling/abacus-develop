@@ -148,7 +148,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     //calculate dS in LCAO basis
     // tips: build_ST_new --> ParaO.set_force 
     //timer::tick("Force_LCAO_gamma","build_S_new",'H');
-    UHM.UOM.build_ST_new ('S', cal_deri);
+    UHM.genH.build_ST_new ('S', cal_deri);
     //timer::tick("Force_LCAO_gamma","build_S_new",'H');
 
     Memory::record("force_lo", "dS", ParaO.nloc*3, "double");
@@ -166,13 +166,13 @@ void Force_LCAO_gamma::allocate_gamma(void)
     //calculate dT
     //calculate T + VNL(P1) in LCAO basis
     //timer::tick("Force_LCAO_gamma","build_T_new",'H');
-    UHM.UOM.build_ST_new ('T', cal_deri);
+    UHM.genH.build_ST_new ('T', cal_deri);
     //timer::tick("Force_LCAO_gamma","build_T_new",'H');
     //test_gamma(LM.DHloc_fixed_x, "dHloc_fixed_x T part");
     
-    //UHM.UOM.build_Nonlocal_beta (cal_deri);
+    //UHM.genH.build_Nonlocal_beta (cal_deri);
     //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu",'H');
-    UHM.UOM.build_Nonlocal_mu (cal_deri);
+    UHM.genH.build_Nonlocal_mu (cal_deri);
     //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu",'H');
     //test_gamma(LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
@@ -852,11 +852,11 @@ void Force_LCAO_gamma::DerivT_PW(void)
     //TEST OUTPUT OF S Deriv Matrix in PW
     //------------------------------------------
     //test under pw basis
-    hm.hon.UOM.ForcedT = new matrix[3];
-    this->dt = hm.hon.UOM.ForcedT;
+    hm.hon.genH.ForcedT = new matrix[3];
+    this->dt = hm.hon.genH.ForcedT;
     for (int i = 0; i < 3; i++) this->dt[i].create (NLOCAL, NLOCAL);
 
-    hm.hon.UOM.build_ST (1, 'T', true);
+    hm.hon.genH.build_ST (1, 'T', true);
 
     cout << "\n===========================================================================" << endl;
     out.printrm("Force_LCAO_gamma, X Directional Derivatives of T Matrix in PW", this->dt[0]);
@@ -1408,31 +1408,6 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(double** dm2d)
     return;
 }
 
-void Force_LCAO_gamma::DerivS_PW (void)
-{
-    WARNING_QUIT("Force_LCAO_gamma::DerivT_PW","no use for a long time.");
-    // no use for a long time.
-    // mohan 2010-08-10
-    /*
-    //-----------------------------------------
-    //TEST OUTPUT OF S Deriv Matrix in PW
-    //-----------------------------------------
-    //test under pw basis
-    hm.hon.UOM.ForcedS = new matrix[3];
-    this->ds = hm.hon.UOM.ForcedS;
-    for (int i = 0; i < 3; i++) this->ds[i].create (NLOCAL, NLOCAL);
-
-    hm.hon.UOM.build_ST (1, 'S', true);
-
-    //    cout << "\n===========================================================================" << endl;
-    //    out.printrm("Force_LCAO_gamma, X Directional Derivatives of S Matrix in PW", this->ds[2]);
-    //    cout << "\n===========================================================================" << endl;
-
-    for (int i = 0; i < 3; i++) this->ds[i].freemem ();
-    delete[] this->ds;
-    */
-    return;
-}
 
 void Force_LCAO_gamma::cal_ftvnl_dphi(const std::vector<matrix> &dm2d)
 {

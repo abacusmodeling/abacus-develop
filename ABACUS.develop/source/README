@@ -1,21 +1,4 @@
+Currently we are working on optimizing the code structure of ABACUS,
+implementing new functions, and adding more autotests.
 
-Currently we are working on:
-1) fix the parallel bug when using plane wave basis (pw is not enough)
-2) SDFT
-3) DeepKS
-
------------------------------------------------------------------------
-
-The code should be reconstructed with the following details:
-
-1) the TDDFT module should be relocated.
-2) the inclusion of files in vdw3 should be changed.
-3) Is is necessary to include <mkl_service.h>
-4) There is a segmental fault when use ABACUS compiled with gnu-mpich
-5) solve the memory problem regarding gamma wave functions in LCAO
-6) delete VNA codes
-
------------------------------------------------------------------------
-Unitesets should include
-1) initialization after cell variation
-2) 
+-- mohan 2021-02-11

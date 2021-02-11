@@ -29,8 +29,8 @@ class Use_Hamilt_Matrix
 	// used for k-dependent grid integration.
 	Gint_k GK;
 
-	// use overlap matrix.
-	Use_Overlap_Matrix UOM;
+	// use overlap matrix to generate fixed Hamiltonian
+	LCAO_gen_fixedH genH;
 
 	// init S (overlap matrix) flag.
     bool init_s;

@@ -1,21 +1,19 @@
 #include "LCAO_gen_fixedH.h"
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
-//#include "../src_develop/src_wannier/manipulation.h"
 #include "LCAO_nnr.h"
+#include "global_fp.h"
 
-#include "global_fp.h" // mohan add 2021-01-30
-
-Use_Overlap_Matrix::Use_Overlap_Matrix()
+LCAO_gen_fixedH::LCAO_gen_fixedH()
 {}
 
-Use_Overlap_Matrix::~Use_Overlap_Matrix()
+LCAO_gen_fixedH::~LCAO_gen_fixedH()
 {}
 
 
-void Use_Overlap_Matrix::calculate_NL_no(void)
+void LCAO_gen_fixedH::calculate_NL_no(void)
 {
-    TITLE("Use_Overlap_Matrix","calculate_NL_no");
+    TITLE("LCAO_gen_fixedH","calculate_NL_no");
 
 	if(GAMMA_ONLY_LOCAL)
 	{
@@ -35,27 +33,27 @@ void Use_Overlap_Matrix::calculate_NL_no(void)
 }
 
 
-void Use_Overlap_Matrix::calculate_T_no(void)
+void LCAO_gen_fixedH::calculate_T_no(void)
 {
-    TITLE("Use_Overlap_Matrix","calculate_T_no");
+    TITLE("LCAO_gen_fixedH","calculate_T_no");
     this->build_ST_new('T', false);
     return;
 }
 
-void Use_Overlap_Matrix::calculate_S_no(void)
+void LCAO_gen_fixedH::calculate_S_no(void)
 {
-    TITLE("Use_Overlap_Matrix", "calculate_S_no");
-    timer::tick("Use_Overlap_Matrix","calculate_S_no");
+    TITLE("LCAO_gen_fixedH", "calculate_S_no");
+    timer::tick("LCAO_gen_fixedH","calculate_S_no");
 	this->build_ST_new('S', false);
-    timer::tick("Use_Overlap_Matrix","calculate_S_no");
+    timer::tick("LCAO_gen_fixedH","calculate_S_no");
     return;
 }
 
 
 //liaochen modify interface 2010-3-22
-void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
+void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 {
-    TITLE("Use_Overlap_Matrix","build_ST_new");
+    TITLE("LCAO_gen_fixedH","build_ST_new");
 
     //array to store data
     double olm[3]={0.0,0.0,0.0};
@@ -262,14 +260,14 @@ void Use_Overlap_Matrix::build_ST_new(const char& dtype, const bool& calc_deri)
 		{
 			cout << " nnr=" << nnr << " LNNR.nnr=" << LNNR.nnr << endl;
 			ofs_running << " nnr=" << nnr << " LNNR.nnr=" << LNNR.nnr << endl;
-			WARNING_QUIT("Use_Overlap_Matrix::build_ST_new","nnr != LNNR.nnr");
+			WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != LNNR.nnr");
 		}
 	}
 
     return;
 }
 
-void Use_Overlap_Matrix::test_Nonlocal()
+void LCAO_gen_fixedH::test_Nonlocal()
 {
 	int nnr = 0;
 	Vector3<double> tau1, tau2, dtau_12, tau0, dtau_10, dtau_20;
@@ -396,10 +394,10 @@ void Use_Overlap_Matrix::test_Nonlocal()
 
 
 #include "record_adj.h" //mohan add 2012-07-06
-void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
+void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 {
-    TITLE("Use_Overlap_Matrix","build_Nonlocal_mu");
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_mu",'G');
+    TITLE("LCAO_gen_fixedH","build_Nonlocal_mu");
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu",'G');
 
 	// < phi1 | beta > < beta | phi2 >
 	// phi1 is within the unitcell.
@@ -633,21 +631,21 @@ void Use_Overlap_Matrix::build_Nonlocal_mu(const bool &calc_deri)
 //		ofs_running << " LNNR.nnr=" << LNNR.nnr << endl;
 		if( nnr!=LNNR.nnr)
 		{
-			WARNING_QUIT("Use_Overlap_Matrix::build_Nonlocal_mu","nnr!=LNNR.nnr");
+			WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=LNNR.nnr");
 		}
 	}
 
 //	cout << " build_Nonlocal_mu done" << endl;
 
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_mu",'G');
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu",'G');
 	return;
 }
 
 
-void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
+void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri)
 {
-    TITLE("Use_Overlap_Matrix","build_Nonlocal_beta");
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_beta",'G');
+    TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta",'G');
 
     for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
@@ -725,7 +723,7 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 									}
 									else
 									{
-										WARNING_QUIT("Use_Overlap_Matrix::build_Nonlocal_beta","not consistent with k point algorithm.");
+										WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 //										assert( nnr < LNNR.nnr );
 //										LM.Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
@@ -752,7 +750,7 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
 									}
 									else
 									{
-										WARNING_QUIT("Use_Overlap_Matrix::build_Nonlocal_beta","not consistent with k point algorithm.");
+										WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 										//LM.DHloc_fixedR_x[ nnr ] += nlm[0];
 										//LM.DHloc_fixedR_y[ nnr ] += nlm[1];
 										//LM.DHloc_fixedR_z[ nnr ] += nlm[2];
@@ -782,7 +780,7 @@ void Use_Overlap_Matrix::build_Nonlocal_beta(const bool& calc_deri)
         }// end I0
     }// end T0
 
-    timer::tick ("Use_Overlap_Matrix","build_Nonlocal_beta",'G');
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta",'G');
     return;
 }
 

@@ -1,14 +1,14 @@
 /************************************
 //LiaoChen Modify on 2010-3-22
 ***********************************/
-#ifndef USE_OVERLAP_MATRIX_H
-#define USE_OVERLAP_MATRIX_H
+#ifndef LCAO_gen_fixedH_H
+#define LCAO_gen_fixedH_H
 
 #include "../src_pw/tools.h"
 #include "ORB_gen_tables.h"
 #include "../src_global/sltk_grid_driver.h"
 
-class Use_Overlap_Matrix
+class LCAO_gen_fixedH
 {
 	friend class Force_LCAO_gamma;
 	friend class Force_LCAO_k;
@@ -17,8 +17,8 @@ class Use_Overlap_Matrix
 
 	public:
 
-	Use_Overlap_Matrix();
-	~Use_Overlap_Matrix();
+	LCAO_gen_fixedH();
+	~LCAO_gen_fixedH();
 
 	void calculate_NL_no(void);
 	void calculate_T_no(void);

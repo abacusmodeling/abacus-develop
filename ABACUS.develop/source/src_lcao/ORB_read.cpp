@@ -3,7 +3,7 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 //==============================
-// Define a object here! 
+// Define an object here! 
 //==============================
 LCAO_Orbitals ORB;
 
@@ -88,6 +88,7 @@ void LCAO_Orbitals::bcast_files(void)
 }
 #endif
 
+
 void LCAO_Orbitals::Read_Orbitals(void)
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
@@ -106,8 +107,6 @@ void LCAO_Orbitals::Read_Orbitals(void)
 	ofs_running << " |                                                                    |" << endl;
 	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 	ofs_running << "\n\n\n\n";	
-
-
 
 	//--------------------------
 	//(1) check dk, dR, Rmax.

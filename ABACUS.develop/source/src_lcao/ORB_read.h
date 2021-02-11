@@ -1,7 +1,7 @@
 //=========================================================
 //AUTHOR : mohan
 //DATE : 2009-04-23
-//Last Update : 2009-04-23
+//Last Update : 2021-02-11
 //=========================================================
 #ifndef LCAO_ORBITALS_H
 #define LCAO_ORBITALS_H
@@ -44,10 +44,13 @@ class LCAO_Orbitals
 	const int& get_ntype(void) const {return ntype;}
 	const double& get_dr_uniform(void) const {return dr_uniform;}
 
+	// numerical atomic orbitals
 	Numerical_Orbital* Phi;
+	
+	// nonlocal projectors (1-dimension array)
 	Numerical_Nonlocal* Beta;
 	
-	// init in input.cpp
+	// initialized in input.cpp
 	double ecutwfc;
 	double dk;
 	double dR;
@@ -60,7 +63,7 @@ class LCAO_Orbitals
 	
 	double dr_uniform;
 
-	// init in unitcell_pseudo
+	// initalized in unitcell_pseudo
 	// assume ntype < 20.
 	bool read_in_flag;
 	std::vector<string> orbital_file;

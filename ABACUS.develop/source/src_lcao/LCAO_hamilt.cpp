@@ -133,7 +133,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 
 	LM.zeros_HSgamma('S');    	
 
-	this->UOM.calculate_S_no();	
+	this->genH.calculate_S_no();	
 
 	//LM.print_HSgamma('S');
 
@@ -154,7 +154,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 	time_t time_vnl_start = time(NULL);
 	if(VNL_IN_H)
 	{
-		UOM.calculate_NL_no();
+		genH.calculate_NL_no();
 	}
 	time_t time_vnl_end = time(NULL);
 
@@ -164,7 +164,7 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 	time_t time_t_start = time(NULL);
 	if(T_IN_H)
 	{
-		UOM.calculate_T_no();
+		genH.calculate_T_no();
 //		LM.print_HSgamma('T');
 	}
 	time_t time_t_end = time(NULL);
@@ -273,7 +273,7 @@ void Use_Hamilt_Matrix::calculate_STNR_k(void)
 	// and store in LM.SlocR.
 	//--------------------------------------------
 	LM.zeros_HSR('S', LNNR.nnr);
-    this->UOM.calculate_S_no();	
+    this->genH.calculate_S_no();	
 
 	//------------------------------
 	// set T(R) and Vnl(R) to zero.
@@ -286,13 +286,13 @@ void Use_Hamilt_Matrix::calculate_STNR_k(void)
 
 	if(T_IN_H)
 	{
-		this->UOM.calculate_T_no();	
+		this->genH.calculate_T_no();	
 	}
 
 
 	if(VNL_IN_H)
 	{
-		this->UOM.calculate_NL_no();
+		this->genH.calculate_NL_no();
 	}
 
 
@@ -348,11 +348,11 @@ void Use_Hamilt_Matrix::calculate_STNR_k(void)
 //		GAMMA_ONLY_LOCAL = true;
 //		LM.allocate_HS_gamma(ParaO.nloc);
 //		LM.zeros_HSgamma('H');
-//		UHM.UOM.calculate_NL_no( nstart );
+//		UHM.genH.calculate_NL_no( nstart );
 //		GAMMA_ONLY_LOCAL = false;
 //		cout << " Correct LCAO Vnl " << endl;
 //		LM.print_HSgamma('H');		
-//		UHM.UOM.calculate_NL_no( nstart );
+//		UHM.genH.calculate_NL_no( nstart );
 //		GAMMA_ONLY_LOCAL = false;
 //		cout << " Correct LCAO Vnl " << endl;
 //		LM.print_HSgamma('H');		

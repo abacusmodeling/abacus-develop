@@ -142,7 +142,7 @@ void Force_LCAO_k::allocate_k(void)
 	//-----------------------------
     // tips: build_ST_new --> ParaO.set_force 
 	bool cal_deri = true;
-	UHM.UOM.build_ST_new ('S', cal_deri);
+	UHM.genH.build_ST_new ('S', cal_deri);
 
 	//-----------------------------------------
 	// (2) allocate for <phi | T + Vnl | dphi>
@@ -157,11 +157,11 @@ void Force_LCAO_k::allocate_k(void)
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
-    UHM.UOM.build_ST_new ('T', cal_deri);
+    UHM.genH.build_ST_new ('T', cal_deri);
 	//test(LM.DHloc_fixedR_x,"LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
-	UHM.UOM.build_Nonlocal_mu (cal_deri);
+	UHM.genH.build_Nonlocal_mu (cal_deri);
 	//test(LM.DHloc_fixedR_x,"LM.DHloc_fixedR_x Vnl part");
 
 	timer::tick("Force_LCAO_k","allocate");
