@@ -20,8 +20,10 @@ class Potential_Libxc
 		matrix &v);
 		
 	private:
+
 	static std::vector<XC(func_type)> init_func();
 	// [ rho, sigma, gdr ]
+
 	static std::tuple< std::vector<double>, std::vector<double>, std::vector<std::vector<Vector3<double>>> > 
 	cal_input( 
 		const std::vector<XC(func_type)> &funcs, 
