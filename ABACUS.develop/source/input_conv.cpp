@@ -14,10 +14,10 @@
 // mohan 2021-01-30  
 #include "src_pw/vdwd2.h"
 #include "src_pw/vdwd3.h"
-#include "src_pw/chi0_hilbert.h"
-#include "src_pw/chi0_standard.h"
-#include "src_pw/epsilon0_pwscf.h"
-#include "src_pw/epsilon0_vasp.h"
+#include "src_io/chi0_hilbert.h"
+#include "src_io/chi0_standard.h"
+#include "src_io/epsilon0_pwscf.h"
+#include "src_io/epsilon0_vasp.h"
 #include "src_pw/unitcell.h"
 #include "src_ri/exx_abfs-jle.h"
 

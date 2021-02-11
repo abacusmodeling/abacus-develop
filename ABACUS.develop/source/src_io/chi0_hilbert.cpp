@@ -7,13 +7,13 @@
 //theory . and it is a basic work and use the hilbert-transform to reduce the
 //calculated quantities.
 //-------------------------------------------------------------------------------
-#include "global.h"
+#include "src_pw/global.h"
 #include "chi0_hilbert.h"
-#include "algorithms.h"
-#include "hamilt_pw.h"
-#include "wavefunc_in_pw.h"
+#include "src_pw/algorithms.h"
+#include "src_pw/hamilt_pw.h"
+#include "src_pw/wavefunc_in_pw.h"
 #include "../src_io/optical.h"
-#include "klist.h"
+#include "src_pw/klist.h"
 #include <iostream>
 #include "../src_lcao/global_fp.h"
 

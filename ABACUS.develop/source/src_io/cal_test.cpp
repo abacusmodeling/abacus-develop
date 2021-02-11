@@ -1,7 +1,6 @@
-#include "global.h"
-#include "tools.h"
+#include "src_pw/global.h"
+#include "src_pw/tools.h"
 #include "cal_test.h"
-#include "cal_test0.h"
 
 double Cal_Test::mporter;
 
@@ -86,7 +85,8 @@ void Cal_Test::test_memory(void)
 	mhs = Memory::calculate_mem( NLOCAL*NLOCAL, "double" );
 	mwf = Memory::calculate_mem( NLOCAL*NBANDS, "double" );
 	mnonzero = Memory::calculate_mem( NLOCAL*(NLOCAL+1)/2, "bool");
-	mspar_hsrho = Memory::calculate_mem( Hnnz*3, "double");
+// mohan comment out 2021-02-11
+//	mspar_hsrho = Memory::calculate_mem( Hnnz*3, "double");
 	
 
 	mgvec = Memory::calculate_mem( ngmc * 3 * 2, "double" );

@@ -223,7 +223,6 @@ ions_move_sd.o\
 ions_move_basic.o\
 bfgs_basic.o\
 occupy.o\
-cal_test0.o\
 cal_test.o\
 winput.o\
 input_update.o\
@@ -260,7 +259,6 @@ global.o \
 symmetry.o \
 symmetry_basic.o \
 symmetry_rho.o \
-symm_book.o \
 symm_other.o \
 eximport.o \
 mulliken_charge.o\

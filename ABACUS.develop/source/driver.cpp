@@ -6,9 +6,8 @@
 #include "src_lcao/global_fp.h"
 #include "src_pw/global.h"
 #include "src_io/print_info.h"
-#include "src_pw/cal_test.h"
-#include "src_pw/cal_test0.h"
-#include "src_pw/winput.h"
+#include "src_io/cal_test.h"
+#include "src_io/winput.h"
 
 Driver::Driver(){}
 
@@ -149,11 +148,8 @@ void Driver::reading(void)
 
 	// mohan add 2010-10-10, just to test the symmetry of a variety
 	// of systems.
-	//xiaohui modified 2013-03-23,adding "/*"
 	if(CALCULATION == "test")
 	{
-		Cal_Test::adjacent_atoms();
-		//Cal_Test::sparsity();
 		Cal_Test::test_memory();
 		QUIT();
 	}

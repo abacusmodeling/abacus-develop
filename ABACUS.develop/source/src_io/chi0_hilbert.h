@@ -1,21 +1,18 @@
 //==========================================================
-//   AUTHOR : Pengfei Li
-//   DATE : 2016-12-14
+// AUTHOR : Pengfei Li
+// DATE : 2016-12-14
 //==========================================================
 #ifndef CHI0_HILBERT_H
 #define CHI0_HILBERT_H
 #include "../input_conv.h"
-#include "wavefunc.h"
-#include "../src_parallel/parallel_global.h"
-//#if defined __FFTW2
-//#include "../src_parallel/fftw.h"
-//#elif defined __FFTW3
-//#include "../src_parallel/fftw3.h"
-//#endif
+#include "src_pw/wavefunc.h"
+#include "src_parallel/parallel_global.h"
 
 class Chi0_hilbert 
 {
-public:
+
+	public:
+
 	Chi0_hilbert();
 	~Chi0_hilbert();
 	

@@ -1,6 +1,6 @@
 #include "ELEC_scf.h"
 #include "src_pw/global.h"
-#include "src_pw/chi0_hilbert.h"
+#include "src_io/chi0_hilbert.h"
 #include "src_pw/symmetry_rho.h"
 #include "dftu.h"
 #include "LCAO_evolve.h"

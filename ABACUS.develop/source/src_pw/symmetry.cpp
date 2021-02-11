@@ -19,7 +19,6 @@ Symmetry::~Symmetry()
 
 }
 
-#include "symm_book.h"
 void Symmetry::analy_sys(void)
 {
     if (available == false) return;
@@ -38,10 +37,6 @@ void Symmetry::analy_sys(void)
 	ofs_running << " |                                                                    |" << endl;
 	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 	ofs_running << "\n\n\n\n";
-
-
-	Symm_Book SB;
-//	SB.Bravais();
 
 
     this->ibrav = 0;

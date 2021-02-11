@@ -4,8 +4,8 @@
 #include "src_pw/algorithms.h"
 #include "src_pw/pseudopot_cell_us.h"
 #include "src_io/optical.h"
-#include "src_pw/cal_test.h"
-#include "src_pw/winput.h"
+#include "src_io/cal_test.h"
+#include "src_io/winput.h"
 
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}

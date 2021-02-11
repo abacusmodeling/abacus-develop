@@ -3,7 +3,7 @@
 #include "src_pw/global.h"
 #include "src_pw/symmetry_rho.h"
 #include "input_update.h"
-#include "src_pw/chi0_hilbert.h"
+#include "src_io/chi0_hilbert.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 //

@@ -1,13 +1,8 @@
 #ifndef CHI0_STANDARD_H
 #define CHI0_STANDARD_H
 
-#include "wavefunc.h"
-#include "../src_parallel/parallel_global.h"
-//#if defined __FFTW2
-//#include "../src_parallel/fftw.h"
-//#elif defined __FFTW3
-//#include "../src_parallel/fftw3.h"
-//#endif
+#include "src_pw/wavefunc.h"
+#include "src_parallel/parallel_global.h"
 
 class Chi0_standard
 {

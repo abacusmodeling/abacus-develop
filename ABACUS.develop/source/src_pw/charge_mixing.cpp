@@ -1,6 +1,6 @@
 #include "charge_mixing.h"
 #include "global.h"
-#include "../src_pw/inverse_matrix.h"
+#include "../src_global/inverse_matrix.h"
 
 Charge_Mixing::Charge_Mixing(){}
 Charge_Mixing::~Charge_Mixing(){}
