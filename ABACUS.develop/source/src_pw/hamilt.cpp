@@ -13,7 +13,7 @@ Hamilt::~Hamilt()
 
 void Hamilt::init(const bool use_pw)
 {
-    if (test_hm)TITLE("Hamilt","init");
+    TITLE("Hamilt","init");
 //	ofs_running << " use_pw=" << use_pw << endl;
     if (use_pw) 
 	{
@@ -363,7 +363,7 @@ void Hamilt::cdiaghg(
 	double *e,
 	ComplexMatrix &hvec)
 {
-    if (test_hm==1) TITLE("Hamilt","cdiaghg");
+    TITLE("Hamilt","cdiaghg");
 	timer::tick("Hamilt","cdiaghg");
     //====================================================================
     // calculates eigenvalues and eigenvectors of the generalized problem
@@ -511,56 +511,3 @@ void Hamilt::cdiaghg(
 	timer::tick("Hamilt","cdiaghg");
     return;
 }
-
-//#include "../src_develop/src_cg/hpsi_ao.h"
-//void Hamilt::h_1psi_real( const int dim, const double* psi, double* hpsi, double* spsi)
-//{
-//#ifdef __FP
-//	/*
-//	for(int i=0; i<NLOCAL; ++i)
-//	{
-//		cout << " psi=" << psi[i] << endl;
-//	}
-//	exit(0);
-//	*/
-//
-//	Hpsi_AO HAO;
-//	if(ATOM_DISTRIBUTION)
-//	{
-//		HAO.mat_psi_parallel(1,dim,psi,hpsi);
-//		HAO.mat_psi_parallel(2,dim,psi,spsi);
-//	}
-//	else
-//	{
-//		HAO.mat_psi_single(1,psi,hpsi);
-//		HAO.mat_psi_single(2,psi,spsi);
-//	}
-//    this->hon.UHM.Sparse_H.multiply_vector(psi, hpsi);
-//    this->hon.UOM.Sparse_S.multiply_vector(psi, spsi);
-//#endif
-//}
-
-//void Hamilt::s_1psi_real( const int dim, const double* psi, double* spsi)
-//{
-//#ifdef __FP
-//	/*
-//	for(int i=0; i<NLOCAL; ++i)
-//	{
-//		cout << " psi=" << psi[i] << endl;
-//	}
-//	exit(0);
-//	*/
-//	Hpsi_AO HAO;
-//	if(ATOM_DISTRIBUTION)
-//	{
-//		HAO.mat_psi_parallel(2,dim,psi,spsi);
-//	}
-//	else
-//	{
-//		HAO.mat_psi_single(2,psi,spsi);
-//	}
-//    this->hon.UOM.Sparse_S.multiply_vector(psi, spsi);
-//#endif
-//}
-
-

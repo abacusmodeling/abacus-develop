@@ -33,7 +33,7 @@ Hamilt_PW::~Hamilt_PW()
 
 void Hamilt_PW::init(void)
 {
-    if (test_hm) TITLE("Hamilt_PW","init");
+    TITLE("Hamilt_PW","init");
 
     delete[] hpsi;
     delete[] spsi;
@@ -57,7 +57,7 @@ void Hamilt_PW::init(void)
 
 void Hamilt_PW::init_k(const int ik)
 {
-    if (test_hm==1) TITLE("Hamilt_PW","init_k");
+    TITLE("Hamilt_PW","init_k");
 	
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
@@ -98,7 +98,7 @@ void Hamilt_PW::cinitcgg(
     ComplexMatrix &evc,
     double *en)
 {
-    if (test_hm==1) TITLE("Hamilt_PW","cinitcgg");
+    TITLE("Hamilt_PW","cinitcgg");
     timer::tick("Hamilt_PW","cinitcgg",'G');
 
 	assert(nstart!=0);
@@ -226,15 +226,15 @@ void Hamilt_PW::cinitcgg(
     //diagonize the H-matrix
     //=======================
 
-    if (test_hm > 2)
-    {
+/*
 		cout << setprecision(3);
 		out.printV3(ofs_running,kv.kvec_c[ik]);
 		out.printcm_norm("sc",sc,1.0e-4);
 		out.printcm_norm("hvec",hvec,1.0e-4);
 		out.printcm_norm("hc",hc,1.0e-4);
 		cout << endl;
-    }
+*/
+
 //	cout << " ----------------------------- ik=" << ik << endl;
 //	out.printV3( kv.kvec_c[ik] );
 //	cout << " cinitcgg" << endl;
@@ -375,6 +375,7 @@ void Hamilt_PW::cinitcgg(
     return;
 } //end subroutine cinitcgg
 
+
 void Hamilt_PW::h_1psi( const int npw_in, const complex < double> *psi,
                         complex<double> *hpsi, complex < double> *spsi)
 {
@@ -386,6 +387,7 @@ void Hamilt_PW::h_1psi( const int npw_in, const complex < double> *psi,
     }
     return;
 }
+
 
 void Hamilt_PW::s_1psi
 (
@@ -538,16 +540,16 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp)
             {
                 for (int ip2=0; ip2<Nprojs; ip2++)
                 {
-			if(NSPIN!=4)
-				this->Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
-			else
-			{
-				this->Ps[sum+ ip2*2] += ppcell.deeq_nc(0, iat, ip2, ip) * becp[sum+ip*2]
+					if(NSPIN!=4)
+						this->Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
+					else
+					{
+						this->Ps[sum+ ip2*2] += ppcell.deeq_nc(0, iat, ip2, ip) * becp[sum+ip*2]
 							+ppcell.deeq_nc(1, iat, ip2, ip) * becp[sum+ip*2+1];
-				this->Ps[sum+ ip2*2+1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp[sum+ip*2]
+						this->Ps[sum+ ip2*2+1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp[sum+ip*2]
 							+ppcell.deeq_nc(3, iat, ip2, ip) * becp[sum+ip*2+1];
-			}
-                }// end ih
+					}
+				}// end ih
             }//end jh
 		if(NSPIN!=4) sum += Nprojs;
 		else sum += 2 * Nprojs;

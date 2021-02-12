@@ -28,7 +28,6 @@ class SubGrid_oper
 
 	int* trace_lo_tot;
 	double*** totwfc;
-	complex<double>*** totwfc_B;//mohan add 2012-04-13
 	bool allocate_totwfc;
 	int lgd;
 

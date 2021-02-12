@@ -178,7 +178,6 @@ extern int test_symmetry;
 extern int test_fft;
 extern int test_pw;
 extern int test_elec;
-extern int test_hm;
 
 extern int test_wf;
 extern int test_charge;

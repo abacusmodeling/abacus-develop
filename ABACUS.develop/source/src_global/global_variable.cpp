@@ -25,7 +25,6 @@ string	CALCULATION = "scf";
 bool 	BERRY_PHASE = false;
 bool 	LDA_PLUS_U = false;
 int		EFIELD = 0; // 5: add electric field
-int		BFIELD = 0; // 6: add magnetic field
 int		DIPOLE = 0; // 7: add dipole field
 
 string  DFT_FUNCTIONAL = "none";
@@ -150,7 +149,6 @@ int test_symmetry = 0;
 int test_fft = 0;
 int test_pw = 0;
 int test_elec = 0;
-int test_hm = 0;
 
 int test_wf = 0;
 int test_charge = 0;

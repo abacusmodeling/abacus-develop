@@ -180,22 +180,11 @@ void SubGrid_oper::cal_totwfc()
 			// need to allocate the pointer,
 			// because it would be some array's
 			// entrance parameters.
-			if(!BFIELD)
+			// mohan update 2021-02-12
+			this->totwfc = new double**[1];
+			for(int is=0; is<1; ++is)
 			{
-				this->totwfc = new double**[1];
-				for(int is=0; is<1; ++is)
-				{
-					this->totwfc[is] = new double*[NBANDS];
-				}
-			}
-			// for B field.
-			else
-			{
-				this->totwfc_B = new complex<double>**[1];
-				for(int is=0; is<1; ++is)
-				{
-					this->totwfc_B[is] = new complex<double>*[NBANDS];
-				}
+				this->totwfc[is] = new double*[NBANDS];
 			}
 			this->allocate_totwfc=false;
 			return;

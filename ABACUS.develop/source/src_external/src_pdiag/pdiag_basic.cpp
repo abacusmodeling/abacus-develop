@@ -707,17 +707,10 @@ MPI_Barrier(comm);
 	// when the third dimension is zero, we don't need to call
 	// this function, however, as proc 0, it needs all the procssors
 	// to give reports to it.
-	if(BFIELD)
-	{
-		cout << " not implement distri_lowf_aug yet." << endl;
-		WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
-	}
-	else
-	{
-//		cout << " block distri_lowf_aug" << endl;
-		WF_Local::distri_lowf_aug( ctot, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]); 
-	}
-	
+	//	cout << " block distri_lowf_aug" << endl;
+	// mohan update 2021-02-12, delte BFIELD option
+	WF_Local::distri_lowf_aug( ctot, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]); 
+
 	// clean staff.
 	if(myid==0)
 	{
@@ -899,15 +892,8 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
 	// mohan add 2012-01-09
 	// 
 	// for complex
-	if(BFIELD)
-	{
-		ofs_running << " not augmented wave functions are implemented with B field" << endl;
-		//WF_Local::distri_lowf_aug_complex( ctot, LOWF.WFC_GAMMA_B_aug[ik]);
-	}
-	else
-	{
-		WF_Local::distri_lowf_aug_complex( ctot, LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
-	}
+	// mohan update 2021-02-12, delete BFIELD option
+	WF_Local::distri_lowf_aug_complex( ctot, LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
 	
 	
 	// clean staff.

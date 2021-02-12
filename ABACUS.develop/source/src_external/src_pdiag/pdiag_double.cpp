@@ -586,21 +586,11 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
                             }
                             Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
                         }
-                        if(BFIELD)
-                        {
-                            cout << " not implement distri_lowf_aug yet." << endl;
-                            WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
-                            info=q2ZLOC_WFC_CTOT(myid, pos, naroc, nb,
-                                                dim0, dim1, iprow, ipcol, this->loc_size,
-                                                work, Z_LOC[ik], wfc, ctot);
-                        }
-                        else
-                        {
-                            info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-                                                        dim0, dim1, iprow, ipcol, this->loc_size,
-                                                        work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
-                        }
-                        stringstream ss;
+						// mohan delete Bfield option 2021-02-12
+						info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
+								dim0, dim1, iprow, ipcol, this->loc_size,
+								work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
+						stringstream ss;
                         ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
                         // mohan add 2012-04-03, because we need the occupations for the
                         // first iteration.
@@ -616,21 +606,11 @@ void Pdiag_Double::diago_double_begin(const int &ik, double **wfc, matrix &wfc_2
                     }
                     else
                     {
-                        if(BFIELD)
-                        {
-                            cout << " not implement distri_lowf_aug yet." << endl;
-                            WARNING_QUIT("Pdiag_Basic::gath_eig","not implement distri_lowf_aug yet for Bfield");
-                            info=q2ZLOC_WFC(pos, naroc, nb,
-                                            dim0, dim1, iprow, ipcol, this->loc_size,
-                                            work, Z_LOC[ik], wfc);
-                        }
-                        else
-                        {
-                            info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-                                                dim0, dim1, iprow, ipcol, this->loc_size,
-                                                work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
-                        }
-                    }
+						// mohan update 2021-02-12, delete Bfield option
+						info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
+								dim0, dim1, iprow, ipcol, this->loc_size,
+								work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
+					}
                 }
             }
         }
@@ -943,19 +923,10 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
                         }
                         Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"cdouble");
                     }
-                    if(BFIELD)
-                    {
-		                ofs_running << " not augmented wave functions are implemented with B field" << endl;
-                        info=q2WFC_CTOT_complex(myid, naroc, nb,
-                                                dim0, dim1, iprow, ipcol,
-                                                work, wfc, ctot);
-                    }
-                    else
-                    {
-                        info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
-                                                       dim0, dim1, iprow, ipcol,
-                                                       work, wfc, LOWF.WFC_K_aug[ik], ctot);
-                    }
+					// mohan update 2021-02-12, delete BFIELD option
+					info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
+							dim0, dim1, iprow, ipcol,
+							work, wfc, LOWF.WFC_K_aug[ik], ctot);
                     stringstream ss;
 	                ss << global_out_dir << "LOWF_K_" << ik+1 << ".dat";
                     // mohan add 2012-04-03, because we need the occupations for the
@@ -972,20 +943,11 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
                 }
                 else
                 {
-                    if(BFIELD)
-                    {
-		                ofs_running << " not augmented wave functions are implemented with B field" << endl;
-                        info=q2WFC_complex(naroc, nb,
-                                           dim0, dim1, iprow, ipcol,
-                                           work, wfc);
-                    }
-                    else
-                    {
-                        info=q2WFC_WFCAUG_complex(naroc, nb,
-                                                  dim0, dim1, iprow, ipcol,
-                                                  work, wfc, LOWF.WFC_K_aug[ik]);
-                    }
-                }
+					// mohan update 2021-02-12, delte BFIELD option
+					info=q2WFC_WFCAUG_complex(naroc, nb,
+							dim0, dim1, iprow, ipcol,
+							work, wfc, LOWF.WFC_K_aug[ik]);
+				}
             }
         }
         delete[] work;
