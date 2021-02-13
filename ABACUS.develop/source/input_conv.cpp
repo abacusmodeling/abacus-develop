@@ -137,9 +137,6 @@ void Input_Conv::Convert(void)
 // new function (5/5)
 //----------------------------------------------------------
     SYMMETRY = INPUT.symmetry;						// 9
-	MLWF_FLAG = INPUT.mlwf_flag;					// 9.1
-    //LOCAL_BASIS = INPUT.local_basis; xiaohui modify 2013-09-01				// 10
-    //LINEAR_SCALING = INPUT.linear_scaling; xiaohui modify 2013-09-01			// 11
 	BASIS_TYPE = INPUT.basis_type; //xiaohui add 2013-09-01
 	KS_SOLVER = INPUT.ks_solver; //xiaohui add 2013-09-01
 	SEARCH_RADIUS = INPUT.search_radius;			// 11.1

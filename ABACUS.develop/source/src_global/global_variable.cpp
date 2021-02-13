@@ -44,9 +44,6 @@ int		NSTEP = 20;
 int 	NITER = 50;
 
 bool 	SYMMETRY = false;
-bool	MLWF_FLAG = false; 
-//int 	LOCAL_BASIS = 0; xiaohui modify 2013-09-01 // 0: plane wave; 1:radial wave functions; 2: PAO; 3: Jlq coef;
-//int	LINEAR_SCALING = false; xiaohui modify 2013-09-01
 string	BASIS_TYPE = "pw"; //xiaohui add 2013-09-01
 string	KS_SOLVER = "cg"; //xiaohui add 2013-09-01
 double	SEARCH_RADIUS = -1.0;
@@ -54,7 +51,6 @@ bool	SEARCH_PBC = true;
 bool	SPARSE_MATRIX = false;
 int		ATOM_DISTRIBUTION = false;
 
-//string 	DIAGO_TYPE = "cg"; xiaohui modify 2013-09-01
 int		DIAGO_PROC = 0;
 int 	DIAGO_CG_MAXITER = 30;
 int		DIAGO_CG_PREC = 1; //mohan add 2012-03-31
@@ -179,20 +175,12 @@ int test_sph_proj = 0;
 int test_build = 0;
 int test_setout = 0;
 //----------------------------------------------------------
-// src_epm || src_pseudo
+// src_pseudo
 //----------------------------------------------------------
-#ifdef __EPM
-int test_epm = 10;
-int test_epm_unitcell = 10;
-int test_epm_nscf = 10;
-#else
 int test_pseudo_cell = 0;// 2 : output readin data
 int test_pp = 0;// pp: pseudopotential
 int test_kmesh = 0;
-int test_mlwf_overlap = 0;
-int test_mlwf_optimize = 0;
 int test_ion_dynamics = 0;
-#endif
 //----------------------------------------------------------
 // src_tools
 //----------------------------------------------------------

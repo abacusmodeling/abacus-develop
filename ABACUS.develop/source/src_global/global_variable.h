@@ -48,11 +48,8 @@ extern int		NSTEP;				// 8.3
 extern int 		NITER;				// 8.4
 
 extern bool 	SYMMETRY;		// 9
-extern bool		MLWF_FLAG;		// 9.1 mohan add 2010-01-26
-//extern int 		LOCAL_BASIS; xiaohui modify 2013-09-01		// 10
-//extern int	 	LINEAR_SCALING;	xiaohui modify 2013-09-01	// 11 // -1: test 0: pw 1:lcao 2:O(N)
-extern string		BASIS_TYPE; //xiaohui add 2013-09-01
-extern string		KS_SOLVER; //xiaohui add 2013-09-01
+extern string	BASIS_TYPE; //xiaohui add 2013-09-01
+extern string	KS_SOLVER; //xiaohui add 2013-09-01
 extern double	SEARCH_RADIUS;		// 11.1 // mohan add 2011-03-10
 extern bool		SEARCH_PBC;			// 11.2 // mohan add 2011-03-10
 extern bool		SPARSE_MATRIX;		// 11.3 // mohan add 2009-03-13
