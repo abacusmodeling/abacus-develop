@@ -11,8 +11,10 @@ Diago_David::Diago_David()
     // default: no check
 }
 
-Diago_David::~Diago_David() {
+Diago_David::~Diago_David() 
+{
 }
+
 
 void Diago_David::diag
 (

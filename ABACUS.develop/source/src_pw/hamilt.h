@@ -7,7 +7,8 @@
 
 class Hamilt
 {
-public:
+	public:
+
     Hamilt();
     ~Hamilt();
 
@@ -16,7 +17,9 @@ public:
     void init_k(const int ik);
 
     void init_before_ions(void);
+
     void init_before_electrons(void);
+
     void clear_after_ions(void);
 
     void cinitcgg(const int ik, const int nstart,const int nbnd,

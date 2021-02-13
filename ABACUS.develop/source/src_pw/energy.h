@@ -25,6 +25,7 @@ class energy
 	friend class Force_Lo;
 	friend class Exx_pw;
 	friend class ON_Tests;
+
     energy();
     ~energy();
 
@@ -60,10 +61,11 @@ class energy
 
 	int out_dos;			// control dos calculation
 	int out_band;                    // control band calculation  pengfei 2014-10-13
-        double dos_emin_ev;
+
+	double dos_emin_ev;
 	double dos_emax_ev;
 	double dos_edelta_ev;
-        double bcoeff;
+	double bcoeff;
 
     double ewald();
 
