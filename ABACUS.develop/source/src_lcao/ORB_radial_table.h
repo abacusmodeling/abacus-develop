@@ -59,13 +59,13 @@ class Make_Overlap_Table
 	void init_Lmax (const int orb_num, const int mode, int &Lmax_used, int &Lmax) const;
 	void init_Table_Spherical_Bessel (const int orb_num, const int mode, int &Lmax_used, int &Lmax);
 
-	Sph_Bessel_Recursive::D2* pSB = nullptr;				// Peize Lin add 2017-04-24, and change all jlx in this class
+	// Peize Lin add 2017-04-24, and change all jlx in this class
+	Sph_Bessel_Recursive::D2* pSB = nullptr;
 
 	//==============================================
 	// make the index, in order to get the element 
 	// from Table_SR and Table_TR quickly.
 	//==============================================
-
 	
 	//-------------------------
 	// OV stands for 'overlap'
@@ -109,6 +109,7 @@ class Make_Overlap_Table
 		const int &rmesh,
 		double *rs,
 		double *drs) const;
+
 	// Peize Lin add 2017-10-13
 	void cal_ST_Phi12_R(
 		const int &job,

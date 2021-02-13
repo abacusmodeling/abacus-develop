@@ -22,7 +22,8 @@ class Numerical_Orbital_Lm
 {
 	friend class Numerical_Orbital;
 
-public:
+	public:
+
 	vector<double> psi_uniform;// mohan add 2009-5-10
 	vector<double> dpsi_uniform; //liaochen add 2010/5/11
 	
@@ -30,8 +31,6 @@ public:
 	double dr_uniform;// mohan add 2009-5-10
 	double zty; // the valus of psi at 0.
 	
-public:
-
 	Numerical_Orbital_Lm();
 	~Numerical_Orbital_Lm();
 
@@ -39,7 +38,9 @@ public:
 // EXPLAIN : set information about Numerical_Orbital_Lm
 // MEMBER FUNCTION :
 //==========================================================
-	enum class Psi_Type{ Psi, Psif, Psik, Psik2 };		// Peize Lin add 2017-12-12
+	// Peize Lin add 2017-12-12
+	enum class Psi_Type{ Psi, Psif, Psik, Psik2 };
+
 	void set_orbital_info
 	(
  		const string &label_in,
@@ -77,6 +78,7 @@ private:
 		const int &nk_in,
 		const double &dk_in,
 		const double &dr_uniform_in);
+
 	void cal_kradial(void);
 	void cal_kradial_sbpool(void);
 	void cal_rradial_sbpool(void);

@@ -11,6 +11,13 @@
 #include "ORB_atomic_lm.h"
 #include "ORB_nonlocal.h"
 
+//---------------------------------------------------------------------
+// advices for reconstructions:
+// each set of orbitals should have: lmax, dr, dk, rmax, lmax, etc.
+// the orbitals include : NAO, non-local projectors, descriptors, etc.
+// mohan note 2021-02-13
+//---------------------------------------------------------------------
+
 class LCAO_Orbitals
 {
 	public:

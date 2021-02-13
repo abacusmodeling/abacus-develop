@@ -639,7 +639,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 	TITLE("LCAO_Orbitals","Read_PAO");
 	int lmaxt = ucell.atoms[it].nwl;
 
-//	OUT(ofs_running,"Lmax for this type",lmaxt);
+	//	OUT(ofs_running,"Lmax for this type",lmaxt);
 
 	// allocate space
 	// number of chi for each L.
@@ -656,7 +656,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
     {
         total_nchi += nchi[l];
     }
-//	OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
+	//	OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
 	
 	delete[] Phi[it].phiLN;
 	this->Phi[it].phiLN = new Numerical_Orbital_Lm[total_nchi];

@@ -15,13 +15,14 @@
 class Numerical_Nonlocal_Lm
 {
 
-public:
+	public:
+
 	double* beta_uniform;
 	double* dbeta_uniform;
 	int nr_uniform;
 	double dr_uniform;
 
-public:
+	public:
 
 	Numerical_Nonlocal_Lm();
 	~Numerical_Nonlocal_Lm();	
@@ -57,7 +58,7 @@ public:
 
 	void plot()const;
 
-private:
+	private:
 
 	void freemem(void);
 	void renew(void);
