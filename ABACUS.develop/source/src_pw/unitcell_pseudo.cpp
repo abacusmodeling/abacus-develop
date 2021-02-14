@@ -1207,6 +1207,7 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 // calculate total number of electrons (nelec) and default
 // number of bands (NBANDS).
 //=========================================================
+#include "occupy.h"
 void UnitCell_pseudo::cal_nelec(void)
 {
 	if(test_pseudo_cell) TITLE("UnitCell_pseudo","cal_nelec");

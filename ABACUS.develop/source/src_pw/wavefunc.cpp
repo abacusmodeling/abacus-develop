@@ -166,6 +166,7 @@ LiuXh modify 20180619*/
 // This routine computes an estimate of the start_ wavefunctions
 // from superposition of atomic wavefunctions or random wave functions.
 //===================================================================
+#include "occupy.h"
 void wavefunc::wfcinit(void)
 {
     TITLE("wavefunc","wfcinit");

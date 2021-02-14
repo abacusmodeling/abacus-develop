@@ -2,6 +2,7 @@
 #include "global.h"
 #include "sto_elec.h" 
 #include "algorithms.h"
+#include "occupy.h"
 #include "symmetry_rho.h"
 #include "../src_io/wf_io.h"
 

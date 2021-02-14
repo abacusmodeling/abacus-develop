@@ -82,6 +82,7 @@ void Electrons::non_self_consistent(const int &istep)
 }
 
 
+#include "occupy.h"
 void Electrons::self_consistent(const int &istep)
 {
     timer::tick("Electrons","self_consistent",'D');

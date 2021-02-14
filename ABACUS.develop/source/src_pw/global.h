@@ -11,7 +11,6 @@
 #include "src_global/global_function.h"
 #include "pw_basis.h"
 #include "energy.h"
-#include "occupy.h"
 #include "pseudopot_cell_vnl.h"
 #include "charge_broyden.h"
 #include "potential.h"

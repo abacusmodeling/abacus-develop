@@ -8,6 +8,7 @@
 #include "ELEC_cbands_gamma.h"
 #include "ELEC_evolve.h"
 #include "input_update.h"
+#include "src_pw/occupy.h"
 
 ELEC_scf::ELEC_scf(){}
 ELEC_scf::~ELEC_scf(){}

@@ -503,6 +503,7 @@ void Pdiag_Basic::data_distribution(
 #endif
 
 #ifdef __MPI
+#include "src_pw/occupy.h"
 void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
 {
     TITLE("Pdiag_Basic","gath_eig");

@@ -52,6 +52,7 @@ Chi0_hilbert::~Chi0_hilbert()
 }
 
 // begin calculate
+#include "src_pw/occupy.h"
 void Chi0_hilbert::Chi()
 {
 	TITLE("Chi0_hilbert","Chi");
