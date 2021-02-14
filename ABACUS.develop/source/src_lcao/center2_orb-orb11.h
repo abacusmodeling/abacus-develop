@@ -22,19 +22,24 @@ using std::set;
 
 class Center2_Orb::Orb11
 {
-public:
+	public:
+
 	Orb11(
 		const Numerical_Orbital_Lm &nA_in,
 		const Numerical_Orbital_Lm &nB_in,
 		const Make_Overlap_Table &MOT_in,
 		const Make_Gaunt_Table &MGT_in	);
-	void init_radial_table();
+
+	void init_radial_table(void);
+
 	void init_radial_table( const set<size_t> &radials );				// unit: Bohr/MOT.dr
+
 	double cal_overlap(
 		const Vector3<double> &RA, const Vector3<double> &RB,			// unit: Bohr
 		const int &mA, const int &mB) const;
 		
-private:
+	private:
+
 	const Numerical_Orbital_Lm &nA;
 	const Numerical_Orbital_Lm &nB;
 	

@@ -24,10 +24,19 @@ using std::set;
 
 class cal_r_overlap_R
 {
-public:
+
+	public:
+
+	cal_r_overlap_R();
+	~cal_r_overlap_R();
+	
+
 	Make_Overlap_Table MOT;
+
 	Make_Gaunt_Table MGT;
+
 	Numerical_Orbital_Lm orb_r;
+
 	vector<vector<vector<Numerical_Orbital_Lm>>> orbital_phi;
 	
 	int R_x_num;
@@ -56,11 +65,6 @@ public:
 						map<size_t,
 						Center2_Orb::Orb21>>>>>> center2_orb21_r;
 						
-						
-						
-	cal_r_overlap_R();
-	~cal_r_overlap_R();
-	
 	void init();
 	void out_r_overlap_R(const int nspin);
 	
