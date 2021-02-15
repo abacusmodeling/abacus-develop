@@ -1,6 +1,6 @@
 #include "../src_pw/tools.h"
 #include "../src_pw/global.h"
-#include "../src_pw/functional.h"
+#include "../src_pw/xc_type.h"
 #include "myfunc.h"
 
 //-----------------------------------------------------------------------

@@ -10,7 +10,7 @@
 #include "src_ri/exx_abfs-screen-schwarz.h"
 #include "src_ri/exx_abfs-screen-cauchy.h"
 #include "src_global/element_basis_index.h"
-#include "src_pw/functional.h"
+#include "src_pw/xc_type.h"
 #include "src_pw/exx_global.h"
 
 #if EXX_DM==1

@@ -1,4 +1,4 @@
-#include "gga_pw.h"
+#include "xc_gga_pw.h"
 #include "global.h"
 #include "xc_functional.h"
 #include "../src_pw/myfunc.h"
@@ -6,10 +6,12 @@
 // from gradcorr.f90
 void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 {
-	TITLE("GGA::gradcorr");
+	TITLE("GGA_PW","gradcorr");
 	
 	if (xcf.igcx_now == 0  &&  xcf.igcc_now == 0)
+	{
 		return;
+	}
 
 	bool igcc_is_lyp = false;
 	if( xcf.igcc_now == 3 || xcf.igcc_now == 7)

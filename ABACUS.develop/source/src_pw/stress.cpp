@@ -2,7 +2,7 @@
 #include "global.h"
 #include "potential.h"
 #include "xc_functional.h"
-#include "gga_pw.h"
+#include "xc_gga_pw.h"
 #include "efield.h"
 
 void Stress::cal_stress()

@@ -1,7 +1,7 @@
 #include "stress_lcao.h"
 #include "../src_pw/global.h"
 #include "../src_pw/xc_functional.h"
-#include "../src_pw/gga_pw.h"
+#include "../src_pw/xc_gga_pw.h"
 
 double Stress_LCAO::stress_invalid_threshold_ev = 0.00;
 

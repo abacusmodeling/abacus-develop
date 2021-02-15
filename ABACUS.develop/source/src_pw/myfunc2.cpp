@@ -8,7 +8,7 @@
 using namespace std;
 
 #include "../src_pw/global.h"
-#include "../src_pw/functional.h"
+#include "../src_pw/xc_type.h"
 #include "../src_pw/xc_functional.h"
 #include "myfunc.h"
 

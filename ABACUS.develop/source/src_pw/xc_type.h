@@ -8,7 +8,9 @@
 #include "tools.h"
 class xcfunc
 {
-public:
+
+	public:
+
 	//module funct
 	// char dft[20];
 	// dft is the exchange-correlation functional, described by

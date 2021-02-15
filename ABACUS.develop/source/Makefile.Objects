@@ -18,7 +18,7 @@ input_conv.o\
 run_pw.o\
 run_lcao.o\
 
-OBJS_PW_BASIC=functional.o \
+OBJS_PW_BASIC=xc_type.o \
 xc_functional.o\
 pseudopot_upf.o\
 pseudo_h.o \
@@ -209,7 +209,7 @@ charge_mixing.o \
 charge_pulay.o \
 charge_broyden.o \
 charge_extra.o \
-gga_pw.o \
+xc_gga_pw.o \
 potential.o \
 potential_libxc.o \
 efield.o \

@@ -2,8 +2,7 @@
 // AUTHOR : Lixin He ,mohan
 // DATE : 2008-11-08
 //==========================================================
-#include "functional.h"
-
+#include "xc_type.h"
 #include "src_global/global_function.h"
 #include "src_pw/global.h"
 #include "src_pw/exx_global.h"

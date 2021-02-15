@@ -2,7 +2,7 @@
 // AUTHOR : Lixin He,mohan
 // DATE : 2008-11-11
 //==========================================================
-#include "functional.h"
+#include "xc_type.h"
 #include "global.h"
 #include "pseudo_h.h"
 #include "tools.h"

@@ -14,7 +14,7 @@
 #include "pseudopot_cell_vnl.h"
 #include "charge_broyden.h"
 #include "potential.h"
-#include "functional.h"
+#include "xc_type.h"
 #include "hamilt.h"
 #include "ions.h"
 #include "wavefunc.h"
