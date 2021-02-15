@@ -29,7 +29,6 @@ wavefunc::~wavefunc()
 	}
 }
 
-#ifdef __FP
 void wavefunc::init_local(void)
 {
     TITLE("wavefunc","init_local");
@@ -52,7 +51,6 @@ void wavefunc::init_local(void)
     if(test_wf)ofs_running << " Allocate : EigenValue; Weight;" << endl;
     return;
 }
-#endif
 
 void wavefunc::init(const int nks)
 {	
@@ -113,7 +111,6 @@ LiuXh modify 20180619*/
 		this->wanf2 = new ComplexMatrix[1];
 		
 		evc[0].create(NBANDS, npwx * NPOL);//added by zhengdy-soc	
-#ifdef __FP
 		//if(LOCAL_BASIS && LINEAR_SCALING==0) xiaohui modify 2013-09-02
 		if(BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
 		{
@@ -121,7 +118,6 @@ LiuXh modify 20180619*/
 			cout << " Memory for wanf2 (MB): " << 
 				Memory::record("wavefunc","wanf2",NLOCAL*(prefactor*npwx),"complexmatrix") << endl;
 		}
-#endif	
 		cout << " MEMORY FOR PSI (MB)  : " << 
 			Memory::record("wavefunc","evc",NBANDS*(prefactor*npwx),"complexmatrix") << endl;
 	}
@@ -135,14 +131,12 @@ LiuXh modify 20180619*/
 			this->evc[ik].create(NBANDS, npwx * NPOL);//added by zhengdy-soc
 
 			//Mohan add 2010-1-10
-#ifdef __FP
 			//xiaohui add 2013 -08-01 
 			//if (LOCAL_BASIS || winput::out_spillage==2) xiaohui modify 2013-09-02
 			if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2) //xiaohui add 2013-09-02
 			{
 				this->wanf2[ik].create(NLOCAL, npwx * NPOL);//added by zhengdy-soc
 			}
-#endif	
 		};
 
 		cout << " MEMORY FOR PSI (MB)  : " << 
@@ -254,7 +248,6 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	TITLE("wavefunc","LCAO_in_pw_k");
 	timer::tick("wavefunc","LCAO_in_pw_k",'G');
 
-#ifdef __FP
 	//assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
 	assert(BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
 	
@@ -281,7 +274,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 //	}
 
 //	DONE(ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
-#endif
+
 	timer::tick("wavefunc","LCAO_in_pw_k",'G');
 	return;
 }
@@ -294,11 +287,8 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double>
         //assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
         assert(BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
 
-#ifdef __FP
-
         Wavefunc_in_pw::produce_local_basis_q_in_pw(ik, wvf, this->table_local, q);
 
-#endif
         timer::tick("wavefunc","LCAO_in_pw_k_q",'G');
         return;
 }
@@ -812,14 +802,12 @@ void wavefunc::init_after_vc(const int nks)
         this->wanf2 = new ComplexMatrix[1];
 
         evc[0].create(NBANDS*prefactor, npwx);
-#ifdef __FP
         if(BASIS_TYPE=="lcao_in_pw")
         {
             wanf2[0].create(NLOCAL*prefactor, npwx);
             cout << " Memory for wanf2 (MB): " <<
             Memory::record("wavefunc","wanf2",(NLOCAL*prefactor)*npwx,"complexmatrix") << endl;
         }
-#endif
         cout << " MEMORY FOR PSI (MB)  : " <<
         Memory::record("wavefunc","evc",(NBANDS*prefactor)*npwx,"complexmatrix") << endl;
     }
@@ -832,12 +820,10 @@ void wavefunc::init_after_vc(const int nks)
         {
             this->evc[ik].create(NBANDS*prefactor, npwx);
 
-#ifdef __FP
             if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
             {
                 this->wanf2[ik].create(NLOCAL, npwx);
             }
-#endif
         }
 
         cout << " MEMORY FOR PSI (MB)  : " <<

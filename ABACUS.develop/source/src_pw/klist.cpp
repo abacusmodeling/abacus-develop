@@ -164,7 +164,6 @@ bool kvect::read_kpoints(const string &fn)
     if (MY_RANK != 0) return 1;
 
 	// mohan add 2010-09-04
-#ifdef __FP 
 	if(GAMMA_ONLY_LOCAL)
 	{
 		ofs_warning << " Auto generating k-points file: " << fn << endl;
@@ -175,7 +174,6 @@ bool kvect::read_kpoints(const string &fn)
 		ofs << "1 1 1 0 0 0" << endl;
 		ofs.close();
 	}
-#endif
 
     ifstream ifk(fn.c_str());
     if (!ifk) 

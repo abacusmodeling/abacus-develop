@@ -30,13 +30,11 @@ void pseudo_atom::set_pseudo_at(const Pseudopot_upf &upf)
 	// in order to calculate more accurate Vna.
 	rcut = 15.0;//(a.u.);
 	
-#ifdef __FP
 	//if(!LOCAL_BASIS) xiaohui modify 2013-09-02 // mohan modified 2009-1-21
 	if(BASIS_TYPE=="pw") //xiaohui add 2013-09-02
 	{
 		//rcut = winput::rcut;
 	}
-#endif
 
 // remember to update here if you need it.
 //	rcut = 25.0; 

@@ -3,7 +3,6 @@
 
 void Dos::calculate_Mulliken(const string &fa)
 {
-#ifdef __FP
 	TITLE("Dos","calculate_Mulliken");
 	ofstream ofs;
 	
@@ -134,7 +133,7 @@ void Dos::calculate_Mulliken(const string &fa)
 	
 
 	if(MY_RANK==0) ofs.close();
-#endif
+
 	return;
 }
 

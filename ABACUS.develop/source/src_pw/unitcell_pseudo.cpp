@@ -927,8 +927,6 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		ofs << atom_label[it] << " " << atom_mass[it] << " " << pseudo_fn[it] << endl;
 	}
 	
-#ifdef __FP
-	//if(LOCAL_BASIS) xiaohui modify 2013-09-02 //mohan fix bug 2011-05-01
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02. Attention...
 	{	
 		ofs << "\nNUMERICAL_ORBITAL" << endl;
@@ -943,7 +941,6 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
                         ofs << ORB.orbital_file[it] << endl;
 		}
 	}
-#endif
 
 	ofs << "\nLATTICE_CONSTANT" << endl;
         //modified by zhengdy 2015-07-24
