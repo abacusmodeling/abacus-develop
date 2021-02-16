@@ -67,6 +67,7 @@ class potential
 	// here vh is complex because the array is got after complex FFT.
 	void write_potential(const int &is, const int &iter, const string &fn,
 		const matrix &v, const int &precision, const int &hartree = 0)const;
+
     void write_elecstat_pot(const string &fn, const string &fn_ave);
 	
 	private:
@@ -74,6 +75,7 @@ class potential
     // use fft to set vltot.
     // do once in demo.cpp
     void set_local(double *vl_pseudo)const;
+
     void v_h( int nspin, double &ehart, matrix &v, double** rho);
 
     int test;

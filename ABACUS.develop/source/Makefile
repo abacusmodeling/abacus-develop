@@ -47,16 +47,10 @@ OPTS_GDB = -g -W -I${BOOST_INCLUDE_DIR}
 #==========================
 # OBJECTS NEEDED
 #==========================
-FP_OBJS_0=$(OBJS_OTHER)\
-$(OBJS_FIRST_PRINCIPLE)\
+FP_OBJS_0=$(OBJS_FIRST_PRINCIPLES)\
 $(OBJS_PARALLEL)\
 $(OBJS_TOOLS) \
-$(OBJS_ONSCALING)\
-$(OBJS_SELINV)\
-$(OBJS_CG)\
-$(OBJS_WANNIER)\
 $(OBJS_COMMON)\
-$(OBJS_MLWF)\
 main.o\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})

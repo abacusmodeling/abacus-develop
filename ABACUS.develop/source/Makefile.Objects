@@ -12,14 +12,22 @@
 VERSION = ABACUS
 HEADERS = *.h
 
-OBJS_DC=driver.o\
+OBJS_MAIN=driver.o\
 input.o \
 input_conv.o\
 run_pw.o\
 run_lcao.o\
 
-OBJS_PW_BASIC=xc_type.o \
+OBJS_PW=xc_type.o \
 xc_functional.o\
+xc_1.o\
+xc_2.o\
+xc_3.o \
+vdwd2.o\
+vdwd2_parameters.o\
+dftd3_subroutine.o\
+vdwd3.o\
+vdwd3_parameters.o\
 pseudopot_upf.o\
 pseudo_h.o \
 pseudo_atom.o \
@@ -35,14 +43,6 @@ threshold_elec.o\
 electrons.o \
 forces.o\
 stress.o\
-xc_1.o\
-xc_2.o\
-xc_4.o \
-vdwd2.o\
-vdwd2_parameters.o\
-dftd3_subroutine.o\
-vdwd3.o\
-vdwd3_parameters.o\
 chi0_hilbert.o\
 chi0_standard.o\
 epsilon0_pwscf.o\
@@ -85,8 +85,10 @@ global_function.o \
 global_file.o \
 element_basis_index.o \
 restart.o \
+mymath1.o \
+mymath3.o \
 
-OBJS_ONSCALING=sltk_grid.o\
+OBJS_LCAO=sltk_grid.o\
 sltk_grid_driver.o \
 sltk_atom_arrange.o\
 sltk_atom.o\
@@ -189,8 +191,7 @@ exx_opt_orb-print.o \
 wfc_dm_2d.o \
 unk_overlap_lcao.o \
 cal_r_overlap_R.o \
-
-OBJS_WANNIER=bessel_basis.o\
+bessel_basis.o\
 numerical_basis.o\
 numerical_descriptor.o\
 wavefunc_in_pw.o\
@@ -203,8 +204,9 @@ parallel_pw.o\
 ft.o\
 parallel_grid.o\
 
-OBJS_FIRST_PRINCIPLE=$(OBJS_PW_BASIC)\
-$(OBJS_DC)\
+OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
+$(OBJS_PW)\
+$(OBJS_LCAO)\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
@@ -264,13 +266,6 @@ symmetry_rho.o \
 symm_other.o \
 eximport.o \
 mulliken_charge.o\
-
-#OBJS_MLWF=mlwf_kmesh.o\
-mlwf_overlap.o\
-mlwf_optimize.o\
-
-OBJS_OTHER=mymath1.o \
-mymath3.o \
 
 OBJS_PDIAG=pdgseps.o \
 pzgseps.o \
