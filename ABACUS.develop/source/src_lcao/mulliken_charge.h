@@ -1,5 +1,5 @@
-#ifndef Mulliken_Charge_H
-#define Mulliken_Charge_H
+#ifndef MULLIKEN_CHARGE_H
+#define MULLIKEN_CHARGE_H
 
 //#include "../src_pw/tools.h"
 #include "../src_pw/tools.h"
@@ -16,7 +16,6 @@
 #include <vector>
 #include "../src_external/src_pdiag/pdiag_double.h"
 #include "../src_external/src_pdiag/GenELPA.h"
-
 
 
 class Mulliken_Charge

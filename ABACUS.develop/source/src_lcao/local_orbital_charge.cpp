@@ -4,7 +4,7 @@
 
 //#include "../src_onscaling/on_tests.h"
 //#include "../src_siao/selinv.h"
-// 2014.10.29 add memory pool for DM and DM_B by yshen
+// 2014.10.29 add memory pool for DM and by yshen
 
 // Shen Yu add 2019/5/9
 extern "C"
@@ -24,7 +24,10 @@ Local_Orbital_Charge::Local_Orbital_Charge()
 
     // for k-dependent algorithms.
     this->init_DM_R = false;
-    out_dm = 0;
+
+	// whether to printout density matrix
+    this->out_dm = 0;
+
     //xiaohui add 2014-06-19
     //band_local = nullptr;
     //Z_wg = nullptr;
@@ -68,23 +71,6 @@ Local_Orbital_Charge::~Local_Orbital_Charge()
         }
         delete[] DM_R;
     }
-
-    //xiaohui add 2014-06-19
-    //delete[] loc_bands;
-    //delete[] Z_wg;
-    //delete[] Z_LOC;
-/*
-    //xiaohui add 2014-06-20
-    for (int is=0; is<NSPIN; is++)
-    {
-        for (int i=0; i<NLOCAL; i++)
-        {
-            delete[] DM[is][i]; // mohan fix 2009-08-20
-        }
-        delete[] DM[is];
-    }
-    delete[] DM;
-*/
 }
 
 
@@ -111,7 +97,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 #include "LCAO_nnr.h"
 void Local_Orbital_Charge::allocate_DM_k(void)
 {
-     TITLE("Local_Orbital_Charge","allocate_k");
+    TITLE("Local_Orbital_Charge","allocate_k");
 
     this->nnrg_now = LNNR.nnrg;
     //xiaohui add 'OUT_LEVEL' line, 2015-09-16
@@ -150,9 +136,12 @@ void Local_Orbital_Charge::allocate_DM_k(void)
         WARNING_QUIT("Local_Orbital_Charge::allocate_k","check init_DM_R.");
     }
 
-    wfc_dm_2d.init();       // Peize Lin test 2019-01-16
+	// Peize Lin test 2019-01-16 
+    wfc_dm_2d.init();
+
     return;
 }
+
 
 // setup buffer parameters for tranforming 2D block-cyclic distributed DM matrix 
 inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
@@ -163,6 +152,7 @@ inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
     return gIndex;
     //return (localIndex/nblk*nprocs+myproc)*nblk+localIndex%nblk;
 }
+
 
 inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 {
@@ -339,40 +329,12 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     return 0;
 }
 
+
 // allocate density kernel may change once the ion
 // positions change
 void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 {
      TITLE("Local_Orbital_Charge","allocate_gamma");
-
-    //xiaohui add 2014-06-20
-    //for(int is=0; is<NSPIN; is++)
-    //{
-    //if(!this->init_DM)
-    //{
-    //  this->DM = new double**[NSPIN];
-    //  for(int is=0; is<NSPIN; is++)
-    //  {
-    //      this->DM[is] = new double*[NLOCAL];
-
-    //      for (int i=0; i<NLOCAL; i++)
-    //      {
-    //          DM[is][i] = new double[NLOCAL];
-    //          ZEROS(DM[is][i], NLOCAL);
-    //      }
-
-    //      this->init_DM = true;
-    //      Memory::record("LocalOrbital_Charge","Density_Kernal",NSPIN*NLOCAL*NLOCAL,"double");
-    //  }
-    //}
-
-        //for (int i=0; i<NLOCAL; i++)
-        //{
-        //  ZEROS(this->DM[is][NLOCAL], NLOCAL);
-        //}
-    //}
-
-    //xiaohui modify 2014-06-18
 
     // mohan fix serious bug 2010-09-06
     this->lgd_now = gt.lgd;
@@ -429,7 +391,8 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
     
     setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
 
-    wfc_dm_2d.init();       // Peize Lin test 2019-01-16
+	// Peize Lin test 2019-01-16
+    wfc_dm_2d.init();
 
     return;
 }
@@ -440,35 +403,6 @@ void Local_Orbital_Charge::sum_bands(void)
     timer::tick("Local_Orbital_Cha","sum_bands",'E');
 
     en.eband = 0.0;
-    //xiaohui modify 2013-09-02
-    //if(LINEAR_SCALING == 2)
-    //{
-    //  //en.eband = ON.eband;
-    //} 
-    //else if(LINEAR_SCALING == 1)
-    //{
-    //  //xiaohui modified 2013-07-22
-    //  //if(DIAGO_TYPE=="selinv")
-    //  //{
-    //  //  en.eband = Selinv::eband;
-    //  //}
-    //  //else
-    //  //{
-    //  //  ofs_running << " calculate eband " << endl;
-    //      for(int ik=0; ik<kv.nks; ik++)
-    //      {
-    //          for (int ib=0; ib<NBANDS; ib++)
-    //          {
-    //              en.eband += wf.ekb[ik][ib] * wf.wg(ik, ib);
-    //          //ofs_running << setw(15) << wf.ekb[ik][ib] << setw(15) << wf.wg(ik,ib) << endl; 
-    //          }//ib
-    //      }//ik
-    //  //}
-    //}
-    //else
-    //{
-    //  WARNING_QUIT("Local_Orbital_Charge","check the parameter: LINEAR SCALINIG");
-    //} xiaohui modify 2013-09-02. Attention...
 
     //xiaohui add 2013-09-02
     for(int ik=0; ik<kv.nks; ik++)
@@ -477,53 +411,7 @@ void Local_Orbital_Charge::sum_bands(void)
         {
             en.eband += wf.ekb[ik][ib] * wf.wg(ik, ib);
         }
-    } //xiaohui add 2013-09-02. Attention...
-
-
-    //------------------------------------------------------------
-     //calculate density matrix, using coefficients of local basis.
-    //------------------------------------------------------------
-    //xiaohui modify 2013-09-02
-    //if(LINEAR_SCALING == 2)
-    //{
-    //  // density matrix has already been calculated.
-    //}
-    //else
-    //{
-    //  if(GAMMA_ONLY_LOCAL)
-    //  {
-    //      if(DIAGO_TYPE=="selinv")
-    //      {
-    //          //density matrix has already been calcualted.
-    //      }
-    //      else
-    //      {
-    //          this->cal_dk_gamma();//calculate the density matrix.
-    //      }
-    //      // @@@@@@@
-    //      // test
-    //      // @@@@@@@
-    //      /*
-    //      cout << " Density Matrix:";
-    //      double sum = 0.0;
-    //      for(int i=0; i<NLOCAL; i++)
-    //      {
-    //          cout << endl;
-    //          for(int j=0; j<NLOCAL; j++)
-    //          {
-    //              cout << setw(15) << DM[0][i][j];
-    //              sum += DM[0][i][j];
-    //          }
-    //      }
-    //      cout << "\n Sum of density kernel = " << sum << endl;
-    //      */
-    //  }
-    //  else
-    //  {
-    //      NOTE("Calculate the density matrix!");
-    //      this->cal_dk_k( GridT );
-    //  }
-    //} xiaohui modify 2013-09-02. Attention...
+    } 
 
     //xiaohui add 2013-09-02
     if(GAMMA_ONLY_LOCAL)
@@ -554,8 +442,10 @@ void Local_Orbital_Charge::sum_bands(void)
         NOTE("Calculate the density matrix!");
         this->cal_dk_k( GridT );
         if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
+		{
             wfc_dm_2d.cal_dm(wf.wg);
-    } //xiaohui add 2013-09-02. Attention...
+		}
+    }
             
     for(int is=0; is<NSPIN; is++)
     {
@@ -585,16 +475,15 @@ void Local_Orbital_Charge::sum_bands(void)
 
     OUT_TIME("charge grid integration", start, end);
 
-    //BLOCK_HERE("sum_bands::before renormalize rho");  
+	//BLOCK_HERE("sum_bands::before renormalize rho");  
 
-     CHR.renormalize_rho();
+	CHR.renormalize_rho();
 
-    timer::tick("Local_Orbital_Cha","sum_bands",'E');
-     return;
+	timer::tick("Local_Orbital_Cha","sum_bands",'E');
+	return;
 }
 
 #include "record_adj.h"
-
 inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Record_adj RA,
                    const int ia1, const int iw1_lo, const int nw1, const int gstart, 
                    complex<double> *WFC_PHASE, complex<double> **DM_ATOM)
@@ -756,9 +645,13 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                 {
                     DM_ATOM_SIZE=ng;
                     for(int is=0; is<NSPIN; ++is)
+					{
                         delete[] DM_ATOM[is];
+					}
                     for(int is=0; is<NSPIN; ++is)
+					{
                         DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
+					}
                 }
                 for(int is=0; is<NSPIN; ++is)
 				{
@@ -1146,51 +1039,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 		}
 	}  // end for is    
 #endif //2015-09-06, xiaohui
-#ifndef __MPI //2015-09-06, xiaohui
-    else
-    {
-        for(int is=0; is<NSPIN; is++)
-		{
-            for (int i=0; i<lgd_now; i++)
-			{
-                ZEROS(this->DM[is][i], lgd_now);
-			}
-		}
-        for(int is=0; is<NSPIN; is++)
-        {
-            for (int i=0; i<NLOCAL; i++)
-            {
-                const int mu_local = GridT.trace_lo[i];
-//              ofs_running << " mu_local=" << mu_local << endl;
-                if ( mu_local >= 0)
-                {
-                    // set a pointer.
-                    double *alpha = this->DM[is][mu_local];
-                    for (int j=i; j<NLOCAL; j++)
-                    {
-                        const int nu_local = GridT.trace_lo[j];
-                        if ( nu_local >= 0)
-                        {
-                            for (int ib=0; ib<NBANDS; ib++)
-                            {
-                                const double wg_local = wf.wg(is, ib);
-                                //ofs_running << " wg_local=" << wg_local << endl;
-                                if(wg_local>0)
-                                {
-                                    // dm = \sum ( wg * c[ib][mu] * c[ib][nu] )
-                                    // dm saved accordint to sub-FFT box.
-                                    alpha[nu_local] += wg_local * LOWF.WFC_GAMMA[is][ib][mu_local] 
-                                    * LOWF.WFC_GAMMA[is][ib][nu_local];
 
-                                }//wg_local
-                            }//ib
-                        }//nu_local
-                    }//j
-                }//mu_local
-            }//i
-        }//is
-    }
-#endif //2015-09-06, xiaohui
     timer::tick("LocalOrbital_Charge","cal_dk_gamma",'F');
     return;
 }
