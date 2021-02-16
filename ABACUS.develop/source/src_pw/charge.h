@@ -44,14 +44,25 @@ public:
     double *start_mag_atom;
 
     void init();
+
     void atomic_rho(const int spin_number_need, double **rho_in)const;
+
     void set_rho_core(const ComplexMatrix &structure_factor);
-    void write_rho(const int &is, const int &iter, const string &fn, const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
-    void write_rho_dipole(const int &is, const int &iter, const string &fn, const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
+
+    void write_rho(const int &is, const int &iter, const string &fn, 
+		const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
+
+    void write_rho_dipole(const int &is, const int &iter, const string &fn, 
+		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
+
     bool read_rho(const int &is, const string &fn);//mohan add 2007-10-17
+
     void sum_band(void);
+
     void renormalize_rho(void);
+
     void save_rho_before_sum_band(void);
+
     void non_linear_core_correction// drhoc
     (
         const bool &numeric,
@@ -66,13 +77,16 @@ public:
 
     void init_final_scf(); //LiuXh add 20180619
 
-private:
+	private:
 
     void sum_band_k();
+
     void rho_mpi(void);
+
     double sum_rho(void) const;
 
 	bool allocate_rho;
+
 	bool allocate_rho_final_scf; //LiuXh add 20180606
 
 };

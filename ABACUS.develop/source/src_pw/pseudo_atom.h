@@ -1,13 +1,3 @@
-//=====================================================================
-// Atomic part
-// <PP_MESH>  ...  </PP_MESH>     // the mesh where the PP is defined
-// <PP_NLCC>  ...  </PP_NLCC>     // non-linear core correction, optional
-// <PP_RHOATOM> ...</PP_RHOATOM>  // atomic charge density
-// <PP_PSWFC> ...  </PP_PSWFC>    // atomic wavfunctions
-// The variables needed to describe the atoms and related quantities
-// based on atom.f90
-// USE parameters, ONLY : npsx, ndmx, nchix //maybe not necessary
-//=====================================================================
 #ifndef PSEUDO_ATOM_H
 #define PSEUDO_ATOM_H
 
@@ -17,7 +7,8 @@
 
 class pseudo_atom: public pseudo_h
 {
-public:
+	public:
+
 	// <PP_MESH>
 	double *r;        // radial logaritmic mesh, r[0:mesh-1]
 	double *rab;      // derivative of the radial mesh, rab[0:mesh-1]

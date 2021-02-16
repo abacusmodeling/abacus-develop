@@ -1,14 +1,3 @@
-/*************************************************************
-// Norm conserving NON-LOCAL pseudopotential (NCNL-PP)
-// include pseudo_vl
-// <PP_BETA>  ... </PP_BETA>       // projector
-// <PP_DIJ> ... </PP_DIJ>          // d(i,j)
-
-// Norm-conserving (atomitic) potential
-// based on MODULE uspp_param
-// USE parameters, ONLY : lqmax, nbrx, npsx, nqfx, ndmx
-*************************************************************/
-
 #ifndef PSEUDO_NC_H
 #define PSEUDO_NC_H
 
@@ -18,8 +7,10 @@
 
 class pseudo_nc: public pseudo_vl
 {
-
 	public:
+
+	pseudo_nc();
+	~pseudo_nc();
 
 	// <PP_BETA>
 	int *lll;       // lll(nbeta), angular momentum of the beta function
@@ -31,9 +22,6 @@ class pseudo_nc: public pseudo_vl
 
 	// other
 	int nh;         // number of beta functions per atomic type
-
-	pseudo_nc();
-	~pseudo_nc();
 
 	void set_pseudo_nc(const Pseudopot_upf &upf);
 	void print_pseudo_nc(ofstream &ofs);
