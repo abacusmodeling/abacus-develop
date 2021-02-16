@@ -23,7 +23,7 @@ void eximport::write_data
 	const string &type
 )
 {
-	if(test_eximport) TITLE("eximport","write_data");
+	TITLE("eximport","write_data");
 	ofstream ofs(fn.c_str());
 
 	this->out_input(ofs);
@@ -81,7 +81,7 @@ void eximport::write_data
 
 void eximport::read_data(const string &fn)
 {
-	if(test_eximport) TITLE("eximport","read_data");
+	TITLE("eximport","read_data");
 
 	ifstream ifs(fn.c_str());
 	if(!ifs)
@@ -107,7 +107,7 @@ void eximport::read_data(const string &fn)
 
 void eximport::print_data(const string &fn) const
 {
-	if(test_eximport) TITLE("eximport","print_data");
+	TITLE("eximport","print_data");
 	ofstream ofs( fn.c_str() );
 
 	ofs << setw(20) << "basis" << setw(20) << this->basis << endl;
@@ -202,7 +202,7 @@ void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const string &fn)
 
 void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string &file_name)
 {
-	if(test_eximport)cout<<"\n ==> ei.wanG_for_fit";
+	//cout<<"\n ==> ei.wanG_for_fit";
 	ofstream out_gwan(file_name.c_str());
 	int qtot = 0;
 	for(int ik=0; ik<kv.nks; ik++)
@@ -319,7 +319,7 @@ bool eximport::sec_wf(complex < double> ***psi, const int npsi, const string &fn
 //******************
 void eximport::out_wannier(ofstream &out_data)
 {
-	if(test_eximport) cout<<"\n ==> out_wannier"<<endl;
+	//cout<<"\n ==> out_wannier"<<endl;
 	out_data << setw(20) << "WANNIER" << endl; //0
 	//out_data << setw(20) << LOCAL_BASIS << endl;//1 xiaohui modify 2013-09-02
 	out_data << setw(20) << BASIS_TYPE << endl; //xiaohui add 2013-09-02
@@ -346,7 +346,7 @@ void eximport::in_wannier(ifstream &in)
 //*************************************
 void eximport::out_unitcell(ofstream &out_data)
 {
-	if(test_eximport)cout << "\n ==> out_unitcell" << endl;
+	//cout << "\n ==> out_unitcell" << endl;
 	out_data << setw(20) << "UNITCELL" << endl;		//2.0
 	out_data << setw(20) << ucell.lat0 << endl;        //2.1
 
@@ -413,7 +413,7 @@ void eximport::in_unitcell(ifstream &in)
 //***************
 void eximport::out_kpoints(ofstream &out_data)
 {
-	if(test_eximport)cout << "\n ==> out_k-points" << endl;
+	//cout << "\n ==> out_k-points" << endl;
 	out_data << "\n<KPOINT>";
 	out_data << "\n" << kv.nkstot << " Number of total k points";      //3.1
 	int sumq = 0;
@@ -440,7 +440,7 @@ void eximport::out_kpoints(ofstream &out_data)
 
 void eximport::out_planewave(ofstream &out_data)
 {
-	if(test_eximport)cout << "\n ==> out_planewave" << endl;
+	//cout << "\n ==> out_planewave" << endl;
 	out_data << "\n<PLANEWAVE>";
 	out_data << "\n" << ucell.lat0 << " Lattice constant";
 	out_data << "\n" << pw.ngmc_g << " Number of plane waves."<<endl;
@@ -457,7 +457,7 @@ void eximport::out_planewave(ofstream &out_data)
 
 void eximport::out_igk(ofstream &out_data)
 {
-	if(test_eximport)cout << "\n ==> out_igk" << endl;
+	//cout << "\n ==> out_igk" << endl;
 	out_data << "\n<KG_INDEX>";
 
 	for(int ik=0; ik<kv.nks; ik++)
@@ -505,7 +505,7 @@ void eximport::in_kpoints(ifstream &in)
 //*********************************
 void eximport::out_input(ofstream &out_data)
 {
-	if(test_eximport)cout << "\n ==> out_input" << endl;
+	//cout << "\n ==> out_input" << endl;
 	out_data << "<HEADER>";			//1.0
 	out_data << "\n" << ucell.latName << " Lattice Name";//1.1
 
@@ -583,7 +583,7 @@ void eximport::in_input(ifstream &in)
 //**********
 void eximport::out_band(ofstream &out_data)
 {
-	if(test_eximport)cout << "\n ==> out_band" << endl;
+	//cout << "\n ==> out_band" << endl;
 	out_data << setw(20) << "BAND" << endl;//6.0
 	for (int ik = 0; ik < kv.nks; ik++)
 	{
@@ -628,7 +628,7 @@ void eximport::in_band(ifstream &in)
 //*****
 void eximport::out_evc(ofstream &out_data)
 {
-	if(test_eximport)cout << "=== out_evc ===" << endl;
+	//cout << "=== out_evc ===" << endl;
 	out_data << setw(20) << "EVC" << endl;
 	out_data << setw(20) << ucell.natomwfc << endl; //4.1
 	int iw;
@@ -701,7 +701,7 @@ void eximport::in_evc(ifstream &in)
 //===========
 void eximport::out_energy(ofstream &out_data)
 {
-	if(test_eximport)cout << "\n ==> out_energy" << endl;
+	//cout << "\n ==> out_energy" << endl;
 	out_data << setw(20) << "ENERGY" << endl;				//6.0
 	out_data << setw(20) << en.etot << endl;                //6.2
 	//out_data << setw(20) << elec.dE << endl;              //6.3

@@ -22,10 +22,7 @@ extern int		NBANDS_ISTATE;		// 1.05 // mohan add 2011-03-22
 extern int 		NLOCAL;				// 1.1 // mohan add 2009-05-29
 
 extern string	CALCULATION;		// 2 "scf";"nscf" ;"symmetry"
-extern bool 	BERRY_PHASE;		// 3 berry phase calculation
-extern bool 	LDA_PLUS_U;			// 4 LDA + U method
 extern int		EFIELD;				// 5 add electric field
-extern int		BFIELD;				// 6 add magnetic field
 extern int 		DIPOLE;				// 7 add dipole correction
 
 
@@ -143,7 +140,6 @@ extern int GSIZE;
 // NAME : global_wannier_card
 // NAME : global_pseudo_dir
 // NAME : global_pseudo_type // mohan add 2013-05-20 (xiaohui add 2013-06-23)
-// NAME : global_epm_pseudo_card
 // NAME : global_out_dir
 // NAME : ofs_running( contain information during runnnig)
 // NAME : ofs_warning( contain warning information, including error)
@@ -193,18 +189,7 @@ extern int TEST_FORCE;// mohan add 2011-03-18
 extern int TEST_STRESS;//zhengdy add 2018-05-16
 extern int test_gridt; // mohan add 2011-03-17
 //==========================================================
-// src_wannier
-//==========================================================
-extern int test_spillage;
-extern int test_improve_pao;
-extern int test_eximport;
-extern int test_operation;
-extern int test_recon;
-extern int test_sph_proj;
-extern int test_build;
-extern int test_setout;
-//==========================================================
-// src_epm || src_pseudo
+// src_pseudo
 //==========================================================
 extern int test_pseudo_cell;
 extern int test_pp;
@@ -215,8 +200,6 @@ extern int test_ion_dynamics;
 //==========================================================
 // src_tools
 //==========================================================
-extern int test_figure;
-extern int test_mathzone;
 extern int test_deconstructor;
 
 extern bool FINAL_SCF; //LiuXh add 20180619

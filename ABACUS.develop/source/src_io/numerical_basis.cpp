@@ -28,7 +28,7 @@ Numerical_Basis::~Numerical_Basis() {}
 //============================================================
 void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
 {
-    if (test_spillage>1) TITLE("Numerical_Basis","start_from_file_k");
+    TITLE("Numerical_Basis","start_from_file_k");
 
     if (!Numerical_Basis::init_label)
     {
@@ -383,7 +383,7 @@ void Numerical_Basis::Sq_overlap(
     const int &ik,
     const int &np)
 {
-    if (test_spillage>1) TITLE("Numerical_Basis","Sq_overlap");
+    TITLE("Numerical_Basis","Sq_overlap");
     timer::tick("Numerical_Basis","Sq_overlap");
 
 	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << endl;
@@ -515,7 +515,7 @@ void Numerical_Basis::jlq3d_overlap(
     const int &np,
     const ComplexMatrix &psi)
 {
-    if (test_spillage>1) TITLE("Numerical_Basis","jlq3d_overlap");
+    TITLE("Numerical_Basis","jlq3d_overlap");
     timer::tick("Numerical_Basis","jlq3d_overlap");
 
 	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
@@ -639,7 +639,7 @@ void Numerical_Basis::numerical_atomic_wfc(
     const int &np,
     ComplexMatrix &psi)
 {
-    if (test_spillage > 2) TITLE("Numerical_Basis", "numerical_atomic_wfc");
+    TITLE("Numerical_Basis", "numerical_atomic_wfc");
 
     const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
     matrix ylm(total_lm, np);

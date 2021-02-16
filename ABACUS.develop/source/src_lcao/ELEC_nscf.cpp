@@ -85,7 +85,7 @@ void ELEC_nscf::nscf(Use_Hamilt_Matrix &uhm)
     }
 	
 	// add by jingan
-	if (BERRY_PHASE && SYMMETRY == 0)
+	if (berryphase::berry_phase_flag && SYMMETRY == 0)
     {
     	berryphase bp;
 		bp.Macroscopic_polarization();

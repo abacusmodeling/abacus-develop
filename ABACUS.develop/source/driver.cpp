@@ -41,8 +41,6 @@ void Driver::reading(void)
 //---------------------------------------------------------------------------------
 
 	// (1) read INPUT 
-	// although I suggest you keep the parameters to be as
-	// local as possible -- mohan 2021-01-31
 	INPUT.Init( global_in_card );
 
 	// (2) copy the variables from INPUT to each class
@@ -65,35 +63,28 @@ void Driver::reading(void)
     // (5) Read in parameters about wannier functions.
     winput::Init( global_wannier_card );
 
-    //xiaohui move 3 lines, 2015-09-30
-    //stringstream ss2;
-    //ss2 << global_out_dir << "INPUTw";
-    //winput::Print( ss2.str() );
-
-    // (3) Print the parameters into INPUT file.
+    // (6) Print the parameters into INPUT file.
     stringstream ss1;
     ss1 << global_out_dir << global_in_card;
     INPUT.Print( ss1.str() );
     //DONE(ofs_running,"READING CARDS");
 
-
-    // (4) Setup the unitcell.
+    // (7) Setup the unitcell.
     ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
     DONE(ofs_running, "SETUP UNITCELL");
 
-    // (5) symmetry analysize.
+    // (8) symmetry analysize.
     if (SYMMETRY)
     {
         symm.analy_sys();
         DONE(ofs_running, "SYMMETRY");
     }
     
-	// (6) Setup the k points according to symmetry.
+	// (9) Setup the k points according to symmetry.
 	kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
     DONE(ofs_running,"INIT K-POINTS");
-	
 
-	// (7) check the number of basis, the warning should be moved to 
+	// (10) check the number of basis, the warning should be moved to 
 	// other places -- mohan 2021-01-30
 	// mohan add 2011-01-5
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") 
@@ -112,8 +103,7 @@ void Driver::reading(void)
 
 //---------------------------------------------------------------------------------
 
-
-	// for LCAO basis, reading the orbitals and construct
+	// (11) for LCAO basis, reading the orbitals and construct
 	// the interpolation tables.
 	// this part should be moved somewher else -- mohan 2021-01-30
 	if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
@@ -131,7 +121,7 @@ void Driver::reading(void)
 		LM.divide_HS_in_frag(); 
 	}
 
-
+	// (12) print information
 	// mohan add 2021-01-30
 	Print_Info PI;
 	PI.screen_output();
@@ -139,14 +129,14 @@ void Driver::reading(void)
 //---------------------------------------------------------------------------------
 
 
-	// Initalize the plane wave basis set
+	// (12) Initalize the plane wave basis set
 	pw.gen_pw(ofs_running, ucell, kv);
 	DONE(ofs_running,"INIT PLANEWAVE");
 	cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
 	cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
 
 
-	// mohan add 2010-10-10, just to test the symmetry of a variety
+	// (13) mohan add 2010-10-10, just to test the symmetry of a variety
 	// of systems.
 	if(CALCULATION == "test")
 	{
@@ -154,7 +144,7 @@ void Driver::reading(void)
 		QUIT();
 	}
 
-	// mohan add 2010-09-13
+	// (14) mohan add 2010-09-13
 	// initialize the real-space uniform grid for FFT and parallel
 	// distribution of plane waves
 	Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp, 

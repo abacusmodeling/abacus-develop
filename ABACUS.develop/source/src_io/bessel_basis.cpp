@@ -120,7 +120,7 @@ void Bessel_Basis::init_Faln(
 	const int &nmax,
 	const int &ecut_number)
 {
-	if(test_spillage) TITLE("Bessel_Basis","init_Faln");
+	TITLE("Bessel_Basis","init_Faln");
 	timer::tick("Spillage","init_Faln");
 	assert( this->kmesh > 0);
 
@@ -144,7 +144,7 @@ void Bessel_Basis::init_Faln(
 			}
 		}
 	}
-	if(test_spillage)OUT("nwfc = ",nwfc);
+	OUT("nwfc = ",nwfc);
 
 	timer::tick("Spillage","init_Faln");
 	return;
@@ -162,7 +162,7 @@ void Bessel_Basis::init_TableOne(
 	const int &ecut_number,
 	const double &tolerence)
 {
-	if(test_spillage) TITLE("Bessel_Basis","init_TableOne");
+	TITLE("Bessel_Basis","init_TableOne");
 	timer::tick("Spillage","TableONe");
 	// check
 	assert(ecutwfc > 0.0);
@@ -283,7 +283,7 @@ void Bessel_Basis::readin_C4(
 	const int &ecut_number,
 	const double &tolerence)
 {
-	if(test_spillage) TITLE("Bessel_Basis","readin_C4");
+	TITLE("Bessel_Basis","readin_C4");
 
 	if(MY_RANK != 0) return;
 
@@ -306,8 +306,9 @@ void Bessel_Basis::readin_C4(
 			{
 				for(int in=0; in< ucell.atoms[it].l_nchi[il]; in++)
 				{
-					if(test_spillage>1)cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
-					if(test_spillage>1)cout << "\n file=" << filec4;
+					//for tests
+					//cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
+					//cout << "\n file=" << filec4;
 					ifstream inc4( filec4.c_str() );
 					
 					if(!inc4) 
@@ -354,7 +355,8 @@ void Bessel_Basis::readin_C4(
 								for(int ie=0; ie<ecut_number; ie++)
 								{
 									inc4 >> this->C4(it, il, in, ie);
-									if(test_spillage>1)cout << "\n" << setw(5) << ie << setw(25) << this->C4(it, il, in, ie);
+									// for tests
+									//cout << "\n" << setw(5) << ie << setw(25) << this->C4(it, il, in, ie);
 								}
 							}
 							else
@@ -389,7 +391,7 @@ void Bessel_Basis::allocate_C4(
 	const int &nmax,
 	const int &ecut_number)
 {
-	if(test_spillage) TITLE("Bessel_Basis","allocate_C4");
+	TITLE("Bessel_Basis","allocate_C4");
 		
 	this->C4.create(ntype, lmax+1, nmax, ecut_number);
 
@@ -412,7 +414,7 @@ void Bessel_Basis::allocate_C4(
 void Bessel_Basis::bcast(void)
 {
 #ifdef __MPI
-	if(test_spillage) TITLE("Bessel_Basis", "bcast");
+	TITLE("Bessel_Basis", "bcast");
 	
 	Parallel_Common::bcast_double( ecut );
 	Parallel_Common::bcast_double( rcut );

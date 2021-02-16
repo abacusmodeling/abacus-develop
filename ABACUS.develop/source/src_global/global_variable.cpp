@@ -22,8 +22,6 @@ int		NBANDS_ISTATE = 0; // default number.
 int		NLOCAL = 0;	// total number of local basis.
 
 string	CALCULATION = "scf";
-bool 	BERRY_PHASE = false;
-bool 	LDA_PLUS_U = false;
 int		EFIELD = 0; // 5: add electric field
 int		DIPOLE = 0; // 7: add dipole field
 
@@ -164,17 +162,6 @@ int TEST_FORCE = 0;//mohan add 2011-03-18
 int TEST_STRESS = 0;//zhengdy add 2018-05-16
 int test_gridt = 0; // mohan add 2011-03-17
 //----------------------------------------------------------
-// src_wannier
-//----------------------------------------------------------
-int test_spillage = 0;
-int test_improve_pao = 0;
-int test_eximport = 0;
-int test_operation = 0;
-int test_recon = 0;
-int test_sph_proj = 0;
-int test_build = 0;
-int test_setout = 0;
-//----------------------------------------------------------
 // src_pseudo
 //----------------------------------------------------------
 int test_pseudo_cell = 0;// 2 : output readin data
@@ -184,8 +171,6 @@ int test_ion_dynamics = 0;
 //----------------------------------------------------------
 // src_tools
 //----------------------------------------------------------
-int test_figure = 0;
-int test_mathzone = 0;
 int test_deconstructor = 0;
 
 //added by zhengdy-soc

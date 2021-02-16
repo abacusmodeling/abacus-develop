@@ -1,5 +1,7 @@
 ﻿#include "berryphase.h"
 
+bool berryphase::berry_phase_flag=false;
+
 berryphase::berryphase()
 {
 	GDIR = INPUT.gdir;
@@ -19,26 +21,31 @@ void berryphase::get_occupation_bands()
 	}
 	
 	occ_nbands = (int) occupied_bands;
-	if(occ_nbands > NBANDS) WARNING_QUIT("berryphase::get_occupation_bands","you set the band numer is not enough for berryphase, please add bands number.");
+	if(occ_nbands > NBANDS) 
+	{
+		WARNING_QUIT("berryphase::get_occupation_bands","not enough bands for berryphase, increase band numbers.");
+	}
 	//ofs_running << "the berryphase's occ_nbands is " << occ_nbands << endl;
 }
 
 void berryphase::lcao_init()
 {
+	TITLE("berryphase","lcao_init");
 	lcao_method.init();
 	lcao_method.cal_R_number();
 	lcao_method.cal_orb_overlap();
-
+	return;
 }
 
 // this routine 依赖于 kpoint的mp生成方式
 void berryphase::set_kpoints(const int direction)
 {
+	TITLE("berryphase","set_kpoints");
+
 	const int mp_x = kv.nmp[0]; // x,y,z方向k点的数目
 	const int mp_y = kv.nmp[1];
 	const int mp_z = kv.nmp[2];
-	const int num_k = int(kv.nkstot/2);
-	
+	const int num_k = int(kv.nkstot/2);	
 
 	if( direction == 1 ) // 计算x方向
 	{
@@ -63,6 +70,7 @@ void berryphase::set_kpoints(const int direction)
 		
 		int string_index = -1;
 		for(int iz = 0; iz < mp_z; iz++)
+		{
 			for(int iy = 0; iy < mp_y; iy++)
 			{
 				string_index++;
@@ -72,6 +80,7 @@ void berryphase::set_kpoints(const int direction)
 					if( ix == (mp_x-1) ) k_index[string_index][ix+1] = k_index[string_index][0];
 				}
 			}
+		}
 		
 		if( NSPIN == 2 )
 		{
@@ -109,6 +118,7 @@ void berryphase::set_kpoints(const int direction)
 		
 		int string_index = -1;
 		for(int iz = 0; iz < mp_z; iz++)
+		{
 			for(int ix = 0; ix < mp_x; ix++)
 			{
 				string_index++;
@@ -118,6 +128,7 @@ void berryphase::set_kpoints(const int direction)
 					if( iy == (mp_y-1) ) k_index[string_index][iy+1] = k_index[string_index][0];
 				}
 			}
+		}
 		
 		if( NSPIN == 2 )
 		{
@@ -155,6 +166,7 @@ void berryphase::set_kpoints(const int direction)
 		
 		int string_index = -1;
 		for(int iy = 0; iy < mp_y; iy++)
+		{
 			for(int ix = 0; ix < mp_x; ix++)
 			{
 				string_index++;
@@ -164,6 +176,7 @@ void berryphase::set_kpoints(const int direction)
 					if( iz == (mp_z-1) ) k_index[string_index][iz+1] = k_index[string_index][0];
 				}
 			}
+		}
 		
 		if( NSPIN == 2 )
 		{

@@ -232,7 +232,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     const int &np,
     const ComplexMatrix &psi)
 {
-    if (test_spillage>1) TITLE("Numerical_Descriptor","jlq3d_overlap");
+    TITLE("Numerical_Descriptor","jlq3d_overlap");
     timer::tick("Numerical_Descriptor","jlq3d_overlap");
 
 	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
