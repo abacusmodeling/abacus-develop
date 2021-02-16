@@ -35,8 +35,9 @@ threshold_elec.o\
 electrons.o \
 forces.o\
 stress.o\
-myfunc1.o\
-myfunc2.o\
+xc_1.o\
+xc_2.o\
+xc_4.o \
 vdwd2.o\
 vdwd2_parameters.o\
 dftd3_subroutine.o\
@@ -270,7 +271,6 @@ mlwf_optimize.o\
 
 OBJS_OTHER=mymath1.o \
 mymath3.o \
-myfunc5.o \
 
 OBJS_PDIAG=pdgseps.o \
 pzgseps.o \
