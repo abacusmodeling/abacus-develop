@@ -17,7 +17,7 @@ using namespace std;
 // EXPLAIN : Basic Global Variables
 //==========================================================
 
-extern int 		NBANDS;				// 1
+extern int 		NBANDS;	
 extern int		NBANDS_ISTATE;		// 1.05 // mohan add 2011-03-22
 extern int 		NLOCAL;				// 1.1 // mohan add 2009-05-29
 
@@ -38,8 +38,8 @@ extern double  PRESS1;
 extern double  PRESS2;
 extern double  PRESS3;
 extern double PRESSURE;
-extern string	MOVE_IONS;			// 8.26
-extern string	OUT_LEVEL;			// 8.27 
+extern string	MOVE_IONS;
+extern string	OUT_LEVEL;
 
 extern int		NSTEP;				// 8.3
 extern int 		NITER;				// 8.4
@@ -60,8 +60,7 @@ extern bool     DOMAG_Z;  //1 : constrain the magnetism to z axis
 extern int      NPOL;     //1 : no soc; 2 : has soc
 extern int      PRENSPIN; //NSPIN used before, for restart with soc
 
-// diagonalization (5)
-//extern string 	DIAGO_TYPE; xiaohui modify 2013-09-01			// 12 "cg","davidson","fs","hpseps"
+
 extern int		DIAGO_PROC;			// 12.1 number of processors used to diag.
 extern int 		DIAGO_CG_MAXITER;	// 13
 extern int		DIAGO_CG_PREC;		// 13.1
@@ -159,8 +158,6 @@ extern ofstream ofs_warning;
 //==========================================================
 // EXPLAIN : test level for each class
 //==========================================================
-extern int test_run;
-
 extern int test_input;
 extern int test_winput;
 extern int test_kpoint;
@@ -176,7 +173,6 @@ extern int test_wf;
 extern int test_charge;
 extern int test_potential;
 extern int test_energy;
-extern int test_geo; // mohan add 2011-03-17
 //==========================================================
 // src_onscaling
 //==========================================================
@@ -194,8 +190,6 @@ extern int test_gridt; // mohan add 2011-03-17
 extern int test_pseudo_cell;
 extern int test_pp;
 extern int test_kmesh;
-extern int test_mlwf_overlap;
-extern int test_mlwf_optimize;
 extern int test_ion_dynamics;
 //==========================================================
 // src_tools

@@ -131,8 +131,6 @@ ofstream ofs_warning;
 //----------------------------------------------------------
 // EXPLAIN : test level for each class
 //----------------------------------------------------------
-int test_run = 0;
-
 int test_input = 0;
 int test_winput = 0;
 int test_kpoint = 0;
@@ -148,8 +146,6 @@ int test_wf = 0;
 int test_charge = 0;
 int test_potential = 0;
 int test_energy = 0;
-
-int test_geo;
 //----------------------------------------------------------
 // src_lcao
 //----------------------------------------------------------
