@@ -2,15 +2,14 @@
 // AUTHOR : Lixin He, mohan
 // DATE : 2008-11-21
 //==========================================================
-
 #include "tools.h"
 #include "global.h"
 #include "energy.h"
 #include "algorithms.h"
-#include "mymath.h"
+#include "src_global/mymath.h"
 #include <vector>
 #include <mpi.h>
-#include<sys/time.h>
+#include <sys/time.h>
 #include "../src_pw/tools.h"
 #include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
 int energy::mxr = 50;

@@ -1,7 +1,7 @@
 #include "global.h"
 #include "occupy.h"
 #include "algorithms.h"
-#include "mymath.h"
+#include "src_global/mymath.h"
 
 Occupy::Occupy(){}
 Occupy::~Occupy(){}

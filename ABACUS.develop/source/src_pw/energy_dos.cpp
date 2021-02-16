@@ -2,7 +2,6 @@
 #include "global.h"
 #include "energy.h"
 #include "algorithms.h"
-#include "mymath.h"
 #include "../src_lcao/mulliken_charge.h"
 #include "../src_lcao/LCAO_nnr.h"
 #include "../src_lcao/LCAO_gen_fixedH.h"    
