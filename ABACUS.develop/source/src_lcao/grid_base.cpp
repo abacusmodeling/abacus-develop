@@ -1,8 +1,7 @@
-#include "grid_integral.h"
 #include "../src_pw/global.h"
 #include "ylm.h"
 #include "ORB_read.h"
-
+#include "grid_base.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
 Grid_Base::Grid_Base()

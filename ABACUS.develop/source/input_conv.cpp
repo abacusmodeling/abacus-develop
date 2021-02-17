@@ -133,7 +133,6 @@ void Input_Conv::Convert(void)
 	KS_SOLVER = INPUT.ks_solver;
 	SEARCH_RADIUS = INPUT.search_radius;
 	SEARCH_PBC = INPUT.search_pbc;
-    SPARSE_MATRIX = INPUT.sparse_matrix;
 
 //----------------------------------------------------------
 // planewave (8/8)
@@ -416,11 +415,13 @@ void Input_Conv::Convert(void)
 	val_elec_03 = INPUT.val_elec_03;
 	vext = INPUT.vext;
 	vext_dire = INPUT.vext_dire;	
-	
+
+
+	// jiyy add 2020.10.11	
 	ocp = INPUT.ocp;
      //ocp_n = INPUT.ocp_n;
     ocp_set = INPUT.ocp_set;
-    if(ocp == 1)       // jiyy add 2020.10.11
+    if(ocp == 1)
 	{
 		int count = 0;
 		string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");

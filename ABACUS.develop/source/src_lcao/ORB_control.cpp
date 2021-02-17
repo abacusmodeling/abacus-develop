@@ -3,7 +3,6 @@
 #include "ORB_control.h"
 #include "src_global/sltk_atom_arrange.h"
 #include "ORB_gen_tables.h"
-#include "grid_integral.h"
 #include "build_st_pw.h"
 
 ORB_control::ORB_control()

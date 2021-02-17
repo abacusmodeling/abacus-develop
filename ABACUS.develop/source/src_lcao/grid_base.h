@@ -29,7 +29,6 @@ protected:
 // MEMBER FUNCTION :
 //===========================================================
 	// define pointer
-	SparseMatrix* SM; // about vlocal
 	const double* vlocal;
 
 	void get_rcut_max(void);

@@ -67,7 +67,6 @@ realarray.o \
 intarray.o\
 matrix.o \
 matrix3.o\
-sparsematrix.o\
 export.o\
 timer.o\
 memory.o\
@@ -100,7 +99,6 @@ grid_meshk.o\
 grid_meshcell.o\
 grid_bigcell.o\
 grid_meshball.o\
-grid_integral.o\
 gint_gamma.o\
 gint_gamma_fvl.o\
 gint_gamma_vl.o\

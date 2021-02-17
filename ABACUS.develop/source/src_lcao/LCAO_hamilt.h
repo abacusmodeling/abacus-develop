@@ -5,7 +5,6 @@
 #include "LCAO_gen_fixedH.h"
 #include "gint_gamma.h"
 #include "gint_k.h"
-#include "grid_integral.h"
 
 class Use_Hamilt_Matrix
 {

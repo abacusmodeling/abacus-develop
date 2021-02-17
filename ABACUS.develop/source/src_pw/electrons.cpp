@@ -496,10 +496,6 @@ void Electrons::c_bands(const int &istep)
         //
         // In localized orbital presented in plane wave case,
         // only using cinitcgg.
-        //
-        // In linear scaling method, using sparse matrix and
-        // adjacent searching code and cg method to calculate the
-        // eigenstates.
         //=============================================================
         double avg_iter_k = 0.0;
         hm.diago(istep, this->iter, ik, h_diag, avg_iter_k);

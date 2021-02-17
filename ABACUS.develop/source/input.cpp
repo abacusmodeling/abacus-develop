@@ -159,11 +159,8 @@ void Input::Default(void)
 	ks_solver = "default"; //xiaohui add 2013-09-01 
     search_radius=-1.0; // unit: a.u. -1.0 has no meaning.
     search_pbc=true;
-    sparse_matrix=false;
     symmetry=false;
 	mlwf_flag=false;
-	vna = 0;
-	grid_speed=1; //mohan add 2012-03-29
     force=0;
     force_set=false;
     force_thr=1.0e-3;
@@ -691,10 +688,6 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, search_pbc);
         }
-        else if (strcmp("sparse_matrix", word) == 0)
-        {
-            read_value(ifs, sparse_matrix);
-        }
         else if (strcmp("symmetry", word) == 0)
         {
             read_value(ifs, symmetry);
@@ -702,14 +695,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("mlwf_flag", word) == 0)
         {
             read_value(ifs, mlwf_flag);
-        }
-        else if (strcmp("vna", word) == 0)
-        {
-            read_value(ifs, vna);
-        }
-        else if (strcmp("grid_speed", word) == 0)//mohan 2012-03-29
-        {
-            read_value(ifs, grid_speed);
         }
         else if (strcmp("force", word) == 0)
         {
@@ -1984,18 +1969,13 @@ void Input::Bcast()
 
     Parallel_Common::bcast_double( tot_magnetization );
 
-    //Parallel_Common::bcast_int( local_basis ); xiaohui modify 2013-09-01
 	Parallel_Common::bcast_string( basis_type ); //xiaohui add 2013-09-01
-    //Parallel_Common::bcast_int ( linear_scaling ); xiaohui modify 2013-09-01
 	Parallel_Common::bcast_string( ks_solver ); //xiaohui add 2013-09-01
 	Parallel_Common::bcast_double( search_radius );
 	Parallel_Common::bcast_bool( search_pbc );
-    Parallel_Common::bcast_bool ( sparse_matrix );
     Parallel_Common::bcast_double( search_radius );
     Parallel_Common::bcast_bool( symmetry );
     Parallel_Common::bcast_bool( mlwf_flag );
-    Parallel_Common::bcast_int( vna );
-	Parallel_Common::bcast_int( grid_speed );//mohan add 2012-03-29
     Parallel_Common::bcast_int( force );
     Parallel_Common::bcast_bool( force_set );
     Parallel_Common::bcast_double( force_thr);
@@ -2016,7 +1996,6 @@ void Input::Bcast()
     Parallel_Common::bcast_double( trust_radius_min);
     Parallel_Common::bcast_double( trust_radius_ini);
 
-    //Parallel_Common::bcast_bool( gamma_only );
     Parallel_Common::bcast_bool( gamma_only );
     Parallel_Common::bcast_bool( gamma_only_local );
     Parallel_Common::bcast_double( ecutwfc );
@@ -2031,7 +2010,6 @@ void Input::Bcast()
     Parallel_Common::bcast_int( by );
     Parallel_Common::bcast_int( bz );
 
-    //Parallel_Common::bcast_string( diago_type ); xiaohui modify 2013-09-01
     Parallel_Common::bcast_int( diago_proc ); //mohan add 2012-01-03
     Parallel_Common::bcast_int( diago_cg_maxiter );
 	Parallel_Common::bcast_int( diago_cg_prec );
@@ -2589,15 +2567,11 @@ void Input::Check(void)
     }
 	
 
-	//if(local_basis==0) xiaohui modify 2013-09-01
 	if(basis_type=="pw") //xiaohui add 2013-09-01
 	{
-		//if(diago_type=="default") xiaohui modify 2013-09-01
 		if(ks_solver=="default") //xiaohui add 2013-09-01
 		{
-			//diago_type = "cg";
 			ks_solver = "cg";
-			//AUTO_SET("diago_type","cg");
 			AUTO_SET("ks_solver","cg");
 		}
 		else if(ks_solver=="cg")
@@ -2608,7 +2582,6 @@ void Input::Check(void)
 		{
 			ofs_warning << " It's ok to use dav." << endl;
 		}
-		//if(diago_type=="hpseps") xiaohui modify 2013-09-01
 		else if(ks_solver=="genelpa") //yshen add 2016-07-20
 		{
 			WARNING_QUIT("Input","genelpa can not be used with plane wave basis."); 
@@ -2617,57 +2590,34 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("Input","scalapack_gvx can not be used with plane wave basis."); 
 		}
-		else if(ks_solver=="hpseps") //xiaohui add 2013-09-01
+		else if(ks_solver=="hpseps")
 		{
-			//ofs_warning << " hpseps can't be used with plane wave basis." << endl; xiaohui modify 2013-09-04
-			//diago_type = "cg";
-			//ks_solver = "cg"; xiaohui modify 2013-09-04
-			//AUTO_SET("diago_type","cg");
-			//AUTO_SET("ks_solver","cg"); xiaohui modify 2013-09-04
 			WARNING_QUIT("Input","hpseps can not be used with plane wave basis."); //xiaohui add 2013-09-04
 		}
-		//else if(diago_type=="selinv") xiaohui modify 2013-09-01
-		else if(ks_solver=="selinv") //xiaohui add 2013-09-01
+		else if(ks_solver=="selinv")
 		{
-			//ofs_warning << " selinv can't be used with plane wave basis." << endl; xiaohui modify 2013-09-04
-			//diago_type = "cg";
-			//ks_solver = "cg"; xiaohui modify 2013-09-04
-			//AUTO_SET("diago_type","cg");
-			//AUTO_SET("ks_solver","cg"); xiaohui modify 2013-09-04
 			WARNING_QUIT("Input","selinv can not be used with plane wave basis."); //xiaohui add 2013-09-04
 		}
-		//xiaohui add 2013-09-04
 		else if(ks_solver=="lapack")
 		{
-			//ofs_warning << " lapack can't be used with plane wave basis." << endl; xiaohui modify 2013-09-04
 			WARNING_QUIT("Input","lapack can not be used with plane wave basis.");
-		}//xiaohui add 2013-09-04
-		else //xiaohui add 2013-09-04
+		}
+		else
 		{
 			WARNING_QUIT("Input","please check the ks_solver parameter!");
-		} //xiaohui add 2013-09-04
+		}
 	}
-	//else if(local_basis==4) xiaohui modify 2013-09-01
-	else if(basis_type=="lcao") //xiaohui add 2013-09-01
+	else if(basis_type=="lcao")
 	{
-		//if(linear_scaling == 1) xiaohui modify 2013-09-01
-		//{
-			//if(diago_type == "default")
 			if(ks_solver == "default")
 			{
-				//diago_type = "hpseps";
-				//ks_solver = "hpseps";
 				ks_solver = "genelpa";
-				//AUTO_SET("diago_type","hpseps");
-				//AUTO_SET("ks_solver","hpseps");
 				AUTO_SET("ks_solver","genelpa");
 			}
-			//else if(diago_type == "cg" )
 			else if (ks_solver == "cg")
 			{
 				WARNING_QUIT("Input","not ready for cg method in lcao ."); //xiaohui add 2013-09-04
 			}
-			//else if( diago_type == "hpseps" )
 			else if (ks_solver == "genelpa")
 			{
 #ifdef __MPI
@@ -2692,82 +2642,45 @@ void Input::Check(void)
 				WARNING_QUIT("Input","hpseps can not be used for series version.");
 #endif
 			}
-			//else if( diago_type == "lapack" )
 			else if (ks_solver == "lapack")
 			{
 #ifdef __MPI
-				//WARNING_QUIT("Input","diago_type=lapack is not an option for parallel version of MESIA (try hpseps).");
-				//xiaohui modify 2015-03-25
-				//WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of MESIA (try hpseps).");	
 				WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of ABACUS (try hpseps).");	
 #else
 				ofs_warning << " It's ok to use lapack." << endl;
 #endif
 			}
-			//else if( diago_type == "selinv")
 			else if (ks_solver == "selinv")
 			{
-				WARNING_QUIT("Input","not ready for selinv method in lcao ."); //xiaohui add 2013-09-04
+				WARNING_QUIT("Input","not ready for selinv method in lcao .");
 			}
-			//xiaohui add 2013-09-04
 			else if(ks_solver == "linear_scaling")
 			{
 				WARNING_QUIT("Input","not ready for linear_scaling method in lcao .");
-			} //xiaohui add 2013-09-04
+			}
 			else
 			{
-				//WARNING_QUIT("Input","please check the diago_type parameter!");
 				WARNING_QUIT("Input","please check the ks_solver parameter!");
 			}
-		//}xiaohui modify 2013-09-01
-		//else if(linear_scaling == 2) xiaohui modify 2013-09-01. Attention! Maybe there is some problem.
-		//{
-			//if(diago_type != "canonical" && diago_type != "trace_correcting" && diago_type != "trace_resetting")
-			//{	
-			//	diago_type = "canonical";
-			//	AUTO_SET("diago_type","canonical");
-			//}
-		//}
-		//else xiaohui modify 2013-09-01, move this part to "lcao in pw"
-		//{
-			//if( diago_type != "lapack" )
-			//{
-				//ofs_warning << " LCAO in plane wave can only done with lapack." << endl;
-				//diago_type = "lapack";
-				//AUTO_SET("diago_type","lapack");
-			//}
-		//}
 	}
-	else if(basis_type=="lcao_in_pw") //xiaohui add 2013-09-01
+	else if(basis_type=="lcao_in_pw")
 	{
 		if( ks_solver != "lapack" )
 		{
-			//ofs_warning << " LCAO in plane wave can only done with lapack." << endl; xiaohui modify 2013-09-04
-			//ks_solver = "lapack"; xiaohui modify 2013-09-04
-			//AUTO_SET("ks_solver","lapack"); xiaohui modify 2013-09-04
 			WARNING_QUIT("Input","LCAO in plane wave can only done with lapack.");
 		}
 	}
-	else //xiaohui add 2013-09-01
+	else
 	{
 		WARNING_QUIT("Input","please check the basis_type parameter!");
 	}
 
-	//if(local_basis==0 && linear_scaling>0) xiaohui modify 2013-09-01. Attention! Maybe there is some problem.
-	//{
-	//	WARNING_QUIT("Input","linear scaling method can not used for plane wave basis!");
-	//}
-
-	// add 2010-09-04
-	//if(local_basis==0 && gamma_only) xiaohui modify 2013-09-01
-	if(basis_type=="pw" && gamma_only) //xiaohui add 2013-09-01
+	if(basis_type=="pw" && gamma_only)
 	{
 		WARNING_QUIT("Input","gamma_only not implemented for plane wave now.");
 	}
 
-	// add 2010-09-06
-	//if(local_basis==0 || (local_basis==4 && !linear_scaling) ) xiaohui modify 2013-09-01
-	if(basis_type=="pw" || basis_type=="lcao_in_pw") //xiaohui add 2013-09-01
+	if(basis_type=="pw" || basis_type=="lcao_in_pw")
 	{
 		if(gamma_only_local)
 		{
@@ -2777,7 +2690,6 @@ void Input::Check(void)
 		}
 	}
 
-	//if( (local_basis>0 && linear_scaling) && !gamma_only_local) xiaohui modify 2013-09-01
 	if(basis_type=="lcao" && !gamma_only_local) //xiaohui add 2013-09-01. Attention! Maybe there is some problem.
 	{
 		WARNING("Input","gamma_only_local algorithm is not used.");
@@ -2795,7 +2707,6 @@ void Input::Check(void)
 		}
 	}
 
-	//if(NPROC>1 && diago_type=="lapack") xiaohui modify 2013-09-01
 	if(NPROC>1 && ks_solver=="lapack") //xiaohui add 2013-09-01
 	{
 		//if(local_basis ==4 && linear_scaling==0) xiaohui modify 2013-09-01
@@ -2809,7 +2720,8 @@ void Input::Check(void)
 		}
 	}
 
-	if(ion_dynamics!= "sd" && ion_dynamics!="cg" && ion_dynamics!="bfgs" && ion_dynamics!="cg_bfgs")   // pengfei add 13-8-10  a new method cg to bfgs
+	// pengfei add 13-8-10 a new method cg to bfgs
+	if(ion_dynamics!= "sd" && ion_dynamics!="cg" && ion_dynamics!="bfgs" && ion_dynamics!="cg_bfgs")
 	{
 		 WARNING_QUIT("Input","ion_dynamics can only be sd, cg, bfgs or cg_bfgs.");
 	}
@@ -2819,8 +2731,7 @@ void Input::Check(void)
 		WARNING_QUIT("Input","please Input the opt_nbands for optical properties calculations");
 	}
 
-	//if(local_basis==0) xiaohui modify 2013-09-01
-	if(basis_type=="pw") //xiaohui add 2013-09-01
+	if(basis_type=="pw")
 	{
 		bx=1;
 		by=1;
@@ -2848,36 +2759,9 @@ void Input::Check(void)
 		}
 	}
 
-/* 
-	if(vdwD2)														//Peize Lin add 2-14-04-05, update 2015-09-30
-	{
-		if( (vdwD2_C6_unit!="Jnm6/mol") && (vdwD2_C6_unit!="eVA6") )
-		{
-			WARNING_QUIT("Input","vdwD2_C6_unit must be Jnm6/mol or eVA6");
-		}
-		if( (vdwD2_R0_unit!="A") && (vdwD2_R0_unit!="Bohr") )
-		{
-			WARNING_QUIT("Input","vdwD2_R0_unit must be A or Bohr");
-		}
-		if( (vdwD2_model!="radius") && (vdwD2_model!="period") )
-		{
-			WARNING_QUIT("Input","vdwD2_model must be radius or period");
-		}
-		if( (vdwD2_period.x<=0) || (vdwD2_period.y<=0) || (vdwD2_period.z<=0) )
-		{
-			WARNING_QUIT("Input","vdwD2_period <= 0 is not allowd");
-		}
-		if( vdwD2_radius<=0 )
-		{
-			WARNING_QUIT("Input","vdwD2_radius <= 0 is not allowd");
-		}
-		if( (vdwD2_radius_unit!="A") && (vdwD2_radius_unit!="Bohr") )
-		{
-			WARNING_QUIT("Input","vdwD2_radius_unit must be A or Bohr");
-		}
-	} */
 	
-	if(vdw_method=="d2" || vdw_method=="d3_0" || vdw_method=="d3_bj")														//jiyy add 2019-08-04
+	// jiyy add 2019-08-04
+	if(vdw_method=="d2" || vdw_method=="d3_0" || vdw_method=="d3_bj")
 	{
 		if( (vdw_C6_unit!="Jnm6/mol") && (vdw_C6_unit!="eVA6") )
 		{
@@ -2918,7 +2802,8 @@ void Input::Check(void)
 		WARNING_QUIT("INPUT","spectral_type must be eels or absorption !");
 	}
 
-	if(spectral_type!="None")                                                     // pengfei 2016-12-14
+	// pengfei 2016-12-14
+	if(spectral_type!="None")
 	{
 		if( system!="bulk" && system!="surface")
 		{
@@ -2946,10 +2831,15 @@ void Input::Check(void)
         //        }		
 	}
 
-	if(exx_hybrid_type!="no" && exx_hybrid_type!="hf" && exx_hybrid_type!="pbe0" && exx_hybrid_type!="hse" && exx_hybrid_type!="opt_orb")
+	if(exx_hybrid_type!="no" && 
+		exx_hybrid_type!="hf" && 
+		exx_hybrid_type!="pbe0" && 
+		exx_hybrid_type!="hse" && 
+		exx_hybrid_type!="opt_orb")
 	{
 		WARNING_QUIT("INPUT","exx_hybrid_type must be no or hf or pbe0 or hse or opt_orb");
 	}
+
 	if(exx_hybrid_type=="hf" || exx_hybrid_type=="pbe0" || exx_hybrid_type=="hse")
 	{
 		if(exx_hybrid_alpha<0 || exx_hybrid_alpha>1)
@@ -2964,7 +2854,10 @@ void Input::Check(void)
 		{
 			WARNING_QUIT("INPUT","must exx_ccp_rmesh_times >= 1");
 		}
-		if(exx_distribute_type!="htime" && exx_distribute_type!="kmeans2" && exx_distribute_type!="kmeans1" && exx_distribute_type!="order")
+		if(exx_distribute_type!="htime" 
+			&& exx_distribute_type!="kmeans2" 
+			&& exx_distribute_type!="kmeans1" 
+			&& exx_distribute_type!="order")
 		{
 			WARNING_QUIT("INPUT","exx_distribute_type must be htime or kmeans2 or kmeans1");
 		}
@@ -2984,12 +2877,12 @@ void Input::Check(void)
 			WARNING_QUIT("INPUT","exx_opt_orb_tolerence must >=0");
 		}
 	}
-	
-//2015-06-15, xiaohui
-        if(mixing_mode == "pulay" && mixing_gg0 > 0.0)
-        {
-                 WARNING("Input","To use pulay-kerker mixing method, please set mixing_type=pulay-kerker");
-        }
+
+	//2015-06-15, xiaohui
+	if(mixing_mode == "pulay" && mixing_gg0 > 0.0)
+	{
+		WARNING("Input","To use pulay-kerker mixing method, please set mixing_type=pulay-kerker");
+	}
 	
 	if(berry_phase)
 	{
@@ -3110,8 +3003,6 @@ void Input::Print(const string &fn)const
 	//OUTP(ofs,"diago_type",DIAGO_TYPE,"cg; david; lapack; hpseps;"); xiaohui modify 2013-09-01
 	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; genelpa; hpseps; scalapack_gvx");
 	OUTP(ofs,"niter",niter,"#number of electron iterations");
-	OUTP(ofs,"vna",vna,"use the vna or not");
-	OUTP(ofs,"grid_speed",grid_speed,"1:normal 2:fast");//mohan add 2012-03-29
 	//OUTP(ofs,"force",force,"calculate the force or not");
         OUTP(ofs,"force_set",force_set,"output the force_set or not"); 
 	OUTP(ofs,"nstep",nstep,"number of ion iteration steps");
@@ -3181,7 +3072,6 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"diago_proc",DIAGO_PROC,"number of proc used to diago");//mohan add 2012-01-13
 	//OUTP(ofs,"gamma_only_pw",gamma_only,"gamma only in pw");
 	OUTP(ofs,"npool",npool,"number of pools for k points, pw only");
-	OUTP(ofs,"sparse_matrix",sparse_matrix,"use sparse matrix, in DMM");
 	OUTP(ofs,"mem_saver",mem_saver,"memory saver for many k points used");
 	OUTP(ofs,"printe",printe,"print band energy for selectively ionic steps");
 
