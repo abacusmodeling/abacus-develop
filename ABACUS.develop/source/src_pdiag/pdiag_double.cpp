@@ -3,10 +3,10 @@
 #include "src_global/lapack_connector.h"
 #include "src_pw/occupy.h"
 #include "src_pw/global.h"
-//#include "../src_pw/global.h"
-//xiaohui add 2014-06-20
 #include "src_lcao/local_orbital_charge.h"
 #include "src_io/wf_local.h"
+
+
 #ifdef __MPI
 extern "C"
 {

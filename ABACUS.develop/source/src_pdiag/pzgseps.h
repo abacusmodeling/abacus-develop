@@ -1,16 +1,17 @@
-#ifndef PDGSEPS_H
-#define PDGSEPS_H
+#ifndef PZGSEPS_H
+#define PZGSEPS_H
 
-#include "../../src_pw/tools.h"
+#include "src_pw/tools.h"
 #include "pdiag_common.h"
 
-void pdgseps(
+void pzgseps(
 		MPI_Comm comm_2D,
 		int n,
 		int nb,
-		double *A, 
-		double *B,
-		double *Z,
+		int &egnum,
+		complex<double> *A, 
+		complex<double> *B,
+		complex<double> *Z,
 		double *eigen,
 		LocalMatrix loc_A,
 		char uplo, 

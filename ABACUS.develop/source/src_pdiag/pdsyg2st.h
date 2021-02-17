@@ -1,15 +1,15 @@
-#ifndef PZHEG2ST_H
-#define PZHEG2ST_H
+#ifndef PDSYG2ST_H
+#define PDSYG2ST_H
 
-#include "../../src_pw/tools.h"
+#include "src_pw/tools.h"
 #include "pdiag_common.h"
 
-void pzheg2st(
+void pdsyg2st(
 	char isuplo,
 	MPI_Comm comm_2D,
-	complex<double> *A, 
+	double *A, 
 	LocalMatrix loc_A,
-	complex<double> *B,
+	double *B,
 	LocalMatrix loc_B,
 	int NB,
 	int N_A);

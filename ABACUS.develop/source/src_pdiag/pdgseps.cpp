@@ -1,9 +1,7 @@
 //column-circle decomposition
 #include"./MRRR/mr_interface.h"
 #include "pdgseps.h"
-
-#include "../../src_parallel/parallel_reduce.h"
-
+#include "src_parallel/parallel_reduce.h"
 #include "pdsyg2st.h"
 #include "pdsytrd.h"
 #include "pdt2s.h"

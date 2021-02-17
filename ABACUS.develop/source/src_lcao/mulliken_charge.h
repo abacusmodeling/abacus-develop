@@ -14,9 +14,8 @@
 #include "../src_global/matrix.h"
 #include "../src_global/complexmatrix.h"
 #include <vector>
-#include "../src_external/src_pdiag/pdiag_double.h"
-#include "../src_external/src_pdiag/GenELPA.h"
-
+#include "../src_pdiag/pdiag_double.h"
+#include "../src_pdiag/GenELPA.h"
 
 class Mulliken_Charge
 {

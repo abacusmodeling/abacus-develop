@@ -9,7 +9,7 @@
 #include "../src_pw/algorithms.h"
 
 #include "ORB_gen_tables.h"
-#include "../src_external/src_pdiag/pdiag_double.h"
+#include "../src_pdiag/pdiag_double.h"
 
 class ORB_control 
 {

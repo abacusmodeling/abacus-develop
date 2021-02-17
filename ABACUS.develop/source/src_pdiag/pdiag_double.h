@@ -1,7 +1,7 @@
 #ifndef PDIAG_DOUBLE_H
 #define PDIAG_DOUBLE_H
 
-#include "../../src_pw/tools.h"
+#include "src_pw/tools.h"
 #include "pdiag_basic.h"
 
 class Pdiag_Double : public Pdiag_Basic

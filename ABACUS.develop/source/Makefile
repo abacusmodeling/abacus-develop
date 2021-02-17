@@ -4,14 +4,14 @@ include Makefile.system
 include Makefile.Objects
 
 VPATH=./src_global\
-:./src_parallel\
-:./src_external/src_pdiag\
 :./src_pw\
 :./src_lcao\
-:./src_ri\
-:./src_io\
 :./src_ions\
-:./src_external/src_pdiag/MRRR\
+:./src_io\
+:./src_parallel\
+:./src_pdiag\
+:./src_pdiag/MRRR\
+:./src_ri\
 :./\
 
 #==========================

@@ -1,14 +1,14 @@
 #include "local_orbital_ions.h"
 #include "src_pw/global.h"
 #include "src_parallel/parallel_orbitals.h"
-#include "src_external/src_pdiag/pdiag_double.h"
+#include "src_pdiag/pdiag_double.h"
 #include "LCAO_nnr.h"
 #include "force_lcao.h"
 #include "stress_lcao.h"
 #include "src_global/global_function.h"
-#include "../src_io/hs_matrix.h"
+#include "src_io/hs_matrix.h"
 #include "src_lcao/cal_r_overlap_R.h"
-#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
+#include "src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "src_ri/exx_abfs.h"
 #include "src_ri/exx_opt_orb.h"
 #include "ELEC_scf.h"
