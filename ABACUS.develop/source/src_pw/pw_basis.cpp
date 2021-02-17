@@ -35,7 +35,7 @@ PW_Basis::PW_Basis()
 
     this->nczp_start = 0;
     gg_global0 = nullptr; //LiuXh 20180515
-    cutgg_num_table = nullptr; //LiuXh 20180515
+    cutgg_num_table = nullptr; //LiuXh 0180515
     ggchg_time_global = 0; //LiuXh 20180515
 
 }
@@ -185,7 +185,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 	// mohan update 2011-09-21
 	this->nbzp=nbz; //nbz shoud equal nz for single proc.
 	this->nczp=nbzp*bz; 
-	this->nbxx=nbz*ncx*ncy;
+	this->nbxx=nbz*nbx*nby; //mohan fix 2021-02-17
 	this->nbzp_start=0;
     bool cutgg_flag = false;
 #endif
@@ -380,14 +380,10 @@ void PW_Basis::setup_gg(void)
     // Ry*a0^2/(2*PI)^2
     //=================================
 
-    //=================================
     // FFT cut off for wave function
-    //=================================
     this->ggwfc = 4 * this->ggpsi;
 
-    //==================================
     // FFT cut off for charge/potential
-    //==================================
     this->ggchg = wfac * this->ggpsi;
 
     this->ggwfc2 = 0;
@@ -519,7 +515,6 @@ void PW_Basis::divide_fft_grid(void)
 	OUT(ofs_running,"nbxx",nbxx);
 	OUT(ofs_running,"nrxx",nrxx);
 	if(test_pw)OUT(ofs_running,"nrxx_start",nrxx_start);
-	if(test_pw)OUT(ofs_running,"nbxx_start",nbxx_start);
 
     //=====================================
     // generate nst,st_i,st_j,st_k,npps

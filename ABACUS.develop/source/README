@@ -5,7 +5,8 @@ implementing new functions, and adding more autotests.
 
 URGENT:
 
-Ask Xiaohui Liu: all functions named with 'after_vc' should be reconstructed 
+Ask Xiaohui Liu: all functions named with 'after_vc' should be reconstructed.
+The 'FINAL_SCF' global varialble should be removed. 
 (condition: need to reconstruct these codes within a given time)
 
 Ask Fuxiang He: we need to remove all TDDFT-related global variables
@@ -24,4 +25,6 @@ Ask Peize: explain exx_lip.h
 Ask Yuyang Ji: what's 'ocp' in input.cpp, what are the options 
 about 'ocp' in input_conv.cpp?
 
+QUESTION:
 
+* in pw_basis.cpp, why ggwfc2=ggwfc if gamma_only is used?

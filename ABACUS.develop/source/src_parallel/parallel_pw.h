@@ -60,6 +60,7 @@ public:
 	int rank_use;
 
 private:
+
 	double gcut;
 	int *ig_l2g;
 	int ngm_i;

@@ -46,9 +46,6 @@ void Local_Orbital_Elec::set_matrix_grid_index(void)
 	//DONE(ofs_running,"SEARCH ADJACENT ATOMS");
 
 	// (3) Periodic condition search for each grid.
-	// here 0 means GridT is not used for Vna.
-	// mohan add Vna 2012-06-13
-	// because it must be consistent with gtf in lcao_vna.
 	GridT.set_pbc_grid(
 			pw.ncx, pw.ncy, pw.ncz,
 			pw.bx, pw.by, pw.bz,

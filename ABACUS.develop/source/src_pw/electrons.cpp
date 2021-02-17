@@ -347,7 +347,6 @@ void Electrons::self_consistent(const int &istep)
 			pot.set_vrs_tddft(istep);
 		}
 
-        //pot.set_vrs(pw.doublegrid);
         //print_eigenvalue(ofs_running);
         en.calculate_etot();
 
