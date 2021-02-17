@@ -2,7 +2,6 @@
 #include "src_pw/global.h"
 #include "input.h"
 #include "src_pw/algorithms.h"
-#include "src_pw/pseudopot_cell_us.h"
 #include "src_io/optical.h"
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"

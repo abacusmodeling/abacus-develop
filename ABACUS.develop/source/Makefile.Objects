@@ -36,7 +36,6 @@ pseudo_nc.o \
 pseudo_us.o \
 pseudopot_cell_vl.o \
 pseudopot_cell_vnl.o \
-pseudopot_cell_us.o\
 atom_pseudo.o\
 unitcell_pseudo.o\
 threshold_elec.o\
