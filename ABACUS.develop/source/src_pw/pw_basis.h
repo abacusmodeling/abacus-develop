@@ -14,15 +14,12 @@ using namespace std;
 
 class PW_Basis
 {
-	public:
 
+public:
     PW_Basis();
     ~PW_Basis();
 
-	const UnitCell *Ucell; // pointer for UnitCell
-	const kvect *Klist; // pointer for K-point list
-	FFT FFT_chg; // FFT operations for charge density
-	FFT FFT_wfc; // FFT operations for wave functions
+    void gen_pw(ofstream &log, const UnitCell &Ucell_in, const kvect &Klist_in);
 
     void set
     (
@@ -40,9 +37,18 @@ class PW_Basis
 		const int &bz_in
     );
 
-    //===============================================
-    // Part 1: Kinetic energy cutoff for plane waves
-    //===============================================
+	const UnitCell *Ucell; // pointer for UnitCell
+	const kvect *Klist; // pointer for K-point list
+
+	FFT FFT_chg; // FFT operations for charge density
+	FFT FFT_wfc; // FFT operations for wave functions
+
+
+
+//===============================================
+// Part 1: Kinetic energy cutoff for plane waves
+//===============================================
+public:
     bool gamma_only;	// only half G are used.
     double ecutwfc;		// Energy cutoff for wavefunctions.
     double ecutrho; 	// Energy cutoff for charge/potential.
@@ -55,11 +61,16 @@ class PW_Basis
     double wfac;		// weighting factor from ggpsi to ggwfc2
     double ggchg;   	// G^2 cutoff for supporting charge density,
 
-    //===============================================
-    // Part 2: FFT dimensions in real space
-    //===============================================
+private:
+	// setup for ggpsi, ggwfc, ggwfc2, ggchg
+    void setup_gg(void);
 
-	//-----------------------------------------------
+
+
+//===============================================
+// Part 2: FFT dimensions in real space
+//===============================================
+public:
 	// FFT dimensions for wave functions.
 	int nx, ny, nz, nxyz;
 	// FFT dimensions for charge/potential.
@@ -72,8 +83,16 @@ class PW_Basis
 	// nrxx_start: starting nrxx in each processor 
     int nrxx_start;
 
-	//-----------------------------------------------
-	// used in LCAO algorithm: grid integrals 
+private:
+    void setup_FFT_dimension(void);	// set up FFT dimensions
+
+
+
+//===============================================
+// Part 3: FFT dimensions in real space
+// used in LCAO algorithm: grid integrals
+//===============================================
+public:
 	// combine [bx,by,bz] FFT grids into a big one
 	// typical values are bx=2, by=2, bz=2
 	// bxyz = bx*by*bz, typical value is 8
@@ -89,46 +108,45 @@ class PW_Basis
 	int nbxx;
 
 
-    //===============================================
-    // Part 3: G vectors in reciprocal FFT box
-    //===============================================
 
-	// structure factor (ntype, ngmax)
+//===============================================
+// Part 4: G vectors in reciprocal FFT box
+//===============================================
+public:
+	// mohan add 2008-4-2
+    int ngmc_g; // global ngmc (total number of G vectors)
+    int ngmc; // num. of G vectors within ggchg in each proc.
+	// map: 1D G vector -> charge in FFT grid 
+    int *ig2fftc; // dimension: [ngmc]
+
+	// PW_complement::get_ngmw(ngmc, ggwfc2, gg_global, ngmw);
+    int ngmw; // num. of G vectors within ggwfc2 in each proc.
+	// map: 1D G vector -> wave function in FFT grid
+    int *ig2fftw; // dimension: [ngmw]
+
+	// structure factor (ntype, ngmc)
     ComplexMatrix strucFac;
+    void setup_structure_factor(void); 		// Calculate structur factors
 
-	// (= ngmax) / num. of G vectors within ggfft
-    int ngmw;
-
-	// mohan add 2008-3-25
-	// (=*ind_FFT) /1D G vector -> for wave function FFT
-    int *ig2fftw;
-    //ig2fftw= new int [ngmw] for wave functions
-    //ig2fftw[ng] -> the coordinates in FFT box
-
-    //===============================================
-    // Part 4: Charge & Potential (G vectors,FFT box)
-    //===============================================
-
-    // G vectors, FFT box related to charge density and potentials etc.
-    // FFT grid for charge density, potentials etc.
-    // this grid equal to the wave function grid
+private:
+#ifdef __MPI
+    void divide_fft_grid(void);
+    void get_MPI_GVectors(void);
+    void columns_and_pw_distribution_2(void);
+#else
+    void get_GVectors(void);
+#endif
 
 
-	// new, num. of G vectors within ggchg
-    int ngmc;
 
-	// mohan add 2008-4-2
-    int ngmc_g;
-
-	// mohan add 2008-4-2
-    int *ig2fftc;
-    //ig2fftc= new int [ngmc] for wave functions
-    //ig2fftc[ng] -> the coordinates in FFT box
-
+//===============================================
+// Part 5: G vectors, |G|^2, G index [ngmc] 
+//===============================================
+public:
     Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc],
     Vector3<double> *gdirect_global;	//(= *G1d) ; // ig = new Vector igc[ngmc],
     // store the 3D G vector coordinates for charge density grid;
-    //ig.x, ig.y, ig.z should be integers !!!
+    // ig.x, ig.y, ig.z should be integers !!!
     // G vectors are in order of increasing G^2
     // can be shared by charge density/potential and wave functions.
 
@@ -137,61 +155,53 @@ class PW_Basis
     //g=ig*G ?? HLX (05-26-06): need to check if this is ok!
     //tau is also defined in Cartesian coordintes unit lat0
 
-    double *gg;         			// modulus (G^2) of G vectors
-    double *gg_global;    			// modulus (G^2) of G vectors
+    double *gg;       	// modulus (G^2) of G vectors [ngmc]
+    double *gg_global;  // modulus (G^2) of G vectors [ngmc_g]
     //gg[ng]=ig[ng]*GGT*ig[ng]/(lat0*lat0)=g[ng]*g[ng] (/lat0*lat0)
+	// gg_global dimension: [cutgg_num_now] (save memory skill is used)
 
-    //==================
-    // void set_nggm()
-    //==================
-    int nggm;          				// =ngl(another dft code);
+	// index of cartesian coordinates [ngmc]
+    int *ig1;	//
+    int *ig2;	// the indices of G components
+    int *ig3;	//
 
+
+
+//===============================================
+// Part 6: |G|^2 [nggm] 
+//===============================================
+public:
     // number of |G| shells (i.e., how many different |G|s)
-    double *ggs;         			// store the |G|^2 for each shell
-    int *ig2ngg;        			//=*igtong1 (another dft code)
-    // G -> correspondence shells of G
-    // end charge grids
+    int nggm;
+    double *ggs;	// store |G|^2 for each shell
+    int *ig2ngg;	// dimension [ngmc], index from ngmc to nggm
+    int gstart;		// first nonzero g vector
 
-    int gstart;        				// first nonzero g vector
-
-    ComplexMatrix eigts1;   		//
-    ComplexMatrix eigts2;   		//the phases e^{-iG*tau_s}
-    ComplexMatrix eigts3;   		//
-
-    int *ig1;        				//
-    int *ig2;        				// the indices of G components
-    int *ig3;        				//
-
-    double *gg_global0; //LiuXh add 20180515
-    int *cutgg_num_table; //LiuXh add 20180515
-    int ggchg_time_global; //LiuXh add 20180515
-
-
-    void gen_pw(ofstream &log, const UnitCell &Ucell_in, const kvect &Klist_in);
-
-    void setup_structure_factor(void); 		// Calculate structur factors
-
-    void update_gvectors(ofstream &log, const UnitCell &Ucell_in); //LiuXh add 20180515
-
-	private:
-
-    void setup_gg(void);
-
-    void setup_FFT_dimension(void); 		// set up FFT dimensions
-
-#ifdef __MPI
-    void divide_fft_grid(void);
-
-    void get_MPI_GVectors(void);
-
-    void columns_and_pw_distribution_2(void);
-#else
-
-    void get_GVectors(void);
-
-#endif
-
+private:
     void get_nggm(const int ngmc_local);
 
+
+
+//===============================================
+// Part 7: phase of e^{-iG*tau_s}
+//===============================================
+public:
+	// phase of e^{-iG*tau_s}
+    ComplexMatrix eigts1; // dimension: [Ucell->nat, 2*this->ncx + 1] 
+    ComplexMatrix eigts2; // dimension: [Ucell->nat, 2*this->ncy + 1] 
+    ComplexMatrix eigts3; // dimension: [Ucell->nat, 2*this->ncz + 1]
+
+
+
+//===============================================
+// Part 8: update_gvectors 
+// LiuXh add 20180515
+//===============================================
+public:
+    double *gg_global0;
+    int *cutgg_num_table;
+    int ggchg_time_global;
+
+    void update_gvectors(ofstream &log, const UnitCell &Ucell_in);
 };
 #endif //PlaneWave class
