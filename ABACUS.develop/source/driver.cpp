@@ -57,7 +57,7 @@ void Driver::reading(void)
 
 #ifdef __MPI
     // (4)  divide the NPROC processors into NPOOL for k-points parallelization.
-    Pkpoints.init();
+    Pkpoints.init_pools();
 #endif
 
     // (5) Read in parameters about wannier functions.

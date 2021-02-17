@@ -8,8 +8,8 @@
 
 class Local_Orbital_Charge
 {
-public:
-	friend class Trace_Rho_HS;
+
+	public:
 
 	Local_Orbital_Charge();
 	~Local_Orbital_Charge();

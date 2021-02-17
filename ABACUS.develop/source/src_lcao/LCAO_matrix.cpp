@@ -39,29 +39,15 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	ofs_running << "\n SETUP THE DIVISION OF H/S MATRIX" << endl;
 	
 	// (1) calculate nrow, ncol, nloc.
-	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" || KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx") //xiaohui add 2013-09-02
+	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" 
+		|| KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx") //xiaohui add 2013-09-02
 	{
 		ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
 #ifdef __MPI
 		ParaO.divide_HS_2d(DIAG_WORLD);
 #else
-		WARNING_QUIT("LCAO_Matrix::init","diago_type = 'HPSEPS' is not available for series version.\n You can use 'LAPACK' instead.");
+		WARNING_QUIT("LCAO_Matrix::init","diago method is not ready.");
 #endif
-	}
-	else if(KS_SOLVER == "canonical"
-		|| KS_SOLVER == "trace_resetting"
-		|| KS_SOLVER == "trace_correcting") 
-	{
-		//-------------------------------------------------------------------------------------
-		// This part is intended for linear-scaling solver for KS matrix utilizing 
-		// the sparse matrices. The developments of these parts need to have efficient
-		// algorithms to design, distribute (parallel), and operate sprase Hamiltionian 
-		// matrix (H), sparse density matrix (DM), and sparse overlap matrix (S),etc.  
-		// in localized basis sets -- mohan 2021-01-31
-		//-------------------------------------------------------------------------------------
-		ofs_running << " divide the H&S matrix according to atoms." << endl;
-		// done nothing.
-		// the nloc is calculated in "ParaA.set_trace"
 	}
 	else
 	{
@@ -69,24 +55,23 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 		ParaO.nloc = NLOCAL * NLOCAL;
 	}
 
-
 	// (2) set the trace, then we can calculate the nnr.
 	// for 2d: calculate ParaO.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
 	ParaO.set_trace();
 
-
-
 	// (3) allocate matrix.
 	if(GAMMA_ONLY_LOCAL)
 	{
+		// allocate for S, H_fixed, H, and S_diag
 		allocate_HS_gamma(ParaO.nloc);
 	}
 	else
 	{
+		// allocate for S, H_fixed, H, and S_diag
+		// for version 2
 		allocate_HS_k(ParaO.nloc);
 	}
-
 
 	return;
 }
@@ -495,6 +480,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 	ofs_running << " nrow=" << ParaO.nrow << endl;
 	ofs_running << " ncol=" << ParaO.ncol << endl;
 	ofs_running << " element number = " << ParaO.ncol << endl;
+
 	if (mtype=='S')
 	{
 		os << setprecision(8);
@@ -515,99 +501,9 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 			}//end j
 			os << endl;
 		}//end i
-
-		/*
-		   ofs_running << " " << setw(10) << "LocalRow" << setw(10) << "LocalCol"
-		   << setw(10) << "GlobalRow" << setw(10) << "GloablCol"
-		   << setw(10) << "Sloc" << endl;
-		   for (int i=0; i<this->nrow; i++)
-		   {
-		   for (int j=0; j<this->ncol; j++)
-		   {
-		   if ( abs(Sloc[i * this->ncol + j]) > 1.0e-5 )
-		   ofs_running << " " << setw(10) << i << setw(10) << j
-		   << setw(10) << MatrixInfo.row_set[i] << setw(10) << MatrixInfo.col_set[j]
-		   << setw(10) << Sloc[i * this->ncol + j] << endl;
-		   }
-		   }
-		os << "\n Smatrix" << endl;
-		//ofs_running << setprecision(5) << endl;
-
-		for(int i=0; i<ParaO.nrow; i++)
-		{
-			for(int j=0; j<ParaO.ncol; j++)
-			{
-				double s = Sloc[ i * ParaO.ncol + j];
-				double h = Hloc[ i * ParaO.ncol + j];
-				
-				if( abs( h - s ) > 1.0e-3 )
-				{
-				//	ofs_running << setw(5) << i+1 << setw(5) << j+1 << setw(12) << h << setw(12) << s << endl;
-				}
-				
-				
-				if( abs(s) > 1.0e-5 )
-				{
-					ofs_running << setw(10) << s;
-				//	ofs_running << setw(5) << i << setw(5) << j << setw(15) << s << endl;
-
-				}
-				else
-				{
-					ofs_running << setw(10) << "0";
-				}
-			}
-			ofs_running << endl;
-		}
-		 */
 	}
 	if (mtype=='T')
 	{
-
-
-		/*
-		ofs_running << " " << setw(10) << "LocalRow" << setw(10) << "LocalCol"
-			<< setw(10) << "GlobalRow" << setw(10) << "GloablCol"
-			<< setw(10) << "Hloc_fixed" << endl;
-		for (int i=0; i<ParaO.nrow; i++)
-		{
-			for (int j=0; j<ParaO.ncol; j++)
-			{
-//				if ( abs(Hloc_fixed[i * ParaO.ncol + j]) > 1.0e-5 )
-				{
-					ofs_running << " " << setw(10) << i+1 << setw(10) << j+1;
-
-					//mohan fix bug 2012-02-22
-					if(ATOM_DISTRIBUTION!=1)
-					{
-						ofs_running << setw(10) << ParaO.MatrixInfo.row_set[i] << setw(10) << ParaO.MatrixInfo.col_set[j];
-					}
-					else
-					{
-						ofs_running << setw(10) << "0" << setw(10) << "0";
-					}
-					ofs_running << setw(10) << Hloc_fixed[i * ParaO.ncol + j] << endl;
-				}
-			}
-		}
-		for(int i=0; i<ParaO.nrow; i++)
-		{
-			for(int j=0; j<ParaO.ncol; j++)
-			{
-				double v = Hloc_fixed[i*ParaO.ncol+j];
-				if( abs(v) > 1.0e-5 )
-				{
-					ofs_running << setw(15) << v;
-				}
-				else
-				{
-					ofs_running << setw(15) << "0";
-				}
-			}
-			ofs_running << endl;
-		}
-		*/
-
 		os << " print Hloc_fixed" << endl;
 		for(int i=0; i<NLOCAL; ++i)
 		{
@@ -628,7 +524,6 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 	}
 	if (mtype=='H')
 	{
-
 		os << " print Hloc" << endl;
 		for(int i=0; i<NLOCAL; ++i)
 		{
@@ -646,41 +541,6 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 			}//end j
 			os << endl;
 		}//end i
-
-	/*
-		ofs_running << " " << setw(10) << "LocalRow" << setw(10) << "LocalCol"
-			<< setw(10) << "GlobalRow" << setw(10) << "GloablCol"
-			<< setw(10) << "Hloc" << endl;
-
-		ofs_running << "\n Hmatrix" << endl;
-		ofs_running << setprecision(8) << endl;
-		for (int i=0; i<ParaO.nrow; i++)
-		{
-			ofs_running << " ";
-			for (int j=0; j<ParaO.ncol; j++)
-			{
-				double a = Hloc[ i * ParaO.ncol + j];
-				if ( abs( a ) > 1.0e-5 )
-				{
-				//	ofs_running << " " << setw(10) << i << setw(10) << j
-				//		<< setw(10) << ParaO.MatrixInfo.row_set[i] << setw(10) << ParaO.MatrixInfo.col_set[j]
-				//		<< setw(10) << a << endl;
-					
-					//
-					ofs_running << setw(15) << a;
-					//ofs_running << setw(5) << i << setw(5) << j << setw(15) << a << endl;
-
-				}
-				else
-				{
-					//
-					ofs_running << setw(15) << "0";
-				}
-			}
-			//
-			ofs_running << endl;
-		}
-		*/
 	}
 
 	return;

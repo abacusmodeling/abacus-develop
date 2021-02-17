@@ -2,7 +2,6 @@
 #include "src_pw/global.h"
 
 Grid_Driver GridD;
-Parallel_Atoms ParaA;
 Parallel_Orbitals ParaO;
 Local_Orbital_Charge LOC;
 Local_Orbital_wfc LOWF;

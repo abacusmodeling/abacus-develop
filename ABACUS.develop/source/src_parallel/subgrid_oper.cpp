@@ -113,15 +113,7 @@ void SubGrid_oper::cal_totwfc()
 	// reduce occupy and get the full occupations.
 #ifdef __MPI
 	// mohan 2012-02-23
-	if(ATOM_DISTRIBUTION==1)
-	{
-		ofs_running << " Because of the atom distribution." << endl;
-		ofs_running << " Don't reduce the trace_lo_tot here." << endl;
-	}
-	else
-	{
-		Parallel_Reduce::reduce_int_grid(occupy, NLOCAL);
-	}
+	Parallel_Reduce::reduce_int_grid(occupy, NLOCAL);
 #endif
 
 	/*

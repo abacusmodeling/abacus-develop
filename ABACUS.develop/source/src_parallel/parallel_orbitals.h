@@ -7,6 +7,7 @@
 class Parallel_Orbitals : public Pdiag_Double
 {
     public:
+
     Parallel_Orbitals();
     ~Parallel_Orbitals();
 

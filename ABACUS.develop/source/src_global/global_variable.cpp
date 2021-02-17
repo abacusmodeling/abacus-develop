@@ -47,7 +47,6 @@ string	KS_SOLVER = "cg"; //xiaohui add 2013-09-01
 double	SEARCH_RADIUS = -1.0;
 bool	SEARCH_PBC = true;
 bool	SPARSE_MATRIX = false;
-int		ATOM_DISTRIBUTION = false;
 
 int		DIAGO_PROC = 0;
 int 	DIAGO_CG_MAXITER = 30;

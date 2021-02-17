@@ -160,7 +160,6 @@ void Input::Default(void)
     search_radius=-1.0; // unit: a.u. -1.0 has no meaning.
     search_pbc=true;
     sparse_matrix=false;
-	atom_distribution=0;
     symmetry=false;
 	mlwf_flag=false;
 	vna = 0;
@@ -695,10 +694,6 @@ bool Input::Read(const string &fn)
         else if (strcmp("sparse_matrix", word) == 0)
         {
             read_value(ifs, sparse_matrix);
-        }
-        else if (strcmp("atom_distribution", word) == 0)
-        {
-            read_value(ifs, atom_distribution);
         }
         else if (strcmp("symmetry", word) == 0)
         {
@@ -1996,7 +1991,6 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( search_radius );
 	Parallel_Common::bcast_bool( search_pbc );
     Parallel_Common::bcast_bool ( sparse_matrix );
-    Parallel_Common::bcast_int ( atom_distribution );
     Parallel_Common::bcast_double( search_radius );
     Parallel_Common::bcast_bool( symmetry );
     Parallel_Common::bcast_bool( mlwf_flag );
@@ -2671,9 +2665,6 @@ void Input::Check(void)
 			//else if(diago_type == "cg" )
 			else if (ks_solver == "cg")
 			{
-				//ofs_warning << " Use CG method in LCAO." << endl; xiaohui 2013-09-04
-				//atom_distribution=1; xiaohui 2013-09-04
-				//AUTO_SET("atom_distribution",1); xiaohui 2013-09-04
 				WARNING_QUIT("Input","not ready for cg method in lcao ."); //xiaohui add 2013-09-04
 			}
 			//else if( diago_type == "hpseps" )
@@ -3191,7 +3182,6 @@ void Input::Print(const string &fn)const
 	//OUTP(ofs,"gamma_only_pw",gamma_only,"gamma only in pw");
 	OUTP(ofs,"npool",npool,"number of pools for k points, pw only");
 	OUTP(ofs,"sparse_matrix",sparse_matrix,"use sparse matrix, in DMM");
-	OUTP(ofs,"atom_distribution",atom_distribution,"distribute atoms, in DMM");
 	OUTP(ofs,"mem_saver",mem_saver,"memory saver for many k points used");
 	OUTP(ofs,"printe",printe,"print band energy for selectively ionic steps");
 

@@ -146,7 +146,6 @@ force_lcao.o\
 force_lcao_gamma.o\
 force_lcao_k.o\
 stress_lcao.o\
-parallel_atoms.o \
 parallel_orbitals.o \
 global_fp.o \
 pdiag_double.o \

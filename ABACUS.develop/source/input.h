@@ -90,7 +90,6 @@ class Input
 	string basis_type; 			//xiaohui add 2013-09-01, for structural adjustment
 	string ks_solver; 			//xiaohui add 2013-09-01
     bool sparse_matrix;
-	int atom_distribution;
 
 	int vna;				//control the vna term.
 	int grid_speed;			//1:normal 2:fast, mohan add 2012-03-29

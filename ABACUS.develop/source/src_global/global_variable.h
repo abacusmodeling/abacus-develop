@@ -50,7 +50,6 @@ extern string	KS_SOLVER; //xiaohui add 2013-09-01
 extern double	SEARCH_RADIUS;		// 11.1 // mohan add 2011-03-10
 extern bool		SEARCH_PBC;			// 11.2 // mohan add 2011-03-10
 extern bool		SPARSE_MATRIX;		// 11.3 // mohan add 2009-03-13
-extern int 		ATOM_DISTRIBUTION;	// 11.4 // mohan add 2010-06-28
 
 //added by zhengdy-soc
 extern bool     NONCOLIN; //0 : collinear ; 1 : non-collinear

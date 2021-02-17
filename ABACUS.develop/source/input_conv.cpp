@@ -134,7 +134,6 @@ void Input_Conv::Convert(void)
 	SEARCH_RADIUS = INPUT.search_radius;
 	SEARCH_PBC = INPUT.search_pbc;
     SPARSE_MATRIX = INPUT.sparse_matrix;
-	ATOM_DISTRIBUTION = INPUT.atom_distribution;
 
 //----------------------------------------------------------
 // planewave (8/8)
