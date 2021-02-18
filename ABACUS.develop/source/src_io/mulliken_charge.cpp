@@ -10,24 +10,21 @@
 ***********************************************************************/
 
 #include "mulliken_charge.h"
-#include "../src_lcao/local_orbital_charge.h"
-#include "LCAO_gen_fixedH.h"
-#include "../src_pw/global.h"
-#include "../src_pw/wavefunc.h"
-#include "global_fp.h"
-#include "LCAO_matrix.h"
-#include "../src_lcao/global_fp.h"
-#include "../src_lcao/wfc_dm_2d.h"
-#include "../src_global/lapack_connector.h"
-#include "../src_global/scalapack_connector.h"
-#include "../src_global/matrix.h"
-#include "../src_global/complexmatrix.h"
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/LCAO_gen_fixedH.h"
+#include "src_pw/global.h"
+#include "src_pw/wavefunc.h"
+#include "src_lcao/LCAO_matrix.h"
+#include "src_lcao/global_fp.h"
+#include "src_lcao/wfc_dm_2d.h"
+#include "src_global/lapack_connector.h"
+#include "src_global/scalapack_connector.h"
+#include "src_global/matrix.h"
+#include "src_global/complexmatrix.h"
 #include <vector>
 #include <mpi.h>
-#include "../src_global/sltk_atom_arrange.h"
-#include "../src_lcao/LCAO_nnr.h"
-
-
+#include "src_global/sltk_atom_arrange.h"
+#include "src_lcao/LCAO_nnr.h"
 
 
 Mulliken_Charge::Mulliken_Charge()

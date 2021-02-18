@@ -1,25 +1,24 @@
-#include "tools.h"
-#include "global.h"
-#include "energy.h"
-#include "algorithms.h"
-#include "../src_lcao/mulliken_charge.h"
-#include "../src_lcao/LCAO_nnr.h"
-#include "../src_lcao/LCAO_gen_fixedH.h"    
-#include "../src_global/sltk_atom_arrange.h"//qifeng-2019-01-21
-#include "../src_lcao/local_orbital_charge.h"
-#include "../src_pw/global.h"
-#include "../src_pw/wavefunc.h"
-#include "../src_lcao/LCAO_matrix.h"
-#include "../src_lcao/global_fp.h"
-#include "../src_lcao/wfc_dm_2d.h"
-#include "../src_global/lapack_connector.h"
-#include "../src_global/scalapack_connector.h"
-#include "../src_global/matrix.h"
-#include "../src_global/complexmatrix.h"
+#include "src_pw/tools.h"
+#include "src_pw/global.h"
+#include "src_pw/energy.h"
+#include "src_pw/algorithms.h"
+#include "src_io/mulliken_charge.h"
+#include "src_lcao/LCAO_nnr.h"
+#include "src_lcao/LCAO_gen_fixedH.h"    
+#include "src_global/sltk_atom_arrange.h"//qifeng-2019-01-21
+#include "src_lcao/local_orbital_charge.h"
+#include "src_pw/global.h"
+#include "src_pw/wavefunc.h"
+#include "src_lcao/LCAO_matrix.h"
+#include "src_lcao/global_fp.h"
+#include "src_lcao/wfc_dm_2d.h"
+#include "src_global/lapack_connector.h"
+#include "src_global/scalapack_connector.h"
+#include "src_global/matrix.h"
+#include "src_global/complexmatrix.h"
 #include <vector>
 #include <mpi.h>
-#include<sys/time.h>
-#include "../src_pw/tools.h"
+#include <sys/time.h>
 
 
 void energy::perform_dos(void)

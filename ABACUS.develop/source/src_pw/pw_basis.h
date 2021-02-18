@@ -5,11 +5,12 @@
 #ifndef PLANEWAVE_H
 #define PLANEWAVE_H
 
-#include "../src_global/complexmatrix.h"
-#include "../src_global/vector3.h"
 #include "unitcell.h"
 #include "klist.h"
+#include "../src_global/complexmatrix.h"
+#include "../src_global/vector3.h"
 #include "../src_parallel/ft.h"
+
 using namespace std;
 
 class PW_Basis

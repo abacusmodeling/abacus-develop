@@ -151,6 +151,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 	this->Klist = &Klist_in;
 
     //mohan modify 2008-3-25
+	// setup for ggpsi, ggwfc, ggwfc2, ggchg
     this->setup_gg();
     this->setup_FFT_dimension();
 
