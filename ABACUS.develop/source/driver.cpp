@@ -71,6 +71,7 @@ void Driver::reading(void)
 
     // (7) Setup the unitcell.
     ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
+    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
     DONE(ofs_running, "SETUP UNITCELL");
 
     // (8) symmetry analysize.
@@ -84,26 +85,9 @@ void Driver::reading(void)
 	kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
     DONE(ofs_running,"INIT K-POINTS");
 
-	// (10) check the number of basis, the warning should be moved to 
-	// other places -- mohan 2021-01-30
-	// mohan add 2011-01-5
-	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") 
-	{
-		if( NLOCAL < NBANDS )
-		{
-			WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
-		}
-		else
-		{
-			//OUT(ofs_running,"NLOCAL",NLOCAL);
-			OUT(ofs_running,"NBASE",NLOCAL);
-			OUT(ofs_running,"NBANDS",NBANDS);
-		}
-	}
-
 //---------------------------------------------------------------------------------
 
-	// (11) for LCAO basis, reading the orbitals and construct
+	// (10) for LCAO basis, reading the orbitals and construct
 	// the interpolation tables.
 	// this part should be moved somewher else -- mohan 2021-01-30
 	if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
@@ -121,7 +105,7 @@ void Driver::reading(void)
 		LM.divide_HS_in_frag(); 
 	}
 
-	// (12) print information
+	// (11) print information
 	// mohan add 2021-01-30
 	Print_Info PI;
 	PI.screen_output();

@@ -64,25 +64,26 @@ void kvect::set(
 {
     TITLE("kvect", "set");
 
- ofs_running << "\n\n\n\n";
- ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
- ofs_running << " |                                                                    |" << endl;
- ofs_running << " | Setup K-points                                                     |" << endl;
- ofs_running << " | We setup the k-points according to input parameters.               |" << endl;
- ofs_running << " | The reduced k-points are set according to symmetry operations.     |" << endl;
- ofs_running << " | We treat the spin as another set of k-points.                      |" << endl;
- ofs_running << " |                                                                    |" << endl;
- ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
- ofs_running << "\n\n\n\n";
-		
-
+	ofs_running << "\n\n\n\n";
+	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+	ofs_running << " |                                                                    |" << endl;
+	ofs_running << " | Setup K-points                                                     |" << endl;
+	ofs_running << " | We setup the k-points according to input parameters.               |" << endl;
+	ofs_running << " | The reduced k-points are set according to symmetry operations.     |" << endl;
+	ofs_running << " | We treat the spin as another set of k-points.                      |" << endl;
+	ofs_running << " |                                                                    |" << endl;
+	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	ofs_running << "\n\n\n\n";
 
 	ofs_running << "\n SETUP K-POINTS" << endl;
 
 	// (1) set nspin, read kpoints.
 	this->nspin = nspin_in;
 	OUT(ofs_running,"nspin",nspin);
-	if(this->nspin==4) this->nspin = 1;//zhengdy-soc
+	if(this->nspin==4) 
+	{
+		this->nspin = 1;//zhengdy-soc
+	}
 		
 	bool read_succesfully = this->read_kpoints(k_file_name);
 #ifdef __MPI

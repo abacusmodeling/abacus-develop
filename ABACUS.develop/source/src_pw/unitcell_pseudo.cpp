@@ -72,8 +72,6 @@ void UnitCell_pseudo::setup_cell(
 			ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 			ofs_running << "\n\n\n\n";
 
-
-
 			ofs_running << " READING UNITCELL INFORMATION" << endl;
 			//========================
 			// call read_atom_species
@@ -136,12 +134,13 @@ void UnitCell_pseudo::setup_cell(
 		
 	//==========================================================
 	// Calculate recip. lattice vectors and dot products
-	// latvec has the unit of lat0, but G has the unit 2Pi/lat0
+	// latvec have the unit of lat0, but G has the unit 2Pi/lat0
 	//==========================================================
 	this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
 	this->invGGT = GGT.Inverse();
+
     //LiuXh add 20180515
     this->GT0 = latvec.Inverse();
     this->G0  = GT.Transpose();
@@ -275,10 +274,15 @@ void UnitCell_pseudo::setup_cell(
 		xcf.which_dft(atoms[it].dft);
 	}
 
-	//this->cal_nelec();
+	// setup the total number of PAOs
 	this->cal_natomwfc();
+
+	// setup NLOCAL
 	this->cal_nwfc();
+
+	// setup NBANDS
 	this->cal_nelec();
+
 	this->cal_meshx();
 
 //	stringstream ss;
@@ -1207,7 +1211,7 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 #include "occupy.h"
 void UnitCell_pseudo::cal_nelec(void)
 {
-	if(test_pseudo_cell) TITLE("UnitCell_pseudo","cal_nelec");
+	TITLE("UnitCell_pseudo","cal_nelec");
 	//=======================================================
 	// calculate the total number of electrons in the system
 	// if nelec <>0; use input number (setup.f90)
@@ -1230,7 +1234,7 @@ void UnitCell_pseudo::cal_nelec(void)
 		}
 	}
 
-//	OUT(ofs_running,"Total nelec",nelec);
+	//OUT(ofs_running,"Total nelec",nelec);
 
 	//=======================================
 	// calculate number of bands (setup.f90)
@@ -1245,12 +1249,12 @@ void UnitCell_pseudo::cal_nelec(void)
 	OUT(ofs_running,"occupied bands",occupied_bands);
 	
 	// mohan add 2010-09-04
-        //cout << "nbands(ucell) = " <<NBANDS <<endl;
+    //cout << "nbands(ucell) = " <<NBANDS <<endl;
 	if(NBANDS==occupied_bands)
 	{
 		if( Occupy::gauss() || Occupy::tetra() )
 		{
-			WARNING_QUIT("UnitCell_pseudo::cal_nelec","If you use smearing, the number of bands should be larger than occupied bands.");
+			WARNING_QUIT("UnitCell_pseudo::cal_nelec","for smearing, num. of bands > num. of occupied bands");
 		}
 	}
 	
@@ -1269,10 +1273,6 @@ void UnitCell_pseudo::cal_nelec(void)
 			int nbands4 = 1.2 * nelec;
 			NBANDS = max(nbands3, nbands4);
 		}
-                if (NBANDS > NLOCAL)
-                {
-                    NBANDS = NLOCAL;
-                }
 		AUTO_SET("NBANDS",NBANDS);
 	}
 	//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
@@ -1288,11 +1288,22 @@ void UnitCell_pseudo::cal_nelec(void)
 		{
 			WARNING_QUIT("unitcell","Too few spin down bands!");
 		}
-		if (NBANDS > NLOCAL)
-		{
-			WARNING_QUIT("unitcell","Too many bands! NBANDS > NBASIS.");
-		}
 	}
+
+	// mohan update 2021-02-19
+    // mohan add 2011-01-5
+    if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+    {
+        if( NBANDS > NLOCAL )
+        {
+            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
+        }
+        else
+        {
+            OUT(ofs_running,"NLOCAL",NLOCAL);
+            OUT(ofs_running,"NBANDS",NBANDS);
+        }
+    }
 
 	OUT(ofs_running,"NBANDS",NBANDS);
 	return;
@@ -1304,9 +1315,9 @@ void UnitCell_pseudo::cal_nelec(void)
 // 			atoms[].stapos_wf
 // 			NBANDS
 //===========================================
-void UnitCell_pseudo::cal_nwfc()
+void UnitCell_pseudo::cal_nwfc(void)
 {
-	if(test_pseudo_cell) TITLE("UnitCell_pseudo","cal_nwfc");
+	TITLE("UnitCell_pseudo","cal_nwfc");
 	assert(ntype>0);
 	assert(nat>0);
 
@@ -1329,8 +1340,9 @@ void UnitCell_pseudo::cal_nwfc()
 		this->nwmax = std::max( atoms[it].nw, nwmax );
 	}
 	assert(namax>0);
-//	OUT(ofs_running,"max input atom number",namax);
-//	OUT(ofs_running,"max wave function number",nwmax);	
+// for tests
+//		OUT(ofs_running,"max input atom number",namax);
+//		OUT(ofs_running,"max wave function number",nwmax);	
 
 	//===========================
 	// (3) set nwfc and stapos_wf
@@ -1340,16 +1352,22 @@ void UnitCell_pseudo::cal_nwfc()
 	{
 		atoms[it].stapos_wf = NLOCAL;
 		const int nlocal_it = atoms[it].nw * atoms[it].na;
-                if(NSPIN!=4) NLOCAL += nlocal_it;
-		else NLOCAL += nlocal_it * 2;//zhengdy-soc
-//		stringstream ss1;
-//		ss1 << "number of local orbitals for species " << it;
-//		if(LOCAL_BASIS)OUT(ofs_running,ss1.str(),nlocal_it);
+		if(NSPIN!=4) 
+		{
+			NLOCAL += nlocal_it;
+		}
+		else 
+		{
+			NLOCAL += nlocal_it * 2;//zhengdy-soc
+		}
+
+// for tests
+//		OUT(ofs_running,ss1.str(),nlocal_it);
 //		OUT(ofs_running,"start position of local orbitals",atoms[it].stapos_wf);
 	}
 	
 	//OUT(ofs_running,"NLOCAL",NLOCAL);
-            ofs_running << " " << setw(40) << "NLOCAL" << " = " << NLOCAL <<endl;
+	ofs_running << " " << setw(40) << "NLOCAL" << " = " << NLOCAL <<endl;
 	//========================================================
 	// (4) set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
 	//========================================================
@@ -1439,13 +1457,8 @@ void UnitCell_pseudo::cal_nwfc()
 	//=====================
 	// Use localized basis
 	//=====================
-	//if(LOCAL_BASIS) xiaohui modify 2013-09-02
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
 	{
-		//if(winput::b_recon)
-		//{
-		//	NBANDS = NLOCAL;
-		//}
 		AUTO_SET("NBANDS",NBANDS);
 	}
 	else // plane wave basis
@@ -1491,6 +1504,7 @@ void UnitCell_pseudo::cal_meshx()
 void UnitCell_pseudo::cal_natomwfc(void)
 {
 	if(test_pseudo_cell) TITLE("UnitCell_pseudo","cal_natomwfc");
+
 	this->natomwfc = 0;
 	for (int it = 0;it < ntype;it++)
 	{

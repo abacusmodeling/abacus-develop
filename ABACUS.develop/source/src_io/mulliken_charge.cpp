@@ -174,21 +174,12 @@ void Mulliken_Charge::cal_mulliken(void)
 
 			for(int ik=0;ik<kv.nks;ik++)
 			{
-
 				if(is == kv.isk[ik])
 				{
-
-
-
 					LM.allocate_HS_k(ParaO.nloc);
 					LM.zeros_HSk('S');
 					LNNR.folding_fixedH(ik);
-
-
-
 					ComplexMatrix Dwf = conj(M.wfc_k[ik]);
-
-
 
 					for (int i=0; i<NBANDS; ++i)		  
 					{     

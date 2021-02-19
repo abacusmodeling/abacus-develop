@@ -3004,16 +3004,16 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; david; lapack; genelpa; hpseps; scalapack_gvx");
 	OUTP(ofs,"niter",niter,"#number of electron iterations");
 	//OUTP(ofs,"force",force,"calculate the force or not");
-        OUTP(ofs,"force_set",force_set,"output the force_set or not"); 
+	OUTP(ofs,"force_set",force_set,"output the force_set or not"); 
 	OUTP(ofs,"nstep",nstep,"number of ion iteration steps");
 	OUTP(ofs,"out_stru",out_stru,"output the structure files after each ion step");
 	OUTP(ofs,"force_thr",force_thr,"force threshold, unit: Ry/Bohr");
 	OUTP(ofs,"force_thr_ev",force_thr*13.6058/0.529177,"force threshold, unit: eV/Angstrom");
 	OUTP(ofs,"force_thr_ev2",force_thr_ev2,"force invalid threshold, unit: eV/Angstrom");
-        OUTP(ofs,"stress_thr",stress_thr,"stress threshold"); //LiuXh add 20180515
-        OUTP(ofs,"press1",press1,"target pressure, unit: KBar");
-        OUTP(ofs,"press2",press2,"target pressure, unit: KBar");
-        OUTP(ofs,"press3",press3,"target pressure, unit: KBar");
+	OUTP(ofs,"stress_thr",stress_thr,"stress threshold"); //LiuXh add 20180515
+	OUTP(ofs,"press1",press1,"target pressure, unit: KBar");
+	OUTP(ofs,"press2",press2,"target pressure, unit: KBar");
+	OUTP(ofs,"press3",press3,"target pressure, unit: KBar");
 	OUTP(ofs,"bfgs_w1",bfgs_w1,"wolfe condition 1 for bfgs");
 	OUTP(ofs,"bfgs_w2",bfgs_w2,"wolfe condition 2 for bfgs");
 	OUTP(ofs,"trust_radius_max", trust_radius_max,"maximal trust radius, unit: Bohr");
@@ -3024,8 +3024,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"move_method",ion_dynamics,"bfgs; sd; cg; cg_bfgs;"); //pengfei add 2013-08-15
 	OUTP(ofs,"out_level",out_level,"ie(for electrons); i(for ions);");
 	OUTP(ofs,"out_dm",out_dm,">0 output density matrix");
-	OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");//caoyu added 2020-11-24, mohan added 2021-01-03
-	OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");//caoyu added 2020-11-24, mohan added 2021-01-03
+
+	OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");//caoyu add 2020-11-24, mohan added 2021-01-03
+	OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");//caoyu add 2020-11-24, mohan added 2021-01-03
 
 	ofs << "\n#Parameters (4.LCAO)" << endl;
 	//OUTP(ofs,"local_basis",local_basis,"0:PW; 1:LO in pw; 4:LCAO"); xiaohui modify 2013-09-01
@@ -3054,8 +3055,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"sigma",degauss,"energy range for smearing");
 	
 	ofs << "\n#Parameters (6.Charge Mixing)" << endl;
-//2015-06-15
-        OUTP(ofs,"mixing_type",mixing_mode,"plain; kerker; pulay; pulay-kerker");
+	OUTP(ofs,"mixing_type",mixing_mode,"plain; kerker; pulay; pulay-kerker");
 	OUTP(ofs,"mixing_beta",mixing_beta,"mixing parameter: 0 means no new charge");
 	OUTP(ofs,"mixing_ndim",mixing_ndim,"mixing dimension in pulay");
 	OUTP(ofs,"mixing_gg0",mixing_gg0,"mixing parameter in kerker");
@@ -3064,21 +3064,15 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"dos_emin_ev",dos_emin_ev,"minimal range for dos");
 	OUTP(ofs,"dos_emax_ev",dos_emax_ev,"maximal range for dos");
 	OUTP(ofs,"dos_edelta_ev",dos_edelta_ev,"delta energy for dos");
-        OUTP(ofs,"dos_sigma",b_coef,"gauss b coefficeinet(default=0.07)");
-	
+	OUTP(ofs,"dos_sigma",b_coef,"gauss b coefficeinet(default=0.07)");
+
 	ofs << "\n#Parameters (8.Technique)" << endl;
-        OUTP(ofs,"gamma_only",gamma_only,"gamma only");
-	//OUTP(ofs,"gamma_only_local",gamma_only_local,"gamma only in LCAO (important)");
+	OUTP(ofs,"gamma_only",gamma_only,"gamma only");
 	OUTP(ofs,"diago_proc",DIAGO_PROC,"number of proc used to diago");//mohan add 2012-01-13
-	//OUTP(ofs,"gamma_only_pw",gamma_only,"gamma only in pw");
 	OUTP(ofs,"npool",npool,"number of pools for k points, pw only");
 	OUTP(ofs,"mem_saver",mem_saver,"memory saver for many k points used");
 	OUTP(ofs,"printe",printe,"print band energy for selectively ionic steps");
 
-//	ofs << "\n#Parameters (11.Divide&Conqure)" << endl;
-//	OUTP(ofs,"DC_nx",dc_nx,"division of atoms along x");
-//	OUTP(ofs,"DC_ny",dc_ny,"division of atoms along y");
-//	OUTP(ofs,"DC_nz",dc_nz,"division of atoms along z");
 
 	ofs << "\n#Parameters (9.SIAO)" << endl;
 	OUTP(ofs,"selinv_npole",selinv_npole,"number of selected poles");
@@ -3090,36 +3084,27 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"selinv_niter",selinv_niter,"max number of steps to update mu");
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << endl;
-/*	
-	OUTP(ofs,"md_dt",md_dt,"time step for molecular dynamics");
-	OUTP(ofs,"md_restart",md_restart,"restart molecular dynamics from previous steps.");
-	OUTP(ofs,"md_thermostat",md_thermostat,"ionic temperature: various md_thermostat");
-	OUTP(ofs,"md_temp0",md_temp0,"start temperature");
-	OUTP(ofs,"md_tolv",md_tolv,"tolerence for velocity scaling");
-	OUTP(ofs,"md_tstep",md_tstep,"the temperature will reduce every md_tstep");
-	OUTP(ofs,"md_delt",md_delt,"the reduce amount of temperature");
-*/
-//added by zheng daye
-        OUTP(ofs,"md_mdtype",md_mdtype,"choose ensemble");
+	//added by zheng daye
+	OUTP(ofs,"md_mdtype",md_mdtype,"choose ensemble");
 	//OUTP(ofs,"md_tauthermo",md_tauthermo,);
-        //OUTP(ofs,"md_taubaro",md_taubaro,);
-        OUTP(ofs,"md_dt",md_dt,"time step");
-        OUTP(ofs,"md_nresn",md_nresn,"parameter during integrater");
-        OUTP(ofs,"md_nyosh",md_nyosh,"parameter during integrater");
-        OUTP(ofs,"md_qmass",md_qmass,"mass of thermostat");
-        OUTP(ofs,"md_tfirst",md_tfirst,"temperature first");
-        OUTP(ofs,"md_tlast",md_tlast,"temperature last");
-        OUTP(ofs,"md_dumpmdfred",md_dumpmdfred,"The period to dump MD information for monitoring and restarting MD");
-        OUTP(ofs,"md_mdoutpath",md_mdoutpath,"output path of md");
-        OUTP(ofs,"md_domsd",md_domsd,"whether compute <r(t)-r(0)>");
-        OUTP(ofs,"md_domsdatom",md_domsdatom,"whether compute msd for each atom");
-        OUTP(ofs,"md_rstmd",md_rstmd,"whether restart");
-        //OUTP(ofs,"md_outputstressperiod",md_outputstressperiod,"period to output stress");
-        OUTP(ofs,"md_fixtemperature",md_fixtemperature,"period to change temperature");
-        OUTP(ofs,"md_ediff",md_ediff,"parameter for constraining total energy change");
-        OUTP(ofs,"md_ediffg",md_ediffg,"parameter for constraining max force change");
-        OUTP(ofs,"md_msdstarttime",md_msdstartTime,"choose which step that msd be calculated");
-//end of zheng daye's adding
+	//OUTP(ofs,"md_taubaro",md_taubaro,);
+	OUTP(ofs,"md_dt",md_dt,"time step");
+	OUTP(ofs,"md_nresn",md_nresn,"parameter during integrater");
+	OUTP(ofs,"md_nyosh",md_nyosh,"parameter during integrater");
+	OUTP(ofs,"md_qmass",md_qmass,"mass of thermostat");
+	OUTP(ofs,"md_tfirst",md_tfirst,"temperature first");
+	OUTP(ofs,"md_tlast",md_tlast,"temperature last");
+	OUTP(ofs,"md_dumpmdfred",md_dumpmdfred,"The period to dump MD information for monitoring and restarting MD");
+	OUTP(ofs,"md_mdoutpath",md_mdoutpath,"output path of md");
+	OUTP(ofs,"md_domsd",md_domsd,"whether compute <r(t)-r(0)>");
+	OUTP(ofs,"md_domsdatom",md_domsdatom,"whether compute msd for each atom");
+	OUTP(ofs,"md_rstmd",md_rstmd,"whether restart");
+	//OUTP(ofs,"md_outputstressperiod",md_outputstressperiod,"period to output stress");
+	OUTP(ofs,"md_fixtemperature",md_fixtemperature,"period to change temperature");
+	OUTP(ofs,"md_ediff",md_ediff,"parameter for constraining total energy change");
+	OUTP(ofs,"md_ediffg",md_ediffg,"parameter for constraining max force change");
+	OUTP(ofs,"md_msdstarttime",md_msdstartTime,"choose which step that msd be calculated");
+	//end of zheng daye's adding
 
 	ofs << "\n#Parameters (11.Efield)" << endl;
 	OUTP(ofs,"efield",efield,"add electric field");
@@ -3144,23 +3129,10 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"mlwf_flag",mlwf_flag,"turn MLWF on or off");
 	OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
 	OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
-//	OUTP(ofs,"berry_phase",berry_phase);
-//	OUTP(ofs,"lda_plus_u",lda_plus_u);
 	
-/* 	ofs << "\n#Parameters (15.vdw-D2)" << endl;												//Peize Lin add 2014-04-05, update 2015-09-30
-	OUTP(ofs,"vdwD2",vdwD2,"calculate vdw-D2 or not");
-	OUTP(ofs,"vdwD2_scaling",vdwD2_scaling,"scaling of vdw-D2");
-	OUTP(ofs,"vdwD2_d",vdwD2_d,"damping parameter");
-	OUTP(ofs,"vdwD2_C6_file",vdwD2_C6_file,"filename of C6");
-	OUTP(ofs,"vdwD2_C6_unit",vdwD2_C6_unit,"unit of C6, Jnm6/mol or eVA6");
-	OUTP(ofs,"vdwD2_R0_file",vdwD2_R0_file,"filename of R0");
-	OUTP(ofs,"vdwD2_R0_unit",vdwD2_R0_unit,"unit of R0, A or Bohr");
-	OUTP(ofs,"vdwD2_model",vdwD2_model,"expression model of periodic structure, radius or period");
-	OUTP(ofs,"vdwD2_radius",vdwD2_radius,"radius cutoff for periodic structure");
-	OUTP(ofs,"vdwD2_radius_unit",vdwD2_radius_unit,"unit of radius cutoff for periodic structure");	
-	ofs << setw(20) << "vdwD2_period" << vdwD2_period.x << " " << vdwD2_period.y << " " << vdwD2_period.z<< " #periods of periodic structure" << endl; */
 	
 	ofs << "\n#Parameters (14.VdW Correction)" << endl;								
+
 //jiyy add 2019-08-04
 	OUTP(ofs,"vdw_method",vdw_method,"the method of calculating vdw (none ; d2 ; d3_0 ; d3_bj");
 	OUTP(ofs,"vdw_s6",vdw_s6,"scale parameter of d2/d3_0/d3_bj");
