@@ -1,6 +1,5 @@
 #include "global.h"
 #include "occupy.h"
-#include "algorithms.h"
 #include "src_global/mymath.h"
 
 Occupy::Occupy(){}

@@ -451,14 +451,14 @@ void Input::Default(void)
 	ocp_set = "none";
 	// for(int i=0; i<10000; i++)
 	// {
-		// ocp_kb[i] = 0.0;
+	// ocp_kb[i] = 0.0;
 	// }
-	
-    cell_factor = 1.2; //LiuXh add 20180619
-    
-    newDM=0; // Shen Yu add 2019/5/9
-         mulliken=0;// qi feng add 2019/9/10
-		 
+
+	cell_factor = 1.2; //LiuXh add 20180619
+
+	newDM=0; // Shen Yu add 2019/5/9
+	mulliken=0;// qi feng add 2019/9/10
+
 //----------------------------------------------------------			//Peize Lin add 2020-04-04
 // restart
 //----------------------------------------------------------

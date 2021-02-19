@@ -4,6 +4,7 @@
 #include "xc_functional.h"
 #include "xc_gga_pw.h"
 #include "efield.h"
+#include "myfunc.h"
 
 void Stress::cal_stress()
 {

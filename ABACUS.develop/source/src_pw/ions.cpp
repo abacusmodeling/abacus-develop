@@ -2,11 +2,9 @@
 #include "ions.h"
 #include "forces.h"
 #include "stress.h"
-#include "algorithms.h"
 #include "../src_pw/global.h" // use chr.
 #include "vdwd2.h"
 #include "vdwd3.h"
-
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01

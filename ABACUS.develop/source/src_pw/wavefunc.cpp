@@ -1,8 +1,6 @@
 #include "wavefunc.h"
 #include "global.h"
-#include "algorithms.h"
 #include "../src_pw/wavefunc_in_pw.h"
-//xiaohui add 2013 -08-01
 #include "src_io/winput.h"
 #include "src_io/chi0_hilbert.h"
 

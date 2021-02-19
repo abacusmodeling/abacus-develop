@@ -5,7 +5,6 @@
 #include "run_lcao.h"
 #include "src_pw/global.h"
 #include "input.h"
-#include "src_pw/algorithms.h"
 #include "src_io/optical.h"
 #include "src_io/cal_test.h"
 #include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029

@@ -7,7 +7,6 @@
 //response theory .
 //-------------------------------------------------------------------------------
 #include "src_pw/global.h"
-#include "src_pw/algorithms.h"
 #include "src_pw/hamilt_pw.h"
 #include "../src_pw/wavefunc_in_pw.h"
 #include "./src_io/optical.h"

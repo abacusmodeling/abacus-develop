@@ -1,5 +1,4 @@
 #include "LCAO_diago.h"
-#include "../src_pw/algorithms.h"
 #include "../src_pw/global.h"
 #include "../src_pdiag/pdiag_double.h"
 #include "../src_io/hs_matrix.h"

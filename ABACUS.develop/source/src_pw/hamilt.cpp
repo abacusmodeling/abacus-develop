@@ -1,6 +1,7 @@
 #include "global.h"
 #include "hamilt.h"
-#include "algorithms.h"
+#include "diago_cg.h"
+#include "diago_david.h"
 
 Hamilt::Hamilt() {}
 Hamilt::~Hamilt() 

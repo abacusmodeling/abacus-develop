@@ -2,6 +2,7 @@
 #include "../src_pw/global.h"
 #include "../src_pw/xc_functional.h"
 #include "../src_pw/xc_gga_pw.h"
+#include "src_pw/myfunc.h"
 
 double Stress_LCAO::stress_invalid_threshold_ev = 0.00;
 
@@ -754,7 +755,7 @@ void Stress_LCAO::cal_stress_cc(void)
 	return;
 }
 
-void Stress_LCAO::cal_stress_har()
+void Stress_LCAO::cal_stress_har(void)
 {
      double shart,g2;
      const double eps=1e-8;
@@ -776,73 +777,72 @@ void Stress_LCAO::cal_stress_har()
     //=============================
     pw.FFT_chg.FFT3D(Porter, -1);
 
-        complex<double> *psic = new complex<double> [pw.nrxx];
-        double *psic0 = new double[pw.nrxx];
-        ZEROS( psic0, pw.nrxx);
-        for(int is=0; is<NSPIN; is++)
-        {
-            daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
-            for (int ir=0; ir<pw.nrxx; ir++)
-            {
-                psic[ir] = complex<double>(psic0[ir], 0.0);
-            }
-        }
+	complex<double> *psic = new complex<double> [pw.nrxx];
+	double *psic0 = new double[pw.nrxx];
+	ZEROS( psic0, pw.nrxx);
+	for(int is=0; is<NSPIN; is++)
+	{
+		daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			psic[ir] = complex<double>(psic0[ir], 0.0);
+		}
+	}
 
-        pw.FFT_chg.FFT3D(psic, -1) ;
+	pw.FFT_chg.FFT3D(psic, -1) ;
+
+	double charge;
+	if (pw.gstart == 1)
+	{
+		charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
+	}
+
+	complex<double> *vh_g  = new complex<double>[pw.ngmc];
+	ZEROS(vh_g, pw.ngmc);
+
+	double g[3];
+	//test
+	//         int i=pw.gstart;
+	//         cout<< "gstart " <<pw.gstart<<endl;
+	double ehart=0;
+	for (int ig = pw.gstart; ig<pw.ngmc; ig++)
+	{
+		const int j = pw.ig2fftc[ig];
+		const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+
+		ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+		//            vh_g[ig] = fac * Porter[j];
+		shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
+		g[0]=pw.gcar[ig].x;
+		g[1]=pw.gcar[ig].y;
+		g[2]=pw.gcar[ig].z;
+		//test
+
+		//   cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
+		//   cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
+		//   cout<<"Porter "<<Porter[j]<<endl;
+		//   cout<<"tpiba2 "<<ucell.tpiba2<<endl;
 
 
-        double charge;
-        if (pw.gstart == 1)
-        {
-                charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
-        }
+		for(l=0;l<3;l++){
+			for(m=0;m<l+1;m++){
+				sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
+			}
+		}
 
-        complex<double> *vh_g  = new complex<double>[pw.ngmc];
-        ZEROS(vh_g, pw.ngmc);
+	}
+	Parallel_Reduce::reduce_double_pool( ehart );
+	ehart *= 0.5 * ucell.omega;
+	//cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
+	for(l=0;l<3;l++){
+		for(m=0;m<l+1;m++){
+			Parallel_Reduce::reduce_double_pool( sigmahar[l][m] );
+		}
+	}
 
-        double g[3];
-//test
-   //         int i=pw.gstart;
-   //         cout<< "gstart " <<pw.gstart<<endl;
-        double ehart=0;
-        for (int ig = pw.gstart; ig<pw.ngmc; ig++)
-        {
-            const int j = pw.ig2fftc[ig];
-            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
-
-            ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-//            vh_g[ig] = fac * Porter[j];
-            shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
-            g[0]=pw.gcar[ig].x;
-            g[1]=pw.gcar[ig].y;
-            g[2]=pw.gcar[ig].z;
-            //test
-
-            //   cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
-            //   cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
-            //   cout<<"Porter "<<Porter[j]<<endl;
-            //   cout<<"tpiba2 "<<ucell.tpiba2<<endl;
-
-
-            for(l=0;l<3;l++){
-               for(m=0;m<l+1;m++){
-                  sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
-               }
-            }
-
-        }
-        Parallel_Reduce::reduce_double_pool( ehart );
-        ehart *= 0.5 * ucell.omega;
-        //cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
-        for(l=0;l<3;l++){
-               for(m=0;m<l+1;m++){
-                  Parallel_Reduce::reduce_double_pool( sigmahar[l][m] );
-            }
-        }
-
-//        Parallel_Reduce::reduce_double_pool( ehart );
-//        ehart *= 0.5 * ucell.omega;
-        //psic(:)=(0.0,0.0)
+	//        Parallel_Reduce::reduce_double_pool( ehart );
+	//        ehart *= 0.5 * ucell.omega;
+	//psic(:)=(0.0,0.0)
 
 	for(l=0;l<3;l++){
 		for(m=0;m<3;m++){
@@ -851,22 +851,22 @@ void Stress_LCAO::cal_stress_har()
 	}
 	for(l=0;l<3;l++)
 		sigmahar[l][l] += en.ehart /ucell.omega;
-     for(l=0;l<3;l++){
-        for(m=0;m<l;m++){
-           sigmahar[m][l]=sigmahar[l][m];
-        }
-     }
+	for(l=0;l<3;l++){
+		for(m=0;m<l;m++){
+			sigmahar[m][l]=sigmahar[l][m];
+		}
+	}
 
-     for(l=0;l<3;l++){
-        for(m=0;m<3;m++){
-           sigmahar[l][m]*=-1;
-        }
-     }
+	for(l=0;l<3;l++){
+		for(m=0;m<3;m++){
+			sigmahar[l][m]*=-1;
+		}
+	}
 
-     delete[] vh_g;
+	delete[] vh_g;
 	delete[] psic;
 	delete[] psic0;
-     return;
+	return;
 }
 
 void Stress_LCAO::cal_stress_gradcorr() 

@@ -1,10 +1,10 @@
 /* hermit.cpp file */
 #include "tools.h"
 #include "global.h"
-#include "algorithms.h"
 #include "hamilt_pw.h"
 #include "src_global/blas_connector.h"
 #include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
+#include "src_pw/myfunc.h"
 
 int Hamilt_PW::moved = 0;
 

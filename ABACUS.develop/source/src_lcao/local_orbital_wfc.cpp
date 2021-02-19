@@ -1,6 +1,5 @@
 #include "local_orbital_wfc.h"
 #include "../src_pw/global.h"
-#include "../src_pw/algorithms.h"
 #include "../src_io/wf_local.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
