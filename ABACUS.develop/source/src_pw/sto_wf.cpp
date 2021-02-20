@@ -4,13 +4,13 @@
 
 Stochastic_WF::Stochastic_WF()
 {
-    chi  = new ComplexMatrix[1];
+    chig  = new ComplexMatrix[1];
     chi0  = new ComplexMatrix[1];
 }
 
 Stochastic_WF::~Stochastic_WF()
 { 
-    delete[] chi;
+    delete[] chig;
     delete[] chi0;
 }
 
@@ -37,11 +37,11 @@ void Stochastic_WF::init()
         chi0[0].c[i]=exp(2*PI*rand()*ui);
     }
 
-    delete[] chi;
+    delete[] chig;
     int nkk = 1; // We temporarily use gamma k point.
-    chi = new ComplexMatrix[nkk];
+    chig = new ComplexMatrix[1];
+    chig[0].create(nchip,nrxx,0);
     return;
 }
-
 
 
