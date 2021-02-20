@@ -70,11 +70,14 @@ void Driver::reading(void)
     //DONE(ofs_running,"READING CARDS");
 
     // (7) Setup the unitcell.
+	// improvement: a) separating the first reading of the atom_card and subsequent
+	// cell relaxation. b) put NLOCAL and NBANDS as input parameters
     ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
     //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
     DONE(ofs_running, "SETUP UNITCELL");
 
-    // (8) symmetry analysize.
+    // (8) Symmetry analysis. 
+	// symmetry analysis should be performed every time the cell is changed
     if (SYMMETRY)
     {
         symm.analy_sys();

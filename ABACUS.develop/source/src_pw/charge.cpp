@@ -53,49 +53,55 @@ Charge::~Charge()
 	}
 }
 
-void Charge::init()
+void Charge::init(const int &nspin_in, const int &nrxx_in, const int &ngmc_in)
 {
     if (test_charge) TITLE("Charge","init");
 
 	assert(allocate_rho == false);
 
+	//  mohan add 2021-02-20
+	this->nspin = nspin_in;
+	this->nrxx = nrxx_in;
+	this->ngmc = ngmc_in;
+
     if (test_charge > 1)
     {
-        cout << "\n spin_number = " << NSPIN
-             << " real_point_number = " << pw.nrxx;
+        cout << "\n spin_number = " << nspin
+             << " real_point_number = " << nrxx;
     }
 
-	// allocate memory
-	rho = new double*[NSPIN];
-	rhog = new complex<double>*[NSPIN];
-	rho_save = new double*[NSPIN];
-	rhog_save = new complex<double>*[NSPIN];
 
-	for(int is=0; is<NSPIN; is++)
+	// allocate memory
+	rho = new double*[nspin];
+	rhog = new complex<double>*[nspin];
+	rho_save = new double*[nspin];
+	rhog_save = new complex<double>*[nspin];
+
+	for(int is=0; is<nspin; is++)
 	{
-		rho[is] = new double[pw.nrxx];
-		rhog[is] = new complex<double>[pw.ngmc];
-		rho_save[is] = new double[pw.nrxx];
-		rhog_save[is] = new complex<double>[pw.ngmc];			
-		ZEROS(rho[is], pw.nrxx);
-		ZEROS(rhog[is], pw.ngmc);
-		ZEROS(rho_save[is], pw.nrxx);
-		ZEROS(rhog_save[is], pw.ngmc);
+		rho[is] = new double[nrxx];
+		rhog[is] = new complex<double>[ngmc];
+		rho_save[is] = new double[nrxx];
+		rhog_save[is] = new complex<double>[ngmc];			
+		ZEROS(rho[is], nrxx);
+		ZEROS(rhog[is], ngmc);
+		ZEROS(rho_save[is], nrxx);
+		ZEROS(rhog_save[is], ngmc);
 	}
 
-    Memory::record("Charge","rho",NSPIN*pw.nrxx,"double");
-    Memory::record("Charge","rho_save",NSPIN*pw.nrxx,"double");
-    Memory::record("Charge","rhog",NSPIN*pw.ngmc,"double");
-    Memory::record("Charge","rhog_save",NSPIN*pw.ngmc,"double");
+    Memory::record("Charge","rho",nspin*nrxx,"double");
+    Memory::record("Charge","rho_save",nspin*nrxx,"double");
+    Memory::record("Charge","rhog",nspin*ngmc,"double");
+    Memory::record("Charge","rhog_save",nspin*ngmc,"double");
 
-    this->rho_core = new double[pw.nrxx]; // core charge in real space
-    ZEROS( rho_core, pw.nrxx);
+    this->rho_core = new double[nrxx]; // core charge in real space
+    ZEROS( rho_core, nrxx);
 
-	this->rhog_core = new complex<double>[pw.ngmc]; // reciprocal core charge
-	ZEROS( rhog_core, pw.ngmc);
+	this->rhog_core = new complex<double>[ngmc]; // reciprocal core charge
+	ZEROS( rhog_core, ngmc);
 
-    Memory::record("Charge","rho_core",pw.nrxx,"double");
-    Memory::record("Charge","rhog_core",pw.ngmc,"double");
+    Memory::record("Charge","rho_core",nrxx,"double");
+    Memory::record("Charge","rhog_core",ngmc,"double");
 
 	this->allocate_rho = true;
     return;

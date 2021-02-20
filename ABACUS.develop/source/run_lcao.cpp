@@ -23,21 +23,23 @@ void Run_lcao::lcao_line(void)
 
     // for LCAO basis, reading the orbitals and construct
     // the interpolation tables.
-    // this part should be moved somewher else -- mohan 2021-01-30
-    if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
-    {
-        // read orbital information.
-        // init overlap matrix table, which is 'S Table'
-        // init kinetical matrix element table, which is 'T Table'
-        // init non-local pseudopotential matrix element table, which is 'NL Table'
-        hm.orb_con.set_orb_tables();
 
-        // xiaohui add 2015-09-06
-        // (1) divide the H and S matrix into each CPU, count the dimensions
-        // (2) set the 'trace' between local H/S and global H/S
-        // (2) allocate the needed H and S memory
-        LM.divide_HS_in_frag();
-    }
+	// read orbital information.
+	// init overlap matrix table, which is 'S Table'
+	// init kinetical matrix element table, which is 'T Table'
+	// init non-local pseudopotential matrix element table, which is 'NL Table'
+	hm.orb_con.set_orb_tables();
+
+	// xiaohui add 2015-09-06
+	// (1) divide the H and S matrix into each CPU, count the dimensions
+	// (2) set the 'trace' between local H/S and global H/S
+	// (2) allocate the needed H and S memory
+	LM.divide_HS_in_frag();
+
+
+//--------------------------------------
+// cell relaxation should begin here
+//--------------------------------------
 
 
     // Initalize the plane wave basis set
@@ -63,7 +65,7 @@ void Run_lcao::lcao_line(void)
 
 
 	// (1) Inititlize the charge density.
-    CHR.init();
+    CHR.init(NSPIN, pw.nrxx, pw.ngmc);
     DONE(ofs_running,"INIT CHARGE");
 
 	// (2) Initializee the potential.

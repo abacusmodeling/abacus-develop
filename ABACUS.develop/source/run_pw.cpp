@@ -50,7 +50,7 @@ void Run_pw::plane_wave_line(void)
     //=====================
     // init potential
     //=====================
-    CHR.init();
+    CHR.init(NSPIN, pw.nrxx, pw.ngmc);
     pot.init(pw.nrxx);
 
     //=====================

@@ -9,8 +9,10 @@ Ask Xiaohui Liu: all functions named with 'after_vc' should be reconstructed.
 The 'FINAL_SCF' global varialble should be removed. 
 (condition: need to reconstruct these codes within a given time)
 
+Ask Xiaohui Liu and Daye Zheng: We need test examples.
+
 Ask Fuxiang He: we need to remove all TDDFT-related global variables
-in global_variable.h
+in global_variable.h, we need TDDFT examples.
 (condition: need to reconstruct these codes within a given time)
 
 Ask Daye Zheng: MD, force, stress modules need reconstruction

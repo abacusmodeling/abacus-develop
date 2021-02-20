@@ -14,9 +14,15 @@
 
 class Charge
 {
+
 public:
+
     Charge();
     ~Charge();
+
+	// mohan update 2021-02-20
+	void init(const int &nspin_in, const int &nrxx_in, const int &ngmc_in);
+
 //==========================================================
 // MEMBER VARIABLES :
 // NAME : rho (nspin,ncxyz), the charge density in real space
@@ -43,7 +49,6 @@ public:
     double *start_mag_type;
     double *start_mag_atom;
 
-    void init();
 
     void atomic_rho(const int spin_number_need, double **rho_in)const;
 
@@ -78,6 +83,11 @@ public:
     void init_final_scf(); //LiuXh add 20180619
 
 	private:
+
+	// mohan add 2021-02-20
+	int nrxx; // number of r vectors in this processor
+	int ngmc; // number of g vectors in this processor
+	int nspin; // number of spins
 
     void sum_band_k();
 

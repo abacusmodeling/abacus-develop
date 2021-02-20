@@ -22,9 +22,8 @@ class potential
     matrix vrs;
     matrix vnew;
     double *vrs1;	// mohan add 2007-11-12
-    double *vext;		// fuxiang add 2017-05
-    double *vextold;		//fuxiang add 2018-01-15
-
+    double *vext;	// fuxiang add 2017-05
+    double *vextold;	//fuxiang add 2018-01-15
 
     // member functions
     void init(const int nrxx);
@@ -37,6 +36,7 @@ class potential
 	// V(rho_atom) is calclated,
 	// V(xc) is not calculated.
 	void init_pot(const int &istep, const bool delta_vh=false, const bool vna=false);
+
     void newd(void);
 
     void v_of_rho( double** rho_in, double &ehart, double &etxc,
