@@ -11,6 +11,7 @@
 #include "src_io/winput.h"
 #include "src_global/sltk_atom_arrange.h"
 #include "src_lcao/local_orbital_ions.h"
+#include "src_io/print_info.h"
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -20,6 +21,33 @@ void Run_lcao::lcao_line(void)
 {
     TITLE("Run_lcao","lcao_line");
 	timer::tick("Run_lcao","lcao_line",'B');
+
+
+    // Setup the unitcell.
+    // improvement: a) separating the first reading of the atom_card and subsequent
+    // cell relaxation. b) put NLOCAL and NBANDS as input parameters
+    ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
+    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
+    DONE(ofs_running, "SETUP UNITCELL");
+
+    // Symmetry analysis.
+    // symmetry analysis should be performed every time the cell is changed
+    if (SYMMETRY)
+    {
+        symm.analy_sys();
+        DONE(ofs_running, "SYMMETRY");
+    }
+
+    // Setup the k points according to symmetry.
+    kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
+    DONE(ofs_running,"INIT K-POINTS");
+
+    // print information
+    // mohan add 2021-01-30
+    Print_Info PI;
+    PI.setup_parameters();
+
+
 
     // for LCAO basis, reading the orbitals and construct
     // the interpolation tables.

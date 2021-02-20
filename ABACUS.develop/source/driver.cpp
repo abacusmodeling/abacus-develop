@@ -5,7 +5,6 @@
 #include "input_conv.h"
 #include "src_lcao/global_fp.h"
 #include "src_pw/global.h"
-#include "src_io/print_info.h"
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"
 
@@ -69,29 +68,6 @@ void Driver::reading(void)
     INPUT.Print( ss1.str() );
     //DONE(ofs_running,"READING CARDS");
 
-    // (7) Setup the unitcell.
-	// improvement: a) separating the first reading of the atom_card and subsequent
-	// cell relaxation. b) put NLOCAL and NBANDS as input parameters
-    ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
-    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
-    DONE(ofs_running, "SETUP UNITCELL");
-
-    // (8) Symmetry analysis. 
-	// symmetry analysis should be performed every time the cell is changed
-    if (SYMMETRY)
-    {
-        symm.analy_sys();
-        DONE(ofs_running, "SYMMETRY");
-    }
-    
-	// (9) Setup the k points according to symmetry.
-	kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
-    DONE(ofs_running,"INIT K-POINTS");
-
-	// (10) print information
-	// mohan add 2021-01-30
-	Print_Info PI;
-	PI.setup_parameters();
 
 	timer::tick("Driver","reading",'A');
 	return;

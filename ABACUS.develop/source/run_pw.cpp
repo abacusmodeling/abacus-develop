@@ -6,6 +6,7 @@
 #include "src_io/winput.h"
 #include "src_io/numerical_basis.h"
 #include "src_io/numerical_descriptor.h"
+#include "src_io/print_info.h"
 
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}
@@ -14,6 +15,33 @@ void Run_pw::plane_wave_line(void)
 {
     TITLE("Run_pw","plane_wave_line");
 	timer::tick("Run_pw","plane_wave_line",'B');
+
+
+    // Setup the unitcell.
+    // improvement: a) separating the first reading of the atom_card and subsequent
+    // cell relaxation. b) put NLOCAL and NBANDS as input parameters
+    ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
+    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
+    DONE(ofs_running, "SETUP UNITCELL");
+
+    // Symmetry analysis.
+    // symmetry analysis should be performed every time the cell is changed
+    if (SYMMETRY)
+    {
+        symm.analy_sys();
+        DONE(ofs_running, "SYMMETRY");
+    }
+
+    // Setup the k points according to symmetry.
+    kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
+    DONE(ofs_running,"INIT K-POINTS");
+
+    // print information
+    // mohan add 2021-01-30
+    Print_Info PI;
+    PI.setup_parameters();
+
+
 
     // Initalize the plane wave basis set
     pw.gen_pw(ofs_running, ucell, kv);

@@ -95,8 +95,11 @@ void UnitCell_pseudo::setup_cell(
 #ifdef __MPI
 	Parallel_Common::bcast_bool(ok);
 	Parallel_Common::bcast_bool(ok2);
-	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG);
-	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG_Z);
+	if(NSPIN==4) 
+	{
+		Parallel_Common::bcast_bool(DOMAG);
+		Parallel_Common::bcast_bool(DOMAG_Z);
+	}
 #endif
 	if(!ok)
 	{
