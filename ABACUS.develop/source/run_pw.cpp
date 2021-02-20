@@ -15,6 +15,28 @@ void Run_pw::plane_wave_line(void)
     TITLE("Run_pw","plane_wave_line");
 	timer::tick("Run_pw","plane_wave_line",'B');
 
+    // Initalize the plane wave basis set
+    pw.gen_pw(ofs_running, ucell, kv);
+    DONE(ofs_running,"INIT PLANEWAVE");
+    cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
+    cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
+
+
+    // mohan add 2010-10-10, just to test the symmetry of a variety
+    // of systems.
+    if(CALCULATION == "test")
+    {
+        Cal_Test::test_memory();
+        QUIT();
+    }
+
+    // mohan add 2010-09-13
+    // initialize the real-space uniform grid for FFT and parallel
+    // distribution of plane waves
+    Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
+        pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
+
+
 //----------------------------------------------------------
 // 1 read in initial data:
 //   a lattice structure:atom_species,atom_positions,lattice vector

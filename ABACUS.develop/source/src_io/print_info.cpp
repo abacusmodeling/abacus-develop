@@ -7,38 +7,34 @@ Print_Info::Print_Info(){}
 Print_Info::~Print_Info(){}
 
 
-void Print_Info::screen_output(void)
+void Print_Info::setup_parameters(void)
 {
+	TITLE("Print_Info","setup_parameters");
 	
-	// the following printing information should be moved to somewhere else -- mohan 2021-01-30
     if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax" || CALCULATION=="nscf"
-	        || CALCULATION=="istate" || CALCULATION=="ienvelope"
-	        || CALCULATION=="md") //pengfei add 2014-10-13
+	        || CALCULATION=="istate" || CALCULATION=="ienvelope" || CALCULATION=="md")
 	{
-		//LM.divide_HS_in_frag(); //move it above 2015-09-06, xiaohui
 		cout << " ---------------------------------------------------------" << endl;
 		if(CALCULATION=="scf")
 		{
-			cout << " This calculation is self-consistent" << endl;
+			cout << " Self-consistent calculations for electrons" << endl;
 		}
 		else if(CALCULATION=="test")
 		{
-			cout << " This calculation is for test" << endl;
+			cout << " Test run" << endl;
 		}
-		if(CALCULATION=="relax") //add 4 lines 2015-09-06, xiaohui
+		if(CALCULATION=="relax")
 		{
-            //cout << " This calculation is structure relaxation" << endl;
-            cout << " This calculation is ion relaxation" << endl;
+            cout << " Ion relaxation calculations" << endl;
 		}
         if(CALCULATION=="cell-relax")
         {
-            cout << " This calculation is cell relaxation" << endl;
+            cout << " Cell relaxation calculations" << endl;
         }
-		if(CALCULATION=="md") //add 4 lines 2015-09-06, xiaohui
+		if(CALCULATION=="md")
 		{
-			cout << " This calculation is molecular dynamics" << endl;
+			cout << " Molecular Dynamics simulations" << endl;
 
-			//xiaohui add 2015-09-15
 			cout << " ---------------------------------------------------------" << endl;
 
 			if(INPUT.md_mdtype ==1 || INPUT.md_mdtype==2)
@@ -55,23 +51,19 @@ void Print_Info::screen_output(void)
 		cout << " ---------------------------------------------------------" << endl;
 
 
-		// TITLE
 		cout << " " << setw(8) << "SPIN"
 		     << setw(16) << "KPOINTS"
 		     << setw(12) << "PROCESSORS";
 
-		//if(LOCAL_BASIS==4) xiaohui modify 2013-09-01
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
+		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 		{
 			cout << setw(12) << "NBASE";
-			cout << setw(12) << "VNA";
 		}
 
 		cout << endl;
 
 
 
-		// data
 		cout << " " << setw(8) << NSPIN;
 
 		if(GAMMA_ONLY_LOCAL)
@@ -103,12 +95,9 @@ void Print_Info::screen_output(void)
 
 		cout << setw(12) << NPROC;
 
-		//if(LOCAL_BASIS==4) xiaohui modify 2013-09-01
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
+		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 		{
 			cout << setw(12) << NLOCAL;
-			// print VNA: no, should delete in future -- mohan 2021-02-09
-			cout << setw(12) << "No";
 		}
 
 		cout << endl;
@@ -117,8 +106,7 @@ void Print_Info::screen_output(void)
 
 
 		cout << " ---------------------------------------------------------" << endl;
-		//if(LOCAL_BASIS==4 && LINEAR_SCALING==1) xiaohui modify 2013-09-01
-		if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
+		if(BASIS_TYPE=="lcao") 
 		{
 			if(COLOUR && MY_RANK==0)
 			{
@@ -131,14 +119,11 @@ void Print_Info::screen_output(void)
 				cout << " Use Systematically Improvable Atomic bases" << endl;
 			}
 		}
-		//else if(LOCAL_BASIS==4 && LINEAR_SCALING==0) xiaohui modify 2013-09-01
-		else if(BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
+		else if(BASIS_TYPE=="lcao_in_pw")
 		{
-			//cout << " Expand Systematically Improvable Atomic bases into plane waves" << endl;
 			cout << " Expand Atomic bases into plane waves" << endl;
 		}
-		//else if(LOCAL_BASIS==0 && LINEAR_SCALING==0) xiaohui modify 2013-09-01
-		else if(BASIS_TYPE=="pw") //xiaohui add 2013-09-01
+		else if(BASIS_TYPE=="pw")
 		{
 			cout << " Use plane wave basis" << endl;
 		}
@@ -152,14 +137,12 @@ void Print_Info::screen_output(void)
 
 		cout << " " << setw(8) << "ELEMENT";
 
-		//if(LOCAL_BASIS==4) xiaohui modify 2013-09-01
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
+		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 		{
 			cout << setw(16) << "ORBITALS";
 			cout << setw(12) << "NBASE";
-			//cout << setw(12) << "NATOM"; //move it below 2015-09-06, xiaohui
 		}
-		cout << setw(12) << "NATOM"; //add 2015-09-06, xiaohui
+		cout << setw(12) << "NATOM";
 
 		cout << setw(12) << "XC";
 		cout << endl;
@@ -170,7 +153,6 @@ void Print_Info::screen_output(void)
 		{
 			if(COLOUR && MY_RANK==0)
 			{
-				//printf( " \e[36m%-8s\e[0m", ucell.atoms[it].label.c_str());
 				printf( " [36m%-8s[0m", ucell.atoms[it].label.c_str());
 			}
 			else
@@ -178,8 +160,7 @@ void Print_Info::screen_output(void)
 				cout << " " << setw(8) << ucell.atoms[it].label;
 			}
 
-			//if(LOCAL_BASIS==4) xiaohui modify 2013-09-01
-			if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-01
+			if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 			{
 				stringstream orb;
 
@@ -249,7 +230,6 @@ void Print_Info::screen_output(void)
 		cout << " Initial plane wave basis and FFT box" << endl;
 		cout << " ---------------------------------------------------------" << endl;
 
-//			cout << " GRID_SPEED           : " << GRID_SPEED << endl;
 	}
 
 	return;

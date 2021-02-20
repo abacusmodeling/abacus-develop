@@ -20,10 +20,7 @@ NEED TO DO:
 Ask Xiaohui: we need to remove DQ and NQX in global_variable.h, 
 but the NQX is computed in ./src_pw/pseudopot_cell_vnl.cpp
 
-Ask Peize: explain exx_lip.h
-
-Ask Yuyang Ji: what's 'ocp' in input.cpp, what are the options 
-about 'ocp' in input_conv.cpp?
+Ask Peize: exx_lip.h and related Exx codes
 
 QUESTION:
 

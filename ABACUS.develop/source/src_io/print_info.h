@@ -12,7 +12,8 @@ class Print_Info
 	Print_Info();
 	~Print_Info();
 
-	void screen_output();
+	// print out to screen about the readin parameters
+	void setup_parameters();
 
 
 };

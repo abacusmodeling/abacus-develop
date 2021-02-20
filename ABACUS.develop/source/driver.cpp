@@ -85,55 +85,10 @@ void Driver::reading(void)
 	kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
     DONE(ofs_running,"INIT K-POINTS");
 
-//---------------------------------------------------------------------------------
-
-	// (10) for LCAO basis, reading the orbitals and construct
-	// the interpolation tables.
-	// this part should be moved somewher else -- mohan 2021-01-30
-	if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-01
-	{
-		// read orbital information.
-		// init overlap matrix table, which is 'S Table'
-		// init kinetical matrix element table, which is 'T Table'
-		// init non-local pseudopotential matrix element table, which is 'NL Table'
-		hm.orb_con.set_orb_tables();
-
-		// xiaohui add 2015-09-06
-		// (1) divide the H and S matrix into each CPU, count the dimensions
-		// (2) set the 'trace' between local H/S and global H/S 
-		// (2) allocate the needed H and S memory
-		LM.divide_HS_in_frag(); 
-	}
-
-	// (11) print information
+	// (10) print information
 	// mohan add 2021-01-30
 	Print_Info PI;
-	PI.screen_output();
-
-//---------------------------------------------------------------------------------
-
-
-	// (12) Initalize the plane wave basis set
-	pw.gen_pw(ofs_running, ucell, kv);
-	DONE(ofs_running,"INIT PLANEWAVE");
-	cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
-	cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
-
-
-	// (13) mohan add 2010-10-10, just to test the symmetry of a variety
-	// of systems.
-	if(CALCULATION == "test")
-	{
-		Cal_Test::test_memory();
-		QUIT();
-	}
-
-	// (14) mohan add 2010-09-13
-	// initialize the real-space uniform grid for FFT and parallel
-	// distribution of plane waves
-	Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp, 
-		pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
-	
+	PI.setup_parameters();
 
 	timer::tick("Driver","reading",'A');
 	return;
@@ -146,7 +101,6 @@ void Driver::atomic_world(void)
 {
 	TITLE("Driver","atomic_world");
 	timer::tick("Driver","atomic_world",'A');
-
 
 	//--------------------------------------------------
 	// choose basis sets:
