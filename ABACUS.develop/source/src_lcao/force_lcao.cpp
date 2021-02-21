@@ -255,7 +255,7 @@ void Force_LCAO::start_force(void)
 	
 
 	// pengfei 2016-12-20
-	if(SYMMETRY)
+	if(Symmetry::symm_flag)
 	{
 		double *pos;
 		double d1,d2,d3;

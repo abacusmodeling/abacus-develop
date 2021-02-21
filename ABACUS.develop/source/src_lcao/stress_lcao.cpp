@@ -234,7 +234,7 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 		}
 	}
 
-    if(SYMMETRY)
+    if(Symmetry::symm_flag)
     {
 		symm.stress_symmetry(scs);
     }//end symmetry

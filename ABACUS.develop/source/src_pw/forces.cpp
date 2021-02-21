@@ -2,6 +2,7 @@
 #include "global.h"
 #include "vdwd2.h"
 #include "vdwd3.h"				  
+#include "symmetry.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -28,7 +29,7 @@ void Forces::init()
 	{
 		vdwd2.force(stress_vdw_pw, STRESS);
 	}
-	if(vdwd3.vdwD3)													//jiyy add 2019-05-18
+	else if(vdwd3.vdwD3)													//jiyy add 2019-05-18
 	{
 		vdwd3.force(stress_vdw_pw, STRESS);
 	}
@@ -96,7 +97,7 @@ void Forces::init()
 		}	
 	}
 	
-	if(SYMMETRY)                                                                 // pengfei 2016-12-20
+	if(Symmetry::symm_flag)
 	{
 		double *pos;
 		double d1,d2,d3;

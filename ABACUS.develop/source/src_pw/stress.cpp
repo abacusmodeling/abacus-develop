@@ -5,6 +5,7 @@
 #include "xc_gga_pw.h"
 #include "efield.h"
 #include "myfunc.h"
+#include "symmetry.h"
 
 void Stress::cal_stress()
 {
@@ -27,10 +28,12 @@ void Stress::cal_stress()
 	}
 	//kinetic contribution
 	stres_knl();
-	if(SYMMETRY)
+
+	if(Symmetry::symm_flag)
 	{
 		symm.stress_symmetry(sigmakin);
 	}//end symmetry
+
 	//hartree contribution
 	stres_har();
 
@@ -52,7 +55,7 @@ void Stress::cal_stress()
     //nonlocal
 	stres_nl();
 
-	if(SYMMETRY)
+	if(Symmetry::symm_flag)
 	{
 		symm.stress_symmetry(sigmanlc);
 	}//end symmetry
@@ -67,7 +70,7 @@ void Stress::cal_stress()
         }
     }
     
-	if(SYMMETRY)                          
+	if(Symmetry::symm_flag)
 	{
 		symm.stress_symmetry(sigmatot);
 	}

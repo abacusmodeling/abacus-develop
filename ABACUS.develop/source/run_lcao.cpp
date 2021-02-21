@@ -12,6 +12,7 @@
 #include "src_global/sltk_atom_arrange.h"
 #include "src_lcao/local_orbital_ions.h"
 #include "src_io/print_info.h"
+#include "src_pw/symmetry.h"
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -30,9 +31,8 @@ void Run_lcao::lcao_line(void)
     //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
     DONE(ofs_running, "SETUP UNITCELL");
 
-    // Symmetry analysis.
     // symmetry analysis should be performed every time the cell is changed
-    if (SYMMETRY)
+    if (Symmetry::symm_flag)
     {
         symm.analy_sys();
         DONE(ofs_running, "SYMMETRY");

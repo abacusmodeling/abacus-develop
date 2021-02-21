@@ -7,6 +7,7 @@
 #include "src_io/numerical_basis.h"
 #include "src_io/numerical_descriptor.h"
 #include "src_io/print_info.h"
+#include "src_pw/symmetry.h"
 
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}
@@ -16,7 +17,6 @@ void Run_pw::plane_wave_line(void)
     TITLE("Run_pw","plane_wave_line");
 	timer::tick("Run_pw","plane_wave_line",'B');
 
-
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put NLOCAL and NBANDS as input parameters
@@ -24,9 +24,8 @@ void Run_pw::plane_wave_line(void)
     //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
     DONE(ofs_running, "SETUP UNITCELL");
 
-    // Symmetry analysis.
     // symmetry analysis should be performed every time the cell is changed
-    if (SYMMETRY)
+    if (Symmetry::symm_flag)
     {
         symm.analy_sys();
         DONE(ofs_running, "SYMMETRY");
@@ -41,14 +40,11 @@ void Run_pw::plane_wave_line(void)
     Print_Info PI;
     PI.setup_parameters();
 
-
-
     // Initalize the plane wave basis set
     pw.gen_pw(ofs_running, ucell, kv);
     DONE(ofs_running,"INIT PLANEWAVE");
     cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
     cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
-
 
     // mohan add 2010-10-10, just to test the symmetry of a variety
     // of systems.
@@ -63,7 +59,6 @@ void Run_pw::plane_wave_line(void)
     // distribution of plane waves
     Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
         pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
-
 
 //----------------------------------------------------------
 // 1 read in initial data:

@@ -19,6 +19,10 @@ Symmetry::~Symmetry()
 
 }
 
+
+bool Symmetry::symm_flag=false;
+
+
 void Symmetry::analy_sys(void)
 {
     if (available == false) return;

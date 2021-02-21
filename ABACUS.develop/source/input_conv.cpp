@@ -19,6 +19,7 @@
 #include "src_ri/exx_abfs-jle.h"
 #include "src_pw/occupy.h"
 #include "src_io/berryphase.h"
+#include "src_pw/symmetry.h"
 
 void Input_Conv::Convert(void)
 {
@@ -128,7 +129,7 @@ void Input_Conv::Convert(void)
 	OUT_LEVEL = INPUT.out_level;
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
 
-    SYMMETRY = INPUT.symmetry;						// 9
+    Symmetry::symm_flag = INPUT.symmetry;						// 9
 	BASIS_TYPE = INPUT.basis_type;
 	KS_SOLVER = INPUT.ks_solver;
 	SEARCH_RADIUS = INPUT.search_radius;

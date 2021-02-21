@@ -44,7 +44,6 @@ extern string	OUT_LEVEL;
 extern int		NSTEP;				// 8.3
 extern int 		NITER;				// 8.4
 
-extern bool 	SYMMETRY;		// 9
 extern string	BASIS_TYPE; //xiaohui add 2013-09-01
 extern string	KS_SOLVER; //xiaohui add 2013-09-01
 extern double	SEARCH_RADIUS;		// 11.1 // mohan add 2011-03-10

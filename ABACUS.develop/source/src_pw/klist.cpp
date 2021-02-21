@@ -1,6 +1,7 @@
 #include "global.h"
 #include "klist.h"
 #include "../src_parallel/parallel_global.h"
+#include "symmetry.h"
 
 kvect::kvect()
 {	
@@ -95,7 +96,7 @@ void kvect::set(
 	}
 
     // (2)
-    if (SYMMETRY)
+	if(Symmetry::symm_flag)
     {
         this->ibz_kpoint(symm);
         this->update_use_ibz();
@@ -280,7 +281,7 @@ bool kvect::read_kpoints(const string &fn)
 		else if (kword == "Line_Cartesian" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(SYMMETRY)
+			if(Symmetry::symm_flag)
 			{
 				WARNING("kvect::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;
@@ -368,7 +369,7 @@ bool kvect::read_kpoints(const string &fn)
 		else if (kword == "Line_Direct" || kword == "L" || kword == "Line" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(SYMMETRY)
+			if(Symmetry::symm_flag)
 			{
 				WARNING("kvect::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;

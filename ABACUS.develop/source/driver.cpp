@@ -21,10 +21,8 @@ void Driver::init()
 	// (1) read the input parameters.
 	this->reading();
 
-
 	// (2) welcome to the atomic world!
 	this->atomic_world();
-
 
 	// (3) close all of the running logs 
 	INPUT.close_log();
@@ -36,8 +34,6 @@ void Driver::init()
 void Driver::reading(void)
 {
 	timer::tick("Driver","reading",'A');
-
-//---------------------------------------------------------------------------------
 
 	// (1) read INPUT 
 	INPUT.Init( global_in_card );
@@ -68,13 +64,9 @@ void Driver::reading(void)
     INPUT.Print( ss1.str() );
     //DONE(ofs_running,"READING CARDS");
 
-
 	timer::tick("Driver","reading",'A');
 	return;
 }
-
-
-
 
 void Driver::atomic_world(void)
 {
@@ -103,6 +95,3 @@ void Driver::atomic_world(void)
 
 	return;
 }
-
-
-

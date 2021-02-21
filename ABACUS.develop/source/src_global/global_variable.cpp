@@ -41,7 +41,6 @@ string  OUT_LEVEL = "ie";
 int		NSTEP = 20;
 int 	NITER = 50;
 
-bool 	SYMMETRY = false;
 string	BASIS_TYPE = "pw"; //xiaohui add 2013-09-01
 string	KS_SOLVER = "cg"; //xiaohui add 2013-09-01
 double	SEARCH_RADIUS = -1.0;
