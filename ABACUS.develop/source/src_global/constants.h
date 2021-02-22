@@ -11,7 +11,6 @@ using namespace std;
 // GLOBAL CONSTANTS 
 //==========================================================
 
-
 //==========================================================
 // EXPLAIN : constants
 // NAME : pi
@@ -93,11 +92,6 @@ const double AMCONV = 1.660538782e-27 / 9.10938215e-31 * 0.50; // mass conversio
 const double uakbar = 147105.0;					// pressure conversion from Ry/(a.u)^3 to K
 
 // zero up to a given accuracy
-const double eps4  = 1.0e-4;
-const double eps8  = 1.0e-8;
-const double eps9  = 1.0e-9;
-const double eps16 = 1.0e-16;
-const double eps32 = 1.0e-32;
 const double epsr  = 1.0e-6;
 const double epsg  = 1.0e-10;
 

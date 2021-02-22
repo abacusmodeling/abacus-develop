@@ -124,7 +124,8 @@ void Numerical_Nonlocal::set_type_info
 							for (int L2 = 0; L2 < nproj_soc; L2++)
 							{
 								this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
-								if(fabs(this->Coefficient_D_so(is, L1, L2).real())>eps8 || fabs(this->Coefficient_D_so(is, L1, L2).imag())>eps8)
+								if(fabs(this->Coefficient_D_so(is, L1, L2).real())>1.0e-8 || 
+									fabs(this->Coefficient_D_so(is, L1, L2).imag())>1.0e-8 )
 								{
 									this->index1_soc[is][non_zero_count_soc[is]] = L1;
 									this->index2_soc[is][non_zero_count_soc[is]] = L2;
@@ -150,7 +151,8 @@ void Numerical_Nonlocal::set_type_info
 							{
 								if(is==1||is==2) this->Coefficient_D_so(is, L1, L2) = ZERO;
 								else this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
-								if(abs(this->Coefficient_D_so(is, L1, L2).real())>eps8 || abs(this->Coefficient_D_so(is, L1, L2).imag())>eps8)
+								if(abs(this->Coefficient_D_so(is, L1, L2).real())>1.0e-8 
+									|| abs(this->Coefficient_D_so(is, L1, L2).imag())>1.0e-8)
 								{
 									this->index1_soc[is][non_zero_count_soc[is]] = L1;
 									this->index2_soc[is][non_zero_count_soc[is]] = L2;

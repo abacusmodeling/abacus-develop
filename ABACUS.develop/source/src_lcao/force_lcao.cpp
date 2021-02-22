@@ -926,13 +926,15 @@ void Force_LCAO::cal_force_scc(void)
 
 void Force_LCAO::cal_stress(matrix &stress)
 {
-     Stress_LCAO SS;
-     SS.allocate();
-     SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi, this->stress_vdw);
+	TITLE("Force_LCAO","cal_stress");
 
-    double unit_transform = 0.0;
-    unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
-    double external_stress[3] = {PRESS1,PRESS2,PRESS3};
+	Stress_LCAO SS;
+	SS.allocate();
+	SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi, this->stress_vdw);
+
+	double unit_transform = 0.0;
+	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+	double external_stress[3] = {PRESS1,PRESS2,PRESS3};
 
 	for(int i=0;i<3;i++)
 	{
@@ -949,7 +951,10 @@ void Force_LCAO::cal_stress(matrix &stress)
 	}
     PRESSURE = (SS.scs[0][0]+SS.scs[1][1]+SS.scs[2][2])/3;
 
-    if(INPUT.dft_plus_u) PRESSURE += (dftu.stress_dftu.at(0).at(0) + dftu.stress_dftu.at(1).at(1) + dftu.stress_dftu.at(2).at(2))/3.0;
+    if(INPUT.dft_plus_u) 
+	{
+		PRESSURE += (dftu.stress_dftu.at(0).at(0) + dftu.stress_dftu.at(1).at(1) + dftu.stress_dftu.at(2).at(2))/3.0;
+	}
 
     return;
 }

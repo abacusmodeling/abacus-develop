@@ -99,7 +99,11 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	NQX = this->calculate_nqx(pw.ecutwfc,DQ) * cell_factor; //LiuXh add 20180619
 	// nqx = (sqrt(ecutwfc)/dq+4)*cell_factor;
 	//
-	//	nbrx is defined in constant.h
+
+	
+	// mohan update 2021-02-22
+	const int nbrx = 10;
+	const int nbrx_nc = 20;
 	//  max number of beta functions
 	if(NSPIN!=4) this->tab.create(ntype, nbrx, NQX);
 	else this->tab.create(ntype, nbrx_nc, NQX);
@@ -570,6 +574,11 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 			}
 		}
 	} 
+
+
+	// max number of beta functions
+	const int nbrx = 10;
+
 	const double pref = FOUR_PI / sqrt(ucell.omega);
 	this->tab_alpha.create(ucell.ntype, nbrx, lmaxkb+2, NQX);
 	this->tab_alpha.zero_out();

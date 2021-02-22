@@ -312,7 +312,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		stress.create(3,3);
 
 		double unit_transform = 0.0;
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 		double external_stress[3] = {PRESS1,PRESS2,PRESS3};
 		for(int i=0;i<3;i++)
 		{
@@ -373,7 +373,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 stress.create(3,3);
 
                 double unit_transform = 0.0;
-                unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+                unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
                 double external_stress[3] = {PRESS1,PRESS2,PRESS3};
                 for(int i=0;i<3;i++)
                 {
@@ -447,7 +447,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             stress.create(3,3);
 
             double unit_transform = 0.0;
-            unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+            unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
             double external_stress[3] = {PRESS1,PRESS2,PRESS3};
             for(int i=0;i<3;i++)
             {

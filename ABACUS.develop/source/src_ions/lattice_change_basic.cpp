@@ -175,7 +175,7 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 	}
 
 	double unit_transform = 0.0;
-	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 	Lattice_Change_Basic::largest_grad = Lattice_Change_Basic::largest_grad * unit_transform;
 	stress_ii_max = stress_ii_max * unit_transform;
 	

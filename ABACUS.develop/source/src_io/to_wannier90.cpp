@@ -97,15 +97,24 @@ void toWannier90::read_nnkp()
 				  
 		real_lattice_nnkp = real_lattice_nnkp / ucell.lat0_angstrom;
 		
-		if(abs(real_lattice_nnkp.e11 - ucell.latvec.e11) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e12 - ucell.latvec.e12) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e13 - ucell.latvec.e13) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e21 - ucell.latvec.e21) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e22 - ucell.latvec.e22) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e23 - ucell.latvec.e23) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e31 - ucell.latvec.e31) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e32 - ucell.latvec.e32) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e33 - ucell.latvec.e33) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e11 - ucell.latvec.e11) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e12 - ucell.latvec.e12) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e13 - ucell.latvec.e13) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e21 - ucell.latvec.e21) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e22 - ucell.latvec.e22) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e23 - ucell.latvec.e23) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e31 - ucell.latvec.e31) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e32 - ucell.latvec.e32) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
+		if(abs(real_lattice_nnkp.e33 - ucell.latvec.e33) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		
 	}
 	
@@ -119,16 +128,24 @@ void toWannier90::read_nnkp()
 		const double tpiba_angstrom = TWO_PI / ucell.lat0_angstrom;
 		recip_lattice_nnkp = recip_lattice_nnkp / tpiba_angstrom;
 		
-		if(abs(recip_lattice_nnkp.e11 - ucell.G.e11) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e12 - ucell.G.e12) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e13 - ucell.G.e13) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e21 - ucell.G.e21) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e22 - ucell.G.e22) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e23 - ucell.G.e23) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e31 - ucell.G.e31) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e32 - ucell.G.e32) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e33 - ucell.G.e33) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		
+		if(abs(recip_lattice_nnkp.e11 - ucell.G.e11) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e12 - ucell.G.e12) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e13 - ucell.G.e13) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e21 - ucell.G.e21) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e22 - ucell.G.e22) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e23 - ucell.G.e23) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e31 - ucell.G.e31) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e32 - ucell.G.e32) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
+		if(abs(recip_lattice_nnkp.e33 - ucell.G.e33) > 1.0e-4) 
+			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 	}
 	
 	if( SCAN_BEGIN(nnkp_read,"kpoints") )
@@ -142,9 +159,12 @@ void toWannier90::read_nnkp()
 		for(int ik = 0; ik < numkpt_nnkp; ik++)
 		{
 			nnkp_read >> kpoints_direct_nnkp[ik].x >> kpoints_direct_nnkp[ik].y >> kpoints_direct_nnkp[ik].z;
-			if(abs(kpoints_direct_nnkp[ik].x - kv.kvec_d[ik].x) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
-			if(abs(kpoints_direct_nnkp[ik].y - kv.kvec_d[ik].y) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
-			if(abs(kpoints_direct_nnkp[ik].z - kv.kvec_d[ik].z) > eps4) WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+			if(abs(kpoints_direct_nnkp[ik].x - kv.kvec_d[ik].x) > 1.0e-4) 
+				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+			if(abs(kpoints_direct_nnkp[ik].y - kv.kvec_d[ik].y) > 1.0e-4) 
+				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
+			if(abs(kpoints_direct_nnkp[ik].z - kv.kvec_d[ik].z) > 1.0e-4) 
+				WARNING_QUIT("toWannier90::read_nnkp","Error kpoints in *.nnkp file");
 		}
 				
 		delete[] kpoints_direct_nnkp;

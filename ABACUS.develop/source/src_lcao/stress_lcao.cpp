@@ -360,7 +360,7 @@ void Stress_LCAO::printstress_total(bool ry)
 
 	if(!ry)
 	{
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
 //	cout.setf(ios::fixed);
 
