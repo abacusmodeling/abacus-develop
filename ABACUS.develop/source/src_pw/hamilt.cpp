@@ -12,16 +12,6 @@ Hamilt::~Hamilt()
 	}
 }
 
-void Hamilt::init(const bool use_pw)
-{
-    TITLE("Hamilt","init");
-//	ofs_running << " use_pw=" << use_pw << endl;
-    if (use_pw) 
-	{
-        this->hpw.init();
-    }
-    return;
-}
 
 void Hamilt::init_k(const int ik)
 {

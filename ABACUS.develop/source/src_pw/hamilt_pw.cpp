@@ -1,4 +1,3 @@
-/* hermit.cpp file */
 #include "tools.h"
 #include "global.h"
 #include "hamilt_pw.h"
@@ -31,7 +30,7 @@ Hamilt_PW::~Hamilt_PW()
 }
 
 
-void Hamilt_PW::init(void)
+void Hamilt_PW::init(const int &npwx, const int &npol, const int &nkb, const int &nrxx)
 {
     TITLE("Hamilt_PW","init");
 
@@ -41,15 +40,15 @@ void Hamilt_PW::init(void)
     delete[] Bec;
     delete[] Ps;
 
-    this->hpsi = new complex<double> [wf.npwx * NPOL];
-    this->spsi = new complex<double> [wf.npwx * NPOL];
-    this->GR_index = new int[pw.nrxx];
-    this->Bec = new complex<double> [ppcell.nkb];
-    this->Ps  = new complex<double> [ppcell.nkb * NPOL];
+    this->hpsi = new complex<double> [npwx * npol];
+    this->spsi = new complex<double> [npwx * npol];
+    this->GR_index = new int[nrxx];
+    this->Bec = new complex<double> [nkb];
+    this->Ps  = new complex<double> [nkb * npol];
 
-    ZEROS(this->hpsi,wf.npwx * NPOL);
-    ZEROS(this->spsi,wf.npwx * NPOL);
-    ZEROS(this->GR_index, pw.nrxx);
+    ZEROS(this->hpsi, npwx * npol);
+    ZEROS(this->spsi, npwx * npol);
+    ZEROS(this->GR_index, nrxx);
 //    ofs_running << "\n Hamiltonian allocate done."<<endl;
     return;
 }

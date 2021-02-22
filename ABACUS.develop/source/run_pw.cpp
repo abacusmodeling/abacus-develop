@@ -90,8 +90,7 @@ void Run_pw::plane_wave_line(void)
     //=====================
     // init hamiltonian
     //=====================
-    hm.init();
-//  DONE(ofs_running,"CHARGE, POTENTIAL, WAVE FUNCTINOS ALLOCATION");
+    hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential

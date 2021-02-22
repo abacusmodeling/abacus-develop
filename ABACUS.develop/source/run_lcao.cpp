@@ -120,24 +120,20 @@ void Run_lcao::lcao_line(void)
 	switch (uoc)
 	{
 		case ALL_LO:
-			// (4) Init the local wave functions.
+			// Init the local wave functions.
 			wf.init_local();
-			// (5) Init the FFT.
+			// Init the FFT.
 			UFFT.allocate();
-			// (6) Init the hamiltonian. 
-			// first0 stands for nkb, but no used.
-			// second0 stands for no use hpw.init()
-			hm.init(0);
-			// (7) Init the local part of NC pseudopotential.
+			// Init the local part of NC pseudopotential.
 			ppcell.init_vloc();
-			// (8) Init the potential.
+			// Init the potential.
 			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
 			break;
 		case SOME_PW:
 			wf.init(kv.nks);
 			UFFT.allocate();
 			ppcell.init(ucell.ntype);
-			hm.init();
+    		hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
 			ppcell.init_vloc();
 			ppcell.init_vnl();
 			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs

@@ -13,7 +13,8 @@ public:
 
     static int moved;
 
-    void init(void);
+	// mohan updated 2021-02-22
+	void init(const int &npwx, const int &npol, const int &nkb, const int &nrxx);
 
     void diag_zheev
     (

@@ -12,8 +12,6 @@ class Hamilt
     Hamilt();
     ~Hamilt();
 
-    void init(const bool use_pw = true);
-
     void init_k(const int ik);
 
     void init_before_ions(void);
