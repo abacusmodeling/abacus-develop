@@ -225,7 +225,9 @@ bool kvect::read_kpoints(const string &fn)
 
     this->k_kword = kword; //LiuXh add 20180619
 
-    if (nkstot > MAX_KPOINTS)
+	// mohan update 2021-02-22
+	int max_kpoints = 100000;
+    if (nkstot > 100000)
     {
 		ofs_warning << " nkstot > MAX_KPOINTS" << endl;
         return 0;

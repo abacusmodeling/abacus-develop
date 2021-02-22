@@ -55,7 +55,10 @@ void pseudo_h::set_pseudo_h(const Pseudopot_upf &upf)
 
 	this->lmax = upf.lmax;
 	this->mesh = upf.mesh;
-
+	
+	// mohan update 2021-02-22
+	//  max number of points in the atomic radial mesh
+	int ndmx = 2000; 
 	if (this->mesh > ndmx)
 	{
 		cout << "\n set_pseudo_h, too many grid points,";

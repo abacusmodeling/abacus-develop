@@ -104,7 +104,10 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	if(NSPIN!=4) this->tab.create(ntype, nbrx, NQX);
 	else this->tab.create(ntype, nbrx_nc, NQX);
 
-	// nchix is defined in constant.h
+	
+	// mohan update 2021-02-22
+	int nchix = 10;
+	int nchix_nc = 20;
 	// nchix : max number of atomic wavefunctions per atom
 	if(NSPIN!=4) this->tab_at.create(ntype, nchix, NQX);
 	else this->tab_at.create(ntype, nchix_nc, NQX);

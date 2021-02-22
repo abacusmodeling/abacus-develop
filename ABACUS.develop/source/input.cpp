@@ -2553,15 +2553,15 @@ void Input::Check(void)
         WARNING_QUIT("Input","wrong start_wfc, please use 'atomic' or 'random' or 'file' ");
     }
 
-    if (nbands > nbndxx)
+    if (nbands > 100000)
     {
-        WARNING_QUIT("Input","nbnd out of range, increase nbndxx!");
+        WARNING_QUIT("Input","nbnd >100000, out of range");
     }
     if ( nelec > 0 && nbands > 0 && nelec > 2*nbands )
     {
         WARNING_QUIT("Input","nelec > 2*nbnd , bands not enough!");
     }
-    if (nspin < 1  || nspin > nspinx)
+    if (nspin < 1  || nspin > 4)
     {
         WARNING_QUIT("Input","nspin out of range!");
     }

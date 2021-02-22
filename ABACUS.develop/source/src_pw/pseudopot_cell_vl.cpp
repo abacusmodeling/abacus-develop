@@ -81,38 +81,14 @@ void pseudopot_cell_vl::allocate(void)
 	for (int it = 0; it < ucell.ntype; it++)
 	{ this->numeric[it] = true; }
 
+	// mohan change global variable 'npsx' to local variable,
+	// 2021-02-22
+	int npsx = 50;
 	delete[] zp; 
 	this->zp = new double[npsx];
 	ZEROS(zp, npsx);
 	// npsx( max number of different PPs)
 
-	/*
-	cc.create(npsx, 2);
-	alpc.create(npsx, 2);
-	aps.create(npsx, 4, 6);
-	alps.create(npsx, 4, 3);
-
-	a_nlcc = new double[npsx];
-	ZEROS(a_nlcc, npsx);
-
-	b_nlcc = new double[npsx];
-	ZEROS(b_nlcc, npsx);
-
-	alpha_nlcc = new double[npsx];
-	ZEROS(alpha_nlcc, npsx);
-
-	nlc  = new int[npsx];
-	ZEROS(nlc, npsx);
-
-	nnl  = new int[npsx];
-	ZEROS(nnl, npsx);
-
-	lmax = new int[npsx];
-	ZEROS(lmax, npsx);
-
-	lloc = new int[npsx];
-	ZEROS(lloc, npsx);
-	*/
 	return;
 }
 

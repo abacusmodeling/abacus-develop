@@ -101,38 +101,4 @@ const double eps32 = 1.0e-32;
 const double epsr  = 1.0e-6;
 const double epsg  = 1.0e-10;
 
-//==========================================================
-// EXPLAIN : max constants we limit.(x stands for max)
-// NAME : nspinx( max number of sionors )
-// NAME : ntypx( max number of different types of atom)
-// NAME : npsx( max number of different PPs)
-// NAME : natx( maximum number of atoms )
-// NAME : nbndxx( maximum number of electronic states )
-// NAME : MAX_KPOINTS( max number of k-points)
-// NAME : nchix( max number of atomic wavefunctions per atom)
-// NAME : ndmx( max number of points in the atomic radial mesh)
-//==========================================================
-const int nspinx= 4;
-const int ntypx = 50;
-const int npsx  = ntypx;
-const int natx  = 1000000;
-const int nbndxx= 4000000;
-const int MAX_KPOINTS = 40000;// npk
-const int nchix = 10;
-const int nchix_nc = 20;
-const int ndmx  = 2000;
-
-//==========================================================
-// NAME : lmaxx( max non-local angular momentum)
-// NAME : nbrx( max number of beta functions )
-// NAME : lqmax( max number of angular momenta of Q) 
-// NAME : nqfx( max number of coefficients in Q smoothing)
-//==========================================================
-#ifndef __EPM
-const int lmaxx = 3;
-const int nbrx  = 10;
-const int nbrx_nc = 20;
-const int lqmax = 2*lmaxx + 1;
-const int nqfx  = 8;
-#endif
 #endif 
