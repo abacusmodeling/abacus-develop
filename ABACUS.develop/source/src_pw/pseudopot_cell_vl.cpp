@@ -15,9 +15,11 @@ pseudopot_cell_vl::~pseudopot_cell_vl()
 	delete[] zp;
 }
 
-// from init_vloc.f90
+
 void pseudopot_cell_vl::init_vloc(void)
 {
+	TITLE("pseudopot_cell_vl","init_vloc");
+
 	// This routine computes the fourier coefficient of the local
 	// potential vloc(ig,it) for each type of atom
 	if(test_pp > 0) TITLE("pseudopot_cell_vl","init_vloc");
@@ -30,13 +32,9 @@ void pseudopot_cell_vl::init_vloc(void)
 	
 	for (int it = 0; it < ucell.ntype; it++) 
 	{
-	//	ofs_running << " it=" << it << endl;
-	//	ofs_running << " numeric[it]=" << numeric[it] << endl;
-
 		const Atom* atom = &ucell.atoms[it];
 
 		ZEROS(vloc1d, pw.nggm);
-		//HLX(05-24-06): add zp[it]=ucell.atoms[it].zv; read zp[it] from atoms
 
 		this->zp[it] = atom->zv;
 
@@ -56,17 +54,17 @@ void pseudopot_cell_vl::init_vloc(void)
 			WARNING_QUIT("init_vloc","not available now.");
 		}
 
-		dcopy(vloc1d, this->vloc,it); //HLX(05-23-06): dcopy might have problems, check later!
+		dcopy(vloc1d, this->vloc,it);
 	} 
 
 
-	delete [] vloc1d;
+	delete[] vloc1d;
 
 	this->print_vloc();
 
 	timer::tick("ppcell_vl","init_vloc",'C');
 	return;
-} // end subroutine init_vloc
+}
 
 
 void pseudopot_cell_vl::allocate(void)
@@ -82,12 +80,12 @@ void pseudopot_cell_vl::allocate(void)
 	{ this->numeric[it] = true; }
 
 	// mohan change global variable 'npsx' to local variable,
+	// npsx( max number of different PPs)
 	// 2021-02-22
 	int npsx = 50;
 	delete[] zp; 
 	this->zp = new double[npsx];
 	ZEROS(zp, npsx);
-	// npsx( max number of different PPs)
 
 	return;
 }
@@ -99,7 +97,7 @@ void pseudopot_cell_vl::allocate(void)
 !
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-// from vloc_of_g.f90
+
 // Here we always have numeric form, i.e. numeric=ture
 void pseudopot_cell_vl::vloc_of_g(
 		const int& msh, 
@@ -199,6 +197,7 @@ void pseudopot_cell_vl::vloc_of_g(
 	delete [] aux1;
 	return;
 } // end subroutine vloc_of_g
+
 
 void pseudopot_cell_vl::print_vloc(void)const
 {

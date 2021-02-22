@@ -9,7 +9,6 @@
 
 potential::potential()
 {
-    this->test = 0;
     vltot = new double[1];
     vrs1 = new double[1];
     this->out_potential = 0;
@@ -953,7 +952,7 @@ void potential::set_vrs(void)
 } //end subroutine set_vrs
 
 // ----------------------------------------------------------------------
-void potential::newd()
+void potential::newd(void)
 {
     if (test_potential) TITLE("potential","newd");
 
@@ -966,83 +965,58 @@ void potential::newd()
     //  This routine computes the integral of the effective potential with
     //  the Q function and adds it to the bare ionic D term which is used
     //  to compute the non-local term in the US scheme.
-    if (!ppcell.okvan)
-    {
-        // no ultrasoft potentials: use bare coefficients for projectors
-        // if( spin_orbital) ....
-        // else if(noncolin) ....
-        for (int iat=0; iat<ucell.nat; iat++)
-        {
-            const int it = ucell.iat2it[iat];
-            const int nht = ucell.atoms[it].nh;
-            // nht: number of beta functions per atom type
-            for (int is = 0; is < NSPIN; is++)
-            {
-                for (int ih=0; ih<nht; ih++)
-                {
-                    for (int jh=ih; jh<nht; jh++)
-                    {
-                        if(LSPINORB)
-                        {
-                            ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
-                            ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
-                        }
-                        else if( NSPIN==4 )
-                        {
-                            if(is==0)
-                            {
-                                ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-                                ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-                            }
-                            else if(is==1)
-                            {
-                                ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-                                ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-                            }
-                            else if(is==2)
-                            {
-                                ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-                                ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
-                            }
-                            else if(is==3)
-                            {
-                                ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-                                ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-                            }
-                        }
-                        else{
-                            ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-                            ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
-                        }
-                    }
-                }
-            }
-        }
-        return;
-    }
 
-    //====================
-    // if use PAW method
-    //====================
-    /*   if (okpaw) then
-     ! Add paw contributions to deeq (computed in paw_potential)
-     do na=1,nat
-        nt = ityp(na)
-        IF (.not.upf(nt)%tpawp) cycle
-        ijh=0
-        do ih=1,nh(nt)
-           do jh=ih,nh(nt)
-              ijh=ijh+1
-              deeq(ih,jh,na,1:nspin) = deeq(ih,jh,na,1:nspin) &
-                                     + ddd_paw(ijh,na,1:nspin)
-              deeq(jh,ih,na,1:nspin) = deeq(ih,jh,na,1:nspin)
-           end do
-        end do
-     end do
-    end IF
-    */
-
-    return;
+	// no ultrasoft potentials: use bare coefficients for projectors
+	// if( spin_orbital) ....
+	// else if(noncolin) ....
+	for (int iat=0; iat<ucell.nat; iat++)
+	{
+		const int it = ucell.iat2it[iat];
+		const int nht = ucell.atoms[it].nh;
+		// nht: number of beta functions per atom type
+		for (int is = 0; is < NSPIN; is++)
+		{
+			for (int ih=0; ih<nht; ih++)
+			{
+				for (int jh=ih; jh<nht; jh++)
+				{
+					if(LSPINORB)
+					{
+						ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
+						ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
+					}
+					else if( NSPIN==4 )
+					{
+						if(is==0)
+						{
+							ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+							ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+						}
+						else if(is==1)
+						{
+							ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+							ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+						}
+						else if(is==2)
+						{
+							ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+							ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+						}
+						else if(is==3)
+						{
+							ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+							ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+						}
+					}
+					else{
+						ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
+						ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+					}
+				}
+			}
+		}
+	}
+	return;
 } // end subroutine newd
 
 void potential::print_pot(ofstream &ofs)const
@@ -1057,185 +1031,7 @@ void potential::print_pot(ofstream &ofs)const
 
 }
 
-/*
 
-// from mix_potential.f90
-//-----------------------------------------------------------------------
-void potential::mix_potential (int ndim, double *vout, double *vin, double alphamix,
-                           double &dr2, double tr2, int iter, int n_iter, string filename,
-                           bool &conv)
-{
-    cout << "\n ==== mix_potential() ==== ";
-    //-----------------------------------------------------------------------
-    //
-    // Modified Broyden"s method for potential/charge density mixing
-    //             D.D.Johnson, PRB 38, 12807 (1988)
-    // On input :
-    //    ndim      dimension of arrays vout, vin
-    //    vout      output potential/rho at current iteration
-    //    vin       potential/rho at previous iteration
-    //    alphamix  mixing factor (0 < alphamix <= 1)
-    //    tr2       threshold for selfconsistency
-    //    iter      current iteration number
-    //    n_iter    number of iterations used in the mixing
-    //    filename  if present save previous iterations on file "filename"
-    //              otherwise keep everything in memory
-    // On output:
-    //    dr2       [(vout-vin)/ndim]^2
-    //    vin       mixed potential
-    //    vout      vout-vin
-    //    conv      true if dr2 <= tr2
-
-    //   First the dummy variables
-    // character (len=42) :: filename
-    // integer :: ndim, iter, n_iter
-    // real(kind=DP) :: vout (ndim), vin (ndim), alphamix, dr2, tr2
-    // logical :: conv
-
-    //   Here the local variables
-
-    // max number of iterations used in mixing: n_iter must be .le. maxter
-    // parameter :
-    int maxter = 8;
-
-    int n, i, j, *iwork, info, iter_used,
-    ipos, inext, ndimtot;
-    iwork = new int[maxter];
-    assert(iwork != 0);
-    // work space containing info from previous iterations:
-    // must be kept in memory and saved between calls if filename=' '
-
-    // allocatable, save ::
-    matrix  df, dv ;
-    double *vinsave, *ework;
-    ework = new double[maxter];
-    assert(ework != 0);
-    matrix beta (maxter, maxter);
-    double gamma, norm;
-
-    // adjustable parameters as suggested in the original paper
-    double *w, w0;
-    w = new double[maxter];
-    // data :
-    w0 = 0.010 ;
-    // w / maxter * 1.0 / ?
-
-    double *work;
-    work = new double[maxter];//?
-    assert(work != 0);
-    start_clock ("mix_pot");
-
-    if (iter < 1)
-        cout << "\n mix_potential, iter is wrong";
-    if (nmix > maxter)
-        cout << "\n mix_potential, nmix too big";
-    if (ndim <= 0)
-        cout << "\n mix_potential, ndim <= 0";
-
-    for(n=0;n<ndim;n++){ //	do n = 1, ndim
-        vout [n] -= vin [n];
-    } //  enddo
-    // dr2 = dnrm2 (ndim, vout, 1) **2;
-    dr2 = dnrm2 (ndim, vout, 1) ;
-    dr2 *= dr2;
-    ndimtot = ndim;
-#ifdef __PARA
-    reduce (1, dr2);
-    ireduce (1, ndimtot);
-#endif
-    dr2 = (sqrt (dr2) / ndimtot);	// **2;
-    dr2 *= dr2;
-    conv_elec = dr2 < tr2;
-    if (iter == 1){
-        matrix df( nmix, ndim );
-        matrix dv( nmix, ndim );
-    } //  endif
-    if (conv_elec) {
-        dv.freemem();
-        df.freemem();
-        stop_clock ("mix_pot");
-        return;
-    } // endif
-    vinsave = new double [ndim];
-
-    // iter_used = iter-1  if iter <= n_iter
-    // iter_used = n_iter  if iter >  n_iter
-    iter_used = (iter - 1 < nmix)?(iter-1):nmix;	// min
-    // ipos is the position in which results from the present iteraction
-    // are stored. ipos=iter-1 until ipos=n_iter, then back to 1,2,...
-
-    ipos = iter - 1 - ( (iter - 2) / nmix) * nmix;
-    if (iter > 1){
-        for(n=0;n<ndim;n++){ //  do n = 1, ndim
-            df (ipos, n) = vout [n] - df (ipos, n);
-            dv (ipos, n) = vin  [n] - dv (ipos, n);
-        } //  enddo
-        // norm = (dnrm2 (ndim, df (1, ipos), 1) ) **2;
-        norm = dnrm2 (df,ipos);
-        norm *= norm;
-#ifdef __PARA
-        reduce (1, norm);
-#endif
-        norm = sqrt (norm);
-        dscal (1.0 / norm, df,ipos);	// dscal(ndim,1.0/norm,df (1, ipos), 1);
-        dscal (1.0 / norm, dv,ipos);	// dscal(ndim,1.0/norm,dv (1, ipos), 1);
-    } //  endif
-
-    dcopy (ndim, vin, 1, vinsave, 1);
-
-    for(i=0;i<iter_used;i++){ // do i = 1, iter_used
-        for(j=i+1;j<iter_used;j++){ //  do j = i + 1, iter_used
-            beta (i, j) = w [i] * w [j] * ddot (df,j, df,i);
-                            //ddot(ndim, df (1, j), 1, df (1, i), 1);
-#ifdef __PARA
-            reduce (1, beta (i, j) );
-#endif
-        } // enddo
-        beta (i, i) = w0 * w0 + w [i] * w[i];
-    } // enddo
-
-    dsytrf ('U', iter_used, beta, maxter, iwork, work, maxter, info);
-    cout << "\n broyden, factorization, info: "
-        << info;
-    dsytri ('U', iter_used, beta, maxter, iwork, work, info);
-    cout << "\n broyden, dsytri, info : "
-        << info;
-    for(i=0;i<iter_used;i++){ // do i = 1, iter_used
-        for(j=i+1;j<iter_used;j++){ // do j = i + 1, iter_used
-            beta (j, i) = beta (i, j);
-        } //enddo
-    } //  enddo
-    for(i=0;i<iter;i++){ // do i = 1, iter_used;
-        work [i] = ddot (df,i,vout);	//ddot(ndim,df (1, i), 1, vout, 1);
-    } // enddo
-#ifdef __PARA
-    reduce (iter_used, work);
-#endif
-    for(n=0;n<ndim;n++){ // do n = 1, ndim
-        vin [n] = vin [n] + mixing_beta * vout [n];
-    } // enddo
-    for(i=0;i<iter_used;i++){ // do i = 1, iter_used
-        gamma = 0.0;
-        for(j=0;j<iter_used;j++){ // do j = 1, iter_used
-            gamma = gamma + beta (i, j) * w [j] * work [j];
-        } // enddo
-        for(n=0;n<ndim;n++){ // do n = 1, ndim
-            vin [n] = vin [n] - w [i] * gamma * (mixing_beta * df (i, n) +
-                dv (i, n) );
-        } // enddo
-    } // enddo
-
-    inext = iter - ( (iter - 1) / nmix) * nmix;
-    //dcopy (ndim, vout,    df,inext);	//df(1, inext), 1);
-    dcopy (vout,    df, inext);	//df(1, inext), 1);
-    //dcopy (ndim, vinsave, dv,inext);	//dv(1, inext), 1);
-    dcopy (vinsave, dv, inext);	//dv(1, inext), 1);
-
-    delete [] vinsave;
-    stop_clock ("mix_pot");
-    return;
-} //end subroutine mix_potential
-*/
 
 double potential::vr_ave(const int n,const int size,const double *p)
 {
@@ -1253,8 +1049,8 @@ double potential::vr_ave(const int n,const int size,const double *p)
 
 
 //==========================================================
-// this function aims to add external time-dependent potential (eg: linear potential)
-// used in tddft
+// this function aims to add external time-dependent potential 
+// (eg: linear potential) used in tddft
 // fuxiang add in 2017-05
 //==========================================================
 

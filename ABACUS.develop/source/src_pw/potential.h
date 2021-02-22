@@ -77,8 +77,6 @@ class potential
     void set_local(double *vl_pseudo)const;
 
     void v_h( int nspin, double &ehart, matrix &v, double** rho);
-
-    int test;
 };
 
 #endif	// POTENTIAL_H
