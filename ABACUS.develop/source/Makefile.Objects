@@ -210,6 +210,7 @@ charge_broyden.o \
 charge_extra.o \
 xc_gga_pw.o \
 potential.o \
+write_pot.o\
 potential_libxc.o \
 efield.o \
 magnetism.o\

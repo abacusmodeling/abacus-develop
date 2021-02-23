@@ -55,6 +55,7 @@ class potential
     void set_vrs_tddft(const int istep);
 
     void print_pot(ofstream &ofs)const;
+
     double vr_ave(const int, const int, const double *) ;
 
     void v_xc(double** rho_in, double &etxc, double &vtxc, matrix &v);
