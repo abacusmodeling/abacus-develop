@@ -840,23 +840,6 @@ void potential::print_pot(ofstream &ofs)const
     //   ofs << "\n charge     = " << charge;
     out.printr1_d(ofs, " vltot : ", vltot, pw.nrxx);
     out.printrm(ofs, "  vrs : ", vrs);
-
-}
-
-
-
-double potential::vr_ave(const int n,const int size,const double *p)
-{
-    // return the average of potential here <V^n>
-    // [sum_i v(i)^n] / size of the array
-    double ave = 0.0;
-    if (size < 0)
-    {
-        cout << "\n The size of the array should > = 1, error";
-        exit(0);
-    }
-    for (int i =0; i< size; i++) ave += pow(p[i], n);
-    return ( ave / static_cast<double>(size) ) ;
 }
 
 

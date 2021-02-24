@@ -246,8 +246,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	TITLE("wavefunc","LCAO_in_pw_k");
 	timer::tick("wavefunc","LCAO_in_pw_k",'G');
 
-	//assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
-	assert(BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
+	assert(BASIS_TYPE=="lcao_in_pw");
 	
 	static bool ltable = false;
 	if(!ltable)
