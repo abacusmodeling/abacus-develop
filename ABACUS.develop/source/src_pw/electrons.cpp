@@ -451,7 +451,7 @@ void Electrons::c_bands(const int &istep)
     ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
     for (int ik = 0;ik < kv.nks;ik++)
     {
-        hm.init_k(ik);
+        hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization

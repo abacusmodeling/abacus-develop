@@ -12,6 +12,7 @@
 class wavefunc : public WF_atomic
 {
 	public:
+
     wavefunc();
     ~wavefunc();
 
@@ -35,7 +36,7 @@ class wavefunc : public WF_atomic
     int get_starting_nw(void)const;
 
 	// wanf2: save PAO orbitals,
-	void PAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
+	//void PAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
 
 	// wanf2: save given localized orbitals. 
 	void LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
@@ -60,8 +61,6 @@ class wavefunc : public WF_atomic
 
     Vector3<int> ***R;
     int ** Rmax;
-
-
 };
 
 #endif //wavefunc

@@ -318,7 +318,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	for (int ik = 0;ik < kv.nks;ik++)
 	{
-		hm.init_k(ik);
+		hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization

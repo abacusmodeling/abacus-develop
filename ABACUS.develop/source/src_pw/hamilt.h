@@ -12,8 +12,6 @@ class Hamilt
     Hamilt();
     ~Hamilt();
 
-    void init_k(const int ik);
-
     void init_before_ions(void);
 
     void init_before_electrons(void);

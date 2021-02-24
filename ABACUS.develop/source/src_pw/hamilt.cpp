@@ -13,12 +13,6 @@ Hamilt::~Hamilt()
 }
 
 
-void Hamilt::init_k(const int ik)
-{
-    this->hpw.init_k(ik);
-}
-
-
 void Hamilt::diago(
     const int &istep,
     const int &iter,
@@ -28,7 +22,6 @@ void Hamilt::diago(
 {
 	TITLE("Hamilt","diago");
 	timer::tick("Hamilt","diago",'F');
-//	timer::tick("Hamilt","diago");
     double avg = 0.0;
 
 	// set ik0 because of mem_saver.
@@ -36,34 +29,29 @@ void Hamilt::diago(
 	// but if mem_saver is used, ik0=0.
 	int ik0 = ik;
 
-	// mohan add 2010-09-07
-	// mohan update 2010-09-14, about wanf2
 	if(CALCULATION=="nscf" && wf.mem_saver==1)
 	{
-		//if(LOCAL_BASIS==0) xiaohui modify 2013-09-02
-		if(BASIS_TYPE=="pw") //xiaohui add 2013-09-02
+		if(BASIS_TYPE=="pw")
 		{
 			// generate PAOs first, then diagonalize to get
 			// inital wavefunctions.
 			wf.diago_PAO_in_pw_k2(ik, wf.evc[0]);	
 		}
-		//else if(LOCAL_BASIS==4) xiaohui modify 2013-09-02
-		else if(BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02. Attention! Maybe "BASIS_TYPE==lcao_in_pw" is just ok.
+		else if(BASIS_TYPE=="lcao_in_pw")
 		{
 			wf.LCAO_in_pw_k(ik, wf.wanf2[0]);
 		}
 		ik0 = 0;
 	}
 
-    //if (LOCAL_BASIS) xiaohui modify 2013-09-02
-    if(BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02. Attention...
+    if(BASIS_TYPE=="lcao_in_pw")
     {
-		//if(DIAGO_TYPE=="lapack") xiaohui modify 2013-09-02
-		if(KS_SOLVER=="lapack") //xiaohui add 2013-09-02
+		if(KS_SOLVER=="lapack")
 		{
 			assert(NLOCAL >= NBANDS);
         	this->cinitcgg(ik, NLOCAL, NBANDS, wf.wanf2[ik0], wf.evc[ik0], wf.ekb[ik]);
-
+			
+			// for tests
 			/*
 			cout << " Check evc unit of ik = " << ik0 << endl;
 			for(int ib=0; ib<NBANDS; ib++)
@@ -80,20 +68,9 @@ void Hamilt::diago(
 		}
 		else
 		{
-			//ofs_warning << " The diago_type " << DIAGO_TYPE << " not implemented yet." << endl; xiaohui modify 2013-09-02
 			ofs_warning << " The diago_type " << KS_SOLVER << " not implemented yet." << endl; //xiaohui add 2013-09-02
 			WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
-		/*
-		for(int ik=0; ik<kv.nks; ik++)
-		{
-			for(int ib=0; ib<NBANDS; ib++)
-			{
-				cout << " " << wf.ekb[ik][ib];
-			}
-			cout << endl;
-		}
-		*/
     }
     else
     {
@@ -101,8 +78,7 @@ void Hamilt::diago(
         int notconv = 0;
         do
         {	
-	   		//if ( DIAGO_TYPE=="cg" ) xiaohui modify 2013-09-02
-	   		if(KS_SOLVER=="cg") //xiaohui add 2013-09-02
+	   		if(KS_SOLVER=="cg")
             {			
                 if ( iter > 0 || istep > 0 ||  ntry > 0)
                 {
@@ -126,14 +102,17 @@ void Hamilt::diago(
 				// if cinitcgg has not been called,
 				// we need to reorder the eigenvectors.
             }
-            //else if ( DIAGO_TYPE=="dav" ) xiaohui modify 2013-09-02
-	   		else if(KS_SOLVER=="dav") //xiaohui add 2013-09-02
+	   		else if(KS_SOLVER=="dav")
         	{
 				Diago_David david;
-				if(NPOL==1) david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
+				if(NPOL==1) 
+				{
+					david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
 						NBANDS, precondition, DIAGO_DAVID_NDIM,
-						ETHR, DIAGO_CG_MAXITER, notconv, avg);
-				else{
+				 		ETHR, DIAGO_CG_MAXITER, notconv, avg);
+				}
+				else
+				{
 					david.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL,
 						NBANDS, precondition, DIAGO_DAVID_NDIM,
 						ETHR, DIAGO_CG_MAXITER, notconv, avg);
@@ -141,8 +120,7 @@ void Hamilt::diago(
         	}
         	else
         	{
-                //WARNING_QUIT("calculate_bands","Check DIAGO_TYPE !"); xiaohui modify 2013-09-02
-				WARNING_QUIT("calculate_bands","Check KS_SOLVER !"); //xiaohui add 2013-09-02
+				WARNING_QUIT("calculate_bands","Check KS_SOLVER !");
         	}
             avg_iter += avg;
             ++ntry;
