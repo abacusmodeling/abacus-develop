@@ -16,15 +16,6 @@ public:
 	// mohan updated 2021-02-22
 	void init(const int &npwx, const int &npol, const int &nkb, const int &nrxx);
 
-    void diag_zheev
-    (
-        const int& npw,
-        ComplexMatrix& psi,
-        const int& nband,
-        double *em,
-        double *err
-    ) ;
-
     void cal_err
     (
         const int &npw,
@@ -35,6 +26,13 @@ public:
     );
 
     void init_k(const int ik);
+
+	private:
+	
+	friend class Diago_David;
+	friend class Diago_CG;
+	friend class Exx_Lip;
+	friend class Hamilt;
 
     void cinitcgg(const int ik,
                   const int nstart,
@@ -56,8 +54,7 @@ public:
         const complex < double> *psi,
         complex < double> *spsi);
 
-    int test;
-    double ddot_real( const int& npw, const complex<double>* psi_L, const complex<double>* psi_R)const;
+	private:
 
     int *GR_index;
 
@@ -72,6 +69,10 @@ public:
 
     void add_vuspsi(complex<double> *hpsi, const complex<double> *becp);
 
+	private:
+
+    double ddot_real( const int& npw, const complex<double>* psi_L, const complex<double>* psi_R)const;
+
 
     complex<double> ddot( const int& npw,
                           const complex<double> * psi_L,
@@ -85,6 +86,18 @@ public:
                           const ComplexMatrix &psi,
                           const int & m,
                           const complex<double> *psik )const ;
+
+	private:
+
+    void diag_zheev
+    (
+        const int& npw,
+        ComplexMatrix& psi,
+        const int& nband,
+        double *em,
+        double *err
+    ) ;
+
 };
 
 #endif 

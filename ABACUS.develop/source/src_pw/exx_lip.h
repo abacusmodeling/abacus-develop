@@ -80,7 +80,8 @@ private:
 	void sum_all(int ik);
 	void exx_energy_cal();
 	void read_q_pack();
-	
+
+// mohan comment out 2021-02-24	
 	friend void Hamilt_PW::cinitcgg(const int ik,const int nstart,const int n_band,const ComplexMatrix &psi,ComplexMatrix &evc,double *en);	
 	
 public:

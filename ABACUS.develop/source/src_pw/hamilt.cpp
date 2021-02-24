@@ -190,160 +190,23 @@ void Hamilt::cinitcgg(
     ComplexMatrix &evc,
     double *en)
 {
-    // 1 : Local basis or not.
-    //     yes : using cinitcgg
-    //     no  : using cinitcgg, then cg method
-    //
-    // 2 : Linear scaling or not.
-    //     yes : using
-    //
-    // 3 : Lapack using or cg method.
-    //
-    //
-    // 4 : Sparse matrix or not.
-    // 	   (Default setting : yes for LINEAR SCALING)
-    //
-    //     LINEAR SCALING: yes( consider set it or not ), no (never do it)
-    //     LOCAL BASIS : yes( consider set it or not), no(never do it)
-    //
-    //     belong to STORE hamiltonian and overlap.
-    //     Can used for LAPACK for check.
-    //     Formally used for CG method.
-    //
-    //	   In LINEAR SCALING case,
-    //	   there are some difference between
-    //     S|psi and H|psi
-    //
-    // 5 : belong to CONSTRUCT hamiltonian and overlap.
-    // 	   only for Local basis = 1 or 2.
-    //     not for Local basis = 0
-    //     can used for both cg or lapack
-    //     can used for both sparsematrix or complexmatrix
-    //
-    //
-    //     Using overlap from SIESTA method
-    //     Using kinetic from SISTA method
-    //     Using non-local from SISTA method
-    //     Local part from SISTA method
-    //
-    //     Overlap, kinetic and non-local can only do once.
-    //     Local part built up in each iteration
-
 	if(nstart < n_band)
 	{
 		WARNING_QUIT("cinitcgg","nstart < n_band!");
 	}
 
-    //if (LINEAR_SCALING && LOCAL_BASIS) xiaohui modify 2013-09-02
-    if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02
-    {
-        WARNING_QUIT("cinitcgg","Diago not doing here.");
-    }
-    //else if (!LINEAR_SCALING) xiaohui modify 2013-09-02
-    else if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
+    if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
     {
         this->hpw.cinitcgg(ik, nstart, n_band, psi, evc, en);
     }
     else
     {
-        //WARNING_QUIT("cinitcgg","Check parameters: LINEAR_SCALING and LOCAL_BASIS. "); xiaohui modify 2013-09-02
-	WARNING_QUIT("cinitcgg","Check parameters: BASIS_TYPE. "); //xiaohui add 2013-09-02
+		WARNING_QUIT("cinitcgg","Check parameters: BASIS_TYPE. ");
     }
     return;
 }
 
 
-void Hamilt::h_1psi(const int dim,const complex<double> *psi,complex<double> *hpsi,complex<double> *spsi)
-{
-    //if (LINEAR_SCALING) xiaohui modify 2013-09-02
-    if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02. Attention! Maybe this change is not reasonable.
-    {
-        timer::tick("Hamilt","Sparse_SH");
-        double *psi_real = new double[dim];
-        double *hpsi_real = new double[dim];
-        double *spsi_real = new double[dim];
-
-        for (int i=0; i<dim; i++) psi_real[i] = psi[i].real();
-        for (int i=0; i<dim; i++) hpsi_real[i] = hpsi[i].real();
-        for (int i=0; i<dim; i++) spsi_real[i] = spsi[i].real();
-
-		WARNING_QUIT("no sparse anymore","haha");
-//      this->hon.UHM.Sparse_H.multiply_vector(psi_real, hpsi_real);
-//      this->hon.UOM.Sparse_S.multiply_vector(psi_real, spsi_real);
-
-        for (int i=0; i<dim; i++) spsi[i] = complex<double>( spsi_real[i], 0.0 );
-        for (int i=0; i<dim; i++) hpsi[i] = complex<double>( hpsi_real[i], 0.0 );
-
-        delete[] psi_real;
-        delete[] hpsi_real;
-        delete[] spsi_real;
-        timer::tick("Hamilt","Sparse_SH");
-    }
-    else
-    {
-        this->hpw.h_1psi(dim, psi, hpsi, spsi);
-    }
-    return;
-}
-
-void Hamilt::s_1psi(const int dim, const complex<double> *psi, complex<double> *spsi)
-{
-    //if (LINEAR_SCALING) xiaohui modify 2013-09-02
-    if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02. Attention! Maybe this change is not reasonable.
-    {
-        timer::tick("Hamilt","Sparse_S");
-        double *psi_real = new double[dim];
-        double *spsi_real = new double[dim];
-
-        for (int i=0; i<dim; i++) psi_real[i] = psi[i].real();
-        for (int i=0; i<dim; i++) spsi_real[i] = spsi[i].real();
-
-		WARNING_QUIT("no sparse anymore","haha");
-        //this->hon.UOM.Sparse_S.multiply_vector(psi_real, spsi_real);
-
-        for (int i=0; i<dim; i++)
-        {
-            spsi[i] = complex<double>( spsi_real[i] , 0.0 );
-        }
-
-        delete[] psi_real;
-        delete[] spsi_real;
-        timer::tick("Hamilt","Sparse_S");
-    }
-    else
-    {
-        this->hpw.s_1psi(dim, psi, spsi);
-    }
-    return;
-}
-
-void Hamilt::h_psi( const int dim, const complex<double> *psi, complex<double> *hpsi)
-{
-    //if (LINEAR_SCALING) xiaohui modify 2013-09-02
-    if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02. Attention! Maybe this change is not reasonable.
-    {
-        timer::tick("Hamilt","Sparse_H");
-        double *psi_real = new double[dim];
-        double *hpsi_real = new double[dim];
-
-        for (int i=0; i<dim; i++) psi_real[i] = psi[i].real();
-        for (int i=0; i<dim; i++) hpsi_real[i] = hpsi[i].real();
-
-		WARNING_QUIT("no sparse anymore","haha");
-        //this->hon.UHM.Sparse_H.multiply_vector(psi_real, hpsi_real);
-
-        for (int i=0; i<dim; i++) hpsi[i] = complex<double>( hpsi[i].real(), 0.0 );
-
-        delete[] psi_real;
-        delete[] hpsi_real;
-        timer::tick("Hamilt","Sparse_H");
-    }
-    else
-    {
-        this->hpw.h_psi( psi, hpsi);
-    }
-    return;
-}
 
 void Hamilt::cdiaghg(
 	const int nstart,

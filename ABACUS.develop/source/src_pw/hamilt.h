@@ -29,14 +29,6 @@ class Hamilt
     void cdiaghg(const int n,const int m,const ComplexMatrix &hc,const ComplexMatrix &sc,
                  const int ldh,double *e,ComplexMatrix &hvec);
 
-    void h_1psi(const int dim,const complex<double> *psi,complex<double> *hpsi,complex<double> *spi);
-    void s_1psi(const int dim,const complex<double> *psi,complex<double> *spsi);
-
-    void h_1psi_real(const int dim,const double *psi,double *hpsi,double *spi);
-    void s_1psi_real(const int dim,const double *psi, double *spsi);
-
-    void h_psi( const int dim, const complex<double> *psi,complex<double> *hpsi);
-
     Hamilt_PW hpw;
 	
 	// mohan update 2021-02-10
