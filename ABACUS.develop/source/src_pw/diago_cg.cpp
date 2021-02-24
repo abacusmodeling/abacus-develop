@@ -3,13 +3,14 @@
 
 int Diago_CG::moved = 0;
 
+
 Diago_CG::Diago_CG()
 {
     test_cg=0;
 }
 Diago_CG::~Diago_CG() {}
 
-// from ccgdiagg.f90
+
 void Diago_CG::diag
 (
     ComplexMatrix &phi,
@@ -37,6 +38,7 @@ void Diago_CG::diag
     // Band-by-band algorithm with minimal use of memory
     // Calls h_1phi and s_1phi to calculate H|phi> and S|phi>
     // Works for generalized eigenvalue problem (US pseudopotentials) as well
+    //-------------------------------------------------------------------
     complex<double> *sphi = new complex<double>[dim]();
     complex<double> *scg  = new complex<double>[dim]();
     complex<double> *hphi = new complex<double>[dim]();

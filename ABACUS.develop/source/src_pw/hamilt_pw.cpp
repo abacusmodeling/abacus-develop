@@ -49,7 +49,8 @@ void Hamilt_PW::init(const int &npwx, const int &npol, const int &nkb, const int
     ZEROS(this->hpsi, npwx * npol);
     ZEROS(this->spsi, npwx * npol);
     ZEROS(this->GR_index, nrxx);
-//    ofs_running << "\n Hamiltonian allocate done."<<endl;
+//  ofs_running << "\n Hamiltonian allocate done."<<endl;
+
     return;
 }
 
@@ -61,21 +62,26 @@ void Hamilt_PW::init_k(const int ik)
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
 	if(NSPIN==2)CURRENT_SPIN = kv.isk[ik];
+
 	// (2) Kinetic energy.
 	wf.ekin(ik);
+
 	// (3) Take the local potential.
 	for (int ir=0; ir<pw.nrxx; ir++)
 	{
 		pot.vrs1[ir] = pot.vrs(CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
+
 	// (4) Calculate nonlocal pseudopotential vkb
 	//if (ppcell.nkb > 0 && !LINEAR_SCALING) xiaohui modify 2013-09-02
 	if(ppcell.nkb > 0 && (BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
 	{
 		ppcell.getvnl(ik);
 	}
+
 	// (5) The number of wave functions.
 	wf.npw = kv.ngk[ik];
+
 	// (6) The index of plane waves.
     for (int ig = 0;ig < wf.npw;ig++)
     {
