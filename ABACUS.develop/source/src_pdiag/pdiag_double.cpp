@@ -953,6 +953,124 @@ void Pdiag_Double::diago_complex_begin(const int &ik, complex<double> **wfc, Com
         delete[] work;
         timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
     } // GenELPA method
+	else if(KS_SOLVER=="scalapack_gvx")
+	{
+		ComplexMatrix h_tmp(this->ncol, this->nrow, false);
+		memcpy( h_tmp.c, ch_mat, sizeof(complex<double>)*this->ncol*this->nrow );
+		ComplexMatrix s_tmp(this->ncol, this->nrow, false);
+		memcpy( s_tmp.c, cs_mat, sizeof(complex<double>)*this->ncol*this->nrow );
+		wfc_2d.create(this->ncol, this->nrow, false);
+		
+		const char jobz='V', range='I', uplo='U';
+		const int itype=1, il=1, iu=NBANDS, one=1;
+		int M=0, NZ=0, lwork=-1, lrwork=-1, liwork=-1, info=0;
+		const double abstol=0, orfac=-1;
+		vector<complex<double>> work(1,0);
+		vector<double> rwork(1,0);
+		vector<int> iwork(1,0);
+		vector<int> ifail(NLOCAL,0);
+		vector<int> iclustr(2*DSIZE);
+		vector<double> gap(DSIZE);
+		
+		pzhegvx_(&itype, &jobz, &range, &uplo,
+			&NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
+			NULL, NULL, &il, &iu, &abstol,
+			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
+			work.data(), &lwork, rwork.data(), &lrwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+		ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<endl;
+		lwork = work[0].real();
+		work.resize(lwork,0);
+		lrwork = rwork[0];
+		rwork.resize(lrwork,0);
+		liwork = iwork[0];
+		iwork.resize(liwork,0);
+		pzhegvx_(&itype, &jobz, &range, &uplo,
+			&NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
+			NULL, NULL, &il, &iu, &abstol,
+			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
+			work.data(), &lwork, rwork.data(), &lrwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
+		ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<endl;
+
+		if(info)
+			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		if(M!=NBANDS)
+			throw runtime_error("M="+TO_STRING(M)+". NBANDS="+TO_STRING(NBANDS)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		if(M!=NZ)
+			throw runtime_error("M="+TO_STRING(M)+". NZ="+TO_STRING(NZ)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		
+//		if(NEW_DM==0)
+//			throw domain_error("NEW_DM must be 1. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+		// the follow will be deleted after finish newdm
+		{
+			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
+			timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+
+			long maxnloc; // maximum number of elements in local matrix
+			MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
+			MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
+			complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
+
+			int naroc[2]; // maximum number of row or column
+			for(int iprow=0; iprow<dim0; ++iprow)
+			{
+				for(int ipcol=0; ipcol<dim1; ++ipcol)
+				{
+					const int coord[2]={iprow, ipcol};
+					int src_rank;
+					MPI_Cart_rank(comm_2D, coord, &src_rank);
+					if(myid==src_rank)
+					{
+						LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
+						naroc[0]=nrow;
+						naroc[1]=ncol;
+					}
+					info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
+					info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, src_rank, comm_2D);
+
+					if(this->out_lowf)
+					{
+						complex<double> **ctot;
+						if(myid==0)
+						{
+							ctot = new complex<double>*[NBANDS];
+							for (int i=0; i<NBANDS; i++)
+							{
+								ctot[i] = new complex<double>[NLOCAL];
+								ZEROS(ctot[i], NLOCAL);
+							}
+							Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"cdouble");
+						}
+						// mohan update 2021-02-12, delete BFIELD option
+						info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
+								dim0, dim1, iprow, ipcol,
+								work, wfc, LOWF.WFC_K_aug[ik], ctot);
+						stringstream ss;
+						ss << global_out_dir << "LOWF_K_" << ik+1 << ".dat";
+						// mohan add 2012-04-03, because we need the occupations for the
+						// first iteration.
+						WF_Local::write_lowf_complex( ss.str(), ctot, ik );//mohan add 2010-09-09
+						if(myid==0)
+						{
+							for (int i=0; i<NBANDS; i++)
+							{
+								delete[] ctot[i];
+							}
+							delete[] ctot;
+						}
+					}
+					else
+					{
+						// mohan update 2021-02-12, delte BFIELD option
+						info=q2WFC_WFCAUG_complex(naroc, nb,
+								dim0, dim1, iprow, ipcol,
+								work, wfc, LOWF.WFC_K_aug[ik]);
+					}
+				}
+			}
+			delete[] work;
+			timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+		}
+	}		
 
 #endif
 	return;
