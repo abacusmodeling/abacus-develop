@@ -20,9 +20,9 @@ potential::~potential()
     delete[] vrs1;
 }
 
-void potential::init(const int nrxx)
+void potential::allocate(const int nrxx)
 {
-    if (test_potential) TITLE("potential","init");
+    TITLE("potential","allocate");
     assert(nrxx>0);
 
     delete[] this->vltot;
@@ -830,17 +830,6 @@ void potential::newd(void)
 	}
 	return;
 } // end subroutine newd
-
-void potential::print_pot(ofstream &ofs)const
-{
-    //  ofs << "\n potinit() : ";
-    ofs << "\n vtxc       = " << en.vtxc;
-    ofs << "\n etxc       = " << en.etxc;
-    ofs << "\n ehart      = " << en.ehart;
-    //   ofs << "\n charge     = " << charge;
-    out.printr1_d(ofs, " vltot : ", vltot, pw.nrxx);
-    out.printrm(ofs, "  vrs : ", vrs);
-}
 
 
 //==========================================================

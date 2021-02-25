@@ -50,21 +50,10 @@ void wavefunc::init_local(void)
     return;
 }
 
-void wavefunc::init(const int nks)
+void wavefunc::allocate(const int nks)
 {	
-/*LiuXh modify 20180619
-	static bool done_once = false;
-	if(done_once)
-	{
-		return;
-	}
-	else
-	{
-		done_once = true;
-	}
-LiuXh modify 20180619*/
+	TITLE("wavefunc","allocate");
 
-	TITLE("wavefunc","init");
 	this->npwx = this->setupIndGk(pw, nks);
 	OUT(ofs_running,"npwx",npwx);
 
@@ -72,11 +61,11 @@ LiuXh modify 20180619*/
 	assert(nks > 0);
 	assert(NBANDS > 0);
 
+	// allocate for kinetic energy
 	delete[] g2kin;
-	this->g2kin = new double[npwx];   // [npw],kinetic energy
+	this->g2kin = new double[npwx];
 	ZEROS(g2kin, npwx);
 	Memory::record("wavefunc","g2kin",npwx,"double");
-	if(test_wf)OUT(ofs_running,"g2kin allocation","Done");
 
 	// if use spin orbital, do not double nks but double allocate evc and wanf2.
 	int prefactor = 1;
@@ -90,11 +79,10 @@ LiuXh modify 20180619*/
 	}
 	this->allocate_ekb = true;
 	
-	this->wg.create(nks, NBANDS);	// the weight of each k point and band
+	// the weight of each k point and band
+	this->wg.create(nks, NBANDS);
 	Memory::record("wavefunc","et",nks*NBANDS,"double");
 	Memory::record("wavefunc","wg",nks*NBANDS,"double");
-	if(test_wf)OUT(ofs_running, "et allocation","Done"); 
-	if(test_wf)OUT(ofs_running, "wg allocation","Done");
 
 	delete[] evc;
 	delete[] wanf2;
@@ -107,7 +95,8 @@ LiuXh modify 20180619*/
 		this->evc = new ComplexMatrix[1];
 		this->wanf2 = new ComplexMatrix[1];
 		
-		evc[0].create(NBANDS, npwx * NPOL);//added by zhengdy-soc	
+		// //added by zhengdy-soc
+		evc[0].create(NBANDS, npwx * NPOL);
 
 		if(BASIS_TYPE=="lcao_in_pw")
 		{
@@ -138,15 +127,6 @@ LiuXh modify 20180619*/
 		Memory::record("wavefunc","evc",nks2*NBANDS*(prefactor*npwx),"complexmatrix") << endl;
 	}
 
-	if(test_wf)
-	{	
-		OUT(ofs_running,"evc allocation","Done");
-		//if(LOCAL_BASIS) xiaohui modify 2013-09-02
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
-		{
-			OUT(ofs_running,"wanf2 allocation","Done");
-		}
-	}
 	//showMemStats();
 	return;
 }

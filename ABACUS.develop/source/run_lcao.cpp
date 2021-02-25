@@ -93,11 +93,11 @@ void Run_lcao::lcao_line(void)
 
 
 	// (1) Inititlize the charge density.
-    CHR.init(NSPIN, pw.nrxx, pw.ngmc);
+    CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
     DONE(ofs_running,"INIT CHARGE");
 
 	// (2) Initializee the potential.
-    pot.init(pw.nrxx);
+    pot.allocate(pw.nrxx);
     DONE(ofs_running,"INIT POTENTIAL");
 
     // declration
@@ -130,7 +130,7 @@ void Run_lcao::lcao_line(void)
 			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
 			break;
 		case SOME_PW:
-			wf.init(kv.nks);
+			wf.allocate(kv.nks);
 			UFFT.allocate();
 			ppcell.init(ucell.ntype);
     		hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);

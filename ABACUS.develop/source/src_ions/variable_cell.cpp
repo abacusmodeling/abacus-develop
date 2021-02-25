@@ -123,13 +123,13 @@ void Variable_Cell::final_calculation_after_vc(void)
     // init potential
     //=====================
     CHR.init_final_scf();
-    pot.init(pw.nrxx);
+    pot.allocate(pw.nrxx);
     //=====================
     // init wave functions
     //=====================
     if(BASIS_TYPE=="pw")
     {
-        wf.init(kv.nks);
+        wf.allocate(kv.nks);
     }
     else
     {

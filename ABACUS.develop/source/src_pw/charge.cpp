@@ -53,9 +53,9 @@ Charge::~Charge()
 	}
 }
 
-void Charge::init(const int &nspin_in, const int &nrxx_in, const int &ngmc_in)
+void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in)
 {
-    if (test_charge) TITLE("Charge","init");
+    TITLE("Charge","allocate");
 
 	assert(allocate_rho == false);
 

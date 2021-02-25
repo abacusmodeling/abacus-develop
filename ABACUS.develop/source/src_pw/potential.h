@@ -32,13 +32,13 @@ class potential
     double *vltot;
 	int out_potential; // mohan add 2011-02-28
 
-    // member functions
-    void init(const int nrxx);
+    void allocate(const int nrxx);
 
 	//------------------------------------------------    
 	// if delta_vh==true, vl_pseudo not calculated,
 	// V(rho-rho_atom) is calculated,
 	// V(xc) is calculated.
+	//------------------------------------------------    
 	// if vna==true, vl_pseudo is calculated,
 	// V(rho_atom) is calclated,
 	// V(xc) is not calculated.
@@ -48,15 +48,13 @@ class potential
     void v_of_rho( double** rho_in, double &ehart, double &etxc,
         double &vtxc, matrix &v, const bool delta_vh=false, const bool vna=false);
 
-    void newd(void);
-
     void set_vrs(void);
 
     void v_xc(double** rho_in, double &etxc, double &vtxc, matrix &v);
 
-	public:
+    void newd(void);
 
-    void print_pot(ofstream &ofs)const;
+	public:
 
 	// mohan add 2011-02-28
 	// here vh is complex because the array is got after complex FFT.

@@ -21,7 +21,7 @@ public:
     ~Charge();
 
 	// mohan update 2021-02-20
-	void init(const int &nspin_in, const int &nrxx_in, const int &ngmc_in);
+	void allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in);
 
 //==========================================================
 // MEMBER VARIABLES :

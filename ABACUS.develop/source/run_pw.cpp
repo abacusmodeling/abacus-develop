@@ -70,16 +70,12 @@ void Run_pw::plane_wave_line(void)
 // 4 initialize charge desity and warefunctios in G_space
 //----------------------------------------------------------
 
-    //=====================
-    // init potential
-    //=====================
-    CHR.init(NSPIN, pw.nrxx, pw.ngmc);
-    pot.init(pw.nrxx);
-
-    //=====================
-    // init wave functions
-    //=====================
-    wf.init(kv.nks);
+    //=====================================
+    // init charge/potential/wave functions
+    //=====================================
+    CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
+    pot.allocate(pw.nrxx);
+    wf.allocate(kv.nks);
 	UFFT.allocate();
 
     //=======================
