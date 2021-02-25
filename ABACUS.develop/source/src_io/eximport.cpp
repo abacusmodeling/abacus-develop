@@ -700,6 +700,7 @@ void eximport::in_evc(ifstream &in)
 //	energy
 //===========
 #include "src_pw/H_Ewald_pw.h"
+#include "src_pw/H_Hartree_pw.h"
 void eximport::out_energy(ofstream &out_data)
 {
 	//cout << "\n ==> out_energy" << endl;
@@ -708,7 +709,7 @@ void eximport::out_energy(ofstream &out_data)
 	//out_data << setw(20) << elec.dE << endl;              //6.3
 	out_data << setw(20) << en.eband << endl;				//6.4
 	out_data << setw(20) << en.eband + en.deband << endl;   //6.5
-	out_data << setw(20) << en.ehart << endl;               //6.6
+	out_data << setw(20) << H_Hartree_pw::hartree_energy << endl;
 	out_data << setw(20) << en.etxc - en.etxcc << endl;     //6.7
 	out_data << setw(20) << H_Ewald_pw::ewald_energy << endl;                //6.8
 }

@@ -129,6 +129,7 @@ void Run_lcao::lcao_line(void)
 			// Init the potential.
 			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
 			break;
+
 		case SOME_PW:
 			wf.allocate(kv.nks);
 			UFFT.allocate();

@@ -3,6 +3,8 @@
 #include "../src_pw/xc_functional.h"
 #include "../src_pw/xc_gga_pw.h"
 #include "src_pw/myfunc.h"
+// new
+#include "src_pw/H_Hartree_pw.h"
 
 double Stress_LCAO::stress_invalid_threshold_ev = 0.00;
 
@@ -758,25 +760,27 @@ void Stress_LCAO::cal_stress_cc(void)
 
 void Stress_LCAO::cal_stress_har(void)
 {
-     double shart,g2;
-     const double eps=1e-8;
-     int is,ig,l,m,nspin0;
+	TITLE("Stress_LCAO","cal_stress_har");
 
-     complex<double> *Porter = UFFT.porter;
+	double shart,g2;
+	const double eps=1e-8;
+	int is,ig,l,m,nspin0;
 
-     //  Hartree potential VH(r) from n(r)
-	 ZEROS( Porter, pw.nrxx );
-	 for(int is=0; is<NSPIN; is++)
-	 {
-		 for (int ir=0; ir<pw.nrxx; ir++)
-		 {
-			 Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
-		 }
-	 }
-    	//=============================
-     //  bring rho (aux) to G space
-    //=============================
-    pw.FFT_chg.FFT3D(Porter, -1);
+	complex<double> *Porter = UFFT.porter;
+
+	//  Hartree potential VH(r) from n(r)
+	ZEROS( Porter, pw.nrxx );
+	for(int is=0; is<NSPIN; is++)
+	{
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+		}
+	}
+	//=============================
+	//  bring rho (aux) to G space
+	//=============================
+	pw.FFT_chg.FFT3D(Porter, -1);
 
 	complex<double> *psic = new complex<double> [pw.nrxx];
 	double *psic0 = new double[pw.nrxx];
@@ -802,9 +806,11 @@ void Stress_LCAO::cal_stress_har(void)
 	ZEROS(vh_g, pw.ngmc);
 
 	double g[3];
-	//test
-	//         int i=pw.gstart;
-	//         cout<< "gstart " <<pw.gstart<<endl;
+
+	// test
+	// int i=pw.gstart;
+	// cout<< "gstart " <<pw.gstart<<endl;
+
 	double ehart=0;
 	for (int ig = pw.gstart; ig<pw.ngmc; ig++)
 	{
@@ -824,9 +830,10 @@ void Stress_LCAO::cal_stress_har(void)
 		//   cout<<"Porter "<<Porter[j]<<endl;
 		//   cout<<"tpiba2 "<<ucell.tpiba2<<endl;
 
-
-		for(l=0;l<3;l++){
-			for(m=0;m<l+1;m++){
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<l+1;m++)
+			{
 				sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
 			}
 		}
@@ -835,31 +842,40 @@ void Stress_LCAO::cal_stress_har(void)
 	Parallel_Reduce::reduce_double_pool( ehart );
 	ehart *= 0.5 * ucell.omega;
 	//cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
-	for(l=0;l<3;l++){
-		for(m=0;m<l+1;m++){
+
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l+1;m++)
+		{
 			Parallel_Reduce::reduce_double_pool( sigmahar[l][m] );
 		}
 	}
 
-	//        Parallel_Reduce::reduce_double_pool( ehart );
-	//        ehart *= 0.5 * ucell.omega;
-	//psic(:)=(0.0,0.0)
-
-	for(l=0;l<3;l++){
-		for(m=0;m<3;m++){
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
 			sigmahar[l][m] *= 0.5 * e2 * FOUR_PI;
 		}
 	}
+
 	for(l=0;l<3;l++)
-		sigmahar[l][l] += en.ehart /ucell.omega;
-	for(l=0;l<3;l++){
-		for(m=0;m<l;m++){
+	{
+		sigmahar[l][l] += H_Hartree_pw::hartree_energy /ucell.omega;
+	}
+
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l;m++)
+		{
 			sigmahar[m][l]=sigmahar[l][m];
 		}
 	}
 
-	for(l=0;l<3;l++){
-		for(m=0;m<3;m++){
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
 			sigmahar[l][m]*=-1;
 		}
 	}

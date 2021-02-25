@@ -189,7 +189,7 @@ void ELEC_scf::scf(const int &istep)
 				// so be careful here, make sure
 				// rho1 and rho2 are the same rho.
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-				pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+				pot.v_of_rho(CHR.rho, en.etxc, en.vtxc, pot.vr);
 				en.delta_escf();
 				if (vext == 0)	
 				{
@@ -417,7 +417,7 @@ void ELEC_scf::scf(const int &istep)
 		if(!conv_elec)
 		{
 			// option 1
-			pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+			pot.v_of_rho(CHR.rho, en.etxc, en.vtxc, pot.vr);
 			en.delta_escf();
 
 			// option 2
@@ -426,16 +426,16 @@ void ELEC_scf::scf(const int &istep)
 			// use real E_tot functional.
 			//------------------------------
 			/*
-			pot.v_of_rho(CHR.rho_save, en.ehart, en.etxc, en.vtxc, pot.vr);
+			pot.v_of_rho(CHR.rho_save, en.etxc, en.vtxc, pot.vr);
 			en.calculate_etot();
 			en.print_etot(conv_elec, istep, iter, dr2, 0.0, ETHR, avg_iter,0);
-			pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+			pot.v_of_rho(CHR.rho, en.etxc, en.vtxc, pot.vr);
 			en.delta_escf();
 			*/
 		}
 		else
 		{
-			pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vnew);
+			pot.v_of_rho(CHR.rho, en.etxc, en.vtxc, pot.vnew);
 			//(used later for scf correction to the forces )
 			pot.vnew -= pot.vr;
 			en.descf = 0.0;

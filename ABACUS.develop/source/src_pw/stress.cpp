@@ -8,6 +8,7 @@
 #include "symmetry.h"
 // new
 #include "H_Ewald_pw.h"
+#include "H_Hartree_pw.h"
 
 void Stress::cal_stress()
 {
@@ -505,8 +506,10 @@ void Stress::stres_har(){
            }
         }
      }
-     for(l=0;l<3;l++)
-        sigmahar[l][l] -= en.ehart /ucell.omega;
+	 for(l=0;l<3;l++)
+	 {
+		 sigmahar[l][l] -= H_Hartree_pw::hartree_energy /ucell.omega;
+	 }
      for(l=0;l<3;l++){
         for(m=0;m<l;m++){
            sigmahar[m][l]=sigmahar[l][m];

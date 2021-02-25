@@ -14,6 +14,7 @@
 #include "src_pw/myfunc.h"
 //new
 #include "H_Ewald_pw.h"
+#include "H_Hartree_pw.h"
 
 
 energy::energy()
@@ -25,7 +26,6 @@ energy::energy()
     this->eband  = 0;          // the band energy
     this->deband = 0;          // correction for variational energy
 	this->deband_harris = 0;   // harris energy
-    this->ehart  = 0;          // the hartree energy
     this->etxc   = 0;          // the exchange and correlation energy
     this->vtxc   = 0;          // another exchange-correlation energy
     this->etxcc  = 0;          // the nlcc exchange and correlation
@@ -53,7 +53,8 @@ void energy::calculate_harris(const int &flag)
 	{
 		this->etot_harris = eband + deband_harris + (etxc - etxcc) 
 		+ H_Ewald_pw::ewald_energy 
-		+ ehart + demet + exx + Efield::etotefield;
+		+ H_Hartree_pw::hartree_energy 
+		+ demet + exx + Efield::etotefield;
 
         if(INPUT.dft_plus_u) 
 		{
@@ -70,7 +71,8 @@ void energy::calculate_etot(void)
 	//cout << "\n demet in etot = " << demet << endl;
 	this->etot = eband + deband + (etxc - etxcc) 
 	+ H_Ewald_pw::ewald_energy 
-	+ ehart + demet + descf + exx + Efield::etotefield;
+	+ H_Hartree_pw::hartree_energy 
+	+ demet + descf + exx + Efield::etotefield;
 
 	// Peize Lin add 2014-04-03, update 2019-04-26
 	if(vdwd2.vdwD2)
@@ -115,7 +117,7 @@ bool print)
 			this->print_format("E_Harris",etot_harris);
 			this->print_format("E_band",eband);
 			this->print_format("E_one_elec",eband+deband);
-			this->print_format("E_Hartree",ehart);
+			this->print_format("E_Hartree",H_Hartree_pw::hartree_energy);
 			this->print_format("E_xc",etxc-etxcc);
 			this->print_format("E_Ewald",H_Ewald_pw::ewald_energy);
 			this->print_format("E_demet",demet); //mohan add 2011-12-02
@@ -289,7 +291,7 @@ bool print)
 				printf( "[36m%-15f[0m", en.etot*Ry_to_eV);	
 				cout << setprecision(3);
 	//			cout << setw(11) << en.eband;
-	//			cout << setw(11) << en.ehart;
+	//			cout << setw(11) << H_Hartree_pw::hartree_energy;
 	//			cout << setw(11) << en.etxc - en.etxcc;
 				cout << resetiosflags(ios::scientific);
 				//if(DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
@@ -324,7 +326,7 @@ bool print)
                         cout << setw(11) << dr2;
 			cout << setprecision(3);
 	//		cout << setw(11) << en.eband;
-	//		cout << setw(11) << en.ehart;
+	//		cout << setw(11) << H_Hartree_pw::hartree_energy;
 	//		cout << setw(11) << en.etxc - en.etxcc;
 			//if(DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
 			if(KS_SOLVER=="cg") //xiaohui add 2013-09-02

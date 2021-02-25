@@ -34,19 +34,9 @@ class potential
 
     void allocate(const int nrxx);
 
-	//------------------------------------------------    
-	// if delta_vh==true, vl_pseudo not calculated,
-	// V(rho-rho_atom) is calculated,
-	// V(xc) is calculated.
-	//------------------------------------------------    
-	// if vna==true, vl_pseudo is calculated,
-	// V(rho_atom) is calclated,
-	// V(xc) is not calculated.
-	//------------------------------------------------    
-	void init_pot(const int &istep, const bool delta_vh=false, const bool vna=false);
+	void init_pot(const int &istep);
 
-    void v_of_rho( double** rho_in, double &ehart, double &etxc,
-        double &vtxc, matrix &v, const bool delta_vh=false, const bool vna=false);
+    void v_of_rho(double** rho_in, double &etxc, double &vtxc, matrix &v);
 
     void set_vrs(void);
 
@@ -67,7 +57,6 @@ class potential
 
     void set_local(double *vl_pseudo)const;
 
-    void v_h( int nspin, double &ehart, matrix &v, double** rho);
 
 
 	private:

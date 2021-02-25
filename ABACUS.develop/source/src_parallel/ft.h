@@ -21,6 +21,7 @@ public:
 	FFT();
 	~FFT();
 
+	// mohan add 'const' 2021-02-25
 	void FFT3D(complex<double> *psi,const int sign);
 //	void FFT3D(double *psi, const int sign);
 //	void FFT3D(matrix &psi, const int sign); // just for now

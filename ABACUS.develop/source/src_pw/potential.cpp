@@ -6,6 +6,8 @@
 #include "efield.h"
 #include "math.h"
 #include "potential_libxc.h"
+// new
+#include "H_Hartree_pw.h"
 
 potential::potential()
 {
@@ -45,14 +47,9 @@ void potential::allocate(const int nrxx)
 }
 
 //----------------------------------------------------------
-//  EXPLAIN :
-//  Initializes the self consistent potential in the array vr
-//  if 'delta_vh=0' & 'vna=1', then 
-//  the final potential: atom Hartree + Local pp = Vna
-//  else if 'delta_vh=1' & 'vna=0', then
-//  the final potential: the remaining Hartree potential.
+//  Initializes the self consistent potential 
 //----------------------------------------------------------
-void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
+void potential::init_pot(const int &istep)
 {
     TITLE("potential","init_pot");
     timer::tick("potential","init_pot");
@@ -67,48 +64,26 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
     // the vltot should and must be zero here.
     ZEROS(this->vltot, pw.nrxx);
 
-    // vna use this line to get delta_vh and V_Efield to do grid integration.
-    // if detal_vh is set to 1, then local pseudopotential is not added.
-    if(delta_vh) 
-    {
-        if(EFIELD && !DIPOLE)
-        {
-            Efield EFID;
-            // in fact, CHR.rho is not used here.
-            // if charge correction due to Efield is considered,
-            // the structure here need to be updated.
+	// (1) local part of pseudopotentials.
+	// set vltot
+	this->set_local(this->vltot);
 
-            static bool first = true;
-            if(first)
-            {
-                cout << " ADD THE EFIELD (V/A) : " << Efield::eamp*51.44 << endl;
-                first = false;
-            }
-            EFID.add_efield(CHR.rho[0], this->vltot);	
-        }
-    }
-    else
-    {
-        // (1) local part of pseudopotentials.
-        // set vltot
-        this->set_local(this->vltot);
+	// mohan fix bug 2011-07-07
+	// set pseudopotentials.
+	int nspin0=NSPIN;//zhengdy-soc, pauli matrix, just index 0 has vlocal term.
 
-        // mohan fix bug 2011-07-07
-        // set pseudopotentials.
-        int nspin0=NSPIN;//zhengdy-soc, pauli matrix, just index 0 has vlocal term.
-        if(NSPIN==4) nspin0=1;
-        for(int is=0; is<nspin0; ++is)
-        {
-            for(int ir=0; ir<pw.nrxx; ++ir)
-            {
-                this->vrs(is,ir) = this->vltot[ir];	
-            }
-        }
-    	// (2) core correction potential.
-        CHR.set_rho_core( pw.strucFac );
+	if(NSPIN==4) nspin0=1;
 
-        //if(vna==1)return; // tmp by mohan
-    }
+	for(int is=0; is<nspin0; ++is)
+	{
+		for(int ir=0; ir<pw.nrxx; ++ir)
+		{
+			this->vrs(is,ir) = this->vltot[ir];	
+		}
+	}
+
+	// (2) core correction potential.
+	CHR.set_rho_core( pw.strucFac );
 
 	// before ion relaxation
 	// need reconstruction -- mohan add 2021-02-09
@@ -201,16 +176,7 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 
     CHR.renormalize_rho();
 
-    //-------------------------------------------------------
-    // Here we computer the potential which correspond
-    // to the charge density
-    // if(vna=1)
-    //   get the Hartree potential from atomic charge density.
-    // else
-    //   delta_vh = 1: get the delta Hartree potential.
-    //   delta_vh = 0: get the full Hartree potential.
-    //--------------------------------------------------------
-    this->v_of_rho( CHR.rho, en.ehart, en.etxc, en.vtxc, vr, delta_vh, vna);
+    this->v_of_rho(CHR.rho, en.etxc, en.vtxc, vr);
 
     //----------------------------------------------------------
     // Define the total local potential (external+scf) in DFT
@@ -286,40 +252,13 @@ void potential::set_local(double* vl_pseudo)const
 void potential::v_of_rho
 (
     double **rho_in,
-    double &ehart,
     double &etxc,
     double &vtxc,
-    matrix &v_in,
-    const bool delta_vh,
-    const bool vna
+    matrix &v_in
 )
 {
     TITLE("potential","v_of_rho");
     v_in.zero_out();
-
-    if(vna)
-    {
-        timer::tick("potential","vna_h");
-        double** rho_atom = new double*[NSPIN];
-        for(int is=0; is<NSPIN; is++)
-        {
-            rho_atom[is] = new double[pw.nrxx];
-            ZEROS(rho_atom[is], pw.nrxx);
-        }
-
-        CHR.atomic_rho(NSPIN,rho_atom);
-
-        this->v_h(NSPIN, ehart, v_in, rho_atom);
-
-        for(int is=0; is<NSPIN; is++)
-        {
-            delete[] rho_atom[is];
-        }
-        delete[] rho_atom;
-
-        timer::tick("potential","vna_h");
-        return;
-    }
 
     timer::tick("potential","v_of_rho",'E');
 
@@ -336,47 +275,7 @@ void potential::v_of_rho
 //----------------------------------------------------------
 //  calculate the Hartree potential
 //----------------------------------------------------------
-    if(delta_vh)
-    {
-        //--------------------------------------------
-        // get the atomic charge on real space grid.	
-        //--------------------------------------------
-        double** rho_atom = new double*[NSPIN];
-        for(int is=0; is<NSPIN; is++)
-        {
-            rho_atom[is] = new double[pw.nrxx];
-            ZEROS(rho_atom[is], pw.nrxx);
-        }
-
-        CHR.atomic_rho(NSPIN,rho_atom);
-
-        //--------------------------------------------
-        // get the delta atomic charge on real space
-        // grid.
-        //--------------------------------------------
-        for(int is=0; is<NSPIN; is++)
-        {
-            for(int ir=0; ir<pw.nrxx; ir++)
-            {
-                rho_atom[is][ir] = rho_in[is][ir] - rho_atom[is][ir];
-            }
-        }
-
-        //--------------------------------------------
-        // get the potential from the delta charge
-        //--------------------------------------------
-        this->v_h(NSPIN, ehart, v_in, rho_atom);
-
-        for(int is=0; is<NSPIN; is++)
-        {
-            delete[] rho_atom[is];
-        }
-        delete[] rho_atom;
-    }
-    else
-    {
-        this->v_h(NSPIN, ehart, v_in, rho_in);
-    }
+	H_Hartree_pw::v_hartree(ucell, pw, UFFT, NSPIN, v_in, rho_in);
 
     // mohan add 2011-06-20
     if(EFIELD && DIPOLE)
@@ -571,120 +470,6 @@ void potential::v_xc
     timer::tick("potential","v_xc");
     return;
 }
-
-//--------------------------------------------------------------------
-// Transform charge density to hartree potential.
-//--------------------------------------------------------------------
-void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
-{
-    TITLE("potential","v_h");
-    timer::tick("potential","v_hartree");
-
-    complex<double> *Porter = UFFT.porter;
-
-    //  Hartree potential VH(r) from n(r)
-    ZEROS( Porter, pw.nrxx );
-    int nspin0 = 1;
-    if(NSPIN==2)nspin0 = NSPIN;
-    for(int is=0; is<nspin0; is++)
-    {
-        for (int ir=0; ir<pw.nrxx; ir++) 
-        {
-            Porter[ir] += complex<double>( rho[is][ir], 0.0 );
-        }
-    }
-
-    //=============================
-    //  bring rho (aux) to G space
-    //=============================
-    pw.FFT_chg.FFT3D(Porter, -1);
-
-    //double charge;
-    //if (pw.gstart == 1)
-    //{
-    //    charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
-    //}
-    //OUT(ofs_running, "v_h charge", charge);
-
-    //=======================================================
-    // calculate hartree potential in G-space (NB: V(G=0)=0 )
-    //=======================================================
-    ehart = 0.0;
-
-    complex<double> *vh_g  = new complex<double>[pw.ngmc];
-    ZEROS(vh_g, pw.ngmc);
-
-    for (int ig = pw.gstart; ig<pw.ngmc; ig++)
-    {
-        const int j = pw.ig2fftc[ig];
-        if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
-        {
-            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
-
-            ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-            vh_g[ig] = fac * Porter[j];
-        }
-    }
-
-    Parallel_Reduce::reduce_double_pool( ehart );
-    ehart *= 0.5 * ucell.omega;
-
-    //cout << " ehart=" << ehart << endl;
-
-    ZEROS(Porter, pw.nrxx);
-
-    for (int ig = 0;ig < pw.ngmc;ig++)
-    {
-        Porter[pw.ig2fftc[ig]] = vh_g[ig];
-    }
-
-    //==========================================
-    //transform hartree potential to real space
-    //==========================================
-    pw.FFT_chg.FFT3D(Porter, 1);
-    //==========================================
-    //Add hartree potential to the xc potential
-    //==========================================
-
-	if(NSPIN==4)
-		for (int ir = 0;ir < pw.nrxx;ir++)
-		{
-			v(0, ir) += Porter[ir].real();
-		}
-	else
-    	for (int is = 0;is < NSPIN;is++)
-    	{
-        	for (int ir = 0;ir < pw.nrxx;ir++)
-        	{
-            		v(is, ir) += Porter[ir].real();
-        	}
-    	}
-
-	//-------------------------------------------
-	// output the Hartree potential into a file.
-	//-------------------------------------------
-	if(out_potential==-2)
-	{
-		cout << " output VH" << endl;
-		int is = 0;
-		int iter = 0;
-		int precision = 3;
-		string fn = "VH.dat";
-		stringstream ss;
-		ss << global_out_dir << fn;
-		matrix v;
-		v.create(1,pw.nrxx);
-		for(int ir=0; ir<pw.nrxx; ++ir)
-		{
-			v(0,ir) = Porter[ir].real();
-		}
-		this->write_potential( is, iter, ss.str(), v, precision, 1 );
-	}
-
-    timer::tick("potential","v_hartree");
-    delete[] vh_g;
-    return;
-} // end subroutine v_h
 
 
 //==========================================================
