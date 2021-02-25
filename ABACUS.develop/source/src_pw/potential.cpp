@@ -35,7 +35,7 @@ void potential::allocate(const int nrxx)
     Memory::record("potential","vrs",NSPIN*nrxx,"double");
 
     delete[] this->vrs1;
-    this->vrs1 = new double[nrxx];//mohan add 2007-11-12
+    this->vrs1 = new double[nrxx];
     Memory::record("potential","vrs1",nrxx,"double");
 
     this->vnew.create(NSPIN,nrxx);
@@ -141,7 +141,9 @@ void potential::init_pot(const int &istep, const bool delta_vh, const bool vna)
 					{//read only up+down , others set to zero.
 						ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
 						for(int ir=0;ir<pw.nrxx;ir++)
+						{
 							CHR.rho[is][ir] = 0.0;
+						}
 					}
 					else if(PRENSPIN == 2)
 					{//read up and down , then rearrange them.
@@ -388,6 +390,7 @@ void potential::v_of_rho
     timer::tick("potential","v_of_rho",'E');
     return;
 } //end subroutine v_of_rho
+
 
 //--------------------------------------------------------------------
 void potential::v_xc
@@ -685,13 +688,11 @@ void potential::v_h(int NSPIN,double &ehart, matrix &v, double** rho)
 
 
 //==========================================================
-// MEMBER FUNCTION : set_vrs
 // set the total local potential vrs on the smooth mesh to
 // be used in h_psi, adding the (spin dependent) scf (H+xc)
 // part and the sum of all the local pseudopotential
 // contributions.
 //==========================================================
-// from set_vrs.f90
 void potential::set_vrs(void)
 {
     TITLE("potential","set_vrs");
@@ -703,16 +704,20 @@ void potential::set_vrs(void)
         // define the total local potential (external + scf) for each spin
         //=================================================================
 		if(NSPIN==4&&is>0)
+		{
 			for (int i = 0;i < pw.nrxx;i++)
 			{
 				this->vrs(is, i) = this->vr(is, i);
 			}
+		}
 		else        
+		{
 			for (int i = 0;i < pw.nrxx;i++)
 	        {
 	            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
 	//	    	cout <<"i: "<< i <<"	"<< "vrs: " << vrs(is,i) <<endl;
 			}
+		}
 
         //====================================================
         // add external linear potential, fuxiang add in 2017/05
@@ -761,7 +766,8 @@ void potential::set_vrs(void)
 
     timer::tick("potential","set_vrs");
     return;
-} //end subroutine set_vrs
+}
+
 
 // ----------------------------------------------------------------------
 void potential::newd(void)

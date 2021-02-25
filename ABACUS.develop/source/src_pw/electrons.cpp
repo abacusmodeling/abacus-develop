@@ -9,6 +9,8 @@
 #include "src_io/epsilon0_vasp.h"
 #include "src_io/to_wannier90.h"
 #include "src_io/berryphase.h"
+// new
+#include "H_Ewald_pw.h"
 
 double Electrons::avg_iter = 0;
 
@@ -84,7 +86,9 @@ void Electrons::non_self_consistent(const int &istep)
 void Electrons::self_consistent(const int &istep)
 {
     timer::tick("Electrons","self_consistent",'D');
-    en.ewld = en.ewald();
+
+	// mohan update 2021-02-25
+	H_Ewald_pw::compute_ewald(ucell,pw); 
 
     set_ethr();
 

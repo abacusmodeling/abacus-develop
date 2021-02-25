@@ -6,6 +6,8 @@
 #include "efield.h"
 #include "myfunc.h"
 #include "symmetry.h"
+// new
+#include "H_Ewald_pw.h"
 
 void Stress::cal_stress()
 {
@@ -1409,7 +1411,7 @@ void Stress::stres_ewa(){
                //calculate tau[na]-tau[nb]
                d_tau = ucell.atoms[it].tau[i] - ucell.atoms[jt].tau[j];
                //generates nearest-neighbors shells 
-               en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
+               H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
                for(int nr=0 ; nr<nrm ; nr++){
                 rr=sqrt(r2[nr]) * ucell.lat0;
                 fac = -e2/2.0/ucell.omega*pow(ucell.lat0,2)*ucell.atoms[it].zv * ucell.atoms[it].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (TWO_PI)) * exp(-alpha * pow(rr,2)));

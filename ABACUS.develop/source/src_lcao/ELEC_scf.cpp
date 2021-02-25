@@ -9,6 +9,8 @@
 #include "ELEC_evolve.h"
 #include "input_update.h"
 #include "src_pw/occupy.h"
+//new
+#include "src_pw/H_Ewald_pw.h"
 
 ELEC_scf::ELEC_scf(){}
 ELEC_scf::~ELEC_scf(){}
@@ -21,7 +23,8 @@ void ELEC_scf::scf(const int &istep)
 	timer::tick("ELEC_scf","scf",'D');
 
 	// (1) calculate ewald energy.
-	en.ewld = en.ewald();
+	// mohan update 2021-02-25
+	H_Ewald_pw::compute_ewald(ucell,pw); 
 
 	// mohan add 2012-02-08
     set_ethr(); 

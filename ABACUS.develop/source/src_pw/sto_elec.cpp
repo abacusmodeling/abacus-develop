@@ -4,6 +4,7 @@
 #include "occupy.h"
 #include "symmetry_rho.h"
 #include "../src_io/wf_io.h"
+#include "H_Ewald_pw.h"
 
 double Stochastic_Elec::avg_iter = 0;
 
@@ -19,7 +20,9 @@ Stochastic_Elec::~Stochastic_Elec()
 void Stochastic_Elec::scf_stochastic(const int &istep)
 {
 	timer::tick("Elec_Stochastic","scf_stochastic",'D');
-    en.ewld = en.ewald();
+
+	// mohan update 2021-02-25
+	H_Ewald_pw::compute_ewald(ucell,pw); 
 
     set_ethr();
     

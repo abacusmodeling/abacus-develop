@@ -377,7 +377,7 @@ void Forces::cal_force_loc(void)
     return;
 }
 
-
+#include "H_Ewald_pw.h"
 void Forces::cal_force_ew(void)
 {
 	timer::tick("Forces","cal_force_ew");
@@ -489,9 +489,7 @@ void Forces::cal_force_ew(void)
                         if (iat1 != iat2)
                         {
                             Vector3<double> d_tau = ucell.atoms[T1].tau[I1] - ucell.atoms[T2].tau[I2];
-                            en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
-
-
+                            H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
 
                             for (int n = 0;n < nrm;n++)
                             {

@@ -55,8 +55,6 @@ class energy
     double etxcc;          // the nlcc exchange and correlation
 	double exx;            // the exact exchange energy.
 
-    double ewld;           // the ewald energy
-	double alpha;		   // the coefficient of ewald method
     double demet;          // correction for metals
 
 	int out_dos;			// control dos calculation
@@ -89,20 +87,9 @@ class energy
 
     void delta_escf(void);
 
-    void rgen(
-        const Vector3<double> &dtau,
-        const double &rmax,
-        int *irr,
-        const Matrix3 &at,
-        const Matrix3 &bg,
-        Vector3<double> *r,
-        double *r2,
-        int  &nrm
-    ) const;
     
     void set_exx();       // Peize Lin add 2016-12-03
     
-    static int mxr;
 };
 
 #endif //energy

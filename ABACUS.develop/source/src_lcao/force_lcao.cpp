@@ -586,6 +586,7 @@ void Force_LCAO::cal_force_loc(void)
 }
 
 
+#include "src_pw/H_Ewald_pw.h"
 void Force_LCAO::cal_force_ew(void)
 {
     timer::tick("Force_lo","cal_force_ew",'E');
@@ -608,7 +609,7 @@ void Force_LCAO::cal_force_ew(void)
 
     for (int ig = gstart; ig < pw.ngmc; ig++)
     {
-        aux[ig] *= exp(-1.0 * pw.gg[ig] * ucell.tpiba2 / en.alpha / 4.0) / (pw.gg[ig] * ucell.tpiba2);
+        aux[ig] *= exp(-1.0 * pw.gg[ig] * ucell.tpiba2 / H_Ewald_pw::alpha / 4.0) / (pw.gg[ig] * ucell.tpiba2);
     }
 
     int iat = 0;
@@ -643,7 +644,7 @@ void Force_LCAO::cal_force_ew(void)
     // means that the processor contains G=0 term.
     if (gstart == 1)
     {
-        double rmax = 5.0 / (sqrt(en.alpha) * ucell.lat0);
+        double rmax = 5.0 / (sqrt(H_Ewald_pw::alpha) * ucell.lat0);
         int nrm = 0;
 
         //output of rgen: the number of vectors in the sphere
@@ -669,18 +670,19 @@ void Force_LCAO::cal_force_ew(void)
                         if (iat1 != iat2)
                         {
                             Vector3<double> d_tau = ucell.atoms[it1].tau[ia1] - ucell.atoms[it2].tau[ia2];
-                            en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
+                            H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
                             // return r2[n], r(n, ipol)
 //							cout << "nrm = " << nrm << endl;
 
                             for (int n = 0; n < nrm; n++)
                             {
-                                assert (en.alpha >= 0.0);
+                                assert (H_Ewald_pw::alpha >= 0.0);
 
                                 const double rr = sqrt(r2[n]) * ucell.lat0;
                                 double factor = ucell.atoms[it1].zv * ucell.atoms[it2].zv * e2 / (rr * rr)
-                                                * (erfc(sqrt(en.alpha) * rr) / rr
-                                                   + sqrt(8.0 * en.alpha / TWO_PI) * exp(-1.0 * en.alpha * rr * rr)) * ucell.lat0;
+                                                * (erfc(sqrt(H_Ewald_pw::alpha) * rr) / rr
+                                                   + sqrt(8.0 * H_Ewald_pw::alpha / TWO_PI) 
+								* exp(-1.0 * H_Ewald_pw::alpha * rr * rr)) * ucell.lat0;
 
                                 //remian problem
                                 //fix bug iat -> iat1
