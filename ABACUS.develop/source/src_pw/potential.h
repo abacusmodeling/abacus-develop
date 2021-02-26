@@ -36,11 +36,10 @@ class potential
 
 	void init_pot(const int &istep);
 
-    void v_of_rho(double** rho_in, double &etxc, double &vtxc, matrix &v);
+    void v_of_rho(double** rho_in, matrix &v);
 
     void set_vrs(void);
 
-    void v_xc(double** rho_in, double &etxc, double &vtxc, matrix &v);
 
     void newd(void);
 

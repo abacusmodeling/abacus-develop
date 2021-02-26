@@ -212,6 +212,7 @@ xc_gga_pw.o \
 potential.o \
 H_Ewald_pw.o\
 H_Hartree_pw.o\
+H_XC_pw.o \
 write_pot.o\
 potential_libxc.o \
 efield.o \

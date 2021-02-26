@@ -15,6 +15,7 @@
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
+#include "H_XC_pw.h"
 
 
 energy::energy()
@@ -26,8 +27,6 @@ energy::energy()
     this->eband  = 0;          // the band energy
     this->deband = 0;          // correction for variational energy
 	this->deband_harris = 0;   // harris energy
-    this->etxc   = 0;          // the exchange and correlation energy
-    this->vtxc   = 0;          // another exchange-correlation energy
     this->etxcc  = 0;          // the nlcc exchange and correlation
 	this->exx    = 0;          // the exact exchange energy.
 
@@ -51,7 +50,8 @@ void energy::calculate_harris(const int &flag)
 	}
 	else if(flag==2)
 	{
-		this->etot_harris = eband + deband_harris + (etxc - etxcc) 
+		this->etot_harris = eband + deband_harris 
+		+ (H_XC_pw::etxc - etxcc) 
 		+ H_Ewald_pw::ewald_energy 
 		+ H_Hartree_pw::hartree_energy 
 		+ demet + exx + Efield::etotefield;
@@ -69,7 +69,8 @@ void energy::calculate_etot(void)
 {
 	TITLE("energy","calculate_etot");
 	//cout << "\n demet in etot = " << demet << endl;
-	this->etot = eband + deband + (etxc - etxcc) 
+	this->etot = eband + deband 
+	+ (H_XC_pw::etxc - etxcc) 
 	+ H_Ewald_pw::ewald_energy 
 	+ H_Hartree_pw::hartree_energy 
 	+ demet + descf + exx + Efield::etotefield;
@@ -118,7 +119,7 @@ bool print)
 			this->print_format("E_band",eband);
 			this->print_format("E_one_elec",eband+deband);
 			this->print_format("E_Hartree",H_Hartree_pw::hartree_energy);
-			this->print_format("E_xc",etxc-etxcc);
+			this->print_format("E_xc",H_XC_pw::etxc-etxcc);
 			this->print_format("E_Ewald",H_Ewald_pw::ewald_energy);
 			this->print_format("E_demet",demet); //mohan add 2011-12-02
 			this->print_format("E_descf",descf);

@@ -287,7 +287,7 @@ void Electrons::self_consistent(const int &istep)
         if (!conv_elec)
         {
             // not converged yet, calculate new potential from mixed charge density
-            pot.v_of_rho(CHR.rho, en.etxc, en.vtxc, pot.vr);
+            pot.v_of_rho(CHR.rho, pot.vr);
 
             // because <T+V(ionic)> = <eband+deband> are calculated after sum
             // band, using output charge density.
@@ -309,7 +309,7 @@ void Electrons::self_consistent(const int &istep)
 
             // mohan fix bug 2012-06-05,
             // the new potential V(PL)+V(H)+V(xc)
-            pot.v_of_rho(CHR.rho, en.etxc, en.vtxc, pot.vr);
+            pot.v_of_rho(CHR.rho, pot.vr);
             //cout<<"Exc = "<<en.etxc<<endl;
             //( vnew used later for scf correction to the forces )
             pot.vnew = pot.vr - pot.vnew;

@@ -3,6 +3,8 @@
 #include "vdwd2.h"
 #include "vdwd3.h"				  
 #include "symmetry.h"
+// new
+#include "H_XC_pw.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -538,7 +540,7 @@ void Forces::cal_force_cc(void)
 
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 
     complex<double> * psiv = new complex<double> [pw.nrxx];
     ZEROS(psiv, pw.nrxx);

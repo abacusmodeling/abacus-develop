@@ -49,8 +49,6 @@ class energy
 	double deband_harris;
     double descf;
 
-    double etxc;           // the exchange and correlation energy
-    double vtxc;           // another exchange-correlation energy
     double etxcc;          // the nlcc exchange and correlation
 	double exx;            // the exact exchange energy.
 

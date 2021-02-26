@@ -5,6 +5,7 @@
 #include "src_pw/myfunc.h"
 // new
 #include "src_pw/H_Hartree_pw.h"
+#include "src_pw/H_XC_pw.h"
 
 double Stress_LCAO::stress_invalid_threshold_ev = 0.00;
 
@@ -93,7 +94,7 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 	for(int i=0;i<3;i++)
 	{
 		// sigmaxc[i][i] = - (en.etxc-en.vtxc) / ucell.omega;
-		sigmaxc[i][i] =  -(en.etxc) / ucell.omega;
+		sigmaxc[i][i] =  -(H_XC_pw::etxc) / ucell.omega;
 
 		// sigmahar[i][i] = en.ehart /ucell.omega;
 
@@ -676,7 +677,7 @@ void Stress_LCAO::cal_stress_cc(void)
 
 	//recalculate the exchange-correlation potential
 	matrix vxc(NSPIN, pw.nrxx);
-	pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 
 	complex<double> * psic = new complex<double> [pw.nrxx];
 

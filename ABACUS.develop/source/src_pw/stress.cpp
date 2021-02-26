@@ -9,6 +9,7 @@
 // new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"
+#include "H_XC_pw.h"
 
 void Stress::cal_stress()
 {
@@ -44,8 +45,9 @@ void Stress::cal_stress()
     stres_ewa();
 
     //xc contribution: add gradient corrections(non diagonal)
-    for(int i=0;i<3;i++){
-       sigmaxc[i][i] = - (en.etxc-en.vtxc) / ucell.omega;
+    for(int i=0;i<3;i++)
+	{
+       sigmaxc[i][i] = - (H_XC_pw::etxc - H_XC_pw::vtxc) / ucell.omega;
     }
     stres_gradcorr();
 
@@ -1686,7 +1688,7 @@ void Stress::stres_cc()
            
     //recalculate the exchange-correlation potential
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 
     complex<double> * psic = new complex<double> [pw.nrxx];
     ZEROS(psic, pw.nrxx);

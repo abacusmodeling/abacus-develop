@@ -2,6 +2,8 @@
 #include "src_pw/global.h"
 #include "src_pw/potential_libxc.h"
 #include "dftu.h"  //Quxin add for DFT+U on 20201029
+// new
+#include "src_pw/H_XC_pw.h"
 
 double Force_LCAO::force_invalid_threshold_ev = 0.00;
 
@@ -727,7 +729,7 @@ void Force_LCAO::cal_force_cc(void)
 	#ifdef TEST_LIBXC
 	Potential_Libxc::v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
 	#else
-    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 	#endif
 
     complex<double> * psiv = new complex<double> [pw.nrxx];
