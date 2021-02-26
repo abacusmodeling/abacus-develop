@@ -23,7 +23,7 @@ class ELEC_evolve
 
 	private:
 
-	static void evolve_psi(const int &istep, Use_Hamilt_Matrix &uhm, complex<double>*** wfc);
+	static void evolve_psi(const int &istep, LCAO_Hamilt &uhm, complex<double>*** wfc);
 
 
 };

@@ -21,7 +21,7 @@ Run_lcao::~Run_lcao(){}
 void Run_lcao::lcao_line(void)
 {
     TITLE("Run_lcao","lcao_line");
-	timer::tick("Run_lcao","lcao_line",'B');
+	timer::tick("Run_lcao","lcao_line",'A');
 
 
     // Setup the unitcell.
@@ -173,6 +173,6 @@ void Run_lcao::lcao_line(void)
 	ions.opt_ions();
 	en.perform_dos();
 
-	timer::tick("Run_lcao","lcao_line",'B');
+	timer::tick("Run_lcao","lcao_line",'A');
     return;
 }

@@ -19,7 +19,7 @@ extern Parallel_Orbitals ParaO;
 extern Local_Orbital_wfc LOWF;
 extern Local_Orbital_Charge LOC;
 extern LCAO_Matrix LM;
-extern Use_Hamilt_Matrix UHM;
+extern LCAO_Hamilt UHM;
 extern SubGrid_oper SGO; //mohan add 2012-01-12
 extern Exx_Lcao exx_lcao; // Peize Lin add 2016-12-03
 #endif

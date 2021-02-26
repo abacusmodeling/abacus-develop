@@ -13,7 +13,7 @@ Build_ST_pw::~Build_ST_pw()
 
 }
 
-// be called in Use_Hamilt_Matrix::calculate_STNR_k()
+// be called in LCAO_Hamilt::calculate_STNR_k()
 // FUNCTION: calculate the overlap and kinetic matrix
 // in localized basis (expanded in plane wave basis).
 void Build_ST_pw::set_ST(const int &ik, const char& dtype)

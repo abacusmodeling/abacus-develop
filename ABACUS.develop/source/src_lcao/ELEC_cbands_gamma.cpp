@@ -11,7 +11,7 @@ ELEC_cbands_gamma::ELEC_cbands_gamma(){};
 ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 
 
-void ELEC_cbands_gamma::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
+void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_cbands_gamma","cal_bands");
 	timer::tick("ELEC_cband_gamma","cal_bands",'E');
@@ -35,7 +35,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 			pot.vrs1[ir] = pot.vrs( CURRENT_SPIN, ir);
 		}
 		
-		if(!UHM.init_s)
+		if(!uhm.init_s)
     	{
     	    WARNING_QUIT("Hamilt_Linear::solve_using_cg","Need init S matrix firstly");
     	}
@@ -46,7 +46,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
 		//--------------------------------------------
 
 		// Peize Lin add ik 2016-12-03
-		UHM.calculate_Hgamma(ik);
+		uhm.calculate_Hgamma(ik);
 
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u) 

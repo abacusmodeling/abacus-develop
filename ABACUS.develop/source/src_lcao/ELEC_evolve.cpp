@@ -10,7 +10,7 @@ ELEC_evolve::ELEC_evolve(){};
 ELEC_evolve::~ELEC_evolve(){};
 
 // this routine only serves for TDDFT using LCAO basis set
-void ELEC_evolve::evolve_psi(const int &istep, Use_Hamilt_Matrix &uhm, complex<double> ***wfc)
+void ELEC_evolve::evolve_psi(const int &istep, LCAO_Hamilt &uhm, complex<double> ***wfc)
 {
 	TITLE("ELEC_evolve","eveolve_psi");
 	timer::tick("ELEC_evolve","evolve_psi",'E');

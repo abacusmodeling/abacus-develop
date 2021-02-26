@@ -24,7 +24,7 @@ class ELEC_nscf
 
 	private:
 
-	static void nscf(Use_Hamilt_Matrix &uhm); 
+	static void nscf(LCAO_Hamilt &uhm); 
 
 
 };

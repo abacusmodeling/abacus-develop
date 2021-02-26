@@ -4,27 +4,28 @@
 #include "../src_global/sltk_atom_arrange.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
-Use_Hamilt_Matrix::Use_Hamilt_Matrix()
+LCAO_Hamilt::LCAO_Hamilt()
 { 
     init_s = false;
 }
 
-Use_Hamilt_Matrix::~Use_Hamilt_Matrix()
+LCAO_Hamilt::~LCAO_Hamilt()
 {
 	if(test_deconstructor)
 	{
-		cout << " ~Use_Hamilt_Matrix()" << endl;	
+		cout << " ~LCAO_Hamilt()" << endl;	
 	}
 }
 
 //--------------------------------------------
-// In set_ion, the 'calculate_STNR_gamma' or 
+// 'calculate_STNR_gamma' or 
 // 'calculate_STNR_k' functions are called
 //--------------------------------------------
-void Use_Hamilt_Matrix::set_ion(void)
+void LCAO_Hamilt::set_lcao_matrices(void)
 {
-	TITLE("Use_Hamilt_Matrix","set_ion");
-	timer::tick("Use_Hamilt_Matrix","set_ion",'D');
+	TITLE("LCAO_Hamilt","set_lcao_matrices");
+	timer::tick("LCAO_Hamilt","set_lcao_matrices",'E');
+
 	if(GAMMA_ONLY_LOCAL)
 	{
 		// mohan add 2012-03-29
@@ -50,14 +51,14 @@ void Use_Hamilt_Matrix::set_ion(void)
 	//cout << " init_s=" << init_s << endl; //delete 2015-09-06, xiaohui
 //	OUT(ofs_running,"init_s",init_s);
 
-	timer::tick("Use_Hamilt_Matrix","set_ion",'D');
+	timer::tick("LCAO_Hamilt","set_lcao_matrices",'E');
 	return;
 }
 
-void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-12-03
+void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-12-03
 {
-	TITLE("Use_Hamilt_Matrix","calculate_Hgamma");
-	timer::tick("Use_Hamilt_Matrix","cal_Hgamma",'F');
+	TITLE("LCAO_Hamilt","calculate_Hgamma");
+	timer::tick("LCAO_Hamilt","cal_Hgamma",'F');
 
 	// Set the matrix 'H' to zero.
 	LM.zeros_HSgamma('H'); // 3 stands for Hloc.
@@ -110,20 +111,20 @@ void Use_Hamilt_Matrix::calculate_Hgamma( const int &ik )				// Peize Lin add ik
 		LM.print_HSgamma('S'); // S
 		LM.print_HSgamma('T');
 		LM.print_HSgamma('H');
-	//	WARNING_QUIT("Use_Hamilt_Matrix::calculate_Hgamma","print the H,S matrix");
+	//	WARNING_QUIT("LCAO_Hamilt::calculate_Hgamma","print the H,S matrix");
 //		QUIT();
 	}
 
 
-	timer::tick("Use_Hamilt_Matrix","cal_Hgamma",'F');
+	timer::tick("LCAO_Hamilt","cal_Hgamma",'F');
 	return;
 }
 
 
 
-void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
+void LCAO_Hamilt::calculate_STNR_gamma(void)
 {
-	TITLE("Use_Hamilt_Matrix","calculate_fixed");
+	TITLE("LCAO_Hamilt","calculate_fixed");
 
 	OUT(ofs_running,"gamma_only_local",GAMMA_ONLY_LOCAL);
 
@@ -181,10 +182,10 @@ void Use_Hamilt_Matrix::calculate_STNR_gamma(void)
 
 #include "LCAO_nnr.h"
 // be called in Local_Orbital_Elec::cal_bands(). 
-void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
+void LCAO_Hamilt::calculate_Hk(const int &ik)
 {
-	TITLE("Use_Hamilt_Matrix","calculate_Hk");
-	timer::tick("Use_Hamilt_Matrix","calculate_Hk",'F');
+	TITLE("LCAO_Hamilt","calculate_Hk");
+	timer::tick("LCAO_Hamilt","calculate_Hk",'F');
 
 	// whether you want to calculate the local potential
 	// or not, you need to set this matrix to 0.
@@ -256,13 +257,13 @@ void Use_Hamilt_Matrix::calculate_Hk(const int &ik)
 	}
 	*/
 	
-	timer::tick("Use_Hamilt_Matrix","calculate_Hk",'F');
+	timer::tick("LCAO_Hamilt","calculate_Hk",'F');
 	return;
 }
 
 // only need to do the first time.
 // available for all k points.
-void Use_Hamilt_Matrix::calculate_STNR_k(void)
+void LCAO_Hamilt::calculate_STNR_k(void)
 {
     TITLE("Hamilt_Linear","calculate_STBR_k");
 
@@ -363,9 +364,9 @@ void Use_Hamilt_Matrix::calculate_STNR_k(void)
 }
 
 
-void Use_Hamilt_Matrix::calculate_STN_R(void)
+void LCAO_Hamilt::calculate_STN_R(void)
 {
-    TITLE("Use_Hamilt_Matrix","calculate_STN_R");
+    TITLE("LCAO_Hamilt","calculate_STN_R");
 
     //int iat = 0;
     int index = 0;

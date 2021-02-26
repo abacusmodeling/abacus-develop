@@ -15,8 +15,8 @@ class Local_Orbital_Elec
 
 	private:
 
-	// set matrix index and grid integral
-	void set_matrix_grid_index(void);
+	// set matrix and grid integral
+	void set_matrix_grid(void);
 
 	void before_solver(const int &istep);
 

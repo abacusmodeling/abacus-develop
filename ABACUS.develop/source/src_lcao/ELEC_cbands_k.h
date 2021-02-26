@@ -26,7 +26,7 @@ class ELEC_cbands_k
 
 	private:
 
-	static void cal_bands(const int &istep, Use_Hamilt_Matrix &uhm);
+	static void cal_bands(const int &istep, LCAO_Hamilt &uhm);
 
 
 };

@@ -23,7 +23,7 @@ Local_Orbital_Ions::~Local_Orbital_Ions()
 void Local_Orbital_Ions::opt_ions(void)
 {
     TITLE("Local_Orbital_Ions","opt_ions"); 
-    timer::tick("Local_Orbital_Ions","opt_ions",'C'); 
+    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
 		
     if(OUT_LEVEL=="i")
     {
@@ -311,7 +311,7 @@ void Local_Orbital_Ions::opt_ions(void)
 	// mohan update 2021-02-10
     hm.orb_con.clear_after_ions();
 
-    timer::tick("Local_Orbital_Ions","opt_ions",'C'); 
+    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
     return;
 }
 
@@ -586,13 +586,13 @@ void Local_Orbital_Ions::final_scf(void)
         LOC.allocate_DM_k();
     }
 
-    UHM.set_ion();
+    UHM.set_lcao_matrices();
 
     if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
     {
         vdwd2.energy();
     }
-	if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+	else if(vdwd3.vdwD3)							//jiyy add 2019-05-18
     {
         vdwd3.energy();
     }											  

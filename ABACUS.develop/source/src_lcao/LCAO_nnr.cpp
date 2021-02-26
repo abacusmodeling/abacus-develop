@@ -554,7 +554,7 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 }
 
 
-// be called in Use_Hamilt_Matrix::calculate_Hk.
+// be called in LCAO_Hamilt::calculate_Hk.
 void LCAO_nnr::folding_fixedH(const int &ik)
 {
 	TITLE("LCAO_nnr","folding_fixedH");

@@ -1,18 +1,19 @@
-#ifndef USE_HAMILT_MATRIX_H
-#define USE_HAMILT_MATRIX_H
+#ifndef LCAO_HAMILT_H
+#define LCAO_HAMILT_H
 
 #include "../src_pw/tools.h"
 #include "LCAO_gen_fixedH.h"
 #include "gint_gamma.h"
 #include "gint_k.h"
 
-class Use_Hamilt_Matrix
+class LCAO_Hamilt
 {
 	public:
-	Use_Hamilt_Matrix();
-	~Use_Hamilt_Matrix();
 
-    void set_ion(void);
+	LCAO_Hamilt();
+	~LCAO_Hamilt();
+
+    void set_lcao_matrices(void);
 		
 	// used fro k-dependent Hamiltonian matrix.
 	void calculate_Hk( const int &ik);

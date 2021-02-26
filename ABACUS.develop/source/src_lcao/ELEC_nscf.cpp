@@ -11,7 +11,7 @@
 ELEC_nscf::ELEC_nscf(){}
 ELEC_nscf::~ELEC_nscf(){}
 
-void ELEC_nscf::nscf(Use_Hamilt_Matrix &uhm)
+void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_nscf","nscf");
 

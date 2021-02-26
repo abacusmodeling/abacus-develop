@@ -24,21 +24,24 @@
 void Local_Orbital_Elec::solve_elec_stru(const int &istep)
 {
     TITLE("Local_Orbital_Elec","solve_elec_stru"); 
+    timer::tick("Local_Orbital_Elec","solve_elec_stru",'C'); 
 
 	// prepare HS matrices, prepare grid integral
-	this->set_matrix_grid_index();
+	this->set_matrix_grid();
 	// density matrix extrapolation and prepare S,T,VNL matrices 
 	this->before_solver(istep);
 	// do self-interaction calculations / nscf/ tddft, etc. 
 	this->solver(istep);
 
+    timer::tick("Local_Orbital_Elec","solve_elec_stru",'C'); 
 	return;
 }
 
 
-void Local_Orbital_Elec::set_matrix_grid_index(void)
+void Local_Orbital_Elec::set_matrix_grid(void)
 {
-    TITLE("Local_Orbital_Elec","set_matrix_grid_index"); 
+    TITLE("Local_Orbital_Elec","set_matrix_grid"); 
+    timer::tick("Local_Orbital_Elec","set_matrix_grid",'D'); 
 
 	// (1) Find adjacent atoms for each atom.
 	atom_arrange::set_sr_NL();
@@ -65,6 +68,7 @@ void Local_Orbital_Elec::set_matrix_grid_index(void)
 		LNNR.cal_nnrg(GridT);
 	}
 
+    timer::tick("Local_Orbital_Elec","set_matrix_grid",'D'); 
 	return;
 }
 
@@ -72,6 +76,7 @@ void Local_Orbital_Elec::set_matrix_grid_index(void)
 void Local_Orbital_Elec::before_solver(const int &istep)
 {
     TITLE("Local_Orbital_Elec","before_solver"); 
+    timer::tick("Local_Orbital_Elec","before_solver",'D'); 
 
 	// set the augmented orbitals index.
 	// after ParaO and GridT, 
@@ -123,15 +128,16 @@ void Local_Orbital_Elec::before_solver(const int &istep)
 
 
 	// (9) compute S, T, Vnl, Vna matrix.
-	UHM.set_ion();
+	UHM.set_lcao_matrices();
 
+    timer::tick("Local_Orbital_Elec","before_solver",'D'); 
 	return;
 }
 
 void Local_Orbital_Elec::solver(const int &istep)
 {
-
     TITLE("Local_Orbital_Elec","solver"); 
+    timer::tick("Local_Orbital_Elec","solver",'D'); 
 
 	// Peize Lin add 2014-04-04, update 2019-04-26
 	if(vdwd2.vdwD2)
@@ -219,9 +225,10 @@ void Local_Orbital_Elec::solver(const int &istep)
 	}
 	else
 	{
-		WARNING_QUIT("Local_Orbital_Ions::opt_ions","What's the CALCULATION.");
+		WARNING_QUIT("Local_Orbital_Ions::solver","CALCULATION type not supported");
 	}
 
+    timer::tick("Local_Orbital_Elec","solver",'D'); 
 	return;
 }
 

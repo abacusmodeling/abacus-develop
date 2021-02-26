@@ -416,7 +416,6 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 //	RA.for_2d();
 
 	// psi1
-//	double sum = 0.0;
     for (int T1 = 0; T1 < ucell.ntype; ++T1)
     {
 		const Atom* atom1 = &ucell.atoms[T1];
@@ -548,7 +547,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 											// mohan add 2010-12-20
 											if( nlm[0]!=0.0 )
 											{
-												//ofs_running << setw(10) << iw1_all << setw(10) << iw2_all << setw(20) << nlm[0] << endl; 
+												// ofs_running << setw(10) << iw1_all << setw(10) 
+												// << iw2_all << setw(20) << nlm[0] << endl; 
 												LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
 											}
 										}
@@ -621,7 +621,6 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 		} // I1
 	} // T1
 
-//	cout << " sum from build_Nonlocal_mu = " << sum << endl;
 
 	if(!GAMMA_ONLY_LOCAL)
 	{

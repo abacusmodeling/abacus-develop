@@ -10,7 +10,7 @@ ELEC_cbands_k::ELEC_cbands_k(){};
 ELEC_cbands_k::~ELEC_cbands_k(){};
 
 
-void ELEC_cbands_k::cal_bands(const int &istep, Use_Hamilt_Matrix &uhm)
+void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_cbands_k","cal_bands");
 	timer::tick("ELEC_cbands_k","cal_bands",'E');

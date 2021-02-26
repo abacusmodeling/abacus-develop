@@ -71,7 +71,6 @@ void Driver::reading(void)
 void Driver::atomic_world(void)
 {
 	TITLE("Driver","atomic_world");
-	timer::tick("Driver","atomic_world",'A');
 
 	//--------------------------------------------------
 	// choose basis sets:
@@ -88,7 +87,6 @@ void Driver::atomic_world(void)
 		Run_lcao::lcao_line();
 	}
 
-	timer::tick("Driver","atomic_world",'A');
 	timer::finish( ofs_running );
 
 	Memory::print_all( ofs_running ) ;
