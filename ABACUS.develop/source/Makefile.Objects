@@ -214,6 +214,7 @@ H_Ewald_pw.o\
 H_Hartree_pw.o\
 H_XC_pw.o \
 write_pot.o\
+write_rho_dipole.o\
 potential_libxc.o \
 efield.o \
 magnetism.o\

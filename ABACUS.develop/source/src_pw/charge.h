@@ -1,7 +1,3 @@
-//==========================================================
-// AUTHOR : Lixin He, mohan , fangwei
-// DATE : 2008-11-10
-//==========================================================
 #ifndef CHARGE_H
 #define CHARGE_H
 
@@ -11,7 +7,6 @@
 //==========================================================
 // Electron Charge Density 
 //==========================================================
-
 class Charge
 {
 
@@ -42,13 +37,12 @@ public:
     complex<double>** rhog_save;
 
     double *rho_core;
-	complex<double> *rhog_core; // mohan add 2009-12-15
+	complex<double> *rhog_core;
 
     int out_charge; // output charge if out_charge > 0, and output every "out_charge" elec step.
 
     double *start_mag_type;
     double *start_mag_atom;
-
 
     void atomic_rho(const int spin_number_need, double **rho_in)const;
 

@@ -1,5 +1,6 @@
 #ifndef POTENTIAL_H
 #define POTENTIAL_H
+
 #include "tools.h"
 
 class potential
@@ -40,7 +41,6 @@ class potential
 
     void set_vrs(void);
 
-
     void newd(void);
 
 	public:
@@ -55,10 +55,6 @@ class potential
 	private:
 
     void set_local(double *vl_pseudo)const;
-
-
-
-	private:
 
 	// TDDFT related, fuxiang add
     double *vext;

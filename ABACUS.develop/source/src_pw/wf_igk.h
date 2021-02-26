@@ -15,7 +15,9 @@ class WF_igk
     int setupIndGk(const PW_Basis &pwb,const int nks);
     
     int npwx;
+
     int npw;
+
     IntArray igk;
 
     // g2kin : [npw],kinetic energy for current k point
