@@ -200,7 +200,6 @@ void potential::init_pot(const int &istep)
 
 //==========================================================
 // This routine computes the local potential in real space
-// vltot(ir)
 //==========================================================
 void potential::set_local(double* vl_pseudo)const
 {

@@ -15,17 +15,12 @@ public:
     Charge();
     ~Charge();
 
-	// mohan update 2021-02-20
-	void allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in);
-
 //==========================================================
 // MEMBER VARIABLES :
 // NAME : rho (nspin,ncxyz), the charge density in real space
-// NAME : rho_save (nspin,ncxyz), another charge density in
-// NAME : rho_ion(extra_pot, nspin, nxyz), mohan add 2011-03-22
-// rho_ion save the previous ion step charge density.
-// for charge extrapolation purpose.
-// real space
+// NAME : rho_save (nspin,ncxyz), for charge mixing
+// NAME : rhog, charge density in G space
+// NAME : rhog_save, chage density in G space
 // NAME : rho_core [nrxx], the core charge in real space
 // NAME : rhog_core [ngm], the core charge in reciprocal space
 //==========================================================
@@ -39,22 +34,18 @@ public:
     double *rho_core;
 	complex<double> *rhog_core;
 
-    int out_charge; // output charge if out_charge > 0, and output every "out_charge" elec step.
+	//  output charge if out_charge > 0, and output every "out_charge" elec step.
+    int out_charge;
 
     double *start_mag_type;
     double *start_mag_atom;
 
+	// mohan update 2021-02-20
+	void allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_in);
+
     void atomic_rho(const int spin_number_need, double **rho_in)const;
 
     void set_rho_core(const ComplexMatrix &structure_factor);
-
-    void write_rho(const int &is, const int &iter, const string &fn, 
-		const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
-
-    void write_rho_dipole(const int &is, const int &iter, const string &fn, 
-		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
-
-    bool read_rho(const int &is, const string &fn);//mohan add 2007-10-17
 
     void sum_band(void);
 
@@ -62,7 +53,8 @@ public:
 
     void save_rho_before_sum_band(void);
 
-    void non_linear_core_correction// drhoc
+	// for non-linear core correction
+    void non_linear_core_correction
     (
         const bool &numeric,
         const int mesh,
@@ -75,6 +67,17 @@ public:
 	double check_ne(const double *rho_in) const;
 
     void init_final_scf(); //LiuXh add 20180619
+
+	public:
+
+    void write_rho(const int &is, const int &iter, const string &fn, 
+		const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
+
+    void write_rho_dipole(const int &is, const int &iter, const string &fn, 
+		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
+
+    bool read_rho(const int &is, const string &fn);//mohan add 2007-10-17
+
 
 	private:
 

@@ -157,68 +157,8 @@ bool print)
 		this->etot_old = this->etot;
 	}
 	
-	// for test, output eigenvalues.
-	/*
-	for(int ik=0; ik<kv.nks; ik++)
-	{
-		for(int ib=0; ib<NBANDS; ib++)
-		{
-			if(ib%8==0)
-			{
-				ofs_running << endl;
-			}
-			ofs_running << setw(15) << wf.et(ik,ib) * Ry_to_ev;
-		}
-	}
-	*/
-
 	// mohan update 2011-02-26
 	stringstream ss;
-	//xiaohui modify 2013-09-02
-	//if(LINEAR_SCALING == 2)
-	//{
-	//	if(DIAGO_TYPE=="canonical")
-	//	{
-	//		ss << "CA" << iter << "\0";
-	//	}
-	//	else if(DIAGO_TYPE=="trace_correcting")
-	//	{
-	//		ss << "TC" << iter << "\0";
-
-	//	}
-	//	else if(DIAGO_TYPE=="trace_resetting")
-	//	{
-	//		ss << "TR" << iter << "\0";
-	//	}
-	//}
-	//else
-	//{
-	//	if(DIAGO_TYPE=="cg")
-	//	{
-	//		ss << "CG" << iter << "\0";
-	//	}
-	//	else if(DIAGO_TYPE=="lapack")
-	//	{
-	//		ss << "LA" << iter << "\0";
-	//	}
-	//	else if(DIAGO_TYPE=="hpseps")
-	//	{
-	//		ss << "HP" << iter << "\0";
-	//	}
-	//	//else if(DIAGO_TYPE=="selinv")
-	//	//{
-	//		// selinv series version
-	//	//	ss << "SI" << iter << "\0";
-	//	//}
-	//	else if(DIAGO_TYPE=="dav")
-	//	{
-	//		ss << "DA" << iter << "\0";
-	//	}
-	//	else
-	//	{
-	//		WARNING_QUIT("Energy","print_etot");
-	//	}
-	//} xiaohui modify 2013-09-02
 
 	//xiaohui add 2013-09-02, Peize Lin update 2020.11.14
     string label;
@@ -347,48 +287,9 @@ bool print)
 	}
 	else
 	{
-	//	if(iter_in % 4 == 0) cout << endl;
-	//	cout << setprecision(6) << setw(15) << en.etot;
 	}
 
-	/*
-	cout << setprecision(9);
-
-	if(converged)
-	{
-		ofs_running << "\n end of self-consistenr calculation ";
-
-		cout 
-		<< "\n" << setw(20) << "  oooO      Oooo   |" << setw(15) << etot
-		<< "\n" << setw(20) << " (####)    (####)  |" << setw(15) << dr2
-		<< "\n" << setw(20) << " \\##(      )##/   |" << setw(15) << duration
-		<< "\n" << setw(20) << "  \\_)      (_/    |"
-		<< endl;
-		
-	}
-	else
-	{
-		if(iter%2==0)
-		{
-			cout 
-			<< "\n" << setw(20) << "  oooO             |" << setw(15) << etot
-			<< "\n" << setw(20) << " (####)            |" << setw(15) << dr2
-			<< "\n" << setw(20) << " \\##(             |" << setw(15) << duration
-			<< "\n" << setw(20) << "  \\_)             |"
-			<< endl;
-		}
-		else
-		{
-			cout 
-			<< "\n" << setw(20) << "            Oooo   |" << setw(15) << etot
-			<< "\n" << setw(20) << "           (####)  |" << setw(15) << dr2
-			<< "\n" << setw(20) << "            )##/   |" << setw(15) << duration
-			<< "\n" << setw(20) << "            (_/    |"
-			<< endl;
-		}
-	}
-	*/
-        this->etot_old = this->etot;
+    this->etot_old = this->etot;
 	return;
 }
 
