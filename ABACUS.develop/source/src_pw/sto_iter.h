@@ -24,17 +24,18 @@ class Stochastic_Iter
 
     void init();
     
-    void calrho(double *);
+    void sum_stoband();
     double calne();
     double caldnedmu();
     void itermu();
     void sumpolyval();
+    void test(); //only for test
     Stochastic_Chebychev stoche;
     Stochastic_hchi stohchi;
 
 
-	static double mu; // chemical potential
-    static double Emin, Emax;
+	static double mu, mu0; // chemical potential; unit in Ry
+    static double Emin, Emax; // unit in Ry
     double targetne;
     double * spolyv;
 
@@ -42,12 +43,11 @@ class Stochastic_Iter
     
     double nchip;
     double th_ne;
+    double KS_ne;
 
     static double root_fd(double e);
-    static double dfddmu(double e);
     static double fd(double e);
     static double nroot_fd(double e);
-    static double ndfddmu(double e);
     static double nfd(double e);
 
 

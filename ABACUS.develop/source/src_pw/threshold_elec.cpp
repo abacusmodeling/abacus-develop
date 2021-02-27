@@ -39,7 +39,7 @@ void Threshold_Elec::set_ethr(void) const
     //================
     // self consistent
     //================
-    else if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
+    else if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="scf-sto")//qianrui 2021-2-20
     {
         if (ETHR == 0.0)
         {

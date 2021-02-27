@@ -8,7 +8,8 @@ Stochastic_Chebychev::Stochastic_Chebychev()
     initcoef = false;
     getcoef = false;
     getpolyval = false;
-    norder = 10;
+    extend = 10;
+    norder = 5;
     ccoef = new complex<double> [1];
     coef = new double [1];
     polyvalue = new complex<double> [1];
@@ -27,17 +28,17 @@ Stochastic_Chebychev::~Stochastic_Chebychev()
 void Stochastic_Chebychev:: init()
 {
     norder = STO_WF.nche_sto;
-    assert(norder > 10);
+    assert(norder > 5);
+    assert(extend >= 1);
     if(norder != 0)
     {
-        norder2 = 2 * norder;
+        norder2 = 2 * norder * extend;
         delete[] coef;
         delete[] ccoef;
         delete[] polyvalue;
         ccoef = new complex<double> [norder2];
-        coef = new double [norder];
+        coef = new double [norder2];
         polyvalue = new complex<double> [norder];
-        ZEROS(polyvalue, norder);
         initcoef = true;
     }
     else
@@ -52,23 +53,24 @@ void Stochastic_Chebychev:: calcoef(double fun(double))
     if(!initcoef) WARNING_QUIT("Stochastic_Chebychev", "Please init coef first!");
     for(int i = 0; i < norder2; ++i)
     {
-        ccoef[i]=complex<double>(fun(cos((i+0.5)*PI/norder)));
+        coef[i]=fun(cos((i+0.5)*TWO_PI/norder2));
     }
      if(!initplan)
     {
         initplan = true;
-        plancoef = fftw_plan_dft_1d(norder2, (fftw_complex *) ccoef, (fftw_complex *) ccoef, FFTW_FORWARD, FFTW_MEASURE);
+        plancoef = fftw_plan_dft_r2c_1d(norder2, coef, (fftw_complex *) ccoef, FFTW_MEASURE);
     }
     fftw_execute(plancoef);
+    complex<double> ui(0,1);
     for(int i = 0; i<norder; ++i)
     {
         if(i == 0)
         {
-            coef[i]=ccoef[i].real()/norder2;
+            coef[i] = real(exp(ui*i*PI/norder2) * ccoef[i]) / norder2;
         }
         else
         {
-            coef[i]/=ccoef[i].real()/norder;
+            coef[i] = real(exp(ui*i*PI/norder2) * ccoef[i]) * 2 / norder2;
         }
     }
     getcoef = true;
@@ -110,26 +112,24 @@ void Stochastic_Chebychev:: calresult(double &t, double& result)
     return;
 }
 
+
 void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<double> *out), int& ndim, complex<double> *wavein)
 {
-    if(!getcoef) WARNING_QUIT("Stochastic_Chebychev", "Please calculate coef first!");
 
     complex<double> *arraynp1, *arrayn, *arrayn_1;
     arraynp1 = new complex<double> [ndim];
     arrayn = new complex<double> [ndim];
     arrayn_1 = new complex<double> [ndim];
 
-    for(int i = 0; i < ndim; ++i)
-    {
-        arrayn_1[i] = wavein[i]; 
-    }
+    DCOPY(wavein, arrayn_1, ndim);
     tfun(arrayn_1, arrayn);
 
+    ZEROS(polyvalue,norder);
     //0- & 1-st order
-    polyvalue[0] = ndim; // 0-th order : <wavein | wavein> = ndim
-    for(int i = 0; i < ndim; ++i) // 1-st order : <wavein | tfun | wavein>
+    for(int i = 0; i < ndim; ++i) 
     {
-        polyvalue[1] += conj(wavein[i]) * arrayn_1[i];
+        polyvalue[0] += conj(wavein[i]) * wavein[i];// 0-th order : <wavein | wavein> = ndim
+        polyvalue[1] += conj(wavein[i]) * arrayn[i];// 1-st order : <wavein | tfun | wavein>
     }
 
     //more than 1-st orders
@@ -140,6 +140,7 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
         {
             polyvalue[ior] += conj(wavein[i]) * arraynp1[i];
         }
+        
         complex<double>* tem = arrayn_1;
         arrayn_1 = arrayn;
         arrayn = arraynp1;

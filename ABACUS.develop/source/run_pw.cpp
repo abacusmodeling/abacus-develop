@@ -34,8 +34,16 @@ void Run_pw::plane_wave_line(void)
     //=====================
     // init wave functions
     //=====================
-    wf.init(kv.nks);
-	UFFT.allocate();
+    if ( NBANDS != 0 || (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") )//qianrui add 
+	{
+        wf.init(kv.nks);
+    }
+    else
+    {
+        wf.npwx = wf.setupIndGk(pw, kv.nks);
+    }
+    UFFT.allocate();
+    
 
     //=======================
     // init pseudopotential
@@ -76,7 +84,12 @@ void Run_pw::plane_wave_line(void)
     //================================
     // Initial start wave functions
     //================================
-   	wf.wfcinit();
+    if ( NBANDS != 0 || (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") )//qianrui add 
+	{
+    	wf.wfcinit();
+    }
+    
+    
 
 
     DONE(ofs_running,"INIT BASIS");

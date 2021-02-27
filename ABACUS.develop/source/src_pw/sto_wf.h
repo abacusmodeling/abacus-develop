@@ -19,13 +19,12 @@ class Stochastic_WF
 
 
 	void init();
-	void calculate_chi();
 
 	// ComplexMatrix may not be a best filetype to store the electronic wave functions
     ComplexMatrix* chi0;  	// origin stochastic wavefunctions in real space
-	ComplexMatrix* chig;	// stochastic wavefunctions after in reciprocal space orthogonalized with KS wavefunctions
+	ComplexMatrix* chiortho;	// stochastic wavefunctions after in reciprocal space orthogonalized with KS wavefunctions
 	Stochastic_Chebychev sto_che;
-	int nchi; 				// Total number of stochatic obitals
+	int nchi; 				// Total number of stochatic obitals; unit in a_0^(3/2)
 	int nchip; 				// The number of stochatic obitals in current process 
 	int nche_sto;			// number of orders for Chebyshev expansion 
 

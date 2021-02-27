@@ -1240,45 +1240,47 @@ void UnitCell_pseudo::cal_nelec(void)
 		}
 	}
 	
-	
-	if(NBANDS == 0)
+	if ( CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto" ) //qianrui 2021-2-20
 	{
-		if(NSPIN == 1)
+		if(NBANDS == 0)
 		{
-			int nbands1 = static_cast<int>(occupied_bands) + 10;
-			int nbands2 = static_cast<int>(1.2 * occupied_bands);
-			NBANDS = max(nbands1, nbands2);
+			if(NSPIN == 1)
+			{
+				int nbands1 = static_cast<int>(occupied_bands) + 10;
+				int nbands2 = static_cast<int>(1.2 * occupied_bands);
+				NBANDS = max(nbands1, nbands2);
+			}
+			else if (NSPIN ==2 || NSPIN == 4)
+			{
+				int nbands3 = nelec + 20;
+				int nbands4 = 1.2 * nelec;
+				NBANDS = max(nbands3, nbands4);
+			}
+    	            if (NBANDS > NLOCAL)
+    	            {
+    	                NBANDS = NLOCAL;
+    	            }
+			AUTO_SET("NBANDS",NBANDS);
 		}
-		else if (NSPIN ==2 || NSPIN == 4)
+		//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+		else
 		{
-			int nbands3 = nelec + 20;
-			int nbands4 = 1.2 * nelec;
-			NBANDS = max(nbands3, nbands4);
+				if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
+				if(NBANDS < mag.get_nelup() ) 
+				{
+					OUT(ofs_running,"nelup",mag.get_nelup());
+					WARNING_QUIT("unitcell","Too few spin up bands!");
+				}
+				if(NBANDS < mag.get_neldw() ) 
+				{
+					WARNING_QUIT("unitcell","Too few spin down bands!");
+				}
+				if (NBANDS > NLOCAL)
+				{
+					WARNING_QUIT("unitcell","Too many bands! NBANDS > NBASIS.");
+				}
 		}
-                if (NBANDS > NLOCAL)
-                {
-                    NBANDS = NLOCAL;
-                }
-		AUTO_SET("NBANDS",NBANDS);
-	}
-	//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
-	else
-	{
-		if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
-		if(NBANDS < mag.get_nelup() ) 
-		{
-			OUT(ofs_running,"nelup",mag.get_nelup());
-			WARNING_QUIT("unitcell","Too few spin up bands!");
-		}
-		if(NBANDS < mag.get_neldw() ) 
-		{
-			WARNING_QUIT("unitcell","Too few spin down bands!");
-		}
-		if (NBANDS > NLOCAL)
-		{
-			WARNING_QUIT("unitcell","Too many bands! NBANDS > NBASIS.");
-		}
-	}
+  	}
 
 	OUT(ofs_running,"NBANDS",NBANDS);
 	return;

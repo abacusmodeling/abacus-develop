@@ -4,6 +4,7 @@
 #include "tools.h"
 #include "threshold_elec.h"
 #include "sto_wf.h"
+#include "sto_iter.h"
 
 //----------------------------------------------
 // methods based on stochastic wave functions
@@ -25,7 +26,7 @@ class Stochastic_Elec: private Threshold_Elec
     void scf_stochastic(const int &istep);
 
 	private:
-    Stochastic_WF swf;
+    Stochastic_Iter stoiter;
 
     void c_bands(const int &istep);
 

@@ -4,10 +4,11 @@
 
 int Stochastic_hchi:: nrxx;
 int Stochastic_hchi:: nx,Stochastic_hchi::ny,Stochastic_hchi::nz;
-fftw_plan Stochastic_hchi:: pf, Stochastic_hchi::pb;
+fftw_plan Stochastic_hchi:: pb, Stochastic_hchi::pf;
 double Stochastic_hchi:: Emin, Stochastic_hchi:: Emax;
 bool Stochastic_hchi:: initplan, Stochastic_hchi::ortho;
-complex<double>* Stochastic_hchi:: rp_chi, * Stochastic_hchi::tmpchi2, * Stochastic_hchi::chig;
+complex<double>* Stochastic_hchi:: rp_chi, * Stochastic_hchi::rl_chi;
+int * Stochastic_hchi:: GRA_index;
 
 
 Stochastic_hchi::Stochastic_hchi()
@@ -16,19 +17,19 @@ Stochastic_hchi::Stochastic_hchi()
 	ortho = false;
 	nrxx = 0;
 	rp_chi = new complex<double> [1];
-	tmpchi2 = new complex<double> [1];
-	chig = new complex<double> [1];
+	rl_chi = new complex<double> [1];
+	GRA_index = new int [1];
 }
 
 Stochastic_hchi::~Stochastic_hchi()
 {
 	if(initplan)
 	{
-		fftw_destroy_plan(pf);
 		fftw_destroy_plan(pb);
+		fftw_destroy_plan(pf);
 	}
 	delete[] rp_chi;
-	delete[] tmpchi2;
+	delete[] rl_chi;
 }
 
 void Stochastic_hchi:: init()
@@ -36,14 +37,20 @@ void Stochastic_hchi:: init()
 	//wait for init--------------------------------------
 		//nrxx
 	//---------------------------------------------------
+	nrxx = pw.nrxx;
+	nx = pw.nx;
+	ny = pw.ny;
+	nz = pw.nz;
     if(nrxx != 0)
     {
         delete[] rp_chi;
-        delete[] tmpchi2;
+        delete[] rl_chi;
+		delete[] GRA_index;
         rp_chi = new complex<double> [nrxx];
-		tmpchi2 = new complex<double> [nrxx];
-		pb=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)rp_chi,(fftw_complex *)rp_chi, FFTW_BACKWARD, FFTW_MEASURE);
-		pf=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)tmpchi2,(fftw_complex *)tmpchi2, FFTW_FORWARD, FFTW_MEASURE);
+		rl_chi = new complex<double> [nrxx];
+		GRA_index = new int [wf.npw];
+		pf=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)rp_chi,(fftw_complex *)rp_chi, FFTW_FORWARD, FFTW_MEASURE);
+		pb=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)rl_chi,(fftw_complex *)rl_chi, FFTW_BACKWARD, FFTW_MEASURE);
 		initplan = true;
     }
     else
@@ -53,85 +60,154 @@ void Stochastic_hchi:: init()
 
 }
 
-void Stochastic_hchi::orthogonal_to_psi(complex<double> *wfin, complex<double> *wfgortho)
+void Stochastic_hchi::get_GRA_index()
 {
-	//wait for init
-	int * GR_INDEX;
-	double * v;
+	int ix,iy,iz;
+	int ir;
+	ZEROS(GRA_index,wf.npw);
+	for(int ig = 0 ; ig < wf.npw; ++ig)
+	{
+		ix = floor(pw.gcar[wf.igk(0, ig)].x+0.1);
+		iy = floor(pw.gcar[wf.igk(0, ig)].y+0.1);
+		iz = floor(pw.gcar[wf.igk(0, ig)].z+0.1);
+		if(ix < 0) ix += nx;
+		if(iy < 0) iy += ny;
+		if(iz < 0) iz += nz;
+		ir = ix * ny * nz + iy * nz + iz;
+		GRA_index[ig] = ir;
+	}
+}
+
+void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<double> *wfout, int &ikk)
+{
 
 	TITLE("Stochastic_hchi","orthogonal_to_psi0");
 	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
-	for( int ir = 0; ir < nrxx; ++ir)
-	{
-		rp_chi[ir] = wfin[ir];
-	}
-	ZEROS(wfgortho,nrxx);
-	fftw_execute(pb);
+	DCOPY(wfin,rp_chi,nrxx);
+	fftw_execute(pf);
 	
-	delete []chig;
-	chig = new complex<double> [wf.npw];
+	complex<double> * chig = new complex<double> [wf.npw];
 	for(int ig = 0; ig < wf.npw; ++ig)
 	{
-		chig[ig] = rp_chi[GR_INDEX[ig]]; 
+		chig[ig] = rp_chi[GRA_index[ig]]; 
 	}
 
 	//orthogonal part
 	complex<double> sum;
 	for(int iksb = 0; iksb < NBANDS; ++iksb)
 	{
-		complex<double> *kswf; // kswf is normalized
+		complex<double> *kswf = &wf.evc[ikk](iksb,0); 
 		sum=0;
-		for(int ig = 0; ig < pw.ngmw; ++ig)
+		for(int ig = 0; ig < wf.npw; ++ig)
 		{
 			sum += conj(kswf[ig]) * chig[ig];
 		}
-		for(int ig = 0; ig < pw.ngmw; ++ig)
+		for(int ig = 0; ig < wf.npw; ++ig)
 		{
 			chig[ig] -= sum*kswf[ig];
 		}
 	}
 
+	//test orthogonal in reciprocal space
+	//complex<double> overlap;
+	//for(int iksb = 0; iksb < NBANDS; ++iksb)
+	//{
+	//	complex<double> *kswf = &wf.evc[ikk](iksb,0); 
+	//	overlap=0;
+	//	for(int ig = 0; ig < wf.npw; ++ig)
+	//	{
+	//		overlap += conj(kswf[ig]) * chig[ig];
+	//	}
+	//	cout<<"OVERLAP "<<overlap<<endl;
+	//}
+
 	for(int ig = 0; ig < wf.npw; ++ig)
 	{
-		rp_chi[GR_INDEX[ig]] = chig[ig];
+		rp_chi[GRA_index[ig]] = chig[ig];
 	}
-	for(int ir = 0; ir < nrxx; ++ir)
+	DCOPY(rp_chi,rl_chi,nrxx);
+
+	fftw_execute(pb);
+	for(int ir = 0; ir < nrxx ; ++ir)
 	{
-		wfgortho[ir] = rp_chi[ir];
+		wfout[ir] = rl_chi[ir] / nrxx;
 	}
+
+	/*//test orthogonal in real space
+	complex<double> overlap;
+	complex<double> * kswf = new complex<double> [nrxx];
+	fftw_plan pp=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)kswf,(fftw_complex *)kswf, FFTW_BACKWARD, FFTW_ESTIMATE);
+	for(int iksb = 0; iksb < NBANDS; ++iksb)
+	{
+		ZEROS(kswf,nrxx);
+		for(int ig = 0 ; ig < wf.npw; ++ig)
+		{
+			kswf[GRA_index[ig]] = wf.evc[ikk](iksb,ig);
+		}
+		fftw_execute(pp);
+		overlap=0;
+		for(int ir = 0; ir < nrxx; ++ir)
+		{
+			overlap += conj(kswf[ir]) * wfout[ir];
+		}
+		cout<<"OVERLAP "<<overlap<<endl;
+	}
+	delete [] kswf;*/
+
 	ortho = true;
+	delete[] chig;
 	return;
 }
 
 
 
 
-void Stochastic_hchi:: hchi(complex<double>*wfgortho, complex<double> *wfout)
+void Stochastic_hchi:: hchi_real(complex<double>*chi_in, complex<double> *hchi)
 {
-	//wait for init--------------------------------------
-		double dk1=1,dk2=1,dk3=1; double*vr;//vr= pot.vrs1 temporarily use cutoff vr.
-	int * GR_INDEX;
+	
+	double*vr = pot.vrs1;  //vr= pot.vrs1 temporarily use cutoff vr.
+
+	//wait for init--------------------------------------	
+	double dk1,dk2,dk3;
+	dk1 = ucell.tpiba;
+	dk2 = ucell.tpiba;
+	dk3 = ucell.tpiba;
 		
 	//---------------------------------------------------
-	if(!initplan||!ortho) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
+	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
-	
+	ZEROS(hchi,nrxx);
+	DCOPY(chi_in, rp_chi, nrxx);
+	fftw_execute(pf);
+
+	complex<double> * chig = new complex<double> [wf.npw];
+	ZEROS(chig,wf.npw);
+	for(int ig = 0; ig < wf.npw; ++ig)
+	{
+		chig[ig] = rp_chi[GRA_index[ig]]; 
+	}
+
 	//------------------------------------
 	//(1) the local potential.
 	//------------------------------------
+
 	if(VL_IN_H)
 	{
 		for(int ir = 0; ir < nrxx; ++ir)
 		{
-			tmpchi2[ir] = wfgortho[ir];
+			hchi[ir] += chi_in[ir] * vr[ir] ;
 		}
-		fftw_execute(pf);
-		for(int ir = 0; ir < nrxx; ++ir)
-		{
-			wfout[ir] += tmpchi2[ir] * vr[ir];
-		}
+		
 	}
+	/*cout<<"HCHI-------------------------"<<endl;
+
+		for(int ir  = 63800 ; ir < 64000; ++ir)
+		{
+			cout<<chi_in[ir] * vr[ir]<<" ";
+		}
+		cout<<endl;*/
+	
 	
 	
 	//------------------------------------
@@ -153,8 +229,8 @@ void Stochastic_hchi:: hchi(complex<double>*wfgortho, complex<double> *wfout)
 					if(ig1 > nx/2) gx -= nx;
 					if(ig2 > ny/2) gy -= ny;
 					if(ig3 > nz/2) gz -= nz;
-					gg.set((gx-double(nx-1)/2)*dk1, (gy-double(ny-1)/2)*dk2, (gz-double(nz-1)/2)*dk3);
-					tmpchi2[i] = -gg.norm2()*wfgortho[i];
+					gg.set(gx*dk1, gy*dk2, gz*dk3);
+					rl_chi[i] = gg.norm2()*rp_chi[i];
 					++i;
 				}
 			}
@@ -162,6 +238,7 @@ void Stochastic_hchi:: hchi(complex<double>*wfgortho, complex<double> *wfout)
 		}
 	}
 
+	
 	
 
 	//------------------------------------
@@ -173,11 +250,10 @@ void Stochastic_hchi:: hchi(complex<double>*wfgortho, complex<double> *wfout)
 		{
 			complex<double> *becp = new complex<double>[ ppcell.nkb * NPOL ];
 			ZEROS(becp,ppcell.nkb * NPOL);
-			
+
 			for (int i=0;i< ppcell.nkb;++i)
 			{
 				const complex<double>* p = &ppcell.vkb(i,0);
-				const complex<double>* const p_end = p + wf.npw;
 				for (int ig=0; ig< wf.npw; ++ig)
 				{
 					if(NSPIN!=4) becp[i] += chig[ig] * conj( p[ig] );
@@ -189,7 +265,7 @@ void Stochastic_hchi:: hchi(complex<double>*wfgortho, complex<double> *wfout)
 			}
 
 			//Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * NPOL);
-			complex<double> * Ps;
+			complex<double> * Ps = new complex<double> [ppcell.nkb * NPOL];
 			ZEROS( Ps, ppcell.nkb * NPOL );
 			int sum = 0;
     		int iat = 0;
@@ -225,34 +301,56 @@ void Stochastic_hchi:: hchi(complex<double>*wfgortho, complex<double> *wfout)
 					complex<double>* p = &ppcell.vkb(i,0);
 					for(int ig=0; ig< wf.npw; ++ig)
 					{
-						chig[ig] = Ps[i] * p[ig];
+						chig[ig] += Ps[i] * p[ig];
 					}
 				}
 			delete[] becp;
+			delete[] Ps;
+		}
+		for(int ig = 0; ig < wf.npw; ++ig)
+		{
+			rl_chi[GRA_index[ig]] += chig[ig];
 		}
 	}
 
-
+	
 	//------------------------------------
 	// (4) Conver (2) & (3) in Reciprocal space to Real one
 	//------------------------------------
-	for(int ig = 0; ig < wf.npw; ++ig)
+	fftw_execute(pb);
+	for(int i = 0; i < nrxx; ++i)
 	{
-		tmpchi2[GR_INDEX[ig]] += chig[ig];
+		hchi[i] += rl_chi[i] / nrxx;
 	}
 
-	fftw_execute(pf);
-	for(int i = 0; i<nrxx; ++i)
-	{
-		wfout[i] += tmpchi2 [i];
-	}
+	
 	double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
 	for(int i = 0; i < nrxx; ++i)
 	{
-		wfout[i] = (wfout[i] - Ebar) / DeltaE;
+		hchi[i] = (hchi[i] - Ebar * chi_in[i]) / DeltaE;
 	}
-	
 	delete [] chig;
+	//test Emax & Emin
+	//------------------------------------------------------------
+	//double sum1 = 0;
+	//double sum2 = 0;
+	//for(int i = 0 ; i < nrxx; ++i)
+	//{
+	//	sum1 += norm(chi_in[i]);
+	//	sum2 += real(conj(chi_in[i]) * hchi[i]);
+	//}
+	//cout<<sum2 << " "<<sum1<<" "<<sum2/sum1<<"  dddd"<<endl;
+	//------------------------------------------------------------
+
+	//test hermit property
+	//------------------------------------------------------------
+	//complex<double> sum=0;
+	//for(int i = 0 ; i < nrxx; ++i)
+	//{
+	//	sum+=conj(chi_in[i]) * hchi[i];
+	//}
+	//cout<<sum<<" must be real numebr."<<endl; //sum must be a real number
+	//------------------------------------------------------------
 	return;
 }

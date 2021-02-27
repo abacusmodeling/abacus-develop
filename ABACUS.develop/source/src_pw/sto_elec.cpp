@@ -19,7 +19,7 @@ Stochastic_Elec::~Stochastic_Elec()
 void Stochastic_Elec::scf_stochastic(const int &istep)
 {
 	timer::tick("Elec_Stochastic","scf_stochastic",'D');
-    en.ewld = en.ewald();
+	en.ewld = en.ewald();
 
     set_ethr();
     
@@ -56,8 +56,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 	clock_t start,finish;
 	double duration = 0.0;	
-	
-    for (this->iter = 1;iter <= NITER;iter++)
+    //for (this->iter = 1;iter <= NITER;iter++)
+	STO_WF.init();
+	for (this->iter = 1;iter <= 20;iter++)
     {
 		ofs_running 
 		<< "\n PW-STOCHASTIC ALGO --------- ION=" << setw(4) << istep + 1
@@ -72,7 +73,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			CHR.new_e_iteration = false;
 		}
-
+		
 		// record the start time.
         start=std::clock();
 		
@@ -81,7 +82,8 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         //this->update_ethr(iter);
         if(FINAL_SCF && iter==1) 
 		{
-			ETHR = 1.0e-2;
+			ETHR = 1.0e-12; // only for test
+			//ETHR = 1.0e-2;
 		}
         else 
 		{
@@ -103,8 +105,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
 		//(2) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
-        this->c_bands(istep);
 
+		if(NBANDS > 0)
+		{
+			this->c_bands(istep+1);
+		}
+		
         if (check_stop_now()) return;
         
 		en.eband  = 0.0;
@@ -112,19 +118,37 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         en.ef     = 0.0;
         en.ef_up  = 0.0;
         en.ef_dw  = 0.0;
-        
-		//(3) calculate weights of each band.
-		Occupy::calculate_weights();	
 
-		//(4) save change density as previous charge,
+		//(3) save change density as previous charge,
 		// prepared fox mixing.
         CHR.save_rho_before_sum_band();
 
-		//(5) calculate new charge density according to
-		// new wave functions.
+		//(4) calculate fermi energy.
+		stoiter.init();
+		stoiter.test();
+		stoiter.itermu();
 		
-		// calculate the new eband here.
-        CHR.sum_band();
+
+		//(5) calculate new charge density 
+		// calculate KS rho.
+		if(NBANDS > 0)
+		{
+			CHR.sum_band();
+		}
+		else
+		{
+			for(int is=0; is<NSPIN; is++)
+			{
+				ZEROS(CHR.rho[is], pw.nrxx);
+			}
+			en.eband = 0.0;
+		}
+		
+        
+		// calculate stochastic rho
+		stoiter.sum_stoband();
+		
+
 
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
@@ -213,14 +237,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
             //( vnew used later for scf correction to the forces )
 	    	pot.vnew = pot.vr - pot.vnew;
             en.descf = 0.0;
+
         }
 		
-		stringstream ssw;
-        ssw << global_out_dir << "WAVEFUNC";
-		
-		//qianrui add 2020-10-12
-		stringstream ssgk;
-		ssgk << global_out_dir << "GKK.dat";
             
 
 		// output for tmp.
@@ -231,14 +250,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			CHR.write_rho( is, iter, ssc.str(), 3);//mohan add 2007-10-17
 		}
         
-		if(wf.out_wf!=0)
-		{
-			//WF_io::write_wfc( ssw.str(), wf.evc );
-			// mohan update 2011-02-21
-			//qianrui update 2020-10-17
-			WF_io::write_wfc2( ssw.str(), wf.evc ,pw.gcar );
-            //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
-		}
+		
 
 		if(vext == 0) 
 		{
@@ -278,11 +290,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			timer::tick("electrons","self_consistent",'D');
             return;
         }
-
+		
         //if ( imix >= 0 )  CHR.rho = CHR.rho_save;
         //ofs_running << "\n start next iterate for idum ";
+		
     } 
-
+	
 	timer::tick("Elec_Stochastic","scf_stochastic",'D');
     return;
 } // end electrons

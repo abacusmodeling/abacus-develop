@@ -4,21 +4,21 @@
 
 Stochastic_WF::Stochastic_WF()
 {
-    chig  = new ComplexMatrix[1];
+    chiortho  = new ComplexMatrix[1];
     chi0  = new ComplexMatrix[1];
 }
 
 Stochastic_WF::~Stochastic_WF()
 { 
-    delete[] chig;
+    delete[] chiortho;
     delete[] chi0;
 }
 
 void Stochastic_WF::init()
 {
     //wait for init
-    int nrxx;
-    int nx,ny,nz;
+    int nrxx = pw.nrxx;
+    int nx = pw.nx,ny = pw.ny,nz = pw.nz;
 
     //distribute nchi for each process
     nchip = int(nchi/NPROC_IN_POOL);
@@ -30,17 +30,23 @@ void Stochastic_WF::init()
     //We temporarily init one group of orbitals for all k points.
     //This save memories.
     chi0 = new ComplexMatrix[1]; 
-    chi0[0].create(nchip,nrxx,0);
+    chi0[0].create(nchip,nrxx,false);
     //init with random number
+    
+    srand((unsigned)time(NULL));
     for(int i=0; i<chi0[0].size; ++i)
     {
-        chi0[0].c[i]=exp(2*PI*rand()*ui);
+        chi0[0].c[i]=exp(2*PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
     }
+    
 
-    delete[] chig;
+    delete[] chiortho;
     int nkk = 1; // We temporarily use gamma k point.
-    chig = new ComplexMatrix[1];
-    chig[0].create(nchip,nrxx,0);
+    chiortho = new ComplexMatrix[1];
+    if(NBANDS > 0)
+    {
+        chiortho[0].create(nchip,nrxx,false);
+    }
     return;
 }
 

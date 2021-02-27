@@ -2282,6 +2282,14 @@ void Input::Check(void)
                 nstep = 1;
 
     }
+	else if (calculation == "scf-sto")  // qianrui 2021-2-20
+    {
+                if(mem_saver == 1)
+                {
+                        mem_saver = 0;
+                        AUTO_SET("mem_savre","0");
+                }
+    }
     else if (calculation == "relax")  // pengfei 2014-10-13
     {
                 if(mem_saver == 1)

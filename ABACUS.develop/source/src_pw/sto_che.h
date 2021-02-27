@@ -25,12 +25,14 @@ class Stochastic_Chebychev
     void calresult(void fun(T *in, T *out), int& ndim, T *wavein, T *waveout);
 
 
+
     void calpolyval(void fun(complex<double> *in, complex<double> *out), int& ndim, complex<double> *wavein);
 
     int norder;
+    int extend;
     int norder2;  // 2 * norder
-    double* coef;  //[norder] expansion coefficient of each order,
-    complex<double> *ccoef;  //[norder2] temporary complex expansion coefficient of each order, only first norder coefficient are usefull.
+    double* coef;  //[norder2] expansion coefficient of each order, only first norder coefficients are usefull
+    complex<double> *ccoef;  //[norder2] temporary complex expansion coefficient of each order, only first norder coefficients are usefull.
     complex<double> *polyvalue; //
     fftw_plan plancoef;
     bool initplan, initcoef, getcoef, getpolyval;
@@ -62,19 +64,19 @@ void Stochastic_Chebychev:: calresult(void tfun(T *in, T *out), int &ndim, T *wa
     arraynp1 = new T [ndim];
     arrayn = new T [ndim];
     arrayn_1 = new T [ndim];
-    for(int i = 0; i < ndim; ++i)
-    {
-        arrayn_1[i] = wavein[i]; 
-    }
+    DCOPY(wavein, arrayn_1, ndim);
     tfun(arrayn_1, arrayn);
+    
     //0- & 1-st order
     for(int i = 0; i < ndim; ++i)
     {
         waveout[i] = coef[0] * arrayn_1[i] + coef[1] * arrayn[i];
     }
 
+    
+
     //more than 1-st orders
-    for(int ior = 2; ior <= norder; ++ior)
+    for(int ior = 2; ior < norder; ++ior)
     {
         recurs(arraynp1, arrayn, arrayn_1, tfun, ndim);
         for(int i = 0; i < ndim; ++i)
