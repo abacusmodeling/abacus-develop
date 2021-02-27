@@ -13,6 +13,7 @@
 class Potential_Libxc
 {
 	public:
+
 	static void v_xc(
 		const double * const * const rho_in,
 		double &etxc,
@@ -24,7 +25,10 @@ class Potential_Libxc
 	static std::vector<XC(func_type)> init_func();
 	// [ rho, sigma, gdr ]
 
-	static std::tuple< std::vector<double>, std::vector<double>, std::vector<std::vector<Vector3<double>>> > 
+	static std::tuple< 
+		std::vector<double>, 
+		std::vector<double>, 
+		std::vector<std::vector<Vector3<double>>> > 
 	cal_input( 
 		const std::vector<XC(func_type)> &funcs, 
 		const double * const * const rho_in );

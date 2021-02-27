@@ -38,7 +38,6 @@ class energy
 	int printe;			   // print energy every 'printe' electron iteration.
 	int iter;
 
-	//private: //mohan change 2011-06-12
 	public:
 
     // The variables needed to compute the energies
