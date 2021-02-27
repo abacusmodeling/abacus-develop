@@ -214,6 +214,8 @@ H_Ewald_pw.o\
 H_Hartree_pw.o\
 H_XC_pw.o \
 read_rho.o\
+read_atoms.o\
+read_pseudopot.o\
 write_pot.o\
 write_rho.o\
 write_rho_dipole.o\
