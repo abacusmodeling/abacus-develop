@@ -2,7 +2,7 @@
 #define INCLUDE_STO_CHEBYCHEV_H
 
 #include "tools.h"
-#include "mymath.h"
+#include "../src_global/mymath.h"
 //----------------------------------------------
 // Chebychev Filtering
 //----------------------------------------------

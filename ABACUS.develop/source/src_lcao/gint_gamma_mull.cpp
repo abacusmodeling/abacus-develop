@@ -1,6 +1,6 @@
 #include "gint_gamma.h"
 #include "grid_technique.h"
-#include "lcao_orbitals.h"
+#include "ORB_read.h"
 #include "../src_pw/global.h"
 
 #include "global_fp.h" // mohan add 2021-01-30

@@ -23,7 +23,6 @@ WF_igk::~WF_igk()
 //  set npwx
 //  set igk
 //========================================================
-//similar to n_plane_waves.f90
 int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 {
     TITLE("WF_igk","setupIndGk");

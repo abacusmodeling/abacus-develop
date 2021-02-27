@@ -89,11 +89,6 @@ class Input
 //==========================================================
 	string basis_type; 			//xiaohui add 2013-09-01, for structural adjustment
 	string ks_solver; 			//xiaohui add 2013-09-01
-    bool sparse_matrix;
-	int atom_distribution;
-
-	int vna;				//control the vna term.
-	int grid_speed;			//1:normal 2:fast, mohan add 2012-03-29
 
 //==========================================================
 // Forces 
@@ -338,7 +333,37 @@ class Input
 	//	bool starting_spin_angle;
 	double *angle1;
 	double *angle2;
+		
 
+//==========================================================
+// exx
+// Peize Lin add 2018-06-20
+//==========================================================		
+	string exx_hybrid_type;		// "no", "hf", "pbe0", "hse"
+
+	double exx_hybrid_alpha;
+	double exx_hse_omega;
+	
+	bool exx_separate_loop;		// 0 or 1
+	int exx_hybrid_step;
+	
+	double exx_lambda;
+	
+	double exx_pca_threshold;
+	double exx_c_threshold;
+	double exx_v_threshold;
+	double exx_dm_threshold;
+	double exx_schwarz_threshold;
+	double exx_cauchy_threshold;
+	double exx_ccp_threshold;
+	double exx_ccp_rmesh_times;
+	
+	string exx_distribute_type;
+	
+	int exx_opt_orb_lmax;
+	double exx_opt_orb_ecut;
+	double exx_opt_orb_tolerence;
+	
 //==========================================================
 // tddft
 // Fuxiang He add 2016-10-26

@@ -1,17 +1,18 @@
 #include "local_orbital_ions.h"
 #include "src_pw/global.h"
 #include "src_parallel/parallel_orbitals.h"
-#include "src_lcao/sltk_atom_arrange.h"
-#include "src_external/src_pdiag/pdiag_double.h"
-#include "src_lcao/lcao_nnr.h"
-#include "src_lcao/force_lcao.h"
-#include "src_lcao/stress_lcao.h"
-#include "src_lcao/istate_charge.h"
-#include "src_lcao/istate_envelope.h"
-#include "../src_lcao/hs_matrix.h"
+#include "src_pdiag/pdiag_double.h"
+#include "LCAO_nnr.h"
+#include "force_lcao.h"
+#include "stress_lcao.h"
+#include "src_global/global_function.h"
+#include "src_io/hs_matrix.h"
 #include "src_lcao/cal_r_overlap_R.h"
-#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
-//#include "../src_siao/selinv.h" //mohan add 2012-05-13
+#include "src_ions/variable_cell.h" // mohan add 2021-02-01
+#include "src_ri/exx_abfs.h"
+#include "src_ri/exx_opt_orb.h"
+#include "ELEC_scf.h"
+#include "src_global/sltk_atom_arrange.h"
 
 Local_Orbital_Ions::Local_Orbital_Ions()
 {}
@@ -22,7 +23,7 @@ Local_Orbital_Ions::~Local_Orbital_Ions()
 void Local_Orbital_Ions::opt_ions(void)
 {
     TITLE("Local_Orbital_Ions","opt_ions"); 
-    timer::tick("Local_Orbital_Ions","opt_ions",'C'); 
+    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
 		
     if(OUT_LEVEL=="i")
     {
@@ -36,7 +37,7 @@ void Local_Orbital_Ions::opt_ions(void)
         <<endl;
     }
 
-    // (3) Geometry optimization algorithm setup.
+    // Geometry optimization algorithm setup.
     if(FORCE)
     {
         //Ions_Move_Methods 
@@ -45,8 +46,10 @@ void Local_Orbital_Ions::opt_ions(void)
         CE.allocate();
     }
 
-    if(STRESS)                    // pengfei Li 2018-05-14
+	// pengfei Li 2018-05-14
+    if(STRESS)
     {
+		// allocate arrays related to changes of lattice vectors
         LCM.allocate();
     }
 
@@ -55,11 +58,15 @@ void Local_Orbital_Ions::opt_ions(void)
     {
         mdtype= INPUT.md_mdtype;//control md
 
-        if(mdtype==1||mdtype==2) {
+		// NVT ensemble
+        if(mdtype==1||mdtype==2) 
+		{
             MDNVT.md_allocate();
             MDNVT.initMD();
         }
-        else if(mdtype==0){
+		// NVE ensemble
+        else if(mdtype==0)
+		{
             MDNVE.md_allocate();
             MDNVE.initMD();
         }
@@ -72,26 +79,23 @@ void Local_Orbital_Ions::opt_ions(void)
     while(istep <= NSTEP && !stop)
     {
         time_t estart = time(NULL);
-        if(OUT_LEVEL=="ie" || OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
+	
+		// xiaohui add "m" option, 2015-09-16
+        if(OUT_LEVEL=="ie" || OUT_LEVEL=="m")
         {
-            //add 2015-09-06, xiaohui
-            //cout << " -------------------------------------------" << endl;
             cout << " ---------------------------------------------------------" << endl;
             if(CALCULATION=="relax") 
             {
                 cout << " RELAX IONS : " << istep << endl;
-                //cout << " ---------------------------------------------------------" << endl;
             }
             else if(CALCULATION=="cell-relax")
             {
                 cout << " RELAX CELL : " << stress_step << endl;
                 cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                //cout << " ---------------------------------------------------------" << endl;
             }
             else if(CALCULATION=="scf")
             {
                 cout << " SELF-CONSISTENT : " << endl;
-                //cout << " ---------------------------------------------------------" << endl;
             }
             else if(CALCULATION=="md") //xiaohui add 2015-09-15
             {
@@ -99,12 +103,9 @@ void Local_Orbital_Ions::opt_ions(void)
                 {
                     cout<<" Molecular Dynamics (NVT) STEP "<< MDNVT.step_rst + istep<<endl;
                 }
-                //cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
             }
-            //cout << " -------------------------------------------" << endl;
             cout << " ---------------------------------------------------------" << endl;
 
-            //ofs_running << " -------------------------------------------" << endl;
             ofs_running << " ---------------------------------------------------------" << endl;
             if(CALCULATION=="relax")
             {
@@ -122,168 +123,17 @@ void Local_Orbital_Ions::opt_ions(void)
                 ofs_running << " SELF-CONSISTENT" << endl;
                 ofs_running << " ---------------------------------------------------------" << endl;
             }
-            //else if(CALCULATION=="md")
-            //{
-            //    ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            //}
-            //ofs_running << " -------------------------------------------" << endl;
-            //ofs_running << " ---------------------------------------------------------" << endl;
-
-            /* delete 2015-09-06, xiaohui
-            cout << " ---------------------------------------------------------" << endl;
-            cout << " RELAX IONS : " << istep<< endl;
-            cout << " ---------------------------------------------------------" << endl;
-            ofs_running << " ---------------------------------------------------------" << endl;
-            ofs_running << " RELAX IONS: " << istep<< endl;
-            ofs_running << " ---------------------------------------------------------" << endl;
-            */
         }
 
-        // (1) Find adjacent atoms for each atom.
-        atom_arrange::set_sr_NL();
-        atom_arrange::search( SEARCH_RADIUS );
-        //DONE(ofs_running,"SEARCH ADJACENT ATOMS");
+		// solve electronic structures in terms of LCAO
+		// mohan add 2021-02-09
+		LOE.solve_elec_stru(this->istep);
 
-        // (3) Periodic condition search
-        // for each grid.
-        // here 0 means GridT is not used for Vna.
-        // mohan add Vna 2012-06-13
-        // because it must be consistent with 
-        // gtf in lcao_vna.
-        // here VNA means considering the radius
-        // cutoff VNA.
-        GridT.set_pbc_grid(
-            pw.ncx, pw.ncy, pw.ncz,
-            pw.bx, pw.by, pw.bz,
-            pw.nbx, pw.nby, pw.nbz,
-            pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
-
-        // (2) If k point is used here, allocate HlocR after atom_arrange.
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            // For each atom, calculate the adjacent atoms in different cells 
-            // and allocate the space for H(R) and S(R).
-            LNNR.cal_nnr();
-            LM.allocate_HS_R(LNNR.nnr);
-        }
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            // need to first calculae lgd.
-            // using GridT.init.
-            LNNR.cal_nnrg(GridT);
-            //mohan add 2012-06-12
-            //the pvnapR need nnrg.
-            if(VNA>0)
-            {
-                UHM.GK.allocate_pvnapR();
-            }
-        }
-
-        // (4) set the augmented orbitals index.
-        // after ParaO and GridT, 
-        // this information is used to calculate
-        // the force.
-        LOWF.set_trace_aug(GridT);
 		
-        // (5) init density kernel
-        // (6) init wave functions.
-        if(GAMMA_ONLY_LOCAL)
-        {
-            // here we reset the density matrix dimension.
-            LOC.allocate_gamma(GridT);
-            LOWF.aloc_gamma_wfc(GridT);
-        }
-        else
-        {
-            LOWF.allocate_k(GridT);
-            LOC.allocate_DM_k();
-        }
-
-        //======================================
-        // do the charge extrapolation before
-        // the density matrix is regenerated.
-        // mohan add 2011-04-08
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // once the atom is move out of this processor,
-        // the density matrix will not map
-        // the 'moved' atom configuration,
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //======================================
-        // HOWEVER, I ACTUALLY FOUND THIS IS 
-        // A BUG, BECAUSE THE INDEX GridT.trace_lo
-        // HAS BEEN REGENERATED, SO WE NEED TO
-        // REALLOCATE THE DENSITY MATRIX FIRST,
-        // THEN WE CAN READ IN DENSITY MATRIX,
-        // AND USE DENSITY MATRIX TO DO 
-        // RHO CALCULATION.
-        // -- mohan 2013-03-31
-        //======================================
-        //if(pot.extra_pot==4 && istep>1)
-        if(pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
-        {
-            for(int is=0; is<NSPIN; is++)
-            {
-                ZEROS(CHR.rho[is], pw.nrxx);
-                stringstream ssd;
-                ssd << global_out_dir << "SPIN" << is + 1 << "_DM" ;
-                // reading density matrix,
-                LOC.read_dm(is, ssd.str() );
-            }
-
-            if(GAMMA_ONLY_LOCAL)
-            {
-                // and then construct the new density.
-                UHM.GG.cal_rho();
-            }
-            else
-            {
-                UHM.GK.calculate_charge();	
-            }
-            CHR.renormalize_rho();
-            pot.init_pot( istep-1 );
-        }
-
-        // (9) S, T, Vnl, Vna matrix.
-        UHM.set_ion();
-
-        if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
-        {
-            vdwd2.energy();
-        }
-		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
-        {
-            vdwd3.energy();
-        }															
-		
-        // (10) self consistent
-        if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
-        {
-            LOE.scf(istep-1);
-        }
-        else if (CALCULATION=="nscf")
-        {
-            LOE.nscf();
-        }
-        else if (CALCULATION=="istate")
-        {
-            IState_Charge ISC;
-            ISC.begin();	
-        }
-        else if (CALCULATION=="ienvelope")
-        {
-            IState_Envelope IEP;
-            IEP.begin();
-        }
-        else
-        {
-            WARNING_QUIT("Local_Orbital_Ions::opt_ions","What's the CALCULATION.");
-        }
-        time_t eend = time(NULL);
+		time_t eend = time(NULL);
 
         //xiaohui add 2014-07-07, for second-order extrapolation
         int iat=0;
-        //xiaohui modify 2015-09-30
-        //if(FORCE || CALCULATION=="md" )
         if(CALCULATION=="relax"|| CALCULATION=="md" || CALCULATION=="cell-relax")
         {
             for(int it = 0;it < ucell.ntype;it++)
@@ -309,17 +159,24 @@ void Local_Orbital_Ions::opt_ions(void)
         }
 
         //2014-07-07, xiaohui
-        //cout<<"CALCULATION:"<<CALCULATION<<endl;
         if(CALCULATION=="md")
         {  
-            if(mdtype==1||mdtype==2)   MDNVT.runnvt(istep);
-            else if(mdtype==0)  MDNVE.runNVE(istep);
-            if((mdtype==1||mdtype==2)&&(istep==NSTEP||stop))MDNVT.md_release();
-            if(mdtype==0&&(istep==NSTEP||stop))MDNVE.md_release();
-            //xiaohui move this line 2015-09-15
-            //cout<<"return to main function:"<<endl;
-
-            //MD.runMD(istep);//we need this total form
+            if(mdtype==1||mdtype==2)   
+			{
+				MDNVT.runnvt(istep);
+			}
+            else if(mdtype==0)  
+			{
+				MDNVE.runNVE(istep);
+			}
+            if((mdtype==1||mdtype==2)&&(istep==NSTEP||stop))
+			{
+				MDNVT.md_release();
+			}
+            if(mdtype==0&&(istep==NSTEP||stop))
+			{
+				MDNVE.md_release();
+			}
         }
 
         if(pot.out_potential == 2)
@@ -331,15 +188,18 @@ void Local_Orbital_Ions::opt_ions(void)
             pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        if(ParaO.out_hsR) this->output_HS_R(); //LiuXh add 2019-07-15
+        if(ParaO.out_hsR) 
+		{
+			this->output_HS_R(); //LiuXh add 2019-07-15
+		}
 
         time_t fstart = time(NULL);
         if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
-            //stop = this->force_stress();
             stop = this->force_stress(istep, force_step, stress_step);
         }            
         time_t fend = time(NULL);
+
 
         //xiaohui add 2014-07-07, for second-order extrapolation
         iat=0;
@@ -358,8 +218,8 @@ void Local_Orbital_Ions::opt_ions(void)
                 }
             }
         }
-///*LiuXh modify, 20180626
-        //if(FORCE || CALCULATION=="md" )
+		
+		///*LiuXh modify, 20180626
         if(CALCULATION=="md" )
         {
             //xiaohui add CE.istep = istep 2014-07-07
@@ -368,7 +228,6 @@ void Local_Orbital_Ions::opt_ions(void)
             // charge extrapolation if istep>0.
             CE.extrapolate_charge();
 
-            //if(pot.extra_pot==4)
             if(pot.extra_pot=="dm")//xiaohui modify 2015-02-01
             {
                 // done after grid technique.
@@ -378,19 +237,8 @@ void Local_Orbital_Ions::opt_ions(void)
                 pot.init_pot( istep );
             }
         }
-//*/
 
 
-
-        // need to destroy the <phi_0i | Vna | phi_Rj> matrix.
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            //mohan add 2012-06-12
-            if(VNA>0)
-            {
-                UHM.GK.destroy_pvnapR();
-            }
-        }
 
         if(OUT_LEVEL=="i")
         {
@@ -401,7 +249,7 @@ void Local_Orbital_Ions::opt_ions(void)
 
             cout << setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
-            << setw(5) << LOE.iter
+            << setw(5) << ELEC_scf::iter
             << setw(18) << setprecision(6) << en.etot * Ry_to_eV;
 
             cout << setprecision(2) << setiosflags(ios::scientific)
@@ -414,12 +262,6 @@ void Local_Orbital_Ions::opt_ions(void)
             << setprecision(2) << setw(10) << etime_min + ftime_min;
             cout << endl;
         }
-        //xiaohui modifed 2013-07-22, adding "//" before ...
-        //if(DIAGO_TYPE=="selinv")
-        //{
-        //    cout << " number of selected inversion: " << Selinv::niter_ion << endl;
-	//    Selinv::niter_ion = 0;
-        //}
 
 //#ifdef __MPI //2015-09-06, xiaohui
 	//2015-05-07, 2015-10-01
@@ -450,7 +292,7 @@ void Local_Orbital_Ions::opt_ions(void)
         {
             if(stress_step==1)
             {
-        	Force_LCAO FL;
+        		Force_LCAO FL;
                 matrix stress_lcao;
                 stress_lcao.create(3,3);
                 FL.cal_stress(stress_lcao);
@@ -466,87 +308,10 @@ void Local_Orbital_Ions::opt_ions(void)
 */
     }
 
-    if(stop && STRESS)
-    {
-//        final_scf();
-/*
-        FINAL_SCF = true;
-        Variable_Cell::final_calculation_after_vc();
-        atom_arrange::set_sr_NL();
-        atom_arrange::search( SEARCH_RADIUS );
-        GridT.set_pbc_grid(
-            pw.ncx, pw.ncy, pw.ncz,
-            pw.bx, pw.by, pw.bz,
-            pw.nbx, pw.nby, pw.nbz,
-            pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
+	// mohan update 2021-02-10
+    hm.orb_con.clear_after_ions();
 
-        // (2) If k point is used here, allocate HlocR after atom_arrange.
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            // For each atom, calculate the adjacent atoms in different cells 
-            // and allocate the space for H(R) and S(R).
-            LNNR.cal_nnr();
-            LM.allocate_HS_R(LNNR.nnr);
-        }
-        if(!GAMMA_ONLY_LOCAL)
-        {
-            // need to first calculae lgd.
-            // using GridT.init.
-            LNNR.cal_nnrg(GridT);
-            //mohan add 2012-06-12
-            //the pvnapR need nnrg.
-            if(VNA>0)
-            {
-                UHM.GK.allocate_pvnapR();
-            }
-        }
-
-        // (4) set the augmented orbitals index.
-        // after ParaO and GridT, 
-        // this information is used to calculate
-        // the force.
-        LOWF.set_trace_aug(GridT);
-		
-        // (5) init density kernel
-        // (6) init wave functions.
-        if(GAMMA_ONLY_LOCAL)
-        {
-            // here we reset the density matrix dimension.
-            LOC.allocate_gamma(GridT);
-            LOWF.aloc_gamma_wfc(GridT);
-        }
-        else
-        {
-            LOWF.allocate_k(GridT);
-            LOC.allocate_DM_k();
-        }
-
-        UHM.set_ion();
-
-        if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
-        {
-            vdwd2.energy();
-        }
-		if(vdwd3.vdwD3)							//jiyy add 2019-05-18
-        {
-            vdwd3.energy();
-        } 
-        LOE.scf(0);
-
-        if(CALCULATION=="scf" || CALCULATION=="relax")
-        {
-            ofs_running << "\n\n --------------------------------------------" << endl;
-            ofs_running << setprecision(16);
-            ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
-            ofs_running << " --------------------------------------------\n\n" << endl;
-        }
-*/
-    }
-
-    hm.hon.clear_after_ions();
-
-
-    timer::tick("Local_Orbital_Ions","opt_ions",'C'); 
+    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
     return;
 }
 
@@ -787,7 +552,7 @@ void Local_Orbital_Ions::final_scf(void)
         pw.ncx, pw.ncy, pw.ncz,
         pw.bx, pw.by, pw.bz,
         pw.nbx, pw.nby, pw.nbz,
-        pw.nbxx, pw.nbzp_start, pw.nbzp, VNA);
+        pw.nbxx, pw.nbzp_start, pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
     if(!GAMMA_ONLY_LOCAL)
@@ -796,18 +561,10 @@ void Local_Orbital_Ions::final_scf(void)
         // and allocate the space for H(R) and S(R).
         LNNR.cal_nnr();
         LM.allocate_HS_R(LNNR.nnr);
-    }
-    if(!GAMMA_ONLY_LOCAL)
-    {
-        // need to first calculae lgd.
+        
+		// need to first calculae lgd.
         // using GridT.init.
         LNNR.cal_nnrg(GridT);
-        //mohan add 2012-06-12
-        //the pvnapR need nnrg.
-        if(VNA>0)
-        {
-            UHM.GK.allocate_pvnapR();
-        }
     }
 
     // (4) set the augmented orbitals index.
@@ -822,7 +579,6 @@ void Local_Orbital_Ions::final_scf(void)
     {
         // here we reset the density matrix dimension.
         LOC.allocate_gamma(GridT);
-        LOWF.aloc_gamma_wfc(GridT);
     }
     else
     {
@@ -830,17 +586,19 @@ void Local_Orbital_Ions::final_scf(void)
         LOC.allocate_DM_k();
     }
 
-    UHM.set_ion();
+    UHM.set_lcao_matrices();
 
     if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
     {
         vdwd2.energy();
     }
-	if(vdwd3.vdwD3)							//jiyy add 2019-05-18
+	else if(vdwd3.vdwD3)							//jiyy add 2019-05-18
     {
         vdwd3.energy();
     }											  
-    LOE.scf(0);
+    
+	ELEC_scf es;
+	es.scf(0);
 
     if(CALCULATION=="scf" || CALCULATION=="relax")
     {
@@ -891,11 +649,8 @@ void Local_Orbital_Ions::output_HS_R(void)
                 {
                     if(VL_IN_H)
                     {
-                        if(VNA==0)
-                        {
-                            //UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-                            UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
-                        }
+						//UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
+						UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
                     }
                 }
                 UHM.GK.cal_vlocal_R(CURRENT_SPIN);

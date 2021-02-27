@@ -2,11 +2,9 @@
 #include "ions.h"
 #include "forces.h"
 #include "stress.h"
-#include "algorithms.h"
 #include "../src_pw/global.h" // use chr.
 #include "vdwd2.h"
 #include "vdwd3.h"
-
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
@@ -109,8 +107,38 @@ void Ions::opt_ions_pw(void)
 		int eiter=0;		
         if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")  // pengfei 2014-10-13
         {
-            elec.self_consistent(istep-1);
-			eiter = elec.iter;
+			if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
+			{			
+				elec.self_consistent(istep-1);
+				eiter = elec.iter;
+			}
+			else if( Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type )
+			{
+				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			}
+			else	// Peize Lin add 2019-03-09
+			{
+				if( exx_global.info.separate_loop )
+				{
+					for( size_t hybrid_step=0; hybrid_step!=exx_global.info.hybrid_step; ++hybrid_step )
+					{
+						elec.self_consistent(istep-1);
+						eiter += elec.iter;
+						if( elec.iter==1 || hybrid_step==exx_global.info.hybrid_step-1 )		// exx converge
+							break;
+						exx_global.info.set_xcfunc(xcf);							
+						exx_lip.cal_exx();
+					}						
+				}
+				else
+				{
+					elec.self_consistent(istep-1);	
+					eiter += elec.iter;
+					exx_global.info.set_xcfunc(xcf);
+					elec.self_consistent(istep-1);
+					eiter += elec.iter;
+				}
+			}
         }
         else if(CALCULATION=="nscf")
         {
@@ -284,7 +312,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		stress.create(3,3);
 
 		double unit_transform = 0.0;
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 		double external_stress[3] = {PRESS1,PRESS2,PRESS3};
 		for(int i=0;i<3;i++)
 		{
@@ -345,7 +373,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 stress.create(3,3);
 
                 double unit_transform = 0.0;
-                unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+                unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
                 double external_stress[3] = {PRESS1,PRESS2,PRESS3};
                 for(int i=0;i<3;i++)
                 {
@@ -419,7 +447,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             stress.create(3,3);
 
             double unit_transform = 0.0;
-            unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+            unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
             double external_stress[3] = {PRESS1,PRESS2,PRESS3};
             for(int i=0;i<3;i++)
             {

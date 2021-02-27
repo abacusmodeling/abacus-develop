@@ -24,6 +24,7 @@ void Stochastic_Iter:: init()
     targetne = ucell.nelec;
     stoche.init();
     stohchi.init();
+    stohchi.get_GRA_index();
     delete [] spolyv;
     int norder = stoche.norder;
     spolyv = new double [norder];
@@ -32,7 +33,7 @@ void Stochastic_Iter:: init()
 
 void Stochastic_Iter:: itermu()
 {
-    stohchi.get_GRA_index();
+    
 
     int nkk=1;// We temporarily use gamma k point.
     //orthogonal part
@@ -324,8 +325,7 @@ double Stochastic_Iter:: nfd(double e)
     complex<double> *chig1 = new complex<double> [wf.npw];
     complex<double> *chig2 = new complex<double> [wf.npw];
     ZEROS(in,pw.nrxx);
-    ZEROS(in2,pw.nrxx);
-    stohchi.get_GRA_index();*/
+    ZEROS(in2,pw.nrxx);*/
 
     //---------------------------------------------------
     /*//test hermit property of  hchi matrix
@@ -399,7 +399,7 @@ double Stochastic_Iter:: nfd(double e)
     
     //---------------------------------------------------
     //compare eigen energy
-    /*stohchi.get_GRA_index();
+    /*
     int * GRA_index = stohchi.GRA_index;
     complex<double> *chigout = new complex<double> [wf.npw];
     complex<double> *wave = new complex<double> [pw.nrxx];
@@ -444,7 +444,7 @@ double Stochastic_Iter:: nfd(double e)
 
     //---------------------------------------------------
     //test ne
-    /*stohchi.get_GRA_index();
+    /*
     int * GRA_index = stohchi.GRA_index;
     complex<double> *wave = new complex<double> [pw.nrxx];
     complex<double> *waveout = new complex<double> [pw.nrxx];

@@ -11,7 +11,7 @@
 class Run_pw
 {
 
-public:
+	public:
 
     Run_pw();
     ~Run_pw();

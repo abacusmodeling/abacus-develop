@@ -17,15 +17,12 @@ using namespace std;
 // EXPLAIN : Basic Global Variables
 //==========================================================
 
-extern int 		NBANDS;				// 1
+extern int 		NBANDS;	
 extern int		NBANDS_ISTATE;		// 1.05 // mohan add 2011-03-22
 extern int 		NLOCAL;				// 1.1 // mohan add 2009-05-29
 
 extern string	CALCULATION;		// 2 "scf";"nscf" ;"symmetry"
-extern bool 	BERRY_PHASE;		// 3 berry phase calculation
-extern bool 	LDA_PLUS_U;			// 4 LDA + U method
 extern int		EFIELD;				// 5 add electric field
-extern int		BFIELD;				// 6 add magnetic field
 extern int 		DIPOLE;				// 7 add dipole correction
 
 
@@ -34,8 +31,6 @@ extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8
 
-extern int 		VNA;				// 8.01 // mohan add 2011-05-27
-extern int		GRID_SPEED;			// 8.02 // mohan add 2012-03-29
 extern int 		FORCE;				// 8.1
 extern double	FORCE_THR;			// 8.2
 extern bool 	STRESS;				// 8.25 calcualte the stress
@@ -43,22 +38,17 @@ extern double  PRESS1;
 extern double  PRESS2;
 extern double  PRESS3;
 extern double PRESSURE;
-extern string	MOVE_IONS;			// 8.26
-extern string	OUT_LEVEL;			// 8.27 
+extern string	MOVE_IONS;
+extern string	OUT_LEVEL;
 
 extern int		NSTEP;				// 8.3
 extern int 		NITER;				// 8.4
 
-extern bool 	SYMMETRY;		// 9
-extern bool		MLWF_FLAG;		// 9.1 mohan add 2010-01-26
-//extern int 		LOCAL_BASIS; xiaohui modify 2013-09-01		// 10
-//extern int	 	LINEAR_SCALING;	xiaohui modify 2013-09-01	// 11 // -1: test 0: pw 1:lcao 2:O(N)
-extern string		BASIS_TYPE; //xiaohui add 2013-09-01
-extern string		KS_SOLVER; //xiaohui add 2013-09-01
+extern string	BASIS_TYPE; //xiaohui add 2013-09-01
+extern string	KS_SOLVER; //xiaohui add 2013-09-01
 extern double	SEARCH_RADIUS;		// 11.1 // mohan add 2011-03-10
 extern bool		SEARCH_PBC;			// 11.2 // mohan add 2011-03-10
 extern bool		SPARSE_MATRIX;		// 11.3 // mohan add 2009-03-13
-extern int 		ATOM_DISTRIBUTION;	// 11.4 // mohan add 2010-06-28
 
 //added by zhengdy-soc
 extern bool     NONCOLIN; //0 : collinear ; 1 : non-collinear
@@ -68,8 +58,7 @@ extern bool     DOMAG_Z;  //1 : constrain the magnetism to z axis
 extern int      NPOL;     //1 : no soc; 2 : has soc
 extern int      PRENSPIN; //NSPIN used before, for restart with soc
 
-// diagonalization (5)
-//extern string 	DIAGO_TYPE; xiaohui modify 2013-09-01			// 12 "cg","davidson","fs","hpseps"
+
 extern int		DIAGO_PROC;			// 12.1 number of processors used to diag.
 extern int 		DIAGO_CG_MAXITER;	// 13
 extern int		DIAGO_CG_PREC;		// 13.1
@@ -148,7 +137,6 @@ extern int GSIZE;
 // NAME : global_wannier_card
 // NAME : global_pseudo_dir
 // NAME : global_pseudo_type // mohan add 2013-05-20 (xiaohui add 2013-06-23)
-// NAME : global_epm_pseudo_card
 // NAME : global_out_dir
 // NAME : ofs_running( contain information during runnnig)
 // NAME : ofs_warning( contain warning information, including error)
@@ -168,8 +156,6 @@ extern ofstream ofs_warning;
 //==========================================================
 // EXPLAIN : test level for each class
 //==========================================================
-extern int test_run;
-
 extern int test_input;
 extern int test_winput;
 extern int test_kpoint;
@@ -180,13 +166,11 @@ extern int test_symmetry;
 extern int test_fft;
 extern int test_pw;
 extern int test_elec;
-extern int test_hm;
 
 extern int test_wf;
 extern int test_charge;
 extern int test_potential;
 extern int test_energy;
-extern int test_geo; // mohan add 2011-03-17
 //==========================================================
 // src_onscaling
 //==========================================================
@@ -199,30 +183,15 @@ extern int TEST_FORCE;// mohan add 2011-03-18
 extern int TEST_STRESS;//zhengdy add 2018-05-16
 extern int test_gridt; // mohan add 2011-03-17
 //==========================================================
-// src_wannier
-//==========================================================
-extern int test_spillage;
-extern int test_improve_pao;
-extern int test_eximport;
-extern int test_operation;
-extern int test_recon;
-extern int test_sph_proj;
-extern int test_build;
-extern int test_setout;
-//==========================================================
-// src_epm || src_pseudo
+// src_pseudo
 //==========================================================
 extern int test_pseudo_cell;
 extern int test_pp;
 extern int test_kmesh;
-extern int test_mlwf_overlap;
-extern int test_mlwf_optimize;
 extern int test_ion_dynamics;
 //==========================================================
 // src_tools
 //==========================================================
-extern int test_figure;
-extern int test_mathzone;
 extern int test_deconstructor;
 
 extern bool FINAL_SCF; //LiuXh add 20180619

@@ -103,7 +103,7 @@ void Grid_BigCell::init_big_latvec(void)
 }
 
 
-void Grid_BigCell::init_grid_expansion(const bool vna)
+void Grid_BigCell::init_grid_expansion(void)
 {
 	TITLE("Grid_BigCell","init_grid_expansion");
 
@@ -112,11 +112,6 @@ void Grid_BigCell::init_grid_expansion(const bool vna)
 	for(int T=0; T<ucell.ntype; T++)
 	{
 		this->orbital_rmax = std::max( ORB.Phi[T].getRcut(), this->orbital_rmax);
-		// mohan add 2011-05-23
-		if(vna)
-		{
-			this->orbital_rmax = std::max( ORB.Vna[T].rcut,this->orbital_rmax);
-		}
 	}
 	if(test_gridt)OUT(ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
 

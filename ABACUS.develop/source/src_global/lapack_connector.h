@@ -82,11 +82,16 @@ extern "C"
     void zgetrf_(const int* m, const int *n, const complex<double> *A, const int *lda, int *ipiv, const int* info);
     void zgetri_(const int* n, complex<double> *A, const int *lda, int *ipiv, complex<double> *work, int *lwork, const int *info);
     void pdgetrf_(const int *m, const int *n, double *a, const int *ia, const int *ja, int *desca, int *ipiv, int *info);
-
 	// Peize Lin add ?nrm2 2018-06-12, to compute out = ||x||_2 = \sqrt{ \sum_i x_i**2 }
-	float snrm2_( const int *N, const float *X, const int *incX );
-	double dnrm2_( const int *N, const double *X, const int *incX );
-	double dznrm2_( const int *N, const complex<double> *X, const int *incX );
+	float snrm2_( const int *n, const float *X, const int *incX );
+	double dnrm2_( const int *n, const double *X, const int *incX );
+	double dznrm2_( const int *n, const complex<double> *X, const int *incX );
+	// Peize Lin add zherk 2019-04-14
+	// if trans=='N':	C = a * A * A.H + b * C
+	// if trans=='C':	C = a * A.H * A + b * C	
+	void zherk_(const char *uplo, const char *trans, const int *n, const int *k, 
+		const double *alpha, const complex<double> *A, const int *lda, 
+		const double *beta, complex<double> *C, const int *ldc);
 }
 
 // Class LapackConnector provide the connector to fortran lapack routine.
@@ -171,8 +176,31 @@ private:
 		{
 			case 'U': return 'L';
 			case 'L': return 'U';
-			default: throw invalid_argument("Uplo must be 'U' or 'L'");
+			default: throw invalid_argument("uplo must be 'U' or 'L'");
 		}		
+	}
+	
+	// Peize Lin add 2019-04-14	
+	static inline
+	char change_trans_NT(const char &trans)
+	{
+		switch(trans)
+		{
+			case 'N': return 'T';
+			case 'T': return 'N';
+			default: throw invalid_argument("trans must be 'N' or 'T'");
+		}
+	}
+	// Peize Lin add 2019-04-14
+	static inline
+	char change_trans_NC(const char &trans)
+	{
+		switch(trans)
+		{
+			case 'N': return 'C';
+			case 'C': return 'N';
+			default: throw invalid_argument("trans must be 'N' or 'C'");
+		}
 	}
 	
 public:
@@ -470,7 +498,6 @@ public:
 		dpotrf_( &uplo_changed, &n, a.c, &lda, info );
 	}	
 	
-
 	// Peize Lin add 2016-07-09
 	static inline
 	void dpotri( char uplo, const int n, matrix &a, const int lda, int *info )
@@ -482,60 +509,60 @@ public:
 	// Peize Lin add 2016-08-04
 	// y=a*x+y
 	static inline 
-	void axpy( const int N, const float alpha, const float *X, const int incX, float *Y, const int incY)
+	void axpy( const int n, const float alpha, const float *X, const int incX, float *Y, const int incY)
 	{
-		saxpy_(&N, &alpha, X, &incX, Y, &incY);
+		saxpy_(&n, &alpha, X, &incX, Y, &incY);
 	}	
 	static inline 
-	void axpy( const int N, const double alpha, const double *X, const int incX, double *Y, const int incY)
+	void axpy( const int n, const double alpha, const double *X, const int incX, double *Y, const int incY)
 	{
-		daxpy_(&N, &alpha, X, &incX, Y, &incY);
+		daxpy_(&n, &alpha, X, &incX, Y, &incY);
 	}	
 	static inline 
-	void axpy( const int N, const complex<float> alpha, const complex<float> *X, const int incX, complex<float> *Y, const int incY)
+	void axpy( const int n, const complex<float> alpha, const complex<float> *X, const int incX, complex<float> *Y, const int incY)
 	{
-		caxpy_(&N, &alpha, X, &incX, Y, &incY);
+		caxpy_(&n, &alpha, X, &incX, Y, &incY);
 	}	
 	static inline 
-	void axpy( const int N, const complex<double> alpha, const complex<double> *X, const int incX, complex<double> *Y, const int incY)
+	void axpy( const int n, const complex<double> alpha, const complex<double> *X, const int incX, complex<double> *Y, const int incY)
 	{
-		zaxpy_(&N, &alpha, X, &incX, Y, &incY);
+		zaxpy_(&n, &alpha, X, &incX, Y, &incY);
 	}	
 	
 	// Peize Lin add 2016-08-04
 	// x=a*x
 	static inline 
-	void scal( const int N, const float alpha, float *X, const int incX)
+	void scal( const int n,  const float alpha, float *X, const int incX)
 	{
-		sscal_(&N, &alpha, X, &incX);
+		sscal_(&n, &alpha, X, &incX);
 	}	
 	static inline 
-	void scal( const int N, const double alpha, double *X, const int incX)
+	void scal( const int n, const double alpha, double *X, const int incX)
 	{
-		dscal_(&N, &alpha, X, &incX);
+		dscal_(&n, &alpha, X, &incX);
 	}	
 	static inline 
-	void scal( const int N, const complex<float> alpha, complex<float> *X, const int incX)
+	void scal( const int n, const complex<float> alpha, complex<float> *X, const int incX)
 	{
-		cscal_(&N, &alpha, X, &incX);
+		cscal_(&n, &alpha, X, &incX);
 	}	
 	static inline 
-	void scal( const int N, const complex<double> alpha, complex<double> *X, const int incX)
+	void scal( const int n, const complex<double> alpha, complex<double> *X, const int incX)
 	{
-		zscal_(&N, &alpha, X, &incX);
+		zscal_(&n, &alpha, X, &incX);
 	}	
 	
 	// Peize Lin add 2017-10-27
 	// d=x*y
 	static inline
-	float dot( const int N, const float *X, const int incX, const float *Y, const int incY)
+	float dot( const int n, const float *X, const int incX, const float *Y, const int incY)
 	{
-		return sdot_(&N, X, &incX, Y, &incY);
+		return sdot_(&n, X, &incX, Y, &incY);
 	}
 	static inline
-	double dot( const int N, const double *X, const int incX, const double *Y, const int incY)
+	double dot( const int n, const double *X, const int incX, const double *Y, const int incY)
 	{
-		return ddot_(&N, X, &incX, Y, &incY);
+		return ddot_(&n, X, &incX, Y, &incY);
 	}
 	
 	// Peize Lin add 2017-10-27, fix bug trans 2019-01-17
@@ -571,19 +598,19 @@ public:
 	// Peize Lin add 2018-06-12
 	// out = ||x||_2
 	static inline
-	float nrm2( const int N, const float *X, const int incX )
+	float nrm2( const int n, const float *X, const int incX )
 	{
-		return snrm2_( &N, X, &incX );
+		return snrm2_( &n, X, &incX );
 	}
 	static inline
-	double nrm2( const int N, const double *X, const int incX )
+	double nrm2( const int n, const double *X, const int incX )
 	{
-		return dnrm2_( &N, X, &incX );
+		return dnrm2_( &n, X, &incX );
 	}
 	static inline
-	double nrm2( const int N, const complex<double> *X, const int incX )
+	double nrm2( const int n, const complex<double> *X, const int incX )
 	{
-		return dznrm2_( &N, X, &incX );
+		return dznrm2_( &n, X, &incX );
 	}
 	
 	static inline
@@ -597,5 +624,18 @@ public:
 		zcopy_(&n, a, &incx, b, &incy);
 	}	
 
+	// Peize Lin add 2019-04-14
+	// if trans=='N':	C = a * A * A.H + b * C
+	// if trans=='C':	C = a * A.H * A + b * C
+	static inline
+	void zherk(const char uplo, const char trans, const int n, const int k, 
+		const double alpha, const complex<double> *A, const int lda, 
+		const double beta, complex<double> *C, const int ldc)
+	{
+		const char uplo_changed = change_uplo(uplo);
+		const char trans_changed = change_trans_NC(trans);
+		zherk_(&uplo_changed, &trans_changed, &n, &k, &alpha, A, &lda, &beta, C, &ldc);
+	}
+	
 };
 #endif  // LAPACKCONNECTOR_HPP

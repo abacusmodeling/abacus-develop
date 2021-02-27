@@ -22,18 +22,13 @@ int		NBANDS_ISTATE = 0; // default number.
 int		NLOCAL = 0;	// total number of local basis.
 
 string	CALCULATION = "scf";
-bool 	BERRY_PHASE = false;
-bool 	LDA_PLUS_U = false;
 int		EFIELD = 0; // 5: add electric field
-int		BFIELD = 0; // 6: add magnetic field
 int		DIPOLE = 0; // 7: add dipole field
 
 string  DFT_FUNCTIONAL = "none";
 int 	NSPIN = 1; // LDA
 bool	TWO_EFERMI = 0; // two fermi energy, exist only magnetization is fixed.
 int 	CURRENT_SPIN = 0;
-int 	VNA = 0;//mohan add 2011-05-27
-int		GRID_SPEED = 1; //mohan add 2012-03-29
 int		FORCE = 0;// if force >1, means do the grid integration 'force' times.
 double	FORCE_THR = 1.0e-3;
 bool	STRESS = false;
@@ -46,18 +41,12 @@ string  OUT_LEVEL = "ie";
 int		NSTEP = 20;
 int 	NITER = 50;
 
-bool 	SYMMETRY = false;
-bool	MLWF_FLAG = false; 
-//int 	LOCAL_BASIS = 0; xiaohui modify 2013-09-01 // 0: plane wave; 1:radial wave functions; 2: PAO; 3: Jlq coef;
-//int	LINEAR_SCALING = false; xiaohui modify 2013-09-01
 string	BASIS_TYPE = "pw"; //xiaohui add 2013-09-01
 string	KS_SOLVER = "cg"; //xiaohui add 2013-09-01
 double	SEARCH_RADIUS = -1.0;
 bool	SEARCH_PBC = true;
 bool	SPARSE_MATRIX = false;
-int		ATOM_DISTRIBUTION = false;
 
-//string 	DIAGO_TYPE = "cg"; xiaohui modify 2013-09-01
 int		DIAGO_PROC = 0;
 int 	DIAGO_CG_MAXITER = 30;
 int		DIAGO_CG_PREC = 1; //mohan add 2012-03-31
@@ -140,8 +129,6 @@ ofstream ofs_warning;
 //----------------------------------------------------------
 // EXPLAIN : test level for each class
 //----------------------------------------------------------
-int test_run = 0;
-
 int test_input = 0;
 int test_winput = 0;
 int test_kpoint = 0;
@@ -152,14 +139,11 @@ int test_symmetry = 0;
 int test_fft = 0;
 int test_pw = 0;
 int test_elec = 0;
-int test_hm = 0;
 
 int test_wf = 0;
 int test_charge = 0;
 int test_potential = 0;
 int test_energy = 0;
-
-int test_geo;
 //----------------------------------------------------------
 // src_lcao
 //----------------------------------------------------------
@@ -172,36 +156,15 @@ int TEST_FORCE = 0;//mohan add 2011-03-18
 int TEST_STRESS = 0;//zhengdy add 2018-05-16
 int test_gridt = 0; // mohan add 2011-03-17
 //----------------------------------------------------------
-// src_wannier
+// src_pseudo
 //----------------------------------------------------------
-int test_spillage = 0;
-int test_improve_pao = 0;
-int test_eximport = 0;
-int test_operation = 0;
-int test_recon = 0;
-int test_sph_proj = 0;
-int test_build = 0;
-int test_setout = 0;
-//----------------------------------------------------------
-// src_epm || src_pseudo
-//----------------------------------------------------------
-#ifdef __EPM
-int test_epm = 10;
-int test_epm_unitcell = 10;
-int test_epm_nscf = 10;
-#else
 int test_pseudo_cell = 0;// 2 : output readin data
 int test_pp = 0;// pp: pseudopotential
 int test_kmesh = 0;
-int test_mlwf_overlap = 0;
-int test_mlwf_optimize = 0;
 int test_ion_dynamics = 0;
-#endif
 //----------------------------------------------------------
 // src_tools
 //----------------------------------------------------------
-int test_figure = 0;
-int test_mathzone = 0;
 int test_deconstructor = 0;
 
 //added by zhengdy-soc

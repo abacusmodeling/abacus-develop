@@ -16,9 +16,9 @@ using std::set;
 #include "center2_orb.h"
 #include "center2_orb-orb21.h"
 
-#include "src_lcao/make_overlap_table.h"
-#include "src_lcao/make_gaunt_table.h"
-#include "src_lcao/numerical_orbital_lm.h"
+#include "src_lcao/ORB_radial_table.h"
+#include "src_lcao/ORB_gaunt_table.h"
+#include "src_lcao/ORB_atomic_lm.h"
 #include "src_global/vector3.h"
 
 class Center2_Orb::Orb22

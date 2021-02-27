@@ -13,7 +13,7 @@ Build_ST_pw::~Build_ST_pw()
 
 }
 
-// be called in Use_Hamilt_Matrix::calculate_STNR_k()
+// be called in LCAO_Hamilt::calculate_STNR_k()
 // FUNCTION: calculate the overlap and kinetic matrix
 // in localized basis (expanded in plane wave basis).
 void Build_ST_pw::set_ST(const int &ik, const char& dtype)
@@ -132,48 +132,49 @@ void Build_ST_pw::set_local(const int &ik)
 
 	for(int i=0; i<NLOCAL; i++)
 	{
-		if(NSPIN!=4){
-		for(int ig=0; ig<npw; ig++)
+		if(NSPIN!=4)
 		{
-			psi_one[ig] = wf.wanf2[ik](i, ig);
-		}
-
-		ZEROS( psic, pw.nrxx);
-		// (1) set value
-		for (int ig=0; ig< npw; ig++)
-		{
-			psic[ fft_index[ig]  ] = psi_one[ig];
-		}
-
-		// (2) fft to real space and doing things.
-		pw.FFT_wfc.FFT3D( psic, 1);
-		for (int ir=0; ir< pw.nrxx; ir++)
-		{
-			psic[ir] *= pot.vrs1[ir];
-		}
-
-		// (3) fft back to G space.
-		pw.FFT_wfc.FFT3D( psic, -1);
-
-		for(int ig=0; ig<npw; ig++)
-		{
-			hpsi[ig] = psic[ fft_index[ig] ];
-		}
-
-		for(int j=i; j<NLOCAL; j++)
-		{
-			complex<double> v = ZERO;
 			for(int ig=0; ig<npw; ig++)
 			{
-				v += conj( wf.wanf2[ik](j,ig) ) * hpsi[ig];
+				psi_one[ig] = wf.wanf2[ik](i, ig);
 			}
-//			vij(j, i) = v;
-			LM.set_HSk(j,i,v,'L');
-			if(i!=j)
+
+			ZEROS( psic, pw.nrxx);
+			// (1) set value
+			for (int ig=0; ig< npw; ig++)
 			{
-				LM.set_HSk(i,j,conj(v),'L');
+				psic[ fft_index[ig]  ] = psi_one[ig];
 			}
-		}
+
+			// (2) fft to real space and doing things.
+			pw.FFT_wfc.FFT3D( psic, 1);
+			for (int ir=0; ir< pw.nrxx; ir++)
+			{
+				psic[ir] *= pot.vrs1[ir];
+			}
+
+			// (3) fft back to G space.
+			pw.FFT_wfc.FFT3D( psic, -1);
+
+			for(int ig=0; ig<npw; ig++)
+			{
+				hpsi[ig] = psic[ fft_index[ig] ];
+			}
+
+			for(int j=i; j<NLOCAL; j++)
+			{
+				complex<double> v = ZERO;
+				for(int ig=0; ig<npw; ig++)
+				{
+					v += conj( wf.wanf2[ik](j,ig) ) * hpsi[ig];
+				}
+	//			vij(j, i) = v;
+				LM.set_HSk(j,i,v,'L');
+				if(i!=j)
+				{
+					LM.set_HSk(i,j,conj(v),'L');
+				}
+			}
 		}
 		else//noncolinear case
 		{

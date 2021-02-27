@@ -8,18 +8,39 @@
 #include "../src_pw/tools.h"
 #include "grid_base_beta.h"
 #include "grid_technique.h"
-#include "lcao_matrix.h"
+#include "LCAO_matrix.h"
 #include <omp.h>
+
 //=========================================================
-//CLASS  Grid_Integral_Beta
-//Note : Integral On 3D Grids, different from Grid_Integral
-//Feature : Matrix Elements Of Local Potential For 
-//Numerical Orbitals
+// Integral On 3D Grids, different from Grid_Integral
+// Feature : Matrix Elements Of Local Potential For 
+// Numerical Orbitals
 //=========================================================
 
 class Gint_Gamma : public Grid_Base_Beta
 {
-private:
+	public:
+
+	Gint_Gamma();
+	~Gint_Gamma();
+
+	// (1) calculate the H matrix in terms of effective potentials
+	void cal_vlocal( const double* vlocal_in);
+
+	// (2) calculate charge density
+	double cal_rho(void);
+
+	// (3) calcualte the forces related to grid
+	void cal_force( const double* vlocal_in);
+
+	// (4) calcualte the envelope function
+	void cal_env(const double* wfc, double* rho);
+
+	// (5) calculate the Mulliken charge
+	void cal_mulliken(double** mulliken);
+
+
+	private:
 
 	double* transformer;
 	double psiv1;
@@ -45,28 +66,15 @@ private:
 	omp_lock_t lock;
 
 	void save_atoms_on_grid(const Grid_Technique &gt);
-	
-	
-	// for calculation of < phi_i | Vna | phi_j >
-	// on normal real space FFT grid.
-	void gamma_vna(void);
-
-
-	// for calculation of < phi_i | Vna | phi_j >
-	// on dense real space FFT grid.
-	void gamma_vna_d(const Grid_Technique &gt, const char &matrix_type);// d stands for 'dense'
 
 	// for calculation of < phi_i | Vlocal | phi_j >
 	void gamma_vlocal(void);  
 
-
 	// for calculation of charege 
 	double gamma_charge(void);
 
-
 	// for calculation of Mulliken charge.
 	void gamma_mulliken(double** mulliken);
-
 
 	// for calculation of envelope functions.
 	void gamma_envelope(const double* wfc, double* rho);// mohan add 2011-07-01
@@ -75,11 +83,6 @@ private:
 	// for calculatin of < dphi_i | Vlocal | phi_j > for foce calculation
 	// on regular FFT real space grid.
 	void gamma_force(void);
-
-
-	// for calculation of < dphi_i | Vlocal | phi_j> for force calculation
-	// on dense FFT grid.
-	void gamma_force_vna(const Grid_Technique &gt, LCAO_Matrix &lm);
 
 
 	void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize, int* colidx, 
@@ -97,26 +100,6 @@ private:
         int* at, int* block_index, int* block_iw, int* block_size, 
         int** cal_flag, double** psir_ylm);
 
-
-public:
-
-	Gint_Gamma();
-	~Gint_Gamma();
-
-	double cal_rho(void);
-	void cal_mulliken(double** mulliken);
-	void cal_env(const double* wfc, double* rho);
-	void cal_vna( const double* vlocal_in);
-	void cal_vna_d( const Grid_Technique &gt, const double* vlocal_in, const char &matrix_type);// d stands for 'dense'
-	void cal_vlocal( const double* vlocal_in);
-	void cal_force( const double* vlocal_in);
-	void cal_force_vna( const double* vlocal_in, const Grid_Technique &gt, LCAO_Matrix &lm );
-	void cal_vnl_B(complex<double> **Tab); // mohan add 2011-04-08
-	
-	
-	
-	// needed while for gauge-invarient B-field.
-	void cal_S_T_AP(char type, const Grid_Technique &gt);//for calculating S,T,and A*P. sun zhiyuan add 2012-01-03
 
 
 };

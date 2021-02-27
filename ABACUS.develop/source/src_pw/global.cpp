@@ -19,6 +19,8 @@ Stochastic_WF STO_WF;
 energy en;
 wavefunc wf;
 Hamilt hm;
+Exx_Global exx_global;
+Exx_Lip exx_lip(exx_global.info);
 
 UnitCell_pseudo ucell;
 pseudopot_cell_vnl ppcell;

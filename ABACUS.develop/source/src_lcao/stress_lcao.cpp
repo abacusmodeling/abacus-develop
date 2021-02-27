@@ -1,7 +1,11 @@
 #include "stress_lcao.h"
 #include "../src_pw/global.h"
 #include "../src_pw/xc_functional.h"
-#include "../src_pw/gga_pw.h"
+#include "../src_pw/xc_gga_pw.h"
+#include "src_pw/myfunc.h"
+// new
+#include "src_pw/H_Hartree_pw.h"
+#include "src_pw/H_XC_pw.h"
 
 double Stress_LCAO::stress_invalid_threshold_ev = 0.00;
 
@@ -46,9 +50,10 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
     TITLE("Stress_LCAO","start_stress");
 	timer::tick("Stress_LCAO","start_stress",'E');
 
-
-    for(int i=0;i<3;i++){
-       for(int j=0;j<3;j++){
+    for(int i=0;i<3;i++)
+	{
+       for(int j=0;j<3;j++)
+		{
           scs[i][j] = 0.0;
           soverlap[i][j] = overlap[i][j];
           stvnl_dphi[i][j] = tvnl_dphi[i][j];
@@ -67,10 +72,10 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 	//--------------------------------------------------------
     this->cal_stress_loc ();
  
-        //--------------------------------------------------------
-        //hartree term
-        //--------------------------------------------------------
-    this->cal_stress_har ();
+	//--------------------------------------------------------
+	//hartree term
+	//--------------------------------------------------------
+	this->cal_stress_har ();
     
 	//--------------------------------------------------------
 	// ewald stress: use plane wave only.
@@ -86,13 +91,14 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 	//--------------------------------------------------------
 	// stress due to self-consistent charge.
 	//--------------------------------------------------------
-        for(int i=0;i<3;i++){
-            //sigmaxc[i][i] = - (en.etxc-en.vtxc) / ucell.omega;
-            sigmaxc[i][i] =  -(en.etxc) / ucell.omega;
-    
-//            sigmahar[i][i] = en.ehart /ucell.omega;
+	for(int i=0;i<3;i++)
+	{
+		// sigmaxc[i][i] = - (en.etxc-en.vtxc) / ucell.omega;
+		sigmaxc[i][i] =  -(H_XC_pw::etxc) / ucell.omega;
 
-        }
+		// sigmahar[i][i] = en.ehart /ucell.omega;
+
+	}
 	//Exchange-correlation for PBE
 	cal_stress_gradcorr();
 
@@ -126,19 +132,19 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 	}*/
 
 	for(int i=0; i<3; i++)
-        {
-    	    for (int j=0;j<3;j++)
-	    {
-        	scs[i][j] += soverlap[i][j]
-			+ stvnl_dphi[i][j] 
-			+ svnl_dbeta[i][j] 
-			+ svl_dphi[i][j] 
-			+ sigmadvl[i][j] // derivative of local potential stress (pw)
-			+ sigmaewa[i][j] // ewald stress (pw)
-			+ sigmacc[i][j] //nonlinear core correction stress (pw)
-			+ sigmaxc[i][j]//exchange corretion stress 
-                        + sigmahar[i][j];// hartree stress 
-	
+	{
+		for (int j=0;j<3;j++)
+		{
+			scs[i][j] += soverlap[i][j]
+				+ stvnl_dphi[i][j] 
+				+ svnl_dbeta[i][j] 
+				+ svl_dphi[i][j] 
+				+ sigmadvl[i][j] // derivative of local potential stress (pw)
+				+ sigmaewa[i][j] // ewald stress (pw)
+				+ sigmacc[i][j] //nonlinear core correction stress (pw)
+				+ sigmaxc[i][j]//exchange corretion stress 
+				+ sigmahar[i][j];// hartree stress 
+
 			if(vdwd2.vdwD2)			// Peize Lin update 2019-04-26
 			{
 				scs[i][j] += stress_vdw(i , j);
@@ -147,18 +153,17 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
 			{
 				scs[i][j] += stress_vdw(i , j);
 			}   
-	/*		if(EFIELD)
-			{
-				scs(iat, i) = scs(iat, i) + sefield(iat, i);
-			}
-*/
-		
+			/*		if(EFIELD)
+					{
+					scs(iat, i) = scs(iat, i) + sefield(iat, i);
+					}
+			 */
+
 		}
 
-	
-
-//		if(OUT_LEVEL != "m") ofs_running << " correction stress for each atom along direction " << i+1 << " is " << sum/ucell.nat << endl;
-    }
+		//	if(OUT_LEVEL != "m") ofs_running << " correction stress for each atom along direction " 
+		// << i+1 << " is " << sum/ucell.nat << endl;
+	}
 
 /*if(SYMMETRY)     
 {
@@ -216,52 +221,52 @@ void Stress_LCAO::start_stress(double overlap[][3],double tvnl_dphi[][3],double 
     {
 		for(int j=0; j<3; j++)
 		{
-                svlocal[i][j] = 0.0;
-        	svlocal[i][j] = svl_dphi[i][j] + sigmadvl[i][j];
+			svlocal[i][j] = 0.0;
+			svlocal[i][j] = svl_dphi[i][j] + sigmadvl[i][j];
 		}
-    }
+	}
 
 	// test
-    double stvnl[3][3];
-    for (int i = 0; i < 3; i++)
-    {
+	double stvnl[3][3];
+	for (int i = 0; i < 3; i++)
+	{
 		for(int j=0; j<3; j++)
 		{
-                stvnl[i][j] = 0.0;
-        	stvnl[i][j] = stvnl_dphi[i][j] + svnl_dbeta[i][j];
+			stvnl[i][j] = 0.0;
+			stvnl[i][j] = stvnl_dphi[i][j] + svnl_dbeta[i][j];
 		}
-    }
+	}
 
-    if(SYMMETRY)
+    if(Symmetry::symm_flag)
     {
-	symm.stress_symmetry(scs);
+		symm.stress_symmetry(scs);
     }//end symmetry
 
 	// print Rydberg stress or not
 	bool ry = false;
   
-//        int TEST_STRESS = 1;
+//  int TEST_STRESS = 1;
 	if(TEST_STRESS)
 	{
 		ofs_running << "\n PARTS OF STRESS: " << endl;
 		ofs_running << setiosflags(ios::showpos);
 		ofs_running << setiosflags(ios::fixed) << setprecision(8) << endl;
 		this->print_stress("OVERLAP    STRESS",soverlap,TEST_STRESS,ry);
-                //test
-                this->print_stress("T      STRESS",stvnl_dphi,TEST_STRESS,ry);
-                this->print_stress("VNL      STRESS",svnl_dbeta,TEST_STRESS,ry);	
+		//test
+		this->print_stress("T      STRESS",stvnl_dphi,TEST_STRESS,ry);
+		this->print_stress("VNL      STRESS",svnl_dbeta,TEST_STRESS,ry);	
 
 		this->print_stress("T_VNL      STRESS",stvnl,TEST_STRESS,ry);
 
 		this->print_stress("VL_dPHI    STRESS",svl_dphi,TEST_STRESS,ry);
 		this->print_stress("VL_dVL     STRESS",sigmadvl,TEST_STRESS,ry);
-                this->print_stress("HAR     STRESS",sigmahar,TEST_STRESS,ry);
+		this->print_stress("HAR     STRESS",sigmahar,TEST_STRESS,ry);
 
 		this->print_stress("EWALD      STRESS",sigmaewa,TEST_STRESS,ry);
-                this->print_stress("cc      STRESS",sigmacc,TEST_STRESS,ry);
-//		this->print_stress("NLCC       STRESS",sigmacc,TEST_STRESS,ry);
+		this->print_stress("cc      STRESS",sigmacc,TEST_STRESS,ry);
+		//		this->print_stress("NLCC       STRESS",sigmacc,TEST_STRESS,ry);
 		this->print_stress("XC        STRESS",sigmaxc,TEST_STRESS,ry);
-                this->print_stress("TOTAL        STRESS",scs,TEST_STRESS,ry);
+		this->print_stress("TOTAL        STRESS",scs,TEST_STRESS,ry);
 	}
 
 
@@ -322,29 +327,28 @@ void Stress_LCAO::print_stress(const string &name, double f[][3], const bool scr
 	
 	}
 
-        for (int i=0;i<3;i++){
-			ofs_running << setw(15)<< " ";
-			if( abs(f[i][0]) >output_acc) ofs_running << setw(15) << f[i][0]*fac;
-			else ofs_running << setw(15) << "0";
-			if( abs(f[i][1]) >output_acc) ofs_running << setw(15) << f[i][1]*fac;
-			else ofs_running << setw(15) << "0";
-			if( abs(f[i][2]) >output_acc) ofs_running << setw(15) << f[i][2]*fac;
-			else ofs_running << setw(15) << "0";
-			ofs_running << endl;
+	for (int i=0;i<3;i++)
+	{
+		ofs_running << setw(15)<< " ";
+		if( abs(f[i][0]) >output_acc) ofs_running << setw(15) << f[i][0]*fac;
+		else ofs_running << setw(15) << "0";
+		if( abs(f[i][1]) >output_acc) ofs_running << setw(15) << f[i][1]*fac;
+		else ofs_running << setw(15) << "0";
+		if( abs(f[i][2]) >output_acc) ofs_running << setw(15) << f[i][2]*fac;
+		else ofs_running << setw(15) << "0";
+		ofs_running << endl;
 
-			if(screen)
-			{
-				if( abs(f[i][0]) >output_acc) cout << setw(15) << f[i][0]*fac;
-				else cout << setw(15) << "0";
-				if( abs(f[i][1]) >output_acc) cout << setw(15) << f[i][1]*fac;
-				else cout << setw(15) << "0";
-				if( abs(f[i][2]) >output_acc) cout << setw(15) << f[i][2]*fac;
-				else cout << setw(15) << "0";
-				cout << endl;
-			}	
-				
-            
-        }
+		if(screen)
+		{
+			if( abs(f[i][0]) >output_acc) cout << setw(15) << f[i][0]*fac;
+			else cout << setw(15) << "0";
+			if( abs(f[i][1]) >output_acc) cout << setw(15) << f[i][1]*fac;
+			else cout << setw(15) << "0";
+			if( abs(f[i][2]) >output_acc) cout << setw(15) << f[i][2]*fac;
+			else cout << setw(15) << "0";
+			cout << endl;
+		}	
+	}
 
 
 	cout << resetiosflags(ios::showpos);
@@ -352,14 +356,14 @@ void Stress_LCAO::print_stress(const string &name, double f[][3], const bool scr
     return;
 }
 
-void Stress_LCAO::printstress_total (bool ry)
+void Stress_LCAO::printstress_total(bool ry)
 {
 // zhengdy update 2016-10-08
 	double unit_transform = 1;
 
 	if(!ry)
 	{
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
 //	cout.setf(ios::fixed);
 
@@ -412,23 +416,25 @@ void Stress_LCAO::cal_stress_loc(void)
 
     dvloc = new double[pw.ngmc];
 
-    for(l=0;l<3;l++){
-       for(m=0;m<3;m++){
-          sigmadvl[l][m]=0;
-       }
-    }
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			sigmadvl[l][m]=0;
+		}
+	}
 
      complex<double> *Porter = UFFT.porter;
 
-     ZEROS( Porter, pw.nrxx );
-        for(int is=0; is<NSPIN; is++)
-        {
-        for (int ir=0; ir<pw.nrxx; ir++)
-                {
-                        Porter[ir] += complex<double>(CHR.rho[is][ir], 0.0 );
-                }
-        }
-     pw.FFT_chg.FFT3D(Porter, -1);
+	 ZEROS( Porter, pw.nrxx );
+	 for(int is=0; is<NSPIN; is++)
+	 {
+		 for (int ir=0; ir<pw.nrxx; ir++)
+		 {
+			 Porter[ir] += complex<double>(CHR.rho[is][ir], 0.0 );
+		 }
+	 }
+	 pw.FFT_chg.FFT3D(Porter, -1);
 
 //    if(INPUT.gamma_only==1) fact=2.0;
 //    else fact=1.0;
@@ -448,7 +454,8 @@ void Stress_LCAO::cal_stress_loc(void)
             evloc += ppcell.vloc(it, pw.ig2ngg[ig]) * (pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
         }
     }
-    for( nt = 0;nt< ucell.ntype; nt++){
+    for( nt = 0;nt< ucell.ntype; nt++)
+	{
         const Atom* atom = &ucell.atoms[nt];
         //mark by zhengdy for check
        // if ( ppcell.vloc == NULL ){
@@ -468,7 +475,8 @@ void Stress_LCAO::cal_stress_loc(void)
         //
         }
 
-        for( ng = 0;ng< pw.ngmc;ng++){
+        for( ng = 0;ng< pw.ngmc;ng++)
+		{
             const int j = pw.ig2fftc[ng];
             g[0]=pw.gcar[ng].x;
             g[1]=pw.gcar[ng].y;
@@ -483,16 +491,19 @@ void Stress_LCAO::cal_stress_loc(void)
          }
     }
 
-    for( l = 0;l< 3;l++){
-//         sigmadvl [l][l] = sigmadvl [l][l] +  evloc;//modified 2017/3/21
+    for( l = 0;l< 3;l++)
+	{
+//     sigmadvl [l][l] = sigmadvl [l][l] +  evloc;//modified 2017/3/21
          for (m = 0; m<l+1; m++)
                sigmadvl [m][l] = sigmadvl [l][m];
     }
-    for(l=0;l<3;l++){
-               for(m=0;m<3;m++){
-                  Parallel_Reduce::reduce_double_pool( sigmadvl[l][m] );
-               }
-    }
+    for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			Parallel_Reduce::reduce_double_pool( sigmadvl[l][m] );
+		}
+	}
     delete[] dvloc;
     delete[] vg;
 
@@ -502,6 +513,7 @@ void Stress_LCAO::cal_stress_loc(void)
 }
 
 
+#include "src_pw/H_Ewald_pw.h"
 void Stress_LCAO::cal_stress_ew(void)
 {
     timer::tick("Stress_lo","cal_stress_ew",'E');
@@ -509,17 +521,22 @@ void Stress_LCAO::cal_stress_ew(void)
     int i,j,l,m;
     double g[3];
 
-    for(i=0;i<3;i++){
-       for(j=0;j<3;j++){
-           sigmaewa[i][j]=0;
-       }
-    }
+	for(i=0;i<3;i++)
+	{
+		for(j=0;j<3;j++)
+		{
+			sigmaewa[i][j]=0;
+		}
+	}
+
     double charge=0;
-    for(int it=0; it < ucell.ntype; it++){
-         for(int i=0; i<ucell.atoms[it].na; i++){
-            charge = charge + ucell.atoms[it].zv;
-         }
-    }
+    for(int it=0; it < ucell.ntype; it++)
+	{
+		for(int i=0; i<ucell.atoms[it].na; i++)
+		{
+			charge = charge + ucell.atoms[it].zv;
+		}
+	}
     //choose alpha in order to have convergence in the sum over G
     //upperbound is a safe upper bound for the error ON THE ENERGY
 
@@ -602,7 +619,7 @@ void Stress_LCAO::cal_stress_ew(void)
                //calculate tau[na]-tau[nb]
                d_tau = ucell.atoms[it].tau[i] - ucell.atoms[jt].tau[j];
                //generates nearest-neighbors shells 
-               en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
+               H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
                for(int nr=0 ; nr<nrm ; nr++){
                 rr=sqrt(r2[nr]) * ucell.lat0;
                 fac = -e2/2.0/ucell.omega*pow(ucell.lat0,2)*ucell.atoms[it].zv * ucell.atoms[it].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (TWO_PI)) * exp(-alpha * pow(rr,2)));
@@ -660,7 +677,7 @@ void Stress_LCAO::cal_stress_cc(void)
 
 	//recalculate the exchange-correlation potential
 	matrix vxc(NSPIN, pw.nrxx);
-	pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 
 	complex<double> * psic = new complex<double> [pw.nrxx];
 
@@ -742,121 +759,132 @@ void Stress_LCAO::cal_stress_cc(void)
 	return;
 }
 
-void Stress_LCAO::cal_stress_har(){
+void Stress_LCAO::cal_stress_har(void)
+{
+	TITLE("Stress_LCAO","cal_stress_har");
 
-     double shart,g2;
-     const double eps=1e-8;
-     int is,ig,l,m,nspin0;
+	double shart,g2;
+	const double eps=1e-8;
+	int is,ig,l,m,nspin0;
 
+	complex<double> *Porter = UFFT.porter;
 
+	//  Hartree potential VH(r) from n(r)
+	ZEROS( Porter, pw.nrxx );
+	for(int is=0; is<NSPIN; is++)
+	{
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+		}
+	}
+	//=============================
+	//  bring rho (aux) to G space
+	//=============================
+	pw.FFT_chg.FFT3D(Porter, -1);
 
-     complex<double> *Porter = UFFT.porter;
+	complex<double> *psic = new complex<double> [pw.nrxx];
+	double *psic0 = new double[pw.nrxx];
+	ZEROS( psic0, pw.nrxx);
+	for(int is=0; is<NSPIN; is++)
+	{
+		daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			psic[ir] = complex<double>(psic0[ir], 0.0);
+		}
+	}
 
-    //  Hartree potential VH(r) from n(r)
-    ZEROS( Porter, pw.nrxx );
-        for(int is=0; is<NSPIN; is++)
-        {
-        for (int ir=0; ir<pw.nrxx; ir++)
-                {
-                        Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
-                }
-        }
-     //=============================
-    //  bring rho (aux) to G space
-    //=============================
-        pw.FFT_chg.FFT3D(Porter, -1);
+	pw.FFT_chg.FFT3D(psic, -1) ;
 
-        complex<double> *psic = new complex<double> [pw.nrxx];
-        double *psic0 = new double[pw.nrxx];
-        ZEROS( psic0, pw.nrxx);
-        for(int is=0; is<NSPIN; is++)
-        {
-            daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
-            for (int ir=0; ir<pw.nrxx; ir++)
-            {
-                psic[ir] = complex<double>(psic0[ir], 0.0);
-            }
-        }
+	double charge;
+	if (pw.gstart == 1)
+	{
+		charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
+	}
 
-        pw.FFT_chg.FFT3D(psic, -1) ;
+	complex<double> *vh_g  = new complex<double>[pw.ngmc];
+	ZEROS(vh_g, pw.ngmc);
 
+	double g[3];
 
-        double charge;
-        if (pw.gstart == 1)
-        {
-                charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
-        }
+	// test
+	// int i=pw.gstart;
+	// cout<< "gstart " <<pw.gstart<<endl;
 
-        complex<double> *vh_g  = new complex<double>[pw.ngmc];
-        ZEROS(vh_g, pw.ngmc);
+	double ehart=0;
+	for (int ig = pw.gstart; ig<pw.ngmc; ig++)
+	{
+		const int j = pw.ig2fftc[ig];
+		const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
 
-        double g[3];
-//test
-   //         int i=pw.gstart;
-   //         cout<< "gstart " <<pw.gstart<<endl;
-        double ehart=0;
-        for (int ig = pw.gstart; ig<pw.ngmc; ig++)
-        {
-            const int j = pw.ig2fftc[ig];
-            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+		ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+		//            vh_g[ig] = fac * Porter[j];
+		shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
+		g[0]=pw.gcar[ig].x;
+		g[1]=pw.gcar[ig].y;
+		g[2]=pw.gcar[ig].z;
+		//test
 
-            ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-//            vh_g[ig] = fac * Porter[j];
-            shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
-            g[0]=pw.gcar[ig].x;
-            g[1]=pw.gcar[ig].y;
-            g[2]=pw.gcar[ig].z;
-            //test
+		//   cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
+		//   cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
+		//   cout<<"Porter "<<Porter[j]<<endl;
+		//   cout<<"tpiba2 "<<ucell.tpiba2<<endl;
 
-            //   cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
-            //   cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
-            //   cout<<"Porter "<<Porter[j]<<endl;
-            //   cout<<"tpiba2 "<<ucell.tpiba2<<endl;
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<l+1;m++)
+			{
+				sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
+			}
+		}
 
+	}
+	Parallel_Reduce::reduce_double_pool( ehart );
+	ehart *= 0.5 * ucell.omega;
+	//cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
 
-            for(l=0;l<3;l++){
-               for(m=0;m<l+1;m++){
-                  sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
-               }
-            }
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l+1;m++)
+		{
+			Parallel_Reduce::reduce_double_pool( sigmahar[l][m] );
+		}
+	}
 
-        }
-        Parallel_Reduce::reduce_double_pool( ehart );
-        ehart *= 0.5 * ucell.omega;
-        //cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
-        for(l=0;l<3;l++){
-               for(m=0;m<l+1;m++){
-                  Parallel_Reduce::reduce_double_pool( sigmahar[l][m] );
-            }
-        }
-
-//        Parallel_Reduce::reduce_double_pool( ehart );
-//        ehart *= 0.5 * ucell.omega;
-        //psic(:)=(0.0,0.0)
-
-	for(l=0;l<3;l++){
-		for(m=0;m<3;m++){
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
 			sigmahar[l][m] *= 0.5 * e2 * FOUR_PI;
 		}
 	}
+
 	for(l=0;l<3;l++)
-		sigmahar[l][l] += en.ehart /ucell.omega;
-     for(l=0;l<3;l++){
-        for(m=0;m<l;m++){
-           sigmahar[m][l]=sigmahar[l][m];
-        }
-     }
+	{
+		sigmahar[l][l] += H_Hartree_pw::hartree_energy /ucell.omega;
+	}
 
-     for(l=0;l<3;l++){
-        for(m=0;m<3;m++){
-           sigmahar[l][m]*=-1;
-        }
-     }
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l;m++)
+		{
+			sigmahar[m][l]=sigmahar[l][m];
+		}
+	}
 
-     delete[] vh_g;
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			sigmahar[l][m]*=-1;
+		}
+	}
+
+	delete[] vh_g;
 	delete[] psic;
 	delete[] psic0;
-     return;
+	return;
 }
 
 void Stress_LCAO::cal_stress_gradcorr() 
@@ -1063,5 +1091,3 @@ void Stress_LCAO::cal_stress_gradcorr()
 	}
 	return;
 }
-
-

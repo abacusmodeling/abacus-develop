@@ -6,28 +6,28 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "../src_global/global_variable.h"
-#include "../src_global/global_function.h"
+#include "../run_pw.h"
+#include "src_global/global_variable.h"
+#include "src_global/global_function.h"
 #include "pw_basis.h"
 #include "energy.h"
-#include "occupy.h"
 #include "pseudopot_cell_vnl.h"
-#include "../run_pw.h"
 #include "charge_broyden.h"
 #include "potential.h"
-#include "functional.h"
+#include "xc_type.h"
 #include "hamilt.h"
 #include "ions.h"
 #include "wavefunc.h"
 #include "use_fft.h"
 #include "klist.h"
-#include "../src_pw/output.h"
+#include "../src_io/output.h"
 #include "magnetism.h"
 #include "vdwd2.h"
-#include "vdwd3.h"				
+#include "vdwd3.h"	
 #include "src_global/restart.h" 
+#include "exx_global.h"
+#include "exx_lip.h"
 #include "soc.h"
-
 #include "../src_parallel/ft.h"
 
 //==========================================================
@@ -43,6 +43,8 @@ extern Stochastic_WF STO_WF; //qianrui add 2021-2-5
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;
+extern Exx_Global exx_global;
+extern Exx_Lip exx_lip;
 
 #include "symmetry.h"
 #include "unitcell_pseudo.h"

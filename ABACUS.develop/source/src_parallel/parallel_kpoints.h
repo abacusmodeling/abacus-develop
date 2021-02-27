@@ -10,7 +10,8 @@ class Parallel_Kpoints
 	Parallel_Kpoints();
 	~Parallel_Kpoints();	
 
-	void init();
+	void init_pools();
+
 	void kinfo(int &nkstot);
 	
 	// collect value from each pool to wk.

@@ -2,9 +2,11 @@
 #define EFIELD_H
 
 #include "../src_global/matrix.h"
+
 class Efield
 {
 	public:
+
 	Efield();
 	~Efield();
 

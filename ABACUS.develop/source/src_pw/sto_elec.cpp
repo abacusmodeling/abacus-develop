@@ -1,9 +1,10 @@
 #include "tools.h"
 #include "global.h"
 #include "sto_elec.h" 
-#include "algorithms.h"
+#include "occupy.h"
 #include "symmetry_rho.h"
-#include "../src_pw/wf_io.h"
+#include "../src_io/wf_io.h"
+#include "H_Ewald_pw.h"
 
 double Stochastic_Elec::avg_iter = 0;
 
@@ -19,7 +20,9 @@ Stochastic_Elec::~Stochastic_Elec()
 void Stochastic_Elec::scf_stochastic(const int &istep)
 {
 	timer::tick("Elec_Stochastic","scf_stochastic",'D');
-	en.ewld = en.ewald();
+
+	// mohan update 2021-02-25
+	H_Ewald_pw::compute_ewald(ucell,pw); 
 
     set_ethr();
     
@@ -212,7 +215,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         if (!conv_elec)
         {
 			// not converged yet, calculate new potential from mixed charge density
-            pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+            pot.v_of_rho(CHR.rho, pot.vr);
 
 			// because <T+V(ionic)> = <eband+deband> are calculated after sum
 			// band, using output charge density.
@@ -232,7 +235,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			}
 
 			// the new potential V(PL)+V(H)+V(xc)
-            pot.v_of_rho(CHR.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+            pot.v_of_rho(CHR.rho, pot.vr);
 
             //( vnew used later for scf correction to the forces )
 	    	pot.vnew = pot.vr - pot.vnew;
@@ -331,7 +334,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	for (int ik = 0;ik < kv.nks;ik++)
 	{
-		hm.init_k(ik);
+		hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization

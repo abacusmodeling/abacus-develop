@@ -12,10 +12,10 @@ using std::set;
 #include "../src_lcao/center2_orb-orb11.h"
 #include "../src_lcao/center2_orb-orb21.h"
 
-#include "../src_lcao/make_overlap_table.h"
-#include "../src_lcao/make_gaunt_table.h"
-#include "../src_lcao/numerical_orbital_lm.h"
-#include "../src_lcao/lcao_orbitals.h"
+#include "../src_lcao/ORB_radial_table.h"
+#include "../src_lcao/ORB_gaunt_table.h"
+#include "../src_lcao/ORB_atomic_lm.h"
+#include "../src_lcao/ORB_read.h"
 #include "../src_global/vector3.h"
 #include "../src_lcao/ylm.h"
 #include "../src_lcao/global_fp.h"
@@ -24,10 +24,19 @@ using std::set;
 
 class cal_r_overlap_R
 {
-public:
+
+	public:
+
+	cal_r_overlap_R();
+	~cal_r_overlap_R();
+	
+
 	Make_Overlap_Table MOT;
+
 	Make_Gaunt_Table MGT;
+
 	Numerical_Orbital_Lm orb_r;
+
 	vector<vector<vector<Numerical_Orbital_Lm>>> orbital_phi;
 	
 	int R_x_num;
@@ -56,11 +65,6 @@ public:
 						map<size_t,
 						Center2_Orb::Orb21>>>>>> center2_orb21_r;
 						
-						
-						
-	cal_r_overlap_R();
-	~cal_r_overlap_R();
-	
 	void init();
 	void out_r_overlap_R(const int nspin);
 	

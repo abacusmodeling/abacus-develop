@@ -113,15 +113,7 @@ void SubGrid_oper::cal_totwfc()
 	// reduce occupy and get the full occupations.
 #ifdef __MPI
 	// mohan 2012-02-23
-	if(ATOM_DISTRIBUTION==1)
-	{
-		ofs_running << " Because of the atom distribution." << endl;
-		ofs_running << " Don't reduce the trace_lo_tot here." << endl;
-	}
-	else
-	{
-		Parallel_Reduce::reduce_int_grid(occupy, NLOCAL);
-	}
+	Parallel_Reduce::reduce_int_grid(occupy, NLOCAL);
 #endif
 
 	/*
@@ -180,22 +172,11 @@ void SubGrid_oper::cal_totwfc()
 			// need to allocate the pointer,
 			// because it would be some array's
 			// entrance parameters.
-			if(!BFIELD)
+			// mohan update 2021-02-12
+			this->totwfc = new double**[1];
+			for(int is=0; is<1; ++is)
 			{
-				this->totwfc = new double**[1];
-				for(int is=0; is<1; ++is)
-				{
-					this->totwfc[is] = new double*[NBANDS];
-				}
-			}
-			// for B field.
-			else
-			{
-				this->totwfc_B = new complex<double>**[1];
-				for(int is=0; is<1; ++is)
-				{
-					this->totwfc_B[is] = new complex<double>*[NBANDS];
-				}
+				this->totwfc[is] = new double*[NBANDS];
 			}
 			this->allocate_totwfc=false;
 			return;
@@ -240,7 +221,8 @@ void SubGrid_oper::cal_totwfc()
 					// bug: dimension of WFC_GAMMA is smaller than totwfc
 					for(int i=0; i<lgd; ++i)
 					{
-						this->totwfc[is][ib][i] = LOWF.WFC_GAMMA[CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
+		// mohan comment out 2021-02-09
+		//				this->totwfc[is][ib][i] = LOWF.WFC_GAMMA[CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
 					}
 				}
 			}	
@@ -291,7 +273,8 @@ void SubGrid_oper::dis_subwfc()
 
 						for(int ib=0; ib<NBANDS; ++ib)
 						{
-							LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
+		// mohan comment out 2021-02-09
+		//					LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
 						}//ib
 					}//mu1>=0
 				}//iw
@@ -382,7 +365,8 @@ void SubGrid_oper::dis_subwfc()
 			{
 				for (int mu=0; mu<GridT.lgd; ++mu)
 				{
-					LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu] = crecv[mu*NBANDS+ib];
+		// mohan comment out 2021-02-09
+		//			LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu] = crecv[mu*NBANDS+ib];
 				}
 			}
 
@@ -428,7 +412,8 @@ void SubGrid_oper::dis_subwfc()
 
 			for(int ib=0; ib<NBANDS; ++ib)
 			{
-				LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
+		// mohan comment out 2021-02-09
+//				LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
 			}//ib
 		}//mu1>=0
 	}//iw

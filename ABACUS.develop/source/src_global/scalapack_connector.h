@@ -76,6 +76,11 @@ extern "C"
 		const double* vl, const double* vu, const int* il, const int* iu,
 		const double* abstol, int* m, int* nz, double* w, const double*orfac, double* Z, const int* iz, const int* jz, const int*descz,
 		double* work, int* lwork, int*iwork, int*liwork, int* ifail, int*iclustr, double*gap, int* info);
+	void pzhegvx_(const int* itype, const char* jobz, const char* range, const char* uplo,
+		const int* n, std::complex<double>* A, const int* ia, const int* ja, const int*desca, std::complex<double>* B, const int* ib, const int* jb, const int*descb,
+		const double* vl, const double* vu, const int* il, const int* iu,
+		const double* abstol, int* m, int* nz, double* w, const double*orfac, std::complex<double>* Z, const int* iz, const int* jz, const int*descz,
+		std::complex<double>* work, int* lwork, double* rwork, int* lrwork, int*iwork, int*liwork, int* ifail, int*iclustr, double*gap, int* info);
 }
 
 /*

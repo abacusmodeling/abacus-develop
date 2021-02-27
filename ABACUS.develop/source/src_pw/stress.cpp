@@ -2,41 +2,52 @@
 #include "global.h"
 #include "potential.h"
 #include "xc_functional.h"
-#include "gga_pw.h"
+#include "xc_gga_pw.h"
 #include "efield.h"
+#include "myfunc.h"
+#include "symmetry.h"
+// new
+#include "H_Ewald_pw.h"
+#include "H_Hartree_pw.h"
+#include "H_XC_pw.h"
 
 void Stress::cal_stress()
 {
-    TITLE("Stress","cal_stress");
-        timer::tick("Stress","cal_stress",'E');    
-   
-    for(int i=0;i<3;i++){
-       for(int j=0;j<3;j++){
-          sigmatot[i][j] = 0.0;
-          sigmaxc[i][j] = 0.0;
-          sigmahar[i][j] = 0.0;
-          sigmakin[i][j] = 0.0;
-          sigmaloc[i][j] = 0.0;
-          sigmanlc[i][j] = 0.0;
-          sigmaewa[i][j] = 0.0;
-          sigmaxcc[i][j] = 0.0;
-       }
-    }
-    //kinetic contribution
-    stres_knl();
-if(SYMMETRY)
-{
-    symm.stress_symmetry(sigmakin);
-}//end symmetry
-    //hartree contribution
-    stres_har();
+	TITLE("Stress","cal_stress");
+	timer::tick("Stress","cal_stress",'E');    
+
+	for(int i=0;i<3;i++)
+	{
+		for(int j=0;j<3;j++)
+		{
+			sigmatot[i][j] = 0.0;
+			sigmaxc[i][j] = 0.0;
+			sigmahar[i][j] = 0.0;
+			sigmakin[i][j] = 0.0;
+			sigmaloc[i][j] = 0.0;
+			sigmanlc[i][j] = 0.0;
+			sigmaewa[i][j] = 0.0;
+			sigmaxcc[i][j] = 0.0;
+		}
+	}
+	//kinetic contribution
+	stres_knl();
+
+	if(Symmetry::symm_flag)
+	{
+		symm.stress_symmetry(sigmakin);
+	}//end symmetry
+
+	//hartree contribution
+	stres_har();
 
     //ewald contribution
     stres_ewa();
 
     //xc contribution: add gradient corrections(non diagonal)
-    for(int i=0;i<3;i++){
-       sigmaxc[i][i] = - (en.etxc-en.vtxc) / ucell.omega;
+    for(int i=0;i<3;i++)
+	{
+       sigmaxc[i][i] = - (H_XC_pw::etxc - H_XC_pw::vtxc) / ucell.omega;
     }
     stres_gradcorr();
 
@@ -47,24 +58,28 @@ if(SYMMETRY)
     stres_cc();
    
     //nonlocal
-    stres_nl();
-if(SYMMETRY)
-{
-    symm.stress_symmetry(sigmanlc);
-}//end symmetry
+	stres_nl();
 
-    for(int ipol=0;ipol<3;ipol++){
-        for(int jpol=0;jpol<3;jpol++){
+	if(Symmetry::symm_flag)
+	{
+		symm.stress_symmetry(sigmanlc);
+	}//end symmetry
+
+    for(int ipol=0;ipol<3;ipol++)
+	{
+        for(int jpol=0;jpol<3;jpol++)
+		{
             sigmatot[ipol][jpol] = sigmakin[ipol][jpol] + sigmahar[ipol][jpol] + sigmanlc[ipol][jpol] 
                                  + sigmaxc[ipol][jpol] + sigmaxcc[ipol][jpol] + sigmaewa[ipol][jpol]
                                  + sigmaloc[ipol][jpol];
         }
     }
     
-if(SYMMETRY)                          
-{
-    symm.stress_symmetry(sigmatot);
-}
+	if(Symmetry::symm_flag)
+	{
+		symm.stress_symmetry(sigmatot);
+	}
+
 /*    cout<<"total stress:"<<endl;
     for(int ipol=0;ipol<3;ipol++){
        for(int jpol=0;jpol<3;jpol++){
@@ -73,78 +88,78 @@ if(SYMMETRY)
        cout<< endl;
     }
   */ 
-        bool ry = false;
-        this->printstress_total(ry);
- 
-        if(TEST_STRESS) 
-        {               
-                ofs_running << "\n PARTS OF STRESS: " << endl;
-                ofs_running << setiosflags(ios::showpos);
-                ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
-                this->print_stress("KINETIC    STRESS",sigmakin,TEST_STRESS,ry);
-                this->print_stress("LOCAL    STRESS",sigmaloc,TEST_STRESS,ry);
-                this->print_stress("HARTREE    STRESS",sigmahar,TEST_STRESS,ry);
-                this->print_stress("NON-LOCAL    STRESS",sigmanlc,TEST_STRESS,ry);
-                this->print_stress("XC    STRESS",sigmaxc,TEST_STRESS,ry);
-                this->print_stress("EWALD    STRESS",sigmaewa,TEST_STRESS,ry);
-                this->print_stress("NLCC    STRESS",sigmaxcc,TEST_STRESS,ry);
-                this->print_stress("TOTAL    STRESS",sigmatot,TEST_STRESS,ry);
-        }
-    return;
+	bool ry = false;
+	this->printstress_total(ry);
+
+	if(TEST_STRESS) 
+	{               
+		ofs_running << "\n PARTS OF STRESS: " << endl;
+		ofs_running << setiosflags(ios::showpos);
+		ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
+		this->print_stress("KINETIC    STRESS",sigmakin,TEST_STRESS,ry);
+		this->print_stress("LOCAL    STRESS",sigmaloc,TEST_STRESS,ry);
+		this->print_stress("HARTREE    STRESS",sigmahar,TEST_STRESS,ry);
+		this->print_stress("NON-LOCAL    STRESS",sigmanlc,TEST_STRESS,ry);
+		this->print_stress("XC    STRESS",sigmaxc,TEST_STRESS,ry);
+		this->print_stress("EWALD    STRESS",sigmaewa,TEST_STRESS,ry);
+		this->print_stress("NLCC    STRESS",sigmaxcc,TEST_STRESS,ry);
+		this->print_stress("TOTAL    STRESS",sigmatot,TEST_STRESS,ry);
+	}
+	return;
     
 }
 
 
 void Stress::print_stress(const string &name, double f[][3], const bool screen, bool ry)const
 {
-        ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
+	ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
 
 
-        double fac = 1.0;
+	double fac = 1.0;
 
-        if(!ry)
-        {
-         //     fac = Ry_to_eV / 0.529177;
-        }
+	if(!ry)
+	{
+		//     fac = Ry_to_eV / 0.529177;
+	}
 
-        cout << setprecision(8);
-        cout << setiosflags(ios::showpos);
+	cout << setprecision(8);
+	cout << setiosflags(ios::showpos);
 
-        if(screen)
-        {
-                cout << " ------------------- " << name << " --------------------" << endl;
+	if(screen)
+	{
+		cout << " ------------------- " << name << " --------------------" << endl;
 
-        }
+	}
 
-        const double output_acc = 1.0e-8;
-        for (int i=0;i<3;i++){
-                        ofs_running << setw(15)<< " ";
-                        if( abs(f[i][0]) >output_acc) ofs_running << setw(15) << f[i][0]*fac;
-                        else ofs_running << setw(15) << "0";
-                        if( abs(f[i][1]) >output_acc) ofs_running << setw(15) << f[i][1]*fac;
-                        else ofs_running << setw(15) << "0";
-                        if( abs(f[i][2]) >output_acc) ofs_running << setw(15) << f[i][2]*fac;
-                        else ofs_running << setw(15) << "0";
-                        ofs_running << endl;
+	const double output_acc = 1.0e-8;
+	for (int i=0;i<3;i++)
+	{
+		ofs_running << setw(15)<< " ";
+		if( abs(f[i][0]) >output_acc) ofs_running << setw(15) << f[i][0]*fac;
+		else ofs_running << setw(15) << "0";
+		if( abs(f[i][1]) >output_acc) ofs_running << setw(15) << f[i][1]*fac;
+		else ofs_running << setw(15) << "0";
+		if( abs(f[i][2]) >output_acc) ofs_running << setw(15) << f[i][2]*fac;
+		else ofs_running << setw(15) << "0";
+		ofs_running << endl;
 
-                        if(screen)
-                        {
-                                if( abs(f[i][0]) >output_acc) cout << setw(15) << f[i][0]*fac;
-                                else cout << setw(15) << "0";
-                                if( abs(f[i][1]) >output_acc) cout << setw(15) << f[i][1]*fac;
-                                else cout << setw(15) << "0";
-                                if( abs(f[i][2]) >output_acc) cout << setw(15) << f[i][2]*fac;
-                                else cout << setw(15) << "0";
-                                cout << endl;
-                        }
-
-
-        }
+		if(screen)
+		{
+			if( abs(f[i][0]) >output_acc) cout << setw(15) << f[i][0]*fac;
+			else cout << setw(15) << "0";
+			if( abs(f[i][1]) >output_acc) cout << setw(15) << f[i][1]*fac;
+			else cout << setw(15) << "0";
+			if( abs(f[i][2]) >output_acc) cout << setw(15) << f[i][2]*fac;
+			else cout << setw(15) << "0";
+			cout << endl;
+		}
 
 
-        cout << resetiosflags(ios::showpos);
+	}
 
-    return;
+	cout << resetiosflags(ios::showpos);
+
+	return;
 }
 
 void Stress::printstress_total (bool ry)
@@ -154,12 +169,12 @@ void Stress::printstress_total (bool ry)
 
 	if(!ry)
 	{
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
-//      cout.setf(ios::fixed);
+	//  cout.setf(ios::fixed);
 
 
-        //ofs_running << setiosflags(ios::right);
+	//ofs_running << setiosflags(ios::right);
 	ofs_running << setprecision(8) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
 	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
 
@@ -176,7 +191,9 @@ void Stress::printstress_total (bool ry)
 
 		for(int i=0; i<3; i++)
 		{
-			ofs << "   " << sigmatot[i][0]*unit_transform << "   " << sigmatot[i][1]*unit_transform << "   " << sigmatot[i][2]*unit_transform << endl;
+			ofs << "   " << sigmatot[i][0]*unit_transform 
+			<< "   " << sigmatot[i][1]*unit_transform 
+			<< "   " << sigmatot[i][2]*unit_transform << endl;
 		}
 
 		ofs.close();
@@ -223,14 +240,14 @@ void Stress::stres_knl()
     
     int npwx=0;
     int qtot = 0;
-    for(int ik=0; ik<kv.nks; ik++)
-    {
-            for(int ig=0; ig<kv.ngk[ik]; ig++)
-            {
-                    qtot += kv.ngk[ik];
-            }
-            if(npwx<kv.ngk[ik])npwx=kv.ngk[ik];
-    }
+	for(int ik=0; ik<kv.nks; ik++)
+	{
+		for(int ig=0; ig<kv.ngk[ik]; ig++)
+		{
+			qtot += kv.ngk[ik];
+		}
+		if(npwx<kv.ngk[ik])npwx=kv.ngk[ik];
+	}
     
     kfac=new double[npwx];
     gk[0]= new double[npwx]; 
@@ -266,20 +283,32 @@ void Stress::stres_knl()
 
        //kinetic contribution
 
-       for(l=0;l<3;l++){
-          for(m=0;m<l+1;m++){
-             for(ibnd=0;ibnd<NBANDS;ibnd++){
-                for(i=0;i<npw;i++){
-                   if(0){
-                      sigmakin[l][m]=sigmakin[l][m]+wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]*(double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i)).real())+double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i+npwx)).real()));
-                   }
-                   else{
-                      sigmakin[l][m]=sigmakin[l][m] +  wf.wg(ik, ibnd) *gk[l][i]*gk[m][i]*kfac[i]*(double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i)).real()));
-                   }
-                }
-              }
-          }
-       }
+	   for(l=0;l<3;l++)
+	   {
+		   for(m=0;m<l+1;m++)
+		   {
+			   for(ibnd=0;ibnd<NBANDS;ibnd++)
+			   {
+				   for(i=0;i<npw;i++)
+				   {
+					   if(0)
+					   {
+						   sigmakin[l][m]=sigmakin[l][m]+
+							   wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+							   *(double((conj(wf.evc[ik](ibnd, i))
+											   *wf.evc[ik](ibnd, i)).real())+
+									   double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i+npwx)).real()));
+					   }
+					   else
+					   {
+						   sigmakin[l][m]=sigmakin[l][m]+
+							   wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+							   *(double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i)).real()));
+					   }
+				   }
+			   }
+		   }
+	   }
        
        //contribution from the nonlocal part
        
@@ -292,30 +321,42 @@ void Stress::stres_knl()
     
     //mp_cast
     
-    for(l=0;l<3;l++){
-       for(m=0;m<l;m++){
-          sigmakin[m][l]=sigmakin[l][m];
-       }
-    }
-    if(INPUT.gamma_only){
-       for(l=0;l<3;l++){
-          for(m=0;m<3;m++){
-             sigmakin[l][m]=2.0*e2/ucell.omega*sigmakin[l][m];
-          }
-       }
-    }
-    else {
-       for(l=0;l<3;l++){
-          for(m=0;m<3;m++){
-             sigmakin[l][m]=e2/ucell.omega*sigmakin[l][m];
-          }
-       }
-    }
-for(l=0;l<3;l++){
-          for(m=0;m<3;m++){
-	     Parallel_Reduce::reduce_double_pool( sigmakin[l][m] );
-          }
-       }
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l;m++)
+		{
+			sigmakin[m][l]=sigmakin[l][m];
+		}
+	}
+
+	if(INPUT.gamma_only)
+	{
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<3;m++)
+			{
+				sigmakin[l][m]=2.0*e2/ucell.omega*sigmakin[l][m];
+			}
+		}
+	}
+	else 
+	{
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<3;m++)
+			{
+				sigmakin[l][m]=e2/ucell.omega*sigmakin[l][m];
+			}
+		}
+	}
+
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			Parallel_Reduce::reduce_double_pool( sigmakin[l][m] );
+		}
+	}
 
 //    cout<<"stres_knl"<<endl;
 //    for(l=0;l<3;l++){
@@ -335,6 +376,7 @@ for(l=0;l<3;l++){
     //symmetrize stress
     //symmatrix();
     //symmatrix();
+
     delete[] kfac;
     delete[] gk[0];
     delete[] gk[1];
@@ -466,8 +508,10 @@ void Stress::stres_har(){
            }
         }
      }
-     for(l=0;l<3;l++)
-        sigmahar[l][l] -= en.ehart /ucell.omega;
+	 for(l=0;l<3;l++)
+	 {
+		 sigmahar[l][l] -= H_Hartree_pw::hartree_energy /ucell.omega;
+	 }
      for(l=0;l<3;l++){
         for(m=0;m<l;m++){
            sigmahar[m][l]=sigmahar[l][m];
@@ -1289,7 +1333,8 @@ void Stress::stres_ewa(){
 
     double alpha=2.9;
     double upperbound;
-    do{
+    do
+	{
        alpha-=0.1;
        if(alpha==0.0)
           WARNING_QUIT("stres_ew", "optimal alpha not found");
@@ -1300,7 +1345,8 @@ void Stress::stres_ewa(){
     //G-space sum here
     //Determine if this processor contains G=0 and set the constant term 
     double sdewald; 
-    if(pw.gstart == 1){
+    if(pw.gstart == 1)
+	{
        sdewald = (TWO_PI) * e2 / 4.0 / alpha * pow(charge/ucell.omega,2);
     }
     else {
@@ -1370,7 +1416,7 @@ void Stress::stres_ewa(){
                //calculate tau[na]-tau[nb]
                d_tau = ucell.atoms[it].tau[i] - ucell.atoms[jt].tau[j];
                //generates nearest-neighbors shells 
-               en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
+               H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
                for(int nr=0 ; nr<nrm ; nr++){
                 rr=sqrt(r2[nr]) * ucell.lat0;
                 fac = -e2/2.0/ucell.omega*pow(ucell.lat0,2)*ucell.atoms[it].zv * ucell.atoms[it].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (TWO_PI)) * exp(-alpha * pow(rr,2)));
@@ -1642,7 +1688,7 @@ void Stress::stres_cc()
            
     //recalculate the exchange-correlation potential
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 
     complex<double> * psic = new complex<double> [pw.nrxx];
     ZEROS(psic, pw.nrxx);

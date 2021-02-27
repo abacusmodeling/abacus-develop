@@ -11,6 +11,7 @@
 #include "src_pw/global.h"
 
 #include "src_external/src_test/test_function.h"
+#include "src_external/src_test/src_global/complexmatrix-test.h"
 
 void Wfc_Dm_2d::init()
 {
@@ -28,6 +29,21 @@ void Wfc_Dm_2d::init()
 
 void Wfc_Dm_2d::cal_dm(const matrix &wg)
 {
+	#ifdef TEST_DIAG
+	{
+		static int istep=0;
+		ofstream ofs("wfc_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		if(GAMMA_ONLY_LOCAL)
+		{
+			ofs<<wfc_gamma<<endl;
+		}
+		else
+		{
+			ofs<<wfc_k<<endl;
+		}
+	}
+	#endif
+	
 	// dm = wfc.T * wg * wfc.conj()
 	// dm[ik](iw1,iw2) = \sum_{ib} wfc[ik](ib,iw1).T * wg(ik,ib) * wfc[ik](ib,iw2).conj()
 	assert(wg.nc<=NLOCAL);
@@ -35,27 +51,41 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	{
 		assert(wg.nr==NSPIN);
 		for(int is=0; is!=NSPIN; ++is)
+		{
 			cal_dm(wg,is);
+		}
 	}
 	else
 	{
 		assert(wg.nr==kv.nks);
 		for(int ik=0; ik!=kv.nks; ++ik)
+		{
 			cal_dm(wg,ik);
+		}
 	}
 	
 	#ifdef TEST_DIAG
 	{
 		static int istep=0;
 		ofstream ofs("dm_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
-		ofs<<dm_gamma<<endl;
-		++istep;
+		if(GAMMA_ONLY_LOCAL)
+		{
+			ofs<<dm_gamma<<endl;
+		}
+		else
+		{
+			ofs<<dm_k<<endl;
+		}
 	}
 	#endif
+
+	return;
 }
 
 void Wfc_Dm_2d::cal_dm(const matrix &wg, const int ik)
 {
+	TITLE("Wfc_Dm_2d","cal_dm");
+
 	// dm = wfc.T * wg * wfc.conj()
 	// dm[ik](iw1,iw2) = \sum_{ib} wfc[ik](ib,iw1).T * wg(ik,ib) * wfc[ik](ib,iw2).conj()
 	assert(wg.nc<=NLOCAL);
@@ -66,13 +96,17 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg, const int ik)
 		{
 			const int ib_local = ParaO.trace_loc_col[ib_global];
 			if(ib_local>=0)
+			{
 				wg_local[ib_local] = wg(ik,ib_global);
+			}
 		}
 		
 		// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
 		matrix wg_wfc(wfc_gamma[ik]);
 		for(int ir=0; ir!=wg_wfc.nr; ++ir)
+		{
 			LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+		}
 		
 		// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
 		const double one_float=1.0, zero_float=0.0;
@@ -95,13 +129,17 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg, const int ik)
 		{
 			const int ib_local = ParaO.trace_loc_col[ib_global];
 			if(ib_local>=0)
+			{
 				wg_local[ib_local] = wg(ik,ib_global);
+			}
 		}
 		
 		// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw).conj();
 		ComplexMatrix wg_wfc = conj(wfc_k[ik]);
 		for(int ir=0; ir!=wg_wfc.nr; ++ir)
+		{
 			LapackConnector::scal( wg_wfc.nc, wg_local[ir], wg_wfc.c+ir*wg_wfc.nc, 1 );
+		}
 
 		// C++: dm(iw1,iw2) = wfc(ib,iw1).T * wg_wfc(ib,iw2)
 		const double one_float=1.0, zero_float=0.0;
@@ -117,4 +155,6 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg, const int ik)
 			&zero_float,
 			dm_k[ik].c, &one_int, &one_int, ParaO.desc);
 	}
+
+	return;
 }

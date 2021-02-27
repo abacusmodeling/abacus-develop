@@ -15,7 +15,7 @@ Parallel_Kpoints::~Parallel_Kpoints()
     delete[] whichpool;
 }
 
-void Parallel_Kpoints::init(void)
+void Parallel_Kpoints::init_pools(void)
 {
 #ifdef __MPI
 //----------------------------------------------------------

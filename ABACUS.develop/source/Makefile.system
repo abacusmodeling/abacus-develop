@@ -4,6 +4,8 @@ include Makefile.vars
 # LIB and INCLUDE
 #==========================
 BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
+#BOOST_LIB_DIR     = ${BOOST_DIR}/lib
+#BOOST_LIB         = -L${BOOST_LIB_DIR} -lboost_serialization -lboost_mpi -Wl,-rpath=${BOOST_LIB_DIR}
 
 LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
 LAPACK_LIB_DIR     = ${LAPACK_DIR}/lib/intel64
@@ -18,18 +20,28 @@ FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 ELPA_LIB_DIR = ${ELPA_DIR}/lib
+# comment out by mohan 2021-02-06
+#ELPA_LIB     = -L${ELPA_LIB_DIR} -lelpa_openmp -Wl,-rpath=${ELPA_LIB_DIR}
 ELPA_LIB     = -L${ELPA_LIB_DIR} -lelpa -Wl,-rpath=${ELPA_LIB_DIR}
+
+LIBXC_INCLUDE_DIR = ${LIBXC_DIR}/include
+LIBXC_LIB_DIR     = ${LIBXC_DIR}/lib
+LIBXC_LIB         = -L${LIBXC_LIB_DIR} -lxc -Wl,-rpath=${LIBXC_LIB_DIR}
+
+CEREAL_INCLUDE_DIR = ${CEREAL_DIR}/include
 
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}
-#LIBS = -liomp5 -lpthread -lm -ldl ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}
+# comment out by mohan 2021-02-06
+#LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} ${LIBXC_LIB}
+LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB} 
+#LIBS = -liomp5 -lpthread -lm -ldl ${BOOST_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${LPA_LIB} ${LIBXC_LIB}
 
-INCLUDES = -I. -Icommands -I${BOOST_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFTW_INCLUDE_DIR}
+INCLUDES = -I. -Icommands -I${BOOST_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${FFTW_INCLUDE_DIR} -I${LIBXC_INCLUDE_DIR} -I${CEREAL_INCLUDE_DIR}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-OPTS     = ${INCLUDES} -Ofast -g -traceback -xHost -std=c++11 -simd -march=native -m64 -qopenmp -Werror -Wall -pedantic
+OPTS     = ${INCLUDES} -Ofast -traceback -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
 OPTS_MPI = -cxx=${CPLUSPLUS}

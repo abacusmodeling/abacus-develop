@@ -28,6 +28,7 @@ UnitCell::UnitCell()
     iat2it = nullptr;
     iat2ia = nullptr;
 	iwt2iat = nullptr;
+	iwt2iw = nullptr;
 
     itia2iat.create(1,1);
 	lc = new int[3];
@@ -53,6 +54,7 @@ UnitCell::~UnitCell()
     delete[] iat2it;
     delete[] iat2ia;
 	delete[] iwt2iat;
+	delete[] iwt2iw;
 	delete[] lc;
 }
 

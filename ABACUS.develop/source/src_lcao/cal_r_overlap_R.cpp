@@ -214,17 +214,23 @@ void cal_r_overlap_R::init()
 							co6.second.init_radial_table();
 						
 	
+	return;
 }
 
 
 void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 {	
+	TITLE("cal_r_overlap_R","out_r_overlap_R");
+	timer::tick("cal_r_overlap_R","out_r_overlap_R");
+
 	Vector3<double> tau1, tau2, dtau;
 	Vector3<double> origin_point(0.0,0.0,0.0);
 
     int R_x;
     int R_y;
     int R_z;
+
+	double factor = sqrt(FOUR_PI/3.0);
 	
 	for(int ix = 0; ix < R_x_num; ix++)
     {
@@ -239,34 +245,53 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 				Vector3<double> R_car = Vector3<double>(dRx,dRy,dRz) * ucell.latvec;
 				
 				int ir,ic;
-				for(int orb_index_in_NLOCAL_1 = 0; orb_index_in_NLOCAL_1 < NLOCAL; orb_index_in_NLOCAL_1++)
+				for(int iw1 = 0; iw1 < NLOCAL; iw1++)
 				{
-					ir = ParaO.trace_loc_row[orb_index_in_NLOCAL_1];	
+					ir = ParaO.trace_loc_row[iw1];	
 					if(ir >= 0)
 					{
-						for(int orb_index_in_NLOCAL_2 = 0; orb_index_in_NLOCAL_2 < NLOCAL; orb_index_in_NLOCAL_2++)
+						for(int iw2 = 0; iw2 < NLOCAL; iw2++)
 						{							
-							ic = ParaO.trace_loc_col[orb_index_in_NLOCAL_2];
+							ic = ParaO.trace_loc_col[iw2];
 							if(ic >= 0)
 							{
 								int icc = ir + ic * ParaO.nrow;
 								
-								int orb_index_row = orb_index_in_NLOCAL_1 / NPOL;
-								int orb_index_col = orb_index_in_NLOCAL_2 / NPOL;
+								int orb_index_row = iw1 / NPOL;
+								int orb_index_col = iw2 / NPOL;
 								
 								// soc中非对角项为零，两个对角项相同
-								int new_index = orb_index_in_NLOCAL_1 - NPOL*orb_index_row + (orb_index_in_NLOCAL_2 - NPOL*orb_index_col)*NPOL;
+								int new_index = iw1 - NPOL*orb_index_row 
+									+ (iw2 - NPOL*orb_index_col)*NPOL;
 								
 								if(new_index == 0 || new_index == 3)
 								{
-									int atomType1 = iw2it(orb_index_row);  int ia1 = iw2ia(orb_index_row);  int N1 = iw2iN(orb_index_row);  int L1 = iw2iL(orb_index_row);  int m1 = iw2im(orb_index_row); 
-									int atomType2 = iw2it(orb_index_col);  int ia2 = iw2ia(orb_index_col);  int N2 = iw2iN(orb_index_col);  int L2 = iw2iL(orb_index_col);  int m2 = iw2im(orb_index_col);
-									Vector3<double> r_distance = ( ucell.atoms[atomType2].tau[ia2] - ucell.atoms[atomType1].tau[ia1] + R_car ) * ucell.lat0;	
-									double overlap_o = center2_orb11[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, m2 );
-									double overlap_x = -1 * sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 1, m2 ); // m = 1
-									double overlap_y = -1 * sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 2, m2 ); // m = -1
-									double overlap_z =      sqrt(FOUR_PI/3.0) * center2_orb21_r[atomType1][atomType2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 0, m2 ); // m = 0									
-									psi_r_psi[ix][iy][iz][icc] = Vector3<double>( overlap_x,overlap_y,overlap_z ) + ucell.atoms[atomType1].tau[ia1] * ucell.lat0 * overlap_o;
+									int it1 = iw2it(orb_index_row);  
+									int ia1 = iw2ia(orb_index_row);  
+									int N1 = iw2iN(orb_index_row);  
+									int L1 = iw2iL(orb_index_row);  
+									int m1 = iw2im(orb_index_row); 
+
+									int it2 = iw2it(orb_index_col);  
+									int ia2 = iw2ia(orb_index_col);  
+									int N2 = iw2iN(orb_index_col);  
+									int L2 = iw2iL(orb_index_col);  
+									int m2 = iw2im(orb_index_col);
+
+									Vector3<double> r_distance = ( ucell.atoms[it2].tau[ia2] 
+									- ucell.atoms[it1].tau[ia1] + R_car ) * ucell.lat0;	
+
+double overlap_o = center2_orb11[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, m2 );
+									double overlap_x = -1 * factor * 
+center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 1, m2 ); // m = 1
+									double overlap_y = -1 * factor * 
+center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 2, m2 ); // m = -1
+									double overlap_z =      factor * 
+center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 0, m2 ); // m = 0	
+
+									psi_r_psi[ix][iy][iz][icc] = Vector3<double>( overlap_x,overlap_y,overlap_z ) 
++ ucell.atoms[it1].tau[ia1] * ucell.lat0 * overlap_o;
+
 								}
 								else
 								{
@@ -339,7 +364,8 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 						{
 							if(i==0 && j==0)
 							{
-								out_r << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
+								out_r << dRx << " " << dRy << " " << dRz  
+								<< "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
 							}
 							
 							out_r << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_x[j] << " "
@@ -362,7 +388,11 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 	}
 	
 	if(DRANK == 0) out_r.close();
+
+
+	timer::tick("cal_r_overlap_R","out_r_overlap_R");
 	
+	return;
 }
 
 int cal_r_overlap_R::iw2it(int iw)
@@ -392,6 +422,7 @@ int cal_r_overlap_R::iw2it(int iw)
     return type;
 }
 
+// low efficiency ? -- mohan added 2021-02-14
 int cal_r_overlap_R::iw2ia(int iw)
 {
     int ic, na;

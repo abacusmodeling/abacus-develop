@@ -1,9 +1,3 @@
-/*****************************************************************
-// General information part
-// base on pseudo_type.f90,
-// <PP_INFO>  ...  </PP_INFO>     // for reader's information only
-// <PP_HEADER> ... </PP_HEADER>   // general information about the pseudopotential
-*******************************************************************/
 #ifndef PSEUDOH_H
 #define PSEUDOH_H
 
@@ -18,6 +12,9 @@ using namespace std;
 class pseudo_h
 {
 public:
+
+	pseudo_h();
+	~pseudo_h();
 
 	//<PP_HEADER>
 	bool has_so;		// if .true. includes spin-orbit
@@ -39,25 +36,9 @@ public:
 	int *lchi;			// lchi[nchi]
 	double *oc;			// oc[nchi]
 
-	/*  <pp_info> */
-//  char generated[80];	  // author
-//  char date_author[80]; // Misc info
-//  char comment[80];	  //
-//  int * nn;		  // nn(nwfc)
-//  double * rcut;	  // cut-off radius(nwfc)	??
-//  double * rcutus;	  // cut-off ultrasoft radius (nwfc)
-//  double * epseu;	  // energy (nwfc)
-//  double  xmin;         // the minimum x of the linear mesh
-//  double  rmax;         // the maximum radius of the mesh
-//  double  zmesh;        // the nuclear charge used for mesh
-//  double  dx;           // the deltax of the linear mesh
-//  double *jchi;			// jchi(nwfc)
-	double *jjj;	  // total angual momentum, jjj[nbeta]
-	double *jchi;	//jchi(nwfc), added by zhengdy-soc
+	double *jjj;	  	// total angual momentum, jjj[nbeta]
+	double *jchi;		//jchi(nwfc), added by zhengdy-soc
 	int *nn;
-
-	pseudo_h();
-	~pseudo_h();
 
 	// member functions
 	void set_pseudo_h(const Pseudopot_upf &upf);
@@ -65,25 +46,3 @@ public:
 };
 
 #endif // PSEUDOH_H
-
-/*
-// pseudo-potential that has spin-orboit term
-// We are not going to implement this PP in the first version
-// USE parameters, ONLY : lqmax, nbrx, npsx, nqfx, ndmx
-
-#ifndef PSEUDO_SO_H
-#define PSEUDO_SO_H
-
-class pseudo_so:public pseudo_us
-{
-	double *jjj;	//(nbrx,npsx), &! total angular momentum of the beta function
-//	pseudo_us uspp;		// if SO+USPP
-
-	pseudo_so();
-	~pseudo_so();
-
-	void set_pseudo_upf();
-
-};
-#endif // PSEUDO_SO_H
-*/

@@ -4,13 +4,22 @@
 #include "../src_pw/tools.h"
 #include "force_lcao_k.h"
 #include "stress_lcao.h"
+#include "../input_conv.h"
 
 class Force_LCAO : private Force_LCAO_k
 {
+	// mohan add 2021-02-09
+	friend class md;
+	friend void Input_Conv::Convert();
+	friend class Update_input;
+	friend class Local_Orbital_Ions;
+
 	public :
 	
 	Force_LCAO ();
 	~Force_LCAO ();
+
+	private:
 
 	void allocate (void);
 	void destroy (void);
@@ -33,8 +42,6 @@ class Force_LCAO : private Force_LCAO_k
 
 	matrix stress_vdw;//zhengdy added for vdw-stress-part
 
-	private:
-	
 	//each part of force
 	double** fvl_dvl;
 	double** fewalds; 

@@ -2,7 +2,7 @@
 #define FORCE_LCAO_GAMMA_H
 
 #include "../src_pw/tools.h"
-#include "lcao_matrix.h" 
+#include "LCAO_matrix.h" 
 
 class Force_LCAO_gamma
 {
@@ -49,11 +49,9 @@ class Force_LCAO_gamma
 	void cal_fvnl_dbeta(const std::vector<matrix> &dm2d);
 	void cal_fvl_dphi(const std::vector<matrix> &dm2d);
 
-	void DerivS_PW (void);
 	void DerivT_PW (void);
 
 	void average_force(double* fm);
-	void cal_fvna(LCAO_Matrix &LM); // mohan add 2011-05-23
 
 	void test_gamma(double* mm, const string &name);
 	

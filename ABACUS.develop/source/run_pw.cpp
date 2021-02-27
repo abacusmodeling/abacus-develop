@@ -1,11 +1,13 @@
 #include "run_pw.h"
 #include "src_pw/global.h"
 #include "input.h"
-#include "src_pw/algorithms.h"
-#include "src_pw/pseudopot_cell_us.h"
-#include "src_pw/optical.h"
-#include "src_pw/cal_test.h"
-#include "src_pw/winput.h"
+#include "src_io/optical.h"
+#include "src_io/cal_test.h"
+#include "src_io/winput.h"
+#include "src_io/numerical_basis.h"
+#include "src_io/numerical_descriptor.h"
+#include "src_io/print_info.h"
+#include "src_pw/symmetry.h"
 
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}
@@ -14,6 +16,49 @@ void Run_pw::plane_wave_line(void)
 {
     TITLE("Run_pw","plane_wave_line");
 	timer::tick("Run_pw","plane_wave_line",'B');
+
+    // Setup the unitcell.
+    // improvement: a) separating the first reading of the atom_card and subsequent
+    // cell relaxation. b) put NLOCAL and NBANDS as input parameters
+    ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
+    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
+    DONE(ofs_running, "SETUP UNITCELL");
+
+    // symmetry analysis should be performed every time the cell is changed
+    if (Symmetry::symm_flag)
+    {
+        symm.analy_sys();
+        DONE(ofs_running, "SYMMETRY");
+    }
+
+    // Setup the k points according to symmetry.
+    kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
+    DONE(ofs_running,"INIT K-POINTS");
+
+    // print information
+    // mohan add 2021-01-30
+    Print_Info PI;
+    PI.setup_parameters();
+
+    // Initalize the plane wave basis set
+    pw.gen_pw(ofs_running, ucell, kv);
+    DONE(ofs_running,"INIT PLANEWAVE");
+    cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
+    cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
+
+    // mohan add 2010-10-10, just to test the symmetry of a variety
+    // of systems.
+    if(CALCULATION == "test")
+    {
+        Cal_Test::test_memory();
+        QUIT();
+    }
+
+    // mohan add 2010-09-13
+    // initialize the real-space uniform grid for FFT and parallel
+    // distribution of plane waves
+    Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
+        pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 //----------------------------------------------------------
 // 1 read in initial data:
@@ -25,25 +70,20 @@ void Run_pw::plane_wave_line(void)
 // 4 initialize charge desity and warefunctios in G_space
 //----------------------------------------------------------
 
-    //=====================
-    // init potential
-    //=====================
-    CHR.init();
-    pot.init(pw.nrxx);
-
-    //=====================
-    // init wave functions
-    //=====================
+    //=====================================
+    // init charge/potential/wave functions
+    //=====================================
+    CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
+    pot.allocate(pw.nrxx);
     if ( NBANDS != 0 || (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") )//qianrui add 
 	{
-        wf.init(kv.nks);
+        wf.allocate(kv.nks);
     }
     else
     {
         wf.npwx = wf.setupIndGk(pw, kv.nks);
     }
-    UFFT.allocate();
-    
+	UFFT.allocate();
 
     //=======================
     // init pseudopotential
@@ -53,8 +93,7 @@ void Run_pw::plane_wave_line(void)
     //=====================
     // init hamiltonian
     //=====================
-    hm.init();
-//  DONE(ofs_running,"CHARGE, POTENTIAL, WAVE FUNCTINOS ALLOCATION");
+    hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
@@ -91,6 +130,19 @@ void Run_pw::plane_wave_line(void)
     
     
 
+	switch(exx_global.info.hybrid_type)				// Peize Lin add 2019-03-09
+	{
+		case Exx_Global::Hybrid_Type::HF:
+		case Exx_Global::Hybrid_Type::PBE0:
+		case Exx_Global::Hybrid_Type::HSE:
+			exx_lip.init(&kv, &wf, &pw, &UFFT, &ucell);
+			break;
+		case Exx_Global::Hybrid_Type::No:
+			break;
+		case Exx_Global::Hybrid_Type::Generate_Matrix:
+		default:
+			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+	}
 
     DONE(ofs_running,"INIT BASIS");
 

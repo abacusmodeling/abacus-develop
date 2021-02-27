@@ -2,28 +2,25 @@
 #define LOCAL_ORBITAL_ELEC
 
 #include "../src_pw/tools.h"
-#include "../src_pw/threshold_elec.h"
 
-class Local_Orbital_Elec: private Threshold_Elec
+class Local_Orbital_Elec
 {
-public:
+	public:
+
 	Local_Orbital_Elec(){};
 	~Local_Orbital_Elec(){};
 
-	void scf(const int &istep);
-	void nscf(void);
+	// mohan add 2021-02-09
+	void solve_elec_stru(const int &istep);
 
-	static int iter;
-	static double avg_iter;
-	
-	complex<double>*** WFC_init;
-protected:
-	static int istep;
+	private:
 
-private:
-	void cal_bands(const int &istep);
-	void init_mixstep_final_scf(void);
+	// set matrix and grid integral
+	void set_matrix_grid(void);
 
+	void before_solver(const int &istep);
+
+	void solver(const int &istep); 
 
 };
 

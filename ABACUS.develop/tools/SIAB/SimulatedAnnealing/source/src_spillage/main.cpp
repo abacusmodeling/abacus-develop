@@ -16,6 +16,7 @@ int main(int argc, char **argv)
     time_t time_start = time(NULL);
 	timer::start();
     cout <<" Start  Time : " << ctime(&time_start);
+	std::srand(std::time(nullptr));
 
 	// (2) if parallel, prepare.
 	cout << " First read in the parameters from INPUT." << endl;

@@ -25,6 +25,7 @@ class energy
 	friend class Force_Lo;
 	friend class Exx_pw;
 	friend class ON_Tests;
+
     energy();
     ~energy();
 
@@ -48,21 +49,18 @@ class energy
 	double deband_harris;
     double descf;
 
-    double ehart;          // the hartree energy
-    double etxc;           // the exchange and correlation energy
-    double vtxc;           // another exchange-correlation energy
     double etxcc;          // the nlcc exchange and correlation
+	double exx;            // the exact exchange energy.
 
-    double ewld;           // the ewald energy
-	double alpha;		   // the coefficient of ewald method
     double demet;          // correction for metals
 
 	int out_dos;			// control dos calculation
 	int out_band;                    // control band calculation  pengfei 2014-10-13
-        double dos_emin_ev;
+
+	double dos_emin_ev;
 	double dos_emax_ev;
 	double dos_edelta_ev;
-        double bcoeff;
+	double bcoeff;
 
     double ewald();
 
@@ -86,18 +84,9 @@ class energy
 
     void delta_escf(void);
 
-    void rgen(
-        const Vector3<double> &dtau,
-        const double &rmax,
-        int *irr,
-        const Matrix3 &at,
-        const Matrix3 &bg,
-        Vector3<double> *r,
-        double *r2,
-        int  &nrm
-    ) const;
     
-    static int mxr;
+    void set_exx();       // Peize Lin add 2016-12-03
+    
 };
 
 #endif //energy

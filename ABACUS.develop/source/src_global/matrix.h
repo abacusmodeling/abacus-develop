@@ -33,13 +33,13 @@ public:
 
 	double &operator()(const int ir,const int ic)
 	{
-//		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
 		return c[ir*nc+ic];
 	}
 
 	const double &operator()(const int ir,const int ic) const
 	{
-//		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
+		assert(ir>=0);	assert(ir<nr);	assert(ic>=0);	assert(ic<nc);
 		return c[ir*nc+ic];
 	}
 

@@ -2,12 +2,11 @@
 // AUTHOR : Lixin He, mohan
 // DATE : 2008-11-08
 //==========================================================
-#include "global.h"			// only out
-
+#include "global.h"
 #include "pseudopot_cell_vnl.h"
 #include "tools.h"
 #include "wavefunc.h"
-#include "../src_lcao/use_overlap_table.h"
+#include "../src_lcao/ORB_gen_tables.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -17,9 +16,10 @@ pseudopot_cell_vnl::~pseudopot_cell_vnl()
 {
 }
 
-//==========================================================
-// see allocate_nlpot.f90
-//==========================================================
+//-----------------------------------
+// setup lmaxkb, nhm, nkb, lmaxq 
+// allocate vkb, NQX, tab, tab_at
+//-----------------------------------
 void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 {
 	TITLE("pseudopot_cell_vnl", "init");
@@ -73,7 +73,6 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		nhtoj.create(ntype, this->nhm);
 		deeq.create(NSPIN, ucell.nat, this->nhm, this->nhm);
 		deeq_nc.create(NSPIN, ucell.nat, this->nhm, this->nhm);
-	//	qq.create(ntype, this->nhm, this->nhm);
 		dvan.create(ntype, this->nhm, this->nhm);
 		dvan_so.create(NSPIN, ntype, this->nhm, this->nhm);
 		becsum.create(NSPIN, ucell.nat, this->nhm * (this->nhm + 1) / 2);
@@ -98,16 +97,34 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	//NQX = this->calculate_nqx(pw.ecutwfc,DQ) * 10; //LiuXh add 20180515
 	NQX = this->calculate_nqx(pw.ecutwfc,DQ) * cell_factor; //LiuXh add 20180619
 	// nqx = (sqrt(ecutwfc)/dq+4)*cell_factor;
-	//
-	//	nbrx is defined in constant.h
-	//  max number of beta functions
-	if(NSPIN!=4) this->tab.create(ntype, nbrx, NQX);
-	else this->tab.create(ntype, nbrx_nc, NQX);
 
-	// nchix is defined in constant.h
+	
+	// mohan update 2021-02-22
+	const int nbrx = 10;
+	const int nbrx_nc = 20;
+	//  max number of beta functions
+	if(NSPIN!=4) 
+	{
+		this->tab.create(ntype, nbrx, NQX);
+	}
+	else 
+	{
+		this->tab.create(ntype, nbrx_nc, NQX);
+	}
+
+	
+	// mohan update 2021-02-22
+	int nchix = 10;
+	int nchix_nc = 20;
 	// nchix : max number of atomic wavefunctions per atom
-	if(NSPIN!=4) this->tab_at.create(ntype, nchix, NQX);
-	else this->tab_at.create(ntype, nchix_nc, NQX);
+	if(NSPIN!=4) 
+	{
+		this->tab_at.create(ntype, nchix, NQX);
+	}
+	else 
+	{
+		this->tab_at.create(ntype, nchix_nc, NQX);
+	}
 
 	if(test_pp > 1)
 	{
@@ -125,12 +142,11 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	return;
 }
 
+
+
 //----------------------------------------------------------
-// MEMBER FUNCTION NAME : 
-// NAME : pseudopot_cell_vnl
-// Calculates beta functions (Kleinman-Bylander projectors), with
-// structure factor, for all atoms, in reciprocal space
-// from init_us_2.f90
+// Calculates beta functions (Kleinman-Bylander projectors),
+// with structure factor, for all atoms, in reciprocal space
 //----------------------------------------------------------
 void pseudopot_cell_vnl::getvnl(const int &ik)
 {
@@ -155,13 +171,11 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
 	}
 
-
 	Mathzone::Ylm_Real(x1, npw, gk, ylm);
 
 	int jkb = 0;
 	for(int it = 0;it < ucell.ntype;it++)
 	{
-		if(test_pp>1) OUT("it",it);
 		// calculate beta in G-space using an interpolation table
 		const int nbeta = ucell.atoms[it].nbeta;
 		const int nh = ucell.atoms[it].nh;
@@ -175,17 +189,9 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 			{
 				const double gnorm = gk[ig].norm() * ucell.tpiba;
 
-//				cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
-//				cout << "\n gk.norm = " << gnorm;
-				
-//if(ik==0){
-//cout<<"ik: "<<ik<<endl;
-//cout<<"ig: "<<ig<<endl;
-//cout<<"gk.norm: "<<gnorm<<endl;
-//}
 				vq [ig] = Mathzone::Polynomial_Interpolation(
 						this->tab, it, nb, NQX, DQ, gnorm );
-			} // enddo
+			}
 
 			// add spherical harmonic part
 			for (ih = 0;ih < nh;ih++)
@@ -221,13 +227,17 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 
 	delete [] gk;
 	delete [] vq;
+
 	timer::tick("pp_cell_vnl","getvnl");
+
 	return;
 } // end subroutine getvnl
 
+
+
 void pseudopot_cell_vnl::init_vnl(void)
 {
-	if(test_pp) TITLE("pseudopot_cell_vnl","init_vnl");
+	TITLE("pseudopot_cell_vnl","init_vnl");
 	timer::tick("ppcell_vnl","init_vnl");
 
 	//from init_us_1
@@ -240,9 +250,10 @@ void pseudopot_cell_vnl::init_vnl(void)
 	//   d) It computes the indices nhtolm which establish the correspondence
 	//      nh <-> combined (l,m) index for the beta function.
 
-	//   For each pseudopotential we initialize the indices nhtol, nhtolm,
-	//   nhtoj, indv, and if the pseudopotential is of KB type we initialize
+	// For each pseudopotential we initialize the indices nhtol, nhtolm,
+	// nhtoj, indv, and if the pseudopotential is of KB type we initialize
 	// the atomic D terms
+
 	this->dvan.zero_out();
 	this->dvan_so.zero_out();//added by zhengdy-soc
 	soc.rot_ylm(this->lmaxkb);
@@ -306,13 +317,17 @@ void pseudopot_cell_vnl::init_vnl(void)
 //
 //   and calculate the bare coefficients
 //
-			for(int ip = 0;ip<Nprojectors; ++ip){
+			for(int ip = 0;ip<Nprojectors; ++ip)
+			{
 				const int ir = static_cast<int>( indv(it, ip ) );
-				for(int ip2=0; ip2<Nprojectors; ++ip2){
+				for(int ip2=0; ip2<Nprojectors; ++ip2)
+				{
 					const int is = static_cast<int>( indv(it, ip2) );
 					int ijs =0;
-					for(int is1=0;is1<2;++is1){
-						for(int is2=0;is2<2;++is2){
+					for(int is1=0;is1<2;++is1)
+					{
+						for(int is2=0;is2<2;++is2)
+						{
 							this->dvan_so(ijs,it,ip,ip2) = ucell.atoms[it].dion(ir, is) * soc.fcoef(it,is1,is2,ip,ip2);
 							++ijs;
 							if(ir != is) soc.fcoef(it,is1,is2,ip,ip2) = complex<double>(0.0,0.0);
@@ -331,11 +346,13 @@ void pseudopot_cell_vnl::init_vnl(void)
 				{
 					const int ir = static_cast<int>( indv(it, ip ) );
 					const int is = static_cast<int>( indv(it, ip2) );
-					if(LSPINORB){
+					if(LSPINORB)
+					{
 						this->dvan_so(0,it,ip,ip2) = ucell.atoms[it].dion(ir, is);
 						this->dvan_so(3,it,ip,ip2) = ucell.atoms[it].dion(ir, is);
 					}
-					else{
+					else
+					{
 						this->dvan(it, ip, ip2) = ucell.atoms[it].dion(ir, is);
 					}
 				}
@@ -343,7 +360,7 @@ void pseudopot_cell_vnl::init_vnl(void)
 		} 
 	} 
 
-	//   h) It fills the interpolation table for the beta functions
+	// h) It fills the interpolation table for the beta functions
 	/**********************************************************
 	// He Lixin: this block is used for non-local potential
 	// fill the interpolation table tab
@@ -392,6 +409,7 @@ void pseudopot_cell_vnl::init_vnl(void)
 	ofs_running << "\n Init Non-Local-Pseudopotential done." << endl;
 	return;
 }
+
 
 complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int M)   // pengfei Li  2018-3-23
 {
@@ -567,6 +585,11 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 			}
 		}
 	} 
+
+
+	// max number of beta functions
+	const int nbrx = 10;
+
 	const double pref = FOUR_PI / sqrt(ucell.omega);
 	this->tab_alpha.create(ucell.ntype, nbrx, lmaxkb+2, NQX);
 	this->tab_alpha.zero_out();
@@ -615,10 +638,13 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 }
 
 
+
 void pseudopot_cell_vnl::print_vnl(ofstream &ofs)
 {
 	out.printr3_d(ofs, " tab : ", tab);
 }
+
+
 
 int pseudopot_cell_vnl::calculate_nqx(const double &ecutwfc,const double &dq)
 {

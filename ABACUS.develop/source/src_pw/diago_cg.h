@@ -17,10 +17,13 @@
 
 class Diago_CG
 {
-public:
+	public:
+
     Diago_CG();
     ~Diago_CG();
+
     static int moved;
+
     static double ddot_real(
         const int & dim,
         const complex<double>* psi_L,
@@ -64,7 +67,7 @@ public:
         complex<double> *psi_m
     );
 
-private:
+	private:
 
     int test_cg;
 

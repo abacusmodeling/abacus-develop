@@ -1,6 +1,9 @@
 #include "force_lcao.h"
-#include "../src_pw/global.h"
+#include "src_pw/global.h"
+#include "src_pw/potential_libxc.h"
 #include "dftu.h"  //Quxin add for DFT+U on 20201029
+// new
+#include "src_pw/H_XC_pw.h"
 
 double Force_LCAO::force_invalid_threshold_ev = 0.00;
 
@@ -167,17 +170,19 @@ void Force_LCAO::start_force(void)
 	// clear the data.
 	this->fcs.zero_out();
 
-	stress_vdw.create(3,3);//zhengdy added in 2018-10-29
-	if(vdwd2.vdwD2)									//Peize Lin add 2014-04-04, update 2019-04-26
+	// zhengdy added in 2018-10-29
+	stress_vdw.create(3,3);
+	// Peize Lin add 2014-04-04, update 2019-04-26
+	if(vdwd2.vdwD2)
 	{
 		vdwd2.force(stress_vdw, STRESS);
 	}
-	if(vdwd3.vdwD3)									//jiyy add 2019-05-18
+	// jiyy add 2019-05-18
+	else if(vdwd3.vdwD3)
 	{
 		vdwd3.force(stress_vdw, STRESS);
 	}																			 
-	
-	
+		
 	matrix fefield;
 	if(EFIELD)
 	{
@@ -200,9 +205,14 @@ void Force_LCAO::start_force(void)
 			+ fcc[iat][i] //nonlinear core correction force (pw)
 			+ fscc[iat][i];//self consistent corretion force (pw)
 
-            if(INPUT.dft_plus_u) fcs(iat, i) += dftu.force_dftu.at(iat).at(i);  //Force contribution from DFT+U, Quxin add on 20201029
+			// Force contribution from DFT+U, Quxin add on 20201029
+            if(INPUT.dft_plus_u) 
+			{
+				fcs(iat, i) += dftu.force_dftu.at(iat).at(i);
+			}
 	
-			if(vdwd2.vdwD2)											//Peize Lin add 2014-04-04, update 2019-04-26
+			// Peize Lin add 2014-04-04, update 2019-04-261
+			if(vdwd2.vdwD2)
 			{
 				switch(i)
 				{
@@ -212,7 +222,8 @@ void Force_LCAO::start_force(void)
 				}
 				
 			}
-	        if(vdwd3.vdwD3)											//jiyy add 2019-05-18
+			// jiyy add 2019-05-18
+	        if(vdwd3.vdwD3)
 			{
 				switch(i)
 				{
@@ -237,10 +248,16 @@ void Force_LCAO::start_force(void)
 		}
 
  		//xiaohui add "OUT_LEVEL", 2015-09-16
-		if(OUT_LEVEL != "m") ofs_running << " correction force for each atom along direction " << i+1 << " is " << sum/ucell.nat << endl;
+		if(OUT_LEVEL != "m") 
+		{
+			ofs_running << " correction force for each atom along direction " 
+				<< i+1 << " is " << sum/ucell.nat << endl;
+		}
     }
 	
-	if(SYMMETRY)                                           // pengfei 2016-12-20
+
+	// pengfei 2016-12-20
+	if(Symmetry::symm_flag)
 	{
 		double *pos;
 		double d1,d2,d3;
@@ -249,7 +266,6 @@ void Force_LCAO::start_force(void)
 		int iat = 0;
 		for(int it = 0;it < ucell.ntype;it++)
 		{
-			//Atom* atom = &ucell.atoms[it];
 			for(int ia =0;ia< ucell.atoms[it].na;ia++)
 			{
 				pos[3*iat  ] = ucell.atoms[it].taud[ia].x ;
@@ -572,6 +588,7 @@ void Force_LCAO::cal_force_loc(void)
 }
 
 
+#include "src_pw/H_Ewald_pw.h"
 void Force_LCAO::cal_force_ew(void)
 {
     timer::tick("Force_lo","cal_force_ew",'E');
@@ -594,7 +611,7 @@ void Force_LCAO::cal_force_ew(void)
 
     for (int ig = gstart; ig < pw.ngmc; ig++)
     {
-        aux[ig] *= exp(-1.0 * pw.gg[ig] * ucell.tpiba2 / en.alpha / 4.0) / (pw.gg[ig] * ucell.tpiba2);
+        aux[ig] *= exp(-1.0 * pw.gg[ig] * ucell.tpiba2 / H_Ewald_pw::alpha / 4.0) / (pw.gg[ig] * ucell.tpiba2);
     }
 
     int iat = 0;
@@ -629,7 +646,7 @@ void Force_LCAO::cal_force_ew(void)
     // means that the processor contains G=0 term.
     if (gstart == 1)
     {
-        double rmax = 5.0 / (sqrt(en.alpha) * ucell.lat0);
+        double rmax = 5.0 / (sqrt(H_Ewald_pw::alpha) * ucell.lat0);
         int nrm = 0;
 
         //output of rgen: the number of vectors in the sphere
@@ -655,18 +672,19 @@ void Force_LCAO::cal_force_ew(void)
                         if (iat1 != iat2)
                         {
                             Vector3<double> d_tau = ucell.atoms[it1].tau[ia1] - ucell.atoms[it2].tau[ia2];
-                            en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
+                            H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
                             // return r2[n], r(n, ipol)
 //							cout << "nrm = " << nrm << endl;
 
                             for (int n = 0; n < nrm; n++)
                             {
-                                assert (en.alpha >= 0.0);
+                                assert (H_Ewald_pw::alpha >= 0.0);
 
                                 const double rr = sqrt(r2[n]) * ucell.lat0;
                                 double factor = ucell.atoms[it1].zv * ucell.atoms[it2].zv * e2 / (rr * rr)
-                                                * (erfc(sqrt(en.alpha) * rr) / rr
-                                                   + sqrt(8.0 * en.alpha / TWO_PI) * exp(-1.0 * en.alpha * rr * rr)) * ucell.lat0;
+                                                * (erfc(sqrt(H_Ewald_pw::alpha) * rr) / rr
+                                                   + sqrt(8.0 * H_Ewald_pw::alpha / TWO_PI) 
+								* exp(-1.0 * H_Ewald_pw::alpha * rr * rr)) * ucell.lat0;
 
                                 //remian problem
                                 //fix bug iat -> iat1
@@ -708,7 +726,11 @@ void Force_LCAO::cal_force_cc(void)
 	timer::tick("Force_LCAO","cal_force_cc",'E');
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+	#ifdef TEST_LIBXC
+	Potential_Libxc::v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+	#else
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
+	#endif
 
     complex<double> * psiv = new complex<double> [pw.nrxx];
     ZEROS(psiv, pw.nrxx);
@@ -908,13 +930,15 @@ void Force_LCAO::cal_force_scc(void)
 
 void Force_LCAO::cal_stress(matrix &stress)
 {
-     Stress_LCAO SS;
-     SS.allocate();
-     SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi, this->stress_vdw);
+	TITLE("Force_LCAO","cal_stress");
 
-    double unit_transform = 0.0;
-    unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
-    double external_stress[3] = {PRESS1,PRESS2,PRESS3};
+	Stress_LCAO SS;
+	SS.allocate();
+	SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi, this->stress_vdw);
+
+	double unit_transform = 0.0;
+	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
+	double external_stress[3] = {PRESS1,PRESS2,PRESS3};
 
 	for(int i=0;i<3;i++)
 	{
@@ -931,7 +955,10 @@ void Force_LCAO::cal_stress(matrix &stress)
 	}
     PRESSURE = (SS.scs[0][0]+SS.scs[1][1]+SS.scs[2][2])/3;
 
-    if(INPUT.dft_plus_u) PRESSURE += (dftu.stress_dftu.at(0).at(0) + dftu.stress_dftu.at(1).at(1) + dftu.stress_dftu.at(2).at(2))/3.0;
+    if(INPUT.dft_plus_u) 
+	{
+		PRESSURE += (dftu.stress_dftu.at(0).at(0) + dftu.stress_dftu.at(1).at(1) + dftu.stress_dftu.at(2).at(2))/3.0;
+	}
 
     return;
 }

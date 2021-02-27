@@ -6,7 +6,7 @@
 #define GRID_BASE_BETA_H
 
 #include "../src_pw/tools.h"
-#include "numerical_orbital_lm.h"
+#include "ORB_atomic_lm.h"
 
 // this class is inherited by Grid_Integral_Beta.h
 // this class provides basic Grid operation and the 

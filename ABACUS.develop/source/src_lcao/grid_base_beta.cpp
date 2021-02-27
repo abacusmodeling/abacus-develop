@@ -1,4 +1,3 @@
-#include "grid_integral.h"
 #include "../src_pw/global.h"
 #include "ylm.h"
 

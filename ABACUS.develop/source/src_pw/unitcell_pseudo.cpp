@@ -3,7 +3,7 @@
 // DATE : 2008-11-10
 //==========================================================
 #include "unitcell_pseudo.h"
-#include "../src_lcao/lcao_orbitals.h" // to use 'ORB' -- mohan 2021-01-30
+#include "../src_lcao/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #include "global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
@@ -72,8 +72,6 @@ void UnitCell_pseudo::setup_cell(
 			ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 			ofs_running << "\n\n\n\n";
 
-
-
 			ofs_running << " READING UNITCELL INFORMATION" << endl;
 			//========================
 			// call read_atom_species
@@ -97,8 +95,11 @@ void UnitCell_pseudo::setup_cell(
 #ifdef __MPI
 	Parallel_Common::bcast_bool(ok);
 	Parallel_Common::bcast_bool(ok2);
-	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG);
-	if(NSPIN==4) Parallel_Common::bcast_bool(DOMAG_Z);
+	if(NSPIN==4) 
+	{
+		Parallel_Common::bcast_bool(DOMAG);
+		Parallel_Common::bcast_bool(DOMAG_Z);
+	}
 #endif
 	if(!ok)
 	{
@@ -136,17 +137,18 @@ void UnitCell_pseudo::setup_cell(
 		
 	//==========================================================
 	// Calculate recip. lattice vectors and dot products
-	// latvec has the unit of lat0, but G has the unit 2Pi/lat0
+	// latvec have the unit of lat0, but G has the unit 2Pi/lat0
 	//==========================================================
 	this->GT = latvec.Inverse();
 	this->G  = GT.Transpose();
 	this->GGT = G * GT;
 	this->invGGT = GGT.Inverse();
-        //LiuXh add 20180515
-        this->GT0 = latvec.Inverse();
-        this->G0  = GT.Transpose();
-        this->GGT0 = G * GT;
-        this->invGGT0 = GGT.Inverse();
+
+    //LiuXh add 20180515
+    this->GT0 = latvec.Inverse();
+    this->G0  = GT.Transpose();
+    this->GGT0 = G * GT;
+    this->invGGT0 = GGT.Inverse();
 
 	ofs_running << endl;
 	out.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
@@ -275,10 +277,15 @@ void UnitCell_pseudo::setup_cell(
 		xcf.which_dft(atoms[it].dft);
 	}
 
-	//this->cal_nelec();
+	// setup the total number of PAOs
 	this->cal_natomwfc();
+
+	// setup NLOCAL
 	this->cal_nwfc();
+
+	// setup NBANDS
 	this->cal_nelec();
+
 	this->cal_meshx();
 
 //	stringstream ss;
@@ -355,6 +362,22 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 				
 			}
 		}	
+	}
+
+	// Peize Lin add 2016-09-23
+	if( Exx_Global::Hybrid_Type::HF   == exx_lcao.info.hybrid_type || 
+	    Exx_Global::Hybrid_Type::PBE0 == exx_lcao.info.hybrid_type || 
+		Exx_Global::Hybrid_Type::HSE  == exx_lcao.info.hybrid_type )
+	{
+		if( SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
+		{
+			for(int i=0; i<ntype; i++)
+			{
+				string ofile;
+				ifa >> ofile;
+				exx_lcao.info.files_abfs.push_back(ofile);
+			}
+		}
 	}
 
 	//==========================
@@ -911,8 +934,6 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		ofs << atom_label[it] << " " << atom_mass[it] << " " << pseudo_fn[it] << endl;
 	}
 	
-#ifdef __FP
-	//if(LOCAL_BASIS) xiaohui modify 2013-09-02 //mohan fix bug 2011-05-01
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02. Attention...
 	{	
 		ofs << "\nNUMERICAL_ORBITAL" << endl;
@@ -927,7 +948,6 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
                         ofs << ORB.orbital_file[it] << endl;
 		}
 	}
-#endif
 
 	ofs << "\nLATTICE_CONSTANT" << endl;
         //modified by zhengdy 2015-07-24
@@ -1191,9 +1211,10 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 // calculate total number of electrons (nelec) and default
 // number of bands (NBANDS).
 //=========================================================
+#include "occupy.h"
 void UnitCell_pseudo::cal_nelec(void)
 {
-	if(test_pseudo_cell) TITLE("UnitCell_pseudo","cal_nelec");
+	TITLE("UnitCell_pseudo","cal_nelec");
 	//=======================================================
 	// calculate the total number of electrons in the system
 	// if nelec <>0; use input number (setup.f90)
@@ -1216,7 +1237,7 @@ void UnitCell_pseudo::cal_nelec(void)
 		}
 	}
 
-//	OUT(ofs_running,"Total nelec",nelec);
+	//OUT(ofs_running,"Total nelec",nelec);
 
 	//=======================================
 	// calculate number of bands (setup.f90)
@@ -1231,56 +1252,63 @@ void UnitCell_pseudo::cal_nelec(void)
 	OUT(ofs_running,"occupied bands",occupied_bands);
 	
 	// mohan add 2010-09-04
-        //cout << "nbands(ucell) = " <<NBANDS <<endl;
+    //cout << "nbands(ucell) = " <<NBANDS <<endl;
 	if(NBANDS==occupied_bands)
 	{
 		if( Occupy::gauss() || Occupy::tetra() )
 		{
-			WARNING_QUIT("UnitCell_pseudo::cal_nelec","If you use smearing, the number of bands should be larger than occupied bands.");
+			WARNING_QUIT("UnitCell_pseudo::cal_nelec","for smearing, num. of bands > num. of occupied bands");
 		}
 	}
 	
 	if ( CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto" ) //qianrui 2021-2-20
 	{
-		if(NBANDS == 0)
+	if(NBANDS == 0)
+	{
+		if(NSPIN == 1)
 		{
-			if(NSPIN == 1)
-			{
-				int nbands1 = static_cast<int>(occupied_bands) + 10;
-				int nbands2 = static_cast<int>(1.2 * occupied_bands);
-				NBANDS = max(nbands1, nbands2);
-			}
-			else if (NSPIN ==2 || NSPIN == 4)
-			{
-				int nbands3 = nelec + 20;
-				int nbands4 = 1.2 * nelec;
-				NBANDS = max(nbands3, nbands4);
-			}
-    	            if (NBANDS > NLOCAL)
-    	            {
-    	                NBANDS = NLOCAL;
-    	            }
-			AUTO_SET("NBANDS",NBANDS);
+			int nbands1 = static_cast<int>(occupied_bands) + 10;
+			int nbands2 = static_cast<int>(1.2 * occupied_bands);
+			NBANDS = max(nbands1, nbands2);
 		}
-		//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
-		else
+		else if (NSPIN ==2 || NSPIN == 4)
 		{
-				if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
-				if(NBANDS < mag.get_nelup() ) 
-				{
-					OUT(ofs_running,"nelup",mag.get_nelup());
-					WARNING_QUIT("unitcell","Too few spin up bands!");
-				}
-				if(NBANDS < mag.get_neldw() ) 
-				{
-					WARNING_QUIT("unitcell","Too few spin down bands!");
-				}
-				if (NBANDS > NLOCAL)
-				{
-					WARNING_QUIT("unitcell","Too many bands! NBANDS > NBASIS.");
-				}
+			int nbands3 = nelec + 20;
+			int nbands4 = 1.2 * nelec;
+			NBANDS = max(nbands3, nbands4);
 		}
-  	}
+		AUTO_SET("NBANDS",NBANDS);
+	}
+	//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+	else
+	{
+		if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
+		if(NBANDS < mag.get_nelup() ) 
+		{
+			OUT(ofs_running,"nelup",mag.get_nelup());
+			WARNING_QUIT("unitcell","Too few spin up bands!");
+		}
+		if(NBANDS < mag.get_neldw() )
+        {
+            WARNING_QUIT("unitcell","Too few spin down bands!");
+        }
+	}
+	}
+
+	// mohan update 2021-02-19
+    // mohan add 2011-01-5
+    if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+    {
+        if( NBANDS > NLOCAL )
+        {
+            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
+        }
+        else
+        {
+            OUT(ofs_running,"NLOCAL",NLOCAL);
+            OUT(ofs_running,"NBANDS",NBANDS);
+        }
+    }
 
 	OUT(ofs_running,"NBANDS",NBANDS);
 	return;
@@ -1292,9 +1320,9 @@ void UnitCell_pseudo::cal_nelec(void)
 // 			atoms[].stapos_wf
 // 			NBANDS
 //===========================================
-void UnitCell_pseudo::cal_nwfc()
+void UnitCell_pseudo::cal_nwfc(void)
 {
-	if(test_pseudo_cell) TITLE("UnitCell_pseudo","cal_nwfc");
+	TITLE("UnitCell_pseudo","cal_nwfc");
 	assert(ntype>0);
 	assert(nat>0);
 
@@ -1317,8 +1345,9 @@ void UnitCell_pseudo::cal_nwfc()
 		this->nwmax = std::max( atoms[it].nw, nwmax );
 	}
 	assert(namax>0);
-//	OUT(ofs_running,"max input atom number",namax);
-//	OUT(ofs_running,"max wave function number",nwmax);	
+// for tests
+//		OUT(ofs_running,"max input atom number",namax);
+//		OUT(ofs_running,"max wave function number",nwmax);	
 
 	//===========================
 	// (3) set nwfc and stapos_wf
@@ -1328,16 +1357,22 @@ void UnitCell_pseudo::cal_nwfc()
 	{
 		atoms[it].stapos_wf = NLOCAL;
 		const int nlocal_it = atoms[it].nw * atoms[it].na;
-                if(NSPIN!=4) NLOCAL += nlocal_it;
-		else NLOCAL += nlocal_it * 2;//zhengdy-soc
-//		stringstream ss1;
-//		ss1 << "number of local orbitals for species " << it;
-//		if(LOCAL_BASIS)OUT(ofs_running,ss1.str(),nlocal_it);
+		if(NSPIN!=4) 
+		{
+			NLOCAL += nlocal_it;
+		}
+		else 
+		{
+			NLOCAL += nlocal_it * 2;//zhengdy-soc
+		}
+
+// for tests
+//		OUT(ofs_running,ss1.str(),nlocal_it);
 //		OUT(ofs_running,"start position of local orbitals",atoms[it].stapos_wf);
 	}
 	
 	//OUT(ofs_running,"NLOCAL",NLOCAL);
-            ofs_running << " " << setw(40) << "NLOCAL" << " = " << NLOCAL <<endl;
+	ofs_running << " " << setw(40) << "NLOCAL" << " = " << NLOCAL <<endl;
 	//========================================================
 	// (4) set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
 	//========================================================
@@ -1350,7 +1385,9 @@ void UnitCell_pseudo::cal_nwfc()
 	// mohan add 2010-09-26
 	assert(NLOCAL>0);
 	delete[] iwt2iat;
+	delete[] iwt2iw;
 	this->iwt2iat = new int[NLOCAL];
+	this->iwt2iw = new int[NLOCAL];
 
 	this->itia2iat.create(ntype, namax);
 	this->itiaiw2iwt.create(ntype, namax, nwmax*NPOL);
@@ -1366,6 +1403,7 @@ void UnitCell_pseudo::cal_nwfc()
 			{
 				this->itiaiw2iwt(it, ia, iw) = iwt;
 				this->iwt2iat[iwt] = iat;
+				this->iwt2iw[iwt] = iw;
 				++iwt;
 			}
 			++iat;
@@ -1424,13 +1462,8 @@ void UnitCell_pseudo::cal_nwfc()
 	//=====================
 	// Use localized basis
 	//=====================
-	//if(LOCAL_BASIS) xiaohui modify 2013-09-02
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
 	{
-		//if(winput::b_recon)
-		//{
-		//	NBANDS = NLOCAL;
-		//}
 		AUTO_SET("NBANDS",NBANDS);
 	}
 	else // plane wave basis
@@ -1476,6 +1509,7 @@ void UnitCell_pseudo::cal_meshx()
 void UnitCell_pseudo::cal_natomwfc(void)
 {
 	if(test_pseudo_cell) TITLE("UnitCell_pseudo","cal_natomwfc");
+
 	this->natomwfc = 0;
 	for (int it = 0;it < ntype;it++)
 	{

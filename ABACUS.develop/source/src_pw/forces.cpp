@@ -2,6 +2,9 @@
 #include "global.h"
 #include "vdwd2.h"
 #include "vdwd3.h"				  
+#include "symmetry.h"
+// new
+#include "H_XC_pw.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -28,7 +31,7 @@ void Forces::init()
 	{
 		vdwd2.force(stress_vdw_pw, STRESS);
 	}
-	if(vdwd3.vdwD3)													//jiyy add 2019-05-18
+	else if(vdwd3.vdwD3)													//jiyy add 2019-05-18
 	{
 		vdwd3.force(stress_vdw_pw, STRESS);
 	}
@@ -96,7 +99,7 @@ void Forces::init()
 		}	
 	}
 	
-	if(SYMMETRY)                                                                 // pengfei 2016-12-20
+	if(Symmetry::symm_flag)
 	{
 		double *pos;
 		double d1,d2,d3;
@@ -376,7 +379,7 @@ void Forces::cal_force_loc(void)
     return;
 }
 
-
+#include "H_Ewald_pw.h"
 void Forces::cal_force_ew(void)
 {
 	timer::tick("Forces","cal_force_ew");
@@ -488,9 +491,7 @@ void Forces::cal_force_ew(void)
                         if (iat1 != iat2)
                         {
                             Vector3<double> d_tau = ucell.atoms[T1].tau[I1] - ucell.atoms[T2].tau[I2];
-                            en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
-
-
+                            H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
 
                             for (int n = 0;n < nrm;n++)
                             {
@@ -539,7 +540,7 @@ void Forces::cal_force_cc(void)
 
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 
     complex<double> * psiv = new complex<double> [pw.nrxx];
     ZEROS(psiv, pw.nrxx);

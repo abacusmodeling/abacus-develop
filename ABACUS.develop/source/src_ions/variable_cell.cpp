@@ -24,7 +24,7 @@ void Variable_Cell::init_after_vc(void)
     ucell.setup_cell_after_vc(global_pseudo_dir, global_atom_card, ofs_running);
     DONE(ofs_running, "SETUP UNITCELL");
 
-    if(SYMMETRY)
+    if(Symmetry::symm_flag)
     {
         symm.analy_sys();
         DONE(ofs_running, "SYMMETRY");
@@ -98,7 +98,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     DONE(ofs_running, "SETUP UNITCELL");
 
     // (6) symmetry analysize.
-    if (SYMMETRY)
+    if(Symmetry::symm_flag)
     {
         symm.analy_sys();
         DONE(ofs_running, "SYMMETRY");
@@ -123,13 +123,13 @@ void Variable_Cell::final_calculation_after_vc(void)
     // init potential
     //=====================
     CHR.init_final_scf();
-    pot.init(pw.nrxx);
+    pot.allocate(pw.nrxx);
     //=====================
     // init wave functions
     //=====================
     if(BASIS_TYPE=="pw")
     {
-        wf.init(kv.nks);
+        wf.allocate(kv.nks);
     }
     else
     {
@@ -144,7 +144,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=====================
     // init hamiltonian
     //=====================
-    hm.init();
+    hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential

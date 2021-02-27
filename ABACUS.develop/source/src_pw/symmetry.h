@@ -15,6 +15,9 @@ public:
 	 Symmetry();
 	~Symmetry();
 
+	// mohan add 2021-02-21
+	static bool symm_flag;
+
 	void analy_sys();
 	bool available;
 

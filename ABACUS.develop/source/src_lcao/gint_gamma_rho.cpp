@@ -1,6 +1,6 @@
 #include "gint_gamma.h"
 #include "grid_technique.h"
-#include "lcao_orbitals.h"
+#include "ORB_read.h"
 #include "../src_pw/global.h"
 #include "src_global/blas_connector.h"
 #include <mkl_service.h>
@@ -308,7 +308,7 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
 	if(max_size)
     {
         const int mkl_threads = mkl_get_max_threads();
-        mkl_set_num_threads(1);
+		mkl_set_num_threads(std::max(1,mkl_threads/GridT.nbx));			// Peize Lin update 2021.01.20
 		
 		#pragma omp parallel
 		{
@@ -338,19 +338,33 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
 			int *block_size=new int[max_size];		//band size: number of columns of a band
 			int *block_index=new int[max_size+1];
 			int *at=new int[max_size];
+
 			double *psir_ylm_pool=new double[pw.bxyz*LD_pool];
 			ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
+			
 			double **psir_ylm=new double *[pw.bxyz];
+
 			for(int i=0; i<pw.bxyz; ++i)
+			{
 				psir_ylm[i] = &psir_ylm_pool[i*LD_pool];
+			}
+
 			double *psir_DM_pool=new double[pw.bxyz*LD_pool];
 			ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
+
 			double **psir_DM=new double *[pw.bxyz];
+
 			for(int i=0; i<pw.bxyz; ++i)
+			{
 				psir_DM[i] = &psir_DM_pool[i*LD_pool];
+			}
+
 			int **cal_flag=new int*[pw.bxyz];
+
 			for(int i=0; i<pw.bxyz; ++i)
+			{
 				cal_flag[i]=new int[max_size];
+			}
 
 			//ofs<<"@/t"<<__LINE__<<endl;
 
@@ -432,8 +446,12 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
 		} // end of #pragma omp parallel
 		
         for(int is=0; is<NSPIN; is++)
+		{
             for (int ir=0; ir<pw.nrxx; ir++)
+			{
                 sum += CHR.rho[is][ir];
+			}
+		}
 			
         mkl_set_num_threads(mkl_threads);
     } // end of if(max_size)

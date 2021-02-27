@@ -1,7 +1,6 @@
 #include "charge_pulay.h"
 #include "global.h"
-#include "../src_pw/inverse_matrix.h"
-
+#include "../src_global/inverse_matrix.h"
 #include "../src_global/random.h"
 
 Charge_Pulay::Charge_Pulay()
@@ -75,9 +74,7 @@ void Charge_Pulay::Pulay_mixing(void)
 	// irstep: iteration step for rstep (Rrho)
 	// idstep: iteration step for dstep (dRrho)
 	// totstep only used for the first few iterations.
-
-	// At the beginning of each ion iteration,
-	// reset the three variables.
+	// At the beginning of each ion iteration, reset the three variables.
 	// mohan add 2010-07-16
 	if(this->new_e_iteration)
 	{
@@ -274,7 +271,16 @@ void Charge_Pulay::Pulay_mixing(void)
     	this->read_rho(ifname.str());
     }
     */
-
+	#if TEST_EXX_LCAO==1
+		cout<<"Charge_Pulay::Pulay_mixing\t"<<__FILE__<<"\t"<<__LINE__<<endl;
+		cout<<"irstep:\t"<<irstep<<endl;
+		cout<<"idstep:\t"<<idstep<<endl;
+		cout<<"rstep:\t"<<rstep<<endl;
+		cout<<"dstep:\t"<<dstep<<endl;
+		cout<<"totstep:\t"<<totstep<<endl;
+	#elif TEST_EXX_LCAO==-1
+		#error
+	#endif
 	return;		
 }
 
@@ -288,7 +294,7 @@ void Charge_Pulay::set_new_e_iteration( const bool new_e_iteration_in )		// Peiz
 		idstep = 0;
 		totstep = 0;
 	}	
-}																									
+}
 
 void Charge_Pulay::allocate_pulay(const int &scheme)
 {
