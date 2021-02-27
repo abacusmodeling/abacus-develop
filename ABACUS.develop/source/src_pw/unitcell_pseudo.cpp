@@ -351,7 +351,8 @@ void UnitCell_pseudo::cal_nelec(void)
 		}
 	}
 	
-	
+	if ( CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto" ) //qianrui 2021-2-20
+	{
 	if(NBANDS == 0)
 	{
 		if(NSPIN == 1)
@@ -377,10 +378,11 @@ void UnitCell_pseudo::cal_nelec(void)
 			OUT(ofs_running,"nelup",mag.get_nelup());
 			WARNING_QUIT("unitcell","Too few spin up bands!");
 		}
-		if(NBANDS < mag.get_neldw() ) 
-		{
-			WARNING_QUIT("unitcell","Too few spin down bands!");
-		}
+		if(NBANDS < mag.get_neldw() )
+        {
+            WARNING_QUIT("unitcell","Too few spin down bands!");
+        }
+	}
 	}
 
 	// mohan update 2021-02-19

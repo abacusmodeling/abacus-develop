@@ -29,6 +29,7 @@ public:
 	friend class Hamilt_PW;
 	friend class WF_atomic;
 	friend class wavefunc;
+	friend class Stochastic_hchi;
 
 	void init(const int ntype, const bool allocate_vkb=1);
 

@@ -75,7 +75,14 @@ void Run_pw::plane_wave_line(void)
     //=====================================
     CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
     pot.allocate(pw.nrxx);
-    wf.allocate(kv.nks);
+    if ( NBANDS != 0 || (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") )//qianrui add 
+	{
+        wf.allocate(kv.nks);
+    }
+    else
+    {
+        wf.npwx = wf.setupIndGk(pw, kv.nks);
+    }
 	UFFT.allocate();
 
     //=======================
@@ -116,7 +123,12 @@ void Run_pw::plane_wave_line(void)
     //================================
     // Initial start wave functions
     //================================
-   	wf.wfcinit();
+    if ( NBANDS != 0 || (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") )//qianrui add 
+	{
+    	wf.wfcinit();
+    }
+    
+    
 
 	switch(exx_global.info.hybrid_type)				// Peize Lin add 2019-03-09
 	{

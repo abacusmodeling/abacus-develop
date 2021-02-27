@@ -184,7 +184,7 @@ void SCAN_END(ifstream &ifs, const string &TargetName);
 template<class T>
 static inline void DCOPY( const T &a, T &b, const int &dim)
 {
-    for (int i=0; i<dim; i++) b[i] = a[i];
+    for (int i=0; i<dim; ++i) b[i] = a[i];
 }
 
 void BLOCK_HERE( const string &description );
