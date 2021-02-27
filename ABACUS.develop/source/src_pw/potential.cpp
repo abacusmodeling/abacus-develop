@@ -57,16 +57,15 @@ void potential::init_pot(const int &istep)
 
     assert(istep>=0);
 
-    //ofs_running << " istep=" << istep << " delta_vh=" << delta_vh << " vna=" << vna << endl;
-
     vrs.zero_out();
 
     // mohan fix bug 2011-07-08
     // the vltot should and must be zero here.
     ZEROS(this->vltot, pw.nrxx);
 
-	// (1) local part of pseudopotentials.
-	// set vltot
+	//-------------------------------------------------------------------
+	// put the local pseudopotential + electric field (if any) in vltot
+	//-------------------------------------------------------------------
 	this->set_local(this->vltot);
 
 	// mohan fix bug 2011-07-07
@@ -75,6 +74,10 @@ void potential::init_pot(const int &istep)
 
 	if(NSPIN==4) nspin0=1;
 
+	//-------------------------------------------------------------------
+	// put the local pseudopotential + electric field (if any) in vltot
+	// vrs saves the total potential.
+	//-------------------------------------------------------------------
 	for(int is=0; is<nspin0; ++is)
 	{
 		for(int ir=0; ir<pw.nrxx; ++ir)
@@ -83,11 +86,13 @@ void potential::init_pot(const int &istep)
 		}
 	}
 
-	// (2) core correction potential.
+	// core correction potential.
 	CHR.set_rho_core( pw.strucFac );
 
-	// before ion relaxation
-	// need reconstruction -- mohan add 2021-02-09
+	//--------------------------------------------------------------------
+	// the other local potentials need charge density, so here you need to 
+	// decide how to obtain the charge density from ionic step 0.
+	//--------------------------------------------------------------------
     if(istep==0)
     {
         OUT(ofs_running,"start_pot",start_pot);
@@ -113,14 +118,16 @@ void potential::init_pot(const int &istep)
 				}
 				else if(is>0 && NSPIN==4)
 				{
+					// read only spin (up+down)
 					if(PRENSPIN == 1)
-					{//read only up+down , others set to zero.
+					{
 						ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
 						for(int ir=0;ir<pw.nrxx;ir++)
 						{
 							CHR.rho[is][ir] = 0.0;
 						}
 					}
+					// 
 					else if(PRENSPIN == 2)
 					{//read up and down , then rearrange them.
 						if(is==1) 
@@ -175,6 +182,7 @@ void potential::init_pot(const int &istep)
         // the extrapolation part moves to ions.cpp.
     }
 
+	// renormalize the charge density
     CHR.renormalize_rho();
 
     this->v_of_rho(CHR.rho, vr);
@@ -291,8 +299,8 @@ void potential::v_of_rho
 
 
 //==========================================================
-// set the total local potential vrs on the smooth mesh to
-// be used in h_psi, adding the (spin dependent) scf (H+xc)
+// set the total local potential vrs on the real space grid 
+// used in h_psi, adding the (spin dependent) scf (H+xc)
 // part and the sum of all the local pseudopotential
 // contributions.
 //==========================================================
@@ -318,52 +326,8 @@ void potential::set_vrs(void)
 			for (int i = 0;i < pw.nrxx;i++)
 	        {
 	            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-	//	    	cout <<"i: "<< i <<"	"<< "vrs: " << vrs(is,i) <<endl;
 			}
 		}
-
-        //====================================================
-        // add external linear potential, fuxiang add in 2017/05
-        //====================================================
-/*
-        if (istep >= 0)
-        {
-            for (int i = 0;i < pw.nrxx;i++)
-            {
-                this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-            }
-        }
-        else
-        {
-            this->vext = new double[pw.nrxx];
-            const int yz = pw.ncy*pw.nczp;
-            int index, i, j, k;
-
-            for(int ir=0; ir<pw.nrxx; ++ir)
-            {
-                index = ir;
-                i     = index / yz; // get the z, z is the fastest
-                index = index - yz * i;// get (x,y)
-                j     = index / pw.nczp;// get y
-                k     = index - pw.nczp*j + pw.nczp_start;// get x
-
-                //if (k<pw.ncx*0.1) this->vext[ir] = -0.4*k/pw.ncx+0.05;
-                //else if (k>=pw.ncx*0.1 && k<pw.ncx*0.9) this->vext[ir] = 0.1*k/pw.ncx;
-                //else if (k>=pw.ncx*0.9) this->vext[ir] = -0.4*(1.0*k/pw.ncx-1)+0.05;
-
-                if (k<pw.ncx*0.05) this->vext[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
-                else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) this->vext[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
-                else if (k>=pw.ncx*0.95) this->vext[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
-
-                this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
-
-                //cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
-                //cout << "vext: " << this->vext[ir] << endl;
-                //cout << "vrs: " << vrs(is,ir) <<endl;
-            }
-        }
-*/
-
     }
 
 

@@ -24,6 +24,7 @@ class potential
 	// vltot: the local potential in real space
 	// out_potential: options to print out potentials 
     //==========================================================
+
     string start_pot;
 	string extra_pot;
     matrix vr;
