@@ -14,7 +14,7 @@
 #include "src_pw/gga_pw.h"
 
 void Potential_Libxc::v_xc(
-	const double * const * const rho_in,	// 此输入可能让人误以为输入仅有此rho_in，然而程序中还用了chr.rho_core。该写法仅为了匹配potential::v_xc，重估时需要修改。
+	const double * const * const rho_in, // CHR.rho_core may be needed in future
     double &etxc,
     double &vtxc,
     matrix &v)
@@ -26,6 +26,12 @@ void Potential_Libxc::v_xc(
     vtxc = 0.0;
 	v.zero_out();
 
+	//----------------------------------------------------------
+	// xc_func_type is defined in Libxc package
+	// to understand the usage of xc_func_type,
+	// use can check on website, for example:
+	// https://www.tddft.org/programs/libxc/manual/libxc-5.1.x/
+	//----------------------------------------------------------
 	vector<xc_func_type> funcs = init_func();
 
 	// [rho, sigma, gdr] = cal_input( funcs, rho_in );
@@ -66,7 +72,7 @@ void Potential_Libxc::v_xc(
 					}
 				}
 			}
-			else		// 修改了soc后，这里可能需要修改
+			else // may need updates for SOC
 			{
 				constexpr double vanishing_charge = 1.0e-12;
 				for( size_t ir=0; ir!=pw.nrxx; ++ir )
@@ -142,15 +148,15 @@ void Potential_Libxc::v_xc(
 					}
 				}
 			}
-			else		// 修改了soc后，这里可能需要修改
+			else // may need updates for SOC
 			{
 				constexpr double vanishing_charge = 1.0e-12;
 				for( size_t ir=0; ir!=pw.nrxx; ++ir )
 				{
 					v(0,ir) -= 0.5 * (dh[0][ir] + dh[1][ir]);
 					const double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
-					const double neg = (soc.lsign && rho_in[1][ir]*soc.ux[0]+rho_in[2][ir]*soc.ux[1]+rho_in[3][ir]*soc.ux[2]<=0)
-						? -1 : 1;
+					const double neg = (soc.lsign && rho_in[1][ir]*soc.ux[0]
+						+rho_in[2][ir]*soc.ux[1]+rho_in[3][ir]*soc.ux[2]<=0) ? -1 : 1;
 					if(amag > vanishing_charge)
 					{
 						for(int i=1;i<4;i++)
@@ -166,6 +172,8 @@ void Potential_Libxc::v_xc(
 		constexpr double rho_threshold = 1E-6;
 		constexpr double grho_threshold = 1E-10;
 		xc_func_set_dens_threshold(&func, rho_threshold);
+
+		// LPZ: Explain what is sgn
 		vector<double> sgn( pw.nrxx * nspin0(), 1.0);
 		if(nspin0()==2 && func.info->family != XC_FAMILY_LDA && func.info->kind==XC_CORRELATION)
 		{
@@ -218,8 +226,8 @@ void Potential_Libxc::v_xc(
 }
 
 
-// 未来不断增加xc泛函时，只需要修改此函数即可
-// abacus中对泛函的指代目前为xcf中的iexch、igcx、icorr、igcc，可能需要改进。如果未来确定捆绑libxc，可以改为用libxc的宏定义来指代。
+// for adding new xc functionals, only this function needs to be updated
+// now we use iexch, igcx, icorr, igcc in xcf to characterize XC functionals
 std::vector<xc_func_type> Potential_Libxc::init_func()
 {
 	std::vector<xc_func_type> funcs;
@@ -285,7 +293,9 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 
 
 // [rho, sigma, gdr] = cal_input( funcs, rho_in )
-std::tuple< std::vector<double>, std::vector<double>, std::vector<std::vector<Vector3<double>>> > 
+std::tuple< std::vector<double>, 
+			std::vector<double>, 
+			std::vector<std::vector<Vector3<double>>> > 
 Potential_Libxc::cal_input( 
 	const std::vector<xc_func_type> &funcs, 
 	const double * const * const rho_in )
@@ -293,7 +303,8 @@ Potential_Libxc::cal_input(
 	// ..., ↑_{i},↓_{i}, ↑_{i+1},↓_{i+1}, ...
 	std::vector<double> rho;
 	bool finished_rho   = false;
-	// 这里假定CHR.rho_core均分到自旋上。可能有误
+
+	// here we assume CHR.rho_core equally exists in different spins, may need double check
 	auto cal_rho = [&]()
 	{
 		if(!finished_rho)
@@ -309,7 +320,7 @@ Potential_Libxc::cal_input(
 					}
 				}
 			}
-			else		// 修改了soc后，这里可能需要修改
+			else // may need updates for SOC
 			{
 				if(xcf.igcx||xcf.igcc)
 				{
@@ -331,7 +342,7 @@ Potential_Libxc::cal_input(
 		
 	// [...,↑_{i},↑_{i+1},...], [...,↓_{i},↓_{i+1},...]
 	std::vector<std::vector<Vector3<double>>> gdr;
-	bool finished_gdr   = false;
+	bool finished_gdr = false;
 	auto cal_gdr = [&]()
 	{
 		if(!finished_gdr)
@@ -344,9 +355,23 @@ Potential_Libxc::cal_input(
 				{
 					rhor[ir] = rho[ir*nspin0()+is];
 				}
+
+				//------------------------------------------
+				// initialize the charge density arry in 
+				// reciprocal space
+				//------------------------------------------
 				vector<complex<double>> rhog(pw.ngmc);
+
+				//-------------------------------------------
+				// bring electron charge density from real
+				// space to reciprocal space
+				//-------------------------------------------
 				CHR.set_rhog(rhor.data(), rhog.data());
 
+				//-------------------------------------------
+				// compute the gradient of charge density and
+				// store the gradient in gdr[is]
+				//-------------------------------------------
 				gdr[is].resize(pw.nrxx);
 				GGA_PW::grad_rho(rhog.data(), gdr[is].data());
 			}

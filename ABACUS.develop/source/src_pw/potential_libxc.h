@@ -40,7 +40,7 @@ class Potential_Libxc
 		const std::vector<XC(func_type)> &funcs, 
 		const double * const * const rho_in );
 
-	static int nspin0()			// 修改了soc判据后，这里可能需要修改
+	static int nspin0() // may need updates from SOC
 	{
 		if     (NSPIN==1 || (NSPIN==4 && (!DOMAG && !DOMAG_Z)))		return 1;
 		else if(NSPIN==2 || (NSPIN==4 && ( DOMAG ||  DOMAG_Z)))		return 2;
