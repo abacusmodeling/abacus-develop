@@ -1,4 +1,11 @@
-#ifdef TEST_LIBXC
+//==========================================================
+// AUTHOR : Peize Lin
+// DATE :   2017-09-14
+// UPDATE : 2021-02-28
+//==========================================================
+
+#ifdef USE_LIBXC
+
 #ifndef POTENTIAL_LIBXC_H
 #define POTENTIAL_LIBXC_H
 
@@ -23,17 +30,17 @@ class Potential_Libxc
 	private:
 
 	static std::vector<XC(func_type)> init_func();
-	// [ rho, sigma, gdr ]
 
+	// [rho, sigma, gdr] = cal_input( funcs, rho_in )
 	static std::tuple< 
 		std::vector<double>, 
 		std::vector<double>, 
 		std::vector<std::vector<Vector3<double>>> > 
-	cal_input( 
+	cal_input(
 		const std::vector<XC(func_type)> &funcs, 
 		const double * const * const rho_in );
 
-	static int nspin0()
+	static int nspin0()			// 修改了soc判据后，这里可能需要修改
 	{
 		if     (NSPIN==1 || (NSPIN==4 && (!DOMAG && !DOMAG_Z)))		return 1;
 		else if(NSPIN==2 || (NSPIN==4 && ( DOMAG ||  DOMAG_Z)))		return 2;
@@ -42,4 +49,5 @@ class Potential_Libxc
 };
 
 #endif
-#endif
+
+#endif	// ifdef USE_LIBXC

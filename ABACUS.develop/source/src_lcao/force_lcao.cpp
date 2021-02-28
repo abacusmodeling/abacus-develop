@@ -726,7 +726,7 @@ void Force_LCAO::cal_force_cc(void)
 	timer::tick("Force_LCAO","cal_force_cc",'E');
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
-	#ifdef TEST_LIBXC
+	#ifdef USE_LIBXC
 	Potential_Libxc::v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
 	#else
     H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);

@@ -1,4 +1,11 @@
-#ifdef TEST_LIBXC
+//==========================================================
+// AUTHOR : Peize Lin
+// DATE :   2017-09-14
+// UPDATE : 2021-02-28
+//==========================================================
+
+#ifdef USE_LIBXC
+
 #include "potential_libxc.h"
 #include "src_pw/global.h"
 #include "src_lcao/global_fp.h"
@@ -7,7 +14,7 @@
 #include "src_pw/gga_pw.h"
 
 void Potential_Libxc::v_xc(
-	const double * const * const rho_in,
+	const double * const * const rho_in,	// 此输入可能让人误以为输入仅有此rho_in，然而程序中还用了chr.rho_core。该写法仅为了匹配potential::v_xc，重估时需要修改。
     double &etxc,
     double &vtxc,
     matrix &v)
@@ -21,6 +28,7 @@ void Potential_Libxc::v_xc(
 
 	vector<xc_func_type> funcs = init_func();
 
+	// [rho, sigma, gdr] = cal_input( funcs, rho_in );
 	const auto input_tmp = cal_input( funcs, rho_in );
 	const vector<double> &rho = std::get<0>(input_tmp);
 	const vector<double> &sigma = std::get<1>(input_tmp);
@@ -31,6 +39,7 @@ void Potential_Libxc::v_xc(
 		vector<double> vrho  ( pw.nrxx * nspin0()            );
 		vector<double> vsigma( pw.nrxx * ((1==nspin0())?1:3) );
 		
+		// cal etxc from rho, exc
 		auto process_exc = [&](vector<double> &sgn)
 		{
 			for( size_t is=0; is!=nspin0(); ++is )
@@ -42,6 +51,7 @@ void Potential_Libxc::v_xc(
 			}
 		};
 
+		// cal vtx, v from rho_in, vrho
 		auto process_vrho = [&](vector<double> &sgn)
 		{
 			if(nspin0()==1 || NSPIN==2)
@@ -56,7 +66,7 @@ void Potential_Libxc::v_xc(
 					}
 				}
 			}
-			else
+			else		// 修改了soc后，这里可能需要修改
 			{
 				constexpr double vanishing_charge = 1.0e-12;
 				for( size_t ir=0; ir!=pw.nrxx; ++ir )
@@ -82,6 +92,8 @@ void Potential_Libxc::v_xc(
 			}
 			
 		};
+
+		// cal vtxc, v from rho_in, rho, gdr, vsigma
 		auto process_vsigma = [&](vector<double> &sgn)
 		{
 			const std::vector<std::vector<Vector3<double>>> &gdr = std::get<2>(input_tmp);
@@ -99,9 +111,9 @@ void Potential_Libxc::v_xc(
 				for( size_t ir=0; ir!=pw.nrxx; ++ir )
 				{
 					h[0][ir] = e2 * (gdr[0][ir] * vsigma[ir*3  ] * 2.0 
-					* sgn[ir*2  ] + gdr[1][ir] * vsigma[ir*3+1] * sgn[ir*2] * sgn[ir*2+1]);
+						* sgn[ir*2  ] + gdr[1][ir] * vsigma[ir*3+1] * sgn[ir*2] * sgn[ir*2+1]);
 					h[1][ir] = e2 * (gdr[1][ir] * vsigma[ir*3+2] * 2.0 
-					* sgn[ir*2+1] + gdr[0][ir] * vsigma[ir*3+1] * sgn[ir*2] * sgn[ir*2+1]);
+						* sgn[ir*2+1] + gdr[0][ir] * vsigma[ir*3+1] * sgn[ir*2] * sgn[ir*2+1]);
 				}
 			}
 
@@ -130,15 +142,15 @@ void Potential_Libxc::v_xc(
 					}
 				}
 			}
-			else
+			else		// 修改了soc后，这里可能需要修改
 			{
 				constexpr double vanishing_charge = 1.0e-12;
 				for( size_t ir=0; ir!=pw.nrxx; ++ir )
 				{
 					v(0,ir) -= 0.5 * (dh[0][ir] + dh[1][ir]);
 					const double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
-					const double neg = (soc.lsign && rho_in[1][ir]*soc.ux[0]
-						+rho_in[2][ir]*soc.ux[1]+rho_in[3][ir]*soc.ux[2]<=0) ? -1 : 1;
+					const double neg = (soc.lsign && rho_in[1][ir]*soc.ux[0]+rho_in[2][ir]*soc.ux[1]+rho_in[3][ir]*soc.ux[2]<=0)
+						? -1 : 1;
 					if(amag > vanishing_charge)
 					{
 						for(int i=1;i<4;i++)
@@ -150,13 +162,11 @@ void Potential_Libxc::v_xc(
 			}
 		};
 		
+		// jiyy add for threshold
 		constexpr double rho_threshold = 1E-6;
 		constexpr double grho_threshold = 1E-10;
-
 		xc_func_set_dens_threshold(&func, rho_threshold);
-
 		vector<double> sgn( pw.nrxx * nspin0(), 1.0);
-
 		if(nspin0()==2 && func.info->family != XC_FAMILY_LDA && func.info->kind==XC_CORRELATION)
 		{
 			for( size_t ir=0; ir!=pw.nrxx; ++ir )
@@ -208,7 +218,8 @@ void Potential_Libxc::v_xc(
 }
 
 
-
+// 未来不断增加xc泛函时，只需要修改此函数即可
+// abacus中对泛函的指代目前为xcf中的iexch、igcx、icorr、igcc，可能需要改进。如果未来确定捆绑libxc，可以改为用libxc的宏定义来指代。
 std::vector<xc_func_type> Potential_Libxc::init_func()
 {
 	std::vector<xc_func_type> funcs;
@@ -273,6 +284,7 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 
 
 
+// [rho, sigma, gdr] = cal_input( funcs, rho_in )
 std::tuple< std::vector<double>, std::vector<double>, std::vector<std::vector<Vector3<double>>> > 
 Potential_Libxc::cal_input( 
 	const std::vector<xc_func_type> &funcs, 
@@ -280,15 +292,8 @@ Potential_Libxc::cal_input(
 {
 	// ..., ↑_{i},↓_{i}, ↑_{i+1},↓_{i+1}, ...
 	std::vector<double> rho;
-	// ..., ↑↑_{i},↑↓_{i},↓↓_{i}, ↑↑_{i+1},↑↓_{i+1},↓↓_{i+1}, ...
-	std::vector<double> sigma;
-	// [...,↑_{i},↑_{i+1},...], [...,↓_{i},↓_{i+1},...]
-	std::vector<std::vector<Vector3<double>>> gdr;
-
 	bool finished_rho   = false;
-	bool finished_gdr   = false;
-	bool finished_sigma = false;
-	
+	// 这里假定CHR.rho_core均分到自旋上。可能有误
 	auto cal_rho = [&]()
 	{
 		if(!finished_rho)
@@ -304,7 +309,7 @@ Potential_Libxc::cal_input(
 					}
 				}
 			}
-			else
+			else		// 修改了soc后，这里可能需要修改
 			{
 				if(xcf.igcx||xcf.igcc)
 				{
@@ -324,6 +329,9 @@ Potential_Libxc::cal_input(
 		finished_rho = true;
 	};		
 		
+	// [...,↑_{i},↑_{i+1},...], [...,↓_{i},↓_{i+1},...]
+	std::vector<std::vector<Vector3<double>>> gdr;
+	bool finished_gdr   = false;
 	auto cal_gdr = [&]()
 	{
 		if(!finished_gdr)
@@ -346,6 +354,9 @@ Potential_Libxc::cal_input(
 		finished_gdr = true;
 	};
 	
+	// ..., ↑↑_{i},↑↓_{i},↓↓_{i}, ↑↑_{i+1},↑↓_{i+1},↓↓_{i+1}, ...
+	std::vector<double> sigma;
+	bool finished_sigma = false;
 	auto cal_sigma = [&]()
 	{
 		if(!finished_sigma)
@@ -395,4 +406,5 @@ Potential_Libxc::cal_input(
 	
 	return std::make_tuple( rho, sigma, gdr );
 }
-#endif
+
+#endif	//ifdef USE_LIBXC

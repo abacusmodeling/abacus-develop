@@ -272,7 +272,7 @@ void potential::v_of_rho
 //  calculate the exchange-correlation potential
 //----------------------------------------------------------
 	
-	#ifdef TEST_LIBXC
+	#ifdef USE_LIBXC
     Potential_Libxc::v_xc(rho_in, en.etxc, en.vtxc, v_in);
 	#else
     H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, rho_in, CHR.rho_core, v_in);
