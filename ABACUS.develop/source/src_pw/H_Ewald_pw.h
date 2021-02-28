@@ -10,9 +10,8 @@ class H_Ewald_pw
 	public:
 
 	// need to be updated in near future 2021-02-25
-	friend class Stress; // Ewald stress
+	friend class Stress_Func; // Ewald stress
 	friend class Forces; // Ewald forces
-	friend class Stress_LCAO; // Ewald stress
 	friend class Force_LCAO; // Ewald forces
 
     H_Ewald_pw();

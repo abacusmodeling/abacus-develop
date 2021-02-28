@@ -7,9 +7,10 @@ class H_XC_pw
 {
 	public:
 
-	friend class Stress;
-	friend class Forces;
+	friend class Stress_Func;
+	friend class Stress_PW;
 	friend class Stress_LCAO;
+	friend class Forces;
     friend class Force_LCAO; 
 	friend class potential;
 	friend class energy;

@@ -22,7 +22,7 @@ public:
 	pseudopot_cell_vnl();
 	~pseudopot_cell_vnl();
 
-	friend class Stress;
+	friend class Stress_Func;
 	friend class Forces;
 	friend class Epsilon0_vasp;
 	friend class potential;

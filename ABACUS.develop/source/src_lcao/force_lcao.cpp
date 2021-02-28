@@ -726,7 +726,7 @@ void Force_LCAO::cal_force_cc(void)
 	timer::tick("Force_LCAO","cal_force_cc",'E');
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
-	#ifdef USE_LIBXC
+	#ifdef TEST_LIBXC
 	Potential_Libxc::v_xc(CHR.rho, en.etxc, en.vtxc, vxc);
 	#else
     H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
@@ -933,8 +933,7 @@ void Force_LCAO::cal_stress(matrix &stress)
 	TITLE("Force_LCAO","cal_stress");
 
 	Stress_LCAO SS;
-	SS.allocate();
-	SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi, this->stress_vdw);
+	SS.start_stress(this->soverlap, this->stvnl_dphi, this->svnl_dbeta, this->svl_dphi, this->stress_vdw, stress);
 
 	double unit_transform = 0.0;
 	unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
@@ -944,21 +943,15 @@ void Force_LCAO::cal_stress(matrix &stress)
 	{
 		for(int j=0;j<3;j++)
 		{
-			stress(i,j) = SS.scs[i][j];
 
             //quxin added for DFT+U; stress contribution from DFT+U
-            if(INPUT.dft_plus_u) if(i!=j) stress(i,j) += dftu.stress_dftu.at(i).at(j);          
+            if(INPUT.dft_plus_u) stress(i,j) += dftu.stress_dftu.at(i).at(j);          
 		}
-		stress(i,i) = SS.scs[i][i] - external_stress[i]/unit_transform;
+		stress(i,i) -= external_stress[i]/unit_transform;
 
-        if(INPUT.dft_plus_u) stress(i,i) += dftu.stress_dftu.at(i).at(i);
 	}
-    PRESSURE = (SS.scs[0][0]+SS.scs[1][1]+SS.scs[2][2])/3;
+    PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 
-    if(INPUT.dft_plus_u) 
-	{
-		PRESSURE += (dftu.stress_dftu.at(0).at(0) + dftu.stress_dftu.at(1).at(1) + dftu.stress_dftu.at(2).at(2))/3.0;
-	}
 
     return;
 }

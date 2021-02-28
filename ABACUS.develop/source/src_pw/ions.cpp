@@ -1,7 +1,7 @@
 #include "tools.h"
 #include "ions.h"
 #include "forces.h"
-#include "stress.h"
+#include "stress_pw.h"
 #include "../src_pw/global.h" // use chr.
 #include "vdwd2.h"
 #include "vdwd3.h"
@@ -306,24 +306,19 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 
 	if(!FORCE&&STRESS)
 	{
-		Stress ss;
-		ss.cal_stress();
+		Stress_PW ss;
 		matrix stress;
 		stress.create(3,3);
+		ss.cal_stress(stress);
 
 		double unit_transform = 0.0;
 		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 		double external_stress[3] = {PRESS1,PRESS2,PRESS3};
 		for(int i=0;i<3;i++)
 		{
-			for(int j=0;j<3;j++)
-			{
-				stress(i,j) = ss.sigmatot[i][j];
-				//OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
-			}
-			stress(i,i) = ss.sigmatot[i][i] - external_stress[i]/unit_transform;
+			stress(i,i) -= external_stress[i]/unit_transform;
 		}
-		PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
+		PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 		if(CALCULATION=="cell-relax")
 		{
 			LCM.cal_lattice_change(stress_step, stress, en.etot);
@@ -367,24 +362,19 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             {
                 force_step = 1;
 
-                Stress ss;
-                ss.cal_stress();
                 matrix stress;
                 stress.create(3,3);
+                Stress_PW ss;
+                ss.cal_stress(stress);
 
                 double unit_transform = 0.0;
                 unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
                 double external_stress[3] = {PRESS1,PRESS2,PRESS3};
                 for(int i=0;i<3;i++)
                 {
-                    for(int j=0;j<3;j++)
-                    {
-                        stress(i,j) = ss.sigmatot[i][j];
-                        //OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
-                    }
-                    stress(i,i) = ss.sigmatot[i][i] - external_stress[i]/unit_transform;
+                    stress(i,i) -= external_stress[i]/unit_transform;
                 }
-                PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
+		PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 
                 if(CALCULATION=="cell-relax")
                 {
@@ -441,24 +431,19 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
         }
         else
         {
-            Stress ss;
-            ss.cal_stress();
             matrix stress;
             stress.create(3,3);
+            Stress_PW ss;
+            ss.cal_stress(stress);
 
             double unit_transform = 0.0;
             unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
             double external_stress[3] = {PRESS1,PRESS2,PRESS3};
             for(int i=0;i<3;i++)
             {
-                for(int j=0;j<3;j++)
-                {
-                    stress(i,j) = ss.sigmatot[i][j];
-                    //OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
-                }
-                stress(i,i) = ss.sigmatot[i][i] - external_stress[i]/unit_transform;
+                stress(i,i) -= external_stress[i]/unit_transform;
             }
-            PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
+		PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
             return 1;
         }
     }

@@ -41,7 +41,15 @@ unitcell_pseudo.o\
 threshold_elec.o\
 electrons.o \
 forces.o\
-stress.o\
+stress_pw.o\
+stress_func_cc.o\
+stress_func_gga.o\
+stress_func_kin.o\
+stress_func_nl.o\
+stress_func_ewa.o\
+stress_func_har.o\
+stress_func_loc.o\
+stress_func_print.o\
 chi0_hilbert.o\
 chi0_standard.o\
 epsilon0_pwscf.o\
