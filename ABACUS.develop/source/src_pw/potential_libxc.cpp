@@ -34,9 +34,14 @@ void Potential_Libxc::v_xc(
 	//----------------------------------------------------------
 	vector<xc_func_type> funcs = init_func();
 
+	// the type of input_tmp is automatically set to 'tuple'
 	// [rho, sigma, gdr] = cal_input( funcs, rho_in );
 	const auto input_tmp = cal_input( funcs, rho_in );
+
+	// obtain the electron charge density rho from 'get' function (first variable)
 	const vector<double> &rho = std::get<0>(input_tmp);
+
+	// obtain the sigma from 'get' function (second variable)
 	const vector<double> &sigma = std::get<1>(input_tmp);
 
 	for( xc_func_type &func : funcs )
@@ -80,7 +85,9 @@ void Potential_Libxc::v_xc(
 					vector<double> v_tmp(4);
 					v_tmp[0] = e2 * (0.5 * (vrho[ir*2] + vrho[ir*2+1]));
 					const double vs = 0.5 * (vrho[ir*2] - vrho[ir*2+1]);
-					const double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
+					const double amag = sqrt( pow(rho_in[1][ir],2) 
+						+ pow(rho_in[2][ir],2) 
+						+ pow(rho_in[3][ir],2) );
 
 					if(amag>vanishing_charge)
 					{
@@ -123,6 +130,7 @@ void Potential_Libxc::v_xc(
 				}
 			}
 
+			// define two dimensional array dh [ nspin, pw.nrxx ]
 			vector<vector<double>> dh(nspin0(), vector<double>(pw.nrxx));
 			for( size_t is=0; is!=nspin0(); ++is )
 			{
@@ -190,9 +198,13 @@ void Potential_Libxc::v_xc(
 			}
 		}
 
+		//------------------------------------------------------------------
+		// "func.info->family" includes LDA, GGA, Hybrid functional (HYB).
+		//------------------------------------------------------------------
 		switch( func.info->family )
 		{
 			case XC_FAMILY_LDA:
+				// call Libxc function: xc_lda_exc_vxc
 				xc_lda_exc_vxc( &func, pw.nrxx, 
 					VECTOR_TO_PTR(rho), VECTOR_TO_PTR(exc), VECTOR_TO_PTR(vrho) );
 				process_exc(sgn);
@@ -200,6 +212,7 @@ void Potential_Libxc::v_xc(
 				break;
 			case XC_FAMILY_GGA:
 			case XC_FAMILY_HYB_GGA:
+				// call Libxc function: xc_gga_exc_vxc
 				xc_gga_exc_vxc( &func, pw.nrxx, 
 					VECTOR_TO_PTR(rho), VECTOR_TO_PTR(sigma), VECTOR_TO_PTR(exc), 
 					VECTOR_TO_PTR(vrho), VECTOR_TO_PTR(vsigma) );
@@ -212,9 +225,14 @@ void Potential_Libxc::v_xc(
 					+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 				break;
 		}
+		// Libxc function: Deallocate memory
 		xc_func_end(&func);
 	}
 
+
+	//-------------------------------------------------
+	// for MPI, reduce the exchange-correlation energy
+	//-------------------------------------------------
 	Parallel_Reduce::reduce_double_pool( etxc );
 	Parallel_Reduce::reduce_double_pool( vtxc );
 
@@ -226,21 +244,35 @@ void Potential_Libxc::v_xc(
 }
 
 
+//----------------------------------------------------------------------------
 // for adding new xc functionals, only this function needs to be updated
 // now we use iexch, igcx, icorr, igcc in xcf to characterize XC functionals
+//----------------------------------------------------------------------------
 std::vector<xc_func_type> Potential_Libxc::init_func()
 {
+	// 'funcs' is the return value
 	std::vector<xc_func_type> funcs;
 
 	const int xc_polarized = (1==nspin0()) ? XC_UNPOLARIZED : XC_POLARIZED;
 
+	//-------------------------------------------
+	// define a function named 'add_func', which 
+	// will be called in the following codes
+	//-------------------------------------------
 	auto add_func = [&]( const int function )
 	{
 		funcs.push_back({});
+		// 'xc_func_init' is defined in Libxc
 		xc_func_init( &funcs.back(), function, xc_polarized );
 	};
-	
-	if( 6==xcf.iexch_now && 8==xcf.igcx_now && 4==xcf.icorr_now && 4==xcf.igcc_now )
+
+	//--------------------------------------
+	// for the exchange energy 
+	//--------------------------------------
+	if( 6==xcf.iexch_now && 
+		8==xcf.igcx_now && 
+		4==xcf.icorr_now && 
+		4==xcf.igcc_now ) // GGA functional
 	{
 		add_func( XC_HYB_GGA_XC_PBEH );		
 		double parameter_hse[3] = { exx_global.info.hybrid_alpha, 
@@ -249,7 +281,10 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 		xc_func_set_ext_params(&funcs.back(), parameter_hse);
 		return funcs;	
 	}
-	else if( 9==xcf.iexch_now && 12==xcf.igcx_now && 4==xcf.icorr_now && 4==xcf.igcc_now )
+	else if( 9==xcf.iexch_now && 
+			12==xcf.igcx_now && 
+			4==xcf.icorr_now && 
+			4==xcf.igcc_now ) // HSE06 hybrid functional
 	{
 		add_func( XC_HYB_GGA_XC_HSE06 );	
 		double parameter_hse[3] = { exx_global.info.hybrid_alpha, 
@@ -259,11 +294,13 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 		return funcs;	
 	}
 	
-	if( 1==xcf.iexch_now && 0==xcf.igcx_now )
+	if( 1==xcf.iexch_now && 
+		0==xcf.igcx_now ) // LDA functional
 	{
 		add_func( XC_LDA_X );
 	}
-	else if( 1==xcf.iexch_now && 3==xcf.igcx_now )
+	else if( 1==xcf.iexch_now && 
+		3==xcf.igcx_now ) // GGA functional
 	{
 		add_func( XC_GGA_X_PBE );
 	}
@@ -273,6 +310,9 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 			+TO_STRING(xcf.igcx_now)+" unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 
+	//--------------------------------------
+	// for the correlation energy part
+	//--------------------------------------
 	if( 1==xcf.icorr_now && 0==xcf.igcc_now )
 	{
 		add_func( XC_LDA_C_PZ );
