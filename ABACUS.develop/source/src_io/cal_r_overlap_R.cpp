@@ -24,6 +24,8 @@ cal_r_overlap_R::~cal_r_overlap_R()
 
 void cal_r_overlap_R::init()
 {
+	TITLE("cal_r_overlap_R","init");
+
 	this->R_x_num = GridD.getCellX();
     this->R_y_num = GridD.getCellY();
     this->R_z_num = GridD.getCellZ();
@@ -31,7 +33,7 @@ void cal_r_overlap_R::init()
 	this->R_minY = (int)GridD.getD_minY();
 	this->R_minZ = (int)GridD.getD_minZ();
 	
-	
+	// allocate for psi_r_psi	
 	psi_r_psi = new Vector3<double> ***[R_x_num];
 	for(int ix = 0; ix < R_x_num; ix++)
 	{
@@ -48,7 +50,8 @@ void cal_r_overlap_R::init()
 	
 	this->allocate_psi_r_psi = true;
 	
-	int Lmax_used, Lmax;
+	int Lmax_used=0;
+	int Lmax=0;
 	
 	MOT.allocate(
 		ORB.get_ntype(),// number of atom types
@@ -198,22 +201,45 @@ void cal_r_overlap_R::init()
 	}
 
 	for( auto &co1 : center2_orb11 )
+	{
 		for( auto &co2 : co1.second )
+		{
 			for( auto &co3 : co2.second )
+			{
 				for( auto &co4 : co3.second )
+				{
 					for( auto &co5 : co4.second )
+					{
 						for( auto &co6 : co5.second )
+						{
 							co6.second.init_radial_table();
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	for( auto &co1 : center2_orb21_r )
+	{
 		for( auto &co2 : co1.second )
+		{
 			for( auto &co3 : co2.second )
+			{
 				for( auto &co4 : co3.second )
+				{
 					for( auto &co5 : co4.second )
+					{
 						for( auto &co6 : co5.second )
+						{
 							co6.second.init_radial_table();
+						}
+					}
+				}
+			}
+		}
+	}
 						
-	
 	return;
 }
 

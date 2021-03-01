@@ -5,10 +5,10 @@
 #ifndef USE_OVERLAP_TABLE_H
 #define USE_OVERLAP_TABLE_H
 
-#include "../src_pw/tools.h"
+#include "src_pw/tools.h"
 #include "ORB_radial_table.h"
 #include "ORB_gaunt_table.h"
-#include "ylm.h"
+#include "src_global/ylm.h"
 
 //------------------------------------
 // used to be 'Use_Overlap_Table',

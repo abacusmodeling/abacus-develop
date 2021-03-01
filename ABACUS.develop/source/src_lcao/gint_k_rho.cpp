@@ -1,12 +1,11 @@
-#include "../src_pw/tools.h"
+#include "src_pw/tools.h"
 #include "gint_k.h"
 #include "LCAO_nnr.h"
 #include "ORB_read.h"
 #include "grid_technique.h"
-#include "ylm.h"
-#include "../src_pw/global.h"
+#include "src_global/ylm.h"
+#include "src_pw/global.h"
 #include "src_global/blas_connector.h"
-
 #include "global_fp.h" // mohan add 2021-01-30
 
 inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)

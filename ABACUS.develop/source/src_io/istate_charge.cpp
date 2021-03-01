@@ -2,22 +2,16 @@
 #include "../src_pw/global.h"
 #include "../src_pw/tools.h"
 
-IState_Charge::IState_Charge()
-{
+IState_Charge::IState_Charge(){}
 
-}
-
-IState_Charge::~IState_Charge()
-{
-
-}
+IState_Charge::~IState_Charge(){}
 
 
 void IState_Charge::begin(void)
 {
 	TITLE("IState_Charge","begin");
 
-	cout << " perform |psi(i)|^2 for selected bands." << endl;
+	cout << " Perform |psi(i)|^2 for selected bands." << endl;
 
 	if(!GAMMA_ONLY_LOCAL)
 	{
@@ -28,7 +22,9 @@ void IState_Charge::begin(void)
 	if(NBANDS_ISTATE > 0) mode = 1;
 	else mode = 2;
 
-	int fermi_band, bands_below, bands_above;
+	int fermi_band=0;
+	int bands_below=0;
+	int bands_above=0;
 
 	// (2) cicle:
 	// (2.1) calculate the selected density matrix
@@ -42,7 +38,6 @@ void IState_Charge::begin(void)
 	// (1.1) allocate the space for LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
-
 	OUT(ofs_running,"LOWF.allocate_flag",LOWF.get_allocate_flag());	
 	cout << " number of electrons = " << ucell.nelec << endl;
 

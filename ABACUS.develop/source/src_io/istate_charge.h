@@ -4,13 +4,14 @@
 class IState_Charge
 {
 	public:
+
 	IState_Charge();
 	~IState_Charge();
 
 	void begin();
 
-
 	private:
+
 	int *bands_picked;
 
 	void idmatrix(const int &ib);

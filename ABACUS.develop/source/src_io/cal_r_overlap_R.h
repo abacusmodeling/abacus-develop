@@ -8,20 +8,22 @@ using std::map;
 #include<set>
 using std::set;
 
-#include "../src_lcao/center2_orb.h"
-#include "../src_lcao/center2_orb-orb11.h"
-#include "../src_lcao/center2_orb-orb21.h"
+#include "src_lcao/center2_orb.h"
+#include "src_lcao/center2_orb-orb11.h"
+#include "src_lcao/center2_orb-orb21.h"
 
-#include "../src_lcao/ORB_radial_table.h"
-#include "../src_lcao/ORB_gaunt_table.h"
-#include "../src_lcao/ORB_atomic_lm.h"
-#include "../src_lcao/ORB_read.h"
-#include "../src_global/vector3.h"
-#include "../src_lcao/ylm.h"
-#include "../src_lcao/global_fp.h"
+#include "src_lcao/ORB_radial_table.h"
+#include "src_lcao/ORB_gaunt_table.h"
+#include "src_lcao/ORB_atomic_lm.h"
+#include "src_lcao/ORB_read.h"
+#include "src_global/vector3.h"
+#include "src_global/ylm.h"
+#include "src_lcao/global_fp.h"
 
-#include "../src_pw/global.h"
+#include "src_pw/global.h"
 
+
+// output r_R matrix, added by Jingan
 class cal_r_overlap_R
 {
 

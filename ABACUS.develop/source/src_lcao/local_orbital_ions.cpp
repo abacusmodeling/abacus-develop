@@ -7,7 +7,7 @@
 #include "stress_lcao.h"
 #include "src_global/global_function.h"
 #include "src_io/hs_matrix.h"
-#include "src_lcao/cal_r_overlap_R.h"
+#include "src_io/cal_r_overlap_R.h"
 #include "src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "src_ri/exx_abfs.h"
 #include "src_ri/exx_opt_orb.h"
