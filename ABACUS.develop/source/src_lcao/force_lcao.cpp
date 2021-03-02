@@ -459,7 +459,7 @@ void Force_LCAO::print_force(const string &name, double** f, const bool screen, 
 
 void Force_LCAO::printforce_total (bool ry)
 {
-// mohan update 2011-03-15
+	TITLE("Force_LCAO","printforce_total");
 	double unit_transform = 1;
 
 	if(!ry)
@@ -474,21 +474,23 @@ void Force_LCAO::printforce_total (bool ry)
  	ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
 	NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
-        if(INPUT.force_set == 1)
-        {
-           ofstream ofs("FORCE.dat");
-           if(!ofs)
-           {
-              cout << "open FORCE.dat error !" <<endl;
-           }
+	// print out forces
+	if(INPUT.force_set == 1)
+	{
+		ofstream ofs("FORCE.dat");
+		if(!ofs)
+		{
+			cout << "open FORCE.dat error !" <<endl;
+		}
 
-           for(int iat=0; iat<ucell.nat; iat++)
-           {
-               ofs << "   " << fcs(iat,0)*Ry_to_eV / 0.529177 << "   " << fcs(iat,1)*Ry_to_eV / 0.529177 << "   " << fcs(iat,2)*Ry_to_eV / 0.529177 << endl;
-           }
-
-           ofs.close();
-        }
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			ofs << "   " << fcs(iat,0)*Ry_to_eV / 0.529177 
+				<< "   " << fcs(iat,1)*Ry_to_eV / 0.529177 
+				<< "   " << fcs(iat,2)*Ry_to_eV / 0.529177 << endl;
+		}
+		ofs.close();
+	}
 
  	if(TEST_FORCE) 
 	{
@@ -522,6 +524,7 @@ void Force_LCAO::printforce_total (bool ry)
 
     return;
 }
+
 
 void Force_LCAO::cal_force_loc(void)
 {

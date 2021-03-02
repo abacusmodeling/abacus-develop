@@ -5,6 +5,7 @@
 #ifndef INPUT_H
 #define INPUT_H
 
+#include "src_global/vector3.h"
 #include <string>
 using namespace std;
 

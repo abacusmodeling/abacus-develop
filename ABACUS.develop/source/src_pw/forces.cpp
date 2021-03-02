@@ -167,11 +167,12 @@ void Forces::init()
 		if(!ofs)
 		{
 			cout << "open FORCE.dat error !" <<endl;
-		}
-		
+		}	
 		for(int iat=0; iat<ucell.nat; iat++)
 		{
-			ofs << "   " << force(iat,0)*Ry_to_eV / 0.529177 << "   " << force(iat,1)*Ry_to_eV / 0.529177 << "   " << force(iat,2)*Ry_to_eV / 0.529177 << endl;
+			ofs << "   " << force(iat,0)*Ry_to_eV / 0.529177 
+				<< "   " << force(iat,1)*Ry_to_eV / 0.529177 
+				<< "   " << force(iat,2)*Ry_to_eV / 0.529177 << endl;
 		}
 		ofs.close();
 	}
