@@ -3,7 +3,10 @@
 
 using namespace std;
 
+//--------------------------------
 // charge extrapolation method
+// written by Xiaohui 2014
+//--------------------------------
 class Charge_Extra
 {
 	public:
@@ -11,14 +14,13 @@ class Charge_Extra
 	Charge_Extra();
 	~Charge_Extra();
 
-	void allocate(void);
-	void record_rho(void);
+	void allocate_ions(void);
 	void extrapolate_charge(void);
 
-	//xiaohui add 2014-05-07, to use "istep = ions.istep"
+	// use "istep = ions.istep"
 	int istep;
 
-	//xiaohui add 2014-05-10, for second-order extrapolation
+	// for the second-order extrapolation
 	double* pos_old1;
 	double* pos_old2;
 	double* pos_now;
@@ -30,12 +32,12 @@ class Charge_Extra
 	bool init_rho;
 	int dim;
 
-	//xiaohui add 2014-05-07, to use first-order extrapolation
+	// use the first-order extrapolation
 	double** delta_rho1;
 	double** delta_rho2;
 	double** delta_rho;
 
-	//xiaohui add 2014-05-10, to use second-order extrapolation
+	// use the second-order extrapolation
 	double** delta_rho3;
 	int pos_dim;
 	double alpha,beta;

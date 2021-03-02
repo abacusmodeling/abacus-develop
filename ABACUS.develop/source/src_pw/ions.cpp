@@ -33,7 +33,7 @@ void Ions::opt_ions_pw(void)
 	if(FORCE)
 	{
 		IMM.allocate();
-		CE.allocate();
+		CE.allocate_ions();
 	}
 
 	if(STRESS)                    // pengfei Li 2018-05-14

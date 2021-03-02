@@ -43,7 +43,7 @@ void Local_Orbital_Ions::opt_ions(void)
         //Ions_Move_Methods 
         IMM.allocate();
         //Charge_Extrapolation
-        CE.allocate();
+        CE.allocate_ions();
     }
 
 	// pengfei Li 2018-05-14
@@ -325,68 +325,40 @@ bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &st
     }
     timer::tick("Local_Orbital_Ions","force_stress",'D');
 
-    //return 0;
-
-    //if(FORCE)
+	//--------------------------------------------------
+	// only forces are needed, no stresses are needed
+	//--------------------------------------------------
     if(FORCE && !STRESS)
     {
-        //force_lo
-        Force_LCAO FL; // init the class.
+        Force_LCAO FL;
         FL.allocate (); 
         FL.start_force();
-
-        // (2) move the ions according to
-        // the algorithms of molecular dynamics.
-        //if(CALCULATION=="md")
-        //{
-        //    md.init_md(istep, FL.fcs);
-        //}
-        // move the atoms according to CG or BFGS
-        // methods.
-        //else
-        //{
-        //---------- for test ---------------------
-        //FL.fcs.zero_out(); // mohan test
-        //ofstream ofs("tmp_force.txt");
-        //ifstream ifs("tmp_force.txt");
-        //for(int i=0; i<FL.fcs.nr*FL.fcs.nc; ++i)
-	//{
-	//    ofs << FL.fcs.c[i] << endl;
-	//    ifs >> FL.fcs.c[i];
-	//}
-	//ofs.close();
-	//ifs.close();
-	//-----------------------------------------
 
 #ifdef __MPI //2015-10-01, xiaohui
         atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif //2015-10-01, xiaohui
 
-        //xiaohui add CALCULATION==relax 2015-09-30
-        //if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
         if(CALCULATION=="relax") 
         {
             IMM.cal_movement(istep, istep, FL.fcs, en.etot);
 
             if(IMM.get_converged() || (istep==NSTEP))
             {
-                return 1;
+                return 1; // 1 means converged
             }
-            else
+            else // ions are not converged
             {
                 CE.istep = istep;
                 CE.extrapolate_charge();
 
-                if(pot.extra_pot=="dm")//xiaohui modify 2015-02-01
+                if(pot.extra_pot=="dm")
                 {
-                    // done after grid technique.
                 }
                 else
                 {
                     pot.init_pot( istep );
                 }
             }
-
             return 0;
         }
         else
