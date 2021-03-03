@@ -11,17 +11,22 @@ class WF_igk
     WF_igk();
     ~WF_igk();
 
+	//---------------------------------------------------
+	// npwx: max npw
+	// npw
+	// igk: [nks, npw_max]
+    // g2kin: [npwx],kinetic energy for current k point
+	//---------------------------------------------------
+    int npwx;
+    int npw;
+    IntArray igk;
+    double *g2kin;
+
+	public:
+
     // for each k point , find the number of pws
     int setupIndGk(const PW_Basis &pwb,const int nks);
     
-    int npwx;
-
-    int npw;
-
-    IntArray igk;
-
-    // g2kin : [npw],kinetic energy for current k point
-    double *g2kin;
 
     // Calculate kinetic energy
     void ekin(const int ik);

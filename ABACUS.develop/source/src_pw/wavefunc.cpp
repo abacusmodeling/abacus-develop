@@ -33,7 +33,7 @@ void wavefunc::init_local(void)
     const int nks = kv.nks;
     this->npwx = this->setupIndGk(pw, nks);
 
-	// mohan add 2009-12-24
+	// band energies
 	this->ekb = new double*[nks];
 	for(int ik=0; ik<nks; ik++)
 	{
@@ -42,7 +42,8 @@ void wavefunc::init_local(void)
 	}
 	this->allocate_ekb = true;
 
-    this->wg.create(nks, NBANDS);   // the weight of each k point and band
+	// the weight of each k point and band
+    this->wg.create(nks, NBANDS);
     Memory::record("wavefunc","ekb",nks*NBANDS,"double");
     Memory::record("wavefunc","wg",nks*NBANDS,"double");
 

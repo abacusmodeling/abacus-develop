@@ -743,13 +743,15 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     return;
 }
 
+
+
 // calculate the grid distributed DM matrix from 2D block-cyclic distributed DM matrix
 // transform dm_gamma[is].c to this->DM[is]
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
-    //timer::tick("LCAO_Charge","newDM",'F');
     timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
     OUT(ofs_running,"cal_dk_gamma_from_2D, NSPIN", NSPIN);
+
     for(int is=0; is<NSPIN; ++is)
     {
         if(NEW_DM>1)
@@ -777,6 +779,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             }
             ofs_running<<"=========================================\n";
         }
+
         // put data from dm_gamma[is] to sender index
         int nNONZERO=0;
         for(int i=0; i<sender_size; ++i)
@@ -817,6 +820,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             //DM[is][icol][irow]=receiver_buffer[i];
             if(receiver_buffer[i]!=0) ++nNONZERO;
         }
+
         if(NEW_DM>1)
         {
             OUT(ofs_running,"number of non-zero elements in receiver_buffer",nNONZERO);
@@ -856,9 +860,10 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             ofs_running<<"=========================================\n";
         }
     }
-    //timer::tick("LCAO_Charge","newDM",'F');
     timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
+	return;
 }
+
 //-------------------------------------------------------------
 //-------------------------------------------------------------
 // NOTE:
@@ -894,23 +899,35 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 #ifdef __MPI //2015-09-06, xiaohui
 	#if EXX_DM==2
-	if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type || Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
+	if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
+		|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
+		|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
 		exx_lcao.DM_para.clear_DMr();
 	#endif
 
 	// Peize Lin update 2018-07-02
-	for( int is=0; is<NSPIN; ++is )
+	for(int is=0; is<NSPIN; ++is )
+	{
 		for (int i=0; i<lgd_now; i++)
+		{
 			ZEROS(this->DM[is][i], lgd_now);
+		}
+	}
 
-	int nprocs,myid;
+	// initialize
+	int nprocs=0;
+	int myid=0;
 	//MPI_Status status;
 	MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
 	MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
+
+	// DSIZE: number of processors in diag world
 	vector<int> bands_local(DSIZE);
 	for (int id=0; id<DSIZE; id++)
+	{
 		bands_local[id] = (id<NBANDS%DSIZE) ? NBANDS/DSIZE+1 : NBANDS/DSIZE;
+	}
 	const int band_local = bands_local[DRANK];
 
 	int lastband_in_proc = 0;
@@ -928,9 +945,15 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 	for(int id=0, Total_Bands=0; id <= lastband_in_proc; ++id)
 	{
 		if(myid == id)
+		{
 			for(int is=0; is<NSPIN; is++)
+			{
 				for (int ib=0; ib<bands_local[myid]; ib++)
+				{
 					wg_local(is,ib) = wf.wg(is,Total_Bands+ib);
+				}
+			}
+		}
 		Total_Bands += bands_local[id];
 	}
 
@@ -938,9 +961,15 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 	{
 		matrix Z_wg( NLOCAL, band_local );
 		if(myid <= lastband_in_proc)
+		{
 			for(int iw=0; iw<NLOCAL; iw++)
+			{
 				for(int ib=0; ib<bands_local[myid]; ib++)
+				{
 					Z_wg(iw,ib) = ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
+				}
+			}
+		}
 
 		const int row_col = (NLOCAL%300) ? NLOCAL/300+1 : NLOCAL/300;
 
@@ -959,7 +988,9 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 			{
 				const int row_index = row_count*300 + i_row;
 				for(int ib=0; ib<band_local; ib++)
+				{
 					Z_row(i_row,ib) = Z_wg(row_index,ib);
+				}
 			}
 
 			for(int col_count=0; col_count<row_col; col_count++)
@@ -973,7 +1004,9 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 				{
 					const int col_index = i_col +col_count*300;
 					for(int ib=0; ib<band_local; ib++)
+					{
 						Z_col(i_col,ib) = ParaO.Z_LOC[is][col_index*band_local+ib] ;
+					}
 				}
 
 				rho_row_col.create( row_remain, col_remain, false );
