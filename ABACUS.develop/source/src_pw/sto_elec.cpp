@@ -85,8 +85,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         //this->update_ethr(iter);
         if(FINAL_SCF && iter==1) 
 		{
-			ETHR = 1.0e-12; // only for test
-			//ETHR = 1.0e-2;
+			ETHR = 1.0e-2;
 		}
         else 
 		{
@@ -166,12 +165,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	// calculate stochastic rho
 		stoiter.sum_stoband();
 
-		double totne;
-		for(int ir = 0 ; ir < pw.nrxx; ++ir)
-		{
-			totne += CHR.rho[0][ir] ;
-		}
-		cout<<totne * ucell.omega / pw.nrxx<<" ddddddddddd "<<ucell.omega<<endl;
+		
 		
 
 

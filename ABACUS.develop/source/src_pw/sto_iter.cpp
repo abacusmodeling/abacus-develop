@@ -62,17 +62,20 @@ void Stochastic_Iter:: itermu( int &iter)
     if(iter == 1)
     {
         dmu = 2;
-        th_ne = 1e-6;
+        th_ne = DRHO2 * 1e-5 * ucell.nelec;
+        cout<<"th_ne "<<th_ne<<endl;
     }
     else
     {
         dmu = 0.1;
-        th_ne = 1e-8;
+        th_ne = DRHO2 * 1e-3 * ucell.nelec;
     }
     sumpolyval();
 
     mu = mu0 - dmu;
+    //if(iter == 2) mu=mu0;
     double ne1 = calne();
+    //if(iter == 2) exit(0);
     double mu1 = mu;
     mu = mu0 + dmu;
     double ne2 = calne();
@@ -134,7 +137,7 @@ void Stochastic_Iter:: itermu( int &iter)
     cout.precision(10);
     cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<endl;
 
-    mu = mu0 = mu3;
+    en.ef = mu = mu0 = mu3;
     
     //Set wf.wg 
     if(NBANDS > 0)
@@ -203,7 +206,9 @@ double Stochastic_Iter::calne()
         for(int ior = 0; ior < norder; ++ior)
         {
             stok_ne += stoche.coef[ior] * spolyv[ior];
+            //cout<<stoche.coef[ior]<<" "; 
         }
+        //cout<<endl;
         //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
         if(NBANDS > 0)
         {
@@ -262,7 +267,7 @@ void Stochastic_Iter::sum_stoband()
     complex<double> * out = new complex<double> [nrxx];
     complex<double> * hout = new complex<double> [nrxx];
 
-    double dr_3 = nrxx / ucell.omega;
+    double dr_3 = ucell.omega / nrxx;
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
    
@@ -313,7 +318,7 @@ void Stochastic_Iter::sum_stoband()
     en.demet *= Occupy::gaussian_parameter;
 
     cout<<"Normalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
-    double factor = (targetne - KS_ne) / sto_ne * dr_3;
+    double factor = (targetne - KS_ne) / sto_ne / dr_3;
     for(int is = 0 ; is < 1; ++is)
     {
         for(int ir = 0; ir < nrxx ; ++ir)

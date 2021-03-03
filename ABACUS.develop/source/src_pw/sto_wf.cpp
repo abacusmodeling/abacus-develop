@@ -33,8 +33,8 @@ void Stochastic_WF::init()
     chi0[0].create(nchip,nrxx,false);
     //init with random number
     
-    srand((unsigned)time(NULL)+MY_POOL*100);
-    //srand((unsigned)MY_POOL*100);
+    //srand((unsigned)time(NULL)+MY_POOL*100);
+    srand((unsigned)MY_POOL*100);
     for(int i=0; i<chi0[0].size; ++i)
     {
         chi0[0].c[i]=exp(2*PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));

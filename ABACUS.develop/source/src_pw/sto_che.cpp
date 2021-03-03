@@ -19,8 +19,9 @@ Stochastic_Chebychev::~Stochastic_Chebychev()
         fftw_destroy_plan(plancoef);
     }
     fftw_free(coef);
-    fftw_free(ccoef);
+    fftw_free(dcoef);
     delete [] polyvalue;
+    delete [] coef;
 }
 void Stochastic_Chebychev:: init()
 {
@@ -31,9 +32,12 @@ void Stochastic_Chebychev:: init()
     {
         norder2 = 2 * norder * extend;
         ccoef = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * norder2);//new complex<double> [norder2];
-        coef = (double *) fftw_malloc(sizeof(double) * norder2);
+        dcoef = (double *) fftw_malloc(sizeof(double) * norder2);
+        plancoef = fftw_plan_dft_r2c_1d(norder2, dcoef, ccoef, FFTW_ESTIMATE);
+        coef = new double [norder];
         polyvalue = new double [norder];
         initcoef = true;
+        initplan = true;
     }
     else
     {
@@ -45,14 +49,11 @@ void Stochastic_Chebychev:: init()
 void Stochastic_Chebychev:: calcoef(double fun(double))
 {
     if(!initcoef) WARNING_QUIT("Stochastic_Chebychev", "Please init coef first!");
+
+    //middle point integral method
     for(int i = 0; i < norder2; ++i)
     {
-        coef[i]=fun(cos((i+0.5)*TWO_PI/norder2));
-    }
-     if(!initplan)
-    {
-        initplan = true;
-        plancoef = fftw_plan_dft_r2c_1d(norder2, coef, ccoef, FFTW_MEASURE);
+        dcoef[i]=fun(cos((i+0.5)*TWO_PI/norder2));
     }
     fftw_execute(plancoef);
     complex<double> ui(0,1);
@@ -61,13 +62,33 @@ void Stochastic_Chebychev:: calcoef(double fun(double))
     {
         if(i == 0)
         {
-            coef[i] = real(exp(ui*i*PI/norder2) * pcoef[i]) / norder2;
+            coef[i] = real(exp(ui*i*PI/norder2) * pcoef[i]) / norder2 * 2 / 3;
         }
         else
         {
-            coef[i] = real(exp(ui*i*PI/norder2) * pcoef[i]) * 2 / norder2;
+            coef[i] = real(exp(ui*i*PI/norder2) * pcoef[i]) / norder2 * 4 / 3;
         }
     }
+
+    //trapezoid integral method
+    for(int i = 0; i < norder2; ++i)
+    {
+        dcoef[i]=fun(cos(i*TWO_PI/norder2));
+    }
+    
+    fftw_execute(plancoef);
+    for(int i = 0; i<norder; ++i)
+    {
+        if(i == 0)
+        {
+            coef[i] += real(pcoef[i]) / norder2 * 1 / 3;
+        }
+        else
+        {
+            coef[i] += real(pcoef[i]) / norder2 * 2 / 3;
+        }
+    }
+    //cout<<endl;
     getcoef = true;
 }
 
