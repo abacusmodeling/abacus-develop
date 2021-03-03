@@ -32,7 +32,6 @@ class Stochastic_Chebychev
     int extend;
     int norder2;  // 2 * norder
     double* coef;  //[norder2] expansion coefficient of each order, only first norder coefficients are usefull
-    double* dcoef;
     fftw_complex *ccoef;  //[norder2] temporary complex expansion coefficient of each order, only first norder coefficients are usefull.
     double *polyvalue; //
     fftw_plan plancoef;
