@@ -791,12 +791,15 @@ void Charge::sum_band_k(void)
 	if(NSPIN==4) delete[] porter1;
 
 #ifdef __MPI
+	if(CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") //qinarui add it temporarily.
+	{
 	this->rho_mpi();
     //==================================
     // Reduce all the Energy in each cpu
     //==================================
 	en.eband /= NPROC_IN_POOL;
 	Parallel_Reduce::reduce_double_all( en.eband );
+	}
 #endif
 	
 	// check how many electrons on this grid.

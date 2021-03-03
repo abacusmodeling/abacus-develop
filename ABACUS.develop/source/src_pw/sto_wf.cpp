@@ -21,8 +21,8 @@ void Stochastic_WF::init()
     int nx = pw.nx,ny = pw.ny,nz = pw.nz;
 
     //distribute nchi for each process
-    nchip = int(nchi/NPROC_IN_POOL);
-    if(RANK_IN_POOL < nchi%NPROC_IN_POOL) ++nchip;
+    nchip = int(nchi/NPOOL);
+    if(MY_POOL < nchi%NPOOL) ++nchip;
 
     complex<double> ui(0,1);
     
@@ -33,11 +33,13 @@ void Stochastic_WF::init()
     chi0[0].create(nchip,nrxx,false);
     //init with random number
     
-    srand((unsigned)time(NULL));
+    srand((unsigned)time(NULL)+MY_POOL*100);
+    //srand((unsigned)MY_POOL*100);
     for(int i=0; i<chi0[0].size; ++i)
     {
         chi0[0].c[i]=exp(2*PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
     }
+
     
 
     delete[] chiortho;

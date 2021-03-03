@@ -26,8 +26,7 @@ class Stochastic_Iter
     
     void sum_stoband();
     double calne();
-    double caldnedmu();
-    void itermu();
+    void itermu(int & iter);
     void sumpolyval();
     void test(); //only for test
     Stochastic_Chebychev stoche;
@@ -49,6 +48,8 @@ class Stochastic_Iter
     static double fd(double e);
     static double nroot_fd(double e);
     static double nfd(double e);
+    static double fdlnfd(double e);
+    static double nfdlnfd(double e);
 
 
 };

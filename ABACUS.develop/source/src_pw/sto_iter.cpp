@@ -31,7 +31,7 @@ void Stochastic_Iter:: init()
 
 }
 
-void Stochastic_Iter:: itermu()
+void Stochastic_Iter:: itermu( int &iter)
 {
     
 
@@ -58,40 +58,52 @@ void Stochastic_Iter:: itermu()
     Emin = -10;
     Stochastic_hchi:: Emin = this->Emin;
     Stochastic_hchi:: Emax = this->Emax;
-     
+    double dmu;
+    if(iter == 1)
+    {
+        dmu = 2;
+        th_ne = 1e-6;
+    }
+    else
+    {
+        dmu = 0.1;
+        th_ne = 1e-8;
+    }
     sumpolyval();
-    mu = mu0 - 2;
+
+    mu = mu0 - dmu;
     double ne1 = calne();
     double mu1 = mu;
-    mu = mu0 + 2;
+    mu = mu0 + dmu;
     double ne2 = calne();
     double mu2 = mu;
-    th_ne = 1e-6;
     double Dne = th_ne + 1;
     double ne3;
     double mu3;
     
-    mu = 0;
-    ne1 = calne();
     //test the domin of mu
     /*for(mu = -5; mu<5;mu+=0.2)
     {
-        ne1 = calne();
-        cout<<"mu: "<<mu<<" ; ne: "<<ne1<<endl;
+        ne3 = calne();
+        cout<<"mu: "<<mu<<" ; ne: "<<ne3<<endl;
     }*/
     while(ne1 > targetne)
     {
-        mu1 -= 2;
+        ne2 = ne1;
+        mu2 = mu1;
+        mu1 -= dmu;
         mu = mu1;
         ne1 = calne();
-        cout<<"Reset mu1 from "<<mu1+2<<" to "<<mu1<<endl;
+        cout<<"Reset mu1 from "<<mu1+dmu<<" to "<<mu1<<endl;
     }
     while(ne2 < targetne)
     {
-        mu2 += 2;
+        ne1 = ne2;
+        mu1 = mu2;
+        mu2 += dmu;
         mu = mu2;
         ne2 = calne();
-        cout<<"Reset mu2 form "<<mu2-2<<" to "<<mu2<<endl;
+        cout<<"Reset mu2 form "<<mu2-dmu<<" to "<<mu2<<endl;
     }
 
     int count = 0;
@@ -119,6 +131,7 @@ void Stochastic_Iter:: itermu()
             cout<<"Fermi energy cannot be converged."<<endl;
         }
     }
+    cout.precision(10);
     cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<endl;
 
     mu = mu0 = mu3;
@@ -135,6 +148,8 @@ void Stochastic_Iter:: itermu()
             }
         }
     }
+
+    return;
 }
 
 void Stochastic_Iter:: sumpolyval()
@@ -162,10 +177,11 @@ void Stochastic_Iter:: sumpolyval()
             stoche.calpolyval(stohchi.hchi_real, nrxx, pchi);
             for(int ior = 0; ior < norder; ++ior)
             {
-                spolyv[ior] += stoche.polyvalue[ior].real();
+                spolyv[ior] += stoche.polyvalue[ior];
             }
         }
     }
+
 
     return;
 }
@@ -176,17 +192,19 @@ double Stochastic_Iter::calne()
     //wait for init
     int nkk = 1;
 
-    stoche.calcoef(this->nfd);
+    stoche.calcoef(nfd);
     int norder = stoche.norder;
     double totne = 0;
+    double sto_ne = 0;
     KS_ne = 0;
     for(int ikk = 0; ikk < nkk; ++ikk)
     {
+        double stok_ne = 0;
         for(int ior = 0; ior < norder; ++ior)
         {
-            totne += stoche.coef[ior] * spolyv[ior] * kv.wk[ikk];
+            stok_ne += stoche.coef[ior] * spolyv[ior];
         }
-        //cout<<endl;
+        //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
         if(NBANDS > 0)
         {
             double *en=wf.ekb[ikk];
@@ -196,38 +214,68 @@ double Stochastic_Iter::calne()
                 KS_ne += fd(en[iksb]) * kv.wk[ikk];
             }
         }
-            
+        sto_ne += stok_ne * kv.wk[ikk]; 
     }
-    totne += KS_ne;
     
+#ifdef __MPI
+        MPI_Allreduce(MPI_IN_PLACE, &sto_ne, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
+#endif
+
+    totne = KS_ne + sto_ne;
     return totne;
 }
 
 void Stochastic_Iter::sum_stoband()
 {  
-    //stoche.calcoef(this->nfd);
-    stoche.calcoef(this->nroot_fd);
-
     int nkk=1;// We temporarily use gamma k point.
     int nrxx = stohchi.nrxx;
+    int norder = stoche.norder;
+
+    //cal demet
+    stoche.calcoef(this->nfdlnfd);
+    double stodemet = 0;
+
+    for(int ikk = 0; ikk < nkk; ++ikk)
+    {
+        double stok_demet=0;
+        for(int ior = 0; ior < norder; ++ior)
+        {
+            stok_demet += stoche.coef[ior] * spolyv[ior];
+        }
+        //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
+        //cout<<endl;
+        if(NBANDS > 0)
+        {
+            double *enb=wf.ekb[ikk];
+            //number of electrons in KS orbitals
+            for(int iksb = 0; iksb < NBANDS; ++iksb)
+            {
+                en.demet += fdlnfd(enb[iksb]) * kv.wk[ikk];
+            }
+        }
+        stodemet += stok_demet * kv.wk[ikk];
+    }
+
+    //cal eband & rho
+    stoche.calcoef(this->nroot_fd);
     
     complex<double> * out = new complex<double> [nrxx];
     complex<double> * hout = new complex<double> [nrxx];
 
-    double dr3 = nrxx / ucell.omega;
+    double dr_3 = nrxx / ucell.omega;
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
    
     double out2, tmpne;
-    double sto_ne;
-    double sto_ekband=0;
-    cout<<"Eband 1 "<<en.eband<<endl;
+    double sto_ne = 0;
+    double sto_eband = 0;
+    double *sto_rho = new double [nrxx];
+    ZEROS(sto_rho, nrxx);
+
     complex<double> * pchi;
     for(int ik = 0; ik < nkk; ++ik)
     {
-        sto_ekband =0;
-        double *rho = CHR.rho[ik];
-        tmpne = 0;
+        double stok_eband =0;
         for(int ichi = 0; ichi < nchip; ++ichi)
         {
             if(NBANDS > 0)
@@ -244,24 +292,37 @@ void Stochastic_Iter::sum_stoband()
             {
                 out2 = norm(out[ir]);
                 tmpne = out2 * kv.wk[ik];
-                sto_ekband += real(conj(out[ir]) * hout[ir]) * DeltaE + Ebar * out2;
-                rho[ir] += tmpne * dr3; 
+                stok_eband += real(conj(out[ir]) * hout[ir]) * DeltaE + Ebar * out2;
+                sto_rho[ir] += tmpne; 
                 sto_ne += tmpne;
-                //rho[ir] += real(conj(pchi[ir]) * out[ir]) * kv.wk[ik] * nrxx / ucell.omega;
             }
         }
-        en.eband += sto_ekband * kv.wk[ik];
+        sto_eband += stok_eband * kv.wk[ik];
     }
-    cout<<"Eband 2 "<<en.eband<<endl;
-    cout<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
-    double factor = targetne / (sto_ne + KS_ne);
-    for(int ik = 0; ik < nkk; ++ik)
+
+
+#ifdef __MPI
+
+    MPI_Allreduce(MPI_IN_PLACE,&stodemet,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE,sto_rho,nrxx,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE,&sto_eband,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE,&sto_ne,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+#endif
+    en.eband += sto_eband;
+    en.demet += stodemet;
+    en.demet *= Occupy::gaussian_parameter;
+
+    cout<<"Normalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
+    double factor = (targetne - KS_ne) / sto_ne * dr_3;
+    for(int is = 0 ; is < 1; ++is)
     {
         for(int ir = 0; ir < nrxx ; ++ir)
         {
-            CHR.rho[ik][ir] *= factor;
+            CHR.rho[is][ir] += sto_rho[ir] * factor;
         }
     }
+
+
     
 
 
@@ -280,7 +341,7 @@ void Stochastic_Iter::sum_stoband()
 double Stochastic_Iter:: root_fd(double e)
 {
     double e_mu = (e - mu) / Occupy::gaussian_parameter ;
-    if(e_mu > 200)
+    if(e_mu > 72)
         return 0;
     else
         return 1 / sqrt(1 + exp(e_mu));
@@ -291,7 +352,7 @@ double Stochastic_Iter:: nroot_fd(double e)
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
     double ne_mu = (e * DeltaE + Ebar - mu) / Occupy::gaussian_parameter ;
-    if(ne_mu > 200)
+    if(ne_mu > 72)
         return 0;
     else
         return 1 / sqrt(1 + exp(ne_mu));
@@ -300,7 +361,7 @@ double Stochastic_Iter:: nroot_fd(double e)
 double Stochastic_Iter:: fd(double e)
 {
     double e_mu = (e - mu) / Occupy::gaussian_parameter ;
-    if(e_mu > 100)
+    if(e_mu > 36)
         return 0;
     else
         return 1 / (1 + exp(e_mu));
@@ -311,11 +372,39 @@ double Stochastic_Iter:: nfd(double e)
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
     double ne_mu = (e * DeltaE + Ebar - mu) / Occupy::gaussian_parameter ;
-    if(ne_mu > 100)
+    if(ne_mu > 36)
         return 0;
     else
         return 1 / (1 + exp(ne_mu));
 }
+
+double Stochastic_Iter:: fdlnfd(double e)
+{
+    double e_mu = (e - mu) / Occupy::gaussian_parameter ;
+    double f = 1 / (1 + exp(e_mu));
+    if(e_mu > 36)
+        return 0;
+    else
+    {
+        return (f * log(f) + (1.0-f) * log(1.0-f)); 
+    }
+}
+
+double Stochastic_Iter:: nfdlnfd(double e)
+{
+    double Ebar = (Emin + Emax)/2;
+	double DeltaE = (Emax - Emin)/2;
+    double ne_mu = (e * DeltaE + Ebar - mu) / Occupy::gaussian_parameter ;
+    double f = 1 / (1 + exp(ne_mu));
+    if(ne_mu > 36)
+        return 0;
+    else
+    {
+        return (f * log(f) + (1-f) * log(1-f)); 
+    }
+}
+
+
  void Stochastic_Iter:: test()
  {
      //=====================test============================
