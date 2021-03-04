@@ -2,6 +2,7 @@
 #include "global.h"
 
 
+
 Stochastic_Chebychev::Stochastic_Chebychev()
 {
     initplan = false;
@@ -137,25 +138,35 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
     arrayn = new complex<double> [ndim];
     arrayn_1 = new complex<double> [ndim];
 
-    DCOPY(wavein, arrayn_1, ndim);
+    //DCOPY(wavein, arrayn_1, ndim);
+
+    LapackConnector::copy(ndim,wavein,1,arrayn_1,1);
     tfun(arrayn_1, arrayn);
 
-    ZEROS(polyvalue,norder);
-    //0- & 1-st order
-    for(int i = 0; i < ndim; ++i) 
-    {
-        polyvalue[0] += real(conj(wavein[i]) * wavein[i]);// 0-th order : <wavein | wavein> = ndim
-        polyvalue[1] += real(conj(wavein[i]) * arrayn[i]);// 1-st order : <wavein | tfun | wavein>
-    }
+    int inc =1 ;
+    complex<double> overlap;
+    zdotc_(&overlap,&ndim,wavein,&inc,wavein,&inc);
+    polyvalue[0] = overlap.real();
+    zdotc_(&overlap,&ndim,wavein,&inc,arrayn,&inc);
+    polyvalue[1] = overlap.real();  
+    //ZEROS(polyvalue,norder);
+    ////0- & 1-st order
+    //for(int i = 0; i < ndim; ++i) 
+    //{
+    //    polyvalue[0] += real(conj(wavein[i]) * wavein[i]);// 0-th order : <wavein | wavein> = ndim
+    //    polyvalue[1] += real(conj(wavein[i]) * arrayn[i]);// 1-st order : <wavein | tfun | wavein>
+    //}
 
     //more than 1-st orders
     for(int ior = 2; ior < norder; ++ior)
     {
         recurs(arraynp1, arrayn, arrayn_1, tfun, ndim);
-        for(int i = 0; i < ndim; ++i) // n-th order : <wavein | T_n(tfun) | wavein>
-        {
-            polyvalue[ior] += real(conj(wavein[i]) * arraynp1[i]);
-        }
+        zdotc_(&overlap,&ndim,wavein,&inc,arraynp1,&inc);
+        polyvalue[ior] = overlap.real();
+        //for(int i = 0; i < ndim; ++i) // n-th order : <wavein | T_n(tfun) | wavein>
+        //{
+        //    polyvalue[ior] += real(conj(wavein[i]) * arraynp1[i]);
+        //}
         
         complex<double>* tem = arrayn_1;
         arrayn_1 = arrayn;

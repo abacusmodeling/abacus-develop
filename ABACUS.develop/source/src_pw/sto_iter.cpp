@@ -181,10 +181,11 @@ void Stochastic_Iter:: sumpolyval()
                 pchi = &STO_WF.chi0[ik](ichi,0);
             }
             stoche.calpolyval(stohchi.hchi_real, nrxx, pchi);
-            for(int ior = 0; ior < norder; ++ior)
-            {
-                spolyv[ior] += stoche.polyvalue[ior];
-            }
+            LapackConnector::axpy(norder,1,stoche.polyvalue,1,spolyv,1);
+            //for(int ior = 0; ior < norder; ++ior)
+            //{
+            //    spolyv[ior] += stoche.polyvalue[ior];
+            //}
         }
     }
 
@@ -205,12 +206,13 @@ double Stochastic_Iter::calne()
     KS_ne = 0;
     for(int ikk = 0; ikk < nkk; ++ikk)
     {
-        double stok_ne = 0;
-        for(int ior = 0; ior < norder; ++ior)
-        {
-            stok_ne += stoche.coef[ior] * spolyv[ior];
-            //cout<<stoche.coef[ior]<<" "; 
-        }
+        double stok_ne = LapackConnector::dot(norder,stoche.coef,1,spolyv,1);
+        //double stok_ne = 0;
+        //for(int ior = 0; ior < norder; ++ior)
+        //{
+        //    stok_ne += stoche.coef[ior] * spolyv[ior];
+        //    //cout<<stoche.coef[ior]<<" "; 
+        //}
         //cout<<endl;
         //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
         if(NBANDS > 0)
@@ -245,11 +247,12 @@ void Stochastic_Iter::sum_stoband()
 
     for(int ikk = 0; ikk < nkk; ++ikk)
     {
-        double stok_demet=0;
-        for(int ior = 0; ior < norder; ++ior)
-        {
-            stok_demet += stoche.coef[ior] * spolyv[ior];
-        }
+        double stok_demet = LapackConnector::dot(norder,stoche.coef,1,spolyv,1);
+        //double stok_demet=0;
+        //for(int ior = 0; ior < norder; ++ior)
+        //{
+        //    stok_demet += stoche.coef[ior] * spolyv[ior];
+        //}
         //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
         //cout<<endl;
         if(NBANDS > 0)
@@ -325,10 +328,11 @@ void Stochastic_Iter::sum_stoband()
     double factor = (targetne - KS_ne) / sto_ne / dr_3;
     for(int is = 0 ; is < 1; ++is)
     {
-        for(int ir = 0; ir < nrxx ; ++ir)
-        {
-            CHR.rho[is][ir] += sto_rho[ir] * factor;
-        }
+        LapackConnector::axpy(nrxx, factor,sto_rho,1,CHR.rho[is],1);
+        //for(int ir = 0; ir < nrxx ; ++ir)
+        //{
+        //    CHR.rho[is][ir] += sto_rho[ir] * factor;
+        //}
     }
 
 

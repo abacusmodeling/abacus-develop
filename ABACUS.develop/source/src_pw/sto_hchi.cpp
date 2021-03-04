@@ -84,7 +84,8 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	TITLE("Stochastic_hchi","orthogonal_to_psi0");
 	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
-	DCOPY(wfin,rp_chi,nrxx);
+	//DCOPY(wfin,rp_chi,nrxx);
+	LapackConnector::copy(nrxx,wfin,1,rp_chi,1);
 	fftw_execute(pf);
 	
 	complex<double> * chig = new complex<double> [wf.npw];
@@ -95,18 +96,21 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 
 	//orthogonal part
 	complex<double> sum;
+	int inc=1;
 	for(int iksb = 0; iksb < NBANDS; ++iksb)
 	{
 		complex<double> *kswf = &wf.evc[ikk](iksb,0); 
-		sum=0;
-		for(int ig = 0; ig < wf.npw; ++ig)
-		{
-			sum += conj(kswf[ig]) * chig[ig];
-		}
-		for(int ig = 0; ig < wf.npw; ++ig)
-		{
-			chig[ig] -= sum*kswf[ig];
-		}
+		zdotc_(&sum,&wf.npw,kswf,&inc,chig,&inc);
+		//for(int ig = 0; ig < wf.npw; ++ig)
+		//{
+		//	sum += conj(kswf[ig]) * chig[ig];
+		//}
+//
+		LapackConnector::axpy(wf.npw,-sum,kswf,1,chig,1);
+		//for(int ig = 0; ig < wf.npw; ++ig)
+		//{
+		//	chig[ig] -= sum*kswf[ig];
+		//}
 	}
 
 	//test orthogonal in reciprocal space
@@ -126,13 +130,18 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	{
 		rp_chi[GRA_index[ig]] = chig[ig];
 	}
-	DCOPY(rp_chi,rl_chi,nrxx);
+	//DCOPY(rp_chi,rl_chi,nrxx);
+	LapackConnector::copy(nrxx,rp_chi,1,rl_chi,1);
 
 	fftw_execute(pb);
-	for(int ir = 0; ir < nrxx ; ++ir)
-	{
-		wfout[ir] = rl_chi[ir] / nrxx;
-	}
+
+	LapackConnector::copy(nrxx,rl_chi,1,wfout,1);
+	LapackConnector::scal(nrxx,1/double(nrxx),wfout,1);
+	//for(int ir = 0; ir < nrxx ; ++ir)
+	//{
+	//	wfout[ir] = rl_chi[ir] / nrxx;
+	//}
+	
 
 	/*//test orthogonal in real space
 	complex<double> overlap;
@@ -178,7 +187,8 @@ void Stochastic_hchi:: hchi_real(complex<double>*chi_in, complex<double> *hchi)
 	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
 
 	ZEROS(hchi,nrxx);
-	DCOPY(chi_in, rp_chi, nrxx);
+	//DCOPY(chi_in, rp_chi, nrxx);
+	LapackConnector::copy(nrxx,chi_in,1,rp_chi,1);
 	fftw_execute(pf);
 
 	complex<double> * chig = new complex<double> [wf.npw];
@@ -244,6 +254,7 @@ void Stochastic_hchi:: hchi_real(complex<double>*chi_in, complex<double> *hchi)
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
+	int inc = 1;
 	if(VNL_IN_H)
 	{
 		if ( ppcell.nkb > 0)
@@ -254,14 +265,11 @@ void Stochastic_hchi:: hchi_real(complex<double>*chi_in, complex<double> *hchi)
 			for (int i=0;i< ppcell.nkb;++i)
 			{
 				const complex<double>* p = &ppcell.vkb(i,0);
-				for (int ig=0; ig< wf.npw; ++ig)
-				{
-					if(NSPIN!=4) becp[i] += chig[ig] * conj( p[ig] );
-					else
-					{
-						//We didnot consider it temporarily.
-					}	
-				} 
+				zdotc_(&becp[i],&wf.npw,p,&inc,chig,&inc);
+				//for (int ig=0; ig< wf.npw; ++ig)
+				//{
+				//	if(NSPIN!=4) becp[i] += chig[ig] * conj( p[ig] );
+				//} 
 			}
 
 			//Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * NPOL);
@@ -299,10 +307,11 @@ void Stochastic_hchi:: hchi_real(complex<double>*chi_in, complex<double> *hchi)
 				for(int i=0; i<ppcell.nkb; ++i)
 				{
 					complex<double>* p = &ppcell.vkb(i,0);
-					for(int ig=0; ig< wf.npw; ++ig)
-					{
-						chig[ig] += Ps[i] * p[ig];
-					}
+					LapackConnector::axpy(wf.npw,Ps[i],p,1,chig,1);
+					//for(int ig=0; ig< wf.npw; ++ig)
+					//{
+					//	chig[ig] += Ps[i] * p[ig];
+					//}
 				}
 			delete[] becp;
 			delete[] Ps;
@@ -318,19 +327,24 @@ void Stochastic_hchi:: hchi_real(complex<double>*chi_in, complex<double> *hchi)
 	// (4) Conver (2) & (3) in Reciprocal space to Real one
 	//------------------------------------
 	fftw_execute(pb);
-	for(int i = 0; i < nrxx; ++i)
-	{
-		hchi[i] += rl_chi[i] / nrxx;
-	}
 
-	
 	double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
-	for(int i = 0; i < nrxx; ++i)
-	{
-		hchi[i] = (hchi[i] - Ebar * chi_in[i]) / DeltaE;
-	}
+
+	LapackConnector::axpy(nrxx,1/double(nrxx),rl_chi,1,hchi,1);
+	LapackConnector::axpy(nrxx,-Ebar,chi_in,1,hchi,1);
+	LapackConnector::scal(nrxx,1/DeltaE,hchi,1);
+	//for(int i = 0; i < nrxx; ++i)
+	//{
+	//	hchi[i] += rl_chi[i] / nrxx;
+	//}
+	//for(int i = 0; i < nrxx; ++i)
+	//{
+	//	hchi[i] = (hchi[i] - Ebar * chi_in[i]) / DeltaE;
+	//}
+
 	delete [] chig;
+	
 	//test Emax & Emin
 	//------------------------------------------------------------
 	//double sum1 = 0;

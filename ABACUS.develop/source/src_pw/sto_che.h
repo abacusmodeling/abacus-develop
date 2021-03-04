@@ -65,7 +65,15 @@ void Stochastic_Chebychev:: calresult(void tfun(T *in, T *out), int &ndim, T *wa
     arraynp1 = new T [ndim];
     arrayn = new T [ndim];
     arrayn_1 = new T [ndim];
-    DCOPY(wavein, arrayn_1, ndim);
+    if(typeid(T)==typeid(complex<double>))
+        LapackConnector::copy(ndim,(complex<double> *)wavein,1,(complex<double>*)arrayn_1,1);
+    else if (typeid(T)==typeid(double))
+        LapackConnector::copy(ndim,(double *)wavein,1,(double*)arrayn_1,1);
+    else
+    {
+        DCOPY(wavein, arrayn_1, ndim);
+    }
+    
     tfun(arrayn_1, arrayn);
     
     //0- & 1-st order
