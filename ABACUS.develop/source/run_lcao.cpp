@@ -100,9 +100,6 @@ void Run_lcao::lcao_line(void)
     pot.allocate(pw.nrxx);
     DONE(ofs_running,"INIT POTENTIAL");
 
-    // declration
-    enum use_wf_coef {SOME_PW, ALL_LO};
-    use_wf_coef uoc = ALL_LO;
 
 	// Peize Lin add 2018-11-30
 	if(CALCULATION=="nscf")
@@ -117,33 +114,16 @@ void Run_lcao::lcao_line(void)
 		}
 	}
 
-	switch (uoc)
-	{
-		case ALL_LO:
-			// Init the local wave functions.
-			wf.init_local();
-			// Init the FFT.
-			UFFT.allocate();
-			// Init the local part of NC pseudopotential.
-			ppcell.init_vloc();
-			// Init the potential.
-			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
-			break;
 
-		case SOME_PW:
-			wf.allocate(kv.nks);
-			UFFT.allocate();
-			ppcell.init(ucell.ntype);
-    		hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
-			ppcell.init_vloc();
-			ppcell.init_vnl();
-			pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
-			pot.newd();//once
-			DONE(ofs_running,"INIT POTENTIAL");
-			wf.wfcinit();
-			DONE(ofs_running,"INIT SOME_PW");
-			break;
-	}
+	// Init the local wave functions.
+	wf.init_local();
+	// Init the FFT.
+	UFFT.allocate();
+	// Init the local part of NC pseudopotential.
+	ppcell.init_vloc();
+	// Init the potential.
+	pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
+
 
     // Peize Lin 2016-12-03
 	if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")

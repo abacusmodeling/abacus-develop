@@ -8,7 +8,6 @@ double Make_Overlap_Table::dr = -1.0;
 
 Make_Overlap_Table::Make_Overlap_Table()
 {
-//	cout << " \n Make_Overlap_Table::Make_Overlap_Table" << endl;
 	destroy_sr = false;
 	destroy_tr = false;
 	destroy_nr = false;
