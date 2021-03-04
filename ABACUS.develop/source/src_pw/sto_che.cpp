@@ -21,6 +21,7 @@ Stochastic_Chebychev::~Stochastic_Chebychev()
     fftw_free(ccoef);
     fftw_free(dcoef);
     delete [] polyvalue;
+    delete [] coef;
 }
 void Stochastic_Chebychev:: init()
 {
@@ -31,9 +32,10 @@ void Stochastic_Chebychev:: init()
     {
         norder2 = 2 * norder * extend;
         ccoef = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * norder2);//new complex<double> [norder2];
-        coef = (double *) fftw_malloc(sizeof(double) * norder2);
-        plancoef = fftw_plan_dft_r2c_1d(norder2, coef, ccoef, FFTW_MEASURE);
+        dcoef = (double *) fftw_malloc(sizeof(double) * norder2);
+        plancoef = fftw_plan_dft_r2c_1d(norder2, dcoef, ccoef, FFTW_ESTIMATE);
         polyvalue = new double [norder];
+        coef = new double [norder];
         initcoef = true;
         initplan = true;
     }
@@ -53,11 +55,8 @@ void Stochastic_Chebychev:: calcoef(double fun(double))
     //(M)iddle point integral method part
     for(int i = 0; i < norder2; ++i)
     {
-        coef[i]=fun(cos((i+0.5)*TWO_PI/norder2));
-        //cout << resetiosflags(ios::fixed);
-        //cout<<coef[i]<<" ";
+        dcoef[i]=fun(cos((i+0.5)*TWO_PI/norder2));
     }
-    //cout<<endl;
     fftw_execute(plancoef);
     complex<double> ui(0,1);
     for(int i = 0; i<norder; ++i)
@@ -87,9 +86,8 @@ void Stochastic_Chebychev:: calcoef(double fun(double))
         }
         else
         {
-            coef[i] = real(exp(ui*i*PI/norder2) * pcoef[i]) * 2 / norder2;
+            coef[i] += real(pcoef[i]) / norder2 * 2 / 3;
         }
-        //cout<<ccoef[i][0]<<" ";
     }
     getcoef = true;
 }
