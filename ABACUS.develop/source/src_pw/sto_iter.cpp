@@ -53,22 +53,23 @@ void Stochastic_Iter:: itermu( int &iter)
     //if(NBANDS > 0)
     //{
     //    Emin = wf.ekb[0][0];}
-    //Emax = pw.ecutwfc * 20-250;
-    Emax = 750;
-    Emin = -10;
+
+    Emax = STO_WF.emax_sto;
+    Emin = STO_WF.emin_sto;
     Stochastic_hchi:: Emin = this->Emin;
     Stochastic_hchi:: Emax = this->Emax;
+    
     double dmu;
     if(iter == 1)
     {
         dmu = 2;
-        th_ne = DRHO2 * 1e-5 * ucell.nelec;
+        th_ne = DRHO2 * 1e-2 * ucell.nelec;
         cout<<"th_ne "<<th_ne<<endl;
     }
     else
     {
         dmu = 0.1;
-        th_ne = DRHO2 * 1e-3 * ucell.nelec;
+        th_ne = DRHO2 * 1e-4 * ucell.nelec;
     }
     sumpolyval();
 
@@ -89,7 +90,8 @@ void Stochastic_Iter:: itermu( int &iter)
     {
         ne3 = calne();
         cout<<"mu: "<<mu<<" ; ne: "<<ne3<<endl;
-    }*/
+    }
+    exit(0);*/
     while(ne1 > targetne)
     {
         ne2 = ne1;
@@ -98,6 +100,7 @@ void Stochastic_Iter:: itermu( int &iter)
         mu = mu1;
         ne1 = calne();
         cout<<"Reset mu1 from "<<mu1+dmu<<" to "<<mu1<<endl;
+        dmu *= 2;
     }
     while(ne2 < targetne)
     {
@@ -107,6 +110,7 @@ void Stochastic_Iter:: itermu( int &iter)
         mu = mu2;
         ne2 = calne();
         cout<<"Reset mu2 form "<<mu2-dmu<<" to "<<mu2<<endl;
+        dmu *= 2;
     }
 
     int count = 0;
@@ -134,7 +138,6 @@ void Stochastic_Iter:: itermu( int &iter)
             cout<<"Fermi energy cannot be converged."<<endl;
         }
     }
-    cout.precision(10);
     cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<endl;
 
     en.ef = mu = mu0 = mu3;
@@ -316,7 +319,8 @@ void Stochastic_Iter::sum_stoband()
     en.eband += sto_eband;
     en.demet += stodemet;
     en.demet *= Occupy::gaussian_parameter;
-
+    
+    cout.precision(12);
     cout<<"Normalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
     double factor = (targetne - KS_ne) / sto_ne / dr_3;
     for(int is = 0 ; is < 1; ++is)
@@ -386,11 +390,13 @@ double Stochastic_Iter:: nfd(double e)
 double Stochastic_Iter:: fdlnfd(double e)
 {
     double e_mu = (e - mu) / Occupy::gaussian_parameter ;
-    double f = 1 / (1 + exp(e_mu));
     if(e_mu > 36)
+        return 0;
+    else if(e_mu < -36)
         return 0;
     else
     {
+        double f = 1 / (1 + exp(e_mu));
         return (f * log(f) + (1.0-f) * log(1.0-f)); 
     }
 }
@@ -400,12 +406,14 @@ double Stochastic_Iter:: nfdlnfd(double e)
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
     double ne_mu = (e * DeltaE + Ebar - mu) / Occupy::gaussian_parameter ;
-    double f = 1 / (1 + exp(ne_mu));
     if(ne_mu > 36)
+        return 0;
+    else if(ne_mu < -36)
         return 0;
     else
     {
-        return (f * log(f) + (1-f) * log(1-f)); 
+        double f = 1 / (1 + exp(ne_mu));
+        return f * log(f) + (1-f) * log(1-f); 
     }
 }
 

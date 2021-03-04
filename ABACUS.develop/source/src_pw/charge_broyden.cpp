@@ -110,7 +110,7 @@ void Charge_Broyden::mix_rho
 	//if(LINEAR_SCALING && LOCAL_BASIS) xiaohui modify 2013-09-01
 	if(BASIS_TYPE=="lcao" || CALCULATION=="scf-sto" || CALCULATION=="relax-sto" || CALCULATION=="md-sto" )//qianrui
 	{
-		dr2 = dr22;	
+		//dr2 = dr22;	
 	}
 	cout<<"dr2 "<<dr2<<" dr22 "<<dr22<<endl;
     if ( dr2 < diago_error )

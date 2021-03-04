@@ -135,8 +135,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #endif
 
 		//(4) calculate fermi energy.
-		stoiter.init();
-				
+		stoiter.init();		
 		stoiter.test();
 		stoiter.itermu(iter);
 

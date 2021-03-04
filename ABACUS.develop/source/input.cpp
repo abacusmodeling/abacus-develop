@@ -581,6 +581,14 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, nche_sto);
         }
+		else if (strcmp("emax_sto", word) == 0)
+        {
+            read_value(ifs, emax_sto);
+        }
+		else if (strcmp("emin_sto", word) == 0)
+        {
+            read_value(ifs, emin_sto);
+        }
         else if (strcmp("npool", word) == 0)// number of pools
         {
             read_value(ifs, npool);
@@ -1945,6 +1953,8 @@ void Input::Bcast()
 	Parallel_Common::bcast_int( nbands_sto );
     Parallel_Common::bcast_int( nbands_istate );
 	Parallel_Common::bcast_int( nche_sto );
+	Parallel_Common::bcast_double( emax_sto );
+	Parallel_Common::bcast_double( emin_sto );
 	Parallel_Common::bcast_int( npool );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );

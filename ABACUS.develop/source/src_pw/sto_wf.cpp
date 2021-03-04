@@ -6,6 +6,8 @@ Stochastic_WF::Stochastic_WF()
 {
     chiortho  = new ComplexMatrix[1];
     chi0  = new ComplexMatrix[1];
+     emax_sto = 1;
+     emin_sto = -1;
 }
 
 Stochastic_WF::~Stochastic_WF()
@@ -19,6 +21,7 @@ void Stochastic_WF::init()
     //wait for init
     int nrxx = pw.nrxx;
     int nx = pw.nx,ny = pw.ny,nz = pw.nz;
+   
 
     //distribute nchi for each process
     nchip = int(nchi/NPOOL);

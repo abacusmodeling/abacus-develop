@@ -31,6 +31,7 @@ class Stochastic_WF
 	int nbands_diag; // number of bands obtained from diagonalization
 
 	int nbands_total; // number of bands in total, nbands_total=nchi+nbands_diag;
+	double emax_sto, emin_sto;
 
 	protected:
 
