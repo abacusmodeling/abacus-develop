@@ -181,11 +181,11 @@ void Stochastic_Iter:: sumpolyval()
                 pchi = &STO_WF.chi0[ik](ichi,0);
             }
             stoche.calpolyval(stohchi.hchi_real, nrxx, pchi);
-            LapackConnector::axpy(norder,1,stoche.polyvalue,1,spolyv,1);
-            //for(int ior = 0; ior < norder; ++ior)
-            //{
-            //    spolyv[ior] += stoche.polyvalue[ior];
-            //}
+            //LapackConnector::axpy(norder,1,stoche.polyvalue,1,spolyv,1);
+            for(int ior = 0; ior < norder; ++ior)
+            {
+                spolyv[ior] += stoche.polyvalue[ior];
+            }
         }
     }
 
@@ -328,11 +328,11 @@ void Stochastic_Iter::sum_stoband()
     double factor = (targetne - KS_ne) / sto_ne / dr_3;
     for(int is = 0 ; is < 1; ++is)
     {
-        LapackConnector::axpy(nrxx, factor,sto_rho,1,CHR.rho[is],1);
-        //for(int ir = 0; ir < nrxx ; ++ir)
-        //{
-        //    CHR.rho[is][ir] += sto_rho[ir] * factor;
-        //}
+        //LapackConnector::axpy(nrxx, factor,sto_rho,1,CHR.rho[is],1);
+        for(int ir = 0; ir < nrxx ; ++ir)
+        {
+            CHR.rho[is][ir] += sto_rho[ir] * factor;
+        }
     }
 
 

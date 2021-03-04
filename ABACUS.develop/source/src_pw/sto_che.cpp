@@ -51,7 +51,7 @@ void Stochastic_Chebychev:: calcoef(double fun(double))
 {
     if(!initcoef) WARNING_QUIT("Stochastic_Chebychev", "Please init coef first!");
     complex<double> *pcoef = (complex<double> *)ccoef;
-    //three point = 2/3 M + 1/2 T;
+    //three point = 2/3 M + 1/3 T;
 
     //(M)iddle point integral method part
     for(int i = 0; i < norder2; ++i)
@@ -138,9 +138,9 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
     arrayn = new complex<double> [ndim];
     arrayn_1 = new complex<double> [ndim];
 
-    //DCOPY(wavein, arrayn_1, ndim);
+    DCOPY(wavein, arrayn_1, ndim);
+    //LapackConnector::copy(ndim,wavein,1,arrayn_1,1);
 
-    LapackConnector::copy(ndim,wavein,1,arrayn_1,1);
     tfun(arrayn_1, arrayn);
 
     int inc =1 ;
