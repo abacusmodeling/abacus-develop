@@ -150,6 +150,9 @@ LCAO_evolve.o\
 ylm.o\
 FORCE_STRESS.o\
 FORCE_gamma.o\
+FORCE_gamma_edm.o\
+FORCE_gamma_vl.o\
+FORCE_gamma_tvnl.o\
 FORCE_k.o\
 parallel_orbitals.o \
 global_fp.o \
