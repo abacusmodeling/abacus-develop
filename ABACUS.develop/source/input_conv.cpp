@@ -4,7 +4,7 @@
 #include "input_conv.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_io/optical.h"
-#include "src_lcao/force_stress_lcao.h"
+#include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ORB_read.h"
 #include "src_pw/efield.h"

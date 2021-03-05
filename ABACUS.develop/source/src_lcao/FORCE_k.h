@@ -3,7 +3,7 @@
 
 #include "../src_pw/tools.h"
 #include "LCAO_matrix.h" 
-#include "force_lcao_gamma.h"
+#include "FORCE_gamma.h"
 
 class Force_LCAO_k : public Force_LCAO_gamma
 {

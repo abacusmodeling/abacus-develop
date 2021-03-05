@@ -2,7 +2,7 @@
 #define FORCE_STRESS_LCAO_H
 
 #include "../src_pw/tools.h"
-#include "./force_lcao_k.h"
+#include "FORCE_k.h"
 //#include "./force_lcao_gamma.h"
 #include "../src_pw/stress_func.h"
 #include "../input_conv.h"
@@ -43,11 +43,13 @@ class Force_Stress_LCAO
 		matrix& scs);
 
 	void forceSymmetry(matrix& fcs);
+
 	void calForcePwPart(
 		matrix& fvl_dvl, 
 		matrix& fewalds, 
 		matrix& fcc, 
 		matrix& fscc);
+
 	void calForceStressIntegralPart(
 		const bool isGammaOnly,
 		const bool isforce,
@@ -60,6 +62,7 @@ class Force_Stress_LCAO
 		matrix& stvnl_dphi,
 		matrix& svnl_dbeta,
 		matrix& svl_dphi);
+
 	void calStressPwPart(
 		matrix& sigmadvl,
 		matrix& sigmahar,

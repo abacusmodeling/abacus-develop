@@ -3,7 +3,7 @@
 #include "src_parallel/parallel_orbitals.h"
 #include "src_pdiag/pdiag_double.h"
 #include "LCAO_nnr.h"
-#include "force_stress_lcao.h"
+#include "FORCE_STRESS.h"
 #include "src_global/global_function.h"
 #include "src_io/hs_matrix.h"
 #include "src_io/cal_r_overlap_R.h"

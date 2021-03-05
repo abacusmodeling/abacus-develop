@@ -1,4 +1,4 @@
-#include "force_lcao_k.h"
+#include "FORCE_k.h"
 #include "../src_pw/global.h"
 #include "dftu.h"  //Quxin add for DFT+U on 20201029
 

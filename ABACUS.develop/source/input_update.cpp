@@ -8,7 +8,7 @@
 #include "input.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_io/optical.h"
-#include "src_lcao/force_stress_lcao.h"
+#include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/global_fp.h" // mohan update 2021-01-30
 

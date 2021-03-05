@@ -1,4 +1,4 @@
-#include "force_lcao_gamma.h"
+#include "FORCE_gamma.h"
 #include "../src_pw/global.h"
 #include "dftu.h"  //Quxin add for DFT+U on 20201029
 

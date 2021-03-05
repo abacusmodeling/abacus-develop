@@ -1,4 +1,4 @@
-#include "./force_stress_lcao.h"
+#include "FORCE_STRESS.h"
 #include "../src_pw/global.h"
 #include "../src_pw/potential_libxc.h"
 #include "./dftu.h"  //Quxin add for DFT+U on 20201029
