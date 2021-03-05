@@ -4,7 +4,7 @@
 #include "input_conv.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_io/optical.h"
-#include "src_lcao/force_lcao.h"
+#include "src_lcao/force_stress_lcao.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ORB_read.h"
 #include "src_pw/efield.h"
@@ -70,7 +70,7 @@ void Input_Conv::Convert(void)
     PRESS1 = INPUT.press1;
     PRESS2 = INPUT.press2;
     PRESS3 = INPUT.press3;
-	Force_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
+	Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 
 	BFGS_Basic::w1 = INPUT.bfgs_w1;
 	BFGS_Basic::w2 = INPUT.bfgs_w2;

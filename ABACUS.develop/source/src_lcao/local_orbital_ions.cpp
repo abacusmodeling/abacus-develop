@@ -3,8 +3,7 @@
 #include "src_parallel/parallel_orbitals.h"
 #include "src_pdiag/pdiag_double.h"
 #include "LCAO_nnr.h"
-#include "force_lcao.h"
-#include "stress_lcao.h"
+#include "force_stress_lcao.h"
 #include "src_global/global_function.h"
 #include "src_io/hs_matrix.h"
 #include "src_io/cal_r_overlap_R.h"
@@ -324,15 +323,16 @@ bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &st
         return 1;
     }
     timer::tick("Local_Orbital_Ions","force_stress",'D');
-
+	matrix fcs;
+	matrix scs;
+	Force_Stress_LCAO FSL;
+	FSL.allocate (); 
+	FSL.getForceStress(FORCE, STRESS, TEST_FORCE, TEST_STRESS, fcs, scs);
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
 	//--------------------------------------------------
     if(FORCE && !STRESS)
     {
-        Force_LCAO FL;
-        FL.allocate (); 
-        FL.start_force();
 
 #ifdef __MPI //2015-10-01, xiaohui
         atom_arrange::delete_vector( SEARCH_RADIUS );
@@ -340,7 +340,7 @@ bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &st
 
         if(CALCULATION=="relax") 
         {
-            IMM.cal_movement(istep, istep, FL.fcs, en.etot);
+            IMM.cal_movement(istep, istep, fcs, en.etot);
 
             if(IMM.get_converged() || (istep==NSTEP))
             {
@@ -396,17 +396,13 @@ xiaohui modify 2014-08-09*/
 
     if(!FORCE&&STRESS)
     {
-        Force_LCAO FL; // init the class.
-		matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
-		stress_lcao.create(3,3);
-		FL.cal_stress(stress_lcao);
 
 #ifdef __MPI
 		atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
 		if(CALCULATION=="cell-relax")
 		{
-           	LCM.cal_lattice_change(stress_step, stress_lcao, en.etot);
+           	LCM.cal_lattice_change(stress_step, scs, en.etot);
            	converged_stress = LCM.get_converged();
            	if(converged_stress)
            	{
@@ -429,9 +425,6 @@ xiaohui modify 2014-08-09*/
 
     if(FORCE&&STRESS)
     {
-        Force_LCAO FL; // init the class.
-        FL.allocate (); 
-        FL.start_force();
 
 //#ifdef __MPI
         atom_arrange::delete_vector( SEARCH_RADIUS );
@@ -440,19 +433,16 @@ xiaohui modify 2014-08-09*/
         //if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
-            IMM.cal_movement(istep, force_step, FL.fcs, en.etot);
+            IMM.cal_movement(istep, force_step, fcs, en.etot);
 
             if(IMM.get_converged())
             {
                 force_step = 1;
 
-                matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
-                stress_lcao.create(3,3);
-                FL.cal_stress(stress_lcao);
 
 			    if(CALCULATION=="cell-relax")
 			    {
-            	    LCM.cal_lattice_change(stress_step, stress_lcao, en.etot);
+            	    LCM.cal_lattice_change(stress_step, scs, en.etot);
             	    converged_stress = LCM.get_converged();
             	    if(converged_stress)
             	    {
@@ -499,10 +489,6 @@ xiaohui modify 2014-08-09*/
         }
         else
         {
-            matrix stress_lcao;//this is the stress matrix same as src_pw/ion.cpp
-            stress_lcao.create(3,3);
-            FL.cal_stress(stress_lcao);
-
             return 1;
         }
     }

@@ -8,32 +8,48 @@
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
-Forces::Forces(const int natom): nat(natom)
+Forces::Forces()
 {
 }
 
 Forces::~Forces() {}
 
 #include "efield.h"
-void Forces::init()
+void Forces::init(matrix& force)
 {
-    TITLE("Forces", "init");
-    this->force.create(nat, 3);
+	TITLE("Forces", "init");
+	this->nat = ucell.nat;
+	force.create(nat, 3);
 	
-    this->cal_force_loc();
-    this->cal_force_ew();
-    this->cal_force_nl();
-	this->cal_force_cc();
-	this->cal_force_scc();
+	matrix forcelc(nat, 3);
+	matrix forceion(nat, 3);
+	matrix forcecc(nat, 3);
+	matrix forcenl(nat, 3);
+	matrix forcescc(nat, 3);
+    this->cal_force_loc(forcelc);
+    this->cal_force_ew(forceion);
+    this->cal_force_nl(forcenl);
+	this->cal_force_cc(forcecc);
+	this->cal_force_scc(forcescc);
 
-	matrix stress_vdw_pw(3,3);//.create(3,3);
+	matrix stress_vdw_pw;//.create(3,3);
+    matrix force_vdw;
+    force_vdw.create(nat, 3);
 	if(vdwd2.vdwD2)													//Peize Lin add 2014-04-03, update 2019-04-26
 	{
-		vdwd2.force(stress_vdw_pw, STRESS);
+		vdwd2.force(1, 0, force_vdw, stress_vdw_pw);
+		if(TEST_FORCE)
+		{
+			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
+		}
 	}
 	else if(vdwd3.vdwD3)													//jiyy add 2019-05-18
 	{
-		vdwd3.force(stress_vdw_pw, STRESS);
+		vdwd3.force(1, 0, force_vdw, stress_vdw_pw);
+		if(TEST_FORCE)
+		{
+			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
+		}
 	}
     //impose total force = 0
     int iat = 0;
@@ -61,25 +77,10 @@ void Forces::init()
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);
 
-				if(vdwd2.vdwD2)											//Peize Lin add 2014-04-03, update 2019-04-26
+				if(vdwd2.vdwD2 || vdwd3.vdwD3)		//linpz and jiyy added vdw force, modified by zhengdy
 				{
-					switch(ipol)
-					{
-						case 0:	force(iat,ipol) += vdwd2.force_result[iat].x;	break;
-						case 1:	force(iat,ipol) += vdwd2.force_result[iat].y;	break;
-						case 2:	force(iat,ipol) += vdwd2.force_result[iat].z;	break;
-					}
-					
-				}
-				if(vdwd3.vdwD3)											//jiyy add 2019-05-18
-				{
-					switch(ipol)
-					{
-						case 0:	force(iat,ipol) += vdwd3.force_result[iat][0];	break;
-						case 1:	force(iat,ipol) += vdwd3.force_result[iat][1];	break;
-						case 2:	force(iat,ipol) += vdwd3.force_result[iat][2];	break;
-					}
-				}																													   
+                    force(iat, ipol) += force_vdw(iat, ipol);
+                }																										   
 					
 				if(EFIELD)
 				{
@@ -167,7 +168,7 @@ void Forces::init()
 		if(!ofs)
 		{
 			cout << "open FORCE.dat error !" <<endl;
-		}	
+		}
 		for(int iat=0; iat<ucell.nat; iat++)
 		{
 			ofs << "   " << force(iat,0)*Ry_to_eV / 0.529177 
@@ -321,10 +322,9 @@ void Forces::print(const string &name, const matrix &f, bool ry)
 }
 
 
-void Forces::cal_force_loc(void)
+void Forces::cal_force_loc(matrix& forcelc)
 {
 	timer::tick("Forces","cal_force_loc");
-    this->forcelc.create(nat, 3);
 
     complex<double> *aux = new complex<double>[pw.nrxx];
     ZEROS(aux, pw.nrxx);
@@ -348,7 +348,6 @@ void Forces::cal_force_loc(void)
 
 //  ofs_running << "\n ggs = " << pw.ggs[0];
 //  ofs_running << "\n gstart_here = " << gstart_here;
-
     int iat = 0;
     for (int it = 0;it < ucell.ntype;it++)
     {
@@ -366,25 +365,22 @@ void Forces::cal_force_loc(void)
             }
             for (int ipol = 0;ipol < 3;ipol++)
             {
-                this->forcelc(iat, ipol) *= (ucell.tpiba * ucell.omega);
+                forcelc(iat, ipol) *= (ucell.tpiba * ucell.omega);
             }
             ++iat;
         }
     }
-
     //this->print(ofs_running, "local forces", forcelc);
     Parallel_Reduce::reduce_double_pool(forcelc.c, forcelc.nr * forcelc.nc);
-
     delete[] aux;
 	timer::tick("Forces","cal_force_loc");
     return;
 }
 
 #include "H_Ewald_pw.h"
-void Forces::cal_force_ew(void)
+void Forces::cal_force_ew(matrix& forceion)
 {
 	timer::tick("Forces","cal_force_ew");
-    this->forceion.create(nat, 3);
 
     double fact = 2.0;
     complex<double> *aux = new complex<double> [pw.ngmc];
@@ -451,7 +447,7 @@ void Forces::cal_force_ew(void)
             }
             for (int ipol = 0;ipol < 3;ipol++)
             {
-                this->forceion(iat, ipol) *= ucell.atoms[it].zv * e2 * ucell.tpiba * TWO_PI / ucell.omega * fact;
+                forceion(iat, ipol) *= ucell.atoms[it].zv * e2 * ucell.tpiba * TWO_PI / ucell.omega * fact;
             }
 
 	//		cout << " atom" << iat << endl;
@@ -502,9 +498,9 @@ void Forces::cal_force_ew(void)
                                                 * (erfc(sqrt(alpha) * rr) / rr
                                     + sqrt(8.0 * alpha / TWO_PI) * exp(-1.0 * alpha * rr * rr)) * ucell.lat0;
 
-								this->forceion(iat1, 0) -= factor * r[n].x;
-                                this->forceion(iat1, 1) -= factor * r[n].y;
-                                this->forceion(iat1, 2) -= factor * r[n].z;
+								forceion(iat1, 0) -= factor * r[n].x;
+                                forceion(iat1, 1) -= factor * r[n].y;
+                                forceion(iat1, 2) -= factor * r[n].z;
 
 //								cout << " r.z=" << r[n].z << " r2=" << r2[n] << endl;
 						//		cout << " " << iat1 << " " << iat2 << " n=" << n
@@ -535,10 +531,8 @@ void Forces::cal_force_ew(void)
     return;
 }
 
-void Forces::cal_force_cc(void)
+void Forces::cal_force_cc(matrix& forcecc)
 {
-    this->forcecc.create(nat, 3);
-
 	// recalculate the exchange-correlation potential.
     matrix vxc(NSPIN, pw.nrxx);
     H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
@@ -623,12 +617,11 @@ void Forces::cal_force_cc(void)
 	return;
 }
 
-void Forces::cal_force_nl(void)
+void Forces::cal_force_nl(matrix& forcenl)
 {
 	TITLE("Forces","cal_force_nl");
 	timer::tick("Forces","cal_force_nl");
 
-    this->forcenl.create(nat, 3);
     const int nkb = ppcell.nkb;
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
@@ -774,10 +767,8 @@ void Forces::cal_force_nl(void)
     return;
 }
 
-void Forces::cal_force_scc(void)
+void Forces::cal_force_scc(matrix& forcescc)
 {
-    forcescc.create(nat, 3);
-
     complex<double>* psic = new complex<double> [pw.nrxx];
     ZEROS(psic, pw.nrxx);
 

@@ -46,12 +46,12 @@ class Gint_k : public Gint_k_init
 
 	// folding the < dphi_0 | V | phi_R> matrix to 
 	// < dphi_0i | V | phi_0j>
-	void folding_force(double** fvl_dphi,
+	void folding_force(matrix& fvl_dphi,
 			double* pvdpx, double* pvdpy, double* pvdpz);//mohan add 2012-1-6
 
 	// folding the < dphi_0 | V * R_beta | phi_R> matrix
 	// < dphi_0i | V | phi_0j>
-	void folding_stress(double** fvl_dphi, double svl_dphi[][3],
+	void folding_stress(matrix& fvl_dphi, matrix& svl_dphi,
 			double* pvdpx, double* pvdpy, double* pvdpz,
 			double* pvdp11, double* pvdp22, double* pvdp33, double* pvdp12, double* pvdp13, double* pvdp23);//zhengdy add 2016-10-18
 
@@ -67,8 +67,8 @@ class Gint_k : public Gint_k_init
 	// drive routine 
 	//>>>>>>>>>>>>>>>>>>>>
 	// calculate the force (many k-points).
-	void fvl_k_RealSpace(double** fvl_dphi, const double* vl);//mohan add 2011-06-19
-	void svl_k_RealSpace(double** fvl_dphi, double svl_dphi[][3], const double* vl);//zhengdy add 2016-10-18
+	void fvl_k_RealSpace(matrix& fvl_dphi, const double* vl);//mohan add 2011-06-19
+	void svl_k_RealSpace(matrix& fvl_dphi, matrix& svl_dphi, const double* vl);//zhengdy add 2016-10-18
 
 
 	// reset the spin.

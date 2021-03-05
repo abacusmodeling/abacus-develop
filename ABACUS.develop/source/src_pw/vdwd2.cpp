@@ -124,7 +124,12 @@ double Vdwd2::energy()
 	return energy_result;
 }
 
-const std::vector<Vector3<double>> &Vdwd2::force(matrix &stress_result, const bool stress_for_vdw)
+const std::vector<Vector3<double>> &Vdwd2::force(
+	const bool force_for_vdw, 
+	const bool stress_for_vdw, 
+	matrix &force_vdw, 
+	matrix &stress_result
+)
 {
     TITLE("Vdwd2","force");
 	initset();
@@ -178,12 +183,30 @@ const std::vector<Vector3<double>> &Vdwd2::force(matrix &stress_result, const bo
 		} // end for it2
 	} // end for it1
 	for( int iat=0; iat!=ucell.nat; ++iat )
+	{
 		force_result[iat] *= scaling/ucell.lat0;
+	}
+
 	for(int ipol=0;ipol<3;ipol++)
 	{
-		for(int jpol=0;jpol<3;jpol++)
+		if(stress_for_vdw)
 		{
-			stress_result(ipol,jpol) *= scaling / ucell.omega;
+			for(int jpol=0;jpol<3;jpol++)
+			{
+				stress_result(ipol,jpol) *= scaling / ucell.omega;
+			}
+		}
+		if(force_for_vdw)
+		{
+			for(int iat=0;iat<ucell.nat;iat++)
+			{
+				switch(ipol)
+				{
+					case 0: force_vdw(iat,ipol) += force_result[iat].x;        break;
+					case 1: force_vdw(iat,ipol) += force_result[iat].y;        break;
+					case 2: force_vdw(iat,ipol) += force_result[iat].z;        break;
+                }
+			}
 		}
 	}
 

@@ -7,6 +7,7 @@ void Stress_PW::cal_stress(matrix& sigma)
 	TITLE("Stress_PW","cal_stress");
 	timer::tick("Stress_PW","cal_stress",'E');    
 
+	sigma.create(3,3);
 	matrix sigmaxc;
 	sigmaxc.create(3,3);
 	matrix sigmatot;
@@ -111,13 +112,14 @@ void Stress_PW::cal_stress(matrix& sigma)
 
 void Stress_PW::stress_vdw(matrix& sigma)
 {
+	matrix force;
 	if(vdwd2.vdwD2)                                                                 //Peize Lin add 2014-04-04, update 2019-04-26
 	{
-		vdwd2.force(sigma, 1);
+		vdwd2.force(0, 1, force, sigma);
 	}
 	if(vdwd3.vdwD3)                                                                 //jiyy add 2019-05-18
 	{
-		vdwd3.force(sigma, 1);
+		vdwd3.force(0, 1, force, sigma);
 	}              
 	return;
 }

@@ -9,9 +9,8 @@ class H_XC_pw
 
 	friend class Stress_Func;
 	friend class Stress_PW;
-	friend class Stress_LCAO;
 	friend class Forces;
-    friend class Force_LCAO; 
+    friend class Force_Stress_LCAO; 
 	friend class potential;
 	friend class energy;
 	friend class eximport;

@@ -8,7 +8,7 @@
 #include "input.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_io/optical.h"
-#include "src_lcao/force_lcao.h"
+#include "src_lcao/force_stress_lcao.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/global_fp.h" // mohan update 2021-01-30
 
@@ -107,10 +107,10 @@ bool Update_input::Read(const string &fn)
         else if (strcmp("force_thr_ev2", word) == 0)
         {
             read_value(ifs, force_thr_ev2);
-			if(force_thr_ev2!=Force_LCAO::force_invalid_threshold_ev)
+			if(force_thr_ev2!=Force_Stress_LCAO::force_invalid_threshold_ev)
 			{
-				this->change(ofs_warning,"force_thr threshold(Ry/Bohr)",Force_LCAO::force_invalid_threshold_ev,force_thr_ev2);
-    			Force_LCAO::force_invalid_threshold_ev = this->force_thr_ev2;
+				this->change(ofs_warning,"force_thr threshold(Ry/Bohr)",Force_Stress_LCAO::force_invalid_threshold_ev,force_thr_ev2);
+    			Force_Stress_LCAO::force_invalid_threshold_ev = this->force_thr_ev2;
 			}
         }
 #endif
@@ -267,7 +267,7 @@ void Update_input::Bcast()
 {
     Parallel_Common::bcast_int( FORCE );
     Parallel_Common::bcast_double( FORCE_THR);
-    Parallel_Common::bcast_double( Force_LCAO::force_invalid_threshold_ev);
+    Parallel_Common::bcast_double( Force_Stress_LCAO::force_invalid_threshold_ev);
     Parallel_Common::bcast_double( DRHO2 );
     Parallel_Common::bcast_int( NITER );
     Parallel_Common::bcast_int( NSTEP );

@@ -132,7 +132,7 @@ void Gint_k::destroy_pvpR(void)
 
 // fold the <phi | vl |dphi(R)> * DM(R) to 
 // calculate the force.
-void Gint_k::folding_force(double** fvl_dphi,
+void Gint_k::folding_force(matrix& fvl_dphi,
 	double* pvdpx, double* pvdpy, double* pvdpz)
 {
 	TITLE("Gint_k","folding_force");
@@ -275,9 +275,9 @@ void Gint_k::folding_force(double** fvl_dphi,
 			}
 			const int iat = ucell.iwt2iat[i];
 			const int index = 3*j;
-			fvl_dphi[iat][0] += 2.0*tmp[index];	
-			fvl_dphi[iat][1] += 2.0*tmp[index+1];	
-			fvl_dphi[iat][2] += 2.0*tmp[index+2];	
+			fvl_dphi(iat,0) += 2.0*tmp[index];	
+			fvl_dphi(iat,1) += 2.0*tmp[index+1];	
+			fvl_dphi(iat,2) += 2.0*tmp[index+2];	
 		}
 	}
 	delete[] tmp;
@@ -304,7 +304,7 @@ void Gint_k::folding_force(double** fvl_dphi,
 
 // fold the <phi | vl * R_beta|dphi(R_alpha)> * DM(R) to 
 // calculate the stress.
-void Gint_k::folding_stress(double** fvl_dphi, double svl_dphi[][3],
+void Gint_k::folding_stress(matrix& fvl_dphi, matrix& svl_dphi,
 	double* pvdpx, double* pvdpy, double* pvdpz,
 	double* pvdp11, double* pvdp22, double* pvdp33,double* pvdp12, double* pvdp13, double* pvdp23)
 {
@@ -504,16 +504,16 @@ void Gint_k::folding_stress(double** fvl_dphi, double svl_dphi[][3],
 			const int iat = ucell.iwt2iat[i];
 			const int index = 3*j;
 			const int index1 = 6*j;
-			fvl_dphi[iat][0] += 2.0*tmp[index];
-			fvl_dphi[iat][1] += 2.0*tmp[index+1];
-			fvl_dphi[iat][2] += 2.0*tmp[index+2];
+			fvl_dphi(iat,0) += 2.0*tmp[index];
+			fvl_dphi(iat,1) += 2.0*tmp[index+1];
+			fvl_dphi(iat,2) += 2.0*tmp[index+2];
 
-			svl_dphi[0][0] -= 2.0*tmp1[index1];
-			svl_dphi[1][1] -= 2.0*tmp1[index1+1];
-			svl_dphi[2][2] -= 2.0*tmp1[index1+2];
-			svl_dphi[0][1] -= 2.0*tmp1[index1+3];
-			svl_dphi[0][2] -= 2.0*tmp1[index1+4];
-			svl_dphi[1][2] -= 2.0*tmp1[index1+5];
+			svl_dphi(0,0) -= 2.0*tmp1[index1];
+			svl_dphi(1,1) -= 2.0*tmp1[index1+1];
+			svl_dphi(2,2) -= 2.0*tmp1[index1+2];
+			svl_dphi(0,1) -= 2.0*tmp1[index1+3];
+			svl_dphi(0,2) -= 2.0*tmp1[index1+4];
+			svl_dphi(1,2) -= 2.0*tmp1[index1+5];
 		}
 	}
 	delete[] tmp;

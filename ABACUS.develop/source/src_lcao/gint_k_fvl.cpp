@@ -4,7 +4,7 @@
 
 #include "global_fp.h" // mohan add 2021-01-30
 
-void Gint_k::fvl_k_RealSpace(double** fvl_dphi, const double *vl)
+void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 {
 	TITLE("Gint_k","cal_force");
 	timer::tick("Gint_k","cal_force");
@@ -199,7 +199,7 @@ void Gint_k::fvl_k_RealSpace(double** fvl_dphi, const double *vl)
 	return;
 }
 
-void Gint_k::svl_k_RealSpace(double** fvl_dphi, double svl_dphi[][3], const double *vl)
+void Gint_k::svl_k_RealSpace(matrix& fvl_dphi, matrix& svl_dphi, const double *vl)
 {
         TITLE("Gint_k","cal_stress");
         timer::tick("Gint_k","cal_stress");

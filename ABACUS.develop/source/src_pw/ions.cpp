@@ -253,8 +253,9 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 	if(FORCE&&!STRESS)
 	{
 		// (1) calculate the force.
-		Forces fcs(ucell.nat);
-		fcs.init();
+		matrix force;
+		Forces fcs;
+		fcs.init(force);
 
 		// (2) move the ions.
 		bool converged = false;
@@ -268,7 +269,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		//}
 		if(CALCULATION=="relax")
 		{
-			IMM.cal_movement(istep, istep, fcs.force, en.etot);
+			IMM.cal_movement(istep, istep, force, en.etot);
 			converged = IMM.get_converged();
 
             if(converged || (istep==NSTEP) ) 
@@ -308,7 +309,6 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 	{
 		Stress_PW ss;
 		matrix stress;
-		stress.create(3,3);
 		ss.cal_stress(stress);
 
 		double unit_transform = 0.0;
@@ -349,12 +349,16 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 	{
 		//cout<<" istep  force_step  stress_step  converged_force  converged_stress = "<<istep<<"  "<<force_step<<"  "<<stress_step<<"  "<<converged_force<<"  "<<converged_stress<<endl;
 
-		Forces fcs(ucell.nat);
-		fcs.init();
+		matrix force;
+		Forces fcs;
+		fcs.init(force);
+                matrix stress;
+                Stress_PW ss;
+                ss.cal_stress(stress);
 		//IMM.cal_movement(force_step, fcs.force, en.etot);
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
-            IMM.cal_movement(istep, force_step, fcs.force, en.etot);
+            IMM.cal_movement(istep, force_step, force, en.etot);
             converged_force = IMM.get_converged();
 
             //cout<<"converged_force = "<<converged_force<<endl;
@@ -362,10 +366,6 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             {
                 force_step = 1;
 
-                matrix stress;
-                stress.create(3,3);
-                Stress_PW ss;
-                ss.cal_stress(stress);
 
                 double unit_transform = 0.0;
                 unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
@@ -374,7 +374,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 {
                     stress(i,i) -= external_stress[i]/unit_transform;
                 }
-		PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
+				PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 
                 if(CALCULATION=="cell-relax")
                 {
@@ -431,10 +431,6 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
         }
         else
         {
-            matrix stress;
-            stress.create(3,3);
-            Stress_PW ss;
-            ss.cal_stress(stress);
 
             double unit_transform = 0.0;
             unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
@@ -443,7 +439,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             {
                 stress(i,i) -= external_stress[i]/unit_transform;
             }
-		PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
+			PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
             return 1;
         }
     }

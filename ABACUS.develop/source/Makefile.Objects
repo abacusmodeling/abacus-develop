@@ -148,10 +148,9 @@ LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
 ylm.o\
-force_lcao.o\
+force_stress_lcao.o\
 force_lcao_gamma.o\
 force_lcao_k.o\
-stress_lcao.o\
 parallel_orbitals.o \
 global_fp.o \
 pdiag_double.o \

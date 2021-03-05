@@ -23,7 +23,11 @@ public:
 	double energy();
 	
 	std::vector<Vector3<double>> force_result;
-	const std::vector<Vector3<double>> &force(matrix &stress_result, const bool stress_for_vdw);
+	const std::vector<Vector3<double>> &force(
+		const bool force_for_vdw, 
+		const bool stress_for_vdw, 
+		matrix &force_vdw, 
+		matrix &stress_result );
 	
 private:
 	

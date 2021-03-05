@@ -9,15 +9,26 @@ class Force_LCAO_k : public Force_LCAO_gamma
 {
 	public :
 	
+	friend class Force_Stress_LCAO;
+
 	Force_LCAO_k ();
 	~Force_LCAO_k ();
 
-	protected:
+	private:
 	
 	//orthonormal force + contribution from T and VNL
-	void ftable_k (void);
-
-	private:
+	void ftable_k (
+		const bool isforce,
+		const bool isstress,
+		matrix& foverlap,
+		matrix& ftvnl_dphi,
+		matrix& fvnl_dbeta,	
+		matrix& fvl_dphi,
+		matrix& soverlap,
+		matrix& stvnl_dphi,
+		matrix& svnl_dbeta,
+		matrix& svl_dphi
+		);
 
 	// get the ds, dt, dvnl.
 	void allocate_k(void);
@@ -26,7 +37,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void finish_k(void);
 
 
-	void set_EDM_k(double **dmR, const bool with_energy);
+	void set_EDM_k(double** dm2d, const bool with_energy);
 
 
 	// mohan add 2012-01-09
@@ -38,22 +49,22 @@ class Force_LCAO_k : public Force_LCAO_gamma
 
 	
 	// calculate the force due to < dphi | beta > < beta | phi >
-	void cal_ftvnl_dphi_k(double **dmR);
+	void cal_ftvnl_dphi_k(double** dm2d, const bool isforce, const bool isstress, matrix& ftvnl_dphi, matrix& stvnl_dphi);
 
 
 	// calculate the force due to < phi | Vlocal | dphi >
-	void cal_fvl_dphi_k(double **dmR);
+	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvl_dphi, matrix& svl_dphi);
 
 
 	// calculate the overlap force
-	void cal_foverlap_k(void);
+	void cal_foverlap_k(const bool isforce, const bool isstress, matrix& foverlap, matrix& soverlap);
 
 
 	// calculate the force due to < phi | dbeta > < beta | phi >
-	void cal_fvnl_dbeta_k(double** dmR);
+	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvnl_dbeta, matrix& svnl_dbeta);
 
 
 	void test(double* mm, const string &name);
-	
+
 };
 #endif

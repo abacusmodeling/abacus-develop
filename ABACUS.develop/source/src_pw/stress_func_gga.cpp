@@ -217,7 +217,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 	{
 		for(int j=0;j<3;j++)
 		{
-			sigma(i,j) += sigma_gradcorr[i][j];
+			sigma(i,j) += sigma_gradcorr[i][j] / pw.ncxyz;
 		}
 	}
 
