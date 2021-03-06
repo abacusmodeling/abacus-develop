@@ -131,7 +131,6 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 	double* drs
 ) const
 {
-//	TITLE("Make_Overlap_Table","cal_ST_Phi12_R");
 	timer::tick("Make_Overlap_Table", "cal_ST_Phi12_R");
 
 	double* k1_dot_k2 = new double[kmesh];
@@ -177,46 +176,12 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		k1_dot_k2_dot_kpoint[ik] = k1_dot_k2[ik] * this->kpoint[ik];
 	}
 
-//	Mathzone_Add1::Sbt_new (3, l, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 2, rs);
-//	for (int ir = 0; ir < rmesh; ir++) rs[ir] *= FOUR_PI;
-	
-	//test
-//	double tmporg = Mathzone_Add1::uni_simpson (k1_dot_k2, kmesh, dk);
-//	tmporg *= FOUR_PI;
-
-	//liaochen modify on 2010/4/21
-	//for origin 
-
 	//Drs
 	//djl = (l*j(l-1) - (l+1)j(l+1))/(2l+1)
-	/*
-	if (l == 0) 
-	{
-		double* tmp1 = new double[rmesh];
-		ZEROS (tmp1, rmesh);
-		Mathzone_Add1::Sbt_new (3, 1, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 1, tmp1);
-		for (int ir = 0; ir < rmesh; ir++) drs[ir] = -FOUR_PI*tmp1[ir];
-		delete[] tmp1;
-	}
-	else
-	{
-		double* tmp1 = new double[rmesh];
-		double* tmp2 = new double[rmesh];
-		ZEROS (tmp1, rmesh);
-		ZEROS (tmp2, rmesh);
-		Mathzone_Add1::Sbt_new (3, l-1, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 1, tmp1);
-		Mathzone_Add1::Sbt_new (3, l+1, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 1, tmp2);
-		for (int ir = 0; ir < rmesh; ir++) drs[ir] = FOUR_PI*(l*tmp1[ir]-(l+1)*tmp2[ir])/(2.0*l+1);
-		delete[] tmp1;
-		delete[] tmp2;
-	}
-	*/
 	
 	//previous version
 	
 	double* integrated_func = new double[kmesh];
-	
-//	double* jl = new double[kmesh];
 	
 	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
 	const vector<vector<double>> &jl = pSB->get_jlx()[l];
@@ -224,11 +189,6 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 	
 	for (int ir = 0; ir < rmesh; ir++)
 	{
-//		ZEROS(integrated_func,kmesh);
-//		ZEROS(jl,kmesh);
-		// Generate Spherical Bessel Function
-//		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l, jl);
-		
 		const vector<double> &jl_r = jl[ir];
 		for (int ik=0; ik<kmesh; ++ik)
 		{
@@ -237,45 +197,7 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		// Call simpson integration
 		double temp = 0.0;
 		Mathzone::Simpson_Integral(kmesh,integrated_func,dk,temp);
-//		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		rs[ir] = temp * FOUR_PI ;
-		
-		// Peize Lin accelerate 2017-10-02
-		/*
-		//drs
-		double temp1, temp2;
-		
-		if (l > 0)
-		{
-	//		ZEROS(jl,kmesh);
-	//		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l-1, jl);
-	
-			const vector<double> &jlm1_r = jlm1[ir];
-			for (int ik=0; ik<kmesh; ++ik)
-				integrated_func[ik] = jlm1_r[ik] * k1_dot_k2[ik] * kpoint[ik];
-
-			Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp1);
-		}
-		
-//		ZEROS(jl,kmesh);
-//		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l+1, jl);
-				
-		const vector<double> &jlp1_r = jlp1[ir];
-		for (int ik=0; ik<kmesh; ++ik)
-			integrated_func[ik] = jlp1_r[ik] * k1_dot_k2[ik] * kpoint[ik];
-		
-		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp2);
-		
-		if (l == 0)
-		{
-			drs[ir] = -FOUR_PI*temp2;
-		}
-		else
-		{
-			drs[ir] = FOUR_PI*(temp1*l-(l+1)*temp2)/(2.0*l+1);
-		}
-		*/
-		
 		
 		// Peize Lin accelerate 2017-10-02
 		const vector<double> &jlm1_r = jlm1[ir];
@@ -295,7 +217,6 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 				integrated_func[ik] = (jlp1_r[ik]-fac*jlm1_r[ik]) * k1_dot_k2_dot_kpoint[ik];
 			}
 		}
-//		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		Mathzone::Simpson_Integral(kmesh,integrated_func,dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
@@ -319,137 +240,15 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 
-//	delete [] jl;
 	delete [] integrated_func;
 	delete [] k1_dot_k2;
 	delete [] k1_dot_k2_dot_kpoint;	
 
-	/*
-	double* integrated_func1 = new double[kmesh];
-	double* integrated_func2 = new double[kmesh];
-	
-	for (int ir = 0; ir < rmesh; ir++)
-	{
-		ZEROS(integrated_func1, kmesh);
-		ZEROS(integrated_func2, kmesh);
-//		ZEROS(jl, kmesh);
-//		ZEROS(djldr, kmesh);
-		
-		// Generate Spherical Bessel Function
-//		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l, jl, djldr);
-		for (int ik = 0; ik < kmesh; ik++)
-		{
-			integrated_func1[ik] = this->jlx[ik][ir][l] * k1_dot_k2[ik];
-			integrated_func2[ik] = this->djlx[ik][ir][l] * k1_dot_k2[ik] * this->kpoint[ik];
-		}
-		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh,integrated_func1,kab,rs[ir]);
-		Mathzone::Simpson_Integral(kmesh,integrated_func2,kab,drs[ir]);
-	
-		rs[ir] *= FOUR_PI;
-		drs[ir] *= FOUR_PI;
-	}
-	
-
-	delete[] integrated_func1;
-	delete[] integrated_func2;
-//	delete[] jl;
-	*/
-
 	timer::tick("Make_Overlap_Table", "cal_ST_Phi12_R");
 	
 	return;
 }
 
-/*
-// Peize Lin add 2017-10-13
-void Make_Overlap_Table::cal_ST_Phi12_R
-(
- 	const int &job,
-    const int &l,
-    const Numerical_Orbital_Lm &n1,
-    const Numerical_Orbital_Lm &n2,
-	const set<size_t> &radials,
-    double* rs,
-	double* drs
-) const
-{
-//	TITLE("Make_Overlap_Table","cal_ST_Phi12_R");
-	timer::tick("Make_Overlap_Table", "cal_ST_Phi12_R");
-
-	vector<double> k1_dot_k2(kmesh);
-	switch(job)
-	{
-		case 1: // calculate overlap
-		for (int ik = 0; ik < kmesh; ik++)
-			k1_dot_k2[ik] = n1.getPsi_k(ik) * n2.getPsi_k(ik);
-		break;
-
-		case 2: // calculate kinetic energy
-		for (int ik = 0; ik < kmesh; ik++)
-			k1_dot_k2[ik] = n1.getPsi_k(ik) * n2.getPsi_k(ik) * this->kpoint[ik] * this->kpoint[ik];
-		break;
-	}
-	
-	vector<double> k1_dot_k2_dot_kpoint(kmesh);
-	for (int ik = 0; ik < kmesh; ik++)
-		k1_dot_k2_dot_kpoint[ik] = k1_dot_k2[ik] * this->kpoint[ik];
-
-
-	vector<double> integrated_func(kmesh);
-	
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l+1];
-	
-	for( const size_t &ir : radials )
-	{
-		// if(rs[ir])  => rs[ir]  has been calculated
-		// if(drs[ir]) => drs[ir] has been calculated
-		// Actually, if(ir[ir]||dr[ir]) is enough. Double insurance for the sake of avoiding numerical errors
-		if( rs[ir] && drs[ir] )	continue;			
-		
-		const vector<double> &jl_r = jl[ir];
-		for (int ik=0; ik<kmesh; ++ik)
-			integrated_func[ik] = jl_r[ik] * k1_dot_k2[ik];
-		double temp = 0.0;
-//		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
-		rs[ir] = temp * FOUR_PI ;
-		
-		const vector<double> &jlm1_r = jlm1[ir];
-		const vector<double> &jlp1_r = jlp1[ir];
-		const double fac = l/(l+1.0);
-		if( l==0 )
-			for (int ik=0; ik<kmesh; ++ik)
-				integrated_func[ik] = jlp1_r[ik] * k1_dot_k2_dot_kpoint[ik];
-		else
-			for (int ik=0; ik<kmesh; ++ik)
-				integrated_func[ik] = (jlp1_r[ik]-fac*jlm1_r[ik]) * k1_dot_k2_dot_kpoint[ik];
-//		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
-		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
-	}
-
-	// cal rs[0] special
-	if (l > 0)
-	{
-		if( radials.find(0)!=radials.end() )
-		{
-			for (int ik = 0; ik < kmesh; ik++)
-				integrated_func[ik] = k1_dot_k2[ik] * pow (kpoint[ik], l);
-			double temp = 0.0;
-	//		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
-			Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
-			rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
-		}
-	}
-	
-	timer::tick("Make_Overlap_Table", "cal_ST_Phi12_R");
-	
-	return;
-}
-*/
 
 // Peize Lin add 2017-10-27
 void Make_Overlap_Table::cal_ST_Phi12_R
@@ -1200,8 +999,6 @@ void Make_Overlap_Table::init_OV_Tpair(void)
     this->OV_Tpair.create(ntype, ntype);
 	this->OV_L2plus1.create(ntype, ntype); // mohan fix bug 2011-03-14
 
-//	OUT(ofs_running,"Number of type pairs",this->OV_nTpairs);
-
     int index = 0;
     for (int T1 = 0;  T1 < ntype ; T1++)
     {
@@ -1432,45 +1229,6 @@ void Make_Overlap_Table::init_Lmax (const int orb_num, const int mode, int &Lmax
 			break;
 	}
 
-/*	if( mode==1 || mode==2)
-	{
-		//obtain maxL of all type
-
-		const int ntype = ORB.get_ntype();
-		for (int it = 0; it < ntype; it++)
-		{
-			const int Lmax_now = ORB.Phi[it].getLmax ();
-			Lmax = max(Lmax, Lmax_now);
-		}
-
-		if(mode==1)
-		{
-			// fix bug.
-			// mohan add the nonlocal part.
-			// 2011-03-07
-			for(int it=0; it< ntype; it++)
-			{
-				const int Lmax_now = ORB.Beta[it].getLmax();
-				Lmax = max(Lmax, Lmax_now);
-			}			
-		}
-
-		//use 2lmax+1 in dS
-		Lmax_used = 2*Lmax + 1;	
-
-		// Peize Lin add 2016-01-26
-		if(mode==2)									
-		{
-			Lmax = max(Lmax, Use_Psi3_Center2::exx_ri_lmax);
-			Lmax_used += Use_Psi3_Center2::exx_ri_lmax;
-		}			
-	}
-	else if( mode==3 )
-	{
-		Lmax = Use_Psi3_Center2::exx_ri_lmax;
-		Lmax_used = 2*Lmax + 1;
-	}*/
-
 	assert(Lmax_used >= 1);
 }
 
@@ -1482,11 +1240,14 @@ void Make_Overlap_Table::init_Table_Spherical_Bessel (const int orb_num, const i
 	this->init_Lmax (orb_num,mode,Lmax_used,Lmax);		// Peize Lin add 2016-01-26
 
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	{
 		if( this->dr * this->dk == sb.get_dx() )
 		{
 			pSB = &sb;
 			break;
 		}
+	}
+
 	if(!pSB)
 	{
 		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});

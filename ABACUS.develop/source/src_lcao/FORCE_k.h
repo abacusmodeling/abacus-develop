@@ -33,12 +33,9 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	// get the ds, dt, dvnl.
 	void allocate_k(void);
 
-
 	void finish_k(void);
 
-
 	void set_EDM_k(double** dm2d, const bool with_energy);
-
 
 	// mohan add 2012-01-09
 	complex<double> set_EDM_k_element(
@@ -46,19 +43,15 @@ class Force_LCAO_k : public Force_LCAO_gamma
 		const bool with_energy,
 		complex<double> &coef1, complex<double> &coef2,
 		const double &ekb);
-
 	
 	// calculate the force due to < dphi | beta > < beta | phi >
 	void cal_ftvnl_dphi_k(double** dm2d, const bool isforce, const bool isstress, matrix& ftvnl_dphi, matrix& stvnl_dphi);
 
-
-	// calculate the force due to < phi | Vlocal | dphi >
-	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvl_dphi, matrix& svl_dphi);
-
-
 	// calculate the overlap force
 	void cal_foverlap_k(const bool isforce, const bool isstress, matrix& foverlap, matrix& soverlap);
 
+	// calculate the force due to < phi | Vlocal | dphi >
+	void cal_fvl_dphi_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvl_dphi, matrix& svl_dphi);
 
 	// calculate the force due to < phi | dbeta > < beta | phi >
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvnl_dbeta, matrix& svnl_dbeta);
