@@ -1,19 +1,12 @@
-//=========================================================
-//AUTHOR : Mohan 
-//DATE : 2009-04-22
-//=========================================================
-#ifndef MAKE_OVERLAP_TABLE_H
-#define MAKE_OVERLAP_TABLE_H
+#ifndef ORB_TABLE_PHI_H 
+#define ORB_TABLE_PHI_H 
 
 #include "src_pw/tools.h"
 #include "ORB_atomic.h"
 #include "ORB_atomic_lm.h"
-#include "ORB_nonlocal.h"
-#include "ORB_nonlocal_lm.h"
 #include "ORB_gaunt_table.h"
 #include "center2_orb.h"
 #include "src_global/sph_bessel_recursive.h"
-
 #include <set>
 
 class Make_Overlap_Table
@@ -32,9 +25,7 @@ class Make_Overlap_Table
 		const double &dk_in);
 
 	void init_Table(const int &job);
-	void init_Table_Beta(void);
 	void Destroy_Table(void);
-	void Destroy_Table_Beta(void);
 
 	// Five dimension:
 	// (1) 0: normal (S(R)) ; 1: derivative( dS/dR )
@@ -44,11 +35,9 @@ class Make_Overlap_Table
 	// (5) Distance between atoms: R.
 	double***** Table_SR;
 	double***** Table_TR;
-	double***** Table_NR;
 
 	bool destroy_sr;
 	bool destroy_tr;
-	bool destroy_nr;
 	
 	//=================================================
 	//make table of Spherical bessel
@@ -79,18 +68,6 @@ class Make_Overlap_Table
     IntArray OV_Opair;
     IntArray OV_L2plus1;
 
-	//-------------------------
-	// NL stands for 'nonlocal'
-	// T stands for atom type.
-	// O stands for orbitals.
-	//-------------------------
-	void init_NL_Tpair(void);
-    void init_NL_Opair(void);
-	int NL_nTpairs;
-	IntArray NL_Tpair;
-	IntArray NL_Opair;
-	IntArray NL_L2plus1;
-
 	//========================================================
 	// Small function
 	//========================================================
@@ -119,14 +96,6 @@ class Make_Overlap_Table
 		const set<size_t> &radials,				// only calculate ir in radials
 		double *rs,
 		double *drs) const;
-
-	void cal_VNL_PhiBeta_R(
-        const int &l,
-        const Numerical_Orbital_Lm &n1,
-        const Numerical_Nonlocal_Lm &n2,
-        const int &rmesh,
-        double *rs,
-		double *drs);
 
 	// variables
     int ntype;

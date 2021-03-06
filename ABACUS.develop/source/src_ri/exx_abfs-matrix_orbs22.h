@@ -5,7 +5,7 @@
 using std::map;
 
 #include "exx_abfs.h"
-#include "src_lcao/ORB_radial_table.h"
+#include "src_lcao/ORB_table_phi.h"
 #include "src_lcao/ORB_gaunt_table.h"
 #include "src_lcao/center2_orb-orb22.h"
 

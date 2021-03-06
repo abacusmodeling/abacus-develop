@@ -28,27 +28,21 @@ void ORB_gen_tables::gen_tables( const int &job0 )
         ORB.get_dR(),// delta R, for making radial table
         ORB.get_dk() ); // delta k, for integration in k space
 
+	tbeta.allocate(
+		ORB.get_ntype(),// number of atom types
+        ORB.get_lmax(),// max L used to calculate overlap
+        ORB.get_kmesh(), // kpoints, for integration in k space
+        ORB.get_Rmax(),// max value of radial table
+        ORB.get_dR(),// delta R, for making radial table
+        ORB.get_dk() ); // delta k, for integration in k space
+
 	// OV: overlap
 	MOT.init_OV_Tpair();
 	MOT.init_OV_Opair();
 
 	// NL: nonlocal
-	MOT.init_NL_Tpair();
-	MOT.init_NL_Opair(); // add 2009-5-8
-
-	// mohan comment out 2021-02-09
-	// if we decompose the VNA into projectors,
-	// we need to prepare for the vna table.
-	//if(VNA==-1)
-	//{
-	//	MVT.allocate(
-	//		ORB.get_ntype(),// number of atom types
-    //   	ORB.get_lmax(),// max L used to calculate overlap
-    //    	ORB.get_kmesh(), // kpoints, for integration in k space
-    //    	ORB.get_Rmax(),// max value of radial table
-    //    	ORB.get_dR(),// delta R, for making radial table
-    //    	ORB.get_dk() ); // delta k, for integration in k space
-	//}
+	tbeta.init_NL_Tpair();
+	tbeta.init_NL_Opair(); // add 2009-5-8
 
 
 	//=========================================
@@ -63,7 +57,7 @@ void ORB_gen_tables::gen_tables( const int &job0 )
 	
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0);
-	MOT.init_Table_Beta();// add 2009-5-8
+	tbeta.init_Table_Beta( MOT.pSB );// add 2009-5-8
 
 	//=========================================
 	// (3) make Gaunt coefficients table
@@ -141,8 +135,8 @@ void ORB_gen_tables::snap_psibeta(
 			all_out = false;
 			calproj[ip] = true;
 			//length of table for interpolation
-			rmesh1[ip] = this->MOT.get_rmesh(Rcut1, Rcut0);
-			rmesh2[ip] = this->MOT.get_rmesh(Rcut2, Rcut0);
+			rmesh1[ip] = tbeta.get_rmesh(Rcut1, Rcut0);
+			rmesh2[ip] = tbeta.get_rmesh(Rcut2, Rcut0);
 		}
 	}
 
@@ -174,7 +168,7 @@ void ORB_gen_tables::snap_psibeta(
     return x1*x2*(table[iq]*x3+table[iq+3]*x0)/6.0
          + x0*x3*(table[iq+1]*x2-table[iq+2]*x1)/2.0;
 	*/
-	psa = distance10 / MOT.dr;
+	psa = distance10 / tbeta.dr;
 	iqa = static_cast<int>(psa);
    	x0a = psa - static_cast<double>(iqa);
   	x1a = 1.0 - x0a;
@@ -185,7 +179,7 @@ void ORB_gen_tables::snap_psibeta(
 	x032a = x0a*x3a*x2a/2.0;
 	x031a = x0a*x3a*x1a/2.0;
 	
-	psb = distance20 / MOT.dr;
+	psb = distance20 / tbeta.dr;
 	iqb = (int) psb;
    	x0b = psb - (double)iqb ;
   	x1b = 1.0 - x0b;
@@ -219,10 +213,10 @@ void ORB_gen_tables::snap_psibeta(
 	// Notice!!! T1 must be orbital, 
 	// T0 must be nonlocal orbital
 	// usage : pairs_nonlocal_type(T1 : orbital, T0 : projector);
-	const int Tpair1 = this->MOT.NL_Tpair(T1, T0);
-	const int Tpair2 = this->MOT.NL_Tpair(T2, T0);
-	const int T1_2Lplus1 = this->MOT.NL_L2plus1(T1, T0);
-	const int T2_2Lplus1 = this->MOT.NL_L2plus1(T2, T0);
+	const int Tpair1 = tbeta.NL_Tpair(T1, T0);
+	const int Tpair2 = tbeta.NL_Tpair(T2, T0);
+	const int T1_2Lplus1 = tbeta.NL_L2plus1(T1, T0);
+	const int T2_2Lplus1 = tbeta.NL_L2plus1(T2, T0);
 
 	//gaunt index
 	const int gindex1 = L1*L1+m1;
@@ -257,9 +251,9 @@ void ORB_gen_tables::snap_psibeta(
 		//const int next_ip = 2* L0 +1;
 	
 		// <psi1 | Beta>
-		const int Opair1 = this->MOT.NL_Opair(Tpair1, L1, N1, nb); 
+		const int Opair1 = tbeta.NL_Opair(Tpair1, L1, N1, nb); 
 		// <psi2 | Beta>
-		const int Opair2 = this->MOT.NL_Opair(Tpair2, L2, N2, nb); 
+		const int Opair2 = tbeta.NL_Opair(Tpair2, L2, N2, nb); 
 		
 			
 		for(int m0=0; m0<2*L0+1; m0++)
@@ -289,9 +283,7 @@ void ORB_gen_tables::snap_psibeta(
 				double Interp_Vnla = 0.0;
 				if (distance10 > tiny2)
 				{	
-					//Interp_Vnla = i_exp * Mathzone::Polynomial_Interpolation(
-					//this->MOT.Table_NR[0][Tpair1][Opair1][L],	rmesh1, this->MOT.dr, distance10);
-					curr = this->MOT.Table_NR[0][Tpair1][Opair1][L];
+					curr = tbeta.Table_NR[0][Tpair1][Opair1][L];
 					if( iqa >= rmesh1[nb]-4)
 					{
 						Interp_Vnla = 0.0;
@@ -304,7 +296,7 @@ void ORB_gen_tables::snap_psibeta(
 				}
 				else 
 				{
-					Interp_Vnla = i_exp * this->MOT.Table_NR[0][Tpair1][Opair1][L][0];
+					Interp_Vnla = i_exp * tbeta.Table_NR[0][Tpair1][Opair1][L][0];
 				}
 	
 				//------------------------------------------
@@ -368,9 +360,7 @@ void ORB_gen_tables::snap_psibeta(
 				double rl2 = pow (distance20, L);	
 				if (distance20 > tiny2)
 				{
-					//Interp_Vnlb = i_exp * Mathzone::Polynomial_Interpolation(
-					//this->MOT.Table_NR[0][Tpair2][Opair2][L],	rmesh2, this->MOT.dr, distance20);
-					curr = this->MOT.Table_NR[0][Tpair2][Opair2][L];
+					curr = tbeta.Table_NR[0][Tpair2][Opair2][L];
    					
 					if( iqb >= rmesh2[nb]-4) Interp_Vnlb = 0.0;
 					else Interp_Vnlb = i_exp * (x123b*curr[iqb]+x120b*curr[iqb+3]+x032b*curr[iqb+1]-curr[iqb+2]*x031b);
@@ -379,7 +369,7 @@ void ORB_gen_tables::snap_psibeta(
 				}
 				else 
 				{
-					Interp_Vnlb = i_exp * this->MOT.Table_NR[0][Tpair2][Opair2][L][0];
+					Interp_Vnlb = i_exp * tbeta.Table_NR[0][Tpair2][Opair2][L][0];
 				}
 
 				
@@ -387,10 +377,7 @@ void ORB_gen_tables::snap_psibeta(
 				{
 					if (distance20 > tiny2)
 					{
-						//Interp_Vnlc = i_exp * Mathzone::Polynomial_Interpolation(
-						//this->MOT.Table_NR[1][Tpair2][Opair2][L],	rmesh2,	this->MOT.dr,	distance20);
-						
-						curr = this->MOT.Table_NR[1][Tpair2][Opair2][L];
+						curr = tbeta.Table_NR[1][Tpair2][Opair2][L];
    					
 						if( iqb >= rmesh2[nb]-4) Interp_Vnlc = 0.0;
 						else Interp_Vnlc = i_exp * (x123b*curr[iqb]+x120b*curr[iqb+3]+x032b*curr[iqb+1]-curr[iqb+2]*x031b);
@@ -441,10 +428,6 @@ void ORB_gen_tables::snap_psibeta(
 				term_b_nc[ip] = term_b;
 			}
 		
-		
-		
-		
-		
 			//===============================================
 			// THIRD PART: SUM THE VALUE FROM ALL PROJECTS.
 			//===============================================
@@ -454,14 +437,6 @@ void ORB_gen_tables::snap_psibeta(
 				{
 					//nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
 					if(!has_so) nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
-/*					else if(nlm1!=NULL)
-					{
-							
-					}
-					else
-					{
-						WARNING_QUIT("ORB_gen_tables::snap_psibeta","something wrong with snap_psibeta.");
-					}*/
 					break;
 				}
 				case 1: //calculate the derivative part.
@@ -469,7 +444,10 @@ void ORB_gen_tables::snap_psibeta(
 					for(int jr = 0; jr < 3; jr++) 
 					{
 						//nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
-						if(!has_so) nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+						if(!has_so) 
+						{
+							nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+						}
 						else
 						{
 							
@@ -484,13 +462,6 @@ void ORB_gen_tables::snap_psibeta(
 	//zhengdy-soc, calculate non-local term
 	if(has_so)
 	{
-		/*for(int p1=0;p1<n_projection;p1++)
-		{
-			for(int p2=0;p2<n_projection;p2++)
-			{
-				nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
-			}
-		}*/
 		switch (job)
 		{
 			case 0://overlap part
@@ -499,11 +470,17 @@ void ORB_gen_tables::snap_psibeta(
 					const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
 					const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
 					if(NSPIN==4 && nlm1!=NULL)
+					{
 						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+					}
 					else if(NSPIN!=4)
+					{
 						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
+					}
 					else
+					{
 						WARNING_QUIT("ORB_gen_tables::snap_psibeta","Conflict! Didn't count non-local part");
+					}
 				}
 				break;
 			case 1://need to be added later

@@ -1,6 +1,5 @@
-#include "ORB_radial_table.h"
+#include "ORB_table_phi.h"
 #include "ORB_read.h"
-
 #include <stdexcept>
 #include "../src_ri/exx_abfs.h"
 
@@ -10,7 +9,6 @@ Make_Overlap_Table::Make_Overlap_Table()
 {
 	destroy_sr = false;
 	destroy_tr = false;
-	destroy_nr = false;
 
 	ntype = 0;
 	lmax = 0;
@@ -373,169 +371,6 @@ void Make_Overlap_Table::cal_ST_Phi12_R
 }
 
 
-void Make_Overlap_Table::cal_VNL_PhiBeta_R(
-        const int &l,
-        const Numerical_Orbital_Lm &n1,
-        const Numerical_Nonlocal_Lm &n2,
-        const int &rmesh,
-        double *rs,
-		double *drs)
-{
-	timer::tick ("Make_Overlap_Table", "VNL_PhiBeta_R");
-
-	assert(kmesh > 0);
-
-	//start calc	
-    double *k1_dot_k2 = new double[kmesh];
-
-	for (int ik = 0; ik < kmesh; ik++)
-	{
-		k1_dot_k2[ik] = n1.getPsi_k(ik) * n2.getBeta_k(ik);
-	}
-
-//	Mathzone_Add1::Sbt_new (3, l, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 2, rs);
-//	for (int ir = 0; ir < rmesh; ir++) rs[ir] *= FOUR_PI;
-	
-	
-	//Drs
-	//djl = (l*j(l-1) - (l+1)j(l+1))/(2l+1)
-	/*
-	if (l == 0) 
-	{
-		double* tmp1 = new double[rmesh];
-		ZEROS (tmp1, rmesh);
-		Mathzone_Add1::Sbt_new (3, 1, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 1, tmp1);
-		for (int ir = 0; ir < rmesh; ir++) drs[ir] = -FOUR_PI*tmp1[ir];
-		delete[] tmp1;
-	}
-	else
-	{
-		double* tmp1 = new double[rmesh];
-		double* tmp2 = new double[rmesh];
-		ZEROS (tmp1, rmesh);
-		ZEROS (tmp2, rmesh);
-		Mathzone_Add1::Sbt_new (3, l-1, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 1, tmp1);
-		Mathzone_Add1::Sbt_new (3, l+1, r, dr, rmesh, kpoint, dk, kmesh, k1_dot_k2, 1, tmp2);
-		for (int ir = 0; ir < rmesh; ir++) drs[ir] = FOUR_PI*(l*tmp1[ir]-(l+1)*tmp2[ir])/(2.0*l+1);
-		delete[] tmp1;
-		delete[] tmp2;
-	}
-	*/
-	
-	//previous version
-	double* integrated_func = new double[kmesh];
-//	double* jl = new double[kmesh];
-	
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l+1];	
-	for (int ir = 0; ir < rmesh; ir++)
-	{
-		ZEROS(integrated_func,kmesh);
-//		ZEROS(jl,kmesh);
-		double temp = 0.0;
-		// Generate Spherical Bessel Function
-//		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l, jl);
-		
-		for (int ik = 0; ik < kmesh; ik++)
-		{
-			integrated_func[ik] = jl[ir][ik] * k1_dot_k2[ik];
-		}
-		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[ir] = temp * FOUR_PI;
-		
-		//drs
-		double temp1, temp2;
-		
-		if (l > 0)
-		{
-//			ZEROS(jl,kmesh);
-//			Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l-1, jl);
-					
-			for (int ik = 0; ik < kmesh; ik++)
-			{
-				integrated_func[ik] = jlm1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
-			}
-
-			Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp1);
-		}
-		
-//		ZEROS(jl,kmesh);
-//		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l+1, jl);
-				
-		for (int ik = 0; ik < kmesh; ik++)
-		{
-			integrated_func[ik] = jlp1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
-		}
-		
-		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp2);
-		
-		if (l == 0)
-		{
-			drs[ir] = -FOUR_PI*temp2;
-		}
-		else
-		{
-			drs[ir] = FOUR_PI*(temp1*l-(l+1)*temp2)/(2.0*l+1);
-		}
-	}
-	
-	//liaochen modify on 2010/4/22
-	//special case for R=0
-	//we store Slm(R) / R**l at the fisrt point, rather than Slm(R)
-	if (l > 0)
-	{
-		ZEROS(integrated_func,kmesh);
-		double temp = 0.0;
-	
-		for (int ik = 0; ik < kmesh; ik++)
-		{
-			integrated_func[ik] = k1_dot_k2[ik] * pow (kpoint[ik], l);
-		}
-		
-		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
-		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
-	}
-	
-	delete [] integrated_func;
-//	delete [] jl;
-	
-	/*
-	double* integrated_func1 = new double[kmesh];
-	double* integrated_func2 = new double[kmesh];
-	
-	for (int ir = 0; ir < rmesh; ir++)
-	{
-		ZEROS(integrated_func1, kmesh);
-		ZEROS(integrated_func2, kmesh);
-//		ZEROS(jl, kmesh);
-//		ZEROS(djldr, kmesh);
-		
-		// Generate Spherical Bessel Function
-//		Mathzone::Spherical_Bessel(this->kmesh,this->kpoint,this->r[ir], l, jl, djldr);
-		for (int ik = 0; ik < kmesh; ik++)
-		{
-			integrated_func1[ik] = this->jlx[ik][ir][l] * k1_dot_k2[ik];
-			integrated_func2[ik] = this->djlx[ik][ir][l] * k1_dot_k2[ik] * this->kpoint[ik];
-		}
-		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh,integrated_func1,kab,rs[ir]);
-		Mathzone::Simpson_Integral(kmesh,integrated_func2,kab,drs[ir]);
-	
-		rs[ir] *= FOUR_PI;
-		drs[ir] *= FOUR_PI;
-	}
-
-	delete [] integrated_func1;
-	delete [] integrated_func2;
-	*/
-
-	delete[] k1_dot_k2;
-	timer::tick ("Make_Overlap_Table", "VNL_PhiBeta_R");
-	return;
-}
 
 void Make_Overlap_Table::init_Table( const int &job0 )
 {
@@ -800,113 +635,6 @@ void Make_Overlap_Table::init_Table( const int &job0 )
 	return;
 }
 
-void Make_Overlap_Table::init_Table_Beta(void)
-{
-	TITLE("Make_Overlap_Table", "init_Table_Beta");
-	timer::tick("Make_Overlap_Table", "init_Table_Beta",'D');
-
-	// (1) allocate 1st dimension ( overlap, derivative)
-	this->Table_NR = new double****[2];
-	// (2) allocate 2nd dimension ( overlap, derivative)
-	this->Table_NR[0] = new double*** [this->NL_nTpairs];
-	this->Table_NR[1] = new double*** [this->NL_nTpairs];
-
-	
-	// <1Phi|2Beta> 
-	for (int T1 = 0;  T1 < ntype ; T1++) // type 1 is orbital
-	{
-		for (int T2 = 0 ; T2 < ntype ; T2++)// type 2 is non-local projector
-		{
-			// Tpair: type pair.
-			const int Tpair=this->NL_Tpair(T1,T2);
-			const int Lmax1 = ORB.Phi[T1].getLmax();
-			
-			const int NBeta = ORB.nproj[T2];
-			
-			//-------------------------------------------------------------
-			// how many <psi|beta_l>
-			// here we count all possible psi with (L,N) index for type T1.
-			//-------------------------------------------------------------
-			const int pairs_chi = ORB.Phi[T1].getTotal_nchi() * NBeta;
-
-			// CAUTION!!!
-			// no matter nchi = 0 or NBeta = 0,
-			// means the Tpair in this table is never used!
-			if(pairs_chi == 0)continue;
-
-			// init 2nd dimension
-			this->Table_NR[0][Tpair] = new double** [ pairs_chi ];
-			this->Table_NR[1][Tpair] = new double** [ pairs_chi ];
-
-            const int T12_2Lplus1 = this->NL_L2plus1(T1,T2);
-
-			const double Rcut1 = ORB.Phi[T1].getRcut();
-			for (int L1 = 0; L1 < Lmax1 + 1; L1++)
-            {
-                for (int N1 = 0; N1 < ORB.Phi[T1].getNchi(L1); N1++)
-				{
-					
-					// number of projectors.
-					for (int nb = 0; nb < NBeta; nb ++)
-					{
-						const int L2 = ORB.Beta[T2].getL_Beta(nb);
-
-						const double Rcut2 = ORB.Beta[T2].Proj[nb].getRcut();
-
-						const int Opair = this->NL_Opair(Tpair,L1,N1,nb);
-						assert( Opair < pairs_chi );
-
-						// init 3rd dimension
-						this->Table_NR[0][ Tpair ][ Opair ] = new double *[T12_2Lplus1];
-						this->Table_NR[1][ Tpair ][ Opair ] = new double *[T12_2Lplus1];
-						
-						const int rmesh = this->get_rmesh( Rcut1, Rcut2);
-						assert( rmesh < this->Rmesh );
-
-						//not all L in T12_2Lplus1 would function
-						const int SL = abs(L1-L2);
-						const int AL = L1+L2;
-							
-						for (int L=0; L < T12_2Lplus1 ; L++)
-						{
-							//Allocation
-							this->Table_NR[0][Tpair][Opair][L] = new double[rmesh];
-							this->Table_NR[1][Tpair][Opair][L] = new double[rmesh];
-
-							Memory::record("Make_Overlap_Table","Table_NR",
-							2*NL_nTpairs*pairs_chi*rmesh,"double");
-
-							//for those L whose Gaunt Coefficients = 0, we
-							//assign every element in Table_NR as zero
-							if ((L > AL) || (L < SL) || ((L-SL) % 2 == 1)) 
-							{
-								ZEROS (Table_NR[0][Tpair][Opair][L], rmesh);
-								ZEROS (Table_NR[1][Tpair][Opair][L], rmesh);
-								
-								continue;
-							}
-
-							assert(nb < ORB.nproj[T2]);	
-							this->cal_VNL_PhiBeta_R(L,
-                                ORB.Phi[T1].PhiLN(L1,N1),
-                                ORB.Beta[T2].Proj[nb], // mohan update 2011-03-07
-                                rmesh,
-								this->Table_NR[0][Tpair][Opair][L],
-								this->Table_NR[1][Tpair][Opair][L]);
-						}// end T12_2Lplus1
-					}// end L2
-				}// end N1
-			}// end L1
-		}// end T2
-	}// end T1
-	destroy_nr = true;
-
-
-//	OUT(ofs_running,"allocate non-local potential matrix","Done");
-	timer::tick("Make_Overlap_Table", "init_Table_Beta",'D');
-	return;
-}
-
 
 void Make_Overlap_Table::Destroy_Table(void)
 {
@@ -955,39 +683,6 @@ void Make_Overlap_Table::Destroy_Table(void)
 	return;
 }
 
-void Make_Overlap_Table::Destroy_Table_Beta(void)
-{
-	if(!destroy_nr) return;
-
-	const int ntype = ORB.get_ntype();
-	for(int ir = 0; ir < 2; ir ++)
-	{
-		for(int T1=0; T1<ntype; T1++)
-		{
-			for(int T2=0; T2<ntype; T2++)
-			{
-				const int Tpair = this->NL_Tpair(T1,T2); 
-				const int L2plus1 = this->NL_L2plus1(T1,T2);
-				const int pairs = ORB.Phi[T1].getTotal_nchi() * ORB.nproj[T2]; 
-
-				// mohan fix bug 2011-03-30
-				if(pairs ==0) continue;
-				for(int dim2=0; dim2<pairs; dim2++)
-				{
-					for(int L=0; L<L2plus1; L++)
-					{
-						delete[] Table_NR[ir][Tpair][dim2][L];
-					}
-					delete[] Table_NR[ir][Tpair][dim2];
-				}
-				delete[] Table_NR[ir][Tpair];
-			}
-		}
-		delete[] Table_NR[ir];
-	}
-	delete[] Table_NR;
-	return;
-}
 
 
 void Make_Overlap_Table::init_OV_Tpair(void)
@@ -1021,44 +716,6 @@ void Make_Overlap_Table::init_OV_Tpair(void)
     return;
 }
 
-
-void Make_Overlap_Table::init_NL_Tpair(void)
-{
-	TITLE("Make_Overlap_Table","init_NL_index");
-	assert(ntype>0);
-	this->NL_nTpairs = this->ntype * this->ntype;	
-	this->NL_Tpair.create( this->ntype, this->ntype);
-	this->NL_L2plus1.create( this->ntype, this->ntype); // mohan fix bug 2011-03-14
-
-//	OUT(ofs_running,"Number of Nonlocal Pairs",NL_nTpairs);
-
-	int index = 0;
-	for (int T1 = 0;  T1 < ntype ; T1++)
-	{
-		for (int T0 = 0 ; T0 < ntype ; T0++)
-		{
-			 this->NL_Tpair(T1,T0) = index;
-			 ++index;
-
-			 // the pair < psi | beta >
-			 // be careful! This is not a symmetry matrix.
-			 this->NL_L2plus1(T1,T0) = std::max(ORB.Phi[T1].getLmax(), ORB.Beta[T0].getLmax() )*2+1;
-			 
-			 // there are special situations:
-			 // for example, two H atom without projector.
-			 // if we use s orbital, 
-			 // Phi.getLmax = 0,
-			 // Beta.getLmax < 0, 
-			 // so the value is 1.
-			 // however, there are no projectors.
-			 if(NL_L2plus1(T1,T0) <= 0)
-			 {
-				WARNING_QUIT("Make_Overlap_Table::init_paris_nonlocal_type","NL_L2plus1<=0");
-			 }
-		}
-	}
-	return;
-}
 
 
 void Make_Overlap_Table::init_OV_Opair(void)
@@ -1096,54 +753,6 @@ void Make_Overlap_Table::init_OV_Opair(void)
         }
     }
     return;
-}
-
-void Make_Overlap_Table::init_NL_Opair(void)
-{
-	const int lmax = ORB.get_lmax();
-	const int nchimax = ORB.get_nchimax();
-	const int nprojmax = ORB.nprojmax;
-	
-	// may have bug if we use all H!
-	if( nprojmax == 0)
-	{
-		WARNING("Make_Overlap_Table","nproj for nonlocal pseudopotetials are zero, it must be all H atoms");
-		return;
-	}
-	assert( NL_nTpairs > 0);
-	
-	this->NL_Opair.create( this->NL_nTpairs, lmax+1, nchimax, nprojmax);
-	
-	// <1psi|2beta>
-	// 1. orbital
-	for(int T1=0; T1<ntype; T1++)
-	{
-		// 2. NL projector
-		for(int T0=0; T0<ntype; T0++)
-		{
-			const int nlpair = this->NL_Tpair(T1, T0);
-			int index = 0;
-			for(int L1=0; L1<ORB.Phi[T1].getLmax()+1; L1++)
-			{
-				for(int N1=0; N1<ORB.Phi[T1].getNchi(L1); N1++)
-				{
-					// notice !! T0 must be Beta( Nonlocal projector)
-					// mohan update 2011-03-07
-					for(int ip=0; ip<ORB.nproj[T0]; ip++)
-					{
-						assert( nlpair < NL_nTpairs );
-						assert( L1 < lmax+1 );
-						assert( N1 < nchimax );
-						assert( ip < nprojmax );
-						this->NL_Opair(nlpair, L1, N1, ip) = index;
-						++index;
-					}
-				}
-			}
-		}
-	}
-
-	return;
 }
 
 // Peize Lin update 2016-01-26

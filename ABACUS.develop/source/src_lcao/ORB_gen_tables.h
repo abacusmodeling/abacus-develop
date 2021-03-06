@@ -6,9 +6,10 @@
 #define USE_OVERLAP_TABLE_H
 
 #include "src_pw/tools.h"
-#include "ORB_radial_table.h"
 #include "ORB_gaunt_table.h"
 #include "src_global/ylm.h"
+#include "ORB_table_beta.h"
+#include "ORB_table_phi.h"
 
 //------------------------------------
 // used to be 'Use_Overlap_Table',
@@ -67,6 +68,7 @@ class ORB_gen_tables
 	// we need to destroy the tables: SR,TR,NR
 	// after ionic optimization is done.
 	Make_Overlap_Table MOT;
+	ORB_table_beta tbeta;
 
 	// if we want to add table for descriptors,
 	// we should consider here -- mohan 2021-02-09

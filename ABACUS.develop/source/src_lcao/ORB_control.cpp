@@ -56,6 +56,6 @@ void ORB_control::clear_after_ions()
 {
     TITLE("ORB_control","clear_after_ions");
     UOT.MOT.Destroy_Table();
-    UOT.MOT.Destroy_Table_Beta();
+    UOT.tbeta.Destroy_Table_Beta();
     return;
 }
