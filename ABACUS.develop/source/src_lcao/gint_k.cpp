@@ -52,9 +52,14 @@ void Gint_k::allocate_pvpR(void)
 			this->pvpR_reduced[is] = new double[LNNR.nnrg];	
 			ZEROS( pvpR_reduced[is], LNNR.nnrg);
 		}
+
 		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", LNNR.nnrg * NSPIN , "double");
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-        if(OUT_LEVEL != "m") ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+
+        if(OUT_LEVEL != "m") 
+		{
+			ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+		}
+
         if( mem > 800 )
         {
             ofs_warning << " memory for pvpR = " << mem << endl;
@@ -67,18 +72,18 @@ void Gint_k::allocate_pvpR(void)
 	{
 		double mem = Memory::record("allocate_pvpR", "pvpR", GridT.lgd * GridT.nutot
 				* GridT.lgd * GridT.nutot , "double");
-		//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-		if(OUT_LEVEL != "m") ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+
+		if(OUT_LEVEL != "m") 
+		{
+			ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+		}
+
 		if( mem > 800 )
 		{
 			ofs_warning << " memory for pvpR = " << mem << endl;
 			ofs_warning << " which is larger than 800 MB ! " << endl;
 			WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
-
-		// output information
-		//cout << " MEMORY OF pvpR       : " << Memory::record("allocate_pvpR", "pvpR", GridT.lgd * GridT.nutot 
-		//* GridT.lgd * GridT.nutot , "cdouble") << " MB" << endl;
 
 		//----------------------------------------------
 		// allocate the complex matrix !!
@@ -87,8 +92,10 @@ void Gint_k::allocate_pvpR(void)
 		// 3*3*3 = 27.
 		//----------------------------------------------
 		const int LDIM=GridT.lgd*GridT.nutot;
+
 		this->pvpR_pool = new double[LDIM*LDIM];
 		ZEROS(pvpR_pool, LDIM*LDIM);
+
 		this->pvpR = new double*[LDIM];
 		for(int i=0; i<LDIM; i++)
 		{

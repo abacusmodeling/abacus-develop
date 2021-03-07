@@ -57,6 +57,7 @@ inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Rec
                    const int ia1, const int iw1_lo, const int nw1, const int gstart, 
                    complex<double> *WFC_PHASE, complex<double> **DM_ATOM)
 {
+
     const char transa='N', transb='T';  
     const complex<double> alpha=1, beta=1;
 
@@ -93,11 +94,15 @@ inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Rec
                     const int iline=nRow*nw1;
                     complex<double> phase=exp_R*wg_local;
                     for(int iw1=0; iw1<nw1; ++iw1)
+					{
                         WFC_PHASE[iline+iw1]=phase*conj(wfc[ib][iw1_lo+iw1]);
+					}
                     ++nRow;
                 }
                 else
+				{
                     break;
+				}
             } // ib
             zgemm_(&transa, &transb, &nw2, &nw1, &nRow, &alpha,
                 &wfc[ibStart][iw2_lo], &gt.lgd, 
@@ -260,7 +265,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
                     {
 						//note: storage nondiagonal term as Re[] and Im[] respectly;
 						this->DM_R[0][gstart+iv]=DM_ATOM[0][iv].real() + DM_ATOM[3][iv].real();
-						if(NONCOLIN){//DOMAG
+						if(NONCOLIN)
+						{//DOMAG
 							this->DM_R[1][gstart+iv]=DM_ATOM[1][iv].real() + DM_ATOM[2][iv].real();
 							this->DM_R[2][gstart+iv]=DM_ATOM[1][iv].imag() - DM_ATOM[2][iv].imag();
 							this->DM_R[3][gstart+iv]=DM_ATOM[0][iv].real() - DM_ATOM[3][iv].real();
