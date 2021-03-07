@@ -139,6 +139,8 @@ ELEC_scf.o\
 ELEC_nscf.o\
 local_orbital_ions.o\
 local_orbital_charge.o\
+DM_gamma.o\
+DM_k.o\
 record_adj.o\
 istate_charge.o \
 istate_envelope.o \
@@ -228,9 +230,11 @@ H_XC_pw.o \
 read_rho.o\
 read_atoms.o\
 read_pseudopot.o\
+read_dm.o\
 write_pot.o\
 write_rho.o\
 write_rho_dipole.o\
+write_dm.o\
 potential_libxc.o \
 efield.o \
 magnetism.o\

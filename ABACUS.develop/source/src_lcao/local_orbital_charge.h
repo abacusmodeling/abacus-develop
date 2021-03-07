@@ -3,7 +3,6 @@
 
 #include "src_pw/tools.h"
 #include "src_lcao/grid_technique.h"
-
 #include "src_lcao/wfc_dm_2d.h"
 
 class Local_Orbital_Charge
@@ -16,13 +15,21 @@ class Local_Orbital_Charge
 
 	// mohan added 2021-02-08
 	void allocate_dm_wfc(const Grid_Technique &gt);
-
-	void allocate_gamma(const Grid_Technique &gt);
-
-	void allocate_DM_k(void);
-	
 	// sum bands to compute the electron charge density
 	void sum_bands(void);
+
+	//-----------------
+	// in DM_gamma.h
+	//-----------------
+	void allocate_gamma(const Grid_Technique &gt);
+
+
+
+	//-----------------
+	// in DM_k.h
+	//-----------------
+	void allocate_DM_k(void);
+	
 
 	// liaochen modify on 2010-3-23 
 	// change its state from private to public
@@ -33,6 +40,7 @@ class Local_Orbital_Charge
 	int out_dm; // output density matrix or not.
 
 	void write_dm(const int &is, const int &iter, const string &fn, const int &precision);
+
 	void read_dm(const int &is, const string &fn);
 	
 	Wfc_Dm_2d wfc_dm_2d;		// Peize Lin test 2019-01-16
