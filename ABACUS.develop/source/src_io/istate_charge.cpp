@@ -134,7 +134,7 @@ void IState_Charge::begin(void)
 			for(int is=0; is<NSPIN; is++)
 			{
 				bool for_plot = true;
-				CHR.write_rho( is, 0, ss.str(), 3, for_plot );
+				CHR.write_rho(CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
 			}
 		}
 	}

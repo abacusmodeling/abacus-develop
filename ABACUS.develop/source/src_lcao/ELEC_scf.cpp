@@ -450,7 +450,7 @@ void ELEC_scf::scf(const int &istep)
 			
 			stringstream ssc;
 			ssc << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-			CHR.write_rho( is, iter, ssc.str(), precision );//mohan add 2007-10-17
+			CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), precision );//mohan add 2007-10-17
 
 			stringstream ssd;
 
@@ -531,7 +531,7 @@ void ELEC_scf::scf(const int &istep)
 
 				stringstream ssc;
 				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-				CHR.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+				CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 
 				stringstream ssd;
 				if(GAMMA_ONLY_LOCAL)
@@ -556,7 +556,7 @@ void ELEC_scf::scf(const int &istep)
 				//fuxiang add 2017-03-15
 				stringstream sse;
 				sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
-				CHR.write_rho_dipole( is, 0, sse.str());
+				CHR.write_rho_dipole(CHR.rho_save, is, 0, sse.str());
 				*/
 			}
 			

@@ -90,7 +90,7 @@ void IState_Envelope::begin(void)
 				ss << global_out_dir << "BAND" << ib + 1 << "_ENV" << is+1 << "_CHG";
 				// 0 means definitely output charge density.
 				bool for_plot = true;
-				CHR.write_rho( is, 0, ss.str(), 3, for_plot );
+				CHR.write_rho(CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
 			}
 		}
 	}

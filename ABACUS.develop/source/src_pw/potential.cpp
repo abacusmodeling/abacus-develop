@@ -112,7 +112,7 @@ void potential::init_pot(const int &istep)
                 ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
                 ofs_running << ssc.str() << endl;
                 // mohan update 2012-02-10
-                if(CHR.read_rho( is, ssc.str() )) 
+                if(CHR.read_rho( is, ssc.str(), CHR.rho[is] )) 
                 {
                     ofs_running << " Read in the charge density: " << ssc.str() << endl;
 				}
