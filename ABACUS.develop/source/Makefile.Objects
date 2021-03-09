@@ -137,6 +137,7 @@ ELEC_cbands_gamma.o\
 ELEC_evolve.o\
 ELEC_scf.o\
 ELEC_nscf.o\
+RELAX_cell.o\
 local_orbital_ions.o\
 local_orbital_charge.o\
 DM_gamma.o\

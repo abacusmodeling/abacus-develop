@@ -10,7 +10,7 @@
 #include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 #include "src_io/winput.h"
 #include "src_global/sltk_atom_arrange.h"
-#include "src_lcao/local_orbital_ions.h"
+#include "src_lcao/RELAX_cell.h"
 #include "src_io/print_info.h"
 #include "src_pw/symmetry.h"
 
@@ -149,8 +149,10 @@ void Run_lcao::lcao_line(void)
 		dftu.init();
 	}
 
-	Local_Orbital_Ions ions;
-	ions.opt_ions();
+	// mohan add 2021-03-09
+	RELAX_cell rcell;
+	rcell.opt_cell();
+
 	en.perform_dos();
 
 	timer::tick("Run_lcao","lcao_line",'A');
