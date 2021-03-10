@@ -50,6 +50,7 @@ class energy
 
     double etxcc;          // the nlcc exchange and correlation
 	double exx;            // the exact exchange energy.
+	double evdw;			// the vdw energy				// Peize Lin add 2021.03.09
 
     double demet;          // correction for metals
 

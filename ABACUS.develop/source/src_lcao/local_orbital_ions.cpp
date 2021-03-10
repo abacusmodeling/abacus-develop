@@ -546,13 +546,15 @@ void Local_Orbital_Ions::final_scf(void)
 
     UHM.set_lcao_matrices();
 
-    if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
+    if(vdwd2.flag_vdwd2())							//Peize Lin add 2014-04-04, update 2021-03-09
     {
-        vdwd2.energy();
+        vdwd2.cal_energy();
+        en.evdw = vdwd2.energy_result;
     }
 	else if(vdwd3.vdwD3)							//jiyy add 2019-05-18
     {
         vdwd3.energy();
+        en.evdw = vdwd3.energy_result;
     }											  
     
 	ELEC_scf es;

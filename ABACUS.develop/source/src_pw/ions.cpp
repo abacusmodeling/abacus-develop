@@ -93,14 +93,16 @@ void Ions::opt_ions_pw(void)
 		}
 
 			
-		if(vdwd2.vdwD2)		//Peize Lin add 2014-04-03, update 2019-04-26
+		if(vdwd2.flag_vdwd2())		//Peize Lin add 2014-04-03, update 2021-03-09
 		{
-			vdwd2.energy();
+			vdwd2.cal_energy();
+			en.evdw = vdwd2.energy_result;
 		}
 		if(vdwd3.vdwD3)		//jiyy add 2019-05-18
 		{
 			vdwd3.energy();
-		}																										 
+			en.evdw = vdwd3.energy_result;
+		}
 
 
 		// mohan added eiter to count for the electron iteration number, 2021-01-28

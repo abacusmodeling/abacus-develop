@@ -35,9 +35,15 @@ void Forces::init(matrix& force)
 	matrix stress_vdw_pw;//.create(3,3);
     matrix force_vdw;
     force_vdw.create(nat, 3);
-	if(vdwd2.vdwD2)													//Peize Lin add 2014-04-03, update 2019-04-26
+	if(vdwd2.flag_vdwd2())													//Peize Lin add 2014.04.03, update 2021.03.09
 	{
-		vdwd2.force(1, 0, force_vdw, stress_vdw_pw);
+		vdwd2.cal_force();
+		for(int iat=0; iat<ucell.nat; ++iat)
+		{
+			force_vdw(iat,0) = vdwd2.force_result[iat].x;
+			force_vdw(iat,1) = vdwd2.force_result[iat].y;
+			force_vdw(iat,2) = vdwd2.force_result[iat].z;
+		}
 		if(TEST_FORCE)
 		{
 			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
@@ -77,7 +83,7 @@ void Forces::init(matrix& force)
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);
 
-				if(vdwd2.vdwD2 || vdwd3.vdwD3)		//linpz and jiyy added vdw force, modified by zhengdy
+				if(vdwd2.flag_vdwd2() || vdwd3.vdwD3)		//linpz and jiyy added vdw force, modified by zhengdy
 				{
                     force(iat, ipol) += force_vdw(iat, ipol);
                 }																										   

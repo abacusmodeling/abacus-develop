@@ -54,7 +54,10 @@ void energy::calculate_harris(const int &flag)
 		+ (H_XC_pw::etxc - etxcc) 
 		+ H_Ewald_pw::ewald_energy 
 		+ H_Hartree_pw::hartree_energy 
-		+ demet + exx + Efield::etotefield;
+		+ demet
+		+ exx
+		+ Efield::etotefield
+		+ evdw;							// Peize Lin add evdw 2021.03.09
 
         if(INPUT.dft_plus_u) 
 		{
@@ -73,18 +76,11 @@ void energy::calculate_etot(void)
 	+ (H_XC_pw::etxc - etxcc) 
 	+ H_Ewald_pw::ewald_energy 
 	+ H_Hartree_pw::hartree_energy 
-	+ demet + descf + exx + Efield::etotefield;
-
-	// Peize Lin add 2014-04-03, update 2019-04-26
-	if(vdwd2.vdwD2)
-	{
-		this->etot += vdwd2.energy_result;
-	}
-	// jiyy add 2019-05-18
-	else if(vdwd3.vdwD3)
-	{
-		this->etot += vdwd3.energy_result;
-	}			
+	+ demet
+	+ descf
+	+ exx
+	+ Efield::etotefield
+	+ evdw;							// Peize Lin add evdw 2021.03.09
 
     //Quxin adds for DFT+U energy correction on 20201029
 
@@ -136,9 +132,9 @@ bool print)
 			this->print_format("E_demet",demet); //mohan add 2011-12-02
 			this->print_format("E_descf",descf);
 			this->print_format("E_efield",Efield::etotefield);
-			if(vdwd2.vdwD2)					//Peize Lin add 2014-04, update 2019-04-26
+			if(vdwd2.flag_vdwd2())					//Peize Lin add 2014-04, update 2021-03-09
 			{
-				this->print_format("E_vdwD2",vdwd2.energy_result);
+				this->print_format("E_vdwD2",evdw);
 			}
 			if(vdwd3.vdwD3)					//jiyy add 2019-05
 			{

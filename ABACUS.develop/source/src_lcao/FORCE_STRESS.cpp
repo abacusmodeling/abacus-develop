@@ -130,14 +130,27 @@ void Force_Stress_LCAO::getForceStress(
 				svl_dphi);
 	
 	//implement vdw force or stress here
-	// Peize Lin add 2014-04-04, update 2019-04-26
+	// Peize Lin add 2014-04-04, update 2021-03-09
 	matrix force_vdw;
 	matrix stress_vdw;
-	if(vdwd2.vdwD2)
+	if(vdwd2.flag_vdwd2())
 	{
-		if(isforce) force_vdw.create(nat,3);
-		if(isstress) stress_vdw.create(3,3);
-		vdwd2.force(isforce, isstress, force_vdw, stress_vdw);
+		if(isforce)
+		{
+			force_vdw.create(nat,3);
+			vdwd2.cal_force();
+			for(int iat=0; iat<ucell.nat; ++iat)
+			{
+				force_vdw(iat,0) = vdwd2.force_result[iat].x;
+				force_vdw(iat,1) = vdwd2.force_result[iat].y;
+				force_vdw(iat,2) = vdwd2.force_result[iat].z;
+			}			
+		}
+		if(isstress)
+		{
+			vdwd2.cal_stress();
+			stress_vdw = vdwd2.stress_result.to_matrix();
+		}
 	}
 	// jiyy add 2019-05-18
 	else if(vdwd3.vdwD3)
@@ -213,7 +226,7 @@ void Force_Stress_LCAO::getForceStress(
 					fcs(iat, i) += force_dftu(iat, i);
 				}
 				//VDW force of vdwd2 or vdwd3
-				if(vdwd2.vdwD2||vdwd3.vdwD3)
+				if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
 				{
 					fcs(iat,i) += force_vdw(iat,i);
 				}
@@ -291,7 +304,7 @@ void Force_Stress_LCAO::getForceStress(
 			{
 				this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
-			if(vdwd2.vdwD2||vdwd3.vdwD3)
+			if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
 			{
 				this->print_force("VDW        FORCE",force_vdw,1,ry);
 			}
@@ -343,7 +356,7 @@ void Force_Stress_LCAO::getForceStress(
 					+ sigmahar(i,j);// hartree stress 
 
 					//VDW stress from linpz and jiyy
-				if(vdwd2.vdwD2||vdwd3.vdwD3)
+				if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
 				{
 					scs(i,j) += stress_vdw(i , j);
 				}
@@ -399,7 +412,7 @@ void Force_Stress_LCAO::getForceStress(
 			sc_pw.print_stress("cc       STRESS",sigmacc,TEST_STRESS,ry);
 			//		sc_pw.print_stress("NLCC       STRESS",sigmacc,TEST_STRESS,ry);
 			sc_pw.print_stress("XC       STRESS",sigmaxc,TEST_STRESS,ry);
-			if(vdwd2.vdwD2||vdwd3.vdwD3)
+			if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
 			{
 				sc_pw.print_stress("VDW      STRESS",sigmaxc,TEST_STRESS,ry);
 			}

@@ -139,15 +139,17 @@ void Local_Orbital_Elec::solver(const int &istep)
     TITLE("Local_Orbital_Elec","solver"); 
     timer::tick("Local_Orbital_Elec","solver",'D'); 
 
-	// Peize Lin add 2014-04-04, update 2019-04-26
-	if(vdwd2.vdwD2)
+	// Peize Lin add 2014.04.04, update 2021.03.09
+	if(vdwd2.flag_vdwd2())
 	{
-		vdwd2.energy();
+		vdwd2.cal_energy();
+		en.evdw = vdwd2.energy_result;
 	}
 	// jiyy add 2019-05-18
 	else if(vdwd3.vdwD3)
 	{
 		vdwd3.energy();
+		en.evdw = vdwd3.energy_result;
 	}
 
 	// self consistent calculations for electronic ground state

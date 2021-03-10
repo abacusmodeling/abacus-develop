@@ -113,9 +113,10 @@ void Stress_PW::cal_stress(matrix& sigma)
 void Stress_PW::stress_vdw(matrix& sigma)
 {
 	matrix force;
-	if(vdwd2.vdwD2)                                                                 //Peize Lin add 2014-04-04, update 2019-04-26
+	if(vdwd2.flag_vdwd2())                                                           //Peize Lin add 2014-04-04, update 2021-03-09
 	{
-		vdwd2.force(0, 1, force, sigma);
+		vdwd2.cal_stress();
+		sigma = vdwd2.stress_result.to_matrix();
 	}
 	if(vdwd3.vdwD3)                                                                 //jiyy add 2019-05-18
 	{
