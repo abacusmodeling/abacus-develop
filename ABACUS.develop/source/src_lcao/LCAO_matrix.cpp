@@ -44,6 +44,8 @@ void LCAO_Matrix::divide_HS_in_frag(void)
 	{
 		ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
 #ifdef __MPI
+		// the storage form of H and S matrices on each processor
+		// is determined in 'divide_HS_2d' subroutine
 		ParaO.divide_HS_2d(DIAG_WORLD);
 #else
 		WARNING_QUIT("LCAO_Matrix::init","diago method is not ready.");
