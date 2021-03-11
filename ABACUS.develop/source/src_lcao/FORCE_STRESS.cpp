@@ -4,6 +4,7 @@
 #include "./dftu.h"  //Quxin add for DFT+U on 20201029
 // new
 #include "../src_pw/H_XC_pw.h"
+#include "src_pw/vdwd2.h"
 
 double Force_Stress_LCAO::force_invalid_threshold_ev = 0.00;
 double Force_Stress_LCAO::output_acc = 1.0e-8;
@@ -133,11 +134,12 @@ void Force_Stress_LCAO::getForceStress(
 	// Peize Lin add 2014-04-04, update 2021-03-09
 	matrix force_vdw;
 	matrix stress_vdw;
-	if(vdwd2.flag_vdwd2())
+	if(vdwd2_para.flag_vdwd2)
 	{
 		if(isforce)
 		{
 			force_vdw.create(nat,3);
+			Vdwd2 vdwd2(ucell,vdwd2_para);
 			vdwd2.cal_force();
 			for(int iat=0; iat<ucell.nat; ++iat)
 			{
@@ -148,6 +150,7 @@ void Force_Stress_LCAO::getForceStress(
 		}
 		if(isstress)
 		{
+			Vdwd2 vdwd2(ucell,vdwd2_para);
 			vdwd2.cal_stress();
 			stress_vdw = vdwd2.stress_result.to_matrix();
 		}
@@ -226,7 +229,7 @@ void Force_Stress_LCAO::getForceStress(
 					fcs(iat, i) += force_dftu(iat, i);
 				}
 				//VDW force of vdwd2 or vdwd3
-				if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
+				if(vdwd2_para.flag_vdwd2||vdwd3.vdwD3)
 				{
 					fcs(iat,i) += force_vdw(iat,i);
 				}
@@ -304,7 +307,7 @@ void Force_Stress_LCAO::getForceStress(
 			{
 				this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
-			if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
+			if(vdwd2_para.flag_vdwd2||vdwd3.vdwD3)
 			{
 				this->print_force("VDW        FORCE",force_vdw,1,ry);
 			}
@@ -356,7 +359,7 @@ void Force_Stress_LCAO::getForceStress(
 					+ sigmahar(i,j);// hartree stress 
 
 					//VDW stress from linpz and jiyy
-				if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
+				if(vdwd2_para.flag_vdwd2||vdwd3.vdwD3)
 				{
 					scs(i,j) += stress_vdw(i , j);
 				}
@@ -412,7 +415,7 @@ void Force_Stress_LCAO::getForceStress(
 			sc_pw.print_stress("cc       STRESS",sigmacc,TEST_STRESS,ry);
 			//		sc_pw.print_stress("NLCC       STRESS",sigmacc,TEST_STRESS,ry);
 			sc_pw.print_stress("XC       STRESS",sigmaxc,TEST_STRESS,ry);
-			if(vdwd2.flag_vdwd2()||vdwd3.vdwD3)
+			if(vdwd2_para.flag_vdwd2||vdwd3.vdwD3)
 			{
 				sc_pw.print_stress("VDW      STRESS",sigmaxc,TEST_STRESS,ry);
 			}

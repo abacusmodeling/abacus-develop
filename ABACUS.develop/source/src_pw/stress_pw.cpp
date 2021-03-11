@@ -1,6 +1,6 @@
 #include "./stress_pw.h"
 #include "./H_XC_pw.h"
-
+#include "src_pw/vdwd2.h"
 
 void Stress_PW::cal_stress(matrix& sigma)
 {
@@ -113,8 +113,9 @@ void Stress_PW::cal_stress(matrix& sigma)
 void Stress_PW::stress_vdw(matrix& sigma)
 {
 	matrix force;
-	if(vdwd2.flag_vdwd2())                                                           //Peize Lin add 2014-04-04, update 2021-03-09
+	if(vdwd2_para.flag_vdwd2)                                                       //Peize Lin add 2014-04-04, update 2021-03-09
 	{
+		Vdwd2 vdwd2(ucell,vdwd2_para);
 		vdwd2.cal_stress();
 		sigma = vdwd2.stress_result.to_matrix();
 	}

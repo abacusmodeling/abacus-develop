@@ -19,6 +19,7 @@
 //
 #include "src_ri/exx_abfs.h"
 #include "src_ri/exx_opt_orb.h"
+#include "src_pw/vdwd2.h"
 
 
 void Local_Orbital_Elec::solve_elec_stru(const int &istep)
@@ -140,8 +141,9 @@ void Local_Orbital_Elec::solver(const int &istep)
     timer::tick("Local_Orbital_Elec","solver",'D'); 
 
 	// Peize Lin add 2014.04.04, update 2021.03.09
-	if(vdwd2.flag_vdwd2())
+	if(vdwd2_para.flag_vdwd2)
 	{
+		Vdwd2 vdwd2(ucell,vdwd2_para);
 		vdwd2.cal_energy();
 		en.evdw = vdwd2.energy_result;
 	}

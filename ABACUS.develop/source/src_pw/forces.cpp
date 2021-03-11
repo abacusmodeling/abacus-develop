@@ -35,8 +35,9 @@ void Forces::init(matrix& force)
 	matrix stress_vdw_pw;//.create(3,3);
     matrix force_vdw;
     force_vdw.create(nat, 3);
-	if(vdwd2.flag_vdwd2())													//Peize Lin add 2014.04.03, update 2021.03.09
+	if(vdwd2_para.flag_vdwd2)													//Peize Lin add 2014.04.03, update 2021.03.09
 	{
+        Vdwd2 vdwd2(ucell,vdwd2_para);
 		vdwd2.cal_force();
 		for(int iat=0; iat<ucell.nat; ++iat)
 		{
@@ -83,7 +84,7 @@ void Forces::init(matrix& force)
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);
 
-				if(vdwd2.flag_vdwd2() || vdwd3.vdwD3)		//linpz and jiyy added vdw force, modified by zhengdy
+				if(vdwd2_para.flag_vdwd2 || vdwd3.vdwD3)		//linpz and jiyy added vdw force, modified by zhengdy
 				{
                     force(iat, ipol) += force_vdw(iat, ipol);
                 }																										   

@@ -132,7 +132,7 @@ bool print)
 			this->print_format("E_demet",demet); //mohan add 2011-12-02
 			this->print_format("E_descf",descf);
 			this->print_format("E_efield",Efield::etotefield);
-			if(vdwd2.flag_vdwd2())					//Peize Lin add 2014-04, update 2021-03-09
+			if(vdwd2_para.flag_vdwd2)					//Peize Lin add 2014-04, update 2021-03-09
 			{
 				this->print_format("E_vdwD2",evdw);
 			}

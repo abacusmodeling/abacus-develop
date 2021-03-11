@@ -61,7 +61,6 @@ extern UnitCell_pseudo ucell;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
 extern Vdwd2_Parameters vdwd2_para;		// Peize Lin add 2021.03.09
-extern Vdwd2 vdwd2;		// Peize Lin add 2019-04-26
 extern Vdwd3 vdwd3;		// jiyy add 2019-05-18		
 extern Restart restart;	// Peize Lin add 2020.04.04  																								 
 extern Soc soc; // zhengdy-soc

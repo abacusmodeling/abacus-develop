@@ -29,24 +29,6 @@ private:
 
 	const UnitCell_pseudo &ucell;
 	Vdwd2_Parameters &para;
-
-public:
-
-	bool flag_vdwd2()const{ return para.flag_vdwd2; }
 };
 
 #endif
-
-
-
-/*
-	for(int iat=0;iat<ucell.nat;iat++)
-	{
-		switch(ipol)
-		{
-			case 0: force_vdw(iat,ipol) += force_result[iat].x;        break;
-			case 1: force_vdw(iat,ipol) += force_result[iat].y;        break;
-			case 2: force_vdw(iat,ipol) += force_result[iat].z;        break;
-		}
-	}
-*/

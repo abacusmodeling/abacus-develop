@@ -93,8 +93,9 @@ void Ions::opt_ions_pw(void)
 		}
 
 			
-		if(vdwd2.flag_vdwd2())		//Peize Lin add 2014-04-03, update 2021-03-09
+		if(vdwd2_para.flag_vdwd2)		//Peize Lin add 2014-04-03, update 2021-03-09
 		{
+			Vdwd2 vdwd2(ucell,vdwd2_para);
 			vdwd2.cal_energy();
 			en.evdw = vdwd2.energy_result;
 		}
