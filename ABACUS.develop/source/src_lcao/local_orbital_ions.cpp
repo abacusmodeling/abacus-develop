@@ -12,6 +12,7 @@
 #include "src_ri/exx_opt_orb.h"
 #include "ELEC_scf.h"
 #include "src_global/sltk_atom_arrange.h"
+#include "src_pw/vdwd2.h"
 
 Local_Orbital_Ions::Local_Orbital_Ions()
 {}
@@ -546,13 +547,16 @@ void Local_Orbital_Ions::final_scf(void)
 
     UHM.set_lcao_matrices();
 
-    if(vdwd2.vdwD2)							//Peize Lin add 2014-04-04, update 2019-04-26
+    if(vdwd2_para.flag_vdwd2)							//Peize Lin add 2014-04-04, update 2021-03-09
     {
-        vdwd2.energy();
+        Vdwd2 vdwd2(ucell,vdwd2_para);
+        vdwd2.cal_energy();
+        en.evdw = vdwd2.energy_result;
     }
 	else if(vdwd3.vdwD3)							//jiyy add 2019-05-18
     {
         vdwd3.energy();
+        en.evdw = vdwd3.energy_result;
     }											  
     
 	ELEC_scf es;
