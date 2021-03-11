@@ -264,61 +264,91 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 }
 
 
-inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
-                              int& sender_index_size, int*& sender_local_index, 
-                              int*& sender_size_process, int*& sender_displacement_process, 
-                              int& sender_size, double*& sender_buffer,
-                              int& receiver_index_size, int*& receiver_global_index, 
-                              int*& receiver_size_process, int*& receiver_displacement_process, 
-                              int& receiver_size, double*& receiver_buffer)
+//------------------------------------------------------------------
+// mohan add notes: 2021-03-11
+// this subroutine is used to transform data from grid integrals
+// to 2D-block distribution
+// s stands for 'sender' and r stands for 'receiver'
+//------------------------------------------------------------------
+inline int setBufferParameter(
+	MPI_Comm comm_2D, 
+	int blacs_ctxt, 
+	int nblk,
+	int& s_index_siz, 
+	int*& s_local_index, 
+	int*& s_siz_pro, 
+	int*& s_dis_pro, 
+	int& s_siz, 
+	double*& s_buffer,
+	int& r_index_siz, 
+	int*& r_global_index, 
+	int*& r_siz_pro, 
+	int*& r_dis_pro, 
+	int& r_siz, 
+	double*& r_buffer)
 {
+	//-----------------------------------------
     // setup blacs parameters
+	//-----------------------------------------
     int nprows, npcols, nprocs;
     int myprow, mypcol, myproc;
+
     Cblacs_gridinfo(blacs_ctxt, &nprows, &npcols, &myprow, &mypcol);
+	
+	//-----------------------------------------
+	// set index of current proor: myproc
+	// set number of total proors: nprocs
+	//-----------------------------------------
     Cblacs_pinfo(&myproc, &nprocs);
     
-    // init data arrays
-    delete[] sender_size_process;
-    sender_size_process=new int[nprocs];
-    delete[] sender_displacement_process;
-    sender_displacement_process=new int[nprocs];
+    // initialize data arrays
+    delete[] s_siz_pro;
+    delete[] s_dis_pro;
+    delete[] r_siz_pro;
+    delete[] r_dis_pro;
 
-    delete[] receiver_size_process;
-    receiver_size_process=new int[nprocs];
-    delete[] receiver_displacement_process;
-    receiver_displacement_process=new int[nprocs];
+    s_siz_pro=new int[nprocs];
+    s_dis_pro=new int[nprocs];
+    r_siz_pro=new int[nprocs];
+    r_dis_pro=new int[nprocs];
 
-    // build the local index to be sent to other process (sender_local_index),
-    //       the global index to be received from other process (receiver_global_index),
-    //       the send/receive size/displacement for data exchange by MPI_Alltoall
-    sender_index_size=GridT.lgd*GridT.lgd*2;
-    delete[] sender_local_index;
-    sender_local_index=new int[sender_index_size];
+	//---------------------------------------------------------------------
+    // build the local index to be sent to other pro (s_local_index),
+    // the global index to be received from other pro (r_global_index),
+    // the send/receive siz/dis for data exchange by MPI_Alltoall
+	//---------------------------------------------------------------------
+    s_index_siz=GridT.lgd*GridT.lgd*2;
 
-    int *sender_global_index=new int[sender_index_size];
+    delete[] s_local_index;
+    s_local_index=new int[s_index_siz];
+
+    int *s_global_index=new int[s_index_siz];
 
     int pos=0;
-    sender_size_process[0]=0;
+    s_siz_pro[0]=0;
     for(int iproc=0; iproc<nprocs; ++iproc)
     {
-        sender_displacement_process[iproc]=pos;
+        s_dis_pro[iproc]=pos;
      
-        int iprow, ipcol;
+        int iprow=0;
+		int ipcol=0;
         Cblacs_pcoord(blacs_ctxt, iproc, &iprow, &ipcol);
         
-        // find out the global index and local index of elements in each process based on 2D block cyclic distribution
+        // find out the global index and local index of elements 
+		// in each pro based on 2D block cyclic distribution
         for(int irow=0, grow=0; grow<NLOCAL; ++irow)
         {
             grow=globalIndex(irow, nblk, nprows, iprow);
             int lrow=GridT.trace_lo[grow];
+
             if(lrow < 0 || grow >= NLOCAL) continue;
+
             for(int icol=0, gcol=0; gcol<NLOCAL; ++icol)
             {
                 gcol=globalIndex(icol,nblk, npcols, ipcol);
                 int lcol=GridT.trace_lo[gcol];
                 if(lcol < 0 || gcol >= NLOCAL) continue;
-                // if(pos<0 || pos >= current_sender_index_size)
+                // if(pos<0 || pos >= current_s_index_siz)
                 // {
                 //     OUT(ofs_running, "pos error, pos:", pos);
                 //     OUT(ofs_running, "irow:", irow);
@@ -328,57 +358,60 @@ inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
                 //     OUT(ofs_running, "lrow:", grow);
                 //     OUT(ofs_running, "lcol:", gcol);
                 // }
-                sender_global_index[pos]=grow;
-                sender_global_index[pos+1]=gcol;
-                sender_local_index[pos]=lrow;
-                sender_local_index[pos+1]=lcol;
+                s_global_index[pos]=grow;
+                s_global_index[pos+1]=gcol;
+                s_local_index[pos]=lrow;
+                s_local_index[pos+1]=lcol;
                 pos+=2;
             }
         }
-        sender_size_process[iproc]=pos-sender_displacement_process[iproc];
+        s_siz_pro[iproc]=pos-s_dis_pro[iproc];
     }
    
-    MPI_Alltoall(sender_size_process, 1, MPI_INT, 
-                 receiver_size_process, 1, MPI_INT, comm_2D);
+    MPI_Alltoall(s_siz_pro, 1, MPI_INT, 
+                 r_siz_pro, 1, MPI_INT, comm_2D);
 
-    receiver_index_size=receiver_size_process[0];
-    receiver_displacement_process[0]=0;
+    r_index_siz=r_siz_pro[0];
+    r_dis_pro[0]=0;
     for(int i=1; i<nprocs; ++i)
     {
-        receiver_index_size+=receiver_size_process[i];
-        receiver_displacement_process[i]=receiver_displacement_process[i-1]+receiver_size_process[i-1];
+        r_index_siz+=r_siz_pro[i];
+        r_dis_pro[i]=r_dis_pro[i-1]+r_siz_pro[i-1];
     }
-	delete[] receiver_global_index;
-	receiver_global_index=new int[receiver_index_size];
+
+	delete[] r_global_index;
+	r_global_index=new int[r_index_siz];
 
     // send the global index in sendBuffer to recvBuffer
-    MPI_Alltoallv(sender_global_index, sender_size_process, sender_displacement_process, MPI_INT, 
-                  receiver_global_index, receiver_size_process, receiver_displacement_process, MPI_INT, comm_2D);
+    MPI_Alltoallv(s_global_index, s_siz_pro, s_dis_pro, MPI_INT, 
+                  r_global_index, r_siz_pro, r_dis_pro, MPI_INT, comm_2D);
     
-    delete [] sender_global_index;
+    delete [] s_global_index;
 
-    // the sender_size_process, sender_displacement_process, receiver_size_process, 
-    // and receiver_displacement_process will be used in transfer sender_buffer, which
-    // is half size of sender_global_index
-    // we have to rebuild the size and displacement for each process
+    // the s_siz_pro, s_dis_pro, r_siz_pro, 
+    // and r_dis_pro will be used in transfer s_buffer, which
+    // is half siz of s_global_index
+    // we have to rebuild the siz and dis for each pro
     for (int iproc=0; iproc < nprocs; ++iproc)
     {
-        sender_size_process[iproc]=sender_size_process[iproc]/2;
-        sender_displacement_process[iproc]=sender_displacement_process[iproc]/2;
-        receiver_size_process[iproc]=receiver_size_process[iproc]/2;
-        receiver_displacement_process[iproc]=receiver_displacement_process[iproc]/2;
+        s_siz_pro[iproc]=s_siz_pro[iproc]/2;
+        s_dis_pro[iproc]=s_dis_pro[iproc]/2;
+        r_siz_pro[iproc]=r_siz_pro[iproc]/2;
+        r_dis_pro[iproc]=r_dis_pro[iproc]/2;
     }
     
-    sender_size=sender_index_size/2;
-	delete[] sender_buffer;
-	sender_buffer=new double[sender_size];
+    s_siz=s_index_siz/2;
+	delete[] s_buffer;
+	s_buffer=new double[s_siz];
 
-    receiver_size=receiver_index_size/2;
-	delete[] receiver_buffer;
-	receiver_buffer=new double[receiver_size];
+    r_siz=r_index_siz/2;
+	delete[] r_buffer;
+	r_buffer=new double[r_siz];
 
     return 0;
 }
+
+
 
 void Gint_Gamma::cal_vlocal(
     const double* vlocal_in)
