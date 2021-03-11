@@ -35,30 +35,46 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
     }
 }
 
-inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi, 
-                        double* mt, double*** dr, double** distance, 
-                        const Numerical_Orbital_Lm* pointer, double* ylma,
-                        int* colidx, int* block_iw, int* bsize, 
-                        double** psir_ylm, int** cal_flag)
+inline void cal_psir_ylm(
+	int size,  // how many atoms on this (i,j,k) grid
+	int grid_index, // 1d index of FFT index (i,j,k) 
+	double delta_r, // delta_r of the uniform FFT grid 
+	double phi, // radial wave functions 
+	double* mt, 
+	double*** dr, // dr[ bxyz ; atoms_on_this_big_cell; xyz ] 
+	double** distance, // [ bxyz ; atoms_on_this_big_cell]
+	const Numerical_Orbital_Lm* pointer, // pointer for ORB.Phi[it].PhiLN 
+	double* ylma, // spherical harmonic functions 
+	int* colidx,  // count total number of atomis orbitals 
+	int* block_iw, 
+	int* bsize,  // ??
+	double** psir_ylm, // bxyz * LD_pool 
+	int** cal_flag)
 {
     colidx[0]=0;
-    for (int id=0; id<size; id++)
+    for (int id=0; id<size; id++) 
     {
         // there are two parameters we want to know here:
         // in which bigcell of the meshball the atom is in?
         // what's the cartesian coordinate of the bigcell?
         const int mcell_index=GridT.bcell_start[grid_index] + id;
+
         const int imcell=GridT.which_bigcell[mcell_index];
 
-        int iat=GridT.which_atom[mcell_index];
+        int iat=GridT.which_atom[mcell_index]; // index of atom 
 
-        const int it=ucell.iat2it[ iat ];
-        const int ia=ucell.iat2ia[ iat ];
-        const int start=ucell.itiaiw2iwt(it, ia, 0);
+        const int it=ucell.iat2it[ iat ]; // index of atom type
+        const int ia=ucell.iat2ia[ iat ]; // index of atoms within each type
+        const int start=ucell.itiaiw2iwt(it, ia, 0); // the index of the first wave function for atom (it,ia)
+
         block_iw[id]=GridT.trace_lo[start];
+
         Atom* atom=&ucell.atoms[it];
+
         bsize[id]=atom->nw;
+
         colidx[id+1]=colidx[id]+atom->nw;
+
         // meshball_positions should be the bigcell position in meshball
         // to the center of meshball.
         // calculated in cartesian coordinates
@@ -69,6 +85,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r, double phi,
         mt[1]=GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
         mt[2]=GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
 
+		// number of grids in each big cell (bxyz)
         for(int ib=0; ib<pw.bxyz; ib++)
         {
             double *p=&psir_ylm[ib][colidx[id]];
@@ -245,6 +262,7 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
     myproc=int((globalIndex%(nblk*nprocs))/nblk);
     return int(globalIndex/(nblk*nprocs))*nblk+globalIndex%nblk;
 }
+
 
 inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
                               int& sender_index_size, int*& sender_local_index, 
@@ -501,11 +519,6 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 					const int jby=j*pw.by; 
 					for (int k=nbz_start; k<nbz_start+nbz; k++) // FFT grid
 					{
-						//OUT(ofs_running, "====================");
-						//OUT(ofs_running, "i", i);
-						//OUT(ofs_running, "j", j);
-						//OUT(ofs_running, "k", k);
-						//this->grid_index=(k-nbz_start) + j * nbz + i * nby * nbz;
 						int grid_index_thread=(k-nbz_start) + j * nbz + i * nby * nbz;
 
 						// get the value: how many atoms has orbital value on this grid.
@@ -521,23 +534,11 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 							vldr3[ib]=this->vlocal[vindex[ib]] * this->vfactor;
 						}
 
-						//OUT(ofs_running, "vldr3 was inited");
-						//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
-						//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, 
-						// distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
 						cal_psir_ylm(size, grid_index_thread, delta_r, phi, mt, dr, 
 						distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
-						//cal_psir_ylm(size, this->grid_index, delta_r, phi, mt, dr, 
-						// distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, i, j, k);
-						//timer::tick("Gint_Gamma","cal_vlocal_psir",'J');
-						//OUT(ofs_running, "psir_ylm was calculated");
-						//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
-						//cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, 
-						// vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal);
+
 						cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, cal_flag, 
 						vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal_thread);
-						//timer::tick("Gint_Gamma","cal_meshball_vlocal",'J');
-						//OUT(ofs_running, "GridVlocal was calculated");
 					}// k
 				}// j
 			}// i
@@ -600,14 +601,6 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
     if(CHR.get_new_e_iteration())
     {
         timer::tick("Gint_Gamma","distri_vl_index",'K');
-        // OUT(ofs_running, "Setup Buffer Parameters");
-        // inline int setBufferParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk,
-        //                             int& sender_index_size, int*& sender_local_index, 
-        //                             int*& sender_size_process, int*& sender_displacement_process, 
-        //                             int& sender_size, double*& sender_buffer,
-        //                             int& receiver_index_size, int*& receiver_global_index, 
-        //                             int*& receiver_size_process, int*& receiver_displacement_process, 
-        //                             int& receiver_size, double*& receiver_buffer)
         setBufferParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb,
                            ParaO.sender_index_size, ParaO.sender_local_index, 
                            ParaO.sender_size_process, ParaO.sender_displacement_process, 
@@ -621,14 +614,11 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
         timer::tick("Gint_Gamma","distri_vl_index",'K');
     }
 
-    // OUT(ofs_running, "Start data transforming");
     timer::tick("Gint_Gamma","distri_vl_value",'K');
+
     // put data to send buffer
     for(int i=0; i<ParaO.sender_index_size; i+=2)
     {
-        // const int idxGrid=ParaO.sender_local_index[i];
-        // const int icol=idxGrid%lgd_now; 
-        // const int irow=(idxGrid-icol)/lgd_now;
         const int irow=ParaO.sender_local_index[i];
         const int icol=ParaO.sender_local_index[i+1];
         if(irow<=icol)
@@ -640,20 +630,18 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
             ParaO.sender_buffer[i/2]=GridVlocal[icol][irow];
 		}
     }
-     OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
+    OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
 
     // use mpi_alltoall to get local data
     MPI_Alltoallv(ParaO.sender_buffer, ParaO.sender_size_process, ParaO.sender_displacement_process, MPI_DOUBLE, 
                   ParaO.receiver_buffer, ParaO.receiver_size_process, 
 					ParaO.receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
 
-     OUT(ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
+    OUT(ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
 
     // put local data to H matrix
     for(int i=0; i<ParaO.receiver_index_size; i+=2)
     {
-        // int g_col=ParaO.receiver_global_index[i]%NLOCAL;
-        // int g_row=(ParaO.receiver_global_index[i]-g_col)/NLOCAL;
         const int g_row=ParaO.receiver_global_index[i];
         const int g_col=ParaO.receiver_global_index[i+1];
         // if(g_col<0 || g_col>=NLOCAL||g_row<0 || g_row>=NLOCAL) 
@@ -666,10 +654,8 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
         LM.set_HSgamma(g_row,g_col,ParaO.receiver_buffer[i/2],'L');
     }
 
-    // OUT(ofs_running, "received vlocal data are put in to H")
     timer::tick("Gint_Gamma","distri_vl_value",'K');
     timer::tick("Gint_Gamma","distri_vl",'K');
-    //OUT(ofs_running, "reduce all vlocal ok,");
 
 	for (int i=0; i<GridT.lgd; i++)
 	{

@@ -313,9 +313,6 @@ void Pdiag_Double::divide_HS_2d
 
 	if(DCOLOR!=0) return; // mohan add 2012-01-13
 
-//	OUT(ofs_running,"NLOCAL",NLOCAL);
-//	OUT(ofs_running,"NPROC",NPROC);
-
 	// get the 2D index of computer.
 	this->dim0 = (int)sqrt((double)DSIZE); //mohan update 2012/01/13
 	//while (NPROC_IN_POOL%dim0!=0)
@@ -325,7 +322,7 @@ void Pdiag_Double::divide_HS_2d
 	}
 	assert(dim0 > 0);
 	this->dim1=DSIZE/dim0;
-//	testpb=1; //mohan test
+
 	if(testpb)OUT(ofs_running,"dim0",dim0);
 	if(testpb)OUT(ofs_running,"dim1",dim1);
 
