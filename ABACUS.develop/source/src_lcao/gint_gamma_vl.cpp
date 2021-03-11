@@ -15,16 +15,24 @@ extern "C"
     void Cblacs_pcoord(int icontxt, int pnum, int *prow, int *pcol);
 }
 
-inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, 
-                    int* vindex)
+// here vindex refers to local potentials
+inline void setVindex
+	(const int ncyz, 
+	const int ibx, 
+	const int jby, 
+	const int kbz, 
+	int* vindex)
 {                
     int bindex=0;
     // z is the fastest, 
+
+	// ipart can be obtained by using a previously stored array
     for(int ii=0; ii<pw.bx; ii++)
     {
         const int ipart=(ibx + ii) * ncyz + kbz;
         for(int jj=0; jj<pw.by; jj++)
         {
+			// jpart can be obtained by using a previously stored array
             const int jpart=(jby + jj) * pw.nczp + ipart;
             for(int kk=0; kk<pw.bz; kk++)
             {
@@ -33,6 +41,7 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
             }
         }
     }
+	return;
 }
 
 inline void cal_psir_ylm(
@@ -46,10 +55,10 @@ inline void cal_psir_ylm(
 	const Numerical_Orbital_Lm* pointer, // pointer for ORB.Phi[it].PhiLN 
 	double* ylma, // spherical harmonic functions 
 	int* colidx,  // count total number of atomis orbitals 
-	int* block_iw, 
+	int* block_iw, // seems not belong to this subroutine
 	int* bsize,  // ??
 	double** psir_ylm, // bxyz * LD_pool 
-	int** cal_flag)
+	int** cal_flag) // whether the atom-grid distance is larger than cutoff
 {
     colidx[0]=0;
     for (int id=0; id<size; id++) 
@@ -434,10 +443,7 @@ void Gint_Gamma::cal_vlocal(
 }
 
 
-// this subroutine lies in the heart of LCAO algorithms.
-// so it should be done very efficiently, very carefully.
-// I might repeat again to emphasize this: need to optimize
-// this code very efficiently, very carefully.
+
 void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
@@ -486,8 +492,12 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 		const int lgd_now=GridT.lgd;    
 		if(max_size>0 && lgd_now>0)
 		{
+			//------------------------------------------------------
+			// <phi | V_local | phi> 
+			//------------------------------------------------------
 			double *GridVlocal_pool=new double [lgd_now*lgd_now];
 			ZEROS(GridVlocal_pool, lgd_now*lgd_now);
+
 			double **GridVlocal_thread=new double*[lgd_now];
 			for (int i=0; i<lgd_now; i++)
 			{
@@ -495,7 +505,10 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			}
 			Memory::record("Gint_Gamma","GridVlocal",lgd_now*lgd_now,"double");
 
-			double* ylma=new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
+			//------------------------------------------------------
+			// spherical harmonic functions Ylm
+			//------------------------------------------------------
+			double* ylma=new double[nnnmax];
 			ZEROS(ylma, nnnmax);
 			double *vldr3=new double[pw.bxyz];
 			ZEROS(vldr3, pw.bxyz);
@@ -503,7 +516,12 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			ZEROS(vindex, pw.bxyz);
 
 			int LD_pool=max_size*ucell.nwmax;
-			double*** dr=new double**[pw.bxyz]; // vectors between atom and grid: [bxyz, maxsize, 3]
+
+
+			//------------------------------------------------------
+			// vectors between atom and grid: [bxyz, maxsize, 3]
+			//------------------------------------------------------
+			double*** dr=new double**[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
 			{
 				dr[i]=new double*[max_size];
@@ -513,35 +531,57 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 					ZEROS(dr[i][j],3);
 				}				
 			}
-			double** distance=new double*[pw.bxyz]; // distance between atom and grid: [bxyz, maxsize]
+
+			//------------------------------------------------------
+			// distance between atom and grid: [bxyz, maxsize]
+			//------------------------------------------------------
+			double** distance=new double*[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
 			{
 				distance[i]=new double[max_size];
 				ZEROS(distance[i], max_size);
 			}
-			int *bsize=new int[max_size];	 //band size: number of columns of a band
+
+			// band size: number of columns of a band
+			int *bsize=new int[max_size];
+
 			int *colidx=new int[max_size+1];
+
 			double *psir_ylm_pool=new double[pw.bxyz*LD_pool];
+
+			//------------------------------------------------------
+			// atomic basis sets 
+			//------------------------------------------------------
 			double **psir_ylm=new double *[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
 			{
 				psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
 			}
 			ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
+
 			double *psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
+
 			double **psir_vlbr3=new double *[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
 			{
 				psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
 			}
 			ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
+
+			//------------------------------------------------------
+			// whether the atom-grid distance is larger than  
+			// cutoff
+			//------------------------------------------------------
 			int **cal_flag=new int*[pw.bxyz];
 			for(int i=0; i<pw.bxyz; i++)
 			{
 				cal_flag[i]=new int[max_size];
 			}
 
-			int *block_iw = new int[max_size]; // index of wave functions of each block;
+			//------------------------------------------------------
+			// index of wave functions for each block
+			//------------------------------------------------------
+			int *block_iw = new int[max_size];
 
 			#pragma omp for
 			for (int i=0; i< nbx; i++)
@@ -554,22 +594,40 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 					{
 						int grid_index_thread=(k-nbz_start) + j * nbz + i * nby * nbz;
 
-						// get the value: how many atoms has orbital value on this grid.
-						//const int size=GridT.how_many_atoms[ this->grid_index ];
+						//------------------------------------------------------------------
+						// get the value: how many atoms are involved in this grid (big cell)
+						//------------------------------------------------------------------
 						const int size=GridT.how_many_atoms[ grid_index_thread ];
+
 						if(size==0) continue;
+
+						//------------------------------------------------------------------
+						// kbz can be obtained using a previously stored array
+						//------------------------------------------------------------------
 						const int kbz=k*pw.bz-pw.nczp_start;
+
+						//------------------------------------------------------------------
+						// set the index for obtaining local potentials
+						//------------------------------------------------------------------
 						setVindex(ncyz, ibx, jby, kbz, vindex);
-						//OUT(ofs_running, "vindex was set");
+
+						//------------------------------------------------------------------
 						// extract the local potentials.
+						//------------------------------------------------------------------
 						for(int ib=0; ib<pw.bxyz; ib++)
 						{
 							vldr3[ib]=this->vlocal[vindex[ib]] * this->vfactor;
 						}
 
+						//------------------------------------------------------------------
+						// compute atomic basis phi(r) with both radial and angular parts
+						//------------------------------------------------------------------
 						cal_psir_ylm(size, grid_index_thread, delta_r, phi, mt, dr, 
 						distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
 
+						//------------------------------------------------------------------
+						// calculate <phi_i|V|phi_j>
+						//------------------------------------------------------------------
 						cal_meshball_vlocal(size, LD_pool, block_iw, bsize, colidx, cal_flag, 
 						vldr3, psir_ylm, psir_vlbr3, vindex, lgd_now, GridVlocal_thread);
 					}// k
