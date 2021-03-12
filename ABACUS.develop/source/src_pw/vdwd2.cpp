@@ -18,7 +18,7 @@ void Vdwd2::cal_energy()
     TITLE("Vdwd2","energy");
 	para.initset(ucell);
 
-	energy_result = 0;
+	energy = 0;
 	for( int it1=0; it1!=ucell.ntype; ++it1 )
 	{
 		for( int it2=0; it2!=ucell.ntype; ++it2 )
@@ -43,13 +43,13 @@ void Vdwd2::cal_energy()
 								const double r_sqr = (tau1 - tau2).norm2();
 								const double r = sqrt(r_sqr);
 								const double tmp_damp_recip = 1+ exp( -para.damping* (r/R0_sum-1) );
-								energy_result -= C6_product/ pow(r_sqr,3)/ tmp_damp_recip/ 2;
+								energy -= C6_product/ pow(r_sqr,3)/ tmp_damp_recip/ 2;
 							} // end for ilat_loop
 				} // end for ia2
 			} // end for ia1
 		} // end for it2
 	} // end for it1
-	energy_result *= para.scaling;
+	energy *= para.scaling;
 }
 
 void Vdwd2::cal_force()
@@ -57,8 +57,8 @@ void Vdwd2::cal_force()
     TITLE("Vdwd2","force");
 	para.initset(ucell);
 
-	force_result.clear();
-	force_result.resize(ucell.nat);
+	force.clear();
+	force.resize(ucell.nat);
 	
 	for( int it1=0; it1!=ucell.ntype; ++it1 )
 	{
@@ -85,7 +85,7 @@ void Vdwd2::cal_force()
 								const double r = sqrt(r_sqr);
 								const double tmp_exp = exp( -para.damping* (r/R0_sum-1) );
 								const double tmp_factor = C6_product/ pow(r_sqr,3)/ r/ (1+tmp_exp)* ( -6/r + tmp_exp/(1+tmp_exp)*para.damping/R0_sum);
-								force_result[ucell.itia2iat(it1,ia1)] += tmp_factor*(tau1-tau2);
+								force[ucell.itia2iat(it1,ia1)] += tmp_factor*(tau1-tau2);
 							} // end for ilat_loop
 				} // end for ia2
 			} // end for ia1
@@ -93,7 +93,7 @@ void Vdwd2::cal_force()
 	} // end for it1
 	for( int iat=0; iat!=ucell.nat; ++iat )
 	{
-		force_result[iat] *= para.scaling/ucell.lat0;
+		force[iat] *= para.scaling/ucell.lat0;
 	}
 }
 
@@ -103,7 +103,7 @@ void Vdwd2::cal_stress()
     TITLE("Vdwd2","force");
 	para.initset(ucell);
 
-	stress_result.Reset();
+	stress.Reset();
 	
 	for( int it1=0; it1!=ucell.ntype; ++it1 )
 	{
@@ -131,7 +131,7 @@ void Vdwd2::cal_stress()
 								const double r = sqrt(r_sqr);
 								const double tmp_exp = exp( -para.damping* (r/R0_sum-1) );
 								const double tmp_factor = C6_product/ pow(r_sqr,3)/ r/ (1+tmp_exp)* ( -6/r + tmp_exp/(1+tmp_exp)*para.damping/R0_sum);
-								stress_result += tmp_factor / 2 * Matrix3(
+								stress += tmp_factor / 2 * Matrix3(
 									dr.x*dr.x, dr.x*dr.y, dr.x*dr.z,
 									dr.y*dr.x, dr.y*dr.y, dr.y*dr.z,
 									dr.z*dr.x, dr.z*dr.y, dr.z*dr.z);
@@ -140,5 +140,5 @@ void Vdwd2::cal_stress()
 			} // end for ia1
 		} // end for it2
 	} // end for it1
-	stress_result *= para.scaling / ucell.omega;
+	stress *= para.scaling / ucell.omega;
 }

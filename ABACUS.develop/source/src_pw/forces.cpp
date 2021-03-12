@@ -41,9 +41,9 @@ void Forces::init(matrix& force)
 		vdwd2.cal_force();
 		for(int iat=0; iat<ucell.nat; ++iat)
 		{
-			force_vdw(iat,0) = vdwd2.force_result[iat].x;
-			force_vdw(iat,1) = vdwd2.force_result[iat].y;
-			force_vdw(iat,2) = vdwd2.force_result[iat].z;
+			force_vdw(iat,0) = vdwd2.get_force()[iat].x;
+			force_vdw(iat,1) = vdwd2.get_force()[iat].y;
+			force_vdw(iat,2) = vdwd2.get_force()[iat].z;
 		}
 		if(TEST_FORCE)
 		{
