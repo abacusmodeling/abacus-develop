@@ -1,5 +1,5 @@
 #include "ELEC_evolve.h"
-#include "local_orbital_elec.h"
+#include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "src_pw/global.h"
 #include "src_pw/symmetry_rho.h"

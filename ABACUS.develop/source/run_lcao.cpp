@@ -10,7 +10,7 @@
 #include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 #include "src_io/winput.h"
 #include "src_global/sltk_atom_arrange.h"
-#include "src_lcao/RELAX_cell.h"
+#include "src_lcao/LOOP_cell.h"
 #include "src_io/print_info.h"
 #include "src_pw/symmetry.h"
 #include "src_lcao/run_md.h"

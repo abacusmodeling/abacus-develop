@@ -1,4 +1,4 @@
-#include "local_orbital_ions.h"
+#include "LOOP_ions.h"
 #include "src_pw/global.h"
 #include "src_parallel/parallel_orbitals.h"
 #include "src_pdiag/pdiag_double.h"

@@ -1,7 +1,7 @@
 #ifndef RUN_MD_H
 #define RUN_MD_H 
 
-#include "local_orbital_elec.h"
+#include "LOOP_elec.h"
 #include "../src_ions/ions_move_methods.h"
 #include "../src_pw/charge_extra.h"
 #include "../src_pw/md.h"
