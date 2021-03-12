@@ -8,7 +8,6 @@
 //#include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 //#include "src_pw/winput.h"
 //#include "src_lcao/sltk_atom_arrange.h"
-//#include "src_lcao/local_orbital_ions.h"
 
 Variable_Cell::Variable_Cell(){}
 Variable_Cell::~Variable_Cell(){}

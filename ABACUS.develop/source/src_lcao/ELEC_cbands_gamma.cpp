@@ -89,7 +89,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			ofs_running << " no diagonalization." << endl;
 #else
 			cout << " DCOLOR=" << DCOLOR << endl;
-			WARNING_QUIT("Local_Orbital_Elec::cal_bands","no diagonalization");
+			WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
 #endif
 
 		}

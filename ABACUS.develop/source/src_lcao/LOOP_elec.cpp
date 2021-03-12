@@ -22,10 +22,10 @@
 #include "src_pw/vdwd2.h"
 
 
-void Local_Orbital_Elec::solve_elec_stru(const int &istep)
+void LOOP_elec::solve_elec_stru(const int &istep)
 {
-    TITLE("Local_Orbital_Elec","solve_elec_stru"); 
-    timer::tick("Local_Orbital_Elec","solve_elec_stru",'C'); 
+    TITLE("LOOP_elec","solve_elec_stru"); 
+    timer::tick("LOOP_elec","solve_elec_stru",'C'); 
 
 	// prepare HS matrices, prepare grid integral
 	this->set_matrix_grid();
@@ -34,15 +34,15 @@ void Local_Orbital_Elec::solve_elec_stru(const int &istep)
 	// do self-interaction calculations / nscf/ tddft, etc. 
 	this->solver(istep);
 
-    timer::tick("Local_Orbital_Elec","solve_elec_stru",'C'); 
+    timer::tick("LOOP_elec","solve_elec_stru",'C'); 
 	return;
 }
 
 
-void Local_Orbital_Elec::set_matrix_grid(void)
+void LOOP_elec::set_matrix_grid(void)
 {
-    TITLE("Local_Orbital_Elec","set_matrix_grid"); 
-    timer::tick("Local_Orbital_Elec","set_matrix_grid",'D'); 
+    TITLE("LOOP_elec","set_matrix_grid"); 
+    timer::tick("LOOP_elec","set_matrix_grid",'D'); 
 
 	// (1) Find adjacent atoms for each atom.
 	atom_arrange::set_sr_NL();
@@ -69,15 +69,15 @@ void Local_Orbital_Elec::set_matrix_grid(void)
 		LNNR.cal_nnrg(GridT);
 	}
 
-    timer::tick("Local_Orbital_Elec","set_matrix_grid",'D'); 
+    timer::tick("LOOP_elec","set_matrix_grid",'D'); 
 	return;
 }
 
 
-void Local_Orbital_Elec::before_solver(const int &istep)
+void LOOP_elec::before_solver(const int &istep)
 {
-    TITLE("Local_Orbital_Elec","before_solver"); 
-    timer::tick("Local_Orbital_Elec","before_solver",'D'); 
+    TITLE("LOOP_elec","before_solver"); 
+    timer::tick("LOOP_elec","before_solver",'D'); 
 
 	// set the augmented orbitals index.
 	// after ParaO and GridT, 
@@ -131,14 +131,14 @@ void Local_Orbital_Elec::before_solver(const int &istep)
 	// (9) compute S, T, Vnl, Vna matrix.
 	UHM.set_lcao_matrices();
 
-    timer::tick("Local_Orbital_Elec","before_solver",'D'); 
+    timer::tick("LOOP_elec","before_solver",'D'); 
 	return;
 }
 
-void Local_Orbital_Elec::solver(const int &istep)
+void LOOP_elec::solver(const int &istep)
 {
-    TITLE("Local_Orbital_Elec","solver"); 
-    timer::tick("Local_Orbital_Elec","solver",'D'); 
+    TITLE("LOOP_elec","solver"); 
+    timer::tick("LOOP_elec","solver",'D'); 
 
 	// Peize Lin add 2014.04.04, update 2021.03.09
 	if(vdwd2_para.flag_vdwd2)
@@ -229,10 +229,10 @@ void Local_Orbital_Elec::solver(const int &istep)
 	}
 	else
 	{
-		WARNING_QUIT("Local_Orbital_Ions::solver","CALCULATION type not supported");
+		WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
 	}
 
-    timer::tick("Local_Orbital_Elec","solver",'D'); 
+    timer::tick("LOOP_elec","solver",'D'); 
 	return;
 }
 

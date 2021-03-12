@@ -181,7 +181,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 
 
 #include "LCAO_nnr.h"
-// be called in Local_Orbital_Elec::cal_bands(). 
+// be called in LOOP_elec::cal_bands(). 
 void LCAO_Hamilt::calculate_Hk(const int &ik)
 {
 	TITLE("LCAO_Hamilt","calculate_Hk");

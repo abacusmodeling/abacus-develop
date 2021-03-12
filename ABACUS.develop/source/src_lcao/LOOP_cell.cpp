@@ -9,7 +9,7 @@ RELAX_cell::~RELAX_cell(){}
 
 void RELAX_cell::opt_cell()
 {
-	Local_Orbital_Ions ions;
+	LOOP_ions ions;
 	ions.opt_ions();
 	
 	return;

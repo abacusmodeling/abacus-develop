@@ -17,7 +17,7 @@ class Run_MD
 	Run_MD();
 	~Run_MD();
 
-	Local_Orbital_Elec LOE;
+	LOOP_elec LOE;
 
 	void opt_ions(void);
 	void output_HS_R(void); //LiuXh add 2019-07-15

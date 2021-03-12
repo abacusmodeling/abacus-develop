@@ -1,5 +1,5 @@
-#ifndef LOCAL_ORBITAL_IONS_H
-#define LOCAL_ORBITAL_IONS_H
+#ifndef LOOP_IONS_H
+#define LOOP_IONS_H
 
 #include "LOOP_elec.h"
 #include "../src_ions/ions_move_methods.h"
@@ -9,15 +9,15 @@
 #include "../src_pw/mdNVE.h"
 #include "../src_ions/lattice_change_methods.h"
 
-class Local_Orbital_Ions
+class LOOP_ions
 {
 
 	public:
 
-	Local_Orbital_Ions();
-	~Local_Orbital_Ions();
+	LOOP_ions();
+	~LOOP_ions();
 
-	Local_Orbital_Elec LOE;
+	LOOP_elec LOE;
 
 	void opt_ions(void);
 	void output_HS_R(void); //LiuXh add 2019-07-15

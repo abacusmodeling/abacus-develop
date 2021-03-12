@@ -40,7 +40,7 @@ void Force_Stress_LCAO::allocate(void)
 }
 
 #include "../src_pw/efield.h"
-// be called in : Local_Orbital_Ions::force_stress
+// be called in : LOOP_ions::force_stress
 void Force_Stress_LCAO::getForceStress(
 	const bool isforce, 
 	const bool isstress, 

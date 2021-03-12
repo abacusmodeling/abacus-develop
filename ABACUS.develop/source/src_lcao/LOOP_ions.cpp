@@ -14,16 +14,16 @@
 #include "src_global/sltk_atom_arrange.h"
 #include "src_pw/vdwd2.h"
 
-Local_Orbital_Ions::Local_Orbital_Ions()
+LOOP_ions::LOOP_ions()
 {}
 
-Local_Orbital_Ions::~Local_Orbital_Ions() 
+LOOP_ions::~LOOP_ions() 
 {}
 
-void Local_Orbital_Ions::opt_ions(void)
+void LOOP_ions::opt_ions(void)
 {
-    TITLE("Local_Orbital_Ions","opt_ions"); 
-    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
+    TITLE("LOOP_ions","opt_ions"); 
+    timer::tick("LOOP_ions","opt_ions",'B'); 
 		
     if(OUT_LEVEL=="i")
     {
@@ -212,7 +212,7 @@ void Local_Orbital_Ions::opt_ions(void)
         ++istep;
     }
 
-    if(CALCULATION=="scf" || CALCULATION=="relax")
+    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
     {
         ofs_running << "\n\n --------------------------------------------" << endl;
         ofs_running << setprecision(16);
@@ -243,19 +243,19 @@ void Local_Orbital_Ions::opt_ions(void)
 	// mohan update 2021-02-10
     hm.orb_con.clear_after_ions();
 
-    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
+    timer::tick("LOOP_ions","opt_ions",'B'); 
     return;
 }
 
-//bool Local_Orbital_Ions::force_stress(void)
-bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &stress_step)
+//bool LOOP_ions::force_stress(void)
+bool LOOP_ions::force_stress(const int &istep, int &force_step, int &stress_step)
 {
-    TITLE("Local_Orbital_Ions","force_stress");
+    TITLE("LOOP_ions","force_stress");
     if(!FORCE && !STRESS)
     {
         return 1;
     }
-    timer::tick("Local_Orbital_Ions","force_stress",'D');
+    timer::tick("LOOP_ions","force_stress",'D');
 	matrix fcs;
 	matrix scs;
 	Force_Stress_LCAO FSL;
@@ -428,12 +428,12 @@ xiaohui modify 2014-08-09*/
 
     return 0;
 
-    timer::tick("Local_Orbital_Ions","force_stress",'D');
+    timer::tick("LOOP_ions","force_stress",'D');
 }
 
-void Local_Orbital_Ions::final_scf(void)
+void LOOP_ions::final_scf(void)
 {
-    TITLE("Local_Orbital_Ions","final_scf"); 
+    TITLE("LOOP_ions","final_scf"); 
 
     FINAL_SCF = true;
     Variable_Cell::final_calculation_after_vc();
@@ -494,7 +494,7 @@ void Local_Orbital_Ions::final_scf(void)
 	ELEC_scf es;
 	es.scf(0);
 
-    if(CALCULATION=="scf" || CALCULATION=="relax")
+    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
     {
         ofs_running << "\n\n --------------------------------------------" << endl;
         ofs_running << setprecision(16);
@@ -505,10 +505,10 @@ void Local_Orbital_Ions::final_scf(void)
     return;
 }
 
-void Local_Orbital_Ions::output_HS_R(void)
+void LOOP_ions::output_HS_R(void)
 {
-    TITLE("Local_Orbital_Ions","output_HS_R"); 
-    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
+    TITLE("LOOP_ions","output_HS_R"); 
+    timer::tick("LOOP_ions","output_HS_R",'D'); 
 	
 	// add by jingan for out r_R matrix 2019.8.14
 	if(INPUT.out_r_matrix)
@@ -559,6 +559,6 @@ void Local_Orbital_Ions::output_HS_R(void)
         UHM.GK.destroy_pvpR();
     } //LiuXh 20181011
 
-    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
+    timer::tick("LOOP_ions","output_HS_R",'D'); 
     return;
 }

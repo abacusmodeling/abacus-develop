@@ -26,7 +26,7 @@ public:
     //called at Run_Frag::frag_LCAO_line(void)
     void init();                        // initialize the input terms of  U, J, double_counting etc
     
-    //called at Local_Orbital_Elec::scf(const int &istep)
+    //called at LOOP_elec::scf(const int &istep)
     //calculate the local occupation number matrix
     void cal_occup_m_k(const int iter);
     void cal_occup_m_gamma(const int iter);

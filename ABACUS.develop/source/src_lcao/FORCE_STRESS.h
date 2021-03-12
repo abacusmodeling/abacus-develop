@@ -15,7 +15,7 @@ class Force_Stress_LCAO
 	friend class Run_MD;
 	friend void Input_Conv::Convert();
 	friend class Update_input;
-	friend class Local_Orbital_Ions;
+	friend class LOOP_ions;
 
 	public :
 	
