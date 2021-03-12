@@ -97,7 +97,7 @@ void Ions::opt_ions_pw(void)
 		{
 			Vdwd2 vdwd2(ucell,vdwd2_para);
 			vdwd2.cal_energy();
-			en.evdw = vdwd2.energy_result;
+			en.evdw = vdwd2.get_energy();
 		}
 		if(vdwd3.vdwD3)		//jiyy add 2019-05-18
 		{

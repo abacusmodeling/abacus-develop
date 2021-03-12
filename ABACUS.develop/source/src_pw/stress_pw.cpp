@@ -117,7 +117,7 @@ void Stress_PW::stress_vdw(matrix& sigma)
 	{
 		Vdwd2 vdwd2(ucell,vdwd2_para);
 		vdwd2.cal_stress();
-		sigma = vdwd2.stress_result.to_matrix();
+		sigma = vdwd2.get_stress().to_matrix();
 	}
 	if(vdwd3.vdwD3)                                                                 //jiyy add 2019-05-18
 	{

@@ -145,7 +145,7 @@ void Local_Orbital_Elec::solver(const int &istep)
 	{
 		Vdwd2 vdwd2(ucell,vdwd2_para);
 		vdwd2.cal_energy();
-		en.evdw = vdwd2.energy_result;
+		en.evdw = vdwd2.get_energy();
 	}
 	// jiyy add 2019-05-18
 	else if(vdwd3.vdwD3)

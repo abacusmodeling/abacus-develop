@@ -16,19 +16,22 @@ public:
 
 	Vdwd2(const UnitCell_pseudo &unit_in, Vdwd2_Parameters &para_in);
 	
-	double energy_result = 0;
-	void cal_energy();
-	
-	std::vector<Vector3<double>> force_result;
+	void cal_energy();	
 	void cal_force();
-
-	Matrix3 stress_result;
 	void cal_stress();
+
+	const double                       &get_energy()const{ return energy; }
+	const std::vector<Vector3<double>> &get_force() const{ return force;  }
+	const Matrix3                      &get_stress()const{ return stress; }
 
 private:
 
 	const UnitCell_pseudo &ucell;
 	Vdwd2_Parameters &para;
+
+	double energy = 0;
+	std::vector<Vector3<double>> force;
+	Matrix3 stress;
 };
 
 #endif

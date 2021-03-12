@@ -143,16 +143,16 @@ void Force_Stress_LCAO::getForceStress(
 			vdwd2.cal_force();
 			for(int iat=0; iat<ucell.nat; ++iat)
 			{
-				force_vdw(iat,0) = vdwd2.force_result[iat].x;
-				force_vdw(iat,1) = vdwd2.force_result[iat].y;
-				force_vdw(iat,2) = vdwd2.force_result[iat].z;
+				force_vdw(iat,0) = vdwd2.get_force()[iat].x;
+				force_vdw(iat,1) = vdwd2.get_force()[iat].y;
+				force_vdw(iat,2) = vdwd2.get_force()[iat].z;
 			}			
 		}
 		if(isstress)
 		{
 			Vdwd2 vdwd2(ucell,vdwd2_para);
 			vdwd2.cal_stress();
-			stress_vdw = vdwd2.stress_result.to_matrix();
+			stress_vdw = vdwd2.get_stress().to_matrix();
 		}
 	}
 	// jiyy add 2019-05-18
