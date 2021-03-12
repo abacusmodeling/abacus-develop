@@ -33,6 +33,7 @@ public:
 	friend class Diago_CG;
 	friend class Exx_Lip;
 	friend class Hamilt;
+    friend class Stochastic_Iter;
 
     void cinitcgg(const int ik,
                   const int nstart,

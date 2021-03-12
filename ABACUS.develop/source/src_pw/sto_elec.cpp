@@ -66,7 +66,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		<< "\n PW-STOCHASTIC ALGO --------- ION=" << setw(4) << istep + 1
 		<< "  ELEC=" << setw(4) << iter 
 		<< "--------------------------------\n";
-		
+		cout<<iter<<" STEP"<<endl;
 		if(iter==1) 
 		{
 			CHR.new_e_iteration = true;
@@ -107,11 +107,17 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
 		//(2) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
-		if(NBANDS > 0)
+		if(NBANDS > 0 && MY_RANK == 0)
 		{
-			if(MY_RANK == 0)
 			this->c_bands(istep+1);
 		}
+		else
+		{
+			hm.hpw.init_k(0); //only GAMMA
+			//In fact, hm.hpw.init_k has been done in wf.wfcinit();
+		}
+		kv.wk[0] = 2;// GAMMA temporary
+		
         if (check_stop_now()) return;
         
 		en.eband  = 0.0;
@@ -128,16 +134,19 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #ifdef __MPI
 		if(NBANDS > 0)
 		{
-			kv.wk[0] = 2;
 			MPI_Bcast(wf.evc[0].c, wf.npw*NBANDS, MPI_COMPLEX , 0, MPI_COMM_WORLD);
 			MPI_Bcast(wf.ekb[0], NBANDS, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 		}
 #endif
-
+		
+		
 		//(4) calculate fermi energy.
-		stoiter.init();		
+		if(iter == 1)	stoiter.init();
+		stoiter.orthog();
+		stoiter.checkemm(iter);	//check and reset emax & emin
 		stoiter.test();
 		stoiter.itermu(iter);
+
 
 		//(5) calculate new charge density 
 		// calculate KS rho.
@@ -160,13 +169,10 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 				ZEROS(CHR.rho[is], pw.nrxx);
 			}
 		}
-        
+
 	// calculate stochastic rho
 		stoiter.sum_stoband();
-
 		
-		
-
 
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.

@@ -27,6 +27,7 @@ class Stochastic_WF
 	int nchi; 				// Total number of stochatic obitals; unit in a_0^(3/2)
 	int nchip; 				// The number of stochatic obitals in current process 
 	int nche_sto;			// number of orders for Chebyshev expansion 
+	string stotype;
 
 	int nbands_diag; // number of bands obtained from diagonalization
 

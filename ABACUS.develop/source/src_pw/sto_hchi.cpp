@@ -27,9 +27,10 @@ Stochastic_hchi::~Stochastic_hchi()
 	{
 		fftw_destroy_plan(pb);
 		fftw_destroy_plan(pf);
+		delete[] rp_chi;
+		delete[] rl_chi;
+		delete[] GRA_index;
 	}
-	delete[] rp_chi;
-	delete[] rl_chi;
 }
 
 void Stochastic_hchi:: init()
@@ -46,12 +47,15 @@ void Stochastic_hchi:: init()
         delete[] rp_chi;
         delete[] rl_chi;
 		delete[] GRA_index;
+		GRA_index = new int [wf.npw];
+		if(STO_WF.stotype != "pw")
+		{
         rp_chi = new complex<double> [nrxx];
 		rl_chi = new complex<double> [nrxx];
-		GRA_index = new int [wf.npw];
 		pf=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)rp_chi,(fftw_complex *)rp_chi, FFTW_FORWARD, FFTW_MEASURE);
 		pb=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)rl_chi,(fftw_complex *)rl_chi, FFTW_BACKWARD, FFTW_MEASURE);
 		initplan = true;
+		}
     }
     else
     {
@@ -62,19 +66,30 @@ void Stochastic_hchi:: init()
 
 void Stochastic_hchi::get_GRA_index()
 {
-	int ix,iy,iz;
-	int ir;
-	ZEROS(GRA_index,wf.npw);
-	for(int ig = 0 ; ig < wf.npw; ++ig)
+	
+	if(STO_WF.stotype == "pw")
 	{
-		ix = floor(pw.gcar[wf.igk(0, ig)].x+0.1);
-		iy = floor(pw.gcar[wf.igk(0, ig)].y+0.1);
-		iz = floor(pw.gcar[wf.igk(0, ig)].z+0.1);
-		if(ix < 0) ix += nx;
-		if(iy < 0) iy += ny;
-		if(iz < 0) iz += nz;
-		ir = ix * ny * nz + iy * nz + iz;
-		GRA_index[ig] = ir;
+		for(int ig = 0 ; ig < wf.npw; ++ig)
+		{
+			GRA_index[ig] = pw.ig2fftw[wf.igk(0,ig)]; //GAMMA POINT temporarily
+		}
+	}
+	else
+	{
+		int ix,iy,iz;
+		int ir;
+		ZEROS(GRA_index,wf.npw);
+		for(int ig = 0 ; ig < wf.npw; ++ig)
+		{
+			ix = floor(pw.gcar[wf.igk(0, ig)].x+0.1);
+			iy = floor(pw.gcar[wf.igk(0, ig)].y+0.1);
+			iz = floor(pw.gcar[wf.igk(0, ig)].z+0.1);
+			if(ix < 0) ix += nx;
+			if(iy < 0) iy += ny;
+			if(iz < 0) iz += nz;
+			ir = ix * ny * nz + iy * nz + iz;
+			GRA_index[ig] = ir;
+		}
 	}
 }
 
@@ -169,6 +184,37 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	return;
 }
 
+void Stochastic_hchi::orthogonal_to_psi_reciprocal(complex<double> *wfgin, complex<double> *wfgout, int &ikk)
+{
+
+	TITLE("Stochastic_hchi","orthogonal_to_psi0");
+
+	for(int ig = 0 ; ig < wf.npw; ++ig)
+	{
+		wfgout[ig] = wfgin[ig];
+	}
+
+	//orthogonal part
+	complex<double> sum = 0;
+	int inc=1;
+	for(int iksb = 0; iksb < NBANDS; ++iksb)
+	{
+		complex<double> *kswf = &wf.evc[ikk](iksb,0); 
+		zdotc_(&sum,&wf.npw,kswf,&inc,wfgin,&inc);
+		//for(int ig = 0; ig < wf.npw; ++ig)
+		//{
+		//	sum += conj(kswf[ig]) * wfgin[ig];
+		//}
+
+		//LapackConnector::axpy(wf.npw,-sum,kswf,1,wfgout,1);
+		for(int ig = 0; ig < wf.npw; ++ig)
+		{
+			wfgout[ig] -= sum*kswf[ig];
+		}
+	}
+	ortho = true;
+	return;
+}
 
 
 
@@ -366,5 +412,130 @@ void Stochastic_hchi:: hchi_real(complex<double>*chi_in, complex<double> *hchi)
 	//}
 	//cout<<sum<<" must be real numebr."<<endl; //sum must be a real number
 	//------------------------------------------------------------
+	return;
+}
+
+void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *hchig)
+{
+	
+	//---------------------------------------------------
+
+
+	//------------------------------------
+	//(1) the kinetical energy.
+	//------------------------------------
+	if(T_IN_H)
+	{
+		for (int ig = 0; ig < wf.npw; ++ig)
+		{
+			hchig[ig] = wf.g2kin[ig] * chig[ig];
+		}
+	}
+
+	//------------------------------------
+	//(2) the local potential.
+	//------------------------------------
+	if(VL_IN_H)
+	{
+		ZEROS( UFFT.porter, pw.nrxx);
+		UFFT.RoundTrip( chig, pot.vrs1, GRA_index, UFFT.porter );
+		for (int ig = 0; ig < wf.npw; ++ig)
+		{
+			hchig[ig] += UFFT.porter[ GRA_index[ig] ];
+		}	
+	}
+
+
+	//------------------------------------
+	// (3) the nonlocal pseudopotential.
+	//------------------------------------
+	int inc = 1;
+	if(VNL_IN_H)
+	{
+		if ( ppcell.nkb > 0)
+		{
+			complex<double> *becp = new complex<double>[ ppcell.nkb * NPOL ];
+			ZEROS(becp,ppcell.nkb * NPOL);
+
+			for (int i=0;i< ppcell.nkb;++i)
+			{
+				const complex<double>* p = &ppcell.vkb(i,0);
+				zdotc_(&becp[i],&wf.npw,p,&inc,chig,&inc);
+				//for (int ig=0; ig< wf.npw; ++ig)
+				//{
+				//	if(NSPIN!=4) becp[i] += chig[ig] * conj( p[ig] );
+				//} 
+			}
+
+			//Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * NPOL);
+			complex<double> * Ps = new complex<double> [ppcell.nkb * NPOL];
+			ZEROS( Ps, ppcell.nkb * NPOL );
+			int sum = 0;
+    		int iat = 0;
+    		// this function sum up each non-local pseudopotential located in each atom,
+    		// all we need to do is put the right Dij coefficient to each becp, which
+    		// is calculated before.
+    		for (int it=0; it<ucell.ntype; ++it)
+    		{
+    		    const int Nprojs = ucell.atoms[it].nh;
+    		    for (int ia=0; ia<ucell.atoms[it].na; ++ia)
+    		    {
+    		        // each atom has Nprojs, means this is with structure factor;
+    		        // each projector (each atom) must multiply coefficient
+    		        // with all the other projectors.
+    		        for (int ip=0; ip<Nprojs; ++ip)
+    		        {
+    		            for (int ip2=0; ip2<Nprojs; ++ip2)
+    		            {
+							if(NSPIN!=4)
+								Ps[sum+ip2] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
+    		            }// end ih
+    		        }//end jh
+					if(NSPIN!=4) sum += Nprojs;
+					++iat;
+    		    } //end na
+    		} //end nt
+
+			// use simple method.
+			if(NSPIN!=4)
+				for(int i=0; i<ppcell.nkb; ++i)
+				{
+					complex<double>* p = &ppcell.vkb(i,0);
+					//LapackConnector::axpy(wf.npw,Ps[i],p,1,chig,1);
+					for(int ig=0; ig< wf.npw; ++ig)
+					{
+						hchig[ig] += Ps[i] * p[ig];
+					}
+				}
+			delete[] becp;
+			delete[] Ps;
+		}
+	}
+
+
+
+	double Ebar = (Emin + Emax)/2;
+	double DeltaE = (Emax - Emin)/2;
+
+	for(int ig = 0; ig < wf.npw; ++ig)
+	{
+		hchig[ig] = (hchig[ig] - Ebar * chig[ig]) / DeltaE;
+	}
+	
+	
+
+	//test Emax & Emin
+	//------------------------------------------------------------
+	double sum1 = 0;
+	double sum2 = 0;
+	for(int i = 0 ; i < wf.npw; ++i)
+	{
+		sum1 += norm(chig[i]);
+		sum2 += real(conj(chig[i]) * hchig[i]);
+	}
+
+	//cout<<setw(30)<<sum2 <<setw(30)<<sum1<<setw(30)<<sum2/sum1 * DeltaE + Ebar<<DeltaE<<" "<<Ebar<<endl;
+	//------------------------------------------------------------
+
 	return;
 }

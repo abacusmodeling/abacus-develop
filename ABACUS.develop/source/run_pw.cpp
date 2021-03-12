@@ -75,14 +75,10 @@ void Run_pw::plane_wave_line(void)
     //=====================================
     CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
     pot.allocate(pw.nrxx);
-    if ( NBANDS != 0 || (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") )//qianrui add 
-	{
-        wf.allocate(kv.nks);
-    }
-    else
-    {
-        wf.npwx = wf.setupIndGk(pw, kv.nks);
-    }
+  
+    wf.allocate(kv.nks);
+
+   
 	UFFT.allocate();
 
     //=======================
@@ -148,8 +144,10 @@ void Run_pw::plane_wave_line(void)
 
 	// ion optimization begins
 	// electron density optimization is included in ion optimization
+    
     Ions ions;
     ions.opt_ions_pw();
+
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
@@ -223,7 +221,7 @@ void Run_pw::plane_wave_line(void)
 
 	// compute density of states
 	en.perform_dos();
-
 	timer::tick("Run_Frag","plane_wave_line",'B');
+
     return;
 }

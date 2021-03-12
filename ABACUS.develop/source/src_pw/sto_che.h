@@ -18,13 +18,12 @@ class Stochastic_Chebychev
     void init();
     
     void calcoef(double fun(double));
-    complex<double> calresult();
+    complex<double> sumallterms();
     void calresult(double &t, double &result);
     
     template<class T>
     void calresult(void fun(T *in, T *out), int& ndim, T *wavein, T *waveout);
-
-
+    bool checkconverge(void tfun(complex<double> *in, complex<double> *out), int& ndim, complex<double> *wavein,double& tmax, double &tmin, double stept);
 
     void calpolyval(void fun(complex<double> *in, complex<double> *out), int& ndim, complex<double> *wavein);
 
@@ -38,7 +37,8 @@ class Stochastic_Chebychev
     fftw_plan plancoef;
     bool initplan, initcoef, getcoef, getpolyval;
 
-	private:
+    private:
+
     void recurs(double&tnp1, double &tn, double &tn_1, double& t); //tnp1: T_(n+1), tn: T_n, tn_1: T_(n-1)
     template<class T>
     void recurs(T *arraynp1, T* arrayn, T *arrayn_1, void fun(T *in,T *out), int& ndim);

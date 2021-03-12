@@ -28,6 +28,8 @@ class Stochastic_Iter
     double calne();
     void itermu(int & iter);
     void sumpolyval();
+    void orthog();
+    void checkemm(int &iter);
     void test(); //only for test
     Stochastic_Chebychev stoche;
     Stochastic_hchi stohchi;
@@ -37,6 +39,7 @@ class Stochastic_Iter
     static double Emin, Emax; // unit in Ry
     double targetne;
     double * spolyv;
+    string stotype;
 
 	private:
     

@@ -59,6 +59,7 @@ void wavefunc::allocate(const int nks)
 
 	assert(npwx > 0);
 	assert(nks > 0);
+	if( (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") ) //qianrui add 
 	assert(NBANDS > 0);
 
 	// allocate for kinetic energy

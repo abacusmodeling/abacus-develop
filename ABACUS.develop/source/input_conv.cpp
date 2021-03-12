@@ -49,6 +49,7 @@ void Input_Conv::Convert(void)
 	STO_WF.nche_sto = INPUT.nche_sto;
 	STO_WF.emax_sto = INPUT.emax_sto;
 	STO_WF.emin_sto = INPUT.emin_sto;
+	STO_WF.stotype = INPUT.stotype;
 
 	// Electrical Field
 	EFIELD = INPUT.efield;

@@ -16,10 +16,12 @@ Stochastic_Iter::Stochastic_Iter()
 
 Stochastic_Iter::~Stochastic_Iter()
 {
+    delete[] spolyv;
 }
 void Stochastic_Iter:: init()
 {
     nchip = STO_WF.nchip;
+    stotype = STO_WF.stotype;
     //wait for init
     targetne = ucell.nelec;
     stoche.init();
@@ -31,10 +33,8 @@ void Stochastic_Iter:: init()
 
 }
 
-void Stochastic_Iter:: itermu( int &iter)
+void Stochastic_Iter:: orthog()
 {
-    
-
     int nkk=1;// We temporarily use gamma k point.
     //orthogonal part
     if(NBANDS > 0)
@@ -45,39 +45,99 @@ void Stochastic_Iter:: itermu( int &iter)
             {
                 complex<double> * p0 = &STO_WF.chi0[ik](ichi,0);
                 complex<double> * pchi = &STO_WF.chiortho[ik](ichi,0);
-                stohchi.orthogonal_to_psi_real(p0,pchi,ik);
+                if(stotype == "pw")
+                {
+                    stohchi.orthogonal_to_psi_reciprocal(p0,pchi,ik);
+                }
+                else
+                {
+                    stohchi.orthogonal_to_psi_real(p0,pchi,ik);
+                }   
             }
         }
     }
+}
 
-    //if(NBANDS > 0)
-    //{
-    //    Emin = wf.ekb[0][0];}
-
-    Emax = STO_WF.emax_sto;
-    Emin = STO_WF.emin_sto;
-    Stochastic_hchi:: Emin = this->Emin;
-    Stochastic_hchi:: Emax = this->Emax;
+void Stochastic_Iter:: checkemm(int &iter)
+{
+    if(iter == 1)
+    {
+        Stochastic_hchi:: Emin = STO_WF.emin_sto;
+        Stochastic_hchi:: Emax = STO_WF.emax_sto;
+    }
+    else if(iter > 5)
+        return;
     
+    int norder = stoche.norder;
+    int ndim;
+    if(stotype == "pw")
+        ndim = wf.npw;
+    else
+        ndim = pw.nrxx;
+        
+    //wait for init
+    
+    complex<double> * pchi;
+    int ntest = 2;
+    if (nchip < ntest) ntest = nchip;
+
+    for(int ichi = 0; ichi < ntest; ++ichi)
+    {
+        if(NBANDS > 0)
+        {
+            pchi = &STO_WF.chiortho[0](ichi,0);
+        }  
+        else
+        {
+            pchi = &STO_WF.chi0[0](ichi,0);
+        }
+
+        while(1)
+        {
+            bool converge;
+            if(stotype == "pw")
+                converge = stoche.checkconverge(stohchi.hchi_reciprocal, ndim, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
+            else
+                converge = stoche.checkconverge(stohchi.hchi_real, ndim, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
+            if(!converge)
+                cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<endl;
+            else
+                break;
+        }
+    }
+
+    Emax = Stochastic_hchi:: Emax;
+    Emin = Stochastic_hchi:: Emin;
+#ifdef __MPI
+    MPI_Allreduce(MPI_IN_PLACE, &Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
+#endif
+    Stochastic_hchi:: Emin = Emin;
+    Stochastic_hchi:: Emax = Emax;
+    
+}
+
+void Stochastic_Iter:: itermu( int &iter) 
+{
+    int nkk=1;// We temporarily use gamma k point.
     double dmu;
     if(iter == 1)
     {
         dmu = 2;
-        th_ne = DRHO2 * 1e-2 * ucell.nelec;
+        th_ne = 0.1 * DRHO2 * ucell.nelec;
         cout<<"th_ne "<<th_ne<<endl;
     }
     else
     {
         dmu = 0.1;
-        th_ne = DRHO2 * 1e-4 * ucell.nelec;
+        th_ne = DRHO2 * 1e-2 * ucell.nelec;
     }
+    
     sumpolyval();
-
     mu = mu0 - dmu;
-    //if(iter == 2) mu=mu0;
     double ne1 = calne();
-    //if(iter == 2) exit(0);
     double mu1 = mu;
+
     mu = mu0 + dmu;
     double ne2 = calne();
     double mu2 = mu;
@@ -112,7 +172,6 @@ void Stochastic_Iter:: itermu( int &iter)
         cout<<"Reset mu2 form "<<mu2-dmu<<" to "<<mu2<<endl;
         dmu *= 2;
     }
-
     int count = 0;
     while(Dne > th_ne)
     {
@@ -133,9 +192,10 @@ void Stochastic_Iter:: itermu( int &iter)
         //cout<<setw(20)<<"targetne"<<setw(20)<<"ne"<<setw(20)<<"mu"<<setw(20)<<"Dne"<<endl;
         //cout<<setw(20)<<targetne<<setw(20)<<ne3<<setw(20)<<mu3<<setw(20)<<Dne<<endl;
         count++;
-        if(count > 100)
+        if(count > 60)
         {
-            cout<<"Fermi energy cannot be converged."<<endl;
+            cout<<"Fermi energy cannot be converged. Set THNE to "<<th_ne<<endl;
+            th_ne *= 1e4;
         }
     }
     cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<endl;
@@ -165,8 +225,8 @@ void Stochastic_Iter:: sumpolyval()
     int nkk=1;
     
     int nrxx = stohchi.nrxx;
+    int npw = wf.npw;
     ZEROS(spolyv, norder);
-    
     complex<double> * pchi;
     for(int ik = 0; ik < nkk; ++ik)
     {
@@ -180,7 +240,15 @@ void Stochastic_Iter:: sumpolyval()
             {
                 pchi = &STO_WF.chi0[ik](ichi,0);
             }
-            stoche.calpolyval(stohchi.hchi_real, nrxx, pchi);
+            
+            if(stotype == "pw")
+            {
+                stoche.calpolyval(stohchi.hchi_reciprocal, npw, pchi);
+            }
+            else
+            {
+                stoche.calpolyval(stohchi.hchi_real, nrxx, pchi);
+            }
             //LapackConnector::axpy(norder,1,stoche.polyvalue,1,spolyv,1);
             for(int ior = 0; ior < norder; ++ior)
             {
@@ -188,8 +256,6 @@ void Stochastic_Iter:: sumpolyval()
             }
         }
     }
-
-
     return;
 }
 
@@ -226,7 +292,7 @@ double Stochastic_Iter::calne()
         }
         sto_ne += stok_ne * kv.wk[ikk]; 
     }
-    
+
 #ifdef __MPI
         MPI_Allreduce(MPI_IN_PLACE, &sto_ne, 1, MPI_DOUBLE, MPI_SUM , MPI_COMM_WORLD);
 #endif
@@ -239,6 +305,7 @@ void Stochastic_Iter::sum_stoband()
 {  
     int nkk=1;// We temporarily use gamma k point.
     int nrxx = stohchi.nrxx;
+    int npw = wf.npw;
     int norder = stoche.norder;
 
     //cal demet
@@ -269,83 +336,160 @@ void Stochastic_Iter::sum_stoband()
 
     //cal eband & rho
     stoche.calcoef(this->nroot_fd);
+    //stoche.calcoef(this->nfd);
     
-    complex<double> * out = new complex<double> [nrxx];
-    complex<double> * hout = new complex<double> [nrxx];
+    complex<double> * out, *hout;
+    double *sto_rho = new double [nrxx];
+    complex<double> *sto_rhog;
+    if(stotype == "pw")
+    {
+        out = new complex<double> [npw];
+        hout = new complex<double> [npw];
+        sto_rhog = new complex<double> [npw];
+    }
+    else
+    {
+        out = new complex<double> [nrxx];
+        hout = new complex<double> [nrxx];
+    }
 
-    double dr_3 = ucell.omega / nrxx;
+    double dr3 = ucell.omega / nrxx;
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
    
-    double out2, tmpne;
+    double tmprho, tmpne;
+    complex<double> outtem;
     double sto_ne = 0;
     double sto_eband = 0;
-    double *sto_rho = new double [nrxx];
     ZEROS(sto_rho, nrxx);
 
     complex<double> * pchi;
+    complex<double>* porter = UFFT.porter;
+    int* GRA_index = stohchi.GRA_index;
+    double out2;
+    
     for(int ik = 0; ik < nkk; ++ik)
     {
         double stok_eband =0;
-        for(int ichi = 0; ichi < nchip; ++ichi)
+        if(stotype == "pw")
         {
-            if(NBANDS > 0)
+            for(int ichi = 0; ichi < nchip; ++ichi)
             {
-                pchi = &STO_WF.chiortho[ik](ichi,0);
-            }  
-            else
-            {
-                pchi = &STO_WF.chi0[ik](ichi,0);
-            }   
-            stoche.calresult(stohchi.hchi_real, nrxx, pchi, out);
-            stohchi.hchi_real(out,hout);
-            for(int ir = 0; ir < nrxx; ++ir)
-            {
-                out2 = norm(out[ir]);
-                tmpne = out2 * kv.wk[ik];
-                stok_eband += real(conj(out[ir]) * hout[ir]) * DeltaE + Ebar * out2;
-                sto_rho[ir] += tmpne; 
-                sto_ne += tmpne;
+                if(NBANDS > 0)
+                {
+                    pchi = &STO_WF.chiortho[ik](ichi,0);
+                }  
+                else
+                {
+                    pchi = &STO_WF.chi0[ik](ichi,0);
+                }
+                
+                stoche.calresult(stohchi.hchi_reciprocal, npw, pchi, out);
+                
+                stohchi.hchi_reciprocal(out,hout);
+                ZEROS( porter, pw.nrxx );
+                for(int ig = 0; ig < npw; ++ig)
+                {
+                    outtem = out[ig];
+                    stok_eband += real(conj(outtem) * hout[ig]) * DeltaE + Ebar * norm(outtem);
+                    porter[ GRA_index[ig] ] = outtem;
+                }
+                pw.FFT_wfc.FFT3D(UFFT.porter, 1);
+                for(int ir = 0 ; ir < nrxx ; ++ir)
+                {
+                    tmprho = norm(porter[ir]) * kv.wk[ik] / ucell.omega;
+                    sto_rho[ir] += tmprho;
+                    sto_ne += tmprho * dr3;
+                }
+
             }
+            sto_eband += stok_eband * kv.wk[ik];
         }
-        sto_eband += stok_eband * kv.wk[ik];
+        else
+        {
+            for(int ichi = 0; ichi < nchip; ++ichi)
+            {
+                if(NBANDS > 0)
+                {
+                    pchi = &STO_WF.chiortho[ik](ichi,0);
+                }  
+                else
+                {
+                    pchi = &STO_WF.chi0[ik](ichi,0);
+                }
+                stoche.calresult(stohchi.hchi_real, nrxx, pchi, out);
+                stohchi.hchi_real(out,hout);
+                for(int ir = 0; ir < nrxx; ++ir)
+                {
+                    out2 = norm(out[ir]);
+                    //out2 = real(conj(pchi[ir]) * out[ir]);
+                    tmpne = out2 * kv.wk[ik];
+                    stok_eband += real(conj(out[ir]) * hout[ir]) * DeltaE + Ebar * out2;
+                    sto_rho[ir] += tmpne; 
+                    sto_ne += tmpne;
+                } 
+            }
+            sto_eband += stok_eband * kv.wk[ik];
+        }
+           
     }
 
+    double *f_storho = new double [nrxx];
 
 #ifdef __MPI
-
     MPI_Allreduce(MPI_IN_PLACE,&stodemet,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
-    MPI_Allreduce(MPI_IN_PLACE,sto_rho,nrxx,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+    MPI_Allreduce(sto_rho,f_storho,nrxx,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
     MPI_Allreduce(MPI_IN_PLACE,&sto_eband,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
     MPI_Allreduce(MPI_IN_PLACE,&sto_ne,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 #endif
     en.eband += sto_eband;
     en.demet += stodemet;
     en.demet *= Occupy::gaussian_parameter;
+
     
     cout.precision(12);
     cout<<"Normalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
-    double factor = (targetne - KS_ne) / sto_ne / dr_3;
+
+
+    double factor;
+    if(stotype == "pw")
+    {
+        if(abs(sto_ne) > 1e-20)
+            factor = (targetne - KS_ne) / sto_ne;
+        else
+            factor = 1;
+    }
+    else
+    {
+        if(abs(sto_ne) > 1e-20)
+            factor = (targetne - KS_ne) / sto_ne / dr3;
+        else
+            factor = 1 / dr3;
+    }
+    
+    
+    
     for(int is = 0 ; is < 1; ++is)
     {
         //LapackConnector::axpy(nrxx, factor,sto_rho,1,CHR.rho[is],1);
         for(int ir = 0; ir < nrxx ; ++ir)
         {
+#ifdef __MPI
+            CHR.rho[is][ir] += f_storho[ir] * factor;
+#else
             CHR.rho[is][ir] += sto_rho[ir] * factor;
+#endif 
         }
     }
 
 
-    
 
-
-    /*double sum = 0;
-	for(int ir = 0; ir < pw.nrxx; ++ir )
-	{
-		sum += CHR.rho[0][ir];
-	}
-	cout<<"Total nele: "<<sum*ucell.omega/pw.nrxx<<endl;*/
-    
+    if(stotype == "pw")
+    {
+        delete [] sto_rhog;
+    }
+    delete [] f_storho;
+    delete [] sto_rho;
     delete [] out;
     delete [] hout;
     return;
@@ -472,7 +616,29 @@ double Stochastic_Iter:: nfdlnfd(double e)
     //---------------------------------------------------
     
     //-------------------------------------------------------
-    /*//compare hchi and h_psi
+    //compare hchi_reciprocal and h_psi
+    /*Emin = -1;
+    Emax = 1;
+    Stochastic_hchi:: Emin = this -> Emin;
+    Stochastic_hchi:: Emax = this -> Emax;
+    complex<double> *chig1 = new complex<double> [wf.npw];
+    complex<double> *chig2 = new complex<double> [wf.npw];
+    complex<double> *kswf = &wf.evc[0](0,0);
+    
+    
+    stohchi.hchi_reciprocal(kswf,chig1);
+    
+    hm.hpw.h_psi( kswf , chig2);
+    for(int i = 0; i<wf.npw;++i)
+    {
+        if(i % 100 == 0)
+            cout<<kswf[i]<<" "<<chig1[i]<<" "<<chig2[i]<<endl;
+    }
+    cout<<endl;*/
+    //---------------------------------------------------
+
+     //-------------------------------------------------------
+    /*//compare hchi_real and h_psi
     Emin = -1;
     Emax = 1;
     Stochastic_hchi:: Emin = this -> Emin;

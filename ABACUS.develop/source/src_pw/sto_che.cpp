@@ -9,8 +9,12 @@ Stochastic_Chebychev::Stochastic_Chebychev()
     initcoef = false;
     getcoef = false;
     getpolyval = false;
-    extend = 2048;
+    extend = 16;
     norder = 5;
+    polyvalue = new double [1];
+    coef = new double [1];
+    ccoef = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) *1);
+    dcoef = (double *) fftw_malloc(sizeof(double) * 1);
 }
 
 Stochastic_Chebychev::~Stochastic_Chebychev()
@@ -19,10 +23,11 @@ Stochastic_Chebychev::~Stochastic_Chebychev()
     {
         fftw_destroy_plan(plancoef);
     }
-    fftw_free(ccoef);
-    fftw_free(dcoef);
-    delete [] polyvalue;
-    delete [] coef;
+        fftw_free(ccoef);
+        fftw_free(dcoef);
+        delete [] polyvalue;
+        delete [] coef;
+    
 }
 void Stochastic_Chebychev:: init()
 {
@@ -31,8 +36,12 @@ void Stochastic_Chebychev:: init()
     assert(extend >= 1);
     if(norder != 0)
     {
+        fftw_free(ccoef);
+        fftw_free(dcoef);
+        delete [] polyvalue;
+        delete [] coef;
         norder2 = 2 * norder * extend;
-        ccoef = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * norder2);//new complex<double> [norder2];
+        ccoef = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * norder2);
         dcoef = (double *) fftw_malloc(sizeof(double) * norder2);
         plancoef = fftw_plan_dft_r2c_1d(norder2, dcoef, ccoef, FFTW_ESTIMATE);
         polyvalue = new double [norder];
@@ -59,16 +68,16 @@ void Stochastic_Chebychev:: calcoef(double fun(double))
         dcoef[i]=fun(cos((i+0.5)*TWO_PI/norder2));
     }
     fftw_execute(plancoef);
-    complex<double> ui(0,1);
+    complex<double> ui(0,1.0);
     for(int i = 0; i<norder; ++i)
     {
         if(i == 0)
         {
-            coef[i] = real(exp(ui*i*PI/norder2) * pcoef[i]) / norder2 * 2 / 3;
+            coef[i] = real(exp(-ui*i*PI/norder2) * pcoef[i]) / norder2 * 2 / 3;
         }
         else
         {
-            coef[i] = real(exp(ui*i*PI/norder2) * pcoef[i]) / norder2 * 4 / 3;
+            coef[i] = real(exp(-ui*i*PI/norder2) * pcoef[i]) / norder2 * 4 / 3;
         }
     }
 
@@ -90,6 +99,10 @@ void Stochastic_Chebychev:: calcoef(double fun(double))
             coef[i] += real(pcoef[i]) / norder2 * 2 / 3;
         }
     }
+    if( coef[norder-1]/coef[0] > 1e-9 )
+    {
+        WARNING("Stochastic_Chebychev", "(coef[norder-1]/coef[0] > 1e-9) Please add more expansion terms for Chebychev expansion.");
+    }
     getcoef = true;
 }
 
@@ -98,7 +111,7 @@ void Stochastic_Chebychev:: recurs(double&tnp1, double& tn, double& tn_1, double
     tnp1 = 2*t*tn-tn_1;
 }
 
-complex<double> Stochastic_Chebychev:: calresult()
+complex<double> Stochastic_Chebychev:: sumallterms()
 {
     if(!getcoef||!getpolyval) WARNING_QUIT("Stochastic_Chebychev", "Please calculate coef or polyval first!");
     complex<double> result = 0;
@@ -139,9 +152,10 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
     arrayn_1 = new complex<double> [ndim];
 
     DCOPY(wavein, arrayn_1, ndim);
-    //LapackConnector::copy(ndim,wavein,1,arrayn_1,1);
+    //LapackConnector::copy(ndim,wavein,1,arrayn_1,1); 
 
     tfun(arrayn_1, arrayn);
+
 
     int inc =1 ;
     complex<double> overlap;
@@ -156,6 +170,7 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
     //    polyvalue[0] += real(conj(wavein[i]) * wavein[i]);// 0-th order : <wavein | wavein> = ndim
     //    polyvalue[1] += real(conj(wavein[i]) * arrayn[i]);// 1-st order : <wavein | tfun | wavein>
     //}
+
 
     //more than 1-st orders
     for(int ior = 2; ior < norder; ++ior)
@@ -179,4 +194,75 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
     delete [] arrayn_1;
     getpolyval = true;
     return;
+}
+
+bool Stochastic_Chebychev:: checkconverge(void tfun(complex<double> *in, complex<double> *out), int& ndim, complex<double> *wavein,double& tmax, double &tmin, double stept)
+{
+    bool converge = true;
+    complex<double> *arraynp1, *arrayn, *arrayn_1;
+    arraynp1 = new complex<double> [ndim];
+    arrayn = new complex<double> [ndim];
+    arrayn_1 = new complex<double> [ndim];
+
+
+    DCOPY(wavein, arrayn_1, ndim);
+    //LapackConnector::copy(ndim,wavein,1,arrayn_1,1); 
+    if(tmin == tmax) tmax += stept;
+
+    tfun(arrayn_1, arrayn);
+    double sum1 = 0;
+	double sum2 = 0;
+    double t;
+	for(int i = 0 ; i < ndim; ++i)
+	{
+		sum1 += norm(arrayn_1[i]);
+		sum2 += real(conj(arrayn_1[i]) * arrayn[i]);
+	}
+    t = sum2 / sum1 * (tmax - tmin) / 2 + (tmax + tmin) / 2;
+    if(t < tmin)
+    {
+        converge = false;
+        tmin = t-stept;
+    }
+    else if(t > tmax)
+    {
+        converge = false;
+        tmax = t+stept;
+    }
+
+    
+    for(int ior = 2; ior < norder; ++ior)
+    {
+        tfun(arrayn,arraynp1);
+        sum1 = sum2 =0;
+        for(int i = 0 ; i < ndim; ++i)
+	    {
+	    	sum1 += norm(arrayn[i]);
+	    	sum2 += real(conj(arrayn[i]) * arraynp1[i]);
+	    }
+        t = sum2/sum1 * (tmax - tmin) / 2 + (tmax + tmin) / 2;
+        if(t < tmin)
+        {
+            converge = false;
+            tmin = t - stept;
+        }
+        else if(t > tmax)
+        {
+            converge = false;
+            tmax = t + stept;
+        }
+        for(int i = 0; i < ndim; ++i)
+        {
+            arraynp1[i]=2*arraynp1[i]-arrayn_1[i];
+        }
+        complex<double>* tem = arrayn_1;
+        arrayn_1 = arrayn;
+        arrayn = arraynp1;
+        arraynp1 = tem; 
+    }
+  
+    delete [] arraynp1;
+    delete [] arrayn;
+    delete [] arrayn_1;
+    return converge;
 }

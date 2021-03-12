@@ -359,6 +359,7 @@ void Electrons::self_consistent(const int &istep)
 
         if (conv_elec || iter==NITER)
         {
+            
             //--------------------------------------
             // output charge density for converged,
             // 0 means don't need to consider iter,
@@ -411,7 +412,6 @@ void Electrons::self_consistent(const int &istep)
             {
                 ofs_running << " convergence has NOT been achieved!" << endl;			
             }
-
             iter_end(ofs_running);
             timer::tick("Electrons","self_consistent",'D');
             return;
