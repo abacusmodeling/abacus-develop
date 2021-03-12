@@ -13,6 +13,7 @@
 #include "src_lcao/RELAX_cell.h"
 #include "src_io/print_info.h"
 #include "src_pw/symmetry.h"
+#include "src_lcao/run_md.h"
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -149,9 +150,17 @@ void Run_lcao::lcao_line(void)
 		dftu.init();
 	}
 
-	// mohan add 2021-03-09
-	RELAX_cell rcell;
-	rcell.opt_cell();
+
+    if(CALCULATION=="md")
+	{
+		Run_MD run_md;
+		run_md.opt_ions();
+	}
+	else
+	{
+		RELAX_cell rcell;
+		rcell.opt_cell();
+	}
 
 	en.perform_dos();
 

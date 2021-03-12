@@ -12,6 +12,7 @@ class Force_Stress_LCAO
 {
 	// mohan add 2021-02-09
 	friend class md;
+	friend class Run_MD;
 	friend void Input_Conv::Convert();
 	friend class Update_input;
 	friend class Local_Orbital_Ions;

@@ -1,4 +1,4 @@
-#include "local_orbital_ions.h"
+#include "run_md.h"
 #include "src_pw/global.h"
 #include "src_parallel/parallel_orbitals.h"
 #include "src_pdiag/pdiag_double.h"
@@ -14,16 +14,16 @@
 #include "src_global/sltk_atom_arrange.h"
 #include "src_pw/vdwd2.h"
 
-Local_Orbital_Ions::Local_Orbital_Ions()
+Run_MD::Run_MD()
 {}
 
-Local_Orbital_Ions::~Local_Orbital_Ions() 
+Run_MD::~Run_MD() 
 {}
 
-void Local_Orbital_Ions::opt_ions(void)
+void Run_MD::opt_ions(void)
 {
-    TITLE("Local_Orbital_Ions","opt_ions"); 
-    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
+    TITLE("Run_MD","opt_ions"); 
+    timer::tick("Run_MD","opt_ions",'B'); 
 		
     if(OUT_LEVEL=="i")
     {
@@ -53,6 +53,21 @@ void Local_Orbital_Ions::opt_ions(void)
         LCM.allocate();
     }
 
+	mdtype= INPUT.md_mdtype;//control md
+
+	// NVT ensemble
+	if(mdtype==1||mdtype==2) 
+	{
+		MDNVT.md_allocate();
+		MDNVT.initMD();
+	}
+	// NVE ensemble
+	else if(mdtype==0)
+	{
+		MDNVE.md_allocate();
+		MDNVE.initMD();
+	}
+
     this->istep = 1;
     int force_step = 1;
     int stress_step = 1;
@@ -64,73 +79,60 @@ void Local_Orbital_Ions::opt_ions(void)
 		// xiaohui add "m" option, 2015-09-16
         if(OUT_LEVEL=="ie" || OUT_LEVEL=="m")
         {
-            cout << " ---------------------------------------------------------" << endl;
-            if(CALCULATION=="relax") 
-            {
-                cout << " RELAX IONS : " << istep << endl;
-            }
-            else if(CALCULATION=="cell-relax")
-            {
-                cout << " RELAX CELL : " << stress_step << endl;
-                cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-            }
-            else if(CALCULATION=="scf")
-            {
-                cout << " SELF-CONSISTENT : " << endl;
-            }
-            cout << " ---------------------------------------------------------" << endl;
-
-            ofs_running << " ---------------------------------------------------------" << endl;
-            if(CALCULATION=="relax")
-            {
-                ofs_running << " RELAX IONS : " << istep << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
-            }
-            else if(CALCULATION=="cell-relax")
-            {
-                ofs_running << " RELAX CELL : " << stress_step << endl;
-                ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
-            }
-            else if(CALCULATION=="scf")
-            {
-                ofs_running << " SELF-CONSISTENT" << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
-            }
+			cout << " ---------------------------------------------------------" << endl;
+			if(mdtype==1||mdtype==2)
+			{
+				cout<<" Molecular Dynamics (NVT) STEP "<< MDNVT.step_rst + istep<<endl;
+			}
+			cout << " ---------------------------------------------------------" << endl;
         }
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09
 		LOE.solve_elec_stru(this->istep);
 
-		
 		time_t eend = time(NULL);
 
         //xiaohui add 2014-07-07, for second-order extrapolation
-        int iat=0;
-        if(CALCULATION=="relax" || CALCULATION=="cell-relax")
-        {
-            for(int it = 0;it < ucell.ntype;it++)
-            {
-                Atom* atom = &ucell.atoms[it];
-                for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                {
-                    CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
-                    CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
-                    CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
+		int iat=0;
 
-                    CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
-                    CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
-                    CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
+		for(int it = 0;it < ucell.ntype;it++)
+		{
+			Atom* atom = &ucell.atoms[it];
+			for(int ia =0;ia< ucell.atoms[it].na;ia++)
+			{
+				CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
+				CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
+				CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
 
-                    CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-                    CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-                    CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
+				CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
+				CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
+				CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
 
-                    iat++;
-                }
-            }
-        }
+				CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
+				CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
+				CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
+
+				iat++;
+			}
+		}
+
+		if(mdtype==1||mdtype==2)   
+		{
+			MDNVT.runnvt(istep);
+		}
+		else if(mdtype==0)  
+		{
+			MDNVE.runNVE(istep);
+		}
+		if((mdtype==1||mdtype==2)&&(istep==NSTEP||stop))
+		{
+			MDNVT.md_release();
+		}
+		if(mdtype==0&&(istep==NSTEP||stop))
+		{
+			MDNVE.md_release();
+		}
 
         if(pot.out_potential == 2)
         {
@@ -141,37 +143,40 @@ void Local_Orbital_Ions::opt_ions(void)
             pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        if(ParaO.out_hsR) 
-		{
-			this->output_HS_R(); //LiuXh add 2019-07-15
-		}
-
         time_t fstart = time(NULL);
-        if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
-        {
-            stop = this->force_stress(istep, force_step, stress_step);
-        }            
         time_t fend = time(NULL);
 
-
         //xiaohui add 2014-07-07, for second-order extrapolation
-        iat=0;
-        if(FORCE)
-        {
-            for(int it = 0;it < ucell.ntype;it++)
-            {
-                Atom* atom = &ucell.atoms[it];
-                for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                {
-                    CE.pos_next[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-                    CE.pos_next[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-                    CE.pos_next[3*iat+2] = atom->tau[ia].z*ucell.lat0;
+		iat=0;
+		for(int it = 0;it < ucell.ntype;it++)
+		{
+			Atom* atom = &ucell.atoms[it];
+			for(int ia =0;ia< ucell.atoms[it].na;ia++)
+			{
+				CE.pos_next[3*iat  ] = atom->tau[ia].x*ucell.lat0;
+				CE.pos_next[3*iat+1] = atom->tau[ia].y*ucell.lat0;
+				CE.pos_next[3*iat+2] = atom->tau[ia].z*ucell.lat0;
 
-                    iat++;
-                }
-            }
-        }
-		
+				iat++;
+			}
+		}
+
+		//xiaohui add CE.istep = istep 2014-07-07
+		CE.istep = istep;
+
+		// charge extrapolation if istep>0.
+		CE.extrapolate_charge();
+
+		if(pot.extra_pot=="dm")//xiaohui modify 2015-02-01
+		{
+			// done after grid technique.
+		}
+		else
+		{
+			pot.init_pot( istep );
+		}
+
+
         if(OUT_LEVEL=="i")
         {
             double etime_min = difftime(eend, estart)/60.0;
@@ -187,75 +192,31 @@ void Local_Orbital_Ions::opt_ions(void)
             cout << setprecision(2) << setiosflags(ios::scientific)
             << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
             << setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
-            //<< setw(12) << IMM.get_trust_radius();
 
             cout << resetiosflags(ios::scientific)
-//            << setw(8) << IMM.get_update_iter()
             << setprecision(2) << setw(10) << etime_min + ftime_min;
             cout << endl;
         }
 
-//#ifdef __MPI //2015-09-06, xiaohui
-	//2015-05-07, 2015-10-01
-        //atom_arrange::delete_vector( SEARCH_RADIUS );
-//#endif //2015-09-06, xiaohui
-
-//2015-09-16
-//#ifdef __MPI
-//    MPI_Barrier(MPI_COMM_WORLD);
-//    for (int i=0;i<ucell.ntype;i++)
-//    {
-//        ucell.atoms[i].bcast_atom(); // bcast tau array
-//    }
-//#endif
-
         ++istep;
-    }
-
-    if(CALCULATION=="scf" || CALCULATION=="relax")
-    {
-        ofs_running << "\n\n --------------------------------------------" << endl;
-        ofs_running << setprecision(16);
-        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
-        ofs_running << " --------------------------------------------\n\n" << endl;
-
-/*
-        if(STRESS)
-        {
-            if(stress_step==1)
-            {
-        		Force_LCAO FL;
-                matrix stress_lcao;
-                stress_lcao.create(3,3);
-                FL.cal_stress(stress_lcao);
-            }
-            double pressure = PRESSURE;
-            en.etot = en.etot + ucell.omega * pressure;
-
-            ofs_running << "\n\n --------------------------------------------" << endl;
-            ofs_running << setprecision(16);
-            ofs_running << " !FINAL_ETOT_IS (+ P*V) " << en.etot * Ry_to_eV << " eV" << endl; 
-            ofs_running << " --------------------------------------------\n\n" << endl;
-        }
-*/
     }
 
 	// mohan update 2021-02-10
     hm.orb_con.clear_after_ions();
 
-    timer::tick("Local_Orbital_Ions","opt_ions",'B'); 
+    timer::tick("Run_MD","opt_ions",'B'); 
     return;
 }
 
-//bool Local_Orbital_Ions::force_stress(void)
-bool Local_Orbital_Ions::force_stress(const int &istep, int &force_step, int &stress_step)
+//bool Run_MD::force_stress(void)
+bool Run_MD::force_stress(const int &istep, int &force_step, int &stress_step)
 {
-    TITLE("Local_Orbital_Ions","force_stress");
+    TITLE("Run_MD","force_stress");
     if(!FORCE && !STRESS)
     {
         return 1;
     }
-    timer::tick("Local_Orbital_Ions","force_stress",'D');
+    timer::tick("Run_MD","force_stress",'D');
 	matrix fcs;
 	matrix scs;
 	Force_Stress_LCAO FSL;
@@ -428,12 +389,12 @@ xiaohui modify 2014-08-09*/
 
     return 0;
 
-    timer::tick("Local_Orbital_Ions","force_stress",'D');
+    timer::tick("Run_MD","force_stress",'D');
 }
 
-void Local_Orbital_Ions::final_scf(void)
+void Run_MD::final_scf(void)
 {
-    TITLE("Local_Orbital_Ions","final_scf"); 
+    TITLE("Run_MD","final_scf"); 
 
     FINAL_SCF = true;
     Variable_Cell::final_calculation_after_vc();
@@ -505,10 +466,10 @@ void Local_Orbital_Ions::final_scf(void)
     return;
 }
 
-void Local_Orbital_Ions::output_HS_R(void)
+void Run_MD::output_HS_R(void)
 {
-    TITLE("Local_Orbital_Ions","output_HS_R"); 
-    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
+    TITLE("Run_MD","output_HS_R"); 
+    timer::tick("Run_MD","output_HS_R",'D'); 
 	
 	// add by jingan for out r_R matrix 2019.8.14
 	if(INPUT.out_r_matrix)
@@ -559,6 +520,6 @@ void Local_Orbital_Ions::output_HS_R(void)
         UHM.GK.destroy_pvpR();
     } //LiuXh 20181011
 
-    timer::tick("Local_Orbital_Ions","output_HS_R",'D'); 
+    timer::tick("Run_MD","output_HS_R",'D'); 
     return;
 }
