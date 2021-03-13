@@ -29,6 +29,7 @@ void Run_lcao::lcao_line(void)
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put NLOCAL and NBANDS as input parameters
     ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
+
     //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
     DONE(ofs_running, "SETUP UNITCELL");
 
@@ -40,7 +41,7 @@ void Run_lcao::lcao_line(void)
     }
 
     // Setup the k points according to symmetry.
-    kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
+    kv.set(symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
     DONE(ofs_running,"INIT K-POINTS");
 
     // print information
@@ -49,21 +50,15 @@ void Run_lcao::lcao_line(void)
     PI.setup_parameters();
 
 
-
-    // for LCAO basis, reading the orbitals and construct
-    // the interpolation tables.
-
-	// read orbital information.
-	// init overlap matrix table, which is 'S Table'
-	// init kinetical matrix element table, which is 'T Table'
-	// init non-local pseudopotential matrix element table, which is 'NL Table'
+    // * reading the localized orbitals/projectors 
+	// * construct the interpolation tables.
 	hm.orb_con.set_orb_tables();
 
-	// xiaohui add 2015-09-06
-	// (1) divide the H and S matrix into each CPU, count the dimensions
-	// (2) set the 'trace' between local H/S and global H/S
-	// (2) allocate the needed H and S memory
-	LM.divide_HS_in_frag();
+	// * divide the H and S according to computational resources
+	// * set the 'trace' between local H/S and global H/S
+	// * allocate the needed H and S memory for Gamma/multi k-points
+	LM.divide_HS_in_frag(GAMMA_ONLY_LOCAL, ParaO);
+
 
 
 //--------------------------------------
