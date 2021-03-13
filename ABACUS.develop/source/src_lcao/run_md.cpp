@@ -20,6 +20,16 @@ Run_MD::Run_MD()
 Run_MD::~Run_MD() 
 {}
 
+
+void Run_MD::opt_cell(void)
+{
+
+	
+	opt_ions();
+
+}
+
+
 void Run_MD::opt_ions(void)
 {
     TITLE("Run_MD","opt_ions"); 

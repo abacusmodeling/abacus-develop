@@ -367,6 +367,7 @@ inline void cal_meshball_DGridV(
                     &dphiz[0][idx2], &LD_pool, 
                     &psir_vlbr3[0][idx1], &LD_pool,  
                     &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
+
                 if(STRESS)
                 {
 					k=1;
@@ -432,44 +433,50 @@ inline void cal_meshball_DGridV(
                             &dphiz[ib][idx2], &LD_pool, 
                             &psir_vlbr3[ib][idx1], &LD_pool,  
                             &beta, &DGridV_z[iw1_lo][iw2_lo], &lgd_now);
+
                         if(STRESS)
-                        {
-					double stress_alpha1 = alpha * drr(ia2,ib,0);
-					double stress_alpha2 = alpha * drr(ia2,ib,1);
-					double stress_alpha3 = alpha * drr(ia2,ib,2);
-					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha1,
-						&dphix[ib][idx2], &LD_pool,
-						&psir_vlbr3[ib][idx1], &LD_pool,
-						&beta, &DGridV_11[iw1_lo][iw2_lo], &lgd_now);
-					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
-						&dphix[ib][idx2], &LD_pool,
-						&psir_vlbr3[ib][idx1], &LD_pool,
-						&beta, &DGridV_12[iw1_lo][iw2_lo], &lgd_now);
-					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
-						&dphix[ib][idx2], &LD_pool,
-						&psir_vlbr3[ib][idx1], &LD_pool,
-						&beta, &DGridV_13[iw1_lo][iw2_lo], &lgd_now);
-					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
-						&dphiy[ib][idx2], &LD_pool,
-						&psir_vlbr3[ib][idx1], &LD_pool,
-						&beta, &DGridV_22[iw1_lo][iw2_lo], &lgd_now);
-					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
-						&dphiy[ib][idx2], &LD_pool,
-						&psir_vlbr3[ib][idx1], &LD_pool,
-						&beta, &DGridV_23[iw1_lo][iw2_lo], &lgd_now);
-					dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
-						&dphiz[ib][idx2], &LD_pool,
-						&psir_vlbr3[ib][idx1], &LD_pool,
-						&beta, &DGridV_33[iw1_lo][iw2_lo], &lgd_now);
-//                        DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][0];
-//                        DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][1];
-//                        DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-//                        DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
-//                        DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-//                        DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-//cout<<"DGridV: "<<iw1_lo<<" "<<iw2_lo<<" "<<iw1_lo*GridT.lgd + iw2_lo<<" "<<DGridV_x[iw1_lo][iw2_lo]<<" "<<DGridV_y[iw1_lo][iw2_lo]<<" "<<DGridV_z[iw1_lo][iw2_lo]<<" "<<drr[ia2][0][0]<<" "<<drr[ia2][0][1]<<" "<<drr[ia2][0][2]<<endl;
-                        }
-                    }                    
+						{
+							double stress_alpha1 = alpha * drr(ia2,ib,0);
+							double stress_alpha2 = alpha * drr(ia2,ib,1);
+							double stress_alpha3 = alpha * drr(ia2,ib,2);
+							dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha1,
+									&dphix[ib][idx2], &LD_pool,
+									&psir_vlbr3[ib][idx1], &LD_pool,
+									&beta, &DGridV_11[iw1_lo][iw2_lo], &lgd_now);
+							dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
+									&dphix[ib][idx2], &LD_pool,
+									&psir_vlbr3[ib][idx1], &LD_pool,
+									&beta, &DGridV_12[iw1_lo][iw2_lo], &lgd_now);
+							dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+									&dphix[ib][idx2], &LD_pool,
+									&psir_vlbr3[ib][idx1], &LD_pool,
+									&beta, &DGridV_13[iw1_lo][iw2_lo], &lgd_now);
+							dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha2,
+									&dphiy[ib][idx2], &LD_pool,
+									&psir_vlbr3[ib][idx1], &LD_pool,
+									&beta, &DGridV_22[iw1_lo][iw2_lo], &lgd_now);
+							dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+									&dphiy[ib][idx2], &LD_pool,
+									&psir_vlbr3[ib][idx1], &LD_pool,
+									&beta, &DGridV_23[iw1_lo][iw2_lo], &lgd_now);
+							dgemm_ (&transa, &transb, &n, &m, &k, &stress_alpha3,
+									&dphiz[ib][idx2], &LD_pool,
+									&psir_vlbr3[ib][idx1], &LD_pool,
+									&beta, &DGridV_33[iw1_lo][iw2_lo], &lgd_now);
+							// DGridV_11[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][0];
+							// DGridV_12[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+							// DGridV_13[iw1_lo*GridT.lgd + iw2_lo] += DGridV_x[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+							// DGridV_22[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
+							// DGridV_23[iw1_lo*GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+							// DGridV_33[iw1_lo*GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
+							//cout<<"DGridV: "<<iw1_lo<<" "<<iw2_lo
+							//<<" "<<iw1_lo*GridT.lgd + iw2_lo<<" "
+							//<<DGridV_x[iw1_lo][iw2_lo]<<" "
+							//<<DGridV_y[iw1_lo][iw2_lo]<<" "
+							//<<DGridV_z[iw1_lo][iw2_lo]<<" "
+							//<<drr[ia2][0][0]<<" "<<drr[ia2][0][1]<<" "<<drr[ia2][0][2]<<endl;
+						}
+					}                    
                 }
             }
         }
@@ -680,7 +687,9 @@ void Gint_Gamma::gamma_force(void)
         delete[] block_iw;
         delete[] block_size;
         for(int ib=0; ib<pw.bxyz; ++ib)
+		{
             delete[] cal_flag[ib];
+		}
         delete[] cal_flag;
         //OUT(ofs_running,"temp variables were deleted");
 

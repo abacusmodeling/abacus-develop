@@ -1,12 +1,12 @@
-#ifndef RELAX_CELL_H
-#define RELAX_CELL_H
+#ifndef LOOP_CELL_H
+#define LOOP_CELL_H
 
-class RELAX_cell 
+class LOOP_cell 
 {
 	public:
 
-	RELAX_cell();
-	~RELAX_cell();
+	LOOP_cell();
+	~LOOP_cell();
 
 	void opt_cell(void);
 

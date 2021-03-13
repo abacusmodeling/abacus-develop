@@ -7,7 +7,6 @@
 
 #include "global_fp.h" // mohan add 2021-01-30
 
-//inline void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex)
 void Gint_Gamma::setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const
 {
     int bindex = 0;
@@ -28,11 +27,11 @@ void Gint_Gamma::setVindex(const int ncyz, const int ibx, const int jby, const i
 }
 
 void Gint_Gamma::cal_psir_ylm_rho(
-	int size, 
-	int grid_index, 
-	double delta_r,
+	int size, // number of atoms on this grid 
+	int grid_index,  
+	double delta_r, // delta_r of uniform grid
 	double** distance, 
-	double* ylma,
+	double* ylma, 
 	int* at, 
 	int* block_index, 
 	int* block_iw, 
@@ -316,7 +315,9 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
 			// allocate 1
 			int nnnmax=0;
 			for(int T=0; T<ucell.ntype; T++)
+			{
 				nnnmax = max(nnnmax, nnn[T]);
+			}
 
 			// set up band matrix psir_ylm and psir_DM
 			const int LD_pool=max_size*ucell.nwmax;

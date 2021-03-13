@@ -116,53 +116,54 @@ void Run_lcao::lcao_line(void)
 	}
 
 
-	// Init the local wave functions.
+	// Initialize the local wave functions.
 	wf.init_local();
-	// Init the FFT.
+	// Initialize the FFT.
 	UFFT.allocate();
-	// Init the local part of NC pseudopotential.
+	// Initialize the local part of NC pseudopotential.
 	ppcell.init_vloc();
-	// Init the potential.
+	// Initialize the potential.
 	pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
 
-
-    // Peize Lin 2016-12-03
-	if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")
-	{
-		switch(exx_global.info.hybrid_type)
-		{
-			case Exx_Global::Hybrid_Type::HF:
-			case Exx_Global::Hybrid_Type::PBE0:
-			case Exx_Global::Hybrid_Type::HSE:
-				exx_lcao.init();
-				break;
-			case Exx_Global::Hybrid_Type::No:
-			case Exx_Global::Hybrid_Type::Generate_Matrix:
-				break;
-			default:
-				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-		}
-	}	
-
-    // Quxin added for DFT+U
-	if(INPUT.dft_plus_u) 
-	{
-		dftu.init();
-	}
 
 
     if(CALCULATION=="md")
 	{
 		Run_MD run_md;
-		run_md.opt_ions();
+		run_md.opt_cell();
 	}
 	else
 	{
-		RELAX_cell rcell;
-		rcell.opt_cell();
+		// Peize Lin 2016-12-03
+		if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+		{
+			switch(exx_global.info.hybrid_type)
+			{
+				case Exx_Global::Hybrid_Type::HF:
+				case Exx_Global::Hybrid_Type::PBE0:
+				case Exx_Global::Hybrid_Type::HSE:
+					exx_lcao.init();
+					break;
+				case Exx_Global::Hybrid_Type::No:
+				case Exx_Global::Hybrid_Type::Generate_Matrix:
+					break;
+				default:
+					throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			}
+		}	
+
+		// Quxin added for DFT+U
+		if(INPUT.dft_plus_u) 
+		{
+			dftu.init();
+		}
+
+		LOOP_cell lc;
+		lc.opt_cell();
+
+		en.perform_dos();
 	}
 
-	en.perform_dos();
 
 	timer::tick("Run_lcao","lcao_line",'A');
     return;
