@@ -27,7 +27,7 @@ class Center2_Orb::Orb11
 	Orb11(
 		const Numerical_Orbital_Lm &nA_in,
 		const Numerical_Orbital_Lm &nB_in,
-		const Make_Overlap_Table &MOT_in,
+		const ORB_table_phi &MOT_in,
 		const Make_Gaunt_Table &MGT_in	);
 
 	void init_radial_table(void);
@@ -43,7 +43,7 @@ class Center2_Orb::Orb11
 	const Numerical_Orbital_Lm &nA;
 	const Numerical_Orbital_Lm &nB;
 	
-	const Make_Overlap_Table &MOT;
+	const ORB_table_phi &MOT;
 	const Make_Gaunt_Table &MGT;	
 
 	map<int,vector<double>> Table_r;									// unit: Bohr/MOT.dr

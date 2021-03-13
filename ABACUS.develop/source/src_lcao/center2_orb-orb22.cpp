@@ -10,7 +10,7 @@ Center2_Orb::Orb22::Orb22(
 	const Numerical_Orbital_Lm &nA2_in,
 	const Numerical_Orbital_Lm &nB1_in,
 	const Numerical_Orbital_Lm &nB2_in,
-	const Make_Overlap_Table &MOT_in,
+	const ORB_table_phi &MOT_in,
 	const Make_Gaunt_Table &MGT_in
 )
 	:nA1(nA1_in),

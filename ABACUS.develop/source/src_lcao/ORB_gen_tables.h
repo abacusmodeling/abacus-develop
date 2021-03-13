@@ -67,7 +67,7 @@ class ORB_gen_tables
 	// set as public because in hamilt_linear, 
 	// we need to destroy the tables: SR,TR,NR
 	// after ionic optimization is done.
-	Make_Overlap_Table MOT;
+	ORB_table_phi MOT;
 	ORB_table_beta tbeta;
 
 	// if we want to add table for descriptors,

@@ -29,7 +29,7 @@ public:
 		const Numerical_Orbital_Lm &nA2_in,
 		const Numerical_Orbital_Lm &nB1_in,
 		const Numerical_Orbital_Lm &nB2_in,		
-		const Make_Overlap_Table &MOT_in,
+		const ORB_table_phi &MOT_in,
 		const Make_Gaunt_Table &MGT_in	);
 	void init_radial_table();
 	void init_radial_table( const set<size_t> &radials );						// unit: Bohr/MOT.dr
@@ -43,7 +43,7 @@ protected:								// Peize Lin test 2016-10-07
 	const Numerical_Orbital_Lm &nB1;
 	const Numerical_Orbital_Lm &nB2;
 	
-	const Make_Overlap_Table &MOT;
+	const ORB_table_phi &MOT;
 	const Make_Gaunt_Table &MGT;	
 
 	map<int,Numerical_Orbital_Lm> nB;

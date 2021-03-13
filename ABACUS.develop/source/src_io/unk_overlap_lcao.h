@@ -25,7 +25,7 @@ class unkOverlap_lcao
 {
 public:
 
-	Make_Overlap_Table MOT;
+	ORB_table_phi MOT;
 	Make_Gaunt_Table MGT;
 	Numerical_Orbital_Lm orb_r;  // 新建的r矢量,以原子轨道形式存在,以solid球谐函数展开
 	

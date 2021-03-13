@@ -33,7 +33,7 @@ class cal_r_overlap_R
 	~cal_r_overlap_R();
 	
 
-	Make_Overlap_Table MOT;
+	ORB_table_phi MOT;
 
 	Make_Gaunt_Table MGT;
 

@@ -66,7 +66,7 @@ public:
 		const Element_Basis_Index::IndexLNM &index_B) const;
 	
 protected:
-	Make_Overlap_Table MOT;
+	ORB_table_phi MOT;
 	Make_Gaunt_Table MGT;
 	
 	map<size_t,                                  // TA

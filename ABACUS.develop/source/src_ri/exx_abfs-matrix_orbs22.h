@@ -54,7 +54,7 @@ public:
 
 private:
 	
-	Make_Overlap_Table MOT;
+	ORB_table_phi MOT;
 	Make_Gaunt_Table MGT;
 
 	map<size_t,                                        // TA
