@@ -57,27 +57,25 @@ void potential::init_pot(const int &istep)
 
     assert(istep>=0);
 
-    vrs.zero_out();
+	// total potential in real space
+    this->vrs.zero_out();
 
-    // mohan fix bug 2011-07-08
     // the vltot should and must be zero here.
     ZEROS(this->vltot, pw.nrxx);
 
 	//-------------------------------------------------------------------
-	// put the local pseudopotential + electric field (if any) in vltot
+	// (1) local pseudopotential + electric field (if any) in vltot
 	//-------------------------------------------------------------------
 	this->set_local(this->vltot);
 
-	// mohan fix bug 2011-07-07
-	// set pseudopotentials.
-	int nspin0=NSPIN;//zhengdy-soc, pauli matrix, just index 0 has vlocal term.
+	// zhengdy-soc, pauli matrix, just index 0 has vlocal term
+	int nspin0=NSPIN;
 
-	if(NSPIN==4) nspin0=1;
+	if(NSPIN==4) 
+	{
+		nspin0=1;
+	}
 
-	//-------------------------------------------------------------------
-	// put the local pseudopotential + electric field (if any) in vltot
-	// vrs saves the total potential.
-	//-------------------------------------------------------------------
 	for(int is=0; is<nspin0; ++is)
 	{
 		for(int ir=0; ir<pw.nrxx; ++ir)
@@ -90,8 +88,8 @@ void potential::init_pot(const int &istep)
 	CHR.set_rho_core( pw.strucFac );
 
 	//--------------------------------------------------------------------
-	// the other local potentials need charge density, so here you need to 
-	// decide how to obtain the charge density from ionic step 0.
+	// (2) other effective potentials need charge density,
+	// choose charge density from ionic step 0.
 	//--------------------------------------------------------------------
     if(istep==0)
     {
@@ -185,11 +183,14 @@ void potential::init_pot(const int &istep)
 	// renormalize the charge density
     CHR.renormalize_rho();
 
+
+    //----------------------------------------------------------
+    // (3) compute Hartree and XC potentials saves in vr 
+    //----------------------------------------------------------
     this->v_of_rho(CHR.rho, vr);
 
     //----------------------------------------------------------
-    // Define the total local potential (external+scf) in DFT
-	// Define TDDFT potential, by Fuxiang He
+    // (4) total potentials 
     //----------------------------------------------------------
     if(vext == 0) 
 	{
@@ -200,6 +201,7 @@ void potential::init_pot(const int &istep)
 		this->set_vrs_tddft(istep);
 	}
 
+	// plots
     //figure::picture(this->vrs1,pw.ncx,pw.ncy,pw.ncz);
     timer::tick("potential","init_pot");
     return;
@@ -316,20 +318,19 @@ void potential::set_vrs(void)
         //=================================================================
 		if(NSPIN==4&&is>0)
 		{
-			for (int i = 0;i < pw.nrxx;i++)
+			for (int i = 0;i < pw.nrxx; i++)
 			{
 				this->vrs(is, i) = this->vr(is, i);
 			}
 		}
 		else        
 		{
-			for (int i = 0;i < pw.nrxx;i++)
+			for (int i = 0;i < pw.nrxx; i++)
 	        {
 	            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
 			}
 		}
     }
-
 
     timer::tick("potential","set_vrs");
     return;
@@ -403,113 +404,3 @@ void potential::newd(void)
 	}
 	return;
 } // end subroutine newd
-
-
-//==========================================================
-// this function aims to add external time-dependent potential 
-// (eg: linear potential) used in tddft
-// fuxiang add in 2017-05
-//==========================================================
-void potential::set_vrs_tddft(const int istep)
-{
-    TITLE("potential","set_vrs_tddft");
-    timer::tick("potential","set_vrs_tddft");
-
-    for (int is = 0;is < NSPIN;is++)
-    {
-        //====================================================
-        // add external linear potential, fuxiang add in 2017/05
-        //====================================================
-
-        const int timescale = 1;  // get the time that vext influences;
-        if (istep >= timescale)
-        {
-            for (int i = 0;i < pw.nrxx;i++)
-            {
-                this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
-            }
-            cout << "vext = 0! " << endl;
-        }
-        else
-        {
-            this->vextold = new double[pw.nrxx];
-            this->vext = new double[pw.nrxx];
-            const int yz = pw.ncy*pw.nczp;
-            int index, i, j, k;
-
-            for(int ir=0; ir<pw.nrxx; ++ir)
-            {
-                index = ir;
-                i     = index / yz; // get the z, z is the fastest
-                index = index - yz * i;// get (x,y)
-                j     = index / pw.nczp;// get y
-                k     = index - pw.nczp*j + pw.nczp_start;// get x
-
-                if(vext_dire == 1)
-                {
-                    if (k<pw.ncx*0.05) this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
-                    else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
-                    else if (k>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
-                }
-                else if(vext_dire == 2)
-                {
-                    if (j<pw.ncx*0.05) this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
-                    else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
-                    else if (j>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
-                }
-                else if(vext_dire == 3)
-                {
-                    if (i<pw.ncx*0.05) this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
-                    else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95) this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
-                    else if (i>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*i/pw.ncx-1)-0.001069585)*ucell.lat0;
-                }
-
-                // Gauss
-/*
-                const double w = 22.13;    // eV
-                const double sigmasquare = 6836;
-                const double timecenter = 700;
-                const double timenow = (istep-timecenter)*INPUT.md_dt*41.34;
-                this->vext[ir] = this->vextold[ir]*cos(w/27.2116*timenow)*exp(-timenow*timenow*0.5/(sigmasquare))*0.25;  //0.1 is modified in 2018/1/12
-*/
-
-                //HHG of H atom
-/*
-                if(istep < 1875)
-                {
-                    this->vext[ir] = this->vextold[ir]*2.74*istep/1875*cos(0.0588*istep*INPUT.md_dt*41.34);	// 2.75 is equal to E0;
-                }
-                else if(istep < 5625)
-                {
-                    this->vext[ir] = this->vextold[ir]*2.74*cos(0.0588*istep*INPUT.md_dt*41.34);
-                }
-                else if(istep < 7500)
-                {
-                    this->vext[ir] = this->vextold[ir]*2.74*(7500-istep)/1875*cos(0.0588*istep*INPUT.md_dt*41.34);
-                }
-*/
-
-                //HHG of H2
-
-                //const double timenow = (istep)*INPUT.md_dt*41.34;
-                //this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow);
-                //this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow)*0.01944;
-                //this->vext[ir] = this->vextold[ir]*2.74*cos(0.0428*timenow)*sin(0.00107*timenow)*sin(0.00107*timenow);
-
-                this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
-
-                //cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
-                //cout << "vext: " << this->vext[ir] << endl;
-                //cout << "vrs: " << vrs(is,ir) <<endl;
-            }
-            cout << "vext is existed!" << endl;
-
-            delete[] this->vextold;
-            delete[] this->vext;
-        }
-    }
-
-
-    timer::tick("potential","set_vrs_tddft");
-    return;
-} //end subroutine set_vrs_tddft

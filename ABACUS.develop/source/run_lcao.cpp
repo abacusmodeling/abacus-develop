@@ -24,7 +24,6 @@ void Run_lcao::lcao_line(void)
     TITLE("Run_lcao","lcao_line");
 	timer::tick("Run_lcao","lcao_line",'A');
 
-
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put NLOCAL and NBANDS as input parameters
@@ -49,22 +48,17 @@ void Run_lcao::lcao_line(void)
     Print_Info PI;
     PI.setup_parameters();
 
-
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
 	hm.orb_con.set_orb_tables();
 
-	// * divide the H and S according to computational resources
+	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
-	// * allocate the needed H and S memory for Gamma/multi k-points
 	LM.divide_HS_in_frag(GAMMA_ONLY_LOCAL, ParaO);
-
-
 
 //--------------------------------------
 // cell relaxation should begin here
 //--------------------------------------
-
 
     // Initalize the plane wave basis set
     pw.gen_pw(ofs_running, ucell, kv);
@@ -72,27 +66,24 @@ void Run_lcao::lcao_line(void)
     cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
     cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
 
-
-    // mohan add 2010-10-10, just to test the symmetry of a variety
-    // of systems.
+    // the symmetry of a variety of systems.
     if(CALCULATION == "test")
     {
         Cal_Test::test_memory();
         QUIT();
     }
 
-    // mohan add 2010-09-13
     // initialize the real-space uniform grid for FFT and parallel
     // distribution of plane waves
     Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
         pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 
-	// (1) Inititlize the charge density.
+	// Inititlize the charge density.
     CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
     DONE(ofs_running,"INIT CHARGE");
 
-	// (2) Initializee the potential.
+	// Initializee the potential.
     pot.allocate(pw.nrxx);
     DONE(ofs_running,"INIT POTENTIAL");
 
@@ -112,14 +103,20 @@ void Run_lcao::lcao_line(void)
 
 
 	// Initialize the local wave functions.
-	wf.init_local();
+	// npwx, eigenvalues, and weights
+	wf.allocate_ekb_wg(kv.nks);
+
 	// Initialize the FFT.
 	UFFT.allocate();
-	// Initialize the local part of NC pseudopotential.
-	ppcell.init_vloc();
-	// Initialize the potential.
-	pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
 
+	// Initialize the local part of
+	// NC pseudopotentials
+	ppcell.init_vloc();
+
+	// Initialize the sum of all local potentials.
+	// if ion_step==0, read in/initialize the potentials
+	int ion_step=0;
+	pot.init_pot(ion_step);
 
 
     if(CALCULATION=="md")
@@ -130,7 +127,7 @@ void Run_lcao::lcao_line(void)
 	else
 	{
 		// Peize Lin 2016-12-03
-		if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+		if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
 		{
 			switch(exx_global.info.hybrid_type)
 			{

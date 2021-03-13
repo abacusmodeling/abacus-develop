@@ -27,10 +27,9 @@ wavefunc::~wavefunc()
 	}
 }
 
-void wavefunc::init_local(void)
+void wavefunc::allocate_ekb_wg(const int nks)
 {
     TITLE("wavefunc","init_local");
-    const int nks = kv.nks;
     this->npwx = this->setupIndGk(pw, nks);
 
 	// band energies
@@ -47,7 +46,6 @@ void wavefunc::init_local(void)
     Memory::record("wavefunc","ekb",nks*NBANDS,"double");
     Memory::record("wavefunc","wg",nks*NBANDS,"double");
 
-    if(test_wf)ofs_running << " Allocate : EigenValue; Weight;" << endl;
     return;
 }
 

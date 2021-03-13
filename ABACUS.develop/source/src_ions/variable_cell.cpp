@@ -132,7 +132,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     }
     else
     {
-        wf.init_local();
+        wf.allocate_ekb_wg(kv.nks);
     }
     UFFT.allocate();
 
