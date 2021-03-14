@@ -47,8 +47,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     //calculate dVL
     //calculate <dphi | VL | phi>
 
+	// mohan add 2021, needs reconstruction!!!
     int istep = 1;
-    pot.init_pot(istep);
+    pot.init_pot(istep, pw.strucFac);
 
     for(int is=0; is<NSPIN; ++is)
     {
@@ -187,7 +188,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     //calculate <dphi | VL | phi>
 
     int istep = 1;
-    pot.init_pot(istep);
+    pot.init_pot(istep, pw.strucFac);
 
     for(int is=0; is<NSPIN; ++is)
     {

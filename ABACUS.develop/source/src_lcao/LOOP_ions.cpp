@@ -289,7 +289,7 @@ bool LOOP_ions::force_stress(const int &istep, int &force_step, int &stress_step
                 }
                 else
                 {
-                    pot.init_pot( istep );
+                    pot.init_pot( istep, pw.strucFac );
                 }
             }
             return 0;
@@ -344,7 +344,7 @@ xiaohui modify 2014-08-09*/
            	else
            	{
                	Variable_Cell::init_after_vc();
-               	pot.init_pot(stress_step);
+               	pot.init_pot(stress_step, pw.strucFac);
 
                	++stress_step;
                	return 0;
@@ -384,7 +384,7 @@ xiaohui modify 2014-08-09*/
             	    else
             	    {
                 	    Variable_Cell::init_after_vc();
-                	    pot.init_pot(stress_step);
+                	    pot.init_pot(stress_step, pw.strucFac);
 
                 	    ++stress_step;
                 	    return 0;
@@ -414,7 +414,7 @@ xiaohui modify 2014-08-09*/
                 }
                 else
                 {
-                    pot.init_pot( istep );
+                    pot.init_pot( istep, pw.strucFac );
                 }
                 ++force_step;
                 return 0;

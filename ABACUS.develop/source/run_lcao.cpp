@@ -115,7 +115,7 @@ void Run_lcao::lcao_line(void)
 	// Initialize the sum of all local potentials.
 	// if ion_step==0, read in/initialize the potentials
 	int ion_step=0;
-	pot.init_pot(ion_step);
+	pot.init_pot(ion_step, pw.strucFac);
 
 
     if(CALCULATION=="md")
@@ -125,24 +125,6 @@ void Run_lcao::lcao_line(void)
 	}
 	else
 	{
-		// Peize Lin 2016-12-03
-		if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
-		{
-			switch(exx_global.info.hybrid_type)
-			{
-				case Exx_Global::Hybrid_Type::HF:
-				case Exx_Global::Hybrid_Type::PBE0:
-				case Exx_Global::Hybrid_Type::HSE:
-					exx_lcao.init();
-					break;
-				case Exx_Global::Hybrid_Type::No:
-				case Exx_Global::Hybrid_Type::Generate_Matrix:
-					break;
-				default:
-					throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-			}
-		}	
-
 		LOOP_cell lc;
 		lc.opt_cell();
 

@@ -291,7 +291,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
                 // calculate the new potential accordint to
                 // the new charge density.
-                pot.init_pot( istep );
+                pot.init_pot( istep, pw.strucFac );
 
                 ofs_running << " Setup the new wave functions?" << endl;
                 // newd() not needed now(if Q in r space, needed).
@@ -334,8 +334,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             else
             {
                 Variable_Cell::init_after_vc();
-                //pot.init_pot(0);
-                pot.init_pot(stress_step); //LiuXh add 20180619
+                pot.init_pot(stress_step, pw.strucFac); //LiuXh add 20180619
                 ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                 wf.wfcinit(); //LiuXh add 20180619
                 ++stress_step;
@@ -391,8 +390,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                     else
                     {
                         Variable_Cell::init_after_vc();
-                        //pot.init_pot(0);
-                        pot.init_pot(stress_step); //LiuXh add 20180619
+                        pot.init_pot(stress_step, pw.strucFac); //LiuXh add 20180619
 
                         ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                         wf.wfcinit(); //LiuXh add 20180619
@@ -426,7 +424,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 CE.istep = force_step;
 
                 CE.extrapolate_charge();
-                pot.init_pot( istep );
+                pot.init_pot( istep, pw.strucFac );
                 wf.wfcinit();
                 ++force_step;
                 return 0;

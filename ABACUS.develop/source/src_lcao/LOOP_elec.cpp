@@ -124,7 +124,7 @@ void LOOP_elec::before_solver(const int &istep)
 		CHR.renormalize_rho();
 
 		// initialize the potential
-		pot.init_pot( istep-1 );
+		pot.init_pot( istep-1, pw.strucFac );
 	}
 
 

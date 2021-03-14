@@ -110,7 +110,7 @@ void Run_pw::plane_wave_line(void)
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
+    pot.init_pot(0, pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
     pot.newd();//once
     DONE(ofs_running,"INIT POTENTIAL");

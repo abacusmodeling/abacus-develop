@@ -917,7 +917,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	int istep = 1;
 
 	// if Vna potential is not used.
-	pot.init_pot(istep);
+	pot.init_pot(istep, pw.strucFac);
 
 
 	for(int is=0; is<NSPIN; ++is)
