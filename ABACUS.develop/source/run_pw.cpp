@@ -98,7 +98,7 @@ void Run_pw::plane_wave_line(void)
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc();
+    ppcell.init_vloc(pw.nggm);
     DONE(ofs_running,"LOCAL POTENTIAL");
 
     //======================================
