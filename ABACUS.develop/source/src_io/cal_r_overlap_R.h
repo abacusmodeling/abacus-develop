@@ -35,7 +35,7 @@ class cal_r_overlap_R
 
 	ORB_table_phi MOT;
 
-	Make_Gaunt_Table MGT;
+	ORB_gaunt_table MGT;
 
 	Numerical_Orbital_Lm orb_r;
 
