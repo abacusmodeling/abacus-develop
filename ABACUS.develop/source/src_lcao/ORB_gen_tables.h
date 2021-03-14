@@ -75,7 +75,7 @@ class ORB_gen_tables
 
 	private:
 
-	Make_Gaunt_Table MGT;
+	ORB_gaunt_table MGT;
 
 	double get_distance(const Vector3<double> &R1, const Vector3<double> &R2)const;
 

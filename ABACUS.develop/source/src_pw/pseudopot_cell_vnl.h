@@ -90,7 +90,7 @@ private:
 	double CG(int l1, int m1, int l2, int m2, int L, int M);
 	void print_vnl(ofstream &ofs);
 	
-	Make_Gaunt_Table MGT;
+	ORB_gaunt_table MGT;
 };
 
 #endif // PSEUDOPOT_CELL_VNL_H

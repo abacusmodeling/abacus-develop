@@ -55,7 +55,7 @@ public:
 private:
 	
 	ORB_table_phi MOT;
-	Make_Gaunt_Table MGT;
+	ORB_gaunt_table MGT;
 
 	map<size_t,                                        // TA
 		map<size_t,                                    // TB
