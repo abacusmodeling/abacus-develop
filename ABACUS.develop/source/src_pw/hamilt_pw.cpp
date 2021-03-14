@@ -113,7 +113,41 @@ void Hamilt_PW::cinitcgg(
     ComplexMatrix hc(nstart, nstart);
     ComplexMatrix sc(nstart, nstart);
     ComplexMatrix hvec(nstart,n_band);
+	int dmin,dmax;
+	const int npw = kv.ngk[ik];
+	if(!NONCOLIN)
+	{
+		dmin= npw;
+		dmax = wf.npwx;
+	}
+	else {
+		dmin = wf.npwx*NPOL;
+		dmax = wf.npwx*NPOL;
+	}
+	//qianrui improve this part 2021-3-14
+	complex<double> *aux=new complex<double> [dmax*nstart];
+	complex<double> *paux = aux;
+	complex<double> *ppsi = psi.c;
+	for(int m=0;m<nstart;++m)
+	{
+		this->h_psi(ppsi, paux);
+		paux += dmax;
+		ppsi += dmax;
+	}
+	char trans1 = 'C';
+	char trans2 = 'N';
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,aux,&dmax,&ZERO,hc.c,&nstart);
+	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,psi.c,&dmax,&ZERO,sc.c,&nstart);
+	//After psis are strictly normalized, we should use this part. 
+	//for(int m=1;m<nstart;++m)
+	//{
+	//	sc(m,m) == 1;
+	//}
 
+	delete []aux;
+
+
+	/*//qianrui replace this part
 	complex<double> **p = new complex<double>*[nstart];
 	for(int i=0; i<nstart; i++)
 	{
@@ -146,18 +180,6 @@ void Hamilt_PW::cinitcgg(
 	}
 
     // Set up the Hamiltonian and Overlap matrices
-	const int npw = kv.ngk[ik];
-	int dmin,dmax;
-	if(NSPIN!=4)
-	{
-		dmin= npw;
-		dmax = wf.npwx;
-	}
-	else 
-	{
-		dmin = wf.npwx*NPOL;
-		dmax = wf.npwx*NPOL;
-	}
 	complex<double>* hpsi = new complex<double>[dmin];
 	complex<double>* spsi = new complex<double>[dmin];
 
@@ -180,6 +202,14 @@ void Hamilt_PW::cinitcgg(
         }
     }
 	
+	delete[] hpsi;
+	delete[] spsi;
+	for(int i=0; i<nstart; i++)
+	{
+		delete[] p[i];
+	}
+	delete[] p;*/
+
 	// Peize Lin add 2019-03-09
 	if("lcao_in_pw"==BASIS_TYPE)
 	{
@@ -206,10 +236,6 @@ void Hamilt_PW::cinitcgg(
 			add_Hexx(exx_global.info.hybrid_alpha);		
 		}
 	}
-	
-	delete[] hpsi;
-	delete[] spsi;
-
 
 	if(NPROC_IN_POOL>1)
 	{
@@ -217,11 +243,7 @@ void Hamilt_PW::cinitcgg(
 		Parallel_Reduce::reduce_complex_double_pool( sc.c, nstart*nstart );
 	}
 
-	for(int i=0; i<nstart; i++)
-	{
-		delete[] p[i];
-	}
-	delete[] p;
+	
 
     hm.cdiaghg(nstart, n_band, hc, sc, nstart, en, hvec);
 
