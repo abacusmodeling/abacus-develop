@@ -137,7 +137,9 @@ void Hamilt_PW::cinitcgg(
 	char trans1 = 'C';
 	char trans2 = 'N';
 	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,aux,&dmax,&ZERO,hc.c,&nstart);
+	hc=transpose(hc,false);
 	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,psi.c,&dmax,&ZERO,sc.c,&nstart);
+	sc=transpose(sc,false);
 	//After psis are strictly normalized, we should use this part. 
 	//for(int m=1;m<nstart;++m)
 	//{
