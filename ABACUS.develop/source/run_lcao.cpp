@@ -7,7 +7,6 @@
 #include "input.h"
 #include "src_io/optical.h"
 #include "src_io/cal_test.h"
-#include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 #include "src_io/winput.h"
 #include "src_global/sltk_atom_arrange.h"
 #include "src_lcao/LOOP_cell.h"
@@ -143,12 +142,6 @@ void Run_lcao::lcao_line(void)
 					throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 			}
 		}	
-
-		// Quxin added for DFT+U
-		if(INPUT.dft_plus_u) 
-		{
-			dftu.init();
-		}
 
 		LOOP_cell lc;
 		lc.opt_cell();
