@@ -323,7 +323,41 @@ void Hamilt_PW::cinitcgg(
 	else
 	{
 		// As the evc and psi may refer to the same matrix, we first
-		// create a temporary matrix to story the result. (by wangjp) 
+		// create a temporary matrix to story the result. (by wangjp)
+		//qianrui improve this part 2021-3-13
+		char transa = 'N';
+		char transb = 'T';
+		if(NPOL == 1)
+		{
+			ComplexMatrix evctmp(n_band, wf.npw,false);
+			zgemm_(&transa,&transb,&wf.npw,&n_band,&nstart,&ONE,psi.c,&wf.npw,hvec.c,&n_band,&ZERO,evctmp.c,&wf.npw);
+			for(int ib=0; ib<n_band; ib++)
+			{
+				for(int ig=0; ig<wf.npw; ig++)
+				{
+					evc(ib,ig) = evctmp(ib,ig);
+				}
+			}
+		}
+		else if(NPOL == 2)
+		{
+			int npw2 = wf.npw*2;
+			ComplexMatrix evctmp(n_band, npw2,false);
+			zgemm_(&transa,&transb,&npw2,&n_band,&nstart,&ONE,psi.c,&npw2,hvec.c,&n_band,&ZERO,evctmp.c,&npw2);
+			for(int ib=0; ib<n_band; ib++)
+			{
+				for(int ig=0; ig<wf.npw; ig++)
+				{
+					evc(ib,ig) = evctmp(ib,ig);
+				}
+				for(int ig=0; ig<wf.npw; ig++)
+				{
+					evc(ib,ig+wf.npwx) = evctmp(ib,ig+wf.npw);
+				}
+			}
+		}
+		
+		/*qianrui replace this part 
 		ComplexMatrix evctmp(n_band, dmax);
 		for(int ib=0; ib<n_band; ib++)
 		{
@@ -353,7 +387,7 @@ void Hamilt_PW::cinitcgg(
 				evc(ib,ig) = evctmp(ib,ig);
 				if(NPOL==2) evc(ib, ig + wf.npwx) = evctmp(ib, ig+wf.npwx);
 			}
-		}
+		}*/
 
 		/*
 		for(int ib=0; ib<n_band; ib++)
