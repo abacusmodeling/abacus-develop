@@ -161,7 +161,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0);//atomic_rho, v_of_rho, set_vrs
+    pot.init_pot(0, pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
     if(BASIS_TYPE=="pw") pot.newd();//once
     DONE(ofs_running,"INIT POTENTIAL");

@@ -50,7 +50,10 @@ void potential::allocate(const int nrxx)
 //----------------------------------------------------------
 //  Initializes the self consistent potential 
 //----------------------------------------------------------
-void potential::init_pot(const int &istep)
+void potential::init_pot(
+	const int &istep, // number of ionic steps
+	ComplexMatrix &sf // structure factors
+)
 {
     TITLE("potential","init_pot");
     timer::tick("potential","init_pot");
@@ -66,7 +69,14 @@ void potential::init_pot(const int &istep)
 	//-------------------------------------------------------------------
 	// (1) local pseudopotential + electric field (if any) in vltot
 	//-------------------------------------------------------------------
-	this->set_local(this->vltot);
+	this->set_local(
+		this->vltot, // 3D local pseudopotentials 
+		ucell.ntype,
+		pw.ngmc,
+		ppcell.vloc,
+		pw.ig2ngg,
+		sf // structure factors		
+	);
 
 	// zhengdy-soc, pauli matrix, just index 0 has vlocal term
 	int nspin0=NSPIN;
@@ -211,20 +221,27 @@ void potential::init_pot(const int &istep)
 //==========================================================
 // This routine computes the local potential in real space
 //==========================================================
-void potential::set_local(double* vl_pseudo)const
+void potential::set_local(
+	double* vl_pseudo, // store the local pseudopotential
+	const int &ntype, // number of atom types
+	const int &ngmc, // number of |g|, g is plane wave
+	matrix &vloc, // local pseduopotentials
+	int* ig2ngg, // ig2ngg
+	ComplexMatrix &sf // structure factors	
+)const
 {
     TITLE("potential","set_local");
     timer::tick("potential","set_local");
 
-    complex<double> *vg = new complex<double>[pw.ngmc];
+    complex<double> *vg = new complex<double>[ngmc];
 
-    ZEROS( vg, pw.ngmc );
+    ZEROS( vg, ngmc );
 
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<ntype; it++)
     {
-        for (int ig=0; ig<pw.ngmc; ig++)
+        for (int ig=0; ig<ngmc; ig++)
         {
-            vg[ig] += ppcell.vloc(it, pw.ig2ngg[ig]) * pw.strucFac(it,ig);
+            vg[ig] += vloc(it, ig2ngg[ig]) * sf(it,ig);
         }
     }
 

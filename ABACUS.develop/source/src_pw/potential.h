@@ -36,7 +36,10 @@ class potential
 
     void allocate(const int nrxx);
 
-	void init_pot(const int &istep);
+	void init_pot(
+		const int &istep, // ionic steps
+		ComplexMatrix &sf // structure factors
+	);
 
     void v_of_rho(double** rho_in, matrix &v);
 
@@ -55,7 +58,15 @@ class potential
 	
 	private:
 
-    void set_local(double *vl_pseudo)const;
+
+	void set_local(
+		double* vl_pseudo, // store the local pseudopotential
+		const int &ntype, // number of atom types
+		const int &ngmc, // number of |g|, g is plane wave
+		matrix &vloc, // local pseduopotentials
+		int* ig2ngg, // ig2ngg
+		ComplexMatrix &sf // structure factors	
+	)const;
 
 	// TDDFT related, fuxiang add
     double *vext;
