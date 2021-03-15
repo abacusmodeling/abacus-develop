@@ -102,9 +102,15 @@ void energy::calculate_etot(void)
 	return;	
 }
 
-void energy::print_etot(const bool converged, const int &istep, const int &iter_in, 
-const double &dr2, const double &duration, const double &ethr, const double &avg_iter,
-bool print)
+void energy::print_etot(
+	const bool converged, 
+	const int &istep, 
+	const int &iter_in, 
+	const double &dr2, 
+	const double &duration, 
+	const double &ethr, 
+	const double &avg_iter,
+	bool print)
 {
 	TITLE("energy","print_etot");
 	this->iter = iter_in;
@@ -116,7 +122,6 @@ bool print)
 
 	if(OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
 	{
-		//if(!LOCAL_BASIS)OUT(ofs_running,"Error Threshold",ethr); xiaohui modify 2013-09-02
 		if(BASIS_TYPE=="pw")OUT(ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
 
 		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == NITER) )	
@@ -171,19 +176,33 @@ bool print)
 	//xiaohui add 2013-09-02, Peize Lin update 2020.11.14
     string label;
 	if(KS_SOLVER=="cg")
+	{
 		label = "CG";
+	}
 	else if (KS_SOLVER=="lapack")
+	{
 		label = "LA";
+	}
     else if(KS_SOLVER=="hpseps")
+	{
 		label = "HP";
+	}
     else if(KS_SOLVER=="genelpa")
+	{
         label = "GE";
+	}
 	else if(KS_SOLVER=="dav")
+	{
 		label = "DA";
+	}
     else if(KS_SOLVER=="scalapack_gvx")
+	{
         label = "GV";
+	}
 	else
+	{
 		WARNING_QUIT("Energy","print_etot");
+	}
     ss << label << iter;
 	//xiaohui add 2013-09-02
 
