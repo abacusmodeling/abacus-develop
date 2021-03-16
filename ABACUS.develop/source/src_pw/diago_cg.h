@@ -51,6 +51,7 @@ class Diago_CG
         ComplexMatrix &phi,
         double *e,
         const int &dim,
+        const int &dmx,
         const int &n_band,
         const double *precondition,
         const double &eps,
@@ -61,6 +62,7 @@ class Diago_CG
 
     static void schmit_orth(
         const int &dim,
+        const int &dmx,
         const int &end,
         const ComplexMatrix &psi,
         complex<double> *spsi,
