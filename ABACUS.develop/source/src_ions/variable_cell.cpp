@@ -46,7 +46,7 @@ void Variable_Cell::init_after_vc(void)
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(pw.nggm);
+    ppcell.init_vloc(pw.nggm, ppcell.vloc);
     DONE(ofs_running,"LOCAL POTENTIAL");
 
     //======================================
@@ -148,7 +148,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(pw.nggm);
+    ppcell.init_vloc(pw.nggm, ppcell.vloc);
     DONE(ofs_running,"LOCAL POTENTIAL");
     //======================================
     // Initalize non local pseudopotential

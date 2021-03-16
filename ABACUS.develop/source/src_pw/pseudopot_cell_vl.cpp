@@ -16,7 +16,7 @@ pseudopot_cell_vl::~pseudopot_cell_vl()
 }
 
 
-void pseudopot_cell_vl::init_vloc(const int &nggm)
+void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 {
 	TITLE("pseudopot_cell_vl","init_vloc");
 
@@ -53,7 +53,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm)
 			WARNING_QUIT("init_vloc","not available now.");
 		}
 
-		dcopy(vloc1d, this->vloc,it);
+		dcopy(vloc1d, vloc_in, it);
 	} 
 
 
