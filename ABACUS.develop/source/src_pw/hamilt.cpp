@@ -88,15 +88,12 @@ void Hamilt::diago(
                 Diago_CG cg;
     	
 				bool reorder = true;
-				if(NPOL==1) 
-				{
-					cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
+
+				if(NPOL==1) cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik], wf.npwx,
 						NBANDS, precondition, ETHR,
 						DIAGO_CG_MAXITER, reorder, notconv, avg);
-				}
-				else
-				{
-					cg.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL,
+				else{
+					cg.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL, wf.npwx*NPOL,
 						NBANDS, precondition, ETHR,
 						DIAGO_CG_MAXITER, reorder, notconv, avg);
 				}
