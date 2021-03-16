@@ -83,6 +83,7 @@ class Diago_CG
 
     void orthogonal_gradient(
         const int &dim,
+        const int &dmx,
         complex<double> *g,
         complex<double> *scg,
         complex<double> *lagrange,

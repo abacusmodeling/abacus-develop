@@ -85,7 +85,7 @@ void Diago_CG::diag
         for (iter = 0;iter < maxter;iter++)
         {
             this->calculate_gradient( precondition, dim, hphi, sphi, g, pphi );
-            this->orthogonal_gradient( dim, g, scg, lagrange, phi, m);
+            this->orthogonal_gradient( dim,dmx, g, scg, lagrange, phi, m);
             this->calculate_gamma_cg( iter, dim, precondition, g, scg, 
 			g0, cg, gg_last, cg_norm, theta, phi_m);// scg used as sg
             converged = this->update_psi( dim, cg_norm, theta, pphi, cg, scg, phi_m , 
@@ -211,7 +211,7 @@ void Diago_CG::calculate_gradient(
 }
 
 
-void Diago_CG::orthogonal_gradient( const int &dim,
+void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
                                     complex<double> *g, complex<double> *sg, complex<double> *lagrange,
                                     const ComplexMatrix &eigenfunction, const int m)
 {
@@ -219,12 +219,11 @@ void Diago_CG::orthogonal_gradient( const int &dim,
     //timer::tick("Diago_CG","orth_grad");
 
     hm.hpw.s_1psi(dim , g, sg);
-
+    int inc=1;
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
-    int inc=1;
     char trans='C';
-    zgemv_(&trans,&dim,&m,&ONE,eigenfunction.c,&dim,sg,&inc,&ZERO,lagrange,&inc);
+    zgemv_(&trans,&dim,&m,&ONE,eigenfunction.c,&dmx,sg,&inc,&ZERO,lagrange,&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
@@ -242,8 +241,8 @@ void Diago_CG::orthogonal_gradient( const int &dim,
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
     char trans2='N';
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dim,lagrange,&inc,&ONE,g,&inc);
-    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dim,lagrange,&inc,&ONE,sg,&inc);
+    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,g,&inc);
+    zgemv_(&trans2,&dim,&m,&NEG_ONE,eigenfunction.c,&dmx,lagrange,&inc,&ONE,sg,&inc);
     //======================================================================
     /*for (int i=0; i<m; i++)
     {
