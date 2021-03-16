@@ -23,10 +23,11 @@ Run_MD::~Run_MD()
 
 void Run_MD::opt_cell(void)
 {
+	TITLE("Run_MD","opt_cell");
 
 	
 	opt_ions();
-
+	return;
 }
 
 

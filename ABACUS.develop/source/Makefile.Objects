@@ -238,6 +238,7 @@ write_pot.o\
 write_rho.o\
 write_rho_dipole.o\
 write_dm.o\
+write_HS_R.o\
 potential_libxc.o \
 efield.o \
 magnetism.o\
