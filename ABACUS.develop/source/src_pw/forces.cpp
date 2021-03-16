@@ -167,6 +167,7 @@ void Forces::init(matrix& force)
 		if(EFIELD) Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
 	}
 	
+/*
 	Forces::print("   TOTAL-FORCE (Ry/Bohr)", force);
 	
 	if(INPUT.force_set)                                                   // pengfei 2016-12-20
@@ -184,6 +185,7 @@ void Forces::init(matrix& force)
 		}
 		ofs.close();
 	}
+*/
 		
 	// output force in unit eV/Angstrom
 	ofs_running << endl;

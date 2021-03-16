@@ -67,15 +67,9 @@ void Diago_CG::diag
         hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
-//		cout<<"\n before h_1psi sphi";
-//		for(int i=0; i<dim; i++) cout<<"\n"<<setw(15)<<sphi[i].real()<<setw(15)<<sphi[i].imag();
-
         hm.hpw.h_1psi(dim , phi_m, hphi, sphi);
 
         e[m] = this->ddot_real(dim, phi_m, hphi );
-//		cout<<"\n\n m="<<m<<" e="<<e[m];
-//		double overlap = this->ddot_real(dim, phi_m, sphi);
-//		if(test_cg>2) OUT("overlap",overlap);
 
         int iter = 0;
         double gg_last = 0.0;
@@ -92,8 +86,6 @@ void Diago_CG::diag
 			e[m], eps, hphi, sphi); // pphi is used as hcg
             if ( converged ) break;
         }//end iter
-//   	hm.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
-//		if(test_cg>2) cout<<"\n\n m="<<m<<" e="<<e[m];
 
         for (int i = 0;i < dim;i++)
         {
@@ -154,7 +146,6 @@ void Diago_CG::diag
 
     }//end m
 
-    //cout << "\n #8 of ccgdiagg() " <<endl;
     avg_iter /= n_band;
 
     delete [] lagrange;
@@ -170,6 +161,7 @@ void Diago_CG::diag
     timer::tick("Diago_CG","diag",'G');
     return;
 } // end subroutine ccgdiagg
+
 
 void Diago_CG::calculate_gradient(
     const double* precondition, const int dim,
@@ -193,8 +185,6 @@ void Diago_CG::calculate_gradient(
     // (5) <psi|SPS|psi >
     const double es = this->ddot_real( dim, spsi, ppsi);
     const double lambda = eh / es;
-
-//	OUT("lambda",lambda);
 
     // Update g!
     for (int i=0; i<dim; i++)
@@ -333,6 +323,7 @@ void Diago_CG::calculate_gamma_cg(
     return;
 }
 
+
 bool Diago_CG::update_psi(
     const int dim,
     double &cg_norm,
@@ -350,6 +341,7 @@ bool Diago_CG::update_psi(
     //timer::tick("Diago_CG","update");
     hm.hpw.h_1psi(dim, cg, hcg, scg);
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
+
     if (cg_norm < 1.0e-10 ) return 1;
 
     const double a0 = this->ddot_real(dim, psi_m, hcg) * 2.0 / cg_norm;
@@ -447,7 +439,6 @@ void Diago_CG::schmit_orth
     Parallel_Reduce::reduce_complex_double_pool( lagrange, m+1 );
 
     double psi_norm = lagrange[m].real();
-//	cout << "\n psi norm1 = " << psi_norm;
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
@@ -461,7 +452,6 @@ void Diago_CG::schmit_orth
         {
             psi_m[ig] -= lagrange[j] * psi(j, ig);
         }
-//		cout << "\n j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real();
         psi_norm -= ( conj(lagrange[j]) * lagrange[j] ).real();
     }*/
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -472,10 +462,6 @@ void Diago_CG::schmit_orth
 		for(int j=0; j<=m; ++j)
 		{
 			cout << "\n j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real();
-//			for(int ig=0; ig<dim; ++ig)
-//			{
-//				cout << psi(j,ig) << " ";
-//			}
 		}
         cout << " in diago_cg, psi norm = " << psi_norm << endl;
 		cout << " If you use GNU compiler, it may due to the zdotc is unavailable." << endl;
@@ -494,6 +480,7 @@ void Diago_CG::schmit_orth
     //timer::tick("Diago_CG","schmit_orth");
     return ;
 }
+
 
 double Diago_CG::ddot_real
 (
@@ -539,6 +526,7 @@ complex<double> Diago_CG::ddot
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 }  // end of ddot
 
+
 // this return <psi(m)|psik>
 complex<double> Diago_CG::ddot
 (
@@ -561,6 +549,7 @@ complex<double> Diago_CG::ddot
     return result;
 }  // end of ddot
 
+
 // this return <psi_L(m) | psi_R(n)>
 complex<double> Diago_CG::ddot
 (
@@ -579,5 +568,6 @@ complex<double> Diago_CG::ddot
         result += conj( psi_L(m,i) ) * psi_R(n,i) ;
     }
     Parallel_Reduce::reduce_complex_double_pool( result );
+
     return result;
 } // end of ddot

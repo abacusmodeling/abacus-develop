@@ -110,7 +110,7 @@ void Run_lcao::lcao_line(void)
 
 	// Initialize the local part of
 	// NC pseudopotentials
-	ppcell.init_vloc();
+	ppcell.init_vloc(pw.nggm);
 
 	// Initialize the sum of all local potentials.
 	// if ion_step==0, read in/initialize the potentials

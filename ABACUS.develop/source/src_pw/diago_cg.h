@@ -1,15 +1,3 @@
-//===============---------------===========================================
-// Author: Mohan Chen
-// UpDATE :
-// 09-03-13 mohan
-// Rewrite the cg code.
-//
-// 09-05-07 wangjp
-// (1) modify ddot(),ddot_real() as static member function
-// (2) overload member function ddot() to compute the product
-// of two rows of ComplexMatrixs
-//==========================================================================
-
 #ifndef DIAGO_CG_H
 #define DIAGO_CG_H
 
