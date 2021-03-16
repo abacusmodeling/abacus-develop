@@ -23,8 +23,8 @@ void Vdwd2::cal_energy()
 	{
 		for( int it2=0; it2!=ucell.ntype; ++it2 )
 		{
-			const double C6_product = sqrt( para.C6.at(ucell.atoms[it1].label) * para.C6.at(ucell.atoms[it2].label) )/pow(ucell.lat0,6) ;
-			const double R0_sum = ( para.R0.at(ucell.atoms[it1].label) + para.R0.at(ucell.atoms[it2].label) )/ucell.lat0;
+			const double C6_product = sqrt( para.C6.at(ucell.atoms[it1].psd) * para.C6.at(ucell.atoms[it2].psd) )/pow(ucell.lat0,6) ;
+			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 				WARNING_QUIT("Input", "R0_sum can not be 0");		
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
@@ -64,8 +64,8 @@ void Vdwd2::cal_force()
 	{
 		for( int it2=0; it2!=ucell.ntype; ++it2 )
 		{
-			const double C6_product = sqrt( para.C6.at(ucell.atoms[it1].label) * para.C6.at(ucell.atoms[it2].label) )/pow(ucell.lat0,6);
-			const double R0_sum = ( para.R0.at(ucell.atoms[it1].label) + para.R0.at(ucell.atoms[it2].label) )/ucell.lat0;
+			const double C6_product = sqrt( para.C6.at(ucell.atoms[it1].psd) * para.C6.at(ucell.atoms[it2].psd) )/pow(ucell.lat0,6);
+			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 				WARNING_QUIT("Input", "R0_sum can not be 0");
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
@@ -100,7 +100,7 @@ void Vdwd2::cal_force()
 
 void Vdwd2::cal_stress()
 {
-    TITLE("Vdwd2","force");
+    TITLE("Vdwd2","stress");
 	para.initset(ucell);
 
 	stress.Reset();
@@ -109,8 +109,8 @@ void Vdwd2::cal_stress()
 	{
 		for( int it2=0; it2!=ucell.ntype; ++it2 )
 		{
-			const double C6_product = sqrt( para.C6.at(ucell.atoms[it1].label) * para.C6.at(ucell.atoms[it2].label) )/pow(ucell.lat0,6);
-			const double R0_sum = ( para.R0.at(ucell.atoms[it1].label) + para.R0.at(ucell.atoms[it2].label) )/ucell.lat0;
+			const double C6_product = sqrt( para.C6.at(ucell.atoms[it1].psd) * para.C6.at(ucell.atoms[it2].psd) )/pow(ucell.lat0,6);
+			const double R0_sum = ( para.R0.at(ucell.atoms[it1].psd) + para.R0.at(ucell.atoms[it2].psd) )/ucell.lat0;
 			if(!R0_sum)
 				WARNING_QUIT("Input", "R0_sum can not be 0");
 			for( int ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
