@@ -351,33 +351,13 @@ void Hamilt_PW::cinitcgg(
 		//qianrui improve this part 2021-3-13
 		char transa = 'N';
 		char transb = 'T';
-		if(NPOL == 1)
+		ComplexMatrix evctmp(n_band, dmin,false);
+		zgemm_(&transa,&transb,&dmin,&n_band,&nstart,&ONE,psi.c,&dmax,hvec.c,&n_band,&ZERO,evctmp.c,&dmin);
+		for(int ib=0; ib<n_band; ib++)
 		{
-			ComplexMatrix evctmp(n_band, wf.npw,false);
-			zgemm_(&transa,&transb,&wf.npw,&n_band,&nstart,&ONE,psi.c,&wf.npw,hvec.c,&n_band,&ZERO,evctmp.c,&wf.npw);
-			for(int ib=0; ib<n_band; ib++)
+			for(int ig=0; ig<dmin; ig++)
 			{
-				for(int ig=0; ig<wf.npw; ig++)
-				{
-					evc(ib,ig) = evctmp(ib,ig);
-				}
-			}
-		}
-		else if(NPOL == 2)
-		{
-			int npw2 = wf.npw*2;
-			ComplexMatrix evctmp(n_band, npw2,false);
-			zgemm_(&transa,&transb,&npw2,&n_band,&nstart,&ONE,psi.c,&npw2,hvec.c,&n_band,&ZERO,evctmp.c,&npw2);
-			for(int ib=0; ib<n_band; ib++)
-			{
-				for(int ig=0; ig<wf.npw; ig++)
-				{
-					evc(ib,ig) = evctmp(ib,ig);
-				}
-				for(int ig=0; ig<wf.npw; ig++)
-				{
-					evc(ib,ig+wf.npwx) = evctmp(ib,ig+wf.npw);
-				}
+				evc(ib,ig) = evctmp(ib,ig);
 			}
 		}
 		
