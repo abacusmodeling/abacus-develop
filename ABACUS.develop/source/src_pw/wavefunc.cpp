@@ -231,7 +231,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	//-------------------------------------------------------------
 	// (2) diago to get wf.ekb, then the weights can be calculated.
 	//-------------------------------------------------------------
-    hm.hpw.init(this->npwx, NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(this->npwx, NPOL, ppcell.nkb, pw.nrxx);
 	hm.hpw.init_k(ik);
 	
 	//hm.cinitcgg(ik ,NLOCAL, NBANDS, wvf, wvf, ekb[ik]);

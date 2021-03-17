@@ -143,7 +143,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=====================
     // init hamiltonian
     //=====================
-    hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential

@@ -18,10 +18,6 @@ Hamilt_PW::Hamilt_PW()
 
 Hamilt_PW::~Hamilt_PW()
 {
-	if(test_deconstructor)
-	{
-		cout << " ~Hamilt_PW()" << endl;
-	}
     delete[] hpsi;
     delete[] spsi;
     delete[] GR_index;
@@ -30,9 +26,18 @@ Hamilt_PW::~Hamilt_PW()
 }
 
 
-void Hamilt_PW::init(const int &npwx, const int &npol, const int &nkb, const int &nrxx)
+void Hamilt_PW::allocate(
+	const int &npwx, 
+	const int &npol, 
+	const int &nkb, 
+	const int &nrxx)
 {
-    TITLE("Hamilt_PW","init");
+    TITLE("Hamilt_PW","allocate");
+
+	assert(npwx > 0);
+	assert(npol > 0);
+	assert(nkb >=0);
+	assert(nrxx > 0);
 
     delete[] hpsi;
     delete[] spsi;
@@ -49,7 +54,6 @@ void Hamilt_PW::init(const int &npwx, const int &npol, const int &nkb, const int
     ZEROS(this->hpsi, npwx * npol);
     ZEROS(this->spsi, npwx * npol);
     ZEROS(this->GR_index, nrxx);
-//  ofs_running << "\n Hamiltonian allocate done."<<endl;
 
     return;
 }
@@ -61,7 +65,10 @@ void Hamilt_PW::init_k(const int ik)
 	
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
-	if(NSPIN==2)CURRENT_SPIN = kv.isk[ik];
+	if(NSPIN==2)
+	{
+		CURRENT_SPIN = kv.isk[ik];
+	}
 
 	// (2) Kinetic energy.
 	wf.ekin(ik);

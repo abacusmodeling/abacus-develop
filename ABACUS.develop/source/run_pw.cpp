@@ -92,8 +92,9 @@ void Run_pw::plane_wave_line(void)
 
     //=====================
     // init hamiltonian
+	// only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential

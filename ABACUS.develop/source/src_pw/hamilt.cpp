@@ -4,13 +4,7 @@
 #include "diago_david.h"
 
 Hamilt::Hamilt() {}
-Hamilt::~Hamilt() 
-{
-	if(test_deconstructor)
-	{
-		cout << " ~Hamilt()" << endl;	
-	}
-}
+Hamilt::~Hamilt() {}
 
 
 void Hamilt::diago(
@@ -50,21 +44,6 @@ void Hamilt::diago(
 		{
 			assert(NLOCAL >= NBANDS);
         	this->cinitcgg(ik, NLOCAL, NBANDS, wf.wanf2[ik0], wf.evc[ik0], wf.ekb[ik]);
-			
-			// for tests
-			/*
-			cout << " Check evc unit of ik = " << ik0 << endl;
-			for(int ib=0; ib<NBANDS; ib++)
-			{
-				complex<double> tmpn = ZERO;
-				for(int ig=0; ig<kv.ngk[ik0]; ig++)
-				{
-					tmpn += conj( wf.evc[ik0](ib,ig) ) * wf.evc[ik0](ib,ig);
-				}
-				cout << " tmpn = " << tmpn << endl;
-			}
-			*/
-
 		}
 		else
 		{
