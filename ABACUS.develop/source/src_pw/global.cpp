@@ -38,5 +38,4 @@ Vdwd3 vdwd3(ucell);	// jiyy add 2019-05-18
 
 Soc soc; //added by zhengdy-soc														
 
-Restart restart;		// Peize Lin add 2020.04.04
-
+Restart restart; // Peize Lin add 2020.04.04

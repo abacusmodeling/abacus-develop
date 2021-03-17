@@ -54,7 +54,7 @@ void Variable_Cell::init_after_vc(void)
     //======================================
     if(BASIS_TYPE=="pw")
     {
-        ppcell.init_vnl();
+        ppcell.init_vnl(ucell);
         DONE(ofs_running,"NON-LOCAL POTENTIAL");
     }
 
@@ -155,7 +155,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //======================================
     if(BASIS_TYPE=="pw")
     {
-        ppcell.init_vnl();
+        ppcell.init_vnl(ucell);
         DONE(ofs_running,"NON-LOCAL POTENTIAL");
     }
     //=========================================================

@@ -105,7 +105,7 @@ void Run_pw::plane_wave_line(void)
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    ppcell.init_vnl();
+    ppcell.init_vnl(ucell);
     DONE(ofs_running,"NON-LOCAL POTENTIAL");
 
     //=========================================================

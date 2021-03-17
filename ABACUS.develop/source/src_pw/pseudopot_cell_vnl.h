@@ -9,6 +9,7 @@
 #include "pseudopot_cell_vl.h"
 #include "../src_lcao/ORB_gen_tables.h"
 #include "wavefunc_in_pw.h"
+#include "unitcell_pseudo.h"
 
 //==========================================================
 // Calculate the non-local pseudopotential in reciprocal
@@ -41,7 +42,7 @@ public:
 // NAME : lmaxkb(max angular momentum,(see pseudo_h))
 	int lmaxkb;
 
-	void init_vnl(void);
+	void init_vnl(UnitCell_pseudo &cell);
 
 private:
 
