@@ -25,7 +25,7 @@ public:
 	friend class Stress_Func;
 	friend class Forces;
 	friend class Epsilon0_vasp;
-	friend class potential;
+	friend class Potential;
 	friend class Hamilt_PW;
 	friend class WF_atomic;
 	friend class wavefunc;

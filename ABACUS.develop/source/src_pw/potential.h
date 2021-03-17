@@ -3,7 +3,7 @@
 
 #include "tools.h"
 
-class potential
+class Potential
 {
 	public:
 
@@ -12,8 +12,8 @@ class potential
 	friend class ELEC_scf;
 
     // constructor and deconstructor
-    potential();
-    ~potential();
+    Potential();
+    ~Potential();
 
     //==========================================================
     // start_pot : "atomic" or "file"

@@ -54,7 +54,7 @@ extern Exx_Lip exx_lip;
 extern pseudopot_cell_vnl ppcell;
 extern xcfunc xcf;
 extern Charge_Broyden CHR;
-extern potential pot;
+extern Potential pot;
 extern Symmetry symm;
 extern Magnetism mag;
 extern UnitCell_pseudo ucell;

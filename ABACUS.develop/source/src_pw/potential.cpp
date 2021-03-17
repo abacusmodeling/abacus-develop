@@ -10,39 +10,39 @@
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
 
-potential::potential()
+Potential::Potential()
 {
     vltot = new double[1];
     vr_eff1 = new double[1];
     this->out_potential = 0;
 }
 
-potential::~potential()
+Potential::~Potential()
 {
     delete[] vltot;
     delete[] vr_eff1;
 }
 
-void potential::allocate(const int nrxx)
+void Potential::allocate(const int nrxx)
 {
-    TITLE("potential","allocate");
+    TITLE("Potential","allocate");
     assert(nrxx>0);
 
     delete[] this->vltot;
     this->vltot = new double[nrxx];
-    Memory::record("potential","vltot",nrxx,"double");
+    Memory::record("Potential","vltot",nrxx,"double");
 
     this->vr.create(NSPIN,nrxx);
     this->vr_eff.create(NSPIN,nrxx);
-    Memory::record("potential","vr",NSPIN*nrxx,"double");
-    Memory::record("potential","vr_eff",NSPIN*nrxx,"double");
+    Memory::record("Potential","vr",NSPIN*nrxx,"double");
+    Memory::record("Potential","vr_eff",NSPIN*nrxx,"double");
 
     delete[] this->vr_eff1;
     this->vr_eff1 = new double[nrxx];
-    Memory::record("potential","vr_eff1",nrxx,"double");
+    Memory::record("Potential","vr_eff1",nrxx,"double");
 
     this->vnew.create(NSPIN,nrxx);
-    Memory::record("potential","vnew",NSPIN*nrxx,"double");
+    Memory::record("Potential","vnew",NSPIN*nrxx,"double");
 
     return;
 }
@@ -50,13 +50,13 @@ void potential::allocate(const int nrxx)
 //----------------------------------------------------------
 //  Initializes the self consistent potential 
 //----------------------------------------------------------
-void potential::init_pot(
+void Potential::init_pot(
 	const int &istep, // number of ionic steps
 	ComplexMatrix &sf // structure factors
 )
 {
-    TITLE("potential","init_pot");
-    timer::tick("potential","init_pot");
+    TITLE("Potential","init_pot");
+    timer::tick("Potential","init_pot");
 
     assert(istep>=0);
 
@@ -213,7 +213,7 @@ void potential::init_pot(
 
 	// plots
     //figure::picture(this->vr_eff1,pw.ncx,pw.ncy,pw.ncz);
-    timer::tick("potential","init_pot");
+    timer::tick("Potential","init_pot");
     return;
 }
 
@@ -221,7 +221,7 @@ void potential::init_pot(
 //==========================================================
 // This routine computes the local potential in real space
 //==========================================================
-void potential::set_local_pot(
+void Potential::set_local_pot(
 	double* vl_pseudo, // store the local pseudopotential
 	const int &ntype, // number of atom types
 	const int &ngmc, // number of |g|, g is plane wave
@@ -230,8 +230,8 @@ void potential::set_local_pot(
 	ComplexMatrix &sf // structure factors	
 )const
 {
-    TITLE("potential","set_local_pot");
-    timer::tick("potential","set_local_pot");
+    TITLE("Potential","set_local_pot");
+    timer::tick("Potential","set_local_pot");
 
     complex<double> *vg = new complex<double>[ngmc];
 
@@ -266,7 +266,7 @@ void potential::set_local_pot(
     }
 
     //ofs_running <<" set local pseudopotential done." << endl;
-    timer::tick("potential","set_local_pot");
+    timer::tick("Potential","set_local_pot");
     return;
 }
 
@@ -276,16 +276,16 @@ void potential::set_local_pot(
 // The XC potential is computed in real space, while the
 // Hartree potential is computed in reciprocal space.
 //==========================================================
-void potential::v_of_rho
+void Potential::v_of_rho
 (
     double **rho_in,
     matrix &v_in
 )
 {
-    TITLE("potential","v_of_rho");
+    TITLE("Potential","v_of_rho");
     v_in.zero_out();
 
-    timer::tick("potential","v_of_rho",'E');
+    timer::tick("Potential","v_of_rho",'E');
 
 //----------------------------------------------------------
 //  calculate the exchange-correlation potential
@@ -311,7 +311,7 @@ void potential::v_of_rho
             EFID.add_efield(rho_in[is], &v_in.c[is*pw.nrxx]);
         }
     }
-    timer::tick("potential","v_of_rho",'E');
+    timer::tick("Potential","v_of_rho",'E');
     return;
 } //end subroutine v_of_rho
 
@@ -323,10 +323,10 @@ void potential::v_of_rho
 // part and the sum of all the local pseudopotential
 // contributions.
 //==========================================================
-void potential::set_vr_eff(void)
+void Potential::set_vr_eff(void)
 {
-    TITLE("potential","set_vr_eff");
-    timer::tick("potential","set_vr_eff");
+    TITLE("Potential","set_vr_eff");
+    timer::tick("Potential","set_vr_eff");
 
     for (int is = 0;is < NSPIN;is++)
     {
@@ -349,15 +349,15 @@ void potential::set_vr_eff(void)
 		}
     }
 
-    timer::tick("potential","set_vr_eff");
+    timer::tick("Potential","set_vr_eff");
     return;
 }
 
 
 // ----------------------------------------------------------------------
-void potential::newd(void)
+void Potential::newd(void)
 {
-    if (test_potential) TITLE("potential","newd");
+    TITLE("Potential","newd");
 
     // distringuish non-local pseudopotential in REAL or RECIPROCAL space.
     // if in real space, call new_r
@@ -411,7 +411,8 @@ void potential::newd(void)
 							ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
 						}
 					}
-					else{
+					else
+					{
 						ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
 						ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
 					}

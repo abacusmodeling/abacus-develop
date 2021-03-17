@@ -112,7 +112,8 @@ void Run_pw::plane_wave_line(void)
     //=========================================================
     pot.init_pot(0, pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
-    pot.newd();//once
+    pot.newd();
+
     DONE(ofs_running,"INIT POTENTIAL");
 
     //==================================================

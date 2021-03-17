@@ -16,7 +16,7 @@ class energy
 	friend class Threshold_Elec;
 	friend class Forces; 
 	friend class Charge;
-	friend class potential;
+	friend class Potential;
 	friend class Occupy;
 	friend class wavefunc;
 	friend class eximport;

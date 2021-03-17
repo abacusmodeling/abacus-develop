@@ -6,10 +6,10 @@
 // (eg: linear potential) used in tddft
 // fuxiang add in 2017-05
 //==========================================================
-void potential::set_vrs_tddft(const int istep)
+void Potential::set_vrs_tddft(const int istep)
 {
-    TITLE("potential","set_vrs_tddft");
-    timer::tick("potential","set_vrs_tddft");
+    TITLE("Potential","set_vrs_tddft");
+    timer::tick("Potential","set_vrs_tddft");
 
     for (int is = 0;is < NSPIN;is++)
     {
