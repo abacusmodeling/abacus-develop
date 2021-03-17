@@ -341,7 +341,7 @@ void Electrons::self_consistent(const int &istep)
 
         if(vext == 0) 
 		{
-			pot.set_vrs();
+			pot.set_vr_eff();
 		}
         else 
 		{

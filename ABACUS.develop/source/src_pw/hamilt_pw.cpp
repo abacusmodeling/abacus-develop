@@ -69,7 +69,7 @@ void Hamilt_PW::init_k(const int ik)
 	// (3) Take the local potential.
 	for (int ir=0; ir<pw.nrxx; ir++)
 	{
-		pot.vrs1[ir] = pot.vrs(CURRENT_SPIN, ir);//mohan add 2007-11-12
+		pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
 
 	// (4) Calculate nonlocal pseudopotential vkb
@@ -492,7 +492,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 		if(NSPIN!=4)
 		{
 			ZEROS( UFFT.porter, pw.nrxx);
-			UFFT.RoundTrip( psi_in, pot.vrs1, GR_index, UFFT.porter );
+			UFFT.RoundTrip( psi_in, pot.vr_eff1, GR_index, UFFT.porter );
 
 			for (j = 0;j < wf.npw;j++)
 			{
@@ -515,10 +515,10 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi)
 			complex<double> sup,sdown;
 			for (int ir=0; ir< pw.nrxx; ir++)
 			{
-				sup = UFFT.porter[ir] * (pot.vrs(0,ir) + pot.vrs(3,ir)) +
-					porter1[ir] * (pot.vrs(1,ir) - complex<double>(0.0,1.0) * pot.vrs(2,ir));
-				sdown = porter1[ir] * (pot.vrs(0,ir) - pot.vrs(3,ir)) +
-				UFFT.porter[ir] * (pot.vrs(1,ir) + complex<double>(0.0,1.0) * pot.vrs(2,ir));
+				sup = UFFT.porter[ir] * (pot.vr_eff(0,ir) + pot.vr_eff(3,ir)) +
+					porter1[ir] * (pot.vr_eff(1,ir) - complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
+				sdown = porter1[ir] * (pot.vr_eff(0,ir) - pot.vr_eff(3,ir)) +
+				UFFT.porter[ir] * (pot.vr_eff(1,ir) + complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
 				UFFT.porter[ir] = sup;
 				porter1[ir] = sdown;
 			}

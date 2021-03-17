@@ -40,7 +40,7 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	
 	// (1) calculate nrow, ncol, nloc.
 	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" 
-		|| KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx") //xiaohui add 2013-09-02
+		|| KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx")
 	{
 		ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
 #ifdef __MPI

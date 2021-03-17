@@ -13,14 +13,14 @@
 potential::potential()
 {
     vltot = new double[1];
-    vrs1 = new double[1];
+    vr_eff1 = new double[1];
     this->out_potential = 0;
 }
 
 potential::~potential()
 {
     delete[] vltot;
-    delete[] vrs1;
+    delete[] vr_eff1;
 }
 
 void potential::allocate(const int nrxx)
@@ -33,13 +33,13 @@ void potential::allocate(const int nrxx)
     Memory::record("potential","vltot",nrxx,"double");
 
     this->vr.create(NSPIN,nrxx);
-    this->vrs.create(NSPIN,nrxx);
+    this->vr_eff.create(NSPIN,nrxx);
     Memory::record("potential","vr",NSPIN*nrxx,"double");
-    Memory::record("potential","vrs",NSPIN*nrxx,"double");
+    Memory::record("potential","vr_eff",NSPIN*nrxx,"double");
 
-    delete[] this->vrs1;
-    this->vrs1 = new double[nrxx];
-    Memory::record("potential","vrs1",nrxx,"double");
+    delete[] this->vr_eff1;
+    this->vr_eff1 = new double[nrxx];
+    Memory::record("potential","vr_eff1",nrxx,"double");
 
     this->vnew.create(NSPIN,nrxx);
     Memory::record("potential","vnew",NSPIN*nrxx,"double");
@@ -61,7 +61,7 @@ void potential::init_pot(
     assert(istep>=0);
 
 	// total potential in real space
-    this->vrs.zero_out();
+    this->vr_eff.zero_out();
 
     // the vltot should and must be zero here.
     ZEROS(this->vltot, pw.nrxx);
@@ -69,7 +69,7 @@ void potential::init_pot(
 	//-------------------------------------------------------------------
 	// (1) local pseudopotential + electric field (if any) in vltot
 	//-------------------------------------------------------------------
-	this->set_local(
+	this->set_local_pot(
 		this->vltot, // 3D local pseudopotentials 
 		ucell.ntype,
 		pw.ngmc,
@@ -90,7 +90,7 @@ void potential::init_pot(
 	{
 		for(int ir=0; ir<pw.nrxx; ++ir)
 		{
-			this->vrs(is,ir) = this->vltot[ir];	
+			this->vr_eff(is,ir) = this->vltot[ir];	
 		}
 	}
 
@@ -204,7 +204,7 @@ void potential::init_pot(
     //----------------------------------------------------------
     if(vext == 0) 
 	{
-		this->set_vrs();
+		this->set_vr_eff();
 	}
     else 
 	{
@@ -212,7 +212,7 @@ void potential::init_pot(
 	}
 
 	// plots
-    //figure::picture(this->vrs1,pw.ncx,pw.ncy,pw.ncz);
+    //figure::picture(this->vr_eff1,pw.ncx,pw.ncy,pw.ncz);
     timer::tick("potential","init_pot");
     return;
 }
@@ -221,7 +221,7 @@ void potential::init_pot(
 //==========================================================
 // This routine computes the local potential in real space
 //==========================================================
-void potential::set_local(
+void potential::set_local_pot(
 	double* vl_pseudo, // store the local pseudopotential
 	const int &ntype, // number of atom types
 	const int &ngmc, // number of |g|, g is plane wave
@@ -230,8 +230,8 @@ void potential::set_local(
 	ComplexMatrix &sf // structure factors	
 )const
 {
-    TITLE("potential","set_local");
-    timer::tick("potential","set_local");
+    TITLE("potential","set_local_pot");
+    timer::tick("potential","set_local_pot");
 
     complex<double> *vg = new complex<double>[ngmc];
 
@@ -266,7 +266,7 @@ void potential::set_local(
     }
 
     //ofs_running <<" set local pseudopotential done." << endl;
-    timer::tick("potential","set_local");
+    timer::tick("potential","set_local_pot");
     return;
 }
 
@@ -318,15 +318,15 @@ void potential::v_of_rho
 
 
 //==========================================================
-// set the total local potential vrs on the real space grid 
+// set the effective potential vr_eff on the real space grid 
 // used in h_psi, adding the (spin dependent) scf (H+xc)
 // part and the sum of all the local pseudopotential
 // contributions.
 //==========================================================
-void potential::set_vrs(void)
+void potential::set_vr_eff(void)
 {
-    TITLE("potential","set_vrs");
-    timer::tick("potential","set_vrs");
+    TITLE("potential","set_vr_eff");
+    timer::tick("potential","set_vr_eff");
 
     for (int is = 0;is < NSPIN;is++)
     {
@@ -337,19 +337,19 @@ void potential::set_vrs(void)
 		{
 			for (int i = 0;i < pw.nrxx; i++)
 			{
-				this->vrs(is, i) = this->vr(is, i);
+				this->vr_eff(is, i) = this->vr(is, i);
 			}
 		}
 		else        
 		{
 			for (int i = 0;i < pw.nrxx; i++)
 	        {
-	            this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+	            this->vr_eff(is, i) = this->vltot[i] + this->vr(is, i);
 			}
 		}
     }
 
-    timer::tick("potential","set_vrs");
+    timer::tick("potential","set_vr_eff");
     return;
 }
 

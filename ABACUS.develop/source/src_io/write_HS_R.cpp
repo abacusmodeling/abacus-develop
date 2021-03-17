@@ -45,7 +45,7 @@ void LOOP_ions::output_HS_R(void)
                 if(NSPIN==2)CURRENT_SPIN = kv.isk[ik];
                 for(int ir=0; ir<pw.nrxx; ir++)
                 {
-                    pot.vrs1[ir] = pot.vrs( CURRENT_SPIN, ir);
+                    pot.vr_eff1[ir] = pot.vr_eff( CURRENT_SPIN, ir);
                 }
         	    	
                 if(!GAMMA_ONLY_LOCAL)
@@ -53,7 +53,7 @@ void LOOP_ions::output_HS_R(void)
                     if(VL_IN_H)
                     {
 						//UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-						UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
+						UHM.GK.cal_vlocal_k(pot.vr_eff1, GridT, CURRENT_SPIN);
                     }
                 }
                 UHM.GK.cal_vlocal_R(CURRENT_SPIN);

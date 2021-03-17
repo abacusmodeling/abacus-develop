@@ -61,14 +61,14 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int ir=0; ir<pw.nrxx; ++ir)
         {
-            pot.vrs1[ir] = pot.vrs(CURRENT_SPIN, ir);
+            pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);
         }
 
         //  should not be set zero if VNA is used.
         //  ZEROS(LM.DHloc_fixed_x,ParaO.nloc);
         //  ZEROS(LM.DHloc_fixed_y,ParaO.nloc);
         //  ZEROS(LM.DHloc_fixed_z,ParaO.nloc);
-        UHM.GG.cal_force(pot.vrs1);
+        UHM.GG.cal_force(pot.vr_eff1);
 
 
         for(int i=0; i<NLOCAL; i++)
@@ -200,14 +200,14 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int ir=0; ir<pw.nrxx; ++ir)
         {
-            pot.vrs1[ir] = pot.vrs(CURRENT_SPIN, ir);
+            pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);
         }
 
         //should not be set zero if VNA is used.
         //ZEROS(LM.DHloc_fixed_x,ParaO.nloc);
         //ZEROS(LM.DHloc_fixed_y,ParaO.nloc);
         //ZEROS(LM.DHloc_fixed_z,ParaO.nloc);
-        UHM.GG.cal_force(pot.vrs1);
+        UHM.GG.cal_force(pot.vr_eff1);
 
         for(int i=0; i<NLOCAL; i++)
         {
