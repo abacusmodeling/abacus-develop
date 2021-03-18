@@ -197,12 +197,6 @@ void LOOP_ions::opt_ions(void)
             cout << endl;
         }
 
-//#ifdef __MPI //2015-09-06, xiaohui
-	//2015-05-07, 2015-10-01
-        //atom_arrange::delete_vector( SEARCH_RADIUS );
-//#endif //2015-09-06, xiaohui
-
-//2015-09-16
 //#ifdef __MPI
 //    MPI_Barrier(MPI_COMM_WORLD);
 //    for (int i=0;i<ucell.ntype;i++)
@@ -221,25 +215,6 @@ void LOOP_ions::opt_ions(void)
         ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
         ofs_running << " --------------------------------------------\n\n" << endl;
 
-/*
-        if(STRESS)
-        {
-            if(stress_step==1)
-            {
-        		Force_LCAO FL;
-                matrix stress_lcao;
-                stress_lcao.create(3,3);
-                FL.cal_stress(stress_lcao);
-            }
-            double pressure = PRESSURE;
-            en.etot = en.etot + ucell.omega * pressure;
-
-            ofs_running << "\n\n --------------------------------------------" << endl;
-            ofs_running << setprecision(16);
-            ofs_running << " !FINAL_ETOT_IS (+ P*V) " << en.etot * Ry_to_eV << " eV" << endl; 
-            ofs_running << " --------------------------------------------\n\n" << endl;
-        }
-*/
     }
 
 	// mohan update 2021-02-10
@@ -249,29 +224,34 @@ void LOOP_ions::opt_ions(void)
     return;
 }
 
-//bool LOOP_ions::force_stress(void)
+
 bool LOOP_ions::force_stress(const int &istep, int &force_step, int &stress_step)
 {
     TITLE("LOOP_ions","force_stress");
+
     if(!FORCE && !STRESS)
     {
         return 1;
     }
     timer::tick("LOOP_ions","force_stress",'D');
+
+	// set force matrix
 	matrix fcs;
+	// set stress matrix
 	matrix scs;
 	Force_Stress_LCAO FSL;
 	FSL.allocate (); 
 	FSL.getForceStress(FORCE, STRESS, TEST_FORCE, TEST_STRESS, fcs, scs);
+
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
 	//--------------------------------------------------
     if(FORCE && !STRESS)
     {
 
-#ifdef __MPI //2015-10-01, xiaohui
+#ifdef __MPI
         atom_arrange::delete_vector( SEARCH_RADIUS );
-#endif //2015-10-01, xiaohui
+#endif
 
         if(CALCULATION=="relax") 
         {
@@ -304,7 +284,7 @@ bool LOOP_ions::force_stress(const int &istep, int &force_step, int &stress_step
         // mohan update 2013-04-11
         // setup the structure factor
         // and do the density extraploation.
-        // for both ionic iteratoin and
+        // for both ionic iteration and
         // force calculations.
 
         //xiaohui modify 2014-08-09
@@ -361,11 +341,8 @@ xiaohui modify 2014-08-09*/
     if(FORCE&&STRESS)
     {
 
-//#ifdef __MPI
         atom_arrange::delete_vector( SEARCH_RADIUS );
-//#endif
         
-        //if(CALCULATION=="relax") IMM.cal_movement(istep, FL.fcs, en.etot);
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
             IMM.cal_movement(istep, force_step, fcs, en.etot);
@@ -397,22 +374,14 @@ xiaohui modify 2014-08-09*/
                     return 1;
                 }
 
-#ifdef __MPI
-            //atom_arrange::delete_vector( SEARCH_RADIUS );
-#endif
             }
             else
             {
-#ifdef __MPI
-            //atom_arrange::delete_vector( SEARCH_RADIUS );
-#endif
-                //CE.istep = istep;
                 CE.istep = force_step;
                 CE.extrapolate_charge();
 
-                if(pot.extra_pot=="dm")//xiaohui modify 2015-02-01
+                if(pot.extra_pot=="dm")
                 {
-                    // done after grid technique.
                 }
                 else
                 {
@@ -438,9 +407,16 @@ void LOOP_ions::final_scf(void)
     TITLE("LOOP_ions","final_scf"); 
 
     FINAL_SCF = true;
+
     Variable_Cell::final_calculation_after_vc();
+
+
+	//------------------------------------------------------------------
+	// THIS PART IS THE SAME AS LOOP_elec::set_matrix_grid
     atom_arrange::set_sr_NL();
+
     atom_arrange::search( SEARCH_RADIUS );
+
     GridT.set_pbc_grid(
         pw.ncx, pw.ncy, pw.ncz,
         pw.bx, pw.by, pw.bz,
@@ -459,27 +435,26 @@ void LOOP_ions::final_scf(void)
         // using GridT.init.
         LNNR.cal_nnrg(GridT);
     }
+	//------------------------------------------------------------------
 
+
+
+
+	//------------------------------------------------------------------
+	// THIS PART IS THE SAME AS LOOP_elec::before_solver 
     // (4) set the augmented orbitals index.
     // after ParaO and GridT, 
     // this information is used to calculate
     // the force.
     LOWF.set_trace_aug(GridT);
-		
-    // (5) init density kernel
-    // (6) init wave functions.
-    if(GAMMA_ONLY_LOCAL)
-    {
-        // here we reset the density matrix dimension.
-        LOC.allocate_gamma(GridT);
-    }
-    else
-    {
-        LOWF.allocate_k(GridT);
-        LOC.allocate_DM_k();
-    }
 
+	LOC.allocate_dm_wfc(GridT);
+		
     UHM.set_lcao_matrices();
+	//------------------------------------------------------------------
+	
+
+
 
     if(vdwd2_para.flag_vdwd2)							//Peize Lin add 2014-04-04, update 2021-03-09
     {
@@ -493,6 +468,8 @@ void LOOP_ions::final_scf(void)
         en.evdw = vdwd3.energy_result;
     }											  
     
+
+
 	ELEC_scf es;
 	es.scf(0);
 

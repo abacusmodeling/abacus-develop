@@ -1,21 +1,10 @@
 #include "variable_cell.h"
 #include "../src_pw/global.h"
 #include "../input.h"
-//#include "src_pw/algorithms.h"
-//#include "src_pw/pseudopot_cell_us.h"
-//#include "src_pw/optical.h"
-//#include "src_pw/cal_test.h"
-//#include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
-//#include "src_pw/winput.h"
-//#include "src_lcao/sltk_atom_arrange.h"
 
 Variable_Cell::Variable_Cell(){}
 Variable_Cell::~Variable_Cell(){}
 
-
-//LiuXh add a new function here,
-//which is used to do initialization after variable cell
-//20180515
 void Variable_Cell::init_after_vc(void)
 {
 	TITLE("Variable_Cell","init_after_vc");
@@ -58,20 +47,10 @@ void Variable_Cell::init_after_vc(void)
         DONE(ofs_running,"NON-LOCAL POTENTIAL");
     }
 
-/*
-    pot.init_pot(0);
-
-    ofs_running << " Setup the new wave functions?" << endl;
-    wf.wfcinit();
-*/
-
     return;
 }
     
 
-//LiuXh add a new function here,
-//which is used to do initialization after variable cell
-//20180619
 void Variable_Cell::final_calculation_after_vc(void)
 {
 	TITLE("Variable_Cell","final_after_vc");
@@ -116,13 +95,15 @@ void Variable_Cell::final_calculation_after_vc(void)
 
     // init the grid, then the charge
     // on grid can be distributed.
-    Pgrid.init_final_scf(pw.ncx, pw.ncy, pw.ncz, pw.nczp, pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    Pgrid.init_final_scf(pw.ncx, pw.ncy, pw.ncz, 
+		pw.nczp, pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
     //=====================
     // init potential
     //=====================
     CHR.init_final_scf();
     pot.allocate(pw.nrxx);
+
     //=====================
     // init wave functions
     //=====================
@@ -139,7 +120,11 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=======================
     // init pseudopotential
     //=======================
-    if(BASIS_TYPE=="pw") ppcell.init(ucell.ntype);
+    if(BASIS_TYPE=="pw")
+	{
+		ppcell.init(ucell.ntype);
+	}
+
     //=====================
     // init hamiltonian
     //=====================
@@ -163,18 +148,16 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=========================================================
     pot.init_pot(0, pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
-    if(BASIS_TYPE=="pw") pot.newd();//once
-    DONE(ofs_running,"INIT POTENTIAL");
-
     //==================================================
-    // create ppcell.tab_at , for trial wave functions.
-    //==================================================
-    if(BASIS_TYPE=="pw") wf.init_at_1();
-    //================================
+    // Create ppcell.tab_at , for trial wave functions.
     // Initial start wave functions
     //================================
     if(BASIS_TYPE=="pw")
     {
+		pot.newd();
+
+		wf.init_at_1();
+
         wf.wfcinit();
         DONE(ofs_running,"INIT BASIS");
     }
