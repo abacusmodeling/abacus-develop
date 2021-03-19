@@ -94,10 +94,15 @@ void ORB_gen_tables::snap_psibeta(
 	const int is) const
 {
 	//TITLE ("ORB_gen_tables","snap_psibeta");
-	//timer::tick ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
-	if(NSPIN==4 && ORB.Beta[T0].get_count_soc(is)==0) return;
+	if(NSPIN==4 && ORB.Beta[T0].get_count_soc(is)==0) 
+	{
+		return;
+	}
+
+	timer::tick ("ORB_gen_tables","snap_psibeta",'X');
+
 	bool has_so = 0;
 	if(ORB.Beta[T0].get_count_soc(0)>0 ) has_so = 1;
 
@@ -145,6 +150,7 @@ void ORB_gen_tables::snap_psibeta(
 		delete[] calproj;
 		delete[] rmesh1;
 		delete[] rmesh2;
+		timer::tick ("ORB_gen_tables","snap_psibeta",'X');
 		return;
 	}
 
@@ -156,18 +162,6 @@ void ORB_gen_tables::snap_psibeta(
 	double x0a,x1a,x2a,x3a,x123a,x120a,x032a,x031a;
 	double x0b,x1b,x2b,x3b,x123b,x120b,x032b,x031b;
 	
-	/*
-    const double position = x / table_interval;
-    const int iq = static_cast<int>(position);
-   	assert(iq < table_length-4);
-    const double x0 = position - static_cast<double>(iq);
-    const double x1 = 1.0 - x0;
-    const double x2 = 2.0 - x0;
-    const double x3 = 3.0 - x0;
-
-    return x1*x2*(table[iq]*x3+table[iq+3]*x0)/6.0
-         + x0*x3*(table[iq+1]*x2-table[iq+2]*x1)/2.0;
-	*/
 	psa = distance10 / tbeta.dr;
 	iqa = static_cast<int>(psa);
    	x0a = psa - static_cast<double>(iqa);
@@ -205,6 +199,7 @@ void ORB_gen_tables::snap_psibeta(
 	//special case for R = 0;
 	const double tiny1 = 1e-12;
 	const double tiny2 = 1e-10;
+
 	if(distance10 < tiny1) distance10 += tiny1;
 	if(distance20 < tiny1) distance20 += tiny1;
 	
@@ -228,8 +223,14 @@ void ORB_gen_tables::snap_psibeta(
 	vector<vector<double>> grlyb;
 	
 	Ylm::rl_sph_harm (T1_2Lplus1-1, dRa.x, dRa.y, dRa.z, rlya);
-	if (job == 0) Ylm::rl_sph_harm (T2_2Lplus1-1, dRb.x, dRb.y, dRb.z, rlyb);
-	else Ylm::grad_rl_sph_harm (T2_2Lplus1-1, dRb.x, dRb.y, dRb.z, rlyb, grlyb);
+	if (job == 0) 
+	{
+		Ylm::rl_sph_harm (T2_2Lplus1-1, dRb.x, dRb.y, dRb.z, rlyb);
+	}
+	else 
+	{
+		Ylm::grad_rl_sph_harm (T2_2Lplus1-1, dRb.x, dRb.y, dRb.z, rlyb, grlyb);
+	}
 	//==============================================================================
 	// Formula :                         T1       T0          T0        T2
 	// sum_{L0}sum_{m0}
@@ -239,10 +240,15 @@ void ORB_gen_tables::snap_psibeta(
 
 	// mohan update 2011-03-07
 	int n_projection =1;
-	if(has_so) n_projection = ORB.Beta[T0].get_nproj_soc();
+	if(has_so) 
+	{
+		n_projection = ORB.Beta[T0].get_nproj_soc();
+	}
+
 	vector<complex<double>> term_a_nc(n_projection,{0,0});		// Peize Lin change ptr to vector at 2020.01.31
 	vector<complex<double>> term_b_nc(n_projection,{0,0});		// Peize Lin change ptr to vector at 2020.01.31
 	int ip = -1;
+
 	for(int nb=0; nb<nproj; nb++)
 	{
 		if( !calproj[nb] ) continue;
@@ -250,6 +256,13 @@ void ORB_gen_tables::snap_psibeta(
 		const int L0 = ORB.Beta[T0].getL_Beta(nb);
 		//const int next_ip = 2* L0 +1;
 	
+
+//-------------------------------------------------------------------
+// move iterations for psi1 and psi2 from cal_fvnl_dbeta 
+// to here --- 2021/03/20 mohan chen
+//-------------------------------------------------------------------
+
+
 		// <psi1 | Beta>
 		const int Opair1 = tbeta.NL_Opair(Tpair1, L1, N1, nb); 
 		// <psi2 | Beta>
@@ -311,37 +324,6 @@ void ORB_gen_tables::snap_psibeta(
 				}
 			} //end L
 
-
-			// for test
-			/*
-			if( abs(term_a)>1.0e-5 && NURSE)
-			{
-				if(R1.x==0 && R1.y==0 && R1.z==0)
-				{
-				//	cout << endl;
-				//	cout << " R1=" << R1.x << " " << R1.y << " " << R1.z << endl;
-				//	cout << " R0=" << R0.x << " " << R0.y << " " << R0.z << endl;
-					stringstream label;
-					stringstream phi;
-					if(nb==0) label<<"s"<<m0;
-					if(nb==1) label<<"p"<<m1;
-					if(L1==0) phi<<"s"<<N1<<m1;
-					if(L1==1) phi<<"p"<<N1<<m1;
-					if(L1==2) phi<<"d"<<N1<<m1;
-					cout << setw(15) << term_a  
-						<< setw(5) << phi.str()
-						<< setw(5) << label.str()
-						<< " R2("
-						<< setw(8) << R2.x 
-						<< setw(8) << R2.y 
-						<< setw(8) << R2.z
-						<< ")"
-						<< endl; 
-				}
-			}
-			*/
-
-
 			//=============
 			// SECOND PART	
 			//=============
@@ -362,8 +344,14 @@ void ORB_gen_tables::snap_psibeta(
 				{
 					curr = tbeta.Table_NR[0][Tpair2][Opair2][L];
    					
-					if( iqb >= rmesh2[nb]-4) Interp_Vnlb = 0.0;
-					else Interp_Vnlb = i_exp * (x123b*curr[iqb]+x120b*curr[iqb+3]+x032b*curr[iqb+1]-curr[iqb+2]*x031b);
+					if( iqb >= rmesh2[nb]-4) 
+					{
+						Interp_Vnlb = 0.0;
+					}
+					else 
+					{
+						Interp_Vnlb = i_exp * (x123b*curr[iqb]+x120b*curr[iqb+3]+x032b*curr[iqb+1]-curr[iqb+2]*x031b);
+					}
 					
 					Interp_Vnlb /= rl2;
 				}
@@ -379,9 +367,14 @@ void ORB_gen_tables::snap_psibeta(
 					{
 						curr = tbeta.Table_NR[1][Tpair2][Opair2][L];
    					
-						if( iqb >= rmesh2[nb]-4) Interp_Vnlc = 0.0;
-						else Interp_Vnlc = i_exp * (x123b*curr[iqb]+x120b*curr[iqb+3]+x032b*curr[iqb+1]-curr[iqb+2]*x031b);
-						
+						if( iqb >= rmesh2[nb]-4) 
+						{
+							Interp_Vnlc = 0.0;
+						}
+						else 
+						{
+							Interp_Vnlc = i_exp * (x123b*curr[iqb]+x120b*curr[iqb+3]+x032b*curr[iqb+1]-curr[iqb+2]*x031b);
+						}
 						Interp_Vnlc = Interp_Vnlc / pow(distance20, L) - Interp_Vnlb * L / distance20;
 					}
 					else 
@@ -407,10 +400,13 @@ void ORB_gen_tables::snap_psibeta(
 						}
 						case 1: // calculate the derivative part.
 						{
+							double tt1 = tmpGaunt * Interp_Vnlc * rlyb[lm] / distance20;
+							double tt2 = tmpGaunt * Interp_Vnlb;
+										
 							for(int ir = 0; ir < 3; ir++)
 							{
-								term_c[ir] += tmpGaunt * (Interp_Vnlc * rlyb[lm] * unit_vec_dRb[ir] / distance20
-											+ Interp_Vnlb * grlyb[lm][ir]);
+								term_c[ir] += tt1 * unit_vec_dRb[ir] 
+											+ tt2 * grlyb[lm][ir];
 							}
 
 							break;
@@ -436,7 +432,10 @@ void ORB_gen_tables::snap_psibeta(
 				case 0://calculate the overlap part.
 				{
 					//nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
-					if(!has_so) nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+					if(!has_so) 
+					{
+						nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
+					}
 					break;
 				}
 				case 1: //calculate the derivative part.
@@ -448,10 +447,6 @@ void ORB_gen_tables::snap_psibeta(
 						{
 							nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb);//LiuXh 2016-01-14
 						}
-						else
-						{
-							
-						}
 					}
 					break;
 				}
@@ -459,6 +454,7 @@ void ORB_gen_tables::snap_psibeta(
 			}
 		}//!m0
 	}//!L0
+
 	//zhengdy-soc, calculate non-local term
 	if(has_so)
 	{
@@ -493,7 +489,7 @@ void ORB_gen_tables::snap_psibeta(
 	delete[] rmesh1;
 	delete[] rmesh2;
 
-//	timer::tick("ORB_gen_tables","snap_psibeta");
+	timer::tick ("ORB_gen_tables","snap_psibeta",'X');
 	return;
 }
 
