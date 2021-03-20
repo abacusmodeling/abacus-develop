@@ -37,6 +37,8 @@ class LCAO_Orbitals
 
 	void set_nl_index(void);
 
+	void Read_Descriptor(void);		//caoyu add 2020-3-16
+
 #ifdef __MPI
 	void bcast_files(void);
 #endif
@@ -47,7 +49,9 @@ class LCAO_Orbitals
 	const double& get_dR(void) const {return dR;}
 	const double& get_Rmax(void) const {return Rmax;}
 	const int& get_lmax(void) const {return lmax;}
+	const int& get_lmax_d(void) const { return lmax_d; }		//lmax of descriptor basis		//caoyu add 2021-03-17
 	const int& get_nchimax(void) const {return nchimax;}
+	const int& get_nchimax_d(void) const { return nchimax_d; }	//nchimax of descriptor basis		//caoyu add 2021-03-17
 	const int& get_ntype(void) const {return ntype;}
 	const double& get_dr_uniform(void) const {return dr_uniform;}
 
@@ -57,6 +61,10 @@ class LCAO_Orbitals
 	// nonlocal projectors (1-dimension array)
 	Numerical_Nonlocal* Beta;
 	
+	//caoyu add 2021-3-10
+	// descriptor bases, saved as one-type atom orbital
+	Numerical_Orbital Alpha;
+
 	// initialized in input.cpp
 	double ecutwfc;
 	double dk;
@@ -75,12 +83,15 @@ class LCAO_Orbitals
 	bool read_in_flag;
 	std::vector<string> orbital_file;
 	std::vector<string> nonlocal_file;
+	string descriptor_file;	//caoyu add 2020-3-16
 
 	private:
 
 	int kmesh;
 	int lmax;
 	int nchimax;
+	int lmax_d;	//caoyu add 2021-03-17
+	int nchimax_d;	//caoyu add 2021-03-17
 	int ntype;
 
 };
