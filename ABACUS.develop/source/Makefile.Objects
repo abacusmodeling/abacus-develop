@@ -164,7 +164,6 @@ global_fp.o \
 pdiag_double.o \
 pdiag_basic.o \
 pdiag_common.o \
-hs_matrix.o \
 subgrid_oper.o \
 GenELPA.o \
 conv_coulomb_pot.o \
@@ -237,8 +236,9 @@ read_dm.o\
 write_pot.o\
 write_rho.o\
 write_rho_dipole.o\
-write_dm.o\
+write_HS.o\
 write_HS_R.o\
+write_dm.o\
 potential_libxc.o \
 efield.o \
 magnetism.o\

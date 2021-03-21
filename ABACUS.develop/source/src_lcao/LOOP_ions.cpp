@@ -5,7 +5,7 @@
 #include "LCAO_nnr.h"
 #include "FORCE_STRESS.h"
 #include "src_global/global_function.h"
-#include "src_io/hs_matrix.h"
+#include "src_io/write_HS.h"
 #include "src_io/cal_r_overlap_R.h"
 #include "src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "src_ri/exx_abfs.h"
