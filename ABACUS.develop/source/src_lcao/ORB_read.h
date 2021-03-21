@@ -63,7 +63,7 @@ class LCAO_Orbitals
 	
 	//caoyu add 2021-3-10
 	// descriptor bases, saved as one-type atom orbital
-	Numerical_Orbital Alpha;
+	Numerical_Orbital* Alpha;
 
 	// initialized in input.cpp
 	double ecutwfc;

@@ -57,5 +57,9 @@ void ORB_control::clear_after_ions()
     TITLE("ORB_control","clear_after_ions");
     UOT.MOT.Destroy_Table();
     UOT.tbeta.Destroy_Table_Beta();
+    //caoyu add 2021-03-18
+    if (INPUT.out_descriptor && BASIS_TYPE == "lcao") {
+        UOT.talpha.Destroy_Table_Alpha();
+    }
     return;
 }
