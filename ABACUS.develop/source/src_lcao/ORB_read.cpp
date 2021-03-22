@@ -12,6 +12,7 @@ LCAO_Orbitals::LCAO_Orbitals()
 	this->nchimax = 0;// this initialzied must specified
 	this->Phi = new Numerical_Orbital[1];	
 	this->Beta = new Numerical_Nonlocal[1];
+	this->Alpha = new Numerical_Orbital[1];
 
 	this->nproj = new int[1];
 	this->nprojmax = 0;
@@ -28,6 +29,7 @@ LCAO_Orbitals::~LCAO_Orbitals()
 	}
 	delete[] Phi;
 	delete[] Beta;
+	delete[] Alpha;
 	delete[] nproj;
 }
 
@@ -224,6 +226,10 @@ void LCAO_Orbitals::Read_Orbitals(void)
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")		//condition: descriptor in lcao line
 	{
+		
+		delete[] this->Alpha;
+		this->Alpha = new Numerical_Orbital[1];	//not related to atom type -- remain to be discussed
+
 		this->Read_Descriptor();
 
 	}
@@ -993,6 +999,7 @@ void LCAO_Orbitals::Read_Descriptor()	//read descriptor basis
 
 	//read lmax and nchi[l]
 	int lmax = 0;
+	int nchimax = 0;
 	int nchi[10]={0};
 	char word[80];
 	if (MY_RANK == 0)
@@ -1011,15 +1018,17 @@ void LCAO_Orbitals::Read_Descriptor()	//read descriptor basis
 		for (int l = 0; l <= lmax; l++)
 		{
 			in >> word >> word >> word >> nchi[l];
-			this->nchimax_d = std::max(this->nchimax_d, nchi[l]);
+			nchimax = std::max(nchimax, nchi[l]);
 		}
 	}
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(lmax);
+		Parallel_Common::bcast_int(nchimax);
 		Parallel_Common::bcast_int(nchi, lmax + 1);
 #endif		
 	this->lmax_d = lmax;
+	this->nchimax_d = nchimax;
 	// calculate total number of chi
 	int total_nchi = 0;
 	for (int l = 0; l <= lmax; l++)
@@ -1027,7 +1036,7 @@ void LCAO_Orbitals::Read_Descriptor()	//read descriptor basis
 		total_nchi += nchi[l];
 	}
 		//OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
-	this->Alpha.phiLN = new Numerical_Orbital_Lm[total_nchi];
+	this->Alpha[0].phiLN = new Numerical_Orbital_Lm[total_nchi];
 
 	int meshr; // number of mesh points
 	int meshr_read;
@@ -1178,7 +1187,7 @@ void LCAO_Orbitals::Read_Descriptor()	//read descriptor basis
 			delete[] inner;
 			ofs_running << setw(12) << unit << endl;
 
-			this->Alpha.phiLN[count].set_orbital_info(
+			this->Alpha[0].phiLN[count].set_orbital_info(
 				"H", //any type
 				1, //any type
 				L, //angular momentum L
@@ -1203,7 +1212,7 @@ void LCAO_Orbitals::Read_Descriptor()	//read descriptor basis
 		}
 	}
 	in.close();
-	this->Alpha.set_orbital_info(
+	this->Alpha[0].set_orbital_info(
 		1, // any type
 		"H", // any label
 		lmax,
