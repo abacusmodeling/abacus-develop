@@ -215,6 +215,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 				integrated_func[ik] = (jlp1_r[ik]-fac*jlm1_r[ik]) * k1_dot_k2_dot_kpoint[ik];
 			}
 		}
+		// PLEASE try to make Simpson_Integral as input parameters
+		// mohan note 2021-03-23
 		Mathzone::Simpson_Integral(kmesh,integrated_func,dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
@@ -233,7 +235,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 			integrated_func[ik] = k1_dot_k2[ik] * pow (kpoint[ik], l);
 		}
 		
-		// Call simpson integration
+		// PLEASE try to make Simpson_Integral as input parameters
+		// mohan note 2021-03-23
 		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
@@ -324,6 +327,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 		}
 		double temp = 0.0;
 //		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		// PLEASE try to make Simpson_Integral as input parameters
+		// mohan note 2021-03-23
 		Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
 		rs[ir] = temp * FOUR_PI ;
 		
@@ -345,6 +350,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 		}
 //		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		// PLEASE try to make Simpson_Integral as input parameters
+		// mohan note 2021-03-23
 		Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
 		drs[ir] = -FOUR_PI*(l+1)/(2.0*l+1) * temp;
 	}
@@ -360,7 +367,11 @@ void ORB_table_phi::cal_ST_Phi12_R
 			}
 			double temp = 0.0;
 	//		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
+			// PLEASE try to make Simpson_Integral as input parameters
+			// mohan note 2021-03-23
 			Mathzone::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
+			// PLEASE try to make dualfac function as input parameters
+			// mohan note 2021-03-23
 			rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
 		}
 	}

@@ -15,6 +15,12 @@ void LCAO_gen_fixedH::calculate_NL_no(void)
 {
     TITLE("LCAO_gen_fixedH","calculate_NL_no");
 
+	// PLEASE rebuild the following two functions,
+	// 'build_Nonlocal_beta' and  'build_Nonlocal_mu',
+	// because the two functions are extremely time consuming
+	// for small systems, especially for multiple-k points
+	// mohan note 2021-03-23
+
 	if(GAMMA_ONLY_LOCAL)
 	{
 	  	//for gamma only.

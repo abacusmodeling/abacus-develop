@@ -225,7 +225,10 @@ void LOOP_ions::opt_ions(void)
 }
 
 
-bool LOOP_ions::force_stress(const int &istep, int &force_step, int &stress_step)
+bool LOOP_ions::force_stress(
+	const int &istep, 
+	int &force_step, 
+	int &stress_step)
 {
     TITLE("LOOP_ions","force_stress");
 

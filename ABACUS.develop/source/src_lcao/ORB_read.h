@@ -96,5 +96,7 @@ class LCAO_Orbitals
 
 };
 
+// PLEASE avoid using 'ORB' as global variable 
+// mohan note 2021-03-23
 extern LCAO_Orbitals ORB;
 #endif
