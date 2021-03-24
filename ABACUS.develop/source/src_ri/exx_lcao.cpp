@@ -863,11 +863,11 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Abfs::cal_Cps\t"<<time_during(t_start)<<endl;
 
 gettimeofday( &t_start, NULL);
-	schwarz.init( true, info.schwarz_threshold );
+	schwarz.init( info.schwarz_threshold, info.schwarz_threshold );
 	schwarz.cal_max_pair_fock( atom_centres_core, m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, Born_von_Karman_period, Cws,Vws );
 ofs_mpi<<"TIME@ schwarz::init\t"<<time_during(t_start)<<endl;
 gettimeofday( &t_start, NULL);
-	cauchy.init( true, info.cauchy_threshold, Born_von_Karman_period );
+	cauchy.init( info.cauchy_threshold, info.cauchy_threshold, Born_von_Karman_period );
 	cauchy.cal_norm_C_max( Cps, index_lcaos, index_abfs );
 	cauchy.cal_norm_V( Vps );
 ofs_mpi<<"TIME@ cauchy::init\t"<<time_during(t_start)<<endl;

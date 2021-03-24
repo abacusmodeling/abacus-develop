@@ -32,6 +32,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
+	OUTP(ofs,"newdm",newDM,"");
 
 	ofs << "\n#Parameters (2.PW)" << endl;
 	OUTP(ofs,"ecutwfc",ecutwfc,"#energy cutoff for wave functions");
