@@ -63,7 +63,7 @@ class LCAO_Orbitals
 	
 	//caoyu add 2021-3-10
 	// descriptor bases, saved as one-type atom orbital
-	Numerical_Orbital Alpha;
+	Numerical_Orbital* Alpha;
 
 	// initialized in input.cpp
 	double ecutwfc;
@@ -96,5 +96,7 @@ class LCAO_Orbitals
 
 };
 
+// PLEASE avoid using 'ORB' as global variable 
+// mohan note 2021-03-23
 extern LCAO_Orbitals ORB;
 #endif

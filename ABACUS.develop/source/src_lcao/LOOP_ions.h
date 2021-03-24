@@ -25,6 +25,13 @@ class LOOP_ions
 
 	Lattice_Change_Methods LCM;
 
+	
+	// PLEASE move 'force_stress()'  function to other places, such as FORCE_STRESS.cpp or
+	// you might think to create a new file, it is because 'force_stress' do not
+	// belong to 'LOOP_ions', 'pot.init_pot' also do not belong to force_stress()
+	// the renew of structure factors, etc. should be ran in other places
+	// the 'IMM' and 'LCM' objects should be passed to force_stress() via parameters list
+	// mohan note 2021-03-23
 	bool force_stress(const int &istep, int &force_step, int &stress_step);
 
 	int istep;
@@ -32,6 +39,9 @@ class LOOP_ions
 	// electron charge density extropolation method
 	Charge_Extra CE;
 
+	// PLEASE move final_scf to other places, for example, now it can be put 
+	// in 'src_ions/variable_cell.cpp'
+	// mohan note 2021-03-23
 	void final_scf(void);
 };
 

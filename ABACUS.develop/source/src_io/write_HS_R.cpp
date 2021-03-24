@@ -1,18 +1,8 @@
 #include "src_lcao/LOOP_ions.h"
 #include "src_io/cal_r_overlap_R.h"
 #include "src_pw/global.h"
-#include "src_io/hs_matrix.h"
+#include "src_io/write_HS.h"
 
-/*
-#include "src_parallel/parallel_orbitals.h"
-#include "src_pdiag/pdiag_double.h"
-#include "LCAO_nnr.h"
-#include "FORCE_STRESS.h"
-#include "src_global/global_function.h"
-#include "src_ions/variable_cell.h" 
-#include "ELEC_scf.h"
-#include "src_global/sltk_atom_arrange.h"
-*/
 
 void LOOP_ions::output_HS_R(void)
 {
