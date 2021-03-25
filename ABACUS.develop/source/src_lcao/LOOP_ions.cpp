@@ -108,6 +108,8 @@ void LOOP_ions::opt_ions(void)
 		
 		time_t eend = time(NULL);
 
+		// PLEASE move the details of CE to other places
+		// mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
         int iat=0;
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
@@ -134,6 +136,10 @@ void LOOP_ions::opt_ions(void)
             }
         }
 
+		// PLEASE design a proper interface to output potentials,
+		// not only electrostatic potential but also others
+		// mohan add 2021-03-25
+		// we need to have a proper
         if(pot.out_potential == 2)
         {
             stringstream ssp;
@@ -155,7 +161,8 @@ void LOOP_ions::opt_ions(void)
         }            
         time_t fend = time(NULL);
 
-
+		// PLEASE move the details of CE to other places
+		// mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
         iat=0;
         if(FORCE)
