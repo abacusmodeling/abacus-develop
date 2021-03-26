@@ -135,14 +135,14 @@ public:
 
 	static void Cubic_Spline_Interpolation
 	(
- 		const double *rad,
-		const double *rad_f,
-		const double *y2,
+		const double * const rad,
+		const double * const rad_f,
+		const double * const y2,
 		const int& mesh,
-		const double* r,
+		const double * const r,
 		const int& rsize,
-		double* y,
-		double* dy
+		double * const y,
+		double * const dy
 	);
 	
 	static double RadialF

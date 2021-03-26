@@ -4,7 +4,6 @@
 // 3. delete condition justification in pw_and_columns distributins 2
 
 #include "tools.h"
-//#include "algorithms.h"
 #include "pw_basis.h"
 #include "../src_pw/pw_complement.h"
 
@@ -35,7 +34,7 @@ PW_Basis::PW_Basis()
 
     this->nczp_start = 0;
     gg_global0 = nullptr; //LiuXh 20180515
-    cutgg_num_table = nullptr; //LiuXh 20180515
+    cutgg_num_table = nullptr; //LiuXh 0180515
     ggchg_time_global = 0; //LiuXh 20180515
 
 }
@@ -121,7 +120,6 @@ void PW_Basis::set
 }
 
 
-//#include "../src_develop/src_wannier/winput.h"
 // initialize of plane wave basis.
 void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &Klist_in)
 {
@@ -153,6 +151,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 	this->Klist = &Klist_in;
 
     //mohan modify 2008-3-25
+	// setup for ggpsi, ggwfc, ggwfc2, ggchg
     this->setup_gg();
     this->setup_FFT_dimension();
 
@@ -160,7 +159,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 	// if calculation is 'test', we don't need
 	// to allocate the arrays, claculate the
 	// structure factors, etc.
-	// we just return here.
+	// just return here.
 	//----------------------------------------
 	if(CALCULATION=="test")
 	{
@@ -181,13 +180,11 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 	//{
 	//	ofs_running << " Turn on the cutgg function." << endl;
 	//}
-
-
 #else
 	// mohan update 2011-09-21
 	this->nbzp=nbz; //nbz shoud equal nz for single proc.
 	this->nczp=nbzp*bz; 
-	this->nbxx=nbz*ncx*ncy;
+	this->nbxx=nbz*nbx*nby; //mohan fix 2021-02-17
 	this->nbzp_start=0;
     bool cutgg_flag = false;
 #endif
@@ -203,11 +200,11 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
         double cutgg_pieces = 10;
 
-//		OUT(ofs_running,"cutgg_pieces",cutgg_pieces);
+		// OUT(ofs_running,"cutgg_pieces",cutgg_pieces);
         const double cutgg_delta = ggchg / std::pow( (double)cutgg_pieces, 2.0/3.0 );
 
         // get cutgg_delta from input.
-//		OUT(ofs_running,"cutgg_delta",cutgg_delta);
+		// OUT(ofs_running,"cutgg_delta",cutgg_delta);
 
         //int cutgg_num_start = 0;
         double ggchg_start = 0.0;
@@ -310,10 +307,10 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
 #ifdef __MPI
         this->get_MPI_GVectors();
-        //cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxxs << endl;
+        //cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxx << endl;
         //cout<<" UNIFORM GRID DIM     : "<<this->ncx<<" * "<<this->ncy<<" * "<<this->ncz << "," << this->nrxx  << endl;
 
-        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxxs,1);
+        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
 #endif
     }
@@ -345,7 +342,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
         this->get_MPI_GVectors();
 
-        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxxs,1);
+        FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
 #else
         this->get_GVectors();
@@ -358,11 +355,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const kvect &K
 
     this->get_nggm(this->ngmc);
 
-#ifdef __EPM // needs in EPM because spin-orbital must use it.
-    if (EPM_SPIN_ORBITAL) this->setup_structure_factor();
-#else
     this->setup_structure_factor();
-#endif
 
 //	this->printPW("src_check/check_pw.txt");
     timer::tick("PW_Basis","gen_pw",'B');
@@ -386,14 +379,10 @@ void PW_Basis::setup_gg(void)
     // Ry*a0^2/(2*PI)^2
     //=================================
 
-    //=================================
     // FFT cut off for wave function
-    //=================================
     this->ggwfc = 4 * this->ggpsi;
 
-    //==================================
     // FFT cut off for charge/potential
-    //==================================
     this->ggchg = wfac * this->ggpsi;
 
     this->ggwfc2 = 0;
@@ -415,12 +404,6 @@ void PW_Basis::setup_gg(void)
 
 	OUT(ofs_running,"energy cutoff for wavefunc (unit:Ry)",ecutwfc);
 
-    this->doublegrid = false;
-    if (ggwfc != ggchg)
-    {
-        doublegrid = true;
-        ofs_running << "Double grid is used."<<endl;
-    }
     return;
 }
 
@@ -480,19 +463,19 @@ void PW_Basis::setup_FFT_dimension(void)
     return;
 }
 
-#ifdef __MPI
 
+#ifdef __MPI
 void PW_Basis::divide_fft_grid(void)
 {
     TITLE("PW_Basis","divide_fft_grid");
+
     //----------------------------------------------
     // set charge/potential grid : nrxx
-    // and smooth grid : nrxxs
-	// nczp: how many planes in this process.
     //----------------------------------------------
     const int remain_planes = this->nbz%NPROC_IN_POOL;
     this->nbzp = this->nbz/NPROC_IN_POOL;
-    if (RANK_IN_POOL < remain_planes)
+    
+	if (RANK_IN_POOL < remain_planes)
     {
         nbzp++;
     }
@@ -501,7 +484,7 @@ void PW_Basis::divide_fft_grid(void)
 
 	this->nbxx = nbzp*this->nbx*this->nby;
     this->nrxx = nczp*this->ncx*this->ncy;
-	this->nrxxs = this->nrxx;
+
     //=====================================
     // set nrxx_start
     //=====================================
@@ -525,9 +508,7 @@ void PW_Basis::divide_fft_grid(void)
 	if(test_pw)OUT(ofs_running,"nbzp_start",nbzp);
 	OUT(ofs_running,"nbxx",nbxx);
 	OUT(ofs_running,"nrxx",nrxx);
-	if(test_pw)OUT(ofs_running,"nrxxs",nrxxs);
 	if(test_pw)OUT(ofs_running,"nrxx_start",nrxx_start);
-	if(test_pw)OUT(ofs_running,"nbxx_start",nbxx_start);
 
     //=====================================
     // generate nst,st_i,st_j,st_k,npps
@@ -572,7 +553,7 @@ void PW_Basis::divide_fft_grid(void)
 
 
 //////////////////////////////////  EXPLAIN    //////////////////////////////////
-//   M. Gong has made mistakes during calculating the effective structure factor
+//  M. Gong has made mistakes during calculating the effective structure factor
 //  ig1[i], ig2[i], ig3[i] store the $G$ points using Cartesian coordinate,
 //  where  -ncx <= ig1[] <= ncx, -ncy <= ig2[] <= ncy and -ncz <= ig3[] <= ncz
 //  ngmc > ngmw. ig1, ig2 and ig3 is a mapping between (k+G) <-> G
@@ -627,7 +608,6 @@ void PW_Basis::get_GVectors(void)
     timer::tick("PW_Basis","get_GVectors");
 
     this->nrxx = this->ncxyz;
-    this->nrxxs = this->nxyz;
     this->ngmc=this->ngmc_g;
 
     //************************************************************
@@ -701,7 +681,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
 
     for (int ig = 1; ig < ngmc_local; ig++)
     {
-        if (abs(this->gg[ig] - tmp[ng]) > eps8)
+        if (abs(this->gg[ig] - tmp[ng]) > 1.0e-8)
         {
             ng++;
             tmp[ng] = this->gg[ig];
@@ -712,9 +692,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
 	
 
     //********************************
-    //
-    // number of different |G| shells
-    //
+    // number of different |G| values
     // *******************************
     this->nggm = ng;
 

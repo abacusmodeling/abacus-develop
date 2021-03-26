@@ -9,13 +9,14 @@
 class energy
 {
 	public:
-	friend class electrons; 
-	friend class Local_Orbital_Elec;
+	friend class Electrons; 
+	friend class Electrons_Stochastic;//mohan add 2021-01-31 
+	friend class LOOP_elec;
 	friend class Local_Orbital_Charge;
 	friend class Threshold_Elec;
 	friend class Forces; 
 	friend class Charge;
-	friend class potential;
+	friend class Potential;
 	friend class Occupy;
 	friend class wavefunc;
 	friend class eximport;
@@ -24,6 +25,7 @@ class energy
 	friend class Force_Lo;
 	friend class Exx_pw;
 	friend class ON_Tests;
+
     energy();
     ~energy();
 
@@ -36,7 +38,6 @@ class energy
 	int printe;			   // print energy every 'printe' electron iteration.
 	int iter;
 
-	//private: //mohan change 2011-06-12
 	public:
 
     // The variables needed to compute the energies
@@ -47,22 +48,19 @@ class energy
 	double deband_harris;
     double descf;
 
-    double ehart;          // the hartree energy
-    double etxc;           // the exchange and correlation energy
-    double vtxc;           // another exchange-correlation energy
     double etxcc;          // the nlcc exchange and correlation
 	double exx;            // the exact exchange energy.
+	double evdw;			// the vdw energy				// Peize Lin add 2021.03.09
 
-    double ewld;           // the ewald energy
-	double alpha;		   // the coefficient of ewald method
     double demet;          // correction for metals
 
 	int out_dos;			// control dos calculation
 	int out_band;                    // control band calculation  pengfei 2014-10-13
-        double dos_emin_ev;
+
+	double dos_emin_ev;
 	double dos_emax_ev;
 	double dos_edelta_ev;
-        double bcoeff;
+	double bcoeff;
 
     double ewald();
 
@@ -80,23 +78,15 @@ class energy
 
 	void print_format(const string &name, const double &value);
 
-#ifndef __EPM
 	void calculate_harris(const int &flag); //mohan add 2012-06-05
+
     double delta_e(void);
+
     void delta_escf(void);
-#endif
-    void rgen(
-        const Vector3<double> &dtau,
-        const double &rmax,
-        int *irr,
-        const Matrix3 &at,
-        const Matrix3 &bg,
-        Vector3<double> *r,
-        double *r2,
-        int  &nrm
-    ) const;
+
     
-    static int mxr;
+    void set_exx();       // Peize Lin add 2016-12-03
+    
 };
 
 #endif //energy

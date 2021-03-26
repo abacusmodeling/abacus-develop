@@ -15,28 +15,25 @@ pseudopot_cell_vl::~pseudopot_cell_vl()
 	delete[] zp;
 }
 
-// from init_vloc.f90
-void pseudopot_cell_vl::init_vloc(void)
+
+void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 {
+	TITLE("pseudopot_cell_vl","init_vloc");
+
 	// This routine computes the fourier coefficient of the local
 	// potential vloc(ig,it) for each type of atom
-	if(test_pp > 0) TITLE("pseudopot_cell_vl","init_vloc");
 	timer::tick("ppcell_vl","init_vloc",'C');
 
-	double *vloc1d = new double[pw.nggm];
-	ZEROS(vloc1d, pw.nggm);
+	double *vloc1d = new double[nggm];
+	ZEROS(vloc1d, nggm);
 
 	this->allocate();
 	
 	for (int it = 0; it < ucell.ntype; it++) 
 	{
-	//	ofs_running << " it=" << it << endl;
-	//	ofs_running << " numeric[it]=" << numeric[it] << endl;
-
 		const Atom* atom = &ucell.atoms[it];
 
-		ZEROS(vloc1d, pw.nggm);
-		//HLX(05-24-06): add zp[it]=ucell.atoms[it].zv; read zp[it] from atoms
+		ZEROS(vloc1d, nggm);
 
 		this->zp[it] = atom->zv;
 
@@ -56,17 +53,17 @@ void pseudopot_cell_vl::init_vloc(void)
 			WARNING_QUIT("init_vloc","not available now.");
 		}
 
-		dcopy(vloc1d, this->vloc,it); //HLX(05-23-06): dcopy might have problems, check later!
+		dcopy(vloc1d, vloc_in, it);
 	} 
 
 
-	delete [] vloc1d;
+	delete[] vloc1d;
 
 	this->print_vloc();
 
 	timer::tick("ppcell_vl","init_vloc",'C');
 	return;
-} // end subroutine init_vloc
+}
 
 
 void pseudopot_cell_vl::allocate(void)
@@ -81,38 +78,14 @@ void pseudopot_cell_vl::allocate(void)
 	for (int it = 0; it < ucell.ntype; it++)
 	{ this->numeric[it] = true; }
 
+	// mohan change global variable 'npsx' to local variable,
+	// npsx( max number of different PPs)
+	// 2021-02-22
+	int npsx = 50;
 	delete[] zp; 
 	this->zp = new double[npsx];
 	ZEROS(zp, npsx);
-	// npsx( max number of different PPs)
 
-	/*
-	cc.create(npsx, 2);
-	alpc.create(npsx, 2);
-	aps.create(npsx, 4, 6);
-	alps.create(npsx, 4, 3);
-
-	a_nlcc = new double[npsx];
-	ZEROS(a_nlcc, npsx);
-
-	b_nlcc = new double[npsx];
-	ZEROS(b_nlcc, npsx);
-
-	alpha_nlcc = new double[npsx];
-	ZEROS(alpha_nlcc, npsx);
-
-	nlc  = new int[npsx];
-	ZEROS(nlc, npsx);
-
-	nnl  = new int[npsx];
-	ZEROS(nnl, npsx);
-
-	lmax = new int[npsx];
-	ZEROS(lmax, npsx);
-
-	lloc = new int[npsx];
-	ZEROS(lloc, npsx);
-	*/
 	return;
 }
 
@@ -123,7 +96,7 @@ void pseudopot_cell_vl::allocate(void)
 !
 !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*/
 
-// from vloc_of_g.f90
+
 // Here we always have numeric form, i.e. numeric=ture
 void pseudopot_cell_vl::vloc_of_g(
 		const int& msh, 
@@ -159,6 +132,7 @@ void pseudopot_cell_vl::vloc_of_g(
 	ZEROS(aux, msh);
 	ZEROS(aux1, msh);
 
+	// for tests
 	/*
 	for(ir=0; ir<msh; ir++)
 	{
@@ -168,7 +142,7 @@ void pseudopot_cell_vl::vloc_of_g(
 	vloc_1d[0] *= 4*3.1415926;
 	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/pw.ngmc << endl;
 	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/pw.ncxyz << endl;
-*/
+	*/
 
 	// (1)
 	if(pw.ggs[0] < 1.0e-8)
@@ -223,6 +197,7 @@ void pseudopot_cell_vl::vloc_of_g(
 	delete [] aux1;
 	return;
 } // end subroutine vloc_of_g
+
 
 void pseudopot_cell_vl::print_vloc(void)const
 {

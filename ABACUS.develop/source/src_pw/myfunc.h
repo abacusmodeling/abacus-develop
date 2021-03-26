@@ -42,25 +42,6 @@ void grad_dot(int ncx, int ncy, int ncz, int ncxyz, Vector3 < double> *a, int ng
               Vector3 < double> *g, int *ig2fftc, double lat0, double *da);
 
 
-// myfunc4.cpp
-/*
-void wsinit(double *rws0, Vector3 < double> *rws, int nrwsx, int nrws,
-            Matrix3 atw);
-void ccalbec(int nkb,
-             int npwx,
-             int npw,
-             int nbnd,
-             ComplexMatrix &bec,
-             const ComplexMatrix &vkb,
-             const ComplexMatrix &psi);
-
-void pw_gemm(char sum_over_nodes, int na, int nb, int n, ComplexMatrix a,
-             int lda, ComplexMatrix b, int ldb, ComplexMatrix c, int ldc);
-
-void interpolate(double *v, double *vs, int iflag);
-void cinterpolate(complex < double> *v, complex < double> *vs, int iflag);
-*/
-
 // myfunc5.cpp (from LPACK)
 // compute y = alpha * y where alpha is a scalar and y is an n-vector
 void dscal(const int n, const double &alpha, double *y, const int incy);

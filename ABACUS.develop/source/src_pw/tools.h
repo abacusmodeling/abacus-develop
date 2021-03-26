@@ -25,7 +25,6 @@ using namespace std;
 #include "../src_global/intarray.h"
 #include "../src_global/complexarray.h"
 #include "../src_global/complexmatrix.h"
-#include "../src_global/sparsematrix.h"
 
 #include "../src_global/memory.h"
 #include "../src_global/timer.h"

@@ -1,46 +1,36 @@
-// =============================================================================
-//                          C++ Header File
-// Project:         Wannier Basis O(N) Scaling Package
-// File:            electronsns.cpp
-// Principal Class:	electronsns
-// Author:          Lixin He,Mohan Chen
-// Comment:
-// Warning:
-// Start time:      2006
-// modified:   		mohan 2008-08-10 change electronsns to be base class of ions
-// =============================================================================
-
 #include "tools.h"
 #include "global.h"
 #include "electrons.h"
-#include "algorithms.h"
 #include "symmetry_rho.h"
-#include "../src_pw/wf_io.h"
-#include "chi0_hilbert.h"            // pengfei 2016-11-23
-#include "chi0_standard.h"
-#include "epsilon0_pwscf.h"
-#include "epsilon0_vasp.h"
-#include "../src_pw/toWannier90.h"
-#include "../src_pw/berryphase.h"
+#include "src_io/wf_io.h"
+#include "src_io/chi0_hilbert.h"
+#include "src_io/chi0_standard.h"
+#include "src_io/epsilon0_pwscf.h"
+#include "src_io/epsilon0_vasp.h"
+#include "src_io/to_wannier90.h"
+#include "src_io/berryphase.h"
+// new
+#include "H_Ewald_pw.h"
 
-double electrons::avg_iter = 0;
+double Electrons::avg_iter = 0;
 
-electrons::electrons()
+Electrons::Electrons()
 {
 }
 
-electrons::~electrons()
+Electrons::~Electrons()
 {
 }
 
-void electrons::non_self_consistent(void)
+void Electrons::non_self_consistent(const int &istep)
 {
-    TITLE("electrons","non_self_consistent");
-    timer::tick("electrons","non_self_consistent",'D');
+    TITLE("Electrons","non_self_consistent");
+    timer::tick("Electrons","non_self_consistent",'D');
+
     //========================================
     // diagonalization of the KS hamiltonian
     // =======================================
-    electrons::c_bands();
+    Electrons::c_bands(istep);
 
     ofs_running << " End of Band Structure Calculation " << endl;
     ofs_running << " Band eigenvalue (eV) :" << endl;
@@ -81,22 +71,24 @@ void electrons::non_self_consistent(void)
     // Do a Berry phase polarization calculation if required
     //=======================================================
 
-    if (BERRY_PHASE && SYMMETRY == 0)
+    if (berryphase::berry_phase_flag && Symmetry::symm_flag == 0)
     {
         berryphase bp;
         bp.Macroscopic_polarization();
     }
 
-    timer::tick("electrons","non_self_consistent",'D');
+    timer::tick("Electrons","non_self_consistent",'D');
     return;
 }
 
-// from electrons.f90
-//------------------------------------------------------------------------
-void electrons::self_consistent(const int &istep)
+
+#include "occupy.h"
+void Electrons::self_consistent(const int &istep)
 {
-    timer::tick("electrons","self_consistent",'D');
-    en.ewld = en.ewald();
+    timer::tick("Electrons","self_consistent",'D');
+
+	// mohan update 2021-02-25
+	H_Ewald_pw::compute_ewald(ucell,pw); 
 
     set_ethr();
 
@@ -137,8 +129,6 @@ void electrons::self_consistent(const int &istep)
     // conv_elec is a member of Threshold_Elec
     this->conv_elec = false;//mohan add 2008-05-25
 
-    clock_t start,finish;
-    double duration = 0.0;
 
     // mohan add 2010/3/25
     // output the charge mixing data :
@@ -153,12 +143,6 @@ void electrons::self_consistent(const int &istep)
     // }
     // ###
 
-    // start the Exx calculation
-    if(DFT_FUNCTIONAL == "PBE0")
-    {
-        exxpw.init(true);
-    }
-
     for (this->iter = 1;iter <= NITER;iter++)
     {
         ofs_running 
@@ -166,11 +150,12 @@ void electrons::self_consistent(const int &istep)
         << "  ELEC=" << setw(4) << iter 
         << "--------------------------------\n";
         // mohan add 2010-07-16
-        if(iter==1) chr.set_new_e_iteration(true);
-        else chr.set_new_e_iteration(false);
+        if(iter==1) CHR.set_new_e_iteration(true);
+        else CHR.set_new_e_iteration(false);
 
         // record the start time.
-        start=std::clock();
+		// the clock is not accurate, needs to be fixed 2021-03-15 mohan
+        clock_t start=std::clock();
 
         //(1) set converged threshold, 
         // automatically updated during self consistency.
@@ -180,27 +165,32 @@ void electrons::self_consistent(const int &istep)
         if(FINAL_SCF && iter==1)
         {
             init_mixstep_final_scf();
-            //chr.irstep=0;
-            //chr.idstep=0;
-            //chr.totstep=0;
+            //CHR.irstep=0;
+            //CHR.idstep=0;
+            //CHR.totstep=0;
         }
 
-        // mohan move harris functional to here, 2012-06-05
-        // use 'rho(in)' and 'v_h and v_xc'(in)
-        en.calculate_harris(1);
-
-        // first_iter_again:					// Peize Lin delete 2019-05-01
-
-        //(2) calculate band energy using cg or davidson method.
-        // output the new eigenvalues and wave functions.
-        this->c_bands();
-
-        // mohan add 2010-07-22	
-        if(DFT_FUNCTIONAL == "PBE0")
-        {
-            exxpw.get_exx2();
-        }
+		// mohan move harris functional to here, 2012-06-05
+		// use 'rho(in)' and 'v_h and v_xc'(in)
+		en.calculate_harris(1);
 	
+		// first_iter_again:					// Peize Lin delete 2019-05-01
+		
+		// calculate exact-exchange
+		switch(xcf.iexch_now)						// Peize Lin add 2019-03-09
+		{
+			case 5:    case 6:   case 9:
+				if( !exx_global.info.separate_loop )				
+				{
+					exx_lip.cal_exx();			
+				}
+				break;
+		}
+		
+		//(2) calculate band energy using cg or davidson method.
+		// output the new eigenvalues and wave functions.
+        this->c_bands(istep);
+
         if (check_stop_now()) return;
 
         en.eband  = 0.0;
@@ -214,24 +204,27 @@ void electrons::self_consistent(const int &istep)
 
         //(4) save change density as previous charge,
         // prepared fox mixing.
-        chr.save_rho_before_sum_band();
+        CHR.save_rho_before_sum_band();
 
         //(5) calculate new charge density according to
         // new wave functions.
-
+		
         // calculate the new eband here.
-        chr.sum_band();
+        CHR.sum_band();
 
-        //(6) calculate the delta_harris energy 
-        // according to new charge density.
-        // mohan add 2009-01-23
-        en.calculate_harris(2);
+		// add exx
+		en.set_exx();		// Peize Lin add 2019-03-09
+		
+		//(6) calculate the delta_harris energy 
+		// according to new charge density.
+		// mohan add 2009-01-23
+		en.calculate_harris(2);
 
-        Symmetry_rho srho;
-        for(int is=0; is<NSPIN; is++)
-        {
-            srho.begin(is);
-        }
+		Symmetry_rho srho;
+		for(int is=0; is<NSPIN; is++)
+		{
+			srho.begin(is);
+		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
         mag.compute_magnetization();
@@ -242,9 +235,9 @@ void electrons::self_consistent(const int &istep)
         en.deband = en.delta_e();
 
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
-	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
+		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
         {
-            chr.mix_rho(dr2,0,DRHO2,iter,conv_elec);
+            CHR.mix_rho(dr2,0,DRHO2,iter,conv_elec);
         }
         else
         {
@@ -265,7 +258,7 @@ void electrons::self_consistent(const int &istep)
             // rho contain the output charge density.
             // in other cases rhoin contains the mixed charge density
             // (the new input density) while rho is unchanged.
-            chr.mix_rho(dr2,diago_error,DRHO2,iter,conv_elec);
+            CHR.mix_rho(dr2,diago_error,DRHO2,iter,conv_elec);
 
             //if(MY_RANK==0)
             //{
@@ -293,11 +286,11 @@ void electrons::self_consistent(const int &istep)
         if (!conv_elec)
         {
             // not converged yet, calculate new potential from mixed charge density
-            pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+            pot.v_of_rho(CHR.rho, pot.vr);
 
             // because <T+V(ionic)> = <eband+deband> are calculated after sum
             // band, using output charge density.
-            // but E_Hartree(en.ehart) and Exc(en.etxc) are calculated in v_of_rho above,
+            // but E_Hartree and Exc(en.etxc) are calculated in v_of_rho above,
             // using the mixed charge density.
             // so delta_escf corrects for this difference at first order. 
             en.delta_escf();
@@ -315,7 +308,7 @@ void electrons::self_consistent(const int &istep)
 
             // mohan fix bug 2012-06-05,
             // the new potential V(PL)+V(H)+V(xc)
-            pot.v_of_rho(chr.rho, en.ehart, en.etxc, en.vtxc, pot.vr);
+            pot.v_of_rho(CHR.rho, pot.vr);
             //cout<<"Exc = "<<en.etxc<<endl;
             //( vnew used later for scf correction to the forces )
             pot.vnew = pot.vr - pot.vnew;
@@ -325,32 +318,44 @@ void electrons::self_consistent(const int &istep)
         stringstream ssw;
         ssw << global_out_dir << "WAVEFUNC.dat";
 
+		//qianrui add 2020-10-12
+		stringstream ssgk;
+		ssgk << global_out_dir << "GKK.dat";
+
         // output for tmp.
         for(int is=0; is<NSPIN; is++)
         {
             stringstream ssc;
             ssc << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-            chr.write_rho( is, iter, ssc.str(), 3);//mohan add 2007-10-17
+            CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
         }
 
         if(wf.out_wf)
         {
             //WF_io::write_wfc( ssw.str(), wf.evc );
             // mohan update 2011-02-21
-            WF_io::write_wfc2( ssw.str(), wf.evc );
+			//qianrui update 2020-10-17
+            WF_io::write_wfc2( ssw.str(), wf.evc, pw.gcar);
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
-        if(vext == 0) pot.set_vrs(pw.doublegrid);
-        else pot.set_vrs_tddft(pw.doublegrid, istep);
-        //pot.set_vrs(pw.doublegrid);
+        if(vext == 0) 
+		{
+			pot.set_vr_eff();
+		}
+        else 
+		{
+			pot.set_vrs_tddft(istep);
+		}
+
         //print_eigenvalue(ofs_running);
         en.calculate_etot();
 
-        finish=clock();
-        duration = (double)(finish - start) / CLOCKS_PER_SEC;
+		// the clock is not accurate, needs to be fixed 2021-03-15 mohan
+        clock_t finish=clock();
+        double duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-	en.print_etot(conv_elec, istep, iter, dr2, duration, ETHR, avg_iter);
+		en.print_etot(conv_elec, istep, iter, dr2, duration, ETHR, avg_iter);
 
         if (conv_elec || iter==NITER)
         {
@@ -392,7 +397,7 @@ void electrons::self_consistent(const int &istep)
             {
                 stringstream ssc;
                 ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-                chr.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+                CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
             }
 
             if(conv_elec)
@@ -408,19 +413,20 @@ void electrons::self_consistent(const int &istep)
             }
 
             iter_end(ofs_running);
-            timer::tick("electrons","self_consistent",'D');
+            timer::tick("Electrons","self_consistent",'D');
             return;
         }
 
-        //if ( imix >= 0 )  chr.rho = chr.rho_save;
+        //if ( imix >= 0 )  CHR.rho = CHR.rho_save;
         //ofs_running << "\n start next iterate for idum ";
     } //END DO
 
-    timer::tick("electrons","self_consistent",'D');
+    timer::tick("Electrons","self_consistent",'D');
     return;
-} // end electrons
+} // end Electrons
 
-bool electrons::check_stop_now(void)
+
+bool Electrons::check_stop_now(void)
 {
     bool check_stop_now = false;
 
@@ -432,10 +438,11 @@ bool electrons::check_stop_now(void)
     return check_stop_now;
 } // END FUNCTION check_stop_now
 
-void electrons::c_bands(void)
+
+void Electrons::c_bands(const int &istep)
 {
-    if (test_elec) TITLE("electrons","c_bands");
-    timer::tick("electrons","c_bands",'E');
+    if (test_elec) TITLE("Electrons","c_bands");
+    timer::tick("Electrons","c_bands",'E');
 
     int precondition_type = 2;
 
@@ -448,12 +455,7 @@ void electrons::c_bands(void)
     ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
     for (int ik = 0;ik < kv.nks;ik++)
     {
-        hm.init_k(ik);
-
-        if(DFT_FUNCTIONAL == "PBE0")
-        {
-            exxpw.ik_now = ik;
-        }
+        hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization
@@ -477,7 +479,7 @@ void electrons::c_bands(void)
             }
         }
         //h_diag can't be zero!  //zhengdy-soc
-	if(NPOL==2)
+		if(NPOL==2)
         {
             for(int ig = wf.npw;ig < wf.npwx; ig++)
             {
@@ -495,13 +497,9 @@ void electrons::c_bands(void)
         //
         // In localized orbital presented in plane wave case,
         // only using cinitcgg.
-        //
-        // In linear scaling method, using sparse matrix and
-        // adjacent searching code and cg method to calculate the
-        // eigenstates.
         //=============================================================
         double avg_iter_k = 0.0;
-        hm.diago(this->istep, this->iter, ik, h_diag, avg_iter_k);
+        hm.diago(istep, this->iter, ik, h_diag, avg_iter_k);
 
         avg_iter += avg_iter_k;
 
@@ -528,13 +526,14 @@ void electrons::c_bands(void)
     return;
 } // END SUBROUTINE c_bands_k
 
-void electrons::init_mixstep_final_scf(void)
+
+void Electrons::init_mixstep_final_scf(void)
 {
     TITLE("electrons","init_mixstep_final_scf");
 
-    chr.irstep=0;
-    chr.idstep=0;
-    chr.totstep=0;
+    CHR.irstep=0;
+    CHR.idstep=0;
+    CHR.totstep=0;
 
     return;
 }

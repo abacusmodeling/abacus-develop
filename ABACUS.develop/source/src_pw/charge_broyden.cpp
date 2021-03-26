@@ -1,11 +1,12 @@
 #include "charge_broyden.h"
 #include "global.h"
-#include "../src_pw/inverse_matrix.h"
+#include "../src_global/inverse_matrix.h"
 
 Charge_Broyden::Charge_Broyden() 
 {
 	initb = false;	
 }
+
 Charge_Broyden::~Charge_Broyden()
 {
     if (initb)

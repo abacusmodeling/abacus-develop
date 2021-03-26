@@ -1,11 +1,11 @@
 #include "lattice_change_cg.h"
 #include "../src_pw/global.h"
 #include "lattice_change_basic.h"
+
+// the 'dim' variable is defined in Lattice_Change_Basic
 using namespace Lattice_Change_Basic;
 
 //=================== NOTES ========================
-// in vasp, it's like
-// contolled by POTIM.
 // the approximate minimum of the total energy
 // is calculated from a cubic (or quadratic)
 // interpolation taking into account the change
@@ -13,7 +13,7 @@ using namespace Lattice_Change_Basic;
 // ( 3 pieces of information )
 // 1. trial step
 // 2. corrector step using cubic or quadratic interpolation
-// 3. Check the force and see if we need brent method interpolation.
+// 3. check the force and see if we need brent method interpolation.
 // 4. a new trial step....
 // Brent's method is a complicated but popular
 // root-finding algorithm combining the bisection method,
@@ -39,14 +39,19 @@ Lattice_Change_CG::~Lattice_Change_CG()
 void Lattice_Change_CG::allocate(void)
 {
 	TITLE("Lattice_Change_CG","allocate");
+	// mohan add 2021-02-07
+	assert(dim>0);
+
 	delete[] lat0;
 	delete[] grad0;
 	delete[] cg_grad0;
 	delete[] move0;
+
 	this->lat0 = new double[dim];
 	this->grad0 = new double[dim];
 	this->cg_grad0 = new double[dim];
 	this->move0 = new double[dim];
+
 	ZEROS(lat0, dim);
 	ZEROS(grad0, dim);
 	ZEROS(cg_grad0, dim);

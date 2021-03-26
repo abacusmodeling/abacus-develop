@@ -1,16 +1,16 @@
-#include "../src_pw/tools.h"
+#include "src_pw/tools.h"
 #include "gint_k.h"
-#include "lcao_nnr.h"
-#include "lcao_orbitals.h"
+#include "LCAO_nnr.h"
+#include "ORB_read.h"
 #include "grid_technique.h"
-#include "ylm.h"
-#include "../src_pw/global.h"
+#include "src_global/ylm.h"
+#include "src_pw/global.h"
+#include "global_fp.h" // mohan add 2021-01-30
 
 Gint_k::Gint_k()
 {
 	ik_now = 0;	
 	pvpR_alloc_flag = false;
-	pvnapR_alloc_flag = false;
 	spin_now = -1; // for a start value, must not equal 1,2 or 4.
 	reduced = true;// use reduced memory for H storage.
 }
@@ -26,42 +26,6 @@ void Gint_k::reset_spin(const int &spin_now_in)
 	return;
 }
 
-
-
-// this function is different from allocate_pvpR,
-// this function is used once in an ionic iteration.
-// the other function is used once in each electron iteration.
-// nnrg may change when the ions move.
-// be called in local_orbital_ions.cpp
-void Gint_k::allocate_pvnapR(void)
-{
-	TITLE("Gint_k","allocate_pvnapR");
-
-	assert( VNA>0 );
-
-	if(this->pvnapR_alloc_flag)
-	{
-		WARNING_QUIT("Gint_k::allocate_pvnapR","pvnapR has been allocated!");
-	}
-
-	assert(LNNR.nnrg!=0); //mohan update 2012-07-01
-	this->pvnapR_reduced = new double[LNNR.nnrg];
-	ZEROS( pvnapR_reduced, LNNR.nnrg);
-
-	double mem = Memory::record("allocate_pvpR", "pvnapR_reduced", LNNR.nnrg , "double");
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") ofs_running << " Memory of pvnapR : " << mem << " MB" << endl;
-	if( mem > 800 )
-	{
-		ofs_warning << " memory for pvnapR = " << mem << endl;
-		ofs_warning << " which is larger than 800 MB ! " << endl;
-		WARNING_QUIT("Gint_k","allocate_pvpR");
-	}
-
-	this->pvnapR_alloc_flag = true;
-
-	return;
-}
 
 
 
@@ -88,9 +52,14 @@ void Gint_k::allocate_pvpR(void)
 			this->pvpR_reduced[is] = new double[LNNR.nnrg];	
 			ZEROS( pvpR_reduced[is], LNNR.nnrg);
 		}
+
 		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", LNNR.nnrg * NSPIN , "double");
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-        if(OUT_LEVEL != "m") ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+
+        if(OUT_LEVEL != "m") 
+		{
+			ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+		}
+
         if( mem > 800 )
         {
             ofs_warning << " memory for pvpR = " << mem << endl;
@@ -103,18 +72,18 @@ void Gint_k::allocate_pvpR(void)
 	{
 		double mem = Memory::record("allocate_pvpR", "pvpR", GridT.lgd * GridT.nutot
 				* GridT.lgd * GridT.nutot , "double");
-		//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-		if(OUT_LEVEL != "m") ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+
+		if(OUT_LEVEL != "m") 
+		{
+			ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+		}
+
 		if( mem > 800 )
 		{
 			ofs_warning << " memory for pvpR = " << mem << endl;
 			ofs_warning << " which is larger than 800 MB ! " << endl;
 			WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
-
-		// output information
-		//cout << " MEMORY OF pvpR       : " << Memory::record("allocate_pvpR", "pvpR", GridT.lgd * GridT.nutot 
-		//* GridT.lgd * GridT.nutot , "cdouble") << " MB" << endl;
 
 		//----------------------------------------------
 		// allocate the complex matrix !!
@@ -123,8 +92,10 @@ void Gint_k::allocate_pvpR(void)
 		// 3*3*3 = 27.
 		//----------------------------------------------
 		const int LDIM=GridT.lgd*GridT.nutot;
+
 		this->pvpR_pool = new double[LDIM*LDIM];
 		ZEROS(pvpR_pool, LDIM*LDIM);
+
 		this->pvpR = new double*[LDIM];
 		for(int i=0; i<LDIM; i++)
 		{
@@ -135,23 +106,6 @@ void Gint_k::allocate_pvpR(void)
 	this->pvpR_alloc_flag = true;
 	return;
 }
-
-
-void Gint_k::destroy_pvnapR(void)
-{
-	TITLE("Gint_k","destroy_pvnapR");
-	
-	if(!pvnapR_alloc_flag)
-	{
-		WARNING_QUIT("Gint_k::destroy_pvnapR","<phi_0i | Vna | phi_Rj> matrix has not been allocated yet!");
-	}
-	
-	delete[] pvnapR_reduced;
-
-	this->pvnapR_alloc_flag = false;
-	return;
-}
-
 
 
 
@@ -185,7 +139,7 @@ void Gint_k::destroy_pvpR(void)
 
 // fold the <phi | vl |dphi(R)> * DM(R) to 
 // calculate the force.
-void Gint_k::folding_force(double** fvl_dphi,
+void Gint_k::folding_force(matrix& fvl_dphi,
 	double* pvdpx, double* pvdpy, double* pvdpz)
 {
 	TITLE("Gint_k","folding_force");
@@ -328,9 +282,9 @@ void Gint_k::folding_force(double** fvl_dphi,
 			}
 			const int iat = ucell.iwt2iat[i];
 			const int index = 3*j;
-			fvl_dphi[iat][0] += 2.0*tmp[index];	
-			fvl_dphi[iat][1] += 2.0*tmp[index+1];	
-			fvl_dphi[iat][2] += 2.0*tmp[index+2];	
+			fvl_dphi(iat,0) += 2.0*tmp[index];	
+			fvl_dphi(iat,1) += 2.0*tmp[index+1];	
+			fvl_dphi(iat,2) += 2.0*tmp[index+2];	
 		}
 	}
 	delete[] tmp;
@@ -357,7 +311,7 @@ void Gint_k::folding_force(double** fvl_dphi,
 
 // fold the <phi | vl * R_beta|dphi(R_alpha)> * DM(R) to 
 // calculate the stress.
-void Gint_k::folding_stress(double** fvl_dphi, double svl_dphi[][3],
+void Gint_k::folding_stress(matrix& fvl_dphi, matrix& svl_dphi,
 	double* pvdpx, double* pvdpy, double* pvdpz,
 	double* pvdp11, double* pvdp22, double* pvdp33,double* pvdp12, double* pvdp13, double* pvdp23)
 {
@@ -557,16 +511,16 @@ void Gint_k::folding_stress(double** fvl_dphi, double svl_dphi[][3],
 			const int iat = ucell.iwt2iat[i];
 			const int index = 3*j;
 			const int index1 = 6*j;
-			fvl_dphi[iat][0] += 2.0*tmp[index];
-			fvl_dphi[iat][1] += 2.0*tmp[index+1];
-			fvl_dphi[iat][2] += 2.0*tmp[index+2];
+			fvl_dphi(iat,0) += 2.0*tmp[index];
+			fvl_dphi(iat,1) += 2.0*tmp[index+1];
+			fvl_dphi(iat,2) += 2.0*tmp[index+2];
 
-			svl_dphi[0][0] -= 2.0*tmp1[index1];
-			svl_dphi[1][1] -= 2.0*tmp1[index1+1];
-			svl_dphi[2][2] -= 2.0*tmp1[index1+2];
-			svl_dphi[0][1] -= 2.0*tmp1[index1+3];
-			svl_dphi[0][2] -= 2.0*tmp1[index1+4];
-			svl_dphi[1][2] -= 2.0*tmp1[index1+5];
+			svl_dphi(0,0) -= 2.0*tmp1[index1];
+			svl_dphi(1,1) -= 2.0*tmp1[index1+1];
+			svl_dphi(2,2) -= 2.0*tmp1[index1+2];
+			svl_dphi(0,1) -= 2.0*tmp1[index1+3];
+			svl_dphi(0,2) -= 2.0*tmp1[index1+4];
+			svl_dphi(1,2) -= 2.0*tmp1[index1+5];
 		}
 	}
 	delete[] tmp;
@@ -623,13 +577,12 @@ void Gint_k::folding_vl_k(const int &ik)
 	// 
 	// 2. why the folding of vlocal is different from folding of 
 	// < phi_0i | T+Vnl | phi_Rj > ?
-	// Because the (i,j) is different for T+Vna and Vlocal+Vna
+	// Because the (i,j) is different for T+Vnl and Vlocal
 	// The first part is due to 2D division of H and S matrix,
 	// The second part is due to real space division. 
 	// 
 	// here we construct a temporary matrix to store the
-	// matrix element < phi_0 | Vlocal+Vna | phi_R >
-	// Vna appears when we use it.
+	// matrix element < phi_0 | Vlocal | phi_R >
 	//#################################################################
 	this->ik_now = ik;
 	this->pvp = new complex<double>*[GridT.lgd];
@@ -749,25 +702,12 @@ void Gint_k::folding_vl_k(const int &ik)
 									int* iw2_lo = &GridT.trace_lo[start2];
 									int* iw2_end = iw2_lo + atom2->nw;
 
-									if(VNA)
+									// get the <phi | V | phi>(R) Hamiltonian.
+									double *vijR = &pvpR_reduced[0][ixxx];
+									// complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
+									for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR)
 									{
-										// get the <phi | V | phi>(R) Hamiltonian.
-										double *vijR = &pvpR_reduced[0][ixxx];
-										double *vijR2 = &pvnapR_reduced[ixxx];
-										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR, ++vijR2)
-										{
-											vij[iw2_lo[0]] += ( vijR[0] + vijR2[0] ) * phase; 
-										}
-									}
-									else
-									{
-										// get the <phi | V | phi>(R) Hamiltonian.
-										double *vijR = &pvpR_reduced[0][ixxx];
-//										complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
-										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR)
-										{
-											vij[iw2_lo[0]] += vijR[0] * phase; 
-										}
+										vij[iw2_lo[0]] += vijR[0] * phase; 
 									}
 									ixxx += atom2->nw;
 									++lgd;
@@ -888,21 +828,6 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		WARNING_QUIT("Gint_k::destroy_pvpR","pvpR hasnot been allocated yet!");
 	}
 
-	//####################### EXPLAIN #################################
-	// 1. what is GridT.lgd ?
-	// GridT.lgd is the number of orbitals in each processor according
-	// to the division of real space FFT grid.
-	// 
-	// 2. why the folding of vlocal is different from folding of 
-	// < phi_0i | T+Vnl | phi_Rj > ?
-	// Because the (i,j) is different for T+Vna and Vlocal+Vna
-	// The first part is due to 2D division of H and S matrix,
-	// The second part is due to real space division. 
-	// 
-	// here we construct a temporary matrix to store the
-	// matrix element < phi_0 | Vlocal+Vna | phi_R >
-	// Vna appears when we use it.
-	//#################################################################
 	this->ik_now = ik;
 //	complex<double>** pvp_nc[4];
 	for(int spin=0;spin<4;spin++)
@@ -1027,28 +952,20 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 									int iw2_lo = GridT.trace_lo[start2]/NPOL;
 									int iw2_end = iw2_lo + atom2->nw;
 
-									if(VNA)
+									// get the <phi | V | phi>(R) Hamiltonian.
+//									complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
+									double *vijR[4];
+									for(int spin = 0;spin<4;spin++) 
 									{
-										// get the <phi | V | phi>(R) Hamiltonian.
-										double *vijR = &pvpR_reduced[0][ixxx];
-										double *vijR2 = &pvnapR_reduced[ixxx];
-										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR, ++vijR2)
-										{
-											vij[0][iw2_lo] += ( vijR[0] + vijR2[0] ) * phase; 
-										}
+										vijR[spin] = &pvpR_reduced[spin][ixxx];
 									}
-									else
+									for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR[0], ++vijR[1],++vijR[2],++vijR[3])
 									{
-										// get the <phi | V | phi>(R) Hamiltonian.
-//										complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
-										double *vijR[4];
-										for(int spin = 0;spin<4;spin++) vijR[spin] = &pvpR_reduced[spin][ixxx];
-										for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR[0], ++vijR[1],++vijR[2],++vijR[3])
+										for(int spin =0;spin<4;spin++)
 										{
-											for(int spin =0;spin<4;spin++)
-												vij[spin][iw2_lo] += vijR[spin][0] * phase; 
-//											else vij[iw2_lo[0]] += vijR_soc[0] * phase;
+											vij[spin][iw2_lo] += vijR[spin][0] * phase; 
 										}
+//										else vij[iw2_lo[0]] += vijR_soc[0] * phase;
 									}
 									ixxx += atom2->nw;
 									++lgd;
@@ -1314,360 +1231,7 @@ void Gint_k::set_ijk_atom(const int &grid_index, const int &size,
 }
 
 
-void Gint_k::set_ijk_atom_vna(const int &grid_index, const int &size,
-	double*** psir_ylm, double*** dr, bool** cal_flag, 
-	double** distance, double* ylma, const double &delta_r,
-	const Grid_Technique &gt, double* vna3d)
-{
-	const Numerical_Orbital_Lm* pointer;
-	double mt[3];
-	for (int id=0; id<size; id++)
-	{
-		// (2.1) get the atom type and atom index.
-		const int mcell_index = gt.bcell_start[grid_index] + id;	
-		const int imcell = gt.which_bigcell[mcell_index];
-		const int iat = gt.which_atom[mcell_index];
-		const int it = ucell.iat2it[ iat ];
-		const int ia = ucell.iat2ia[ iat ];
 
-		// (2.2) get the distance between the grid and the atom.
-		mt[0] = gt.meshball_positions[imcell][0] - gt.tau_in_bigcell[iat][0];
-		mt[1] = gt.meshball_positions[imcell][1] - gt.tau_in_bigcell[iat][1];
-		mt[2] = gt.meshball_positions[imcell][2] - gt.tau_in_bigcell[iat][2];
-
-		// as big as 64!
-		for(int ib=0; ib<gt.bxyz; ib++)
-		{
-			// meshcell_pos: z is the fastest
-			dr[ib][id][0] = gt.meshcell_pos[ib][0] + mt[0];
-			dr[ib][id][1] = gt.meshcell_pos[ib][1] + mt[1];
-			dr[ib][id][2] = gt.meshcell_pos[ib][2] + mt[2];
-
-			distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
-			+ dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
-
-
-			//mohan fix bug 2012-07-02, should be >=
-			if(distance[ib][id] >= ORB.Vna[it].rcut &&
-		   	   distance[ib][id] >= ORB.Phi[it].getRcut())
-			{
-				cal_flag[ib][id]=false;
-//				ofs_running << " ibbb=" << ib << " iddd=" << id << " cal_flag=" << cal_flag[ib][id] << endl;
-				continue;
-			}
-
-			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
-
-			
-
-			// these parameters are about interpolation
-			// because once we know the distance from atom to grid point,
-			// we can get the parameters we need to do interpolation and
-			// store them first!! these can save a lot of effort.
-			const double position = distance[ib][id] / delta_r;
-
-			const int iq = static_cast<int>(position);
-			const double x0 = position - static_cast<double>(iq);
-			const double x1 = 1.0 - x0;
-			const double x2 = 2.0 - x0;
-			const double x3 = 3.0 - x0;
-			const double x12 = x1*x2/6.0;
-			const double x03 = x0*x3/2.0;
-
-
-
-			// mohan add 2012-06-13
-			double ccc;
-			if(distance[ib][id] <= ORB.Vna[it].rcut)
-			{
-				ccc = (x12*(ORB.Vna[it].vna_u[iq]*x3
-				+ORB.Vna[it].vna_u[iq+3]*x0)
-				+ x03*(ORB.Vna[it].vna_u[iq+1]*x2
-				-ORB.Vna[it].vna_u[iq+2]*x1));
-				vna3d[ib] += ccc;
-			}
-
-
-			//if(distance[ib][id] <= ORB.Phi[it].getRcut())
-			// mohan fix bug 2012-06-27
-			// if use '<=', there may be atoms out of plan.
-			if(distance[ib][id] < ORB.Phi[it].getRcut())
-			{
-				cal_flag[ib][id]=true;
-//				ofs_running << " ibbb=" << ib << " iddd=" << id << " cal_flag=" << cal_flag[ib][id] << endl;
-			}
-			else
-			{
-				cal_flag[ib][id]=false;
-//				ofs_running << " ibbb=" << ib << " iddd=" << id << " cal_flag=" << cal_flag[ib][id] << endl;
-				continue;
-			}
-
-
-
-			Ylm::sph_harm ( ucell.atoms[it].nwl,
-					dr[ib][id][0] / distance[ib][id],
-					dr[ib][id][1] / distance[ib][id],
-					dr[ib][id][2] / distance[ib][id],
-					ylma);
-
-
-
-
-
-			const int ip = static_cast<int>(position);
-
-			const double dx = position - ip;
-			const double dx2 = dx * dx;
-			const double dx3 = dx2 * dx;
-
-			const double c3 = 3.0*dx2-2.0*dx3;
-			const double c1 = 1.0-c3;
-			const double c2 = (dx-2.0*dx2+dx3)*delta_r;
-			const double c4 = (dx3-dx2)*delta_r;
-
-
-
-
-
-
-
-			Atom* atom1 = &ucell.atoms[it];
-			double tmp=0.0;//mohan fix bug 2011-05-04
-			for (int iw=0; iw< atom1->nw; iw++)
-			{
-				if ( atom1->iw2_new[iw] )
-				{
-					pointer = &ORB.Phi[it].PhiLN(
-							atom1->iw2l[iw],
-							atom1->iw2n[iw]);
-
-					// Efficient!! to get the orbital value at this point.
-					tmp = c1*pointer->psi_uniform[ip] 
-						+ c2*pointer->dpsi_uniform[ip]
-						+ c3*pointer->psi_uniform[ip+1] 
-						+ c4*pointer->dpsi_uniform[ip+1];
-				}
-				psir_ylm[ib][id][iw] = tmp * ylma[atom1->iw2_ylm[iw]];
-//				psir_ylm[ib][id][iw] = 1.0; 
-			}// end iw.
-		}//end ib
-	}// int id
-
-
-
-	/*
-	if(grid_index==0)
-	{
-		for(int id=0; id<size; ++id)
-		{
-        const int mcell_index = GridT.bcell_start[grid_index] + id;
-        const int imcell = GridT.which_bigcell[mcell_index];
-        const int iat = GridT.which_atom[mcell_index];
-        const int it = ucell.iat2it[ iat ];
-
-			for(int ib=0; ib<pw.bxyz; ++ib)
-			{
-				ofs_running << " atom=" << id << " ib=" << ib << " it=" << ucell.atoms[it].label 
-				<< " distance=" << distance[ib][id] 
-				<< " cal_flag=" << cal_flag[ib][id] << endl;	
-			}
-		} 
-	}
-	*/
-
-	return;
-}
-
-
-
-void Gint_k::set_ijk_atom_fvna(const int &grid_index, const int &size,
-    double*** psir_ylm, double*** dr, bool** cal_flag,
-    double** distance, double* ylma, const double &delta_r,
-    double*** dphi_x, double*** dphi_y, double*** dphi_z,
-	const Grid_Technique &gt, double* vna3d)
-{
-    const Numerical_Orbital_Lm* pointer;
-    double mt[3];
-    // Peize Lin change rly, grly 2016-08-26
-    static vector<double> rly;
-    static vector<vector<double>> grly;
-    for (int id=0; id<size; id++)
-    {
-        // (2.1) get the atom type and atom index.
-        const int mcell_index = gt.bcell_start[grid_index] + id;
-        const int imcell = gt.which_bigcell[mcell_index];
-        const int iat = gt.which_atom[mcell_index];
-        const int it = ucell.iat2it[ iat ];
-        const int ia = ucell.iat2ia[ iat ];
-        Atom *atom = &ucell.atoms[it];
-
-        // (2.2) get the distance between the grid and the atom.
-        mt[0] = gt.meshball_positions[imcell][0] - gt.tau_in_bigcell[iat][0];
-        mt[1] = gt.meshball_positions[imcell][1] - gt.tau_in_bigcell[iat][1];
-        mt[2] = gt.meshball_positions[imcell][2] - gt.tau_in_bigcell[iat][2];
-
-        for(int ib=0; ib<gt.bxyz; ib++) //mohan fix bug 2012-06-29 
-        {
-            // meshcell_pos: z is the fastest
-            dr[ib][id][0] = gt.meshcell_pos[ib][0] + mt[0];
-            dr[ib][id][1] = gt.meshcell_pos[ib][1] + mt[1];
-            dr[ib][id][2] = gt.meshcell_pos[ib][2] + mt[2];
-
-            distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0]
-            + dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
-
-
-			// mohan fix bug 2012-07-02
-            if(distance[ib][id] >= ORB.Vna[it].rcut &&
-               distance[ib][id] >= ORB.Phi[it].getRcut())
-            {
-                cal_flag[ib][id]=false;
-                continue;
-            }
-
-// don't need, deal with in the following
-//			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
-
-
-            // get the 'phi' and 'dphi'.
-            Ylm::grad_rl_sph_harm(ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
-
-//          if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
-//          Ylm::sph_harm ( ucell.atoms[it].nwl,
-//                  dr[ib][id][0] / distance[ib][id],
-//                  dr[ib][id][1] / distance[ib][id],
-//                  dr[ib][id][2] / distance[ib][id],
-//                  ylma);
-
-            // these parameters are about interpolation
-            // because once we know the distance from atom to grid point,
-            // we can get the parameters we need to do interpolation and
-            // store them first!! these can save a lot of effort.
-            const double position = distance[ib][id] / delta_r;
-
-            const int iq = static_cast<int>(position);
-            const double x0 = position - static_cast<double>(iq);
-            const double x1 = 1.0 - x0;
-            const double x2 = 2.0 - x0;
-            const double x3 = 3.0 - x0;
-            const double x12 = x1*x2 / 6.0;
-            const double x03 = x0*x3 / 2.0;
-
-
-            // mohan add 2012-06-13
-            double ccc;
-            if(distance[ib][id] <= ORB.Vna[it].rcut)
-            {
-                ccc = (x12*(ORB.Vna[it].vna_u[iq]*x3
-                +ORB.Vna[it].vna_u[iq+3]*x0)
-                + x03*(ORB.Vna[it].vna_u[iq+1]*x2
-                -ORB.Vna[it].vna_u[iq+2]*x1));
-                vna3d[ib] += ccc;
-            }
-
-			
-            //if(distance[ib][id] <= ORB.Phi[it].getRcut())
-			// mohan fix 2012-06-27
-            if(distance[ib][id] < ORB.Phi[it].getRcut())
-            {
-                cal_flag[ib][id]=true;
-            }
-            else
-            {
-                cal_flag[ib][id]=false;
-                continue;
-            }			
-
-
-			double tmp = 0.0;//mohan fix bug 2011-05-04
-            double dtmp = 0.0;
-            for (int iw=0; iw< atom->nw; iw++)
-            {
-                if ( atom->iw2_new[iw] )
-                {
-                    pointer = &ORB.Phi[it].PhiLN(
-                            atom->iw2l[iw],
-                            atom->iw2n[iw]);
-
-                    if(iq >= pointer->nr_uniform-4)
-                    {
-                        tmp = dtmp = 0.0;
-                    }
-                    else
-                    {
-                        // Efficient!! to get the orbital value at this point.
-                        tmp = x12*(pointer->psi_uniform[iq]*x3
-                            +pointer->psi_uniform[iq+3]*x0)
-                        + x03*(pointer->psi_uniform[iq+1]*x2
-                        -pointer->psi_uniform[iq+2]*x1);
-
-                        dtmp = x12*(pointer->dpsi_uniform[iq]*x3
-                        +pointer->dpsi_uniform[iq+3]*x0)
-                        + x03*(pointer->dpsi_uniform[iq+1]*x2
-                        -pointer->dpsi_uniform[iq+2]*x1);
-
-                        //dtmp = x12*(pointer->psi_uniform[iq]*x3
-                        //+pointer->psi_uniform[iq+3]*x0)
-                        //+ x03*(pointer->psi_uniform[iq+1]*x2
-                        //-pointer->psi_uniform[iq+2]*x1);
-                    }
-                }// new l is used.
-
-                int ll = atom->iw2l[iw];
-                int idx_lm = atom->iw2_ylm[iw];
-                //special case for distance[id] -> 0
-                //Problems Remained
-                //You have to add this two lines
-                double rr = distance[ib][id];
-
-				if (rr < 1e-9)
-                {
-                    if (ll == 0)
-                    {
-                        psir_ylm[ib][id][iw] = tmp * rly[idx_lm];
-                        dphi_x[ib][id][iw] = dphi_y[ib][id][iw] = dphi_z[ib][id][iw] = 0.0;
-                    }
-                    else
-                    {
-                        pointer = &ORB.Phi[it].
-                            PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
-
-                        double Zty = pointer->zty;
-                        psir_ylm[ib][id][iw] = Zty * rly[idx_lm];
-                        dphi_x[ib][id][iw] = Zty * grly[idx_lm][0];
-                        dphi_y[ib][id][iw] = Zty * grly[idx_lm][1];
-                        dphi_z[ib][id][iw] = Zty * grly[idx_lm][2];
-                    }
-                }
-                else
-                {
-                    double rl;
-                    if(ll==0)
-                    {
-                        rl = 1.0;
-                    }
-                    else if(ll==1)
-                    {
-                        rl = rr;
-                    }
-                    else
-                    {
-                        rl = pow(rr, ll);
-                    }
-
-                    psir_ylm[ib][id][iw] = tmp * rly[idx_lm] / rl;
-                    double tmpdphi_rly = (dtmp  - tmp * ll / rr) / rl * rly[idx_lm] / rr;
-                    double tmprl = tmp/rl;
-                    dphi_x[ib][id][iw] = tmpdphi_rly * dr[ib][id][0]  + tmprl * grly[idx_lm][0];
-                    dphi_y[ib][id][iw] = tmpdphi_rly * dr[ib][id][1]  + tmprl * grly[idx_lm][1];
-                    dphi_z[ib][id][iw] = tmpdphi_rly * dr[ib][id][2]  + tmprl * grly[idx_lm][2];
-                }
-            }
-        }//end ib
-    }// int id
-    return;
-}
 
 void Gint_k::allocate_pvpR_tr(void)
 {

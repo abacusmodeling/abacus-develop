@@ -22,6 +22,7 @@ public:
 	T z;
 	
 	Vector3(const T &x1 = 0,const T &y1 = 0,const T &z1 = 0) :x(x1),y(y1),z(z1){};
+	Vector3(const Vector3<T> &v) :x(v.x),y(v.y),z(v.z){};		// Peize Lin add 2018-07-16
 	void set(const T &x1, const T &y1,const T &z1) { x = x1; y = y1; z = z1; }
 
 	Vector3<T>& operator =(const Vector3<T> &u) { x=u.x; y=u.y; z=u.z;     return *this; }
@@ -35,8 +36,8 @@ public:
 
 	T norm2(void) const	{ return x*x + y*y + z*z; }
 	T norm(void) const	{ return sqrt(norm2()); }
-	void normalize(void){ const T m=norm(); x/=m; y/=m; z/=m; }
-	void reverse(void)	{ x=-x; y=-y; z=-z; }
+	Vector3<T>& normalize(void){ const T m=norm(); x/=m; y/=m; z/=m; return *this; }	// Peize Lin update return 2019-09-08
+	Vector3<T>& reverse(void){ x=-x; y=-y; z=-z; return *this; }						// Peize Lin update return 2019-09-08
 
 	void print(void)const ;		// mohan add 2009-11-29
 };

@@ -1,36 +1,35 @@
 #include "global.h"
 #include "occupy.h"
-#include "algorithms.h"
-#include "mymath.h"
+#include "src_global/mymath.h"
 
 Occupy::Occupy(){}
 Occupy::~Occupy(){}
 
 //===========================================================
-// There are four smearing methods:
-// (1) not do anything, 
+// Four smearing methods:
+// (1) do nothing 
 // (2) gaussian_broadening method (need 'degauss' value).
 // (3) tetrahedron method
 // (4) fixed_occupations
 //===========================================================
 
 bool Occupy::use_gaussian_broadening = false;
-int Occupy::gaussian_type ;
+int Occupy::gaussian_type;
 double Occupy::gaussian_parameter;
 bool Occupy::use_tetrahedron_method = false;
 bool Occupy::fixed_occupations = false;
 
+
 void Occupy::calculate_weights(void)
 {
 	TITLE("Occupy","calculate_weights");
+
 	// for test
 //	cout << " gaussian_broadening = " << use_gaussian_broadening << endl;
 //	cout << " tetrahedron_method = " << use_tetrahedron_method << endl;
 //	cout << " fixed_occupations = " << fixed_occupations << endl; 
 
-	// mohan add 2011/09/30
-	//if(DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
-	if(KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+	if(KS_SOLVER=="selinv")
 	{
 		ofs_running << " Could not calculate occupation." << endl;
 		return;
@@ -62,7 +61,6 @@ void Occupy::calculate_weights(void)
     }
     else if (use_gaussian_broadening)
     {
-		// mohan add 2011-04-02
 		if (TWO_EFERMI)
 		{
 			double demet_up = 0.0;
@@ -81,7 +79,6 @@ void Occupy::calculate_weights(void)
                  wf.ekb, en.ef, en.demet, wf.wg, -1, kv.isk);
 
 		}
-                //cout << "en.demet = " <<en.demet << endl;
     }
     else if (fixed_occupations)
     {
@@ -100,7 +97,6 @@ void Occupy::calculate_weights(void)
 		}
     }
 	
-//	ofs_running << " Calculate some special energy." << endl;
     if (TWO_EFERMI==2)
     {
 		Parallel_Reduce::gather_max_double_all( en.ef_up );
@@ -131,19 +127,9 @@ void Occupy::calculate_weights(void)
 //		OUT(ofs_running,"Range  Energy (eV)", etop-ebotom * Ry_to_eV);
     }
 
-
-	/*
-	for(int ik=0; ik<kv.nks; ++ik)
-	{
-		ofs_running << " ik=" << ik+1 << endl;
-		for(int ib=0; ib<NBANDS; ++ib)
-		{
-			ofs_running << " weight=" << wf.wg(ik,ib) << endl;	
-		}
-	}
-	*/
 	return;
 }
+
 
 void Occupy::decision(const string &name,const string &smearing,const double &degauss)
 {
@@ -151,13 +137,6 @@ void Occupy::decision(const string &name,const string &smearing,const double &de
     use_gaussian_broadening = false;
     use_tetrahedron_method = false;
     fixed_occupations = false;
-
-//  OUT(ofs_running,"occupations",name);
-
-//	if( ( kvect::degauss != 0.0 ) && ( !tfixed_occ ) )
-//	{
-//		kvect::lgauss = true;
-//	}
 
     gaussian_type = 0;
     gaussian_parameter = degauss;
@@ -231,6 +210,7 @@ void Occupy::decision(const string &name,const string &smearing,const double &de
     return;
 }
 
+
 //=============================================================
 // calculates weights for semiconductors and insulators
 // (bands are either empty or filled)
@@ -261,12 +241,14 @@ void Occupy::iweights
 	int ib_min1 = ( ib_min - int(ib_min) == 0) ? int(ib_min) : int(ib_min) + 1;
 	
 	for(int ik=0; ik<nks && !conv; ik++)
+	{
 		for(int ib=0; ib<nband && !conv; ib++)
 		{
 			//cout << " ekb=" << ekb[ik][ib] << endl;
 			int count =0;
 			ef = ekb[ik][ib];
 			for(int ik1=0; ik1<nks; ik1++)
+			{
 				for(int ib1=0; ib1<nband; ib1++)
 				{
 					if( ekb[ik1][ib1] < ef || ekb[ik1][ib1] == ef )
@@ -274,17 +256,20 @@ void Occupy::iweights
 						count++;
 					}
 				}
+			}
 				
-			//cout<<"count = "<<count<<endl;
-			if( (NSPIN == 2 && count == ib_min1 * nks/2) || (NSPIN == 1 && count == ib_min1 * nks) || ((NSPIN == 4) && count == ib_min1 * nks))
+			if( (NSPIN == 2 && count == ib_min1 * nks/2) 
+				|| (NSPIN == 1 && count == ib_min1 * nks) 
+				|| ((NSPIN == 4) && count == ib_min1 * nks))
 			{
 				conv = true;
 			}
 		}
+	}
 		
-	//cout << " ef = " <<ef <<endl;
 	
 	for(int ik=0; ik<nks; ik++)
+	{
 		for(int ib=0; ib<nband; ib++)
 		{
 			if (ekb[ik][ib] < ef)
@@ -300,45 +285,15 @@ void Occupy::iweights
 				wg(ik,ib) = 0.0;
 			}
 		}
-	
-
-    /*ef = - 1.0e+20;
-    for (int ik = 0;ik < nks;ik ++)
-    {
-		// mohan add 2011-04-03
-		if(is!=-1 && is!=isk[ik]) continue;
-		
-		for (int ib = 0;ib < nband;ib++)
-		{
-                        cout << " ekb=" << ekb[ik][ib] << endl;
-                        if ( ib < ib_min - 1 || ib == ib_min - 1)
-                        {
-                                wg(ik,ib) = wk[ik];
-                                ef = std::max( ef, ekb[ik][ib] );
-                        }
-                        else if ( ib == ib_min - 0.5 )
-                        {
-                                wg(ik,ib) = wk[ik]/2;
-                                ef = std::max( ef, ekb[ik][ib] );
-
-                        }
-                        else
-                        {
-                                wg(ik,ib) = 0.0;
-                                //cout << "\n nelec" << nelec << " ib = " << ib << " ib_min = " << ib_min;
-                        }                                                          
-
-		}
-	}*/
+	}
 
     if(conv == false && en.iter == 2)
     {
-       WARNING_QUIT("Occupied","Fixed occupation is not comfortable here, please change the parameter 'smearing' to gauss or any others !");
+       WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
     }
 
     return;
 }// end subroutine iweights
-
 
 
 //==========================================================
@@ -365,13 +320,9 @@ void Occupy::gweights(
     // call efermig
     Occupy::efermig(ekb, NBANDS, nks, nelec, wk, degauss, ngauss, ef, is, isk);
     demet = 0.0;
-	//cout << "\n ngauss = " << ngauss << " degauss = " << degauss
-	//     << " ef = " << ef << endl;
 
     for (int ik = 0;ik < nks;ik++)
     {
-    //            cout << " isk" <<ik<<" = " <<isk[ik] <<endl;
-    //            cout << " is = " << is <<endl;
 		// mohan add 2011-04-03
 		if(is!=-1 && is!=isk[ik]) continue;
 
@@ -381,10 +332,7 @@ void Occupy::gweights(
 			// Calculate the gaussian weights
 			//================================
 			// call wgauss
-//			cout << " ekb=" << ekb[ik][ib] << " ef=" << ef << endl;
-//			cout << " wk = " << wk [ik] << endl;
-                        wg(ik, ib) = wk [ik] * Occupy::wgauss( (ef - ekb[ik][ib] )/ degauss, ngauss);
-  //                      cout << " wg = " <<wg(ik, ib) <<endl;
+			wg(ik, ib) = wk [ik] * Occupy::wgauss( (ef - ekb[ik][ib] )/ degauss, ngauss);
 
 			//====================================================================
 			// The correct form of the band energy is  \int e n(e) de   for e<ef
@@ -396,13 +344,10 @@ void Occupy::gweights(
 		}
 	}
 
-//	cout << "\n demet final =" << demet << endl;
-//	BLOCK_HERE("haha");
-
     return;
 } // end subroutine gweights
 
-// from eferming.f90
+
 void Occupy::efermig
 (
     double **ekb,
@@ -434,8 +379,6 @@ void Occupy::efermig
 		}
 	}
 	*/
-	
-
 
 	// the first 0 stands for the first k point.
     double elw = ekb[0][0];
@@ -447,9 +390,6 @@ void Occupy::efermig
         eup = std::max(eup, ekb[ik][nband-1]);
     }
 
-//	ofs_running << "\n eup in pool = " << eup;
-//	ofs_running << "\n elw in pool = " << elw;
-
     eup += 2 * degauss;
     elw -= 2 * degauss;
 
@@ -458,9 +398,6 @@ void Occupy::efermig
 	Parallel_Reduce::gather_max_double_all( eup );
 	Parallel_Reduce::gather_min_double_all( elw );
 
-//	ofs_running << "\n eup after reduce = " << eup;
-//	ofs_running << "\n elw after reduce = " << elw;
-
 #endif
     //=================
     //Bisection method
@@ -468,10 +405,6 @@ void Occupy::efermig
     // call sumkg
     const double sumkup = Occupy::sumkg(ekb, nband, nks, wk, degauss, ngauss, eup, is, isk);
     const double sumklw = Occupy::sumkg(ekb, nband, nks, wk, degauss, ngauss, elw, is, isk);
-
-	//cout << "\n nelec = " << nelec;
-	//cout << "\n sumkup = " << sumkup;
-	//cout << "\n sumklw = " << sumklw << endl;
 
     if ((sumkup - nelec) < -eps || (sumklw - nelec) > eps)
     {
@@ -496,11 +429,6 @@ void Occupy::efermig
         ef = (eup + elw) / 2.0;
         const double sumkmid = sumkg(ekb, nband, nks, wk, degauss, ngauss, ef, is, isk);
 
-// Test
-//		cout << setprecision(20);
-//		cout << " i=" << i << " sumkmid=" << sumkmid << " nelec=" << nelec << endl; 
-//		cout << setprecision(6);
-
         if (abs(sumkmid - nelec) < eps)
         {
             return;
@@ -516,6 +444,7 @@ void Occupy::efermig
     }
     return;
 } // end function efermig
+
 
 //===================================================================
 // This function computes the number of states under a given energy e
@@ -561,8 +490,6 @@ double Occupy::sumkg(
 } // end function sumkg
 
 
-
-// wgauss.f90
 double Occupy::wgauss(const double &x,const int n)
 {
 	//TITLE("Occupy","wgauss");
@@ -646,7 +573,6 @@ double Occupy::wgauss(const double &x,const int n)
 } // end function wgauss
 
 
-// from w1gauss.f90
 double Occupy::w1gauss(const double &x,const int n)
 {
     //========================================================================
@@ -745,16 +671,12 @@ double Occupy::w1gauss(const double &x,const int n)
         h0 =  2.00 * x * h1 - 2.00 * static_cast<double>(ni) * h0 ;
         ni++;
         h1 = 2.00 * x * h0 - 2.00 * static_cast<double>(ni) * h1 ;
-
-        //cout << " a = " <<a<<endl;
-        //cout << " wga = " <<wga<<endl;
-    //    cout << " w1 == "<<w1<<endl;
         w1 = w1 - a * ( 0.50 * h0 + static_cast<double>(ni) * h0m1 ) * hp ;
-    //    cout << " w1 == "<<w1<<endl;
     }
 
     return w1;
 } // end function w1gauss
+
 
 void Occupy::tweights(const int nks,const int nspin,const int nband,const double &nelec,
                       const int ntetra,const matrix &tetra, double **ekb, double &ef, matrix &wg)
@@ -912,6 +834,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
     }
     return;
 } // end subroutine tweights
+
 
 double Occupy::wsweight(const Vector3<double> &r, Vector3<double> *rws,const int nrws)
 {
@@ -1153,5 +1076,3 @@ void Occupy::piksort(const int n, double *a)
     }
     return;
 } //end subroutine piksort
-
-

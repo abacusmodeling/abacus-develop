@@ -12,6 +12,9 @@
 //===================================
 #include "tools.h"
 #include "charge_mixing.h"
+#include "src_ri/exx_abfs-dm.h"
+#include "src_ri/exx_abfs-parallel-communicate-hexx.h"
+
 class Charge_Pulay: public Charge_Mixing
 {
 	public:
@@ -26,10 +29,12 @@ class Charge_Pulay: public Charge_Mixing
 	const bool &get_new_e_iteration(){ return new_e_iteration; }
 	void set_new_e_iteration( const bool new_e_iteration_in );			
 
-	protected:
 
 	// mohan add 2010-07-16
 	bool new_e_iteration;
+
+	protected:
+
 	
 	// Pulay mixing method.
 	void Pulay_mixing();
@@ -60,7 +65,8 @@ class Charge_Pulay: public Charge_Mixing
 	// Sophisticated mixing method.
 	void Modified_Broyden_mixing();
 
-
+	friend class Exx_Abfs::DM;
+	friend class Exx_Abfs::Parallel::Communicate::Hexx;
 };
 
 #endif

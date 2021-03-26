@@ -23,7 +23,7 @@ public:
 	
 private:
 
-	const Coordinate &coordinate;
+	const Coordinate coordinate;
 	const vector<R_Type> &rab;
 	vector<R_Type> radial_2;	
 

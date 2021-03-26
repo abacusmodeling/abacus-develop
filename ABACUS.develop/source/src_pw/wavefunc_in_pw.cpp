@@ -310,26 +310,26 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 								{//atomic_wfc_so_mag
 									double alpha, gamma;
 									complex<double> fup,fdown;
-                              //int nc;
-                              //This routine creates two functions only in the case j=l+1/2 or exit in the other case  
+                              		//int nc;
+                              		//This routine creates two functions only in the case j=l+1/2 or exit in the other case  
 									if(fabs(j-L+0.5<1e-4)) continue;
 									delete[] chiaux;
 									chiaux = new double [npw];
-                              //Find the functions j= l- 1/2
+                              		//Find the functions j= l- 1/2
 									if(L==0) 
 									for(int ig=0;ig<npw;ig++){
 										chiaux[ig] = flq[ig];
 									}
 									else
 									{
-                                 /*for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
-                                 {
-                                    if((ucell.atoms[it].lchi[ib] == L)&&(fabs(ucell.atoms[it].jjj[ib]-L+0.5)<1e-4))
-                                    {
-                                       nc=ib;
-                                       break;
-                                    }
-                                 }*/
+										/*for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
+										{
+											if((ucell.atoms[it].lchi[ib] == L)&&(fabs(ucell.atoms[it].jjj[ib]-L+0.5)<1e-4))
+											{
+											nc=ib;
+											break;
+											}
+										}*/
 										for(int ig=0;ig<npw;ig++)
 										{//Average the two functions
 											chiaux[ig] =  L * 
@@ -340,94 +340,93 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 											chiaux[ig] *= 1/(2.0*L+1.0);
 										}
 									}
-                              //and construct the starting wavefunctions as in the noncollinear case.
-                              alpha = soc.angle1[it];
-                              gamma = -1 * soc.angle2[it] + 0.5 * PI;
+									//and construct the starting wavefunctions as in the noncollinear case.
+									alpha = soc.angle1[it];
+									gamma = -1 * soc.angle2[it] + 0.5 * PI;
 
-                              for(int m = 0;m<2*L+1;m++)
-                              {
-                                 const int lm = L*L +m;
-                                 if(iwall+2*L+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
-                                 for(int ig = 0;ig<npw;ig++)
-                                 {
-                                     aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
-                                 }
-                                 //rotate wfc as needed
-                                 //first rotation with angle alpha around (OX)
-                                 for(int ig = 0;ig<npw;ig++)
-                                 {
-                                     fup = cos(0.5 * alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
-                                     //build the orthogonal wfc
-                                     //first rotation with angle (alpha + PI) around (OX)
-                                     psi(iwall,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
-                                     psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
-                                     //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI))*aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
-                                     psi(iwall+2*L+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
-                                     psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
-                                 }
-                                 iwall++;
-                              }
-                              iwall += 2*L +1;
-                            }
-                        }
-                        else 
-                        {//atomic_wfc_nc
-                            double alpha, gamman;
-                            complex<double> fup, fdown;
-                            alpha = soc.angle1[it];
-                            gamman = -soc.angle2[it] + 0.5*PI;
-                            for(int m = 0;m<2*L+1;m++)
-                            {
-                                const int lm = L*L +m;
-                                if(iwall+2*L+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
-                                for(int ig = 0;ig<npw;ig++)
-                                {
-                                     aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
-                                }
-                                //rotate function
-                                //first, rotation with angle alpha around(OX)
-                                for(int ig = 0;ig<npw;ig++)
-                                {
-                                     fup = cos(0.5*alpha) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
-                                     //build the orthogonal wfc
-                                     //first rotation with angle(alpha+PI) around(OX)
-                                     psi(iwall,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
-                                     psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
-                                     //second rotation with angle gamma around(OZ)
-                                     fup = cos(0.5 * (alpha + PI)) * aux[ig];
-                                     fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
-                                     psi(iwall+2*L+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
-                                     psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
-                                }//end ig
-                                iwall++;
-                            }//end m
-                            iwall += 2*L+1;
-                        }//end if
-                    }//end is_N
-                    }//end if
+									for(int m = 0;m<2*L+1;m++)
+									{
+										const int lm = L*L +m;
+										if(iwall+2*L+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+										for(int ig = 0;ig<npw;ig++)
+										{
+											aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
+										}
+										//rotate wfc as needed
+										//first rotation with angle alpha around (OX)
+										for(int ig = 0;ig<npw;ig++)
+										{
+											fup = cos(0.5 * alpha) * aux[ig];
+											fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+											//build the orthogonal wfc
+											//first rotation with angle (alpha + PI) around (OX)
+											psi(iwall,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
+											psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
+											//second rotation with angle gamma around(OZ)
+											fup = cos(0.5 * (alpha + PI))*aux[ig];
+											fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
+											psi(iwall+2*L+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
+											psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
+										}
+										iwall++;
+									}
+									iwall += 2*L +1;
+								} // end else INPUT.starting_spin_angle || !DOMAG
+							} // end if ucell.atoms[it].has_so
+							else 
+							{//atomic_wfc_nc
+								double alpha, gamman;
+								complex<double> fup, fdown;
+								alpha = soc.angle1[it];
+								gamman = -soc.angle2[it] + 0.5*PI;
+								for(int m = 0;m<2*L+1;m++)
+								{
+									const int lm = L*L +m;
+									if(iwall+2*L+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+									for(int ig = 0;ig<npw;ig++)
+									{
+										aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
+									}
+									//rotate function
+									//first, rotation with angle alpha around(OX)
+									for(int ig = 0;ig<npw;ig++)
+									{
+										fup = cos(0.5*alpha) * aux[ig];
+										fdown = IMAG_UNIT * sin(0.5* alpha) * aux[ig];
+										//build the orthogonal wfc
+										//first rotation with angle(alpha+PI) around(OX)
+										psi(iwall,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
+										psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
+										//second rotation with angle gamma around(OZ)
+										fup = cos(0.5 * (alpha + PI)) * aux[ig];
+										fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
+										psi(iwall+2*L+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
+										psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
+									} // end ig
+									iwall++;
+								} // end m
+								iwall += 2*L+1;
+							} // end else ucell.atoms[it].has_so
+						} // end for is_N
+                    } // end if NONCOLIN
                     else{//LSDA and nomagnet case
-
-					for(int m=0; m<2*L+1; m++)
-					{
-						const int lm = L*L+m;
-						for(int ig=0; ig<npw; ig++)
+						for(int m=0; m<2*L+1; m++)
 						{
-							psi(iwall, ig) =
-							lphase * sk[ig] * ylm(lm, ig) * flq[ig];
-						}	
-						++iwall;
-					}
+							const int lm = L*L+m;
+							for(int ig=0; ig<npw; ig++)
+							{
+								psi(iwall, ig) =
+								lphase * sk[ig] * ylm(lm, ig) * flq[ig];
+							}	
+							++iwall;
+						}
 					}
 					++ic;
-				}
-			}
+				} // end for N
+			} // end for L
 			delete[] sk;
-		}
-	}
+		} // end for ia
+	} // end for it
 	assert(iwall == NLOCAL);
 	delete[] flq;
 	delete[] gk;
@@ -469,14 +468,14 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 				{
 					for(int ig=0; ig<npw; ig++)
 					{
-                                                if(gkq[ig].norm() * ucell.tpiba > ((NQX-4) * DQ) )
-                                                {
-                                                   flq[ig] = 0.0;
-                                                }
-                                                else
-                                                {
+						if(gkq[ig].norm() * ucell.tpiba > ((NQX-4) * DQ) )
+						{
+						   flq[ig] = 0.0;
+						}
+						else
+						{
 						   flq[ig] = Mathzone::Polynomial_Interpolation(table_local, it, ic, NQX, DQ, gkq[ig].norm() * ucell.tpiba );
-                                                }
+						}
 					}
 
 
@@ -625,17 +624,16 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
                     }//end is_N
                     }//end if
                     else{//LSDA and nomagnet case
-
-					for(int m=0; m<2*L+1; m++)
-					{
-						const int lm = L*L+m;
-						for(int ig=0; ig<npw; ig++)
+						for(int m=0; m<2*L+1; m++)
 						{
-							psi(iwall, ig) =
-							lphase * skq[ig] * ylm(lm, ig) * flq[ig];
-						}	
-						++iwall;
-					}
+							const int lm = L*L+m;
+							for(int ig=0; ig<npw; ig++)
+							{
+								psi(iwall, ig) =
+								lphase * skq[ig] * ylm(lm, ig) * flq[ig];
+							}	
+							++iwall;
+						}
 					}
 					++ic;
 				}

@@ -1,17 +1,6 @@
-// =============================================================================
-//                          C++ Header File
-// Project:         Wannier Basis O(N) Scaling Package
-// File:            electronsns.cpp
-// Principal Class:	electronsns
-// Author:          Lixin He,Mohan Chen
-// Comment:
-// Warning:
-// Start time:      2006
-// modified:   		mohan 2008-08-10 change electronsns to be base class of ions
-// =============================================================================
-
 #include "global.h"
 #include "threshold_elec.h"
+
 Threshold_Elec::Threshold_Elec() 
 { 
 	dr2 = 0.0; 
@@ -20,15 +9,16 @@ Threshold_Elec::Threshold_Elec()
 
 void Threshold_Elec::set_ethr(void) const
 {
+	TITLE("Threshold_Elec","set_ethr");
     //========================================================================
     // setup ethr see setup.f90 Page 5/14
     // setup ethr, the convergence threshold for eigenvalues
     // tr2: the convergence threshold for self-consistency (rho or potential);
     //========================================================================
 
-    //==================
-    // nscf calculation
-    //==================
+    //===================
+    // nscf calculations
+    //===================
     if (CALCULATION=="nscf")
     {
         if (ETHR == 0.0)
@@ -36,10 +26,10 @@ void Threshold_Elec::set_ethr(void) const
             ETHR = 0.1 * std::min(1.0e-2, DRHO2 / ucell.nelec);
         }
     }
-    //================
+    //=================
     // self consistent
-    //================
-    else if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
+    //=================
+    else if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="scf-sto")//qianrui 2021-2-20
     {
         if (ETHR == 0.0)
         {
@@ -84,8 +74,7 @@ void Threshold_Elec::update_ethr(const int &iter)
 		// mohan update 2012-03-26
 		// mohan update 2012-02-08
 		//----------------------------
-		//if(LINEAR_SCALING==1 && LOCAL_BASIS==4) xiaohui modify 2013-09-02
-		if(BASIS_TYPE=="lcao") //xiaohui add 2013-09-02
+		if(BASIS_TYPE=="lcao")
 		{
 			ETHR = std::min( ETHR, 0.01*dr2/ std::max(1.0, ucell.nelec));
 		}
@@ -102,24 +91,13 @@ void Threshold_Elec::update_ethr(const int &iter)
 
 void Threshold_Elec::iter_end(ofstream &ofs)
 {
-        //figure::picture(d_rho,pw.ncx,pw.ncy,pw.ncz);
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") print_eigenvalue(ofs);
-
-//      if (pot.tefield)
-//      {
-//          ofs << "\n electric field correction = "<< pot.etotefield << " ryd";
-//      }
-//      if(lda_plus_u)
-//      {
-//          ofs << "\n Hubbard energy            = "<< eth << " ryd";
-//      }
-//    if ( Occupy::gauss() )
-//    {
-//          ofs << " Correction of metals = "<< en.demet << " Rydberg" << endl;
-//    }
+	if(OUT_LEVEL != "m") 
+	{
+		print_eigenvalue(ofs);
+	}
     return;
 }
+
 
 void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 {
@@ -141,7 +119,11 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 	}
 
 
-	if(MY_RANK!=0) return;
+	if(MY_RANK!=0) 
+	{
+		return;
+	}
+
 	TITLE("Threshold_Elec","print_eigenvalue");
 
     ofs << "\n STATE ENERGY(eV) AND OCCUPATIONS.";
@@ -173,21 +155,21 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 
                 ofs << setprecision(6);
 
-            }
-        }       // Pengfei Li  added  14-9-9
-	else	
-	{
-             	ofs << " " << ik+1 << "/" << kv.nks << " kpoint (Cartesian) = " 
-		<< kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z 
-		<< " (" << kv.ngk[ik] << " pws)" << endl; 
+			}
+		}       // Pengfei Li  added  14-9-9
+		else	
+		{
+			ofs << " " << ik+1 << "/" << kv.nks << " kpoint (Cartesian) = " 
+				<< kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z 
+				<< " (" << kv.ngk[ik] << " pws)" << endl; 
 
-		ofs << setprecision(6);
-        }
+			ofs << setprecision(6);
+		}
+
 		//----------------------
 		// no energy to output
 		//----------------------
-		//if(DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
-		if(KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+		if(KS_SOLVER=="selinv")
 		{
 			ofs << " USING SELINV, NO BAND ENERGY IS AVAILABLE." << endl;
 		}
@@ -209,4 +191,3 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
     }//end ik
     return;
 }
-

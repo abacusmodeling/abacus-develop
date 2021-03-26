@@ -1,6 +1,7 @@
 #include "global.h"
 #include "klist.h"
 #include "../src_parallel/parallel_global.h"
+#include "symmetry.h"
 
 kvect::kvect()
 {	
@@ -64,25 +65,26 @@ void kvect::set(
 {
     TITLE("kvect", "set");
 
- ofs_running << "\n\n\n\n";
- ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
- ofs_running << " |                                                                    |" << endl;
- ofs_running << " | Setup K-points                                                     |" << endl;
- ofs_running << " | We setup the k-points according to input parameters.               |" << endl;
- ofs_running << " | The reduced k-points are set according to symmetry operations.     |" << endl;
- ofs_running << " | We treat the spin as another set of k-points.                      |" << endl;
- ofs_running << " |                                                                    |" << endl;
- ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
- ofs_running << "\n\n\n\n";
-		
-
+	ofs_running << "\n\n\n\n";
+	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+	ofs_running << " |                                                                    |" << endl;
+	ofs_running << " | Setup K-points                                                     |" << endl;
+	ofs_running << " | We setup the k-points according to input parameters.               |" << endl;
+	ofs_running << " | The reduced k-points are set according to symmetry operations.     |" << endl;
+	ofs_running << " | We treat the spin as another set of k-points.                      |" << endl;
+	ofs_running << " |                                                                    |" << endl;
+	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	ofs_running << "\n\n\n\n";
 
 	ofs_running << "\n SETUP K-POINTS" << endl;
 
 	// (1) set nspin, read kpoints.
 	this->nspin = nspin_in;
 	OUT(ofs_running,"nspin",nspin);
-	if(this->nspin==4) this->nspin = 1;//zhengdy-soc
+	if(this->nspin==4) 
+	{
+		this->nspin = 1;//zhengdy-soc
+	}
 		
 	bool read_succesfully = this->read_kpoints(k_file_name);
 #ifdef __MPI
@@ -94,7 +96,7 @@ void kvect::set(
 	}
 
     // (2)
-    if (SYMMETRY)
+	if(Symmetry::symm_flag)
     {
         this->ibz_kpoint(symm);
         this->update_use_ibz();
@@ -122,9 +124,8 @@ void kvect::set(
     // It's very important in parallel case,
     // firstly do the mpi_k() and then
     // do set_kup_and_kdw()
-#ifndef __EPM
 	Pkpoints.kinfo(nkstot);
-#endif
+
     this->mpi_k();//2008-4-29
 
     this->set_kup_and_kdw();
@@ -165,7 +166,6 @@ bool kvect::read_kpoints(const string &fn)
     if (MY_RANK != 0) return 1;
 
 	// mohan add 2010-09-04
-#ifdef __FP 
 	if(GAMMA_ONLY_LOCAL)
 	{
 		ofs_warning << " Auto generating k-points file: " << fn << endl;
@@ -176,7 +176,6 @@ bool kvect::read_kpoints(const string &fn)
 		ofs << "1 1 1 0 0 0" << endl;
 		ofs.close();
 	}
-#endif
 
     ifstream ifk(fn.c_str());
     if (!ifk) 
@@ -226,7 +225,9 @@ bool kvect::read_kpoints(const string &fn)
 
     this->k_kword = kword; //LiuXh add 20180619
 
-    if (nkstot > MAX_KPOINTS)
+	// mohan update 2021-02-22
+	int max_kpoints = 100000;
+    if (nkstot > 100000)
     {
 		ofs_warning << " nkstot > MAX_KPOINTS" << endl;
         return 0;
@@ -282,7 +283,7 @@ bool kvect::read_kpoints(const string &fn)
 		else if (kword == "Line_Cartesian" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(SYMMETRY)
+			if(Symmetry::symm_flag)
 			{
 				WARNING("kvect::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;
@@ -370,7 +371,7 @@ bool kvect::read_kpoints(const string &fn)
 		else if (kword == "Line_Direct" || kword == "L" || kword == "Line" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(SYMMETRY)
+			if(Symmetry::symm_flag)
 			{
 				WARNING("kvect::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;

@@ -39,7 +39,7 @@ public: // member functions
 	void print_tau(void)const;
 	void print_stru_file(const string &fn, const int &type=1)const; // mohan add 2011-03-22
 	void check_dtau(void);
-        void setup_cell_after_vc(const string &s_pseudopot_dir, const string &fn, ofstream &log); //LiuXh add 20180515
+    void setup_cell_after_vc(const string &s_pseudopot_dir, const string &fn, ofstream &log); //LiuXh add 20180515
 
 private: // member variables
 	bool set_atom_flag;//added on 2009-3-8 by mohan

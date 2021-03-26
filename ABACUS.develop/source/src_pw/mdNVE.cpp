@@ -127,7 +127,7 @@ void mdNVE::runNVE(int step1){
 		for(int i=0;i<3;i++)
 			press += stress_lcao(i,i)/3;
 		press += twiceKE/3/ucell.omega; //output virtual press = 2/3*Ek/V + sum(sigma[i][i])/3
-		double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8 ;
+		double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8 ;
 		cout<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<endl;
 	}
   

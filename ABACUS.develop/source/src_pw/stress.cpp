@@ -2,41 +2,52 @@
 #include "global.h"
 #include "potential.h"
 #include "xc_functional.h"
-#include "gga_pw.h"
+#include "xc_gga_pw.h"
 #include "efield.h"
+#include "myfunc.h"
+#include "symmetry.h"
+// new
+#include "H_Ewald_pw.h"
+#include "H_Hartree_pw.h"
+#include "H_XC_pw.h"
 
 void Stress::cal_stress()
 {
-    TITLE("Stress","cal_stress");
-        timer::tick("Stress","cal_stress",'E');    
-   
-    for(int i=0;i<3;i++){
-       for(int j=0;j<3;j++){
-          sigmatot[i][j] = 0.0;
-          sigmaxc[i][j] = 0.0;
-          sigmahar[i][j] = 0.0;
-          sigmakin[i][j] = 0.0;
-          sigmaloc[i][j] = 0.0;
-          sigmanlc[i][j] = 0.0;
-          sigmaewa[i][j] = 0.0;
-          sigmaxcc[i][j] = 0.0;
-       }
-    }
-    //kinetic contribution
-    stres_knl();
-if(SYMMETRY)
-{
-    symm.stress_symmetry(sigmakin);
-}//end symmetry
-    //hartree contribution
-    stres_har();
+	TITLE("Stress","cal_stress");
+	timer::tick("Stress","cal_stress",'E');    
+
+	for(int i=0;i<3;i++)
+	{
+		for(int j=0;j<3;j++)
+		{
+			sigmatot[i][j] = 0.0;
+			sigmaxc[i][j] = 0.0;
+			sigmahar[i][j] = 0.0;
+			sigmakin[i][j] = 0.0;
+			sigmaloc[i][j] = 0.0;
+			sigmanlc[i][j] = 0.0;
+			sigmaewa[i][j] = 0.0;
+			sigmaxcc[i][j] = 0.0;
+		}
+	}
+	//kinetic contribution
+	stres_knl();
+
+	if(Symmetry::symm_flag)
+	{
+		symm.stress_symmetry(sigmakin);
+	}//end symmetry
+
+	//hartree contribution
+	stres_har();
 
     //ewald contribution
     stres_ewa();
 
     //xc contribution: add gradient corrections(non diagonal)
-    for(int i=0;i<3;i++){
-       sigmaxc[i][i] = - (en.etxc-en.vtxc) / ucell.omega;
+    for(int i=0;i<3;i++)
+	{
+       sigmaxc[i][i] = - (H_XC_pw::etxc - H_XC_pw::vtxc) / ucell.omega;
     }
     stres_gradcorr();
 
@@ -47,24 +58,28 @@ if(SYMMETRY)
     stres_cc();
    
     //nonlocal
-    stres_nl();
-if(SYMMETRY)
-{
-    symm.stress_symmetry(sigmanlc);
-}//end symmetry
+	stres_nl();
 
-    for(int ipol=0;ipol<3;ipol++){
-        for(int jpol=0;jpol<3;jpol++){
+	if(Symmetry::symm_flag)
+	{
+		symm.stress_symmetry(sigmanlc);
+	}//end symmetry
+
+    for(int ipol=0;ipol<3;ipol++)
+	{
+        for(int jpol=0;jpol<3;jpol++)
+		{
             sigmatot[ipol][jpol] = sigmakin[ipol][jpol] + sigmahar[ipol][jpol] + sigmanlc[ipol][jpol] 
                                  + sigmaxc[ipol][jpol] + sigmaxcc[ipol][jpol] + sigmaewa[ipol][jpol]
                                  + sigmaloc[ipol][jpol];
         }
     }
     
-if(SYMMETRY)                          
-{
-    symm.stress_symmetry(sigmatot);
-}
+	if(Symmetry::symm_flag)
+	{
+		symm.stress_symmetry(sigmatot);
+	}
+
 /*    cout<<"total stress:"<<endl;
     for(int ipol=0;ipol<3;ipol++){
        for(int jpol=0;jpol<3;jpol++){
@@ -73,78 +88,78 @@ if(SYMMETRY)
        cout<< endl;
     }
   */ 
-        bool ry = false;
-        this->printstress_total(ry);
- 
-        if(TEST_STRESS) 
-        {               
-                ofs_running << "\n PARTS OF STRESS: " << endl;
-                ofs_running << setiosflags(ios::showpos);
-                ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
-                this->print_stress("KINETIC    STRESS",sigmakin,TEST_STRESS,ry);
-                this->print_stress("LOCAL    STRESS",sigmaloc,TEST_STRESS,ry);
-                this->print_stress("HARTREE    STRESS",sigmahar,TEST_STRESS,ry);
-                this->print_stress("NON-LOCAL    STRESS",sigmanlc,TEST_STRESS,ry);
-                this->print_stress("XC    STRESS",sigmaxc,TEST_STRESS,ry);
-                this->print_stress("EWALD    STRESS",sigmaewa,TEST_STRESS,ry);
-                this->print_stress("NLCC    STRESS",sigmaxcc,TEST_STRESS,ry);
-                this->print_stress("TOTAL    STRESS",sigmatot,TEST_STRESS,ry);
-        }
-    return;
+	bool ry = false;
+	this->printstress_total(ry);
+
+	if(TEST_STRESS) 
+	{               
+		ofs_running << "\n PARTS OF STRESS: " << endl;
+		ofs_running << setiosflags(ios::showpos);
+		ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
+		this->print_stress("KINETIC    STRESS",sigmakin,TEST_STRESS,ry);
+		this->print_stress("LOCAL    STRESS",sigmaloc,TEST_STRESS,ry);
+		this->print_stress("HARTREE    STRESS",sigmahar,TEST_STRESS,ry);
+		this->print_stress("NON-LOCAL    STRESS",sigmanlc,TEST_STRESS,ry);
+		this->print_stress("XC    STRESS",sigmaxc,TEST_STRESS,ry);
+		this->print_stress("EWALD    STRESS",sigmaewa,TEST_STRESS,ry);
+		this->print_stress("NLCC    STRESS",sigmaxcc,TEST_STRESS,ry);
+		this->print_stress("TOTAL    STRESS",sigmatot,TEST_STRESS,ry);
+	}
+	return;
     
 }
 
 
 void Stress::print_stress(const string &name, double f[][3], const bool screen, bool ry)const
 {
-        ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
+	ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
 
 
-        double fac = 1.0;
+	double fac = 1.0;
 
-        if(!ry)
-        {
-         //     fac = Ry_to_eV / 0.529177;
-        }
+	if(!ry)
+	{
+		//     fac = Ry_to_eV / 0.529177;
+	}
 
-        cout << setprecision(8);
-        cout << setiosflags(ios::showpos);
+	cout << setprecision(8);
+	cout << setiosflags(ios::showpos);
 
-        if(screen)
-        {
-                cout << " ------------------- " << name << " --------------------" << endl;
+	if(screen)
+	{
+		cout << " ------------------- " << name << " --------------------" << endl;
 
-        }
+	}
 
-        const double output_acc = 1.0e-8;
-        for (int i=0;i<3;i++){
-                        ofs_running << setw(15)<< " ";
-                        if( abs(f[i][0]) >output_acc) ofs_running << setw(15) << f[i][0]*fac;
-                        else ofs_running << setw(15) << "0";
-                        if( abs(f[i][1]) >output_acc) ofs_running << setw(15) << f[i][1]*fac;
-                        else ofs_running << setw(15) << "0";
-                        if( abs(f[i][2]) >output_acc) ofs_running << setw(15) << f[i][2]*fac;
-                        else ofs_running << setw(15) << "0";
-                        ofs_running << endl;
+	const double output_acc = 1.0e-8;
+	for (int i=0;i<3;i++)
+	{
+		ofs_running << setw(15)<< " ";
+		if( abs(f[i][0]) >output_acc) ofs_running << setw(15) << f[i][0]*fac;
+		else ofs_running << setw(15) << "0";
+		if( abs(f[i][1]) >output_acc) ofs_running << setw(15) << f[i][1]*fac;
+		else ofs_running << setw(15) << "0";
+		if( abs(f[i][2]) >output_acc) ofs_running << setw(15) << f[i][2]*fac;
+		else ofs_running << setw(15) << "0";
+		ofs_running << endl;
 
-                        if(screen)
-                        {
-                                if( abs(f[i][0]) >output_acc) cout << setw(15) << f[i][0]*fac;
-                                else cout << setw(15) << "0";
-                                if( abs(f[i][1]) >output_acc) cout << setw(15) << f[i][1]*fac;
-                                else cout << setw(15) << "0";
-                                if( abs(f[i][2]) >output_acc) cout << setw(15) << f[i][2]*fac;
-                                else cout << setw(15) << "0";
-                                cout << endl;
-                        }
-
-
-        }
+		if(screen)
+		{
+			if( abs(f[i][0]) >output_acc) cout << setw(15) << f[i][0]*fac;
+			else cout << setw(15) << "0";
+			if( abs(f[i][1]) >output_acc) cout << setw(15) << f[i][1]*fac;
+			else cout << setw(15) << "0";
+			if( abs(f[i][2]) >output_acc) cout << setw(15) << f[i][2]*fac;
+			else cout << setw(15) << "0";
+			cout << endl;
+		}
 
 
-        cout << resetiosflags(ios::showpos);
+	}
 
-    return;
+	cout << resetiosflags(ios::showpos);
+
+	return;
 }
 
 void Stress::printstress_total (bool ry)
@@ -154,12 +169,12 @@ void Stress::printstress_total (bool ry)
 
 	if(!ry)
 	{
-		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * eps8;
+		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 	}
-//      cout.setf(ios::fixed);
+	//  cout.setf(ios::fixed);
 
 
-        //ofs_running << setiosflags(ios::right);
+	//ofs_running << setiosflags(ios::right);
 	ofs_running << setprecision(8) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
 	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
 
@@ -176,7 +191,9 @@ void Stress::printstress_total (bool ry)
 
 		for(int i=0; i<3; i++)
 		{
-			ofs << "   " << sigmatot[i][0]*unit_transform << "   " << sigmatot[i][1]*unit_transform << "   " << sigmatot[i][2]*unit_transform << endl;
+			ofs << "   " << sigmatot[i][0]*unit_transform 
+			<< "   " << sigmatot[i][1]*unit_transform 
+			<< "   " << sigmatot[i][2]*unit_transform << endl;
 		}
 
 		ofs.close();
@@ -209,8 +226,10 @@ void Stress::printstress_total (bool ry)
 }
 
 
-void Stress::stres_knl()
+void Stress::stres_knl(void)
 {
+	TITLE("Stress","stres_nkl");
+
     double *kfac;
     double **gk;
     gk=new double* [3];
@@ -218,19 +237,18 @@ void Stress::stres_knl()
     int ik,l,m,i,j,ibnd,is;
     int npw;
     
-
     tbsp=2.0/sqrt(PI);
     
     int npwx=0;
     int qtot = 0;
-    for(int ik=0; ik<kv.nks; ik++)
-    {
-            for(int ig=0; ig<kv.ngk[ik]; ig++)
-            {
-                    qtot += kv.ngk[ik];
-            }
-            if(npwx<kv.ngk[ik])npwx=kv.ngk[ik];
-    }
+	for(int ik=0; ik<kv.nks; ik++)
+	{
+		for(int ig=0; ig<kv.ngk[ik]; ig++)
+		{
+			qtot += kv.ngk[ik];
+		}
+		if(npwx<kv.ngk[ik])npwx=kv.ngk[ik];
+	}
     
     kfac=new double[npwx];
     gk[0]= new double[npwx]; 
@@ -266,20 +284,32 @@ void Stress::stres_knl()
 
        //kinetic contribution
 
-       for(l=0;l<3;l++){
-          for(m=0;m<l+1;m++){
-             for(ibnd=0;ibnd<NBANDS;ibnd++){
-                for(i=0;i<npw;i++){
-                   if(0){
-                      sigmakin[l][m]=sigmakin[l][m]+wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]*(double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i)).real())+double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i+npwx)).real()));
-                   }
-                   else{
-                      sigmakin[l][m]=sigmakin[l][m] +  wf.wg(ik, ibnd) *gk[l][i]*gk[m][i]*kfac[i]*(double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i)).real()));
-                   }
-                }
-              }
-          }
-       }
+	   for(l=0;l<3;l++)
+	   {
+		   for(m=0;m<l+1;m++)
+		   {
+			   for(ibnd=0;ibnd<NBANDS;ibnd++)
+			   {
+				   for(i=0;i<npw;i++)
+				   {
+					   if(0)
+					   {
+						   sigmakin[l][m]=sigmakin[l][m]+
+							   wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+							   *(double((conj(wf.evc[ik](ibnd, i))
+											   *wf.evc[ik](ibnd, i)).real())+
+									   double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i+npwx)).real()));
+					   }
+					   else
+					   {
+						   sigmakin[l][m]=sigmakin[l][m]+
+							   wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+							   *(double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i)).real()));
+					   }
+				   }
+			   }
+		   }
+	   }
        
        //contribution from the nonlocal part
        
@@ -292,30 +322,42 @@ void Stress::stres_knl()
     
     //mp_cast
     
-    for(l=0;l<3;l++){
-       for(m=0;m<l;m++){
-          sigmakin[m][l]=sigmakin[l][m];
-       }
-    }
-    if(INPUT.gamma_only){
-       for(l=0;l<3;l++){
-          for(m=0;m<3;m++){
-             sigmakin[l][m]=2.0*e2/ucell.omega*sigmakin[l][m];
-          }
-       }
-    }
-    else {
-       for(l=0;l<3;l++){
-          for(m=0;m<3;m++){
-             sigmakin[l][m]=e2/ucell.omega*sigmakin[l][m];
-          }
-       }
-    }
-for(l=0;l<3;l++){
-          for(m=0;m<3;m++){
-	     Parallel_Reduce::reduce_double_pool( sigmakin[l][m] );
-          }
-       }
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l;m++)
+		{
+			sigmakin[m][l]=sigmakin[l][m];
+		}
+	}
+
+	if(INPUT.gamma_only)
+	{
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<3;m++)
+			{
+				sigmakin[l][m]=2.0*e2/ucell.omega*sigmakin[l][m];
+			}
+		}
+	}
+	else 
+	{
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<3;m++)
+			{
+				sigmakin[l][m]=e2/ucell.omega*sigmakin[l][m];
+			}
+		}
+	}
+
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			Parallel_Reduce::reduce_double_pool( sigmakin[l][m] );
+		}
+	}
 
 //    cout<<"stres_knl"<<endl;
 //    for(l=0;l<3;l++){
@@ -335,6 +377,7 @@ for(l=0;l<3;l++){
     //symmetrize stress
     //symmatrix();
     //symmatrix();
+
     delete[] kfac;
     delete[] gk[0];
     delete[] gk[1];
@@ -346,264 +389,298 @@ for(l=0;l<3;l++){
 
 
 
-void Stress::stres_har(){
-     
-     double shart,g2;
-     const double eps=1e-8;
-     int is,ig,l,m,nspin0;
-    
-/*     for(l=0;l<3;l++){
-        for(m=0;m<3;m++){
-           sigmahar[l][m]=0.0;
-        }
-     }*/
-     
-                   
-     complex<double> *Porter = UFFT.porter;
+void Stress::stres_har(void)
+{
+	TITLE("Stress","stres_har");
 
-    //  Hartree potential VH(r) from n(r)
-    ZEROS( Porter, pw.nrxx );
-        for(int is=0; is<NSPIN; is++)
-        {
-        for (int ir=0; ir<pw.nrxx; ir++)
-                {
-                        Porter[ir] += complex<double>( chr.rho[is][ir], 0.0 );
-                }
-        }
-     //=============================
-    //  bring rho (aux) to G space
-    //=============================
-        pw.FFT_chg.FFT3D(Porter, -1);
-       
-        complex<double> *psic = new complex<double> [pw.nrxx];
-        double *psic0 = new double[pw.nrxx];
-        ZEROS( psic0, pw.nrxx);
-        for(int is=0; is<NSPIN; is++)
-        {
-            daxpy (pw.nrxx, 1.0, chr.rho[is],1,psic0,2 );
-            for (int ir=0; ir<pw.nrxx; ir++)
-            {
-                psic[ir] = complex<double>(psic0[ir], 0.0);
-            }
-        }
+	double shart,g2;
+	const double eps=1e-8;
+	int is,ig,l,m,nspin0;
 
-        pw.FFT_chg.FFT3D(psic, -1) ;
+	/*     for(l=0;l<3;l++){
+		   for(m=0;m<3;m++){
+		   sigmahar[l][m]=0.0;
+		   }
+		   }*/
+
+	complex<double> *Porter = UFFT.porter;
+
+	//  Hartree potential VH(r) from n(r)
+	ZEROS( Porter, pw.nrxx );
+	for(int is=0; is<NSPIN; is++)
+	{
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+		}
+	}
+	//=============================
+	//  bring rho (aux) to G space
+	//=============================
+	pw.FFT_chg.FFT3D(Porter, -1);
+
+	complex<double> *psic = new complex<double> [pw.nrxx];
+	double *psic0 = new double[pw.nrxx];
+	ZEROS( psic0, pw.nrxx);
+	for(int is=0; is<NSPIN; is++)
+	{
+		daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			psic[ir] = complex<double>(psic0[ir], 0.0);
+		}
+	}
+
+	pw.FFT_chg.FFT3D(psic, -1) ;
 
 
-        double charge;
-        if (pw.gstart == 1)
-        {
-                charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
-        }
+	double charge;
+	if (pw.gstart == 1)
+	{
+		charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
+	}
 
-        complex<double> *vh_g  = new complex<double>[pw.ngmc];
-        ZEROS(vh_g, pw.ngmc);
-            
-        double g[3];
-//test
-   //         int i=pw.gstart;
-   //         cout<< "gstart " <<pw.gstart<<endl;
-        double ehart=0;
-        for (int ig = pw.gstart; ig<pw.ngmc; ig++)
-        {
-            const int j = pw.ig2fftc[ig];
-            if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
-            {
-                const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+	complex<double> *vh_g  = new complex<double>[pw.ngmc];
+	ZEROS(vh_g, pw.ngmc);
 
-                ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-//              vh_g[ig] = fac * Porter[j];
-                shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
-                g[0]=pw.gcar[ig].x;
-                g[1]=pw.gcar[ig].y;
-                g[2]=pw.gcar[ig].z;
-                //test
-           
-                //cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
-                //cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
-                //cout<<"Porter "<<Porter[j]<<endl;
-                //cout<<"tpiba2 "<<ucell.tpiba2<<endl;
-            
-            
-                for(l=0;l<3;l++){
-                   for(m=0;m<l+1;m++){
-                      sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
-                   }
-                }
-            }
+	double g[3];
+	//test
+	//         int i=pw.gstart;
+	//         cout<< "gstart " <<pw.gstart<<endl;
+	double ehart=0;
+	for (int ig = pw.gstart; ig<pw.ngmc; ig++)
+	{
+		const int j = pw.ig2fftc[ig];
+		if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
+		{
+			const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
 
-        }
-        Parallel_Reduce::reduce_double_pool( ehart );
-        ehart *= 0.5 * ucell.omega;
-        //cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
-        for(l=0;l<3;l++){
-               for(m=0;m<l+1;m++){
-                  Parallel_Reduce::reduce_double_pool( sigmahar[l][m] );
-            }
-        }
+			ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+			// vh_g[ig] = fac * Porter[j];
 
-//        Parallel_Reduce::reduce_double_pool( ehart );
-//        ehart *= 0.5 * ucell.omega;
+			shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
 
-        //psic(:)=(0.0,0.0)
-/*        nspin0=NSPIN;
-        if(NSPIN==4)nspin0=1;
-        for(is=0;is<nspin0;is++){
-        daxpy();
-     }*/
-     
-     if(INPUT.gamma_only){
-        for(l=0;l<3;l++){
-           for(m=0;m<3;m++){
-              sigmahar[l][m] *= e2 * FOUR_PI;
-           }
-        }
-     }
-     else{
-        for(l=0;l<3;l++){
-           for(m=0;m<3;m++){
-              sigmahar[l][m] *= 0.5 * e2 * FOUR_PI;
-           }
-        }
-     }
-     for(l=0;l<3;l++)
-        sigmahar[l][l] -= en.ehart /ucell.omega;
-     for(l=0;l<3;l++){
-        for(m=0;m<l;m++){
-           sigmahar[m][l]=sigmahar[l][m];
-        }
-     }
+			g[0]=pw.gcar[ig].x;
+			g[1]=pw.gcar[ig].y;
+			g[2]=pw.gcar[ig].z;
+			//test
 
-     for(l=0;l<3;l++){
-        for(m=0;m<3;m++){
-           sigmahar[l][m]*=-1;
-        }
-     }
-//     cout<<"stres_har"<<endl;
-     for(l=0;l<3;l++){
-        for(m=0;m<3;m++){
-  //         cout<<setprecision(3)<<setiosflags(ios::scientific)<<sigmahar[l][m]<<" ";
-        }
-    //    cout<<endl;
-     }
-     
-     delete[] vh_g;
+			//cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
+			//cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
+			//cout<<"Porter "<<Porter[j]<<endl;
+			//cout<<"tpiba2 "<<ucell.tpiba2<<endl;
+
+
+			for(l=0;l<3;l++)
+			{
+				for(m=0;m<l+1;m++)
+				{
+					sigmahar[l][m]=sigmahar[l][m]+shart *2*g[l]*g[m]/pw.gg[ig];
+				}
+			}
+		}
+
+	}
+	Parallel_Reduce::reduce_double_pool( ehart );
+
+	ehart *= 0.5 * ucell.omega;
+
+	//cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l+1;m++)
+		{
+			Parallel_Reduce::reduce_double_pool( sigmahar[l][m] );
+		}
+	}
+
+	//        Parallel_Reduce::reduce_double_pool( ehart );
+	//        ehart *= 0.5 * ucell.omega;
+
+	//psic(:)=(0.0,0.0)
+	/*        nspin0=NSPIN;
+			  if(NSPIN==4)nspin0=1;
+			  for(is=0;is<nspin0;is++){
+			  daxpy();
+			  }*/
+
+	if(INPUT.gamma_only)
+	{
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<3;m++)
+			{
+				sigmahar[l][m] *= e2 * FOUR_PI;
+			}
+		}
+	}
+	else
+	{
+		for(l=0;l<3;l++)
+		{
+			for(m=0;m<3;m++)
+			{
+				sigmahar[l][m] *= 0.5 * e2 * FOUR_PI;
+			}
+		}
+	}
+
+	for(l=0;l<3;l++)
+	{
+		sigmahar[l][l] -= H_Hartree_pw::hartree_energy /ucell.omega;
+	}
+
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<l;m++)
+		{
+			sigmahar[m][l]=sigmahar[l][m];
+		}
+	}
+
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			sigmahar[l][m]*=-1;
+		}
+	}
+
+	//     cout<<"stres_har"<<endl;
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			//         cout<<setprecision(3)<<setiosflags(ios::scientific)<<sigmahar[l][m]<<" ";
+		}
+		//    cout<<endl;
+	}
+
+	delete[] vh_g;
 	delete[] psic;
 	delete[] psic0;
-     return;
+	return;
 }
 
-void Stress::stres_loc()
+void Stress::stres_loc(void)
 {
-    
-    double *dvloc;
-    double evloc,fact;
-    int ng,nt,l,m,is;
+	TITLE("Stress","stres_loc");
 
-    dvloc = new double[pw.ngmc];
-    
-/*    for(l=0;l<3;l++){
-       for(m=0;m<3;m++){
-          sigmaloc[l][m]=0;
-       }
-    }*/
+	double *dvloc;
+	double evloc,fact;
+	int ng,nt,l,m,is;
+
+	dvloc = new double[pw.ngmc];
+
+	/*    for(l=0;l<3;l++){
+		  for(m=0;m<3;m++){
+		  sigmaloc[l][m]=0;
+		  }
+		  }*/
 
 
-     complex<double> *Porter = UFFT.porter;
-     
-     ZEROS( Porter, pw.nrxx );
-        for(int is=0; is<NSPIN; is++)
-        {
-        for (int ir=0; ir<pw.nrxx; ir++)
-                {
-                        Porter[ir] += complex<double>(chr.rho[is][ir], 0.0 );
-                }
-        }
-     pw.FFT_chg.FFT3D(Porter, -1);
-    
-/*        complex<double> *psic = new complex<double> [pw.nrxx];
-        double *psic0 = new double[pw.nrxx];
-        ZEROS( psic0, pw.nrxx);
-        for(int is=0; is<NSPIN; is++)
-        {
-            daxpy (pw.nrxx, 1.0, chr.rho[is],1,psic0,2 );
-            for (int ir=0; ir<pw.nrxx; ir++)
-            {
-                psic[ir] = complex<double>(psic0[ir], 0.0);
-            }
-        }
+	complex<double> *Porter = UFFT.porter;
 
-        pw.FFT_chg.FFT3D(psic, -1) ;
-  */  
+	ZEROS( Porter, pw.nrxx );
+	for(int is=0; is<NSPIN; is++)
+	{
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			Porter[ir] += complex<double>(CHR.rho[is][ir], 0.0 );
+		}
+	}
+	pw.FFT_chg.FFT3D(Porter, -1);
 
-    if(INPUT.gamma_only==1) fact=2.0;
-    else fact=1.0;
+	/*        complex<double> *psic = new complex<double> [pw.nrxx];
+			  double *psic0 = new double[pw.nrxx];
+			  ZEROS( psic0, pw.nrxx);
+			  for(int is=0; is<NSPIN; is++)
+			  {
+			  daxpy (pw.nrxx, 1.0, CHR.rho[is],1,psic0,2 );
+			  for (int ir=0; ir<pw.nrxx; ir++)
+			  {
+			  psic[ir] = complex<double>(psic0[ir], 0.0);
+			  }
+			  }
 
-    evloc=0.0;
-    double g[3]={0,0,0};
+			  pw.FFT_chg.FFT3D(psic, -1) ;
+	 */  
 
-    complex<double> *vg = new complex<double>[pw.ngmc];
-    ZEROS( vg, pw.ngmc );
-    for (int it=0; it<ucell.ntype; it++)
-    {
-        if (pw.gstart==1) evloc += ppcell.vloc(it, pw.ig2ngg[0]) * (pw.strucFac(it,0) * conj(Porter[pw.ig2fftc[0]])).real();
-        for (int ig=pw.gstart; ig<pw.ngmc; ig++)
-        {
-            const int j = pw.ig2fftc[ig];
-            evloc += ppcell.vloc(it, pw.ig2ngg[ig]) * (pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
-        }
-    }
-    for( nt = 0;nt< ucell.ntype; nt++){
-        const Atom* atom = &ucell.atoms[nt];
-        //mark by zhengdy for check
-       // if ( ppcell.vloc == NULL ){
-        if(0){
-        //
-        // special case: pseudopotential is coulomb 1/r potential
-        //
-        dvloc_coul (atom->zv, dvloc);
-        //
-        }
-        else{
-        //
-        // normal case: dvloc contains dV_loc(G)/dG
-        //
-        dvloc_of_g ( atom->msh, atom->rab, atom->r,
-          atom->vloc_at, atom->zv, dvloc);
-        //
-        }
-     
-        for( ng = 0;ng< pw.ngmc;ng++){
-            const int j = pw.ig2fftc[ng];
-            g[0]=pw.gcar[ng].x;
-            g[1]=pw.gcar[ng].y;
-            g[2]=pw.gcar[ng].z;
-            for (l = 0;l< 3;l++){
-               for (m = 0; m<l+1;m++){
-                  sigmaloc[l][m] = sigmaloc[l][m] +  ( conj( Porter[j] ) 
-                                   * pw.strucFac (nt, ng) ).real() * 2.0 * dvloc [ pw.ig2ngg[ng] ] 
-                                   * ucell.tpiba2 * g[l] * g[m] * fact;
-               }
-            }
-         }
-    }
+	if(INPUT.gamma_only==1) fact=2.0;
+	else fact=1.0;
 
-    for( l = 0;l< 3;l++){
-         sigmaloc [l][l] = sigmaloc [l][l] + evloc;
-         for (m = 0; m<l+1; m++)
-               sigmaloc [m][l] = sigmaloc [l][m];
-     }
+	evloc=0.0;
+	double g[3]={0,0,0};
 
-    for(l=0;l<3;l++){
-               for(m=0;m<3;m++){
-                  Parallel_Reduce::reduce_double_pool( sigmaloc[l][m] );
-               }
-    }
-  
-    //mp_sum(  sigmaloc, intra_bgrp_comm )
-    delete[] dvloc;
-    delete[] vg; 
-    return;
+	complex<double> *vg = new complex<double>[pw.ngmc];
+	ZEROS( vg, pw.ngmc );
+	for (int it=0; it<ucell.ntype; it++)
+	{
+		if (pw.gstart==1) 
+		{
+			evloc += ppcell.vloc(it, pw.ig2ngg[0]) * (pw.strucFac(it,0) * conj(Porter[pw.ig2fftc[0]])).real();
+		}
+		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+		{
+			const int j = pw.ig2fftc[ig];
+			evloc += ppcell.vloc(it, pw.ig2ngg[ig]) * (pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
+		}
+	}
+	for( nt = 0;nt< ucell.ntype; nt++)
+	{
+		const Atom* atom = &ucell.atoms[nt];
+		//mark by zhengdy for check
+		// if ( ppcell.vloc == NULL ){
+		if(0)
+		{
+			// special case: pseudopotential is coulomb 1/r potential
+			dvloc_coul (atom->zv, dvloc);
+		}
+		else{
+			// normal case: dvloc contains dV_loc(G)/dG
+			dvloc_of_g ( atom->msh, atom->rab, atom->r,
+					atom->vloc_at, atom->zv, dvloc);
+		}
+
+		for( ng = 0;ng< pw.ngmc;ng++)
+		{
+			const int j = pw.ig2fftc[ng];
+			g[0]=pw.gcar[ng].x;
+			g[1]=pw.gcar[ng].y;
+			g[2]=pw.gcar[ng].z;
+			for (l = 0;l< 3;l++)
+			{
+				for (m = 0; m<l+1;m++)
+				{
+					sigmaloc[l][m] = sigmaloc[l][m] +  ( conj( Porter[j] ) 
+							* pw.strucFac (nt, ng) ).real() * 2.0 * dvloc [ pw.ig2ngg[ng] ] 
+						* ucell.tpiba2 * g[l] * g[m] * fact;
+				}
+			}
+		}
+	}
+
+	for( l = 0;l< 3;l++)
+	{
+		sigmaloc [l][l] = sigmaloc [l][l] + evloc;
+		for (m = 0; m<l+1; m++)
+		{
+			sigmaloc [m][l] = sigmaloc [l][m];
+		}
+	}
+
+	for(l=0;l<3;l++)
+	{
+		for(m=0;m<3;m++)
+		{
+			Parallel_Reduce::reduce_double_pool( sigmaloc[l][m] );
+		}
+	}
+
+	//mp_sum(  sigmaloc, intra_bgrp_comm )
+	delete[] dvloc;
+	delete[] vg; 
+	return;
 }
     
 void Stress::dvloc_of_g (const int& msh,
@@ -734,394 +811,394 @@ void Stress::dvloc_coul (const double& zp,
        
 
 void Stress::stres_nl(){
-        TITLE("Stress","stres_nl");
-        timer::tick("Stress","stres_nl");
-        
-
-        const int nkb = ppcell.nkb;
-        if(nkb == 0) return; 
-
-        // dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-        ComplexMatrix dbecp( nkb, NBANDS);
-        ComplexMatrix becp( nkb, NBANDS);
-
-        // vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-        ComplexMatrix vkb1( nkb, wf.npwx );
-        ComplexMatrix vkb0[3];
-        for(int i=0;i<3;i++){
-           vkb0[i].create(nkb, wf.npwx);
-        }
-        ComplexMatrix vkb2( nkb, wf.npwx );
-        for (int ik = 0;ik < kv.nks;ik++)
-        {
-            for(int i=0;i<3;i++){
-                vkb0[i].zero_out();
-            }
-            vkb2.zero_out();      
-      
-            if (NSPIN==2) CURRENT_SPIN = kv.isk[ik];
-            wf.npw = kv.ngk[ik];
-            // generate vkb
-            if (ppcell.nkb > 0)
-            {
-                  ppcell.getvnl(ik);
-            }
-
-            // get becp according to wave functions and vkb
-            // important here ! becp must set zero!!
-            // vkb: Beta(nkb,npw)
-            // becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
-            becp.zero_out();
-            for (int ib=0; ib<NBANDS; ib++)
-            {
-                for (int i=0;i<nkb;i++)
-                {
-                    for (int ig=0; ig<wf.npw; ig++)
-                    {
-                        becp(i,ib) += wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
-                    }
-                }
-            }
-            Parallel_Reduce::reduce_complex_double_pool( becp.c, becp.size);
-
-            
-
-            for(int i=0;i<3;i++) {
-                     get_dvnl1(vkb0[i],ik,i);
-            }
-            
-            get_dvnl2(vkb2,ik);
-
-            Vector3<double> qvec;
-            double qvec0[3];
-            
-            for (int ipol = 0; ipol<3; ipol++)
-            {
-              for(int jpol = 0; jpol < ipol+1; jpol++)
-              {
-                dbecp.zero_out();    
-                vkb1.zero_out();
-                for (int i = 0;i < nkb;i++)
-                {
-                   
-                    for (int ig=0; ig<wf.npw; ig++)  
-                    {
-                          
-                        qvec = wf.get_1qvec_cartesian(ik,ig) ;
-                        qvec0[0] = qvec.x;
-                        qvec0[1] = qvec.y;
-                        qvec0[2] = qvec.z;
-
-                      
-                        vkb1(i, ig) += 0.5 * qvec0[ipol] * vkb0[jpol](i,ig)
-                                       + 0.5 * qvec0[jpol] * vkb0[ipol](i,ig) ;
-                    }//end ig
-                        
-                        
-                   /*     if (kpol==0)
-                        {
-                            for (int ig=0; ig<wf.npw; ig++)
-                            {
-                                qvec = wf.get_1qvec_cartesian(ik,ig);
-                                vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.x;
-                            }
-                        }
-                        if (kpol==1)
-                        {
-                            for (int ig=0; ig<wf.npw; ig++)
-                            {
-                                qvec = wf.get_1qvec_cartesian(ik,ig);
-                                vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.y;
-                            }
-                        }
-                        if (kpol==2)
-                        {
-                            for (int ig=0; ig<wf.npw; ig++)
-                            {
-                                qvec = wf.get_1qvec_cartesian(ik,ig);
-                                vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.z;
-                            }
-                        }*/
-                  
-                }//end nkb
- 
-
-                for (int ib=0; ib<NBANDS; ib++)
-                {
-                    for (int i=0; i<nkb; i++)
-                    {
-                        for (int ig=0; ig<wf.npw; ig++)
-                        {
-                            //first term
-                            dbecp(i,ib) = dbecp(i,ib) - 2.0 * wf.evc[ik](ib,ig) * conj( vkb1(i,ig) ) ;
-                            //second termi
-                            if(ipol == jpol)
-                                 dbecp(i,ib) += -1.0 * wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
-                            //third term
-                            qvec = wf.get_1qvec_cartesian(ik,ig);
-                            qvec0[0] = qvec.x;
-                            qvec0[1] = qvec.y;
-                            qvec0[2] = qvec.z;
-                            double qm1; 
-                            if(qvec.norm() > 1e-8) qm1 = 1.0 / qvec.norm();
-                            else qm1 = 0;
-                            dbecp(i,ib) +=  -2.0 * wf.evc[ik](ib,ig) * conj(vkb2(i,ig)) * qvec0[ipol] * qvec0[jpol] * qm1 * ucell.tpiba;
-                        }//end ig
-                    }//end i
-                }//end ib
+	TITLE("Stress","stres_nl");
+	timer::tick("Stress","stres_nl");
 
 
-//              don't need to reduce here, keep dbecp different in each processor,
-//              and at last sum up all the forces.
-//              Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
+	const int nkb = ppcell.nkb;
+	if(nkb == 0) return; 
 
-//              double *cf = new double[ucell.nat*3];
-//              ZEROS(cf, ucell.nat);
-            for (int ib=0; ib<NBANDS; ib++)
-            {
-                double fac = wf.wg(ik, ib) * 1.0;
-                int iat = 0;
-                int sum = 0;
-                for (int it=0; it<ucell.ntype; it++)
-                {
-                    const int Nprojs = ucell.atoms[it].nh;
-                    for (int ia=0; ia<ucell.atoms[it].na; ia++)
-                    {
-                        for (int ip=0; ip<Nprojs; ip++)
-                        {
-                            double ps = ppcell.deeq(CURRENT_SPIN, iat, ip, ip) ;
-                            const int inkb = sum + ip;
-                            //out<<"\n ps = "<<ps;
+	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
+	ComplexMatrix dbecp( nkb, NBANDS);
+	ComplexMatrix becp( nkb, NBANDS);
 
-                         
-                            const double dbb = ( conj( dbecp( inkb, ib) ) * becp( inkb, ib) ).real();
-                            sigmanlc[ipol][ jpol] -= ps * fac * dbb;
-                         
-                         }//end ip
-                         ++iat;        
-                         sum+=Nprojs;
-                    }//ia
-                } //end it
-            } //end band
+	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
+	ComplexMatrix vkb1( nkb, wf.npwx );
+	ComplexMatrix vkb0[3];
+	for(int i=0;i<3;i++){
+		vkb0[i].create(nkb, wf.npwx);
+	}
+	ComplexMatrix vkb2( nkb, wf.npwx );
+	for (int ik = 0;ik < kv.nks;ik++)
+	{
+		for(int i=0;i<3;i++){
+			vkb0[i].zero_out();
+		}
+		vkb2.zero_out();      
 
-           }//end jpol
-          }//end ipol
-        }// end ik
+		if (NSPIN==2) CURRENT_SPIN = kv.isk[ik];
+		wf.npw = kv.ngk[ik];
+		// generate vkb
+		if (ppcell.nkb > 0)
+		{
+			ppcell.getvnl(ik);
+		}
 
-        // sum up forcenl from all processors
-        for(int l=0;l<3;l++){
-               for(int m=0;m<3;m++){
-                  if(m>l) sigmanlc[l][m] = sigmanlc[m][l];
-                  Parallel_Reduce::reduce_double_pool( sigmanlc[l][m] );
-            }
-        }
+		// get becp according to wave functions and vkb
+		// important here ! becp must set zero!!
+		// vkb: Beta(nkb,npw)
+		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
+		becp.zero_out();
+		for (int ib=0; ib<NBANDS; ib++)
+		{
+			for (int i=0;i<nkb;i++)
+			{
+				for (int ig=0; ig<wf.npw; ig++)
+				{
+					becp(i,ib) += wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+				}
+			}
+		}
+		Parallel_Reduce::reduce_complex_double_pool( becp.c, becp.size);
 
-//        Parallel_Reduce::reduce_double_all(sigmanl.c, sigmanl.nr * sigmanl.nc);
-        
-//        cout<<"sigmanl:"<<endl;
-        for (int ipol = 0; ipol<3; ipol++)
-        {
-              for(int jpol = 0; jpol < 3; jpol++)
-              {
-                  sigmanlc[ipol][jpol] *= 1.0 / ucell.omega;
-  //                cout << sigmanl(ipol,jpol)<<" ";
-              }
-    //          cout<<endl;
-        }
 
-        //  this->print(ofs_running, "nonlocal stress", stresnl);
-        timer::tick("Stress","stres_nl");
-        return;
+
+		for(int i=0;i<3;i++) {
+			get_dvnl1(vkb0[i],ik,i);
+		}
+
+		get_dvnl2(vkb2,ik);
+
+		Vector3<double> qvec;
+		double qvec0[3];
+
+		for (int ipol = 0; ipol<3; ipol++)
+		{
+			for(int jpol = 0; jpol < ipol+1; jpol++)
+			{
+				dbecp.zero_out();    
+				vkb1.zero_out();
+				for (int i = 0;i < nkb;i++)
+				{
+
+					for (int ig=0; ig<wf.npw; ig++)  
+					{
+
+						qvec = wf.get_1qvec_cartesian(ik,ig) ;
+						qvec0[0] = qvec.x;
+						qvec0[1] = qvec.y;
+						qvec0[2] = qvec.z;
+
+
+						vkb1(i, ig) += 0.5 * qvec0[ipol] * vkb0[jpol](i,ig)
+							+ 0.5 * qvec0[jpol] * vkb0[ipol](i,ig) ;
+					}//end ig
+
+
+					/*     if (kpol==0)
+						   {
+						   for (int ig=0; ig<wf.npw; ig++)
+						   {
+						   qvec = wf.get_1qvec_cartesian(ik,ig);
+						   vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.x;
+						   }
+						   }
+						   if (kpol==1)
+						   {
+						   for (int ig=0; ig<wf.npw; ig++)
+						   {
+						   qvec = wf.get_1qvec_cartesian(ik,ig);
+						   vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.y;
+						   }
+						   }
+						   if (kpol==2)
+						   {
+						   for (int ig=0; ig<wf.npw; ig++)
+						   {
+						   qvec = wf.get_1qvec_cartesian(ik,ig);
+						   vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.z;
+						   }
+						   }*/
+
+				}//end nkb
+
+
+				for (int ib=0; ib<NBANDS; ib++)
+				{
+					for (int i=0; i<nkb; i++)
+					{
+						for (int ig=0; ig<wf.npw; ig++)
+						{
+							//first term
+							dbecp(i,ib) = dbecp(i,ib) - 2.0 * wf.evc[ik](ib,ig) * conj( vkb1(i,ig) ) ;
+							//second termi
+							if(ipol == jpol)
+								dbecp(i,ib) += -1.0 * wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+							//third term
+							qvec = wf.get_1qvec_cartesian(ik,ig);
+							qvec0[0] = qvec.x;
+							qvec0[1] = qvec.y;
+							qvec0[2] = qvec.z;
+							double qm1; 
+							if(qvec.norm() > 1e-8) qm1 = 1.0 / qvec.norm();
+							else qm1 = 0;
+							dbecp(i,ib) +=  -2.0 * wf.evc[ik](ib,ig) * conj(vkb2(i,ig)) * qvec0[ipol] * qvec0[jpol] * qm1 * ucell.tpiba;
+						}//end ig
+					}//end i
+				}//end ib
+
+
+				//              don't need to reduce here, keep dbecp different in each processor,
+				//              and at last sum up all the forces.
+				//              Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
+
+				//              double *cf = new double[ucell.nat*3];
+				//              ZEROS(cf, ucell.nat);
+				for (int ib=0; ib<NBANDS; ib++)
+				{
+					double fac = wf.wg(ik, ib) * 1.0;
+					int iat = 0;
+					int sum = 0;
+					for (int it=0; it<ucell.ntype; it++)
+					{
+						const int Nprojs = ucell.atoms[it].nh;
+						for (int ia=0; ia<ucell.atoms[it].na; ia++)
+						{
+							for (int ip=0; ip<Nprojs; ip++)
+							{
+								double ps = ppcell.deeq(CURRENT_SPIN, iat, ip, ip) ;
+								const int inkb = sum + ip;
+								//out<<"\n ps = "<<ps;
+
+
+								const double dbb = ( conj( dbecp( inkb, ib) ) * becp( inkb, ib) ).real();
+								sigmanlc[ipol][ jpol] -= ps * fac * dbb;
+
+							}//end ip
+							++iat;        
+							sum+=Nprojs;
+						}//ia
+					} //end it
+				} //end band
+
+			}//end jpol
+		}//end ipol
+	}// end ik
+
+	// sum up forcenl from all processors
+	for(int l=0;l<3;l++){
+		for(int m=0;m<3;m++){
+			if(m>l) sigmanlc[l][m] = sigmanlc[m][l];
+			Parallel_Reduce::reduce_double_pool( sigmanlc[l][m] );
+		}
+	}
+
+	//        Parallel_Reduce::reduce_double_all(sigmanl.c, sigmanl.nr * sigmanl.nc);
+
+	//        cout<<"sigmanl:"<<endl;
+	for (int ipol = 0; ipol<3; ipol++)
+	{
+		for(int jpol = 0; jpol < 3; jpol++)
+		{
+			sigmanlc[ipol][jpol] *= 1.0 / ucell.omega;
+			//                cout << sigmanl(ipol,jpol)<<" ";
+		}
+		//          cout<<endl;
+	}
+
+	//  this->print(ofs_running, "nonlocal stress", stresnl);
+	timer::tick("Stress","stres_nl");
+	return;
 }
  
 void Stress::get_dvnl1(
-               ComplexMatrix &vkb,
-               const int ik,
-               const int ipol)
+		ComplexMatrix &vkb,
+		const int ik,
+		const int ipol)
 {
-        if(test_pp) TITLE("Stress","get_dvnl1");
-//        timer::tick("Stress","get_dvnl1");
+	if(test_pp) TITLE("Stress","get_dvnl1");
+	//        timer::tick("Stress","get_dvnl1");
 
-        const int lmaxkb = ppcell.lmaxkb;
-        if(lmaxkb < 0)
-        {
-                return;
-        }
+	const int lmaxkb = ppcell.lmaxkb;
+	if(lmaxkb < 0)
+	{
+		return;
+	}
 
-        const int npw = kv.ngk[ik];
-        const int nhm = ppcell.nhm;
-        int ig, ia, nb, ih;
-        matrix vkb1(nhm, npw);
-        vkb1.zero_out();
-        double *vq = new double[npw];
-        const int x1= (lmaxkb + 1)*(lmaxkb + 1);
+	const int npw = kv.ngk[ik];
+	const int nhm = ppcell.nhm;
+	int ig, ia, nb, ih;
+	matrix vkb1(nhm, npw);
+	vkb1.zero_out();
+	double *vq = new double[npw];
+	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
-        matrix dylm(x1, npw);
-        Vector3<double> *gk = new Vector3<double>[npw];
-        for (ig = 0;ig < npw;ig++)
-        {
-                gk[ig] = wf.get_1qvec_cartesian(ik, ig);
-        }
-           
-        dylmr2(x1, npw, gk, dylm, ipol);
+	matrix dylm(x1, npw);
+	Vector3<double> *gk = new Vector3<double>[npw];
+	for (ig = 0;ig < npw;ig++)
+	{
+		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+	}
 
-        int jkb = 0;
-        for(int it = 0;it < ucell.ntype;it++)
-        {
-                if(test_pp>1) OUT("it",it);
-                // calculate beta in G-space using an interpolation table
-                const int nbeta = ucell.atoms[it].nbeta;
-                const int nh = ucell.atoms[it].nh;
+	dylmr2(x1, npw, gk, dylm, ipol);
 
-                if(test_pp>1) OUT("nbeta",nbeta);
+	int jkb = 0;
+	for(int it = 0;it < ucell.ntype;it++)
+	{
+		if(test_pp>1) OUT("it",it);
+		// calculate beta in G-space using an interpolation table
+		const int nbeta = ucell.atoms[it].nbeta;
+		const int nh = ucell.atoms[it].nh;
 
-                for (nb = 0;nb < nbeta;nb++)
-                {
-                        if(test_pp>1) OUT("ib",nb);
-                        for (ig = 0;ig < npw;ig++)
-                        {
-                                const double gnorm = gk[ig].norm() * ucell.tpiba;
+		if(test_pp>1) OUT("nbeta",nbeta);
 
-//                              cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
-//                              cout << "\n gk.norm = " << gnorm;
+		for (nb = 0;nb < nbeta;nb++)
+		{
+			if(test_pp>1) OUT("ib",nb);
+			for (ig = 0;ig < npw;ig++)
+			{
+				const double gnorm = gk[ig].norm() * ucell.tpiba;
 
-                                vq [ig] = Mathzone::Polynomial_Interpolation(
-                                                ppcell.tab, it, nb, NQX, DQ, gnorm );
+				//                              cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
+				//                              cout << "\n gk.norm = " << gnorm;
 
-                        } // enddo
+				vq [ig] = Mathzone::Polynomial_Interpolation(
+						ppcell.tab, it, nb, NQX, DQ, gnorm );
 
-                        // add spherical harmonic part
-                        for (ih = 0;ih < nh;ih++)
-                        {
-                                if (nb == ppcell.indv(it, ih))
-                                {
-                                        const int lm = static_cast<int>( ppcell.nhtolm(it, ih) );
-                                        for (ig = 0;ig < npw;ig++)
-                                        {
-                                                vkb1(ih, ig) = dylm(lm, ig) * vq [ig];
-                                        }
+			} // enddo
 
-                                }
+			// add spherical harmonic part
+			for (ih = 0;ih < nh;ih++)
+			{
+				if (nb == ppcell.indv(it, ih))
+				{
+					const int lm = static_cast<int>( ppcell.nhtolm(it, ih) );
+					for (ig = 0;ig < npw;ig++)
+					{
+						vkb1(ih, ig) = dylm(lm, ig) * vq [ig];
+					}
 
-                        } // end ih
+				}
 
-                } // end nbeta
+			} // end ih
 
-                // vkb1 contains all betas including angular part for type nt
-                // now add the structure factor and factor (-i)^l
-                for (ia=0; ia<ucell.atoms[it].na; ia++)
-                {
-                        complex<double> *sk = wf.get_sk(ik, it, ia);
-                        for (ih = 0;ih < nh;ih++)
-                        {
-                                complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?
-                                for (ig = 0;ig < npw;ig++)
-                                {
-                                        vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
-                                }
-                                ++jkb;
-                        } // end ih
-                        delete [] sk;
-                } // end ia
-        } // enddo
-        delete [] gk;
-        delete [] vq;
-        //timer::tick("Stress","get_dvnl1");
-        return;
+		} // end nbeta
+
+		// vkb1 contains all betas including angular part for type nt
+		// now add the structure factor and factor (-i)^l
+		for (ia=0; ia<ucell.atoms[it].na; ia++)
+		{
+			complex<double> *sk = wf.get_sk(ik, it, ia);
+			for (ih = 0;ih < nh;ih++)
+			{
+				complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?
+				for (ig = 0;ig < npw;ig++)
+				{
+					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
+				}
+				++jkb;
+			} // end ih
+			delete [] sk;
+		} // end ia
+	} // enddo
+	delete [] gk;
+	delete [] vq;
+	//timer::tick("Stress","get_dvnl1");
+	return;
 }//end get_dvnl1
 
-void Stress::get_dvnl2(ComplexMatrix &vkb,
-               const int ik)
+
+void Stress::get_dvnl2(
+	ComplexMatrix &vkb,
+	const int ik)
 {
-        if(test_pp) TITLE("Stress","get_dvnl2");
-        timer::tick("Stress","get_dvnl2");
+	if(test_pp) TITLE("Stress","get_dvnl2");
+	timer::tick("Stress","get_dvnl2");
 
-        const int lmaxkb = ppcell.lmaxkb;
-        if(lmaxkb < 0)
-        {
-                return;
-        }
+	const int lmaxkb = ppcell.lmaxkb;
+	if(lmaxkb < 0)
+	{
+		return;
+	}
 
-        const int npw = kv.ngk[ik];
-        const int nhm = ppcell.nhm;
-        int ig, ia, nb, ih;
-        matrix vkb1(nhm, npw);
-        double *vq = new double[npw];
-        const int x1= (lmaxkb + 1)*(lmaxkb + 1);
+	const int npw = kv.ngk[ik];
+	const int nhm = ppcell.nhm;
+	int ig, ia, nb, ih;
+	matrix vkb1(nhm, npw);
+	double *vq = new double[npw];
+	const int x1= (lmaxkb + 1)*(lmaxkb + 1);
 
-        matrix ylm(x1, npw);
-        Vector3<double> *gk = new Vector3<double>[npw];
-        for (ig = 0;ig < npw;ig++)
-        {
-                gk[ig] = wf.get_1qvec_cartesian(ik, ig);
-        }
-        Mathzone::Ylm_Real(x1, npw, gk, ylm);
+	matrix ylm(x1, npw);
+	Vector3<double> *gk = new Vector3<double>[npw];
+	for (ig = 0;ig < npw;ig++)
+	{
+		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+	}
+	Mathzone::Ylm_Real(x1, npw, gk, ylm);
 
-        int jkb = 0;
-        for(int it = 0;it < ucell.ntype;it++)
-        {
-                if(test_pp>1) OUT("it",it);
-                // calculate beta in G-space using an interpolation table
-                const int nbeta = ucell.atoms[it].nbeta;
-                const int nh = ucell.atoms[it].nh;
+	int jkb = 0;
+	for(int it = 0;it < ucell.ntype;it++)
+	{
+		if(test_pp>1) OUT("it",it);
+		// calculate beta in G-space using an interpolation table
+		const int nbeta = ucell.atoms[it].nbeta;
+		const int nh = ucell.atoms[it].nh;
 
-                if(test_pp>1) OUT("nbeta",nbeta);
+		if(test_pp>1) OUT("nbeta",nbeta);
 
-                for (nb = 0;nb < nbeta;nb++)
-                {
-                        if(test_pp>1) OUT("ib",nb);
-                        for (ig = 0;ig < npw;ig++)
-                        {
-                                const double gnorm = gk[ig].norm() * ucell.tpiba;
+		for (nb = 0;nb < nbeta;nb++)
+		{
+			if(test_pp>1) OUT("ib",nb);
+			for (ig = 0;ig < npw;ig++)
+			{
+				const double gnorm = gk[ig].norm() * ucell.tpiba;
 
-//                              cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
-//                              cout << "\n gk.norm = " << gnorm;
-                                vq [ig] = Polynomial_Interpolation_nl(
-                                                ppcell.tab, it, nb, DQ, gnorm );
+				//                              cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
+				//                              cout << "\n gk.norm = " << gnorm;
+				vq [ig] = Polynomial_Interpolation_nl(
+						ppcell.tab, it, nb, DQ, gnorm );
 
-                        } // enddo
+			} // enddo
 
-                        // add spherical harmonic part
-                        for (ih = 0;ih < nh;ih++)
-                        {
-                                if (nb == ppcell.indv(it, ih))
-                                {
-                                        const int lm = static_cast<int>( ppcell.nhtolm(it, ih) );
-                                        for (ig = 0;ig < npw;ig++)
-                                        {
-                                                vkb1(ih, ig) = ylm(lm, ig) * vq [ig];
-                                        }
-                                }
-                        } // end ih
-                } // end nbeta
+			// add spherical harmonic part
+			for (ih = 0;ih < nh;ih++)
+			{
+				if (nb == ppcell.indv(it, ih))
+				{
+					const int lm = static_cast<int>( ppcell.nhtolm(it, ih) );
+					for (ig = 0;ig < npw;ig++)
+					{
+						vkb1(ih, ig) = ylm(lm, ig) * vq [ig];
+					}
+				}
+			} // end ih
+		} // end nbeta
 
-                // vkb1 contains all betas including angular part for type nt
-                // now add the structure factor and factor (-i)^l
-                for (ia=0; ia<ucell.atoms[it].na; ia++)
-                {
-                        complex<double> *sk = wf.get_sk(ik, it, ia);
-                        for (ih = 0;ih < nh;ih++)
-                        {
-                                complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?
-                                for (ig = 0;ig < npw;ig++)
-                                {
-                                        vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
-                                }
-                                ++jkb;
-                        } // end ih
-                        delete [] sk;
+		// vkb1 contains all betas including angular part for type nt
+		// now add the structure factor and factor (-i)^l
+		for (ia=0; ia<ucell.atoms[it].na; ia++)
+		{
+			complex<double> *sk = wf.get_sk(ik, it, ia);
+			for (ih = 0;ih < nh;ih++)
+			{
+				complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?
+				for (ig = 0;ig < npw;ig++)
+				{
+					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
+				}
+				++jkb;
+			} // end ih
+			delete [] sk;
 
-                } // end ia
-        } // enddo
+		} // end ia
+	} // enddo
 
-        delete [] gk;
-        delete [] vq;
-        timer::tick("Stress","get_dvnl2");
+	delete [] gk;
+	delete [] vq;
+	timer::tick("Stress","get_dvnl2");
 
-        return;
+	return;
 }
-
-
 
 
 double Stress::Polynomial_Interpolation_nl
@@ -1289,7 +1366,8 @@ void Stress::stres_ewa(){
 
     double alpha=2.9;
     double upperbound;
-    do{
+    do
+	{
        alpha-=0.1;
        if(alpha==0.0)
           WARNING_QUIT("stres_ew", "optimal alpha not found");
@@ -1300,7 +1378,8 @@ void Stress::stres_ewa(){
     //G-space sum here
     //Determine if this processor contains G=0 and set the constant term 
     double sdewald; 
-    if(pw.gstart == 1){
+    if(pw.gstart == 1)
+	{
        sdewald = (TWO_PI) * e2 / 4.0 / alpha * pow(charge/ucell.omega,2);
     }
     else {
@@ -1370,7 +1449,7 @@ void Stress::stres_ewa(){
                //calculate tau[na]-tau[nb]
                d_tau = ucell.atoms[it].tau[i] - ucell.atoms[jt].tau[j];
                //generates nearest-neighbors shells 
-               en.rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
+               H_Ewald_pw::rgen(d_tau, rmax, irr, ucell.latvec, ucell.G, r, r2, nrm);
                for(int nr=0 ; nr<nrm ; nr++){
                 rr=sqrt(r2[nr]) * ucell.lat0;
                 fac = -e2/2.0/ucell.omega*pow(ucell.lat0,2)*ucell.atoms[it].zv * ucell.atoms[it].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (TWO_PI)) * exp(-alpha * pow(rr,2)));
@@ -1440,12 +1519,12 @@ void Stress::stres_gradcorr()
      const double fac = 1.0/ NSPIN;
 
      // doing FFT to get rho in G space: rhog1 
-     chr.set_rhog(chr.rho[0], chr.rhog[0]);
+     CHR.set_rhog(CHR.rho[0], CHR.rhog[0]);
      if(NSPIN==2)//mohan fix bug 2012-05-28
      {
-          chr.set_rhog(chr.rho[1], chr.rhog[1]);
+          CHR.set_rhog(CHR.rho[1], CHR.rhog[1]);
      }
-     chr.set_rhog(chr.rho_core, chr.rhog_core);
+     CHR.set_rhog(CHR.rho_core, CHR.rhog_core);
     
 	double* rhotmp1;
 	double* rhotmp2;
@@ -1458,8 +1537,8 @@ void Stress::stres_gradcorr()
      rhogsum1 = new complex<double>[pw.ngmc];
      ZEROS(rhotmp1, pw.nrxx);
      ZEROS(rhogsum1, pw.ngmc);
-     for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = chr.rho[0][ir] + fac * chr.rho_core[ir];
-     for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = chr.rhog[0][ig] + fac * chr.rhog_core[ig];
+     for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = CHR.rho[0][ir] + fac * CHR.rho_core[ir];
+     for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = CHR.rhog[0][ig] + fac * CHR.rhog_core[ig];
 	gdr1 = new Vector3<double>[pw.nrxx];
 	ZEROS(gdr1, pw.nrxx);
 
@@ -1471,8 +1550,8 @@ void Stress::stres_gradcorr()
                 rhogsum2 = new complex<double>[pw.ngmc];
                 ZEROS(rhotmp2, pw.nrxx);
                 ZEROS(rhogsum2, pw.ngmc);
-                for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] = chr.rho[1][ir] + fac * chr.rho_core[ir];
-                for(int ig=0; ig<pw.ngmc; ig++) rhogsum2[ig] = chr.rhog[1][ig] + fac * chr.rhog_core[ig];
+                for(int ir=0; ir<pw.nrxx; ir++) rhotmp2[ir] = CHR.rho[1][ir] + fac * CHR.rho_core[ir];
+                for(int ig=0; ig<pw.ngmc; ig++) rhogsum2[ig] = CHR.rhog[1][ig] + fac * CHR.rhog_core[ig];
 
                         gdr2 = new Vector3<double>[pw.nrxx];
                         ZEROS(gdr2, pw.nrxx);
@@ -1642,7 +1721,7 @@ void Stress::stres_cc()
            
     //recalculate the exchange-correlation potential
     matrix vxc(NSPIN, pw.nrxx);
-    pot.v_xc(chr.rho, en.etxc, en.vtxc, vxc);
+    H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core, vxc);
 
     complex<double> * psic = new complex<double> [pw.nrxx];
     ZEROS(psic, pw.nrxx);
@@ -1675,7 +1754,7 @@ void Stress::stres_cc()
     for(nt=0;nt<ucell.ntype;nt++){
         if(ucell.atoms[nt].nlcc){
         //drhoc();
-        chr.non_linear_core_correction(
+        CHR.non_linear_core_correction(
                 ppcell.numeric,
                 ucell.atoms[nt].msh,
                 ucell.atoms[nt].r,

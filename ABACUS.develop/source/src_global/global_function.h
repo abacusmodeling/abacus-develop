@@ -7,6 +7,7 @@
 #define GLOBAL_FUNCTION_H
 
 #include <vector>
+#include <valarray>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -17,7 +18,7 @@
 #include <cassert>
 
 #include "global_variable.h"
-//#include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
+#include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
 using namespace std;
 
@@ -183,7 +184,7 @@ void SCAN_END(ifstream &ifs, const string &TargetName);
 template<class T>
 static inline void DCOPY( const T &a, T &b, const int &dim)
 {
-    for (int i=0; i<dim; i++) b[i] = a[i];
+    for (int i=0; i<dim; ++i) b[i] = a[i];
 }
 
 void BLOCK_HERE( const string &description );
@@ -199,9 +200,19 @@ static inline T * VECTOR_TO_PTR( std::vector<T> & v )
 {
     return &(v[0]);
 }
+template<class T>
+static inline T * VECTOR_TO_PTR( std::valarray<T> & v )
+{
+    return &(v[0]);
+}
 
 template<class T>
 static inline const T * VECTOR_TO_PTR( const std::vector<T> & v )
+{
+    return &(v[0]);
+}
+template<class T>
+static inline const T * VECTOR_TO_PTR( const std::valarray<T> & v )
 {
     return &(v[0]);
 }
@@ -220,5 +231,54 @@ std::string TO_STRING ( const T &n )
 	newstr<<n;
 	return newstr.str();
 }
+
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : MAP_EXIST
+// find whether exists the map index
+// if exist return the ptr called, else return nullptr
+// example: map_exist(ms,i,j,k) -> try to find ms[i][j][k]
+// Peize Lin add 2018-07-16
+//==========================================================
+template< typename T_map, typename T_key1  >
+inline void* MAP_EXIST( T_map &ms, const T_key1 &key1 )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return static_cast<void*>(&ms1->second);
+}
+
+template< typename T_map, typename T_key1, typename... T_key_tail >
+inline void* MAP_EXIST( T_map &ms, const T_key1 &key1, const T_key_tail&... key_tail )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return MAP_EXIST( ms1->second, key_tail... );
+}
+
+template< typename T_map, typename T_key1  >
+inline const void* MAP_EXIST( const T_map &ms, const T_key1 &key1 )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return static_cast<const void*>(&ms1->second);
+}
+
+template< typename T_map, typename T_key1, typename... T_key_tail >
+inline const void* MAP_EXIST( const T_map &ms, const T_key1 &key1, const T_key_tail&... key_tail )
+{
+	auto ms1 = ms.find(key1);
+	if( ms1 == ms.end() )	return nullptr;
+	return MAP_EXIST( ms1->second, key_tail... );
+}
+
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : MemAvailable
+// read /proc/meminfo
+// unit: kB
+// Peize Lin add 2019-12-21
+//==========================================================
+size_t MemAvailable();
 
 #endif

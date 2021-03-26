@@ -29,7 +29,7 @@ class Grid_BigCell: public Grid_MeshCell
 
 
 	//---------------------------------
-	void init_grid_expansion(const bool vna);
+	void init_grid_expansion(void);
 
 	// get the max radius of all orbitals.
 	// which will use to generate grid expansion,

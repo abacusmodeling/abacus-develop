@@ -11,8 +11,7 @@
 
 using namespace std;
 #include "matrix.h"
-#include "src_global/lapack_connector.h"
-#include "src_global/global_function.h"
+#include "lapack_connector.h"
 
 //*********************************************************
 // The init() function is the main initialization routine.
@@ -385,7 +384,7 @@ double matrix::min() const
 // Peize Lin add 2018-07-02
 double matrix::absmax() const
 {
-	double value = std::numeric_limits<double>::min();
+	double value = 0;
 	const int size = nr * nc;
 	for( int i=0; i<size; ++i )
 		value = std::max( value, std::abs(c[i]) );

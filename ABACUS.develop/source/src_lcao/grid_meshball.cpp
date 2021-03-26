@@ -154,7 +154,6 @@ double Grid_MeshBall::deal_with_atom_spillage(const double *pos)
 }
 
 //LiuXh add 2018-12-14
-///*
 void Grid_MeshBall::delete_meshball_positions(void)
 {	
 	TITLE("Grid_MeshBall","delete_meshball_positions");
@@ -169,4 +168,3 @@ void Grid_MeshBall::delete_meshball_positions(void)
 	}
 	return;
 }
-//*/

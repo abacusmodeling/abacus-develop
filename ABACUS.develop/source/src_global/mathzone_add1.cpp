@@ -18,6 +18,7 @@ typedef fftw_complex FFTW_COMPLEX;
 //#include <unistd.h>
 //#include <fstream>
 //#include <string>
+#include <omp.h>
 
 bool Mathzone_Add1::flag_jlx_expand_coef = false;
 double** Mathzone_Add1::c_ln_c = nullptr;
@@ -1042,54 +1043,50 @@ void Mathzone_Add1::SplineD2 // modified by pengfei 13-8-8 add second derivative
 	timer::tick("Mathzone_Add1","SplineD2");
 }
 
-	
+// Peize Lin add openmp 2019-12-13	
 void Mathzone_Add1::Cubic_Spline_Interpolation
 (
- 	const double *rad,
-	const double *rad_f,
-	const double *y2,
+ 	const double * const rad,
+	const double * const rad_f,
+	const double * const y2,
 	const int& mesh,
-	const double* r,
+	const double * const r,
 	const int& rsize,
-	double* y,
-	double* dy
+	double * const y,
+	double * const dy
 )
 {	
 	timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");
-	
-	//begin interpolation
-	int k, klo, khi, m;
-	double h, b, a;
 
-	for(m = 0; m < rsize ; m++)
+	#pragma omp parallel for schedule(static)
+	for(int m = 0; m < rsize ; m++)
 	{
-		klo = 0;
-		khi = mesh-1;
-		
+		int klo = 0;
+		int khi = mesh-1;
 		while (khi - klo > 1)
 		{
-			k = (khi + klo) / 2 ;
+			const int k = (khi + klo) / 2 ;
 			if(rad[k] > r[m]) khi = k;
 			else klo = k;
 		}
                 
-                //if(klo==0 && khi==1)                    // extrapolation
-                //{ 
-                //        klo = 1;
-                //        khi = 2;
-                //}
+		//if(klo==0 && khi==1)                    // extrapolation
+		//{ 
+		//        klo = 1;
+		//        khi = 2;
+		//}
 
-		h = rad[khi] - rad[klo];
-		
+		const double h = rad[khi] - rad[klo];
 		if(h == 0.0) WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
-		a = (rad[khi] - r[m]) / h;
-		b = (r[m] - rad[klo]) / h;
+		const double a = (rad[khi] - r[m]) / h;
+		const double b = (r[m] - rad[klo]) / h;
 		
-		dy[m] = (rad_f[khi] - rad_f[klo]) / h - 
+		const double dy_tmp = (rad_f[khi] - rad_f[klo]) / h - 
 						(3.0 * a * a - 1.0) / 6.0 * h * y2[klo] + 
 										( 3.0 * b * b - 1.0) / 6.0 * h * y2[khi];
-		
-		y[m] = a * rad_f[klo] + b * rad_f[khi] + ((a*a*a - a) * y2[klo] + (b*b*b - b) * y2[khi]) * (h*h) / 6.0;
+		dy[m] = dy_tmp;
+		const double y_tmp = a * rad_f[klo] + b * rad_f[khi] + ((a*a*a - a) * y2[klo] + (b*b*b - b) * y2[khi]) * (h*h) / 6.0;
+		y[m] = y_tmp;
 	}
 
 	timer::tick("Mathzone_Add1","Cubic_Spline_Interpolation");

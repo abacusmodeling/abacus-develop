@@ -1,6 +1,4 @@
-/* pseudo_us.cpp */
-
-#include "../src_pw/output.h"
+#include "../src_io/output.h"
 #include "pseudo_us.h"
 
 pseudo_us::pseudo_us()

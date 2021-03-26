@@ -28,6 +28,7 @@ UnitCell::UnitCell()
     iat2it = nullptr;
     iat2ia = nullptr;
 	iwt2iat = nullptr;
+	iwt2iw = nullptr;
 
     itia2iat.create(1,1);
 	lc = new int[3];
@@ -47,14 +48,13 @@ UnitCell::UnitCell()
 
 UnitCell::~UnitCell()
 {
-#ifndef __EPM
     delete[] atom_label;
     delete[] atom_mass;
     delete[] pseudo_fn;
-#endif
     delete[] iat2it;
     delete[] iat2ia;
 	delete[] iwt2iat;
+	delete[] iwt2iw;
 	delete[] lc;
 }
 
@@ -113,9 +113,8 @@ void UnitCell::bcast_unitcell(void)
     Parallel_Common::bcast_double( latvec_supercell.e32 );
     Parallel_Common::bcast_double( latvec_supercell.e33 );
 
-#ifndef __EPM
     Parallel_Common::bcast_double( mag.start_magnetization, ntype );
-#endif
+
     if(NSPIN != 1)
     for(int it = 0;it<ntype;it++)
     {

@@ -67,8 +67,7 @@ class Grid_Technique : public Grid_MeshBall
 			const int &nbz_in,
 			const int &nbxx_in,
 			const int &nbzp_start_in,
-			const int &nbzp_in,
-			const bool vna = false);
+			const int &nbzp_in);
 
 	private:
 		

@@ -1,6 +1,6 @@
 #include "charge_mixing.h"
 #include "global.h"
-#include "../src_pw/inverse_matrix.h"
+#include "../src_global/inverse_matrix.h"
 
 Charge_Mixing::Charge_Mixing(){}
 Charge_Mixing::~Charge_Mixing(){}
@@ -215,7 +215,7 @@ double Charge_Mixing::rhog_dot_product(
 			// (2) Second part of density error.
 			// including |G|=0 term.
 			double sum2 = 0.0;
-			
+
 			sum2 += fac2 * ( conj( rhog1[0][0]-rhog1[1][0] ) * ( rhog2[0][0]-rhog2[1][0] ) ).real();
 
 			double mag = 0.0;
@@ -235,7 +235,6 @@ double Charge_Mixing::rhog_dot_product(
 			sum2 += mag;
 			sum += sum2;
 			break;
-
 		}
 	case 4:
 		// non-collinear spin, added by zhengdy

@@ -1,7 +1,7 @@
 #include "gint_gamma.h"
-#include "../src_pw/global.h"
-#include "ylm.h"
-#include "sltk_atom_arrange.h"
+#include "src_pw/global.h"
+#include "src_global/ylm.h"
+#include "src_global/sltk_atom_arrange.h"
 
 Gint_Gamma::Gint_Gamma()
 {
@@ -76,5 +76,3 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 
     return;
 }
-
-

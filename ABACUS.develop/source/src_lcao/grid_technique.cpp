@@ -1,6 +1,8 @@
 #include "grid_technique.h"
 #include "../src_pw/global.h"
 
+#include "global_fp.h" // mohan add 2021-01-30
+
 Grid_Technique GridT;
 
 Grid_Technique::Grid_Technique()
@@ -31,7 +33,7 @@ Grid_Technique::~Grid_Technique()
 }
 
 
-// This function is called in local_orbital_ions.cpp
+// This function is called in LOOP_ions.cpp
 // after the orbital information has been read,
 // this function control the routinue to generate 
 // grid technique parameters.
@@ -47,39 +49,46 @@ void Grid_Technique::set_pbc_grid(
 		const int &nbz_in,
 		const int &nbxx_in,
 		const int &nbzp_start_in,
-		const int &nbzp_in,
-		const bool vna)
+		const int &nbzp_in)
 {
 	TITLE("Grid_Technique","init");
 	timer::tick("Grid_Technique","init",'D');
 
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") ofs_running << "\n SETUP EXTENDED REAL SPACE GRID FOR GRID INTEGRATION" << endl;
-	if(OUT_LEVEL != "m") OUT(ofs_running,"vna",vna);
+	if(OUT_LEVEL != "m") 
+	{
+		ofs_running << "\n SETUP EXTENDED REAL SPACE GRID FOR GRID INTEGRATION" << endl;
+	}
 
 	// (1) init_meshcell cell and big cell.
-	this->set_grid_dim(ncx_in,ncy_in,ncz_in,
-	bx_in,by_in,bz_in,nbx_in,nby_in,nbz_in,
-	nbxx_in,nbzp_start_in,nbzp_in);
+	this->set_grid_dim(
+		ncx_in,ncy_in,ncz_in,
+		bx_in,by_in,bz_in,
+		nbx_in,nby_in,nbz_in,
+		nbxx_in,nbzp_start_in,nbzp_in);
 
 	this->init_latvec();
+
 	this->init_big_latvec();
+
 	this->init_meshcell_pos();
+
 	// (2) expand the grid
-	this->init_grid_expansion(vna);
+	this->init_grid_expansion();
+
 	// (3) calculate the extended grid.
 	this->cal_extended_cell(this->dxe, this->dye, this->dze);
+
 	this->init_tau_in_bigcell();
+
 	// init meshball
 	this->delete_meshball_positions(); //LiuXh add 2018-12-14
+
 	this->init_meshball();
+
 	this->init_atoms_on_grid();	
 
 	this->cal_trace_lo();
-	if(BFIELD)
-	{
-		this->cal_trace_beta();//add by sunzhiyuan
-	}
+
 	timer::tick("Grid_Technique","init",'D');
 	return;
 }
@@ -445,9 +454,12 @@ void Grid_Technique::cal_trace_lo(void)
 //		ofs_running << " i=" << i+1 << " trace_lo=" << trace_lo[i] << endl;
 //	}
 
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") OUT(ofs_running,"Atom number in sub-FFT-grid",lnat);
-	if(OUT_LEVEL != "m") OUT(ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
+	if(OUT_LEVEL != "m") 
+	{
+		OUT(ofs_running,"Atom number in sub-FFT-grid",lnat);
+		OUT(ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
+	}
+
 	assert(iw_local == lgd);
 	assert(iw_all == NLOCAL);
 	return;

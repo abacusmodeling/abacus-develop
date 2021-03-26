@@ -15,6 +15,9 @@ public:
 	 Symmetry();
 	~Symmetry();
 
+	// mohan add 2021-02-21
+	static bool symm_flag;
+
 	void analy_sys();
 	bool available;
 
@@ -88,7 +91,7 @@ public:
 	void checksym(Matrix3 &s, Vector3<double> &gtrans, double *pos);
 	void rho_symmetry(double *rho, const int &nr1, const int &nr2, const int &nr3);
 	void force_symmetry(matrix &force, double* pos);
-	void stress_symmetry(double sigma[][3]);
+	void stress_symmetry(matrix &sigma);
 	void write();
 
 	void print_pos(const double* pos, const int &nat);

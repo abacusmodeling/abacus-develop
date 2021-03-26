@@ -23,11 +23,11 @@ WF_igk::~WF_igk()
 //  set npwx
 //  set igk
 //========================================================
-//similar to n_plane_waves.f90
 int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 {
     TITLE("WF_igk","setupIndGk");
     timer::tick("WF_igk","setupIndGk");
+
     //============================================
     // Find out for each k point,
     // how many planewave within the radius ggpsi
@@ -39,7 +39,6 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
     // Done this in each cpu ( use nks,not nkstot )
     // notice : using cartesian coordinate
     //=============================================
-//	ofs_running << " " << setw(8) << "KPOINTS" << setw(10) << "ngk" << endl;
     for (int ik = 0; ik < nks; ik++)
     {
         int ng = 0;
@@ -122,9 +121,8 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
     return npw_max;
 } // end setupIndGk()
 
+
 //--------------------------------------------------------
-// MEMBER FUNCTION :
-// NAME : ekin
 // Compute kinetic energy for each k-point
 //--------------------------------------------------------
 void WF_igk::ekin(const int ik)
@@ -146,6 +144,7 @@ void WF_igk::ekin(const int ik)
     return ;
 }
 
+
 Vector3<double> WF_igk::get_1qvec_cartesian(const int ik,const int ig)const
 {
     Vector3<double> qvec = kv.kvec_c[ik] + pw.gcar[ this->igk(ik, ig) ];
@@ -163,6 +162,7 @@ Vector3<double> WF_igk::get_1qvec_cartesian(const int ik,const int ig)const
     return qvec;
 }
 
+
 double* WF_igk::get_qvec_cartesian(const int &ik)
 {
     double *qmod = new double[ kv.ngk[ik] ];
@@ -176,6 +176,7 @@ double* WF_igk::get_qvec_cartesian(const int &ik)
     }
     return qmod;
 }
+
 
 complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
 {
@@ -195,6 +196,7 @@ complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
     timer::tick("WF_igk","get_sk");
     return sk;
 }
+
 
 complex<double>* WF_igk::get_skq(int ik, const int it, const int ia, Vector3<double> q)   //pengfei 2016-11-23 
 {

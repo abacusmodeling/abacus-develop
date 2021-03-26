@@ -7,6 +7,10 @@
 #include "parallel_reduce.h"
 #include "../src_global/global_function.h"
 
+#ifdef _OPENMP
+#include <omp.h>					// Peize Lin add 2018-02-13
+#endif
+
 using namespace std;
 
 #if defined __MPI
@@ -151,7 +155,16 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
     }
     cout<<endl;
 */
-    MPI_Init(&argc,&argv);
+
+	#ifdef _OPENMP
+//	omp_set_nested(true);					// Peize Lin add 2018-02-13
+	#endif
+	
+//	MPI_Init(&argc,&argv);					// Peize Lin change 2018-07-12
+	int provided;
+	MPI_Init_thread(&argc,&argv,MPI_THREAD_FUNNELED,&provided);
+	if( provided != MPI_THREAD_FUNNELED )
+		ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<endl;
 //----------------------------------------------------------
 // int atoi ( const char * str );
 // atoi : Convert string to int type
@@ -217,7 +230,8 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	// mohan 2011-03-15
     if (MY_RANK != 0 ) 
     {
-        cout.rdbuf(NULL);
+        //cout.rdbuf(NULL);
+		cout.setstate(ios::failbit);//qianrui modify 2020-10-14
     }
 	// end test
 	

@@ -12,16 +12,21 @@
 
 class Wfc_Dm_2d
 {
-public:
+
+	public:
+
+	// wfc stands for wave functions
 	std::vector<matrix> wfc_gamma;			// wfc_gamma[is](ib,iw);
 	std::vector<ComplexMatrix> wfc_k;		// wfc_k[ik](ib,iw);
+
+	// dm stands for density matrix
 	std::vector<matrix> dm_gamma;			// dm_gamma[is](iw1,iw2);
 	std::vector<ComplexMatrix> dm_k;		// dm_k[ik](iw1,iw2);
 	
-	void init();
+	void init(void);
+
+	// dm = wfc.T * wg * wfc.conj()
 	void cal_dm(const matrix &wg);					// wg(ik,ib), cal all dm
-	void cal_dm(const matrix &wg, const int ik);	// wg(ik,ib), cal only dm[ik]
-		// dm = wfc.T * wg * wfc.conj()
 };
 
 #endif
