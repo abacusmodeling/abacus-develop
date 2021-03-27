@@ -456,7 +456,7 @@ void Input::Default(void)
 
 	cell_factor = 1.2; //LiuXh add 20180619
 
-	newDM=0; // Shen Yu add 2019/5/9
+	newDM=1; // Shen Yu add 2019/5/9
 	mulliken=0;// qi feng add 2019/9/10
 
 //----------------------------------------------------------			//Peize Lin add 2020-04-04
@@ -1484,7 +1484,7 @@ bool Input::Read(const string &fn)
 		else if (strcmp("ocp_set", word) == 0)
 		{
 			getline(ifs, ocp_set);
-			ifs.ignore(150, '\n');
+//			ifs.ignore(150, '\n');
 		}
         // else if (strcmp("ocp_n", word) == 0)
         // {
@@ -2291,7 +2291,7 @@ void Input::Bcast()
 #endif
 
 
-	void Input::Check(void)
+void Input::Check(void)
 {
     TITLE("Input","Check");
 

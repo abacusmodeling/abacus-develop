@@ -206,6 +206,6 @@ void Run_pw::plane_wave_line(void)
 	// compute density of states
 	en.perform_dos();
 
-	timer::tick("Run_Frag","plane_wave_line",'B');
+	timer::tick("Run_pw","plane_wave_line",'B');
     return;
 }

@@ -224,7 +224,7 @@ void Ions::opt_ions_pw(void)
 
     }
 
-    if(CALCULATION=="scf" || CALCULATION=="relax")
+    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
     {
         ofs_running << "\n\n --------------------------------------------" << endl;
         ofs_running << setprecision(16);
