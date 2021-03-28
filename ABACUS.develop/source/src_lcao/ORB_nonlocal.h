@@ -84,6 +84,8 @@ public:
 	int nproj;
 	int *LfromBeta;
 
+	// PLEASE consider the following parameters can be moved to the 'pseudopotential' module
+	// mohan note 2021-03-28
 	int nproj_soc;//demention of D_ij^so
 
 	ComplexArray Coefficient_D_so;   //(:,:,:),  spin-orbit case,  added by zhengdy-soc
