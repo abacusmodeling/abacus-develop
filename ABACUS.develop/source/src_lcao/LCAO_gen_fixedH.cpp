@@ -123,6 +123,8 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 							complex<double> *olm2 = &olm1[0];
 							if(!calc_deri)
 							{
+								// PLEASE use UOT as an input parameter of this subroutine
+								// mohan add 2021-03-30
 								UOT.snap_psipsi( olm, 0, dtype, tau1, 
 										T1, L1, m1, N1, GridD.getAdjacentTau(ad), 
 										T2, L2, m2, N2,

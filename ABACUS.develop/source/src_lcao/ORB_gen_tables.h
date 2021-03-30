@@ -103,6 +103,8 @@ class ORB_gen_tables
 
 };
 
+// PLEASE try to get rid of UOT, which is a global variable
+// mohan add 2021-03-30
 extern ORB_gen_tables UOT;
 
 #endif
