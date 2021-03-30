@@ -2646,7 +2646,8 @@ void Input::Check(void)
 			else if (ks_solver == "hpseps")
 			{
 #ifdef __MPI
-				ofs_warning << "It's a good choice to use hpseps!" << endl;
+				ofs_warning << "It's not a good choice to use hpseps!" << endl;
+				if(gamma_only) WARNING_QUIT("Input","hpseps can not be used for gamma_only.");
 #else
 				WARNING_QUIT("Input","hpseps can not be used for series version.");
 #endif

@@ -122,7 +122,7 @@ void Hamilt_PW::cinitcgg(
     ComplexMatrix hvec(nstart,n_band);
 	int dmin,dmax;
 	const int npw = kv.ngk[ik];
-	if(!NONCOLIN)
+	if(NSPIN != 4)
 	{
 		dmin= npw;
 		dmax = wf.npwx;
