@@ -1,0 +1,14 @@
+include Makefile.vars
+
+#==========================
+# LIBS and INCLUDES
+#==========================
+LIBS = -lifcore -lm -lpthread 
+
+INCLUDES = -I. -Icommands 
+
+#==========================
+# OPTIMIZE OPTIONS
+#==========================
+OPTS     = ${INCLUDES} -Ofast -traceback -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+OPTS_MPI = -cxx=${CPLUSPLUS}
