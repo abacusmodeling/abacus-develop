@@ -4,8 +4,7 @@
 //==========================================================
 
 #include "sph_bessel_recursive.h"
-
-#include "src_global/constants.h"
+#include "constants.h"
 
 #include<cmath>
 #include<stdexcept>

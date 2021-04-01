@@ -1,4 +1,4 @@
-#include "timer.h"
+//#include "timer.h"
 #include <ctime>
 
 void calculate();
@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 
 void calculate()
 {
-
+/*
 	time_t time_start = std::time(NULL);
 
 //	timer::start();
@@ -39,6 +39,7 @@ void calculate()
 	cout << " Total  Time  : " << hour << " h "
 	            << mins << " mins "
 	            << secs << " secs "<< endl;
+*/
 
     return;
 }
