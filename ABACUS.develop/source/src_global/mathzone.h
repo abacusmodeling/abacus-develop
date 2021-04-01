@@ -2,9 +2,12 @@
 #define MATHZONE_H
 
 #include "realarray.h"
+#include "vector3.h"
+#include "matrix3.h"
 #include <vector>
 #include <map>
 #include <cassert>
+#include <complex>
 using namespace std;
 
 class Mathzone
