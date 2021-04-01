@@ -272,8 +272,6 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 // PLEASE avoid using capital letters for local variables
 // mohan note 2021-03-23 
 	const int N_PROJECTORS = atom->nh;//zhengdy-soc
-//cout << " number of projectros " << N_PROJECTORS << endl;
-//	cout << " number of projectros " << n_projectors << endl;
 
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
@@ -289,11 +287,11 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		{
 			const int lnow = atom->lll[p1];
 
-		// this will be wrong if dion is non-diagoal
-		//Coefficient_D_in(lnow,lnow)=atom->dion(p1,p1);//LiuXh 2016-01-14
+			// this will be wrong if dion is non-diagoal
+			//Coefficient_D_in(lnow,lnow)=atom->dion(p1,p1);//LiuXh 2016-01-14
 			Coefficient_D_in(p1,p1)=atom->dion(p1,p1);//LiuXh 2016-01-14
 
-		// only keep the nonzero part.
+			// only keep the nonzero part.
 			int cut_mesh = atom->mesh; 
 			for(int ir=atom->mesh-1; ir>=0; --ir)
 			{

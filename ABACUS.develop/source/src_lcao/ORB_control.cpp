@@ -4,19 +4,15 @@
 #include "src_global/sltk_atom_arrange.h"
 #include "ORB_gen_tables.h"
 #include "build_st_pw.h"
+#include "../src_pdiag/pdiag_double.h"
 
 ORB_control::ORB_control()
 {}
 
 ORB_control::~ORB_control()
-{
-	if(test_deconstructor)
-	{
-		cout << " ~ORB_control()" << endl;
-	}
-}
+{}
 
-void ORB_control::set_orb_tables(void)
+void ORB_control::set_orb_tables(ORB_gen_tables &OGT)
 {
     TITLE("ORB_control","set_orb_tables");
 	timer::tick("ORB_control","set_orb_tables",'B');
@@ -34,7 +30,7 @@ void ORB_control::set_orb_tables(void)
 	}
 
     //=============================================================================
-    // (2) FUNCTION : Generate Gaunt_Coefficients and S-table using UOT.init
+    // (2) FUNCTION : Generate Gaunt_Coefficients and S-table using OGT.init
     // 	   Must have 'Numerical Orbital' infomation
     // (2) RESULT : we have tabulated S table for use.
     //=============================================================================
@@ -43,23 +39,25 @@ void ORB_control::set_orb_tables(void)
     // 1: generate overlap table
     // 2: generate kinetic table
     // 3: generate overlap & kinetic table
-    UOT.gen_tables(job0);
+    OGT.gen_tables(job0);
     // init lat0, in order to interpolated value from this table.
-    UOT.set_unit(ucell.lat0);
+    OGT.set_unit(ucell.lat0);
 
 
 	timer::tick("ORB_control","set_orb_tables",'B');
     return;
 }
 
-void ORB_control::clear_after_ions(void)
+void ORB_control::clear_after_ions(ORB_gen_tables &OGT)
 {
     TITLE("ORB_control","clear_after_ions");
-    UOT.MOT.Destroy_Table();
-    UOT.tbeta.Destroy_Table_Beta();
-    //caoyu add 2021-03-18
-    if (INPUT.out_descriptor && BASIS_TYPE == "lcao") {
-        UOT.talpha.Destroy_Table_Alpha();
+    OGT.MOT.Destroy_Table();
+    OGT.tbeta.Destroy_Table_Beta();
+    
+	//caoyu add 2021-03-18
+    if (INPUT.out_descriptor && BASIS_TYPE == "lcao") 
+	{
+        OGT.talpha.Destroy_Table_Alpha();
     }
     return;
 }

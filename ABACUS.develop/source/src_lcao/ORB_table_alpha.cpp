@@ -1,11 +1,7 @@
 //caoyu add 2021-03-17
-
 #include "ORB_table_alpha.h"
 #include "ORB_read.h"
-#include "../src_pw/global.h"
 #include <stdexcept>
-#include "../src_ri/exx_abfs.h"
-#include "../src_io/winput.h"
 
 double ORB_table_alpha::dr = -1.0;
 
@@ -415,7 +411,7 @@ void ORB_table_alpha::print_Table_DSR(void)
 	ofstream ofs;
 	stringstream ss;
 	// the parameter 'winput::spillage_outdir' is read from INPUTw.
-	ss << winput::spillage_outdir << "/" << "S_I_mu_alpha.dat";
+	ss << "./S_I_mu_alpha.dat";
 	if (MY_RANK == 0)
 	{
 		ofs.open(ss.str().c_str());
@@ -434,7 +430,7 @@ void ORB_table_alpha::print_Table_DSR(void)
 					for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						const int Opair = this->DS_Opair(T1, L1, L2, N1, N2);	//Opair
-						ofs <<setw(20)<< "atom_type: " << ucell.atoms[T1].label << endl;
+						//ofs <<setw(20)<< "atom_type: " << ucell.atoms[T1].label << endl;
 						ofs <<setw(20)<< "lcao basis: " << "L1=" << L1 << ", N1=" << N1 << endl;
 						ofs <<setw(20)<< "descriptor basis: " << "L2=" << L2 << ", N2=" << N2 << endl;
 						for (int il = 0; il < this-> DS_2Lplus1[T1]; il++)
@@ -456,13 +452,11 @@ void ORB_table_alpha::print_Table_DSR(void)
 								if ( (ir+1) % 8 == 0) ofs << endl;
 							}
 							ofs << endl <<endl;
-						}
-					}
-				}
-			}
-		}
-
-
-	}
-
+						}// il
+					}// N2
+				}// L2
+			}// N1
+		}// L1
+	}// T1
+	return;
 }

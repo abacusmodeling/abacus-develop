@@ -236,7 +236,7 @@ void Run_MD::opt_ions(void)
     }
 
 	// mohan update 2021-02-10
-    hm.orb_con.clear_after_ions();
+    hm.orb_con.clear_after_ions(UOT);
 
     timer::tick("Run_MD","opt_ions",'B'); 
     return;
