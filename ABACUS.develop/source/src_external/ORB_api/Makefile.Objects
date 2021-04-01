@@ -9,8 +9,10 @@
 # machine specific and depend on the local installation.  Hence the name.
 #
 
-VERSION = ABACUS
-HEADERS = *.h
+VERSION= ABACUS-ORB
+HEADERS= *.h
+
+OBJS_ORB=ORB_read.o\
 
 OBJS_ORBITAL=ORB_control.o\
 ORB_read.o\
@@ -24,5 +26,6 @@ ORB_table_phi.o\
 ORB_table_alpha.o\
 ORB_gen_tables.o\
 
-OBJS_GLOBAL=timer.o\
-vector3.o\
+OBJS_GLOBAL=#sph_bessel.o\
+#sph_bessel_recursive-d1.o\
+#sph_bessel_recursive-d2.o\
