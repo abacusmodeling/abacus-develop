@@ -53,7 +53,7 @@ void ORB_gen_tables::gen_tables( const int &job0 )
 
 	// NL: nonlocal
 	tbeta.init_NL_Tpair();
-	tbeta.init_NL_Opair(); // add 2009-5-8
+	tbeta.init_NL_Opair(ORB); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor

@@ -402,11 +402,11 @@ void ORB_table_beta::init_NL_Tpair(void)
 
 
 
-void ORB_table_beta::init_NL_Opair(void)
+void ORB_table_beta::init_NL_Opair(LCAO_Orbitals &orb)
 {
-	const int lmax = ORB.get_lmax();
-	const int nchimax = ORB.get_nchimax();
-	const int nprojmax = ORB.nprojmax;
+	const int lmax = orb.get_lmax();
+	const int nchimax = orb.get_nchimax();
+	const int nprojmax = orb.nprojmax;
 	
 	// may have bug if we use all H!
 	if( nprojmax == 0)
@@ -427,13 +427,13 @@ void ORB_table_beta::init_NL_Opair(void)
 		{
 			const int nlpair = this->NL_Tpair(T1, T0);
 			int index = 0;
-			for(int L1=0; L1<ORB.Phi[T1].getLmax()+1; L1++)
+			for(int L1=0; L1<orb.Phi[T1].getLmax()+1; L1++)
 			{
-				for(int N1=0; N1<ORB.Phi[T1].getNchi(L1); N1++)
+				for(int N1=0; N1<orb.Phi[T1].getNchi(L1); N1++)
 				{
 					// notice !! T0 must be Beta( Nonlocal projector)
 					// mohan update 2011-03-07
-					for(int ip=0; ip<ORB.nproj[T0]; ip++)
+					for(int ip=0; ip<orb.nproj[T0]; ip++)
 					{
 						assert( nlpair < NL_nTpairs );
 						assert( L1 < lmax+1 );

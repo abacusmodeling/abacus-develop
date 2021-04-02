@@ -2,6 +2,7 @@
 #define ORB_TABLE_BETA_H 
 
 #include "src_pw/tools.h"
+#include "ORB_read.h"
 #include "ORB_atomic.h"
 #include "ORB_atomic_lm.h"
 #include "ORB_nonlocal.h"
@@ -33,7 +34,9 @@ class ORB_table_beta
 	// O stands for orbitals.
 	//-------------------------
 	void init_NL_Tpair(void);
-    void init_NL_Opair(void);
+
+    void init_NL_Opair(LCAO_Orbitals &orb);
+
 	int NL_nTpairs;
 	IntArray NL_Tpair;
 	IntArray NL_Opair;

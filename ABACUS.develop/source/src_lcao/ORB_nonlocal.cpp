@@ -41,6 +41,7 @@ void Numerical_Nonlocal::set_type_info
 	const bool has_so
 )
 {
+	// PLEASE take care of this warning
 	if (type_in < 0 || type_in > 2)
 	{
 		WARNING("Numerical_Nonlocal", "bad input of type_in: not ready yet for type >2");
@@ -56,47 +57,35 @@ void Numerical_Nonlocal::set_type_info
 	}
 
 	this->lmax = lmax_in;
-//----------------------------------------------------------
-//EXPLAIN : Coefficient D used in calculate elements of NLps
-//----------------------------------------------------------
-/*2016-07-19, LiuXh
-	this->Coefficient_D.create( lmax_in+1, lmax_in+1);
-	for (int L1 = 0; L1 < lmax + 1; L1++)
-	{
-		for (int L2 = 0; L2 < lmax + 1; L2++)
-		{
-			this->Coefficient_D(L1, L2) = Coefficient_D_in(L1, L2);
-		}
-	}
-2016-07-19, LiuXh*/
 
 //----------------------------------------------------------
 //EXPLAIN : LfromBeta
 //----------------------------------------------------------
 	this->nproj = nproj_in;
-	if(has_so){ 
+
+	if(has_so)
+	{ 
 		this->nproj_soc = nproj_in_so;
 	}
-	//assert(nproj <= lmax_in+1); //LiuXh 2016-01-13, 2016-05-16
+
 	assert(nproj <= nproj_in+1); //LiuXh 2016-01-13, 2016-05-16
 	assert(nproj >= 0);
 
-//2016-07-19 begin, LiuXh
-	if(!has_so){
+	//2016-07-19 begin, LiuXh
+	if(!has_so)
+	{
 		this->Coefficient_D.create( nproj_in+1, nproj_in+1);
 		ZEROS(this->non_zero_count_soc, 4);
 		if(lmax_in > -1) //LiuXh add 20180328, fix bug of Hydrogen element with single projector pseudopot
-		{ //LiuXh add 20180328
-//			for (int L1 = 0; L1 < nproj + 1; L1++)
+		{
 			for (int L1 = 0; L1 < min(this->Coefficient_D.nr, Coefficient_D_in.nr); L1++)
 			{
-//				for (int L2 = 0; L2 < nproj + 1; L2++)
 				for (int L2 = 0; L2 < min(this->Coefficient_D.nc, Coefficient_D_in.nc); L2++)
 				{
 					this->Coefficient_D(L1, L2) = Coefficient_D_in(L1, L2);
 				}
 			}
-		} //LiuXh add 20180328
+		}
 	}
 	else//zhengdy-soc
 	{
