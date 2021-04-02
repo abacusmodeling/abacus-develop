@@ -12,7 +12,7 @@ ORB_control::ORB_control()
 ORB_control::~ORB_control()
 {}
 
-void ORB_control::set_orb_tables(ORB_gen_tables &OGT)
+void ORB_control::set_orb_tables(ORB_gen_tables &OGT, const double &lat0)
 {
     TITLE("ORB_control","set_orb_tables");
 	timer::tick("ORB_control","set_orb_tables",'B');
@@ -41,7 +41,9 @@ void ORB_control::set_orb_tables(ORB_gen_tables &OGT)
     // 3: generate overlap & kinetic table
     OGT.gen_tables(job0);
     // init lat0, in order to interpolated value from this table.
-    OGT.set_unit(ucell.lat0);
+
+	assert(lat0>0.0);
+    OGT.set_unit(lat0);
 
 
 	timer::tick("ORB_control","set_orb_tables",'B');

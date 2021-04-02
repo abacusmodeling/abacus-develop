@@ -45,7 +45,7 @@ void Run_lcao::lcao_line(void)
 
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
-	hm.orb_con.set_orb_tables(UOT);
+	hm.orb_con.set_orb_tables(UOT, ucell.lat0);
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
