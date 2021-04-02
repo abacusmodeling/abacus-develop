@@ -5,7 +5,7 @@
 #include "LCAO_nnr.h"
 #include "FORCE_STRESS.h"
 #include "src_global/global_function.h"
-#include "src_io/hs_matrix.h"
+#include "src_io/write_HS.h"
 #include "src_io/cal_r_overlap_R.h"
 #include "src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "src_ri/exx_abfs.h"
@@ -23,10 +23,34 @@ Run_MD::~Run_MD()
 
 void Run_MD::opt_cell(void)
 {
+	TITLE("Run_MD","opt_cell");
+
+
+	
+
+    // Initialize the local wave functions.
+    // npwx, eigenvalues, and weights
+    // npwx may change according to cell change
+    // this function belongs to cell LOOP
+    wf.allocate_ekb_wg(kv.nks);
+
+    // Initialize the FFT.
+    // this function belongs to cell LOOP
+    UFFT.allocate();
+
+    // output is ppcell.vloc 3D local pseudopotentials
+    // this function belongs to cell LOOP
+    ppcell.init_vloc(pw.nggm, ppcell.vloc);
+
+    // Initialize the sum of all local potentials.
+    // if ion_step==0, read in/initialize the potentials
+    // this function belongs to ions LOOP
+    int ion_step=0;
+    pot.init_pot(ion_step, pw.strucFac);
 
 	
 	opt_ions();
-
+	return;
 }
 
 
@@ -212,7 +236,7 @@ void Run_MD::opt_ions(void)
     }
 
 	// mohan update 2021-02-10
-    hm.orb_con.clear_after_ions();
+    hm.orb_con.clear_after_ions(UOT);
 
     timer::tick("Run_MD","opt_ions",'B'); 
     return;
@@ -473,63 +497,5 @@ void Run_MD::final_scf(void)
         ofs_running << " --------------------------------------------\n\n" << endl;
     }
 
-    return;
-}
-
-void Run_MD::output_HS_R(void)
-{
-    TITLE("Run_MD","output_HS_R"); 
-    timer::tick("Run_MD","output_HS_R",'D'); 
-	
-	// add by jingan for out r_R matrix 2019.8.14
-	if(INPUT.out_r_matrix)
-	{
-		cal_r_overlap_R r_matrix;
-		r_matrix.init();
-		r_matrix.out_r_overlap_R(NSPIN);
-	}
-
-    if(NSPIN==1||NSPIN==4)
-    {
-        UHM.calculate_STN_R();
-        UHM.GK.cal_vlocal_R(0);
-        UHM.GK.distribute_pvpR_tr();
-        HS_Matrix::save_HSR_tr(0);
-    }
-    ///*
-    else if(NSPIN==2)
-    {
-        UHM.calculate_STN_R();
-        for(int ik=0; ik<kv.nks; ik++)
-        {
-            if(ik==0 || ik==kv.nks/2)
-            {
-                if(NSPIN==2)CURRENT_SPIN = kv.isk[ik];
-                for(int ir=0; ir<pw.nrxx; ir++)
-                {
-                    pot.vrs1[ir] = pot.vrs( CURRENT_SPIN, ir);
-                }
-        	    	
-                if(!GAMMA_ONLY_LOCAL)
-                {
-                    if(VL_IN_H)
-                    {
-						//UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-						UHM.GK.cal_vlocal_k(pot.vrs1,GridT,CURRENT_SPIN);
-                    }
-                }
-                UHM.GK.cal_vlocal_R(CURRENT_SPIN);
-                UHM.GK.distribute_pvpR_tr();
-                HS_Matrix::save_HSR_tr(CURRENT_SPIN);
-            }
-        }
-    }
-    //*/
-    if(!GAMMA_ONLY_LOCAL) //LiuXh 20181011
-    {
-        UHM.GK.destroy_pvpR();
-    } //LiuXh 20181011
-
-    timer::tick("Run_MD","output_HS_R",'D'); 
     return;
 }

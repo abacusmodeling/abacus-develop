@@ -224,7 +224,7 @@ void Ions::opt_ions_pw(void)
 
     }
 
-    if(CALCULATION=="scf" || CALCULATION=="relax")
+    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
     {
         ofs_running << "\n\n --------------------------------------------" << endl;
         ofs_running << setprecision(16);
@@ -294,9 +294,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 pot.init_pot( istep, pw.strucFac );
 
                 ofs_running << " Setup the new wave functions?" << endl;
-                // newd() not needed now(if Q in r space, needed).
                 wf.wfcinit();
-                // mp_bcast
             }
         }
         else

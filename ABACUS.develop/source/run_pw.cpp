@@ -92,19 +92,20 @@ void Run_pw::plane_wave_line(void)
 
     //=====================
     // init hamiltonian
+	// only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.init(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(pw.nggm);
+    ppcell.init_vloc(pw.nggm, ppcell.vloc);
     DONE(ofs_running,"LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    ppcell.init_vnl();
+    ppcell.init_vnl(ucell);
     DONE(ofs_running,"NON-LOCAL POTENTIAL");
 
     //=========================================================
@@ -112,7 +113,8 @@ void Run_pw::plane_wave_line(void)
     //=========================================================
     pot.init_pot(0, pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
-    pot.newd();//once
+    pot.newd();
+
     DONE(ofs_running,"INIT POTENTIAL");
 
     //==================================================
@@ -204,6 +206,6 @@ void Run_pw::plane_wave_line(void)
 	// compute density of states
 	en.perform_dos();
 
-	timer::tick("Run_Frag","plane_wave_line",'B');
+	timer::tick("Run_pw","plane_wave_line",'B');
     return;
 }

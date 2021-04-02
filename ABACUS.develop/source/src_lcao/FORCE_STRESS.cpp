@@ -9,17 +9,13 @@
 double Force_Stress_LCAO::force_invalid_threshold_ev = 0.00;
 double Force_Stress_LCAO::output_acc = 1.0e-8;
 
-Force_Stress_LCAO::Force_Stress_LCAO ()
-{	
-}
+Force_Stress_LCAO::Force_Stress_LCAO (){}
+Force_Stress_LCAO::~Force_Stress_LCAO (){}
 
-Force_Stress_LCAO::~Force_Stress_LCAO ()
-{
-}
 
 void Force_Stress_LCAO::allocate(void)
 {
-    TITLE("Force_Stress_LCAO","init");
+    TITLE("Force_Stress_LCAO","allocate");
 
     // reduce memory occupy by vlocal
     delete[] ParaO.sender_local_index;
@@ -39,15 +35,15 @@ void Force_Stress_LCAO::allocate(void)
     return;
 }
 
+
 #include "../src_pw/efield.h"
-// be called in : LOOP_ions::force_stress
 void Force_Stress_LCAO::getForceStress(
 	const bool isforce, 
 	const bool isstress, 
 	const bool istestf, 
 	const bool istests, 
-	matrix& fcs, 
-	matrix& scs)
+	matrix &fcs, 
+	matrix &scs)
 {
     TITLE("Force_Stress_LCAO","getForceStress");
 	timer::tick("Force_Stress_LCAO","getForceStress",'E');
@@ -67,7 +63,9 @@ void Force_Stress_LCAO::getForceStress(
     matrix fewalds;
     matrix fcc;
 	matrix fscc;
+
 	fvl_dphi.create (nat, 3);//must do it now, update it later, noted by zhengdy
+
 	if(isforce)
 	{
 		fcs.create (nat, 3);
@@ -92,6 +90,7 @@ void Force_Stress_LCAO::getForceStress(
 	matrix stvnl_dphi;
 	matrix svnl_dbeta;
 	matrix svl_dphi;
+
 	if(isstress)
 	{
 		scs.create(3,3);
@@ -506,7 +505,7 @@ void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool sc
     return;
 }
 
-//print total force
+
 void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, matrix& fcs)
 {
 	TITLE("Force_Stress_LCAO","printforce_total");
@@ -582,10 +581,10 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
 //local pseudopotential, ewald, core correction, scc terms in force
 void Force_Stress_LCAO::calForcePwPart(
-	matrix& fvl_dvl, 
-	matrix& fewalds, 
-	matrix& fcc, 
-	matrix& fscc)
+	matrix &fvl_dvl, 
+	matrix &fewalds, 
+	matrix &fcc, 
+	matrix &fscc)
 {
 	//--------------------------------------------------------
 	// local pseudopotential force: 

@@ -6,10 +6,10 @@
 // (eg: linear potential) used in tddft
 // fuxiang add in 2017-05
 //==========================================================
-void potential::set_vrs_tddft(const int istep)
+void Potential::set_vrs_tddft(const int istep)
 {
-    TITLE("potential","set_vrs_tddft");
-    timer::tick("potential","set_vrs_tddft");
+    TITLE("Potential","set_vrs_tddft");
+    timer::tick("Potential","set_vrs_tddft");
 
     for (int is = 0;is < NSPIN;is++)
     {
@@ -22,7 +22,7 @@ void potential::set_vrs_tddft(const int istep)
         {
             for (int i = 0;i < pw.nrxx;i++)
             {
-                this->vrs(is, i) = this->vltot[i] + this->vr(is, i);
+                this->vr_eff(is, i) = this->vltot[i] + this->vr(is, i);
             }
             cout << "vext = 0! " << endl;
         }
@@ -92,7 +92,7 @@ void potential::set_vrs_tddft(const int istep)
                 //this->vext[ir] = this->vextold[ir]*2.74*cos(0.856*timenow)*sin(0.0214*timenow)*sin(0.0214*timenow)*0.01944;
                 //this->vext[ir] = this->vextold[ir]*2.74*cos(0.0428*timenow)*sin(0.00107*timenow)*sin(0.00107*timenow);
 
-                this->vrs(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
+                this->vr_eff(is,ir) = this->vltot[ir] + this->vr(is, ir) + this->vext[ir];
 
                 //cout << "x: " << k <<"	" << "y: " << j <<"	"<< "z: "<< i <<"	"<< "ir: " << ir << endl;
                 //cout << "vext: " << this->vext[ir] << endl;

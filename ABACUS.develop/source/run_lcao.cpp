@@ -1,7 +1,3 @@
-//==========================================================
-// AUTHOR : mohan
-// DATE : 2021-02-01
-//==========================================================
 #include "run_lcao.h"
 #include "src_pw/global.h"
 #include "input.h"
@@ -49,7 +45,7 @@ void Run_lcao::lcao_line(void)
 
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
-	hm.orb_con.set_orb_tables();
+	hm.orb_con.set_orb_tables(UOT);
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
@@ -99,23 +95,6 @@ void Run_lcao::lcao_line(void)
 				break;
 		}
 	}
-
-
-	// Initialize the local wave functions.
-	// npwx, eigenvalues, and weights
-	wf.allocate_ekb_wg(kv.nks);
-
-	// Initialize the FFT.
-	UFFT.allocate();
-
-	// Initialize the local part of
-	// NC pseudopotentials
-	ppcell.init_vloc(pw.nggm);
-
-	// Initialize the sum of all local potentials.
-	// if ion_step==0, read in/initialize the potentials
-	int ion_step=0;
-	pot.init_pot(ion_step, pw.strucFac);
 
 
     if(CALCULATION=="md")

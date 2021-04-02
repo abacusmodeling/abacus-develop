@@ -1,7 +1,7 @@
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
 #include "../src_pdiag/pdiag_double.h"
-#include "../src_io/hs_matrix.h"
+#include "../src_io/write_HS.h"
 //xiaohui modified 2013-03-23
 //#include "../src_develop/src_siao/selinv.h"
 

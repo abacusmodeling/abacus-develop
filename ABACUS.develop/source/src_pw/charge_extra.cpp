@@ -14,6 +14,12 @@ Charge_Extra::Charge_Extra()
 	// for second-order extrapolation
 	this->delta_rho3 = new double*[NSPIN];
 
+	// PLEASE update the following lines, because
+	// the pw.nrxx may not be initialized yet
+	// since Charge_Extra is a member of LOOP_ions
+	// you can move the initialization of the following 
+	// arrays to somewhere else
+	// mohan add 2021-03-30
 	for(int is=0; is<NSPIN; is++)
 	{
 		delta_rho1[is] = new double[pw.nrxx];
