@@ -7,6 +7,7 @@
 #define SPH_BESSEL_RECURSIVE_H
 
 #include<vector>
+#include"stddef.h"
 
 class Sph_Bessel_Recursive
 {
