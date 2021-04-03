@@ -154,6 +154,7 @@ LCAO_matrix.o\
 LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
+LCAO_descriptor.o\
 ylm.o\
 FORCE_STRESS.o\
 FORCE_gamma.o\

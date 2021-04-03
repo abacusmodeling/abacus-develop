@@ -13,6 +13,7 @@
 #include "ELEC_scf.h"
 #include "src_global/sltk_atom_arrange.h"
 #include "src_pw/vdwd2.h"
+#include "LCAO_descriptor.h"
 
 LOOP_ions::LOOP_ions()
 {}
@@ -153,6 +154,14 @@ void LOOP_ions::opt_ions(void)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
+        //caoyu add 2021-03-31
+        if (INPUT.out_descriptor)
+        {
+            LCAO_Descriptor ld;
+            ld.build_S_descriptor(0);  //derivation not needed yet
+            ld.cal_projective_DM();
+            ld.cal_descriptor();
+        }
 
         time_t fstart = time(NULL);
         if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
