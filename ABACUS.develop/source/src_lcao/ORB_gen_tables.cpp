@@ -824,9 +824,7 @@ void ORB_gen_tables::snap_psialpha(
 	const int& T2,
 	const int& L2,
 	const int& m2,
-	const int& N2,
-	complex<double>* olm1,
-	const int is) const
+	const int& N2) const
 {
 
 	if (job != 0 && job != 1)
@@ -960,20 +958,10 @@ void ORB_gen_tables::snap_psialpha(
 			case 0: // calculate overlap.
 			{
 				if (NSPIN != 4) olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
-				else if (olm1 != NULL)
-				{
-					olm1[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
-					olm1[1] += 0;//tmpOlm0 * (tmp(0,0)+tmp(0,1));
-					olm1[2] += 0;//tmpOlm0 * (tmp(1,0)+tmp(1,1));
-					olm1[3] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
-
-				}
 				else
 				{
-					WARNING_QUIT("ORB_gen_tables::snap_psialpha", "something wrong!");
-
+					WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with NSPIN>1 has not implemented yet!");
 				}
-
 				/*
 				if( abs ( tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ) > 1.0e-3 )
 				{
