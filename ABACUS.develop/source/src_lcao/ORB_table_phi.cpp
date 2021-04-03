@@ -1,6 +1,6 @@
+#include <stdexcept>
 #include "ORB_table_phi.h"
 #include "ORB_read.h"
-#include <stdexcept>
 #include "../src_ri/exx_abfs.h"
 
 double ORB_table_phi::dr = -1.0;

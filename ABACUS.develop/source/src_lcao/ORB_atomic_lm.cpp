@@ -1,10 +1,7 @@
-//=========================================================
-//AUTHOR : liaochen, mohan
-//DATE : 2008-11-12
-//=========================================================
 #include "ORB_atomic_lm.h"
-#include "src_global/sph_bessel_recursive.h"
-#include "src_global/lapack_connector.h"
+#include "../src_global/sph_bessel_recursive.h"
+#include "../src_global/lapack_connector.h"
+#include "../src_global/timer.h"
 #include <omp.h>
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
@@ -27,12 +24,7 @@ Numerical_Orbital_Lm::Numerical_Orbital_Lm()
 }
 
 Numerical_Orbital_Lm::~Numerical_Orbital_Lm()
-{
-	if(test_deconstructor)
-	{
-		cout << " ~Numerical_Orbital_Lm()" << endl;
-	}
-}
+{}
 
 void Numerical_Orbital_Lm::set_orbital_info
 (

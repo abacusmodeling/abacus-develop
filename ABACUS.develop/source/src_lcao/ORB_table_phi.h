@@ -1,9 +1,6 @@
 #ifndef ORB_TABLE_PHI_H 
 #define ORB_TABLE_PHI_H 
 
-//#include "src_pw/tools.h"
-//#include "ORB_gaunt_table.h"
-//#include "ORB_atomic.h"
 #include "ORB_read.h"
 #include "ORB_atomic_lm.h"
 #include "center2_orb.h"

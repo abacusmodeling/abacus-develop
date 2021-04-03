@@ -81,6 +81,7 @@ memory.o\
 print_info.o\
 mathzone.o\
 mathzone_add1.o\
+math_integral.o\
 integral.o \
 poission.o \
 polint.o \
