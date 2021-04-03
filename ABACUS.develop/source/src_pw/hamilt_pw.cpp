@@ -706,7 +706,7 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
 					}//end ib
                 }// end ih
             }//end jh
-		 	sum += 2 * Nprojs;
+		 	sum += Nprojs;
 			++iat;
         } //end na
     } //end nt
