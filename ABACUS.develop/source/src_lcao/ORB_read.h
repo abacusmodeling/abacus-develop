@@ -20,7 +20,7 @@ class LCAO_Orbitals
 	LCAO_Orbitals();
 	~LCAO_Orbitals();
 
-	void Read_Orbitals(void);
+	void Read_Orbitals(const int &ntype_in);
 
 	void Read_PAO(const int& it);
 
@@ -30,7 +30,6 @@ class LCAO_Orbitals
 	// read in the NONLOCAL projector from file.
 	void Read_NonLocal(const int& it, int &n_projectors);
 
-	void set_nl_index(void);
 
 	void Read_Descriptor(void);		//caoyu add 2020-3-16
 
@@ -87,7 +86,10 @@ class LCAO_Orbitals
 	int nchimax;
 	int lmax_d;	//caoyu add 2021-03-17
 	int nchimax_d;	//caoyu add 2021-03-17
-	int ntype;
+	int ntype; // number of elements
+
+
+	void set_nl_index(void);
 
 };
 

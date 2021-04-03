@@ -21,7 +21,7 @@ void ORB_control::set_orb_tables(ORB_gen_tables &OGT, const double &lat0)
     // (1) FUNCTION : use 'info' to generate 'Numerical Orbital'
     // (1) RESULT : We have 'Numerical Orbital' for calculate S-table and T-table.
 	//=============================================================================
-    ORB.Read_Orbitals();
+    ORB.Read_Orbitals(ucell.ntype);
 
 	if(CALCULATION=="test")
 	{
