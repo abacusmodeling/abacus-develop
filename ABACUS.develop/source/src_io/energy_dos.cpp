@@ -327,7 +327,7 @@ void energy::perform_dos(void)
 				atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
 
 				// mohan update 2021-02-10
-				hm.orb_con.set_orb_tables(UOT, ORB, ucell.lat0);
+				hm.orb_con.set_orb_tables(UOT, ORB, ucell.lat0, Exx_Abfs::Lmax);
 				LM.allocate_HS_R(LNNR.nnr);
 				LM.zeros_HSR('S', LNNR.nnr);
 				UHM.genH.calculate_S_no();

@@ -22,7 +22,11 @@ class ORB_gen_tables
 	ORB_gen_tables();
 	~ORB_gen_tables();
 
-	void gen_tables( const int &job0, LCAO_Orbitals &orb);
+	void gen_tables( 
+		const int &job0, 
+		LCAO_Orbitals &orb,
+		const int &Lmax_exx);
+
 	void set_unit( const double &v ){lat0=v;}
 	
 	void snap_psipsi(

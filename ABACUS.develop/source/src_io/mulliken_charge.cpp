@@ -166,7 +166,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			mud[0].create(ParaO.ncol,ParaO.nrow);
 			atom_arrange::set_sr_NL();
 			atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
-			hm.orb_con.set_orb_tables(UOT, ORB, ucell.lat0);
+			hm.orb_con.set_orb_tables(UOT, ORB, ucell.lat0, Exx_Abfs::Lmax);
 			LM.allocate_HS_R(LNNR.nnr);
 			LM.zeros_HSR('S', LNNR.nnr);
 			UHM.genH.calculate_S_no();

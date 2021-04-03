@@ -1,7 +1,5 @@
 #include <stdexcept>
 #include "ORB_table_phi.h"
-#include "ORB_read.h"
-#include "../src_ri/exx_abfs.h"
 #include "../src_global/math_integral.h"
 
 double ORB_table_phi::dr = -1.0;
@@ -767,7 +765,8 @@ void ORB_table_phi::init_Lmax (
 	const int orb_num, 
 	const int mode, 
 	int &Lmax_used, 
-	int &Lmax) const
+	int &Lmax,
+	const int &Lmax_exx) const
 {
 	auto cal_Lmax_Phi = [](int &Lmax)
 	{
@@ -805,7 +804,7 @@ void ORB_table_phi::init_Lmax (
 					Lmax_used = 2*Lmax + 1;
 					break;
 				case 2:			// used in <jY|jY> or <Abfs|Abfs>
-					Lmax = max(Lmax, Exx_Abfs::Lmax);
+					Lmax = max(Lmax, Lmax_exx);
 					Lmax_used = 2*Lmax + 1;
 					break;
 				case 3:                // used in berryphase by jingan
@@ -824,8 +823,8 @@ void ORB_table_phi::init_Lmax (
 				case 1:			// used in <jY|PhiPhi> or <Abfs|PhiPhi>
 					cal_Lmax_Phi(Lmax);
 					Lmax_used = 2*Lmax + 1;
-					Lmax = max(Lmax, Exx_Abfs::Lmax);
-					Lmax_used += Exx_Abfs::Lmax;
+					Lmax = max(Lmax, Lmax_exx);
+					Lmax_used += Lmax_exx;
 					break;
 				default:
 					throw invalid_argument("ORB_table_phi::init_Lmax orb_num=3, mode error");
@@ -853,11 +852,16 @@ void ORB_table_phi::init_Lmax (
 }
 
 // Peize Lin update 2016-01-26
-void ORB_table_phi::init_Table_Spherical_Bessel (const int orb_num, const int mode, int &Lmax_used, int &Lmax)
+void ORB_table_phi::init_Table_Spherical_Bessel (
+	const int orb_num, 
+	const int mode, 
+	int &Lmax_used, 
+	int &Lmax,
+	const int &Lmax_exx)
 {
 	TITLE("ORB_table_phi", "init_Table_Spherical_Bessel");
 
-	this->init_Lmax (orb_num,mode,Lmax_used,Lmax);		// Peize Lin add 2016-01-26
+	this->init_Lmax (orb_num,mode,Lmax_used,Lmax,Lmax_exx);		// Peize Lin add 2016-01-26
 
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
 	{

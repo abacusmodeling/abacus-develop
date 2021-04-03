@@ -50,13 +50,15 @@ class ORB_table_phi
 		const int orb_num, 
 		const int mode, 
 		int &Lmax_used, 
-		int &Lmax) const;
+		int &Lmax,
+		const int &Lmax_exx) const;
 
 	void init_Table_Spherical_Bessel(
 		const int orb_num, 
 		const int mode, 
 		int &Lmax_used, 
-		int &Lmax);
+		int &Lmax,
+		const int &Lmax_exx);
 
 	// Peize Lin add 2017-04-24, and change all jlx in this class
 	Sph_Bessel_Recursive::D2* pSB = nullptr;

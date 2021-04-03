@@ -16,7 +16,8 @@ class ORB_control
     void set_orb_tables(
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
-		const double &lat0);
+		const double &lat0,
+		const int &Lmax_exx);
 
     void clear_after_ions(
 		ORB_gen_tables &OGT, 

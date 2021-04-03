@@ -10,7 +10,10 @@ ORB_gen_tables::ORB_gen_tables(){}
 ORB_gen_tables::~ORB_gen_tables(){}
 
 // call in hamilt_linear::init_before_ions.
-void ORB_gen_tables::gen_tables( const int &job0, LCAO_Orbitals &orb )
+void ORB_gen_tables::gen_tables( 
+	const int &job0, 
+	LCAO_Orbitals &orb, 
+	const int &Lmax_exx)
 {
 	TITLE("ORB_gen_tables","gen_tables");
 	timer::tick("ORB_gen_tables","gen_tables",'C');
@@ -68,16 +71,23 @@ void ORB_gen_tables::gen_tables( const int &job0, LCAO_Orbitals &orb )
 	//liaochen add 2010/4/29
 	Ylm::set_coefficients ();
 
+	// PLEASE add explanations for all options of 'orb_num' and 'mode'
+	// mohan add 2021-04-03
 	// Peize Lin update 2016-01-26
-	int Lmax_used, Lmax;
-	MOT.init_Table_Spherical_Bessel (2,1, Lmax_used, Lmax);
+	int orb_num=2; //
+	int mode=1; // 1: <phi|phi> and <phi|beta>
+	int Lmax_used=0;
+	int Lmax=0;
+
+	MOT.init_Table_Spherical_Bessel (orb_num, mode, Lmax_used, Lmax, Lmax_exx);
 	
 	//calculate S(R) for interpolation
 	MOT.init_Table(job0, orb);
 	tbeta.init_Table_Beta( MOT.pSB );// add 2009-5-8
 
 	//caoyu add 2021-03-18
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao") {
+	if (INPUT.out_descriptor && BASIS_TYPE == "lcao") 
+	{
 		talpha.init_Table_Alpha(MOT.pSB);
 		talpha.print_Table_DSR();	
 	}
