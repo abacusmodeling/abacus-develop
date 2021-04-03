@@ -5,6 +5,7 @@
 #include "symmetry.h"
 // new
 #include "H_XC_pw.h"
+#include "../src_global/math_integral.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 
@@ -837,7 +838,7 @@ void Forces::cal_force_scc(matrix& forcescc)
                     aux[ir] = ucell.atoms[nt].rho_at[ir] * sin(gxx) / gxx;
                 }
             }
-            Mathzone::Simpson_Integral(mesh , aux, ucell.atoms[nt].rab , rhocgnt [ig]);
+            Integral::Simpson_Integral(mesh , aux, ucell.atoms[nt].rab , rhocgnt [ig]);
         }
 
         int iat = 0;

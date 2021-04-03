@@ -1,6 +1,7 @@
 #include "bessel_basis.h"
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_common.h"
+#include "../src_global/math_integral.h"
 
 Bessel_Basis::Bessel_Basis()
 {
@@ -306,7 +307,7 @@ void Bessel_Basis::init_TableOne(
 				}
 				
 				// make table value
-				Mathzone::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
+				Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
 			}
 			
 		}// end ie

@@ -2,6 +2,7 @@
 #include "../src_global/sph_bessel_recursive.h"
 #include "../src_global/lapack_connector.h"
 #include "../src_global/timer.h"
+#include "../src_global/math_integral.h"
 #include <omp.h>
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
@@ -388,7 +389,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 			integrated_func[ir] = this->psir[ir] * this->r_radial[ir] * jl[ir];
 		}
 
-		Mathzone::Simpson_Integral(
+		Integral::Simpson_Integral(
 				this->nr,
 				integrated_func,
 				VECTOR_TO_PTR(this->rab),
@@ -442,7 +443,7 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 		const vector<double> &jlk = jl[ik];
 		for (int ir = 0; ir < nr; ir++)
 			integrated_func[ir] = psir2[ir] * jlk[ir];
-		Mathzone::Simpson_Integral(
+		Integral::Simpson_Integral(
 				this->nr,
 				VECTOR_TO_PTR(integrated_func),
 				dr,
@@ -560,7 +561,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 	double sumr = 0.0;
 	//double sumk = 0.0;
 
-	Mathzone::Simpson_Integral(this->nr, f, VECTOR_TO_PTR(this->rab), sumr);
+	Integral::Simpson_Integral(this->nr, f, VECTOR_TO_PTR(this->rab), sumr);
 
 	delete[] f;
 	f = new double[nk];
@@ -569,7 +570,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 		f[ik] = this->psik[ik] * this->psik[ik];
 	}
 
-//	Mathzone::Simpson_Integral(this->nk, f, this->k_radial, sumk);
+//	Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
 	
 	//means nothing.
 	//ofs_running << setw(12) << sumk << endl;

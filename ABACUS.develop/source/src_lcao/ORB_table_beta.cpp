@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "ORB_table_beta.h"
 #include "ORB_read.h"
+#include "../src_global/math_integral.h"
 
 double ORB_table_beta::dr = -1.0;
 
@@ -155,7 +156,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 			integrated_func[ik] = jl[ir][ik] * k1_dot_k2[ik];
 		}
 		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		rs[ir] = temp * FOUR_PI;
 		
 		//drs
@@ -168,7 +169,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 				integrated_func[ik] = jlm1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 			}
 
-			Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp1);
+			Integral::Simpson_Integral(kmesh,integrated_func,kab,temp1);
 		}
 		
 				
@@ -177,7 +178,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 			integrated_func[ik] = jlp1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 		}
 		
-		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp2);
+		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp2);
 		
 		if (l == 0)
 		{
@@ -203,7 +204,7 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 		}
 		
 		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh,integrated_func,kab,temp);
+		Integral::Simpson_Integral(kmesh,integrated_func,kab,temp);
 		rs[0] = FOUR_PI / Mathzone_Add1::dualfac (2*l+1) * temp;
 	}
 	

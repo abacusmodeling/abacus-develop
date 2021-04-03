@@ -7,6 +7,7 @@
 #include "tools.h"
 #include "wavefunc.h"
 #include "../src_lcao/ORB_gen_tables.h"
+#include "../src_global/math_integral.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -398,7 +399,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 					          jl[ir] * cell.atoms[it].r[ir];
 				} 
 				double vqint;
-				Mathzone::Simpson_Integral(kkbeta, aux, cell.atoms[it].rab, vqint);
+				Integral::Simpson_Integral(kkbeta, aux, cell.atoms[it].rab, vqint);
 				this->tab(it, ib, iq) = vqint * pref;
 			} 
 		} 
@@ -624,7 +625,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 								  ucell.atoms[it].r[ir] * ucell.atoms[it].r[ir];
 					}
 					double vqint;
-					Mathzone::Simpson_Integral(kkbeta, aux, ucell.atoms[it].rab, vqint);
+					Integral::Simpson_Integral(kkbeta, aux, ucell.atoms[it].rab, vqint);
 					this->tab_alpha(it, ib, L, iq) = vqint * pref;
 				}
 			}

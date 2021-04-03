@@ -25,7 +25,7 @@ OPTS_GDB = -g -W
 #main.o\
 
 FP_OBJS_0=main.o\
-$(OBJS_ORB)\
+$(OBJS_TRY)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 PDIAG_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${OBJS_PDIAG})

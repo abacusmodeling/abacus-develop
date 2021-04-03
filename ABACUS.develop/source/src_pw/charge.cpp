@@ -21,6 +21,7 @@
 #include "charge.h"
 #include "magnetism.h"
 #include "../src_parallel/parallel_grid.h"
+#include "../src_global/math_integral.h"
 
 Charge::Charge()
 {
@@ -227,7 +228,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 		rhoatm[0] = rhoatm[1] / rhoatm[0];  
 
 		double charge = 0.0;
-		Mathzone::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);
+		Integral::Simpson_Integral(atom->msh,atom->rho_at,atom->rab,charge);
 
 		OUT(ofs_warning,"charge from rho_at",charge);
 		assert(charge!=0.0);
@@ -255,7 +256,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
 //              rho1d [ir] = atom->rho_at[ir];
 				rho1d[ir] = rhoatm[ir];
             }
-            Mathzone::Simpson_Integral(mesh, rho1d, atom->rab , rho_lgl[0]);
+            Integral::Simpson_Integral(mesh, rho1d, atom->rab , rho_lgl[0]);
         }
 
 
@@ -283,7 +284,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const
                     rho1d[ir] = rhoatm[ir] * sin(gxx) / gxx;
                 }
             }
-            Mathzone::Simpson_Integral(mesh , rho1d, atom->rab , rho_lgl [ig]);
+            Integral::Simpson_Integral(mesh , rho1d, atom->rab , rho_lgl [ig]);
         }
 		delete[] rhoatm;
         
@@ -651,7 +652,7 @@ void Charge::non_linear_core_correction
             {
                 aux [ir] = r [ir] * r [ir] * rhoc [ir];
             }
-            Mathzone::Simpson_Integral(mesh, aux, rab, rhocg1);
+            Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
             //rhocg [1] = fpi * rhocg1 / omega;
             rhocg [0] = FOUR_PI * rhocg1 / ucell.omega;//mohan modify 2008-01-19
             igl0 = 1;
@@ -666,7 +667,7 @@ void Charge::non_linear_core_correction
             {
                 aux [ir] = r[ir] * r[ir] * rhoc [ir] * aux [ir];
             } //  enddo
-            Mathzone::Simpson_Integral(mesh, aux, rab, rhocg1);
+            Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
             rhocg [igl] = FOUR_PI * rhocg1 / ucell.omega;
         } //  enddo
         delete [] aux;

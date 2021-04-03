@@ -1,6 +1,7 @@
 #include "ORB_read.h"
 #include "../src_pw/global.h" // only use ucell.atoms[it]
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
+#include "../src_global/math_integral.h"
 
 //==============================
 // Define an object here! 
@@ -882,7 +883,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 				inner[ir] = psir[ir] * psir[ir];
 			}
 			double unit = 0.0;
-			Mathzone::Simpson_Integral(meshr, inner, rab, unit);
+			Integral::Simpson_Integral(meshr, inner, rab, unit);
 
 			// check unit: \sum ( psi[r] * r )^2 = 1
 			ofs_running << setprecision(3) << setw(12) << unit;
@@ -897,7 +898,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 			{
 				inner[ir] = psir[ir] * psir[ir];
 			}
-			Mathzone::Simpson_Integral(meshr, inner, rab, unit);
+			Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
 			ofs_running << setw(12) << unit << endl;
 			
@@ -1212,9 +1213,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			}
 			double unit = 0.0;
 
-// PLEASE make Simpson_Integral as input parameters?
-// mohan note 2021-03-23
-			Mathzone::Simpson_Integral(meshr, inner, rab, unit);
+			Integral::Simpson_Integral(meshr, inner, rab, unit);
 
 			// check unit: \sum ( psi[r] * r )^2 = 1
 			ofs_running << setprecision(3) << setw(12) << unit;
@@ -1229,7 +1228,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			{
 				inner[ir] = psir[ir] * psir[ir];
 			}
-			Mathzone::Simpson_Integral(meshr, inner, rab, unit);
+			Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
 			ofs_running << setw(12) << unit << endl;
 

@@ -1,6 +1,7 @@
 //caoyu add 2021-03-17
 #include "ORB_table_alpha.h"
 #include "ORB_read.h"
+#include "../src_global/math_integral.h"
 #include <stdexcept>
 
 double ORB_table_alpha::dr = -1.0;
@@ -159,7 +160,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 			integrated_func[ik] = jl[ir][ik] * k1_dot_k2[ik];
 		}
 		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh, integrated_func, kab, temp);
+		Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
 		rs[ir] = temp * FOUR_PI;
 
 		//drs
@@ -172,7 +173,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 				integrated_func[ik] = jlm1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 			}
 
-			Mathzone::Simpson_Integral(kmesh, integrated_func, kab, temp1);
+			Integral::Simpson_Integral(kmesh, integrated_func, kab, temp1);
 		}
 
 
@@ -181,7 +182,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 			integrated_func[ik] = jlp1[ir][ik] * k1_dot_k2[ik] * kpoint[ik];
 		}
 
-		Mathzone::Simpson_Integral(kmesh, integrated_func, kab, temp2);
+		Integral::Simpson_Integral(kmesh, integrated_func, kab, temp2);
 
 		if (l == 0)
 		{
@@ -207,7 +208,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 		}
 
 		// Call simpson integration
-		Mathzone::Simpson_Integral(kmesh, integrated_func, kab, temp);
+		Integral::Simpson_Integral(kmesh, integrated_func, kab, temp);
 		rs[0] = FOUR_PI / Mathzone_Add1::dualfac(2 * l + 1) * temp;
 	}
 

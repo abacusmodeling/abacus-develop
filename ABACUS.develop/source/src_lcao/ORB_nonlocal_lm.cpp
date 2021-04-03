@@ -4,6 +4,7 @@
 //=========================================================
 #include "ORB_nonlocal_lm.h"
 #include "../src_pw/global.h"
+#include "../src_global/math_integral.h"
 
 Numerical_Nonlocal_Lm::Numerical_Nonlocal_Lm()
 {
@@ -245,7 +246,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
             integrated_func[ir] = this->beta_r[ir] * this->r_radial[ir] * jl[ir];
         }
 
-        Mathzone::Simpson_Integral(
+        Integral::Simpson_Integral(
                 this->nr,
                 integrated_func,
                 this->rab,
