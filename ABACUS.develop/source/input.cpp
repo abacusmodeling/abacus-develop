@@ -115,6 +115,7 @@ void Input::Default(void)
     atom_file = "";//xiaohui modify 2015-02-01
     kpoint_file = "";//xiaohui modify 2015-02-01
     pseudo_dir = "";
+	read_file_dir = "auto";
     pseudo_type = "auto"; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 	wannier_card = "";
     latname = "test";
@@ -359,7 +360,7 @@ void Input::Default(void)
 	kernel_type="rpa";
 	eels_method=0;
 	absorption_method=0;
-	system="bulk";
+	system_type="bulk";
 	eta=0.05;
 	domega=0.01;
 	nomega=300;
@@ -949,6 +950,10 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, restart_mode);
         }
+		else if (strcmp("read_file_dir", word) == 0)
+		{
+			read_value(ifs, read_file_dir);
+		}
         else if (strcmp("start_wfc", word) == 0)
         {
             read_value(ifs, start_wfc);
@@ -1404,7 +1409,7 @@ bool Input::Read(const string &fn)
 	    }
 	    else if (strcmp("system", word) == 0)
 	    {
-	        read_value(ifs, system);
+	        read_value(ifs, system_type);
 	    }
 	    else if (strcmp("eta", word) == 0)
 	    {
@@ -2040,6 +2045,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double( mixing_gg0 ); //mohan add 2014-09-27
 
     Parallel_Common::bcast_string( restart_mode );
+	Parallel_Common::bcast_string( read_file_dir);
     Parallel_Common::bcast_string( start_wfc );
 	Parallel_Common::bcast_int( mem_saver );
 	Parallel_Common::bcast_int( printe );
@@ -2161,7 +2167,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_string( kernel_type );
 	Parallel_Common::bcast_int( eels_method );
 	Parallel_Common::bcast_int( absorption_method );
-    Parallel_Common::bcast_string( system );
+    Parallel_Common::bcast_string( system_type );
     Parallel_Common::bcast_double( eta );
     Parallel_Common::bcast_double( domega );
     Parallel_Common::bcast_int( nomega );
@@ -2815,7 +2821,7 @@ void Input::Check(void)
 	// pengfei 2016-12-14
 	if(spectral_type!="None")
 	{
-		if( system!="bulk" && system!="surface")
+		if( system_type!="bulk" && system_type!="surface")
 		{
 			WARNING_QUIT("Input","system must be bulk or surface");
 		}
@@ -2936,6 +2942,20 @@ void Input::Check(void)
 				WARNING_QUIT("Input","to use towannier90, please set wannier_spin = up or down");
 			}
 		}
+	}
+
+	const string ss = "test -d " + read_file_dir;
+	if(read_file_dir=="auto")
+	{
+		global_readin_dir = global_out_dir;
+	}
+	else if( system( ss.c_str() ))
+	{
+		WARNING_QUIT("Input","please set right files directory for reading in.");
+	}
+	else
+	{
+		global_readin_dir = read_file_dir + '/';
 	}
 	
     return;

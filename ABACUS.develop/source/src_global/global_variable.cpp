@@ -122,6 +122,7 @@ string	global_pseudo_dir = "./";
 string  global_pseudo_type = "upf"; // mohan add 2013-05-20, default is UPF, we can also use VWR (xiaohui add 2013-06-23)
 string	global_epm_pseudo_card;
 string	global_out_dir;
+string  global_readin_dir; //zhengdy modified
 
 ofstream ofs_running;
 ofstream ofs_warning;

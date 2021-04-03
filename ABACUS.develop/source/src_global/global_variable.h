@@ -149,6 +149,7 @@ extern string	global_wannier_card;
 extern string	global_pseudo_dir;
 extern string   global_pseudo_type; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
 extern string 	global_out_dir;
+extern string   global_readin_dir; //zhengdy modified
 
 extern ofstream ofs_running;
 extern ofstream ofs_warning;

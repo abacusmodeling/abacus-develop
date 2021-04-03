@@ -57,6 +57,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"out_band",out_band,"output energy and band structure");
 	OUTP(ofs,"restart_save",restart_save,"print to disk every step for restart");
 	OUTP(ofs,"restart_load",restart_load,"restart from disk");
+	OUTP(ofs,"read_file_dir",read_file_dir,"directory of files for reading");
 	OUTP(ofs,"nx",nx,"number of points along x axis for FFT grid");
 	OUTP(ofs,"ny",ny,"number of points along y axis for FFT grid");
 	OUTP(ofs,"nz",nz,"number of points along z axis for FFT grid");	
@@ -208,7 +209,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"kernel_type",kernel_type,"the kernel type: rpa, tdlda ...");
 	OUTP(ofs,"eels_method",eels_method,"0: hilbert_transform method; 1: standard method");
 	OUTP(ofs,"absorption_method",absorption_method,"0: vasp's method  1: pwscf's method");
-	OUTP(ofs,"system",system,"the calculate system");
+	OUTP(ofs,"system",system_type,"the calculate system");
 	OUTP(ofs,"eta",eta,"eta(Ry)");
 	OUTP(ofs,"domega",domega,"domega(Ry)");
 	OUTP(ofs,"nomega",nomega,"nomega");

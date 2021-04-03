@@ -274,7 +274,7 @@ void Input_Conv::Convert(void)
 		}
 		//chi0_hilbert.epsilon = INPUT.epsilon;
 		chi0_hilbert.kernel_type = INPUT.kernel_type;
-		chi0_hilbert.system = INPUT.system;
+		chi0_hilbert.system = INPUT.system_type;
 		chi0_hilbert.eta = INPUT.eta;
 		chi0_hilbert.domega = INPUT.domega;
 		chi0_hilbert.nomega = INPUT.nomega;
@@ -314,7 +314,7 @@ void Input_Conv::Convert(void)
 	{
 		//chi0_standard.epsilon = INPUT.epsilon;
 		chi0_standard.epsilon = true;
-		chi0_standard.system = INPUT.system;
+		chi0_standard.system = INPUT.system_type;
 		chi0_standard.eta = INPUT.eta;
 		chi0_standard.domega = INPUT.domega;
 		chi0_standard.nomega = INPUT.nomega;
