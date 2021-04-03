@@ -409,7 +409,7 @@ void energy::perform_dos(void)
 				atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
 				// mohan update 2021-02-10
-				hm.orb_con.clear_after_ions(UOT);
+				hm.orb_con.clear_after_ions(UOT, ORB);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

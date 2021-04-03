@@ -1,14 +1,9 @@
 #ifndef ORB_TABLE_BETA_H 
 #define ORB_TABLE_BETA_H 
 
-#include "src_pw/tools.h"
-#include "ORB_read.h"
-#include "ORB_atomic.h"
-#include "ORB_atomic_lm.h"
-#include "ORB_nonlocal.h"
-#include "ORB_nonlocal_lm.h"
-#include "ORB_gaunt_table.h"
-#include "src_global/sph_bessel_recursive.h"
+#include "ORB_read.h" // use LCAO_Orbitals
+#include "ORB_atomic_lm.h" // use Numerical_Orbital_Lm
+#include "../src_global/sph_bessel_recursive.h" // use Sph_Bessel_Recursive
 
 class ORB_table_beta
 {
@@ -44,11 +39,12 @@ class ORB_table_beta
 
 	void init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB);
 
-	void Destroy_Table_Beta(void);
+	void Destroy_Table_Beta(LCAO_Orbitals &orb);
 
 	static int get_rmesh( const double &R1, const double &R2);
 
 	static double dr;
+
 	int Rmesh;
 
 	private:
@@ -69,6 +65,7 @@ class ORB_table_beta
 	double dk;
 	int nlm;
 	int kmesh;
+
 	double *kpoint;
 	double *r;
 	double *rab;

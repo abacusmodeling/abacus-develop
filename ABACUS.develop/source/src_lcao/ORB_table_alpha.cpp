@@ -148,6 +148,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	const vector<vector<double>>& jlm1 = pSB->get_jlx()[l - 1];
 	const vector<vector<double>>& jl = pSB->get_jlx()[l];
 	const vector<vector<double>>& jlp1 = pSB->get_jlx()[l + 1];
+
 	for (int ir = 0; ir < rmesh; ir++)
 	{
 		ZEROS(integrated_func, kmesh);
@@ -211,9 +212,8 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	}
 
 	delete[] integrated_func;
-
-
 	delete[] k1_dot_k2;
+
 	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 	return;
 }
@@ -223,6 +223,8 @@ void ORB_table_alpha::init_Table_Alpha(Sph_Bessel_Recursive::D2* pSB)
 {
 	TITLE("ORB_table_alpha", "init_Table_Alpha");
 	timer::tick("ORB_table_alpha", "init_Table_Alpha", 'D');
+
+	assert(ntype>0);
 
 	// (1) allocate 1st dimension ( overlap, derivative)
 	this->Table_DSR = new double**** [2];

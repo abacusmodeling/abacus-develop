@@ -50,11 +50,11 @@ void ORB_control::set_orb_tables(ORB_gen_tables &OGT, const double &lat0)
     return;
 }
 
-void ORB_control::clear_after_ions(ORB_gen_tables &OGT)
+void ORB_control::clear_after_ions(ORB_gen_tables &OGT, LCAO_Orbitals &orb)
 {
     TITLE("ORB_control","clear_after_ions");
     OGT.MOT.Destroy_Table();
-    OGT.tbeta.Destroy_Table_Beta();
+    OGT.tbeta.Destroy_Table_Beta(orb);
     
 	//caoyu add 2021-03-18
     if (INPUT.out_descriptor && BASIS_TYPE == "lcao") 

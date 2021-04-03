@@ -1,7 +1,6 @@
+#include <stdexcept>
 #include "ORB_table_beta.h"
 #include "ORB_read.h"
-#include <stdexcept>
-#include "../src_ri/exx_abfs.h"
 
 double ORB_table_beta::dr = -1.0;
 
@@ -121,11 +120,11 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 
 void ORB_table_beta::cal_VNL_PhiBeta_R(
 		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
-        const int &l,
-        const Numerical_Orbital_Lm &n1,
-        const Numerical_Nonlocal_Lm &n2,
-        const int &rmesh,
-        double *rs,
+		const int &l,
+		const Numerical_Orbital_Lm &n1,
+		const Numerical_Nonlocal_Lm &n2,
+		const int &rmesh,
+		double *rs,
 		double *drs)
 {
 	timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
@@ -209,9 +208,8 @@ void ORB_table_beta::cal_VNL_PhiBeta_R(
 	}
 	
 	delete [] integrated_func;
-	
-
 	delete[] k1_dot_k2;
+
 	timer::tick ("ORB_table_beta", "VNL_PhiBeta_R");
 	return;
 }
@@ -227,7 +225,6 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 	// (2) allocate 2nd dimension ( overlap, derivative)
 	this->Table_NR[0] = new double*** [this->NL_nTpairs];
 	this->Table_NR[1] = new double*** [this->NL_nTpairs];
-
 	
 	// <1Phi|2Beta> 
 	for (int T1 = 0;  T1 < ntype ; T1++) // type 1 is orbital
@@ -236,8 +233,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 		{
 			// Tpair: type pair.
 			const int Tpair=this->NL_Tpair(T1,T2);
-			const int Lmax1 = ORB.Phi[T1].getLmax();
-			
+			const int Lmax1 = ORB.Phi[T1].getLmax();			
 			const int NBeta = ORB.nproj[T2];
 			
 			//-------------------------------------------------------------
@@ -262,7 +258,6 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
             {
                 for (int N1 = 0; N1 < ORB.Phi[T1].getNchi(L1); N1++)
 				{
-					
 					// number of projectors.
 					for (int nb = 0; nb < NBeta; nb ++)
 					{
@@ -304,6 +299,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 							}
 
 							assert(nb < ORB.nproj[T2]);	
+
 							this->cal_VNL_PhiBeta_R(
 								pSB, // mohan add 2021-03-06
 								L,
@@ -327,11 +323,11 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 }
 
 
-void ORB_table_beta::Destroy_Table_Beta(void)
+void ORB_table_beta::Destroy_Table_Beta(LCAO_Orbitals &orb)
 {
 	if(!destroy_nr) return;
 
-	const int ntype = ORB.get_ntype();
+	const int ntype = orb.get_ntype();
 	for(int ir = 0; ir < 2; ir ++)
 	{
 		for(int T1=0; T1<ntype; T1++)
@@ -340,7 +336,7 @@ void ORB_table_beta::Destroy_Table_Beta(void)
 			{
 				const int Tpair = this->NL_Tpair(T1,T2); 
 				const int L2plus1 = this->NL_L2plus1(T1,T2);
-				const int pairs = ORB.Phi[T1].getTotal_nchi() * ORB.nproj[T2]; 
+				const int pairs = orb.Phi[T1].getTotal_nchi() * orb.nproj[T2]; 
 
 				// mohan fix bug 2011-03-30
 				if(pairs ==0) continue;

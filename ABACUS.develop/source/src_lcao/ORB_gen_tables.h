@@ -1,13 +1,9 @@
-//=========================================================
-//AUTHOR : Mohan 
-//DATE : 2009-04-22
-//=========================================================
-#ifndef USE_OVERLAP_TABLE_H
-#define USE_OVERLAP_TABLE_H
+#ifndef ORB_GEN_TABLES_H
+#define ORB_GEN_TABLES_H
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
+#include "../src_global/ylm.h"
 #include "ORB_gaunt_table.h"
-#include "src_global/ylm.h"
 #include "ORB_table_beta.h"
 #include "ORB_table_phi.h"
 #include "ORB_table_alpha.h"		//caoyu add 2020-3-18

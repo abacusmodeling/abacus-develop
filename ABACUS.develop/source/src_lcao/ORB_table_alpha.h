@@ -1,14 +1,10 @@
-//caoyu add 2021-03-17
-
 #ifndef ORB_TABLE_ALPHA_H 
 #define ORB_TABLE_ALPHA_H 
 
-#include "src_pw/tools.h"
-#include "ORB_atomic.h"
 #include "ORB_atomic_lm.h"
-#include "ORB_gaunt_table.h"
-#include "src_global/sph_bessel_recursive.h"
+#include "../src_global/sph_bessel_recursive.h"
 
+//caoyu add 2021-03-17
 
 class ORB_table_alpha
 {
@@ -31,6 +27,7 @@ class ORB_table_alpha
 	//-------------------------
 	// O stands for orbitals.
 	//-------------------------
+
 	void init_DS_Opair(void);
 	void init_DS_2Lplus1(void);
 	IntArray DS_Opair;

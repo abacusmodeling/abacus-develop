@@ -225,7 +225,7 @@ void LOOP_ions::opt_ions(void)
     }
 
 	// mohan update 2021-02-10
-    hm.orb_con.clear_after_ions(UOT);
+    hm.orb_con.clear_after_ions(UOT, ORB);
 
     timer::tick("LOOP_ions","opt_ions",'B'); 
     return;

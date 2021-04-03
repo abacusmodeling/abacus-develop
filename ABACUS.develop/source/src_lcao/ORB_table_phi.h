@@ -6,7 +6,7 @@
 #include "ORB_atomic_lm.h"
 #include "ORB_gaunt_table.h"
 #include "center2_orb.h"
-#include "src_global/sph_bessel_recursive.h"
+#include "../src_global/sph_bessel_recursive.h"
 #include <set>
 
 class ORB_table_phi
