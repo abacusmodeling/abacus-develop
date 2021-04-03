@@ -129,6 +129,7 @@ ORB_nonlocal_lm.o\
 ORB_gaunt_table.o\
 ORB_table_beta.o\
 ORB_table_phi.o\
+ORB_table_alpha.o\
 ORB_gen_tables.o\
 local_orbital_wfc.o\
 local_orbital_charge.o\
@@ -152,6 +153,7 @@ LCAO_matrix.o\
 LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
+LCAO_descriptor.o\
 ylm.o\
 FORCE_STRESS.o\
 FORCE_gamma.o\
