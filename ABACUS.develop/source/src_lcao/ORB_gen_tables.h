@@ -79,9 +79,7 @@ class ORB_gen_tables
 		const int& I2,
 		const int& l2,
 		const int& m2,
-		const int& n2,
-		complex<double>* olm1 = NULL,
-		const int is = 0)const;
+		const int& n2)const;
 
 	// set as public because in hamilt_linear, 
 	// we need to destroy the tables: SR,TR,NR

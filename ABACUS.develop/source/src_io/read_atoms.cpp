@@ -71,6 +71,10 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 				
 			}
 		}	
+		// caoyu add 2021-03-16
+		if (SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
+			ifa >> ORB.descriptor_file;
+		}
 	}
 
 	// Peize Lin add 2016-09-23
