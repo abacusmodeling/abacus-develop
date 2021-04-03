@@ -7,6 +7,7 @@
 #include "ORB_table_beta.h"
 #include "ORB_table_phi.h"
 #include "ORB_table_alpha.h"		//caoyu add 2020-3-18
+#include "ORB_read.h"
 
 //------------------------------------
 // used to be 'Use_Overlap_Table',
@@ -21,7 +22,7 @@ class ORB_gen_tables
 	ORB_gen_tables();
 	~ORB_gen_tables();
 
-	void gen_tables( const int &job0 );
+	void gen_tables( const int &job0, LCAO_Orbitals &orb);
 	void set_unit( const double &v ){lat0=v;}
 	
 	void snap_psipsi(

@@ -12,7 +12,10 @@ ORB_control::ORB_control()
 ORB_control::~ORB_control()
 {}
 
-void ORB_control::set_orb_tables(ORB_gen_tables &OGT, const double &lat0)
+void ORB_control::set_orb_tables(
+	ORB_gen_tables &OGT, 
+	LCAO_Orbitals &orb,
+	const double &lat0)
 {
     TITLE("ORB_control","set_orb_tables");
 	timer::tick("ORB_control","set_orb_tables",'B');
@@ -21,7 +24,7 @@ void ORB_control::set_orb_tables(ORB_gen_tables &OGT, const double &lat0)
     // (1) FUNCTION : use 'info' to generate 'Numerical Orbital'
     // (1) RESULT : We have 'Numerical Orbital' for calculate S-table and T-table.
 	//=============================================================================
-    ORB.Read_Orbitals(ucell.ntype);
+    orb.Read_Orbitals(ucell.ntype);
 
 	if(CALCULATION=="test")
 	{
@@ -39,7 +42,7 @@ void ORB_control::set_orb_tables(ORB_gen_tables &OGT, const double &lat0)
     // 1: generate overlap table
     // 2: generate kinetic table
     // 3: generate overlap & kinetic table
-    OGT.gen_tables(job0);
+    OGT.gen_tables(job0, orb);
     // init lat0, in order to interpolated value from this table.
 
 	assert(lat0>0.0);
@@ -53,7 +56,7 @@ void ORB_control::set_orb_tables(ORB_gen_tables &OGT, const double &lat0)
 void ORB_control::clear_after_ions(ORB_gen_tables &OGT, LCAO_Orbitals &orb)
 {
     TITLE("ORB_control","clear_after_ions");
-    OGT.MOT.Destroy_Table();
+    OGT.MOT.Destroy_Table(orb);
     OGT.tbeta.Destroy_Table_Beta(orb);
     
 	//caoyu add 2021-03-18

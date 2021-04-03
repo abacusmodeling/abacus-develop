@@ -13,9 +13,14 @@ class ORB_control
     ~ORB_control();
 
     // Generate the S(overlap),T,NL matrix.
-    void set_orb_tables(ORB_gen_tables &OGT, const double &lat0);
+    void set_orb_tables(
+		ORB_gen_tables &OGT, 
+		LCAO_Orbitals &orb,
+		const double &lat0);
 
-    void clear_after_ions(ORB_gen_tables &OGT, LCAO_Orbitals &orb);
+    void clear_after_ions(
+		ORB_gen_tables &OGT, 
+		LCAO_Orbitals &orb);
 
 };
 #endif

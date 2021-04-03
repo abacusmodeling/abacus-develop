@@ -10,7 +10,7 @@ ORB_gen_tables::ORB_gen_tables(){}
 ORB_gen_tables::~ORB_gen_tables(){}
 
 // call in hamilt_linear::init_before_ions.
-void ORB_gen_tables::gen_tables( const int &job0 )
+void ORB_gen_tables::gen_tables( const int &job0, LCAO_Orbitals &orb )
 {
 	TITLE("ORB_gen_tables","gen_tables");
 	timer::tick("ORB_gen_tables","gen_tables",'C');
@@ -21,39 +21,39 @@ void ORB_gen_tables::gen_tables( const int &job0 )
 	// (1) MOT: make overlap table.
 	//=========================================
 	MOT.allocate(
-		ORB.get_ntype(),// number of atom types
-        ORB.get_lmax(),// max L used to calculate overlap
-        ORB.get_kmesh(), // kpoints, for integration in k space
-        ORB.get_Rmax(),// max value of radial table
-        ORB.get_dR(),// delta R, for making radial table
-        ORB.get_dk() ); // delta k, for integration in k space
+		orb.get_ntype(),// number of atom types
+        orb.get_lmax(),// max L used to calculate overlap
+        orb.get_kmesh(), // kpoints, for integration in k space
+        orb.get_Rmax(),// max value of radial table
+        orb.get_dR(),// delta R, for making radial table
+        orb.get_dk() ); // delta k, for integration in k space
 
 	tbeta.allocate(
-		ORB.get_ntype(),// number of atom types
-        ORB.get_lmax(),// max L used to calculate overlap
-        ORB.get_kmesh(), // kpoints, for integration in k space
-        ORB.get_Rmax(),// max value of radial table
-        ORB.get_dR(),// delta R, for making radial table
-        ORB.get_dk() ); // delta k, for integration in k space
+		orb.get_ntype(),// number of atom types
+        orb.get_lmax(),// max L used to calculate overlap
+        orb.get_kmesh(), // kpoints, for integration in k space
+        orb.get_Rmax(),// max value of radial table
+        orb.get_dR(),// delta R, for making radial table
+        orb.get_dk() ); // delta k, for integration in k space
 
 	//caoyu add 2021-03-18
 	if (INPUT.out_descriptor && BASIS_TYPE == "lcao") {
 		talpha.allocate(
-			ORB.get_ntype(),// number of atom types
-			ORB.get_lmax(),// max L used to calculate overlap
-			ORB.get_kmesh(), // kpoints, for integration in k space
-			ORB.get_Rmax(),// max value of radial table
-			ORB.get_dR(),// delta R, for making radial table
-			ORB.get_dk()); // delta k, for integration in k space
+			orb.get_ntype(),// number of atom types
+			orb.get_lmax(),// max L used to calculate overlap
+			orb.get_kmesh(), // kpoints, for integration in k space
+			orb.get_Rmax(),// max value of radial table
+			orb.get_dR(),// delta R, for making radial table
+			orb.get_dk()); // delta k, for integration in k space
 	}
 
 	// OV: overlap
-	MOT.init_OV_Tpair();
-	MOT.init_OV_Opair();
+	MOT.init_OV_Tpair(orb);
+	MOT.init_OV_Opair(orb);
 
 	// NL: nonlocal
 	tbeta.init_NL_Tpair();
-	tbeta.init_NL_Opair(ORB); // add 2009-5-8
+	tbeta.init_NL_Opair(orb); // add 2009-5-8
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
@@ -73,7 +73,7 @@ void ORB_gen_tables::gen_tables( const int &job0 )
 	MOT.init_Table_Spherical_Bessel (2,1, Lmax_used, Lmax);
 	
 	//calculate S(R) for interpolation
-	MOT.init_Table(job0);
+	MOT.init_Table(job0, orb);
 	tbeta.init_Table_Beta( MOT.pSB );// add 2009-5-8
 
 	//caoyu add 2021-03-18
@@ -87,9 +87,9 @@ void ORB_gen_tables::gen_tables( const int &job0 )
 	//=========================================
 
 	const int lmax = (Lmax_used-1) / 2 ;
-	//MGT.init_Ylm_Gaunt(ORB.get_lmax()+1, 0.0,PI,0.0,TWO_PI);
+	//MGT.init_Ylm_Gaunt(orb.get_lmax()+1, 0.0,PI,0.0,TWO_PI);
 	MGT.init_Gaunt_CH( lmax );
-	//MGT.init_Gaunt(ORB.get_lmax()+1);
+	//MGT.init_Gaunt(orb.get_lmax()+1);
 	MGT.init_Gaunt( lmax );
 
 
