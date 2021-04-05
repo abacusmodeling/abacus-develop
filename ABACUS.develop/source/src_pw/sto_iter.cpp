@@ -448,7 +448,7 @@ void Stochastic_Iter::sum_stoband()
 
     
     cout.precision(12);
-    cout<<"Normalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
+    cout<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
 
 
     double factor;
