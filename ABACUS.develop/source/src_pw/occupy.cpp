@@ -391,7 +391,7 @@ void Occupy::efermig
     }
 
     eup += 2 * degauss;
-    elw -= 2 * degauss;
+    elw -= 5 * degauss; //qianrui change 2 to 5 for high temerature
 
 #ifdef __MPI
     // find min and max across pools
