@@ -3,7 +3,6 @@
 
 #include "ORB_read.h"
 #include "ORB_atomic_lm.h"
-#include "center2_orb.h"
 #include "../src_global/sph_bessel_recursive.h"
 #include <set>
 
@@ -90,7 +89,6 @@ class ORB_table_phi
 	static double dr;
 	int Rmesh;
 
-	private:
 
 	void cal_ST_Phi12_R(
 		const int &job,
@@ -111,6 +109,8 @@ class ORB_table_phi
 		double *rs,
 		double *drs) const;
 
+	private:
+
 	// variables
     int ntype;
 	int lmax;
@@ -122,7 +122,5 @@ class ORB_table_phi
 	double *r;
 	double *rab;
 	double *kab;	
-
-	friend class Center2_Orb::Orb11;			// Peize Lin add 2016-01-24
 };
 #endif

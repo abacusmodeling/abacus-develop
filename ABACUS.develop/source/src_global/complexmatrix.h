@@ -1,8 +1,3 @@
-//==========================================================
-// Author : Lixin He, Mohan Chen
-// Update : Peize Lin
-// Last Update : 2018-09-04
-//==========================================================
 #ifndef COMPLEXMATRIX_H
 #define COMPLEXMATRIX_H
 

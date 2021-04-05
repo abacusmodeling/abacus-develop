@@ -1,7 +1,10 @@
 #ifndef NUMERICAL_NONLOCAL_H
 #define NUMERICAL_NONLOCAL_H
 
-#include "../src_pw/tools.h"
+//#include "../src_pw/tools.h"
+
+#include "../src_global/complexarray.h"
+#include "../src_global/complexmatrix.h"
 #include "ORB_nonlocal_lm.h"
 //=========================================================
 //CLASS  Numerical_Nonlocal

@@ -6,6 +6,7 @@
 #include <mkl_service.h>
 
 #include "global_fp.h" // mohan add 2021-01-30
+#include "../src_global/ylm.h"
 
 void Gint_Gamma::setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const
 {

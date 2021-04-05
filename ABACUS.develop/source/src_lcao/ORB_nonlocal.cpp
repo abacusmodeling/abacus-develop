@@ -3,6 +3,8 @@
 //DATE : 2008-03-04
 //=========================================================
 #include "ORB_nonlocal.h"
+#include "../src_global/global_function.h"
+#include "../src_global/constants.h"
 
 Numerical_Nonlocal::Numerical_Nonlocal()
 {

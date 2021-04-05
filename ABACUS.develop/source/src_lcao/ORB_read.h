@@ -1,7 +1,7 @@
 #ifndef LCAO_ORBITALS_H
 #define LCAO_ORBITALS_H
 
-#include "../src_pw/tools.h"
+//#include "../src_pw/tools.h"
 #include "ORB_atomic.h"
 #include "ORB_atomic_lm.h"
 #include "ORB_nonlocal.h"
