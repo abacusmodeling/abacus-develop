@@ -1593,7 +1593,7 @@ void Symmetry::force_symmetry(matrix &force , double* pos)   // pengfei 2016-12-
 	return;
 }
 
-void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
+void Symmetry::stress_symmetry(matrix& sigma)   //zhengdy added 2017
 {
 	double *tot_sigma, *temp;
 	tot_sigma = new double[9];
@@ -1619,7 +1619,7 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
                         {
                                 for(int l=0;l<3;l++)
                                 {
-                                        tot_sigma[i*3 +j] += sigma[k][l] * temp[i*3+k] * temp[j*3+l];
+                                        tot_sigma[i*3 +j] += sigma(k,l) * temp[i*3+k] * temp[j*3+l];
                                 }
                         }
                 }
@@ -1628,7 +1628,7 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
 	{
 		for(int j = 0;j<3;j++)
 		{
-			sigma[i][j] = tot_sigma[i*3+j];
+			sigma(i,j) = tot_sigma[i*3+j];
 		}
 	}
 	ZEROS(temp, 9);
@@ -1654,7 +1654,7 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
 				{
 					for( int m=0; m<3; m++)
 					{
-						tot_sigma[i * 3 +j] += sigma[l][m] * temp[i * 3 + l] * temp[j * 3 + m];
+						tot_sigma[i * 3 +j] += sigma(l,m) * temp[i * 3 + l] * temp[j * 3 + m];
 					}
 				}
 			}
@@ -1665,7 +1665,7 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
 	{
 		for (int j = 0; j < 3; j++)
 		{
-			sigma[i][j] = tot_sigma[i *3 + j] / nrotk;
+			sigma(i,j) = tot_sigma[i *3 + j] / nrotk;
 		}
 	}
 
@@ -1696,7 +1696,7 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
                         {
                                 for(int l=0;l<3;l++)
                                 {
-                                        tot_sigma[i*3 +j] += sigma[k][l] * temp[i*3+k] * temp[j*3+l];
+                                        tot_sigma[i*3 +j] += sigma(k,l) * temp[i*3+k] * temp[j*3+l];
                                 }
                         }
                 }
@@ -1706,7 +1706,7 @@ void Symmetry::stress_symmetry(double sigma[][3])   //zhengdy added 2017
 	{
 		for(int j = 0;j<3;j++)
 		{
-			sigma[i][j] = tot_sigma[i*3+j];
+			sigma(i,j) = tot_sigma[i*3+j];
 		}
 	}
 

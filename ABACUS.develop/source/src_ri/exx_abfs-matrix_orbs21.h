@@ -14,7 +14,7 @@ using std::map;
 using std::set;
 
 #include "exx_abfs.h"
-#include "src_lcao/ORB_radial_table.h"
+#include "src_lcao/ORB_table_phi.h"
 #include "src_lcao/ORB_gaunt_table.h"
 #include "src_lcao/center2_orb-orb21.h"
 
@@ -66,8 +66,8 @@ public:
 		const Element_Basis_Index::IndexLNM &index_B) const;
 	
 protected:
-	Make_Overlap_Table MOT;
-	Make_Gaunt_Table MGT;
+	ORB_table_phi MOT;
+	ORB_gaunt_table MGT;
 	
 	map<size_t,                                  // TA
 		map<size_t,                              // TB

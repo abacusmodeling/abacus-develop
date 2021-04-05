@@ -1,15 +1,24 @@
 #include "ORB_gaunt_table.h"
+#include <math.h>
+#include <cassert>
+#include "../src_global/timer.h"
+#include "../src_global/memory.h"
+#include "../src_global/mathzone.h"
+#include "../src_global/global_function.h"
+//#include "../src_global/matrix3.h"
+#include "../src_global/vector3.h"
+#include "../src_global/constants.h"
 
-Make_Gaunt_Table::Make_Gaunt_Table(){}
-Make_Gaunt_Table::~Make_Gaunt_Table(){}
+ORB_gaunt_table::ORB_gaunt_table(){}
+ORB_gaunt_table::~ORB_gaunt_table(){}
 
-void Make_Gaunt_Table::init_Gaunt(const int &lmax)
+void ORB_gaunt_table::init_Gaunt(const int &lmax)
 {
 //----------------------------------------------------------
 // EXPLAIN : make table of Gaunt Coefficients
 // ---------------------------------------------------------
-    TITLE("Make_Gaunt_Table", "init_Gaunt");
-    timer::tick("Make_Gaunt_Table", "init_Gaunt",'D');
+    TITLE("ORB_gaunt_table", "init_Gaunt");
+    timer::tick("ORB_gaunt_table", "init_Gaunt",'D');
     
 	const int nlm = (lmax * 2 + 1) * (lmax * 2 + 1);
 	this->Gaunt_Coefficients.create(nlm, nlm, nlm);
@@ -37,67 +46,33 @@ void Make_Gaunt_Table::init_Gaunt(const int &lmax)
 					
 							Gaunt_Coefficients(dim1, dim2, dim) = 
 								this->Get_Gaunt_SH (L1, m1, L2, m2, L, m);	
+						}// m2
+                    }// L2
+                }// m1
+            }// L1
+        }// m
+    }// L
 
-							/*
-							if (dim1 == 1 && dim2 == 1 && dim == 4)
-							{
-								cout << "\nGaunt_Coef = " << Gaunt_Coefficients (dim1, dim2, dim) << endl;
-								cout << "\nGet_Gaunt_SH = " << Get_Gaunt_SH (L1, m1, L2, m2, L, m) << endl;
-							}
-							*/
-
-						//	Gaunt_Coefficients(dim1, dim2, dim) = 
-						//		this->Cal_Gaunt_single(L1, m1, L2, m2, L, m, 0.0, PI, 0.0, TWO_PI);
-						
-							//test
-//							double G_revers = this->Cal_Gaunt_single(L2, m2, L1, m1, L, m, 0.0, pi, 0.0, tpi);
-
-//							cout <<  Gaunt_Coefficients(dim1, dim2, dim3) << setw(20) << G_revers << endl;
-							
-							/*
-							//test
-							int M1, M2, M;
-							if(m1 % 2 == 0) M1 = - m1 / 2;
-							else	M1 = (m1+1) / 2;
-							if(m2 % 2 == 0) M2 = - m2 / 2;
-							else	M2 = (m2+1) / 2;
-							if(m % 2 == 0) M = - m / 2;
-							else	M = (m+1) / 2;
-							*/
-							
-							/*
-							double G1 = Get_Gaunt_SH(L1, m1, L2, m2, L, m);
-
-							if( fabs(Gaunt_Coefficients(dim1, dim2, dim) - G1) > 1e-5)
-							{
-								cout << "\nl1 = " << L1 << " m1 = " << m1 << " l2 = " << L2 << " m2 = " << m2 
-												<< " L = " << L << " M = " << m << endl;
-							
-								cout << Gaunt_Coefficients(dim1, dim2, dim) << setw(20) << G1 << setw(20) 
-											<< Gaunt_Coefficients(dim1, dim2, dim) - G1 << endl;
-							}
-							*/
-						}
-                    }
-                }
-            }
-        }
-    }
-
-    timer::tick("Make_Gaunt_Table", "init_Gaunt",'D');
+    timer::tick("ORB_gaunt_table", "init_Gaunt",'D');
     return;
 }
 
-double Make_Gaunt_Table::Cal_Gaunt_single
+
+double ORB_gaunt_table::Cal_Gaunt_single
 (
-    const int &L1, const int &m1,
-    const int &L2, const int &m2,
-    const int &L, const int &m,
-    const double &s1, const double &e1,
-    const double &s2, const double &e2
+    const int &L1, 
+	const int &m1,
+    const int &L2, 
+	const int &m2,
+    const int &L, 
+	const int &m,
+    const double &s1, 
+	const double &e1,
+    const double &s2, 
+	const double &e2
 )
 {
-	timer::tick("Make_Gaunt_Table", "Cal_Gaunt_single");
+	timer::tick("ORB_gaunt_table", "Cal_Gaunt_single");
 	if ((L1 - L2 - L) % 2 != 0)
 	{
 		return 0.0;
@@ -121,7 +96,6 @@ double Make_Gaunt_Table::Cal_Gaunt_single
 		for (int j = 0;j < 16;j++)
 		{
 			double theta = ((s1 + e1) + (e1 - s1) * absc[i]) / 2;
-			//double phi = ((s2 + e2) + (e2 - s2) * absc[j]) / 2;
 
 			result += weight[i] * weight[j] * sin(theta) *
 			          this->Ylm_Gaunt( this->get_lm_index(L1, m1), 16 * i + j) *
@@ -131,19 +105,22 @@ double Make_Gaunt_Table::Cal_Gaunt_single
 	}
 
 	result *= ((e1 - s1) / 2) * ((e2 - s2) / 2);
-	timer::tick("Make_Gaunt_Table", "Cal_Gaunt_single");
+	timer::tick("ORB_gaunt_table", "Cal_Gaunt_single");
 	return result;
 }
 
-void Make_Gaunt_Table::init_Ylm_Gaunt
+
+void ORB_gaunt_table::init_Ylm_Gaunt
 (
  	const int &lmax,
-    const double &s1, const double &e1,
-    const double &s2, const double &e2
+    const double &s1, 
+	const double &e1,
+    const double &s2, 
+	const double &e2
 )
 {
-	TITLE("Make_Gaunt_Table", "init_Ylm_Gaunt");
-	timer::tick("Make_Gaunt_Table", "inite_Ylm_Gaunt");
+	TITLE("ORB_gaunt_table", "init_Ylm_Gaunt");
+	timer::tick("ORB_gaunt_table", "inite_Ylm_Gaunt");
 
 	const int nlm = (2*lmax+1) * (2*lmax+1);
 
@@ -152,12 +129,6 @@ void Make_Gaunt_Table::init_Ylm_Gaunt
 		-0.6178762444026438, -0.4580167776572274, -0.2816035507792589, -0.09501250983763744, 
 		0.09501250983763744, 0.2816035507792589, 0.4580167776572274, 0.6178762444026438, 
 		0.755404408355003, 0.8656312023878318, 0.9445750230732326, 0.9894009349916499 };
-
-	//static double weight[16] = {
-	//	0.02715245941175406, 0.06225352393864778, 0.0951585116824929, 0.1246289712555339, 
-	//	0.1495959888165768, 0.1691565193950026, 0.1826034150449236, 0.1894506104550685, 
-	//	0.1894506104550685, 0.1826034150449236, 0.1691565193950026, 0.1495959888165768, 
-	//	0.1246289712555339, 0.0951585116824929, 0.06225352393864778, 0.02715245941175406 };
 
 	//initialization of ylm_map
 
@@ -178,33 +149,38 @@ void Make_Gaunt_Table::init_Ylm_Gaunt
 
 	Mathzone::Ylm_Real(nlm, 256, &g_gaunt[0], this->Ylm_Gaunt);
 
-	timer::tick("Make_Gaunt_Table", "init_Ylm_Gaunt");
+	timer::tick("ORB_gaunt_table", "init_Ylm_Gaunt");
 	return;
 }
 
-int Make_Gaunt_Table::get_lm_index(const int l, const int m)
+
+int ORB_gaunt_table::get_lm_index(
+	const int l, 
+	const int m)
 {
 	return l*l+m;
 }
 
+
 /**********************
 //Rasch and Yu's Method
 ***********************/
-
 //total pointers
-int Make_Gaunt_Table::P_EL(const int& L)
+int ORB_gaunt_table::P_EL(const int& L)
 {
 	return (L+1) * (L+2) * (L+3) * (L+4) / 24;
 }
 
+
 //effective pointers
-int Make_Gaunt_Table::EP_EL(const int& L)
+int ORB_gaunt_table::EP_EL(const int& L)
 {
 	if(L % 2 == 0) return (L+2) * (L+4) * (3*L*L+14*L+24) / 192;
 	else return (L+1) * (L+3) * (L+5) * (3*L+5) / 192;
 }
 
-int Make_Gaunt_Table::index_func
+
+int ORB_gaunt_table::index_func
 (
  	const int& l1,
 	const int& l2,
@@ -219,10 +195,11 @@ int Make_Gaunt_Table::index_func
 	return aux1 + aux2 + aux3 + m3;
 }
 
-void Make_Gaunt_Table::init_Gaunt_CH(const int& Lmax)
+
+void ORB_gaunt_table::init_Gaunt_CH(const int& Lmax)
 {
-	TITLE("Make_Gaunt_Table","init_Gaunt_CH");
-	timer::tick("Make_Gaunt_Table","init_Gaunt_CH",'D');
+	TITLE("ORB_gaunt_table","init_Gaunt_CH");
+	timer::tick("ORB_gaunt_table","init_Gaunt_CH",'D');
 
 //	assert(Lmax <= 6);			// Peize Lin delete 2016-08-26. why?
 
@@ -233,7 +210,7 @@ void Make_Gaunt_Table::init_Gaunt_CH(const int& Lmax)
 
 	int Eff_Np = this->EP_EL(L);
 
-	double mem = Memory::record("Make_Gaunt_Table","Gaunt_CH",Eff_Np * 30, "double");
+	double mem = Memory::record("ORB_gaunt_table","Gaunt_CH",Eff_Np * 30, "double");
 	OUT(ofs_running,"Gaunt_CH (Memory, unit: MB)",mem);
 	
 	int ic1 = 0;
@@ -272,17 +249,18 @@ void Make_Gaunt_Table::init_Gaunt_CH(const int& Lmax)
 					}
 
 					ic1++;
-				}
-			}
-		}
-	}
+				}// m3
+			}// l3
+		}// l2
+	} // l1
 
-	timer::tick("Make_Gaunt_Table","init_Gaunt_CH",'D');
+	timer::tick("ORB_gaunt_table","init_Gaunt_CH",'D');
 	return;
 }
 
+
 //using wigner 3j expression
-double Make_Gaunt_Table::Calc_Gaunt_CH
+double ORB_gaunt_table::Calc_Gaunt_CH
 (
  	const int& l1,
 	const int& m1,
@@ -292,8 +270,8 @@ double Make_Gaunt_Table::Calc_Gaunt_CH
 	const int& m3
 )
 {
-//	TITLE("Make_Gaunt_Table","Calc_Gaunt_CH");
-	timer::tick("Make_Gaunt_Table","Calc_Gaunt_CH");
+//	TITLE("ORB_gaunt_table","Calc_Gaunt_CH");
+	timer::tick("ORB_gaunt_table","Calc_Gaunt_CH");
 	
 	double fac = sqrt((2*l1+1) * (2*l2+1) * (2*l3+1) / FOUR_PI);
 
@@ -321,10 +299,11 @@ double Make_Gaunt_Table::Calc_Gaunt_CH
 
 	return fac * pow(-1.0, l1-l2-m3) * triangle_f * aux1 * aux2;
 
-	timer::tick("Make_Gaunt_Table","Calc_Gaunt_CH");
+	timer::tick("ORB_gaunt_table","Calc_Gaunt_CH");
 }
 	
-double Make_Gaunt_Table::Get_Gaunt_CH
+
+double ORB_gaunt_table::Get_Gaunt_CH
 (
  	const int& l1,
 	const int& m1,
@@ -382,10 +361,11 @@ double Make_Gaunt_Table::Get_Gaunt_CH
 	catch( out_of_range ){ return 0; }
 }
 	
+
 //Input value
 //m1, m2, m3 are restricted within 0 to 2l+1
 //and should be transformed first
-double Make_Gaunt_Table::Get_Gaunt_SH
+double ORB_gaunt_table::Get_Gaunt_SH
 (
  	const int& l1,
 	const int& mm1,
@@ -395,8 +375,8 @@ double Make_Gaunt_Table::Get_Gaunt_SH
 	const int& mm3
 )
 {
-//	TITLE("Make_Gaunt_Table","Get_Gaunt_SH");
-	timer::tick("Make_Gaunt_Table","Get_Gaunt_SH");
+//	TITLE("ORB_gaunt_table","Get_Gaunt_SH");
+	timer::tick("ORB_gaunt_table","Get_Gaunt_SH");
 	
 	//Tranform M index
 	int m1 = Index_M(mm1);
@@ -463,24 +443,11 @@ double Make_Gaunt_Table::Get_Gaunt_SH
 		else return 0.0;
 	}
 
-	timer::tick("Make_Gaunt_Table","Get_Gaunt_SH");
+	timer::tick("ORB_gaunt_table","Get_Gaunt_SH");
 }
 
-/*	// Peize Lin delete 2016-08-26
-void Make_Gaunt_Table::ZEROS()
-{
-	for(int ir = 0; ir < 5000; ir++)
-	{
-		for(int ic = 0; ic < 30; ic++)
-		{
-			Gaunt_CH[ir][ic] = 0.0;
-		}
-	}
-	return;
-}
-*/
 
-double Make_Gaunt_Table::Fact(const int& n)
+double ORB_gaunt_table::Fact(const int& n)
 {
 	double val = 1.0;
 	for(int i = 1; i <= n; i++)
@@ -490,7 +457,12 @@ double Make_Gaunt_Table::Fact(const int& n)
 	return val;
 }
 
-void Make_Gaunt_Table::Swap(int& l1, int& m1, int& l2, int & m2)
+
+void ORB_gaunt_table::Swap(
+	int& l1, 
+	int& m1, 
+	int& l2, 
+	int & m2)
 {
 	int tmp1, tmp2;
 	if(l1 >= l2) return;
@@ -508,7 +480,8 @@ void Make_Gaunt_Table::Swap(int& l1, int& m1, int& l2, int & m2)
 	return;
 }
 
-int Make_Gaunt_Table::Index_M(const int& m)
+
+int ORB_gaunt_table::Index_M(const int& m)
 {
 	if(m % 2 == 0) return (- m / 2);
 	else return ((m+1) / 2);

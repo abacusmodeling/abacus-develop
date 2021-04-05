@@ -10,6 +10,7 @@
 #endif
 
 #include "vector3.h"
+#include "matrix.h"
 
 class Matrix3
 {
@@ -36,6 +37,7 @@ public:
 	Matrix3& operator/=(const double &s);
 
 	void print(void)const;
+	matrix to_matrix(void)const;
 };
 
 Matrix3 operator +(const Matrix3 &m1, const Matrix3 &m2);	//m1+m2

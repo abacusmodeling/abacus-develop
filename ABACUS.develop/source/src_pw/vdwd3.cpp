@@ -30,7 +30,7 @@ void Vdwd3::atomkind (const UnitCell_pseudo &unitcell)
 	{
 		for (int j=0; j!=element_name.size(); j++)
 		{
-			if ( unitcell.atoms[i].label == element_name[j] )
+			if ( unitcell.atoms[i].psd == element_name[j] )
 			{
 				atom_kind[i] = j ;
 				break;
@@ -210,7 +210,12 @@ double Vdwd3::energy()
 	return energy_result;
 }
 
-vector< vector<double> > Vdwd3::force(matrix &stress_result, const bool stress_for_vdw)
+vector< vector<double> > Vdwd3::force(
+	const bool force_for_vdw, 
+	const bool stress_for_vdw, 
+	matrix &force_vdw, 
+	matrix &stress_result
+)
 {
 	TITLE("Vdwd3","force");
     initset();
@@ -249,9 +254,19 @@ vector< vector<double> > Vdwd3::force(matrix &stress_result, const bool stress_f
 	}
 	for(int ipol=0;ipol<3;ipol++)
 	{
-		for(int jpol=0;jpol<3;jpol++)
+		if(stress_for_vdw)
 		{
-			stress_result(ipol,jpol) = 2*sigma[ipol][jpol]/ucell.omega;
+			for(int jpol=0;jpol<3;jpol++)
+			{
+				stress_result(ipol,jpol) = 2*sigma[ipol][jpol]/ucell.omega;
+			}
+		}
+		if(force_for_vdw)
+		{
+			for(int iat=0;iat<ucell.nat;iat++)
+			{
+				force_vdw(iat,ipol) += force_result[iat][ipol];
+			}
 		}
 	}
 	return force_result;

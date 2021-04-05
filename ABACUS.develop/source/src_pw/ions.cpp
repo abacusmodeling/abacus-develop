@@ -1,7 +1,7 @@
 #include "tools.h"
 #include "ions.h"
 #include "forces.h"
-#include "stress.h"
+#include "stress_pw.h"
 #include "../src_pw/global.h" // use chr.
 #include "vdwd2.h"
 #include "vdwd3.h"
@@ -33,7 +33,7 @@ void Ions::opt_ions_pw(void)
 	if(FORCE)
 	{
 		IMM.allocate();
-		CE.allocate();
+		CE.allocate_ions();
 	}
 
 	if(STRESS)                    // pengfei Li 2018-05-14
@@ -93,14 +93,17 @@ void Ions::opt_ions_pw(void)
 		}
 
 			
-		if(vdwd2.vdwD2)		//Peize Lin add 2014-04-03, update 2019-04-26
+		if(vdwd2_para.flag_vdwd2)		//Peize Lin add 2014-04-03, update 2021-03-09
 		{
-			vdwd2.energy();
+			Vdwd2 vdwd2(ucell,vdwd2_para);
+			vdwd2.cal_energy();
+			en.evdw = vdwd2.get_energy();
 		}
 		if(vdwd3.vdwD3)		//jiyy add 2019-05-18
 		{
 			vdwd3.energy();
-		}																										 
+			en.evdw = vdwd3.energy_result;
+		}
 
 
 		// mohan added eiter to count for the electron iteration number, 2021-01-28
@@ -221,7 +224,7 @@ void Ions::opt_ions_pw(void)
 
     }
 
-    if(CALCULATION=="scf" || CALCULATION=="relax")
+    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
     {
         ofs_running << "\n\n --------------------------------------------" << endl;
         ofs_running << setprecision(16);
@@ -253,8 +256,9 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 	if(FORCE&&!STRESS)
 	{
 		// (1) calculate the force.
-		Forces fcs(ucell.nat);
-		fcs.init();
+		matrix force;
+		Forces fcs;
+		fcs.init(force);
 
 		// (2) move the ions.
 		bool converged = false;
@@ -268,7 +272,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		//}
 		if(CALCULATION=="relax")
 		{
-			IMM.cal_movement(istep, istep, fcs.force, en.etot);
+			IMM.cal_movement(istep, istep, force, en.etot);
 			converged = IMM.get_converged();
 
             if(converged || (istep==NSTEP) ) 
@@ -287,12 +291,10 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
                 // calculate the new potential accordint to
                 // the new charge density.
-                pot.init_pot( istep );
+                pot.init_pot( istep, pw.strucFac );
 
                 ofs_running << " Setup the new wave functions?" << endl;
-                // newd() not needed now(if Q in r space, needed).
                 wf.wfcinit();
-                // mp_bcast
             }
         }
         else
@@ -306,24 +308,18 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 
 	if(!FORCE&&STRESS)
 	{
-		Stress ss;
-		ss.cal_stress();
+		Stress_PW ss;
 		matrix stress;
-		stress.create(3,3);
+		ss.cal_stress(stress);
 
 		double unit_transform = 0.0;
 		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
 		double external_stress[3] = {PRESS1,PRESS2,PRESS3};
 		for(int i=0;i<3;i++)
 		{
-			for(int j=0;j<3;j++)
-			{
-				stress(i,j) = ss.sigmatot[i][j];
-				//OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
-			}
-			stress(i,i) = ss.sigmatot[i][i] - external_stress[i]/unit_transform;
+			stress(i,i) -= external_stress[i]/unit_transform;
 		}
-		PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
+		PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 		if(CALCULATION=="cell-relax")
 		{
 			LCM.cal_lattice_change(stress_step, stress, en.etot);
@@ -336,8 +332,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             else
             {
                 Variable_Cell::init_after_vc();
-                //pot.init_pot(0);
-                pot.init_pot(stress_step); //LiuXh add 20180619
+                pot.init_pot(stress_step, pw.strucFac); //LiuXh add 20180619
                 ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                 wf.wfcinit(); //LiuXh add 20180619
                 ++stress_step;
@@ -354,12 +349,16 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 	{
 		//cout<<" istep  force_step  stress_step  converged_force  converged_stress = "<<istep<<"  "<<force_step<<"  "<<stress_step<<"  "<<converged_force<<"  "<<converged_stress<<endl;
 
-		Forces fcs(ucell.nat);
-		fcs.init();
+		matrix force;
+		Forces fcs;
+		fcs.init(force);
+                matrix stress;
+                Stress_PW ss;
+                ss.cal_stress(stress);
 		//IMM.cal_movement(force_step, fcs.force, en.etot);
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
-            IMM.cal_movement(istep, force_step, fcs.force, en.etot);
+            IMM.cal_movement(istep, force_step, force, en.etot);
             converged_force = IMM.get_converged();
 
             //cout<<"converged_force = "<<converged_force<<endl;
@@ -367,24 +366,15 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             {
                 force_step = 1;
 
-                Stress ss;
-                ss.cal_stress();
-                matrix stress;
-                stress.create(3,3);
 
                 double unit_transform = 0.0;
                 unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
                 double external_stress[3] = {PRESS1,PRESS2,PRESS3};
                 for(int i=0;i<3;i++)
                 {
-                    for(int j=0;j<3;j++)
-                    {
-                        stress(i,j) = ss.sigmatot[i][j];
-                        //OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
-                    }
-                    stress(i,i) = ss.sigmatot[i][i] - external_stress[i]/unit_transform;
+                    stress(i,i) -= external_stress[i]/unit_transform;
                 }
-                PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
+				PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 
                 if(CALCULATION=="cell-relax")
                 {
@@ -398,8 +388,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                     else
                     {
                         Variable_Cell::init_after_vc();
-                        //pot.init_pot(0);
-                        pot.init_pot(stress_step); //LiuXh add 20180619
+                        pot.init_pot(stress_step, pw.strucFac); //LiuXh add 20180619
 
                         ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                         wf.wfcinit(); //LiuXh add 20180619
@@ -433,7 +422,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 CE.istep = force_step;
 
                 CE.extrapolate_charge();
-                pot.init_pot( istep );
+                pot.init_pot( istep, pw.strucFac );
                 wf.wfcinit();
                 ++force_step;
                 return 0;
@@ -441,24 +430,15 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
         }
         else
         {
-            Stress ss;
-            ss.cal_stress();
-            matrix stress;
-            stress.create(3,3);
 
             double unit_transform = 0.0;
             unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
             double external_stress[3] = {PRESS1,PRESS2,PRESS3};
             for(int i=0;i<3;i++)
             {
-                for(int j=0;j<3;j++)
-                {
-                    stress(i,j) = ss.sigmatot[i][j];
-                    //OUT(ofs_running,"stress(i,j)", stress(i,j)); //LiuXh modify 20180619
-                }
-                stress(i,i) = ss.sigmatot[i][i] - external_stress[i]/unit_transform;
+                stress(i,i) -= external_stress[i]/unit_transform;
             }
-            PRESSURE = (ss.sigmatot[0][0]+ss.sigmatot[1][1]+ss.sigmatot[2][2])/3;
+			PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
             return 1;
         }
     }

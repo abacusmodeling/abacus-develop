@@ -16,7 +16,7 @@ using std::set;
 #include "center2_orb.h"
 #include "center2_orb-orb11.h"
 
-#include "src_lcao/ORB_radial_table.h"
+#include "src_lcao/ORB_table_phi.h"
 #include "src_lcao/ORB_gaunt_table.h"
 #include "src_lcao/ORB_atomic_lm.h"
 #include "src_global/vector3.h"
@@ -30,8 +30,8 @@ class Center2_Orb::Orb21
 		const Numerical_Orbital_Lm &nA1_in,
 		const Numerical_Orbital_Lm &nA2_in,
 		const Numerical_Orbital_Lm &nB_in,
-		const Make_Overlap_Table &MOT_in,
-		const Make_Gaunt_Table &MGT_in	);
+		const ORB_table_phi &MOT_in,
+		const ORB_gaunt_table &MGT_in	);
 
 	void init_radial_table();
 
@@ -47,8 +47,8 @@ class Center2_Orb::Orb21
 	const Numerical_Orbital_Lm &nA2;
 	const Numerical_Orbital_Lm &nB;
 	
-	const Make_Overlap_Table &MOT;
-	const Make_Gaunt_Table &MGT;	
+	const ORB_table_phi &MOT;
+	const ORB_gaunt_table &MGT;	
 
 	map<int,Numerical_Orbital_Lm> nA;
 	map<int,Center2_Orb::Orb11> orb11s;

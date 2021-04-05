@@ -327,7 +327,7 @@ void energy::perform_dos(void)
 				atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
 
 				// mohan update 2021-02-10
-				hm.orb_con.set_orb_tables();
+				hm.orb_con.set_orb_tables(UOT);
 				LM.allocate_HS_R(LNNR.nnr);
 				LM.zeros_HSR('S', LNNR.nnr);
 				UHM.genH.calculate_S_no();
@@ -342,8 +342,6 @@ void energy::perform_dos(void)
 
 					if(is == kv.isk[ik])
 					{
-
-
 						LM.allocate_HS_k(ParaO.nloc);
 						LM.zeros_HSk('S');
 						LNNR.folding_fixedH(ik);
@@ -411,7 +409,7 @@ void energy::perform_dos(void)
 				atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
 				// mohan update 2021-02-10
-				hm.orb_con.clear_after_ions();
+				hm.orb_con.clear_after_ions(UOT);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

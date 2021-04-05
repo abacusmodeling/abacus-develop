@@ -46,7 +46,12 @@ class Vdwd3
 		double energy();
 
 		vector< vector<double> > force_result;
-		vector< vector<double> > force(matrix &stress_result, const bool stress_for_vdw);
+		vector< vector<double> > force(
+			const bool force_for_vdw, 
+			const bool stress_for_vdw, 
+			matrix &force_vdw, 
+			matrix &stress_result
+		);
 
 	private:
 		//third-order term?

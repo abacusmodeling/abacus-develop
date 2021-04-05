@@ -5,7 +5,7 @@
 using std::map;
 
 #include "exx_abfs.h"
-#include "src_lcao/ORB_radial_table.h"
+#include "src_lcao/ORB_table_phi.h"
 #include "src_lcao/ORB_gaunt_table.h"
 #include "src_lcao/center2_orb-orb22.h"
 
@@ -54,8 +54,8 @@ public:
 
 private:
 	
-	Make_Overlap_Table MOT;
-	Make_Gaunt_Table MGT;
+	ORB_table_phi MOT;
+	ORB_gaunt_table MGT;
 
 	map<size_t,                                        // TA
 		map<size_t,                                    // TB

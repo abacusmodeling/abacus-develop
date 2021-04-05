@@ -7,7 +7,7 @@
 #include <set>
 #include "src_pw/global.h"
 #include "src_lcao/ORB_read.h"
-#include "src_lcao/ylm.h"
+#include "src_global/ylm.h"
 
 #include<sys/time.h>					// Peize Lin test
 #include "src_external/src_test/test_function.h"			// Peize Lin test 2016-04-05

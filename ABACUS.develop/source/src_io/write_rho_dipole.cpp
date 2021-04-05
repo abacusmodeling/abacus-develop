@@ -3,7 +3,7 @@
 #include "src_pw/global.h"
 
 //fuxiang add 2017-03-15
-void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, const int &precision, const bool for_plot)
+void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const string &fn, const int &precision, const bool for_plot)
 {
     TITLE("Charge","write_rho_dipole");
     if (out_charge==0) 
@@ -95,9 +95,9 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 		{
 			for(int i=0; i<pw.ncx; i++)
 			{
-				dipole_elec_x += rho_save[is][i*pw.ncy*pw.ncz + j*pw.ncz + k]*i*ucell.lat0*0.529177/pw.ncx;
-				dipole_elec_y += rho_save[is][i*pw.ncy*pw.ncz + j*pw.ncz + k]*j*ucell.lat0*0.529177/pw.ncy;
-				dipole_elec_z += rho_save[is][i*pw.ncy*pw.ncz + j*pw.ncz + k]*k*ucell.lat0*0.529177/pw.ncz;
+				dipole_elec_x += rho_save[i*pw.ncy*pw.ncz + j*pw.ncz + k]*i*ucell.lat0*0.529177/pw.ncx;
+				dipole_elec_y += rho_save[i*pw.ncy*pw.ncz + j*pw.ncz + k]*j*ucell.lat0*0.529177/pw.ncy;
+				dipole_elec_z += rho_save[i*pw.ncy*pw.ncz + j*pw.ncz + k]*k*ucell.lat0*0.529177/pw.ncz;
 			}
 		}
 	}
@@ -187,7 +187,7 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 					// mohan change to rho_save on 2012-02-10
 					// because this can make our next restart calculation lead
 					// to the same dr2 as the one saved.
-					zpiece[ir] = rho_save[is][ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
+					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
 					//ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
 				}
 			}
@@ -198,7 +198,7 @@ void Charge::write_rho_dipole(const int &is, const int &iter, const string &fn, 
 				for(int ir=0; ir<nxy; ir++)
 				{
 					//zpiece[ir] = rho[is][ir*num_z[RANK_IN_POOL]+iz];
-					zpiece[ir] = rho_save[is][ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
+					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
 					//ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
 				}
 				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);

@@ -276,14 +276,14 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			stringstream ssc;
 			ssc << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-			CHR.write_rho( is, iter, ssc.str(), 3);//mohan add 2007-10-17
+			CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
 		}
         
 		
 
 		if(vext == 0) 
 		{
-			pot.set_vrs();
+			pot.set_vr_eff();
 		}
         
         //print_eigenvalue(ofs_running);
@@ -300,7 +300,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
         		stringstream ssc;
         		ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
-        		CHR.write_rho( is, 0, ssc.str() );//mohan add 2007-10-17
+        		CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 			}
               	 
 			if(conv_elec)

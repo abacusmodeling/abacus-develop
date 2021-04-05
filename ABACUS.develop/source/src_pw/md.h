@@ -9,7 +9,7 @@
 #include<cmath>
 #include"tools.h"
 #include"global.h"
-#include"../src_lcao/force_lcao.h"
+#include"../src_lcao/FORCE_STRESS.h"
 #include"unitcell_pseudo.h"
 
 using namespace std;

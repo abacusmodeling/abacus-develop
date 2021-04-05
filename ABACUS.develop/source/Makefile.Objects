@@ -14,6 +14,7 @@ HEADERS = *.h
 
 OBJS_MAIN=driver.o\
 input.o \
+write_input.o\
 input_conv.o\
 run_pw.o\
 run_lcao.o\
@@ -41,7 +42,15 @@ unitcell_pseudo.o\
 threshold_elec.o\
 electrons.o \
 forces.o\
-stress.o\
+stress_pw.o\
+stress_func_cc.o\
+stress_func_gga.o\
+stress_func_kin.o\
+stress_func_nl.o\
+stress_func_ewa.o\
+stress_func_har.o\
+stress_func_loc.o\
+stress_func_print.o\
 chi0_hilbert.o\
 chi0_standard.o\
 epsilon0_pwscf.o\
@@ -118,17 +127,23 @@ ORB_atomic_lm.o\
 ORB_nonlocal.o\
 ORB_nonlocal_lm.o\
 ORB_gaunt_table.o\
-ORB_radial_table.o\
+ORB_table_beta.o\
+ORB_table_phi.o\
+ORB_table_alpha.o\
 ORB_gen_tables.o\
 local_orbital_wfc.o\
-local_orbital_elec.o\
+local_orbital_charge.o\
 ELEC_cbands_k.o\
 ELEC_cbands_gamma.o\
 ELEC_evolve.o\
 ELEC_scf.o\
 ELEC_nscf.o\
-local_orbital_ions.o\
-local_orbital_charge.o\
+LOOP_cell.o\
+LOOP_elec.o\
+LOOP_ions.o\
+run_md.o\
+DM_gamma.o\
+DM_k.o\
 record_adj.o\
 istate_charge.o \
 istate_envelope.o \
@@ -139,16 +154,17 @@ LCAO_nnr.o \
 LCAO_diago.o\
 LCAO_evolve.o\
 ylm.o\
-force_lcao.o\
-force_lcao_gamma.o\
-force_lcao_k.o\
-stress_lcao.o\
+FORCE_STRESS.o\
+FORCE_gamma.o\
+FORCE_gamma_edm.o\
+FORCE_gamma_vl.o\
+FORCE_gamma_tvnl.o\
+FORCE_k.o\
 parallel_orbitals.o \
 global_fp.o \
 pdiag_double.o \
 pdiag_basic.o \
 pdiag_common.o \
-hs_matrix.o \
 subgrid_oper.o \
 GenELPA.o \
 conv_coulomb_pot.o \
@@ -213,10 +229,17 @@ potential.o \
 H_Ewald_pw.o\
 H_Hartree_pw.o\
 H_XC_pw.o \
+H_TDDFT_pw.o\
 read_rho.o\
+read_atoms.o\
+read_pseudopot.o\
+read_dm.o\
 write_pot.o\
 write_rho.o\
 write_rho_dipole.o\
+write_HS.o\
+write_HS_R.o\
+write_dm.o\
 potential_libxc.o \
 efield.o \
 magnetism.o\

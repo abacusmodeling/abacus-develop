@@ -1,15 +1,3 @@
-//===============---------------===========================================
-// Author: Mohan Chen
-// UpDATE :
-// 09-03-13 mohan
-// Rewrite the cg code.
-//
-// 09-05-07 wangjp
-// (1) modify ddot(),ddot_real() as static member function
-// (2) overload member function ddot() to compute the product
-// of two rows of ComplexMatrixs
-//==========================================================================
-
 #ifndef DIAGO_CG_H
 #define DIAGO_CG_H
 
@@ -27,12 +15,14 @@ class Diago_CG
     static double ddot_real(
         const int & dim,
         const complex<double>* psi_L,
-        const complex<double>* psi_R) ;
+        const complex<double>* psi_R,
+        const bool reduce = true) ;
 
     static complex<double> ddot(
         const int & dim,
         const complex<double>* psi_L,
         const complex<double>* psi_R ) ;
+
 
     static complex<double> ddot(
         const int & dim,
@@ -51,6 +41,7 @@ class Diago_CG
         ComplexMatrix &phi,
         double *e,
         const int &dim,
+        const int &dmx,
         const int &n_band,
         const double *precondition,
         const double &eps,
@@ -61,6 +52,7 @@ class Diago_CG
 
     static void schmit_orth(
         const int &dim,
+        const int &dmx,
         const int &end,
         const ComplexMatrix &psi,
         complex<double> *spsi,
@@ -81,6 +73,7 @@ class Diago_CG
 
     void orthogonal_gradient(
         const int &dim,
+        const int &dmx,
         complex<double> *g,
         complex<double> *scg,
         complex<double> *lagrange,

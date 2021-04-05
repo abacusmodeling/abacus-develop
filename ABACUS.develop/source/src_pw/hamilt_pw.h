@@ -13,8 +13,11 @@ public:
 
     static int moved;
 
-	// mohan updated 2021-02-22
-	void init(const int &npwx, const int &npol, const int &nkb, const int &nrxx);
+	void allocate(
+		const int &npwx, // number of plane wave (max)
+		const int &npol, // polarization 
+		const int &nkb,  // number of non-local pseudopotential projectors 
+		const int &nrxx); // number of grids on this processor
 
     void cal_err
     (
@@ -48,7 +51,7 @@ public:
         complex<double> *hpsi,
         complex<double> *spsi);
 
-    void h_psi( const complex<double> *psi, complex<double> *hpsi);
+    void h_psi( const complex<double> *psi, complex<double> *hpsi, const int m = 1); // qianrui add a default parameter 2021-3-31
 
     void s_1psi(
         const int npw,
@@ -64,11 +67,9 @@ public:
     // hpsi , spsi
     complex<double> *hpsi;
     complex<double> *spsi;
-
     complex<double> *Bec;
-    complex<double> *Ps;
 
-    void add_vuspsi(complex<double> *hpsi, const complex<double> *becp);
+    void add_vuspsi(complex<double> *hpsi, const complex<double> *becp, const int m);
 
 	private:
 

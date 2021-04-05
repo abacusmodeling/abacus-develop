@@ -14,6 +14,7 @@ class pseudo_us: public pseudo_nc
 
 	// <PP_QIJ>
 	int nqf;
+
 	//  <PP_RINNER>
 	double *rinner;		// rinner(0:2*lmax)
 	matrix qqq;			// qqq(nbeta,nbeta)
@@ -26,6 +27,7 @@ class pseudo_us: public pseudo_nc
 	int nqlc;			// number of angular momenta in Q
 
 	void set_pseudo_us(const Pseudopot_upf &upf);
+
 	void print_pseudo_us(ofstream &ofs);
 
 };

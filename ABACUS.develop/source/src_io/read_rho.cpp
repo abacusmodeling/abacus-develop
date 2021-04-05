@@ -1,7 +1,7 @@
 #include "src_pw/charge.h"
 #include "src_pw/global.h"
 
-bool Charge::read_rho(const int &is, const string &fn) //add by dwan
+bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwan
 {
     TITLE("Charge","read_rho");
     ifstream ifs(fn.c_str());
@@ -88,7 +88,7 @@ bool Charge::read_rho(const int &is, const string &fn) //add by dwan
 		{
 			for(int i=0; i<pw.ncx; i++)
 			{
-				ifs >> rho[is][i*pw.ncy*pw.ncz + j*pw.ncz +k];
+				ifs >> rho[i*pw.ncy*pw.ncz + j*pw.ncz +k];
 			}
 		}
 	}
@@ -110,7 +110,7 @@ bool Charge::read_rho(const int &is, const string &fn) //add by dwan
 				}
 			}
 		}
-		Pgrid.zpiece_to_all(zpiece, iz, rho[is]);
+		Pgrid.zpiece_to_all(zpiece, iz, rho);
 	}// iz
 	delete[] zpiece;
 #endif

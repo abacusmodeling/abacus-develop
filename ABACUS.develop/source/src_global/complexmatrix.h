@@ -9,7 +9,7 @@
 #include <complex>
 using namespace std;
 
-#include "src_global/matrix.h"
+#include "matrix.h"
 
 #ifdef _MCD_CHECK
 #include "src_parallel/mcd.h"

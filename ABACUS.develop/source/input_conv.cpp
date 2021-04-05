@@ -4,12 +4,12 @@
 #include "input_conv.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_io/optical.h"
-#include "src_lcao/force_lcao.h"
+#include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ORB_read.h"
 #include "src_pw/efield.h"
 #include "src_lcao/global_fp.h"
-#include "src_pw/vdwd2.h"
+#include "src_pw/vdwd2_parameters.h"
 #include "src_pw/vdwd3.h"
 #include "src_io/chi0_hilbert.h"
 #include "src_io/chi0_standard.h"
@@ -73,7 +73,7 @@ void Input_Conv::Convert(void)
     PRESS1 = INPUT.press1;
     PRESS2 = INPUT.press2;
     PRESS3 = INPUT.press3;
-	Force_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
+	Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 
 	BFGS_Basic::w1 = INPUT.bfgs_w1;
 	BFGS_Basic::w2 = INPUT.bfgs_w2;
@@ -192,26 +192,26 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------	
 	if(INPUT.vdw_method=="d2")
 	{
-		vdwd2.vdwD2 = true;
-		vdwd2.scaling = std::stod(INPUT.vdw_s6);
-		vdwd2.damping = INPUT.vdw_d;
-		vdwd2.C6_input(INPUT.vdw_C6_file, INPUT.vdw_C6_unit);
-		vdwd2.R0_input(INPUT.vdw_R0_file, INPUT.vdw_R0_unit);
-		vdwd2.model = INPUT.vdw_model;
+		vdwd2_para.flag_vdwd2 = true;
+		vdwd2_para.scaling = std::stod(INPUT.vdw_s6);
+		vdwd2_para.damping = INPUT.vdw_d;
+		vdwd2_para.C6_input(INPUT.vdw_C6_file, INPUT.vdw_C6_unit);
+		vdwd2_para.R0_input(INPUT.vdw_R0_file, INPUT.vdw_R0_unit);
+		vdwd2_para.model = INPUT.vdw_model;
 		if(INPUT.vdw_model=="radius")
 		{
 			if(INPUT.vdw_radius_unit=="Bohr")
 			{
-				vdwd2.radius = std::stod(INPUT.vdw_radius);
+				vdwd2_para.radius = std::stod(INPUT.vdw_radius);
 			}
 			else
 			{
-				vdwd2.radius = std::stod(INPUT.vdw_radius) * BOHR_TO_A;
+				vdwd2_para.radius = std::stod(INPUT.vdw_radius) * BOHR_TO_A;
 			}
 		}
 		else if(INPUT.vdw_model=="period")
 		{
-			vdwd2.period = INPUT.vdw_period;
+			vdwd2_para.period = INPUT.vdw_period;
 		}
 	}
     if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")

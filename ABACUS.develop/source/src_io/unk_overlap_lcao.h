@@ -8,25 +8,25 @@ using std::map;
 #include<set>
 using std::set;
 
-#include "../src_lcao/center2_orb.h"
-#include "../src_lcao/center2_orb-orb11.h"
-#include "../src_lcao/center2_orb-orb21.h"
+#include "src_lcao/center2_orb.h"
+#include "src_lcao/center2_orb-orb11.h"
+#include "src_lcao/center2_orb-orb21.h"
 
-#include "../src_lcao/ORB_radial_table.h"
-#include "../src_lcao/ORB_gaunt_table.h"
-#include "../src_lcao/ORB_atomic_lm.h"
-#include "../src_lcao/ORB_read.h"
-#include "../src_global/vector3.h"
-#include "../src_lcao/ylm.h"
+#include "src_lcao/ORB_table_phi.h"
+#include "src_lcao/ORB_gaunt_table.h"
+#include "src_lcao/ORB_atomic_lm.h"
+#include "src_lcao/ORB_read.h"
+#include "src_global/vector3.h"
+#include "src_global/ylm.h"
 
-#include "../src_pw/global.h"
+#include "src_pw/global.h"
 
 class unkOverlap_lcao
 {
 public:
 
-	Make_Overlap_Table MOT;
-	Make_Gaunt_Table MGT;
+	ORB_table_phi MOT;
+	ORB_gaunt_table MGT;
 	Numerical_Orbital_Lm orb_r;  // 新建的r矢量,以原子轨道形式存在,以solid球谐函数展开
 	
 	vector<vector<vector<Vector3<double>>>> orb1_orb2_R;

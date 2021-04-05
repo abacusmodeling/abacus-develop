@@ -1,7 +1,13 @@
 #include "src_pw/charge.h"
 #include "src_pw/global.h"
 
-void Charge::write_rho(const int &is, const int &iter, const string &fn, const int &precision, const bool for_plot)
+void Charge::write_rho(
+	const double* rho_save, 
+	const int &is, 
+	const int &iter, 
+	const string &fn, 
+	const int &precision, 
+	const bool for_plot)
 {
     TITLE("Charge","write_rho");
 
@@ -34,6 +40,7 @@ void Charge::write_rho(const int &is, const int &iter, const string &fn, const i
 		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
 		ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
 		ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+
 		for(int it=0; it<ucell.ntype; it++)
 		{
 			ofs << " " << ucell.atoms[it].label;
@@ -95,7 +102,7 @@ void Charge::write_rho(const int &is, const int &iter, const string &fn, const i
 			for(int i=0; i<pw.ncx; i++)
 			{
 				if(count%8==0) ofs << "\n";
-				ofs << " " << rho_save[is][i*pw.ncy*pw.ncz + j*pw.ncz + k];
+				ofs << " " << rho_save[i*pw.ncy*pw.ncz + j*pw.ncz + k];
 				++count;
 			}
 		}
@@ -168,7 +175,7 @@ void Charge::write_rho(const int &is, const int &iter, const string &fn, const i
 					// mohan change to rho_save on 2012-02-10
 					// because this can make our next restart calculation lead
 					// to the same dr2 as the one saved.
-					zpiece[ir] = rho_save[is][ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
+					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
 					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
 				}
 			}
@@ -179,7 +186,7 @@ void Charge::write_rho(const int &is, const int &iter, const string &fn, const i
 				for(int ir=0; ir<nxy; ir++)
 				{
 					//						zpiece[ir] = rho[is][ir*num_z[RANK_IN_POOL]+iz];
-					zpiece[ir] = rho_save[is][ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
+					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
 					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
 				}
 				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);

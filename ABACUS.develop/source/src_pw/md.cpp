@@ -7,7 +7,7 @@
 #include<cmath>
 #include"md.h"
 #include"../input.h"
-#include"../src_lcao/local_orbital_ions.h"
+#include"../src_lcao/LOOP_ions.h"
 #include "../src_global/sltk_atom_arrange.h" //2015-10-01, xiaohui
 
 md::md(int n)
@@ -1008,24 +1008,19 @@ void md::connection2(){
 void md::callforce(){
 //to call the force of each atom
 	int ion;
-	Force_LCAO FL;
-	FL.allocate (); 
-	FL.start_force();
+	Force_Stress_LCAO FSL;
+	FSL.allocate (); 
+	matrix forceMd;
+	FSL.getForceStress(FORCE, STRESS, TEST_FORCE, TEST_STRESS, forceMd, stress_lcao);
 	for(ion=0;ion<numIon;ion++){
-			force[ion].x=FL.fcs(ion,0)/2.0;
-			force[ion].y=FL.fcs(ion,1)/2.0;
-			force[ion].z=FL.fcs(ion,2)/2.0;
+			force[ion].x=forceMd(ion,0)/2.0;
+			force[ion].y=forceMd(ion,1)/2.0;
+			force[ion].z=forceMd(ion,2)/2.0;
                        // cout<<force[ion].x/0.0195<<" "<<force[ion].y/0.0195<<" "<<force[ion].z/0.0195<<endl;
 	}
 #ifdef __MPI //2015-10-01, xiaohui
         atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif //2015-10-01, xiaohui
-	if(STRESS)
-	{
-	//	matrix stress_lcao;//this is the stress matrix same as src_p    w/ion.cpp
-                stress_lcao.create(3,3);
-                FL.cal_stress(stress_lcao);
-	}
 	return;
 }
 void md::moveatoms(int step){
