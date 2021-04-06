@@ -109,32 +109,10 @@ void LOOP_ions::opt_ions(void)
 		
 		time_t eend = time(NULL);
 
-		// PLEASE move the details of CE to other places
-		// mohan add 2021-03-25
-        //xiaohui add 2014-07-07, for second-order extrapolation
-        int iat=0;
+		//for second-order extrapolation
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
-            for(int it = 0;it < ucell.ntype;it++)
-            {
-                Atom* atom = &ucell.atoms[it];
-                for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                {
-                    CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
-                    CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
-                    CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
-
-                    CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
-                    CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
-                    CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
-
-                    CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-                    CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-                    CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
-
-                    iat++;
-                }
-            }
+            CE.update_all_pos(ucell);
         }
 
 		// PLEASE design a proper interface to output potentials,
@@ -173,21 +151,9 @@ void LOOP_ions::opt_ions(void)
 		// PLEASE move the details of CE to other places
 		// mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
-        iat=0;
         if(FORCE)
         {
-            for(int it = 0;it < ucell.ntype;it++)
-            {
-                Atom* atom = &ucell.atoms[it];
-                for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                {
-                    CE.pos_next[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-                    CE.pos_next[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-                    CE.pos_next[3*iat+2] = atom->tau[ia].z*ucell.lat0;
-
-                    iat++;
-                }
-            }
+            CE.save_pos_next(ucell);
         }
 		
         if(OUT_LEVEL=="i")
@@ -282,7 +248,7 @@ bool LOOP_ions::force_stress(
             }
             else // ions are not converged
             {
-                CE.istep = istep;
+                CE.update_istep(istep); 
                 CE.extrapolate_charge();
 
                 if(pot.extra_pot=="dm")
@@ -396,7 +362,7 @@ xiaohui modify 2014-08-09*/
             }
             else
             {
-                CE.istep = force_step;
+                CE.update_istep(force_step);
                 CE.extrapolate_charge();
 
                 if(pot.extra_pot=="dm")

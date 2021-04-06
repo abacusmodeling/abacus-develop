@@ -156,29 +156,9 @@ void Ions::opt_ions_pw(void)
 		}
 	
 
-		int iat=0; //LiuXh add 20180619
 		if(CALCULATION=="relax"|| CALCULATION=="md" || CALCULATION=="cell-relax")
 		{
-			for(int it = 0;it < ucell.ntype;it++)
-			{
-				Atom* atom = &ucell.atoms[it];
-				for(int ia =0;ia< ucell.atoms[it].na;ia++)
-				{
-					CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
-					CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
-					CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
-
-					CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
-					CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
-					CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
-
-					CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-					CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-					CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
-
-					iat++;
-				}
-			}
+			CE.update_all_pos(ucell);
 		}
 
 		if(pot.out_potential == 2)
@@ -404,24 +384,10 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             }
             else
             {
-                //stress_step = 1;
-                pw.setup_structure_factor();
-                int iat=0; //LiuXh add 20180619
-                for(int it = 0;it < ucell.ntype;it++)
-                {
-                    Atom* atom = &ucell.atoms[it];
-                    for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                    {
-                        CE.pos_next[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-                        CE.pos_next[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-                        CE.pos_next[3*iat+2] = atom->tau[ia].z*ucell.lat0;
-
-                        iat++;
-                    }
-                }
-                CE.istep = force_step;
-
+                CE.save_pos_next(ucell);
+                CE.update_istep(force_step);
                 CE.extrapolate_charge();
+
                 pot.init_pot( istep, pw.strucFac );
                 wf.wfcinit();
                 ++force_step;

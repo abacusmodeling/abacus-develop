@@ -1,4 +1,3 @@
-//caoyu add 2021-03-29
 #include "LCAO_descriptor.h"
 #include "LCAO_matrix.h"
 #include "../src_global/lapack_connector.h"
@@ -7,6 +6,8 @@
 #include "global_fp.h"
 #include "../src_pw/global.h"
 #include "../src_io/winput.h"
+
+//caoyu add 2021-03-29
 
 LCAO_Descriptor::LCAO_Descriptor()
 {
@@ -29,12 +30,19 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
 
     // =======init==============
     // cal n(descriptor) per atom , related to Lmax, nchi(L) and m. (not total_nchi!)
+
+	this->des_per_atom=0;
     for (int l = 0; l <= ORB.get_lmax_d(); l++)
     {
         this->des_per_atom += ORB.Alpha[0].getNchi(l) * (2 * l + 1);
     }
+
+	// total number of descriptors
     this->n_descriptor = ucell.nat * this->des_per_atom;
+
+	// size of the full density matrix (DM)
     const long DMsize = this->n_descriptor * this->n_descriptor;
+
     delete[] S_mu_alpha;
     S_mu_alpha = new double[DMsize];
 
@@ -47,6 +55,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
     //\sum{T} e**{ikT} <\phi_{ia}|d\phi_{k\beta}(T)>	//???
     Vector3<double> tau1, tau2, dtau;
     Vector3<double> dtau1, dtau2, tau0;
+
     for (int T1 = 0; T1 < ucell.ntype; ++T1)
     {
         Atom *atom1 = &ucell.atoms[T1];
@@ -63,10 +72,12 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
                 tau2 = GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * ucell.lat0;
-                double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut(); //Rcut is subject to ORB.Phi to keep dimension of S_mu_alpha same as Sloc
+				// rcut is subject to ORB.Phi to keep dimension of S_mu_alpha same as Sloc
+                double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
                 if (distance < rcut)
                 {
-                    int iw1_all = ucell.itiaiw2iwt(T1, I1, 0); //iw1_all = combined index (it, ia, iw)
+					// iw1_all = combined index (it, ia, iw)
+                    int iw1_all = ucell.itiaiw2iwt(T1, I1, 0);
 
                     for (int jj = 0; jj < atom1->nw * NPOL; ++jj)
                     {
@@ -95,7 +106,9 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
                             {
                                 for (int m2 = 0; m2 < 2 * L2 + 1; ++m2)
                                 {
-                                    olm[0] = olm[1] = olm[2] = 0.0;
+                                    olm[0] = 0.0;
+									olm[1] = 0.0;
+									olm[2] = 0.0;
 
                                     complex<double> olm1[4] = {ZERO, ZERO, ZERO, ZERO};
                                     complex<double> *olm2 = &olm1[0];
@@ -136,7 +149,8 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
 
     if (!GAMMA_ONLY_LOCAL)
     {
-        WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", "muti-kpoint method for descriptor is not implemented yet! ");
+        WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", 
+		"muti-kpoint method for descriptor is not implemented yet! ");
     }
 
     return;
@@ -165,7 +179,7 @@ void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &iw2_all, con
     return;
 }
 
-void LCAO_Descriptor::cal_projective_DM()
+void LCAO_Descriptor::cal_projective_DM(void)
 {
     //step 1: cal inv of Sloc
     double *sinv = new double[NLOCAL * NLOCAL]; //size :NLOCAL*NLOCAL
@@ -216,6 +230,7 @@ void LCAO_Descriptor::cal_projective_DM()
     const long tmp_PDM_size = NLOCAL * this->n_descriptor;
     double *tmp_PDM = new double[tmp_PDM_size];
     const long PDM_size = this->n_descriptor * this->n_descriptor;
+
     delete[] this->PDM;
     this->PDM = new double[PDM_size];
 
@@ -226,19 +241,23 @@ void LCAO_Descriptor::cal_projective_DM()
     double *a = sinv;
     double *b = ss;
     double *c = tmp_PDM;
-    dgemm_(&nt, &nt, &NLOCAL, &n_descriptor, &NLOCAL, &alpha, a, &NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //S_nu_nu*SS_nu_beta
+    dgemm_(&nt, &nt, &NLOCAL, &n_descriptor, &NLOCAL, &alpha, a, 
+	&NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //S_nu_nu*SS_nu_beta
     a = dm;
     b = c;
     c = this->PDM;
-    dgemm_(&nt, &nt, &NLOCAL, &n_descriptor, &NLOCAL, &alpha, a, &NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //DM*S_nu_nu*SS_nu_beta
+    dgemm_(&nt, &nt, &NLOCAL, &n_descriptor, &NLOCAL, &alpha, a, 
+	&NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //DM*S_nu_nu*SS_nu_beta
     a = sinv;
     b = c;
     c = tmp_PDM;
-    dgemm_(&t, &nt, &NLOCAL, &n_descriptor, &NLOCAL, &alpha, a, &NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //S_mu_mu*DM*S_nu_nu*SS_nu_beta
+    dgemm_(&t, &nt, &NLOCAL, &n_descriptor, &NLOCAL, &alpha, a, 
+	&NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //S_mu_mu*DM*S_nu_nu*SS_nu_beta
     a = ss;
     b = c;
     c = this->PDM;
-    dgemm_(&t, &nt, &n_descriptor, &n_descriptor, &NLOCAL, &alpha, a, &NLOCAL, b, &NLOCAL, &beta, c, &n_descriptor); //SS_alpha_mu*S_mu_mu*DM*S_nu_nu*SS_nu_beta
+    dgemm_(&t, &nt, &n_descriptor, &n_descriptor, &NLOCAL, &alpha, a, 
+	&NLOCAL, b, &NLOCAL, &beta, c, &n_descriptor); //SS_alpha_mu*S_mu_mu*DM*S_nu_nu*SS_nu_beta
 
     delete[] dm;
     delete[] sinv;
@@ -246,10 +265,11 @@ void LCAO_Descriptor::cal_projective_DM()
     return;
 }
 
-void LCAO_Descriptor::cal_descriptor()
+void LCAO_Descriptor::cal_descriptor(void)
 {
     delete[] d;
     d = new double[this->n_descriptor];
+
     //==========print preparation=============
     ofs_running << " print out each DM_Inl" << endl;
     ofstream ofs;
@@ -267,7 +287,9 @@ void LCAO_Descriptor::cal_descriptor()
     {
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
         {
-            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << endl;
+            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 
+			<< " n_descriptor " << this->des_per_atom << endl;
+
             for (int l = 0; l <= lmax; l++)
             {
                 int nmax = ORB.Alpha[0].getNchi(l);
@@ -327,11 +349,16 @@ void LCAO_Descriptor::cal_descriptor()
             } //l
         }     //ia
     }         //it
+
     if (ofs)
+	{
         ofs.close();
+	}
+
     this->print_descriptor();
     return;
 }
+
 
 void LCAO_Descriptor::init_mu_index(void)
 {
@@ -380,7 +407,14 @@ void LCAO_Descriptor::init_mu_index(void)
     return;
 }
 
-void LCAO_Descriptor::print_projective_DM(ofstream &ofs, ComplexMatrix &des, const int &it, const int &ia, const int &l, const int &n)
+
+void LCAO_Descriptor::print_projective_DM(
+	ofstream &ofs, 
+	ComplexMatrix &des, 
+	const int &it, 
+	const int &ia, 
+	const int &l, 
+	const int &n)
 {
     ofs << "L=" << l << "   N=" << n << endl;
     for (int i = 0; i < 2 * l + 1; i++)
@@ -393,7 +427,9 @@ void LCAO_Descriptor::print_projective_DM(ofstream &ofs, ComplexMatrix &des, con
     }
     return;
 }
-void LCAO_Descriptor::print_descriptor()
+
+
+void LCAO_Descriptor::print_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "print_descriptor");
     ofstream ofs;
@@ -405,11 +441,13 @@ void LCAO_Descriptor::print_descriptor()
     {
         ofs.open(ss.str().c_str());
     }
+
     for (int it = 0; it < ucell.ntype; it++)
     {
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
         {
-            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << endl;
+            ofs << ucell.atoms[it].label << " atom_index " 
+			<< ia + 1 << " n_descriptor " << this->des_per_atom << endl;
             int id0 = this->mu_index[it](ia, 0, 0, 0);
             for (int id = id0; id < id0 + this->des_per_atom; ++id)
             {

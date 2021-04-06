@@ -66,8 +66,6 @@ class LCAO_Orbitals
 	double Rmax;
 	int *nproj; //mohan add 2010-12-19
 	int nprojmax; // mohan add 2010-03-07
-	int nkb; // total number of projectors.
-	IntArray itiaib2ib_all;
 	IntArray ib2_ylm;
 	
 	double dr_uniform;
@@ -87,7 +85,6 @@ class LCAO_Orbitals
 	int lmax_d;	//caoyu add 2021-03-17
 	int nchimax_d;	//caoyu add 2021-03-17
 	int ntype; // number of elements
-
 
 	void set_nl_index(void);
 

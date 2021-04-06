@@ -945,48 +945,6 @@ void LCAO_Orbitals::set_nl_index(void)
 
 	assert(this->ntype>0);
 
-	this->nkb=0;
-	for(int it=0; it<ntype; it++)
-	{
-		nkb += ucell.atoms[it].na * ucell.atoms[it].nh;
-//		cout << " projectors for " << ucell.atoms[it].label << " is " << ucell.atoms[it].nh << endl;
-	}
-
-	// mohan update 2011-05-01
-	if(nkb==0)
-	{
-		WARNING("LCAO_Orbitals","No non-local projectos, it must all be H atoms.");
-		return;
-	}
-	
-
-	this->itiaib2ib_all.create(ntype, ucell.namax, this->nkb);
-
-	int ib_all = 0;
-	for(int it=0; it<ntype; it++)
-	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
-		{
-			for(int ib=0; ib<ucell.atoms[it].nh; ib++)
-			{
-				itiaib2ib_all(it,ia,ib) = ib_all;
-				++ib_all;
-			}
-			/*
-			for(int ib=0; ib< this->nproj[it]; ib++)
-			{
-				for(int m=0; m< 2*Beta[it].Proj[ib].getL()+1; m++)
-				{
-					itiaib2ib_all(it,ia,ib) = ib_all;
-					++ib_all;
-				}
-			}
-			*/	
-		}
-	}
-	assert(ib_all==nkb);
-
-
 	int nh_max = 0;
 	for(int it=0; it<ntype; it++)
 	{
