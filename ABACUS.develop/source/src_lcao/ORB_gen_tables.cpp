@@ -134,10 +134,18 @@ void ORB_gen_tables::snap_psibeta(
 		return;
 	}
 
-	timer::tick ("ORB_gen_tables","snap_psibeta",'X');
+//	timer::tick ("ORB_gen_tables","snap_psibeta",'X');
 
+	// PLEASE update this option,
+	// has_so only needs to be determined once,
+	// has_so can be used as a static variable,
+	// or an input parameter
+	// mohan add 2021-04-06
 	bool has_so = 0;
-	if(ORB.Beta[T0].get_count_soc(0)>0 ) has_so = 1;
+	if(ORB.Beta[T0].get_count_soc(0)>0 ) 
+	{
+		has_so = 1;
+	}
 
 	const int nproj = ORB.nproj[T0];
 	bool *calproj = new bool[nproj];
@@ -163,7 +171,10 @@ void ORB_gen_tables::snap_psibeta(
 	bool all_out = true;
 	for(int ip=0; ip<nproj; ip++)
 	{
+
+		// PLEASE note that all projectors should share the same rcut
 		const double Rcut0 = ORB.Beta[T0].Proj[ip].getRcut();
+
 		if( distance10 > (Rcut1 + Rcut0) || distance20 > (Rcut2 + Rcut0) )  
 		{
 			calproj[ip] = false;
@@ -183,7 +194,7 @@ void ORB_gen_tables::snap_psibeta(
 		delete[] calproj;
 		delete[] rmesh1;
 		delete[] rmesh2;
-		timer::tick ("ORB_gen_tables","snap_psibeta",'X');
+//		timer::tick ("ORB_gen_tables","snap_psibeta",'X');
 		return;
 	}
 
@@ -194,7 +205,9 @@ void ORB_gen_tables::snap_psibeta(
 	double psa, psb;
 	double x0a,x1a,x2a,x3a,x123a,x120a,x032a,x031a;
 	double x0b,x1b,x2b,x3b,x123b,x120b,x032b,x031b;
-	
+
+	// PLEASE note that x1a*x2a is called twice, etc.
+	// mohan add 2021-04-06	
 	psa = distance10 / tbeta.dr;
 	iqa = static_cast<int>(psa);
    	x0a = psa - static_cast<double>(iqa);
@@ -218,12 +231,6 @@ void ORB_gen_tables::snap_psibeta(
 	x031b = x0b*x3b*x1b/2.0;
 	
 	//UNIT VECTOR
-			
-	//double unit_vec_dRa[3];
-	//unit_vec_dRa[0] = dRa.x;
-	//unit_vec_dRa[1] = dRa.y;
-	//unit_vec_dRa[2] = dRa.z;
-	
 	double unit_vec_dRb[3];
 	unit_vec_dRb[0] = dRb.x;
 	unit_vec_dRb[1] = dRb.y;
@@ -287,21 +294,18 @@ void ORB_gen_tables::snap_psibeta(
 		if( !calproj[nb] ) continue;
 
 		const int L0 = ORB.Beta[T0].getL_Beta(nb);
-		//const int next_ip = 2* L0 +1;
-	
+		//const int next_ip = 2* L0 +1;	
 
 //-------------------------------------------------------------------
 // move iterations for psi1 and psi2 from cal_fvnl_dbeta 
 // to here --- 2021/03/20 mohan chen
 //-------------------------------------------------------------------
 
-
 		// <psi1 | Beta>
 		const int Opair1 = tbeta.NL_Opair(Tpair1, L1, N1, nb); 
 		// <psi2 | Beta>
 		const int Opair2 = tbeta.NL_Opair(Tpair2, L2, N2, nb); 
 		
-			
 		for(int m0=0; m0<2*L0+1; m0++)
 		{
 			++ip;
@@ -512,8 +516,10 @@ void ORB_gen_tables::snap_psibeta(
 					}
 				}
 				break;
+
 			case 1://need to be added later
-			{break;}
+				{break;}
+
 			default: break;
 		}
 	}
@@ -522,7 +528,7 @@ void ORB_gen_tables::snap_psibeta(
 	delete[] rmesh1;
 	delete[] rmesh2;
 
-	timer::tick ("ORB_gen_tables","snap_psibeta",'X');
+//	timer::tick ("ORB_gen_tables","snap_psibeta",'X');
 	return;
 }
 
