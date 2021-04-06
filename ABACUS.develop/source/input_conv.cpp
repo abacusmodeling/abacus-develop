@@ -578,7 +578,7 @@ void Input_Conv::Convert(void)
 
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
-    NEW_DM=INPUT.newDM;  // Shen Yu add 2019/5/9
+//    NEW_DM=INPUT.new_dm;  // Shen Yu add 2019/5/9
 
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 2/16 )

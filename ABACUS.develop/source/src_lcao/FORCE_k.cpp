@@ -864,7 +864,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											{
 												for(int ipol=0;ipol<3;ipol++)
 												{
-													svnl_dbeta(jpol, ipol) += dm2d[is][iir] * (nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
+													svnl_dbeta(jpol, ipol) += dm2d[is][iir] * 
+													(nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
 												}
 											}
 										}
@@ -883,7 +884,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 
 	assert( iir == LNNR.nnr );
 
-	if(isstress){
+	if(isstress)
+	{
 		for(int i=0;i<3;i++)
 		{
 			for(int j=0;j<3;j++)
