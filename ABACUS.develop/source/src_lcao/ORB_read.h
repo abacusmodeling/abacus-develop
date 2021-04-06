@@ -67,7 +67,6 @@ class LCAO_Orbitals
 	int *nproj; //mohan add 2010-12-19
 	int nprojmax; // mohan add 2010-03-07
 	int nkb; // total number of projectors.
-	IntArray itiaib2ib_all;
 	IntArray ib2_ylm;
 	
 	double dr_uniform;
