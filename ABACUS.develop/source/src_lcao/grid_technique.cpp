@@ -352,7 +352,11 @@ void Grid_Technique::cal_trace_beta(void)
 {
 	// save the atom information in trace_beta//
 	delete[] trace_beta;
-	int nkb=ORB.nkb;
+
+	// mohan modify 2021-04-06
+	//int nkb=ORB.nkb;
+	int nkb=ppcell.nkb;
+
 	this->trace_beta = new int[nkb];
 	for(int i=0; i<nkb; i++)
 	{
