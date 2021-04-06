@@ -462,16 +462,22 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 
 	// dr must be all the same for Sph_Bessel_Recursive_Pool
 	const double dr = this->rab[0];
+	
 	for( int ir=1; ir<this->nr; ++ir )
+	{
 		assert( dr == this->rab[ir] );
+	}
 
 	Sph_Bessel_Recursive::D2* pSB = nullptr;
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	{
 		if( this->dk * dr == sb.get_dx() )
 		{
 			pSB = &sb;
 			break;
 		}
+	}
+
 	if(!pSB)
 	{
 		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
@@ -485,20 +491,42 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 
 	vector<double> r_tmp(nr);
 	for( int ir=0; ir!=nr; ++ir )
+	{
 		r_tmp[ir] = this->psir[ir] * this->r_radial[ir] * this->rab[ir];
-	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
-	r_tmp[0]*=one_three;	r_tmp[nr-1]*=one_three;
-	for( int ir=1; ir!=nr-1; ++ir )
-		r_tmp[ir] *= (ir&1) ? four_three : two_three;
+	}
 
+	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
+	r_tmp[0]*=one_three;	
+	r_tmp[nr-1]*=one_three;
+
+	for( int ir=1; ir!=nr-1; ++ir )
+	{
+		r_tmp[ir] *= (ir&1) ? four_three : two_three;
+	}
+
+#ifdef __NORMAL
+	// need to be checked (avoid using Lapack)
+	for(int ik=0; ik<nk; ++ik)
+	{
+		double psi_f_tmp = 0.0; 
+		for(int ir=0; ir<nr; ++ir)
+		{
+			psi_f_tmp += r_tmp[ir]*jl[ik][ir];
+		}
+		psi_f_tmp *= pref;
+	}
+#else
 	#pragma omp parallel for schedule(static)
 	for (int ik = 0; ik < nk; ik++)
 	{
-		const double psi_f_tmp = pref * LapackConnector::dot( this->nr, VECTOR_TO_PTR(r_tmp), 1, VECTOR_TO_PTR(jl[ik]), 1 ) ;
+		const double psi_f_tmp = 
+		pref * LapackConnector::dot( this->nr, VECTOR_TO_PTR(r_tmp), 1, VECTOR_TO_PTR(jl[ik]), 1 ) ;
 		this->psif[ik] = psi_f_tmp;
 		this->psik[ik] = psi_f_tmp * k_radial[ik];
 		this->psik2[ik] = this->psik[ik] * k_radial[ik];
 	}
+#endif
+	return;
 }
 
 // Peize Lin add 2017-12-11
