@@ -70,6 +70,11 @@ public:
     void print_cell_cif(const string &fn)const;
     const double& getNelec(void)const {return electrons_number;}
 
+    void update_pos_tau(const double* pos);
+    void periodic_boundary_adjustment();
+    void bcast_atoms_tau();
+    void save_cartesian_position(double* pos)const;
+
 protected:
 
     double electrons_number;
