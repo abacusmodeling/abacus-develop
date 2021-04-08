@@ -39,6 +39,8 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 			pp_address = pp_dir + this->pseudo_fn[i];
 			//error = upf.read_pseudo_upf( pp_address ); xiaohui modify 2013-06-23
 			error = upf.init_pseudo_reader( pp_address ); //xiaohui add 2013-06-23
+			if(this->atoms[i].flag_empty_element)					// Peize Lin add for bsse 2021.04.07
+				upf.set_empty_element();			
 			//average pseudopotential if needed
 			error_ap = upf.average_p(); //added by zhengdy 2020-10-20
 		}
