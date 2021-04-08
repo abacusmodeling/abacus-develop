@@ -649,11 +649,21 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 }
 
 
-void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri)
+void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liuyu 2021-04-07
 {
     TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
     timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta",'G');
 
+	matrix Rcut;
+	Rcut.create(ucell.ntype, ucell.ntype);
+	for(int i=0; i<ucell.ntype; i++)
+	{
+        for(int j=0; j<ucell.ntype; j++)
+        {
+            Rcut(i,j) = ORB.Phi[i].getRcut() + ORB.Phi[j].getRcut();
+        }
+    }
+	
     for (int T0 = 0; T0 < ucell.ntype; T0++)
     {
 		Atom* atom0 = &ucell.atoms[T0]; 
@@ -668,45 +678,50 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri)
             {
                 const int T1 = GridD.getType(ad);
                 const int I1 = GridD.getNatom(ad);
-				const int iat = ucell.itia2iat(T1, I1);
+				//const int iat = ucell.itia2iat(T1, I1);
                 const int start = ucell.itiaiw2iwt(T1, I1, 0);
                 const Vector3<double> tau1 = GridD.getAdjacentTau(ad);
 				const Atom* atom1 = &ucell.atoms[T1];
+				const int nw1_tot = atom1->nw*NPOL;
 
 				// use to label < mu | H | nu(prime) >
-				int nnr = LNNR.nlocstart[iat];
+				//int nnr = LNNR.nlocstart[iat];
             
 				//(3)
 				for (int ad2=0; ad2 < GridD.getAdjacentNum()+1 ; ad2++)
 				{
-					if(ad2<ad && !calc_deri) continue; //add by liuyu 20210406
+					//if(ad2<ad && !calc_deri) continue; //add by liuyu 20210406
 					const int T2 = GridD.getType(ad2);
 					const int I2 = GridD.getNatom(ad2);
 					const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 					const Vector3<double> tau2 = GridD.getAdjacentTau(ad2);
 					const Atom* atom2 = &ucell.atoms[T2];
+					const int nw2_tot = atom2->nw*NPOL;
 
 					Vector3<double> dtau = tau2 - tau1;
 					double distance = dtau.norm() * ucell.lat0;
-					double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+					double rcut = Rcut(T1,T2);
+					//double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 					if(distance < rcut)
 					{
 						// ------------- enter the nnr increaing zone --------------
-						for (int j=0; j<atom1->nw*NPOL; j++)
+						//for (int j=0; j<atom1->nw*NPOL; j++)
+						for (int j=0; j<nw1_tot; j++)
 						{
-							const int j0 = j/NPOL;
 							const int iw1_all = start + j;
 							const int mu = ParaO.trace_loc_row[iw1_all];
-							if(mu < 0)continue; 
+							if(mu < 0)continue;
+							const int j0 = j/NPOL;
 
 							// mohan fix bug 2010-12-20
 							// atom2[T2] -> atom2.
-							for (int k=0; k<atom2->nw*NPOL; k++)
+							//for (int k=0; k<atom2->nw*NPOL; k++)
+							for (int k=0; k<nw2_tot; k++)
 							{
-								const int k0 = k/NPOL;
 								const int iw2_all = start2 + k;
 								const int nu = ParaO.trace_loc_col[iw2_all];
 								if(nu < 0)continue;
+								const int k0 = k/NPOL;
 
 								double nlm[3];
 								nlm[0] = nlm[1] = nlm[2] = 0.0;
@@ -725,18 +740,18 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri)
 											ucell.atoms[T0].tau[I0], T0
 											);
 
-									if(GAMMA_ONLY_LOCAL)
-									{
+									//if(GAMMA_ONLY_LOCAL)
+									//{
 										LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
-										if(ad!=ad2) LM.set_HSgamma(iw2_all,iw1_all,nlm[0],'N'); //add by liuyu 20210406
-									}
-									else
-									{
-										WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
+										//if(ad!=ad2) LM.set_HSgamma(iw2_all,iw1_all,nlm[0],'N'); //add by liuyu 20210406
+									//}
+								//	else
+								//	{
+								//		WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 //										assert( nnr < LNNR.nnr );
 //										LM.Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
-									}
+								//	}
 								}
 								else  // calculate force
 								{
@@ -752,19 +767,19 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri)
 											ucell.atoms[T0].tau[I0], T0
 											);
 
-									if(GAMMA_ONLY_LOCAL)
-									{
+									//if(GAMMA_ONLY_LOCAL)
+									//{
 										//add part of nonlocal ps derivatives to T matrix
 										LM.set_force(iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
-									}
-									else
-									{
-										WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
+									//}
+									//else
+									//{
+										//WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 										//LM.DHloc_fixedR_x[ nnr ] += nlm[0];
 										//LM.DHloc_fixedR_y[ nnr ] += nlm[1];
 										//LM.DHloc_fixedR_z[ nnr ] += nlm[2];
-										++nnr;
-									}
+										//++nnr;
+									//}
 								}
 							}// end k
 						}// j 
@@ -772,7 +787,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri)
                 }// ad2
 				// mohan add 2011-06-16
 
-				if(!GAMMA_ONLY_LOCAL) // mohan fix bug 2011-06-26
+				/*if(!GAMMA_ONLY_LOCAL) // mohan fix bug 2011-06-26
 				{
 					if( iat < ucell.nat-1 )
 					{
@@ -784,7 +799,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri)
 							WARNING_QUIT("build_Nonlocal_beta","nnr");
 						}
 					}
-				}
+				}*/
             }// ad
         }// end I0
     }// end T0
