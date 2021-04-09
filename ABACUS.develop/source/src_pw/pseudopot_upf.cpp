@@ -2296,3 +2296,16 @@ int Pseudopot_upf::average_p()
 	this->has_so = 0;	
 	return error;
 }
+
+// Peize Lin add for bsse 2021.04.07
+void Pseudopot_upf::set_empty_element()
+{
+	this->zp = 0;
+	for(int ir=0; ir<mesh; ++ir)
+		this->vloc[ir] = 0;
+	for(int i=0; i<nbeta; ++i)
+		for(int j=0; j<nbeta; ++j)
+			this->dion(i,j) = 0;
+	for(int ir=0; ir<mesh; ++ir)
+		this->rho_at[ir] = 0;
+}
