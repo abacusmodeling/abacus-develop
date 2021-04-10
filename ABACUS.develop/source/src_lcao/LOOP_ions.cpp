@@ -137,7 +137,7 @@ void LOOP_ions::opt_ions(void)
         {
             LCAO_Descriptor ld;
             ld.build_S_descriptor(0);  //derivation not needed yet
-            ld.cal_projective_DM();
+            ld.cal_projected_DM();
             ld.cal_descriptor();
         }
 
