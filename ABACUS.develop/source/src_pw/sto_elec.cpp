@@ -134,7 +134,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #ifdef __MPI
 		if(NBANDS > 0)
 		{
-			MPI_Bcast(wf.evc[0].c, wf.npw*NBANDS, MPI_COMPLEX , 0, MPI_COMM_WORLD);
+			MPI_Bcast(wf.evc[0].c, wf.npw*NBANDS*2, MPI_DOUBLE , 0, MPI_COMM_WORLD);
 			MPI_Bcast(wf.ekb[0], NBANDS, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 		}
 #endif
