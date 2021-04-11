@@ -397,6 +397,8 @@ void Input_Conv::Convert(void)
 #endif
 	}
 	else{
+		delete[] soc.m_loc;
+		soc.m_loc = new Vector3<double> [INPUT.ntype];
 		LSPINORB = false;
 		NONCOLIN = false;
 		DOMAG = false;
