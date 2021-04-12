@@ -33,6 +33,13 @@ void Stochastic_WF::init()
     }
     
     //distribute nchi for each process
+    bool allbase = false;
+    if(nchi == 0)
+    {
+        nchi = kv.ngk[0]-NBANDS;
+        cout<<"Using all normal bases: "<<kv.ngk[0]<<endl;
+        allbase = true;
+    }
     nchip = int(nchi/NPOOL);
     if(MY_POOL < nchi%NPOOL) ++nchip;
 
@@ -42,15 +49,37 @@ void Stochastic_WF::init()
     delete[] chi0;
     chi0 = new ComplexMatrix[1]; 
     chi0[0].create(nchip,ndim,false);
-    //init with random number
     
-    //srand((unsigned)time(NULL)+MY_POOL*100);
-    srand((unsigned)MY_POOL*100);
+    
+    srand((unsigned)time(NULL)+MY_POOL*100);
+    //srand((unsigned)MY_POOL*100);
     //srand((unsigned)0);
-    for(int i=0; i<chi0[0].size; ++i)
+    
+    if(allbase)
     {
-        chi0[0].c[i]=exp(2*PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
+        int re = nchi % NPOOL;
+        if(MY_POOL < re)
+        for(int i = 0 ; i < nchip ; ++i)
+        {
+            chi0[0](i , MY_RANK * nchip + i) = 1;
+        }
+        else
+        for(int i = 0 ; i < nchip ; ++i)
+        {
+            chi0[0](i , re + MY_RANK * nchip + i) = 1;
+        }
     }
+    else
+    {
+        //init with random number
+        for(int i=0; i<chi0[0].size; ++i)
+        {
+            chi0[0].c[i]=exp(2*PI*rand()/double(RAND_MAX)*ui) / sqrt(double(nchi));
+        }
+    }
+    
+
+    //
 
     
 
@@ -61,6 +90,7 @@ void Stochastic_WF::init()
     {
         chiortho[0].create(nchip,ndim,false);
     }
+    
     return;
 }
 
