@@ -29,6 +29,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
 
     // =======init==============
     // cal n(descriptor) per atom , related to Lmax, nchi(L) and m. (not total_nchi!)
+	this->des_per_atom=0; // mohan add 2021-04-21
     for (int l = 0; l <= ORB.get_lmax_d(); l++)
     {
         this->des_per_atom += ORB.Alpha[0].getNchi(l) * (2 * l + 1);
