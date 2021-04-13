@@ -316,7 +316,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			}
 							
 			iter_end(ofs_running);
-			timer::tick("electrons","self_consistent",'D');
+			timer::tick("Elec_Stochastic","scf_stochastic",'D');
             return;
         }
 		

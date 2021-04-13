@@ -78,9 +78,9 @@ void Stochastic_Iter:: checkemm(int &iter)
     //wait for init
     
     complex<double> * pchi;
-    int ntest = 2;
+    int ntest = 1;
     if (nchip < ntest) ntest = nchip;
-
+    bool change = false;
     for(int ichi = 0; ichi < ntest; ++ichi)
     {
         if(NBANDS > 0)
@@ -91,7 +91,6 @@ void Stochastic_Iter:: checkemm(int &iter)
         {
             pchi = &STO_WF.chi0[0](ichi,0);
         }
-
         while(1)
         {
             bool converge;
@@ -100,18 +99,19 @@ void Stochastic_Iter:: checkemm(int &iter)
             else
                 converge = stoche.checkconverge(stohchi.hchi_real, ndim, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
             if(!converge)
-                cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<endl;
+                change = true;
             else
                 break;
         }
     }
-
     Emax = Stochastic_hchi:: Emax;
     Emin = Stochastic_hchi:: Emin;
 #ifdef __MPI
     MPI_Allreduce(MPI_IN_PLACE, &Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
     MPI_Allreduce(MPI_IN_PLACE, &Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
+    MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
 #endif
+    if(change)   cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<endl;
     Stochastic_hchi:: Emin = Emin;
     Stochastic_hchi:: Emax = Emax;
     
@@ -119,6 +119,7 @@ void Stochastic_Iter:: checkemm(int &iter)
 
 void Stochastic_Iter:: itermu( int &iter) 
 {
+    timer::tick("Stochastic_Iter","itermu",'E');
     int nkk=1;// We temporarily use gamma k point.
     double dmu;
     if(iter == 1)
@@ -214,12 +215,13 @@ void Stochastic_Iter:: itermu( int &iter)
             }
         }
     }
-
+    timer::tick("Stochastic_Iter","itermu",'E');
     return;
 }
 
 void Stochastic_Iter:: sumpolyval()
 {
+    timer::tick("Stochastic_Iter","sumpolyval",'F');
     int norder = stoche.norder;
     //wait for init
     int nkk=1;
@@ -256,12 +258,14 @@ void Stochastic_Iter:: sumpolyval()
             }
         }
     }
+    timer::tick("Stochastic_Iter","sumpolyval",'F');
     return;
 }
 
 
 double Stochastic_Iter::calne()
 {  
+    timer::tick("Stochastic_Iter","calne",'F');
     //wait for init
     int nkk = 1;
 
@@ -298,11 +302,13 @@ double Stochastic_Iter::calne()
 #endif
 
     totne = KS_ne + sto_ne;
+    timer::tick("Stochastic_Iter","calne",'F');
     return totne;
 }
 
 void Stochastic_Iter::sum_stoband()
 {  
+    timer::tick("Stochastic_Iter","sum_stoband",'E');
     int nkk=1;// We temporarily use gamma k point.
     int nrxx = stohchi.nrxx;
     int npw = wf.npw;
@@ -492,6 +498,7 @@ void Stochastic_Iter::sum_stoband()
     delete [] sto_rho;
     delete [] out;
     delete [] hout;
+    timer::tick("Stochastic_Iter","sum_stoband",'E');
     return;
 }
 

@@ -417,6 +417,7 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi)
 
 void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *hchig)
 {
+	timer::tick("Stochastic_hchi","hchi_reciprocal",'H');
 	
 	//---------------------------------------------------
 
@@ -435,6 +436,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 	//------------------------------------
 	//(2) the local potential.
 	//------------------------------------
+	timer::tick("Stochastic_hchi","vloc",'H');
 	if(VL_IN_H)
 	{
 		ZEROS( UFFT.porter, pw.nrxx);
@@ -444,11 +446,13 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 			hchig[ig] += UFFT.porter[ GRA_index[ig] ];
 		}	
 	}
+	timer::tick("Stochastic_hchi","vloc",'H');
 
 
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
+	timer::tick("Stochastic_hchi","vnl",'H');
 	int inc = 1;
 	if(VNL_IN_H)
 	{
@@ -511,6 +515,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 			delete[] Ps;
 		}
 	}
+	timer::tick("Stochastic_hchi","vnl",'H');
 
 
 
@@ -522,20 +527,8 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 		hchig[ig] = (hchig[ig] - Ebar * chig[ig]) / DeltaE;
 	}
 	
-	
+	timer::tick("Stochastic_hchi","hchi_reciprocal",'H');
 
-	//test Emax & Emin
-	//------------------------------------------------------------
-	double sum1 = 0;
-	double sum2 = 0;
-	for(int i = 0 ; i < wf.npw; ++i)
-	{
-		sum1 += norm(chig[i]);
-		sum2 += real(conj(chig[i]) * hchig[i]);
-	}
-
-	//cout<<setw(30)<<sum2 <<setw(30)<<sum1<<setw(30)<<sum2/sum1 * DeltaE + Ebar<<DeltaE<<" "<<Ebar<<endl;
-	//------------------------------------------------------------
 
 	return;
 }
