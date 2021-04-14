@@ -20,13 +20,6 @@
 #include "LOOP_ions.h"
 #include "LCAO_matrix.h"
 
-
-extern "C"
-{
-	void sphbsl_(int *n, double *r, double *A, double *val);
-	void sphhnk_(int *n, double *r, double *A, double *val);
-}
-
 DFTU_Yukawa::DFTU_Yukawa(){}
 
 DFTU_Yukawa::~DFTU_Yukawa(){}
@@ -95,14 +88,14 @@ void DFTU_Yukawa::cal_slater_Fk(const int L, const int T)
 						int l = 2*k;
 						if(ir0<ir1)  //less than
 						{
-						 	sphbsl_(&l, &r0, &lambda, &bslval);
-							sphhnk_(&l, &r1, &lambda, &hnkval);
+						 	bslval=this->spherical_Bessel(l, r0, lambda);
+							hnkval=this->spherical_Hankel(l, r1, lambda);
 						}
 						else //greater than
 						{
-						 	sphbsl_(&l, &r1, &lambda, &bslval);
-							sphhnk_(&l, &r0, &lambda, &hnkval);
-						}					
+						 	bslval=this->spherical_Bessel(l, r1, lambda);
+							hnkval=this->spherical_Hankel(l, r0, lambda);
+						}				
 						this->Fk.at(T).at(L).at(chi).at(k) -= (4*k+1)*lambda*pow(R_L0,2)*bslval*hnkval*pow(R_L1,2)*pow(r0,2)*pow(r1,2)*rab0*rab1;					
 					}
 				}
