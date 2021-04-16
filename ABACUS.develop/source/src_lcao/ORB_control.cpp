@@ -15,6 +15,10 @@ ORB_control::~ORB_control()
 void ORB_control::set_orb_tables(
 	ORB_gen_tables &OGT, 
 	LCAO_Orbitals &orb,
+	const double &lcao_ecut_in, // mohan add 2021-04-16
+	const double &lcao_dk_in, // mohan add 2021-04-16
+	const double &lcao_dr_in, // mohan add 2021-04-16
+	const double &lcao_rmax_in, // mohan add 2021-04-16
 	const double &lat0,
 	const int &Lmax_exx)
 {
@@ -25,6 +29,19 @@ void ORB_control::set_orb_tables(
     // (1) FUNCTION : use 'info' to generate 'Numerical Orbital'
     // (1) RESULT : We have 'Numerical Orbital' for calculate S-table and T-table.
 	//=============================================================================
+
+	// mohan add 2021-04-16
+	assert(lcao_ecut_in>0.0);
+	assert(lcao_dk_in>0.0);
+	assert(lcao_dr_in>0.0);
+	assert(lcao_rmax_in>0.0);
+
+	// mohan add 2021-04-16
+	orb.ecutwfc = lcao_ecut_in;
+	orb.dk = lcao_dk_in;
+	orb.dR = lcao_dr_in;
+	orb.Rmax = lcao_rmax_in;
+	
     orb.Read_Orbitals(ucell.ntype, ucell.lmax);
 
 	if(CALCULATION=="test")

@@ -273,18 +273,15 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
 
-
 // PLEASE avoid using capital letters for local variables
 // mohan note 2021-03-23 
-	const int N_PROJECTORS = atom->nh;//zhengdy-soc
+	const int nh = atom->nh;//zhengdy-soc
 
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	//const int nproj_allowed = atom->lmax + 1;	
-	//matrix Coefficient_D_in(nproj_allowed, nproj_allowed); //LiuXh 2016-01-14
 	matrix Coefficient_D_in(n_projectors, n_projectors); //LiuXh 2016-01-14
-	ComplexMatrix Coefficient_D_in_so(N_PROJECTORS*2, N_PROJECTORS*2);//zhengdy-soc
+	ComplexMatrix Coefficient_D_in_so(nh*2, nh*2);//zhengdy-soc
 
 	if(!atom->has_so)
 	{
@@ -388,7 +385,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 											conj(soc.rotylm(m2,mj))*soc.spinor(l2,j2,m,is2);
 									}
 									soc.fcoef(it,is1,is2,ip1,ip2) = coeff;
-									Coefficient_D_in_so(ip1 + N_PROJECTORS*is1, ip2 + N_PROJECTORS*is2) = atom->dion(p1,p2) * soc.fcoef(it, is1, is2, ip1, ip2);
+									Coefficient_D_in_so(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) * soc.fcoef(it, is1, is2, ip1, ip2);
 									if(p1 != p2) soc.fcoef(it, is1, is2, ip1, ip2) = complex<double>(0.0,0.0);
 								}
 							}
@@ -396,7 +393,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 						ip2++;
 					}
 				}
-				assert(ip2==N_PROJECTORS);
+				assert(ip2==nh);
 				ip1++;
 			}
 		// only keep the nonzero part.
@@ -434,7 +431,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			delete[] beta_r;
 		}
 
-		assert(ip1==N_PROJECTORS);
+		assert(ip1==nh);
 
 		this->Beta[it].set_type_info(
 			it, 
@@ -444,7 +441,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			Coefficient_D_in, 
 			Coefficient_D_in_so, 
 			n_projectors, 
-			N_PROJECTORS, 
+			nh, 
 			atom->lll, 
 			tmpBeta_lm, 
 			1);//zhengdy-soc 2018-09-10
@@ -1042,10 +1039,11 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 	}
 
 #ifdef __MPI
-		Parallel_Common::bcast_int(lmax);
-		Parallel_Common::bcast_int(nchimax);
-		Parallel_Common::bcast_int(nchi, lmax + 1);
+	Parallel_Common::bcast_int(lmax);
+	Parallel_Common::bcast_int(nchimax);
+	Parallel_Common::bcast_int(nchi, lmax + 1);
 #endif		
+
 	this->lmax_d = lmax;
 	this->nchimax_d = nchimax;
 	// calculate total number of chi
