@@ -9,7 +9,7 @@
 #include <math.h>
 #include <string>
 #include <sstream>
-#include <cstring>		// Peize Lin fix bug about strcpy 2016-08-02
+#include <cstring> // Peize Lin fix bug about strcpy 2016-08-02
 
 int Number[2];
 
@@ -35,14 +35,14 @@ Pseudopot_upf::Pseudopot_upf()
 	this->jchi = new double[1];
 	this->jjj = new double[1];
 
-        functional_error = 0;//xiaohui add 2015-03-24
+	functional_error = 0;//xiaohui add 2015-03-24
 }
 
 Pseudopot_upf::~Pseudopot_upf()
 {
-	delete [] els;  //header_15
-	delete [] lchi; //header_16
-	delete [] oc;   //header_17
+	delete [] els; 
+	delete [] lchi;
+	delete [] oc;
 
 	delete [] r;    //mesh_1
 	delete [] rab;  //mesh_2
@@ -61,7 +61,7 @@ Pseudopot_upf::~Pseudopot_upf()
 
 int Pseudopot_upf::init_pseudo_reader(const string &fn)
 {
-    if(test_pp) TITLE("Pseudopot_upf","init");
+    TITLE("Pseudopot_upf","init");
     // First check if this pseudo-potential has spin-orbit information
     ifstream ifs(fn.c_str(), ios::in);
 
@@ -72,10 +72,10 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
     }
 
     //cout << "global_pseudo_type =" << global_pseudo_type << endl;
-    if(global_pseudo_type=="auto") //{zws
+    if(global_pseudo_type=="auto") //zws
 	{
 		set_pseudo_type(fn);
-	} //}
+	}
 
 	// read in the .UPF type of pseudopotentials
 	if(global_pseudo_type=="upf")
@@ -98,9 +98,6 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 		return info;
 	}
 
-
-
-
 	return 0;
 }
 
@@ -108,7 +105,7 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 //----------------------------------------------------------
 // setting the type of the pseudopotential file
 //----------------------------------------------------------
-int Pseudopot_upf::set_pseudo_type(const string &fn) //{zws add
+int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
 {
     ifstream pptype_ifs(fn.c_str(), ios::in);
     string dummy, strversion;
@@ -202,7 +199,7 @@ int Pseudopot_upf::read_pseudo_vwr(ifstream &ifs)
 	if(mesh%2==0) 
 	{
 		mesh=mesh-1;
-		ofs_running << " Mesh number - 1, because we need odd number, \n this may affect some polar atomic orbitals." << endl;
+		ofs_running << " Mesh number - 1, we need odd number, \n this may affect some polar atomic orbitals." << endl;
 	}
 	ofs_running << setw(15) << "MESH" << setw(15) << mesh << endl;
 	// (2) read in nlcc: nonlinear core correction
@@ -2298,14 +2295,23 @@ int Pseudopot_upf::average_p()
 }
 
 // Peize Lin add for bsse 2021.04.07
-void Pseudopot_upf::set_empty_element()
+void Pseudopot_upf::set_empty_element(void)
 {
 	this->zp = 0;
 	for(int ir=0; ir<mesh; ++ir)
+	{
 		this->vloc[ir] = 0;
+	}
 	for(int i=0; i<nbeta; ++i)
+	{
 		for(int j=0; j<nbeta; ++j)
+		{
 			this->dion(i,j) = 0;
+		}
+	}
 	for(int ir=0; ir<mesh; ++ir)
+	{
 		this->rho_at[ir] = 0;
+	}
+	return;
 }
