@@ -20,7 +20,9 @@ class LCAO_Orbitals
 	LCAO_Orbitals();
 	~LCAO_Orbitals();
 
-	void Read_Orbitals(const int &ntype_in);
+	void Read_Orbitals(
+		const int &ntype_in,
+		const int &lmax_in);
 
 	void Read_PAO(const int& it);
 

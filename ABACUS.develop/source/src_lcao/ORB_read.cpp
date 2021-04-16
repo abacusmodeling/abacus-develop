@@ -90,15 +90,17 @@ void LCAO_Orbitals::bcast_files(void)
 //			nonlocal_file.push_back ( nfile );
 		}
 
-		ofs_running << " " << ucell.atoms[it].label << " orbital file: " << orbital_file[it] << endl;
-//		ofs_running << " " << ucell.atoms[it].label << " nonlocal file: " << nonlocal_file[it] << endl;
+		ofs_running << " orbital file: " << orbital_file[it] << endl;
+//		ofs_running << " nonlocal file: " << nonlocal_file[it] << endl;
 	}
 	return;
 }
 #endif
 
 
-void LCAO_Orbitals::Read_Orbitals(const int &ntype_in)
+void LCAO_Orbitals::Read_Orbitals(
+	const int &ntype_in, 
+	const int &lmax_in)
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
 	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
@@ -144,11 +146,14 @@ void LCAO_Orbitals::Read_Orbitals(const int &ntype_in)
 	this->ntype = ntype_in; 
 	assert(ntype>0);
 
-	this->lmax = ucell.lmax;
-	for(int i=0; i<ntype; i++)
-	{
-		OUT(ofs_running,"atom label",ucell.atoms[i].label);
-	}
+	assert(lmax_in>=0); // mohan add 2021-04-16
+	this->lmax = lmax_in;
+
+// mohan comment out 2021-04-16
+//	for(int i=0; i<ntype; i++)
+//	{
+//		OUT(ofs_running,"atom label",ucell.atoms[i].label);
+//	}
 
 	//-------------------------------------------------
 	//(2) set the kmesh according to ecutwfc and dk. 
@@ -682,9 +687,21 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		}
 	}// end projectors.
 	
-	this->Beta[it].set_type_info(it, label, ps_type, nlmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, LfromBeta, tmpBeta_lm, ucell.atoms[it].has_so);
+	this->Beta[it].set_type_info(
+		it, 
+		label, 
+		ps_type, 
+		nlmax, 
+		Coefficient_D_in, 
+		Coefficient_D_in_so, 
+		n_projectors, 
+		0, 
+		LfromBeta, 
+		tmpBeta_lm, 
+		ucell.atoms[it].has_so);
 		
 	ifs.close();
+
 	delete[] LfromBeta;
 	delete[] tmpBeta_lm;
 
