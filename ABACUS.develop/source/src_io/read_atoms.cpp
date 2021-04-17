@@ -3,6 +3,8 @@
 #include "src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
+#include "src_external/src_test/icecream.hpp"
+
 void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 {
 	TITLE("UnitCell_pseudo","read_atom_species");
@@ -35,8 +37,9 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 
 			// Peize Lin test for bsse 2021.04.07
 			const string bsse_label = "empty";
-			if(search( atom_label[i].begin(), atom_label[i].end(), bsse_label.begin(), bsse_label.end() ) != atom_label[i].end())
-				this->atoms[i].flag_empty_element = true;
+			this->atoms[i].flag_empty_element = 
+				(search( atom_label[i].begin(), atom_label[i].end(), bsse_label.begin(), bsse_label.end() ) != atom_label[i].end())
+				? true : false;
 		}
 	}
 
