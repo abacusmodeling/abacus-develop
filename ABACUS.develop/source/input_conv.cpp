@@ -627,10 +627,11 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // About LCAO
 //----------------------------------------------------------
-	ORB.ecutwfc = INPUT.lcao_ecut;
-	ORB.dk = INPUT.lcao_dk;
-	ORB.dR = INPUT.lcao_dr;
-	ORB.Rmax = INPUT.lcao_rmax; 
+// mohan add 2021-04-16
+//	ORB.ecutwfc = INPUT.lcao_ecut;
+//	ORB.dk = INPUT.lcao_dk;
+//	ORB.dR = INPUT.lcao_dr;
+//	ORB.Rmax = INPUT.lcao_rmax; 
 
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;

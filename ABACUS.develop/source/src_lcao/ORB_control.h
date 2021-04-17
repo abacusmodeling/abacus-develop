@@ -16,6 +16,10 @@ class ORB_control
     void set_orb_tables(
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
+		const double &lcao_ecut_in, // mohan add 2021-04-16
+		const double &lcao_dk_in, // mohan add 2021-04-16
+		const double &lcao_dr_in, // mohan add 2021-04-16
+		const double &lcao_rmax_in, // mohan add 2021-04-16
 		const double &lat0,
 		const int &Lmax_exx);
 

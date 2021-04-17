@@ -90,15 +90,17 @@ void LCAO_Orbitals::bcast_files(void)
 //			nonlocal_file.push_back ( nfile );
 		}
 
-		ofs_running << " " << ucell.atoms[it].label << " orbital file: " << orbital_file[it] << endl;
-//		ofs_running << " " << ucell.atoms[it].label << " nonlocal file: " << nonlocal_file[it] << endl;
+		ofs_running << " orbital file: " << orbital_file[it] << endl;
+//		ofs_running << " nonlocal file: " << nonlocal_file[it] << endl;
 	}
 	return;
 }
 #endif
 
 
-void LCAO_Orbitals::Read_Orbitals(const int &ntype_in)
+void LCAO_Orbitals::Read_Orbitals(
+	const int &ntype_in, 
+	const int &lmax_in)
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
 	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
@@ -144,11 +146,14 @@ void LCAO_Orbitals::Read_Orbitals(const int &ntype_in)
 	this->ntype = ntype_in; 
 	assert(ntype>0);
 
-	this->lmax = ucell.lmax;
-	for(int i=0; i<ntype; i++)
-	{
-		OUT(ofs_running,"atom label",ucell.atoms[i].label);
-	}
+	assert(lmax_in>=0); // mohan add 2021-04-16
+	this->lmax = lmax_in;
+
+// mohan comment out 2021-04-16
+//	for(int i=0; i<ntype; i++)
+//	{
+//		OUT(ofs_running,"atom label",ucell.atoms[i].label);
+//	}
 
 	//-------------------------------------------------
 	//(2) set the kmesh according to ecutwfc and dk. 
@@ -268,18 +273,15 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
 
-
 // PLEASE avoid using capital letters for local variables
 // mohan note 2021-03-23 
-	const int N_PROJECTORS = atom->nh;//zhengdy-soc
+	const int nh = atom->nh;//zhengdy-soc
 
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	//const int nproj_allowed = atom->lmax + 1;	
-	//matrix Coefficient_D_in(nproj_allowed, nproj_allowed); //LiuXh 2016-01-14
 	matrix Coefficient_D_in(n_projectors, n_projectors); //LiuXh 2016-01-14
-	ComplexMatrix Coefficient_D_in_so(N_PROJECTORS*2, N_PROJECTORS*2);//zhengdy-soc
+	ComplexMatrix Coefficient_D_in_so(nh*2, nh*2);//zhengdy-soc
 
 	if(!atom->has_so)
 	{
@@ -383,7 +385,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 											conj(soc.rotylm(m2,mj))*soc.spinor(l2,j2,m,is2);
 									}
 									soc.fcoef(it,is1,is2,ip1,ip2) = coeff;
-									Coefficient_D_in_so(ip1 + N_PROJECTORS*is1, ip2 + N_PROJECTORS*is2) = atom->dion(p1,p2) * soc.fcoef(it, is1, is2, ip1, ip2);
+									Coefficient_D_in_so(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) * soc.fcoef(it, is1, is2, ip1, ip2);
 									if(p1 != p2) soc.fcoef(it, is1, is2, ip1, ip2) = complex<double>(0.0,0.0);
 								}
 							}
@@ -391,7 +393,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 						ip2++;
 					}
 				}
-				assert(ip2==N_PROJECTORS);
+				assert(ip2==nh);
 				ip1++;
 			}
 		// only keep the nonzero part.
@@ -429,7 +431,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			delete[] beta_r;
 		}
 
-		assert(ip1==N_PROJECTORS);
+		assert(ip1==nh);
 
 		this->Beta[it].set_type_info(
 			it, 
@@ -439,7 +441,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			Coefficient_D_in, 
 			Coefficient_D_in_so, 
 			n_projectors, 
-			N_PROJECTORS, 
+			nh, 
 			atom->lll, 
 			tmpBeta_lm, 
 			1);//zhengdy-soc 2018-09-10
@@ -682,9 +684,21 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		}
 	}// end projectors.
 	
-	this->Beta[it].set_type_info(it, label, ps_type, nlmax, Coefficient_D_in, Coefficient_D_in_so, n_projectors, 0, LfromBeta, tmpBeta_lm, ucell.atoms[it].has_so);
+	this->Beta[it].set_type_info(
+		it, 
+		label, 
+		ps_type, 
+		nlmax, 
+		Coefficient_D_in, 
+		Coefficient_D_in_so, 
+		n_projectors, 
+		0, 
+		LfromBeta, 
+		tmpBeta_lm, 
+		ucell.atoms[it].has_so);
 		
 	ifs.close();
+
 	delete[] LfromBeta;
 	delete[] tmpBeta_lm;
 
@@ -1025,10 +1039,11 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 	}
 
 #ifdef __MPI
-		Parallel_Common::bcast_int(lmax);
-		Parallel_Common::bcast_int(nchimax);
-		Parallel_Common::bcast_int(nchi, lmax + 1);
+	Parallel_Common::bcast_int(lmax);
+	Parallel_Common::bcast_int(nchimax);
+	Parallel_Common::bcast_int(nchi, lmax + 1);
 #endif		
+
 	this->lmax_d = lmax;
 	this->nchimax_d = nchimax;
 	// calculate total number of chi
