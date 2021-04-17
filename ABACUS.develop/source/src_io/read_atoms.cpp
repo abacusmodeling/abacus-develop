@@ -3,8 +3,6 @@
 #include "src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
-#include "src_external/src_test/icecream.hpp"
-
 void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 {
 	TITLE("UnitCell_pseudo","read_atom_species");
