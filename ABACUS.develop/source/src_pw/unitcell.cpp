@@ -353,7 +353,7 @@ void UnitCell::save_cartesian_position(double* pos)const
 	for(int it = 0;it < this->ntype;it++)
 	{
 		Atom* atom = &this->atoms[it];
-		for(int ia =0; ia<atoms->na; ia++)
+		for(int ia =0; ia<atom->na; ia++)
 		{	
 			pos[3*iat  ] = atom->tau[ia].x*this->lat0;
 			pos[3*iat+1] = atom->tau[ia].y*this->lat0;
