@@ -27,7 +27,8 @@ class ORB_gen_tables
 	void gen_tables( 
 		const int &job0, 
 		LCAO_Orbitals &orb,
-		const int &Lmax_exx);
+		const int &Lmax_exx,
+		const int &out_descriptor); // whether to generate descriptors
 
 	void set_unit( const double &v ){lat0=v;}
 	

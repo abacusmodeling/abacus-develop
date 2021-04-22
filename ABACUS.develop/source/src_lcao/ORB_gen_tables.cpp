@@ -1,4 +1,4 @@
-#include "src_pw/global.h"
+//#include "src_pw/global.h"
 #include "ORB_read.h"
 #include "ORB_gen_tables.h"
 #include "src_global/ylm.h"
@@ -13,7 +13,8 @@ ORB_gen_tables::~ORB_gen_tables() {}
 void ORB_gen_tables::gen_tables(
 	const int &job0,
 	LCAO_Orbitals &orb,
-	const int &Lmax_exx)
+	const int &Lmax_exx,
+	const int &out_descriptor)
 {
 	TITLE("ORB_gen_tables", "gen_tables");
 	timer::tick("ORB_gen_tables", "gen_tables", 'C');
@@ -40,7 +41,8 @@ void ORB_gen_tables::gen_tables(
 		orb.get_dk());	 // delta k, for integration in k space
 
 	//caoyu add 2021-03-18
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")
+	//mohan update 2021-04-22
+	if (out_descriptor>0)
 	{
 		talpha.allocate(
 			orb.get_ntype(), // number of atom types
@@ -61,7 +63,7 @@ void ORB_gen_tables::gen_tables(
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")
+	if (out_descriptor>0)
 	{
 		talpha.init_DS_Opair();
 		talpha.init_DS_2Lplus1();
@@ -88,7 +90,7 @@ void ORB_gen_tables::gen_tables(
 	tbeta.init_Table_Beta(MOT.pSB); // add 2009-5-8
 
 	//caoyu add 2021-03-18
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")
+	if (out_descriptor>0)
 	{
 		talpha.init_Table_Alpha(MOT.pSB);
 		//talpha.print_Table_DSR();
