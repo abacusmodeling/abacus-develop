@@ -1,11 +1,10 @@
-//=========================================================
-//AUTHOR : liaochen, mohan
-//DATE : 2009-03-04
-//=========================================================
 #ifndef NUMERICAL_NONLOCAL_H
 #define NUMERICAL_NONLOCAL_H
 
-#include "../src_pw/tools.h"
+//#include "../src_pw/tools.h"
+
+#include "../src_global/complexarray.h"
+#include "../src_global/complexmatrix.h"
 #include "ORB_nonlocal_lm.h"
 //=========================================================
 //CLASS  Numerical_Nonlocal
@@ -87,9 +86,15 @@ public:
 	// each Beta may have different L.
 	int nproj;
 	int *LfromBeta;
+
+	// PLEASE consider the following parameters can be moved to the 'pseudopotential' module
+	// mohan note 2021-03-28
 	int nproj_soc;//demention of D_ij^so
+
 	ComplexArray Coefficient_D_so;   //(:,:,:),  spin-orbit case,  added by zhengdy-soc
+
 	int non_zero_count_soc[4];
+
 	int *index1_soc[4], *index2_soc[4];
 };
 

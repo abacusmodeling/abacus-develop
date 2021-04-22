@@ -6,7 +6,13 @@
 #ifndef NUMERICAL_ORBITAL_H
 #define NUMERICAL_ORBITAL_H
 
-#include "../src_pw/tools.h"
+#include <string>
+using namespace std;
+
+#include "../src_global/intarray.h"
+#include "../src_global/vector3.h"
+
+//#include "../src_pw/tools.h"
 #include "ORB_atomic_lm.h"
 
 //=========================================================

@@ -156,29 +156,9 @@ void Ions::opt_ions_pw(void)
 		}
 	
 
-		int iat=0; //LiuXh add 20180619
 		if(CALCULATION=="relax"|| CALCULATION=="md" || CALCULATION=="cell-relax")
 		{
-			for(int it = 0;it < ucell.ntype;it++)
-			{
-				Atom* atom = &ucell.atoms[it];
-				for(int ia =0;ia< ucell.atoms[it].na;ia++)
-				{
-					CE.pos_old2[3*iat  ] = CE.pos_old1[3*iat  ];
-					CE.pos_old2[3*iat+1] = CE.pos_old1[3*iat+1];
-					CE.pos_old2[3*iat+2] = CE.pos_old1[3*iat+2];
-
-					CE.pos_old1[3*iat  ] = CE.pos_now[3*iat  ];
-					CE.pos_old1[3*iat+1] = CE.pos_now[3*iat+1];
-					CE.pos_old1[3*iat+2] = CE.pos_now[3*iat+2];
-
-					CE.pos_now[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-					CE.pos_now[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-					CE.pos_now[3*iat+2] = atom->tau[ia].z*ucell.lat0;
-
-					iat++;
-				}
-			}
+			CE.update_all_pos(ucell);
 		}
 
 		if(pot.out_potential == 2)
@@ -224,7 +204,7 @@ void Ions::opt_ions_pw(void)
 
     }
 
-    if(CALCULATION=="scf" || CALCULATION=="relax")
+    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
     {
         ofs_running << "\n\n --------------------------------------------" << endl;
         ofs_running << setprecision(16);
@@ -404,25 +384,15 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             }
             else
             {
-                //stress_step = 1;
+				ofs_running << " Setup the structure factor in plane wave basis." << endl;
                 pw.setup_structure_factor();
-                int iat=0; //LiuXh add 20180619
-                for(int it = 0;it < ucell.ntype;it++)
-                {
-                    Atom* atom = &ucell.atoms[it];
-                    for(int ia =0;ia< ucell.atoms[it].na;ia++)
-                    {
-                        CE.pos_next[3*iat  ] = atom->tau[ia].x*ucell.lat0;
-                        CE.pos_next[3*iat+1] = atom->tau[ia].y*ucell.lat0;
-                        CE.pos_next[3*iat+2] = atom->tau[ia].z*ucell.lat0;
-
-                        iat++;
-                    }
-                }
-                CE.istep = force_step;
-
+				ofs_running << " Setup the extrapolated charge." << endl;
+                CE.save_pos_next(ucell);
+                CE.update_istep(force_step);
                 CE.extrapolate_charge();
+				ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
                 pot.init_pot( istep, pw.strucFac );
+				ofs_running << " Setup the new wave functions?" << endl;
                 wf.wfcinit();
                 ++force_step;
                 return 0;

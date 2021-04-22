@@ -9,8 +9,8 @@
 #include "../src_parallel/mcd.h"
 #endif
 
-#include "src_global/vector3.h"
-#include "src_global/matrix.h"
+#include "vector3.h"
+#include "matrix.h"
 
 class Matrix3
 {
@@ -26,6 +26,7 @@ public:
 
 	void Reset(void);
 	void Identity(void);
+	void Zero(void);
 	double Det(void) const ;
 	Matrix3	Transpose(void) const ;
 	Matrix3	Inverse(void) const ;

@@ -33,7 +33,7 @@ void Force_LCAO_gamma::ftable_gamma (
     // calculate the 'energy density matrix' here.
     this->cal_foverlap(isforce, isstress, foverlap, soverlap);
 
-    if(NEW_DM>0)
+    if(INPUT.new_dm>0)
     {
         this->cal_ftvnl_dphi(LOC.wfc_dm_2d.dm_gamma, isforce, isstress, ftvnl_dphi, stvnl_dphi);
         this->cal_fvnl_dbeta(LOC.wfc_dm_2d.dm_gamma, isforce, isstress, fvnl_dbeta, svnl_dbeta);

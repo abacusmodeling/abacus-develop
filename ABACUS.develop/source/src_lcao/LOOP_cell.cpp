@@ -24,6 +24,7 @@ void LOOP_cell::opt_cell(void)
     UFFT.allocate();
 
     // output is ppcell.vloc 3D local pseudopotentials
+	// without structure factors
     // this function belongs to cell LOOP
     ppcell.init_vloc(pw.nggm, ppcell.vloc);
 
@@ -34,6 +35,8 @@ void LOOP_cell::opt_cell(void)
     pot.init_pot(ion_step, pw.strucFac);
 
 
+	// PLEASE simplify the Exx_Global interface
+	// mohan add 2021-03-25
 	// Peize Lin 2016-12-03
 	if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
 	{
@@ -52,6 +55,8 @@ void LOOP_cell::opt_cell(void)
 		}
 	}	
 
+	// PLEASE do not use INPUT global variable
+	// mohan add 2021-03-25
 	// Quxin added for DFT+U
 	if(INPUT.dft_plus_u) 
 	{

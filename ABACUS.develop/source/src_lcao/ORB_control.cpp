@@ -4,19 +4,23 @@
 #include "src_global/sltk_atom_arrange.h"
 #include "ORB_gen_tables.h"
 #include "build_st_pw.h"
+#include "../src_pdiag/pdiag_double.h"
 
 ORB_control::ORB_control()
 {}
 
 ORB_control::~ORB_control()
-{
-	if(test_deconstructor)
-	{
-		cout << " ~ORB_control()" << endl;
-	}
-}
+{}
 
-void ORB_control::set_orb_tables(void)
+void ORB_control::set_orb_tables(
+	ORB_gen_tables &OGT, 
+	LCAO_Orbitals &orb,
+	const double &lcao_ecut_in, // mohan add 2021-04-16
+	const double &lcao_dk_in, // mohan add 2021-04-16
+	const double &lcao_dr_in, // mohan add 2021-04-16
+	const double &lcao_rmax_in, // mohan add 2021-04-16
+	const double &lat0,
+	const int &Lmax_exx)
 {
     TITLE("ORB_control","set_orb_tables");
 	timer::tick("ORB_control","set_orb_tables",'B');
@@ -25,7 +29,20 @@ void ORB_control::set_orb_tables(void)
     // (1) FUNCTION : use 'info' to generate 'Numerical Orbital'
     // (1) RESULT : We have 'Numerical Orbital' for calculate S-table and T-table.
 	//=============================================================================
-    ORB.Read_Orbitals();
+
+	// mohan add 2021-04-16
+	assert(lcao_ecut_in>0.0);
+	assert(lcao_dk_in>0.0);
+	assert(lcao_dr_in>0.0);
+	assert(lcao_rmax_in>0.0);
+
+	// mohan add 2021-04-16
+	orb.ecutwfc = lcao_ecut_in;
+	orb.dk = lcao_dk_in;
+	orb.dR = lcao_dr_in;
+	orb.Rmax = lcao_rmax_in;
+	
+    orb.Read_Orbitals(ucell.ntype, ucell.lmax);
 
 	if(CALCULATION=="test")
 	{
@@ -34,7 +51,7 @@ void ORB_control::set_orb_tables(void)
 	}
 
     //=============================================================================
-    // (2) FUNCTION : Generate Gaunt_Coefficients and S-table using UOT.init
+    // (2) FUNCTION : Generate Gaunt_Coefficients and S-table using OGT.init
     // 	   Must have 'Numerical Orbital' infomation
     // (2) RESULT : we have tabulated S table for use.
     //=============================================================================
@@ -43,23 +60,27 @@ void ORB_control::set_orb_tables(void)
     // 1: generate overlap table
     // 2: generate kinetic table
     // 3: generate overlap & kinetic table
-    UOT.gen_tables(job0);
+    OGT.gen_tables(job0, orb, Lmax_exx);
     // init lat0, in order to interpolated value from this table.
-    UOT.set_unit(ucell.lat0);
+
+	assert(lat0>0.0);
+    OGT.set_unit(lat0);
 
 
 	timer::tick("ORB_control","set_orb_tables",'B');
     return;
 }
 
-void ORB_control::clear_after_ions(void)
+void ORB_control::clear_after_ions(ORB_gen_tables &OGT, LCAO_Orbitals &orb)
 {
     TITLE("ORB_control","clear_after_ions");
-    UOT.MOT.Destroy_Table();
-    UOT.tbeta.Destroy_Table_Beta();
-    //caoyu add 2021-03-18
-    if (INPUT.out_descriptor && BASIS_TYPE == "lcao") {
-        UOT.talpha.Destroy_Table_Alpha();
+    OGT.MOT.Destroy_Table(orb);
+    OGT.tbeta.Destroy_Table_Beta(orb);
+    
+	//caoyu add 2021-03-18
+    if (INPUT.out_descriptor && BASIS_TYPE == "lcao") 
+	{
+        OGT.talpha.Destroy_Table_Alpha();
     }
     return;
 }

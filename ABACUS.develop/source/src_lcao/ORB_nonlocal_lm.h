@@ -1,11 +1,10 @@
-//=========================================================
-//AUTHOR : liaochen, mohan
-//DATE : 2008-03-04
-//=========================================================
 #ifndef NUMERICAL_NONLOCAL_LM
 #define NUMERICAL_NONLOCAL_LM
 
-#include "../src_pw/tools.h"
+#include <string>
+using namespace std;
+
+//#include "../src_pw/tools.h"
 //=========================================================
 //CLASS Numerical_Nonlocal_Lm
 //Note : contain information about each projector
