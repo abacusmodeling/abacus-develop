@@ -95,10 +95,8 @@ void Charge_Broyden::mix_rho
 			dr22 += abs( rho[is][ir] - rho_save[is][ir] );
 		}
 	}
-	if ( CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto" )//qianrui add it temporarily
-	{
-		Parallel_Reduce::reduce_double_pool( dr22 );
-	}
+
+	Parallel_Reduce::reduce_double_pool( dr22 );
 	assert( ucell.nelec != 0);
 	assert( ucell.omega > 0);
 	assert( pw.ncxyz > 0);

@@ -211,6 +211,7 @@ void Electrons::self_consistent(const int &istep)
 		
         // calculate the new eband here.
         CHR.sum_band();
+        
 
 		// add exx
 		en.set_exx();		// Peize Lin add 2019-03-09

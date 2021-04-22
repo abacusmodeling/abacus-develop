@@ -801,9 +801,9 @@ void Charge::sum_band_k(void)
 	if(NSPIN==4) delete[] porter1;
 
 #ifdef __MPI
+	this->rho_mpi();
 	if(CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") //qinarui add it temporarily.
 	{
-	this->rho_mpi();
     //==================================
     // Reduce all the Energy in each cpu
     //==================================
@@ -831,6 +831,8 @@ void Charge::rho_mpi(void)
 {
 	TITLE("Charge","rho_mpi");
     if (NPROC==1) return;
+	if((CALCULATION=="scf-sto" || CALCULATION!="relax-sto" || CALCULATION!="md-sto")&&NPROC_IN_POOL==1) 
+		return;//qinarui add it temporarily.
     timer::tick("Charge","rho_mpi");
     int ir;//counters on real space mesh point.
     int iz;//counters on z direction of fft grid.
@@ -966,6 +968,11 @@ void Charge::rho_mpi(void)
         //==================================
         // Reduce all the rho in each cpu
         //==================================
+		if(CALCULATION=="scf-sto" || CALCULATION!="relax-sto" || CALCULATION!="md-sto") //qinarui add it temporarily.
+		{
+			MPI_Allreduce(rho_tot_aux,rho_tot,pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+		}
+		else
         MPI_Allreduce(rho_tot_aux,rho_tot,pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
         
 		//=====================================

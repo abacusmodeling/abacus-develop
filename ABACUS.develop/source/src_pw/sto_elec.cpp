@@ -60,13 +60,13 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	clock_t start,finish;
 	double duration = 0.0;	
 	STO_WF.init();
+
 	for (this->iter = 1;iter <= NITER;iter++)
     {
 		ofs_running 
 		<< "\n PW-STOCHASTIC ALGO --------- ION=" << setw(4) << istep + 1
 		<< "  ELEC=" << setw(4) << iter 
 		<< "--------------------------------\n";
-		cout<<iter<<" STEP"<<endl;
 		if(iter==1) 
 		{
 			CHR.new_e_iteration = true;
@@ -75,6 +75,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			CHR.new_e_iteration = false;
 		}
+		if(FINAL_SCF && iter==1)
+        {
+            CHR.irstep=0;
+            CHR.idstep=0;
+            CHR.totstep=0;
+        }
 		
 		// record the start time.
         start=std::clock();
@@ -92,12 +98,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			this->update_ethr(iter);
         }
 
-        if(FINAL_SCF && iter==1)
-        {
-            CHR.irstep=0;
-            CHR.idstep=0;
-            CHR.totstep=0;
-        }
+        
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
@@ -107,7 +108,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
 		//(2) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
-		if(NBANDS > 0 && MY_RANK == 0)
+		if(NBANDS > 0 && MY_POOL == 0)
 		{
 			this->c_bands(istep+1);
 		}
@@ -128,14 +129,16 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		//(3) save change density as previous charge,
 		// prepared fox mixing.
-		if(MY_RANK == 0)
+		if(MY_POOL == 0)
         	CHR.save_rho_before_sum_band();
+		
+
 		//prepare wavefunction&eband for other pools
 #ifdef __MPI
 		if(NBANDS > 0)
 		{
-			MPI_Bcast(wf.evc[0].c, wf.npw*NBANDS*2, MPI_DOUBLE , 0, MPI_COMM_WORLD);
-			MPI_Bcast(wf.ekb[0], NBANDS, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+			MPI_Bcast(wf.evc[0].c, wf.npw*NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
+			MPI_Bcast(wf.ekb[0], NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
 		}
 #endif
 		
@@ -144,7 +147,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		if(iter == 1)	stoiter.init();
 		stoiter.orthog();
 		stoiter.checkemm(iter);	//check and reset emax & emin
-		stoiter.test();
+		//stoiter.test();  //only for test
 		stoiter.itermu(iter);
 
 
@@ -152,15 +155,22 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// calculate KS rho.
 		if(NBANDS > 0)
 		{
-			if(MY_RANK == 0)
+			if(MY_POOL == 0)
 			{
 				CHR.sum_band();
 			}
-			for(int is = 0; is < NSPIN; ++is)
+			else
 			{
-				MPI_Bcast(CHR.rho[is], pw.nrxx, MPI_DOUBLE , 0,MPI_COMM_WORLD);
+				for(int is=0; is<NSPIN; is++)
+				{
+					ZEROS(CHR.rho[is], pw.nrxx);
+				}
 			}
-			MPI_Bcast(&en.eband,1, MPI_DOUBLE, 0,MPI_COMM_WORLD);
+			//for(int is = 0; is < NSPIN; ++is)
+			//{
+			//	MPI_Bcast(CHR.rho[is], pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
+			//}
+			MPI_Bcast(&en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
 		}
 		else
 		{
@@ -186,6 +196,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			srho.begin(is);
 		}
 
+
 		//(8) deband is calculated from "output" charge density calculated 
 		// in sum_band
 		// need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
@@ -209,11 +220,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// rho contain the output charge density.
 		// in other cases rhoin contains the mixed charge density
 		// (the new input density) while rho is unchanged.
-		if(MY_RANK == 0)
+		if(MY_POOL == 0)
 			CHR.mix_rho(dr2,diago_error,DRHO2,iter,conv_elec);
 #ifdef __MPI
-		MPI_Bcast(&dr2, 1, MPI_DOUBLE , 0, MPI_COMM_WORLD);
-		MPI_Bcast(&conv_elec, 1, MPI_DOUBLE , 0, MPI_COMM_WORLD);
+		MPI_Bcast(&dr2, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
+		MPI_Bcast(&conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
+		MPI_Bcast(CHR.rho[0], pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
 #endif
 
 		//			if(MY_RANK==0)

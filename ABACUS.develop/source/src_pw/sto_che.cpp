@@ -1,4 +1,5 @@
 #include "sto_che.h" 
+#include "diago_cg.h"
 #include "global.h"
 
 
@@ -143,26 +144,24 @@ void Stochastic_Chebychev:: calresult(double &t, double& result)
 }
 
 
-void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<double> *out), int& ndim, complex<double> *wavein)
+void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<double> *out, const int), 
+                            int& ndim, complex<double> *wavein, const int m)
 {
 
     complex<double> *arraynp1, *arrayn, *arrayn_1;
-    arraynp1 = new complex<double> [ndim];
-    arrayn = new complex<double> [ndim];
-    arrayn_1 = new complex<double> [ndim];
+    int ndmx = ndim * m;
+    arraynp1 = new complex<double> [ndmx];
+    arrayn = new complex<double> [ndmx];
+    arrayn_1 = new complex<double> [ndmx];
 
-    DCOPY(wavein, arrayn_1, ndim);
-    //LapackConnector::copy(ndim,wavein,1,arrayn_1,1); 
+    DCOPY(wavein, arrayn_1, ndmx);
 
-    tfun(arrayn_1, arrayn);
+    tfun(arrayn_1, arrayn,m);
 
 
-    int inc =1 ;
-    complex<double> overlap;
-    zdotc_(&overlap,&ndim,wavein,&inc,wavein,&inc);
-    polyvalue[0] = overlap.real();
-    zdotc_(&overlap,&ndim,wavein,&inc,arrayn,&inc);
-    polyvalue[1] = overlap.real();  
+    polyvalue[0] = Diago_CG::ddot_real(ndmx,wavein,wavein, false);
+    polyvalue[1] = Diago_CG::ddot_real(ndmx,wavein,arrayn, false);
+    
     //ZEROS(polyvalue,norder);
     ////0- & 1-st order
     //for(int i = 0; i < ndim; ++i) 
@@ -175,9 +174,9 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
     //more than 1-st orders
     for(int ior = 2; ior < norder; ++ior)
     {
-        recurs(arraynp1, arrayn, arrayn_1, tfun, ndim);
-        zdotc_(&overlap,&ndim,wavein,&inc,arraynp1,&inc);
-        polyvalue[ior] = overlap.real();
+        recurs(arraynp1, arrayn, arrayn_1, tfun, ndim, m);
+        polyvalue[ior] = Diago_CG::ddot_real(ndmx,wavein,arraynp1, false);
+        
         //for(int i = 0; i < ndim; ++i) // n-th order : <wavein | T_n(tfun) | wavein>
         //{
         //    polyvalue[ior] += real(conj(wavein[i]) * arraynp1[i]);
@@ -196,7 +195,49 @@ void Stochastic_Chebychev:: calpolyval(void tfun(complex<double> *in, complex<do
     return;
 }
 
-bool Stochastic_Chebychev:: checkconverge(void tfun(complex<double> *in, complex<double> *out), int& ndim, complex<double> *wavein,double& tmax, double &tmin, double stept)
+void Stochastic_Chebychev:: calfinalvec(void tfun(complex<double> *in, complex<double> *out, const int n), 
+                            int &ndim, complex<double> *wavein, complex<double> *waveout, const int m)
+{
+    if(!getcoef) WARNING_QUIT("Stochastic_Chebychev", "Please calculate coef first!");
+
+    complex<double> *arraynp1, *arrayn, *arrayn_1;
+    int ndmx = ndim * m;
+    arraynp1 = new complex<double> [ndmx];
+    arrayn = new complex<double> [ndmx];
+    arrayn_1 = new complex<double> [ndmx];
+  
+    DCOPY(wavein, arrayn_1, ndmx);
+    
+    tfun(arrayn_1, arrayn,m);
+    
+    //0- & 1-st order
+    for(int i = 0; i < ndmx; ++i)
+    {
+        waveout[i] = coef[0] * arrayn_1[i] + coef[1] * arrayn[i];
+    }
+
+    
+
+    //more than 1-st orders
+    for(int ior = 2; ior < norder; ++ior)
+    {
+        recurs(arraynp1, arrayn, arrayn_1, tfun, ndim,m);
+        for(int i = 0; i < ndmx; ++i)
+        {
+            waveout[i] += coef[ior] * arraynp1[i];
+        }
+        complex<double> * tem = arrayn_1;
+        arrayn_1 = arrayn;
+        arrayn = arraynp1;
+        arraynp1 = tem; 
+    }
+    delete [] arraynp1;
+    delete [] arrayn;
+    delete [] arrayn_1;
+    return;
+}
+
+bool Stochastic_Chebychev:: checkconverge(void tfun(complex<double> *in, complex<double> *out, const int), int& ndim, complex<double> *wavein,double& tmax, double &tmin, double stept,const int m)
 {
     bool converge = true;
     complex<double> *arraynp1, *arrayn, *arrayn_1;
@@ -209,15 +250,12 @@ bool Stochastic_Chebychev:: checkconverge(void tfun(complex<double> *in, complex
     //LapackConnector::copy(ndim,wavein,1,arrayn_1,1); 
     if(tmin == tmax) tmax += stept;
 
-    tfun(arrayn_1, arrayn);
-    double sum1 = 0;
-	double sum2 = 0;
+    tfun(arrayn_1, arrayn,m);
+    double sum1,sum2;
     double t;
-	for(int i = 0 ; i < ndim; ++i)
-	{
-		sum1 += norm(arrayn_1[i]);
-		sum2 += real(conj(arrayn_1[i]) * arrayn[i]);
-	}
+
+    sum1=Diago_CG::ddot_real(ndim,arrayn_1,arrayn_1);
+    sum2=Diago_CG::ddot_real(ndim,arrayn_1,arrayn);
     t = sum2 / sum1 * (tmax - tmin) / 2 + (tmax + tmin) / 2;
     if(t < tmin)
     {
@@ -233,13 +271,9 @@ bool Stochastic_Chebychev:: checkconverge(void tfun(complex<double> *in, complex
     
     for(int ior = 2; ior < norder; ++ior)
     {
-        tfun(arrayn,arraynp1);
-        sum1 = sum2 =0;
-        for(int i = 0 ; i < ndim; ++i)
-	    {
-	    	sum1 += norm(arrayn[i]);
-	    	sum2 += real(conj(arrayn[i]) * arraynp1[i]);
-	    }
+        tfun(arrayn,arraynp1,m);
+        sum1=Diago_CG::ddot_real(ndim,arrayn,arrayn);
+        sum2=Diago_CG::ddot_real(ndim,arrayn,arraynp1);
         t = sum2/sum1 * (tmax - tmin) / 2 + (tmax + tmin) / 2;
         if(t < tmin)
         {
