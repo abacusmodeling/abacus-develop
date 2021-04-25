@@ -150,12 +150,6 @@ void LCAO_Orbitals::Read_Orbitals(
 	assert(lmax_in>=0); // mohan add 2021-04-16
 	this->lmax = lmax_in;
 
-// mohan comment out 2021-04-16
-//	for(int i=0; i<ntype; i++)
-//	{
-//		OUT(ofs_running,"atom label",ucell.atoms[i].label);
-//	}
-
 	//-------------------------------------------------
 	//(2) set the kmesh according to ecutwfc and dk. 
 	//-------------------------------------------------
@@ -325,7 +319,9 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 				
 		}
 		
-		WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		
+		// mohan comment out 2021-04-26
+		//WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		
+
 		// Peize Lin add 2019-01-23
 		this->Beta[it].set_type_info(it, 
 			atom->label, 
@@ -376,18 +372,23 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 										m1, m2,
 										j1, j2,
 										it, ip1, ip2);
-									Coefficient_D_in_so(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) * soc.fcoef(it, is1, is2, ip1, ip2);
-									if(p1 != p2) soc.fcoef(it, is1, is2, ip1, ip2) = complex<double>(0.0,0.0);
-								}
-							}
-						}
+									Coefficient_D_in_so(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) 
+									* soc.fcoef(it, is1, is2, ip1, ip2);
+									if(p1 != p2) 
+									{
+										soc.fcoef(it, is1, is2, ip1, ip2) = complex<double>(0.0,0.0);
+									}
+								}// end is2
+							}// end is1
+						}// end l1==l2
 						ip2++;
-					}
-				}
+					}// end m2
+				}// end p2
 				assert(ip2==nh);
 				ip1++;
-			}
-		// only keep the nonzero part.
+			}// end m1
+
+			// only keep the nonzero part.
 			int cut_mesh = atom->mesh; 
 			for(int ir=atom->mesh-1; ir>=0; --ir)
 			{
@@ -397,9 +398,11 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 					break;
 				}
 			}
-			if(cut_mesh %2 == 0) ++cut_mesh;
+			if(cut_mesh %2 == 0) 
+			{
+				++cut_mesh;
+			}
 
-//		cout << " cut_mesh=" << cut_mesh << endl;
 			double* beta_r = new double[cut_mesh];
 			ZEROS(beta_r, cut_mesh);
 			for(int ir=0; ir<cut_mesh; ++ir)
@@ -440,7 +443,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 
 	delete[] tmpBeta_lm;
 
-	cout << " Set NonLocal Pseudopotential Projectors " << endl;
+	cout << " SET NONLOCAL PSEUDOPOTENTIAL PROJECTORS" << endl;
 	return;
 }
 

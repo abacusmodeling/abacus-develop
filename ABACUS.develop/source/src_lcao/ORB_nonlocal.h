@@ -10,6 +10,8 @@
 //about atoms
 //Feature : set and store information about ps infomation 
 //			related to atoms
+//AUTHOR : liaochen
+//DATE : 2008-03-04
 //=========================================================
 
 class Numerical_Nonlocal

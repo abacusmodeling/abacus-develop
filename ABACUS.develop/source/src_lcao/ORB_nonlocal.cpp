@@ -1,10 +1,6 @@
-//=========================================================
-//AUTHOR : liaochen
-//DATE : 2008-03-04
-//=========================================================
 #include "ORB_nonlocal.h"
 #include "../src_global/global_function.h"
-#include "../src_global/constants.h"
+//#include "../src_global/constants.h"
 
 Numerical_Nonlocal::Numerical_Nonlocal()
 {
@@ -42,11 +38,7 @@ void Numerical_Nonlocal::set_type_info
 	const bool has_so
 )
 {
-	// PLEASE take care of this warning
-	if (type_in < 0 || type_in > 2)
-	{
-		WARNING("Numerical_Nonlocal", "bad input of type_in: not ready yet for type >2");
-	}
+	//TITLE("Numerical_Nonlocal","set_type_info");
 
 	this->type = type_in;
 	this->label = label_in;
@@ -128,7 +120,7 @@ void Numerical_Nonlocal::set_type_info
 						{
 							for (int L2 = 0; L2 < nproj_soc; L2++)
 							{
-								if(is==1||is==2) this->Coefficient_D_so(is, L1, L2) = ZERO;
+								if(is==1||is==2) this->Coefficient_D_so(is, L1, L2) = complex<double>(0.0,0.0);
 								else this->Coefficient_D_so(is, L1, L2) = Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
 								if(abs(this->Coefficient_D_so(is, L1, L2).real())>1.0e-8 
 									|| abs(this->Coefficient_D_so(is, L1, L2).imag())>1.0e-8)
