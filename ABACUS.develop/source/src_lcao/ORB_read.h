@@ -41,7 +41,7 @@ class LCAO_Orbitals
 	void Read_Descriptor(void);		//caoyu add 2020-3-16
 
 #ifdef __MPI
-	void bcast_files(void);
+	void bcast_files(const int &ntype_in);
 #endif
 
 	const double& get_ecutwfc(void) const {return ecutwfc;}

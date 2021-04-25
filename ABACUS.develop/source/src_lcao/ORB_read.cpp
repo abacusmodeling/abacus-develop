@@ -1,8 +1,16 @@
 #include "ORB_read.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
+#include <cassert>
 #include "../src_global/math_integral.h"
 
-#include "../src_pw/global.h" // only use ucell.atoms[it]
+// 
+#include "../src_pw/global.h"
+
+#include <math.h>
+#include <algorithm>
+using namespace std;
+
+//#include "../src_pw/global.h" // only use ucell.atoms[it]
 
 //==============================
 // Define an object here! 
@@ -39,7 +47,7 @@ LCAO_Orbitals::~LCAO_Orbitals()
 
 #ifdef __MPI
 // be called in unitcell_pseudo.
-void LCAO_Orbitals::bcast_files(void)
+void LCAO_Orbitals::bcast_files(const int &ntype_in)
 {
 	TITLE("LCAO_Orbitals","bcast_files");
 
@@ -52,10 +60,10 @@ void LCAO_Orbitals::bcast_files(void)
 		return;
 	}
 
-	assert(ucell.ntype > 0 );
+	assert(ntype_in > 0 );
 
 	ofs_running << "\n READING ORBITAL FILE NAMES FOR LCAO" << endl;
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<ntype_in; it++)
 	{
 		string ofile;
 		string nfile;
@@ -170,8 +178,6 @@ void LCAO_Orbitals::Read_Orbitals(
 		this->kmesh = static_cast<int>( sqrt(ecutwfc) / dk )  + 4;
 	}
 
-// PLEASE avoid using 'INPUT.' as global variable 
-// mohan note 2021-03-23
 	// jingan add for calculate r(R) matrix
 	if(out_r_matrix) 
 	{
@@ -246,9 +252,6 @@ void LCAO_Orbitals::Read_Orbitals(
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
-// PLEASE avoid using 'INPUT.' as global variable 
-// the descriptor parameter can be used as an input parameter
-// mohan note 2021-03-23
 	if (out_descriptor>0)	//condition: descriptor in lcao line
 	{
 		
