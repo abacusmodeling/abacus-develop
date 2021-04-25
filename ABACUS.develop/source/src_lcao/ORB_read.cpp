@@ -216,6 +216,9 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	for(int it=0; it<ntype; it++)
 	{
+#ifdef __NORMAL
+		// need to be added 2021-04-26 mohan
+#else
 		if(readin_nonlocal)
 		{
 			this->Read_NonLocal(it, this->nproj[it]);	
@@ -224,6 +227,7 @@ void LCAO_Orbitals::Read_Orbitals(
 		{
 			this->Set_NonLocal(it, this->nproj[it]);
 		}
+#endif
 		this->nprojmax = std::max( this->nprojmax, this->nproj[it] );
 	}
 
@@ -255,7 +259,9 @@ void LCAO_Orbitals::Read_Orbitals(
 }
 
 
+#ifdef __NORMAL
 
+#else
 // mohan add 2013-08-02
 // In order to get rid of the read in file .NONLOCAL.
 void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
@@ -703,6 +709,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 	return;
 }
 
+#endif // end for Read and Set Nonlocal, mohan add 2021-04-26
 
 void LCAO_Orbitals::Read_PAO(const int& it)
 {

@@ -1,9 +1,6 @@
 #ifndef ORB_GEN_TABLES_H
 #define ORB_GEN_TABLES_H
 
-//#include "../src_pw/tools.h"
-//#include "../src_global/ylm.h"
-
 #include "ORB_gaunt_table.h"
 #include "ORB_table_beta.h"
 #include "ORB_table_phi.h"

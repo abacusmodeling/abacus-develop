@@ -27,11 +27,15 @@ class LCAO_Orbitals
 
 	void Read_PAO(const int& it);
 
+#ifdef __NORMAL
+
+#else
 	// in order to get rid of the .NONLOCAL file.
 	void Set_NonLocal(const int &it, int &n_projectors);
 
 	// read in the NONLOCAL projector from file.
 	void Read_NonLocal(const int& it, int &n_projectors);
+#endif
 
 
 	void Read_Descriptor(void);		//caoyu add 2020-3-16
