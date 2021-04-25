@@ -22,6 +22,7 @@ class ORB_control
 		const double &lcao_rmax_in, // mohan add 2021-04-16
 		const double &lat0,
 		const int &out_descriptor, // mohan add 2021-04-25
+		const int &out_r_matrix, // mohan add 2021-04-26
 		const int &Lmax_exx);
 
     void clear_after_ions(

@@ -1,7 +1,8 @@
 #include "ORB_read.h"
-#include "../src_pw/global.h" // only use ucell.atoms[it]
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include "../src_global/math_integral.h"
+
+#include "../src_pw/global.h" // only use ucell.atoms[it]
 
 //==============================
 // Define an object here! 
@@ -101,7 +102,8 @@ void LCAO_Orbitals::bcast_files(void)
 void LCAO_Orbitals::Read_Orbitals(
 	const int &ntype_in, 
 	const int &lmax_in,
-	const int &out_descriptor)
+	const int &out_descriptor,
+	const int &out_r_matrix)
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
 	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
@@ -171,7 +173,10 @@ void LCAO_Orbitals::Read_Orbitals(
 // PLEASE avoid using 'INPUT.' as global variable 
 // mohan note 2021-03-23
 	// jingan add for calculate r(R) matrix
-	if(INPUT.out_r_matrix) kmesh = kmesh * 4;
+	if(out_r_matrix) 
+	{
+		kmesh = kmesh * 4;
+	}
 
 	//	this->kmesh = static_cast<int> (PI / 0.01 / 4 / this->dk);
 	if(kmesh%2==0) kmesh++;

@@ -1,7 +1,6 @@
 #ifndef LCAO_ORBITALS_H
 #define LCAO_ORBITALS_H
 
-//#include "../src_pw/tools.h"
 #include "ORB_atomic.h"
 #include "ORB_atomic_lm.h"
 #include "ORB_nonlocal.h"
@@ -23,7 +22,8 @@ class LCAO_Orbitals
 	void Read_Orbitals(
 		const int &ntype_in,
 		const int &lmax_in,
-		const int &out_descriptor); // mohan add 2021-04-25
+		const int &out_descriptor, //  mohan add 2021-04-25
+		const int &out_r_matrix); // mohan add 2021-04-26
 
 	void Read_PAO(const int& it);
 
