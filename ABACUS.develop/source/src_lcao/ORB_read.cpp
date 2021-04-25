@@ -281,7 +281,6 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	matrix Coefficient_D_in(n_projectors, n_projectors); //LiuXh 2016-01-14
 	ComplexMatrix Coefficient_D_in_so(nh*2, nh*2);//zhengdy-soc
 
 	if(!atom->has_so)
@@ -289,10 +288,6 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		for(int p1 = 0; p1<n_projectors; p1++)
 		{
 			const int lnow = atom->lll[p1];
-
-			// this will be wrong if dion is non-diagoal
-			//Coefficient_D_in(lnow,lnow)=atom->dion(p1,p1);//LiuXh 2016-01-14
-			Coefficient_D_in(p1,p1)=atom->dion(p1,p1);//LiuXh 2016-01-14
 
 			// only keep the nonzero part.
 			int cut_mesh = atom->mesh; 
@@ -336,7 +331,6 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			atom->label, 
 			atom->pp_type, 
 			atom->lmax, 
-			Coefficient_D_in, 
 			Coefficient_D_in_so, 
 			n_projectors, 
 			0, 
@@ -435,7 +429,6 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			atom->label, 
 			atom->pp_type, 
 			atom->lmax, 
-			Coefficient_D_in, 
 			Coefficient_D_in_so, 
 			n_projectors, 
 			nh, 
@@ -587,7 +580,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 
 #ifdef __MPI
 	Parallel_Common::bcast_int(n_projectors); // mohan add 2010-12-20
-	Parallel_Common::bcast_double(Coefficient_D_in.c, Coefficient_D_in.nr * Coefficient_D_in.nc);
+//	Parallel_Common::bcast_double(Coefficient_D_in.c, Coefficient_D_in.nr * Coefficient_D_in.nc);
 #endif
 
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
@@ -686,7 +679,6 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		label, 
 		ps_type, 
 		nlmax, 
-		Coefficient_D_in, 
 		Coefficient_D_in_so, 
 		n_projectors, 
 		0, 

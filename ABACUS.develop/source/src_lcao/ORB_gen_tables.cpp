@@ -125,6 +125,7 @@ void ORB_gen_tables::snap_psibeta(
 	const int &N2,
 	const Vector3<double> &R0, // The projector.
 	const int &T0,
+	const matrix &dion, // mohan add 2021-04-25
 	complex<double> *nlm1,
 	const int is) const
 {
@@ -488,7 +489,7 @@ void ORB_gen_tables::snap_psibeta(
 				{
 					if (!has_so)
 					{
-						nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
+						nlm[0] += term_a * term_b * dion(nb, nb); //LiuXh 2016-01-14
 					}
 					break;
 				}
@@ -498,7 +499,7 @@ void ORB_gen_tables::snap_psibeta(
 					{
 						if (!has_so)
 						{
-							nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
+							nlm[jr] += term_c[jr] * term_a * dion(nb, nb); //LiuXh 2016-01-14
 						}
 					}
 					break;

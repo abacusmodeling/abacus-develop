@@ -34,7 +34,6 @@ void Numerical_Nonlocal::set_type_info
 	const string& label_in,
 	const string& type_ps_in,
 	const int& lmax_in,
-	matrix& Coefficient_D_in,
 	ComplexMatrix& Coefficient_D_in_so,
 	const int& nproj_in,
 	const int& nproj_in_so,
@@ -76,18 +75,7 @@ void Numerical_Nonlocal::set_type_info
 	//2016-07-19 begin, LiuXh
 	if(!has_so)
 	{
-		this->Coefficient_D.create( nproj_in+1, nproj_in+1);
 		ZEROS(this->non_zero_count_soc, 4);
-		if(lmax_in > -1) //LiuXh add 20180328, fix bug of Hydrogen element with single projector pseudopot
-		{
-			for (int L1 = 0; L1 < min(this->Coefficient_D.nr, Coefficient_D_in.nr); L1++)
-			{
-				for (int L2 = 0; L2 < min(this->Coefficient_D.nc, Coefficient_D_in.nc); L2++)
-				{
-					this->Coefficient_D(L1, L2) = Coefficient_D_in(L1, L2);
-				}
-			}
-		}
 	}
 	else//zhengdy-soc
 	{

@@ -30,9 +30,6 @@ public:
 
 	const string& getType_ps() const { return this->type_ps; }
 
-	const double& getCoefficient_D(const int& L1, const int& L2) 
-						const { return this->Coefficient_D(L1, L2); }
-
 	const complex<double>& getCoefficient_D_so(const int& is, const int& L1, const int& L2) 
 						const { return this->Coefficient_D_so(is, L1, L2); }
 
@@ -50,7 +47,6 @@ public:
 			const string& label_in,
 			const string& type_ps_in,
 			const int& lmax_in,
-			matrix& Coefficient_D_in,
 			ComplexMatrix& Coefficient_D_in_so,
 			const int& nproj_in,
 			const int& nproj_in_so,
@@ -76,8 +72,6 @@ public:
 
 	string type_ps; //local or nonlocal
 
-	matrix Coefficient_D; //Coefficient Matrix dimension : (lmax+1) * (lmax+1)
-	
 	int nproj;
 
 	int *LfromBeta;

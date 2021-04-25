@@ -10,6 +10,7 @@
 #include "ORB_table_alpha.h"		//caoyu add 2020-3-18
 #include "ORB_read.h"
 #include "../src_global/vector3.h"
+#include "../src_global/matrix.h"
 
 //------------------------------------
 // used to be 'Use_Overlap_Table',
@@ -65,6 +66,7 @@ class ORB_gen_tables
 		const int &n2,
 		const Vector3<double> &Rnl,
 		const int &type,
+		const matrix &dion, // mohan add 2021-04-25
 		complex<double> *nlm1=NULL,
 		const int is=0)const;
 
