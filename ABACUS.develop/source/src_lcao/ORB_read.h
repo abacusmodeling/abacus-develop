@@ -22,7 +22,8 @@ class LCAO_Orbitals
 
 	void Read_Orbitals(
 		const int &ntype_in,
-		const int &lmax_in);
+		const int &lmax_in,
+		const int &out_descriptor); // mohan add 2021-04-25
 
 	void Read_PAO(const int& it);
 

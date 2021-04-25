@@ -21,11 +21,13 @@ class ORB_control
 		const double &lcao_dr_in, // mohan add 2021-04-16
 		const double &lcao_rmax_in, // mohan add 2021-04-16
 		const double &lat0,
+		const int &out_descriptor, // mohan add 2021-04-25
 		const int &Lmax_exx);
 
     void clear_after_ions(
 		ORB_gen_tables &OGT, 
-		LCAO_Orbitals &orb);
+		LCAO_Orbitals &orb,
+		const int &out_descriptor);
 
 };
 #endif

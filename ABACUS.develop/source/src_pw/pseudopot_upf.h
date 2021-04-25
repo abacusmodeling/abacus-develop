@@ -1,8 +1,3 @@
-//==========================================================
-// Author: Lixin He,mohan
-// DATE : 2009-02-26
-//==========================================================
-/* pseudopot_upf.h   */
 #ifndef PSEUDOPOT_UPF_H
 #define PSEUDOPOT_UPF_H
 
