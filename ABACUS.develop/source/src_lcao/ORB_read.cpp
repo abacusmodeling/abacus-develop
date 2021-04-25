@@ -2,11 +2,8 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include <cassert>
 #include "../src_global/math_integral.h"
-
-// 
-#include "../src_pw/global.h"
-
 #include <math.h>
+#include <cmath>
 #include <algorithm>
 using namespace std;
 
@@ -270,6 +267,8 @@ void LCAO_Orbitals::Read_Orbitals(
 #ifdef __NORMAL
 
 #else
+
+#include "../src_pw/global.h"
 // mohan add 2013-08-02
 // In order to get rid of the read in file .NONLOCAL.
 void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
@@ -976,21 +975,6 @@ void LCAO_Orbitals::set_nl_index(void)
 	for(int it=0; it<ntype; it++)
 	{
 		nh_max = max(nh_max, ucell.atoms[it].nh);
-	}
-
-	this->ib2_ylm.create(ntype, nh_max);
-	for(int it=0; it<ntype; it++)
-	{
-		int index = 0;
-		for(int ib=0; ib< this->nproj[it]; ib++)
-		{
-			const int L = Beta[it].Proj[ib].getL();
-			for(int m=0; m<2*L+1; m++)
-			{
-				this->ib2_ylm(it, index) = L*L+m;
-				++index;
-			}
-		}
 	}
 
 	return;

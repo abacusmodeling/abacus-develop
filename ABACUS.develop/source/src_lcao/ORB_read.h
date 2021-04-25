@@ -73,7 +73,6 @@ class LCAO_Orbitals
 	double Rmax;
 	int *nproj; //mohan add 2010-12-19
 	int nprojmax; // mohan add 2010-03-07
-	IntArray ib2_ylm;
 	
 	double dr_uniform;
 
