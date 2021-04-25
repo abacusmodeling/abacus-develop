@@ -55,7 +55,8 @@ void Run_lcao::lcao_line(void)
 		ucell.lat0, 
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
-		Exx_Abfs::Lmax);
+		Exx_Abfs::Lmax,
+		MY_RANK);
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S

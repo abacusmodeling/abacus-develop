@@ -337,7 +337,8 @@ void energy::perform_dos(void)
 						ucell.lat0, 
 						INPUT.out_descriptor,
 						INPUT.out_r_matrix,
-						Exx_Abfs::Lmax);
+						Exx_Abfs::Lmax,
+						MY_RANK);
 
 				LM.allocate_HS_R(LNNR.nnr);
 				LM.zeros_HSR('S', LNNR.nnr);

@@ -108,7 +108,8 @@ void LCAO_Orbitals::Read_Orbitals(
 	const int &ntype_in, 
 	const int &lmax_in,
 	const int &out_descriptor,
-	const int &out_r_matrix)
+	const int &out_r_matrix,
+	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
 	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
@@ -196,7 +197,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->Phi = new Numerical_Orbital[ntype];
 	for(int it=0; it<ntype; it++)
 	{
-		this->Read_PAO(it);	
+		this->Read_PAO(it, my_rank);	
 	}
 
 	
@@ -717,7 +718,9 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 
 #endif // end for Read and Set Nonlocal, mohan add 2021-04-26
 
-void LCAO_Orbitals::Read_PAO(const int& it)
+void LCAO_Orbitals::Read_PAO(
+	const int& it, 
+	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals","Read_PAO");
 	int lmaxt = ucell.atoms[it].nwl;
@@ -760,7 +763,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 			// mohan add 2010-09-08.
 			// check if the orbital file exists.
             bool open=false;
-            if(MY_RANK==0)
+            if(my_rank==0)
             {
 				//cout << " file name : " << orbital_file[it] << endl;
                 in.open(this->orbital_file[it].c_str());
@@ -787,7 +790,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 			double dr; // only used in case 1
 
 			int meshr_read;
-			if(MY_RANK==0)    //pengfei 2014-10-13
+			if(my_rank==0)    //pengfei 2014-10-13
 			{
 				while (in.good())
 				{
@@ -811,7 +814,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 			Parallel_Common::bcast_int( meshr );	
 			Parallel_Common::bcast_int( meshr_read );	
 #endif				
-			if(MY_RANK==0)
+			if(my_rank==0)
 			{
 				CHECK_NAME(in, "dr");
 				in >> dr;
@@ -846,7 +849,7 @@ void LCAO_Orbitals::Read_PAO(const int& it)
 
 			// mohan update 2010-09-07
 			bool find = false;
-			if(MY_RANK==0)
+			if(my_rank==0)
 			{
 				string name1, name2, name3;
 				int tmp_it, tmp_l ,tmp_n;

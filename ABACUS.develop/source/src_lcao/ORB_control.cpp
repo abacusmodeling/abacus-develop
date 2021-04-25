@@ -22,7 +22,8 @@ void ORB_control::set_orb_tables(
 	const double &lat0,
 	const int &out_descriptor,
 	const int &out_r_matrix,
-	const int &Lmax_exx)
+	const int &Lmax_exx,
+	const int &my_rank) // mohan add 2021-04-26
 {
     TITLE("ORB_control","set_orb_tables");
 	timer::tick("ORB_control","set_orb_tables",'B');
@@ -44,7 +45,7 @@ void ORB_control::set_orb_tables(
 	orb.dR = lcao_dr_in;
 	orb.Rmax = lcao_rmax_in;
 	
-    orb.Read_Orbitals(ucell.ntype, ucell.lmax, out_descriptor, out_r_matrix);
+    orb.Read_Orbitals(ucell.ntype, ucell.lmax, out_descriptor, out_r_matrix, my_rank);
 
 	if(CALCULATION=="test")
 	{
