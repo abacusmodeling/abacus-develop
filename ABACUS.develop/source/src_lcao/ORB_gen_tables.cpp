@@ -412,7 +412,7 @@ void ORB_gen_tables::snap_psibeta(
 				else
 				{
 					Interp_Vnlb = i_exp * tbeta.Table_NR[0][Tpair2][Opair2][L][0];
-				}
+				}// end if(distance20)
 
 				if (job == 1) // 1 means calculate the derivative part.
 				{
@@ -437,7 +437,7 @@ void ORB_gen_tables::snap_psibeta(
 					{
 						Interp_Vnlc = 0.0;
 					}
-				}
+				} // end job==1
 
 				// sum up the second part.
 				for (int m = 0; m < 2 * L + 1; m++)
@@ -450,27 +450,27 @@ void ORB_gen_tables::snap_psibeta(
 					switch (job)
 					{
 						case 0: // calculate the overlap part.
-							{
-								term_b += tmpGaunt * Interp_Vnlb * rlyb[lm];
-								break;
-							}
+						{
+							term_b += tmpGaunt * Interp_Vnlb * rlyb[lm];
+							break;
+						}
 						case 1: // calculate the derivative part.
+						{
+							double tt1 = tmpGaunt * Interp_Vnlc * rlyb[lm] / distance20;
+							double tt2 = tmpGaunt * Interp_Vnlb;
+
+							for (int ir = 0; ir < 3; ir++)
 							{
-								double tt1 = tmpGaunt * Interp_Vnlc * rlyb[lm] / distance20;
-								double tt2 = tmpGaunt * Interp_Vnlb;
-
-								for (int ir = 0; ir < 3; ir++)
-								{
-									term_c[ir] += tt1 * unit_vec_dRb[ir] + tt2 * grlyb[lm][ir];
-								}
-
-								break;
+								term_c[ir] += tt1 * unit_vec_dRb[ir] + tt2 * grlyb[lm][ir];
 							}
+
+							break;
+						}
 						default:
 							break;
 					}
 				} // end m of SECOND PART
-			}	  // end L of SECOND PART
+			} // end L of SECOND PART
 
 			//added by zhengdy-soc, store them for soc case
 			if (has_so)
@@ -485,29 +485,30 @@ void ORB_gen_tables::snap_psibeta(
 			switch (job)
 			{
 				case 0: //calculate the overlap part.
+				{
+					if (!has_so)
+					{
+						nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
+					}
+					break;
+				}
+				case 1: //calculate the derivative part.
+				{
+					for (int jr = 0; jr < 3; jr++)
 					{
 						if (!has_so)
 						{
-							nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
+							nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
 						}
-						break;
 					}
-				case 1: //calculate the derivative part.
-					{
-						for (int jr = 0; jr < 3; jr++)
-						{
-							if (!has_so)
-							{
-								nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
-							}
-						}
-						break;
-					}
+					break;
+				}
 				default:
 					break;
 			}
-		} //!m0
-	}	  //!L0
+
+		} // end m0
+	}// end nb
 
 	//zhengdy-soc, calculate non-local term
 	if (has_so)
