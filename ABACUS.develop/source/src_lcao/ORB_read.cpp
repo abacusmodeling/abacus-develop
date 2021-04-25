@@ -239,7 +239,6 @@ void LCAO_Orbitals::Read_Orbitals(
 		this->nprojmax = std::max( this->nprojmax, this->nproj[it] );
 	}
 
-	this->set_nl_index();
 	ofs_running << " max number of nonlocal projetors among all species is " << nprojmax << endl; 
 
 	//caoyu add 2021-3-16
@@ -965,20 +964,6 @@ void LCAO_Orbitals::Read_PAO(const int& it)
     return;
 }
 
-void LCAO_Orbitals::set_nl_index(void)
-{
-	TITLE("LCAO_Orbitals","set_nl_index");
-
-	assert(this->ntype>0);
-
-	int nh_max = 0;
-	for(int it=0; it<ntype; it++)
-	{
-		nh_max = max(nh_max, ucell.atoms[it].nh);
-	}
-
-	return;
-}
 
 //caoyu add 2021-3-16
 void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis

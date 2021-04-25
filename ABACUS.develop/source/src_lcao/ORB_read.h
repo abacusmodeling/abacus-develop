@@ -92,8 +92,6 @@ class LCAO_Orbitals
 	int nchimax_d;	//caoyu add 2021-03-17
 	int ntype; // number of elements
 
-	void set_nl_index(void);
-
 };
 
 // PLEASE avoid using 'ORB' as global variable 
