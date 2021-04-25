@@ -315,6 +315,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 					this->dk,
 					dr_uniform); // delta k mesh in reciprocal space
 
+			tmpBeta_lm[p1].plot(MY_RANK);
+
 			delete[] beta_r;
 				
 		}
@@ -421,6 +423,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 					this->kmesh,
 					this->dk,
 					dr_uniform); // delta k mesh in reciprocal space
+
+			tmpBeta_lm[p1].plot(MY_RANK);
 
 			delete[] beta_r;
 		}
@@ -666,6 +670,8 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
                 this->kmesh,
                 this->dk,
 				dr_uniform); // delta k mesh in reciprocal space
+
+		tmpBeta_lm[p1].plot(MY_RANK);
 
 		delete[] radial_ps;
 		delete[] rab_ps;

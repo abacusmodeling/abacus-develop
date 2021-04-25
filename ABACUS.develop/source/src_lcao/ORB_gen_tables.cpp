@@ -1,7 +1,6 @@
-//#include "src_pw/global.h"
 #include "ORB_read.h"
 #include "ORB_gen_tables.h"
-#include "src_global/ylm.h"
+#include "../src_global/ylm.h"
 
 // here is a member of ORB_gen_tables class
 ORB_gen_tables UOT;
