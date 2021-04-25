@@ -335,6 +335,7 @@ void energy::perform_dos(void)
 						INPUT.lcao_dr,
 						INPUT.lcao_rmax, 
 						ucell.lat0, 
+						INPUT.out_descriptor,
 						Exx_Abfs::Lmax);
 
 				LM.allocate_HS_R(LNNR.nnr);
@@ -418,7 +419,7 @@ void energy::perform_dos(void)
 				atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
 				// mohan update 2021-02-10
-				hm.orb_con.clear_after_ions(UOT, ORB);
+				hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

@@ -53,6 +53,7 @@ void Run_lcao::lcao_line(void)
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax, 
 		ucell.lat0, 
+		INPUT.out_descriptor,
 		Exx_Abfs::Lmax);
 
 	// * allocate H and S matrices according to computational resources

@@ -100,7 +100,8 @@ void LCAO_Orbitals::bcast_files(void)
 
 void LCAO_Orbitals::Read_Orbitals(
 	const int &ntype_in, 
-	const int &lmax_in)
+	const int &lmax_in,
+	const int &out_descriptor)
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
 	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
@@ -245,7 +246,7 @@ void LCAO_Orbitals::Read_Orbitals(
 // PLEASE avoid using 'INPUT.' as global variable 
 // the descriptor parameter can be used as an input parameter
 // mohan note 2021-03-23
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")		//condition: descriptor in lcao line
+	if (out_descriptor>0)	//condition: descriptor in lcao line
 	{
 		
 		delete[] this->Alpha;

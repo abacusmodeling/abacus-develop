@@ -20,6 +20,7 @@ void ORB_control::set_orb_tables(
 	const double &lcao_dr_in, // mohan add 2021-04-16
 	const double &lcao_rmax_in, // mohan add 2021-04-16
 	const double &lat0,
+	const int &out_descriptor,
 	const int &Lmax_exx)
 {
     TITLE("ORB_control","set_orb_tables");
@@ -42,7 +43,7 @@ void ORB_control::set_orb_tables(
 	orb.dR = lcao_dr_in;
 	orb.Rmax = lcao_rmax_in;
 	
-    orb.Read_Orbitals(ucell.ntype, ucell.lmax);
+    orb.Read_Orbitals(ucell.ntype, ucell.lmax, INPUT.out_descriptor);
 
 	if(CALCULATION=="test")
 	{
@@ -60,7 +61,7 @@ void ORB_control::set_orb_tables(
     // 1: generate overlap table
     // 2: generate kinetic table
     // 3: generate overlap & kinetic table
-    OGT.gen_tables(job0, orb, Lmax_exx, INPUT.out_descriptor);
+    OGT.gen_tables(job0, orb, Lmax_exx, out_descriptor);
     // init lat0, in order to interpolated value from this table.
 
 	assert(lat0>0.0);
@@ -71,14 +72,17 @@ void ORB_control::set_orb_tables(
     return;
 }
 
-void ORB_control::clear_after_ions(ORB_gen_tables &OGT, LCAO_Orbitals &orb)
+void ORB_control::clear_after_ions(
+	ORB_gen_tables &OGT, 
+	LCAO_Orbitals &orb,
+	const int &out_descriptor)
 {
     TITLE("ORB_control","clear_after_ions");
     OGT.MOT.Destroy_Table(orb);
     OGT.tbeta.Destroy_Table_Beta(orb);
     
 	//caoyu add 2021-03-18
-    if (INPUT.out_descriptor && BASIS_TYPE == "lcao") 
+    if (out_descriptor>0) 
 	{
         OGT.talpha.Destroy_Table_Alpha();
     }

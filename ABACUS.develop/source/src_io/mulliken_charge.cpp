@@ -176,6 +176,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					INPUT.lcao_dr,
 					INPUT.lcao_rmax, 
 					ucell.lat0, 
+					INPUT.out_descriptor,
 					Exx_Abfs::Lmax);
 
 
@@ -237,7 +238,7 @@ void Mulliken_Charge::cal_mulliken(void)
 #ifdef __MPI
 			atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
-			hm.orb_con.clear_after_ions(UOT, ORB);
+			hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
