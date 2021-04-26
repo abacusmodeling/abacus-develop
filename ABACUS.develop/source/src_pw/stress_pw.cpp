@@ -2,16 +2,14 @@
 #include "./H_XC_pw.h"
 #include "src_pw/vdwd2.h"
 
-void Stress_PW::cal_stress(matrix& sigma)
+void Stress_PW::cal_stress(matrix& sigmatot)
 {
 	TITLE("Stress_PW","cal_stress");
 	timer::tick("Stress_PW","cal_stress",'E');    
 
-	sigma.create(3,3);
+	sigmatot.create(3,3);
 	matrix sigmaxc;
 	sigmaxc.create(3,3);
-	matrix sigmatot;
-	sigmatot.create(3,3);
 	matrix sigmahar;
 	sigmahar.create(3,3);
 	matrix sigmakin;

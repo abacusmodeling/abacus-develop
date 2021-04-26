@@ -7,6 +7,7 @@
 #include "tools.h"
 #include "wavefunc.h"
 #include "../src_lcao/ORB_gen_tables.h"
+#include "../src_global/math_integral.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -300,15 +301,11 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 						{
 							for(int is2=0;is2<2;is2++)
 							{
-								complex<double> coeff = complex<double>(0.0,0.0);
-								for(int m=-l1-1;m<l1+1;m++)
-								{
-									const int mi = soc.sph_ind(l1,j1,m,is1) + this->lmaxkb ;
-									const int mj = soc.sph_ind(l2,j2,m,is2) + this->lmaxkb ;
-									coeff += soc.rotylm(m1,mi) * soc.spinor(l1,j1,m,is1)*
-										conj(soc.rotylm(m2,mj))*soc.spinor(l2,j2,m,is2);
-								}
-								soc.fcoef(it,is1,is2,ip,ip2) = coeff;
+								soc.set_fcoef(l1, l2,
+										is1, is2,
+										m1, m2,
+										j1, j2,
+										it, ip, ip2);
 							}
 						}
 					}
@@ -398,7 +395,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 					          jl[ir] * cell.atoms[it].r[ir];
 				} 
 				double vqint;
-				Mathzone::Simpson_Integral(kkbeta, aux, cell.atoms[it].rab, vqint);
+				Integral::Simpson_Integral(kkbeta, aux, cell.atoms[it].rab, vqint);
 				this->tab(it, ib, iq) = vqint * pref;
 			} 
 		} 
@@ -624,7 +621,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 								  ucell.atoms[it].r[ir] * ucell.atoms[it].r[ir];
 					}
 					double vqint;
-					Mathzone::Simpson_Integral(kkbeta, aux, ucell.atoms[it].rab, vqint);
+					Integral::Simpson_Integral(kkbeta, aux, ucell.atoms[it].rab, vqint);
 					this->tab_alpha(it, ib, L, iq) = vqint * pref;
 				}
 			}

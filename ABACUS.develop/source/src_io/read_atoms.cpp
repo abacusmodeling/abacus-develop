@@ -32,6 +32,12 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 						<< setw(12) << atom_mass[i] 
 						<< setw(18) << pseudo_fn[i];
 			}
+
+			// Peize Lin test for bsse 2021.04.07
+			const string bsse_label = "empty";
+			this->atoms[i].flag_empty_element = 
+				(search( atom_label[i].begin(), atom_label[i].end(), bsse_label.begin(), bsse_label.end() ) != atom_label[i].end())
+				? true : false;
 		}
 	}
 
@@ -71,6 +77,10 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 				
 			}
 		}	
+		// caoyu add 2021-03-16
+		if (SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
+			ifa >> ORB.descriptor_file;
+		}
 	}
 
 	// Peize Lin add 2016-09-23
