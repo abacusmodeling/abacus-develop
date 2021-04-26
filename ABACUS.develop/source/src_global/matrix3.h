@@ -25,7 +25,6 @@ public:
 	        const double &r21,const double &r22,const double &r23,
 	        const double &r31,const double &r32,const double &r33);
 
-	void Reset(void);
 	void Identity(void);
 	void Zero(void);
 	double Det(void) const ;
