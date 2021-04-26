@@ -28,8 +28,6 @@ class LCAO_Orbitals
 
 	void Read_PAO(
 		const int& it,
-		const int& lmaxt, // lmax for atom species 'it', mohan add 2021-04-26
-		int* nchi, // number of chi for each L, mohan add 2021-04-26
 		const int& my_rank); // mohan add 2021-04-26
 
 #ifdef __NORMAL
@@ -90,12 +88,14 @@ class LCAO_Orbitals
 
 	private:
 
-	int kmesh;
+	int ntype; // number of elements
+	int kmesh; // number of points on kmesh
+
 	int lmax;
 	int nchimax;
+
 	int lmax_d;	//caoyu add 2021-03-17
 	int nchimax_d;	//caoyu add 2021-03-17
-	int ntype; // number of elements
 
 };
 

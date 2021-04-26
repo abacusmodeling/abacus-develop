@@ -50,7 +50,12 @@ void ORB_control::set_orb_tables(
 	orb.dR = lcao_dr_in;
 	orb.Rmax = lcao_rmax_in;
 	
-    orb.Read_Orbitals(ntype, lmax, out_descriptor, out_r_matrix, my_rank);
+    orb.Read_Orbitals(
+		ntype, 
+		lmax, 
+		out_descriptor, 
+		out_r_matrix, 
+		my_rank);
 
 	if(CALCULATION=="test")
 	{
