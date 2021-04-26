@@ -46,7 +46,7 @@ Matrix3 operator -(const Matrix3 &m1, const Matrix3 &m2);	//m1-m2
 Matrix3 operator /(const Matrix3 &m,const double &s);		//m/s
 Matrix3 operator *(const Matrix3 &m1,const  Matrix3 &m2);	//m1*m2
 Matrix3 operator *(const Matrix3 &m,const double &s);		//m*s
-Matrix3 operator *(double &s, const Matrix3 &m);		//s*m
+Matrix3 operator *(const double &s, const Matrix3 &m);		//s*m
 template<typename T> Vector3<double> operator *(const Matrix3 &m, const Vector3<T> &u);	//m*u				// Peize Lin change Vector3<T> 2017-01-10
 template<typename T> Vector3<double> operator *(const Vector3<T> &u, const Matrix3 &m);	//u*m				// Peize Lin change Vector3<T> 2017-01-10
 
