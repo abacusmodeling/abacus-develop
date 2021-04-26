@@ -90,12 +90,14 @@ class LCAO_Orbitals
 
 	private:
 
-	int kmesh;
+	int ntype; // number of elements
+	int kmesh; // number of points on kmesh
+
 	int lmax;
 	int nchimax;
+
 	int lmax_d;	//caoyu add 2021-03-17
 	int nchimax_d;	//caoyu add 2021-03-17
-	int ntype; // number of elements
 
 };
 
