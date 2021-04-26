@@ -214,7 +214,8 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	return;
 }
 
-void ORB_table_alpha::init_Table_Alpha(Sph_Bessel_Recursive::D2 *pSB)
+void ORB_table_alpha::init_Table_Alpha(
+	Sph_Bessel_Recursive::D2 *pSB)
 {
 	TITLE("ORB_table_alpha", "init_Table_Alpha");
 	timer::tick("ORB_table_alpha", "init_Table_Alpha", 'D');
@@ -241,7 +242,9 @@ void ORB_table_alpha::init_Table_Alpha(Sph_Bessel_Recursive::D2 *pSB)
 		const int pairs_chi = ORB.Phi[T1].getTotal_nchi() * ORB.Alpha[0].getTotal_nchi();
 
 		if (pairs_chi == 0)
+		{
 			continue;
+		}
 
 		// init 2nd dimension
 		this->Table_DSR[0][T1] = new double **[pairs_chi];

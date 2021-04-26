@@ -102,6 +102,7 @@ void LCAO_Orbitals::bcast_files(const int &ntype_in)
 #endif
 
 
+#include "../src_pw/global.h"
 void LCAO_Orbitals::Read_Orbitals(
 	const int &ntype_in, 
 	const int &lmax_in,
@@ -195,7 +196,18 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->Phi = new Numerical_Orbital[ntype];
 	for(int it=0; it<ntype; it++)
 	{
-		this->Read_PAO(it, my_rank);	
+
+		int lmaxt = ucell.atoms[it].nwl;
+		// number of chi for each L.
+		int *nchi = new int[lmaxt+1];
+		for(int l=0; l<=lmaxt; l++)
+		{
+			nchi[l] = ucell.atoms[it].l_nchi[l];
+		}
+
+		this->Read_PAO(it, lmaxt, nchi, my_rank);	
+
+		delete[] nchi;
 	}
 
 	
@@ -718,19 +730,14 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 
 void LCAO_Orbitals::Read_PAO(
 	const int& it, 
+	const int& lmaxt, // lmax for atom species 'it', mohan add 2021-04-26
+	int* nchi, // number of chi for each L, mohan add 2021-04-26
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals","Read_PAO");
-	int lmaxt = ucell.atoms[it].nwl;
 
-	//	OUT(ofs_running,"Lmax for this type",lmaxt);
-
-	// allocate space
-	// number of chi for each L.
-	int *nchi = new int[lmaxt+1];
 	for(int l=0; l<=lmaxt; l++)
 	{
-		nchi[l] = ucell.atoms[it].l_nchi[l];
 		this->nchimax = std::max( this->nchimax, nchi[l]);
 	}
 
@@ -961,7 +968,6 @@ void LCAO_Orbitals::Read_PAO(
         nchi,
         total_nchi); //copy twice !
 
-    delete[] nchi;
     return;
 }
 
@@ -998,7 +1004,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 
 	//read lmax and nchi[l]
 	int lmax = 0;
-	int nchimax = 0;
+	this->nchimax_d = 0;
 	int nchi[10]={0};
 	char word[80];
 	if (MY_RANK == 0)
@@ -1017,18 +1023,17 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 		for (int l = 0; l <= lmax; l++)
 		{
 			in >> word >> word >> word >> nchi[l];
-			nchimax = std::max(nchimax, nchi[l]);
+			this->nchimax_d = std::max(this->nchimax_d, nchi[l]);
 		}
 	}
 
 #ifdef __MPI
 	Parallel_Common::bcast_int(lmax);
-	Parallel_Common::bcast_int(nchimax);
+	Parallel_Common::bcast_int(this->nchimax_d);
 	Parallel_Common::bcast_int(nchi, lmax + 1);
 #endif		
 
 	this->lmax_d = lmax;
-	this->nchimax_d = nchimax;
 	// calculate total number of chi
 	int total_nchi = 0;
 	for (int l = 0; l <= lmax; l++)
