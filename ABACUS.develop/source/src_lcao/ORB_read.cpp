@@ -198,18 +198,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->Phi = new Numerical_Orbital[ntype];
 	for(int it=0; it<ntype; it++)
 	{
-
-		int lmaxt = ucell.atoms[it].nwl;
-		// number of chi for each L.
-		int *nchi = new int[lmaxt+1];
-		for(int l=0; l<=lmaxt; l++)
-		{
-			nchi[l] = ucell.atoms[it].l_nchi[l];
-		}
-
-		this->Read_PAO(it, lmaxt, nchi, my_rank);	
-
-		delete[] nchi;
+		this->Read_PAO(it, my_rank);	
 	}
 
 	
@@ -730,16 +719,26 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 
 #endif // end for Read and Set Nonlocal, mohan add 2021-04-26
 
+
+//-------------------------------------------------------
+// mohan note 2021-04-26
+// to_caoyu: 
+// 1) read in lmaxt and nchi directly from orbital files
+// 2) pass nchi to phi via this->Phi[it].set_orbital_info 
+// be careful! nchi[l] may be different for differnt phi
+//-------------------------------------------------------
 void LCAO_Orbitals::Read_PAO(
 	const int& it, 
-	const int& lmaxt, // lmax for atom species 'it', mohan add 2021-04-26
-	int* nchi, // number of chi for each L, mohan add 2021-04-26
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals","Read_PAO");
 
+	int lmaxt = ucell.atoms[it].nwl;
+	// number of chi for each L.
+	int *nchi = new int[lmaxt+1];
 	for(int l=0; l<=lmaxt; l++)
 	{
+		nchi[l] = ucell.atoms[it].l_nchi[l];
 		this->nchimax = std::max( this->nchimax, nchi[l]);
 	}
 
@@ -972,6 +971,8 @@ void LCAO_Orbitals::Read_PAO(
         lmaxt,
         nchi,
         total_nchi); //copy twice !
+
+	delete[] nchi;
 
     return;
 }
