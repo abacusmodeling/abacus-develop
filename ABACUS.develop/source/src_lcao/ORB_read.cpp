@@ -151,9 +151,11 @@ void LCAO_Orbitals::Read_Orbitals(
     assert(dR > 0.0);
     assert(Rmax > 0.0);
 
+	// ntype: number of atom species
 	this->ntype = ntype_in; 
 	assert(ntype>0);
 
+	// lmax: lmax used in local orbitals as basis sets
 	assert(lmax_in>=0); // mohan add 2021-04-16
 	this->lmax = lmax_in;
 
@@ -752,7 +754,7 @@ void LCAO_Orbitals::Read_PAO(
 	delete[] Phi[it].phiLN;
 	this->Phi[it].phiLN = new Numerical_Orbital_Lm[total_nchi];
 
-	ifstream in;
+	ifstream in_ao;
 
 	int count=0;
 	ofs_running << " " << setw(8) << "ORBITAL" << setw(3) << "L" 
@@ -765,14 +767,11 @@ void LCAO_Orbitals::Read_PAO(
         {
 			ofs_running << " " << setw(8) << count+1 << setw(3) << L << setw(3) << N;
 
-			// mohan add 2010-09-08.
-			// check if the orbital file exists.
             bool open=false;
             if(my_rank==0)
             {
-				//cout << " file name : " << orbital_file[it] << endl;
-                in.open(this->orbital_file[it].c_str());
-                if(in)
+                in_ao.open(this->orbital_file[it].c_str());
+                if(in_ao)
                 {
                     open=true;
                 }
@@ -797,17 +796,17 @@ void LCAO_Orbitals::Read_PAO(
 			int meshr_read;
 			if(my_rank==0)    //pengfei 2014-10-13
 			{
-				while (in.good())
+				while (in_ao.good())
 				{
-					in >> word;
+					in_ao >> word;
 					if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
 					{
 						break;
 					}
 				}
 
-				CHECK_NAME(in, "Mesh");
-				in >> meshr;
+				CHECK_NAME(in_ao, "Mesh");
+				in_ao >> meshr;
 				meshr_read = meshr;
 				if(meshr%2==0) 
 				{
@@ -821,8 +820,8 @@ void LCAO_Orbitals::Read_PAO(
 #endif				
 			if(my_rank==0)
 			{
-				CHECK_NAME(in, "dr");
-				in >> dr;
+				CHECK_NAME(in_ao, "dr");
+				in_ao >> dr;
 			}
 			
 #ifdef __MPI
@@ -856,11 +855,15 @@ void LCAO_Orbitals::Read_PAO(
 			bool find = false;
 			if(my_rank==0)
 			{
-				string name1, name2, name3;
-				int tmp_it, tmp_l ,tmp_n;
+				string name1;
+				string name2;
+				string name3;
+				int tmp_it=0;
+				int tmp_l=0;
+				int tmp_n=0;
 				while( !find )
 				{
-					if(in.eof())
+					if(in_ao.eof())
 					{
 						ofs_warning << " Can't find l=" 
 						<< L << " n=" << N << " orbital." << endl; 			
@@ -868,15 +871,15 @@ void LCAO_Orbitals::Read_PAO(
 					}
 
 					
-					in >> name1 >> name2 >> name3;
+					in_ao >> name1 >> name2 >> name3;
 					assert( name1 == "Type" );
-					in >> tmp_it >> tmp_l >> tmp_n;
+					in_ao >> tmp_it >> tmp_l >> tmp_n;
 					if( L == tmp_l && N == tmp_n )
 					{
 						// meshr_read is different from meshr if meshr is even number.
 						for(int ir=0; ir<meshr_read; ir++)
 						{
-							in >> psi[ir];
+							in_ao >> psi[ir];
 							/*
 							double rl = pow (ir*dr, l);	
 							psi[ir] *= rl;
@@ -890,7 +893,7 @@ void LCAO_Orbitals::Read_PAO(
 						double no_use;
 						for(int ir=0; ir<meshr_read; ir++)
 						{
-							in >> no_use;
+							in_ao >> no_use;
 						}
 					}
 				}//end find
@@ -910,13 +913,15 @@ void LCAO_Orbitals::Read_PAO(
 #endif
 
 			// renormalize radial wave functions
-			double* inner = new double[meshr];
+			double* inner = new double[meshr]();
 			for(int ir=0; ir<meshr; ir++)
 			{
 				inner[ir] = psir[ir] * psir[ir];
 			}
 			double unit = 0.0;
 			Integral::Simpson_Integral(meshr, inner, rab, unit);
+
+			assert(unit>0.0); // mohan add 2021-04-26
 
 			// check unit: \sum ( psi[r] * r )^2 = 1
 			ofs_running << setprecision(3) << setw(12) << unit;
@@ -957,7 +962,7 @@ void LCAO_Orbitals::Read_PAO(
 			delete[] psi;
 
             ++count;
-			in.close();
+			in_ao.close();
         }
     }
 
@@ -977,7 +982,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 {
 	TITLE("LCAO_Orbitals", "Read_Descriptor");
 
-	ifstream in;
+	ifstream in_de;
 	ofs_running << " " << setw(12) << "DESCRIPTOR" << setw(3) << "L"
 		<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
 		<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
@@ -987,8 +992,8 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 	bool open = false;
 	if (MY_RANK == 0)
 	{
-		in.open(this->descriptor_file.c_str());
-		if (in)
+		in_de.open(this->descriptor_file.c_str());
+		if (in_de)
 		{
 			open = true;
 		}
@@ -1009,12 +1014,12 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 	char word[80];
 	if (MY_RANK == 0)
 	{
-		while (in.good())
+		while (in_de.good())
 		{
-			in >> word;
+			in_de >> word;
 			if (std::strcmp(word, "Lmax") == 0)
 			{
-				in >> lmax;
+				in_de >> lmax;
 				break;
 			}
 		}
@@ -1022,7 +1027,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 		// number of chi for each L.
 		for (int l = 0; l <= lmax; l++)
 		{
-			in >> word >> word >> word >> nchi[l];
+			in_de >> word >> word >> word >> nchi[l];
 			this->nchimax_d = std::max(this->nchimax_d, nchi[l]);
 		}
 	}
@@ -1043,29 +1048,29 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 		//OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
 	this->Alpha[0].phiLN = new Numerical_Orbital_Lm[total_nchi];
 
-	int meshr; // number of mesh points
-	int meshr_read;
-	double dr; 
+	int meshr=0; // number of mesh points
+	int meshr_read=0;
+	double dr=0.0; 
 
 	if (MY_RANK == 0)
 	{
-		while (in.good())
+		while (in_de.good())
 		{
-			in >> word;
+			in_de >> word;
 			if (std::strcmp(word, "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
 			{
 				break;
 			}
 		}
-		CHECK_NAME(in, "Mesh");
-		in >> meshr;
+		CHECK_NAME(in_de, "Mesh");
+		in_de >> meshr;
 		meshr_read = meshr;
 		if (meshr % 2 == 0)
 		{
 			++meshr;
 		}
-		CHECK_NAME(in, "dr");
-		in >> dr;
+		CHECK_NAME(in_de, "dr");
+		in_de >> dr;
 	}
 
 #ifdef __MPI
@@ -1075,8 +1080,10 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 #endif		
 
 	int count = 0;
-	string name1, name2;
-	int tmp_l, tmp_n;
+	string name1;
+	string name2;
+	int tmp_l=0;
+	int tmp_n=0;
 
 	for (int L = 0; L <= lmax; L++)
 	{
@@ -1097,10 +1104,13 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			psir = new double[meshr];
 			rab = new double[meshr];
 
-			ZEROS(radial, meshr);
-			ZEROS(psi, meshr);
-			ZEROS(psir, meshr);
-			ZEROS(rab, meshr);
+			for(int im=0; im<meshr; ++im)
+			{
+				radial[im]=0.0;
+				psi[im]=0.0;
+				psir[im]=0.0;
+				rab[im]=0.0;
+			}
 
 			for (int ir = 0; ir < meshr; ir++)
 			{
@@ -1119,25 +1129,21 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			{
 				while (!find)
 				{
-					if (in.eof())
+					if (in_de.eof())
 					{
 						ofs_warning << " Can't find l="
 							<< L << " n=" << N << " orbital." << endl;
 						break;
 					}
 
-					in >> name1 >> name2;
-					in >> tmp_l >> tmp_n;
+					in_de >> name1 >> name2;
+					in_de >> tmp_l >> tmp_n;
 					if (L == tmp_l && N == tmp_n)
 					{
 						// meshr_read is different from meshr if meshr is even number.
 						for (int ir = 0; ir < meshr_read; ir++)
 						{
-							in >> psi[ir];
-							/*
-							double rl = pow (ir*dr, l);
-							psi[ir] *= rl;
-							*/
+							in_de >> psi[ir];
 							psir[ir] = psi[ir] * radial[ir];
 						}
 						find = true;
@@ -1147,7 +1153,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 						double no_use;
 						for (int ir = 0; ir < meshr_read; ir++)
 						{
-							in >> no_use;
+							in_de >> no_use;
 						}
 					}
 				}//end find
@@ -1167,7 +1173,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 #endif
 
 			// renormalize radial wave functions
-			double* inner = new double[meshr];
+			double* inner = new double[meshr]();
 			for (int ir = 0; ir < meshr; ir++)
 			{
 				inner[ir] = psir[ir] * psir[ir];
@@ -1175,6 +1181,8 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			double unit = 0.0;
 
 			Integral::Simpson_Integral(meshr, inner, rab, unit);
+
+			assert(unit>0.0);
 
 			// check unit: \sum ( psi[r] * r )^2 = 1
 			ofs_running << setprecision(3) << setw(12) << unit;
@@ -1218,7 +1226,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 		}
 	}
 
-	in.close();
+	in_de.close();
 
 	this->Alpha[0].set_orbital_info(
 		1, // any type
@@ -1226,5 +1234,6 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 		lmax,
 		nchi,
 		total_nchi); //copy twice !
+
 	return;
 }
