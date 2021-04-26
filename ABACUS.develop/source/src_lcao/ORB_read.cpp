@@ -2,12 +2,10 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include <cassert>
 #include "../src_global/math_integral.h"
-#include <math.h>
-#include <cmath>
+//#include <math.h>
+//#include <cmath>
 #include <algorithm>
 using namespace std;
-
-//#include "../src_pw/global.h" // only use ucell.atoms[it]
 
 //==============================
 // Define an object here! 

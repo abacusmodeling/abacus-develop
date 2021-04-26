@@ -330,6 +330,8 @@ void energy::perform_dos(void)
 				hm.orb_con.set_orb_tables(
 						UOT, 
 						ORB,
+						ucell.ntype,
+						ucell.lmax,
 						INPUT.lcao_ecut,
 						INPUT.lcao_dk,
 						INPUT.lcao_dr,

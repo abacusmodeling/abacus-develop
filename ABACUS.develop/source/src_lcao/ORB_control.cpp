@@ -1,10 +1,11 @@
 #include "../src_pw/tools.h"
-#include "../src_pw/global.h"
 #include "ORB_control.h"
 //#include "src_global/sltk_atom_arrange.h"
 #include "ORB_gen_tables.h"
 #include "build_st_pw.h"
 #include "../src_pdiag/pdiag_double.h"
+
+#include "../src_pw/global.h"
 
 ORB_control::ORB_control()
 {}
@@ -15,6 +16,8 @@ ORB_control::~ORB_control()
 void ORB_control::set_orb_tables(
 	ORB_gen_tables &OGT, 
 	LCAO_Orbitals &orb,
+	const int &ntype, // mohan add 2021-04-26
+	const int &lmax, // mohan add 2021-04-26 
 	const double &lcao_ecut_in, // mohan add 2021-04-16
 	const double &lcao_dk_in, // mohan add 2021-04-16
 	const double &lcao_dr_in, // mohan add 2021-04-16
@@ -34,6 +37,8 @@ void ORB_control::set_orb_tables(
 	//=============================================================================
 
 	// mohan add 2021-04-16
+	assert(ntype>0);
+	assert(lmax>=0);
 	assert(lcao_ecut_in>0.0);
 	assert(lcao_dk_in>0.0);
 	assert(lcao_dr_in>0.0);
@@ -45,7 +50,7 @@ void ORB_control::set_orb_tables(
 	orb.dR = lcao_dr_in;
 	orb.Rmax = lcao_rmax_in;
 	
-    orb.Read_Orbitals(ucell.ntype, ucell.lmax, out_descriptor, out_r_matrix, my_rank);
+    orb.Read_Orbitals(ntype, lmax, out_descriptor, out_r_matrix, my_rank);
 
 	if(CALCULATION=="test")
 	{
