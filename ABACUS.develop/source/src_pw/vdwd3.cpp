@@ -123,10 +123,272 @@ void Vdwd3::pbcncoord(vector<double> &cn)
 	}
 }
 
-//void Vdwd3::pbcthreebody(vector<double> &cc6ab, double &e63)
-//{
+void Vdwd3::pbcthreebody(vector<int> &iz,  vector<Vector3<double>> &lat, vector<Vector3<double>> &xyz, vector<int> &rep_cn, vector<double> &cc6ab, double &eabc)
+{
+	double sr9=0.75, alp9=-16.0;
+	int ij, ik, jk;
+	double r0ij, r0ik, r0jk, c9, rij2, rik2, rjk2, rr0ij, rr0ik, rr0jk, geomean, fdamp, tmp1, tmp2, tmp3, tmp4, ang;
+	Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
+	vector<double> repmin(3), repmax(3);
+	for(int iat=2; iat!=ucell.nat; iat++)
+		for(int jat=1; jat!=iat; jat++)
+		{
+			ijvec = xyz[jat]-xyz[iat];
+			ij = lin(iat, jat);
+			r0ij = para.r0ab[iz[jat]][iz[iat]];
+			for(int kat=0; kat!=jat; kat++)
+			{
+				ik = lin(iat, kat);
+				jk = lin(jat, kat);
+				ikvec = xyz[kat]-xyz[iat];
+				jkvec = xyz[kat]-xyz[jat];
+				c9 = -cc6ab[ij]*cc6ab[ik]*cc6ab[jk];
 
-//}
+				r0ik = para.r0ab[iz[kat]][iz[iat]];
+				r0jk = para.r0ab[iz[kat]][iz[jat]];
+
+				for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+				{
+					repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+					repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+					for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+					{
+						repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+						repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+						for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+						{
+							repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+							repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+							jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+							rij2 = (ijvec+jtau).norm2();
+							if(rij2>para.cn_thr2) continue;
+							rr0ij = sqrt(rij2)/r0ij;
+
+							for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+								for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+									for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+									{
+										ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+										rik2 = (ikvec+ktau).norm2();
+										if(rik2>para.cn_thr2) continue;
+										rr0ik = sqrt(rik2)/r0ik;
+
+										rjk2 = (jkvec+ktau-jtau).norm2();
+										if(rjk2>para.cn_thr2) continue;
+										rr0jk = sqrt(rjk2)/r0jk;
+
+										geomean = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+										fdamp = 1.0/(1.0+6.0*pow(sr9*geomean, alp9));
+										tmp1 = (rij2+rjk2-rik2);
+                						tmp2 = (rij2+rik2-rjk2);
+                						tmp3 = (rik2+rjk2-rij2);
+                						tmp4=rij2*rjk2*rik2;
+
+										ang = (0.375*tmp1*tmp2*tmp3/tmp4+1.0)/pow(tmp4, 1.5);	
+										
+										eabc += ang*c9*fdamp;
+									} // end ktau
+						} // end jtauz
+					} // end jtauy
+				} // end jtaux
+			} // end kat
+		} // end jat
+	//end iat
+
+	for(int iat=1; iat!=ucell.nat; iat++)
+	{
+		int jat = iat;
+		ij = lin(iat, jat);
+		ijvec.set(0, 0, 0);
+		r0ij = para.r0ab[iz[jat]][iz[iat]];
+		for(int kat=0; kat!=iat; kat++)
+		{
+			jk = lin(jat, kat);
+			ik = jk;
+			ikvec = xyz[kat] - xyz[iat];
+			jkvec = ikvec;
+			c9 = -cc6ab[ij]*cc6ab[ik]*cc6ab[jk];
+
+			r0ik = para.r0ab[iz[kat]][iz[iat]];
+			r0jk = para.r0ab[iz[kat]][iz[jat]];
+			for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+			{
+				repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+				repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+				for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+				{
+					repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+					repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+					for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+					{
+						repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+						repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+						if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
+						jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+						rij2 = (ijvec+jtau).norm2();
+						if(rij2>para.cn_thr2) continue;
+						rr0ij = sqrt(rij2)/r0ij;
+
+						for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+							for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+								for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+								{
+									ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+									rik2 = (ikvec+ktau).norm2();
+									if(rik2>para.cn_thr2) continue;
+									rr0ik = sqrt(rik2)/r0ik;
+
+									rjk2 = (jkvec+ktau-jtau).norm2();
+									if(rjk2>para.cn_thr2) continue;
+									rr0jk = sqrt(rjk2)/r0jk;
+
+									geomean = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+									fdamp = 1.0/(1.0+6.0*pow(sr9*geomean, alp9));
+									tmp1 = (rij2+rjk2-rik2);
+               						tmp2 = (rij2+rik2-rjk2);
+               						tmp3 = (rik2+rjk2-rij2);
+               						tmp4=rij2*rjk2*rik2;
+
+									ang = (0.375*tmp1*tmp2*tmp3/tmp4+1.0)/pow(tmp4, 1.5);	
+										
+									eabc += ang*c9*fdamp/2.0;
+								} // end ktau
+					} //end jtauz
+				} // end jtauy
+			} // end jtaux
+		} // end kat
+	} // end iat
+
+	for(int iat=1; iat!=ucell.nat; iat++)
+		for(int jat=0; jat!=iat; jat++)
+		{
+			int kat = jat;
+			ij = lin(iat, jat);
+			jk = lin(jat, kat);
+			ik = ij;
+			ikvec = xyz[kat] - xyz[iat];
+			ijvec = ikvec;
+			jkvec.set(0, 0, 0);
+			c9 = -cc6ab[ij]*cc6ab[ik]*cc6ab[jk];
+
+			r0ij = para.r0ab[iz[jat]][iz[iat]];
+			r0ik = r0ij;
+			r0jk = para.r0ab[iz[kat]][iz[jat]];
+
+			for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+			{
+				repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+				repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+				for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+				{
+					repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+					repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+					for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+					{
+						repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+						repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+						jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+						rij2 = (ijvec+jtau).norm2();
+						if(rij2>para.cn_thr2) continue;
+						rr0ij = sqrt(rij2)/r0ij;
+
+						for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+							for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+								for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+								{
+									if(jtaux == ktaux && jtauy == ktauy && jtauz == ktauz) continue;
+									ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+									rik2 = (ikvec+ktau).norm2();
+									if(rik2>para.cn_thr2) continue;
+									rr0ik = sqrt(rik2)/r0ik;
+
+									rjk2 = (jkvec+ktau-jtau).norm2();
+									if(rjk2>para.cn_thr2) continue;
+									rr0jk = sqrt(rjk2)/r0jk;
+
+									geomean = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+									fdamp = 1.0/(1.0+6.0*pow(sr9*geomean, alp9));
+									tmp1 = (rij2+rjk2-rik2);
+               						tmp2 = (rij2+rik2-rjk2);
+               						tmp3 = (rik2+rjk2-rij2);
+               						tmp4=rij2*rjk2*rik2;
+
+									ang = (0.375*tmp1*tmp2*tmp3/tmp4+1.0)/pow(tmp4, 1.5);	
+										
+									eabc += ang*c9*fdamp/2.0;
+								} // end ktau
+					} //end jtauz
+				} // end jtauy
+			} // end jtaux
+		} // end jat
+	// end iat
+
+	for(int iat=0; iat!=ucell.nat; iat++)
+	{
+		int jat = iat;
+		int kat = iat;
+		ijvec.set(0, 0, 0);
+		ij = lin(iat, iat);
+		ik = ij;
+		jk = ij;
+		ikvec = ijvec;
+		jkvec = ikvec;
+		c9 = -cc6ab[ij]*cc6ab[ik]*cc6ab[jk];
+
+		r0ij = para.r0ab[iz[iat]][iz[iat]];
+		r0ik = r0ij;
+		r0jk = r0ij;
+
+		for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+		{
+			repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+			repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+			for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+			{
+				repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+				repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+				for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+				{
+					repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+					repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+					jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+					if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
+					rij2 = jtau.norm2();
+					if(rij2>para.cn_thr2) continue;
+					rr0ij = sqrt(rij2)/r0ij;
+
+					for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+						for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+							for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+							{
+								if(ktaux == 0 && ktauy == 0 && ktauz == 0) continue;
+								if(jtaux == ktaux && jtauy == ktauy && jtauz == ktauz) continue;
+								ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+								rik2 = ktau.norm2();
+								if(rik2>para.cn_thr2) continue;
+								rr0ik = sqrt(rik2)/r0ik;
+
+								rjk2 = (jkvec+ktau-jtau).norm2();
+								if(rjk2>para.cn_thr2) continue;
+								rr0jk = sqrt(rjk2)/r0jk;
+
+								geomean = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+								fdamp = 1.0/(1.0+6.0*pow(sr9*geomean, alp9));
+								tmp1 = (rij2+rjk2-rik2);
+               					tmp2 = (rij2+rik2-rjk2);
+               					tmp3 = (rik2+rjk2-rij2);
+               					tmp4=rij2*rjk2*rik2;
+
+								ang = (0.375*tmp1*tmp2*tmp3/tmp4+1.0)/pow(tmp4, 1.5);	
+										
+								eabc += ang*c9*fdamp/6.0;
+							} // end ktau
+					} //end jtauz
+				} // end jtauy
+			} // end jtaux
+
+	} // end iat
+}
 
 void Vdwd3::cal_energy()
 {
@@ -135,7 +397,7 @@ void Vdwd3::cal_energy()
 
 	int ij;	
 	double c6 = 0.0, c8 = 0.0, r2 = 0.0, r6 = 0.0, r8 = 0.0, rr = 0.0, damp6 = 0.0, damp8 = 0.0;
-	double e6 = 0.0, e8 = 0.0, e63 = 0.0;
+	double e6 = 0.0, e8 = 0.0, eabc = 0.0;
 	vector<double> cc6ab(ucell.nat*ucell.nat), cn(ucell.nat);
 	pbcncoord(cn);
 	Vector3<double> tau;
@@ -273,11 +535,11 @@ void Vdwd3::cal_energy()
 		} // end iat
 	} // end d3_bj
 
-	//if(para.abc)
-	//{
-	//	pbcthreebody(cc6ab, e63)
-	//}
-	energy = (-para.s6*e6-para.s18*e8-e63)*2;
+	if(para.abc)
+	{
+		pbcthreebody(iz, lat, xyz, rep_cn, cc6ab, eabc);
+	}
+	energy = (-para.s6*e6-para.s18*e8-eabc)*2;
 }
 
 void Vdwd3::get_dc6_dcnij(int &mxci, int &mxcj, double &cni, double &cnj, int &izi, int &izj, int &iat, int &jat, double &c6check, double &dc6i, double &dc6j)
@@ -509,10 +771,360 @@ void Vdwd3::pbcgdisp(vector<Vector3<double>> &g, matrix &sigma)
 		} // end iat
 	} // end d3_bj 
 
-	//if(para.abc)
-	//{
-	//	
-	//}
+	if(para.abc)
+	{
+		Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
+		vector<int> repmin(3), repmax(3);
+		double sr9=0.75, alp9=-16.0;
+		double linik, linjk, rij2, rik2, rjk2, rr0ij, rr0ik, rr0jk, geomean2, geomean, geomean3, r0av, r;
+		double c6ij, c6ik, c6jk, c9, damp9, ang, dfdmp, dang, tmp1, dc9;
+		for(int iat=2; iat!=ucell.nat; iat++)
+			for(int jat=1; jat!=iat; jat++)
+			{
+				linij = lin(iat, jat);
+				ijvec = xyz[jat] - xyz[iat];
+
+				c6ij = c6save[linij];
+				for(int kat=0; kat!=jat; kat++)
+				{
+					linik = lin(iat, kat);
+					linjk = lin(jat, kat);
+					ikvec = xyz[kat] - xyz[iat];
+					jkvec = xyz[kat] - xyz[jat];
+
+					c6ik = c6save[linik];
+					c6jk = c6save[linjk];
+					c9 = -1.0*sqrt(c6ij*c6ik*c6jk);
+
+					for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+					{
+						repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+						repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+						for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+						{
+							repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+							repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+							for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+							{
+								repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+								repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+								jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+								rij2 = (ijvec+jtau).norm2();
+								if(rij2>para.cn_thr2) continue;
+								rr0ij = sqrt(rij2)/para.r0ab[iz[jat]][iz[iat]];
+
+								for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+									for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+										for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+										{
+											ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+											rik2 = (ikvec+ktau).norm2();
+											if(rik2>para.cn_thr2) continue;
+
+											rjk2 = (jkvec+ktau-jtau).norm2();
+											if(rjk2>para.cn_thr2) continue;
+											rr0ik = sqrt(rik2)/para.r0ab[iz[kat]][iz[iat]];
+											rr0jk = sqrt(rjk2)/para.r0ab[iz[kat]][iz[jat]];
+
+											geomean2 = rij2*rjk2*rik2;
+											r0av = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+											damp9 = 1.0/(1.0+6.0*pow(sr9*r0av, alp9));
+											geomean = sqrt(geomean2);
+											geomean3 = geomean*geomean2;
+											ang = 0.375*(rij2+rjk2-rik2)*(rij2-rjk2+rik2)*(-rij2+rjk2+rik2)/(geomean3*geomean2)+1.0/geomean3;
+											dc6_rest = ang*damp9;											
+											dfdmp = 2.0*alp9*pow(0.75*r0av, alp9)*damp9*damp9;
+											
+											r = sqrt(rij2);
+											dang = -0.375*(pow(rij2, 3)+pow(rij2, 2)*(rjk2+rik2)+rij2*(3.0*pow(rjk2, 2)+2.0*rjk2*rik2+3.0*pow(rik2, 2))-5.0*pow(rjk2-rik2, 2)*(rjk2+rik2))/(r*geomean3*geomean2);
+											tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+											drij[linij][jtaux+rep_vdw[0]][jtauy+rep_vdw[1]][jtauz+rep_vdw[2]] -= tmp1;
+
+											r = sqrt(rik2);
+											dang = -0.375*(pow(rik2, 3)+pow(rik2, 2)*(rjk2+rij2)+rik2*(3.0*pow(rjk2, 2)+2.0*rjk2*rij2+3.0*pow(rij2, 2))-5.0*pow(rjk2-rij2, 2)*(rjk2+rij2))/(r*geomean3*geomean2);
+											tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+											drij[linik][ktaux+rep_vdw[0]][ktauy+rep_vdw[1]][ktauz+rep_vdw[2]] -= tmp1;
+
+											r = sqrt(rjk2);
+											dang = -0.375*(pow(rjk2, 3)+pow(rjk2, 2)*(rik2+rij2)+rjk2*(3.0*pow(rik2, 2)+2.0*rik2*rij2+3.0*pow(rij2, 2))-5.0*pow(rik2-rij2, 2)*(rik2+rij2))/(r*geomean3*geomean2);
+											tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+											drij[linjk][ktaux-jtaux+rep_vdw[0]][ktauy-jtauy+rep_vdw[1]][ktauz-jtauz+rep_vdw[2]] -= tmp1;
+											
+											dc9 = (dc6ij[jat][iat]/c6ij+dc6ij[kat][iat]/c6ik)*c9*0.5;
+              								dc6i[iat] += dc6_rest*dc9;
+             
+           									dc9 = (dc6ij[iat][jat]/c6ij+dc6ij[kat][jat]/c6jk)*c9*0.5;
+              								dc6i[jat] += dc6_rest*dc9;
+
+											dc9 = (dc6ij[iat][kat]/c6ik+dc6ij[jat][kat]/c6jk)*c9*0.5;
+              								dc6i[kat] += dc6_rest*dc9;
+										} // end ktau
+							} // end jtauz
+						} //end jtauy
+					} // end jtaux
+				} // end kat
+			} // end jat
+
+		for(int iat=1; iat!=ucell.nat; iat++)
+		{
+			int jat = iat;
+			linij = lin(iat, jat);
+			ijvec.set(0, 0, 0);
+
+			c6ij = c6save[linij];
+			for(int kat=0; kat!=iat; kat++)
+			{
+				linjk = lin(jat, kat);
+				linik = linjk;
+				ikvec = xyz[kat] - xyz[iat];
+				jkvec = ikvec;
+
+				c6ik = c6save[linik];
+				c6jk = c6ik;
+				c9 = -1.0*sqrt(c6ij*c6ik*c6jk);
+
+				for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+				{
+					repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+					repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+					for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+					{
+						repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+						repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+						for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+						{
+							repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+							repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+							if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
+							jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+							rij2 = jtau.norm2();
+							if(rij2>para.cn_thr2) continue;
+							rr0ij = sqrt(rij2)/para.r0ab[iz[jat]][iz[iat]];
+
+							for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+								for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+									for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+									{
+										ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+										rik2 = (ikvec+ktau).norm2();
+										if(rik2>para.cn_thr2) continue;
+
+										rjk2 = (jkvec+ktau-jtau).norm2();
+										if(rjk2>para.cn_thr2) continue;
+										rr0ik = sqrt(rik2)/para.r0ab[iz[kat]][iz[iat]];
+										rr0jk = sqrt(rjk2)/para.r0ab[iz[kat]][iz[jat]];
+
+										geomean2 = rij2*rjk2*rik2;
+										r0av = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+										damp9 = 1.0/(1.0+6.0*pow(sr9*r0av, alp9));
+										geomean = sqrt(geomean2);
+										geomean3 = geomean*geomean2;
+										ang = 0.375*(rij2+rjk2-rik2)*(rij2-rjk2+rik2)*(-rij2+rjk2+rik2)/(geomean3*geomean2)+1.0/geomean3;
+										dc6_rest = ang*damp9/2.0;											
+										dfdmp = 2.0*alp9*pow(0.75*r0av, alp9)*damp9*damp9;
+											
+										r = sqrt(rij2);
+										dang = -0.375*(pow(rij2, 3)+pow(rij2, 2)*(rjk2+rik2)+rij2*(3.0*pow(rjk2, 2)+2.0*rjk2*rik2+3.0*pow(rik2, 2))-5.0*pow(rjk2-rik2, 2)*(rjk2+rik2))/(r*geomean3*geomean2);
+										tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+										drij[linij][jtaux+rep_vdw[0]][jtauy+rep_vdw[1]][jtauz+rep_vdw[2]] -= tmp1/2.0;
+
+										r = sqrt(rik2);
+										dang = -0.375*(pow(rik2, 3)+pow(rik2, 2)*(rjk2+rij2)+rik2*(3.0*pow(rjk2, 2)+2.0*rjk2*rij2+3.0*pow(rij2, 2))-5.0*pow(rjk2-rij2, 2)*(rjk2+rij2))/(r*geomean3*geomean2);
+										tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+										drij[linik][ktaux+rep_vdw[0]][ktauy+rep_vdw[1]][ktauz+rep_vdw[2]] -= tmp1/2.0;
+
+										r = sqrt(rjk2);
+										dang = -0.375*(pow(rjk2, 3)+pow(rjk2, 2)*(rik2+rij2)+rjk2*(3.0*pow(rik2, 2)+2.0*rik2*rij2+3.0*pow(rij2, 2))-5.0*pow(rik2-rij2, 2)*(rik2+rij2))/(r*geomean3*geomean2);
+										tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+										drij[linjk][ktaux-jtaux+rep_vdw[0]][ktauy-jtauy+rep_vdw[1]][ktauz-jtauz+rep_vdw[2]] -= tmp1/2.0;
+
+										dc9 = (dc6ij[jat][iat]/c6ij+dc6ij[kat][iat]/c6ik)*c9*0.5;
+              							dc6i[iat] += dc6_rest*dc9;
+             
+           								dc9 = (dc6ij[iat][jat]/c6ij+dc6ij[kat][jat]/c6jk)*c9*0.5;
+              							dc6i[jat] += dc6_rest*dc9;
+
+										dc9 = (dc6ij[iat][kat]/c6ik+dc6ij[jat][kat]/c6jk)*c9*0.5;
+              							dc6i[kat] += dc6_rest*dc9;
+									} // end ktau
+						} // end jtauz
+					} //end jtauy
+				} // end jtaux
+			} // end kat
+		} // end iat
+
+		for(int iat=1; iat!=ucell.nat; iat++)
+			for(int jat=0; jat!=iat; jat++)
+			{
+				int kat = jat;
+				linij = lin(iat, jat);
+				linjk = lin(jat, kat);
+				linik = linij;
+				ikvec = xyz[kat] - xyz[iat];
+				ijvec = ikvec;
+				jkvec.set(0, 0, 0);
+
+				c6ij = c6save[linij];
+				c6ik = c6ij;
+				c6jk = c6save[linjk];
+				c9 = -1.0*sqrt(c6ij*c6ik*c6jk);
+
+				for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+				{
+					repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+					repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+					for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+					{
+						repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+						repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+						for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+						{
+							repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+							repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+							jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+							rij2 = (ijvec+jtau).norm2();
+							if(rij2>para.cn_thr2) continue;
+							rr0ij = sqrt(rij2)/para.r0ab[iz[jat]][iz[iat]];
+
+							for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+								for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+									for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+									{
+										if(jtaux == ktaux && jtauy == ktauy && jtauz == ktauz) continue;
+										ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+										rik2 = (ikvec+ktau).norm2();
+										if(rik2>para.cn_thr2) continue;
+										rr0ik = sqrt(rik2)/para.r0ab[iz[kat]][iz[iat]];
+
+										rjk2 = (jkvec+ktau-jtau).norm2();
+										if(rjk2>para.cn_thr2) continue;
+										rr0jk = sqrt(rjk2)/para.r0ab[iz[kat]][iz[jat]];
+
+										geomean2 = rij2*rjk2*rik2;
+										r0av = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+										damp9 = 1.0/(1.0+6.0*pow(sr9*r0av, alp9));
+										geomean = sqrt(geomean2);
+										geomean3 = geomean*geomean2;
+										ang = 0.375*(rij2+rjk2-rik2)*(rij2-rjk2+rik2)*(-rij2+rjk2+rik2)/(geomean3*geomean2)+1.0/geomean3;
+										dc6_rest = ang*damp9/2.0;											
+										dfdmp = 2.0*alp9*pow(0.75*r0av, alp9)*damp9*damp9;
+											
+										r = sqrt(rij2);
+										dang = -0.375*(pow(rij2, 3)+pow(rij2, 2)*(rjk2+rik2)+rij2*(3.0*pow(rjk2, 2)+2.0*rjk2*rik2+3.0*pow(rik2, 2))-5.0*pow(rjk2-rik2, 2)*(rjk2+rik2))/(r*geomean3*geomean2);
+										tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+										drij[linij][jtaux+rep_vdw[0]][jtauy+rep_vdw[1]][jtauz+rep_vdw[2]] -= tmp1/2.0;
+
+										r = sqrt(rik2);
+										dang = -0.375*(pow(rik2, 3)+pow(rik2, 2)*(rjk2+rij2)+rik2*(3.0*pow(rjk2, 2)+2.0*rjk2*rij2+3.0*pow(rij2, 2))-5.0*pow(rjk2-rij2, 2)*(rjk2+rij2))/(r*geomean3*geomean2);
+										tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+										drij[linik][ktaux+rep_vdw[0]][ktauy+rep_vdw[1]][ktauz+rep_vdw[2]] -= tmp1/2.0;
+
+										r = sqrt(rjk2);
+										dang = -0.375*(pow(rjk2, 3)+pow(rjk2, 2)*(rik2+rij2)+rjk2*(3.0*pow(rik2, 2)+2.0*rik2*rij2+3.0*pow(rij2, 2))-5.0*pow(rik2-rij2, 2)*(rik2+rij2))/(r*geomean3*geomean2);
+										tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+										drij[linjk][ktaux-jtaux+rep_vdw[0]][ktauy-jtauy+rep_vdw[1]][ktauz-jtauz+rep_vdw[2]] -= tmp1/2.0;
+
+										dc9 = (dc6ij[jat][iat]/c6ij+dc6ij[kat][iat]/c6ik)*c9*0.5;
+              							dc6i[iat] += dc6_rest*dc9;
+             
+           								dc9 = (dc6ij[iat][jat]/c6ij+dc6ij[kat][jat]/c6jk)*c9*0.5;
+              							dc6i[jat] += dc6_rest*dc9;
+
+										dc9 = (dc6ij[iat][kat]/c6ik+dc6ij[jat][kat]/c6jk)*c9*0.5;
+              							dc6i[kat] += dc6_rest*dc9;
+									} // end ktau
+						} // end jtauz
+					} //end jtauy
+				} // end jtaux
+			} // end jat
+		 // end iat
+
+		for(int iat=0; iat!=ucell.nat; iat++)
+		{
+			int jat = iat;
+			int kat = iat;
+			ijvec.set(0, 0, 0);
+			linij = lin(iat, jat);
+      		linik = lin(iat, kat);
+      		linjk = lin(jat, kat);
+      		ikvec = ijvec;
+      		jkvec = ikvec;
+			c6ij = c6save[linij];
+			c6ik = c6ij;
+			c6jk = c6ij;
+			c9 = -1.0*sqrt(c6ij*c6ik*c6jk);
+
+			for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
+			{
+				repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
+				repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+				for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
+				{
+					repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
+					repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+					for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
+					{
+						repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
+						repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+						if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
+						jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
+						rij2 = jtau.norm2();
+						if(rij2>para.cn_thr2) continue;
+						rr0ij = sqrt(rij2)/para.r0ab[iz[jat]][iz[iat]];
+
+						for(int ktaux=repmin[0]; ktaux<=repmax[0]; ktaux++)
+							for(int ktauy=repmin[1]; ktauy<=repmax[1]; ktauy++)
+								for(int ktauz=repmin[2]; ktauz<=repmax[2]; ktauz++)
+								{
+									if(ktaux == 0 && ktauy == 0 && ktauz == 0) continue;
+									if(jtaux == ktaux && jtauy == ktauy && jtauz == ktauz) continue;
+									ktau = static_cast<double>(ktaux)*lat[0]+static_cast<double>(ktauy)*lat[1]+static_cast<double>(ktauz)*lat[2];
+									rik2 = ktau.norm2();
+									if(rik2>para.cn_thr2) continue;
+									rr0ik = sqrt(rik2)/para.r0ab[iz[kat]][iz[iat]];
+
+									rjk2 = (jkvec+ktau-jtau).norm2();
+									if(rjk2>para.cn_thr2) continue;
+									rr0jk = sqrt(rjk2)/para.r0ab[iz[kat]][iz[jat]];
+
+									geomean2 = rij2*rjk2*rik2;
+									r0av = pow(rr0ij*rr0ik*rr0jk, 1.0/3.0);
+									damp9 = 1.0/(1.0+6.0*pow(sr9*r0av, alp9));
+									geomean = sqrt(geomean2);
+									geomean3 = geomean*geomean2;
+									ang = 0.375*(rij2+rjk2-rik2)*(rij2-rjk2+rik2)*(-rij2+rjk2+rik2)/(geomean3*geomean2)+1.0/geomean3;
+									dc6_rest = ang*damp9/6.0;											
+									dfdmp = 2.0*alp9*pow(0.75*r0av, alp9)*damp9*damp9;
+											
+									r = sqrt(rij2);
+									dang = -0.375*(pow(rij2, 3)+pow(rij2, 2)*(rjk2+rik2)+rij2*(3.0*pow(rjk2, 2)+2.0*rjk2*rik2+3.0*pow(rik2, 2))-5.0*pow(rjk2-rik2, 2)*(rjk2+rik2))/(r*geomean3*geomean2);
+									tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+									drij[linij][jtaux+rep_vdw[0]][jtauy+rep_vdw[1]][jtauz+rep_vdw[2]] -= tmp1/6.0;
+
+									r = sqrt(rik2);
+									dang = -0.375*(pow(rik2, 3)+pow(rik2, 2)*(rjk2+rij2)+rik2*(3.0*pow(rjk2, 2)+2.0*rjk2*rij2+3.0*pow(rij2, 2))-5.0*pow(rjk2-rij2, 2)*(rjk2+rij2))/(r*geomean3*geomean2);
+									tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+									drij[linik][ktaux+rep_vdw[0]][ktauy+rep_vdw[1]][ktauz+rep_vdw[2]] -= tmp1/6.0;
+
+									r = sqrt(rjk2);
+									dang = -0.375*(pow(rjk2, 3)+pow(rjk2, 2)*(rik2+rij2)+rjk2*(3.0*pow(rik2, 2)+2.0*rik2*rij2+3.0*pow(rij2, 2))-5.0*pow(rik2-rij2, 2)*(rik2+rij2))/(r*geomean3*geomean2);
+									tmp1 = -dang*c9*damp9+dfdmp/r*c9*ang;
+									drij[linjk][ktaux-jtaux+rep_vdw[0]][ktauy-jtauy+rep_vdw[1]][ktauz-jtauz+rep_vdw[2]] -= tmp1/6.0;
+
+									dc9 = (dc6ij[jat][iat]/c6ij+dc6ij[kat][iat]/c6ik)*c9*0.5;
+              						dc6i[iat] += dc6_rest*dc9;
+             
+           							dc9 = (dc6ij[iat][jat]/c6ij+dc6ij[kat][jat]/c6jk)*c9*0.5;
+              						dc6i[jat] += dc6_rest*dc9;
+
+									dc9 = (dc6ij[iat][kat]/c6ik+dc6ij[jat][kat]/c6jk)*c9*0.5;
+            						dc6i[kat] += dc6_rest*dc9;
+								} // end ktau
+					} // end jtauz
+				} // end jtauy
+			} // jtaux
+		} // end iat
+	}
 
 	// dE/dr_ij * dr_ij/dxyz_i
 	double expterm, dcnn, x1;
