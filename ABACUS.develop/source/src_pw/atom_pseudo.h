@@ -1,7 +1,3 @@
-//==========================================================
-// AUTHOR : mohan
-// DATE : 2008-11-08
-//==========================================================
 #ifndef ATOM_PSEUDO_H
 #define ATOM_PSEUDO_H
 
@@ -9,10 +5,6 @@
 #include "pseudo_us.h"
 using namespace std;
 
-//==========================================================
-// CLASS :
-// NAME : Atom_pseudo
-//==========================================================
 class Atom_pseudo : public pseudo_us
 {
 public:
@@ -20,10 +12,10 @@ public:
 	Atom_pseudo();
 	~Atom_pseudo();
 
-	Vector3<int> *mbl; //If this atom can move
-	string pseudo_fn;// File name of pseudopotentia
+	Vector3<int> *mbl; // whether the atoms can move or not
+	string pseudo_fn; // File name of pseudopotentials
 	double mass; // the mass of atom
-	bool flag_empty_element = false;	// whether is the empty element for bsse.	Peize Lin add 2021.04.07
+	bool flag_empty_element = false; // whether is the empty element for bsse.	Peize Lin add 2021.04.07
 
 protected:
 
@@ -31,7 +23,7 @@ protected:
 
 #ifdef __MPI
 	void bcast_atom_pseudo(const int &na);
-	void bcast_atom_pseudo2(void);
+	void bcast_atom_pseudo2(void); // for upf201
 #endif
 
 };
