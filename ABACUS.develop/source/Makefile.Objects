@@ -26,7 +26,6 @@ xc_2.o\
 xc_3.o \
 vdwd2.o\
 vdwd2_parameters.o\
-dftd3_subroutine.o\
 vdwd3.o\
 vdwd3_parameters.o\
 pseudopot_upf.o\

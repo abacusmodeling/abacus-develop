@@ -24,7 +24,8 @@
 #include "magnetism.h"
 #include "vdwd2.h"
 #include "vdwd2_parameters.h"
-#include "vdwd3.h"	
+#include "vdwd3.h"
+#include "vdwd3_parameters.h"	
 #include "src_global/restart.h" 
 #include "exx_global.h"
 #include "exx_lip.h"
@@ -61,7 +62,7 @@ extern UnitCell_pseudo ucell;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
 extern Vdwd2_Parameters vdwd2_para;		// Peize Lin add 2021.03.09
-extern Vdwd3 vdwd3;		// jiyy add 2019-05-18		
+extern Vdwd3_Parameters vdwd3_para;		// jiyy add 2019-05-18, update 2021-04-25		
 extern Restart restart;	// Peize Lin add 2020.04.04  																								 
 extern Soc soc; // zhengdy-soc
 
