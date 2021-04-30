@@ -15,17 +15,17 @@ class Stochastic_Chebychev
     // constructor and deconstructor
     Stochastic_Chebychev();
     ~Stochastic_Chebychev();
-    void init();
+    void init(int &dim, int& chetype);
     
     void calcoef(double fun(double));
     complex<double> sumallterms();
-    void calresult(double &t, double &result);
     
-    void calfinalvec(void fun(complex<double> *in, complex<double> *out, const int), int& ndim, complex<double> *wavein, complex<double> *waveout, const int m = 1);
-    bool checkconverge(void tfun(complex<double> *in, complex<double> *out, const int), 
-                    int& ndim, complex<double> *wavein,double& tmax, double &tmin, double stept,const int m = 1);
+    void calfinalvec(void fun(complex<double> *in, complex<double> *out, const int), complex<double> *wavein, complex<double> *waveout, const int m = 1);
 
-    void calpolyval(void fun(complex<double> *in, complex<double> *out, const int), int& ndim, complex<double> *wavein, const int m =1);
+    bool checkconverge(void tfun(complex<double> *in, complex<double> *out, const int), 
+                      complex<double> *wavein,double& tmax, double &tmin, double stept);
+
+    void calpolyval(void fun(complex<double> *in, complex<double> *out, const int), complex<double> *wavein, const int m =1);
 
     int norder;
     int extend;
@@ -34,20 +34,20 @@ class Stochastic_Chebychev
     double* dcoef; //[norder2] expansion coefficient of each order, only first norder coefficients are usefull
     fftw_complex *ccoef;  //[norder2] temporary complex expansion coefficient of each order, only first norder coefficients are usefull.
     double *polyvalue; //
+    complex<double> *vecn;
     fftw_plan plancoef;
     bool initplan, initcoef, getcoef, getpolyval;
 
     private:
-
-    void recurs(double&tnp1, double &tn, double &tn_1, double& t); //tnp1: T_(n+1), tn: T_n, tn_1: T_(n-1)
+    int ndim; //dim of vector
     template<class T>
-    void recurs(T *arraynp1, T* arrayn, T *arrayn_1, void fun(T *in,T *out, const int), int& ndim,const int m);
+    void recurs(T *arraynp1, T* arrayn, T *arrayn_1, void fun(T *in,T *out, const int),const int m);
 
 
 };
 
 template<class T>
-void Stochastic_Chebychev:: recurs(T *arraynp1, T* arrayn, T *arrayn_1, void fun(T *in,T *out, const int), int& ndim,const int m)
+void Stochastic_Chebychev:: recurs(T *arraynp1, T* arrayn, T *arrayn_1, void fun(T *in,T *out, const int),const int m)
 {
     fun(arrayn,arraynp1,m);
     for(int i = 0; i < ndim * m; ++i)

@@ -60,6 +60,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	clock_t start,finish;
 	double duration = 0.0;	
 	STO_WF.init();
+	int chetype = 1;
 
 	for (this->iter = 1;iter <= NITER;iter++)
     {
@@ -144,7 +145,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
 		
 		//(4) calculate fermi energy.
-		if(iter == 1)	stoiter.init();
+		int ndim;
+    	if(STO_WF.stotype == "pw")
+    	    ndim = wf.npw;
+    	else
+    	    ndim = pw.nrxx;
+		if(iter == 1)	stoiter.init( ndim, chetype );
 		stoiter.orthog();
 		stoiter.checkemm(iter);	//check and reset emax & emin
 		//stoiter.test();  //only for test

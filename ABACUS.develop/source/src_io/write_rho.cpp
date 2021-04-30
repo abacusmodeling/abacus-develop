@@ -1,5 +1,6 @@
 #include "src_pw/charge.h"
 #include "src_pw/global.h"
+#include "../src_io/rwstream.h"
 
 void Charge::write_rho(
 	const double* rho_save, 
@@ -22,19 +23,23 @@ void Charge::write_rho(
 	
 	time_t start, end;
 	ofstream ofs;
+	Rwstream rws;
 	
 	if(MY_RANK==0)
 	{
 		start = time(NULL);
-    	
-		ofs.open(fn.c_str());
-    	if (!ofs)
+    	if(out_charge == 1)
+			ofs.open(fn.c_str());
+		else
+			rws.open(fn,"w");
+    	if (!ofs && !rws)
     	{
         	WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
 		//ofs_running << "\n Output charge file." << endl;
-
+		if(out_charge == 1)
+		{
 		ofs << ucell.latName << endl;//1
 		ofs << " " << ucell.lat0 * 0.529177 << endl;
 		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
@@ -89,9 +94,9 @@ void Charge::write_rho(
 
 		ofs << setprecision(precision);
 		ofs << scientific;
+		}
 
 	}
-
 	
 #ifndef __MPI
 	int count=0;
@@ -101,8 +106,15 @@ void Charge::write_rho(
 		{
 			for(int i=0; i<pw.ncx; i++)
 			{
+				if(out_charge == 1)
+				{
 				if(count%8==0) ofs << "\n";
 				ofs << " " << rho_save[i*pw.ncy*pw.ncz + j*pw.ncz + k];
+				}
+				else
+				{
+					rws<<rho_save[i*pw.ncy*pw.ncz + j*pw.ncz + k];
+				}
 				++count;
 			}
 		}
@@ -209,8 +221,15 @@ void Charge::write_rho(
 				{
 					for(int ix=0; ix<pw.ncx; ix++)
 					{
+						if(out_charge == 1)
+						{
 						if(count%8==0) ofs << "\n";
 						ofs << " " << zpiece[ix*pw.ncy+iy];
+						}
+						else
+						{
+							rws<<zpiece[ix*pw.ncy+iy];
+						}
 						++count;
 					}
 				}
@@ -226,6 +245,7 @@ void Charge::write_rho(
 		end = time(NULL);
 		OUT_TIME("write_rho",start,end);
 		ofs.close();
+		rws.close();
 	}
 
     return;

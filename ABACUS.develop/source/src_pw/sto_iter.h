@@ -22,7 +22,7 @@ class Stochastic_Iter
     Stochastic_Iter();
     ~Stochastic_Iter();
 
-    void init();
+    void init(int &, int &);
     
     void sum_stoband();
     double calne();

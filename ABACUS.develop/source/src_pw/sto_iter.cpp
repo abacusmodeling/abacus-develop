@@ -19,13 +19,13 @@ Stochastic_Iter::~Stochastic_Iter()
 {
     delete[] spolyv;
 }
-void Stochastic_Iter:: init()
+void Stochastic_Iter:: init(int &dim, int& chetype)
 {
     nchip = STO_WF.nchip;
     stotype = STO_WF.stotype;
     //wait for init
     targetne = ucell.nelec;
-    stoche.init();
+    stoche.init( dim, chetype );
     stohchi.init();
     stohchi.get_GRA_index();
     delete [] spolyv;
@@ -68,11 +68,7 @@ void Stochastic_Iter:: checkemm(int &iter)
         return;
         
     int norder = stoche.norder;
-    int ndim;
-    if(stotype == "pw")
-        ndim = wf.npw;
-    else
-        ndim = pw.nrxx;
+    
         
     //wait for init
     
@@ -94,9 +90,9 @@ void Stochastic_Iter:: checkemm(int &iter)
         {
             bool converge;
             if(stotype == "pw")
-                converge = stoche.checkconverge(stohchi.hchi_reciprocal, ndim, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
+                converge = stoche.checkconverge(stohchi.hchi_reciprocal, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
             else
-                converge = stoche.checkconverge(stohchi.hchi_real, ndim, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
+                converge = stoche.checkconverge(stohchi.hchi_real, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
             if(!converge)
                 change = true;
             else
@@ -224,8 +220,6 @@ void Stochastic_Iter:: sumpolyval()
     //wait for init
     int nkk=1;
     
-    int nrxx = stohchi.nrxx;
-    int npw = wf.npw;
     ZEROS(spolyv, norder);
     complex<double> * pchi;
     for(int ik = 0; ik < nkk; ++ik)
@@ -234,7 +228,7 @@ void Stochastic_Iter:: sumpolyval()
         {
             if(NBANDS > 0)  pchi = STO_WF.chiortho[ik].c; 
             else            pchi = STO_WF.chi0[ik].c;
-            stoche.calpolyval(stohchi.hchi_reciprocal, npw, pchi, nchip);
+            stoche.calpolyval(stohchi.hchi_reciprocal, pchi, nchip);
             DCOPY(stoche.polyvalue, spolyv, norder);
         }
         else
@@ -242,7 +236,7 @@ void Stochastic_Iter:: sumpolyval()
         {
             if(NBANDS > 0)  pchi = &STO_WF.chiortho[ik](ichi,0);
             else            pchi = &STO_WF.chi0[ik](ichi,0);
-            stoche.calpolyval(stohchi.hchi_real, nrxx, pchi);
+            stoche.calpolyval(stohchi.hchi_real , pchi);
             for(int ior = 0; ior < norder; ++ior)
             {
                 spolyv[ior] += stoche.polyvalue[ior];
@@ -341,7 +335,7 @@ void Stochastic_Iter::sum_stoband()
     int npwall = npw * nchip;
     if(stotype == "pw")
     {
-        //if(NBANDS == 0)
+        if(NBANDS == 0)
             out = new complex<double> [npwall];
         sto_rhog = new complex<double> [npw];
     }
@@ -376,37 +370,6 @@ void Stochastic_Iter::sum_stoband()
     for(int ik = 0; ik < nkk; ++ik)
     {
         double stok_eband =0;
-        /*if(stotype == "pw")
-        {
-                if(NBANDS > 0)
-                    out = pchi = STO_WF.chiortho[ik].c;
-                else
-                    pchi = STO_WF.chi0[ik].c;
-                
-                stoche.calfinalvec(stohchi.hchi_reciprocal, npw, pchi, out, nchip);
-                hout = new complex<double> [npwall];
-                stohchi.hchi_reciprocal(out,hout,nchip);
-                stok_eband = Diago_CG::ddot_real(npwall, out, hout,false) * DeltaE 
-                            +  Diago_CG::ddot_real(npwall, out, out,false) * Ebar;
-                sto_eband += stok_eband * kv.wk[ik];
-                complex<double> *tmpout = out;
-            for(int ichi = 0; ichi < nchip ; ++ichi)
-            {
-                ZEROS( porter, pw.nrxx );
-                for(int ig = 0; ig < npw; ++ig)
-                {
-                    porter[ GRA_index[ig] ] = tmpout[ig];
-                }
-                pw.FFT_wfc.FFT3D(UFFT.porter, 1);
-                for(int ir = 0 ; ir < nrxx ; ++ir)
-                {
-                    tmprho = norm(porter[ir]) * kv.wk[ik] / ucell.omega;
-                    sto_rho[ir] += tmprho;
-                    sto_ne += tmprho * dr3;
-                }
-                tmpout+=npw;
-            }
-        }*/
         if(stotype == "pw")
         {
                 if(NBANDS > 0)
@@ -414,7 +377,7 @@ void Stochastic_Iter::sum_stoband()
                 else
                     pchi = STO_WF.chi0[ik].c;
                 
-                stoche.calfinalvec(stohchi.hchi_reciprocal, npw, pchi, out, nchip);
+                stoche.calfinalvec(stohchi.hchi_reciprocal, pchi, out, nchip);
                 hout = new complex<double> [npwall];
                 stohchi.hchi_reciprocal(out,hout,nchip);
                 stok_eband = Diago_CG::ddot_real(npwall, out, hout,false) * DeltaE 
@@ -457,7 +420,7 @@ void Stochastic_Iter::sum_stoband()
                 {
                     pchi = &STO_WF.chi0[ik](ichi,0);
                 }
-                stoche.calfinalvec(stohchi.hchi_real, nrxx, pchi, out);
+                stoche.calfinalvec(stohchi.hchi_real, pchi, out);
                 stohchi.hchi_real(out,hout);
                 for(int ir = 0; ir < nrxx; ++ir)
                 {
