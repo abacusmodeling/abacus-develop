@@ -733,248 +733,42 @@ void LCAO_Orbitals::Read_PAO(
 {
 	TITLE("LCAO_Orbitals","Read_PAO");
 
-	int lmaxt = ucell.atoms[it].nwl;
-	// number of chi for each L.
-	int *nchi = new int[lmaxt+1];
-	for(int l=0; l<=lmaxt; l++)
+	ifstream in_ao;
+	bool open=false;
+	if(my_rank==0)
 	{
-		nchi[l] = ucell.atoms[it].l_nchi[l];
-		this->nchimax = std::max( this->nchimax, nchi[l]);
+		in_ao.open(this->orbital_file[it].c_str());
+		if(in_ao)
+		{
+			open=true;
+		}
+	}
+#ifdef __MPI
+	Parallel_Common::bcast_bool( open );
+#endif
+	if(!open)
+	{
+		ofs_warning << " Orbital file : " << this->orbital_file[it] << endl;
+		WARNING_QUIT("LCAO_Orbitals::Read_PAO","Couldn't find orbital files");
 	}
 
-	// calculate total number of chi
-    int total_nchi = 0;
-    for(int l=0; l<=lmaxt; l++)
-    {
-        total_nchi += nchi[l];
-    }
-	//	OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
-	
-	delete[] Phi[it].phiLN;
-	this->Phi[it].phiLN = new Numerical_Orbital_Lm[total_nchi];
-
-	ifstream in_ao;
-
-	int count=0;
-	ofs_running << " " << setw(8) << "ORBITAL" << setw(3) << "L" 
+	ofs_running << " " << setw(12) << "ORBITAL" << setw(3) << "L" 
 	<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
 	<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
-	<< setw(12) << "NEW_UNIT" << endl;
-    for (int L=0; L<=lmaxt; L++)
-    {
-        for (int N=0; N<nchi[L]; N++)
-        {
-			ofs_running << " " << setw(8) << count+1 << setw(3) << L << setw(3) << N;
+		<< setw(12) << "NEW_UNIT" << endl;
+	
+	//lmax and nchimax for type it
+	int lmaxt=0;
+	int nchimaxt=0;
 
-            bool open=false;
-            if(my_rank==0)
-            {
-                in_ao.open(this->orbital_file[it].c_str());
-                if(in_ao)
-                {
-                    open=true;
-                }
-            }
-#ifdef __MPI
-            Parallel_Common::bcast_bool( open );
-#endif
-            if(!open)
-            {
-                ofs_warning << " Orbital file : " << this->orbital_file[it] << endl;
-                WARNING_QUIT("LCAO_Orbitals::Read_PAO","Couldn't find orbital files");
-            }
+	this->read_orb_file(in_ao, it, lmaxt, nchimaxt, this->Phi);
 
-			double* radial; // radial mesh
-			double* psi; // radial local orbital
-			double* psir;// psi * r
-			double* rab;// dr
-            int meshr; // number of mesh points
-            char word[80];
-			double dr; // only used in case 1
-
-			int meshr_read;
-			if(my_rank==0)    //pengfei 2014-10-13
-			{
-				while (in_ao.good())
-				{
-					in_ao >> word;
-					if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
-					{
-						break;
-					}
-				}
-
-				CHECK_NAME(in_ao, "Mesh");
-				in_ao >> meshr;
-				meshr_read = meshr;
-				if(meshr%2==0) 
-				{
-					++meshr;
-				}
-			}
-				
-#ifdef __MPI
-			Parallel_Common::bcast_int( meshr );	
-			Parallel_Common::bcast_int( meshr_read );	
-#endif				
-			if(my_rank==0)
-			{
-				CHECK_NAME(in_ao, "dr");
-				in_ao >> dr;
-			}
-			
-#ifdef __MPI
-			Parallel_Common::bcast_double( dr );
-#endif
-			// set the number of mesh and the interval distance.
-			ofs_running << setw(8) << meshr << setw(8) << dr;
-
-            radial = new double[meshr];
-			psi = new double[meshr];
-            psir = new double[meshr];
-            rab = new double[meshr];
-
-			ZEROS( radial, meshr );
-			ZEROS( psi, meshr);
-			ZEROS( psir, meshr );
-			ZEROS( rab, meshr );
-
-			for(int ir=0; ir<meshr; ir++)
-			{
-				rab[ir] = dr;
-				// plus one because we can't read in r = 0 term now.
-				// change ir+1 to ir, because we need psi(r==0) information.
-				radial[ir] = ir*dr; //mohan 2010-04-19
-			}
-
-			// set the length of orbital
-			ofs_running << setw(8) << radial[meshr-1];
-
-			// mohan update 2010-09-07
-			bool find = false;
-			if(my_rank==0)
-			{
-				string name1;
-				string name2;
-				string name3;
-				int tmp_it=0;
-				int tmp_l=0;
-				int tmp_n=0;
-				while( !find )
-				{
-					if(in_ao.eof())
-					{
-						ofs_warning << " Can't find l=" 
-						<< L << " n=" << N << " orbital." << endl; 			
-						break;
-					}
-
-					
-					in_ao >> name1 >> name2 >> name3;
-					assert( name1 == "Type" );
-					in_ao >> tmp_it >> tmp_l >> tmp_n;
-					if( L == tmp_l && N == tmp_n )
-					{
-						// meshr_read is different from meshr if meshr is even number.
-						for(int ir=0; ir<meshr_read; ir++)
-						{
-							in_ao >> psi[ir];
-							/*
-							double rl = pow (ir*dr, l);	
-							psi[ir] *= rl;
-							*/
-							psir[ir] = psi[ir] * radial[ir];
-						}
-						find = true;
-					}
-					else
-					{
-						double no_use;
-						for(int ir=0; ir<meshr_read; ir++)
-						{
-							in_ao >> no_use;
-						}
-					}
-				}//end find
-			}
-
-#ifdef __MPI
-			Parallel_Common::bcast_bool(find);
-#endif
-			if(!find)
-			{
-				WARNING_QUIT("LCAO_Orbitals::Read_PAO","Can't find atomic orbitals.");
-			}
-
-#ifdef __MPI
-			Parallel_Common::bcast_double( psi, meshr_read ); // mohan add 2010-06-24
-			Parallel_Common::bcast_double( psir, meshr_read );
-#endif
-
-			// renormalize radial wave functions
-			double* inner = new double[meshr]();
-			for(int ir=0; ir<meshr; ir++)
-			{
-				inner[ir] = psir[ir] * psir[ir];
-			}
-			double unit = 0.0;
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
-
-			assert(unit>0.0); // mohan add 2021-04-26
-
-			// check unit: \sum ( psi[r] * r )^2 = 1
-			ofs_running << setprecision(3) << setw(12) << unit;
-
-			for(int ir=0; ir<meshr; ir++)
-			{
-				psi[ir] /= sqrt(unit);
-				psir[ir] /= sqrt(unit);
-			}
-
-			for(int ir=0; ir<meshr; ir++)
-			{
-				inner[ir] = psir[ir] * psir[ir];
-			}
-			Integral::Simpson_Integral(meshr, inner, rab, unit);
-			delete[] inner;
-			ofs_running << setw(12) << unit << endl;
-			
-			this->Phi[it].phiLN[count].set_orbital_info(
-                ucell.atoms[it].label,
-                it, //type
-                L, //angular momentum L
-                N, // number of orbitals of this L
-                meshr, // number of radial mesh
-                rab,
-                radial,// radial mesh value(a.u.)
-				Numerical_Orbital_Lm::Psi_Type::Psi,// psi type next
-                psi, // radial wave function
-                this->kmesh,
-                this->dk,
-				this->dr_uniform,
-				true,
-				true); // delta k mesh in reciprocal space
-
-            delete[] radial;
-            delete[] rab;
-            delete[] psir;
-			delete[] psi;
-
-            ++count;
-			in_ao.close();
-        }
-    }
-
-    this->Phi[it].set_orbital_info(
-        it, // type
-        ucell.atoms[it].label, // label
-        lmaxt,
-        nchi,
-        total_nchi); //copy twice !
-
-	delete[] nchi;
-
-    return;
+	//lmax and nchimax for all types
+	this->lmax = std::max(this->lmax, lmaxt);
+	this->nchimax = std::max(this->nchimax, nchimaxt);
+	
+	in_ao.close();
+	return;
 }
 
 
@@ -1008,46 +802,62 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 		WARNING_QUIT("LCAO_Orbitals::Read_Descriptor", "Couldn't find orbital files for descriptor");
 	}
 
-	//read lmax and nchi[l]
-	int lmax = 0;
+	this->lmax_d = 0;
 	this->nchimax_d = 0;
-	int nchi[10]={0};
+
+	this->read_orb_file(in_de, 0, this->lmax_d, this->nchimax_d, this->Alpha);
+
+	in_de.close();
+
+	return;
+}
+
+
+void LCAO_Orbitals::read_orb_file(ifstream &ifs,const int &it, int &lmax, int &nchimax, Numerical_Orbital* ao)
+{
+	TITLE("LCAO_Orbitals","read_orb_file");
 	char word[80];
 	if (MY_RANK == 0)
 	{
-		while (in_de.good())
+		while (ifs.good())
 		{
-			in_de >> word;
+			ifs >> word;
 			if (std::strcmp(word, "Lmax") == 0)
 			{
-				in_de >> lmax;
+				ifs >> lmax;
 				break;
 			}
 		}
-		// allocate space
-		// number of chi for each L.
+	}
+#ifdef __MPI
+	Parallel_Common::bcast_int(lmax);
+#endif	
+	
+	int* nchi = new int[lmax];		// allocate space: number of chi for each L.
+	
+	if (MY_RANK == 0)
+	{	
 		for (int l = 0; l <= lmax; l++)
 		{
-			in_de >> word >> word >> word >> nchi[l];
-			this->nchimax_d = std::max(this->nchimax_d, nchi[l]);
+			ifs >> word >> word >> word >> nchi[l];
+			nchimax = std::max(nchimax, nchi[l]);
 		}
 	}
 
 #ifdef __MPI
-	Parallel_Common::bcast_int(lmax);
-	Parallel_Common::bcast_int(this->nchimax_d);
+	Parallel_Common::bcast_int(nchimax);
 	Parallel_Common::bcast_int(nchi, lmax + 1);
 #endif		
 
-	this->lmax_d = lmax;
 	// calculate total number of chi
 	int total_nchi = 0;
 	for (int l = 0; l <= lmax; l++)
 	{
 		total_nchi += nchi[l];
 	}
-		//OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
-	this->Alpha[0].phiLN = new Numerical_Orbital_Lm[total_nchi];
+	//OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
+	delete[] ao[it].phiLN;
+	ao[it].phiLN = new Numerical_Orbital_Lm[total_nchi];
 
 	int meshr=0; // number of mesh points
 	int meshr_read=0;
@@ -1055,23 +865,23 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 
 	if (MY_RANK == 0)
 	{
-		while (in_de.good())
+		while (ifs.good())
 		{
-			in_de >> word;
+			ifs >> word;
 			if (std::strcmp(word, "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
 			{
 				break;
 			}
 		}
-		CHECK_NAME(in_de, "Mesh");
-		in_de >> meshr;
+		CHECK_NAME(ifs, "Mesh");
+		ifs >> meshr;
 		meshr_read = meshr;
 		if (meshr % 2 == 0)
 		{
 			++meshr;
 		}
-		CHECK_NAME(in_de, "dr");
-		in_de >> dr;
+		CHECK_NAME(ifs, "dr");
+		ifs >> dr;
 	}
 
 #ifdef __MPI
@@ -1083,6 +893,8 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 	int count = 0;
 	string name1;
 	string name2;
+	string name3;
+	int tmp_it=0;
 	int tmp_l=0;
 	int tmp_n=0;
 
@@ -1130,21 +942,22 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			{
 				while (!find)
 				{
-					if (in_de.eof())
+					if (ifs.eof())
 					{
 						ofs_warning << " Can't find l="
 							<< L << " n=" << N << " orbital." << endl;
 						break;
 					}
 
-					in_de >> name1 >> name2;
-					in_de >> tmp_l >> tmp_n;
+					ifs >> name1 >> name2>> name3;
+					ifs >> tmp_it >> tmp_l >> tmp_n;
+					assert( name1 == "Type" );
 					if (L == tmp_l && N == tmp_n)
 					{
 						// meshr_read is different from meshr if meshr is even number.
 						for (int ir = 0; ir < meshr_read; ir++)
 						{
-							in_de >> psi[ir];
+							ifs >> psi[ir];
 							psir[ir] = psi[ir] * radial[ir];
 						}
 						find = true;
@@ -1154,7 +967,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 						double no_use;
 						for (int ir = 0; ir < meshr_read; ir++)
 						{
-							in_de >> no_use;
+							ifs >> no_use;
 						}
 					}
 				}//end find
@@ -1165,7 +978,7 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 #endif
 			if (!find)
 			{
-				WARNING_QUIT("LCAO_Orbitals::Read_Descriptor", "Can't find descriptor orbitals.");
+				WARNING_QUIT("LCAO_Orbitals::read_orb_file", "Can't find orbitals.");
 			}
 
 #ifdef __MPI
@@ -1202,9 +1015,9 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			delete[] inner;
 			ofs_running << setw(12) << unit << endl;
 
-			this->Alpha[0].phiLN[count].set_orbital_info(
-				"H", //any type
-				1, //any type
+			ao[it].phiLN[count].set_orbital_info(
+                ucell.atoms[it].label,
+                it, //type
 				L, //angular momentum L
 				N, // number of orbitals of this L
 				meshr, // number of radial mesh
@@ -1226,15 +1039,13 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 			++count;
 		}
 	}
-
-	in_de.close();
-
-	this->Alpha[0].set_orbital_info(
-		1, // any type
-		"H", // any label
+	ao[it].set_orbital_info(
+        it, // type
+        ucell.atoms[it].label, // label	
 		lmax,
 		nchi,
 		total_nchi); //copy twice !
-
+	
+	delete[] nchi;
 	return;
 }

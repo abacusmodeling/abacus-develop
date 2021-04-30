@@ -96,6 +96,9 @@ class LCAO_Orbitals
 
 	int lmax_d;	//caoyu add 2021-03-17
 	int nchimax_d;	//caoyu add 2021-03-17
+	void read_orb_file(ifstream &ifs, 
+		const int &it, int &lmax, 
+		int &nchimax, Numerical_Orbital* ao);	//caoyu add 2021-04-26
 
 };
 
