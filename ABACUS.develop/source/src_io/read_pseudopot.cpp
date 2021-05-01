@@ -78,7 +78,7 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 		if(MY_RANK==0)
 		{
 //			upf.print_pseudo_upf( ofs );
-			atoms[i].set_pseudo_us( upf );
+			atoms[i].set_pseudo_nc( upf );
 
 			ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << endl;
 			OUT(ofs_running,"pseudopotential type",atoms[i].pp_type);
