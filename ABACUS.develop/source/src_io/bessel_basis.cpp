@@ -261,8 +261,8 @@ void Bessel_Basis::init_TableOne(
 
 			//caoyu add 2021-3-10
 			//=========output .orb format=============
-			ofs << setiosflags(ios::right) << setw(20) << "L" << setw(20) << "N" << endl;
-			ofs << setiosflags(ios::right) << setw(20) << l << setw(20) << ie << endl;
+			ofs << setiosflags(ios::right) << setw(20) << "Type"<< setw(20) << "L" << setw(20) << "N" << endl;
+			ofs << setiosflags(ios::right) << setw(20) << "0"<< setw(20) << l << setw(20) << ie << endl;
 			for (int ir = 0; ir < rmesh; ir++) 
 			{ 
 				ofs << setiosflags(ios::scientific) 

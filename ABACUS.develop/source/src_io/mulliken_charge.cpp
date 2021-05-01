@@ -171,12 +171,17 @@ void Mulliken_Charge::cal_mulliken(void)
 			hm.orb_con.set_orb_tables(
 					UOT, 
 					ORB,
+					ucell.ntype,
+					ucell.lmax,
 					INPUT.lcao_ecut,
 					INPUT.lcao_dk,
 					INPUT.lcao_dr,
 					INPUT.lcao_rmax, 
 					ucell.lat0, 
-					Exx_Abfs::Lmax);
+					INPUT.out_descriptor,
+					INPUT.out_r_matrix,
+					Exx_Abfs::Lmax,
+					MY_RANK);
 
 
 
@@ -237,7 +242,7 @@ void Mulliken_Charge::cal_mulliken(void)
 #ifdef __MPI
 			atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
-			hm.orb_con.clear_after_ions(UOT, ORB);
+			hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

@@ -1,8 +1,3 @@
-//==========================================================
-// Author: Lixin He,mohan
-// DATE : 2009-02-26
-//==========================================================
-/* pseudopot_upf.h   */
 #ifndef PSEUDOPOT_UPF_H
 #define PSEUDOPOT_UPF_H
 
@@ -66,8 +61,6 @@ public:
 	int  nd; 			// nl_5 // Number of nonzero Dij
 //	int  nqf;			// nl_6 // Number of expansion coefficients for q_{ij} (may be zero)
 //	int  nqlc;			// nl_7 // 2 * lmax  + 1
-//	double *rinner;		// nl_8  // rinner(0:2*lmax) : for r < rinner(i) Q functions are pseudized
-						         //(not read if nqf=0)
 //	matrix qqq;			// nl_9  // qqq(nbeta,nbeta):Q_{ij} = \int q_{ij}(r) dr
 //	realArray qfunc;	// nl_10 // qfunc(mesh,nbeta,nbeta):q_{ij}(r) for r > rinner(i)
 //	realArray qfcoef;	// nl_11 // qfcoef(nqf,0:2*lmax,nbeta,nbeta):expansion coefficients of q_{ij}(r) for r < rinner(i)

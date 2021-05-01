@@ -10,22 +10,19 @@
 void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 {
 	TITLE("UnitCell_pseudo","read_pseudopot");
-//----------------------------------------------------------
-// EXPLAIN : setup reading log for pseudopot_upf
-//----------------------------------------------------------
+	// setup reading log for pseudopot_upf
 	stringstream ss;
 	ss << global_out_dir << "atom_pseudo.log";
 	
-//----------------------------------------------------------
-// EXPLAIN : Read in the atomic pseudo potential
-//----------------------------------------------------------
+	// Read in the atomic pseudo potentials
 	string pp_address;
 	for (int i = 0;i < ntype;i++)
 	{
 		Pseudopot_upf upf;
 	
 		// mohan update 2010-09-12	
-		int error = 0, error_ap = 0;
+		int error = 0;
+		int error_ap = 0;
 		
 		if(MY_RANK==0)
 		{
@@ -48,7 +45,10 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 		Parallel_Common::bcast_int(error_ap);
 #endif
 
-		if(error_ap) WARNING_QUIT("UnitCell_pseudo::read_pseudopot","error when average the pseudopotential.");
+		if(error_ap) 
+		{
+			WARNING_QUIT("UnitCell_pseudo::read_pseudopot","error when average the pseudopotential.");
+		}
 
 		if(error==1)
 		{
@@ -64,7 +64,6 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 		{
 			WARNING_QUIT("read_pseudopot","Check the reference states in pseudopotential .vwr file.\n Also the norm of the read in pseudo wave functions\n explicitly please check S, P and D channels.\n If the norm of the wave function is \n unreasonable large (should be near 1.0), ABACUS would quit. \n The solution is to turn off the wave functions  \n and the corresponding non-local projectors together\n in .vwr pseudopotential file.");
 		}
-//		OUT(ofs_running,"PP_ERRROR",error);
 
 //xiaohui add 2015-03-24
 #ifdef __MPI
@@ -79,7 +78,7 @@ void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
 		if(MY_RANK==0)
 		{
 //			upf.print_pseudo_upf( ofs );
-			atoms[i].set_pseudo_us( upf );
+			atoms[i].set_pseudo_nc( upf );
 
 			ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << endl;
 			OUT(ofs_running,"pseudopotential type",atoms[i].pp_type);

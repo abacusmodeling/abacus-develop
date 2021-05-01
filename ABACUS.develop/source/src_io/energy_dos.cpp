@@ -330,12 +330,17 @@ void energy::perform_dos(void)
 				hm.orb_con.set_orb_tables(
 						UOT, 
 						ORB,
+						ucell.ntype,
+						ucell.lmax,
 						INPUT.lcao_ecut,
 						INPUT.lcao_dk,
 						INPUT.lcao_dr,
 						INPUT.lcao_rmax, 
 						ucell.lat0, 
-						Exx_Abfs::Lmax);
+						INPUT.out_descriptor,
+						INPUT.out_r_matrix,
+						Exx_Abfs::Lmax,
+						MY_RANK);
 
 				LM.allocate_HS_R(LNNR.nnr);
 				LM.zeros_HSR('S', LNNR.nnr);
@@ -418,7 +423,7 @@ void energy::perform_dos(void)
 				atom_arrange::delete_vector( SEARCH_RADIUS );
 #endif
 				// mohan update 2021-02-10
-				hm.orb_con.clear_after_ions(UOT, ORB);
+				hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

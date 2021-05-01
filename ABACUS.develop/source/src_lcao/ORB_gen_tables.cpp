@@ -1,7 +1,6 @@
-#include "src_pw/global.h"
 #include "ORB_read.h"
 #include "ORB_gen_tables.h"
-#include "src_global/ylm.h"
+#include "../src_global/ylm.h"
 
 // here is a member of ORB_gen_tables class
 ORB_gen_tables UOT;
@@ -13,7 +12,8 @@ ORB_gen_tables::~ORB_gen_tables() {}
 void ORB_gen_tables::gen_tables(
 	const int &job0,
 	LCAO_Orbitals &orb,
-	const int &Lmax_exx)
+	const int &Lmax_exx,
+	const int &out_descriptor)
 {
 	TITLE("ORB_gen_tables", "gen_tables");
 	timer::tick("ORB_gen_tables", "gen_tables", 'C');
@@ -40,7 +40,8 @@ void ORB_gen_tables::gen_tables(
 		orb.get_dk());	 // delta k, for integration in k space
 
 	//caoyu add 2021-03-18
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")
+	//mohan update 2021-04-22
+	if (out_descriptor>0)
 	{
 		talpha.allocate(
 			orb.get_ntype(), // number of atom types
@@ -61,7 +62,7 @@ void ORB_gen_tables::gen_tables(
 
 	//caoyu add 2021-03-18
 	// DS: Descriptor
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")
+	if (out_descriptor>0)
 	{
 		talpha.init_DS_Opair();
 		talpha.init_DS_2Lplus1();
@@ -88,7 +89,7 @@ void ORB_gen_tables::gen_tables(
 	tbeta.init_Table_Beta(MOT.pSB); // add 2009-5-8
 
 	//caoyu add 2021-03-18
-	if (INPUT.out_descriptor && BASIS_TYPE == "lcao")
+	if (out_descriptor>0)
 	{
 		talpha.init_Table_Alpha(MOT.pSB);
 		//talpha.print_Table_DSR();
@@ -123,6 +124,7 @@ void ORB_gen_tables::snap_psibeta(
 	const int &N2,
 	const Vector3<double> &R0, // The projector.
 	const int &T0,
+	const matrix &dion, // mohan add 2021-04-25
 	complex<double> *nlm1,
 	const int is) const
 {
@@ -138,9 +140,13 @@ void ORB_gen_tables::snap_psibeta(
 
 	bool has_so = 0;
 	if (ORB.Beta[T0].get_count_soc(0) > 0)
+	{
 		has_so = 1;
+	}
 
 	const int nproj = ORB.nproj[T0];
+	assert(nproj>0); // mohan add 2021-04-25
+	
 	bool *calproj = new bool[nproj];
 	int *rmesh1 = new int[nproj];
 	int *rmesh2 = new int[nproj];
@@ -190,32 +196,29 @@ void ORB_gen_tables::snap_psibeta(
 
 	//FOR INTERPOLATION
 	double *curr; //current pointer
-	int iqa, iqb;
-	double psa, psb;
-	double x0a, x1a, x2a, x3a, x123a, x120a, x032a, x031a;
-	double x0b, x1b, x2b, x3b, x123b, x120b, x032b, x031b;
 
-	psa = distance10 / tbeta.dr;
-	iqa = static_cast<int>(psa);
-	x0a = psa - static_cast<double>(iqa);
-	x1a = 1.0 - x0a;
-	x2a = 2.0 - x0a;
-	x3a = 3.0 - x0a;
-	x123a = x1a * x2a * x3a / 6.0;
-	x120a = x1a * x2a * x0a / 6.0;
-	x032a = x0a * x3a * x2a / 2.0;
-	x031a = x0a * x3a * x1a / 2.0;
+	double psa = distance10 / tbeta.dr;
+	int iqa = static_cast<int>(psa);
+	double x0a = psa - static_cast<double>(iqa);
+	double x1a = 1.0 - x0a;
+	double x2a = 2.0 - x0a;
+	double x3a = 3.0 - x0a;
+	double x123a = x1a * x2a * x3a / 6.0;
+	double x120a = x1a * x2a * x0a / 6.0;
+	double x032a = x0a * x3a * x2a / 2.0;
+	double x031a = x0a * x3a * x1a / 2.0;
 
-	psb = distance20 / tbeta.dr;
-	iqb = (int)psb;
-	x0b = psb - (double)iqb;
-	x1b = 1.0 - x0b;
-	x2b = 2.0 - x0b;
-	x3b = 3.0 - x0b;
-	x123b = x1b * x2b * x3b / 6.0;
-	x120b = x1b * x2b * x0b / 6.0;
-	x032b = x0b * x3b * x2b / 2.0;
-	x031b = x0b * x3b * x1b / 2.0;
+	double psb = distance20 / tbeta.dr;
+	int iqb = (int)psb;
+	double x0b = psb - (double)iqb;
+	double x1b = 1.0 - x0b;
+	double x2b = 2.0 - x0b;
+	double x3b = 3.0 - x0b;
+
+	double x123b = x1b * x2b * x3b / 6.0;
+	double x120b = x1b * x2b * x0b / 6.0;
+	double x032b = x0b * x3b * x2b / 2.0;
+	double x031b = x0b * x3b * x1b / 2.0;
 
 	//UNIT VECTOR
 
@@ -234,9 +237,13 @@ void ORB_gen_tables::snap_psibeta(
 	const double tiny2 = 1e-10;
 
 	if (distance10 < tiny1)
+	{
 		distance10 += tiny1;
+	}
 	if (distance20 < tiny1)
+	{
 		distance20 += tiny1;
+	}
 
 	// Find three dimension of 'Table_NR' '
 	// Notice!!! T1 must be orbital,
@@ -273,26 +280,28 @@ void ORB_gen_tables::snap_psibeta(
 	//double v = 0.0;
 
 	// mohan update 2011-03-07
-	int n_projection = 1;
+	int nprojections = 1;
 	if (has_so)
 	{
-		n_projection = ORB.Beta[T0].get_nproj_soc();
+		nprojections = ORB.Beta[T0].get_nproj_soc();
 	}
 
-	vector<complex<double>> term_a_nc(n_projection, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31
-	vector<complex<double>> term_b_nc(n_projection, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31
+	vector<complex<double>> term_a_nc(nprojections, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31
+	vector<complex<double>> term_b_nc(nprojections, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31
 	int ip = -1;
 
 	for (int nb = 0; nb < nproj; nb++)
 	{
 		if (!calproj[nb])
+		{
 			continue;
+		}
 
 		const int L0 = ORB.Beta[T0].getL_Beta(nb);
 		//const int next_ip = 2* L0 +1;
 
 		//-------------------------------------------------------------------
-		// move iterations for psi1 and psi2 from cal_fvnl_dbeta
+		// we should consider move iterations for psi1 and psi2 from cal_fvnl_dbeta
 		// to here --- 2021/03/20 mohan chen
 		//-------------------------------------------------------------------
 
@@ -320,7 +329,9 @@ void ORB_gen_tables::snap_psibeta(
 				int AL = L1 + L0;
 				int SL = abs(L1 - L0);
 				if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
+				{
 					continue;
+				}
 
 				//prefac = (i)^{lphi - lbeta - l}
 				//R0-R1 ==> <phi|beta>
@@ -336,7 +347,10 @@ void ORB_gen_tables::snap_psibeta(
 					}
 					else
 					{
-						Interp_Vnla = i_exp * (x123a * curr[iqa] + x120a * curr[iqa + 3] + x032a * curr[iqa + 1] - x031a * curr[iqa + 2]);
+						Interp_Vnla = i_exp * (x123a * curr[iqa] 
+						+ x120a * curr[iqa + 3] 
+						+ x032a * curr[iqa + 1] 
+						- x031a * curr[iqa + 2]);
 					}
 					Interp_Vnla /= rl1;
 				}
@@ -366,7 +380,9 @@ void ORB_gen_tables::snap_psibeta(
 				int AL = L2 + L0;
 				int SL = abs(L2 - L0);
 				if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
+				{
 					continue;
+				}
 
 				double Interp_Vnlb = 0.0;
 				double Interp_Vnlc = 0.0;
@@ -374,6 +390,7 @@ void ORB_gen_tables::snap_psibeta(
 				//prefac
 				double i_exp = pow(-1.0, (L2 - L0 - L) / 2);
 				double rl2 = pow(distance20, L);
+
 				if (distance20 > tiny2)
 				{
 					curr = tbeta.Table_NR[0][Tpair2][Opair2][L];
@@ -384,7 +401,10 @@ void ORB_gen_tables::snap_psibeta(
 					}
 					else
 					{
-						Interp_Vnlb = i_exp * (x123b * curr[iqb] + x120b * curr[iqb + 3] + x032b * curr[iqb + 1] - curr[iqb + 2] * x031b);
+						Interp_Vnlb = i_exp * (x123b * curr[iqb] 
+						+ x120b * curr[iqb + 3] 
+						+ x032b * curr[iqb + 1] 
+						- curr[iqb + 2] * x031b);
 					}
 
 					Interp_Vnlb /= rl2;
@@ -392,7 +412,7 @@ void ORB_gen_tables::snap_psibeta(
 				else
 				{
 					Interp_Vnlb = i_exp * tbeta.Table_NR[0][Tpair2][Opair2][L][0];
-				}
+				}// end if(distance20)
 
 				if (job == 1) // 1 means calculate the derivative part.
 				{
@@ -406,7 +426,10 @@ void ORB_gen_tables::snap_psibeta(
 						}
 						else
 						{
-							Interp_Vnlc = i_exp * (x123b * curr[iqb] + x120b * curr[iqb + 3] + x032b * curr[iqb + 1] - curr[iqb + 2] * x031b);
+							Interp_Vnlc = i_exp * (x123b * curr[iqb] 
+							+ x120b * curr[iqb + 3] 
+							+ x032b * curr[iqb + 1] 
+							- curr[iqb + 2] * x031b);
 						}
 						Interp_Vnlc = Interp_Vnlc / pow(distance20, L) - Interp_Vnlb * L / distance20;
 					}
@@ -414,7 +437,7 @@ void ORB_gen_tables::snap_psibeta(
 					{
 						Interp_Vnlc = 0.0;
 					}
-				}
+				} // end job==1
 
 				// sum up the second part.
 				for (int m = 0; m < 2 * L + 1; m++)
@@ -426,28 +449,28 @@ void ORB_gen_tables::snap_psibeta(
 
 					switch (job)
 					{
-					case 0: // calculate the overlap part.
-					{
-						term_b += tmpGaunt * Interp_Vnlb * rlyb[lm];
-						break;
-					}
-					case 1: // calculate the derivative part.
-					{
-						double tt1 = tmpGaunt * Interp_Vnlc * rlyb[lm] / distance20;
-						double tt2 = tmpGaunt * Interp_Vnlb;
-
-						for (int ir = 0; ir < 3; ir++)
+						case 0: // calculate the overlap part.
 						{
-							term_c[ir] += tt1 * unit_vec_dRb[ir] + tt2 * grlyb[lm][ir];
+							term_b += tmpGaunt * Interp_Vnlb * rlyb[lm];
+							break;
 						}
+						case 1: // calculate the derivative part.
+						{
+							double tt1 = tmpGaunt * Interp_Vnlc * rlyb[lm] / distance20;
+							double tt2 = tmpGaunt * Interp_Vnlb;
 
-						break;
-					}
-					default:
-						break;
+							for (int ir = 0; ir < 3; ir++)
+							{
+								term_c[ir] += tt1 * unit_vec_dRb[ir] + tt2 * grlyb[lm][ir];
+							}
+
+							break;
+						}
+						default:
+							break;
 					}
 				} // end m of SECOND PART
-			}	  // end L of SECOND PART
+			} // end L of SECOND PART
 
 			//added by zhengdy-soc, store them for soc case
 			if (has_so)
@@ -461,63 +484,62 @@ void ORB_gen_tables::snap_psibeta(
 			//===============================================
 			switch (job)
 			{
-			case 0: //calculate the overlap part.
-			{
-				//nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
-				if (!has_so)
+				case 0: //calculate the overlap part.
 				{
-					nlm[0] += term_a * term_b * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
-				}
-				break;
-			}
-			case 1: //calculate the derivative part.
-			{
-				for (int jr = 0; jr < 3; jr++)
-				{
-					//nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(L0, L0);//LiuXh 2016-01-14
 					if (!has_so)
 					{
-						nlm[jr] += term_c[jr] * term_a * ORB.Beta[T0].getCoefficient_D(nb, nb); //LiuXh 2016-01-14
+						nlm[0] += term_a * term_b * dion(nb, nb); //LiuXh 2016-01-14
 					}
+					break;
 				}
-				break;
+				case 1: //calculate the derivative part.
+				{
+					for (int jr = 0; jr < 3; jr++)
+					{
+						if (!has_so)
+						{
+							nlm[jr] += term_c[jr] * term_a * dion(nb, nb); //LiuXh 2016-01-14
+						}
+					}
+					break;
+				}
+				default:
+					break;
 			}
-			default:
-				break;
-			}
-		} //!m0
-	}	  //!L0
+
+		} // end m0
+	}// end nb
 
 	//zhengdy-soc, calculate non-local term
 	if (has_so)
 	{
 		switch (job)
 		{
-		case 0: //overlap part
-			for (int no = 0; no < ORB.Beta[T0].get_count_soc(is); no++)
-			{
-				const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
-				const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
-				if (NSPIN == 4 && nlm1 != NULL)
+			case 0: //overlap part
+				for (int no = 0; no < ORB.Beta[T0].get_count_soc(is); no++)
 				{
-					nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+					const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
+					const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
+					if (NSPIN == 4 && nlm1 != NULL)
+					{
+						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+					}
+					else if (NSPIN != 4)
+					{
+						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
+					}
+					else
+					{
+						WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
+					}
 				}
-				else if (NSPIN != 4)
+				break;
+			case 1: //need to be added later
 				{
-					nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
+					break;
 				}
-				else
-				{
-					WARNING_QUIT("ORB_gen_tables::snap_psibeta", "Conflict! Didn't count non-local part");
-				}
-			}
-			break;
-		case 1: //need to be added later
-		{
-			break;
-		}
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
@@ -591,9 +613,13 @@ void ORB_gen_tables::snap_psipsi(
 
 	int dim2;
 	if (T1 <= T2)
+	{
 		dim2 = this->MOT.OV_Opair(dim1, L1, L2, N1, N2);
+	}
 	else
+	{
 		dim2 = this->MOT.OV_Opair(dim1, L2, L1, N2, N1);
+	}
 
 	// Find the needed Ylm(dR) dimension
 	const int nlm = dim3 * dim3; //(2lmax+1)*(2lmax+!)
