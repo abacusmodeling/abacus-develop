@@ -99,11 +99,10 @@ void Ions::opt_ions_pw(void)
 			vdwd2.cal_energy();
 			en.evdw = vdwd2.get_energy();
 		}
-		if(vdwd3_para.flag_vdwd3)		//jiyy add 2019-05-18, update 2021-04-25
+		if(vdwd3.vdwD3)		//jiyy add 2019-05-18
 		{
-			Vdwd3 vdwd3(ucell,vdwd3_para);
-			vdwd3.cal_energy();
-			en.evdw = vdwd3.get_energy();;
+			vdwd3.energy();
+			en.evdw = vdwd3.energy_result;
 		}
 
 

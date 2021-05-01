@@ -13,7 +13,6 @@
 #include "ELEC_scf.h"
 #include "src_global/sltk_atom_arrange.h"
 #include "src_pw/vdwd2.h"
-#include "src_pw/vdwd3.h"
 
 Run_MD::Run_MD()
 {}
@@ -448,11 +447,10 @@ void Run_MD::final_scf(void)
         vdwd2.cal_energy();
         en.evdw = vdwd2.get_energy();
     }
-	else if(vdwd3_para.flag_vdwd3)							//jiyy add 2019-05-18, update 2021-04-25
+	else if(vdwd3.vdwD3)							//jiyy add 2019-05-18
     {
-        Vdwd3 vdwd3(ucell,vdwd3_para);
-        vdwd3.cal_energy();
-        en.evdw = vdwd3.get_energy();
+        vdwd3.energy();
+        en.evdw = vdwd3.energy_result;
     }											  
     
 	ELEC_scf es;
