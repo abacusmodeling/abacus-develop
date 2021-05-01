@@ -1,7 +1,7 @@
 #ifndef PSEUDOPOT_UPF_H
 #define PSEUDOPOT_UPF_H
 
-#include "tools.h"
+#include "src_pw/tools.h"
 
 class Pseudopot_upf
 {
