@@ -49,28 +49,31 @@ pseudo_nc::~pseudo_nc()
 	delete[] lll;
 }
 
+
+
 //---------------------------------------------------------------------
 void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 {
 	TITLE("pseudo_nc","set_pseudo_nc");
 
-	int i=0;
-	int nb=0;
-
+	// call subroutines
+	this->set_pseudo_h(upf);
+	this->set_pseudo_atom(upf);
 	this->set_pseudo_vl(upf);
+
 
 	delete[] lll;
 	lll = new int[nbeta];
 	assert(lll != 0);
 
-	for (i = 0;i < nbeta;i++)
+	for (int i = 0;i < nbeta;i++)
 	{
 		lll[i] = upf.lll[i];
 	}
 
 	kkbeta = 0;
 
-	for (nb = 0;nb < nbeta;nb++)
+	for (int nb = 0;nb < nbeta;nb++)
 	{
 		kkbeta = (upf.kkbeta[nb] > kkbeta) ? upf.kkbeta[nb] : kkbeta;
 	}
@@ -88,7 +91,7 @@ void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 
 	nh = 0;
 
-	for (nb = 0; nb < nbeta;nb++)
+	for (int nb = 0; nb < nbeta;nb++)
 	{
 		nh += 2 * lll [nb] + 1;
 	} 
@@ -113,9 +116,9 @@ void pseudo_nc::print_pseudo_nc(ofstream &ofs)
 void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 {
 	TITLE("pseudo_nc::set_pseudo_h");
-	//   set "is"-th pseudopotential using the Unified Pseudopotential Format
+	// set pseudopotential for each atom type
+	// by using the Unified Pseudopotential Format
 
-	int i=0;
 	this->nv = upf.nv;// UPF file version number
 	this->psd = upf.psd;
 	this->pp_type = upf.pp_type;
@@ -159,7 +162,7 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 	this->oc = new double[nchi];
 	assert(this->oc != 0);
 
-	for (i = 0;i < nchi;i++)
+	for (int i = 0;i < nchi;i++)
 	{
 		this->els[i] = upf.els[i];
 		this->lchi[i] = upf.lchi[i];
@@ -179,24 +182,27 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 	assert(this->jchi != 0);
 
 	this->has_so = upf.has_so;//added by zhengdy-soc
+
 	if (this->has_so)
 	{ 
-		for (i = 0;i < nchi;i++){
+		for(int i=0;i < nchi;i++)
+		{
 			this->nn[i] = upf.nn[i];
 			this->jchi[i] = upf.jchi[i];
 		}
-		for (i = 0;i < upf.nbeta;i++)
+		for(int i=0;i < upf.nbeta;i++)
 		{
 			this->jjj[i]  = upf.jjj [i];
 		}
 	}
 	else
 	{
-		for (i = 0;i < nchi;i++){
+		for (int i=0; i<nchi; i++)
+		{
 			this->nn[i] = 0;
 			this->jchi[i] = 0;
 		}
-		for (i = 0;i < upf.nbeta;i++)
+		for (int i=0; i<upf.nbeta; i++)
 		{
 			this->jjj[i]  = 0;
 		}
@@ -223,13 +229,10 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 {
 	TITLE("pseudo_nc","set_pseudo_atom");
 
-	this->set_pseudo_h(upf);
-	int i, ir, j;
-
 	// mohan 2009-12-15
 	// mohan update again 2011-05-23, 
 	// in order to calculate more accurate Vna.
-	rcut = 15.0;//(a.u.);
+	this->rcut = 15.0;//(a.u.);
 	
 // remember to update here if you need it.
 //	rcut = 25.0; 
@@ -262,50 +265,52 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	assert(rho_atc != 0);
 	ZEROS(rho_atc, mesh);
 
-	for (i = 0;i < nchi;i++)
+	for (int i = 0;i < nchi;i++)
 	{
-		for (j = 0; j < mesh; j++)
+		for (int j = 0; j < mesh; j++)
 		{
 			chi(i, j) = upf.chi(i, j);
 		}
 	}
 
-	for (i = 0;i < mesh;i++)
+	for (int i = 0;i < mesh;i++)
 	{
 		r  [i]     = upf.r  [i];
 		rab[i]     = upf.rab[i];
 		rho_at [i] = upf.rho_at [i];
 	}
 
+	// nlcc: non-linear core corrections
+	// rho_atc: core atomic charge
 	if (nlcc)
 	{
-		for (i = 0;i < mesh;i++)
+		for (int i = 0;i < mesh;i++)
 		{
 			rho_atc[i] = upf.rho_atc[i];
 		}
 	}
 	else
 	{
-		for (i = 0;i < upf.mesh;i++)
+		for (int i = 0;i < upf.mesh;i++)
 		{
 			rho_atc[i] = 0.0;
 		}
 	} // end if
 
+
 	bool br = false;
 
-	msh = 0;
+	this->msh = 0;
 
-	for (ir = 0;ir < mesh;ir++) // do ir = 1, mesh [is]
+	for (int ir = 0;ir < mesh;ir++)
 	{
 		if (r [ir] > rcut)
 		{
 			msh = ir + 1;
 			br = true;
 			break;
-			//	goto 5;
-		} // endif
-	} // enddo
+		}
+	}
 
 	if (br)
 	{
@@ -316,8 +321,29 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	{
 		msh = mesh ;
 	}
+
 	return;
 } // end subroutine set_pseudo
+
+
+
+void pseudo_nc::set_pseudo_vl(const Pseudopot_upf &upf)
+{
+	TITLE("pseudo_nc","set_pseudo_vl");
+
+	assert(mesh>0);//mohan add 2021-05-01
+
+	delete[] vloc_at;
+	vloc_at = new double[mesh];
+	assert(vloc_at != 0);
+
+	for (int i = 0;i < mesh;i++)
+	{
+		vloc_at[i] = upf.vloc[i];
+	}
+
+	return;
+} 
 
 
 void pseudo_nc::print_pseudo_atom(ofstream &ofs)
@@ -334,25 +360,6 @@ void pseudo_nc::print_pseudo_atom(ofstream &ofs)
 	out.printrm(ofs, " chi : ", chi);
 	ofs << "\n ----------------------";
 }
-
-
-void pseudo_nc::set_pseudo_vl(const Pseudopot_upf &upf)
-{
-	TITLE("pseudo_nc","set_pseudo_vl");
-
-	this->set_pseudo_atom(upf);
-
-	delete[] vloc_at;
-	vloc_at = new double[mesh];
-	assert(vloc_at != 0);
-
-	for (int i = 0;i < mesh;i++)
-	{
-		vloc_at[i] = upf.vloc[i];
-	}
-
-	return;
-} 
 
 
 void pseudo_nc::print_pseudo_vl(ofstream &ofs)

@@ -56,7 +56,7 @@ class pseudo_nc
 	matrix chi;	  // radial atomic orbitals, chi(nchi, mesh)
 
 	//other
-	int msh;          // the point at rcut
+	int msh;          // number of points up to rcut
 	double rcut;      // cut-off radius
 
 
