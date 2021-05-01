@@ -1,8 +1,8 @@
-#ifndef PSEUDOPOT_CELL_VNL_H
-#define PSEUDOPOT_CELL_VNL_H
+#ifndef VNL_IN_PW_H 
+#define VNL_IN_PW_H 
 
 #include "tools.h"
-#include "pseudopot_cell_vl.h"
+#include "VL_in_pw.h"
 #include "../src_lcao/ORB_gen_tables.h"
 #include "wavefunc_in_pw.h"
 #include "unitcell_pseudo.h"
@@ -92,4 +92,4 @@ private:
 	ORB_gaunt_table MGT;
 };
 
-#endif // PSEUDOPOT_CELL_VNL_H
+#endif // VNL_IN_PW 

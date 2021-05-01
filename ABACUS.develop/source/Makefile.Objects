@@ -30,9 +30,11 @@ dftd3_subroutine.o\
 vdwd3.o\
 vdwd3_parameters.o\
 pseudopot_upf.o\
+pseudopot_upf201.o\
+pseudopot_vwr.o\
 pseudo_nc.o \
-pseudopot_cell_vl.o \
-pseudopot_cell_vnl.o \
+VL_in_pw.o\
+VNL_in_pw.o\
 atom_pseudo.o\
 unitcell_pseudo.o\
 threshold_elec.o\
@@ -230,7 +232,7 @@ H_XC_pw.o \
 H_TDDFT_pw.o\
 read_rho.o\
 read_atoms.o\
-read_pseudopot.o\
+read_cell_pseudopots.o\
 read_dm.o\
 write_pot.o\
 write_rho.o\

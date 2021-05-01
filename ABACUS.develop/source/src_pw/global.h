@@ -6,7 +6,7 @@
 #include "../src_global/global_function.h"
 #include "pw_basis.h"
 #include "energy.h"
-#include "pseudopot_cell_vnl.h"
+#include "VNL_in_pw.h"
 #include "charge_broyden.h"
 #include "potential.h"
 #include "xc_type.h"

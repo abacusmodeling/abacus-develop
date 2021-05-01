@@ -1,9 +1,5 @@
-//==========================================================
-// AUTHOR : Lixin He, mohan
-// DATE : 2008-11-08
-//==========================================================
 #include "global.h"
-#include "pseudopot_cell_vnl.h"
+#include "VNL_in_pw.h"
 #include "tools.h"
 #include "wavefunc.h"
 #include "../src_lcao/ORB_gen_tables.h"

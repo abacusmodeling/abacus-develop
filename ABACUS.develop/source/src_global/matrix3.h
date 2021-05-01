@@ -1,7 +1,3 @@
-//==========================================================
-// AUTHOR: Lixin He, Mohan Chen
-// LAST UPDATE : 2009-03-24 add operator == and !=
-//==========================================================
 #ifndef MatriX3_H
 #define MatriX3_H
 

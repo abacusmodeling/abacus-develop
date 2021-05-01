@@ -1,7 +1,7 @@
 #include "global.h"
 #include "tools.h"
 #include "../src_pw/myfunc.h"
-#include "pseudopot_cell_vl.h"
+#include "VL_in_pw.h"
 #include "../src_global/math_integral.h"
 
 pseudopot_cell_vl::pseudopot_cell_vl()
