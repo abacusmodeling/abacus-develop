@@ -7,9 +7,9 @@
 //==========================================================
 // Read pseudopotential according to the dir
 //==========================================================
-void UnitCell_pseudo::read_pseudopot(const string &pp_dir)
+void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 {
-	TITLE("UnitCell_pseudo","read_pseudopot");
+	TITLE("UnitCell_pseudo","read_cell_pseudopots");
 	// setup reading log for pseudopot_upf
 	stringstream ss;
 	ss << global_out_dir << "atom_pseudo.log";
