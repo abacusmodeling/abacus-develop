@@ -31,8 +31,8 @@ vdwd3.o\
 vdwd3_parameters.o\
 pseudopot_upf.o\
 pseudo_nc.o \
-pseudopot_cell_vl.o \
-pseudopot_cell_vnl.o \
+VL_in_pw.o\
+VNL_in_pw.o\
 atom_pseudo.o\
 unitcell_pseudo.o\
 threshold_elec.o\
