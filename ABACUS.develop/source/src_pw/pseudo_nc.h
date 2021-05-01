@@ -18,7 +18,7 @@ class pseudo_nc: public pseudo_vl
 
 	// <PP_DIJ>
 	matrix dion;	// dion(nbeta,nbeta)
-	matrix betar;	//(nbeta, mesh), radial beta_{mu} functions
+	matrix betar;	// (nbeta, mesh), radial beta_{mu} functions
 
 	// other
 	int nh;         // number of beta functions per atomic type

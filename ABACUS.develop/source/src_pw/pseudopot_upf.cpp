@@ -841,17 +841,12 @@ void Pseudopot_upf::read_pseudo_nl(ifstream &ifs)
 
 	if (nbeta == 0)
 	{
-//		this->nqf = 0;
-//		this->nqlc = 0;
 		delete[] kkbeta;
 		delete[] lll;
 		this->kkbeta = new int[1];
 		this->lll = new int[1];
 		this->beta.create(1, 1);
 		this->dion.create(1, 1);
-//		this->qqq.create(1, 1);
-//		this->qfunc.create(1, 1, mesh);
-//		this->qfcoef.create(1, 1, 1, lmax);
 		return;
 	}
 	else

@@ -2,10 +2,10 @@
 #define ATOM_PSEUDO_H
 
 #include "tools.h"
-#include "pseudo_us.h"
+#include "pseudo_nc.h"
 using namespace std;
 
-class Atom_pseudo : public pseudo_us
+class Atom_pseudo : public pseudo_nc
 {
 public:
 

@@ -58,6 +58,7 @@ private:
 	int calculate_nqx(const double &ecutwfc,const double &dq);
 
 	int nhm;
+
 	int lmaxq;
 
 	matrix indv;		// indes linking  atomic beta's to beta's in the solid
