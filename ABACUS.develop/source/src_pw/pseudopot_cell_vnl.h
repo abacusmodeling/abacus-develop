@@ -32,11 +32,9 @@ public:
 
     double cell_factor; //LiuXh add 20180619
 
-// NAME : nkb(total number of beta functions, with struct.fact.)
-	int nkb; // be called in hm.hpw.init
+	int nkb; // total number of beta functions considering all atoms 
 
-// NAME : lmaxkb(max angular momentum,(see pseudo_h))
-	int lmaxkb;
+	int lmaxkb; // max angular momentum for non-local projectors
 
 	void init_vnl(UnitCell_pseudo &cell);
 
@@ -60,6 +58,7 @@ private:
 	int calculate_nqx(const double &ecutwfc,const double &dq);
 
 	int nhm;
+
 	int lmaxq;
 
 	matrix indv;		// indes linking  atomic beta's to beta's in the solid
@@ -78,13 +77,16 @@ private:
 	ComplexArray deeq_nc;	//(:,:,:,:), the spin-orbit case
 	realArray becsum;	//(:,:,:,:), \sum_i  f(i) <psi(i)/beta_1><beta_m/psi(i)> //used in charge
 
+
 	ComplexMatrix vkb;	// all beta functions in reciprocal space
 	complex<double> ***vkb1_alpha;
 	complex<double> ***vkb_alpha;
 	
-
+	// other variables
 	complex<double> Cal_C(int alpha, int lu, int mu, int L, int M);
+
 	double CG(int l1, int m1, int l2, int m2, int L, int M);
+
 	void print_vnl(ofstream &ofs);
 	
 	ORB_gaunt_table MGT;

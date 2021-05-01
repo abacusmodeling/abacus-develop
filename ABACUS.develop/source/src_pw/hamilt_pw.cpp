@@ -654,62 +654,62 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
     // is calculated before.
     if(NSPIN!=4)
 	{
-    for (int it=0; it<ucell.ntype; it++)
-    {
-        const int Nprojs = ucell.atoms[it].nh;
-        for (int ia=0; ia<ucell.atoms[it].na; ia++)
-        {
-            // each atom has Nprojs, means this is with structure factor;
-            // each projector (each atom) must multiply coefficient
-            // with all the other projectors.
-            for (int ip=0; ip<Nprojs; ip++)
-            {
-                for (int ip2=0; ip2<Nprojs; ip2++)
-                {
-					for(int ib = 0; ib < m ; ++ib)
+		for (int it=0; it<ucell.ntype; it++)
+		{
+			const int Nprojs = ucell.atoms[it].nh;
+			for (int ia=0; ia<ucell.atoms[it].na; ia++)
+			{
+				// each atom has Nprojs, means this is with structure factor;
+				// each projector (each atom) must multiply coefficient
+				// with all the other projectors.
+				for (int ip=0; ip<Nprojs; ip++)
+				{
+					for (int ip2=0; ip2<Nprojs; ip2++)
 					{
-						Ps[(sum + ip2) * m + ib] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[ib * nkb + sum + ip];
-					}//end ib
-                }// end ih
-            }//end jh 
-			sum += Nprojs;
-			++iat;
-        } //end na
-    } //end nt
+						for(int ib = 0; ib < m ; ++ib)
+						{
+							Ps[(sum + ip2) * m + ib] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[ib * nkb + sum + ip];
+						}//end ib
+					}// end ih
+				}//end jh 
+				sum += Nprojs;
+				++iat;
+			} //end na
+		} //end nt
 	}
 	else
 	{
-	for (int it=0; it<ucell.ntype; it++)
-    {
-		int psind,becpind;
-		complex<double> becp1,becp2;
-        const int Nprojs = ucell.atoms[it].nh;
-        for (int ia=0; ia<ucell.atoms[it].na; ia++)
-        {
-            // each atom has Nprojs, means this is with structure factor;
-            // each projector (each atom) must multiply coefficient
-            // with all the other projectors.
-            for (int ip=0; ip<Nprojs; ip++)
-            {
-                for (int ip2=0; ip2<Nprojs; ip2++)
-                {
-					for(int ib = 0; ib < m ; ++ib)
+		for (int it=0; it<ucell.ntype; it++)
+		{
+			int psind,becpind;
+			complex<double> becp1,becp2;
+			const int Nprojs = ucell.atoms[it].nh;
+			for (int ia=0; ia<ucell.atoms[it].na; ia++)
+			{
+				// each atom has Nprojs, means this is with structure factor;
+				// each projector (each atom) must multiply coefficient
+				// with all the other projectors.
+				for (int ip=0; ip<Nprojs; ip++)
+				{
+					for (int ip2=0; ip2<Nprojs; ip2++)
 					{
-						psind = (sum+ip2) * 2 * m + ib * 2;
-						becpind = ib*nkb*2 + sum + ip;
-						becp1 =  becp[becpind];
-						becp2 =  becp[becpind + nkb];
-						Ps[psind] += ppcell.deeq_nc(0, iat, ip2, ip) * becp1
-							+ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
-						Ps[psind +1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp1
-							+ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
-					}//end ib
-                }// end ih
-            }//end jh
-		 	sum += Nprojs;
-			++iat;
-        } //end na
-    } //end nt
+						for(int ib = 0; ib < m ; ++ib)
+						{
+							psind = (sum+ip2) * 2 * m + ib * 2;
+							becpind = ib*nkb*2 + sum + ip;
+							becp1 =  becp[becpind];
+							becp2 =  becp[becpind + nkb];
+							Ps[psind] += ppcell.deeq_nc(0, iat, ip2, ip) * becp1
+								+ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
+							Ps[psind +1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp1
+								+ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
+						}//end ib
+					}// end ih
+				}//end jh
+				sum += Nprojs;
+				++iat;
+			} //end na
+		} //end nt
 	}
 
 	/*

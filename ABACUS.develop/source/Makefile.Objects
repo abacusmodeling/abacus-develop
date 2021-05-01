@@ -30,11 +30,7 @@ dftd3_subroutine.o\
 vdwd3.o\
 vdwd3_parameters.o\
 pseudopot_upf.o\
-pseudo_h.o \
-pseudo_atom.o \
-pseudo_vl.o \
 pseudo_nc.o \
-pseudo_us.o \
 pseudopot_cell_vl.o \
 pseudopot_cell_vnl.o \
 atom_pseudo.o\

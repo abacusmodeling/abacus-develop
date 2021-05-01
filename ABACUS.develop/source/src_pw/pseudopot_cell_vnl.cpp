@@ -68,15 +68,15 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 
 	if( this->nhm > 0 )
 	{
-		indv.create(ntype, this->nhm);
-		nhtol.create(ntype, this->nhm);
-		nhtolm.create(ntype, this->nhm);
-		nhtoj.create(ntype, this->nhm);
-		deeq.create(NSPIN, ucell.nat, this->nhm, this->nhm);
-		deeq_nc.create(NSPIN, ucell.nat, this->nhm, this->nhm);
-		dvan.create(ntype, this->nhm, this->nhm);
-		dvan_so.create(NSPIN, ntype, this->nhm, this->nhm);
-		becsum.create(NSPIN, ucell.nat, this->nhm * (this->nhm + 1) / 2);
+		this->indv.create(ntype, this->nhm);
+		this->nhtol.create(ntype, this->nhm);
+		this->nhtolm.create(ntype, this->nhm);
+		this->nhtoj.create(ntype, this->nhm);
+		this->deeq.create(NSPIN, ucell.nat, this->nhm, this->nhm);
+		this->deeq_nc.create(NSPIN, ucell.nat, this->nhm, this->nhm);
+		this->dvan.create(ntype, this->nhm, this->nhm);
+		this->dvan_so.create(NSPIN, ntype, this->nhm, this->nhm);
+		this->becsum.create(NSPIN, ucell.nat, this->nhm * (this->nhm + 1) / 2);
 	}
 	else
 	{
@@ -125,18 +125,6 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	else 
 	{
 		this->tab_at.create(ntype, nchix_nc, NQX);
-	}
-
-	if(test_pp > 1)
-	{
-		cout 
-		<< "\n     ntype   = " << ntype
-		<< "\n     lmaxkb  = " << this->lmaxkb
-		<< "\n     nhm     = " << this->nhm  
-		<< "\n     nkb     = " << this->nkb
-		<< "\n     nbrx    = " << nbrx
-		<< "\n     nchix   = " << nchix 
-		<< endl;
 	}
 
 	timer::tick("ppcell_vnl","init",'C');

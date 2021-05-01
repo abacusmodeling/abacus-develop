@@ -1,7 +1,3 @@
-//==========================================================
-// Author: Lixin He,mohan
-// DATE : 2009-02-26
-//==========================================================
 #include "../src_io/output.h"
 #include "pseudopot_upf.h"
 #include <iostream>
@@ -65,13 +61,12 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
     // First check if this pseudo-potential has spin-orbit information
     ifstream ifs(fn.c_str(), ios::in);
 
-    if (!ifs)
+	// can't find the file.
+	if (!ifs)
     {
-        // can't find the file.
         return 1;
     }
 
-    //cout << "global_pseudo_type =" << global_pseudo_type << endl;
     if(global_pseudo_type=="auto") //zws
 	{
 		set_pseudo_type(fn);
@@ -81,20 +76,17 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 	if(global_pseudo_type=="upf")
 	{
 		int info = read_pseudo_upf(ifs);
-		//this->print_pseudo_upf(ofs_running);
 		return info;
 	}
 	// read in the .vwr type of pseudopotentials
 	else if(global_pseudo_type=="vwr")
 	{
 		int info = read_pseudo_vwr(ifs);
-	//	this->print_pseudo_upf(ofs_running);
 		return info;
 	}
 	else if(global_pseudo_type=="upf201")
 	{
 		int info = read_pseudo_upf201(ifs);
-		//this->print_pseudo_upf(ofs_running);
 		return info;
 	}
 
@@ -108,22 +100,16 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
 {
     ifstream pptype_ifs(fn.c_str(), ios::in);
-    string dummy, strversion;
-	//int ierr = 0;
+    string dummy;
+	string strversion;
 
 	if (pptype_ifs.good())
 	{
 		getline(pptype_ifs,dummy);
-		//cout << "dummy : " << dummy << endl;
-		//if ( dummy == "<PP_INFO>" )
-		//{
-		//	global_pseudo_type = "upf";
-		//}
 
 		stringstream wdsstream(dummy);
 		getline(wdsstream,strversion,'"');
 		getline(wdsstream,strversion,'"');
-		//cout << "strversi:" << strversion << endl;
 
 		if ( trim(strversion) == "2.0.1" )
 		{
@@ -142,7 +128,9 @@ string& Pseudopot_upf::trim(string &in_str)
     static const string deltri = " \t" ; // delete tab or space
     string::size_type position = in_str.find_first_of(deltri, position);
     if (position == string::npos)
+	{
         return in_str;
+	}
     return trim(in_str.erase(position, 1) );
 }
 
@@ -150,20 +138,18 @@ string Pseudopot_upf::trimend(string &in_str)
 {
     const string &deltri =" \t" ;
     string::size_type position = in_str.find_last_not_of(deltri)+1;
-    //cout << "--" << position << "--" << endl;
     string tmpstr=in_str.erase(position);
-    //cout << "--" << tmpstr << "--" << endl;
     return tmpstr.erase(0,tmpstr.find_first_not_of(deltri));
-} //}zws
+} //zws
 
 
 
 //----------------------------------------------------------
 // This code is used to read in vwr pseudopotential format,
-// which is used in PEtot mostly. Now I only use LDA, so if 
-// PBE or other functionals are used, one needs to change 
-// the following code. The vwr format needs we to generate 
-// NL projectors by ourself. One way to check this is correct
+// Now we only use LDA, so if PBE or other functionals are used, 
+// one needs to change the following code. The vwr format 
+// needs we to generate NL projectors by ourself. 
+// One way to check this is correct
 // is to use opium to generate .ncpp pseudopotential first, 
 // which contains the same informaiton in vwr, then we had
 // both UPF format from upftools in Quantum Espresso and
@@ -501,11 +487,10 @@ int Pseudopot_upf::read_pseudo_vwr(ifstream &ifs)
 			{
 				coef=coef+(vl[ir]-vloc[ir])*wlr[ir]*wlr[ir]*(r[ir+1]-r[ir-1])/2.0;
 			}
-	//		ofs_running << setw(15) << r[ir] << setw(25) << beta(ib,ir) << endl;
 		}
 
 
-// In quantum espresso they did this:
+// In pw they did this:
 //		dion(ib,ib)=1.0/coef;
 
         if(coef<0.0) dion(ib,ib) = -1.0;
@@ -672,6 +657,7 @@ int Pseudopot_upf::read_pseudo_upf(ifstream &ifs)
 	// return 0: read in sucessfully.
 	return 0;
 }// end subroutine read_pseudopot_upf
+
 
 void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 {
@@ -855,18 +841,12 @@ void Pseudopot_upf::read_pseudo_nl(ifstream &ifs)
 
 	if (nbeta == 0)
 	{
-//		this->nqf = 0;
-//		this->nqlc = 0;
 		delete[] kkbeta;
 		delete[] lll;
 		this->kkbeta = new int[1];
 		this->lll = new int[1];
 		this->beta.create(1, 1);
 		this->dion.create(1, 1);
-//		this->rinner = new double[lmax];
-//		this->qqq.create(1, 1);
-//		this->qfunc.create(1, 1, mesh);
-//		this->qfcoef.create(1, 1, 1, lmax);
 		return;
 	}
 	else
@@ -921,93 +901,9 @@ void Pseudopot_upf::read_pseudo_nl(ifstream &ifs)
 		if (tvanp)
 		{
 			WARNING_QUIT("read_pseudo_nl","Ultra Soft Pseudopotential not available yet.");
-			/*
-			SCAN_BEGIN(ifs, "<PP_QIJ>", false);
-			ifs >> this->nqf;//nl_6
-			int xx = (this->nqf > 1) ? this->nqf : 1;
-			ifs.ignore(75, '\n');
-			this->nqlc = 2 * lmax  + 1;
-			this->rinner = new double[nqlc]();
-
-			this->qqq.create(nbeta , nbeta);
-			this->qqq.zero_out();
-
-			this->qfunc.create(nbeta , nbeta , mesh);
-			this->qfcoef.create(nbeta , nbeta , nqlc , xx);
-
-			if (nqf != 0)
-			{
-				SCAN_BEGIN(ifs, "<PP_RINNER>", false);
-
-				for (i = 0;i < nqlc;i++)
-				{
-					ifs >> idum >> rinner[i];
-				}
-
-				SCAN_END(ifs, "</PP_RINNER>");
-			}
-
-			for (int  nb = 0;nb < nbeta;nb++)
-			{
-				for (int  mb = nb;mb < nbeta;mb++)
-				{
-					ifs >> idum >> idum >> ldum;
-					ifs.ignore(75, '\n');
-
-					if (ldum != lll[mb])
-					{
-						cerr << " read_pseudo_nl inconsistent angular momentum for Q_ij \n ";
-					}
-
-					ifs >> x;
-
-					this->qqq(nb, mb) = x;
-					ifs.ignore(75, '\n');
-
-					// "Q_int"
-					// qqq.assign(mb , nb , x);
-					this->qqq(mb, nb) = x;
-
-					for (n = 0;n < mesh;n++)
-					{
-						ifs >> x;
-						this->qfunc(mb , nb , n) = x ;
-					}
-
-					for (n = 0;n < mesh;n++)
-					{
-						x = this->qfunc(mb,nb,n); // bad idea!
-						this->qfunc(nb,mb,n) =  x;
-					}
-
-					// QFCOEF
-					if (nqf > 0)
-					{
-						SCAN_BEGIN(ifs, "<PP_QFCOEF>", false);
-						for (lp = 0;lp < nqlc;lp++)
-						{
-							for (i = 1;i < nqf;i++)
-							{
-								ifs >> x;
-								this->qfcoef(nb , mb , lp , i) = x;
-							}
-						}
-						SCAN_END(ifs, "</PP_QFCOEF>");
-					}
-				}
-			}
-			SCAN_END(ifs, "</PP_QIJ>");
-			*/
 		}
 		else // not tvanp
 		{
-//			this->nqf  = 1;//nl_6
-//			this->nqlc = 2 * lmax  + 1;//nl_7
-//			this->rinner = new double[nqlc]();//nl_8
-//			this->qqq.create(nbeta , nbeta);//nl_9
-//			this->qqq.zero_out();
-//			this->qfunc.create(nbeta , nbeta , mesh);//nl_10
-//			this->qfcoef.create(nbeta , nbeta , nqlc , nqf);//nl_11
 		}
 	}
 	return;
@@ -1079,46 +975,6 @@ void Pseudopot_upf::read_pseudo_so(ifstream &ifs)
        return;
 }
 
-/*
-//
-//	This routine reads from the new UPF file,
-//  and the total angual momentum jjj of the beta and jchi of the
-//  wave-functions.
-void Pseudopot_upf::read_pseudo_addinfo(ifstream &ifs)
-{
-	for (int i = 0;i < 6;i++)
-	{
-		ifs.ignore(75, '\n');
-	}
-
-	int nb = 0;
-
-	this->nn = new int[nwfc]();
-	this->rcut = new double[nwfc]();
-	this->rcutus = new double[nwfc]();
-	this->epseu = new double[nwfc]();
-	this->jchi = new double[nwfc]();
-	this->jjj = new double[nbeta]();
-
-	char s[10];
-
-	for (nb = 0; nb < nwfc;nb++)
-	{
-		ifs >> s >> this->nn[nb] >> this->lchi[nb] >> this->jchi[nb] >> this->oc[nb];
-		this->els[nb] = s;
-	}
-
-
-	for (nb = 0; nb < nbeta;nb++)
-	{
-		ifs >> lll[nb] >> jjj[nb];
-	}
-
-	ifs >> xmin >> rmax >> zmesh >> dx;
-
-//	cerr<< " read_pseudo_addinfo Reading pseudo file \n";
-}
-*/
 
 void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 {
@@ -1146,64 +1002,6 @@ void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 		ofs << " iw=" << i << " els=" << els[i] << " lchi=" << lchi[i] << " oc=" << oc[i] << endl;
 	}
 
-	// print PP_MESH
-	/*
-	ofs.setf(ios::scientific, ios::floatfield);
-
-	for(int i=0; i<100; ++i)
-	{
-		ofs << setw(25) << r[i] << setw(25) << rab[i] << setw(25) << vloc[i] << setw(25) << rho_at[i] << endl;
-	}
-
-	ofs << "chi:" << endl;
-	for(int ir=0; ir<100; ++ir)
-	{
-		for(int i=0; i<nwfc; ++i)
-		{
-			ofs << " " << chi(i,ir);
-		}
-		ofs << endl;
-	}
-
-
-	if (nlcc)
-	{
-		ofs << setw(25) << rho_atc[i] << endl;
-	}
-
-
-	// PRINT PP_NONLOCAL
-	ofs << " nd: " << nd << endl;
-	ofs << " nbeta: " << nbeta << endl;
-	for(int i=0; i<nbeta; ++i)
-	{
-		ofs << lll[i] << " " << kkbeta[i] << endl;
-	}
-
-
-
-	ofs << " dion: " << endl;
-	for(int i=0; i<nbeta; ++i)
-	{
-		for(int j=0; j<nbeta; ++j)
-		{
-			ofs << dion(i,j) << endl;
-		}
-	}
-
-
-	for(int i=0; i<nbeta; ++i)
-	{
-		ofs << " beta: " << i+1 << endl;
-		for(int ir=0; ir<kkbeta[i]; ++ir)
-		{
-			ofs << r[ir] << " " << beta(i,ir) << endl;
-		}
-	}
-
-
-	ofs.unsetf(ios::scientific);
-    */
 	ofs << " End of pseudopot_upf." << endl;
 
 	return;
@@ -1999,106 +1797,32 @@ void Pseudopot_upf::get_char( string ss)
     return;
 }
 
-/*string Pseudopot_upf::get_string( char ss[])
-{
-    int n[2], i, q;
-    char b[1], ssss[200];
-    string sss;
-    q =0;
-    strcpy(b,"\"");
-
-    for(i=0;i<200;i++)
-    {
-        if(ss[i]== b[0])
-        {
-           n[q] = i;
-           q++;
-        }
-
-    }
-
-    for(i=0;i<(n[1]-n[0]-1);i++)
-    {
-
-        ssss[i] = ss[(n[0]+i+1)];
-    }
-    cout << "ssss = " << ssss << endl;
-    sss.assign(ssss);
-    cout << "sss = " << sss << endl;
-    return sss;
-
-}
-
-int Pseudopot_upf::get_int( char ss[])
-{
-    int n[2], i, q, m;
-    char b[1],sss[200];
-    q =0;
-    strcpy(b,"\"");
-
-    for(i=0;i<200;i++)
-    {
-        if(ss[i]== b[0])
-        {
-           n[q] = i;
-           q++;
-        }
-
-    }
-
-    for(i=0;i<(n[1]-n[0]-1);i++)
-    {
-
-        sss[i] = ss[(n[0]+i+1)];
-    }
-    m = atoi(sss);
-
-    return m;
-
-}
-
-double Pseudopot_upf::get_double( char ss[])
-{
-    int n[2], i, q;
-    double l;
-    char b[1],sss[200];
-    q =0;
-    strcpy(b,"\"");
-
-    for(i=0;i<200;i++)
-    {
-        if(ss[i]== b[0])
-        {
-           n[q] = i;
-           q++;
-        }
-
-    }
-
-    for(i=0;i<(n[1]-n[0]-1);i++)
-    {
-
-        sss[i] = ss[(n[0]+i+1)];
-    }
-    l = atof(sss);
-
-    return l;
-
-}*/
-
 int Pseudopot_upf::average_p()
 {
 	int error = 0;
-	if(!this->has_so && LSPINORB) {error++; cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<endl; return error;}
-		//WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
-	if(!this->has_so || LSPINORB) return error; 
+	if(!this->has_so && LSPINORB) 
+	{
+		error++; 
+		cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<endl; 
+		return error;
+	}
+	//WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
+
+	if(!this->has_so || LSPINORB) 
+	{
+		return error; 
+	}
+
 	int new_nbeta = 0; //calculate the new nbeta
 	for(int nb=0; nb< this->nbeta; nb++)
 	{
 		new_nbeta++;
 		if(this->lll[nb] != 0 && abs(this->jjj[nb] - this->lll[nb] - 0.5) < 1e-6) //two J = l +- 0.5 average to one
+		{
 			new_nbeta--;
+		}
 	}
+
 	this->nbeta = new_nbeta;
 	matrix dion_new;
 	dion_new.create(this->nbeta, this->nbeta);
@@ -2111,8 +1835,6 @@ int Pseudopot_upf::average_p()
 		int ind=0, ind1=0;
 		if(l != 0)
 		{
-//			cout<<this->jjj[old_nbeta] <<" "<< this->lll[old_nbeta]<<" "<<abs(this->jjj[old_nbeta] - this->lll[old_nbeta] + 0.5)<<endl;
-//			cout<<this->jjj[old_nbeta+1] <<" "<< this->lll[old_nbeta+1]<<" "<<abs(this->jjj[old_nbeta+1] - this->lll[old_nbeta+1] + 0.5)<<endl;
 			if(abs(this->jjj[old_nbeta] - this->lll[old_nbeta] + 0.5) < 1e-6)
 			{
 				if(abs(this->jjj[old_nbeta+1]-this->lll[old_nbeta+1]-0.5)>1e-6) 
@@ -2141,17 +1863,24 @@ int Pseudopot_upf::average_p()
 			this->dion(nb, nb) = vion1;
 			old_nbeta++;	
 		}
-		else{
+		else
+		{
 			for(int ir = 0; ir<this->mesh;ir++)
 				this->beta(nb, ir) = this->beta(old_nbeta, ir);
 			this->dion(nb, nb) = this->dion(old_nbeta, old_nbeta);
 		}
 		this->lll[nb] = this->lll[old_nbeta]; //reset the lll index, ignore jjj index
 	}
+
 	//store the old dion and then recreate dion 
 	for(int i=0;i<this->nbeta; i++)
+	{
 		for(int j=0;j<this->nbeta;j++)
+		{
 			dion_new(i,j) = this->dion(i,j);
+		}
+	}
+
 	this->dion = dion_new;
 //	this->dion.create(this->nbeta, this->nbeta);
 //	for(int i=0;i<this->nbeta; i++)
@@ -2163,8 +1892,11 @@ int Pseudopot_upf::average_p()
 	{
 		new_nwfc++;
 		if(this->lchi[nb] != 0 && abs(this->jchi[nb] - this->lchi[nb] - 0.5)<1e-6)
+		{
 			new_nwfc--;
+		}
 	}
+
 	this->nwfc = new_nwfc;
 	int old_nwfc=0;
 	for(int nb=0; nb<this->nwfc; nb++)
