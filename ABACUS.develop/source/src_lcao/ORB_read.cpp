@@ -102,7 +102,7 @@ void LCAO_Orbitals::bcast_files(const int &ntype_in)
 #endif
 
 
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 void LCAO_Orbitals::Read_Orbitals(
 	const int &ntype_in, 
 	const int &lmax_in,
@@ -813,7 +813,12 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 }
 
 
-void LCAO_Orbitals::read_orb_file(ifstream &ifs,const int &it, int &lmax, int &nchimax, Numerical_Orbital* ao)
+void LCAO_Orbitals::read_orb_file(
+	ifstream &ifs,
+	const int &it, 
+	int &lmax, 
+	int &nchimax, 
+	Numerical_Orbital* ao)
 {
 	TITLE("LCAO_Orbitals","read_orb_file");
 	char word[80];
