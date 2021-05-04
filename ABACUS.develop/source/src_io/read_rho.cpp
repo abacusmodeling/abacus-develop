@@ -1,17 +1,11 @@
 #include "src_pw/charge.h"
 #include "src_pw/global.h"
-#include "../src_io/rwstream.h"
 
 bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwan
 {
     TITLE("Charge","read_rho");
-    ifstream ifs;
-	Rwstream rws;
-	if(out_charge == 1 || out_charge == 0)
-		ifs.open(fn.c_str());
-	else if(out_charge == 2)
-		rws.open(fn, "r");
-    if (!ifs && rws) 
+    ifstream ifs(fn.c_str());
+    if (!ifs) 
 	{
 		ofs_running << " !!! Couldn't find the charge file !!!" << endl;
 		return false;
@@ -22,8 +16,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	}
 
 	bool quit=false;
-	if(out_charge == 1 || out_charge == 0)
-	{
+
     string name;
 	ifs >> name;
     
@@ -84,7 +77,6 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	CHECK_INT(ifs, pw.ncx);	
 	CHECK_INT(ifs, pw.ncy);	
 	CHECK_INT(ifs, pw.ncz);	
-	}
 
 #ifndef __MPI
 	ofs_running << " Read SPIN = " << is+1 << " charge now." << endl;
@@ -96,10 +88,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 		{
 			for(int i=0; i<pw.ncx; i++)
 			{
-				if(out_charge == 1 || out_charge == 0)
-					ifs >> rho[i*pw.ncy*pw.ncz + j*pw.ncz +k];
-				else if(out_charge == 2)
-					rws >> rho[i*pw.ncy*pw.ncz + j*pw.ncz +k];
+				ifs >> rho[i*pw.ncy*pw.ncz + j*pw.ncz +k];
 			}
 		}
 	}
@@ -117,10 +106,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 			{
 				for(int i=0; i<pw.ncx; i++)
 				{
-					if(out_charge == 1 || out_charge == 0)
-						ifs >> zpiece[ i*pw.ncy + j ];
-					else if(out_charge == 2)
-						rws >> zpiece[ i*pw.ncy + j ];
+					ifs >> zpiece[ i*pw.ncy + j ];
 				}
 			}
 		}
@@ -129,10 +115,6 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	delete[] zpiece;
 #endif
 
-    if(MY_RANK==0) 
-	{
-		ifs.close();
-		rws.close();
-	}
+    if(MY_RANK==0) ifs.close();
     return true;
 }

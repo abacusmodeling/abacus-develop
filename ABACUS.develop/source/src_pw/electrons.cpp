@@ -339,7 +339,6 @@ void Electrons::self_consistent(const int &istep)
             WF_io::write_wfc2( ssw.str(), wf.evc, pw.gcar);
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
-
         if(vext == 0) 
 		{
 			pot.set_vr_eff();
