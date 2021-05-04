@@ -831,8 +831,6 @@ void LCAO_Orbitals::read_orb_file(
 			if (std::strcmp(word, "Element") == 0)
 			{
 				ifs >> orb_label;
-				int pos = this->orbital_file[it].find_last_of('/');
-				assert(orb_label == this->orbital_file[it].substr(pos + 1, orb_label.length()));
 				continue;
 			}
 			if (std::strcmp(word, "Lmax") == 0)
