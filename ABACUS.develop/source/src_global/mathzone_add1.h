@@ -175,23 +175,21 @@ public:
 		double* phind
 	);
 	
-	
-	
 	private:
-			const static int sph_lmax = 20;
-			static double** c_ln_c;
-			static double** c_ln_s;
-			static bool flag_jlx_expand_coef;
+	const static int sph_lmax = 20;
+	static double** c_ln_c;
+	static double** c_ln_s;
+	static bool flag_jlx_expand_coef;
 
-			static void expand_coef_jlx ();
-			static double pol_seg_int
-			(
-				const int& polint_order,
-				const double* coef,
-				const int& n,
-				const double* k,
-				const int& ik
-			);
+	static void expand_coef_jlx ();
+	static double pol_seg_int
+		(
+		 const int& polint_order,
+		 const double* coef,
+		 const int& n,
+		 const double* k,
+		 const int& ik
+		);
 };
 
 #endif
