@@ -16,8 +16,6 @@
 typedef fftw_complex FFTW_COMPLEX;
 
 //#include <unistd.h>
-//#include <fstream>
-//#include <string>
 #include <omp.h>
 
 bool Mathzone_Add1::flag_jlx_expand_coef = false;
@@ -1421,9 +1419,13 @@ void Mathzone_Add1::Uni_Deriv_Phi
 	for (int ir = 0; ir < mesh; ir++)
 	{
 		if (is_re)
+		{
 			phind[ir] = fac * c_re(fft_ndphir[ir]) / FFT_NR;
+		}
 		else
+		{
 			phind[ir] = fac * c_im(fft_ndphir[ir]) / FFT_NR;
+		}
 	}
 	
 	fftw_destroy_plan (p1);
@@ -1431,4 +1433,3 @@ void Mathzone_Add1::Uni_Deriv_Phi
 	
 	timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
 }
-

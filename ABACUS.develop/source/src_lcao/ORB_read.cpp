@@ -2,8 +2,6 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include <cassert>
 #include "../src_global/math_integral.h"
-//#include <math.h>
-//#include <cmath>
 #include <algorithm>
 using namespace std;
 
@@ -102,7 +100,6 @@ void LCAO_Orbitals::bcast_files(const int &ntype_in)
 #endif
 
 
-//#include "../src_pw/global.h"
 void LCAO_Orbitals::Read_Orbitals(
 	const int &ntype_in, 
 	const int &lmax_in,
