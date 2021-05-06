@@ -292,7 +292,12 @@ void Potential::v_of_rho
 //----------------------------------------------------------
 	
 	#ifdef USE_LIBXC
-    Potential_Libxc::v_xc(rho_in, H_XC_pw::etxc, H_XC_pw::vtxc, v_in);
+	H_XC_pw::etxc = 0.0;
+	H_XC_pw::vtxc = 0.0;
+    const auto etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, CHR.rho_core);
+	H_XC_pw::etxc += std::get<0>(etxc_vtxc_v);
+	H_XC_pw::vtxc += std::get<1>(etxc_vtxc_v);
+	v_in          += std::get<2>(etxc_vtxc_v);
 	#else
     H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, rho_in, CHR.rho_core, v_in);
 	#endif
@@ -300,7 +305,7 @@ void Potential::v_of_rho
 //----------------------------------------------------------
 //  calculate the Hartree potential
 //----------------------------------------------------------
-	H_Hartree_pw::v_hartree(ucell, pw, UFFT, NSPIN, v_in, rho_in);
+	v_in += H_Hartree_pw::v_hartree(ucell, pw, NSPIN, rho_in);
 
     // mohan add 2011-06-20
     if(EFIELD && DIPOLE)
