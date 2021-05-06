@@ -1,6 +1,31 @@
 # This is the Makefile of ABACUS-ORB API
 
-include Makefile.system
+CPLUSPLUS      = icpc
+CPLUSPLUS_MPI = icpc 
+FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+OBJ_DIR = obj
+NP      = 1
+
+HONG_FFTW        = -D__FFTW3
+FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+
+#==========================
+# LIBS and INCLUDES
+#==========================
+LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
+
+#==========================
+# OPTIMIZE OPTIONS
+#==========================
+INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
+
+OPTS     = ${INCLUDES} -Ofast -traceback -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+#OPTS_MPI = -cxx=${CPLUSPLUS}
+
+
+
 include Makefile.Objects
 
 VPATH=../../src_global\
@@ -10,7 +35,7 @@ VPATH=../../src_global\
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__NORMAL
+HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
 
 #==========================
 # OPTIMIZE OPTIONS

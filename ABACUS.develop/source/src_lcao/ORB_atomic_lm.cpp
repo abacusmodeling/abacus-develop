@@ -268,9 +268,6 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
 	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 2, ddpsi_uniform);
 
-
-
-
 	double* rad = new double[nr_uniform];
 	for (int ir = 0; ir < nr_uniform; ir++)
 	{
@@ -284,9 +281,15 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 
 	// calculate zty
 	// liaochen add 2010-08
-	if( FORCE )															// Peize Lin add if 2017-10-26
+	if( FORCE )	// Peize Lin add if 2017-10-26
 	{
-		Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(this->psi_uniform), this->nr_uniform, dr_uniform, angular_momentum_l, tmp);
+		Mathzone_Add1::Uni_Deriv_Phi (
+			VECTOR_TO_PTR(this->psi_uniform), 
+			this->nr_uniform, 
+			dr_uniform, 
+			angular_momentum_l, 
+			tmp);
+
 		this->zty = tmp[0]/Mathzone_Add1::factorial (angular_momentum_l);
 	}
 
@@ -329,7 +332,12 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 	}
 	
 	this->dpsi_uniform.resize(nr_uniform);
-	Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(psi_uniform), nr_uniform, dr_uniform, 1, VECTOR_TO_PTR(dpsi_uniform));
+
+	Mathzone_Add1::Uni_Deriv_Phi (
+		VECTOR_TO_PTR(psi_uniform), 
+		nr_uniform, dr_uniform, 
+		1, 
+		VECTOR_TO_PTR(dpsi_uniform));
 	
 	if(MY_RANK==0)
 	{

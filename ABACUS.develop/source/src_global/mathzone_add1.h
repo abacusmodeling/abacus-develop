@@ -1,16 +1,14 @@
-/************************************************************************
-LiaoChen add @ 2010/03/09 to add efficient functions in LCAO calculation
-************************************************************************/
-
 #ifndef MATHZONE_ADD1_H
 #define MATHZONE_ADD1_H
 
-#include "timer.h"
 #include <cmath>
 #include <cassert>
 
 using namespace std;
 
+/************************************************************************
+LiaoChen add @ 2010/03/09 to add efficient functions in LCAO calculation
+************************************************************************/
 class Mathzone_Add1
 {
 public:

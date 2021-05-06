@@ -12,24 +12,41 @@ Mathzone::~Mathzone()
 
 void Mathzone::norm_pw(complex<double> *u,const int n)
 {
-    if (n < 1) WARNING_QUIT("Mathzone::norm","n < 1");
+    if (n < 1) 
+	{
+		WARNING_QUIT("Mathzone::norm","n < 1");
+	}
+
     complex<double> rrc = ZERO;//complex < double> (0.0,0.0);
 
-    for (int i = 0;i < n;i++) rrc += conj(u[i]) * u[i];
+    for (int i = 0;i < n;i++) 
+	{
+		rrc += conj(u[i]) * u[i];
+	}
 
     Parallel_Reduce::reduce_complex_double_pool( rrc );
 
     double rr = rrc.real();
 
-    if (rr <= 1.e-20) WARNING_QUIT("Mathzone::norm","rr <= 1.e-20");
+    if (rr <= 1.e-20) 
+	{
+		WARNING_QUIT("Mathzone::norm","rr <= 1.e-20");
+	}
 
     rr = 1.0/sqrt(rr);
 
-    if (rr==1.0) return;
+    if (rr==1.0) 
+	{
+		return;
+	}
     else
     {
-        for (int i = 0;i < n;i++) u[i] *= rr;
+        for (int i = 0;i < n;i++) 
+		{
+			u[i] *= rr;
+		}
     }
+	return;
 }
 
 void Mathzone::Polynomial_Interpolation
@@ -274,7 +291,9 @@ void Mathzone::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp,
 
     if (x <= 0.0 || xnu < 0.0)
     {
-        WARNING_QUIT("Mathzone::BESSJY","bad arguments");
+		cout << "Mathzone::BESSJY, bad arguments" << endl;
+        //WARNING_QUIT("Mathzone::BESSJY","bad arguments");
+		exit(0); // mohan add 2021-05-06
     }
 
 
@@ -286,7 +305,11 @@ void Mathzone::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp,
     w = xi2 / PI;
     isign = 1;
     h = xnu * xi;
-    if (h < FPMIN) h = FPMIN;
+
+    if (h < FPMIN) 
+	{
+		h = FPMIN;
+	}
 
     b = xi2 * xnu;
 
@@ -316,7 +339,10 @@ void Mathzone::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp,
         if (fabs(del - 1.0) < EPS) break;
     }
 
-    if (i > MAXIT) cout << "x too large in bessjy; try asymptotic expansion" << endl;
+    if (i > MAXIT) 
+	{
+		cout << "x too large in bessjy; try asymptotic expansion" << endl;
+	}
 
     rjl = isign * FPMIN;
 
@@ -336,7 +362,10 @@ void Mathzone::BESSJY(double x, double xnu, double *rj, double *ry, double *rjp,
         rjl = rjtemp;
     }
 
-    if (rjl == 0.0) rjl = EPS;
+    if (rjl == 0.0) 
+	{
+		rjl = EPS;
+	}
 
     f = rjpl / rjl;
 
@@ -629,19 +658,22 @@ void Mathzone::Spherical_Bessel_Roots
     delete[] jl;
 }
 
-// from sph_bes.f90
+
 void Mathzone::Spherical_Bessel
 (
-    const int &msh,	//number of grid points
-    const double *r,//radial grid
-    const double &q,	//
-    const int &l,	//angular momentum
-    double *jl		//jl(1:msh) = j_l(q*r(i)),spherical bessel function
+    const int &msh,	 // number of grid points
+    const double *r, // radial grid
+    const double &q, // wave vector
+    const int &l,	 // angular momentum
+    double *jl		 // jl(1:msh) = j_l(q*r(i)),spherical bessel function
 )
 {
     timer::tick("Mathzone","Spherical_Bessel");
-    double x1;
-    int i, ir, ir0;
+    double x1=0.0;
+
+    int i=0;
+	int ir=0;
+	int ir0=0;
 
     if (l>=7)
     {
@@ -805,9 +837,10 @@ void Mathzone::Spherical_Bessel
         else
         {
             cout << "\n error in sph_bes, l out of {-1 ... 6},l = " << l ;
+			exit(0);
         }
     }
-//	printr1_d(ofs,"jl[] :",jl,msh);
+
     timer::tick("Mathzone","Spherical_Bessel");
     return;
 }

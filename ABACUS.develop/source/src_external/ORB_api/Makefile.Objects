@@ -34,3 +34,4 @@ sph_bessel_recursive-d1.o\
 sph_bessel_recursive-d2.o\
 title.o\
 timer.o\
+mathzone_add1.o\

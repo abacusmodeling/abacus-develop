@@ -5,7 +5,7 @@
 #include "ORB_nonlocal_lm.h"
 #include "../src_global/math_integral.h"
 #include "../src_global/global_function.h"
-#include "../src_global/mathzone.h" // use Polynomial_Interpolation_xy
+#include "../src_global/mathzone.h" // use Polynomial_Interpolation_xy, Spherical_Bessel
 #include "../src_global/mathzone_add1.h" // use SplineD2
 
 Numerical_Nonlocal_Lm::Numerical_Nonlocal_Lm()

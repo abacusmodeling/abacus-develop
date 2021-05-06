@@ -1,14 +1,18 @@
 #include "mathzone_add1.h"
-#include "../src_pw/tools.h"
+#include "timer.h"
+#include "mathzone.h"
+#include "global_variable.h"
+#include "constants.h"
+#include "global_function.h"
 
 #if defined __FFTW2
 #include "fftw.h"
 #elif defined __FFTW3
-#include "fftw3.h"
+#include "fftw3.h" // mohan update 2021-05-06
 #define c_re(c) ((c)[0])
 #define c_im(c) ((c)[1])
 #else
-#include <fftw3-mpi.h>
+#include <fftw3-mpi.h> 
 //#include "fftw3-mpi_mkl.h"
 #define c_re(c) ((c)[0])
 #define c_im(c) ((c)[1])
@@ -23,41 +27,22 @@ double** Mathzone_Add1::c_ln_c = nullptr;
 double** Mathzone_Add1::c_ln_s = nullptr;
 
 Mathzone_Add1::Mathzone_Add1()
-{
-	/*
-	//Lmax
-	const int L = Mathzone_Add1::sph_lmax;
-	
-	//allocation
-	delete[] c_ln_c;
-	delete[] c_ln_s;
-
-	c_ln_c = new double*[L+1];
-	c_ln_s = new double*[L+1];
-
-	for(int ir = 0; ir < L+1; ir++)
-	{
-		c_ln_c[ir] = new double[ir+1];
-		c_ln_s[ir] = new double[ir+1];
-	}
-	*/
-}
+{}
 
 Mathzone_Add1::~Mathzone_Add1()
 {}
+
 
 /**********************************************
  * coefficients to expand jlx using
  * cos and sin, from SIESTA
  * *******************************************/
-
 void Mathzone_Add1::expand_coef_jlx()
 {
 	timer::tick("Mathzone_Add1","expand_coef_jlx");
 
 	int ir, il, in;
 	const int L = 20;
-
 	
 	//allocation
 	delete[] c_ln_c;
@@ -81,9 +66,6 @@ void Mathzone_Add1::expand_coef_jlx()
 	c_ln_s[1][0] = 1.0;
 	c_ln_s[1][1] = 0.0;
 
-//	cout << "\nsph_lmax = " << Mathzone_Add1::sph_lmax << endl;
-//	QUIT();
-	
 	//recursive equation
 	for(il = 2; il < Mathzone_Add1::sph_lmax+1; il++)
 	{
@@ -108,14 +90,6 @@ void Mathzone_Add1::expand_coef_jlx()
 				c_ln_c[il][in] = (2*il-1)*c_ln_c[il-1][in];
 				c_ln_s[il][in] = (2*il-1)*c_ln_s[il-1][in];
 			}
-
-/*
-			if (il == 2)
-			{
-				cout << "\nin = " << in << " clnc = " << c_ln_c[il][in] << " clns = " << c_ln_s[il][in] << endl;
-				QUIT();
-			}
-*/
 		}
 	}
 
@@ -144,7 +118,6 @@ void Mathzone_Add1::Spherical_Bessel
 		flag_jlx_expand_coef = true;
 	}
 	
-//	QUIT ();
 	//epsilon
 	const double eps = 1.0E-10;
 	
@@ -171,7 +144,6 @@ void Mathzone_Add1::Spherical_Bessel
 			sjp[ir] = 0.0;
 		
 			double lqr = pow (qr, l);
-//			cout << "\nlqr = " << lqr << endl;
 			
 			//divided fac
 			double xqr = 1.0;
@@ -182,38 +154,16 @@ void Mathzone_Add1::Spherical_Bessel
 				double com2 = (c_ln_s[l][n] * cos(qr) - c_ln_c[l][n] * sin(qr)) * xqr * qr
 							+	(c_ln_s[l][n] * sin(qr) + c_ln_c[l][n] * cos(qr)) * n * xqr;
 				
-//				cout << "\nc1 = " << com1 << " c2 = " << com2 << endl;
-							
 				sj[ir] += com1;
 				sjp[ir] += (com2 - l*com1); 
 			
-			/*
-				if (fabs(qr - 1E-4) < eps && (l == 2))
-				{
-					cout << "com1 = " << com1 << " com2 = " << com2 << endl;
-					cout << "\nsj = " << sj[ir] << endl;
-				}
-			*/
-				
 				xqr *= qr;
 			}
 
 			sj[ir] /= lqr;
 			sj[ir] /= (lqr * qr);
-	
-/*	
-			if (fabs(sj[ir]) > 100)
-			{
-				cout << "\nsj = " << sj[ir] << " " << "sjp = " << sjp[ir] << endl;
-				cout << "\nl = " << l << endl << " qr = " << qr << endl;
-				cout << "\nlqr = " << lqr << endl;
-				QUIT();
-			}
-*/
 		}
 	}
-
-//	QUIT();
 
 	timer::tick ("Mathzone_Add1","Spherical_Bessel");
 	
@@ -232,8 +182,10 @@ double Mathzone_Add1::uni_simpson
 	
 	assert(mshr >= 3);
 	
-	int ir, idx, msh_left;
-	double sum = 0.0;;
+	int ir=0;
+	int idx=0;
+	int msh_left=0;
+	double sum = 0.0;
 	
 	//f(a)
 	sum += func[0];
@@ -245,7 +197,10 @@ double Mathzone_Add1::uni_simpson
 		sum += 9.0 / 8.0 * (func[mshr-1] + 3.0*(func[mshr-2] + func[mshr-3]) + func[mshr-4]);
 		msh_left = mshr - 3;
 	}
-	else msh_left = mshr;
+	else 
+	{
+		msh_left = mshr;
+	}
 	
 	//f(b)
 	sum += func[msh_left-1];
@@ -318,17 +273,6 @@ void Mathzone_Add1::uni_radfft
 	return;
 }
 
-/**********************************************************************
-  Spherical_Bessel.c:
-
-     Spherical_Bessel.c is a subroutine to calculate the spherical 
-     Bessel functions and its derivative from 0 to lmax
-
-  Log of Spherical_Bessel.c:
-
-     08/Nov/2005  Released by T.Ozaki
-
-***********************************************************************/
 void Mathzone_Add1::Sph_Bes (double x, int lmax, double *sb, double *dsb) 
 {
 	timer::tick("Mathzone_Add1","Spherical_Bessel");
@@ -339,7 +283,7 @@ void Mathzone_Add1::Sph_Bes (double x, int lmax, double *sb, double *dsb)
   	if (x < 0.0)
 	{
 		cout << "\nminus x is invalid for Spherical_Bessel" << endl;  
-  		QUIT();
+		exit(0); // mohan add 2021-05-06
 	}
 	 
   	const double xmin = 1E-10;
@@ -467,14 +411,7 @@ void Mathzone_Add1::Sbt_new
 )
 {
 	timer::tick ("Mathzone_Add1","Sbt_new");
-/*	
-	cout << "\nmshk = " << mshk << endl;
-	for (int ik = 0; ik < mshk; ik++)
-	{
-		cout << k[ik] << endl;
-	}
-	QUIT ();
-*/	
+
 	//check parameter
 	assert (mshr >= 1);
 	assert (l >= 0);
@@ -483,32 +420,22 @@ void Mathzone_Add1::Sbt_new
 	//step 0
 	//l is odd or even
 	bool parity_flag;
-	if (l % 2 == 0) parity_flag = true;
-	else parity_flag = false;
+	if (l % 2 == 0) 
+	{
+		parity_flag = true;
+	}
+	else 
+	{
+		parity_flag = false;
+	}
 	
-//	cout << "\nparity_flag = " << parity_flag << endl;
-/*
-	cout << "\nmshk = " << mshk << endl;
-	for (int ik = 0; ik < mshk; ik++)
-	{
-		cout << k[ik] << endl;
-	}
-	QUIT ();*/
-	//ZEROS
 	ZEROS (fk, mshk);
-	/*
-	cout << "\nmshk = " << mshk << endl;
-	for (int ik = 0; ik < mshk; ik++)
-	{
-		cout << k[ik] << endl;
-	}
-	QUIT ();
-	*/
 	
 	if (polint_order != 3)
 	{
 		cout << "\nhigh order interpolation is not available!" << endl;
-		QUIT ();
+		exit(0); // mohan add 2021-05-06
+		//QUIT();
 	}
 	
 	/**********************************
@@ -581,8 +508,6 @@ void Mathzone_Add1::Sbt_new
 			dft_save = dft1;
 		}
 		
-//		QUIT ();
-		
 		//store coefficients for calculation
 		double* coef = new double[n+1];
 		double fac = dualfac (l-1) / dualfac (l);
@@ -597,10 +522,6 @@ void Mathzone_Add1::Sbt_new
 		}
 		coef[n] = pow (-1.0, n) * dualfac (2*l-1) / factorial (l);
 
-		//test for coef
-//		for (int j = 0; j <= n; j++) cout << "j = " << j << " fac = " << coef[j] << endl;
-//		QUIT ();
-		
 		//start calc
 		//special case k = 0;
 		if (n ==0) fk[0] = uni_simpson (fr2, mshr, dr); 
@@ -617,8 +538,6 @@ void Mathzone_Add1::Sbt_new
 				double k2j = pow (k[ik], 2*j+1);
 
 				fk[ik] += coef[j] * Snm / k2j;
-			//	if (ik == 1) cout << " coef = " << coef[j] << " Snm = " << Snm << " k2j = " << k2j  << " Sdj = " << Snm / k2j << endl;
-				
 			}
 		}
 		//free
@@ -667,8 +586,6 @@ void Mathzone_Add1::Sbt_new
 			dft_save = dft1;
 		}
 		
-//		QUIT ();
-		
 		//store coefficients for calculation
 		double* coef = new double[n+1];
 		double fac = dualfac (l) / dualfac (l-1);
@@ -685,7 +602,6 @@ void Mathzone_Add1::Sbt_new
 //			cout << "\ncoef[j] = " << coef[j] << endl;
 		}
 		coef[n] = pow (-1.0, n) * dualfac (2*l-1) / factorial (l);
-//		QUIT ();
 		
 		//start calc
 		//special case k =0 ;
@@ -701,7 +617,6 @@ void Mathzone_Add1::Sbt_new
 				double k2j = pow(k[ik], 2*j+2);
 				
 				fk[ik] += coef[j] * Snm / k2j;
-		//		if (ik == 1) cout << " coef = " << coef[j] << " Snm = " << Snm << " k2j = " << k2j  << " Sdj = " << Snm / k2j << endl;
 			}
 		}
 		
@@ -946,7 +861,12 @@ double Mathzone_Add1::Polynomial_Interpolation
 			w = cn[i+1] - dn[i];
 
 			den = ho - hp;
-			if(den == 0.0) WARNING_QUIT("Mathzone_Add1::Polynomial_Interpolation","Two Xs are equal");
+			if(den == 0.0) 
+			{
+				cout << "Two Xs are equal" << endl;
+				// WARNING_QUIT("Mathzone_Add1::Polynomial_Interpolation","Two Xs are equal");
+				exit(0); // mohan update 2021-05-06
+			}
 			den = w / den;
 
 			dn[i] = hp * den;
@@ -1075,7 +995,13 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 		//}
 
 		const double h = rad[khi] - rad[klo];
-		if(h == 0.0) WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
+		if(h == 0.0) 
+		{
+			cout << "Cubic_Spline_Interpolation, h == 0.0 so that cannot be divided" << endl;
+			//WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
+			exit(0);
+		}
+
 		const double a = (rad[khi] - r[m]) / h;
 		const double b = (r[m] - rad[klo]) / h;
 		
