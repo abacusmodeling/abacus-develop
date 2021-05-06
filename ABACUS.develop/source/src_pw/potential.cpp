@@ -300,7 +300,7 @@ void Potential::v_of_rho
 //----------------------------------------------------------
 //  calculate the Hartree potential
 //----------------------------------------------------------
-	H_Hartree_pw::v_hartree(ucell, pw, UFFT, NSPIN, v_in, rho_in);
+	v_in += H_Hartree_pw::v_hartree(ucell, pw, NSPIN, rho_in);
 
     // mohan add 2011-06-20
     if(EFIELD && DIPOLE)
