@@ -1,5 +1,9 @@
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 #include "mathzone.h"
+#include "constants.h"
+#include "global_variable.h"
+#include "global_function.h"
+#include "timer.h"
 #include "../src_parallel/parallel_reduce.h"
 
 Mathzone::Mathzone()
@@ -107,8 +111,10 @@ double Mathzone::Polynomial_Interpolation
 		cout << "\n table_interval = " << table_interval;
 		cout << "\n iq=" << iq << " table_length = " << table_length << endl;
         cout << "\n Not enough space allocated for radial FFT: try restarting with a larger cell_factor" << endl; //LiuXh add 20180619
-        cout << "\n Now cell_factor is: " << ppcell.cell_factor << endl; //LiuXh add 20180619
+        //cout << "\n Now cell_factor is: " << ppcell.cell_factor << endl; //LiuXh add 20180619
+		// mohan comment out 2021-05-06
 	}
+
 	assert(iq < table_length-4);
     const double x0 = position - static_cast<double>(iq);
     const double x1 = 1.0 - x0;

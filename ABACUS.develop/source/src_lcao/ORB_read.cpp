@@ -343,7 +343,6 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			Coefficient_D_in_so, 
 			n_projectors, 
 			0, 
-			atom->lll, 
 			tmpBeta_lm, 
 			0);//LiuXh 2016-01-14, 2016-07-19
 	}
@@ -450,7 +449,6 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			Coefficient_D_in_so, 
 			n_projectors, 
 			nh, 
-			atom->lll, 
 			tmpBeta_lm, 
 			1);//zhengdy-soc 2018-09-10
 
@@ -702,7 +700,6 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		Coefficient_D_in_so, 
 		n_projectors, 
 		0, 
-		LfromBeta, 
 		tmpBeta_lm, 
 		ucell.atoms[it].has_so);
 		

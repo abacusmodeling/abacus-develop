@@ -7,7 +7,6 @@ Numerical_Nonlocal::Numerical_Nonlocal()
 	//question remains
 	this->type = 0;
 	this->lmax = 0;
-	this->LfromBeta = new int[1];
 	this->Proj = new Numerical_Nonlocal_Lm[1];
 	this->nproj = -1;
 	//zhengdy-soc, for optimize nonlocal part
@@ -18,7 +17,6 @@ Numerical_Nonlocal::Numerical_Nonlocal()
 Numerical_Nonlocal::~Numerical_Nonlocal()
 {
 	delete[] Proj;
-	delete[] LfromBeta;
 	for(int is=0;is<4;is++) delete[] this->index1_soc[is];
 	for(int is=0;is<4;is++) delete[] this->index2_soc[is];
 }
@@ -32,7 +30,6 @@ void Numerical_Nonlocal::set_type_info
 	ComplexMatrix& Coefficient_D_in_so,
 	const int& nproj_in,
 	const int& nproj_in_so,
-	int* LfromBeta_in,
 	const Numerical_Nonlocal_Lm* Proj_in,
 	const bool has_so
 )
@@ -50,9 +47,6 @@ void Numerical_Nonlocal::set_type_info
 
 	this->lmax = lmax_in;
 
-//----------------------------------------------------------
-//EXPLAIN : LfromBeta
-//----------------------------------------------------------
 	this->nproj = nproj_in;
 
 	if(has_so)
@@ -138,14 +132,6 @@ void Numerical_Nonlocal::set_type_info
 		}
 	}
 //2016-07-19 end, LiuXh
-
-	delete[] LfromBeta;
-	this->LfromBeta = new int[nproj];
-	ZEROS(LfromBeta, nproj);
-	for(int i=0; i<nproj; i++)
-	{
-		this->LfromBeta[i] = LfromBeta_in[i];
-	}
 
 //----------------------------------------------------------
 // EXPLAIN : non_local pseudopotential projector for each l

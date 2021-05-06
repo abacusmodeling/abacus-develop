@@ -297,7 +297,8 @@ void ORB_gen_tables::snap_psibeta(
 			continue;
 		}
 
-		const int L0 = ORB.Beta[T0].getL_Beta(nb);
+		//const int L0 = ORB.Beta[T0].getL_Beta(nb); // mohan delete the variable 2021-05-07
+		const int L0 = ORB.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
 		//const int next_ip = 2* L0 +1;
 
 		//-------------------------------------------------------------------

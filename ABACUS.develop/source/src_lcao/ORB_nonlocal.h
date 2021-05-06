@@ -21,9 +21,6 @@ public:
 	Numerical_Nonlocal();
 	~Numerical_Nonlocal();
 
-	// mohan add 2011-03-07
-	const int& getL_Beta(const int &nb){ return this->LfromBeta[nb]; }
-
 	const int& getLmax() const { return this->lmax; }
 
    	const int& getType() const { return this->type; }
@@ -52,7 +49,6 @@ public:
 			ComplexMatrix& Coefficient_D_in_so,
 			const int& nproj_in,
 			const int& nproj_in_so,
-			int* LfromBeta_in,
 			const Numerical_Nonlocal_Lm* ps_orbital_in,
 			const bool has_so);
 
@@ -75,8 +71,6 @@ public:
 	string type_ps; //local or nonlocal
 
 	int nproj;
-
-	int *LfromBeta;
 
 	// spin-orbital related
 	int nproj_soc; //dimension of D_ij^so

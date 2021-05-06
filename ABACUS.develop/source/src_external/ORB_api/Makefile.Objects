@@ -13,6 +13,7 @@ VERSION= ABACUS-ORB
 HEADERS= *.h
 
 OBJS_TRY=math_integral.o\
+math_sphbes.o\
 complexarray.o\
 complexmatrix.o\
 matrix.o\

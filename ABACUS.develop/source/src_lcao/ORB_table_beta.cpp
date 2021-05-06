@@ -262,7 +262,8 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 					// number of projectors.
 					for (int nb = 0; nb < NBeta; nb ++)
 					{
-						const int L2 = ORB.Beta[T2].getL_Beta(nb);
+						//const int L2 = ORB.Beta[T2].getL_Beta(nb); // mohan delete the variable 2021-05-07
+						const int L2 = ORB.Beta[T2].Proj[nb].getL(); // mohan add 2021-05-07
 
 						const double Rcut2 = ORB.Beta[T2].Proj[nb].getRcut();
 
