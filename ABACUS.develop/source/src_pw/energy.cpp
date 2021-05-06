@@ -93,6 +93,7 @@ void energy::calculate_etot(void)
 	cout << " ehart=" << H_Hartree_pw::hartree_energy << endl;
 	cout << " demet=" << demet << endl;
 	cout << " descf=" << descf << endl;
+	cout << " exx=" << exx << endl;
 	cout << " efiled=" << Efield::etotefield << endl;
 	cout << " fermienergy= "<<ef<<endl;
     if(INPUT.dft_plus_u) 
