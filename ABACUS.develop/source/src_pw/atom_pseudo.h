@@ -17,6 +17,11 @@ public:
 	double mass; // the mass of atom
 	bool flag_empty_element = false; // whether is the empty element for bsse.	Peize Lin add 2021.04.07
 
+	// mohan add 2021-05-07
+	ComplexArray d_so; //(:,:,:), spin-orbit case
+
+	void set_d_so(); // mohan add 2021-05-07
+	
 protected:
 
 	void print_atom(ofstream &ofs);

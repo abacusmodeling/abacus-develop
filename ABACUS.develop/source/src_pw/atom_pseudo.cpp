@@ -14,6 +14,13 @@ Atom_pseudo::~Atom_pseudo()
 	delete[] mbl;
 }
 
+// mohan add 2021-05-07
+void Atom_pseudo::set_d_so(void)
+{
+	
+
+}
+
 void Atom_pseudo::print_atom(ofstream &ofs)
 {
 	if(test_atom) TITLE("atom_pseudo","print_atom");
