@@ -1,6 +1,7 @@
 #include "wavefunc_in_pw.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
 
 void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_local)
 {
@@ -222,7 +223,7 @@ const double *rab, const int &l, double* table)
 	for (int iq=0; iq<NQX; iq++)
 	{
 		const double q = DQ * iq;
-		Mathzone::Spherical_Bessel(meshr, r, q, l, aux);
+		Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
 		for (int ir = 0;ir < meshr;ir++)
 		{
 			vchi[ir] = psir[ir] * aux[ir] * r[ir];

@@ -4,6 +4,7 @@
 #include "wavefunc.h"
 #include "../src_lcao/ORB_gen_tables.h"
 #include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -371,7 +372,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 			for (int iq=0; iq<NQX; iq++)  
 			{
 				const double q = iq * DQ;
-				Mathzone::Spherical_Bessel(kkbeta, cell.atoms[it].r, q, l, jl);
+				Sphbes::Spherical_Bessel(kkbeta, cell.atoms[it].r, q, l, jl);
 
 				for (int ir = 0;ir < kkbeta;ir++)
 				{
@@ -597,7 +598,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 				for (int iq = 0; iq < NQX; iq++)
 				{
 					const double q = iq * DQ;
-					Mathzone::Spherical_Bessel(kkbeta, ucell.atoms[it].r, q, L, jl);
+					Sphbes::Spherical_Bessel(kkbeta, ucell.atoms[it].r, q, L, jl);
 					
 					for (int ir = 0;ir < kkbeta;ir++)
 					{

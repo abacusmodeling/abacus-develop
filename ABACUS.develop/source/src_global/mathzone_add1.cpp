@@ -4,6 +4,7 @@
 #include "global_variable.h"
 #include "constants.h"
 #include "global_function.h"
+#include "math_sphbes.h"
 
 #if defined __FFTW2
 #include "fftw.h"
@@ -252,7 +253,7 @@ void Mathzone_Add1::uni_radfft
 	for (int ik = 0; ik < mshk; ik++)
 	{
 		//calculate spherical bessel
-		Mathzone::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
+		Sphbes::Spherical_Bessel(mshr, ri, arr_k[ik], aml, jl);
 		
 		//functions to be integrated
 		for (int ir = 0; ir < mshr; ir++)

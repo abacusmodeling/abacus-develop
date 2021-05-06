@@ -7,6 +7,7 @@
 #include "../src_global/global_function.h"
 #include "../src_global/mathzone.h" // use Polynomial_Interpolation_xy, Spherical_Bessel
 #include "../src_global/mathzone_add1.h" // use SplineD2
+#include "../src_global/math_sphbes.h" // mohan add 2021-05-06
 
 Numerical_Nonlocal_Lm::Numerical_Nonlocal_Lm()
 {
@@ -236,7 +237,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
 
     for (int ik = 0; ik < nk; ik++)
     {
-        Mathzone::Spherical_Bessel(
+        Sphbes::Spherical_Bessel(
                 this->nr,
                 this->r_radial,
                 this->k_radial[ik],

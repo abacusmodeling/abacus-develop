@@ -1,6 +1,7 @@
 #include "wf_atomic.h"
 #include "global.h"
 #include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
 
 WF_atomic::WF_atomic()
 {
@@ -113,7 +114,7 @@ void WF_atomic::init_at_1(void)
                 for (int iq=startq; iq<NQX; iq++)
                 {
                     const double q = DQ * iq;
-                    Mathzone::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
+                    Sphbes::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
                     for (int ir = 0;ir < atom->msh;ir++)
                     {
                         vchi[ir] = atom->chi(ic,ir) * aux[ir] * atom->r[ir];

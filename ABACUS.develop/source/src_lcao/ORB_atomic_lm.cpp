@@ -3,6 +3,7 @@
 #include "../src_global/lapack_connector.h"
 #include "../src_global/timer.h"
 #include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
 #include <omp.h>
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
@@ -389,7 +390,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	//integration directly
 	for (int ik = 0; ik < nk; ik++)
 	{
-		Mathzone::Spherical_Bessel(
+		Sphbes::Spherical_Bessel(
 				this->nr, 
 				VECTOR_TO_PTR(this->r_radial), 
 				this->k_radial[ik], 
