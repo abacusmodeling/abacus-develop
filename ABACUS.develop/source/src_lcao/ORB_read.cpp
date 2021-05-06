@@ -349,13 +349,13 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	else//added by zhengdy-soc
 	{
 		int lmaxkb = - 1;
-		for (int ibeta = 0; ibeta < ucell.atoms[it].nbeta; ibeta++)
+		for (int ibeta = 0; ibeta < atom->nbeta; ibeta++)
 		{
-			lmaxkb = max( lmaxkb, ucell.atoms[it].lll[ibeta]);
+			lmaxkb = max( lmaxkb, atom->lll[ibeta]);
 		}
 
 		soc.rot_ylm(lmaxkb);
-		soc.fcoef.create(ucell.ntype, ucell.atoms[it].nh, ucell.atoms[it].nh);
+		soc.fcoef.create(ucell.ntype, atom->nh, atom->nh);
 
 		int ip1=0;
 		for(int p1 = 0; p1<n_projectors; p1++)//nbeta
