@@ -26,7 +26,6 @@ public:
 	int *index2_soc[4];
 
 	void set_d_so( // mohan add 2021-05-07
-		const int &lmax_in,
 		ComplexMatrix &d_so_in,
 		const int &nproj_in,
 		const int &nproj_in_so,

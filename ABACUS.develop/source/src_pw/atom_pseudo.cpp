@@ -16,13 +16,12 @@ Atom_pseudo::~Atom_pseudo()
 
 // mohan add 2021-05-07
 void Atom_pseudo::set_d_so(
-	const int &lmax_in,
 	ComplexMatrix &d_so_in,
 	const int &nproj_in,
 	const int &nproj_in_so,
 	const bool has_so)
 {
-	if (lmax_in < -1 || lmax_in > 20)
+	if (this->lmax < -1 || this->lmax > 20)
 	{
 		 WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
 	}
@@ -56,7 +55,7 @@ void Atom_pseudo::set_d_so(
 			this->index2_soc[is] = new int[nproj_soc * nproj_soc];
 		}
 
-		if(lmax_in > -1)
+		if(this->lmax > -1)
 		{
 			if(LSPINORB)
 			{

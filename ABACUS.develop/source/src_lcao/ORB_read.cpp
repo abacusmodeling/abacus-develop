@@ -347,11 +347,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			tmpBeta_lm, 
 			0);//LiuXh 2016-01-14, 2016-07-19
 
-
-		//atom.set_d_so(Coefficient_D_in_so,n_projectors,0,tmpBeta_lm,0);
-		// LiuXh 2016-01-14, 2016-07-19
-
-
+		// mohan add 2021-05-07
+		atom->set_d_so(Coefficient_D_in_so,n_projectors,0,0);
 	}
 	else//added by zhengdy-soc
 	{
