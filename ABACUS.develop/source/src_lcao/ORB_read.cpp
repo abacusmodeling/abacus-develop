@@ -335,6 +335,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		// mohan comment out 2021-04-26
 		//WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		
 
+
 		// Peize Lin add 2019-01-23
 		this->Beta[it].set_type_info(it, 
 			atom->label, 
@@ -345,6 +346,12 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			0, 
 			tmpBeta_lm, 
 			0);//LiuXh 2016-01-14, 2016-07-19
+
+
+		//atom.set_d_so(Coefficient_D_in_so,n_projectors,0,tmpBeta_lm,0);
+		// LiuXh 2016-01-14, 2016-07-19
+
+
 	}
 	else//added by zhengdy-soc
 	{
