@@ -160,7 +160,8 @@ void WF_atomic::print_PAOs(void)const
             if (ic == 0)  orbital_type = "S";
             else if (ic == 1) orbital_type = "P";
             else if (ic == 2) orbital_type = "D";
-			else if (ic == 3) orbital_type = "F";//mohan add 2009-12-15
+			else if (ic == 3) orbital_type = "F"; // mohan add 2009-12-15
+			else if (ic == 4) orbital_type = "G"; // liuyu add 2021-05-07
             else
             {
 				ofs_warning << "\n nchi = " << ucell.atoms[it].nchi << endl;
