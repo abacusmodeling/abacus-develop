@@ -2,6 +2,7 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include <cassert>
 #include "../src_global/math_integral.h"
+#include "../src_global/tool_check.h"
 #include <algorithm>
 using namespace std;
 

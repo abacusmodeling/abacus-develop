@@ -579,38 +579,65 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 {
 	// dr must be all the same for Sph_Bessel_Recursive_Pool
 	const double dr = this->rab[0];
+
 	for( int ir=1; ir<this->nr; ++ir )
+	{
 		assert( dr == this->rab[ir] );
+	}
 
 	Sph_Bessel_Recursive::D2* pSB = nullptr;
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	{
 		if( dr * dk == sb.get_dx() )
 		{
 			pSB = &sb;
 			break;
 		}
+	}
+
 	if(!pSB)
 	{
 		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
 		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
+
 	pSB->set_dx( dr * dk );
 	pSB->cal_jlx( this->angular_momentum_l, this->nr, this->nk );
+
 	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	const double pref = sqrt(2.0/PI);
 
 	vector<double> k_tmp(nk);
+
 	for( int ik=0; ik!=nk; ++ik )
+	{
 		k_tmp[ik] = this->psik2[ik] * dk;
+	}
+
 	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
-	k_tmp[0]*=one_three;	k_tmp[nk-1]*=one_three;
+
+	k_tmp[0]*=one_three;	
+	k_tmp[nk-1]*=one_three;
+
 	for( int ik=1; ik!=nk-1; ++ik )
+	{
 		k_tmp[ik] *= (ik&1) ? four_three : two_three;
+	}
 
 	for( int ir = 0; ir!=nr; ++ir )
 	{
+#ifdef __NORMAL
+		// mohan add 2021-05-08, test needed
+		double kj_dot = 0.0;
+		for( int ik=0; ik<nk; ++ik)
+		{
+			kj_dot += k_tmp[ik]*jl[ir][ik];
+		}
+		this->psi[ir] = pref * kj_dot;
+#else
 		this->psi[ir] = pref * LapackConnector::dot( this->nk, VECTOR_TO_PTR(k_tmp), 1, VECTOR_TO_PTR(jl[ir]), 1 );
+#endif
 		this->psir[ir] = this->psi[ir] * r_radial[ir];
 	}
 }

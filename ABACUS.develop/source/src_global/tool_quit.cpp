@@ -1,4 +1,4 @@
-#include "quit.h"
+#include "tool_quit.h"
 
 #ifdef __NORMAL
 
