@@ -29,17 +29,6 @@ public:
 
 	const string& getType_ps() const { return this->type_ps; }
 
-//	const complex<double>& getCoefficient_D_so(const int& is, const int& L1, const int& L2) 
-//						const { return this->Coefficient_D_so(is, L1, L2); }
-
-//	const int& get_index1_soc(const int& is, const int& no)
-//						const { return this->index1_soc[is][no]; }
-
-//	const int& get_index2_soc(const int& is, const int& no)
-//						const { return this->index2_soc[is][no]; }
-
-//	const int& get_count_soc(const int& is)
-//						const { return this->non_zero_count_soc[is]; }
 
 	void set_type_info(
 			const int& type_in,
@@ -75,13 +64,6 @@ public:
 	// spin-orbital related
 	int nproj_soc; //dimension of D_ij^so
 
-	ComplexArray Coefficient_D_so;   //(:,:,:),  spin-orbit case,  added by zhengdy-soc
-
-	int non_zero_count_soc[4];
-
-	int *index1_soc[4];
- 
-	int *index2_soc[4];
 };
 
 #endif
