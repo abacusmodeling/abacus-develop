@@ -3,6 +3,7 @@
 #include "../src_global/math_integral.h" 
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h" 
+#include "../src_global/math_ylmreal.h" 
 
 toWannier90::toWannier90(int num_kpts, Matrix3 recip_lattice)
 {
@@ -776,7 +777,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 		gk[ig] = wf.get_1qvec_cartesian(ik, ig);  // k+GÊ¸Á¿
 	}
 	
-	Mathzone::Ylm_Real(total_lm, npw, gk, ylm);
+	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
 	
 	// test by jingan
 	//ofs_running << "the mathzone::ylm_real is successful!" << endl;

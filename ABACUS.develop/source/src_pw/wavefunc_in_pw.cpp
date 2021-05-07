@@ -3,6 +3,7 @@
 #include "../src_global/math_integral.h"
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
+#include "../src_global/math_ylmreal.h"
 
 void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_local)
 {
@@ -257,7 +258,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
 	}
 	
-	Mathzone::Ylm_Real(total_lm, npw, gk, ylm);
+	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
 
 	//int index = 0;
 	double *flq = new double[npw];
@@ -453,7 +454,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 		gkq[ig] = wf.get_1qvec_cartesian(ik, ig) + q;
 	}
 
-	Mathzone::Ylm_Real(total_lm, npw, gkq, ylm);
+	YlmReal::Ylm_Real(total_lm, npw, gkq, ylm);
 
 	//int index = 0;
 	double *flq = new double[npw];

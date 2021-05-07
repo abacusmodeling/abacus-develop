@@ -15,6 +15,7 @@ HEADERS= *.h
 OBJS_TRY=math_integral.o\
 math_sphbes.o\
 math_polyint.o\
+math_ylmreal.o\
 ylm.o\
 memory.o\
 complexarray.o\

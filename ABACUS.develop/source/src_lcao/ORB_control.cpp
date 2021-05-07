@@ -56,11 +56,15 @@ void ORB_control::set_orb_tables(
 		force_flag,
 		my_rank);
 
+#ifdef __NORMAL
+
+#else
 	if(CALCULATION=="test")
 	{
 		timer::tick("ORB_control","set_orb_tables",'B');
 		return;
 	}
+#endif
 
     //=============================================================================
     // (2) FUNCTION : Generate Gaunt_Coefficients and S-table using OGT.init

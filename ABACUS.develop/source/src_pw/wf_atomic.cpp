@@ -3,6 +3,7 @@
 #include "../src_global/math_integral.h"
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
+#include "../src_global/math_ylmreal.h"
 
 WF_atomic::WF_atomic()
 {
@@ -245,7 +246,7 @@ void WF_atomic::atomic_wfc
         gk[ig] = WF_atomic::get_1qvec_cartesian(ik, ig);
     }
     //ylm = spherical harmonics functions
-    Mathzone::Ylm_Real(total_lm, np, gk, ylm);
+    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
     int index = 0;
     //---------------------------------------------------------
     // Calculate G space 3D wave functions

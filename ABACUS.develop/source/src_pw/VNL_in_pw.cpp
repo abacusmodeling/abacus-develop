@@ -6,6 +6,7 @@
 #include "../src_global/math_integral.h"
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
+#include "../src_global/math_ylmreal.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -158,7 +159,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
 	}
 
-	Mathzone::Ylm_Real(x1, npw, gk, ylm);
+	YlmReal::Ylm_Real(x1, npw, gk, ylm);
 
 	int jkb = 0;
 	for(int it = 0;it < ucell.ntype;it++)
@@ -471,7 +472,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 		}
 	}
 	
-	Mathzone::Ylm_Real(x1, npw, gk, ylm);
+	YlmReal::Ylm_Real(x1, npw, gk, ylm);
 
 	MGT.init_Gaunt_CH( lmaxkb + 2 );
 	MGT.init_Gaunt( lmaxkb + 2 );
