@@ -2,6 +2,7 @@
 #include "../src_lcao/global_fp.h" // mohan add 2021-01-30, this module should be modified
 #include "../src_global/math_integral.h" 
 #include "../src_global/math_sphbes.h"
+#include "../src_global/math_polyint.h" 
 
 toWannier90::toWannier90(int num_kpts, Matrix3 recip_lattice)
 {
@@ -1352,7 +1353,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	// 从NQX个G点中插值法获得npw个G点的值
 	for(int ig = 0; ig < npw; ig++)
 	{
-		psik[ig] = Mathzone::Polynomial_Interpolation(psik_tem, NQX, DQ, gk[ig].norm() * ucell.tpiba);
+		psik[ig] = PolyInt::Polynomial_Interpolation(psik_tem, NQX, DQ, gk[ig].norm() * ucell.tpiba);
 	}
 	
 	

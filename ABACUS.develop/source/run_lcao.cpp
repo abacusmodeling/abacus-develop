@@ -47,6 +47,7 @@ void Run_lcao::lcao_line(void)
 	// * construct the interpolation tables.
 
 	hm.orb_con.set_orb_tables(
+		ofs_running,
 		UOT, 
 		ORB,
 		ucell.ntype,

@@ -1,4 +1,5 @@
-#include"stress_func.h"
+#include "stress_func.h"
+#include "../src_global/math_polyint.h"
 
 //calculate the nonlocal pseudopotential stress in PW
 void Stress_Func::stress_nl(matrix& sigma){
@@ -265,7 +266,7 @@ void Stress_Func::get_dvnl1
 				//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 				//cout << "\n gk.norm = " << gnorm;
 
-				vq [ig] = Mathzone::Polynomial_Interpolation(
+				vq [ig] = PolyInt::Polynomial_Interpolation(
 						ppcell.tab, it, nb, NQX, DQ, gnorm );
 
 			} // enddo

@@ -5,6 +5,7 @@
 #include "../src_lcao/ORB_gen_tables.h"
 #include "../src_global/math_integral.h"
 #include "../src_global/math_sphbes.h"
+#include "../src_global/math_polyint.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -175,7 +176,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 			{
 				const double gnorm = gk[ig].norm() * ucell.tpiba;
 
-				vq [ig] = Mathzone::Polynomial_Interpolation(
+				vq [ig] = PolyInt::Polynomial_Interpolation(
 						this->tab, it, nb, NQX, DQ, gnorm );
 			}
 
@@ -502,7 +503,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 				for (ig = 0;ig < npw;ig++)
 				{
 					const double gnorm = gk[ig].norm() * ucell.tpiba;
-					vq [ig] = Mathzone::Polynomial_Interpolation(
+					vq [ig] = PolyInt::Polynomial_Interpolation(
 							this->tab_alpha, it, nb, L, NQX, DQ, gnorm);
 					
 					for (int M=0; M<2*L+1; M++)

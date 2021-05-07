@@ -79,8 +79,9 @@ memory.o\
 print_info.o\
 mathzone.o\
 math_sphbes.o\
-mathzone_add1.o\
+math_polyint.o\
 math_integral.o\
+mathzone_add1.o\
 integral.o \
 poission.o \
 polint.o \

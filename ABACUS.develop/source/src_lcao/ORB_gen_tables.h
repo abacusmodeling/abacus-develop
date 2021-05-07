@@ -23,6 +23,7 @@ class ORB_gen_tables
 	~ORB_gen_tables();
 
 	void gen_tables( 
+		ofstream &ofs_in, // mohan add 2021-05-07
 		const int &job0, 
 		LCAO_Orbitals &orb,
 		const int &Lmax_exx,

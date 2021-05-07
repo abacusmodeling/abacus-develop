@@ -14,9 +14,14 @@ HEADERS= *.h
 
 OBJS_TRY=math_integral.o\
 math_sphbes.o\
+math_polyint.o\
+ylm.o\
+memory.o\
 complexarray.o\
 complexmatrix.o\
 matrix.o\
+realarray.o\
+intarray.o\
 
 OBJS_ORBITAL=ORB_control.o\
 ORB_read.o\
@@ -34,5 +39,6 @@ OBJS_GLOBAL=sph_bessel.o\
 sph_bessel_recursive-d1.o\
 sph_bessel_recursive-d2.o\
 title.o\
+quit.o\
 timer.o\
 mathzone_add1.o\

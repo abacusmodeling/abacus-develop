@@ -2,6 +2,7 @@
 #include "global.h"
 #include "../src_global/math_integral.h"
 #include "../src_global/math_sphbes.h"
+#include "../src_global/math_polyint.h"
 
 WF_atomic::WF_atomic()
 {
@@ -276,7 +277,7 @@ void WF_atomic::atomic_wfc
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] =
-                            Mathzone::Polynomial_Interpolation(table_q,
+                            PolyInt::Polynomial_Interpolation(table_q,
                                                                it, iw, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
                     }
 
@@ -344,7 +345,7 @@ void WF_atomic::atomic_wfc
                                  for(int ig=0;ig<np;ig++)
                                  {//Average the two functions
                                     chiaux[ig] =  l * 
-                                         Mathzone::Polynomial_Interpolation(table_q,
+                                         PolyInt::Polynomial_Interpolation(table_q,
                                                                it, nc, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
 
                                     chiaux[ig] += flq[ig] * (l+1.0) ;

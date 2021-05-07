@@ -169,6 +169,7 @@ void Mulliken_Charge::cal_mulliken(void)
 
 			// 2021-04-16
 			hm.orb_con.set_orb_tables(
+					ofs_running,
 					UOT, 
 					ORB,
 					ucell.ntype,

@@ -1,6 +1,7 @@
 #include "ORB_read.h"
 #include "ORB_gen_tables.h"
 #include "../src_global/ylm.h"
+#include "../src_global/math_polyint.h"
 
 // here is a member of ORB_gen_tables class
 ORB_gen_tables UOT;
@@ -10,6 +11,7 @@ ORB_gen_tables::~ORB_gen_tables() {}
 
 // call in hamilt_linear::init_before_ions.
 void ORB_gen_tables::gen_tables(
+	ofstream &ofs_in,
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,
@@ -18,7 +20,7 @@ void ORB_gen_tables::gen_tables(
 	TITLE("ORB_gen_tables", "gen_tables");
 	timer::tick("ORB_gen_tables", "gen_tables", 'C');
 
-	ofs_running << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
+	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
 
 	//=========================================
 	// (1) MOT: make overlap table.
@@ -698,7 +700,7 @@ void ORB_gen_tables::snap_psipsi(
 
 			if (distance > tiny2)
 			{
-				Interp_Slm = i_exp * Mathzone::Polynomial_Interpolation(
+				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
 										 MOT.Table_SR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Slm /= rl;
 			}
@@ -711,7 +713,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dSlm = i_exp * Mathzone::Polynomial_Interpolation(
+					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
 											  MOT.Table_SR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 				}
@@ -799,7 +801,7 @@ void ORB_gen_tables::snap_psipsi(
 			double rl = pow(distance, L);
 			if (distance > tiny2)
 			{
-				Interp_Tlm = i_exp * Mathzone::Polynomial_Interpolation(
+				Interp_Tlm = i_exp * PolyInt::Polynomial_Interpolation(
 										 MOT.Table_TR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Tlm /= rl;
 			}
@@ -810,7 +812,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dTlm = i_exp * Mathzone::Polynomial_Interpolation(
+					Interp_dTlm = i_exp * PolyInt::Polynomial_Interpolation(
 											  MOT.Table_TR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dTlm = Interp_dTlm / rl - Interp_Tlm * L / distance;
 				}
@@ -997,7 +999,7 @@ void ORB_gen_tables::snap_psialpha(
 
 		if (distance > tiny2)
 		{
-			Interp_Slm = i_exp * Mathzone::Polynomial_Interpolation(
+			Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
 									 talpha.Table_DSR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 			Interp_Slm /= rl;
 		}
@@ -1010,7 +1012,7 @@ void ORB_gen_tables::snap_psialpha(
 		{
 			if (distance > tiny2)
 			{
-				Interp_dSlm = i_exp * Mathzone::Polynomial_Interpolation(
+				Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
 										  talpha.Table_DSR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 			}

@@ -2,6 +2,7 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include "../src_global/math_integral.h"
 #include "../src_global/math_sphbes.h"
+#include "../src_global/math_polyint.h"
 
 void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_local)
 {
@@ -276,7 +277,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 					
 					for(int ig=0; ig<npw; ig++)
 					{
-						flq[ig] = Mathzone::Polynomial_Interpolation(table_local,
+						flq[ig] = PolyInt::Polynomial_Interpolation(table_local,
 						it, ic, NQX, DQ, gk[ig].norm() * ucell.tpiba );
 					}
 
@@ -335,7 +336,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 										for(int ig=0;ig<npw;ig++)
 										{//Average the two functions
 											chiaux[ig] =  L * 
-												Mathzone::Polynomial_Interpolation(table_local,
+												PolyInt::Polynomial_Interpolation(table_local,
 												it, ic, NQX, DQ, gk[ig].norm() * ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;
@@ -476,7 +477,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 						}
 						else
 						{
-						   flq[ig] = Mathzone::Polynomial_Interpolation(table_local, it, ic, NQX, DQ, gkq[ig].norm() * ucell.tpiba );
+						   flq[ig] = PolyInt::Polynomial_Interpolation(table_local, it, ic, NQX, DQ, gkq[ig].norm() * ucell.tpiba );
 						}
 					}
 
@@ -548,7 +549,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
                                  for(int ig=0;ig<npw;ig++)
                                  {//Average the two functions
                                     chiaux[ig] =  L * 
-                                         Mathzone::Polynomial_Interpolation(table_local,
+                                         PolyInt::Polynomial_Interpolation(table_local,
                                                                it, ic, NQX, DQ, gkq[ig].norm() * ucell.tpiba );
 
                                     chiaux[ig] += flq[ig] * (L+1.0) ;
