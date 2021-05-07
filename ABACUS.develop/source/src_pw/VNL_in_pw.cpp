@@ -2,7 +2,7 @@
 #include "VNL_in_pw.h"
 #include "tools.h"
 #include "wavefunc.h"
-#include "../src_lcao/ORB_gen_tables.h"
+#include "../module_ORB/ORB_gen_tables.h"
 #include "../src_global/math_integral.h"
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"

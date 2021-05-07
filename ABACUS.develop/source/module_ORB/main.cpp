@@ -1,10 +1,15 @@
 //#include "timer.h"
 #include <ctime>
+#include "ORB_control.h"
 
 void calculate();
 
 int main(int argc, char **argv)
 {
+
+	cout << "Hello, this is the ORB module of ABACUS." << endl;
+
+	cout << "Right now, the module is still empty, soon we will have more tests." << endl;
 
     calculate();
 
@@ -14,6 +19,18 @@ int main(int argc, char **argv)
 
 void calculate()
 {
+	ORB_control ooo;
+
+	ofstream ofs("log.txt");
+
+//	ooo.set_orb_tables();
+
+	ofs.close();
+
+	cout << "--------------------" << endl;
+	cout << " Have a great day! " << endl;
+	cout << "--------------------" << endl;
+
 /*
 	time_t time_start = std::time(NULL);
 

@@ -28,8 +28,7 @@ OPTS     = ${INCLUDES} -Ofast -traceback -std=c++11 -simd -march=native -xHost -
 
 include Makefile.Objects
 
-VPATH=../../src_global\
-:../../src_lcao\
+VPATH=../src_global\
 :./\
 
 #==========================

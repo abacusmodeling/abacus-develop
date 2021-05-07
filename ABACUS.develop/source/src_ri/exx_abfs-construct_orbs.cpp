@@ -1,7 +1,7 @@
 #include "exx_abfs-construct_orbs.h"
 #include "exx_abfs-pca.h"
 
-#include "src_lcao/ORB_read.h"
+#include "module_ORB/ORB_read.h"
 #include "src_global/gram_schmidt_orth.h"
 #include "src_global/gram_schmidt_orth-inl.h"
 
