@@ -24,8 +24,6 @@ INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
 OPTS     = ${INCLUDES} -Ofast -traceback -std=c++11 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
 #OPTS_MPI = -cxx=${CPLUSPLUS}
 
-
-
 include Makefile.Objects
 
 VPATH=../src_global\
@@ -49,8 +47,7 @@ OPTS_GDB = -g -W
 #main.o\
 
 FP_OBJS_0=main.o\
-$(OBJS_TRY)\
-$(OBJS_GLOBAL)\
+$(OBJS_BASE)\
 $(OBJS_ORBITAL)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
@@ -67,7 +64,6 @@ fp_mpi :
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
-	@ if [ ! -d ../bin ]; then mkdir ../bin; fi
 
 serial : ${FP_OBJS} ${HEADERS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
