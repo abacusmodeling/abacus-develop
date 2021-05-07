@@ -89,9 +89,13 @@ void Numerical_Nonlocal::set_type_info
 							{
 								this->Coefficient_D_so(is, L1, L2) = 
 									Coefficient_D_in_so(L1 + nproj_soc*is1, L2 + nproj_soc*is2);
+
+
 								if(fabs(this->Coefficient_D_so(is, L1, L2).real())>1.0e-8 || 
 									fabs(this->Coefficient_D_so(is, L1, L2).imag())>1.0e-8 )
 								{
+			//					cout << "tt in nonl is=" << is << " L1=" << L1 << " L2=" 
+		//						<< L2 << " " << Coefficient_D_so(is, L1, L2) << endl;
 									this->index1_soc[is][non_zero_count_soc[is]] = L1;
 									this->index2_soc[is][non_zero_count_soc[is]] = L2;
 									this->non_zero_count_soc[is]++;	

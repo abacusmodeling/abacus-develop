@@ -28,10 +28,6 @@ LCAO_Orbitals::LCAO_Orbitals()
 
 LCAO_Orbitals::~LCAO_Orbitals()
 {
-	if(test_deconstructor)
-	{
-		cout << " ~LCAO_Orbitals()" << endl;
-	}
 	delete[] Phi;
 	delete[] Beta;
 	delete[] Alpha;
@@ -455,6 +451,9 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			nh, 
 			tmpBeta_lm, 
 			1);//zhengdy-soc 2018-09-10
+
+		// mohan add 2021-05-07
+		atom->set_d_so(Coefficient_D_in_so,n_projectors,nh,1);
 
 	}//end if
 
