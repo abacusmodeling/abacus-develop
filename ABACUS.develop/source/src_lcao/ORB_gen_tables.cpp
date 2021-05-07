@@ -125,6 +125,7 @@ void ORB_gen_tables::snap_psibeta(
 	const Vector3<double> &R0, // The projector.
 	const int &T0,
 	const matrix &dion, // mohan add 2021-04-25
+	const int &nspin,
 	const ComplexArray &d_so, // mohan add 2021-05-07
 	const int &count_soc, // mohan add 2021-05-07
 	int* index1_soc, // mohan add 2021-05-07
@@ -136,7 +137,7 @@ void ORB_gen_tables::snap_psibeta(
 	//TITLE ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
-	if (NSPIN == 4 && count_soc == 0)
+	if (nspin == 4 && count_soc == 0)
 	{
 		return;
 	}
@@ -527,11 +528,11 @@ void ORB_gen_tables::snap_psibeta(
 				{
 					const int p1 = index1_soc[no];
 					const int p2 = index2_soc[no]; 
-					if (NSPIN == 4 && nlm1 != NULL)
+					if (nspin == 4 && nlm1 != NULL)
 					{
 						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * d_so(is, p2, p1);
 					}
-					else if (NSPIN != 4)
+					else if (nspin != 4)
 					{
 						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * d_so(0, p2, p1)).real();
 					}
@@ -572,6 +573,7 @@ void ORB_gen_tables::snap_psipsi(
 	const int &L2,
 	const int &m2,
 	const int &N2,
+	const int &nspin,
 	complex<double> *olm1) const
 {
 	//TITLE("ORB_gen_tables","snap_psipsi");
@@ -592,9 +594,13 @@ void ORB_gen_tables::snap_psipsi(
 	const double Rcut2 = ORB.Phi[T2].getRcut();
 
 	if (job == 0)
+	{
 		ZEROS(olm, 1);
+	}
 	else if (job == 1)
+	{
 		ZEROS(olm, 3);
+	}
 
 	if (distance > (Rcut1 + Rcut2))
 		return;
@@ -732,8 +738,10 @@ void ORB_gen_tables::snap_psipsi(
 				{
 				case 0: // calculate overlap.
 				{
-					if (NSPIN != 4)
+					if (nspin != 4)
+					{
 						olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
+					}
 					else if (olm1 != NULL)
 					{
 						olm1[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
@@ -761,7 +769,8 @@ void ORB_gen_tables::snap_psipsi(
 				{
 					for (int ir = 0; ir < 3; ir++)
 					{
-						olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] + tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
+						olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] 
+						+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
 					}
 					break;
 				}
@@ -825,8 +834,10 @@ void ORB_gen_tables::snap_psipsi(
 				{
 				case 0:
 				{
-					if (NSPIN != 4)
+					if (nspin != 4)
+					{
 						olm[0] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
+					}
 					else if (olm1 != NULL)
 					{
 						olm1[0] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
@@ -898,12 +909,19 @@ void ORB_gen_tables::snap_psialpha(
 	const double Rcut2 = ORB.Alpha[0].getRcut();
 
 	if (job == 0)
+	{
 		ZEROS(olm, 1);
+	}
+
 	else if (job == 1)
+	{
 		ZEROS(olm, 3);
+	}
 
 	if (distance > (Rcut1 + Rcut2))
+	{
 		return;
+	}
 
 	//if distance == 0
 	//\int psi(r) psi(r-R) dr independent of R if R == 0
@@ -911,7 +929,9 @@ void ORB_gen_tables::snap_psialpha(
 	const double tiny1 = 1e-12;
 	const double tiny2 = 1e-10;
 	if (distance < tiny1)
+	{
 		distance += tiny1;
+	}
 
 	// (2) if there exist overlap, calculate the mesh number
 	// between two atoms
@@ -1017,8 +1037,11 @@ void ORB_gen_tables::snap_psialpha(
 			{
 			case 0: // calculate overlap.
 			{
-				if (NSPIN != 4)
+				int nspin = 1; // mohan add 2021-05-07, currently deepks works only for nspin=1
+				if (nspin != 4)
+				{
 					olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
+				}
 				else
 				{
 					WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with NSPIN>1 has not implemented yet!");
@@ -1038,7 +1061,8 @@ void ORB_gen_tables::snap_psialpha(
 			{
 				for (int ir = 0; ir < 3; ir++)
 				{
-					olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] + tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
+					olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] 
+					+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
 				}
 				break;
 			}

@@ -829,7 +829,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											atom1->iw2l[ j ], // L1
 											atom1->iw2m[ j ], // m1
 											atom1->iw2n[ j ], // N1
-											tau0, T0, ucell.atoms[T0].dion,
+											tau0, T0, ucell.atoms[T0].dion, NSPIN,
 											ucell.atoms[T0].d_so,
 											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 											ucell.atoms[T0].index1_soc[0],
@@ -852,7 +852,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											atom2->iw2l[ k ], // L2
 											atom2->iw2m[ k ], // m2
 											atom2->iw2n[ k ], // N2
-											tau0, T0, ucell.atoms[T0].dion,
+											tau0, T0, ucell.atoms[T0].dion, NSPIN,
 											ucell.atoms[T0].d_so,
 											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 											ucell.atoms[T0].index1_soc[0],

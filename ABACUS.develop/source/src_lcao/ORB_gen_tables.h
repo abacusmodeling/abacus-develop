@@ -44,6 +44,7 @@ class ORB_gen_tables
     	const int &l2,
     	const int &m2,
 		const int &n2,
+		const int &nspin,
 		complex<double> *olm1=NULL)const;
 		
 	//job = 0 for vnl matrix elements
@@ -64,6 +65,7 @@ class ORB_gen_tables
 		const Vector3<double> &Rnl,
 		const int &type,
 		const matrix &dion, // mohan add 2021-04-25
+		const int &nspin, // mohan add 2021-05-07
 		const ComplexArray &d_so, // mohan add 2021-04-25
 		const int &count_soc, // mohan add 2021-05-07
 		int* index1_soc, // mohan add 2021-05-07

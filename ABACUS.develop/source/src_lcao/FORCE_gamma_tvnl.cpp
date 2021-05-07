@@ -149,7 +149,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                             atom2->iw2l[kk], // L1
                             atom2->iw2m[kk], // m1
                             atom2->iw2n[kk], // n1
-                            tau0, it, ucell.atoms[it].dion,
+                            tau0, it, ucell.atoms[it].dion, NSPIN,
 							ucell.atoms[it].d_so,
 							ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 							ucell.atoms[it].index1_soc[0],
@@ -171,7 +171,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                                 atom1->iw2l[jj], // L1
                                 atom1->iw2m[jj], // m1
                                 atom1->iw2n[jj], // n1
-                                tau0, it, ucell.atoms[it].dion,
+                                tau0, it, ucell.atoms[it].dion, NSPIN,
 								ucell.atoms[it].d_so,
 								ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 								ucell.atoms[it].index1_soc[0],
@@ -376,7 +376,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                                         atom2->iw2l[kk], // L1
                                         atom2->iw2m[kk], // m1
                                         atom2->iw2n[kk], // n1
-										tau0, it, ucell.atoms[it].dion,
+										tau0, it, ucell.atoms[it].dion, NSPIN,
 										ucell.atoms[it].d_so,
 										ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 										ucell.atoms[it].index1_soc[0],
@@ -395,7 +395,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                                                    atom1->iw2l[jj], // L1
                                                    atom1->iw2m[jj], // m1
                                                    atom1->iw2n[jj], // n1
-                                                   tau0, it, ucell.atoms[it].dion,
+                                                   tau0, it, ucell.atoms[it].dion, NSPIN,
 												   ucell.atoms[it].d_so,
 												   ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 												   ucell.atoms[it].index1_soc[0],
