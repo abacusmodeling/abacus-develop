@@ -100,9 +100,13 @@ void Numerical_Orbital_Lm::set_orbital_info
 		case Psi_Type::Psik:
 		case Psi_Type::Psik2:
 			if( flag_sbpool )
-				this->cal_rradial_sbpool();
+			{
+			 	this->cal_rradial_sbpool();
+			}
 			else
+			{
 				throw domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			}
 			break;
 		default:	break;
 	}
@@ -126,16 +130,23 @@ void Numerical_Orbital_Lm::set_orbital_info
 	{
 		case Psi_Type::Psi:
 			if( flag_sbpool )
-				this->cal_kradial_sbpool();
+			{
+			 	this->cal_kradial_sbpool();
+			}
 			else
+			{
 				this->cal_kradial();
+			}
 			break;
 		default:	break;
 	}
 
 //	this->norm_test();						// Peize Lin delete 2016-08-31
 	if( flag_plot )
+	{
 		this->plot();			// Peize Lin add flag_plot 2016-08-31
+	}
+	return;
 }
 
 void Numerical_Orbital_Lm::copy_parameter(
@@ -315,17 +326,29 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 	string orbital_type; 
 	// Peize Lin update 2016-08-31
 	if( 0==this->angular_momentum_l )
+	{
 		orbital_type = 's';
+	}
 	else if( 1==this->angular_momentum_l )
+	{
 		orbital_type = 'p';
+	}
 	else if( 2==this->angular_momentum_l )
+	{
 		orbital_type = 'd';
+	}
 	else if( 3<=this->angular_momentum_l && this->angular_momentum_l<=6 )
+	{
 		orbital_type = 'f'+this->angular_momentum_l-3;
+	}
 	else if( 7<=this->angular_momentum_l && this->angular_momentum_l<=11 )
+	{
 		orbital_type = 'k'+this->angular_momentum_l-7;
+	}
 	else
+	{
 		orbital_type = "L" + TO_STRING(this->angular_momentum_l);
+	}
 		
 	cout << "===========================================================" << endl;
 	for(int i=0; i<nr_uniform; i++)
@@ -341,7 +364,10 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 		nr_uniform, dr_uniform, 
 		1, 
 		VECTOR_TO_PTR(dpsi_uniform));
-	
+
+#ifdef __NORMAL
+
+#else	
 	if(MY_RANK==0)
 	{
 		stringstream ss;
@@ -356,6 +382,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 		}
 		ofs.close();
 	}
+#endif
 
 	return;
 }
@@ -632,18 +659,34 @@ void Numerical_Orbital_Lm::plot(void)const
 	string orbital_type;
 	// Peize Lin update 2016-08-31
 	if( 0==this->angular_momentum_l )
+	{
 		orbital_type = 's';
+	}
 	else if( 1==this->angular_momentum_l )
+	{
 		orbital_type = 'p';
+	}
 	else if( 2==this->angular_momentum_l )
+	{
 		orbital_type = 'd';
+	}
 	else if( 3<=this->angular_momentum_l && this->angular_momentum_l<=6 )
+	{
 		orbital_type = 'f' + this->angular_momentum_l - 3;
+	}
 	else if( 7<=this->angular_momentum_l && this->angular_momentum_l<=11 )
+	{
 		orbital_type = 'k' + this->angular_momentum_l - 7;
+	}
 	else
+	{
 		orbital_type = "L" + TO_STRING(this->angular_momentum_l);	
+	}
 
+
+#ifdef __NORMAL
+
+#else
 	if(MY_RANK==0)
 	{
 		stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
@@ -688,12 +731,12 @@ void Numerical_Orbital_Lm::plot(void)const
 		{
 			ofsdru << this->dr_uniform * i << " " << dpsi_uniform[i] << endl;// output dphi/dr 2013-08-10  pengfei
 		}
-
-
 		ofsr.close();
 		ofsk.close();
 		ofsru.close();
 		ofsdru.close(); // 13-08-10 pengfei
 	}
+
+#endif
 	return;
 }

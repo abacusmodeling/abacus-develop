@@ -278,6 +278,9 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		default: WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
 	}
 
+#ifdef __NORMAL
+
+#else
 	if(my_rank==0)
 	{
 		stringstream ssr, ssk, ssru;
@@ -318,5 +321,6 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		ofsk.close();
 		ofsru.close();
 	}
+#endif
 	return;
 }
