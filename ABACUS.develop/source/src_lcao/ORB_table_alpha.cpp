@@ -432,7 +432,7 @@ void ORB_table_alpha::print_Table_DSR(void)
 					for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						const int Opair = this->DS_Opair(T1, L1, L2, N1, N2);	//Opair
-						//ofs <<setw(20)<< "atom_type: " << ucell.atoms[T1].label << endl;
+						//ofs <<setw(20)<< "atom_type: " << label << endl;
 						ofs <<setw(20)<< "lcao basis: " << "L1=" << L1 << ", N1=" << N1 << endl;
 						ofs <<setw(20)<< "descriptor basis: " << "L2=" << L2 << ", N2=" << N2 << endl;
 						for (int il = 0; il < this-> DS_2Lplus1[T1]; il++)

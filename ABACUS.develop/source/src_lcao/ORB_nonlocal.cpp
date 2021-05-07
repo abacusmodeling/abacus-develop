@@ -23,11 +23,8 @@ void Numerical_Nonlocal::set_type_info
 	const string& label_in,
 	const string& type_ps_in,
 	const int& lmax_in,
-	ComplexMatrix& Coefficient_D_in_so,
 	const int& nproj_in,
-	const int& nproj_in_so,
-	const Numerical_Nonlocal_Lm* Proj_in,
-	const bool has_so
+	const Numerical_Nonlocal_Lm* Proj_in
 )
 {
 	//TITLE("Numerical_Nonlocal","set_type_info");
@@ -45,12 +42,6 @@ void Numerical_Nonlocal::set_type_info
 
 	this->nproj = nproj_in;
 
-	if(has_so)
-	{ 
-		this->nproj_soc = nproj_in_so;
-	}
-
-	assert(nproj <= nproj_in+1); //LiuXh 2016-01-13, 2016-05-16
 	assert(nproj >= 0);
 
 //----------------------------------------------------------

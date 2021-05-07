@@ -33,9 +33,9 @@ void Atom_pseudo::set_d_so(
 		 WARNING_QUIT("Numerical_Nonlocal", "bad input of lmax : should be between -1 and 20");
 	}
 
-	const int nproj = nproj_in;
+	this->nproj = nproj_in;
+	this->nproj_soc=0;
 
-	int nproj_soc=0;
 	if(has_so)
 	{
 		nproj_soc = nproj_in_so;
@@ -54,8 +54,6 @@ void Atom_pseudo::set_d_so(
 	else //zhengdy-soc
 	{
 		this->d_so.create(NSPIN,  nproj_soc+1,  nproj_soc+1);
-//		cout << "nproj_soc=" << nproj_soc << endl;
- 
 
 		// optimize
 		for(int is=0;is<4;is++)

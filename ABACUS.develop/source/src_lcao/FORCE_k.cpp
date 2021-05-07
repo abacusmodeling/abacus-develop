@@ -833,7 +833,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											ucell.atoms[T0].d_so,
 											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 											ucell.atoms[T0].index1_soc[0],
-											ucell.atoms[T0].index2_soc[0]
+											ucell.atoms[T0].index2_soc[0],
+											ucell.atoms[T0].nproj_soc
 											); // mohan  add 2021-05-07
 
 									double nlm1[3]={0,0,0};
@@ -855,7 +856,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											ucell.atoms[T0].d_so,
 											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 											ucell.atoms[T0].index1_soc[0],
-											ucell.atoms[T0].index2_soc[0]
+											ucell.atoms[T0].index2_soc[0],
+											ucell.atoms[T0].nproj_soc
 											); // mohan  add 2021-05-07
 									}
 									/// only one projector for each atom force, but another projector for stress

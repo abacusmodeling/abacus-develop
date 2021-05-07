@@ -129,6 +129,7 @@ void ORB_gen_tables::snap_psibeta(
 	const int &count_soc, // mohan add 2021-05-07
 	int* index1_soc, // mohan add 2021-05-07
 	int* index2_soc, // mohan add 2021-05-07
+	const int &nproj_in, // mohan add 2021-05-07
 	complex<double> *nlm1,
 	const int is) const
 {
@@ -287,7 +288,8 @@ void ORB_gen_tables::snap_psibeta(
 	int nprojections = 1;
 	if (has_so)
 	{
-		nprojections = ORB.Beta[T0].get_nproj_soc();
+//		nprojections = ORB.Beta[T0].get_nproj_soc();
+		nprojections = nproj_in; // mohan add 2021-05-07 
 	}
 
 	vector<complex<double>> term_a_nc(nprojections, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31

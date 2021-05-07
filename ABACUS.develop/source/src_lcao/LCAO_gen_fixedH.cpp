@@ -361,7 +361,8 @@ void LCAO_gen_fixedH::test_Nonlocal()
 											ucell.atoms[T0].d_so, // mohan  add 2021-05-07
 											ucell.atoms[T0].non_zero_count_soc[0], // 0 stands for spin
 											ucell.atoms[T0].index1_soc[0],
-											ucell.atoms[T0].index2_soc[0]
+											ucell.atoms[T0].index2_soc[0],
+											ucell.atoms[T0].nproj_soc
 											);
 									
 									//vnltest[ mu * ParaO.ncol + nu ] += nlm[0];
@@ -554,6 +555,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 												ucell.atoms[T0].non_zero_count_soc[is0], // index stands for spin
 												ucell.atoms[T0].index1_soc[is0],
 												ucell.atoms[T0].index2_soc[is0],
+												ucell.atoms[T0].nproj_soc,
 												nlm2, is0 //for soc
 												);
 
@@ -598,7 +600,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 													ucell.atoms[T0].d_so, // mohan  add 2021-05-07
 													ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 													ucell.atoms[T0].index1_soc[0],
-													ucell.atoms[T0].index2_soc[0]
+													ucell.atoms[T0].index2_soc[0],
+													ucell.atoms[T0].nproj_soc
 													);
 
 											// sum all projectors for one atom.
@@ -625,7 +628,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 													ucell.atoms[T0].d_so, // mohan  add 2021-05-07
 													ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 													ucell.atoms[T0].index1_soc[0],
-													ucell.atoms[T0].index2_soc[0]
+													ucell.atoms[T0].index2_soc[0],
+													ucell.atoms[T0].nproj_soc
 													);
 
 
@@ -752,7 +756,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 											ucell.atoms[T0].d_so,
 											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 											ucell.atoms[T0].index1_soc[0],
-											ucell.atoms[T0].index2_soc[0]
+											ucell.atoms[T0].index2_soc[0],
+											ucell.atoms[T0].nproj_soc
 											);
 
 									//if(GAMMA_ONLY_LOCAL)
@@ -783,7 +788,8 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 											ucell.atoms[T0].d_so,
 											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
 											ucell.atoms[T0].index1_soc[0],
-											ucell.atoms[T0].index2_soc[0]
+											ucell.atoms[T0].index2_soc[0],
+											ucell.atoms[T0].nproj_soc
 											);
 
 									//if(GAMMA_ONLY_LOCAL)

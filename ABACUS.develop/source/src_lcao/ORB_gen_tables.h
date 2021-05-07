@@ -68,6 +68,7 @@ class ORB_gen_tables
 		const int &count_soc, // mohan add 2021-05-07
 		int* index1_soc, // mohan add 2021-05-07
 		int* index2_soc, // mohan add 2021-05-07
+		const int &nproj_in, // mohan add 2021-05-07
 		complex<double> *nlm1=NULL,
 		const int is=0)const;
 

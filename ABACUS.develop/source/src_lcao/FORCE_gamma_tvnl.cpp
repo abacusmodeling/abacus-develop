@@ -153,7 +153,8 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 							ucell.atoms[it].d_so,
 							ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 							ucell.atoms[it].index1_soc[0],
-							ucell.atoms[it].index2_soc[0]
+							ucell.atoms[it].index2_soc[0],
+							ucell.atoms[it].nproj_soc
 							); // mohan  add 2021-05-07
 
                         double nlm1[3] = {0,0,0};
@@ -174,7 +175,8 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 								ucell.atoms[it].d_so,
 								ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 								ucell.atoms[it].index1_soc[0],
-								ucell.atoms[it].index2_soc[0]);
+								ucell.atoms[it].index2_soc[0],
+								ucell.atoms[it].nproj_soc);
 						}
 
                         const int index = mu * ParaO.ncol + nu;
@@ -378,7 +380,8 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 										ucell.atoms[it].d_so,
 										ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 										ucell.atoms[it].index1_soc[0],
-										ucell.atoms[it].index2_soc[0]
+										ucell.atoms[it].index2_soc[0],
+										ucell.atoms[it].nproj_soc
 								); // mohan  add 2021-05-07
 
                         double nlm1[3] = {0,0,0};
@@ -396,7 +399,8 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 												   ucell.atoms[it].d_so,
 												   ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 												   ucell.atoms[it].index1_soc[0],
-												   ucell.atoms[it].index2_soc[0]
+												   ucell.atoms[it].index2_soc[0],
+												   ucell.atoms[it].nproj_soc
 								); // mohan  add 2021-05-07
 
                         const int index = mu * ParaO.ncol + nu;

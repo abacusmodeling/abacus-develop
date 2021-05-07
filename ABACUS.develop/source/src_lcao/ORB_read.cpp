@@ -333,15 +333,13 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 
 
 		// Peize Lin add 2019-01-23
-		this->Beta[it].set_type_info(it, 
+		this->Beta[it].set_type_info(
+			it, 
 			atom->label, 
 			atom->pp_type, 
 			atom->lmax, 
-			Coefficient_D_in_so, 
 			n_projectors, 
-			0, 
-			tmpBeta_lm, 
-			0);//LiuXh 2016-01-14, 2016-07-19
+			tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
 
 		// mohan add 2021-05-07
 		atom->set_d_so(Coefficient_D_in_so,n_projectors,0,0);
@@ -446,11 +444,8 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			atom->label, 
 			atom->pp_type, 
 			atom->lmax, 
-			Coefficient_D_in_so, 
 			n_projectors, 
-			nh, 
-			tmpBeta_lm, 
-			1);//zhengdy-soc 2018-09-10
+			tmpBeta_lm);//zhengdy-soc 2018-09-10
 
 		// mohan add 2021-05-07
 		atom->set_d_so(Coefficient_D_in_so,n_projectors,nh,1);
@@ -700,11 +695,8 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		label, 
 		ps_type, 
 		nlmax, 
-		Coefficient_D_in_so, 
 		n_projectors, 
-		0, 
-		tmpBeta_lm, 
-		ucell.atoms[it].has_so);
+		tmpBeta_lm);
 		
 	ifs.close();
 

@@ -35,17 +35,12 @@ public:
 			const string& label_in,
 			const string& type_ps_in,
 			const int& lmax_in,
-			ComplexMatrix& Coefficient_D_in_so,
 			const int& nproj_in,
-			const int& nproj_in_so,
-			const Numerical_Nonlocal_Lm* ps_orbital_in,
-			const bool has_so);
+			const Numerical_Nonlocal_Lm* ps_orbital_in);
 
 	Numerical_Nonlocal_Lm* Proj; // length: nproj(only store radial function )
 
 	const double& get_rcut_max(void) const { return rcut_max; }
-
-	const int& get_nproj_soc(void) const {return nproj_soc;}
 
 	private:
 	
@@ -60,9 +55,6 @@ public:
 	string type_ps; //local or nonlocal
 
 	int nproj;
-
-	// spin-orbital related
-	int nproj_soc; //dimension of D_ij^so
 
 };
 
