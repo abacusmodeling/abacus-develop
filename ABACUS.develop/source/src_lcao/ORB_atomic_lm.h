@@ -47,22 +47,18 @@ class Numerical_Orbital_Lm
 	 	const int &index_atom_type_in,
 		const int &angular_momentum_l_in,
 		const int &index_chi_in,
-
 	    const int &nr_in,
 		const double *rab_in,
 		const double *r_radial_in,
-		
 		const Psi_Type &psi_type,				// Peize Lin add 2017-12-12
 		const double *psi_in,
-
 		const int &nk_in,
 		const double &dk_in,
-
 		// Peize Lin delete lat0 2016-02-03
 		const double &dr_uniform,
-		
 		bool flag_plot,						// Peize Lin add flag_plot 2016-08-31
-		bool flag_sbpool					// Peize Lin add flag_sbpool 2017-10-02
+		bool flag_sbpool,					// Peize Lin add flag_sbpool 2017-10-02
+		const bool &force_flag // mohan add 2021-05-07
 	);
 
 private:
@@ -85,7 +81,7 @@ private:
 	void norm_test()const;
 	void plot()const;
 	void use_uniform(const double &dr_uniform_in);
-	void extra_uniform(const double &dr_uniform_in);
+	void extra_uniform(const double &dr_uniform_in, const bool &force_flag);
 
 	string label;
 	int index_atom_type;

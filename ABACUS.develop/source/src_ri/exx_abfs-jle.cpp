@@ -50,7 +50,7 @@ void Exx_Abfs::Jle::init_jle( const double kmesh_times )
 					ORB.Phi[T].PhiLN(0,0).getDk(),
 					ORB.Phi[T].PhiLN(0,0).getDruniform(),
 					false,
-					true);
+					true, FORCE);
 			}
 		}
 	}

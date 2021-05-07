@@ -27,6 +27,7 @@ class ORB_control
 		const int &out_descriptor, // mohan add 2021-04-25
 		const int &out_r_matrix, // mohan add 2021-04-26
 		const int &Lmax_exx,
+		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank); // mohan add 2021-04-26;
 
     void clear_after_ions(

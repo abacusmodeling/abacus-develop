@@ -25,11 +25,13 @@ class LCAO_Orbitals
 		const int &lmax_in,
 		const int &out_descriptor, //  mohan add 2021-04-25
 		const int &out_r_matrix, // mohan add 2021-04-26
+		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank); // mohan add 2021-04-26
 
 	void Read_PAO(
 		ofstream &ofs_in,
 		const int& it,
+		const bool &force_flag, // mohan add 2021-05-07
 		const int& my_rank); // mohan add 2021-04-26
 
 #ifdef __NORMAL
@@ -45,6 +47,7 @@ class LCAO_Orbitals
 
 	void Read_Descriptor(
 		ofstream &ofs_in,
+		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank);	//caoyu add 2020-3-16
 
 #ifdef __MPI
@@ -108,6 +111,7 @@ class LCAO_Orbitals
 		int &lmax, 
 		int &nchimax, 
 		Numerical_Orbital* ao,
+		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank);	//caoyu add 2021-04-26
 
 };

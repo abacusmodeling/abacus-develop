@@ -22,6 +22,7 @@ void ORB_control::set_orb_tables(
 	const int &out_descriptor,
 	const int &out_r_matrix,
 	const int &Lmax_exx,
+	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
     TITLE("ORB_control","set_orb_tables");
@@ -52,6 +53,7 @@ void ORB_control::set_orb_tables(
 		lmax, 
 		out_descriptor, 
 		out_r_matrix, 
+		force_flag,
 		my_rank);
 
 	if(CALCULATION=="test")

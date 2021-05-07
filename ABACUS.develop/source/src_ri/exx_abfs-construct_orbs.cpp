@@ -40,7 +40,7 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::change_or
 //					orb_origin.getDk() / kmesh_times,
 					orb_origin.getDruniform(),
 					false,
-					true);
+					true, FORCE);
 			}
 		}
 	}
@@ -431,7 +431,7 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::Construct_Orbs::orbital(
 //					orb_info.getDk() / kmesh_times,
 					orb_info.getDruniform(),
 					false,
-					true);
+					true, FORCE);
 			}
 		}
 	}	

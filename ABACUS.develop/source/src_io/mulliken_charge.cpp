@@ -182,6 +182,7 @@ void Mulliken_Charge::cal_mulliken(void)
 					INPUT.out_descriptor,
 					INPUT.out_r_matrix,
 					Exx_Abfs::Lmax,
+					FORCE,
 					MY_RANK);
 
 

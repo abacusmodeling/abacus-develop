@@ -44,7 +44,8 @@ void Numerical_Orbital_Lm::set_orbital_info
 	// Peize Lin delete lat0 2016-02-03
 	const double &dr_uniform_in,
 	bool flag_plot,				// Peize Lin add flag_plot 2016-08-31
-	bool flag_sbpool			// Peize Lin add flag_sbpool 2017-10-02
+	bool flag_sbpool,			// Peize Lin add flag_sbpool 2017-10-02
+	const bool &force_flag // mohan add 2021-05-07
 )
 {
 	copy_parameter(
@@ -119,7 +120,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 	bool uni = true;
 	if (uni)
 	{
-		this->extra_uniform(dr_uniform);
+		this->extra_uniform(dr_uniform, force_flag);
 	}
 	else
 	{
@@ -207,7 +208,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 	this->kcut = (nk-1) * this->dk;
 }
 
-void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
+void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool &force_flag)
 {
 	timer::tick("NOrbital_Lm", "extra_uniform");
 	
@@ -295,7 +296,7 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 
 	// calculate zty
 	// liaochen add 2010-08
-	if( FORCE )	// Peize Lin add if 2017-10-26
+	if( force_flag )	// Peize Lin add if 2017-10-26
 	{
 		Mathzone_Add1::Uni_Deriv_Phi (
 			VECTOR_TO_PTR(this->psi_uniform), 

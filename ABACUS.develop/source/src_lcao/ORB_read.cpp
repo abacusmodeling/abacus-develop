@@ -103,6 +103,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	const int &lmax_in,
 	const int &out_descriptor,
 	const int &out_r_matrix,
+	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
@@ -193,7 +194,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->Phi = new Numerical_Orbital[ntype];
 	for(int it=0; it<ntype; it++)
 	{
-		this->Read_PAO(ofs_in, it, my_rank);	
+		this->Read_PAO(ofs_in, it, force_flag, my_rank);	
 	}
 
 	
@@ -251,7 +252,7 @@ void LCAO_Orbitals::Read_Orbitals(
 		delete[] this->Alpha;
 		this->Alpha = new Numerical_Orbital[1];	//not related to atom type -- remain to be discussed
 
-		this->Read_Descriptor(ofs_in, my_rank);
+		this->Read_Descriptor(ofs_in, force_flag, my_rank);
 
 	}
 
@@ -724,6 +725,7 @@ void LCAO_Orbitals::Read_NonLocal(
 void LCAO_Orbitals::Read_PAO(
 	ofstream &ofs_in,
 	const int& it, 
+	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals","Read_PAO");
@@ -756,7 +758,7 @@ void LCAO_Orbitals::Read_PAO(
 	int lmaxt=0;
 	int nchimaxt=0;
 
-	this->read_orb_file(ofs_in, in_ao, it, lmaxt, nchimaxt, this->Phi, my_rank);
+	this->read_orb_file(ofs_in, in_ao, it, lmaxt, nchimaxt, this->Phi, force_flag, my_rank);
 
 	//lmax and nchimax for all types
 	this->lmax = std::max(this->lmax, lmaxt);
@@ -770,6 +772,7 @@ void LCAO_Orbitals::Read_PAO(
 //caoyu add 2021-3-16
 void LCAO_Orbitals::Read_Descriptor(
 	ofstream &ofs_in,
+	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank)	//read descriptor basis
 {
 	TITLE("LCAO_Orbitals", "Read_Descriptor");
@@ -802,7 +805,7 @@ void LCAO_Orbitals::Read_Descriptor(
 	this->lmax_d = 0;
 	this->nchimax_d = 0;
 
-	this->read_orb_file(ofs_in, in_de, 0, this->lmax_d, this->nchimax_d, this->Alpha, my_rank);
+	this->read_orb_file(ofs_in, in_de, 0, this->lmax_d, this->nchimax_d, this->Alpha, force_flag, my_rank);
 
 	in_de.close();
 
@@ -817,6 +820,7 @@ void LCAO_Orbitals::read_orb_file(
 	int &lmax, 
 	int &nchimax, 
 	Numerical_Orbital* ao,
+	const bool &force_flag,
 	const int &my_rank)
 {
 	TITLE("LCAO_Orbitals","read_orb_file");
@@ -1040,7 +1044,8 @@ void LCAO_Orbitals::read_orb_file(
 				this->dk,
 				this->dr_uniform,
 				true,
-				true); // delta k mesh in reciprocal space
+				true,
+				force_flag); // delta k mesh in reciprocal space
 
 			delete[] radial;
 			delete[] rab;

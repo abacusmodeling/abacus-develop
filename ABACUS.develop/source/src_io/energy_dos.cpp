@@ -341,6 +341,7 @@ void energy::perform_dos(void)
 						INPUT.out_descriptor,
 						INPUT.out_r_matrix,
 						Exx_Abfs::Lmax,
+						FORCE,
 						MY_RANK);
 
 				LM.allocate_HS_R(LNNR.nnr);
