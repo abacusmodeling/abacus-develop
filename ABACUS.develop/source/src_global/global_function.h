@@ -13,6 +13,7 @@
 #include <cassert>
 
 #include "title.h" // mohan add 2021-05-05
+#include "quit.h" // mohan add 2021-05-07
 #include "global_variable.h"
 #include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
@@ -95,17 +96,6 @@ void AUTO_SET(const string &name,const T &a)
     ofs_warning <<" AUTO_SET "<<name<<" to "<<a << endl;
     return;
 }
-
-//==========================================================
-// GLOBAL FUNCTION :
-// NAME : WARNING( write information into ofs_warning)
-// NAME : QUIT( exit the running program)
-// NAME : WARNING_QUIT( write information into
-// 		  ofs_warning , and then quit)
-//==========================================================
-void WARNING(const string &file,const string &description);
-void QUIT(void);
-void WARNING_QUIT(const string &file,const string &description);
 
 //==========================================================
 // GLOBAL FUNCTION :
