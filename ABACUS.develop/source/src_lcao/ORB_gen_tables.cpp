@@ -125,14 +125,17 @@ void ORB_gen_tables::snap_psibeta(
 	const Vector3<double> &R0, // The projector.
 	const int &T0,
 	const matrix &dion, // mohan add 2021-04-25
-	const ComplexArray &d_so, // mohan add 2021-04-25
+	const ComplexArray &d_so, // mohan add 2021-05-07
+	const int &count_soc, // mohan add 2021-05-07
+	int* index1_soc, // mohan add 2021-05-07
+	int* index2_soc, // mohan add 2021-05-07
 	complex<double> *nlm1,
 	const int is) const
 {
 	//TITLE ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
-	if (NSPIN == 4 && ORB.Beta[T0].get_count_soc(is) == 0)
+	if (NSPIN == 4 && count_soc == 0)
 	{
 		return;
 	}
@@ -140,7 +143,7 @@ void ORB_gen_tables::snap_psibeta(
 	timer::tick("ORB_gen_tables", "snap_psibeta", 'X');
 
 	bool has_so = 0;
-	if (ORB.Beta[T0].get_count_soc(0) > 0)
+	if (count_soc > 0)
 	{
 		has_so = 1;
 	}
@@ -518,10 +521,10 @@ void ORB_gen_tables::snap_psibeta(
 		switch (job)
 		{
 			case 0: //overlap part
-				for (int no = 0; no < ORB.Beta[T0].get_count_soc(is); no++)
+				for (int no = 0; no < count_soc; no++)
 				{
-					const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
-					const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
+					const int p1 = index1_soc[no];
+					const int p2 = index2_soc[no]; 
 					if (NSPIN == 4 && nlm1 != NULL)
 					{
 						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * d_so(is, p2, p1);

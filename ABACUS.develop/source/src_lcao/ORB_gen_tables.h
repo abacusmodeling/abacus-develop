@@ -65,6 +65,9 @@ class ORB_gen_tables
 		const int &type,
 		const matrix &dion, // mohan add 2021-04-25
 		const ComplexArray &d_so, // mohan add 2021-04-25
+		const int &count_soc, // mohan add 2021-05-07
+		int* index1_soc, // mohan add 2021-05-07
+		int* index2_soc, // mohan add 2021-05-07
 		complex<double> *nlm1=NULL,
 		const int is=0)const;
 

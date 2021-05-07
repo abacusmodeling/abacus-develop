@@ -29,17 +29,17 @@ public:
 
 	const string& getType_ps() const { return this->type_ps; }
 
-	const complex<double>& getCoefficient_D_so(const int& is, const int& L1, const int& L2) 
-						const { return this->Coefficient_D_so(is, L1, L2); }
+//	const complex<double>& getCoefficient_D_so(const int& is, const int& L1, const int& L2) 
+//						const { return this->Coefficient_D_so(is, L1, L2); }
 
-	const int& get_index1_soc(const int& is, const int& no)
-						const { return this->index1_soc[is][no]; }
+//	const int& get_index1_soc(const int& is, const int& no)
+//						const { return this->index1_soc[is][no]; }
 
-	const int& get_index2_soc(const int& is, const int& no)
-						const { return this->index2_soc[is][no]; }
+//	const int& get_index2_soc(const int& is, const int& no)
+//						const { return this->index2_soc[is][no]; }
 
-	const int& get_count_soc(const int& is)
-						const { return this->non_zero_count_soc[is]; }
+//	const int& get_count_soc(const int& is)
+//						const { return this->non_zero_count_soc[is]; }
 
 	void set_type_info(
 			const int& type_in,
