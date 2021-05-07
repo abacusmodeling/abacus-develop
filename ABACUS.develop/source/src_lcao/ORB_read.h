@@ -39,14 +39,16 @@ class LCAO_Orbitals
 	void Set_NonLocal(const int &it, int &n_projectors);
 
 	// read in the NONLOCAL projector from file.
-	void Read_NonLocal(const int& it, int &n_projectors);
+	void Read_NonLocal(const int& it, int &n_projectors, const int &my_rank);
 #endif
 
 
-	void Read_Descriptor(ofstream &ofs_in);	//caoyu add 2020-3-16
+	void Read_Descriptor(
+		ofstream &ofs_in,
+		const int &my_rank);	//caoyu add 2020-3-16
 
 #ifdef __MPI
-	void bcast_files(const int &ntype_in);
+	void bcast_files(const int &ntype_in, const int &my_rank);
 #endif
 
 	const double& get_ecutwfc(void) const {return ecutwfc;}
@@ -105,7 +107,8 @@ class LCAO_Orbitals
 		const int &it, 
 		int &lmax, 
 		int &nchimax, 
-		Numerical_Orbital* ao);	//caoyu add 2021-04-26
+		Numerical_Orbital* ao,
+		const int &my_rank);	//caoyu add 2021-04-26
 
 };
 

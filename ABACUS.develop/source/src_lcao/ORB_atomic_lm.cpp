@@ -254,8 +254,10 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 		case 3: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
 		case 4: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-			ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
-			ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			//ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
+			//ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
+			cout << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
 			Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 

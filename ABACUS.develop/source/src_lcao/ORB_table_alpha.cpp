@@ -111,8 +111,10 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 
 	if (rmesh <= 0)
 	{
-		ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-		ofs_warning << "\n rmesh = " << rmesh;
+//		ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+//		ofs_warning << "\n rmesh = " << rmesh;
+		cout << "\n R1 = " << R1 << " R2 = " << R2;
+		cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
