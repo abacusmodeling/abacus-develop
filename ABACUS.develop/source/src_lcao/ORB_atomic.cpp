@@ -15,10 +15,6 @@ Numerical_Orbital::Numerical_Orbital()
 
 Numerical_Orbital::~Numerical_Orbital()
 {
-	if(test_deconstructor)
-	{
-		cout << " ~Numerical_Orbital()" << endl;
-	}
 	delete[] nchi;
 	delete[] phiLN;
 }
@@ -33,7 +29,7 @@ void Numerical_Orbital::set_orbital_info
 )
 {
 	//what is test_overlap
-	if (test_overlap) TITLE("Numerical_Orbital", "set_type_info");
+	TITLE("Numerical_Orbital", "set_type_info");
 
 	// (1) set type,label,lmax
 	this->type = type_in;

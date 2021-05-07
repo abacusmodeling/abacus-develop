@@ -111,8 +111,10 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 
 	if (rmesh <= 0)
 	{
-		ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-		ofs_warning << "\n rmesh = " << rmesh;
+//		ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+//		ofs_warning << "\n rmesh = " << rmesh;
+		cout << "\n R1 = " << R1 << " R2 = " << R2;
+		cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
@@ -432,7 +434,7 @@ void ORB_table_alpha::print_Table_DSR(void)
 					for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						const int Opair = this->DS_Opair(T1, L1, L2, N1, N2);	//Opair
-						//ofs <<setw(20)<< "atom_type: " << ucell.atoms[T1].label << endl;
+						//ofs <<setw(20)<< "atom_type: " << label << endl;
 						ofs <<setw(20)<< "lcao basis: " << "L1=" << L1 << ", N1=" << N1 << endl;
 						ofs <<setw(20)<< "descriptor basis: " << "L2=" << L2 << ", N2=" << N2 << endl;
 						for (int il = 0; il < this-> DS_2Lplus1[T1]; il++)

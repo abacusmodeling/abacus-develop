@@ -7,6 +7,7 @@
 #include "../src_global/global_function.h"
 #include "../src_global/vector3.h"
 #include "../src_global/constants.h"
+#include "../src_global/math_ylmreal.h"
 
 ORB_gaunt_table::ORB_gaunt_table(){}
 ORB_gaunt_table::~ORB_gaunt_table(){}
@@ -146,7 +147,7 @@ void ORB_gaunt_table::init_Ylm_Gaunt
 		}
 	}
 
-	Mathzone::Ylm_Real(nlm, 256, &g_gaunt[0], this->Ylm_Gaunt);
+	YlmReal::Ylm_Real(nlm, 256, &g_gaunt[0], this->Ylm_Gaunt);
 
 	timer::tick("ORB_gaunt_table", "init_Ylm_Gaunt");
 	return;
@@ -210,7 +211,7 @@ void ORB_gaunt_table::init_Gaunt_CH(const int& Lmax)
 	int Eff_Np = this->EP_EL(L);
 
 	double mem = Memory::record("ORB_gaunt_table","Gaunt_CH",Eff_Np * 30, "double");
-	OUT(ofs_running,"Gaunt_CH (Memory, unit: MB)",mem);
+	//OUT(ofs_running,"Gaunt_CH (Memory, unit: MB)",mem);
 	
 	int ic1 = 0;
 	for(int l1 = 0; l1 <= L; l1++)

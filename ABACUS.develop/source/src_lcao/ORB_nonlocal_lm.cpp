@@ -5,8 +5,10 @@
 #include "ORB_nonlocal_lm.h"
 #include "../src_global/math_integral.h"
 #include "../src_global/global_function.h"
-#include "../src_global/mathzone.h" // use Polynomial_Interpolation_xy
+#include "../src_global/mathzone.h" // use Polynomial_Interpolation_xy, Spherical_Bessel
 #include "../src_global/mathzone_add1.h" // use SplineD2
+#include "../src_global/math_sphbes.h" // mohan add 2021-05-06
+#include "../src_global/math_polyint.h" // mohan add 2021-05-06
 
 Numerical_Nonlocal_Lm::Numerical_Nonlocal_Lm()
 {
@@ -191,7 +193,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	for (int ir = 0; ir < this->nr_uniform; ir++)
 	{
 		double rnew = ir * dr_uniform;
-		this->beta_uniform[ir] = Mathzone::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
+		this->beta_uniform[ir] = PolyInt::Polynomial_Interpolation_xy(this->r_radial, beta, this->nr, rnew); 
     }
 	delete[] beta;
 
@@ -236,7 +238,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
 
     for (int ik = 0; ik < nk; ik++)
     {
-        Mathzone::Spherical_Bessel(
+        Sphbes::Spherical_Bessel(
                 this->nr,
                 this->r_radial,
                 this->k_radial[ik],
@@ -276,6 +278,9 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		default: WARNING_QUIT("Numerical_Orbital_Lm::plot","Please check in functoin.");
 	}
 
+#ifdef __NORMAL
+
+#else
 	if(my_rank==0)
 	{
 		stringstream ssr, ssk, ssru;
@@ -316,5 +321,6 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		ofsk.close();
 		ofsru.close();
 	}
+#endif
 	return;
 }

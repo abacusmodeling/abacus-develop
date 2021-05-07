@@ -1,6 +1,7 @@
 #include "ORB_read.h"
 #include "ORB_gen_tables.h"
 #include "../src_global/ylm.h"
+#include "../src_global/math_polyint.h"
 
 // here is a member of ORB_gen_tables class
 ORB_gen_tables UOT;
@@ -10,6 +11,7 @@ ORB_gen_tables::~ORB_gen_tables() {}
 
 // call in hamilt_linear::init_before_ions.
 void ORB_gen_tables::gen_tables(
+	ofstream &ofs_in,
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,
@@ -18,7 +20,7 @@ void ORB_gen_tables::gen_tables(
 	TITLE("ORB_gen_tables", "gen_tables");
 	timer::tick("ORB_gen_tables", "gen_tables", 'C');
 
-	ofs_running << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
+	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
 
 	//=========================================
 	// (1) MOT: make overlap table.
@@ -125,13 +127,19 @@ void ORB_gen_tables::snap_psibeta(
 	const Vector3<double> &R0, // The projector.
 	const int &T0,
 	const matrix &dion, // mohan add 2021-04-25
+	const int &nspin,
+	const ComplexArray &d_so, // mohan add 2021-05-07
+	const int &count_soc, // mohan add 2021-05-07
+	int* index1_soc, // mohan add 2021-05-07
+	int* index2_soc, // mohan add 2021-05-07
+	const int &nproj_in, // mohan add 2021-05-07
 	complex<double> *nlm1,
 	const int is) const
 {
 	//TITLE ("ORB_gen_tables","snap_psibeta");
 
 	//optimized by zhengdy-soc
-	if (NSPIN == 4 && ORB.Beta[T0].get_count_soc(is) == 0)
+	if (nspin == 4 && count_soc == 0)
 	{
 		return;
 	}
@@ -139,7 +147,7 @@ void ORB_gen_tables::snap_psibeta(
 	timer::tick("ORB_gen_tables", "snap_psibeta", 'X');
 
 	bool has_so = 0;
-	if (ORB.Beta[T0].get_count_soc(0) > 0)
+	if (count_soc > 0)
 	{
 		has_so = 1;
 	}
@@ -283,7 +291,8 @@ void ORB_gen_tables::snap_psibeta(
 	int nprojections = 1;
 	if (has_so)
 	{
-		nprojections = ORB.Beta[T0].get_nproj_soc();
+//		nprojections = ORB.Beta[T0].get_nproj_soc();
+		nprojections = nproj_in; // mohan add 2021-05-07 
 	}
 
 	vector<complex<double>> term_a_nc(nprojections, {0, 0}); // Peize Lin change ptr to vector at 2020.01.31
@@ -297,7 +306,8 @@ void ORB_gen_tables::snap_psibeta(
 			continue;
 		}
 
-		const int L0 = ORB.Beta[T0].getL_Beta(nb);
+		//const int L0 = ORB.Beta[T0].getL_Beta(nb); // mohan delete the variable 2021-05-07
+		const int L0 = ORB.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
 		//const int next_ip = 2* L0 +1;
 
 		//-------------------------------------------------------------------
@@ -516,17 +526,17 @@ void ORB_gen_tables::snap_psibeta(
 		switch (job)
 		{
 			case 0: //overlap part
-				for (int no = 0; no < ORB.Beta[T0].get_count_soc(is); no++)
+				for (int no = 0; no < count_soc; no++)
 				{
-					const int p1 = ORB.Beta[T0].get_index1_soc(is, no);
-					const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
-					if (NSPIN == 4 && nlm1 != NULL)
+					const int p1 = index1_soc[no];
+					const int p2 = index2_soc[no]; 
+					if (nspin == 4 && nlm1 != NULL)
 					{
-						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * d_so(is, p2, p1);
 					}
-					else if (NSPIN != 4)
+					else if (nspin != 4)
 					{
-						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
+						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * d_so(0, p2, p1)).real();
 					}
 					else
 					{
@@ -565,6 +575,7 @@ void ORB_gen_tables::snap_psipsi(
 	const int &L2,
 	const int &m2,
 	const int &N2,
+	const int &nspin,
 	complex<double> *olm1) const
 {
 	//TITLE("ORB_gen_tables","snap_psipsi");
@@ -585,9 +596,13 @@ void ORB_gen_tables::snap_psipsi(
 	const double Rcut2 = ORB.Phi[T2].getRcut();
 
 	if (job == 0)
+	{
 		ZEROS(olm, 1);
+	}
 	else if (job == 1)
+	{
 		ZEROS(olm, 3);
+	}
 
 	if (distance > (Rcut1 + Rcut2))
 		return;
@@ -685,7 +700,7 @@ void ORB_gen_tables::snap_psipsi(
 
 			if (distance > tiny2)
 			{
-				Interp_Slm = i_exp * Mathzone::Polynomial_Interpolation(
+				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
 										 MOT.Table_SR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Slm /= rl;
 			}
@@ -698,7 +713,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dSlm = i_exp * Mathzone::Polynomial_Interpolation(
+					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
 											  MOT.Table_SR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 				}
@@ -725,8 +740,10 @@ void ORB_gen_tables::snap_psipsi(
 				{
 				case 0: // calculate overlap.
 				{
-					if (NSPIN != 4)
+					if (nspin != 4)
+					{
 						olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
+					}
 					else if (olm1 != NULL)
 					{
 						olm1[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
@@ -754,7 +771,8 @@ void ORB_gen_tables::snap_psipsi(
 				{
 					for (int ir = 0; ir < 3; ir++)
 					{
-						olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] + tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
+						olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] 
+						+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
 					}
 					break;
 				}
@@ -783,7 +801,7 @@ void ORB_gen_tables::snap_psipsi(
 			double rl = pow(distance, L);
 			if (distance > tiny2)
 			{
-				Interp_Tlm = i_exp * Mathzone::Polynomial_Interpolation(
+				Interp_Tlm = i_exp * PolyInt::Polynomial_Interpolation(
 										 MOT.Table_TR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Tlm /= rl;
 			}
@@ -794,7 +812,7 @@ void ORB_gen_tables::snap_psipsi(
 			{
 				if (distance > tiny2)
 				{
-					Interp_dTlm = i_exp * Mathzone::Polynomial_Interpolation(
+					Interp_dTlm = i_exp * PolyInt::Polynomial_Interpolation(
 											  MOT.Table_TR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dTlm = Interp_dTlm / rl - Interp_Tlm * L / distance;
 				}
@@ -818,8 +836,10 @@ void ORB_gen_tables::snap_psipsi(
 				{
 				case 0:
 				{
-					if (NSPIN != 4)
+					if (nspin != 4)
+					{
 						olm[0] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
+					}
 					else if (olm1 != NULL)
 					{
 						olm1[0] += tmpKem0 * rly[MGT.get_lm_index(L, m)];
@@ -891,12 +911,19 @@ void ORB_gen_tables::snap_psialpha(
 	const double Rcut2 = ORB.Alpha[0].getRcut();
 
 	if (job == 0)
+	{
 		ZEROS(olm, 1);
+	}
+
 	else if (job == 1)
+	{
 		ZEROS(olm, 3);
+	}
 
 	if (distance > (Rcut1 + Rcut2))
+	{
 		return;
+	}
 
 	//if distance == 0
 	//\int psi(r) psi(r-R) dr independent of R if R == 0
@@ -904,7 +931,9 @@ void ORB_gen_tables::snap_psialpha(
 	const double tiny1 = 1e-12;
 	const double tiny2 = 1e-10;
 	if (distance < tiny1)
+	{
 		distance += tiny1;
+	}
 
 	// (2) if there exist overlap, calculate the mesh number
 	// between two atoms
@@ -970,7 +999,7 @@ void ORB_gen_tables::snap_psialpha(
 
 		if (distance > tiny2)
 		{
-			Interp_Slm = i_exp * Mathzone::Polynomial_Interpolation(
+			Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
 									 talpha.Table_DSR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 			Interp_Slm /= rl;
 		}
@@ -983,7 +1012,7 @@ void ORB_gen_tables::snap_psialpha(
 		{
 			if (distance > tiny2)
 			{
-				Interp_dSlm = i_exp * Mathzone::Polynomial_Interpolation(
+				Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
 										  talpha.Table_DSR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 			}
@@ -1010,8 +1039,11 @@ void ORB_gen_tables::snap_psialpha(
 			{
 			case 0: // calculate overlap.
 			{
-				if (NSPIN != 4)
+				int nspin = 1; // mohan add 2021-05-07, currently deepks works only for nspin=1
+				if (nspin != 4)
+				{
 					olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
+				}
 				else
 				{
 					WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with NSPIN>1 has not implemented yet!");
@@ -1031,7 +1063,8 @@ void ORB_gen_tables::snap_psialpha(
 			{
 				for (int ir = 0; ir < 3; ir++)
 				{
-					olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] + tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
+					olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] 
+					+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
 				}
 				break;
 			}

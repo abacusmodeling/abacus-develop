@@ -67,13 +67,6 @@ void ORB_table_phi::allocate
 		++Rmesh;
 	}
 
-//	OUT(ofs_running,"lmax",lmax);
-//	OUT(ofs_running,"Rmax (Bohr)",Rmax);
-//	OUT(ofs_running,"dr (Bohr)",dr);
-//	OUT(ofs_running,"dk",dk);
-//	OUT(ofs_running,"nlm",nlm);
-//	OUT(ofs_running,"kmesh",kmesh);
-	
 	delete[] kpoint;
 	delete[] r;
 	kpoint = new double[kmesh];
@@ -96,7 +89,6 @@ void ORB_table_phi::allocate
 		rab[ir] = dr;
 	}
 
-//	OUT(ofs_running,"allocate kpoint, r, rab, kab","Done");
 	return;
 }
 
@@ -109,8 +101,10 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 	
 	if(rmesh <= 0)
 	{
-		ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-		ofs_warning << "\n rmesh = " << rmesh;
+		//ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+		//ofs_warning << "\n rmesh = " << rmesh;
+		cout << "\n R1 = " << R1 << " R2 = " << R2;
+		cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
@@ -902,7 +896,7 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
     goto once_again;
 */
 
-	OUT(ofs_running,"lmax used to generate Jlq",Lmax_used);
+//	OUT(ofs_running,"lmax used to generate Jlq",Lmax_used);
 //	OUT(ofs_running,"kmesh",kmesh);
 //	OUT(ofs_running,"Rmesh",Rmesh);
 	Memory::record ("ORB_table_phi", "Jl(x)", (Lmax_used+1) * this->kmesh * this->Rmesh, "double");

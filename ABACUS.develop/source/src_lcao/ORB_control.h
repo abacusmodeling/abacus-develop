@@ -14,6 +14,7 @@ class ORB_control
 
     // Generate the S(overlap),T,NL matrix.
     void set_orb_tables(
+		ofstream &ofs_in, // mohan add 2021-05-07
 		ORB_gen_tables &OGT, 
 		LCAO_Orbitals &orb,
 		const int &ntype, // number of speceies, mohan add 2021-04-26
@@ -26,6 +27,7 @@ class ORB_control
 		const int &out_descriptor, // mohan add 2021-04-25
 		const int &out_r_matrix, // mohan add 2021-04-26
 		const int &Lmax_exx,
+		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank); // mohan add 2021-04-26;
 
     void clear_after_ions(

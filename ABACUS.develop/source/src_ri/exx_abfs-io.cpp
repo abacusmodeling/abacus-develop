@@ -247,7 +247,7 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 				dk,
 				dr_uniform,
 				false,
-				true);		
+				true, FORCE);		
 		}
 	}
 	

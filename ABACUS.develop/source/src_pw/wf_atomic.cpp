@@ -1,6 +1,9 @@
 #include "wf_atomic.h"
 #include "global.h"
 #include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
+#include "../src_global/math_polyint.h"
+#include "../src_global/math_ylmreal.h"
 
 WF_atomic::WF_atomic()
 {
@@ -113,7 +116,7 @@ void WF_atomic::init_at_1(void)
                 for (int iq=startq; iq<NQX; iq++)
                 {
                     const double q = DQ * iq;
-                    Mathzone::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
+                    Sphbes::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
                     for (int ir = 0;ir < atom->msh;ir++)
                     {
                         vchi[ir] = atom->chi(ic,ir) * aux[ir] * atom->r[ir];
@@ -244,7 +247,7 @@ void WF_atomic::atomic_wfc
         gk[ig] = WF_atomic::get_1qvec_cartesian(ik, ig);
     }
     //ylm = spherical harmonics functions
-    Mathzone::Ylm_Real(total_lm, np, gk, ylm);
+    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
     int index = 0;
     //---------------------------------------------------------
     // Calculate G space 3D wave functions
@@ -276,7 +279,7 @@ void WF_atomic::atomic_wfc
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] =
-                            Mathzone::Polynomial_Interpolation(table_q,
+                            PolyInt::Polynomial_Interpolation(table_q,
                                                                it, iw, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
                     }
 
@@ -344,7 +347,7 @@ void WF_atomic::atomic_wfc
                                  for(int ig=0;ig<np;ig++)
                                  {//Average the two functions
                                     chiaux[ig] =  l * 
-                                         Mathzone::Polynomial_Interpolation(table_q,
+                                         PolyInt::Polynomial_Interpolation(table_q,
                                                                it, nc, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
 
                                     chiaux[ig] += flq[ig] * (l+1.0) ;

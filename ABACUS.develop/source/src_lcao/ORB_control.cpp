@@ -9,6 +9,7 @@ ORB_control::~ORB_control()
 {}
 
 void ORB_control::set_orb_tables(
+	ofstream &ofs_in,
 	ORB_gen_tables &OGT, 
 	LCAO_Orbitals &orb,
 	const int &ntype, // mohan add 2021-04-26
@@ -21,6 +22,7 @@ void ORB_control::set_orb_tables(
 	const int &out_descriptor,
 	const int &out_r_matrix,
 	const int &Lmax_exx,
+	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
     TITLE("ORB_control","set_orb_tables");
@@ -46,17 +48,23 @@ void ORB_control::set_orb_tables(
 	orb.Rmax = lcao_rmax_in;
 	
     orb.Read_Orbitals(
+		ofs_in,
 		ntype, 
 		lmax, 
 		out_descriptor, 
 		out_r_matrix, 
+		force_flag,
 		my_rank);
 
+#ifdef __NORMAL
+
+#else
 	if(CALCULATION=="test")
 	{
 		timer::tick("ORB_control","set_orb_tables",'B');
 		return;
 	}
+#endif
 
     //=============================================================================
     // (2) FUNCTION : Generate Gaunt_Coefficients and S-table using OGT.init
@@ -68,7 +76,7 @@ void ORB_control::set_orb_tables(
     // 1: generate overlap table
     // 2: generate kinetic table
     // 3: generate overlap & kinetic table
-    OGT.gen_tables(job0, orb, Lmax_exx, out_descriptor);
+    OGT.gen_tables(ofs_in, job0, orb, Lmax_exx, out_descriptor);
     // init lat0, in order to interpolated value from this table.
 
 	assert(lat0>0.0);

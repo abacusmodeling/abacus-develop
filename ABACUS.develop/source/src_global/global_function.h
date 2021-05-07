@@ -12,7 +12,9 @@
 #include <complex>
 #include <cassert>
 
-#include "title.h" // mohan add 2021-05-05
+#include "tool_title.h" // mohan add 2021-05-05
+#include "tool_quit.h" // mohan add 2021-05-07
+#include "tool_check.h" // mohan add 2021-05-08
 #include "global_variable.h"
 #include "global_function-func_each_2.h"		// Peize Lin add 2016-09-07
 
@@ -98,17 +100,6 @@ void AUTO_SET(const string &name,const T &a)
 
 //==========================================================
 // GLOBAL FUNCTION :
-// NAME : WARNING( write information into ofs_warning)
-// NAME : QUIT( exit the running program)
-// NAME : WARNING_QUIT( write information into
-// 		  ofs_warning , and then quit)
-//==========================================================
-void WARNING(const string &file,const string &description);
-void QUIT(void);
-void WARNING_QUIT(const string &file,const string &description);
-
-//==========================================================
-// GLOBAL FUNCTION :
 // NAME : DONE( ouput information(time) on screen and log)
 // 		  we can regard it as a milestone.
 //==========================================================
@@ -147,10 +138,6 @@ inline void ZEROS(T *u,const TI n)		// Peize Lin change int to TI at 2020.03.03
 // control the test_level
 //==========================================================
 void TEST_LEVEL(const string &name);
-void CHECK_NAME(ifstream &ifs, const string &name_in, bool quit=true);
-void CHECK_INT(ifstream &ifs, const int &v, bool quit=true);
-void CHECK_DOUBLE(ifstream &ifs, const double &v, bool quit=true);
-void CHECK_STRING(ifstream &ifs, const string &v, bool quit=true);
 
 
 //==========================================================

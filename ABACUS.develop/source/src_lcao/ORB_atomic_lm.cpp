@@ -3,6 +3,7 @@
 #include "../src_global/lapack_connector.h"
 #include "../src_global/timer.h"
 #include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
 #include <omp.h>
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()
@@ -43,7 +44,8 @@ void Numerical_Orbital_Lm::set_orbital_info
 	// Peize Lin delete lat0 2016-02-03
 	const double &dr_uniform_in,
 	bool flag_plot,				// Peize Lin add flag_plot 2016-08-31
-	bool flag_sbpool			// Peize Lin add flag_sbpool 2017-10-02
+	bool flag_sbpool,			// Peize Lin add flag_sbpool 2017-10-02
+	const bool &force_flag // mohan add 2021-05-07
 )
 {
 	copy_parameter(
@@ -99,9 +101,13 @@ void Numerical_Orbital_Lm::set_orbital_info
 		case Psi_Type::Psik:
 		case Psi_Type::Psik2:
 			if( flag_sbpool )
-				this->cal_rradial_sbpool();
+			{
+			 	this->cal_rradial_sbpool();
+			}
 			else
+			{
 				throw domain_error("flag_sbpool false not finished in Numerical_Orbital_Lm::set_orbital_info_k. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			}
 			break;
 		default:	break;
 	}
@@ -114,7 +120,7 @@ void Numerical_Orbital_Lm::set_orbital_info
 	bool uni = true;
 	if (uni)
 	{
-		this->extra_uniform(dr_uniform);
+		this->extra_uniform(dr_uniform, force_flag);
 	}
 	else
 	{
@@ -125,16 +131,23 @@ void Numerical_Orbital_Lm::set_orbital_info
 	{
 		case Psi_Type::Psi:
 			if( flag_sbpool )
-				this->cal_kradial_sbpool();
+			{
+			 	this->cal_kradial_sbpool();
+			}
 			else
+			{
 				this->cal_kradial();
+			}
 			break;
 		default:	break;
 	}
 
 //	this->norm_test();						// Peize Lin delete 2016-08-31
 	if( flag_plot )
+	{
 		this->plot();			// Peize Lin add flag_plot 2016-08-31
+	}
+	return;
 }
 
 void Numerical_Orbital_Lm::copy_parameter(
@@ -195,7 +208,7 @@ void Numerical_Orbital_Lm::copy_parameter(
 	this->kcut = (nk-1) * this->dk;
 }
 
-void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
+void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool &force_flag)
 {
 	timer::tick("NOrbital_Lm", "extra_uniform");
 	
@@ -253,8 +266,10 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 		case 3: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
 		case 4: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-			ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
-			ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			//ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
+			//ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
+			cout << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
 			Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 
@@ -267,9 +282,6 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 	//Method 1
 	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
 	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 2, ddpsi_uniform);
-
-
-
 
 	double* rad = new double[nr_uniform];
 	for (int ir = 0; ir < nr_uniform; ir++)
@@ -284,9 +296,15 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in)
 
 	// calculate zty
 	// liaochen add 2010-08
-	if( FORCE )															// Peize Lin add if 2017-10-26
+	if( force_flag )	// Peize Lin add if 2017-10-26
 	{
-		Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(this->psi_uniform), this->nr_uniform, dr_uniform, angular_momentum_l, tmp);
+		Mathzone_Add1::Uni_Deriv_Phi (
+			VECTOR_TO_PTR(this->psi_uniform), 
+			this->nr_uniform, 
+			dr_uniform, 
+			angular_momentum_l, 
+			tmp);
+
 		this->zty = tmp[0]/Mathzone_Add1::factorial (angular_momentum_l);
 	}
 
@@ -309,17 +327,29 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 	string orbital_type; 
 	// Peize Lin update 2016-08-31
 	if( 0==this->angular_momentum_l )
+	{
 		orbital_type = 's';
+	}
 	else if( 1==this->angular_momentum_l )
+	{
 		orbital_type = 'p';
+	}
 	else if( 2==this->angular_momentum_l )
+	{
 		orbital_type = 'd';
+	}
 	else if( 3<=this->angular_momentum_l && this->angular_momentum_l<=6 )
+	{
 		orbital_type = 'f'+this->angular_momentum_l-3;
+	}
 	else if( 7<=this->angular_momentum_l && this->angular_momentum_l<=11 )
+	{
 		orbital_type = 'k'+this->angular_momentum_l-7;
+	}
 	else
+	{
 		orbital_type = "L" + TO_STRING(this->angular_momentum_l);
+	}
 		
 	cout << "===========================================================" << endl;
 	for(int i=0; i<nr_uniform; i++)
@@ -329,8 +359,16 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 	}
 	
 	this->dpsi_uniform.resize(nr_uniform);
-	Mathzone_Add1::Uni_Deriv_Phi (VECTOR_TO_PTR(psi_uniform), nr_uniform, dr_uniform, 1, VECTOR_TO_PTR(dpsi_uniform));
-	
+
+	Mathzone_Add1::Uni_Deriv_Phi (
+		VECTOR_TO_PTR(psi_uniform), 
+		nr_uniform, dr_uniform, 
+		1, 
+		VECTOR_TO_PTR(dpsi_uniform));
+
+#ifdef __NORMAL
+
+#else	
 	if(MY_RANK==0)
 	{
 		stringstream ss;
@@ -345,6 +383,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 		}
 		ofs.close();
 	}
+#endif
 
 	return;
 }
@@ -381,7 +420,7 @@ void Numerical_Orbital_Lm::cal_kradial(void)
 	//integration directly
 	for (int ik = 0; ik < nk; ik++)
 	{
-		Mathzone::Spherical_Bessel(
+		Sphbes::Spherical_Bessel(
 				this->nr, 
 				VECTOR_TO_PTR(this->r_radial), 
 				this->k_radial[ik], 
@@ -540,38 +579,65 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 {
 	// dr must be all the same for Sph_Bessel_Recursive_Pool
 	const double dr = this->rab[0];
+
 	for( int ir=1; ir<this->nr; ++ir )
+	{
 		assert( dr == this->rab[ir] );
+	}
 
 	Sph_Bessel_Recursive::D2* pSB = nullptr;
 	for( auto & sb : Sph_Bessel_Recursive_Pool::D2::sb_pool )
+	{
 		if( dr * dk == sb.get_dx() )
 		{
 			pSB = &sb;
 			break;
 		}
+	}
+
 	if(!pSB)
 	{
 		Sph_Bessel_Recursive_Pool::D2::sb_pool.push_back({});
 		pSB = &Sph_Bessel_Recursive_Pool::D2::sb_pool.back();
 	}
+
 	pSB->set_dx( dr * dk );
 	pSB->cal_jlx( this->angular_momentum_l, this->nr, this->nk );
+
 	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	const double pref = sqrt(2.0/PI);
 
 	vector<double> k_tmp(nk);
+
 	for( int ik=0; ik!=nk; ++ik )
+	{
 		k_tmp[ik] = this->psik2[ik] * dk;
+	}
+
 	constexpr double one_three=1.0/3.0, two_three=2.0/3.0, four_three=4.0/3.0;
-	k_tmp[0]*=one_three;	k_tmp[nk-1]*=one_three;
+
+	k_tmp[0]*=one_three;	
+	k_tmp[nk-1]*=one_three;
+
 	for( int ik=1; ik!=nk-1; ++ik )
+	{
 		k_tmp[ik] *= (ik&1) ? four_three : two_three;
+	}
 
 	for( int ir = 0; ir!=nr; ++ir )
 	{
+#ifdef __NORMAL
+		// mohan add 2021-05-08, test needed
+		double kj_dot = 0.0;
+		for( int ik=0; ik<nk; ++ik)
+		{
+			kj_dot += k_tmp[ik]*jl[ir][ik];
+		}
+		this->psi[ir] = pref * kj_dot;
+#else
 		this->psi[ir] = pref * LapackConnector::dot( this->nk, VECTOR_TO_PTR(k_tmp), 1, VECTOR_TO_PTR(jl[ir]), 1 );
+#endif
 		this->psir[ir] = this->psi[ir] * r_radial[ir];
 	}
 }
@@ -621,18 +687,34 @@ void Numerical_Orbital_Lm::plot(void)const
 	string orbital_type;
 	// Peize Lin update 2016-08-31
 	if( 0==this->angular_momentum_l )
+	{
 		orbital_type = 's';
+	}
 	else if( 1==this->angular_momentum_l )
+	{
 		orbital_type = 'p';
+	}
 	else if( 2==this->angular_momentum_l )
+	{
 		orbital_type = 'd';
+	}
 	else if( 3<=this->angular_momentum_l && this->angular_momentum_l<=6 )
+	{
 		orbital_type = 'f' + this->angular_momentum_l - 3;
+	}
 	else if( 7<=this->angular_momentum_l && this->angular_momentum_l<=11 )
+	{
 		orbital_type = 'k' + this->angular_momentum_l - 7;
+	}
 	else
+	{
 		orbital_type = "L" + TO_STRING(this->angular_momentum_l);	
+	}
 
+
+#ifdef __NORMAL
+
+#else
 	if(MY_RANK==0)
 	{
 		stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
@@ -677,12 +759,12 @@ void Numerical_Orbital_Lm::plot(void)const
 		{
 			ofsdru << this->dr_uniform * i << " " << dpsi_uniform[i] << endl;// output dphi/dr 2013-08-10  pengfei
 		}
-
-
 		ofsr.close();
 		ofsk.close();
 		ofsru.close();
 		ofsdru.close(); // 13-08-10 pengfei
 	}
+
+#endif
 	return;
 }

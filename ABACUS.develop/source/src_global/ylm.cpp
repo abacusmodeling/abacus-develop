@@ -1,4 +1,8 @@
+#include <cassert>
+#include <iomanip>
 #include "ylm.h"
+#include "constants.h"
+#include "timer.h"
 
 using namespace std;
 int Ylm::nlm = 0;
@@ -1116,7 +1120,9 @@ void Ylm::test1 (void)
 		double diff = fabs(rlya[i]-rlyb[i]);
 		if (diff > 1e-8) 
 		{
-			WARNING_QUIT ("Ylm::test1","error is too large!");
+			cout << "Ylm::test1, error is too large!" << endl;
+			//WARNING_QUIT ("Ylm::test1","error is too large!");
+			exit(0);
 		}
 	}
 	return;
@@ -1141,23 +1147,13 @@ void Ylm::test2 (void)
 	
 	for (int i = 0; i < 100; i++)
 	{
-//		cout << "\ni = " << i << " xa = " << grlya[i][0] << " xb = " << grlyb[i][0] << endl;
-		
-		/*
-		double diff = fabs(rlya[i]-rlyb[i]);
-		if (diff > 1e-8)
-		{
-			cout << "\nLarge Error in Rlya!" << endl;
-		}
-		*/
-		
-//		/*
 		double diffx = fabs(grlya[i][2]-grlyb[i][2]);
 		if (diffx > 1e-8)
 		{
-			WARNING_QUIT ("Ylm::test2","Large error in Direv X!");
+			cout << "Ylm::test2, Large error in Direv X!" << endl;
+			//WARNING_QUIT ("Ylm::test2","Large error in Direv X!");
+			exit(0);
 		}
-//		*/
 	}
 	return;
 }
@@ -1173,9 +1169,6 @@ void Ylm::rlylm
 	double grly[][3]
 )
 {
-//	TITLE("Ylm","rlylm");
-//	timer::tick("Ylm","rlylm");
-
 	int MaxL = Lmax - 1;
 	
 	assert(MaxL >= 0);
@@ -1513,7 +1506,6 @@ void Ylm::rlylm
 		}
 	}
 
-//	timer::tick("Ylm", "rlylm");
 	return;
 }
 
@@ -1599,14 +1591,7 @@ void Ylm::test(void)
 			ylm[i] *= pow(R.norm(), 7);
 		}
 		
-
-//		cout << i << " " << ylm[i] << setw(20) << rly[i] << setw(20) << ylm[i] - rly[i] << endl;
-	//	cout << i << " " << dylmdr[i][0] << setw(20) << dylmdr[i][1] << setw(20) << dylmdr[i][2] << endl;
 		cout << grly[i][0] << setw(20) << grly[i][1] << setw(20) << grly[i][2] << endl;
-//
-//		cout << i << " " << dylmdr[i][0] - grly[i][0] << setw(20) 
-///							<< dylmdr[i][1] - grly[i][1] << setw(20) 
-//								<< dylmdr[i][2] - grly[i][2] << endl;
 	}
 
 	return;
@@ -1634,10 +1619,6 @@ long double Ylm::Fact(const int n)
 	for(int i=n; i>1; i--)
 	{
 		f *= i;
-//		if(n>16)
-//		{
-//			cout<<"\n n="<<n<<" "<<f;
-//		}
 	}
 	return f;
 }

@@ -2,6 +2,7 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include <cassert>
 #include "../src_global/math_integral.h"
+#include "../src_global/tool_check.h"
 #include <algorithm>
 using namespace std;
 
@@ -24,14 +25,11 @@ LCAO_Orbitals::LCAO_Orbitals()
 	this->read_in_flag = false;	
 
 	this->dr_uniform = 0.001;
+
 }
 
 LCAO_Orbitals::~LCAO_Orbitals()
 {
-	if(test_deconstructor)
-	{
-		cout << " ~LCAO_Orbitals()" << endl;
-	}
 	delete[] Phi;
 	delete[] Beta;
 	delete[] Alpha;
@@ -40,7 +38,9 @@ LCAO_Orbitals::~LCAO_Orbitals()
 
 #ifdef __MPI
 // be called in unitcell_pseudo.
-void LCAO_Orbitals::bcast_files(const int &ntype_in)
+void LCAO_Orbitals::bcast_files(
+	const int &ntype_in, 
+	const int &my_rank)
 {
 	TITLE("LCAO_Orbitals","bcast_files");
 
@@ -61,9 +61,7 @@ void LCAO_Orbitals::bcast_files(const int &ntype_in)
 		string ofile;
 		string nfile;
 
-// PLEASE avoid using 'MY_RANK' as global variable 
-// mohan note 2021-03-23
-		if(MY_RANK==0)
+		if(my_rank==0)
 		{
 			ofile = orbital_file[it];
 			//-----------------------------------
@@ -82,7 +80,7 @@ void LCAO_Orbitals::bcast_files(const int &ntype_in)
 		//-----------------------------------
 //		Parallel_Common::bcast_string(nfile);
 
-		if(MY_RANK!=0)
+		if(my_rank!=0)
 		{
 			orbital_file.push_back( ofile );
 			//-----------------------------------
@@ -101,34 +99,36 @@ void LCAO_Orbitals::bcast_files(const int &ntype_in)
 
 
 void LCAO_Orbitals::Read_Orbitals(
+	ofstream &ofs_in,
 	const int &ntype_in, 
 	const int &lmax_in,
 	const int &out_descriptor,
 	const int &out_r_matrix,
+	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
 	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
 
-	ofs_running << "\n\n\n\n";
-	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " | Setup numerical orbitals:                                          |" << endl;
-	ofs_running << " | This part setup: numerical atomic orbitals, non-local projectors   |" << endl;
-	ofs_running << " | and neutral potential (1D). The atomic orbitals information        |" << endl;
-	ofs_running << " | including the radius, angular momentum and zeta number.            |" << endl;
-	ofs_running << " | The neutral potential is the sum of local part of pseudopotential  |" << endl;
-	ofs_running << " | and potential given by atomic charge, they will cancel out beyond  |" << endl;
-	ofs_running << " | a certain radius cutoff, because the Z/r character.                |" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-	ofs_running << "\n\n\n\n";	
+	ofs_in << "\n\n\n\n";
+	ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+	ofs_in << " |                                                                    |" << endl;
+	ofs_in << " | Setup numerical orbitals:                                          |" << endl;
+	ofs_in << " | This part setup: numerical atomic orbitals, non-local projectors   |" << endl;
+	ofs_in << " | and neutral potential (1D). The atomic orbitals information        |" << endl;
+	ofs_in << " | including the radius, angular momentum and zeta number.            |" << endl;
+	ofs_in << " | The neutral potential is the sum of local part of pseudopotential  |" << endl;
+	ofs_in << " | and potential given by atomic charge, they will cancel out beyond  |" << endl;
+	ofs_in << " | a certain radius cutoff, because the Z/r character.                |" << endl;
+	ofs_in << " |                                                                    |" << endl;
+	ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	ofs_in << "\n\n\n\n";	
 
 	//--------------------------
 	//(1) check dk, dR, Rmax.
 	//--------------------------
 
-	ofs_running << "\n SETUP ONE DIMENSIONAL ORBITALS/POTENTIAL" << endl;
+	ofs_in << "\n SETUP ONE DIMENSIONAL ORBITALS/POTENTIAL" << endl;
 
 	if(!read_in_flag)
 	{
@@ -136,11 +136,11 @@ void LCAO_Orbitals::Read_Orbitals(
 	}
 
 
-	//OUT(ofs_running,"ecutwfc for kmesh",ecutwfc);
-	OUT(ofs_running,"delta k  (1/Bohr)",dk);
-	OUT(ofs_running,"delta r    (Bohr)",dR);
-	OUT(ofs_running,"dr_uniform (Bohr)",dr_uniform);
-	OUT(ofs_running,"rmax       (Bohr)",Rmax);
+	//OUT(ofs_in,"ecutwfc for kmesh",ecutwfc);
+	OUT(ofs_in,"delta k  (1/Bohr)",dk);
+	OUT(ofs_in,"delta r    (Bohr)",dR);
+	OUT(ofs_in,"dr_uniform (Bohr)",dr_uniform);
+	OUT(ofs_in,"rmax       (Bohr)",Rmax);
 
 	// check the read in data.
     assert(dk > 0.0);
@@ -182,7 +182,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	//	this->kmesh = static_cast<int> (PI / 0.01 / 4 / this->dk);
 	if(kmesh%2==0) kmesh++;
-	OUT(ofs_running,"kmesh",kmesh);
+	OUT(ofs_in,"kmesh",kmesh);
 	//-----------------------------------------------------------------
 
 
@@ -195,7 +195,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->Phi = new Numerical_Orbital[ntype];
 	for(int it=0; it<ntype; it++)
 	{
-		this->Read_PAO(it, my_rank);	
+		this->Read_PAO(ofs_in, it, force_flag, my_rank);	
 	}
 
 	
@@ -228,7 +228,7 @@ void LCAO_Orbitals::Read_Orbitals(
 #else
 		if(readin_nonlocal)
 		{
-			this->Read_NonLocal(it, this->nproj[it]);	
+			this->Read_NonLocal(it, this->nproj[it], my_rank);	
 		}
 		else
 		{
@@ -238,7 +238,7 @@ void LCAO_Orbitals::Read_Orbitals(
 		this->nprojmax = std::max( this->nprojmax, this->nproj[it] );
 	}
 
-	ofs_running << " max number of nonlocal projetors among all species is " << nprojmax << endl; 
+	ofs_in << " max number of nonlocal projetors among all species is " << nprojmax << endl; 
 
 	//caoyu add 2021-3-16
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -253,7 +253,7 @@ void LCAO_Orbitals::Read_Orbitals(
 		delete[] this->Alpha;
 		this->Alpha = new Numerical_Orbital[1];	//not related to atom type -- remain to be discussed
 
-		this->Read_Descriptor();
+		this->Read_Descriptor(ofs_in, force_flag, my_rank);
 
 	}
 
@@ -335,28 +335,29 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		// mohan comment out 2021-04-26
 		//WARNING("LCAO_Orbitals::Set_NonLocal","bug in line "+TO_STRING(__LINE__)+", matrix ic>=nc");		
 
+
 		// Peize Lin add 2019-01-23
-		this->Beta[it].set_type_info(it, 
+		this->Beta[it].set_type_info(
+			it, 
 			atom->label, 
 			atom->pp_type, 
 			atom->lmax, 
-			Coefficient_D_in_so, 
 			n_projectors, 
-			0, 
-			atom->lll, 
-			tmpBeta_lm, 
-			0);//LiuXh 2016-01-14, 2016-07-19
+			tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
+
+		// mohan add 2021-05-07
+		atom->set_d_so(Coefficient_D_in_so,n_projectors,0,0);
 	}
 	else//added by zhengdy-soc
 	{
 		int lmaxkb = - 1;
-		for (int ibeta = 0; ibeta < ucell.atoms[it].nbeta; ibeta++)
+		for (int ibeta = 0; ibeta < atom->nbeta; ibeta++)
 		{
-			lmaxkb = max( lmaxkb, ucell.atoms[it].lll[ibeta]);
+			lmaxkb = max( lmaxkb, atom->lll[ibeta]);
 		}
 
 		soc.rot_ylm(lmaxkb);
-		soc.fcoef.create(ucell.ntype, ucell.atoms[it].nh, ucell.atoms[it].nh);
+		soc.fcoef.create(ucell.ntype, atom->nh, atom->nh);
 
 		int ip1=0;
 		for(int p1 = 0; p1<n_projectors; p1++)//nbeta
@@ -447,12 +448,11 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			atom->label, 
 			atom->pp_type, 
 			atom->lmax, 
-			Coefficient_D_in_so, 
 			n_projectors, 
-			nh, 
-			atom->lll, 
-			tmpBeta_lm, 
-			1);//zhengdy-soc 2018-09-10
+			tmpBeta_lm);//zhengdy-soc 2018-09-10
+
+		// mohan add 2021-05-07
+		atom->set_d_so(Coefficient_D_in_so,n_projectors,nh,1);
 
 	}//end if
 
@@ -463,7 +463,10 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 }
 
 
-void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
+void LCAO_Orbitals::Read_NonLocal(
+	const int &it, 
+	int &n_projectors,
+	const int &my_rank)
 {
 	TITLE("LCAO_Orbitals","Read_NonLocal");
 
@@ -472,7 +475,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 	// mohan add 2010-09-08.
 	// check if the non-local pseudopotential file exist.
 	bool open = false;	
-	if(MY_RANK==0)
+	if(my_rank==0)
 	{
 		ifs.open( this->nonlocal_file[it].c_str() );
 		if(ifs)
@@ -485,7 +488,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 #endif
 	if(!open)
 	{
-		ofs_warning << " Non-local File : " << nonlocal_file[it] << endl;
+		cout << " Non-local File : " << nonlocal_file[it] << endl;
 		WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Can not find the NONLOCAL file.");
 	}
 	else
@@ -500,7 +503,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 	// maximal lmax allowed in this calculation
 	int nlmax = 0;
 
-	if(MY_RANK==0)
+	if(my_rank==0)
 	{
 		if(SCAN_BEGIN(ifs, "<HEADER>"))
 		{
@@ -540,11 +543,11 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 
 		if( !find_lmax )
 		{
-			ofs_warning << " For element " << label << endl;
-			ofs_warning << " Max L Read in from NONLOCAL = " << nlmax << endl;
+			cout << " For element " << label << endl;
+			cout << " Max L Read in from NONLOCAL = " << nlmax << endl;
 			for(int ib=0; ib<ucell.atoms[it].nbeta; ++ib)
 			{
-				ofs_warning << " Max L Read in from pseudopotential file = " << ucell.atoms[it].lll[ib] << endl;
+				cout << " Max L Read in from pseudopotential file = " << ucell.atoms[it].lll[ib] << endl;
 			}
 			WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != ucell.atoms[it].lll");
 		}
@@ -566,7 +569,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 
 //	OUT(ofs_running,"nproj_allowed",nproj_allowed);
 
-	if(MY_RANK==0)
+	if(my_rank==0)
 	{
 		if(SCAN_BEGIN(ifs, "<DIJ>"))
 		{
@@ -608,7 +611,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 	for(int p1 = 0; p1<n_projectors; p1++)
 	{
 		int meshr_ps = 0;
-		if(MY_RANK==0)
+		if(my_rank==0)
 		{
 			if(SCAN_BEGIN(ifs, "<PP_BETA>", 0))
 			{
@@ -635,7 +638,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 			{
 				WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","<PP_BETA> doesn't match!");
 			}
-		}// end MY_RANK==0
+		}// end my_rank==0
 
 //		OUT(ofs_running,"meshr_ps",meshr_ps);
 
@@ -651,7 +654,7 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		ZEROS(rab_ps, meshr_ps);
 		ZEROS(beta_r, meshr_ps);
 
-		if(MY_RANK==0)
+		if(my_rank==0)
 		{
             for (int ir = 0; ir < meshr_ps; ir++)
             {
@@ -682,13 +685,13 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
                 this->dk,
 				dr_uniform); // delta k mesh in reciprocal space
 
-		tmpBeta_lm[p1].plot(MY_RANK);
+		tmpBeta_lm[p1].plot(my_rank);
 
 		delete[] radial_ps;
 		delete[] rab_ps;
 		delete[] beta_r;
 		
-		if(MY_RANK==0)
+		if(my_rank==0)
 		{
 			SCAN_END(ifs,"</PP_BETA>");
 		}
@@ -699,12 +702,8 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 		label, 
 		ps_type, 
 		nlmax, 
-		Coefficient_D_in_so, 
 		n_projectors, 
-		0, 
-		LfromBeta, 
-		tmpBeta_lm, 
-		ucell.atoms[it].has_so);
+		tmpBeta_lm);
 		
 	ifs.close();
 
@@ -725,7 +724,9 @@ void LCAO_Orbitals::Read_NonLocal(const int &it, int &n_projectors)
 // be careful! nchi[l] may be different for differnt phi
 //-------------------------------------------------------
 void LCAO_Orbitals::Read_PAO(
+	ofstream &ofs_in,
 	const int& it, 
+	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals","Read_PAO");
@@ -745,11 +746,11 @@ void LCAO_Orbitals::Read_PAO(
 #endif
 	if(!open)
 	{
-		ofs_warning << " Orbital file : " << this->orbital_file[it] << endl;
+		cout << " Orbital file : " << this->orbital_file[it] << endl;
 		WARNING_QUIT("LCAO_Orbitals::Read_PAO","Couldn't find orbital files");
 	}
 
-	ofs_running << " " << setw(12) << "ORBITAL" << setw(3) << "L" 
+	ofs_in << " " << setw(12) << "ORBITAL" << setw(3) << "L" 
 	<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
 	<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
 		<< setw(12) << "NEW_UNIT" << endl;
@@ -758,7 +759,7 @@ void LCAO_Orbitals::Read_PAO(
 	int lmaxt=0;
 	int nchimaxt=0;
 
-	this->read_orb_file(in_ao, it, lmaxt, nchimaxt, this->Phi);
+	this->read_orb_file(ofs_in, in_ao, it, lmaxt, nchimaxt, this->Phi, force_flag, my_rank);
 
 	//lmax and nchimax for all types
 	this->lmax = std::max(this->lmax, lmaxt);
@@ -770,19 +771,22 @@ void LCAO_Orbitals::Read_PAO(
 
 
 //caoyu add 2021-3-16
-void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
+void LCAO_Orbitals::Read_Descriptor(
+	ofstream &ofs_in,
+	const bool &force_flag, // mohan add 2021-05-07
+	const int &my_rank)	//read descriptor basis
 {
 	TITLE("LCAO_Orbitals", "Read_Descriptor");
 
 	ifstream in_de;
-	ofs_running << " " << setw(12) << "DESCRIPTOR" << setw(3) << "L"
+	ofs_in << " " << setw(12) << "DESCRIPTOR" << setw(3) << "L"
 		<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
 		<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
 		<< setw(12) << "NEW_UNIT" << endl;
 
 	// check if the descriptor file exists.
 	bool open = false;
-	if (MY_RANK == 0)
+	if (my_rank == 0)
 	{
 		in_de.open(this->descriptor_file.c_str());
 		if (in_de)
@@ -795,14 +799,14 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 #endif
 	if (!open)
 	{
-		ofs_warning << " Orbital file : " << this->descriptor_file << endl;
+		cout << " Orbital file : " << this->descriptor_file << endl;
 		WARNING_QUIT("LCAO_Orbitals::Read_Descriptor", "Couldn't find orbital files for descriptor");
 	}
 
 	this->lmax_d = 0;
 	this->nchimax_d = 0;
 
-	this->read_orb_file(in_de, 0, this->lmax_d, this->nchimax_d, this->Alpha);
+	this->read_orb_file(ofs_in, in_de, 0, this->lmax_d, this->nchimax_d, this->Alpha, force_flag, my_rank);
 
 	in_de.close();
 
@@ -811,16 +815,19 @@ void LCAO_Orbitals::Read_Descriptor(void)	//read descriptor basis
 
 
 void LCAO_Orbitals::read_orb_file(
+	ofstream &ofs_in, // ofs_running
 	ifstream &ifs,
 	const int &it, 
 	int &lmax, 
 	int &nchimax, 
-	Numerical_Orbital* ao)
+	Numerical_Orbital* ao,
+	const bool &force_flag,
+	const int &my_rank)
 {
 	TITLE("LCAO_Orbitals","read_orb_file");
 	char word[80];
 	string orb_label;
-	if (MY_RANK == 0)
+	if (my_rank == 0)
 	{
 		while (ifs.good())
 		{
@@ -843,7 +850,7 @@ void LCAO_Orbitals::read_orb_file(
 	
 	int* nchi = new int[lmax];		// allocate space: number of chi for each L.
 	
-	if (MY_RANK == 0)
+	if (my_rank == 0)
 	{	
 		for (int l = 0; l <= lmax; l++)
 		{
@@ -863,6 +870,7 @@ void LCAO_Orbitals::read_orb_file(
 	{
 		total_nchi += nchi[l];
 	}
+
 	//OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
 	delete[] ao[it].phiLN;
 	ao[it].phiLN = new Numerical_Orbital_Lm[total_nchi];
@@ -871,7 +879,7 @@ void LCAO_Orbitals::read_orb_file(
 	int meshr_read=0;
 	double dr=0.0; 
 
-	if (MY_RANK == 0)
+	if (my_rank == 0)
 	{
 		while (ifs.good())
 		{
@@ -910,7 +918,7 @@ void LCAO_Orbitals::read_orb_file(
 	{
 		for (int N = 0; N < nchi[L]; N++)
 		{
-			ofs_running << " " << setw(12) << count + 1 << setw(3) << L << setw(3) << N;
+			ofs_in << " " << setw(12) << count + 1 << setw(3) << L << setw(3) << N;
 
 			double* radial; // radial mesh
 			double* psi; // radial local orbital
@@ -918,7 +926,7 @@ void LCAO_Orbitals::read_orb_file(
 			double* rab;// dr
 
 			// set the number of mesh and the interval distance.
-			ofs_running << setw(8) << meshr << setw(8) << dr;
+			ofs_in << setw(8) << meshr << setw(8) << dr;
 
 			radial = new double[meshr];
 			psi = new double[meshr];
@@ -942,17 +950,17 @@ void LCAO_Orbitals::read_orb_file(
 			}
 
 			// set the length of orbital
-			ofs_running << setw(8) << radial[meshr - 1];
+			ofs_in << setw(8) << radial[meshr - 1];
 
 			// mohan update 2010-09-07
 			bool find = false;
-			if (MY_RANK == 0)
+			if (my_rank == 0)
 			{
 				while (!find)
 				{
 					if (ifs.eof())
 					{
-						ofs_warning << " Can't find l="
+						cout << " Can't find l="
 							<< L << " n=" << N << " orbital." << endl;
 						break;
 					}
@@ -1007,7 +1015,7 @@ void LCAO_Orbitals::read_orb_file(
 			assert(unit>0.0);
 
 			// check unit: \sum ( psi[r] * r )^2 = 1
-			ofs_running << setprecision(3) << setw(12) << unit;
+			ofs_in << setprecision(3) << setw(12) << unit;
 
 			for (int ir = 0; ir < meshr; ir++)
 			{
@@ -1021,7 +1029,7 @@ void LCAO_Orbitals::read_orb_file(
 			}
 			Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
-			ofs_running << setw(12) << unit << endl;
+			ofs_in << setw(12) << unit << endl;
 
 			ao[it].phiLN[count].set_orbital_info(
                 orb_label,
@@ -1037,7 +1045,8 @@ void LCAO_Orbitals::read_orb_file(
 				this->dk,
 				this->dr_uniform,
 				true,
-				true); // delta k mesh in reciprocal space
+				true,
+				force_flag); // delta k mesh in reciprocal space
 
 			delete[] radial;
 			delete[] rab;

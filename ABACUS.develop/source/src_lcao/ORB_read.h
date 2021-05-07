@@ -20,14 +20,18 @@ class LCAO_Orbitals
 	~LCAO_Orbitals();
 
 	void Read_Orbitals(
+		ofstream &ofs_in, // mohan add 2021-05-07
 		const int &ntype_in,
 		const int &lmax_in,
 		const int &out_descriptor, //  mohan add 2021-04-25
 		const int &out_r_matrix, // mohan add 2021-04-26
+		const bool &force_flag, // mohan add 2021-05-07
 		const int &my_rank); // mohan add 2021-04-26
 
 	void Read_PAO(
+		ofstream &ofs_in,
 		const int& it,
+		const bool &force_flag, // mohan add 2021-05-07
 		const int& my_rank); // mohan add 2021-04-26
 
 #ifdef __NORMAL
@@ -37,14 +41,17 @@ class LCAO_Orbitals
 	void Set_NonLocal(const int &it, int &n_projectors);
 
 	// read in the NONLOCAL projector from file.
-	void Read_NonLocal(const int& it, int &n_projectors);
+	void Read_NonLocal(const int& it, int &n_projectors, const int &my_rank);
 #endif
 
 
-	void Read_Descriptor(void);		//caoyu add 2020-3-16
+	void Read_Descriptor(
+		ofstream &ofs_in,
+		const bool &force_flag, // mohan add 2021-05-07
+		const int &my_rank);	//caoyu add 2020-3-16
 
 #ifdef __MPI
-	void bcast_files(const int &ntype_in);
+	void bcast_files(const int &ntype_in, const int &my_rank);
 #endif
 
 	const double& get_ecutwfc(void) const {return ecutwfc;}
@@ -96,9 +103,16 @@ class LCAO_Orbitals
 
 	int lmax_d;	//caoyu add 2021-03-17
 	int nchimax_d;	//caoyu add 2021-03-17
-	void read_orb_file(ifstream &ifs, 
-		const int &it, int &lmax, 
-		int &nchimax, Numerical_Orbital* ao);	//caoyu add 2021-04-26
+
+	void read_orb_file(
+		ofstream &ofs_in,
+		ifstream &ifs, 
+		const int &it, 
+		int &lmax, 
+		int &nchimax, 
+		Numerical_Orbital* ao,
+		const bool &force_flag, // mohan add 2021-05-07
+		const int &my_rank);	//caoyu add 2021-04-26
 
 };
 
