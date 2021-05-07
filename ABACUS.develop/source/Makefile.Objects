@@ -88,6 +88,7 @@ sph_bessel_recursive-d1.o \
 sph_bessel_recursive-d2.o \
 global_variable.o \
 global_function.o \
+title.o\
 global_file.o \
 element_basis_index.o \
 restart.o \

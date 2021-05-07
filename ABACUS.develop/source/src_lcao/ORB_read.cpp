@@ -2,8 +2,6 @@
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include <cassert>
 #include "../src_global/math_integral.h"
-//#include <math.h>
-//#include <cmath>
 #include <algorithm>
 using namespace std;
 
@@ -102,7 +100,6 @@ void LCAO_Orbitals::bcast_files(const int &ntype_in)
 #endif
 
 
-//#include "../src_pw/global.h"
 void LCAO_Orbitals::Read_Orbitals(
 	const int &ntype_in, 
 	const int &lmax_in,
@@ -822,11 +819,17 @@ void LCAO_Orbitals::read_orb_file(
 {
 	TITLE("LCAO_Orbitals","read_orb_file");
 	char word[80];
+	string orb_label;
 	if (MY_RANK == 0)
 	{
 		while (ifs.good())
 		{
 			ifs >> word;
+			if (std::strcmp(word, "Element") == 0)
+			{
+				ifs >> orb_label;
+				continue;
+			}
 			if (std::strcmp(word, "Lmax") == 0)
 			{
 				ifs >> lmax;
@@ -1021,7 +1024,7 @@ void LCAO_Orbitals::read_orb_file(
 			ofs_running << setw(12) << unit << endl;
 
 			ao[it].phiLN[count].set_orbital_info(
-                ucell.atoms[it].label,
+                orb_label,
                 it, //type
 				L, //angular momentum L
 				N, // number of orbitals of this L
@@ -1046,7 +1049,7 @@ void LCAO_Orbitals::read_orb_file(
 	}
 	ao[it].set_orbital_info(
         it, // type
-        ucell.atoms[it].label, // label	
+        orb_label, // label	
 		lmax,
 		nchi,
 		total_nchi); //copy twice !

@@ -1,11 +1,6 @@
-//#include "../src_pw/tools.h"
 #include "ORB_control.h"
-//#include "src_global/sltk_atom_arrange.h"
 #include "ORB_gen_tables.h"
 #include "build_st_pw.h"
-#include "../src_pdiag/pdiag_double.h"
-
-//#include "../src_pw/global.h"
 
 ORB_control::ORB_control()
 {}
