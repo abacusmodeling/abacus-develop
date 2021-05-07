@@ -64,6 +64,7 @@ class ORB_gen_tables
 		const Vector3<double> &Rnl,
 		const int &type,
 		const matrix &dion, // mohan add 2021-04-25
+		const ComplexArray &d_so, // mohan add 2021-04-25
 		complex<double> *nlm1=NULL,
 		const int is=0)const;
 

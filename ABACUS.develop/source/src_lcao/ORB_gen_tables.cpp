@@ -125,6 +125,7 @@ void ORB_gen_tables::snap_psibeta(
 	const Vector3<double> &R0, // The projector.
 	const int &T0,
 	const matrix &dion, // mohan add 2021-04-25
+	const ComplexArray &d_so, // mohan add 2021-04-25
 	complex<double> *nlm1,
 	const int is) const
 {
@@ -523,11 +524,11 @@ void ORB_gen_tables::snap_psibeta(
 					const int p2 = ORB.Beta[T0].get_index2_soc(is, no);
 					if (NSPIN == 4 && nlm1 != NULL)
 					{
-						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(is, p2, p1);
+						nlm1[is] += term_a_nc[p1] * term_b_nc[p2] * d_so(is, p2, p1);
 					}
 					else if (NSPIN != 4)
 					{
-						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * ORB.Beta[T0].getCoefficient_D_so(0, p2, p1)).real();
+						nlm[0] += (term_a_nc[p1] * term_b_nc[p2] * d_so(0, p2, p1)).real();
 					}
 					else
 					{
