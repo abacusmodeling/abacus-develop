@@ -96,7 +96,7 @@ class Gint_Gamma : public Grid_Base_Beta
 	void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const;
 
 	void cal_psir_ylm_rho(int size, int grid_index, double delta_r,
-        double** distance, double* ylma,
+        double** distance,
         int* at, int* block_index, int* block_iw, int* block_size, 
         int** cal_flag, double** psir_ylm);
 

@@ -54,7 +54,6 @@ inline void cal_psir_ylm(
 	double*** dr, // dr[ bxyz ; atoms_on_this_big_cell; xyz ] 
 	double** distance, // [ bxyz ; atoms_on_this_big_cell]
 	const Numerical_Orbital_Lm* pointer, // pointer for ORB.Phi[it].PhiLN 
-	double* ylma, // spherical harmonic functions 
 	int* colidx,  // count total number of atomis orbitals 
 	int* block_iw, // seems not belong to this subroutine
 	int* bsize,  // ??
@@ -118,6 +117,7 @@ inline void cal_psir_ylm(
             
 			cal_flag[ib][id]=1;
 
+			std::vector<double> ylma;
             //if(distance[id] > GridT.orbital_rmax) continue;
             //    Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
             if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
@@ -511,8 +511,6 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			//------------------------------------------------------
 			// spherical harmonic functions Ylm
 			//------------------------------------------------------
-			double* ylma=new double[nnnmax];
-			ZEROS(ylma, nnnmax);
 			double *vldr3=new double[pw.bxyz];
 			ZEROS(vldr3, pw.bxyz);
 			int* vindex=new int[pw.bxyz];
@@ -628,7 +626,7 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 						// compute atomic basis phi(r) with both radial and angular parts
 						//------------------------------------------------------------------
 						cal_psir_ylm(size, grid_index_thread, delta_r, phi, mt, dr, 
-						distance, pointer, ylma, colidx, block_iw, bsize,  psir_ylm, cal_flag);
+						distance, pointer, colidx, block_iw, bsize,  psir_ylm, cal_flag);
 
 						//------------------------------------------------------------------
 						// calculate <phi_i|V|phi_j>
@@ -675,7 +673,6 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 			}
 			delete[] cal_flag;
 			delete[] vindex;
-			delete[] ylma;
 			delete[] vldr3;    
 			delete[] block_iw;
 			delete[] psir_vlbr3;

@@ -85,7 +85,7 @@ class Gint_k : public Gint_k_init
 	// set the orbital/Ylm information on each real space grid.
 	void set_ijk_atom(const int &grid_index, const int &size,
 		double*** psir_ylm, double*** dr, bool** cal_flag, 
-		double** distance, double* ylma, const double &delta_r);
+		double** distance, const double &delta_r);
 
 	//------------------------------------------------------
 	// in gint_k_vl.cpp 
