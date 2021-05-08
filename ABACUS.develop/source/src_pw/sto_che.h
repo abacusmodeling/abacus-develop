@@ -20,7 +20,11 @@ class Stochastic_Chebychev
     void calcoef(double fun(double));
     complex<double> sumallterms();
     
-    void calfinalvec(void fun(complex<double> *in, complex<double> *out, const int), complex<double> *wavein, complex<double> *waveout, const int m = 1);
+    void calfinalvec(
+		void fun(complex<double> *in, complex<double> *out, const int), 
+		complex<double> *wavein, 
+		complex<double> *waveout, 
+		const int m = 1);
 
     bool checkconverge(void tfun(complex<double> *in, complex<double> *out, const int), 
                       complex<double> *wavein,double& tmax, double &tmin, double stept);
