@@ -34,7 +34,7 @@ class ORB_gen_tables
 	void snap_psipsi(
 		double olm[],
 		const int &job, // 0 for matrix element of either S or T, 1 for its derivatives
-	    const char &dtype, // derivative type, 'S' for overlap, 'T' for kinetic energy
+	    const char &dtype, // derivative type, 'S' for overlap, 'T' for kinetic energy, 'D' for descriptor in deepks
 		const Vector3<double> &R1,
     	const int &I1,
     	const int &l1,
@@ -74,23 +74,6 @@ class ORB_gen_tables
 		const int &nproj_in, // mohan add 2021-05-07
 		complex<double> *nlm1=NULL,
 		const int is=0)const;
-
-	//caoyu add 2021-03-17
-	//job = 0 for vnl matrix elements
-	//job = 1 for its derivatives
-	void snap_psialpha(
-		double olm[],
-		const int& job,
-		const Vector3<double>& R1,
-		const int& I1,
-		const int& l1,
-		const int& m1,
-		const int& n1,
-		const Vector3<double>& R2,
-		const int& I2,
-		const int& l2,
-		const int& m2,
-		const int& n2)const;
 
 	// set as public because in hamilt_linear, 
 	// we need to destroy the tables: SR,TR,NR
