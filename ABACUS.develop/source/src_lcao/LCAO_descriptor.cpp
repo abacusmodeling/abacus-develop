@@ -115,9 +115,9 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
                                     olm[0] = olm[1] = olm[2] = 0.0;
                                     if (!calc_deri)
                                     {
-                                        UOT.snap_psialpha(olm, 0, tau1,
+                                        UOT.snap_psipsi(olm, 0, 'D', tau1,
                                                 T1, L1, m1, N1, GridD.getAdjacentTau(ad),
-                                                T2, L2, m2, N2);
+                                                T2, L2, m2, N2, NSPIN);
                                         if (GAMMA_ONLY_LOCAL)
                                         {
                                             this->set_S_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0]);
@@ -125,9 +125,9 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
                                     }
                                     else
                                     {
-                                        UOT.snap_psialpha(olm, 1, tau1,
+                                        UOT.snap_psipsi(olm, 1, 'D', tau1,
                                             T1, L1, m1, N1, GridD.getAdjacentTau(ad),
-                                            T2, L2, m2, N2);
+                                            T2, L2, m2, N2, NSPIN);
                                         if (GAMMA_ONLY_LOCAL)
                                         {
                                             this->set_DS_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0], olm[1], olm[2]);
