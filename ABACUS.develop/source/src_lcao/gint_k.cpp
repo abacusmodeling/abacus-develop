@@ -1150,8 +1150,7 @@ void Gint_k::set_ijk_atom(
 	double*** psir_ylm, 
 	double*** dr, 
 	bool** cal_flag, 
-	double** distance, 
-	double* ylma, 
+	double** distance,
 	const double &delta_r)
 {
 	const Numerical_Orbital_Lm* pointer;
@@ -1201,7 +1200,7 @@ void Gint_k::set_ijk_atom(
 
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 
-			
+			std::vector<double> ylma;
 			Ylm::sph_harm ( ucell.atoms[it].nwl,
 					dr[ib][id][0] / distance[ib][id],
 					dr[ib][id][1] / distance[ib][id],

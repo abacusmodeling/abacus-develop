@@ -6,7 +6,7 @@
 
 using namespace std;
 int Ylm::nlm = 0;
-vector<double> Ylm::ylmcoef(100);
+std::vector<double> Ylm::ylmcoef(100);
 
 // here Lmax == max angular momentum + 1
 void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr[] )
@@ -486,9 +486,11 @@ void Ylm::sph_harm
  	const double& xdr,
 	const double& ydr,
 	const double& zdr,
-	double rly[]
+	std::vector<double> &rly
 )
 {
+	rly.resize( (Lmax+1)*(Lmax+1) );
+
 	//begin calculation
 	/***************************
 			 L = 0
@@ -623,7 +625,7 @@ void Ylm::rl_sph_harm
  	const double& x,
 	const double& y,
 	const double& z,
-	vector<double>& rly
+	std::vector<double>& rly
 )
 {
 	rly.resize( (Lmax+1)*(Lmax+1) );
@@ -762,12 +764,12 @@ void Ylm::grad_rl_sph_harm
  	const double& x,
 	const double& y,
 	const double& z,
-	vector<double>& rly,
-	vector<vector<double>>& grly
+	std::vector<double>& rly,
+	std::vector<std::vector<double>>& grly
 )
 {
 	rly.resize( (Lmax+1)*(Lmax+1) );
-	grly.resize( (Lmax+1)*(Lmax+1), vector<double>(3) );
+	grly.resize( (Lmax+1)*(Lmax+1), std::vector<double>(3) );
 
 	double radius2 = x*x+y*y+z*z;
 	double tx = 2.0*x;
@@ -1105,7 +1107,7 @@ void Ylm::test1 (void)
 	int nu = 100;
 	
 	// Peize Lin change rlya 2016-08-26
-	vector<double> rlya;
+	std::vector<double> rlya;
 	double rlyb[400];
 	ZEROS( rlyb, 400);
 	
@@ -1136,10 +1138,10 @@ void Ylm::test2 (void)
 	
 	//int nu = 100;
 
-	vector<double> rlya;
+	std::vector<double> rlya;
 	double rlyb[400];
 	
-	vector<vector<double>> grlya;
+	std::vector<std::vector<double>> grlya;
 	double grlyb[400][3];
 	
 	Ylm::grad_rl_sph_harm (9, R.x, R.y, R.z, rlya, grlya);

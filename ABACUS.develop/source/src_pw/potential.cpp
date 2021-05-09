@@ -290,9 +290,9 @@ matrix Potential::v_of_rho(
 //----------------------------------------------------------
 	
 	#ifdef USE_LIBXC
-    const auto etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, CHR.rho_core);
+    const std::tuple<double,double,matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, CHR.rho_core);
 	#else
-    const auto etxc_vtxc_v = H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, rho_in, CHR.rho_core);
+    const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, rho_in, CHR.rho_core);
 	#endif
 	H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
 	H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
