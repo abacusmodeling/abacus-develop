@@ -19,7 +19,8 @@ Stochastic_Iter::~Stochastic_Iter()
 {
     delete[] spolyv;
 }
-void Stochastic_Iter:: init(int &dim, int& chetype)
+
+void Stochastic_Iter::init(int &dim, int& chetype)
 {
     nchip = STO_WF.nchip;
     stotype = STO_WF.stotype;
@@ -34,7 +35,7 @@ void Stochastic_Iter:: init(int &dim, int& chetype)
 
 }
 
-void Stochastic_Iter:: orthog()
+void Stochastic_Iter::orthog()
 {
     int nkk=1;// We temporarily use gamma k point.
     //orthogonal part
@@ -57,7 +58,7 @@ void Stochastic_Iter:: orthog()
     }
 }
 
-void Stochastic_Iter:: checkemm(int &iter)
+void Stochastic_Iter::checkemm(int &iter)
 {
     if(iter == 1)
     {
@@ -65,16 +66,22 @@ void Stochastic_Iter:: checkemm(int &iter)
         Stochastic_hchi:: Emax = STO_WF.emax_sto;
     }
     else if(iter > 5)
+	{
         return;
+	}
         
     int norder = stoche.norder;
-    
-        
+       
     //wait for init
     
     complex<double> * pchi;
     int ntest = 1;
-    if (nchip < ntest) ntest = nchip;
+
+    if (nchip < ntest) 
+	{
+		ntest = nchip;
+	}
+
     bool change = false;
     for(int ichi = 0; ichi < ntest; ++ichi)
     {
@@ -90,29 +97,55 @@ void Stochastic_Iter:: checkemm(int &iter)
         {
             bool converge;
             if(stotype == "pw")
-                converge = stoche.checkconverge(stohchi.hchi_reciprocal, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
+			{
+                converge = stoche.checkconverge(
+					stohchi.hchi_reciprocal, 
+					pchi, 
+					Stochastic_hchi::Emax, 
+					Stochastic_hchi::Emin, 
+					5);
+			}
             else
-                converge = stoche.checkconverge(stohchi.hchi_real, pchi, Stochastic_hchi:: Emax, Stochastic_hchi:: Emin, 5);
+			{
+                converge = stoche.checkconverge(
+					stohchi.hchi_real, 
+					pchi, 
+					Stochastic_hchi::Emax, 
+					Stochastic_hchi::Emin, 
+					5);
+			}
+
             if(!converge)
+			{
                 change = true;
+			}
             else
+			{
                 break;
+			}
         }
     }
+
     Emax = Stochastic_hchi:: Emax;
     Emin = Stochastic_hchi:: Emin;
+
 #ifdef __MPI
     MPI_Allreduce(MPI_IN_PLACE, &Emax, 1, MPI_DOUBLE, MPI_MAX , MPI_COMM_WORLD);
     MPI_Allreduce(MPI_IN_PLACE, &Emin, 1, MPI_DOUBLE, MPI_MIN , MPI_COMM_WORLD);
     MPI_Allreduce(MPI_IN_PLACE, &change, 1, MPI_CHAR, MPI_LOR , MPI_COMM_WORLD);
 #endif
-    if(change)   cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<endl;
+
+    if(change)
+	{
+		cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<endl;
+	}
+
     Stochastic_hchi:: Emin = Emin;
     Stochastic_hchi:: Emax = Emax;
     
 }
 
-void Stochastic_Iter:: itermu( int &iter) 
+void Stochastic_Iter::itermu(int &iter) 
 {
     timer::tick("Stochastic_Iter","itermu",'E');
     int nkk=1;// We temporarily use gamma k point.

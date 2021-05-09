@@ -1,14 +1,13 @@
 #include "sto_wf.h"
 #include "global.h"
 
-
 Stochastic_WF::Stochastic_WF()
 {
     chiortho  = new ComplexMatrix[1];
-    chi0  = new ComplexMatrix[1];
-     emax_sto = 1;
-     emin_sto = -1;
-     stotype = "pw";
+	chi0  = new ComplexMatrix[1];
+	emax_sto = 1;
+	emin_sto = -1;
+	stotype = "pw";
 }
 
 Stochastic_WF::~Stochastic_WF()
@@ -17,7 +16,7 @@ Stochastic_WF::~Stochastic_WF()
     delete[] chi0;
 }
 
-void Stochastic_WF::init()
+void Stochastic_WF::init(void)
 {
     //wait for init
 
@@ -78,9 +77,13 @@ void Stochastic_WF::init()
         for(int i = 0 ; i < nchip ; ++i)
         {
             if(MY_POOL < re)
+			{
                 ig = MY_POOL * nchip + i - ig0;
+			}
             else
+			{
                 ig = MY_POOL * nchip - re + i - ig0;
+			}
             while(ig >= npwip[ip])
             {
                 ig -= npwip[ip];
@@ -88,7 +91,9 @@ void Stochastic_WF::init()
                 ip++;
             }
             if(RANK_IN_POOL == ip)
+			{
                 chi0[0](i , ig) = 1;
+			}
         }
     }
     else

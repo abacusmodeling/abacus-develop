@@ -2,14 +2,24 @@
 #include "global.h"
 #include "sto_hchi.h" 
 
-int Stochastic_hchi:: nrxx;
-int Stochastic_hchi:: nx,Stochastic_hchi::ny,Stochastic_hchi::nz;
-fftw_plan Stochastic_hchi:: pb, Stochastic_hchi::pf;
-double Stochastic_hchi:: Emin, Stochastic_hchi:: Emax;
-bool Stochastic_hchi:: initplan, Stochastic_hchi::ortho;
-complex<double>* Stochastic_hchi:: rp_chi, * Stochastic_hchi::rl_chi;
-int * Stochastic_hchi:: GRA_index;
+int Stochastic_hchi::nrxx;
+int Stochastic_hchi::nx;
+int Stochastic_hchi::ny;
+int Stochastic_hchi::nz;
 
+fftw_plan Stochastic_hchi::pb;
+fftw_plan Stochastic_hchi::pf;
+
+double Stochastic_hchi::Emin;
+double Stochastic_hchi::Emax;
+
+bool Stochastic_hchi::initplan;
+bool Stochastic_hchi::ortho;
+
+complex<double>* Stochastic_hchi::rp_chi;
+complex<double>* Stochastic_hchi::rl_chi;
+
+int * Stochastic_hchi:: GRA_index;
 
 Stochastic_hchi::Stochastic_hchi()
 {
@@ -50,11 +60,22 @@ void Stochastic_hchi:: init()
 		GRA_index = new int [wf.npw];
 		if(STO_WF.stotype != "pw")
 		{
-        rp_chi = new complex<double> [nrxx];
-		rl_chi = new complex<double> [nrxx];
-		pf=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)rp_chi,(fftw_complex *)rp_chi, FFTW_FORWARD, FFTW_MEASURE);
-		pb=fftw_plan_dft_3d(nx,ny,nz,(fftw_complex *)rl_chi,(fftw_complex *)rl_chi, FFTW_BACKWARD, FFTW_MEASURE);
-		initplan = true;
+			rp_chi = new complex<double> [nrxx];
+			rl_chi = new complex<double> [nrxx];
+
+			pf=fftw_plan_dft_3d(nx,ny,nz,
+				(fftw_complex *)rp_chi,
+				(fftw_complex *)rp_chi, 
+				FFTW_FORWARD, 
+				FFTW_MEASURE);
+
+			pb=fftw_plan_dft_3d(nx,ny,nz,
+				(fftw_complex *)rl_chi,
+				(fftw_complex *)rl_chi, 
+				FFTW_BACKWARD, 
+				FFTW_MEASURE);
+
+			initplan = true;
 		}
     }
     else
@@ -474,9 +495,13 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 			char transn = 'N';
 			char transt = 'T';
 			if(m==1 && NPOL ==1)
+			{
 				zgemv_(&transc, &npw, &nkb, &ONE, ppcell.vkb.c, &wf.npwx, chig, &inc, &ZERO, becp, &inc);
+			}
 			else
+			{
 				zgemm_(&transc,&transn,&nkb,&npm,&npw,&ONE,ppcell.vkb.c,&wf.npwx,chig,&npw,&ZERO,becp,&nkb);
+			}
 			Parallel_Reduce::reduce_complex_double_pool( becp, nkb * NPOL * m);
 
 			complex<double> *Ps  = new complex<double> [nkb * NPOL * m];
@@ -498,7 +523,8 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
     		            {
 							for(int ib = 0; ib < m ; ++ib)
 							{
-								Ps[(sum + ip2) * m + ib] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[ib * nkb + sum + ip];
+								Ps[(sum + ip2) * m + ib] += 
+								ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[ib * nkb + sum + ip];
 							}//end ib
     		            }// end ih
     		        }//end jh 
@@ -508,9 +534,14 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
     		} //end nt
 
 			if(NPOL==1 && m==1)
+			{
 				zgemv_(&transn, &npw, &nkb, &ONE, ppcell.vkb.c, &wf.npwx, Ps, &inc, &ONE, hchig, &inc);
+			}
 			else
+			{
 				zgemm_(&transn,&transt,&npw,&npm,&nkb,&ONE,ppcell.vkb.c,&wf.npwx,Ps,&npm,&ONE,hchig,&npw);
+			}
+
 			delete[] becp;
 			delete[] Ps;
 		}

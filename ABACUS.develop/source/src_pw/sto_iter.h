@@ -1,5 +1,5 @@
-#ifndef INCLUDE_STO_ITER_H
-#define INCLUDE_STO_ITER_H
+#ifndef STO_ITER_H
+#define STO_ITER_H
 
 #include "tools.h"
 #include "sto_che.h"
@@ -24,21 +24,35 @@ class Stochastic_Iter
 
     void init(int &, int &);
     
-    void sum_stoband();
-    double calne();
+    void sum_stoband(void);
+
+    double calne(void);
+
     void itermu(int & iter);
-    void sumpolyval();
-    void orthog();
+
+    void sumpolyval(void);
+
+    void orthog(void);
+
     void checkemm(int &iter);
-    void test(); //only for test
+
+    void test(void); //only for test
+
     Stochastic_Chebychev stoche;
+
     Stochastic_hchi stohchi;
 
 
-	static double mu, mu0; // chemical potential; unit in Ry
-    static double Emin, Emax; // unit in Ry
+	static double mu;
+	static double mu0; // chemical potential; unit in Ry
+
+    static double Emin;
+	static double Emax; // unit in Ry
+
     double targetne;
-    double * spolyv;
+
+    double *spolyv;
+
     string stotype;
 
 	private:
@@ -53,7 +67,6 @@ class Stochastic_Iter
     static double nfd(double e);
     static double fdlnfd(double e);
     static double nfdlnfd(double e);
-
 
 };
 
