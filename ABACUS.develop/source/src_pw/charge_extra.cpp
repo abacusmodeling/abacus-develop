@@ -420,3 +420,27 @@ void Charge_Extra::find_alpha_and_beta(void)
 	}
 	return;
 }
+
+void Charge_Extra::save_pos_next(const UnitCell_pseudo& ucell)
+{
+	ucell.save_cartesian_position(this->pos_next);
+	return;
+}
+
+void Charge_Extra::update_istep(const int &step)
+{
+	this->istep = step;
+	return;
+}
+
+void Charge_Extra::update_all_pos(const UnitCell_pseudo& ucell)
+{
+	const int total_freedom = ucell.nat * 3;
+	for(int i=0;i<total_freedom;i++)
+	{
+		this->pos_old2[i] = this->pos_old1[i];
+		this->pos_old1[i] = this->pos_now[i];
+	}
+	ucell.save_cartesian_position(this->pos_now);
+	return;
+}

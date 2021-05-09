@@ -829,8 +829,13 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											atom1->iw2l[ j ], // L1
 											atom1->iw2m[ j ], // m1
 											atom1->iw2n[ j ], // N1
-											tau0, T0
-											);
+											tau0, T0, ucell.atoms[T0].dion, NSPIN,
+											ucell.atoms[T0].d_so,
+											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
+											ucell.atoms[T0].index1_soc[0],
+											ucell.atoms[T0].index2_soc[0],
+											ucell.atoms[T0].nproj_soc
+											); // mohan  add 2021-05-07
 
 									double nlm1[3]={0,0,0};
 									if(isstress)
@@ -847,8 +852,13 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											atom2->iw2l[ k ], // L2
 											atom2->iw2m[ k ], // m2
 											atom2->iw2n[ k ], // N2
-											tau0, T0
-											);
+											tau0, T0, ucell.atoms[T0].dion, NSPIN,
+											ucell.atoms[T0].d_so,
+											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
+											ucell.atoms[T0].index1_soc[0],
+											ucell.atoms[T0].index2_soc[0],
+											ucell.atoms[T0].nproj_soc
+											); // mohan  add 2021-05-07
 									}
 									/// only one projector for each atom force, but another projector for stress
 									for(int is=0; is<NSPIN; ++is)
@@ -864,7 +874,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											{
 												for(int ipol=0;ipol<3;ipol++)
 												{
-													svnl_dbeta(jpol, ipol) += dm2d[is][iir] * (nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
+													svnl_dbeta(jpol, ipol) += dm2d[is][iir] * 
+													(nlm[jpol] * r1[ipol] + nlm1[jpol] * r0[ipol]);
 												}
 											}
 										}
@@ -883,7 +894,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 
 	assert( iir == LNNR.nnr );
 
-	if(isstress){
+	if(isstress)
+	{
 		for(int i=0;i<3;i++)
 		{
 			for(int j=0;j<3;j++)

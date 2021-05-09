@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <set>
 #include "src_pw/global.h"
-#include "src_lcao/ORB_read.h"
+#include "module_ORB/ORB_read.h"
 #include "src_global/ylm.h"
 #include "src_global/global_function.h"
 
@@ -36,7 +36,7 @@ void Exx_Abfs::Matrix_Orbs11::init(
 //ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.allocate\t"<<time_during(t_start)<<endl;
 	int Lmax_used, Lmax;
 //gettimeofday( &t_start, NULL);
-	MOT.init_Table_Spherical_Bessel (2, mode, Lmax_used, Lmax);
+	MOT.init_Table_Spherical_Bessel (2, mode, Lmax_used, Lmax, Exx_Abfs::Lmax);
 //	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1
 //	MOT.Destroy_Table_Spherical_Bessel (Lmax_used);				// why?
 //ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.init_Table_Spherical_Bessel\t"<<time_during(t_start)<<endl;

@@ -1,0 +1,7 @@
+This is the ORB module, which is used to compute
+the "two-center integrals" of numerical atomic orbitals
+
+Numerical atomic orbitals now include:
+1) numerical atomic orbitals for expanding wave functions of systems
+2) non-local projectors
+3) descriptors
