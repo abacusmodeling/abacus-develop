@@ -131,8 +131,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		//(3) save change density as previous charge,
 		// prepared fox mixing.
 		if(MY_POOL == 0)
+		{
         	CHR.save_rho_before_sum_band();
-		
+		}
 
 		//prepare wavefunction&eband for other pools
 #ifdef __MPI
@@ -147,10 +148,19 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		//(4) calculate fermi energy.
 		int ndim;
     	if(STO_WF.stotype == "pw")
+		{
     	    ndim = wf.npw;
+		}
     	else
+		{
     	    ndim = pw.nrxx;
-		if(iter == 1)	stoiter.init( ndim, chetype );
+		}
+
+		if(iter == 1)	
+		{
+			stoiter.init( ndim, chetype );
+		}
+
 		stoiter.orthog();
 		stoiter.checkemm(iter);	//check and reset emax & emin
 		//stoiter.test();  //only for test
@@ -227,7 +237,10 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// in other cases rhoin contains the mixed charge density
 		// (the new input density) while rho is unchanged.
 		if(MY_POOL == 0)
+		{
 			CHR.mix_rho(dr2,diago_error,DRHO2,iter,conv_elec);
+		}
+
 #ifdef __MPI
 		MPI_Bcast(&dr2, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
 		MPI_Bcast(&conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
