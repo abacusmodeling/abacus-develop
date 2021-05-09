@@ -138,11 +138,10 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #ifdef __MPI
 		if(NBANDS > 0)
 		{
-			MPI_Bcast(wf.evc[0].c, wf.npw*NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
+			MPI_Bcast(wf.evc[0].c, wf.npwx*NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
 			MPI_Bcast(wf.ekb[0], NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
 		}
 #endif
-		
 		
 		//(4) calculate fermi energy.
 		int ndim;
@@ -153,7 +152,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		if(iter == 1)	stoiter.init( ndim, chetype );
 		stoiter.orthog();
 		stoiter.checkemm(iter);	//check and reset emax & emin
-		//stoiter.test();  //only for test
+		stoiter.test();  //only for test
 		stoiter.itermu(iter);
 
 

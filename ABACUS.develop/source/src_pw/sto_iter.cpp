@@ -767,6 +767,33 @@ double Stochastic_Iter:: nfdlnfd(double e)
     delete []wave;
     delete []waveout;*/
 
+    //-------------------------------------------------------------
+	//test orthogonal
+    /*int npw=wf.npw;
+    char transC='C';
+    char transN='N';
+    int nchip = STO_WF.nchip;
+    complex<double> *wave = new complex<double> [nchip*npw];
+    for(int i = 0; i < nchip*npw; ++i)
+    {
+        wave[i]=STO_WF.chi0[0].c[i];
+    }
+    complex<double> *sum = new complex<double> [nchip * nchip];
+	zgemm_(&transC, &transN, &nchip, &nchip, &npw, &ONE, STO_WF.chi0[0].c, &npw, wave, &npw, &ZERO, sum, &nchip);
+	Parallel_Reduce::reduce_complex_double_pool(sum, nchip * nchip);
+	if(MY_RANK!=0) cout.clear();
+    double abs2 = 0;
+    for(int i=0;i<nchip * nchip;++i)
+    {
+        if(i%nchip==int(i%nchip)) continue;
+        abs2+=norm(sum[i]);
+    }
+	cout<<abs2/nchip<<endl;
+    delete [] sum;
+    delete [] wave;
+	if(MY_RANK!=0) cout.setstate(ios::failbit);*/
+	//-------------------------------------------------------------
 
+    
     //=====================================================
  }

@@ -204,7 +204,7 @@ void Stochastic_hchi::orthogonal_to_psi_reciprocal(complex<double> *wfgin, compl
 	
 	//psi -= psi * sum
 	zgemm_(&transN, &transN, &npw, &nchip, &NBANDS, &NEG_ONE, wf.evc[ikk].c, &wf.npwx, sum, &NBANDS, &ONE, wfgout, &npw);
-
+	
 	ortho = true;
 	delete[] sum;
 	return;
