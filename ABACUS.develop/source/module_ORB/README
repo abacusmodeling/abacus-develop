@@ -50,3 +50,5 @@ which we will give detaied explanations in near future.
 You may see codes with __NORMAL defined. Those codes compiled with __NORMAL
 are used in this ORB module, while those codes compiled without __NORMAL are
 used in the ABACUS code. We will keep on optimizing those codes in near fugure.
+
+-- Mohan Chen 2021-05-21 mohanchen@pku.edu.cn
