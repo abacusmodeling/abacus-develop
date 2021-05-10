@@ -73,13 +73,13 @@ void WF_atomic::init_at_1(void)
 			//cout << "\n T=" << it << " ic=" << ic << endl;
 
             // check the unit condition
-            double *inner_part = new double[atom->msh];
-            for (int ir=0; ir<atom->msh; ir++)
+            double *inner_part = new double[atom->mesh];
+            for (int ir=0; ir<atom->mesh; ir++) //qianrui change msh to mesh, as QE uses mesh
             {
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             double unit = 0.0;
-            Mathzone::Simpson_Integral(atom->msh, inner_part, atom->rab, unit);
+            Mathzone::Simpson_Integral(atom->mesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			ofs_running << " the unit of pseudo atomic orbital is " << unit; 
@@ -87,7 +87,7 @@ void WF_atomic::init_at_1(void)
             //=================================
             // normalize radial wave functions
             //=================================
-            for (int ir=0; ir<atom->msh; ir++)
+            for (int ir=0; ir<atom->mesh; ir++)
             {
                 atom->chi(ic,ir) /= sqrt(unit);
             }
@@ -95,13 +95,13 @@ void WF_atomic::init_at_1(void)
             //===========
             // recheck
             //===========
-            inner_part = new double[atom->msh];
-            for (int ir=0; ir<atom->msh; ir++)
+            inner_part = new double[atom->mesh];
+            for (int ir=0; ir<atom->mesh; ir++)
             {
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             unit = 0.0;
-            Mathzone::Simpson_Integral(atom->msh, inner_part, atom->rab, unit);
+            Mathzone::Simpson_Integral(atom->mesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			ofs_running << ", renormalize to " << unit << endl;
@@ -465,15 +465,15 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
     {
         for (int ig = 0;ig < ng;ig++)
         {
-            const double rr = std::rand();
-            const double arg= TWO_PI * std::rand();
+            const double rr = std::rand()/double(RAND_MAX);
+            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
             Vector3<double> v3 = kv.kvec_c[ik] + pw.gcar[this->igk(ik, ig)];
             psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
         }
         if(NPOL==2)for (int ig = wf.npwx;ig < wf.npwx + ng;ig++)
         {
-            const double rr = std::rand();
-            const double arg= TWO_PI * std::rand();
+            const double rr = std::rand()/double(RAND_MAX);
+            const double arg= TWO_PI * std::rand()/double(RAND_MAX);
             Vector3<double> v3 = kv.kvec_c[ik] + pw.gcar[this->igk(ik, ig-wf.npwx)];
             psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
         }

@@ -28,7 +28,8 @@ void pseudo_atom::set_pseudo_at(const Pseudopot_upf &upf)
 	// mohan 2009-12-15
 	// mohan update again 2011-05-23, 
 	// in order to calculate more accurate Vna.
-	rcut = 15.0;//(a.u.);
+	//rcut = 15.0;//(a.u.);
+	rcut = 10.0; //qianrui temporarily modify
 	
 	//if(!LOCAL_BASIS) xiaohui modify 2013-09-02 // mohan modified 2009-1-21
 	if(BASIS_TYPE=="pw") //xiaohui add 2013-09-02
