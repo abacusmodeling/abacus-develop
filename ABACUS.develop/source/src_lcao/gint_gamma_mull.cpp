@@ -68,9 +68,6 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 		}
 	}
 
-	double* ylma = new double[nnnmax]; // Ylm for each atom: [bxyz, nnnmax]
-	ZEROS(ylma, nnnmax);
-
 	double mt[3]={0,0,0};
 	double *vldr3 = new double[pw.bxyz];
 	double v1 = 0.0;
@@ -141,6 +138,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 							continue;
 						}
 						
+						std::vector<double> ylma;
 						//if(distance[id] > GridT.orbital_rmax) continue;
 						//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 						if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
@@ -291,7 +289,6 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
         }// j
     }// i
 
-	delete[] ylma;
 	delete[] vldr3;
 	
 	if(max_size!=0) 

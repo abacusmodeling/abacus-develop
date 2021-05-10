@@ -1,4 +1,4 @@
-# This is the Makefile of ABACUS-ORB API
+# This is the Makefile of ABACUS-ADJ API
 
 #==========================
 # Compiler information 
@@ -33,7 +33,7 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 
 include Makefile.Objects
 
-VPATH=../src_global\
+VPATH=../../src_global\
 :./\
 
 #==========================
@@ -42,8 +42,8 @@ VPATH=../src_global\
 HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
 
 FP_OBJS_0=main.o\
+$(OBJS_ADJACENT)\
 $(OBJS_BASE)\
-$(OBJS_ORBITAL)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 

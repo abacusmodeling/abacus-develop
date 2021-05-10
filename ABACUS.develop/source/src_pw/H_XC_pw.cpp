@@ -5,6 +5,7 @@
 double H_XC_pw::etxc;
 double H_XC_pw::vtxc;
 
+// [etxc, vtxc, v] = H_XC_pw::v_xc(...)
 std::tuple<double,double,matrix> H_XC_pw::v_xc
 (
 	const int &nrxx, // number of real-space grid
@@ -161,5 +162,5 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     vt_xc *= omega / ncxyz;
 
     timer::tick("H_XC_pw","v_xc");
-    return std::make_tuple(et_xc,vt_xc,v);
+    return std::make_tuple(et_xc, vt_xc, std::move(v));
 }

@@ -85,18 +85,38 @@ class Gint_Gamma : public Grid_Base_Beta
 	void gamma_force(void);
 
 
-	void cal_meshball_vlocal(int size, int LD_pool, int* block_iw, int* bsize, int* colidx, 
-        int** cal_flag, double* vldr3, double** psir_ylm, double** psir_vlbr3, 
-        int* vindex, int lgd_now, double** GridVlocal);
+	void cal_meshball_vlocal(
+		const int size,
+		const int LD_pool,
+		const int*const block_iw,
+		const int*const bsize,
+		const int*const colidx,
+		const int*const*const cal_flag,
+		const double*const vldr3,
+		const double*const*const psir_ylm,
+		double*const*const psir_vlbr3,
+		const int lgd_now,
+		double*const*const GridVlocal);
 
-	void cal_band_rho(int size, int LD_pool, int* block_iw, int* bsize, int* colidx,
-                        int** cal_flag, double ** psir_ylm, double **psir_DM,
-                        double* psir_DM_pool, int* vindex);
+	void cal_band_rho(
+		int size, 
+		int LD_pool, 
+		int* block_iw, 
+		int* bsize, 
+		int* colidx,
+		int** cal_flag, 
+		double ** psir_ylm, 
+		double **psir_DM, 
+		double* psir_DM_pool, 
+		int* vindex);
 
 	void setVindex(const int ncyz, const int ibx, const int jby, const int kbz, int* vindex) const;
 
+	// extract the local potentials.
+	double* get_vldr3( const int ncyz, const int ibx, const int jby, const int kbz) const;
+	
 	void cal_psir_ylm_rho(int size, int grid_index, double delta_r,
-        double** distance, double* ylma,
+        double** distance,
         int* at, int* block_index, int* block_iw, int* block_size, 
         int** cal_flag, double** psir_ylm);
 
