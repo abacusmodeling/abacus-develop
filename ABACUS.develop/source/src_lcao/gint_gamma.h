@@ -48,7 +48,7 @@ class Gint_Gamma : public Grid_Base_Beta
 	double* ylm1;
 	double* ylm2;
 
-	int grid_index;
+	int grid_index;			// may delete?
 	int max_size;
 	
 	// these parameters are for interpolation.
