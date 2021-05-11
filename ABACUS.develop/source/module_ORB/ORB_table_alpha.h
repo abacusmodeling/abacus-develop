@@ -20,16 +20,20 @@ public:
 		const double &dR_in,
 		const double &dk_in);
 
-	double *****Table_DSR; //overlap between lcao basis phi and descriptor basis alpha
+	// overlap between lcao basis phi and descriptor basis alpha
+	double *****Table_DSR;
+
 	bool destroy_nr;
 
 	//-------------------------
 	// O stands for orbitals.
 	//-------------------------
-
 	void init_DS_Opair(void);
+
 	void init_DS_2Lplus1(void);
+
 	IntArray DS_Opair;
+
 	int *DS_2Lplus1;
 
 	void init_Table_Alpha(Sph_Bessel_Recursive::D2 *pSB);
@@ -39,13 +43,17 @@ public:
 	static int get_rmesh(const double &R1, const double &R2);
 
 	static double dr;
+
 	int Rmesh;
+
 	int ntype;
+
 	int lmax;
 
 	//void print_Table_DSR(void);		//caoyu add 2021-03-20
 
 private:
+
 	void cal_S_PhiAlpha_R(
 		Sph_Bessel_Recursive::D2 *pSB, // mohan add 2021-03-06
 		const int &l,

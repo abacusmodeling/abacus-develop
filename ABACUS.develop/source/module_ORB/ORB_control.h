@@ -6,7 +6,6 @@
 
 class ORB_control 
 {
-
 	public:
 
     ORB_control();

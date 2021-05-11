@@ -257,4 +257,63 @@ inline const void* MAP_EXIST( const T_map &ms, const T_key1 &key1, const T_key_t
 //==========================================================
 size_t MemAvailable();
 
+
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : DELETE_MUL_PTR
+// delete Multi-dimensional array pointer
+// example:
+//		int*** v;
+//		DELETE_MUL_PTR(v,N1,N2);
+//	->	for(int i1=0; i1<N1; ++i1){
+//			for(int i2=0; i2<N2; ++i2){
+//				delete[] v[i1][i2];	v[i1][i2]=nullptr;	}
+//			delete[] v[i1];	v[i1]=nullptr;	}
+//		delete[] v;	v=nullptr;
+// Peize Lin add 2021-05-09
+//==========================================================
+template <typename T_element>
+static inline void DELETE_MUL_PTR(T_element* v)
+{
+	delete[] v;
+	v = nullptr;
+}
+template <typename T_element, typename T_N_first, typename... T_N_tail>
+static inline void DELETE_MUL_PTR(T_element* v, const T_N_first N_first, const T_N_tail... N_tail)
+{
+	for(T_N_first i=0; i<N_first; ++i)
+		DELETE_MUL_PTR(v[i],N_tail...);
+	delete[] v;
+	v = nullptr;
+}
+
+//==========================================================
+// GLOBAL FUNCTION :
+// NAME : FREE_MUL_PTR
+// delete Multi-dimensional array pointer
+// example:
+//		int*** v;
+//		DELETE_MUL_PTR(v,N1,N2);
+//	->	for(int i1=0; i1<N1; ++i1){
+//			for(int i2=0; i2<N2; ++i2){
+//				free(v[i1][i2]);	v[i1][i2]=nullptr;	}
+//			free(v[i1]);	v[i1]=nullptr;	}
+//		free(v);	v=nullptr;
+// Peize Lin add 2021-05-09
+//==========================================================
+template <typename T_element>
+static inline void FREE_MUL_PTR(T_element* v)
+{
+	free(v);
+	v = nullptr;
+}
+template <typename T_element, typename T_N_first, typename... T_N_tail>
+static inline void FREE_MUL_PTR(T_element* v, const T_N_first N_first, const T_N_tail... N_tail)
+{
+	for(T_N_first i=0; i<N_first; ++i)
+		FREE_MUL_PTR(v[i],N_tail...);
+	free(v);
+	v = nullptr;
+}
+
 #endif
