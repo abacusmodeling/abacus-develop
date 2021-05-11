@@ -81,12 +81,12 @@ void energy::calculate_etot(void)
     //Quxin adds for DFT+U energy correction on 20201029
 
 	/*cout << resetiosflags(ios::scientific) << endl;
-	cout << setprecision(6) << endl;
+	cout << setprecision(16) << endl;
 	cout << " eband=" << eband << endl;
 	cout << " deband=" << deband << endl;
-	cout << " etxc-etxcc=" << etxc-etxcc << endl;
-	cout << " ewld=" << ewld << endl;
-	cout << " ehart=" << ehart << endl;
+	cout << " etxc-etxcc=" << H_XC_pw::etxc-etxcc << endl;
+	cout << " ewld=" << H_Ewald_pw::ewald_energy << endl;
+	cout << " ehart=" << H_Hartree_pw::hartree_energy << endl;
 	cout << " demet=" << demet << endl;
 	cout << " descf=" << descf << endl;
 	cout << " efiled=" << Efield::etotefield << endl;

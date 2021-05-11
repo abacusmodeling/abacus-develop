@@ -1207,7 +1207,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 		ll=pos2-pos;
 		val[i] = txt.substr(pos,ll);
 		pos = pos2+2;
-		cout<<name[i]<<"=\""<<val[i]<<"\""<<endl;
+		//cout<<name[i]<<"=\""<<val[i]<<"\""<<endl;
 	}
 	return;
 }

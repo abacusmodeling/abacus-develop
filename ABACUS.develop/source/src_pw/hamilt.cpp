@@ -59,7 +59,7 @@ void Hamilt::diago(
         {	
 	   		if(KS_SOLVER=="cg")
             {			
-                if ( iter > 0 || istep > 0 ||  ntry > 0)
+                if ( iter > 1 || istep > 1 ||  ntry > 0) //qian change it, because it has been executed in diago_PAO_in_pw_k2.
                 {
                     this->cinitcgg( ik ,NBANDS, NBANDS, wf.evc[ik0], wf.evc[ik0], wf.ekb[ik]);
                     avg_iter += 1.0;
