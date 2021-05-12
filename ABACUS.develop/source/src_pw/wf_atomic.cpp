@@ -1,5 +1,9 @@
 #include "wf_atomic.h"
 #include "global.h"
+#include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
+#include "../src_global/math_polyint.h"
+#include "../src_global/math_ylmreal.h"
 
 WF_atomic::WF_atomic()
 {
@@ -73,13 +77,13 @@ void WF_atomic::init_at_1(void)
 			//cout << "\n T=" << it << " ic=" << ic << endl;
 
             // check the unit condition
-            double *inner_part = new double[atom->mesh];
-            for (int ir=0; ir<atom->mesh; ir++) //qianrui change msh to mesh, as QE uses mesh
+            double *inner_part = new double[atom->msh];
+            for (int ir=0; ir<atom->msh; ir++)
             {
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             double unit = 0.0;
-            Mathzone::Simpson_Integral(atom->mesh, inner_part, atom->rab, unit);
+            Integral::Simpson_Integral(atom->msh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			ofs_running << " the unit of pseudo atomic orbital is " << unit; 
@@ -87,7 +91,7 @@ void WF_atomic::init_at_1(void)
             //=================================
             // normalize radial wave functions
             //=================================
-            for (int ir=0; ir<atom->mesh; ir++)
+            for (int ir=0; ir<atom->msh; ir++)
             {
                 atom->chi(ic,ir) /= sqrt(unit);
             }
@@ -95,13 +99,13 @@ void WF_atomic::init_at_1(void)
             //===========
             // recheck
             //===========
-            inner_part = new double[atom->mesh];
-            for (int ir=0; ir<atom->mesh; ir++)
+            inner_part = new double[atom->msh];
+            for (int ir=0; ir<atom->msh; ir++)
             {
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             unit = 0.0;
-            Mathzone::Simpson_Integral(atom->mesh, inner_part, atom->rab, unit);
+            Integral::Simpson_Integral(atom->msh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			ofs_running << ", renormalize to " << unit << endl;
@@ -112,14 +116,14 @@ void WF_atomic::init_at_1(void)
                 for (int iq=startq; iq<NQX; iq++)
                 {
                     const double q = DQ * iq;
-                    Mathzone::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
+                    Sphbes::Spherical_Bessel(atom->msh, atom->r, q, l, aux);
                     for (int ir = 0;ir < atom->msh;ir++)
                     {
                         vchi[ir] = atom->chi(ic,ir) * aux[ir] * atom->r[ir];
                     }
 
                     double vqint = 0.0;
-                    Mathzone::Simpson_Integral(atom->msh, vchi, atom->rab, vqint);
+                    Integral::Simpson_Integral(atom->msh, vchi, atom->rab, vqint);
 
                     ppcell.tab_at(it, ic, iq) =  vqint * pref;
                     //				if( it == 0 && ic == 0 )
@@ -156,7 +160,8 @@ void WF_atomic::print_PAOs(void)const
             if (ic == 0)  orbital_type = "S";
             else if (ic == 1) orbital_type = "P";
             else if (ic == 2) orbital_type = "D";
-			else if (ic == 3) orbital_type = "F";//mohan add 2009-12-15
+			else if (ic == 3) orbital_type = "F"; // mohan add 2009-12-15
+			else if (ic == 4) orbital_type = "G"; // liuyu add 2021-05-07
             else
             {
 				ofs_warning << "\n nchi = " << ucell.atoms[it].nchi << endl;
@@ -242,7 +247,7 @@ void WF_atomic::atomic_wfc
         gk[ig] = WF_atomic::get_1qvec_cartesian(ik, ig);
     }
     //ylm = spherical harmonics functions
-    Mathzone::Ylm_Real(total_lm, np, gk, ylm);
+    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
     int index = 0;
     //---------------------------------------------------------
     // Calculate G space 3D wave functions
@@ -274,7 +279,7 @@ void WF_atomic::atomic_wfc
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] =
-                            Mathzone::Polynomial_Interpolation(table_q,
+                            PolyInt::Polynomial_Interpolation(table_q,
                                                                it, iw, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
                     }
 
@@ -342,7 +347,7 @@ void WF_atomic::atomic_wfc
                                  for(int ig=0;ig<np;ig++)
                                  {//Average the two functions
                                     chiaux[ig] =  l * 
-                                         Mathzone::Polynomial_Interpolation(table_q,
+                                         PolyInt::Polynomial_Interpolation(table_q,
                                                                it, nc, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
 
                                     chiaux[ig] += flq[ig] * (l+1.0) ;

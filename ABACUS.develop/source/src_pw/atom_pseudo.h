@@ -1,36 +1,43 @@
-//==========================================================
-// AUTHOR : mohan
-// DATE : 2008-11-08
-//==========================================================
 #ifndef ATOM_PSEUDO_H
 #define ATOM_PSEUDO_H
 
 #include "tools.h"
-#include "pseudo_us.h"
+#include "pseudo_nc.h"
 using namespace std;
 
-//==========================================================
-// CLASS :
-// NAME : Atom_pseudo
-//==========================================================
-class Atom_pseudo : public pseudo_us
+class Atom_pseudo : public pseudo_nc
 {
 public:
 
 	Atom_pseudo();
 	~Atom_pseudo();
 
-	Vector3<int> *mbl; //If this atom can move
-	string pseudo_fn;// File name of pseudopotentia
+	Vector3<int> *mbl; // whether the atoms can move or not
+	string pseudo_fn; // File name of pseudopotentials
 	double mass; // the mass of atom
+	bool flag_empty_element = false; // whether is the empty element for bsse.	Peize Lin add 2021.04.07
 
+	// mohan add 2021-05-07
+	ComplexArray d_so; //(:,:,:), spin-orbit case
+	int nproj;
+	int nproj_soc; // dimension of D_ij^so
+	int non_zero_count_soc[4];
+	int *index1_soc[4];
+	int *index2_soc[4];
+
+	void set_d_so( // mohan add 2021-05-07
+		ComplexMatrix &d_so_in,
+		const int &nproj_in,
+		const int &nproj_in_so,
+		const bool has_so);
+	
 protected:
 
 	void print_atom(ofstream &ofs);
 
 #ifdef __MPI
 	void bcast_atom_pseudo(const int &na);
-	void bcast_atom_pseudo2(void);
+	void bcast_atom_pseudo2(void); // for upf201
 #endif
 
 };

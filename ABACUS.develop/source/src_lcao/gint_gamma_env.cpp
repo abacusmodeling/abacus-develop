@@ -1,7 +1,8 @@
 #include "gint_gamma.h"
 #include "grid_technique.h"
-#include "ORB_read.h"
+#include "../module_ORB/ORB_read.h"
 #include "../src_pw/global.h"
+#include "../src_global/ylm.h"
 
 void Gint_Gamma::cal_env(const double* wfc, double* rho)
 {

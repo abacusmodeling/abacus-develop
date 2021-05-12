@@ -1,6 +1,8 @@
 #include "bessel_basis.h"
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_common.h"
+#include "../src_global/math_integral.h"
+#include "../src_global/math_sphbes.h"
 
 Bessel_Basis::Bessel_Basis()
 {
@@ -246,7 +248,7 @@ void Bessel_Basis::init_TableOne(
 		ZEROS(jlk, rmesh);
 
 		// calculate eigenvalue for l
-		Mathzone::Spherical_Bessel_Roots(ecut_number, l, tolerence, en, rcut);
+		Sphbes::Spherical_Bessel_Roots(ecut_number, l, tolerence, en, rcut);
 //		for (int ie=0; ie<ecut_number; ie++) 
 //		{
 //			cout << "\n en[" << ie << "]=" << en[ie];
@@ -256,12 +258,12 @@ void Bessel_Basis::init_TableOne(
 		for (int ie=0; ie<ecut_number; ie++)
 		{
 			// calculate J_{l}( en[ir]*r) 
-			Mathzone::Spherical_Bessel(rmesh, r, en[ie], l, jle);
+			Sphbes::Spherical_Bessel(rmesh, r, en[ie], l, jle);
 
 			//caoyu add 2021-3-10
 			//=========output .orb format=============
-			ofs << setiosflags(ios::right) << setw(20) << "L" << setw(20) << "N" << endl;
-			ofs << setiosflags(ios::right) << setw(20) << l << setw(20) << ie << endl;
+			ofs << setiosflags(ios::right) << setw(20) << "Type"<< setw(20) << "L" << setw(20) << "N" << endl;
+			ofs << setiosflags(ios::right) << setw(20) << "0"<< setw(20) << l << setw(20) << ie << endl;
 			for (int ir = 0; ir < rmesh; ir++) 
 			{ 
 				ofs << setiosflags(ios::scientific) 
@@ -297,7 +299,7 @@ void Bessel_Basis::init_TableOne(
 			for(int ik=0; ik<kmesh; ik++)
 			{
 				// calculate J_{l}( ik*dk*r )
-				Mathzone::Spherical_Bessel(rmesh, r, ik*dk, l, jlk);
+				Sphbes::Spherical_Bessel(rmesh, r, ik*dk, l, jlk);
 
 				// calculate the function will be integrated
 				for(int ir=0; ir<rmesh; ir++)
@@ -306,7 +308,7 @@ void Bessel_Basis::init_TableOne(
 				}
 				
 				// make table value
-				Mathzone::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
+				Integral::Simpson_Integral(rmesh, function, rab, this->TableOne(l, ie, ik) );
 			}
 			
 		}// end ie

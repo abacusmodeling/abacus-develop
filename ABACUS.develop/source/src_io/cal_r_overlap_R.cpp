@@ -61,7 +61,7 @@ void cal_r_overlap_R::init()
 		ORB.get_dR(),// delta R, for making radial table
 		ORB.get_dk()); // delta k, for integration in k space
 		
-	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax);
+	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax);
 
 	Ylm::set_coefficients();
 
@@ -101,7 +101,7 @@ void cal_r_overlap_R::init()
 	ORB.Phi[T].PhiLN(0,0).getDk(),
 	ORB.Phi[T].PhiLN(0,0).getDruniform(),
 	false,
-	true);
+	true, FORCE);
 
 /*
 	orbital_phi.resize(ucell.ntype);

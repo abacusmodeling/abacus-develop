@@ -69,7 +69,7 @@ void unkOverlap_lcao::init()
 		ORB.get_dR(),// delta R, for making radial table
 		ORB.get_dk()); // delta k, for integration in k space
 		
-	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax);
+	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax);
 
 	Ylm::set_coefficients ();
 
@@ -91,7 +91,7 @@ void unkOverlap_lcao::init()
 	ORB.Phi[T].PhiLN(0,0).getDk(),
 	ORB.Phi[T].PhiLN(0,0).getDruniform(),
 	false,
-	true);
+	true, FORCE);
 	
 	// 数组初始化
 	allocate_flag = true;
