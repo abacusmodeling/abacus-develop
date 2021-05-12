@@ -10,7 +10,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 	//--------------------------------------
 	//-              PP_HEADER             - 
 	//--------------------------------------
-	SCAN_BEGIN(ifs,"<PP_HEADER");
+	if(!SCAN_BEGIN(ifs,"<PP_HEADER"))	WARNING_QUIT("read_pseudo_upf201","Found no PP_HEADER");
 	string *name=new string[50];
 	string *val=new string[50];
 	int nparameter;
@@ -38,20 +38,20 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		}
 		else if(name[ip]=="relativistic"){}
 		else if(name[ip]=="is_ultrasoft"){
-			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True")
+			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 			{
 				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
 			}
 		}
 		else if(name[ip]=="is_paw"){
-			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True")
+			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 			{
 				WARNING_QUIT("Pseudopot_upf::read_pseudo_header","PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!!");
 			}
 		}
 		else if(name[ip]=="is_coulomb"){}
 		else if(name[ip]=="has_so"){
-			if( val[ip] == "T" || val[ip] == "TRUE" || val[ip]=="True")
+			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 				has_so = true;
 			else
 				has_so = false;
@@ -62,7 +62,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			ONCVPSP = 0;
 		}
 		else if(name[ip]=="core_correction"){
-			if( val[ip] == "T" || val[ip] == "TRUE" || val[ip]=="True")
+			if(val[ip]=="T" || val[ip]=="TRUE" || val[ip]=="True" || val[ip]=="true")
 				nlcc = true;
 			else
 				nlcc = false;
@@ -98,7 +98,8 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		}
 		else
 		{
-			cout<<name[ip]<<" is not inputed when reading PP_HEADER. Please add this parameter in read_pp_upf201.cpp if needed."<<endl;
+			string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+			WARNING("PP_HEADRER reading", warningstr);
 		}
 	}
 	
@@ -117,7 +118,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="rmax"){}
 			else if(name[ip]=="zmesh"){}
 			else
-			cout<<name[ip]<<" is not inputed when reading PP_MESH. Please add this parameter in read_pp_upf201.cpp if needed."<<endl;
+			{
+				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				WARNING("PP_MESH reading", warningstr);
+			}
 
 		}
 	}
@@ -214,7 +218,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="cutoff_radius"){}
 			else if(name[ip]=="ultrasoft_cutoff_radius"){}
 			else
-			cout<<name[ip]<<" is not inputed when reading PP_BETA. Please add this parameter in read_pp_upf201.cpp if needed."<<endl;
+			{
+				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				WARNING("PP_BETA reading", warningstr);
+			}
 		}
 		for (int ir=0;ir<mesh;ir++)
 		{
@@ -279,7 +286,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="cutoff_radius"){}
 			else if(name[ip]=="ultrasoft_cutoff_radius"){}
 			else
-			cout<<name[ip]<<" is not inputed when reading PP_CHI. Please add this parameter in read_pp_upf201.cpp if needed."<<endl;
+			{
+				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				WARNING("PP_CHI reading", warningstr);
+			}
 		}
 		for (int ir=0;ir<mesh;ir++)
 		{
@@ -337,7 +347,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 						jjj[nb] = atof(val[ip].c_str());
 					}
 					else
-					cout<<name[ip]<<" is not inputed when reading PP_RELBETA. Please add this parameter in read_pp_upf201.cpp if needed."<<endl;
+					{
+						string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+						WARNING("PP_RELBETA reading", warningstr);
+					}
 				}
 			}
 		}
@@ -366,7 +379,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 						oc[nw] = atof(val[ip].c_str());
 					}
 					else
-					cout<<name[ip]<<" is not inputed when reading PP_RELWFC. Please add this parameter in read_pp_upf201.cpp if needed."<<endl;
+					{
+						string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+						WARNING("PP_RELWFC reading", warningstr);
+					}
 				}
 			}
 		}
@@ -1180,21 +1196,20 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 	for(int i = 0; i < n; ++i)
 	{
 		pos2 = txt.find("=",pos);
-		string space = " ";
 		for(; pos2 > pos ; --pos2)//There may be a space before "=";
 		{
-			if(txt.substr(pos2-1,1) != space) break;
+			if(txt.substr(pos2-1,1) != " ") break;
 		}
 		ll=pos2-pos;
 		name[i] = txt.substr(pos,ll);
 		//cout<<i<<" "<<name[i]<<endl;
 		string mark;
 		bool findmark=false;
-		for(int j = 0; j < 100; ++j)//The mark can be ' or ".
+		for(int j = 0; j < 100; ++j)//The mark can be ' or " or .
 		{
 			mark = txt.substr(pos2,1);
 			pos2++;
-			if(mark=="\""||mark=="\'")
+			if(mark=="\""||mark=="\'"||mark==".")
 			{
 				findmark = true;
 				break;
@@ -1205,8 +1220,17 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 		pos = pos2;
 		pos2 = txt.find(mark,pos);
 		ll=pos2-pos;
-		val[i] = txt.substr(pos,ll);
-		pos = pos2+2;
+		string tmpval = txt.substr(pos,ll);
+		tmpval = trim(tmpval);
+		val[i]=tmpval;
+		pos=pos2+1;
+		for(int j = 0; j < 100; ++j)
+		{
+			if(txt.substr(pos,1)==" " || txt.substr(pos,1)==",")
+				pos++;
+			else
+				break;
+		}
 		//cout<<name[i]<<"=\""<<val[i]<<"\""<<endl;
 	}
 	return;
