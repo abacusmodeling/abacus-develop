@@ -27,7 +27,8 @@ class Charge_Broyden: public Charge_Pulay
 
 	// Sophisticated mixing method.
 	void Modified_Broyden_mixing(void);
-	void allocate_Broyden(void);
+	void Simplified_Broyden_mixing(const int &iter);
+	void allocate_Broyden();
 
 	void generate_beta(const int &is);
 	void generate_Zmk(const int &totstep, const int &irstep, const int &idstep, const int &is);
@@ -36,6 +37,7 @@ class Charge_Broyden: public Charge_Pulay
 	bool initb; // b stands for Broyden algorithms.
 	double w0;
 	double* w;
+	int broyden_type;
 	matrix beta; // (dstep, dstep)
 	matrix betabar; // (dstep, dstep)
 	matrix* Zmk;

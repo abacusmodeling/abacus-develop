@@ -90,6 +90,7 @@ void energy::calculate_etot(void)
 	cout << " demet=" << demet << endl;
 	cout << " descf=" << descf << endl;
 	cout << " efiled=" << Efield::etotefield << endl;
+	cout << " total= "<<etot<<endl;
 	cout << " fermienergy= "<<ef<<endl;*/
     if(INPUT.dft_plus_u) 
 	{
