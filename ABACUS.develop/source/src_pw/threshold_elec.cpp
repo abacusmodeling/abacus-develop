@@ -66,7 +66,7 @@ void Threshold_Elec::update_ethr(const int &iter)
     {
         if (iter == 2)
         {
-            ETHR = 1.e-5/ucell.nelec;
+            ETHR = 1.e-2;
         }
 
 		//----------------------------

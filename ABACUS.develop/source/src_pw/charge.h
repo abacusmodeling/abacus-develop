@@ -13,7 +13,7 @@ class Charge
 public:
 
     Charge();
-    virtual ~Charge();
+    ~Charge();
 
 //==========================================================
 // MEMBER VARIABLES :
