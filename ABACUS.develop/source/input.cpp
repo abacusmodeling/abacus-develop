@@ -2562,7 +2562,7 @@ void Input::Check(void)
         AUTO_SET("start_pot",start_pot);
     }
 
-    if (start_wfc != "atomic" && start_wfc != "random" &&
+    if (start_wfc != "atomic" && start_wfc != "atomic+random" && start_wfc != "random" &&
             start_wfc != "file")
     {
         WARNING_QUIT("Input","wrong start_wfc, please use 'atomic' or 'random' or 'file' ");

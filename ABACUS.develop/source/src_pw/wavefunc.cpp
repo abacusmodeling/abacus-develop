@@ -176,7 +176,7 @@ int wavefunc::get_starting_nw(void)const
         // ... read the wavefunction into memory (if it is not done in c_bands)
         //**********************************************************************
     }
-    else if (start_wfc == "atomic")
+    else if (start_wfc.substr(0,6) == "atomic")
     {
         if (ucell.natomwfc >= NBANDS)
         {
@@ -275,9 +275,28 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 
 	ComplexMatrix wfcatom(starting_nw, npwx * NPOL);//added by zhengdy-soc
 	if(test_wf)OUT(ofs_running, "starting_nw", starting_nw);
-	if(start_wfc=="atomic")
+	if(start_wfc.substr(0,6)=="atomic")
 	{
 		this->atomic_wfc(ik, this->npw, ucell.lmax_ppwf, wfcatom, ppcell.tab_at, NQX, DQ);
+		if( start_wfc == "atomic+random" && starting_nw == ucell.natomwfc )//added by qianrui 2021-5-16
+		{
+			double rr, arg;
+			for(int ib = 0 ; ib < starting_nw ; ++ib )
+			{
+				int startig = 0;
+				for(int ip = 0 ; ip < NPOL; ++ip)
+				{
+					for(int ig = 0 ; ig < npw ; ++ig)
+					{
+						rr = rand()/double(RAND_MAX);
+						arg = TWO_PI * rand()/double(RAND_MAX);
+						wfcatom(ib,startig+ig) *= (1.0 + 0.05 * complex<double>(rr * cos(arg), rr * sin(arg)));
+					}
+					startig += npwx;
+				}
+			}
+		}
+		
 		//====================================================
 		// If not enough atomic wfc are available, complete
 		// with random wfcs
