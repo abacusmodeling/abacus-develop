@@ -91,8 +91,7 @@ void Charge_Broyden::mix_rho
 
 		NOTE("Perform FFT on rho_save(r) to obtain rho_save(G).");
         this->set_rhog(rho_save[is], rhog_save[is]);
-		//cout<<setprecision(16)<<rhog_save[0][0]<<rhog_save[0][1]<<" "<<rhog_save[0][2]<<"iiiiiiii"<<endl;
-		//cout<<setprecision(16)<<rhog[0][0]<<rhog[0][1]<<" "<<rhog[0][2]<<"llllllllll"<<endl;
+
 
 		NOTE("Calculate the charge difference between rho(G) and rho_save(G)");
         for (int ig=0; ig<pw.ngmc; ig++)

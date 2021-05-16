@@ -27,7 +27,7 @@ class Charge_Broyden: public Charge_Pulay
 
 	// Sophisticated mixing method.
 	void Modified_Broyden_mixing(void);
-	void Simplified_Broyden_mixing(const int &iter);
+	void Simplified_Broyden_mixing(const int &iter); //qianrui created 2021-5-15
 	void allocate_Broyden();
 
 	void generate_beta(const int &is);

@@ -212,7 +212,6 @@ void Electrons::self_consistent(const int &istep)
 
         // calculate the new eband here.
         CHR.sum_band();
-        cout<<setprecision(16)<<CHR.rho[0][0]<<" "<<CHR.rho[0][1]<<" "<<CHR.rho[0][2]<<"iiiiiiii"<<endl;
 
 		// add exx
 		en.set_exx();		// Peize Lin add 2019-03-09
@@ -282,7 +281,6 @@ void Electrons::self_consistent(const int &istep)
                     ETHR = 0.1 * dr2 / ucell.nelec;
                     ofs_running << " New    ETHR = " << ETHR << endl;
                     //goto first_iter_again;
-                    cout<<dr2<<" "<<diago_error<<" "<<ETHR<<" pppppppp"<<endl;
                     goto scf_step;
                 }
             }
