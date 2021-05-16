@@ -593,7 +593,7 @@ void ORB_gen_tables::snap_psipsi(
 	double distance = Numerical_Orbital::get_distance() * this->lat0;
 
 	const double Rcut1 = ORB.Phi[T1].getRcut();
-	const double Rcut2 = ORB.Phi[T2].getRcut();
+	const double Rcut2 = (dtype == 'D' ? ORB.Alpha[0].getRcut() : ORB.Phi[T2].getRcut());	//caoyu modified 2021-05-08
 
 	if (job == 0)
 	{
@@ -617,33 +617,38 @@ void ORB_gen_tables::snap_psipsi(
 
 	// (2) if there exist overlap, calculate the mesh number
 	// between two atoms
-	const int rmesh = this->MOT.get_rmesh(Rcut1, Rcut2);
+	const int rmesh = (dtype == 'D' ? this->talpha.get_rmesh(Rcut1, Rcut2) : this->MOT.get_rmesh(Rcut1, Rcut2));	//caoyu modified 2021-05-08
 
 	// (3) Find three dimension of 'Table_S' or 'Table_T'
 	// dim1 : type pairs,
 	// dim2 : radial orbital pairs,
 	// dim3 : find lmax between T1 and T2, and get lmax*2+1
-	const int dim1 = this->MOT.OV_Tpair(T1, T2);
-	const int dim3 = this->MOT.OV_L2plus1(T1, T2); //2*lmax+1
-
-	int dim2;
-	if (T1 <= T2)
+	int dim1, dim2, dim3;
+	if (dtype == 'D')	//caoyu modified 2021-05-08
 	{
-		dim2 = this->MOT.OV_Opair(dim1, L1, L2, N1, N2);
+		dim1 = T1;
+		dim2 = this->talpha.DS_Opair(dim1, L1, L2, N1, N2);
+		dim3 = this->talpha.DS_2Lplus1[T1];
 	}
 	else
 	{
-		dim2 = this->MOT.OV_Opair(dim1, L2, L1, N2, N1);
+		dim1 = this->MOT.OV_Tpair(T1, T2);
+		dim3 = this->MOT.OV_L2plus1(T1, T2); //2*lmax+1
+		if (T1 <= T2)
+		{
+			dim2 = this->MOT.OV_Opair(dim1, L1, L2, N1, N2);
+		}
+		else
+		{
+			dim2 = this->MOT.OV_Opair(dim1, L2, L1, N2, N1);
+		}
 	}
-
-	// Find the needed Ylm(dR) dimension
-	const int nlm = dim3 * dim3; //(2lmax+1)*(2lmax+!)
+	
 
 	//Gaunt Index
 	const int gindex1 = L1 * L1 + m1;
 	const int gindex2 = L2 * L2 + m2;
 
-	assert(nlm < 400);
 	// Peize Lin change rly, grly 2016-08-26
 	vector<double> rly;
 	vector<vector<double>> grly;
@@ -701,7 +706,7 @@ void ORB_gen_tables::snap_psipsi(
 			if (distance > tiny2)
 			{
 				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
-										 MOT.Table_SR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
+					MOT.Table_SR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Slm /= rl;
 			}
 			else // distance = 0.0;
@@ -714,7 +719,7 @@ void ORB_gen_tables::snap_psipsi(
 				if (distance > tiny2)
 				{
 					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
-											  MOT.Table_SR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
+						MOT.Table_SR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
 				}
 				else
@@ -756,11 +761,11 @@ void ORB_gen_tables::snap_psipsi(
 						WARNING_QUIT("ORB_gen_tables::snap_psipsi", "something wrong!");
 					}
 
-					/*		
+					/*
 						if( abs ( tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ) > 1.0e-3 )
 						{
-						cout << " L=" << L << " m=" << m << " tmpOlm0=" << tmpOlm0 
-						<< " rly=" << rly[ MGT.get_lm_index(L, m) ] 
+						cout << " L=" << L << " m=" << m << " tmpOlm0=" << tmpOlm0
+						<< " rly=" << rly[ MGT.get_lm_index(L, m) ]
 						<< " r=" << olm[0]
 						<< endl;
 						}
@@ -771,8 +776,8 @@ void ORB_gen_tables::snap_psipsi(
 				{
 					for (int ir = 0; ir < 3; ir++)
 					{
-						olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] 
-						+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
+						olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir]
+							+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
 					}
 					break;
 				}
@@ -802,7 +807,7 @@ void ORB_gen_tables::snap_psipsi(
 			if (distance > tiny2)
 			{
 				Interp_Tlm = i_exp * PolyInt::Polynomial_Interpolation(
-										 MOT.Table_TR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
+					MOT.Table_TR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
 				Interp_Tlm /= rl;
 			}
 			else
@@ -813,7 +818,7 @@ void ORB_gen_tables::snap_psipsi(
 				if (distance > tiny2)
 				{
 					Interp_dTlm = i_exp * PolyInt::Polynomial_Interpolation(
-											  MOT.Table_TR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
+						MOT.Table_TR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
 					Interp_dTlm = Interp_dTlm / rl - Interp_Tlm * L / distance;
 				}
 				else
@@ -867,6 +872,94 @@ void ORB_gen_tables::snap_psipsi(
 			} // end T: m
 		}	  // end T: :
 		break;
+	case 'D'://caoyu add 2021-05-08
+		for (int L = 0; L < dim3; L++) //maxL = dim3-1
+		{
+			//===========================================================
+			// triangle rule for L and sum of L, L1, L2 should be even
+			//===========================================================
+			int AL = L1 + L2;
+			int SL = abs(L1 - L2);
+
+			if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
+				continue;
+
+			double Interp_Slm = 0.0;
+			double Interp_dSlm = 0.0;
+			double tmpOlm0 = 0.0;
+			double tmpOlm1 = 0.0;
+
+			// prefactor
+			double i_exp = pow(-1.0, (L1 - L2 - L) / 2);
+			double rl = pow(distance, L);
+
+			if (distance > tiny2)
+			{
+				Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
+					talpha.Table_DSR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
+				Interp_Slm /= rl;
+			}
+			else // distance = 0.0;
+			{
+				Interp_Slm = i_exp * talpha.Table_DSR[0][dim1][dim2][L][0];
+			}
+
+			if (job == 1) //calculate the derivative.
+			{
+				if (distance > tiny2)
+				{
+					Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
+						talpha.Table_DSR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
+					Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
+				}
+				else
+				{
+					Interp_dSlm = 0.0;
+				}
+			}
+
+			for (int m = 0; m < 2 * L + 1; m++)
+			{
+				int gindex = L * L + m;
+				//			double tmpGaunt1 = MGT.Get_Gaunt_SH(L1, m1, L2, m2, L, m);
+				double tmpGaunt = MGT.Gaunt_Coefficients(gindex1, gindex2, gindex);
+
+				tmpOlm0 = Interp_Slm * tmpGaunt;
+
+				if (job == 1)
+				{
+					tmpOlm1 = Interp_dSlm * tmpGaunt;
+				}
+
+				switch (job)
+				{
+				case 0: // calculate overlap.
+				{
+					int nspin = 1; // mohan add 2021-05-07, currently deepks works only for nspin=1
+					if (nspin != 4)
+					{
+						olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
+					}
+					else
+					{
+						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with NSPIN>1 has not implemented yet!");
+					}
+					break;
+				}
+				case 1: // calculate gradient.
+				{
+					for (int ir = 0; ir < 3; ir++)
+					{
+						olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir]
+							+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
+					}
+					break;
+				}
+				default:
+					break;
+				}
+			} //!m
+		}
 	}
 	//	timer::tick ("ORB_gen_tables", "snap_psipsi");
 	return;
@@ -879,200 +972,3 @@ double ORB_gen_tables::get_distance(const Vector3<double> &R1, const Vector3<dou
 	return dR.norm() * this->lat0;
 }
 
-//caoyu add 2021-03-17
-void ORB_gen_tables::snap_psialpha(
-	double olm[],
-	const int &job,
-	const Vector3<double> &R1,
-	const int &T1,
-	const int &L1,
-	const int &m1,
-	const int &N1,
-	const Vector3<double> &R2,
-	const int &T2,
-	const int &L2,
-	const int &m2,
-	const int &N2) const
-{
-
-	if (job != 0 && job != 1)
-	{
-		WARNING_QUIT("ORB_gen_tables::snap_psialpha", "job must be equal to 0 or 1!");
-	}
-
-	Numerical_Orbital::set_position(R1, R2);
-	assert(this->lat0 > 0.0);
-
-	// (1) get distance between R1 and R2 (a.u.)
-	// judge if there exist overlap
-	double distance = Numerical_Orbital::get_distance() * this->lat0;
-
-	const double Rcut1 = ORB.Phi[T1].getRcut();
-	const double Rcut2 = ORB.Alpha[0].getRcut();
-
-	if (job == 0)
-	{
-		ZEROS(olm, 1);
-	}
-
-	else if (job == 1)
-	{
-		ZEROS(olm, 3);
-	}
-
-	if (distance > (Rcut1 + Rcut2))
-	{
-		return;
-	}
-
-	//if distance == 0
-	//\int psi(r) psi(r-R) dr independent of R if R == 0
-	//distance += tiny1 avoid overflow during calculation
-	const double tiny1 = 1e-12;
-	const double tiny2 = 1e-10;
-	if (distance < tiny1)
-	{
-		distance += tiny1;
-	}
-
-	// (2) if there exist overlap, calculate the mesh number
-	// between two atoms
-	const int rmesh = this->talpha.get_rmesh(Rcut1, Rcut2);
-
-	// (3) Find three dimension of 'Table_DS'
-	// dim1 : type pairs, equal to T1 here
-	// dim2 : radial orbital pairs,
-	// dim3 : find lmax between T1 and T2, and get lmax*2+1
-	const int dim1 = T1;
-	int dim2 = this->talpha.DS_Opair(dim1, L1, L2, N1, N2);
-	int dim3 = this->talpha.DS_2Lplus1[T1];
-
-	//Gaunt Index
-	const int gindex1 = L1 * L1 + m1;
-	const int gindex2 = L2 * L2 + m2;
-
-	// Peize Lin change rly, grly 2016-08-26
-	vector<double> rly;
-	vector<vector<double>> grly;
-
-	double arr_dR[3];
-	arr_dR[0] = Numerical_Orbital::getX() * this->lat0;
-	arr_dR[1] = Numerical_Orbital::getY() * this->lat0;
-	arr_dR[2] = Numerical_Orbital::getZ() * this->lat0;
-
-	//double xdr = arr_dR[0] / distance;
-	//double ydr = arr_dR[1] / distance;
-	//double zdr = arr_dR[2] / distance;
-
-	//=======================
-	// *r**l*Ylm_real
-	// include its derivations
-	//=======================
-	if (job == 0)
-	{
-		Ylm::rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly);
-	}
-	else
-	{
-		Ylm::grad_rl_sph_harm(dim3 - 1, arr_dR[0], arr_dR[1], arr_dR[2], rly, grly);
-	}
-
-	for (int L = 0; L < dim3; L++) //maxL = dim3-1
-	{
-		//===========================================================
-		// triangle rule for L and sum of L, L1, L2 should be even
-		//===========================================================
-		int AL = L1 + L2;
-		int SL = abs(L1 - L2);
-
-		if ((L > AL) || (L < SL) || ((L - SL) % 2 == 1))
-			continue;
-
-		double Interp_Slm = 0.0;
-		double Interp_dSlm = 0.0;
-		double tmpOlm0 = 0.0;
-		double tmpOlm1 = 0.0;
-
-		// prefactor
-		double i_exp = pow(-1.0, (L1 - L2 - L) / 2);
-		double rl = pow(distance, L);
-
-		if (distance > tiny2)
-		{
-			Interp_Slm = i_exp * PolyInt::Polynomial_Interpolation(
-									 talpha.Table_DSR[0][dim1][dim2][L], rmesh, MOT.dr, distance);
-			Interp_Slm /= rl;
-		}
-		else // distance = 0.0;
-		{
-			Interp_Slm = i_exp * talpha.Table_DSR[0][dim1][dim2][L][0];
-		}
-
-		if (job == 1) //calculate the derivative.
-		{
-			if (distance > tiny2)
-			{
-				Interp_dSlm = i_exp * PolyInt::Polynomial_Interpolation(
-										  talpha.Table_DSR[1][dim1][dim2][L], rmesh, MOT.dr, distance);
-				Interp_dSlm = Interp_dSlm / pow(distance, L) - Interp_Slm * L / distance;
-			}
-			else
-			{
-				Interp_dSlm = 0.0;
-			}
-		}
-
-		for (int m = 0; m < 2 * L + 1; m++)
-		{
-			int gindex = L * L + m;
-			//			double tmpGaunt1 = MGT.Get_Gaunt_SH(L1, m1, L2, m2, L, m);
-			double tmpGaunt = MGT.Gaunt_Coefficients(gindex1, gindex2, gindex);
-
-			tmpOlm0 = Interp_Slm * tmpGaunt;
-
-			if (job == 1)
-			{
-				tmpOlm1 = Interp_dSlm * tmpGaunt;
-			}
-
-			switch (job)
-			{
-			case 0: // calculate overlap.
-			{
-				int nspin = 1; // mohan add 2021-05-07, currently deepks works only for nspin=1
-				if (nspin != 4)
-				{
-					olm[0] += tmpOlm0 * rly[MGT.get_lm_index(L, m)];
-				}
-				else
-				{
-					WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with NSPIN>1 has not implemented yet!");
-				}
-				/*
-				if( abs ( tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ) > 1.0e-3 )
-				{
-				cout << " L=" << L << " m=" << m << " tmpOlm0=" << tmpOlm0
-				<< " rly=" << rly[ MGT.get_lm_index(L, m) ]
-				<< " r=" << olm[0]
-				<< endl;
-				}
-				*/
-				break;
-			}
-			case 1: // calculate gradient.
-			{
-				for (int ir = 0; ir < 3; ir++)
-				{
-					olm[ir] += tmpOlm0 * grly[MGT.get_lm_index(L, m)][ir] 
-					+ tmpOlm1 * rly[MGT.get_lm_index(L, m)] * arr_dR[ir] / distance;
-				}
-				break;
-			}
-			default:
-				break;
-			}
-		} //!m
-	}
-
-	return;
-}

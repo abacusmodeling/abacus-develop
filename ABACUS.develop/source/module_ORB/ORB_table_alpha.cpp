@@ -104,10 +104,13 @@ void ORB_table_alpha::allocate(
 int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 {
 	int rmesh = static_cast<int>((R1 + R2) / ORB_table_alpha::dr) + 5;
+
 	//mohan update 2009-09-08 +1 ==> +5
 	//considering interpolation or so on...
 	if (rmesh % 2 == 0)
+	{
 		rmesh++;
+	}
 
 	if (rmesh <= 0)
 	{
@@ -323,7 +326,9 @@ void ORB_table_alpha::init_Table_Alpha(
 void ORB_table_alpha::Destroy_Table_Alpha(void)
 {
 	if (!destroy_nr)
+	{
 		return;
+	}
 
 	const int ntype = ORB.get_ntype();
 	for (int ir = 0; ir < 2; ir++)
@@ -337,7 +342,10 @@ void ORB_table_alpha::Destroy_Table_Alpha(void)
 
 			// mohan fix bug 2011-03-30
 			if (pairs == 0)
+			{
 				continue;
+			}
+
 			for (int dim2 = 0; dim2 < pairs; dim2++)
 			{
 				for (int L = 0; L < 2 * lmax_now + 1; L++)

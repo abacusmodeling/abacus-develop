@@ -92,7 +92,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         //this->update_ethr(iter);
         if(FINAL_SCF && iter==1) 
 		{
-			ETHR = 1.0e-2;
+			ETHR = 1.0e-5/ucell.nelec;
 		}
         else 
 		{

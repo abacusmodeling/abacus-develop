@@ -11,46 +11,64 @@ Charge_Broyden::~Charge_Broyden()
 {
     if (initb)
 	{
-		// delete: Rrho[i] = rho_out[i] - rho_in[i];
-		for (int is=0; is<NSPIN; is++)
+		if(broyden_type==0)
 		{
-			for (int i=0; i<rstep; i++)
+			for (int i=0; i<mixing_ndim+1; ++i)
 			{
-				delete[] Rrho[is][i];
+				for(int is = 0 ; is < NSPIN ; ++is)
+				{
+					delete[] dF[i][is];
+					delete[] dn[i][is];
+				}
+				delete[] dF[i];
+				delete[] dn[i];
 			}
-			delete[] Rrho[is];
+			delete[] dF;
+			delete[] dn;
 		}
-
-		// delete: dRrho[i] = Rrho[i+1] - Rrho[i]
-		for (int is=0; is<NSPIN; is++)
+		else
 		{
-			for (int i=0; i<dstep; i++)
+			// delete: Rrho[i] = rho_out[i] - rho_in[i];
+			for (int is=0; is<NSPIN; is++)
 			{
-				delete[] dRrho[is][i];
-				delete[] drho[is][i];
+				for (int i=0; i<rstep; i++)
+				{
+					delete[] Rrho[is][i];
+				}
+				delete[] Rrho[is];
 			}
-			delete[] dRrho[is];
-			delete[] drho[is];
-		}
-		delete[] dRrho;
-		delete[] drho;
-		
-		// dimension : dstep
-		delete[] w;
-		delete[] dRR;
 
-		// dimension of rho_save2(NSPIN, pw.nrxx)
-		for (int is=0; is<NSPIN; is++)
-		{
-			delete[] rho_save2[is];
-		}
-		delete[] rho_save2;
+			// delete: dRrho[i] = Rrho[i+1] - Rrho[i]
+			for (int is=0; is<NSPIN; is++)
+			{
+				for (int i=0; i<dstep; i++)
+				{
+					delete[] dRrho[is][i];
+					delete[] drho[is][i];
+				}
+				delete[] dRrho[is];
+				delete[] drho[is];
+			}
+			delete[] dRrho;
+			delete[] drho;
 
-		// dimension (NSPIN, dstep, dstep)
-		delete[] Zmk;
+			// dimension : dstep
+			delete[] w;
+			delete[] dRR;
 
-		// dimension (NSPIN, dstep-1, dstep-1)
+			// dimension of rho_save2(NSPIN, pw.nrxx)
+			for (int is=0; is<NSPIN; is++)
+			{
+				delete[] rho_save2[is];
+			}
+			delete[] rho_save2;
+
+			// dimension (NSPIN, dstep, dstep)
+			delete[] Zmk;
+
+			// dimension (NSPIN, dstep-1, dstep-1)
 //		delete[] Zmk_old;
+		}
 	}
 }
 
@@ -74,6 +92,7 @@ void Charge_Broyden::mix_rho
 		NOTE("Perform FFT on rho_save(r) to obtain rho_save(G).");
         this->set_rhog(rho_save[is], rhog_save[is]);
 
+
 		NOTE("Calculate the charge difference between rho(G) and rho_save(G)");
         for (int ig=0; ig<pw.ngmc; ig++)
         {
@@ -84,6 +103,7 @@ void Charge_Broyden::mix_rho
 
 	NOTE("Calculate the norm of the Residual vector: < R[rho] | R[rho_save] >");
     dr2 = this->rhog_dot_product( this->rhog, this->rhog);
+	
 	if(test_charge)ofs_running << " dr2 from rhog_dot_product is " << dr2 << endl;
 
 	// dr2 calculated from real space.
@@ -163,7 +183,8 @@ void Charge_Broyden::mix_rho
     }
     else if ( this->mixing_mode == "broyden")
     {
-        this->Modified_Broyden_mixing();
+		this->Simplified_Broyden_mixing(iter);
+        //this->Modified_Broyden_mixing();
     }
     else
     {
@@ -196,6 +217,121 @@ void Charge_Broyden::mix_rho
     return;
 }
 
+void Charge_Broyden::Simplified_Broyden_mixing(const int &iter)
+{
+	//It is a simplified modified broyden_mixing method.
+	//Ref: D.D. Johnson PRB 38, 12807 (1988)
+	//Here the weight w0 of the error of the inverse Jacobian is set to 0 and the weight wn of
+	//the error of each previous iteration is set to same.
+
+	// (1)
+	this->broyden_type=0;
+	this->allocate_Broyden();
+	
+	int iter_used = min(iter-1, mixing_ndim);
+	int ipos = iter-2 - int((iter-2)/mixing_ndim) * mixing_ndim;
+	if(iter > 1)
+	{
+		for(int is=0; is<NSPIN; is++)
+		{
+			for(int ig = 0 ; ig < pw.ngmc; ++ig)
+			{
+				dF[ipos][is][ig] -= this->rhog[is][ig];
+				dn[ipos][is][ig] -= this->rhog_save[is][ig];
+			}
+		}
+	}
+	for(int is=0; is<NSPIN; is++)
+	{
+		for(int ig = 0 ; ig < pw.ngmc; ++ig)
+		{
+			dF[mixing_ndim][is][ig] = rhog[is][ig];
+			dn[mixing_ndim][is][ig] = rhog_save[is][ig];
+		}
+	}
+	
+	if(iter_used > 0)
+	{
+		this->beta.create(iter_used, iter_used,false);
+		for(int i = 0; i < iter_used; ++i)
+		{
+			for(int j = i; j < iter_used; ++j)
+			{
+				beta(i,j) = rhog_dot_product( this->dF[i], this->dF[j] );
+				if(j != i)
+				{
+					beta(j,i)=beta(i,j);
+				}
+			}
+		}
+		double * work = new double [iter_used];
+		int * iwork = new int [iter_used];
+		char uu='U';
+		int info;
+		dsytrf_(&uu,&iter_used,beta.c,&iter_used,iwork,work,&iter_used,&info);
+		if(info != 0) WARNING_QUIT("Broyden_mixing", "Error when factorizing beta.");
+		dsytri_(&uu,&iter_used,beta.c,&iter_used,iwork,work,&info);
+		if(info != 0) WARNING_QUIT("Broyden_mixing", "Error when DSYTRI beta.");
+		for(int i = 0; i < iter_used; ++i)
+		{
+			for(int j = i + 1; j < iter_used; ++j)
+			{
+				beta(i,j) = beta(j,i);
+			}
+		}
+		for(int i = 0 ; i < iter_used ; ++i)
+		{
+			work[i] = rhog_dot_product( this->dF[i], this->rhog );
+		}
+		for(int i = 0 ; i < iter_used ; ++i)
+		{
+			double gamma0 = 0;
+			for(int j = 0; j < iter_used ; ++j)
+			{
+				gamma0 += beta(i,j) * work[j];
+			}
+			for(int is=0; is<NSPIN; is++)
+			{
+				for(int ig = 0 ; ig < pw.ngmc; ++ig)
+				{
+					this->rhog[is][ig] -= gamma0 * dF[i][is][ig];
+					this->rhog_save[is][ig] -= gamma0 * dn[i][is][ig];
+				}
+			}
+			
+		}
+		delete[] work;
+		delete[] iwork;
+	}
+	int inext = iter-1 - int((iter-1)/mixing_ndim) * mixing_ndim;
+	
+	for(int is=0; is<NSPIN; is++)
+	{
+		for(int ig = 0 ; ig < pw.ngmc; ++ig)
+		{
+			dF[inext][is][ig] = dF[mixing_ndim][is][ig];
+			dn[inext][is][ig] = dn[mixing_ndim][is][ig];
+		}
+	}
+
+	//kerker part if needed
+	{
+	}
+
+	for(int is=0; is<NSPIN; is++)
+	{
+		for(int ig = 0 ; ig < pw.ngmc; ++ig)
+		{
+			rhog_save[is][ig] += mixing_beta * rhog[is][ig];
+		}
+		this->set_rhor( rhog_save[is], rho[is]);
+	}
+
+
+
+	return;
+}
+
 void Charge_Broyden::Modified_Broyden_mixing(void)
 {
     //TITLE("Charge_Broyden","Modified_Broyden_Mixing");
@@ -206,6 +342,7 @@ void Charge_Broyden::Modified_Broyden_mixing(void)
 	//cout << "\n initb = " << initb << endl;
     
 	// (1)
+	this->broyden_type=1;
 	this->allocate_Broyden();
 	
 	// irstep: iteration step for rstep (Rrho)
@@ -259,77 +396,101 @@ void Charge_Broyden::Modified_Broyden_mixing(void)
 }
 
 
-void Charge_Broyden::allocate_Broyden(void)
+void Charge_Broyden::allocate_Broyden()
 {
 	if(!initb)
 	{
-    	assert(rstep > 0);
-
-		// weight
-    	this->w0 = 0.01;
-    	this->w = new double[rstep];
-    	for (int i=0; i<rstep; i++)
-    	{
-        	w[i] = 1.0/static_cast<double>(rstep);
-    	}
-
-		//special test: Pulay mixing
-		//this->w0 = 0.00;
-		//for(int i=0; i<rstep; i++)
-		//{
-		//	w[i] = 1.0;
-		//}
-	
-		// R[rho_in] = rho_out - rho_in
-    	this->Rrho = new double**[NSPIN];
-    	for (int is=0; is<NSPIN; is++)
-    	{
-        	this->Rrho[is] = new double*[rstep];
-        	for (int i=0; i<rstep; i++)
-        	{
-            	this->Rrho[is][i] = new double[pw.nrxx];
-            	ZEROS(Rrho[is][i],pw.nrxx);
-        	}	
-    	}
-    	Memory::record("Charge_Broyden","Rrho", NSPIN*rstep*pw.nrxx,"double");
-
-    	// (2) allocate dRrho[i]: Rrho[i+1] - Rrho[i]
-    	this->dRrho = new double**[NSPIN];
-    	this->drho = new double**[NSPIN];
-    	this->rho_save2 = new double*[NSPIN];
-    	for (int is=0; is<NSPIN; is++)
-    	{
-        	dRrho[is] = new double*[dstep];
-        	drho[is] = new double*[dstep];
-        	rho_save2[is] = new double[pw.nrxx];
-        	for (int i=0; i<dstep; i++)
-        	{
-            	dRrho[is][i] = new double[pw.nrxx];
-            	drho[is][i] = new double[pw.nrxx];
-            	ZEROS( dRrho[is][i], pw.nrxx );
-            	ZEROS( drho[is][i], pw.nrxx);
-        	}
-    	}
-    	Memory::record("Charge_Broyden","dRrho", NSPIN*dstep*pw.nrxx,"double");
-    	Memory::record("Charge_Broyden","drho", NSPIN*dstep*pw.nrxx,"double");
-    	Memory::record("Charge_Broyden","rho_save2", NSPIN*pw.nrxx,"double");
-
-		this->dRR = new double[dstep];
-		ZEROS(dRR, dstep);
-
-		this->beta.create(dstep, dstep);
-		this->betabar.create(dstep, dstep);
-		this->Abar.create(dstep, dstep);
-		this->initb = true;
-
-		this->Zmk = new matrix[NSPIN];
-//		this->Zmk_old = new matrix[NSPIN];
-		for(int is=0; is<NSPIN; is++)
+		if(broyden_type==0)
 		{
-			this->Zmk[is].create(dstep, dstep);
-//			this->Zmk_old[is].create(dstep, dstep);
+			int npdim = mixing_ndim + 1; // another array is used for temporarily store
+			this->dF = new complex<double>**[npdim];
+    		this->dn = new complex<double>**[npdim];
+			
+			for (int i=0; i<npdim; i++)
+    		{
+				dF[i] = new complex<double>*[NSPIN]; 
+    	    	dn[i] = new complex<double>*[NSPIN]; 
+				for (int is=0; is<NSPIN; is++)
+    	    	{
+    	        	dF[i][is] = new complex<double>[pw.ngmc];
+    	        	dn[i][is] = new complex<double>[pw.ngmc];
+    	    	}
+			}
+			Memory::record("Charge_Broyden","dF", NSPIN*npdim*pw.ngmc,"cdouble");
+    		Memory::record("Charge_Broyden","dn", NSPIN*npdim*pw.ngmc,"cdouble");
 		}
+		else
+		{
+    		assert(rstep > 0);
+
+			// weight
+    		this->w0 = 0.01;
+    		this->w = new double[rstep];
+    		for (int i=0; i<rstep; i++)
+    		{
+    	    	w[i] = 1.0/static_cast<double>(rstep);
+    		}
+
+			//special test: Pulay mixing
+			//this->w0 = 0.00;
+			//for(int i=0; i<rstep; i++)
+			//{
+			//	w[i] = 1.0;
+			//}
+
+			// R[rho_in] = rho_out - rho_in
+    		this->Rrho = new double**[NSPIN];
+    		for (int is=0; is<NSPIN; is++)
+    		{
+    	    	this->Rrho[is] = new double*[rstep];
+    	    	for (int i=0; i<rstep; i++)
+    	    	{
+    	        	this->Rrho[is][i] = new double[pw.nrxx];
+    	        	ZEROS(Rrho[is][i],pw.nrxx);
+    	    	}	
+    		}
+    		Memory::record("Charge_Broyden","Rrho", NSPIN*rstep*pw.nrxx,"double");
+
+    		// (2) allocate dRrho[i]: Rrho[i+1] - Rrho[i]
+    		this->dRrho = new double**[NSPIN];
+    		this->drho = new double**[NSPIN];
+    		this->rho_save2 = new double*[NSPIN];
+    		for (int is=0; is<NSPIN; is++)
+    		{
+    	    	dRrho[is] = new double*[dstep];
+    	    	drho[is] = new double*[dstep];
+    	    	rho_save2[is] = new double[pw.nrxx];
+    	    	for (int i=0; i<dstep; i++)
+    	    	{
+    	        	dRrho[is][i] = new double[pw.nrxx];
+    	        	drho[is][i] = new double[pw.nrxx];
+    	        	ZEROS( dRrho[is][i], pw.nrxx );
+    	        	ZEROS( drho[is][i], pw.nrxx);
+    	    	}
+    		}
+    		Memory::record("Charge_Broyden","dRrho", NSPIN*dstep*pw.nrxx,"double");
+    		Memory::record("Charge_Broyden","drho", NSPIN*dstep*pw.nrxx,"double");
+    		Memory::record("Charge_Broyden","rho_save2", NSPIN*pw.nrxx,"double");
+
+			this->dRR = new double[dstep];
+			ZEROS(dRR, dstep);
+
+			this->beta.create(dstep, dstep);
+			this->betabar.create(dstep, dstep);
+			this->Abar.create(dstep, dstep);
+			
+
+			this->Zmk = new matrix[NSPIN];
+//			this->Zmk_old = new matrix[NSPIN];
+			for(int is=0; is<NSPIN; is++)
+			{
+				this->Zmk[is].create(dstep, dstep);
+//				this->Zmk_old[is].create(dstep, dstep);
+			}
+		}
+		this->initb = true;
 	}
+
     return;
 }
 
