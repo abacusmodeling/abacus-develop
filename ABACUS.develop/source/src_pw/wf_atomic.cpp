@@ -470,11 +470,7 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
     {
         for (int ig = 0;ig < ng;ig++)
         {
-<<<<<<< HEAD
-            const double rr = std::rand()/double(RAND_MAX);
-=======
             const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
->>>>>>> master
             const double arg= TWO_PI * std::rand()/double(RAND_MAX);
             Vector3<double> v3 = kv.kvec_c[ik] + pw.gcar[this->igk(ik, ig)];
             psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);

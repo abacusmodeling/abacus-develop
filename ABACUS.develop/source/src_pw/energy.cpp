@@ -80,13 +80,8 @@ void energy::calculate_etot(void)
 
     //Quxin adds for DFT+U energy correction on 20201029
 
-<<<<<<< HEAD
-	cout << resetiosflags(ios::scientific) << endl;
-	cout << setprecision(6) << endl;
-=======
 	/*cout << resetiosflags(ios::scientific) << endl;
 	cout << setprecision(16) << endl;
->>>>>>> master
 	cout << " eband=" << eband << endl;
 	cout << " deband=" << deband << endl;
 	cout << " etxc-etxcc=" << H_XC_pw::etxc-etxcc << endl;
@@ -96,12 +91,8 @@ void energy::calculate_etot(void)
 	cout << " descf=" << descf << endl;
 	cout << " exx=" << exx << endl;
 	cout << " efiled=" << Efield::etotefield << endl;
-<<<<<<< HEAD
-	cout << " fermienergy= "<<ef<<endl;
-=======
 	cout << " total= "<<etot<<endl;
 	cout << " fermienergy= "<<ef<<endl;*/
->>>>>>> master
     if(INPUT.dft_plus_u) 
 	{
 		this->etot += dftu.EU;																	  
