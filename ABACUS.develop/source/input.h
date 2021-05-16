@@ -47,7 +47,10 @@ class Input
 	int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
 	int nbands_istate;		// number of bands around fermi level for istate calculation.
 	int nche_sto;			// number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
-	unsigned int seed_sto;  // random seed for sDFT
+	int seed_sto;  // random seed for sDFT
+	double emax_sto;		//Emax & Emin to normalize H
+	double emin_sto;
+	string stotype;
 
     bool symmetry;			// turn on symmetry or not
 	int npool; 				// ecch pool is for one k point

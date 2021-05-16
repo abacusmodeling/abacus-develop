@@ -179,6 +179,7 @@ void Parallel_Reduce::reduce_complex_double_pool(complex<double> &object)
 void Parallel_Reduce::reduce_complex_double_pool(complex <double> *object, const int n)
 {
 #ifdef __MPI
+	if(NPROC_IN_POOL == 1) return;
 	complex<double> *swap = new complex<double>[n];
 	for(int i=0;i<n;i++) swap[i] = object[i];
 	MPI_Allreduce(swap, object, n, mpicomplex, myOp, POOL_WORLD);

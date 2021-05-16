@@ -212,6 +212,7 @@ void Electrons::self_consistent(const int &istep)
 
         // calculate the new eband here.
         CHR.sum_band();
+        
 
 		// add exx
 		en.set_exx();		// Peize Lin add 2019-03-09
@@ -341,7 +342,6 @@ void Electrons::self_consistent(const int &istep)
             WF_io::write_wfc2( ssw.str(), wf.evc, pw.gcar);
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
-
         if(vext == 0) 
 		{
 			pot.set_vr_eff();
@@ -362,6 +362,7 @@ void Electrons::self_consistent(const int &istep)
 
         if (conv_elec || iter==NITER)
         {
+            
             //--------------------------------------
             // output charge density for converged,
             // 0 means don't need to consider iter,
@@ -414,7 +415,6 @@ void Electrons::self_consistent(const int &istep)
             {
                 ofs_running << " convergence has NOT been achieved!" << endl;			
             }
-
             iter_end(ofs_running);
             timer::tick("Electrons","self_consistent",'D');
             return;

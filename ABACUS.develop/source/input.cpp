@@ -130,6 +130,7 @@ void Input::Default(void)
 	nbands_istate = 5;
 	nche_sto = 0;
 	seed_sto = 0;
+	stotype = "pw";
 	npool = 1;
     berry_phase = false;
 	gdir = 3;
@@ -596,6 +597,18 @@ bool Input::Read(const string &fn)
 		else if (strcmp("seed_sto", word) == 0)
         {
             read_value(ifs, seed_sto);
+		}
+		else if (strcmp("emax_sto", word) == 0)
+        {
+            read_value(ifs, emax_sto);
+        }
+		else if (strcmp("emin_sto", word) == 0)
+        {
+            read_value(ifs, emin_sto);
+        }
+		else if (strcmp("stotype", word) == 0)
+        {
+            read_value(ifs, stotype);
         }
         else if (strcmp("npool", word) == 0)// number of pools
         {
@@ -1960,14 +1973,17 @@ void Input::Bcast()
     Parallel_Common::bcast_string( wannier_card );
     Parallel_Common::bcast_string( latname );
     Parallel_Common::bcast_string( calculation );
-	Parallel_Common::bcast_int( pseudo_rcut );
-	Parallel_Common::bcast_int( renormwithmesh );
+	Parallel_Common::bcast_double( pseudo_rcut );
+	Parallel_Common::bcast_bool( renormwithmesh );
     Parallel_Common::bcast_int( ntype );
     Parallel_Common::bcast_int( nbands );
 	Parallel_Common::bcast_int( nbands_sto );
     Parallel_Common::bcast_int( nbands_istate );
 	Parallel_Common::bcast_int( nche_sto );
 	Parallel_Common::bcast_int( seed_sto );
+	Parallel_Common::bcast_double( emax_sto );
+	Parallel_Common::bcast_double( emin_sto );
+	Parallel_Common::bcast_string( stotype );
 	Parallel_Common::bcast_int( npool );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );

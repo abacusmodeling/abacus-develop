@@ -115,6 +115,7 @@ void Charge_Broyden::mix_rho
 			dr22 += abs( rho[is][ir] - rho_save[is][ir] );
 		}
 	}
+
 	Parallel_Reduce::reduce_double_pool( dr22 );
 	assert( ucell.nelec != 0);
 	assert( ucell.omega > 0);
@@ -125,11 +126,10 @@ void Charge_Broyden::mix_rho
 
 	// mohan add 2011-01-22
 	//if(LINEAR_SCALING && LOCAL_BASIS) xiaohui modify 2013-09-01
-	if(BASIS_TYPE=="lcao")
+	if(BASIS_TYPE=="lcao" )
 	{
 		dr2 = dr22;	
 	}
-
     if ( dr2 < diago_error )
     {
         ofs_warning << " dr2 < diago_error, keep charge density unchanged." << endl;
