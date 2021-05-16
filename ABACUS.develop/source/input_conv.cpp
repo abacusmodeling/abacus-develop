@@ -44,9 +44,13 @@ void Input_Conv::Convert(void)
 	NPOOL = INPUT.npool;
 	CALCULATION = INPUT.calculation;
 
+	PSEUDORCUT = INPUT.pseudo_rcut; 
+    RENORMWITHMESH = INPUT.renormwithmesh;
+
 	// qianrui add 2021-2-5
 	STO_WF.nchi = INPUT.nbands_sto;
 	STO_WF.nche_sto = INPUT.nche_sto;
+	STO.seed_sto = INPUT.seed_sto;
 
 	// Electrical Field
 	EFIELD = INPUT.efield;

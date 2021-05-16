@@ -21,6 +21,9 @@ int 	NBANDS = 0;
 int		NBANDS_ISTATE = 0; // default number.
 int		NLOCAL = 0;	// total number of local basis.
 
+double PSEUDORCUT;
+bool RENORMWITHMESH;
+
 string	CALCULATION = "scf";
 int		EFIELD = 0; // 5: add electric field
 int		DIPOLE = 0; // 7: add dipole field

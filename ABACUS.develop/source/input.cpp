@@ -122,11 +122,14 @@ void Input::Default(void)
     //xiaohui modify 2015-09-15, relax -> scf
     //calculation = "relax";
     calculation = "scf";
+	pseudo_rcut = 10.0;
+	renormwithmesh = true;
     ntype = 0;
     nbands = 0;
 	nbands_sto = 0;
 	nbands_istate = 5;
 	nche_sto = 0;
+	seed_sto = 0;
 	npool = 1;
     berry_phase = false;
 	gdir = 3;
@@ -558,6 +561,14 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, latname);
         }
+		else if (strcmp("pseudo_rcut", word) == 0)// 
+        {
+            read_value(ifs, pseudo_rcut);
+        }
+		else if (strcmp("renormwithmesh", word) == 0)// 
+		{
+            read_value(ifs, renormwithmesh);
+        }
         else if (strcmp("calculation", word) == 0)// which type calculation
         {
             read_value(ifs, calculation);
@@ -581,6 +592,10 @@ bool Input::Read(const string &fn)
 		else if (strcmp("nche_sto", word) == 0)// Chebyshev expansion order
         {
             read_value(ifs, nche_sto);
+        }
+		else if (strcmp("seed_sto", word) == 0)
+        {
+            read_value(ifs, seed_sto);
         }
         else if (strcmp("npool", word) == 0)// number of pools
         {
@@ -1945,11 +1960,14 @@ void Input::Bcast()
     Parallel_Common::bcast_string( wannier_card );
     Parallel_Common::bcast_string( latname );
     Parallel_Common::bcast_string( calculation );
+	Parallel_Common::bcast_int( pseudo_rcut );
+	Parallel_Common::bcast_int( renormwithmesh );
     Parallel_Common::bcast_int( ntype );
     Parallel_Common::bcast_int( nbands );
 	Parallel_Common::bcast_int( nbands_sto );
     Parallel_Common::bcast_int( nbands_istate );
 	Parallel_Common::bcast_int( nche_sto );
+	Parallel_Common::bcast_int( seed_sto );
 	Parallel_Common::bcast_int( npool );
     Parallel_Common::bcast_bool( berry_phase );
 	Parallel_Common::bcast_int( gdir );
