@@ -75,15 +75,20 @@ void WF_atomic::init_at_1(void)
         for (int ic=0; ic<atom->nchi ;ic++)
         {
 			//cout << "\n T=" << it << " ic=" << ic << endl;
-
+            int nmesh;
+            if(RENORMWITHMESH)
+                nmesh = atom->mesh;
+            else
+                nmesh = atom->msh;
+                
             // check the unit condition
-            double *inner_part = new double[atom->msh];
-            for (int ir=0; ir<atom->msh; ir++)
+            double *inner_part = new double[nmesh];
+            for (int ir=0; ir<nmesh; ir++)
             {
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             double unit = 0.0;
-            Integral::Simpson_Integral(atom->msh, inner_part, atom->rab, unit);
+            Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			ofs_running << " the unit of pseudo atomic orbital is " << unit; 
@@ -91,7 +96,7 @@ void WF_atomic::init_at_1(void)
             //=================================
             // normalize radial wave functions
             //=================================
-            for (int ir=0; ir<atom->msh; ir++)
+            for (int ir=0; ir<nmesh; ir++)
             {
                 atom->chi(ic,ir) /= sqrt(unit);
             }
@@ -99,13 +104,13 @@ void WF_atomic::init_at_1(void)
             //===========
             // recheck
             //===========
-            inner_part = new double[atom->msh];
-            for (int ir=0; ir<atom->msh; ir++)
+            inner_part = new double[nmesh];
+            for (int ir=0; ir<nmesh; ir++)
             {
                 inner_part[ir] = atom->chi(ic,ir) * atom->chi(ic,ir);
             }
             unit = 0.0;
-            Integral::Simpson_Integral(atom->msh, inner_part, atom->rab, unit);
+            Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
 			ofs_running << ", renormalize to " << unit << endl;
