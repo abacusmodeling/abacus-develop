@@ -122,8 +122,8 @@ void Input::Default(void)
     //xiaohui modify 2015-09-15, relax -> scf
     //calculation = "relax";
     calculation = "scf";
-	pseudo_rcut = 10.0;
-	renormwithmesh = true;
+	pseudo_rcut = 15.0; //qianrui add this parameter 2021-5
+	renormwithmesh = false; //qianrui add this pararmeter
     ntype = 0;
     nbands = 0;
 	nbands_sto = 0;
