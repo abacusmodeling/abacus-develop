@@ -79,7 +79,7 @@ void energy::calculate_etot(void)
 	+ evdw;							// Peize Lin add evdw 2021.03.09
 
     //Quxin adds for DFT+U energy correction on 20201029
-
+/*
 	cout << resetiosflags(ios::scientific) << endl;
 	cout << setprecision(16) << endl;
 	cout << " eband=" << eband << endl;
@@ -92,7 +92,7 @@ void energy::calculate_etot(void)
 	cout << " exx=" << exx << endl;
 	cout << " efiled=" << Efield::etotefield << endl;
 	cout << " total= "<<etot<<endl;
-	cout << " fermienergy= "<<ef<<endl;
+	cout << " fermienergy= "<<ef<<endl;*/
     if(INPUT.dft_plus_u) 
 	{
 		this->etot += dftu.EU;																	  
