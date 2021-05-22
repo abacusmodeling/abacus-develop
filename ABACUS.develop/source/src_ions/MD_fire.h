@@ -5,14 +5,16 @@
 
 class MD_fire
 {
-    public:
-        MD_fire();
-        ~MD_fire(){};
-        void check_FIRE(
-            const int& numIon, 
-            const Vector3<double>const* force, 
-            double& deltaT, 
-            Vector3<double>* vel);
+	public:
+
+		MD_fire();
+		~MD_fire(){};
+		void check_FIRE(
+				const int& numIon, 
+				const Vector3<double>const* force, 
+				double& deltaT, 
+				Vector3<double>* vel);
+
     private:
         double alpha_start ;//alpha_start begin
         double alpha;//alpha begin
