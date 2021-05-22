@@ -1,0 +1,8 @@
+This test for: Si-nspin2-AFM
+*Si-diamond
+*Kpoints 2*2*2
+*old upf pseudopotential
+*smearing default
+*ks_solver genelpa
+*nspin 2
+*LCAO

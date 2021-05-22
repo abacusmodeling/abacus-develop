@@ -1,0 +1,20 @@
+INPUT_PARAMETERS
+#Parameters	(General)
+suffix              autotest
+pseudo_dir		./
+ntype			1	
+nbands			8
+calculation             scf
+#Parameters (Accuracy)
+ecutwfc			20
+niter			20
+
+basis_type		pw
+nstep                   1
+
+#start_wfc       random
+
+ks_solver           cg
+mixing_type         pulay
+mixing_beta         0.7
+mixing_gg0          1.5

@@ -1,0 +1,9 @@
+This test for:
+*Si-dojo-PW
+*PW
+*2*2*2 K-points
+*dojo pseudopotential
+*smearing gauss
+*ks_solver cg
+*mixing_type pulay-kerker
+*mixing_beta 0.7
