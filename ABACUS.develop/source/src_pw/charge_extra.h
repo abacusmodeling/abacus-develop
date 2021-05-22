@@ -1,6 +1,7 @@
 #ifndef CHARGE_EXTRA_H
 #define CHARGE_EXTRA_H
-#include "src_pw/unitcell_pseudo.h"
+
+#include "unitcell_pseudo.h"
 
 using namespace std;
 

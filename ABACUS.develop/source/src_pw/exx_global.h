@@ -1,7 +1,7 @@
 #ifndef EXX_GLOBAL_H
 #define EXX_GLOBAL_H
 
-#include "src_pw/xc_type.h"
+#include "xc_type.h"
 
 struct Exx_Global
 {

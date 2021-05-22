@@ -5,10 +5,11 @@
 //==========================================================
 #ifndef VDWD2_H
 #define VDWD2_H
-#include"src_pw/vdwd2_parameters.h"
-#include"src_pw/unitcell_pseudo.h"
-#include"src_global/vector3.h"
-#include<vector>
+
+#include "vdwd2_parameters.h"
+#include "unitcell_pseudo.h"
+#include "../src_global/vector3.h"
+#include <vector>
 
 class Vdwd2
 {
