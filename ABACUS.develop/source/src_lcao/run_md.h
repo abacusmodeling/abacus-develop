@@ -4,7 +4,7 @@
 #include "LOOP_elec.h"
 #include "../src_ions/ions_move_methods.h"
 #include "../src_pw/charge_extra.h"
-#include "../src_pw/MD_basic.h"
+#include "../src_ions/MD_basic.h"
 #include "../src_ions/lattice_change_methods.h"
 
 class Run_MD 
