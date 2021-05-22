@@ -7,6 +7,7 @@
 
 #include "src_global/vector3.h"
 #include <string>
+#include "src_pw/MD_parameters.h"
 using namespace std;
 
 class Input
@@ -40,11 +41,17 @@ class Input
     string calculation;		// "scf" : self consistent calculation.
 						    // "nscf" : non-self consistent calculation.
 							// "relax" : cell relaxations
+    double pseudo_rcut;     // cut-off radius for calculating msh
+	bool renormwithmesh;     // 0: use msh to normalize radial wave functions;  1: use mesh, which is used in QE.
     int ntype;				// number of atom types
     int nbands;				// number of bands
 	int nbands_sto;			// number of stochastic bands //qianrui 2021-2-5
 	int nbands_istate;		// number of bands around fermi level for istate calculation.
 	int nche_sto;			// number of orders for Chebyshev expansion in stochastic DFT //qinarui 2021-2-5
+	int seed_sto;  // random seed for sDFT
+	double emax_sto;		//Emax & Emin to normalize H
+	double emin_sto;
+	string stotype;
 
     bool symmetry;			// turn on symmetry or not
 	int npool; 				// ecch pool is for one k point
@@ -244,7 +251,7 @@ class Input
 // molecular dynamics 
 // added by Daye Zheng
 //==========================================================
-    int md_mdtype;                   //choose ensemble
+/*    int md_mdtype;                   //choose ensemble
 	double md_tauthermo;
 	double md_taubaro;
 	double md_dt;                    //time step
@@ -262,7 +269,8 @@ class Input
 	int md_fixtemperature;          //period to change temperature
 	double md_ediff;             //parameter for constraining total energy change
 	double md_ediffg;             //parameter for constraining max force change
-	int md_msdstartTime;            //choose which step that msd be calculated 
+	int md_msdstartTime;            //choose which step that msd be calculated */
+	MD_parameters mdp;
 
 //==========================================================
 // vdw
@@ -379,6 +387,11 @@ class Input
 	int val_elec_03;			//valence electron 03
 	int vext;			//add extern potential or not
 	int vext_dire;			//vext direction
+	double timescale;			//"fs"
+	int vexttype;
+	int vextout; 			// output the electronic potential or not
+	int td_dipoleout;			// output the dipole or not
+
 	
 //==========================================================
 // restart

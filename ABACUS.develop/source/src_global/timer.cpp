@@ -148,7 +148,7 @@ void timer::print_all(ofstream &ofs)
 			 << setw(2)  << timer_one.level
 			 << setw(20) << class_name
 			 << setw(20) << name
-			 << setw(15) << timer_one.cpu_second
+			 << setw(15) << setprecision(5) << timer_one.cpu_second
 			 << setw(10) << timer_one.calls
 			 << setw(10) << setprecision(2) << timer_one.cpu_second/timer_one.calls
 			 << setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << endl;		

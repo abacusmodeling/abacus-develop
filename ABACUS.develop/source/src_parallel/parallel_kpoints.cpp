@@ -115,6 +115,12 @@ void Parallel_Kpoints::divide_pools(void)
     // Note: The color must be non-negative or MPI_UNDEFINED.
     //========================================================
     MPI_Comm_split(MPI_COMM_WORLD,MY_POOL,key,&POOL_WORLD);
+    if(CALCULATION == "scf-sto")
+    {
+        assert(NPROC%NPOOL == 0);
+	    int color = MY_RANK % NPROC_IN_POOL;
+	    MPI_Comm_split(MPI_COMM_WORLD, color, key, &PARAPW_WORLD);
+    }
 
     return;
 }

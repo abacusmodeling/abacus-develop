@@ -859,7 +859,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
                         //------------------------------------------------------
                         if (npw2 < npw1)
                         {
-							if (non_zero_grid < ngrid)
+							if (non_zero_grid + nz < ngrid) //qianrui fix a bug 2021-5-20 to make sure non_zero_grid < ngrid after distributing pw
 							{
 								// ip1 save the process number which has smallest number of plane wave
 								// in this pool.
@@ -876,7 +876,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
                         {
                             if (nst2 < nst1)
                             {
-                                if (non_zero_grid < ngrid)
+                                if (non_zero_grid + nz < ngrid) //qianrui add nz
                                 {
                                     ip1=ip2;
                                 }
@@ -907,7 +907,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
                 if (npw2 < pw_tmp)
                 {
                     pw_tmp = npw2;
-                    if (non_zero_grid < ngrid)
+                    if (non_zero_grid + nz < ngrid) //qianrui add nz
                     {
                         // ip1 is the index of processor which
                         // has smallest number of plane wave.

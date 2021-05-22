@@ -232,7 +232,7 @@ void pseudo_nc::set_pseudo_atom(const Pseudopot_upf &upf)
 	// mohan 2009-12-15
 	// mohan update again 2011-05-23, 
 	// in order to calculate more accurate Vna.
-	this->rcut = 15.0;//(a.u.);
+	this->rcut = PSEUDORCUT;//(a.u.);
 	
 // remember to update here if you need it.
 //	rcut = 25.0; 

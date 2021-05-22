@@ -1,0 +1,7 @@
+This test for:
+*Al-fcc
+*sg15 pseudopotential
+*smearing kerker mixing
+*ks_solver cg
+*mixing_type kerker 
+*mixing_beta 0.4

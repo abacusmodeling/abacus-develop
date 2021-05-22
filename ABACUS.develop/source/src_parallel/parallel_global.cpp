@@ -17,7 +17,8 @@ using namespace std;
 MPI_Datatype mpicomplex;
 MPI_Op myOp;
 MPI_Comm POOL_WORLD;
-MPI_Comm GRID_WORLD; // mohan add 2012-01-13
+MPI_Comm PARAPW_WORLD; // qianrui add it for sto-dft 2021-4-14
+MPI_Comm GRID_WORLD; // mohan add 2012-01-13z
 MPI_Comm DIAG_WORLD; // mohan add 2012-01-13
 
 void Parallel_Global::myProd(complex<double> *in,complex<double> *inout,int *len,MPI_Datatype *dptr)

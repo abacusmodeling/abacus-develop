@@ -1,0 +1,6 @@
+This test for:
+*fcc Al
+*k-points 2*2*2
+*SG15 upf pseudopotential
+*smearing mp2
+*ks_solver cg

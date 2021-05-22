@@ -544,10 +544,21 @@ public:
 	{
 		return sdot_(&n, X, &incX, Y, &incY);
 	}
+
 	static inline
 	double dot( const int n, const double *X, const int incX, const double *Y, const int incY)
 	{
 		return ddot_(&n, X, &incX, Y, &incY);
+	}
+
+	static inline
+	double ddot_real(const int &dim, const complex<double>* psi_L,
+		const complex<double>* psi_R)
+	{
+    	double *pL,*pR;
+    	pL=(double *)psi_L;
+    	pR=(double *)psi_R;
+    	return dot(2*dim,pL,1,pR,1);
 	}
 	
 	// Peize Lin add 2017-10-27, fix bug trans 2019-01-17

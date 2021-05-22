@@ -186,8 +186,13 @@ void Electrons::self_consistent(const int &istep)
 				}
 				break;
 		}
-		
-		//(2) calculate band energy using cg or davidson method.
+        //(2) save change density as previous charge,
+        // prepared fox mixing.
+        CHR.save_rho_before_sum_band();
+
+		bool onescf = false; 
+    scf_step:
+		//(3) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
         this->c_bands(istep);
 
@@ -199,22 +204,19 @@ void Electrons::self_consistent(const int &istep)
         en.ef_up  = 0.0;
         en.ef_dw  = 0.0;
 
-        //(3) calculate weights of each band.
-        Occupy::calculate_weights();	
-
-        //(4) save change density as previous charge,
-        // prepared fox mixing.
-        CHR.save_rho_before_sum_band();
+        //(4) calculate weights of each band.
+        Occupy::calculate_weights();
 
         //(5) calculate new charge density according to
         // new wave functions.
-		
+
         // calculate the new eband here.
         CHR.sum_band();
+        
 
 		// add exx
 		en.set_exx();		// Peize Lin add 2019-03-09
-		
+
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
 		// mohan add 2009-01-23
@@ -265,8 +267,9 @@ void Electrons::self_consistent(const int &istep)
             //    ofs_mix << setw(5) << iter << setw(20) << dr2 << endl; 
             //}
 
-            if (iter==1)
+            if (iter==1 && !onescf)
             {
+                onescf = true;   
                 if (dr2 < diago_error)
                 {
                     ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
@@ -276,9 +279,10 @@ void Electrons::self_consistent(const int &istep)
 
                     // update ETHR.
                     ofs_running << " Origin ETHR = " << ETHR << endl;
-                    ETHR = dr2 / ucell.nelec;
+                    ETHR = 0.1 * dr2 / ucell.nelec;
                     ofs_running << " New    ETHR = " << ETHR << endl;
                     //goto first_iter_again;
+                    goto scf_step;
                 }
             }
         }
@@ -338,7 +342,6 @@ void Electrons::self_consistent(const int &istep)
             WF_io::write_wfc2( ssw.str(), wf.evc, pw.gcar);
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
-
         if(vext == 0) 
 		{
 			pot.set_vr_eff();
@@ -359,6 +362,7 @@ void Electrons::self_consistent(const int &istep)
 
         if (conv_elec || iter==NITER)
         {
+            
             //--------------------------------------
             // output charge density for converged,
             // 0 means don't need to consider iter,
@@ -411,7 +415,6 @@ void Electrons::self_consistent(const int &istep)
             {
                 ofs_running << " convergence has NOT been achieved!" << endl;			
             }
-
             iter_end(ofs_running);
             timer::tick("Electrons","self_consistent",'D');
             return;
