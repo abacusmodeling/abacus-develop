@@ -1,5 +1,5 @@
-#ifndef INCLUDE_STO_ELEC_H
-#define INCLUDE_STO_ELEC_H
+#ifndef STO_ELEC_H
+#define STO_ELEC_H
 
 #include "tools.h"
 #include "threshold_elec.h"
@@ -26,6 +26,7 @@ class Stochastic_Elec: private Threshold_Elec
     void scf_stochastic(const int &istep);
 
 	private:
+
     Stochastic_Iter stoiter;
 
     void c_bands(const int &istep);

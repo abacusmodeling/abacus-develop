@@ -21,6 +21,9 @@ extern int 		NBANDS;
 extern int		NBANDS_ISTATE;		// 1.05 // mohan add 2011-03-22
 extern int 		NLOCAL;				// 1.1 // mohan add 2009-05-29
 
+extern double PSEUDORCUT;
+extern bool RENORMWITHMESH;
+
 extern string	CALCULATION;		// 2 "scf";"nscf" ;"symmetry"
 extern int		EFIELD;				// 5 add electric field
 extern int 		DIPOLE;				// 7 add dipole correction

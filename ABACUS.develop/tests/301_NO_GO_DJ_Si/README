@@ -1,0 +1,9 @@
+This test for:
+*Si-dojo-LCAO
+*LCAO
+*Gamma-only
+*dojo pseudopotential
+*smearing gauss
+*ks_solver genelpa
+*mixing_type pulay-kerker
+*mixing_beta 0.7

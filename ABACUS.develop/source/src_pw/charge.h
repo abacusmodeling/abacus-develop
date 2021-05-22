@@ -77,6 +77,7 @@ public:
 		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
 
     bool read_rho(const int &is, const string &fn, double* rho);//mohan add 2007-10-17
+    void rho_mpi(void);
 
 
 	private:
@@ -87,8 +88,6 @@ public:
 	int nspin; // number of spins
 
     void sum_band_k();
-
-    void rho_mpi(void);
 
     double sum_rho(void) const;
 
