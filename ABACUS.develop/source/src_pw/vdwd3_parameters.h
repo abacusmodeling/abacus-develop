@@ -2,15 +2,15 @@
 // AUTHOR:	Yuyang Ji
 // DATE:	2021-04-19
 //==========================================================
-
 #ifndef VDWD3_PARAMETERS_H
 #define VDWD3_PARAMETERS_H
 
 #include <vector>
 #include <string>
-#include "src_global/vector3.h"
-#include "src_global/matrix3.h"
-#include "src_pw/unitcell_pseudo.h"
+#include "../src_global/vector3.h"
+#include "../src_global/matrix3.h"
+#include "unitcell_pseudo.h"
+
 
 class Vdwd3_Parameters
 {
