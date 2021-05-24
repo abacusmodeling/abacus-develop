@@ -2,7 +2,7 @@
 // AUTHOR : ywcui , mohan
 // DATE : 2008-11-22
 //==========================================================
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 #include "sltk_atom_input.h"
 #include "sltk_grid.h"
 #include "../src_pw/tools.h"

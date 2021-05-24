@@ -391,7 +391,7 @@ void unkOverlap_lcao::cal_R_number()
 		for (int I1 = 0; I1 < atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
-			GridD.Find_atom(tau1, T1, I1);
+			GridD.Find_atom(ucell, tau1, T1, I1);
 			
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
 			{
