@@ -99,7 +99,7 @@ void Hamilt_PW::init_k(const int ik)
 // by nstart states psi (atomic or random wavefunctions).
 // Produces on output n_band eigenvectors (n_band <= nstart) in evc.
 //----------------------------------------------------------------------
-void Hamilt_PW::cinitcgg(
+void Hamilt_PW::diagH_subspace(
     const int ik,
     const int nstart,
     const int n_band,
@@ -107,8 +107,8 @@ void Hamilt_PW::cinitcgg(
     ComplexMatrix &evc,
     double *en)
 {
-    TITLE("Hamilt_PW","cinitcgg");
-    timer::tick("Hamilt_PW","cinitcgg",'G');
+    TITLE("Hamilt_PW","diagH_subspace");
+    timer::tick("Hamilt_PW","diagH_subspace",'G');
 
 	assert(nstart!=0);
 	assert(n_band!=0);
@@ -116,29 +116,30 @@ void Hamilt_PW::cinitcgg(
     ComplexMatrix hc(nstart, nstart);
     ComplexMatrix sc(nstart, nstart);
     ComplexMatrix hvec(nstart,n_band);
-	int dmin,dmax;
+
+	int dmin=0;
+	int dmax=0;
 	const int npw = kv.ngk[ik];
+
 	if(NSPIN != 4)
 	{
 		dmin= npw;
 		dmax = wf.npwx;
 	}
-	else {
+	else 
+	{
 		dmin = wf.npwx*NPOL;
 		dmax = wf.npwx*NPOL;
 	}
+
 	//qianrui improve this part 2021-3-14
 	complex<double> *aux=new complex<double> [dmax*nstart];
 	complex<double> *paux = aux;
 	complex<double> *ppsi = psi.c;
+
 	//qianrui replace it
 	this->h_psi(psi.c, aux, nstart);
-	//for(int m=0;m<nstart;++m)
-	//{
-	//	this->h_psi(ppsi, paux);
-	//	paux += dmax;
-	//	ppsi += dmax;
-	//}
+
 	char trans1 = 'C';
 	char trans2 = 'N';
 	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,aux,&dmax,&ZERO,hc.c,&nstart);
@@ -146,80 +147,11 @@ void Hamilt_PW::cinitcgg(
 
 	zgemm_(&trans1,&trans2,&nstart,&nstart,&dmin,&ONE,psi.c,&dmax,psi.c,&dmax,&ZERO,sc.c,&nstart);
 	sc=transpose(sc,false);
-	//After psis are strictly normalized, we should use this part. 
-	//for(int m=1;m<nstart;++m)
-	//{
-	//	sc(m,m) == 1;
-	//}
 
 	delete []aux;
 
-
-	/*//qianrui replace this part
-	complex<double> **p = new complex<double>*[nstart];
-	for(int i=0; i<nstart; i++)
-	{
-		if(NPOL==2)
-		{
-			p[i] = new complex<double>[wf.npwx*NPOL];
-		}
-		else
-		{
-			p[i] = new complex<double>[wf.npwx];
-		}
-	}
-
-	for(int i=0; i<nstart; i++)
-	{
-		for(int j=0; j<wf.npwx; j++)
-		{
-			p[i][j] = psi(i,j);
-		}
-	}
-	if(NPOL == 2)
-	{
-		for(int i=0; i<nstart; i++)
-		{
-			for(int j=0; j<wf.npwx; j++)
-			{
-				p[i][j+wf.npwx] = psi(i,j+wf.npwx);
-			}
-		}
-	}
-
-    // Set up the Hamiltonian and Overlap matrices
-	complex<double>* hpsi = new complex<double>[dmin];
-	complex<double>* spsi = new complex<double>[dmin];
-
-    for (int m=0; m<nstart; m++)
-    {
-        this->h_1psi(dmin, p[m], hpsi, spsi);
-
-        hc(m,m) = this->just_ddot(dmin, p[m], hpsi);
-        sc(m,m) = this->just_ddot(dmin, p[m], spsi);
-
-        if (m+1<nstart)
-        {
-            for (int j = m + 1;j < nstart;j++)
-            {
-                hc(j,m) = this->just_ddot(dmin, p[j], hpsi);
-                sc(j,m) = this->just_ddot(dmin, p[j], spsi);
-                hc(m, j) = conj(hc(j, m));
-                sc(m, j) = conj(sc(j, m));
-            }
-        }
-    }
-	
-	delete[] hpsi;
-	delete[] spsi;
-	for(int i=0; i<nstart; i++)
-	{
-		delete[] p[i];
-	}
-	delete[] p;*/
-
 	// Peize Lin add 2019-03-09
-	if("lcao_in_pw"==BASIS_TYPE)
+	if(BASIS_TYPE=="lcao_in_pw")
 	{
 		auto add_Hexx = [&](const double alpha)
 		{
@@ -251,8 +183,7 @@ void Hamilt_PW::cinitcgg(
 		Parallel_Reduce::reduce_complex_double_pool( sc.c, nstart*nstart );
 	}
 
-	
-
+	// after generation of H and S matrix, diag them
     hm.diagH_LAPACK(nstart, n_band, hc, sc, nstart, en, hvec);
 
 
@@ -332,7 +263,7 @@ void Hamilt_PW::cinitcgg(
 		&& ( CALCULATION == "scf" || CALCULATION == "md" || CALCULATION == "relax")) //pengfei 2014-10-13
 	{
 		// because psi and evc are different here,
-		// I think if psi and evc is the same, 
+		// I think if psi and evc are the same, 
 		// there may be problems, mohan 2011-01-01
 		char transa = 'N';
 		char transb = 'T';
@@ -354,7 +285,7 @@ void Hamilt_PW::cinitcgg(
 	{
 		// As the evc and psi may refer to the same matrix, we first
 		// create a temporary matrix to story the result. (by wangjp)
-		//qianrui improve this part 2021-3-13
+		// qianrui improve this part 2021-3-13
 		char transa = 'N';
 		char transb = 'T';
 		ComplexMatrix evctmp(n_band, dmin,false);
@@ -366,57 +297,6 @@ void Hamilt_PW::cinitcgg(
 				evc(ib,ig) = evctmp(ib,ig);
 			}
 		}
-		
-		/*qianrui replace this part 
-		ComplexMatrix evctmp(n_band, dmax);
-		for(int ib=0; ib<n_band; ib++)
-		{
-			for(int ig=0; ig<wf.npw; ig++)
-			{
-				complex<double> sum = ZERO;
-				complex<double> sum1 = ZERO;
-				for(int ib2=0; ib2<nstart; ib2++)
-				{
-					sum += psi(ib2, ig) * hvec(ib2, ib);
-					if(NPOL == 2) 
-					{
-						sum1 +=  psi(ib2,ig + wf.npwx) * hvec(ib2, ib);
-					}
-				}
-				evctmp(ib,ig) = sum;
-				if(NPOL == 2)
-				{
-					evctmp(ib,ig + wf.npwx) = sum1;
-				}
-			}
-		}
-		for(int ib=0; ib<n_band; ib++)
-		{
-			for(int ig=0; ig<wf.npw; ig++)
-			{
-				evc(ib,ig) = evctmp(ib,ig);
-				if(NPOL==2) evc(ib, ig + wf.npwx) = evctmp(ib, ig+wf.npwx);
-			}
-		}*/
-
-		/*
-		for(int ib=0; ib<n_band; ib++)
-		{
-			for(int ig=0; ig<wf.npw; ig++)
-			{
-				complex<double> diff = evctmp(ib, ig) - evc(ib, ig);
-				if( norm(diff) > 1.0e-5 )
-				{
-					cout << " npw = " << wf.npw << endl;
-					cout << " nstart = " << nstart << endl;
-					cout << " nbands = " << n_band << endl;
-					cout << " wf.npwx = " << wf.npwx << endl;
-					cout << " ib=" << ib << " ig=" << ig << " diff=" << diff << endl;
-				}
-			}
-		}
-		*/
-
 	}
     //out.printr1_d("en",en,n_band);
 
@@ -428,7 +308,7 @@ void Hamilt_PW::cinitcgg(
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
 
-    timer::tick("Hamilt_PW","cinitcgg",'G');
+    timer::tick("Hamilt_PW","diagH_subspace",'G');
     return;
 }
 

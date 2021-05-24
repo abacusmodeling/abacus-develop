@@ -82,9 +82,16 @@ private:
 	void read_q_pack();
 
 // mohan comment out 2021-02-24	
-	friend void Hamilt_PW::cinitcgg(const int ik,const int nstart,const int n_band,const ComplexMatrix &psi,ComplexMatrix &evc,double *en);	
+	friend void Hamilt_PW::diagH_subspace(
+		const int ik,
+		const int nstart,
+		const int n_band,
+		const ComplexMatrix &psi,
+		ComplexMatrix &evc,
+		double *en);	
 	
 public:
+
 	PW_Basis *pw_ptr;
 	Use_FFT *UFFT_ptr;
 	UnitCell_pseudo *ucell_ptr;

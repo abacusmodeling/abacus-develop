@@ -43,11 +43,19 @@ void Hamilt::diago(
 		if(KS_SOLVER=="lapack")
 		{
 			assert(NLOCAL >= NBANDS);
-        	this->cinitcgg(ik, NLOCAL, NBANDS, wf.wanf2[ik0], wf.evc[ik0], wf.ekb[ik]);
+        	this->diagH_subspace(
+				ik, 
+				NLOCAL, 
+				NBANDS, 
+				wf.wanf2[ik0], 
+				wf.evc[ik0], 
+				wf.ekb[ik]);
 		}
 		else
 		{
-			ofs_warning << " The diago_type " << KS_SOLVER << " not implemented yet." << endl; //xiaohui add 2013-09-02
+			ofs_warning << " The diago_type " 
+				<< KS_SOLVER 
+				<< " not implemented yet." << endl; //xiaohui add 2013-09-02
 			WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
     }
@@ -61,7 +69,14 @@ void Hamilt::diago(
             {			
                 if ( iter > 1 || istep > 1 ||  ntry > 0) //qian change it, because it has been executed in diago_PAO_in_pw_k2.
                 {
-                    this->cinitcgg( ik ,NBANDS, NBANDS, wf.evc[ik0], wf.evc[ik0], wf.ekb[ik]);
+                    this->diagH_subspace( 
+						ik,
+						NBANDS, 
+						NBANDS, 
+						wf.evc[ik0], 
+						wf.evc[ik0], 
+						wf.ekb[ik]);
+
                     avg_iter += 1.0;
                 }
                 Diago_CG cg;
@@ -77,9 +92,9 @@ void Hamilt::diago(
 						DIAGO_CG_MAXITER, reorder, notconv, avg);
 				}
 				// P.S. : nscf is the flag about reorder.
-				// if cinitcgg is done once,
+				// if diagH_subspace is done once,
 				// we don't need to reorder the eigenvectors order.
-				// if cinitcgg has not been called,
+				// if diagH_subspace has not been called,
 				// we need to reorder the eigenvectors.
             }
 	   		else if(KS_SOLVER=="dav")
@@ -122,8 +137,8 @@ void Hamilt::diago(
 bool Hamilt::test_exit_cond(const int &ntry, const int &notconv)
 {
     //================================================================
-    // If this logical function is true, need to do cinitcgg and cg
-    // again.
+    // If this logical function is true, need to do diagH_subspace 
+	// and cg again.
     //================================================================
 
 	bool scf = true;
@@ -136,12 +151,12 @@ bool Hamilt::test_exit_cond(const int &ntry, const int &notconv)
     const bool f2 = ( (!scf && (notconv > 0)) );
 
     // if self consistent calculation, if not converged > 5,
-    // using cinitcgg and cg method again. ntry++
+    // using diagH_subspace and cg method again. ntry++
     const bool f3 = ( ( scf && (notconv > 5)) );
     return  ( f1 && ( f2 || f3 ) );
 }
 
-void Hamilt::cinitcgg(
+void Hamilt::diagH_subspace(
     const int ik,
     const int nstart,
     const int n_band,
@@ -151,16 +166,16 @@ void Hamilt::cinitcgg(
 {
 	if(nstart < n_band)
 	{
-		WARNING_QUIT("cinitcgg","nstart < n_band!");
+		WARNING_QUIT("diagH_subspace","nstart < n_band!");
 	}
 
     if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
     {
-        this->hpw.cinitcgg(ik, nstart, n_band, psi, evc, en);
+        this->hpw.diagH_subspace(ik, nstart, n_band, psi, evc, en);
     }
     else
     {
-		WARNING_QUIT("cinitcgg","Check parameters: BASIS_TYPE. ");
+		WARNING_QUIT("diagH_subspace","Check parameters: BASIS_TYPE. ");
     }
     return;
 }

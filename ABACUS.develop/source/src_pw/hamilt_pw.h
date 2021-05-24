@@ -38,7 +38,7 @@ public:
 	friend class Hamilt;
     friend class Stochastic_Iter;
 
-    void cinitcgg(const int ik,
+    void diagH_subspace(const int ik,
                   const int nstart,
                   const int nbnd,
                   const ComplexMatrix &psi,

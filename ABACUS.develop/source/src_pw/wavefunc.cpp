@@ -230,7 +230,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
     hm.hpw.allocate(this->npwx, NPOL, ppcell.nkb, pw.nrxx);
 	hm.hpw.init_k(ik);
 	
-	//hm.cinitcgg(ik ,NLOCAL, NBANDS, wvf, wvf, ekb[ik]);
+	//hm.diagH_subspace(ik ,NLOCAL, NBANDS, wvf, wvf, ekb[ik]);
 //	for(int ib=0; ib<NBANDS; ib++)
 //	{
 //		cout << " ib=" << ib << " e=" << ekb[ik][ib] << endl;
@@ -315,7 +315,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	//if(DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
 	if(KS_SOLVER=="cg") //xiaohui add 2013-09-02
 	{
-		hm.cinitcgg(ik ,starting_nw, NBANDS, wfcatom, wfcatom, etatom);
+		hm.diagH_subspace(ik ,starting_nw, NBANDS, wfcatom, wfcatom, etatom);
 	}
 
 	/*

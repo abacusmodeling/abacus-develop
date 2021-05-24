@@ -495,11 +495,11 @@ void Electrons::c_bands(const int &istep)
 
         //============================================================
         // diago the hamiltonian!!
-        // In plane wave method, firstly using cinitcgg to diagnolize,
+        // In plane wave method, firstly using diagH_subspace to diagnolize,
         // then using cg method.
         //
         // In localized orbital presented in plane wave case,
-        // only using cinitcgg.
+        // only use diagH_subspace.
         //=============================================================
         double avg_iter_k = 0.0;
         hm.diago(istep, this->iter, ik, h_diag, avg_iter_k);
