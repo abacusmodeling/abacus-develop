@@ -12,8 +12,9 @@
 //==========================================================
 Atom_input::Atom_input
 (
-    const int amount,
-    const int ntype,
+	const UnitCell &ucell,
+	const int amount,
+	const int ntype,
     const bool boundary_in,
     const double radius_in
 )
@@ -148,7 +149,7 @@ Atom_input::Atom_input
 // ( if > 1 ,expand flag = 1)
 //----------------------------------------------------------
 
-	this->Check_Expand_Condition();
+	this->Check_Expand_Condition(ucell);
 
 	// for check
 	//glayerX+=2;
@@ -170,7 +171,7 @@ Atom_input::Atom_input
 
 	if (this->expand_flag)
 	{
-		this->Expand_Grid(ntype);
+		this->Expand_Grid(ucell, ntype);
 	}
 
 	if(test_grid)OUT(ofs_running, "expand_flag", expand_flag);
@@ -202,7 +203,7 @@ Atom_input::~Atom_input()
 // should use the same algorithm to generate
 // dxe, dye, dze in grid_meshcell.cpp.
 //============================================
-void Atom_input::Check_Expand_Condition(void)
+void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 {
 //	TITLE(ofs_running, "Atom_input", "Check_Expand_Condition");
 
@@ -393,7 +394,7 @@ void Atom_input::Check_Expand_Condition(void)
 	return;
 }
 
-void Atom_input::Expand_Grid(const int ntype)
+void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 {
 	TITLE("Atom_input", "Expand_Grid");
 
@@ -608,7 +609,7 @@ void Atom_input::calculate_cells(void)
 	return;
 }
 
-void Atom_input::operator>>(FAtom &a)const
+void Atom_input::set_FAtom(const UnitCell &ucell, FAtom &a)const
 {
 //----------------------------------------------------------
 // EXPLAIN : if expand grid , set from array
@@ -631,7 +632,9 @@ void Atom_input::operator>>(FAtom &a)const
 //----------------------------------------------------------
 	else
 	{
-		Load_atom();
+		Load_atom(ucell
+
+		);
 		a.setX(x);
 		a.setY(y);
 		a.setZ(z);
@@ -647,7 +650,7 @@ void Atom_input::operator>>(FAtom &a)const
 	return;
 }
 
-void Atom_input::Load_atom(void)const
+void Atom_input::Load_atom(const UnitCell& ucell)const
 {
 //	TITLE("Atom_input","load_atom");
 	natom++;
