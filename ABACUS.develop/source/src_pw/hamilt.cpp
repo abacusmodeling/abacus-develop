@@ -7,15 +7,15 @@ Hamilt::Hamilt() {}
 Hamilt::~Hamilt() {}
 
 
-void Hamilt::diago(
+void Hamilt::diagH_pw(
     const int &istep,
     const int &iter,
     const int &ik,
     const double *precondition,
     double &avg_iter)
 {
-	TITLE("Hamilt","diago");
-	timer::tick("Hamilt","diago",'F');
+	TITLE("Hamilt","diagH_pw");
+	timer::tick("Hamilt","diagH_pw",'F');
     double avg = 0.0;
 
 	// set ik0 because of mem_saver.
@@ -53,8 +53,7 @@ void Hamilt::diago(
 		}
 		else
 		{
-			ofs_warning << " The diago_type " 
-				<< KS_SOLVER 
+			ofs_warning << " The diago_type " << KS_SOLVER 
 				<< " not implemented yet." << endl; //xiaohui add 2013-09-02
 			WARNING_QUIT("Hamilt::diago","no implemt yet.");
 		}
@@ -67,7 +66,8 @@ void Hamilt::diago(
         {	
 	   		if(KS_SOLVER=="cg")
             {			
-                if ( iter > 1 || istep > 1 ||  ntry > 0) //qian change it, because it has been executed in diago_PAO_in_pw_k2.
+				// qian change it, because it has been executed in diago_PAO_in_pw_k2
+                if ( iter > 1 || istep > 1 ||  ntry > 0)
                 {
                     this->diagH_subspace( 
 						ik,
@@ -83,10 +83,14 @@ void Hamilt::diago(
     	
 				bool reorder = true;
 
-				if(NPOL==1) cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik], wf.npwx,
+				if(NPOL==1) 
+				{
+						cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik], wf.npwx,
 						NBANDS, precondition, ETHR,
 						DIAGO_CG_MAXITER, reorder, notconv, avg);
-				else{
+				}
+				else
+				{
 					cg.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*NPOL, wf.npwx*NPOL,
 						NBANDS, precondition, ETHR,
 						DIAGO_CG_MAXITER, reorder, notconv, avg);
@@ -129,7 +133,7 @@ void Hamilt::diago(
         }
     }
 
-	timer::tick("Hamilt","diago",'F');
+	timer::tick("Hamilt","diagH_pw",'F');
     return;
 }
 
