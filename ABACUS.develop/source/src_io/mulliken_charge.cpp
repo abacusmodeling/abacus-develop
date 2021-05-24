@@ -165,7 +165,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			mud.resize(1);
 			mud[0].create(ParaO.ncol,ParaO.nrow);
 			SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
-			atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+			atom_arrange::search(ucell, SEARCH_RADIUS );//qifeng-2019-01-21
 
 			// 2021-04-16
 			hm.orb_con.set_orb_tables(
@@ -242,7 +242,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				}//if                       
 			}//ik
 #ifdef __MPI
-			atom_arrange::delete_vector( SEARCH_RADIUS );
+			atom_arrange::delete_vector(ucell, SEARCH_RADIUS );
 #endif
 			hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
