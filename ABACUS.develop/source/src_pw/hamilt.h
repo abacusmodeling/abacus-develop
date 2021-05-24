@@ -24,8 +24,14 @@ class Hamilt
     void diago(const int &istep,const int &iter,const int &ik,
                const double *precondition,double &avg_iter);
 
-    void cdiaghg(const int n,const int m,const ComplexMatrix &hc,const ComplexMatrix &sc,
-                 const int ldh,double *e,ComplexMatrix &hvec);
+    void diagH_LAPACK(
+		const int n,
+		const int m,
+		const ComplexMatrix &hc, // Hamiltonian matrix
+		const ComplexMatrix &sc, // overlap matrix
+		const int ldh,
+		double *e, // output: eigenvalues
+		ComplexMatrix &hvec); // output: eigenvectors
 
     Hamilt_PW hpw;
 	

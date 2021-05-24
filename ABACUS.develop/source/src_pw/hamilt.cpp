@@ -167,7 +167,13 @@ void Hamilt::cinitcgg(
 
 
 
-void Hamilt::cdiaghg(
+//====================================================================
+// calculates eigenvalues and eigenvectors of the generalized problem
+// Hv=eSv, with H hermitean matrix, S overlap matrix .
+// On output both matrix are unchanged
+// LAPACK version - uses both ZHEGV and ZHEGVX
+//=====================================================================
+void Hamilt::diagH_LAPACK(
 	const int nstart,
 	const int nbands,
 	const ComplexMatrix &hc,
@@ -176,16 +182,10 @@ void Hamilt::cdiaghg(
 	double *e,
 	ComplexMatrix &hvec)
 {
-    TITLE("Hamilt","cdiaghg");
-	timer::tick("Hamilt","cdiaghg");
-    //====================================================================
-    // calculates eigenvalues and eigenvectors of the generalized problem
-    // Hv=eSv, with H hermitean matrix, S overlap matrix .
-    // On output both matrix are unchanged
-    // LAPACK version - uses both ZHEGV and ZHEGVX
-    //=====================================================================
+    TITLE("Hamilt","diagH_LAPACK");
+	timer::tick("Hamilt","diagH_LAPACK");
 
-    int lwork;
+    int lwork=0;
     //========================================
     // int ILAENV();
     // ILAENV returns optimal block size "nb"
@@ -302,6 +302,6 @@ void Hamilt::cdiaghg(
     delete[] rwork;
     delete[] work;
 
-	timer::tick("Hamilt","cdiaghg");
+	timer::tick("Hamilt","diagH_LAPACK");
     return;
 }

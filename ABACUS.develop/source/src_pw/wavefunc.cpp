@@ -19,7 +19,7 @@ wavefunc::~wavefunc()
 	{
 		// bug still remains, hard to find!
 		// it might be somewhere out there,
-		// may be in cdiaghg.
+		// may be in diagH_LAPACK.
 		// I don't know why.......
 		// mohan 2010-08-08
 		//for(int ik=0; ik<kv.nks-1; ik++) delete[] ekb[ik];
