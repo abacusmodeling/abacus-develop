@@ -11,7 +11,7 @@
 #include "potential.h"
 #include "xc_type.h"
 #include "hamilt.h"
-#include "ions.h"
+#include "../src_ions/ions.h"
 #include "wavefunc.h"
 #include "use_fft.h"
 #include "klist.h"
