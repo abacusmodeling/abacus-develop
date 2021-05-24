@@ -323,7 +323,7 @@ void energy::perform_dos(void)
 			}//if
 			else
 			{
-				atom_arrange::set_sr_NL();
+				SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
 				atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
 
 				// mohan update 2021-04-16

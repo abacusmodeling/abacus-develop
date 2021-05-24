@@ -399,7 +399,7 @@ void LOOP_ions::final_scf(void)
 
 	//------------------------------------------------------------------
 	// THIS PART IS THE SAME AS LOOP_elec::set_matrix_grid
-    atom_arrange::set_sr_NL();
+    SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
 
     atom_arrange::search( SEARCH_RADIUS );
 

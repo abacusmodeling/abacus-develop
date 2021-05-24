@@ -64,7 +64,11 @@ class LCAO_Orbitals
 	const int& get_nchimax(void) const {return nchimax;}
 	const int& get_nchimax_d(void) const { return nchimax_d; }	//nchimax of descriptor basis		//caoyu add 2021-03-17
 	const int& get_ntype(void) const {return ntype;}
-	const double& get_dr_uniform(void) const {return dr_uniform;}
+	const double& get_dr_uniform(void) const { return dr_uniform; }
+
+	//caoyu add 021-05-24
+	const double& get_rcutmax_Phi(void) const { return rcutmax_Phi; }
+	const double& get_rcutmax_Beta(void) const { return rcutmax_Beta; }
 
 	// numerical atomic orbitals
 	Numerical_Orbital* Phi;
@@ -93,7 +97,7 @@ class LCAO_Orbitals
 	std::vector<string> nonlocal_file;
 	string descriptor_file;	//caoyu add 2020-3-16
 
-	private:
+private:
 
 	int ntype; // number of elements
 	int kmesh; // number of points on kmesh
@@ -103,6 +107,9 @@ class LCAO_Orbitals
 
 	int lmax_d;	//caoyu add 2021-03-17
 	int nchimax_d;	//caoyu add 2021-03-17
+
+	double rcutmax_Phi;	//caoyu add 2021-05-24
+	double rcutmax_Beta;	//caoyu add 2021-05-24
 
 	void read_orb_file(
 		ofstream &ofs_in,

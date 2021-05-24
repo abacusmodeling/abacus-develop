@@ -202,7 +202,7 @@ void Run_MD::final_scf(void)
 
     FINAL_SCF = true;
     Variable_Cell::final_calculation_after_vc();
-    atom_arrange::set_sr_NL();
+    SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
     atom_arrange::search( SEARCH_RADIUS );
     GridT.set_pbc_grid(
         pw.ncx, pw.ncy, pw.ncz,
