@@ -46,7 +46,7 @@ void Run_lcao::lcao_line(void)
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
 
-	hm.orb_con.set_orb_tables(
+	LOWF.orb_con.set_orb_tables(
 		ofs_running,
 		UOT, 
 		ORB,
@@ -112,20 +112,18 @@ void Run_lcao::lcao_line(void)
 		}
 	}
 
-
     if(CALCULATION=="md")
 	{
 		Run_MD run_md;
 		run_md.opt_cell();
 	}
-	else
+	else // cell relaxations
 	{
 		LOOP_cell lc;
 		lc.opt_cell();
 
 		en.perform_dos();
 	}
-
 
 	timer::tick("Run_lcao","lcao_line",'A');
     return;

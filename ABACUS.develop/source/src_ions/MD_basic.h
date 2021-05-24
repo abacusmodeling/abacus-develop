@@ -1,18 +1,20 @@
 #ifndef MD_BASIC_H
 #define MD_BASIC_H
 
-#include "src_pw/MD_func.h"
-#include "src_pw/MD_thermo.h"
-#include "src_pw/MD_parameters.h"
+#include "src_ions/MD_func.h"
+#include "src_ions/MD_thermo.h"
+#include "src_ions/MD_parameters.h"
+#include "src_ions/MD_fire.h"
 #include "src_pw/unitcell_pseudo.h"
-#include "src_pw/MD_fire.h"
 
 //using namespace std;
 class MD_basic
 {
 	public:	
+
 	MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
 	~MD_basic();
+
 	void runNVT(int step1);//NVT ensemble MD
 	void runNVE(int step1); //NVE ensemble MD
 	bool runFIRE(int step1); //relax method FIRE
@@ -49,8 +51,6 @@ class MD_basic
 	void save_output_position();
 	void outStressMD(const matrix& stress, const double& twiceKE);
 	void getTaudUpdate();
-	
-
 };
 
 #endif

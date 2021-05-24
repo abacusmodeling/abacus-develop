@@ -1,0 +1,199 @@
+# The ABACUS-PW module
+#
+
+VERSION= ABACUS-PW
+HEADERS= *.h
+
+OBJS_BASE=math_integral.o\
+math_sphbes.o\
+math_polyint.o\
+math_ylmreal.o\
+ylm.o\
+memory.o\
+complexarray.o\
+complexmatrix.o\
+matrix.o\
+realarray.o\
+intarray.o\
+sph_bessel.o\
+sph_bessel_recursive-d1.o\
+sph_bessel_recursive-d2.o\
+tool_title.o\
+tool_quit.o\
+tool_check.o\
+timer.o\
+mathzone_add1.o\
+
+OBJS_MAIN=driver.o\
+input.o \
+write_input.o\
+input_conv.o\
+run_pw.o\
+run_lcao.o\
+
+OBJS_PW=main.o\
+xc_type.o \
+xc_functional.o\
+xc_1.o\
+xc_2.o\
+xc_3.o \
+vdwd2.o\
+vdwd2_parameters.o\
+vdwd3.o\
+vdwd3_parameters.o\
+read_pp.o \
+read_pp_upf100.o \
+read_pp_upf201.o \
+read_pp_vwr.o \
+pseudo_nc.o \
+VL_in_pw.o\
+VNL_in_pw.o\
+atom_pseudo.o\
+unitcell_pseudo.o\
+threshold_elec.o\
+electrons.o \
+forces.o\
+stress_pw.o\
+stress_func_cc.o\
+stress_func_gga.o\
+stress_func_kin.o\
+stress_func_nl.o\
+stress_func_ewa.o\
+stress_func_har.o\
+stress_func_loc.o\
+stress_func_print.o\
+chi0_hilbert.o\
+chi0_standard.o\
+epsilon0_pwscf.o\
+epsilon0_vasp.o\
+MD_basic.o\
+MD_thermo.o\
+MD_fire.o\
+MD_func.o\
+exx_lip.o\
+soc.o\
+to_wannier90.o \
+unk_overlap_pw.o \
+berryphase.o \
+sto_elec.o\
+sto_wf.o\
+sto_iter.o\
+sto_hchi.o\
+sto_che.o\
+
+OBJS_TOOLS=complexarray.o\
+complexmatrix.o \
+realarray.o \
+intarray.o\
+matrix.o \
+matrix3.o\
+export.o\
+timer.o\
+memory.o\
+print_info.o\
+mathzone.o\
+math_sphbes.o\
+math_polyint.o\
+math_integral.o\
+math_ylmreal.o\
+mathzone_add1.o\
+integral.o \
+poission.o \
+polint.o \
+sph_bessel.o \
+sph_bessel_recursive-d1.o \
+sph_bessel_recursive-d2.o \
+global_variable.o \
+global_function.o \
+tool_title.o\
+tool_quit.o\
+tool_check.o\
+global_file.o \
+element_basis_index.o \
+restart.o \
+mymath1.o \
+mymath3.o \
+
+OBJS_PARALLEL=parallel_global.o\
+parallel_kpoints.o\
+parallel_common.o\
+parallel_reduce.o\
+parallel_pw.o\
+ft.o\
+parallel_grid.o\
+
+OBJS_FIRST_PRINCIPLES=$(OBJS_MAIN)\
+$(OBJS_PW)\
+$(OBJS_LCAO)\
+charge.o \
+charge_mixing.o \
+charge_pulay.o \
+charge_broyden.o \
+charge_extra.o \
+xc_gga_pw.o \
+potential.o \
+H_Ewald_pw.o\
+H_Hartree_pw.o\
+H_XC_pw.o \
+H_TDDFT_pw.o\
+read_rho.o\
+read_atoms.o\
+read_cell_pseudopots.o\
+read_dm.o\
+write_pot.o\
+write_rho.o\
+write_rho_dipole.o\
+write_HS.o\
+write_HS_R.o\
+write_dm.o\
+potential_libxc.o \
+efield.o \
+magnetism.o\
+optical.o\
+ions.o \
+ions_move_methods.o\
+ions_move_bfgs.o\
+ions_move_cg.o\
+ions_move_sd.o\
+ions_move_basic.o\
+bfgs_basic.o\
+occupy.o\
+cal_test.o\
+winput.o\
+input_update.o\
+lattice_change_methods.o \
+lattice_change_cg.o \
+lattice_change_basic.o \
+variable_cell.o\
+dftu.o\
+dftu_yukawa.o\
+dftu_relax.o\
+
+OBJS_COMMON=atom_spec.o \
+unitcell.o \
+pw_basis.o\
+hamilt.o \
+pw_complement.o\
+wf_local.o \
+hamilt_pw.o \
+diago_david.o\
+diago_cg.o\
+output.o  \
+dos.o \
+inverse_matrix.o \
+energy.o \
+energy_dos.o\
+wavefunc.o\
+wf_io.o \
+rwstream.o\
+wf_atomic.o \
+wf_igk.o \
+use_fft.o\
+klist.o  \
+global.o \
+symmetry.o \
+symmetry_basic.o \
+symmetry_rho.o \
+symm_other.o \
+eximport.o \
+mulliken_charge.o\

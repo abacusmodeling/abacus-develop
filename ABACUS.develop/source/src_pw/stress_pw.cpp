@@ -8,23 +8,33 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 	TITLE("Stress_PW","cal_stress");
 	timer::tick("Stress_PW","cal_stress",'E');    
 
+	// total stress
 	sigmatot.create(3,3);
 	matrix sigmaxc;
+	// exchange-correlation stress
 	sigmaxc.create(3,3);
+	// hartree stress
 	matrix sigmahar;
 	sigmahar.create(3,3);
+	// electron kinetic stress
 	matrix sigmakin;
 	sigmakin.create(3,3);
+	// local pseudopotential stress
 	matrix sigmaloc;
 	sigmaloc.create(3,3);
+	// non-local pseudopotential stress
 	matrix sigmanl;
 	sigmanl.create(3,3);
+	// Ewald stress
 	matrix sigmaewa;
 	sigmaewa.create(3,3);
+	// non-linear core correction stress
 	matrix sigmaxcc;
 	sigmaxcc.create(3,3);
+	// vdw stress
 	matrix sigmavdw;
 	sigmavdw.create(3,3);
+
 	for(int i=0;i<3;i++)
 	{
 		for(int j=0;j<3;j++)
@@ -40,6 +50,7 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 			sigmavdw(i,j) = 0.0;
 		}
 	}
+
 	//kinetic contribution
 	stress_kin(sigmakin);
 	
@@ -112,13 +123,13 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 void Stress_PW::stress_vdw(matrix& sigma)
 {
 	matrix force;
-	if(vdwd2_para.flag_vdwd2)                                                       //Peize Lin add 2014-04-04, update 2021-03-09
+	if(vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
 	{
 		Vdwd2 vdwd2(ucell,vdwd2_para);
 		vdwd2.cal_stress();
 		sigma = vdwd2.get_stress().to_matrix();
 	}
-	if(vdwd3_para.flag_vdwd3)                                                                 //jiyy add 2019-05-18, update 2021-05-02
+	if(vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
 	{
 		Vdwd3 vdwd3(ucell,vdwd3_para);
 		vdwd3.cal_stress();
