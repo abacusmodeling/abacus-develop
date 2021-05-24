@@ -3,6 +3,7 @@
 
 #include "grid_technique.h"
 #include "../src_pw/tools.h"
+#include "../module_ORB/ORB_control.h" // mohan add 2021-05-24
 
 class Local_Orbital_wfc
 {
@@ -41,6 +42,9 @@ class Local_Orbital_wfc
     //=========================================
 	// void init_Cij(const bool change_c = 1);
 	bool get_allocate_flag(void)const{return allocate_flag;}	
+
+	// mohan move orb_con here, 2021-05-24 
+	ORB_control orb_con;
 	
 	private:
 

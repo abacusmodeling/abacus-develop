@@ -2,7 +2,6 @@
 #define HAMILT_H
 
 #include "tools.h"
-#include "../module_ORB/ORB_control.h"
 #include "hamilt_pw.h"
 
 class Hamilt
@@ -46,9 +45,6 @@ class Hamilt
 		ComplexMatrix &hvec); // output: eigenvectors
 
     Hamilt_PW hpw;
-	
-	// mohan update 2021-02-10
-	ORB_control orb_con;
 
 private:
 
