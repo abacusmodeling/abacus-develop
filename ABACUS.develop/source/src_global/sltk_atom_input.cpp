@@ -16,7 +16,8 @@ Atom_input::Atom_input
 	const int amount,
 	const int ntype,
     const bool boundary_in,
-    const double radius_in
+	const double radius_in,
+	const int &test_atom_in
 )
 		:d_amount(amount),
 		d_amount_expand(amount),
@@ -36,6 +37,8 @@ Atom_input::Atom_input
 		y_max_expand(0),
 		z_max_expand(0),
 		d_current(0),
+		test_atom_input(test_atom_in),
+
 //----------------------------------------------------------
 // WARNING :
 // Please be very very careful!

@@ -47,7 +47,7 @@ const char* const Grid::ERROR[3] =
 	"MAX_ATOM_IN_ONE_GRID!"
 };
 
-Grid::Grid()
+Grid::Grid(const int &test_grid_in):test_grid(test_grid_in)
 {
 //	TITLE("Grid","Grid");
 //----------------------------------------------------------
@@ -1069,7 +1069,7 @@ void Grid::Construct_Adjacent_final
 	{
 		int offset = Cell[i2][j2][k2].address - this->atomlink;
 		offset += ia2;
-		Cell[i][j][k].address[ia].fatom.getAdjacentSet()->set(b0, b1, b2, offset);
+		Cell[i][j][k].address[ia].fatom.getAdjacentSet()->set(b0, b1, b2, offset, test_grid);
 
 		if (test_grid > 2)
 		{

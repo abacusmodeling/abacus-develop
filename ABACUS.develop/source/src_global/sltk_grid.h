@@ -61,7 +61,7 @@ class Grid
 public:
 
 	// Constructors and destructor
-	Grid();
+	Grid(const int &test_grid_in);
 	~Grid();
 
 	void init(const UnitCell &ucell, const Atom_input &input);
@@ -114,7 +114,7 @@ protected:
 	AtomLink* cordon_p;// Warning! A guard! Don't delete it!
 
 private:
-
+	const int test_grid;
 //==========================================================
 // MEMBER FUNCTIONS :
 // Three Main Steps:

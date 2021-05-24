@@ -1,9 +1,10 @@
 #include "sltk_grid_driver.h"
 #include "../src_pw/tools.h"
 
-Grid_Driver::Grid_Driver()
+Grid_Driver::Grid_Driver(const int &test_d_in, const int &test_gd_in, const int &test_grid_in)
+:test_deconstructor(test_d_in),test_grid_driver(test_gd_in),Grid(test_grid_in)
 {
-//	TITLE("Grid_Driver","Grid_Driver");
+	//	TITLE("Grid_Driver","Grid_Driver");
 	ntype = new int[1];
 	natom = new int[1];
 	adjacent_tau = new Vector3<double>[1];

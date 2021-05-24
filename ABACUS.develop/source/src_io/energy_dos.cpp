@@ -324,7 +324,7 @@ void energy::perform_dos(void)
 			else
 			{
 				SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
-				atom_arrange::search(GridD, ucell, SEARCH_RADIUS );//qifeng-2019-01-21
+				atom_arrange::search(GridD, ucell, SEARCH_RADIUS, test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
 				hm.orb_con.set_orb_tables(
@@ -422,7 +422,7 @@ void energy::perform_dos(void)
 					}//if                       
 				}//ik
 #ifdef __MPI
-				atom_arrange::delete_vector(GridD, ucell, SEARCH_RADIUS );
+				atom_arrange::delete_vector(GridD, ucell, SEARCH_RADIUS, test_atom_input);
 #endif
 				// mohan update 2021-02-10
 				hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
