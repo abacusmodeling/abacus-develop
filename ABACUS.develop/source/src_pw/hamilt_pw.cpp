@@ -253,7 +253,7 @@ void Hamilt_PW::cinitcgg(
 
 	
 
-    hm.cdiaghg(nstart, n_band, hc, sc, nstart, en, hvec);
+    hm.diagH_LAPACK(nstart, n_band, hc, sc, nstart, en, hvec);
 
 
 	// Peize Lin add 2019-03-09

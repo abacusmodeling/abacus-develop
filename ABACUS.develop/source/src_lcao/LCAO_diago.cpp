@@ -151,7 +151,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	ZEROS(en, NLOCAL);
 
 	ComplexMatrix hvec(NLOCAL, NBANDS);
-	hm.cdiaghg(NLOCAL, NBANDS, Htmp, Stmp, NLOCAL, en, hvec);
+	hm.diagH_LAPACK(NLOCAL, NBANDS, Htmp, Stmp, NLOCAL, en, hvec);
 
 	if(NSPIN!=4)
 	{
