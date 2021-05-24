@@ -25,9 +25,6 @@ void Run_MD::opt_cell(void)
 {
 	TITLE("Run_MD","opt_cell");
 
-
-	
-
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
     // npwx may change according to cell change
@@ -190,7 +187,7 @@ void Run_MD::opt_ions(void)
     if(istep>1) final_scf();
 
 	// mohan update 2021-02-10
-    hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
     timer::tick("Run_MD","opt_ions",'B'); 
     return;
