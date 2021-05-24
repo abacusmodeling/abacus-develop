@@ -430,7 +430,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 		clock_t start=clock();
 
 		double avg_iter_k = 0.0;
-		hm.diago(istep, this->iter, ik, h_diag, avg_iter_k);
+		hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
 
 		avg_iter += avg_iter_k;
 
