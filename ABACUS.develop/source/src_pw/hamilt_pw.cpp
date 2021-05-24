@@ -592,7 +592,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 			{
 				int npm = NPOL * m;
 				zgemm_(&transa,&transb,&nkb,&npm,&wf.npw,&ONE,ppcell.vkb.c,&wf.npwx,psi_in,&wf.npwx,&ZERO,becp.c,&nkb);
-				//add_vuspsi is moddified, thus tranpose not needed here.
+				//add_nonlocal_pp is moddified, thus tranpose not needed here.
 				//if(NONCOLIN)
 				//{
 				//	ComplexMatrix partbecp(NPOL, nkb ,false);
@@ -611,7 +611,8 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 			}
 
 			Parallel_Reduce::reduce_complex_double_pool( becp.c, nkb * NPOL * m);
-			this->add_vuspsi(hpsi, becp.c, m);
+
+			this->add_nonlocal_pp(hpsi, becp.c, m);
 			//======================================================================
 			/*complex<double> *becp = new complex<double>[ ppcell.nkb * NPOL ];
 			ZEROS(becp,ppcell.nkb * NPOL);
@@ -630,7 +631,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 				}
 			}
 			Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * NPOL);
-			this->add_vuspsi(hpsi, becp);
+			this->add_nonlocal_pp(hpsi, becp);
 			delete[] becp;*/
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		}
@@ -640,39 +641,47 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
     return;
 }
 
-void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp, const int m)
+//--------------------------------------------------------------------------
+// this function sum up each non-local pseudopotential located on each atom,
+//--------------------------------------------------------------------------
+void Hamilt_PW::add_nonlocal_pp(
+	complex<double> *hpsi_in,
+	const complex<double> *becp,
+	const int m)
 {
-    timer::tick("Hamilt_PW","add_vuspsi",'I');
+    timer::tick("Hamilt_PW","add_nonlocal_pp",'I');
+
+	// number of projectors
 	int nkb = ppcell.nkb;
-	complex<double> *Ps  = new complex<double> [nkb * NPOL * m];
-    ZEROS( Ps, NPOL * m * nkb);
+
+	complex<double> *ps  = new complex<double> [nkb * NPOL * m];
+    ZEROS(ps, NPOL * m * nkb);
 
     int sum = 0;
     int iat = 0;
-    // this function sum up each non-local pseudopotential located in each atom,
-    // all we need to do is put the right Dij coefficient to each becp, which
-    // is calculated before.
     if(NSPIN!=4)
 	{
 		for (int it=0; it<ucell.ntype; it++)
 		{
-			const int Nprojs = ucell.atoms[it].nh;
+			const int nproj = ucell.atoms[it].nh;
 			for (int ia=0; ia<ucell.atoms[it].na; ia++)
 			{
-				// each atom has Nprojs, means this is with structure factor;
+				// each atom has nproj, means this is with structure factor;
 				// each projector (each atom) must multiply coefficient
 				// with all the other projectors.
-				for (int ip=0; ip<Nprojs; ip++)
+				for (int ip=0; ip<nproj; ip++)
 				{
-					for (int ip2=0; ip2<Nprojs; ip2++)
+					for (int ip2=0; ip2<nproj; ip2++)
 					{
 						for(int ib = 0; ib < m ; ++ib)
 						{
-							Ps[(sum + ip2) * m + ib] += ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) * becp[ib * nkb + sum + ip];
+							ps[(sum + ip2) * m + ib] += 
+							ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) 
+							* becp[ib * nkb + sum + ip];
 						}//end ib
 					}// end ih
 				}//end jh 
-				sum += Nprojs;
+				sum += nproj;
 				++iat;
 			} //end na
 		} //end nt
@@ -681,17 +690,20 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
 	{
 		for (int it=0; it<ucell.ntype; it++)
 		{
-			int psind,becpind;
-			complex<double> becp1,becp2;
-			const int Nprojs = ucell.atoms[it].nh;
+			int psind=0;
+			int becpind=0;
+			complex<double> becp1=complex<double>(0.0,0.0);
+			complex<double> becp2=complex<double>(0.0,0.0);
+
+			const int nproj = ucell.atoms[it].nh;
 			for (int ia=0; ia<ucell.atoms[it].na; ia++)
 			{
-				// each atom has Nprojs, means this is with structure factor;
+				// each atom has nproj, means this is with structure factor;
 				// each projector (each atom) must multiply coefficient
 				// with all the other projectors.
-				for (int ip=0; ip<Nprojs; ip++)
+				for (int ip=0; ip<nproj; ip++)
 				{
-					for (int ip2=0; ip2<Nprojs; ip2++)
+					for (int ip2=0; ip2<nproj; ip2++)
 					{
 						for(int ib = 0; ib < m ; ++ib)
 						{
@@ -699,14 +711,14 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
 							becpind = ib*nkb*2 + sum + ip;
 							becp1 =  becp[becpind];
 							becp2 =  becp[becpind + nkb];
-							Ps[psind] += ppcell.deeq_nc(0, iat, ip2, ip) * becp1
+							ps[psind] += ppcell.deeq_nc(0, iat, ip2, ip) * becp1
 								+ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
-							Ps[psind +1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp1
+							ps[psind +1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp1
 								+ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
 						}//end ib
 					}// end ih
 				}//end jh
-				sum += Nprojs;
+				sum += nproj;
 				++iat;
 			} //end na
 		} //end nt
@@ -717,7 +729,7 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
     {
         for (int i=0;i< ppcell.nkb;i++)
         {
-            hpsi_in[ig]+=Ps[i]*ppcell.vkb(i,ig);
+            hpsi_in[ig]+=ps[i]*ppcell.vkb(i,ig);
         }
     }
 	*/
@@ -731,13 +743,36 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
 	if(NPOL==1 && m==1)
 	{
 		int inc = 1;
-		zgemv_(&transa, &wf.npw, &ppcell.nkb, &ONE, ppcell.vkb.c, &wf.npwx, Ps, &inc, &ONE, hpsi_in, &inc);
+		zgemv_(&transa, 
+			&wf.npw, 
+			&ppcell.nkb, 
+			&ONE, 
+			ppcell.vkb.c, 
+			&wf.npwx, 
+			ps, 
+			&inc, 
+			&ONE, 
+			hpsi_in, 
+			&inc);
 	}
 	else
 	{
 		int npm = NPOL*m;
-		zgemm_(&transa,&transb,&wf.npw,&npm,&ppcell.nkb,&ONE,ppcell.vkb.c,&wf.npwx,Ps,&npm,&ONE,hpsi_in,&wf.npwx);
+		zgemm_(&transa,
+			&transb,
+			&wf.npw,
+			&npm,
+			&ppcell.nkb,
+			&ONE,
+			ppcell.vkb.c,
+			&wf.npwx,
+			ps,
+			&npm,
+			&ONE,
+			hpsi_in,
+			&wf.npwx);
 	}
+
 	//======================================================================
 	/*if(!NONCOLIN)
 	for(int i=0; i<ppcell.nkb; i++)
@@ -745,7 +780,7 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
 		complex<double>* p = &ppcell.vkb(i,0);
 		complex<double>* p_end = p + wf.npw;
 		complex<double>* hp = hpsi_in;
-		complex<double>* psp = &Ps[i];
+		complex<double>* psp = &ps[i];
 		for (;p<p_end;++p,++hp)
 		{
 			hp[0] += psp[0] * p[0];
@@ -758,7 +793,7 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
 		complex<double>* p_end = p + wf.npw;
 		complex<double>* hp = hpsi_in;
 		complex<double>* hp1 = hpsi_in + wf.npwx;
-		complex<double>* psp = &Ps[i*2];
+		complex<double>* psp = &ps[i*2];
 		for (;p<p_end;p++,++hp,++hp1)
 		{
 			hp[0] += psp[0] * (p[0]);
@@ -766,8 +801,9 @@ void Hamilt_PW::add_vuspsi(complex<double> *hpsi_in,const complex<double> *becp,
 		}
 	}*/
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	delete []Ps;
-    timer::tick("Hamilt_PW","add_vuspsi",'I');
+
+	delete[] ps;
+    timer::tick("Hamilt_PW","add_nonlocal_pp",'I');
     return;
 }
 

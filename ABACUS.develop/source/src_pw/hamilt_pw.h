@@ -51,7 +51,10 @@ public:
         complex<double> *hpsi,
         complex<double> *spsi);
 
-    void h_psi( const complex<double> *psi, complex<double> *hpsi, const int m = 1); // qianrui add a default parameter 2021-3-31
+    void h_psi( 
+		const complex<double> *psi, 
+		complex<double> *hpsi, 
+		const int m = 1); // qianrui add a default parameter 2021-3-31
 
     void s_1psi(
         const int npw,
@@ -64,17 +67,24 @@ public:
 
     complex<double> *psi_one;
 
-    // hpsi , spsi
+    // hpsi and spsi
     complex<double> *hpsi;
     complex<double> *spsi;
     complex<double> *Bec;
 
-    void add_vuspsi(complex<double> *hpsi, const complex<double> *becp, const int m);
+	// add contributions of h*psi from
+	// non-local pseduopotentials
+    void add_nonlocal_pp(
+		complex<double> *hpsi, 
+		const complex<double> *becp, 
+		const int m);
 
 	private:
 
-    double ddot_real( const int& npw, const complex<double>* psi_L, const complex<double>* psi_R)const;
-
+    double ddot_real( 
+		const int& npw, 
+		const complex<double>* psi_L, 
+		const complex<double>* psi_R)const;
 
     complex<double> ddot( const int& npw,
                           const complex<double> * psi_L,
