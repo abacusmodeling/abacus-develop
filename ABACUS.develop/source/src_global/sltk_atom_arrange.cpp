@@ -4,9 +4,9 @@
 #include "sltk_grid_driver.h"
 
 // update the followig two includes in near future 
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 #include "../src_lcao/global_fp.h" // mohan add 2021-01-30
-
+#include "../src_pw/unitcell.h"
 
 atom_arrange::atom_arrange()
 {
@@ -82,7 +82,7 @@ void atom_arrange::set_sr_OV(void)
 	return;
 }
 */
-void atom_arrange::search( const double &search_radius_bohr)
+void atom_arrange::search(const UnitCell &ucell, const double &search_radius_bohr)
 {
 	TITLE("atom_arrange", "search");
 	timer::tick("atom_arrange","search");
@@ -140,7 +140,7 @@ void atom_arrange::search( const double &search_radius_bohr)
 
 
 //2015-05-07
-void atom_arrange::delete_vector(const double &search_radius_bohr)
+void atom_arrange::delete_vector(const UnitCell &ucell, const double &search_radius_bohr)
 {
 	const double radius_lat0unit2 = search_radius_bohr / ucell.lat0;
 

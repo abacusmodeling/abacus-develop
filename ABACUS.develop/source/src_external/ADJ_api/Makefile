@@ -4,8 +4,12 @@
 # Compiler information 
 #==========================
 CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = icpc 
-FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+CPLUSPLUS_MPI = icpc
+BOOST_DIR = /home/cyFortneu/soft/boost_1_74_0
+#BOOST_DIR = /home/mohan/1_Software/impi_boost-1.70.0
+FFTW_DIR = /home/cyFortneu/soft/fftw-3.3.8
+#FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+
 OBJ_DIR = obj
 NP      = 1
 
@@ -18,6 +22,11 @@ FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 #==========================
+# boost package needed 
+#==========================
+BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
+
+#==========================
 # LIBS and INCLUDES
 #==========================
 LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
@@ -25,7 +34,9 @@ LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
+OPTS_GDB = -g -W -I${BOOST_INCLUDE_DIR}
+
+INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${BOOST_INCLUDE_DIR}
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
@@ -60,6 +71,10 @@ init :
 
 serial : ${FP_OBJS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
+
+serial_gdb : ${FP_OBJS} ${HEADERS}
+	${CPLUSPLUS} ${OPTS_GDB} $(FP_OBJS) ${LIBS} -o ${VERSION}.fp_gdb.x
+
 
 #==========================
 # rules

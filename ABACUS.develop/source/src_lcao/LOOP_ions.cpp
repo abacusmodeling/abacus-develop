@@ -236,7 +236,7 @@ bool LOOP_ions::force_stress(
     {
 
 #ifdef __MPI
-        atom_arrange::delete_vector( SEARCH_RADIUS );
+        atom_arrange::delete_vector(ucell, SEARCH_RADIUS );
 #endif
 
         if(CALCULATION=="relax") 
@@ -299,7 +299,7 @@ xiaohui modify 2014-08-09*/
     {
 
 #ifdef __MPI
-		atom_arrange::delete_vector( SEARCH_RADIUS );
+		atom_arrange::delete_vector(ucell, SEARCH_RADIUS );
 #endif
 		if(CALCULATION=="cell-relax")
 		{
@@ -327,7 +327,7 @@ xiaohui modify 2014-08-09*/
     if(FORCE&&STRESS)
     {
 
-        atom_arrange::delete_vector( SEARCH_RADIUS );
+        atom_arrange::delete_vector(ucell, SEARCH_RADIUS );
         
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
@@ -401,7 +401,7 @@ void LOOP_ions::final_scf(void)
 	// THIS PART IS THE SAME AS LOOP_elec::set_matrix_grid
     SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
 
-    atom_arrange::search( SEARCH_RADIUS );
+    atom_arrange::search(ucell, SEARCH_RADIUS );
 
     GridT.set_pbc_grid(
         pw.ncx, pw.ncy, pw.ncz,
