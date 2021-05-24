@@ -32,7 +32,8 @@ void AdjacentSet::set
     const int box_x,
     const int box_y,
     const int box_z,
-    const int offset_in
+	const int offset_in,
+	const int &test_grid_in
 )
 {
 	int index_box;
@@ -46,7 +47,7 @@ void AdjacentSet::set
 		index_box = AdjacentSet::index_expand(box_x, box_y, box_z);
 	}
 
-	if (test_grid > 3)
+	if (test_grid_in > 3)
 	{
 		ofs_running << "\n box(" << box_x
 		<< " " << box_y

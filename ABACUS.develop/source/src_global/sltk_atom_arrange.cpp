@@ -82,7 +82,7 @@ void atom_arrange::set_sr_OV(void)
 	return;
 }
 */
-void atom_arrange::search(Grid_Driver &grid_d, const UnitCell &ucell, const double &search_radius_bohr)
+void atom_arrange::search(Grid_Driver &grid_d, const UnitCell &ucell, const double &search_radius_bohr, const int &test_atom_in)
 {
 	TITLE("atom_arrange", "search");
 	timer::tick("atom_arrange","search");
@@ -102,7 +102,7 @@ void atom_arrange::search(Grid_Driver &grid_d, const UnitCell &ucell, const doub
 
 	const double radius_lat0unit = search_radius_bohr / ucell.lat0;
 
-	Atom_input at(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit);
+	Atom_input at(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit, test_atom_in);
 	//===========================================
 	// Print important information in Atom_input
 	//===========================================
@@ -140,11 +140,11 @@ void atom_arrange::search(Grid_Driver &grid_d, const UnitCell &ucell, const doub
 
 
 //2015-05-07
-void atom_arrange::delete_vector(Grid_Driver &grid_d, const UnitCell &ucell, const double &search_radius_bohr)
+void atom_arrange::delete_vector(Grid_Driver &grid_d, const UnitCell &ucell, const double &search_radius_bohr, const int &test_atom_in)
 {
 	const double radius_lat0unit2 = search_radius_bohr / ucell.lat0;
 
-	Atom_input at2(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit2);
+	Atom_input at2(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit2, test_atom_in);
 
 	grid_d.delete_vector(at2);
 
