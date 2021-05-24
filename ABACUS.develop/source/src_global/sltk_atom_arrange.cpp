@@ -113,7 +113,7 @@ void atom_arrange::search( const double &search_radius_bohr)
 
 	const double radius_lat0unit = search_radius_bohr / ucell.lat0;
 
-	Atom_input at(ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit);
+	Atom_input at(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit);
 	//===========================================
 	// Print important information in Atom_input
 	//===========================================
@@ -155,7 +155,7 @@ void atom_arrange::delete_vector(const double &search_radius_bohr)
 {
 	const double radius_lat0unit2 = search_radius_bohr / ucell.lat0;
 
-	Atom_input at2(ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit2);
+	Atom_input at2(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit2);
 
 	GridD.delete_vector(at2);
 

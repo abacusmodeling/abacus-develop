@@ -327,12 +327,12 @@ AtomLink* Grid::Build_Cache(const Atom_input &input)
 	{
 //----------------------------------------------------------
 // CALL OTHER CLASS FUNCTION :
-// NAME : operator>>
+// NAME : set_FAtom
 //
 // CALL MEMBER FUNCTION :
 // NAME : Push
 //----------------------------------------------------------
-		input >> current->fatom;
+		input.set_FAtom(ucell, current->fatom);	//caoyu modified 2021/5/24
 
 		// input parameter: the Fatom class of AtomLink class.
 		// use atom information to check which cell in.
