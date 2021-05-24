@@ -5,7 +5,7 @@
 
 // update the followig two includes in near future 
 //#include "../src_pw/global.h"
-#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
+//#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
 #include "../src_pw/unitcell.h"
 
 atom_arrange::atom_arrange()
@@ -82,7 +82,7 @@ void atom_arrange::set_sr_OV(void)
 	return;
 }
 */
-void atom_arrange::search(const UnitCell &ucell, const double &search_radius_bohr)
+void atom_arrange::search(Grid_Driver &grid_d, const UnitCell &ucell, const double &search_radius_bohr)
 {
 	TITLE("atom_arrange", "search");
 	timer::tick("atom_arrange","search");
@@ -111,7 +111,7 @@ void atom_arrange::search(const UnitCell &ucell, const double &search_radius_boh
 	//=========================================
 	// Construct Grid , Cells , Adjacent atoms
 	//=========================================
-	GridD.init(at);
+	grid_d.init(at);
 
 	// test the adjacent atoms and the box.
 	//ofs_running << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << endl;
@@ -119,14 +119,14 @@ void atom_arrange::search(const UnitCell &ucell, const double &search_radius_boh
 	{
 		for (int ia = 0;ia < ucell.atoms[it].na;ia++)
 		{
-	//		GridD.Find_atom(ucell.atoms[it].tau[ia]);
+	//		grid_d.Find_atom(ucell.atoms[it].tau[ia]);
 			
-	//		ofs_running << " " << setw(5) << it << setw(5) << ia << setw(8) << GridD.getAdjacentNum()+1 << endl;
+	//		ofs_running << " " << setw(5) << it << setw(5) << ia << setw(8) << grid_d.getAdjacentNum()+1 << endl;
 			/*
-			for(int ad=0; ad < GridD.getAdjacentNum()+1; ad++)
+			for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
 			{
-				Vector3<double> tau = GridD.getAdjacentTau(ad);
-				Vector3<int> box = GridD.getBox(ad);
+				Vector3<double> tau = grid_d.getAdjacentTau(ad);
+				Vector3<int> box = grid_d.getBox(ad);
 				cout << setw(8) << tau.x << setw(8) << tau.y << setw(8) << tau.z 
 				<< setw(8) << box.x << setw(8) << box.y << setw(8) << box.z << endl;
 			}
@@ -140,29 +140,29 @@ void atom_arrange::search(const UnitCell &ucell, const double &search_radius_boh
 
 
 //2015-05-07
-void atom_arrange::delete_vector(const UnitCell &ucell, const double &search_radius_bohr)
+void atom_arrange::delete_vector(Grid_Driver &grid_d, const UnitCell &ucell, const double &search_radius_bohr)
 {
 	const double radius_lat0unit2 = search_radius_bohr / ucell.lat0;
 
 	Atom_input at2(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit2);
 
-	GridD.delete_vector(at2);
+	grid_d.delete_vector(at2);
 
-	if (GridD.init_cell_flag)
+	if (grid_d.init_cell_flag)
 	{
-		for (int i = 0;i < GridD.dx;i++)
+		for (int i = 0;i < grid_d.dx;i++)
 		{
-			for (int j = 0;j < GridD.dy;j++)
+			for (int j = 0;j < grid_d.dy;j++)
 			{
-				delete[] GridD.Cell[i][j];
+				delete[] grid_d.Cell[i][j];
 			}
 		}
 
-		for (int i = 0;i < GridD.dx;i++)
+		for (int i = 0;i < grid_d.dx;i++)
 		{
-			delete[] GridD.Cell[i];
+			delete[] grid_d.Cell[i];
 		}
 
-		delete[] GridD.Cell;
+		delete[] grid_d.Cell;
 	}
 }
