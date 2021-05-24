@@ -111,7 +111,7 @@ void atom_arrange::search(Grid_Driver &grid_d, const UnitCell &ucell, const doub
 	//=========================================
 	// Construct Grid , Cells , Adjacent atoms
 	//=========================================
-	grid_d.init(at);
+	grid_d.init(ucell, at);
 
 	// test the adjacent atoms and the box.
 	//ofs_running << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << endl;

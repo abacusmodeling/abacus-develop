@@ -85,7 +85,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
         const Vector3<double> tau0 = ucell.atoms[it].tau[ia];
         //find ajacent atom of atom ia
         //GridD.Find_atom( ucell.atoms[it].tau[ia] );
-		GridD.Find_atom( ucell.atoms[it].tau[ia] ,it, ia);
+		GridD.Find_atom(ucell, ucell.atoms[it].tau[ia] ,it, ia);
 		const double Rcut_Beta = ORB.Beta[it].get_rcut_max();
 
         //FOLLOWING ARE CONTRIBUTIONS FROM
@@ -309,7 +309,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
         const Vector3<double> tau0 = ucell.atoms[it].tau[ia];
         //find ajacent atom of atom ia
         //GridD.Find_atom( ucell.atoms[it].tau[ia] );
-        GridD.Find_atom( ucell.atoms[it].tau[ia] ,it, ia);
+        GridD.Find_atom(ucell, ucell.atoms[it].tau[ia] ,it, ia);
 
         //FOLLOWING ARE CONTRIBUTIONS FROM
         //VNL DUE TO PROJECTOR'S DISPLACEMENT

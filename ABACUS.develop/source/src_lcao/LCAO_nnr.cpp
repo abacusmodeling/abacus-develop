@@ -67,7 +67,7 @@ void LCAO_nnr::cal_nnr(void)
 		{
 			tau1 = ucell.atoms[T1].tau[I1];
 			//GridD.Find_atom( tau1 );
-			GridD.Find_atom( tau1 ,T1, I1);
+			GridD.Find_atom(ucell,  tau1 ,T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 			this->nlocstart[iat] = nnr;
 			int nw1 = ucell.atoms[T1].nw * NPOL;
@@ -217,7 +217,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 		{
 			tau1 = atom1->tau[I1];
 			//GridD.Find_atom(tau1);
-			GridD.Find_atom(tau1, T1, I1);
+			GridD.Find_atom(ucell, tau1, T1, I1);
 			const int iat = ucell.itia2iat(T1,I1);
 
 			// for grid integration (on FFT box),
@@ -365,7 +365,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 //			cout << " T1=" << T1 << " I1=" << I1 << endl; 
 			tau1 = ucell.atoms[T1].tau[I1];
 			//GridD.Find_atom(tau1);
-			GridD.Find_atom(tau1, T1, I1);
+			GridD.Find_atom(ucell, tau1, T1, I1);
 			const int iat = ucell.itia2iat(T1,I1);
 
 //			cout << " Number of adjacent = " << GridD.getAdjacentNum()+1 << endl;
@@ -492,7 +492,7 @@ void LCAO_nnr::cal_max_box_index(void)
 		{
 			Vector3<double> tau1 = ucell.atoms[T1].tau[I1];
 			//GridD.Find_atom(tau1);
-			GridD.Find_atom(tau1, T1, I1);
+			GridD.Find_atom(ucell, tau1, T1, I1);
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
 			{
 				this->maxB1 = max( GridD.getBox(ad).x, maxB1 ); 
@@ -581,7 +581,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 		{
 			tau1 = atom1->tau[I1];
 			//GridD.Find_atom(tau1);
-			GridD.Find_atom(tau1, T1, I1);
+			GridD.Find_atom(ucell, tau1, T1, I1);
 			Atom* atom1 = &ucell.atoms[T1];
 			const int start = ucell.itiaiw2iwt(T1,I1,0);
 

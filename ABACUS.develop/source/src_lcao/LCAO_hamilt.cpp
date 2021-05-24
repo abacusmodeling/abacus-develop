@@ -392,7 +392,7 @@ void LCAO_Hamilt::calculate_STN_R(void)
         {
             tau1 = atom1->tau[I1];
             //GridD.Find_atom(tau1);
-            GridD.Find_atom(tau1, T1, I1);
+            GridD.Find_atom(ucell, tau1, T1, I1);
             Atom* atom1 = &ucell.atoms[T1];
             const int start = ucell.itiaiw2iwt(T1,I1,0);
 

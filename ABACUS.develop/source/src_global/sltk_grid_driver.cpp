@@ -23,7 +23,7 @@ Grid_Driver::~Grid_Driver()
 }
 
 //void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos)const
-void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
+void Grid_Driver::Find_atom(const UnitCell &ucell, const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
 {
 	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_atom");
 	timer::tick("Grid_Driver","Find_atom");
@@ -41,7 +41,7 @@ void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos, const int &nty
 // NAME : Find_adjacent_Atom ( find the adjacent information)
 //----------------------------------------------------------
 	//const int offset = this->Locate_offset(cartesian_pos);
-	const int offset = this->Locate_offset(cartesian_pos, ntype, nnumber);
+	const int offset = this->Locate_offset(ucell, cartesian_pos, ntype, nnumber);
 
 //	cout << "lenght in Find atom = " << atomlink[offset].fatom.getAdjacentSet()->getLength() << endl;
 
@@ -52,7 +52,7 @@ void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos, const int &nty
 }
 
 //int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos)const
-int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
+int Grid_Driver::Locate_offset(const UnitCell &ucell, const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
 //ywcui add 08-8-4
 {
 	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Locate_offset");
@@ -71,7 +71,7 @@ int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos, const int &
 //----------------------------------------------------------
 // EXPLAIN : Find the Hash number of this atom position
 //----------------------------------------------------------
-	AtomLink* Search = this->getHashCode(temp.fatom);
+	AtomLink* Search = this->getHashCode(ucell, temp.fatom);
 
 //----------------------------------------------------------
 // EXPLAIN : If we don't get the index for one Hash try,
