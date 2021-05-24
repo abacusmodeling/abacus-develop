@@ -18,8 +18,13 @@ class Hamilt
 
     void clear_after_ions(void);
 
-    void cinitcgg(const int ik, const int nstart,const int nbnd,
-                  const ComplexMatrix &psi,ComplexMatrix &evc,double *en);
+    void diagH_subspace(
+		const int ik, 
+		const int nstart,
+		const int nbnd,
+		const ComplexMatrix &psi,
+		ComplexMatrix &evc,
+		double *en);
 
     void diago(const int &istep,const int &iter,const int &ik,
                const double *precondition,double &avg_iter);
