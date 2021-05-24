@@ -195,7 +195,9 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->Phi = new Numerical_Orbital[ntype];
 	for(int it=0; it<ntype; it++)
 	{
-		this->Read_PAO(ofs_in, it, force_flag, my_rank);	
+		this->Read_PAO(ofs_in, it, force_flag, my_rank);
+		//caoyu add 2021-05-24	to reconstruct atom_arrange::set_sr_NL
+		this->rcutmax_Phi = std::max(this->rcutmax_Phi, this->Phi[it].getRcut());
 	}
 
 	
@@ -235,7 +237,9 @@ void LCAO_Orbitals::Read_Orbitals(
 			this->Set_NonLocal(it, this->nproj[it]);
 		}
 #endif
-		this->nprojmax = std::max( this->nprojmax, this->nproj[it] );
+		this->nprojmax = std::max(this->nprojmax, this->nproj[it]);
+		//caoyu add 2021-05-24 to reconstruct atom_arrange::set_sr_NL
+		this->rcutmax_Beta = std::max(this->rcutmax_Beta, this->Beta[it].get_rcut_max());
 	}
 
 	ofs_in << " max number of nonlocal projetors among all species is " << nprojmax << endl; 

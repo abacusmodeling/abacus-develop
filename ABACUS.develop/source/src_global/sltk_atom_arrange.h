@@ -12,9 +12,10 @@ public:
 	atom_arrange();
 	~atom_arrange();
 	
-	static void search( const double &search_radius_bohr);
-	static void set_sr_OV(void);
-	static void set_sr_NL(void);
+	static void search(const double& search_radius_bohr);
+	//caoyu modify 2021-05-24
+	//static void set_sr_OV(void);
+	static double set_sr_NL(const double& rcutmax_Phi, const double& rcutmax_Beta, const bool gamma_only_local);
 	//2015-05-07
 	static void delete_vector(const double &search_radius_bohr);
 

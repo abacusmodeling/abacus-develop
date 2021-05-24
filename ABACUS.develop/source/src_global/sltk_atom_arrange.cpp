@@ -16,15 +16,9 @@ atom_arrange::~atom_arrange()
 {
 }
 
-void atom_arrange::set_sr_NL(void)
+double atom_arrange::set_sr_NL(const double &rcutmax_Phi, const double &rcutmax_Beta, const bool gamma_only_local)
 {
 	TITLE("atom_arrange","set_sr_NL");
-	double longest_orb_rcut = 0.0;
-	for(int it=0; it<ucell.ntype; it++)
-	{
-		longest_orb_rcut = std::max(longest_orb_rcut, ORB.Phi[it].getRcut() );	
-	}
-//	cout << " LONGEST ORB RCUT     : " << longest_orb_rcut << endl;
 
 	if(OUT_LEVEL != "m") //xiaohui add 'OUT_LEVEL', 2015-09-16
 	{
@@ -45,35 +39,30 @@ void atom_arrange::set_sr_NL(void)
 	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
 	if(OUT_LEVEL != "m") ofs_running << "\n SETUP SEARCHING RADIUS FOR PROGRAM TO SEARCH ADJACENT ATOMS" << endl;
 	if(OUT_LEVEL != "m") ofs_running << setprecision(3);
-	if(OUT_LEVEL != "m") OUT(ofs_running,"longest orb rcut (Bohr)",longest_orb_rcut);
+	if(OUT_LEVEL != "m") OUT(ofs_running,"longest orb rcut (Bohr)",rcutmax_Phi);
 
-	double longest_nl_proj_rcut = 0.0;
-	for(int it=0; it<ucell.ntype; it++)
-	{
-		longest_nl_proj_rcut = std::max(longest_nl_proj_rcut, ORB.Beta[it].get_rcut_max());
-	}
 //	cout << " LONGEST NL PROJ RCUT : " << longest_nl_proj_rcut << endl;
-	if(OUT_LEVEL != "m") OUT(ofs_running,"longest nonlocal projector rcut (Bohr)", longest_nl_proj_rcut);
+	if(OUT_LEVEL != "m") OUT(ofs_running,"longest nonlocal projector rcut (Bohr)", rcutmax_Beta);
 
 	// check in use_overlap_matrix, 
 	double sr = 0.0;
-	if(GAMMA_ONLY_LOCAL)
+	if(gamma_only_local)
 	{
-		sr = 2 * longest_orb_rcut + 0.01;
+		sr = 2 * rcutmax_Phi + 0.01;
 	}
 	else
 	{
-		sr = 2 * (longest_orb_rcut + longest_nl_proj_rcut) + 0.01; // 0.01 is added to make safe.
+		sr = 2 * (rcutmax_Phi +rcutmax_Beta) + 0.01; // 0.01 is added to make safe.
 		//sr = 2 * longest_orb_rcut + 0.01;
 	}
 
 	// if use build_Nonlocal_mu (not GAMMA_ONLY_LOCAL) use 2*longest_orb_rcut
 	// if use build_Nonlocal_beta ( K-point used ) use 2 * (longest_orb_rcut + longest_nl_proj_rcut) 
-	SEARCH_RADIUS = sr;			
+	return sr;			
 //	cout << " SEARCH RADIUS (BOHR) : " << SEARCH_RADIUS << endl;
 //	OUT(ofs_running,"search radius (Bohr)", SEARCH_RADIUS);
 }
-
+/*
 // mohan update 2011-03-10
 void atom_arrange::set_sr_OV(void)
 {
@@ -92,7 +81,7 @@ void atom_arrange::set_sr_OV(void)
 //	cout << " SEARCH RADIUS (BOHR) : " << SEARCH_RADIUS << endl;
 	return;
 }
-
+*/
 void atom_arrange::search( const double &search_radius_bohr)
 {
 	TITLE("atom_arrange", "search");
