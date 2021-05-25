@@ -15,7 +15,7 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, complex<double>** 
 	time_t time_start = time(NULL);
 	ofs_running << " Start Time : " << ctime(&time_start);
 
-	if (tddft==1)
+	if (INPUT.tddft==1)
 	{
 /*
 #ifdef __MPI

@@ -191,7 +191,7 @@ void ELEC_scf::scf(const int &istep)
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
 				en.delta_escf();
-				if (vext == 0)	
+				if (ELEC_evolve::td_vext == 0)	
 				{
 					pot.set_vr_eff();
 				}
@@ -206,7 +206,7 @@ void ELEC_scf::scf(const int &istep)
 		// need reconstruction in near future -- mohan 2021-02-09
 		// the initialization of wave functions should be moved to 
 		// somewhere else
-		if(tddft==1 && iter == 2)
+		if(ELEC_evolve::tddft == 1 && iter == 2)
 		{
 			this->WFC_init = new complex<double>**[kv.nks];
 			for(int ik=0; ik<kv.nks; ik++)
@@ -272,7 +272,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 		else
 		{
-			if(tddft == 1 && istep >= 1 && iter > 1)
+			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
 				ELEC_evolve::evolve_psi(istep, UHM, this->WFC_init);
 			}
@@ -473,7 +473,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// (10) add Vloc to Vhxc.
-		if(vext == 0)	
+		if(ELEC_evolve::td_vext == 0)	
 		{
 			pot.set_vr_eff();
 		}
@@ -586,7 +586,7 @@ void ELEC_scf::scf(const int &istep)
 	}
 
 	// fuxiang add, should be reconstructed in near future -- mohan note 2021-02-09
-	if (tddft==1)
+	if (ELEC_evolve::tddft==1)
 	{
 		delete[] WFC_init;
 	}

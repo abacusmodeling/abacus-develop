@@ -1,5 +1,6 @@
 #include "src_pw/potential.h"
 #include "global.h"
+#include "../src_lcao/ELEC_evolve.h"
 
 //==========================================================
 // this function aims to add external time-dependent potential 
@@ -17,8 +18,8 @@ void Potential::set_vrs_tddft(const int istep)
         // add external linear potential, fuxiang add in 2017/05
         //====================================================
 
-        const int timescale = 1;  // get the time that vext influences;
-        if (istep >= timescale)
+        //const int timescale = 1;  // get the time that vext influences;
+        if (istep >= ELEC_evolve::td_timescale)
         {
             for (int i = 0;i < pw.nrxx;i++)
             {
@@ -41,19 +42,19 @@ void Potential::set_vrs_tddft(const int istep)
                 j     = index / pw.nczp;// get y
                 k     = index - pw.nczp*j + pw.nczp_start;// get x
 
-                if(vext_dire == 1)
+                if(ELEC_evolve::td_vext_dire == 1)
                 {
                     if (k<pw.ncx*0.05) this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
                     else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
                     else if (k>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
                 }
-                else if(vext_dire == 2)
+                else if(ELEC_evolve::td_vext_dire == 2)
                 {
                     if (j<pw.ncx*0.05) this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
                     else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
                     else if (j>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
                 }
-                else if(vext_dire == 3)
+                else if(ELEC_evolve::td_vext_dire == 3)
                 {
                     if (i<pw.ncx*0.05) this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
                     else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95) this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
