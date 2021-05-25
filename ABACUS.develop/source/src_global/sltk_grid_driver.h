@@ -19,11 +19,11 @@ public:
 //		adjacent of this atom,and store the information
 //		in 'adj_num','ntype','natom'
 //==========================================================
-	Grid_Driver();
+	Grid_Driver(const int &test_d_in, const int &test_gd_in, const int &test_grid_in);
 	~Grid_Driver();
 
 	//void Find_atom(const Vector3<double> &cartesian_pos)const;
-	void Find_atom(const Vector3<double> &cartesian_posi, const int &ntype, const int &nnumber)const;
+	void Find_atom(const UnitCell &ucell, const Vector3<double> &cartesian_posi, const int &ntype, const int &nnumber)const;
 
 //==========================================================
 // EXPLAIN : The adjacent information for the input 
@@ -45,14 +45,16 @@ private:
 	mutable int* natom;
 	mutable Vector3<double>* adjacent_tau;
 	mutable Vector3<int>* box;
-//==========================================================
+	const int test_deconstructor;//caoyu reconst 2021-05-24
+	const int test_grid_driver;	//caoyu reconst 2021-05-24
+	//==========================================================
 // MEMBER FUNCTIONS :
 // NAME : Locate_offset (find the atom index according to pos)
 // NAME : Find_adjacent_atom ( find adjacent atmos for offset)
 // NAME : Distance ( between a1 and a2)
 //==========================================================
 	//int Locate_offset(const Vector3<double> &cartesian_pos)const;
-	int Locate_offset(const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const;
+	int Locate_offset(const UnitCell &ucell, const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const;
 	void Find_adjacent_atom(const int offset, AdjacentSet* as)const;
 	double Distance(const AtomLink& a1, const Vector3<double> &adjacent_site)const;
 	double Distance(const AtomLink& a1, const AtomLink& a2)const;

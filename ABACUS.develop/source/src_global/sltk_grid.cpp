@@ -6,7 +6,7 @@
 #include "sltk_grid.h"
 #include "sltk_atom_input.h"
 #include "../src_pw/tools.h"
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 //=================
 // Class AtomLink
 //=================
@@ -47,7 +47,7 @@ const char* const Grid::ERROR[3] =
 	"MAX_ATOM_IN_ONE_GRID!"
 };
 
-Grid::Grid()
+Grid::Grid(const int &test_grid_in):test_grid(test_grid_in)
 {
 //	TITLE("Grid","Grid");
 //----------------------------------------------------------
@@ -64,12 +64,12 @@ Grid::~Grid()
 
 }
 
-void Grid::init(const Atom_input &input)
+void Grid::init(const UnitCell &ucell, const Atom_input &input)
 {
 	TITLE("SLTK_Grid", "init");
 
 	this->setMemberVariables(input);
-	this->setAtomLinkArray(input);
+	this->setAtomLinkArray(ucell, input);
 	this->setBoundaryAdjacent(input);
 
 	return;
@@ -156,13 +156,13 @@ void Grid::setMemberVariables(const Atom_input &input)
 	return;
 }
 
-void Grid::setAtomLinkArray(const Atom_input &input)
+void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 {
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
 // NAME : Bulid_Cache
 //----------------------------------------------------------
-	AtomLink* const pointCache = this->Build_Cache(input);
+	AtomLink* const pointCache = this->Build_Cache(ucell, input);
 //----------------------------------------------------------
 // WARNING : Don't delete this testing code.
 //----------------------------------------------------------
@@ -193,7 +193,7 @@ void Grid::setAtomLinkArray(const Atom_input &input)
 
 	if (test_grid) DONE(ofs_running, "Build_Cell");
 
-	this->Build_Hash_Table(pointCache);
+	this->Build_Hash_Table(ucell, pointCache);
 
 	if (test_grid) DONE(ofs_running, "Build_Hash_Table");
 
@@ -282,7 +282,7 @@ void Grid::setBoundaryAdjacent(const Atom_input &input)
 	return;
 }
 
-bool Grid::Push(const FAtom &atom)
+bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 {
 	//=======================================================
 	// sradius is cell radius.
@@ -290,7 +290,7 @@ bool Grid::Push(const FAtom &atom)
 	// d_minX ,d_minY, d_minZ  is origin of cell_0.
 	//=======================================================
 	int a, b, c;
-	this->In_Which_Cell(a, b, c, atom);
+	this->In_Which_Cell(ucell, a, b, c, atom);
 
 	if(test_grid) ofs_running << setw(5) << a << setw(5) << b << setw(5) << c;
 	
@@ -311,7 +311,7 @@ bool Grid::Push(const FAtom &atom)
 }
 
 
-AtomLink* Grid::Build_Cache(const Atom_input &input)
+AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 {
 	if (test_grid)TITLE(ofs_running, "Grid", "Build_Cache");
 	AtomLink* const start = new AtomLink[natom+1];
@@ -327,16 +327,16 @@ AtomLink* Grid::Build_Cache(const Atom_input &input)
 	{
 //----------------------------------------------------------
 // CALL OTHER CLASS FUNCTION :
-// NAME : operator>>
+// NAME : set_FAtom
 //
 // CALL MEMBER FUNCTION :
 // NAME : Push
 //----------------------------------------------------------
-		input >> current->fatom;
+		input.set_FAtom(ucell, current->fatom);	//caoyu modified 2021/5/24
 
 		// input parameter: the Fatom class of AtomLink class.
 		// use atom information to check which cell in.
-		if (this->Push(current->fatom))
+		if (this->Push(ucell, current->fatom))
 		{
 			++current;
 		}
@@ -382,7 +382,7 @@ void Grid::Build_Cell(void)
 	return;
 }
 
-void Grid::In_Which_Cell(int &a, int &b, int &c, const FAtom &atom)const
+void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FAtom &atom)const
 {
 	if (expand_flag)
 	{
@@ -477,10 +477,10 @@ void Grid::In_Which_Cell(int &a, int &b, int &c, const FAtom &atom)const
 	return;
 }
 
-AtomLink* Grid::getHashCode(const FAtom& atom)const
+AtomLink* Grid::getHashCode(const UnitCell &ucell, const FAtom& atom)const
 {
 	int a, b, c;
-	this->In_Which_Cell(a, b, c, atom);
+	this->In_Which_Cell(ucell, a, b, c, atom);
 	return this->Cell[a][b][c].address +
 	       (INT_HASHER(  static_cast<int>(atom.x() / TOLERATE_ERROR)
 	                   + static_cast<int>(atom.y() / TOLERATE_ERROR)
@@ -489,7 +489,7 @@ AtomLink* Grid::getHashCode(const FAtom& atom)const
 }
 
 
-void Grid::Build_Hash_Table(AtomLink* const pointCache)
+void Grid::Build_Hash_Table(const UnitCell &ucell, AtomLink* const pointCache)
 {
 	TITLE("SLTK_Grid", "Build_Hash_Table");
 
@@ -500,7 +500,7 @@ void Grid::Build_Hash_Table(AtomLink* const pointCache)
 	Hash_one_hit = 0; // mohan add 2010-06-25
 	for (; current < end; ++ current)
 	{
-		AtomLink* const hashTarget = this->getHashCode(current->fatom);
+		AtomLink* const hashTarget = this->getHashCode(ucell, current->fatom);
 
 		//================================================
 		// Find a new position
@@ -1069,7 +1069,7 @@ void Grid::Construct_Adjacent_final
 	{
 		int offset = Cell[i2][j2][k2].address - this->atomlink;
 		offset += ia2;
-		Cell[i][j][k].address[ia].fatom.getAdjacentSet()->set(b0, b1, b2, offset);
+		Cell[i][j][k].address[ia].fatom.getAdjacentSet()->set(b0, b1, b2, offset, test_grid);
 
 		if (test_grid > 2)
 		{

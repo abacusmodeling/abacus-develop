@@ -762,7 +762,7 @@ void DFTU_RELAX::folding_dSm_soverlap()
 			  tau1 = atom1->tau[I1];
         const int start1 = ucell.itiaiw2iwt(T1,I1,0);    
 
-        GridD.Find_atom(tau1, T1, I1);
+        GridD.Find_atom(ucell, tau1, T1, I1);
         for(int ad=0; ad<GridD.getAdjacentNum()+1; ++ad)
         {
           const int T2 = GridD.getType(ad);

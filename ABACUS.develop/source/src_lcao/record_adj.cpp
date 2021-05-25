@@ -56,7 +56,7 @@ void Record_adj::for_2d(void)
 		{
 			tau1 = atom1->tau[I1];
 			//GridD.Find_atom( tau1 );
-			GridD.Find_atom( tau1 ,T1, I1);
+			GridD.Find_atom(ucell,  tau1 ,T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 
 			// (2) search among all adjacent atoms.
@@ -159,7 +159,7 @@ void Record_adj::for_2d(void)
 		{
 			tau1 = atom1->tau[I1];
 			//GridD.Find_atom( tau1 );
-			GridD.Find_atom( tau1 ,T1, I1);
+			GridD.Find_atom(ucell,  tau1 ,T1, I1);
 
 			// (2) search among all adjacent atoms.
 			int cb = 0;
@@ -262,7 +262,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 			{	
 				tau1 = atom1->tau[I1];
 				//GridD.Find_atom(tau1);
-				GridD.Find_atom(tau1, T1, I1);
+				GridD.Find_atom(ucell, tau1, T1, I1);
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
 				{
 					const int T2 = GridD.getType(ad);
@@ -347,7 +347,7 @@ void Record_adj::for_grid(const Grid_Technique &gt)
 			{
 				tau1 = atom1->tau[I1];
 				//GridD.Find_atom(tau1);
-				GridD.Find_atom(tau1, T1, I1);
+				GridD.Find_atom(ucell, tau1, T1, I1);
 
 				int cb = 0;
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)

@@ -99,7 +99,7 @@ void Exx_Abfs::test_all() const
 			for (int I1 = 0; I1 < ucell.atoms[T1].na; ++I1)
 			{
 				cout<<"@\t"<<T1<<"\t"<<I1<<endl;
-				GridD.Find_atom( ucell.atoms[T1].tau[I1], T1, I1 );
+				GridD.Find_atom(ucell,  ucell.atoms[T1].tau[I1], T1, I1 );
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
 					cout<<GridD.getBox(ad).x<<"\t"<<GridD.getBox(ad).y<<"\t"<<GridD.getBox(ad).z<<endl;
 			}

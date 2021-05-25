@@ -47,8 +47,6 @@ public:
 //
 // NAME : setAdjacentSet
 //==========================================================
-	void setAdjacent(const int x_in, const int y_in, const int z_in, const int offset)
-	{ this->as->set(x_in, y_in, z_in, offset); }
 
 	AdjacentSet* getAdjacentSet() const
 	{ return this->as; }

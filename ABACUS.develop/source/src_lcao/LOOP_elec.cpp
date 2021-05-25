@@ -46,8 +46,8 @@ void LOOP_elec::set_matrix_grid(void)
     timer::tick("LOOP_elec","set_matrix_grid",'D'); 
 
 	// (1) Find adjacent atoms for each atom.
-	atom_arrange::set_sr_NL();
-	atom_arrange::search( SEARCH_RADIUS );
+	SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
+	atom_arrange::search(GridD, ucell, SEARCH_RADIUS, test_atom_input);
 	//DONE(ofs_running,"SEARCH ADJACENT ATOMS");
 
 	// (3) Periodic condition search for each grid.
