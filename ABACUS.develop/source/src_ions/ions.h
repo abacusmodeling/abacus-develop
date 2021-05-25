@@ -1,24 +1,24 @@
 #ifndef IONS_H
 #define IONS_H
 
-#include "electrons.h"
-#include "tools.h"
+#include "../src_pw/electrons.h"
+#include "../src_pw/tools.h"
+#include "../src_pw/charge_extra.h"
+#include "../src_pw/sto_elec.h" //mohan added 2021-01-28
 #include "../src_ions/ions_move_methods.h"
 #include "../src_ions/lattice_change_methods.h"
-#include "charge_extra.h"
-//#include "../src_develop/src_md/md.h"
-#include "sto_elec.h" //mohan added 2021-01-28
 
 class Ions
 {
-public:
+
+	public:
 
     Ions(){};
     ~Ions(){};
 
     void opt_ions_pw(void);
 
-private:
+	private:
 
 	// mohan add 2021-01-28
     Electrons elec;

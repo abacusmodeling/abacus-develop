@@ -1,4 +1,4 @@
-#include "src_pw/MD_func.h"
+#include "src_ions/MD_func.h"
 #include "src_pw/tools.h"
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_pw/forces.h"

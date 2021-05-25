@@ -2,14 +2,13 @@
 // AUTHOR:	Peize Lin
 // DATE:	2021-03-09
 //==========================================================
-
 #ifndef VDWD2_PARAMETERS_H
 #define VDWD2_PARAMETERS_H
 
 #include <map>
 #include <string>
-#include "src_global/vector3.h"
-#include "src_pw/unitcell_pseudo.h"
+#include "../src_global/vector3.h"
+#include "unitcell_pseudo.h"
 
 class Vdwd2_Parameters
 {

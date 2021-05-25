@@ -1,4 +1,4 @@
-#include "src_pw/MD_fire.h"
+#include "src_ions/MD_fire.h"
 
 MD_fire::MD_fire()
 {
@@ -43,7 +43,8 @@ void MD_fire::check_FIRE(
 		vel[iatom].z = (1.0-alpha)*vel[iatom].z+alpha*force[iatom].z/sumforce*normvel;
 	}
 	
-	if(P > 0 ){
+	if(P > 0 )
+	{
 	    negative_count +=1 ;
 		if(negative_count >=N_min)
         {

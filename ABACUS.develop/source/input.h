@@ -1,13 +1,10 @@
-//==========================================================
-// Author: Lixin He,mohan
-// DATE : 2008-12-24
-//==========================================================
 #ifndef INPUT_H
 #define INPUT_H
 
 #include "src_global/vector3.h"
 #include <string>
-#include "src_pw/MD_parameters.h"
+#include "src_ions/MD_parameters.h"
+
 using namespace std;
 
 class Input

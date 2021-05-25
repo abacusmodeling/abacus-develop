@@ -3,12 +3,13 @@
 
 #include "src_pw/unitcell_pseudo.h"
 
-
 class MD_func
 {
     public:
+
     MD_func(){};
     ~MD_func(){};
+
 	bool RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst);
     void mdRestartOut(const int& step, const int& recordFreq, const int& numIon, Vector3<double>* vel);
 	double GetAtomKE(const int& numIon, const Vector3<double>const* vel, const double const* allmass);
@@ -18,6 +19,7 @@ class MD_func
 		const double& fundamentalTime, 
 		const double const* allmass,
 		Vector3<double>* vel);
+
 //	void ReadNewTemp(int step);
 	string intTurnTostring(long int iter,string path);
 	int getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3<int>* ionmbl);
