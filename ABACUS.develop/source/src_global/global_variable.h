@@ -87,16 +87,6 @@ extern int VL_IN_H; // 24, calculate Vl in H or not.
 extern int VNL_IN_H; // 25, calculate Vnl in H or not.
 extern double   STRESS_THR; //LiuXh add 20180515
 
-extern int tddft;	//fuxiang add 2016-10-27
-extern double td_dr2;
-extern double td_dt;
-extern double td_force_dt;
-extern int val_elec_01;
-extern int val_elec_02;
-extern int val_elec_03;
-extern int vext;
-extern int vext_dire;
-
 extern int ocp;
 //extern int ocp_n;
 extern string ocp_set;

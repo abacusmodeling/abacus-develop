@@ -1,6 +1,7 @@
 #include "src_pw/charge.h"
 #include "src_pw/energy.h"
 #include "src_pw/global.h"
+#include "../src_lcao/ELEC_evolve.h"
 
 //fuxiang add 2017-03-15
 void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const string &fn, const int &precision, const bool for_plot)
@@ -263,51 +264,52 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		{
 			for(int ia=0; ia<ucell.atoms[0].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*val_elec_01;
-				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*val_elec_01;
-				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*val_elec_01;
+				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
 			}
 		}
 		else if(ucell.ntype == 2)
 		{
 			for(int ia=0; ia<ucell.atoms[0].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*val_elec_01;
-				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*val_elec_01;
-				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*val_elec_01;
+				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
 			}
 			for(int ia=0; ia<ucell.atoms[1].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[1].taud[ia].x*ucell.lat0*0.529177*val_elec_02;
-				dipole_ion_y += ucell.atoms[1].taud[ia].y*ucell.lat0*0.529177*val_elec_02;
-				dipole_ion_z += ucell.atoms[1].taud[ia].z*ucell.lat0*0.529177*val_elec_02;
+				dipole_ion_x += ucell.atoms[1].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_y += ucell.atoms[1].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_z += ucell.atoms[1].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
 			}
 		}
 		else if(ucell.ntype == 3)
 		{
 			for(int ia=0; ia<ucell.atoms[0].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*val_elec_01;
-				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*val_elec_01;
-				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*val_elec_01;
+				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
 			}
 			for(int ia=0; ia<ucell.atoms[1].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[1].taud[ia].x*ucell.lat0*0.529177*val_elec_02;
-				dipole_ion_y += ucell.atoms[1].taud[ia].y*ucell.lat0*0.529177*val_elec_02;
-				dipole_ion_z += ucell.atoms[1].taud[ia].z*ucell.lat0*0.529177*val_elec_02;
+				dipole_ion_x += ucell.atoms[1].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_y += ucell.atoms[1].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_z += ucell.atoms[1].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
 			}
 			for(int ia=0; ia<ucell.atoms[2].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[2].taud[ia].x*ucell.lat0*0.529177*val_elec_03;
-				dipole_ion_y += ucell.atoms[2].taud[ia].y*ucell.lat0*0.529177*val_elec_03;
-				dipole_ion_z += ucell.atoms[2].taud[ia].z*ucell.lat0*0.529177*val_elec_03;
+				dipole_ion_x += ucell.atoms[2].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
+				dipole_ion_y += ucell.atoms[2].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
+				dipole_ion_z += ucell.atoms[2].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
 			}
 		}
 		else
 		{
 			cout << "atom ntype is too large!" << endl;
 		}
+
 
 /*
 		for(int it=1; it<(ucell.ntype); it++)
