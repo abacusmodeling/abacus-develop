@@ -9,6 +9,7 @@
 // new
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
+#include "../src_lcao/ELEC_evolve.h"
 
 Potential::Potential()
 {
@@ -202,7 +203,7 @@ void Potential::init_pot(
     //----------------------------------------------------------
     // (4) total potentials 
     //----------------------------------------------------------
-    if(vext == 0) 
+    if(ELEC_evolve::td_vext == 0) 
 	{
 		this->set_vr_eff();
 	}

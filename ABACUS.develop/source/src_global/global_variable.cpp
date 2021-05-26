@@ -76,15 +76,6 @@ int VNL_IN_H = 1;
 int ZEEMAN_IN_H = 1;
 double  STRESS_THR = 1.0e-2; //LiuXh add 20180515
 
-int tddft = 0;	//fuxiang add 2016-10-27
-double td_dr2 = 1.0e-9;
-double td_dt = 0.02; //fs
-double td_force_dt = 0.02; //fs
-int val_elec_01 =1;
-int val_elec_02 =1;
-int val_elec_03 =1;
-int vext =0;
-int vext_dire=1;
 int ocp=0;
 string ocp_set = "none";
 vector<double> ocp_kb(10000);
