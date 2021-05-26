@@ -44,21 +44,48 @@ void Potential::set_vrs_tddft(const int istep)
 
                 if(ELEC_evolve::td_vext_dire == 1)
                 {
-                    if (k<pw.ncx*0.05) this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
-                    else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
-                    else if (k>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
+                    if (k<pw.ncx*0.05) 
+					{
+						this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
+					}
+                    else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) 
+					{
+						this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
+					}
+                    else if (k>=pw.ncx*0.95) 
+					{
+						this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
+					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 2)
                 {
-                    if (j<pw.ncx*0.05) this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
-                    else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
-                    else if (j>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
+                    if (j<pw.ncx*0.05) 
+					{
+						this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
+					}
+                    else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	
+					{
+						this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
+					}
+                    else if (j>=pw.ncx*0.95) 
+					{
+						this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
+					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 3)
                 {
-                    if (i<pw.ncx*0.05) this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
-                    else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95) this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
-                    else if (i>=pw.ncx*0.95) this->vextold[ir] = (0.019447*(1.0*i/pw.ncx-1)-0.001069585)*ucell.lat0;
+                    if (i<pw.ncx*0.05) 
+					{
+						this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
+					}
+                    else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95) 
+					{
+						this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
+					}
+                    else if (i>=pw.ncx*0.95) 
+					{
+						this->vextold[ir] = (0.019447*(1.0*i/pw.ncx-1)-0.001069585)*ucell.lat0;
+					}
                 }
 
                 // Gauss
@@ -99,13 +126,12 @@ void Potential::set_vrs_tddft(const int istep)
                 //cout << "vext: " << this->vext[ir] << endl;
                 //cout << "vrs: " << vrs(is,ir) <<endl;
             }
-            cout << "vext is existed!" << endl;
+            cout << "vext exists" << endl;
 
             delete[] this->vextold;
             delete[] this->vext;
         }
     }
-
 
     timer::tick("potential","set_vrs_tddft");
     return;
