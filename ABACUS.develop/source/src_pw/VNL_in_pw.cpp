@@ -7,6 +7,7 @@
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
 #include "../src_global/math_ylmreal.h"
+#include "src_pw/soc.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -244,8 +245,6 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 
 	this->dvan.zero_out();
 	this->dvan_so.zero_out();//added by zhengdy-soc
-	soc.rot_ylm(this->lmaxkb);
-	soc.fcoef.create(cell.ntype, this->nhm, this->nhm);
 
 	for(int it=0;it<cell.ntype;it++)
 	{
@@ -270,6 +269,9 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 		//    Here we initialize the D of the solid
 		if(cell.atoms[it].has_so )
 		{
+			Soc soc;
+			soc.rot_ylm(this->lmaxkb);
+			soc.fcoef.create(cell.ntype, this->nhm, this->nhm);
 			for(int ip=0; ip<Nprojectors; ip++)
 			{
 				const int l1 = this->nhtol (it, ip);

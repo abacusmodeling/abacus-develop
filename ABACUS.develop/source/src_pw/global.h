@@ -24,7 +24,6 @@
 #include "../src_global/restart.h" 
 #include "exx_global.h"
 #include "exx_lip.h"
-#include "soc.h"
 #include "../src_parallel/ft.h"
 
 //==========================================================
@@ -58,8 +57,7 @@ extern Parallel_Grid Pgrid;
 extern Parallel_Kpoints Pkpoints;
 extern Vdwd2_Parameters vdwd2_para;		// Peize Lin add 2021.03.09
 extern Vdwd3_Parameters vdwd3_para;		// jiyy add 2021-05-02	
-extern Restart restart;	// Peize Lin add 2020.04.04  																								 
-extern Soc soc; // zhengdy-soc
+extern Restart restart;	// Peize Lin add 2020.04.04
 
 #include "../src_lcao/global_fp.h"
 
