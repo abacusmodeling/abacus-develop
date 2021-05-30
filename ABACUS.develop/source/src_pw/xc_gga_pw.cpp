@@ -24,7 +24,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	if(NSPIN==4&&(DOMAG||DOMAG_Z)) nspin0 = 2;
 	if(NSPIN==4)
 	{
-		if(xcf.igcx != 0  ||  xcf.igcc != 0) soc.cal_ux(ucell.ntype);
+		if(xcf.igcx != 0  ||  xcf.igcc != 0) mag.cal_ux(ucell.ntype);
 	}
 
 	assert(nspin0>0);
@@ -455,11 +455,11 @@ void GGA_PW::noncolin_rho(double *rhoout1,double *rhoout2, double *neg)
 	//ux, otherwise rho + |m| is always rhoup and rho-|m| is always rhodw.
 	double amag=0;
 	for(int ir = 0;ir<pw.nrxx;ir++) neg[ir] = 1.0;
-	if(soc.lsign)
+	if(mag.lsign_)
 	{
 		for(int ir = 0;ir<pw.nrxx;ir++)
 		{
-			if(CHR.rho[1][ir]*soc.ux[0] + CHR.rho[2][ir]*soc.ux[1] + CHR.rho[3][ir]*soc.ux[2]>0) neg[ir] = 1.0;
+			if(CHR.rho[1][ir]*mag.ux_[0] + CHR.rho[2][ir]*mag.ux_[1] + CHR.rho[3][ir]*mag.ux_[2]>0) neg[ir] = 1.0;
 			else neg[ir] = -1.0;
 		}
 	}

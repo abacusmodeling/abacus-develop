@@ -66,18 +66,8 @@ class Soc
 		const int &ip2
 	);
 
-	Vector3<double> *m_loc;   //magnetization for each atom axis
-	double *angle1;
-	double *angle2;
-
-	double ux[3];
-	void cal_ux(const int ntype);
-	bool lsign ;
-
 	//int npol;
 	private:
-
-	bool judge_parallel(double a[3],Vector3<double> b);
 
 	int l_max_;
 	int l2plus1_;

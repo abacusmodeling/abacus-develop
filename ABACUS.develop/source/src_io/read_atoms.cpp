@@ -229,29 +229,29 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			{
 				if(NONCOLIN)
 				{
-					soc.m_loc[it].x = mag.start_magnetization[it] *
-							sin(soc.angle1[it]) * cos(soc.angle2[it]);
-					soc.m_loc[it].y = mag.start_magnetization[it] *
-							sin(soc.angle1[it]) * sin(soc.angle2[it]);
-					soc.m_loc[it].z = mag.start_magnetization[it] *
-							cos(soc.angle1[it]);
+					mag.m_loc_[it].x = mag.start_magnetization[it] *
+							sin(mag.angle1_[it]) * cos(mag.angle2_[it]);
+					mag.m_loc_[it].y = mag.start_magnetization[it] *
+							sin(mag.angle1_[it]) * sin(mag.angle2_[it]);
+					mag.m_loc_[it].z = mag.start_magnetization[it] *
+							cos(mag.angle1_[it]);
 				}
 				else
 				{
-					soc.m_loc[it].x = 0;
-					soc.m_loc[it].y = 0;
-					soc.m_loc[it].z = mag.start_magnetization[it];
+					mag.m_loc_[it].x = 0;
+					mag.m_loc_[it].y = 0;
+					mag.m_loc_[it].z = mag.start_magnetization[it];
 				}
 
-				OUT(ofs_running, "noncollinear magnetization_x",soc.m_loc[it].x);
-				OUT(ofs_running, "noncollinear magnetization_y",soc.m_loc[it].y);
-				OUT(ofs_running, "noncollinear magnetization_z",soc.m_loc[it].z);
+				OUT(ofs_running, "noncollinear magnetization_x",mag.m_loc_[it].x);
+				OUT(ofs_running, "noncollinear magnetization_y",mag.m_loc_[it].y);
+				OUT(ofs_running, "noncollinear magnetization_z",mag.m_loc_[it].z);
 
-				ZEROS(soc.ux ,3);
+				ZEROS(mag.ux_ ,3);
 			}
 			else if(NSPIN==2)
 			{
-				soc.m_loc[it].x = mag.start_magnetization[it];
+				mag.m_loc_[it].x = mag.start_magnetization[it];
 				OUT(ofs_running, "start magnetization",mag.start_magnetization[it]);
 			}
 			else if(NSPIN==1)

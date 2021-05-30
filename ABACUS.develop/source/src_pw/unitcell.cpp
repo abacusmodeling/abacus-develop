@@ -114,15 +114,15 @@ void UnitCell::bcast_unitcell(void)
     if(NSPIN != 1)
     for(int it = 0;it<ntype;it++)
     {
-         Parallel_Common::bcast_double( soc.m_loc[it].x );
-         Parallel_Common::bcast_double( soc.m_loc[it].y );
-         Parallel_Common::bcast_double( soc.m_loc[it].z );
+         Parallel_Common::bcast_double( mag.m_loc_[it].x );
+         Parallel_Common::bcast_double( mag.m_loc_[it].y );
+         Parallel_Common::bcast_double( mag.m_loc_[it].z );
     }
     if(NSPIN==4)
     {
-         Parallel_Common::bcast_double( soc.ux[0] );
-         Parallel_Common::bcast_double( soc.ux[1] );
-         Parallel_Common::bcast_double( soc.ux[2] );
+         Parallel_Common::bcast_double( mag.ux_[0] );
+         Parallel_Common::bcast_double( mag.ux_[1] );
+         Parallel_Common::bcast_double( mag.ux_[2] );
     }
 
     for (int i=0;i<ntype;i++)
