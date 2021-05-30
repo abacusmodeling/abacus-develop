@@ -379,25 +379,25 @@ void Input_Conv::Convert(void)
 		}
 		LSPINORB = INPUT.lspinorb;
 
-		delete[] soc.m_loc;
-		delete[] soc.angle1;
-		delete[] soc.angle2;
-		soc.m_loc = new Vector3<double> [INPUT.ntype];
-		soc.angle1 = new double[INPUT.ntype];
-		soc.angle2 = new double[INPUT.ntype];
+		delete[] mag.m_loc_;
+		delete[] mag.angle1_;
+		delete[] mag.angle2_;
+		mag.m_loc_ = new Vector3<double> [INPUT.ntype];
+		mag.angle1_ = new double[INPUT.ntype];
+		mag.angle2_ = new double[INPUT.ntype];
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
-			soc.angle1[i] = INPUT.angle1[i]/180*PI;
-			soc.angle2[i] = INPUT.angle2[i]/180*PI;
+			mag.angle1_[i] = INPUT.angle1[i]/180*PI;
+			mag.angle2_[i] = INPUT.angle2[i]/180*PI;
 		}
 #ifdef __MPI
-//			Parallel_Common::bcast_double(soc.angle1[i]);
-//			Parallel_Common::bcast_double(soc.angle2[i]);
+//			Parallel_Common::bcast_double(mag.angle1_[i]);
+//			Parallel_Common::bcast_double(mag.angle2_[i]);
 #endif
 	}
 	else{
-		delete[] soc.m_loc;
-		soc.m_loc = new Vector3<double> [INPUT.ntype];
+		delete[] mag.m_loc_;
+		mag.m_loc_ = new Vector3<double> [INPUT.ntype];
 		LSPINORB = false;
 		NONCOLIN = false;
 		DOMAG = false;

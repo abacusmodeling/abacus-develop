@@ -37,17 +37,11 @@ void Fcoef::create(const int i1, const int i2, const int i3)
 
 Soc::Soc()
 {
-	m_loc = new Vector3<double> [1];
-	angle1 = new double[1];
-	angle2 = new double[1];
 	p_rot = new complex<double> [1];
 }
 
 Soc::~Soc()
 {
-	delete[] m_loc;
-	delete[] angle1;
-	delete[] angle2;
 	delete[] p_rot;
 }
 
@@ -165,62 +159,6 @@ int Soc::sph_ind(const int l, const double j, const int m, const int spin)
 		sph_ind0 =0;
 	}
     return sph_ind0;
-}
-
-
-void Soc::cal_ux(const int ntype)
-{
-	double amag, uxmod;
-	int starting_it;
-	bool is_paraller;
-	//do not sign feature in teh general case
-	lsign = false;
-	ZEROS(ux, 3);
-
-	starting_it = 0;
-	for(int it = 0;it<ntype;it++)
-	{
-		amag = pow(m_loc[it].x,2) + pow(m_loc[it].y,2) + pow(m_loc[it].z,2);
-		if(amag > 1e-6)
-		{
-			ux[0] = m_loc[it].x;
-			ux[1] = m_loc[it].y;
-			ux[2] = m_loc[it].z;
-			starting_it = it;
-			lsign = true;
-			break;
-		}
-	}
-	//initial magnetizations should be parallel
-	for(int it = starting_it+1; it<ntype;it++)
-	{
-		lsign = lsign && judge_parallel(ux, m_loc[it]);
-	}
-	if(lsign)
-	{
-		uxmod =  pow(ux[0],2) + pow(ux[1],2) +pow(ux[2],2);
-		if(uxmod<1e-6) 
-		{
-			WARNING_QUIT("cal_ux","wrong uxmod");
-		}
-		for(int i = 0;i<3;i++)
-		{
-			ux[i] *= 1/sqrt(uxmod);
-		}
-		//       cout<<"    Fixed quantization axis for GGA: "
-		//<<setw(10)<<ux[0]<<"  "<<setw(10)<<ux[1]<<"  "<<setw(10)<<ux[2]<<endl;
-	}
-	return;
-}
-
-
-bool Soc::judge_parallel(double a[3], Vector3<double> b)
-{
-   bool jp=false;
-   double cross;
-   cross = pow((a[1]*b.z-a[2]*b.y),2) +  pow((a[2]*b.x-a[0]*b.z),2) + pow((a[0]*b.y-a[1]*b.x),2);
-   jp = (fabs(cross)<1e-6);
-   return jp;
 }
 
 void Soc::set_fcoef(
