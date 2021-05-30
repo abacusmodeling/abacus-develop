@@ -4,6 +4,7 @@
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
 #include "../src_global/math_ylmreal.h"
+#include "src_pw/soc.h"
 
 WF_atomic::WF_atomic()
 {
@@ -292,6 +293,8 @@ void WF_atomic::atomic_wfc
                     {
                         if(ucell.atoms[it].has_so)
                         {
+                            Soc soc;
+						    soc.rot_ylm(l+1);
                             const double j = ucell.atoms[it].jchi[iw];
                             if ( !(DOMAG||DOMAG_Z))
                             {//atomic_wfc_so

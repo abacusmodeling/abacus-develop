@@ -4,6 +4,7 @@
 #include "../src_global/math_integral.h"
 #include "../src_global/tool_check.h"
 #include <algorithm>
+#include "src_pw/soc.h"
 using namespace std;
 
 //==============================
@@ -357,7 +358,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		{
 			lmaxkb = max( lmaxkb, atom->lll[ibeta]);
 		}
-
+		Soc soc;
 		soc.rot_ylm(lmaxkb);
 		soc.fcoef.create(ucell.ntype, atom->nh, atom->nh);
 
