@@ -283,14 +283,12 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
 
-// PLEASE avoid using capital letters for local variables
-// mohan note 2021-03-23 
 	const int nh = atom->nh;//zhengdy-soc
 
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	ComplexMatrix Coefficient_D_in_so(nh*2, nh*2);//zhengdy-soc
+	ComplexMatrix coefficient_D_nc_in(nh*2, nh*2);//zhengdy-soc
 
 	if(!atom->has_so)
 	{
@@ -350,7 +348,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
 
 		// mohan add 2021-05-07
-		atom->set_d_so(Coefficient_D_in_so,n_projectors,0,0);
+		atom->set_d_so(coefficient_D_nc_in,n_projectors,0,0);
 	}
 	else//added by zhengdy-soc
 	{
@@ -390,7 +388,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 										m1, m2,
 										j1, j2,
 										it, ip1, ip2);
-									Coefficient_D_in_so(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) 
+									coefficient_D_nc_in(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) 
 									* soc.fcoef(it, is1, is2, ip1, ip2);
 									if(p1 != p2) 
 									{
@@ -456,7 +454,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			tmpBeta_lm);//zhengdy-soc 2018-09-10
 
 		// mohan add 2021-05-07
-		atom->set_d_so(Coefficient_D_in_so,n_projectors,nh,1);
+		atom->set_d_so(coefficient_D_nc_in,n_projectors,nh,1);
 
 	}//end if
 
@@ -568,8 +566,8 @@ void LCAO_Orbitals::Read_NonLocal(
 	// this needed to be modified.	
 	//-------------------------------------------
 	int nproj_allowed = nlmax+1;
-	matrix Coefficient_D_in(nproj_allowed, nproj_allowed);
-	ComplexMatrix Coefficient_D_in_so(nproj_allowed*2, nproj_allowed*2);
+	matrix coefficient_D_in(nproj_allowed, nproj_allowed);
+	ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
 
 //	OUT(ofs_running,"nproj_allowed",nproj_allowed);
 
@@ -594,9 +592,9 @@ void LCAO_Orbitals::Read_NonLocal(
 					assert(L1_read <= nlmax);
 					assert(L2_read <= nlmax);
                 	
-					ifs >> Coefficient_D_in(L1_read, L2_read);
+					ifs >> coefficient_D_in(L1_read, L2_read);
 					
-//					ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << Coefficient_D_in(L1_read,L2_read) << endl;
+//					ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << endl;
             	}
         	}
 			SCAN_END(ifs,"</DIJ>");
@@ -605,7 +603,7 @@ void LCAO_Orbitals::Read_NonLocal(
 
 #ifdef __MPI
 	Parallel_Common::bcast_int(n_projectors); // mohan add 2010-12-20
-//	Parallel_Common::bcast_double(Coefficient_D_in.c, Coefficient_D_in.nr * Coefficient_D_in.nc);
+//	Parallel_Common::bcast_double(coefficient_D_in.c, coefficient_D_in.nr * coefficient_D_in.nc);
 #endif
 
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
