@@ -1,14 +1,43 @@
-on: [push]
-
+on: [push, pull_request]
+env:
+  PREFIX: ABACUS.develop
 jobs:
-  main:
-    env:
-      ITK: ghcr.io/tansongchen/itk
+  Build_on_GNU:
     runs-on: ubuntu-latest
+    container: darelbeida/debian10:latest
     steps:
-      - uses: actions/checkout@v2
-      - run: echo ${{ secrets.PAT }} | docker login ghcr.io -u tansongchen --password-stdin
-      - run: docker pull ${{ env.ITK }}
-      - run: docker build . -t ${{ env.ITK }} --cache-from=${{ env.ITK }}
-      - run: docker run -v $GITHUB_WORKSPACE:/code -w /code ${{ env.ITK }} bash entrypoint.sh
-      - run: docker push ${{ env.ITK }}
+      - name: Setup env
+        run: git config --global http.sslverify false && git config --global https.sslverify false
+      - name: Download source codes
+        uses: actions/checkout@v2
+      - name: Build
+        run: cd ${PREFIX}/source && GNU=1 make fp_mpi
+      - name: Artifacts bins
+        uses: actions/upload-artifact@v2
+        with:
+          name: bin
+          path: ${{env.PREFIX}}/bin/*
+          retention-days: 1
+
+  Test:
+    runs-on: ubuntu-latest
+    container: darelbeida/debian10:latest
+    needs: Build_on_GNU
+    steps:
+      - name: Setup env
+        run: git config --global http.sslverify false && git config --global https.sslverify false
+      - name: Download source codes
+        uses: actions/checkout@v2
+      - name: Reload bins
+        uses: actions/download-artifact@v2
+        with:
+          name: bin
+          path: ${{env.PREFIX}}/bin/
+      - name: Test single
+        run: |
+          export PATH=$PATH:$PWD/${PREFIX}/bin
+          export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+          chmod +x ${PREFIX}/bin/ABACUS.mpi
+          cd ${PREFIX}/tests/
+          cd 103_PW_15_CS_CF/
+          ABACUS.mpi
