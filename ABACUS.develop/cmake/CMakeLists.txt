@@ -13,13 +13,16 @@ project(ABACUS
 set(ABACUS_BIN_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+add_compile_options(-O2 -g)
+
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
 
 get_filename_component(ABACUS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
 set(ABACUS_SOURCE_DIR ${ABACUS_DIR}/source)
+include_directories(${ABACUS_SOURCE_DIR})
 
-set(CEREAL_DIR /usr/local)
-include_directories(${CEREAL_DIR}/include)
+# This is a header-only library
+find_package(Cereal REQUIRED)
 
 set(ELPA_DIR /usr/local)
 include_directories(${ELPA_DIR}/include)
@@ -452,12 +455,7 @@ add_library(abacusTools OBJECT ${CODE_TOOLS})
 add_library(abacusCodePdiag OBJECT ${CODE_PDIAG})
 add_library(abacusCodePdiagMr OBJECT ${CODE_PDIAG_MR})
 
-target_include_directories(abacusCommon PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusFirstPrinciple PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusParallel PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusTools PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusCodePdiag PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusCodePdiagMr PUBLIC ${ABACUS_SOURCE_DIR})
+target_include_directories(abacusFirstPrinciple PUBLIC ${Cereal_INCLUDE_DIRS})
 
 add_executable(${ABACUS_BIN_NAME}
     ${ABACUS_SOURCE_DIR}/main.cpp
