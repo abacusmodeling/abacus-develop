@@ -21,35 +21,27 @@ get_filename_component(ABACUS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
 set(ABACUS_SOURCE_DIR ${ABACUS_DIR}/source)
 include_directories(${ABACUS_SOURCE_DIR})
 
-# This is a header-only library
+# We only use headers
+find_package(Boost REQUIRED)
 find_package(Cereal REQUIRED)
 
-# We only use the library while there is a customed header in project
-find_package(ELPA REQUIRED)
-
-find_package(FFTW3 REQUIRED)
-
-set(SCALAPACK_DIR /usr/local)
-include_directories(${SCALAPACK_DIR}/include)
-
-# OpenBlas is required by ScaLAPACK
+# We only use libraries while headers are customed in project:
+# - "blas_connector.h"
+# - "lapack_connect.h"
+# - "my_elpa.h"
+# - "scalapack_connector.h"
 find_package(BLAS REQUIRED)
+find_package(ELPA REQUIRED)
+find_package(ScaLAPACK REQUIRED)
 
-# We only use the header-only part of Boost
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
+# Both header and library are needed
+find_package(FFTW3 REQUIRED)
 find_package(MPI REQUIRED)
-include_directories(${MPI_CXX_INCLUDE_PATH})
-add_compile_options(${MPI_CXX_COMPILE_FLAGS})
+include_directories(${MPI_CXX_INCLUDE_PATH} ${FFTW3_INCLUDE_DIRS})
 
-# Look for pthread or equivalent
+# No header needed
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
-
-set(EXTERNAL_LIB_NAMES
-    ${SCALAPACK_DIR}/lib/libscalapack.a
-)
 
 add_definitions(
     -D__EXX
@@ -444,7 +436,10 @@ add_library(abacusTools OBJECT ${CODE_TOOLS})
 add_library(abacusCodePdiag OBJECT ${CODE_PDIAG})
 add_library(abacusCodePdiagMr OBJECT ${CODE_PDIAG_MR})
 
-target_include_directories(abacusFirstPrinciple PUBLIC ${Cereal_INCLUDE_DIRS})
+target_include_directories(abacusFirstPrinciple PUBLIC
+    ${Cereal_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+)
 
 add_executable(${ABACUS_BIN_NAME}
     ${ABACUS_SOURCE_DIR}/main.cpp
@@ -458,9 +453,9 @@ add_executable(${ABACUS_BIN_NAME}
 target_link_libraries(${ABACUS_BIN_NAME}
     -lgfortran
     -lm
-    ${EXTERNAL_LIB_NAMES}
     ELPA::ELPA
     FFTW3::FFTW3
+    ScaLAPACK::ScaLAPACK
     BLAS::BLAS
     MPI::MPI_CXX
     OpenMP::OpenMP_CXX
