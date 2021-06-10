@@ -24,8 +24,8 @@ include_directories(${ABACUS_SOURCE_DIR})
 # This is a header-only library
 find_package(Cereal REQUIRED)
 
-set(ELPA_DIR /usr/local)
-include_directories(${ELPA_DIR}/include)
+# We only use the library while there is a customed header in project
+find_package(ELPA REQUIRED)
 
 set(FFTW_DIR /usr/local)
 include_directories(${FFTW_DIR}/include)
@@ -51,7 +51,6 @@ find_package(OpenMP REQUIRED)
 set(EXTERNAL_LIB_NAMES
     -lgfortran
     -lm
-    -lelpa
     -lfftw3
     ${SCALAPACK_DIR}/lib/libscalapack.a
 )
@@ -59,7 +58,6 @@ set(EXTERNAL_LIB_NAMES
 set(EXTERNAL_LIB_DIRS
     ${LAPACK_DIR}/lib
     ${FFTW_DIR}/lib
-    ${ELPA_DIR}/lib
 )
 
 add_definitions(
@@ -468,6 +466,7 @@ add_executable(${ABACUS_BIN_NAME}
 )
 target_link_libraries(${ABACUS_BIN_NAME}
     ${EXTERNAL_LIB_NAMES}
+    ELPA::ELPA
     MPI::MPI_CXX
     OpenMP::OpenMP_CXX
     BLAS::BLAS
