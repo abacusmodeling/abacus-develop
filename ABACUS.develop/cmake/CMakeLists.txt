@@ -27,8 +27,7 @@ find_package(Cereal REQUIRED)
 # We only use the library while there is a customed header in project
 find_package(ELPA REQUIRED)
 
-set(FFTW_DIR /usr/local)
-include_directories(${FFTW_DIR}/include)
+find_package(FFTW3 REQUIRED)
 
 set(SCALAPACK_DIR /usr/local)
 include_directories(${SCALAPACK_DIR}/include)
@@ -49,15 +48,7 @@ find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
 set(EXTERNAL_LIB_NAMES
-    -lgfortran
-    -lm
-    -lfftw3
     ${SCALAPACK_DIR}/lib/libscalapack.a
-)
-
-set(EXTERNAL_LIB_DIRS
-    ${LAPACK_DIR}/lib
-    ${FFTW_DIR}/lib
 )
 
 add_definitions(
@@ -465,13 +456,13 @@ add_executable(${ABACUS_BIN_NAME}
     $<TARGET_OBJECTS:abacusCodePdiagMr>
 )
 target_link_libraries(${ABACUS_BIN_NAME}
+    -lgfortran
+    -lm
     ${EXTERNAL_LIB_NAMES}
     ELPA::ELPA
+    FFTW3::FFTW3
+    BLAS::BLAS
     MPI::MPI_CXX
     OpenMP::OpenMP_CXX
-    BLAS::BLAS
     Threads::Threads
-)
-target_link_directories(${ABACUS_BIN_NAME}
-    PUBLIC ${EXTERNAL_LIB_DIRS}
 )

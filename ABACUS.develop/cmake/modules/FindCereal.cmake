@@ -8,8 +8,8 @@
 
 find_path(Cereal_INCLUDE_DIR cereal/cereal.hpp)
 
-# handle the QUIET and REQUIRED arguments and
-# set Cereal_FOUND to TRUE if all variables are non-zero
+# Handle the QUIET and REQUIRED arguments and
+# set Cereal_FOUND to TRUE if all variables are non-zero.
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Cereal DEFAULT_MSG Cereal_INCLUDE_DIR)
 

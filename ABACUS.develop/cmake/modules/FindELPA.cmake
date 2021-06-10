@@ -10,8 +10,8 @@
 find_path(ELPA_INCLUDE_DIR elpa/elpa.h)
 find_library(ELPA_LIBRARY NAMES elpa)
 
-# handle the QUIET and REQUIRED arguments and
-# set ELPA_FOUND to TRUE if all variables are non-zero
+# Handle the QUIET and REQUIRED arguments and
+# set ELPA_FOUND to TRUE if all variables are non-zero.
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ELPA DEFAULT_MSG ELPA_LIBRARY ELPA_INCLUDE_DIR)
 
@@ -23,6 +23,7 @@ if(ELPA_FOUND)
     if(NOT TARGET ELPA::ELPA)
         add_library(ELPA::ELPA UNKNOWN IMPORTED)
         set_target_properties(ELPA::ELPA PROPERTIES
+           IMPORTED_LINK_INTERFACE_LANGUAGES "C"
            IMPORTED_LOCATION "${ELPA_LIBRARY}"
            INTERFACE_INCLUDE_DIRECTORIES "${ELPA_INCLUDE_DIR}")
     endif()
