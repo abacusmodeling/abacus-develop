@@ -13,7 +13,6 @@ project(ABACUS
 set(ABACUS_BIN_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
 
 set(CMAKE_CXX_STANDARD 11)
-<<<<<<< HEAD
 add_compile_options(-O2 -g)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
@@ -44,54 +43,6 @@ include_directories(${MPI_CXX_INCLUDE_PATH} ${FFTW3_INCLUDE_DIRS})
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
-=======
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
-
-get_filename_component(ABACUS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/.. ABSOLUTE)
-set(ABACUS_SOURCE_DIR ${ABACUS_DIR}/source)
-
-set(CEREAL_DIR /usr/local)
-include_directories(${CEREAL_DIR}/include)
-
-set(ELPA_DIR /usr/local)
-include_directories(${ELPA_DIR}/include)
-
-set(FFTW_DIR /usr/local)
-include_directories(${FFTW_DIR}/include)
-
-set(SCALAPACK_DIR /usr/local)
-include_directories(${SCALAPACK_DIR}/include)
-
-# OpenBlas is required by ScaLAPACK
-find_package(BLAS REQUIRED)
-
-# We only use the header-only part of Boost
-find_package(Boost REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-
-find_package(MPI REQUIRED)
-include_directories(${MPI_CXX_INCLUDE_PATH})
-add_compile_options(${MPI_CXX_COMPILE_FLAGS})
-
-# Look for pthread or equivalent
-find_package(Threads REQUIRED)
-find_package(OpenMP REQUIRED)
-
-set(EXTERNAL_LIB_NAMES
-    -lgfortran
-    -lm
-    -lelpa
-    -lfftw3
-    ${SCALAPACK_DIR}/lib/libscalapack.a
-)
-
-set(EXTERNAL_LIB_DIRS
-    ${LAPACK_DIR}/lib
-    ${FFTW_DIR}/lib
-    ${ELPA_DIR}/lib
-)
-
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
 add_definitions(
     -D__EXX
     -D__FFTW3
@@ -128,17 +79,10 @@ SET(CODE_PW
     src_io/read_pp_vwr.cpp
     src_io/to_wannier90.cpp
     src_io/unk_overlap_pw.cpp
-<<<<<<< HEAD
-    src_pw/MD_basic.cpp
-    src_pw/MD_fire.cpp
-    src_pw/MD_func.cpp
-    src_pw/MD_thermo.cpp
-=======
     src_ions/MD_basic.cpp
     src_ions/MD_fire.cpp
     src_ions/MD_func.cpp
     src_ions/MD_thermo.cpp
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
     src_pw/VL_in_pw.cpp
     src_pw/VNL_in_pw.cpp
     src_pw/atom_pseudo.cpp
@@ -210,8 +154,6 @@ set(CODE_TOOLS
 )
 
 set(CODE_LCAO
-<<<<<<< HEAD
-=======
     module_ORB/ORB_atomic.cpp
     module_ORB/ORB_atomic_lm.cpp
     module_ORB/ORB_control.cpp
@@ -237,7 +179,6 @@ set(CODE_LCAO
     src_io/numerical_basis.cpp
     src_io/numerical_descriptor.cpp
     src_io/unk_overlap_lcao.cpp
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
     src_lcao/DM_gamma.cpp
     src_lcao/DM_k.cpp
     src_lcao/ELEC_cbands_gamma.cpp
@@ -251,10 +192,6 @@ set(CODE_LCAO
     src_lcao/FORCE_gamma_tvnl.cpp
     src_lcao/FORCE_gamma_vl.cpp
     src_lcao/FORCE_k.cpp
-<<<<<<< HEAD
-    src_pdiag/GenELPA.cpp
-=======
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
     src_lcao/LCAO_descriptor.cpp
     src_lcao/LCAO_diago.cpp
     src_lcao/LCAO_evolve.cpp
@@ -265,27 +202,6 @@ set(CODE_LCAO
     src_lcao/LOOP_cell.cpp
     src_lcao/LOOP_elec.cpp
     src_lcao/LOOP_ions.cpp
-<<<<<<< HEAD
-    module_ORB/ORB_atomic.cpp
-    module_ORB/ORB_atomic_lm.cpp
-    module_ORB/ORB_control.cpp
-    module_ORB/ORB_gaunt_table.cpp
-    module_ORB/ORB_gen_tables.cpp
-    module_ORB/ORB_nonlocal.cpp
-    module_ORB/ORB_nonlocal_lm.cpp
-    module_ORB/ORB_read.cpp
-    module_ORB/ORB_table_alpha.cpp
-    module_ORB/ORB_table_beta.cpp
-    module_ORB/ORB_table_phi.cpp
-    src_ri/abfs-vector3_order.cpp
-    src_ri/abfs.cpp
-    src_io/bessel_basis.cpp
-    src_lcao/build_st_pw.cpp
-    src_io/cal_r_overlap_R.cpp
-    src_lcao/center2_orb-orb11.cpp
-    src_lcao/center2_orb-orb21.cpp
-    src_lcao/center2_orb-orb22.cpp
-=======
     src_lcao/build_st_pw.cpp
     src_lcao/center2_orb-orb11.cpp
     src_lcao/center2_orb-orb21.cpp
@@ -318,7 +234,6 @@ set(CODE_LCAO
     src_lcao/wfc_dm_2d.cpp
     src_ri/abfs-vector3_order.cpp
     src_ri/abfs.cpp
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
     src_ri/conv_coulomb_pot.cpp
     src_ri/conv_coulomb_pot_k.cpp
     src_ri/exx_abfs-abfs_index.cpp
@@ -347,51 +262,6 @@ set(CODE_LCAO
     src_ri/exx_lcao.cpp
     src_ri/exx_opt_orb-print.cpp
     src_ri/exx_opt_orb.cpp
-<<<<<<< HEAD
-    src_lcao/gint_gamma.cpp
-    src_lcao/gint_gamma_common.cpp
-    src_lcao/gint_gamma_env.cpp
-    src_lcao/gint_gamma_fvl.cpp
-    src_lcao/gint_gamma_mull.cpp
-    src_lcao/gint_gamma_rho.cpp
-    src_lcao/gint_gamma_vl.cpp
-    src_lcao/gint_k.cpp
-    src_lcao/gint_k_fvl.cpp
-    src_lcao/gint_k_init.cpp
-    src_lcao/gint_k_rho.cpp
-    src_lcao/gint_k_vl.cpp
-    src_lcao/global_fp.cpp
-    src_lcao/grid_base.cpp
-    src_lcao/grid_base_beta.cpp
-    src_lcao/grid_bigcell.cpp
-    src_lcao/grid_meshball.cpp
-    src_lcao/grid_meshcell.cpp
-    src_lcao/grid_meshk.cpp
-    src_lcao/grid_technique.cpp
-    src_io/istate_charge.cpp
-    src_io/istate_envelope.cpp
-    src_lcao/local_orbital_charge.cpp
-    src_lcao/local_orbital_wfc.cpp
-    src_io/numerical_basis.cpp
-    src_io/numerical_descriptor.cpp
-    src_parallel/parallel_orbitals.cpp
-    src_pdiag/pdiag_basic.cpp
-    src_pdiag/pdiag_common.cpp
-    src_pdiag/pdiag_double.cpp
-    src_lcao/record_adj.cpp
-    src_lcao/run_md.cpp
-    src_global/sltk_adjacent_set.cpp
-    src_global/sltk_atom.cpp
-    src_global/sltk_atom_arrange.cpp
-    src_global/sltk_atom_input.cpp
-    src_global/sltk_grid.cpp
-    src_global/sltk_grid_driver.cpp
-    src_parallel/subgrid_oper.cpp
-    src_io/unk_overlap_lcao.cpp
-    src_pw/wavefunc_in_pw.cpp
-    src_lcao/wfc_dm_2d.cpp
-    src_global/ylm.cpp
-=======
     src_parallel/parallel_orbitals.cpp
     src_parallel/subgrid_oper.cpp
     src_pdiag/GenELPA.cpp
@@ -399,7 +269,6 @@ set(CODE_LCAO
     src_pdiag/pdiag_common.cpp
     src_pdiag/pdiag_double.cpp
     src_pw/wavefunc_in_pw.cpp
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
 )
 
 set(CODE_PARALLEL
@@ -436,10 +305,7 @@ set(CODE_FIRST_PRINCIPLES
     src_ions/ions_move_cg.cpp
     src_ions/ions_move_methods.cpp
     src_ions/ions_move_sd.cpp
-<<<<<<< HEAD
-=======
     src_ions/ions.cpp
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
     src_ions/lattice_change_basic.cpp
     src_ions/lattice_change_cg.cpp
     src_ions/lattice_change_methods.cpp
@@ -571,19 +437,10 @@ add_library(abacusTools OBJECT ${CODE_TOOLS})
 add_library(abacusCodePdiag OBJECT ${CODE_PDIAG})
 add_library(abacusCodePdiagMr OBJECT ${CODE_PDIAG_MR})
 
-<<<<<<< HEAD
 target_include_directories(abacusFirstPrinciple PUBLIC
     ${Cereal_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
 )
-=======
-target_include_directories(abacusCommon PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusFirstPrinciple PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusParallel PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusTools PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusCodePdiag PUBLIC ${ABACUS_SOURCE_DIR})
-target_include_directories(abacusCodePdiagMr PUBLIC ${ABACUS_SOURCE_DIR})
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
 
 add_executable(${ABACUS_BIN_NAME}
     ${ABACUS_SOURCE_DIR}/main.cpp
@@ -595,7 +452,6 @@ add_executable(${ABACUS_BIN_NAME}
     $<TARGET_OBJECTS:abacusCodePdiagMr>
 )
 target_link_libraries(${ABACUS_BIN_NAME}
-<<<<<<< HEAD
     -lgfortran
     -lm
     ELPA::ELPA
@@ -606,21 +462,3 @@ target_link_libraries(${ABACUS_BIN_NAME}
     OpenMP::OpenMP_CXX
     Threads::Threads
 )
-
-install(PROGRAMS ${ABACUS_BIN_NAME}
-    TYPE BIN
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    RENAME ${PROJECT_NAME}
-)
-=======
-    ${EXTERNAL_LIB_NAMES}
-    MPI::MPI_CXX
-    OpenMP::OpenMP_CXX
-    BLAS::BLAS
-    Threads::Threads
-)
-target_link_directories(${ABACUS_BIN_NAME}
-    PUBLIC ${EXTERNAL_LIB_DIRS}
-)
-
->>>>>>> 16ce6c7 (Add cmake config for ABACUS MPI.)
