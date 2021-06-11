@@ -461,3 +461,9 @@ target_link_libraries(${ABACUS_BIN_NAME}
     OpenMP::OpenMP_CXX
     Threads::Threads
 )
+
+install(PROGRAMS ${ABACUS_BIN_NAME}
+    TYPE BIN
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    RENAME ${PROJECT_NAME}
+)
