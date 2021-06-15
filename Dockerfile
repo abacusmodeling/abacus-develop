@@ -1,19 +1,46 @@
-FROM ubuntu:20.04
+FROM debian:buster-slim
 
-SHELL ["/bin/bash", "-c"]
+LABEL org.opencontainers.image.source https://github.com/darelbeida/abacus-develop
 
-RUN export DEBIAN_FRONTEND=noninteractive && apt update && \
-    apt install -y wget gnupg gcc g++ gfortran cmake pkg-config build-essential git && \
-    wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
-    apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
-    rm GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB && \
-    echo "deb https://apt.repos.intel.com/oneapi all main" | tee -a /etc/apt/sources.list && \
-    apt update && \
-    apt install -y intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic intel-oneapi-compiler-fortran intel-oneapi-mkl-devel intel-oneapi-mpi-devel
+RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libboost-dev libssl-dev make ssh vim wget \
+    && apt-get install -y --no-install-recommends mpich libmpich-dev
 
-RUN cd /opt/intel/oneapi/ && \
-    rm -r conda_channel debugger dev-utilities tbb compiler/2021.2.0/linux/lib mpi/2021.2.0/lib/release mpi/2021.2.0/lib/release_mt mpi/2021.2.0/lib/debug_mt && \
-    cd compiler/2021.2.0/linux/bin && find . -maxdepth 1 -type f -delete && cd ../../../.. && \
-    mkdir mkl/2021.2.0/lib/tmp && cd mkl/2021.2.0/lib/tmp && \
-    mv ../intel64/* ./ && mv libmkl_avx2.so.1 libmkl_avx512.so.1 libmkl_core.so* libmkl_intel_lp64.so* libmkl_blacs_intelmpi_lp64.so libmkl_intel_thread.so* libmkl_scalapack_lp64.so* locale ../intel64/ && \
-    cd ../../../.. && rm -r mkl/2021.2.0/lib/tmp
+ENV GIT_SSL_NO_VERIFY 1
+
+RUN cd /tmp \
+    && wget https://cmake.org/files/v3.18/cmake-3.18.4.tar.gz --no-check-certificate \
+    && tar xf cmake-3.18.4.tar.gz cmake-3.18.4/ && cd cmake-3.18.4 \
+    && ./configure && make -j8 && make install \
+    && cd /tmp && rm -rf cmake-3.18.4
+
+RUN cd /tmp \
+    && git clone https://github.com/xianyi/OpenBLAS.git --single-branch --depth=1 \
+    && cd OpenBLAS && make NO_AVX512=1 FC=gfortran -j8 && make PREFIX=/usr/local install \
+    && cd /tmp && rm -rf OpenBLAS
+
+RUN cd /tmp \
+    && git clone https://github.com/darelbeida/scalapack.git -b v2.0.2-openblas --single-branch --depth=1 \
+    && cd scalapack && make lib && cp libscalapack.a /usr/local/lib/ \
+    && cd /tmp && rm -rf scalapack
+
+RUN cd /tmp \
+    && git clone https://github.com/darelbeida/elpa.git -b ELPA_2016.05.004-openblas --single-branch --depth=1 \
+    && cd elpa && mkdir build && cd build \
+    && ../configure CFLAGS="-O3 -march=native -mavx2 -mfma -funsafe-loop-optimizations -funsafe-math-optimizations -ftree-vect-loop-version -ftree-vectorize" \
+        FCFLAGS="-O2 -mavx" \
+    && make -j8 && make PREFIX=/usr/local install \
+    && ln -s /usr/local/include/elpa-2016.05.004/elpa /usr/local/include/ \
+    && cd /tmp && rm -rf elpa
+
+RUN cd /tmp \
+    && wget http://www.fftw.org/fftw-3.3.9.tar.gz \
+    && tar zxvf fftw-3.3.9.tar.gz \
+    && cd fftw-3.3.9 \
+    && ./configure --enable-mpi-fortran --enable-orterun-prefix-by-default FC=gfortran \
+    && make -j8 && make PREFIX=/usr/local install \
+    && cd /tmp && rm -rf fftw-3.3.9 && rm fftw-3.3.9.tar.gz
+
+RUN cd /tmp \
+    && git clone https://github.com/USCiLab/cereal.git \
+    && cp -r cereal/include /usr/local \
+    && rm -rf cereal
