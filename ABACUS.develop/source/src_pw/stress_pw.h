@@ -3,7 +3,7 @@
 
 #include "stress_func.h"
 
-class Stress_PW:public Stress_Func
+class Stress_PW: public Stress_Func
 {
 	public :
 	
@@ -14,10 +14,9 @@ class Stress_PW:public Stress_Func
 	void cal_stress(matrix& sigmatot);
 
 	private :
+
 	//call the vdw stress
 	void stress_vdw(matrix& sigma);   //force and stress calculated in vdw together.
-	
-
 
 };
 #endif

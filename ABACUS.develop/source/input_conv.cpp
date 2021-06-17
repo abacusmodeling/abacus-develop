@@ -20,6 +20,7 @@
 #include "src_pw/occupy.h"
 #include "src_io/berryphase.h"
 #include "src_pw/symmetry.h"
+#include "src_lcao/ELEC_evolve.h"
 
 void Input_Conv::Convert(void)
 {
@@ -378,25 +379,25 @@ void Input_Conv::Convert(void)
 		}
 		LSPINORB = INPUT.lspinorb;
 
-		delete[] soc.m_loc;
-		delete[] soc.angle1;
-		delete[] soc.angle2;
-		soc.m_loc = new Vector3<double> [INPUT.ntype];
-		soc.angle1 = new double[INPUT.ntype];
-		soc.angle2 = new double[INPUT.ntype];
+		delete[] mag.m_loc_;
+		delete[] mag.angle1_;
+		delete[] mag.angle2_;
+		mag.m_loc_ = new Vector3<double> [INPUT.ntype];
+		mag.angle1_ = new double[INPUT.ntype];
+		mag.angle2_ = new double[INPUT.ntype];
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
-			soc.angle1[i] = INPUT.angle1[i]/180*PI;
-			soc.angle2[i] = INPUT.angle2[i]/180*PI;
+			mag.angle1_[i] = INPUT.angle1[i]/180*PI;
+			mag.angle2_[i] = INPUT.angle2[i]/180*PI;
 		}
 #ifdef __MPI
-//			Parallel_Common::bcast_double(soc.angle1[i]);
-//			Parallel_Common::bcast_double(soc.angle2[i]);
+//			Parallel_Common::bcast_double(mag.angle1_[i]);
+//			Parallel_Common::bcast_double(mag.angle2_[i]);
 #endif
 	}
 	else{
-		delete[] soc.m_loc;
-		soc.m_loc = new Vector3<double> [INPUT.ntype];
+		delete[] mag.m_loc_;
+		mag.m_loc_ = new Vector3<double> [INPUT.ntype];
 		LSPINORB = false;
 		NONCOLIN = false;
 		DOMAG = false;
@@ -407,15 +408,20 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // Fuxiang He add 2016-10-26
 //----------------------------------------------------------
-	tddft = INPUT.tddft;
-	td_dr2 = INPUT.td_dr2;
-	td_dt = INPUT.td_dt;
-	td_force_dt = INPUT.td_force_dt;
-	val_elec_01 = INPUT.val_elec_01;
-	val_elec_02 = INPUT.val_elec_02;
-	val_elec_03 = INPUT.val_elec_03;
-	vext = INPUT.vext;
-	vext_dire = INPUT.vext_dire;	
+	ELEC_evolve::tddft = INPUT.tddft;
+	ELEC_evolve::td_dr2 = INPUT.td_dr2;
+	ELEC_evolve::td_dt = INPUT.td_dt;
+	ELEC_evolve::td_force_dt = INPUT.td_force_dt;
+	ELEC_evolve::td_val_elec_01 = INPUT.td_val_elec_01;
+	ELEC_evolve::td_val_elec_02 = INPUT.td_val_elec_02;
+	ELEC_evolve::td_val_elec_03 = INPUT.td_val_elec_03;
+	ELEC_evolve::td_vext = INPUT.td_vext;
+	ELEC_evolve::td_vext_dire = INPUT.td_vext_dire;	
+	ELEC_evolve::td_timescale = INPUT.td_timescale;
+	ELEC_evolve::td_vexttype = INPUT.td_vexttype;
+	ELEC_evolve::td_vextout = INPUT.td_vextout;
+	ELEC_evolve::td_dipoleout = INPUT.td_dipoleout;
+
 
 
 	// jiyy add 2020.10.11	

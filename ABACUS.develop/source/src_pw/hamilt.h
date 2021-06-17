@@ -2,7 +2,6 @@
 #define HAMILT_H
 
 #include "tools.h"
-#include "../module_ORB/ORB_control.h"
 #include "hamilt_pw.h"
 
 class Hamilt
@@ -18,19 +17,34 @@ class Hamilt
 
     void clear_after_ions(void);
 
-    void cinitcgg(const int ik, const int nstart,const int nbnd,
-                  const ComplexMatrix &psi,ComplexMatrix &evc,double *en);
+	// diagH_subspace then full space in pw
+    void diagH_pw(
+		const int &istep,
+		const int &iter,
+		const int &ik,
+		const double *precondition,
+		double &avg_iter);
 
-    void diago(const int &istep,const int &iter,const int &ik,
-               const double *precondition,double &avg_iter);
+	// generate H and S then call diagH_subspace
+    void diagH_subspace(
+		const int ik, 
+		const int nstart,
+		const int nbnd,
+		const ComplexMatrix &psi,
+		ComplexMatrix &evc,
+		double *en);
 
-    void cdiaghg(const int n,const int m,const ComplexMatrix &hc,const ComplexMatrix &sc,
-                 const int ldh,double *e,ComplexMatrix &hvec);
+	// be called by diagH_subspace
+    void diagH_LAPACK(
+		const int n,
+		const int m,
+		const ComplexMatrix &hc, // Hamiltonian matrix
+		const ComplexMatrix &sc, // overlap matrix
+		const int ldh,
+		double *e, // output: eigenvalues
+		ComplexMatrix &hvec); // output: eigenvectors
 
     Hamilt_PW hpw;
-	
-	// mohan update 2021-02-10
-	ORB_control orb_con;
 
 private:
 

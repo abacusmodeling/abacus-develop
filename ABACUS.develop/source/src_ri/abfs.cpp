@@ -401,7 +401,7 @@ map<size_t,vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
 	const Vector3<double> &tau = ucell.atoms[it].tau[ia];
 	
 	map<size_t,vector<Vector3_Order<int>>> adjs;
-	GridD.Find_atom( tau, it, ia );
+	GridD.Find_atom(ucell,  tau, it, ia );
 	for( int ad=0; ad<GridD.getAdjacentNum()+1; ++ad )
 	{
 		const size_t it_ad = GridD.getType(ad);

@@ -7,6 +7,7 @@
 
 #include "../src_pw/tools.h"
 #include "sltk_atom.h"
+#include "../src_pw/unitcell.h"
 
 class Atom_input
 {
@@ -16,16 +17,18 @@ public:
 //==========================================================
 	Atom_input
 	(
-	    const int amount = 0,	//number of atoms
+		const UnitCell &ucell,
+		const int amount = 0,	//number of atoms
 	    const int ntype = 0,	//number of atom_types
 	    const bool boundary = 1,	// 1 : periodic ocndition
-	    const double radius_in = 0// searching radius
+		const double radius_in = 0, // searching radius
+		const int &test_atom_in = 0	//caoyu reconst 2021-05-24
 	);
 	~Atom_input();
 //==========================================================
 // Manipulators
 //==========================================================
-	void operator>>(FAtom& a)const ;
+	void set_FAtom(const UnitCell &ucell, FAtom& a)const ;
 
 	double vec1[3];
 	double vec2[3];
@@ -120,6 +123,7 @@ public:
 	int getGrid_layerZ_minus(void) const { return glayerZ_minus;}
 
 private:
+	int test_atom_input;	//caoyu reconst 2021-05-24
 	int d_amount;//number of atoms.
 	int d_amount_expand;
 	bool periodic_boundary;
@@ -141,7 +145,7 @@ private:
 // MEMBRE FUNCTION :
 // NAME : Check_Expand_Condition
 //==========================================================
-	void Check_Expand_Condition(void);
+	void Check_Expand_Condition(const UnitCell& ucell);
 	bool expand_flag;
 	int glayerX;
 	int glayerX_minus;
@@ -153,7 +157,7 @@ private:
 // MEMBRE FUNCTION :
 // NAME : Expand_Grid
 //==========================================================
-	void Expand_Grid(const int ntype);
+	void Expand_Grid(const UnitCell& ucell, const int ntype);
 	double* store_x;
 	double* store_y;
 	double* store_z;
@@ -180,7 +184,7 @@ private:
 // MEMBRE FUNCTION :
 // NAME : Load_atom
 //==========================================================
-	void Load_atom(void)const;
+	void Load_atom(const UnitCell& ucell)const;
 	mutable int d_current;
 	mutable double x;
 	mutable double y;

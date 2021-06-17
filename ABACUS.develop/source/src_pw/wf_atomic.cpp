@@ -4,6 +4,7 @@
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
 #include "../src_global/math_ylmreal.h"
+#include "src_pw/soc.h"
 
 WF_atomic::WF_atomic()
 {
@@ -292,6 +293,8 @@ void WF_atomic::atomic_wfc
                     {
                         if(ucell.atoms[it].has_so)
                         {
+                            Soc soc;
+						    soc.rot_ylm(l+1);
                             const double j = ucell.atoms[it].jchi[iw];
                             if ( !(DOMAG||DOMAG_Z))
                             {//atomic_wfc_so
@@ -360,8 +363,8 @@ void WF_atomic::atomic_wfc
                                  }
                               }
                               //and construct the starting wavefunctions as in the noncollinear case.
-                              alpha = soc.angle1[it];
-                              gamma = -1 * soc.angle2[it] + 0.5 * PI;
+                              alpha = mag.angle1_[it];
+                              gamma = -1 * mag.angle2_[it] + 0.5 * PI;
 
                               for(int m = 0;m<2*l+1;m++)
                               {
@@ -396,8 +399,8 @@ void WF_atomic::atomic_wfc
                         {//atomic_wfc_nc
                             double alpha, gamman;
                             complex<double> fup, fdown;
-                            alpha = soc.angle1[it];
-                            gamman = -soc.angle2[it] + 0.5*PI;
+                            alpha = mag.angle1_[it];
+                            gamman = -mag.angle2_[it] + 0.5*PI;
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;

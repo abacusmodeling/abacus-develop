@@ -164,8 +164,8 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				{
 					v(0,ir) -= 0.5 * (dh[0][ir] + dh[1][ir]);
 					const double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
-					const double neg = (soc.lsign
-					                 && rho_in[1][ir]*soc.ux[0]+rho_in[2][ir]*soc.ux[1]+rho_in[3][ir]*soc.ux[2]<=0)
+					const double neg = (mag.lsign_
+					                 && rho_in[1][ir]*mag.ux_[0]+rho_in[2][ir]*mag.ux_[1]+rho_in[3][ir]*mag.ux_[2]<=0)
 									 ? -1 : 1;
 					if(amag > vanishing_charge)
 					{
@@ -337,14 +337,14 @@ Potential_Libxc::cal_input(
 			{
 				if(xcf.igcx||xcf.igcc)
 				{
-					soc.cal_ux(ucell.ntype);
+					mag.cal_ux(ucell.ntype);
 				}
 				for( size_t ir=0; ir!=pw.nrxx; ++ir )
 				{
 					const double amag = sqrt( pow(rho_in[1][ir],2) + pow(rho_in[2][ir],2) + pow(rho_in[3][ir],2) );
-					const double neg = (soc.lsign && rho_in[1][ir]*soc.ux[0]
-					                    +rho_in[2][ir]*soc.ux[1]
-					                    +rho_in[3][ir]*soc.ux[2]<=0)
+					const double neg = (mag.lsign_ && rho_in[1][ir]*mag.ux_[0]
+					                    +rho_in[2][ir]*mag.ux_[1]
+					                    +rho_in[3][ir]*mag.ux_[2]<=0)
 					                   ? -1 : 1;
 					rho[ir*2]   = 0.5 * (rho_in[0][ir] + neg * amag) + 0.5 * rho_core_in[ir];
 					rho[ir*2+1] = 0.5 * (rho_in[0][ir] - neg * amag) + 0.5 * rho_core_in[ir];

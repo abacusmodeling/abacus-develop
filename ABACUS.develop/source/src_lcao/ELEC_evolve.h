@@ -21,6 +21,23 @@ class ELEC_evolve
 	ELEC_evolve();
 	~ELEC_evolve();
 
+	// fuxiang add 2021-05-25
+
+    static int tddft;
+    static double td_dr2;
+    static double td_dt;
+    static double td_force_dt;
+    static int td_val_elec_01;
+    static int td_val_elec_02;
+    static int td_val_elec_03;
+    static int td_vext;
+    static int td_vext_dire;
+	static double td_timescale;
+	static int td_vexttype;
+	static int td_vextout;
+	static int td_dipoleout;
+
+
 	private:
 
 	static void evolve_psi(const int &istep, LCAO_Hamilt &uhm, complex<double>*** wfc);

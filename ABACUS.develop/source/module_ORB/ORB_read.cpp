@@ -4,12 +4,13 @@
 #include "../src_global/math_integral.h"
 #include "../src_global/tool_check.h"
 #include <algorithm>
+#include "src_pw/soc.h"
 using namespace std;
 
 //==============================
 // Define an object here! 
 //==============================
-// PLEASE avoid using 'ORB' as global variable 
+/// PLEASE avoid using 'ORB' as global variable 
 // mohan note 2021-03-23
 LCAO_Orbitals ORB;
 
@@ -124,9 +125,9 @@ void LCAO_Orbitals::Read_Orbitals(
 	ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
 	ofs_in << "\n\n\n\n";	
 
-	//--------------------------
-	//(1) check dk, dR, Rmax.
-	//--------------------------
+	//////////////////////
+	/// (1) check dk, dR, Rmax.
+	//////////////////////
 
 	ofs_in << "\n SETUP ONE DIMENSIONAL ORBITALS/POTENTIAL" << endl;
 
@@ -148,21 +149,21 @@ void LCAO_Orbitals::Read_Orbitals(
     assert(dR > 0.0);
     assert(Rmax > 0.0);
 
-	// ntype: number of atom species
+	/// ntype: number of atom species
 	this->ntype = ntype_in; 
 	assert(ntype>0);
 
-	// lmax: lmax used in local orbitals as basis sets
+	/// lmax: lmax used in local orbitals as basis sets
 	assert(lmax_in>=0); // mohan add 2021-04-16
 	this->lmax = lmax_in;
 
-	//-------------------------------------------------
-	//(2) set the kmesh according to ecutwfc and dk. 
-	//-------------------------------------------------
+	//////////////////////////////////////////////////////////
+	/// (2) set the kmesh according to ecutwfc and dk. 
+	//////////////////////////////////////////////////////////
 
 	//-----------------------------------------------------------------
-	// calculate number of k mesh according to energy cutoff.
-	// Mohan choose ecutwfc according to interpolation requirement.
+	/// calculate number of k mesh according to energy cutoff.
+	/// Mohan choose ecutwfc according to interpolation requirement.
 	//	cout << " ecutwfc=" << ecutwfc << endl;
 	//LiuXh modified 2016-01-25, 2016-07-20
 	if(ecutwfc< 20)
@@ -195,7 +196,9 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->Phi = new Numerical_Orbital[ntype];
 	for(int it=0; it<ntype; it++)
 	{
-		this->Read_PAO(ofs_in, it, force_flag, my_rank);	
+		this->Read_PAO(ofs_in, it, force_flag, my_rank);
+		//caoyu add 2021-05-24	to reconstruct atom_arrange::set_sr_NL
+		this->rcutmax_Phi = std::max(this->rcutmax_Phi, this->Phi[it].getRcut());
 	}
 
 	
@@ -235,16 +238,18 @@ void LCAO_Orbitals::Read_Orbitals(
 			this->Set_NonLocal(it, this->nproj[it]);
 		}
 #endif
-		this->nprojmax = std::max( this->nprojmax, this->nproj[it] );
+		this->nprojmax = std::max(this->nprojmax, this->nproj[it]);
+		//caoyu add 2021-05-24 to reconstruct atom_arrange::set_sr_NL
+		this->rcutmax_Beta = std::max(this->rcutmax_Beta, this->Beta[it].get_rcut_max());
 	}
 
 	ofs_in << " max number of nonlocal projetors among all species is " << nprojmax << endl; 
 
 	//caoyu add 2021-3-16
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	//~~~~~~~~~~~~~~~~~~~~~~   3    ~~~~~~~~~~~~~~~~~~~~~~~~~
-	// Read in numerical basis for descriptor.
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	///>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+	///~~~~~~~~~~~~~~~~~~~~~~   3    ~~~~~~~~~~~~~~~~~~~~~~~~~
+	/// Read in numerical basis for descriptor.
+	///>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 	if (out_descriptor>0)	//condition: descriptor in lcao line
@@ -279,14 +284,12 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
 
-// PLEASE avoid using capital letters for local variables
-// mohan note 2021-03-23 
 	const int nh = atom->nh;//zhengdy-soc
 
 	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
-	ComplexMatrix Coefficient_D_in_so(nh*2, nh*2);//zhengdy-soc
+	ComplexMatrix coefficient_D_nc_in(nh*2, nh*2);//zhengdy-soc
 
 	if(!atom->has_so)
 	{
@@ -346,7 +349,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			tmpBeta_lm);//LiuXh 2016-01-14, 2016-07-19
 
 		// mohan add 2021-05-07
-		atom->set_d_so(Coefficient_D_in_so,n_projectors,0,0);
+		atom->set_d_so(coefficient_D_nc_in,n_projectors,0,0);
 	}
 	else//added by zhengdy-soc
 	{
@@ -355,7 +358,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		{
 			lmaxkb = max( lmaxkb, atom->lll[ibeta]);
 		}
-
+		Soc soc;
 		soc.rot_ylm(lmaxkb);
 		soc.fcoef.create(ucell.ntype, atom->nh, atom->nh);
 
@@ -386,7 +389,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 										m1, m2,
 										j1, j2,
 										it, ip1, ip2);
-									Coefficient_D_in_so(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) 
+									coefficient_D_nc_in(ip1 + nh*is1, ip2 + nh*is2) = atom->dion(p1,p2) 
 									* soc.fcoef(it, is1, is2, ip1, ip2);
 									if(p1 != p2) 
 									{
@@ -452,7 +455,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			tmpBeta_lm);//zhengdy-soc 2018-09-10
 
 		// mohan add 2021-05-07
-		atom->set_d_so(Coefficient_D_in_so,n_projectors,nh,1);
+		atom->set_d_so(coefficient_D_nc_in,n_projectors,nh,1);
 
 	}//end if
 
@@ -564,8 +567,8 @@ void LCAO_Orbitals::Read_NonLocal(
 	// this needed to be modified.	
 	//-------------------------------------------
 	int nproj_allowed = nlmax+1;
-	matrix Coefficient_D_in(nproj_allowed, nproj_allowed);
-	ComplexMatrix Coefficient_D_in_so(nproj_allowed*2, nproj_allowed*2);
+	matrix coefficient_D_in(nproj_allowed, nproj_allowed);
+	ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
 
 //	OUT(ofs_running,"nproj_allowed",nproj_allowed);
 
@@ -590,9 +593,9 @@ void LCAO_Orbitals::Read_NonLocal(
 					assert(L1_read <= nlmax);
 					assert(L2_read <= nlmax);
                 	
-					ifs >> Coefficient_D_in(L1_read, L2_read);
+					ifs >> coefficient_D_in(L1_read, L2_read);
 					
-//					ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << Coefficient_D_in(L1_read,L2_read) << endl;
+//					ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << endl;
             	}
         	}
 			SCAN_END(ifs,"</DIJ>");
@@ -601,7 +604,7 @@ void LCAO_Orbitals::Read_NonLocal(
 
 #ifdef __MPI
 	Parallel_Common::bcast_int(n_projectors); // mohan add 2010-12-20
-//	Parallel_Common::bcast_double(Coefficient_D_in.c, Coefficient_D_in.nr * Coefficient_D_in.nc);
+//	Parallel_Common::bcast_double(coefficient_D_in.c, coefficient_D_in.nr * coefficient_D_in.nc);
 #endif
 
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
@@ -719,8 +722,8 @@ void LCAO_Orbitals::Read_NonLocal(
 //-------------------------------------------------------
 // mohan note 2021-04-26
 // to_caoyu: 
-// 1) read in lmaxt and nchi directly from orbital files
-// 2) pass nchi to phi via this->Phi[it].set_orbital_info 
+// 1. read in lmaxt and nchi directly from orbital files
+// 2. pass nchi to phi via this->Phi[it].set_orbital_info 
 // be careful! nchi[l] may be different for differnt phi
 //-------------------------------------------------------
 void LCAO_Orbitals::Read_PAO(

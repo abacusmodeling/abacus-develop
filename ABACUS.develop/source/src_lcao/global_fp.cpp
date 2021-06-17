@@ -1,7 +1,7 @@
 #include "global_fp.h"
 #include "src_pw/global.h"
 
-Grid_Driver GridD;
+Grid_Driver GridD(test_deconstructor, test_grid_driver,test_grid);
 Parallel_Orbitals ParaO;
 Local_Orbital_Charge LOC;
 Local_Orbital_wfc LOWF;

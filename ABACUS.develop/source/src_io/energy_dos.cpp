@@ -323,11 +323,11 @@ void energy::perform_dos(void)
 			}//if
 			else
 			{
-				atom_arrange::set_sr_NL();
-				atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+				SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
+				atom_arrange::search(GridD, ucell, SEARCH_RADIUS, test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
-				hm.orb_con.set_orb_tables(
+				LOWF.orb_con.set_orb_tables(
 						ofs_running,
 						UOT, 
 						ORB,
@@ -422,10 +422,10 @@ void energy::perform_dos(void)
 					}//if                       
 				}//ik
 #ifdef __MPI
-				atom_arrange::delete_vector( SEARCH_RADIUS );
+				atom_arrange::delete_vector(GridD, ucell, SEARCH_RADIUS, test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+				LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
@@ -744,12 +744,15 @@ void energy::perform_dos(void)
 	}
 	if(this->out_band) //pengfei 2014-10-13
 	{
-
-		int nks;
-		if(nspin0==1) nks = kv.nkstot;
-		else if(nspin0==2) nks = kv.nkstot/2;
-
-
+		int nks=0;
+		if(nspin0==1) 
+		{
+			nks = kv.nkstot;
+		}
+		else if(nspin0==2) 
+		{
+			nks = kv.nkstot/2;
+		}
 
 		for(int is=0; is<nspin0; is++)
 		{

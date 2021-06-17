@@ -16,6 +16,10 @@ double Electrons::avg_iter = 0;
 
 Electrons::Electrons()
 {
+    iter = 0;
+    test = 0;
+    unit = 0;
+    delta_total_energy = 0.0;
 }
 
 Electrons::~Electrons()
@@ -342,14 +346,8 @@ void Electrons::self_consistent(const int &istep)
             WF_io::write_wfc2( ssw.str(), wf.evc, pw.gcar);
             //DONE(ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
-        if(vext == 0) 
-		{
+
 			pot.set_vr_eff();
-		}
-        else 
-		{
-			pot.set_vrs_tddft(istep);
-		}
 
         //print_eigenvalue(ofs_running);
         en.calculate_etot();
@@ -495,14 +493,14 @@ void Electrons::c_bands(const int &istep)
 
         //============================================================
         // diago the hamiltonian!!
-        // In plane wave method, firstly using cinitcgg to diagnolize,
+        // In plane wave method, firstly using diagH_subspace to diagnolize,
         // then using cg method.
         //
         // In localized orbital presented in plane wave case,
-        // only using cinitcgg.
+        // only use diagH_subspace.
         //=============================================================
         double avg_iter_k = 0.0;
-        hm.diago(istep, this->iter, ik, h_diag, avg_iter_k);
+        hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
 
         avg_iter += avg_iter_k;
 

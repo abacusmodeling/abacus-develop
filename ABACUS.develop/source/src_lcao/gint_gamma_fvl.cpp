@@ -1,4 +1,5 @@
 #include "gint_gamma.h"
+#include "gint_tools.h"
 #include "grid_technique.h"
 #include "../module_ORB/ORB_read.h"
 #include "../src_pw/global.h"
@@ -512,12 +513,8 @@ void Gint_Gamma::gamma_force(void)
     const double delta_r = ORB.dr_uniform;
 
     int LD_pool=max_size*ucell.nwmax;
-    double* psir_ylm_pool;
-    double* psir_vlbr3_pool;
     double* dphi_pool;
     
-    double** psir_ylm;
-    double** psir_vlbr3;
     double** dphix;
     double** dphiy;
     double** dphiz;
@@ -533,16 +530,9 @@ void Gint_Gamma::gamma_force(void)
         goto ENDandRETURN;
     }*/
     if(max_size>0 && GridT.lgd > 0)
-    {
-    
-        psir_ylm_pool=new double [pw.bxyz*LD_pool];
-        ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
-        psir_vlbr3_pool=new double[pw.bxyz*LD_pool];
-        ZEROS(psir_vlbr3_pool, pw.bxyz*LD_pool);
+    {    
         dphi_pool=new double [3*pw.bxyz*LD_pool];
         ZEROS(dphi_pool, 3*pw.bxyz*LD_pool);
-        psir_ylm = new double*[pw.bxyz];
-        psir_vlbr3=new double *[pw.bxyz];
         dphix = new double*[pw.bxyz];
         dphiy = new double*[pw.bxyz];
         dphiz = new double*[pw.bxyz];    
@@ -550,8 +540,6 @@ void Gint_Gamma::gamma_force(void)
         cal_flag=new bool*[pw.bxyz];
         for(int i=0; i<pw.bxyz; i++)
         {
-            psir_ylm[i] = &psir_ylm_pool[i*LD_pool];
-            psir_vlbr3[i]=&psir_vlbr3_pool[i*LD_pool];
             dphix[i] = &dphi_pool[i*LD_pool];
             dphiy[i] = &dphi_pool[i*LD_pool+pw.bxyz*LD_pool];
             dphiz[i] = &dphi_pool[i*LD_pool+2*pw.bxyz*LD_pool];
@@ -603,20 +591,23 @@ void Gint_Gamma::gamma_force(void)
 					//------------------------------------------------------
 					// index of wave functions for each block
 					//------------------------------------------------------
-					int *block_iw = get_block_iw(na_grid, grid_index, this->max_size);
+					int *block_iw = Gint_Tools::get_block_iw(na_grid, grid_index, this->max_size);
 					
-					int* block_index = get_colidx(na_grid, grid_index);
+					int* block_index = Gint_Tools::get_block_index(na_grid, grid_index);
 					
 					//------------------------------------------------------
 					// band size: number of columns of a band
 					//------------------------------------------------------------------
-					int* block_size = get_bsize(na_grid, grid_index);
+					int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
+
+					Gint_Tools::Array_Pool<double> psir_vlbr3(pw.bxyz, LD_pool);
+					Gint_Tools::Array_Pool<double> psir_ylm(pw.bxyz, LD_pool);
     
                     cal_psir_ylm_dphi(na_grid, grid_index, delta_r, 
-                            block_index, block_size, cal_flag, psir_ylm, dphix, dphiy, dphiz, drr);
+                            block_index, block_size, cal_flag, psir_ylm.ptr_2D, dphix, dphiy, dphiz, drr);
     
                     cal_meshball_DGridV(na_grid, GridT.lgd, LD_pool, block_index, block_iw, block_size, cal_flag, vldr3, 
-                                psir_ylm, psir_vlbr3, dphix,  dphiy, dphiz, 
+                                psir_ylm.ptr_2D, psir_vlbr3.ptr_2D, dphix,  dphiy, dphiz, 
                                 DGridV_x, DGridV_y, DGridV_z,
                                 DGridV_11, DGridV_12, DGridV_13,
                                 DGridV_22, DGridV_23, DGridV_33, drr);
@@ -634,10 +625,6 @@ void Gint_Gamma::gamma_force(void)
         delete[] dphiy;
         delete[] dphiz;
         delete[] dphi_pool;
-        delete[] psir_ylm;
-        delete[] psir_ylm_pool;
-        delete[] psir_vlbr3;
-        delete[] psir_vlbr3_pool;
         for(int ib=0; ib<pw.bxyz; ++ib)
 		{
             delete[] cal_flag[ib];

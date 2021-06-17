@@ -25,9 +25,6 @@ void Run_MD::opt_cell(void)
 {
 	TITLE("Run_MD","opt_cell");
 
-
-	
-
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
     // npwx may change according to cell change
@@ -190,7 +187,7 @@ void Run_MD::opt_ions(void)
     if(istep>1) final_scf();
 
 	// mohan update 2021-02-10
-    hm.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
     timer::tick("Run_MD","opt_ions",'B'); 
     return;
@@ -202,8 +199,8 @@ void Run_MD::final_scf(void)
 
     FINAL_SCF = true;
     Variable_Cell::final_calculation_after_vc();
-    atom_arrange::set_sr_NL();
-    atom_arrange::search( SEARCH_RADIUS );
+    SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
+    atom_arrange::search(GridD, ucell, SEARCH_RADIUS, test_atom_input);
     GridT.set_pbc_grid(
         pw.ncx, pw.ncy, pw.ncz,
         pw.bx, pw.by, pw.bz,

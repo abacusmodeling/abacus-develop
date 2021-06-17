@@ -45,7 +45,7 @@ private:
 	static int trueX;
 	static int trueY;
 	static int trueZ;
-//==========================================================
+	//==========================================================
 // MEMBER STATIC FUNCTION :
 // NAME : index
 // NAME : index_expand
@@ -87,7 +87,8 @@ public:
 	    const int box_x,
 	    const int box_y,
 	    const int box_z,
-	    const int offset
+		const int offset,
+		const int& test_grid_in
 	);
 
 	static void getBox

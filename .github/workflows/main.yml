@@ -1,14 +1,38 @@
-on: [push]
-
+on: [push, pull_request]
+env:
+  PREFIX: ABACUS.develop
+  BIN: ABACUS
 jobs:
-  main:
-    env:
-      ITK: ghcr.io/tansongchen/itk
+  build_dockerfile:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
-      - uses: actions/checkout@v2
-      - run: echo ${{ secrets.PAT }} | docker login ghcr.io -u tansongchen --password-stdin
-      - run: docker pull ${{ env.ITK }}
-      - run: docker build . -t ${{ env.ITK }} --cache-from=${{ env.ITK }}
-      - run: docker run -v $GITHUB_WORKSPACE:/code -w /code ${{ env.ITK }} bash entrypoint.sh
-      - run: docker push ${{ env.ITK }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/darelbeida/abacus_debian10_gnu:latest
+          cache-from: type=registry,ref=ghcr.io/darelbeida/abacus_debian10_gnu:latest
+          cache-to: type=inline
+
+  build_and_test:
+    runs-on: ubuntu-latest
+    container: ghcr.io/darelbeida/abacus_debian10_gnu:latest
+    needs: build_dockerfile
+    steps:
+      - name: Download source codes
+        uses: actions/checkout@v2
+      - name: Build
+        run: cd ${PREFIX} && mkdir build && cd build && cmake ../cmake && make -j4 && make install
+      - name: Test single
+        run: |
+          cd ${PREFIX}/tests/
+          cd 103_PW_15_CS_CF/
+          ${BIN}

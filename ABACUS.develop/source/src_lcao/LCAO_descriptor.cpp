@@ -84,7 +84,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
         {
             tau1 = atom1->tau[I1];
             //GridD.Find_atom(tau1);
-            GridD.Find_atom(tau1, T1, I1);
+            GridD.Find_atom(ucell, tau1, T1, I1);
 
             for (int ad = 0; ad < GridD.getAdjacentNum() + 1; ++ad)
             {
