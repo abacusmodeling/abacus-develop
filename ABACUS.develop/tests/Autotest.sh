@@ -62,8 +62,10 @@ check_out(){
 		#--------------------------------------------------
 		# If deviation < threshold, then the test passes,
 		# otherwise, the test prints out warning
+		# Daye Zheng found bug on 2021-06-20,
+		# deviation should be positively defined
 		#--------------------------------------------------
-		if [ $(echo "$deviation < $threshold"|bc) = 0 ]; then
+		if [ $(echo "sqrt($deviation*$deviation) < $threshold"|bc) = 0 ]; then
 			echo " *************"
 			echo -e "\e[1;31m Incorrect :(  \e[0m"
 			echo " *************"
