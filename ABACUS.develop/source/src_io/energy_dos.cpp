@@ -4,7 +4,7 @@
 #include "src_io/mulliken_charge.h"
 #include "src_lcao/LCAO_nnr.h"
 #include "src_lcao/LCAO_gen_fixedH.h"    
-#include "src_global/sltk_atom_arrange.h"//qifeng-2019-01-21
+#include "module_neighbor/sltk_atom_arrange.h"//qifeng-2019-01-21
 #include "src_lcao/local_orbital_charge.h"
 #include "src_pw/global.h"
 #include "src_pw/wavefunc.h"

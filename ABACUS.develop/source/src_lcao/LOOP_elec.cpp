@@ -7,10 +7,10 @@
 #include "LCAO_evolve.h"
 #include "dftu.h"
 //
-#include "../src_global/sltk_atom_arrange.h"
+#include "module_neighbor/sltk_atom_arrange.h"
 #include "src_lcao/LCAO_nnr.h"
-#include "../src_io/istate_charge.h"
-#include "../src_io/istate_envelope.h"
+#include "src_io/istate_charge.h"
+#include "src_io/istate_envelope.h"
 #include "ELEC_scf.h"
 #include "ELEC_nscf.h"
 #include "ELEC_cbands_gamma.h"

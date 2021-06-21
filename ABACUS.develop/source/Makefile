@@ -9,6 +9,7 @@ include Makefile.Objects
 
 VPATH=./src_global\
 :./module_ORB\
+:./module_neighbor\
 :./src_pw\
 :./src_lcao\
 :./src_ions\

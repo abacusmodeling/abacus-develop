@@ -3,7 +3,7 @@
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_pw/forces.h"
 #include "src_pw/stress_pw.h"
-#include "src_global/sltk_atom_arrange.h"
+#include "module_neighbor/sltk_atom_arrange.h"
 
 bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 {

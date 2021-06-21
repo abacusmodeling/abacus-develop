@@ -11,7 +11,7 @@
 #include "src_ri/exx_abfs.h"
 #include "src_ri/exx_opt_orb.h"
 #include "ELEC_scf.h"
-#include "src_global/sltk_atom_arrange.h"
+#include "module_neighbor/sltk_atom_arrange.h"
 #include "src_pw/vdwd2.h"
 
 Run_MD::Run_MD()
