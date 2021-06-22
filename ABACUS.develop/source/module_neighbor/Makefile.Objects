@@ -5,9 +5,9 @@
 VERSION= ABACUS-neighbor
 HEADERS= *.h
 
-OBJS_BASE=
+OBJS_BASE=tool_quit.o\
 
-OBJS_ADJACENT=sltk_adjacent_set.o\
+OBJS_NEIGHBOR=sltk_adjacent_set.o\
 sltk_atom_arrange.o\
 sltk_atom.o\
 sltk_atom_input.o\

@@ -1,8 +1,13 @@
 #include "sltk_grid_driver.h"
 #include "../src_pw/tools.h"
 
-Grid_Driver::Grid_Driver(const int &test_d_in, const int &test_gd_in, const int &test_grid_in)
-:test_deconstructor(test_d_in),test_grid_driver(test_gd_in),Grid(test_grid_in)
+Grid_Driver::Grid_Driver(
+	const int &test_d_in, 
+	const int &test_gd_in, 
+	const int &test_grid_in)
+:test_deconstructor(test_d_in),
+test_grid_driver(test_gd_in),
+Grid(test_grid_in)
 {
 	//	TITLE("Grid_Driver","Grid_Driver");
 	ntype = new int[1];
@@ -13,27 +18,27 @@ Grid_Driver::Grid_Driver(const int &test_d_in, const int &test_gd_in, const int 
 
 Grid_Driver::~Grid_Driver()
 {
-	if(test_deconstructor)
-	{
-		cout << " ~Grid_Driver" << endl;
-	}
 	delete [] ntype;
 	delete [] natom;
 	delete [] adjacent_tau;
 	delete [] box;
 }
 
-//void Grid_Driver::Find_atom(const Vector3<double> &cartesian_pos)const
-void Grid_Driver::Find_atom(const UnitCell &ucell, const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
+
+void Grid_Driver::Find_atom(
+	const UnitCell &ucell, 
+	const Vector3<double> &cartesian_pos, 
+	const int &ntype, 
+	const int &nnumber)const
 {
-	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_atom");
+	//if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_atom");
 	timer::tick("Grid_Driver","Find_atom");
 
 	if (test_grid_driver > 1)
 	{
-		ofs_running << " Atom cartesian_pos = " << cartesian_pos.x
-		<< " " << cartesian_pos.y
-		<< " " << cartesian_pos.z << endl;
+//		ofs_running << " Atom cartesian_pos = " << cartesian_pos.x
+//		<< " " << cartesian_pos.y
+//		<< " " << cartesian_pos.z << endl;
 	}
 
 //----------------------------------------------------------
@@ -52,11 +57,14 @@ void Grid_Driver::Find_atom(const UnitCell &ucell, const Vector3<double> &cartes
 	return;
 }
 
-//int Grid_Driver::Locate_offset(const Vector3<double> &cartesian_pos)const
-int Grid_Driver::Locate_offset(const UnitCell &ucell, const Vector3<double> &cartesian_pos, const int &ntype, const int &nnumber)const
-//ywcui add 08-8-4
+
+int Grid_Driver::Locate_offset(
+	const UnitCell &ucell, 
+	const Vector3<double> &cartesian_pos, 
+	const int &ntype, 
+	const int &nnumber)const
 {
-	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Locate_offset");
+//	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Locate_offset");
 
 //----------------------------------------------------------
 // EXPLAIN : Create an AtomLink object
@@ -89,13 +97,18 @@ int Grid_Driver::Locate_offset(const UnitCell &ucell, const Vector3<double> &car
 		}
 	}
 
-	throw runtime_error("Locate_Atom wrong. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));		// Peize Lin update 2019-05-01
-	//	WARNING_QUIT("Locate_Atom", "something wrong!");
+	// Peize Lin update 2019-05-01
+	// throw runtime_error("Locate_Atom wrong. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	// mohan update 2021-06-21
+	WARNING_QUIT("Locate_Atom", "something wrong!");
+
+	return 0; //meaningless mohan add 2021-06-21
+
 }
 
 void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 {
-	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_adjacent_atom");
+//	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_adjacent_atom");
 
 //----------------------------------------------------------
 // CALL OTHER CLASS MEMBER FUNCTION :
@@ -105,7 +118,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 
 	if (test_grid_driver > 1) 
 	{
-		OUT(ofs_running,"adj_num",this->adj_num);
+//		OUT(ofs_running,"adj_num",this->adj_num);
 	}	
 	
 	//cout << "\n length = " << adj_num << endl;
@@ -140,6 +153,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 
 	if (test_grid_driver > 1)
 	{
+/*
 		ofs_running << " "
 		<< setw(15) << "Box"
 		<< setw(8) << "Offset"
@@ -149,6 +163,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 		<< setw(10) << "Y"
 		<< setw(10) << "Z"
 		<< setw(10) << "Distance" << endl;
+*/
 	}
 
 
@@ -173,6 +188,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 		{
 			//if(i<100)
 			{
+/*
 				ofs_running << " "
 				<< setw(5) << box[i].x
 				<< setw(5) << box[i].y
@@ -180,6 +196,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 				<< setw(8) << offset_i
 				<< setw(5) << ntype[i]
 				<< setw(8) << natom[i];
+*/
 			}
 		}
 
@@ -201,10 +218,12 @@ void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 				//if(i<100)
 				{
 					const double distance = Distance(this->atomlink[offset], this->atomlink[offset_i]);
+/*
 					ofs_running << setw(10) << this->atomlink[offset_i].fatom.x()
 					<< setw(10) << this->atomlink[offset_i].fatom.y()
 					<< setw(10) << this->atomlink[offset_i].fatom.z()
 					<< setw(10) << distance << endl;
+*/
 					assert(distance <= this->sradius);
 				}
 			}
@@ -230,10 +249,12 @@ void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
 				if(i<100)
 				{
 					const double distance = this->Distance(this->atomlink[offset], adjacent_tau[i]);
+/*
 					ofs_running << setw(10) << adjacent_tau[i].x
 					<< setw(10) << adjacent_tau[i].y
 					<< setw(10) << adjacent_tau[i].z
 					<< setw(10) << distance;
+*/
 					assert(distance <= this->sradius);
 				}
 			}
@@ -265,6 +286,7 @@ double Grid_Driver::Distance(const AtomLink& a1, const Vector3<double> &adjacent
 	return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
+
 Vector3<double> Grid_Driver::Calculate_adjacent_site
 (
     const short offset,
@@ -286,6 +308,7 @@ Vector3<double> Grid_Driver::Calculate_adjacent_site
 
 	if (test_grid_driver > 3)
 	{
+/*
 		ofs_running << " Offset_i cartesian :" 
 		<< " " << this->atomlink[offset].fatom.x()
 		<< " " << this->atomlink[offset].fatom.y()
@@ -299,6 +322,7 @@ Vector3<double> Grid_Driver::Calculate_adjacent_site
 		<< " " << adjacent_site.y
 		<< " " << adjacent_site.z 
 		<< endl;
+*/
 	}
 
 	return adjacent_site;
