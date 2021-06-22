@@ -282,8 +282,15 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 		force[ion].y =fcs(ion, 1)/2.0;
 		force[ion].z =fcs(ion, 2)/2.0;
 	}
+
 #ifdef __MPI //2015-10-01, xiaohui
-	atom_arrange::delete_vector(SEARCH_PBC, GridD, ucell, SEARCH_RADIUS, test_atom_input);
+	atom_arrange::delete_vector(
+		ofs_running, 
+		SEARCH_PBC, 
+		GridD, 
+		ucell, 
+		SEARCH_RADIUS, 
+		test_atom_input);
 #endif //2015-10-01, xiaohui
 
 	return;

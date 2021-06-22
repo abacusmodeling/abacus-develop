@@ -88,7 +88,7 @@ void atom_arrange::set_sr_OV(void)
 
 void atom_arrange::search(
 	const bool pbc_flag,
-	ofstream &ofs,
+	ofstream &ofs_in,
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 
 	const double &search_radius_bohr, 
@@ -99,11 +99,14 @@ void atom_arrange::search(
 
 	assert( search_radius_bohr > 0.0 );
 
-//	OUT(ofs,"Atom coordinates reading from",global_atom_card);
-//	OUT(ofs,"The coordinate type",ucell.Coordinate);
-//	OUT(ofs,"Use cartesian(unit:lat0) coordinate","TRUE");
-	if(OUT_LEVEL != "m") OUT(ofs,"searching radius is (Bohr))", search_radius_bohr);
-	if(OUT_LEVEL != "m") OUT(ofs,"searching radius unit is (Bohr))",ucell.lat0);
+//	OUT(ofs_in,"Atom coordinates reading from",global_atom_card);
+//	OUT(ofs_in,"The coordinate type",ucell.Coordinate);
+//	OUT(ofs_in,"Use cartesian(unit:lat0) coordinate","TRUE");
+//	if(OUT_LEVEL != "m") OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
+//	if(OUT_LEVEL != "m") OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
+
+	OUT(ofs_in,"searching radius is (Bohr))", search_radius_bohr);
+	OUT(ofs_in,"searching radius unit is (Bohr))",ucell.lat0);
 
 	assert(ucell.nat > 0);
 	//=============================
@@ -112,7 +115,15 @@ void atom_arrange::search(
 
 	const double radius_lat0unit = search_radius_bohr / ucell.lat0;
 
-	Atom_input at(ucell, ucell.nat, ucell.ntype, pbc_flag, radius_lat0unit, test_atom_in);
+	Atom_input at(
+		ofs_in,
+		ucell, 
+		ucell.nat, 
+		ucell.ntype, 
+		pbc_flag, 
+		radius_lat0unit, 
+		test_atom_in);
+
 	//===========================================
 	// Print important information in Atom_input
 	//===========================================
@@ -121,17 +132,17 @@ void atom_arrange::search(
 	//=========================================
 	// Construct Grid , Cells , Adjacent atoms
 	//=========================================
-	grid_d.init(ofs, ucell, at);
+	grid_d.init(ofs_in, ucell, at);
 
 	// test the adjacent atoms and the box.
-	//ofs << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << endl;
+	//ofs_in << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << endl;
 	for (int it = 0;it < ucell.ntype;it++)
 	{
 		for (int ia = 0;ia < ucell.atoms[it].na;ia++)
 		{
 	//		grid_d.Find_atom(ucell.atoms[it].tau[ia]);
 			
-	//		ofs << " " << setw(5) << it << setw(5) << ia << setw(8) << grid_d.getAdjacentNum()+1 << endl;
+	//		ofs_in << " " << setw(5) << it << setw(5) << ia << setw(8) << grid_d.getAdjacentNum()+1 << endl;
 			/*
 			for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
 			{
@@ -151,6 +162,7 @@ void atom_arrange::search(
 
 //2015-05-07
 void atom_arrange::delete_vector(
+	ofstream &ofs_in,
 	const bool pbc_flag, // SEARCH_PBC
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 
@@ -159,7 +171,14 @@ void atom_arrange::delete_vector(
 {
 	const double radius_lat0unit2 = search_radius_bohr / ucell.lat0;
 
-	Atom_input at2(ucell, ucell.nat, ucell.ntype, pbc_flag, radius_lat0unit2, test_atom_in);
+	Atom_input at2(
+		ofs_in,
+		ucell, 
+		ucell.nat, 
+		ucell.ntype, 
+		pbc_flag, 
+		radius_lat0unit2, 
+		test_atom_in);
 
 	grid_d.delete_vector(at2);
 
@@ -180,4 +199,5 @@ void atom_arrange::delete_vector(
 
 		delete[] grid_d.Cell;
 	}
+	return;
 }

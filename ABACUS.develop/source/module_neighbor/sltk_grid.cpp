@@ -271,15 +271,18 @@ void Grid::setBoundaryAdjacent(
 	if (!expand_flag)
 	{
 		//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-		if(OUT_LEVEL != "m") OUT(ofs_in,"average adjacent (per atom)",
-		static_cast<double>(AdjacentSet::call_times)
-		/ static_cast<double>(this->natom));
+		//if(OUT_LEVEL != "m") OUT(ofs_in,"average adjacent (per atom)",
+
+// mohan comment out 2021-06-22
+//		if(OUT_LEVEL != "m") OUT(ofs_in,"average adjacent (per atom)",
+//		static_cast<double>(AdjacentSet::call_times)
+//		/ static_cast<double>(this->natom));
 	}
 	else
 	{
-		if(OUT_LEVEL != "m") OUT(ofs_in,"average adjacent (per atom)",
-		static_cast<double>(AdjacentSet::call_times)
-		/ static_cast<double>(Cell[0][0][0].length));
+//		if(OUT_LEVEL != "m") OUT(ofs_in,"average adjacent (per atom)",
+//		static_cast<double>(AdjacentSet::call_times)
+//		/ static_cast<double>(Cell[0][0][0].length));
 	}
 
 	Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");

@@ -434,7 +434,13 @@ void energy::perform_dos(void)
 					}//if                       
 				}//ik
 #ifdef __MPI
-				atom_arrange::delete_vector(SEARCH_PBC, GridD, ucell, SEARCH_RADIUS, test_atom_input);
+				atom_arrange::delete_vector(
+					ofs_running,
+					SEARCH_PBC, 
+					GridD, 
+					ucell, 
+					SEARCH_RADIUS, 
+					test_atom_input);
 #endif
 				// mohan update 2021-02-10
 				LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);

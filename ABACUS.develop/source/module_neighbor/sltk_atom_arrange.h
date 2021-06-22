@@ -1,7 +1,7 @@
 #ifndef ATOM_ARRANGE_H
 #define ATOM_ARRANGE_H
 
-#include "../src_pw/tools.h"
+//#include "../src_pw/tools.h"
 #include "sltk_grid.h"
 #include "sltk_grid_driver.h"
 #include "sltk_atom_input.h"
@@ -32,6 +32,7 @@ public:
 
 	//2015-05-07
 	static void delete_vector(
+		ofstream &ofs_in,
 		const bool pbc_flag,
 		Grid_Driver &grid_d, 
 		const UnitCell &ucell, 

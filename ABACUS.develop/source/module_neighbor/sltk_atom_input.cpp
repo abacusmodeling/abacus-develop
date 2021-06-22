@@ -5,13 +5,14 @@
 //#include "../src_pw/global.h"
 #include "sltk_atom_input.h"
 #include "sltk_grid.h"
-#include "../src_pw/tools.h"
+//#include "../src_pw/tools.h"
 
 //==========================================================
 // define constructor and deconstructor
 //==========================================================
 Atom_input::Atom_input
 (
+	ofstream &ofs_in,
 	const UnitCell &ucell,
 	const int amount,
 	const int ntype,
@@ -50,14 +51,14 @@ Atom_input::Atom_input
 {
 	TITLE("Atom_input", "Atom_input");
 
-	if(test_atom_input)OUT(ofs_running, "ntype", ntype);
-	if(test_atom_input)OUT(ofs_running, "Amount(atom number)", amount);
-	if(test_atom_input)OUT(ofs_running, "Periodic_boundary", periodic_boundary);
+	if(test_atom_input) OUT(ofs_in, "ntype", ntype);
+	if(test_atom_input) OUT(ofs_in, "Amount(atom number)", amount);
+	if(test_atom_input) OUT(ofs_in, "Periodic_boundary", periodic_boundary);
 
 //----------------------------------------------------------
 // EXPLAIN : check searching raidus
 //----------------------------------------------------------
-	if(test_atom_input)OUT(ofs_running, "Searching radius(lat0)", radius);
+	if(test_atom_input)OUT(ofs_in, "Searching radius(lat0)", radius);
 
 	if (radius < 0)
 	{
@@ -81,20 +82,20 @@ Atom_input::Atom_input
 
 	if(test_grid)
 	{
-		ofs_running << " Output lattice vectors now (unit:lat0):" << endl;
-		ofs_running << " " << setw(5) << "Vec1" 
+		ofs_in << " Output lattice vectors now (unit:lat0):" << endl;
+		ofs_in << " " << setw(5) << "Vec1" 
 			<< setw(10) << vec1[0]
 			<< setw(10) << vec1[1]
 			<< setw(10) << vec1[2] << endl;
-		ofs_running << " " << setw(5) << "Vec2" 
+		ofs_in << " " << setw(5) << "Vec2" 
 			<< setw(10) << vec2[0]
 			<< setw(10) << vec2[1]
 			<< setw(10) << vec2[2] << endl;
-		ofs_running << " " << setw(5) << "Vec3" 
+		ofs_in << " " << setw(5) << "Vec3" 
 			<< setw(10) << vec3[0]
 			<< setw(10) << vec3[1]
 			<< setw(10) << vec3[2];
-		ofs_running << endl;
+		ofs_in << endl;
 	}
 
 	//=============================================
@@ -104,13 +105,13 @@ Atom_input::Atom_input
 	clength1 = sqrt(vec2[0] * vec2[0] + vec2[1] * vec2[1] + vec2[2] * vec2[2]) ;
 	clength2 = sqrt(vec3[0] * vec3[0] + vec3[1] * vec3[1] + vec3[2] * vec3[2]) ;
 
-	if(test_atom_input)OUT(ofs_running,"CellLength(unit: lat0)",clength0,clength1,clength2);
+	if(test_atom_input) OUT(ofs_in,"CellLength(unit: lat0)",clength0,clength1,clength2);
 	//==============================
 	// set lattice constant
 	//==============================
 	lat_now = ucell.lat0;
 
-	if(test_atom_input)OUT(ofs_running, "lat0_now (Bohr)", lat_now);
+	if(test_atom_input) OUT(ofs_in, "lat0_now (Bohr)", lat_now);
 
 	// random selection, in order to estimate again.
 	this->x_min = ucell.atoms[0].tau[0].x;
@@ -136,10 +137,10 @@ Atom_input::Atom_input
 
 	if(test_atom_input)
 	{
-		ofs_running << " Find the coordinate range of the input atom(unit:lat0)." << endl;
+		ofs_in << " Find the coordinate range of the input atom(unit:lat0)." << endl;
 	}
-	if(test_atom_input)OUT(ofs_running,"min_tau", x_min, y_min, z_min);
-	if(test_atom_input)OUT(ofs_running,"max_tau", x_max, y_max, z_max);
+	if(test_atom_input) OUT(ofs_in,"min_tau", x_min, y_min, z_min);
+	if(test_atom_input) OUT(ofs_in,"max_tau", x_max, y_max, z_max);
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
@@ -162,8 +163,8 @@ Atom_input::Atom_input
 	//glayerY_minus-=2;
 	//glayerZ_minus-=2;
 
-	if(test_atom_input)OUT(ofs_running,"glayer+",glayerX,glayerY,glayerZ);
-	if(test_atom_input)OUT(ofs_running,"glayer-",glayerX_minus,glayerY_minus,glayerZ_minus);
+	if(test_atom_input) OUT(ofs_in,"glayer+",glayerX,glayerY,glayerZ);
+	if(test_atom_input) OUT(ofs_in,"glayer-",glayerX_minus,glayerY_minus,glayerZ_minus);
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
@@ -177,7 +178,7 @@ Atom_input::Atom_input
 		this->Expand_Grid(ucell, ntype);
 	}
 
-	if(test_grid)OUT(ofs_running, "expand_flag", expand_flag);
+	if(test_grid) OUT(ofs_in, "expand_flag", expand_flag);
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
@@ -185,7 +186,7 @@ Atom_input::Atom_input
 // Calculate how many cells we need in each direction.
 //----------------------------------------------------------
 	this->calculate_cells();
-	if(test_atom_input)OUT(ofs_running, "CellDim", cell_nx, cell_ny, cell_nz);
+	if(test_atom_input) OUT(ofs_in, "CellDim", cell_nx, cell_ny, cell_nz);
 	return;
 }
 

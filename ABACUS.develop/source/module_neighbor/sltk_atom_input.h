@@ -5,7 +5,7 @@
 #ifndef ATOM_INPUT_H
 #define ATOM_INPUT_H
 
-#include "../src_pw/tools.h"
+//#include "../src_pw/tools.h"
 #include "sltk_atom.h"
 #include "../src_pw/unitcell.h"
 
@@ -17,6 +17,7 @@ public:
 //==========================================================
 	Atom_input
 	(
+		ofstream &ofs_in,
 		const UnitCell &ucell,
 		const int amount = 0,	//number of atoms
 	    const int ntype = 0,	//number of atom_types

@@ -256,6 +256,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			}//ik
 #ifdef __MPI
 			atom_arrange::delete_vector(
+				ofs_running,
 				SEARCH_PBC,
 				GridD, 
 				ucell, 
