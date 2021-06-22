@@ -1,15 +1,3 @@
-// =============================================================================
-//                          C++ Header File
-// Project:         Luna - SLTK
-// File:            Util.hpp
-// Principal Class:
-// Author:          sltk
-// Comment:
-// Warning:
-// Start time:      2004-10-4
-// Last modified:
-// =============================================================================
-
 #ifndef UTIL_H
 #define UTIL_H
 
@@ -38,6 +26,4 @@ static inline void affirm(const bool b, const std::string& message)
 
 { if (!b) throw exception(message); }
 
-
-
-#endif  // UTIL_H
+#endif

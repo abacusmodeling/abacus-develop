@@ -1,8 +1,3 @@
-//==========================================================
-// AUTHOR : sltk, ywcui, mohan
-// START DATE : 2007-04-07
-// LAST DATE : 2008-11-22
-//==========================================================
 #include "sltk_atom.h"
 #include <iostream>
 
@@ -33,9 +28,12 @@ FAtom::~FAtom(){
 //		count2++;
 //		cout << "\n count2 = " << count2;
 //	}
-	if(allocate) delete this->as;
+	if(allocate) 
+	{
+		delete this->as;
+	}
 }
-//2015-05-07
+
 void FAtom::delete_vector(void)
 {
 	as->delete_vector();

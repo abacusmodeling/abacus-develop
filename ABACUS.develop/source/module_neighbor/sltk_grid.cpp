@@ -64,13 +64,16 @@ Grid::~Grid()
 
 }
 
-void Grid::init(const UnitCell &ucell, const Atom_input &input)
+void Grid::init(
+	ofstream &ofs_in,
+	const UnitCell &ucell, 
+	const Atom_input &input)
 {
 	TITLE("SLTK_Grid", "init");
 
-	this->setMemberVariables(input);
+	this->setMemberVariables(ofs_in, input);
 	this->setAtomLinkArray(ucell, input);
-	this->setBoundaryAdjacent(input);
+	this->setBoundaryAdjacent(ofs_in, input);
 
 	return;
 }
@@ -79,7 +82,9 @@ void Grid::init(const UnitCell &ucell, const Atom_input &input)
 // MEMBER FUNCTION :
 // NAME : setMemberVariables(read in data from Atom_input)
 //==========================================================
-void Grid::setMemberVariables(const Atom_input &input)
+void Grid::setMemberVariables(
+	ofstream &ofs_in, //  output data to ofs
+	const Atom_input &input)
 {
 	TITLE("SLTK_Grid", "setMemberVariables");
 
@@ -87,12 +92,13 @@ void Grid::setMemberVariables(const Atom_input &input)
 	AdjacentSet::call_times = 0;
 
 	this->natom = input.getAmount();
-	
-	if(test_grid)OUT(ofs_running, "natom", natom);
+	if(test_grid)OUT(ofs_in, "natom", natom);
+
 	this->pbc = input.getBoundary();
-	if(test_grid)OUT(ofs_running, "PeriodicBoundary", this->pbc);
+	if(test_grid)OUT(ofs_in, "PeriodicBoundary", this->pbc);
+
 	this->sradius = input.getRadius();
-	if(test_grid)OUT(ofs_running, "Radius(unit:lat0)", sradius);
+	if(test_grid)OUT(ofs_in, "Radius(unit:lat0)", sradius);
 
 	for (int i = 0;i < 3;i++)
 	{
@@ -102,18 +108,22 @@ void Grid::setMemberVariables(const Atom_input &input)
 	}
 
 	this->lat_now = input.getLatNow();
-	if(test_grid)OUT(ofs_running,"lat0(unit:Bohr)", lat_now);
+	if(test_grid)OUT(ofs_in,"lat0(unit:Bohr)", lat_now);
+
 	this->expand_flag = input.getExpandFlag();
-	if(test_grid)OUT(ofs_running,"Expand_flag", expand_flag);
+	if(test_grid)OUT(ofs_in,"Expand_flag", expand_flag);
+	
 	// output vector
-	if(test_grid)OUT(ofs_running,"Vec1",vec1[0],vec1[1],vec1[2]);
-	if(test_grid)OUT(ofs_running,"Vec2",vec2[0],vec2[1],vec2[2]);
-	if(test_grid)OUT(ofs_running,"Vec3",vec3[0],vec3[1],vec3[2]);
+	if(test_grid)OUT(ofs_in,"Vec1",vec1[0],vec1[1],vec1[2]);
+	if(test_grid)OUT(ofs_in,"Vec2",vec2[0],vec2[1],vec2[2]);
+	if(test_grid)OUT(ofs_in,"Vec3",vec3[0],vec3[1],vec3[2]);
+
 	// output grid length
 	this->grid_length[0] = input.Clength0();
 	this->grid_length[1] = input.Clength1();
 	this->grid_length[2] = input.Clength2();
-	if(test_grid)OUT(ofs_running,"Grid_length",grid_length[0],grid_length[1],grid_length[2]);
+
+	if(test_grid)OUT(ofs_in,"Grid_length",grid_length[0],grid_length[1],grid_length[2]);
 //----------------------------------------------------------
 // EXPLAIN : (d_minX,d_minY,d_minZ)minimal value of
 // x[] ,y[] , z[]
@@ -121,21 +131,22 @@ void Grid::setMemberVariables(const Atom_input &input)
 	this->d_minX = input.minX();
 	this->d_minY = input.minY();
 	this->d_minZ = input.minZ();
-	if(test_grid)OUT(ofs_running,"MinCoordinate",d_minX,d_minY,d_minZ);
+	if(test_grid)OUT(ofs_in,"MinCoordinate",d_minX,d_minY,d_minZ);
 //----------------------------------------------------------
 //layer: grid layer after expand
 //----------------------------------------------------------
 	this->cell_x_length = input.getCellXLength();
 	this->cell_y_length = input.getCellYLength();
 	this->cell_z_length = input.getCellZLength();
-	if(test_grid)OUT(ofs_running,"CellLength(unit: lat0)",cell_x_length,cell_y_length,cell_z_length);
+	if(test_grid)OUT(ofs_in,"CellLength(unit: lat0)",cell_x_length,cell_y_length,cell_z_length);
 //----------------------------------------------------------
 // set dx, dy, dz
 //----------------------------------------------------------
 	this->dx = input.getCellX();
 	this->dy = input.getCellY();
 	this->dz = input.getCellZ();
-	if(test_grid)OUT(ofs_running,"CellNumber",dx,dy,dz);
+	if(test_grid)OUT(ofs_in,"CellNumber",dx,dy,dz);
+
 	Cell = new CellSet**[dx];
 	for (int i = 0;i < dx;i++)
 	{
@@ -242,9 +253,11 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 	return;
 }
 
-void Grid::setBoundaryAdjacent(const Atom_input &input)
+void Grid::setBoundaryAdjacent(
+	ofstream &ofs_in,
+	const Atom_input &input)
 {
-	if (test_grid)TITLE(ofs_running, "Grid", "setBoundaryAdjacent");
+	if (test_grid) TITLE(ofs_in, "Grid", "setBoundaryAdjacent");
 
 	if (expand_flag)
 	{
@@ -258,18 +271,18 @@ void Grid::setBoundaryAdjacent(const Atom_input &input)
 		this->Construct_Adjacent_begin();
 	}
 
-	if(test_grid)OUT(ofs_running,"Adjacent_set call times",AdjacentSet::call_times);
+	if(test_grid)OUT(ofs_in,"Adjacent_set call times",AdjacentSet::call_times);
 
 	if (!expand_flag)
 	{
 		//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-		if(OUT_LEVEL != "m") OUT(ofs_running,"average adjacent (per atom)",
+		if(OUT_LEVEL != "m") OUT(ofs_in,"average adjacent (per atom)",
 		static_cast<double>(AdjacentSet::call_times)
 		/ static_cast<double>(this->natom));
 	}
 	else
 	{
-		if(OUT_LEVEL != "m") OUT(ofs_running,"average adjacent (per atom)",
+		if(OUT_LEVEL != "m") OUT(ofs_in,"average adjacent (per atom)",
 		static_cast<double>(AdjacentSet::call_times)
 		/ static_cast<double>(Cell[0][0][0].length));
 	}
@@ -277,7 +290,7 @@ void Grid::setBoundaryAdjacent(const Atom_input &input)
 	Memory::record("AdjacentSet", "offset", AdjacentSet::call_times, "short");
 	Memory::record("AdjacentSet", "box", AdjacentSet::call_times, "short");
 
-	if (test_grid)DONE(ofs_running, "Construct_Adjacent");
+	//if (test_grid)DONE(ofs_in, "Construct_Adjacent");
 
 	return;
 }
@@ -289,7 +302,9 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 	// atom.x ,atom.y, atom.z  is atom position , respectly.
 	// d_minX ,d_minY, d_minZ  is origin of cell_0.
 	//=======================================================
-	int a, b, c;
+	int a=0;
+	int b=0;
+	int c=0; //mohan update 2021-06-22
 	this->In_Which_Cell(ucell, a, b, c, atom);
 
 	if(test_grid) ofs_running << setw(5) << a << setw(5) << b << setw(5) << c;
@@ -693,9 +708,12 @@ void Grid::Fold_Hash_Table()
 	return;
 }
 
-void Grid::Construct_Adjacent_expand(const int true_i, const int true_j, const int true_k)
+void Grid::Construct_Adjacent_expand(
+	const int true_i, 
+	const int true_j, 
+	const int true_k)
 {
-	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand");
+//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand");
 
 //----------------------------------------------------------
 // EXPlAIN : In expand grid case, use
@@ -725,8 +743,8 @@ void Grid::Construct_Adjacent_expand(const int true_i, const int true_j, const i
 	AdjacentSet::setCenter(true_i * dy * dz + true_j * dz + true_k);
 	
 
-	if(test_grid)OUT(ofs_running,"GridCenter",true_i,true_j,true_k);
-	if(test_grid)OUT(ofs_running,"GridDim",dx,dy,dz);
+//	if(test_grid)OUT(ofs_running,"GridCenter",true_i,true_j,true_k);
+//	if(test_grid)OUT(ofs_running,"GridDim",dx,dy,dz);
 
 //-----------------------------------------------------------
 // EXPLAIN : (true_i,true_j,true_k) is the cell we want
@@ -768,9 +786,12 @@ void Grid::Construct_Adjacent_expand(const int true_i, const int true_j, const i
 }
 
 void Grid::Construct_Adjacent_expand_periodic(
-    const int true_i, const int true_j, const int true_k, const int true_ia)
+    const int true_i, 
+	const int true_j, 
+	const int true_k, 
+	const int true_ia)
 {
-	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand_periodic");
+//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_expand_periodic");
 
 	for (int i = 0;i < this->dx;i++)
 	{
@@ -791,7 +812,7 @@ void Grid::Construct_Adjacent_expand_periodic(
 
 void Grid::Construct_Adjacent_begin(void)
 {
-	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_begin");
+//	if (test_grid)TITLE(ofs_running, "Grid", "Construct_Adjacent_begin");
 
 //----------------------------------------------------------
 // EXPLAIN : Searching in all cells in this grid
@@ -810,11 +831,13 @@ void Grid::Construct_Adjacent_begin(void)
 				{
 					if (test_grid > 2)
 					{
+/*
 						ofs_running << "\n" << setw(15) << "Atom"
 						<< setw(15) << Cell[i][j][k].address[ia].fatom.x()
 						<< setw(15) << Cell[i][j][k].address[ia].fatom.y()
 						<< setw(15) << Cell[i][j][k].address[ia].fatom.z()
 						<< setw(10) << Cell[i][j][k].address[ia].fatom.getType();
+*/
 					}
 
 					// the new allocate space is needed.

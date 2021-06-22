@@ -1,8 +1,3 @@
-//==========================================================
-// AUTHOR : sltk, ywcui, mohan
-// START DATE : 2007-04-07
-// LAST DATE : 2008-11-22
-//==========================================================
 #ifndef INCLUDE_FATOM
 #define INCLUDE_FATOM
 
@@ -79,4 +74,4 @@ public:
 	void setNatom(const int atom) {natom = atom;}
 };
 
-#endif // INCLUDE_FATOM
+#endif

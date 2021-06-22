@@ -164,8 +164,20 @@ void Mulliken_Charge::cal_mulliken(void)
 			std::vector<ComplexMatrix> mud;
 			mud.resize(1);
 			mud[0].create(ParaO.ncol,ParaO.nrow);
-			SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
-			atom_arrange::search(GridD, ucell, SEARCH_RADIUS,test_atom_input );//qifeng-2019-01-21
+
+			SEARCH_RADIUS = atom_arrange::set_sr_NL(
+				ofs_running,
+				OUT_LEVEL,
+				ORB.get_rcutmax_Phi(), 
+				ORB.get_rcutmax_Beta(), 
+				GAMMA_ONLY_LOCAL);
+
+			atom_arrange::search(
+				ofs_running,
+				GridD, 
+				ucell, 
+				SEARCH_RADIUS,
+				test_atom_input);//qifeng-2019-01-21
 
 			// 2021-04-16
 			LOWF.orb_con.set_orb_tables(

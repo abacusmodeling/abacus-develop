@@ -394,12 +394,21 @@ void LOOP_ions::final_scf(void)
 
     Variable_Cell::final_calculation_after_vc();
 
-
 	//------------------------------------------------------------------
 	// THIS PART IS THE SAME AS LOOP_elec::set_matrix_grid
-    SEARCH_RADIUS = atom_arrange::set_sr_NL(ORB.get_rcutmax_Phi(), ORB.get_rcutmax_Beta(), GAMMA_ONLY_LOCAL);
+    SEARCH_RADIUS = atom_arrange::set_sr_NL(
+		ofs_running,
+		OUT_LEVEL,
+		ORB.get_rcutmax_Phi(), 
+		ORB.get_rcutmax_Beta(), 
+		GAMMA_ONLY_LOCAL);
 
-    atom_arrange::search(GridD, ucell, SEARCH_RADIUS, test_atom_input);
+    atom_arrange::search(
+		ofs_running,
+		GridD, 
+		ucell, 
+		SEARCH_RADIUS, 
+		test_atom_input);
 
     GridT.set_pbc_grid(
         pw.ncx, pw.ncy, pw.ncz,

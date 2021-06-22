@@ -1,8 +1,3 @@
-//==========================================================
-// AUTHOR : sltk, ywcui, mohan
-// START DATE : 2007-04-11
-// LAST DATE : 2008-11-22
-//==========================================================
 #ifndef GRID_H
 #define GRID_H
 
@@ -11,6 +6,7 @@
 #include "sltk_util.h"
 #include "sltk_atom.h"
 #include "sltk_atom_input.h"
+
 #include "../src_pw/tools.h"
 #include "../src_pw/pw_basis.h"
 #include "../src_pw/unitcell.h"
@@ -64,7 +60,11 @@ public:
 	Grid(const int &test_grid_in);
 	~Grid();
 
-	void init(const UnitCell &ucell, const Atom_input &input);
+	void init(
+		ofstream &ofs,
+		const UnitCell &ucell, 
+		const Atom_input &input);
+
 	//2015-05-07
 	void delete_vector(const Atom_input &input);
 
@@ -114,6 +114,7 @@ protected:
 	AtomLink* cordon_p;// Warning! A guard! Don't delete it!
 
 private:
+
 	const int test_grid;
 //==========================================================
 // MEMBER FUNCTIONS :
@@ -126,15 +127,25 @@ private:
 // 			if not_expand case : nature/periodic boundary
 // 			condition , if expand_case)
 //==========================================================
-	void setMemberVariables(const Atom_input &input);
-	void setAtomLinkArray(const UnitCell &ucell, const Atom_input &input);
-	void setBoundaryAdjacent(const Atom_input &input);
+	void setMemberVariables(
+		ofstream &ofs_in, 
+		const Atom_input &input);
+
+	void setAtomLinkArray(
+		const UnitCell &ucell, 
+		const Atom_input &input);
+
+	void setBoundaryAdjacent(
+		ofstream &ofs_in, 
+		const Atom_input &input);
 
 //==========================================================
 //
 //==========================================================
-	AtomLink* Build_Cache(const UnitCell &ucell, const Atom_input &input);		// Peize Lin delete const and throw(std::out_of_range, std::logic_error) 2018-07-14
-//	AtomLink* const Build_Cache(const Atom_input &input) throw(std::out_of_range, std::logic_error);
+	AtomLink* Build_Cache(const UnitCell &ucell, const Atom_input &input);		
+	// Peize Lin delete const and throw(std::out_of_range, std::logic_error) 2018-07-14
+
+	//	AtomLink* const Build_Cache(const Atom_input &input) throw(std::out_of_range, std::logic_error);
 	bool Push(const UnitCell &ucell, const FAtom& atom);
 	void In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FAtom &atom)const;
 	void Build_Cell(void);
@@ -159,4 +170,4 @@ private:
 	    const int i2, const int j2, const int k2, const int ia2);
 };
 
-#endif // GRID_H
+#endif

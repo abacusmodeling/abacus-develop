@@ -1,10 +1,8 @@
-//==========================================================
-// AUTHOR : sltk, ywcui, mohan
-// DATE : 2007-04-05
-//==========================================================
 #include <stdexcept>
 #include <string>
 #include "sltk_adjacent_set.h"
+
+// to be deleted
 #include "../src_pw/tools.h"
 
 long AdjacentSet::call_times = 0;
@@ -36,7 +34,7 @@ void AdjacentSet::set
 	const int &test_grid_in
 )
 {
-	int index_box;
+	int index_box=0; // mohan update 2021-06-22
 
 	if (!expand_flag)
 	{
@@ -49,11 +47,13 @@ void AdjacentSet::set
 
 	if (test_grid_in > 3)
 	{
+/*
 		ofs_running << "\n box(" << box_x
 		<< " " << box_y
 		<< " " << box_z
 		<< " ) offset=" << offset_in
 		<< " index = " << index_box;
+*/
 	}
 
 	this->box.push_back(index_box);
