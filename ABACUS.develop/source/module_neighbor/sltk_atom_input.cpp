@@ -1,7 +1,3 @@
-//==========================================================
-// AUTHOR : ywcui , mohan
-// DATE : 2008-11-22
-//==========================================================
 //#include "../src_pw/global.h"
 #include "sltk_atom_input.h"
 #include "sltk_grid.h"
@@ -363,12 +359,12 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 	glayerZ_minus = extend_d33;
 	//End, 2016-09-05, LiuXh
 
-        if(glayerX==1) glayerX++;
-        if(glayerY==1) glayerY++;
-        if(glayerZ==1) glayerZ++;
-        if(glayerX_minus==1) glayerX_minus++;
-        if(glayerY_minus==1) glayerY_minus++;
-        if(glayerZ_minus==1) glayerZ_minus++;
+	if(glayerX==1) glayerX++;
+	if(glayerY==1) glayerY++;
+	if(glayerZ==1) glayerZ++;
+	if(glayerX_minus==1) glayerX_minus++;
+	if(glayerY_minus==1) glayerY_minus++;
+	if(glayerZ_minus==1) glayerZ_minus++;
 	//End, 2016-07-19, LiuXh
 /*	
 	if(test_atom_input)
@@ -677,4 +673,3 @@ void Atom_input::Load_atom(const UnitCell& ucell)const
 //		<<" natom = "<<natom;
 	return;
 }
-
