@@ -5,8 +5,8 @@
 #include "../src_parallel/mcd.h"
 #endif
 
-#include "vector3.h"
-#include "matrix.h"
+#include "../src_global/vector3.h"
+#include "../src_global/matrix.h"
 
 class Matrix3
 {
