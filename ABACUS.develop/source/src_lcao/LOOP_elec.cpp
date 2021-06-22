@@ -54,6 +54,7 @@ void LOOP_elec::set_matrix_grid(void)
 		GAMMA_ONLY_LOCAL);
 
 	atom_arrange::search(
+		SEARCH_PBC,
 		ofs_running,
 		GridD, 
 		ucell, 

@@ -209,6 +209,7 @@ void Run_MD::final_scf(void)
 		GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
+		SEARCH_PBC,
 		ofs_running,
 		GridD, 
 		ucell, 

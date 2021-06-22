@@ -15,6 +15,7 @@ public:
 	~atom_arrange();
 	
 	static void search(
+		const bool flag,
 		ofstream &ofs,
 		Grid_Driver &grid_d, 
 		const UnitCell &ucell, 
@@ -31,6 +32,7 @@ public:
 
 	//2015-05-07
 	static void delete_vector(
+		const bool pbc_flag,
 		Grid_Driver &grid_d, 
 		const UnitCell &ucell, 
 		const double &search_radius_bohr, 

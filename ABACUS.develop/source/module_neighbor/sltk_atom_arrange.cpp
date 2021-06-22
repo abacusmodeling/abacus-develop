@@ -3,9 +3,7 @@
 #include "sltk_grid.h"
 #include "sltk_grid_driver.h"
 
-// update the followig two includes in near future 
-//#include "../src_pw/global.h"
-//#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
+// update the followig class in near future 
 #include "../src_pw/unitcell.h"
 
 atom_arrange::atom_arrange()
@@ -89,6 +87,7 @@ void atom_arrange::set_sr_OV(void)
 */
 
 void atom_arrange::search(
+	const bool pbc_flag,
 	ofstream &ofs,
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 
@@ -113,7 +112,7 @@ void atom_arrange::search(
 
 	const double radius_lat0unit = search_radius_bohr / ucell.lat0;
 
-	Atom_input at(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit, test_atom_in);
+	Atom_input at(ucell, ucell.nat, ucell.ntype, pbc_flag, radius_lat0unit, test_atom_in);
 	//===========================================
 	// Print important information in Atom_input
 	//===========================================
@@ -151,11 +150,16 @@ void atom_arrange::search(
 
 
 //2015-05-07
-void atom_arrange::delete_vector(Grid_Driver &grid_d, const UnitCell &ucell, const double &search_radius_bohr, const int &test_atom_in)
+void atom_arrange::delete_vector(
+	const bool pbc_flag, // SEARCH_PBC
+	Grid_Driver &grid_d, 
+	const UnitCell &ucell, 
+	const double &search_radius_bohr, 
+	const int &test_atom_in)
 {
 	const double radius_lat0unit2 = search_radius_bohr / ucell.lat0;
 
-	Atom_input at2(ucell, ucell.nat, ucell.ntype, SEARCH_PBC, radius_lat0unit2, test_atom_in);
+	Atom_input at2(ucell, ucell.nat, ucell.ntype, pbc_flag, radius_lat0unit2, test_atom_in);
 
 	grid_d.delete_vector(at2);
 

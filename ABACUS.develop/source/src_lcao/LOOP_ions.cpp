@@ -234,7 +234,7 @@ bool LOOP_ions::force_stress(
     {
 
 #ifdef __MPI
-        atom_arrange::delete_vector(GridD, ucell, SEARCH_RADIUS, test_atom_input);
+        atom_arrange::delete_vector(SEARCH_PBC, GridD, ucell, SEARCH_RADIUS, test_atom_input);
 #endif
 
         if(CALCULATION=="relax") 
@@ -297,7 +297,7 @@ xiaohui modify 2014-08-09*/
     {
 
 #ifdef __MPI
-		atom_arrange::delete_vector(GridD, ucell, SEARCH_RADIUS, test_atom_input);
+		atom_arrange::delete_vector(SEARCH_PBC, GridD, ucell, SEARCH_RADIUS, test_atom_input);
 #endif
 		if(CALCULATION=="cell-relax")
 		{
@@ -325,7 +325,7 @@ xiaohui modify 2014-08-09*/
     if(FORCE&&STRESS)
     {
 
-        atom_arrange::delete_vector(GridD, ucell, SEARCH_RADIUS, test_atom_input);
+        atom_arrange::delete_vector(SEARCH_PBC, GridD, ucell, SEARCH_RADIUS, test_atom_input);
         
         if(CALCULATION=="relax" || CALCULATION=="cell-relax")
         {
@@ -404,6 +404,7 @@ void LOOP_ions::final_scf(void)
 		GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
+		SEARCH_PBC,
 		ofs_running,
 		GridD, 
 		ucell, 

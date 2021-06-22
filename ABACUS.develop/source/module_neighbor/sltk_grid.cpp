@@ -1,8 +1,3 @@
-//==========================================================
-// AUTHOR : sltk, ywcui, mohan
-// START DATE : 2007-04-11
-// LAST DATE : 2008-11-22
-//==========================================================
 #include "sltk_grid.h"
 #include "sltk_atom_input.h"
 #include "../src_pw/tools.h"
@@ -194,7 +189,7 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 		}
 	*/
 
-	if (test_grid) DONE(ofs_running, "Build_Cache");
+//	if (test_grid) DONE(ofs_running, "Build_Cache");
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
@@ -202,11 +197,11 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 //----------------------------------------------------------
 	this->Build_Cell();
 
-	if (test_grid) DONE(ofs_running, "Build_Cell");
+//	if (test_grid) DONE(ofs_running, "Build_Cell");
 
 	this->Build_Hash_Table(ucell, pointCache);
 
-	if (test_grid) DONE(ofs_running, "Build_Hash_Table");
+//	if (test_grid) DONE(ofs_running, "Build_Hash_Table");
 
 //----------------------------------------------------------
 // WARNING : Don't Deleete this testing code.
@@ -236,7 +231,7 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 
 	this->Fold_Hash_Table();
 
-	if (test_grid) DONE(ofs_running, "Fold_Hash_Table");
+//	if (test_grid) DONE(ofs_running, "Fold_Hash_Table");
 
 //----------------------------------------------------------
 // EXPLAIN : Don't Deleete this testing code.
@@ -307,7 +302,7 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 	int c=0; //mohan update 2021-06-22
 	this->In_Which_Cell(ucell, a, b, c, atom);
 
-	if(test_grid) ofs_running << setw(5) << a << setw(5) << b << setw(5) << c;
+//	if(test_grid) ofs_running << setw(5) << a << setw(5) << b << setw(5) << c;
 	
 	//======================================================
 	// dx, dy, dz is max cell in each direction ,respectly.
@@ -315,12 +310,12 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 	if (a < dx && a >= 0 && b < dy && b >= 0 && c < dz && c >= 0)
 	{
 		++ this->Cell[a][b][c].length;
-		if(test_grid) ofs_running << setw(10) << this->Cell[a][b][c].length << endl;
+//		if(test_grid) ofs_running << setw(10) << this->Cell[a][b][c].length << endl;
 		return true;
 	}
 	else
 	{
-		if(test_grid) ofs_running << setw(10) << " no cell in" << endl; 
+//		if(test_grid) ofs_running << setw(10) << " no cell in" << endl; 
 		return false;
 	}
 }
@@ -328,7 +323,7 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 
 AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 {
-	if (test_grid)TITLE(ofs_running, "Grid", "Build_Cache");
+//	if (test_grid)TITLE(ofs_running, "Grid", "Build_Cache");
 	AtomLink* const start = new AtomLink[natom+1];
 	Memory::record("grid", "AtomLink", natom, "AtomLink");
 
@@ -337,7 +332,7 @@ AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 
 	AtomLink* current = start;
 
-	if(test_grid) ofs_running << " total atom number is " << natom << endl;
+//	if(test_grid) ofs_running << " total atom number is " << natom << endl;
 	for (int i = 0;i < natom;i++)
 	{
 //----------------------------------------------------------
@@ -371,7 +366,7 @@ void Grid::Build_Cell(void)
 
 	AtomLink* cellAddress = this->atomlink;
 
-	if (test_grid)ofs_running << " Cell_length(number of atoms) " << endl;
+//	if (test_grid)ofs_running << " Cell_length(number of atoms) " << endl;
 
 	for (int i = 0; i < this->dx; ++i)
 	{
@@ -385,10 +380,12 @@ void Grid::Build_Cell(void)
 
 				if (test_grid)
 				{
+/*
 					ofs_running << setw(6) << i 
 					<< setw(6) << j 
 					<< setw(6) << k
 					<< setw(10) << Cell[i][j][k].length << endl;
+*/
 				}
 			}
 		}
@@ -555,8 +552,8 @@ void Grid::Build_Hash_Table(const UnitCell &ucell, AtomLink* const pointCache)
 		}
 	}
 
-	if(test_grid)OUT(ofs_running,"Hash one hit number",Hash_one_hit);
-	if(test_grid)OUT(ofs_running,"One hit on target percentage(%)",static_cast<double>(Hash_one_hit) / static_cast<double>(natom)*100);
+//	if(test_grid)OUT(ofs_running,"Hash one hit number",Hash_one_hit);
+//	if(test_grid)OUT(ofs_running,"One hit on target percentage(%)",static_cast<double>(Hash_one_hit) / static_cast<double>(natom)*100);
 	return;
 }
 
@@ -1096,10 +1093,12 @@ void Grid::Construct_Adjacent_final
 
 		if (test_grid > 2)
 		{
+/*
 			ofs_running << "\n"
 			<< setw(15) << x2 << setw(15) << y2 << setw(15) << z2
 			<< setw(10) << Cell[i2][j2][k2].address[ia2].fatom.getType()
 			<< setw(10) << dr;
+*/
 		}
 	}
 
