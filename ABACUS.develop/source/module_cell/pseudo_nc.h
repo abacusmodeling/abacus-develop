@@ -1,8 +1,8 @@
 #ifndef PSEUDO_NC_H
 #define PSEUDO_NC_H
 
-#include "tools.h"
-#include "../src_io/read_pp.h"
+#include "src_pw/tools.h"
+#include "src_io/read_pp.h"
 
 //-----------------------------------------
 // read in norm conserving pseudopotentials

@@ -1,7 +1,7 @@
 #ifndef ATOM_PSEUDO_H
 #define ATOM_PSEUDO_H
 
-#include "tools.h"
+//#include "tools.h"
 #include "pseudo_nc.h"
 using namespace std;
 

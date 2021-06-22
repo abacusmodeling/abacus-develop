@@ -3,8 +3,8 @@
 #include <mpi.h>
 #endif
 
-#include "global.h"
-#include "tools.h"
+#include "src_pw/global.h"
+#include "src_pw/tools.h"
 #include "unitcell.h"
 using namespace std;
 

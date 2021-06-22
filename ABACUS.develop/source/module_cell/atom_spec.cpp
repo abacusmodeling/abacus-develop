@@ -1,13 +1,9 @@
-/*******************************************
- * ESCP:Electro-Structure Calculate Package.
- ********************************************/
 #include <cstdlib>
-
 #include "atom_spec.h"
-#include "global.h"		// only out
+#include "src_pw/global.h"		// only out
+
 Atom::Atom()
 {
-    if (test_atom) TITLE("atom_spec","Constructor");
     na = 0;
     label = "\0";
     na = 0;
@@ -83,8 +79,6 @@ void Atom::set_index(void)
 
 void Atom::print_Atom(ofstream &ofs)
 {
-    if (test_atom) TITLE("atom_spec","print_Atom");
-
     //OUT(ofs,"print_Atom()");
     OUT(ofs,"label",label);
     OUT(ofs,"type", type);
@@ -115,7 +109,7 @@ void Atom::print_Atom(ofstream &ofs)
 }
 
 #ifdef __MPI
-void Atom::bcast_atom()
+void Atom::bcast_atom(void)
 {
     if (test_atom) TITLE("Atom","bcast_atom");
 

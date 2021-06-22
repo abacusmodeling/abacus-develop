@@ -1,8 +1,8 @@
 #ifndef UNITCELL_PSEUDO_H
 #define UNITCELL_PSEUDO_H
 
-#include "tools.h"
 #include "atom_spec.h"
+#include "src_pw/tools.h"
 #include "unitcell.h"
 
 class UnitCell_pseudo : public UnitCell

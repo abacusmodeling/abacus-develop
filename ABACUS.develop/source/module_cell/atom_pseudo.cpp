@@ -1,6 +1,6 @@
-#include "global.h"
 #include "atom_pseudo.h"
-#include "tools.h"
+#include "src_pw/tools.h"
+#include "src_pw/global.h"
 
 Atom_pseudo::Atom_pseudo()
 {

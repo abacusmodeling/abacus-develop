@@ -1,10 +1,6 @@
-//==========================================================
-// AUTHOR : mohan
-// DATE : 2008-11-10
-//==========================================================
 #include "unitcell_pseudo.h"
-#include "../module_ORB/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
-#include "global.h"
+#include "module_ORB/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
+#include "src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 UnitCell_pseudo::UnitCell_pseudo()
@@ -304,7 +300,7 @@ void UnitCell_pseudo::setup_cell(
 // calculate total number of electrons (nelec) and default
 // number of bands (NBANDS).
 //=========================================================
-#include "occupy.h"
+#include "src_pw/occupy.h"
 void UnitCell_pseudo::cal_nelec(void)
 {
 	TITLE("UnitCell_pseudo","cal_nelec");

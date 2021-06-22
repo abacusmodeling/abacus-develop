@@ -1,11 +1,15 @@
 #ifndef ATOM_H
 #define ATOM_H
 
-#include "tools.h"
+//#include "tools.h"
 #include "atom_pseudo.h"
 class Atom: public Atom_pseudo
 {
 public:
+
+    // constructor and destructor
+    Atom();
+    ~Atom();
 
     int *iw2m; // use iw to find m
     int *iw2n; // use iw to find n
@@ -13,10 +17,6 @@ public:
 	int *iw2_ylm;
 	bool *iw2_new;
     int nw; // number of local orbitals (l,n,m) of this type
-	
-    // constructor and destructor
-    Atom();
-    ~Atom();
 
     void set_index(void);
 
