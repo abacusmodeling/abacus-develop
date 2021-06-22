@@ -1,7 +1,7 @@
 #ifndef PLANEWAVE_H
 #define PLANEWAVE_H
 
-#include "module_cell/unitcell.h"
+#include "../module_cell/unitcell.h"
 #include "klist.h"
 #include "src_global/complexmatrix.h"
 #include "src_global/vector3.h"

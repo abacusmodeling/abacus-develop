@@ -1,5 +1,13 @@
 //#include "timer.h"
+#include <cstdlib>
 #include <ctime>
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <iomanip>
+
+using namespace std;
 
 void calculate();
 
@@ -16,7 +24,6 @@ int main(int argc, char **argv)
 
 void calculate()
 {
-	ORB_control ooo;
 
 	ofstream ofs("log.txt");
 

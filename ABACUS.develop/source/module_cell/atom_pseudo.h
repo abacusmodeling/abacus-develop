@@ -1,7 +1,10 @@
 #ifndef ATOM_PSEUDO_H
 #define ATOM_PSEUDO_H
 
-//#include "tools.h"
+#include "../src_pw/tools.h"
+#include "../src_global/vector3.h"
+#include "../src_global/complexarray.h"
+#include "../src_global/complexmatrix.h"
 #include "pseudo_nc.h"
 using namespace std;
 
