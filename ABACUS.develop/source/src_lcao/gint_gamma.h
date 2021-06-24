@@ -5,6 +5,7 @@
 #ifndef GINT_GAMMA_H
 #define GINT_GAMMA_H
 
+#include "gint_tools.h"
 #include "../src_pw/tools.h"
 #include "grid_base_beta.h"
 #include "grid_technique.h"
@@ -68,7 +69,7 @@ class Gint_Gamma : public Grid_Base_Beta
 	void save_atoms_on_grid(const Grid_Technique &gt);
 
 	// for calculation of < phi_i | Vlocal | phi_j >
-	void gamma_vlocal(void);  
+	Gint_Tools::Array_Pool<double> gamma_vlocal(void);  
 
 	// for calculation of charege 
 	double gamma_charge(void);

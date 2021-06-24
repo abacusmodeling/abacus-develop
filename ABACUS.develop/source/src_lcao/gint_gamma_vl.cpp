@@ -297,40 +297,14 @@ inline int setBufferParameter(
 
 
 
-void Gint_Gamma::cal_vlocal(
-    const double* vlocal_in)
-{
-    omp_init_lock(&lock);
-
-    TITLE("Gint_Gamma","cal_vlocal");
-    timer::tick("Gint_Gamma","cal_vlocal",'J');
-
-    this->job=cal_local;
-    this->vlocal=vlocal_in;
-    this->save_atoms_on_grid(GridT);
-
-    this->gamma_vlocal();
-
-    omp_destroy_lock(&lock);
-
-    timer::tick("Gint_Gamma","cal_vlocal",'J');
-    return;
-}
-
-
-
-void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
+Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
 
-    double ** GridVlocal = new double*[GridT.lgd];
-    for (int i=0; i<GridT.lgd; i++)
-    {
-        GridVlocal[i] = new double[GridT.lgd];
-        ZEROS(GridVlocal[i], GridT.lgd);
-    }
-			Memory::record("Gint_Gamma","GridVlocal",GridT.lgd*GridT.lgd,"double");
+	Gint_Tools::Array_Pool<double> GridVlocal(GridT.lgd, GridT.lgd);
+	ZEROS(GridVlocal.ptr_1D, GridT.lgd*GridT.lgd);
+    Memory::record("Gint_Gamma","GridVlocal",GridT.lgd*GridT.lgd,"double");
 
     const int omp_threads = omp_get_max_threads();
 	omp_set_num_threads(std::max(1,omp_threads/GridT.nbx));		// Peize Lin update 2021.01.20
@@ -446,7 +420,7 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 				{
 					for (int j=0; j<lgd_now; j++)
 					{
-						GridVlocal[i][j] += GridVlocal_thread.ptr_2D[i][j];
+						GridVlocal.ptr_2D[i][j] += GridVlocal_thread.ptr_2D[i][j];
 					}
 				}
 			}
@@ -459,7 +433,12 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
     MPI_Barrier(MPI_COMM_WORLD);
     timer::tick("Gint_Gamma","distri_vl",'K');
-
+	
+	return GridVlocal;
+}
+	
+void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
+{
     // setup send buffer and receive buffer size
     // OUT(ofs_running, "Start transforming vlocal from grid distribute to 2D block");
     if(CHR.get_new_e_iteration())
@@ -487,11 +466,11 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
         const int icol=ParaO.sender_local_index[i+1];
         if(irow<=icol)
 		{
-            ParaO.sender_buffer[i/2]=GridVlocal[irow][icol];
+            ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[irow][icol];
 		}
         else
 		{
-            ParaO.sender_buffer[i/2]=GridVlocal[icol][irow];
+            ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[icol][irow];
 		}
     }
     OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
@@ -520,13 +499,25 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 
     timer::tick("Gint_Gamma","distri_vl_value",'K');
     timer::tick("Gint_Gamma","distri_vl",'K');
+}
 
-	for (int i=0; i<GridT.lgd; i++)
-	{
-		delete[] GridVlocal[i];
-	}
-	delete[] GridVlocal;
+void Gint_Gamma::cal_vlocal(
+    const double* vlocal_in)
+{
+    omp_init_lock(&lock);
 
-	//OUT(ofs_running, "ALL GridVlocal was calculated");
-    return;
+    TITLE("Gint_Gamma","cal_vlocal");
+    timer::tick("Gint_Gamma","cal_vlocal",'J');
+
+    this->job=cal_local;
+    this->vlocal=vlocal_in;
+    this->save_atoms_on_grid(GridT);
+
+    const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal();
+
+    omp_destroy_lock(&lock);
+	
+	vl_grid_to_2D(GridVlocal);
+
+    timer::tick("Gint_Gamma","cal_vlocal",'J');
 }
