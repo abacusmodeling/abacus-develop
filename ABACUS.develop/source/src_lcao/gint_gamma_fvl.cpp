@@ -8,12 +8,11 @@
 #include "global_fp.h" // mohan add 2021-01-30
 #include "../src_global/ylm.h"
 
-void Gint_Gamma::cal_force(const double* vlocal_in)
+void Gint_Gamma::cal_force(const double*const vlocal)
 {
     timer::tick("Gint_Gamma","cal_force",'H');
-    this->vlocal = vlocal_in;
     this->save_atoms_on_grid(GridT);
-    this->gamma_force();
+    this->gamma_force(vlocal);
     timer::tick("Gint_Gamma","cal_force",'H');
 }
 
@@ -458,7 +457,7 @@ inline void cal_meshball_DGridV(
 }
 
 
-void Gint_Gamma::gamma_force(void)
+void Gint_Gamma::gamma_force(const double*const vlocal)
 {
     TITLE("Grid_Integral","gamma_force");
     timer::tick("Gint_Gamma","gamma_force",'I');
@@ -586,7 +585,7 @@ void Gint_Gamma::gamma_force(void)
 					//------------------------------------------------------------------
 					// extract the local potentials.
 					//------------------------------------------------------------------
-					double *vldr3 = get_vldr3(ncyz, ibx, jby, kbz);
+					double *vldr3 = get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 					
 					//------------------------------------------------------
 					// index of wave functions for each block

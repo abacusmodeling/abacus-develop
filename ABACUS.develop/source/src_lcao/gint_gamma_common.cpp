@@ -4,6 +4,7 @@
 
 // extract the local potentials.
 double* Gint_Gamma::get_vldr3(
+	const double*const vlocal,
 	const int ncyz,
 	const int ibx,
 	const int jby,
@@ -14,7 +15,7 @@ double* Gint_Gamma::get_vldr3(
 	double *vldr3 = (double*)malloc(pw.bxyz*sizeof(double));					
 	for(int ib=0; ib<pw.bxyz; ib++)
 	{
-		vldr3[ib]=this->vlocal[vindex[ib]] * this->vfactor;
+		vldr3[ib]=vlocal[vindex[ib]] * this->vfactor;
 	}
 	free(vindex);	vindex=nullptr;
 	return vldr3;

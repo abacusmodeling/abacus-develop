@@ -297,7 +297,7 @@ inline int setBufferParameter(
 
 
 
-Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
+Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal)						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
@@ -364,7 +364,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(void)						// Peize Lin 
 						//------------------------------------------------------------------
 						// extract the local potentials.
 						//------------------------------------------------------------------
-						double *vldr3 = this->get_vldr3(ncyz, ibx, jby, kbz);
+						double *vldr3 = this->get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 
 						//------------------------------------------------------
 						// index of wave functions for each block
@@ -502,7 +502,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
 }
 
 void Gint_Gamma::cal_vlocal(
-    const double* vlocal_in)
+    const double*const vlocal)
 {
     omp_init_lock(&lock);
 
@@ -510,10 +510,9 @@ void Gint_Gamma::cal_vlocal(
     timer::tick("Gint_Gamma","cal_vlocal",'J');
 
     this->job=cal_local;
-    this->vlocal=vlocal_in;
     this->save_atoms_on_grid(GridT);
 
-    const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal();
+    const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
 
     omp_destroy_lock(&lock);
 	

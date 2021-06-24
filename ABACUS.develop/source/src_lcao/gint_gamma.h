@@ -26,13 +26,13 @@ class Gint_Gamma : public Grid_Base_Beta
 	~Gint_Gamma();
 
 	// (1) calculate the H matrix in terms of effective potentials
-	void cal_vlocal( const double* vlocal_in);
+	void cal_vlocal( const double*const vlocal);
 
 	// (2) calculate charge density
 	double cal_rho(void);
 
 	// (3) calcualte the forces related to grid
-	void cal_force( const double* vlocal_in);
+	void cal_force( const double*const vlocal);
 
 	// (4) calcualte the envelope function
 	void cal_env(const double* wfc, double* rho);
@@ -69,7 +69,7 @@ class Gint_Gamma : public Grid_Base_Beta
 	void save_atoms_on_grid(const Grid_Technique &gt);
 
 	// for calculation of < phi_i | Vlocal | phi_j >
-	Gint_Tools::Array_Pool<double> gamma_vlocal(void);  
+	Gint_Tools::Array_Pool<double> gamma_vlocal(const double*const vlocal);  
 
 	// for calculation of charege 
 	double gamma_charge(void);
@@ -83,7 +83,7 @@ class Gint_Gamma : public Grid_Base_Beta
 
 	// for calculatin of < dphi_i | Vlocal | phi_j > for foce calculation
 	// on regular FFT real space grid.
-	void gamma_force(void);
+	void gamma_force(const double*const vlocal);
 
 	void cal_meshball_vlocal(
 		const int na_grid,
@@ -110,7 +110,7 @@ class Gint_Gamma : public Grid_Base_Beta
 	
 	// extract the local potentials.
 	// vldr3[pw.bxyz]
-	double* get_vldr3( const int ncyz, const int ibx, const int jby, const int kbz) const;
+	double* get_vldr3(const double*const vlocal, const int ncyz, const int ibx, const int jby, const int kbz) const;
 };
 
 #endif
