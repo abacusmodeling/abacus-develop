@@ -103,7 +103,6 @@ void Gint_Gamma::cal_meshball_vlocal(
                 }
 
                 const int n=block_size[ia2];
-//omp_set_lock(&lock);
                 if(cal_pair_num>ib_length/4)
                 {
                     dgemm_(&transa, &transb, &n, &m, &ib_length, &alpha,
@@ -125,8 +124,6 @@ void Gint_Gamma::cal_meshball_vlocal(
                         }
                     }
                 }
-//omp_unset_lock(&lock);
-
 			}
 		}
 	}
@@ -504,8 +501,6 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
 void Gint_Gamma::cal_vlocal(
     const double*const vlocal)
 {
-    omp_init_lock(&lock);
-
     TITLE("Gint_Gamma","cal_vlocal");
     timer::tick("Gint_Gamma","cal_vlocal",'J');
 
@@ -513,9 +508,6 @@ void Gint_Gamma::cal_vlocal(
     this->save_atoms_on_grid(GridT);
 
     const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
-
-    omp_destroy_lock(&lock);
-	
 	vl_grid_to_2D(GridVlocal);
 
     timer::tick("Gint_Gamma","cal_vlocal",'J');

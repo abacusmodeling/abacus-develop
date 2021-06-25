@@ -154,10 +154,7 @@ double Gint_Gamma::cal_rho(void)
     this->job = cal_charge;
     this->save_atoms_on_grid(GridT);
 
-	// I guess Peize add this, mohan 2021-01-31
-	omp_init_lock(&lock);
     const double ne = this->gamma_charge();
-	omp_destroy_lock(&lock);
 
     timer::tick("Gint_Gamma","cal_rho",'F');
     return ne;

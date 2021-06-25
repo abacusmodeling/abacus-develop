@@ -63,9 +63,6 @@ class Gint_Gamma : public Grid_Base_Beta
 	double* x03;
 	int *iq;
 
-	// peize add, I guess, mohan add 2021-01-31
-	omp_lock_t lock;
-
 	void save_atoms_on_grid(const Grid_Technique &gt);
 
 	// for calculation of < phi_i | Vlocal | phi_j >
