@@ -84,7 +84,7 @@ namespace Gint_Tools
 		}
 		return block_size;
 	}
-
+	
 	// whether the atom-grid distance is larger than cutoff
 	bool** get_cal_flag(
 		const int na_grid, 		// number of atoms on this grid 

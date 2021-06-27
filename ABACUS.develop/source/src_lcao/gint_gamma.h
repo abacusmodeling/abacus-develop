@@ -29,7 +29,7 @@ class Gint_Gamma : public Grid_Base_Beta
 	void cal_vlocal( const double*const vlocal);
 
 	// (2) calculate charge density
-	double cal_rho(void);
+	double cal_rho(const double*const*const*const DM);
 
 	// (3) calcualte the forces related to grid
 	void cal_force( const double*const vlocal);
@@ -66,10 +66,14 @@ class Gint_Gamma : public Grid_Base_Beta
 	void save_atoms_on_grid(const Grid_Technique &gt);
 
 	// for calculation of < phi_i | Vlocal | phi_j >
-	Gint_Tools::Array_Pool<double> gamma_vlocal(const double*const vlocal);  
+	// Input:	vlocal[ir]
+	// Output:	GridVlocal.ptr_2D[iw1_lo][iw2_lo]
+	Gint_Tools::Array_Pool<double> gamma_vlocal(const double*const vlocal) const;  
 
 	// for calculation of charege 
-	double gamma_charge(void);
+	// Input:	DM[is][iw1_lo][iw2_lo]
+	// Output:	rho.ptr_2D[is][ir]
+	Gint_Tools::Array_Pool<double> gamma_charge(const double*const*const*const DM) const;
 
 	// for calculation of Mulliken charge.
 	void gamma_mulliken(double** mulliken);
@@ -80,7 +84,7 @@ class Gint_Gamma : public Grid_Base_Beta
 
 	// for calculatin of < dphi_i | Vlocal | phi_j > for foce calculation
 	// on regular FFT real space grid.
-	void gamma_force(const double*const vlocal);
+	void gamma_force(const double*const vlocal) const;
 
 	void cal_meshball_vlocal(
 		const int na_grid,
@@ -93,7 +97,7 @@ class Gint_Gamma : public Grid_Base_Beta
 		const double*const*const psir_ylm,
 		const double*const*const psir_vlbr3,
 		const int lgd_now,
-		double*const*const GridVlocal);
+		double*const*const GridVlocal) const;
 
 	void cal_band_rho(
 		const int na_grid, 
@@ -103,7 +107,9 @@ class Gint_Gamma : public Grid_Base_Beta
 		const int*const block_index,
 		const bool*const*const cal_flag, 
 		const double*const*const psir_ylm,
-		const int*const vindex);
+		const int*const vindex,
+		const double*const*const*const DM,
+		Gint_Tools::Array_Pool<double> &rho) const;
 	
 	// extract the local potentials.
 	// vldr3[pw.bxyz]

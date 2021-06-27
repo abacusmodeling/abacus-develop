@@ -61,7 +61,7 @@ void Gint_Gamma::cal_meshball_vlocal(
 	const double*const*const psir_ylm,
 	const double*const*const psir_vlbr3,
 	const int lgd_now,
-	double*const*const GridVlocal)
+	double*const*const GridVlocal) const
 {
 	const char transa='N', transb='T';
 	const double alpha=1, beta=1;
@@ -294,7 +294,7 @@ inline int setBufferParameter(
 
 
 
-Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal)						// Peize Lin update OpenMP 2020.09.27
+Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal) const						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');

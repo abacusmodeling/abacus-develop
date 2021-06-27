@@ -126,7 +126,7 @@ void IState_Charge::begin(void)
 			
 			// (4) calculate charge density for a particular 
 			// band.
-   			UHM.GG.cal_rho();
+   			UHM.GG.cal_rho(LOC.DM);
 			CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			stringstream ss;
 			ss << global_out_dir << "BAND" << ib + 1 << "_CHG";

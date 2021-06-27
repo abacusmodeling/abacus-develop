@@ -457,7 +457,7 @@ inline void cal_meshball_DGridV(
 }
 
 
-void Gint_Gamma::gamma_force(const double*const vlocal)
+void Gint_Gamma::gamma_force(const double*const vlocal) const
 {
     TITLE("Grid_Integral","gamma_force");
     timer::tick("Gint_Gamma","gamma_force",'I');
