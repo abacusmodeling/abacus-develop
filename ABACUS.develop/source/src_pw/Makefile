@@ -4,8 +4,8 @@
 # Compiler information 
 #==========================
 CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = icpc 
-FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+CPLUSPLUS_MPI = mpiicpc 
+FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
 OBJ_DIR = obj
 NP      = 1
 
