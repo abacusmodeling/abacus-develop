@@ -1,7 +1,7 @@
 #ifndef PDIAG_BASIC_H
 #define PDIAG_BASIC_H
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 #include "pdiag_common.h"
 
 class Pdiag_Basic

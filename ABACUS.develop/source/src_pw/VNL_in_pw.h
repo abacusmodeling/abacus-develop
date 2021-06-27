@@ -3,9 +3,11 @@
 
 #include "tools.h"
 #include "VL_in_pw.h"
+#ifdef __LCAO
 #include "module_ORB/ORB_gen_tables.h"
+#endif
 #include "wavefunc_in_pw.h"
-#include "module_cell/unitcell_pseudo.h"
+#include "../module_cell/unitcell_pseudo.h"
 
 //==========================================================
 // Calculate the non-local pseudopotential in reciprocal
@@ -88,8 +90,9 @@ private:
 	double CG(int l1, int m1, int l2, int m2, int L, int M);
 
 	void print_vnl(ofstream &ofs);
-	
+	#ifdef __LCAO
 	ORB_gaunt_table MGT;
+	#endif
 };
 
 #endif // VNL_IN_PW 

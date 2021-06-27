@@ -4,7 +4,7 @@
 #include "sltk_grid_driver.h"
 
 // update the followig class in near future 
-#include "module_cell/unitcell.h"
+#include "../module_cell/unitcell.h"
 
 atom_arrange::atom_arrange()
 {

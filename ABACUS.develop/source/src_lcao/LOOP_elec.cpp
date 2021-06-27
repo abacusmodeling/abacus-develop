@@ -1,16 +1,16 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
-#include "src_pw/global.h"
-#include "src_pw/symmetry_rho.h"
+#include "../src_pw/global.h"
+#include "../src_pw/symmetry_rho.h"
 #include "input_update.h"
-#include "src_io/chi0_hilbert.h"
+#include "../src_io/chi0_hilbert.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 //
-#include "module_neighbor/sltk_atom_arrange.h"
+#include "../module_neighbor/sltk_atom_arrange.h"
 #include "src_lcao/LCAO_nnr.h"
-#include "src_io/istate_charge.h"
-#include "src_io/istate_envelope.h"
+#include "../src_io/istate_charge.h"
+#include "../src_io/istate_envelope.h"
 #include "ELEC_scf.h"
 #include "ELEC_nscf.h"
 #include "ELEC_cbands_gamma.h"
@@ -19,8 +19,8 @@
 //
 #include "src_ri/exx_abfs.h"
 #include "src_ri/exx_opt_orb.h"
-#include "src_pw/vdwd2.h"
-#include "src_pw/vdwd3.h"
+#include "../src_pw/vdwd2.h"
+#include "../src_pw/vdwd3.h"
 
 
 void LOOP_elec::solve_elec_stru(const int &istep)

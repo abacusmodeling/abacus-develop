@@ -30,10 +30,12 @@ void berryphase::get_occupation_bands()
 
 void berryphase::lcao_init()
 {
+	#ifdef __LCAO
 	TITLE("berryphase","lcao_init");
 	lcao_method.init();
 	lcao_method.cal_R_number();
 	lcao_method.cal_orb_overlap();
+	#endif
 	return;
 }
 
@@ -309,6 +311,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 			
 			delete[] ipiv;
 		}
+		#ifdef __LCAO
 		else if(BASIS_TYPE=="lcao")
 		{
 			if(NSPIN!=4)
@@ -354,6 +357,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 			*/
 			// test by jingan
 		}
+		#endif
 
 
 	}

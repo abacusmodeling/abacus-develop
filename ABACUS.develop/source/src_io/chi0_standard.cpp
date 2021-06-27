@@ -7,12 +7,12 @@
 //theory . 
 //-------------------------------------------------------------------------------
 
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "chi0_standard.h"
-#include "src_pw/hamilt_pw.h"
-#include "src_pw/wavefunc_in_pw.h"
-#include "src_io/optical.h"
-#include "src_pw/klist.h"
+#include "../src_pw/hamilt_pw.h"
+#include "../src_pw/wavefunc_in_pw.h"
+#include "../src_io/optical.h"
+#include "../src_pw/klist.h"
 #include <iostream>
 #include <cstring>
 #include <vector>

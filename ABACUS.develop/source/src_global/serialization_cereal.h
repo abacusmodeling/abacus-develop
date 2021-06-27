@@ -7,9 +7,9 @@
 #include <cereal/types/map.hpp>
 #include <cereal/types/set.hpp>
 
-#include "src_global/vector3.h"
+#include "../src_global/vector3.h"
 #include "src_ri/abfs-vector3_order.h"
-#include "module_base/matrix.h"
+#include "../module_base/matrix.h"
 
 
 template<class Archive, typename T> void serialize( Archive & ar, Vector3<T> & v ){ ar(v.x); ar(v.y); ar(v.z); }

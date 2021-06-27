@@ -1,6 +1,6 @@
 #include "restart.h"
-#include "src_global/global_function.h"
-#include "src_pw/global.h"
+#include "../src_global/global_function.h"
+#include "../src_pw/global.h"
 #include "src_lcao/global_fp.h"
 #include <fcntl.h> 
 #include <unistd.h>

@@ -1,4 +1,4 @@
-#include "src_pw/potential.h"
+#include "../src_pw/potential.h"
 #include "global.h"
 #include "../src_lcao/ELEC_evolve.h"
 

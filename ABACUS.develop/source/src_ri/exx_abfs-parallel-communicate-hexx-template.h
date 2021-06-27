@@ -2,7 +2,7 @@
 #define EXX_ABFS_PARALLEL_COMMUNICATE_HEXX_TEMPLATE_H
 
 #include "exx_abfs-parallel-communicate-hexx.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "src_lcao/global_fp.h"
 #include <cassert>
 

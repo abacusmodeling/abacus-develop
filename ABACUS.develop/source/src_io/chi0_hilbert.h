@@ -5,8 +5,8 @@
 #ifndef CHI0_HILBERT_H
 #define CHI0_HILBERT_H
 #include "../input_conv.h"
-#include "src_pw/wavefunc.h"
-#include "src_parallel/parallel_global.h"
+#include "../src_pw/wavefunc.h"
+#include "../src_parallel/parallel_global.h"
 
 class Chi0_hilbert 
 {

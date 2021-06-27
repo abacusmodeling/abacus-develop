@@ -2,7 +2,7 @@
 #define LCAO_MATRIX_H
 
 #include "../src_pw/tools.h"
-#include "src_parallel/parallel_orbitals.h"
+#include "../src_parallel/parallel_orbitals.h"
 
 class LCAO_Matrix 
 {

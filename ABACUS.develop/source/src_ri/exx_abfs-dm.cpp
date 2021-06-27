@@ -1,9 +1,9 @@
 #include "exx_abfs.h"
 
-#include "src_pw/global.h"
-#include "src_global/mathzone.h"
-#include "src_pw/charge_pulay.h"
-#include "src_global/container_operator.h"
+#include "../src_pw/global.h"
+#include "../src_global/mathzone.h"
+#include "../src_pw/charge_pulay.h"
+#include "../src_global/container_operator.h"
 
 #include "src_external/src_test/src_global/matrix-test.h"
 #include "src_external/src_test/src_global/complexmatrix-test.h"

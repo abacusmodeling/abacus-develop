@@ -1,5 +1,5 @@
-#include "src_pw/charge.h"
-#include "src_pw/global.h"
+#include "../src_pw/charge.h"
+#include "../src_pw/global.h"
 
 bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwan
 {

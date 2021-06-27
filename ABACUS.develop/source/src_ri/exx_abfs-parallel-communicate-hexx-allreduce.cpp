@@ -1,7 +1,7 @@
 #include "exx_abfs-parallel-communicate-hexx.h"
-#include "src_global/serialization_boost.h"
+#include "../src_global/serialization_boost.h"
 
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "src_lcao/global_fp.h"
 
 #include <thread>

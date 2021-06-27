@@ -3,6 +3,7 @@
 
 //#include "tools.h"
 #include "atom_pseudo.h"
+#include "../src_io/output.h"
 class Atom: public Atom_pseudo
 {
 public:

@@ -4,7 +4,7 @@
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
 #include "../src_global/math_ylmreal.h"
-#include "src_pw/soc.h"
+#include "../src_pw/soc.h"
 
 WF_atomic::WF_atomic()
 {

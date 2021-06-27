@@ -7,7 +7,7 @@
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
 #include "../src_global/math_ylmreal.h"
-#include "src_pw/soc.h"
+#include "../src_pw/soc.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()
 {
@@ -419,7 +419,7 @@ complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int 
 	
 	return cf;
 }
-
+#ifdef __LCAO
 double pseudopot_cell_vnl::CG(int l1, int m1, int l2, int m2, int L, int M)      // pengfei Li 2018-3-23
 {
 	int dim = L*L+M;
@@ -549,6 +549,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 	timer::tick("pp_cell_vnl","getvnl_alpha");
 	return;
 } 
+#endif
 
 void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 {

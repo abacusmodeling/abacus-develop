@@ -1,5 +1,4 @@
 #include "pseudo_nc.h"
-//#include "../src_pw/global.h"
 
 pseudo_nc::pseudo_nc()
 {

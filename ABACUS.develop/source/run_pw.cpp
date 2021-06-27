@@ -24,6 +24,10 @@ void Run_pw::plane_wave_line(void)
     // cell relaxation. b) put NLOCAL and NBANDS as input parameters
     ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
     //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
+
+    // setup vdwd2 parameters
+	//vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021.06.27
+
     DONE(ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed

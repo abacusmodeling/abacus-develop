@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include "atom_spec.h"
-//#include "../src_pw/global.h"		// only out
 
 Atom::Atom()
 {

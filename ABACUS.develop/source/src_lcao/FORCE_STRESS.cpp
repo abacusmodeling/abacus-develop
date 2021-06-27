@@ -4,8 +4,8 @@
 #include "./dftu.h"  //Quxin add for DFT+U on 20201029
 // new
 #include "../src_pw/H_XC_pw.h"
-#include "src_pw/vdwd2.h"
-#include "src_pw/vdwd3.h"
+#include "../src_pw/vdwd2.h"
+#include "../src_pw/vdwd3.h"
 
 double Force_Stress_LCAO::force_invalid_threshold_ev = 0.00;
 double Force_Stress_LCAO::output_acc = 1.0e-8;
