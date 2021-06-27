@@ -6,7 +6,7 @@
 #ifndef MATRIX_TEST_H
 #define MATRIX_TEST_H
 
-#include "module_base/matrix.h"
+#include "../../../module_base/matrix.h"
 #include<limits>
 
 static double sum( const matrix & m )

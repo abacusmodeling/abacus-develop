@@ -1,6 +1,6 @@
-#include "src_pw/charge.h"
-#include "src_pw/energy.h"
-#include "src_pw/global.h"
+#include "../src_pw/charge.h"
+#include "../src_pw/energy.h"
+#include "../src_pw/global.h"
 #include "../src_lcao/ELEC_evolve.h"
 
 //fuxiang add 2017-03-15

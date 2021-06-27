@@ -5,10 +5,10 @@
 //=========================================================
 
 #include "wfc_dm_2d.h"
-#include "src_global/lapack_connector.h"
-#include "src_global/scalapack_connector.h"
+#include "../src_global/lapack_connector.h"
+#include "../src_global/scalapack_connector.h"
 #include "src_lcao/global_fp.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 
 #include "src_external/src_test/test_function.h"
 #include "src_external/src_test/src_global/complexmatrix-test.h"

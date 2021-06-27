@@ -4,7 +4,7 @@
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h"
 #include "../src_global/math_ylmreal.h"
-#include "src_pw/soc.h"
+#include "../src_pw/soc.h"
 
 void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_local)
 {

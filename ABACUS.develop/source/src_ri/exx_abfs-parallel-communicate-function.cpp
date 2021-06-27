@@ -1,5 +1,5 @@
 #include "exx_abfs-parallel-communicate-function.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "src_lcao/global_fp.h"
 
 vector<pair<vector<bool>,vector<bool>>>

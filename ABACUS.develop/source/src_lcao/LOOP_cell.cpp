@@ -4,7 +4,7 @@
 #include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
 
 // delete in near future
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 
 LOOP_cell::LOOP_cell(){}
 LOOP_cell::~LOOP_cell(){}

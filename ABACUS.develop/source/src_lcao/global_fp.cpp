@@ -1,5 +1,5 @@
 #include "global_fp.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 
 Grid_Driver GridD(test_deconstructor, test_grid_driver,test_grid);
 Parallel_Orbitals ParaO;

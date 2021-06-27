@@ -1,5 +1,5 @@
 #include "exx_opt_orb.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "module_ORB/ORB_atomic_lm.h"
 #include "src_ri/exx_abfs.h"
 #include "src_ri/exx_abfs-abfs_index.h"

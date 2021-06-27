@@ -1,5 +1,5 @@
-#include "src_ions/Cell_PW.h"
-#include "src_ions/ions.h"
+#include "../src_ions/Cell_PW.h"
+#include "../src_ions/ions.h"
 
 void Cell_PW::opt_cells_pw()
 {

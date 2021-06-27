@@ -1,6 +1,6 @@
 #include "exx_abfs-screen-cauchy.h"
 
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 
 #include "src_external/src_test/src_ri/exx_abfs-screen-test.h"
 //double Exx_Abfs::Screen::Cauchy::num_screen1 = 0;

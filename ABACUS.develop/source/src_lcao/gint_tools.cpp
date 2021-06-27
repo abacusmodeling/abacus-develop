@@ -1,7 +1,7 @@
 #include "gint_tools.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "src_lcao/global_fp.h"
-#include "src_global/ylm.h"
+#include "../src_global/ylm.h"
 #include <cmath>
 
 namespace Gint_Tools

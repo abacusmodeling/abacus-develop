@@ -1,5 +1,5 @@
 #include "exx_abfs-parallel-distribute-kmeans.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include <random>
 
 #include "src_external/src_test/test_function.h"

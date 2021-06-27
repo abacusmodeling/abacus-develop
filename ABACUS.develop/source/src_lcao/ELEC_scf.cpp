@@ -1,16 +1,16 @@
 #include "ELEC_scf.h"
-#include "src_pw/global.h"
-#include "src_io/chi0_hilbert.h"
-#include "src_pw/symmetry_rho.h"
+#include "../src_pw/global.h"
+#include "../src_io/chi0_hilbert.h"
+#include "../src_pw/symmetry_rho.h"
 #include "dftu.h"
 #include "LCAO_evolve.h"
 #include "ELEC_cbands_k.h"
 #include "ELEC_cbands_gamma.h"
 #include "ELEC_evolve.h"
 #include "input_update.h"
-#include "src_pw/occupy.h"
+#include "../src_pw/occupy.h"
 //new
-#include "src_pw/H_Ewald_pw.h"
+#include "../src_pw/H_Ewald_pw.h"
 
 ELEC_scf::ELEC_scf(){}
 ELEC_scf::~ELEC_scf(){}

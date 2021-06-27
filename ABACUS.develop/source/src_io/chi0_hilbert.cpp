@@ -7,12 +7,12 @@
 //theory . and it is a basic work and use the hilbert-transform to reduce the
 //calculated quantities.
 //-------------------------------------------------------------------------------
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "chi0_hilbert.h"
-#include "src_pw/hamilt_pw.h"
-#include "src_pw/wavefunc_in_pw.h"
+#include "../src_pw/hamilt_pw.h"
+#include "../src_pw/wavefunc_in_pw.h"
 #include "../src_io/optical.h"
-#include "src_pw/klist.h"
+#include "../src_pw/klist.h"
 #include <iostream>
 #include "../src_lcao/global_fp.h"
 
@@ -51,7 +51,7 @@ Chi0_hilbert::~Chi0_hilbert()
 }
 
 // begin calculate
-#include "src_pw/occupy.h"
+#include "../src_pw/occupy.h"
 void Chi0_hilbert::Chi()
 {
 	TITLE("Chi0_hilbert","Chi");
