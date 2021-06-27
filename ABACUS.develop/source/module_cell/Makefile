@@ -25,8 +25,8 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 include Makefile.Objects
 
 VPATH=../src_global\
-:./src_io\
-:./src_pw\
+:../src_io\
+:../src_pw\
 :./\
 
 #==========================
@@ -43,7 +43,7 @@ FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 #==========================
 # MAKING OPTIONS
 #==========================
-ORB : 
+cell : 
 	@ make init
 	@ make -j $(NP) serial
 

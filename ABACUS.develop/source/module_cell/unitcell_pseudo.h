@@ -2,7 +2,7 @@
 #define UNITCELL_PSEUDO_H
 
 #include "atom_spec.h"
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 #include "unitcell.h"
 
 class UnitCell_pseudo : public UnitCell

@@ -1,5 +1,5 @@
 #include "exx_abfs-parallel-communicate-dm3.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 
 const matrix &Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 	const matrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const

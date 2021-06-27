@@ -1,7 +1,7 @@
 #ifndef MD_FIRE_H
 #define MD_FIRE_H
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 
 class MD_fire
 {

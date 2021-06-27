@@ -1,7 +1,7 @@
 #ifndef LOCAL_ORBITAL_CHARGE
 #define LOCAL_ORBITAL_CHARGE
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 #include "src_lcao/grid_technique.h"
 #include "src_lcao/wfc_dm_2d.h"
 

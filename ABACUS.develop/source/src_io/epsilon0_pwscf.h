@@ -1,7 +1,7 @@
 #ifndef EPSILON0_PWSCF_H
 #define EPSILON0_PWSCF_H
 
-#include "src_pw/wavefunc.h"
+#include "../src_pw/wavefunc.h"
 #include "../src_parallel/parallel_global.h"
 
 class Epsilon0_pwscf

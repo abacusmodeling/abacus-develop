@@ -43,7 +43,7 @@ extern Exx_Global exx_global;
 extern Exx_Lip exx_lip;
 
 #include "symmetry.h"
-#include "module_cell/unitcell_pseudo.h"
+#include "../module_cell/unitcell_pseudo.h"
 #include "../src_parallel/parallel_grid.h"
 #include "../src_parallel/parallel_kpoints.h"
 extern pseudopot_cell_vnl ppcell;
@@ -59,7 +59,8 @@ extern Vdwd2_Parameters vdwd2_para;		// Peize Lin add 2021.03.09
 extern Vdwd3_Parameters vdwd3_para;		// jiyy add 2021-05-02	
 extern Restart restart;	// Peize Lin add 2020.04.04
 
+#ifdef __LCAO
 #include "../src_lcao/global_fp.h"
-
+#endif
 
 #endif

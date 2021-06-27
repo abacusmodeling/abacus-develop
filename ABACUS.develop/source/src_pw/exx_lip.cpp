@@ -4,16 +4,17 @@
 //==========================================================
 
 #include "exx_lip.h"
-#include "src_global/global_function.h"
-#include "src_global/vector3.h"
-#include "src_pw/global.h"
-#include "src_pw/klist.h"
-#include "src_pw/wavefunc.h"
-#include "src_pw/wavefunc_in_pw.h"
-#include "src_global/lapack_connector.h"
+#include "../src_global/global_function.h"
+#include "../src_global/vector3.h"
+#include "../src_pw/global.h"
+#include "../src_pw/klist.h"
+#include "../src_pw/wavefunc.h"
+#include "../src_pw/wavefunc_in_pw.h"
+#include "../src_global/lapack_connector.h"
 #include <limits>
+#include "../src_parallel/parallel_global.h"
 
-#include "src_external/src_test/test_function.h"
+#include "../src_external/src_test/test_function.h"
 
 Exx_Lip::Exx_Lip( const Exx_Global::Exx_Info &info_global )
 	:init_finish(false),

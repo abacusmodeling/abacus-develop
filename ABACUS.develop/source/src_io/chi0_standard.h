@@ -1,8 +1,8 @@
 #ifndef CHI0_STANDARD_H
 #define CHI0_STANDARD_H
 
-#include "src_pw/wavefunc.h"
-#include "src_parallel/parallel_global.h"
+#include "../src_pw/wavefunc.h"
+#include "../src_parallel/parallel_global.h"
 
 class Chi0_standard
 {

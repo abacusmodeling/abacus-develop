@@ -5,9 +5,9 @@
 
 #include "center2_orb-orb11.h"
 
-#include "src_global/constants.h"
-#include "src_global/ylm.h"
-#include "src_global/math_polyint.h"
+#include "../module_base/constants.h"
+#include "../src_global/ylm.h"
+#include "../src_global/math_polyint.h"
 
 #include <cmath>
 

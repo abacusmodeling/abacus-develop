@@ -62,15 +62,12 @@ stress_func_ewa.o\
 stress_func_har.o\
 stress_func_loc.o\
 stress_func_print.o\
-chi0_hilbert.o\
-chi0_standard.o\
 epsilon0_pwscf.o\
 epsilon0_vasp.o\
 MD_basic.o\
 MD_thermo.o\
 MD_fire.o\
 MD_func.o\
-exx_lip.o\
 soc.o\
 to_wannier90.o \
 unk_overlap_pw.o \

@@ -1,8 +1,8 @@
 #include "wavefunc.h"
 #include "global.h"
 #include "../src_pw/wavefunc_in_pw.h"
-#include "src_io/winput.h"
-#include "src_io/chi0_hilbert.h"
+#include "../src_io/winput.h"
+#include "../src_io/chi0_hilbert.h"
 
 wavefunc::wavefunc()
 {

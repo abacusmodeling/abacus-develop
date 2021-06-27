@@ -1,4 +1,4 @@
-#include "src_ions/MD_fire.h"
+#include "../src_ions/MD_fire.h"
 
 MD_fire::MD_fire()
 {

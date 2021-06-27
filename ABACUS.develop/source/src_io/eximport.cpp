@@ -699,9 +699,9 @@ void eximport::in_evc(ifstream &in)
 //===========
 //	energy
 //===========
-#include "src_pw/H_Ewald_pw.h"
-#include "src_pw/H_Hartree_pw.h"
-#include "src_pw/H_XC_pw.h"
+#include "../src_pw/H_Ewald_pw.h"
+#include "../src_pw/H_Hartree_pw.h"
+#include "../src_pw/H_XC_pw.h"
 void eximport::out_energy(ofstream &out_data)
 {
 	//cout << "\n ==> out_energy" << endl;

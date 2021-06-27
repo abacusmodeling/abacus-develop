@@ -1,11 +1,11 @@
 #include "conv_coulomb_pot.h"
 #include "conv_coulomb_pot-inl.h"
-#include "src_global/mathzone.h"
-#include "src_global/constants.h"
-#include "src_global/global_function.h"
+#include "../src_global/mathzone.h"
+#include "../module_base/constants.h"
+#include "../src_global/global_function.h"
 
 #include "src_external/src_test/test_function.h"
-#include "src_global/math_integral.h" // mohan add 2021-04-03
+#include "../src_global/math_integral.h" // mohan add 2021-04-03
 
 Conv_Coulomb_Pot::Conv_Coulomb_Pot(const Numerical_Orbital_Lm &orb_in)
 	:orb(orb_in)

@@ -9,10 +9,10 @@
 #ifndef POTENTIAL_LIBXC_H
 #define POTENTIAL_LIBXC_H
 
-#include "src_global/matrix.h"
-#include "src_global/vector3.h"
-#include "src_global/global_variable.h"
-#include "src_global/global_function.h"
+#include "../module_base/matrix.h"
+#include "../src_global/vector3.h"
+#include "../src_global/global_variable.h"
+#include "../src_global/global_function.h"
 #include <xc.h>
 #include <vector>
 #include <tuple>

@@ -1,13 +1,13 @@
 #include "tools.h"
 #include "global.h"
 #include "energy.h"
-#include "src_global/mymath.h"
+#include "../src_global/mymath.h"
 #include <vector>
 #include <mpi.h>
 #include <sys/time.h>
 #include "../src_pw/tools.h"
 #include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
-#include "src_pw/myfunc.h"
+#include "../src_pw/myfunc.h"
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"

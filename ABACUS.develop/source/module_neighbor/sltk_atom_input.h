@@ -3,7 +3,7 @@
 
 //#include "../src_pw/tools.h"
 #include "sltk_atom.h"
-#include "module_cell/unitcell.h"
+#include "../module_cell/unitcell.h"
 
 class Atom_input
 {

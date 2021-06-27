@@ -5,7 +5,7 @@
 #ifndef VARIABLE_CELL_H
 #define VARIABLE_CELL_H
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 #include "input.h"
 
 class Variable_Cell

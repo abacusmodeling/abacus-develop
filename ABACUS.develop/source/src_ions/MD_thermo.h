@@ -1,7 +1,7 @@
 #ifndef MD_THERMO_H
 #define MD_THERMO_H
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 
 class MD_thermo 
 {

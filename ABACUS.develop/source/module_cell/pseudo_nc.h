@@ -2,6 +2,7 @@
 #define PSEUDO_NC_H
 
 #include "read_pp.h"
+#include "../src_io/output.h"
 
 //-----------------------------------------
 // read in norm conserving pseudopotentials
@@ -75,10 +76,10 @@ class pseudo_nc
 	void set_pseudo_vl(const Pseudopot_upf &upf);
 	void set_pseudo_nc(const Pseudopot_upf &upf);
 
-	void print_pseudo_h(ofstream &ofs);
-	void print_pseudo_atom(ofstream &ofs);
-	void print_pseudo_vl(ofstream &ofs);
-	void print_pseudo_nc(ofstream &ofs);
+	void print_pseudo_h(ofstream &ofs, output &outp);
+	void print_pseudo_atom(ofstream &ofs, output &outp);
+	void print_pseudo_vl(ofstream &ofs, output &outp);
+	void print_pseudo_nc(ofstream &ofs, output &outp);
 
 };
 

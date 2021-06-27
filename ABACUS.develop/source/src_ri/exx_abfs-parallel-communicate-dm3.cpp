@@ -1,6 +1,6 @@
 #include "exx_abfs-parallel-communicate-dm3.h"
 #include "exx_abfs-parallel-communicate-dm3-template.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "src_lcao/global_fp.h"
 #include "src_ri/abfs-template.h"
 

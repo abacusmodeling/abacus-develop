@@ -6,9 +6,9 @@
 #include <fstream>
 
 #ifdef USE_BOOST_SERIALIZATION
-	#include "src_global/serialization_boost.h"
+	#include "../src_global/serialization_boost.h"
 #elif defined USE_CEREAL_SERIALIZATION
-	#include "src_global/serialization_cereal.h"
+	#include "../src_global/serialization_cereal.h"
 #endif
 
 template<typename T>

@@ -8,6 +8,7 @@ HEADERS= *.h
 OBJS_BASE=tool_title.o\
 tool_quit.o\
 timer.o\
+output.o\
 
 OBJS_ORBITAL=pseudo_nc.o\
 atom_spec.o\
