@@ -115,7 +115,7 @@ void UnitCell_pseudo::print_unitcell_pseudo(const string &fn)
 	if(test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
 	ofstream ofs( fn.c_str() );
 
-	this->print_cell(ofs);
+	this->print_cell(ofs, out);
 	for (int i = 0;i < ntype;i++)
 	{
 		atoms[i].print_Atom(ofs, out);
