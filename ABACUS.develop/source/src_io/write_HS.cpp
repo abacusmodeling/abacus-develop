@@ -860,3 +860,441 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     timer::tick("HS_Matrix","save_HSR_tr");
     return;
 }
+
+void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_threshold, const bool &binary)
+{
+    TITLE("HS_Matrix","save_HSR_sparse");
+    timer::tick("HS_Matrix","save_HSR_sparse");
+
+    auto &HR_sparse_ptr = LM.HR_sparse;
+    auto &HR_soc_sparse_ptr = LM.HR_soc_sparse;
+    auto &SR_sparse_ptr = LM.SR_sparse;
+    auto &SR_soc_sparse_ptr = LM.SR_soc_sparse;
+
+    int R_x = GridD.getCellX();
+    int R_y = GridD.getCellY();
+    int R_z = GridD.getCellZ();
+
+    double R_minX = GridD.getD_minX();
+    double R_minY = GridD.getD_minY();
+    double R_minZ = GridD.getD_minZ();
+
+    int total_R_number = R_x * R_y * R_z;
+    int output_R_number = 0;
+    int *H_nonzero_number = new int[total_R_number];
+    int *S_nonzero_number = new int[total_R_number];
+    int count_n = 0;
+    for (int ix = 0; ix < R_x; ++ix)
+    {
+        for (int iy = 0; iy < R_y; ++iy)
+        {
+            for (int iz = 0; iz < R_z; ++iz)
+            {
+                H_nonzero_number[count_n] = 0;
+                S_nonzero_number[count_n] = 0;
+                if (NSPIN != 4)
+                {
+                    for (auto &iter : HR_sparse_ptr[ix][iy][iz])
+                    {
+                        H_nonzero_number[count_n] += iter.second.size();
+                    }
+                    for (auto &iter : SR_sparse_ptr[ix][iy][iz])
+                    {
+                        S_nonzero_number[count_n] += iter.second.size();
+                    }
+                }
+                else
+                {
+                    for (auto &iter : HR_soc_sparse_ptr[ix][iy][iz])
+                    {
+                        H_nonzero_number[count_n] += iter.second.size();
+                    }
+                    for (auto &iter : SR_soc_sparse_ptr[ix][iy][iz])
+                    {
+                        S_nonzero_number[count_n] += iter.second.size();
+                    }
+                }
+
+                count_n++;
+            }
+        }
+    }
+
+    Parallel_Reduce::reduce_int_all(H_nonzero_number, total_R_number);
+    Parallel_Reduce::reduce_int_all(S_nonzero_number, total_R_number);
+
+    for (int index = 0; index < total_R_number; ++index)
+    {
+        if (H_nonzero_number[index] == 0 && S_nonzero_number[index] == 0)
+        {
+            // do nothing
+        } 
+        else
+        {
+            output_R_number++;
+        }
+    }
+
+    stringstream ssh;
+    stringstream sss;
+    ssh << global_out_dir << "data-HR-sparse_SPIN" << current_spin << ".csr";
+    sss << global_out_dir << "data-SR-sparse_SPIN" << current_spin << ".csr";
+    ofstream g1;
+    ofstream g2;
+
+    if(DRANK==0)
+    {
+        if (binary)
+        {
+            g1.open(ssh.str().c_str(), ios::binary);
+            g1.write(reinterpret_cast<char *>(&NLOCAL), sizeof(int));
+            g1.write(reinterpret_cast<char *>(&output_R_number), sizeof(int));
+
+            g2.open(sss.str().c_str(), ios::binary);
+            g2.write(reinterpret_cast<char *>(&NLOCAL), sizeof(int));
+            g2.write(reinterpret_cast<char *>(&output_R_number), sizeof(int));
+        }
+        else
+        {
+            g1.open(ssh.str().c_str());
+            g1 << "Matrix Dimension of H(R): " << NLOCAL <<endl;
+            g1 << "Matrix number of H(R): " << output_R_number << endl;
+
+            g2.open(sss.str().c_str());
+            g2 << "Matrix Dimension of S(R): " << NLOCAL <<endl;
+            g2 << "Matrix number of S(R): " << output_R_number << endl;
+        }
+    }
+
+    count_n = 0;
+    for(int ix=0; ix<R_x; ix++)
+    {
+        int dRx = ix + R_minX;
+        for(int iy=0; iy<R_y; iy++)
+        {
+            int dRy = iy + R_minY;
+            for(int iz=0; iz<R_z; iz++)
+            {
+                int dRz = iz + R_minZ;
+
+                if (H_nonzero_number[count_n] == 0 && S_nonzero_number[count_n] == 0) 
+                {
+                    count_n++;
+                    continue;
+                }
+
+                if (DRANK == 0) 
+                {
+                    if (binary)
+                    {
+                        g1.write(reinterpret_cast<char *>(&dRx), sizeof(int));
+                        g1.write(reinterpret_cast<char *>(&dRy), sizeof(int));
+                        g1.write(reinterpret_cast<char *>(&dRz), sizeof(int));
+                        g1.write(reinterpret_cast<char *>(&H_nonzero_number[count_n]), sizeof(int));
+
+                        g2.write(reinterpret_cast<char *>(&dRx), sizeof(int));
+                        g2.write(reinterpret_cast<char *>(&dRy), sizeof(int));
+                        g2.write(reinterpret_cast<char *>(&dRz), sizeof(int));
+                        g2.write(reinterpret_cast<char *>(&S_nonzero_number[count_n]), sizeof(int));
+                    }
+                    else
+                    {
+                        g1 << dRx << " " << dRy << " " << dRz << " " << H_nonzero_number[count_n] << endl;
+                        g2 << dRx << " " << dRy << " " << dRz << " " << S_nonzero_number[count_n] << endl;
+                    }
+                }
+
+                if (H_nonzero_number[count_n] == 0)
+                {
+                    // if (DRANK == 0)
+                    // {
+                    //     if (!binary)
+                    //     {
+                    //         g1 << endl;
+                    //         g1 << endl;
+                    //         for (int index = 0; index < NLOCAL+1; ++index)
+                    //         {
+                    //             g1 << 0 << " ";
+                    //         }
+                    //         g1 << endl;
+                    //     }
+                    // }
+                }
+                else
+                {
+                    if (NSPIN != 4)
+                    {
+                        output_single_R(g1, HR_sparse_ptr[ix][iy][iz], sparse_threshold, binary);
+                    }
+                    else
+                    {
+                        output_soc_single_R(g1, HR_soc_sparse_ptr[ix][iy][iz], sparse_threshold, binary);
+                    }
+                }
+
+                if (S_nonzero_number[count_n] == 0)
+                {
+                    // if (!binary)
+                    // {
+                    //     if (DRANK == 0)
+                    //     {
+                    //         g2 << endl;
+                    //         g2 << endl;
+                    //         for (int index = 0; index < NLOCAL+1; ++index)
+                    //         {
+                    //             g2 << 0 << " ";
+                    //         }
+                    //         g2 << endl;
+                    //     }
+                    // }
+                }
+                else
+                {
+                    if (NSPIN != 4)
+                    {
+                        output_single_R(g2, SR_sparse_ptr[ix][iy][iz], sparse_threshold, binary);
+                    }
+                    else
+                    {
+                        output_soc_single_R(g2, SR_soc_sparse_ptr[ix][iy][iz], sparse_threshold, binary);
+                    }
+                }
+
+                count_n++;
+
+            }
+        }
+    }
+
+    if(DRANK==0) 
+    {
+        g1.close();
+        g2.close();
+    }
+
+    delete[] H_nonzero_number;
+    delete[] S_nonzero_number;
+    H_nonzero_number = nullptr;
+    S_nonzero_number = nullptr;
+
+    timer::tick("HS_Matrix","save_HSR_sparse");
+    return;
+}
+
+void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, double>> &XR, const double &sparse_threshold, const bool &binary)
+{
+    double *line = nullptr;
+    vector<int> indptr;
+    indptr.reserve(NLOCAL + 1);
+    indptr.push_back(0);
+    
+    stringstream tem1;
+    tem1 << global_out_dir << "temp_sparse_indices.dat";
+    ofstream ofs_tem1;
+    ifstream ifs_tem1;
+
+    if (DRANK == 0)
+    {
+        if (binary)
+        {
+            ofs_tem1.open(tem1.str().c_str(), ios::binary);
+        }
+        else
+        {
+            ofs_tem1.open(tem1.str().c_str());
+        }
+    }
+
+    for(int row = 0; row < NLOCAL; ++row)
+    {
+        line = new double[NLOCAL];
+        ZEROS(line, NLOCAL);
+       
+        if(ParaO.trace_loc_row[row] >= 0)
+        {
+            auto iter = XR.find(row);
+            if (iter != XR.end())
+            {
+                for (auto &value : iter->second)
+                {
+                    line[value.first] = value.second;
+                }
+            }
+        }
+
+        Parallel_Reduce::reduce_double_all(line, NLOCAL);
+        
+        if(DRANK == 0)
+        {
+            int nonzeros_count = 0;
+            for (int col = 0; col < NLOCAL; ++col)
+            {
+                if (abs(line[col]) > sparse_threshold)
+                {
+                    if (binary)
+                    {
+                        ofs.write(reinterpret_cast<char *>(&line[col]), sizeof(double));
+                        ofs_tem1.write(reinterpret_cast<char *>(&col), sizeof(int));
+                    }
+                    else
+                    {
+                        ofs << " " << fixed << scientific << setprecision(8) << line[col];
+                        ofs_tem1 << " " << col;
+                    }
+                        
+                    nonzeros_count++;
+            
+                }
+                
+            }
+            nonzeros_count += indptr.back();
+            indptr.push_back(nonzeros_count);
+        }
+
+        delete[] line;
+        line = nullptr;
+        
+    }
+
+    if (DRANK == 0)
+    {
+        if (binary)
+        {
+            ofs_tem1.close();
+            ifs_tem1.open(tem1.str().c_str(), ios::binary);
+            ofs << ifs_tem1.rdbuf();
+            ifs_tem1.close();
+            for (auto &i : indptr)
+            {
+                ofs.write(reinterpret_cast<char *>(&i), sizeof(int));
+            }
+        }
+        else
+        {
+            ofs << endl;
+            ofs_tem1 << endl;
+            ofs_tem1.close();
+            ifs_tem1.open(tem1.str().c_str());
+            ofs << ifs_tem1.rdbuf();
+            ifs_tem1.close();
+            for (auto &i : indptr)
+            {
+                ofs << " " << i;
+            }
+            ofs << endl;
+        }
+            
+        std::remove(tem1.str().c_str());
+        
+    }
+
+}
+
+void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t, complex<double>>> &XR, const double &sparse_threshold, const bool &binary)
+{
+    complex<double> *line = nullptr;
+    vector<int> indptr;
+    indptr.reserve(NLOCAL + 1);
+    indptr.push_back(0);
+    
+    stringstream tem1;
+    tem1 << global_out_dir << "temp_sparse_indices.dat";
+    ofstream ofs_tem1;
+    ifstream ifs_tem1;
+
+    if (DRANK == 0)
+    {
+        if (binary)
+        {
+            ofs_tem1.open(tem1.str().c_str(), ios::binary);
+        }
+        else
+        {
+            ofs_tem1.open(tem1.str().c_str());
+        }
+    }
+
+    for(int row = 0; row < NLOCAL; ++row)
+    {
+        line = new complex<double>[NLOCAL];
+        ZEROS(line, NLOCAL);
+       
+        if(ParaO.trace_loc_row[row] >= 0)
+        {
+            auto iter = XR.find(row);
+            if (iter != XR.end())
+            {
+                for (auto &value : iter->second)
+                {
+                    line[value.first] = value.second;
+                }
+            }
+        }
+
+        Parallel_Reduce::reduce_complex_double_all(line, NLOCAL);
+        
+        if (DRANK == 0)
+        {
+            int nonzeros_count = 0;
+            for (int col = 0; col < NLOCAL; ++col)
+            {
+                if (abs(line[col]) > sparse_threshold)
+                {
+                    if (binary)
+                    {
+                        ofs.write(reinterpret_cast<char *>(&line[col]), sizeof(complex<double>));
+                        ofs_tem1.write(reinterpret_cast<char *>(&col), sizeof(int));
+                    }
+                    else
+                    {
+                        ofs << " (" << fixed << scientific << setprecision(8) << line[col].real() << "," 
+                                    << fixed << scientific << setprecision(8) << line[col].imag() << ")";
+                        ofs_tem1 << " " << col;
+                    }
+
+                    nonzeros_count++;
+
+                }
+                
+            }
+            nonzeros_count += indptr.back();
+            indptr.push_back(nonzeros_count);
+        }
+
+        delete[] line;
+        line = nullptr;
+        
+    }
+
+    if (DRANK == 0)
+    {
+        if (binary)
+        {
+            ofs_tem1.close();
+            ifs_tem1.open(tem1.str().c_str(), ios::binary);
+            ofs << ifs_tem1.rdbuf();
+            ifs_tem1.close();
+            for (auto &i : indptr)
+            {
+                ofs.write(reinterpret_cast<char *>(&i), sizeof(int));
+            }
+        }
+        else
+        {
+            ofs << endl;
+            ofs_tem1 << endl;
+            ofs_tem1.close();
+            ifs_tem1.open(tem1.str().c_str());
+            ofs << ifs_tem1.rdbuf();
+            ifs_tem1.close();
+            for (auto &i : indptr)
+            {
+                ofs << " " << i;
+            }
+            ofs << endl;
+        }
+
+        std::remove(tem1.str().c_str());
+    }
+
+}
