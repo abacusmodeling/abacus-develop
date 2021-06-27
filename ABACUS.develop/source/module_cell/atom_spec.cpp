@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include "atom_spec.h"
-#include "src_pw/global.h"		// only out
+//#include "../src_pw/global.h"		// only out
 
 Atom::Atom()
 {
@@ -77,7 +77,7 @@ void Atom::set_index(void)
     return;
 }
 
-void Atom::print_Atom(ofstream &ofs)
+void Atom::print_Atom(ofstream &ofs, output &outp)
 {
     //OUT(ofs,"print_Atom()");
     OUT(ofs,"label",label);
@@ -94,7 +94,7 @@ void Atom::print_Atom(ofstream &ofs)
     //===================
     this->print_atom(ofs);
 
-    out.printv31_d(ofs,"atom_position(cartesian)",tau,na);
+    outp.printv31_d(ofs,"atom_position(cartesian)",tau,na);
     /*
     for (int i = 0;i < na;i++)
     {

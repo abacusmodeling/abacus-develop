@@ -1,5 +1,5 @@
 #include "pseudo_nc.h"
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 
 pseudo_nc::pseudo_nc()
 {
@@ -100,15 +100,15 @@ void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 } // end subroutine set_pseudo_upf
 
 
-void pseudo_nc::print_pseudo_nc(ofstream &ofs)
+void pseudo_nc::print_pseudo_nc(ofstream &ofs, output &outp)
 {
-	print_pseudo_vl(ofs);
+	print_pseudo_vl(ofs, outp);
 	ofs << "\n pseudo_nc : ";
 	ofs << "\n kkbeta	" << kkbeta;
 	ofs << "\n nh  " << nh;
-	out.printr1_d(ofs, " lll : ", lll, nbeta);
-	out.printrm(ofs, " betar : ", betar);
-	out.printrm(ofs, " dion : ", dion);
+	outp.printr1_d(ofs, " lll : ", lll, nbeta);
+	outp.printrm(ofs, " betar : ", betar);
+	outp.printrm(ofs, " dion : ", dion);
 	ofs << "\n ----------------------";
 }
 
@@ -346,31 +346,31 @@ void pseudo_nc::set_pseudo_vl(const Pseudopot_upf &upf)
 } 
 
 
-void pseudo_nc::print_pseudo_atom(ofstream &ofs)
+void pseudo_nc::print_pseudo_atom(ofstream &ofs, output &outp)
 {
-	print_pseudo_h(ofs);
+	print_pseudo_h(ofs, outp);
 	ofs << "\n pseudo_atom : ";
 	ofs << "\n msh	" << msh;
 //	ofs	<< "\n nchi	" << nchi;
-	out.printr1_d(ofs, " r : ", r, mesh);
-	out.printr1_d(ofs, " rab : ", rab, mesh);
-	out.printr1_d(ofs, " rho_atc : ", rho_atc, mesh);
-	out.printr1_d(ofs, " rho_at : ", rho_at, mesh);
-	out.printr1_d(ofs," jchi : ", jchi, nchi);
-	out.printrm(ofs, " chi : ", chi);
+	outp.printr1_d(ofs, " r : ", r, mesh);
+	outp.printr1_d(ofs, " rab : ", rab, mesh);
+	outp.printr1_d(ofs, " rho_atc : ", rho_atc, mesh);
+	outp.printr1_d(ofs, " rho_at : ", rho_at, mesh);
+	outp.printr1_d(ofs," jchi : ", jchi, nchi);
+	outp.printrm(ofs, " chi : ", chi);
 	ofs << "\n ----------------------";
 }
 
 
-void pseudo_nc::print_pseudo_vl(ofstream &ofs)
+void pseudo_nc::print_pseudo_vl(ofstream &ofs, output &outp)
 {
 	ofs << "\n pseudo_vl:";
-	print_pseudo_atom(ofs);
-	out.printr1_d(ofs, "vloc_at : ", vloc_at, mesh);
+	print_pseudo_atom(ofs, outp);
+	outp.printr1_d(ofs, "vloc_at : ", vloc_at, mesh);
 	ofs << "\n ----------------------------------- ";
 }
 
-void pseudo_nc::print_pseudo_h(ofstream &ofs)
+void pseudo_nc::print_pseudo_h(ofstream &ofs, output &outp)
 {
     ofs << "\n pseudo_info :";
     ofs << "\n nv       " << nv;
@@ -388,8 +388,8 @@ void pseudo_nc::print_pseudo_h(ofstream &ofs)
     ofs << "\n nchi " << nchi;
     ofs << "\n nbeta    " << nbeta;
 //  out.printr1_d(ofs," els: ", els, nchi);
-    out.printr1_d(ofs, " lchi: ", lchi, nchi);
-    out.printr1_d(ofs, " oc: ", oc, nchi);
+    outp.printr1_d(ofs, " lchi: ", lchi, nchi);
+    outp.printr1_d(ofs, " oc: ", oc, nchi);
     ofs << "\n ----------------------";
 }
 

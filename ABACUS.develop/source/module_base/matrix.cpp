@@ -14,7 +14,7 @@ using namespace std;
 
 #ifdef __NORMAL
 #else
-#include "lapack_connector.h"
+#include "../src_global/lapack_connector.h"
 #endif
 
 //*********************************************************
