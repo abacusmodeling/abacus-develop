@@ -7,6 +7,10 @@
 
 #include "global_fp.h" // mohan add 2021-01-30
 
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
+
 // can be done by GPU
 void Gint_Gamma::cal_band_rho(
 	const int na_grid, 
@@ -159,8 +163,10 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 
 	if(max_size)
     {
-        const int omp_threads = omp_get_max_threads();
-		omp_set_num_threads(std::max(1,omp_threads/GridT.nbx));			// Peize Lin update 2021.01.20
+#ifdef __MKL
+   		const int mkl_threads = mkl_get_max_threads();
+		mkl_set_num_threads(std::max(1,mkl_threads/GridT.nbx));		// Peize Lin update 2021.01.20
+#endif
 		
 #ifdef __OPENMP
 		#pragma omp parallel
@@ -239,7 +245,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 			}// i
 		} // end of #pragma omp parallel
 			
-        omp_set_num_threads(omp_threads);
+#ifdef __MKL
+   		mkl_set_num_threads(mkl_threads);
+#endif
     } // end of if(max_size)
 
 	return rho;
