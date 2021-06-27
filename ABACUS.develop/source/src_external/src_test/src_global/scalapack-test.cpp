@@ -1,6 +1,6 @@
 #include <mpi.h>
 #include "src_global/scalapack-connector.h"
-#include "src_global/global_function.h"
+#include "module_base/global_function.h"
 
 void test_pblas()
 {

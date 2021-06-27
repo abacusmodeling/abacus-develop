@@ -13,6 +13,7 @@
 //----------------------------------------------------------
 // EXPLAIN : Be Called in input.cpp
 //----------------------------------------------------------
+/*
 void Global_File::make_dir_out(
     const std::string &suffix,
 	const std::string &calculation,
@@ -100,7 +101,7 @@ void Global_File::make_dir_out(
     }
     return;
 }
-
+*/
 void Global_File::make_dir_atom(const std::string &label)
 {
 //----------------------------------------------------------
