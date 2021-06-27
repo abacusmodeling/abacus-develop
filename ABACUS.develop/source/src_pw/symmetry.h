@@ -2,7 +2,7 @@
 #define SYMMETRY_H
 
 #include "tools.h"
-#include "module_cell/unitcell.h"
+#include "../module_cell/unitcell.h"
 #include "symmetry_basic.h"
 
 class Symmetry : public Symmetry_Basic

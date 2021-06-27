@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 
 class Pseudopot_upf
 {

@@ -118,7 +118,7 @@ void UnitCell_pseudo::print_unitcell_pseudo(const string &fn)
 	this->print_cell(ofs);
 	for (int i = 0;i < ntype;i++)
 	{
-		atoms[i].print_Atom(ofs);
+		atoms[i].print_Atom(ofs, out);
 	}
 
 	ofs.close();
