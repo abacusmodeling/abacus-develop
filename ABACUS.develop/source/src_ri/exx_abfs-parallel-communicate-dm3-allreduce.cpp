@@ -1,11 +1,11 @@
 #include "exx_abfs-parallel-communicate-dm3.h"
 #include "exx_abfs-parallel-communicate-function.h"
 
-#include "src_pw/global.h"
-#include "module_base/global_function.h"
+#include "../src_pw/global.h"
+#include "../module_base/global_function.h"
 
 #ifdef USE_CEREAL_SERIALIZATION
-	#include "src_global/serialization_cereal.h"
+	#include "../src_global/serialization_cereal.h"
 #endif
 
 #include <mpi.h>

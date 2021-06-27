@@ -1,8 +1,9 @@
 #ifndef BERRYPHASE_H
 #define BERRYPHASE_H
-
 #include "../src_io/unk_overlap_pw.h"
+#ifdef __LCAO
 #include "../src_io/unk_overlap_lcao.h"
+#endif
 
 class berryphase
 {
@@ -14,10 +15,10 @@ public:
 
 	// mohan add 2021-02-16
 	static bool berry_phase_flag;
-
 	unkOverlap_pw pw_method;
-
+#ifdef __LCAO
 	unkOverlap_lcao lcao_method;
+#endif
 
 	int total_string;
 	vector<vector<int>> k_index;

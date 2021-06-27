@@ -1,10 +1,10 @@
 /*test generalized Stardand double precision symmetric eigenproblem*/
 #include "pdiag_double.h"
-#include "module_base/lapack_connector.h"
-#include "src_pw/occupy.h"
-#include "src_pw/global.h"
+#include "../module_base/lapack_connector.h"
+#include "../src_pw/occupy.h"
+#include "../src_pw/global.h"
 #include "src_lcao/local_orbital_charge.h"
-#include "src_io/wf_local.h"
+#include "../src_io/wf_local.h"
 
 
 #ifdef __MPI
@@ -14,12 +14,12 @@ extern "C"
 //    #include "pblas.h"
 //    #include "scalapack.h"
     #include "my_elpa.h"
-	#include "module_base/scalapack_connector.h"
+	#include "../module_base/scalapack_connector.h"
 }
 #include "GenELPA.h"
 #include "pdgseps.h"
 #include "pzgseps.h"
-#include "module_base/lapack_connector.h"
+#include "../module_base/lapack_connector.h"
 #endif
 
 #include "src_external/src_test/test_function.h"

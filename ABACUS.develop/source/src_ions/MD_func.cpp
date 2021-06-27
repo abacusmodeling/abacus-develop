@@ -1,9 +1,12 @@
-#include "src_ions/MD_func.h"
-#include "src_pw/tools.h"
+#include "../src_ions/MD_func.h"
+#include "../src_pw/tools.h"
+#ifdef __LCAO
 #include "src_lcao/FORCE_STRESS.h"
-#include "src_pw/forces.h"
-#include "src_pw/stress_pw.h"
-#include "module_neighbor/sltk_atom_arrange.h"
+#include "../module_neighbor/sltk_atom_arrange.h"
+#endif
+#include "../src_pw/forces.h"
+#include "../src_pw/stress_pw.h"
+
 
 bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 {
@@ -270,6 +273,7 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3
 	return nfrozen;
 }
 
+#ifdef __LCAO
 void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
 {
 //to call the force of each atom
@@ -295,6 +299,7 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 
 	return;
 }
+#endif
 void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
 {
 //to call the force of each atom

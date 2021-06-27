@@ -7,7 +7,7 @@
 
 #include <mpi.h>
 #include <boost/dynamic_bitset.hpp>
-#include "src_global/serialization_boost.h"
+#include "../src_global/serialization_boost.h"
 
 #include <thread>
 #include <atomic>

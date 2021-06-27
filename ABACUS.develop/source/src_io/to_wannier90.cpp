@@ -1,5 +1,7 @@
 #include "to_wannier90.h"
+#ifdef __LCAO
 #include "../src_lcao/global_fp.h" // mohan add 2021-01-30, this module should be modified
+#endif
 #include "../src_global/math_integral.h" 
 #include "../src_global/math_sphbes.h"
 #include "../src_global/math_polyint.h" 
@@ -79,7 +81,7 @@ void toWannier90::init_wannier()
 void toWannier90::read_nnkp()
 {
 	// read *.nnkp file
-	// ¼ì²é Õý¸ñÊ¸£¬µ¹¸ñÊ¸£¬kµã×ø±ê£¬ÊÔÌ½¹ìµÀÍ¶Ó°£¬Ã¿¸ökµãµÄ½üÁÚkµã£¬ÐèÒªÅÅ³ýµÄÄÜ´øÖ¸±ê
+	// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ê¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¸ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½ï¿½ê£¬ï¿½ï¿½Ì½ï¿½ï¿½ï¿½Í¶Ó°ï¿½ï¿½Ã¿ï¿½ï¿½kï¿½ï¿½Ä½ï¿½ï¿½ï¿½kï¿½ã£¬ï¿½ï¿½Òªï¿½Å³ï¿½ï¿½ï¿½ï¿½Ü´ï¿½Ö¸ï¿½ï¿½
 	
 	wannier_file_name = INPUT.NNKP;
 	wannier_file_name = wannier_file_name.substr(0,wannier_file_name.length() - 5);
@@ -171,7 +173,7 @@ void toWannier90::read_nnkp()
 				
 		delete[] kpoints_direct_nnkp;
 		
-		//ÅÐ¶Ïgamma only
+		//ï¿½Ð¶ï¿½gamma only
 		Vector3<double> my_gamma_point(0.0,0.0,0.0);
 		//if( (kv.nkstot == 1) && (kv.kvec_d[0] == my_gamma_point) ) gamma_only_wannier = true;
 	} 
@@ -272,11 +274,11 @@ void toWannier90::read_nnkp()
 	
 	nnkp_read.close();
 	
-	// ÉèÖÃÊÔÌ½¹ìµÀ²ÎÊý
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	for(int i = 0; i < num_wannier; i++)
 	{
 		R_centre[i] = R_centre[i] * ucell.latvec;
-		m[i] = m[i] - 1; // ABACUS and wannier90 ¶Ô´Å½Ç¶¯Á¿mµÄ¶¨Òå²»Ò»Ñù£¬ABACUSÊÇ´Ó0¿ªÊ¼µÄ£¬wannier90ÊÇ´Ó1¿ªÊ¼µÄ
+		m[i] = m[i] - 1; // ABACUS and wannier90 ï¿½Ô´Å½Ç¶ï¿½ï¿½ï¿½mï¿½Ä¶ï¿½ï¿½å²»Ò»ï¿½ï¿½ï¿½ï¿½ABACUSï¿½Ç´ï¿½0ï¿½ï¿½Ê¼ï¿½Ä£ï¿½wannier90ï¿½Ç´ï¿½1ï¿½ï¿½Ê¼ï¿½ï¿½
 	}
 	
 	// test by jingan
@@ -288,7 +290,7 @@ void toWannier90::read_nnkp()
 	//}
 	// test by jingan
 	
-	// ÉèÖÃexclude_bands
+	// ï¿½ï¿½ï¿½ï¿½exclude_bands
 	tag_cal_band = new bool[NBANDS];
 	if(NBANDS <= num_exclude_bands) WARNING_QUIT("toWannier90::read_nnkp","you set the band numer is not enough, please add bands number.");
 	if(num_exclude_bands == 0)
@@ -572,9 +574,9 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 
 void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 {
-	// µÚÒ»²½£º½¨Á¢ÊµÇòÐ³º¯ÊýlmÔÚÄ³¸ökµãÏÂµÄÆ½Ãæ²¨»ù×éÏÂµÄ±í¸ñ£¨¾ØÕó£©	
-	// µÚ¶þ²½£º½«ÊÔÌ½¹ìµÀµÄ¾¶Ïò²¿·ÖÏòÄ³¸ökµãÏÂÆ½Ãæ²¨Í¶Ó°
-	// µÚÈý²½£º»ñÈ¡ÊÔÌ½¹ìµÀÔÚÄ³¸ökµãÏÂÆ½Ãæ²¨»ù×éÏÂµÄÍ¶Ó°
+	// ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Ð³ï¿½ï¿½ï¿½ï¿½lmï¿½ï¿½Ä³ï¿½ï¿½kï¿½ï¿½ï¿½Âµï¿½Æ½ï¿½æ²¨ï¿½ï¿½ï¿½ï¿½ï¿½ÂµÄ±ï¿½ï¿½ñ£¨¾ï¿½ï¿½ï¿½	
+	// ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ò²¿·ï¿½ï¿½ï¿½Ä³ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½Æ½ï¿½æ²¨Í¶Ó°
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½Æ½ï¿½æ²¨ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½Í¶Ó°
 	const int pwNumberMax = wf.npwx;
 	
 	ofstream Amn_file;
@@ -685,7 +687,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 	{
 		for(int ib = 0; ib < nntot; ib++)
 		{
-			int ikb = nnlist[ik][ib];             // ik+b : ikµÄ½üÁÚkµã	
+			int ikb = nnlist[ik][ib];             // ik+b : ikï¿½Ä½ï¿½ï¿½ï¿½kï¿½ï¿½	
 			
 			Vector3<double> phase_G = nncell[ik][ib];
 			
@@ -744,7 +746,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 
 void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbitals_k)
 {
-	// ¼ì²é²ÎÊýÊÇ·ñÕýÈ·
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½È·
 	for(int i =0; i < num_wannier; i++)
 	{
 		if(L[i] < -5 || L[i] > 3) cout << "toWannier90::produce_trial_in_pw() your L angular momentum is wrong , please check !!! " << endl;
@@ -763,8 +765,8 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	const int npw = kv.ngk[ik];
 	const int npwx = wf.npwx;
 	const int total_lm = 16;
-	matrix ylm(total_lm,npw);               //ËùÓÐÀàÐÍµÄÇòÐ³º¯Êý
-	//matrix wannier_ylm(num_wannier,npw);    //ÒªÊÔÌ½¹ìµÀµÄÊ¹ÓÃµÄÇòÐ³º¯Êý
+	matrix ylm(total_lm,npw);               //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½Ð³ï¿½ï¿½ï¿½ï¿½
+	//matrix wannier_ylm(num_wannier,npw);    //Òªï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½ï¿½ï¿½Ð³ï¿½ï¿½ï¿½ï¿½
 	double bs2, bs3, bs6, bs12;
 	bs2 = 1.0/sqrt(2.0);
 	bs3 = 1.0/sqrt(3.0);
@@ -774,7 +776,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
-		gk[ig] = wf.get_1qvec_cartesian(ik, ig);  // k+GÊ¸Á¿
+		gk[ig] = wf.get_1qvec_cartesian(ik, ig);  // k+GÊ¸ï¿½ï¿½
 	}
 	
 	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
@@ -785,17 +787,17 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	// test by jingan
 	
 	
-	// 1.Éú³É¾¶Ïò¹ìµÀÔÚÄ³¸ökµãÆ½Ãæ²¨»ù×éµÄÍ¶Ó°
-	const int mesh_r = 333; 		//ÃèÊö¾¶Ïòº¯ÊýËùÐèÒªµÄ¸ñµãÊý
-	const double dx = 0.025; 		//¹Ì¶¨¼ä¸ô£¬ÓÃÓÚÉú³É·Ç¹Ì¶¨¼ä¸ôµÄdrÀ´Ìá¸ß¾«¶È,Õâ¸öÖµºÜÇÉÃî
-	const double x_min = -6.0;  	// ÓÃÓÚÉú³ÉdrºÍrµÄÆðÊ¼µã
-	matrix r(num_wannier,mesh_r);   //²»Í¬alfaµÄ¾¶Ïòº¯ÊýµÄr
-	matrix dr(num_wannier,mesh_r);  //²»Í¬alfaµÄ¾¶Ïòº¯ÊýµÄÃ¿¸örµãµÄ¼ä¸ô
-	matrix psi(num_wannier,mesh_r); //¾¶Ïòº¯Êýpsi in Êµ¿Õ¼ä
-	matrix psir(num_wannier,mesh_r);// psi * r in Êµ¿Õ¼ä
-	matrix psik(num_wannier,npw);   //¾¶Ïòº¯ÊýÔÚÄ³¸ökµãÏÂµ¹¿Õ¼äµÄÍ¶Ó°
+	// 1.ï¿½ï¿½ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½kï¿½ï¿½Æ½ï¿½æ²¨ï¿½ï¿½ï¿½ï¿½ï¿½Í¶Ó°
+	const int mesh_r = 333; 		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ä¸ï¿½ï¿½ï¿½ï¿½
+	const double dx = 0.025; 		//ï¿½Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É·Ç¹Ì¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½drï¿½ï¿½ï¿½ï¿½ß¾ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	const double x_min = -6.0;  	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½drï¿½ï¿½rï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
+	matrix r(num_wannier,mesh_r);   //ï¿½ï¿½Í¬alfaï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½r
+	matrix dr(num_wannier,mesh_r);  //ï¿½ï¿½Í¬alfaï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½rï¿½ï¿½Ä¼ï¿½ï¿½
+	matrix psi(num_wannier,mesh_r); //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½psi in Êµï¿½Õ¼ï¿½
+	matrix psir(num_wannier,mesh_r);// psi * r in Êµï¿½Õ¼ï¿½
+	matrix psik(num_wannier,npw);   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½kï¿½ï¿½ï¿½Âµï¿½ï¿½Õ¼ï¿½ï¿½Í¶Ó°
 	
-	// Éú³Ér,dr
+	// ï¿½ï¿½ï¿½ï¿½r,dr
 	for(int i = 0; i < num_wannier; i++)
 	{
 		double x = 0;
@@ -808,7 +810,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 		
 	}
 	
-	// Éú³Épsi
+	// ï¿½ï¿½ï¿½ï¿½psi
 	for(int i = 0; i < num_wannier; i++)
 	{
 		double alfa32 = pow(alfa[i],3.0/2.0);
@@ -845,7 +847,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 		
 	}
 
-	// Éú³Épsir
+	// ï¿½ï¿½ï¿½ï¿½psir
 	for(int i = 0; i < num_wannier; i++)
 	{
 		for(int ir = 0; ir < mesh_r; ir++)
@@ -855,7 +857,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	}
 	
 	
-	// »ñµÃÊÔÌ½¹ìµÀ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½
 	for(int wannier_index = 0; wannier_index < num_wannier; wannier_index++)
 	{
 		if(L[wannier_index] >= 0)
@@ -1327,17 +1329,17 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	
 }
 
-// ×¢ÒâÕâÀï¹ìµÀµÄLÖµ±ØÐëÊÇ´óÓÚµÈÓÚ0µÄ
+// ×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½LÖµï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ï¿½Úµï¿½ï¿½ï¿½0ï¿½ï¿½
 void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orbital_L, const int orbital_m, matrix &ylm, 
 										matrix &dr, matrix &r, matrix &psir, const int mesh_r, 
 										Vector3<double> *gk, const int npw, ComplexMatrix &trial_orbitals_k)
 {
-	//¼ÆËã¾¶Ïòº¯ÊýÔÚÄ³¸ökµãÏÂµ¹¿Õ¼äµÄÍ¶Ó°
+	//ï¿½ï¿½ï¿½ã¾¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½kï¿½ï¿½ï¿½Âµï¿½ï¿½Õ¼ï¿½ï¿½Í¶Ó°
 	double *psik = new double[npw];
 	double *psir_tem = new double[mesh_r];
 	double *r_tem = new double[mesh_r];
 	double *dr_tem = new double[mesh_r];
-	double *psik_tem = new double[NQX];    //¾¶Ïòº¯ÊýÔÚ¹Ì¶¨k¿Õ¼äµÄÍ¶Ó°£¨ÁÙÊ±Ê¹ÓÃµÄÊý×é£©
+	double *psik_tem = new double[NQX];    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¹Ì¶ï¿½kï¿½Õ¼ï¿½ï¿½Í¶Ó°ï¿½ï¿½ï¿½ï¿½Ê±Ê¹ï¿½Ãµï¿½ï¿½ï¿½ï¿½é£©
 	ZEROS(psir_tem,mesh_r);
 	ZEROS(r_tem,mesh_r);
 	ZEROS(dr_tem,mesh_r);
@@ -1351,14 +1353,14 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	
 	toWannier90::integral(mesh_r,psir_tem,r_tem,dr_tem,orbital_L,psik_tem);
 	
-	// ´ÓNQX¸öGµãÖÐ²åÖµ·¨»ñµÃnpw¸öGµãµÄÖµ
+	// ï¿½ï¿½NQXï¿½ï¿½Gï¿½ï¿½ï¿½Ð²ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½npwï¿½ï¿½Gï¿½ï¿½ï¿½Öµ
 	for(int ig = 0; ig < npw; ig++)
 	{
 		psik[ig] = PolyInt::Polynomial_Interpolation(psik_tem, NQX, DQ, gk[ig].norm() * ucell.tpiba);
 	}
 	
 	
-	// 2.¼ÆËãÓëÔ­µãÑ¡Ôñ£¨¼´¹ìµÀÖÐÐÄ£©¶ø²úÉúµÄÏàÎ»ÔÚÆ½Ãæ²¨»ù×éÏÂ	
+	// 2.ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½Ñ¡ï¿½ñ£¨¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Æ½ï¿½æ²¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½	
 	complex<double> *sk = new complex<double>[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
@@ -1366,7 +1368,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 		sk[ig] = complex <double> ( cos(arg),  -sin(arg) );
 	}
 	
-	// 3.Éú³É wannier_ylm
+	// 3.ï¿½ï¿½ï¿½ï¿½ wannier_ylm
 	double *wannier_ylm = new double[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
@@ -1381,7 +1383,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 		}
 	}
 	
-	// 4.¼ÆËã×îÖÕÊÔÌ½¹ìµÀÔÚÄ³¸ökµãÏÂÆ½Ãæ²¨»ù×éµÄÍ¶Ó°
+	// 4.ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½Æ½ï¿½æ²¨ï¿½ï¿½ï¿½ï¿½ï¿½Í¶Ó°
 	complex<double> lphase = pow(NEG_IMAG_UNIT, orbital_L);
 	for(int ig = 0; ig < wf.npwx; ig++)
 	{
@@ -1393,7 +1395,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	}
 	
 	
-	// 5.¹éÒ»»¯
+	// 5.ï¿½ï¿½Ò»ï¿½ï¿½
 	complex<double> anorm(0.0,0.0);
 	for(int ig = 0; ig < wf.npwx; ig++)
 	{
@@ -1622,7 +1624,8 @@ complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, co
 	
 }
 
-//Ê¹ÓÃlcao_in_pw·½·¨½«lcao»ù×é×ª³Épw»ù×é
+//Ê¹ï¿½ï¿½lcao_in_pwï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lcaoï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½pwï¿½ï¿½ï¿½ï¿½
+#ifdef __LCAO
 void toWannier90::lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G)
 {
 	this->table_local.create(ucell.ntype, ucell.nmax_total, NQX);
@@ -1630,7 +1633,8 @@ void toWannier90::lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G)
 	Wavefunc_in_pw::produce_local_basis_in_pw(ik, orbital_in_G, this->table_local);
 }
 
-// ´Ólcao»ù×éÏÂ²úÉúpw»ù×éµÄ²¨º¯ÊýÖÜÆÚ²¿·ÖunkµÄÖµ£¬unk_inLcao[ik](ib,ig),igµÄ·¶Î§ÊÇkv.ngk[ik]
+
+// ï¿½ï¿½lcaoï¿½ï¿½ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½pwï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½unkï¿½ï¿½Öµï¿½ï¿½unk_inLcao[ik](ib,ig),igï¿½Ä·ï¿½Î§ï¿½ï¿½kv.ngk[ik]
 void toWannier90::getUnkFromLcao()
 {
 	complex<double>*** lcao_wfc_global = new complex<double>**[num_kpts];
@@ -1651,7 +1655,7 @@ void toWannier90::getUnkFromLcao()
 
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
-		// »ñÈ¡È«¾ÖµÄlcaoµÄ²¨º¯ÊýÏµÊý
+		// ï¿½ï¿½È¡È«ï¿½Öµï¿½lcaoï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½
 		get_lcao_wfc_global_ik(lcao_wfc_global[ik],LOWF.WFC_K[ik]);
 	
 		int npw = kv.ngk[ik];
@@ -1661,7 +1665,7 @@ void toWannier90::getUnkFromLcao()
 	
 	}
 	
-	// ½«lcao»ù×éµÄunk×ª³Épw»ù×éÏÂµÄunk
+	// ï¿½ï¿½lcaoï¿½ï¿½ï¿½ï¿½ï¿½unk×ªï¿½ï¿½pwï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿½unk
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
 		for(int ib = 0; ib < NBANDS; ib++)
@@ -1676,7 +1680,7 @@ void toWannier90::getUnkFromLcao()
 		}
 	}
 	
-	// ¹éÒ»»¯
+	// ï¿½ï¿½Ò»ï¿½ï¿½
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
 		for(int ib = 0; ib < NBANDS; ib++)
@@ -1716,7 +1720,7 @@ void toWannier90::getUnkFromLcao()
 	return;
 }
 
-// »ñÈ¡È«¾ÖµÄlcaoµÄ²¨º¯ÊýÏµÊý
+// ï¿½ï¿½È¡È«ï¿½Öµï¿½lcaoï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½
 void toWannier90::get_lcao_wfc_global_ik(complex<double> **ctot, complex<double> **cc)
 {
 	complex<double>* ctot_send = new complex<double>[NBANDS*NLOCAL];
@@ -1839,6 +1843,6 @@ void toWannier90::get_lcao_wfc_global_ik(complex<double> **ctot, complex<double>
 	return;
 }
 
-
+#endif
 
 

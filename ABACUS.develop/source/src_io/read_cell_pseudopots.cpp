@@ -1,6 +1,6 @@
-#include "module_cell/unitcell_pseudo.h"
+#include "../module_cell/unitcell_pseudo.h"
 #include "module_ORB/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 
@@ -115,10 +115,10 @@ void UnitCell_pseudo::print_unitcell_pseudo(const string &fn)
 	if(test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
 	ofstream ofs( fn.c_str() );
 
-	this->print_cell(ofs);
+	this->print_cell(ofs, out);
 	for (int i = 0;i < ntype;i++)
 	{
-		atoms[i].print_Atom(ofs);
+		atoms[i].print_Atom(ofs, out);
 	}
 
 	ofs.close();

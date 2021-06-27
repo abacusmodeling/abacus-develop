@@ -1,8 +1,8 @@
 #include "xc_functional.h"
 #include "xc_type.h"
-#include "src_pw/global.h"
-#include "src_pw/myfunc.h"
-#include "module_base/global_function.h"
+#include "../src_pw/global.h"
+#include "../src_pw/myfunc.h"
+#include "../module_base/global_function.h"
 #include <stdexcept>
 
 XC_Functional::XC_Functional(){}

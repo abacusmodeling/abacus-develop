@@ -5,8 +5,8 @@
 //==========================================================
 
 #include"vdwd2.h"
-#include"module_base/global_function.h"
-#include"module_base/constants.h"
+#include"../module_base/global_function.h"
+#include"../module_base/constants.h"
 #include<cmath>
 
 Vdwd2::Vdwd2(const UnitCell_pseudo &unit_in, Vdwd2_Parameters &para_in):

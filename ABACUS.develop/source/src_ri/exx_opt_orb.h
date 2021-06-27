@@ -1,8 +1,8 @@
 #ifndef EXX_OPT_ORB_H
 #define EXX_OPT_ORB_H
 
-#include "module_base/matrix.h"
-#include "src_global/element_basis_index.h"
+#include "../module_base/matrix.h"
+#include "../src_global/element_basis_index.h"
 #include <vector>
 #include <map>
 #include <set>

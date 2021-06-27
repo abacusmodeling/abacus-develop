@@ -6,10 +6,10 @@
 //this part is for calculating the macroscopic dielectric tensor  using the linear
 //response theory .
 //-------------------------------------------------------------------------------
-#include "src_pw/global.h"
-#include "src_pw/hamilt_pw.h"
+#include "../src_pw/global.h"
+#include "../src_pw/hamilt_pw.h"
 #include "../src_pw/wavefunc_in_pw.h"
-#include "./src_io/optical.h"
+#include "../src_io/optical.h"
 #include "epsilon0_vasp.h"
 #include <iostream>
 #include <math.h>

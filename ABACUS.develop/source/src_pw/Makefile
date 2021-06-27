@@ -4,8 +4,8 @@
 # Compiler information 
 #==========================
 CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = icpc 
-FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+CPLUSPLUS_MPI = mpiicpc 
+FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
 OBJ_DIR = obj
 NP      = 1
 
@@ -34,14 +34,17 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 include Makefile.Objects
 
 VPATH=../src_global\
-:./src_pw\
+:../module_base\
 :../src_parallel\
+:../module_cell\
+:../src_io\
+:../src_ions\
 
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
-
+#HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
+HONG= ${HONG_FFTW}  -D__MPI
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\
 $(OBJS_PW)\
@@ -54,13 +57,13 @@ FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 #==========================
 ORB : 
 	@ make init
-	@ make -j $(NP) serial
+	@ make -j $(NP) parallel
 
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
-serial : ${FP_OBJS} 
+parallel : ${FP_OBJS} 
 	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
 
 #==========================

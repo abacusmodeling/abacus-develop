@@ -4,10 +4,10 @@
 #include "exx_abfs-io.h"
 #include "exx_abfs-jle.h"
 #include "exx_abfs-abfs_index.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include "module_ORB/ORB_read.h"
-#include "module_base/global_function.h"
-#include "src_global/math_integral.h" // mohan add 2021-04-03
+#include "../module_base/global_function.h"
+#include "../src_global/math_integral.h" // mohan add 2021-04-03
 
 
 vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(

@@ -1,7 +1,7 @@
 //column-circle decomposition
 #include "pzgseps.h"
-#include "src_parallel/parallel_reduce.h"
-#include "module_base/lapack_connector.h"
+#include "../src_parallel/parallel_reduce.h"
+#include "../module_base/lapack_connector.h"
 
 #include "pzheg2st.h"
 #include "pdstebz.h"

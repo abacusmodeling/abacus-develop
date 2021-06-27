@@ -3,7 +3,7 @@
 
 #include "exx_abfs.h"
 
-#include "module_base/matrix.h"
+#include "../module_base/matrix.h"
 
 #include<memory>
 

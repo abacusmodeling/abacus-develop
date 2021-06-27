@@ -1,7 +1,7 @@
 #ifndef PZHEG2ST_H
 #define PZHEG2ST_H
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
 #include "pdiag_common.h"
 
 void pzheg2st(

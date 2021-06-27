@@ -1,6 +1,6 @@
 #include "gint_gamma.h"
 #include "gint_tools.h"
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 
 // extract the local potentials.
 double* Gint_Gamma::get_vldr3(

@@ -3,6 +3,7 @@
 
 //#include "tools.h"
 #include "atom_pseudo.h"
+#include "../src_io/output.h"
 class Atom: public Atom_pseudo
 {
 public:
@@ -37,7 +38,7 @@ public:
 	double angle1;//spin angle, added by zhengdy-soc
 	double angle2;
 
-    void print_Atom(ofstream &ofs);
+    void print_Atom(ofstream &ofs, output &outp);
 #ifdef __MPI
     void bcast_atom(void);
     void bcast_atom2(void);

@@ -7,7 +7,7 @@ using namespace std;
 #include "matrix.h"
 
 #ifdef _MCD_CHECK
-#include "src_parallel/mcd.h"
+#include "../src_parallel/mcd.h"
 #endif
 
 class ComplexMatrix

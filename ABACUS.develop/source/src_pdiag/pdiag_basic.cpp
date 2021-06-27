@@ -1,8 +1,8 @@
 #include "pdiag_basic.h"
-#include "src_parallel/parallel_common.h"
-#include "src_pw/global.h"
-#include "src_io/wf_local.h"
-#include "module_base/lapack_connector.h"
+#include "../src_parallel/parallel_common.h"
+#include "../src_pw/global.h"
+#include "../src_io/wf_local.h"
+#include "../module_base/lapack_connector.h"
 
 Pdiag_Basic::Pdiag_Basic()
 {
@@ -502,7 +502,7 @@ void Pdiag_Basic::data_distribution(
 #endif
 
 #ifdef __MPI
-#include "src_pw/occupy.h"
+#include "../src_pw/occupy.h"
 void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
 {
     TITLE("Pdiag_Basic","gath_eig");

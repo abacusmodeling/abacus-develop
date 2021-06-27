@@ -1,5 +1,5 @@
-#include "src_pw/charge.h"
-#include "src_pw/global.h"
+#include "../src_pw/charge.h"
+#include "../src_pw/global.h"
 
 void Charge::write_rho(
 	const double* rho_save, 

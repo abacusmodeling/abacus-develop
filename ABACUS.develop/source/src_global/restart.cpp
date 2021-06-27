@@ -1,7 +1,7 @@
 #include "restart.h"
 #include "module_base/global_function.h"
-#include "src_pw/global.h"
-#include "src_lcao/global_fp.h"
+#include "../src_pw/global.h"
+#include "../src_lcao/global_fp.h"
 #include <fcntl.h> 
 #include <unistd.h>
 #include <fstream>

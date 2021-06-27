@@ -22,7 +22,23 @@ void Run_lcao::lcao_line(void)
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put NLOCAL and NBANDS as input parameters
-    ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running);
+    ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
+
+	// mohan add 2010-09-06
+	// Yu Liu move here 2021-06-27
+	// because the number of element type
+	// will easily be ignored, so here
+	// I warn the user again for each type.
+	for(int it=0; it<ucell.ntype; it++)
+	{
+		xcf.which_dft(ucell.atoms[it].dft);
+	}
+
+	// setup vdwd2 parameters
+	vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021-06-27
+
+	// setup vdwd2 parameters
+	//vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021.06.27
 
     //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
     DONE(ofs_running, "SETUP UNITCELL");

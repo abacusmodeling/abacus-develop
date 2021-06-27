@@ -1,9 +1,9 @@
 #ifndef GGA_PW_H 
 #define GGA_PW_H
 
-#include "src_pw/tools.h"
-#include "module_base/vector3.h"
-#include "src_parallel/parallel_global.h"
+#include "../src_pw/tools.h"
+#include "../module_base/vector3.h"
+#include "../src_parallel/parallel_global.h"
 
 //==========================================================
 // Calculate the charge gradient using plane wave basis. 

@@ -14,13 +14,13 @@
 #include "conv_coulomb_pot.h"
 #include "conv_coulomb_pot-inl.h"
 
-#include "module_base/global_function.h"
+#include "../module_base/global_function.h"
 
 #include "src_external/src_test/test_function.h"				// Peize Lin test
 #include "src_external/src_test/src_ri/exx_abfs-unittest.h"
 #include "src_external/src_test/src_ri/make_gaunt_table-unittest.h"
 #include "src_external/src_test/src_global/element_basis_index-test.h"			// Peize Lin test 2016-04-05
-#include "src_pw/global.h"
+#include "../src_pw/global.h"
 #include<sys/time.h>				// Peize Lin test
 
 int Exx_Abfs::Lmax = 0;		// Peize Lin test

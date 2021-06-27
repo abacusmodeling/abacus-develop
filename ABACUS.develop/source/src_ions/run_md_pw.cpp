@@ -1,4 +1,4 @@
-#include "src_ions/run_md_pw.h"
+#include "../src_ions/run_md_pw.h"
 #include "../src_pw/forces.h"
 #include "../src_pw/stress_pw.h"
 #include "../src_pw/global.h" // use chr.
@@ -7,7 +7,7 @@
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
-#include "src_ions/MD_basic.h"
+#include "../src_ions/MD_basic.h"
 
 void Run_MD_PW::md_ions_pw(void)
 {

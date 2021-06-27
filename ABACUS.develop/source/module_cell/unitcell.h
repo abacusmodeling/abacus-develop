@@ -1,7 +1,9 @@
 #ifndef UNITCELL_H
 #define UNITCELL_H
 
-#include "src_pw/tools.h"
+#include "../src_pw/tools.h"
+#include "../src_io/output.h"
+
 #include "atom_spec.h"
 
 // the "base class" of UnitCell_pseudo.
@@ -61,7 +63,7 @@ public:
 public:
     UnitCell();
     ~UnitCell();
-    void print_cell(ofstream &ofs)const;
+    void print_cell(ofstream &ofs, output &outp)const;
     void print_cell_xyz(const string &fn)const;
     void print_cell_cif(const string &fn)const;
     const double& getNelec(void)const {return electrons_number;}
