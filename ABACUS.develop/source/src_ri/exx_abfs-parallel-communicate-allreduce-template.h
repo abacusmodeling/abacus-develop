@@ -12,8 +12,8 @@
 #include <thread>
 #include <atomic>
 
-#ifdef _OPENMP
-#include <omp.h>
+#ifdef __MKL
+#include <mkl_service.h>
 #endif
 
 #include "src_external/src_test/src_ri/exx_lcao-test.h"
@@ -55,9 +55,9 @@ ofs_mpi<<"insert\t"<<time_during(t_start)<<endl;
 	for( auto &iarp : iarps )
 		iarp = new boost::mpi::packed_iarchive{MPI_COMM_WORLD};
 
-	#ifdef _OPENMP
-	const int omp_threads = omp_get_max_threads();
-	omp_set_num_threads(1);
+	#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+	mkl_set_num_threads(1);
 	#endif
 	
 	while( !flag_irecvs.all() || !flag_isends.all() )
@@ -124,8 +124,8 @@ ofs_mpi<<"t_recv\t"<<t_recv<<endl;
 
 ofs_mpi.close();
 
-	#ifdef _OPENMP
-	omp_set_num_threads(omp_threads);
+	#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
 	#endif
 	
 	return data_all;
