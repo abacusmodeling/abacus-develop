@@ -2,8 +2,9 @@
 #include "../src_global/serialization_boost.h"
 
 #include <thread>
-#ifdef _OPENMP
-#include <omp.h>
+
+#ifdef __MKL
+#include <mkl_service.h>
 #endif
 
 #include "src_external/src_test/src_ri/exx_lcao-test.h"
@@ -162,10 +163,10 @@ ofs_mpi<<"TIME@ insert_data\t"<<time_during(t_start)<<endl;
 	boost::dynamic_bitset<> flags_request_isend_data(comm_sz,false);
 	boost::dynamic_bitset<> flags_request_ask(comm_sz,false);
 		
-	#ifdef _OPENMP
-	const int omp_threads = omp_get_max_threads();
-	omp_set_num_threads(1);
-	#endif	
+	#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+	mkl_set_num_threads(1);
+	#endif
 	
 	while( !if_finish(flags_ask_atom) || !if_finish(flags_isend_data) || !flags_recv_data.all() )
 	{
@@ -250,8 +251,8 @@ ofs_mpi<<"TIME@ MPI_Isend isend_data\t"<<time_during(t_start)<<endl;
 			if(MPI_SUCCESS!=MPI_Wait( &requests_ask[i_rank], MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 
-	#ifdef _OPENMP
-	omp_set_num_threads(omp_threads);
+	#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
 	#endif
 ofs_mpi.close();
 	

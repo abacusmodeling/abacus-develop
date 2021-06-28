@@ -5,8 +5,9 @@
 #include "src_lcao/global_fp.h"
 
 #include <thread>
-#ifdef _OPENMP
-#include <omp.h>
+
+#ifdef __MKL
+#include <mkl_service.h>
 #endif
 
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::Allreduce(
@@ -112,9 +113,9 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 	vector<MPI_Request> requests_ask(comm_sz);
 	boost::dynamic_bitset<> flags_request_isend_data(comm_sz,false);
 
-	#ifdef _OPENMP
-	const int omp_threads = omp_get_max_threads();
-	omp_set_num_threads(1);
+	#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+	mkl_set_num_threads(1);
 	#endif
 
 	while( !if_finish(flags_ask_atom) || !if_finish(flags_isend_data) || !flags_recv_data.all() )
@@ -189,8 +190,8 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 			if(MPI_SUCCESS!=MPI_Wait( &requests_ask[i_rank], MPI_STATUS_IGNORE ))	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 
-	#ifdef _OPENMP
-	omp_set_num_threads(omp_threads);
+	#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
 	#endif
 
 	return data_all;

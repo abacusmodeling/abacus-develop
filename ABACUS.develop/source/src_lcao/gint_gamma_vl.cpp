@@ -5,10 +5,14 @@
 #include "gint_tools.h"
 #include "grid_technique.h"
 #include "module_ORB/ORB_read.h"
-#include "../src_pw/global.h"
-#include "../module_base/blas_connector.h"
+#include "src_pw/global.h"
+#include "module_base/blas_connector.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
+
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
 
 extern "C"
 {
@@ -307,8 +311,10 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 	ZEROS(GridVlocal.ptr_1D, GridT.lgd*GridT.lgd);
     Memory::record("Gint_Gamma","GridVlocal",GridT.lgd*GridT.lgd,"double");
 
-    const int omp_threads = omp_get_max_threads();
-	omp_set_num_threads(std::max(1,omp_threads/GridT.nbx));		// Peize Lin update 2021.01.20
+#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+	mkl_set_num_threads(std::max(1,mkl_threads/GridT.nbx));		// Peize Lin update 2021.01.20
+#endif
 
 #ifdef __OPENMP
 	#pragma omp parallel
@@ -428,7 +434,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 		} // end of if(max_size>0 && lgd_now>0)
 	} // end of #pragma omp parallel
 
-    omp_set_num_threads(omp_threads);
+#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
+#endif
 
     OUT(ofs_running, "temp variables are deleted");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
