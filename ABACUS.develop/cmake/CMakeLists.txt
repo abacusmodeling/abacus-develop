@@ -361,6 +361,7 @@ set(CODE_COMMON
     src_pw/wavefunc.cpp
     src_pw/wf_atomic.cpp
     src_pw/wf_igk.cpp
+    src_pw/make_dir_out.cpp
 )
 
 set(CODE_PDIAG
