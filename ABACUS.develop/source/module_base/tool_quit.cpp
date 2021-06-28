@@ -3,7 +3,7 @@
 #ifdef __NORMAL
 
 #else
-#include "global_variable.h"
+#include "../module_base/global_variable.h"
 #include "global_file.h"
 #include "../src_parallel/parallel_common.h"
 #include "timer.h"

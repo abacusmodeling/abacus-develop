@@ -1,5 +1,5 @@
 #include "pdsytrd.h"
-#include "../src_global/lapack_connector.h"
+#include "../module_base/lapack_connector.h"
 
 void pdsytrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
              double *a,double *diag,double *off_diag,double  *norm,char uplo)
