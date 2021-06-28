@@ -24,8 +24,10 @@ UnitCell_pseudo::~UnitCell_pseudo()
 //Calculate various lattice related quantities for given latvec
 //==============================================================
 void UnitCell_pseudo::setup_cell(
-		const string &s_pseudopot_dir ,  
-		const string &fn , ofstream &log)
+		const string &s_pseudopot_dir,
+		output &outp,  
+		const string &fn,
+		ofstream &log)
 {
 	TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag (global class)
@@ -152,8 +154,8 @@ void UnitCell_pseudo::setup_cell(
     this->invGGT0 = GGT.Inverse();
 
 	ofs_running << endl;
-	out.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
-	out.printM3(ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
+	outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
+	outp.printM3(ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
 //	OUT(ofs_running,"lattice center x",latcenter.x);
 //	OUT(ofs_running,"lattice center y",latcenter.y);
 //	OUT(ofs_running,"lattice center z",latcenter.z);
@@ -273,10 +275,10 @@ void UnitCell_pseudo::setup_cell(
 	// because the number of element type
 	// will easily be ignored, so here
 	// I warn the user again for each type.
-	for(int it=0; it<ntype; it++)
-	{
-		xcf.which_dft(atoms[it].dft);
-	}
+	//for(int it=0; it<ntype; it++)
+	//{
+	//	xcf.which_dft(atoms[it].dft);
+	//}
 
 	// setup the total number of PAOs
 	this->cal_natomwfc();
@@ -290,7 +292,7 @@ void UnitCell_pseudo::setup_cell(
 	this->cal_meshx();
 
 	// setup vdwd2 parameters
-	vdwd2_para.initset(*this);		// Peize Lin add 2021.03.09
+	//vdwd2_para.initset(*this);		// Peize Lin add 2021.03.09
 
 //	stringstream ss;
 //	ss << global_out_dir << "unitcell_pp.log";
@@ -644,6 +646,7 @@ void UnitCell_pseudo::cal_natomwfc(void)
 //20180515
 void UnitCell_pseudo::setup_cell_after_vc(
         const string &s_pseudopot_dir,
+		output &outp,
         const string &fn, ofstream &log)
 {
     if(MY_RANK == 0)
@@ -701,8 +704,8 @@ Parallel_Common::bcast_double( atom->taud[ia].z );
 #endif
 
     ofs_running << endl;
-    out.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);
-    out.printM3(ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
+    outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec);
+    outp.printM3(ofs_running,"Reciprocal vectors: (Cartesian coordinate: in unit of 2 pi/a_0)",G);
 
     return;
 }

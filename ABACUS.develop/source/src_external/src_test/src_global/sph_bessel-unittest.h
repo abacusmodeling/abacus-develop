@@ -2,7 +2,7 @@
 #define SPH_BESSEL_UNITTEST_H
 
 #include<sys/time.h>
-#include "src_global/global_function.h"
+#include "module_base/global_function.h"
 #include "src_global/sph_bessel.h"
 
 static void Sph_Bessel_timetest(

@@ -62,6 +62,7 @@ soc.o\
 to_wannier90.o \
 unk_overlap_pw.o \
 berryphase.o \
+make_dir_out.o\
 sto_elec.o\
 sto_wf.o\
 sto_iter.o\

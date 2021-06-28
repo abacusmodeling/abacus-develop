@@ -142,7 +142,7 @@ void UnitCell::bcast_unitcell2(void)
 }
 #endif
 
-void UnitCell::print_cell(ofstream &ofs)const
+void UnitCell::print_cell(ofstream &ofs, output &outp)const
 {
     if (test_unitcell) TITLE("UnitCell","print_cell");
 
@@ -156,10 +156,10 @@ void UnitCell::print_cell(ofstream &ofs)const
     OUT(ofs,"tpiba",tpiba);
     OUT(ofs,"omega",omega);
 
-    out.printM3(ofs,"Lattices Vector (R) : ", latvec);
-    out.printM3(ofs ,"Supercell lattice vector : ", latvec_supercell);
-    out.printM3(ofs, "Reciprocal lattice Vector (G): ", G);
-    out.printM3(ofs, "GGT : ", GGT);
+    outp.printM3(ofs,"Lattices Vector (R) : ", latvec);
+    outp.printM3(ofs ,"Supercell lattice vector : ", latvec_supercell);
+    outp.printM3(ofs, "Reciprocal lattice Vector (G): ", G);
+    outp.printM3(ofs, "GGT : ", GGT);
 
     ofs<<endl;
     return;

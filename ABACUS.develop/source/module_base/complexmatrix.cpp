@@ -7,7 +7,7 @@
 
 #ifdef __NORMAL
 #else
-#include "../src_global/lapack_connector.h"
+#include "../module_base/lapack_connector.h"
 #endif
 
 // constructor with sizes

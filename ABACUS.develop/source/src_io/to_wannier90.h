@@ -8,12 +8,12 @@ using namespace std;
 #include <cmath>
 #include <cstdlib>
 #include "../src_pw/tools.h"
-#include "../src_global/lapack_connector.h"
+#include "../module_base/lapack_connector.h"
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc_in_pw.h"
 
 #ifdef __LCAO
-#include "src_lcao/local_orbital_wfc.h"
+#include "../src_lcao/local_orbital_wfc.h"
 #endif
 
 

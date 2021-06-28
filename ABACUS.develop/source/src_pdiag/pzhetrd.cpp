@@ -1,5 +1,5 @@
 #include "pzhetrd.h"
-#include "../src_global/lapack_connector.h"
+#include "../module_base/lapack_connector.h"
 
 void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
              complex<double> *A,double *diag,double *off_diag,complex<double> *norm,char uplo)

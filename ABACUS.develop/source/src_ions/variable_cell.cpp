@@ -9,7 +9,7 @@ void Variable_Cell::init_after_vc(void)
 {
 	TITLE("Variable_Cell","init_after_vc");
 
-    ucell.setup_cell_after_vc(global_pseudo_dir, global_atom_card, ofs_running);
+    ucell.setup_cell_after_vc(global_pseudo_dir, out, global_atom_card, ofs_running);
     DONE(ofs_running, "SETUP UNITCELL");
 
     if(Symmetry::symm_flag)
@@ -72,7 +72,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     OUT(ofs_running," ------------------------------------------------------------------------------------");
 
     // (5) Setup the unitcell.
-    ucell.setup_cell_after_vc(global_pseudo_dir, global_atom_card, ofs_running);
+    ucell.setup_cell_after_vc(global_pseudo_dir, out, global_atom_card, ofs_running);
     DONE(ofs_running, "SETUP UNITCELL");
 
     // (6) symmetry analysize.
