@@ -1,3 +1,6 @@
+//=========================================================
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "grid_technique.h"
@@ -9,16 +12,16 @@
 
 // can be done by GPU
 void Gint_Gamma::cal_band_rho(
-	const int na_grid, 
+	const int na_grid,    							// how many atoms on this (i,j,k) grid
 	const int LD_pool, 
-	const int*const block_iw, 
-	const int*const block_size, 
-	const int*const block_index,
-	const bool*const*const cal_flag, 
-	const double*const*const psir_ylm,
-	const int*const vindex,
-	const double*const*const*const DM,
-	Gint_Tools::Array_Pool<double> &rho) const
+    const int*const block_iw, 						// block_iw[na_grid],	index of wave functions for each block
+    const int*const block_size, 					// block_size[na_grid],	band size: number of columns of a band
+    const int*const block_index,					// block_index[na_grid+1], count total number of atomis orbitals
+    const bool*const*const cal_flag, 				// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+    const double*const*const psir_ylm,				// psir_ylm[pw.bxyz][LD_pool]
+    const int*const vindex,							// vindex[pw.bxyz]
+    const double*const*const*const DM,				// DM[NSPIN][lgd_now][lgd_now]
+    Gint_Tools::Array_Pool<double> &rho) const		// rho[NSPIN][pw.nrxx]
 {
     //parameters for dsymm, dgemm and ddot
     constexpr char side='L', uplo='U';
@@ -148,7 +151,9 @@ void Gint_Gamma::cal_band_rho(
 }
 
 
-
+// for calculation of charege 
+// Input:	DM[is][iw1_lo][iw2_lo]
+// Output:	rho.ptr_2D[is][ir]
 Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const*const DM) const					// Peize Lin update OpenMP 2020.09.28
 {
     TITLE("Gint_Gamma","gamma_charge");
@@ -283,7 +288,7 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 
 
 
-
+// calculate charge density
 double Gint_Gamma::cal_rho(const double*const*const*const DM)
 {
     TITLE("Gint_Gamma","cal_rho");

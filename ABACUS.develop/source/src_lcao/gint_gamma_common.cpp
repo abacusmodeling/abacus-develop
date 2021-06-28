@@ -1,10 +1,13 @@
+//=========================================================
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "../src_pw/global.h"
 
 // extract the local potentials.
 double* Gint_Gamma::get_vldr3(
-	const double*const vlocal,
+	const double*const vlocal,		// vlocal[ir]
 	const int ncyz,
 	const int ibx,
 	const int jby,

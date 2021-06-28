@@ -1,3 +1,6 @@
+//=========================================================
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "grid_technique.h"
@@ -17,12 +20,12 @@ extern "C"
 // atomic basis sets
 // psir_vlbr3[pw.bxyz][LD_pool]
 Gint_Tools::Array_Pool<double> get_psir_vlbr3(
-	const int na_grid,
+	const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int LD_pool,
-	const int*const block_index,
-	const bool*const*const cal_flag,
-	const double*const vldr3,
-	const double*const*const psir_ylm)
+	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+	const bool*const*const cal_flag,	    	// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,			    	// vldr3[pw.bxyz]
+	const double*const*const psir_ylm)		    // psir_ylm[pw.bxyz][LD_pool]
 {
 	Gint_Tools::Array_Pool<double> psir_vlbr3(pw.bxyz, LD_pool);
 	for(int ib=0; ib<pw.bxyz; ++ib)
@@ -49,19 +52,18 @@ Gint_Tools::Array_Pool<double> get_psir_vlbr3(
     return psir_vlbr3;
 }
 
-//inline void cal_meshball_vlocal(int na_grid, int LD_pool, int* block_iw, int* block_size, int* block_index,
 void Gint_Gamma::cal_meshball_vlocal(
-	const int na_grid,
+	const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int LD_pool,
-	const int*const block_iw,
-	const int*const block_size,
-	const int*const block_index,
-	const bool*const*const cal_flag,
-	const double*const vldr3,
-	const double*const*const psir_ylm,
-	const double*const*const psir_vlbr3,
+	const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
+	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
+	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+	const bool*const*const cal_flag,	    	// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,			    	// vldr3[pw.bxyz]
+	const double*const*const psir_ylm,		    // psir_ylm[pw.bxyz][LD_pool]
+	const double*const*const psir_vlbr3,	    // psir_vlbr3[pw.bxyz][LD_pool]
 	const int lgd_now,
-	double*const*const GridVlocal) const
+	double*const*const GridVlocal) const	    // GridVlocal[lgd_now][lgd_now]
 {
 	const char transa='N', transb='T';
 	const double alpha=1, beta=1;
@@ -293,7 +295,9 @@ inline int setBufferParameter(
 }
 
 
-
+// for calculation of < phi_i | Vlocal | phi_j >
+// Input:	vlocal[ir]
+// Output:	GridVlocal.ptr_2D[iw1_lo][iw2_lo]
 Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal) const						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
@@ -358,11 +362,6 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						const int kbz=k*pw.bz-pw.nczp_start;
 
-						//------------------------------------------------------------------
-						// extract the local potentials.
-						//------------------------------------------------------------------
-						double *vldr3 = this->get_vldr3(vlocal, ncyz, ibx, jby, kbz);
-
 						//------------------------------------------------------
 						// index of wave functions for each block
 						//------------------------------------------------------
@@ -386,6 +385,11 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
 							na_grid, LD_pool, grid_index, delta_r,
 							block_index, block_size, cal_flag);
+
+						//------------------------------------------------------------------
+						// extract the local potentials.
+						//------------------------------------------------------------------
+						double *vldr3 = this->get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 
                         const Gint_Tools::Array_Pool<double> psir_vlbr3 = get_psir_vlbr3(
                                 na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
@@ -498,6 +502,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
     timer::tick("Gint_Gamma","distri_vl",'K');
 }
 
+// calculate the H matrix in terms of effective potentials
 void Gint_Gamma::cal_vlocal(
     const double*const vlocal)
 {

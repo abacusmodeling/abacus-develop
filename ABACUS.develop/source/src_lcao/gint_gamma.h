@@ -1,6 +1,7 @@
 //=========================================================
 //AUTHOR : mohan
 //DATE : 2009-09-16
+//REFACTOR : Peize Lin, 2021.06.28
 //=========================================================
 #ifndef GINT_GAMMA_H
 #define GINT_GAMMA_H
@@ -87,29 +88,29 @@ class Gint_Gamma : public Grid_Base_Beta
 	void gamma_force(const double*const vlocal) const;
 
 	void cal_meshball_vlocal(
-		const int na_grid,
+		const int na_grid,  						// how many atoms on this (i,j,k) grid
 		const int LD_pool,
-		const int*const block_iw,
-		const int*const block_size,
-		const int*const block_index,
-		const bool*const*const cal_flag,
-		const double*const vldr3,
-		const double*const*const psir_ylm,
-		const double*const*const psir_vlbr3,
+		const int*const block_iw,					// block_iw[na_grid],	index of wave functions for each block
+		const int*const block_size, 				// block_size[na_grid],	number of columns of a band
+		const int*const block_index,				// block_index[na_grid+1], count total number of atomis orbitals
+		const bool*const*const cal_flag,			// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const vldr3,					// vldr3[pw.bxyz]
+		const double*const*const psir_ylm,			// psir_ylm[pw.bxyz][LD_pool]
+		const double*const*const psir_vlbr3,		// psir_vlbr3[pw.bxyz][LD_pool]
 		const int lgd_now,
-		double*const*const GridVlocal) const;
+		double*const*const GridVlocal) const;		// GridVlocal[lgd_now][lgd_now]
 
 	void cal_band_rho(
-		const int na_grid, 
+		const int na_grid,   							// how many atoms on this (i,j,k) grid
 		const int LD_pool, 
-		const int*const block_iw, 
-		const int*const block_size, 
-		const int*const block_index,
-		const bool*const*const cal_flag, 
-		const double*const*const psir_ylm,
-		const int*const vindex,
-		const double*const*const*const DM,
-		Gint_Tools::Array_Pool<double> &rho) const;
+		const int*const block_iw, 						// block_iw[na_grid],	index of wave functions for each block
+		const int*const block_size, 					// block_size[na_grid],	band size: number of columns of a band
+		const int*const block_index,					// block_index[na_grid+1], count total number of atomis orbitals
+		const bool*const*const cal_flag, 				// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_ylm,				// psir_ylm[pw.bxyz][LD_pool]
+		const int*const vindex,							// vindex[pw.bxyz]
+		const double*const*const*const DM,				// DM[NSPIN][lgd_now][lgd_now]
+		Gint_Tools::Array_Pool<double> &rho) const;		// rho[NSPIN][pw.nrxx]
 	
 	// extract the local potentials.
 	// vldr3[pw.bxyz]
