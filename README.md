@@ -1,4 +1,10 @@
-WELOCOME TO THE "ABACUS" PROGRAM
+<div style="text-align:center">
+    <img src="https://raw.githubusercontent.com/deepmodeling/abacus-develop/develop/ABACUS.develop/documents/abacus-logo.jpg"/>
+</div>
+
+[![Container](https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml/badge.svg)](https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml) [![Test](https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml/badge.svg)](https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml)
+
+WELCOME TO THE "ABACUS" PROGRAM!
 
 THE PROJECT STARTS FROM https://github.com/abacusmodeling/abacus-develop,
 WHERE MORE INFORMATION CAN BE FOUND.
@@ -6,11 +12,12 @@ WHERE MORE INFORMATION CAN BE FOUND.
 ABACUS IS AN ELECTRONIC STRUCTURE PACKAGE BASED ON DENSITY FUNCTIONAL THEORY.
 ABACUS ADOPTS EITHER PLANE WAVE BASIS OR NUMERICAL ATOMIC ORBITALS
 
----------------------------------------------------------------------
+---
+
 ABACUS provides the following features and functionalities:
 
 1. Ground-state total energy calculations using Kohn-Sham (KS) density functional theory
-(DFT) with local-density, generalized gradient approximations (LDA/GGAs), and hybrid functionals 
+(DFT) with local-density, generalized gradient approximations (LDA/GGAs), and hybrid functionals
 (PBE0 and HSE06, only for LCAO).
 2. Brillouin zone sampling using the Monkhorst-Pack special k-points.
 3. Geometry relaxations with Conjugated Gradient (CG) and BFGS methods.
