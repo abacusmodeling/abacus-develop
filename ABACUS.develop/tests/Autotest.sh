@@ -23,7 +23,7 @@ check_out(){
 	properties=`awk '{print $1}' $outfile`
 
 	#------------------------------------------------------
-	# jd = job description 
+	# jd = job description
 	#------------------------------------------------------
 	if test -e "jd"; then
 		jd=`cat jd`
@@ -31,7 +31,7 @@ check_out(){
 	fi
 
 	#------------------------------------------------------
-	# check every 'key' word 
+	# check every 'key' word
 	#------------------------------------------------------
 	for key in $properties; do
 
@@ -47,18 +47,18 @@ check_out(){
 		ref=`grep "$key" result.ref | awk '{printf "%.'$CA'f\n",$2}'`
 
 		#--------------------------------------------------
-		# computed the deviation between the calculated 
+		# computed the deviation between the calculated
 		# and reference value
 		#--------------------------------------------------
 		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$CA'f\n",x-y}'`
 
 
-		if [ $key == "totaltimeref" ]; then		
+		if [ $key == "totaltimeref" ]; then
 #			echo "time=$cal ref=$ref"
 			break
 		fi
 
-		
+
 		#--------------------------------------------------
 		# If deviation < threshold, then the test passes,
 		# otherwise, the test prints out warning
@@ -71,7 +71,7 @@ check_out(){
 			echo " *************"
 			echo "$key cal=$cal ref=$ref deviation=$deviation"
 			break
-		else 
+		else
 			#echo "$key cal=$cal ref=$ref deviation=$deviation"
 			#echo "[ PASS ] $key"
 			echo -e "\e[1;32m [ PASS ] \e[0m $key"
@@ -83,13 +83,12 @@ check_out(){
 # the file name that contains all of the tests
 #---------------------------------------------
 
-test -e general_info||echo "plese write the file list_of_tests"
-test -e general_info||exit 0
-exec_path=`grep EXEC general_info|awk '{printf $2}'`
-test -e $exec_path || echo "Error! ABACUS path was wrong!!"
-test -e $exec_path || exit 0
+test -e general_info || echo "plese write the file list_of_tests"
+test -e general_info || exit 0
+which $ABACUS_PATH || echo "Error! ABACUS path was wrong!!"
+which $ABACUS_PATH || exit 0
 CA=`grep CHECKACCURACY general_info | awk '{printf $2}'`
-NP=`grep NUMBEROFPROCESS general_info | awk '{printf $2}'`
+# NP=`grep NUMBEROFPROCESS general_info | awk '{printf $2}'`
 
 grep -w TESTDIR general_info | awk '{print $2}' > testdir.txt
 list=`grep list_of_tests general_info|sed -e 's/[^ ]* //'`
@@ -115,11 +114,11 @@ for dir in $testdir; do
 cd $dir
 	echo "$dir ($NP cores)"
 	#parallel test
-	mpirun -np $NP $exec_path > log.txt
+	mpirun -np $NP $ABACUS_PATH > log.txt
 	test -d OUT.autotest || echo "Some errors happened in ABACUS!"
 	test -d OUT.autotest || exit 0
 
-	if test -z $1 
+	if test -z $1
 	then
 		../tools/catch_properties.sh result.out
 		check_out result.out
@@ -129,4 +128,4 @@ cd $dir
 
 	echo ""
 cd ../
-done	
+done

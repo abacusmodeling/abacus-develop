@@ -1,0 +1,23 @@
+name: Test ABACUS
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+env:
+  CONTAINER: ghcr.io/deepmodeling/abacus-development-kit:gnu
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build Docker Image
+        uses: docker/build-push-action@v2
+        with:
+          tags: test
+          cache-from: type=registry,ref=${{ env.CONTAINER }}
+      - name: Build and Test
+        run: docker run -v $GITHUB_WORKSPACE:/workspace -w /workspace test bash entrypoint.sh
