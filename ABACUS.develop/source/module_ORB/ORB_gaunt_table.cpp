@@ -3,11 +3,11 @@
 #include "ORB_gaunt_table.h"
 #include "../module_base/timer.h"
 #include "../src_global/memory.h"
-#include "../src_global/mathzone.h"
+#include "../module_base/mathzone.h"
 #include "../module_base/global_function.h"
 #include "../module_base/vector3.h"
 #include "../module_base/constants.h"
-#include "../src_global/math_ylmreal.h"
+#include "../module_base/math_ylmreal.h"
 
 ORB_gaunt_table::ORB_gaunt_table(){}
 ORB_gaunt_table::~ORB_gaunt_table(){}

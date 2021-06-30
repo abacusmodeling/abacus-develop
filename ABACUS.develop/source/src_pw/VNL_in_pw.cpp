@@ -3,10 +3,10 @@
 #include "tools.h"
 #include "wavefunc.h"
 #include "../module_ORB/ORB_gen_tables.h"
-#include "../src_global/math_integral.h"
-#include "../src_global/math_sphbes.h"
-#include "../src_global/math_polyint.h"
-#include "../src_global/math_ylmreal.h"
+#include "../module_base/math_integral.h"
+#include "../module_base/math_sphbes.h"
+#include "../module_base/math_polyint.h"
+#include "../module_base/math_ylmreal.h"
 #include "../src_pw/soc.h"
 
 pseudopot_cell_vnl::pseudopot_cell_vnl()

@@ -2,7 +2,7 @@
 #include "../module_base/timer.h"
 #include "../module_base/constants.h"
 #include "../module_base/tool_quit.h"
-#include "realarray.h"
+#include "../module_base/realarray.h"
 #include <cassert>
 
 YlmReal::YlmReal(){}

@@ -3,7 +3,7 @@
 
 #include "exx_abfs-parallel.h"
 #include "../module_base/matrix.h"
-#include "../src_global/matrix_wrapper.h"
+#include "../module_base/matrix_wrapper.h"
 #include "../module_base/complexmatrix.h"
 #include "src_ri/abfs-vector3_order.h"
 #include <vector>

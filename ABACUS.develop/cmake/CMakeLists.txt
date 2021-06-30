@@ -128,12 +128,12 @@ set(CODE_TOOLS
     module_base/global_variable.cpp
     module_base/intarray.cpp
     src_global/integral.cpp
-    src_global/math_integral.cpp
-    src_global/math_polyint.cpp
-    src_global/math_sphbes.cpp
-    src_global/math_ylmreal.cpp
-    src_global/mathzone_add1.cpp
-    src_global/mathzone.cpp
+    module_base/math_integral.cpp
+    module_base/math_polyint.cpp
+    module_base/math_sphbes.cpp
+    module_base/math_ylmreal.cpp
+    module_base/mathzone_add1.cpp
+    module_base/mathzone.cpp
     module_base/matrix.cpp
     module_base/matrix3.cpp
     src_global/mymath1.cpp
@@ -171,7 +171,7 @@ set(CODE_LCAO
     module_neighbor/sltk_atom_input.cpp
     module_neighbor/sltk_grid.cpp
     module_neighbor/sltk_grid_driver.cpp
-    src_global/ylm.cpp
+    module_base/ylm.cpp
     src_io/bessel_basis.cpp
     src_io/cal_r_overlap_R.cpp
     src_io/istate_charge.cpp

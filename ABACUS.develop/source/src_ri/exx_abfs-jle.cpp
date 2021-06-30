@@ -3,8 +3,8 @@
 #include "../src_pw/global.h"
 #include "module_ORB/ORB_read.h"
 #include "../module_base/global_function.h"
-#include "../src_global/mathzone.h"
-#include "../src_global/math_sphbes.h" // mohan add 2021-05-06
+#include "../module_base/mathzone.h"
+#include "../module_base/math_sphbes.h" // mohan add 2021-05-06
 
 int Exx_Abfs::Jle::Lmax = 2;
 double Exx_Abfs::Jle::Ecut_exx = 60;

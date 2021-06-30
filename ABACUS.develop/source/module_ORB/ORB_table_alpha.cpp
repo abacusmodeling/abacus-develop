@@ -1,7 +1,7 @@
 //caoyu add 2021-03-17
 #include "ORB_table_alpha.h"
 #include "ORB_read.h"
-#include "../src_global/math_integral.h"
+#include "../module_base/math_integral.h"
 #include <stdexcept>
 
 double ORB_table_alpha::dr = -1.0;

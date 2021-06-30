@@ -1,6 +1,6 @@
 #include "./stress_func.h"
 #include "./H_XC_pw.h"
-#include "../src_global/math_integral.h"
+#include "../module_base/math_integral.h"
 
 //NLCC term, need to be tested
 void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)

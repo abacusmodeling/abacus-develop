@@ -11,6 +11,14 @@ intarray.o\
 complexmatrix.o\
 complexarray.o\
 timer.o\
+realarray.o\
+math_polyint.o\
+math_integral.o\
+math_sphbes.o\
+math_ylmreal.o\
+ylm.o\
+mathzone.o\
+mathzone_add1.o\
 global_file.o\
 global_function.o\
 global_variable.o\

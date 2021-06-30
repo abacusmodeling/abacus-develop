@@ -1,7 +1,7 @@
 #ifndef MATHZONE_H
 #define MATHZONE_H
 
-#include "realarray.h"
+#include "../module_base/realarray.h"
 #include "../module_base/vector3.h"
 #include "../module_base/matrix3.h"
 #include "../module_base/global_function.h"
@@ -29,7 +29,6 @@ class Mathzone
 
     // be careful, this can only be used for plane wave
     // during parallel calculation
-    static void norm_pw(complex<double> *u, const int n);
 
 public:
 

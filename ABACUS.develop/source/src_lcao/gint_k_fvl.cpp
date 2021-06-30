@@ -3,7 +3,7 @@
 #include "LCAO_nnr.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
-#include "../src_global/ylm.h"
+#include "../module_base/ylm.h"
 
 void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 {

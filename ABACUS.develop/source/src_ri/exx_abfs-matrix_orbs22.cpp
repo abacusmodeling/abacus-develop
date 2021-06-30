@@ -5,7 +5,7 @@
 
 #include "../src_pw/global.h"
 #include "module_ORB/ORB_read.h"
-#include "../src_global/ylm.h"
+#include "../module_base/ylm.h"
 
 #include "src_external/src_test/test_function.h"			// Peize Lin test 2016-04-05
 #include "src_external/src_test/src_ri/exx_lcao-test.h"

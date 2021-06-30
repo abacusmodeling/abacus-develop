@@ -2,7 +2,7 @@
 #include "../src_pw/global.h"
 #include "../src_pw/symmetry.h"
 #include "winput.h"
-#include "../src_global/math_ylmreal.h"
+#include "../module_base/math_ylmreal.h"
 
 bool Numerical_Basis::init_label = false;
 Bessel_Basis Numerical_Basis::bessel_basis;

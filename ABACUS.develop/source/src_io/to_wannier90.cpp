@@ -2,10 +2,10 @@
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h" // mohan add 2021-01-30, this module should be modified
 #endif
-#include "../src_global/math_integral.h" 
-#include "../src_global/math_sphbes.h"
-#include "../src_global/math_polyint.h" 
-#include "../src_global/math_ylmreal.h" 
+#include "../module_base/math_integral.h" 
+#include "../module_base/math_sphbes.h"
+#include "../module_base/math_polyint.h" 
+#include "../module_base/math_ylmreal.h" 
 
 toWannier90::toWannier90(int num_kpts, Matrix3 recip_lattice)
 {

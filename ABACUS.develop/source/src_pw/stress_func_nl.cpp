@@ -1,6 +1,6 @@
 #include "stress_func.h"
-#include "../src_global/math_polyint.h"
-#include "../src_global/math_ylmreal.h"
+#include "../module_base/math_polyint.h"
+#include "../module_base/math_ylmreal.h"
 
 //calculate the nonlocal pseudopotential stress in PW
 void Stress_Func::stress_nl(matrix& sigma){

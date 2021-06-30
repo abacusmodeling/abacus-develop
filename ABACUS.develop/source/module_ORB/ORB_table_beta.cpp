@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include "ORB_table_beta.h"
 #include "ORB_read.h"
-#include "../src_global/math_integral.h"
+#include "../module_base/math_integral.h"
 
 double ORB_table_beta::dr = -1.0;
 

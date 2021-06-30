@@ -1,8 +1,8 @@
 #include "bessel_basis.h"
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_common.h"
-#include "../src_global/math_integral.h"
-#include "../src_global/math_sphbes.h"
+#include "../module_base/math_integral.h"
+#include "../module_base/math_sphbes.h"
 
 Bessel_Basis::Bessel_Basis()
 {

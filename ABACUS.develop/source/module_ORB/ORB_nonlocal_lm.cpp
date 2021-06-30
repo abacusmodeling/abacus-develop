@@ -3,12 +3,12 @@
 #include <sstream>
 #include <cmath>
 #include "ORB_nonlocal_lm.h"
-#include "../src_global/math_integral.h"
+#include "../module_base/math_integral.h"
 #include "../module_base/global_function.h"
-#include "../src_global/mathzone.h" /// use Polynomial_Interpolation_xy, Spherical_Bessel
-#include "../src_global/mathzone_add1.h" /// use SplineD2
-#include "../src_global/math_sphbes.h" // mohan add 2021-05-06
-#include "../src_global/math_polyint.h" // mohan add 2021-05-06
+#include "../module_base/mathzone.h" /// use Polynomial_Interpolation_xy, Spherical_Bessel
+#include "../module_base/mathzone_add1.h" /// use SplineD2
+#include "../module_base/math_sphbes.h" // mohan add 2021-05-06
+#include "../module_base/math_polyint.h" // mohan add 2021-05-06
 
 Numerical_Nonlocal_Lm::Numerical_Nonlocal_Lm()
 {
