@@ -22,6 +22,6 @@ mathzone_add1.o\
 global_file.o\
 global_function.o\
 global_variable.o\
+tool_title.o\
 tool_check.o\
 tool_quit.o\
-tool_title.o\
