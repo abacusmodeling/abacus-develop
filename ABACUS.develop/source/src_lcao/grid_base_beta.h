@@ -28,7 +28,6 @@ protected:
 // EXPLAIN : Integral On 3D Real Space For Local Potential
 // MEMBER FUNCTION :
 //===========================================================
-	const double* vlocal;
 	double* rho1; // about charge
 	double **density_kernel;
 	double vfactor;

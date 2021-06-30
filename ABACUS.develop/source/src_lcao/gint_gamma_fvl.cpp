@@ -1,3 +1,6 @@
+//=========================================================
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "grid_technique.h"
@@ -8,23 +11,23 @@
 #include "global_fp.h" // mohan add 2021-01-30
 #include "../src_global/ylm.h"
 
-void Gint_Gamma::cal_force(const double* vlocal_in)
+// calcualte the forces related to grid
+void Gint_Gamma::cal_force(const double*const vlocal)
 {
     timer::tick("Gint_Gamma","cal_force",'H');
-    this->vlocal = vlocal_in;
     this->save_atoms_on_grid(GridT);
-    this->gamma_force();
+    this->gamma_force(vlocal);
     timer::tick("Gint_Gamma","cal_force",'H');
 }
 
 inline void cal_psir_ylm_dphi(
-	const int na_grid, 
+	const int na_grid,   					// how many atoms on this (i,j,k) grid
 	const int grid_index, 
 	const double delta_r,
-	const int*const block_index,
-	const int*const block_size, 
-	bool*const*const cal_flag,
-	double*const*const psir_ylm, 
+	const int*const block_index,			// block_index[na_grid+1], count total number of atomis orbitals
+	const int*const block_size,  			// block_size[na_grid],	number of columns of a band
+	bool*const*const cal_flag,		        // cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	double*const*const psir_ylm,	    	// psir_ylm[pw.bxyz][LD_pool] 
 	double*const*const dphix, 
 	double*const*const dphiy, 
 	double*const*const dphiz,
@@ -241,16 +244,16 @@ inline void cal_psir_ylm_dphi(
 
 
 inline void cal_meshball_DGridV(
-	const int na_grid,
+	const int na_grid,   			    	    	// how many atoms on this (i,j,k) grid
 	int lgd_now,
 	int LD_pool, 
-	const int*const block_index,
-	const int*const block_iw, 
-	const int*const block_size,
-	const bool*const*const cal_flag,
-	const double*const vldr3, 
-	const double*const*const psir_ylm,
-	double*const*const psir_vlbr3,
+	const int*const block_index,	    	    	// block_index[na_grid+1], count total number of atomis orbitals
+	const int*const block_iw, 		    	    	// block_iw[na_grid],	index of wave functions for each block
+	const int*const block_size, 	    	    	// block_size[na_grid],	number of columns of a band
+	const bool*const*const cal_flag,		        // cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,               	    // vldr3[pw.bxyz]
+	const double*const*const psir_ylm,		        // psir_ylm[pw.bxyz][LD_pool]
+	double*const*const psir_vlbr3,              	// psir_vlbr3[pw.bxyz][LD_pool]
 	const double*const*const dphix, const double*const*const dphiy, const double*const*const dphiz, 
 	double*const*const DGridV_x,  double*const*const DGridV_y,  double*const*const DGridV_z,
 	double*const*const DGridV_11, double*const*const DGridV_12, double*const*const DGridV_13,
@@ -458,7 +461,7 @@ inline void cal_meshball_DGridV(
 }
 
 
-void Gint_Gamma::gamma_force(void)
+void Gint_Gamma::gamma_force(const double*const vlocal) const
 {
     TITLE("Grid_Integral","gamma_force");
     timer::tick("Gint_Gamma","gamma_force",'I');
@@ -586,7 +589,7 @@ void Gint_Gamma::gamma_force(void)
 					//------------------------------------------------------------------
 					// extract the local potentials.
 					//------------------------------------------------------------------
-					double *vldr3 = get_vldr3(ncyz, ibx, jby, kbz);
+					double *vldr3 = get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 					
 					//------------------------------------------------------
 					// index of wave functions for each block
