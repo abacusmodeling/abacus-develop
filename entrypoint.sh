@@ -1,4 +1,7 @@
-source /opt/intel/oneapi/setvars.sh -i_mpi_library_kind=debug
-cmake -B build -DCMAKE_CXX_COMPILER=icpc
-cmake --build build
-build/ABACUS.develop/source/main
+cd ABACUS.develop
+cmake -B build cmake
+cmake --build build -j4
+cmake --install build
+cd tests
+ABACUS_PATH=ABACUS NP=2 bash Autotest.sh
+bash clean.sh

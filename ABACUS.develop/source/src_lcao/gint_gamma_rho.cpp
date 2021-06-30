@@ -1,3 +1,6 @@
+//=========================================================
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "grid_technique.h"
@@ -7,16 +10,22 @@
 
 #include "global_fp.h" // mohan add 2021-01-30
 
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
+
 // can be done by GPU
 void Gint_Gamma::cal_band_rho(
-	const int na_grid, 
+	const int na_grid,    							// how many atoms on this (i,j,k) grid
 	const int LD_pool, 
-	const int*const block_iw, 
-	const int*const block_size, 
-	const int*const block_index,
-	const bool*const*const cal_flag, 
-	const double*const*const psir_ylm,
-	const int*const vindex)
+    const int*const block_iw, 						// block_iw[na_grid],	index of wave functions for each block
+    const int*const block_size, 					// block_size[na_grid],	band size: number of columns of a band
+    const int*const block_index,					// block_index[na_grid+1], count total number of atomis orbitals
+    const bool*const*const cal_flag, 				// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+    const double*const*const psir_ylm,				// psir_ylm[pw.bxyz][LD_pool]
+    const int*const vindex,							// vindex[pw.bxyz]
+    const double*const*const*const DM,				// DM[NSPIN][lgd_now][lgd_now]
+    Gint_Tools::Array_Pool<double> &rho) const		// rho[NSPIN][pw.nrxx]
 {
     //parameters for dsymm, dgemm and ddot
     constexpr char side='L', uplo='U';
@@ -64,7 +73,7 @@ void Gint_Gamma::cal_band_rho(
             if(cal_num>ib_length/4)
             {
                 dsymm_(&side, &uplo, &block_size[ia1], &ib_length, 
-                    &alpha_symm, &LOC.DM[is][iw1_lo][iw1_lo], &GridT.lgd, 
+                    &alpha_symm, &DM[is][iw1_lo][iw1_lo], &GridT.lgd, 
                     &psir_ylm[first_ib][block_index[ia1]], &LD_pool, 
                     &beta, &psir_DM.ptr_2D[first_ib][block_index[ia1]], &LD_pool);
             }
@@ -76,7 +85,7 @@ void Gint_Gamma::cal_band_rho(
                     if(cal_flag[ib][ia1])
                     {
                         dsymv_(&uplo, &block_size[ia1],
-                            &alpha_symm, &LOC.DM[is][iw1_lo][iw1_lo], &GridT.lgd,
+                            &alpha_symm, &DM[is][iw1_lo][iw1_lo], &GridT.lgd,
                             &psir_ylm[ib][block_index[ia1]], &inc,
                             &beta, &psir_DM.ptr_2D[ib][block_index[ia1]], &inc);
                     }
@@ -115,7 +124,7 @@ void Gint_Gamma::cal_band_rho(
                 if(cal_pair_num>ib_length/4)
                 {
                     dgemm_(&transa, &transb, &block_size[ia2], &ib_length, &block_size[ia1], 
-                        &alpha_gemm, &LOC.DM[is][iw1_lo][iw2_lo], &GridT.lgd, 
+                        &alpha_gemm, &DM[is][iw1_lo][iw2_lo], &GridT.lgd, 
                         &psir_ylm[first_ib][block_index[ia1]], &LD_pool, 
                         &beta, &psir_DM.ptr_2D[first_ib][block_index[ia2]], &LD_pool);
                 }
@@ -126,7 +135,7 @@ void Gint_Gamma::cal_band_rho(
                         if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
                         {
                             dgemv_(&transa, &block_size[ia2], &block_size[ia1], 
-                                &alpha_gemm, &LOC.DM[is][iw1_lo][iw2_lo], &GridT.lgd,
+                                &alpha_gemm, &DM[is][iw1_lo][iw2_lo], &GridT.lgd,
                                 &psir_ylm[ib][block_index[ia1]], &inc,
                                 &beta, &psir_DM.ptr_2D[ib][block_index[ia2]], &inc);
                         }
@@ -136,45 +145,33 @@ void Gint_Gamma::cal_band_rho(
             }// ia2
         } // ia1
     
-        double*const rhop = CHR.rho[is];
         for(int ib=0; ib<pw.bxyz; ++ib)
         {
             const double r = ddot_(&block_index[na_grid], psir_ylm[ib], &inc, psir_DM.ptr_2D[ib], &inc);
             const int grid = vindex[ib];
-            rhop[ grid ] += r;
+            rho.ptr_2D[is][grid] += r;
         }
     } // end is
 }
 
-double Gint_Gamma::cal_rho(void)
-{
-    TITLE("Gint_Gamma","cal_rho");
-    timer::tick("Gint_Gamma","cal_rho",'F');
 
-    this->job = cal_charge;
-    this->save_atoms_on_grid(GridT);
-
-	// I guess Peize add this, mohan 2021-01-31
-	omp_init_lock(&lock);
-    const double ne = this->gamma_charge();
-	omp_destroy_lock(&lock);
-
-    timer::tick("Gint_Gamma","cal_rho",'F');
-    return ne;
-}
-
-
-
-double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
+// for calculation of charege 
+// Input:	DM[is][iw1_lo][iw2_lo]
+// Output:	rho.ptr_2D[is][ir]
+Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const*const DM) const					// Peize Lin update OpenMP 2020.09.28
 {
     TITLE("Gint_Gamma","gamma_charge");
-    timer::tick("Gint_Gamma","gamma_charge",'I');    
-    double sum = 0.0;//LiuXh 2016-01-10
+    timer::tick("Gint_Gamma","gamma_charge",'I');   
+
+	Gint_Tools::Array_Pool<double> rho(NSPIN, pw.nrxx);
+	ZEROS(rho.ptr_1D, NSPIN*pw.nrxx);
 
 	if(max_size)
     {
-        const int omp_threads = omp_get_max_threads();
-		omp_set_num_threads(std::max(1,omp_threads/GridT.nbx));			// Peize Lin update 2021.01.20
+#ifdef __MKL
+   		const int mkl_threads = mkl_get_max_threads();
+		mkl_set_num_threads(std::max(1,mkl_threads/GridT.nbx));		// Peize Lin update 2021.01.20
+#endif
 		
 #ifdef __OPENMP
 		#pragma omp parallel
@@ -238,7 +235,7 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
 							cal_flag);
 						
 						this->cal_band_rho(na_grid, LD_pool, block_iw, block_size, block_index,
-							cal_flag, psir_ylm.ptr_2D, vindex);
+							cal_flag, psir_ylm.ptr_2D, vindex, DM, rho);
 
 						free(vindex);			vindex=nullptr;
 						free(block_size);		block_size=nullptr;
@@ -252,19 +249,35 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
 				}// j
 			}// i
 		} // end of #pragma omp parallel
-		
-        for(int is=0; is<NSPIN; is++)
-		{
-            for (int ir=0; ir<pw.nrxx; ir++)
-			{
-                sum += CHR.rho[is][ir];
-			}
-		}
 			
-        omp_set_num_threads(omp_threads);
+#ifdef __MKL
+   		mkl_set_num_threads(mkl_threads);
+#endif
     } // end of if(max_size)
-        
-//ENDandRETURN:
+
+	return rho;
+}
+
+
+
+double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
+{
+	for(int is=0; is<NSPIN; is++)
+	{
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			CHR.rho[is][ir] += rho.ptr_2D[is][ir];
+		}
+	}
+
+    double sum = 0.0;//LiuXh 2016-01-10
+	for(int is=0; is<NSPIN; is++)
+	{
+		for (int ir=0; ir<pw.nrxx; ir++)
+		{
+			sum += CHR.rho[is][ir];
+		}
+	}
     if(OUT_LEVEL != "m") OUT(ofs_running, "sum", sum);
 
     timer::tick("Gint_Gamma","reduce_charge",'J');
@@ -278,7 +291,23 @@ double Gint_Gamma::gamma_charge(void)					// Peize Lin update OpenMP 2020.09.28
     //xiaohui add 'OUT_LEVEL', 2015-09-16
     if(OUT_LEVEL != "m") OUT(ofs_running, "ne", ne);
     timer::tick("Gint_Gamma","gamma_charge",'I');
-
-    return ne;
+	return ne;
 }
 
+
+
+// calculate charge density
+double Gint_Gamma::cal_rho(const double*const*const*const DM)
+{
+    TITLE("Gint_Gamma","cal_rho");
+    timer::tick("Gint_Gamma","cal_rho",'F');
+
+    this->job = cal_charge;
+    this->save_atoms_on_grid(GridT);
+
+	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(DM);
+    const double ne = sum_up_rho(rho);
+
+    timer::tick("Gint_Gamma","cal_rho",'F');
+    return ne;
+}

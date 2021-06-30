@@ -1,3 +1,6 @@
+//=========================================================
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
 #include "gint_tools.h"
 #include "../src_pw/global.h"
 #include "src_lcao/global_fp.h"
@@ -37,7 +40,7 @@ namespace Gint_Tools
 	// index of wave functions for each block
 	int* get_block_iw(
 		const int na_grid,  		// how many atoms on this (i,j,k) grid
-		const int grid_index,		// 1d index of FFT index (i,j,k))
+		const int grid_index,		// 1d index of FFT index (i,j,k)
 		const int max_size)
 	{
 		int *block_iw = (int*)malloc(max_size*sizeof(int));
@@ -84,11 +87,11 @@ namespace Gint_Tools
 		}
 		return block_size;
 	}
-
+	
 	// whether the atom-grid distance is larger than cutoff
 	bool** get_cal_flag(
-		const int na_grid, 		// number of atoms on this grid 
-		const int grid_index)
+		const int na_grid, 			// number of atoms on this grid 
+		const int grid_index)		// 1d index of FFT index (i,j,k) 
 	{
 		bool** cal_flag = (bool**)malloc(pw.bxyz*sizeof(bool*));
 		for(int ib=0; ib<pw.bxyz; ++ib)
@@ -134,13 +137,13 @@ namespace Gint_Tools
 	}
 
 	Array_Pool<double> cal_psir_ylm(
-		const int na_grid, // number of atoms on this grid 
+		const int na_grid, 					// number of atoms on this grid 
 		const int LD_pool,
-		const int grid_index, // 1d index of FFT index (i,j,k) 
-		const double delta_r, // delta_r of the uniform FFT grid
-		const int*const block_index,  // count total number of atomis orbitals
-		const int*const block_size, 
-		const bool*const*const cal_flag) // whether the atom-grid distance is larger than cutoff
+		const int grid_index, 				// 1d index of FFT index (i,j,k) 
+		const double delta_r, 				// delta_r of the uniform FFT grid
+		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
+		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
+		const bool*const*const cal_flag) 	// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 	{
 		Array_Pool<double> psir_ylm(pw.bxyz, LD_pool);
 		for (int id=0; id<na_grid; id++)

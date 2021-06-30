@@ -127,7 +127,7 @@ void LOOP_elec::before_solver(const int &istep)
 		// calculate the charge density
 		if(GAMMA_ONLY_LOCAL)
 		{
-			UHM.GG.cal_rho();
+			UHM.GG.cal_rho(LOC.DM);
 		}
 		else
 		{

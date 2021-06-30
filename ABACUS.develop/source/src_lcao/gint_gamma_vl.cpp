@@ -1,11 +1,18 @@
+//=========================================================
+//REFACTOR : Peize Lin, 2021.06.28
+//=========================================================
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "grid_technique.h"
 #include "module_ORB/ORB_read.h"
-#include "../src_pw/global.h"
-#include "../module_base/blas_connector.h"
+#include "src_pw/global.h"
+#include "module_base/blas_connector.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
+
+#ifdef __MKL
+#include <mkl_service.h>
+#endif
 
 extern "C"
 {
@@ -17,12 +24,12 @@ extern "C"
 // atomic basis sets
 // psir_vlbr3[pw.bxyz][LD_pool]
 Gint_Tools::Array_Pool<double> get_psir_vlbr3(
-	const int na_grid,
+	const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int LD_pool,
-	const int*const block_index,
-	const bool*const*const cal_flag,
-	const double*const vldr3,
-	const double*const*const psir_ylm)
+	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+	const bool*const*const cal_flag,	    	// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,			    	// vldr3[pw.bxyz]
+	const double*const*const psir_ylm)		    // psir_ylm[pw.bxyz][LD_pool]
 {
 	Gint_Tools::Array_Pool<double> psir_vlbr3(pw.bxyz, LD_pool);
 	for(int ib=0; ib<pw.bxyz; ++ib)
@@ -49,19 +56,18 @@ Gint_Tools::Array_Pool<double> get_psir_vlbr3(
     return psir_vlbr3;
 }
 
-//inline void cal_meshball_vlocal(int na_grid, int LD_pool, int* block_iw, int* block_size, int* block_index,
 void Gint_Gamma::cal_meshball_vlocal(
-	const int na_grid,
+	const int na_grid,  					    // how many atoms on this (i,j,k) grid
 	const int LD_pool,
-	const int*const block_iw,
-	const int*const block_size,
-	const int*const block_index,
-	const bool*const*const cal_flag,
-	const double*const vldr3,
-	const double*const*const psir_ylm,
-	const double*const*const psir_vlbr3,
+	const int*const block_iw,				    // block_iw[na_grid],	index of wave functions for each block
+	const int*const block_size, 			    // block_size[na_grid],	number of columns of a band
+	const int*const block_index,		    	// block_index[na_grid+1], count total number of atomis orbitals
+	const bool*const*const cal_flag,	    	// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,			    	// vldr3[pw.bxyz]
+	const double*const*const psir_ylm,		    // psir_ylm[pw.bxyz][LD_pool]
+	const double*const*const psir_vlbr3,	    // psir_vlbr3[pw.bxyz][LD_pool]
 	const int lgd_now,
-	double*const*const GridVlocal)
+	double*const*const GridVlocal) const	    // GridVlocal[lgd_now][lgd_now]
 {
 	const char transa='N', transb='T';
 	const double alpha=1, beta=1;
@@ -103,7 +109,6 @@ void Gint_Gamma::cal_meshball_vlocal(
                 }
 
                 const int n=block_size[ia2];
-//omp_set_lock(&lock);
                 if(cal_pair_num>ib_length/4)
                 {
                     dgemm_(&transa, &transb, &n, &m, &ib_length, &alpha,
@@ -125,8 +130,6 @@ void Gint_Gamma::cal_meshball_vlocal(
                         }
                     }
                 }
-//omp_unset_lock(&lock);
-
 			}
 		}
 	}
@@ -296,44 +299,22 @@ inline int setBufferParameter(
 }
 
 
-
-void Gint_Gamma::cal_vlocal(
-    const double* vlocal_in)
-{
-    omp_init_lock(&lock);
-
-    TITLE("Gint_Gamma","cal_vlocal");
-    timer::tick("Gint_Gamma","cal_vlocal",'J');
-
-    this->job=cal_local;
-    this->vlocal=vlocal_in;
-    this->save_atoms_on_grid(GridT);
-
-    this->gamma_vlocal();
-
-    omp_destroy_lock(&lock);
-
-    timer::tick("Gint_Gamma","cal_vlocal",'J');
-    return;
-}
-
-
-
-void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
+// for calculation of < phi_i | Vlocal | phi_j >
+// Input:	vlocal[ir]
+// Output:	GridVlocal.ptr_2D[iw1_lo][iw2_lo]
+Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal) const						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
 
-    double ** GridVlocal = new double*[GridT.lgd];
-    for (int i=0; i<GridT.lgd; i++)
-    {
-        GridVlocal[i] = new double[GridT.lgd];
-        ZEROS(GridVlocal[i], GridT.lgd);
-    }
-			Memory::record("Gint_Gamma","GridVlocal",GridT.lgd*GridT.lgd,"double");
+	Gint_Tools::Array_Pool<double> GridVlocal(GridT.lgd, GridT.lgd);
+	ZEROS(GridVlocal.ptr_1D, GridT.lgd*GridT.lgd);
+    Memory::record("Gint_Gamma","GridVlocal",GridT.lgd*GridT.lgd,"double");
 
-    const int omp_threads = omp_get_max_threads();
-	omp_set_num_threads(std::max(1,omp_threads/GridT.nbx));		// Peize Lin update 2021.01.20
+#ifdef __MKL
+    const int mkl_threads = mkl_get_max_threads();
+	mkl_set_num_threads(std::max(1,mkl_threads/GridT.nbx));		// Peize Lin update 2021.01.20
+#endif
 
 #ifdef __OPENMP
 	#pragma omp parallel
@@ -387,11 +368,6 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 						//------------------------------------------------------------------
 						const int kbz=k*pw.bz-pw.nczp_start;
 
-						//------------------------------------------------------------------
-						// extract the local potentials.
-						//------------------------------------------------------------------
-						double *vldr3 = this->get_vldr3(ncyz, ibx, jby, kbz);
-
 						//------------------------------------------------------
 						// index of wave functions for each block
 						//------------------------------------------------------
@@ -415,6 +391,11 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
 							na_grid, LD_pool, grid_index, delta_r,
 							block_index, block_size, cal_flag);
+
+						//------------------------------------------------------------------
+						// extract the local potentials.
+						//------------------------------------------------------------------
+						double *vldr3 = this->get_vldr3(vlocal, ncyz, ibx, jby, kbz);
 
                         const Gint_Tools::Array_Pool<double> psir_vlbr3 = get_psir_vlbr3(
                                 na_grid, LD_pool, block_index, cal_flag, vldr3, psir_ylm.ptr_2D);
@@ -446,20 +427,27 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 				{
 					for (int j=0; j<lgd_now; j++)
 					{
-						GridVlocal[i][j] += GridVlocal_thread.ptr_2D[i][j];
+						GridVlocal.ptr_2D[i][j] += GridVlocal_thread.ptr_2D[i][j];
 					}
 				}
 			}
 		} // end of if(max_size>0 && lgd_now>0)
 	} // end of #pragma omp parallel
 
-    omp_set_num_threads(omp_threads);
+#ifdef __MKL
+    mkl_set_num_threads(mkl_threads);
+#endif
 
     OUT(ofs_running, "temp variables are deleted");
     timer::tick("Gint_Gamma","gamma_vlocal",'K');
     MPI_Barrier(MPI_COMM_WORLD);
     timer::tick("Gint_Gamma","distri_vl",'K');
-
+	
+	return GridVlocal;
+}
+	
+void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
+{
     // setup send buffer and receive buffer size
     // OUT(ofs_running, "Start transforming vlocal from grid distribute to 2D block");
     if(CHR.get_new_e_iteration())
@@ -487,11 +475,11 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
         const int icol=ParaO.sender_local_index[i+1];
         if(irow<=icol)
 		{
-            ParaO.sender_buffer[i/2]=GridVlocal[irow][icol];
+            ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[irow][icol];
 		}
         else
 		{
-            ParaO.sender_buffer[i/2]=GridVlocal[icol][irow];
+            ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[icol][irow];
 		}
     }
     OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
@@ -520,13 +508,20 @@ void Gint_Gamma::gamma_vlocal(void)						// Peize Lin update OpenMP 2020.09.27
 
     timer::tick("Gint_Gamma","distri_vl_value",'K');
     timer::tick("Gint_Gamma","distri_vl",'K');
+}
 
-	for (int i=0; i<GridT.lgd; i++)
-	{
-		delete[] GridVlocal[i];
-	}
-	delete[] GridVlocal;
+// calculate the H matrix in terms of effective potentials
+void Gint_Gamma::cal_vlocal(
+    const double*const vlocal)
+{
+    TITLE("Gint_Gamma","cal_vlocal");
+    timer::tick("Gint_Gamma","cal_vlocal",'J');
 
-	//OUT(ofs_running, "ALL GridVlocal was calculated");
-    return;
+    this->job=cal_local;
+    this->save_atoms_on_grid(GridT);
+
+    const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
+	vl_grid_to_2D(GridVlocal);
+
+    timer::tick("Gint_Gamma","cal_vlocal",'J');
 }
