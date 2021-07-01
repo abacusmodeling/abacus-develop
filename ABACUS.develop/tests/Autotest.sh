@@ -3,22 +3,22 @@
 # ABACUS executable path
 abacus=ABACUS
 # number of cores
-np=4
+np=2
 # threshold with unit: eV
 threshold=0.0000001
 # check accuracy
 ca=8
-# list of tests
-list_of_tests="_PW" 
+# regex of case name
+case="^[^#].*_PW_.*$"
 
-while getopts a:n:t:c:l: flag
+while getopts a:n:t:c:r: flag
 do
     case "${flag}" in
         a) abacus=${OPTARG};;
         n) np=${OPTARG};;
 		t) threshold=${OPTARG};;
 		c) ca=${OPTARG};;
-		l) list_of_tests=${OPTARG};;
+		r) case=${OPTARG};;
     esac
 done
 
@@ -27,7 +27,7 @@ echo "ABACUS path: $abacus";
 echo "Number of cores: $np";
 echo "Test accuracy: $threshold eV."
 echo "Check accuaracy: $ca"
-echo "Test cases: $list_of_tests"
+echo "Test cases: $case"
 echo "--------------------------------"
 echo ""
 
@@ -61,19 +61,19 @@ check_out(){
 		#--------------------------------------------------
 		# calculated value
 		#--------------------------------------------------
-		cal=`grep "$key" $outfile | awk '{printf "%.'$CA'f\n",$2}'`
+		cal=`grep "$key" $outfile | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
 		# reference value
 		#--------------------------------------------------
 
-		ref=`grep "$key" result.ref | awk '{printf "%.'$CA'f\n",$2}'`
+		ref=`grep "$key" result.ref | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
 		# computed the deviation between the calculated
 		# and reference value
 		#--------------------------------------------------
-		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$CA'f\n",x-y}'`
+		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",x-y}'`
 
 
 		if [ $key == "totaltimeref" ]; then
@@ -106,49 +106,32 @@ check_out(){
 # the file name that contains all of the tests
 #---------------------------------------------
 
-test -e general_info || echo "plese write the file list_of_tests"
-test -e general_info || exit 0
+test -e CASES || echo "Plese specify tests"
+test -e CASES || exit 0
 which $abacus || echo "Error! ABACUS path was wrong!!"
 which $abacus || exit 0
-# CA=`grep CHECKACCURACY general_info | awk '{printf $2}'`
-# NP=`grep NUMBEROFPROCESS general_info | awk '{printf $2}'`
 
-grep -w TESTDIR general_info | awk '{print $2}' > testdir.txt
-list=`grep list_of_tests general_info|sed -e 's/[^ ]* //'`
-if [ -z "$list" ]
-then
-#echo "do no thing"
-testdir=`cat testdir.txt`
-else
-#echo $list
-value_line=(` echo $list | head -n1 `)
-
-colume=`echo ${#value_line[@]}`
-for (( col=0 ; col<$colume ; col++ ));do
-    value=`echo ${value_line[$col]}`
-    grep $value testdir.txt > testdir.dat
-    mv testdir.dat testdir.txt
-done
-testdir=`cat testdir.txt`
-fi
-rm testdir.txt
+testdir=`cat CASES | grep -E $case`
 
 for dir in $testdir; do
-cd $dir
+	cd $dir
 	echo "$dir ($np cores)"
+	TIMEFORMAT='Time elapsed: %R seconds'
 	#parallel test
-	mpirun -np $np $abacus > log.txt
-	test -d OUT.autotest || echo "Some errors happened in ABACUS!"
-	test -d OUT.autotest || exit 0
+	time {
+		mpirun -np $np $abacus > log.txt
+		test -d OUT.autotest || echo "Some errors happened in ABACUS!"
+		test -d OUT.autotest || exit 0
 
-	if test -z $1
-	then
-		../tools/catch_properties.sh result.out
-		check_out result.out
-	else
-		../tools/catch_properties.sh result.ref
-	fi
+		if test -z $1
+		then
+			../tools/catch_properties.sh result.out
+			check_out result.out
+		else
+			../tools/catch_properties.sh result.ref
+		fi
+	}
 
 	echo ""
-cd ../
+	cd ../
 done

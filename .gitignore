@@ -3,3 +3,4 @@ build
 OUT.*
 log.txt
 result.out
+.DS_Store
