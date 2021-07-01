@@ -468,3 +468,15 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME}
     DESTINATION ${CMAKE_INSTALL_BINDIR}
     RENAME ${PROJECT_NAME}
 )
+
+set(ABACUS_TEST_DIR ${ABACUS_DIR}/tests)
+
+enable_testing()
+
+find_program(BASH bash)
+
+add_test(
+    NAME integrated_test
+    COMMAND ${BASH} Autotest.sh
+    WORKING_DIRECTORY ${ABACUS_TEST_DIR}
+)

@@ -1,10 +1,33 @@
 #!/bin/bash
 
+# ABACUS executable path
+abacus=ABACUS
+# number of cores
+np=4
 # threshold with unit: eV
-threshold="0.0000001"
+threshold=0.0000001
+# check accuracy
+ca=8
+# list of tests
+list_of_tests="_PW" 
+
+while getopts a:n:t:c:l: flag
+do
+    case "${flag}" in
+        a) abacus=${OPTARG};;
+        n) np=${OPTARG};;
+		t) threshold=${OPTARG};;
+		c) ca=${OPTARG};;
+		l) list_of_tests=${OPTARG};;
+    esac
+done
 
 echo "-----AUTO TESTS OF ABACUS ------"
-echo "test accuracy is $threshold eV."
+echo "ABACUS path: $abacus";
+echo "Number of cores: $np";
+echo "Test accuracy: $threshold eV."
+echo "Check accuaracy: $ca"
+echo "Test cases: $list_of_tests"
 echo "--------------------------------"
 echo ""
 
@@ -54,7 +77,7 @@ check_out(){
 
 
 		if [ $key == "totaltimeref" ]; then
-#			echo "time=$cal ref=$ref"
+			# echo "time=$cal ref=$ref"
 			break
 		fi
 
@@ -85,9 +108,9 @@ check_out(){
 
 test -e general_info || echo "plese write the file list_of_tests"
 test -e general_info || exit 0
-which $ABACUS_PATH || echo "Error! ABACUS path was wrong!!"
-which $ABACUS_PATH || exit 0
-CA=`grep CHECKACCURACY general_info | awk '{printf $2}'`
+which $abacus || echo "Error! ABACUS path was wrong!!"
+which $abacus || exit 0
+# CA=`grep CHECKACCURACY general_info | awk '{printf $2}'`
 # NP=`grep NUMBEROFPROCESS general_info | awk '{printf $2}'`
 
 grep -w TESTDIR general_info | awk '{print $2}' > testdir.txt
@@ -112,9 +135,9 @@ rm testdir.txt
 
 for dir in $testdir; do
 cd $dir
-	echo "$dir ($NP cores)"
+	echo "$dir ($np cores)"
 	#parallel test
-	mpirun -np $NP $ABACUS_PATH > log.txt
+	mpirun -np $np $abacus > log.txt
 	test -d OUT.autotest || echo "Some errors happened in ABACUS!"
 	test -d OUT.autotest || exit 0
 

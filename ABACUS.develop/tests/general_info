@@ -1,8 +1,3 @@
-EXEC path_of_ABACUS
-NUMBEROFPROCESS 1
-CHECKACCURACY 8
-list_of_tests _PW 
-##################
 _PW    plain wave bases
 _NO    numerical atoms orbitals bases
 _NP    expand numerical atoms orbitals in plane-wave basis
@@ -76,10 +71,10 @@ TESTDIR 101_PW_OU_pseudopots
 TESTDIR 101_PW_VW_pseudopots
 TESTDIR 101_PW_15_f_pseudopots
 TESTDIR 101_PW_upf201_pseudopots
-#TEST#DIR 102_PW_DA_davidson 
+#TEST#DIR 102_PW_DA_davidson
 TESTDIR 103_PW_15_CS_CF
-TESTDIR 103_PW_OU_CS_CF 
-TESTDIR 103_PW_CF_CS_S1_smallg 
+TESTDIR 103_PW_OU_CS_CF
+TESTDIR 103_PW_CF_CS_S1_smallg
 TESTDIR 104_PW_AF_magnetic
 TESTDIR 104_PW_FM_magnetic
 TESTDIR 105_PW_FD_smearing
@@ -88,11 +83,11 @@ TESTDIR 105_PW_M2_smearing
 TESTDIR 105_PW_GA_smearing
 TESTDIR 105_PW_MP_smearing
 TESTDIR 105_PW_MV_smearing
-TESTDIR 106_PW_BD_chargemixing 
-TESTDIR 106_PW_KK_chargemixing 
-TESTDIR 106_PW_PK_chargemixing 
-TESTDIR 106_PW_PL_chargemixing 
-TESTDIR 106_PW_PU_chargemixing 
+TESTDIR 106_PW_BD_chargemixing
+TESTDIR 106_PW_KK_chargemixing
+TESTDIR 106_PW_PK_chargemixing
+TESTDIR 106_PW_PL_chargemixing
+TESTDIR 106_PW_PU_chargemixing
 TESTDIR 107_PW_OB_outputbands
 #TEST#DIR 107_PW_OD_outputdos
 TESTDIR 108_PW_RE
@@ -115,7 +110,7 @@ TESTDIR 140_PW_15_SO
 TESTDIR 201_NO_KP_15_CF_CS_Si
 TESTDIR 201_NO_KP_DJ_CF_CS_GaAs
 TESTDIR 201_NO_KP_DJ_Si
-TESTDIR 202_NO_KP_HP_hpseps 
+TESTDIR 202_NO_KP_HP_hpseps
 TESTDIR 204_NO_KP_FM
 TESTDIR 204_NO_KP_AFM
 

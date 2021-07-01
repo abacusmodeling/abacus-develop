@@ -43,4 +43,6 @@ RUN cd /tmp \
     && cp -r cereal/include /usr/local \
     && rm -rf cereal
 
+RUN apt-get install -y bc
+
 ENV LD_LIBRARY_PATH /usr/local/lib

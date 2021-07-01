@@ -1,2 +1,5 @@
 build
 *.o
+OUT.*
+log.txt
+result.out
