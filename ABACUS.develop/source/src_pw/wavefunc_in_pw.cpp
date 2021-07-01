@@ -1,9 +1,9 @@
 #include "wavefunc_in_pw.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
-#include "../src_global/math_integral.h"
-#include "../src_global/math_sphbes.h"
-#include "../src_global/math_polyint.h"
-#include "../src_global/math_ylmreal.h"
+#include "../module_base/math_integral.h"
+#include "../module_base/math_sphbes.h"
+#include "../module_base/math_polyint.h"
+#include "../module_base/math_ylmreal.h"
 #include "../src_pw/soc.h"
 
 void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_local)

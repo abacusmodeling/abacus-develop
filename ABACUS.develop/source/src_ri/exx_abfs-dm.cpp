@@ -1,7 +1,7 @@
 #include "exx_abfs.h"
 
 #include "../src_pw/global.h"
-#include "../src_global/mathzone.h"
+#include "../module_base/mathzone.h"
 #include "../src_pw/charge_pulay.h"
 #include "../src_global/container_operator.h"
 

@@ -21,8 +21,8 @@
 #include "charge.h"
 #include "magnetism.h"
 #include "../src_parallel/parallel_grid.h"
-#include "../src_global/math_integral.h"
-#include "../src_global/math_sphbes.h"
+#include "../module_base/math_integral.h"
+#include "../module_base/math_sphbes.h"
 #include <vector>
 
 Charge::Charge()

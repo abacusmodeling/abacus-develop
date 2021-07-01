@@ -1,7 +1,7 @@
 #include "ORB_read.h"
 #include "ORB_gen_tables.h"
-#include "../src_global/ylm.h"
-#include "../src_global/math_polyint.h"
+#include "../module_base/ylm.h"
+#include "../module_base/math_polyint.h"
 
 ///here is a member of ORB_gen_tables class
 ORB_gen_tables UOT;

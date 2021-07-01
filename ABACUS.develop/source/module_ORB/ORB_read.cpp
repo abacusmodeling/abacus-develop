@@ -1,7 +1,7 @@
 #include "ORB_read.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 #include <cassert>
-#include "../src_global/math_integral.h"
+#include "../module_base/math_integral.h"
 #include "../module_base/tool_check.h"
 #include <algorithm>
 //#include "../src_pw/soc.h"

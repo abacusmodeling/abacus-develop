@@ -9,7 +9,7 @@
 #include "../module_base/blas_connector.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
-#include "../src_global/ylm.h"
+#include "../module_base/ylm.h"
 
 // calcualte the forces related to grid
 void Gint_Gamma::cal_force(const double*const vlocal)

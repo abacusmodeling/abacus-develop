@@ -4,7 +4,7 @@
 #include "../src_pw/global.h"
 
 #include "global_fp.h" // mohan add 2021-01-30
-#include "../src_global/ylm.h"
+#include "../module_base/ylm.h"
 
 void Gint_Gamma::cal_mulliken(double** mulliken)
 {

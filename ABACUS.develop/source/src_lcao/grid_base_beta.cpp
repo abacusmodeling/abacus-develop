@@ -1,5 +1,5 @@
 #include "../src_pw/global.h"
-#include "../src_global/ylm.h"
+#include "../module_base/ylm.h"
 #include "global_fp.h" // mohan add 2021-01-30
 
 Grid_Base_Beta::Grid_Base_Beta()

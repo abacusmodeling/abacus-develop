@@ -2,8 +2,8 @@
 #include "../src_global/sph_bessel_recursive.h"
 #include "../module_base/lapack_connector.h"
 #include "../module_base/timer.h"
-#include "../src_global/math_integral.h"
-#include "../src_global/math_sphbes.h"
+#include "../module_base/math_integral.h"
+#include "../module_base/math_sphbes.h"
 #include <omp.h>
 
 Numerical_Orbital_Lm::Numerical_Orbital_Lm()

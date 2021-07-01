@@ -5,7 +5,7 @@
 #include "symmetry.h"
 // new
 #include "H_XC_pw.h"
-#include "../src_global/math_integral.h"
+#include "../module_base/math_integral.h"
 
 double Forces::output_acc = 1.0e-8; // (Ryd/angstrom).	
 

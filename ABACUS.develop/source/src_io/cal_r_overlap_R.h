@@ -17,7 +17,7 @@ using std::set;
 #include "module_ORB/ORB_atomic_lm.h"
 #include "module_ORB/ORB_read.h"
 #include "module_base/vector3.h"
-#include "../src_global/ylm.h"
+#include "../module_base/ylm.h"
 #include "src_lcao/global_fp.h"
 
 #include "../src_pw/global.h"

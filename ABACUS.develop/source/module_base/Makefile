@@ -5,19 +5,19 @@
 #==========================
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = icpc 
-FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+FFTW_DIR = /home/lrx/ABACUS/fftw3.3.9/fftw
 OBJ_DIR = obj
-NP      = 1
+NP      = 4
 
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread
+LIBS = -lifcore -lm -lpthread -lfftw3 -L${FFTW_DIR}/lib
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands 
+INCLUDES = -I. -Icommands -I${FFTW_DIR}/include 
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
