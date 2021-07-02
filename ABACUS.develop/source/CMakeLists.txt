@@ -1,6 +1,23 @@
-add_subdirectory(src_global)
+add_subdirectory(module_base)
+add_subdirectory(module_cell)
+add_subdirectory(module_neighbor)
 add_subdirectory(module_ORB)
+add_subdirectory(src_global)
+add_subdirectory(src_io)
+add_subdirectory(src_ions)
+add_subdirectory(src_lcao)
+add_subdirectory(src_parallel)
+add_subdirectory(src_pdiag)
+add_subdirectory(src_pw)
+add_subdirectory(src_ri)
 
-add_executable(main module_ORB/main.cpp)
-target_link_options(main PRIVATE -mkl)
-target_link_libraries(main PRIVATE orb global)
+add_library(
+    driver
+    OBJECT
+    driver.cpp
+    input.cpp
+    input_conv.cpp
+    input_update.cpp
+    run_lcao.cpp
+    run_pw.cpp
+)
