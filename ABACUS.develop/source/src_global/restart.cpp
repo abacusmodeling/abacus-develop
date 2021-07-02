@@ -1,7 +1,9 @@
 #include "restart.h"
-#include "module_base/global_function.h"
+#include "../module_base/global_function.h"
 #include "../src_pw/global.h"
+#ifdef __LCAO
 #include "../src_lcao/global_fp.h"
+#endif
 #include <fcntl.h> 
 #include <unistd.h>
 #include <fstream>
@@ -39,6 +41,7 @@ void Restart::save_disk(const std::string mode, const int i) const
 {
 	if("charge"==mode)
 		write_file2(folder+"charge_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], pw.nrxx*sizeof(double));
+#ifdef __LCAO
 	if("H"==mode)
 	{
 		if(GAMMA_ONLY_LOCAL)
@@ -46,12 +49,14 @@ void Restart::save_disk(const std::string mode, const int i) const
 		else
 			write_file2(folder+"Hk_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), LM.Hloc2, ParaO.nloc*sizeof(complex<double>));
 	}
+#endif 
 }
 
 void Restart::load_disk(const std::string mode, const int i) const
 {
 	if("charge"==mode)
 		read_file2(folder+"charge_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], pw.nrxx*sizeof(double));
+#ifdef __LCAO
 	if("H"==mode)
 	{
 		if(GAMMA_ONLY_LOCAL)
@@ -59,4 +64,5 @@ void Restart::load_disk(const std::string mode, const int i) const
 		else
 			read_file2(folder+"Hk_"+TO_STRING(MY_RANK)+"_"+TO_STRING(i), LM.Hloc2, ParaO.nloc*sizeof(complex<double>));
 	}
+#endif
 }

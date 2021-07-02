@@ -18,14 +18,23 @@ FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 #==========================
+# LAPACK package needed 
+#==========================
+LAPACK_DIR    		= $(MKLROOT)
+LAPACK_INCLUDE_DIR	= ${LAPACK_DIR}/include 
+LAPACK_LIB_DIR		= ${LAPACK_DIR}/lib/intel64
+LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread\
+					  -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
+
+#==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread ${FFTW_LIB}
+LIBS = -lifcore -lm -lpthread ${FFTW_LIB} ${LAPACK_LIB}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR}
+INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR}
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
@@ -39,6 +48,7 @@ VPATH=../src_global\
 :../module_cell\
 :../src_io\
 :../src_ions\
+:../\
 
 #==========================
 # Define HONG
@@ -49,6 +59,9 @@ FP_OBJS_0=main.o\
 $(OBJS_BASE)\
 $(OBJS_PW)\
 $(OBJS_PARALLEL)\
+${OBJS_IO}\
+${OBJS_CELL}\
+$(OBJS_MAIN)
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 
@@ -64,7 +77,7 @@ init :
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
 parallel : ${FP_OBJS} 
-	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
+	${CPLUSPLUS_MPI} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
 
 #==========================
 # rules

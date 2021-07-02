@@ -1,4 +1,4 @@
-#include "input.h"
+#include "../input.h"
 #include "../src_pw/tools.h"
 
 void Input::Print(const string &fn)const
