@@ -10,7 +10,7 @@
 find_path(ELPA_INCLUDE_DIR
     elpa/elpa.h
     HINTS ${ELPA_ROOT}
-    PATH_SUFFIXES "include"
+    PATH_SUFFIXES "include" "include/elpa-2016.05.004"
     )
 find_library(ELPA_LIBRARY
     NAMES elpa

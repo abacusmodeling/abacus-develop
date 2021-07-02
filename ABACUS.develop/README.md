@@ -17,11 +17,13 @@ You can specify the bin path of ABACUS binary to install by `CMAKE_INSTALL_PREFI
 cmake -DCMAKE_INSTALL_PREFIX=${ABACUS_BIN_PATH} ../cmake
 ```
 You can provide root path of each dependent package if the package cannot be automatically found by cmake. 
-Keys `ELPA_ROOT`, `FFTW3_ROOT`, `CEREAL_ROOT` and `LAPACK_ROOT` are currently available to specify. 
+Keys `ELPA_ROOT`, `FFTW3_ROOT`, `CEREAL_INCLUDEDIR` and `SCALAPACK_ROOT` are currently available to specify.
 For example
 ```bash
 cmake -DFFTW3_ROOT=/opt/fftw3 ../cmake
 ```
+Other variables you can set are: `BOOST_INCLUDEDIR`, `MPI_CXX_COMPILER` and `BLAS_LIBRARIES`.
+
 If the cmake has executed successfully, then
 ```bash
 make -j 16

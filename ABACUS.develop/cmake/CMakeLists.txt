@@ -37,7 +37,7 @@ find_package(ScaLAPACK REQUIRED)
 # Both header and library are needed
 find_package(FFTW3 REQUIRED)
 find_package(MPI REQUIRED)
-include_directories(${MPI_CXX_INCLUDE_PATH} ${FFTW3_INCLUDE_DIRS})
+include_directories(${MPI_CXX_INCLUDE_PATH} ${FFTW3_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 # No header needed
 find_package(Threads REQUIRED)

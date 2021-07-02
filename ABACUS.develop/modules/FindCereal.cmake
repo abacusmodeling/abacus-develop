@@ -8,9 +8,8 @@
 
 find_path(Cereal_INCLUDE_DIR
     cereal/cereal.hpp
-    HINTS ${CEREAL_ROOT}
-    PATH_SUFFIXES "include"
-    )
+    HINTS ${CEREAL_INCLUDEDIR}
+)
 
 # Handle the QUIET and REQUIRED arguments and
 # set Cereal_FOUND to TRUE if all variables are non-zero.
