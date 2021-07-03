@@ -80,10 +80,13 @@ void Run_MD_PW::md_ions_pw(void)
         int eiter = 0;
         if (CALCULATION == "md")
         {
+#ifdef __LCAO
             if (Exx_Global::Hybrid_Type::No == exx_global.info.hybrid_type)
             {
+#endif
                 elec.self_consistent(istep - 1);
                 eiter = elec.iter;
+#ifdef __LCAO
             }
             else if (Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type)
             {
@@ -112,6 +115,7 @@ void Run_MD_PW::md_ions_pw(void)
                     eiter += elec.iter;
                 }
             }
+#endif
         }
         // mohan added 2021-01-28, perform stochastic calculations
         else if (CALCULATION == "md-sto")
@@ -259,7 +263,7 @@ void Run_MD_PW::md_cells_pw()
     {
         wf.wfcinit();
     }
-
+#ifdef __LCAO
     switch (exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
     case Exx_Global::Hybrid_Type::HF:
@@ -273,6 +277,7 @@ void Run_MD_PW::md_cells_pw()
     default:
         throw invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
     }
+#endif
 
     DONE(ofs_running, "INIT BASIS");
 

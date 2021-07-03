@@ -130,14 +130,18 @@ void MD_basic::runNVT(int step1){
 	twiceKE = twiceKE * 2;
 	
 	//Set up forces and stress
+#ifdef __LCAO
     if(INPUT.basis_type == "lcao")
     {
 	    mdf.callInteraction_LCAO(ucell.nat, force, stress);
     }
     else if(INPUT.basis_type == "pw")
+#else
+    if(INPUT.basis_type == "pw")
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
     }
+#endif
 	//print total stress + stress_MD
 	if(STRESS)
 	{
@@ -296,14 +300,16 @@ void MD_basic::runNVE(int step1){
     cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<endl;
 
     // Set up forces
-    if (INPUT.basis_type == "lcao")
-    {
-        mdf.callInteraction_LCAO(ucell.nat, force, stress);
-    }
-    else if (INPUT.basis_type == "pw")
+    if (INPUT.basis_type == "pw")
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
     }
+#ifdef __LCAO
+    else if (INPUT.basis_type == "lcao")
+    {
+        mdf.callInteraction_LCAO(ucell.nat, force, stress);
+    }
+#endif
     if(STRESS)
 	{
 		outStressMD(stress, twiceKE);
@@ -435,19 +441,19 @@ bool MD_basic::runFIRE(int step1){
     double tempNow = twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU;
     cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<endl;
 
-
-
-
-
     // Set up forces
+#ifdef __LCAO
     if (INPUT.basis_type == "lcao")
     {
         mdf.callInteraction_LCAO(ucell.nat, force, stress);
     }
     else if (INPUT.basis_type == "pw")
+#else
+    if (INPUT.basis_type == "pw")
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
     }
+#endif
 
     for(int k=0;k<ucell.nat;k++)
     {

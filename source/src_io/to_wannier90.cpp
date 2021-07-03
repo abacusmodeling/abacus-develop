@@ -46,6 +46,7 @@ void toWannier90::init_wannier()
 		cal_Mmn(wf.evc);
 		cal_Amn(wf.evc);
 	}
+#ifdef __LCAO
 	else if(BASIS_TYPE == "lcao")
 	{
 		getUnkFromLcao();
@@ -54,6 +55,7 @@ void toWannier90::init_wannier()
 		writeUNK(this->unk_inLcao);
 		outEIG();
 	}
+#endif
 
 	/*
 	if(MY_RANK==0)

@@ -14,7 +14,9 @@
 #include "../src_io/optical.h"
 #include "../src_pw/klist.h"
 #include <iostream>
+#ifdef __LCAO
 #include "../src_lcao/global_fp.h"
+#endif
 
 using namespace std;
 
@@ -1111,7 +1113,7 @@ void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
 //---------------------------------------------------------------------------
 //  calculation in lcao(about to do)
 //---------------------------------------------------------------------------
-
+#ifdef __LCAO
 void Chi0_hilbert::Cal_lcao_psi()
 {
 }
@@ -1244,6 +1246,8 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 	
 	return;
 }
+
+#endif
 
 void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 {
@@ -1539,10 +1543,12 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 			{
 				Cal_b(iq, ik, iqk, 0);
 			}
+#ifdef __LCAO
 			else
 			{
 				Cal_b_lcao(iq, ik, iqk);
 			}
+#endif
 			
 			for(int ib1=0; ib1<oband; ib1++)
 			{

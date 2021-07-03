@@ -1,21 +1,23 @@
+#include "../src_io/dos.h"
 #include "../src_pw/tools.h"
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
-#include "../src_io/mulliken_charge.h"
-#include "src_lcao/LCAO_nnr.h"
-#include "src_lcao/LCAO_gen_fixedH.h"    
-#include "../module_neighbor/sltk_atom_arrange.h"//qifeng-2019-01-21
-#include "src_lcao/local_orbital_charge.h"
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
-#include "src_lcao/LCAO_matrix.h"
-#include "src_lcao/global_fp.h"
-#include "src_lcao/wfc_dm_2d.h"
+#ifdef __LCAO
+#include "../src_io/mulliken_charge.h"
+#include "../src_lcao/LCAO_nnr.h"
+#include "../src_lcao/LCAO_gen_fixedH.h"    
+#include "../src_lcao/local_orbital_charge.h"
+#include "../src_lcao/LCAO_matrix.h"
+#include "../src_lcao/global_fp.h"
+#include "../src_lcao/wfc_dm_2d.h"
+#include "../module_neighbor/sltk_atom_arrange.h"//qifeng-2019-01-21
+#endif
 #include "../module_base/lapack_connector.h"
 #include "../module_base/scalapack_connector.h"
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
-#include "../src_io/dos.h"
 #include <vector>
 #include <mpi.h>
 #include <sys/time.h>
@@ -171,11 +173,13 @@ void energy::perform_dos(void)
 
 
 	// mulliken charge analysis
+#ifdef __LCAO
 	if(mulliken == 1)
 	{
 		Mulliken_Charge   MC;
 		MC.stdout_mulliken();			
 	}//qifeng add 2019/9/10
+#endif
 
 	int nspin0=1;
 	if(NSPIN==2) nspin0=2;
@@ -215,7 +219,6 @@ void energy::perform_dos(void)
 		const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
 
 		int NUM=NLOCAL*npoints;
-
 		Wfc_Dm_2d D;
 		D.init();
 		if(GAMMA_ONLY_LOCAL)

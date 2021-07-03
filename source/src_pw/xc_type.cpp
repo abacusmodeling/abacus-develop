@@ -283,6 +283,7 @@ void xcfunc::copy_to_now()
 // Peize Lin add 2016-12-03
 void xcfunc::hybrid_first()
 {
+#ifdef __LCAO
 	// may do something
 	WARNING("functional","file "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__)+" may error ");
 	if(Exx_Global::Hybrid_Type::HF==exx_global.info.hybrid_type)
@@ -300,4 +301,5 @@ void xcfunc::hybrid_first()
 		iexch_now = 1;
 		igcx_now = 3;
 	}
+#endif
 }
