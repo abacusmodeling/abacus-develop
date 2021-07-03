@@ -71,7 +71,6 @@ target_link_libraries(${ABACUS_BIN_NAME}
     cell
     neighbor
     orb
-    global
     io
     ions
     lcao
