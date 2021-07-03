@@ -116,37 +116,7 @@ void LOOP_ions::opt_ions(void)
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
-            vdwd3_para.flag_vdwd3 = true;
-            vdwd3_para.s6 = std::stod(INPUT.vdw_s6);
-            vdwd3_para.s18 = std::stod(INPUT.vdw_s8);
-            vdwd3_para.rs6 = std::stod(INPUT.vdw_a1);
-            vdwd3_para.rs18 = std::stod(INPUT.vdw_a2);					
-            vdwd3_para.abc = INPUT.vdw_abc;
-            vdwd3_para.version = INPUT.vdw_method;
-            vdwd3_para.model = INPUT.vdw_model;
-            if(INPUT.vdw_model=="radius")
-            {
-                if(INPUT.vdw_radius_unit=="Bohr")
-                {
-                    vdwd3_para.rthr2 = pow(std::stod(INPUT.vdw_radius),2);
-                }
-                else
-                {
-                    vdwd3_para.rthr2 = pow((std::stod(INPUT.vdw_radius) * BOHR_TO_A),2);       
-                }
-                if(INPUT.vdw_cn_thr_unit=="Bohr")
-                {
-                    vdwd3_para.cn_thr2 = pow(INPUT.vdw_cn_thr,2);
-                }
-                else
-                {  
-                    vdwd3_para.cn_thr2 = pow((INPUT.vdw_cn_thr * BOHR_TO_A),2);			
-                }
-            }
-            else if(INPUT.vdw_model=="period")
-            {
-                vdwd3_para.period = INPUT.vdw_period.x;
-            }
+            vdwd3_para.initial_parameters(INPUT);
         }
         // Peize Lin add 2014.04.04, update 2021.03.09
         if(vdwd2_para.flag_vdwd2)
