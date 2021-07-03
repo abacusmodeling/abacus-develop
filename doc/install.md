@@ -39,7 +39,7 @@ The source directory further contains the following folders, where the source fi
 - module_grid
 - module_grid
 - module_neighbor
-- module_ORB
+- module_orbital
 - obj
 - src_external
 - src_global

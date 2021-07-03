@@ -3,7 +3,7 @@
 
 #include "grid_technique.h"
 #include "../src_pw/tools.h"
-#include "../module_ORB/ORB_control.h" // mohan add 2021-05-24
+#include "../module_orbital/ORB_control.h" // mohan add 2021-05-24
 
 class Local_Orbital_wfc
 {

@@ -1,7 +1,7 @@
 #include "exx_abfs-jle.h"
 
 #include "../src_pw/global.h"
-#include "module_ORB/ORB_read.h"
+#include "module_orbital/ORB_read.h"
 #include "../module_base/global_function.h"
 #include "../module_base/mathzone.h"
 #include "../module_base/math_sphbes.h" // mohan add 2021-05-06
