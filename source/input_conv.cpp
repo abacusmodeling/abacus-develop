@@ -19,7 +19,7 @@
 #include "module_cell/unitcell.h"
 #include "src_ri/exx_abfs-jle.h"
 #ifdef __LCAO
-#include "module_ORB/ORB_read.h"
+#include "module_orbital/ORB_read.h"
 #include "src_lcao/global_fp.h"
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"

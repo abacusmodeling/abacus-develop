@@ -1,9 +1,9 @@
 #include "exx_abfs-construct_orbs.h"
 #include "exx_abfs-pca.h"
 
-#include "module_ORB/ORB_read.h"
-#include "../src_global/gram_schmidt_orth.h"
-#include "../src_global/gram_schmidt_orth-inl.h"
+#include "module_orbital/ORB_read.h"
+#include "../module_base/gram_schmidt_orth.h"
+#include "../module_base/gram_schmidt_orth-inl.h"
 
 #include "src_external/src_test/src_ri/exx_abfs-construct_orbs-test.h"		// Peize Lin test
 #include "src_lcao/global_fp.h"

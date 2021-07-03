@@ -1,7 +1,7 @@
 add_subdirectory(module_base)
 add_subdirectory(module_cell)
 add_subdirectory(module_neighbor)
-add_subdirectory(module_ORB)
+add_subdirectory(module_orbital)
 add_subdirectory(src_global)
 add_subdirectory(src_io)
 add_subdirectory(src_ions)

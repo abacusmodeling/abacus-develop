@@ -1,4 +1,4 @@
-PROJECT_NAME = module_ORB
+PROJECT_NAME = module_orbital
 INPUT = ../..
 PROJECT_BRIEF = "Compute the \"Two Center Integrals (TCI)\" of Numerical Atomic Orbitals (NAO)."
 OUTPUT_DIRECTORY = .

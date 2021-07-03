@@ -1,6 +1,6 @@
 #include "charge_broyden.h"
 #include "global.h"
-#include "../src_global/inverse_matrix.h"
+#include "../module_base/inverse_matrix.h"
 
 Charge_Broyden::Charge_Broyden() 
 {

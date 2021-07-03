@@ -3,6 +3,10 @@ add_library(
     OBJECT
     complexarray.cpp
     complexmatrix.cpp
+    element_basis_index.cpp
+    export.cpp
+    integral.cpp
+    inverse_matrix.cpp
     global_file.cpp
     global_function.cpp
     global_variable.cpp
@@ -15,7 +19,14 @@ add_library(
     mathzone_add1.cpp
     matrix.cpp
     matrix3.cpp
+    memory.cpp
+    mymath1.cpp
+    mymath3.cpp
+    polint.cpp
     realarray.cpp
+    sph_bessel.cpp
+    sph_bessel_recursive-d1.cpp
+    sph_bessel_recursive-d2.cpp
     timer.cpp
     tool_check.cpp
     tool_quit.cpp

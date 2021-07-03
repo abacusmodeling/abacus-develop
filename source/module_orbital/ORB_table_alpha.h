@@ -2,7 +2,7 @@
 #define ORB_TABLE_ALPHA_H
 
 #include "ORB_atomic_lm.h"
-#include "../src_global/sph_bessel_recursive.h"
+#include "../module_base/sph_bessel_recursive.h"
 
 //caoyu add 2021-03-17
 

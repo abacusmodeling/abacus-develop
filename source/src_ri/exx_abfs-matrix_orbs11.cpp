@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <set>
 #include "../src_pw/global.h"
-#include "module_ORB/ORB_read.h"
+#include "module_orbital/ORB_read.h"
 #include "../module_base/ylm.h"
 #include "../module_base/global_function.h"
 

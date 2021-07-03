@@ -19,7 +19,7 @@ sys.path.append( "/usr/local/lib/python3.9/site-packages/breathe" )
 
 # -- Project information -----------------------------------------------------
 
-project = 'ABACUS-module_ORB'
+project = 'ABACUS-module_orbital'
 copyright = '2021, x'
 author = 'mohan'
 
@@ -58,8 +58,8 @@ html_static_path = ['_static']
 
 # -- Options for breathe -------------------------------------------------
 
-breathe_projects = { "ABACUS-module_ORB": "../../doxygen/xml/" }
-breathe_default_project = "ABACUS-module_ORB"
+breathe_projects = { "ABACUS-module_orbital": "../../doxygen/xml/" }
+breathe_default_project = "ABACUS-module_orbital"
 
 #-- Options for exhale-------------------------------------
 # Setup the exhale extension

@@ -5,7 +5,7 @@
 #include "../module_base/global_function.h"
 
 #ifdef USE_CEREAL_SERIALIZATION
-	#include "../src_global/serialization_cereal.h"
+	#include "../src_lcao/serialization_cereal.h"
 #endif
 
 #include <mpi.h>

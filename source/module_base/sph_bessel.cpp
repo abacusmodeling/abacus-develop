@@ -1,6 +1,6 @@
 //#include "../src_pw/global.h"
 #include "sph_bessel.h"
-#include "../src_parallel/parallel_reduce.h"
+//#include "../src_parallel/parallel_reduce.h"
 #include "../module_base/timer.h"
 #include "../module_base/global_function.h"
 

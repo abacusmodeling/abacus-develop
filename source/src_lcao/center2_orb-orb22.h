@@ -16,9 +16,9 @@ using std::set;
 #include "center2_orb.h"
 #include "center2_orb-orb21.h"
 
-#include "../module_ORB/ORB_table_phi.h"
-#include "../module_ORB/ORB_gaunt_table.h"
-#include "../module_ORB/ORB_atomic_lm.h"
+#include "../module_orbital/ORB_table_phi.h"
+#include "../module_orbital/ORB_gaunt_table.h"
+#include "../module_orbital/ORB_atomic_lm.h"
 #include "../module_base/vector3.h"
 
 class Center2_Orb::Orb22
