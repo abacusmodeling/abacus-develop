@@ -36,6 +36,8 @@ element_basis_index.o \
 restart.o \
 mymath1.o \
 mymath3.o \
+driver.o \
+run_pw.o
 
 OBJS_MAIN=input.o \
 write_input.o\
@@ -146,7 +148,10 @@ read_cell_pseudopots.o\
 write_pot.o\
 write_rho.o\
 chi0_standard.o\
-make_dir_out.o
+make_dir_out.o\
+numerical_basis.o\
+numerical_descriptor.o\
+bessel_basis.o
 
 OBJS_CELL=unitcell.o\
 atom_spec.o
