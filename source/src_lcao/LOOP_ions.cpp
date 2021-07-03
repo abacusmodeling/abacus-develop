@@ -14,6 +14,8 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
+#include "../src_pw/vdwd2_parameters.h"
+#include "../src_pw/vdwd3_parameters.h"
 #include "LCAO_descriptor.h"
 
 LOOP_ions::LOOP_ions()
@@ -102,6 +104,35 @@ void LOOP_ions::opt_ions(void)
                 ofs_running << " ---------------------------------------------------------" << endl;
             }
         }
+
+    //----------------------------------------------------------
+    // about vdw, jiyy add vdwd3 and linpz add vdwd2
+    //----------------------------------------------------------	
+        if(INPUT.vdw_method=="d2")
+        {
+            // setup vdwd2 parameters
+	        vdwd2_para.initial_parameters(INPUT);
+	        vdwd2_para.initset(ucell);
+        }
+        if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
+        {
+            vdwd3_para.initial_parameters(INPUT);
+        }
+        // Peize Lin add 2014.04.04, update 2021.03.09
+        if(vdwd2_para.flag_vdwd2)
+        {
+            Vdwd2 vdwd2(ucell,vdwd2_para);
+            vdwd2.cal_energy();
+            en.evdw = vdwd2.get_energy();
+        }
+        // jiyy add 2019-05-18, update 2021.05.02
+        else if(vdwd3_para.flag_vdwd3)
+        {
+            Vdwd3 vdwd3(ucell,vdwd3_para);
+            vdwd3.cal_energy();
+            en.evdw = vdwd3.get_energy();
+        }
+
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09

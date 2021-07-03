@@ -11,6 +11,30 @@ Vdwd2_Parameters::Vdwd2_Parameters()
 	init_R0();
 }
 
+void Vdwd2_Parameters::initial_parameters(const Input &input)
+{
+	this->flag_vdwd2 = true;
+	this->scaling = std::stod(input.vdw_s6);
+	this->damping = input.vdw_d;
+	this->C6_input(input.vdw_C6_file, input.vdw_C6_unit);
+	this->R0_input(input.vdw_R0_file, input.vdw_R0_unit);
+	this->model = input.vdw_model;
+	if(input.vdw_model=="radius")
+	{
+		if(input.vdw_radius_unit=="Bohr")
+		{
+			this->radius = std::stod(input.vdw_radius);
+		}
+		else
+		{
+			this->radius = std::stod(input.vdw_radius) * BOHR_TO_A;
+		}
+	}
+	else if(input.vdw_model=="period")
+	{
+		this->period = input.vdw_period;
+	}
+}
 
 void Vdwd2_Parameters::initset(const UnitCell_pseudo &ucell)
 {

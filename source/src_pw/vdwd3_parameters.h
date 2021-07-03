@@ -10,12 +10,14 @@
 #include "../module_base/vector3.h"
 #include "../module_base/matrix3.h"
 #include "../module_cell/unitcell_pseudo.h"
+#include "../input.h"
 
 
 class Vdwd3_Parameters
 {
 public:
 	Vdwd3_Parameters();
+    void initial_parameters(const Input &input);
 
     void init_C6();
     void init_r2r4();
