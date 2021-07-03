@@ -70,6 +70,8 @@ void Run_MD_PW::md_ions_pw(void)
     //----------------------------------------------------------	
         if(INPUT.vdw_method=="d2")
         {
+            // setup vdwd2 parameters
+	        vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021-06-27
             vdwd2_para.flag_vdwd2 = true;
             vdwd2_para.scaling = std::stod(INPUT.vdw_s6);
             vdwd2_para.damping = INPUT.vdw_d;

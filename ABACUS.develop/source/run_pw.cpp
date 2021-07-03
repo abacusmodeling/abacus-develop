@@ -35,9 +35,6 @@ void Run_pw::plane_wave_line(void)
 		xcf.which_dft(ucell.atoms[it].dft);
     }
 
-    // setup vdwd2 parameters
-	vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021-06-27
-
     DONE(ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed

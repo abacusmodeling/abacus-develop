@@ -34,12 +34,6 @@ void Run_lcao::lcao_line(void)
 		xcf.which_dft(ucell.atoms[it].dft);
 	}
 
-	// setup vdwd2 parameters
-	vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021-06-27
-
-	// setup vdwd2 parameters
-	//vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021.06.27
-
     //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
     DONE(ofs_running, "SETUP UNITCELL");
 
