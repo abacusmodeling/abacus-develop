@@ -9,7 +9,9 @@
 // new
 #include "H_Hartree_pw.h"
 #include "H_XC_pw.h"
+#ifdef __LCAO
 #include "../src_lcao/ELEC_evolve.h"
+#endif
 
 Potential::Potential()
 {
@@ -203,7 +205,8 @@ void Potential::init_pot(
     //----------------------------------------------------------
     // (4) total potentials 
     //----------------------------------------------------------
-    if(ELEC_evolve::td_vext == 0) 
+#ifdef __LCAO
+	if(ELEC_evolve::td_vext == 0) 
 	{
 		this->set_vr_eff();
 	}
@@ -211,6 +214,10 @@ void Potential::init_pot(
 	{
 		this->set_vrs_tddft(istep);
 	}
+#else
+	this->set_vr_eff();
+#endif
+	
 
 	// plots
     //figure::picture(this->vr_eff1,pw.ncx,pw.ncy,pw.ncz);

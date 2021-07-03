@@ -2,17 +2,19 @@
 #define MULLIKEN_CHARGE_H
 
 #include "../src_pw/tools.h"
+#ifdef __LCAO
 #include "../module_ORB/ORB_gen_tables.h"
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../src_lcao/LCAO_matrix.h"
 #include "../src_lcao/global_fp.h"
 #include "../src_lcao/wfc_dm_2d.h"
+#include "../src_pdiag/pdiag_double.h"
+#include "../src_pdiag/GenELPA.h"
+#endif
 #include "../module_base/lapack_connector.h"
 #include "../module_base/scalapack_connector.h"
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
-#include "src_pdiag/pdiag_double.h"
-#include "src_pdiag/GenELPA.h"
 #include <vector>
 
 // by qifeng

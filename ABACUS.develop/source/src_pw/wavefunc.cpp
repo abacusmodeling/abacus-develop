@@ -205,7 +205,7 @@ int wavefunc::get_starting_nw(void)const
 
 
 
-
+#ifdef __LCAO
 void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","LCAO_in_pw_k");
@@ -255,6 +255,7 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double>
 	timer::tick("wavefunc","LCAO_in_pw_k_q",'G');
 	return;
 }
+#endif
 
 
 void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)

@@ -98,7 +98,6 @@ diago_cg.o\
 output.o  \
 inverse_matrix.o \
 energy.o \
-energy_dos.o\
 wavefunc.o\
 wf_io.o \
 rwstream.o\
@@ -112,7 +111,6 @@ symmetry_basic.o \
 symmetry_rho.o \
 symm_other.o \
 eximport.o \
-mulliken_charge.o\
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
@@ -123,17 +121,6 @@ potential.o \
 H_Ewald_pw.o\
 H_Hartree_pw.o\
 H_XC_pw.o \
-H_TDDFT_pw.o\
-read_rho.o\
-read_atoms.o\
-read_cell_pseudopots.o\
-read_dm.o\
-write_pot.o\
-write_rho.o\
-write_rho_dipole.o\
-write_HS.o\
-write_HS_R.o\
-write_dm.o\
 potential_libxc.o \
 efield.o \
 magnetism.o\
@@ -155,12 +142,14 @@ lattice_change_methods.o \
 lattice_change_cg.o \
 lattice_change_basic.o \
 variable_cell.o\
-dftu.o\
-dftu_yukawa.o\
-dftu_relax.o\
 
 OBJS_IO=berryphase.o\
 output.o\
+read_rho.o\
+read_atoms.o\
+read_cell_pseudopots.o\
+write_pot.o\
+write_rho.o\
 
 OBJS_CELL=unitcell.o
 

@@ -1,34 +1,17 @@
 add_library(
     global
     OBJECT
-    math_integral.cpp
-    math_sphbes.cpp
-    math_polyint.cpp
-    math_ylmreal.cpp
-    ylm.cpp
+    element_basis_index.cpp
+    export.cpp
+    integral.cpp
+    inverse_matrix.cpp
     memory.cpp
-    complexarray.cpp
-    complexmatrix.cpp
-    matrix.cpp
-    realarray.cpp
-    intarray.cpp
+    mymath1.cpp
+    mymath3.cpp
+    poission.cpp
+    polint.cpp
+    restart.cpp
     sph_bessel.cpp
     sph_bessel_recursive-d1.cpp
     sph_bessel_recursive-d2.cpp
-    tool_title.cpp
-    tool_quit.cpp
-    tool_check.cpp
-    timer.cpp
-    mathzone_add1.cpp
-)
-target_compile_definitions(global PRIVATE __NORMAL)
-target_compile_options(
-    global
-    PRIVATE
-    -Ofast -std=c++11 -simd -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
-)
-target_include_directories(
-    global
-    PRIVATE
-    $ENV{MKLROOT}/include/fftw
 )

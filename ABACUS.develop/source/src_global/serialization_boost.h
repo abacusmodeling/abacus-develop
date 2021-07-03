@@ -12,7 +12,7 @@
 #include <boost/serialization/string.hpp>
 
 #include "module_base/vector3.h"
-#include "src_lcao/abfs-vector3_order.h"
+#include "../src_ri/abfs-vector3_order.h"
 #include "../module_base/matrix.h"
 #include "../module_base/matrix_wrapper.h"
 
@@ -21,25 +21,25 @@ namespace boost
 	namespace serialization
 	{
 		// Vector3<T>								Peize Lin add 2018-07-01
-		template<typename Archive, typename T> 
+		template<typename Archive, typename T>
 		inline void serialize(Archive & ar, Vector3<T> & v, const unsigned int version)
 		{
 			ar & v.x;
 			ar & v.y;
 			ar & v.z;
 		}
-		
+
 		// Abfs::Vector3_Order<T>					Peize Lin add 2018-07-01
-		template<typename Archive, typename T> 
+		template<typename Archive, typename T>
 		inline void serialize(Archive & ar, Abfs::Vector3_Order<T> & v, const unsigned int version)
 		{
 			ar & v.x;
 			ar & v.y;
 			ar & v.z;
 		}
-		
+
 		// matrix									Peize Lin add 2018-07-01
-		template<typename Archive> 
+		template<typename Archive>
 		inline void save( Archive & ar, const matrix & m, const unsigned int /*file_version*/ )
 		{
 			const collection_size_type nr(m.nr), nc(m.nc);
@@ -61,9 +61,9 @@ namespace boost
 		{
 			boost::serialization::split_free(ar, m, file_version);
 		}
-		
+
 		// MatrixWrapper									Peize Lin add 2018-07-31
-		template<typename Archive> 
+		template<typename Archive>
 		inline void save( Archive & ar, const Matrix_Wrapper & m, const unsigned int /*file_version*/ )
 		{
 			const collection_size_type nr(m.nr), nc(m.nc);
