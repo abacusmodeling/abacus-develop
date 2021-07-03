@@ -71,28 +71,8 @@ void Run_MD_PW::md_ions_pw(void)
         if(INPUT.vdw_method=="d2")
         {
             // setup vdwd2 parameters
-	        vdwd2_para.initset(ucell);		// Peize Lin add 2021.03.09  Yu Liu put here 2021-06-27
-            vdwd2_para.flag_vdwd2 = true;
-            vdwd2_para.scaling = std::stod(INPUT.vdw_s6);
-            vdwd2_para.damping = INPUT.vdw_d;
-            vdwd2_para.C6_input(INPUT.vdw_C6_file, INPUT.vdw_C6_unit);
-            vdwd2_para.R0_input(INPUT.vdw_R0_file, INPUT.vdw_R0_unit);
-            vdwd2_para.model = INPUT.vdw_model;
-            if(INPUT.vdw_model=="radius")
-            {
-                if(INPUT.vdw_radius_unit=="Bohr")
-                {
-                    vdwd2_para.radius = std::stod(INPUT.vdw_radius);
-                }
-                else
-                {
-                    vdwd2_para.radius = std::stod(INPUT.vdw_radius) * BOHR_TO_A;
-                }
-            }
-            else if(INPUT.vdw_model=="period")
-            {
-                vdwd2_para.period = INPUT.vdw_period;
-            }
+	        vdwd2_para.initial_parameters(INPUT);
+	        vdwd2_para.initset(ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
