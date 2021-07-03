@@ -36,12 +36,13 @@ element_basis_index.o \
 restart.o \
 mymath1.o \
 mymath3.o \
-driver.o \
-run_pw.o
+
 
 OBJS_MAIN=input.o \
 write_input.o\
 input_conv.o\
+driver.o \
+run_pw.o
 
 OBJS_PW=xc_type.o \
 xc_functional.o\
@@ -96,8 +97,6 @@ diago_cg.o\
 inverse_matrix.o \
 energy.o \
 wavefunc.o\
-wf_io.o \
-rwstream.o\
 wf_atomic.o \
 wf_igk.o \
 use_fft.o\
@@ -107,7 +106,6 @@ symmetry.o \
 symmetry_basic.o \
 symmetry_rho.o \
 symm_other.o \
-eximport.o \
 charge.o \
 charge_mixing.o \
 charge_pulay.o \
@@ -142,6 +140,8 @@ variable_cell.o
 
 OBJS_IO=berryphase.o\
 output.o\
+wf_io.o \
+rwstream.o\
 read_rho.o\
 read_atoms.o\
 read_cell_pseudopots.o\

@@ -26,6 +26,14 @@ LAPACK_LIB_DIR		= ${LAPACK_DIR}/lib/intel64
 LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread\
 					  -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
 
+##==========================
+## LIBXC package needed 
+##==========================
+#LIBXC_DIR    		= /home/qianrui/intelcompile/intel_libxc4.3.4
+#LIBXC_INCLUDE_DIR	= ${LIBXC_DIR}/include 
+#LIBXC_LIB_DIR		= ${LIBXC_DIR}/lib
+#LIBXC_LIB 			= -L${LIBXC_LIB_DIR} -Wl,-rpath=${LIBXC_LIB_DIR} -lxc
+
 #==========================
 # LIBS and INCLUDES
 #==========================
@@ -54,6 +62,7 @@ VPATH=../src_global\
 # Define HONG
 #==========================
 #HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
+#HONG= ${HONG_FFTW}  -D__MPI -DUSE_LIBXC
 HONG= ${HONG_FFTW}  -D__MPI
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\
