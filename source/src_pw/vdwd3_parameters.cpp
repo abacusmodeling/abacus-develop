@@ -17,6 +17,41 @@ Vdwd3_Parameters::Vdwd3_Parameters():
       init_r0ab();
 }
 
+void Vdwd3_Parameters::initial_parameters(const Input &input)
+{
+      this->flag_vdwd3 = true;
+      this->s6 = std::stod(input.vdw_s6);
+      this->s18 = std::stod(input.vdw_s8);
+      this->rs6 = std::stod(input.vdw_a1);
+      this->rs18 = std::stod(input.vdw_a2);					
+      this->abc = input.vdw_abc;
+      this->version = input.vdw_method;
+      this->model = input.vdw_model;
+      if(input.vdw_model=="radius")
+      {
+            if(input.vdw_radius_unit=="Bohr")
+            {
+                  this->rthr2 = pow(std::stod(input.vdw_radius),2);
+            }
+            else
+            {
+                  this->rthr2 = pow((std::stod(input.vdw_radius) * BOHR_TO_A),2);       
+            }
+            if(input.vdw_cn_thr_unit=="Bohr")
+            {
+                  this->cn_thr2 = pow(input.vdw_cn_thr,2);
+            }
+            else
+            {  
+                  this->cn_thr2 = pow((input.vdw_cn_thr * BOHR_TO_A),2);			
+            }
+      }
+      else if(input.vdw_model=="period")
+      {
+            this->period = input.vdw_period.x;
+      }
+}
+
 void Vdwd3_Parameters::init_C6()
 {
 	vector<double> C6_tmp={

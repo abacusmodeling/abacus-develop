@@ -9,6 +9,7 @@
 #include <string>
 #include "../module_base/vector3.h"
 #include "../module_cell/unitcell_pseudo.h"
+#include "../input.h"
 
 class Vdwd2_Parameters
 {
@@ -32,7 +33,8 @@ public:
 	double radius;
 	Vector3<int> period;
 
-	void initset(const UnitCell_pseudo &ucell);
+	void initset(const UnitCell_pseudo &ucell); //init sets of vdwd2 once this correction is called
+	void initial_parameters(const Input &input); //initial parameters of Vdwd2 with INPUT file 
 };
 
 #endif // define VDWD2_PARAMETERS_H

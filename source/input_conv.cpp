@@ -13,8 +13,6 @@
 #include "src_pw/tools.h"
 #include "src_pw/symmetry.h"
 #include "src_pw/efield.h"
-#include "src_pw/vdwd2_parameters.h"
-#include "src_pw/vdwd3_parameters.h"
 #include "src_pw/occupy.h"
 #include "module_cell/unitcell.h"
 #include "src_ri/exx_abfs-jle.h"
@@ -198,67 +196,6 @@ void Input_Conv::Convert(void)
 	wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
 	en.printe    = INPUT.printe; // mohan add 2011-03-16
 
-//----------------------------------------------------------
-// about vdw, jiyy add 2019-08-04
-//----------------------------------------------------------	
-	if(INPUT.vdw_method=="d2")
-	{
-		vdwd2_para.flag_vdwd2 = true;
-		vdwd2_para.scaling = std::stod(INPUT.vdw_s6);
-		vdwd2_para.damping = INPUT.vdw_d;
-		vdwd2_para.C6_input(INPUT.vdw_C6_file, INPUT.vdw_C6_unit);
-		vdwd2_para.R0_input(INPUT.vdw_R0_file, INPUT.vdw_R0_unit);
-		vdwd2_para.model = INPUT.vdw_model;
-		if(INPUT.vdw_model=="radius")
-		{
-			if(INPUT.vdw_radius_unit=="Bohr")
-			{
-				vdwd2_para.radius = std::stod(INPUT.vdw_radius);
-			}
-			else
-			{
-				vdwd2_para.radius = std::stod(INPUT.vdw_radius) * BOHR_TO_A;
-			}
-		}
-		else if(INPUT.vdw_model=="period")
-		{
-			vdwd2_para.period = INPUT.vdw_period;
-		}
-	}
-    if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
-    {
-		vdwd3_para.flag_vdwd3 = true;
-		vdwd3_para.s6 = std::stod(INPUT.vdw_s6);
-		vdwd3_para.s18 = std::stod(INPUT.vdw_s8);
-		vdwd3_para.rs6 = std::stod(INPUT.vdw_a1);
-		vdwd3_para.rs18 = std::stod(INPUT.vdw_a2);					
-		vdwd3_para.abc = INPUT.vdw_abc;
-		vdwd3_para.version = INPUT.vdw_method;
-		vdwd3_para.model = INPUT.vdw_model;
-		if(INPUT.vdw_model=="radius")
-		{
-			if(INPUT.vdw_radius_unit=="Bohr")
-			{
-				vdwd3_para.rthr2 = pow(std::stod(INPUT.vdw_radius),2);
-			}
-			else
-			{
-				vdwd3_para.rthr2 = pow((std::stod(INPUT.vdw_radius) * BOHR_TO_A),2);       
-			}
-			if(INPUT.vdw_cn_thr_unit=="Bohr")
-			{
-				vdwd3_para.cn_thr2 = pow(INPUT.vdw_cn_thr,2);
-			}
-			else
-			{  
-				vdwd3_para.cn_thr2 = pow((INPUT.vdw_cn_thr * BOHR_TO_A),2);			
-			}
-		}
-		else if(INPUT.vdw_model=="period")
-		{
-			vdwd3_para.period = INPUT.vdw_period.x;
-		}
-	}
     
 //----------------------------------------------------------
 // about spectrum, pengfei 2016-12-14

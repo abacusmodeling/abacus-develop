@@ -4,6 +4,8 @@
 #include "../src_pw/global.h" // use chr.
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
+#include "../src_pw/vdwd2_parameters.h"
+#include "../src_pw/vdwd3_parameters.h"
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
@@ -63,6 +65,19 @@ void Run_MD_PW::md_ions_pw(void)
             ofs_running << " -------------------------------------------" << endl;
         }
 
+    //----------------------------------------------------------
+    // about vdw, jiyy add vdwd3 and linpz add vdwd2
+    //----------------------------------------------------------	
+        if(INPUT.vdw_method=="d2")
+        {
+            // setup vdwd2 parameters
+	        vdwd2_para.initial_parameters(INPUT);
+	        vdwd2_para.initset(ucell);
+        }
+        if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
+        {
+            vdwd3_para.initial_parameters(INPUT);
+        }
         if (vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-03, update 2021-03-09
         {
             Vdwd2 vdwd2(ucell, vdwd2_para);
