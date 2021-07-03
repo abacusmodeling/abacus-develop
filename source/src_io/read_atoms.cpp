@@ -351,6 +351,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			else
 #else
 			if(BASIS_TYPE == "pw")
+#endif
 			{
 				delete[] this->atoms[it].l_nchi;
 				this->atoms[it].l_nchi = new int[ this->atoms[it].nwl+1];
@@ -362,18 +363,19 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				{
 					this->atoms[it].nwl = INPUT.lmaxmax;
 				}
+				cout<<atoms[it].nwl<<"llllllllkkk"<<endl;
 				for(int L=0; L<atoms[it].nwl+1; L++)
 				{
 					this->atoms[it].l_nchi[L] = 1;
 					// calculate the number of local basis(3D)
 					this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
-
+					cout<<this->atoms[it].nw<<"lllllllllllll"<<endl;
 					stringstream ss;
 					ss << "L=" << L << ", number of zeta";
 					OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 				}
 			} // end basis type
-#endif
+
 
 			//OUT(ofs_running,"Total number of local orbitals",atoms[it].nw);
 

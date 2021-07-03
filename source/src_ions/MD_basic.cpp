@@ -138,10 +138,11 @@ void MD_basic::runNVT(int step1){
     else if(INPUT.basis_type == "pw")
 #else
     if(INPUT.basis_type == "pw")
+#endif
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
     }
-#endif
+
 	//print total stress + stress_MD
 	if(STRESS)
 	{
@@ -450,10 +451,11 @@ bool MD_basic::runFIRE(int step1){
     else if (INPUT.basis_type == "pw")
 #else
     if (INPUT.basis_type == "pw")
+#endif
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
     }
-#endif
+
 
     for(int k=0;k<ucell.nat;k++)
     {
