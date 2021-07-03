@@ -31,12 +31,12 @@ WHERE MORE INFORMATION CAN BE FOUND.
 
 
 # About ABACUS
-ABACUS IS AN ELECTRONIC STRUCTURE PACKAGE BASED ON DENSITY FUNCTIONAL THEORY.
-ABACUS ADOPTS EITHER PLANE WAVE BASIS OR NUMERICAL ATOMIC ORBITALS
+ABACUS is an electronic structure package based on Density Functional Theory (DFT).
+Both plane wave basis and numerical atomic orbitals can be used with ABACUS.
 
 ---
 
-ABACUS provides the following features and functionalities:
+ABACUS provides the following functionalities:
 
 1. Ground-state total energy calculations using Kohn-Sham (KS) density functional theory
 (DFT) with local-density, generalized gradient approximations (LDA/GGAs), and hybrid functionals
@@ -53,7 +53,6 @@ ABACUS provides the following features and functionalities:
 11. Mulliken charge analysis.
 12. Projected density of states (PDOS).
 
-<<<<<<< HEAD
 [back to top](#readme-top)
 
 # Download and install
