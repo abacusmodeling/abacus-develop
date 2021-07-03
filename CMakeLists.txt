@@ -110,4 +110,6 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME}
     RENAME ${PROJECT_NAME}
 )
 
+enable_testing()
+
 add_subdirectory(tests)
