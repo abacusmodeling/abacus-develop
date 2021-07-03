@@ -26,10 +26,10 @@ using namespace std;
 #include "../module_base/complexarray.h"
 #include "../module_base/complexmatrix.h"
 
-#include "../src_global/memory.h"
+#include "../module_base/memory.h"
 #include "../module_base/timer.h"
 #include "../module_base/lapack_connector.h"
-#include "../src_global/export.h"
+#include "../module_base/export.h"
 
 #include "../module_base/mathzone.h"
 #include "../module_base/mathzone_add1.h"

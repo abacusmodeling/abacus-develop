@@ -3,7 +3,7 @@
 // DATE : 2016-06-02
 //==========================================================
 
-#include "../src_global/element_basis_index.h"
+#include "../module_base/element_basis_index.h"
 #include "src_external/src_test/src_global/element_basis_index-test.h"
 
 Element_Basis_Index::Range construct_range()

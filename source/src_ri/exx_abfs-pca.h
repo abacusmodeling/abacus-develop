@@ -4,7 +4,7 @@
 #include "exx_abfs.h"
 #include "module_ORB/ORB_atomic_lm.h"
 #include "../module_base/matrix.h"
-#include "../src_global/element_basis_index.h"
+#include "../module_base/element_basis_index.h"
 #include <vector>
 
 //	training data: lcaos[i] * lcaos[j]

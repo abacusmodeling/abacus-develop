@@ -1,7 +1,7 @@
 #include "tools.h"
 #include "global.h"
 #include "energy.h"
-#include "../src_global/mymath.h"
+#include "../module_base/mymath.h"
 #include <vector>
 #include <mpi.h>
 #include <sys/time.h>

@@ -1,6 +1,5 @@
-#include "../src_pw/tools.h"
 #include "mymath.h"
-
+#include "timer.h"
 void heapAjust(double *r, int *ind, int s, int m)
 {
     int j, ic;

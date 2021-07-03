@@ -18,7 +18,7 @@
 #include "../module_base/global_function.h"
 //#include "../module_base/scalapack_connector.h"
 #include "../module_base/lapack_connector.h"
-#include "../src_global/inverse_matrix.h"
+#include "../module_base/inverse_matrix.h"
 #include "LOOP_ions.h"
 #include "LCAO_matrix.h"
 #include "../src_pw/magnetism.h"

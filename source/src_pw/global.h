@@ -21,7 +21,7 @@
 #include "vdwd2_parameters.h"
 #include "vdwd3.h"
 #include "vdwd3_parameters.h"	
-#include "../src_global/restart.h" 
+#include "../src_io/restart.h" 
 #include "exx_global.h"
 #include "exx_lip.h"
 #include "../src_parallel/ft.h"

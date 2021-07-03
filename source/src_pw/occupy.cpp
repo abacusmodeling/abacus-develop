@@ -1,6 +1,6 @@
 #include "global.h"
 #include "occupy.h"
-#include "../src_global/mymath.h"
+#include "../module_base/mymath.h"
 
 Occupy::Occupy(){}
 Occupy::~Occupy(){}
