@@ -263,7 +263,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about spectrum, pengfei 2016-12-14
 //----------------------------------------------------------
-
+#ifdef __LCAO
 	if( (INPUT.spectral_type == "eels" && INPUT.eels_method == 0) 
 		|| (INPUT.spectral_type == "None" 
 		&& INPUT.eels_method == 0 
@@ -313,6 +313,7 @@ void Input_Conv::Convert(void)
 		chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
 		chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
 	}
+#endif
 	
 	//if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
 	if( INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
@@ -534,6 +535,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------	
+#ifdef __LCAO
 	if(INPUT.exx_hybrid_type=="no")
 	{
 		exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
@@ -561,7 +563,6 @@ void Input_Conv::Convert(void)
 		exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
 		exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
 		exx_lip.info.lambda             = INPUT.exx_lambda            ;
-#ifdef __LCAO
 		exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
 		exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
 		exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
@@ -586,11 +587,11 @@ void Input_Conv::Convert(void)
 		{
 			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
 		}
-#endif
 		Exx_Abfs::Jle::Lmax      = INPUT.exx_opt_orb_lmax;
 		Exx_Abfs::Jle::Ecut_exx  = INPUT.exx_opt_orb_ecut;
 		Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
 	}
+#endif
 
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 

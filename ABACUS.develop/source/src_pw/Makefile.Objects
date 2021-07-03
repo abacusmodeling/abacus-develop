@@ -86,16 +86,12 @@ sto_wf.o\
 sto_iter.o\
 sto_hchi.o\
 sto_che.o\
-H_Ewald_pw.o\
-symmetry_rho.o\
-unitcell.o \
 pw_basis.o\
 hamilt.o \
 pw_complement.o\
 hamilt_pw.o \
 diago_david.o\
 diago_cg.o\
-output.o  \
 inverse_matrix.o \
 energy.o \
 wavefunc.o\
@@ -141,7 +137,7 @@ input_update.o\
 lattice_change_methods.o \
 lattice_change_cg.o \
 lattice_change_basic.o \
-variable_cell.o\
+variable_cell.o
 
 OBJS_IO=berryphase.o\
 output.o\
@@ -150,8 +146,11 @@ read_atoms.o\
 read_cell_pseudopots.o\
 write_pot.o\
 write_rho.o\
+chi0_standard.o\
+make_dir_out.o
 
-OBJS_CELL=unitcell.o
+OBJS_CELL=unitcell.o\
+atom_spec.o
 
 
 

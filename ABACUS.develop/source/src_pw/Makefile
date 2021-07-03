@@ -88,3 +88,4 @@ ${OBJ_DIR}/%.o:%.cpp
 .PHONY:clean
 clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
+	@ if [ -d ${VERSION}.x ]; then rm -rf ${VERSION}.x; fi

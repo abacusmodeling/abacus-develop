@@ -356,25 +356,27 @@ void wavefunc::wfcinit_k(void)
 
 	for(int ik=0; ik<kv.nks; ik++)
 	{
-		if(BASIS_TYPE=="lcao_in_pw")
-		{
-			// just get the numerical local basis wave functions
-			// in plane wave basis
-			this->LCAO_in_pw_k(ik, wf.wanf2[ik]);
-		}
-		else if (BASIS_TYPE=="pw")
+		if (BASIS_TYPE=="pw")
 		{
 			// get the wave functions 
 			// by first diagolize PAO
 			// wave functions.
 			this->diago_PAO_in_pw_k(ik, wf.evc[ik]);
 		}
+#ifdef __LCAO
+		else if(BASIS_TYPE=="lcao_in_pw")
+		{
+			// just get the numerical local basis wave functions
+			// in plane wave basis
+			this->LCAO_in_pw_k(ik, wf.wanf2[ik]);
+		}
+#endif
 	}
 	
 	//---------------------------------------------------
 	//  calculte the overlap <i,0 | e^{i(q+G)r} | j,R>
 	//---------------------------------------------------
-	
+#ifdef __LCAO
 	if((!chi0_hilbert.epsilon) && chi0_hilbert.kmesh_interpolation )    // pengfei  2016-11-23
 	{
 		chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(pw.gcars))  are the same
@@ -630,6 +632,7 @@ void wavefunc::wfcinit_k(void)
 		delete[] wanf2_q;
 	
 	}
+#endif
 	
 	return;
 }

@@ -53,7 +53,7 @@ void Cell_PW::opt_cells_pw()
     {
         wf.wfcinit();
     }
-
+#ifdef __LCAO
     switch (exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
     case Exx_Global::Hybrid_Type::HF:
@@ -67,6 +67,7 @@ void Cell_PW::opt_cells_pw()
     default:
         throw invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
     }
+#endif
 
     DONE(ofs_running, "INIT BASIS");
 

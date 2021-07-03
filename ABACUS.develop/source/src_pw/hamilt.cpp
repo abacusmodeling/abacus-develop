@@ -31,10 +31,12 @@ void Hamilt::diagH_pw(
 			// inital wavefunctions.
 			wf.diago_PAO_in_pw_k2(ik, wf.evc[0]);	
 		}
+#ifdef __LCAO
 		else if(BASIS_TYPE=="lcao_in_pw")
 		{
 			wf.LCAO_in_pw_k(ik, wf.wanf2[0]);
 		}
+#endif
 		ik0 = 0;
 	}
 

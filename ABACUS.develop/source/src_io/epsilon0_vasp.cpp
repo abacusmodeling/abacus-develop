@@ -407,6 +407,7 @@ void Epsilon0_vasp:: Cal_b(int ik)
 	return;
 }
 
+#ifdef __LCAO
 void Epsilon0_vasp:: Cal_psi_nu(int ik)
 {
 	ppcell.getvnl_alpha(ik);
@@ -489,6 +490,7 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 			
 	return;
 }
+#endif
 
 void Epsilon0_vasp:: Cal_epsilon0s()
 {

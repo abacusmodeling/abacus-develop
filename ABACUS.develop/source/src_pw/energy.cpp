@@ -468,6 +468,7 @@ void energy::print_band(const int &ik)
 }
 
 // Peize Lin add 2016-12-03
+#ifdef __LCAO
 void energy::set_exx()
 {
 	TITLE("energy", "set_exx");
@@ -478,18 +479,15 @@ void energy::set_exx()
 		{
 			return exx_lip.get_exx_energy();
 		}
-#ifdef __LCAO
 		else if("lcao"==BASIS_TYPE)
 		{
 			return exx_lcao.get_energy();
 		}
-#endif
 		else
 		{
 			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 	};
-
 	if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
 	{
 		this->exx = exx_energy();
@@ -505,3 +503,4 @@ void energy::set_exx()
 
 	return;
 }
+#endif
