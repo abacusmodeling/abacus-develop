@@ -1,8 +1,15 @@
-<div style="text-align:center">
+<p style="text-align:center">
     <img src="https://raw.githubusercontent.com/deepmodeling/abacus-develop/develop/ABACUS.develop/documents/abacus-logo.jpg"/>
-</div>
+</p>
 
-[![Container](https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml/badge.svg)](https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml) [![Test](https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml/badge.svg)](https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml)
+<p style="text-align:center">
+    <a href="https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml">
+        <img src="https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml/badge.svg">
+    </a>
+    <a href="https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml">
+        <img src="https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml/badge.svg">
+    </a>
+</p>
 
 WELCOME TO THE "ABACUS" PROGRAM!
 
@@ -30,3 +37,29 @@ ABACUS provides the following features and functionalities:
 10. Electrostatic potential.
 11. Mulliken charge analysis.
 12. Projected density of states (PDOS).
+
+# Build and install ABACUS from CMake
+
+Check the cmake version on your machine
+```bash
+cmake --version
+```
+ABACUS requires the minimum cmake version `3.18`.
+
+You can specify the bin path of ABACUS binary to install by `CMAKE_INSTALL_PREFIX`.
+```bash
+cmake -B build -DCMAKE_INSTALL_PREFIX=${ABACUS_BIN_PATH}
+```
+You can provide root path of each dependent package if the package cannot be automatically found by cmake.
+Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDEDIR`, `BOOST_INCLUDEDIR`, `MPI_CXX_COMPILER` and `MKL_DIR`. are currently available to specify.
+For example
+```bash
+cmake -B build -DFFTW3_ROOT=/opt/fftw3
+```
+
+If the cmake has executed successfully, then
+```bash
+cmake --build build
+cmake --install build
+```
+If no install prefix is specified, the binary will be installed to `/usr/local/bin/ABACUS` by default.
