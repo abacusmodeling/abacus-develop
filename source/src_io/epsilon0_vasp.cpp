@@ -37,7 +37,7 @@ void Epsilon0_vasp::cal_epsilon0()
 	cout << "nomega = "<<nomega<<endl;
 	cout << "eta = "<<eta<<endl;
 	
-	double occupied_bands = static_cast<double>(ucell.nelec/DEGSPIN);
+	double occupied_bands = static_cast<double>(CHR.nelec/DEGSPIN);
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
 	{
 		occupied_bands = std::floor(occupied_bands) + 1.0;
@@ -407,6 +407,7 @@ void Epsilon0_vasp:: Cal_b(int ik)
 	return;
 }
 
+#ifdef __LCAO
 void Epsilon0_vasp:: Cal_psi_nu(int ik)
 {
 	ppcell.getvnl_alpha(ik);
@@ -489,6 +490,7 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 			
 	return;
 }
+#endif
 
 void Epsilon0_vasp:: Cal_epsilon0s()
 {

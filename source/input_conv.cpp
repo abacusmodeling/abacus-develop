@@ -1,26 +1,30 @@
-#include "src_pw/global.h"
-#include "src_pw/tools.h"
 #include "input.h"
 #include "input_conv.h"
-#include "src_ions/ions_move_basic.h"
+
+
 #include "src_io/optical.h"
-#include "src_lcao/FORCE_STRESS.h"
-#include "src_lcao/local_orbital_charge.h"
-#include "module_orbital/ORB_read.h"
-#include "src_pw/efield.h"
-#include "src_lcao/global_fp.h"
-#include "src_pw/vdwd2_parameters.h"
-#include "src_pw/vdwd3_parameters.h"
 #include "src_io/chi0_hilbert.h"
 #include "src_io/chi0_standard.h"
 #include "src_io/epsilon0_pwscf.h"
 #include "src_io/epsilon0_vasp.h"
+#include "src_io/berryphase.h"
+#include "src_ions/ions_move_basic.h"
+#include "src_pw/global.h"
+#include "src_pw/tools.h"
+#include "src_pw/symmetry.h"
+#include "src_pw/efield.h"
+#include "src_pw/vdwd2_parameters.h"
+#include "src_pw/vdwd3_parameters.h"
+#include "src_pw/occupy.h"
 #include "module_cell/unitcell.h"
 #include "src_ri/exx_abfs-jle.h"
-#include "src_pw/occupy.h"
-#include "src_io/berryphase.h"
-#include "src_pw/symmetry.h"
+#ifdef __LCAO
+#include "module_orbital/ORB_read.h"
+#include "src_lcao/global_fp.h"
+#include "src_lcao/FORCE_STRESS.h"
+#include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/ELEC_evolve.h"
+#endif 
 
 void Input_Conv::Convert(void)
 {
@@ -37,7 +41,7 @@ void Input_Conv::Convert(void)
     global_pseudo_type = INPUT.pseudo_type;
 	ucell.latName = INPUT.latname; 
 	ucell.ntype = INPUT.ntype;
-	ucell.nelec = INPUT.nelec;
+	CHR.nelec = INPUT.nelec;
 //  ucell.lmaxmax = INPUT.lmaxmax;
 
     NBANDS = INPUT.nbands;
@@ -78,7 +82,9 @@ void Input_Conv::Convert(void)
     PRESS1 = INPUT.press1;
     PRESS2 = INPUT.press2;
     PRESS3 = INPUT.press3;
+#ifdef __LCAO
 	Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
+#endif
 
 	BFGS_Basic::w1 = INPUT.bfgs_w1;
 	BFGS_Basic::w2 = INPUT.bfgs_w2;
@@ -257,7 +263,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about spectrum, pengfei 2016-12-14
 //----------------------------------------------------------
-
+#ifdef __LCAO
 	if( (INPUT.spectral_type == "eels" && INPUT.eels_method == 0) 
 		|| (INPUT.spectral_type == "None" 
 		&& INPUT.eels_method == 0 
@@ -307,6 +313,7 @@ void Input_Conv::Convert(void)
 		chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
 		chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
 	}
+#endif
 	
 	//if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
 	if( INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
@@ -408,6 +415,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // Fuxiang He add 2016-10-26
 //----------------------------------------------------------
+#ifdef __LCAO
 	ELEC_evolve::tddft = INPUT.tddft;
 	ELEC_evolve::td_dr2 = INPUT.td_dr2;
 	ELEC_evolve::td_dt = INPUT.td_dt;
@@ -421,6 +429,7 @@ void Input_Conv::Convert(void)
 	ELEC_evolve::td_vexttype = INPUT.td_vexttype;
 	ELEC_evolve::td_vextout = INPUT.td_vextout;
 	ELEC_evolve::td_dipoleout = INPUT.td_dipoleout;
+#endif
 
 
 
@@ -526,6 +535,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // about exx, Peize Lin add 2018-06-20
 //----------------------------------------------------------	
+#ifdef __LCAO
 	if(INPUT.exx_hybrid_type=="no")
 	{
 		exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
@@ -581,6 +591,7 @@ void Input_Conv::Convert(void)
 		Exx_Abfs::Jle::Ecut_exx  = INPUT.exx_opt_orb_ecut;
 		Exx_Abfs::Jle::tolerence = INPUT.exx_opt_orb_tolerence;
 	}
+#endif
 
     ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
@@ -618,10 +629,12 @@ void Input_Conv::Convert(void)
     wf.out_wf = INPUT.out_wf;
 	en.out_dos = INPUT.out_dos;
     en.out_band = INPUT.out_band;
+#ifdef __LCAO
 	LOC.out_dm = INPUT.out_dm;
 	ParaO.out_hs = INPUT.out_hs;
 	ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
 	ParaO.out_lowf = INPUT.out_lowf;
+#endif
 
 	en.dos_emin_ev = INPUT.dos_emin_ev;
 	en.dos_emax_ev = INPUT.dos_emax_ev;

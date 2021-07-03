@@ -181,6 +181,7 @@ void Electrons::self_consistent(const int &istep)
 		// first_iter_again:					// Peize Lin delete 2019-05-01
 		
 		// calculate exact-exchange
+#ifdef __LCAO
 		switch(xcf.iexch_now)						// Peize Lin add 2019-03-09
 		{
 			case 5:    case 6:   case 9:
@@ -190,6 +191,7 @@ void Electrons::self_consistent(const int &istep)
 				}
 				break;
 		}
+#endif
         //(2) save change density as previous charge,
         // prepared fox mixing.
         CHR.save_rho_before_sum_band();
@@ -219,7 +221,9 @@ void Electrons::self_consistent(const int &istep)
         
 
 		// add exx
+#ifdef __LCAO
 		en.set_exx();		// Peize Lin add 2019-03-09
+#endif
 
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
@@ -254,7 +258,7 @@ void Electrons::self_consistent(const int &istep)
                 // if 'dr2 < ETHR * nelec' happen,
                 // in other word, 'dr2 < diago_error'
                 // we update ETHR.
-                diago_error = ETHR*std::max(1.0, ucell.nelec);
+                diago_error = ETHR*std::max(1.0, CHR.nelec);
             }
 
             // if converged is achieved, or the self-consistent error(dr2)
@@ -283,7 +287,7 @@ void Electrons::self_consistent(const int &istep)
 
                     // update ETHR.
                     ofs_running << " Origin ETHR = " << ETHR << endl;
-                    ETHR = 0.1 * dr2 / ucell.nelec;
+                    ETHR = 0.1 * dr2 / CHR.nelec;
                     ofs_running << " New    ETHR = " << ETHR << endl;
                     //goto first_iter_again;
                     goto scf_step;
@@ -365,6 +369,7 @@ void Electrons::self_consistent(const int &istep)
             // output charge density for converged,
             // 0 means don't need to consider iter,
             //--------------------------------------
+#ifdef __LCAO
             if(chi0_hilbert.epsilon)                 // pengfei 2016-11-23
             {
                 cout <<"eta = "<<chi0_hilbert.eta<<endl;
@@ -374,6 +379,7 @@ void Electrons::self_consistent(const int &istep)
                 //cout <<"oband = "<<chi0_hilbert.oband<<endl;
                 chi0_hilbert.Chi();
             }
+#endif
 
             if(chi0_standard.epsilon)
             {

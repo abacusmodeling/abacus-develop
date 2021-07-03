@@ -110,10 +110,13 @@ void Ions::opt_ions_pw(void)
 		int eiter=0;		
         if (CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="cell-relax")  // pengfei 2014-10-13
         {
+#ifdef __LCAO
 			if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
-			{			
+			{	
+#endif		
 				elec.self_consistent(istep-1);
 				eiter = elec.iter;
+#ifdef __LCAO
 			}
 			else if( Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type )
 			{
@@ -142,6 +145,7 @@ void Ions::opt_ions_pw(void)
 					eiter += elec.iter;
 				}
 			}
+#endif
         }
         else if(CALCULATION=="nscf")
         {

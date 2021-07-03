@@ -10,13 +10,16 @@
 ***********************************************************************/
 
 #include "mulliken_charge.h"
-#include "src_lcao/local_orbital_charge.h"
-#include "src_lcao/LCAO_gen_fixedH.h"
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
+#ifdef __LCAO
+#include "src_lcao/local_orbital_charge.h"
+#include "src_lcao/LCAO_gen_fixedH.h"
 #include "src_lcao/LCAO_matrix.h"
 #include "src_lcao/global_fp.h"
 #include "src_lcao/wfc_dm_2d.h"
+#include "src_lcao/LCAO_nnr.h"
+#endif
 #include "../module_base/lapack_connector.h"
 #include "../module_base/scalapack_connector.h"
 #include "../module_base/matrix.h"
@@ -24,7 +27,7 @@
 #include <vector>
 #include <mpi.h>
 #include "../module_neighbor/sltk_atom_arrange.h"
-#include "src_lcao/LCAO_nnr.h"
+
 
 
 Mulliken_Charge::Mulliken_Charge()

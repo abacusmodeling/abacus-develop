@@ -1,5 +1,7 @@
 #include "../module_cell/unitcell_pseudo.h"
-#include "module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
+#ifdef __LCAO
+#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
+#endif
 #include "../src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
@@ -40,7 +42,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 				? true : false;
 		}
 	}
-
+#ifdef __LCAO
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
 	{
 		if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
@@ -98,7 +100,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 			}
 		}
 	}
-
+#endif
 	//==========================
 	// read in lattice constant
 	//==========================
@@ -264,6 +266,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			// int atoms[it].nwl
 			// int* atoms[it].l_nchi;
 			//===========================================
+#ifdef __LCAO
 			if (BASIS_TYPE == "lcao" || BASIS_TYPE == "lcao_in_pw")
 			{    
 				ifstream ifs(ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
@@ -346,6 +349,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				ifs.close();
 			}
 			else
+#else
+			if(BASIS_TYPE == "pw")
 			{
 				delete[] this->atoms[it].l_nchi;
 				this->atoms[it].l_nchi = new int[ this->atoms[it].nwl+1];
@@ -368,6 +373,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 				}
 			} // end basis type
+#endif
 
 			//OUT(ofs_running,"Total number of local orbitals",atoms[it].nw);
 
@@ -618,7 +624,8 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
                 //modified by zhengdy 2015-07-24
 		ofs << atom_label[it] << " " << atom_mass[it] << " " << pseudo_fn[it] << endl;
 	}
-	
+
+#ifdef __LCAO
 	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02. Attention...
 	{	
 		ofs << "\nNUMERICAL_ORBITAL" << endl;
@@ -633,6 +640,7 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
                         ofs << ORB.orbital_file[it] << endl;
 		}
 	}
+#endif
 
 	ofs << "\nLATTICE_CONSTANT" << endl;
         //modified by zhengdy 2015-07-24

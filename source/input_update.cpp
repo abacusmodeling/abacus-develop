@@ -8,9 +8,11 @@
 #include "input.h"
 #include "src_ions/ions_move_basic.h"
 #include "src_io/optical.h"
+#ifdef __LCAO
 #include "src_lcao/FORCE_STRESS.h"
 #include "src_lcao/local_orbital_charge.h"
 #include "src_lcao/global_fp.h" // mohan update 2021-01-30
+#endif
 
 Update_input::Update_input() {}
 Update_input::~Update_input() {}
@@ -267,7 +269,11 @@ void Update_input::Bcast()
 {
     Parallel_Common::bcast_int( FORCE );
     Parallel_Common::bcast_double( FORCE_THR);
+#ifdef __LCAO
     Parallel_Common::bcast_double( Force_Stress_LCAO::force_invalid_threshold_ev);
+    Parallel_Common::bcast_int( LOC.out_dm );
+    Parallel_Common::bcast_int( ParaO.out_lowf );
+#endif
     Parallel_Common::bcast_double( DRHO2 );
     Parallel_Common::bcast_int( NITER );
     Parallel_Common::bcast_int( NSTEP );
@@ -275,9 +281,8 @@ void Update_input::Bcast()
     Parallel_Common::bcast_int( en.printe );
     Parallel_Common::bcast_string( pot.extra_pot );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( CHR.out_charge );
-    Parallel_Common::bcast_int( LOC.out_dm );
 	Parallel_Common::bcast_int( en.out_dos );
-	Parallel_Common::bcast_int( ParaO.out_lowf );
+	
 
     return;
 }

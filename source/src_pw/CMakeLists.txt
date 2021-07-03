@@ -3,7 +3,6 @@ add_library(
     OBJECT
     H_Ewald_pw.cpp
     H_Hartree_pw.cpp
-    H_TDDFT_pw.cpp
     H_XC_pw.cpp
     VL_in_pw.cpp
     VNL_in_pw.cpp

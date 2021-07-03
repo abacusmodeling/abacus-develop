@@ -396,7 +396,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 	return;
 }
 
-
+#ifdef __LCAO
 complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int M)   // pengfei Li  2018-3-23
 {
 	complex<double> cf;
@@ -419,7 +419,7 @@ complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int 
 	
 	return cf;
 }
-#ifdef __LCAO
+
 double pseudopot_cell_vnl::CG(int l1, int m1, int l2, int m2, int L, int M)      // pengfei Li 2018-3-23
 {
 	int dim = L*L+M;

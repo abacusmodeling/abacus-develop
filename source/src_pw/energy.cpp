@@ -6,7 +6,9 @@
 #include <mpi.h>
 #include <sys/time.h>
 #include "../src_pw/tools.h"
+#ifdef __LCAO
 #include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
+#endif
 #include "../src_pw/myfunc.h"
 //new
 #include "H_Ewald_pw.h"
@@ -54,11 +56,12 @@ void energy::calculate_harris(const int &flag)
 		+ exx
 		+ Efield::etotefield
 		+ evdw;							// Peize Lin add evdw 2021.03.09
-
+#ifdef __LCAO
         if(INPUT.dft_plus_u) 
 		{
 			this->etot_harris += dftu.EU;  //Energy correction from DFT+U; Quxin adds on 20201029
 		}
+#endif
 	}
 	
 	return;
@@ -93,10 +96,12 @@ void energy::calculate_etot(void)
 	cout << " efiled=" << Efield::etotefield << endl;
 	cout << " total= "<<etot<<endl;
 	cout << " fermienergy= "<<ef<<endl;*/
+#ifdef __LCAO
     if(INPUT.dft_plus_u) 
 	{
 		this->etot += dftu.EU;																	  
 	}
+#endif
 	return;	
 }
 
@@ -463,6 +468,7 @@ void energy::print_band(const int &ik)
 }
 
 // Peize Lin add 2016-12-03
+#ifdef __LCAO
 void energy::set_exx()
 {
 	TITLE("energy", "set_exx");
@@ -482,7 +488,6 @@ void energy::set_exx()
 			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 	};
-
 	if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
 	{
 		this->exx = exx_energy();
@@ -498,3 +503,4 @@ void energy::set_exx()
 
 	return;
 }
+#endif
