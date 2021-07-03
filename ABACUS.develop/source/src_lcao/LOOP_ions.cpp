@@ -14,6 +14,8 @@
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
+#include "../src_pw/vdwd2_parameters.h"
+#include "../src_pw/vdwd3_parameters.h"
 #include "LCAO_descriptor.h"
 
 LOOP_ions::LOOP_ions()
@@ -102,6 +104,83 @@ void LOOP_ions::opt_ions(void)
                 ofs_running << " ---------------------------------------------------------" << endl;
             }
         }
+
+    //----------------------------------------------------------
+    // about vdw, jiyy add vdwd3 and linpz add vdwd2
+    //----------------------------------------------------------	
+        if(INPUT.vdw_method=="d2")
+        {
+            vdwd2_para.flag_vdwd2 = true;
+            vdwd2_para.scaling = std::stod(INPUT.vdw_s6);
+            vdwd2_para.damping = INPUT.vdw_d;
+            vdwd2_para.C6_input(INPUT.vdw_C6_file, INPUT.vdw_C6_unit);
+            vdwd2_para.R0_input(INPUT.vdw_R0_file, INPUT.vdw_R0_unit);
+            vdwd2_para.model = INPUT.vdw_model;
+            if(INPUT.vdw_model=="radius")
+            {
+                if(INPUT.vdw_radius_unit=="Bohr")
+                {
+                    vdwd2_para.radius = std::stod(INPUT.vdw_radius);
+                }
+                else
+                {
+                    vdwd2_para.radius = std::stod(INPUT.vdw_radius) * BOHR_TO_A;
+                }
+            }
+            else if(INPUT.vdw_model=="period")
+            {
+                vdwd2_para.period = INPUT.vdw_period;
+            }
+        }
+        if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
+        {
+            vdwd3_para.flag_vdwd3 = true;
+            vdwd3_para.s6 = std::stod(INPUT.vdw_s6);
+            vdwd3_para.s18 = std::stod(INPUT.vdw_s8);
+            vdwd3_para.rs6 = std::stod(INPUT.vdw_a1);
+            vdwd3_para.rs18 = std::stod(INPUT.vdw_a2);					
+            vdwd3_para.abc = INPUT.vdw_abc;
+            vdwd3_para.version = INPUT.vdw_method;
+            vdwd3_para.model = INPUT.vdw_model;
+            if(INPUT.vdw_model=="radius")
+            {
+                if(INPUT.vdw_radius_unit=="Bohr")
+                {
+                    vdwd3_para.rthr2 = pow(std::stod(INPUT.vdw_radius),2);
+                }
+                else
+                {
+                    vdwd3_para.rthr2 = pow((std::stod(INPUT.vdw_radius) * BOHR_TO_A),2);       
+                }
+                if(INPUT.vdw_cn_thr_unit=="Bohr")
+                {
+                    vdwd3_para.cn_thr2 = pow(INPUT.vdw_cn_thr,2);
+                }
+                else
+                {  
+                    vdwd3_para.cn_thr2 = pow((INPUT.vdw_cn_thr * BOHR_TO_A),2);			
+                }
+            }
+            else if(INPUT.vdw_model=="period")
+            {
+                vdwd3_para.period = INPUT.vdw_period.x;
+            }
+        }
+        // Peize Lin add 2014.04.04, update 2021.03.09
+        if(vdwd2_para.flag_vdwd2)
+        {
+            Vdwd2 vdwd2(ucell,vdwd2_para);
+            vdwd2.cal_energy();
+            en.evdw = vdwd2.get_energy();
+        }
+        // jiyy add 2019-05-18, update 2021.05.02
+        else if(vdwd3_para.flag_vdwd3)
+        {
+            Vdwd3 vdwd3(ucell,vdwd3_para);
+            vdwd3.cal_energy();
+            en.evdw = vdwd3.get_energy();
+        }
+
 
 		// solve electronic structures in terms of LCAO
 		// mohan add 2021-02-09

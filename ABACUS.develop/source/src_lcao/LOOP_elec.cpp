@@ -154,21 +154,6 @@ void LOOP_elec::solver(const int &istep)
     TITLE("LOOP_elec","solver"); 
     timer::tick("LOOP_elec","solver",'D'); 
 
-	// Peize Lin add 2014.04.04, update 2021.03.09
-	if(vdwd2_para.flag_vdwd2)
-	{
-		Vdwd2 vdwd2(ucell,vdwd2_para);
-		vdwd2.cal_energy();
-		en.evdw = vdwd2.get_energy();
-	}
-	// jiyy add 2019-05-18, update 2021.05.02
-	else if(vdwd3_para.flag_vdwd3)
-	{
-		Vdwd3 vdwd3(ucell,vdwd3_para);
-		vdwd3.cal_energy();
-		en.evdw = vdwd3.get_energy();
-	}
-
 	// self consistent calculations for electronic ground state
 	if (CALCULATION=="scf" || CALCULATION=="md"
 			|| CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
