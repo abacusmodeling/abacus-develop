@@ -1,5 +1,4 @@
-cd ABACUS.develop
-cmake -B build cmake
+cmake -B build
 cmake --build build -j4
 cmake --install build
 cd build

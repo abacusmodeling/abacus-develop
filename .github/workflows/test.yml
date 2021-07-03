@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - develop
+      - reconstruction
 
 env:
   CONTAINER: ghcr.io/deepmodeling/abacus-development-kit:gnu
