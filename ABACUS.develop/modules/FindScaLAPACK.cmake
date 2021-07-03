@@ -7,7 +7,7 @@
 
 find_library(ScaLAPACK_LIBRARY
     NAMES scalapack
-    HINTS ${SCALAPACK_ROOT}
+    HINTS ${SCALAPACK_DIR}
     PATH_SUFFIXES "lib"
 )
 

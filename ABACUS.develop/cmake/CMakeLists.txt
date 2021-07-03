@@ -30,19 +30,29 @@ find_package(Cereal REQUIRED)
 # - "lapack_connect.h"
 # - "my_elpa.h"
 # - "scalapack_connector.h"
-find_package(BLAS REQUIRED)
 find_package(ELPA REQUIRED)
-find_package(ScaLAPACK REQUIRED)
 
 # Both header and library are needed
-find_package(FFTW3 REQUIRED)
 find_package(MPI REQUIRED)
-include_directories(${MPI_CXX_INCLUDE_PATH} ${FFTW3_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+include_directories(${MPI_CXX_INCLUDE_PATH} ${Boost_INCLUDE_DIRS})
 
 # No header needed
 find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
+if(DEFINED MKL_DIR)
+  find_package(MKL REQUIRED)
+  add_definitions(-D__MKL -DMKL_ILP64)
+  include_directories(${MKL_INCLUDE_DIRS} ${MKL_INCLUDE_DIRS}/fftw)
+else()
+  find_package(FFTW3 REQUIRED)
+  find_package(LAPACK REQUIRED)
+  find_package(ScaLAPACK REQUIRED)
+
+  add_definitions(-D__FFTW3)
+  include_directories(${FFTW3_INCLUDE_DIRS})
+endif()
+  
 add_definitions(
     -D__EXX
     -D__FFTW3
@@ -452,16 +462,27 @@ add_executable(${ABACUS_BIN_NAME}
     $<TARGET_OBJECTS:abacusCodePdiagMr>
 )
 target_link_libraries(${ABACUS_BIN_NAME}
-    -lgfortran
     -lm
     ELPA::ELPA
-    FFTW3::FFTW3
-    ScaLAPACK::ScaLAPACK
-    BLAS::BLAS
     MPI::MPI_CXX
-    OpenMP::OpenMP_CXX
     Threads::Threads
 )
+
+if(DEFINED MKL_DIR)
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lifcore
+    MKL::MKL
+    OpenMP::OpenMP_CXX
+  )
+else()
+  target_link_libraries(${ABACUS_BIN_NAME}
+    -lgfortran
+    FFTW3::FFTW3
+    ScaLAPACK::ScaLAPACK
+    LAPACK::LAPACK
+    OpenMP::OpenMP_CXX
+  )
+endif()
 
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME}
     TYPE BIN
