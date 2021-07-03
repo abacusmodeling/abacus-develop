@@ -3,21 +3,26 @@
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = icpc 
+CPLUSPLUS     = mpiicpc
+CPLUSPLUS_MPI = mpiicpc 
 FFTW_DIR = /home/lrx/ABACUS/fftw3.3.9/fftw
+LAPACK_DIR = /opt/intel/compilers_and_libraries_2017.8.262/linux/mkl
+HONG_LAPACK        = -D__MKL -DMKL_ILP64
+LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
+LAPACK_LIB_DIR     = ${LAPACK_DIR}/lib/intel64
+LAPACK_LIB         = -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
 OBJ_DIR = obj
 NP      = 4
 
 #==========================
 # LIBS and INCLUDES
 #==========================
-LIBS = -lifcore -lm -lpthread -lfftw3 -L${FFTW_DIR}/lib
+LIBS = -lifcore -lm -lpthread -lfftw3 -L${FFTW_DIR}/lib ${LAPACK_LIB}
 
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_DIR}/include 
+INCLUDES = -I. -Icommands -I${FFTW_DIR}/include -I${LAPACK_INCLUDE_DIR}
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
@@ -31,7 +36,7 @@ VPATH=../src_global\
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__NORMAL
+HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_LAPACK}
 
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\

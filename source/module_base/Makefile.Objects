@@ -10,6 +10,17 @@ matrix.o\
 intarray.o\
 complexmatrix.o\
 complexarray.o\
+element_basis_index.o\
+export.o\
+integral.o\
+inverse_matrix.o\
+memory.o\
+mymath1.o\
+mymath3.o\
+polint.o\
+sph_bessel.o\
+sph_bessel_recursive-d1.o\
+sph_bessel_recursive-d2.o\
 timer.o\
 realarray.o\
 math_polyint.o\

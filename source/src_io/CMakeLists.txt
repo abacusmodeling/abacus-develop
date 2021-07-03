@@ -24,6 +24,7 @@ add_library(
     read_cell_pseudopots.cpp
     read_dm.cpp
     read_rho.cpp
+    restart.cpp
     rwstream.cpp
     to_wannier90.cpp
     unk_overlap_lcao.cpp

@@ -4,7 +4,7 @@
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "grid_technique.h"
-#include "../module_ORB/ORB_read.h"
+#include "../module_orbital/ORB_read.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
 

@@ -30,7 +30,6 @@ export.o\
 print_info.o\
 mathzone.o\
 integral.o \
-poission.o \
 polint.o \
 global_file.o \
 element_basis_index.o \

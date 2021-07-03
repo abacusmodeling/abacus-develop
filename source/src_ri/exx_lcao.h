@@ -9,7 +9,7 @@
 #include "src_ri/exx_abfs-parallel-communicate-hexx.h"
 #include "src_ri/exx_abfs-screen-schwarz.h"
 #include "src_ri/exx_abfs-screen-cauchy.h"
-#include "../src_global/element_basis_index.h"
+#include "../module_base/element_basis_index.h"
 #include "../src_pw/xc_type.h"
 #include "../src_pw/exx_global.h"
 

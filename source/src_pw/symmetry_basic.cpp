@@ -4,7 +4,7 @@
 //==========================================================
 #include "symmetry.h"
 #include "global.h"
-#include "../src_global/mymath.h"
+#include "../module_base/mymath.h"
 #include "symm_other.h"
 
 Symmetry_Basic::Symmetry_Basic()

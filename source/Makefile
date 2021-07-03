@@ -8,7 +8,7 @@ endif
 include Makefile.Objects
 
 VPATH=./src_global\
-:./module_ORB\
+:./module_orbital\
 :./module_neighbor\
 :./module_cell\
 :./module_base\

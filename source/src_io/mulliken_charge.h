@@ -3,7 +3,7 @@
 
 #include "../src_pw/tools.h"
 #ifdef __LCAO
-#include "../module_ORB/ORB_gen_tables.h"
+#include "../module_orbital/ORB_gen_tables.h"
 #include "../module_neighbor/sltk_grid_driver.h"
 #include "../src_lcao/LCAO_matrix.h"
 #include "../src_lcao/global_fp.h"

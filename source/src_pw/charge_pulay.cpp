@@ -1,7 +1,7 @@
 #include "charge_pulay.h"
 #include "global.h"
-#include "../src_global/inverse_matrix.h"
-#include "../src_global/random.h"
+#include "../module_base/inverse_matrix.h"
+#include "../module_base/random.h"
 
 Charge_Pulay::Charge_Pulay()
 {

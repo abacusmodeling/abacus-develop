@@ -1,5 +1,5 @@
 #include "H_Ewald_pw.h"
-#include "../src_global/mymath.h" // use heapsort
+#include "../module_base/mymath.h" // use heapsort
 #include "myfunc.h" // use dnrm2
 
 double H_Ewald_pw::alpha=0.0;

@@ -1,7 +1,7 @@
 #include "../src_pw/tools.h"
 #include "gint_k.h"
 #include "LCAO_nnr.h"
-#include "../module_ORB/ORB_read.h"
+#include "../module_orbital/ORB_read.h"
 #include "grid_technique.h"
 #include "../module_base/ylm.h"
 #include "../src_pw/global.h"
