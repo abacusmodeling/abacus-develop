@@ -13,8 +13,6 @@
 #include "src_pw/tools.h"
 #include "src_pw/symmetry.h"
 #include "src_pw/efield.h"
-#include "src_pw/vdwd2_parameters.h"
-#include "src_pw/vdwd3_parameters.h"
 #include "src_pw/occupy.h"
 #include "module_cell/unitcell.h"
 #include "src_ri/exx_abfs-jle.h"
