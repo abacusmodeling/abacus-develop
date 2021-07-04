@@ -119,6 +119,7 @@ void Run_pw::plane_wave_line(void)
     {
         //cout << "\n Output Spillage Information : " << endl;
         // calculate spillage value.
+#ifdef __LCAO
         if ( winput::out_spillage == 3)
         {
             BASIS_TYPE="pw"; 
@@ -140,6 +141,7 @@ void Run_pw::plane_wave_line(void)
             //Spillage sp;
             //sp.get_both(NBANDS, NLOCAL, wf.wanf2, wf.evc);
         }
+#endif
 
         // output overlap
         if ( winput::out_spillage <= 2 )
@@ -158,7 +160,9 @@ void Run_pw::plane_wave_line(void)
 	}
 
 	// compute density of states
+#ifdef __LCAO
 	en.perform_dos();
+#endif
 
 	timer::tick("Run_pw","plane_wave_line",'B');
     return;

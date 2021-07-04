@@ -1,9 +1,11 @@
 #include "driver.h"
 #include "run_pw.h"
-#include "run_lcao.h"
 #include "input.h"
 #include "input_conv.h"
+#ifdef __LCAO
+#include "run_lcao.h"
 #include "src_lcao/global_fp.h"
+#endif
 #include "src_pw/global.h"
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"
@@ -82,10 +84,12 @@ void Driver::atomic_world(void)
 	{
 		Run_pw::plane_wave_line();
 	}
+#ifdef __LCAO
 	else if(BASIS_TYPE=="lcao")
 	{
 		Run_lcao::lcao_line();
 	}
+#endif
 
 	timer::finish( ofs_running );
 

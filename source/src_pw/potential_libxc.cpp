@@ -8,10 +8,12 @@
 
 #include "potential_libxc.h"
 #include "../src_pw/global.h"
-#include "src_lcao/global_fp.h"
 #include "../src_pw/tools.h"
-#include "../module_base/global_function.h"
 #include "../src_pw/xc_gga_pw.h"
+#include "../module_base/global_function.h"
+#ifdef __LCAO
+#include "../src_lcao/global_fp.h"
+#endif
 
 // [etxc, vtxc, v] = Potential_Libxc::v_xc(...)
 std::tuple<double,double,matrix> Potential_Libxc::v_xc(
