@@ -363,7 +363,6 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				{
 					this->atoms[it].nwl = INPUT.lmaxmax;
 				}
-				cout<<atoms[it].nwl<<"llllllllkkk"<<endl;
 				for(int L=0; L<atoms[it].nwl+1; L++)
 				{
 					this->atoms[it].l_nchi[L] = 1;

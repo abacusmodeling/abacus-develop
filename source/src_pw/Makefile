@@ -70,7 +70,8 @@ $(OBJS_PW)\
 $(OBJS_PARALLEL)\
 ${OBJS_IO}\
 ${OBJS_CELL}\
-$(OBJS_MAIN)
+$(OBJS_MAIN)\
+${OBJS_IONS}
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 
