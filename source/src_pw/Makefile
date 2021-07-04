@@ -6,8 +6,9 @@
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = mpiicpc 
 FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
+#FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
 OBJ_DIR = obj
-NP      = 1
+NP      = 12
 
 #==========================
 # FFTW package needed 
@@ -52,8 +53,8 @@ include Makefile.Objects
 
 VPATH=../src_global\
 :../module_base\
-:../src_parallel\
 :../module_cell\
+:../src_parallel\
 :../src_io\
 :../src_ions\
 :../\
@@ -77,7 +78,7 @@ FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 #==========================
 # MAKING OPTIONS
 #==========================
-ORB : 
+pw : 
 	@ make init
 	@ make -j $(NP) parallel
 
