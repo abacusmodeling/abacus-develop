@@ -12,16 +12,13 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container: ${{ env.CONTAINER }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Build Docker Image
-        uses: docker/build-push-action@v2
-        with:
-          load: true
-          tags: abacus-development-kit:gnu
-          cache-from: type=registry,ref=${{ env.CONTAINER }}
       - name: Build and Test
-        run: docker run -v $GITHUB_WORKSPACE:/workspace -w /workspace abacus-development-kit:gnu bash entrypoint.sh
+        run: |
+          cmake -B build
+          cmake --build build -j4
+          cmake --install build
+          ctest --test-dir build --verbose

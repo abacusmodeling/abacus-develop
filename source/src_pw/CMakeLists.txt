@@ -53,7 +53,6 @@ add_library(
     vdwd3.cpp
     vdwd3_parameters.cpp
     wavefunc.cpp
-    wavefunc_in_pw.cpp
     wf_atomic.cpp
     wf_igk.cpp
     xc_1.cpp
