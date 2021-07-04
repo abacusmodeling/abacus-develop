@@ -3,7 +3,7 @@
 #ifdef __LCAO
 #include "module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 UnitCell_pseudo::UnitCell_pseudo()
@@ -116,7 +116,7 @@ void UnitCell_pseudo::setup_cell(
 
 	// mohan add 2010-09-29
 	#ifdef __LCAO
-	ORB.bcast_files(ucell.ntype, MY_RANK);
+	ORB.bcast_files(ntype, MY_RANK);
 	#endif
 #endif
 	
@@ -534,11 +534,11 @@ void UnitCell_pseudo::cal_nwfc(void)
 	this->lmax_ppwf = 0;
 	for(int it=0; it< ntype; it++)
 	{
-		for(int ic=0; ic<ucell.atoms[it].nchi; ic++)
+		for(int ic=0; ic<atoms[it].nchi; ic++)
 		{
-			if( lmax_ppwf < ucell.atoms[it].lchi[ic] )
+			if( lmax_ppwf < atoms[it].lchi[ic] )
 			{
-				this->lmax_ppwf = ucell.atoms[it].lchi[ic]; 
+				this->lmax_ppwf = atoms[it].lchi[ic]; 
 			}
 		}
 	}
@@ -546,10 +546,10 @@ void UnitCell_pseudo::cal_nwfc(void)
 	/*
 	for(int it=0; it< ntype; it++)
 	{
-		cout << " label=" << it << " nbeta=" << ucell.atoms[it].nbeta << endl;
-		for(int ic=0; ic<ucell.atoms[it].nbeta; ic++)
+		cout << " label=" << it << " nbeta=" << atoms[it].nbeta << endl;
+		for(int ic=0; ic<atoms[it].nbeta; ic++)
 		{
-			cout << " " << ucell.atoms[it].lll[ic] << endl;
+			cout << " " << atoms[it].lll[ic] << endl;
 		}
 	}
 	*/
@@ -678,12 +678,12 @@ void UnitCell_pseudo::setup_cell_after_vc(
     this->GGT = G * GT;
     this->invGGT = GGT.Inverse();
 
-    for(int it=0; it<ucell.ntype; it++)
+    for(int it=0; it<ntype; it++)
     {
-        Atom* atom = &ucell.atoms[it];
+        Atom* atom = &atoms[it];
         for(int ia =0;ia< atom->na;ia++)
         {
-            atom->tau[ia] = atom->taud[ia] * ucell.latvec;
+            atom->tau[ia] = atom->taud[ia] * latvec;
 /*
 #ifdef __MPI
 Parallel_Common::bcast_double( atom->tau[ia].x );
@@ -698,9 +698,9 @@ Parallel_Common::bcast_double( atom->taud[ia].z );
     }
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
-    for (int i=0;i<ucell.ntype;i++)
+    for (int i=0;i<ntype;i++)
     {
-        ucell.atoms[i].bcast_atom(); // bcast tau array
+        atoms[i].bcast_atom(); // bcast tau array
     }
 #endif
 

@@ -39,6 +39,7 @@ void Input_Conv::Convert(void)
     global_pseudo_type = INPUT.pseudo_type;
 	ucell.latName = INPUT.latname; 
 	ucell.ntype = INPUT.ntype;
+	ucell.lmaxmax = INPUT.lmaxmax;
 	CHR.nelec = INPUT.nelec;
 //  ucell.lmaxmax = INPUT.lmaxmax;
 

@@ -1,5 +1,7 @@
 #include "magnetism.h"
+#ifndef __CELL
 #include "global.h"
+#endif
 
 Magnetism::Magnetism()
 {
@@ -20,6 +22,7 @@ Magnetism::~Magnetism()
 	delete[] angle2_;
 }
 
+#ifndef __CELL
 void Magnetism::compute_magnetization()
 {
     if (NSPIN==2)
@@ -187,3 +190,4 @@ bool Magnetism::judge_parallel(double a[3], Vector3<double> b)
    jp = (fabs(cross)<1e-6);
    return jp;
 }
+#endif

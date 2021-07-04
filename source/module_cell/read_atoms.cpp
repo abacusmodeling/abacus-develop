@@ -1,8 +1,11 @@
-#include "../module_cell/unitcell_pseudo.h"
+#include "unitcell_pseudo.h"
 #ifdef __LCAO
 #include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
+
+#ifndef __CELL
 #include "../src_pw/global.h"
+#endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 void UnitCell_pseudo::read_atom_species(ifstream &ifa)
@@ -358,10 +361,10 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				this->atoms[it].nw = 0;
 
 				this->atoms[it].nwl = 2;
-				//cout << INPUT.lmaxmax << endl;
-				if ( INPUT.lmaxmax != 2 )
+				//cout << lmaxmax << endl;
+				if ( lmaxmax != 2 )
 				{
-					this->atoms[it].nwl = INPUT.lmaxmax;
+					this->atoms[it].nwl = lmaxmax;
 				}
 				cout<<atoms[it].nwl<<"llllllllkkk"<<endl;
 				for(int L=0; L<atoms[it].nwl+1; L++)
@@ -581,7 +584,7 @@ bool UnitCell_pseudo::check_tau(void)const
 					else
 					{
 						diff = atoms[T1].tau[I1] - atoms[T2].tau[I2];
-						norm = diff.norm() * ucell.lat0;
+						norm = diff.norm() * lat0;
 						if( shortest_norm > norm )
 						{
 							shortest_norm = norm;
@@ -711,7 +714,7 @@ void UnitCell_pseudo::print_tau(void)const
     TITLE("UnitCell_pseudo","print_tau");
     if(Coordinate == "Cartesian" || Coordinate == "Cartesian_angstrom")
     {
-        ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << ucell.lat0 << " Bohr )." << endl;
+        ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << lat0 << " Bohr )." << endl;
         ofs_running << setw(13) << " atom"
         //<< setw(20) << "x" 
         //<< setw(20) << "y" 
@@ -725,12 +728,12 @@ void UnitCell_pseudo::print_tau(void)const
         ofs_running << setprecision(12);
 
         int iat=0;
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<ntype; it++)
         {
-            for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+            for (int ia = 0; ia < atoms[it].na; ia++)
             {
                 stringstream ss;
-                ss << "tauc_" << ucell.atoms[it].label << ia+1;
+                ss << "tauc_" << atoms[it].label << ia+1;
 
                 ofs_running << " " << setw(12) << ss.str()
                 //<< setw(20) << atoms[it].tau[ia].x 
@@ -764,12 +767,12 @@ void UnitCell_pseudo::print_tau(void)const
         << endl;
 
         int iat=0;
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<ntype; it++)
         {
-            for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+            for (int ia = 0; ia < atoms[it].na; ia++)
             {
                 stringstream ss;
-                ss << "taud_" << ucell.atoms[it].label << ia+1;
+                ss << "taud_" << atoms[it].label << ia+1;
 
                 ofs_running << " " << setw(12) << ss.str()
                 //<< setw(20) << atoms[it].taud[ia].x

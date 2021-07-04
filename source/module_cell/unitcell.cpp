@@ -3,7 +3,7 @@
 #include <mpi.h>
 #endif
 
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 #include "../src_pw/tools.h"
 #include "unitcell.h"
 using namespace std;
@@ -352,9 +352,9 @@ void UnitCell::bcast_atoms_tau()
 {
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
-    for (int i=0;i<ucell.ntype;i++)
+    for (int i=0;i<ntype;i++)
     {
-        ucell.atoms[i].bcast_atom(); // bcast tau array
+        atoms[i].bcast_atom(); // bcast tau array
     }
 #endif
 }
