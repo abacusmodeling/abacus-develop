@@ -5,17 +5,19 @@
 #==========================
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = mpiicpc 
-FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
+
 OBJ_DIR = obj
 NP      = 1
 
-#==========================
-# FFTW package needed 
-#==========================
+##==========================
+## FFTW package needed 
+##==========================
+#FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
 HONG_FFTW        = -D__FFTW3
-FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+#FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
+#FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+#FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 #==========================
 # LAPACK package needed 
