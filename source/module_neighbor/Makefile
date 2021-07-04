@@ -6,12 +6,12 @@
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = icpc
 #BOOST_DIR = /home/cyFortneu/soft/boost_1_74_0
-BOOST_DIR = /home/mohan/1_Software/impi_boost-1.70.0
+BOOST_DIR = /home/lrx/ABACUS/boost/boost
 #FFTW_DIR = /home/cyFortneu/soft/fftw-3.3.8
-FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+FFTW_DIR = /home/lrx/ABACUS/fftw3.3.9/fftw
 
 OBJ_DIR = obj
-NP      = 1
+NP      = 4
 
 #==========================
 # FFTW package needed 
@@ -44,7 +44,7 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 
 include Makefile.Objects
 
-VPATH=../src_global\
+VPATH=../module_base/\
 :./\
 
 #==========================

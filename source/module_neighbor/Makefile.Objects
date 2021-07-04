@@ -8,6 +8,9 @@ HEADERS= *.h
 OBJS_BASE=tool_quit.o\
 tool_title.o\
 timer.o\
+global_variable.o\
+matrix.o\
+matrix3.o\
 memory.o\
 
 OBJS_NEIGHBOR=sltk_adjacent_set.o\

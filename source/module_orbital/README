@@ -1,5 +1,5 @@
-This is the ORB module, which is used to compute
-the "Two Center Integrals (TCI)" of Numerical Atomic Orbitals (NAO).
+This is the ‘orbital' module, which is used to compute
+"Two-Center Integrals (TCI)" by using the Numerical Atomic Orbitals (NAO).
 
 Explain TCI:
 TCI is defined as <phi_i | phi_j> or <dphi_i/dR | phi_j>, where
