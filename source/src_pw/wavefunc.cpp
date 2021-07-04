@@ -218,6 +218,9 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	if(!ltable)
 	{
 		this->table_local.create(ucell.ntype, ucell.nmax_total, NQX);
+
+		// ORB.orbital_file: file name of the numerical atomic orbitals (NAOs)
+		// table_local: generate one-dimensional table for NAOs
 		Wavefunc_in_pw::make_table_q(ORB.orbital_file, this->table_local);
 		ltable = true;
 	}

@@ -6,7 +6,9 @@
 #include "../module_base/math_ylmreal.h"
 #include "../src_pw/soc.h"
 
-void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_local)
+void Wavefunc_in_pw::make_table_q(
+	std::vector<string> &fn, 
+	realArray &table_local)
 {
 	TITLE("Wavefunc_in_pw","make_table_q");
 
@@ -47,17 +49,17 @@ void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_loca
 					ofs_warning << " File name : " << fn[it] << endl;
 					WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 				}
-				int meshr;
-				double dr; // only used in uniform grid
-                                char word[80];     // pengfei Li add 15-1-31
-                                while (in.good())
-                                {
-                                    in >> word;
-                                    if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
-                                    {
-                                        break;
-                                    }
-                                }
+				int meshr=0;
+				double dr=0.0; // only used in uniform grid
+				char word[80];     // pengfei Li add 15-1-31
+				while (in.good())
+				{
+					in >> word;
+					if (std::strcmp(word , "END") == 0)		// Peize Lin fix bug about strcmp 2016-08-02
+					{
+						break;
+					}
+				}
 
 				CHECK_NAME(in, "Mesh");
 				in >> meshr;
@@ -89,8 +91,12 @@ void Wavefunc_in_pw::make_table_q(std::vector<string> &fn, realArray &table_loca
 				}
 				ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << endl;
 
-				string name1, name2, name3;
-				int tmp_it, tmp_l ,tmp_n;
+				string name1;
+				string name2;
+				string name3;
+				int tmp_it=0;
+				int tmp_l=0;
+				int tmp_n=0;
 				bool find = false;
 
 				while( !find )
@@ -198,11 +204,9 @@ double Wavefunc_in_pw::smearing(const double &energy_x,
     {
         w = 0.0 ;
     }
+
     return w ;
-
 }
-
-
 
 
 void Wavefunc_in_pw::integral(const int meshr, const double *psir, const double *r,
