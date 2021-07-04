@@ -30,10 +30,10 @@ void UnitCell_pseudo::setup_cell(
 		ofstream &log)
 {
 	TITLE("UnitCell_pseudo","setup_cell");	
-	// (1) init mag (global class)
+	// (1) init mag
 	assert(ntype>0);
-	delete[] mag.start_magnetization;
-	mag.start_magnetization = new double[this->ntype];
+	delete[] magnet.start_magnetization;
+	magnet.start_magnetization = new double[this->ntype];
 
 	// (2) init *Atom class array.
 	this->atoms = new Atom[this->ntype]; // atom species.
@@ -380,12 +380,12 @@ void UnitCell_pseudo::cal_nelec(void)
 	else
 	{
 		if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
-		if(NBANDS < mag.get_nelup() ) 
+		if(NBANDS < magnet.get_nelup() ) 
 		{
-			OUT(ofs_running,"nelup",mag.get_nelup());
+			OUT(ofs_running,"nelup",magnet.get_nelup());
 			WARNING_QUIT("unitcell","Too few spin up bands!");
 		}
-		if(NBANDS < mag.get_neldw() )
+		if(NBANDS < magnet.get_neldw() )
         {
             WARNING_QUIT("unitcell","Too few spin down bands!");
         }

@@ -380,7 +380,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// (6) compute magnetization, only for spin==2
-        mag.compute_magnetization();
+        ucell.magnet.compute_magnetization();
 
 		// resume codes!
 		//-------------------------------------------------------------------------

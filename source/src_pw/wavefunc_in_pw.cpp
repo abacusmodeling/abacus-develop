@@ -346,8 +346,8 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 										}
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
-									alpha = mag.angle1_[it];
-									gamma = -1 * mag.angle2_[it] + 0.5 * PI;
+									alpha = ucell.magnet.angle1_[it];
+									gamma = -1 * ucell.magnet.angle2_[it] + 0.5 * PI;
 
 									for(int m = 0;m<2*L+1;m++)
 									{
@@ -382,8 +382,8 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 							{//atomic_wfc_nc
 								double alpha, gamman;
 								complex<double> fup, fdown;
-								alpha = mag.angle1_[it];
-								gamman = -mag.angle2_[it] + 0.5*PI;
+								alpha = ucell.magnet.angle1_[it];
+								gamman = -ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
@@ -561,8 +561,8 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 										}
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
-									alpha = mag.angle1_[it];
-									gamma = -1 * mag.angle2_[it] + 0.5 * PI;
+									alpha = ucell.magnet.angle1_[it];
+									gamma = -1 * ucell.magnet.angle2_[it] + 0.5 * PI;
 
 									for(int m = 0;m<2*L+1;m++)
 									{
@@ -597,8 +597,8 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 							{//atomic_wfc_nc
 								double alpha, gamman;
 								complex<double> fup, fdown;
-								alpha = mag.angle1_[it];
-								gamman = -mag.angle2_[it] + 0.5*PI;
+								alpha = ucell.magnet.angle1_[it];
+								gamman = -ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;

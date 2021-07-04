@@ -323,25 +323,25 @@ void Input_Conv::Convert(void)
 		}
 		LSPINORB = INPUT.lspinorb;
 
-		delete[] mag.m_loc_;
-		delete[] mag.angle1_;
-		delete[] mag.angle2_;
-		mag.m_loc_ = new Vector3<double> [INPUT.ntype];
-		mag.angle1_ = new double[INPUT.ntype];
-		mag.angle2_ = new double[INPUT.ntype];
+		delete[] ucell.magnet.m_loc_;
+		delete[] ucell.magnet.angle1_;
+		delete[] ucell.magnet.angle2_;
+		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		ucell.magnet.angle1_ = new double[INPUT.ntype];
+		ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
-			mag.angle1_[i] = INPUT.angle1[i]/180*PI;
-			mag.angle2_[i] = INPUT.angle2[i]/180*PI;
+			ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
+			ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
 		}
 #ifdef __MPI
-//			Parallel_Common::bcast_double(mag.angle1_[i]);
-//			Parallel_Common::bcast_double(mag.angle2_[i]);
+//			Parallel_Common::bcast_double(ucell.magnet.angle1_[i]);
+//			Parallel_Common::bcast_double(ucell.magnet.angle2_[i]);
 #endif
 	}
 	else{
-		delete[] mag.m_loc_;
-		mag.m_loc_ = new Vector3<double> [INPUT.ntype];
+		delete[] ucell.magnet.m_loc_;
+		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
 		LSPINORB = false;
 		NONCOLIN = false;
 		DOMAG = false;

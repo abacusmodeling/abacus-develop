@@ -22,7 +22,7 @@ UnitCell_pseudo ucell;
 pseudopot_cell_vnl ppcell;
 xcfunc xcf;
 Charge_Broyden CHR;
-Magnetism mag;
+//Magnetism mag;
 
 Potential pot;
 Symmetry symm;

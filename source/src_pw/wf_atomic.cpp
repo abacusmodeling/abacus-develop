@@ -364,8 +364,8 @@ void WF_atomic::atomic_wfc
                                  }
                               }
                               //and construct the starting wavefunctions as in the noncollinear case.
-                              alpha = mag.angle1_[it];
-                              gamma = -1 * mag.angle2_[it] + 0.5 * PI;
+                              alpha = ucell.magnet.angle1_[it];
+                              gamma = -1 * ucell.magnet.angle2_[it] + 0.5 * PI;
 
                               for(int m = 0;m<2*l+1;m++)
                               {
@@ -400,8 +400,8 @@ void WF_atomic::atomic_wfc
                         {//atomic_wfc_nc
                             double alpha, gamman;
                             complex<double> fup, fdown;
-                            alpha = mag.angle1_[it];
-                            gamman = -mag.angle2_[it] + 0.5*PI;
+                            alpha = ucell.magnet.angle1_[it];
+                            gamman = -ucell.magnet.angle2_[it] + 0.5*PI;
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;

@@ -51,7 +51,7 @@ extern xcfunc xcf;
 extern Charge_Broyden CHR;
 extern Potential pot;
 extern Symmetry symm;
-extern Magnetism mag;
+//extern Magnetism mag;
 extern UnitCell_pseudo ucell;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
