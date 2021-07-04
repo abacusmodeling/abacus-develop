@@ -55,32 +55,50 @@ class Gint_k : public Gint_k_init
 	// V is (Vl + Vh + Vxc) if no Vna is used,
 	// and is (Vna + delta_Vh + Vxc) if Vna is used.
 	void folding_vl_k(const int &ik);
+
 	void folding_vl_k_nc(const int &ik);//zhengdy-soc
 
 	// folding the < dphi_0 | V | phi_R> matrix to 
 	// < dphi_0i | V | phi_0j>
-	void folding_force(matrix& fvl_dphi,
-			double* pvdpx, double* pvdpy, double* pvdpz);//mohan add 2012-1-6
+	void folding_force(
+		matrix& fvl_dphi,
+		double* pvdpx, 
+		double* pvdpy, 
+		double* pvdpz);//mohan add 2012-1-6
 
 	// folding the < dphi_0 | V * R_beta | phi_R> matrix
 	// < dphi_0i | V | phi_0j>
-	void folding_stress(matrix& fvl_dphi, matrix& svl_dphi,
-			double* pvdpx, double* pvdpy, double* pvdpz,
-			double* pvdp11, double* pvdp22, double* pvdp33, 
-			double* pvdp12, double* pvdp13, double* pvdp23);//zhengdy add 2016-10-18
+	void folding_stress(
+		matrix& fvl_dphi, 
+		matrix& svl_dphi,
+		double* pvdpx, 
+		double* pvdpy, 
+		double* pvdpz,
+		double* pvdp11, 
+		double* pvdp22, 
+		double* pvdp33, 
+		double* pvdp12, 
+		double* pvdp13, 
+		double* pvdp23);//zhengdy add 2016-10-18
 
 	//------------------------------------------------------
 	// in gint_k_rho.cpp 
 	//------------------------------------------------------
-	// calculate the charge density.
-	void calculate_charge(void);
+	// calculate the charge density via grid integrals
+	void cal_rho_k(void);
 
 	//------------------------------------------------------
 	// in gint_k_fvl.cpp 
 	//------------------------------------------------------
 	// calculate the force (many k-points).
-	void fvl_k_RealSpace(matrix& fvl_dphi, const double* vl);//mohan add 2011-06-19
-	void svl_k_RealSpace(matrix& fvl_dphi, matrix& svl_dphi, const double* vl);//zhengdy add 2016-10-18
+	void fvl_k_RealSpace(
+		matrix& fvl_dphi, 
+		const double* vl);//mohan add 2011-06-19
+
+	void svl_k_RealSpace(
+		matrix& fvl_dphi, 
+		matrix& svl_dphi, 
+		const double* vl);//zhengdy add 2016-10-18
 
 	private:
 	
@@ -89,54 +107,113 @@ class Gint_k : public Gint_k_init
 	//------------------------------------------------------
 	// set the orbital info 
 	// set the orbital/Ylm information on each real space grid.
-	void set_ijk_atom(const int &grid_index, const int &size,
-		double*** psir_ylm, double*** dr, bool** cal_flag, 
-		double** distance, const double &delta_r);
+	void set_ijk_atom(
+		const int &grid_index, 
+		const int &size,
+		double*** psir_ylm, 
+		double*** dr, 
+		bool** cal_flag, 
+		double** distance, 
+		const double &delta_r);
 
 	//------------------------------------------------------
 	// in gint_k_vl.cpp 
 	//------------------------------------------------------
 	// evaluate the matrix element < phi0 | V | phiR> and store them in
 	// a full H matrix.
-	void evaluate_pvpR_full(const int &grid_index, const int &size, double*** psir_ylm,
-		bool** cal_flag, double* vldr3);
+	void evaluate_pvpR_full(
+		const int &grid_index, 
+		const int &size, 
+		double*** psir_ylm,
+		bool** cal_flag, 
+		double* vldr3);
 
 	// reduced means the H storage take the advance of adjacent atoms.
-	void evaluate_pvpR_reduced(double* pvpR, const int &grid_index, 
-		const int &size, const int &i, const int &j, const int &k,
-		double*** psir_ylm, bool** cal_flag, double* vldr3, 
-		double** distance, const Grid_Technique &gt);
+	void evaluate_pvpR_reduced(
+		double* pvpR, 
+		const int &grid_index, 
+		const int &size, 
+		const int &i, 
+		const int &j, 
+		const int &k,
+		double*** psir_ylm, 
+		bool** cal_flag, 
+		double* vldr3, 
+		double** distance, 
+		const Grid_Technique &gt);
 
 	//------------------------------------------------------
 	// in gint_k_rho.cpp 
 	//------------------------------------------------------
 	// evaluate the <phi0 | Density Matrix | phiR> to get the charge density.
-	void evaluate_pDMp(const int &grid_index, const int &size,
-		bool** cal_flag, double*** psir_ylm, int* vindex);
+	void evaluate_pDMp(
+		const int &grid_index, 
+		const int &size,
+		bool** cal_flag, 
+		double*** psir_ylm, 
+		int* vindex);
 
 	//------------------------------------------------------
 	// in gint_k_fvl.cpp 
 	//------------------------------------------------------
 	// set the orbital info 
 	// set the derivative/Ylm information on each real space grid.
-	void set_ijk_atom_force(const int &grid_index, const int &size,
-		double*** psir_ylm, double*** dr, bool** cal_flag, 
-		double** distance, double* ylma, const double &delta_r,
-		double*** dphi_x, double ***dphi_y, double*** dphi_z);
+	void set_ijk_atom_force(
+		const int &grid_index, 
+		const int &size,
+		double*** psir_ylm, 
+		double*** dr, 
+		bool** cal_flag, 
+		double** distance, 
+		double* ylma, 
+		const double &delta_r,
+		double*** dphi_x, 
+		double ***dphi_y, 
+		double*** dphi_z);
 
 	// evaluate the force due to local potential.
-	void evaluate_vl_force(const int &grid_index, const int &size, const int &i, const int &j, const int &k,
-		double*** psir_ylm, bool** cal_flag, double* vldr3, double** distance,
-		double*** dphi_x, double*** dphi_y, double*** dphi_z,
-		double* pvdpx, double* pvdpy, double* pvdpz,
+	void evaluate_vl_force(
+		const int &grid_index, 
+		const int &size, 
+		const int &i, 
+		const int &j, 
+		const int &k,
+		double*** psir_ylm, 
+		bool** cal_flag, 
+		double* vldr3, 
+		double** distance,
+		double*** dphi_x, // gradient of orbital phi along x direction
+		double*** dphi_y, // gradient of orbital phi along y direction
+		double*** dphi_z, // gradient of orbital phi along z direction
+		double* pvdpx, 
+		double* pvdpy, 
+		double* pvdpz,
 		const Grid_Technique &gt);
 
 	// evaluate the stresses due to local potential
-	void evaluate_vl_stress(const int &grid_index, const int &size, const int &i, const int &j, const int &k,
-		double*** psir_ylm, bool** cal_flag, double* vldr3, double** distance,
-		double*** dphi_x, double*** dphi_y, double*** dphi_z,
-		double* pvdpx, double* pvdpy, double* pvdpz,
-		double* pvdp11, double* pvdp22, double* pvdp33, double* pvdp12, double* pvdp13, double* pvdp23,double*** dr,
+	void evaluate_vl_stress(
+		const int &grid_index, 
+		const int &size, 
+		const int &i, 
+		const int &j, 
+		const int &k,
+		double*** psir_ylm, 
+		bool** cal_flag, 
+		double* vldr3, 
+		double** distance,
+		double*** dphi_x, 
+		double*** dphi_y, 
+		double*** dphi_z,
+		double* pvdpx, 
+		double* pvdpy, 
+		double* pvdpz,
+		double* pvdp11, 
+		double* pvdp22, 
+		double* pvdp33, 
+		double* pvdp12, 
+		double* pvdp13, 
+		double* pvdp23,
+		double*** dr,
 		const Grid_Technique &gt);
 
 	private:

@@ -121,10 +121,13 @@ void Local_Orbital_Charge::sum_bands(void)
         {
             if(INPUT.new_dm>0)
             {
-                //density matrix has already been calcualted.
+                //density matrix has already been calculated.
                 timer::tick("LCAO_Charge","cal_dm_2d",'F');
+
                 wfc_dm_2d.cal_dm(wf.wg);        // Peize Lin test 2019-01-16
+
                 timer::tick("LCAO_Charge","cal_dm_2d",'F');
+
                 this->cal_dk_gamma_from_2D(); // transform dm_gamma[is].c to this->DM[is]
             }
             else
@@ -136,21 +139,22 @@ void Local_Orbital_Charge::sum_bands(void)
     }
     else
     {
-        NOTE("Calculate the density matrix!");
+        NOTE("Calculate the density matrix.");
         this->cal_dk_k( GridT );
         if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
             wfc_dm_2d.cal_dm(wf.wg);
 		}
     }
-            
+
+
     for(int is=0; is<NSPIN; is++)
     {
         ZEROS( CHR.rho[is], pw.nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------
-    //calculate the density in real space grid.
+    //calculate the charge density on real space grid.
     //------------------------------------------------------------
      time_t start = time(NULL);
 
@@ -161,7 +165,7 @@ void Local_Orbital_Charge::sum_bands(void)
     else
     {
         NOTE("Calculate the charge on real space grid!");
-        UHM.GK.calculate_charge();
+        UHM.GK.cal_rho_k();
     }
 
      time_t end = time(NULL);

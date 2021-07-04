@@ -131,7 +131,7 @@ void LOOP_elec::before_solver(const int &istep)
 		}
 		else
 		{
-			UHM.GK.calculate_charge();
+			UHM.GK.cal_rho_k();
 		}
 
 		// renormalize the charge density
