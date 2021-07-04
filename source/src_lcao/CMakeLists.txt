@@ -8,6 +8,7 @@ add_library(
     ELEC_evolve.cpp
     ELEC_nscf.cpp
     ELEC_scf.cpp
+    exx_lip.cpp
     FORCE_STRESS.cpp
     FORCE_gamma.cpp
     FORCE_gamma_edm.cpp

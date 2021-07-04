@@ -6,7 +6,7 @@
 #ifdef __LCAO
 #include "module_orbital/ORB_gen_tables.h"
 #endif
-#include "wavefunc_in_pw.h"
+#include "../src_lcao/wavefunc_in_pw.h"
 #include "../module_cell/unitcell_pseudo.h"
 
 //==========================================================

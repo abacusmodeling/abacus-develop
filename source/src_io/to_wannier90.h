@@ -10,7 +10,7 @@ using namespace std;
 #include "../src_pw/tools.h"
 #include "../module_base/lapack_connector.h"
 #include "../src_pw/global.h"
-#include "../src_pw/wavefunc_in_pw.h"
+#include "../src_lcao/wavefunc_in_pw.h"
 
 #ifdef __LCAO
 #include "../src_lcao/local_orbital_wfc.h"
