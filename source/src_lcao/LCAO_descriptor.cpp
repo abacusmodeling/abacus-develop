@@ -90,7 +90,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool &calc_deri)
             {
                 const int T2 = GridD.getType(ad);
                 const int I2 = GridD.getNatom(ad);
-                Atom *atom2 = &ucell.atoms[T2];
+                //Atom *atom2 = &ucell.atoms[T2];
                 tau2 = GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * ucell.lat0;
