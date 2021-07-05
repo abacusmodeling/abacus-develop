@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ABACUS executable path
-abacus=ABACUS
+abacus=abacus
 # number of cores
 np=2
 # threshold with unit: eV

@@ -10,7 +10,8 @@ project(ABACUS
     HOMEPAGE_URL "https://github.com/deepmodeling/abacus-develop"
     LANGUAGES CXX
 )
-set(ABACUS_BIN_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
+
+set(ABACUS_BIN_NAME abacus)
 
 set(CMAKE_CXX_STANDARD 11)
 add_compile_options(-O2 -g)
@@ -105,7 +106,6 @@ endif()
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME}
     TYPE BIN
     DESTINATION ${CMAKE_INSTALL_BINDIR}
-    RENAME ${PROJECT_NAME}
 )
 
 enable_testing()

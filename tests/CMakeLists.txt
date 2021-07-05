@@ -4,6 +4,6 @@ find_program(BASH bash)
 
 add_test(
     NAME integrated_test
-    COMMAND ${BASH} Autotest.sh
+    COMMAND ${BASH} Autotest.sh -a "${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME}"
     WORKING_DIRECTORY ${ABACUS_TEST_DIR}
 )
