@@ -32,7 +32,7 @@ VPATH=../module_base\
 #==========================
 # Define HONG
 #==========================
-HONG= -D__CELL -D__NORMAL
+HONG= -DMETIS -DMKL_ILP64 -D__CELL -D__NORMAL
 
 FP_OBJS_0=main.o\
 $(OBJS_IO)\
