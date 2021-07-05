@@ -28,14 +28,22 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
 }
 
 
-inline void cal_psir_ylm(int size, int grid_index, double delta_r,
-						int* at, int* uc, int* block_index, int* block_iw, int* block_size, 
-						bool** cal_flag, double** psir_ylm)
+inline void cal_psir_ylm(
+	int size, 
+	int grid_index, 
+	double delta_r,
+	int* at, 
+	int* uc, 
+	int* block_index, 
+	int* block_iw, 
+	int* block_size, 
+	bool** cal_flag, 
+	double** psir_ylm)
 {
 	const Numerical_Orbital_Lm *pointer;
 	double mt[3];
 	double dr[3];
-	double distance;
+	double distance=0.0; // mohan initialize the variable 2021-07-04
 	block_index[0]=0;
 	for (int id=0; id<size; id++)
 	{
@@ -124,17 +132,29 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 	}// end id
 }
 
-inline void cal_band_rho(const int size, const int grid_index, const int LD_pool, 
-                      int* block_iw, int* block_size, int* at, int *uc, int* block_index,
-                      double ** psir_ylm, double **psir_DM, double* psir_DM_pool, 
-                      int* vindex, bool** cal_flag)
+inline void cal_band_rho(
+	const int size, 
+	const int grid_index, 
+	const int LD_pool, 
+	int* block_iw, 
+	int* block_size, 
+	int* at, 
+	int* uc, 
+	int* block_index,
+	double** psir_ylm, 
+	double** psir_DM, 
+	double* psir_DM_pool, 
+	int* vindex, 
+	bool** cal_flag)
 {
 	char trans='N';
-	double alpha_diag=1, alpha_nondiag=2, beta=1;
+	double alpha_diag=1;
+	double alpha_nondiag=2;
+	double beta=1;
 	int inc=1;
-	int cal_num;
-	
-	int iw1_lo;
+	int cal_num=0; // mohan initialize 2021-07-04
+	int iw1_lo=0;
+
 	for(int is=0; is<NSPIN; ++is)
 	{
 		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
@@ -155,7 +175,9 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 			for(int ib=0; ib<pw.bxyz; ++ib)
 			{
     			if(cal_flag[ib][ia1])
+				{
     			    ++cal_num;
+				}
 			}
 			if(cal_num>pw.bxyz/4)
 			{
@@ -242,7 +264,7 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 				}
 			}
 			//ia2>ia1
-			for (int ia2=ia1+1; ia2<size; ++ia2)
+			for(int ia2=ia1+1; ia2<size; ++ia2)
 			{			
 			    cal_num=0;
     			for(int ib=0; ib<pw.bxyz; ++ib)
@@ -293,6 +315,7 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
     				assert(offset < LNNR.nad[iat1]);
 
     				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
+
     				dgemm_(&trans, &trans, &block_size[ia2], &pw.bxyz, &block_size[ia1], &alpha_nondiag,
     					&LOC.DM_R[is][DM_start], &block_size[ia2], 
     					&psir_ylm[0][idx1], &LD_pool,
@@ -366,17 +389,20 @@ inline void cal_band_rho(const int size, const int grid_index, const int LD_pool
 	}
 }
 
-void Gint_k::calculate_charge(void)
+
+void Gint_k::cal_rho_k(void)
 {
-	TITLE("Gint_k","calculate_charge");
-	timer::tick("Gint_k","charge",'F');
+	TITLE("Gint_k","cal_rho_k");
+	timer::tick("Gint_k","cal_rho_k",'F');
 
 	const double delta_r = ORB.dr_uniform;
-	// it's a uniform grid to save orbital values, so the delta_r is a constant.
+	// it is an uniform grid to save orbital values, so the delta_r is a constant.
 	const int max_size = GridT.max_atom;
 	
-	double *psir_ylm_pool, **psir_ylm;
-	double *psir_DM_pool, **psir_DM;
+	double *psir_ylm_pool;
+	double **psir_ylm;
+	double *psir_DM_pool;
+	double **psir_DM;
 	int *block_iw; // index of wave functions of each block;	
 	int *block_size; //band size: number of columns of a band
 	int *at;
@@ -386,6 +412,7 @@ void Gint_k::calculate_charge(void)
 	bool** cal_flag;
 	//int** AllOffset;
 	int LD_pool=max_size*ucell.nwmax;
+
     if(max_size!=0)
     {
 		psir_ylm_pool=new double[pw.bxyz*LD_pool];
@@ -445,7 +472,21 @@ void Gint_k::calculate_charge(void)
 						cal_flag, psir_ylm);
 				//timer::tick("Gint_k","cal_psir_ylm",'G');
 
-				cal_band_rho(size, grid_index, LD_pool, block_iw, block_size, at, uc, block_index, psir_ylm, psir_DM, psir_DM_pool, vindex, cal_flag);
+				cal_band_rho(
+					size, 
+					grid_index, 
+					LD_pool, 
+					block_iw, 
+					block_size, 
+					at, 
+					uc, 
+					block_index, 
+					psir_ylm, 
+					psir_DM, 
+					psir_DM_pool, 
+					vindex, 
+					cal_flag);
+
 			}// int k
 		}// int j
 	} // int i
@@ -465,18 +506,21 @@ void Gint_k::calculate_charge(void)
 		delete[] at;
 		delete[] block_index;
         delete[] cal_flag;
-
 		delete[] vindex;
     }	
 
 //	cout << " calculate the charge density from density matrix " << endl;
 
-	timer::tick("Gint_k","charge",'F');
+	timer::tick("Gint_k","cal_rho_k",'F');
 	return;
 }
 
-void Gint_k::evaluate_pDMp(const int &grid_index, const int &size,
-	bool** cal_flag, double*** psir_ylm, int* vindex)
+void Gint_k::evaluate_pDMp(
+	const int &grid_index, 
+	const int &size,
+	bool** cal_flag, 
+	double*** psir_ylm, 
+	int* vindex)
 {
 	//-----------------------------------------------------
 	// in order to calculate <i,alpha,R1 | DM_R | j,beta,R2>

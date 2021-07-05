@@ -104,13 +104,13 @@ void Run_MD::opt_ions(void)
 			cout<<" Molecular Dynamics STEP "<< mdb.getRealStep()<<endl;
 			cout << " ---------------------------------------------------------" << endl;
         }
-    //----------------------------------------------------------
-    // about vdw, jiyy add vdwd3 and linpz add vdwd2
-    //----------------------------------------------------------	
-        if(INPUT.vdw_method=="d2")
-        {
-            // setup vdwd2 parameters
-	        vdwd2_para.initial_parameters(INPUT);
+		//----------------------------------------------------------
+		// about vdw, jiyy add vdwd3 and linpz add vdwd2
+		//----------------------------------------------------------	
+		if(INPUT.vdw_method=="d2")
+		{
+			// setup vdwd2 parameters
+			vdwd2_para.initial_parameters(INPUT);
 	        vdwd2_para.initset(ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
@@ -215,7 +215,10 @@ void Run_MD::opt_ions(void)
         ++istep;
     }
 
-    if(istep>1) final_scf();
+    if(istep>1) 
+	{
+		final_scf();
+	}
 
 	// mohan update 2021-02-10
     LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
@@ -287,13 +290,13 @@ void Run_MD::final_scf(void)
 
     UHM.set_lcao_matrices();
 
-    if(vdwd2_para.flag_vdwd2)							//Peize Lin add 2014-04-04, update 2021-03-09
+    if(vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
     {
         Vdwd2 vdwd2(ucell,vdwd2_para);
         vdwd2.cal_energy();
         en.evdw = vdwd2.get_energy();
     }
-	else if(vdwd3_para.flag_vdwd3)							//jiyy add 2019-05-18, update 2021-05-02
+	else if(vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
     {
         Vdwd3 vdwd3(ucell,vdwd3_para);
         vdwd3.cal_energy();

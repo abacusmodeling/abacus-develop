@@ -3,6 +3,10 @@
 
 #include "grid_technique.h"
 
+
+//---------------------------------------------------
+// FUNCTION: record the adjacent atoms for each atom
+//---------------------------------------------------
 class Record_adj
 {
 	public:

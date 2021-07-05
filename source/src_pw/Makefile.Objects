@@ -36,35 +36,65 @@ element_basis_index.o \
 restart.o \
 mymath1.o \
 mymath3.o \
+inverse_matrix.o \
 
 
 OBJS_MAIN=input.o \
 write_input.o\
 input_conv.o\
 driver.o \
-run_pw.o
+run_pw.o\
+input_update.o
 
-OBJS_PW=xc_type.o \
-xc_functional.o\
-xc_1.o\
-xc_2.o\
-xc_3.o \
-vdwd2.o\
-vdwd2_parameters.o\
-vdwd3.o\
-vdwd3_parameters.o\
-read_pp.o \
-read_pp_upf100.o \
-read_pp_upf201.o \
-read_pp_vwr.o \
-pseudo_nc.o \
-VL_in_pw.o\
-VNL_in_pw.o\
-atom_pseudo.o\
-unitcell_pseudo.o\
-threshold_elec.o\
+OBJS_IONS=MD_basic.o\
+MD_thermo.o\
+MD_fire.o\
+MD_func.o\
+ions.o \
+ions_move_methods.o\
+ions_move_bfgs.o\
+ions_move_cg.o\
+ions_move_sd.o\
+ions_move_basic.o\
+bfgs_basic.o\
+Cell_PW.o\
+run_md_pw.o\
+lattice_change_methods.o \
+lattice_change_cg.o \
+lattice_change_basic.o \
+variable_cell.o
+
+OBJS_PW=\
+charge.o \
+charge_mixing.o \
+charge_pulay.o \
+charge_broyden.o \
+charge_extra.o \
+diago_david.o\
+diago_cg.o\
 electrons.o \
+efield.o \
+energy.o \
 forces.o\
+global.o \
+hamilt_pw.o \
+hamilt.o \
+H_Ewald_pw.o\
+H_Hartree_pw.o\
+H_XC_pw.o \
+klist.o  \
+magnetism.o\
+occupy.o\
+potential.o \
+potential_libxc.o \
+pw_basis.o\
+pw_complement.o\
+soc.o\
+sto_elec.o\
+sto_wf.o\
+sto_iter.o\
+sto_hchi.o\
+sto_che.o\
 stress_pw.o\
 stress_func_cc.o\
 stress_func_gga.o\
@@ -74,71 +104,31 @@ stress_func_ewa.o\
 stress_func_har.o\
 stress_func_loc.o\
 stress_func_print.o\
-epsilon0_pwscf.o\
-epsilon0_vasp.o\
-MD_basic.o\
-MD_thermo.o\
-MD_fire.o\
-MD_func.o\
-soc.o\
-to_wannier90.o \
-unk_overlap_pw.o \
-sto_elec.o\
-sto_wf.o\
-sto_iter.o\
-sto_hchi.o\
-sto_che.o\
-pw_basis.o\
-hamilt.o \
-pw_complement.o\
-hamilt_pw.o \
-diago_david.o\
-diago_cg.o\
-inverse_matrix.o \
-energy.o \
-wavefunc.o\
-wf_atomic.o \
-wf_igk.o \
-use_fft.o\
-klist.o  \
-global.o \
 symmetry.o \
 symmetry_basic.o \
 symmetry_rho.o \
 symm_other.o \
-charge.o \
-charge_mixing.o \
-charge_pulay.o \
-charge_broyden.o \
-charge_extra.o \
+threshold_elec.o\
+use_fft.o\
+vdwd2.o\
+vdwd2_parameters.o\
+vdwd3.o\
+vdwd3_parameters.o\
+VL_in_pw.o\
+VNL_in_pw.o\
+wavefunc.o\
+wf_atomic.o \
+wf_igk.o \
+xc_1.o\
+xc_2.o\
+xc_3.o \
 xc_gga_pw.o \
-potential.o \
-H_Ewald_pw.o\
-H_Hartree_pw.o\
-H_XC_pw.o \
-potential_libxc.o \
-efield.o \
-magnetism.o\
-optical.o\
-Cell_PW.o\
-run_md_pw.o\
-ions.o \
-ions_move_methods.o\
-ions_move_bfgs.o\
-ions_move_cg.o\
-ions_move_sd.o\
-ions_move_basic.o\
-bfgs_basic.o\
-occupy.o\
-cal_test.o\
-winput.o\
-input_update.o\
-lattice_change_methods.o \
-lattice_change_cg.o \
-lattice_change_basic.o \
-variable_cell.o
+xc_type.o \
+xc_functional.o
 
 OBJS_IO=berryphase.o\
+epsilon0_pwscf.o\
+epsilon0_vasp.o\
 output.o\
 wf_io.o \
 rwstream.o\
@@ -148,13 +138,24 @@ read_cell_pseudopots.o\
 write_pot.o\
 write_rho.o\
 chi0_standard.o\
-make_dir_out.o\
 numerical_basis.o\
 numerical_descriptor.o\
-bessel_basis.o
+bessel_basis.o\
+to_wannier90.o \
+unk_overlap_pw.o \
+optical.o\
+cal_test.o\
+winput.o\
 
 OBJS_CELL=unitcell.o\
-atom_spec.o
+atom_spec.o\
+pseudo_nc.o \
+read_pp.o \
+read_pp_upf100.o \
+read_pp_upf201.o \
+read_pp_vwr.o \
+unitcell_pseudo.o\
+atom_pseudo.o\
 
 
 

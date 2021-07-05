@@ -16,14 +16,12 @@ add_library(
     efield.cpp
     electrons.cpp
     energy.cpp
-    exx_lip.cpp
     forces.cpp
     global.cpp
     hamilt.cpp
     hamilt_pw.cpp
     klist.cpp
     magnetism.cpp
-    make_dir_out.cpp
     occupy.cpp
     potential.cpp
     potential_libxc.cpp
@@ -55,7 +53,6 @@ add_library(
     vdwd3.cpp
     vdwd3_parameters.cpp
     wavefunc.cpp
-    wavefunc_in_pw.cpp
     wf_atomic.cpp
     wf_igk.cpp
     xc_1.cpp

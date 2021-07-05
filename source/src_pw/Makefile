@@ -4,19 +4,20 @@
 # Compiler information 
 #==========================
 CPLUSPLUS     = icpc
-CPLUSPLUS_MPI = mpiicpc 
-FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
-#FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
+CPLUSPLUS_MPI = mpiicpc
 OBJ_DIR = obj
 NP      = 12
 
-#==========================
-# FFTW package needed 
-#==========================
+##==========================
+## FFTW package needed 
+##==========================
+#FFTW_DIR = /home/qianrui/intelcompile/impi_fftw
+#FFTW_DIR = /home/mohan/1_Software/impi_fftw-3.3.8
 HONG_FFTW        = -D__FFTW3
-FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
-FFTW_LIB_DIR     = ${FFTW_DIR}/lib
-FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
+#FFTW_INCLUDE_DIR = ${FFTW_DIR}/include
+FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
+#FFTW_LIB_DIR     = ${FFTW_DIR}/lib
+#FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
 #==========================
 # LAPACK package needed 
@@ -71,7 +72,8 @@ $(OBJS_PW)\
 $(OBJS_PARALLEL)\
 ${OBJS_IO}\
 ${OBJS_CELL}\
-$(OBJS_MAIN)
+$(OBJS_MAIN)\
+${OBJS_IONS}
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 

@@ -34,6 +34,7 @@ class wavefunc : public WF_atomic
 	//void PAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
 
 	// wanf2: save given localized orbitals. 
+	// mohan_to_qianrui: move the LCAO_in_pw_k and LCAO_in_pw_k_q to wavefunc_in_pw.h 
 	void LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf);
 	void LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double> q);   // pengfei 2016-11-23
 
@@ -48,12 +49,12 @@ class wavefunc : public WF_atomic
 
     int get_R(int ix, int iy, int iz);     // pengfei 2016-11-23
 
-    int iw2it( int iw);
-    int iw2ia( int iw);
+    int iw2it(int iw);
+    int iw2ia(int iw);
 
     void init_after_vc(const int nks); //LiuXh 20180515
 
-    private:                              // pengfei 2016-11-23
+    private: // pengfei 2016-11-23
 
     Vector3<int> ***R;
     int ** Rmax;

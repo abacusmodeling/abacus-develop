@@ -8,6 +8,7 @@ add_library(
     ELEC_evolve.cpp
     ELEC_nscf.cpp
     ELEC_scf.cpp
+    exx_lip.cpp
     FORCE_STRESS.cpp
     FORCE_gamma.cpp
     FORCE_gamma_edm.cpp
@@ -58,5 +59,6 @@ add_library(
     record_adj.cpp
     run_md.cpp
     wfc_dm_2d.cpp
+    wavefunc_in_pw.cpp
 	H_TDDFT_pw.cpp
 )
