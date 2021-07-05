@@ -55,7 +55,7 @@ void LCAO_nnr::cal_nnr(void)
 
 	this->nnr = 0;
 	int start = 0;
-	int ind1 = 0;
+	//int ind1 = 0;
 	int iat = 0;
 
 	// (1) find the adjacent atoms of atom[T1,I1];
@@ -82,7 +82,7 @@ void LCAO_nnr::cal_nnr(void)
 			{
 				const int T2 = GridD.getType(ad);
 				const int I2 = GridD.getNatom(ad);
-				const int iat2 = ucell.itia2iat(T2, I2);
+				//const int iat2 = ucell.itia2iat(T2, I2);
 				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 				int nw2 = ucell.atoms[T2].nw * NPOL;
 
@@ -130,8 +130,8 @@ void LCAO_nnr::cal_nnr(void)
 					{
 						const int T0 = GridD.getType(ad0);
 						const int I0 = GridD.getNatom(ad0);
-						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 					
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1; 
@@ -615,8 +615,8 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					{
 						const int T0 = GridD.getType(ad0); 
 						const int I0 = GridD.getNatom(ad0); 
-						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;

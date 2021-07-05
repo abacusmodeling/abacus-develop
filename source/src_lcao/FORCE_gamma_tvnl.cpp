@@ -403,7 +403,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 												   ucell.atoms[it].nproj_soc
 								); // mohan  add 2021-05-07
 
-                        const int index = mu * ParaO.ncol + nu;
+                        //const int index = mu * ParaO.ncol + nu;
 
                         // dbeta is minus, that's consistent.
                         // only one projector for each atom force.

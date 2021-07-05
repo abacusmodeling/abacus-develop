@@ -63,7 +63,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
     //xiaohui add 2015-03-24, like density matrix calculation
 #ifdef __MPI //2015-09-06, xiaohui
     int nprocs,myid;
-    MPI_Status status;
+    //MPI_Status status;
     MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
     MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
@@ -75,7 +75,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 	ZEROS(local_bands, DSIZE);
 
 	int lastband_in_proc = 0;
-	int lastband_number = 0;
+	//int lastband_number = 0;
 	int count_bands = 0;
 	for (int i=0; i<DSIZE; i++)
 	{
@@ -91,7 +91,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		if (count_bands >= NBANDS)
 		{
 			lastband_in_proc = i;
-			lastband_number = NBANDS - (count_bands - local_bands[i]);
+			//lastband_number = NBANDS - (count_bands - local_bands[i]);
 			break;
 		}
 	}
@@ -106,10 +106,9 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 			ZEROS(w1[is], local_band);
 		}
 
-		int total_bands = 0;
 
-		time_t time_wg2w1_start = time(NULL);
-		double Time_Wg2w1_Start = (double)clock();
+		//time_t time_wg2w1_start = time(NULL);
+		//double Time_Wg2w1_Start = (double)clock();
 
 		int Total_Bands = 0;
 		int Nbands = -1;
@@ -141,8 +140,8 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 			ZEROS(Z_wg[is], local_band * NLOCAL);
 		}
 
-		time_t time_Z_wg_start = time(NULL);
-		double Time_Z_Wg_Start = (double)clock();
+		//time_t time_Z_wg_start = time(NULL);
+		//double Time_Z_Wg_Start = (double)clock();
 
 		if(myid <= lastband_in_proc)
 		{
@@ -164,10 +163,10 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 
 		time_t time_Z_wg_end = time(NULL);
 		double Time_Z_Wg_End =(double)clock();
-		double time_Z_wg = difftime(time_Z_wg_start,time_Z_wg_end);
+		//double time_Z_wg = difftime(time_Z_wg_start,time_Z_wg_end);
 
 		double coll_time = 0.0;
-		double Time_Cal_Start = (double)clock();
+		//double Time_Cal_Start = (double)clock();
 
 		int row_col = NLOCAL/300;
 		if(row_col >= 1)
