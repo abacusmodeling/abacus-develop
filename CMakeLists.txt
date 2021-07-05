@@ -11,14 +11,15 @@ project(ABACUS
     LANGUAGES CXX
 )
 
-set(ABACUS_BIN_NAME abacus)
-
 set(CMAKE_CXX_STANDARD 11)
 add_compile_options(-O2 -g)
 
+set(ABACUS_BIN_NAME abacus)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
 set(ABACUS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set(ABACUS_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+set(ABACUS_BIN_PATH ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME})
+
 include_directories(${ABACUS_SOURCE_DIR})
 
 find_package(Boost REQUIRED)
@@ -96,6 +97,7 @@ if(DEFINED MKL_DIR)
   )
 else()
   target_link_libraries(${ABACUS_BIN_NAME}
+    -lgfortran
     FFTW3::FFTW3
     ScaLAPACK::ScaLAPACK
     LAPACK::LAPACK
@@ -103,7 +105,7 @@ else()
   )
 endif()
 
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${ABACUS_BIN_NAME}
+install(PROGRAMS ${ABACUS_BIN_PATH}
     TYPE BIN
     DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

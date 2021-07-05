@@ -123,13 +123,13 @@ for dir in $testdir; do
 		test -d OUT.autotest || echo "Some errors happened in ABACUS!"
 		test -d OUT.autotest || exit 0
 
-		if test -z $1
-		then
-			../tools/catch_properties.sh result.out
-			check_out result.out
-		else
-			../tools/catch_properties.sh result.ref
-		fi
+		# if test -z $1
+		# then
+		../tools/catch_properties.sh result.out
+		check_out result.out
+		# else
+			# ../tools/catch_properties.sh result.ref
+		# fi
 	}
 
 	echo ""

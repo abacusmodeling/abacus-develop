@@ -6,13 +6,10 @@ on:
       - develop
       - reconstruction
 
-env:
-  CONTAINER: ghcr.io/deepmodeling/abacus-development-kit:gnu
-
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: ${{ env.CONTAINER }}
+    container: ghcr.io/deepmodeling/abacus-development-kit:gnu
     steps:
       - name: Checkout
         uses: actions/checkout@v2
