@@ -311,10 +311,10 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						for (int ig = 0; ig < pw.ngmc ; ig++)
 						{
 							const complex<double> swap = pw.strucFac(it, ig)* rho_lgl[pw.ig2ngg[ig]];
-							//rho_g3d(0, ig) += swap * mag.nelup_percent(it);
-							//rho_g3d(1, ig) += swap * mag.neldw_percent(it);
-							const double up = 0.5 * ( 1 + mag.start_magnetization[it] / atom->zv );
-							const double dw = 0.5 * ( 1 - mag.start_magnetization[it] / atom->zv );
+							//rho_g3d(0, ig) += swap * ucell.magnet.nelup_percent(it);
+							//rho_g3d(1, ig) += swap * ucell.magnet.neldw_percent(it);
+							const double up = 0.5 * ( 1 + ucell.magnet.start_magnetization[it] / atom->zv );
+							const double dw = 0.5 * ( 1 - ucell.magnet.start_magnetization[it] / atom->zv );
 							rho_g3d(0, ig) += swap * up;
 							rho_g3d(1, ig) += swap * dw;
 						}
@@ -358,17 +358,17 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 							rho_g3d(0, ig) += swap ;
 							if(DOMAG)
 							{
-								rho_g3d(1, ig) += swap * (mag.start_magnetization[it] / atom->zv) 
-								* sin(mag.angle1_[it]) * cos(mag.angle2_[it]);
-								rho_g3d(2, ig) += swap * (mag.start_magnetization[it] / atom->zv) 
-								* sin(mag.angle1_[it]) * sin(mag.angle2_[it]);
-								rho_g3d(3, ig) += swap * (mag.start_magnetization[it] / atom->zv) 
-								* cos(mag.angle1_[it]);
+								rho_g3d(1, ig) += swap * (ucell.magnet.start_magnetization[it] / atom->zv) 
+								* sin(ucell.magnet.angle1_[it]) * cos(ucell.magnet.angle2_[it]);
+								rho_g3d(2, ig) += swap * (ucell.magnet.start_magnetization[it] / atom->zv) 
+								* sin(ucell.magnet.angle1_[it]) * sin(ucell.magnet.angle2_[it]);
+								rho_g3d(3, ig) += swap * (ucell.magnet.start_magnetization[it] / atom->zv) 
+								* cos(ucell.magnet.angle1_[it]);
 							}
 							else if(DOMAG_Z)
 							{
-								//rho_g3d(3, ig) += swap * mag.start_magnetization[it];
-								rho_g3d(3, ig) += swap * (mag.start_magnetization[it] / atom->zv);
+								//rho_g3d(3, ig) += swap * ucell.magnet.start_magnetization[it];
+								rho_g3d(3, ig) += swap * (ucell.magnet.start_magnetization[it] / atom->zv);
 							}
 						}
 					}
@@ -391,11 +391,11 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 								if(DOMAG)
 								{
 									rho_g3d(1, ig) += swap * (atom->mag[ia] / atom->zv) 
-										* sin(mag.angle1_[it]) * cos(mag.angle2_[it]);
+										* sin(ucell.magnet.angle1_[it]) * cos(ucell.magnet.angle2_[it]);
 									rho_g3d(2, ig) += swap * (atom->mag[ia] / atom->zv) 
-										* sin(mag.angle1_[it]) * sin(mag.angle2_[it]);
+										* sin(ucell.magnet.angle1_[it]) * sin(ucell.magnet.angle2_[it]);
 									rho_g3d(3, ig) += swap * (atom->mag[ia] / atom->zv) 
-										* cos(mag.angle1_[it]);
+										* cos(ucell.magnet.angle1_[it]);
 								}
 								else if(DOMAG_Z)
 								{
@@ -462,8 +462,8 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 
 //	for(int it=0; it<ucell.ntype; it++)
 //	{
-		//cout << " nelup_percent = " << mag.nelup_percent(it) << endl;
-		//cout << " neldw_percent = " << mag.neldw_percent(it) << endl;
+		//cout << " nelup_percent = " << ucell.magnet.nelup_percent(it) << endl;
+		//cout << " neldw_percent = " << ucell.magnet.neldw_percent(it) << endl;
 //	}
 
 
@@ -485,7 +485,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	// if TWO_EFEMI, 
 	// the total magnetism will affect the calculation of
 	// occupations.
-	// mag.compute_magnetization();
+	// ucell.magnet.compute_magnetization();
 
 	//ofs_running << " Superposition of atomic wave function as First-Charge done." << endl;
 	//2014-06-22
@@ -1139,12 +1139,12 @@ void Charge::cal_nelec(void)
 	else
 	{
 		if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
-		if(NBANDS < mag.get_nelup() ) 
+		if(NBANDS < ucell.magnet.get_nelup() ) 
 		{
-			OUT(ofs_running,"nelup",mag.get_nelup());
+			OUT(ofs_running,"nelup",ucell.magnet.get_nelup());
 			WARNING_QUIT("unitcell","Too few spin up bands!");
 		}
-		if(NBANDS < mag.get_neldw() )
+		if(NBANDS < ucell.magnet.get_neldw() )
         {
             WARNING_QUIT("unitcell","Too few spin down bands!");
         }

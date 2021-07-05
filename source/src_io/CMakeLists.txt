@@ -20,8 +20,6 @@ add_library(
     optical.cpp
     output.cpp
     print_info.cpp
-    read_atoms.cpp
-    read_cell_pseudopots.cpp
     read_dm.cpp
     read_rho.cpp
     restart.cpp

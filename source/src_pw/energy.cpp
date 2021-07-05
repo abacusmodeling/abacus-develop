@@ -234,16 +234,16 @@ void energy::print_etot(
 				if(NSPIN==2)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<mag.tot_magnetization;
-					cout<<setw(10)<<mag.abs_magnetization;
+					cout<<setw(10)<<ucell.magnet.tot_magnetization;
+					cout<<setw(10)<<ucell.magnet.abs_magnetization;
 				}
 				else if(NSPIN==4 && NONCOLIN)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<mag.tot_magnetization_nc[0]
-					<<setw(10)<<mag.tot_magnetization_nc[1]
-					<<setw(10)<<mag.tot_magnetization_nc[2];
-					cout<<setw(10)<<mag.abs_magnetization;
+					cout<<setw(10)<<ucell.magnet.tot_magnetization_nc[0]
+					<<setw(10)<<ucell.magnet.tot_magnetization_nc[1]
+					<<setw(10)<<ucell.magnet.tot_magnetization_nc[2];
+					cout<<setw(10)<<ucell.magnet.abs_magnetization;
 				}
 				if(dr2>1.0)
 				{
@@ -287,8 +287,8 @@ void energy::print_etot(
 			if(NSPIN==2)
 			{
 				cout << setprecision(2);
-				cout<<setw(10)<<mag.tot_magnetization;
-				cout<<setw(10)<<mag.abs_magnetization;
+				cout<<setw(10)<<ucell.magnet.tot_magnetization;
+				cout<<setw(10)<<ucell.magnet.abs_magnetization;
 			}
 			cout << setprecision(6);
 			cout << setw(15) << en.etot*Ry_to_eV;

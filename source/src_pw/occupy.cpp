@@ -41,8 +41,8 @@ void Occupy::calculate_weights(void)
     {
         if (TWO_EFERMI)
         {
-            iweights(kv.nks, kv.wk, NBANDS, mag.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, kv.isk);
-            iweights(kv.nks, kv.wk, NBANDS, mag.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, kv.isk);
+            iweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, kv.isk);
+            iweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, kv.isk);
 			//ef = ( ef_up + ef_dw ) / 2.0_dp need??? mohan add 2012-04-16
         }
         else
@@ -65,9 +65,9 @@ void Occupy::calculate_weights(void)
 		{
 			double demet_up = 0.0;
 			double demet_dw = 0.0;
-			Occupy::gweights(kv.nks, kv.wk, NBANDS, mag.get_nelup(), gaussian_parameter, gaussian_type,
+			Occupy::gweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
 			                 wf.ekb, en.ef_up, demet_up, wf.wg, 0, kv.isk);
-			Occupy::gweights(kv.nks, kv.wk, NBANDS, mag.get_neldw(), gaussian_parameter, gaussian_type,
+			Occupy::gweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
 			                 wf.ekb, en.ef_dw, demet_dw, wf.wg, 1, kv.isk);
 			en.demet = demet_up + demet_dw;
                         

@@ -1,8 +1,11 @@
-#include "../module_cell/unitcell_pseudo.h"
+#include "unitcell_pseudo.h"
 #ifdef __LCAO
 #include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
+
+#ifndef __CELL
 #include "../src_pw/global.h"
+#endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 void UnitCell_pseudo::read_atom_species(ifstream &ifa)
@@ -223,7 +226,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << endl;
 				return 0;
 			}
-			READ_VALUE(ifpos, mag.start_magnetization[it] );
+			READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
 			OUT(ofs_running, "atom label",atoms[it].label);
 
@@ -231,30 +234,30 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			{
 				if(NONCOLIN)
 				{
-					mag.m_loc_[it].x = mag.start_magnetization[it] *
-							sin(mag.angle1_[it]) * cos(mag.angle2_[it]);
-					mag.m_loc_[it].y = mag.start_magnetization[it] *
-							sin(mag.angle1_[it]) * sin(mag.angle2_[it]);
-					mag.m_loc_[it].z = mag.start_magnetization[it] *
-							cos(mag.angle1_[it]);
+					magnet.m_loc_[it].x = magnet.start_magnetization[it] *
+							sin(magnet.angle1_[it]) * cos(magnet.angle2_[it]);
+					magnet.m_loc_[it].y = magnet.start_magnetization[it] *
+							sin(magnet.angle1_[it]) * sin(magnet.angle2_[it]);
+					magnet.m_loc_[it].z = magnet.start_magnetization[it] *
+							cos(magnet.angle1_[it]);
 				}
 				else
 				{
-					mag.m_loc_[it].x = 0;
-					mag.m_loc_[it].y = 0;
-					mag.m_loc_[it].z = mag.start_magnetization[it];
+					magnet.m_loc_[it].x = 0;
+					magnet.m_loc_[it].y = 0;
+					magnet.m_loc_[it].z = magnet.start_magnetization[it];
 				}
 
-				OUT(ofs_running, "noncollinear magnetization_x",mag.m_loc_[it].x);
-				OUT(ofs_running, "noncollinear magnetization_y",mag.m_loc_[it].y);
-				OUT(ofs_running, "noncollinear magnetization_z",mag.m_loc_[it].z);
+				OUT(ofs_running, "noncollinear magnetization_x",magnet.m_loc_[it].x);
+				OUT(ofs_running, "noncollinear magnetization_y",magnet.m_loc_[it].y);
+				OUT(ofs_running, "noncollinear magnetization_z",magnet.m_loc_[it].z);
 
-				ZEROS(mag.ux_ ,3);
+				ZEROS(magnet.ux_ ,3);
 			}
 			else if(NSPIN==2)
 			{
-				mag.m_loc_[it].x = mag.start_magnetization[it];
-				OUT(ofs_running, "start magnetization",mag.start_magnetization[it]);
+				magnet.m_loc_[it].x = magnet.start_magnetization[it];
+				OUT(ofs_running, "start magnetization",magnet.start_magnetization[it]);
 			}
 			else if(NSPIN==1)
 			{
@@ -358,10 +361,10 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				this->atoms[it].nw = 0;
 
 				this->atoms[it].nwl = 2;
-				//cout << INPUT.lmaxmax << endl;
-				if ( INPUT.lmaxmax != 2 )
+				//cout << lmaxmax << endl;
+				if ( lmaxmax != 2 )
 				{
-					this->atoms[it].nwl = INPUT.lmaxmax;
+					this->atoms[it].nwl = lmaxmax;
 				}
 				for(int L=0; L<atoms[it].nwl+1; L++)
 				{
@@ -580,7 +583,7 @@ bool UnitCell_pseudo::check_tau(void)const
 					else
 					{
 						diff = atoms[T1].tau[I1] - atoms[T2].tau[I2];
-						norm = diff.norm() * ucell.lat0;
+						norm = diff.norm() * lat0;
 						if( shortest_norm > norm )
 						{
 							shortest_norm = norm;
@@ -660,7 +663,7 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		{
 			ofs << endl;
 			ofs << atoms[it].label << " #label" << endl;
-			ofs << mag.start_magnetization[it] << " #magnetism" << endl;
+			ofs << magnet.start_magnetization[it] << " #magnetism" << endl;
 			//2015-05-07, modify
 			//ofs << atoms[it].nwl << " #max angular momentum" << endl;
 			//xiaohui modify 2015-03-15
@@ -683,7 +686,7 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		{
 			ofs << endl;
 			ofs << atoms[it].label << " #label" << endl;
-			ofs << mag.start_magnetization[it] << " #magnetism" << endl;
+			ofs << magnet.start_magnetization[it] << " #magnetism" << endl;
 			//ofs << atoms[it].nwl << " #max angular momentum" << endl;
 			//xiaohui modify 2015-03-15
 			//for(int l=0; l<=atoms[it].nwl; l++)
@@ -710,7 +713,7 @@ void UnitCell_pseudo::print_tau(void)const
     TITLE("UnitCell_pseudo","print_tau");
     if(Coordinate == "Cartesian" || Coordinate == "Cartesian_angstrom")
     {
-        ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << ucell.lat0 << " Bohr )." << endl;
+        ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << lat0 << " Bohr )." << endl;
         ofs_running << setw(13) << " atom"
         //<< setw(20) << "x" 
         //<< setw(20) << "y" 
@@ -724,12 +727,12 @@ void UnitCell_pseudo::print_tau(void)const
         ofs_running << setprecision(12);
 
         int iat=0;
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<ntype; it++)
         {
-            for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+            for (int ia = 0; ia < atoms[it].na; ia++)
             {
                 stringstream ss;
-                ss << "tauc_" << ucell.atoms[it].label << ia+1;
+                ss << "tauc_" << atoms[it].label << ia+1;
 
                 ofs_running << " " << setw(12) << ss.str()
                 //<< setw(20) << atoms[it].tau[ia].x 
@@ -740,7 +743,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].tau[ia].y
                 << setw(20) << atoms[it].tau[ia].z
                 //<< setw(20) << atoms[it].mag[ia]
-                << setw(20) << mag.start_magnetization[it]
+                << setw(20) << magnet.start_magnetization[it]
                 << endl;
 
                 ++iat;
@@ -763,12 +766,12 @@ void UnitCell_pseudo::print_tau(void)const
         << endl;
 
         int iat=0;
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<ntype; it++)
         {
-            for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+            for (int ia = 0; ia < atoms[it].na; ia++)
             {
                 stringstream ss;
-                ss << "taud_" << ucell.atoms[it].label << ia+1;
+                ss << "taud_" << atoms[it].label << ia+1;
 
                 ofs_running << " " << setw(12) << ss.str()
                 //<< setw(20) << atoms[it].taud[ia].x
@@ -779,7 +782,7 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].taud[ia].y
                 << setw(20) << atoms[it].taud[ia].z
                 //<< setw(20) << atoms[it].mag[ia]
-                << setw(20) << mag.start_magnetization[it]
+                << setw(20) << magnet.start_magnetization[it]
                 << endl;
 
                 ++iat;

@@ -5,10 +5,21 @@
 VERSION= ABACUS-cell
 HEADERS= *.h
 
-OBJS_BASE=tool_title.o\
-tool_quit.o\
+OBJS_IO=output.o\
+
+OBJS_PW=magnetism.o\
+
+OBJS_BASE=matrix3.o\
+matrix.o\
+intarray.o\
+complexarray.o\
 timer.o\
-output.o\
+realarray.o\
+global_file.o\
+global_function.o\
+global_variable.o\
+tool_title.o\
+tool_quit.o\
 
 OBJS_ORBITAL=pseudo_nc.o\
 atom_spec.o\
@@ -19,3 +30,5 @@ read_pp_upf201.o\
 read_pp_vwr.o\
 unitcell.o\
 unitcell_pseudo.o\
+read_atoms.o\
+read_cell_pseudopots.o\
