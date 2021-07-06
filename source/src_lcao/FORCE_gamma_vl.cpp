@@ -76,7 +76,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             const int iat = ucell.iwt2iat[i];
             for(int j=0; j<NLOCAL; j++)
             {
-                const int iat2 = ucell.iwt2iat[j];
+                //const int iat2 = ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];
                 const int nu = ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0 )
@@ -214,7 +214,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             const int iat = ucell.iwt2iat[i];
             for(int j=0; j<NLOCAL; j++)
             {
-                const int iat2 = ucell.iwt2iat[j];
+                //const int iat2 = ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];
                 const int nu = ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0 )
