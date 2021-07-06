@@ -9,7 +9,7 @@ threshold=0.0000001
 # check accuracy
 ca=8
 # regex of case name
-case="^[^#].*_PW_.*$"
+case="^[^#].*01_PW_.*$"
 
 
 while getopts a:n:t:c:r,g flag
@@ -91,15 +91,21 @@ check_out(){
 		# Daye Zheng found bug on 2021-06-20,
 		# deviation should be positively defined
 		#--------------------------------------------------
-		if [ $(echo "sqrt($deviation*$deviation) < $threshold"|bc) = 0 ]; then
-			echo -e "\e[1;31m [  FAILED  ] \e[0m"\
-				"$key cal=$cal ref=$ref deviation=$deviation"
+		if [ ! -n "$deviation" ]; then
+            echo -e "\e[1;31m Fatal Error! :(  \e[0m"
 			let failed++
 			break
-		else
-			#echo "$key cal=$cal ref=$ref deviation=$deviation"
-			#echo "[ PASS ] $key"
-			echo -e "\e[1;32m [      OK  ] \e[0m $key"
+        else
+			if [ $(echo "sqrt($deviation*$deviation) < $threshold"|bc) = 0 ]; then
+				echo -e "\e[1;31m [  FAILED  ] \e[0m"\
+					"$key cal=$cal ref=$ref deviation=$deviation"
+				let failed++
+				break
+			else
+				#echo "$key cal=$cal ref=$ref deviation=$deviation"
+				#echo "[ PASS ] $key"
+				echo -e "\e[1;32m [      OK  ] \e[0m $key"
+			fi
 		fi
 		let ok++
 	done
