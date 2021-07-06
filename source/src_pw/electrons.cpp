@@ -237,7 +237,7 @@ void Electrons::self_consistent(const int &istep)
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
-        mag.compute_magnetization();
+        ucell.magnet.compute_magnetization();
 
         //(8) deband is calculated from "output" charge density calculated 
         // in sum_band

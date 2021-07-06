@@ -1,15 +1,20 @@
 FROM debian:buster-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libboost-dev libssl-dev make ssh vim wget \
+RUN apt-get update && apt-get install -y --no-install-recommends git gfortran libboost-dev libssl-dev make ssh vim wget bc \
     && apt-get install -y --no-install-recommends mpich libmpich-dev
 
 ENV GIT_SSL_NO_VERIFY 1
 
 RUN cd /tmp \
-    && wget https://cmake.org/files/v3.18/cmake-3.18.4.tar.gz --no-check-certificate \
-    && tar xf cmake-3.18.4.tar.gz cmake-3.18.4/ && cd cmake-3.18.4 \
+    && wget https://cmake.org/files/v3.20/cmake-3.20.5.tar.gz --no-check-certificate \
+    && tar xf cmake-3.20.5.tar.gz cmake-3.20.5/ && cd cmake-3.20.5 \
     && ./configure && make -j8 && make install \
-    && cd /tmp && rm -rf cmake-3.18.4
+    && cd /tmp && rm -rf cmake-3.20.5
+
+RUN cd /tmp \
+    && git clone https://github.com/USCiLab/cereal.git \
+    && cp -r cereal/include /usr/local \
+    && rm -rf cereal
 
 RUN cd /tmp \
     && git clone https://github.com/xianyi/OpenBLAS.git --single-branch --depth=1 \
@@ -37,12 +42,5 @@ RUN cd /tmp \
     && ./configure --enable-mpi-fortran --enable-orterun-prefix-by-default FC=gfortran \
     && make -j8 && make PREFIX=/usr/local install \
     && cd /tmp && rm -rf fftw-3.3.9 && rm fftw-3.3.9.tar.gz
-
-RUN cd /tmp \
-    && git clone https://github.com/USCiLab/cereal.git \
-    && cp -r cereal/include /usr/local \
-    && rm -rf cereal
-
-RUN apt-get install -y bc
 
 ENV LD_LIBRARY_PATH /usr/local/lib

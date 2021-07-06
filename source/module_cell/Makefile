@@ -3,10 +3,10 @@
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = icpc
+CPLUSPLUS     = mpiicpc
 CPLUSPLUS_MPI = icpc 
 OBJ_DIR = obj
-NP      = 1
+NP      = 4
 
 #==========================
 # LIBS and INCLUDES
@@ -24,7 +24,7 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 
 include Makefile.Objects
 
-VPATH=../src_global\
+VPATH=../module_base\
 :../src_io\
 :../src_pw\
 :./\
@@ -32,9 +32,11 @@ VPATH=../src_global\
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__NORMAL
+HONG= -DMETIS -DMKL_ILP64 -D__CELL -D__NORMAL
 
 FP_OBJS_0=main.o\
+$(OBJS_IO)\
+$(OBJS_PW)\
 $(OBJS_BASE)\
 $(OBJS_ORBITAL)\
 
@@ -45,14 +47,14 @@ FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 #==========================
 cell : 
 	@ make init
-	@ make -j $(NP) serial
+	@ make -j $(NP) parallel
 
 init :
 	@ if [ ! -d $(OBJ_DIR) ]; then mkdir $(OBJ_DIR); fi
 	@ if [ ! -d $(OBJ_DIR)/README ]; then echo "This directory contains all of the .o files" > $(OBJ_DIR)/README; fi
 
-serial : ${FP_OBJS} 
-	${CPLUSPLUS} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
+parallel : ${FP_OBJS} 
+	${CPLUSPLUS_MPI} ${OPTS} $(FP_OBJS) ${LIBS} -o ${VERSION}.x 
 
 #==========================
 # rules
@@ -63,3 +65,4 @@ ${OBJ_DIR}/%.o:%.cpp
 .PHONY:clean
 clean:
 	@ if [ -d $(OBJ_DIR) ]; then rm -rf $(OBJ_DIR); fi
+	@ if [ -e ${VERSION}.x ]; then rm -f ${VERSION}.x; fi

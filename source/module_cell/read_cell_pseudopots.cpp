@@ -2,7 +2,11 @@
 #ifdef __LCAO
 //#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
+
+#ifndef __CELL
 #include "../src_pw/global.h"
+#endif
+
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
 
@@ -112,15 +116,15 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 }
 
 
-void UnitCell_pseudo::print_unitcell_pseudo(const string &fn)
+void UnitCell_pseudo::print_unitcell_pseudo(const string &fn, output &outp)
 {
 	if(test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
 	ofstream ofs( fn.c_str() );
 
-	this->print_cell(ofs, out);
+	this->print_cell(ofs, outp);
 	for (int i = 0;i < ntype;i++)
 	{
-		atoms[i].print_Atom(ofs, out);
+		atoms[i].print_Atom(ofs, outp);
 	}
 
 	ofs.close();

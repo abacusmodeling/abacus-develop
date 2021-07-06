@@ -47,8 +47,6 @@ void Run_MD_PW::md_ions_pw(void)
     int mdtype = INPUT.mdp.mdtype;
 
     this->istep = 1;
-    int force_step = 1; // pengfei Li 2018-05-14
-    int stress_step = 1;
     bool stop = false;
 
     while (istep <= NSTEP && !stop)

@@ -16,6 +16,7 @@ public: // member variables
 	// nmax  : Max N used for localized orbital.
 	// lmax_ppwf : Max L of pseudo wave functinos
 	// nelec : total number of electrons
+	// lmaxmax : revert from INPUT
 	//============================================================
 	int meshx;
 	int natomwfc;
@@ -23,6 +24,7 @@ public: // member variables
 	int nmax;
 	int nmax_total;//mohan add 2009-09-10
 	int lmax_ppwf;
+	int lmaxmax; // liuyu 2021-07-04
 	//double nelec;
 
 public: // member functions
@@ -52,7 +54,7 @@ public: // member functions
 	//void cal_nelec();
 	void cal_meshx();
 	void cal_natomwfc(); 
-	void print_unitcell_pseudo(const string &fn);
+	void print_unitcell_pseudo(const string &fn, output &outp);
 	bool check_tau(void)const; //mohan add 2011-03-03
 
 #ifdef __MPI

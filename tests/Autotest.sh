@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ABACUS executable path
-abacus=ABACUS
+abacus=abacus
 # number of cores
 np=2
 # threshold with unit: eV
@@ -73,8 +73,8 @@ check_out(){
 		# computed the deviation between the calculated
 		# and reference value
 		#--------------------------------------------------
-		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$CA'f\n",x-y}'`
-		deviation1=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$CA'f\n",y-x}'`
+		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",x-y}'`
+		deviation1=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",y-x}'`
 
 		if [ $key == "totaltimeref" ]; then
 			# echo "time=$cal ref=$ref"
@@ -123,13 +123,13 @@ for dir in $testdir; do
 		test -d OUT.autotest || echo "Some errors happened in ABACUS!"
 		test -d OUT.autotest || exit 0
 
-		if test -z $1
-		then
-			../tools/catch_properties.sh result.out
-			check_out result.out
-		else
-			../tools/catch_properties.sh result.ref
-		fi
+		# if test -z $1
+		# then
+		../tools/catch_properties.sh result.out
+		check_out result.out
+		# else
+			# ../tools/catch_properties.sh result.ref
+		# fi
 	}
 
 	echo ""

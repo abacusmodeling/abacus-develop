@@ -47,12 +47,19 @@ class LCAO_nnr
 
 	void cal_max_box_index(void);
 
-	int maxB1, maxB2, maxB3;
-	int minB1, minB2, minB3;
-	int nB1, nB2, nB3;
-	int nbox;
+	int maxB1;
+	int maxB2;
+	int maxB3;
 
-	
+	int minB1;
+	int minB2;
+	int minB3;
+
+	int nB1;
+	int nB2;
+	int nB3;
+
+	int nbox;
 };
 
 extern LCAO_nnr LNNR;

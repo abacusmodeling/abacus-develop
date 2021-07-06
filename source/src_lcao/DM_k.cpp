@@ -53,13 +53,22 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
 
 #include "record_adj.h"
-inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Record_adj RA,
-                   const int ia1, const int iw1_lo, const int nw1, const int gstart, 
-                   complex<double> *WFC_PHASE, complex<double> **DM_ATOM)
+inline void cal_DM_ATOM(
+	const Grid_Technique &gt, 
+	const complex<double> fac, 
+	Record_adj RA,
+ 	const int ia1, 
+	const int iw1_lo, 
+	const int nw1, 
+	const int gstart, 
+	complex<double> *WFC_PHASE, 
+	complex<double> **DM_ATOM)
 {
 
-    const char transa='N', transb='T';  
-    const complex<double> alpha=1, beta=1;
+    const char transa='N';
+	const char transb='T';  
+    const complex<double> alpha=1;
+	const complex<double> beta=1;
 
     for(int ik=0; ik<kv.nks; ik++)
     {
@@ -108,6 +117,7 @@ inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Rec
                 &wfc[ibStart][iw2_lo], &gt.lgd, 
                 WFC_PHASE, &nw1,
                 &beta, DM, &nw2);           
+
             atom2start+=nw1*nw2;
         } // ia2
     } // ik
@@ -115,13 +125,27 @@ inline void cal_DM_ATOM(const Grid_Technique &gt, const complex<double> fac, Rec
 }
 
 //added by zhengdy-soc, for non-collinear case
-inline void cal_DM_ATOM_nc(const Grid_Technique &gt, const complex<double> fac, Record_adj RA,
-                   const int ia1, const int iw1_lo, const int nw1, const int gstart, 
-                   complex<double> *WFC_PHASE, complex<double> **DM_ATOM)
+inline void cal_DM_ATOM_nc(
+	const Grid_Technique &gt, 
+	const complex<double> fac, 
+	Record_adj RA,
+	const int ia1, 
+	const int iw1_lo, 
+	const int nw1, 
+	const int gstart, 
+	complex<double> *WFC_PHASE, 
+	complex<double> **DM_ATOM)
 {
-    if(NSPIN !=4 ) WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
-    const char transa='N', transb='T';  
-    const complex<double> alpha=1, beta=1;
+
+    if(NSPIN !=4 ) 
+	{
+		WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
+	}
+
+    const char transa='N';
+	const char transb='T';  
+    const complex<double> alpha=1;
+	const complex<double> beta=1;
     int ispin=0;
 
     for(int is1=0;is1<2;is1++)
@@ -191,7 +215,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     TITLE("Local_Orbital_Charge","cal_dk_k");
     timer::tick("LCAO_Charge","cal_dk_k",'F');  
     //int nnrg = 0;
-    Vector3<double> tau1, dtau;
+    Vector3<double> tau1;
+	Vector3<double> dtau;
         
     Record_adj RA;
     RA.for_grid(gt);
@@ -203,6 +228,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     
     int DM_ATOM_SIZE=1; 
     complex<double> **DM_ATOM=new complex<double> *[NSPIN];
+
     for(int is=0; is<NSPIN; ++is)
     {
         DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];

@@ -5,8 +5,8 @@
 
 //----------------------------
 // define a global class obj.
-LCAO_nnr LNNR;
 //----------------------------
+LCAO_nnr LNNR;
 
 LCAO_nnr::LCAO_nnr()
 {
@@ -55,12 +55,17 @@ void LCAO_nnr::cal_nnr(void)
 
 	this->nnr = 0;
 	int start = 0;
-	int ind1 = 0;
+	//int ind1 = 0;
 	int iat = 0;
 
 	// (1) find the adjacent atoms of atom[T1,I1];
-	Vector3<double> tau1, tau2, dtau;
-	Vector3<double> tau0, dtau1, dtau2;
+	Vector3<double> tau1;
+	Vector3<double> tau2;
+	Vector3<double> dtau;
+	Vector3<double> tau0;
+	Vector3<double> dtau1;
+	Vector3<double> dtau2;
+
 	for (int T1 = 0; T1 < ucell.ntype; T1++)
 	{
 		for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++)
@@ -77,7 +82,7 @@ void LCAO_nnr::cal_nnr(void)
 			{
 				const int T2 = GridD.getType(ad);
 				const int I2 = GridD.getNatom(ad);
-				const int iat2 = ucell.itia2iat(T2, I2);
+				//const int iat2 = ucell.itia2iat(T2, I2);
 				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 				int nw2 = ucell.atoms[T2].nw * NPOL;
 
@@ -125,8 +130,8 @@ void LCAO_nnr::cal_nnr(void)
 					{
 						const int T0 = GridD.getType(ad0);
 						const int I0 = GridD.getNatom(ad0);
-						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 					
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1; 
@@ -178,8 +183,6 @@ void LCAO_nnr::cal_nnr(void)
 //		cout << " nlocstart[" << iat << "]=" << nlocstart[iat] << endl;
 //	}
 
-
-
 	return;
 }
 
@@ -204,9 +207,6 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	ZEROS(nlocdimg, ucell.nat);
 	ZEROS(nlocstartg, ucell.nat);
 
-//	stringstream ss;
-//	ss << global_out_dir << "sltk_box.dat";
-//	ofstream ofs(ss.str().c_str());
 
 	Vector3<double> tau1, tau2, dtau;
 	Vector3<double> dtau1, dtau2, tau0;
@@ -216,8 +216,9 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 		for (int I1 = 0; I1 < atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
-			//GridD.Find_atom(tau1);
+
 			GridD.Find_atom(ucell, tau1, T1, I1);
+
 			const int iat = ucell.itia2iat(T1,I1);
 
 			// for grid integration (on FFT box),
@@ -252,12 +253,12 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 
 
 						//if(distance < rcut)
-			// mohan reset this 2013-07-02 in Princeton
-			// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
-			// this should be consistant with LCAO_nnr::cal_nnrg function 
-			// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
-			// distance = 7.0000000000000000
-			// ORB.Phi[it].getRcut = 7.0000000000000008
+						// mohan reset this 2013-07-02 in Princeton
+						// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
+						// this should be consistant with LCAO_nnr::cal_nnrg function 
+						// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
+						// distance = 7.0000000000000000
+						// ORB.Phi[it].getRcut = 7.0000000000000008
 						if(distance < rcut - 1.0e-15)
 						{
 							const int nelement = atom1->nw * atom2->nw;//modified by zhengdy-soc, no need to double
@@ -317,9 +318,8 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 			}// end iat
 		}// end I1
 	}// end T1
-	//ofs.close();
-	if(OUT_LEVEL != "m") OUT(ofs_running,"nnrg",this->nnrg);
 
+	if(OUT_LEVEL != "m") OUT(ofs_running,"nnrg",this->nnrg);
 
 	//--------------------------------------------------
 	// search again, to order each (iat2, b1, b2, b3)
@@ -331,10 +331,16 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	//--------------------------------------------------
 	if(allocate_find_R2)
 	{
-		for(int iat=0; iat<ucell.nat; iat++)delete[] find_R2[iat];
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			delete[] find_R2[iat];
+		}
 		delete[] find_R2;
 
-		for(int iat=0; iat<ucell.nat; iat++)delete[] find_R2st[iat];
+		for(int iat=0; iat<ucell.nat; iat++)
+		{
+			delete[] find_R2st[iat];
+		}
 		delete[] find_R2st;
 		allocate_find_R2 = false;
 	}
@@ -364,7 +370,6 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 		{
 //			cout << " T1=" << T1 << " I1=" << I1 << endl; 
 			tau1 = ucell.atoms[T1].tau[I1];
-			//GridD.Find_atom(tau1);
 			GridD.Find_atom(ucell, tau1, T1, I1);
 			const int iat = ucell.itia2iat(T1,I1);
 
@@ -415,14 +420,14 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						// " b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance << endl;
 					
 						// mohan fix bug 2011-06-26, should be '<', not '<='	
-			//			if(distance < rcut)
+						//			if(distance < rcut)
 
-			// mohan reset this 2013-07-02 in Princeton
-			// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
-			// this should be consistant with LCAO_nnr::cal_nnrg function 
-			// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
-			// distance = 7.0000000000000000
-			// ORB.Phi[it].getRcut = 7.0000000000000008
+						// mohan reset this 2013-07-02 in Princeton
+						// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
+						// this should be consistant with LCAO_nnr::cal_nnrg function 
+						// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
+						// distance = 7.0000000000000000
+						// ORB.Phi[it].getRcut = 7.0000000000000008
 						if(distance < rcut - 1.0e-15)
 						{
 						//	assert( count < nad[iat] );
@@ -451,7 +456,8 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							// find_R2st: start position of each adjacen atom.
 							if( count + 1 < nad[iat] )
 							{
-								find_R2st[iat][count+1] = find_R2st[iat][count] + ucell.atoms[T1].nw * ucell.atoms[T2].nw; //modified by zhengdy-soc
+								find_R2st[iat][count+1] = find_R2st[iat][count] 
+								+ ucell.atoms[T1].nw * ucell.atoms[T2].nw; //modified by zhengdy-soc
 							}
 							++count;
 						}
@@ -475,8 +481,6 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	}
 	ofs_running << endl;
 	*/
-
-
 
 	return;
 }
@@ -560,10 +564,6 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 	TITLE("LCAO_nnr","folding_fixedH");
 	timer::tick("LCAO_nnr","folding_fixedH",'G');
 
-//	cout << " kvec_c = " << kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z << endl;
-//	Record_adj RA;
-//	RA.for_2d();
-
 	//Quxin added for DFT+U calculation
  	if(INPUT.dft_plus_u) 
 	{
@@ -572,8 +572,14 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 	int iat = 0;
 	int index = 0;
-	Vector3<double> dtau, tau1, tau2;
-	Vector3<double> dtau1, dtau2, tau0;
+	Vector3<double> dtau;
+	Vector3<double> tau1;
+	Vector3<double> tau2;
+
+	Vector3<double> dtau1;
+	Vector3<double> dtau2;
+	Vector3<double> tau0;
+
 	for (int T1 = 0; T1 < ucell.ntype; ++T1)
 	{
 		Atom* atom1 = &ucell.atoms[T1];
@@ -599,15 +605,18 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 				bool adj = false;
 
-				if(distance < rcut) adj = true;
+				if(distance < rcut) 
+				{
+					adj = true;
+				}
 				else if(distance >= rcut)
 				{
 					for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
 					{
 						const int T0 = GridD.getType(ad0); 
 						const int I0 = GridD.getNatom(ad0); 
-						const int iat0 = ucell.itia2iat(T0, I0);
-						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int iat0 = ucell.itia2iat(T0, I0);
+						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
@@ -712,8 +721,6 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 	} // end T1
 
 	assert(index==this->nnr);
-
-//	cout << " folding Hfixed" << endl;
 
 	timer::tick("LCAO_nnr","folding_fixedH",'G');
 	return;

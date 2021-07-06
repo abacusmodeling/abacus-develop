@@ -4,6 +4,6 @@ find_program(BASH bash)
 
 add_test(
     NAME integrated_test
-    COMMAND ${BASH} Autotest.sh
+    COMMAND ${BASH} Autotest.sh -a ${ABACUS_BIN_PATH}
     WORKING_DIRECTORY ${ABACUS_TEST_DIR}
 )

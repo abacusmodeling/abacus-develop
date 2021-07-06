@@ -59,5 +59,6 @@ add_library(
     record_adj.cpp
     run_md.cpp
     wfc_dm_2d.cpp
+    wavefunc_in_pw.cpp
 	H_TDDFT_pw.cpp
 )

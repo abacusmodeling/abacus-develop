@@ -89,7 +89,7 @@ void Potential::set_vrs_tddft(const int istep)
                 }
 
                 // Gauss
-				if (ELEC_evolve::td_vexttype = 1)
+				if (ELEC_evolve::td_vexttype == 1)
 				{
 					const double w = 22.13;    // eV
 					const double sigmasquare = 700;
@@ -100,7 +100,7 @@ void Potential::set_vrs_tddft(const int istep)
 				}
 
                 //HHG of H atom
-				if (ELEC_evolve::td_vexttype = 2)
+				if (ELEC_evolve::td_vexttype == 2)
 				{
 					const double w_h = 0.0588; //a.u.
 					const int stepcut1 = 1875;
@@ -123,7 +123,7 @@ void Potential::set_vrs_tddft(const int istep)
 
                 //HHG of H2
 				// Type 3 will be modified into more normolized type soon.
-				if (ELEC_evolve::td_vexttype = 3)
+				if (ELEC_evolve::td_vexttype == 3)
 				{
 					const double w_h2 = 0.0428;  //a.u.
 					const double w_h3 = 0.00107;  //a.u.

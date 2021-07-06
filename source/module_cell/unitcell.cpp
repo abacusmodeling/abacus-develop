@@ -3,7 +3,7 @@
 #include <mpi.h>
 #endif
 
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 #include "../src_pw/tools.h"
 #include "unitcell.h"
 using namespace std;
@@ -109,20 +109,20 @@ void UnitCell::bcast_unitcell(void)
     Parallel_Common::bcast_double( latvec_supercell.e32 );
     Parallel_Common::bcast_double( latvec_supercell.e33 );
 
-    Parallel_Common::bcast_double( mag.start_magnetization, ntype );
+    Parallel_Common::bcast_double( magnet.start_magnetization, ntype );
 
     if(NSPIN != 1)
     for(int it = 0;it<ntype;it++)
     {
-         Parallel_Common::bcast_double( mag.m_loc_[it].x );
-         Parallel_Common::bcast_double( mag.m_loc_[it].y );
-         Parallel_Common::bcast_double( mag.m_loc_[it].z );
+         Parallel_Common::bcast_double( magnet.m_loc_[it].x );
+         Parallel_Common::bcast_double( magnet.m_loc_[it].y );
+         Parallel_Common::bcast_double( magnet.m_loc_[it].z );
     }
     if(NSPIN==4)
     {
-         Parallel_Common::bcast_double( mag.ux_[0] );
-         Parallel_Common::bcast_double( mag.ux_[1] );
-         Parallel_Common::bcast_double( mag.ux_[2] );
+         Parallel_Common::bcast_double( magnet.ux_[0] );
+         Parallel_Common::bcast_double( magnet.ux_[1] );
+         Parallel_Common::bcast_double( magnet.ux_[2] );
     }
 
     for (int i=0;i<ntype;i++)
@@ -352,9 +352,9 @@ void UnitCell::bcast_atoms_tau()
 {
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
-    for (int i=0;i<ucell.ntype;i++)
+    for (int i=0;i<ntype;i++)
     {
-        ucell.atoms[i].bcast_atom(); // bcast tau array
+        atoms[i].bcast_atom(); // bcast tau array
     }
 #endif
 }

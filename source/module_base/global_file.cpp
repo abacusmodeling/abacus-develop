@@ -64,7 +64,9 @@ void Global_File::make_dir_out(
 				make_dir = 0;
 			}
 		}
+#ifdef __MPI
 		Parallel_Reduce::reduce_int_all(make_dir);
+#endif
 		if(make_dir>0)break;
 		++times;
 	}
