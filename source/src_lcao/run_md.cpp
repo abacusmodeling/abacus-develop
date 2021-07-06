@@ -90,8 +90,6 @@ void Run_MD::opt_ions(void)
     int mdtype = INPUT.mdp.mdtype;
 
     this->istep = 1;
-    int force_step = 1;
-    int stress_step = 1;
     bool stop = false;
     while(istep <= NSTEP && !stop)
     {
