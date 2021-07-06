@@ -2,8 +2,8 @@
 
 # ABACUS executable path
 abacus=abacus
-# number of cores
-np=2
+# number of mpi processes
+np=4
 # threshold with unit: eV
 threshold=0.0000001
 # check accuracy
@@ -11,7 +11,8 @@ ca=8
 # regex of case name
 case="^[^#].*_PW_.*$"
 
-while getopts a:n:t:c:r: flag
+
+while getopts a:n:t:c:r,g flag
 do
     case "${flag}" in
         a) abacus=${OPTARG};;
@@ -19,15 +20,17 @@ do
 		t) threshold=${OPTARG};;
 		c) ca=${OPTARG};;
 		r) case=${OPTARG};;
+		g) g=true;; #generate test reference
     esac
 done
 
 echo "-----AUTO TESTS OF ABACUS ------"
 echo "ABACUS path: $abacus";
 echo "Number of cores: $np";
-echo "Test accuracy: $threshold eV."
+echo "Test accuracy: $threshold eV"
 echo "Check accuaracy: $ca"
 echo "Test cases: $case"
+echo "Generate reference: $g"
 echo "--------------------------------"
 echo ""
 
@@ -50,7 +53,7 @@ check_out(){
 	#------------------------------------------------------
 	if test -e "jd"; then
 		jd=`cat jd`
- 		echo $jd
+ 		echo " [  ------  ] $jd"
 	fi
 
 	#------------------------------------------------------
@@ -89,16 +92,16 @@ check_out(){
 		# deviation should be positively defined
 		#--------------------------------------------------
 		if [ $(echo "sqrt($deviation*$deviation) < $threshold"|bc) = 0 ]; then
-			echo " *************"
-			echo -e "\e[1;31m Incorrect :(  \e[0m"
-			echo " *************"
-			echo "$key cal=$cal ref=$ref deviation=$deviation"
+			echo -e "\e[1;31m [  FAILED  ] \e[0m"\
+				"$key cal=$cal ref=$ref deviation=$deviation"
+			let failed++
 			break
 		else
 			#echo "$key cal=$cal ref=$ref deviation=$deviation"
 			#echo "[ PASS ] $key"
-			echo -e "\e[1;32m [ PASS ] \e[0m $key"
+			echo -e "\e[1;32m [      OK  ] \e[0m $key"
 		fi
+		let ok++
 	done
 }
 
@@ -108,30 +111,44 @@ check_out(){
 
 test -e CASES || echo "Plese specify tests"
 test -e CASES || exit 0
-which $abacus || echo "Error! ABACUS path was wrong!!"
-which $abacus || exit 0
+which $abacus > /dev/null || echo "Error! ABACUS path was wrong!!"
+which $abacus > /dev/null || exit 0
 
 testdir=`cat CASES | grep -E $case`
+failed=0
+ok=0
 
 for dir in $testdir; do
 	cd $dir
-	echo "$dir ($np cores)"
-	TIMEFORMAT='Time elapsed: %R seconds'
+	echo -e "\e[1;32m [  RUN     ]\e[0m $dir"
+	TIMEFORMAT=' [  ------  ] Time elapsed: %R seconds'
 	#parallel test
 	time {
 		mpirun -np $np $abacus > log.txt
+		#$abacus > log.txt
 		test -d OUT.autotest || echo "Some errors happened in ABACUS!"
 		test -d OUT.autotest || exit 0
-
-		# if test -z $1
-		# then
-		../tools/catch_properties.sh result.out
-		check_out result.out
-		# else
-			# ../tools/catch_properties.sh result.ref
-		# fi
+		if test -z $g
+		then
+			../tools/catch_properties.sh result.out
+			check_out result.out
+		else
+			../tools/catch_properties.sh result.ref
+		fi
 	}
-
 	echo ""
 	cd ../
+
 done
+if [ -z $g ]
+then
+if [ $failed -eq 0 ]
+then
+	echo -e "\e[1;32m [  PASSED  ] \e[0m $ok test cases passed."
+else
+	echo -e "\e[1;31m [  FAILED  ] \e[0m $failed test cases out of $[ $failed + $ok ] failed."
+	exit 1
+fi
+else
+echo "Generate test cases complete."
+fi
