@@ -282,6 +282,7 @@ void Update_input::Bcast()
     Parallel_Common::bcast_string( pot.extra_pot );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( CHR.out_charge );
 	Parallel_Common::bcast_int( en.out_dos );
+    Parallel_Common::bcast_double( CHR.nelec );
 	
 
     return;

@@ -1,5 +1,9 @@
 #include "tool_quit.h"
 
+#ifdef __MPI
+#include "mpi.h"
+#endif
+
 #ifdef __NORMAL
 
 #else
