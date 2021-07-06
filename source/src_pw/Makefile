@@ -5,7 +5,7 @@
 #==========================
 CPLUSPLUS     = icpc
 CPLUSPLUS_MPI = mpiicpc
-OBJ_DIR = obj
+OBJ_DIR = pw_obj
 NP      = 12
 
 ##==========================
