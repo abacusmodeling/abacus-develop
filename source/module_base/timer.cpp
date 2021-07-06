@@ -114,7 +114,8 @@ void timer::print_all(ofstream &ofs)
 			const Timer_One timer_one = timer_pool_B.second;
 			if(timer_pool_order.size() < timer_one.order+1)
 				timer_pool_order.resize(timer_one.order+1);
-			timer_pool_order[timer_one.order] = {{class_name, name}, timer_one};
+			//timer_pool_order[timer_one.order] = {{class_name, name}, timer_one}; //qianrui change it to make it compatible with old compiler version
+			timer_pool_order[timer_one.order] = pair<pair<string,string>, Timer_One> {pair<string,string >{class_name,name}, timer_one};
 		}
 	}
 	
