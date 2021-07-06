@@ -369,7 +369,7 @@ void Pdiag_Basic::data_distribution(
 
 //    ofs_running << "\n myid = " << myid << endl;
 
-    //int cur_i = 0;
+    int cur_i = 0;
 
     int iacol;
     int iarow;
@@ -619,7 +619,7 @@ void Pdiag_Basic::gath_eig(MPI_Comm comm,int n,double **wfc,double *Z)
         }
         else if (myid==0)
         {
-            //int col=0;
+            int col=0;
             for (j=0; j<mpi_times; j++)
             {
                 double *ctmp = new double[NLOCAL];
@@ -690,32 +690,27 @@ MPI_Barrier(comm);
 		// mohan add 2012-04-03, because we need the occupations for the
 		// first iteration. 
 		Occupy::calculate_weights();
-        if(myid==0)
-        {
-		    WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09        
-        }
+		WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09        
 	}
 
-    if(myid==0)
-    {
-        // mohan add 2010-09-10
-        // distribution of local wave functions 
-        // to each processor.
-        // only used for GAMMA_ONLY_LOCAL
-        WF_Local::distri_lowf( ctot, wfc);
+	// mohan add 2010-09-10
+	// distribution of local wave functions 
+	// to each processor.
+	// only used for GAMMA_ONLY_LOCAL
+	WF_Local::distri_lowf( ctot, wfc);
 
-        // mohan 2010-09-26
-        // distribution of augmented wave functions.
-        // mohan fix bug 2011-01-03
-        // the third dimension of WFC_GAMMA_aug may be zero.
-        // mohan fix bug 2011-03-03
-        // when the third dimension is zero, we don't need to call
-        // this function, however, as proc 0, it needs all the procssors
-        // to give reports to it.
-        //	cout << " block distri_lowf_aug" << endl;
-        // mohan update 2021-02-12, delte BFIELD option
-        WF_Local::distri_lowf_aug( ctot, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]); 
-    }
+	// mohan 2010-09-26
+	// distribution of augmented wave functions.
+	// mohan fix bug 2011-01-03
+	// the third dimension of WFC_GAMMA_aug may be zero.
+	// mohan fix bug 2011-03-03
+	// when the third dimension is zero, we don't need to call
+	// this function, however, as proc 0, it needs all the procssors
+	// to give reports to it.
+	//	cout << " block distri_lowf_aug" << endl;
+	// mohan update 2021-02-12, delte BFIELD option
+	WF_Local::distri_lowf_aug( ctot, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]); 
+
 	// clean staff.
 	if(myid==0)
 	{
@@ -738,6 +733,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
     time_t time_start = time(NULL);
     //ofs_running << " Start gath_eig_complex Time : " << ctime(&time_start);
 
+    int i,j,k;
     int nprocs,myid;
     MPI_Status status;
     MPI_Comm_size(comm,&nprocs);
@@ -767,7 +763,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
     	Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"cdouble");
 	}
 
-	int k=0;
+	k=0;
     if (myid==0)
     {
         // mohan add nbnd0 2010-07-02
@@ -786,9 +782,9 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
         }
         if(testpb)ofs_running << " nbnd in processor 0 is " << nbnd0 << endl;
 
-        for (int i=0; i<nbnd0; i++)
+        for (i=0; i<nbnd0; i++)
         {
-            for (int j=0; j<NLOCAL; j++)
+            for (j=0; j<NLOCAL; j++)
             {
 				// change the order in processor 0.
 				// the contribution from processor 0.
@@ -801,7 +797,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
     }
     MPI_Barrier(comm);
 
-	for (int i=1; i<= this->lastband_in_proc; i++)
+	for (i=1; i<= this->lastband_in_proc; i++)
     {
         // mohan fix bug 2010-07-02
         // rows indicates the data structure of Z.
@@ -820,7 +816,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
         if(testpb)ofs_running << " nbnd in processor " << i << " is " << mpi_times << endl;
         if (myid==i)
         {
-            for (int j=0; j<mpi_times; j++)
+            for (j=0; j<mpi_times; j++)
             {
                 int tag = j;
                 complex<double> *send = new complex<double>[n];
@@ -845,8 +841,8 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
         }
         else if (myid==0)
         {
-            //int col=0;
-            for (int j=0; j<mpi_times; j++)
+            int col=0;
+            for (j=0; j<mpi_times; j++)
             {
                 complex<double> *ctmp = new complex<double>[NLOCAL];
                 ZEROS(ctmp, NLOCAL);
@@ -872,35 +868,32 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
 	// output the wave function if required.
 	// this is a bad position to output wave functions.
 	// but it works!
-    if(DRANK==0)
-    {
-        if(this->out_lowf)
-        {
-            stringstream ss;
-            ss << global_out_dir << "LOWF_K_" << ik+1 << ".dat";
-    //		cout << " write the wave functions" << endl;
-            WF_Local::write_lowf_complex( ss.str(), ctot, ik );//mohan add 2010-09-09        
-        }
+	stringstream ss;
+	ss << global_out_dir << "LOWF_K_" << ik+1 << ".dat";
+    if(this->out_lowf)
+	{
+//		cout << " write the wave functions" << endl;
+		WF_Local::write_lowf_complex( ss.str(), ctot, ik );//mohan add 2010-09-09        
+	}
 
-        // mohan add 2010-09-10
-        // distribution of local wave functions 
-        // to each processor.
-        WF_Local::distri_lowf_complex( ctot, cc);
+	// mohan add 2010-09-10
+	// distribution of local wave functions 
+	// to each processor.
+	WF_Local::distri_lowf_complex( ctot, cc);
 
-        // mohan 2010-09-26
-        // distribution of augmented wave functions.
-        // mohan fix bug 2011-01-03
-        // the third dimension of WFC_GAMMA_aug may be zero.
-        // mohan fix bug 2011-03-03
-        // when the third dimension is zero, we don't need to call
-        // this function, however, as proc 0, it needs all the procssors
-        // to give reports to it.
-        // mohan add 2012-01-09
-        // 
-        // for complex
-        // mohan update 2021-02-12, delete BFIELD option
-        WF_Local::distri_lowf_aug_complex( ctot, LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
-    }
+	// mohan 2010-09-26
+	// distribution of augmented wave functions.
+	// mohan fix bug 2011-01-03
+	// the third dimension of WFC_GAMMA_aug may be zero.
+	// mohan fix bug 2011-03-03
+	// when the third dimension is zero, we don't need to call
+	// this function, however, as proc 0, it needs all the procssors
+	// to give reports to it.
+	// mohan add 2012-01-09
+	// 
+	// for complex
+	// mohan update 2021-02-12, delete BFIELD option
+	WF_Local::distri_lowf_aug_complex( ctot, LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
 	
 	
 	// clean staff.
@@ -926,17 +919,17 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
 {
     TITLE("Pdiag_Basic","gath_full_eig");
 
-    //time_t time_start = time(NULL);
+    time_t time_start = time(NULL);
     //ofs_running << " Start gath_full_eig Time : " << ctime(&time_start);
 
-    int k=0;
+    int i,j,k,incx=1;
     int *loc_sizes,loc_size,nprocs,myid;
     MPI_Status status;
     MPI_Comm_size(comm,&nprocs);
     MPI_Comm_rank(comm,&myid);
     loc_sizes =(int*)malloc(sizeof(int)*nprocs);
     loc_size=n/nprocs;
-    for (int i=0; i<nprocs; i++)
+    for (i=0; i<nprocs; i++)
     {
         if (i<n%nprocs)
         {
@@ -950,9 +943,9 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
     if (myid==0)
     {
         k=0;
-        for (int i=0; i<loc_sizes[0]; i++)
+        for (i=0; i<loc_sizes[0]; i++)
         {
-            for (int j=0; j<n; j++)
+            for (j=0; j<n; j++)
             {
                 // i : column index;
                 // j : row index.
@@ -965,13 +958,13 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
     }
     MPI_Barrier(comm);
 
-    for (int i=1; i<nprocs; i++)
+    for (i=1; i<nprocs; i++)
     {
         const int rows = loc_sizes[i];
         const int mpi_times = rows;
         if (myid==i)
         {
-            for (int j=0; j<mpi_times; j++)
+            for (j=0; j<mpi_times; j++)
             {
                 int tag = j;
 
@@ -995,7 +988,7 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
         else if (myid==0)
         {
             int col=0;
-            for (int j=0; j<mpi_times; j++)
+            for (j=0; j<mpi_times; j++)
             {
                 double *ctmp = new double[n];
                 ZEROS(ctmp, n);
@@ -1020,7 +1013,7 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
         Parallel_Common::bcast_double(c[i],NLOCAL);
     }
 
-    //time_t time_end = time(NULL);
+    time_t time_end = time(NULL);
 //    ofs_running << " End   gath_full_eig Time : " << ctime(&time_end);
 
     return;
@@ -1033,14 +1026,14 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c,
     time_t time_start = time(NULL);
     //ofs_running << " Start gath_full_eig_complex Time : " << ctime(&time_start);
 
-    int k=0;
+    int i,j,k,incx=1;
     int *loc_sizes,loc_size,nprocs,myid;
     MPI_Status status;
     MPI_Comm_size(comm,&nprocs);
     MPI_Comm_rank(comm,&myid);
     loc_sizes =(int*)malloc(sizeof(int)*nprocs);
     loc_size=n/nprocs;
-    for (int i=0; i<nprocs; i++)
+    for (i=0; i<nprocs; i++)
     {
         if (i<n%nprocs)
         {
@@ -1054,9 +1047,9 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c,
     if (myid==0)
     {
         k=0;
-        for (int i=0; i<loc_sizes[0]; i++)
+        for (i=0; i<loc_sizes[0]; i++)
         {
-            for (int j=0; j<n; j++)
+            for (j=0; j<n; j++)
             {
                 // i : column index;
                 // j : row index.
@@ -1069,13 +1062,13 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c,
     }
     MPI_Barrier(comm);
 
-	for (int i=1; i<nprocs; i++)
+	for (i=1; i<nprocs; i++)
 	{
 		const int rows = loc_sizes[i];
 		const int mpi_times = rows;
 		if (myid==i)
 		{
-			for (int j=0; j<mpi_times; j++)
+			for (j=0; j<mpi_times; j++)
 			{
 				int tag = j;
 
@@ -1098,8 +1091,8 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c,
 		}
 		else if (myid==0)
 		{
-			//int col=0;
-			for (int j=0; j<mpi_times; j++)
+			int col=0;
+			for (j=0; j<mpi_times; j++)
 			{
 				complex<double> *ctmp = new complex<double>[n];
 				ZEROS(ctmp, n);

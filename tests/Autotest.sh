@@ -73,8 +73,8 @@ check_out(){
 		# computed the deviation between the calculated
 		# and reference value
 		#--------------------------------------------------
-		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",x-y}'`
-		deviation1=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",y-x}'`
+		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$CA'f\n",x-y}'`
+		deviation1=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$CA'f\n",y-x}'`
 
 		if [ $key == "totaltimeref" ]; then
 			# echo "time=$cal ref=$ref"

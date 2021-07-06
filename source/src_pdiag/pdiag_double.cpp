@@ -530,7 +530,7 @@ void Pdiag_Double::diago_double_begin(
 	const int inc=1;
 
     int nprocs, myid;
-    //MPI_Status status;
+    MPI_Status status;
     MPI_Comm_size(comm_2D, &nprocs);
     MPI_Comm_rank(comm_2D, &myid);
 
@@ -659,26 +659,28 @@ void Pdiag_Double::diago_double_begin(
 
                     if(this->out_lowf)
                     {
+                        double **ctot;
                         if(myid==0)
                         {
-                            double **ctot = new double*[NBANDS];
+                            ctot = new double*[NBANDS];
                             for (int i=0; i<NBANDS; i++)
                             {
                                 ctot[i] = new double[NLOCAL];
                                 ZEROS(ctot[i], NLOCAL);
                             }
                             Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
-                        
-							// mohan delete Bfield option 2021-02-12
-							info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-									dim0, dim1, iprow, ipcol, this->loc_size,
-									work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
-							stringstream ss;
-							ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
-							// mohan add 2012-04-03, because we need the occupations for the
-							// first iteration.
-							WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
-                        
+                        }
+						// mohan delete Bfield option 2021-02-12
+						info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
+								dim0, dim1, iprow, ipcol, this->loc_size,
+								work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
+						stringstream ss;
+                        ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
+                        // mohan add 2012-04-03, because we need the occupations for the
+                        // first iteration.
+                        WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
+                        if(myid==0)
+                        {
                             for (int i=0; i<NBANDS; i++)
                             {
                                 delete[] ctot[i];
@@ -946,7 +948,7 @@ void Pdiag_Double::diago_complex_begin(
 	const int inc=1;
 
     int nprocs, myid;
-    //MPI_Status status;
+    MPI_Status status;
     MPI_Comm_size(comm_2D, &nprocs);
     MPI_Comm_rank(comm_2D, &myid);
 
@@ -1226,15 +1228,14 @@ void Pdiag_Double::readin(
 {
     TITLE("Pdiag_Double","readin");
 
-    //int coord[2];
+    int coord[2];
     int dim[2];
-    //int period[2];
-    //int i,j,tmp1,tmp2;
-    int loc_size,loc_pos;
+    int period[2];
+    int i,j,tmp1,tmp2;
+    int k,loc_size,loc_pos;
     double time1,time2;
 
-    //MPI_Comm comm=DIAG_HPSEPS_WORLD,comm_2D,comm_col,comm_row,newcomm;
-	MPI_Comm comm_2D;
+    MPI_Comm comm=DIAG_HPSEPS_WORLD,comm_2D,comm_col,comm_row,newcomm;
 
     dim[0]=(int)sqrt((double)DSIZE);
 
