@@ -85,7 +85,7 @@ void IState_Charge::begin(void)
 			}
 			else
 			{
-				//int band_index;
+				int band_index;
 				for(int ib=0; ib<NBANDS; ++ib)
 				{
 					READ_VALUE(ifs, bands_picked[ib]);
@@ -156,7 +156,7 @@ void IState_Charge::idmatrix(const int &ib)
 			if ( mu_local >= 0)
 			{
 				// set a pointer.
-				//double *alpha = LOC.DM[is][mu_local];
+				double *alpha = LOC.DM[is][mu_local];
 				for (int j=i; j<NLOCAL; j++)
 				{
 					const int nu_local = GridT.trace_lo[j];

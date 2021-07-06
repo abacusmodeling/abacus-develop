@@ -327,7 +327,7 @@ bool LOOP_ions::force_stress(
 xiaohui modify 2014-08-09*/
     }
 
-//    static bool converged_force = false;
+    static bool converged_force = false;
     static bool converged_stress = false;
 
     if(!FORCE&&STRESS)

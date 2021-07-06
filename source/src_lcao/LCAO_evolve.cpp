@@ -147,7 +147,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
                        	else Idmat(i,j) = complex<double>(0.0, 0.0);
                 }
         }
-        //double delta_t;
+        double delta_t;
 //      delta_t = 0.2;	//identity: fs;
         ComplexMatrix Numerator(NLOCAL,NLOCAL);
         Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
@@ -232,7 +232,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 		complex<double> ccc[NLOCAL];
 		for(int j=0; j<NLOCAL; j++)
 		{	
-			ccc[j] = complex<double>(0.0,0.0);
+			ccc[j] = (0.0,0.0);
 			for(int k=0; k<NLOCAL; k++)
 			{
 				 ccc[j] += U_operator(j,k)*c_init[i][k];

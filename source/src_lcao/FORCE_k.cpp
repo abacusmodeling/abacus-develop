@@ -644,7 +644,7 @@ void Force_LCAO_k::test(double* mmm, const string &name)
         Atom* atom1 = &ucell.atoms[T1];
         for(int I1=0; I1<atom1->na; I1++)
         {
-			//const int iat = ucell.itia2iat(T1,I1);
+			const int iat = ucell.itia2iat(T1,I1);
 			const int start1 = ucell.itiaiw2iwt(T1,I1,0);
 			for (int cb = 0; cb < RA.na_each[ca]; cb++ )
 			{
@@ -725,7 +725,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 			tau1 = atom1->tau[I1];
 			//GridD.Find_atom( tau1 );
 			GridD.Find_atom(ucell, tau1 ,T1, I1);
-			//const int iat = ucell.itia2iat(T1, I1);
+			const int iat = ucell.itia2iat(T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 
 			for (int ad2=0; ad2<GridD.getAdjacentNum()+1 ; ++ad2)
@@ -733,7 +733,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 				const int T2 = GridD.getType(ad2);
 				const Atom* atom2 = &ucell.atoms[T2];
 				const int I2 = GridD.getNatom(ad2);
-				//const int iat2 = ucell.itia2iat(T2, I2);
+				const int iat2 = ucell.itia2iat(T2, I2);
 				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 				tau2 = GridD.getAdjacentTau(ad2);
 
@@ -751,8 +751,8 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 						const int T0 = GridD.getType(ad0);
 						if( ORB.nproj[T0] == 0) continue;
 						const int I0 = GridD.getNatom(ad0);
-						//const int iat0 = ucell.itia2iat(T0, I0);
-						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						const int iat0 = ucell.itia2iat(T0, I0);
+						const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
@@ -792,7 +792,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 								if( ORB.nproj[T0] == 0) continue;
 								const int I0 = GridD.getNatom(ad0);
 								const int iat0 = ucell.itia2iat(T0, I0);
-								//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+								const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 								tau0 = GridD.getAdjacentTau(ad0);
 
 								dtau1 = tau0 - tau1;
@@ -814,7 +814,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 
 								if(distance1 < rcut1 && distance2 < rcut2)
 								{
-									//const Atom* atom0 = &ucell.atoms[T0];
+									const Atom* atom0 = &ucell.atoms[T0];
 									double nlm[3]={0,0,0};
 
 									UOT.snap_psibeta(
