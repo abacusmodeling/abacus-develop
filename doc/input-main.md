@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog)
     - [Plane wave related variables](#plane-wave-related-variables)
     
         [ecutwfc](#ecutwfc) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
@@ -36,7 +36,7 @@ ecutwfc 60
 ```
 Parameters list starts with key word `INPUT_PARAMETERS`. Any content before `INPUT_PARAMETERS` will be ignored.
 
-Any line starting with `#` will also be ignored.
+Any line starting with `#` or `/` will also be ignored.
 
 Each parameter value is provided by specifying the name of the input variable
 and then putting the value after the name, separated by one or more blank characters(space
@@ -176,6 +176,11 @@ This part of variables are used to control general system parameters.
         - upf201 : the new UPF format
     - *Default* : upf
 
+- out_alllog<a id="out-alllog"></a>
+    - *Type*: Integer
+    - *Description*: determines whether to write log from all ranks in an MPI run. If set to be 1, then each rank will write detained running information to a file named running_${calculation}\_(${rank}+1).log. If set to 0, log will only be written from rank 0 into a file named running_${calculation}.log.
+    - *Default*: 0
+
     [back to top](#input-file)
 
 ### Plane wave related variables
@@ -204,7 +209,7 @@ This part of variables are used to control the plane wave related parameters.
 - start_charge<a id="start-charge"></a>
     - *Type*: String
     - *Description*: This variable is used for both plane wave set and localized orbitals set. It indicates the type of starting density. If set this to ‘atomic’, the density is starting from summation of atomic density of single atoms. If set this to ‘file’, the density will be read in from file. The file should be in the output directory. Besides, when you do ‘nspin=1’ calculation, you only need the density file SPIN1_CHGCAR. However, if you do ‘nspin=2’ calculation, you also need the density file SPIN2_CHGCAR. The density file should be output with these names if you set out_charge = 1 in INPUT file.
-        -  atomic:
+        - atomic:
         - file:
     - *Default*:atomic
 
@@ -396,7 +401,8 @@ calculations.
     [back to top](#input-file)
 - force_thr<a id="force-thr"></a>
     - *Type*: Real
-    - *Description*: The threshold of the force convergence, it indicates the largest force among all the atoms, the unit is Ry=Bohr, *Default*: 0.000388935 Ry/Bohr = 0.01 eV/Angstrom
+    - *Description*: The threshold of the force convergence, it indicates the largest force among all the atoms, the unit is Ry=Bohr
+    - *Default*: 0.000388935 Ry/Bohr = 0.01 eV/Angstrom
 
     [back to top](#input-file)
 - force_thr_ev<a id="force-thr-ev"></a>

@@ -102,7 +102,7 @@ When the calculation finishes, the program will create an output directory (defa
 into which the following output files will be generated:
 1. INPUT: contains all input parameters, user’s input and default.
 2. istate.info: information of energy eigenvalues.
-3. running_scf.log: contains the running details.
+3. running_${calculation}.log: contains the running details. Information on the variable calculation is found in the [list of keywords](doc/input-main.md#calculation). For example, if we are doing a SCF calculation, the log files will be named running_scf.log.
 4. STRU_READIN_ADJUST.cif: structure file in the cif formatter.
 5. warning.log: errors and warning messages.
 6. directories containing element information. For example, Si/:
