@@ -7,8 +7,8 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
     timer::tick("Stress_Func","stress_loc",'F');
 
     double *dvloc;
-    double evloc,fact=1.0;
-    int ng,nt,l,m,is;
+    double evloc=0.0;
+	double fact=1.0;
 
 	if (INPUT.gamma_only && is_pw) fact=2.0;
 
@@ -30,8 +30,6 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 //    else fact=1.0;
 
 	evloc=0.0;
-	double g[3]={0,0,0};
-
 
 	complex<double> *vg = new complex<double>[pw.ngmc];
 	ZEROS( vg, pw.ngmc );
@@ -44,7 +42,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 			evloc += ppcell.vloc(it, pw.ig2ngg[ig]) * (pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
 		}
 	}
-	for( nt = 0;nt< ucell.ntype; nt++)
+	for(int nt = 0;nt< ucell.ntype; nt++)
 	{
 		const Atom* atom = &ucell.atoms[nt];
 		//mark by zhengdy for check
@@ -67,12 +65,12 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 		//
 		}
 
-		for( ng = 0;ng< pw.ngmc;ng++)
+		for(int ng = 0;ng< pw.ngmc;ng++)
 		{
 			const int j = pw.ig2fftc[ng];
-			for (l = 0;l< 3;l++)
+			for (int l = 0;l< 3;l++)
 			{
-				for (m = 0; m<l+1;m++)
+				for (int m = 0; m<l+1;m++)
 				{
 					sigma(l, m) = sigma(l, m) + (conj(Porter[j]) * pw.strucFac(nt, ng)).real() 
 						* 2.0 * dvloc[pw.ig2ngg[ng]] * ucell.tpiba2 * 
@@ -82,17 +80,17 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 		}
 	}
 
-    for( l = 0;l< 3;l++)
+    for(int l = 0;l< 3;l++)
 	{
 		if(is_pw) sigma(l,l) += evloc;
-		for (m = 0; m<l+1; m++)
+		for (int m = 0; m<l+1; m++)
 		{
 			sigma(m,l) = sigma(l,m);
 		}
 	}
-	for(l=0;l<3;l++)
+	for(int l=0;l<3;l++)
 	{
-		for(m=0;m<3;m++)
+		for(int m=0;m<3;m++)
 		{
 			Parallel_Reduce::reduce_double_pool( sigma(l,m) );
 		}
@@ -127,7 +125,7 @@ double*  dvloc
 	double vlcp=0;
 	double  *aux, *aux1;
 
-	int i, igl, igl0;
+	int igl0;
 	// counter on erf functions or gaussians
 	// counter on g shells vectors
 	// first shell with g != 0
@@ -156,11 +154,11 @@ double*  dvloc
 	//   This is the part of the integrand function
 	//   indipendent of |G| in real space
 	//
-	for( i = 0;i< msh; i++)
+	for(int i = 0;i< msh; i++)
 	{
 		aux1[i] = r [i] * vloc_at [i] + zp * e2 * erf(r[i]);
 	}
-	for( igl = igl0;igl< pw.nggm;igl++)
+	for(int igl = igl0;igl< pw.nggm;igl++)
 	{
 		double gx = sqrt (pw.ggs [igl] * ucell.tpiba2);
 		double gx2 = pw.ggs [igl] * ucell.tpiba2;
@@ -169,7 +167,7 @@ double*  dvloc
 		//    dependent  part
 		//
 		// DV(g)/Dg = Integral of r (Dj_0(gr)/Dg) V(r) dr
-		for( i = 1;i< msh;i++)
+		for(int i = 1;i< msh;i++)
 		{
 			aux [i] = aux1 [i] * (r [i] * cos (gx * r [i] ) / gx - sin (gx * r [i] ) / pow(gx,2));
 		}

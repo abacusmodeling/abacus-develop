@@ -89,7 +89,7 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 								+ sigmaxc(ipol,jpol) 
 								+ sigmaxcc(ipol,jpol) 
 								+ sigmaewa(ipol,jpol)
-								+ sigmaloc(ipol,jpol);
+								+ sigmaloc(ipol,jpol)
 								+ sigmavdw(ipol,jpol);
         }
     }

@@ -22,13 +22,13 @@ void Stress_Func::stress_gga(matrix& sigma)
 	{
 		igcc_is_lyp = true;
 	}
-
-	assert(NSPIN>0);
-	const double fac = 1.0/ NSPIN;
+	const int nspin_in = NSPIN;
+	assert(nspin_in>0);
+	const double fac = 1.0/ nspin_in;
 
 	// doing FFT to get rho in G space: rhog1 
 	CHR.set_rhog(CHR.rho[0], CHR.rhog[0]);
-	if(NSPIN==2)//mohan fix bug 2012-05-28
+	if(nspin_in==2)//mohan fix bug 2012-05-28
 	{
 		CHR.set_rhog(CHR.rho[1], CHR.rhog[1]);
 	}
@@ -52,7 +52,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 
 	GGA_PW::grad_rho( rhogsum1 , gdr1 );
 
-	if(NSPIN==2)
+	if(nspin_in==2)
 	{
 		rhotmp2 = new double[pw.nrxx];
 		rhogsum2 = new complex<double>[pw.ngmc];
@@ -84,12 +84,10 @@ void Stress_Func::stress_gga(matrix& sigma)
 	double v2x = 0.0;
 	double v1c = 0.0;
 	double v2c = 0.0;
-	double vtxcgc = 0.0;
-	double etxcgc = 0.0;
 
-	if(NSPIN==1||NSPIN==4)
+	if(nspin_in==1||nspin_in==4)
 	{
-		double segno;
+		//double segno;
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
 			const double arho = std::abs( rhotmp1[ir] );
@@ -98,8 +96,8 @@ void Stress_Func::stress_gga(matrix& sigma)
 				grho2a = gdr1[ir].norm2();
 				if( grho2a > epsg )
 				{
-					if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
-					if( rhotmp1[ir] < 0.0 ) segno = -1.0;
+					//if( rhotmp1[ir] >= 0.0 ) segno = 1.0;
+					//if( rhotmp1[ir] < 0.0 ) segno = -1.0;
 
 					XC_Functional::gcxc( arho, grho2a, sx, sc, v1x, v2x, v1c, v2c);
 					double tt[3];
@@ -117,7 +115,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 			}
 		} 
 	}
-	else if(NSPIN==2)
+	else if(nspin_in==2)
 	{
 		double v1cup = 0.0;
 		double v1cdw = 0.0;
@@ -224,7 +222,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 	delete[] rhotmp1;
 	delete[] rhogsum1;
 	delete[] gdr1;
-	if(NSPIN==2)
+	if(nspin_in==2)
 	{
 		delete[] rhotmp2;
 		delete[] rhogsum2;
