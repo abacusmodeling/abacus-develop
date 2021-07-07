@@ -78,11 +78,11 @@ make sure these files are prepared and stored in the working directory.
 
     The STRU file contains the structural information about the system, e.g., lattice constant, lattice vectors, and positions of the atoms within a unit cell. The positions can be given either in direct or Cartesian coordinates. Moreover, the name (and location of the pseudopotential and numerical orbital files, see below) need to be specified in the STRU file.
 
-    Specifications of the STRU file can be found in this [short instruction](doc/input-stru).
+    Specifications of the STRU file can be found in this [short instruction](doc/input-stru.md).
 - The k-point file
     The default name is KPT. It contains the information of the k-grid setting for the Brillouin zone sampling.
 
-    Specification of the k-point file can be found in this [short instruction](doc/input-kpt).
+    Specification of the k-point file can be found in this [short instruction](doc/input-kpt.md).
 - The pseudopotential files
 
     Norm-conserving pseudopotentials are used in ABACUS, in the UPF file format.The filename of each element’s pseudopotential needs to be specified in the `STRU` file, if the the pseudopotential files are already present in the working directory. However, in case that the pseudopotential files are stored in some other directories, then a full path to access the pseudopotential files have to be specified in the `STRU` file.
