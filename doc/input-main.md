@@ -250,7 +250,7 @@ calculations.
         - fixed: use fixed occupations.
         - gauss or gaussian: use gaussian smearing method.
         - mp: use methfessel-paxton smearing method.
-    - *Default*: fixed.
+    - *Default*: fixed
 
     [back to top](#input-file)
 - sigma<a id="sigma"></a>
@@ -266,7 +266,7 @@ calculations.
         - kerker: Use kerker method, which is the mixing method in G space.
         - pulay: Standard Pulay method.
         - pulay-kerker:
-    - *Default*: pulay.
+    - *Default*: pulay
 
     [back to top](#input-file)
 - mixing_beta<a id="mixing-beta"></a>
@@ -336,13 +336,13 @@ calculations.
 - out_charge<a id="out-charge"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the charge density on real space grid. The name of the density file is SPIN1_CHGCAR and SPIN2_CHGCAR (if nspin = 2). Suppose each density on grid has coordinate (x; y; z). The circle order of the density on real space grid is: z is the outer loop, then y and finally x (x is moving fastest).
-    - *Default*:0
+    - *Default*: 0
 
     [back to top](#input-file)
 - out_potential<a id="out-potential"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the local potential on real space grid. The name of the file is SPIN1_POT and SPIN2_POT (if nspin = 2). If set to 2, ABACUS will output the electrostatic potential on real space grid. The name of the file is ElecStaticPot and ElecStaticP ot_AV E (along the z-axis).
-    - *Default*:0
+    - *Default*: 0
 
     [back to top](#input-file)
 - out_dm<a id="out-dm"></a>
@@ -365,9 +365,12 @@ calculations.
     [back to top](#input-file)
 - out_dos<a id="out-dos"></a>
     - *Type*: Integer
-    - *Description*: Controls the output of density of state (DOS). For more information, refer to the [worked example](examples/dos.md).
+    - *Description*: Controls whether to output the density of state (DOS). For more information, refer to the [worked example](examples/dos.md).
     - *Default*: 0
 - out_band<a id="out-band"></a>
+    - *Type*: Integer
+    - *Description*: Controls whether to output the band structure. For mroe information, refer to the [worked example](examples/band-struc.md)
+    - *Default*: 0
 - mulliken<a id="mulliken"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the Mulliken population analysis result. The name of the output file is mulliken.txt
@@ -555,25 +558,25 @@ This part of variables are used to control vdW-corrected related parameters.
 - vdw_s6<a id="vdw-s6"></a>
     - *Type*: Real
     - *Description*: This scale factor is to optimize the interaction energy deviations. For DFT-D2, it is found to be 0.75 (PBE), 1.2 (BLYP), 1.05 (B-P86), 1.0 (TPSS), and 1.05 (B3LYP). For DFT-D3, recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 0.75 if vdw_method is chosen to be d2; 1.0 if vdw_method is chosen to be d3_0 or d3_bj
 
     [back to top](#input-file)
 - vdw_s8<a id="vdw-s8"></a>
     - *Type*: Real
     - *Description*: This scale factor is only the parameter of DFTD3 approachs including D3(0) and D3(BJ). Recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 0.722 if vdw_method is chosen to be d3_0; 0.7875 if vdw_method is chosen to be d3_bj
 
     [back to top](#input-file)
 -   vdw_a1<a id="vdw-a1"></a>
     - *Type*: Real
     - *Description*: This damping function parameter is only the parameter of DFT-D3 approachs including D3(0) and D3(BJ). Recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 1.217 if vdw_method is chosen to be d3_0; 0.4289 if vdw_method is chosen to be d3_bj
 
     [back to top](#input-file)
 - vdw_a2<a id="vdw-a2"></a>
     - *Type*: Real
     - *Description*: This damping function arameter is only the parameter of DFT-D3(BJ) approach. Recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 1.0 if vdw_method is chosen to be d3_0; 4.4407 if vdw_method is chosen to be d3_bj
 
     [back to top](#input-file)
 - vdw_d<a id="vdw-d"></a>
@@ -621,7 +624,7 @@ This part of variables are used to control vdW-corrected related parameters.
 - vdw_radius<a id="vdw-radius"></a>
     - *Type*: Real
     - *Description*: If vdw_model is set to radius, this variable specifies the radius of the calculated sphere. For DFT-D2, the default value is 56.6918 ,while it is 95 for DFT-D3. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 56.6918 if vdw_method is chosen to be d2; 95 if vdw_method is chosen to be d3_0 or d3_bj
 
     [back to top](#input-file)
 - vdw_radius_unit<a id="vdw-radius-unit"></a>
