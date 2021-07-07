@@ -70,8 +70,36 @@ K_POINTS
 Gamma
 8 8 8 0 0 0
 ```
-Run the program, and you will see a file named DOS1_smearing.dat in the output directory.
+Run the program, and you will see a file named DOS1_smearing.dat in the output directory. The first two columns in the file are the energy and DOS, respectively.Plot file DOS1_smearing.dat with graphing software, and you’ll get the DOS.
 
-Next, plot file DOS1_smearing.dat with graphing software, and you’ll get the DOS.
+Along with the DOS1_smearing.dat file, we also produce the projected density of states (PDOS) in a file called PDOS.
+
+The PDOS file starts with number of atomic orbitals in the system, then a list of energy values, such as:
+```
+<pdos>
+<nspin>1</nspin>
+<norbitals>26</norbitals>
+<energy_values units="eV">
+...
+
+```
+
+The rest of the fileis arranged in sections, each section with a header such as below:
+
+```
+<orbital
+ index="                                       1"
+ atom_index="                                       1"
+ species="Si"
+ l="                                       0"
+ m="                                       0"
+ z="                                       1"
+>
+<data>
+...
+</data>
+
+```
+which tells the atom and symmetry of the current atomic orbital, and followed by the PDOS values. The values can thus be plotted against the energies.
 
 [back to top](#dos,-wave-functions)
