@@ -219,7 +219,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
             // we ensure increasing the same volumn each time
             // to make sure to get the nearly same plane wave number.
             ggchg_end = cutgg_delta * std::pow( (double)ggchg_time, 2.0/3.0 ) ;
-            if ( ggchg_end > ggchg ) ggchg_end = ggchg;
+            if ( abs(ggchg_end - ggchg)<1.0e-8 ) ggchg_end = ggchg;
             //cout << "\n ggchg_start = " << ggchg_start;
             //cout << "\n ggchg_end = " << ggchg_end << endl;
 
@@ -1059,7 +1059,7 @@ void PW_Basis::update_gvectors(ofstream &runlog, const UnitCell &Ucell_in)
         do
         {
             ggchg_end = cutgg_delta * std::pow( (double)ggchg_time, 2.0/3.0 ) ;
-            if ( ggchg_end > ggchg ) ggchg_end = ggchg;
+            if ( abs(ggchg_end - ggchg)<1.0e-8 ) ggchg_end = ggchg;
 
             delete[] gg_global0;
             delete[] gg_global;
