@@ -232,7 +232,7 @@ calculations.
 
         For plane-wave basis,
         - cg: cg method.
-        - david: david is the Davidson algorithm.
+        - dav: the Davidson algorithm. (Currently not working with Intel MKL library).
 
         For atomic orbitals basis,
         - genelpa: This method should be used if you choose localized orbitals.
@@ -313,13 +313,13 @@ calculations.
     [back to top](#input-file)
 - diago_cg_maxiter<a id="diago-cg-maxiter"></a>
     - *Type*: Integer
-    - *Description*: Only useful when you use ks_solver = cg or ks_solver = david. It indicates the maximal iteration number for cg/david method.
+    - *Description*: Only useful when you use ks_solver = cg or ks_solver = dav. It indicates the maximal iteration number for cg/david method.
     - *Default*: 40
 
     [back to top](#input-file)
 - diago_david_ndim<a id="diago-david-ndim"></a>
     - *Type*: Integer
-    - *Description*: Only useful when you use ks_solver = david. It indicates the maximal dimension for david method.
+    - *Description*: Only useful when you use ks_solver = dav. It indicates the maximal dimension for the Davidson method.
     - *Default*: 10
 
     [back to top](#input-file)
