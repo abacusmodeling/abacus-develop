@@ -6,9 +6,6 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 {
     timer::tick("Stress_Func","stress_ew",'F');
 
-    int i,j,l,m;
-    double g[3];
-
     double charge=0;
     for(int it=0; it < ucell.ntype; it++)
 	{
@@ -56,7 +53,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 	{
 		g2 = pw.gg[ng]* ucell.tpiba2;
 		g2a = g2 /4.0/alpha;
-		rhostar=(0.0,0.0);
+		rhostar=complex<double>(0.0,0.0);
 		for(int it=0; it < ucell.ntype; it++)
 		{
 			for(int i=0; i<ucell.atoms[it].na; i++)
@@ -70,16 +67,16 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 		rhostar /= ucell.omega;
 		sewald = fact* (TWO_PI) * e2 * exp(-g2a) / g2 * pow(abs(rhostar),2);
 		sdewald = sdewald - sewald;
-		for(l=0;l<3;l++)
+		for(int l=0;l<3;l++)
 		{
-			for(m=0;m<l+1;m++)
+			for(int m=0;m<l+1;m++)
 			{
 				sigma(l, m) += sewald * ucell.tpiba2 * 2.0 * pw.get_G_cartesian_projection(ng, l) * pw.get_G_cartesian_projection(ng, m) / g2 * (g2a + 1);
 			}
 		}
 	}
 
-	for(l=0;l<3;l++)
+	for(int l=0;l<3;l++)
 	{
 		sigma(l,l) +=sdewald;
 	}
@@ -117,9 +114,9 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 						{
 							rr=sqrt(r2[nr]) * ucell.lat0;
 							fac = -e2/2.0/ucell.omega*pow(ucell.lat0,2)*ucell.atoms[it].zv * ucell.atoms[jt].zv / pow(rr,3) * (erfc(sqrt(alpha)*rr)+rr * sqrt(8 * alpha / (TWO_PI)) * exp(-alpha * pow(rr,2)));
-							for(l=0; l<3; l++)
+							for(int l=0; l<3; l++)
 							{
-								for(m=0; m<l+1; m++)
+								for(int m=0; m<l+1; m++)
 								{
 									r0[0] = r[nr].x;
 									r0[1] = r[nr].y;
@@ -133,16 +130,16 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 			}//end i
 		}//end it
 	}//end if
-	for(l=0;l<3;l++)
+	for(int l=0;l<3;l++)
 	{
-		for(m=0;m<l+1;m++)
+		for(int m=0;m<l+1;m++)
 		{
 			sigma(m,l)=sigma(l,m);
 		}
 	}
-	for(l=0;l<3;l++)
+	for(int l=0;l<3;l++)
 	{
-		for(m=0;m<3;m++)
+		for(int m=0;m<3;m++)
 		{
 			sigma(l,m)=-sigma(l,m);
 			Parallel_Reduce::reduce_double_pool( sigma(l,m) );

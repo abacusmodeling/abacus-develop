@@ -17,7 +17,6 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 
 	complex<double> sigmadiag;
 	double* rhocg;
-	double g[3];
 
 	int judge=0;
 	for(nt=0;nt<ucell.ntype;nt++)

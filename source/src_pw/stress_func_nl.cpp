@@ -182,8 +182,11 @@ void Stress_Func::stress_nl(matrix& sigma){
 	// sum up forcenl from all processors
 	for(int l=0;l<3;l++){
 		for(int m=0;m<3;m++){
-			if(m>l) sigmanlc[l][m] = sigmanlc[m][l];
-				Parallel_Reduce::reduce_double_pool( sigmanlc[l][m] );
+			if(m>l) 
+			{
+				sigmanlc[l][m] = sigmanlc[m][l];
+			}
+			Parallel_Reduce::reduce_double_pool( sigmanlc[l][m] );
 		}
 	}
 

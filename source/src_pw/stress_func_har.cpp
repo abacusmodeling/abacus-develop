@@ -6,9 +6,7 @@
 void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 {
 	timer::tick("Stress_Func","stress_har",'F');
-	double shart,g2;
-	const double eps=1e-8;
-	int l,m,nspin0;
+	double shart;
 
 	complex<double> *Porter = UFFT.porter;
 
@@ -40,37 +38,17 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 
 	pw.FFT_chg.FFT3D(psic, -1) ;
 
-
-	double charge;
-	if (pw.gstart == 1)
-	{
-		charge = ucell.omega * Porter[pw.ig2fftc[0]].real();
-	}
-
 	complex<double> *vh_g  = new complex<double>[pw.ngmc];
 	ZEROS(vh_g, pw.ngmc);
 
-	double g[3];
-//test
-   //         int i=pw.gstart;
-   //         cout<< "gstart " <<pw.gstart<<endl;
 //	double ehart=0;
 	for (int ig = pw.gstart; ig<pw.ngmc; ig++)
 	{
 		const int j = pw.ig2fftc[ig];
-		const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
-
-//		ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
-	//            vh_g[ig] = fac * Porter[j];
+		//const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+		//ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
+		//vh_g[ig] = fac * Porter[j];
 		shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * pw.gg [ig]);
-        //test
-
-        //   cout<<"g "<<g[0]<<" "<<g[1]<<" "<<g[2]<<endl;
-        //   cout<<"gg "<<pw.gg[i]<<" "<<pw.gcar[i].norm2()<<endl;
-        //   cout<<"Porter "<<Porter[j]<<endl;
-        //   cout<<"tpiba2 "<<ucell.tpiba2<<endl;
-
-
 		for(int l=0;l<3;l++)
 		{
 			for(int m=0;m<l+1;m++)
@@ -79,9 +57,8 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 			}
 		}
 	}
-//	Parallel_Reduce::reduce_double_pool( en.ehart );
-//	ehart *= 0.5 * ucell.omega;
-        //cout<<"ehart "<<ehart<<" en.ehart "<< en.ehart<<endl;
+	//	Parallel_Reduce::reduce_double_pool( en.ehart );
+	//	ehart *= 0.5 * ucell.omega;
 	for(int l=0;l<3;l++)
 	{
 		for(int m=0;m<l+1;m++)
