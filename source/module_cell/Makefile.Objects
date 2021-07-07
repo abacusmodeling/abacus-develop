@@ -9,6 +9,10 @@ OBJS_IO=output.o\
 
 OBJS_PW=magnetism.o\
 
+OBJS_PARALELL=parallel_reduce.o\
+parallel_common.o\
+parallel_global.o\
+
 OBJS_BASE=matrix3.o\
 matrix.o\
 intarray.o\

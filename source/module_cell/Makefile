@@ -3,10 +3,10 @@
 #==========================
 # Compiler information 
 #==========================
-CPLUSPLUS     = mpiicpc
-CPLUSPLUS_MPI = icpc 
+CPLUSPLUS     = icpc
+CPLUSPLUS_MPI = mpiicpc
 OBJ_DIR = obj
-NP      = 4
+NP      = 8
 
 #==========================
 # LIBS and INCLUDES
@@ -27,18 +27,20 @@ include Makefile.Objects
 VPATH=../module_base\
 :../src_io\
 :../src_pw\
+:../src_parallel\
 :./\
 
 #==========================
 # Define HONG
 #==========================
-HONG= -DMETIS -DMKL_ILP64 -D__CELL -D__NORMAL
+HONG= -DMETIS -DMKL_ILP64 -D__MPI -D__CELL -D__NORMAL
 
 FP_OBJS_0=main.o\
 $(OBJS_IO)\
 $(OBJS_PW)\
 $(OBJS_BASE)\
 $(OBJS_ORBITAL)\
+$(OBJS_PARALELL)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 

@@ -40,8 +40,6 @@ void Input_Conv::Convert(void)
 	ucell.latName = INPUT.latname; 
 	ucell.ntype = INPUT.ntype;
 	ucell.lmaxmax = INPUT.lmaxmax;
-	CHR.nelec = INPUT.nelec;
-//  ucell.lmaxmax = INPUT.lmaxmax;
 
     NBANDS = INPUT.nbands;
     NBANDS_ISTATE = INPUT.nbands_istate;
@@ -563,6 +561,7 @@ void Input_Conv::Convert(void)
     pot.start_pot = INPUT.start_pot;
 	pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
     CHR.out_charge = INPUT.out_charge;
+	CHR.nelec = INPUT.nelec;
 	pot.out_potential = INPUT.out_potential;
     wf.out_wf = INPUT.out_wf;
 	en.out_dos = INPUT.out_dos;
