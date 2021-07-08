@@ -1,6 +1,8 @@
 #ifndef MRRR_H_
 #define MRRR_H_
-#include<mpi.h>
+#ifdef __MPI
+#include <mpi.h>
+#endif
 #include<stdlib.h>
 #include<stdio.h>
 #include<time.h>
