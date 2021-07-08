@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool)
     - [Plane wave related variables](#plane-wave-related-variables)
     
         [ecutwfc](#ecutwfc) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
@@ -180,6 +180,11 @@ This part of variables are used to control general system parameters.
     - *Type*: Integer
     - *Description*: determines whether to write log from all ranks in an MPI run. If set to be 1, then each rank will write detained running information to a file named running_${calculation}\_(${rank}+1).log. If set to 0, log will only be written from rank 0 into a file named running_${calculation}.log.
     - *Default*: 0
+
+- npool<a id="npool"></a>
+    - *Type*: Integer
+    - *Description*: devide all processors into npool groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
+    - *Default*: 1
 
     [back to top](#input-file)
 
