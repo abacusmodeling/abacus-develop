@@ -20,8 +20,7 @@ void Stochastic_WF::init(void)
 {
     //wait for init
 
-    int ndim;
-    int nx,ny,nz;
+    int ndim=0;
     if(stotype == "pw")
     {
         ndim = kv.ngk[0]; // only GAMMA point temporarily
@@ -30,8 +29,9 @@ void Stochastic_WF::init(void)
     {
         ndim = pw.nrxx;
     }
-    int * npwip = new int [NPROC_IN_POOL];
     int totnpw=0;
+#ifdef __MPI
+    int * npwip = new int [NPROC_IN_POOL];
     int *rec = new int [NPROC_IN_POOL];
     int *displ = new int [NPROC_IN_POOL];
     for(int ip = 0 ; ip < NPROC_IN_POOL ;++ip)
@@ -44,6 +44,9 @@ void Stochastic_WF::init(void)
     {
         totnpw += npwip[ip];
     }
+#else
+    totnpw = ndim;
+#endif
     
     
     //distribute nchi for each process
@@ -76,6 +79,7 @@ void Stochastic_WF::init(void)
         int ig;
         for(int i = 0 ; i < nchip ; ++i)
         {
+#ifdef __MPI
             if(MY_POOL < re)
 			{
                 ig = MY_POOL * nchip + i - ig0;
@@ -94,6 +98,9 @@ void Stochastic_WF::init(void)
 			{
                 chi0[0](i , ig) = 1;
 			}
+#else
+                chi0[0](i , ig) = 1;
+#endif
         }
     }
     else
@@ -112,9 +119,11 @@ void Stochastic_WF::init(void)
     
 
     delete[] chiortho;
+#ifdef __MPI
     delete[] npwip;
     delete[] rec;
     delete[] displ;
+#endif
     int nkk = 1; // We temporarily use gamma k point.
     chiortho = new ComplexMatrix[1];
     if(NBANDS > 0)

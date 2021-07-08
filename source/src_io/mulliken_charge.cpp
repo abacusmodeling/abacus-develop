@@ -25,7 +25,9 @@
 #include "../module_base/matrix.h"
 #include "../module_base/complexmatrix.h"
 #include <vector>
-#include <mpi.h>
+#ifdef __MPI
+#include<mpi.h>
+#endif
 #include "../module_neighbor/sltk_atom_arrange.h"
 
 

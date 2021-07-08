@@ -5,7 +5,9 @@
 
 #include <vector>
 
+#ifdef __MPI
 #include <mpi.h>
+#endif
 #include <boost/dynamic_bitset.hpp>
 #include "../src_lcao/serialization_boost.h"
 

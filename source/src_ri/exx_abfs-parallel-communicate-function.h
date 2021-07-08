@@ -4,7 +4,9 @@
 #include "exx_abfs-parallel.h"
 #include <vector>
 #include <utility>
+#ifdef __MPI
 #include <mpi.h>
+#endif
 using namespace std;
 
 class Exx_Abfs::Parallel::Communicate::Function
