@@ -169,7 +169,7 @@ void Parallel_Grid::z_distribution(void)
 
 		//(5)
 		startdata[ip][0]=0;
-		for(int proc=0; proc<nproc; proc++)
+		for(int proc=1; proc<nproc; proc++)
 		{
 			startdata[ip][proc]=startdata[ip][proc-1]+numdata[ip][proc-1];
 		}
