@@ -6,7 +6,9 @@
 #include<vector>
 #include<set>
 #include<string>
+#ifdef __MPI
 #include<mpi.h>
+#endif
 #include<sys/time.h>
 
 // Peize Lin add 2015-11-11

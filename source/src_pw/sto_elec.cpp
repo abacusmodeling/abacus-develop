@@ -189,7 +189,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			//{
 			//	MPI_Bcast(CHR.rho[is], pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
 			//}
+#ifdef __MPI
 			MPI_Bcast(&en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
+#endif
 		}
 		else
 		{

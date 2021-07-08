@@ -8,7 +8,9 @@
 #include <vector>
 #include <map>
 #include <set>
+#ifdef __MPI
 #include <mpi.h>
+#endif
 #include <atomic>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/mpi.hpp>

@@ -1085,9 +1085,10 @@ void PW_Basis::update_gvectors(ofstream &runlog, const UnitCell &Ucell_in)
             ggchg_start = ggchg_end;
             ++ggchg_time;
         } while ( ggchg_end < ggchg );
+#endif
     }
 
-#endif
+
 
 #ifdef __MPI
     this->get_MPI_GVectors();

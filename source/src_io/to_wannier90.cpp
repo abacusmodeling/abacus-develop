@@ -619,9 +619,11 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 					int cal_ik = ik - start_k_index;
 					amn_tem = amn_tem + conj( wfc_pw[ik](ib,ig) ) * trial_orbitals[cal_ik](iw,ig);
 				}
-				
+#ifdef __MPI
 				MPI_Allreduce(&amn_tem , &amn , 1, MPI_DOUBLE_COMPLEX , MPI_SUM , POOL_WORLD);
-				
+#else
+				amn=amn_tem;
+#endif
 				if(MY_RANK == 0)
 				{
 					Amn_file << setw(5) << index_band << setw(5) << iw+1 << setw(5) << ik+1-start_k_index 
@@ -1405,7 +1407,11 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	}
 	
 	complex<double> anorm_tem(0.0,0.0);
+#ifdef __MPI
 	MPI_Allreduce(&anorm , &anorm_tem , 1, MPI_DOUBLE_COMPLEX , MPI_SUM , POOL_WORLD);
+#else
+	anorm_tem=anorm;
+#endif
 	
 	for(int ig = 0; ig < wf.npwx; ig++)
 	{
@@ -1560,9 +1566,11 @@ complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &
 		result_tem = result_tem + conj( psir[ pw.ig2fftw[wf.igk(ikb, ig)] ] ) * wfc_pw[ikb](iband_R,ig);	
 		
 	}
-	
-	MPI_Allreduce(&result_tem , &result , 1, MPI_DOUBLE_COMPLEX , MPI_SUM , POOL_WORLD);	
-	
+#ifdef __MPI
+	MPI_Allreduce(&result_tem , &result , 1, MPI_DOUBLE_COMPLEX , MPI_SUM , POOL_WORLD);
+#else
+	result=result_tem;
+#endif
 	delete[] psir;	
 	return result;	
 	
