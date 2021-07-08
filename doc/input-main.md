@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [symmetry](#symmetry)
     - [Plane wave related variables](#plane-wave-related-variables)
     
         [ecutwfc](#ecutwfc) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
@@ -125,7 +125,7 @@ This part of variables are used to control general system parameters.
 
 - dft_functional<a id="dft-functional"></a>
     - *Type*: String
-    - *Description*: In our package, the XC functional can either be set explicitly using the dft_functional keyword as explained below, or set implicitly according to the XC functional information read from pseudopotential file. The user should ensure that the XC functional set in the INPUT file and the pseudopotential file are consistent. **Currently only LDA and GGA are supported.**
+    - *Description*: In our package, the XC functional can either be set explicitly using the dft_functional keyword as explained below, or set implicitly according to the XC functional information read from pseudopotential file. The user should ensure that the XC functional set in the INPUT file and the pseudopotential file are consistent. If more than one element is present in the system, make sure all of pseudopotentials have the same XC functional. **Currently only LDA and GGA are supported.**
 
         To be specific, we briefly explain the format of the pseudopotential file and the key information it contains. There are a few lines in Si’s GGA pseudopotential file Si_ONCV_PBE-1.0.upf:
         ```
@@ -185,6 +185,11 @@ This part of variables are used to control general system parameters.
     - *Type*: Integer
     - *Description*: devide all processors into npool groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
     - *Default*: 1
+
+- symmetry<a id="symmetry"></a>
+    - *Type*: Integer
+    - *Description*: takes value 0 and 1, if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations.
+    - *Default*: 0
 
     [back to top](#input-file)
 
