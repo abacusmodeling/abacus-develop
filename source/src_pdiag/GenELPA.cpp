@@ -64,7 +64,9 @@
 #include <complex>
 #include <cmath>
 #include <cfloat>
+#ifdef __MPI
 #include <mpi.h>
+#endif
 extern "C"
 {
 //    #include "pblas.h"

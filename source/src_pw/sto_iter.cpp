@@ -431,7 +431,9 @@ void Stochastic_Iter::sum_stoband()
                 }
                 tmpout+=npw;
             }
+#ifdef __MPI
             CHR.rho_mpi();
+#endif
             for(int ir = 0; ir < nrxx ; ++ir)
             {
                 tmprho = CHR.rho[0][ir] * kv.wk[ik] / ucell.omega;

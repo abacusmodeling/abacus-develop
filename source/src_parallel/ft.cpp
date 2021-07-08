@@ -146,13 +146,13 @@ void FFT::setupFFT3D_2()
 	(
 	//this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(psi),  psiout,
 	//this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(psi),  reinterpret_cast<fftw_complex*>(psi) ,
-		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(psi),
+		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(aux4plan),
 		FFTW_BACKWARD, FFTW_ESTIMATE // FFTW_ESTIMATE //FFTW_MEASURE
 	);
 	//cout << "\n sign = -1, R->K space \n";
 	this->minus_plan = fftw_plan_dft_3d
 	(
-		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(psi),
+		this->plan_nx,this->plan_ny,this->plan_nz, reinterpret_cast<fftw_complex*>(aux4plan), reinterpret_cast<fftw_complex*>(aux4plan),
 		FFTW_FORWARD, FFTW_ESTIMATE  // FFTW_ESTIMATE FFTW_MEASURE
 	);
 

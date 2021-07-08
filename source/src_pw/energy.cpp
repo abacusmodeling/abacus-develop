@@ -3,7 +3,9 @@
 #include "energy.h"
 #include "../module_base/mymath.h"
 #include <vector>
+#ifdef __MPI
 #include <mpi.h>
+#endif
 #include <sys/time.h>
 #include "../src_pw/tools.h"
 #ifdef __LCAO

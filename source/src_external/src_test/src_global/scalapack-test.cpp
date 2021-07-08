@@ -1,4 +1,6 @@
-#include <mpi.h>
+#ifdef __MPI
+#include<mpi.h>
+#endif
 #include "../src_global/scalapack-connector.h"
 #include "../src_global/global_function.h"
 
