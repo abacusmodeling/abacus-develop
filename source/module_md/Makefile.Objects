@@ -1,0 +1,12 @@
+# The ABACUS-MD module
+#
+
+VERSION= ABACUS-MD
+HEADERS= *.h
+
+OBJS_MD=MD_basic.o\
+MD_fire.o\
+MD_func.o\
+MD_thermo.o\
+run_md.o\
+run_md_pw.o\

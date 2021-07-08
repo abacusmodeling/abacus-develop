@@ -9,7 +9,7 @@
 #include "src_io/print_info.h"
 #include "src_pw/symmetry.h"
 #include "src_ions/Cell_PW.h"
-#include "src_ions/run_md_pw.h"
+#include "module_md/run_md_pw.h"
 
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}
