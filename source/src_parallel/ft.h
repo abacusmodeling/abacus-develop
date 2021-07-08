@@ -42,13 +42,13 @@ private:
 	int nxx;
 	bool FFTWsetupwasdone;
 	int test;
+	complex<double> *aux4plan;
 #ifdef __MPI
 	void P3DFFT(complex<double> *psi, const int sign);
 	void fftxy(complex<double> *psi, const int sign);
 	void fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out);
 	void scatter(complex<double> *psi, const int sign);
 	complex<double> *aux;
-	complex<double> *aux4plan;
 	fftw_plan planplus_x;
 	fftw_plan planplus_y; // mohan fix bug 2009-10-10
 	fftw_plan planplus_z;
