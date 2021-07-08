@@ -27,7 +27,6 @@ WHERE MORE INFORMATION CAN BE FOUND.
 - [Functionalities](#functionalities)
 - [Examples](#examples)
 - [For developers](#for-developers)
-  - [Build and install ABACUS from CMake](#build-and-install-abacus-from-cmake)
 
 
 # About ABACUS
@@ -148,34 +147,14 @@ ABACUS provides a wide variety of functionalities, with explanation and examples
 # Examples
 We also provide many examples in the directories examples/ and tests/
 
+[back to top](#readme-top)
+
 # For developers
 
 We also provide some [information](doc/developer.md) for developers.
+- [Build and install ABACUS with CMake](doc/developer.md#build-and-install-abacus-with-cmake)
+- [Raising issues on GitHub](doc/developer.md#raising-issues-on-github)
+- [Modularization and module tests](doc/developer.md#modularization-and-module-tests)
+- [Contributing to ABACUS](doc/developer.md#contributing-to-abacus)
 
----
-
-## Build and install ABACUS from CMake
-
-Check the cmake version on your machine
-```bash
-cmake --version
-```
-ABACUS requires the minimum cmake version `3.18`.
-
-You can specify the bin path of ABACUS binary to install by `CMAKE_INSTALL_PREFIX`.
-```bash
-cmake -B build -DCMAKE_INSTALL_PREFIX=${ABACUS_BIN_PATH}
-```
-You can provide root path of each dependent package if the package cannot be automatically found by cmake.
-Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDEDIR`, `BOOST_INCLUDEDIR`, `MPI_CXX_COMPILER` and `MKL_DIR`. are currently available to specify.
-For example
-```bash
-cmake -B build -DFFTW3_ROOT=/opt/fftw3
-```
-
-If the cmake has executed successfully, then
-```bash
-cmake --build build
-cmake --install build
-```
-If no install prefix is specified, the binary will be installed to `/usr/local/bin/ABACUS` by default.
+[back to top](#readme-top)
