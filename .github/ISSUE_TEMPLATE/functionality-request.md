@@ -1,6 +1,6 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Functionality Request
+about: Suggest something more for ABACUS to do
 title: ''
 labels: enhancement
 assignees: mohanchen

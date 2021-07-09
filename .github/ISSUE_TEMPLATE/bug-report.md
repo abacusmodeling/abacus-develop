@@ -1,9 +1,9 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Bug Report
+about: Create a report for problems with ABACUS
 title: ''
 labels: bug
-assignees: mohanchen
+assignees: dyzheng
 
 ---
 
