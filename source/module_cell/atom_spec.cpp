@@ -119,6 +119,11 @@ void Atom::bcast_atom(void)
     Parallel_Common::bcast_int( nw );
     Parallel_Common::bcast_int( stapos_wf );
     Parallel_Common::bcast_string( label );
+    if(MY_RANK!=0)
+    {
+        delete[] l_nchi;
+        l_nchi = new int[nwl+1];
+    }
     Parallel_Common::bcast_int( l_nchi, nwl+1);
     Parallel_Common::bcast_bool( flag_empty_element );
 

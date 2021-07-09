@@ -284,8 +284,6 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				}
 
 				char word[80];
-				delete[] this->atoms[it].l_nchi;
-				this->atoms[it].l_nchi = new int[ this->atoms[it].nwl+1];
 				this->atoms[it].nw = 0;
 				int L =0;
 
@@ -295,6 +293,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					if (strcmp("Lmax", word) == 0)
 					{
 						READ_VALUE(ifs, this->atoms[it].nwl);
+						delete[] this->atoms[it].l_nchi;
+						this->atoms[it].l_nchi = new int[ this->atoms[it].nwl+1];
 					}
 					assert(this->atoms[it].nwl<10);
 
@@ -356,8 +356,6 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			if(BASIS_TYPE == "pw")
 #endif
 			{
-				delete[] this->atoms[it].l_nchi;
-				this->atoms[it].l_nchi = new int[ this->atoms[it].nwl+1];
 				this->atoms[it].nw = 0;
 
 				this->atoms[it].nwl = 2;
@@ -366,6 +364,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				{
 					this->atoms[it].nwl = lmaxmax;
 				}
+				delete[] this->atoms[it].l_nchi;
+				this->atoms[it].l_nchi = new int[ this->atoms[it].nwl+1];
 				for(int L=0; L<atoms[it].nwl+1; L++)
 				{
 					this->atoms[it].l_nchi[L] = 1;
