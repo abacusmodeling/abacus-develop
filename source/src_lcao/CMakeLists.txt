@@ -29,7 +29,6 @@ add_library(
     center2_orb-orb11.cpp
     center2_orb-orb21.cpp
     center2_orb-orb22.cpp
-    # center2_orb-orb22_ccp.cpp
     dftu.cpp
     dftu_relax.cpp
     dftu_yukawa.cpp
@@ -57,7 +56,6 @@ add_library(
     local_orbital_charge.cpp
     local_orbital_wfc.cpp
     record_adj.cpp
-    run_md.cpp
     wfc_dm_2d.cpp
     wavefunc_in_pw.cpp
 	H_TDDFT_pw.cpp

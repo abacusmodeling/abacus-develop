@@ -1,5 +1,10 @@
 add_library(
-    base
+    md
     OBJECT
-    xxx.cpp
+    MD_basic.cpp
+    MD_fire.cpp
+    MD_func.cpp
+    MD_thermo.cpp
+    run_md.cpp
+    run_md_pw.cpp
 )

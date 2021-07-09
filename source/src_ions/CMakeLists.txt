@@ -2,10 +2,6 @@ add_library(
     ions
     OBJECT
     Cell_PW.cpp
-    MD_basic.cpp
-    MD_fire.cpp
-    MD_func.cpp
-    MD_thermo.cpp
     bfgs_basic.cpp
     ions.cpp
     ions_move_basic.cpp
@@ -16,6 +12,5 @@ add_library(
     lattice_change_basic.cpp
     lattice_change_cg.cpp
     lattice_change_methods.cpp
-    run_md_pw.cpp
     variable_cell.cpp
 )

@@ -4,7 +4,7 @@
 #include "module_base/vector3.h"
 #include <fstream>
 #include <string>
-#include "src_ions/MD_parameters.h"
+#include "module_md/MD_parameters.h"
 
 using namespace std;
 
