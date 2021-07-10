@@ -13,8 +13,8 @@
 
 #include <fstream>		// Peize Lin test
 #include <iomanip>		// Peize Lin test
-#include "src_external/src_test/src_global/matrix-test.h"		// Peize Lin test
-#include"src_external/src_test/test_function.h"
+#include "../src_external/src_test/src_global/matrix-test.h"		// Peize Lin test
+#include "../src_external/src_test/test_function.h"
 
 map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Cs(
 	const set<size_t> &atom_centres,

@@ -2,7 +2,7 @@
 #define EXX_ABFS_SCREEN_CAUCHY_H
 
 #include "exx_abfs.h"
-#include "src_ri/abfs-vector3_order.h"
+#include "abfs-vector3_order.h"
 #include <map>
 #include <valarray>
 

@@ -19,6 +19,13 @@ FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
 #FFTW_LIB_DIR     = ${FFTW_DIR}/lib
 #FFTW_LIB         = -L${FFTW_LIB_DIR} -lfftw3 -Wl,-rpath=${FFTW_LIB_DIR}
 
+##==========================
+## FFTW package needed 
+##==========================
+#BOOST_DIR = /home/mohan/1_Software/impi_boost-1.70.0
+BOOST_DIR = /home/qianrui/intelcompile/impi_boost
+BOOST_INCLUDE_DIR = ${BOOST_DIR}/include
+
 #==========================
 # LAPACK package needed 
 #==========================
@@ -44,7 +51,7 @@ LIBS = -lifcore -lm -lpthread ${FFTW_LIB} ${LAPACK_LIB}
 #==========================
 # OPTIMIZE OPTIONS
 #==========================
-INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR}
+INCLUDES = -I. -Icommands -I${FFTW_INCLUDE_DIR} -I${LAPACK_INCLUDE_DIR} -I${BOOST_INCLUDE_DIR}
 
 # -pedantic turns off more extensions and generates more warnings
 # -xHost generates instructions for the highest instruction set available on the compilation host processor
@@ -63,11 +70,11 @@ VPATH=../src_global\
 #==========================
 # Define HONG
 #==========================
-HONG= ${HONG_FFTW}  -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL
+HONG= ${HONG_FFTW}  -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -DEXX_H_COMM=2
 
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\
-$(OBJS_PW)\
+$(OBJS_MD)\
 $(OBJS_PARALLEL)\
 ${OBJS_IO}\
 ${OBJS_CELL}\

@@ -1,24 +1,24 @@
 #ifndef EXX_LCAO_H
 #define EXX_LCAO_H
 
-#include "src_ri/abfs.h"
-#include "src_ri/abfs-vector3_order.h"
-#include "src_ri/exx_abfs-matrix_orbs11.h" 
-#include "src_ri/exx_abfs-matrix_orbs21.h" 
-#include "src_ri/exx_abfs-dm.h"
-#include "src_ri/exx_abfs-parallel-communicate-hexx.h"
-#include "src_ri/exx_abfs-screen-schwarz.h"
-#include "src_ri/exx_abfs-screen-cauchy.h"
+#include "abfs.h"
+#include "abfs-vector3_order.h"
+#include "exx_abfs-matrix_orbs11.h" 
+#include "exx_abfs-matrix_orbs21.h" 
+#include "exx_abfs-dm.h"
+#include "exx_abfs-parallel-communicate-hexx.h"
+#include "exx_abfs-screen-schwarz.h"
+#include "exx_abfs-screen-cauchy.h"
 #include "../module_base/element_basis_index.h"
 #include "../src_pw/xc_type.h"
 #include "../src_pw/exx_global.h"
 
 #if EXX_DM==1
-#include "src_ri/exx_abfs-parallel-communicate-dm.h"
+#include "exx_abfs-parallel-communicate-dm.h"
 #elif EXX_DM==2
-#include "src_ri/exx_abfs-parallel-communicate-dm2.h"
+#include "exx_abfs-parallel-communicate-dm2.h"
 #elif EXX_DM==3
-#include "src_ri/exx_abfs-parallel-communicate-dm3.h"
+#include "exx_abfs-parallel-communicate-dm3.h"
 #endif
 
 #include<set>

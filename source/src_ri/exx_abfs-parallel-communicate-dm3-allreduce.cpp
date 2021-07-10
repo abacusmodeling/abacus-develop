@@ -13,7 +13,7 @@
 #include <algorithm>
 
 
-#include "src_external/src_test/test_function.h"
+#include "../src_external/src_test/test_function.h"
 
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(

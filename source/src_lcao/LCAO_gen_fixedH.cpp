@@ -1,8 +1,8 @@
 #include "LCAO_gen_fixedH.h"
 #include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
-#include "src_lcao/LCAO_nnr.h"
-#include "src_lcao/global_fp.h"
+#include "LCAO_nnr.h"
+#include "global_fp.h"
 
 LCAO_gen_fixedH::LCAO_gen_fixedH()
 {}
