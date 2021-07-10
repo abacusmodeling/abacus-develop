@@ -11,7 +11,7 @@
 #include <boost/serialization/set.hpp>
 #include <boost/serialization/string.hpp>
 
-#include "module_base/vector3.h"
+#include "../module_base/vector3.h"
 #include "../src_ri/abfs-vector3_order.h"
 #include "../module_base/matrix.h"
 #include "../module_base/matrix_wrapper.h"

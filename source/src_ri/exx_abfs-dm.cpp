@@ -5,10 +5,10 @@
 #include "../src_pw/charge_pulay.h"
 #include "../module_base/container_operator.h"
 
-#include "src_external/src_test/src_global/matrix-test.h"
-#include "src_external/src_test/src_global/complexmatrix-test.h"
-#include "src_external/src_test/src_ri/exx_lcao-test.h"
-#include "src_external/src_test/src_ri/exx_abfs-dm-test.h"
+#include "../src_external/src_test/src_global/matrix-test.h"
+#include "../src_external/src_test/src_global/complexmatrix-test.h"
+#include "../src_external/src_test/src_ri/exx_lcao-test.h"
+#include "../src_external/src_test/src_ri/exx_abfs-dm-test.h"
 
 void Exx_Abfs::DM::cal_DM(
 	const set<pair<size_t,size_t>> &atom_pairs,

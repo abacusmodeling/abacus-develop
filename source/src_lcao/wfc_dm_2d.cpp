@@ -7,11 +7,11 @@
 #include "wfc_dm_2d.h"
 #include "../module_base/lapack_connector.h"
 #include "../module_base/scalapack_connector.h"
-#include "src_lcao/global_fp.h"
+#include "global_fp.h"
 #include "../src_pw/global.h"
 
-#include "src_external/src_test/test_function.h"
-#include "src_external/src_test/src_global/complexmatrix-test.h"
+#include "../src_external/src_test/test_function.h"
+#include "../src_external/src_test/src_global/complexmatrix-test.h"
 
 void Wfc_Dm_2d::init()
 {

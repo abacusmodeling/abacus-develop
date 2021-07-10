@@ -2,7 +2,7 @@
 #include "../src_pw/global.h"
 #include <random>
 
-#include "src_external/src_test/test_function.h"
+#include "../src_external/src_test/test_function.h"
 
 pair< vector<Exx_Abfs::Parallel::Distribute::Kmeans::Atom>, vector<Exx_Abfs::Parallel::Distribute::Kmeans::Cluster> >
 Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )

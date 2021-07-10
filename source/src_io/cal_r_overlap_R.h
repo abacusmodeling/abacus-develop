@@ -8,17 +8,17 @@ using std::map;
 #include<set>
 using std::set;
 
-#include "src_lcao/center2_orb.h"
-#include "src_lcao/center2_orb-orb11.h"
-#include "src_lcao/center2_orb-orb21.h"
+#include "../src_lcao/center2_orb.h"
+#include "../src_lcao/center2_orb-orb11.h"
+#include "../src_lcao/center2_orb-orb21.h"
 
-#include "module_orbital/ORB_table_phi.h"
-#include "module_orbital/ORB_gaunt_table.h"
-#include "module_orbital/ORB_atomic_lm.h"
-#include "module_orbital/ORB_read.h"
-#include "module_base/vector3.h"
+#include "../module_orbital/ORB_table_phi.h"
+#include "../module_orbital/ORB_gaunt_table.h"
+#include "../module_orbital/ORB_atomic_lm.h"
+#include "../module_orbital/ORB_read.h"
+#include "../module_base/vector3.h"
 #include "../module_base/ylm.h"
-#include "src_lcao/global_fp.h"
+#include "../src_lcao/global_fp.h"
 
 #include "../src_pw/global.h"
 

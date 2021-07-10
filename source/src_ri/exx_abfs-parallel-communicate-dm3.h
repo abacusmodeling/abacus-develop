@@ -1,8 +1,8 @@
 #ifndef EXX_ABFS_PARALLEL_COMMUNICATE_DM3_H
 #define EXX_ABFS_PARALLEL_COMMUNICATE_DM3_H
 
-#include "src_ri/exx_abfs-parallel.h"
-#include "src_ri/abfs-vector3_order.h"
+#include "exx_abfs-parallel.h"
+#include "abfs-vector3_order.h"
 
 #include <vector>
 #include <map>
