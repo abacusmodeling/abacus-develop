@@ -7,11 +7,11 @@
 #include <mpi.h>
 #endif
 #include <sys/time.h>
-#include "../src_pw/tools.h"
+#include "tools.h"
 #ifdef __LCAO
 #include "../src_lcao/dftu.h"  //Quxin adds for DFT+U on 20201029
 #endif
-#include "../src_pw/myfunc.h"
+#include "myfunc.h"
 //new
 #include "H_Ewald_pw.h"
 #include "H_Hartree_pw.h"

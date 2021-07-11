@@ -5,8 +5,8 @@
 #include "../src_pw/tools.h"
 #include "../src_pw/charge_extra.h"
 #include "../src_pw/sto_elec.h" //mohan added 2021-01-28
-#include "../src_ions/ions_move_methods.h"
-#include "../src_ions/lattice_change_methods.h"
+#include "ions_move_methods.h"
+#include "lattice_change_methods.h"
 
 class Ions
 {

@@ -10,7 +10,7 @@
 #ifndef Diago_David_H
 #define Diago_David_H
 
-#include "../src_pw/tools.h"
+#include "tools.h"
 
 class Diago_David
 {

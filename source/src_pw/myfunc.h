@@ -2,7 +2,7 @@
 #define MYFUNC_H
 using namespace std;
 
-#include "../src_pw/tools.h"
+#include "tools.h"
 //#include "../src_algorithms/mymath.h"     //  only wgauss(),wlgauss()
 #include <complex>
 

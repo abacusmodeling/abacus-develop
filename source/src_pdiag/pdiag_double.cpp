@@ -3,7 +3,7 @@
 #include "../module_base/lapack_connector.h"
 #include "../src_pw/occupy.h"
 #include "../src_pw/global.h"
-#include "src_lcao/local_orbital_charge.h"
+#include "../src_lcao/local_orbital_charge.h"
 #include "../src_io/wf_local.h"
 
 
@@ -22,7 +22,7 @@ extern "C"
 #include "../module_base/lapack_connector.h"
 #endif
 
-#include "src_external/src_test/test_function.h"
+#include "../src_external/src_test/test_function.h"
 
 inline int cart2blacs(
 	MPI_Comm comm_2D,

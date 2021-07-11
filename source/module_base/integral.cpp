@@ -1,6 +1,6 @@
 #include "integral.h"
 #include "polint.h"
-#include "../module_base/constants.h"
+#include "constants.h"
 #include <cassert>
 #include <cmath>
 using namespace std;

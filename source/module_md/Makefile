@@ -65,21 +65,26 @@ VPATH=../src_global\
 :../src_parallel\
 :../src_io\
 :../src_ions\
+:../src_pw\
+:../src_lcao\
 :./\
+:../\
 
 #==========================
 # Define HONG
 #==========================
-HONG= ${HONG_FFTW}  -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -DEXX_H_COMM=2
+HONG= ${HONG_FFTW} -D__LCAO -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -DEXX_H_COMM=2
 
 FP_OBJS_0=main.o\
-$(OBJS_BASE)\
-$(OBJS_MD)\
-$(OBJS_PARALLEL)\
-${OBJS_IO}\
-${OBJS_CELL}\
 $(OBJS_MAIN)\
-${OBJS_IONS}
+$(OBJS_BASE)\
+$(OBJS_CELL)\
+$(OBJS_MD)\
+$(OBJS_PW)\
+$(OBJS_LCAO)\
+$(OBJS_IO)\
+${OBJS_IONS}\
+${OBJS_PARALLEL}\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 
