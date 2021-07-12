@@ -17,6 +17,8 @@ class Run_md
     ~Run_md();
 
     static void md_line(void);
+    static void classic_md_line(void);
+    static void ai_md_line(void);
 
 };
 

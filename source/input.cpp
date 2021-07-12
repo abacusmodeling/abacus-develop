@@ -1143,6 +1143,10 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
+		else if (strcmp("md_potential",word) == 0)
+		{
+			read_value(ifs, mdp.md_potential);
+		}
 		else if (strcmp("NVT_tau",word) == 0)
 		{
 			read_value(ifs, mdp.NVT_tau);
@@ -2114,6 +2118,7 @@ void Input::Bcast()
 */
 	//zheng daye add 2014/5/5
         Parallel_Common::bcast_int(mdp.mdtype);
+		Parallel_Common::bcast_int(mdp.md_potential);
         Parallel_Common::bcast_double(mdp.NVT_tau);
         Parallel_Common::bcast_int(mdp.NVT_control);
         Parallel_Common::bcast_double(mdp.dt);
@@ -2494,6 +2499,7 @@ void Input::Check(void)
 	else if(calculation == "md") // mohan add 2011-11-04
 	{
 		CALCULATION = "md"; 
+		symmetry = false;
 		force = 1;
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
 

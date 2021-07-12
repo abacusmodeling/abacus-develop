@@ -13,9 +13,25 @@ Run_md::~Run_md(){}
 
 void Run_md::md_line(void)
 {
-    TITLE("Run_md","md_line");
+	TITLE("Run_md","md_line");
 	timer::tick("Run_md","md_line",'A');
 
+	if(INPUT.mdp.md_potential==0)
+	{
+		Run_md::ai_md_line();
+	}
+	else
+	{
+		Run_md::classic_md_line();
+	}
+
+	timer::tick("Run_md","md_line",'A');
+    return;
+}
+
+
+void Run_md::ai_md_line(void)
+{
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put NLOCAL and NBANDS as input parameters
@@ -119,6 +135,11 @@ void Run_md::md_line(void)
 		run_md_lcao.opt_cell();
 	}
 
-	timer::tick("Run_lcao","lcao_line",'A');
     return;
+}
+
+void Run_md::classic_md_line(void)
+{
+	cout << "Classic MD !!" << endl;
+	return;
 }
