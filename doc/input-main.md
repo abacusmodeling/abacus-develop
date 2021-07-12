@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [symmetry](#symmetry)
     - [Plane wave related variables](#plane-wave-related-variables)
     
         [ecutwfc](#ecutwfc) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
@@ -36,7 +36,7 @@ ecutwfc 60
 ```
 Parameters list starts with key word `INPUT_PARAMETERS`. Any content before `INPUT_PARAMETERS` will be ignored.
 
-Any line starting with `#` will also be ignored.
+Any line starting with `#` or `/` will also be ignored.
 
 Each parameter value is provided by specifying the name of the input variable
 and then putting the value after the name, separated by one or more blank characters(space
@@ -125,7 +125,7 @@ This part of variables are used to control general system parameters.
 
 - dft_functional<a id="dft-functional"></a>
     - *Type*: String
-    - *Description*: In our package, the XC functional can either be set explicitly using the dft_functional keyword as explained below, or set implicitly according to the XC functional information read from pseudopotential file. The user should ensure that the XC functional set in the INPUT file and the pseudopotential file are consistent. **Currently only LDA and GGA are supported.**
+    - *Description*: In our package, the XC functional can either be set explicitly using the dft_functional keyword as explained below, or set implicitly according to the XC functional information read from pseudopotential file. The user should ensure that the XC functional set in the INPUT file and the pseudopotential file are consistent. If more than one element is present in the system, make sure all of pseudopotentials have the same XC functional. **Currently only LDA and GGA are supported.**
 
         To be specific, we briefly explain the format of the pseudopotential file and the key information it contains. There are a few lines in Si’s GGA pseudopotential file Si_ONCV_PBE-1.0.upf:
         ```
@@ -176,6 +176,21 @@ This part of variables are used to control general system parameters.
         - upf201 : the new UPF format
     - *Default* : upf
 
+- out_alllog<a id="out-alllog"></a>
+    - *Type*: Integer
+    - *Description*: determines whether to write log from all ranks in an MPI run. If set to be 1, then each rank will write detained running information to a file named running_${calculation}\_(${rank}+1).log. If set to 0, log will only be written from rank 0 into a file named running_${calculation}.log.
+    - *Default*: 0
+
+- npool<a id="npool"></a>
+    - *Type*: Integer
+    - *Description*: devide all processors into npool groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
+    - *Default*: 1
+
+- symmetry<a id="symmetry"></a>
+    - *Type*: Integer
+    - *Description*: takes value 0 and 1, if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations.
+    - *Default*: 0
+
     [back to top](#input-file)
 
 ### Plane wave related variables
@@ -204,7 +219,7 @@ This part of variables are used to control the plane wave related parameters.
 - start_charge<a id="start-charge"></a>
     - *Type*: String
     - *Description*: This variable is used for both plane wave set and localized orbitals set. It indicates the type of starting density. If set this to ‘atomic’, the density is starting from summation of atomic density of single atoms. If set this to ‘file’, the density will be read in from file. The file should be in the output directory. Besides, when you do ‘nspin=1’ calculation, you only need the density file SPIN1_CHGCAR. However, if you do ‘nspin=2’ calculation, you also need the density file SPIN2_CHGCAR. The density file should be output with these names if you set out_charge = 1 in INPUT file.
-        -  atomic:
+        - atomic:
         - file:
     - *Default*:atomic
 
@@ -227,7 +242,7 @@ calculations.
 
         For plane-wave basis,
         - cg: cg method.
-        - david: david is the Davidson algorithm.
+        - dav: the Davidson algorithm. (Currently not working with Intel MKL library).
 
         For atomic orbitals basis,
         - genelpa: This method should be used if you choose localized orbitals.
@@ -250,7 +265,7 @@ calculations.
         - fixed: use fixed occupations.
         - gauss or gaussian: use gaussian smearing method.
         - mp: use methfessel-paxton smearing method.
-    - *Default*: fixed.
+    - *Default*: fixed
 
     [back to top](#input-file)
 - sigma<a id="sigma"></a>
@@ -266,7 +281,7 @@ calculations.
         - kerker: Use kerker method, which is the mixing method in G space.
         - pulay: Standard Pulay method.
         - pulay-kerker:
-    - *Default*: pulay.
+    - *Default*: pulay
 
     [back to top](#input-file)
 - mixing_beta<a id="mixing-beta"></a>
@@ -308,13 +323,13 @@ calculations.
     [back to top](#input-file)
 - diago_cg_maxiter<a id="diago-cg-maxiter"></a>
     - *Type*: Integer
-    - *Description*: Only useful when you use ks_solver = cg or ks_solver = david. It indicates the maximal iteration number for cg/david method.
+    - *Description*: Only useful when you use ks_solver = cg or ks_solver = dav. It indicates the maximal iteration number for cg/david method.
     - *Default*: 40
 
     [back to top](#input-file)
 - diago_david_ndim<a id="diago-david-ndim"></a>
     - *Type*: Integer
-    - *Description*: Only useful when you use ks_solver = david. It indicates the maximal dimension for david method.
+    - *Description*: Only useful when you use ks_solver = dav. It indicates the maximal dimension for the Davidson method.
     - *Default*: 10
 
     [back to top](#input-file)
@@ -336,13 +351,13 @@ calculations.
 - out_charge<a id="out-charge"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the charge density on real space grid. The name of the density file is SPIN1_CHGCAR and SPIN2_CHGCAR (if nspin = 2). Suppose each density on grid has coordinate (x; y; z). The circle order of the density on real space grid is: z is the outer loop, then y and finally x (x is moving fastest).
-    - *Default*:0
+    - *Default*: 0
 
     [back to top](#input-file)
 - out_potential<a id="out-potential"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the local potential on real space grid. The name of the file is SPIN1_POT and SPIN2_POT (if nspin = 2). If set to 2, ABACUS will output the electrostatic potential on real space grid. The name of the file is ElecStaticPot and ElecStaticP ot_AV E (along the z-axis).
-    - *Default*:0
+    - *Default*: 0
 
     [back to top](#input-file)
 - out_dm<a id="out-dm"></a>
@@ -365,9 +380,12 @@ calculations.
     [back to top](#input-file)
 - out_dos<a id="out-dos"></a>
     - *Type*: Integer
-    - *Description*: Controls the output of density of state (DOS). For more information, refer to the [worked example](examples/dos.md).
+    - *Description*: Controls whether to output the density of state (DOS). For more information, refer to the [worked example](examples/dos.md).
     - *Default*: 0
 - out_band<a id="out-band"></a>
+    - *Type*: Integer
+    - *Description*: Controls whether to output the band structure. For mroe information, refer to the [worked example](examples/band-struc.md)
+    - *Default*: 0
 - mulliken<a id="mulliken"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the Mulliken population analysis result. The name of the output file is mulliken.txt
@@ -393,7 +411,8 @@ calculations.
     [back to top](#input-file)
 - force_thr<a id="force-thr"></a>
     - *Type*: Real
-    - *Description*: The threshold of the force convergence, it indicates the largest force among all the atoms, the unit is Ry=Bohr, *Default*: 0.000388935 Ry/Bohr = 0.01 eV/Angstrom
+    - *Description*: The threshold of the force convergence, it indicates the largest force among all the atoms, the unit is Ry=Bohr
+    - *Default*: 0.000388935 Ry/Bohr = 0.01 eV/Angstrom
 
     [back to top](#input-file)
 - force_thr_ev<a id="force-thr-ev"></a>
@@ -555,25 +574,25 @@ This part of variables are used to control vdW-corrected related parameters.
 - vdw_s6<a id="vdw-s6"></a>
     - *Type*: Real
     - *Description*: This scale factor is to optimize the interaction energy deviations. For DFT-D2, it is found to be 0.75 (PBE), 1.2 (BLYP), 1.05 (B-P86), 1.0 (TPSS), and 1.05 (B3LYP). For DFT-D3, recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 0.75 if vdw_method is chosen to be d2; 1.0 if vdw_method is chosen to be d3_0 or d3_bj
 
     [back to top](#input-file)
 - vdw_s8<a id="vdw-s8"></a>
     - *Type*: Real
     - *Description*: This scale factor is only the parameter of DFTD3 approachs including D3(0) and D3(BJ). Recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 0.722 if vdw_method is chosen to be d3_0; 0.7875 if vdw_method is chosen to be d3_bj
 
     [back to top](#input-file)
 -   vdw_a1<a id="vdw-a1"></a>
     - *Type*: Real
     - *Description*: This damping function parameter is only the parameter of DFT-D3 approachs including D3(0) and D3(BJ). Recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 1.217 if vdw_method is chosen to be d3_0; 0.4289 if vdw_method is chosen to be d3_bj
 
     [back to top](#input-file)
 - vdw_a2<a id="vdw-a2"></a>
     - *Type*: Real
     - *Description*: This damping function arameter is only the parameter of DFT-D3(BJ) approach. Recommended values of this parameter with different DFT functionals can be found on the [webpage](https://www.chemie.uni-bonn.de/pctc/mulliken-center/software/dft-d3). The default values of this parameter in ABACUS is available for PBE. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 1.0 if vdw_method is chosen to be d3_0; 4.4407 if vdw_method is chosen to be d3_bj
 
     [back to top](#input-file)
 - vdw_d<a id="vdw-d"></a>
@@ -621,7 +640,7 @@ This part of variables are used to control vdW-corrected related parameters.
 - vdw_radius<a id="vdw-radius"></a>
     - *Type*: Real
     - *Description*: If vdw_model is set to radius, this variable specifies the radius of the calculated sphere. For DFT-D2, the default value is 56.6918 ,while it is 95 for DFT-D3. This variable will be set to default, if no vdW-corrected method has been used.
-    - *Default*: default
+    - *Default*: 56.6918 if vdw_method is chosen to be d2; 95 if vdw_method is chosen to be d3_0 or d3_bj
 
     [back to top](#input-file)
 - vdw_radius_unit<a id="vdw-radius-unit"></a>
