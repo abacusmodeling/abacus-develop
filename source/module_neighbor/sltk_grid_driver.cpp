@@ -10,18 +10,10 @@ test_grid_driver(test_gd_in),
 Grid(test_grid_in)
 {
 	//	TITLE("Grid_Driver","Grid_Driver");
-	ntype = new int[1];
-	natom = new int[1];
-	adjacent_tau = new Vector3<double>[1];
-	box = new Vector3<int>[1];
 }
 
 Grid_Driver::~Grid_Driver()
 {
-	delete [] ntype;
-	delete [] natom;
-	delete [] adjacent_tau;
-	delete [] box;
 }
 
 
@@ -29,7 +21,7 @@ void Grid_Driver::Find_atom(
 	const UnitCell &ucell, 
 	const Vector3<double> &cartesian_pos, 
 	const int &ntype, 
-	const int &nnumber)const
+	const int &nnumber)
 {
 	//if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_atom");
 	timer::tick("Grid_Driver","Find_atom");
@@ -106,7 +98,7 @@ int Grid_Driver::Locate_offset(
 
 }
 
-void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentSet> as)const
+void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentSet> as)
 {
 //	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_adjacent_atom");
 
@@ -124,21 +116,14 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 	//cout << "\n length = " << adj_num << endl;
 	//BLOCK_HERE("Find_adjacent_atom");
 
-	delete[] ntype;
-	delete[] natom;
-	delete[] adjacent_tau;
-	delete[] box;
-
 //----------------------------------------------------------
 // add center atom at the end of these arrays
 // ywcui add 2009-03-30
 //----------------------------------------------------------
-	ntype = new int[adj_num+1];
-	natom = new int[adj_num+1];
-	ZEROS(ntype, adj_num);
-	ZEROS(natom, adj_num);
-	adjacent_tau = new Vector3<double>[adj_num+1];
-	box = new Vector3<int>[adj_num+1];
+	ntype.resize(adj_num+1);
+	natom.resize(adj_num+1);
+	adjacent_tau.resize(adj_num+1);
+	box.resize(adj_num+1);
 
 	// the last one is the atom itself.
 	ntype[adj_num] = this->atomlink[offset].fatom.getType();
