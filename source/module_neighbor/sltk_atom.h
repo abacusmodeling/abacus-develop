@@ -1,6 +1,7 @@
 #ifndef INCLUDE_FATOM
 #define INCLUDE_FATOM
 
+#include <memory>
 #include "sltk_util.h"
 #include "sltk_adjacent_set.h"
 
@@ -14,7 +15,7 @@ private:
 	double d_x;
 	double d_y;
 	double d_z;
-	AdjacentSet* as;
+	std::shared_ptr<AdjacentSet> as;
 
 	int type;
 	int natom;
@@ -43,15 +44,11 @@ public:
 // NAME : setAdjacentSet
 //==========================================================
 
-	AdjacentSet* getAdjacentSet() const
+	std::shared_ptr<AdjacentSet> getAdjacentSet() const
 	{ return this->as; }
 
-	void setAdjacentSet(AdjacentSet* const pointAdjacentSet)
-	{ this->as = pointAdjacentSet; }
-
 	void allocate_AdjacentSet(void)
-	{ this->as = new AdjacentSet; allocate = true; }
-	bool allocate;
+	{ this->as = std::make_shared<AdjacentSet>(); }
 
 //==========================================================
 // MEMBER FUNCTION :

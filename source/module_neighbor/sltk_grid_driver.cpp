@@ -106,7 +106,7 @@ int Grid_Driver::Locate_offset(
 
 }
 
-void Grid_Driver::Find_adjacent_atom(const int offset, AdjacentSet* as)const
+void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentSet> as)const
 {
 //	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_adjacent_atom");
 

@@ -1,6 +1,7 @@
 #ifndef GRID_DRIVER_H
 #define GRID_DRIVER_H
 
+#include <memory>
 #include <stdexcept>
 #include "sltk_atom.h"
 #include "sltk_atom_input.h"
@@ -72,7 +73,7 @@ private:
 
 	void Find_adjacent_atom(
 		const int offset, 
-		AdjacentSet* as)const;
+		std::shared_ptr<AdjacentSet> as)const;
 
 	double Distance(const AtomLink& a1, const Vector3<double> &adjacent_site)const;
 	double Distance(const AtomLink& a1, const AtomLink& a2)const;
