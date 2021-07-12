@@ -92,7 +92,8 @@ void atom_arrange::search(
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 
 	const double &search_radius_bohr, 
-	const int &test_atom_in)
+	const int &test_atom_in,
+	const bool test_only)
 {
 	TITLE("atom_arrange", "search");
 	timer::tick("atom_arrange","search");
@@ -135,24 +136,28 @@ void atom_arrange::search(
 	grid_d.init(ofs_in, ucell, at);
 
 	// test the adjacent atoms and the box.
-	//ofs_in << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << endl;
-	for (int it = 0;it < ucell.ntype;it++)
+	if(test_only)
 	{
-		for (int ia = 0;ia < ucell.atoms[it].na;ia++)
+		ofs_in << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << endl;
+		for (int it = 0;it < ucell.ntype;it++)
 		{
-	//		grid_d.Find_atom(ucell.atoms[it].tau[ia]);
-			
-	//		ofs_in << " " << setw(5) << it << setw(5) << ia << setw(8) << grid_d.getAdjacentNum()+1 << endl;
-			/*
-			for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
+			for (int ia = 0;ia < ucell.atoms[it].na;ia++)
 			{
-				Vector3<double> tau = grid_d.getAdjacentTau(ad);
-				Vector3<int> box = grid_d.getBox(ad);
-				cout << setw(8) << tau.x << setw(8) << tau.y << setw(8) << tau.z 
-				<< setw(8) << box.x << setw(8) << box.y << setw(8) << box.z << endl;
+				grid_d.Find_atom(ucell, ucell.atoms[it].tau[ia], it, ia);
+				
+				ofs_in << " " << setw(5) << it << setw(5) << ia << setw(8) << grid_d.getAdjacentNum()+1 << endl;
+				
+				for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
+				{
+					Vector3<double> tau = grid_d.getAdjacentTau(ad);
+					Vector3<int> box = grid_d.getBox(ad);
+					cout << setw(15) << tau.x << " " << setw(15) << tau.y << " " << setw(15) << tau.z << " " 
+					<< setw(8) << box.x << setw(8) << box.y << setw(8) << box.z << endl;
+				}
 			}
-			*/
 		}
+		ofs_in << "search neighboring atoms done." << endl;
+		exit(0);//just test neighboring searching!
 	}
 	
 	timer::tick("atom_arrange","search");
