@@ -29,7 +29,7 @@ Input::~Input()
 
 void Input::Init(const string &fn)
 {
-	timer::tick("Input","Init",'B');
+	timer::tick("Input","Init");
     this->Default();
 
     bool success = this->Read(fn);
@@ -99,7 +99,7 @@ void Input::Init(const string &fn)
 
 	OUT(ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, global_pseudo_type -> pseudo_type)
 
-	timer::tick("Input","Init",'B');
+	timer::tick("Input","Init");
     return;
 }
 

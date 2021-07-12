@@ -305,7 +305,7 @@ inline int setBufferParameter(
 Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vlocal) const						// Peize Lin update OpenMP 2020.09.27
 {
     TITLE("Gint_Gamma","gamma_vlocal");
-    timer::tick("Gint_Gamma","gamma_vlocal",'K');
+    timer::tick("Gint_Gamma","gamma_vlocal");
 
 	Gint_Tools::Array_Pool<double> GridVlocal(GridT.lgd, GridT.lgd);
 	ZEROS(GridVlocal.ptr_1D, GridT.lgd*GridT.lgd);
@@ -439,9 +439,9 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 #endif
 
     OUT(ofs_running, "temp variables are deleted");
-    timer::tick("Gint_Gamma","gamma_vlocal",'K');
+    timer::tick("Gint_Gamma","gamma_vlocal");
     MPI_Barrier(MPI_COMM_WORLD);
-    timer::tick("Gint_Gamma","distri_vl",'K');
+    timer::tick("Gint_Gamma","distri_vl");
 	
 	return GridVlocal;
 }
@@ -452,7 +452,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
     // OUT(ofs_running, "Start transforming vlocal from grid distribute to 2D block");
     if(CHR.get_new_e_iteration())
     {
-        timer::tick("Gint_Gamma","distri_vl_index",'K');
+        timer::tick("Gint_Gamma","distri_vl_index");
         setBufferParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb,
                            ParaO.sender_index_size, ParaO.sender_local_index,
                            ParaO.sender_size_process, ParaO.sender_displacement_process,
@@ -463,10 +463,10 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
         OUT(ofs_running, "vlocal exchange index is built");
         OUT(ofs_running, "buffer size(M):", (ParaO.sender_size+ParaO.receiver_size)*sizeof(double)/1024/1024);
         OUT(ofs_running, "buffer index size(M):", (ParaO.sender_index_size+ParaO.receiver_index_size)*sizeof(int)/1024/1024);
-        timer::tick("Gint_Gamma","distri_vl_index",'K');
+        timer::tick("Gint_Gamma","distri_vl_index");
     }
 
-    timer::tick("Gint_Gamma","distri_vl_value",'K');
+    timer::tick("Gint_Gamma","distri_vl_value");
 
     // put data to send buffer
     for(int i=0; i<ParaO.sender_index_size; i+=2)
@@ -506,8 +506,8 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
         LM.set_HSgamma(g_row,g_col,ParaO.receiver_buffer[i/2],'L');
     }
 
-    timer::tick("Gint_Gamma","distri_vl_value",'K');
-    timer::tick("Gint_Gamma","distri_vl",'K');
+    timer::tick("Gint_Gamma","distri_vl_value");
+    timer::tick("Gint_Gamma","distri_vl");
 }
 
 // calculate the H matrix in terms of effective potentials
@@ -515,7 +515,8 @@ void Gint_Gamma::cal_vlocal(
     const double*const vlocal)
 {
     TITLE("Gint_Gamma","cal_vlocal");
-    timer::tick("Gint_Gamma","cal_vlocal",'J');
+    timer::tick("Gint_Gamma", "cal_vlocal"
+    );
 
     this->job=cal_local;
     this->save_atoms_on_grid(GridT);
@@ -523,5 +524,5 @@ void Gint_Gamma::cal_vlocal(
     const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
 	vl_grid_to_2D(GridVlocal);
 
-    timer::tick("Gint_Gamma","cal_vlocal",'J');
+    timer::tick("Gint_Gamma","cal_vlocal");
 }

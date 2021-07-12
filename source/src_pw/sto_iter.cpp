@@ -147,7 +147,7 @@ void Stochastic_Iter::checkemm(int &iter)
 
 void Stochastic_Iter::itermu(int &iter) 
 {
-    timer::tick("Stochastic_Iter","itermu",'E');
+    timer::tick("Stochastic_Iter","itermu");
     int nkk=1;// We temporarily use gamma k point.
     double dmu;
     if(iter == 1)
@@ -242,13 +242,13 @@ void Stochastic_Iter::itermu(int &iter)
             }
         }
     }
-    timer::tick("Stochastic_Iter","itermu",'E');
+    timer::tick("Stochastic_Iter","itermu");
     return;
 }
 
 void Stochastic_Iter:: sumpolyval()
 {
-    timer::tick("Stochastic_Iter","sumpolyval",'F');
+    timer::tick("Stochastic_Iter","sumpolyval");
     int norder = stoche.norder;
     //wait for init
     int nkk=1;
@@ -276,14 +276,14 @@ void Stochastic_Iter:: sumpolyval()
             }
         }
     }
-    timer::tick("Stochastic_Iter","sumpolyval",'F');
+    timer::tick("Stochastic_Iter","sumpolyval");
     return;
 }
 
 
 double Stochastic_Iter::calne()
 {  
-    timer::tick("Stochastic_Iter","calne",'F');
+    timer::tick("Stochastic_Iter","calne");
     //wait for init
     int nkk = 1;
 
@@ -320,13 +320,13 @@ double Stochastic_Iter::calne()
 #endif
 
     totne = KS_ne + sto_ne;
-    timer::tick("Stochastic_Iter","calne",'F');
+    timer::tick("Stochastic_Iter","calne");
     return totne;
 }
 
 void Stochastic_Iter::sum_stoband()
 {  
-    timer::tick("Stochastic_Iter","sum_stoband",'E');
+    timer::tick("Stochastic_Iter","sum_stoband");
     int nkk=1;// We temporarily use gamma k point.
     int nrxx = stohchi.nrxx;
     int npw = wf.npw;
@@ -535,7 +535,7 @@ void Stochastic_Iter::sum_stoband()
     delete [] sto_rho;
     if(NBANDS == 0 || stotype != "pw")
         delete [] out;
-    timer::tick("Stochastic_Iter","sum_stoband",'E');
+    timer::tick("Stochastic_Iter","sum_stoband");
     return;
 }
 

@@ -108,7 +108,7 @@ void Hamilt_PW::diagH_subspace(
     double *en)
 {
     TITLE("Hamilt_PW","diagH_subspace");
-    timer::tick("Hamilt_PW","diagH_subspace",'G');
+    timer::tick("Hamilt_PW","diagH_subspace");
 
 	assert(nstart!=0);
 	assert(n_band!=0);
@@ -312,7 +312,7 @@ void Hamilt_PW::diagH_subspace(
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
 
-    timer::tick("Hamilt_PW","diagH_subspace",'G');
+    timer::tick("Hamilt_PW","diagH_subspace");
     return;
 }
 
@@ -347,7 +347,7 @@ void Hamilt_PW::s_1psi
 
 void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, const int m)
 {
-    timer::tick("Hamilt_PW","h_psi",'H');
+    timer::tick("Hamilt_PW","h_psi");
     int i = 0;
     int j = 0;
     int ig= 0;
@@ -395,7 +395,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 	//------------------------------------
 	//(2) the local potential.
 	//-----------------------------------
-	timer::tick("Hamilt_PW","vloc",'H');
+	timer::tick("Hamilt_PW","vloc");
 	if(VL_IN_H)
 	{
 		tmhpsi = hpsi;
@@ -451,12 +451,12 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 			tmpsi_in += dmax;
 		}
 	}
-	timer::tick("Hamilt_PW","vloc",'H');
+	timer::tick("Hamilt_PW","vloc");
 
 	//------------------------------------
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
-	timer::tick("Hamilt_PW","vnl",'H');
+	timer::tick("Hamilt_PW","vnl");
 	if(VNL_IN_H)
 	{
 		if ( ppcell.nkb > 0)
@@ -520,8 +520,8 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		}
 	}
-	timer::tick("Hamilt_PW","vnl",'H');
-    timer::tick("Hamilt_PW","h_psi",'H');
+	timer::tick("Hamilt_PW","vnl");
+    timer::tick("Hamilt_PW","h_psi");
     return;
 }
 
@@ -533,7 +533,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	const complex<double> *becp,
 	const int m)
 {
-    timer::tick("Hamilt_PW","add_nonlocal_pp",'I');
+    timer::tick("Hamilt_PW","add_nonlocal_pp");
 
 	// number of projectors
 	int nkb = ppcell.nkb;
@@ -687,7 +687,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 	delete[] ps;
-    timer::tick("Hamilt_PW","add_nonlocal_pp",'I');
+    timer::tick("Hamilt_PW","add_nonlocal_pp");
     return;
 }
 

@@ -15,7 +15,7 @@ void Hamilt::diagH_pw(
     double &avg_iter)
 {
 	TITLE("Hamilt","diagH_pw");
-	timer::tick("Hamilt","diagH_pw",'F');
+    timer::tick("Hamilt", "diagH_pw");
     double avg = 0.0;
 
 	// set ik0 because of mem_saver.
@@ -135,7 +135,7 @@ void Hamilt::diagH_pw(
         }
     }
 
-	timer::tick("Hamilt","diagH_pw",'F');
+	timer::tick("Hamilt","diagH_pw");
     return;
 }
 

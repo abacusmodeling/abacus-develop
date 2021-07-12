@@ -14,7 +14,7 @@ Run_md::~Run_md(){}
 void Run_md::md_line(void)
 {
 	TITLE("Run_md","md_line");
-	timer::tick("Run_md","md_line",'A');
+	timer::tick("Run_md","md_line");
 
 	if(INPUT.mdp.md_potential==0)
 	{
@@ -25,7 +25,7 @@ void Run_md::md_line(void)
 		Run_md::classic_md_line();
 	}
 
-	timer::tick("Run_md","md_line",'A');
+	timer::tick("Run_md","md_line");
     return;
 }
 

@@ -48,7 +48,7 @@ double timer::cpu_time(void)
 		// mohan add, abandon the cross point time 2^32 ~ -2^32 .
 }
 
-void timer::tick(const string &class_name,const string &name,char level_in)
+void timer::tick(const string &class_name,const string &name)
 {
 //----------------------------------------------------------
 // EXPLAIN : if timer is disabled , return
@@ -76,7 +76,6 @@ void timer::tick(const string &class_name,const string &name,char level_in)
 		timer_one.cpu_start = cpu_time();
 #endif
 		++timer_one.calls;
-		timer_one.level = level_in;
 		timer_one.start_flag = false;
 	}
 	else
@@ -130,8 +129,6 @@ void timer::print_all(ofstream &ofs)
 		const Timer_One &timer_one = timer_pool_order_A.second;
 		
 		if(timer_one.cpu_second < small)
-			continue;
-		if(timer_one.level > 'X')
 			continue;
 		
 		ofs  << " " 

@@ -36,7 +36,7 @@ void Driver::init()
 
 void Driver::reading(void)
 {
-	timer::tick("Driver","reading",'A');
+	timer::tick("Driver","reading");
 
 	// (1) read INPUT 
 	INPUT.Init( global_in_card );
@@ -67,7 +67,7 @@ void Driver::reading(void)
     INPUT.Print( ss1.str() );
     //DONE(ofs_running,"READING CARDS");
 
-	timer::tick("Driver","reading",'A');
+	timer::tick("Driver","reading");
 	return;
 }
 

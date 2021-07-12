@@ -24,7 +24,7 @@ pseudopot_cell_vnl::~pseudopot_cell_vnl()
 void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 {
 	TITLE("pseudopot_cell_vnl", "init");
-	timer::tick("ppcell_vnl","init",'C');
+	timer::tick("ppcell_vnl", "init");
 
 	ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << endl;
 
@@ -127,7 +127,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		this->tab_at.create(ntype, nchix_nc, NQX);
 	}
 
-	timer::tick("ppcell_vnl","init",'C');
+	timer::tick("ppcell_vnl","init");
 	return;
 }
 

@@ -9,7 +9,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 	matrix& svl_dphi)
 {   
     TITLE("Force_LCAO_gamma","cal_fvl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi",'G');
+    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 	
 	if(isforce)
 	{
@@ -138,7 +138,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     delete[] tmpDHz;
 
 
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi",'G');
+    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
     return;
 }
 
@@ -152,7 +152,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 	matrix& svl_dphi)
 {   
     TITLE("Force_LCAO_gamma","cal_fvl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi",'G');
+    timer::tick("Force_LCAO_gamma","cal_fvl_dphi");
 
     ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
     ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
@@ -274,6 +274,6 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     delete[] tmpDHy;
     delete[] tmpDHz;
 
-    timer::tick("Force_LCAO_gamma","cal_fvl_dphi",'G');
+    timer::tick("Force_LCAO_gamma", "cal_fvl_dphi");
     return;
 }
