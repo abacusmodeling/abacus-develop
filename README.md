@@ -1,17 +1,18 @@
-<div style="text-align:center; margin: 20px">
+<p align="center">
     <img src="documents/abacus-logo.jpg">
-</div>
+</p>
 
-<div style="text-align:center; margin: 20px">
+<p align="center">
     <a href="https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml">
         <img src="https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml/badge.svg">
     </a>
     <a href="https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml">
         <img src="https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml/badge.svg">
     </a>
-</div>
+</p>
 
 <a id="readme-top"></a>
+
 WELCOME TO THE "ABACUS" PROGRAM!
 THE PROJECT STARTS FROM https://github.com/abacusmodeling/abacus-develop,
 WHERE MORE INFORMATION CAN BE FOUND.

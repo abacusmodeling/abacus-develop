@@ -52,4 +52,5 @@ RUN cd /tmp \
     && unzip libtorch-shared-with-deps-1.9.0+cpu.zip \
     && cp -r libtorch/include /usr/local \
     && cp -r libtorch/lib /usr/local \
-    && cp -r libtorch/share /usr/local
+    && cp -r libtorch/share /usr/local \
+    && rm -rf libtorch
