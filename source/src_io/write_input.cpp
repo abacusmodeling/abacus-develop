@@ -142,6 +142,7 @@ void Input::Print(const string &fn)const
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << endl;
 	OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
+	OUTP(ofs,"md_potential",mdp.md_potential,"choose potential for md");
 	OUTP(ofs,"md_dt",mdp.dt,"time step");
 	OUTP(ofs,"mnhc",mdp.MNHC,"number of Nose-Hoover chains");
 	OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");

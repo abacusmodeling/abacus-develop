@@ -5,10 +5,10 @@
 #include<sstream>
 using namespace std;
 
-#include "src_ri/exx_abfs.h"
+#include "../../../src_ri/exx_abfs.h"
 
-#include "src_external/src_test/src_global/matrix-test.h"
-#include "src_external/src_test/src_ri/exx_abfs-unittest.h"
+#include "../src_global/matrix-test.h"
+#include "../src_ri/exx_abfs-unittest.h"
 
 static void of_abfs_cpp( const string &file_name, const vector<vector<vector<Numerical_Orbital_Lm>>> &orb ) 
 {

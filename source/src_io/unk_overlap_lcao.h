@@ -8,9 +8,9 @@ using std::map;
 #include<set>
 using std::set;
 
-#include "src_lcao/center2_orb.h"
-#include "src_lcao/center2_orb-orb11.h"
-#include "src_lcao/center2_orb-orb21.h"
+#include "../src_lcao/center2_orb.h"
+#include "../src_lcao/center2_orb-orb11.h"
+#include "../src_lcao/center2_orb-orb21.h"
 
 #include "module_orbital/ORB_table_phi.h"
 #include "module_orbital/ORB_gaunt_table.h"

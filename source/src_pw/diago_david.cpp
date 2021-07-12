@@ -1,6 +1,6 @@
 #include "diago_david.h"
 #include "diago_cg.h"
-#include "../src_pw/global.h"
+#include "global.h"
 
 Diago_David::Diago_David()
 {

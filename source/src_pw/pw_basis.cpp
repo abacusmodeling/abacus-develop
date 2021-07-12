@@ -5,7 +5,7 @@
 
 #include "tools.h"
 #include "pw_basis.h"
-#include "../src_pw/pw_complement.h"
+#include "pw_complement.h"
 #include <omp.h>
 
 PW_Basis::PW_Basis()

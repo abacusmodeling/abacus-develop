@@ -1,7 +1,7 @@
 #include "xc_gga_pw.h"
 #include "global.h"
 #include "xc_functional.h"
-#include "../src_pw/myfunc.h"
+#include "myfunc.h"
 
 // from gradcorr.f90
 void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)

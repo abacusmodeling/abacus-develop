@@ -11,7 +11,7 @@
 #include "chi0_hilbert.h"
 #include "../src_pw/hamilt_pw.h"
 #include "../src_lcao/wavefunc_in_pw.h"
-#include "../src_io/optical.h"
+#include "optical.h"
 #include "../src_pw/klist.h"
 #include <iostream>
 #ifdef __LCAO

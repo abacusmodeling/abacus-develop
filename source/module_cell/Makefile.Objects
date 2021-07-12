@@ -25,7 +25,7 @@ global_variable.o\
 tool_title.o\
 tool_quit.o\
 
-OBJS_ORBITAL=pseudo_nc.o\
+OBJS_CELL=pseudo_nc.o\
 atom_spec.o\
 atom_pseudo.o\
 read_pp.o\

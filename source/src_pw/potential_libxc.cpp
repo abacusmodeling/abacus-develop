@@ -7,9 +7,9 @@
 #ifdef USE_LIBXC
 
 #include "potential_libxc.h"
-#include "../src_pw/global.h"
-#include "../src_pw/tools.h"
-#include "../src_pw/xc_gga_pw.h"
+#include "global.h"
+#include "tools.h"
+#include "xc_gga_pw.h"
 #include "../module_base/global_function.h"
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"

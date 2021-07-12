@@ -11,8 +11,8 @@
 #include "charge_mixing.h"
 
 #ifdef __EXX // mohan add 2021-05-23
-#include "src_ri/exx_abfs-dm.h"
-#include "src_ri/exx_abfs-parallel-communicate-hexx.h"
+#include "../src_ri/exx_abfs-dm.h"
+#include "../src_ri/exx_abfs-parallel-communicate-hexx.h"
 #endif
 
 class Charge_Pulay: public Charge_Mixing

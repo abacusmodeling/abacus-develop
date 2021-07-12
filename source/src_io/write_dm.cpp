@@ -1,7 +1,7 @@
-#include "src_lcao/local_orbital_charge.h"
+#include "../src_lcao/local_orbital_charge.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
-#include "src_lcao/LCAO_nnr.h" // mohan add 2021-03-07
+#include "../src_lcao/LCAO_nnr.h" // mohan add 2021-03-07
 
 //-------------------------------------------------
 // NOTE for Local_Orbital_Charge::write_dm
