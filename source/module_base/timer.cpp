@@ -135,7 +135,8 @@ void timer::print_all(ofstream &ofs)
 			continue;
 		
 		ofs  << " " 
-			 << setw(2)  << timer_one.level
+			// << setw(2)  << timer_one.level
+			 << setw(2)  << " "
 			 << setw(20) << class_name
 			 << setw(20) << name
 			 << setw(15) << timer_one.cpu_second
@@ -146,7 +147,8 @@ void timer::print_all(ofstream &ofs)
 		cout << resetiosflags(ios::scientific);
 		
 		cout << " " 
-			 << setw(2)  << timer_one.level
+			// << setw(2)  << timer_one.level
+			 << setw(2)  << " "
 			 << setw(20) << class_name
 			 << setw(20) << name
 			 << setw(15) << setprecision(5) << timer_one.cpu_second
