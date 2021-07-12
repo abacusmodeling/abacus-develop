@@ -1,7 +1,7 @@
 #include "xc_type.h"
 #include "../module_base/global_function.h"
-#include "../src_pw/global.h"
-#include "../src_pw/exx_global.h"
+#include "global.h"
+#include "exx_global.h"
 
 xcfunc::xcfunc()
 {

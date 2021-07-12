@@ -1,4 +1,4 @@
-#include "../module_cell/unitcell_pseudo.h"
+#include "unitcell_pseudo.h"
 #ifdef __LCAO
 //#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif

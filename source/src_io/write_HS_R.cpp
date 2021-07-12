@@ -1,7 +1,7 @@
-#include "src_lcao/LOOP_ions.h"
-#include "../src_io/cal_r_overlap_R.h"
+#include "../src_lcao/LOOP_ions.h"
+#include "cal_r_overlap_R.h"
 #include "../src_pw/global.h"
-#include "../src_io/write_HS.h"
+#include "write_HS.h"
 
 
 void LOOP_ions::output_HS_R(void)

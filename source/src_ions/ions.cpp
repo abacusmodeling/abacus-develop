@@ -8,7 +8,7 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
-#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
+#include "variable_cell.h" // mohan add 2021-02-01
 
 void Ions::opt_ions_pw(void)
 {

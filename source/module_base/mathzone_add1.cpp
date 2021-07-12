@@ -1,10 +1,10 @@
 #include "mathzone_add1.h"
-#include "../module_base/timer.h"
-#include "../module_base/mathzone.h"
-#include "../module_base/global_variable.h"
-#include "../module_base/constants.h"
-#include "../module_base/global_function.h"
-#include "../module_base/math_sphbes.h"
+#include "timer.h"
+#include "mathzone.h"
+#include "global_variable.h"
+#include "constants.h"
+#include "global_function.h"
+#include "math_sphbes.h"
 
 #if defined __FFTW2
 #include "fftw.h"

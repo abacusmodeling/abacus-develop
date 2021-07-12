@@ -1,7 +1,7 @@
 #include "unitcell_pseudo.h"
 
 #ifdef __LCAO
-#include "module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
+#include "../module_orbital/ORB_read.h" // to use 'ORB' -- mohan 2021-01-30
 #endif
 //#include "../src_pw/global.h"
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02

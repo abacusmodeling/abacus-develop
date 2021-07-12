@@ -2,9 +2,9 @@
 #include <vector>
 #include <set>
 #include <complex>
-#include "module_base/global_function.h"
-#include "module_base/matrix.h"
-#include"src_pw/global.h"
+#include "../../../module_base/global_function.h"
+#include "../../../module_base/matrix.h"
+#include"../../../src_pw/global.h"
 
 class Exx_Abfs_DM_Test
 {

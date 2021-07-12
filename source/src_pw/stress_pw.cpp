@@ -1,7 +1,7 @@
 #include "./stress_pw.h"
 #include "./H_XC_pw.h"
-#include "../src_pw/vdwd2.h"
-#include "../src_pw/vdwd3.h"
+#include "vdwd2.h"
+#include "vdwd3.h"
 
 void Stress_PW::cal_stress(matrix& sigmatot)
 {

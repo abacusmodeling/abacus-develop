@@ -7,6 +7,7 @@ public:
     MD_parameters()
 	{
 		mdtype=1;
+		md_potential=0;
 		NVT_tau=0;
 		NVT_control=1;
 		dt=1;
@@ -26,6 +27,7 @@ public:
     int rstMD;          // 1 : restart MD, vel.restart and ion.restart files will be read
                         // 0 : not restart from ion and vel files
 	int mdtype;         // 1: NVT:Nose Hoover, 2:NVT:velocity scaling 3: NPT, 0: NVE 
+	int md_potential;   // 0: Pseudopotential, 1: LJ potential   Yu Liu 2021-07-12
     double Qmass;       // Inertia of extended system variable
     double dt ;         // Time increment (hbar/E_hartree)
     double tfirst; //Temperature (in Hartree, 1 Hartree ~ 3E5 K)

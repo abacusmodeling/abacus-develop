@@ -39,7 +39,7 @@ FP_OBJS_0=main.o\
 $(OBJS_IO)\
 $(OBJS_PW)\
 $(OBJS_BASE)\
-$(OBJS_ORBITAL)\
+$(OBJS_CELL)\
 $(OBJS_PARALELL)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
