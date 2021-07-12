@@ -435,6 +435,11 @@ class Input
     int out_descriptor; // output descritpor for deepks. caoyu added 2020-11-24, mohan modified 2021-01-03
 	int lmax_descriptor; // lmax used in descriptor, mohan added 2021-01-03
 
+//==========================================================
+// variables for test only
+//==========================================================
+	bool test_just_neighbor;
+	
 	private:
 
 //==========================================================

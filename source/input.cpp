@@ -456,6 +456,11 @@ void Input::Default(void)
 	restart_load = false;
 
 //==========================================================
+// test only
+//==========================================================
+	test_just_neighbor = false;
+
+//==========================================================
 //    DFT+U     Xin Qu added on 2020-10-29
 //==========================================================
     dft_plus_u = false;                    // 1:DFT+U correction; 0：standard DFT calcullation
@@ -1679,6 +1684,10 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, new_dm);
 		}
+		else if (strcmp("test_just_neighbor", word) == 0)
+		{
+			read_value(ifs, test_just_neighbor);
+		}
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
 //----------------------------------------------------------------------------------		
@@ -2209,6 +2218,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double( fermi_level );
     Parallel_Common::bcast_bool( coulomb_cutoff );
     Parallel_Common::bcast_bool( kmesh_interpolation );
+	Parallel_Common::bcast_bool( test_just_neighbor );
     for(int i=0; i<100; i++)
     {
         Parallel_Common::bcast_double( qcar[i][0] );
