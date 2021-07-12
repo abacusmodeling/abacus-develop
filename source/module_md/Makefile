@@ -73,7 +73,7 @@ VPATH=../src_global\
 #==========================
 # Define HONG
 #==========================
-HONG= ${HONG_FFTW} -D__LCAO -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -DEXX_H_COMM=2
+HONG= ${HONG_FFTW} -D__LCAO -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -DEXX_H_COMM=2 -D__MD
 
 FP_OBJS_0=main.o\
 $(OBJS_MAIN)\
@@ -105,6 +105,8 @@ parallel : ${FP_OBJS}
 #==========================
 # rules
 #==========================
+${OBJ_DIR}/main.o:../main.cpp
+	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} ../main.cpp -o ${OBJ_DIR}/main.o
 ${OBJ_DIR}/%.o:%.cpp
 	${CPLUSPLUS_MPI} ${OPTS} ${OPTS_MPI} -c ${HONG} $< -o $@
 

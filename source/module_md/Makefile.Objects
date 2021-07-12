@@ -5,13 +5,18 @@ VERSION= ABACUS-MD
 HEADERS= *.h
 
 OBJS_MAIN=input.o\
+write_input.o\
+input_conv.o\
+driver.o\
+input_update.o\
 
 OBJS_MD=MD_basic.o\
 MD_fire.o\
 MD_func.o\
 MD_thermo.o\
-run_md.o\
+run_md_lcao.o\
 run_md_pw.o\
+run_md.o\
 
 OBJS_BASE=matrix3.o\
 matrix.o\

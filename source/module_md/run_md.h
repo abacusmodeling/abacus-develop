@@ -1,38 +1,22 @@
+//==========================================================
+// AUTHOR : liuyu
+// DATE : 2021-07-12
+//==========================================================
 #ifndef RUN_MD_H
-#define RUN_MD_H 
+#define RUN_MD_H
 
-#include "../src_lcao/LOOP_elec.h"
-#include "../src_ions/ions_move_methods.h"
-#include "../src_pw/charge_extra.h"
-#include "MD_basic.h"
-#include "../src_ions/lattice_change_methods.h"
+#include "src_pw/tools.h"
+#include "input.h"
 
-class Run_MD 
+class Run_md
 {
 
 	public:
 
-	Run_MD();
-	~Run_MD();
+    Run_md();
+    ~Run_md();
 
-	LOOP_elec LOE;
-
-	void opt_cell(void);
-	void opt_ions(void);
-
-	private:
-
-	Ions_Move_Methods IMM;
-
-	//bool force_stress(void);
-	Lattice_Change_Methods LCM;
-
-	int istep;
-
-	// electron charge density extropolation method
-	Charge_Extra CE;
-
-	void final_scf(void);
+    static void md_line(void);
 
 };
 
