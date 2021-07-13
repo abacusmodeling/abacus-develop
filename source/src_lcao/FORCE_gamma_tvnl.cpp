@@ -10,7 +10,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 	matrix& stvnl_dphi)
 {
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi",'G');
+    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     for(int i=0; i<NLOCAL; i++)
     {
         const int iat = ucell.iwt2iat[i];
@@ -59,7 +59,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi",'G');
+    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
 }
 
@@ -73,7 +73,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 	matrix& svnl_dbeta)
 {
     TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta",'G');
+    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
 	double r0[3];
 	double r1[3];
@@ -224,7 +224,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta",'G');
+    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;
 }
 
@@ -237,7 +237,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 	matrix& stvnl_dphi)
 {
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi",'G');
+    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
 
     for(int i=0; i<NLOCAL; i++)
     {
@@ -287,7 +287,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi",'G');
+    timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
     return;
 }
 
@@ -300,7 +300,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 	matrix& svnl_dbeta)
 {
     TITLE("Force_LCAO_gamma","cal_fvnl_dbeta");
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta",'G');
+    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
 
     for(int iat=0; iat<ucell.nat; iat++)
     {
@@ -447,6 +447,6 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             }
         }
     }
-    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta",'G');
+    timer::tick("Force_LCAO_gamma","cal_fvnl_dbeta");
     return;
 }

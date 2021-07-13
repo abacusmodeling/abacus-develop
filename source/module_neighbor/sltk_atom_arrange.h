@@ -20,7 +20,8 @@ public:
 		Grid_Driver &grid_d, 
 		const UnitCell &ucell, 
 		const double& search_radius_bohr, 
-		const int &test_atom_in);
+		const int &test_atom_in,
+		const bool test_only = false);
 
 	//caoyu modify 2021-05-24
 	static double set_sr_NL(

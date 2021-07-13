@@ -27,7 +27,7 @@ void Diago_CG::diag
 )
 {
     if (test_cg==1) TITLE("Diago_CG","ccgdiagg");
-    timer::tick("Diago_CG","diag",'G');
+    timer::tick("Diago_CG", "diag");
 
     avg_iter = 0.0;
     notconv = 0;
@@ -158,7 +158,7 @@ void Diago_CG::diag
     delete [] sphi;
     delete [] phi_m;
 
-    timer::tick("Diago_CG","diag",'G');
+    timer::tick("Diago_CG","diag");
     return;
 } // end subroutine ccgdiagg
 

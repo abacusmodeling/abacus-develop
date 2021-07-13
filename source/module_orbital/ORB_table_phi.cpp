@@ -374,7 +374,7 @@ void ORB_table_phi::init_Table(
 	LCAO_Orbitals &orb)
 {
 	TITLE("ORB_table_phi", "init_Table");
-	timer::tick("ORB_table_phi", "init_Table",'D');
+	timer::tick("ORB_table_phi", "init_Table");
 	const int ntype = orb.get_ntype();
 	assert( ORB_table_phi::dr > 0.0);
 	assert( OV_nTpairs>0);
@@ -630,7 +630,7 @@ void ORB_table_phi::init_Table(
 		break;
 	}
 		
-	timer::tick("ORB_table_phi", "init_Table",'D');
+	timer::tick("ORB_table_phi", "init_Table");
 	return;
 }
 

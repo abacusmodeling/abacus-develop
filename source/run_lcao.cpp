@@ -16,13 +16,31 @@ Run_lcao::~Run_lcao(){}
 void Run_lcao::lcao_line(void)
 {
     TITLE("Run_lcao","lcao_line");
-	timer::tick("Run_lcao","lcao_line",'A');
+	timer::tick("Run_lcao","lcao_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put NLOCAL and NBANDS as input parameters
     ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
+	if(INPUT.test_just_neighbor)
+	{
+		//test_search_neighbor();
+		SEARCH_RADIUS = atom_arrange::set_sr_NL(
+			ofs_running,
+			OUT_LEVEL,
+			ORB.get_rcutmax_Phi(), 
+			ORB.get_rcutmax_Beta(), 
+			GAMMA_ONLY_LOCAL);
 
+		atom_arrange::search(
+			SEARCH_PBC,
+			ofs_running,
+			GridD, 
+			ucell, 
+			SEARCH_RADIUS, 
+			test_atom_input,
+			INPUT.test_just_neighbor);
+	}
 	// setup NBANDS 
 	// Yu Liu add 2021-07-03
 	CHR.cal_nelec();
@@ -130,6 +148,6 @@ void Run_lcao::lcao_line(void)
 
 	en.perform_dos();
 
-	timer::tick("Run_lcao","lcao_line",'A');
+	timer::tick("Run_lcao","lcao_line");
     return;
 }

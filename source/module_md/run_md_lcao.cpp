@@ -56,7 +56,7 @@ void Run_MD_LCAO::opt_cell(void)
 void Run_MD_LCAO::opt_ions(void)
 {
     TITLE("Run_MD_LCAO","opt_ions"); 
-    timer::tick("Run_MD_LCAO","opt_ions",'B'); 
+    timer::tick("Run_MD_LCAO","opt_ions"); 
 		
     if(OUT_LEVEL=="i")
     {
@@ -221,7 +221,7 @@ void Run_MD_LCAO::opt_ions(void)
 	// mohan update 2021-02-10
     LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
-    timer::tick("Run_MD_LCAO","opt_ions",'B'); 
+    timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
 }
 

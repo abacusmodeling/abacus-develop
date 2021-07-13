@@ -64,7 +64,7 @@ void FFT::FFT3D(complex<double> *psi,const int sign)
 	cout << endl;
 	*/
 
-	timer::tick("FFT","FFT3D",'X');
+	timer::tick("FFT","FFT3D");
 
 #ifdef __MPI
 	P3DFFT(psi,sign);
@@ -73,7 +73,7 @@ void FFT::FFT3D(complex<double> *psi,const int sign)
 	SFFT3D(psi,sign);
 #endif
 
-	timer::tick("FFT","FFT3D",'X');
+	timer::tick("FFT","FFT3D");
 
 	/*
 	cout << "\n\n after FFTW:  \n ";
