@@ -1,6 +1,40 @@
 #include "wf_local.h"
 #include "../src_pw/global.h"
 
+inline int globalIndex(int localIndex, int nblk, int nprocs, int myproc)
+{
+    int iblock, gIndex;
+    iblock=localIndex/nblk;
+    gIndex=(iblock*nprocs+myproc)*nblk+localIndex%nblk;
+    return gIndex;
+    //return (localIndex/nblk*nprocs+myproc)*nblk+localIndex%nblk;
+}
+
+inline int CTOT2q(
+	int myid,
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	double* work,
+	double** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+			//ofs_running << "i,j,igcol,igrow" << i<<" "<<j<<" "<<igcol<<" "<<igrow<<endl;
+            if(myid==0) work[j*naroc[0]+i]=CTOT[igcol][igrow];
+        }
+    }
+    return 0;
+}
+
 // be called in local_orbital_wfc::allocate_k
 int WF_Local::read_lowf_complex(complex<double> **c, const int &ik)
 {
@@ -267,7 +301,7 @@ int WF_Local::read_lowf(double **c, const int &is)
 	}
 	else
 	{
-		WF_Local::distri_lowf_new(ctot);
+		WF_Local::distri_lowf_new(ctot, is);
 	}
 	
 	// mohan add 2012-02-15,
@@ -368,11 +402,66 @@ void WF_Local::write_lowf_complex(const string &name, complex<double> **ctot, co
     return;
 }
 
-void WF_Local::distri_lowf_new(double **ctot)
+void WF_Local::distri_lowf_new(double **ctot, const int &is)
 {
     TITLE("WF_Local","distri_lowf");
 #ifdef __MPI
+
+//1. alloc work array; set some parameters
+
+	long maxnloc; // maximum number of elements in local matrix
+	MPI_Reduce(&ParaO.nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, ParaO.comm_2D);
+	MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, ParaO.comm_2D);
+	//reduce and bcast could be replaced by allreduce
 	
+    int nprocs, myid;
+    MPI_Comm_size(ParaO.comm_2D, &nprocs);
+    MPI_Comm_rank(ParaO.comm_2D, &myid);
+
+	double *work=new double[maxnloc]; // work/buffer matrix
+	int nb = 0;
+	if(NB2D==0)
+	{
+		if(NLOCAL>0) nb = 1;
+		if(NLOCAL>500) nb = 32;
+		if(NLOCAL>1000) nb = 64;
+	}
+	else if(NB2D>0)
+	{
+		nb = NB2D; // mohan add 2010-06-28
+	}
+	int info;
+	int naroc[2]; // maximum number of row or column
+	
+//2. copy from ctot to wfc_gamma
+	for(int iprow=0; iprow<ParaO.dim0; ++iprow)
+	{
+		for(int ipcol=0; ipcol<ParaO.dim1; ++ipcol)
+		{
+//2.1 get and bcast local 2d matrix info
+			const int coord[2]={iprow, ipcol};
+			int src_rank;
+			MPI_Cart_rank(ParaO.comm_2D, coord, &src_rank);
+			if(myid==src_rank)
+			{
+				naroc[0]=ParaO.nrow;
+				naroc[1]=ParaO.ncol;
+			}
+			info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, ParaO.comm_2D);
+
+//2.2 copy from ctot to work, then bcast work
+			info=CTOT2q(myid, naroc, nb, ParaO.dim0, ParaO.dim1, iprow, ipcol, work, ctot);
+			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, 0, ParaO.comm_2D);
+			ofs_running << "iprow, ipcow : " << iprow << ipcol << endl;
+			for (int i=0; i<maxnloc; ++i)
+			{
+				ofs_running << *(work+i)<<" ";
+			}
+			ofs_running << endl;
+		}//loop ipcol
+	}//loop	iprow
+
+	delete[] work;
 #else
 	WARNING_QUIT("WF_Local::distri_lowf","check the code without MPI.");
 #endif

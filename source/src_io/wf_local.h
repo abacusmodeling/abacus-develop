@@ -12,7 +12,7 @@ namespace WF_Local
 	void distri_lowf(double** ctot, double **c);
 	void distri_lowf_complex(complex<double>** ctot, complex<double> **cc);
 
-	void distri_lowf_new(double** ctot);
+	void distri_lowf_new(double** ctot, const int &is);
 
 	void distri_lowf_aug(double** ctot, double **c_aug);
 	void distri_lowf_aug_complex(complex<double>** ctot, complex<double> **c_aug);
