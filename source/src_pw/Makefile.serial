@@ -56,6 +56,7 @@ VPATH=../src_global\
 :../src_parallel\
 :../src_io\
 :../src_ions\
+:../module_md\
 :../\
 
 #==========================
@@ -63,7 +64,7 @@ VPATH=../src_global\
 #==========================
 #HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
 #HONG= ${HONG_FFTW}  -D__MPI -DUSE_LIBXC
-HONG= ${HONG_FFTW} 
+HONG= ${HONG_FFTW} -D__NOMD
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\
 $(OBJS_PW)\

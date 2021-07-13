@@ -65,7 +65,7 @@ VPATH=../src_global\
 #==========================
 #HONG= -DMETIS -DMKL_ILP64 -D__NORMAL ${HONG_FFTW} 
 #HONG= ${HONG_FFTW}  -D__MPI -DUSE_LIBXC
-HONG= ${HONG_FFTW}  -D__MPI
+HONG= ${HONG_FFTW}  -D__MPI -D__NOMD
 FP_OBJS_0=main.o\
 $(OBJS_BASE)\
 $(OBJS_PW)\

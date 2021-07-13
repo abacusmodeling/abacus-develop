@@ -81,12 +81,17 @@ void Driver::atomic_world(void)
 	// lcao_in_pw: LCAO expaned by plane wave basis set
 	// lcao: linear combination of atomic orbitals
 	//--------------------------------------------------
+#ifndef __NOMD //qianrui do not want to add md to pw module temporarily before md is compeletly built.
 	if(CALCULATION=="md" || CALCULATION=="md-sto") // Yu Liu 2021-07-12
 	{
 		Run_md::md_line();
 	}
 	else if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+#else
+	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+#endif
 	{
+
 		Run_pw::plane_wave_line();
 	}
 #ifdef __LCAO
