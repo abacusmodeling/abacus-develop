@@ -398,10 +398,12 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			{
        			delete[] atoms[it].tau;
 				delete[] atoms[it].taud;
+				delete[] atoms[it].vel;
        			delete[] atoms[it].mbl;
 				delete[] atoms[it].mag;
        			atoms[it].tau = new Vector3<double>[na];
        			atoms[it].taud = new Vector3<double>[na];
+				atoms[it].vel = new Vector3<double>[na];
        			atoms[it].mbl = new Vector3<int>[na];
 				atoms[it].mag = new double[na];
 				atoms[it].mass = this->atom_mass[it]; //mohan add 2011-11-07 
@@ -436,6 +438,14 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					{
 						ifpos >> v.x >> v.y >> v.z
 							>> mv.x >> mv.y >> mv.z;
+						if(CALCULATION=="md" && INPUT.mdp.md_potential)
+						{
+							ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
+						}
+						else
+						{
+							atoms[it].vel[ia].set(0,0,0);
+						}
 						string mags;
 						std::getline( ifpos, mags );
 						// change string to double.

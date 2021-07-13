@@ -22,7 +22,18 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     step_=0;
 //	ucell.latvec=ucell.latvec;
 
-    vel=new Vector3<double>[ucell.nat];
+    vel=new Vector3<double>[ucell.nat]; //initialize velocity of atoms from STRU  Yu Liu 2021-07-14
+    int iat=0;
+    for(int it=0; it<ucell.ntype; ++it)
+    {
+        for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+        {
+            vel[iat] = ucell.atoms[it].vel[ia];
+            ++iat;
+        }
+    }
+    assert(iat==ucell.nat);
+
 	cart_change=new Vector3<double>[ucell.nat];
 	tauDirectChange=new Vector3<double>[ucell.nat];
 	allmass=new double[ucell.nat];

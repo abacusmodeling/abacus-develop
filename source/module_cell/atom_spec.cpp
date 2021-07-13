@@ -13,6 +13,7 @@ Atom::Atom()
     stapos_wf = 0;
     tau = new Vector3<double>[1];
     taud = new Vector3<double>[1];
+    vel = new Vector3<double>[1];
     mag = new double[1];
     l_nchi = new int[1];
     iw2l = new int[1];
@@ -26,6 +27,7 @@ Atom::~Atom()
 {
     delete[] tau;
     delete[] taud;
+    delete[] vel;
     delete[] mag;
     delete[] l_nchi;
     delete[] iw2l;
