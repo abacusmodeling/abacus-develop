@@ -14,6 +14,7 @@ OBJS_MD=MD_basic.o\
 MD_fire.o\
 MD_func.o\
 MD_thermo.o\
+run_md_classic.o\
 run_md_lcao.o\
 run_md_pw.o\
 run_md.o\
