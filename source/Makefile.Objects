@@ -284,6 +284,7 @@ hamilt_pw.o \
 diago_david.o\
 diago_cg.o\
 output.o  \
+run_md_classic.o\
 dos.o \
 inverse_matrix.o \
 energy.o \

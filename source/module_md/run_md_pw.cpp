@@ -205,15 +205,6 @@ void Run_MD_PW::md_ions_pw(void)
         ++istep;
     }
 
-    if (CALCULATION == "scf" || CALCULATION == "relax" || CALCULATION == "cell-relax")
-    {
-        ofs_running << "\n\n --------------------------------------------" << endl;
-        ofs_running << setprecision(16);
-        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
-        ofs_running << " --------------------------------------------\n\n"
-                    << endl;
-    }
-
     if (OUT_LEVEL == "i")
     {
         cout << " ION DYNAMICS FINISHED :)" << endl;

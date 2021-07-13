@@ -1,6 +1,7 @@
 #include "run_md.h"
 #include "run_md_pw.h"
 #include "run_md_lcao.h"
+#include "run_md_classic.h"
 #include "../src_pw/global.h"
 #include "../input.h"
 #include "../src_io/cal_test.h"
@@ -140,6 +141,15 @@ void Run_md::ai_md_line(void)
 
 void Run_md::classic_md_line(void)
 {
-	cout << "Classic MD !!" << endl;
+	// Setup the unitcell.
+    ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
+	DONE(ofs_running, "SETUP UNITCELL");
+
+	Print_Info PI;
+    PI.setup_parameters();
+
+	Run_MD_CLASSIC run_md_classic;
+	run_md_classic.md_cells_classic();
+
 	return;
 }

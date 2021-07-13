@@ -300,116 +300,108 @@ void UnitCell_pseudo::setup_cell(
 	return;
 }
 
-
-
-
-//=========================================================
-// calculate total number of electrons (nelec) and default
-// number of bands (NBANDS).
-//=========================================================
-/*
-#include "../src_pw/occupy.h"
-void UnitCell_pseudo::cal_nelec(void)
+void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstream &log)
 {
-	TITLE("UnitCell_pseudo","cal_nelec");
-	//=======================================================
-	// calculate the total number of electrons in the system
-	// if nelec <>0; use input number (setup.f90)
-	//=======================================================
+	TITLE("UnitCell_pseudo","setup_cell_classic");
 
-	ofs_running << "\n SETUP THE ELECTRONS NUMBER" << endl;
+	// (1) init magnetization (useless for classic MD)
+	assert(ntype>0);
+	delete[] magnet.start_magnetization;
+	magnet.start_magnetization = new double[this->ntype];
 
-	if (nelec == 0)
+	// (2) init *Atom class array.
+	this->atoms = new Atom[this->ntype];
+	this->set_atom_flag = true;
+
+	bool ok = true;
+	bool ok2 = true;
+
+	// (3) read in atom information
+	if(MY_RANK == 0)
 	{
-		for (int it = 0; it < ntype;it++)
+		ifstream ifa(fn.c_str(), ios::in);
+		if (!ifa)
 		{
-			stringstream ss1, ss2;
-			ss1 << "electron number of element " << atoms[it].label;
-			const int nelec_it = atoms[it].zv * atoms[it].na;
-			nelec += nelec_it;
-			ss2 << "total electron number of element " << atoms[it].label; 
-			
-			OUT(ofs_running,ss1.str(),atoms[it].zv);
-			OUT(ofs_running,ss2.str(),nelec_it);
+			ofs_warning << fn;
+			ok = false;
+		}
+
+		if(ok)
+		{
+			ofs_running << "\n\n\n\n";
+			ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+			ofs_running << " |                                                                    |" << endl;
+			ofs_running << " | Reading atom information in unitcell for classic MD:               |" << endl;
+			ofs_running << " | From the input file and the structure file we know the number of   |" << endl;
+			ofs_running << " | different elments in this unitcell, then we list the detail        |" << endl;
+			ofs_running << " | information for each element. The total atom number is counted.    |" << endl;
+			ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << endl;
+			ofs_running << " | Cartesian and Direct coordinates for each atom.                    |" << endl;
+			ofs_running << " | The volume and the lattice vectors in real space is also shown.    |" << endl;
+			ofs_running << " |                                                                    |" << endl;
+			ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+			ofs_running << "\n\n\n\n";
+
+			ofs_running << " READING UNITCELL INFORMATION" << endl;
+			//========================
+			// call read_atom_species
+			//========================
+			this->read_atom_species(ifa);
+
+			//==========================
+			// call read_atom_positions
+			//==========================
+			ok2 = this->read_atom_positions(ifa);
+
+			if(ok2)
+			{
+				for(int i=0;i<this->ntype;i++)
+				{
+					Global_File::make_dir_atom( this->atoms[i].label );
+				}
+			}
 		}
 	}
-
-	//OUT(ofs_running,"Total nelec",nelec);
-
-	//=======================================
-	// calculate number of bands (setup.f90)
-	//=======================================
-	double occupied_bands = static_cast<double>(nelec/DEGSPIN);	
-
-	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
+#ifdef __MPI
+	Parallel_Common::bcast_bool(ok);
+	Parallel_Common::bcast_bool(ok2);
+#endif
+	if(!ok)
 	{
-		occupied_bands = std::floor(occupied_bands) + 1.0; //mohan fix 2012-04-16
+		WARNING_QUIT("UnitCell_pseudo::setup_cell","Can not find the file containing atom positions.!");
+	}
+	if(!ok2)
+	{
+		WARNING_QUIT("UnitCell_pseudo::setup_cell","Something wrong during read_atom_positions.");
 	}
 
-	OUT(ofs_running,"occupied bands",occupied_bands);
-	
-	// mohan add 2010-09-04
-    //cout << "nbands(ucell) = " <<NBANDS <<endl;
-	if(NBANDS==occupied_bands)
+#ifdef __MPI
+	this->bcast_unitcell();
+#endif
+
+	//========================================================
+	// Calculate unit cell volume
+	//========================================================
+	assert(lat0 > 0.0);
+	this->omega = abs( latvec.Det() ) * this->lat0 * lat0 * lat0 ;
+	if(this->omega<=0)
 	{
-		if( Occupy::gauss() || Occupy::tetra() )
-		{
-			WARNING_QUIT("UnitCell_pseudo::cal_nelec","for smearing, num. of bands > num. of occupied bands");
-		}
+		WARNING_QUIT("setup_cell","omega <= 0 .");
 	}
-	
-	if ( CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto" ) //qianrui 2021-2-20
-	{
-	if(NBANDS == 0)
-	{
-		if(NSPIN == 1)
-		{
-			int nbands1 = static_cast<int>(occupied_bands) + 10;
-			int nbands2 = static_cast<int>(1.2 * occupied_bands);
-			NBANDS = max(nbands1, nbands2);
-		}
-		else if (NSPIN ==2 || NSPIN == 4)
-		{
-			int nbands3 = nelec + 20;
-			int nbands4 = 1.2 * nelec;
-			NBANDS = max(nbands3, nbands4);
-		}
-		AUTO_SET("NBANDS",NBANDS);
-	}
-	//else if ( CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
 	else
 	{
-		if(NBANDS < occupied_bands) WARNING_QUIT("unitcell","Too few bands!");
-		if(NBANDS < magnet.get_nelup() ) 
-		{
-			OUT(ofs_running,"nelup",magnet.get_nelup());
-			WARNING_QUIT("unitcell","Too few spin up bands!");
-		}
-		if(NBANDS < magnet.get_neldw() )
-        {
-            WARNING_QUIT("unitcell","Too few spin down bands!");
-        }
-	}
+		ofs_running << endl;
+		OUT(ofs_running,"Volume (Bohr^3)", this->omega);
+		OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
 	}
 
-	// mohan update 2021-02-19
-    // mohan add 2011-01-5
-    if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
-    {
-        if( NBANDS > NLOCAL )
-        {
-            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < NBANDS");
-        }
-        else
-        {
-            OUT(ofs_running,"NLOCAL",NLOCAL);
-            OUT(ofs_running,"NBANDS",NBANDS);
-        }
-    }
+	ofs_running << endl;
+	outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
 
-	OUT(ofs_running,"NBANDS",NBANDS);
-	return;
-}*/
+}
+
+
+
 
 //===========================================
 // calculate the total number of local basis
