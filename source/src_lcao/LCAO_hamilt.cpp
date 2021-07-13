@@ -25,7 +25,7 @@ LCAO_Hamilt::~LCAO_Hamilt()
 void LCAO_Hamilt::set_lcao_matrices(void)
 {
 	TITLE("LCAO_Hamilt","set_lcao_matrices");
-	timer::tick("LCAO_Hamilt","set_lcao_matrices",'E');
+	timer::tick("LCAO_Hamilt","set_lcao_matrices");
 
 	if(GAMMA_ONLY_LOCAL)
 	{
@@ -52,14 +52,14 @@ void LCAO_Hamilt::set_lcao_matrices(void)
 	//cout << " init_s=" << init_s << endl; //delete 2015-09-06, xiaohui
 //	OUT(ofs_running,"init_s",init_s);
 
-	timer::tick("LCAO_Hamilt","set_lcao_matrices",'E');
+	timer::tick("LCAO_Hamilt","set_lcao_matrices");
 	return;
 }
 
 void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-12-03
 {
 	TITLE("LCAO_Hamilt","calculate_Hgamma");
-	timer::tick("LCAO_Hamilt","cal_Hgamma",'F');
+	timer::tick("LCAO_Hamilt","cal_Hgamma");
 
 	// Set the matrix 'H' to zero.
 	LM.zeros_HSgamma('H'); // 3 stands for Hloc.
@@ -117,7 +117,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 	}
 
 
-	timer::tick("LCAO_Hamilt","cal_Hgamma",'F');
+	timer::tick("LCAO_Hamilt","cal_Hgamma");
 	return;
 }
 
@@ -186,7 +186,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 void LCAO_Hamilt::calculate_Hk(const int &ik)
 {
 	TITLE("LCAO_Hamilt","calculate_Hk");
-	timer::tick("LCAO_Hamilt","calculate_Hk",'F');
+	timer::tick("LCAO_Hamilt","calculate_Hk");
 
 	// whether you want to calculate the local potential
 	// or not, you need to set this matrix to 0.
@@ -258,7 +258,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 	}
 	*/
 	
-	timer::tick("LCAO_Hamilt","calculate_Hk",'F');
+	timer::tick("LCAO_Hamilt","calculate_Hk");
 	return;
 }
 

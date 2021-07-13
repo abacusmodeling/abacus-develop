@@ -29,7 +29,6 @@ class timer
 		double cpu_second = 0.0;
 		size_t calls = 0;
 		size_t order = n_now++;
-		char level;
 		bool start_flag = true;
 	};
 	
@@ -43,7 +42,7 @@ class timer
 // NAME : disable
 // NAME : print_all
 //==========================================================
-	static void tick(const string &class_name_in,const string &name_in,char level_in='Z');
+	static void tick(const string &class_name_in,const string &name_in);
 
 	static void start(void);
 	static void finish(ofstream &ofs,const bool print_flag = 1);

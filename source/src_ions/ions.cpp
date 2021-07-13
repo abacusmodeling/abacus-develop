@@ -13,7 +13,7 @@
 void Ions::opt_ions_pw(void)
 {
 	TITLE("Ions","opt_ions_pw");
-	timer::tick("Ions","opt_ions_pw",'C');
+	timer::tick("Ions","opt_ions_pw");
 	
 	if(OUT_LEVEL=="i")
 	{
@@ -236,7 +236,7 @@ void Ions::opt_ions_pw(void)
 		cout << " ION DYNAMICS FINISHED :)" << endl;
 	}
 
-	timer::tick("Ions","opt_ions_pw",'C');
+	timer::tick("Ions","opt_ions_pw");
     return;
 }
 

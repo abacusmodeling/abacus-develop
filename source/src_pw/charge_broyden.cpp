@@ -82,7 +82,7 @@ void Charge_Broyden::mix_rho
 )
 {
     TITLE("Charge_Broyden","mix_rho");
-    timer::tick("Charge","mix_rho",'E');
+	timer::tick("Charge", "mix_rho");
 
     for (int is=0; is<NSPIN; is++)
     {
@@ -212,7 +212,7 @@ void Charge_Broyden::mix_rho
 	}
 	delete[] rho123;
 
-    timer::tick("Charge","mix_rho",'E');
+    timer::tick("Charge","mix_rho");
     return;
 }
 

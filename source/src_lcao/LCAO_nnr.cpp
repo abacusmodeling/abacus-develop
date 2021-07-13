@@ -562,7 +562,7 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 void LCAO_nnr::folding_fixedH(const int &ik)
 {
 	TITLE("LCAO_nnr","folding_fixedH");
-	timer::tick("LCAO_nnr","folding_fixedH",'G');
+	timer::tick("LCAO_nnr","folding_fixedH");
 
 	//Quxin added for DFT+U calculation
  	if(INPUT.dft_plus_u) 
@@ -722,6 +722,6 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 	assert(index==this->nnr);
 
-	timer::tick("LCAO_nnr","folding_fixedH",'G');
+	timer::tick("LCAO_nnr","folding_fixedH");
 	return;
 }

@@ -18,7 +18,7 @@ void ORB_gen_tables::gen_tables(
 	const int &out_descriptor)
 {
 	TITLE("ORB_gen_tables", "gen_tables");
-	timer::tick("ORB_gen_tables", "gen_tables", 'C');
+	timer::tick("ORB_gen_tables", "gen_tables");
 
 	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
 
@@ -107,7 +107,7 @@ void ORB_gen_tables::gen_tables(
 	//MGT.init_Gaunt(orb.get_lmax()+1);
 	MGT.init_Gaunt(lmax);
 
-	timer::tick("ORB_gen_tables", "gen_tables", 'C');
+	timer::tick("ORB_gen_tables", "gen_tables");
 	return;
 }
 
@@ -144,7 +144,7 @@ void ORB_gen_tables::snap_psibeta(
 		return;
 	}
 
-	timer::tick("ORB_gen_tables", "snap_psibeta", 'X');
+	timer::tick("ORB_gen_tables", "snap_psibeta");
 
 	bool has_so = 0;
 	if (count_soc > 0)
@@ -198,7 +198,7 @@ void ORB_gen_tables::snap_psibeta(
 		delete[] calproj;
 		delete[] rmesh1;
 		delete[] rmesh2;
-		timer::tick("ORB_gen_tables", "snap_psibeta", 'X');
+		timer::tick("ORB_gen_tables", "snap_psibeta");
 		return;
 	}
 
@@ -559,7 +559,7 @@ void ORB_gen_tables::snap_psibeta(
 	delete[] rmesh1;
 	delete[] rmesh2;
 
-	timer::tick("ORB_gen_tables", "snap_psibeta", 'X');
+	timer::tick("ORB_gen_tables", "snap_psibeta");
 	return;
 }
 

@@ -289,7 +289,7 @@ matrix Potential::v_of_rho(
 	const double * const rho_core_in)
 {
     TITLE("Potential","v_of_rho");
-    timer::tick("Potential","v_of_rho",'E');
+    timer::tick("Potential","v_of_rho");
 
     matrix v(NSPIN,pw.nrxx);
 
@@ -320,7 +320,7 @@ matrix Potential::v_of_rho(
             EFID.add_efield(rho_in[is], &v.c[is*pw.nrxx]);
         }
     }
-    timer::tick("Potential","v_of_rho",'E');
+    timer::tick("Potential","v_of_rho");
     return v;
 } //end subroutine v_of_rho
 
