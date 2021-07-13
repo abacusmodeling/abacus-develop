@@ -1,4 +1,4 @@
-#include "../src_ions/MD_basic.h"
+#include "MD_basic.h"
 #include "../src_pw/global.h"
 
 //define in MD_basic.h
@@ -103,7 +103,7 @@ void MD_basic::runNVT(int step1){
 //------------------------------------------------------------------------------
 
 	TITLE("MD_basic","runnvt");
-	timer::tick("MD_basic","runnvt",'C');
+	timer::tick("MD_basic","runnvt");
 	step_=step1+step_rst_;
 	//the real MD step
 	
@@ -259,7 +259,7 @@ void MD_basic::runNVT(int step1){
     //    MPI_Bcast(&vLogS,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
     }
 #endif
-    timer::tick("MD_basic","runnvt",'C');
+    timer::tick("MD_basic","runnvt");
     return;
 }
 
@@ -270,7 +270,7 @@ void MD_basic::runNVE(int step1){
 //-------------------------------------------------------------------------------
 
     TITLE("MD_basic","runNVE");
-    timer::tick("MD_basic","runNVE",'C');
+    timer::tick("MD_basic","runNVE");
     step_=step1+step_rst_;
     if(step_==1)
     {
@@ -399,7 +399,7 @@ void MD_basic::runNVE(int step1){
     }
 #endif
 
-    timer::tick("MD_basic","runNVE",'C');
+    timer::tick("MD_basic","runNVE");
     return;
 }
 
@@ -408,7 +408,7 @@ bool MD_basic::runFIRE(int step1){
 // REFERENCES:
 //   
     TITLE("MD_basic","runFIRE");
-    timer::tick("MD_basic","runFIRE",'C');
+    timer::tick("MD_basic","runFIRE");
     step_ = step1;
     if(step_==1)
     {
@@ -512,7 +512,7 @@ bool MD_basic::runFIRE(int step1){
     {
 	//"convergency reach"
 		//cout <<"CONVERGENCY REACH of FIRE in the "<<step <<" steps " <<endl;
-		timer::tick("MD_basic","runFIRE",'C');
+		timer::tick("MD_basic","runFIRE");
 		return true;
 	}
 
@@ -554,7 +554,7 @@ bool MD_basic::runFIRE(int step1){
     }
 #endif
 
-    timer::tick("MD_basic","runFIRE",'C');
+    timer::tick("MD_basic","runFIRE");
     return false;
 }
 

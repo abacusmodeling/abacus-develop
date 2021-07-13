@@ -1,7 +1,7 @@
 #include "build_st_pw.h"
 #include "../src_pw/global.h"
 
-#include "../src_lcao/global_fp.h" // mohan add 2021-01-30
+#include "global_fp.h" // mohan add 2021-01-30
 
 Build_ST_pw::Build_ST_pw()
 {

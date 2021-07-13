@@ -2,7 +2,7 @@
 #define PARALLEL_ORBITALS_H
 
 #include "../src_pw/tools.h"
-#include "src_pdiag/pdiag_double.h"
+#include "../src_pdiag/pdiag_double.h"
 
 class Parallel_Orbitals : public Pdiag_Double
 {

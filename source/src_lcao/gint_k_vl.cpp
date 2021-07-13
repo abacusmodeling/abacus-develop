@@ -349,7 +349,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		}
 	}
 
-	timer::tick("Gint_k","vlocal", 'K');
+	timer::tick("Gint_k","vlocal");
 
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
 	double delta_r = ORB.dr_uniform;
@@ -491,7 +491,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		delete[] block_index;
 	}	
 
-	timer::tick("Gint_k","vlocal", 'K');
+	timer::tick("Gint_k","vlocal");
 	return;
 }
 

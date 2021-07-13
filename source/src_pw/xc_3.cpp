@@ -9,7 +9,7 @@
 using namespace std;
 #include "myfunc.h"
 #include "../module_base/blas_connector.h"
-#include "../src_pw/global.h"
+#include "global.h"
 
 // dscal compute y = alpha * y, where alpha is a scalar and
 void dscal(const int n,const double &alpha,double *y,const int incy)

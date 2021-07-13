@@ -2,7 +2,7 @@
 #define WF_IO_H
 
 #include "../src_pw/tools.h"
-#include "../src_io/rwstream.h"
+#include "rwstream.h"
 
 namespace WF_io
 {

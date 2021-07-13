@@ -5,7 +5,7 @@
 //calculate the Hartree part in PW or LCAO base
 void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 {
-	timer::tick("Stress_Func","stress_har",'F');
+	timer::tick("Stress_Func","stress_har");
 	double shart;
 
 	complex<double> *Porter = UFFT.porter;

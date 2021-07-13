@@ -7,9 +7,9 @@
 
 using namespace std;
 
-#include "../src_pw/global.h"
-#include "../src_pw/xc_type.h"
-#include "../src_pw/xc_functional.h"
+#include "global.h"
+#include "xc_type.h"
+#include "xc_functional.h"
 #include "myfunc.h"
 
 xcfunc xc2;

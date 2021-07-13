@@ -1,31 +1,31 @@
-#include "run_md.h"
+#include "run_md_lcao.h"
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_orbitals.h"
-#include "src_pdiag/pdiag_double.h"
-#include "LCAO_nnr.h"
-#include "FORCE_STRESS.h"
+#include "../src_pdiag/pdiag_double.h"
+#include "../src_lcao/LCAO_nnr.h"
+#include "../src_lcao/FORCE_STRESS.h"
 #include "../module_base/global_function.h"
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
-#include "src_ri/exx_abfs.h"
-#include "src_ri/exx_opt_orb.h"
-#include "ELEC_scf.h"
+#include "../src_ri/exx_abfs.h"
+#include "../src_ri/exx_opt_orb.h"
+#include "../src_lcao/ELEC_scf.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd2_parameters.h"
 #include "../src_pw/vdwd3_parameters.h"
 
-Run_MD::Run_MD()
+Run_MD_LCAO::Run_MD_LCAO()
 {}
 
-Run_MD::~Run_MD() 
+Run_MD_LCAO::~Run_MD_LCAO() 
 {}
 
 
-void Run_MD::opt_cell(void)
+void Run_MD_LCAO::opt_cell(void)
 {
-	TITLE("Run_MD","opt_cell");
+	TITLE("Run_MD_LCAO","opt_cell");
 
     // Initialize the local wave functions.
     // npwx, eigenvalues, and weights
@@ -53,10 +53,10 @@ void Run_MD::opt_cell(void)
 }
 
 
-void Run_MD::opt_ions(void)
+void Run_MD_LCAO::opt_ions(void)
 {
-    TITLE("Run_MD","opt_ions"); 
-    timer::tick("Run_MD","opt_ions",'B'); 
+    TITLE("Run_MD_LCAO","opt_ions"); 
+    timer::tick("Run_MD_LCAO","opt_ions"); 
 		
     if(OUT_LEVEL=="i")
     {
@@ -221,13 +221,13 @@ void Run_MD::opt_ions(void)
 	// mohan update 2021-02-10
     LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
-    timer::tick("Run_MD","opt_ions",'B'); 
+    timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
 }
 
-void Run_MD::final_scf(void)
+void Run_MD_LCAO::final_scf(void)
 {
-    TITLE("Run_MD","final_scf"); 
+    TITLE("Run_MD_LCAO","final_scf"); 
 
     FINAL_SCF = true;
 

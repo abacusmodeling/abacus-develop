@@ -27,7 +27,7 @@
 void Input_Conv::Convert(void)
 {
     TITLE("Input_Conv","Convert");
-	timer::tick("Input_Conv","Convert",'B');
+	timer::tick("Input_Conv","Convert");
 //----------------------------------------------------------
 // main parameters / electrons / spin ( 10/16 )
 //----------------------------------------------------------
@@ -590,7 +590,7 @@ void Input_Conv::Convert(void)
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
 
-	timer::tick("Input_Conv","Convert",'B');
+	timer::tick("Input_Conv","Convert");
     return;
 }
 

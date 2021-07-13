@@ -9,6 +9,7 @@
 #include "src_pw/global.h"
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"
+#include "module_md/run_md.h"
 
 Driver::Driver(){}
 
@@ -35,7 +36,7 @@ void Driver::init()
 
 void Driver::reading(void)
 {
-	timer::tick("Driver","reading",'A');
+	timer::tick("Driver","reading");
 
 	// (1) read INPUT 
 	INPUT.Init( global_in_card );
@@ -66,7 +67,7 @@ void Driver::reading(void)
     INPUT.Print( ss1.str() );
     //DONE(ofs_running,"READING CARDS");
 
-	timer::tick("Driver","reading",'A');
+	timer::tick("Driver","reading");
 	return;
 }
 
@@ -80,7 +81,11 @@ void Driver::atomic_world(void)
 	// lcao_in_pw: LCAO expaned by plane wave basis set
 	// lcao: linear combination of atomic orbitals
 	//--------------------------------------------------
-	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+	if(CALCULATION=="md" || CALCULATION=="md-sto") // Yu Liu 2021-07-12
+	{
+		Run_md::md_line();
+	}
+	else if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
 	{
 		Run_pw::plane_wave_line();
 	}

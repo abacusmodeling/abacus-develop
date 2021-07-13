@@ -2,17 +2,17 @@
 #define GLOBAL_FP_H
 
 #include "../module_neighbor/sltk_grid_driver.h"
-#include "src_lcao/grid_technique.h"
+#include "grid_technique.h"
 #include "../src_parallel/parallel_orbitals.h"
-#include "src_lcao/local_orbital_wfc.h"
-#include "src_lcao/local_orbital_charge.h"
-#include "src_lcao/LCAO_matrix.h"
-#include "src_lcao/LCAO_gen_fixedH.h"
-#include "src_lcao/LCAO_hamilt.h" 
-#include "module_orbital/ORB_read.h"
-#include "module_orbital/ORB_gen_tables.h"
+#include "local_orbital_wfc.h"
+#include "local_orbital_charge.h"
+#include "LCAO_matrix.h"
+#include "LCAO_gen_fixedH.h"
+#include "LCAO_hamilt.h" 
+#include "../module_orbital/ORB_read.h"
+#include "../module_orbital/ORB_gen_tables.h"
 #include "../src_parallel/subgrid_oper.h"
-#include "src_ri/exx_lcao.h"
+#include "../src_ri/exx_lcao.h"
 
 extern Grid_Driver GridD;
 extern Parallel_Orbitals ParaO;

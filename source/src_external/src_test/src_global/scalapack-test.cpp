@@ -1,8 +1,8 @@
 #ifdef __MPI
 #include<mpi.h>
 #endif
-#include "../src_global/scalapack-connector.h"
-#include "../src_global/global_function.h"
+#include "../../../module_base/scalapack-connector.h"
+#include "../../../module_base/global_function.h"
 
 void test_pblas()
 {

@@ -1,10 +1,10 @@
 #ifndef MD_BASIC_H
 #define MD_BASIC_H
 
-#include "../src_ions/MD_func.h"
-#include "../src_ions/MD_thermo.h"
-#include "../src_ions/MD_parameters.h"
-#include "../src_ions/MD_fire.h"
+#include "MD_func.h"
+#include "MD_thermo.h"
+#include "MD_parameters.h"
+#include "MD_fire.h"
 #include "../module_cell/unitcell_pseudo.h"
 
 //using namespace std;

@@ -4,7 +4,7 @@
 #include "gint_gamma.h"
 #include "gint_tools.h"
 #include "grid_technique.h"
-#include "module_orbital/ORB_read.h"
+#include "../module_orbital/ORB_read.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
 
@@ -161,7 +161,7 @@ void Gint_Gamma::cal_band_rho(
 Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const*const DM) const					// Peize Lin update OpenMP 2020.09.28
 {
     TITLE("Gint_Gamma","gamma_charge");
-    timer::tick("Gint_Gamma","gamma_charge",'I');   
+    timer::tick("Gint_Gamma","gamma_charge");   
 
 	Gint_Tools::Array_Pool<double> rho(NSPIN, pw.nrxx);
 	ZEROS(rho.ptr_1D, NSPIN*pw.nrxx);
@@ -280,17 +280,17 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 	}
     if(OUT_LEVEL != "m") OUT(ofs_running, "sum", sum);
 
-    timer::tick("Gint_Gamma","reduce_charge",'J');
+    timer::tick("Gint_Gamma","reduce_charge");
 #ifdef __MPI
     Parallel_Reduce::reduce_double_pool( sum );
 #endif
-    timer::tick("Gint_Gamma","reduce_charge",'J');
+    timer::tick("Gint_Gamma","reduce_charge");
     OUT(ofs_warning,"charge density sumed from grid", sum * ucell.omega/ pw.ncxyz);
 
     const double ne = sum * ucell.omega / pw.ncxyz;
     //xiaohui add 'OUT_LEVEL', 2015-09-16
     if(OUT_LEVEL != "m") OUT(ofs_running, "ne", ne);
-    timer::tick("Gint_Gamma","gamma_charge",'I');
+    timer::tick("Gint_Gamma","gamma_charge");
 	return ne;
 }
 
@@ -300,7 +300,7 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 double Gint_Gamma::cal_rho(const double*const*const*const DM)
 {
     TITLE("Gint_Gamma","cal_rho");
-    timer::tick("Gint_Gamma","cal_rho",'F');
+    timer::tick("Gint_Gamma","cal_rho");
 
     this->job = cal_charge;
     this->save_atoms_on_grid(GridT);
@@ -308,6 +308,6 @@ double Gint_Gamma::cal_rho(const double*const*const*const DM)
 	const Gint_Tools::Array_Pool<double> rho = this->gamma_charge(DM);
     const double ne = sum_up_rho(rho);
 
-    timer::tick("Gint_Gamma","cal_rho",'F');
+    timer::tick("Gint_Gamma","cal_rho");
     return ne;
 }

@@ -1,11 +1,11 @@
 #include "exx_abfs-parallel-communicate-dm3.h"
 #include "exx_abfs-parallel-communicate-dm3-template.h"
 #include "../src_pw/global.h"
-#include "src_lcao/global_fp.h"
-#include "src_ri/abfs-template.h"
+#include "../src_lcao/global_fp.h"
+#include "abfs-template.h"
 
-#include "src_external/src_test/test_function.h"
-#include "src_external/src_test/src_global/complexmatrix-test.h"
+#include "../src_external/src_test/test_function.h"
+#include "../src_external/src_test/src_global/complexmatrix-test.h"
 
 /*
 template<> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>

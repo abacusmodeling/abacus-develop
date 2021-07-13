@@ -12,6 +12,7 @@ VPATH=./src_global\
 :./module_neighbor\
 :./module_cell\
 :./module_base\
+:./module_md\
 :./src_pw\
 :./src_lcao\
 :./src_ions\

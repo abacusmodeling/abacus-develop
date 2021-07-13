@@ -6,7 +6,7 @@
 #ifndef WFC_DM_2D_TEST_H
 #define WFC_DM_2D_TEST_H
 
-#include "src_lcao/wfc_dm_2d.h"
+#include "../../../src_lcao/wfc_dm_2d.h"
 #include <iostream>
 #include <fstream>
 

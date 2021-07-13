@@ -1,4 +1,4 @@
-#include "../src_ions/run_md_pw.h"
+#include "run_md_pw.h"
 #include "../src_pw/forces.h"
 #include "../src_pw/stress_pw.h"
 #include "../src_pw/global.h" // use chr.
@@ -9,12 +9,12 @@
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
-#include "../src_ions/MD_basic.h"
+#include "MD_basic.h"
 
 void Run_MD_PW::md_ions_pw(void)
 {
     TITLE("Run_MD_PW", "md_ions_pw");
-    timer::tick("Run_MD_PW", "md_ions_pw", 'C');
+    timer::tick("Run_MD_PW", "md_ions_pw");
 
     if (OUT_LEVEL == "i")
     {
@@ -205,28 +205,19 @@ void Run_MD_PW::md_ions_pw(void)
         ++istep;
     }
 
-    if (CALCULATION == "scf" || CALCULATION == "relax" || CALCULATION == "cell-relax")
-    {
-        ofs_running << "\n\n --------------------------------------------" << endl;
-        ofs_running << setprecision(16);
-        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
-        ofs_running << " --------------------------------------------\n\n"
-                    << endl;
-    }
-
     if (OUT_LEVEL == "i")
     {
         cout << " ION DYNAMICS FINISHED :)" << endl;
     }
 
-    timer::tick("Run_MD_PW", "md_ions_pw", 'C');
+    timer::tick("Run_MD_PW", "md_ions_pw");
     return;
 }
 
 void Run_MD_PW::md_cells_pw()
 {
     TITLE("Run_MD_PW", "md_cells_pw");
-    timer::tick("Run_MD_PW", "md_cells_pw", 'C');
+    timer::tick("Run_MD_PW", "md_cells_pw");
 
     wf.allocate(kv.nks);
 
@@ -304,5 +295,5 @@ void Run_MD_PW::md_cells_pw()
     ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
     ofs_running << " --------------------------------------------\n\n" << endl;
 
-    timer::tick("Run_MD_PW", "md_cells_pw", 'C');
+    timer::tick("Run_MD_PW", "md_cells_pw");
 }

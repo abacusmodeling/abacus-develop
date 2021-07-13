@@ -1,7 +1,7 @@
-#include "../src_ions/MD_func.h"
+#include "MD_func.h"
 #include "../src_pw/tools.h"
 #ifdef __LCAO
-#include "src_lcao/FORCE_STRESS.h"
+#include "../src_lcao/FORCE_STRESS.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #endif
 #include "../src_pw/forces.h"

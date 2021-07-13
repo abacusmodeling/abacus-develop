@@ -107,7 +107,11 @@ void Print_Info::setup_parameters(void)
 
 
 		cout << " ---------------------------------------------------------" << endl;
-		if(BASIS_TYPE=="lcao") 
+		if(CALCULATION=="md" && INPUT.mdp.md_potential)
+		{
+			cout << " Classic Molecular Dynamics simulations" << endl;
+		}
+		else if(BASIS_TYPE=="lcao") 
 		{
 			if(COLOUR && MY_RANK==0)
 			{

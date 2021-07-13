@@ -1,6 +1,6 @@
 #include "../src_pw/potential.h"
 #include "../src_pw/global.h"
-#include "../src_lcao/ELEC_evolve.h"
+#include "ELEC_evolve.h"
 
 //==========================================================
 // this function aims to add external time-dependent potential 

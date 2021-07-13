@@ -9,9 +9,9 @@ using std::map;
 using std::set;
 
 #include "exx_abfs.h"
-#include "module_orbital/ORB_table_phi.h"
-#include "module_orbital/ORB_gaunt_table.h"
-#include "src_lcao/center2_orb-orb11.h"
+#include "../module_orbital/ORB_table_phi.h"
+#include "../module_orbital/ORB_gaunt_table.h"
+#include "../src_lcao/center2_orb-orb11.h"
 
 class LCAO_Orbitals;
 

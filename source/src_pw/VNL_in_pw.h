@@ -4,7 +4,7 @@
 #include "tools.h"
 #include "VL_in_pw.h"
 #ifdef __LCAO
-#include "module_orbital/ORB_gen_tables.h"
+#include "../module_orbital/ORB_gen_tables.h"
 #endif
 #include "../src_lcao/wavefunc_in_pw.h"
 #include "../module_cell/unitcell_pseudo.h"

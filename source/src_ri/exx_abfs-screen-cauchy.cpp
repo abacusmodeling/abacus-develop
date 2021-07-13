@@ -2,7 +2,7 @@
 
 #include "../src_pw/global.h"
 
-#include "src_external/src_test/src_ri/exx_abfs-screen-test.h"
+#include "../src_external/src_test/src_ri/exx_abfs-screen-test.h"
 //double Exx_Abfs::Screen::Cauchy::num_screen1 = 0;
 //double Exx_Abfs::Screen::Cauchy::num_screen2 = 0;
 //double Exx_Abfs::Screen::Cauchy::num_screen3 = 0;

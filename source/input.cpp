@@ -29,7 +29,7 @@ Input::~Input()
 
 void Input::Init(const string &fn)
 {
-	timer::tick("Input","Init",'B');
+	timer::tick("Input","Init");
     this->Default();
 
     bool success = this->Read(fn);
@@ -99,7 +99,7 @@ void Input::Init(const string &fn)
 
 	OUT(ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, global_pseudo_type -> pseudo_type)
 
-	timer::tick("Input","Init",'B');
+	timer::tick("Input","Init");
     return;
 }
 
@@ -454,6 +454,11 @@ void Input::Default(void)
 //----------------------------------------------------------
 	restart_save = false;
 	restart_load = false;
+
+//==========================================================
+// test only
+//==========================================================
+	test_just_neighbor = false;
 
 //==========================================================
 //    DFT+U     Xin Qu added on 2020-10-29
@@ -1143,6 +1148,10 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
+		else if (strcmp("md_potential",word) == 0)
+		{
+			read_value(ifs, mdp.md_potential);
+		}
 		else if (strcmp("NVT_tau",word) == 0)
 		{
 			read_value(ifs, mdp.NVT_tau);
@@ -1675,6 +1684,10 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, new_dm);
 		}
+		else if (strcmp("test_just_neighbor", word) == 0)
+		{
+			read_value(ifs, test_just_neighbor);
+		}
 //----------------------------------------------------------------------------------
 //         Xin Qu added on 2020-10-29 for DFT+U
 //----------------------------------------------------------------------------------		
@@ -2114,6 +2127,7 @@ void Input::Bcast()
 */
 	//zheng daye add 2014/5/5
         Parallel_Common::bcast_int(mdp.mdtype);
+		Parallel_Common::bcast_int(mdp.md_potential);
         Parallel_Common::bcast_double(mdp.NVT_tau);
         Parallel_Common::bcast_int(mdp.NVT_control);
         Parallel_Common::bcast_double(mdp.dt);
@@ -2204,6 +2218,7 @@ void Input::Bcast()
     Parallel_Common::bcast_double( fermi_level );
     Parallel_Common::bcast_bool( coulomb_cutoff );
     Parallel_Common::bcast_bool( kmesh_interpolation );
+	Parallel_Common::bcast_bool( test_just_neighbor );
     for(int i=0; i<100; i++)
     {
         Parallel_Common::bcast_double( qcar[i][0] );
@@ -2494,6 +2509,7 @@ void Input::Check(void)
 	else if(calculation == "md") // mohan add 2011-11-04
 	{
 		CALCULATION = "md"; 
+		symmetry = false;
 		force = 1;
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
 

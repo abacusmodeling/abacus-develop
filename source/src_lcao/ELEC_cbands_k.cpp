@@ -13,7 +13,7 @@ ELEC_cbands_k::~ELEC_cbands_k(){};
 void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_cbands_k","cal_bands");
-	timer::tick("ELEC_cbands_k","cal_bands",'E');
+	timer::tick("ELEC_cbands_k","cal_bands");
 
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
@@ -126,7 +126,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		uhm.GK.destroy_pvpR();
 	}
 
-	timer::tick("ELEC_cbands_k","cal_bands",'E');
+	timer::tick("ELEC_cbands_k","cal_bands");
 	return;	
 }
 

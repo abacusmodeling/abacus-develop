@@ -8,7 +8,7 @@
 #include "dftu.h"
 //
 #include "../module_neighbor/sltk_atom_arrange.h"
-#include "src_lcao/LCAO_nnr.h"
+#include "LCAO_nnr.h"
 #include "../src_io/istate_charge.h"
 #include "../src_io/istate_envelope.h"
 #include "ELEC_scf.h"
@@ -17,8 +17,8 @@
 #include "ELEC_cbands_k.h"
 #include "ELEC_evolve.h"
 //
-#include "src_ri/exx_abfs.h"
-#include "src_ri/exx_opt_orb.h"
+#include "../src_ri/exx_abfs.h"
+#include "../src_ri/exx_opt_orb.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd3.h"
 
@@ -26,7 +26,7 @@
 void LOOP_elec::solve_elec_stru(const int &istep)
 {
     TITLE("LOOP_elec","solve_elec_stru"); 
-    timer::tick("LOOP_elec","solve_elec_stru",'C'); 
+    timer::tick("LOOP_elec","solve_elec_stru"); 
 
 	// prepare HS matrices, prepare grid integral
 	this->set_matrix_grid();
@@ -35,7 +35,7 @@ void LOOP_elec::solve_elec_stru(const int &istep)
 	// do self-interaction calculations / nscf/ tddft, etc. 
 	this->solver(istep);
 
-    timer::tick("LOOP_elec","solve_elec_stru",'C'); 
+    timer::tick("LOOP_elec","solve_elec_stru"); 
 	return;
 }
 
@@ -43,7 +43,7 @@ void LOOP_elec::solve_elec_stru(const int &istep)
 void LOOP_elec::set_matrix_grid(void)
 {
     TITLE("LOOP_elec","set_matrix_grid"); 
-    timer::tick("LOOP_elec","set_matrix_grid",'D'); 
+    timer::tick("LOOP_elec","set_matrix_grid"); 
 
 	// (1) Find adjacent atoms for each atom.
 	SEARCH_RADIUS = atom_arrange::set_sr_NL(
@@ -83,7 +83,7 @@ void LOOP_elec::set_matrix_grid(void)
 		LNNR.cal_nnrg(GridT);
 	}
 
-    timer::tick("LOOP_elec","set_matrix_grid",'D'); 
+    timer::tick("LOOP_elec","set_matrix_grid"); 
 	return;
 }
 
@@ -91,7 +91,7 @@ void LOOP_elec::set_matrix_grid(void)
 void LOOP_elec::before_solver(const int &istep)
 {
     TITLE("LOOP_elec","before_solver"); 
-    timer::tick("LOOP_elec","before_solver",'D'); 
+    timer::tick("LOOP_elec","before_solver"); 
 
 	// set the augmented orbitals index.
 	// after ParaO and GridT, 
@@ -145,14 +145,14 @@ void LOOP_elec::before_solver(const int &istep)
 	// (9) compute S, T, Vnl, Vna matrix.
 	UHM.set_lcao_matrices();
 
-    timer::tick("LOOP_elec","before_solver",'D'); 
+    timer::tick("LOOP_elec","before_solver"); 
 	return;
 }
 
 void LOOP_elec::solver(const int &istep)
 {
     TITLE("LOOP_elec","solver"); 
-    timer::tick("LOOP_elec","solver",'D'); 
+    timer::tick("LOOP_elec","solver"); 
 
 	// self consistent calculations for electronic ground state
 	if (CALCULATION=="scf" || CALCULATION=="md"
@@ -232,7 +232,7 @@ void LOOP_elec::solver(const int &istep)
 		WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
 	}
 
-    timer::tick("LOOP_elec","solver",'D'); 
+    timer::tick("LOOP_elec","solver"); 
 	return;
 }
 
