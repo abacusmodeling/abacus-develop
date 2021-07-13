@@ -159,6 +159,7 @@ void Atom_pseudo::bcast_atom_pseudo(const int &na)
 
 	if(MY_RANK!=0)
 	{
+		delete[] mbl;
 		mbl = new Vector3<int>[na];
 	}
 
@@ -200,6 +201,12 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 
 	if(MY_RANK!=0)
 	{
+		delete[] jjj;
+		delete[] els;
+		delete[] lchi;
+		delete[] oc;
+		delete[] jchi;
+		delete[] nn;
 		jjj = new double [nbeta];
 		els = new string[nchi];
 		lchi = new int [nchi];
@@ -222,6 +229,10 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 	if(MY_RANK != 0)
 	{
 		assert(mesh!=0);
+		delete[] r;
+		delete[] rab;
+		delete[] rho_atc;
+		delete[] rho_at;
 		r = new double[mesh];
 		rab = new double[mesh];
 		rho_atc = new double[mesh];
@@ -239,6 +250,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 // == pseudo_vl ==
 	if(MY_RANK != 0)
 	{
+		delete[] vloc_at;
 		vloc_at = new double[mesh];
 	}
 	Parallel_Common::bcast_double( vloc_at, mesh);
@@ -247,6 +259,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 // == pseudo_nc ==
 	if(MY_RANK != 0)
 	{
+		delete[] lll;
 		lll = new int[nbeta];
 	}
 	Parallel_Common::bcast_int( lll, nbeta );
