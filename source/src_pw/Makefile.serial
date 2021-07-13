@@ -24,7 +24,7 @@ FFTW_INCLUDE_DIR = ${MKLROOT}/include/fftw
 LAPACK_DIR    		= $(MKLROOT)
 LAPACK_INCLUDE_DIR	= ${LAPACK_DIR}/include 
 LAPACK_LIB_DIR		= ${LAPACK_DIR}/lib/intel64
-LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_gf_lp64  -lmkl_core -lmkl_gnu_thread -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
+LAPACK_LIB 			= -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64  -lmkl_core -lmkl_intel_thread -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
 
 ##==========================
 ## LIBXC package needed 

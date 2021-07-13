@@ -58,6 +58,7 @@ VPATH=../src_global\
 :../src_parallel\
 :../src_io\
 :../src_ions\
+:../module_md\
 :../\
 
 #==========================
