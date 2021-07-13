@@ -159,7 +159,7 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik)
 	return 0;
 }
 
-int WF_Local::read_lowf(double **c)
+int WF_Local::read_lowf(double **c, const int &is)
 {
     TITLE("WF_Local","read_lowf");
     timer::tick("WF_Local","read_lowf");
@@ -171,7 +171,7 @@ int WF_Local::read_lowf(double **c)
 	{
 		// read wave functions
 		// write is in ../src_pdiag/pdiag_basic.cpp
-    	ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 <<".dat";
+    	ss << global_out_dir << "LOWF_GAMMA_S" << is+1 <<".dat";
 		cout << " name is = " << ss.str() << endl;
 	}
 	else
@@ -233,19 +233,20 @@ int WF_Local::read_lowf(double **c)
 			READ_VALUE(ifs, wf.ekb[CURRENT_SPIN][i]);
 			READ_VALUE(ifs, wf.wg(CURRENT_SPIN,i));
             assert( (i+1)==ib);
-	//		cout << " ib=" << ib << endl;
+			//cout << " ib=" << ib << endl;
             for (int j=0; j<NLOCAL; j++)
             {
                 ifs >> ctot[i][j];
-	//			cout << ctot[i][j] << " " << endl;
+				//cout << ctot[i][j] << " ";
             }
+		//cout << endl;
         }
     }
 
 
 #ifdef __MPI
     Parallel_Common::bcast_int(error);
-	Parallel_Common::bcast_double( wf.ekb[CURRENT_SPIN], NBANDS);
+	Parallel_Common::bcast_double( wf.ekb[is], NBANDS);
 	Parallel_Common::bcast_double( wf.wg.c, NSPIN*NBANDS);
 #endif
 	if(error==2) return 2;
@@ -259,8 +260,15 @@ int WF_Local::read_lowf(double **c)
 	// otherwise, read in sucessfully.
     // if DRANK!=0, ctot is not used,
     // so it's save.
-	
-    WF_Local::distri_lowf(ctot, SGO.totwfc[0]);
+
+	if(INPUT.new_dm==0)
+	{	
+		WF_Local::distri_lowf(ctot, SGO.totwfc[0]);
+	}
+	else
+	{
+		WF_Local::distri_lowf_new(ctot);
+	}
 	
 	// mohan add 2012-02-15,
 	// still have bugs, but can solve it later.
@@ -360,6 +368,16 @@ void WF_Local::write_lowf_complex(const string &name, complex<double> **ctot, co
     return;
 }
 
+void WF_Local::distri_lowf_new(double **ctot)
+{
+    TITLE("WF_Local","distri_lowf");
+#ifdef __MPI
+	
+#else
+	WARNING_QUIT("WF_Local::distri_lowf","check the code without MPI.");
+#endif
+    return;
+}
 
 
 void WF_Local::distri_lowf(double **ctot, double **c)

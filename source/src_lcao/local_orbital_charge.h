@@ -23,6 +23,7 @@ class Local_Orbital_Charge
 	//-----------------
 	void allocate_gamma(const Grid_Technique &gt);
 
+	void gamma_file(const Grid_Technique &gt);
 
 
 	//-----------------
