@@ -504,6 +504,7 @@ void Gint_k::cal_rho_k(void)
 		delete[] block_iw;
 		delete[] block_size;
 		delete[] at;
+		delete[] uc;
 		delete[] block_index;
         delete[] cal_flag;
 		delete[] vindex;
