@@ -1,6 +1,7 @@
 #include "dos.h"
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
+
 void energy::perform_dos_pw(void)
 {
 	TITLE("energy","perform_dos_pw");
@@ -111,9 +112,11 @@ void energy::perform_dos_pw(void)
 		emin *= Ry_to_eV;
 
 //scale up a little bit so the end peaks are displaced better
-//		double delta=(emax-emin)*dos_scale;
-//		emax=emax+delta/2.0;
-//		emin=emin-delta/2.0;
+		const double scl=this->dos_scale;
+		double delta=(emax-emin)*scl;
+		cout << scl;
+		emax=emax+delta/2.0;
+		emin=emin-delta/2.0;
 
 				OUT(ofs_running,"minimal energy is (eV)", emin);
 				OUT(ofs_running,"maximal energy is (eV)", emax);
@@ -122,6 +125,7 @@ void energy::perform_dos_pw(void)
 		
 //determine #. energy points	
 		const double de_ev = this->dos_edelta_ev;
+		cout << de_ev;
 
 		const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
 		const int np=npoints;

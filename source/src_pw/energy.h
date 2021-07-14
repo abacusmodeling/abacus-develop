@@ -57,8 +57,8 @@ class energy
 	double dos_emin_ev;
 	double dos_emax_ev;
 	double dos_edelta_ev;
+	double dos_scale;
 	double bcoeff;
-//	double dos_scale;
 
     double ewald();
 
