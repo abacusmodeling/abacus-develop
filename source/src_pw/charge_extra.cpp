@@ -58,6 +58,7 @@ Charge_Extra::~Charge_Extra()
 			}
 			delete[] rho_ion[i];
 		}	
+		delete[] rho_ion;
 	}
 
 	for(int is=0; is<NSPIN; is++)
