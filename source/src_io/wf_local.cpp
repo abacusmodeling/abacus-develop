@@ -452,12 +452,18 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 //2.2 copy from ctot to work, then bcast work
 			info=CTOT2q(myid, naroc, nb, ParaO.dim0, ParaO.dim1, iprow, ipcol, work, ctot);
 			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, 0, ParaO.comm_2D);
-			ofs_running << "iprow, ipcow : " << iprow << ipcol << endl;
-			for (int i=0; i<maxnloc; ++i)
+			//ofs_running << "iprow, ipcow : " << iprow << ipcol << endl;
+			//for (int i=0; i<maxnloc; ++i)
+			//{
+				//ofs_running << *(work+i)<<" ";
+			//}
+			//ofs_running << endl;
+//2.3 copy from work to wfc_gamma
+			const int inc=1;
+			if(myid==src_rank)
 			{
-				ofs_running << *(work+i)<<" ";
+				LapackConnector::copy(ParaO.nloc, work, inc, LOC.wfc_dm_2d.wfc_gamma[is].c, inc);
 			}
-			ofs_running << endl;
 		}//loop ipcol
 	}//loop	iprow
 
