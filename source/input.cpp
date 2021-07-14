@@ -165,6 +165,7 @@ void Input::Default(void)
     search_radius=-1.0; // unit: a.u. -1.0 has no meaning.
     search_pbc=true;
     symmetry=false;
+	set_vel=false;
 	mlwf_flag=false;
     force=0;
     force_set=false;
@@ -711,6 +712,10 @@ bool Input::Read(const string &fn)
         {
             read_value(ifs, symmetry);
         }
+		else if (strcmp("set_vel", word) == 0)
+        {
+            read_value(ifs, set_vel);
+        }
         else if (strcmp("mlwf_flag", word) == 0)
         {
             read_value(ifs, mlwf_flag);
@@ -1148,10 +1153,10 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
-		else if (strcmp("md_potential",word) == 0)
-		{
-			read_value(ifs, mdp.md_potential);
-		}
+		//else if (strcmp("md_potential",word) == 0)
+		//{
+		//	read_value(ifs, mdp.md_potential);
+		//}
 		else if (strcmp("NVT_tau",word) == 0)
 		{
 			read_value(ifs, mdp.NVT_tau);
@@ -2010,6 +2015,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_bool( search_pbc );
     Parallel_Common::bcast_double( search_radius );
     Parallel_Common::bcast_bool( symmetry );
+	Parallel_Common::bcast_bool( set_vel );  //liuyu 2021-07-14
     Parallel_Common::bcast_bool( mlwf_flag );
     Parallel_Common::bcast_int( force );
     Parallel_Common::bcast_bool( force_set );
@@ -2127,7 +2133,7 @@ void Input::Bcast()
 */
 	//zheng daye add 2014/5/5
         Parallel_Common::bcast_int(mdp.mdtype);
-		Parallel_Common::bcast_int(mdp.md_potential);
+		//Parallel_Common::bcast_int(mdp.md_potential);
         Parallel_Common::bcast_double(mdp.NVT_tau);
         Parallel_Common::bcast_int(mdp.NVT_control);
         Parallel_Common::bcast_double(mdp.dt);

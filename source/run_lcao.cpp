@@ -8,6 +8,7 @@
 #include "src_lcao/LOOP_cell.h"
 #include "src_io/print_info.h"
 #include "src_pw/symmetry.h"
+#include "module_md/run_md_lcao.h"
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -143,8 +144,18 @@ void Run_lcao::lcao_line(void)
 		}
 	}
 
-	LOOP_cell lc;
-	lc.opt_cell();
+	if(CALCULATION=="md")
+	{
+		Run_MD_LCAO run_md_lcao;
+		run_md_lcao.opt_cell();
+	}
+	else // cell relaxations
+	{
+		LOOP_cell lc;
+		lc.opt_cell();
+
+		en.perform_dos();
+	}
 
 	en.perform_dos();
 

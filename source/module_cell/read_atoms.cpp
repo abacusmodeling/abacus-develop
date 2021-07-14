@@ -438,7 +438,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					{
 						ifpos >> v.x >> v.y >> v.z
 							>> mv.x >> mv.y >> mv.z;
-						if(CALCULATION=="md" && INPUT.mdp.md_potential)
+						if(INPUT.set_vel)
 						{
 							ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
 						}

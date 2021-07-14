@@ -852,7 +852,7 @@ void LCAO_Orbitals::read_orb_file(
 	Parallel_Common::bcast_int(lmax);
 #endif	
 	
-	int* nchi = new int[lmax];		// allocate space: number of chi for each L.
+	int* nchi = new int[lmax+1];		// allocate space: number of chi for each L.
 	
 	if (my_rank == 0)
 	{	

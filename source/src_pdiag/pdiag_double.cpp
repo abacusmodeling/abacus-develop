@@ -63,6 +63,31 @@ inline int cart2blacs(
 #endif
 }
 
+inline int q2CTOT(
+	int myid,
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	int loc_size,
+	double* work,
+	double** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
+}
+
 inline int q2ZLOC_WFC(
 	int pos,
 	int naroc[2],
@@ -628,80 +653,89 @@ void Pdiag_Double::diago_double_begin(
         delete[] eigen;
 	    OUT(ofs_running,"eigenvalues were copied to ekb");
 
-        if(INPUT.new_dm==0)
-        {
-            // convert wave function to band distribution
+		// convert wave function to band distribution
 			// and calculate the density matrix in the tranditional way
-            // redistribute eigenvectors to wfc / wfc_aug
+			// redistribute eigenvectors to wfc / wfc_aug
 
-            timer::tick("Diago_LCAO_Matrix","gath_eig");
-            int pos=0;
-            for(int i=0; i<myid; ++i)
-            {
-                pos+=loc_sizes[i];
-            }
-            int naroc[2]; // maximum number of row or column
-            for(int iprow=0; iprow<dim0; ++iprow)
-            {
-                for(int ipcol=0; ipcol<dim1; ++ipcol)
-                {
-                    const int coord[2]={iprow, ipcol};
-                    int src_rank;
-                    MPI_Cart_rank(comm_2D, coord, &src_rank);
-                    if(myid==src_rank)
-                    {
-                        LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
-                        naroc[0]=nrow;
-                        naroc[1]=ncol;
-                    }
-                    info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
-                    info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+		timer::tick("Diago_LCAO_Matrix","gath_eig");
+		int pos=0;
+		for(int i=0; i<myid; ++i)
+		{
+			pos+=loc_sizes[i];
+		}
+		int naroc[2]; // maximum number of row or column
+		double **ctot;
 
-                    if(this->out_lowf)
-                    {
-                        double **ctot;
-                        if(myid==0)
-                        {
-                            ctot = new double*[NBANDS];
-                            for (int i=0; i<NBANDS; i++)
-                            {
-                                ctot[i] = new double[NLOCAL];
-                                ZEROS(ctot[i], NLOCAL);
-                            }
-                            Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
-                        }
+		if(this->out_lowf && myid==0)
+		{
+			ctot = new double*[NBANDS];
+			for (int i=0; i<NBANDS; i++)
+			{
+				ctot[i] = new double[NLOCAL];
+				ZEROS(ctot[i], NLOCAL);
+			}
+			Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
+		}
+
+		for(int iprow=0; iprow<dim0; ++iprow)
+		{
+			for(int ipcol=0; ipcol<dim1; ++ipcol)
+			{
+				const int coord[2]={iprow, ipcol};
+				int src_rank;
+				MPI_Cart_rank(comm_2D, coord, &src_rank);
+				if(myid==src_rank)
+				{
+					LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
+					naroc[0]=nrow;
+					naroc[1]=ncol;
+				}
+				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
+				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+
+				if(out_lowf)
+				{
+					if(INPUT.new_dm==0)
+					{
 						// mohan delete Bfield option 2021-02-12
 						info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-								dim0, dim1, iprow, ipcol, this->loc_size,
-								work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
-						stringstream ss;
-                        ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
-                        // mohan add 2012-04-03, because we need the occupations for the
-                        // first iteration.
-                        WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
-                        if(myid==0)
-                        {
-                            for (int i=0; i<NBANDS; i++)
-                            {
-                                delete[] ctot[i];
-                            }
-                            delete[] ctot;
-                        }
-                    }
-                    else
-                    {
-						// mohan update 2021-02-12, delete Bfield option
-						info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-								dim0, dim1, iprow, ipcol, this->loc_size,
-								work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
+							dim0, dim1, iprow, ipcol, this->loc_size,
+							work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
 					}
-                }
-            }
-        }
+					else
+					{
+						info=q2CTOT(myid, naroc, nb,
+							dim0, dim1, iprow, ipcol, this->loc_size,
+							work, ctot);
+					}
+				}//out_lowf
+				else
+				{
+					// mohan update 2021-02-12, delete Bfield option
+					info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
+						dim0, dim1, iprow, ipcol, this->loc_size,
+						work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
+				}
+			}//loop ipcol
+		}//loop iprow
+	
+		if(out_lowf && myid==0)
+		{
+			stringstream ss;
+			ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
+			// mohan add 2012-04-03, because we need the occupations for the
+				// first iteration.
+			WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
+			for (int i=0; i<NBANDS; i++)
+			{
+				delete[] ctot[i];
+			}
+			delete[] ctot;
+		}
 
-        delete[] work;
-        timer::tick("Diago_LCAO_Matrix","gath_eig");
-    } // GenELPA method
+		delete[] work;
+		timer::tick("Diago_LCAO_Matrix","gath_eig");
+	} // GenELPA method
 	else if(KS_SOLVER=="lapack_gv")
 	{
 		wfc_2d.create(this->ncol, this->nrow, false);

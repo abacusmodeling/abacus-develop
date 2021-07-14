@@ -769,8 +769,7 @@ void Grid::Construct_Adjacent_expand(
 //----------------------------------------------------------
 	for (int ia = 0;ia < Cell[true_i][true_j][true_k].length;ia++)
 	{
-		AdjacentSet* p = new AdjacentSet;
-		Cell[true_i][true_j][true_k].address[ia].fatom.setAdjacentSet(p);
+		Cell[true_i][true_j][true_k].address[ia].fatom.allocate_AdjacentSet();
 
 		if (this->pbc)
 		{
@@ -780,7 +779,6 @@ void Grid::Construct_Adjacent_expand(
 		{
 			WARNING_QUIT("Construct_Adjacent_expand", "\n Expand case, must use periodic boundary.");
 		}
-		//delete p;//mohan add 2012-04-02, this is wrong, may cause segment fault.
 	}
 	return;
 }
