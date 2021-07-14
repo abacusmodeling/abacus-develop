@@ -26,6 +26,7 @@ class energy
     ~energy();
 
 	void perform_dos(void);
+	void perform_dos_pw(void);
 
     double etot;    	   // the total energy of the solid
     double ef;             // the fermi energy
@@ -57,6 +58,7 @@ class energy
 	double dos_emax_ev;
 	double dos_edelta_ev;
 	double bcoeff;
+//	double dos_scale;
 
     double ewald();
 
