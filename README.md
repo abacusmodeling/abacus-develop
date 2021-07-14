@@ -151,10 +151,10 @@ We also provide many examples in the directories examples/ and tests/
 
 # For developers
 
-We also provide some [information](doc/developer.md) for developers.
-- [Build and install ABACUS with CMake](doc/developer.md#build-and-install-abacus-with-cmake)
-- [Raising issues on GitHub](doc/developer.md#raising-issues-on-github)
-- [Modularization and module tests](doc/developer.md#modularization-and-module-tests)
-- [Contributing to ABACUS](doc/developer.md#contributing-to-abacus)
+We also provide some [information](doc/developers.md) for developers.
+- [Build and install ABACUS with CMake](doc/developers.md#build-and-install-abacus-with-cmake)
+- [Raising issues on GitHub](doc/developers.md#raising-issues-on-github)
+- [Modularization and module tests](doc/developers.md#modularization-and-module-tests)
+- [Contributing to ABACUS](doc/developers.md#contributing-to-abacus)
 
 [back to top](#readme-top)

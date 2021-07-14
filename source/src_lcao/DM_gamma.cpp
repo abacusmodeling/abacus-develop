@@ -1,6 +1,7 @@
 #include "local_orbital_charge.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
+#include "../src_io/wf_local.h"
 
 extern "C"
 {
@@ -267,10 +268,54 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 
 	// Peize Lin test 2019-01-16
     wfc_dm_2d.init();
+	if(wf.start_wfc=="file")
+	{
+		this->gamma_file(gt);
+	}
 
     return;
 }
 
+void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
+{
+	TITLE("Local_Orbital_Charge","gamma_file");
+
+	int error;
+	cout << " Read in gamma point wave function files " << endl;
+
+	double **ctot;
+
+	for(int is=0; is<NSPIN; ++is)
+	{
+
+		LOC.wfc_dm_2d.wfc_gamma[is].create(ParaO.ncol, ParaO.nrow);
+		LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
+
+		ofs_running << " Read in wave functions " << is << endl;
+		error = WF_Local::read_lowf( ctot , is);
+#ifdef __MPI
+		Parallel_Common::bcast_int(error);
+#endif
+		ofs_running << " Error=" << error << endl;
+		if(error==1)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+		}
+		else if(error==2)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+		}
+		else if(error==3)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+		}
+		else if(error==4)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+		}
+
+	}//loop ispin
+}
 
 // calculate the grid distributed DM matrix from 2D block-cyclic distributed DM matrix
 // transform dm_gamma[is].c to this->DM[is]
