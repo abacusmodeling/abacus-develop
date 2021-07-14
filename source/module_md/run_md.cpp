@@ -1,6 +1,8 @@
 #include "run_md.h"
 #include "run_md_pw.h"
+#ifdef __LCAO
 #include "run_md_lcao.h"
+#endif
 #include "run_md_classic.h"
 #include "../src_pw/global.h"
 #include "../input.h"
@@ -130,11 +132,13 @@ void Run_md::ai_md_line(void)
 		Run_MD_PW run_md_pw;
         run_md_pw.md_cells_pw();
 	}
+#ifdef __LCAO
 	else if(BASIS_TYPE=="lcao")
 	{
 		Run_MD_LCAO run_md_lcao;
 		run_md_lcao.opt_cell();
 	}
+#endif
 
     return;
 }

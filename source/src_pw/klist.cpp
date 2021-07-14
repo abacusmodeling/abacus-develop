@@ -125,8 +125,9 @@ void K_Vectors::set(
     // firstly do the mpi_k() and then
     // do set_kup_and_kdw()
 	Pkpoints.kinfo(nkstot);
-
+#ifdef __MPI
     this->mpi_k();//2008-4-29
+#endif
 
     this->set_kup_and_kdw();
 
@@ -532,7 +533,7 @@ void K_Vectors::update_use_ibz( void )
 	OUT(ofs_running,"nkstot now",nkstot);
 
     delete[] kvec_d;
-    this->kvec_d = new Vector3<double>[ this->nkstot ];
+    this->kvec_d = new Vector3<double>[ this->nkstot * nspin]; //qianrui fix a bug 2021-7-13 for nspin=2 in set_kup_and_kdw()
 
     for (int i = 0; i < this->nkstot; ++i)
     {
@@ -825,9 +826,9 @@ void K_Vectors::normalize_wk(const int &degspin)
     return;
 }
 
+#ifdef __MPI
 void K_Vectors::mpi_k(void)
 {
-#ifdef __MPI
 	TITLE("K_Vectors","mpi_k");
 
     Parallel_Common::bcast_bool(kc_done);
@@ -911,9 +912,8 @@ void K_Vectors::mpi_k(void)
     delete[] wk_aux;
     delete[] kvec_c_aux;
     delete[] kvec_d_aux;
-#endif
 } // END SUBROUTINE
-
+#endif
 
 
 //----------------------------------------------------------
