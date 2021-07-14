@@ -12,13 +12,27 @@ project(ABACUS
 )
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
+option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
 else()
   set(CMAKE_CXX_STANDARD 11)
 endif()
-add_compile_options(-O2 -g)
+if(ENABLE_ASAN)
+  add_compile_options(
+    -O1
+    -g
+    -fsanitize=address
+    -fno-omit-frame-pointer
+  )
+  add_link_options(
+    -g
+    -fsanitize=address
+  )
+else()
+  add_compile_options(-O2 -g)
+endif()
 
 set(ABACUS_BIN_NAME abacus)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/modules)
