@@ -5,8 +5,9 @@
 - [Modularization and module tests](#modularization-and-module-tests)
 - [Contributing to ABACUS](#contributing-to-abacus)
     - [Making pull requests](#making-pull-requests)
-    - [Providing tests](#providing-tests)
+    - [Providing uniy tests](#providing-unit-tests)
     - [Upating documentation](#updating-documentation)
+    - [Macros](#macros)
     - [Comment style for documentation](#comment-style-for-documentation)
 
 [back to main page](../README.md)
@@ -53,9 +54,11 @@ The ABACUS code is reconstructed to form several self-contained modules. A descr
 
 ### Making pull requests
 
-### Providing tests
+### Providing unit tests
 
 ### Updating documentation
+
+### Macros
 
 ### Comment Style for Documentation
 ABACUS uses Doxygen to generate docs directly from `.h ` and `.cpp` code files. 
