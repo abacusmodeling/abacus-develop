@@ -1,6 +1,8 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
 #include "../src_pw/global.h"
+#include "../src_io/print_info.h"
+#include "../module_neighbor/sltk_atom_arrange.h"
 
 Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(test_deconstructor, test_grid_driver, test_grid)
 {
@@ -16,6 +18,31 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 	delete[] pos_old2;
 	delete[] pos_now;
 	delete[] pos_next;
+}
+
+void Run_MD_CLASSIC::classic_md_line(void)
+{
+	// Setup the unitcell.
+    ucell.setup_cell_classic(global_atom_card, out, ofs_running);
+	DONE(ofs_running, "SETUP UNITCELL");
+
+	Run_MD_CLASSIC run_md_classic;
+
+	atom_arrange::search(
+			SEARCH_PBC,
+			ofs_running,
+			run_md_classic.grid_neigh,
+			ucell, 
+			SEARCH_RADIUS, 
+			test_atom_input,
+			INPUT.test_just_neighbor);
+
+	Print_Info PI;
+    PI.setup_parameters();
+
+	run_md_classic.md_cells_classic();
+
+	return;
 }
 
 void Run_MD_CLASSIC::md_cells_classic(void)

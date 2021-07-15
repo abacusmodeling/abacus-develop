@@ -1,5 +1,9 @@
 #include "MD_basic.h"
+#ifdef __CMD
+#include "../input.h"
+#else
 #include "../src_pw/global.h"
+#endif
 
 //define in MD_basic.h
 //class MD_basic

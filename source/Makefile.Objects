@@ -148,7 +148,6 @@ ELEC_nscf.o\
 LOOP_cell.o\
 LOOP_elec.o\
 LOOP_ions.o\
-run_md.o\
 run_md_lcao.o\
 DM_gamma.o\
 DM_k.o\

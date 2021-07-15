@@ -8,5 +8,4 @@ add_library(
     run_md_classic.cpp
     run_md_lcao.cpp
     run_md_pw.cpp
-    run_md.cpp
 )

@@ -11,7 +11,9 @@ public:
     ~Run_MD_CLASSIC();
 
     Grid_Driver grid_neigh;
+    
 
+    void classic_md_line(void);
     void md_cells_classic(void);
     void md_allocate_ions(void);
     void update_pos_classic(void);
