@@ -32,11 +32,11 @@ LIBXC_LIB         = -L${LIBXC_LIB_DIR} -lxc -Wl,-rpath=${LIBXC_LIB_DIR}
 CEREAL_INCLUDE_DIR = ${CEREAL_DIR}/include
 
 #============DeePKS================
-LIBTORCH_INCLUDE_DIR =  -isystem /home/cyFortneu/pkgs/libtorch/include -isystem /home/cyFortneu/pkgs/libtorch/include/torch/csrc/api/include
-LIBTORCH_LIB_DIR= /home/cyFortneu/pkgs/libtorch/lib
-LIBTORCH_LIB = -L${LIBTORCH_LIB_DIR} -ltorch -lc10 -Wl,-rpath,/home/cyFortneu/pkgs/libtorch/lib -Wl,--no-as-needed,"/home/cyFortneu/pkgs/libtorch/lib/libtorch_cpu.so" -Wl,--as-needed /home/cyFortneu/pkgs/libtorch/lib/libc10.so -lpthread -Wl,--no-as-needed,"/home/cyFortneu/pkgs/libtorch/lib/libtorch.so" -Wl,--as-needed 
+LIBTORCH_INCLUDE_DIR =  -isystem ${LIBTORCH_DIR}/include -isystem ${LIBTORCH_DIR}/include/torch/csrc/api/include
+LIBTORCH_LIB_DIR= ${LIBTORCH_DIR}/lib
+LIBTORCH_LIB = -L${LIBTORCH_LIB_DIR} -ltorch -lc10 -Wl,-rpath,${LIBTORCH_LIB_DIR} -Wl,--no-as-needed,"${LIBTORCH_LIB_DIR}/libtorch_cpu.so" -Wl,--as-needed ${LIBTORCH_LIB_DIR}/libc10.so -lpthread -Wl,--no-as-needed,"${LIBTORCH_LIB_DIR}/libtorch.so" -Wl,--as-needed 
 
-CNPY_INCLUDE_DIR = /home/cyFortneu/libnpy
+CNPY_INCLUDE_DIR = ${LIBNPY_DIR}
 #============\DeePKS================
 
 #==========================
