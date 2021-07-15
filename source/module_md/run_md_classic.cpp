@@ -1,6 +1,7 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
-#include "../src_pw/global.h"
+#include "../input.h"
+//#include "../src_pw/global.h"
 #include "../src_io/print_info.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 
@@ -23,7 +24,7 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 void Run_MD_CLASSIC::classic_md_line(void)
 {
 	// Setup the unitcell.
-    ucell.setup_cell_classic(global_atom_card, out, ofs_running);
+    ucell_c.setup_cell_classic(global_atom_card, ofs_running);
 	DONE(ofs_running, "SETUP UNITCELL");
 
 	Run_MD_CLASSIC run_md_classic;
@@ -31,14 +32,14 @@ void Run_MD_CLASSIC::classic_md_line(void)
 	atom_arrange::search(
 			SEARCH_PBC,
 			ofs_running,
-			run_md_classic.grid_neigh,
-			ucell, 
+			this->grid_neigh,
+			ucell_c, 
 			SEARCH_RADIUS, 
 			test_atom_input,
 			INPUT.test_just_neighbor);
 
-	Print_Info PI;
-    PI.setup_parameters();
+	//Print_Info PI;
+    //PI.setup_parameters();
 
 	run_md_classic.md_cells_classic();
 
@@ -52,7 +53,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
     this->md_allocate_ions();
 
-    MD_basic mdb(INPUT.mdp, ucell);
+    MD_basic mdb(INPUT.mdp, ucell_c);
     int mdtype = INPUT.mdp.mdtype;
 
     this->istep = 1;
@@ -96,7 +97,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
         time_t fend = time(NULL);
 
-		ucell.save_cartesian_position(this->pos_next);
+		ucell_c.save_cartesian_position(this->pos_next);
 
 		++istep;
     }
@@ -107,7 +108,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
 void Run_MD_CLASSIC::md_allocate_ions(void)
 {
-	pos_dim = ucell.nat * 3;
+	pos_dim = ucell_c.nat * 3;
 
 	delete[] this->pos_old1;
 	delete[] this->pos_old2;
@@ -132,6 +133,6 @@ void Run_MD_CLASSIC::update_pos_classic(void)
 		this->pos_old2[i] = this->pos_old1[i];
 		this->pos_old1[i] = this->pos_now[i];
 	}
-	ucell.save_cartesian_position(this->pos_now);
+	ucell_c.save_cartesian_position(this->pos_now);
 	return;
 }

@@ -32,7 +32,7 @@ public: // member functions
 	UnitCell_pseudo();
 	~UnitCell_pseudo();
 	void setup_cell(const string &s_pseudopot_dir, output &outp, const string &fn, ofstream &log);
-	void setup_cell_classic(const string &fn, output &outp, ofstream &log); // Yu Liu 2021-07-13
+	void setup_cell_classic(const string &fn, ofstream &log); // Yu Liu 2021-07-13
 	void read_atom_species(ifstream &ifa); // read in the atom information for each type of atom
 	bool read_atom_positions(ifstream &ifpos); // read in atomic positions
 	int find_type(const string &label);

@@ -43,6 +43,7 @@ OPTS = ${INCLUDES} -Ofast -std=c++11 -simd -march=native -xHost -m64 -qopenmp -W
 include Makefile.Objects
 
 VPATH=../module_base\
+:../module_neighbor\
 :../module_cell\
 :../src_parallel\
 :../src_io\
@@ -61,6 +62,7 @@ $(OBJS_CELL)\
 $(OBJS_MD)\
 $(OBJS_IO)\
 $(OBJS_PARALELL)\
+$(OBJS_NEIGHBOR)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 

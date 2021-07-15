@@ -302,7 +302,7 @@ void UnitCell_pseudo::setup_cell(
 	return;
 }
 
-void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstream &log)
+void UnitCell_pseudo::setup_cell_classic(const string &fn, ofstream &log)
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 
@@ -396,7 +396,6 @@ void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstrea
 	}
 
 	ofs_running << endl;
-	outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
 }
 
 
