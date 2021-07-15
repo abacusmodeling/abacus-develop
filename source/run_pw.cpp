@@ -7,7 +7,7 @@
 #include "src_io/numerical_basis.h"
 #include "src_io/numerical_descriptor.h"
 #include "src_io/print_info.h"
-#include "src_pw/symmetry.h"
+#include "module_symmetry/symmetry.h"
 #include "src_ions/Cell_PW.h"
 
 Run_pw::Run_pw(){}

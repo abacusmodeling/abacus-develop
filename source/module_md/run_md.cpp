@@ -8,7 +8,7 @@
 #include "../input.h"
 #include "../src_io/cal_test.h"
 #include "../src_io/print_info.h"
-#include "../src_pw/symmetry.h"
+#include "../module_symmetry/symmetry.h"
 
 Run_md::Run_md(){}
 Run_md::~Run_md(){}

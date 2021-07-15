@@ -4,7 +4,7 @@
 //==========================================================
 #ifndef SYMMETRY_BASIC_H
 #define SYMMETRY_BASIC_H
-#include "tools.h"
+#include "../src_pw/tools.h"
 #include "symmetry_basic.h"
 
 class Symmetry_Basic

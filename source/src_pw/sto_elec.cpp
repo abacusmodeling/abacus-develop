@@ -2,7 +2,7 @@
 #include "global.h"
 #include "sto_elec.h" 
 #include "occupy.h"
-#include "symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "../src_io/wf_io.h"
 #include "H_Ewald_pw.h"
 

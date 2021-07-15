@@ -1,7 +1,7 @@
 #ifndef SYMM_OTHER_H
 #define SYMM_OTHER_H
 
-#include "tools.h"
+#include "../src_pw/tools.h"
 
 namespace Symm_Other
 {

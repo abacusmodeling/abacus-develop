@@ -1,6 +1,6 @@
 #include <memory>
 #include "symmetry.h"
-#include "global.h"
+#include "../src_pw/global.h"
 #include "symm_other.h"
 
 Symmetry::Symmetry()
