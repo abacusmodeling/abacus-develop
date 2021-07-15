@@ -1,4 +1,5 @@
-//caoyu add 2021-03-29
+//caoyu add 2021-03-2
+#ifdef __DEEPKS
 
 #include "LCAO_descriptor.h"
 #include "LCAO_matrix.h"
@@ -858,3 +859,5 @@ void LCAO_Descriptor::save_npy_f(matrix& fbase)
     npy::SaveArrayAsNumpy("f_base.npy", false, 2, fshape, npy_fbase);
     return;
 }
+
+#endif

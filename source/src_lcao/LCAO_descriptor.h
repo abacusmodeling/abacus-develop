@@ -1,3 +1,4 @@
+#ifdef __DEEPKS
 #ifndef LCAO_DESCRIPTOR_H
 #define LCAO_DESCRIPTOR_H
 
@@ -127,5 +128,7 @@ private:
 
 };
 extern LCAO_Descriptor ld;
+
+#endif
 
 #endif
