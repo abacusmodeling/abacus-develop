@@ -273,6 +273,8 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3
 	return nfrozen;
 }
 
+#ifndef __CMD
+
 #ifdef __LCAO
 void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
 {
@@ -300,6 +302,7 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 	return;
 }
 #endif
+
 void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
 {
 //to call the force of each atom
@@ -318,6 +321,7 @@ void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matr
 	}
 	return;
 }
+#endif
 
 void MD_func::printpos(const string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
 {

@@ -32,10 +32,7 @@ void Driver_classic::reading(void)
 	// (1) read INPUT 
 	INPUT.Init( global_in_card );
 
-	// (2) copy the variables from INPUT to each class
-	this->convert();
-
-    // (3) Print the parameters into INPUT file.
+    // (2) Print the parameters into INPUT file.
     stringstream ss1;
     ss1 << global_out_dir << global_in_card;
     INPUT.Print( ss1.str() );
@@ -44,7 +41,7 @@ void Driver_classic::reading(void)
 	return;
 }
 
-void Driver_classic::convert(void)
+void Driver_classic::convert(UnitCell_pseudo &ucell_c)
 {
     TITLE("Driver_classic","convert");
 	timer::tick("Driver_classic","convert");
@@ -56,8 +53,9 @@ void Driver_classic::convert(void)
 	SEARCH_PBC = INPUT.search_pbc;
     NSTEP = INPUT.nstep;
 
-    ucell.latName = INPUT.latname; 
-	ucell.ntype = INPUT.ntype;
+    ucell_c.latName = INPUT.latname; 
+	ucell_c.ntype = INPUT.ntype;
+	ucell_c.set_vel = INPUT.set_vel;
 
 }
 
@@ -66,6 +64,9 @@ void Driver_classic::classic_world(void)
 	TITLE("Driver_classic", "classic_world");
 
 	Run_MD_CLASSIC run_md_classic;
+
+	this->convert(run_md_classic.ucell_c);
+
     run_md_classic.classic_md_line();
 
 	timer::finish( ofs_running );

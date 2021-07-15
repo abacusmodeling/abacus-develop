@@ -44,7 +44,11 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	ionmbl=new Vector3<int>[ucell.nat];
 	force=new Vector3<double>[ucell.nat];
 
+#ifdef __CMD
+    energy_=0;
+#else
 	energy_=en.etot/2;
+#endif
 
 	//MD starting setup
 	if(!mdp.rstMD){
@@ -145,6 +149,8 @@ void MD_basic::runNVT(int step1){
 	twiceKE = twiceKE * 2;
 	
 	//Set up forces and stress
+#ifndef __CMD
+
 #ifdef __LCAO
     if(INPUT.basis_type == "lcao")
     {
@@ -157,6 +163,7 @@ void MD_basic::runNVT(int step1){
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
     }
+#endif
 
 	//print total stress + stress_MD
 	if(STRESS)
@@ -170,7 +177,13 @@ void MD_basic::runNVT(int step1){
 		if(ionmbl[k].z==0)force[k].z=0;
 	}
 	double maxForce = mdf.MAXVALF(ucell.nat, force);
+
+#ifdef __CMD
+    energy_=0;
+#else
 	energy_=en.etot/2;
+#endif
+
     double hamiltonian;
 	//----------------------------------------------
 	// big loop
@@ -316,6 +329,7 @@ void MD_basic::runNVE(int step1){
     cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<endl;
 
     // Set up forces
+#ifndef __CMD
     if (INPUT.basis_type == "pw")
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
@@ -326,6 +340,9 @@ void MD_basic::runNVE(int step1){
         mdf.callInteraction_LCAO(ucell.nat, force, stress);
     }
 #endif
+
+#endif
+
     if(STRESS)
 	{
 		outStressMD(stress, twiceKE);
@@ -341,7 +358,13 @@ void MD_basic::runNVE(int step1){
     //cout<<"begin maxForce"<<endl;
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
-    energy_=en.etot/2;
+
+#ifdef __CMD
+    energy_=0;
+#else
+	energy_=en.etot/2;
+#endif
+
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
     cout<< "NVE_STEP "<<" "<<"SystemEnergy"<<" "<< "Conserved"<<" "<< "DeltaE"<<" "<< "Temperature"<<endl;
@@ -458,6 +481,7 @@ bool MD_basic::runFIRE(int step1){
     cout<<" start temperature = "<< tempNow/K_BOLTZMAN_AU<< " (k)"<<endl;
 
     // Set up forces
+#ifndef __CMD
 #ifdef __LCAO
     if (INPUT.basis_type == "lcao")
     {
@@ -470,6 +494,7 @@ bool MD_basic::runFIRE(int step1){
     {
         mdf.callInteraction_PW(ucell.nat, force, stress);
     }
+#endif
 
 
     for(int k=0;k<ucell.nat;k++)
@@ -482,7 +507,13 @@ bool MD_basic::runFIRE(int step1){
     //cout<<"begin maxForce"<<endl;
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
-    energy_ = en.etot/2;
+    
+#ifdef __CMD
+    energy_=0;
+#else
+	energy_=en.etot/2;
+#endif
+
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
     cout<<"------------------------------------------------------------------------------"<<endl;

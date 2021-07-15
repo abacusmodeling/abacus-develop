@@ -226,9 +226,10 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << endl;
 				return 0;
 			}
-			READ_VALUE(ifpos, magnet.start_magnetization[it] );
-
 			OUT(ofs_running, "atom label",atoms[it].label);
+
+#ifndef __CMD
+			READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
 			if(NSPIN==4)//added by zhengdy-soc
 			{
@@ -376,9 +377,9 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 				}
 			} // end basis type
-
-
-			//OUT(ofs_running,"Total number of local orbitals",atoms[it].nw);
+#else
+			ifpos.ignore(150, '\n');
+#endif
 
 			//=========================
 			// (3) read in atom number
@@ -438,7 +439,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					{
 						ifpos >> v.x >> v.y >> v.z
 							>> mv.x >> mv.y >> mv.z;
-						if(INPUT.set_vel)
+						if(set_vel)
 						{
 							ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
 						}
@@ -673,7 +674,11 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		{
 			ofs << endl;
 			ofs << atoms[it].label << " #label" << endl;
+#ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << endl;
+#else
+			ofs << "0" << " #magnetism" << endl;
+#endif
 			//2015-05-07, modify
 			//ofs << atoms[it].nwl << " #max angular momentum" << endl;
 			//xiaohui modify 2015-03-15
@@ -697,7 +702,11 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		{
 			ofs << endl;
 			ofs << atoms[it].label << " #label" << endl;
+#ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << endl;
+#else
+			ofs << "0" << " #magnetism" << endl;
+#endif
 			//ofs << atoms[it].nwl << " #max angular momentum" << endl;
 			//xiaohui modify 2015-03-15
 			//for(int l=0; l<=atoms[it].nwl; l++)
@@ -757,8 +766,11 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].tau[ia].x
                 << setw(20) << atoms[it].tau[ia].y
                 << setw(20) << atoms[it].tau[ia].z
-                //<< setw(20) << atoms[it].mag[ia]
-                << setw(20) << magnet.start_magnetization[it]
+#ifndef __CMD
+				<< setw(20) << magnet.start_magnetization[it]
+#else
+				<< setw(20) << 0
+#endif
 				<< setw(20) << atoms[it].vel[ia].x
                 << setw(20) << atoms[it].vel[ia].y
                 << setw(20) << atoms[it].vel[ia].z
@@ -802,8 +814,11 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].taud[ia].x
                 << setw(20) << atoms[it].taud[ia].y
                 << setw(20) << atoms[it].taud[ia].z
-                //<< setw(20) << atoms[it].mag[ia]
-                << setw(20) << magnet.start_magnetization[it]
+#ifndef __CMD
+				<< setw(20) << magnet.start_magnetization[it]
+#else
+				<< setw(20) << 0
+#endif
 				<< setw(20) << atoms[it].vel[ia].x
                 << setw(20) << atoms[it].vel[ia].y
                 << setw(20) << atoms[it].vel[ia].z

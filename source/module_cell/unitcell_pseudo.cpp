@@ -32,8 +32,10 @@ void UnitCell_pseudo::setup_cell(
 	TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag
 	assert(ntype>0);
+#ifndef __CMD
 	delete[] magnet.start_magnetization;
 	magnet.start_magnetization = new double[this->ntype];
+#endif
 
 	// (2) init *Atom class array.
 	this->atoms = new Atom[this->ntype]; // atom species.
@@ -306,8 +308,6 @@ void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstrea
 
 	// (1) init magnetization (useless for classic MD)
 	assert(ntype>0);
-	delete[] magnet.start_magnetization;
-	magnet.start_magnetization = new double[this->ntype];
 
 	// (2) init *Atom class array.
 	this->atoms = new Atom[this->ntype];

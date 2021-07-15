@@ -3,6 +3,7 @@
 
 #include "../src_pw/tools.h"
 #include "../module_neighbor/sltk_grid_driver.h"
+#include "../module_cell/unitcell_pseudo.h"
 
 class Run_MD_CLASSIC
 {
@@ -11,6 +12,7 @@ public:
     ~Run_MD_CLASSIC();
 
     Grid_Driver grid_neigh;
+    UnitCell_pseudo ucell_c;
     
 
     void classic_md_line(void);

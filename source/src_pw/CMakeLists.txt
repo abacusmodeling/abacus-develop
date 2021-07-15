@@ -61,4 +61,5 @@ add_library(
     xc_functional.cpp
     xc_gga_pw.cpp
     xc_type.cpp
+    run_md_pw.cpp
 )

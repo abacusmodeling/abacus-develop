@@ -6,7 +6,8 @@ HEADERS= *.h
 
 OBJS_MAIN=input.o\
 
-OBJS_MD=MD_basic.o\
+OBJS_MD=driver_classic.o\
+MD_basic.o\
 MD_fire.o\
 MD_func.o\
 MD_thermo.o\
@@ -24,3 +25,23 @@ global_variable.o\
 tool_title.o\
 tool_quit.o\
 mymath3.o\
+memory.o\
+
+OBJS_CELL=pseudo_nc.o\
+atom_spec.o\
+atom_pseudo.o\
+read_pp.o\
+read_pp_upf100.o\
+read_pp_upf201.o\
+read_pp_vwr.o\
+unitcell.o\
+unitcell_pseudo.o\
+read_atoms.o\
+read_cell_pseudopots.o\
+
+OBJS_IO=write_input.o\
+output.o\
+
+OBJS_PARALELL=parallel_reduce.o\
+parallel_common.o\
+parallel_global.o\

@@ -25,6 +25,7 @@ public: // member variables
 	int nmax_total;//mohan add 2009-09-10
 	int lmax_ppwf;
 	int lmaxmax; // liuyu 2021-07-04
+	bool set_vel; // liuyu 2021-07-15
 	//double nelec;
 
 public: // member functions

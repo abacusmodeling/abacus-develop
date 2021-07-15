@@ -40,6 +40,7 @@ void Input_Conv::Convert(void)
 	ucell.latName = INPUT.latname; 
 	ucell.ntype = INPUT.ntype;
 	ucell.lmaxmax = INPUT.lmaxmax;
+	ucell.set_vel = INPUT.set_vel;
 
     NBANDS = INPUT.nbands;
     NBANDS_ISTATE = INPUT.nbands_istate;

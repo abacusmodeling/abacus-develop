@@ -45,18 +45,22 @@ include Makefile.Objects
 VPATH=../module_base\
 :../module_cell\
 :../src_parallel\
+:../src_io\
 :./\
 :../\
 
 #==========================
 # Define HONG
 #==========================
-HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD
+HONG= ${HONG_FFTW} -D__MPI -DMETIS -DMKL_ILP64 -D__NORMAL -D__CMD -D__CELL
 
 FP_OBJS_0=main.o\
 $(OBJS_MAIN)\
 $(OBJS_BASE)\
+$(OBJS_CELL)\
 $(OBJS_MD)\
+$(OBJS_IO)\
+$(OBJS_PARALELL)\
 
 FP_OBJS=$(patsubst %.o, ${OBJ_DIR}/%.o, ${FP_OBJS_0})
 
