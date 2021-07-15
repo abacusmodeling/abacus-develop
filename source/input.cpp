@@ -266,6 +266,7 @@ void Input::Default(void)
 	dos_emin_ev = -15;//(ev)
 	dos_emax_ev = 15;//(ev)
 	dos_edelta_ev = 0.01;//(ev)
+	dos_scale = 0.01;
     b_coef = 0.07;
 //----------------------------------------------------------
 // LCAO 
@@ -1066,6 +1067,10 @@ bool Input::Read(const string &fn)
         else if (strcmp("dos_edelta_ev", word) == 0)
         {
             read_value(ifs, dos_edelta_ev);
+		}
+        else if (strcmp("dos_scale", word) == 0)
+        {
+            read_value(ifs, dos_scale);
         }
         else if (strcmp("dos_sigma", word) == 0)
         {
@@ -2109,6 +2114,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( dos_emin_ev );
 	Parallel_Common::bcast_double( dos_emax_ev );
 	Parallel_Common::bcast_double( dos_edelta_ev );
+	Parallel_Common::bcast_double( dos_scale );
         Parallel_Common::bcast_double( b_coef );
 
 	// mohan add 2009-11-11

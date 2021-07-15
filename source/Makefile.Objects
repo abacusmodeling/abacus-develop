@@ -289,6 +289,7 @@ dos.o \
 inverse_matrix.o \
 energy.o \
 energy_dos.o\
+energy_dos_pw.o\
 wavefunc.o\
 wf_io.o \
 rwstream.o\

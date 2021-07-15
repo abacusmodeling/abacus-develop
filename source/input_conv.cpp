@@ -1,7 +1,6 @@
 #include "input.h"
 #include "input_conv.h"
 
-
 #include "src_io/optical.h"
 #include "src_io/chi0_hilbert.h"
 #include "src_io/chi0_standard.h"
@@ -576,6 +575,7 @@ void Input_Conv::Convert(void)
 	en.dos_emin_ev = INPUT.dos_emin_ev;
 	en.dos_emax_ev = INPUT.dos_emax_ev;
 	en.dos_edelta_ev = INPUT.dos_edelta_ev;
+	en.dos_scale= INPUT.dos_scale;
     en.bcoeff = INPUT.b_coef;
 
 //----------------------------------------------------------
