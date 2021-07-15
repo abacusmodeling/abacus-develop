@@ -10,15 +10,17 @@ threshold=0.0000001
 ca=8
 # regex of case name
 case="^[^#].*01_PW_.*$"
+# enable AddressSanitizer
+sanitize=false
 
-
-while getopts a:n:t:c:r,g flag
+while getopts a:n:t:c:s:r,g flag
 do
     case "${flag}" in
         a) abacus=${OPTARG};;
         n) np=${OPTARG};;
 		t) threshold=${OPTARG};;
 		c) ca=${OPTARG};;
+		s) sanitize=${OPTARG};;
 		r) case=${OPTARG};;
 		g) g=true;; #generate test reference
     esac
@@ -123,6 +125,15 @@ which $abacus > /dev/null || exit 0
 testdir=`cat CASES | grep -E $case`
 failed=0
 ok=0
+report=""
+repo="$(realpath ..)/"
+
+if [ "$sanitize" == true ]; then
+	echo "Testing with Address Sanitizer..."
+	mkdir ../html
+	echo -e "# Address Sanitizer Diagnostics\n" > ../html/README.md
+	report=$(realpath ../html/README.md)
+fi
 
 for dir in $testdir; do
 	cd $dir
@@ -130,7 +141,18 @@ for dir in $testdir; do
 	TIMEFORMAT=' [  ------  ] Time elapsed: %R seconds'
 	#parallel test
 	time {
-		mpirun -np $np $abacus > log.txt
+		if [ "$sanitize" == true ]; then
+			ASAN_OPTIONS="log_path=asan" mpirun -np $np $abacus > log.txt
+			echo -e "## Test case ${dir}\n" >> ${report}
+			for diagnostic in asan.*; do
+				echo -e "### On process id ${diagnostic}\n" >> ${report}
+				echo -e "\`\`\`bash" >> ${report}
+				cat ${diagnostic} >> ${report}
+				echo -e "\`\`\`\n" >> ${report}
+			done
+		else
+			mpirun -np $np $abacus > log.txt
+		fi
 		#$abacus > log.txt
 		test -d OUT.autotest || echo "Some errors happened in ABACUS!"
 		test -d OUT.autotest || exit 0
@@ -144,8 +166,16 @@ for dir in $testdir; do
 	}
 	echo ""
 	cd ../
-
 done
+
+if [ "$sanitize" == true ]; then
+	if [[ `uname` == "Darwin" ]]; then
+		sed -i '' "s,${repo},,g" ${report}
+	else
+		sed -i "s,${repo},,g" ${report}
+	fi
+fi
+
 if [ -z $g ]
 then
 if [ $failed -eq 0 ]

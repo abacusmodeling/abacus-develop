@@ -1008,8 +1008,16 @@ bool Input::Read(const string &fn)
         else if (strcmp("lmax_descriptor", word) == 0)// mohan added 2021-01-03
         {
             read_value(ifs, lmax_descriptor);
+		}
+		else if (strcmp("deepks_scf", word) == 0) // caoyu added 2021-06-02
+        {
+            read_value(ifs, deepks_scf);
+		}
+		else if (strcmp("model_file", word) == 0) // caoyu added 2021-06-03
+        {
+            read_value(ifs, model_file);
         }
-        else if (strcmp("out_potential", word) == 0)
+		else if (strcmp("out_potential", word) == 0)
         {
             read_value(ifs, out_potential);
         }
@@ -2090,8 +2098,10 @@ void Input::Bcast()
     Parallel_Common::bcast_int( out_dm );
     Parallel_Common::bcast_int( out_descriptor ); // caoyu added 2020-11-24, mohan modified 2021-01-03
     Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
-
-    Parallel_Common::bcast_int( out_potential );
+    Parallel_Common::bcast_int( deepks_scf ); // caoyu add 2021-06-02
+	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
+	
+	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_bool( out_wf );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
