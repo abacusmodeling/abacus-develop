@@ -1,13 +1,16 @@
-name: Test
+name: Dynamic Analysis
 
 on:
-  pull_request_target:
-    branches:
-      - develop
-      - reconstruction
+  schedule:
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Number of Cores to Run ABACUS'
+        required: false
+        default: '2'
 
 jobs:
-
   start-runner:
     name: Start self-hosted EC2 runner
     runs-on: ubuntu-latest
@@ -41,10 +44,16 @@ jobs:
         uses: actions/checkout@v2
       - name: Build and Test
         run: |
-          cmake -B build
+          cmake -B build -DENABLE_ASAN=1
           cmake --build build -j16
-          cmake --install build
           ctest --test-dir build --verbose
+      - name: Publish Report to Dashboard
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: dashboard
+          build_dir: html
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   stop-runner:
     name: Stop self-hosted EC2 runner
     needs:
