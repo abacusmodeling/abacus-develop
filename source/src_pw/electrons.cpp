@@ -1,7 +1,7 @@
 #include "tools.h"
 #include "global.h"
 #include "electrons.h"
-#include "symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "../src_io/wf_io.h"
 #include "../src_io/chi0_hilbert.h"
 #include "../src_io/chi0_standard.h"

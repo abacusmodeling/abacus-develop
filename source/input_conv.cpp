@@ -10,7 +10,7 @@
 #include "src_ions/ions_move_basic.h"
 #include "src_pw/global.h"
 #include "src_pw/tools.h"
-#include "src_pw/symmetry.h"
+#include "module_symmetry/symmetry.h"
 #include "src_pw/efield.h"
 #include "src_pw/occupy.h"
 #include "module_cell/unitcell.h"

@@ -1,5 +1,5 @@
 #include "symmetry_rho.h"
-#include "global.h"
+#include "../src_pw/global.h"
 
 Symmetry_rho::Symmetry_rho()
 {
