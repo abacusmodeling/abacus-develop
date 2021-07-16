@@ -2,8 +2,8 @@
 #define LOCAL_ORBITAL_CHARGE
 
 #include "../src_pw/tools.h"
-#include "src_lcao/grid_technique.h"
-#include "src_lcao/wfc_dm_2d.h"
+#include "grid_technique.h"
+#include "wfc_dm_2d.h"
 
 class Local_Orbital_Charge
 {
@@ -23,6 +23,7 @@ class Local_Orbital_Charge
 	//-----------------
 	void allocate_gamma(const Grid_Technique &gt);
 
+	void gamma_file(const Grid_Technique &gt);
 
 
 	//-----------------

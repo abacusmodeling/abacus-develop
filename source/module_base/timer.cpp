@@ -48,7 +48,7 @@ double timer::cpu_time(void)
 		// mohan add, abandon the cross point time 2^32 ~ -2^32 .
 }
 
-void timer::tick(const string &class_name,const string &name,char level_in)
+void timer::tick(const string &class_name,const string &name)
 {
 //----------------------------------------------------------
 // EXPLAIN : if timer is disabled , return
@@ -76,7 +76,6 @@ void timer::tick(const string &class_name,const string &name,char level_in)
 		timer_one.cpu_start = cpu_time();
 #endif
 		++timer_one.calls;
-		timer_one.level = level_in;
 		timer_one.start_flag = false;
 	}
 	else
@@ -131,11 +130,10 @@ void timer::print_all(ofstream &ofs)
 		
 		if(timer_one.cpu_second < small)
 			continue;
-		if(timer_one.level > 'X')
-			continue;
 		
 		ofs  << " " 
-			 << setw(2)  << timer_one.level
+			// << setw(2)  << timer_one.level
+			 << setw(2)  << " "
 			 << setw(20) << class_name
 			 << setw(20) << name
 			 << setw(15) << timer_one.cpu_second
@@ -146,7 +144,8 @@ void timer::print_all(ofstream &ofs)
 		cout << resetiosflags(ios::scientific);
 		
 		cout << " " 
-			 << setw(2)  << timer_one.level
+			// << setw(2)  << timer_one.level
+			 << setw(2)  << " "
 			 << setw(20) << class_name
 			 << setw(20) << name
 			 << setw(15) << setprecision(5) << timer_one.cpu_second

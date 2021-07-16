@@ -218,6 +218,7 @@ class Input
 	double dos_emin_ev;
 	double dos_emax_ev;
 	double dos_edelta_ev;
+	double dos_scale;
 
     double b_coef;           //  pengfei 2014-10-13
 
@@ -437,6 +438,11 @@ class Input
 	int deepks_scf;	//if set 1, a trained model would be needed to cal V_delta and F_delta
 	string model_file;		//needed when deepks_scf=1
 
+//==========================================================
+// variables for test only
+//==========================================================
+	bool test_just_neighbor;
+	
 	private:
 
 //==========================================================

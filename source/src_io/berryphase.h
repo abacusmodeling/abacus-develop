@@ -1,8 +1,8 @@
 #ifndef BERRYPHASE_H
 #define BERRYPHASE_H
-#include "../src_io/unk_overlap_pw.h"
+#include "unk_overlap_pw.h"
 #ifdef __LCAO
-#include "../src_io/unk_overlap_lcao.h"
+#include "unk_overlap_lcao.h"
 #endif
 
 class berryphase

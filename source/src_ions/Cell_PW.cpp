@@ -1,10 +1,10 @@
-#include "../src_ions/Cell_PW.h"
-#include "../src_ions/ions.h"
+#include "Cell_PW.h"
+#include "ions.h"
 
 void Cell_PW::opt_cells_pw()
 {
     TITLE("Cell_PW", "opt_cells_pw");
-    timer::tick("Cell_PW", "opt_cells_pw", 'C');
+    timer::tick("Cell_PW", "opt_cells_pw");
     wf.allocate(kv.nks);
 
     UFFT.allocate();
@@ -77,5 +77,5 @@ void Cell_PW::opt_cells_pw()
     Ions ions;
     ions.opt_ions_pw();
     
-    timer::tick("Cell_PW", "opt_cells_pw", 'C');
+    timer::tick("Cell_PW", "opt_cells_pw");
 }

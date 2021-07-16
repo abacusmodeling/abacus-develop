@@ -1,5 +1,6 @@
+#include <memory>
 #include "symmetry.h"
-#include "global.h"
+#include "../src_pw/global.h"
 #include "symm_other.h"
 
 Symmetry::Symmetry()
@@ -1437,7 +1438,7 @@ void Symmetry::rho_symmetry( double *rho,
 
 
 	// get the remaining rotation matrix.
-    Matrix3 *gmatrix_fft = new Matrix3[48];
+	std::array<Matrix3, 48> gmatrix_fft;
 
     int counter = 0;
     for (int i=0; i<48; ++i)

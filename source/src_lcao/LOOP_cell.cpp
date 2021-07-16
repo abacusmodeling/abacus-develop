@@ -1,7 +1,7 @@
 #include "LOOP_cell.h"
 #include "LOOP_ions.h"
 
-#include "src_lcao/dftu.h"   //Quxin add for DFT+U on 20201029
+#include "dftu.h"   //Quxin add for DFT+U on 20201029
 
 // delete in near future
 #include "../src_pw/global.h"

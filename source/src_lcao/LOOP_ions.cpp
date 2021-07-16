@@ -1,15 +1,15 @@
 #include "LOOP_ions.h"
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_orbitals.h"
-#include "src_pdiag/pdiag_double.h"
+#include "../src_pdiag/pdiag_double.h"
 #include "LCAO_nnr.h"
 #include "FORCE_STRESS.h"
 #include "../module_base/global_function.h"
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
-#include "src_ri/exx_abfs.h"
-#include "src_ri/exx_opt_orb.h"
+#include "../src_ri/exx_abfs.h"
+#include "../src_ri/exx_opt_orb.h"
 #include "ELEC_scf.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../src_pw/vdwd2.h"
@@ -29,7 +29,7 @@ LOOP_ions::~LOOP_ions()
 void LOOP_ions::opt_ions(void)
 {
     TITLE("LOOP_ions","opt_ions");
-    timer::tick("LOOP_ions","opt_ions",'B');
+    timer::tick("LOOP_ions","opt_ions");
 
     if(OUT_LEVEL=="i")
     {
@@ -248,7 +248,7 @@ void LOOP_ions::opt_ions(void)
     }
 
 
-    timer::tick("LOOP_ions","opt_ions",'B');
+    timer::tick("LOOP_ions","opt_ions"); 
     return;
 }
 
@@ -264,7 +264,7 @@ bool LOOP_ions::force_stress(
     {
         return 1;
     }
-    timer::tick("LOOP_ions","force_stress",'D');
+    timer::tick("LOOP_ions","force_stress");
 
 	// set force matrix
 	matrix fcs;
@@ -447,7 +447,7 @@ xiaohui modify 2014-08-09*/
 
     return 0;
 
-    timer::tick("LOOP_ions","force_stress",'D');
+    timer::tick("LOOP_ions","force_stress");
 }
 
 void LOOP_ions::final_scf(void)

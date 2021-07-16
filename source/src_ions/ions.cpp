@@ -8,12 +8,12 @@
 #include "../src_pw/vdwd3_parameters.h"
 #include "../src_pw/pw_complement.h"
 #include "../src_pw/pw_basis.h"
-#include "../src_ions/variable_cell.h" // mohan add 2021-02-01
+#include "variable_cell.h" // mohan add 2021-02-01
 
 void Ions::opt_ions_pw(void)
 {
 	TITLE("Ions","opt_ions_pw");
-	timer::tick("Ions","opt_ions_pw",'C');
+	timer::tick("Ions","opt_ions_pw");
 	
 	if(OUT_LEVEL=="i")
 	{
@@ -236,7 +236,7 @@ void Ions::opt_ions_pw(void)
 		cout << " ION DYNAMICS FINISHED :)" << endl;
 	}
 
-	timer::tick("Ions","opt_ions_pw",'C');
+	timer::tick("Ions","opt_ions_pw");
     return;
 }
 

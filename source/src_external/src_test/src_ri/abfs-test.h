@@ -1,4 +1,4 @@
-#include "src_ri/abfs.h"
+#include "../../../src_ri/abfs.h"
 #include <iostream>
 
 static void test_adjs( ostream & os )

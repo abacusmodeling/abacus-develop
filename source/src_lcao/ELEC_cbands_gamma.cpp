@@ -2,7 +2,7 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
-#include "../src_pw/symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 
@@ -14,7 +14,7 @@ ELEC_cbands_gamma::~ELEC_cbands_gamma(){};
 void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 {
 	TITLE("ELEC_cbands_gamma","cal_bands");
-	timer::tick("ELEC_cband_gamma","cal_bands",'E');
+	timer::tick("ELEC_cband_gamma","cal_bands");
 
 	assert(NSPIN == kv.nks);
 						
@@ -102,7 +102,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		SGO.dis_subwfc();
 	}// end k points
 			
-	timer::tick("ELEC_cband_gamma","cal_bands",'E');
+	timer::tick("ELEC_cband_gamma","cal_bands");
 	return;	
 }
 

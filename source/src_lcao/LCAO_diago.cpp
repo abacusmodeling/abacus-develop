@@ -43,7 +43,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 	matrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","solve_double_matrix");
-	timer::tick("Diago_LCAO_Matrix","solve_double_matrix",'F');
+	timer::tick("Diago_LCAO_Matrix","solve_double_matrix");
 	time_t time_start = time(NULL);
 
 	
@@ -67,7 +67,7 @@ void Diago_LCAO_Matrix::solve_double_matrix(
 
 	OUT_TIME("diago(double)",time_start, time_end);
 
-	timer::tick("Diago_LCAO_Matrix","solve_double_matrix",'F');
+	timer::tick("Diago_LCAO_Matrix","solve_double_matrix");
 	return;
 }
 

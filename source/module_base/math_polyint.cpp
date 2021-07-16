@@ -1,5 +1,5 @@
 #include "math_polyint.h"
-#include "../module_base/timer.h"
+#include "timer.h"
 
 void PolyInt::Polynomial_Interpolation
 (

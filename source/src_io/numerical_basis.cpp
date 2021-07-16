@@ -1,6 +1,6 @@
 #include "numerical_basis.h"
 #include "../src_pw/global.h"
-#include "../src_pw/symmetry.h"
+#include "../module_symmetry/symmetry.h"
 #include "winput.h"
 #include "../module_base/math_ylmreal.h"
 

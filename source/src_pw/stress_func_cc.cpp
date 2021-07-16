@@ -5,7 +5,7 @@
 //NLCC term, need to be tested
 void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 {
-	timer::tick("Stress_Func","stress_cc",'F');
+	timer::tick("Stress_Func","stress_cc");
         
 	int nt,ng,l,m,ir;
 	double fact=1.0;

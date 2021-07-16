@@ -1,6 +1,7 @@
 #ifndef GRID_DRIVER_H
 #define GRID_DRIVER_H
 
+#include <memory>
 #include <stdexcept>
 #include "sltk_atom.h"
 #include "sltk_atom_input.h"
@@ -30,7 +31,7 @@ public:
 		const UnitCell &ucell, 
 		const Vector3<double> &cartesian_posi, 
 		const int &ntype, 
-		const int &nnumber)const;
+		const int &nnumber);
 
 	//==========================================================
 	// EXPLAIN : The adjacent information for the input 
@@ -50,10 +51,10 @@ public:
 private:
 
 	mutable int adj_num;
-	mutable int* ntype;
-	mutable int* natom;
-	mutable Vector3<double>* adjacent_tau;
-	mutable Vector3<int>* box;
+	vector<int> ntype;
+	vector<int> natom;
+	vector<Vector3<double>> adjacent_tau;
+	vector<Vector3<int>> box;
 
 	const int test_deconstructor;//caoyu reconst 2021-05-24
 	const int test_grid_driver;	//caoyu reconst 2021-05-24
@@ -72,7 +73,7 @@ private:
 
 	void Find_adjacent_atom(
 		const int offset, 
-		AdjacentSet* as)const;
+		std::shared_ptr<AdjacentSet> as);
 
 	double Distance(const AtomLink& a1, const Vector3<double> &adjacent_site)const;
 	double Distance(const AtomLink& a1, const AtomLink& a2)const;

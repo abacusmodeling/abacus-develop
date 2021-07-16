@@ -4,7 +4,7 @@
 //calcualte the Ewald stress term in PW and LCAO
 void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 {
-    timer::tick("Stress_Func","stress_ew",'F');
+    timer::tick("Stress_Func","stress_ew");
 
     double charge=0;
     for(int it=0; it < ucell.ntype; it++)

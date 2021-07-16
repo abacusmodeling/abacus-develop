@@ -3,7 +3,7 @@
 
 #include "exx_abfs-parallel.h"
 
-#include "src_ri/abfs.h"
+#include "abfs.h"
 
 #include <vector>
 #include <utility>

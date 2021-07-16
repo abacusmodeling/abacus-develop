@@ -1,7 +1,7 @@
 #ifndef EXX_ABFS_IO_TEMPLATE_H
 #define EXX_ABFS_IO_TEMPLATE_H
 
-#include "src_ri/exx_abfs-io.h"
+#include "exx_abfs-io.h"
 #include <string>
 #include <fstream>
 

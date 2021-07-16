@@ -3,7 +3,7 @@
 #include "../module_base/lapack_connector.h"
 #include "../src_pw/occupy.h"
 #include "../src_pw/global.h"
-#include "src_lcao/local_orbital_charge.h"
+#include "../src_lcao/local_orbital_charge.h"
 #include "../src_io/wf_local.h"
 
 
@@ -22,7 +22,7 @@ extern "C"
 #include "../module_base/lapack_connector.h"
 #endif
 
-#include "src_external/src_test/test_function.h"
+#include "../src_external/src_test/test_function.h"
 
 inline int cart2blacs(
 	MPI_Comm comm_2D,
@@ -61,6 +61,31 @@ inline int cart2blacs(
 #else
     return 0;
 #endif
+}
+
+inline int q2CTOT(
+	int myid,
+	int naroc[2],
+	int nb,
+	int dim0,
+	int dim1,
+	int iprow,
+	int ipcol,
+	int loc_size,
+	double* work,
+	double** CTOT)
+{
+    for(int j=0; j<naroc[1]; ++j)
+    {
+        int igcol=globalIndex(j, nb, dim1, ipcol);
+        if(igcol>=NBANDS) continue;
+        for(int i=0; i<naroc[0]; ++i)
+        {
+            int igrow=globalIndex(i, nb, dim0, iprow);
+            if(myid==0) CTOT[igcol][igrow]=work[j*naroc[0]+i];
+        }
+    }
+    return 0;
 }
 
 inline int q2ZLOC_WFC(
@@ -551,10 +576,10 @@ void Pdiag_Double::diago_double_begin(
         ZEROS(Z, this->loc_size * NLOCAL);
 
         Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"double");
-        timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
+        timer::tick("Diago_LCAO_Matrix","pdgseps");
 		LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
 		pdgseps(comm_2D, NLOCAL, nb, h_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
-        timer::tick("Diago_LCAO_Matrix","pdgseps",'G');
+        timer::tick("Diago_LCAO_Matrix","pdgseps");
 
         if(myid <= lastband_in_proc)
         {
@@ -578,9 +603,9 @@ void Pdiag_Double::diago_double_begin(
         //=====================================
 
         //xiaohui modify 2014-06-18
-        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
+        timer::tick("Diago_LCAO_Matrix","gath_eig");
         this->gath_eig(DIAG_HPSEPS_WORLD, NLOCAL, wfc, Z);
-        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
+        timer::tick("Diago_LCAO_Matrix","gath_eig");
         //delete[] Z; //LiuXh 20171109
 	}// HPSEPS method
     else if(KS_SOLVER=="genelpa")
@@ -606,102 +631,111 @@ void Pdiag_Double::diago_double_begin(
 
         if(CHR.get_new_e_iteration())
         {
-            timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
+            timer::tick("Diago_LCAO_Matrix","genelpa1");
             method=0;
         	LapackConnector::copy(nloc, s_mat, inc, Stmp, inc);
             info=pdDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
                                         Stmp, eigen, wfc_2d.c, work,
                                         comm_2D_f, mpi_comm_rows, mpi_comm_cols,
                                         method, THIS_REAL_ELPA_KERNEL_API, useQR);
-            timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
+            timer::tick("Diago_LCAO_Matrix","genelpa1");
         }
-        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa2");
         info=pdSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
                           h_mat, Stmp, eigen, wfc_2d.c, work,
                           comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
                           THIS_REAL_ELPA_KERNEL_API, useQR,
                           wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa2");
 
     	OUT(ofs_running,"K-S equation was solved by genelpa2");
         LapackConnector::copy(NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 	    OUT(ofs_running,"eigenvalues were copied to ekb");
 
-        if(INPUT.new_dm==0)
-        {
-            // convert wave function to band distribution
+		// convert wave function to band distribution
 			// and calculate the density matrix in the tranditional way
-            // redistribute eigenvectors to wfc / wfc_aug
+			// redistribute eigenvectors to wfc / wfc_aug
 
-            timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
-            int pos=0;
-            for(int i=0; i<myid; ++i)
-            {
-                pos+=loc_sizes[i];
-            }
-            int naroc[2]; // maximum number of row or column
-            for(int iprow=0; iprow<dim0; ++iprow)
-            {
-                for(int ipcol=0; ipcol<dim1; ++ipcol)
-                {
-                    const int coord[2]={iprow, ipcol};
-                    int src_rank;
-                    MPI_Cart_rank(comm_2D, coord, &src_rank);
-                    if(myid==src_rank)
-                    {
-                        LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
-                        naroc[0]=nrow;
-                        naroc[1]=ncol;
-                    }
-                    info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
-                    info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+		timer::tick("Diago_LCAO_Matrix","gath_eig");
+		int pos=0;
+		for(int i=0; i<myid; ++i)
+		{
+			pos+=loc_sizes[i];
+		}
+		int naroc[2]; // maximum number of row or column
+		double **ctot;
 
-                    if(this->out_lowf)
-                    {
-                        double **ctot;
-                        if(myid==0)
-                        {
-                            ctot = new double*[NBANDS];
-                            for (int i=0; i<NBANDS; i++)
-                            {
-                                ctot[i] = new double[NLOCAL];
-                                ZEROS(ctot[i], NLOCAL);
-                            }
-                            Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
-                        }
+		if(this->out_lowf && myid==0)
+		{
+			ctot = new double*[NBANDS];
+			for (int i=0; i<NBANDS; i++)
+			{
+				ctot[i] = new double[NLOCAL];
+				ZEROS(ctot[i], NLOCAL);
+			}
+			Memory::record("Pdiag_Basic","ctot",NBANDS*NLOCAL,"double");
+		}
+
+		for(int iprow=0; iprow<dim0; ++iprow)
+		{
+			for(int ipcol=0; ipcol<dim1; ++ipcol)
+			{
+				const int coord[2]={iprow, ipcol};
+				int src_rank;
+				MPI_Cart_rank(comm_2D, coord, &src_rank);
+				if(myid==src_rank)
+				{
+					LapackConnector::copy(nloc, wfc_2d.c, inc, work, inc);
+					naroc[0]=nrow;
+					naroc[1]=ncol;
+				}
+				info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, comm_2D);
+				info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, src_rank, comm_2D);
+
+				if(out_lowf)
+				{
+					if(INPUT.new_dm==0)
+					{
 						// mohan delete Bfield option 2021-02-12
 						info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
-								dim0, dim1, iprow, ipcol, this->loc_size,
-								work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
-						stringstream ss;
-                        ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
-                        // mohan add 2012-04-03, because we need the occupations for the
-                        // first iteration.
-                        WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
-                        if(myid==0)
-                        {
-                            for (int i=0; i<NBANDS; i++)
-                            {
-                                delete[] ctot[i];
-                            }
-                            delete[] ctot;
-                        }
-                    }
-                    else
-                    {
-						// mohan update 2021-02-12, delete Bfield option
-						info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
-								dim0, dim1, iprow, ipcol, this->loc_size,
-								work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
+							dim0, dim1, iprow, ipcol, this->loc_size,
+							work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN], ctot);
 					}
-                }
-            }
-        }
+					else
+					{
+						info=q2CTOT(myid, naroc, nb,
+							dim0, dim1, iprow, ipcol, this->loc_size,
+							work, ctot);
+					}
+				}//out_lowf
+				else
+				{
+					// mohan update 2021-02-12, delete Bfield option
+					info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
+						dim0, dim1, iprow, ipcol, this->loc_size,
+						work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[CURRENT_SPIN]);
+				}
+			}//loop ipcol
+		}//loop iprow
+	
+		if(out_lowf && myid==0)
+		{
+			stringstream ss;
+			ss << global_out_dir << "LOWF_GAMMA_S" << CURRENT_SPIN+1 << ".dat";
+			// mohan add 2012-04-03, because we need the occupations for the
+				// first iteration.
+			WF_Local::write_lowf( ss.str(), ctot );//mohan add 2010-09-09
+			for (int i=0; i<NBANDS; i++)
+			{
+				delete[] ctot[i];
+			}
+			delete[] ctot;
+		}
 
-        delete[] work;
-        timer::tick("Diago_LCAO_Matrix","gath_eig",'G');
-    } // GenELPA method
+		delete[] work;
+		timer::tick("Diago_LCAO_Matrix","gath_eig");
+	} // GenELPA method
 	else if(KS_SOLVER=="lapack_gv")
 	{
 		wfc_2d.create(this->ncol, this->nrow, false);
@@ -971,18 +1005,18 @@ void Pdiag_Double::diago_complex_begin(
 
         Memory::record("Pdiag_Double","Z",loc_size * NLOCAL,"cdouble");
 		int nbands_tmp = NBANDS;
-        timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
+        timer::tick("Diago_LCAO_Matrix","pzgseps");
 		LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
     	pzgseps(comm_2D, NLOCAL, nb, nbands_tmp, ch_mat, Stmp, Z, eigen, this->MatrixInfo, uplo, this->loc_size, loc_pos);
-        timer::tick("Diago_LCAO_Matrix","pzgseps",'G');
+        timer::tick("Diago_LCAO_Matrix","pzgseps");
         // the eigenvalues.
         LapackConnector::copy(NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         // Z is delete in gath_eig
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
         this->gath_eig_complex(DIAG_HPSEPS_WORLD, NLOCAL, wfc, Z, ik);
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
         //delete[] Z; //LiuXh 20180329, fix bug of 'double free()'
         //this->gath_full_eig_complex(DIAG_WORLD, NLOCAL, c, Z);
 	} // HPSEPS method
@@ -1002,7 +1036,7 @@ void Pdiag_Double::diago_complex_begin(
         MPI_Comm comm_2D_f = comm_2D;
 
         int THIS_REAL_ELPA_KERNEL_API=9;
-        timer::tick("Diago_LCAO_Matrix","genelpa",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa");
         LapackConnector::copy(nloc, cs_mat, inc, Stmp, inc);
         int method=0;
         //info=pzSolveGenEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
@@ -1010,27 +1044,27 @@ void Pdiag_Double::diago_complex_begin(
         //                      comm_2D_f, blacs_ctxt,
         //                      method, THIS_REAL_ELPA_KERNEL_API,
         //                      wantEigenVector, wantDebug);
-        //timer::tick("Diago_LCAO_Matrix","genelpa",'G');
-        timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
+        //timer::tick("Diago_LCAO_Matrix","genelpa");
+        timer::tick("Diago_LCAO_Matrix","genelpa1");
         info=pzDecomposeRightMatrix2(NLOCAL, nrow, ncol, desc,
                                     Stmp, eigen, wfc_2d.c, work,
                                     comm_2D_f, mpi_comm_rows, mpi_comm_cols,
                                     method, THIS_REAL_ELPA_KERNEL_API);
-        timer::tick("Diago_LCAO_Matrix","genelpa1",'G');
-        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa1");
+        timer::tick("Diago_LCAO_Matrix","genelpa2");
         info=pzSolveEigen2(NBANDS, NLOCAL, nrow, ncol, desc,
                     ch_mat, Stmp, eigen, wfc_2d.c, work,
                     comm_2D_f, mpi_comm_rows, mpi_comm_cols, method,
                     THIS_REAL_ELPA_KERNEL_API,
                     wantEigenVector, wantDebug);
-        timer::tick("Diago_LCAO_Matrix","genelpa2",'G');
+        timer::tick("Diago_LCAO_Matrix","genelpa2");
 
         // the eigenvalues.
         LapackConnector::copy(NBANDS, eigen, inc, ekb, inc);
         delete[] eigen;
 
         //change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
         int naroc[2]; // maximum number of row or column
         for(int iprow=0; iprow<dim0; ++iprow)
         {
@@ -1089,7 +1123,7 @@ void Pdiag_Double::diago_complex_begin(
             }
         }
         delete[] work;
-        timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+        timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
     } // GenELPA method
 	else if(KS_SOLVER=="scalapack_gvx")
 	{
@@ -1143,7 +1177,7 @@ void Pdiag_Double::diago_complex_begin(
 		// the follow will be deleted after finish newdm
 		{
 			//change eigenvector matrix from block-cycle distribute matrix to column-divided distribute matrix
-			timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+			timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
 
 			long maxnloc; // maximum number of elements in local matrix
 			MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
@@ -1208,7 +1242,7 @@ void Pdiag_Double::diago_complex_begin(
 				}
 			}
 			delete[] work;
-			timer::tick("Diago_LCAO_Matrix","gath_eig_complex",'G');
+			timer::tick("Diago_LCAO_Matrix","gath_eig_complex");
 		}
 	}
 

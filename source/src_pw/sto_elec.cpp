@@ -2,7 +2,7 @@
 #include "global.h"
 #include "sto_elec.h" 
 #include "occupy.h"
-#include "symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "../src_io/wf_io.h"
 #include "H_Ewald_pw.h"
 
@@ -19,7 +19,7 @@ Stochastic_Elec::~Stochastic_Elec()
 
 void Stochastic_Elec::scf_stochastic(const int &istep)
 {
-	timer::tick("Elec_Stochastic","scf_stochastic",'D');
+	timer::tick("Elec_Stochastic","scf_stochastic");
 
 	// mohan update 2021-02-25
 	H_Ewald_pw::compute_ewald(ucell,pw); 
@@ -349,7 +349,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			}
 							
 			iter_end(ofs_running);
-			timer::tick("Elec_Stochastic","scf_stochastic",'D');
+			timer::tick("Elec_Stochastic","scf_stochastic");
             return;
         }
 		
@@ -358,7 +358,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
     } 
 	
-	timer::tick("Elec_Stochastic","scf_stochastic",'D');
+	timer::tick("Elec_Stochastic","scf_stochastic");
     return;
 } // end electrons
 
@@ -379,7 +379,7 @@ bool Stochastic_Elec::check_stop_now(void)
 void Stochastic_Elec::c_bands(const int &istep)
 {
 	if (test_elec) TITLE("electrons","c_bands");
-	timer::tick("Elec_Stochastic","c_bands",'E');
+	timer::tick("Elec_Stochastic","c_bands");
 
 	int precondition_type = 2;
 
@@ -455,7 +455,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	delete [] h_diag;
 
-	timer::tick("Elec_Stochastic","c_bands",'E');
+	timer::tick("Elec_Stochastic","c_bands");
 
 	return;
 } 

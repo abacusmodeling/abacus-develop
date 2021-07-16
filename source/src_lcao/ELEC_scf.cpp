@@ -1,7 +1,7 @@
 #include "ELEC_scf.h"
 #include "../src_pw/global.h"
 #include "../src_io/chi0_hilbert.h"
-#include "../src_pw/symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "dftu.h"
 #include "LCAO_evolve.h"
 #include "ELEC_cbands_k.h"
@@ -23,7 +23,7 @@ int ELEC_scf::iter=0;
 void ELEC_scf::scf(const int &istep)
 {
 	TITLE("ELEC_scf","scf");
-	timer::tick("ELEC_scf","scf",'D');
+	timer::tick("ELEC_scf","scf");
 
 	// (1) calculate ewald energy.
 	// mohan update 2021-02-25
@@ -300,7 +300,7 @@ void ELEC_scf::scf(const int &istep)
 
 		if(conv_elec)
 		{
-			timer::tick("ELEC_scf","scf",'D');
+			timer::tick("ELEC_scf","scf");
 			return;
 		}
 
@@ -589,7 +589,7 @@ void ELEC_scf::scf(const int &istep)
 			}
 
 //			DONE(ofs_running,"ELECTRONS CONVERGED!");
-			timer::tick("ELEC_scf","scf",'D');
+			timer::tick("ELEC_scf","scf");
 			return;
 		}
 	}
@@ -600,7 +600,7 @@ void ELEC_scf::scf(const int &istep)
 		delete[] WFC_init;
 	}
 
-	timer::tick("ELEC_scf","scf",'D');
+	timer::tick("ELEC_scf","scf");
 	return;
 }
 

@@ -1,6 +1,6 @@
 #include "exx_abfs-parallel-communicate-function.h"
 #include "../src_pw/global.h"
-#include "src_lcao/global_fp.h"
+#include "../src_lcao/global_fp.h"
 
 vector<pair<vector<bool>,vector<bool>>>
 Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &mpi_comm)

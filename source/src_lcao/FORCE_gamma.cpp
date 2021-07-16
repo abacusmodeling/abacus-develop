@@ -22,7 +22,7 @@ void Force_LCAO_gamma::ftable_gamma (
 	matrix& svl_dphi)
 {
     TITLE("Force_LCAO_gamma", "ftable");
-    timer::tick("Force_LCAO_gamma","ftable_gamma",'F');
+    timer::tick("Force_LCAO_gamma","ftable_gamma");
     
     // allocate DSloc_x, DSloc_y, DSloc_z
     // allocate DHloc_fixed_x, DHloc_fixed_y, DHloc_fixed_z
@@ -46,7 +46,7 @@ void Force_LCAO_gamma::ftable_gamma (
     }
     else
     {
-        timer::tick("Force_LCAO_gamma","cal_dm_grid",'G');
+        timer::tick("Force_LCAO_gamma","cal_dm_grid");
         // calculate the 'density matrix' here.
         matrix dm2d;
 		dm2d.create(NSPIN, ParaO.nloc);
@@ -56,7 +56,7 @@ void Force_LCAO_gamma::ftable_gamma (
 
 		this->set_EDM_gamma(dm2d, with_energy);
 
-        timer::tick("Force_LCAO_gamma","cal_dm_grid",'G');
+        timer::tick("Force_LCAO_gamma","cal_dm_grid");
 
         this->cal_ftvnl_dphi(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
         this->cal_fvnl_dbeta(dm2d, isforce, isstress, fvnl_dbeta, svnl_dbeta);
@@ -91,14 +91,14 @@ void Force_LCAO_gamma::ftable_gamma (
     // delete DHloc_fixed_x, DHloc_fixed_y, DHloc_fixed_z
     this->finish_ftable_gamma();
 
-    timer::tick("Force_LCAO_gamma","ftable_gamma",'F');
+    timer::tick("Force_LCAO_gamma","ftable_gamma");
     return;
 }
 
 void Force_LCAO_gamma::allocate_gamma(void)
 {
     TITLE("Force_LCAO_gamma","allocate_gamma");
-    timer::tick("Force_LCAO_gamma","allocate_gamma",'G');
+    timer::tick("Force_LCAO_gamma","allocate_gamma");
 
     // need to calculate the derivative in build_ST_new
     bool cal_deri = true;
@@ -143,9 +143,9 @@ void Force_LCAO_gamma::allocate_gamma(void)
     }
     //calculate dS in LCAO basis
     // tips: build_ST_new --> ParaO.set_force 
-    //timer::tick("Force_LCAO_gamma","build_S_new",'H');
+    //timer::tick("Force_LCAO_gamma","build_S_new");
     UHM.genH.build_ST_new ('S', cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_S_new",'H');
+    //timer::tick("Force_LCAO_gamma","build_S_new");
 
     Memory::record("force_lo", "dS", ParaO.nloc*3, "double");
 
@@ -161,20 +161,20 @@ void Force_LCAO_gamma::allocate_gamma(void)
     
     //calculate dT
     //calculate T + VNL(P1) in LCAO basis
-    //timer::tick("Force_LCAO_gamma","build_T_new",'H');
+    //timer::tick("Force_LCAO_gamma","build_T_new");
     UHM.genH.build_ST_new ('T', cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_T_new",'H');
+    //timer::tick("Force_LCAO_gamma","build_T_new");
     //test_gamma(LM.DHloc_fixed_x, "dHloc_fixed_x T part");
     
     //UHM.genH.build_Nonlocal_beta (cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu",'H');
+    //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     UHM.genH.build_Nonlocal_mu (cal_deri);
-    //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu",'H');
+    //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
     Memory::record("force_lo", "dTVNL", ParaO.nloc*3, "double");
 
-    timer::tick("Force_LCAO_gamma","allocate_gamma",'G');
+    timer::tick("Force_LCAO_gamma","allocate_gamma");
     return;
 }
 

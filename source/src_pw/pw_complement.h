@@ -5,7 +5,7 @@
 #ifndef PW_COMPLEMENT_H
 #define PW_COMPLEMENT_H
 
-#include "../src_pw/tools.h"
+#include "tools.h"
 
 namespace PW_complement
 {

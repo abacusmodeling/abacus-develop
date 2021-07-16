@@ -109,7 +109,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals", "Read_Orbitals");
-	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
+	timer::tick("LCAO_Orbitals","Read_Orbitals");
 
 	ofs_in << "\n\n\n\n";
 	ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
@@ -262,7 +262,7 @@ void LCAO_Orbitals::Read_Orbitals(
 
 	}
 
-	timer::tick("LCAO_Orbitals","Read_Orbitals",'C');
+	timer::tick("LCAO_Orbitals","Read_Orbitals");
 	return;
 }
 
@@ -852,7 +852,7 @@ void LCAO_Orbitals::read_orb_file(
 	Parallel_Common::bcast_int(lmax);
 #endif	
 	
-	int* nchi = new int[lmax];		// allocate space: number of chi for each L.
+	int* nchi = new int[lmax+1];		// allocate space: number of chi for each L.
 	
 	if (my_rank == 0)
 	{	

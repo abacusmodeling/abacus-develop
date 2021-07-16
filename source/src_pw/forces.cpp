@@ -2,7 +2,7 @@
 #include "global.h"
 #include "vdwd2.h"
 #include "vdwd3.h"				  
-#include "symmetry.h"
+#include "../module_symmetry/symmetry.h"
 // new
 #include "H_XC_pw.h"
 #include "../module_base/math_integral.h"

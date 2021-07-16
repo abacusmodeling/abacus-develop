@@ -1,6 +1,7 @@
 #include "local_orbital_charge.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
+#include "../src_io/wf_local.h"
 
 extern "C"
 {
@@ -31,7 +32,7 @@ inline int localIndex(int globalIndex, int nblk, int nprocs, int& myproc)
 int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt, int nblk)
 {
     OUT(ofs_running,"enter setAlltoallvParameter, nblk", nblk);
-    timer::tick("LCAO_Charge","newDM_index",'F');
+    timer::tick("LCAO_Charge","newDM_index");
     // setup blacs parameters
     int nprows=0;	
 	int npcols=0;
@@ -199,7 +200,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     }
     // OUT(ofs_running,"last sender_2D_index",sender_2D_index[lgd_now*lgd_now-1]);
     delete[] receiver_2D_index;
-    timer::tick("LCAO_Charge","newDM_index",'F');
+    timer::tick("LCAO_Charge","newDM_index");
     return 0;
 }
 
@@ -267,16 +268,60 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 
 	// Peize Lin test 2019-01-16
     wfc_dm_2d.init();
+	if(wf.start_wfc=="file")
+	{
+		this->gamma_file(gt);
+	}
 
     return;
 }
 
+void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
+{
+	TITLE("Local_Orbital_Charge","gamma_file");
+
+	int error;
+	cout << " Read in gamma point wave function files " << endl;
+
+	double **ctot;
+
+	for(int is=0; is<NSPIN; ++is)
+	{
+
+		LOC.wfc_dm_2d.wfc_gamma[is].create(ParaO.ncol, ParaO.nrow);
+		LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
+
+		ofs_running << " Read in wave functions " << is << endl;
+		error = WF_Local::read_lowf( ctot , is);
+#ifdef __MPI
+		Parallel_Common::bcast_int(error);
+#endif
+		ofs_running << " Error=" << error << endl;
+		if(error==1)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+		}
+		else if(error==2)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","In wave function file, band number doesn't match");
+		}
+		else if(error==3)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","In wave function file, nlocal doesn't match");
+		}
+		else if(error==4)
+		{
+			WARNING_QUIT("Local_Orbital_wfc","In k-dependent wave function file, k point is not correct");
+		}
+
+	}//loop ispin
+}
 
 // calculate the grid distributed DM matrix from 2D block-cyclic distributed DM matrix
 // transform dm_gamma[is].c to this->DM[is]
 void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 {
-    timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
+    timer::tick("LCAO_Charge","dm_2dTOgrid");
     OUT(ofs_running,"cal_dk_gamma_from_2D, NSPIN", NSPIN);
 
     for(int is=0; is<NSPIN; ++is)
@@ -387,7 +432,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             ofs_running<<"=========================================\n";
         }
     }
-    timer::tick("LCAO_Charge","dm_2dTOgrid",'F');
+    timer::tick("LCAO_Charge","dm_2dTOgrid");
 	return;
 }
 
@@ -395,7 +440,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
 void Local_Orbital_Charge::cal_dk_gamma(void)
 {
     TITLE("Local_Orbital_Charge","cal_density_kernal");
-    timer::tick("LocalOrbital_Charge","cal_dk_gamma",'F');
+    timer::tick("LocalOrbital_Charge","cal_dk_gamma");
 
     assert(NSPIN==kv.nks);
 
@@ -575,6 +620,6 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 	}  // end for is    
 #endif //2015-09-06, xiaohui
 
-    timer::tick("LocalOrbital_Charge","cal_dk_gamma",'F');
+    timer::tick("LocalOrbital_Charge","cal_dk_gamma");
     return;
 }

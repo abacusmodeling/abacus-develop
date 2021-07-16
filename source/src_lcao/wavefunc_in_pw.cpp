@@ -438,6 +438,8 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	} // end for it
 	assert(iwall == NLOCAL);
 	delete[] flq;
+	delete[] aux;
+	delete[] chiaux;
 	delete[] gk;
 }
 
@@ -655,5 +657,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 
 	assert(iwall == NLOCAL);
 	delete[] flq;
+	delete[] aux;
+	delete[] chiaux;
 	delete[] gkq;
 }

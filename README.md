@@ -28,7 +28,6 @@ WHERE MORE INFORMATION CAN BE FOUND.
 - [Functionalities](#functionalities)
 - [Examples](#examples)
 - [For developers](#for-developers)
-  - [Build and install ABACUS from CMake](#build-and-install-abacus-from-cmake)
 
 
 # About ABACUS
@@ -88,7 +87,7 @@ make sure these files are prepared and stored in the working directory.
 
     Norm-conserving pseudopotentials are used in ABACUS, in the UPF file format.The filename of each element’s pseudopotential needs to be specified in the `STRU` file, if the the pseudopotential files are already present in the working directory. However, in case that the pseudopotential files are stored in some other directories, then a full path to access the pseudopotential files have to be specified in the `STRU` file.
 
-    More information on pseudopotentials is given [below](#pseudopotentials).
+    More information on pseudopotentials is given [here](doc/features.md#pseudopotentials).
 
 - The numerical orbital file
 
@@ -103,7 +102,7 @@ When the calculation finishes, the program will create an output directory (defa
 into which the following output files will be generated:
 1. INPUT: contains all input parameters, user’s input and default.
 2. istate.info: information of energy eigenvalues.
-3. running_scf.log: contains the running details.
+3. running_${calculation}.log: contains the running details. Information on the variable calculation is found in the [list of keywords](doc/input-main.md#calculation). For example, if we are doing a SCF calculation, the log files will be named running_scf.log.
 4. STRU_READIN_ADJUST.cif: structure file in the cif formatter.
 5. warning.log: errors and warning messages.
 6. directories containing element information. For example, Si/:
@@ -147,36 +146,20 @@ ABACUS provides a wide variety of functionalities, with explanation and examples
 [back to top](#readme-top)
 
 # Examples
-We also provide many examples in the directories examples/ and tests/
+We also provide many examples in the directories examples/ and tests/.
+
+Note that the examples there are intended as references, and the results are not converged with regard to basis set or k point sampling.
+
+In the directory tests/, each sub-directory contains a separate test example. An introduction of the examples in tests/ directory can be found [here](tests/README.md). In each subdirectory, you may also find a file named jd which contains a short job description, and for some cases you may also find a README file containing more details about the run. Also, reference output is provided in the file result.ref.
+
+[back to top](#readme-top)
 
 # For developers
 
-We also provide some [information](doc/developer.md) for developers.
+We also provide some [information](doc/developers.md) for developers.
+- [Build and install ABACUS with CMake](doc/developers.md#build-and-install-abacus-with-cmake)
+- [Raising issues on GitHub](doc/developers.md#raising-issues-on-github)
+- [Modularization and module tests](doc/developers.md#modularization-and-module-tests)
+- [Contributing to ABACUS](doc/developers.md#contributing-to-abacus)
 
----
-
-## Build and install ABACUS from CMake
-
-Check the cmake version on your machine
-```bash
-cmake --version
-```
-ABACUS requires the minimum cmake version `3.18`.
-
-You can specify the bin path of ABACUS binary to install by `CMAKE_INSTALL_PREFIX`.
-```bash
-cmake -B build -DCMAKE_INSTALL_PREFIX=${ABACUS_BIN_PATH}
-```
-You can provide root path of each dependent package if the package cannot be automatically found by cmake.
-Keys `LAPACK_DIR`, `SCALAPACK_DIR`, `ELPA_DIR`, `FFTW3_DIR`, `CEREAL_INCLUDEDIR`, `BOOST_INCLUDEDIR`, `MPI_CXX_COMPILER` and `MKL_DIR`. are currently available to specify.
-For example
-```bash
-cmake -B build -DFFTW3_ROOT=/opt/fftw3
-```
-
-If the cmake has executed successfully, then
-```bash
-cmake --build build
-cmake --install build
-```
-If no install prefix is specified, the binary will be installed to `/usr/local/bin/ABACUS` by default.
+[back to top](#readme-top)

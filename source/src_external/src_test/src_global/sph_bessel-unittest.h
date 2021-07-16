@@ -2,8 +2,8 @@
 #define SPH_BESSEL_UNITTEST_H
 
 #include<sys/time.h>
-#include "module_base/global_function.h"
-#include "module_base/sph_bessel.h"
+#include "../../../module_base/global_function.h"
+#include "../../../module_base/sph_bessel.h"
 
 static void Sph_Bessel_timetest(
 	const int Lmax,

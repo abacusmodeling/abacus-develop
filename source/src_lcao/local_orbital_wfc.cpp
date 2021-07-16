@@ -163,7 +163,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 {
 	TITLE("Local_Orbital_wfc","set_trace_aug");
-	timer::tick("Local_Orbital_wfc","set_trace_aug",'D');
+	timer::tick("Local_Orbital_wfc","set_trace_aug");
 	// this function must be called after ParaO.trace_loc_row
 	// , ParaO.trace_loc_col and GridT.trace_lo have been called.
 
@@ -302,6 +302,6 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 		OUT(ofs_running,"daug",daug);
 	}
 
-	timer::tick("Local_Orbital_wfc","set_trace_aug",'D');
+	timer::tick("Local_Orbital_wfc","set_trace_aug");
 	return; 
 }

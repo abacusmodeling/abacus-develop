@@ -10,6 +10,7 @@ include Makefile.Objects
 VPATH=./src_global\
 :./module_orbital\
 :./module_neighbor\
+:./module_symmetry\
 :./module_cell\
 :./module_base\
 :./module_md\

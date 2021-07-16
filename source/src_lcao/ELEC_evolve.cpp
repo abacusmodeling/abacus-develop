@@ -2,7 +2,7 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
-#include "../src_pw/symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 
@@ -30,7 +30,7 @@ void ELEC_evolve::evolve_psi(
 	complex<double> ***wfc)
 {
 	TITLE("ELEC_evolve","eveolve_psi");
-	timer::tick("ELEC_evolve","evolve_psi",'E');
+	timer::tick("ELEC_evolve","evolve_psi");
 
 	int start_spin = -1;
 	uhm.GK.reset_spin(start_spin);
@@ -147,7 +147,7 @@ void ELEC_evolve::evolve_psi(
 		uhm.GK.destroy_pvpR();
 	}
 
-	timer::tick("ELEC_evolve","evolve_psi",'E');
+	timer::tick("ELEC_evolve","evolve_psi");
 	return;	
 }
 

@@ -9,6 +9,7 @@ add_library(
     chi0_standard.cpp
     dos.cpp
     energy_dos.cpp
+    energy_dos_pw.cpp
     epsilon0_pwscf.cpp
     epsilon0_vasp.cpp
     eximport.cpp

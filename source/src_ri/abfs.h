@@ -3,7 +3,7 @@
 
 #include "../module_base/vector3.h"
 #include "../module_base/matrix.h"
-#include "src_ri/exx_abfs.h"
+#include "exx_abfs.h"
 
 #include <set>
 #include <vector>

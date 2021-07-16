@@ -393,7 +393,7 @@ inline void cal_band_rho(
 void Gint_k::cal_rho_k(void)
 {
 	TITLE("Gint_k","cal_rho_k");
-	timer::tick("Gint_k","cal_rho_k",'F');
+	timer::tick("Gint_k","cal_rho_k");
 
 	const double delta_r = ORB.dr_uniform;
 	// it is an uniform grid to save orbital values, so the delta_r is a constant.
@@ -466,11 +466,11 @@ void Gint_k::cal_rho_k(void)
 				const int size = GridT.how_many_atoms[grid_index];
 				if(size==0) continue;
 				setVindex(ncyz, ibx, jby, kbz, vindex);
-				//timer::tick("Gint_k","cal_psir_ylm",'G');
+				//timer::tick("Gint_k","cal_psir_ylm");
 				cal_psir_ylm(size, grid_index, delta_r,
 						at, uc, block_index, block_iw, block_size, 
 						cal_flag, psir_ylm);
-				//timer::tick("Gint_k","cal_psir_ylm",'G');
+				//timer::tick("Gint_k","cal_psir_ylm");
 
 				cal_band_rho(
 					size, 
@@ -504,6 +504,7 @@ void Gint_k::cal_rho_k(void)
 		delete[] block_iw;
 		delete[] block_size;
 		delete[] at;
+		delete[] uc;
 		delete[] block_index;
         delete[] cal_flag;
 		delete[] vindex;
@@ -511,7 +512,7 @@ void Gint_k::cal_rho_k(void)
 
 //	cout << " calculate the charge density from density matrix " << endl;
 
-	timer::tick("Gint_k","cal_rho_k",'F');
+	timer::tick("Gint_k","cal_rho_k");
 	return;
 }
 

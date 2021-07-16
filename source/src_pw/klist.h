@@ -2,7 +2,7 @@
 #define K_VECTORS_H
 
 #include "tools.h"
-#include "symmetry.h"
+#include "../module_symmetry/symmetry.h"
 
 class K_Vectors
 {

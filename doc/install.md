@@ -73,6 +73,12 @@ FFTW3;
 [back to top](#download-and-install)
 
 ## Building the program
+Before starting to build the program, note that if you are using Intel MKL library, please set the following environmental variable:
+
+```bash
+export MKL_NUM_THREAD=1
+```
+
 To compile the ABACUS program, go to the source directory:
 ```bash
 cd source/
