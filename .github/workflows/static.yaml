@@ -1,10 +1,7 @@
 name: Static Analysis
 
 on:
-  pull_request_target:
-    branches:
-      - develop
-      - reconstruction
+  workflow_dispatch:
 
 jobs:
   clang-tidy:
