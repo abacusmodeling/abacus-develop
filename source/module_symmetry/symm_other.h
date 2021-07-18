@@ -3,9 +3,7 @@
 
 //#include "../src_pw/tools.h"
 #include "../module_base/vector3.h"
-#include "../module_base/tool_title.h"
 #include "../module_base/global_function.h"
-#include "../module_base/tool_quit.h"
 namespace Symm_Other
 {
 	void print1(const int &ibrav, const double *cel_const);
