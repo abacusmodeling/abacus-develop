@@ -18,7 +18,7 @@ Symmetry::~Symmetry()
 bool Symmetry::symm_flag=false;
 
 
-void Symmetry::analy_sys(const UnitCell_pseudo &ucell, output &out)
+void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out)
 {
     if (available == false) return;
     TITLE("Symmetry","init");

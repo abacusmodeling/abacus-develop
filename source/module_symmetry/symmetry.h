@@ -15,7 +15,7 @@ public:
 	// mohan add 2021-02-21
 	static bool symm_flag;
 
-	void analy_sys(const UnitCell_pseudo &ucell, output &out);
+	void analy_sys(const UnitCell_pseudo &ucell, const output &out);
 	bool available;
 
 	Vector3<double> s1, s2, s3;
