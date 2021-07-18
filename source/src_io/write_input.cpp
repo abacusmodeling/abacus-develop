@@ -123,6 +123,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"dos_emin_ev",dos_emin_ev,"minimal range for dos");
 	OUTP(ofs,"dos_emax_ev",dos_emax_ev,"maximal range for dos");
 	OUTP(ofs,"dos_edelta_ev",dos_edelta_ev,"delta energy for dos");
+	OUTP(ofs,"dos_scale",dos_scale,"scale dos range by");
 	OUTP(ofs,"dos_sigma",b_coef,"gauss b coefficeinet(default=0.07)");
 
 	ofs << "\n#Parameters (8.Technique)" << endl;

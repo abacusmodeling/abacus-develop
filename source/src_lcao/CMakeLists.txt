@@ -15,7 +15,6 @@ add_library(
     FORCE_gamma_tvnl.cpp
     FORCE_gamma_vl.cpp
     FORCE_k.cpp
-    LCAO_descriptor.cpp
     LCAO_diago.cpp
     LCAO_evolve.cpp
     LCAO_gen_fixedH.cpp
@@ -61,3 +60,7 @@ add_library(
 	H_TDDFT_pw.cpp
     run_md_lcao.cpp
 )
+
+if(ENABLE_DEEPKS)
+    target_sources(lcao PRIVATE LCAO_descriptor.cpp)
+endif()

@@ -1,7 +1,7 @@
 #include "ELEC_scf.h"
 #include "../src_pw/global.h"
 #include "../src_io/chi0_hilbert.h"
-#include "../src_pw/symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "dftu.h"
 #include "LCAO_evolve.h"
 #include "ELEC_cbands_k.h"
@@ -11,6 +11,9 @@
 #include "../src_pw/occupy.h"
 //new
 #include "../src_pw/H_Ewald_pw.h"
+#ifdef __DEEPKS
+    #include "LCAO_descriptor.h"	//caoyu add 2021-06-04
+#endif
 
 ELEC_scf::ELEC_scf(){}
 ELEC_scf::~ELEC_scf(){}
@@ -24,10 +27,10 @@ void ELEC_scf::scf(const int &istep)
 
 	// (1) calculate ewald energy.
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell,pw); 
+	H_Ewald_pw::compute_ewald(ucell,pw);
 
 	// mohan add 2012-02-08
-    set_ethr(); 
+    set_ethr();
 
 	// the electron charge density should be symmetrized,
 	// here is the initialization
@@ -40,23 +43,23 @@ void ELEC_scf::scf(const int &istep)
 //	cout << scientific;
 //	cout << setiosflags(ios::fixed);
 
-	if(OUT_LEVEL=="ie" ||OUT_LEVEL=="m") 
+	if(OUT_LEVEL=="ie" ||OUT_LEVEL=="m")
 	{
 		if(COLOUR && MY_RANK==0)
 		{
-			printf( " [33m%-7s[0m", "ITER");	
-			printf( "[33m%-15s[0m", "ETOT(Ry)");	
+			printf( " [33m%-7s[0m", "ITER");
+			printf( "[33m%-15s[0m", "ETOT(Ry)");
 			if(NSPIN==2)
 			{
-				printf( "[33m%-10s[0m", "TMAG");	
-				printf( "[33m%-10s[0m", "AMAG");	
+				printf( "[33m%-10s[0m", "TMAG");
+				printf( "[33m%-10s[0m", "AMAG");
 			}
-			printf( "[33m%-14s[0m", "DRHO2");	
-			printf( "[33m%-15s[0m", "ETOT(eV)");	
-			printf( "\e[33m%-11s\e[0m\n", "TIME(s)");	
+			printf( "[33m%-14s[0m", "DRHO2");
+			printf( "[33m%-15s[0m", "ETOT(eV)");
+			printf( "\e[33m%-11s\e[0m\n", "TIME(s)");
 		}
 		else
-		{	
+		{
 			cout << " " << setw(7)<< "ITER";
 
 			if(NSPIN==2)
@@ -87,26 +90,26 @@ void ELEC_scf::scf(const int &istep)
         }
         else if(CALCULATION=="relax" || CALCULATION=="cell-relax")
 		{
-			ofs_running 
-			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1 
-			<< "  ELEC=" << setw(4) << iter 
+			ofs_running
+			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
+			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
 
-			ofs_warning 
-			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1 
-			<< "  ELEC=" << setw(4) << iter 
+			ofs_warning
+			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
+			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
 		}
 		else if(CALCULATION=="md")
 		{
-			ofs_running 
-			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1 
-			<< "  ELEC=" << setw(4) << iter 
+			ofs_running
+			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
+			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
 
-			ofs_warning 
-			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1 
-			<< "  ELEC=" << setw(4) << iter 
+			ofs_warning
+			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
+			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
 		}
 
@@ -116,7 +119,7 @@ void ELEC_scf::scf(const int &istep)
 		string ufile = "CHANGE";
 		Update_input UI;
 		UI.init(ufile);
-			
+
 		if(INPUT.dft_plus_u) dftu.iter_dftu = iter;
 		//time_start= std::time(NULL);
 		clock_start = std::clock();
@@ -124,16 +127,16 @@ void ELEC_scf::scf(const int &istep)
 
 		// mohan add 2010-07-16
 		// used for pulay mixing.
-		if(iter==1) 
+		if(iter==1)
 		{
 			CHR.set_new_e_iteration(true);
 		}
-		else 
+		else
 		{
 			CHR.set_new_e_iteration(false);
 		}
 
-		// set converged threshold, 
+		// set converged threshold,
 		// automatically updated during self consistency, only for CG.
         this->update_ethr(iter);
         if(FINAL_SCF && iter==1)
@@ -148,13 +151,13 @@ void ELEC_scf::scf(const int &istep)
 		en.calculate_harris(1);
 
 		// mohan move it outside 2011-01-13
-		// first need to calculate the weight according to 
+		// first need to calculate the weight according to
 		// electrons number.
 		// mohan add iter > 1 on 2011-04-02
 		// because the en.ekb has not value now.
 		// so the smearing can not be done.
 		if(iter>1)Occupy::calculate_weights();
-		
+
 		if(wf.start_wfc == "file")
 		{
 			if(iter==1)
@@ -163,7 +166,7 @@ void ELEC_scf::scf(const int &istep)
 
 				// The occupation should be read in together.
 				// Occupy::calculate_weights(); //mohan add 2012-02-15
-				
+
 				// calculate the density matrix using read in wave functions
 				// and the ncalculate the charge density on grid.
 				LOC.sum_bands();
@@ -191,11 +194,11 @@ void ELEC_scf::scf(const int &istep)
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
 				en.delta_escf();
-				if (ELEC_evolve::td_vext == 0)	
+				if (ELEC_evolve::td_vext == 0)
 				{
 					pot.set_vr_eff();
 				}
-				else		
+				else
 				{
 					pot.set_vrs_tddft(istep);
 				}
@@ -204,7 +207,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// fuxiang add 2016-11-1
 		// need reconstruction in near future -- mohan 2021-02-09
-		// the initialization of wave functions should be moved to 
+		// the initialization of wave functions should be moved to
 		// somewhere else
 		if(ELEC_evolve::tddft == 1 && iter == 2)
 		{
@@ -247,19 +250,19 @@ void ELEC_scf::scf(const int &istep)
 				}
 			}
 		}
-		
+
 		// calculate exact-exchange
 		switch(xcf.iexch_now)						// Peize Lin add 2018-10-30
 		{
 			case 5:    case 6:   case 9:
-				if( !exx_global.info.separate_loop )				
+				if( !exx_global.info.separate_loop )
 				{
 					exx_lcao.cal_exx_elec();
 				}
 				break;
-		}		
-		
-		if(INPUT.dft_plus_u) 
+		}
+
+		if(INPUT.dft_plus_u)
 		{
 			dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
 		}
@@ -295,12 +298,12 @@ void ELEC_scf::scf(const int &istep)
 		if(GAMMA_ONLY_LOCAL && NSPIN == 2 && CURRENT_SPIN == 0) continue;
 
 
-		if(conv_elec) 
+		if(conv_elec)
 		{
 			timer::tick("ELEC_scf","scf");
 			return;
 		}
-		
+
 		en.eband  = 0.0;
 		en.ef     = 0.0;
 		en.ef_up  = 0.0;
@@ -314,7 +317,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// (2)
 		CHR.save_rho_before_sum_band();
-		
+
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
 
@@ -342,22 +345,22 @@ void ELEC_scf::scf(const int &istep)
 		// add exx
 		// Peize Lin add 2016-12-03
 		en.set_exx();
-		
+
 		// Peize Lin add 2020.04.04
-		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
-			|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
+		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type
+			|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type
 			|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type)
 		{
 			if(restart.info_load.load_H && restart.info_load.load_H_finish && !restart.info_load.restart_exx)
 			{
-				exx_global.info.set_xcfunc(xcf);							
-				exx_lcao.cal_exx_elec();			
+				exx_global.info.set_xcfunc(xcf);
+				exx_lcao.cal_exx_elec();
 				restart.info_load.restart_exx = true;
 			}
 		}
 
 
-		// if DFT+U calculation is needed, this function will calculate 
+		// if DFT+U calculation is needed, this function will calculate
 		// the local occupation number matrix and energy correction
 		if(INPUT.dft_plus_u)
 		{
@@ -371,7 +374,7 @@ void ELEC_scf::scf(const int &istep)
 		// (4) mohan add 2010-06-24
 		// using new charge density.
 		en.calculate_harris(2);
-		
+
 		// (5) symmetrize the charge density
 		Symmetry_rho srho;
 		for(int is=0; is<NSPIN; is++)
@@ -394,7 +397,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// (8) Mix charge density
 		CHR.mix_rho(dr2,0,DRHO2,iter,conv_elec);
-		
+
 		// Peize Lin add 2020.04.04
 		if(restart.info_save.save_charge)
 		{
@@ -405,9 +408,9 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// (9) Calculate new potential according to new Charge Density.
-	
+
 		if(conv_elec || iter==NITER)
-		{ 
+		{
 			if(pot.out_potential<0) //mohan add 2011-10-10
 			{
 				pot.out_potential = -2;
@@ -447,7 +450,7 @@ void ELEC_scf::scf(const int &istep)
 		for(int is=0; is<NSPIN; is++)
 		{
 			const int precision = 3;
-			
+
 			stringstream ssc;
 			ssc << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
 			CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), precision );//mohan add 2007-10-17
@@ -473,15 +476,15 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// (10) add Vloc to Vhxc.
-		if(ELEC_evolve::td_vext == 0)	
+		if(ELEC_evolve::td_vext == 0)
 		{
 			pot.set_vr_eff();
 		}
-		else		
+		else
 		{
 			pot.set_vrs_tddft(istep);
 		}
-	
+
 		//time_finish=std::time(NULL);
 		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
 		//double duration_time = difftime(time_finish, time_start);
@@ -491,11 +494,11 @@ void ELEC_scf::scf(const int &istep)
 		// (11) calculate the total energy.
 		en.calculate_etot();
 
-		// avg_iter is an useless variable in LCAO, 
+		// avg_iter is an useless variable in LCAO,
 		// will fix this interface in future -- mohan 2021-02-10
 		int avg_iter=0;
 		en.print_etot(conv_elec, istep, iter, dr2, duration, ETHR, avg_iter);
-	
+
 		en.etot_old = en.etot;
 
 		if (conv_elec || iter==NITER)
@@ -519,9 +522,9 @@ void ELEC_scf::scf(const int &istep)
 			{
 				if(CHR.out_charge)
 				{
-					stringstream sst; 
-					sst << global_out_dir << "onsite.dm"; 
-					dftu.write_occup_m( sst.str() );		
+					stringstream sst;
+					sst << global_out_dir << "onsite.dm";
+					dftu.write_occup_m( sst.str() );
 				}
 			}
 
@@ -559,18 +562,24 @@ void ELEC_scf::scf(const int &istep)
 				CHR.write_rho_dipole(CHR.rho_save, is, 0, sse.str());
 				*/
 			}
-			
+
 			iter_end(ofs_running);
 
 			if(conv_elec)
 			{
  				//xiaohui add "OUT_LEVEL", 2015-09-16
 				if(OUT_LEVEL != "m") ofs_running << setprecision(16);
-				if(OUT_LEVEL != "m") ofs_running << " EFERMI = " << en.ef * Ry_to_eV << " eV" << endl; 
+				if(OUT_LEVEL != "m") ofs_running << " EFERMI = " << en.ef * Ry_to_eV << " eV" << endl;
 				if(OUT_LEVEL=="ie")
 				{
-					ofs_running << " " << global_out_dir << " final etot is " << en.etot * Ry_to_eV << " eV" << endl; 
+					ofs_running << " " << global_out_dir << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
 				}
+#ifdef __DEEPKS
+				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
+				{
+					ld.save_npy_e(en.etot);//ebase = etot, no deepks E_delta including
+				}
+#endif
 			}
 			else
 			{

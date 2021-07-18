@@ -7,7 +7,7 @@
 #include "module_neighbor/sltk_atom_arrange.h"
 #include "src_lcao/LOOP_cell.h"
 #include "src_io/print_info.h"
-#include "src_pw/symmetry.h"
+#include "module_symmery/symmetry.h"
 #include "src_lcao/run_md_lcao.h"
 
 Run_lcao::Run_lcao(){}

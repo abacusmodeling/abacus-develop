@@ -267,6 +267,7 @@ void Input::Default(void)
 	dos_emin_ev = -15;//(ev)
 	dos_emax_ev = 15;//(ev)
 	dos_edelta_ev = 0.01;//(ev)
+	dos_scale = 0.01;
     b_coef = 0.07;
 //----------------------------------------------------------
 // LCAO 
@@ -1012,8 +1013,16 @@ bool Input::Read(const string &fn)
         else if (strcmp("lmax_descriptor", word) == 0)// mohan added 2021-01-03
         {
             read_value(ifs, lmax_descriptor);
+		}
+		else if (strcmp("deepks_scf", word) == 0) // caoyu added 2021-06-02
+        {
+            read_value(ifs, deepks_scf);
+		}
+		else if (strcmp("model_file", word) == 0) // caoyu added 2021-06-03
+        {
+            read_value(ifs, model_file);
         }
-        else if (strcmp("out_potential", word) == 0)
+		else if (strcmp("out_potential", word) == 0)
         {
             read_value(ifs, out_potential);
         }
@@ -1063,6 +1072,10 @@ bool Input::Read(const string &fn)
         else if (strcmp("dos_edelta_ev", word) == 0)
         {
             read_value(ifs, dos_edelta_ev);
+		}
+        else if (strcmp("dos_scale", word) == 0)
+        {
+            read_value(ifs, dos_scale);
         }
         else if (strcmp("dos_sigma", word) == 0)
         {
@@ -2091,8 +2104,10 @@ void Input::Bcast()
     Parallel_Common::bcast_int( out_dm );
     Parallel_Common::bcast_int( out_descriptor ); // caoyu added 2020-11-24, mohan modified 2021-01-03
     Parallel_Common::bcast_int( lmax_descriptor ); // mohan modified 2021-01-03
-
-    Parallel_Common::bcast_int( out_potential );
+    Parallel_Common::bcast_int( deepks_scf ); // caoyu add 2021-06-02
+	Parallel_Common::bcast_string( model_file ); //  caoyu add 2021-06-03
+	
+	Parallel_Common::bcast_int(out_potential);
     Parallel_Common::bcast_bool( out_wf );
 	Parallel_Common::bcast_int( out_dos );
         Parallel_Common::bcast_int( out_band );
@@ -2105,6 +2120,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_double( dos_emin_ev );
 	Parallel_Common::bcast_double( dos_emax_ev );
 	Parallel_Common::bcast_double( dos_edelta_ev );
+	Parallel_Common::bcast_double( dos_scale );
         Parallel_Common::bcast_double( b_coef );
 
 	// mohan add 2009-11-11

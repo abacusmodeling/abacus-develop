@@ -1,5 +1,6 @@
 #include "run_pw.h"
 #include "src_pw/global.h"
+#include "src_pw/energy.h"
 #include "input.h"
 #include "src_io/optical.h"
 #include "src_io/cal_test.h"
@@ -7,7 +8,7 @@
 #include "src_io/numerical_basis.h"
 #include "src_io/numerical_descriptor.h"
 #include "src_io/print_info.h"
-#include "src_pw/symmetry.h"
+#include "module_symmetry/symmetry.h"
 #include "src_ions/Cell_PW.h"
 #include "src_pw/run_md_pw.h"
 
@@ -159,9 +160,9 @@ void Run_pw::plane_wave_line(void)
 	}
 
 	// compute density of states
-#ifdef __LCAO
-	en.perform_dos();
-#endif
+//#ifdef __LCAO
+	en.perform_dos_pw();
+//#endif
 
 	timer::tick("Run_pw","plane_wave_line");
     return;
