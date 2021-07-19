@@ -1,17 +1,18 @@
-<div style="text-align:center; margin: 20px">
+<p align="center">
     <img src="documents/abacus-logo.jpg">
-</div>
+</p>
 
-<div style="text-align:center; margin: 20px">
+<p align="center">
     <a href="https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml">
         <img src="https://github.com/deepmodeling/abacus-develop/actions/workflows/container.yml/badge.svg">
     </a>
     <a href="https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml">
         <img src="https://github.com/deepmodeling/abacus-develop/actions/workflows/test.yml/badge.svg">
     </a>
-</div>
+</p>
 
 <a id="readme-top"></a>
+
 WELCOME TO THE "ABACUS" PROGRAM!
 THE PROJECT STARTS FROM https://github.com/abacusmodeling/abacus-develop,
 WHERE MORE INFORMATION CAN BE FOUND.
@@ -86,7 +87,7 @@ make sure these files are prepared and stored in the working directory.
 
     Norm-conserving pseudopotentials are used in ABACUS, in the UPF file format.The filename of each element’s pseudopotential needs to be specified in the `STRU` file, if the the pseudopotential files are already present in the working directory. However, in case that the pseudopotential files are stored in some other directories, then a full path to access the pseudopotential files have to be specified in the `STRU` file.
 
-    More information on pseudopotentials is given [below](#pseudopotentials).
+    More information on pseudopotentials is given [here](doc/features.md#pseudopotentials).
 
 - The numerical orbital file
 
@@ -145,7 +146,11 @@ ABACUS provides a wide variety of functionalities, with explanation and examples
 [back to top](#readme-top)
 
 # Examples
-We also provide many examples in the directories examples/ and tests/
+We also provide many examples in the directories examples/ and tests/.
+
+Note that the examples there are intended as references, and the results are not converged with regard to basis set or k point sampling.
+
+In the directory tests/, each sub-directory contains a separate test example. An introduction of the examples in tests/ directory can be found [here](tests/README.md). In each subdirectory, you may also find a file named jd which contains a short job description, and for some cases you may also find a README file containing more details about the run. Also, reference output is provided in the file result.ref.
 
 [back to top](#readme-top)
 

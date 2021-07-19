@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [symmetry](#symmetry)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [symmetry](#symmetry) | [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale)
     - [Plane wave related variables](#plane-wave-related-variables)
     
         [ecutwfc](#ecutwfc) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
@@ -180,20 +180,47 @@ This part of variables are used to control general system parameters.
         - upf201 : the new UPF format
     - *Default* : upf
 
+    [back to top](#input-file)
+
 - out_alllog<a id="out-alllog"></a>
     - *Type*: Integer
     - *Description*: determines whether to write log from all ranks in an MPI run. If set to be 1, then each rank will write detained running information to a file named running_${calculation}\_(${rank}+1).log. If set to 0, log will only be written from rank 0 into a file named running_${calculation}.log.
     - *Default*: 0
+
+    [back to top](#input-file)
 
 - npool<a id="npool"></a>
     - *Type*: Integer
     - *Description*: devide all processors into npool groups, and k points will be distributed among each group. The value taken should be less than or equal to the number of k points as well as the number of MPI threads.
     - *Default*: 1
 
+    [back to top](#input-file)
+
 - symmetry<a id="symmetry"></a>
     - *Type*: Integer
     - *Description*: takes value 0 and 1, if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations.
     - *Default*: 0
+
+    [back to top](#input-file)
+
+- dos_edelta_ev<a id="dos-edelta-ev"></a>
+    - *Type*: Real
+    - *Description*: controls the step size in writing DOS (in eV).
+    - *Default*: 0.1
+
+    [back to top](#input-file)
+
+- dos_sigma<a id="dos-sigma"></a>
+    - *Type*: Real
+    - *Description*: controls the width of Gaussian factor when obtaining smeared DOS (in eV).
+    - *Default*: 0.07
+
+    [back to top](#input-file)
+
+- dos_scale<a id="dos-scale"></a>
+    - *Type*: Real
+    - *Description*: the energy range of dos output is given by (emax-emin)*(1+dos_scale), centered at (emax+emin)/2.
+    - *Default*: 0.01
 
     [back to top](#input-file)
 

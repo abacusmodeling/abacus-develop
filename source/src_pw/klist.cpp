@@ -1,7 +1,7 @@
 #include "global.h"
 #include "klist.h"
 #include "../src_parallel/parallel_global.h"
-#include "symmetry.h"
+#include "../module_symmetry/symmetry.h"
 
 K_Vectors::K_Vectors()
 {	

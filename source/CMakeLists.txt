@@ -1,5 +1,6 @@
 add_subdirectory(module_base)
 add_subdirectory(module_cell)
+add_subdirectory(module_symmetry)
 add_subdirectory(module_neighbor)
 add_subdirectory(module_orbital)
 add_subdirectory(module_md)
