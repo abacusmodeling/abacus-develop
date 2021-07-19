@@ -2464,13 +2464,13 @@ void Input::Check(void)
 		out_stru = 0;
         
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
-		if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
+		/*if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
 		{
 			if (ethr>1.0e-3)
         	{
         	    WARNING_QUIT("Input::Check","nscf : ethr > 1.0e-3, ethr too large.");
         	}
-		}
+		}*/
 		if(force) // mohan add 2010-09-07
 		{
 			force = false;
