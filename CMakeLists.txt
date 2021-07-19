@@ -113,6 +113,7 @@ target_link_libraries(${ABACUS_BIN_NAME}
     base
     cell
     md
+    symmetry
     neighbor
     orb
     io
