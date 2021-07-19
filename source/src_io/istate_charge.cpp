@@ -188,15 +188,23 @@ void IState_Charge::idmatrix(const int &ib)
 			std::vector<double> wg_local(ParaO.ncol,0.0);
 			const int ib_local = ParaO.trace_loc_col[ib];
 
+			int fermi_band=0;
+			fermi_band = static_cast<int>( (CHR.nelec+1)/2 + 1.0e-8 ) ;
+
 			if(ib_local>=0)
 			{
-				wg_local[ib_local] = wf.wg(is,ib);
+				if(ib<fermi_band)
+				{
+					wg_local[ib_local] = wf.wg(is,ib);
+				}
+				else
+				{
+					wg_local[ib_local] = wf.wg(is,fermi_band-1);
+				}//unoccupied bands, use occupation of homo
 			}
-			ofs_running << "ib, ib_local : " << ib << ' ' << ib_local << endl;
 		
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
 			matrix wg_wfc(LOC.wfc_dm_2d.wfc_gamma[is]);
-			ofs_running << wg_wfc << endl;
 	
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
