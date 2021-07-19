@@ -130,12 +130,15 @@ void IState_Charge::begin(void)
    			UHM.GG.cal_rho(LOC.DM);
 			CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			stringstream ss;
+			stringstream ss1;
 			ss << global_out_dir << "BAND" << ib + 1 << "_CHG";
+			ss1 << global_out_dir << "BAND" << ib + 1 << "_CHG.cube";
 			// 0 means definitely output charge density.
 			for(int is=0; is<NSPIN; is++)
 			{
 				bool for_plot = true;
 				CHR.write_rho(CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
+				CHR.write_rho_cube(CHR.rho_save[is], is, ss1.str(), 3);
 			}
 		}
 	}
