@@ -9,10 +9,10 @@
     - [Macros](#macros)
     - [Comment style for documentation](#comment-style-for-documentation)
 
-[back to main page](../README.md)
+    [back to main page](../README.md)
 
 ## Raising issues on GitHub
-Raise issues on GitHub is a convernient way to notify the develper team about bugs and feature requests of the ABACUS code. We provide a few templates for issues.
+Raising issues on GitHub is a convernient way to notify the develper team about bugs and feature requests of the ABACUS code. We provide a few templates for issues.
 
 [back to top](#for-developers)
 

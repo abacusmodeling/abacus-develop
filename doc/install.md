@@ -7,7 +7,7 @@
   - [Building the program](#building-the-program)
   - [Build and install ABACUS with CMake](#build-and-install-abacus-with-cmake)
 
-  [back to main page](#../install.md)  
+  [back to main page](../README.md)  
 
 # Structure of the package
 Under the ABACUS directory, there are the following subdirectories:
