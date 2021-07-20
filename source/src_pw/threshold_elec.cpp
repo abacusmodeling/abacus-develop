@@ -21,7 +21,7 @@ void Threshold_Elec::set_ethr(void) const
     //===================
     if (CALCULATION=="nscf")
     {
-        if (ETHR == 0.0)
+        if (abs(ETHR - 1.0e-2 < 1.0e-10))
         {
             ETHR = 0.1 * std::min(1.0e-2, DRHO2 / CHR.nelec);
         }
@@ -31,7 +31,7 @@ void Threshold_Elec::set_ethr(void) const
     //=================
     else if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="scf-sto")//qianrui 2021-2-20
     {
-        if (ETHR == 0.0)
+        if (abs(ETHR - 1.0e-2 < 1.0e-10))
         {
             if (pot.start_pot == "file")
             {

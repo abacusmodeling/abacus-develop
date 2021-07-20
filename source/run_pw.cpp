@@ -44,7 +44,7 @@ void Run_pw::plane_wave_line(void)
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
-        symm.analy_sys();
+        symm.analy_sys(ucell, out);
         DONE(ofs_running, "SYMMETRY");
     }
 
@@ -151,9 +151,7 @@ void Run_pw::plane_wave_line(void)
 	}
 
 	// compute density of states
-//#ifdef __LCAO
 	en.perform_dos_pw();
-//#endif
 
 	timer::tick("Run_pw","plane_wave_line");
     return;

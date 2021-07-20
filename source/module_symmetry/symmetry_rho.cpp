@@ -1,5 +1,5 @@
 #include "symmetry_rho.h"
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 
 Symmetry_rho::Symmetry_rho()
 {
@@ -11,14 +11,14 @@ Symmetry_rho::~Symmetry_rho()
 
 }
 
-void Symmetry_rho::begin(const int &spin_now) const
+void Symmetry_rho::begin(const int &spin_now, const Charge_Broyden &CHR, const PW_Basis &pw, Parallel_Grid &Pgrid, Symmetry &symm) const
 {
 	assert(spin_now < 4);//added by zhengdy-soc
 
 	if(!Symmetry::symm_flag) return;
 #ifdef __MPI
 	// parallel version
-	psymm(CHR.rho[spin_now]);
+	psymm(CHR.rho[spin_now], pw, Pgrid, symm);
 #else
 	// series version.
 	symm.rho_symmetry(CHR.rho[spin_now], pw.ncx, pw.ncy, pw.ncz);
@@ -26,14 +26,14 @@ void Symmetry_rho::begin(const int &spin_now) const
 	return;
 }
 
-void Symmetry_rho::psymm(double* rho_part) const
+void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pgrid, Symmetry &symm) const
 {
 #ifdef __MPI
 	// (1) reduce all rho from the first pool.
 	double* rhotot = new double[pw.ncxyz];
 	ZEROS(rhotot, pw.ncxyz);
 	Pgrid.reduce_to_fullrho(rhotot, rho_part);
-	
+
 	// (2)
 	if(RANK_IN_POOL==0)
 	{
@@ -56,7 +56,7 @@ void Symmetry_rho::psymm(double* rho_part) const
 		}
 		*/
 	}
-	
+
 	// (3)
 	const int ncxy = pw.ncx * pw.ncy;
 	double* zpiece = new double[ncxy];
@@ -78,7 +78,7 @@ void Symmetry_rho::psymm(double* rho_part) const
 		}
 		Pgrid.zpiece_to_all(zpiece,iz, rho_part);
 	}
-						
+
 	delete[] rhotot;
 	delete[] zpiece;
 #endif

@@ -112,7 +112,9 @@ add_executable(${ABACUS_BIN_NAME}
 target_link_libraries(${ABACUS_BIN_NAME}
     base
     cell
+    symmetry
     md
+    symmetry
     neighbor
     orb
     io
