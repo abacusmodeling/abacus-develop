@@ -1,8 +1,8 @@
 #ifndef CONV_COULOMB_POT_UNITTEST_H
 #define CONV_COULOMB_POT_UNITTEST_H
 
-#include "src_lcao/conv_coulomb_pot.h"
-#include "src_external/src_test/test_function.h"
+#include "../../../src_ri/conv_coulomb_pot.h"
+#include "../test_function.h"
 
 static void test_ccp()
 {

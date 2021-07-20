@@ -14,27 +14,16 @@ FAtom::FAtom()
 	d_x = 0.0;	
 	d_y = 0.0;	
 	d_z = 0.0;	
-	this->as = NULL;
+	as = nullptr;
 	type = 0;		
 	natom = 0;
-	allocate = false;
 }
 
-FAtom::~FAtom(){ 
-//	if(this->as!=NULL)
-//	{
-//		delete this->as; 
-//		cout << "\n destroy Adjacent!";
-//		count2++;
-//		cout << "\n count2 = " << count2;
-//	}
-	if(allocate) 
-	{
-		delete this->as;
-	}
+FAtom::~FAtom()
+{
 }
 
 void FAtom::delete_vector(void)
 {
-	as->delete_vector();
+	if (as) { as->delete_vector(); }
 }

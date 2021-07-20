@@ -410,7 +410,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 {
     TITLE("LCAO_gen_fixedH","build_Nonlocal_mu");
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu",'G');
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
 
 	// < phi1 | beta > < beta | phi2 >
 	// phi1 is within the unitcell.
@@ -664,7 +664,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 
 //	cout << " build_Nonlocal_mu done" << endl;
 
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu",'G');
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_mu");
 	return;
 }
 
@@ -672,7 +672,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liuyu 2021-04-07
 {
     TITLE("LCAO_gen_fixedH","build_Nonlocal_beta");
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta",'G');
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
 
 	matrix Rcut(ucell.ntype, ucell.ntype);
 	for(int it1=0; it1<ucell.ntype; ++it1)
@@ -829,7 +829,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
         }// end I0
     }// end T0
 
-    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta",'G');
+    timer::tick ("LCAO_gen_fixedH","build_Nonlocal_beta");
     return;
 }
 

@@ -15,11 +15,12 @@ FFT::FFT()
 	this->nxx = 0;
 	this->scale_xyz = 1;
 	this->FFTWsetupwasdone = 0;//mohan modify 2007-11-12
+	this->aux4plan = new complex<double>[1];
 
 #ifdef __MPI
 	this->plane = new int[1];
 	this->aux = new complex<double>[1];
-	this->aux4plan = new complex<double>[1];
+	
 	
 	this->sentc = new int[1];
 	this->sdis = new int[1];
@@ -33,7 +34,7 @@ FFT::FFT()
 
 FFT::~FFT()
 {
-#if defined __MPI
+#ifdef __MPI
 	delete[] plane;
 	delete[] aux;
 	delete[] aux4plan;
@@ -64,7 +65,7 @@ void FFT::FFT3D(complex<double> *psi,const int sign)
 	cout << endl;
 	*/
 
-	timer::tick("FFT","FFT3D",'X');
+	timer::tick("FFT","FFT3D");
 
 #ifdef __MPI
 	P3DFFT(psi,sign);
@@ -73,7 +74,7 @@ void FFT::FFT3D(complex<double> *psi,const int sign)
 	SFFT3D(psi,sign);
 #endif
 
-	timer::tick("FFT","FFT3D",'X');
+	timer::tick("FFT","FFT3D");
 
 	/*
 	cout << "\n\n after FFTW:  \n ";

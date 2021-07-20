@@ -1,8 +1,8 @@
 #include <cassert>
 #include <iomanip>
 #include "ylm.h"
-#include "../module_base/constants.h"
-#include "../module_base/timer.h"
+#include "constants.h"
+#include "timer.h"
 
 using namespace std;
 int Ylm::nlm = 0;

@@ -1,7 +1,7 @@
 #ifndef EXX_ABFS_INVERSE_MATRIX_DOUBLE_TEST_H
 #define EXX_ABFS_INVERSE_MATRIX_DOUBLE_TEST_H
 
-#include "src_lcao/exx_abfs-inverse_matrix_double.h"
+#include "../../../src_ri/exx_abfs-inverse_matrix_double.h"
 
 matrix init_matrix();
 

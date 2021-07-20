@@ -6,3 +6,6 @@ OUT.*
 log.txt
 result.out
 .DS_Store
+.cache
+.vscode
+html

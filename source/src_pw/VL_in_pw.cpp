@@ -1,6 +1,6 @@
 #include "global.h"
 #include "tools.h"
-#include "../src_pw/myfunc.h"
+#include "myfunc.h"
 #include "VL_in_pw.h"
 #include "../module_base/math_integral.h"
 
@@ -23,7 +23,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 
 	// This routine computes the fourier coefficient of the local
 	// potential vloc(ig,it) for each type of atom
-	timer::tick("ppcell_vl","init_vloc",'C');
+	timer::tick("ppcell_vl","init_vloc");
 
 	double *vloc1d = new double[nggm];
 	ZEROS(vloc1d, nggm);
@@ -62,7 +62,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 
 	this->print_vloc();
 
-	timer::tick("ppcell_vl","init_vloc",'C');
+	timer::tick("ppcell_vl","init_vloc");
 	return;
 }
 

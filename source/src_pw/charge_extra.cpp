@@ -1,5 +1,5 @@
 #include "charge_extra.h"
-#include "../src_pw/tools.h"
+#include "tools.h"
 #include "global.h"
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"
@@ -58,6 +58,7 @@ Charge_Extra::~Charge_Extra()
 			}
 			delete[] rho_ion[i];
 		}	
+		delete[] rho_ion;
 	}
 
 	for(int is=0; is<NSPIN; is++)

@@ -5,7 +5,7 @@
 
 #include "tools.h"
 #include "pw_basis.h"
-#include "../src_pw/pw_complement.h"
+#include "pw_complement.h"
 #include <omp.h>
 
 PW_Basis::PW_Basis()
@@ -125,7 +125,7 @@ void PW_Basis::set
 void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vectors &Klist_in)
 {
     TITLE("PW_Basis","gen_pw");
-    timer::tick("PW_Basis","gen_pw",'B');
+    timer::tick("PW_Basis","gen_pw");
 
 
 	ofs_running << "\n\n\n\n";
@@ -359,7 +359,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
     this->setup_structure_factor();
 
 //	this->printPW("src_check/check_pw.txt");
-    timer::tick("PW_Basis","gen_pw",'B');
+    timer::tick("PW_Basis","gen_pw");
     return;
 }
 
@@ -1033,7 +1033,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 void PW_Basis::update_gvectors(ofstream &runlog, const UnitCell &Ucell_in)
 {
     TITLE("PW_Basis","update_gvectors");
-    timer::tick("PW_Basis","update_gvectors",'B');
+    timer::tick("PW_Basis","update_gvectors");
 
 #ifdef __MPI
     bool cutgg_flag = true;
@@ -1098,7 +1098,7 @@ void PW_Basis::update_gvectors(ofstream &runlog, const UnitCell &Ucell_in)
 
     this->setup_structure_factor();
 
-    timer::tick("PW_Basis","update_gvectors",'B');
+    timer::tick("PW_Basis","update_gvectors");
 
 
     return;

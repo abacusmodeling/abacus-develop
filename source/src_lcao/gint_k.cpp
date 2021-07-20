@@ -575,7 +575,7 @@ void Gint_k::folding_stress(
 void Gint_k::folding_vl_k(const int &ik)
 {
 	TITLE("Gint_k","folding_vl_k");
-	timer::tick("Gint_k","folding_vl_k",'G');
+	timer::tick("Gint_k","folding_vl_k");
 
 	if(!pvpR_alloc_flag)
 	{
@@ -766,7 +766,7 @@ void Gint_k::folding_vl_k(const int &ik)
 	*/
 
 	// Distribution of data.
-	timer::tick("Gint_k","Distri",'G');
+	timer::tick("Gint_k","Distri");
 	complex<double>* tmp;
 	for (int i=0; i<NLOCAL; i++)
 	{
@@ -821,9 +821,9 @@ void Gint_k::folding_vl_k(const int &ik)
 		delete[] pvp[i];
 	}
 	delete[] pvp;
-	timer::tick("Gint_k","Distri",'G');
+	timer::tick("Gint_k","Distri");
 
-	timer::tick("Gint_k","folding_vl_k",'G');
+	timer::tick("Gint_k","folding_vl_k");
 	return;
 }
 
@@ -833,7 +833,7 @@ void Gint_k::folding_vl_k(const int &ik)
 void Gint_k::folding_vl_k_nc(const int &ik)
 {
 	TITLE("Gint_k","folding_vl_k_nc");
-	timer::tick("Gint_k","folding_vl_k_nc",'G');
+	timer::tick("Gint_k","folding_vl_k_nc");
 
 	if(!pvpR_alloc_flag)
 	{
@@ -1024,7 +1024,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	*/
 
 	// Distribution of data.
-	timer::tick("Gint_k","Distri",'G');
+	timer::tick("Gint_k","Distri");
 	complex<double>* tmp;
 	for (int i=0; i<NLOCAL; i++)
 	{
@@ -1138,9 +1138,9 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		}
 		delete[] this->pvp_nc[spin];
 	}
-	timer::tick("Gint_k","Distri",'G');
+	timer::tick("Gint_k","Distri");
 
-	timer::tick("Gint_k","folding_vl_k_nc",'G');
+	timer::tick("Gint_k","folding_vl_k_nc");
 	return;
 }
 

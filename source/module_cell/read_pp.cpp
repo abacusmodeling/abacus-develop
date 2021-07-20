@@ -124,7 +124,7 @@ int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
 string& Pseudopot_upf::trim(string &in_str)
 {
     static const string deltri = " \t" ; // delete tab or space
-    string::size_type position = in_str.find_first_of(deltri, position);
+    string::size_type position = in_str.find_first_of(deltri, 0);
     if (position == string::npos)
 	{
         return in_str;

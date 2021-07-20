@@ -5,7 +5,7 @@
 //calculate the nonlocal pseudopotential stress in PW
 void Stress_Func::stress_nl(matrix& sigma){
 	TITLE("Stress_Func","stres_nl");
-	timer::tick("Stress_Func","stres_nl",'F');
+	timer::tick("Stress_Func","stres_nl");
 	
 	const int nkb = ppcell.nkb;
 	if(nkb == 0) return;
@@ -210,7 +210,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 	//do symmetry
 	if(Symmetry::symm_flag)
 	{
-		symm.stress_symmetry(sigma);
+		symm.stress_symmetry(sigma, ucell);
 	}//end symmetry
 	
 	//  this->print(ofs_running, "nonlocal stress", stresnl);

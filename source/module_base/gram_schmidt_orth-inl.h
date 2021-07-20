@@ -8,9 +8,9 @@
 
 #include "gram_schmidt_orth.h"
 
-#include "../module_base/mathzone.h"
-#include "../module_base/lapack_connector.h"
-#include "../module_base/math_integral.h" // mohan add 2021-04-03
+#include "mathzone.h"
+#include "lapack_connector.h"
+#include "math_integral.h" // mohan add 2021-04-03
 
 template<typename Func_Type, typename R_Type>
 Gram_Schmidt_Orth<Func_Type,R_Type>::Gram_Schmidt_Orth( const vector<R_Type> &rab_in, const Coordinate &coordinate_in )

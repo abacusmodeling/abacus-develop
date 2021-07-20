@@ -52,7 +52,7 @@ void Grid_Technique::set_pbc_grid(
 		const int &nbzp_in)
 {
 	TITLE("Grid_Technique","init");
-	timer::tick("Grid_Technique","init",'D');
+	timer::tick("Grid_Technique","init");
 
 	if(OUT_LEVEL != "m") 
 	{
@@ -89,7 +89,7 @@ void Grid_Technique::set_pbc_grid(
 
 	this->cal_trace_lo();
 
-	timer::tick("Grid_Technique","init",'D');
+	timer::tick("Grid_Technique","init");
 	return;
 }
 

@@ -223,7 +223,7 @@ void ORB_table_alpha::init_Table_Alpha(
 	Sph_Bessel_Recursive::D2 *pSB)
 {
 	TITLE("ORB_table_alpha", "init_Table_Alpha");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha", 'D');
+	timer::tick("ORB_table_alpha", "init_Table_Alpha");
 
 	assert(ntype > 0);
 
@@ -319,7 +319,7 @@ void ORB_table_alpha::init_Table_Alpha(
 	destroy_nr = true;
 
 	//	OUT(ofs_running,"allocate non-local potential matrix","Done");
-	timer::tick("ORB_table_alpha", "init_Table_Alpha", 'D');
+	timer::tick("ORB_table_alpha", "init_Table_Alpha");
 	return;
 }
 

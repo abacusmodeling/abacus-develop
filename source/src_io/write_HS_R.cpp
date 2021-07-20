@@ -1,13 +1,13 @@
-#include "src_lcao/LOOP_ions.h"
-#include "../src_io/cal_r_overlap_R.h"
+#include "../src_lcao/LOOP_ions.h"
+#include "cal_r_overlap_R.h"
 #include "../src_pw/global.h"
-#include "../src_io/write_HS.h"
+#include "write_HS.h"
 
 
 void LOOP_ions::output_HS_R(void)
 {
     TITLE("LOOP_ions","output_HS_R"); 
-    timer::tick("LOOP_ions","output_HS_R",'D'); 
+    timer::tick("LOOP_ions","output_HS_R"); 
 	
 	// add by jingan for out r_R matrix 2019.8.14
 	if(INPUT.out_r_matrix)
@@ -96,6 +96,6 @@ void LOOP_ions::output_HS_R(void)
         UHM.GK.destroy_pvpR();
     } //LiuXh 20181011
 
-    timer::tick("LOOP_ions","output_HS_R",'D'); 
+    timer::tick("LOOP_ions","output_HS_R"); 
     return;
 }

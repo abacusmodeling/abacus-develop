@@ -1,5 +1,6 @@
 #include "run_pw.h"
 #include "src_pw/global.h"
+#include "src_pw/energy.h"
 #include "input.h"
 #include "src_io/optical.h"
 #include "src_io/cal_test.h"
@@ -7,9 +8,8 @@
 #include "src_io/numerical_basis.h"
 #include "src_io/numerical_descriptor.h"
 #include "src_io/print_info.h"
-#include "src_pw/symmetry.h"
+#include "module_symmetry/symmetry.h"
 #include "src_ions/Cell_PW.h"
-#include "module_md/run_md_pw.h"
 
 Run_pw::Run_pw(){}
 Run_pw::~Run_pw(){}
@@ -17,7 +17,7 @@ Run_pw::~Run_pw(){}
 void Run_pw::plane_wave_line(void)
 {
     TITLE("Run_pw","plane_wave_line");
-	timer::tick("Run_pw","plane_wave_line",'B');
+	timer::tick("Run_pw","plane_wave_line");
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
@@ -44,7 +44,7 @@ void Run_pw::plane_wave_line(void)
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
-        symm.analy_sys();
+        symm.analy_sys(ucell, out);
         DONE(ofs_running, "SYMMETRY");
     }
 
@@ -93,17 +93,8 @@ void Run_pw::plane_wave_line(void)
     CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
     pot.allocate(pw.nrxx);
 
-    if(CALCULATION == "md")
-    {
-        Run_MD_PW rmdp;
-        rmdp.md_cells_pw();
-    }
-    else
-    {
-        Cell_PW cpws;
-        cpws.opt_cells_pw();
-    }
-
+    Cell_PW cpws;
+    cpws.opt_cells_pw();
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
@@ -160,10 +151,8 @@ void Run_pw::plane_wave_line(void)
 	}
 
 	// compute density of states
-#ifdef __LCAO
-	en.perform_dos();
-#endif
+	en.perform_dos_pw();
 
-	timer::tick("Run_pw","plane_wave_line",'B');
+	timer::tick("Run_pw","plane_wave_line");
     return;
 }

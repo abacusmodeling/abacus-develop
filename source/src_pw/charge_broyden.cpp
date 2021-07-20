@@ -1,5 +1,6 @@
 #include "charge_broyden.h"
 #include "global.h"
+#include "../module_base/global_variable.h"
 #include "../module_base/inverse_matrix.h"
 
 Charge_Broyden::Charge_Broyden() 
@@ -82,7 +83,7 @@ void Charge_Broyden::mix_rho
 )
 {
     TITLE("Charge_Broyden","mix_rho");
-    timer::tick("Charge","mix_rho",'E');
+	timer::tick("Charge", "mix_rho");
 
     for (int is=0; is<NSPIN; is++)
     {
@@ -212,7 +213,7 @@ void Charge_Broyden::mix_rho
 	}
 	delete[] rho123;
 
-    timer::tick("Charge","mix_rho",'E');
+    timer::tick("Charge","mix_rho");
     return;
 }
 

@@ -1,6 +1,6 @@
 #include "diago_david.h"
 #include "diago_cg.h"
-#include "../src_pw/global.h"
+#include "global.h"
 
 Diago_David::Diago_David()
 {
@@ -31,7 +31,7 @@ void Diago_David::diag
 )
 {
     if (test_david==1) TITLE("Diago_David","diag");
-    timer::tick("Diago_David", "diag", 'G');
+    timer::tick("Diago_David", "diag");
 
     assert( order > 1 );
     assert( order*nband < npw );
@@ -69,7 +69,7 @@ void Diago_David::diag
     ZEROS( convflag, nband );
     for ( int m = 0 ; m < nband; m++ ) unconv[m] = m;
 
-    timer::tick("Diago_David","first",'G');
+    timer::tick("Diago_David","first");
     // orthogonalise the initial trial psi(0~nband-1)
     for (int m = 0; m < nband; m++)
     {
@@ -104,7 +104,7 @@ void Diago_David::diag
 		en[m] = e[m];
 	}
 
-    timer::tick("Diago_David","first",'G');
+    timer::tick("Diago_David","first");
 
     int dav_iter = 0;
     do
@@ -119,7 +119,7 @@ void Diago_David::diag
         this->diag_zhegvx( nbase, nband, hc, sc, nbase_x, e, vc );
 
         // check convergence and update eigenvalues
-        timer::tick("Diago_David","check_update",'G');
+        timer::tick("Diago_David","check_update");
 
         notconv = 0;
         for ( int m = 0 ; m < nband; m++ )
@@ -135,7 +135,7 @@ void Diago_David::diag
             en[m] = e[m];
         }
 
-        timer::tick("Diago_David","check_update",'G');
+        timer::tick("Diago_David","check_update");
         /*
         		// test_david==2 cout info of each iteration
         		if( test_david==2 )
@@ -146,7 +146,7 @@ void Diago_David::diag
         */
         if ( !notconv || ( nbase + notconv > nbase_x) || (dav_iter == maxiter) )
         {
-            timer::tick("Diago_David","last",'G');
+            timer::tick("Diago_David","last");
 
             // updata eigenvectors of Hamiltonian
             psi.zero_out();
@@ -165,7 +165,7 @@ void Diago_David::diag
             {
                 // overall convergence or last iteration: exit the iteration
 
-                timer::tick("Diago_David","last",'G');
+                timer::tick("Diago_David","last");
                 break;
             }
             else
@@ -175,7 +175,7 @@ void Diago_David::diag
                 // estimate of the eigenvectors and set the basis dimension to N;
 
                 this->refresh( npw, nband, nbase, en, psi, basis, hp, sp, hc, sc, vc );
-                timer::tick("Diago_David","last",'G');
+                timer::tick("Diago_David","last");
             }
 
         }// end of if
@@ -202,7 +202,7 @@ void Diago_David::diag
     delete[] convflag;
     delete[] unconv;
 
-    timer::tick("Diago_David", "diag", 'G');
+    timer::tick("Diago_David", "diag");
     return;
 }
 
@@ -225,7 +225,8 @@ void Diago_David::cal_grad
 )
 {
     if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_grad");
-    timer::tick("Diago_David","cal_grad", 'G');
+    timer::tick("Diago_David", "cal_grad"
+    );
 
     // expand the reduced basis set with the new basis vectors P|R(psi)>...
     // in which psi are the last eigenvectors
@@ -263,7 +264,7 @@ void Diago_David::cal_grad
         }
     }
 
-    timer::tick("Diago_David","cal_grad",'G');
+    timer::tick("Diago_David","cal_grad");
     return;
 }
 
@@ -280,7 +281,7 @@ void Diago_David::cal_elem
 )
 {
     if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_elem");
-    timer::tick("Diago_David","cal_elem",'G');
+    timer::tick("Diago_David","cal_elem");
 
     // updat the reduced Hamiltonian
     int offset_h = nbase * hc.nr ;
@@ -315,7 +316,7 @@ void Diago_David::cal_elem
     	}
     */
     nbase += notconv;
-    timer::tick("Diago_David","cal_elem",'G');
+    timer::tick("Diago_David","cal_elem");
     return;
 }
 
@@ -344,7 +345,7 @@ void Diago_David::diag_zhegvx
 )
 {
 //	TITLE("DIAGO_DAVID","diag_zhegvx");
-    timer::tick("Diago_David","diag_zhegvx",'G');
+    timer::tick("Diago_David","diag_zhegvx");
     assert( ldh >= max(1,n) );
     int lwork ;
     int info = 0;
@@ -396,7 +397,7 @@ void Diago_David::diag_zhegvx
     delete[] rwork;
     delete[] iwork;
     delete[] ifail;
-    timer::tick("Diago_David","diag_zhegvx",'G');
+    timer::tick("Diago_David","diag_zhegvx");
     return;
 }
 
@@ -416,7 +417,7 @@ void Diago_David::refresh
 )
 {
     if ( test_david==1 ) TITLE("Diago_David","refresh");
-    timer::tick("Diago_David","refresh",'G');
+    timer::tick("Diago_David","refresh");
 
     // update hp,sp
     basis.zero_out();
@@ -459,7 +460,7 @@ void Diago_David::refresh
         vc(i,i) = ONE;
     }
 
-    timer::tick("Diago_David","refresh",'G');
+    timer::tick("Diago_David","refresh");
     return;
 }
 
@@ -475,7 +476,7 @@ void Diago_David::cal_err
     complex<double>* respsi
 )
 {
-    timer::tick("Diago_David","cal_err",'G');
+    timer::tick("Diago_David","cal_err");
     double *err = new double[nband];
     assert(err != 0);
 
@@ -502,7 +503,7 @@ void Diago_David::cal_err
     }
 
     delete[] err;
-    timer::tick("Diago_David","cal_err",'G');
+    timer::tick("Diago_David","cal_err");
     return;
 }
 
@@ -517,7 +518,7 @@ void Diago_David::SchmitOrth
 )
 {
 //	if(test_david == 1) TITLE("Diago_David","SchmitOrth");
-    timer::tick("Diago_David","SchmitOrth",'G');
+    timer::tick("Diago_David","SchmitOrth");
 
     // orthogonalize starting eigenfunction to those already calculated
     // psi_m orthogonalize to psi(0) ~ psi(m-1)
@@ -587,6 +588,6 @@ void Diago_David::SchmitOrth
     hm.hpw.s_1psi(npw, psi_m, spsi);
 
     delete[] lagrange;
-    timer::tick("Diago_David","SchmitOrth",'G');
+    timer::tick("Diago_David","SchmitOrth");
     return;
 }

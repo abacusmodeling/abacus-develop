@@ -1,4 +1,4 @@
-#include "src_lcao/local_orbital_charge.h"
+#include "../src_lcao/local_orbital_charge.h"
 #include "../src_pw/global.h"
 #include "../module_base/blas_connector.h"
 

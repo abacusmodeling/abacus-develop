@@ -1,8 +1,8 @@
 #include "math_ylmreal.h"
-#include "../module_base/timer.h"
-#include "../module_base/constants.h"
-#include "../module_base/tool_quit.h"
-#include "../module_base/realarray.h"
+#include "timer.h"
+#include "constants.h"
+#include "tool_quit.h"
+#include "realarray.h"
 #include <cassert>
 
 YlmReal::YlmReal(){}

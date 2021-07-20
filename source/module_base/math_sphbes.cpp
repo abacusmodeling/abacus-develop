@@ -1,6 +1,6 @@
 #include "math_sphbes.h"
-#include "../module_base/timer.h"
-#include "../module_base/constants.h"
+#include "timer.h"
+#include "constants.h"
 
 Sphbes::Sphbes(){}
 Sphbes::~Sphbes(){}

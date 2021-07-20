@@ -75,6 +75,8 @@ diago_cg.o\
 electrons.o \
 efield.o \
 energy.o \
+energy_dos_pw.o\
+dos.o\
 forces.o\
 global.o \
 hamilt_pw.o \
@@ -146,6 +148,8 @@ unk_overlap_pw.o \
 optical.o\
 cal_test.o\
 winput.o\
+energy_dos_pw.o\
+dos.o
 
 OBJS_CELL=unitcell.o\
 atom_spec.o\

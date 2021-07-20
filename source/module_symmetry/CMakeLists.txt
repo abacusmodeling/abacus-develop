@@ -1,5 +1,8 @@
 add_library(
-    base
+    symmetry
     OBJECT
-    xxx.cpp
+    symm_other.cpp
+    symmetry_basic.cpp
+    symmetry_rho.cpp
+    symmetry.cpp
 )

@@ -18,7 +18,7 @@ void ORB_gaunt_table::init_Gaunt(const int &lmax)
 /// EXPLAIN : make table of Gaunt Coefficients
 ////////////////////////////////////////
     TITLE("ORB_gaunt_table", "init_Gaunt");
-    timer::tick("ORB_gaunt_table", "init_Gaunt",'D');
+    timer::tick("ORB_gaunt_table", "init_Gaunt");
     
 	const int nlm = (lmax * 2 + 1) * (lmax * 2 + 1);
 	this->Gaunt_Coefficients.create(nlm, nlm, nlm);
@@ -53,7 +53,7 @@ void ORB_gaunt_table::init_Gaunt(const int &lmax)
         }// m
     }// L
 
-    timer::tick("ORB_gaunt_table", "init_Gaunt",'D');
+    timer::tick("ORB_gaunt_table", "init_Gaunt");
     return;
 }
 
@@ -199,7 +199,7 @@ int ORB_gaunt_table::index_func
 void ORB_gaunt_table::init_Gaunt_CH(const int& Lmax)
 {
 	TITLE("ORB_gaunt_table","init_Gaunt_CH");
-	timer::tick("ORB_gaunt_table","init_Gaunt_CH",'D');
+	timer::tick("ORB_gaunt_table","init_Gaunt_CH");
 
 //	assert(Lmax <= 6);			// Peize Lin delete 2016-08-26. why?
 
@@ -254,7 +254,7 @@ void ORB_gaunt_table::init_Gaunt_CH(const int& Lmax)
 		}// l2
 	} // l1
 
-	timer::tick("ORB_gaunt_table","init_Gaunt_CH",'D');
+	timer::tick("ORB_gaunt_table","init_Gaunt_CH");
 	return;
 }
 

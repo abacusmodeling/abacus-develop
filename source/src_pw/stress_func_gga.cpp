@@ -6,7 +6,7 @@
 //calculate the GGA stress correction in PW and LCAO
 void Stress_Func::stress_gga(matrix& sigma) 
 {
-	timer::tick("Stress_Func","stress_gga",'F');
+	timer::tick("Stress_Func","stress_gga");
      
 	if (xcf.igcx == 0  &&  xcf.igcc == 0)
 	{

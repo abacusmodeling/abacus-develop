@@ -15,7 +15,7 @@ class ELEC_scf: private Threshold_Elec
 
 	friend class LOOP_elec;
 	friend class LOOP_ions;
-	friend class Run_MD;
+	friend class Run_MD_LCAO;
 
 
 	public:

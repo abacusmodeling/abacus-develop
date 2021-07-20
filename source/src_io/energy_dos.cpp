@@ -1,11 +1,10 @@
-#include "../src_io/dos.h"
+#include "dos.h"
 #include "../src_pw/tools.h"
 #include "../src_pw/global.h"
 #include "../src_pw/energy.h"
-#include "../src_pw/global.h"
 #include "../src_pw/wavefunc.h"
 #ifdef __LCAO
-#include "../src_io/mulliken_charge.h"
+#include "mulliken_charge.h"
 #include "../src_lcao/LCAO_nnr.h"
 #include "../src_lcao/LCAO_gen_fixedH.h"    
 #include "../src_lcao/local_orbital_charge.h"
@@ -23,7 +22,6 @@
 #include<mpi.h>
 #endif
 #include <sys/time.h>
-
 
 void energy::perform_dos(void)
 {
@@ -46,14 +44,14 @@ void energy::perform_dos(void)
     }
 
 
-	if(MY_RANK==0)
+/*	if(MY_RANK==0)
 	{
 		if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
 		{
 			stringstream ss;
 			ss << global_out_dir << "istate.info" ;
 			ofstream ofsi( ss.str().c_str() );
-			/*for(int ib=0; ib<NBANDS; ++ib)
+			*for(int ib=0; ib<NBANDS; ++ib)
 			{
 				ofsi << "0 " << ib+1;
 				for(int is=0; is<NSPIN; ++is)
@@ -61,7 +59,7 @@ void energy::perform_dos(void)
 					ofsi << " " << wf.ekb[is][ib];
 					}
 					ofsi << endl;
-					}*/
+					}
 			// pengfei 2015-4-1
 			if(NSPIN == 1||NSPIN == 4)
 			{ 
@@ -106,7 +104,7 @@ void energy::perform_dos(void)
 			ofsi.close();
 		}
 	}
-
+*/
 
 	//qianrui modify 2020-10-18
 	if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
@@ -200,7 +198,6 @@ void energy::perform_dos(void)
 			}
 		}
 
-
 #ifdef __MPI
 		Parallel_Reduce::gather_max_double_all(emax);
 		Parallel_Reduce::gather_min_double_all(emin);
@@ -209,9 +206,14 @@ void energy::perform_dos(void)
 		emax *= Ry_to_eV;
 		emin *= Ry_to_eV;
 
+//scale up a little bit so the end peaks are displaced better
+		double delta=(emax-emin)*dos_scale;
+		cout << dos_scale;
+		emax=emax+delta/2.0;
+		emin=emin-delta/2.0;
 
-		//		OUT(ofs_running,"minimal energy is (eV)", emin);
-		//		OUT(ofs_running,"maximal energy is (eV)", emax);
+			//	OUT(ofs_running,"minimal energy is (eV)", emin);
+			//	OUT(ofs_running,"maximal energy is (eV)", emax);
 		//  output the PDOS file.////qifeng-2019-01-21
 		// 		atom_arrange::set_sr_NL();
 		//		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21

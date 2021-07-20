@@ -1,7 +1,7 @@
 #include "tools.h"
 #include "global.h"
 #include "electrons.h"
-#include "symmetry_rho.h"
+#include "../module_symmetry/symmetry_rho.h"
 #include "../src_io/wf_io.h"
 #include "../src_io/chi0_hilbert.h"
 #include "../src_io/chi0_standard.h"
@@ -29,7 +29,7 @@ Electrons::~Electrons()
 void Electrons::non_self_consistent(const int &istep)
 {
     TITLE("Electrons","non_self_consistent");
-    timer::tick("Electrons","non_self_consistent",'D');
+    timer::tick("Electrons","non_self_consistent");
 
     //========================================
     // diagonalization of the KS hamiltonian
@@ -81,7 +81,7 @@ void Electrons::non_self_consistent(const int &istep)
         bp.Macroscopic_polarization();
     }
 
-    timer::tick("Electrons","non_self_consistent",'D');
+    timer::tick("Electrons","non_self_consistent");
     return;
 }
 
@@ -89,7 +89,7 @@ void Electrons::non_self_consistent(const int &istep)
 #include "occupy.h"
 void Electrons::self_consistent(const int &istep)
 {
-    timer::tick("Electrons","self_consistent",'D');
+    timer::tick("Electrons","self_consistent");
 
 	// mohan update 2021-02-25
 	H_Ewald_pw::compute_ewald(ucell,pw); 
@@ -127,7 +127,7 @@ void Electrons::self_consistent(const int &istep)
     Symmetry_rho srho;
     for(int is=0; is<NSPIN; is++)
     {
-        srho.begin(is);
+        srho.begin(is, CHR, pw, Pgrid, symm);
     }
 
     // conv_elec is a member of Threshold_Elec
@@ -233,7 +233,7 @@ void Electrons::self_consistent(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<NSPIN; is++)
 		{
-			srho.begin(is);
+			srho.begin(is, CHR, pw, Pgrid, symm);
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
@@ -420,7 +420,7 @@ void Electrons::self_consistent(const int &istep)
                 ofs_running << " convergence has NOT been achieved!" << endl;			
             }
             iter_end(ofs_running);
-            timer::tick("Electrons","self_consistent",'D');
+            timer::tick("Electrons","self_consistent");
             return;
         }
 
@@ -428,7 +428,7 @@ void Electrons::self_consistent(const int &istep)
         //ofs_running << "\n start next iterate for idum ";
     } //END DO
 
-    timer::tick("Electrons","self_consistent",'D');
+    timer::tick("Electrons","self_consistent");
     return;
 } // end Electrons
 
@@ -449,7 +449,8 @@ bool Electrons::check_stop_now(void)
 void Electrons::c_bands(const int &istep)
 {
     if (test_elec) TITLE("Electrons","c_bands");
-    timer::tick("Electrons","c_bands",'E');
+    timer::tick("Electrons", "c_bands"
+    );
 
     int precondition_type = 2;
 
@@ -529,7 +530,7 @@ void Electrons::c_bands(const int &istep)
         avg_iter /= static_cast<double>(kv.nkstot);
     }
     delete [] h_diag;
-    timer::tick("electrons","c_bands",'E');
+    timer::tick("electrons","c_bands");
     return;
 } // END SUBROUTINE c_bands_k
 
