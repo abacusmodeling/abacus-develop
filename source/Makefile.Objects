@@ -245,6 +245,7 @@ read_cell_pseudopots.o\
 read_dm.o\
 write_pot.o\
 write_rho.o\
+write_rho_cube.o\
 write_rho_dipole.o\
 write_HS.o\
 write_HS_R.o\
