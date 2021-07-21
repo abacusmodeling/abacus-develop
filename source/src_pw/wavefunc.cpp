@@ -22,7 +22,7 @@ wavefunc::~wavefunc()
 		// may be in diagH_LAPACK.
 		// I don't know why.......
 		// mohan 2010-08-08
-		//for(int ik=0; ik<kv.nks-1; ik++) delete[] ekb[ik];
+		//for(int ik=0; ik<GlobalC::kv.nks-1; ik++) delete[] ekb[ik];
 		//delete[] ekb;
 	}
 }
@@ -357,7 +357,7 @@ void wavefunc::wfcinit_k(void)
 		return;
 	}
 
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		if (GlobalV::BASIS_TYPE=="pw")
 		{
@@ -427,8 +427,8 @@ void wavefunc::wfcinit_k(void)
 		
 		complex<double> ***wanf2_q;    // <j,0 | k+G+q>
 		
-		wanf2_q = new complex<double> **[kv.nks];
-		for(int ik=0; ik<kv.nks; ik++)
+		wanf2_q = new complex<double> **[GlobalC::kv.nks];
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			wanf2_q[ik] = new complex<double> *[GlobalV::NLOCAL];
 			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
@@ -513,12 +513,12 @@ void wavefunc::wfcinit_k(void)
 				qg.y = chi0_hilbert.qcar[iq][1] + chi0_hilbert.all_gcar[g].y; 
 				qg.z = chi0_hilbert.qcar[iq][2] + chi0_hilbert.all_gcar[g].z;
 				cout <<"qg = "<<qg.x<<" "<<qg.y<<" "<<qg.z<<endl;
-				for(int ik=0; ik<kv.nks; ik++)
+				for(int ik=0; ik<GlobalC::kv.nks; ik++)
 				{
 					this->LCAO_in_pw_k_q(ik, Mat, qg);
 					for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 					{
-						for(int ig=0; ig<kv.ngk[ik]; ig++)
+						for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 						{
 							wanf2_q[ik][iw][ig] = Mat(iw,ig);
 						}										
@@ -528,9 +528,9 @@ void wavefunc::wfcinit_k(void)
 				{
 					for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)  // loop over iw2
 					{
-						for(int ik=0;ik<kv.nks;ik++)         // loop over ik
+						for(int ik=0;ik<GlobalC::kv.nks;ik++)         // loop over ik
 						{
-							for(int ig=0;ig<kv.ngk[ik];ig++)    // loop over ig
+							for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)    // loop over ig
 							{
 								gkqg = pw.get_GPlusK_cartesian(ik, wf.igk(ik, ig)) + qg;
 								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
@@ -538,7 +538,7 @@ void wavefunc::wfcinit_k(void)
 									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
 									phase = complex<double>( cos(arg),  -sin(arg) );
 									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) 
-									* wanf2_q[ik][iw2][ig] * phase/static_cast<double>(kv.nks);		
+									* wanf2_q[ik][iw2][ig] * phase/static_cast<double>(GlobalC::kv.nks);		
 									// Peize Lin add static_cast 2018-07-14
 								}
 							}
@@ -624,7 +624,7 @@ void wavefunc::wfcinit_k(void)
 		}
 		delete[] Rmax;
 		
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{

@@ -63,7 +63,7 @@ void Hamilt_PW::init_k(const int ik)
 	// (1) Which spin to use.
 	if(GlobalV::NSPIN==2)
 	{
-		GlobalV::CURRENT_SPIN = kv.isk[ik];
+		GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 	}
 
 	// (2) Kinetic energy.
@@ -83,7 +83,7 @@ void Hamilt_PW::init_k(const int ik)
 	}
 
 	// (5) The number of wave functions.
-	wf.npw = kv.ngk[ik];
+	wf.npw = GlobalC::kv.ngk[ik];
 
 	// (6) The index of plane waves.
     for (int ig = 0;ig < wf.npw;ig++)
@@ -119,7 +119,7 @@ void Hamilt_PW::diagH_subspace(
 
 	int dmin=0;
 	int dmax=0;
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 
 	if(GlobalV::NSPIN != 4)
 	{
@@ -211,7 +211,7 @@ void Hamilt_PW::diagH_subspace(
 // for tests
 /*
 		cout << setprecision(3);
-		out.printV3(GlobalV::ofs_running,kv.kvec_c[ik]);
+		out.printV3(GlobalV::ofs_running,GlobalC::kv.kvec_c[ik]);
 		out.printcm_norm("sc",sc,1.0e-4);
 		out.printcm_norm("hvec",hvec,1.0e-4);
 		out.printcm_norm("hc",hc,1.0e-4);

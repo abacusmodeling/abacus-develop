@@ -16,10 +16,10 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 	TITLE("ELEC_cbands_gamma","cal_bands");
 	timer::tick("ELEC_cband_gamma","cal_bands");
 
-	assert(GlobalV::NSPIN == kv.nks);
+	assert(GlobalV::NSPIN == GlobalC::kv.nks);
 						
 	// pool parallization in future -- mohan note 2021-02-09
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	
 		//-----------------------------------------
 		//(1) prepare data for this k point.
@@ -27,9 +27,9 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//-----------------------------------------
 		if(GlobalV::NSPIN==2) 
 		{
-			GlobalV::CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
-		wf.npw = kv.ngk[ik];
+		wf.npw = GlobalC::kv.ngk[ik];
 
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
@@ -54,7 +54,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		{
 			dftu.cal_eff_pot_mat(ik, istep);
 
-			const int spin = kv.isk[ik];
+			const int spin = GlobalC::kv.isk[ik];
 			for(int irc=0; irc<ParaO.nloc; irc++)
 			{
 				LM.Hloc[irc] += dftu.pot_eff_gamma.at(spin).at(irc);

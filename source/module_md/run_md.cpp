@@ -65,7 +65,7 @@ void Run_md::ai_md_line(void)
     }
 
     // Setup the k points according to symmetry.
-    kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
+    GlobalC::kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
@@ -102,7 +102,7 @@ void Run_md::ai_md_line(void)
 #endif
 
     // Initalize the plane wave basis set
-    pw.gen_pw(GlobalV::ofs_running, ucell, kv);
+    pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
     cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;

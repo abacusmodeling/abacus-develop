@@ -147,7 +147,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		return;
 	}
 
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	int ig, ia, nb, ih;
 	matrix vkb1(nhm, npw);
 	double *vq = new double[npw];
@@ -441,7 +441,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 		return;
 	}
 	
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	int ig, ia, nb, ih, lu, mu;
 
 	double *vq = new double[npw];

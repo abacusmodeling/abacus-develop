@@ -5,7 +5,7 @@ void Cell_PW::opt_cells_pw()
 {
     TITLE("Cell_PW", "opt_cells_pw");
     timer::tick("Cell_PW", "opt_cells_pw");
-    wf.allocate(kv.nks);
+    wf.allocate(GlobalC::kv.nks);
 
     UFFT.allocate();
 
@@ -59,7 +59,7 @@ void Cell_PW::opt_cells_pw()
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        exx_lip.init(&kv, &wf, &pw, &UFFT, &ucell);
+        exx_lip.init(&GlobalC::kv, &wf, &pw, &UFFT, &ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;

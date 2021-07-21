@@ -122,7 +122,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			hm.hpw.init_k(0); //only GAMMA
 			//In fact, hm.hpw.init_k has been done in wf.wfcinit();
 		}
-		kv.wk[0] = 2;// GAMMA temporary
+		GlobalC::kv.wk[0] = 2;// GAMMA temporary
 		
         if (check_stop_now()) return;
         
@@ -391,7 +391,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 	GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
 
-	for (int ik = 0;ik < kv.nks;ik++)
+	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
 		hm.hpw.init_k(ik);
 
@@ -450,7 +450,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 		//		GlobalV::ofs_running << " avg_iteri " << avg_iter << endl;
 		//Parallel_Reduce::reduce_double_allpool(avg_iter); //mohan fix bug 2012-06-05
 		//		GlobalV::ofs_running << " avg_iter_after " << avg_iter << endl;
-		//avg_iter /= static_cast<double>(kv.nkstot);
+		//avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
 	}
 
 	delete [] h_diag;

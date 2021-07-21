@@ -24,7 +24,7 @@ static void os_wfc_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 	else
 	{
 		os<<"@@@"<<endl;
-		for(int ik=0; ik!=kv.nks; ++ik)
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
 			os<<"ik:\t"<<ik<<endl;
 			os<<wfc_dm_2d.dm_k[ik]<<endl;
@@ -46,7 +46,7 @@ static void os_dm_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 	else
 	{
 		os<<"@@@"<<endl;
-		for(int ik=0; ik!=kv.nks; ++ik)
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
 			os<<"ik:\t"<<ik<<endl;
 			os<<wfc_dm_2d.dm_k[ik]<<endl;

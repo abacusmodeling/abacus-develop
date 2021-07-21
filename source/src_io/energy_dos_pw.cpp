@@ -42,7 +42,7 @@ void energy::perform_dos_pw(void)
 				ofstream ofsi2( ss.str().c_str(), ios::app );
 				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 				{
-					for (int ik = 0;ik < kv.nks;ik++)
+					for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 					{
 						ofsi2<<"BAND"
 						<<setw(25)<<"Energy(ev)"
@@ -52,7 +52,7 @@ void energy::perform_dos_pw(void)
 #else
 						<<setw(25)<<"Kpoint = "<<ik+1
 #endif
-						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<wf.wg(ik,ib)<<endl;
@@ -63,7 +63,7 @@ void energy::perform_dos_pw(void)
 				}
 				else
 				{
-					for (int ik = 0;ik < kv.nks/2;ik++)
+					for (int ik = 0;ik < GlobalC::kv.nks/2;ik++)
 					{
 						ofsi2<<"BAND"
 						<<setw(25)<<"Spin up Energy(ev)"
@@ -75,15 +75,15 @@ void energy::perform_dos_pw(void)
 #else
 						<<setw(25)<<"Kpoint = "<<ik+1
 #endif
-						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1
 							<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV
 							<<setw(25)<<wf.wg(ik,ib)
-							<<setw(25)<<wf.ekb[(ik+kv.nks/2)][ib]* Ry_to_eV
-							<<setw(25)<<wf.wg(ik+kv.nks/2,ib)<<endl;
+							<<setw(25)<<wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<setw(25)<<wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
 						}
 						ofsi2 <<endl;
 						ofsi2 <<endl;
@@ -106,7 +106,7 @@ void energy::perform_dos_pw(void)
 //find energy range
 		double emax = wf.ekb[0][0];
 		double emin = wf.ekb[0][0];
-		for(int ik=0; ik<kv.nks; ++ik)
+		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
@@ -150,12 +150,12 @@ void energy::perform_dos_pw(void)
 
 			 Dos::calculate_dos(
 					 is,
-					 kv.isk,
+					 GlobalC::kv.isk,
 					 ss.str(), 
 					 this->dos_edelta_ev, 
 					 emax, 
 					 emin, 
-					 kv.nks, kv.nkstot, kv.wk, wf.wg, GlobalV::NBANDS, wf.ekb );
+					 GlobalC::kv.nks, GlobalC::kv.nkstot, GlobalC::kv.wk, wf.wg, GlobalV::NBANDS, wf.ekb );
 			 ifstream in(ss.str().c_str());
 			 if(!in)
 			 {

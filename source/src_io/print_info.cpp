@@ -85,12 +85,12 @@ void Print_Info::setup_parameters(void)
 			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				// zi
-				//printf( "\e[35m%-16d\e[0m", kv.nkstot);
-				printf( "[35m%-16d[0m", kv.nkstot);
+				//printf( "\e[35m%-16d\e[0m", GlobalC::kv.nkstot);
+				printf( "[35m%-16d[0m", GlobalC::kv.nkstot);
 			}
 			else
 			{
-				cout << setw(16) << kv.nkstot;
+				cout << setw(16) << GlobalC::kv.nkstot;
 			}
 		}
 

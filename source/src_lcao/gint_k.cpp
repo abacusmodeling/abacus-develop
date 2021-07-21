@@ -629,7 +629,7 @@ void Gint_k::folding_vl_k(const int &ik)
 				dR.y = GridT.ucell_index2y[m] - R1y;
 				dR.z = GridT.ucell_index2z[m] - R1z;
 
-				arg = (kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 				phase = complex<double>(cos(arg), sin(arg));
 				for(int i=0; i<GridT.lgd; i++)
 				{
@@ -702,7 +702,7 @@ void Gint_k::folding_vl_k(const int &ik)
 								dR.z = GridD.getBox(ad).z;
 
 								// calculate the phase factor exp(ikR).
-								const double arg = (kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 								complex<double> phase = complex<double>(cos(arg), sin(arg));
 								int ixxx = DM_start + LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
@@ -877,7 +877,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 				dR.y = GridT.ucell_index2y[m] - R1y;
 				dR.z = GridT.ucell_index2z[m] - R1z;
 
-				arg = (kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 				phase = complex<double>(cos(arg), sin(arg));
 				for(int i=0; i<GridT.lgd; i++)
 				{
@@ -950,7 +950,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 								dR.z = GridD.getBox(ad).z;
 
 								// calculate the phase factor exp(ikR).
-								const double arg = (kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
+								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 								complex<double> phase = complex<double>(cos(arg), sin(arg));
 								int ixxx = DM_start + LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)

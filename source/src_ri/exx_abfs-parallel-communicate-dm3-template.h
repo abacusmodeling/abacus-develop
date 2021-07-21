@@ -11,7 +11,7 @@ const matrix &Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 matrix Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 	const ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return (DK * exp( -TWO_PI*IMAG_UNIT * (kv.kvec_c[ik] * (box2*ucell.latvec)) )).real();
+	return (DK * exp( -TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*ucell.latvec)) )).real();
 }
 
 
@@ -30,14 +30,14 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<Tmatrix> &DK_2D, const
 	
 	const map<int,int> nspin_2D = {{1,1}, {2,2}, {4,1}};
 	const map<int,double> SPIN_multiple = {{1,0.5}, {2,1}, {4,1}};							// ???
-	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{kv.nmp[0],kv.nmp[1],kv.nmp[2]};
+	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 	const vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	for(const Abfs::Vector3_Order<int> &box2 : supercell_boxes)
 	{
 		vector<matrix> DR_2D( nspin_2D.at(GlobalV::NSPIN),
 			{DK_2D[0].nr, DK_2D[0].nc} );
 		for(int ik=0; ik!=DK_2D.size(); ++ik)
-			DR_2D[kv.isk[ik]] += D_phase( DK_2D[ik], ik, box2);
+			DR_2D[GlobalC::kv.isk[ik]] += D_phase( DK_2D[ik], ik, box2);
 		
 		// C++: 0 1
 		//      2 3

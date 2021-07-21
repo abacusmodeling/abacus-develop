@@ -700,10 +700,10 @@ void Charge::sum_band_k(void)
 	complex<double>* porter1 = nullptr;
 	if(GlobalV::NSPIN==4) porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
 
-	for (int ik = 0;ik < kv.nks;ik++)
+	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
 		//cout << "\n ik=" << ik;
-		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = kv.isk[ik];
+		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		
 		//  here we compute the band energy: the sum of the eigenvalues
 		if(GlobalV::NSPIN==4)
@@ -712,7 +712,7 @@ void Charge::sum_band_k(void)
 			{
 				en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
 				ZEROS( porter, pw.nrxx );
-				for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
  				{
 					porter[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
 				}
@@ -720,7 +720,7 @@ void Charge::sum_band_k(void)
 				if(GlobalV::NPOL ==2)
 				{
 					ZEROS( porter1, pw.nrxx );
-					for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
 						porter1[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig + wf.npwx);
 					}
@@ -768,7 +768,7 @@ void Charge::sum_band_k(void)
 			//cout << "\n ekb = " << wf.ekb[ik][ibnd] << " wg = " << wf.wg(ik, ibnd);
 
 			ZEROS( porter, pw.nrxx );
-			for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+			for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 			{
 				porter[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
 			}

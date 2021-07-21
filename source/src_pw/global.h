@@ -29,9 +29,13 @@
 //==========================================================
 // EXPLAIN : define "GLOBAL CLASS"
 //==========================================================
+namespace GlobalC
+{
+extern K_Vectors kv;
+}
 extern Use_FFT UFFT;
 extern FFT fftwan;
-extern K_Vectors kv;
+
 extern output out;
 
 extern PW_Basis pw;
