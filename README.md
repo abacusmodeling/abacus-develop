@@ -18,7 +18,6 @@ THE PROJECT STARTS FROM https://github.com/abacusmodeling/abacus-develop,
 WHERE MORE INFORMATION CAN BE FOUND.
 
 # Table of contents
-- [Table of contents](#table-of-contents)
 - [About ABACUS](#about-abacus)
 - [Download and install](#download-and-install)
 - [Quickstart guide](#quickstart-guide)
@@ -100,16 +99,16 @@ make sure these files are prepared and stored in the working directory.
 
 When the calculation finishes, the program will create an output directory (default: OUT.ABACUS/),
 into which the following output files will be generated:
-1. INPUT: contains all input parameters, user’s input and default.
-2. istate.info: information of energy eigenvalues.
-3. running_${calculation}.log: contains the running details. Information on the variable calculation is found in the [list of keywords](doc/input-main.md#calculation). For example, if we are doing a SCF calculation, the log files will be named running_scf.log.
-4. STRU_READIN_ADJUST.cif: structure file in the cif formatter.
-5. warning.log: errors and warning messages.
+1. `INPUT`: contains all input parameters, user’s input and default.
+2. `istate.info`: information of energy eigenvalues.
+3. `running_${calculation}.log`: contains the running details. Information on the variable calculation is found in the [list of keywords](doc/input-main.md#calculation). For example, if we are doing a SCF calculation, the log files will be named running_scf.log.
+4. `STRU_READIN_ADJUST.cif`: structure file in the cif formatter.
+5. `warning.log`: errors and warning messages.
 6. directories containing element information. For example, Si/:
-    - Si.NONLOCAL: non-local pseudopotential projectors.
-    - Si-P.ORBITAL: pseudo atomic orbitals, p orbital
-    - Si-S.ORBITAL: pseudo atomic orbitals, s orbital
-    - v_loc_g.dat: vlocal in G space
+    - `Si.NONLOCAL`: non-local pseudopotential projectors.
+    - `Si-P.ORBITAL`: pseudo atomic orbitals, p orbital
+    - `Si-S.ORBITAL`: pseudo atomic orbitals, s orbital
+    - `v_loc_g.dat`: vlocal in G space
 
 [back to top](#readme-top)
 
@@ -157,9 +156,13 @@ In the directory tests/, each sub-directory contains a separate test example. An
 # For developers
 
 We also provide some [information](doc/developers.md) for developers.
-- [Build and install ABACUS with CMake](doc/developers.md#build-and-install-abacus-with-cmake)
 - [Raising issues on GitHub](doc/developers.md#raising-issues-on-github)
 - [Modularization and module tests](doc/developers.md#modularization-and-module-tests)
 - [Contributing to ABACUS](doc/developers.md#contributing-to-abacus)
+    - [Making pull requests](doc/developers.md#making-pull-requests)
+    - [Providing uniy tests](doc/developers.md#providing-unit-tests)
+    - [Upating documentation](doc/developers.md#updating-documentation)
+    - [Macros](doc/developers.md#macros)
+    - [Comment style for documentation](doc/developers.md#comment-style-for-documentation)
 
 [back to top](#readme-top)

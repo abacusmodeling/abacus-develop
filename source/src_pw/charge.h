@@ -77,6 +77,9 @@ public:
     void write_rho(const double* rho_save, const int &is, const int &iter, const string &fn, 
 		const int &precision = 11, const bool for_plot = false);//mohan add 2007-10-17
 
+    void write_rho_cube(const double* rho_save, const int &is, const string &fn, 
+		const int &precision = 11);
+
     void write_rho_dipole(const double* rho_save, const int &is, const int &iter, const string &fn, 
 		const int &precision = 11, const bool for_plot = false);//fuxiang add 2017-3-15    
 
