@@ -132,10 +132,10 @@ void IState_Charge::begin(void)
 			stringstream ss;
 			stringstream ss1;
 			ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_CHG";
-			ss1 << GlobalV::global_out_dir << "BAND" << ib + 1 << "_CHG.cube";
 			// 0 means definitely output charge density.
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
+				ss1 << GlobalV::global_out_dir << "BAND" << ib + 1 << "_SPIN" << is << "_CHG.cube";
 				bool for_plot = true;
 				CHR.write_rho(CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
 				CHR.write_rho_cube(CHR.rho_save[is], is, ss1.str(), 3);
