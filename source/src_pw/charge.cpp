@@ -418,7 +418,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	vector<double> ne(spin_number_need);
     for (int is = 0; is < spin_number_need;is++)
     {
-        UFFT.ToRealSpace( is, rho_g3d, rho_in[is]);
+        GlobalC::UFFT.ToRealSpace( is, rho_g3d, rho_in[is]);
 
 		for(int ir=0; ir<pw.nrxx; ++ir)
 			ne[is] += rho_in[is][ir];
@@ -432,10 +432,10 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 		double sumrea = 0.0;
         for (int ir=0;ir < pw.nrxx; ir++)
         {
-            rea = UFFT.porter[ir].real();
+            rea = GlobalC::UFFT.porter[ir].real();
 			sumrea += rea;
             neg += std::min(0.0, rea);
-            ima += abs(UFFT.porter[ir].imag());
+            ima += abs(GlobalC::UFFT.porter[ir].imag());
         }
 
 		Parallel_Reduce::reduce_double_pool( neg );	
@@ -571,15 +571,15 @@ void Charge::set_rho_core(
 		this->rhog_core[ig] = vg[ig];
 	}
 
-    UFFT.ToRealSpace(vg, this->rho_core);
+    GlobalC::UFFT.ToRealSpace(vg, this->rho_core);
 
     // test on the charge and computation of the core energy
     double rhoima = 0.0;
     double rhoneg = 0.0;
     for (int ir = 0; ir < pw.nrxx; ir++)
     {
-        rhoneg += min(0.0, UFFT.porter[ir].real());
-        rhoima += abs(UFFT.porter[ir].imag());
+        rhoneg += min(0.0, GlobalC::UFFT.porter[ir].real());
+        rhoima += abs(GlobalC::UFFT.porter[ir].imag());
         // NOTE: Core charge is computed in reciprocal space and brought to real
         // space by FFT. For non smooth core charges (or insufficient cut-off)
         // this may result in negative values in some grid points.
@@ -696,14 +696,14 @@ void Charge::sum_band_k(void)
 	TITLE("Charge","sum_band_k");
 	en.eband = 0.0;
 
-	complex<double>* porter = UFFT.porter;
+	complex<double>* porter = GlobalC::UFFT.porter;
 	complex<double>* porter1 = nullptr;
 	if(GlobalV::NSPIN==4) porter1 = new complex<double>[pw.nrxx];//added by zhengdy-soc
 
-	for (int ik = 0;ik < kv.nks;ik++)
+	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
 		//cout << "\n ik=" << ik;
-		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = kv.isk[ik];
+		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		
 		//  here we compute the band energy: the sum of the eigenvalues
 		if(GlobalV::NSPIN==4)
@@ -712,15 +712,15 @@ void Charge::sum_band_k(void)
 			{
 				en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
 				ZEROS( porter, pw.nrxx );
-				for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
  				{
 					porter[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
 				}
-				pw.FFT_wfc.FFT3D(UFFT.porter, 1);
+				pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
 				if(GlobalV::NPOL ==2)
 				{
 					ZEROS( porter1, pw.nrxx );
-					for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
 						porter1[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig + wf.npwx);
 					}
@@ -768,11 +768,11 @@ void Charge::sum_band_k(void)
 			//cout << "\n ekb = " << wf.ekb[ik][ibnd] << " wg = " << wf.wg(ik, ibnd);
 
 			ZEROS( porter, pw.nrxx );
-			for (int ig = 0;ig < kv.ngk[ik] ; ig++)
+			for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 			{
 				porter[ pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
 			}
-			pw.FFT_wfc.FFT3D(UFFT.porter, 1);
+			pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
 
 			const double w1 = wf.wg(ik, ibnd) / ucell.omega;
 

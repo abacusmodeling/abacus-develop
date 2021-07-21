@@ -251,7 +251,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 {
 	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
 	complex<double> *aux = new complex<double>[npw];
@@ -448,7 +448,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 {
 	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
 	complex<double> *aux = new complex<double>[npw];

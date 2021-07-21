@@ -107,8 +107,8 @@ void Exx_Abfs::test_all() const
 
 	auto test_k = []()
 	{
-		for( size_t ik=0; ik!=kv.nks; ++ik )
-			cout<<kv.kvec_d[ik].x<<"\t"<<kv.kvec_d[ik].y<<"\t"<<kv.kvec_d[ik].z<<endl;
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
+			cout<<GlobalC::kv.kvec_d[ik].x<<"\t"<<GlobalC::kv.kvec_d[ik].y<<"\t"<<GlobalC::kv.kvec_d[ik].z<<endl;
 	};
 }
 
@@ -1039,17 +1039,17 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::cal_lca
 void cal_R_supercell()
 {
 	vector<Vector3_Exx> R_supercell;
-	for( size_t x=0; x!=kv.nmp[0]; ++x)
-		for( size_t y=0; y!=kv.nmp[1]; ++y )
-			for( size_t z=0; z!=kv.nmp[2]; ++z )
+	for( size_t x=0; x!=GlobalC::kv.nmp[0]; ++x)
+		for( size_t y=0; y!=GlobalC::kv.nmp[1]; ++y )
+			for( size_t z=0; z!=GlobalC::kv.nmp[2]; ++z )
 				R_supercell.push_back(Vector3_Exx(x,y,z));
 }
 */
 /*
 void density_matrix()
 {
-	vector<matrix> DM_k(kv.nks);
-	for( size_t ik=0; ik!=kv.nks; ++ik )
+	vector<matrix> DM_k(GlobalC::kv.nks);
+	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 		{
@@ -1066,13 +1066,13 @@ void density_matrix()
 	vector<size_t,vector<matrix>> DM_R( GlobalV::NSPIN, vector<matrix>(R_supercell.size()) );
 	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
-		const size_t k_start = (GlobalV::NSPIN==1) ? 0 : ((is==0) ? 0 : (kv.nks/2));
-		const size_t k_end = (GlobalV::NSPIN==1) ? kv.nks : ((is==0) ? (kv.nks/2) : kv.nks);
+		const size_t k_start = (GlobalV::NSPIN==1) ? 0 : ((is==0) ? 0 : (GlobalC::kv.nks/2));
+		const size_t k_end = (GlobalV::NSPIN==1) ? GlobalC::kv.nks : ((is==0) ? (GlobalC::kv.nks/2) : GlobalC::kv.nks);
 		for( size_it iR=0; iR!=R_supercell.size(); ++iR )
 		{
 			for( size_t ik=k_start; ik!=k_end; ++ik )
 			{
-				DM_R[is][iR] += exp(TWO_PI*IMAG_UNIT*dot(kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
+				DM_R[is][iR] += exp(TWO_PI*IMAG_UNIT*dot(GlobalC::kv.kvec_d[ik],R_supercell[iR])) * DM[ik];
 			}
 		}
 	}

@@ -102,7 +102,7 @@ void Threshold_Elec::iter_end(ofstream &ofs)
 void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 {
 	bool wrong = false;
-	for(int ik=0; ik<kv.nks; ++ik)
+	for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 	{
 		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 		{
@@ -128,30 +128,30 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 
     ofs << "\n STATE ENERGY(eV) AND OCCUPATIONS.";
 	ofs << setprecision(5);
-    for (int ik = 0;ik < kv.nks;ik++)
+    for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         if (GlobalV::NSPIN==2)
         {
-            if (kv.isk[ik] == 0)ofs << "\n spin up :";
-            if (kv.isk[ik] == 1)ofs << "\n spin down :";
+            if (GlobalC::kv.isk[ik] == 0)ofs << "\n spin up :";
+            if (GlobalC::kv.isk[ik] == 1)ofs << "\n spin down :";
         }
         
         if (GlobalV::NSPIN==2)
         {
-            if (kv.isk[ik] == 0)
+            if (GlobalC::kv.isk[ik] == 0)
             {
-                ofs << " " << ik+1 << "/" << kv.nks/2 << " kpoint (Cartesian) = "
-                << kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z
-                << " (" << kv.ngk[ik] << " pws)" << endl;
+                ofs << " " << ik+1 << "/" << GlobalC::kv.nks/2 << " kpoint (Cartesian) = "
+                << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z
+                << " (" << GlobalC::kv.ngk[ik] << " pws)" << endl;
 
                 ofs << setprecision(6);
 
             }
-            if (kv.isk[ik] == 1)
+            if (GlobalC::kv.isk[ik] == 1)
             {
-                ofs << " " << ik+1-kv.nks/2 << "/" << kv.nks/2 << " kpoint (Cartesian) = "
-                << kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z
-                << " (" << kv.ngk[ik] << " pws)" << endl;
+                ofs << " " << ik+1-GlobalC::kv.nks/2 << "/" << GlobalC::kv.nks/2 << " kpoint (Cartesian) = "
+                << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z
+                << " (" << GlobalC::kv.ngk[ik] << " pws)" << endl;
 
                 ofs << setprecision(6);
 
@@ -159,9 +159,9 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		}       // Pengfei Li  added  14-9-9
 		else	
 		{
-			ofs << " " << ik+1 << "/" << kv.nks << " kpoint (Cartesian) = " 
-				<< kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z 
-				<< " (" << kv.ngk[ik] << " pws)" << endl; 
+			ofs << " " << ik+1 << "/" << GlobalC::kv.nks << " kpoint (Cartesian) = " 
+				<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z 
+				<< " (" << GlobalC::kv.ngk[ik] << " pws)" << endl; 
 
 			ofs << setprecision(6);
 		}
@@ -178,12 +178,12 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		//----------------------
 		else
 		{
-			//ofs << setw(12) << kv.ngk[ik] << " PWs ";
+			//ofs << setw(12) << GlobalC::kv.ngk[ik] << " PWs ";
 			GlobalV::ofs_running << setprecision(6);
 			GlobalV::ofs_running << setiosflags(ios::showpoint);
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
-				ofs << " [spin" << kv.isk[ik]+1 << "_state] " << setw(8) << ib+1 
+				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << setw(8) << ib+1 
 				<< setw(15) << wf.ekb[ik][ib] * Ry_to_eV << setw(15) << wf.wg(ik, ib) << endl;
 			}
 			ofs << endl;

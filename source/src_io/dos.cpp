@@ -187,7 +187,7 @@ bool Dos::calculate_dos
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs << npoints << endl;
-		ofs << kv.nkstot << endl;
+		ofs << GlobalC::kv.nkstot << endl;
 	}
 
 	GlobalV::ofs_running << "\n OUTPUT DOS FILE IN: " << fa << endl;
@@ -209,7 +209,7 @@ bool Dos::calculate_dos
 		e_new += de_ev;
 		for(int ik=0;ik<nks;ik++)
 		{
-			if(is == kv.isk[ik])
+			if(is == GlobalC::kv.isk[ik])
 			{
 				for(int ib = 0; ib < nbands; ib++)
 				{
@@ -267,7 +267,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 		ofs.close();	
 	}
 
-	for(int ik=0; ik<kv.nkstot; ik++)
+	for(int ik=0; ik<GlobalC::kv.nkstot; ik++)
 	{
 		if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
 		{
@@ -300,7 +300,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 
 				const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
 				ofs << "ik= " << ik << endl;
-				ofs << kv.kvec_c[ik_now].x << " " << kv.kvec_c[ik_now].y << " " << kv.kvec_c[ik_now].z << endl;  
+				ofs << GlobalC::kv.kvec_c[ik_now].x << " " << GlobalC::kv.kvec_c[ik_now].y << " " << GlobalC::kv.kvec_c[ik_now].z << endl;  
 
 				for(int ib = 0; ib < nband; ib++)
 				{
@@ -309,7 +309,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 				ofs << endl;
 
 				// the last k point
-				if(ik==kv.nkstot-1)
+				if(ik==GlobalC::kv.nkstot-1)
 				{
 					ofs << " END_BANDGRID_3D" << endl;
 					ofs << " END_BLOCK_BANDGRID_3D" << endl;
@@ -352,7 +352,7 @@ void Dos::nscf_band(
 		if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
 		{
 			const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
-			if( kv.isk[ik_now+is*nks] == is )
+			if( GlobalC::kv.isk[ik_now+is*nks] == is )
 			{ 
 				if ( GlobalV::RANK_IN_POOL == 0)
 				{
@@ -400,7 +400,7 @@ void Dos::nscf_band(
 	ofstream ofs(out_band_dir.c_str());
 	for(int ik=0;ik<nks;ik++)
 	{
-		if( kv.isk[ik] == is)
+		if( GlobalC::kv.isk[ik] == is)
 		{
 			ofs<<setw(12)<<ik;
 			for(int ibnd = 0; ibnd < nband; ibnd++)

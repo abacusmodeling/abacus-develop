@@ -211,12 +211,12 @@ void ELEC_scf::scf(const int &istep)
 		// somewhere else
 		if(ELEC_evolve::tddft == 1 && iter == 2)
 		{
-			this->WFC_init = new complex<double>**[kv.nks];
-			for(int ik=0; ik<kv.nks; ik++)
+			this->WFC_init = new complex<double>**[GlobalC::kv.nks];
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				this->WFC_init[ik] = new complex<double>*[GlobalV::NBANDS];
 			}
-			for(int ik=0; ik<kv.nks; ik++)
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				for(int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
@@ -225,7 +225,7 @@ void ELEC_scf::scf(const int &istep)
 			}
 			if(istep>=1)
 			{
-				for (int ik=0; ik<kv.nks; ik++)
+				for (int ik=0; ik<GlobalC::kv.nks; ik++)
 				{
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
@@ -238,7 +238,7 @@ void ELEC_scf::scf(const int &istep)
 			}
 			else
 			{
-				for (int ik=0; ik<kv.nks; ik++)
+				for (int ik=0; ik<GlobalC::kv.nks; ik++)
 				{
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
@@ -323,7 +323,7 @@ void ELEC_scf::scf(const int &istep)
 
 		if (GlobalV::ocp == 1)
 		{
-			for (int ik=0; ik<kv.nks; ik++)
+			for (int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
@@ -333,7 +333,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 
-		for(int ik=0; ik<kv.nks; ++ik)
+		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
 			en.print_band(ik);
 		}

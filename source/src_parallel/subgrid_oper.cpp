@@ -248,7 +248,7 @@ void SubGrid_oper::dis_subwfc()
 	//------------------------------------------
 	// bcast the eigenvalues
 	//------------------------------------------
-	for(int ik=0; ik<kv.nks; ++ik)
+	for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 	{
 		MPI_Bcast(wf.ekb[ik], GlobalV::NBANDS, MPI_DOUBLE, 0, GRID_WORLD);
 	}	

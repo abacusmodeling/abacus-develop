@@ -97,7 +97,7 @@ cout_t("sum_all",t_sum_all);
 	auto print_Hexxk = [&]()
 	{
 		static int istep=1;
-		for(int ik=0; ik!=kv.nks; ++ik)
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
 			ofstream ofs("Hexxk_"+TO_STRING(istep++)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int i=0; i!=GlobalV::NLOCAL; ++i)
@@ -566,7 +566,7 @@ void Exx_Lip::exx_energy_cal()
 			}
 		}
 	}
-	MPI_Allreduce( &exx_energy_tmp, &exx_energy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);				// !!! k_point parallel incompleted. different pools have different kv.nks => deadlock
+	MPI_Allreduce( &exx_energy_tmp, &exx_energy, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);				// !!! k_point parallel incompleted. different pools have different GlobalC::kv.nks => deadlock
 	exx_energy *= (GlobalV::NSPIN==1) ? 2 : 1;
 	exx_energy /= 2;										// ETOT = E_band - 1/2 E_exx
 

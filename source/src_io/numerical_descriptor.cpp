@@ -35,7 +35,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 	this->lmax = lmax_in;
 	assert(lmax>=0);
 
-    const int nks = kv.nks;
+    const int nks = GlobalC::kv.nks;
     int ne = 0; 
 	
     // 0 stands for : 'Faln' is not used.
@@ -81,7 +81,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
     // nks now is the reduced k-points.
     for (int ik=0; ik<nks; ik++)
     {
-        const int npw= kv.ngk[ik];
+        const int npw= GlobalC::kv.ngk[ik];
 		GlobalV::ofs_running << " --------------------------------------------------------" << endl;
 		GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint";
         GlobalV::ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";

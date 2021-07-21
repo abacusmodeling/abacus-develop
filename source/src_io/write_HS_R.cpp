@@ -37,11 +37,11 @@ void LOOP_ions::output_HS_R(void)
     else if(GlobalV::NSPIN==2)
     {
         // UHM.calculate_STN_R();
-        // for(int ik=0; ik<kv.nks; ik++)
+        // for(int ik=0; ik<GlobalC::kv.nks; ik++)
         // {
-        //     if(ik==0 || ik==kv.nks/2)
+        //     if(ik==0 || ik==GlobalC::kv.nks/2)
         //     {
-        //         if(GlobalV::NSPIN==2)GlobalV::CURRENT_SPIN = kv.isk[ik];
+        //         if(GlobalV::NSPIN==2)GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
         //         for(int ir=0; ir<pw.nrxx; ir++)
         //         {
         //             pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
@@ -62,13 +62,13 @@ void LOOP_ions::output_HS_R(void)
         // }
 
         // jingan add 2021-6-4
-        for(int ik = 0; ik < kv.nks; ik++)
+        for(int ik = 0; ik < GlobalC::kv.nks; ik++)
         {
-            if(ik == 0 || ik == kv.nks/2)
+            if(ik == 0 || ik == GlobalC::kv.nks/2)
             {
                 if(GlobalV::NSPIN == 2)
                 {
-                    GlobalV::CURRENT_SPIN = kv.isk[ik];
+                    GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
                 }
 
                 for(int ir = 0; ir < pw.nrxx; ir++)

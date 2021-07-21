@@ -147,7 +147,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		return;
 	}
 
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	int ig, ia, nb, ih;
 	matrix vkb1(nhm, npw);
 	double *vq = new double[npw];
@@ -441,7 +441,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 		return;
 	}
 	
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	int ig, ia, nb, ih, lu, mu;
 
 	double *vq = new double[npw];
@@ -628,7 +628,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 
 void pseudopot_cell_vnl::print_vnl(ofstream &ofs)
 {
-	out.printr3_d(ofs, " tab : ", tab);
+	GlobalC::out.printr3_d(ofs, " tab : ", tab);
 }
 
 

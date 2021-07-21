@@ -87,7 +87,7 @@ void Hamilt::diagH_pw(
 
 				if(GlobalV::NPOL==1) 
 				{
-						cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik], wf.npwx,
+						cg.diag(wf.evc[ik0], wf.ekb[ik], GlobalC::kv.ngk[ik], wf.npwx,
 						GlobalV::NBANDS, precondition, GlobalV::ETHR,
 						GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 				}
@@ -108,7 +108,7 @@ void Hamilt::diagH_pw(
 				Diago_David david;
 				if(GlobalV::NPOL==1) 
 				{
-					david.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik],
+					david.diag(wf.evc[ik0], wf.ekb[ik], GlobalC::kv.ngk[ik],
 						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
 				 		GlobalV::ETHR, GlobalV::DIAGO_CG_MAXITER, notconv, avg);
 				}

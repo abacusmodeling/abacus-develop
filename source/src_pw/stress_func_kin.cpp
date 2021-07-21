@@ -17,9 +17,9 @@ void Stress_Func::stress_kin(matrix& sigma)
 	}
 		
 	int npwx=0;
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		if(npwx<kv.ngk[ik])npwx=kv.ngk[ik];
+		if(npwx<GlobalC::kv.ngk[ik])npwx=GlobalC::kv.ngk[ik];
 	}
 		
 	kfac=new double[npwx];
@@ -32,9 +32,9 @@ void Stress_Func::stress_kin(matrix& sigma)
 	}
 	double factor=TWO_PI/ucell.lat0;
 
-	for(int ik=0;ik<kv.nks;ik++)
+	for(int ik=0;ik<GlobalC::kv.nks;ik++)
 	{
-		npw = kv.ngk[ik];
+		npw = GlobalC::kv.ngk[ik];
 		for(int i=0;i<npw;i++)
 		{
 			gk[0][i] = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 0) * factor;

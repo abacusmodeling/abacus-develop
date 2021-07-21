@@ -219,9 +219,9 @@ void Run_MD_PW::md_cells_pw()
     TITLE("Run_MD_PW", "md_cells_pw");
     timer::tick("Run_MD_PW", "md_cells_pw");
 
-    wf.allocate(kv.nks);
+    wf.allocate(GlobalC::kv.nks);
 
-    UFFT.allocate();
+    GlobalC::UFFT.allocate();
 
     //=======================
     // init pseudopotential
@@ -273,7 +273,7 @@ void Run_MD_PW::md_cells_pw()
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        exx_lip.init(&kv, &wf, &pw, &UFFT, &ucell);
+        exx_lip.init(&GlobalC::kv, &wf, &pw, &GlobalC::UFFT, &ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;

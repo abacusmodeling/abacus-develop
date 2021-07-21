@@ -62,7 +62,7 @@ template<>
 ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ComplexMatrix>(
 	matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (kv.kvec_c[ik] * (box2*ucell.latvec)) );
+	return ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*ucell.latvec)) );
 }
 
 template<typename Tmatrix>
@@ -77,8 +77,8 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 	else
 		HK_m2D.create( ParaO.nrow, ParaO.ncol );
 
-	const int is_begin = (GlobalV::NSPIN==4) ? 0 : kv.isk[ik];
-	const int is_end = (GlobalV::NSPIN==4) ? 4 : kv.isk[ik]+1;
+	const int is_begin = (GlobalV::NSPIN==4) ? 0 : GlobalC::kv.isk[ik];
+	const int is_end = (GlobalV::NSPIN==4) ? 4 : GlobalC::kv.isk[ik]+1;
 	for(int is=is_begin; is!=is_end; ++is)
 	{
 		for(auto & HR_a2D_A : HR_a2D[is])
@@ -139,9 +139,9 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing");
 
-	HK_m2D.resize(kv.nks);
-	HK_m2D_pulay_seq.resize(kv.nks);
-	for( int ik=0; ik!=kv.nks; ++ik )
+	HK_m2D.resize(GlobalC::kv.nks);
+	HK_m2D_pulay_seq.resize(GlobalC::kv.nks);
+	for( int ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 //gettimeofday( &t_start, NULL);
 //			const map<size_t,map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[ik]);

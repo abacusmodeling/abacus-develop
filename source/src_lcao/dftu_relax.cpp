@@ -233,9 +233,9 @@ void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
 		dm_VU_dSm.at(dim).resize(ParaO.nloc, zero);
 	}
 	
-	for(int ik=0; ik<kv.nks; ik++)	
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)	
 	{
-		const int spin = kv.isk[ik];
+		const int spin = GlobalC::kv.isk[ik];
 
 		for(int dim=0; dim<3; dim++)
 		{
@@ -339,9 +339,9 @@ void DFTU_RELAX::cal_stress_k(const vector<vector<complex<double>>>& VU)
 		{
 			vector<complex<double>> dm_VU_sover(ParaO.nloc, zero);
 
-			for(int ik=0; ik<kv.nks; ik++)
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
-				const int spin = kv.isk[ik];
+				const int spin = GlobalC::kv.isk[ik];
 				
 				// The first term
 				vector<complex<double>> stress_tmp(ParaO.nloc);
@@ -457,9 +457,9 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 	//Calculate mat_tmp=dm*VU
 	vector<double> mat_tmp(ParaO.nloc, 0.0);
 	
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		const int spin = kv.isk[ik];
+		const int spin = GlobalC::kv.isk[ik];
 
 		for(int dim=0; dim<3; dim++)
 		{
@@ -618,9 +618,9 @@ void DFTU_RELAX::cal_stress_gamma(const vector<vector<double>> &VU)
 		{
 			vector<double> dm_VU_sover(ParaO.nloc, 0.0);
 
-			for(int ik=0; ik<kv.nks; ik++)
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
-				const int spin = kv.isk[ik];
+				const int spin = GlobalC::kv.isk[ik];
 				
 				// The first term
 				vector<double> stress_tmp(ParaO.nloc, 0.0);
@@ -731,7 +731,7 @@ void DFTU_RELAX::folding_dSm_soverlap()
 	}
 	else
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			for(int dim=0; dim<3; dim++)
 			{
@@ -741,7 +741,7 @@ void DFTU_RELAX::folding_dSm_soverlap()
 
 		if(GlobalV::STRESS)
 		{
-			for(int ik=0; ik<kv.nks; ik++)
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				for(int i=0; i<6; i++)
 				{
@@ -859,9 +859,9 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  			{
 				  				Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z); 
   
-				  				for(int ik=0; ik<kv.nks; ik++)
+				  				for(int ik=0; ik<GlobalC::kv.nks; ik++)
 				  				{
-				  					const double arg = ( kv.kvec_d[ik] * dR ) * TWO_PI;
+				  					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 				  					const complex<double> kphase( cos(arg),  sin(arg) );
 
 				  					this->dSm_k[ik][0][irc] += LM.DSloc_Rx[nnr]*kphase;
@@ -952,10 +952,10 @@ void DFTU_RELAX::allocate_force_stress()
 	}
 	else
 	{
-		dSm_k = new complex<double>** [kv.nks];
-		//this->dSm_k.resize(kv.nks);
+		dSm_k = new complex<double>** [GlobalC::kv.nks];
+		//this->dSm_k.resize(GlobalC::kv.nks);
 
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			//this->dSm_k.at(ik).resize(3);
 			dSm_k[ik] = new complex<double>* [3];
@@ -968,10 +968,10 @@ void DFTU_RELAX::allocate_force_stress()
 
 		if(GlobalV::STRESS)
 		{
-			//this->soverlap_k.resize(kv.nks);
-			soverlap_k = new complex<double>** [kv.nks];
+			//this->soverlap_k.resize(GlobalC::kv.nks);
+			soverlap_k = new complex<double>** [GlobalC::kv.nks];
 
-			for(int ik=0; ik<kv.nks; ik++)
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				//this->soverlap_k.at(ik).resize(6);   //xx, xy, xz, yy, yz, zz
 				soverlap_k[ik] = new complex<double>* [6];
@@ -1008,9 +1008,9 @@ void DFTU_RELAX::erase_force_stress()
 	}
 	else
 	{
-		//this->dSm_k.resize(kv.nks);
+		//this->dSm_k.resize(GlobalC::kv.nks);
 
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			//this->dSm_k.at(ik).resize(3);
 			for(int dim=0; dim<3; dim++)
@@ -1025,9 +1025,9 @@ void DFTU_RELAX::erase_force_stress()
 
 		if(GlobalV::STRESS)
 		{
-			//this->soverlap_k.resize(kv.nks);
+			//this->soverlap_k.resize(GlobalC::kv.nks);
 
-			for(int ik=0; ik<kv.nks; ik++)
+			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				//this->soverlap_k.at(ik).resize(6);   //xx, xy, xz, yy, yz, zz
 				for(int i=0; i<6; i++)

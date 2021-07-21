@@ -20,7 +20,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 	uhm.GK.allocate_pvpR();
 						
 	// pool parallization in future -- mohan note 2021-02-09
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	
 		//-----------------------------------------
 		//(1) prepare data for this k point.
@@ -28,9 +28,9 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//-----------------------------------------
 		if(GlobalV::NSPIN==2) 
 		{
-			GlobalV::CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
-		wf.npw = kv.ngk[ik];
+		wf.npw = GlobalC::kv.ngk[ik];
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
 			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
