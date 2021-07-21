@@ -1,7 +1,7 @@
 #include "ELEC_scf.h"
 #include "../src_pw/global.h"
 #include "../src_io/chi0_hilbert.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "dftu.h"
 #include "LCAO_evolve.h"
 #include "ELEC_cbands_k.h"

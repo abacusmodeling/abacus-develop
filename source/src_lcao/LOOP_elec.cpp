@@ -1,7 +1,7 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "input_update.h"
 #include "../src_io/chi0_hilbert.h"
 #include "LCAO_evolve.h"
