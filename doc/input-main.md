@@ -11,7 +11,11 @@
     - [Electronic structure and geometry relaxation](#electronic-structure-and-geometry-relaxation)
     
         [basis_type](#basis-type) | [ks_solver](#ks-solver) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [mulliken](#mulliken) | [out_alllog](#out-alllog) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method)
-
+    
+    - [Electric field](#electric-field)
+    
+        [efield](#efield) | [edir](#edir) | [emaxpos](#emaxpos) | [eopreg](#eopreg) | [eamp](#eamp)
+        
     - [DeePKS](#deepks)
 
         [out_descriptor](#out-descriptor) | [lmax_descriptor](#lmax-descriptor) | [deepks_scf](#deepks-scf) | [model_file](#model-file)
@@ -521,6 +525,44 @@ calculations.
     - *Type*: String
     - *Description*: The method to do geometry optimizations. If set to bfgs, using BFGS algorithm. If set to cg, using cg algorithm. If set to sd, using steepest-descent lgorithm.
     - *Default*: cg
+
+    [back to top](#input-file)
+
+### Electric field
+This part of variables are used to control the addition of an external electric field. It is achieved by adding a saw-like potential to the local ionic potential.
+
+- efield<a id="efield"></a>
+    - *Type*: Bool
+    - *Description*: Controls whether to add the external electric field. When set to 1, the electric field is turned on. When set to 0, there is no electric field.
+    - *Default*: 0.
+
+    [back to top](#input-file)
+
+- edir<a id="edir"></a>
+    - *Type*: Integer
+    - *Description*: Tells which reciprocal lattice vector the external electric field aligns with. Allowed values are 1,2, and 3, corresponding to the three reciprocal lattice vectors respectively.
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- emaxpos<a id="emaxpos"></a>
+    - *Type*: Real
+    - *Description*: Position of the maximum of the saw-like potential along the reciprocal lattice vector specified by edir, 0 < emaxpos < 1.
+    - *Default*: 0.5
+
+    [back to top](#input-file)
+
+- eopreg<a id="eopreg"></a>
+    - *Type*: Real
+    - *Description*: The saw-like potential increases in the region from `(emaxpos+eopreg-1)` to `(emaxpos)`, then decreases to 0 until (emaxpos+eopreg), in units of the crystal vector `edir`. Important: the change of slope of this potential must be located in the empty region, or else unphysical forces will result.
+    - *Default*: 0.1
+
+    [back to top](#input-file)
+
+- eamp<a id="eamp"></a>
+    - *Type*: Real
+    - *Description*: Amplitude of the electric field, in atomic unit: 1 a.u. = 51.4220632*10^10 V/m.
+    - *Default*: 0.001
 
     [back to top](#input-file)
 
