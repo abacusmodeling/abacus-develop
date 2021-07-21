@@ -251,7 +251,7 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double>
 	TITLE("wavefunc","LCAO_in_pw_k_q");
 	timer::tick("wavefunc","LCAO_in_pw_k_q");
 	//assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
-	assert(GlobalV::BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "GlobalV::BASIS_TYPE=="lcao""???
+	assert(GlobalV::BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
 
 	Wavefunc_in_pw::produce_local_basis_q_in_pw(ik, wvf, this->table_local, q);
 

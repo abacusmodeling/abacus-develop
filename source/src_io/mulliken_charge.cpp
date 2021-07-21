@@ -301,10 +301,10 @@ void Mulliken_Charge::stdout_mulliken(void)
 	{
 		TITLE("Dos","calculate_Mulliken");
 		ofstream fout;
-		const char * fn= "GlobalV::mulliken.txt";
+		const char * fn= "mulliken.txt";
 		fout.open(fn);
 		// ofstream fout;
-		// string wordqf="GlobalV::mulliken.txt";
+		// string wordqf="mulliken.txt";
 		// wordqf += char(GlobalV::MY_RANK + 48);
 		//  wordqf += ".txt";
 		//   fout.open(wordqf.c_str(),ios::app);     

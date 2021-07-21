@@ -229,7 +229,7 @@ void LOOP_elec::solver(const int &istep)
 	}
 	else
 	{
-		WARNING_QUIT("LOOP_elec::solver","GlobalV::CALCULATION type not supported");
+		WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
 	}
 
     timer::tick("LOOP_elec","solver"); 

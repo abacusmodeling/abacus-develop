@@ -101,7 +101,7 @@ void Cal_Test::test_memory(void)
 
 
 	//(3) Memory for H,S matrix.
-	cout << " GlobalV::NLOCAL = " << GlobalV::NLOCAL << endl;
+	cout << " NLOCAL = " << GlobalV::NLOCAL << endl;
 	cout << " NBANdS = " << GlobalV::NBANDS << endl;
 
 //	cout << " Memory for H,S matrix ( " 

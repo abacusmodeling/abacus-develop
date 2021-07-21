@@ -114,7 +114,7 @@ void Run_pw::plane_wave_line(void)
         if ( winput::out_spillage == 3)
         {
             GlobalV::BASIS_TYPE="pw"; 
-            cout << " GlobalV::NLOCAL = " << GlobalV::NLOCAL << endl;
+            cout << " NLOCAL = " << GlobalV::NLOCAL << endl;
 
             for (int ik=0; ik<kv.nks; ik++)
             {

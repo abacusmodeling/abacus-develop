@@ -89,7 +89,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 #ifdef __MPI
 			GlobalV::ofs_running << " no diagonalization." << endl;
 #else
-			cout << " GlobalV::DCOLOR=" << GlobalV::DCOLOR << endl;
+			cout << " DCOLOR=" << GlobalV::DCOLOR << endl;
 			WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
 #endif
 

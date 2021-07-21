@@ -380,7 +380,7 @@ void SubGrid_oper::dis_subwfc()
 	// Test
 	//-------------------
 	/*
-	GlobalV::ofs_running << " WFC " << " GlobalV::CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
+	GlobalV::ofs_running << " WFC " << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
 	for(int i=0; i<GlobalV::NBANDS; ++i)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; ++j)

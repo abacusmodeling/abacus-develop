@@ -16,7 +16,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	}
 
 	int nnrg = LNNR.nnrg;
- 	//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+ 	//xiaohui add "OUT_LEVEL", 2015-09-16
 	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
 	assert(nnrg>=0);
 

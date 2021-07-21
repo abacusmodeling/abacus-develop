@@ -153,7 +153,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	if(GlobalV::MY_RANK==0)
 	{
 		stringstream ss;
-		ss << GlobalV::global_out_dir << "GlobalV::EFIELD.dat";
+		ss << GlobalV::global_out_dir << "EFIELD.dat";
 		ofstream ofs(ss.str().c_str());
 		
 		int npoi;

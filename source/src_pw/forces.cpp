@@ -172,7 +172,7 @@ void Forces::init(matrix& force)
 		Forces::print("NLCC     FORCE (Ry/Bohr)", forcecc);
 		Forces::print("ION      FORCE (Ry/Bohr)", forceion);
 		Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
-		if(GlobalV::EFIELD) Forces::print("GlobalV::EFIELD   FORCE (Ry/Bohr)", force_e);
+		if(GlobalV::EFIELD) Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
 	}
 	
 /*
@@ -205,7 +205,7 @@ void Forces::init(matrix& force)
 		Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc,0);
 		Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
-		if(GlobalV::EFIELD) Forces::print("GlobalV::EFIELD   FORCE (eV/Angstrom)", force_e,0);
+		if(GlobalV::EFIELD) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
 	}
 	Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 

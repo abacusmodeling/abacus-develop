@@ -229,17 +229,17 @@ void Input::Print(const string &fn)const
 	{
 		ofs << setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << endl;
 	}
-	OUTP(ofs,"GlobalV::ocp",GlobalV::ocp,"change occupation or not");
-	OUTP(ofs,"GlobalV::ocp_set",GlobalV::ocp_set,"set occupation");
+	OUTP(ofs,"ocp",GlobalV::ocp,"change occupation or not");
+	OUTP(ofs,"ocp_set",GlobalV::ocp_set,"set occupation");
 	//OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
 	// for(int i=0; i<ocp_n; i++)
 	// {
-		// ofs << setw(20) <<"GlobalV::ocp_kb" << GlobalV::ocp_kb[i]<< endl;
+		// ofs << setw(20) <<"ocp_kb" << GlobalV::ocp_kb[i]<< endl;
 	// }
 	ofs << setw(20) <<"lcao_box"<<lcao_box[0]
 		<<"   "<<lcao_box[1]<<"   "
 		<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<endl;
-	OUTP(ofs," GlobalV::mulliken", GlobalV::mulliken," GlobalV::mulliken  charge or not");//qifeng add 2019/9/10
+	OUTP(ofs," mulliken", GlobalV::mulliken," mulliken  charge or not");//qifeng add 2019/9/10
 	
 	//OUTP(ofs,"epsilon0",epsilon0,"calculate the macroscopic dielectric constant or not");
 	OUTP(ofs,"intrasmear",intrasmear,"Eta");

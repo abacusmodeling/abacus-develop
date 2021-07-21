@@ -37,7 +37,7 @@ void Pdiag_Basic::set_parameters(void)
 		if(loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << endl;
-			WARNING_QUIT("Pdiag_Basic::set_parameters","GlobalV::NLOCAL < GlobalV::DSIZE");
+			WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
 		if (GlobalV::DRANK<GlobalV::NBANDS%GlobalV::DSIZE) loc_size=loc_size+1;
@@ -79,7 +79,7 @@ void Pdiag_Basic::set_parameters(void)
 		if(loc_size==0)
 		{
 			GlobalV::ofs_warning << " loc_size=0" << " in proc " << GlobalV::MY_RANK+1 << endl;
-			WARNING_QUIT("Pdiag_Basic::set_parameters","GlobalV::NLOCAL < GlobalV::DSIZE");
+			WARNING_QUIT("Pdiag_Basic::set_parameters","NLOCAL < GlobalV::DSIZE");
 		}
 
 		if (GlobalV::DRANK<GlobalV::NLOCAL%GlobalV::DSIZE) 

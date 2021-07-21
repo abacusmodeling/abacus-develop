@@ -28,12 +28,12 @@ void Parallel_Kpoints::init_pools(void)
 /*
     if (GlobalV::MY_RANK==0)
     {
-        cout << "\n     " << setw(8) << "GlobalV::MY_RANK"
-             << setw(8) << "GlobalV::MY_POOL"
-             << setw(13) << "GlobalV::RANK_IN_POOL"
-             << setw(6) << "GlobalV::NPROC"
-             << setw(6) << "GlobalV::NPOOL"
-             << setw(14) << "GlobalV::NPROC_IN_POOL" << endl;
+        cout << "\n     " << setw(8) << "MY_RANK"
+             << setw(8) << "MY_POOL"
+             << setw(13) << "RANK_IN_POOL"
+             << setw(6) << "NPROC"
+             << setw(6) << "NPOOL"
+             << setw(14) << "NPROC_IN_POOL" << endl;
     }
     for (int i=0; i<GlobalV::NPROC; i++)
     {
@@ -67,7 +67,7 @@ void Parallel_Kpoints::divide_pools(void)
     int j=0;
     if (GlobalV::NPROC<GlobalV::NPOOL)
     {
-        cout<<"\n GlobalV::NPROC=" << GlobalV::NPROC << " GlobalV::NPOOL=" << GlobalV::NPOOL;
+        cout<<"\n GlobalV::NPROC=" << GlobalV::NPROC << " NPOOL=" << GlobalV::NPOOL;
         cout<<"Error : Too many pools !"<<endl;
         exit(0);
     }

@@ -109,7 +109,7 @@ void Electrons::self_consistent(const int &istep)
             cout<<setw(10)<<"AMAG";
         }
 
-        cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "GlobalV::DRHO2"; // pengfei Li added 2015-1-31
+        cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
         //if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
         if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
         {

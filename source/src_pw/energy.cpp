@@ -125,7 +125,7 @@ void energy::print_etot(
 
 	GlobalV::ofs_running << "\n Density error is " << dr2 << endl;
 
-	if(GlobalV::OUT_LEVEL != "m") //xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
 	{
 		if(GlobalV::BASIS_TYPE=="pw")OUT(GlobalV::ofs_running,"Error Threshold",ethr); //xiaohui add 2013-09-02
 
@@ -168,7 +168,7 @@ void energy::print_etot(
 		{
 			this->print_format("E_Fermi",this->ef);
 		}
-	}//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+	}//xiaohui add "OUT_LEVEL", 2015-09-16
 
 	if (iter_in == 1)   // pengfei Li added 2015-1-31
 	{

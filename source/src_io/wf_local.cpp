@@ -127,13 +127,13 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
         else if (nbands!=GlobalV::NBANDS)
         {
             GlobalV::ofs_warning << " read in nbands=" << nbands;
-            GlobalV::ofs_warning << " GlobalV::NBANDS=" << GlobalV::NBANDS << endl;
+            GlobalV::ofs_warning << " NBANDS=" << GlobalV::NBANDS << endl;
             error = 2;
         }
         else if (nlocal != GlobalV::NLOCAL)
         {
             GlobalV::ofs_warning << " read in nlocal=" << nlocal;
-            GlobalV::ofs_warning << " GlobalV::NLOCAL=" << GlobalV::NLOCAL << endl;
+            GlobalV::ofs_warning << " NLOCAL=" << GlobalV::NLOCAL << endl;
             error = 3;
         }
 
@@ -276,13 +276,13 @@ int WF_Local::read_lowf(double **c, const int &is)
         if (nbands!=GlobalV::NBANDS)
         {
             GlobalV::ofs_warning << " read in nbands=" << nbands;
-            GlobalV::ofs_warning << " GlobalV::NBANDS=" << GlobalV::NBANDS << endl;
+            GlobalV::ofs_warning << " NBANDS=" << GlobalV::NBANDS << endl;
             error = 2;
         }
         else if (nlocal != GlobalV::NLOCAL)
         {
             GlobalV::ofs_warning << " read in nlocal=" << nlocal;
-            GlobalV::ofs_warning << " GlobalV::NLOCAL=" << GlobalV::NLOCAL << endl;
+            GlobalV::ofs_warning << " NLOCAL=" << GlobalV::NLOCAL << endl;
             error = 3;
         }
 

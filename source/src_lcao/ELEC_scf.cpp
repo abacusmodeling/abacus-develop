@@ -54,7 +54,7 @@ void ELEC_scf::scf(const int &istep)
 				printf( "[33m%-10s[0m", "TMAG");
 				printf( "[33m%-10s[0m", "AMAG");
 			}
-			printf( "[33m%-14s[0m", "GlobalV::DRHO2");
+			printf( "[33m%-14s[0m", "DRHO2");
 			printf( "[33m%-15s[0m", "ETOT(eV)");
 			printf( "\e[33m%-11s\e[0m\n", "TIME(s)");
 		}
@@ -70,7 +70,7 @@ void ELEC_scf::scf(const int &istep)
 
 			cout << setw(15) << "ETOT(eV)";
 			cout << setw(15) << "EDIFF(eV)";
-			cout << setw(11) << "GlobalV::DRHO2";
+			cout << setw(11) << "DRHO2";
 			cout << setw(11) << "TIME(s)" << endl;
 		}
 	}// end GlobalV::OUT_LEVEL
@@ -567,7 +567,7 @@ void ELEC_scf::scf(const int &istep)
 
 			if(conv_elec)
 			{
- 				//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+ 				//xiaohui add "OUT_LEVEL", 2015-09-16
 				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << setprecision(16);
 				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << en.ef * Ry_to_eV << " eV" << endl;
 				if(GlobalV::OUT_LEVEL=="ie")

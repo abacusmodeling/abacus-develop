@@ -138,7 +138,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        //GlobalV::ofs_running << " GlobalV::NLOCAL=" << GlobalV::NLOCAL << endl;
+        //GlobalV::ofs_running << " NLOCAL=" << GlobalV::NLOCAL << endl;
         //GlobalV::ofs_running << " lgd_now=" << lgd_now << endl;
         //GlobalV::ofs_running << " GridT.lgd=" << GridT.lgd << endl;
 
