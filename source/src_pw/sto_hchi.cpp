@@ -467,11 +467,11 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 		hchibg = hchig;
 		for(int ib = 0 ; ib < m ; ++ib)
 		{
-			ZEROS( UFFT.porter, pw.nrxx);
-			UFFT.RoundTrip( chibg, pot.vr_eff1, GRA_index, UFFT.porter );
+			ZEROS( GlobalC::UFFT.porter, pw.nrxx);
+			GlobalC::UFFT.RoundTrip( chibg, pot.vr_eff1, GRA_index, GlobalC::UFFT.porter );
 			for (int ig = 0; ig < npw; ++ig)
 			{
-				hchibg[ig] += UFFT.porter[ GRA_index[ig] ];
+				hchibg[ig] += GlobalC::UFFT.porter[ GRA_index[ig] ];
 			}
 			chibg += npw;
 			hchibg += npw;

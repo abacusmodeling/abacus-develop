@@ -645,8 +645,8 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					// dR is the index of box in Crystal coordinates
 					//------------------------------------------------
 					Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z); 
-					const double arg = ( kv.kvec_d[ik] * dR ) * TWO_PI;
-					//const double arg = ( kv.kvec_d[ik] * GridD.getBox(ad) ) * TWO_PI;
+					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
+					//const double arg = ( GlobalC::kv.kvec_d[ik] * GridD.getBox(ad) ) * TWO_PI;
 					const complex<double> kphase = complex <double> ( cos(arg),  sin(arg) );
 
 					//--------------------------------------------------

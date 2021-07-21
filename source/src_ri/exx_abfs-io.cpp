@@ -326,7 +326,7 @@ void Exx_Abfs::IO::print_matrix(
 
 		ofs << Exx_Abfs::Jle::Lmax << " lmax" << endl;
 
-		ofs << kv.nkstot << " nks" << endl;
+		ofs << GlobalC::kv.nkstot << " nks" << endl;
 		ofs	<< index_lcaos[TA].count_size * index_lcaos[TB].count_size << " nbands" << endl;
 		
 		auto cal_sum_M = [&range_jles](size_t T) -> size_t
@@ -345,10 +345,10 @@ void Exx_Abfs::IO::print_matrix(
 		ofs	<< ecut_numberA << " ne" << endl;
 		
 		ofs << "<WEIGHT_OF_KPOINTS>" << endl;
-		for( int ik=0; ik!=kv.nkstot; ++ik )		
+		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )		
 		{
-			ofs << kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z;
-			ofs << " " << kv.wk[ik] * 0.5 << endl;
+			ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z;
+			ofs << " " << GlobalC::kv.wk[ik] * 0.5 << endl;
 		}
 		ofs << "</WEIGHT_OF_KPOINTS>" << endl;
 
@@ -363,7 +363,7 @@ void Exx_Abfs::IO::print_matrix(
 
 		ofs<< "<OVERLAP_Q>" << std::endl;
 		
-		for( int ik=0; ik!=kv.nkstot; ++ik )
+		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 			for( size_t LA=0; LA!=range_lcaos[TA].size(); ++LA )
 				for( size_t NA=0; NA!=range_lcaos[TA][LA].N; ++NA )
 					for( size_t MA=0; MA!=range_lcaos[TA][LA].M; ++MA )
@@ -444,7 +444,7 @@ void Exx_Abfs::IO::print_matrix(
 		
 		ofs<< "<OVERLAP_Sq>" <<endl;
 		
-		for( int ik=0; ik!=kv.nkstot; ++ik )
+		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 		{
 			if( TA==TB && IA==IB )
 			{
@@ -470,7 +470,7 @@ void Exx_Abfs::IO::print_matrix(
 		
 		const matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
 		
-		for( int ik=0; ik!=kv.nkstot; ++ik )
+		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 	//		for ib = 0 to GlobalV::NBANDS
 			for( size_t LA=0; LA!=range_lcaos[TA].size(); ++LA )
 				for( size_t NA=0; NA!=range_lcaos[TA][LA].N; ++NA )

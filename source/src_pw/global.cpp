@@ -2,11 +2,13 @@
 //----------------------------------------------------------
 // init "GLOBAL CLASS" object
 //----------------------------------------------------------
-
+namespace GlobalC
+{
 K_Vectors kv; // mem check in in here.
 Use_FFT UFFT; // mohan add 2010-07-22
-FFT fftwan;
 output out;
+}
+
 
 PW_Basis pw;
 Stochastic_WF STO_WF;

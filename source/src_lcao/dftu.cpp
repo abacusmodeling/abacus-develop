@@ -45,7 +45,7 @@ void DFTU::init(
 	// global parameters, need to be removed in future
 	const int npol = GlobalV::NPOL; // number of polarization directions
 	const int nlocal = GlobalV::NLOCAL; // number of total local orbitals
-	const int nks = kv.nks; // number of k-points
+	const int nks = GlobalC::kv.nks; // number of k-points
 	const int nspin = GlobalV::NSPIN; // number of spins
 	const int dftu_type = INPUT.dftu_type;
 	const int double_counting = INPUT.double_counting;
@@ -305,13 +305,13 @@ void DFTU::cal_occup_m_k(const int iter)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0;
 
-	vector<vector<complex<double>>> srho(kv.nks);
-	for(int ik=0; ik<kv.nks; ik++)
+	vector<vector<complex<double>>> srho(GlobalC::kv.nks);
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		srho.at(ik).resize(ParaO.nloc, complex<double>(0.0, 0.0));
 	}	
 	
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{		
 		// srho(mu,nu) = \sum_{iw} S(mu,iw)*dm_k(iw,nu)
 		pzgemm_(&transN, &transT,
@@ -329,7 +329,7 @@ void DFTU::cal_occup_m_k(const int iter)
 	/*
 	complex<double> elec_tot(0.0, 0.0);
 	complex<double> Nele(0.0, 0.0);
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		for(int ir=0; ir<ParaO.nrow; ir++)
 		{
@@ -440,9 +440,9 @@ void DFTU::cal_occup_m_k(const int iter)
 
 									if( (nu>=0) && (mu>=0) )
 									{	
-										for(int ik=0; ik<kv.nks; ik++)
+										for(int ik=0; ik<GlobalC::kv.nks; ik++)
 										{
-											const int spin = kv.isk[ik];
+											const int spin = GlobalC::kv.isk[ik];
 
 											loc_occup_m_tmp.at(spin)(m0_all, m1_all) += srho.at(ik).at(irc)/4.0;
 										}												
@@ -450,9 +450,9 @@ void DFTU::cal_occup_m_k(const int iter)
 
 									if( (nu_prime>=0) && (mu_prime>=0) )
 									{
-										for(int ik=0; ik<kv.nks; ik++)
+										for(int ik=0; ik<GlobalC::kv.nks; ik++)
 										{
-											const int spin = kv.isk[ik];
+											const int spin = GlobalC::kv.isk[ik];
 											
 											loc_occup_m_tmp.at(spin)(m0_all, m1_all) += std::conj(srho.at(ik).at(irc_prime))/4.0;
 										}
@@ -748,9 +748,9 @@ void DFTU::cal_occup_m_gamma(const int iter)
 									const int irc = nu*ParaO.nrow + mu;
 									const int irc_prime = mu_prime*ParaO.nrow + nu_prime;
 
-									for(int ik=0; ik<kv.nks; ik++)
+									for(int ik=0; ik<GlobalC::kv.nks; ik++)
 									{
-										int spin = kv.isk[ik];
+										int spin = GlobalC::kv.isk[ik];
 
 										if( (nu>=0) && (mu>=0) )
 										{																																																
@@ -1324,9 +1324,9 @@ void DFTU::cal_eff_pot_mat(const int ik, const int istep)
 
  	if((GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
 	
-	int spin = kv.isk[ik];
+	int spin = GlobalC::kv.isk[ik];
 
-	if(GlobalV::GAMMA_ONLY_LOCAL) ZEROS(VECTOR_TO_PTR(this->pot_eff_gamma.at(kv.isk[ik])), ParaO.nloc);
+	if(GlobalV::GAMMA_ONLY_LOCAL) ZEROS(VECTOR_TO_PTR(this->pot_eff_gamma.at(GlobalC::kv.isk[ik])), ParaO.nloc);
 	else ZEROS(VECTOR_TO_PTR(this->pot_eff_k.at(ik)), ParaO.nloc);
 
 	//GlobalV::ofs_running << "dftu.cpp "<< __LINE__  << endl;
@@ -1339,7 +1339,7 @@ void DFTU::cal_eff_pot_mat(const int ik, const int istep)
 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		int spin = kv.isk[ik];
+		int spin = GlobalC::kv.isk[ik];
 		vector<double> VU(ParaO.nloc, 0.0);
 
 		for(int ir=0; ir<ParaO.nrow; ir++)

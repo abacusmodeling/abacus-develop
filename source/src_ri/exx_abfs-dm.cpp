@@ -28,9 +28,9 @@ void Exx_Abfs::DM::cal_DM(
 		for( const Vector3<int> &box : Born_von_Karman_boxes )
 		{
 			DMr[iat1][iat2][box] = vector<matrix>( GlobalV::NSPIN, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
-			for( size_t ik=0; ik!=kv.nks; ++ik )
+			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				DMr[iat1][iat2][box][kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (kv.kvec_c[ik]* (box*ucell.latvec)) ) ).real();
+				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*ucell.latvec)) ) ).real();
 			}
 		}
 	}
@@ -99,8 +99,8 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 		const size_t ia1 = ucell.iat2ia[iat1];
 		const size_t ia2 = ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( kv.nks, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
 			{

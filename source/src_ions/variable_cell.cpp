@@ -9,16 +9,16 @@ void Variable_Cell::init_after_vc(void)
 {
 	TITLE("Variable_Cell","init_after_vc");
 
-    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(ucell, out);
+        symm.analy_sys(ucell, GlobalC::out);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
-    kv.set_after_vc(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec);
+    GlobalC::kv.set_after_vc(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec);
     DONE(GlobalV::ofs_running, "INIT K-POINTS");
 
     pw.update_gvectors(GlobalV::ofs_running, ucell);
@@ -27,7 +27,7 @@ void Variable_Cell::init_after_vc(void)
 
     if(GlobalV::BASIS_TYPE=="pw")
     {
-        wf.init_after_vc(kv.nks);
+        wf.init_after_vc(GlobalC::kv.nks);
         wf.init_at_1();
     }
 
@@ -72,23 +72,23 @@ void Variable_Cell::final_calculation_after_vc(void)
     OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
 
     // (5) Setup the unitcell.
-    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // (6) symmetry analysize.
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(ucell, out);
+        symm.analy_sys(ucell, GlobalC::out);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
 
     // (7) Setup the k points according to symmetry.
-    kv.set( symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
+    GlobalC::kv.set( symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // (1) Init the plane wave.
-    pw.gen_pw(GlobalV::ofs_running, ucell, kv);
+    pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
     cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
@@ -109,13 +109,13 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=====================
     if(GlobalV::BASIS_TYPE=="pw")
     {
-        wf.allocate(kv.nks);
+        wf.allocate(GlobalC::kv.nks);
     }
     else
     {
-        wf.allocate_ekb_wg(kv.nks);
+        wf.allocate_ekb_wg(GlobalC::kv.nks);
     }
-    UFFT.allocate();
+    GlobalC::UFFT.allocate();
 
     //=======================
     // init pseudopotential

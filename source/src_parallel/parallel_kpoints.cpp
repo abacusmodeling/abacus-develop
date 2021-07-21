@@ -71,7 +71,7 @@ void Parallel_Kpoints::divide_pools(void)
         cout<<"Error : Too many pools !"<<endl;
         exit(0);
     }
-    //if(kv.nkstot<GlobalV::NPOOL) cout<<"Error !"<<endl;
+    //if(GlobalC::kv.nkstot<GlobalV::NPOOL) cout<<"Error !"<<endl;
 
     // (1) per process in each pool
     GlobalV::NPROC_IN_POOL = GlobalV::NPROC/GlobalV::NPOOL;

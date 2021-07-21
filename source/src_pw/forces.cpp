@@ -646,10 +646,10 @@ void Forces::cal_force_nl(matrix& forcenl)
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
 	ComplexMatrix vkb1( nkb, wf.npwx );
 
-    for (int ik = 0;ik < kv.nks;ik++)
+    for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
-        if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = kv.isk[ik];
-        wf.npw = kv.ngk[ik];
+        if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
+        wf.npw = GlobalC::kv.ngk[ik];
         // generate vkb
         if (ppcell.nkb > 0)
         {

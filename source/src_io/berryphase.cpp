@@ -44,10 +44,10 @@ void berryphase::set_kpoints(const int direction)
 {
 	TITLE("berryphase","set_kpoints");
 
-	const int mp_x = kv.nmp[0]; // x,y,z方向k点的数目
-	const int mp_y = kv.nmp[1];
-	const int mp_z = kv.nmp[2];
-	const int num_k = int(kv.nkstot/2);	
+	const int mp_x = GlobalC::kv.nmp[0]; // x,y,z方向k点的数目
+	const int mp_y = GlobalC::kv.nmp[1];
+	const int mp_z = GlobalC::kv.nmp[2];
+	const int num_k = int(GlobalC::kv.nkstot/2);	
 
 	if( direction == 1 ) // 计算x方向
 	{
@@ -205,9 +205,9 @@ void berryphase::set_kpoints(const int direction)
 		GlobalV::ofs_running << " the string is " << istring << endl;
 		for(int count = 0; count < nppstr; count++)
 		{
-			GlobalV::ofs_running << "(" << kv.kvec_c[ k_index[istring][count] ].x << ","
-							   << kv.kvec_c[ k_index[istring][count] ].y << ","
-							   << kv.kvec_c[ k_index[istring][count] ].z << ")" << endl;
+			GlobalV::ofs_running << "(" << GlobalC::kv.kvec_c[ k_index[istring][count] ].x << ","
+							   << GlobalC::kv.kvec_c[ k_index[istring][count] ].y << ","
+							   << GlobalC::kv.kvec_c[ k_index[istring][count] ].z << ")" << endl;
 		}
 		
 	}
@@ -224,7 +224,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 	int ik_1;
 	int ik_2;
 	Vector3<double> G(0.0,0.0,0.0);
-	Vector3<double> dk = kv.kvec_c[ k_index[index_str][1] ] - kv.kvec_c[ k_index[index_str][0] ];
+	Vector3<double> dk = GlobalC::kv.kvec_c[ k_index[index_str][1] ] - GlobalC::kv.kvec_c[ k_index[index_str][0] ];
 	//GlobalV::ofs_running << "the string index is " << index_str << endl;
 	
 	for(int k_start = 0; k_start < (nppstr-1); k_start++)

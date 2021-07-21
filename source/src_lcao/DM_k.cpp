@@ -60,11 +60,11 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 	TITLE("Local_Orbital_Charge","kpt_file");
 
 	int error;
-	cout << " Read in wave functions files: " << kv.nkstot << endl;
+	cout << " Read in wave functions files: " << GlobalC::kv.nkstot << endl;
 
 	complex<double> **ctot;
 
-	for(int ik=0; ik<kv.nkstot; ++ik)
+	for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 	{
 
 		LOC.wfc_dm_2d.wfc_k[ik].create(ParaO.ncol, ParaO.nrow);
@@ -116,10 +116,10 @@ inline void cal_DM_ATOM(
     const complex<double> alpha=1;
 	const complex<double> beta=1;
 
-    for(int ik=0; ik<kv.nks; ik++)
+    for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
         complex<double> **wfc = LOWF.WFC_K[ik];
-        const int ispin = kv.isk[ik];
+        const int ispin = GlobalC::kv.isk[ik];
         int atom2start=0;
 
         for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
@@ -132,9 +132,9 @@ inline void cal_DM_ATOM(
             const int iw2_lo=gt.trace_lo[start2];
             const int nw2=atom2->nw;
             complex<double> exp_R= exp( fac * (
-                        kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
-                        kv.kvec_d[ik].y * RA.info[ia1][ia2][1] + 
-                        kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
+                        GlobalC::kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
+                        GlobalC::kv.kvec_d[ik].y * RA.info[ia1][ia2][1] + 
+                        GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                         ) );
             
             //ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
@@ -198,7 +198,7 @@ inline void cal_DM_ATOM_nc(
     {
         for(int is2=0;is2<2;is2++)
         {
-            for(int ik=0; ik<kv.nks; ik++)
+            for(int ik=0; ik<GlobalC::kv.nks; ik++)
             {
                 complex<double> **wfc = LOWF.WFC_K[ik];
                 int atom2start=0;
@@ -213,9 +213,9 @@ inline void cal_DM_ATOM_nc(
                     const int iw2_lo=gt.trace_lo[start2]/GlobalV::NPOL + gt.lgd/GlobalV::NPOL*is2;
                     const int nw2=atom2->nw;
                     complex<double> exp_R= exp( fac * (
-                                kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
-                                kv.kvec_d[ik].y * RA.info[ia1][ia2][1] + 
-                                kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
+                                GlobalC::kv.kvec_d[ik].x * RA.info[ia1][ia2][0] + 
+                                GlobalC::kv.kvec_d[ik].y * RA.info[ia1][ia2][1] + 
+                                GlobalC::kv.kvec_d[ik].z * RA.info[ia1][ia2][2]  
                                 ) );
             
             		//ZEROS(WFC_PHASE, GlobalV::NBANDS*nw1);
@@ -368,7 +368,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
 /*  cout << setprecision(3);
     for(int i=0; i<nnrg_now; i++)
 
-    for(int ik=0; ik<kv.nkstot; ++ik)
+    for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
     {
         for(int ib=0; ib<GlobalV::NBANDS; ++ib)
         {

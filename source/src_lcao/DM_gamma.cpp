@@ -448,7 +448,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
     TITLE("Local_Orbital_Charge","cal_density_kernal");
     timer::tick("LocalOrbital_Charge","cal_dk_gamma");
 
-    assert(GlobalV::NSPIN==kv.nks);
+    assert(GlobalV::NSPIN==GlobalC::kv.nks);
 
 #ifdef __MPI //2015-09-06, xiaohui
 	#if EXX_DM==2

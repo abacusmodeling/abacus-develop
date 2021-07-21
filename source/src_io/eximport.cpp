@@ -125,7 +125,7 @@ void eximport::print_data(const string &fn) const
 
 	ofs << setw(20) << "nks" << setw(20) << this->nks << endl;
 
-	for (int ik = 0;ik < kv.nks;ik++)
+	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{ 
 		ofs << setw(20) << "ngk[" << ik << "]" << setw(20) << ngk[ik] << endl; 
 	}
@@ -183,10 +183,10 @@ void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const string &fn)
 
     for(int i=0; i<npsi; i++)
     {
-        for(int ik=0; ik<kv.nks; ik++)
+        for(int ik=0; ik<GlobalC::kv.nks; ik++)
         {
             ofs << "\n" << ik;
-            for(int ig=0; ig<kv.ngk[ik]; ig++)
+            for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
             {
                 if(ig%4==0) ofs << "\n";
                 ofs << setw(15) << psi[ik](i, ig).real()
@@ -205,20 +205,20 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string
 	//cout<<"\n ==> ei.wanG_for_fit";
 	ofstream out_gwan(file_name.c_str());
 	int qtot = 0;
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		for(int ig=0; ig<kv.ngk[ik]; ig++)
+		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 		{
-			qtot += kv.ngk[ik];
+			qtot += GlobalC::kv.ngk[ik];
 		}
 	}
-	int nks = kv.nks;
+	int nks = GlobalC::kv.nks;
 	double factor = TWO_PI/ucell.lat0;
 	out_gwan << qtot << endl;
 	for(int ik=0;ik<nks;ik++)
 	{
 		//output wannier functions in G space.
-		for(int ig=0;ig<kv.ngk[ik];ig++)
+		for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)
 		{
 			double g1 = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 0);
 			double g2 = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 1);
@@ -253,11 +253,11 @@ bool eximport::sec_wf(ComplexMatrix *psi, const int wf_num, const string &fn)con
 		return 0;
 	}
 
-	for (int ik = 0;ik != kv.nks;ik++)
+	for (int ik = 0;ik != GlobalC::kv.nks;ik++)
 	{
 		for (int iw = 0;iw != wf_num;iw++)
 		{
-			for (int ig = 0;ig != kv.ngk[ik];ig++)
+			for (int ig = 0;ig != GlobalC::kv.ngk[ik];ig++)
 			{
 				// Peize Lin fix bug about rvalue 2016-08-02
 				double tmp_real, tmp_imag;
@@ -289,11 +289,11 @@ bool eximport::sec_wf(complex < double> ***psi, const int npsi, const string &fn
 		return 0;
 	}
 
-	for (int ik = 0;ik < kv.nks;ik++)
+	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
 		for (int iw = 0;iw < npsi;iw++)
 		{
-			for (int ig = 0;ig < kv.ngk[ik];ig++)
+			for (int ig = 0;ig < GlobalC::kv.ngk[ik];ig++)
 			{
 				// Peize Lin fix bug about rvalue 2016-08-02
 				double tmp_real, tmp_imag;
@@ -415,22 +415,22 @@ void eximport::out_kpoints(ofstream &out_data)
 {
 	//cout << "\n ==> out_k-points" << endl;
 	out_data << "\n<KPOINT>";
-	out_data << "\n" << kv.nkstot << " Number of total k points";      //3.1
+	out_data << "\n" << GlobalC::kv.nkstot << " Number of total k points";      //3.1
 	int sumq = 0;
 
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		if(ik%10==0) out_data<<endl;
-		out_data << setw(10) << kv.ngk[ik];
-		sumq += kv.ngk[ik];
+		out_data << setw(10) << GlobalC::kv.ngk[ik];
+		sumq += GlobalC::kv.ngk[ik];
 	}
 
-	for (int ik = 0;ik < kv.nks;ik++)
+	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
 		if(ik%3==0) out_data << "\n";
-		out_data << setw(10) << kv.kvec_c[ik].x
-		<< setw(10) << kv.kvec_c[ik].y
-		<< setw(10) << kv.kvec_c[ik].z;//3.3
+		out_data << setw(10) << GlobalC::kv.kvec_c[ik].x
+		<< setw(10) << GlobalC::kv.kvec_c[ik].y
+		<< setw(10) << GlobalC::kv.kvec_c[ik].z;//3.3
 	}
 
 	out_data << "\n" << sumq << " Total Number of K+G points.";//3.4
@@ -460,9 +460,9 @@ void eximport::out_igk(ofstream &out_data)
 	//cout << "\n ==> out_igk" << endl;
 	out_data << "\n<KG_INDEX>";
 
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		for(int ig=0; ig<kv.ngk[ik]; ig++)
+		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 		{
 			if(ig%10==0) out_data<<"\n";
 			out_data << setw(10) << wf.igk(ik, ig);
@@ -585,7 +585,7 @@ void eximport::out_band(ofstream &out_data)
 {
 	//cout << "\n ==> out_band" << endl;
 	out_data << setw(20) << "BAND" << endl;//6.0
-	for (int ik = 0; ik < kv.nks; ik++)
+	for (int ik = 0; ik < GlobalC::kv.nks; ik++)
 	{
 		for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
@@ -637,9 +637,9 @@ void eximport::out_evc(ofstream &out_data)
 
 	for (iw = 0;iw < ucell.natomwfc;iw++)
 	{
-		for (ik = 0;ik < kv.nks;ik++)
+		for (ik = 0;ik < GlobalC::kv.nks;ik++)
 		{
-			int npw = kv.ngk[ik];
+			int npw = GlobalC::kv.ngk[ik];
 
 			for (ig = 0;ig < npw;ig++)
 			{

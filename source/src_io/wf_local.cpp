@@ -113,15 +113,15 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
 			error = 4;
 		}
 		else if ( 
-			abs(kx-kv.kvec_c[ik].x)>1.0e-5 ||
-			abs(ky-kv.kvec_c[ik].y)>1.0e-5 ||
-			abs(kz-kv.kvec_c[ik].z)>1.0e-5 )
+			abs(kx-GlobalC::kv.kvec_c[ik].x)>1.0e-5 ||
+			abs(ky-GlobalC::kv.kvec_c[ik].y)>1.0e-5 ||
+			abs(kz-GlobalC::kv.kvec_c[ik].z)>1.0e-5 )
 		{	
 			GlobalV::ofs_warning << " k vector is not correct" << endl;
 			GlobalV::ofs_warning << " Read in kx=" << kx << " ky = " << ky << " kz = " << kz << endl;
-			GlobalV::ofs_warning << " In fact, kx=" << kv.kvec_c[ik].x 
-			 << " ky=" << kv.kvec_c[ik].y
-			 << " kz=" << kv.kvec_c[ik].z << endl;
+			GlobalV::ofs_warning << " In fact, kx=" << GlobalC::kv.kvec_c[ik].x 
+			 << " ky=" << GlobalC::kv.kvec_c[ik].y
+			 << " kz=" << GlobalC::kv.kvec_c[ik].z << endl;
 			 error = 4; 
 		}
         else if (nbands!=GlobalV::NBANDS)
@@ -410,7 +410,7 @@ void WF_Local::write_lowf_complex(const string &name, complex<double> **ctot, co
         }
         ofs << setprecision(25);
 		ofs << ik+1 << " (index of k points)" << endl;
-		ofs << kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z << endl;
+		ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << endl;
         ofs << GlobalV::NBANDS << " (number of bands)" << endl;
         ofs << GlobalV::NLOCAL << " (number of orbitals)";
         ofs << scientific;

@@ -23,7 +23,7 @@ void Stochastic_WF::init(void)
     int ndim=0;
     if(stotype == "pw")
     {
-        ndim = kv.ngk[0]; // only GAMMA point temporarily
+        ndim = GlobalC::kv.ngk[0]; // only GAMMA point temporarily
     }
     else
     {
@@ -39,7 +39,7 @@ void Stochastic_WF::init(void)
         rec[ip] = 1;
         displ[ip] = ip;
     }
-    MPI_Allgatherv(&kv.ngk[0], 1, MPI_INT, npwip, rec, displ, MPI_INT, POOL_WORLD);
+    MPI_Allgatherv(&GlobalC::kv.ngk[0], 1, MPI_INT, npwip, rec, displ, MPI_INT, POOL_WORLD);
     for(int ip = 0; ip < GlobalV::NPROC_IN_POOL; ++ip)
     {
         totnpw += npwip[ip];

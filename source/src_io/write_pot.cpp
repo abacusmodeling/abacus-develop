@@ -205,7 +205,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     v_elecstat = new double[pw.nrxx];
     ZEROS(v_elecstat, pw.nrxx);
 
-    complex<double> *Porter = UFFT.porter;
+    complex<double> *Porter = GlobalC::UFFT.porter;
     ZEROS( Porter, pw.nrxx );
     
     int nspin0 = 1;

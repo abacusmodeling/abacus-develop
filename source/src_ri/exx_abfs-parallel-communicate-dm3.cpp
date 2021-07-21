@@ -56,7 +56,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 	
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
-	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{kv.nmp[0],kv.nmp[1],kv.nmp[2]};
+	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 	const vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
@@ -74,10 +74,10 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 				const int iw2 = ucell.iwt2iw[iwt2];
 				for(const Abfs::Vector3_Order<int> &box2 : supercell_boxes)
 				{
-					matrix &DR_a2D_box2 = DR_a2D[kv.isk[ik]][iat1][iat2][box2];
+					matrix &DR_a2D_box2 = DR_a2D[GlobalC::kv.isk[ik]][iat1][iat2][box2];
 					if(!DR_a2D_box2.c)
 						DR_a2D_box2.create(ucell.atoms[ucell.iat2it[iat1]].nw, ucell.atoms[ucell.iat2it[iat2]].nw);
-					DR_a2D_box2(iw1,iw2) += real( DK_2D[ik](iwt1_local,iwt2_local) * exp(-TWO_PI*IMAG_UNIT*(kv.kvec_c[ik]*(box2*ucell.latvec))) ) * SPIN_multiple;
+					DR_a2D_box2(iw1,iw2) += real( DK_2D[ik](iwt1_local,iwt2_local) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*ucell.latvec))) ) * SPIN_multiple;
 				}
 			}
 		}

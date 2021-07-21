@@ -30,15 +30,15 @@ void Stress_Func::stress_nl(matrix& sigma){
 		vkb0[i].create(nkb, wf.npwx);
 	}
 	ComplexMatrix vkb2( nkb, wf.npwx );
-    for (int ik = 0;ik < kv.nks;ik++)
+    for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
 		for(int i=0;i<3;i++){
 			vkb0[i].zero_out();
 		}
 		vkb2.zero_out();      
 		  
-		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = kv.isk[ik];
-		wf.npw = kv.ngk[ik];
+		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
+		wf.npw = GlobalC::kv.ngk[ik];
 		// generate vkb
 		if (ppcell.nkb > 0)
 		{
@@ -233,7 +233,7 @@ void Stress_Func::get_dvnl1
 		return;
 	}
 
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	const int nhm = ppcell.nhm;
 	int ig, ia, nb, ih;
 	matrix vkb1(nhm, npw);
@@ -326,7 +326,7 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 		return;
 	}
 
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 	const int nhm = ppcell.nhm;
 	int ig, ia, nb, ih;
 	matrix vkb1(nhm, npw);
