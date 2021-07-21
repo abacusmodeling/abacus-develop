@@ -109,8 +109,8 @@ class Gint_Gamma : public Grid_Base_Beta
 		const bool*const*const cal_flag, 				// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 		const double*const*const psir_ylm,				// psir_ylm[pw.bxyz][LD_pool]
 		const int*const vindex,							// vindex[pw.bxyz]
-		const double*const*const*const DM,				// DM[NSPIN][lgd_now][lgd_now]
-		Gint_Tools::Array_Pool<double> &rho) const;		// rho[NSPIN][pw.nrxx]
+		const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
+		Gint_Tools::Array_Pool<double> &rho) const;		// rho[GlobalV::NSPIN][pw.nrxx]
 	
 	// extract the local potentials.
 	// vldr3[pw.bxyz]

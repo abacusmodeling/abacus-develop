@@ -6,31 +6,31 @@ void Dos::calculate_Mulliken(const string &fa)
 	TITLE("Dos","calculate_Mulliken");
 	ofstream ofs;
 	
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(fa.c_str());
 		ofs << setiosflags(ios::left);
 	}
 
-	ofs_running << "\n CALCULATE THE MULLIkEN ANALYSIS FOR EACH ATOM" << endl;
+	GlobalV::ofs_running << "\n CALCULATE THE MULLIkEN ANALYSIS FOR EACH ATOM" << endl;
 
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		double** mulliken = new double* [NSPIN];
-		for(int is=0; is<NSPIN; ++is)
+		double** mulliken = new double* [GlobalV::NSPIN];
+		for(int is=0; is<GlobalV::NSPIN; ++is)
 		{
-			mulliken[is] = new double[NLOCAL];
-			ZEROS(mulliken[is], NLOCAL);
+			mulliken[is] = new double[GlobalV::NLOCAL];
+			ZEROS(mulliken[is], GlobalV::NLOCAL);
 		}
 		
 		UHM.GG.cal_mulliken( mulliken );	
 
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
 			// normalize the mulliken charge.
-			for(int is=0; is<NSPIN; ++is)
+			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				for(int iw=0; iw<NLOCAL; ++iw)
+				for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
 					mulliken[is][iw] *= ucell.omega/pw.ncxyz;
 					if( abs(mulliken[is][iw]) < 1.0e-10 ) mulliken[is][iw] = 0.0; 
@@ -40,10 +40,10 @@ void Dos::calculate_Mulliken(const string &fa)
 			// calculate the total charge of the system.
 			double sch = 0.0;
 			ofs << setprecision(8);
-			for(int is=0; is<NSPIN; ++is)
+			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				double sss = 0.0;
-				for(int iw=0; iw<NLOCAL; ++iw)
+				for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
 					sch += mulliken[is][iw];
 					sss += mulliken[is][iw];
@@ -77,7 +77,7 @@ void Dos::calculate_Mulliken(const string &fa)
 				double scht = 0.0;
 				for(int ia=0; ia<atom->na; ++ia)
 				{
-					for(int is=0; is<NSPIN; is++)
+					for(int is=0; is<GlobalV::NSPIN; is++)
 					{
 						int iw_alllll = iw_all;
 						
@@ -106,7 +106,7 @@ void Dos::calculate_Mulliken(const string &fa)
 							delete[] mmm;
 						}
 				
-						ofs << sum << "/" << atom->zv/NSPIN;
+						ofs << sum << "/" << atom->zv/GlobalV::NSPIN;
 						ofs << endl;
 
 						scht += sum;
@@ -120,7 +120,7 @@ void Dos::calculate_Mulliken(const string &fa)
 			}
 		}
 
-		for(int is=0; is<NSPIN; ++is)
+		for(int is=0; is<GlobalV::NSPIN; ++is)
 		{
 			delete[] mulliken[is];
 		}	
@@ -132,7 +132,7 @@ void Dos::calculate_Mulliken(const string &fa)
 	}	
 	
 
-	if(MY_RANK==0) ofs.close();
+	if(GlobalV::MY_RANK==0) ofs.close();
 
 	return;
 }
@@ -156,7 +156,7 @@ bool Dos::calculate_dos
 {
 	TITLE("Dos","calculae_dos");
 	ofstream ofs;
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(fa.c_str());//make the file clear!!
 	}
@@ -180,20 +180,20 @@ bool Dos::calculate_dos
 	const int npoints = static_cast<int>(std::floor ( ( emax_ev - emin_ev ) / de_ev )) ;
 	if(npoints <= 0)
 	{
-		OUT(ofs_running,"npoints",npoints);
+		OUT(GlobalV::ofs_running,"npoints",npoints);
 		WARNING("calculate_dos","npoints < 0");
 		return 0;
 	}
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		ofs << npoints << endl;
 		ofs << kv.nkstot << endl;
 	}
 
-	ofs_running << "\n OUTPUT DOS FILE IN: " << fa << endl;
-	OUT(ofs_running,"min state energy (eV)",emin_ev);
-	OUT(ofs_running,"max state energy (eV)",emax_ev);
-	OUT(ofs_running,"delta energy interval (eV)",  de_ev);
+	GlobalV::ofs_running << "\n OUTPUT DOS FILE IN: " << fa << endl;
+	OUT(GlobalV::ofs_running,"min state energy (eV)",emin_ev);
+	OUT(GlobalV::ofs_running,"max state energy (eV)",emax_ev);
+	OUT(GlobalV::ofs_running,"delta energy interval (eV)",  de_ev);
 	
 	double *e_mod = new double[npoints];
 	ZEROS(e_mod, npoints);
@@ -203,7 +203,7 @@ bool Dos::calculate_dos
 	double e_old = 0.0;
 	while( e_new < emax_ev)
 	{
-//		ofs_running << " enew=" << e_new << endl;
+//		GlobalV::ofs_running << " enew=" << e_new << endl;
 		double count = 0.0;
 		e_old = e_new ;
 		e_new += de_ev;
@@ -219,7 +219,7 @@ bool Dos::calculate_dos
 						// because count is 'double' type,so
 						// we can't write count++ or ++count
 						count += wk[ik]*nkstot; //mohanix bug 2012-04-23
-//						ofs_running << " count = " << count << " wk = " << wk[ik] << " nks = " << nks << endl;
+//						GlobalV::ofs_running << " count = " << count << " wk = " << wk[ik] << " nks = " << nks << endl;
 					}		
 				}
 			}
@@ -229,18 +229,18 @@ bool Dos::calculate_dos
 #endif
 		count = count / static_cast<double>(nkstot);
 		sum += count;
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
 			ofs << e_new << " " << count << endl;
 		}
 
 	}
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		ofs.close();
 	}
-	OUT(ofs_running,"number of bands",nbands);
-	OUT(ofs_running,"sum up the states", sum);
+	OUT(GlobalV::ofs_running,"number of bands",nbands);
+	OUT(GlobalV::ofs_running,"sum up the states", sum);
 	delete[] e_mod;
 
 	return 1;
@@ -255,12 +255,12 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 #ifdef __MPI
 
 	int start = 1;
-	int end = NBANDS;
+	int end = GlobalV::NBANDS;
 
 	assert(wf.allocate_ekb);
 
 	ofstream ofs;
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(out_band_dir.c_str());//make the file clear!!
 		ofs << setprecision(6);
@@ -269,9 +269,9 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 
 	for(int ik=0; ik<kv.nkstot; ik++)
 	{
-		if ( MY_POOL == Pkpoints.whichpool[ik] )
+		if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
 		{
-			if( RANK_IN_POOL == 0)
+			if( GlobalV::RANK_IN_POOL == 0)
 			{
 				ofstream ofs(out_band_dir.c_str(),ios::app);
 				ofs << setprecision(8);
@@ -298,7 +298,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 					ofs << " " << ucell.G.e31 << " " << ucell.G.e32 << " " << ucell.G.e33 << endl; 
 				}
 
-				const int ik_now = ik - Pkpoints.startk_pool[MY_POOL];
+				const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
 				ofs << "ik= " << ik << endl;
 				ofs << kv.kvec_c[ik_now].x << " " << kv.kvec_c[ik_now].y << " " << kv.kvec_c[ik_now].z << endl;  
 
@@ -340,7 +340,7 @@ void Dos::nscf_band(
 	TITLE("Dos","nscf_band");
 
 #ifdef __MPI
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		ofstream ofs(out_band_dir.c_str());//make the file clear!!
 		ofs.close();
@@ -349,12 +349,12 @@ void Dos::nscf_band(
 
 	for(int ik=0; ik<nks; ik++)
 	{
-		if ( MY_POOL == Pkpoints.whichpool[ik] )
+		if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
 		{
-			const int ik_now = ik - Pkpoints.startk_pool[MY_POOL];
+			const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
 			if( kv.isk[ik_now+is*nks] == is )
 			{ 
-				if ( RANK_IN_POOL == 0)
+				if ( GlobalV::RANK_IN_POOL == 0)
 				{
 					ofstream ofs(out_band_dir.c_str(),ios::app);
 					ofs << setprecision(8);
@@ -374,9 +374,9 @@ void Dos::nscf_band(
 	
 	// old version
 	/*
-	for(int ip=0;ip<NPOOL;ip++)
+	for(int ip=0;ip<GlobalV::NPOOL;ip++)
 	{
-		if(MY_POOL == ip && RANK_IN_POOL == 0)
+		if(GlobalV::MY_POOL == ip && GlobalV::RANK_IN_POOL == 0)
 		{
 			ofstream ofs(out_band_dir.c_str(),ios::app);
 			for(int ik=0;ik<nks;ik++)

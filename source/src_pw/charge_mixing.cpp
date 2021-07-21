@@ -30,8 +30,8 @@ void Charge_Mixing::set_mixing
 // Fourier transform of rho(g) to rho(r) in real space.
 void Charge_Mixing::set_rhor(complex<double> *rhog, double *rho)const
 {
-    if (test_charge)TITLE("Charge_Mixing","set_rhor");
-    for (int is=0; is < NSPIN; is++)
+    if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhor");
+    for (int is=0; is < GlobalV::NSPIN; is++)
     {
 		UFFT.ToRealSpace(rhog, rho);
     }
@@ -41,7 +41,7 @@ void Charge_Mixing::set_rhor(complex<double> *rhog, double *rho)const
 
 void Charge_Mixing::set_rhog(const double *rho_in, complex<double> *rhog_in)const
 {
-    if (test_charge)TITLE("Charge_Mixing","set_rhog");
+    if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhog");
 	UFFT.ToReciSpace(rho_in, rhog_in);
     return;
 }
@@ -192,7 +192,7 @@ double Charge_Mixing::rhog_dot_product(
 		sum *= fac;
 	};
 
-    switch ( NSPIN )
+    switch ( GlobalV::NSPIN )
     {
 	case 1:
 		part_of_noncolin();
@@ -207,7 +207,7 @@ double Charge_Mixing::rhog_dot_product(
 			}
 			sum *= fac;
 
-			if(GAMMA_ONLY_PW)
+			if(GlobalV::GAMMA_ONLY_PW)
 			{
 				sum *= 2.0;
 			}
@@ -225,8 +225,8 @@ double Charge_Mixing::rhog_dot_product(
 			}
 			mag *= fac2;
 
-			//if(GAMMA_ONLY_PW);
-			if(GAMMA_ONLY_PW)			// Peize Lin delete ; 2020.01.31
+			//if(GlobalV::GAMMA_ONLY_PW);
+			if(GlobalV::GAMMA_ONLY_PW)			// Peize Lin delete ; 2020.01.31
 			{
 				mag *= 2.0;
 			}
@@ -238,7 +238,7 @@ double Charge_Mixing::rhog_dot_product(
 		}
 	case 4:
 		// non-collinear spin, added by zhengdy
-		if(!DOMAG&&!DOMAG_Z)
+		if(!GlobalV::DOMAG&&!GlobalV::DOMAG_Z)
 			part_of_noncolin();
 		else
 		{
@@ -255,7 +255,7 @@ double Charge_Mixing::rhog_dot_product(
 					(conj( rhog1[3][0])*rhog2[3][0]).real());
 			}
 			double fac3 = fac2;
-			if(GAMMA_ONLY_PW)
+			if(GlobalV::GAMMA_ONLY_PW)
 			{
 				fac3 *= 2.0;
 			}

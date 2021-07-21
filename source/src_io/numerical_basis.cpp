@@ -65,7 +65,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/" << ucell.latName << "." << ucell.lat0 << ".dat";
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         ofs.open(ss.str().c_str());
     }
@@ -74,8 +74,8 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     const int ne = Numerical_Basis::bessel_basis.get_ecut_number();
 
 	// OVERLAP : < J_mu | Psi >
-    realArray overlap_Q1(nks, NBANDS, NLOCAL, ne );
-    realArray overlap_Q2(nks, NBANDS, NLOCAL, ne );
+    realArray overlap_Q1(nks, GlobalV::NBANDS, GlobalV::NLOCAL, ne );
+    realArray overlap_Q2(nks, GlobalV::NBANDS, GlobalV::NLOCAL, ne );
 
 	// OVERLAP : < J_mu | J_nu >
     realArray *Sq_real = new realArray[nks];
@@ -84,8 +84,8 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     // (1) allocate Sq matrix.
     if (winput::out_spillage == 2)
     {
-        for (int ik=0; ik<nks; ik++) Sq_real[ik].create( NLOCAL, NLOCAL, ne, ne );
-        for (int ik=0; ik<nks; ik++) Sq_imag[ik].create( NLOCAL, NLOCAL, ne, ne );
+        for (int ik=0; ik<nks; ik++) Sq_real[ik].create( GlobalV::NLOCAL, GlobalV::NLOCAL, ne, ne );
+        for (int ik=0; ik<nks; ik++) Sq_imag[ik].create( GlobalV::NLOCAL, GlobalV::NLOCAL, ne, ne );
     }
 
     ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
@@ -97,29 +97,29 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         ZEROS(Sq_imag[ik].ptr, Sq_imag[ik].getSize() );
     }
 
-	OUT(ofs_running,"number of k points",overlap_Q1.getBound1());
-	OUT(ofs_running,"number of bands",overlap_Q1.getBound2());
-	OUT(ofs_running,"number of local orbitals",overlap_Q1.getBound3());
-	OUT(ofs_running,"number of eigenvalues of Jl(x)",overlap_Q1.getBound4());
+	OUT(GlobalV::ofs_running,"number of k points",overlap_Q1.getBound1());
+	OUT(GlobalV::ofs_running,"number of bands",overlap_Q1.getBound2());
+	OUT(GlobalV::ofs_running,"number of local orbitals",overlap_Q1.getBound3());
+	OUT(GlobalV::ofs_running,"number of eigenvalues of Jl(x)",overlap_Q1.getBound4());
 
     // nks now is the reduced k-points.
     for (int ik=0; ik<nks; ik++)
     {
         const int npw= kv.ngk[ik];
-		ofs_running << " --------------------------------------------------------" << endl;
-		ofs_running << " Print the overlap matrixs Q and S for this kpoint";
-        ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";
-        ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << endl;
-		ofs_running << " --------------------------------------------------------" << endl;
+		GlobalV::ofs_running << " --------------------------------------------------------" << endl;
+		GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint";
+        GlobalV::ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";
+        GlobalV::ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << endl;
+		GlobalV::ofs_running << " --------------------------------------------------------" << endl;
         // search for all k-points.
         this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
-        DONE(ofs_running,"jlq3d_overlap");
+        DONE(GlobalV::ofs_running,"jlq3d_overlap");
 
         // (2) generate Sq matrix if necessary.
         if (winput::out_spillage == 2)
         {
             this->Sq_overlap( Sq_real[ik], Sq_imag[ik], ik, npw );
-            DONE(ofs_running,"Sq_overlap");
+            DONE(GlobalV::ofs_running,"Sq_overlap");
         }
     }
 
@@ -134,7 +134,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
 #endif
 
 	// only print out to the information by the first processor
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         ofs.precision(10);
         ofs << ucell.lat0 << endl;
@@ -174,7 +174,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     ofs << scientific;
 
     ofs << setprecision(8);
-    // NOTICE: ofs_warning << "\n The precison may affect the optimize result.";
+    // NOTICE: GlobalV::ofs_warning << "\n The precison may affect the optimize result.";
     
     this->output_overlap_Q( ofs, overlap_Q1, overlap_Q2 );
 
@@ -186,7 +186,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     delete[] Sq_real;
     delete[] Sq_imag;
 
-    if (MY_RANK==0) ofs.close();
+    if (GlobalV::MY_RANK==0) ofs.close();
     return;
 }
 
@@ -196,7 +196,7 @@ void Numerical_Basis::output_overlap_Sq(
     const realArray *Sq_real,
     const realArray *Sq_imag)
 {
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         ofs << "\n<OVERLAP_Sq>";
         ofs.close();
@@ -205,12 +205,12 @@ void Numerical_Basis::output_overlap_Sq(
     int count = 0;
     for (int ik=0; ik< kv.nkstot; ik++)
     {
-        if ( MY_POOL == Pkpoints.whichpool[ik] )
+        if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
         {
-            if ( RANK_IN_POOL == 0)
+            if ( GlobalV::RANK_IN_POOL == 0)
             {
                 ofs.open(name.c_str(), ios::app);
-                const int ik_now = ik - Pkpoints.startk_pool[MY_POOL];
+                const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
                 for (int i=0; i< Sq_real[ik_now].getSize(); i++)
                 {
                     if (count%2==0) ofs << "\n";
@@ -232,7 +232,7 @@ void Numerical_Basis::output_overlap_Sq(
         }
 
         /*
-        if(MY_RANK==0)
+        if(GlobalV::MY_RANK==0)
         for(int i=0; i< Sq_real[ik].getSize(); i++)
         {
         	if(i%2==0) ofs << "\n";
@@ -241,7 +241,7 @@ void Numerical_Basis::output_overlap_Sq(
         */
 
     }
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         ofs.open(name.c_str(), ios::app);
         ofs << "\n</OVERLAP_Sq>" << endl;
@@ -255,7 +255,7 @@ void Numerical_Basis::output_overlap_Q(
     const realArray &overlap_Q2)
 {
     // (1)
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         ofs << kv.nkstot << " nks" << endl;
         ofs	<< overlap_Q1.getBound2() << " nbands" << endl;
@@ -270,10 +270,10 @@ void Numerical_Basis::output_overlap_Q(
         double kx, ky, kz, wknow;
 #ifdef __MPI
         const int pool = Pkpoints.whichpool[ik];
-        const int iknow = ik - Pkpoints.startk_pool[MY_POOL];
-        if (RANK_IN_POOL==0)
+        const int iknow = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
+        if (GlobalV::RANK_IN_POOL==0)
         {
-            if (MY_POOL==0)
+            if (GlobalV::MY_POOL==0)
             {
                 if (pool==0)
                 {
@@ -293,7 +293,7 @@ void Numerical_Basis::output_overlap_Q(
             }
             else
             {
-                if (MY_POOL == pool)
+                if (GlobalV::MY_POOL == pool)
                 {
                     MPI_Send(&kv.kvec_c[iknow].x, 1, MPI_DOUBLE, 0, ik*4, MPI_COMM_WORLD);
                     MPI_Send(&kv.kvec_c[iknow].y, 1, MPI_DOUBLE, 0, ik*4+1, MPI_COMM_WORLD);
@@ -305,7 +305,7 @@ void Numerical_Basis::output_overlap_Q(
         // this barrier is very important
         MPI_Barrier(MPI_COMM_WORLD);
 #else
-        if (MY_RANK==0)
+        if (GlobalV::MY_RANK==0)
         {
             kx = kv.kvec_c[ik].x;
             ky = kv.kvec_c[ik].y;
@@ -314,7 +314,7 @@ void Numerical_Basis::output_overlap_Q(
         }
 #endif
 
-        if (MY_RANK==0)
+        if (GlobalV::MY_RANK==0)
         {
             ofs << "\n" << kx << " " << ky << " " << kz;
             ofs << " " << wknow * 0.5;
@@ -322,7 +322,7 @@ void Numerical_Basis::output_overlap_Q(
     }
 
     // (3)
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         ofs << "\n</WEIGHT_OF_KPOINTS>" << endl;
         ofs << "\n<OVERLAP_Q>";
@@ -330,7 +330,7 @@ void Numerical_Basis::output_overlap_Q(
 
     // (4)
     /*
-    if(MY_RANK==0)
+    if(GlobalV::MY_RANK==0)
     {
     //    	for( int i=0; i<overlap_Q1.getSize(); i++)
     //    	{
@@ -341,7 +341,7 @@ void Numerical_Basis::output_overlap_Q(
     */
 
     const int ne = overlap_Q1.getBound4();
-    const int dim = NBANDS * NLOCAL * ne;
+    const int dim = GlobalV::NBANDS * GlobalV::NLOCAL * ne;
     double *Qtmp1 = new double[dim];
     double *Qtmp2 = new double[dim];
     int count = 0;
@@ -351,7 +351,7 @@ void Numerical_Basis::output_overlap_Q(
         ZEROS(Qtmp1, dim);
         ZEROS(Qtmp2, dim);
         Pkpoints.pool_collection(Qtmp1, Qtmp2, overlap_Q1, overlap_Q2, ik);
-        if (MY_RANK==0)
+        if (GlobalV::MY_RANK==0)
         {
     //        ofs << "\n ik=" << ik;
             // begin data writing.
@@ -371,7 +371,7 @@ void Numerical_Basis::output_overlap_Q(
     delete[] Qtmp2;
 
     // (5)
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         ofs << "\n</OVERLAP_Q>" << endl;
     }
@@ -387,8 +387,8 @@ void Numerical_Basis::Sq_overlap(
     TITLE("Numerical_Basis","Sq_overlap");
     timer::tick("Numerical_Basis","Sq_overlap");
 
-	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << endl;
-	ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << endl; 
+	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << endl;
+	GlobalV::ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << endl; 
 
 	const double normalization = (4 * PI) * (4 * PI) / ucell.omega;			// Peize Lin add normalization 2015-12-29
 	
@@ -423,7 +423,7 @@ void Numerical_Basis::Sq_overlap(
     complex<double> *about_ig = new complex<double>[np];
 	ZEROS(about_ig, np);
 
-    ofs_running << "\n " << setw(5) << "ik"
+    GlobalV::ofs_running << "\n " << setw(5) << "ik"
     << setw(8) << "Type1"
     << setw(8) << "Atom1"
     << setw(8) << "L1"
@@ -446,7 +446,7 @@ void Numerical_Basis::Sq_overlap(
                         complex<double> lphase = normalization * pow(IMAG_UNIT, l);			// Peize Lin add normalization 2015-12-29
                         for (int l2 = 0; l2 < ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
-                            ofs_running << " " << setw(5) << ik+1
+                            GlobalV::ofs_running << " " << setw(5) << ik+1
                             << setw(8) << ucell.atoms[T1].label
                             << setw(8) << I1+1
                             << setw(8) << l
@@ -519,8 +519,8 @@ void Numerical_Basis::jlq3d_overlap(
     TITLE("Numerical_Basis","jlq3d_overlap");
     timer::tick("Numerical_Basis","jlq3d_overlap");
 
-	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
-	ofs_running << " Q = < J_mu, q | Psi_n, k > " << endl;
+	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
+	GlobalV::ofs_running << " Q = < J_mu, q | Psi_n, k > " << endl;
 
 	const double normalization = (4 * PI) / sqrt(ucell.omega);			// Peize Lin add normalization 2015-12-29
 
@@ -535,7 +535,7 @@ void Numerical_Basis::jlq3d_overlap(
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
-    ofs_running << "\n " << setw(5) << "ik"
+    GlobalV::ofs_running << "\n " << setw(5) << "ik"
     << setw(8) << "Type1"
     << setw(8) << "Atom1" 
 	<< setw(8) << "L"
@@ -552,7 +552,7 @@ void Numerical_Basis::jlq3d_overlap(
             complex<double> *sk = wf.get_sk(ik, T1, I1);
             for (int L=0; L< ucell.atoms[T1].nwl+1; L++)
             {
-                ofs_running << " " << setw(5) << ik+1
+                GlobalV::ofs_running << " " << setw(5) << ik+1
                             << setw(8) << ucell.atoms[T1].label
                             << setw(8) << I1+1 
 							<< setw(8) << L
@@ -572,7 +572,7 @@ void Numerical_Basis::jlq3d_overlap(
                     for (int m=0; m<2*L+1; m++)
                     {
                         const int lm = L*L+m;
-                        for (int ib=0; ib<NBANDS; ib++)
+                        for (int ib=0; ib<GlobalV::NBANDS; ib++)
                         {
                             complex<double> overlap_tmp = ZERO;
                             for (int ig=0; ig<np; ig++)
@@ -598,7 +598,7 @@ void Numerical_Basis::jlq3d_overlap(
 
 void Numerical_Basis::init_mu_index(void)
 {
-	ofs_running << " Initialize the mu index" << endl;
+	GlobalV::ofs_running << " Initialize the mu index" << endl;
     Numerical_Basis::mu_index = new IntArray[ucell.ntype];
 
     int mu = 0;
@@ -611,7 +611,7 @@ void Numerical_Basis::init_mu_index(void)
             2*(ucell.atoms[it].nwl+1)+1); // m ==> 2*l+1
 
 		// mohan added 2021-01-03
-		ofs_running << "Type " << it+1 
+		GlobalV::ofs_running << "Type " << it+1 
 		<< " number_of_atoms " << ucell.atoms[it].na
 		<< " number_of_L " << ucell.atoms[it].nwl+1
 		<< " number_of_n " << ucell.nmax

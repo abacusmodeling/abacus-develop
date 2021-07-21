@@ -232,7 +232,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 							const int I2 = ucell.iat2ia[ GridT.which_atom[mcell_index2]];
 							const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
 
-							for(int is=0; is<NSPIN; is++)
+							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								double *rhop = CHR.rho[is];
 								for (int ib=0; ib<pw.bxyz; ib++)
@@ -311,9 +311,9 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 		delete[] cal_flag;
 	}
 
-	for(int is=0; is<NSPIN; ++is)
+	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
-		Parallel_Reduce::reduce_double_all( mulliken[is], NLOCAL );
+		Parallel_Reduce::reduce_double_all( mulliken[is], GlobalV::NLOCAL );
 	}
 
     return;

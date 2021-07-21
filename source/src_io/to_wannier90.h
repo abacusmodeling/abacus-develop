@@ -47,7 +47,7 @@ public:
 	string wannier_file_name = "seedname";                                                  // .mmn,.amn�ļ���
 	int num_exclude_bands = 0;																// �ų�������ܴ���Ŀ��-1��ʾû����Ҫ�ų����ܴ�
 	int *exclude_bands;                                                                     // �ų��ܴ���index
-	bool *tag_cal_band;																		// �ж�NBANDS�ܴ���һ����Ҫ����
+	bool *tag_cal_band;																		// �ж�GlobalV::NBANDS�ܴ���һ����Ҫ����
 	int num_bands;																		   	// wannier90 �е�num_bands
 	bool gamma_only_wannier = false;														// ֻ��gamma������wannier����
 	string wannier_spin = "up";                                                             // spin��������up,down��������

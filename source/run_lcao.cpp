@@ -20,28 +20,28 @@ void Run_lcao::lcao_line(void)
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
-    // cell relaxation. b) put NLOCAL and NBANDS as input parameters
-    ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
+    // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+    ucell.setup_cell( GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
 	if(INPUT.test_just_neighbor)
 	{
 		//test_search_neighbor();
-		SEARCH_RADIUS = atom_arrange::set_sr_NL(
-			ofs_running,
-			OUT_LEVEL,
+		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+			GlobalV::ofs_running,
+			GlobalV::OUT_LEVEL,
 			ORB.get_rcutmax_Phi(), 
 			ORB.get_rcutmax_Beta(), 
-			GAMMA_ONLY_LOCAL);
+			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
-			SEARCH_PBC,
-			ofs_running,
+			GlobalV::SEARCH_PBC,
+			GlobalV::ofs_running,
 			GridD, 
 			ucell, 
-			SEARCH_RADIUS, 
-			test_atom_input,
+			GlobalV::SEARCH_RADIUS, 
+			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
 	}
-	// setup NBANDS 
+	// setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
 	CHR.cal_nelec();
 
@@ -55,19 +55,19 @@ void Run_lcao::lcao_line(void)
 		xcf.which_dft(ucell.atoms[it].dft);
 	}
 
-    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
-    DONE(ofs_running, "SETUP UNITCELL");
+    //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
+    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
         symm.analy_sys(ucell, out);
-        DONE(ofs_running, "SYMMETRY");
+        DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    kv.set(symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
-    DONE(ofs_running,"INIT K-POINTS");
+    kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
+    DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
@@ -78,7 +78,7 @@ void Run_lcao::lcao_line(void)
 	// * construct the interpolation tables.
 
 	LOWF.orb_con.set_orb_tables(
-		ofs_running,
+		GlobalV::ofs_running,
 		UOT, 
 		ORB,
 		ucell.ntype,
@@ -91,25 +91,25 @@ void Run_lcao::lcao_line(void)
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
 		Exx_Abfs::Lmax,
-		FORCE,
-		MY_RANK);
+		GlobalV::FORCE,
+		GlobalV::MY_RANK);
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
-	LM.divide_HS_in_frag(GAMMA_ONLY_LOCAL, ParaO);
+	LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, ParaO);
 
 //--------------------------------------
 // cell relaxation should begin here
 //--------------------------------------
 
     // Initalize the plane wave basis set
-    pw.gen_pw(ofs_running, ucell, kv);
-    DONE(ofs_running,"INIT PLANEWAVE");
+    pw.gen_pw(GlobalV::ofs_running, ucell, kv);
+    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
     cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
 
     // the symmetry of a variety of systems.
-    if(CALCULATION == "test")
+    if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
         QUIT();
@@ -122,16 +122,16 @@ void Run_lcao::lcao_line(void)
 
 
 	// Inititlize the charge density.
-    CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
-    DONE(ofs_running,"INIT CHARGE");
+    CHR.allocate(GlobalV::NSPIN, pw.nrxx, pw.ngmc);
+    DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
     pot.allocate(pw.nrxx);
-    DONE(ofs_running,"INIT POTENTIAL");
+    DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 
 	// Peize Lin add 2018-11-30
-	if(CALCULATION=="nscf")
+	if(GlobalV::CALCULATION=="nscf")
 	{
 		switch(exx_global.info.hybrid_type)
 		{

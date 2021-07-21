@@ -15,7 +15,7 @@ void IF_MATCH(const string &name,const string &name2)
 {
 	if(name!=name2)
 	{
-		if(MY_RANK == 0)
+		if(GlobalV::MY_RANK == 0)
 		{
 			cout<<"\n Can not match : "<<name<<"  "<<name2<<endl;
 		}

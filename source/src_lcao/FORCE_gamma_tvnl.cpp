@@ -11,10 +11,10 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
 {
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
     timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
-    for(int i=0; i<NLOCAL; i++)
+    for(int i=0; i<GlobalV::NLOCAL; i++)
     {
         const int iat = ucell.iwt2iat[i];
-        for(int j=0; j<NLOCAL; j++)
+        for(int j=0; j<GlobalV::NLOCAL; j++)
         {
             const int mu = ParaO.trace_loc_row[j];
             const int nu = ParaO.trace_loc_col[i];
@@ -25,7 +25,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
                 //contribution from deriv of AO's in T+VNL term
                 
                 double sum = 0.0;
-                for(int is=0; is<NSPIN; ++is)
+                for(int is=0; is<GlobalV::NSPIN; ++is)
                 {
                     sum += dm2d(is, index);
                 }
@@ -149,7 +149,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                             atom2->iw2l[kk], // L1
                             atom2->iw2m[kk], // m1
                             atom2->iw2n[kk], // n1
-                            tau0, it, ucell.atoms[it].dion, NSPIN,
+                            tau0, it, ucell.atoms[it].dion, GlobalV::NSPIN,
 							ucell.atoms[it].d_so,
 							ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 							ucell.atoms[it].index1_soc[0],
@@ -171,7 +171,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                                 atom1->iw2l[jj], // L1
                                 atom1->iw2m[jj], // m1
                                 atom1->iw2n[jj], // n1
-                                tau0, it, ucell.atoms[it].dion, NSPIN,
+                                tau0, it, ucell.atoms[it].dion, GlobalV::NSPIN,
 								ucell.atoms[it].d_so,
 								ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 								ucell.atoms[it].index1_soc[0],
@@ -185,7 +185,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                         // only one projector for each atom force.
 
                         double sum = 0.0;
-                        for(int is=0; is<NSPIN; ++is)
+                        for(int is=0; is<GlobalV::NSPIN; ++is)
                         {
                             sum += dm2d(is,index);
                         }
@@ -239,10 +239,10 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
     TITLE("Force_LCAO_gamma","cal_ftvnl_dphi");
     timer::tick("Force_LCAO_gamma","cal_ftvnl_dphi");
 
-    for(int i=0; i<NLOCAL; i++)
+    for(int i=0; i<GlobalV::NLOCAL; i++)
     {
         const int iat = ucell.iwt2iat[i];
-        for(int j=0; j<NLOCAL; j++)
+        for(int j=0; j<GlobalV::NLOCAL; j++)
         {
             const int mu = ParaO.trace_loc_row[j];
             const int nu = ParaO.trace_loc_col[i];
@@ -253,7 +253,7 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
                 //contribution from deriv of AO's in T+VNL term
 
                 double sum = 0.0;
-                for(int is=0; is<NSPIN; ++is)
+                for(int is=0; is<GlobalV::NSPIN; ++is)
                 {
                     sum += dm2d[is](nu, mu);
                 }
@@ -376,7 +376,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                                         atom2->iw2l[kk], // L1
                                         atom2->iw2m[kk], // m1
                                         atom2->iw2n[kk], // n1
-										tau0, it, ucell.atoms[it].dion, NSPIN,
+										tau0, it, ucell.atoms[it].dion, GlobalV::NSPIN,
 										ucell.atoms[it].d_so,
 										ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 										ucell.atoms[it].index1_soc[0],
@@ -395,7 +395,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                                                    atom1->iw2l[jj], // L1
                                                    atom1->iw2m[jj], // m1
                                                    atom1->iw2n[jj], // n1
-                                                   tau0, it, ucell.atoms[it].dion, NSPIN,
+                                                   tau0, it, ucell.atoms[it].dion, GlobalV::NSPIN,
 												   ucell.atoms[it].d_so,
 												   ucell.atoms[it].non_zero_count_soc[0], // index stands for spin
 												   ucell.atoms[it].index1_soc[0],
@@ -409,7 +409,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                         // only one projector for each atom force.
 
                         double sum = 0.0;
-                        for(int is=0; is<NSPIN; ++is)
+                        for(int is=0; is<GlobalV::NSPIN; ++is)
                         {
                             //sum += dm2d[is][index];
                             sum += dm2d[is](nu, mu);

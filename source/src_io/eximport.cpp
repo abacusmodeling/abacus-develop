@@ -86,7 +86,7 @@ void eximport::read_data(const string &fn)
 	ifstream ifs(fn.c_str());
 	if(!ifs)
 	{
-		ofs_warning << " File name : " << fn << endl;
+		GlobalV::ofs_warning << " File name : " << fn << endl;
 		WARNING_QUIT("eximport::read_data","Can not find file.");
 	}
 
@@ -160,9 +160,9 @@ void eximport::print_data(const string &fn) const
 
 void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const string &fn)
 {
-	if(MY_RANK!=0)
+	if(GlobalV::MY_RANK!=0)
 	{
-		cout<<"\n not the MY_RANK processor , return.";
+		cout<<"\n not the GlobalV::MY_RANK processor , return.";
 		return;
 	}
 
@@ -322,7 +322,7 @@ void eximport::out_wannier(ofstream &out_data)
 	//cout<<"\n ==> out_wannier"<<endl;
 	out_data << setw(20) << "WANNIER" << endl; //0
 	//out_data << setw(20) << LOCAL_BASIS << endl;//1 xiaohui modify 2013-09-02
-	out_data << setw(20) << BASIS_TYPE << endl; //xiaohui add 2013-09-02
+	out_data << setw(20) << GlobalV::BASIS_TYPE << endl; //xiaohui add 2013-09-02
 	return;
 }
 
@@ -526,13 +526,13 @@ void eximport::out_input(ofstream &out_data)
 
 	out_data << "\n" << ucell.ntype << " Types of atoms.";
 
-//	out_data << "\n" << NBANDS << " Number of wave functions.";//1.4
+//	out_data << "\n" << GlobalV::NBANDS << " Number of wave functions.";//1.4
 	//out_data << "\n" << LOCAL_BASIS << " 1 for Local Basis"; xiaohui modify 2013-09-02
-	out_data << "\n" << BASIS_TYPE << " Basis type"; //xiaohui add 2013-09-02
+	out_data << "\n" << GlobalV::BASIS_TYPE << " Basis type"; //xiaohui add 2013-09-02
 
 	//out_data << "\n" << LINEAR_SCALING << " 1 for Linear Scaling"; xiaohui modify 2013-09-02
-	out_data << "\n" << KS_SOLVER << " Diago type"; //xiaohui add 2013-09-02
-	out_data << "\n" << SPARSE_MATRIX << " 1 for Sparse Matrix";
+	out_data << "\n" << GlobalV::KS_SOLVER << " Diago type"; //xiaohui add 2013-09-02
+	out_data << "\n" << GlobalV::SPARSE_MATRIX << " 1 for Sparse Matrix";
 
 /*
 	out_data << setw(20) << tr2 << endl;                 //1.5
@@ -587,7 +587,7 @@ void eximport::out_band(ofstream &out_data)
 	out_data << setw(20) << "BAND" << endl;//6.0
 	for (int ik = 0; ik < kv.nks; ik++)
 	{
-		for (int ib = 0; ib < NBANDS; ib++)
+		for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
 			out_data << setw(10) << setprecision(6) << wf.ekb[ik][ib]*Ry_to_eV;//6.1
 		}
@@ -740,7 +740,7 @@ void eximport::in_charge_mpi(const string &dir)
 	double *rho_tmp = new double[pw.ncxyz]();
 	assert(rho_tmp!=0);
 
-	if(MY_RANK == 0)
+	if(GlobalV::MY_RANK == 0)
 	{
 		ifstream in(dir.c_str());
 		in >> name;
@@ -781,27 +781,27 @@ void eximport::in_charge_mpi(const string &dir)
 	//=================================================
     // Find number of planes for each cpu in this pool
     //=================================================
-    int *num_z = new int[NPROC_IN_POOL]();
+    int *num_z = new int[GlobalV::NPROC_IN_POOL]();
     for(iz=0;iz<pw.ncz;iz++)
     {
-        ip = iz % NPROC_IN_POOL;
+        ip = iz % GlobalV::NPROC_IN_POOL;
         num_z[ip]++;
     }
 
     //=======================================
     // Find current number of planes (nz)
     //=======================================
-    int *cur_z = new int[NPROC_IN_POOL]();
-    for(ip=1;ip<NPROC_IN_POOL;ip++)
+    int *cur_z = new int[GlobalV::NPROC_IN_POOL]();
+    for(ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
     {
         cur_z[ip] = cur_z[ip-1]+num_z[ip-1];
     }
 
 	for(ir =0;ir<pw.ncx * pw.ncy;ir++)
     {
-        for(iz=0;iz<num_z[RANK_IN_POOL];iz++)
+        for(iz=0;iz<num_z[GlobalV::RANK_IN_POOL];iz++)
         {
-            CHR.rho[0][ ir*num_z[RANK_IN_POOL]+iz ]= rho_tmp[ir*pw.ncz + cur_z[RANK_IN_POOL] + iz ];
+            CHR.rho[0][ ir*num_z[GlobalV::RANK_IN_POOL]+iz ]= rho_tmp[ir*pw.ncz + cur_z[GlobalV::RANK_IN_POOL] + iz ];
         }
     }
 
@@ -844,7 +844,7 @@ void eximport::out_charge_mpi(const string &dir,double* rho_in)
 void eximport::out_charge(ofstream &out_data)
 {
 	/*
-	ofs_running << "\n Output charge file." << endl;
+	GlobalV::ofs_running << "\n Output charge file." << endl;
 	out_data << setw(20) << "CHARGE" << endl;	//7.0
 	out_data << setw(20) << pw.omega << endl;	//7.1
 	out_data << setw(20) << pw.ncx 

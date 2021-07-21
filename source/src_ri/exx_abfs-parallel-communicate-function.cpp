@@ -11,7 +11,7 @@ Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(const MPI_Comm &m
 	bool atom_in_2D[ucell.nat*2];
 	for(int i=0; i<ucell.nat*2; ++i)
 		atom_in_2D[i]=false;
-	for(int iwt=0; iwt<NLOCAL; ++iwt)
+	for(int iwt=0; iwt<GlobalV::NLOCAL; ++iwt)
 	{
 		const int iat = ucell.iwt2iat[iwt];
 		if( ParaO.trace_loc_row[iwt]>=0 )

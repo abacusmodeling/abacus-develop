@@ -67,9 +67,9 @@ void Chi0_hilbert::Chi()
 	{
 		for(int ik2=0; ik2<kv.nks; ik2++)
 		{
-			if(max_e < (wf.ekb[ik1][NBANDS-1] - wf.ekb[ik2][0]))
+			if(max_e < (wf.ekb[ik1][GlobalV::NBANDS-1] - wf.ekb[ik2][0]))
 			{
-				max_e = wf.ekb[ik1][NBANDS-1] - wf.ekb[ik2][0];
+				max_e = wf.ekb[ik1][GlobalV::NBANDS-1] - wf.ekb[ik2][0];
 			}			
 		}		 
 	}
@@ -266,12 +266,12 @@ void Chi0_hilbert::Chi()
 	cweight = new double*[kv.nks]; 
 	for(int i=0;i<kv.nks;i++)             // new occupation
 	{
-		cweight[i] = new double[NBANDS];
+		cweight[i] = new double[GlobalV::NBANDS];
 	}
 	
 	for(int ik = 0;ik < kv.nks;ik++)
 	{
-		for(int ib=0; ib<NBANDS; ib++)
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			//----------------------------------------------------------
 			//  gauss smearing
@@ -318,7 +318,7 @@ void Chi0_hilbert::Chi()
 	double elec = 0.0;
 	for(int ik = 0;ik < kv.nks;ik++)
 	{
-		for(int ib=0; ib<NBANDS; ib++)
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			elec += cweight[ik][ib];
 		}
@@ -331,7 +331,7 @@ void Chi0_hilbert::Chi()
 	//----------------------------------------------------------	
 	int occ_bands = 0;
 	bool occ_flag;
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		occ_flag = false;
 		for(int ik=0; ik<kv.nks; ik++)
@@ -367,7 +367,7 @@ void Chi0_hilbert::Chi()
 		//-------------------------------------------------
 		// pw method
 		//-------------------------------------------------
-		if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+		if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 		{
 			for(int iq=start_q;iq< (start_q + interval_q * nq); iq=iq+interval_q)
 			{
@@ -410,7 +410,7 @@ void Chi0_hilbert::Chi()
 		//-------------------------------------------------
 		// lcao method
 		//-------------------------------------------------
-		else if(BASIS_TYPE == "lcao")
+		else if(GlobalV::BASIS_TYPE == "lcao")
 		{
 			//-------------------------------------------------
 			// first, readin files( "nearest.dat" and "overlap_q")
@@ -420,7 +420,7 @@ void Chi0_hilbert::Chi()
 			// nearest.dat
 			//------------------------
 			stringstream ss;
-			ss << global_out_dir <<"nearest.dat";
+			ss << GlobalV::global_out_dir <<"nearest.dat";
 			cout << ss.str().c_str() << endl;
 			ifstream ifsn(ss.str().c_str());
 			if(!ifsn)
@@ -430,35 +430,35 @@ void Chi0_hilbert::Chi()
 			ifsn >> NR;
 			cout << "NR in = "<<NR << endl;
 			
-			R = new Vector3<int>** [NLOCAL];
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			R = new Vector3<int>** [GlobalV::NLOCAL];
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				R[iw1] = new Vector3<int>* [NLOCAL];
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				R[iw1] = new Vector3<int>* [GlobalV::NLOCAL];
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					R[iw1][iw2] = new Vector3<int>[NR];
 				}
 			}
 			
-			Rcar = new Vector3<double>** [NLOCAL];
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			Rcar = new Vector3<double>** [GlobalV::NLOCAL];
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				Rcar[iw1] = new Vector3<double>* [NLOCAL];
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				Rcar[iw1] = new Vector3<double>* [GlobalV::NLOCAL];
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					Rcar[iw1][iw2] = new Vector3<double>[NR];
 				}
 			}
 			
-			Rmax = new int* [NLOCAL];
-			for(int iw=0; iw<NLOCAL; iw++)
+			Rmax = new int* [GlobalV::NLOCAL];
+			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{
-				Rmax[iw] = new int[NLOCAL];
+				Rmax[iw] = new int[GlobalV::NLOCAL];
 			}
 			
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					//cout <<"iw1 = "<<iw1<<" iw2 = "<<iw2<<endl;
 					ifsn >> tmp; 
@@ -474,9 +474,9 @@ void Chi0_hilbert::Chi()
 			}
 			ifsn.close();
 			
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					for(int i=0; i<Rmax[iw1][iw2]; i++)
 					{
@@ -490,11 +490,11 @@ void Chi0_hilbert::Chi()
 				}
 			}
 			
-			overlap = new complex<double> ***[NLOCAL];
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			overlap = new complex<double> ***[GlobalV::NLOCAL];
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				overlap[iw1] = new complex<double>**[NLOCAL];
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				overlap[iw1] = new complex<double>**[GlobalV::NLOCAL];
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					overlap[iw1][iw2] = new complex<double>*[dim];
 					for(int ig=0; ig<dim; ig++)
@@ -512,7 +512,7 @@ void Chi0_hilbert::Chi()
 				//--------------------------------
 				//cout << "begin overlap"<<endl;
 				stringstream ssq;
-				ssq << global_out_dir <<"q_"<<icount;
+				ssq << GlobalV::global_out_dir <<"q_"<<icount;
 				ifstream ifso(ssq.str().c_str());
 				if (!ifso)
 				{
@@ -521,9 +521,9 @@ void Chi0_hilbert::Chi()
 				ifso >> tmp; //cout << tmp << endl;
 				for(int ig=0; ig<dim; ig++)
 				{
-					for(int iw1=0; iw1<NLOCAL; iw1++)
+					for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 					{
-						for(int iw2=0; iw2<NLOCAL; iw2++)
+						for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 						{
 							for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 							{
@@ -573,9 +573,9 @@ void Chi0_hilbert::Chi()
 				icount++;
 			}
 			
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					delete[] R[iw1][iw2];
 				}
@@ -583,9 +583,9 @@ void Chi0_hilbert::Chi()
 			}
 			delete[] R;
 			
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					delete[] Rcar[iw1][iw2];
 				}
@@ -593,15 +593,15 @@ void Chi0_hilbert::Chi()
 			}
 			delete[] Rcar;
 			
-			for(int iw=0; iw<NLOCAL; iw++)
+			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{
 				delete[] Rmax[iw];
 			}
 			delete[] Rmax;
 			
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					for(int ig=0; ig<dim; ig++)
 					{
@@ -675,7 +675,7 @@ void Chi0_hilbert::Chi()
 void Chi0_hilbert::Init()
 {
 	TITLE("Chi0_hilbert","Init");
-	//cout << "nbands(init) = " <<NBANDS <<endl;
+	//cout << "nbands(init) = " <<GlobalV::NBANDS <<endl;
 	//cout << "oband = " <<oband <<endl;
 	//cout << "nrxx = "<<pw.nrxx<<endl;
 	//cout << "ngmc = " << pw.ngmc <<endl;
@@ -693,23 +693,23 @@ void Chi0_hilbert::Init()
 	/*psi_r = new complex<double>**[kv.nks];
 	for(int iq=0; iq<kv.nks; iq++)
 	{
-		psi_r[iq] = new complex<double>*[NBANDS];
-		for(int ib=0; ib<NBANDS; ib++)
+		psi_r[iq] = new complex<double>*[GlobalV::NBANDS];
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			psi_r[iq][ib] = new complex<double>[pw.nrxx];
 		}
 	}*/
 	
-	if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+	if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 	{
-		psi_r1 = new complex<double>*[NBANDS];
-		for(int ib=0; ib<NBANDS; ib++)
+		psi_r1 = new complex<double>*[GlobalV::NBANDS];
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			psi_r1[ib] = new complex<double>[pw.nrxx];
 		}
 		
-		psi_r2 = new complex<double>*[NBANDS];
-		for(int ib=0; ib<NBANDS; ib++)
+		psi_r2 = new complex<double>*[GlobalV::NBANDS];
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			psi_r2[ib] = new complex<double>[pw.nrxx];
 		}
@@ -724,7 +724,7 @@ void Chi0_hilbert::Init()
 		b[g0] = new complex<double>*[oband];
 		for(int ib=0; ib<oband; ib++)
 		{
-			b[g0][ib] = new complex<double>[NBANDS];
+			b[g0][ib] = new complex<double>[GlobalV::NBANDS];
 		}
 	}
 	cout << "b OK" <<endl;
@@ -831,15 +831,15 @@ void Chi0_hilbert::Delete()
 		}
 		delete[] cweight;
 		
-		if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+		if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 		{
-			for(int ib=0; ib<NBANDS; ib++)
+			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
 				delete[] psi_r1[ib];
 			}
 			delete[] psi_r1;
 			
-			for(int ib=0; ib<NBANDS; ib++)
+			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
 				delete[] psi_r2[ib];
 			}
@@ -961,11 +961,11 @@ void Chi0_hilbert::Parallel_G()
 	//----------------------------
 	// init
 	//----------------------------
-	num_G_core = new int[DSIZE];
-	num_G_dis = new int[DSIZE];
+	num_G_core = new int[GlobalV::DSIZE];
+	num_G_dis = new int[GlobalV::DSIZE];
 	G_r_core = new double[pw.ngmc];
-	num_Gvector_core = new int[DSIZE];
-	num_Gvector_dis = new int[DSIZE];
+	num_Gvector_core = new int[GlobalV::DSIZE];
+	num_Gvector_dis = new int[GlobalV::DSIZE];
 	G_r = new double[pw.ngmc_g];
 	Gvec_core = new double[3*pw.ngmc];
 	Gvec = new double[3*pw.ngmc_g];
@@ -977,17 +977,17 @@ void Chi0_hilbert::Parallel_G()
 		flag[i] = i;
 	}
 	
-	ZEROS( num_G_dis, DSIZE);
-	ZEROS( num_G_core, DSIZE);
-	ZEROS( num_Gvector_dis, DSIZE);
-	ZEROS( num_Gvector_core, DSIZE);
+	ZEROS( num_G_dis, GlobalV::DSIZE);
+	ZEROS( num_G_core, GlobalV::DSIZE);
+	ZEROS( num_Gvector_dis, GlobalV::DSIZE);
+	ZEROS( num_Gvector_core, GlobalV::DSIZE);
 	
 #ifdef __MPI
 	MPI_Allgather( &pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
 #endif
 	
-	memset(num_G_dis,0,DSIZE*sizeof(int));
-	for(int i=0; i<DSIZE; i++)
+	memset(num_G_dis,0,GlobalV::DSIZE*sizeof(int));
+	for(int i=0; i<GlobalV::DSIZE; i++)
 	{
 		for(int j=0; j<i; j++)
 		{
@@ -995,7 +995,7 @@ void Chi0_hilbert::Parallel_G()
 		}
 	}
 	
-	for(int i=0;i<DSIZE;i++)
+	for(int i=0;i<GlobalV::DSIZE;i++)
 	{
 		num_Gvector_dis[i] = num_G_dis[i] * 3;
 		num_Gvector_core[i] = num_G_core[i] * 3;
@@ -1043,7 +1043,7 @@ void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
 	complex<double> exp_tmp;
-	for(int ib = 0; ib < NBANDS; ib++)
+	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
 		ZEROS( UFFT.porter, (pw.nrxx) );
 		for(int ig = 0; ig < kv.ngk[iq] ; ig++)
@@ -1079,7 +1079,7 @@ void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
 	complex<double> exp_tmp;
-	for(int ib = 0; ib < NBANDS; ib++)
+	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
 		ZEROS( UFFT.porter, (pw.nrxx) );
 		for(int ig = wf.npwx; ig < wf.npwx + kv.ngk[iq] ; ig++)
@@ -1133,18 +1133,18 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
 		{
-			ZEROS( b[ig][ib1], NBANDS);
+			ZEROS( b[ig][ib1], GlobalV::NBANDS);
 		}
 	}
 	
-	vector<vector<vector<complex<double>>>> phase(NLOCAL,
-		vector<vector<complex<double>>>(NLOCAL,
+	vector<vector<vector<complex<double>>>> phase(GlobalV::NLOCAL,
+		vector<vector<complex<double>>>(GlobalV::NLOCAL,
 			vector<complex<double>>(NR)));	// Peize Lin change ptr to vector at 2020.01.31
 	
 	int MR = 0;
-	for(int iw1=0; iw1<NLOCAL; iw1++)
+	for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 	{
-		for(int iw2=0; iw2<NLOCAL; iw2++)
+		for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 		{
 			for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 			{
@@ -1163,14 +1163,14 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 	{
 		for(int ib1=0; ib1< oband; ib1++)
 		{
-			for(int ib2=0; ib2<NBANDS; ib2++) 
+			for(int ib2=0; ib2<GlobalV::NBANDS; ib2++) 
 			{
 				//------------------------------
 				// calculate the matrix
 				//------------------------------
-				for(int iw1=0; iw1<NLOCAL; iw1++)
+				for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 				{
-					for(int iw2=0; iw2<NLOCAL; iw2++)
+					for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 					{
 						for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 						{
@@ -1185,17 +1185,17 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 	vector<vector<complex<double>>> left(oband,
 		vector<complex<double>>(MR));				// Peize Lin change ptr to vector at 2020.01.31
 	vector<vector<complex<double>>> right(MR,
-		vector<complex<double>>(NBANDS));			// Peize Lin change ptr to vector at 2020.01.31
+		vector<complex<double>>(GlobalV::NBANDS));			// Peize Lin change ptr to vector at 2020.01.31
 	vector<vector<complex<double>>> b_single(oband,
-		vector<complex<double>>(NBANDS)); 			// Peize Lin change ptr to vector at 2020.01.31
+		vector<complex<double>>(GlobalV::NBANDS)); 			// Peize Lin change ptr to vector at 2020.01.31
 	for(int ig=0; ig<dim; ig++)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
 		{
 			int r=0;
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 					{
@@ -1206,12 +1206,12 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 			}
 		}
 		
-		for(int ib2=0; ib2<NBANDS; ib2++)
+		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			int r=0;
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 					{
@@ -1226,18 +1226,18 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		complex<double> beta=0;
 		char transa = 'N';
 		char transb = 'N';
-		int M = NBANDS;
+		int M = GlobalV::NBANDS;
 		int N = oband;
 		int K = MR;
-		int lda =NBANDS;
+		int lda =GlobalV::NBANDS;
 		int ldb = MR;
-		int ldc =NBANDS;
+		int ldc =GlobalV::NBANDS;
 		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(right[0]), &lda, 
 			VECTOR_TO_PTR(left[0]), &ldb, &beta,  VECTOR_TO_PTR(b_single[0]), &ldc);
 		
 		for(int ib1=0; ib1<oband; ib1++)
 		{
-			for(int ib2=0; ib2<NBANDS; ib2++)
+			for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 			{
 				b[ig][ib1][ib2] = b_single[ib1][ib2];
 			}
@@ -1272,7 +1272,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 
 	for(int ib1=0; ib1< oband; ib1++)
 	{
-		for(int ib2=0; ib2<NBANDS; ib2++)
+		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			int ir=0;
 			for(int ix=0; ix<pw.ncx; ix++)
@@ -1325,7 +1325,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	//{
 	//	for(int ib1=0; ib1<oband; ib1++)
 	//	{
-	//		for(int ib2=0; ib2<NBANDS; ib2++)
+	//		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 	//		{
 	//			b[i][ib1][ib2] = complex<double>(0.0,0.0);
 	//		}
@@ -1333,7 +1333,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 		
 	//	for(int ib1=0; ib1<oband; ib1++)
 	//	{
-	//		for(int ib2=0; ib2<NBANDS; ib2++)
+	//		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 	//		{
 	//			for(int ig =0; ig< kv.ngk[ik]; ig++)
 	//			{
@@ -1366,7 +1366,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
         Cal_Psi2(iqk);
 
         for(int ib1=0;ib1<oband; ib1++)
-            for(int ib2=0;ib2<NBANDS; ib2++)
+            for(int ib2=0;ib2<GlobalV::NBANDS; ib2++)
                 for(int ig=0;ig<dim;ig++)
                 {
                     b[ig][ib1][ib2].real() = 0.0;
@@ -1375,7 +1375,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 
         //for(int ib1=0; ib1<oband; ib1++)
         //{
-        //        for(int ib2=0; ib2<NBANDS; ib2++)
+        //        for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
         //        {
 
         //            for(int ig=0; ig<dim; ig++)
@@ -1419,7 +1419,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
                         exp_tmp.imag() = sin(-phase_xyz);
                         for(int ib1=0;ib1<oband;ib1++)
                         {
-                            for(int ib2=0;ib2<NBANDS;ib2++)
+                            for(int ib2=0;ib2<GlobalV::NBANDS;ib2++)
                             {
                                 b[ig][ib1][ib2] = b[ig][ib1][ib2] +  conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
                             }
@@ -1432,7 +1432,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 
 
         for(int ib1=0;ib1<oband; ib1++)
-            for(int ib2=0;ib2<NBANDS; ib2++)
+            for(int ib2=0;ib2<GlobalV::NBANDS; ib2++)
                 for(int ig=0;ig<dim;ig++)
                 {
                     b[ig][ib1][ib2] = b[ig][ib1][ib2]/pw.ncxyz; 
@@ -1459,7 +1459,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	//---------------------------------------------------------------------------------
 	// some test(use our program's wavefunction and other program's occupation to check)
 	//---------------------------------------------------------------------------------
-	/*double Q[kv.nks][NBANDS];
+	/*double Q[kv.nks][GlobalV::NBANDS];
 	ifstream ifs("band.dat");
 	if(!ifs)
 	{
@@ -1467,7 +1467,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	}
 	for(int i=0;i<kv.nks;i++)
 	{
-		for(int j=0;j<NBANDS;j++)
+		for(int j=0;j<GlobalV::NBANDS;j++)
 		{
 			ifs >> Q[i][j];
 		}
@@ -1476,12 +1476,12 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	//---------------------------------------------------------------------------------
 	// no spin
 	//---------------------------------------------------------------------------------
-	if(NSPIN == 1) 
+	if(GlobalV::NSPIN == 1) 
 	{
 		for(int ik=0; ik<kv.nks; ik++)
 		{
 			int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
-			if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+			if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{
 				Cal_b(iq, ik, iqk, 0);
 			}
@@ -1492,7 +1492,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 
 			for(int ib1=0; ib1<oband; ib1++)
 			{
-				for(int ib2=0; ib2<NBANDS; ib2++)
+				for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 				{
 					delta_e = wf.ekb[iqk][ib2] - wf.ekb[ik][ib1];
 					//delta_e = Q[ik][ib2] - Q[ik][ib1];
@@ -1533,13 +1533,13 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	//---------------------------------------------------------------------------------
 	// spin = 2 ( fermi_level != 0 haven't been tested)
 	//---------------------------------------------------------------------------------
-	else if(NSPIN == 2)
+	else if(GlobalV::NSPIN == 2)
 	{
 		// spin up
 		for(int ik=0; ik<kv.nks/2; ik++)
 		{
 			int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
-			if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+			if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{
 				Cal_b(iq, ik, iqk, 0);
 			}
@@ -1552,7 +1552,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 			
 			for(int ib1=0; ib1<oband; ib1++)
 			{
-				for(int ib2=0; ib2<NBANDS; ib2++)
+				for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 				{
 					delta_e = wf.ekb[iqk][ib2] - wf.ekb[ik][ib1];
 					if ((delta_e > 0 || delta_e == 0) && delta_e < ((nomega-1) * domega) )
@@ -1595,7 +1595,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 		for(int ik=kv.nks/2 + 1; ik<kv.nks; ik++)
 		{
 			int iqk = Cal_iq(ik-kv.nks/2, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]) + kv.nks/2;
-			if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+			if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{
 				Cal_b(iq+kv.nks/2, ik, iqk, 0);
 			}
@@ -1605,7 +1605,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 			}
 			for(int ib1=0; ib1<oband; ib1++)
 			{
-				for(int ib2=0; ib2<NBANDS; ib2++)
+				for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 				{
 					delta_e = wf.ekb[iqk][ib2] - wf.ekb[ik][ib1];
 					if ((delta_e > 0 || delta_e == 0) && delta_e < ((nomega-1) * domega) )
@@ -1645,15 +1645,15 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 			}			
 		}
 	}
-	else if(NSPIN == 4)
+	else if(GlobalV::NSPIN == 4)
 	{
-		cout<<"NSPIN = "<<NSPIN<<endl;
+		cout<<"GlobalV::NSPIN = "<<GlobalV::NSPIN<<endl;
 		for(int ik=0; ik<kv.nks; ik++)
 		{
 			int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
 			for(int ispin =0; ispin<2; ispin++)
 			{
-				if(BASIS_TYPE == "pw" || BASIS_TYPE == "lcao_in_pw")
+				if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 				{
 					Cal_b(iq, ik, iqk, ispin);
 				}
@@ -1669,7 +1669,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 
 				for(int ib1=0; ib1<oband; ib1++)	
 				{
-					for(int ib2=0; ib2<NBANDS; ib2++)
+					for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 					{
 						delta_e = wf.ekb[iqk][ib2] - wf.ekb[ik][ib1];
 						//delta_e = Q[ik][ib2] - Q[ik][ib1];
@@ -1881,7 +1881,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 	if(out_chi)
 	{
 		stringstream sschi;
-		sschi << global_out_dir << "chi_"<<iq<<".dat";
+		sschi << GlobalV::global_out_dir << "chi_"<<iq<<".dat";
 		ofstream ofschi(sschi.str().c_str());
 		for(int i=0;i<nomega;i++)
 		{
@@ -1893,7 +1893,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 	if(out_epsilon)
 	{
 		stringstream sseps;
-		sseps << global_out_dir << "Imeps^-1_"<<iq<<".dat";
+		sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
 		ofstream ofseps(sseps.str().c_str());
 		ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<endl;
 		if(!coulomb_cutoff)
@@ -2540,7 +2540,7 @@ complex<double> Chi0_hilbert:: Cal_g(int iq)
 void Chi0_hilbert::plot_chi0(int iq)
 {
 	stringstream ss;
-	ss << global_out_dir <<"chi0"<<"_"<<iq<<".dat";
+	ss << GlobalV::global_out_dir <<"chi0"<<"_"<<iq<<".dat";
 	ofstream ofs(ss.str().c_str());
 	for(int i=0;i<nomega;i++)
 	{

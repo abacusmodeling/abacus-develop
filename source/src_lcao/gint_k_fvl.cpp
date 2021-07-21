@@ -16,8 +16,8 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	}
 
 	int nnrg = LNNR.nnrg;
- 	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(OUT_LEVEL != "m") ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
+ 	//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
@@ -213,7 +213,7 @@ void Gint_k::svl_k_RealSpace(
 
 	int nnrg = LNNR.nnrg;
 
-	if(OUT_LEVEL != "m") ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
@@ -471,7 +471,7 @@ void Gint_k::evaluate_vl_stress(
 	}
 
 
-	double* dmR = LOC.DM_R[CURRENT_SPIN];
+	double* dmR = LOC.DM_R[GlobalV::CURRENT_SPIN];
 
 	double* dmR2;
 	for (int ia1=0; ia1<size; ++ia1)
@@ -754,7 +754,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         }
 
 
-        double* dmR = LOC.DM_R[CURRENT_SPIN];
+        double* dmR = LOC.DM_R[GlobalV::CURRENT_SPIN];
         double* dmR2;
         for (int ia1=0; ia1<size; ++ia1)
         {

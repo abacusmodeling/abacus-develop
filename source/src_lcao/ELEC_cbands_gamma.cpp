@@ -16,7 +16,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 	TITLE("ELEC_cbands_gamma","cal_bands");
 	timer::tick("ELEC_cband_gamma","cal_bands");
 
-	assert(NSPIN == kv.nks);
+	assert(GlobalV::NSPIN == kv.nks);
 						
 	// pool parallization in future -- mohan note 2021-02-09
 	for(int ik=0; ik<kv.nks; ik++)
@@ -25,15 +25,15 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//(1) prepare data for this k point.
 		// copy the local potential from array.
 		//-----------------------------------------
-		if(NSPIN==2) 
+		if(GlobalV::NSPIN==2) 
 		{
-			CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = kv.isk[ik];
 		}
 		wf.npw = kv.ngk[ik];
 
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( CURRENT_SPIN, ir);
+			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		if(!uhm.init_s)
@@ -78,7 +78,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//--------------------------------------
 		// DIAG GROUP OPERATION HERE
 		//--------------------------------------
-		if(DCOLOR==0)
+		if(GlobalV::DCOLOR==0)
 		{
 			Diago_LCAO_Matrix DLM;
 			// the temperary array totwfc only have one spin direction.
@@ -87,9 +87,9 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		else
 		{
 #ifdef __MPI
-			ofs_running << " no diagonalization." << endl;
+			GlobalV::ofs_running << " no diagonalization." << endl;
 #else
-			cout << " DCOLOR=" << DCOLOR << endl;
+			cout << " GlobalV::DCOLOR=" << GlobalV::DCOLOR << endl;
 			WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
 #endif
 

@@ -48,7 +48,7 @@ void Stress_Func::stress_kin(matrix& sigma)
 		{
 			for(int m=0;m<l+1;m++)
 			{
-				for(int ibnd=0;ibnd<NBANDS;ibnd++)
+				for(int ibnd=0;ibnd<GlobalV::NBANDS;ibnd++)
 				{
 					for(int i=0;i<npw;i++)
 					{

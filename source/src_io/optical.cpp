@@ -14,9 +14,9 @@ void Optical::cal_epsilon2(const int &nbands)
 	TITLE("Optical","cal_epsilon2");
 	timer::tick("Optical","cal_epsilon2");
 
-	if(Optical::opt_nbands > NBANDS)
+	if(Optical::opt_nbands > GlobalV::NBANDS)
 	{
-		opt_nbands = NBANDS;
+		opt_nbands = GlobalV::NBANDS;
 	}
 
 	assert( wf.ekb!=0 );
@@ -26,10 +26,10 @@ void Optical::cal_epsilon2(const int &nbands)
 	
 	ofstream ofs;
 
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		stringstream ss;
-		ss << global_out_dir << "EPSILON2.dat";
+		ss << GlobalV::global_out_dir << "EPSILON2.dat";
 		ofs.open( ss.str().c_str() );
 	}
 
@@ -67,13 +67,13 @@ void Optical::cal_epsilon2(const int &nbands)
 	cout << " energy range = " << maxe - mine << endl;
 	cout << " de = " << de << " points = " << np << endl;
 
-	OUT(ofs_running,"n_occ",n_occ);
-	OUT(ofs_running,"nbands for optical",opt_nbands);
-	OUT(ofs_running,"max energy",maxe);
-	OUT(ofs_running,"min energy",mine);
-	OUT(ofs_running,"energy range",maxe-mine);
-	OUT(ofs_running,"de",de);
-	OUT(ofs_running,"points",np);
+	OUT(GlobalV::ofs_running,"n_occ",n_occ);
+	OUT(GlobalV::ofs_running,"nbands for optical",opt_nbands);
+	OUT(GlobalV::ofs_running,"max energy",maxe);
+	OUT(GlobalV::ofs_running,"min energy",mine);
+	OUT(GlobalV::ofs_running,"energy range",maxe-mine);
+	OUT(GlobalV::ofs_running,"de",de);
+	OUT(GlobalV::ofs_running,"points",np);
 
 	double *epsilon2 = new double[np];
 	ZEROS(epsilon2, np);
@@ -97,7 +97,7 @@ void Optical::cal_epsilon2(const int &nbands)
 	Parallel_Reduce::reduce_double_allpool( epsilon2, np);	
 #endif
 
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		ofs << np << endl;
 		ofs << kv.nkstot << endl;

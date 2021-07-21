@@ -101,7 +101,7 @@ void cal_r_overlap_R::init()
 	ORB.Phi[T].PhiLN(0,0).getDk(),
 	ORB.Phi[T].PhiLN(0,0).getDruniform(),
 	false,
-	true, FORCE);
+	true, GlobalV::FORCE);
 
 /*
 	orbital_phi.resize(ucell.ntype);
@@ -271,24 +271,24 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 				Vector3<double> R_car = Vector3<double>(dRx,dRy,dRz) * ucell.latvec;
 				
 				int ir,ic;
-				for(int iw1 = 0; iw1 < NLOCAL; iw1++)
+				for(int iw1 = 0; iw1 < GlobalV::NLOCAL; iw1++)
 				{
 					ir = ParaO.trace_loc_row[iw1];	
 					if(ir >= 0)
 					{
-						for(int iw2 = 0; iw2 < NLOCAL; iw2++)
+						for(int iw2 = 0; iw2 < GlobalV::NLOCAL; iw2++)
 						{							
 							ic = ParaO.trace_loc_col[iw2];
 							if(ic >= 0)
 							{
 								int icc = ir + ic * ParaO.nrow;
 								
-								int orb_index_row = iw1 / NPOL;
-								int orb_index_col = iw2 / NPOL;
+								int orb_index_row = iw1 / GlobalV::NPOL;
+								int orb_index_col = iw2 / GlobalV::NPOL;
 								
 								// soc中非对角项为零，两个对角项相同
-								int new_index = iw1 - NPOL*orb_index_row 
-									+ (iw2 - NPOL*orb_index_col)*NPOL;
+								int new_index = iw1 - GlobalV::NPOL*orb_index_row 
+									+ (iw2 - GlobalV::NPOL*orb_index_col)*GlobalV::NPOL;
 								
 								if(new_index == 0 || new_index == 3)
 								{
@@ -334,11 +334,11 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	// out r_overlap_R file
 	ofstream out_r;
 	stringstream ssh;
-	ssh << global_out_dir << "data-rR-tr_SPIN" << nspin;
-	if(DRANK == 0)
+	ssh << GlobalV::global_out_dir << "data-rR-tr_SPIN" << nspin;
+	if(GlobalV::DRANK == 0)
 	{
 		out_r.open(ssh.str().c_str());
-		out_r << "Matrix Dimension of vector r(R): " << NLOCAL <<endl;
+		out_r << "Matrix Dimension of vector r(R): " << GlobalV::NLOCAL <<endl;
 	}
 	
 	for(int ix = 0; ix < R_x_num; ix++)
@@ -352,21 +352,21 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
                 int dRz = iz + R_minZ;				
 				
 				int ir,ic;
-				for(int i = 0; i < NLOCAL; i++)
+				for(int i = 0; i < GlobalV::NLOCAL; i++)
 				{
 					double *liner_x, *liner_y, *liner_z;
-					liner_x = new double[NLOCAL];
-					liner_y = new double[NLOCAL];
-					liner_z = new double[NLOCAL];
-					ZEROS(liner_x,NLOCAL);
-					ZEROS(liner_y,NLOCAL);
-					ZEROS(liner_z,NLOCAL);
+					liner_x = new double[GlobalV::NLOCAL];
+					liner_y = new double[GlobalV::NLOCAL];
+					liner_z = new double[GlobalV::NLOCAL];
+					ZEROS(liner_x,GlobalV::NLOCAL);
+					ZEROS(liner_y,GlobalV::NLOCAL);
+					ZEROS(liner_z,GlobalV::NLOCAL);
 					
 					ir = ParaO.trace_loc_row[i];
 					
 					if(ir >= 0)
 					{
-						for(int j = 0; j < NLOCAL; j++)
+						for(int j = 0; j < GlobalV::NLOCAL; j++)
 						{
 							ic = ParaO.trace_loc_col[j];
 							if(ic >= 0)
@@ -380,13 +380,13 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 						}
 					}
 					
-					Parallel_Reduce::reduce_double_all(liner_x,NLOCAL);
-					Parallel_Reduce::reduce_double_all(liner_y,NLOCAL);
-					Parallel_Reduce::reduce_double_all(liner_z,NLOCAL);
+					Parallel_Reduce::reduce_double_all(liner_x,GlobalV::NLOCAL);
+					Parallel_Reduce::reduce_double_all(liner_y,GlobalV::NLOCAL);
+					Parallel_Reduce::reduce_double_all(liner_z,GlobalV::NLOCAL);
 					
-					if(DRANK == 0)
+					if(GlobalV::DRANK == 0)
 					{
-						for(int j = 0; j < NLOCAL; j++)
+						for(int j = 0; j < GlobalV::NLOCAL; j++)
 						{
 							if(i==0 && j==0)
 							{
@@ -413,7 +413,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 		}
 	}
 	
-	if(DRANK == 0) out_r.close();
+	if(GlobalV::DRANK == 0) out_r.close();
 
 
 	timer::tick("cal_r_overlap_R","out_r_overlap_R");

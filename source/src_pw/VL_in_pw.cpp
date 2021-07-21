@@ -69,7 +69,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 
 void pseudopot_cell_vl::allocate(void)
 {
-	if(test_pp>0) TITLE("pseudopot_cell_vl","allocate");
+	if(GlobalV::test_pp>0) TITLE("pseudopot_cell_vl","allocate");
 	this->vloc.create(ucell.ntype, pw.nggm);
 
 	delete[] numeric;
@@ -204,14 +204,14 @@ void pseudopot_cell_vl::vloc_of_g(
 
 void pseudopot_cell_vl::print_vloc(void)const
 {
-	if(MY_RANK!=0) return; //mohan fix bug 2011-10-13
+	if(GlobalV::MY_RANK!=0) return; //mohan fix bug 2011-10-13
 	bool check_vl = true;
 	if(check_vl)
 	{
 		for(int it=0; it<ucell.ntype; it++)
 		{
 			stringstream ss ;
-			ss << global_out_dir << ucell.atoms[it].label << "/v_loc_g.dat" ;
+			ss << GlobalV::global_out_dir << ucell.atoms[it].label << "/v_loc_g.dat" ;
 			ofstream ofs_vg( ss.str().c_str() );
 			for(int ig=0;ig<pw.nggm;ig++)
 			{

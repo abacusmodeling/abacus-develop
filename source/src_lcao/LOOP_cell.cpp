@@ -38,7 +38,7 @@ void LOOP_cell::opt_cell(void)
 	// PLEASE simplify the Exx_Global interface
 	// mohan add 2021-03-25
 	// Peize Lin 2016-12-03
-	if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+	if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
 	{
 		switch(exx_global.info.hybrid_type)
 		{

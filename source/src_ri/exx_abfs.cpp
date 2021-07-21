@@ -1051,11 +1051,11 @@ void density_matrix()
 	vector<matrix> DM_k(kv.nks);
 	for( size_t ik=0; ik!=kv.nks; ++ik )
 	{
-		for( size_t ib=0; ib!=NBANDS; ++ib )
+		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 		{
-			for( size_t iw1=0; iw1!=NLOCAL; ++iw1 )
+			for( size_t iw1=0; iw1!=GlobalV::NLOCAL; ++iw1 )
 			{
-				for( size_t iw2=0; iw2!=NLOCAL; ++iw2 )
+				for( size_t iw2=0; iw2!=GlobalV::NLOCAL; ++iw2 )
 				{
 					DM_k[ik](iw1,iw2) += wf.wg(ik,ib) * conj(LOWF.WFC_K[ik][ib][iw1]) * LOWF.WFC_K[ik][ib][iw2];
 				}
@@ -1063,11 +1063,11 @@ void density_matrix()
 		}
 	}
 
-	vector<size_t,vector<matrix>> DM_R( NSPIN, vector<matrix>(R_supercell.size()) );
-	for( size_t is=0; is!=NSPIN; ++is )
+	vector<size_t,vector<matrix>> DM_R( GlobalV::NSPIN, vector<matrix>(R_supercell.size()) );
+	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
-		const size_t k_start = (NSPIN==1) ? 0 : ((is==0) ? 0 : (kv.nks/2));
-		const size_t k_end = (NSPIN==1) ? kv.nks : ((is==0) ? (kv.nks/2) : kv.nks);
+		const size_t k_start = (GlobalV::NSPIN==1) ? 0 : ((is==0) ? 0 : (kv.nks/2));
+		const size_t k_end = (GlobalV::NSPIN==1) ? kv.nks : ((is==0) ? (kv.nks/2) : kv.nks);
 		for( size_it iR=0; iR!=R_supercell.size(); ++iR )
 		{
 			for( size_t ik=k_start; ik!=k_end; ++ik )

@@ -22,7 +22,7 @@ void Gint_k_init::init(
 	const int &ncxyz_in
 	)
 {
-	TITLE(ofs_running,"Gint_k_init","init");
+	TITLE(GlobalV::ofs_running,"Gint_k_init","init");
 
 	this->nbx = nbx_in;
 	this->nby = nby_in;

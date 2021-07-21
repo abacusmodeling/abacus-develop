@@ -10,11 +10,11 @@ Charge_Extra::Charge_Extra()
 	init_rho = false;
 
 	// for first-order extrapolation
-	this->delta_rho1 = new double*[NSPIN];
-	this->delta_rho2 = new double*[NSPIN];
-	this->delta_rho = new double*[NSPIN];
+	this->delta_rho1 = new double*[GlobalV::NSPIN];
+	this->delta_rho2 = new double*[GlobalV::NSPIN];
+	this->delta_rho = new double*[GlobalV::NSPIN];
 	// for second-order extrapolation
-	this->delta_rho3 = new double*[NSPIN];
+	this->delta_rho3 = new double*[GlobalV::NSPIN];
 
 	// PLEASE update the following lines, because
 	// the pw.nrxx may not be initialized yet
@@ -22,7 +22,7 @@ Charge_Extra::Charge_Extra()
 	// you can move the initialization of the following 
 	// arrays to somewhere else
 	// mohan add 2021-03-30
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		delta_rho1[is] = new double[pw.nrxx];
 		delta_rho2[is] = new double[pw.nrxx];
@@ -52,7 +52,7 @@ Charge_Extra::~Charge_Extra()
 	{
 		for(int i=0; i<dim; i++)
 		{
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				delete[] rho_ion[i][is];
 			}
@@ -61,7 +61,7 @@ Charge_Extra::~Charge_Extra()
 		delete[] rho_ion;
 	}
 
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		delete[] delta_rho1[is];
 		delete[] delta_rho2[is];
@@ -116,8 +116,8 @@ void Charge_Extra::allocate_ions(void)
 
 	for(int i=0; i<dim; i++)
 	{
-		rho_ion[i] = new double*[NSPIN];
-		for(int is=0; is<NSPIN; is++)
+		rho_ion[i] = new double*[GlobalV::NSPIN];
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			rho_ion[i][is] = new double[pw.nrxx];
 			// first value from charge density.
@@ -130,7 +130,7 @@ void Charge_Extra::allocate_ions(void)
 
 	init_rho = true;
 
-	Memory::record("charge_extra","rho_ion",dim*NSPIN*pw.nrxx,"double");
+	Memory::record("charge_extra","rho_ion",dim*GlobalV::NSPIN*pw.nrxx,"double");
 
 	return;
 }
@@ -157,7 +157,7 @@ void Charge_Extra::extrapolate_charge()
 
 	if(pot.extra_pot == "dm")//xiaohui modify 2015-02-01
 	{
-		if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			WARNING_QUIT("Charge_Extra","charge extrapolation method is not available");
 		}
@@ -169,10 +169,10 @@ void Charge_Extra::extrapolate_charge()
 	// "atomic" extrapolation
 	else if(pot.extra_pot == "atomic")
 	{
-		double** rho_atom_old = new double*[NSPIN];
-		double** rho_atom_new = new double*[NSPIN];
+		double** rho_atom_old = new double*[GlobalV::NSPIN];
+		double** rho_atom_new = new double*[GlobalV::NSPIN];
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			rho_atom_old[is] = new double[pw.nrxx];
 			rho_atom_new[is] = new double[pw.nrxx];
@@ -180,8 +180,8 @@ void Charge_Extra::extrapolate_charge()
 			ZEROS(rho_atom_old[is], pw.nrxx);
 			ZEROS(rho_atom_new[is], pw.nrxx);
 		}
-		CHR.atomic_rho(NSPIN,rho_atom_old);
-		for(int is=0; is<NSPIN; is++)
+		CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
@@ -189,22 +189,22 @@ void Charge_Extra::extrapolate_charge()
 			}
 		}
 
-		if(OUT_LEVEL != "m") 
+		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
 		}
 		pw.setup_structure_factor();
 
-		CHR.atomic_rho(NSPIN,rho_atom_new);
+		CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new);
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
 				CHR.rho[is][ir] = delta_rho[is][ir] + rho_atom_new[is][ir];
 			}
 		}
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			delete[] rho_atom_old[is];
 			delete[] rho_atom_new[is];
@@ -216,10 +216,10 @@ void Charge_Extra::extrapolate_charge()
 	// "first-order" extrapolation
 	else if(pot.extra_pot == "first-order")
 	{
-		double** rho_atom_old = new double*[NSPIN];
-		double** rho_atom_new = new double*[NSPIN];
+		double** rho_atom_old = new double*[GlobalV::NSPIN];
+		double** rho_atom_new = new double*[GlobalV::NSPIN];
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			rho_atom_old[is] = new double[pw.nrxx];
 			rho_atom_new[is] = new double[pw.nrxx];
@@ -229,9 +229,9 @@ void Charge_Extra::extrapolate_charge()
 		}
 
 		// generate atomic rho
-		CHR.atomic_rho(NSPIN,rho_atom_old);
+		CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
@@ -241,14 +241,14 @@ void Charge_Extra::extrapolate_charge()
 			}
 		}
 
-		if(OUT_LEVEL != "m") 
+		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
 		}
 		pw.setup_structure_factor();
 
-		CHR.atomic_rho(NSPIN,rho_atom_new);
-		for(int is=0; is<NSPIN; is++)
+		CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new);
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
@@ -262,7 +262,7 @@ void Charge_Extra::extrapolate_charge()
 				}
 			}
 		}
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			delete[] rho_atom_old[is];
 			delete[] rho_atom_new[is];
@@ -274,10 +274,10 @@ void Charge_Extra::extrapolate_charge()
 	// "second-order" extrapolation of charge density
 	else if(pot.extra_pot == "second-order")
 	{
-		double** rho_atom_old = new double*[NSPIN];
-		double** rho_atom_new = new double*[NSPIN];
+		double** rho_atom_old = new double*[GlobalV::NSPIN];
+		double** rho_atom_new = new double*[GlobalV::NSPIN];
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			rho_atom_old[is] = new double[pw.nrxx];
 			rho_atom_new[is] = new double[pw.nrxx];
@@ -287,12 +287,12 @@ void Charge_Extra::extrapolate_charge()
 		}
 
 		// generate atomic_rho
-		CHR.atomic_rho(NSPIN,rho_atom_old);
+		CHR.atomic_rho(GlobalV::NSPIN,rho_atom_old);
 
 		// compute alpha and beta
 		find_alpha_and_beta();
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
@@ -305,19 +305,19 @@ void Charge_Extra::extrapolate_charge()
 			}
 		}
 
-		//xiaohui add 'OUT_LEVEL', 2015-09-16
-		if(OUT_LEVEL != "m") 
+		//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
+		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			ofs_running << " Setup the structure factor in plane wave basis." << endl;
+			GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
 		}
 
 		// setup the structure factor
 		pw.setup_structure_factor();
 
 		// generate atomic rho
-		CHR.atomic_rho(NSPIN,rho_atom_new);
+		CHR.atomic_rho(GlobalV::NSPIN,rho_atom_new);
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for(int ir=0; ir<pw.nrxx; ir++)
 			{
@@ -337,7 +337,7 @@ void Charge_Extra::extrapolate_charge()
 			}
 		}
 
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			delete[] rho_atom_old[is];
 			delete[] rho_atom_new[is];

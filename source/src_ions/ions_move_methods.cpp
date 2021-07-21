@@ -9,26 +9,26 @@ void Ions_Move_Methods::allocate()
 {
 	Ions_Move_Basic::dim = ucell.nat * 3;
 
-	if(MOVE_IONS=="bfgs")
+	if(GlobalV::MOVE_IONS=="bfgs")
 	{
 		this->bfgs.allocate();
 	}
-	else if(MOVE_IONS=="sd")
+	else if(GlobalV::MOVE_IONS=="sd")
 	{
 		this->sd.allocate();
 	}
-        else if(MOVE_IONS=="cg")
+        else if(GlobalV::MOVE_IONS=="cg")
         {
                 this->cg.allocate();
         }
-        else if(MOVE_IONS=="cg_bfgs")
+        else if(GlobalV::MOVE_IONS=="cg_bfgs")
 	{
 		this->cg.allocate();
                 this->bfgs.allocate();           // added by pengfei  13-8-8
 	}
 	else
 	{
-		WARNING("Ions_Move_Methods::init","the parameter MOVE_IONS is not correct.");
+		WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
 	}
 	return;
 }
@@ -41,34 +41,34 @@ void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, co
 	//Ions_Move_Basic::istep = istep;
     Ions_Move_Basic::istep = force_step;
 
-	if(MOVE_IONS=="bfgs")
+	if(GlobalV::MOVE_IONS=="bfgs")
 	{
 		// move_ions
 		// output tau
 		// check all symmery
 		bfgs.start(f, etot);
 	}
-	else if(MOVE_IONS=="sd")
+	else if(GlobalV::MOVE_IONS=="sd")
 	{
 		sd.start(f, etot);	
 	}
-	else if(MOVE_IONS=="cg")
+	else if(GlobalV::MOVE_IONS=="cg")
 	{
 		cg.start(f, etot );
 	}
-        else if(MOVE_IONS=="cg_bfgs")
+        else if(GlobalV::MOVE_IONS=="cg_bfgs")
         {
                 cg.start(f, etot );                                                // added by pengfei 13-8-10
         }
 	else
 	{
-		WARNING("Ions_Move_Methods::init","the parameter MOVE_IONS is not correct.");
+		WARNING("Ions_Move_Methods::init","the parameter GlobalV::MOVE_IONS is not correct.");
 	}
 
 	// print the atom positions for convinience.
 	stringstream ss;
 
-	ss << global_out_dir << "STRU_ION";
+	ss << GlobalV::global_out_dir << "STRU_ION";
 	
 	if(Ions_Move_Basic::out_stru)
 	{	

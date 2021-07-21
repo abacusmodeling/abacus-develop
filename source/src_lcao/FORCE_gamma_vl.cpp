@@ -51,9 +51,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     int istep = 1;
     pot.init_pot(istep, pw.strucFac);
 
-    for(int is=0; is<NSPIN; ++is)
+    for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        CURRENT_SPIN = is;
+        GlobalV::CURRENT_SPIN = is;
 
         ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
@@ -61,7 +61,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int ir=0; ir<pw.nrxx; ++ir)
         {
-            pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);
+            pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
         //  should not be set zero if VNA is used.
@@ -71,10 +71,10 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         UHM.GG.cal_force(pot.vr_eff1);
 
 
-        for(int i=0; i<NLOCAL; i++)
+        for(int i=0; i<GlobalV::NLOCAL; i++)
         {
             const int iat = ucell.iwt2iat[i];
-            for(int j=0; j<NLOCAL; j++)
+            for(int j=0; j<GlobalV::NLOCAL; j++)
             {
                 //const int iat2 = ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];
@@ -157,7 +157,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
     ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
     ZEROS (LM.DHloc_fixed_z, ParaO.nloc);
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         ZEROS (LM.DHloc_fixed_11, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_12, ParaO.nloc);
@@ -190,9 +190,9 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     int istep = 1;
     pot.init_pot(istep, pw.strucFac);
 
-    for(int is=0; is<NSPIN; ++is)
+    for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        CURRENT_SPIN = is;
+        GlobalV::CURRENT_SPIN = is;
 
         ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
@@ -200,7 +200,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int ir=0; ir<pw.nrxx; ++ir)
         {
-            pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);
+            pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
         //should not be set zero if VNA is used.
@@ -209,10 +209,10 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         //ZEROS(LM.DHloc_fixed_z,ParaO.nloc);
         UHM.GG.cal_force(pot.vr_eff1);
 
-        for(int i=0; i<NLOCAL; i++)
+        for(int i=0; i<GlobalV::NLOCAL; i++)
         {
             const int iat = ucell.iwt2iat[i];
-            for(int j=0; j<NLOCAL; j++)
+            for(int j=0; j<GlobalV::NLOCAL; j++)
             {
                 //const int iat2 = ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];

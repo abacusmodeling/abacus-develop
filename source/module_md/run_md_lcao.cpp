@@ -58,7 +58,7 @@ void Run_MD_LCAO::opt_ions(void)
     TITLE("Run_MD_LCAO","opt_ions"); 
     timer::tick("Run_MD_LCAO","opt_ions"); 
 		
-    if(OUT_LEVEL=="i")
+    if(GlobalV::OUT_LEVEL=="i")
     {
         cout << setprecision(12);
         cout<< " " << setw(7)<< "ISTEP"
@@ -71,7 +71,7 @@ void Run_MD_LCAO::opt_ions(void)
     }
 
     // Geometry optimization algorithm setup.
-    if(FORCE)
+    if(GlobalV::FORCE)
     {
         //Ions_Move_Methods 
         IMM.allocate();
@@ -80,7 +80,7 @@ void Run_MD_LCAO::opt_ions(void)
     }
 
 	// pengfei Li 2018-05-14
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
 		// allocate arrays related to changes of lattice vectors
         LCM.allocate();
@@ -91,12 +91,12 @@ void Run_MD_LCAO::opt_ions(void)
 
     this->istep = 1;
     bool stop = false;
-    while(istep <= NSTEP && !stop)
+    while(istep <= GlobalV::NSTEP && !stop)
     {
         time_t estart = time(NULL);
 	
 		// xiaohui add "m" option, 2015-09-16
-        if(OUT_LEVEL=="ie" || OUT_LEVEL=="m")
+        if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
         {
 			cout << " ---------------------------------------------------------" << endl;
 			cout<<" Molecular Dynamics STEP "<< mdb.getRealStep()<<endl;
@@ -162,8 +162,8 @@ void Run_MD_LCAO::opt_ions(void)
         {
             stringstream ssp;
             stringstream ssp_ave;
-            ssp << global_out_dir << "ElecStaticPot";
-            ssp_ave << global_out_dir << "ElecStaticPot_AVE";
+            ssp << GlobalV::global_out_dir << "ElecStaticPot";
+            ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
             pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
@@ -189,12 +189,12 @@ void Run_MD_LCAO::opt_ions(void)
 		}
 
 
-        if(OUT_LEVEL=="i")
+        if(GlobalV::OUT_LEVEL=="i")
         {
             double etime_min = difftime(eend, estart)/60.0;
             double ftime_min = difftime(fend, fstart)/60.0;
             stringstream ss;
-            ss << MOVE_IONS << istep;
+            ss << GlobalV::MOVE_IONS << istep;
 
             cout << setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
@@ -229,24 +229,24 @@ void Run_MD_LCAO::final_scf(void)
 {
     TITLE("Run_MD_LCAO","final_scf"); 
 
-    FINAL_SCF = true;
+    GlobalV::FINAL_SCF = true;
 
     Variable_Cell::final_calculation_after_vc();
 
-    SEARCH_RADIUS = atom_arrange::set_sr_NL(
-		ofs_running, 
-		OUT_LEVEL, 
+    GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+		GlobalV::ofs_running, 
+		GlobalV::OUT_LEVEL, 
 		ORB.get_rcutmax_Phi(), 
 		ORB.get_rcutmax_Beta(), 
-		GAMMA_ONLY_LOCAL);
+		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
-		SEARCH_PBC,
-		ofs_running,
+		GlobalV::SEARCH_PBC,
+		GlobalV::ofs_running,
 		GridD, 
 		ucell, 
-		SEARCH_RADIUS, 
-		test_atom_input);
+		GlobalV::SEARCH_RADIUS, 
+		GlobalV::test_atom_input);
 
     GridT.set_pbc_grid(
         pw.ncx, pw.ncy, pw.ncz,
@@ -255,7 +255,7 @@ void Run_MD_LCAO::final_scf(void)
         pw.nbxx, pw.nbzp_start, pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
-    if(!GAMMA_ONLY_LOCAL)
+    if(!GlobalV::GAMMA_ONLY_LOCAL)
     {
         // For each atom, calculate the adjacent atoms in different cells 
         // and allocate the space for H(R) and S(R).
@@ -275,7 +275,7 @@ void Run_MD_LCAO::final_scf(void)
 		
     // (5) init density kernel
     // (6) init wave functions.
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         // here we reset the density matrix dimension.
         LOC.allocate_gamma(GridT);
@@ -304,10 +304,10 @@ void Run_MD_LCAO::final_scf(void)
 	ELEC_scf es;
 	es.scf(0);
 
-    ofs_running << "\n\n --------------------------------------------" << endl;
-    ofs_running << setprecision(16);
-    ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
-    ofs_running << " --------------------------------------------\n\n" << endl;
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+    GlobalV::ofs_running << setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     return;
 }

@@ -28,7 +28,7 @@ void Potential::write_potential(
 
     ofstream ofs;
 
-    if(MY_RANK==0)
+    if(GlobalV::MY_RANK==0)
     {
         ofs.open( fn.c_str() );
 
@@ -91,22 +91,22 @@ void Potential::write_potential(
 #else
     MPI_Barrier(MPI_COMM_WORLD);
     // only do in the first pool.
-    if(MY_POOL==0)
+    if(GlobalV::MY_POOL==0)
     {
         // num_z: how many planes on processor 'ip'
-        int *num_z = new int[NPROC_IN_POOL];
-        ZEROS(num_z, NPROC_IN_POOL);
+        int *num_z = new int[GlobalV::NPROC_IN_POOL];
+        ZEROS(num_z, GlobalV::NPROC_IN_POOL);
         for (int iz=0;iz<pw.ncz;iz++)
         {
-            int ip = iz % NPROC_IN_POOL;
+            int ip = iz % GlobalV::NPROC_IN_POOL;
             num_z[ip]++;
         }
 
         // start_z: start position of z in
         // processor ip.
-        int *start_z = new int[NPROC_IN_POOL];
-        ZEROS(start_z, NPROC_IN_POOL);
-        for (int ip=1;ip<NPROC_IN_POOL;ip++)
+        int *start_z = new int[GlobalV::NPROC_IN_POOL];
+        ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+        for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
         {
             start_z[ip] = start_z[ip-1]+num_z[ip-1];
         }
@@ -116,11 +116,11 @@ void Potential::write_potential(
         ZEROS(which_ip, pw.ncz);
         for(int iz=0; iz<pw.ncz; iz++)
         {
-            for(int ip=0; ip<NPROC_IN_POOL; ip++)
+            for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
             {
-                if(iz>=start_z[NPROC_IN_POOL-1])
+                if(iz>=start_z[GlobalV::NPROC_IN_POOL-1])
                 {
-                    which_ip[iz] = NPROC_IN_POOL-1;
+                    which_ip[iz] = GlobalV::NPROC_IN_POOL-1;
                     break;
                 }
                 else if(iz>=start_z[ip] && iz<start_z[ip+1])
@@ -129,7 +129,7 @@ void Potential::write_potential(
                     break;
                 }
             }
-            //ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
+            //GlobalV::ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
         }
         int count=0;
         int nxy = pw.ncx * pw.ncy;
@@ -137,42 +137,42 @@ void Potential::write_potential(
         // save the rho one z by one z.
         for(int iz=0; iz<pw.ncz; iz++)
         {
-            //ofs_running << "\n" << iz << " iz"; //LiuXh modify 20200624
+            //GlobalV::ofs_running << "\n" << iz << " iz"; //LiuXh modify 20200624
             // tag must be different for different iz.
             ZEROS(zpiece, nxy);
             int tag = iz;
             MPI_Status ierror;
 
             // case 1: the first part of rho in processor 0.
-            if(which_ip[iz] == 0 && RANK_IN_POOL ==0)
+            if(which_ip[iz] == 0 && GlobalV::RANK_IN_POOL ==0)
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[RANK_IN_POOL] );
-                    //ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] );
+                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
                 }
             }
             // case 2: > first part rho: send the rho to
             // processor 0.
-            else if(which_ip[iz] == RANK_IN_POOL )
+            else if(which_ip[iz] == GlobalV::RANK_IN_POOL )
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[RANK_IN_POOL]);
+                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]);
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }
 
             // case 2: > first part rho: processor 0 receive the rho
             // from other processors
-            else if(RANK_IN_POOL==0)
+            else if(GlobalV::RANK_IN_POOL==0)
             {
                 MPI_Recv(zpiece, nxy, MPI_DOUBLE, which_ip[iz], tag, POOL_WORLD, &ierror);
-                //ofs_running << "\n Receieve First number = " << zpiece[0];
+                //GlobalV::ofs_running << "\n Receieve First number = " << zpiece[0];
             }
 
             // write data
-            if(MY_RANK==0)
+            if(GlobalV::MY_RANK==0)
             {
                 //ofs << "\niz=" << iz;
                 double ave = 0.0;
@@ -190,7 +190,7 @@ void Potential::write_potential(
     }
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
-    if(MY_RANK==0) ofs.close();
+    if(GlobalV::MY_RANK==0) ofs.close();
     timer::tick("potential","write_potential");
     return;
 }
@@ -209,7 +209,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     ZEROS( Porter, pw.nrxx );
     
     int nspin0 = 1;
-    if(NSPIN==2) nspin0 = NSPIN;
+    if(GlobalV::NSPIN==2) nspin0 = GlobalV::NSPIN;
     for(int is=0; is<nspin0; is++)
     {
         for(int ir=0; ir<pw.nrxx; ir++)
@@ -264,7 +264,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     ofstream ofs;
     ofstream ofs_ave;
 
-    if(MY_RANK==0)
+    if(GlobalV::MY_RANK==0)
     {
         ofs.open( fn.c_str() );
         ofs_ave.open( fn_ave.c_str() );
@@ -353,27 +353,27 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
 #else
     MPI_Barrier(MPI_COMM_WORLD);
     // only do in the first pool.
-    if(MY_POOL==0)
+    if(GlobalV::MY_POOL==0)
     {
         // num_z: how many planes on processor 'ip'
-        int *num_z = new int[NPROC_IN_POOL];
-        ZEROS(num_z, NPROC_IN_POOL);
+        int *num_z = new int[GlobalV::NPROC_IN_POOL];
+        ZEROS(num_z, GlobalV::NPROC_IN_POOL);
         //for (int iz=0;iz<pw.ncz;iz++)
         //{
-        //    int ip = iz % NPROC_IN_POOL;
+        //    int ip = iz % GlobalV::NPROC_IN_POOL;
         //    num_z[ip]++;
         //}
         for (int iz=0;iz<pw.nbz;iz++)
         {
-            int ip = iz % NPROC_IN_POOL;
+            int ip = iz % GlobalV::NPROC_IN_POOL;
             num_z[ip] += pw.bz;
         }
 
         // start_z: start position of z in
         // processor ip.
-        int *start_z = new int[NPROC_IN_POOL];
-        ZEROS(start_z, NPROC_IN_POOL);
-        for (int ip=1;ip<NPROC_IN_POOL;ip++)
+        int *start_z = new int[GlobalV::NPROC_IN_POOL];
+        ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+        for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
         {
             start_z[ip] = start_z[ip-1]+num_z[ip-1];
         }
@@ -383,11 +383,11 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         ZEROS(which_ip, pw.ncz);
         for(int iz=0; iz<pw.ncz; iz++)
         {
-            for(int ip=0; ip<NPROC_IN_POOL; ip++)
+            for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
             {
-                if(iz>=start_z[NPROC_IN_POOL-1])
+                if(iz>=start_z[GlobalV::NPROC_IN_POOL-1])
                 {
-                    which_ip[iz] = NPROC_IN_POOL-1;
+                    which_ip[iz] = GlobalV::NPROC_IN_POOL-1;
                     break;
                 }
                 else if(iz>=start_z[ip] && iz<start_z[ip+1])
@@ -396,7 +396,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
                     break;
                 }
             }
-            //ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
+            //GlobalV::ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
         }
         int count=0;
         int nxy = pw.ncx * pw.ncy;
@@ -404,42 +404,42 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         // save the rho one z by one z.
         for(int iz=0; iz<pw.ncz; iz++)
         {
-            //ofs_running << "\n" << iz << " iz";
+            //GlobalV::ofs_running << "\n" << iz << " iz";
             // tag must be different for different iz.
             ZEROS(zpiece, nxy);
             int tag = iz;
             MPI_Status ierror;
 
             // case 1: the first part of rho in processor 0.
-            if(which_ip[iz] == 0 && RANK_IN_POOL ==0)
+            if(which_ip[iz] == 0 && GlobalV::RANK_IN_POOL ==0)
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*pw.nczp+iz-start_z[RANK_IN_POOL] ];
-                    //ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+                    zpiece[ir] = v_elecstat[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] ];
+                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
                 }
             }
             // case 2: > first part rho: send the rho to
             // processor 0.
-            else if(which_ip[iz] == RANK_IN_POOL )
+            else if(which_ip[iz] == GlobalV::RANK_IN_POOL )
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
+                    zpiece[ir] = v_elecstat[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }
 
             // case 2: > first part rho: processor 0 receive the rho
             // from other processors
-            else if(RANK_IN_POOL==0)
+            else if(GlobalV::RANK_IN_POOL==0)
             {
                 MPI_Recv(zpiece, nxy, MPI_DOUBLE, which_ip[iz], tag, POOL_WORLD, &ierror);
-                //ofs_running << "\n Receieve First number = " << zpiece[0];
+                //GlobalV::ofs_running << "\n Receieve First number = " << zpiece[0];
             }
 
             // write data
-            if(MY_RANK==0)
+            if(GlobalV::MY_RANK==0)
             {
                 //ofs << "\niz=" << iz;
                 double ave = 0.0;
@@ -478,7 +478,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     }
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
-    if(MY_RANK==0) ofs.close();
+    if(GlobalV::MY_RANK==0) ofs.close();
 
     delete[] v_elecstat;
     delete[] vh_g;

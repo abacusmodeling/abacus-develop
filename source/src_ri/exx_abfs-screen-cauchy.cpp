@@ -132,7 +132,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const vector<map<size_t,map<size_
 	if(!flag_screen_cauchy)	return;
 	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_D_max");
 	
-	for( size_t is=0; is!=NSPIN; ++is )
+	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		for( const auto & DsA : Ds[is] )
 		{
@@ -246,24 +246,24 @@ bool Exx_Abfs::Screen::Cauchy::postcalC(
 		case 1:
 			if( info_step.C1_norm2_max * DVC24_norm2_max > threshold )
 			{
-//				num_cal += 0.25/NSPIN;
+//				num_cal += 0.25/GlobalV::NSPIN;
 				return true;
 			}
 			else 
 			{
-//				num_screen3 += 0.25/NSPIN; 
+//				num_screen3 += 0.25/GlobalV::NSPIN; 
 				return false; 
 			}
 			break;
 		case 3:
 			if( info_step.C3_norm2_max * DVC24_norm2_max > threshold )	
 			{ 
-//				num_cal += 0.25/NSPIN; 
+//				num_cal += 0.25/GlobalV::NSPIN; 
 				return true; 
 			}
 			else
 			{ 
-//				num_screen3 += 0.25/NSPIN; 
+//				num_screen3 += 0.25/GlobalV::NSPIN; 
 				return false; 
 			}	
 			break;

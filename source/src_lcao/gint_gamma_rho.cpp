@@ -24,8 +24,8 @@ void Gint_Gamma::cal_band_rho(
     const bool*const*const cal_flag, 				// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
     const double*const*const psir_ylm,				// psir_ylm[pw.bxyz][LD_pool]
     const int*const vindex,							// vindex[pw.bxyz]
-    const double*const*const*const DM,				// DM[NSPIN][lgd_now][lgd_now]
-    Gint_Tools::Array_Pool<double> &rho) const		// rho[NSPIN][pw.nrxx]
+    const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
+    Gint_Tools::Array_Pool<double> &rho) const		// rho[GlobalV::NSPIN][pw.nrxx]
 {
     //parameters for dsymm, dgemm and ddot
     constexpr char side='L', uplo='U';
@@ -33,7 +33,7 @@ void Gint_Gamma::cal_band_rho(
     constexpr double alpha_symm=1, alpha_gemm=2, beta=1;    
     constexpr int inc=1;
 
-    for(int is=0; is<NSPIN; ++is)
+    for(int is=0; is<GlobalV::NSPIN; ++is)
     {
         Gint_Tools::Array_Pool<double> psir_DM(pw.bxyz, LD_pool);
         ZEROS(psir_DM.ptr_1D, pw.bxyz*LD_pool);
@@ -92,7 +92,7 @@ void Gint_Gamma::cal_band_rho(
                 }
             }
             
-            //OUT(ofs_running, "diagonal part of psir_DM done");
+            //OUT(GlobalV::ofs_running, "diagonal part of psir_DM done");
             for (int ia2=ia1+1; ia2<na_grid; ++ia2)
             {
                 int first_ib=0, last_ib=0;
@@ -141,7 +141,7 @@ void Gint_Gamma::cal_band_rho(
                         }
                     }
                 }
-                //OUT(ofs_running, "upper triangle part of psir_DM done, atom2", ia2);
+                //OUT(GlobalV::ofs_running, "upper triangle part of psir_DM done, atom2", ia2);
             }// ia2
         } // ia1
     
@@ -163,8 +163,8 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
     TITLE("Gint_Gamma","gamma_charge");
     timer::tick("Gint_Gamma","gamma_charge");   
 
-	Gint_Tools::Array_Pool<double> rho(NSPIN, pw.nrxx);
-	ZEROS(rho.ptr_1D, NSPIN*pw.nrxx);
+	Gint_Tools::Array_Pool<double> rho(GlobalV::NSPIN, pw.nrxx);
+	ZEROS(rho.ptr_1D, GlobalV::NSPIN*pw.nrxx);
 
 	if(max_size)
     {
@@ -262,7 +262,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 
 double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 {
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{
@@ -271,25 +271,25 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 	}
 
     double sum = 0.0;//LiuXh 2016-01-10
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{
 			sum += CHR.rho[is][ir];
 		}
 	}
-    if(OUT_LEVEL != "m") OUT(ofs_running, "sum", sum);
+    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running, "sum", sum);
 
     timer::tick("Gint_Gamma","reduce_charge");
 #ifdef __MPI
     Parallel_Reduce::reduce_double_pool( sum );
 #endif
     timer::tick("Gint_Gamma","reduce_charge");
-    OUT(ofs_warning,"charge density sumed from grid", sum * ucell.omega/ pw.ncxyz);
+    OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * ucell.omega/ pw.ncxyz);
 
     const double ne = sum * ucell.omega / pw.ncxyz;
-    //xiaohui add 'OUT_LEVEL', 2015-09-16
-    if(OUT_LEVEL != "m") OUT(ofs_running, "ne", ne);
+    //xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
+    if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running, "ne", ne);
     timer::tick("Gint_Gamma","gamma_charge");
 	return ne;
 }

@@ -25,7 +25,7 @@ Magnetism::~Magnetism()
 #ifndef __CELL
 void Magnetism::compute_magnetization()
 {
-    if (NSPIN==2)
+    if (GlobalV::NSPIN==2)
     {
         this->tot_magnetization = 0.00;
         this->abs_magnetization = 0.00;
@@ -44,24 +44,24 @@ void Magnetism::compute_magnetization()
         this->tot_magnetization *= ucell.omega / pw.ncxyz;
         this->abs_magnetization *= ucell.omega / pw.ncxyz;
 
-		OUT(ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
-		OUT(ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
+		OUT(GlobalV::ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
+		OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 		
-		if(TWO_EFERMI)
+		if(GlobalV::TWO_EFERMI)
 		{
-			OUT(ofs_running,"nelup",get_nelup());
-			OUT(ofs_running,"neldw",get_neldw());
+			OUT(GlobalV::ofs_running,"nelup",get_nelup());
+			OUT(GlobalV::ofs_running,"neldw",get_neldw());
 		}
 		else
 		{
-			OUT(ofs_running,"nelec",CHR.nelec);
+			OUT(GlobalV::ofs_running,"nelec",CHR.nelec);
 		}
 
 //        cout << "\n tot_mag = " << setprecision(6) << this->tot_magnetization << " Bohr mag/cell" << endl;
   //      cout << " abs_mag = " << setprecision(6) << this->abs_magnetization << " Bohr mag/cell" << endl;
     }
 	// noncolliear :
-	else if(NSPIN==4)
+	else if(GlobalV::NSPIN==4)
 	{
 		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] = 0.00;
 		this->abs_magnetization = 0.00;
@@ -77,8 +77,8 @@ void Magnetism::compute_magnetization()
 
 		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= ucell.omega / pw.ncxyz;
 		this->abs_magnetization *= ucell.omega / pw.ncxyz;
-		ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
-		OUT(ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
+		GlobalV::ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
+		OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 	}
 
     return;
@@ -88,7 +88,7 @@ void Magnetism::compute_magnetization()
 double Magnetism::get_nelup(void)
 {
 	double nelup = 0.0;
-	if(TWO_EFERMI)
+	if(GlobalV::TWO_EFERMI)
 	{
 //===============================================================
 //  this type of electrons are used as "fixed" magnetization.
@@ -116,7 +116,7 @@ double Magnetism::get_nelup(void)
 double Magnetism::get_neldw(void)
 {
 	double neldw = 0.0;
-	if(TWO_EFERMI)
+	if(GlobalV::TWO_EFERMI)
 	{
 //===============================================================
 //  this type of electrons are used as "fixed" magnetization.

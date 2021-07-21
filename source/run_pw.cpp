@@ -21,11 +21,11 @@ void Run_pw::plane_wave_line(void)
 
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
-    // cell relaxation. b) put NLOCAL and NBANDS as input parameters
-    ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
-    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
+    // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+    ucell.setup_cell( GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
 
-    // setup NBANDS 
+    // setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
 	CHR.cal_nelec();
 
@@ -39,18 +39,18 @@ void Run_pw::plane_wave_line(void)
 		xcf.which_dft(ucell.atoms[it].dft);
     }
 
-    DONE(ofs_running, "SETUP UNITCELL");
+    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
         symm.analy_sys(ucell, out);
-        DONE(ofs_running, "SYMMETRY");
+        DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    kv.set( symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
-    DONE(ofs_running,"INIT K-POINTS");
+    kv.set( symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
+    DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
@@ -58,14 +58,14 @@ void Run_pw::plane_wave_line(void)
     PI.setup_parameters();
 
     // Initalize the plane wave basis set
-    pw.gen_pw(ofs_running, ucell, kv);
-    DONE(ofs_running,"INIT PLANEWAVE");
+    pw.gen_pw(GlobalV::ofs_running, ucell, kv);
+    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
     cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
 
     // mohan add 2010-10-10, just to test the symmetry of a variety
     // of systems.
-    if(CALCULATION == "test")
+    if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
         QUIT();
@@ -90,7 +90,7 @@ void Run_pw::plane_wave_line(void)
     //=====================================
     // init charge/potential/wave functions
     //=====================================
-    CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
+    CHR.allocate(GlobalV::NSPIN, pw.nrxx, pw.ngmc);
     pot.allocate(pw.nrxx);
 
     Cell_PW cpws;
@@ -98,39 +98,39 @@ void Run_pw::plane_wave_line(void)
 
 
     // caoyu add 2020-11-24, mohan updat 2021-01-03
-    if(BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
+    if(GlobalV::BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
     {
         Numerical_Descriptor nc;
         nc.output_descriptor(wf.evc, INPUT.lmax_descriptor);
-        DONE(ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
+        DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
 
-    if(BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
+    if(GlobalV::BASIS_TYPE=="pw" && winput::out_spillage) //xiaohui add 2013-09-01
     {
         //cout << "\n Output Spillage Information : " << endl;
         // calculate spillage value.
 #ifdef __LCAO
         if ( winput::out_spillage == 3)
         {
-            BASIS_TYPE="pw"; 
-            cout << " NLOCAL = " << NLOCAL << endl;
+            GlobalV::BASIS_TYPE="pw"; 
+            cout << " GlobalV::NLOCAL = " << GlobalV::NLOCAL << endl;
 
             for (int ik=0; ik<kv.nks; ik++)
             {
-                wf.wanf2[ik].create(NLOCAL, wf.npwx);
-				if(BASIS_TYPE=="pw")
+                wf.wanf2[ik].create(GlobalV::NLOCAL, wf.npwx);
+				if(GlobalV::BASIS_TYPE=="pw")
                 {
 					cout << " ik=" << ik + 1 << endl;
 
-                    BASIS_TYPE="lcao_in_pw";
+                    GlobalV::BASIS_TYPE="lcao_in_pw";
 					wf.LCAO_in_pw_k(ik, wf.wanf2[ik]);
-                    BASIS_TYPE="pw";
+                    GlobalV::BASIS_TYPE="pw";
                 }
             }
 
             //Spillage sp;
-            //sp.get_both(NBANDS, NLOCAL, wf.wanf2, wf.evc);
+            //sp.get_both(GlobalV::NBANDS, GlobalV::NLOCAL, wf.wanf2, wf.evc);
         }
 #endif
 
@@ -139,15 +139,15 @@ void Run_pw::plane_wave_line(void)
         {
             Numerical_Basis numerical_basis;
             numerical_basis.output_overlap(wf.evc);
-            DONE(ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
+            DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
         }
     }
 
 
-	if(Optical::opt_epsilon2 && (BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw"))
+	if(Optical::opt_epsilon2 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw"))
 	{
 		Optical opt;
-		opt.cal_epsilon2(NBANDS);
+		opt.cal_epsilon2(GlobalV::NBANDS);
 	}
 
 	// compute density of states

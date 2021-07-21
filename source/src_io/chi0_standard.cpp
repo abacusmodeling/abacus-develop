@@ -221,7 +221,7 @@ void Chi0_standard:: Chi()
 	//----------------------------------------------------------	
 	int occ_bands = 0;
 	bool occ_flag;
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		occ_flag = false;
 		for(int ik=0; ik<kv.nks; ik++)
@@ -271,7 +271,7 @@ void Chi0_standard:: Chi()
 		if(out_epsilon)
 		{
 			stringstream sseps;
-			sseps << global_out_dir << "Imeps^-1_"<<iq<<".dat";
+			sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
 			ofstream ofseps(sseps.str().c_str());
 			ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<endl;
 			for(int i=0; i<nomega; i++)
@@ -292,11 +292,11 @@ void Chi0_standard::Parallel_G()
 	//----------------------------
 	// init
 	//----------------------------
-	num_G_core = new int[DSIZE];
-	num_G_dis = new int[DSIZE];
+	num_G_core = new int[GlobalV::DSIZE];
+	num_G_dis = new int[GlobalV::DSIZE];
 	G_r_core = new double[pw.ngmc];
-	num_Gvector_core = new int[DSIZE];
-	num_Gvector_dis = new int[DSIZE];
+	num_Gvector_core = new int[GlobalV::DSIZE];
+	num_Gvector_dis = new int[GlobalV::DSIZE];
 	G_r = new double[pw.ngmc_g];
 	Gvec_core = new double[3*pw.ngmc];
 	Gvec = new double[3*pw.ngmc_g];
@@ -308,17 +308,17 @@ void Chi0_standard::Parallel_G()
 		flag[i] = i;
 	}
 	
-	ZEROS( num_G_dis, DSIZE);
-	ZEROS( num_G_core, DSIZE);
-	ZEROS( num_Gvector_dis, DSIZE);
-	ZEROS( num_Gvector_core, DSIZE);
+	ZEROS( num_G_dis, GlobalV::DSIZE);
+	ZEROS( num_G_core, GlobalV::DSIZE);
+	ZEROS( num_Gvector_dis, GlobalV::DSIZE);
+	ZEROS( num_Gvector_core, GlobalV::DSIZE);
 	
 #ifdef __MPI
 	MPI_Allgather( &pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
 #endif
 	
-	memset(num_G_dis,0,DSIZE*sizeof(int));
-	for(int i=0; i<DSIZE; i++)
+	memset(num_G_dis,0,GlobalV::DSIZE*sizeof(int));
+	for(int i=0; i<GlobalV::DSIZE; i++)
 	{
 		for(int j=0; j<i; j++)
 		{
@@ -326,7 +326,7 @@ void Chi0_standard::Parallel_G()
 		}
 	}
 	
-	for(int i=0;i<DSIZE;i++)
+	for(int i=0;i<GlobalV::DSIZE;i++)
 	{
 		num_Gvector_dis[i] = num_G_dis[i] * 3;
 		num_Gvector_core[i] = num_G_core[i] * 3;
@@ -379,14 +379,14 @@ void Chi0_standard:: Init()
 	
 	b_order = new complex<double>[pw.ngmc_g];
 
-	psi_r1 = new complex<double>*[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_r1 = new complex<double>*[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		psi_r1[ib] = new complex<double>[pw.nrxx];
 	}
 		
-	psi_r2 = new complex<double>*[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_r2 = new complex<double>*[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		psi_r2[ib] = new complex<double>[pw.nrxx];
 	}	
@@ -395,25 +395,25 @@ void Chi0_standard:: Init()
 	b = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		b[g0] = new complex<double>[oband*NBANDS];
+		b[g0] = new complex<double>[oband*GlobalV::NBANDS];
 	}
 	cout << "b ok"<<endl;
 	
 	A = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		A[g0] = new complex<double>[oband*NBANDS];
+		A[g0] = new complex<double>[oband*GlobalV::NBANDS];
 	}
 	cout << "A ok"<<endl;	
 	
-	B = new complex<double>*[oband*NBANDS];
-	for(int ib=0; ib<(oband*NBANDS); ib++)
+	B = new complex<double>*[oband*GlobalV::NBANDS];
+	for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 	{
 		B[ib] = new complex<double>[dim];
 	}
 	cout << "B ok" << endl;
 	
-	weight = new complex<double> [oband*NBANDS];
+	weight = new complex<double> [oband*GlobalV::NBANDS];
 	cout << "weight OK"<<endl;
 	
 	chi0 = new complex<double>*[dim];
@@ -457,13 +457,13 @@ void Chi0_standard::Delete()
 		delete[] b_summary;
 		delete[] b_order;
 		
-		for(int ib=0; ib<NBANDS; ib++)
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			delete[] psi_r1[ib];
 		}
 		delete[] psi_r1;
 			
-		for(int ib=0; ib<NBANDS; ib++)
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			delete[] psi_r2[ib];
 		}
@@ -481,7 +481,7 @@ void Chi0_standard::Delete()
 		}
 		delete[] A;
 
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 		{
 			delete[] B[ib];
 		}
@@ -520,7 +520,7 @@ void Chi0_standard::Cal_Psi(int iq, complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
 	complex<double> exp_tmp;
-	for(int ib = 0; ib < NBANDS; ib++)
+	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
 		ZEROS( UFFT.porter, (pw.nrxx) );
 		for(int ig = 0; ig < kv.ngk[iq] ; ig++)
@@ -566,7 +566,7 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 	
 	for(int ib1=0; ib1< oband; ib1++)
 	{
-		for(int ib2=0; ib2<NBANDS; ib2++)
+		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			int ir=0;
 			for(int ix=0; ix<pw.ncx; ix++)
@@ -606,7 +606,7 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 			
 			for(int g0=0; g0<dim; g0++)
 			{
-				b[g0][ib2+ib1*NBANDS] = b_order[g0];
+				b[g0][ib2+ib1*GlobalV::NBANDS] = b_order[g0];
 			}
 
 		}
@@ -619,10 +619,10 @@ void Chi0_standard:: Cal_weight(int iq, int ik, double omega)
 {
 	int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
 	for(int ib1=0; ib1<oband; ib1++)
-		for(int ib2=0; ib2<NBANDS; ib2++)
+		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			complex<double> factor = complex<double>( (omega + wf.ekb[ik][ib1] - wf.ekb[iqk][ib2]), eta);
-			weight[ib2+ib1*NBANDS] = ( wf.wg(ik,ib1)  - wf.wg(iqk,ib2) )/factor/ucell.omega;
+			weight[ib2+ib1*GlobalV::NBANDS] = ( wf.wg(ik,ib1)  - wf.wg(iqk,ib2) )/factor/ucell.omega;
 		}
 		
 	return;
@@ -632,7 +632,7 @@ void Chi0_standard:: Cal_weight(int iq, int ik, double omega)
 void Chi0_standard:: Cal_last()
 {
 	for(int g0=0; g0<dim; g0++)
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 		{
 			B[ib][g0] = conj(b[g0][ib]);
 		}
@@ -643,7 +643,7 @@ void Chi0_standard:: Cal_last()
 void Chi0_standard:: Cal_first()
 {
 	for(int g0=0; g0<dim; g0++)
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 		{
 			A[g0][ib] = weight[ib] * b[g0][ib];
 		}
@@ -666,17 +666,17 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		Cal_weight(iq, ik, omega);
 		Cal_last();
 		Cal_first();
-		std::vector<std::vector<complex<double>>> A1(dim, std::vector<complex<double>>(oband*NBANDS));       // Peize Lin change ptr to vector at 2020.01.31
-		std::vector<std::vector<complex<double>>> B1(oband*NBANDS, std::vector<complex<double>>(dim));       // Peize Lin change ptr to vector at 2020.01.31
+		std::vector<std::vector<complex<double>>> A1(dim, std::vector<complex<double>>(oband*GlobalV::NBANDS));       // Peize Lin change ptr to vector at 2020.01.31
+		std::vector<std::vector<complex<double>>> B1(oband*GlobalV::NBANDS, std::vector<complex<double>>(dim));       // Peize Lin change ptr to vector at 2020.01.31
 		std::vector<std::vector<complex<double>>> C(dim, std::vector<complex<double>>(dim));                 // Peize Lin change ptr to vector at 2020.01.31
 		
 		for(int g0=0; g0<dim; g0++)
-			for(int ib=0; ib<(oband*NBANDS); ib++)
+			for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 			{
 				A1[g0][ib] = A[g0][ib];
 			}
 		
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 			for(int g0=0; g0<dim; g0++)
 			{
 				B1[ib][g0] = B[ib][g0];
@@ -688,9 +688,9 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		char transb = 'N';
 		int M = dim;
 		int N = dim;
-		int K = oband*NBANDS;
+		int K = oband*GlobalV::NBANDS;
 		int lda = dim;
-		int ldb = oband*NBANDS;
+		int ldb = oband*GlobalV::NBANDS;
 		int ldc = dim;
 		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(B1[0]), &lda, VECTOR_TO_PTR(A1[0]), &ldb, &beta, VECTOR_TO_PTR(C[0]), &ldc);
 		

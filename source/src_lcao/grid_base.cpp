@@ -82,20 +82,20 @@ void Grid_Base::init(
 
 	this->get_rcut_max();
 
-	OUT(ofs_running,"lat0 = ", lat0);
-	OUT(ofs_running,"|a1| = ", a1_len);
-	OUT(ofs_running,"|a2| = ", a2_len);
-	OUT(ofs_running,"|a3| = ", a3_len);
-	OUT(ofs_running,"da_d.x = ", da_d.x);
-	OUT(ofs_running,"da_d.y = ", da_d.y);
-	OUT(ofs_running,"da_d.z = ", da_d.z);
-	OUT(ofs_running,"nx = ", nx);
-	OUT(ofs_running,"ny = ", ny);
-	OUT(ofs_running,"nz = ", nz);
-	OUT(ofs_running,"nxyz = ", nxyz);
-	OUT(ofs_running,"da1 = ", da1);
-	OUT(ofs_running,"da2 = ", da2);
-	OUT(ofs_running,"da3 = ", da3);
+	OUT(GlobalV::ofs_running,"lat0 = ", lat0);
+	OUT(GlobalV::ofs_running,"|a1| = ", a1_len);
+	OUT(GlobalV::ofs_running,"|a2| = ", a2_len);
+	OUT(GlobalV::ofs_running,"|a3| = ", a3_len);
+	OUT(GlobalV::ofs_running,"da_d.x = ", da_d.x);
+	OUT(GlobalV::ofs_running,"da_d.y = ", da_d.y);
+	OUT(GlobalV::ofs_running,"da_d.z = ", da_d.z);
+	OUT(GlobalV::ofs_running,"nx = ", nx);
+	OUT(GlobalV::ofs_running,"ny = ", ny);
+	OUT(GlobalV::ofs_running,"nz = ", nz);
+	OUT(GlobalV::ofs_running,"nxyz = ", nxyz);
+	OUT(GlobalV::ofs_running,"da1 = ", da1);
+	OUT(GlobalV::ofs_running,"da2 = ", da2);
+	OUT(GlobalV::ofs_running,"da3 = ", da3);
 
 	delete[] this->cartesian;
 	this->cartesian = new Vector3<double>[ this->nxyz ];
@@ -138,7 +138,7 @@ void Grid_Base::init(
 			}
 		}
 	}
-	OUT(ofs_running,"total atom pairs = ",tot_pairs);	
+	OUT(GlobalV::ofs_running,"total atom pairs = ",tot_pairs);	
 
 	return;
 }
@@ -172,7 +172,7 @@ void Grid_Base::get_rcut_max(void)
 		this->Rcut_max_direct[it].y = this->da_d.y * Rcut_max[it];
 		this->Rcut_max_direct[it].z = this->da_d.z * Rcut_max[it];
 		
-		ofs_running << "\n" << "Type=" << it << " Rcut_max(a.u.)=" << Rcut_max[it] 
+		GlobalV::ofs_running << "\n" << "Type=" << it << " Rcut_max(a.u.)=" << Rcut_max[it] 
 			<< " Direct = " 
 			<< Rcut_max_direct[it].x << " "
 			<< Rcut_max_direct[it].y << " "
@@ -271,7 +271,7 @@ void Grid_Base::edge_grid_points(
 
 	if( (grid_number > grid_number_last) || (n1 > n1_last) || (n2 > n2_last)  )
 	{
-		ofs_running << "\n Renew!" << " n1=" << n1 << " n1_last=" << n1_last 
+		GlobalV::ofs_running << "\n Renew!" << " n1=" << n1 << " n1_last=" << n1_last 
 			<< " n2=" << n2 << " n2_last=" << n2
 			<< " grid_number=" << grid_number << " grid_number_last=" << grid_number_last;
 		for(int i=0; i<n1_last; i++) delete[] yy1[i];
@@ -352,8 +352,8 @@ void Grid_Base::edge_grid_points(
 
 	if(count!=grid_number)
 	{
-		ofs_warning << "\n count = " << count;
-		ofs_warning << "\n grid_number = " << grid_number;
+		GlobalV::ofs_warning << "\n count = " << count;
+		GlobalV::ofs_warning << "\n grid_number = " << grid_number;
 		WARNING_QUIT("Grid_Base::edge_grid_points","count!=grid_number");
 	}
 	timer::tick("Grid_Base","edge_grid_points");

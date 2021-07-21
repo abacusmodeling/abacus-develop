@@ -121,7 +121,7 @@ void Force_Stress_LCAO::getForceStress(
 	// implement four terms which needs integration
 	//--------------------------------------------------------
 	this->calForceStressIntegralPart(
-				GAMMA_ONLY_LOCAL,
+				GlobalV::GAMMA_ONLY_LOCAL,
 				isforce,
 				isstress,
 				foverlap,
@@ -182,7 +182,7 @@ void Force_Stress_LCAO::getForceStress(
 	}
 	//implement force from E-field
     matrix fefield;
-    if(EFIELD&&isforce)
+    if(GlobalV::EFIELD&&isforce)
     {
         fefield.create(nat, 3);
         Efield::compute_force(fefield);
@@ -252,7 +252,7 @@ void Force_Stress_LCAO::getForceStress(
 					fcs(iat,i) += force_vdw(iat,i);
 				}
 				//E-field force
-				if(EFIELD)
+				if(GlobalV::EFIELD)
 				{
 					fcs(iat, i) += fefield(iat, i);
 				}
@@ -270,10 +270,10 @@ void Force_Stress_LCAO::getForceStress(
 				fcs(iat, i) -= sum/nat;
 			}
 
-			//xiaohui add "OUT_LEVEL", 2015-09-16
-			if(OUT_LEVEL != "m")
+			//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+			if(GlobalV::OUT_LEVEL != "m")
 			{
-				ofs_running << " correction force for each atom along direction "
+				GlobalV::ofs_running << " correction force for each atom along direction "
 					<< i+1 << " is " << sum/nat << endl;
 			}
 		}
@@ -308,28 +308,28 @@ void Force_Stress_LCAO::getForceStress(
 				}
 			}
 
-			ofs_running << "\n PARTS OF FORCE: " << endl;
-			ofs_running << setiosflags(ios::showpos);
-			ofs_running << setiosflags(ios::fixed) << setprecision(8) << endl;
+			GlobalV::ofs_running << "\n PARTS OF FORCE: " << endl;
+			GlobalV::ofs_running << setiosflags(ios::showpos);
+			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(8) << endl;
 			//-----------------------------
 			//regular force terms test.
 			//-----------------------------
 			this->print_force("OVERLAP    FORCE",foverlap,1,ry);
-			//  this->print_force("TVNL_DPHI  force",ftvnl_dphi,TEST_FORCE);
-			//  this->print_force("VNL_DBETA  force",fvnl_dbeta,TEST_FORCE);
+			//  this->print_force("TVNL_DPHI  force",ftvnl_dphi,GlobalV::TEST_FORCE);
+			//  this->print_force("VNL_DBETA  force",fvnl_dbeta,GlobalV::TEST_FORCE);
 			this->print_force("T_VNL      FORCE",ftvnl,1,ry);
 			this->print_force("VL_dPHI    FORCE",fvl_dphi,1,ry);
 			this->print_force("VL_dVL     FORCE",fvl_dvl,1,ry);
-			// 	this->print_force("VLOCAL     FORCE",fvlocal,TEST_FORCE);
+			// 	this->print_force("VLOCAL     FORCE",fvlocal,GlobalV::TEST_FORCE);
 			this->print_force("EWALD      FORCE",fewalds,1,ry);
 			this->print_force("NLCC       FORCE",fcc,1,ry);
 			this->print_force("SCC        FORCE",fscc,1,ry);
 			//-------------------------------
 			//put extra force here for test!
 			//-------------------------------
-			if(EFIELD)
+			if(GlobalV::EFIELD)
 			{
-				this->print_force("EFIELD     FORCE",fefield,1,ry);
+				this->print_force("GlobalV::EFIELD     FORCE",fefield,1,ry);
 			}
 			if(vdwd2_para.flag_vdwd2||vdwd3_para.flag_vdwd3)
 			{
@@ -344,29 +344,29 @@ void Force_Stress_LCAO::getForceStress(
 #endif
 		}
 
-		ofs_running << setiosflags(ios::left);
+		GlobalV::ofs_running << setiosflags(ios::left);
 
 		this->printforce_total(ry, istestf, fcs);
 		if(istestf)
 		{
-			ofs_running << "\n FORCE INVALID TABLE." << endl;
-			ofs_running << " " << setw(8) << "atom" << setw(5) << "x" << setw(5) << "y" << setw(5) << "z" << endl;
+			GlobalV::ofs_running << "\n FORCE INVALID TABLE." << endl;
+			GlobalV::ofs_running << " " << setw(8) << "atom" << setw(5) << "x" << setw(5) << "y" << setw(5) << "z" << endl;
 			for(int iat=0; iat<ucell.nat; iat++)
 			{
-				ofs_running << " " << setw(8) << iat;
+				GlobalV::ofs_running << " " << setw(8) << iat;
 				for(int i=0; i<3; i++)
 				{
 					if( abs( fcs(iat,i)*Ry_to_eV/0.529177 ) < Force_Stress_LCAO::force_invalid_threshold_ev)
 					{
 						fcs(iat,i) = 0.0;
-						ofs_running << setw(5) << "1";
+						GlobalV::ofs_running << setw(5) << "1";
 					}
 					else
 					{
-						ofs_running << setw(5) << "0";
+						GlobalV::ofs_running << setw(5) << "0";
 					}
 				}
-				ofs_running << endl;
+				GlobalV::ofs_running << endl;
 			}
 		}
 	}//end of force calculation
@@ -428,48 +428,48 @@ void Force_Stress_LCAO::getForceStress(
 				}
 			}
 
-			ofs_running << "\n PARTS OF STRESS: " << endl;
-			ofs_running << setiosflags(ios::showpos);
-			ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
-			sc_pw.print_stress("OVERLAP  STRESS",soverlap,TEST_STRESS,ry);
+			GlobalV::ofs_running << "\n PARTS OF STRESS: " << endl;
+			GlobalV::ofs_running << setiosflags(ios::showpos);
+			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
+			sc_pw.print_stress("OVERLAP  STRESS",soverlap,GlobalV::TEST_STRESS,ry);
 			//test
-			sc_pw.print_stress("T        STRESS",stvnl_dphi,TEST_STRESS,ry);
-			sc_pw.print_stress("VNL      STRESS",svnl_dbeta,TEST_STRESS,ry);
+			sc_pw.print_stress("T        STRESS",stvnl_dphi,GlobalV::TEST_STRESS,ry);
+			sc_pw.print_stress("VNL      STRESS",svnl_dbeta,GlobalV::TEST_STRESS,ry);
 
-			sc_pw.print_stress("T_VNL    STRESS",stvnl,TEST_STRESS,ry);
+			sc_pw.print_stress("T_VNL    STRESS",stvnl,GlobalV::TEST_STRESS,ry);
 
-			sc_pw.print_stress("VL_dPHI  STRESS",svl_dphi,TEST_STRESS,ry);
-			sc_pw.print_stress("VL_dVL   STRESS",sigmadvl,TEST_STRESS,ry);
-			sc_pw.print_stress("HAR      STRESS",sigmahar,TEST_STRESS,ry);
+			sc_pw.print_stress("VL_dPHI  STRESS",svl_dphi,GlobalV::TEST_STRESS,ry);
+			sc_pw.print_stress("VL_dVL   STRESS",sigmadvl,GlobalV::TEST_STRESS,ry);
+			sc_pw.print_stress("HAR      STRESS",sigmahar,GlobalV::TEST_STRESS,ry);
 
-			sc_pw.print_stress("EWALD    STRESS",sigmaewa,TEST_STRESS,ry);
-			sc_pw.print_stress("cc       STRESS",sigmacc,TEST_STRESS,ry);
-			//		sc_pw.print_stress("NLCC       STRESS",sigmacc,TEST_STRESS,ry);
-			sc_pw.print_stress("XC       STRESS",sigmaxc,TEST_STRESS,ry);
+			sc_pw.print_stress("EWALD    STRESS",sigmaewa,GlobalV::TEST_STRESS,ry);
+			sc_pw.print_stress("cc       STRESS",sigmacc,GlobalV::TEST_STRESS,ry);
+			//		sc_pw.print_stress("NLCC       STRESS",sigmacc,GlobalV::TEST_STRESS,ry);
+			sc_pw.print_stress("XC       STRESS",sigmaxc,GlobalV::TEST_STRESS,ry);
 			if(vdwd2_para.flag_vdwd2||vdwd3_para.flag_vdwd3)
 			{
-				sc_pw.print_stress("VDW      STRESS",sigmaxc,TEST_STRESS,ry);
+				sc_pw.print_stress("VDW      STRESS",sigmaxc,GlobalV::TEST_STRESS,ry);
 			}
 			if(INPUT.dft_plus_u)
 			{
-				sc_pw.print_stress("DFTU     STRESS",sigmaxc,TEST_STRESS,ry);
+				sc_pw.print_stress("DFTU     STRESS",sigmaxc,GlobalV::TEST_STRESS,ry);
 			}
-			sc_pw.print_stress("TOTAL    STRESS",scs,TEST_STRESS,ry);
+			sc_pw.print_stress("TOTAL    STRESS",scs,GlobalV::TEST_STRESS,ry);
 
 		}//end of test
-		ofs_running << setiosflags(ios::left);
+		GlobalV::ofs_running << setiosflags(ios::left);
 		//print total stress
 		sc_pw.printstress_total(scs, ry);
 
 		double unit_transform = 0.0;
 		unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8;
-		double external_stress[3] = {PRESS1,PRESS2,PRESS3};
+		double external_stress[3] = {GlobalV::PRESS1,GlobalV::PRESS2,GlobalV::PRESS3};
 
 		for(int i=0;i<3;i++)
 		{
 			scs(i,i) -= external_stress[i]/unit_transform;
 		}
-		PRESSURE = (scs(0,0)+scs(1,1)+scs(2,2))/3;
+		GlobalV::PRESSURE = (scs(0,0)+scs(1,1)+scs(2,2))/3;
 	}//end of stress calculation
 	
 	timer::tick("Force_LCAO","start_force");
@@ -479,8 +479,8 @@ void Force_Stress_LCAO::getForceStress(
 //print force term for test
 void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool screen, bool ry)const
 {
-	ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
-	ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
+	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
 
 	double fac = 1.0;
 
@@ -506,14 +506,14 @@ void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool sc
 			stringstream ss;
 			ss << ucell.atoms[it].label << ia+1;
 
-			ofs_running << " " << setw(8) << ss.str();
-			if( abs(f(iat,0)) >output_acc) ofs_running << setw(15) << f(iat,0)*fac;
-			else ofs_running << setw(15) << "0";
-			if( abs(f(iat,1)) >output_acc) ofs_running << setw(15) << f(iat,1)*fac;
-			else ofs_running << setw(15) << "0";
-			if( abs(f(iat,2)) >output_acc) ofs_running << setw(15) << f(iat,2)*fac;
-			else ofs_running << setw(15) << "0";
-			ofs_running << endl;
+			GlobalV::ofs_running << " " << setw(8) << ss.str();
+			if( abs(f(iat,0)) >output_acc) GlobalV::ofs_running << setw(15) << f(iat,0)*fac;
+			else GlobalV::ofs_running << setw(15) << "0";
+			if( abs(f(iat,1)) >output_acc) GlobalV::ofs_running << setw(15) << f(iat,1)*fac;
+			else GlobalV::ofs_running << setw(15) << "0";
+			if( abs(f(iat,2)) >output_acc) GlobalV::ofs_running << setw(15) << f(iat,2)*fac;
+			else GlobalV::ofs_running << setw(15) << "0";
+			GlobalV::ofs_running << endl;
 
 			if(screen)
 			{
@@ -551,8 +551,8 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
     int iat=0;
 
-	//ofs_running << setiosflags(ios::right);
- 	ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
+	//GlobalV::ofs_running << setiosflags(ios::right);
+ 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
 	NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
 	// print out forces
@@ -578,7 +578,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 		cout << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
 		cout << " ------------------- TOTAL      FORCE --------------------" << endl;
     	cout << " " << setw(8) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
-    	ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+    	GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
 	}
 
     iat=0;
@@ -597,7 +597,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 					<< setw(15) << fcs(iat,2)*unit_transform << endl;
 			}
 
-            ofs_running << " " << setw(12) << ss.str()
+            GlobalV::ofs_running << " " << setw(12) << ss.str()
 				<< setw(15) << fcs(iat,0)*unit_transform
 				<< setw(15) << fcs(iat,1)*unit_transform
 				<< setw(15) << fcs(iat,2)*unit_transform << endl;
@@ -605,7 +605,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
             ++iat;
         }
     }
-	ofs_running << setiosflags(ios::left);
+	GlobalV::ofs_running << setiosflags(ios::left);
 	cout << resetiosflags(ios::showpos);
 
     return;

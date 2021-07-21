@@ -3,7 +3,7 @@
 
 void Input::Print(const string &fn)const
 {
-    if (MY_RANK!=0) return;
+    if (GlobalV::MY_RANK!=0) return;
 
     TITLE("Input","Print");
 
@@ -18,10 +18,10 @@ void Input::Print(const string &fn)const
 	ofs << "#Parameters (1.General)" << endl;
 	OUTP(ofs,"suffix",suffix,"the name of main output directory");
 	OUTP(ofs,"latname",latname,"the name of lattice name");
-	OUTP(ofs,"atom_file",global_atom_card,"the filename of file containing atom positions");
-	OUTP(ofs,"kpoint_file",global_kpoint_card,"the name of file containing k points");
-	OUTP(ofs,"pseudo_dir",global_pseudo_dir,"the directory containing pseudo files");
-	OUTP(ofs,"pseudo_type",global_pseudo_type,"the type pseudo files");
+	OUTP(ofs,"atom_file",GlobalV::global_atom_card,"the filename of file containing atom positions");
+	OUTP(ofs,"kpoint_file",GlobalV::global_kpoint_card,"the name of file containing k points");
+	OUTP(ofs,"pseudo_dir",GlobalV::global_pseudo_dir,"the directory containing pseudo files");
+	OUTP(ofs,"pseudo_type",GlobalV::global_pseudo_type,"the type pseudo files");
 	OUTP(ofs,"dft_functional",dft_functional,"exchange correlation functional");
 	OUTP(ofs,"calculation",calculation,"test; scf; relax; nscf; ienvelope; istate;");
 	OUTP(ofs,"ntype",ntype,"atom species number");
@@ -62,7 +62,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nz",nz,"number of points along z axis for FFT grid");	
 	
 	ofs << "\n#Parameters (3.Relaxation)" << endl;
-	OUTP(ofs,"ks_solver",KS_SOLVER,"cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
+	OUTP(ofs,"ks_solver",GlobalV::KS_SOLVER,"cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
 	OUTP(ofs,"niter",niter,"#number of electron iterations");
 	OUTP(ofs,"force_set",force_set,"output the force_set or not"); 
 	OUTP(ofs,"nstep",nstep,"number of ion iteration steps");
@@ -127,7 +127,7 @@ void Input::Print(const string &fn)const
 
 	ofs << "\n#Parameters (8.Technique)" << endl;
 	OUTP(ofs,"gamma_only",gamma_only,"gamma only, only used in LCAO basis");
-	OUTP(ofs,"diago_proc",DIAGO_PROC,"number of proc used to diago");
+	OUTP(ofs,"diago_proc",GlobalV::DIAGO_PROC,"number of proc used to diago");
 	OUTP(ofs,"npool",npool,"number of pools for k points, pw only");
 	OUTP(ofs,"mem_saver",mem_saver,"memory saver for many k points used");
 	OUTP(ofs,"printe",printe,"print band energy for selectively ionic steps");
@@ -229,17 +229,17 @@ void Input::Print(const string &fn)const
 	{
 		ofs << setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << endl;
 	}
-	OUTP(ofs,"ocp",ocp,"change occupation or not");
-	OUTP(ofs,"ocp_set",ocp_set,"set occupation");
+	OUTP(ofs,"GlobalV::ocp",GlobalV::ocp,"change occupation or not");
+	OUTP(ofs,"GlobalV::ocp_set",GlobalV::ocp_set,"set occupation");
 	//OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
 	// for(int i=0; i<ocp_n; i++)
 	// {
-		// ofs << setw(20) <<"ocp_kb" << ocp_kb[i]<< endl;
+		// ofs << setw(20) <<"GlobalV::ocp_kb" << GlobalV::ocp_kb[i]<< endl;
 	// }
 	ofs << setw(20) <<"lcao_box"<<lcao_box[0]
 		<<"   "<<lcao_box[1]<<"   "
 		<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<endl;
-	OUTP(ofs," mulliken", mulliken," mulliken  charge or not");//qifeng add 2019/9/10
+	OUTP(ofs," GlobalV::mulliken", GlobalV::mulliken," GlobalV::mulliken  charge or not");//qifeng add 2019/9/10
 	
 	//OUTP(ofs,"epsilon0",epsilon0,"calculate the macroscopic dielectric constant or not");
 	OUTP(ofs,"intrasmear",intrasmear,"Eta");

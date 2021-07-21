@@ -19,19 +19,19 @@ void Threshold_Elec::set_ethr(void) const
     //===================
     // nscf calculations
     //===================
-    if (CALCULATION=="nscf")
+    if (GlobalV::CALCULATION=="nscf")
     {
-        if (abs(ETHR - 1.0e-2 < 1.0e-10))
+        if (abs(GlobalV::ETHR - 1.0e-2 < 1.0e-10))
         {
-            ETHR = 0.1 * std::min(1.0e-2, DRHO2 / CHR.nelec);
+            GlobalV::ETHR = 0.1 * std::min(1.0e-2, GlobalV::DRHO2 / CHR.nelec);
         }
     }
     //=================
     // self consistent
     //=================
-    else if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax" || CALCULATION=="scf-sto")//qianrui 2021-2-20
+    else if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="scf-sto")//qianrui 2021-2-20
     {
-        if (abs(ETHR - 1.0e-2 < 1.0e-10))
+        if (abs(GlobalV::ETHR - 1.0e-2 < 1.0e-10))
         {
             if (pot.start_pot == "file")
             {
@@ -40,7 +40,7 @@ void Threshold_Elec::set_ethr(void) const
                 // do not spoil it with a louly first diagonalization:
                 // set a strict ethr in the input file ()diago_the_init
                 //======================================================
-                ETHR = 1.0e-5;
+                GlobalV::ETHR = 1.0e-5;
             }
             else
             {
@@ -48,7 +48,7 @@ void Threshold_Elec::set_ethr(void) const
                 // starting atomic potential is probably far from scf
                 // don't waste iterations in the first diagonalization
                 //=======================================================
-                ETHR = 1.0e-2;
+                GlobalV::ETHR = 1.0e-2;
             }
         }
     }
@@ -66,23 +66,23 @@ void Threshold_Elec::update_ethr(const int &iter)
     {
         if (iter == 2)
         {
-            ETHR = 1.e-2;
+            GlobalV::ETHR = 1.e-2;
         }
 
 		//----------------------------
-		// ETHR changes in CG Method. 
+		// GlobalV::ETHR changes in CG Method. 
 		// mohan update 2012-03-26
 		// mohan update 2012-02-08
 		//----------------------------
-		if(BASIS_TYPE=="lcao")
+		if(GlobalV::BASIS_TYPE=="lcao")
 		{
-			ETHR = std::min( ETHR, 0.01*dr2/ std::max(1.0, CHR.nelec));
+			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.01*dr2/ std::max(1.0, CHR.nelec));
 		}
 		// mohan update 2009-09-04
 		else
 		{
-			ETHR = std::min( ETHR, 0.1*dr2/ std::max(1.0, CHR.nelec));
-			//cout << " new ethr = " << ETHR << endl;
+			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.1*dr2/ std::max(1.0, CHR.nelec));
+			//cout << " new ethr = " << GlobalV::ETHR << endl;
 		}
 
     }
@@ -91,7 +91,7 @@ void Threshold_Elec::update_ethr(const int &iter)
 
 void Threshold_Elec::iter_end(ofstream &ofs)
 {
-	if(OUT_LEVEL != "m") 
+	if(GlobalV::OUT_LEVEL != "m") 
 	{
 		print_eigenvalue(ofs);
 	}
@@ -104,11 +104,11 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 	bool wrong = false;
 	for(int ik=0; ik<kv.nks; ++ik)
 	{
-		for(int ib=0; ib<NBANDS; ++ib)
+		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 		{
 			if( abs( wf.ekb[ik][ib] ) > 1.0e10)
 			{
-				ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << wf.ekb[ik][ib] << " Ry" << endl;
+				GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << wf.ekb[ik][ib] << " Ry" << endl;
 				wrong = true;
 			}
 		}
@@ -119,7 +119,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 	}
 
 
-	if(MY_RANK!=0) 
+	if(GlobalV::MY_RANK!=0) 
 	{
 		return;
 	}
@@ -130,13 +130,13 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 	ofs << setprecision(5);
     for (int ik = 0;ik < kv.nks;ik++)
     {
-        if (NSPIN==2)
+        if (GlobalV::NSPIN==2)
         {
             if (kv.isk[ik] == 0)ofs << "\n spin up :";
             if (kv.isk[ik] == 1)ofs << "\n spin down :";
         }
         
-        if (NSPIN==2)
+        if (GlobalV::NSPIN==2)
         {
             if (kv.isk[ik] == 0)
             {
@@ -169,7 +169,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		//----------------------
 		// no energy to output
 		//----------------------
-		if(KS_SOLVER=="selinv")
+		if(GlobalV::KS_SOLVER=="selinv")
 		{
 			ofs << " USING SELINV, NO BAND ENERGY IS AVAILABLE." << endl;
 		}
@@ -179,9 +179,9 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		else
 		{
 			//ofs << setw(12) << kv.ngk[ik] << " PWs ";
-			ofs_running << setprecision(6);
-			ofs_running << setiosflags(ios::showpoint);
-			for (int ib = 0; ib < NBANDS; ib++)
+			GlobalV::ofs_running << setprecision(6);
+			GlobalV::ofs_running << setiosflags(ios::showpoint);
+			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
 				ofs << " [spin" << kv.isk[ik]+1 << "_state] " << setw(8) << ib+1 
 				<< setw(15) << wf.ekb[ik][ib] * Ry_to_eV << setw(15) << wf.wg(ik, ib) << endl;

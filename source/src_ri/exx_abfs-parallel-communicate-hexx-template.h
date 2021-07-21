@@ -13,7 +13,7 @@ T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const map<size_t,map<size_t
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D");
 	
 	T H_m2D;
-	if(KS_SOLVER=="genelpa")
+	if(GlobalV::KS_SOLVER=="genelpa")
 		H_m2D.create( ParaO.ncol, ParaO.nrow );
 	else
 		H_m2D.create( ParaO.nrow, ParaO.ncol );
@@ -38,7 +38,7 @@ T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const map<size_t,map<size_t
 					const int iwt2_m2D = ParaO.trace_loc_col[iwt2];
 					if( iwt2_m2D == -1 )	continue;
 					
-					if(KS_SOLVER=="genelpa")
+					if(GlobalV::KS_SOLVER=="genelpa")
 						H_m2D( iwt2_m2D, iwt1_m2D ) = H(iw1,iw2);
 					else
 						H_m2D( iwt1_m2D, iwt2_m2D ) = H(iw1,iw2);
@@ -72,13 +72,13 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D");
 
 	Tmatrix HK_m2D;
-	if(KS_SOLVER=="genelpa")
+	if(GlobalV::KS_SOLVER=="genelpa")
 		HK_m2D.create( ParaO.ncol, ParaO.nrow );
 	else
 		HK_m2D.create( ParaO.nrow, ParaO.ncol );
 
-	const int is_begin = (NSPIN==4) ? 0 : kv.isk[ik];
-	const int is_end = (NSPIN==4) ? 4 : kv.isk[ik]+1;
+	const int is_begin = (GlobalV::NSPIN==4) ? 0 : kv.isk[ik];
+	const int is_end = (GlobalV::NSPIN==4) ? 4 : kv.isk[ik]+1;
 	for(int is=is_begin; is!=is_end; ++is)
 	{
 		for(auto & HR_a2D_A : HR_a2D[is])
@@ -104,7 +104,7 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 
 				for(int iw1=0; iw1!=HK_a2D.nr; ++iw1)
 				{
-					const int iw1_tmp = (NSPIN==4)
+					const int iw1_tmp = (GlobalV::NSPIN==4)
 						? (iw1*2+is/2)
 						: iw1;
 					const int iwt1 = ucell.itiaiw2iwt(it1,ia1,iw1_tmp);
@@ -112,14 +112,14 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 					if(iwt1_m2D<0) continue;
 					for(int iw2=0; iw2!=HK_a2D.nc; ++iw2)
 					{
-						const int iw2_tmp = (NSPIN==4)
+						const int iw2_tmp = (GlobalV::NSPIN==4)
 							? (iw2*2+is%2)
 							: iw2;
 						const int iwt2 = ucell.itiaiw2iwt(it2,ia2,iw2_tmp);
 						const int iwt2_m2D = ParaO.trace_loc_col[iwt2];
 						if(iwt2_m2D<0) continue;
 
-						if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
+						if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
 							HK_m2D(iwt2_m2D,iwt1_m2D) = HK_a2D(iw1,iw2);
 						else
 							HK_m2D(iwt1_m2D,iwt2_m2D) = HK_a2D(iw1,iw2);
@@ -146,7 +146,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 //gettimeofday( &t_start, NULL);
 //			const map<size_t,map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[ik]);
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<endl;
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(ik)+"_"+TO_STRING(MY_RANK), HK_a2D );
+//ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), HK_a2D );
 //gettimeofday( &t_start, NULL);
 		switch(mixing_mode)
 		{
@@ -167,7 +167,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 		}
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<endl;
 	}
-//ofs_matrixes( exx_lcao.test_dir+"test-HK_m2D_"+TO_STRING(MY_RANK), HK_m2D );
+//ofs_matrixes( exx_lcao.test_dir+"test-HK_m2D_"+TO_STRING(GlobalV::MY_RANK), HK_m2D );
 }
 
 template<typename Tmatrix>

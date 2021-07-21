@@ -82,9 +82,9 @@ void Cal_Test::test_memory(void)
 	mrhog_save = Memory::calculate_mem( ngmc, "cdouble");
 	mrhog_core = Memory::calculate_mem( ngmc, "cdouble"); 
 	
-	mhs = Memory::calculate_mem( NLOCAL*NLOCAL, "double" );
-	mwf = Memory::calculate_mem( NLOCAL*NBANDS, "double" );
-	mnonzero = Memory::calculate_mem( NLOCAL*(NLOCAL+1)/2, "bool");
+	mhs = Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NLOCAL, "double" );
+	mwf = Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NBANDS, "double" );
+	mnonzero = Memory::calculate_mem( GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/2, "bool");
 // mohan comment out 2021-02-11
 //	mspar_hsrho = Memory::calculate_mem( Hnnz*3, "double");
 	
@@ -101,18 +101,18 @@ void Cal_Test::test_memory(void)
 
 
 	//(3) Memory for H,S matrix.
-	cout << " NLOCAL = " << NLOCAL << endl;
-	cout << " NBANdS = " << NBANDS << endl;
+	cout << " GlobalV::NLOCAL = " << GlobalV::NLOCAL << endl;
+	cout << " NBANdS = " << GlobalV::NBANDS << endl;
 
 //	cout << " Memory for H,S matrix ( " 
-//		<< NLOCAL << ", "
-//		<< NLOCAL << ") = "
+//		<< GlobalV::NLOCAL << ", "
+//		<< GlobalV::NLOCAL << ") = "
 //		<< mhs << " MB" << endl;
 	
 	//(4) Memory for wave functions.
 //	cout << " Memory for wave functions ( " 
-//		<< NLOCAL << ", "
-//		<< NBANDS << ") = "
+//		<< GlobalV::NLOCAL << ", "
+//		<< GlobalV::NBANDS << ") = "
 //		<< mwf << " MB" << endl;
 
 	print_mem(1);
@@ -169,8 +169,8 @@ void Cal_Test::print_mem(const int &nproc)
 	mgvec + mgg + mig2fftw + mig2fftc + mig123 +
 	mstrucFac + meigts123; 
 
-	//if(DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
-	if(KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+	//if(GlobalV::DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
+	if(GlobalV::KS_SOLVER=="selinv") //xiaohui add 2013-09-02
 	{
 		mtot += mnonzero + mspar_hsrho;
 	}
@@ -209,5 +209,5 @@ void Cal_Test::print_mem(const int &nproc)
 	cout << " MEMORY FOR eigts1,2,3   : " << setw(15) << meigts123/nproc << " MB" << endl;
 	cout << " TOTAL MEMORY            : " << setw(15) << mtot/nproc << " MB" << endl;
 	
-	cout << " MEMORY FOR nonzero      : " << setw(15) << (double)NLOCAL*(NLOCAL+1)/1028/1028/2.0/nproc << " MB" << endl; //mohan for tmp 
+	cout << " MEMORY FOR nonzero      : " << setw(15) << (double)GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/1028/1028/2.0/nproc << " MB" << endl; //mohan for tmp 
 }

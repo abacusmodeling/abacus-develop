@@ -35,7 +35,7 @@ void ELEC_scf::scf(const int &istep)
 	// the electron charge density should be symmetrized,
 	// here is the initialization
 	Symmetry_rho srho;
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		srho.begin(is, CHR, pw, Pgrid, symm);
 	}
@@ -43,18 +43,18 @@ void ELEC_scf::scf(const int &istep)
 //	cout << scientific;
 //	cout << setiosflags(ios::fixed);
 
-	if(OUT_LEVEL=="ie" ||OUT_LEVEL=="m")
+	if(GlobalV::OUT_LEVEL=="ie" ||GlobalV::OUT_LEVEL=="m")
 	{
-		if(COLOUR && MY_RANK==0)
+		if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 		{
 			printf( " [33m%-7s[0m", "ITER");
 			printf( "[33m%-15s[0m", "ETOT(Ry)");
-			if(NSPIN==2)
+			if(GlobalV::NSPIN==2)
 			{
 				printf( "[33m%-10s[0m", "TMAG");
 				printf( "[33m%-10s[0m", "AMAG");
 			}
-			printf( "[33m%-14s[0m", "DRHO2");
+			printf( "[33m%-14s[0m", "GlobalV::DRHO2");
 			printf( "[33m%-15s[0m", "ETOT(eV)");
 			printf( "\e[33m%-11s\e[0m\n", "TIME(s)");
 		}
@@ -62,7 +62,7 @@ void ELEC_scf::scf(const int &istep)
 		{
 			cout << " " << setw(7)<< "ITER";
 
-			if(NSPIN==2)
+			if(GlobalV::NSPIN==2)
 			{
 				cout<<setw(10)<<"TMAG";
 				cout<<setw(10)<<"AMAG";
@@ -70,44 +70,44 @@ void ELEC_scf::scf(const int &istep)
 
 			cout << setw(15) << "ETOT(eV)";
 			cout << setw(15) << "EDIFF(eV)";
-			cout << setw(11) << "DRHO2";
+			cout << setw(11) << "GlobalV::DRHO2";
 			cout << setw(11) << "TIME(s)" << endl;
 		}
-	}// end OUT_LEVEL
+	}// end GlobalV::OUT_LEVEL
 
 
-	for(iter=1; iter<=NITER; iter++)
+	for(iter=1; iter<=GlobalV::NITER; iter++)
 	{
-        if(CALCULATION=="scf")
+        if(GlobalV::CALCULATION=="scf")
         {
-            ofs_running
+            GlobalV::ofs_running
             << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
             << "--------------------------------\n";
 
-            ofs_warning
+            GlobalV::ofs_warning
             << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
             << "--------------------------------\n";
         }
-        else if(CALCULATION=="relax" || CALCULATION=="cell-relax")
+        else if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
 		{
-			ofs_running
+			GlobalV::ofs_running
 			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
 			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
 
-			ofs_warning
+			GlobalV::ofs_warning
 			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
 			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
 		}
-		else if(CALCULATION=="md")
+		else if(GlobalV::CALCULATION=="md")
 		{
-			ofs_running
+			GlobalV::ofs_running
 			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
 			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
 
-			ofs_warning
+			GlobalV::ofs_warning
 			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
 			<< "  ELEC=" << setw(4) << iter
 			<< "--------------------------------\n";
@@ -139,7 +139,7 @@ void ELEC_scf::scf(const int &istep)
 		// set converged threshold,
 		// automatically updated during self consistency, only for CG.
         this->update_ethr(iter);
-        if(FINAL_SCF && iter==1)
+        if(GlobalV::FINAL_SCF && iter==1)
         {
             init_mixstep_final_scf();
             //CHR.irstep=0;
@@ -214,22 +214,22 @@ void ELEC_scf::scf(const int &istep)
 			this->WFC_init = new complex<double>**[kv.nks];
 			for(int ik=0; ik<kv.nks; ik++)
 			{
-				this->WFC_init[ik] = new complex<double>*[NBANDS];
+				this->WFC_init[ik] = new complex<double>*[GlobalV::NBANDS];
 			}
 			for(int ik=0; ik<kv.nks; ik++)
 			{
-				for(int ib=0; ib<NBANDS; ib++)
+				for(int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					this->WFC_init[ik][ib] = new complex<double>[NLOCAL];
+					this->WFC_init[ik][ib] = new complex<double>[GlobalV::NLOCAL];
 				}
 			}
 			if(istep>=1)
 			{
 				for (int ik=0; ik<kv.nks; ik++)
 				{
-					for (int ib=0; ib<NBANDS; ib++)
+					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
-						for (int i=0; i<NLOCAL; i++)
+						for (int i=0; i<GlobalV::NLOCAL; i++)
 						{
 							WFC_init[ik][ib][i] = LOWF.WFC_K[ik][ib][i];
 						}
@@ -240,9 +240,9 @@ void ELEC_scf::scf(const int &istep)
 			{
 				for (int ik=0; ik<kv.nks; ik++)
 				{
-					for (int ib=0; ib<NBANDS; ib++)
+					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
-						for (int i=0; i<NLOCAL; i++)
+						for (int i=0; i<GlobalV::NLOCAL; i++)
 						{
 							WFC_init[ik][ib][i] = complex<double>(0.0,0.0);
 						}
@@ -269,7 +269,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// (1) calculate the bands.
 		// mohan add 2021-02-09
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			ELEC_cbands_gamma::cal_bands(istep, UHM);
 		}
@@ -286,7 +286,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 
-//		for(int ib=0; ib<NBANDS; ++ib)
+//		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 //		{
 //			cout << ib+1 << " " << wf.ekb[0][ib] << endl;
 //		}
@@ -295,7 +295,7 @@ void ELEC_scf::scf(const int &istep)
 		// only deal with charge density after both wavefunctions.
 		// are calculated.
 		//-----------------------------------------------------------
-		if(GAMMA_ONLY_LOCAL && NSPIN == 2 && CURRENT_SPIN == 0) continue;
+		if(GlobalV::GAMMA_ONLY_LOCAL && GlobalV::NSPIN == 2 && GlobalV::CURRENT_SPIN == 0) continue;
 
 
 		if(conv_elec)
@@ -310,7 +310,7 @@ void ELEC_scf::scf(const int &istep)
 		en.ef_dw  = 0.0;
 
 		// demet is included into eband.
-		//if(DIAGO_TYPE!="selinv")
+		//if(GlobalV::DIAGO_TYPE!="selinv")
 		{
 			en.demet  = 0.0;
 		}
@@ -321,13 +321,13 @@ void ELEC_scf::scf(const int &istep)
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
 
-		if (ocp == 1)
+		if (GlobalV::ocp == 1)
 		{
 			for (int ik=0; ik<kv.nks; ik++)
 			{
-				for (int ib=0; ib<NBANDS; ib++)
+				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					wf.wg(ik,ib)=ocp_kb[ik*NBANDS+ib];
+					wf.wg(ik,ib)=GlobalV::ocp_kb[ik*GlobalV::NBANDS+ib];
 				}
 			}
 		}
@@ -364,7 +364,7 @@ void ELEC_scf::scf(const int &istep)
 		// the local occupation number matrix and energy correction
 		if(INPUT.dft_plus_u)
 		{
-			if(GAMMA_ONLY_LOCAL) dftu.cal_occup_m_gamma(iter);
+			if(GlobalV::GAMMA_ONLY_LOCAL) dftu.cal_occup_m_gamma(iter);
 			else dftu.cal_occup_m_k(iter);
 
 		 	dftu.cal_energy_correction(istep);
@@ -377,7 +377,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// (5) symmetrize the charge density
 		Symmetry_rho srho;
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			srho.begin(is, CHR, pw, Pgrid, symm);
 		}
@@ -396,12 +396,12 @@ void ELEC_scf::scf(const int &istep)
 		en.deband = en.delta_e();
 
 		// (8) Mix charge density
-		CHR.mix_rho(dr2,0,DRHO2,iter,conv_elec);
+		CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
 
 		// Peize Lin add 2020.04.04
 		if(restart.info_save.save_charge)
 		{
-			for(int is=0; is<NSPIN; ++is)
+			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				restart.save_disk("charge", is);
 			}
@@ -409,7 +409,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// (9) Calculate new potential according to new Charge Density.
 
-		if(conv_elec || iter==NITER)
+		if(conv_elec || iter==GlobalV::NITER)
 		{
 			if(pot.out_potential<0) //mohan add 2011-10-10
 			{
@@ -431,7 +431,7 @@ void ELEC_scf::scf(const int &istep)
 			/*
 			pot.vr = pot.v_of_rho(CHR.rho_save, CHR.rho);
 			en.calculate_etot();
-			en.print_etot(conv_elec, istep, iter, dr2, 0.0, ETHR, avg_iter,0);
+			en.print_etot(conv_elec, istep, iter, dr2, 0.0, GlobalV::ETHR, avg_iter,0);
 			pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
 			en.delta_escf();
 			*/
@@ -447,30 +447,30 @@ void ELEC_scf::scf(const int &istep)
 		//-----------------------------------
 		// output charge density for tmp
 		//-----------------------------------
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			const int precision = 3;
 
 			stringstream ssc;
-			ssc << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
+			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
 			CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), precision );//mohan add 2007-10-17
 
 			stringstream ssd;
 
-			if(GAMMA_ONLY_LOCAL)
+			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
-				ssd << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_DM";
+				ssd << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_DM";
 			}
 			else
 			{
-				ssd << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_DM_R";
+				ssd << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_DM_R";
 			}
 			LOC.write_dm( is, iter, ssd.str(), precision );
 
 			//LiuXh modify 20200701
 			/*
 			stringstream ssp;
-			ssp << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_POT";
+			ssp << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_POT";
 			pot.write_potential( is, iter, ssp.str(), pot.vr, precision );
 			*/
 		}
@@ -497,11 +497,11 @@ void ELEC_scf::scf(const int &istep)
 		// avg_iter is an useless variable in LCAO,
 		// will fix this interface in future -- mohan 2021-02-10
 		int avg_iter=0;
-		en.print_etot(conv_elec, istep, iter, dr2, duration, ETHR, avg_iter);
+		en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
 
 		en.etot_old = en.etot;
 
-		if (conv_elec || iter==NITER)
+		if (conv_elec || iter==GlobalV::NITER)
 		{
 			//--------------------------------------
 			// output charge density for converged,
@@ -523,34 +523,34 @@ void ELEC_scf::scf(const int &istep)
 				if(CHR.out_charge)
 				{
 					stringstream sst;
-					sst << global_out_dir << "onsite.dm";
+					sst << GlobalV::global_out_dir << "onsite.dm";
 					dftu.write_occup_m( sst.str() );
 				}
 			}
 
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				const int precision = 3;
 
 				stringstream ssc;
-				ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+				ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
 				CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 
 				stringstream ssd;
-				if(GAMMA_ONLY_LOCAL)
+				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
-					ssd << global_out_dir << "SPIN" << is + 1 << "_DM";
+					ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM";
 				}
 				else
 				{
-					ssd << global_out_dir << "SPIN" << is + 1 << "_DM_R";
+					ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM_R";
 				}
 				LOC.write_dm( is, 0, ssd.str(), precision );
 
 				if(pot.out_potential == 1) //LiuXh add 20200701
 				{
 					stringstream ssp;
-					ssp << global_out_dir << "SPIN" << is + 1 << "_POT";
+					ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT";
 					pot.write_potential( is, 0, ssp.str(), pot.vr_eff, precision );
 				}
 
@@ -558,21 +558,21 @@ void ELEC_scf::scf(const int &istep)
 				/*
 				//fuxiang add 2017-03-15
 				stringstream sse;
-				sse << global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
+				sse << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
 				CHR.write_rho_dipole(CHR.rho_save, is, 0, sse.str());
 				*/
 			}
 
-			iter_end(ofs_running);
+			iter_end(GlobalV::ofs_running);
 
 			if(conv_elec)
 			{
- 				//xiaohui add "OUT_LEVEL", 2015-09-16
-				if(OUT_LEVEL != "m") ofs_running << setprecision(16);
-				if(OUT_LEVEL != "m") ofs_running << " EFERMI = " << en.ef * Ry_to_eV << " eV" << endl;
-				if(OUT_LEVEL=="ie")
+ 				//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << setprecision(16);
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << en.ef * Ry_to_eV << " eV" << endl;
+				if(GlobalV::OUT_LEVEL=="ie")
 				{
-					ofs_running << " " << global_out_dir << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
 				}
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
@@ -583,12 +583,12 @@ void ELEC_scf::scf(const int &istep)
 			}
 			else
 			{
-				ofs_running << " !! convergence has not been achieved @_@" << endl;
-				if(OUT_LEVEL=="ie" || OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
+				GlobalV::ofs_running << " !! convergence has not been achieved @_@" << endl;
+				if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
 				cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << endl;
 			}
 
-//			DONE(ofs_running,"ELECTRONS CONVERGED!");
+//			DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");
 			timer::tick("ELEC_scf","scf");
 			return;
 		}

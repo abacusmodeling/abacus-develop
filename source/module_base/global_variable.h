@@ -12,7 +12,8 @@
 #include <sstream>
 #include <iomanip>
 
-using namespace std;
+namespace GlobalV
+{
 //==========================================================
 // EXPLAIN : Basic Global Variables
 //==========================================================
@@ -24,12 +25,12 @@ extern int 		NLOCAL;				// 1.1 // mohan add 2009-05-29
 extern double PSEUDORCUT;
 extern bool RENORMWITHMESH;
 
-extern string	CALCULATION;		// 2 "scf";"nscf" ;"symmetry"
+extern std::string	CALCULATION;		// 2 "scf";"nscf" ;"symmetry"
 extern int		EFIELD;				// 5 add electric field
 extern int 		DIPOLE;				// 7 add dipole correction
 
 
-extern string   DFT_FUNCTIONAL;		// 6.5 change the DFT functional from input file.
+extern std::string   DFT_FUNCTIONAL;		// 6.5 change the DFT functional from input file.
 extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8
@@ -41,14 +42,14 @@ extern double  PRESS1;
 extern double  PRESS2;
 extern double  PRESS3;
 extern double PRESSURE;
-extern string	MOVE_IONS;
-extern string	OUT_LEVEL;
+extern std::string	MOVE_IONS;
+extern std::string	OUT_LEVEL;
 
 extern int		NSTEP;				// 8.3
 extern int 		NITER;				// 8.4
 
-extern string	BASIS_TYPE; //xiaohui add 2013-09-01
-extern string	KS_SOLVER; //xiaohui add 2013-09-01
+extern std::string	BASIS_TYPE; //xiaohui add 2013-09-01
+extern std::string	KS_SOLVER; //xiaohui add 2013-09-01
 extern double	SEARCH_RADIUS;		// 11.1 // mohan add 2011-03-10
 extern bool		SEARCH_PBC;			// 11.2 // mohan add 2011-03-10
 extern bool		SPARSE_MATRIX;		// 11.3 // mohan add 2009-03-13
@@ -67,12 +68,11 @@ extern int 		DIAGO_CG_MAXITER;	// 13
 extern int		DIAGO_CG_PREC;		// 13.1
 extern int 		DIAGO_DAVID_NDIM;	// 14
 extern double 	ETHR;				// 15 ethr
-extern double	FS_REF_ENERGY;		// 16
 extern int		NB2D;				// 16.5 dividsion of 2D_matrix.
 
 extern double 	DRHO2;				// 17
 
-extern string	RESTART_MODE;		// 18
+extern std::string	RESTART_MODE;		// 18
 
 extern double DQ;	// 19 mohan add 2009-09-10
 extern int NQX;	// 20 mohan add 2009-09-10
@@ -89,8 +89,8 @@ extern double   STRESS_THR; //LiuXh add 20180515
 
 extern int ocp;
 //extern int ocp_n;
-extern string ocp_set;
-extern vector<double> ocp_kb;
+extern std::string ocp_set;
+extern std::vector<double> ocp_kb;
 //extern double ocp_kb[10000];
 extern int  mulliken;//qifeng add 2019/9/10
 //========================================================================
@@ -134,18 +134,18 @@ extern int GSIZE;
 // NAME : ofs_running( contain information during runnnig)
 // NAME : ofs_warning( contain warning information, including error)
 //==========================================================
-extern string	global_in_card;
-extern string	global_atom_card;
-extern string 	global_kpoint_card;
-extern string	global_wannier_card;
+extern std::string	global_in_card;
+extern std::string	global_atom_card;
+extern std::string 	global_kpoint_card;
+extern std::string	global_wannier_card;
 
-extern string	global_pseudo_dir;
-extern string   global_pseudo_type; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
-extern string 	global_out_dir;
-extern string   global_readin_dir; //zhengdy modified
+extern std::string	global_pseudo_dir;
+extern std::string   global_pseudo_type; // mohan add 2013-05-20 (xiaohui add 2013-06-23)
+extern std::string 	global_out_dir;
+extern std::string   global_readin_dir; //zhengdy modified
 
-extern ofstream ofs_running;
-extern ofstream ofs_warning;
+extern std::ofstream ofs_running;
+extern std::ofstream ofs_warning;
 
 //==========================================================
 // EXPLAIN : test level for each class
@@ -190,4 +190,5 @@ extern int test_deconstructor;
 
 extern bool FINAL_SCF; //LiuXh add 20180619
 
+}
 #endif

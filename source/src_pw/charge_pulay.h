@@ -39,13 +39,13 @@ class Charge_Pulay: public Charge_Mixing
 	void Pulay_mixing();
 	int rstep; // the record step;
 	int dstep; // Delta step " dstep = rstep-1 ".
-	double*** Rrho;// Rrho(i) = rho(i) - rho_save(i), (NSPIN, rstep, pw.nrxx)
-	double*** dRrho;// dRrho(i) = Rrho(i+1) - Rrho(i), (NSPIN, dstep, pw.nrxx)
-	double*** drho;// drho(i)= rho_save(i+1) - rho_save2(i), (NSPIN, dstep, pw.nrxx)
+	double*** Rrho;// Rrho(i) = rho(i) - rho_save(i), (GlobalV::NSPIN, rstep, pw.nrxx)
+	double*** dRrho;// dRrho(i) = Rrho(i+1) - Rrho(i), (GlobalV::NSPIN, dstep, pw.nrxx)
+	double*** drho;// drho(i)= rho_save(i+1) - rho_save2(i), (GlobalV::NSPIN, dstep, pw.nrxx)
 	double** rho_save2;//rho_save: rho_in, rho_save2: rho_in(last step)
 	bool initp; // p stands for pulay algorithms
-	complex<double>*** dF; // dF(i) = rhog(i) - rhog_save(i), (NSPIN, rstep, pw.ngmc)
-	complex<double>*** dn; // dn(i) = rhog(i+1) - rhog(i), (NSPIN, rstep, pw.ngmc)
+	complex<double>*** dF; // dF(i) = rhog(i) - rhog_save(i), (GlobalV::NSPIN, rstep, pw.ngmc)
+	complex<double>*** dn; // dn(i) = rhog(i+1) - rhog(i), (GlobalV::NSPIN, rstep, pw.ngmc)
 	
 	matrix Abar; // <dR_j|dR_i>^{-1}
 	double* dRR; // <dR_j|R_m>

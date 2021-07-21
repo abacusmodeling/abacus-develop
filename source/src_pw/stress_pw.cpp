@@ -102,19 +102,19 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 	bool ry = false;
 	this->printstress_total(sigmatot, ry);
 
-	if(TEST_STRESS) 
+	if(GlobalV::TEST_STRESS) 
 	{               
-		ofs_running << "\n PARTS OF STRESS: " << endl;
-		ofs_running << setiosflags(ios::showpos);
-		ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
-		this->print_stress("KINETIC    STRESS",sigmakin,TEST_STRESS,ry);
-		this->print_stress("LOCAL    STRESS",sigmaloc,TEST_STRESS,ry);
-		this->print_stress("HARTREE    STRESS",sigmahar,TEST_STRESS,ry);
-		this->print_stress("NON-LOCAL    STRESS",sigmanl,TEST_STRESS,ry);
-		this->print_stress("XC    STRESS",sigmaxc,TEST_STRESS,ry);
-		this->print_stress("EWALD    STRESS",sigmaewa,TEST_STRESS,ry);
-		this->print_stress("NLCC    STRESS",sigmaxcc,TEST_STRESS,ry);
-		this->print_stress("TOTAL    STRESS",sigmatot,TEST_STRESS,ry);
+		GlobalV::ofs_running << "\n PARTS OF STRESS: " << endl;
+		GlobalV::ofs_running << setiosflags(ios::showpos);
+		GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
+		this->print_stress("KINETIC    STRESS",sigmakin,GlobalV::TEST_STRESS,ry);
+		this->print_stress("LOCAL    STRESS",sigmaloc,GlobalV::TEST_STRESS,ry);
+		this->print_stress("HARTREE    STRESS",sigmahar,GlobalV::TEST_STRESS,ry);
+		this->print_stress("NON-LOCAL    STRESS",sigmanl,GlobalV::TEST_STRESS,ry);
+		this->print_stress("XC    STRESS",sigmaxc,GlobalV::TEST_STRESS,ry);
+		this->print_stress("EWALD    STRESS",sigmaewa,GlobalV::TEST_STRESS,ry);
+		this->print_stress("NLCC    STRESS",sigmaxcc,GlobalV::TEST_STRESS,ry);
+		this->print_stress("TOTAL    STRESS",sigmatot,GlobalV::TEST_STRESS,ry);
 	}
 	return;
     

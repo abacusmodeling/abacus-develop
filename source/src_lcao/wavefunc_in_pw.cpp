@@ -22,14 +22,14 @@ void Wavefunc_in_pw::make_table_q(
 		ifstream in(fn[it].c_str());
 		if(!in)
 		{
-			ofs_warning << " File name : " << fn[it] << endl;
+			GlobalV::ofs_warning << " File name : " << fn[it] << endl;
 			WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 		}
 		else
 		{
 			stringstream ss;
 			ss << "Orbital of species " << ucell.atoms[it].label;
-			OUT(ofs_running,ss.str(),fn[it]);
+			OUT(GlobalV::ofs_running,ss.str(),fn[it]);
 		}
 		in.close();
 	}
@@ -42,11 +42,11 @@ void Wavefunc_in_pw::make_table_q(
 		{
 			for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
 			{
-				ofs_running << " L=" << L << " N=" << N;
+				GlobalV::ofs_running << " L=" << L << " N=" << N;
 				ifstream in(fn[it].c_str());
 				if (!in)
 				{
-					ofs_warning << " File name : " << fn[it] << endl;
+					GlobalV::ofs_warning << " File name : " << fn[it] << endl;
 					WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 				}
 				int meshr=0;
@@ -68,11 +68,11 @@ void Wavefunc_in_pw::make_table_q(
 				{
 					++meshr;
 				}
-				ofs_running << " meshr=" << meshr;
+				GlobalV::ofs_running << " meshr=" << meshr;
 
 				CHECK_NAME(in, "dr");
 				in >> dr;
-				ofs_running << " dr=" << dr;
+				GlobalV::ofs_running << " dr=" << dr;
 
 				double* radial = new double[meshr];
 				double *psi = new double[meshr];
@@ -89,7 +89,7 @@ void Wavefunc_in_pw::make_table_q(
 					// plus one because we can't read in r = 0 term now.
 					radial[ir] = ir*dr;  //mohan modify 2010-04-19
 				}
-				ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << endl;
+				GlobalV::ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << endl;
 
 				string name1;
 				string name2;
@@ -103,7 +103,7 @@ void Wavefunc_in_pw::make_table_q(
 				{
 					if(in.eof())
 					{
-						ofs_warning << "\n Can't find l="
+						GlobalV::ofs_warning << "\n Can't find l="
 						<< L << " n=" << N << " orbital." << endl;
 						WARNING_QUIT("Control_Overlap","Read_PAO");
 					}
@@ -130,11 +130,11 @@ void Wavefunc_in_pw::make_table_q(
 						 }
 					}
 				}
-				double* table = new double[NQX];
+				double* table = new double[GlobalV::NQX];
 				Wavefunc_in_pw::integral(meshr, psir, radial, rab, L, table);
-				for(int iq=0; iq<NQX; iq++)
+				for(int iq=0; iq<GlobalV::NQX; iq++)
 				{
-					//double energy_q = pow(iq * DQ,2);
+					//double energy_q = pow(iq * GlobalV::DQ,2);
 					table_local(it,ic,iq) = table[iq];//* Wavefunc_in_pw::smearing(energy_q,150,0.666666);
 				}
 				delete[] table;
@@ -148,17 +148,17 @@ void Wavefunc_in_pw::make_table_q(
 	}// T
 
 
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		for(int it=0; it<ucell.ntype; it++)
 		{
 			stringstream ss;
-			ss << global_out_dir << ucell.atoms[it].label << "/LOCAL_G.dat";
+			ss << GlobalV::global_out_dir << ucell.atoms[it].label << "/LOCAL_G.dat";
 			ofstream ofs(ss.str().c_str());
-			for(int iq=0; iq<NQX; iq++)
+			for(int iq=0; iq<GlobalV::NQX; iq++)
 			{
 				int ic=0;
-				double energy_q = pow((double)iq*DQ,2);
+				double energy_q = pow((double)iq*GlobalV::DQ,2);
 				ofs << energy_q; // unit (Ry)
 				for(int L=0; L<ucell.atoms[it].nwl+1; L++)
 				{
@@ -223,13 +223,13 @@ const double *rab, const int &l, double* table)
 	double unit = 0.0;
 	Integral::Simpson_Integral(meshr, inner_part, rab, unit);
 	delete[] inner_part;
-	OUT(ofs_running,"normalize unit",unit);
+	OUT(GlobalV::ofs_running,"normalize unit",unit);
 
 	double *aux = new double[meshr];
 	double *vchi = new double[meshr];
-	for (int iq=0; iq<NQX; iq++)
+	for (int iq=0; iq<GlobalV::NQX; iq++)
 	{
-		const double q = DQ * iq;
+		const double q = GlobalV::DQ * iq;
 		Sphbes::Spherical_Bessel(meshr, r, q, l, aux);
 		for (int ir = 0;ir < meshr;ir++)
 		{
@@ -279,15 +279,15 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
 				for(int N=0; N < ucell.atoms[it].l_nchi[L]; N++)
 				{
-//					ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << endl;
+//					GlobalV::ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << endl;
 
 					for(int ig=0; ig<npw; ig++)
 					{
 						flq[ig] = PolyInt::Polynomial_Interpolation(table_local,
-						it, ic, NQX, DQ, gk[ig].norm() * ucell.tpiba );
+						it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * ucell.tpiba );
 					}
 
-					if(NSPIN==4)
+					if(GlobalV::NSPIN==4)
 					{
 /*						for(int is_N = 0; is_N < 2; is_N++)*/  //for rotate base
 						for(int is_N = 0; is_N < 1; is_N++)
@@ -296,7 +296,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 							if(ucell.atoms[it].has_so)
 							{
 								const double j = abs(double(L+is_N) - 0.5);
-								if (!(DOMAG||DOMAG_Z))
+								if (!(GlobalV::DOMAG||GlobalV::DOMAG_Z))
 								{//atomic_wfc_so
 									for(int m=0; m<2*L+1; m++)
 									{
@@ -343,7 +343,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 										{//Average the two functions
 											chiaux[ig] =  L *
 												PolyInt::Polynomial_Interpolation(table_local,
-												it, ic, NQX, DQ, gk[ig].norm() * ucell.tpiba );
+												it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;
 											chiaux[ig] *= 1/(2.0*L+1.0);
@@ -380,7 +380,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 										iwall++;
 									}
 									iwall += 2*L +1;
-								} // end else INPUT.starting_spin_angle || !DOMAG
+								} // end else INPUT.starting_spin_angle || !GlobalV::DOMAG
 							} // end if ucell.atoms[it].has_so
 							else
 							{//atomic_wfc_nc
@@ -417,7 +417,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 								iwall += 2*L+1;
 							} // end else ucell.atoms[it].has_so
 						} // end for is_N
-                    } // end if NONCOLIN
+                    } // end if GlobalV::NONCOLIN
                     else{//LSDA and nomagnet case
 						for(int m=0; m<2*L+1; m++)
 						{
@@ -436,7 +436,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 			delete[] sk;
 		} // end for ia
 	} // end for it
-	assert(iwall == NLOCAL);
+	assert(iwall == GlobalV::NLOCAL);
 	delete[] flq;
 	delete[] aux;
 	delete[] chiaux;
@@ -479,18 +479,18 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 				{
 					for(int ig=0; ig<npw; ig++)
 					{
-						if(gkq[ig].norm() * ucell.tpiba > ((NQX-4) * DQ) )
+						if(gkq[ig].norm() * ucell.tpiba > ((GlobalV::NQX-4) * GlobalV::DQ) )
 						{
 						   flq[ig] = 0.0;
 						}
 						else
 						{
-						   flq[ig] = PolyInt::Polynomial_Interpolation(table_local, it, ic, NQX, DQ, gkq[ig].norm() * ucell.tpiba );
+						   flq[ig] = PolyInt::Polynomial_Interpolation(table_local, it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * ucell.tpiba );
 						}
 					}
 
 
-					if(NSPIN==4)
+					if(GlobalV::NSPIN==4)
                     {
 						Soc soc;
 						soc.rot_ylm(ucell.atoms[it].nwl+1);
@@ -500,7 +500,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 							if(ucell.atoms[it].has_so)
 							{
 								const double j = double(L+is_N) - 0.5;
-								if ( !(DOMAG||DOMAG_Z))
+								if ( !(GlobalV::DOMAG||GlobalV::DOMAG_Z))
 								{//atomic_wfc_so
 									double fact[2];
 									for(int m=-L-1;m<L+1;m++)
@@ -560,7 +560,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 										{//Average the two functions
 											chiaux[ig] =  L *
 												PolyInt::Polynomial_Interpolation(table_local,
-																	it, ic, NQX, DQ, gkq[ig].norm() * ucell.tpiba );
+																	it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;
 											chiaux[ig] *= 1/(2.0*L+1.0);
@@ -655,7 +655,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 		}
 	}
 
-	assert(iwall == NLOCAL);
+	assert(iwall == GlobalV::NLOCAL);
 	delete[] flq;
 	delete[] aux;
 	delete[] chiaux;

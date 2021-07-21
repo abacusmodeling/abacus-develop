@@ -39,7 +39,7 @@ void Stochastic_Iter::orthog()
 {
     int nkk=1;// We temporarily use gamma k point.
     //orthogonal part
-    if(NBANDS > 0)
+    if(GlobalV::NBANDS > 0)
     {
         for(int ik = 0; ik < nkk; ++ik)
         {
@@ -85,7 +85,7 @@ void Stochastic_Iter::checkemm(int &iter)
     bool change = false;
     for(int ichi = 0; ichi < ntest; ++ichi)
     {
-        if(NBANDS > 0)
+        if(GlobalV::NBANDS > 0)
         {
             pchi = &STO_WF.chiortho[0](ichi,0);
         }  
@@ -153,13 +153,13 @@ void Stochastic_Iter::itermu(int &iter)
     if(iter == 1)
     {
         dmu = 2;
-        th_ne = 0.1 * DRHO2 * CHR.nelec;
+        th_ne = 0.1 * GlobalV::DRHO2 * CHR.nelec;
         cout<<"th_ne "<<th_ne<<endl;
     }
     else
     {
         dmu = 0.1;
-        th_ne = DRHO2 * 1e-2 * CHR.nelec;
+        th_ne = GlobalV::DRHO2 * 1e-2 * CHR.nelec;
     }
     sumpolyval();
     mu = mu0 - dmu;
@@ -231,12 +231,12 @@ void Stochastic_Iter::itermu(int &iter)
     en.ef = mu = mu0 = mu3;
     
     //Set wf.wg 
-    if(NBANDS > 0)
+    if(GlobalV::NBANDS > 0)
     {
         for(int ikk = 0; ikk < nkk; ++ikk)
         {
             double *en=wf.ekb[ikk];
-            for(int iksb = 0; iksb < NBANDS; ++iksb)
+            for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
                 wf.wg(ikk,iksb) = fd(en[iksb])*kv.wk[ikk];
             }
@@ -259,7 +259,7 @@ void Stochastic_Iter:: sumpolyval()
     {
         if(stotype == "pw")
         {
-            if(NBANDS > 0)  pchi = STO_WF.chiortho[ik].c; 
+            if(GlobalV::NBANDS > 0)  pchi = STO_WF.chiortho[ik].c; 
             else            pchi = STO_WF.chi0[ik].c;
             stoche.calpolyval(stohchi.hchi_reciprocal, pchi, nchip);
             DCOPY(stoche.polyvalue, spolyv, norder);
@@ -267,7 +267,7 @@ void Stochastic_Iter:: sumpolyval()
         else
         for(int ichi = 0; ichi < nchip; ++ichi)
         {
-            if(NBANDS > 0)  pchi = &STO_WF.chiortho[ik](ichi,0);
+            if(GlobalV::NBANDS > 0)  pchi = &STO_WF.chiortho[ik](ichi,0);
             else            pchi = &STO_WF.chi0[ik](ichi,0);
             stoche.calpolyval(stohchi.hchi_real , pchi);
             for(int ior = 0; ior < norder; ++ior)
@@ -303,11 +303,11 @@ double Stochastic_Iter::calne()
         //}
         //cout<<endl;
         //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
-        if(NBANDS > 0)
+        if(GlobalV::NBANDS > 0)
         {
             double *en=wf.ekb[ikk];
             //number of electrons in KS orbitals
-            for(int iksb = 0; iksb < NBANDS; ++iksb)
+            for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
                 KS_ne += fd(en[iksb]) * kv.wk[ikk];
             }
@@ -346,11 +346,11 @@ void Stochastic_Iter::sum_stoband()
         //}
         //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
         //cout<<endl;
-        if(NBANDS > 0)
+        if(GlobalV::NBANDS > 0)
         {
             double *enb=wf.ekb[ikk];
             //number of electrons in KS orbitals
-            for(int iksb = 0; iksb < NBANDS; ++iksb)
+            for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
                 en.demet += fdlnfd(enb[iksb]) * kv.wk[ikk];
             }
@@ -368,7 +368,7 @@ void Stochastic_Iter::sum_stoband()
     int npwall = npw * nchip;
     if(stotype == "pw")
     {
-        if(NBANDS == 0)
+        if(GlobalV::NBANDS == 0)
             out = new complex<double> [npwall];
         sto_rhog = new complex<double> [npw];
     }
@@ -393,7 +393,7 @@ void Stochastic_Iter::sum_stoband()
     double out2;
 
     double *ksrho;
-    if(NBANDS > 0 && MY_POOL==0 && stotype == "pw")
+    if(GlobalV::NBANDS > 0 && GlobalV::MY_POOL==0 && stotype == "pw")
     {
         ksrho = new double [nrxx];
         DCOPY(CHR.rho[0],ksrho,nrxx);
@@ -405,7 +405,7 @@ void Stochastic_Iter::sum_stoband()
         double stok_eband =0;
         if(stotype == "pw")
         {
-                if(NBANDS > 0)
+                if(GlobalV::NBANDS > 0)
                     out = pchi = STO_WF.chiortho[ik].c;
                 else
                     pchi = STO_WF.chi0[ik].c;
@@ -447,7 +447,7 @@ void Stochastic_Iter::sum_stoband()
             hout = new complex<double> [nrxx];
             for(int ichi = 0; ichi < nchip; ++ichi)
             {
-                if(NBANDS > 0)
+                if(GlobalV::NBANDS > 0)
                 {
                     pchi = &STO_WF.chiortho[ik](ichi,0);
                 }  
@@ -505,16 +505,16 @@ void Stochastic_Iter::sum_stoband()
             factor = 1 / dr3;
     }
     
-    if(MY_POOL==0 && stotype == "pw")
+    if(GlobalV::MY_POOL==0 && stotype == "pw")
     {
-        if(NBANDS > 0)
+        if(GlobalV::NBANDS > 0)
             DCOPY(ksrho,CHR.rho[0],nrxx);
         else
             ZEROS(CHR.rho[0],nrxx);
     }
     
     
-    if(MY_POOL == 0)
+    if(GlobalV::MY_POOL == 0)
     for(int is = 0 ; is < 1; ++is)
     {
         for(int ir = 0; ir < nrxx ; ++ir)
@@ -533,7 +533,7 @@ void Stochastic_Iter::sum_stoband()
         delete [] sto_rhog;
     }
     delete [] sto_rho;
-    if(NBANDS == 0 || stotype != "pw")
+    if(GlobalV::NBANDS == 0 || stotype != "pw")
         delete [] out;
     timer::tick("Stochastic_Iter","sum_stoband");
     return;
@@ -673,14 +673,14 @@ double Stochastic_Iter:: nfdlnfd(double e)
     stohchi.hchi_reciprocal(kswf,chig1);
     
     hm.hpw.h_psi( kswf , chig2);
-    if(MY_RANK==0)
+    if(GlobalV::MY_RANK==0)
     for(int i = 0; i<wf.npw;++i)
     {
         if(i % 100 == 0)
             cout<<kswf[i]<<" "<<chig1[i]<<" "<<chig2[i]<<endl;
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    if(MY_RANK==1)
+    if(GlobalV::MY_RANK==1)
     for(int i = 0; i<wf.npw;++i)
     {
         cout.clear();
@@ -736,7 +736,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     double Ebar = (Emax + Emin)/2;
     double DeltaE = (Emax - Emin)/2;
     fftw_plan pp=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
-    for(int ib = 0 ; ib < NBANDS ; ++ib)
+    for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
         complex<double> *kswf = &wf.evc[0](ib,0);
         hm.hpw.h_psi( kswf , chigout);
@@ -780,7 +780,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     mu = en.ef;
     stoche.calcoef(this->nfd);
     fftw_plan pp=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
-    for(int ib = 0 ; ib < NBANDS ; ++ib)
+    for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
         ZEROS(wave,pw.nrxx);
         complex<double> *kswf = &wf.evc[0](ib,0);
@@ -816,7 +816,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     complex<double> *sum = new complex<double> [nchip * nchip];
 	zgemm_(&transC, &transN, &nchip, &nchip, &npw, &ONE, STO_WF.chi0[0].c, &npw, wave, &npw, &ZERO, sum, &nchip);
 	Parallel_Reduce::reduce_complex_double_pool(sum, nchip * nchip);
-	if(MY_RANK!=0) cout.clear();
+	if(GlobalV::MY_RANK!=0) cout.clear();
     double abs2 = 0;
     for(int i=0;i<nchip * nchip;++i)
     {
@@ -826,7 +826,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
 	cout<<abs2/nchip<<endl;
     delete [] sum;
     delete [] wave;
-	if(MY_RANK!=0) cout.setstate(ios::failbit);*/
+	if(GlobalV::MY_RANK!=0) cout.setstate(ios::failbit);*/
 	//-------------------------------------------------------------
 
     

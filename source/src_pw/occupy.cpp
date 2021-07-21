@@ -29,9 +29,9 @@ void Occupy::calculate_weights(void)
 //	cout << " tetrahedron_method = " << use_tetrahedron_method << endl;
 //	cout << " fixed_occupations = " << fixed_occupations << endl; 
 
-	if(KS_SOLVER=="selinv")
+	if(GlobalV::KS_SOLVER=="selinv")
 	{
-		ofs_running << " Could not calculate occupation." << endl;
+		GlobalV::ofs_running << " Could not calculate occupation." << endl;
 		return;
 	}
 
@@ -39,16 +39,16 @@ void Occupy::calculate_weights(void)
             !use_tetrahedron_method &&
             !fixed_occupations)
     {
-        if (TWO_EFERMI)
+        if (GlobalV::TWO_EFERMI)
         {
-            iweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, kv.isk);
-            iweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, kv.isk);
+            iweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, kv.isk);
+            iweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, kv.isk);
 			//ef = ( ef_up + ef_dw ) / 2.0_dp need??? mohan add 2012-04-16
         }
         else
         {
 			// -1 means don't need to consider spin.
-            iweights(kv.nks, kv.wk, NBANDS, CHR.nelec, wf.ekb, en.ef, wf.wg, -1, kv.isk);
+            iweights(kv.nks, kv.wk, GlobalV::NBANDS, CHR.nelec, wf.ekb, en.ef, wf.wg, -1, kv.isk);
         }
     }
     else if (use_tetrahedron_method)
@@ -56,18 +56,18 @@ void Occupy::calculate_weights(void)
         WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
 //		if(my_rank == 0)
 //		{
-//			tweights(kv.nkstot, nspin, NBANDS, CHR.nelec, ntetra,tetra, wf.et, en.ef, wf.wg);
+//			tweights(kv.nkstot, nspin, GlobalV::NBANDS, CHR.nelec, ntetra,tetra, wf.et, en.ef, wf.wg);
 //		}
     }
     else if (use_gaussian_broadening)
     {
-		if (TWO_EFERMI)
+		if (GlobalV::TWO_EFERMI)
 		{
 			double demet_up = 0.0;
 			double demet_dw = 0.0;
-			Occupy::gweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
+			Occupy::gweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
 			                 wf.ekb, en.ef_up, demet_up, wf.wg, 0, kv.isk);
-			Occupy::gweights(kv.nks, kv.wk, NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
+			Occupy::gweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
 			                 wf.ekb, en.ef_dw, demet_dw, wf.wg, 1, kv.isk);
 			en.demet = demet_up + demet_dw;
                         
@@ -75,7 +75,7 @@ void Occupy::calculate_weights(void)
 		else
 		{
 			// -1 means is no related to spin.
-        	Occupy::gweights(kv.nks, kv.wk, NBANDS, CHR.nelec, gaussian_parameter, gaussian_type,
+        	Occupy::gweights(kv.nks, kv.wk, GlobalV::NBANDS, CHR.nelec, gaussian_parameter, gaussian_type,
                  wf.ekb, en.ef, en.demet, wf.wg, -1, kv.isk);
 
 		}
@@ -87,7 +87,7 @@ void Occupy::calculate_weights(void)
 		en.ef = - 1.0e+20;
 		for (int ik = 0;ik < kv.nks ;ik++)
 		{
-			for (int ibnd = 0;ibnd < NBANDS;ibnd++)
+			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
 				if (wf.wg(ik, ibnd) > 0.0)
 				{
@@ -97,7 +97,7 @@ void Occupy::calculate_weights(void)
 		}
     }
 	
-    if (TWO_EFERMI==2)
+    if (GlobalV::TWO_EFERMI==2)
     {
 		Parallel_Reduce::gather_max_double_all( en.ef_up );
 		Parallel_Reduce::gather_max_double_all( en.ef_dw );	
@@ -108,7 +108,7 @@ void Occupy::calculate_weights(void)
 		double etop = wf.ekb[0][0];
 		for(int ik=0; ik<kv.nks; ik++)
 		{
-			for(int ib=0; ib<NBANDS; ib++)
+			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{
 				ebotom = min ( ebotom, wf.ekb[ik][ib] );
 				etop = max ( etop, wf.ekb[ik][ib] );
@@ -121,10 +121,10 @@ void Occupy::calculate_weights(void)
 		Parallel_Reduce::gather_min_double_all( ebotom );
 		
 		//not parallel yet!
-//		OUT(ofs_running,"Top    Energy (eV)", etop * Ry_to_eV);
-//      OUT(ofs_running,"Fermi  Energy (eV)", en.ef * Ry_to_eV);
-//		OUT(ofs_running,"Bottom Energy (eV)", ebotom * Ry_to_eV);
-//		OUT(ofs_running,"Range  Energy (eV)", etop-ebotom * Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Top    Energy (eV)", etop * Ry_to_eV);
+//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", en.ef * Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Bottom Energy (eV)", ebotom * Ry_to_eV);
+//		OUT(GlobalV::ofs_running,"Range  Energy (eV)", etop-ebotom * Ry_to_eV);
     }
 
 	return;
@@ -232,8 +232,8 @@ void Occupy::iweights
 	double degspin;
 	bool conv = false;          // pengfei 2017-04-04
 	
-	degspin = (NSPIN == 2)? 1.0 : 2.0;
-	if(NSPIN == 4)degspin = 1.0;//added by zhengdy-soc
+	degspin = (GlobalV::NSPIN == 2)? 1.0 : 2.0;
+	if(GlobalV::NSPIN == 4)degspin = 1.0;//added by zhengdy-soc
 	
 	assert( degspin > 0.0);
 	double ib_min = nelec/degspin;
@@ -258,9 +258,9 @@ void Occupy::iweights
 				}
 			}
 				
-			if( (NSPIN == 2 && count == ib_min1 * nks/2) 
-				|| (NSPIN == 1 && count == ib_min1 * nks) 
-				|| ((NSPIN == 4) && count == ib_min1 * nks))
+			if( (GlobalV::NSPIN == 2 && count == ib_min1 * nks/2) 
+				|| (GlobalV::NSPIN == 1 && count == ib_min1 * nks) 
+				|| ((GlobalV::NSPIN == 4) && count == ib_min1 * nks))
 			{
 				conv = true;
 			}
@@ -318,7 +318,7 @@ void Occupy::gweights(
     // Calculate the Fermi energy ef
     //===============================
     // call efermig
-    Occupy::efermig(ekb, NBANDS, nks, nelec, wk, degauss, ngauss, ef, is, isk);
+    Occupy::efermig(ekb, GlobalV::NBANDS, nks, nelec, wk, degauss, ngauss, ef, is, isk);
     demet = 0.0;
 
     for (int ik = 0;ik < nks;ik++)
@@ -326,7 +326,7 @@ void Occupy::gweights(
 		// mohan add 2011-04-03
 		if(is!=-1 && is!=isk[ik]) continue;
 
-		for (int ib = 0;ib < NBANDS;ib++)
+		for (int ib = 0;ib < GlobalV::NBANDS;ib++)
 		{
 			//================================
 			// Calculate the gaussian weights
@@ -468,7 +468,7 @@ double Occupy::sumkg(
 		if(is!=-1 && is!=isk[ik]) continue;
 	
 		double sum1 = 0.0;
-		for (int ib = 0;ib < NBANDS; ib++)
+		for (int ib = 0;ib < GlobalV::NBANDS; ib++)
 		{
 			//===========================
 			// call wgauss
@@ -478,13 +478,13 @@ double Occupy::sumkg(
 		sum2 += wk [ik] * sum1;
 	}
 
-	//ofs_running << "\n sum2 before reduce = " << sum2 << endl;
+	//GlobalV::ofs_running << "\n sum2 before reduce = " << sum2 << endl;
 
 #ifdef __MPI
 	Parallel_Reduce::reduce_double_allpool(sum2);
 #endif
 
-	//ofs_running << "\n sum2 after reduce = " << sum2 << endl;
+	//GlobalV::ofs_running << "\n sum2 after reduce = " << sum2 << endl;
 
     return sum2;
 } // end function sumkg
@@ -683,7 +683,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 {
     //===================================================================
     // calculates weights with the tetrahedron method (Bloechl version)
-    // integer :: nks, nspin, NBANDS, ntetra, tetra (4, ntetra)
+    // integer :: nks, nspin, GlobalV::NBANDS, ntetra, tetra (4, ntetra)
     //===================================================================
 
     double e1, e2, e3, e4, c1, c2, c3, c4, dosef;
@@ -693,7 +693,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
     int itetra[4];
 
     // Calculate the Fermi energy ef
-    efermit(ekb, NBANDS, nks, nelec, nspin, ntetra, tetra, ef);
+    efermit(ekb, GlobalV::NBANDS, nks, nelec, nspin, ntetra, tetra, ef);
 
     for (ik = 0;ik < nks;ik++)
     {
@@ -719,7 +719,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
 
         for (nt = 0;nt < ntetra;nt++)
         {
-            for (ibnd = 0;ibnd < NBANDS;ibnd++)
+            for (ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
             {
                 //======================================================
                 // etetra are the energies at the vertexes of the nt-th
@@ -827,7 +827,7 @@ void Occupy::tweights(const int nks,const int nspin,const int nband,const double
     //=====================================================================
     for (ik = 0;ik < nks;ik++)
     {
-        for (ibnd = 0;ibnd < NBANDS;ibnd++)
+        for (ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
         {
             wg(ik, ibnd) = wg(ik, ibnd) * 2.0 / nspin;
         }
@@ -893,17 +893,17 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     //===================================
     const int nlw = max(  1, static_cast<int>( (nelec / 2.0 - 5.0) )  );
     double elw = ekb[nlw][0];
-    double eup = ekb[0][NBANDS-1];
+    double eup = ekb[0][GlobalV::NBANDS-1];
 
     for (int ik = 1;ik < nks;ik++)// do ik = 2, nks
     {
         elw = min(elw, ekb[ik][nlw]);
-        eup = max(eup, ekb[ik][NBANDS-1]);
+        eup = max(eup, ekb[ik][GlobalV::NBANDS-1]);
     }
     for (int ik = 1;ik < nks;ik++)// do ik = 2, nks
     {
         elw = min(elw, ekb[ik][nlw]);
-        eup = max(eup, ekb[ik][NBANDS-1]);
+        eup = max(eup, ekb[ik][GlobalV::NBANDS-1]);
     }
 
     //===============================
@@ -911,11 +911,11 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     // the number of states with eup
     // the number of states with elw
     //===============================
-    const double sumkup = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, eup);
-    const double sumklw = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, elw);
+    const double sumkup = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, eup);
+    const double sumklw = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, elw);
 
-	ofs_running << "\n sumkup = " << sumkup;
-	ofs_running << "\n sumklw = " << sumklw << endl;
+	GlobalV::ofs_running << "\n sumkup = " << sumkup;
+	GlobalV::ofs_running << "\n sumklw = " << sumklw << endl;
 
     if ((sumkup - nelec) < - eps || (sumklw - nelec) > eps)
     {
@@ -931,7 +931,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     {
         // the number of states with ef
         ef = (eup + elw) / 2.0;
-        sumkmid = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, ef);
+        sumkmid = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, ef);
 
         if (abs(sumkmid - nelec) < better)
         {
@@ -959,7 +959,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
         // unconverged exit:
         // the best available ef is used . Needed in some difficult cases
         ef = efbetter;
-        sumkmid = sumkt(ekb, NBANDS, nks, nspin, ntetra, tetra, ef);
+        sumkmid = sumkt(ekb, GlobalV::NBANDS, nks, nspin, ntetra, tetra, ef);
     }
 
     //==============================================================
@@ -967,7 +967,7 @@ void Occupy::efermit(double** ekb,const int nband,const int nks,const double &ne
     //==============================================================
     for (int ik = 0;ik < nks;ik++)
     {
-        if (ef > ekb[ik][NBANDS-1] + 1.e-4)
+        if (ef > ekb[ik][GlobalV::NBANDS-1] + 1.e-4)
         {
             cout << "\n ef = " << ef;
         }
@@ -999,7 +999,7 @@ double Occupy::sumkt(double** ekb,const int nband,const int nks,const int nspin,
 
         for (int nt = 0; nt < ntetra; nt++)
         {
-            for (int ibnd = 0; ibnd < NBANDS; ibnd++)
+            for (int ibnd = 0; ibnd < GlobalV::NBANDS; ibnd++)
             {
                 //======================================================
                 // etetra are the energies at the vertexes of the nt-th

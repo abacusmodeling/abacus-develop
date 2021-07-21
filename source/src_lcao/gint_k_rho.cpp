@@ -60,7 +60,7 @@ inline void cal_psir_ylm(
 		const int it=ucell.iat2it[iat];
 		const int ia=ucell.iat2ia[iat];
 		const int start=ucell.itiaiw2iwt(it, ia, 0);
-		block_iw[id]=GridT.trace_lo[start]/NPOL;
+		block_iw[id]=GridT.trace_lo[start]/GlobalV::NPOL;
 		Atom* atom=&ucell.atoms[it];
 		block_size[id]=atom->nw;
 		block_index[id+1]=block_index[id]+atom->nw;
@@ -155,7 +155,7 @@ inline void cal_band_rho(
 	int cal_num=0; // mohan initialize 2021-07-04
 	int iw1_lo=0;
 
-	for(int is=0; is<NSPIN; ++is)
+	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
 		for (int ia1=0; ia1<size; ++ia1)
@@ -526,8 +526,8 @@ void Gint_k::evaluate_pDMp(
 	//-----------------------------------------------------
 	// in order to calculate <i,alpha,R1 | DM_R | j,beta,R2>
 	//-----------------------------------------------------
-	double **tchg = new double*[NSPIN];
-	for(int is=0; is<NSPIN; is++)
+	double **tchg = new double*[GlobalV::NSPIN];
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		tchg[is] = new double[pw.bxyz];
 		ZEROS(tchg[is], pw.bxyz);
@@ -656,7 +656,7 @@ void Gint_k::evaluate_pDMp(
 				// key variable:
 				ixxx = DM_start + LNNR.find_R2st[iat][offset];	
 				
-				for(int is=0; is<NSPIN; is++)
+				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
 					dm = LOC.DM_R[is];
 					tchgs = tchg[is];
@@ -669,14 +669,14 @@ void Gint_k::evaluate_pDMp(
 							end1 = psi1 + nw1;
 							end2 = psi2 + nw2;
 							
-							iw1_lo = GridT.trace_lo[start1]/NPOL;
+							iw1_lo = GridT.trace_lo[start1]/GlobalV::NPOL;
 							ixxx2 = ixxx;
 							//------------------------------------
 							// circle for wave functions of atom 1.
 							//------------------------------------
 							for (iw1p=psi1; iw1p<end1; ++iw1p)
 							{
-								iw2_lo = GridT.trace_lo[start2]/NPOL;
+								iw2_lo = GridT.trace_lo[start2]/GlobalV::NPOL;
 								// 2.0 counts for the undiagonalized part
 								psi1_2 = 2.0 * iw1p[0];
 								//------------------------------------
@@ -719,7 +719,7 @@ void Gint_k::evaluate_pDMp(
 		}// ia2
 	}// ia1
 
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for(int ib=0; ib<pw.bxyz; ib++)
 		{
@@ -729,7 +729,7 @@ void Gint_k::evaluate_pDMp(
 
 	delete[] all_out_of_range;
 
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		delete[] tchg[is];
 	}

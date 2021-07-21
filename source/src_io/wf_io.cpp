@@ -20,7 +20,7 @@
 
 void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
 {
-    if (test_wf) TITLE("WF_io","write_wfc");
+    if (GlobalV::test_wf) TITLE("WF_io","write_wfc");
 
     ofstream ofs( fn.c_str() );
 
@@ -31,9 +31,9 @@ void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
     //exi.out_planewave(ofs);
 
     ofs << "\n<WAVEFUNC>";
-    ofs << "\n" << NBANDS << " Number of bands." << endl;
+    ofs << "\n" << GlobalV::NBANDS << " Number of bands." << endl;
     ofs << setprecision(6);
-    for (int i=0; i<NBANDS; i++)
+    for (int i=0; i<GlobalV::NBANDS; i++)
     {
         for (int ik=0; ik<kv.nks; ik++)
         {
@@ -55,7 +55,7 @@ void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
 
 void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3<double> *gkk)
 {
-    if (test_wf) TITLE("WF_io","write_wfc2"); 
+    if (GlobalV::test_wf) TITLE("WF_io","write_wfc2"); 
 
     string * wfilename;
     wfilename=new string[kv.nkstot];
@@ -69,7 +69,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
             wfss<<fn<<ik+1<<".dat";
         }
         wfilename[ik]=wfss.str();
-        if ( MY_RANK == 0 )
+        if ( GlobalV::MY_RANK == 0 )
         {
             if(wf.out_wf==1)
             {
@@ -83,17 +83,17 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
             }
         }
     }
-    //if(MY_RANK!=0) cout.clear();
+    //if(GlobalV::MY_RANK!=0) cout.clear();
     //cout<<"Hello"<<endl;
-    //if(MY_RANK!=0) cout.setstate(ios::failbit);
+    //if(GlobalV::MY_RANK!=0) cout.setstate(ios::failbit);
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
 
 	
     // out put the wave functions in plane wave basis.
-	for(int ip=0; ip<NPOOL; ip++)
+	for(int ip=0; ip<GlobalV::NPOOL; ip++)
 	{
-        if( MY_POOL == ip )
+        if( GlobalV::MY_POOL == ip )
 		{
 #endif
 			for(int ik=0; ik<kv.nks; ik++)
@@ -108,11 +108,11 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
                 ikstot=ik;
 #endif
 #ifdef __MPI
-                //int ikstot=getink(ik,ip,kv.nkstot,NPOOL);
-				for( int id=0; id<NPROC_IN_POOL; id++)
+                //int ikstot=getink(ik,ip,kv.nkstot,GlobalV::NPOOL);
+				for( int id=0; id<GlobalV::NPROC_IN_POOL; id++)
 				{
 					MPI_Barrier(POOL_WORLD);
-                    if (RANK_IN_POOL == id)
+                    if (GlobalV::RANK_IN_POOL == id)
 					{
 #else
                     int id=0;               
@@ -128,7 +128,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
                             <<"ngtot"<<setw(10)<<"nband"<<setw(10)<<"ecut"<<setw(10)<<"lat0"<<setw(10)<<"2pi/lat0"<<endl;
                             ofs2<<setw(10)<<ikstot+1<<setw(10)<<kv.nkstot<<setw(10)<<kv.kvec_c[ik].x<<setw(10)
                             <<kv.kvec_c[ik].y<<setw(10)<<kv.kvec_c[ik].z<<setw(10)<<kv.wk[ik]<<setw(10)
-                            <<ikngtot<<setw(10)<<NBANDS<<setw(10)<<pw.ecutwfc<<setw(10)<<ucell.lat0<<setw(10)<<ucell.tpiba<<endl;
+                            <<ikngtot<<setw(10)<<GlobalV::NBANDS<<setw(10)<<pw.ecutwfc<<setw(10)<<ucell.lat0<<setw(10)<<ucell.tpiba<<endl;
                             ofs2<<"\n<Reciprocal Lattice Vector>"<<endl;
                             ofs2<<setw(10)<<ucell.G.e11<<setw(10)<<ucell.G.e12<<setw(10)<<ucell.G.e13<<endl;
                             ofs2<<setw(10)<<ucell.G.e21<<setw(10)<<ucell.G.e22<<setw(10)<<ucell.G.e23<<endl;
@@ -140,7 +140,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 					    {
                             ofs2<<setw(10)<<gkk[ig].x<<setw(10)<<gkk[ig].y<<setw(10)<<gkk[ig].z<<endl;
 						}
-                        if(id==NPROC_IN_POOL-1)
+                        if(id==GlobalV::NPROC_IN_POOL-1)
                         {
                             ofs2<<"<G vectors>\n"<<endl;
                         }
@@ -153,7 +153,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
                         {
                             wfs2<<int(72)<<ikstot+1<<kv.nkstot<<kv.kvec_c[ik].x
                                 <<kv.kvec_c[ik].y<<kv.kvec_c[ik].z<<kv.wk[ik]
-                                <<ikngtot<<NBANDS<<pw.ecutwfc<<ucell.lat0<<ucell.tpiba<<72; //4 int + 7 double is 72B
+                                <<ikngtot<<GlobalV::NBANDS<<pw.ecutwfc<<ucell.lat0<<ucell.tpiba<<72; //4 int + 7 double is 72B
                             wfs2<<72<<ucell.G.e11<<ucell.G.e12<<ucell.G.e13
                                     <<ucell.G.e21<<ucell.G.e22<<ucell.G.e23
                                     <<ucell.G.e31<<ucell.G.e32<<ucell.G.e33<<72; //9 double is 72B
@@ -167,7 +167,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 					    {
                             wfs2<<gkk[ig].x<<gkk[ig].y<<gkk[ig].z;
 						}
-                        if(id==NPROC_IN_POOL-1)
+                        if(id==GlobalV::NPROC_IN_POOL-1)
                         {
                             wfs2<<ikngtot*8*3;
                         } 
@@ -177,13 +177,13 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 					}
 				}// end id
 #endif
-                for(int ib=0; ib<NBANDS; ib++)
+                for(int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
 #ifdef __MPI
-					for( int id=0; id<NPROC_IN_POOL; id++)
+					for( int id=0; id<GlobalV::NPROC_IN_POOL; id++)
 					{
 						MPI_Barrier(POOL_WORLD); //qianrui add
-                        if (RANK_IN_POOL == id)
+                        if (GlobalV::RANK_IN_POOL == id)
 						{
 #else
                     int id=0;
@@ -200,7 +200,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 								ofs2 << setw(15) << psi[ik](ib, ig).real()
 									<< setw(15) << psi[ik](ib, ig).imag();
 							} // end ig
-                            if(id==NPROC_IN_POOL-1)   ofs2 << "\n< Band "<<ib+1 <<" >" <<endl; 
+                            if(id==GlobalV::NPROC_IN_POOL-1)   ofs2 << "\n< Band "<<ib+1 <<" >" <<endl; 
 							ofs2.close();
                         }
                         else
@@ -211,7 +211,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 							{
 								wfs2 << psi[ik](ib, ig).real() << psi[ik](ib, ig).imag();
 							}
-                            if(id==NPROC_IN_POOL-1) wfs2<<ikngtot*16;
+                            if(id==GlobalV::NPROC_IN_POOL-1) wfs2<<ikngtot*16;
                             wfs2.close();
                         }
 #ifdef __MPI                      

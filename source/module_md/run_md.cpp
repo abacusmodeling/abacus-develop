@@ -37,10 +37,10 @@ void Run_md::ai_md_line(void)
 {
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
-    // cell relaxation. b) put NLOCAL and NBANDS as input parameters
-    ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
+    // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
+    ucell.setup_cell( GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
 
-	// setup NBANDS 
+	// setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
 	CHR.cal_nelec();
 
@@ -54,19 +54,19 @@ void Run_md::ai_md_line(void)
 		xcf.which_dft(ucell.atoms[it].dft);
 	}
 
-    //ucell.setup_cell( global_pseudo_dir , global_atom_card , ofs_running, NLOCAL, NBANDS);
-    DONE(ofs_running, "SETUP UNITCELL");
+    //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
+    DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
         symm.analy_sys(ucell, out);
-        DONE(ofs_running, "SYMMETRY");
+        DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    kv.set(symm, global_kpoint_card, NSPIN, ucell.G, ucell.latvec );
-    DONE(ofs_running,"INIT K-POINTS");
+    kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
+    DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
     // mohan add 2021-01-30
@@ -76,10 +76,10 @@ void Run_md::ai_md_line(void)
 #ifdef __LCAO
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
-	if(BASIS_TYPE=="lcao")
+	if(GlobalV::BASIS_TYPE=="lcao")
 	{
 		LOWF.orb_con.set_orb_tables(
-		ofs_running,
+		GlobalV::ofs_running,
 		UOT, 
 		ORB,
 		ucell.ntype,
@@ -92,23 +92,23 @@ void Run_md::ai_md_line(void)
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
 		Exx_Abfs::Lmax,
-		FORCE,
-		MY_RANK);
+		GlobalV::FORCE,
+		GlobalV::MY_RANK);
 
 		// * allocate H and S matrices according to computational resources
 		// * set the 'trace' between local H/S and global H/S
-		LM.divide_HS_in_frag(GAMMA_ONLY_LOCAL, ParaO);
+		LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, ParaO);
 	}
 #endif
 
     // Initalize the plane wave basis set
-    pw.gen_pw(ofs_running, ucell, kv);
-    DONE(ofs_running,"INIT PLANEWAVE");
+    pw.gen_pw(GlobalV::ofs_running, ucell, kv);
+    DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
     cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
 
     // the symmetry of a variety of systems.
-    if(CALCULATION == "test")
+    if(GlobalV::CALCULATION == "test")
     {
         Cal_Test::test_memory();
         QUIT();
@@ -120,20 +120,20 @@ void Run_md::ai_md_line(void)
         pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 	// Inititlize the charge density.
-    CHR.allocate(NSPIN, pw.nrxx, pw.ngmc);
-    DONE(ofs_running,"INIT CHARGE");
+    CHR.allocate(GlobalV::NSPIN, pw.nrxx, pw.ngmc);
+    DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
     pot.allocate(pw.nrxx);
-    DONE(ofs_running,"INIT POTENTIAL");
+    DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
-	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{
 		Run_MD_PW run_md_pw;
         run_md_pw.md_cells_pw();
 	}
 #ifdef __LCAO
-	else if(BASIS_TYPE=="lcao")
+	else if(GlobalV::BASIS_TYPE=="lcao")
 	{
 		Run_MD_LCAO run_md_lcao;
 		run_md_lcao.opt_cell();
@@ -146,8 +146,8 @@ void Run_md::ai_md_line(void)
 void Run_md::classic_md_line(void)
 {
 	// Setup the unitcell.
-    ucell.setup_cell( global_pseudo_dir, out, global_atom_card, ofs_running);
-	DONE(ofs_running, "SETUP UNITCELL");
+    ucell.setup_cell( GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+	DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
 	Print_Info PI;
     PI.setup_parameters();

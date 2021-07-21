@@ -13,11 +13,11 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<matrix> &DK_2D, const 
 {
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
-	assert(DK_2D.size()==NSPIN);
-	const double SPIN_multiple = 0.5*NSPIN;
+	assert(DK_2D.size()==GlobalV::NSPIN);
+	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(NSPIN);
-	for(int is=0; is!=NSPIN; ++is)
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
+	for(int is=0; is!=GlobalV::NSPIN; ++is)
 	{
 		for(int iwt1_local=0; iwt1_local!=DK_2D[is].nr; ++iwt1_local)
 		{
@@ -50,16 +50,16 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 {
 	{
 		static int istep=0;
-		ofstream ofs("DK_2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofstream ofs("DK_2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		ofs<<DK_2D<<endl;
 	}
 	
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
-	const double SPIN_multiple = 0.5*NSPIN;
+	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{kv.nmp[0],kv.nmp[1],kv.nmp[2]};
 	const vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(NSPIN);
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
 	for(int ik=0; ik!=DK_2D.size(); ++ik)
 	{
 		for(int iwt1_local=0; iwt1_local!=DK_2D[ik].nr; ++iwt1_local)
@@ -87,7 +87,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 	
 	{
 		static int istep=0;
-		ofstream ofs("DR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofstream ofs("DR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		ofs<<DR_a2D<<endl;
 	}	
 	return DR_a2D;
@@ -98,14 +98,14 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::cal_DM");
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D = GAMMA_ONLY_LOCAL
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D = GlobalV::GAMMA_ONLY_LOCAL
 		? K_to_R(LOC.wfc_dm_2d.dm_gamma, threshold_D)
 		: K_to_R(LOC.wfc_dm_2d.dm_k, threshold_D);
 	DMr = allreduce.a2D_to_exx(DR_a2D);
 
 	/*{
 		static int istep=0;
-		ofstream ofs("DMr_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofstream ofs("DMr_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		ofs<<DMr<<endl;
 	}*/	
 }

@@ -2,12 +2,12 @@
 
 unkOverlap_pw::unkOverlap_pw()
 {
-	//ofs_running << "this is unkOverlap_pw()" << endl;
+	//GlobalV::ofs_running << "this is unkOverlap_pw()" << endl;
 }
 
 unkOverlap_pw::~unkOverlap_pw()
 {
-	//ofs_running << "this is ~unkOverlap_pw()" << endl;
+	//GlobalV::ofs_running << "this is ~unkOverlap_pw()" << endl;
 }
 
 
@@ -44,7 +44,7 @@ complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const i
 
 
 #ifdef __MPI
-    // note: the mpi uses MPI_COMMON_WORLD,so you must make the NPOOL = 1.
+    // note: the mpi uses MPI_COMMON_WORLD,so you must make the GlobalV::NPOOL = 1.
 	double in_date_real = result.real();
 	double in_date_imag = result.imag();
 	double out_date_real = 0.0;
@@ -111,7 +111,7 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
 	}
 
 #ifdef __MPI
-    // note: the mpi uses MPI_COMMON_WORLD,so you must make the NPOOL = 1.
+    // note: the mpi uses MPI_COMMON_WORLD,so you must make the GlobalV::NPOOL = 1.
 	double in_date_real = result.real();
 	double in_date_imag = result.imag();
 	double out_date_real = 0.0;
@@ -125,19 +125,19 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
     return result;
 }
 
-// if noncollinear = 1 or NSPIN = 4 , you need this routine to calculate overlap unk
+// if noncollinear = 1 or GlobalV::NSPIN = 4 , you need this routine to calculate overlap unk
 complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const ComplexMatrix *evc)
 {
 	
 	complex<double> result(0.0,0.0);
 	//波函数的平面波基组总数
 	const int number_pw = pw.ngmw;
-	complex<double> *unk_L = new complex<double>[number_pw*NPOL];
-	complex<double> *unk_R = new complex<double>[number_pw*NPOL];
-	ZEROS(unk_L,number_pw*NPOL);
-	ZEROS(unk_R,number_pw*NPOL);
+	complex<double> *unk_L = new complex<double>[number_pw*GlobalV::NPOL];
+	complex<double> *unk_R = new complex<double>[number_pw*GlobalV::NPOL];
+	ZEROS(unk_L,number_pw*GlobalV::NPOL);
+	ZEROS(unk_R,number_pw*GlobalV::NPOL);
 	
-	for(int i = 0; i < NPOL; i++)
+	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
 		for (int ig = 0; ig < kv.ngk[ik_L]; ig++)
 		{
@@ -151,7 +151,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, con
 
 	}
 	
-	for (int iG = 0; iG < number_pw*NPOL; iG++)
+	for (int iG = 0; iG < number_pw*GlobalV::NPOL; iG++)
 	{
 
 		result = result + conj(unk_L[iG]) * unk_R[iG];
@@ -159,7 +159,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, con
 	}
 	
 #ifdef __MPI
-    // note: the mpi uses MPI_COMMON_WORLD,so you must make the NPOOL = 1.
+    // note: the mpi uses MPI_COMMON_WORLD,so you must make the GlobalV::NPOOL = 1.
 	double in_date_real = result.real();
 	double in_date_imag = result.imag();
 	double out_date_real = 0.0;
@@ -189,7 +189,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 	ZEROS( psi_up, pw.nrxx );
 	ZEROS( psi_down, pw.nrxx );
 
-	for(int i = 0; i < NPOL; i++)
+	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
 		for (int ig = 0; ig < kv.ngk[ik_L]; ig++)
 		{
@@ -224,7 +224,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 	pw.FFT_wfc.FFT3D( psi_up, -1);
 	pw.FFT_wfc.FFT3D( psi_down, -1);
 	
-	for(int i = 0; i < NPOL; i++)
+	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
 		for(int ig = 0; ig < kv.ngk[ik_R]; ig++)
 		{
@@ -234,7 +234,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 	}
 	
 #ifdef __MPI
-    // note: the mpi uses MPI_COMMON_WORLD,so you must make the NPOOL = 1.
+    // note: the mpi uses MPI_COMMON_WORLD,so you must make the GlobalV::NPOOL = 1.
 	double in_date_real = result.real();
 	double in_date_imag = result.imag();
 	double out_date_real = 0.0;
@@ -253,7 +253,7 @@ void unkOverlap_pw::test_for_unkOverlap_pw()
 {
 	
 	const int number_pw = pw.ngmw;
-	ofs_running << "the pw.ngmw is " << number_pw << endl;
+	GlobalV::ofs_running << "the pw.ngmw is " << number_pw << endl;
 	complex<double> *unk_L = new complex<double>[number_pw];
 	for (int ig = 0; ig < kv.ngk[0]; ig++)
 	{
@@ -261,7 +261,7 @@ void unkOverlap_pw::test_for_unkOverlap_pw()
 	}
 	for (int ig = 0; ig < pw.ngmw; ig++)
 	{
-		ofs_running << pw.gdirect[ig].x << "," << pw.gdirect[ig].y << "," << pw.gdirect[ig].z << "  = " << unk_L[ig] << endl;
+		GlobalV::ofs_running << pw.gdirect[ig].x << "," << pw.gdirect[ig].y << "," << pw.gdirect[ig].z << "  = " << unk_L[ig] << endl;
 	}	
 	
 }

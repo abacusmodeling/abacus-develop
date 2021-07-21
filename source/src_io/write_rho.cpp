@@ -23,7 +23,7 @@ void Charge::write_rho(
 	time_t start, end;
 	ofstream ofs;
 	
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		start = time(NULL);
     	
@@ -33,7 +33,7 @@ void Charge::write_rho(
         	WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
-		//ofs_running << "\n Output charge file." << endl;
+		//GlobalV::ofs_running << "\n Output charge file." << endl;
 
 		ofs << ucell.latName << endl;//1
 		ofs << " " << ucell.lat0 * 0.529177 << endl;
@@ -70,12 +70,12 @@ void Charge::write_rho(
 		}
 		else
 		{
-			ofs << "\n  " << NSPIN;
-			if(NSPIN==1 || NSPIN == 4)
+			ofs << "\n  " << GlobalV::NSPIN;
+			if(GlobalV::NSPIN==1 || GlobalV::NSPIN == 4)
 			{
 				ofs << "\n " << en.ef << " (fermi energy)";
 			}
-			else if(NSPIN==2)
+			else if(GlobalV::NSPIN==2)
 			{
 				if(is==0)ofs << "\n " << en.ef_up << " (fermi energy for spin=1)"; 
 				else if(is==1)ofs << "\n " << en.ef_dw << " (fermi energy for spin=2)";
@@ -109,25 +109,25 @@ void Charge::write_rho(
 	}
 #else
 //	for(int ir=0; ir<pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
-//	ofs_running << "\n RANK_IN_POOL = " << RANK_IN_POOL;
+//	GlobalV::ofs_running << "\n GlobalV::RANK_IN_POOL = " << GlobalV::RANK_IN_POOL;
 	
 	// only do in the first pool.
-	if(MY_POOL==0)
+	if(GlobalV::MY_POOL==0)
 	{
 		// num_z: how many planes on processor 'ip'
-    	int *num_z = new int[NPROC_IN_POOL];
-    	ZEROS(num_z, NPROC_IN_POOL);
+    	int *num_z = new int[GlobalV::NPROC_IN_POOL];
+    	ZEROS(num_z, GlobalV::NPROC_IN_POOL);
     	for (int iz=0;iz<pw.nbz;iz++)
     	{
-        	int ip = iz % NPROC_IN_POOL;
+        	int ip = iz % GlobalV::NPROC_IN_POOL;
         	num_z[ip] += pw.bz;
     	}	
 
 		// start_z: start position of z in 
 		// processor ip.
-    	int *start_z = new int[NPROC_IN_POOL];
-    	ZEROS(start_z, NPROC_IN_POOL);
-    	for (int ip=1;ip<NPROC_IN_POOL;ip++)
+    	int *start_z = new int[GlobalV::NPROC_IN_POOL];
+    	ZEROS(start_z, GlobalV::NPROC_IN_POOL);
+    	for (int ip=1;ip<GlobalV::NPROC_IN_POOL;ip++)
     	{
         	start_z[ip] = start_z[ip-1]+num_z[ip-1];
     	}	
@@ -137,11 +137,11 @@ void Charge::write_rho(
 		ZEROS(which_ip, pw.ncz);
 		for(int iz=0; iz<pw.ncz; iz++)
 		{
-			for(int ip=0; ip<NPROC_IN_POOL; ip++)
+			for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
 			{
-				if(iz>=start_z[NPROC_IN_POOL-1]) 
+				if(iz>=start_z[GlobalV::NPROC_IN_POOL-1]) 
 				{
-					which_ip[iz] = NPROC_IN_POOL-1;
+					which_ip[iz] = GlobalV::NPROC_IN_POOL-1;
 					break;
 				}
 				else if(iz>=start_z[ip] && iz<start_z[ip+1])
@@ -150,7 +150,7 @@ void Charge::write_rho(
 					break;
 				}
 			}
-//			ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
+//			GlobalV::ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
 		}
 
 		
@@ -168,40 +168,40 @@ void Charge::write_rho(
 			MPI_Status ierror;
 
 			// case 1: the first part of rho in processor 0.
-			if(which_ip[iz] == 0 && RANK_IN_POOL ==0)
+			if(which_ip[iz] == 0 && GlobalV::RANK_IN_POOL ==0)
 			{
 				for(int ir=0; ir<nxy; ir++)
 				{
 					// mohan change to rho_save on 2012-02-10
 					// because this can make our next restart calculation lead
 					// to the same dr2 as the one saved.
-					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
-					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
 				}
 			}
 			// case 2: > first part rho: send the rho to 
 			// processor 0.
-			else if(which_ip[iz] == RANK_IN_POOL )
+			else if(which_ip[iz] == GlobalV::RANK_IN_POOL )
 			{
 				for(int ir=0; ir<nxy; ir++)
 				{
-					//						zpiece[ir] = rho[is][ir*num_z[RANK_IN_POOL]+iz];
-					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[RANK_IN_POOL]];
-					//						ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+					//						zpiece[ir] = rho[is][ir*num_z[GlobalV::RANK_IN_POOL]+iz];
+					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
 				}
 				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
 			}
 
 			// case 2: > first part rho: processor 0 receive the rho
 			// from other processors
-			else if(RANK_IN_POOL==0)
+			else if(GlobalV::RANK_IN_POOL==0)
 			{
 				MPI_Recv(zpiece, nxy, MPI_DOUBLE, which_ip[iz], tag, POOL_WORLD, &ierror);
-				//					ofs_running << "\n Receieve First number = " << zpiece[0];
+				//					GlobalV::ofs_running << "\n Receieve First number = " << zpiece[0];
 			}
 
 			// write data	
-			if(MY_RANK==0)
+			if(GlobalV::MY_RANK==0)
 			{
 				//	ofs << "\niz=" << iz;
 				// mohan update 2011-03-30
@@ -221,7 +221,7 @@ void Charge::write_rho(
 	MPI_Barrier(MPI_COMM_WORLD);
 #endif
 
-	if(MY_RANK==0) 
+	if(GlobalV::MY_RANK==0) 
 	{
 		end = time(NULL);
 		OUT_TIME("write_rho",start,end);

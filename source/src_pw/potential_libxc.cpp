@@ -25,7 +25,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 
     double etxc = 0.0;
     double vtxc = 0.0;
-	matrix v(NSPIN,pw.nrxx);
+	matrix v(GlobalV::NSPIN,pw.nrxx);
 
 	//----------------------------------------------------------
 	// xc_func_type is defined in Libxc package
@@ -79,7 +79,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 		// cal vtx, v from rho_in, vrho
 		auto process_vrho = [&]()
 		{
-			if(nspin0()==1 || NSPIN==2)
+			if(nspin0()==1 || GlobalV::NSPIN==2)
 			{
 				for( size_t is=0; is!=nspin0(); ++is )
 				{
@@ -153,7 +153,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 				for( size_t ir=0; ir!=pw.nrxx; ++ir )
 					vtxc -= dh[is][ir] * rho[ir*nspin0()+is];
 
-			if(nspin0()==1 || NSPIN==2)
+			if(nspin0()==1 || GlobalV::NSPIN==2)
 			{
 				for( size_t is=0; is!=nspin0(); ++is )
 					for( size_t ir=0; ir!=pw.nrxx; ++ir )
@@ -329,7 +329,7 @@ Potential_Libxc::cal_input(
 		if(!finished_rho)
 		{
 			rho.resize(pw.nrxx*nspin0());
-			if(nspin0()==1 || NSPIN==2)
+			if(nspin0()==1 || GlobalV::NSPIN==2)
 			{
 				for( size_t is=0; is!=nspin0(); ++is )
 					for( size_t ir=0; ir!=pw.nrxx; ++ir )

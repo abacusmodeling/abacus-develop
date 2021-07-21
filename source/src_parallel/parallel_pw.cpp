@@ -63,7 +63,7 @@ delete[] ngm_i_number;
 void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in, const int &n3_in,
 		const int &bz, const int &nproc_in,const int &rank_in)
 {
-	if(test_pw) TITLE("Parallel_PW","init");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","init");
 
 	this->gcut=gcut_in;
 	this->n1=n1_in;
@@ -89,9 +89,9 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 		npps[ip] *= bz;//mohan update 2011-04-22
 		if(ip < nb3%nproc_use) this->npps[ip]+=bz;
 		
-		if(test_pw)
+		if(GlobalV::test_pw)
 		{
-			ofs_running << " processor="<<ip<<" npps="<<npps[ip] << endl;
+			GlobalV::ofs_running << " processor="<<ip<<" npps="<<npps[ip] << endl;
 		}
 	}
 
@@ -104,7 +104,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 
 void Parallel_PW::columns_map(void)
 {
-	if(test_pw) TITLE("Parallel_PW","columns_map");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","columns_map");
 	timer::tick("Parallel_PW","columns_map");
 		
 	int ibox[3];
@@ -182,8 +182,8 @@ void Parallel_PW::columns_map(void)
 		}
 	}
 
-	OUT(ofs_running,"number of plane waves",ng);
-	OUT(ofs_running,"number of sticks", nst);
+	OUT(GlobalV::ofs_running,"number of plane waves",ng);
+	OUT(GlobalV::ofs_running,"number of sticks", nst);
 
 	timer::tick("Parallel_PW","columns_map");
 	return;
@@ -191,7 +191,7 @@ void Parallel_PW::columns_map(void)
 
 void Parallel_PW::restore_st(void)
 {
-	if(test_pw) TITLE("Parallel_PW","restore_st");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","restore_st");
 	
 	// assert the number of total sticks has
 	// been calculated.
@@ -240,7 +240,7 @@ void Parallel_PW::restore_st(void)
 
 void Parallel_PW::columns_and_pw_distribution(void)
 {
-	if(test_pw) TITLE("Parallel_PW","columns_and_pw_distribution");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","columns_and_pw_distribution");
 
 	// number of sticks of each processor in one pool.
 	delete[] nst_per;
@@ -408,7 +408,7 @@ void Parallel_PW::fft_map(
         int ggchg_time
 )
 {
-	if(test_pw) TITLE("Parallel_PW","fft_map");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i == ngm) return;
@@ -554,7 +554,7 @@ void Parallel_PW::fft_map_after_vc(
         int ggchg_time
 )
 {
-    if(test_pw) TITLE("Parallel_PW","fft_map_after_vc");
+    if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map_after_vc");
 
     if(!allocate_igl2g)
     {
@@ -588,7 +588,7 @@ void Parallel_PW::fft_map_final_scf(
 	const int &ngmc_g_in // cutgg_num
 )
 {
-	if(test_pw) TITLE("Parallel_PW","fft_map_final_scf");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map_final_scf");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i_final_scf == ngm) return;

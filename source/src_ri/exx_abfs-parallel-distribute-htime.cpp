@@ -8,7 +8,7 @@ vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute(
 	const Abfs::Vector3_Order<int> & Born_von_Karman_period,
 	const double rmesh_times )
 {
-//ofstream ofs("htime_"+TO_STRING(MY_RANK));
+//ofstream ofs("htime_"+TO_STRING(GlobalV::MY_RANK));
 //ofs<<rmesh_times<<endl;
 
 	TITLE("Exx_Abfs::Parallel::Distribute::Htime::distribute");
@@ -23,7 +23,7 @@ vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute(
 //	ofs<<irank<<"\t"<<rank_work[irank]<<endl;
 //ofs.close();
 	
-	return rank_work[MY_RANK];
+	return rank_work[GlobalV::MY_RANK];
 }
 
 // Nadj[iat]
@@ -93,8 +93,8 @@ vector<vector<pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_r
 	const vector<pair<size_t,pair<size_t,size_t>>> & pair_costs )
 {
 	TITLE("Exx_Abfs::Parallel::Distribute::Htime::cal_rank_work");
-	vector<pair<size_t,size_t>> rank_cost(NPROC);				// rank_cost[i] = { irank, cost }
-	for( size_t irank=0; irank!=NPROC; ++irank )
+	vector<pair<size_t,size_t>> rank_cost(GlobalV::NPROC);				// rank_cost[i] = { irank, cost }
+	for( size_t irank=0; irank!=GlobalV::NPROC; ++irank )
 		rank_cost[irank] = { irank, 0 };
 	
 	auto comp = [](
@@ -102,7 +102,7 @@ vector<vector<pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_r
 		const pair<size_t,size_t> & rank_cost2 )
 	{	return rank_cost1.second > rank_cost2.second;	};
 	
-	vector<vector<pair<size_t,size_t>>> rank_work(NPROC);		// rank_work[irank] = { {iat1,iat2}, {iat1,iat2}, ... }
+	vector<vector<pair<size_t,size_t>>> rank_work(GlobalV::NPROC);		// rank_work[irank] = { {iat1,iat2}, {iat1,iat2}, ... }
 	for( const auto pair_cost : pair_costs )
 	{
 		pop_heap( rank_cost.begin(), rank_cost.end(), comp );
