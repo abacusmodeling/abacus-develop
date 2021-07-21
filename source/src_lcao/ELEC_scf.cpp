@@ -1,7 +1,7 @@
 #include "ELEC_scf.h"
 #include "../src_pw/global.h"
 #include "../src_io/chi0_hilbert.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "dftu.h"
 #include "LCAO_evolve.h"
 #include "ELEC_cbands_k.h"
@@ -47,15 +47,15 @@ void ELEC_scf::scf(const int &istep)
 	{
 		if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 		{
-			printf( " [33m%-7s[0m", "ITER");
-			printf( "[33m%-15s[0m", "ETOT(Ry)");
+			printf( "\e[33m%-7s\e[0m", "ITER");
+			printf( "\e[33m%-15s\e[0m", "ETOT(Ry)");
 			if(GlobalV::NSPIN==2)
 			{
-				printf( "[33m%-10s[0m", "TMAG");
-				printf( "[33m%-10s[0m", "AMAG");
+				printf( "\e[33m%-10s\e[0m", "TMAG");
+				printf( "\e[33m%-10s\e[0m", "AMAG");
 			}
-			printf( "[33m%-14s[0m", "DRHO2");
-			printf( "[33m%-15s[0m", "ETOT(eV)");
+			printf( "\e[33m%-14s\e[0m", "DRHO2");
+			printf( "\e[33m%-15s\e[0m", "ETOT(eV)");
 			printf( "\e[33m%-11s\e[0m\n", "TIME(s)");
 		}
 		else

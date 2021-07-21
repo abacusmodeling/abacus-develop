@@ -79,6 +79,10 @@ void Occupy::calculate_weights(void)
                  wf.ekb, en.ef, en.demet, wf.wg, -1, GlobalC::kv.isk);
 
 		}
+
+        //qianrui fix a bug on 2021-7-21
+        en.demet /= GlobalV:: NPROC_IN_POOL;
+	    Parallel_Reduce::reduce_double_all( en.demet );
     }
     else if (fixed_occupations)
     {
