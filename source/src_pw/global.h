@@ -33,11 +33,9 @@ namespace GlobalC
 {
 extern K_Vectors kv;
 extern Use_FFT UFFT;
+extern output out;
 }
 
-extern FFT fftwan;
-
-extern output out;
 
 extern PW_Basis pw;
 extern Stochastic_WF STO_WF; //qianrui add 2021-2-5

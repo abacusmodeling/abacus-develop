@@ -159,7 +159,7 @@ void wavefunc::wfcinit(void)
 	}
     if (GlobalV::test_wf>2)
     {
-        out.printrm(GlobalV::ofs_running, " wg  ",  wg);
+        GlobalC::out.printrm(GlobalV::ofs_running, " wg  ",  wg);
         this->check_psi(evc);
     }
 

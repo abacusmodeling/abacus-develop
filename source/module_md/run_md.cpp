@@ -38,7 +38,7 @@ void Run_md::ai_md_line(void)
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
-    ucell.setup_cell( GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
 
 	// setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
@@ -60,7 +60,7 @@ void Run_md::ai_md_line(void)
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
-        symm.analy_sys(ucell, out);
+        symm.analy_sys(ucell, GlobalC::out);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
@@ -146,7 +146,7 @@ void Run_md::ai_md_line(void)
 void Run_md::classic_md_line(void)
 {
 	// Setup the unitcell.
-    ucell.setup_cell( GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
 	DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
 	Print_Info PI;

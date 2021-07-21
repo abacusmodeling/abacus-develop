@@ -9,12 +9,12 @@ void Variable_Cell::init_after_vc(void)
 {
 	TITLE("Variable_Cell","init_after_vc");
 
-    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(ucell, out);
+        symm.analy_sys(ucell, GlobalC::out);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
@@ -72,13 +72,13 @@ void Variable_Cell::final_calculation_after_vc(void)
     OUT(GlobalV::ofs_running," ------------------------------------------------------------------------------------");
 
     // (5) Setup the unitcell.
-    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    ucell.setup_cell_after_vc(GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // (6) symmetry analysize.
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(ucell, out);
+        symm.analy_sys(ucell, GlobalC::out);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 

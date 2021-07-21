@@ -628,7 +628,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 
 void pseudopot_cell_vnl::print_vnl(ofstream &ofs)
 {
-	out.printr3_d(ofs, " tab : ", tab);
+	GlobalC::out.printr3_d(ofs, " tab : ", tab);
 }
 
 
