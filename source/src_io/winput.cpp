@@ -79,7 +79,7 @@ winput::~winput()
 void winput::Init(const string &fn)
 {
 	Default();
-	if(test_winput) TITLE("winput","Init");
+	if(GlobalV::test_winput) TITLE("winput","Init");
 	//==========================================
 	// First readin and check value in root cpu
 	// and then bcast value
@@ -97,7 +97,7 @@ void winput::Read(const string &fn)
 {
 	TITLE("winput","Read");
 	
-	if(MY_RANK!=0) return;
+	if(GlobalV::MY_RANK!=0) return;
 
 	ifstream ifs(fn.c_str(), ios::in);
 	if (!ifs)
@@ -108,7 +108,7 @@ void winput::Read(const string &fn)
 	}
 	else
 	{
-		ofs_running << "Open file : " << fn << endl;
+		GlobalV::ofs_running << "Open file : " << fn << endl;
 	}
 
 	ifs.clear();
@@ -234,7 +234,7 @@ void winput::Read(const string &fn)
 
 void winput::Default()
 {
-	if(test_winput) TITLE("winput","Default");
+	if(GlobalV::test_winput) TITLE("winput","Default");
 	//========================
 	//	part1 : control
 	//========================
@@ -345,11 +345,11 @@ void winput::Default()
 
 void winput::Check(void)
 {
-	if(test_winput) TITLE("winput","Check");
+	if(GlobalV::test_winput) TITLE("winput","Check");
 
-	if(MY_RANK!=0) return;
+	if(GlobalV::MY_RANK!=0) return;
 
-	if(CALCULATION=="nscf")
+	if(GlobalV::CALCULATION=="nscf")
 	{
 		if(out_charge)
 		{
@@ -449,7 +449,7 @@ void winput::Check(void)
 	//		if(imp_pao == 2)
 	//		{
 	//			WARNING("winput::Check","Use improve_pao method.");
-	//			OUT(ofs_warning,"imp_pao",imp_pao);
+	//			OUT(GlobalV::ofs_warning,"imp_pao",imp_pao);
 
 	//			WARNING("winput::Check","If use imp_pao>0 ,sph_proj must be 0.");
 	//			sph_proj=0;
@@ -496,9 +496,9 @@ void winput::Check(void)
 	//			{
 	//				WARNING_QUIT("winput::Check","Please check your bloch_end");
 	//			}
-	//			if(bloch_end > NBANDS)
+	//			if(bloch_end > GlobalV::NBANDS)
 	//			{
-	//				WARNING_QUIT("winput::Check","Bloch_end > NBANDS, reset either of them");
+	//				WARNING_QUIT("winput::Check","Bloch_end > GlobalV::NBANDS, reset either of them");
 	//			}
 	//		}
 	//	}// end after_iter
@@ -529,9 +529,9 @@ void winput::Check(void)
 
 void winput::Print(const string &fn)
 {
-	if(test_winput) TITLE("winput","Print");
+	if(GlobalV::test_winput) TITLE("winput","Print");
 
-	if(MY_RANK!=0) return;
+	if(GlobalV::MY_RANK!=0) return;
  
 	ofstream ofs(fn.c_str());
 	ofs << setiosflags(ios::left);
@@ -626,7 +626,7 @@ void winput::Print(const string &fn)
 #ifdef __MPI
 void winput::Bcast(void)
 {
-	if(test_winput) TITLE("winput","Bcast");
+	if(GlobalV::test_winput) TITLE("winput","Bcast");
 
 	Parallel_Common::bcast_string( target );
 	Parallel_Common::bcast_bool( before_iter );

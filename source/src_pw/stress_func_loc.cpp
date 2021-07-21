@@ -17,7 +17,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 	complex<double> *Porter = UFFT.porter;
 
 	ZEROS( Porter, pw.nrxx );
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{

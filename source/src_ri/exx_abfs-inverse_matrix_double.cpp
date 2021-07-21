@@ -39,7 +39,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 	if(info!=0)
 	{
 		cout << "\n info_dpotrf = " << info <<endl;
-		ofs_warning<<A<<endl;
+		GlobalV::ofs_warning<<A<<endl;
 		QUIT();
 	}
 
@@ -48,7 +48,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 	if(info!=0)
 	{
 		cout << "\n info_dpotri = " << info <<endl;
-		ofs_warning<<A<<endl;
+		GlobalV::ofs_warning<<A<<endl;
 		QUIT();
 	}
 	

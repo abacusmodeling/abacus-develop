@@ -46,22 +46,22 @@ void LOOP_elec::set_matrix_grid(void)
     timer::tick("LOOP_elec","set_matrix_grid"); 
 
 	// (1) Find adjacent atoms for each atom.
-	SEARCH_RADIUS = atom_arrange::set_sr_NL(
-		ofs_running,
-		OUT_LEVEL,
+	GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+		GlobalV::ofs_running,
+		GlobalV::OUT_LEVEL,
 		ORB.get_rcutmax_Phi(), 
 		ORB.get_rcutmax_Beta(), 
-		GAMMA_ONLY_LOCAL);
+		GlobalV::GAMMA_ONLY_LOCAL);
 
 	atom_arrange::search(
-		SEARCH_PBC,
-		ofs_running,
+		GlobalV::SEARCH_PBC,
+		GlobalV::ofs_running,
 		GridD, 
 		ucell, 
-		SEARCH_RADIUS, 
-		test_atom_input);
+		GlobalV::SEARCH_RADIUS, 
+		GlobalV::test_atom_input);
 
-	//DONE(ofs_running,"SEARCH ADJACENT ATOMS");
+	//DONE(GlobalV::ofs_running,"SEARCH ADJACENT ATOMS");
 
 	// (3) Periodic condition search for each grid.
 	GridT.set_pbc_grid(
@@ -71,7 +71,7 @@ void LOOP_elec::set_matrix_grid(void)
 			pw.nbxx, pw.nbzp_start, pw.nbzp);
 
 	// (2) If k point is used here, allocate HlocR after atom_arrange.
-	if(!GAMMA_ONLY_LOCAL)
+	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		// For each atom, calculate the adjacent atoms in different cells
 		// and allocate the space for H(R) and S(R).
@@ -111,21 +111,21 @@ void LOOP_elec::before_solver(const int &istep)
 	// THIS IS A BUG, BECAUSE THE INDEX GridT.trace_lo
 	// HAS BEEN REGENERATED, SO WE NEED TO
 	// REALLOCATE DENSITY MATRIX FIRST, THEN READ IN DENSITY MATRIX,
-	// AND USE DENSITY MATRIX TO DO RHO CALCULATION.-- mohan 2013-03-31
+	// AND USE DENSITY MATRIX TO DO RHO GlobalV::CALCULATION.-- mohan 2013-03-31
 	//======================================
 	if(pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
 	{
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			ZEROS(CHR.rho[is], pw.nrxx);
 			stringstream ssd;
-			ssd << global_out_dir << "SPIN" << is + 1 << "_DM" ;
+			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
 			LOC.read_dm(is, ssd.str() );
 		}
 
 		// calculate the charge density
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			UHM.GG.cal_rho(LOC.DM);
 		}
@@ -155,8 +155,8 @@ void LOOP_elec::solver(const int &istep)
     timer::tick("LOOP_elec","solver"); 
 
 	// self consistent calculations for electronic ground state
-	if (CALCULATION=="scf" || CALCULATION=="md"
-			|| CALCULATION=="relax" || CALCULATION=="cell-relax") //pengfei 2014-10-13
+	if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md"
+			|| GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") //pengfei 2014-10-13
 	{
 		//Peize Lin add 2016-12-03
 		switch(exx_lcao.info.hybrid_type)
@@ -213,23 +213,23 @@ void LOOP_elec::solver(const int &istep)
 			}
 		}
 	}
-	else if (CALCULATION=="nscf")
+	else if (GlobalV::CALCULATION=="nscf")
 	{
 		ELEC_nscf::nscf(UHM);
 	}
-	else if (CALCULATION=="istate")
+	else if (GlobalV::CALCULATION=="istate")
 	{
 		IState_Charge ISC;
 		ISC.begin();
 	}
-	else if (CALCULATION=="ienvelope")
+	else if (GlobalV::CALCULATION=="ienvelope")
 	{
 		IState_Envelope IEP;
 		IEP.begin();
 	}
 	else
 	{
-		WARNING_QUIT("LOOP_elec::solver","CALCULATION type not supported");
+		WARNING_QUIT("LOOP_elec::solver","GlobalV::CALCULATION type not supported");
 	}
 
     timer::tick("LOOP_elec","solver"); 

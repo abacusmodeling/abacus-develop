@@ -64,7 +64,7 @@ Exx_Abfs::Parallel::Communicate::DM::a2Dexx_to_exx(
 	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & m_exx, 
 	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & m_a2Dexx ) const
 {
-	for( size_t is=0; is!=NSPIN; ++is )
+	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		for( auto & m_a2DexxA : m_a2Dexx[is] )
 		{
@@ -104,13 +104,13 @@ void Exx_Abfs::Parallel::Communicate::DM::cal_DM(
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
 	
-ofstream ofs_time("time_"+TO_STRING(MY_RANK),ofstream::app);
+ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 //gettimeofday( &t_start, NULL);
 #if false
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid = LOC_to_grid( Born_von_Karman_period, threshold );
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid\t"<<time_during(t_start)<<endl;
-ofs_matrixes( "DM_grid_"+TO_STRING(MY_RANK), DM_grid );
+ofs_matrixes( "DM_grid_"+TO_STRING(GlobalV::MY_RANK), DM_grid );
 
 //gettimeofday( &t_start, NULL);	
 	MPI_Barrier( MPI_COMM_WORLD );
@@ -133,7 +133,7 @@ ofs_matrixes( "DM_grid_"+TO_STRING(MY_RANK), DM_grid );
 		dm_my.flag_mix = false;
 		dm_my.cal_DM( H_atom_pairs_core, Born_von_Karman_boxes );
 		
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(NSPIN);
+		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(GlobalV::NSPIN);
 		for( const auto &DMrA : dm_my.DMr )
 		{
 			const size_t iat1 = DMrA.first;
@@ -155,7 +155,7 @@ ofs_matrixes( "DM_grid_"+TO_STRING(MY_RANK), DM_grid );
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::cal_dm_my\t"<<time_during(t_start)<<endl;
 #endif	
 //ofs_time.close();
-ofs_matrixes( "DMr_"+TO_STRING(MY_RANK), DMr );
+ofs_matrixes( "DMr_"+TO_STRING(GlobalV::MY_RANK), DMr );
 }
 
 vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
@@ -165,14 +165,14 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid");
 	
-	const double SPIN_multiple = 0.5*NSPIN;
+	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(NSPIN);
-	if(GAMMA_ONLY_LOCAL)
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(GlobalV::NSPIN);
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 {
-	ofstream ofs("LOC.DM_"+TO_STRING(MY_RANK));
-	for( int is=0; is!=NSPIN; ++is )
+	ofstream ofs("LOC.DM_"+TO_STRING(GlobalV::MY_RANK));
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		for( int i1=0; i1!=GridT.lgd; ++i1 )
 		{
@@ -184,7 +184,7 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 	}
 	ofs.close();
 }		
-		for( size_t is=0; is!=NSPIN; ++is )
+		for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 		{			
 			for( int iat1=0, iwt1_index=0; iat1!=ucell.nat; ++iat1 )
 			{
@@ -242,7 +242,7 @@ cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;
 	}
 	else
 	{	
-ofstream ofs_LOC_DM("LOC.DM_R_"+TO_STRING(MY_RANK));
+ofstream ofs_LOC_DM("LOC.DM_R_"+TO_STRING(GlobalV::MY_RANK));
 for( int i=0; i<100; ++i )
 	ofs_LOC_DM<<LOC.DM_R[0][i]<<"\t";
 ofs_LOC_DM<<endl<<endl;
@@ -251,7 +251,7 @@ ofs_LOC_DM<<endl<<endl;
 		RA.for_grid(GridT);
 //cout<<__FILE__<<__LINE__<<endl;
 
-		for( size_t is=0; is!=NSPIN; ++is )
+		for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 		{
 			for( size_t iat1=0; iat1<ucell.nat; ++iat1 )
 			{

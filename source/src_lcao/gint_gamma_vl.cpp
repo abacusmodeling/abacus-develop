@@ -223,27 +223,27 @@ inline int setBufferParameter(
 
         // find out the global index and local index of elements
 		// in each pro based on 2D block cyclic distribution
-        for(int irow=0, grow=0; grow<NLOCAL; ++irow)
+        for(int irow=0, grow=0; grow<GlobalV::NLOCAL; ++irow)
         {
             grow=globalIndex(irow, nblk, nprows, iprow);
             int lrow=GridT.trace_lo[grow];
 
-            if(lrow < 0 || grow >= NLOCAL) continue;
+            if(lrow < 0 || grow >= GlobalV::NLOCAL) continue;
 
-            for(int icol=0, gcol=0; gcol<NLOCAL; ++icol)
+            for(int icol=0, gcol=0; gcol<GlobalV::NLOCAL; ++icol)
             {
                 gcol=globalIndex(icol,nblk, npcols, ipcol);
                 int lcol=GridT.trace_lo[gcol];
-                if(lcol < 0 || gcol >= NLOCAL) continue;
+                if(lcol < 0 || gcol >= GlobalV::NLOCAL) continue;
                 // if(pos<0 || pos >= current_s_index_siz)
                 // {
-                //     OUT(ofs_running, "pos error, pos:", pos);
-                //     OUT(ofs_running, "irow:", irow);
-                //     OUT(ofs_running, "icol:", icol);
-                //     OUT(ofs_running, "grow:", grow);
-                //     OUT(ofs_running, "gcol:", gcol);
-                //     OUT(ofs_running, "lrow:", grow);
-                //     OUT(ofs_running, "lcol:", gcol);
+                //     OUT(GlobalV::ofs_running, "pos error, pos:", pos);
+                //     OUT(GlobalV::ofs_running, "irow:", irow);
+                //     OUT(GlobalV::ofs_running, "icol:", icol);
+                //     OUT(GlobalV::ofs_running, "grow:", grow);
+                //     OUT(GlobalV::ofs_running, "gcol:", gcol);
+                //     OUT(GlobalV::ofs_running, "lrow:", grow);
+                //     OUT(GlobalV::ofs_running, "lcol:", gcol);
                 // }
                 s_global_index[pos]=grow;
                 s_global_index[pos+1]=gcol;
@@ -320,7 +320,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 	#pragma omp parallel
 #endif
 	{
-		//OUT(ofs_running, "start calculate gamma_vlocal");
+		//OUT(GlobalV::ofs_running, "start calculate gamma_vlocal");
 
 		// it's a uniform grid to save orbital values, so the delta_r is a constant.
 		const double delta_r=ORB.dr_uniform;
@@ -438,7 +438,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
     mkl_set_num_threads(mkl_threads);
 #endif
 
-    OUT(ofs_running, "temp variables are deleted");
+    OUT(GlobalV::ofs_running, "temp variables are deleted");
     timer::tick("Gint_Gamma","gamma_vlocal");
     MPI_Barrier(MPI_COMM_WORLD);
     timer::tick("Gint_Gamma","distri_vl");
@@ -449,7 +449,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
 {
     // setup send buffer and receive buffer size
-    // OUT(ofs_running, "Start transforming vlocal from grid distribute to 2D block");
+    // OUT(GlobalV::ofs_running, "Start transforming vlocal from grid distribute to 2D block");
     if(CHR.get_new_e_iteration())
     {
         timer::tick("Gint_Gamma","distri_vl_index");
@@ -460,9 +460,9 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
                            ParaO.receiver_index_size, ParaO.receiver_global_index,
                            ParaO.receiver_size_process, ParaO.receiver_displacement_process,
                            ParaO.receiver_size, ParaO.receiver_buffer);
-        OUT(ofs_running, "vlocal exchange index is built");
-        OUT(ofs_running, "buffer size(M):", (ParaO.sender_size+ParaO.receiver_size)*sizeof(double)/1024/1024);
-        OUT(ofs_running, "buffer index size(M):", (ParaO.sender_index_size+ParaO.receiver_index_size)*sizeof(int)/1024/1024);
+        OUT(GlobalV::ofs_running, "vlocal exchange index is built");
+        OUT(GlobalV::ofs_running, "buffer size(M):", (ParaO.sender_size+ParaO.receiver_size)*sizeof(double)/1024/1024);
+        OUT(GlobalV::ofs_running, "buffer index size(M):", (ParaO.sender_index_size+ParaO.receiver_index_size)*sizeof(int)/1024/1024);
         timer::tick("Gint_Gamma","distri_vl_index");
     }
 
@@ -482,26 +482,26 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
             ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[icol][irow];
 		}
     }
-    OUT(ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
+    OUT(GlobalV::ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
 
     // use mpi_alltoall to get local data
     MPI_Alltoallv(ParaO.sender_buffer, ParaO.sender_size_process, ParaO.sender_displacement_process, MPI_DOUBLE,
                   ParaO.receiver_buffer, ParaO.receiver_size_process,
 					ParaO.receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
 
-    OUT(ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
+    OUT(GlobalV::ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
 
     // put local data to H matrix
     for(int i=0; i<ParaO.receiver_index_size; i+=2)
     {
         const int g_row=ParaO.receiver_global_index[i];
         const int g_col=ParaO.receiver_global_index[i+1];
-        // if(g_col<0 || g_col>=NLOCAL||g_row<0 || g_row>=NLOCAL)
+        // if(g_col<0 || g_col>=GlobalV::NLOCAL||g_row<0 || g_row>=GlobalV::NLOCAL)
         // {
-        //     OUT(ofs_running, "index error, i:", i);
-        //     OUT(ofs_running, "index：", ParaO.receiver_global_index[i]);
-        //     OUT(ofs_running, "g_col:", g_col);
-        //     OUT(ofs_running, "g_col:", g_col);
+        //     OUT(GlobalV::ofs_running, "index error, i:", i);
+        //     OUT(GlobalV::ofs_running, "index：", ParaO.receiver_global_index[i]);
+        //     OUT(GlobalV::ofs_running, "g_col:", g_col);
+        //     OUT(GlobalV::ofs_running, "g_col:", g_col);
         // }
         LM.set_HSgamma(g_row,g_col,ParaO.receiver_buffer[i/2],'L');
     }

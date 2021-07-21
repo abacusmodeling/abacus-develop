@@ -27,7 +27,7 @@ void Exx_Abfs::DM::cal_DM(
 
 		for( const Vector3<int> &box : Born_von_Karman_boxes )
 		{
-			DMr[iat1][iat2][box] = vector<matrix>( NSPIN, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
+			DMr[iat1][iat2][box] = vector<matrix>( GlobalV::NSPIN, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
 			for( size_t ik=0; ik!=kv.nks; ++ik )
 			{
 				DMr[iat1][iat2][box][kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (kv.kvec_c[ik]* (box*ucell.latvec)) ) ).real();
@@ -87,7 +87,7 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 {
 	TITLE("Exx_Abfs::DM::cal_DMk_raw");
 
-	const double SPIN_multiple = 0.5*NSPIN;
+	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
 	map<size_t,map<size_t,vector<ComplexMatrix>>> DMk_raw;
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
@@ -106,9 +106,9 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 			{
 				for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
 				{
-					for( size_t ib=0; ib!=NBANDS; ++ib )
+					for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 					{
-						if( GAMMA_ONLY_LOCAL )
+						if( GlobalV::GAMMA_ONLY_LOCAL )
 						{
 							//---------------------------------------------------------
 							// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 

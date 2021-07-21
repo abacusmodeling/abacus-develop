@@ -181,23 +181,23 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 	
 	if(Lattice_Change_Basic::largest_grad == 0.0)
 	{
-		ofs_running << " largest stress is 0, no movement is possible." << endl;
-		ofs_running << " it may converged, otherwise no movement of lattice parameters is allowed." << endl;
+		GlobalV::ofs_running << " largest stress is 0, no movement is possible." << endl;
+		GlobalV::ofs_running << " it may converged, otherwise no movement of lattice parameters is allowed." << endl;
 		Lattice_Change_Basic::converged = true;
 	}
 	else if(ucell.lc[0] == 1 && ucell.lc[1] == 1 && ucell.lc[2] == 1)
 	{
-		//if(Lattice_Change_Basic::largest_grad < STRESS_THR)
-		if(Lattice_Change_Basic::largest_grad < STRESS_THR && stress_ii_max < STRESS_THR)
+		//if(Lattice_Change_Basic::largest_grad < GlobalV::STRESS_THR)
+		if(Lattice_Change_Basic::largest_grad < GlobalV::STRESS_THR && stress_ii_max < GlobalV::STRESS_THR)
 		{
-			ofs_running << "\n Lattice relaxation is converged!" << endl;
-			ofs_running << "\n Largest gradient is = " << largest_grad << endl;
+			GlobalV::ofs_running << "\n Lattice relaxation is converged!" << endl;
+			GlobalV::ofs_running << "\n Largest gradient is = " << largest_grad << endl;
 			Lattice_Change_Basic::converged = true;
 			++ Lattice_Change_Basic::update_iter;
 		}
 		else
 		{
-			 ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< STRESS_THR << ")" << endl;
+			 GlobalV::ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< GlobalV::STRESS_THR << ")" << endl;
 			 Lattice_Change_Basic::converged = false;
 		}
 	}
@@ -207,16 +207,16 @@ void Lattice_Change_Basic::check_converged(matrix &stress, double *grad)
 		{
 			cout<<"i= "<<i<<" "<<grad[i]<<endl;
 		}*/
-		if(Lattice_Change_Basic::largest_grad < 10 * STRESS_THR)
+		if(Lattice_Change_Basic::largest_grad < 10 * GlobalV::STRESS_THR)
 		{
-			ofs_running << "\n Lattice relaxation is converged!" << endl;
-			ofs_running << "\n Largest gradient is = " << largest_grad << endl;
+			GlobalV::ofs_running << "\n Lattice relaxation is converged!" << endl;
+			GlobalV::ofs_running << "\n Largest gradient is = " << largest_grad << endl;
 			Lattice_Change_Basic::converged = true;
 			++ Lattice_Change_Basic::update_iter;
 		}
 		else
 		{
-			 ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< STRESS_THR << ")" << endl;
+			 GlobalV::ofs_running << "\n Lattice relaxation is not converged yet (threshold is "<< GlobalV::STRESS_THR << ")" << endl;
 			 Lattice_Change_Basic::converged = false;
 		}
 	}
@@ -230,11 +230,11 @@ void Lattice_Change_Basic::terminate(void)
 	TITLE("Lattice_Change_Basic","terminate");
 	if(Lattice_Change_Basic::converged)
 	{
-		ofs_running << " end of lattice optimization"<<endl;
-		OUT(ofs_running,"istep", Lattice_Change_Basic::istep);
-		OUT(ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
+		GlobalV::ofs_running << " end of lattice optimization"<<endl;
+		OUT(GlobalV::ofs_running,"istep", Lattice_Change_Basic::istep);
+		OUT(GlobalV::ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
 		/*
-		ofs_running<<"Saving the approximate inverse hessian"<<endl;
+		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<endl;
 		ofstream hess("hess.out");
 		for(int i=0;i<dim;i++)
 		{
@@ -248,8 +248,8 @@ void Lattice_Change_Basic::terminate(void)
 	}
 	else
 	{
-		ofs_running<<" the maximum number of steps has been reached." << endl;
-		ofs_running<<" end of lattice optimization." << endl;
+		GlobalV::ofs_running<<" the maximum number of steps has been reached." << endl;
+		GlobalV::ofs_running<<" end of lattice optimization." << endl;
 	}
 
 	return;

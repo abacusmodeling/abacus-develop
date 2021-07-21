@@ -8,13 +8,13 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     TITLE("Local_Orbital_Charge","read_dm");
     timer::tick("Local_Orbital_Charge","read_dm");
 
-    ofs_running << "\n processor 0 is reading density matrix from file < " << fn << " > " << endl;
+    GlobalV::ofs_running << "\n processor 0 is reading density matrix from file < " << fn << " > " << endl;
     //xiaohui modify 2015-03-25
     //bool quit_mesia = false;
     bool quit_abacus = false;
 
     ifstream ifs;
-    if(MY_RANK==0)
+    if(GlobalV::MY_RANK==0)
     {
         ifs.open(fn.c_str());
         if (!ifs)
@@ -67,13 +67,13 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
                 }
             }
 
-            CHECK_INT(ifs, NSPIN);
-            if(NSPIN == 1||NSPIN == 4)
+            CHECK_INT(ifs, GlobalV::NSPIN);
+            if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
             {
                 READ_VALUE(ifs, en.ef);
-                ofs_running << " read in fermi energy = " << en.ef << endl;
+                GlobalV::ofs_running << " read in fermi energy = " << en.ef << endl;
             }
-            else if(NSPIN == 2)
+            else if(GlobalV::NSPIN == 2)
             {
                 if(is==0)READ_VALUE(ifs, en.ef_up);
                 else if(is==1)READ_VALUE(ifs, en.ef_dw);
@@ -82,20 +82,20 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             {
                 WARNING_QUIT("read_dm","check nspin!");
             }
-            CHECK_INT(ifs, NLOCAL);
-            CHECK_INT(ifs, NLOCAL);
+            CHECK_INT(ifs, GlobalV::NLOCAL);
+            CHECK_INT(ifs, GlobalV::NLOCAL);
         }// If file exist, read in data.
     } // Finish reading the first part of density matrix.
 
 
 #ifndef __MPI
-    ofs_running << " Read SPIN = " << is+1 << " density matrix now." << endl;
+    GlobalV::ofs_running << " Read SPIN = " << is+1 << " density matrix now." << endl;
 
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        for(int i=0; i<NLOCAL; ++i)
+        for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            for(int j=0; j<NLOCAL; ++j)
+            for(int j=0; j<GlobalV::NLOCAL; ++j)
             {
                 ifs >> DM[is][i][j];
             }
@@ -125,41 +125,41 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     }
 
 
-    if(NSPIN==1||NSPIN==4)
+    if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
     {
         Parallel_Common::bcast_double(en.ef);
     }
-    else if(NSPIN==2)
+    else if(GlobalV::NSPIN==2)
     {
         Parallel_Common::bcast_double(en.ef_up);
         Parallel_Common::bcast_double(en.ef_dw);
     }
 
 
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        //ofs_running << " NLOCAL=" << NLOCAL << endl;
-        //ofs_running << " lgd_now=" << lgd_now << endl;
-        //ofs_running << " GridT.lgd=" << GridT.lgd << endl;
+        //GlobalV::ofs_running << " GlobalV::NLOCAL=" << GlobalV::NLOCAL << endl;
+        //GlobalV::ofs_running << " lgd_now=" << lgd_now << endl;
+        //GlobalV::ofs_running << " GridT.lgd=" << GridT.lgd << endl;
 
-        double *tmp = new double[NLOCAL];
-        for(int i=0; i<NLOCAL; ++i)
+        double *tmp = new double[GlobalV::NLOCAL];
+        for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            //ofs_running << " i=" << i << endl;
-            ZEROS(tmp, NLOCAL);
-            if(MY_RANK==0)
+            //GlobalV::ofs_running << " i=" << i << endl;
+            ZEROS(tmp, GlobalV::NLOCAL);
+            if(GlobalV::MY_RANK==0)
             {
-                for(int j=0; j<NLOCAL; ++j)
+                for(int j=0; j<GlobalV::NLOCAL; ++j)
                 {
                     ifs >> tmp[j];
                 }
             }
-            Parallel_Common::bcast_double(tmp, NLOCAL);
+            Parallel_Common::bcast_double(tmp, GlobalV::NLOCAL);
 
             const int mu = GridT.trace_lo[i];
             if(mu >= 0)
             {   
-                for(int j=0; j<NLOCAL; ++j)
+                for(int j=0; j<GlobalV::NLOCAL; ++j)
                 {
                     const int nu = GridT.trace_lo[j];
                     if(nu >= 0)
@@ -176,9 +176,9 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
         WARNING_QUIT("Local_Orbital_Charge::read_dm","not ready to readin DM_R");
     }
 #endif
-    if(MY_RANK==0) ifs.close();
+    if(GlobalV::MY_RANK==0) ifs.close();
 
-    ofs_running << " Finish reading density matrix." << endl;
+    GlobalV::ofs_running << " Finish reading density matrix." << endl;
 
     timer::tick("Local_Orbital_Charge","read_dm");
     return;

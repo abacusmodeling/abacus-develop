@@ -35,22 +35,22 @@ void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pg
 	Pgrid.reduce_to_fullrho(rhotot, rho_part);
 
 	// (2)
-	if(RANK_IN_POOL==0)
+	if(GlobalV::RANK_IN_POOL==0)
 	{
 		symm.rho_symmetry(rhotot, pw.ncx, pw.ncy, pw.ncz);
 		/*
 		int count = 0;
-		ofs_running << scientific;
+		GlobalV::ofs_running << scientific;
 		for(int iz=0; iz<pw.ncz; iz++)
 		{
-			ofs_running << "\n iz=" << iz;
+			GlobalV::ofs_running << "\n iz=" << iz;
 			for(int iy=0; iy<pw.ncy; iy++)
 			{
 				for(int ix=0; ix<pw.ncx; ix++)
 				{
-					if(count%5==0) ofs_running << "\n";
+					if(count%5==0) GlobalV::ofs_running << "\n";
 					++count;
-					ofs_running << " " << rhotot[ix*pw.ncy*pw.ncz+iy*pw.ncz+iz];
+					GlobalV::ofs_running << " " << rhotot[ix*pw.ncy*pw.ncz+iy*pw.ncz+iz];
 				}
 			}
 		}
@@ -62,9 +62,9 @@ void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pg
 	double* zpiece = new double[ncxy];
 	for(int iz=0; iz<pw.ncz; iz++)
 	{
-		//ofs_running << "\n iz=" << iz;
+		//GlobalV::ofs_running << "\n iz=" << iz;
 		ZEROS(zpiece, ncxy);
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
 			for(int ix=0; ix<pw.ncx; ix++)
 			{

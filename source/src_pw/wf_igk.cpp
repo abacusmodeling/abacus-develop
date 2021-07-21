@@ -8,7 +8,7 @@ WF_igk::WF_igk()
 
 WF_igk::~WF_igk()
 { 
-	if(test_deconstructor)
+	if(GlobalV::test_deconstructor)
 	{
 		cout << " ~WF_igk()" << endl;
 	}
@@ -60,10 +60,10 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
         {
             npw_max = ng;
         }
-//		ofs_running << " " << setw(8) << ik << setw(10) << kv.ngk[ik] << endl;
+//		GlobalV::ofs_running << " " << setw(8) << ik << setw(10) << kv.ngk[ik] << endl;
     }
 
-    if (test_wf > 1) OUT("npw_max",npw_max);
+    if (GlobalV::test_wf > 1) OUT("npw_max",npw_max);
 //----------------------------------------------------------
 // EXPLAIN : correspondence K + G <- -> G
 //----------------------------------------------------------
@@ -96,7 +96,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 	if(out_gk)
 	{
 		stringstream ss;
-		ss << global_out_dir << "PW_GK" << MY_RANK+1 << ".dat";
+		ss << GlobalV::global_out_dir << "PW_GK" << GlobalV::MY_RANK+1 << ".dat";
 		ofstream ofs( ss.str().c_str() );
 		ofs << pw.ggpsi << " (ggpsi, Ry)" << endl;
 		ofs << pw.ggwfc << " (ggwfc, Ry)" << endl;

@@ -42,7 +42,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 
 	ZEROS(psic, pw.nrxx);
 
-	if(NSPIN==1||NSPIN==4)
+	if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 	{
 		for(ir=0;ir<pw.nrxx;ir++)
 		{

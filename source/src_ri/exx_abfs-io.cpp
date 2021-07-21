@@ -247,7 +247,7 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 				dk,
 				dr_uniform,
 				false,
-				true, FORCE);		
+				true, GlobalV::FORCE);		
 		}
 	}
 	
@@ -471,7 +471,7 @@ void Exx_Abfs::IO::print_matrix(
 		const matrix & matrix_V = matrixes_V.at(TA).at(IA).at(TB).at(IB);
 		
 		for( int ik=0; ik!=kv.nkstot; ++ik )
-	//		for ib = 0 to NBANDS
+	//		for ib = 0 to GlobalV::NBANDS
 			for( size_t LA=0; LA!=range_lcaos[TA].size(); ++LA )
 				for( size_t NA=0; NA!=range_lcaos[TA][LA].N; ++NA )
 					for( size_t MA=0; MA!=range_lcaos[TA][LA].M; ++MA )

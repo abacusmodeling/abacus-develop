@@ -94,7 +94,7 @@ void MAKE_DIR( const string &file );
 template <class T>
 void AUTO_SET(const string &name,const T &a)
 {
-    ofs_warning <<" AUTO_SET "<<name<<" to "<<a << endl;
+    GlobalV::ofs_warning <<" AUTO_SET "<<name<<" to "<<a << endl;
     return;
 }
 

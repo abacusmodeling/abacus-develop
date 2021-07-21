@@ -40,7 +40,7 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 	if(max_size == 0)
 	{
 		// mohan add return 2011-03-15
-		ofs_warning << " processor " << MY_RANK << ": no atom on sub-fft-grid." << endl;
+		GlobalV::ofs_warning << " processor " << GlobalV::MY_RANK << ": no atom on sub-fft-grid." << endl;
 		return;
 	}
 
@@ -69,10 +69,10 @@ void Gint_Gamma::save_atoms_on_grid(const Grid_Technique &gt)
 
 	this->vfactor = std::abs(this->latvec0.Det())/gt.ncxyz;
 
-    //OUT(ofs_running,"Max atom number on sub-FFT-grid",max_size);
-    //ofs_running << "\n dense(DIY) = " << dense;
-    //ofs_running << "\n count_dense = " << (double)count_dense/nxyz*100 << "%";
-    //ofs_running << "\n count_sparse = " << (double)count_sparse/nxyz*100 << "%" << endl;
+    //OUT(GlobalV::ofs_running,"Max atom number on sub-FFT-grid",max_size);
+    //GlobalV::ofs_running << "\n dense(DIY) = " << dense;
+    //GlobalV::ofs_running << "\n count_dense = " << (double)count_dense/nxyz*100 << "%";
+    //GlobalV::ofs_running << "\n count_sparse = " << (double)count_sparse/nxyz*100 << "%" << endl;
 
     return;
 }

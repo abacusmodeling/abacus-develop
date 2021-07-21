@@ -266,8 +266,8 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		case 3: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
 		case 4: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-			//ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
-			//ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
+			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
 			cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
 			cout << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
 			Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
@@ -369,10 +369,10 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 #ifdef __NORMAL
 
 #else	
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		stringstream ss;
-		ss << global_out_dir << this->label << "/"
+		ss << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << ".ORBITAL_NOR_uniform.txt";
 
 		ofstream ofs(ss.str().c_str());
@@ -674,7 +674,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 //	Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
 	
 	//means nothing.
-	//ofs_running << setw(12) << sumk << endl;
+	//GlobalV::ofs_running << setw(12) << sumk << endl;
 
 	delete[] f;
 	return;
@@ -715,19 +715,19 @@ void Numerical_Orbital_Lm::plot(void)const
 #ifdef __NORMAL
 
 #else
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		stringstream ssr, ssk, ssru ,ssdru; // 2013-08-10 pengfei
-		ssr << global_out_dir << this->label << "/"
+		ssr << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-"<< orbital_type << index_chi+1 << "-orbital-r.dat";
 
-		ssk << global_out_dir << this->label << "/"
+		ssk << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << index_chi+1 << "-orbital-k.dat";
 
-		ssru << global_out_dir << this->label << "/"
+		ssru << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << index_chi+1 << "-orbital-ru.dat";
 
-		ssdru << global_out_dir << this->label << "/"  // 2013-08-10 pengfei
+		ssdru << GlobalV::global_out_dir << this->label << "/"  // 2013-08-10 pengfei
 			<< this->label << "-" << orbital_type << index_chi+1 << "-orbital-dru.dat";
 
 		ofstream ofsr(ssr.str().c_str());

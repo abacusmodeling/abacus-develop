@@ -17,7 +17,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::Allreduce(
 	 data_local(data_local_in),
 	 lock_insert(ATOMIC_FLAG_INIT)
 {
-	data_all.resize(NSPIN);
+	data_all.resize(GlobalV::NSPIN);
 
 	MPI_Comm_size( mpi_comm, &comm_sz );
 	MPI_Comm_rank( mpi_comm, &my_rank );
@@ -268,7 +268,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::recv_data_process( const 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::insert_data(
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank )
 {
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_rank_is = data_rank[is];
 		auto &data_all_is = data_all[is];
@@ -297,7 +297,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::insert_data(
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::insert_data()
 {
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_local_is = data_local[is];
 		auto &data_all_is = data_all[is];
@@ -343,8 +343,8 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::send_data_process( const 
 vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::get_data_local_wrapper( const pair<vector<bool>,vector<bool>> &atom_asked ) const
 {
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(NSPIN);
-	for( int is=0; is!=NSPIN; ++is )
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_local_is = data_local[is];
 		auto &mw_is = mw[is];

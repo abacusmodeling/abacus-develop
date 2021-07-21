@@ -23,12 +23,12 @@ void Grid_Driver::Find_atom(
 	const int &ntype, 
 	const int &nnumber)
 {
-	//if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_atom");
+	//if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_atom");
 	timer::tick("Grid_Driver","Find_atom");
 
 	if (test_grid_driver > 1)
 	{
-//		ofs_running << " Atom cartesian_pos = " << cartesian_pos.x
+//		GlobalV::ofs_running << " Atom cartesian_pos = " << cartesian_pos.x
 //		<< " " << cartesian_pos.y
 //		<< " " << cartesian_pos.z << endl;
 	}
@@ -56,7 +56,7 @@ int Grid_Driver::Locate_offset(
 	const int &ntype, 
 	const int &nnumber)const
 {
-//	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Locate_offset");
+//	if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Locate_offset");
 
 //----------------------------------------------------------
 // EXPLAIN : Create an AtomLink object
@@ -100,7 +100,7 @@ int Grid_Driver::Locate_offset(
 
 void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentSet> as)
 {
-//	if (test_grid_driver) TITLE(ofs_running, "Grid_Driver", "Find_adjacent_atom");
+//	if (test_grid_driver) TITLE(GlobalV::ofs_running, "Grid_Driver", "Find_adjacent_atom");
 
 //----------------------------------------------------------
 // CALL OTHER CLASS MEMBER FUNCTION :
@@ -110,7 +110,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 
 	if (test_grid_driver > 1) 
 	{
-//		OUT(ofs_running,"adj_num",this->adj_num);
+//		OUT(GlobalV::ofs_running,"adj_num",this->adj_num);
 	}	
 	
 	//cout << "\n length = " << adj_num << endl;
@@ -139,7 +139,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 	if (test_grid_driver > 1)
 	{
 /*
-		ofs_running << " "
+		GlobalV::ofs_running << " "
 		<< setw(15) << "Box"
 		<< setw(8) << "Offset"
 		<< setw(5) << "Type"
@@ -174,7 +174,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 			//if(i<100)
 			{
 /*
-				ofs_running << " "
+				GlobalV::ofs_running << " "
 				<< setw(5) << box[i].x
 				<< setw(5) << box[i].y
 				<< setw(5) << box[i].z
@@ -204,7 +204,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 				{
 					const double distance = Distance(this->atomlink[offset], this->atomlink[offset_i]);
 /*
-					ofs_running << setw(10) << this->atomlink[offset_i].fatom.x()
+					GlobalV::ofs_running << setw(10) << this->atomlink[offset_i].fatom.x()
 					<< setw(10) << this->atomlink[offset_i].fatom.y()
 					<< setw(10) << this->atomlink[offset_i].fatom.z()
 					<< setw(10) << distance << endl;
@@ -235,7 +235,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 				{
 					const double distance = this->Distance(this->atomlink[offset], adjacent_tau[i]);
 /*
-					ofs_running << setw(10) << adjacent_tau[i].x
+					GlobalV::ofs_running << setw(10) << adjacent_tau[i].x
 					<< setw(10) << adjacent_tau[i].y
 					<< setw(10) << adjacent_tau[i].z
 					<< setw(10) << distance;
@@ -294,15 +294,15 @@ Vector3<double> Grid_Driver::Calculate_adjacent_site
 	if (test_grid_driver > 3)
 	{
 /*
-		ofs_running << " Offset_i cartesian :" 
+		GlobalV::ofs_running << " Offset_i cartesian :" 
 		<< " " << this->atomlink[offset].fatom.x()
 		<< " " << this->atomlink[offset].fatom.y()
 		<< " " << this->atomlink[offset].fatom.z() 
 		<< endl;
-		ofs_running << " box1 : " << box11 << " " << box12 << " " << box13 << endl;
-		ofs_running << " box2 : " << box21 << " " << box22 << " " << box23 << endl;
-		ofs_running << " box3 : " << box31 << " " << box32 << " " << box33 << endl;
-		ofs_running << " adjacent site:" 
+		GlobalV::ofs_running << " box1 : " << box11 << " " << box12 << " " << box13 << endl;
+		GlobalV::ofs_running << " box2 : " << box21 << " " << box22 << " " << box23 << endl;
+		GlobalV::ofs_running << " box3 : " << box31 << " " << box32 << " " << box33 << endl;
+		GlobalV::ofs_running << " adjacent site:" 
 		<< " " << adjacent_site.x
 		<< " " << adjacent_site.y
 		<< " " << adjacent_site.z 

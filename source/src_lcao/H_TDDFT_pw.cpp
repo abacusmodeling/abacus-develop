@@ -12,7 +12,7 @@ void Potential::set_vrs_tddft(const int istep)
     TITLE("Potential","set_vrs_tddft");
     timer::tick("Potential","set_vrs_tddft");
 
-    for (int is = 0;is < NSPIN;is++)
+    for (int is = 0;is < GlobalV::NSPIN;is++)
     {
         //====================================================
         // add external linear potential, fuxiang add in 2017/05

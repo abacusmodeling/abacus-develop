@@ -46,7 +46,7 @@ void Forces::init(matrix& force)
 			force_vdw(iat,1) = vdwd2.get_force()[iat].y;
 			force_vdw(iat,2) = vdwd2.get_force()[iat].z;
 		}
-		if(TEST_FORCE)
+		if(GlobalV::TEST_FORCE)
 		{
 			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
 		}
@@ -61,7 +61,7 @@ void Forces::init(matrix& force)
 			force_vdw(iat,1) = vdwd3.get_force()[iat].y;
 			force_vdw(iat,2) = vdwd3.get_force()[iat].z;
 		}
-		if(TEST_FORCE)
+		if(GlobalV::TEST_FORCE)
 		{
 			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
 		}
@@ -70,7 +70,7 @@ void Forces::init(matrix& force)
     int iat = 0;
 
 	matrix force_e;
-	if(EFIELD)
+	if(GlobalV::EFIELD)
 	{
 		force_e.create(ucell.nat, 3);
 		Efield::compute_force(force_e);
@@ -97,7 +97,7 @@ void Forces::init(matrix& force)
                     force(iat, ipol) += force_vdw(iat, ipol);
                 }																										   
 					
-				if(EFIELD)
+				if(GlobalV::EFIELD)
 				{
 					force(iat,ipol) = force(iat, ipol) + force_e(iat, ipol);
 				}
@@ -164,15 +164,15 @@ void Forces::init(matrix& force)
 		
 	}
 
- 	ofs_running << setiosflags(ios::fixed) << setprecision(6) << endl;
-	if(TEST_FORCE)
+ 	GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(6) << endl;
+	if(GlobalV::TEST_FORCE)
 	{
 		Forces::print("LOCAL    FORCE (Ry/Bohr)", forcelc);
 		Forces::print("NONLOCAL FORCE (Ry/Bohr)", forcenl);
 		Forces::print("NLCC     FORCE (Ry/Bohr)", forcecc);
 		Forces::print("ION      FORCE (Ry/Bohr)", forceion);
 		Forces::print("SCC      FORCE (Ry/Bohr)", forcescc);
-		if(EFIELD) Forces::print("EFIELD   FORCE (Ry/Bohr)", force_e);
+		if(GlobalV::EFIELD) Forces::print("GlobalV::EFIELD   FORCE (Ry/Bohr)", force_e);
 	}
 	
 /*
@@ -196,16 +196,16 @@ void Forces::init(matrix& force)
 */
 		
 	// output force in unit eV/Angstrom
-	ofs_running << endl;
+	GlobalV::ofs_running << endl;
 
-	if(TEST_FORCE)
+	if(GlobalV::TEST_FORCE)
 	{
 		Forces::print("LOCAL    FORCE (eV/Angstrom)", forcelc,0);
 		Forces::print("NONLOCAL FORCE (eV/Angstrom)", forcenl,0);
 		Forces::print("NLCC     FORCE (eV/Angstrom)", forcecc,0);
 		Forces::print("ION      FORCE (eV/Angstrom)", forceion,0);
 		Forces::print("SCC      FORCE (eV/Angstrom)", forcescc,0);
-		if(EFIELD) Forces::print("EFIELD   FORCE (eV/Angstrom)", force_e,0);
+		if(GlobalV::EFIELD) Forces::print("GlobalV::EFIELD   FORCE (eV/Angstrom)", force_e,0);
 	}
 	Forces::print("   TOTAL-FORCE (eV/Angstrom)", force,0);
 
@@ -221,7 +221,7 @@ void Forces::print_to_files(ofstream &ofs, const string &name, const matrix &f)
    
 	double fac = Ry_to_eV / 0.529177;// (eV/A)
 
-	if(TEST_FORCE)
+	if(GlobalV::TEST_FORCE)
 	{
 		cout << setiosflags(ios::showpos);
 		cout << " " << name;
@@ -238,7 +238,7 @@ void Forces::print_to_files(ofstream &ofs, const string &name, const matrix &f)
             << setw(20) << f(iat, 1)*fac
             << setw(20) << f(iat, 2)*fac << endl;
 			
-			if(TEST_FORCE)
+			if(GlobalV::TEST_FORCE)
 			{
             	cout << " " << setw(5) << it
             	<< setw(8) << ia+1
@@ -250,7 +250,7 @@ void Forces::print_to_files(ofstream &ofs, const string &name, const matrix &f)
         }
     }
 
-	ofs_running << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << resetiosflags(ios::showpos);
 	cout << resetiosflags(ios::showpos);
     return;
 }
@@ -261,12 +261,12 @@ void Forces::print(const string &name, const matrix &f, bool ry)
 {
 	NEW_PART(name);
 
-	ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
-	ofs_running << setiosflags(ios::showpos);
+	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+	GlobalV::ofs_running << setiosflags(ios::showpos);
 
 	const double fac = Ry_to_eV / 0.529177;
 	
-	if(TEST_FORCE)
+	if(GlobalV::TEST_FORCE)
 	{
 		cout << " --------------- " << name << " ---------------" << endl;
 		cout << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
@@ -285,28 +285,28 @@ void Forces::print(const string &name, const matrix &f, bool ry)
 
 			if(ry) // output Rydberg Unit
 			{
-				ofs_running << " " << setw(8) << ss.str();
-				if( abs(f(iat,0)) > Forces::output_acc) ofs_running << setw(15) << f(iat,0);
-				else ofs_running << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) ofs_running << setw(15) << f(iat,1);
-				else ofs_running << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) ofs_running << setw(15) << f(iat,2);
-				else ofs_running << setw(15) << "0";
-				ofs_running << endl;
+				GlobalV::ofs_running << " " << setw(8) << ss.str();
+				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,0);
+				else GlobalV::ofs_running << setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,1);
+				else GlobalV::ofs_running << setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,2);
+				else GlobalV::ofs_running << setw(15) << "0";
+				GlobalV::ofs_running << endl;
 			}
 			else
 			{
-				ofs_running << " " << setw(8) << ss.str();
-				if( abs(f(iat,0)) > Forces::output_acc) ofs_running << setw(15) << f(iat,0)*fac;
-				else ofs_running << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) ofs_running << setw(15) << f(iat,1)*fac;
-				else ofs_running << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) ofs_running << setw(15) << f(iat,2)*fac;
-				else ofs_running << setw(15) << "0";
-				ofs_running << endl;
+				GlobalV::ofs_running << " " << setw(8) << ss.str();
+				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,0)*fac;
+				else GlobalV::ofs_running << setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,1)*fac;
+				else GlobalV::ofs_running << setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,2)*fac;
+				else GlobalV::ofs_running << setw(15) << "0";
+				GlobalV::ofs_running << endl;
 			}
 
-			if(TEST_FORCE && ry)
+			if(GlobalV::TEST_FORCE && ry)
 			{
 				cout << " " << setw(8) << ss.str();
 				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0);
@@ -317,7 +317,7 @@ void Forces::print(const string &name, const matrix &f, bool ry)
 				else cout << setw(15) << "0";
 				cout << endl;
 			}
-			else if (TEST_FORCE)
+			else if (GlobalV::TEST_FORCE)
 			{
 				cout << " " << setw(8) << ss.str();
 				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0)*fac;
@@ -333,7 +333,7 @@ void Forces::print(const string &name, const matrix &f, bool ry)
         }
     }
 
-	ofs_running << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << resetiosflags(ios::showpos);
 	cout << resetiosflags(ios::showpos);
     return;
 }
@@ -349,7 +349,7 @@ void Forces::cal_force_loc(matrix& forcelc)
     // now, in all pools , the charge are the same,
     // so, the force calculated by each pool is equal.
     
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{
@@ -363,8 +363,8 @@ void Forces::cal_force_loc(matrix& forcelc)
     int gstart_here = pw.gstart;
     if (pw.ggs[0] != 0) gstart_here = 0;
 
-//  ofs_running << "\n ggs = " << pw.ggs[0];
-//  ofs_running << "\n gstart_here = " << gstart_here;
+//  GlobalV::ofs_running << "\n ggs = " << pw.ggs[0];
+//  GlobalV::ofs_running << "\n gstart_here = " << gstart_here;
     int iat = 0;
     for (int it = 0;it < ucell.ntype;it++)
     {
@@ -387,7 +387,7 @@ void Forces::cal_force_loc(matrix& forcelc)
             ++iat;
         }
     }
-    //this->print(ofs_running, "local forces", forcelc);
+    //this->print(GlobalV::ofs_running, "local forces", forcelc);
     Parallel_Reduce::reduce_double_pool(forcelc.c, forcelc.nr * forcelc.nc);
     delete[] aux;
 	timer::tick("Forces","cal_force_loc");
@@ -541,7 +541,7 @@ void Forces::cal_force_ew(matrix& forceion)
 
     Parallel_Reduce::reduce_double_pool(forceion.c, forceion.nr * forceion.nc);
 
-    //this->print(ofs_running, "ewald forces", forceion);
+    //this->print(GlobalV::ofs_running, "ewald forces", forceion);
 
 	timer::tick("Forces","cal_force_ew");
 
@@ -558,7 +558,7 @@ void Forces::cal_force_cc(matrix& forcecc)
 
     complex<double> * psiv = new complex<double> [pw.nrxx];
     ZEROS(psiv, pw.nrxx);
-    if (NSPIN == 1 || NSPIN == 4)
+    if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
         for (int ir = 0;ir < pw.nrxx;ir++)
         {
@@ -639,8 +639,8 @@ void Forces::cal_force_nl(matrix& forcenl)
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ComplexArray dbecp( nkb, NBANDS, 3);
-    ComplexMatrix becp( nkb, NBANDS);
+	ComplexArray dbecp( nkb, GlobalV::NBANDS, 3);
+    ComplexMatrix becp( nkb, GlobalV::NBANDS);
     
 	
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
@@ -648,7 +648,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 
     for (int ik = 0;ik < kv.nks;ik++)
     {
-        if (NSPIN==2) CURRENT_SPIN = kv.isk[ik];
+        if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = kv.isk[ik];
         wf.npw = kv.ngk[ik];
         // generate vkb
         if (ppcell.nkb > 0)
@@ -661,7 +661,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 		// vkb: Beta(nkb,npw)
 		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
         becp.zero_out();
-        for (int ib=0; ib<NBANDS; ib++)
+        for (int ib=0; ib<GlobalV::NBANDS; ib++)
         {
             for (int i=0;i<nkb;i++)
             {
@@ -697,7 +697,7 @@ void Forces::cal_force_nl(matrix& forcenl)
                         vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * pw.get_G_cartesian_projection(wf.igk(ik, ig), 2);
                 }
 			}
-            for (int ib=0; ib<NBANDS; ib++)
+            for (int ib=0; ib<GlobalV::NBANDS; ib++)
             {
                 for (int i=0; i<nkb; i++)
                 {
@@ -715,7 +715,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 
 //		double *cf = new double[ucell.nat*3];
 //		ZEROS(cf, ucell.nat);
-		for (int ib=0; ib<NBANDS; ib++)
+		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			double fac = wf.wg(ik, ib) * 2.0 * ucell.tpiba;
         	int iat = 0;
@@ -727,7 +727,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 				{
 					for (int ip=0; ip<Nprojs; ip++)
 					{
-						double ps = ppcell.deeq(CURRENT_SPIN, iat, ip, ip) ;
+						double ps = ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
 						const int inkb = sum + ip; 
 						//out<<"\n ps = "<<ps;
 
@@ -751,7 +751,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 						//if ( ip != ip2 )
 						//{
 							const int jnkb = sum + ip2;
-							double ps = ppcell.deeq(CURRENT_SPIN, iat, ip2, ip) ;
+							double ps = ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip2, ip) ;
 
 							for (int ipol=0; ipol<3; ipol++)
 							{
@@ -775,7 +775,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 
     // sum up forcenl from all processors
     Parallel_Reduce::reduce_double_all(forcenl.c, forcenl.nr * forcenl.nc);
-//  this->print(ofs_running, "nonlocal forces", forcenl);
+//  this->print(GlobalV::ofs_running, "nonlocal forces", forcenl);
 	timer::tick("Forces","cal_force_nl");
     return;
 }
@@ -785,7 +785,7 @@ void Forces::cal_force_scc(matrix& forcescc)
     complex<double>* psic = new complex<double> [pw.nrxx];
     ZEROS(psic, pw.nrxx);
 
-    if (NSPIN == 1 || NSPIN == 4)
+    if (GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4)
     {
         for (int i = 0;i < pw.nrxx;i++)
         {

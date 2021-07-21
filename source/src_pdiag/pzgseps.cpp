@@ -34,29 +34,29 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 	int wrong_input = 0;
 
 	/*
-	ofs_running << "\n nb = " << nb;
-	ofs_running << "\n n = " << n;
-	ofs_running << "\n LocalMatrix A information : ";
-	ofs_running << "\n col_num = " << LM.col_num;
-	ofs_running << "\n row_num = " << LM.row_num;
-	ofs_running << "\n col_pos = " << LM.col_pos;
-	ofs_running << "\n row_pos = " << LM.row_pos;
-	ofs_running << "\n row_b   = " << LM.row_b;
-	ofs_running << "\n col_b   = " << LM.col_b;
+	GlobalV::ofs_running << "\n nb = " << nb;
+	GlobalV::ofs_running << "\n n = " << n;
+	GlobalV::ofs_running << "\n LocalMatrix A information : ";
+	GlobalV::ofs_running << "\n col_num = " << LM.col_num;
+	GlobalV::ofs_running << "\n row_num = " << LM.row_num;
+	GlobalV::ofs_running << "\n col_pos = " << LM.col_pos;
+	GlobalV::ofs_running << "\n row_pos = " << LM.row_pos;
+	GlobalV::ofs_running << "\n row_b   = " << LM.row_b;
+	GlobalV::ofs_running << "\n col_b   = " << LM.col_b;
 	*/
 
 	/*
 	for(int i=0; i<LM.row_num; i++)
 	{
-		ofs_running << "\n row_set[" << i << "] = " << LM.row_set[i];
+		GlobalV::ofs_running << "\n row_set[" << i << "] = " << LM.row_set[i];
 	}
 
 	for(int i=0; i<LM.col_num; i++)
 	{
-		ofs_running << "\n col_set[" << i << "] = " << LM.col_set[i];
+		GlobalV::ofs_running << "\n col_set[" << i << "] = " << LM.col_set[i];
 	} 
 	 */
-//	ofs_running << "\n LocalMatrix Information done." << endl;
+//	GlobalV::ofs_running << "\n LocalMatrix Information done." << endl;
 
 	if(LM.col_num==0 || LM.row_num==0)
 	{
@@ -65,10 +65,10 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 
 	Parallel_Reduce::reduce_int_all( wrong_input );
 
-	//ofs_running << "\n wrong_input = " << wrong_input << endl;
+	//GlobalV::ofs_running << "\n wrong_input = " << wrong_input << endl;
 	if(wrong_input > 0)
 	{
-		ofs_running << "\n col_num == 0 || row_num == 0" << endl;
+		GlobalV::ofs_running << "\n col_num == 0 || row_num == 0" << endl;
 		WARNING_QUIT("pzgseps","col_num == 0 || row_num == 0");
 	}
 
@@ -120,7 +120,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 		++loc_size;
 	}
 
-//	ofs_running << "\n loc_size = " << loc_size << endl;
+//	GlobalV::ofs_running << "\n loc_size = " << loc_size << endl;
 
 //	printf("loc_pos=%d\n",loc_pos);
 	pzsteiz(n,D,E,&eigen[loc_pos],Z,loc_size);
@@ -137,7 +137,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 		pzst2g(comm_2D,nb,n,B,Z,LM,loc_size,uplo);
 	}
 
-//	ofs_running << "\n local_size = " << loc_size << endl;
+//	GlobalV::ofs_running << "\n local_size = " << loc_size << endl;
 	if (uplo=='u'||(uplo=='U'))
 	{
 		for (i=0; i<loc_size; i++)
@@ -165,6 +165,6 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 	delete[] E;
 	delete[] Z1;
 
-//	ofs_running << "\n Finish." << endl;
+//	GlobalV::ofs_running << "\n Finish." << endl;
 	return;
 }

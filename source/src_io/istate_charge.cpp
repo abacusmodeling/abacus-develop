@@ -14,13 +14,13 @@ void IState_Charge::begin(void)
 
 	cout << " Perform |psi(i)|^2 for selected bands." << endl;
 
-	if(!GAMMA_ONLY_LOCAL)
+	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		WARNING_QUIT("IState_Charge::begin","Only available for GAMMA_ONLY_LOCAL now.");
+		WARNING_QUIT("IState_Charge::begin","Only available for GlobalV::GAMMA_ONLY_LOCAL now.");
 	}
 
 	int mode = 0;
-	if(NBANDS_ISTATE > 0) mode = 1;
+	if(GlobalV::NBANDS_ISTATE > 0) mode = 1;
 	else mode = 2;
 
 	int fermi_band=0;
@@ -32,14 +32,14 @@ void IState_Charge::begin(void)
 	// from wave functions.
 	// (2.2) carry out the grid integration to
 	// get the charge density.
-	this->bands_picked = new int[NBANDS];
-	ZEROS(bands_picked, NBANDS);
+	this->bands_picked = new int[GlobalV::NBANDS];
+	ZEROS(bands_picked, GlobalV::NBANDS);
 
 	// (1) 
 	// (1.1) allocate the space for LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
-	OUT(ofs_running,"LOWF.allocate_flag",LOWF.get_allocate_flag());	
+	OUT(GlobalV::ofs_running,"LOWF.allocate_flag",LOWF.get_allocate_flag());	
 	cout << " number of electrons = " << CHR.nelec << endl;
 
 	// mohan update 2011-03-21
@@ -51,8 +51,8 @@ void IState_Charge::begin(void)
 
 	if(mode == 1)
 	{
-		bands_below = NBANDS_ISTATE;
-		bands_above = NBANDS_ISTATE;
+		bands_below = GlobalV::NBANDS_ISTATE;
+		bands_above = GlobalV::NBANDS_ISTATE;
 
 		cout << " plot band decomposed charge density below fermi surface with " 
 			<< bands_below << " bands." << endl;
@@ -60,7 +60,7 @@ void IState_Charge::begin(void)
 		cout << " plot band decomposed charge density above fermi surface with " 
 			<< bands_above << " bands." << endl;
 
-		for(int ib=0; ib<NBANDS; ib++)
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			if( ib >= fermi_band - bands_below ) 
 			{
@@ -75,9 +75,9 @@ void IState_Charge::begin(void)
 	{
 		bool stop = false;
 		stringstream ss;
-		ss << global_out_dir << "istate.info";
+		ss << GlobalV::global_out_dir << "istate.info";
 		cout << " Open the file : " << ss.str() << endl; 
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
 			ifstream ifs(ss.str().c_str());
 			if(!ifs)
@@ -87,7 +87,7 @@ void IState_Charge::begin(void)
 			else
 			{
 				//int band_index;
-				for(int ib=0; ib<NBANDS; ++ib)
+				for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				{
 					READ_VALUE(ifs, bands_picked[ib]);
 				}
@@ -96,16 +96,16 @@ void IState_Charge::begin(void)
 
 #ifdef __MPI
 		Parallel_Common::bcast_bool(stop);
-		Parallel_Common::bcast_int(bands_picked, NBANDS);
+		Parallel_Common::bcast_int(bands_picked, GlobalV::NBANDS);
 #endif
 		if(stop)
 		{
-			ofs_warning << " Can't find the file : " << ss.str() << endl;
+			GlobalV::ofs_warning << " Can't find the file : " << ss.str() << endl;
 			WARNING_QUIT("IState_Charge::begin","can't find the istate file.");
 		}
 	}
 
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		if(bands_picked[ib])
 		{
@@ -120,7 +120,7 @@ void IState_Charge::begin(void)
 			this->idmatrix(ib);
 
 			// (3) zero out of charge density array. 
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				ZEROS( CHR.rho[is], pw.nrxx );
 			}
@@ -131,10 +131,10 @@ void IState_Charge::begin(void)
 			CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			stringstream ss;
 			stringstream ss1;
-			ss << global_out_dir << "BAND" << ib + 1 << "_CHG";
-			ss1 << global_out_dir << "BAND" << ib + 1 << "_CHG.cube";
+			ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_CHG";
+			ss1 << GlobalV::global_out_dir << "BAND" << ib + 1 << "_CHG.cube";
 			// 0 means definitely output charge density.
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				bool for_plot = true;
 				CHR.write_rho(CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
@@ -154,14 +154,14 @@ void IState_Charge::idmatrix(const int &ib)
 /*		
 	for(int is=0; is<NSPIN; is++)
 	{
-		for (int i=0; i<NLOCAL; i++)
+		for (int i=0; i<GlobalV::NLOCAL; i++)
 		{
 			const int mu_local = GridT.trace_lo[i];
 			if ( mu_local >= 0)
 			{
 				// set a pointer.
 				//double *alpha = LOC.DM[is][mu_local];
-				for (int j=i; j<NLOCAL; j++)
+				for (int j=i; j<GlobalV::NLOCAL; j++)
 				{
 					const int nu_local = GridT.trace_lo[j];
 					if ( nu_local >= 0)
@@ -182,8 +182,8 @@ void IState_Charge::idmatrix(const int &ib)
 	return;
 */
 
-		assert(wf.wg.nr==NSPIN);
-		for(int is=0; is!=NSPIN; ++is)
+		assert(wf.wg.nr==GlobalV::NSPIN);
+		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
 			std::vector<double> wg_local(ParaO.ncol,0.0);
 			const int ib_local = ParaO.trace_loc_col[ib];
@@ -219,7 +219,7 @@ void IState_Charge::idmatrix(const int &ib)
 
 			pdgemm_(
 				&N_char, &T_char,
-				&NLOCAL, &NLOCAL, &wf.wg.nc,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wf.wg.nc,
 				&one_float,
 				wg_wfc.c, &one_int, &one_int, ParaO.desc,
 				LOC.wfc_dm_2d.wfc_gamma[is].c, &one_int, &one_int, ParaO.desc,

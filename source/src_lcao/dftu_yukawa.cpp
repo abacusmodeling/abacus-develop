@@ -31,7 +31,7 @@ void DFTU_Yukawa::cal_yukawa_lambda()
 	
 	double sum_rho = 0.0;
 	double sum_rho_lambda = 0.0;	
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for(int ir=0; ir<pw.nrxx; ir++) 
 		{

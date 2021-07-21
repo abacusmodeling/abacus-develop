@@ -56,7 +56,7 @@ void DFTU_RELAX::force_stress()
 {
 	TITLE("DFTU_RELAX", "force_stress");
 
-	if(FORCE)
+	if(GlobalV::FORCE)
 	{
 		for(int iat=0; iat<ucell.nat; iat++)
 		{
@@ -67,7 +67,7 @@ void DFTU_RELAX::force_stress()
 		}
 	}
 
-	if(STRESS)
+	if(GlobalV::STRESS)
 	{
 		for(int dim=0; dim<3; dim++)
 		{
@@ -84,26 +84,26 @@ void DFTU_RELAX::force_stress()
 	//=======================================================
 	vector<vector<complex<double>>> VU_k;
 	vector<vector<double>> VU_gamma;	
-	if(FORCE || STRESS)
+	if(GlobalV::FORCE || GlobalV::STRESS)
 	{
 		this->folding_dSm_soverlap();
 
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			VU_gamma.resize(NSPIN);
-			for(int is=0; is<NSPIN; is++)
+			VU_gamma.resize(GlobalV::NSPIN);
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				VU_gamma.at(is).resize(ParaO.nloc, 0.0);
 			}
 		}
 		else
 		{
-			if(NSPIN==1)
+			if(GlobalV::NSPIN==1)
 			{
 				VU_k.resize(1);
 				VU_k.at(0).resize(ParaO.nloc, complex<double>(0.0,0.0));
 			}
-			else if(NSPIN==2 || NSPIN==4)
+			else if(GlobalV::NSPIN==2 || GlobalV::NSPIN==4)
 			{
 				VU_k.resize(2);
 				for(int is=0; is<2; is++)
@@ -153,9 +153,9 @@ void DFTU_RELAX::force_stress()
 				// const int m1_all = m1 + (2*L1+1)*ipol1;
 				// const int m2_all = m2 + (2*L2+1)*ipol2;
 
-				if(GAMMA_ONLY_LOCAL)
+				if(GlobalV::GAMMA_ONLY_LOCAL)
 				{
-					for(int is=0; is<NSPIN; is++) //no soc
+					for(int is=0; is<GlobalV::NSPIN; is++) //no soc
 					{
 						double val = get_onebody_eff_pot(T1, iat1, L1, n1, is, m1, m2, cal_type, false);
 					
@@ -164,20 +164,20 @@ void DFTU_RELAX::force_stress()
 				}
 				else
 				{
-					if(NSPIN==1)
+					if(GlobalV::NSPIN==1)
 					{
 						double val = get_onebody_eff_pot(T1, iat1, L1, n1, 0, m1, m2, cal_type, false);
 						VU_k.at(0).at(irc) = complex<double>(val, 0.0);
 					}
-					else if(NSPIN==2)
+					else if(GlobalV::NSPIN==2)
 					{
-						for(int is=0; is<NSPIN; is++)
+						for(int is=0; is<GlobalV::NSPIN; is++)
 						{
 							double val = get_onebody_eff_pot(T1, iat1, L1, n1, is, m1, m2, cal_type, false);
 							VU_k.at(is).at(irc) = complex<double>(val, 0.0);
 						}
 					}
-					else if(NSPIN==4)//SOC
+					else if(GlobalV::NSPIN==4)//SOC
 					{
 						if(ipol1==ipol2)
 						{
@@ -195,15 +195,15 @@ void DFTU_RELAX::force_stress()
 	//=======================================================
 	//       calculate force
 	//=======================================================
-	if(FORCE) 
+	if(GlobalV::FORCE) 
 	{
-		if(GAMMA_ONLY_LOCAL) cal_force_gamma(VU_gamma);
+		if(GlobalV::GAMMA_ONLY_LOCAL) cal_force_gamma(VU_gamma);
 		else  cal_force_k(VU_k);
 	}
 
-	if(STRESS)
+	if(GlobalV::STRESS)
 	{
-		if(GAMMA_ONLY_LOCAL) cal_stress_gamma(VU_gamma);
+		if(GlobalV::GAMMA_ONLY_LOCAL) cal_stress_gamma(VU_gamma);
 		else  cal_stress_k(VU_k);
 	}			
 
@@ -247,7 +247,7 @@ void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
 				ZEROS(VECTOR_TO_PTR(mat_tmp), ParaO.nloc);
 
 				pzgemm_(&transT, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
@@ -256,7 +256,7 @@ void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
 			}			
 
 			pzgemm_(&transN, &transN,
-				&NLOCAL, &NLOCAL, &NLOCAL,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
 				VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
 				this->dSm_k[ik][dim], &one_int, &one_int, ParaO.desc,
@@ -274,7 +274,7 @@ void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
 			ZEROS(VECTOR_TO_PTR(force_tmp), ParaO.nloc);
 
 			pzgemm_(&transN, &transC,
-				&NLOCAL, &NLOCAL, &NLOCAL,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
 				this->dSm_k[ik][dim], &one_int, &one_int, ParaO.desc, 
 				VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
@@ -350,7 +350,7 @@ void DFTU_RELAX::cal_stress_k(const vector<vector<complex<double>>>& VU)
 				vector<complex<double>> mat_tmp(ParaO.nloc);
 
 				pzgemm_(&transT, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
@@ -358,7 +358,7 @@ void DFTU_RELAX::cal_stress_k(const vector<vector<complex<double>>>& VU)
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc);
 
 				pzgemm_(&transN, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
 					this->soverlap_k[ik][count], &one_int, &one_int, ParaO.desc,
@@ -375,7 +375,7 @@ void DFTU_RELAX::cal_stress_k(const vector<vector<complex<double>>>& VU)
 				ZEROS(VECTOR_TO_PTR(stress_tmp), ParaO.nloc);
 
 				pzgemm_(&transN, &transC,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					this->soverlap_k[ik][count], &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
@@ -469,7 +469,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 				ZEROS(VECTOR_TO_PTR(mat_tmp), ParaO.nloc);
 
 				pdgemm_(&transT, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					LOC.wfc_dm_2d.dm_gamma.at(spin).c, &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
@@ -480,7 +480,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 			if(dim==0)
 			{
 				pdgemm_(&transN, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
 					LM.DSloc_x, &one_int, &one_int, ParaO.desc,
@@ -490,7 +490,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 			else if(dim==1)
 			{
 				pdgemm_(&transN, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
 					LM.DSloc_y, &one_int, &one_int, ParaO.desc,
@@ -500,7 +500,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 			else if(dim==2)
 			{
 				pdgemm_(&transN, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
 					LM.DSloc_z, &one_int, &one_int, ParaO.desc,
@@ -519,7 +519,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 			if(dim==0)
 			{
 				pdgemm_(&transN, &transT,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					LM.DSloc_x, &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
@@ -529,7 +529,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 			else if(dim==1)
 			{
 				pdgemm_(&transN, &transT,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					LM.DSloc_y, &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
@@ -539,7 +539,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 			else if(dim==2)
 			{
 				pdgemm_(&transN, &transT,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					LM.DSloc_z, &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
@@ -629,7 +629,7 @@ void DFTU_RELAX::cal_stress_gamma(const vector<vector<double>> &VU)
 				vector<double> mat_tmp(ParaO.nloc, 0.0);
 
 				pdgemm_(&transT, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					LOC.wfc_dm_2d.dm_gamma.at(spin).c, &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(VU.at(spin)), &one_int, &one_int, ParaO.desc,
@@ -637,7 +637,7 @@ void DFTU_RELAX::cal_stress_gamma(const vector<vector<double>> &VU)
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc);
 
 				pdgemm_(&transN, &transN,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc, 
 					this->soverlap_gamma[count], &one_int, &one_int, ParaO.desc,
@@ -653,7 +653,7 @@ void DFTU_RELAX::cal_stress_gamma(const vector<vector<double>> &VU)
 				ZEROS(VECTOR_TO_PTR(stress_tmp), ParaO.nloc);
 
 				pdgemm_(&transN, &transT,
-					&NLOCAL, &NLOCAL, &NLOCAL,
+					&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					&alpha, 
 					this->soverlap_gamma[count], &one_int, &one_int, ParaO.desc, 
 					VECTOR_TO_PTR(mat_tmp), &one_int, &one_int, ParaO.desc,
@@ -719,9 +719,9 @@ void DFTU_RELAX::folding_dSm_soverlap()
 
 	int nnr = 0;
 
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		if(STRESS)
+		if(GlobalV::STRESS)
 		{
 			for(int i=0; i<6; i++)
 			{
@@ -739,7 +739,7 @@ void DFTU_RELAX::folding_dSm_soverlap()
 			}
 		}
 
-		if(STRESS)
+		if(GlobalV::STRESS)
 		{
 			for(int ik=0; ik<kv.nks; ik++)
 			{
@@ -808,9 +808,9 @@ void DFTU_RELAX::folding_dSm_soverlap()
 
 				  if(adj)
 				  {
-				  	for(int jj=0; jj<atom1->nw*NPOL; ++jj)
+				  	for(int jj=0; jj<atom1->nw*GlobalV::NPOL; ++jj)
 				  	{
-              const int jj0 = jj/NPOL;
+              const int jj0 = jj/GlobalV::NPOL;
 
               const int iw1_all = start1 + jj0; 
               const int mu = ParaO.trace_loc_row[iw1_all];
@@ -821,9 +821,9 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  		const int m1 = atom1->iw2m[jj0];
 
 
-				  		for(int kk=0; kk<atom2->nw*NPOL; ++kk)
+				  		for(int kk=0; kk<atom2->nw*GlobalV::NPOL; ++kk)
 				  		{
-                const int kk0 = kk/NPOL;
+                const int kk0 = kk/GlobalV::NPOL;
 
                 const int iw2_all = start2 + kk0;
 						    const int nu = ParaO.trace_loc_col[iw2_all];
@@ -843,9 +843,9 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  			// int nu = ParaO.trace_loc_col[iw2_all];
 				  			int irc = nu*ParaO.nrow + mu;
   
-				  			if(GAMMA_ONLY_LOCAL)
+				  			if(GlobalV::GAMMA_ONLY_LOCAL)
 							  {
-							  	if(STRESS)
+							  	if(GlobalV::STRESS)
 							  	{
 							  		this->soverlap_gamma[0][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+0];
 							  		this->soverlap_gamma[1][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+1];
@@ -868,7 +868,7 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  					this->dSm_k[ik][1][irc] += LM.DSloc_Ry[nnr]*kphase;
 				  					this->dSm_k[ik][2][irc] += LM.DSloc_Rz[nnr]*kphase;
 
-				  					if(STRESS)
+				  					if(GlobalV::STRESS)
 				  					{		
 				  						this->soverlap_k[ik][0][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+0]*kphase;
 				  						this->soverlap_k[ik][1][irc] += LM.DSloc_Rx[nnr]*LM.DH_r[nnr*3+1]*kphase;
@@ -907,12 +907,12 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  	// }//ad0
 				  	// if( is_adj )
 				  	// {
-				  // 		for(int jj=0; jj<atom1->nw * NPOL; ++jj)
+				  // 		for(int jj=0; jj<atom1->nw * GlobalV::NPOL; ++jj)
 				  // 		{
 				  // 			const int mu = ParaO.trace_loc_row[start1+jj];
 				  // 			if(mu<0) continue; 
 
-				  // 			for(int kk=0; kk<atom2->nw * NPOL; ++kk)
+				  // 			for(int kk=0; kk<atom2->nw * GlobalV::NPOL; ++kk)
 				  // 			{
 				  // 				const int nu = ParaO.trace_loc_col[start2+kk];
 				  // 				if(nu<0) continue;
@@ -934,9 +934,9 @@ void DFTU_RELAX::allocate_force_stress()
 {
 	TITLE("DFTU_RELAX","allocate_force_stress");
 
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		if(STRESS)
+		if(GlobalV::STRESS)
 		{
 			// this->soverlap_gamma.resize(6);   //xx, xy, xz, yy, yz, zz
 			// for(int i=0; i<6; i++)
@@ -966,7 +966,7 @@ void DFTU_RELAX::allocate_force_stress()
 			}
 		}
 
-		if(STRESS)
+		if(GlobalV::STRESS)
 		{
 			//this->soverlap_k.resize(kv.nks);
 			soverlap_k = new complex<double>** [kv.nks];
@@ -992,9 +992,9 @@ void DFTU_RELAX::erase_force_stress()
 {
 	TITLE("DFTU_RELAX","erase_force_stress");
 
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		if(STRESS)
+		if(GlobalV::STRESS)
 		{
 			//this->soverlap_gamma.resize(6);   //xx, xy, xz, yy, yz, zz
 			for(int i=0; i<6; i++)
@@ -1023,7 +1023,7 @@ void DFTU_RELAX::erase_force_stress()
 		delete [] dSm_k;
     dSm_k = nullptr;
 
-		if(STRESS)
+		if(GlobalV::STRESS)
 		{
 			//this->soverlap_k.resize(kv.nks);
 

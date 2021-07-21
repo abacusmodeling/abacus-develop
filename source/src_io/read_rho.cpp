@@ -7,12 +7,12 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
     ifstream ifs(fn.c_str());
     if (!ifs) 
 	{
-		ofs_running << " !!! Couldn't find the charge file !!!" << endl;
+		GlobalV::ofs_running << " !!! Couldn't find the charge file !!!" << endl;
 		return false;
 	}
 	else
 	{
-    	ofs_running << " Find the file, try to read charge from file." << endl;
+    	GlobalV::ofs_running << " Find the file, try to read charge from file." << endl;
 	}
 
 	bool quit=false;
@@ -55,17 +55,17 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 		}
 	}
 
-	if(NSPIN != 4) CHECK_INT(ifs, NSPIN);
+	if(GlobalV::NSPIN != 4) CHECK_INT(ifs, GlobalV::NSPIN);
 	else
 	{
-		READ_VALUE(ifs, PRENSPIN);
+		READ_VALUE(ifs, GlobalV::PRENSPIN);
 	}
-	if(NSPIN == 1||NSPIN == 4)
+	if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 	{
 		READ_VALUE(ifs, en.ef);
-		ofs_running << " read in fermi energy = " << en.ef << endl;
+		GlobalV::ofs_running << " read in fermi energy = " << en.ef << endl;
 	}
-	else if(NSPIN == 2)
+	else if(GlobalV::NSPIN == 2)
 	{
 		if(is==0)READ_VALUE(ifs, en.ef_up);
 		else if(is==1)READ_VALUE(ifs, en.ef_dw);
@@ -79,7 +79,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	CHECK_INT(ifs, pw.ncz);	
 
 #ifndef __MPI
-	ofs_running << " Read SPIN = " << is+1 << " charge now." << endl;
+	GlobalV::ofs_running << " Read SPIN = " << is+1 << " charge now." << endl;
 	for(int k=0; k<pw.ncz; k++)
 	{
 		// consistent with the write_rho, something is
@@ -99,9 +99,9 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	for(int iz=0; iz<pw.ncz; iz++)
 	{
 		ZEROS(zpiece, nxy);
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
-			//				ofs_running << " Read charge density iz=" << iz << endl;
+			//				GlobalV::ofs_running << " Read charge density iz=" << iz << endl;
 			for(int j=0; j<pw.ncy; j++)
 			{
 				for(int i=0; i<pw.ncx; i++)
@@ -115,6 +115,6 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	delete[] zpiece;
 #endif
 
-    if(MY_RANK==0) ifs.close();
+    if(GlobalV::MY_RANK==0) ifs.close();
     return true;
 }

@@ -110,7 +110,7 @@ void Atom::print_Atom(ofstream &ofs, output &outp)
 #ifdef __MPI
 void Atom::bcast_atom(void)
 {
-    if (test_atom) TITLE("Atom","bcast_atom");
+    if (GlobalV::test_atom) TITLE("Atom","bcast_atom");
 
     Parallel_Common::bcast_int( type );
     Parallel_Common::bcast_int( na );
@@ -119,7 +119,7 @@ void Atom::bcast_atom(void)
     Parallel_Common::bcast_int( nw );
     Parallel_Common::bcast_int( stapos_wf );
     Parallel_Common::bcast_string( label );
-    if(MY_RANK!=0)
+    if(GlobalV::MY_RANK!=0)
     {
         delete[] l_nchi;
         l_nchi = new int[nwl+1];
@@ -127,7 +127,7 @@ void Atom::bcast_atom(void)
     Parallel_Common::bcast_int( l_nchi, nwl+1);
     Parallel_Common::bcast_bool( flag_empty_element );
 
-    if (MY_RANK!=0)
+    if (GlobalV::MY_RANK!=0)
     {
         assert(na!=0);
         delete[] tau;

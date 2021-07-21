@@ -17,7 +17,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 {
 	TITLE("Efield","add_efield");
 
-	if(!EFIELD) return;
+	if(!GlobalV::EFIELD) return;
 
 	double avec[3];
 	if(edir == 1)
@@ -58,7 +58,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 
 	matrix fdip(ucell.nat, 3);
 
-	if(DIPOLE)
+	if(GlobalV::DIPOLE)
 	{
 		// id dipole correction is active
 		this->compute_el_dip(emaxpos, eopreg, edir, rho, e_dipole);
@@ -68,7 +68,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		// calculate the correction to total energy
 		etotefield = -e2*(eamp-tot_dipole/2.0)*tot_dipole*ucell.omega/FOUR_PI;
 		// calculate the force
-		if(FORCE)
+		if(GlobalV::FORCE)
 		{
 //			cout << "\n dipole force: " << endl;
 			int iat = 0;
@@ -94,7 +94,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		this->compute_ion_dip(emaxpos, eopreg, edir, ion_dipole, bmod, bvec);
 		this->etotefield=-e2*eamp*ion_dipole*ucell.omega/FOUR_PI;
 		// calculate the force
-		if(FORCE)
+		if(GlobalV::FORCE)
 		{
 			assert(bmod>0);
 //			cout << "\n dipole force: " << endl;
@@ -127,7 +127,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 //	cout << " Elec. dipole = " << e_dipole << " (Ry au), also = " 
 //	<< e_dipole * debye << " (debye)" << endl; 
 	
-	ofs_running << " Ion dipole = " << ion_dipole << " (Ry au), also = " 
+	GlobalV::ofs_running << " Ion dipole = " << ion_dipole << " (Ry au), also = " 
 	<< ion_dipole * debye << " (debye)" << endl;
 
 //	cout << " Dipole = " << (tot_dipole* fac) << " (Ry au), also = " 
@@ -136,9 +136,9 @@ void Efield::add_efield(const double*const rho, double* v_in)
 
 	if( abs(eamp) > 0.0) 
 	{
-		OUT(ofs_running,"Amplitute of Efield (Hartree)",eamp);
-		OUT(ofs_running,"Potential amplitute is (Ry)",vamp);
-		OUT(ofs_running,"Total length is (Bohr)",length);
+		OUT(GlobalV::ofs_running,"Amplitute of Efield (Hartree)",eamp);
+		OUT(GlobalV::ofs_running,"Potential amplitute is (Ry)",vamp);
+		OUT(GlobalV::ofs_running,"Total length is (Bohr)",length);
 	}
 	
 	//-----------------------------------------------------------
@@ -150,10 +150,10 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	int i,j,k,index;	//index0;
 	double value;
 
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		stringstream ss;
-		ss << global_out_dir << "EFIELD.dat";
+		ss << GlobalV::global_out_dir << "GlobalV::EFIELD.dat";
 		ofstream ofs(ss.str().c_str());
 		
 		int npoi;

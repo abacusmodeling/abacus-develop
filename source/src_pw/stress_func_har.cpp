@@ -12,7 +12,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 
 	//  Hartree potential VH(r) from n(r)
 	ZEROS( Porter, pw.nrxx );
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		for (int ir=0; ir<pw.nrxx; ir++)
 		{
@@ -27,7 +27,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	complex<double> *psic = new complex<double> [pw.nrxx];
 	double *psic0 = new double[pw.nrxx];
 	ZEROS( psic0, pw.nrxx);
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		daxpy (pw.nrxx, 1.0, CHR.rho[is], 1, psic0, 2);
 		for (int ir=0; ir<pw.nrxx; ir++)

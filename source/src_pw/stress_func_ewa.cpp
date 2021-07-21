@@ -149,7 +149,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 	delete[] r;
 	delete[] r2;
 	delete[] irr;
-	// this->print(ofs_running, "ewald stress", stression);
+	// this->print(GlobalV::ofs_running, "ewald stress", stression);
 	timer::tick("Force_Func","stress_ew");
 
 	return;

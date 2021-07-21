@@ -8,39 +8,39 @@ void energy::perform_dos_pw(void)
 
 	if(out_dos !=0 || out_band !=0)
     {
-        ofs_running << "\n\n\n\n";
-        ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-        ofs_running << " |                                                                    |" << endl;
-        ofs_running << " | Post-processing of data:                                           |" << endl;
-        ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
-        ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
-        ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
-        ofs_running << " | done here.                                                         |" << endl;
-        ofs_running << " |                                                                    |" << endl;
-        ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-        ofs_running << "\n\n\n\n";
+        GlobalV::ofs_running << "\n\n\n\n";
+        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+        GlobalV::ofs_running << " |                                                                    |" << endl;
+        GlobalV::ofs_running << " | Post-processing of data:                                           |" << endl;
+        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
+        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
+        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
+        GlobalV::ofs_running << " | done here.                                                         |" << endl;
+        GlobalV::ofs_running << " |                                                                    |" << endl;
+        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        GlobalV::ofs_running << "\n\n\n\n";
     }
 
 	//qianrui modify 2020-10-18
-	if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
+	if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
 	{
 		stringstream ss;
-		ss << global_out_dir << "istate.info" ;
-		if(MY_RANK==0)
+		ss << GlobalV::global_out_dir << "istate.info" ;
+		if(GlobalV::MY_RANK==0)
 		{
 			ofstream ofsi( ss.str().c_str() ); // clear istate.info
 			ofsi.close();
 		}
 #ifdef __MPI
-		for(int ip=0; ip<NPOOL; ip++)
+		for(int ip=0; ip<GlobalV::NPOOL; ip++)
 		{
 			MPI_Barrier(MPI_COMM_WORLD);
-			if( MY_POOL == ip )
+			if( GlobalV::MY_POOL == ip )
 			{
-				if( RANK_IN_POOL != 0 ) continue;
+				if( GlobalV::RANK_IN_POOL != 0 ) continue;
 #endif
 				ofstream ofsi2( ss.str().c_str(), ios::app );
-				if(NSPIN == 1||NSPIN == 4)
+				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 				{
 					for (int ik = 0;ik < kv.nks;ik++)
 					{
@@ -53,7 +53,7 @@ void energy::perform_dos_pw(void)
 						<<setw(25)<<"Kpoint = "<<ik+1
 #endif
 						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
-						for(int ib=0;ib<NBANDS;ib++)
+						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<wf.wg(ik,ib)<<endl;
 						}
@@ -77,7 +77,7 @@ void energy::perform_dos_pw(void)
 #endif
 						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
 
-						for(int ib=0;ib<NBANDS;ib++)
+						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1
 							<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV
@@ -99,7 +99,7 @@ void energy::perform_dos_pw(void)
 	}
 	
 	int nspin0=1;
-	if(NSPIN==2) nspin0=2;
+	if(GlobalV::NSPIN==2) nspin0=2;
 
 	if(this->out_dos)
 	{
@@ -108,7 +108,7 @@ void energy::perform_dos_pw(void)
 		double emin = wf.ekb[0][0];
 		for(int ik=0; ik<kv.nks; ++ik)
 		{
-			for(int ib=0; ib<NBANDS; ++ib)
+			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				emax = std::max( emax, wf.ekb[ik][ib] );
 				emin = std::min( emin, wf.ekb[ik][ib] );
@@ -130,10 +130,10 @@ void energy::perform_dos_pw(void)
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
-				OUT(ofs_running,"minimal energy is (eV)", emin);
-				OUT(ofs_running,"maximal energy is (eV)", emax);
+				OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
+				OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
 		// 		atom_arrange::set_sr_NL();
-		//		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+		//		atom_arrange::search( GlobalV::SEARCH_RADIUS );//qifeng-2019-01-21
 		
 //determine #. energy points	
 		const double de_ev = this->dos_edelta_ev;
@@ -146,7 +146,7 @@ void energy::perform_dos_pw(void)
 	 	{
 //DOS_ispin contains not smoothed dos
 			 stringstream ss;
-			 ss << global_out_dir << "DOS" << is+1;
+			 ss << GlobalV::global_out_dir << "DOS" << is+1;
 
 			 Dos::calculate_dos(
 					 is,
@@ -155,7 +155,7 @@ void energy::perform_dos_pw(void)
 					 this->dos_edelta_ev, 
 					 emax, 
 					 emin, 
-					 kv.nks, kv.nkstot, kv.wk, wf.wg, NBANDS, wf.ekb );
+					 kv.nks, kv.nkstot, kv.wk, wf.wg, GlobalV::NBANDS, wf.ekb );
 			 ifstream in(ss.str().c_str());
 			 if(!in)
 			 {
@@ -224,7 +224,7 @@ void energy::perform_dos_pw(void)
 		 // EXPLAIN : output DOS2.txt
 		 //----------------------------------------------------------
 		 stringstream sss;
-		 sss << global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
+		 sss << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
 		 ofstream out(sss.str().c_str());
 		 double sum2=0.0;
 		 for(int i=0;i<number;i++)

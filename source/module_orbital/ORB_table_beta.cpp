@@ -67,12 +67,12 @@ void ORB_table_beta::allocate
 		++Rmesh;
 	}
 
-//	OUT(ofs_running,"lmax",lmax);
-//	OUT(ofs_running,"Rmax (Bohr)",Rmax);
-//	OUT(ofs_running,"dr (Bohr)",dr);
-//	OUT(ofs_running,"dk",dk);
-//	OUT(ofs_running,"nlm",nlm);
-//	OUT(ofs_running,"kmesh",kmesh);
+//	OUT(GlobalV::ofs_running,"lmax",lmax);
+//	OUT(GlobalV::ofs_running,"Rmax (Bohr)",Rmax);
+//	OUT(GlobalV::ofs_running,"dr (Bohr)",dr);
+//	OUT(GlobalV::ofs_running,"dk",dk);
+//	OUT(GlobalV::ofs_running,"nlm",nlm);
+//	OUT(GlobalV::ofs_running,"kmesh",kmesh);
 	
 	delete[] kpoint;
 	delete[] r;
@@ -96,7 +96,7 @@ void ORB_table_beta::allocate
 		rab[ir] = dr;
 	}
 
-//	OUT(ofs_running,"allocate kpoint, r, rab, kab","Done");
+//	OUT(GlobalV::ofs_running,"allocate kpoint, r, rab, kab","Done");
 	return;
 }
 
@@ -110,8 +110,8 @@ int ORB_table_beta::get_rmesh(const double &R1, const double &R2)
 	
 	if(rmesh <= 0)
 	{
-		//ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-		//ofs_warning << "\n rmesh = " << rmesh;
+		//GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		cout << "\n R1 = " << R1 << " R2 = " << R2;
 		cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_beta::get_rmesh", "rmesh <= 0");
@@ -321,7 +321,7 @@ void ORB_table_beta::init_Table_Beta(Sph_Bessel_Recursive::D2 *pSB)
 	destroy_nr = true;
 
 
-//	OUT(ofs_running,"allocate non-local potential matrix","Done");
+//	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
 	timer::tick("ORB_table_beta", "init_Table_Beta");
 	return;
 }
@@ -370,7 +370,7 @@ void ORB_table_beta::init_NL_Tpair(void)
 	this->NL_Tpair.create( this->ntype, this->ntype);
 	this->NL_L2plus1.create( this->ntype, this->ntype); // mohan fix bug 2011-03-14
 
-//	OUT(ofs_running,"Number of Nonlocal Pairs",NL_nTpairs);
+//	OUT(GlobalV::ofs_running,"Number of Nonlocal Pairs",NL_nTpairs);
 
 	int index = 0;
 	for (int T1 = 0;  T1 < ntype ; T1++)

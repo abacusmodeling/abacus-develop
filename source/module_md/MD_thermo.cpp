@@ -114,15 +114,15 @@ double MD_thermo::NHChamiltonian(
 		}
 	}
 
-	if (!MY_RANK)
+	if (!GlobalV::MY_RANK)
     {
-        ofs_running<< " --------------------------------------------------"<<endl;
-        ofs_running<< " SUMMARY OF NVT CALCULATION"<<endl;
-        ofs_running<<" --------------------------------------------------"<<endl;
-        ofs_running<<" NVT Conservation     : "<<setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<endl;
-        ofs_running<<" NVT Temperature      : "<<setw(10)<< KE*2/(3*double(numIon_-nfrozen))/K_BOLTZMAN_AU<<" (K)"<<endl;
-        ofs_running<<" NVT Kinetic energy   : "<<setw(10)<< KE*2<<" (Rydberg)"<<endl;
-        ofs_running<<" NVT Potential energy : "<<setw(10)<< PE*2<<" (Rydberg)"<<endl;
+        GlobalV::ofs_running<< " --------------------------------------------------"<<endl;
+        GlobalV::ofs_running<< " SUMMARY OF NVT GlobalV::CALCULATION"<<endl;
+        GlobalV::ofs_running<<" --------------------------------------------------"<<endl;
+        GlobalV::ofs_running<<" NVT Conservation     : "<<setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<endl;
+        GlobalV::ofs_running<<" NVT Temperature      : "<<setw(10)<< KE*2/(3*double(numIon_-nfrozen))/K_BOLTZMAN_AU<<" (K)"<<endl;
+        GlobalV::ofs_running<<" NVT Kinetic energy   : "<<setw(10)<< KE*2<<" (Rydberg)"<<endl;
+        GlobalV::ofs_running<<" NVT Potential energy : "<<setw(10)<< PE*2<<" (Rydberg)"<<endl;
     }
 //	cout << "hamiltonian1 =    "<< NHChamiltonian0 <<endl;
    
@@ -490,9 +490,9 @@ void MD_thermo::NHC_info_out(const int& step, const int& recordFreq, const int& 
 		pass =1;
 	if (!pass) return;
 
-	if(!MY_RANK){
+	if(!GlobalV::MY_RANK){
 		stringstream ssc;
-		ssc << global_out_dir << "Restart_md.dat";
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		ofstream file(ssc.str().c_str(), ios::app);
         file<<'\n';
 		file<<"MD_THERMOSTAT"<<endl;
@@ -522,10 +522,10 @@ void MD_thermo::NHC_restart()
     double *nhcg=new double[numIon_*3*MNHC_];
     double *nhcp=new double[numIon_*3*MNHC_];
     double *nhce=new double[numIon_*3*MNHC_];
-    if (!MY_RANK)
+    if (!GlobalV::MY_RANK)
 	{
 		stringstream ssc;
-		ssc << global_readin_dir << "Restart_md.dat";
+		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
 		ifstream file(ssc.str().c_str());
 
         char word[80];

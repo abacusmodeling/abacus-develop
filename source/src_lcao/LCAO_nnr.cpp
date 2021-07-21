@@ -75,7 +75,7 @@ void LCAO_nnr::cal_nnr(void)
 			GridD.Find_atom(ucell,  tau1 ,T1, I1);
 			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
 			this->nlocstart[iat] = nnr;
-			int nw1 = ucell.atoms[T1].nw * NPOL;
+			int nw1 = ucell.atoms[T1].nw * GlobalV::NPOL;
 
 			// (2) search among all adjacent atoms.
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
@@ -84,7 +84,7 @@ void LCAO_nnr::cal_nnr(void)
 				const int I2 = GridD.getNatom(ad);
 				//const int iat2 = ucell.itia2iat(T2, I2);
 				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
-				int nw2 = ucell.atoms[T2].nw * NPOL;
+				int nw2 = ucell.atoms[T2].nw * GlobalV::NPOL;
 
 				tau2 = GridD.getAdjacentTau(ad);
 
@@ -175,8 +175,8 @@ void LCAO_nnr::cal_nnr(void)
 		}// end I1
 	} // end T1
 
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") OUT(ofs_running,"nnr",nnr);
+	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnr",nnr);
 //	for(int iat=0; iat<ucell.nat; iat++)
 //	{
 //		cout << " nlocdim[" << iat << "]=" << nlocdim[iat];
@@ -314,12 +314,12 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						*/
 					}// end iat2
 				}// end ad
-//				ofs_running << " iat=" << iat << " nlocstartg=" << nlocstartg[iat] << " nad=" << nad[iat] << endl;
+//				GlobalV::ofs_running << " iat=" << iat << " nlocstartg=" << nlocstartg[iat] << " nad=" << nad[iat] << endl;
 			}// end iat
 		}// end I1
 	}// end T1
 
-	if(OUT_LEVEL != "m") OUT(ofs_running,"nnrg",this->nnrg);
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg",this->nnrg);
 
 	//--------------------------------------------------
 	// search again, to order each (iat2, b1, b2, b3)
@@ -361,7 +361,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	}
 	allocate_find_R2 = true;
 
-//	ofs_running << setw(5) << "b1" << setw(5) << "b2" << setw(5) << "b3"
+//	GlobalV::ofs_running << setw(5) << "b1" << setw(5) << "b2" << setw(5) << "b3"
 //	<< setw(8) << "iat" << setw(8) << "ad" << setw(8) << "iat2"
 //	<< setw(8) << "find_R2" << setw(8) << "find_R2st" << setw(8) << "dis" << endl;
 	for (int T1 = 0; T1 < ucell.ntype; T1++)
@@ -440,13 +440,13 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 
 							if(iat==50 && iat2==96)
 							{
-								ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
+								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
 								<< " rcut=" << rcut <<endl;
 							}
 							else if(find_R2[iat][count]==10536)
 							{
-								ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
+								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
 								<< " rcut=" << rcut <<endl;
 							}
@@ -471,15 +471,15 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	// for test
 	//---------
 	/*
-	ofs_running << " print find_R2 " << endl;
+	GlobalV::ofs_running << " print find_R2 " << endl;
 	for(int i=0; i<ucell.nat; i++)
 	{
 		for(int j=0; j<nad[i]; j++)
 		{
-			ofs_running << " i=" << i << " j=" << j << " find_R2=" << find_R2[i][j] << endl;
+			GlobalV::ofs_running << " i=" << i << " j=" << j << " find_R2=" << find_R2[i][j] << endl;
 		}
 	}
-	ofs_running << endl;
+	GlobalV::ofs_running << endl;
 	*/
 
 	return;
@@ -511,12 +511,12 @@ void LCAO_nnr::cal_max_box_index(void)
 	}
 
 	/*
-	OUT(ofs_running,"maxB1",maxB1);
-	OUT(ofs_running,"maxB2",maxB2);
-	OUT(ofs_running,"maxB3",maxB3);
-	OUT(ofs_running,"minB1",minB1);
-	OUT(ofs_running,"minB2",minB2);
-	OUT(ofs_running,"minB3",minB3);
+	OUT(GlobalV::ofs_running,"maxB1",maxB1);
+	OUT(GlobalV::ofs_running,"maxB2",maxB2);
+	OUT(GlobalV::ofs_running,"maxB3",maxB3);
+	OUT(GlobalV::ofs_running,"minB1",minB1);
+	OUT(GlobalV::ofs_running,"minB2",minB2);
+	OUT(GlobalV::ofs_running,"minB3",minB3);
 	*/
 
 	nB1 = maxB1-minB1+1;
@@ -524,14 +524,14 @@ void LCAO_nnr::cal_max_box_index(void)
 	nB3 = maxB3-minB3+1;
 
 	/*
-	OUT(ofs_running,"nB1",nB1);
-	OUT(ofs_running,"nB2",nB2);
-	OUT(ofs_running,"nB3",nB3);
+	OUT(GlobalV::ofs_running,"nB1",nB1);
+	OUT(GlobalV::ofs_running,"nB2",nB2);
+	OUT(GlobalV::ofs_running,"nB3",nB3);
 	*/
 
 	nbox = nB1 * nB2 * nB3;
 	
-	//OUT(ofs_running,"nbox",nbox);
+	//OUT(GlobalV::ofs_running,"nbox",nbox);
 
 	return;
 }
@@ -653,14 +653,14 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					// calculate how many matrix elements are in 
 					// this processor.
 					//--------------------------------------------------
-					for(int ii=0; ii<atom1->nw*NPOL; ii++)
+					for(int ii=0; ii<atom1->nw*GlobalV::NPOL; ii++)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start + ii;
 						const int mu = ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
-						for(int jj=0; jj<atom2->nw*NPOL; jj++)
+						for(int jj=0; jj<atom2->nw*GlobalV::NPOL; jj++)
 						{
 							int iw2_all = start2 + jj;
 							const int nu = ParaO.trace_loc_col[iw2_all];
@@ -668,7 +668,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							if(nu<0)continue;
 							//const int iic = mu*ParaO.ncol+nu;
                             int iic;
-                            if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+                            if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
                                 iic=mu+nu*ParaO.nrow;
                             }
@@ -691,7 +691,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							// Hloc_fixed2 is used to diagonalize (eliminate index R).
 							//###################################################################
 							
-							if(NSPIN!=4)
+							if(GlobalV::NSPIN!=4)
 							{
 								LM.Sloc2[iic] += LM.SlocR[index] * kphase;
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;

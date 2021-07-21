@@ -26,38 +26,38 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//(1) prepare data for this k point.
 		// copy the local potential from array.
 		//-----------------------------------------
-		if(NSPIN==2) 
+		if(GlobalV::NSPIN==2) 
 		{
-			CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = kv.isk[ik];
 		}
 		wf.npw = kv.ngk[ik];
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( CURRENT_SPIN, ir);
+			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		//--------------------------------------------
 		//(2) check if we need to calculate 
 		// pvpR = < phi0 | v(spin) | phiR> for a new spin.
 		//--------------------------------------------
-		if(CURRENT_SPIN == uhm.GK.get_spin() )
+		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
 		{
-			//ofs_running << " Same spin, same vlocal integration." << endl;
+			//GlobalV::ofs_running << " Same spin, same vlocal integration." << endl;
 		}
 		else
 		{
-			//ofs_running << " (spin change)" << endl;
-			uhm.GK.reset_spin( CURRENT_SPIN );
+			//GlobalV::ofs_running << " (spin change)" << endl;
+			uhm.GK.reset_spin( GlobalV::CURRENT_SPIN );
 
 			// if you change the place of the following code,
 			// rememeber to delete the #include	
-			if(VL_IN_H)
+			if(GlobalV::VL_IN_H)
 			{
 				// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
 				uhm.GK.cal_vlocal_k(pot.vr_eff1,GridT);
 				// added by zhengdy-soc, for non-collinear case
 				// integral 4 times, is there any method to simplify?
-				if(NSPIN==4)
+				if(GlobalV::NSPIN==4)
 				{
 					for(int is=1;is<4;is++)
 					{

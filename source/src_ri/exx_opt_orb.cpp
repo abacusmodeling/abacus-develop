@@ -18,7 +18,7 @@
 
 void Exx_Opt_Orb::generate_matrix() const
 {
-ofstream ofs_mpi(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+ofstream ofs_mpi(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 
 	TITLE("Exx_Opt_Orb::generate_matrix");
 ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;

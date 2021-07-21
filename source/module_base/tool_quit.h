@@ -16,10 +16,10 @@ using namespace std;
 
 //==========================================================
 // GLOBAL FUNCTION :
-// NAME : WARNING( write information into ofs_warning)
+// NAME : WARNING( write information into GlobalV::ofs_warning)
 // NAME : QUIT( exit the running program)
 // NAME : WARNING_QUIT( write information into
-// 		  ofs_warning , and then quit)
+// 		  GlobalV::ofs_warning , and then quit)
 //==========================================================
 void WARNING(const string &file,const string &description);
 void QUIT(void);

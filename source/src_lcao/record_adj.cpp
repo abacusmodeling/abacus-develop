@@ -104,14 +104,14 @@ void Record_adj::for_2d(void)
 				{
 					++na_each[iat];
 
-					for(int ii=0; ii<atom1->nw * NPOL; ++ii)
+					for(int ii=0; ii<atom1->nw * GlobalV::NPOL; ++ii)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start1 + ii;
 						const int mu = ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
-						for(int jj=0; jj<ucell.atoms[T2].nw * NPOL; ++jj)
+						for(int jj=0; jj<ucell.atoms[T2].nw * GlobalV::NPOL; ++jj)
 						{
 							const int iw2_all = start2 + jj;
 							const int nu = ParaO.trace_loc_col[iw2_all];
@@ -126,9 +126,9 @@ void Record_adj::for_2d(void)
 		}//end I1
 	}//end T1
 
- 	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(OUT_LEVEL != "m") OUT(ofs_running,"irr",irr);
-	if(OUT_LEVEL != "m") OUT(ofs_running,"LNNR.nnr",LNNR.nnr);
+ 	//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"irr",irr);
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"LNNR.nnr",LNNR.nnr);
 
 
 
@@ -138,7 +138,7 @@ void Record_adj::for_2d(void)
 	this->info = new int**[na_proc];
 	for(int i=0; i<na_proc; i++)
 	{
-//		ofs_running << " atom" << setw(5) << i << setw(10) << na_each[i] << endl;
+//		GlobalV::ofs_running << " atom" << setw(5) << i << setw(10) << na_each[i] << endl;
 		if( na_each[i] > 0)
 		{
 			info[i] = new int*[ na_each[i] ];
@@ -211,7 +211,7 @@ void Record_adj::for_2d(void)
 					++cb;
 				}
 			}//end ad
-//			ofs_running << " nadj = " << cb << endl;
+//			GlobalV::ofs_running << " nadj = " << cb << endl;
 			++iat;
 		}//end I1
 	}//end T1

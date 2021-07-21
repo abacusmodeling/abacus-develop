@@ -43,7 +43,7 @@ void Epsilon0_vasp::cal_epsilon0()
 		occupied_bands = std::floor(occupied_bands) + 1.0;
 	}
 
-	if(NSPIN == 1 || NSPIN == 2)
+	if(GlobalV::NSPIN == 1 || GlobalV::NSPIN == 2)
 	{
 		oband = int(occupied_bands + 0.5);
 	}	
@@ -51,7 +51,7 @@ void Epsilon0_vasp::cal_epsilon0()
 	{
 		oband = 2 * int(occupied_bands + 0.5);
 	}
-	uband = NBANDS - oband;
+	uband = GlobalV::NBANDS - oband;
 	
 	cout << "oband = "<<oband<<endl;
 	cout << "uband = "<<uband<<endl;
@@ -69,26 +69,26 @@ void Epsilon0_vasp::cal_epsilon0()
 	Cal_T();
 	Cal_epsilon0();
 	
-	ofs_running<<endl; 
-	ofs_running<<" The real part of the macroscopic dielectric constant:"<<endl;
-	ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
+	GlobalV::ofs_running<<endl; 
+	GlobalV::ofs_running<<" The real part of the macroscopic dielectric constant:"<<endl;
+	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
 	for(int i=0; i<nomega; i++)
 	{
-		ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<eps0[0][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][i].real()<<setprecision(2)<<setw(15)<<eps0[2][i].real()<<setprecision(2)<<setw(15)<<eps0[3][i].real()<<setprecision(2)<<setw(15)<<eps0[4][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][i].real()<<setprecision(2)<<setw(15)<<eps0[6][i].real()<<setprecision(2)<<setw(15)<<eps0[7][i].real()<<setprecision(2)<<setw(15)<<eps0[8][i].real()+1.0<<endl;
+		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<eps0[0][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][i].real()<<setprecision(2)<<setw(15)<<eps0[2][i].real()<<setprecision(2)<<setw(15)<<eps0[3][i].real()<<setprecision(2)<<setw(15)<<eps0[4][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][i].real()<<setprecision(2)<<setw(15)<<eps0[6][i].real()<<setprecision(2)<<setw(15)<<eps0[7][i].real()<<setprecision(2)<<setw(15)<<eps0[8][i].real()+1.0<<endl;
 	}
 	
-	ofs_running<<endl; 
-	ofs_running<<" The imag part of the macroscopic dielectric constant:"<<endl;
-	ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
+	GlobalV::ofs_running<<endl; 
+	GlobalV::ofs_running<<" The imag part of the macroscopic dielectric constant:"<<endl;
+	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
 	for(int i=0; i<nomega; i++)
 	{
-		ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<-eps0[0][i].imag()<<setprecision(2)<<setw(15)<<-eps0[1][i].imag()<<setprecision(2)<<setw(15)<<-eps0[2][i].imag()<<setprecision(2)<<setw(15)<<-eps0[3][i].imag()<<setprecision(2)<<setw(15)<<-eps0[4][i].imag()<<setprecision(2)<<setw(15)<<-eps0[5][i].imag()<<setprecision(2)<<setw(15)<<-eps0[6][i].imag()<<setprecision(2)<<setw(15)<<-eps0[7][i].imag()<<setprecision(2)<<setw(15)<<-eps0[8][i].imag()<<endl;
+		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<-eps0[0][i].imag()<<setprecision(2)<<setw(15)<<-eps0[1][i].imag()<<setprecision(2)<<setw(15)<<-eps0[2][i].imag()<<setprecision(2)<<setw(15)<<-eps0[3][i].imag()<<setprecision(2)<<setw(15)<<-eps0[4][i].imag()<<setprecision(2)<<setw(15)<<-eps0[5][i].imag()<<setprecision(2)<<setw(15)<<-eps0[6][i].imag()<<setprecision(2)<<setw(15)<<-eps0[7][i].imag()<<setprecision(2)<<setw(15)<<-eps0[8][i].imag()<<endl;
 	}
 	
-	ofs_running<<" Macroscopic dielectric constant matrix :"<<endl;
-	ofs_running<<setprecision(2)<<setw(15)<<eps0[0][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][0].real()<<setprecision(2)<<setw(15)<<eps0[2][0].real()<<endl;
-	ofs_running<<setprecision(2)<<setw(15)<<eps0[3][0].real()<<setprecision(2)<<setw(15)<<eps0[4][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][0].real()<<endl;
-	ofs_running<<setprecision(2)<<setw(15)<<eps0[6][0].real()<<setprecision(2)<<setw(15)<<eps0[7][0].real()<<setprecision(2)<<setw(15)<<eps0[8][0].real()+1.0<<endl;	
+	GlobalV::ofs_running<<" Macroscopic dielectric constant matrix :"<<endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[0][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][0].real()<<setprecision(2)<<setw(15)<<eps0[2][0].real()<<endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[3][0].real()<<setprecision(2)<<setw(15)<<eps0[4][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][0].real()<<endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[6][0].real()<<setprecision(2)<<setw(15)<<eps0[7][0].real()<<setprecision(2)<<setw(15)<<eps0[8][0].real()+1.0<<endl;	
 	
 	//cout <<"Macroscopic dielectric constant matrix :"<<endl;
 	//cout << eps0[0][0].real()+1.0 <<"  "<<eps0[1][0].real() <<"  "<<eps0[2][0].real() <<"  "<<endl;
@@ -112,14 +112,14 @@ void Epsilon0_vasp:: Init()
 		}
 	}
 
-	psi = new complex<double> *[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi = new complex<double> *[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		psi[ib] = new complex<double>[pw.nrxx];
 	}
 	
-	psi_nabla =new complex<double> **[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_nabla =new complex<double> **[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		psi_nabla[ib] = new complex<double> *[pw.nrxx];
 		for(int ir=0; ir<pw.nrxx; ir++)
@@ -128,8 +128,8 @@ void Epsilon0_vasp:: Init()
 		}
 	}
 	
-	psi_nu = new complex<double> **[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_nu = new complex<double> **[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		psi_nu[ib] = new complex<double> *[ppcell.nkb];
 		for(int u=0; u<ppcell.nkb; u++)
@@ -171,13 +171,13 @@ void Epsilon0_vasp:: Delete()
 	}
 	delete[] b;
 
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		delete[] psi[ib];
 	}
 	delete[] psi;
 	
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{
@@ -187,7 +187,7 @@ void Epsilon0_vasp:: Delete()
 	}
 	delete[] psi_nabla;
 	
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		for(int u=0; u<ppcell.nkb; u++)
 		{
@@ -220,7 +220,7 @@ void Epsilon0_vasp:: Delete()
 
 void Epsilon0_vasp:: Cal_psi(int ik)      // pengfei Li 2018-11-13
 {
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		ZEROS( UFFT.porter, (pw.nrxx) );
 		for(int ig = 0; ig < kv.ngk[ik] ; ig++)
@@ -240,7 +240,7 @@ void Epsilon0_vasp:: Cal_psi(int ik)      // pengfei Li 2018-11-13
 
 void Epsilon0_vasp:: Cal_psi_nabla(int ik)      // pengfei Li 2018-11-13
 {
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		ZEROS( UFFT.porter, (pw.nrxx) );
 		for(int ig = 0; ig < kv.ngk[ik] ; ig++)
@@ -295,7 +295,7 @@ void Epsilon0_vasp:: Cal_b(int ik)
 	//Cal_psi(ik);
 	//Cal_psi_nabla(ik);	
 
-	if(NSPIN == 1 || NSPIN == 2)
+	if(GlobalV::NSPIN == 1 || GlobalV::NSPIN == 2)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
 			for(int ib2=0; ib2<uband; ib2++)
@@ -318,7 +318,7 @@ void Epsilon0_vasp:: Cal_b(int ik)
 				}
 			}
 	}
-	else if(NSPIN == 4)
+	else if(GlobalV::NSPIN == 4)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
 			for(int ib2=0; ib2<uband; ib2++)
@@ -412,16 +412,16 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 {
 	ppcell.getvnl_alpha(ik);
 	
-	complex<double> psi_nu_core[NBANDS][ppcell.nkb][4];
+	complex<double> psi_nu_core[GlobalV::NBANDS][ppcell.nkb][4];
 	
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		for(int ikb=0; ikb<ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)
 			{
 				psi_nu_core[ib][ikb][i] = complex<double>(0.0,0.0);
 			}
 	
-	/*for(int ib=0; ib<NBANDS; ib++)
+	/*for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		for(int u=0; u<ppcell.nkb; u++)
 		{
@@ -446,7 +446,7 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 			cout<<"ik = "<<ik<<" u = "<<u<<" ig = "<<ig<<"  ppcell.vkb["<<u<<"]["<<ig<<"] = "<<ppcell.vkb(u,ig)<<endl;
 		}	 
 
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		for(int u=0; u<ppcell.nkb; u++)
 		{
@@ -463,12 +463,12 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 		}
 	}
 	
-	double psi_nu_core_R[NBANDS][ppcell.nkb][4];
-	double psi_nu_core_I[NBANDS][ppcell.nkb][4];
-	double psi_nu_R[NBANDS][ppcell.nkb][4];
-	double psi_nu_I[NBANDS][ppcell.nkb][4];
+	double psi_nu_core_R[GlobalV::NBANDS][ppcell.nkb][4];
+	double psi_nu_core_I[GlobalV::NBANDS][ppcell.nkb][4];
+	double psi_nu_R[GlobalV::NBANDS][ppcell.nkb][4];
+	double psi_nu_I[GlobalV::NBANDS][ppcell.nkb][4];
 	
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		for(int ikb=0; ikb<ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)
 			{
@@ -477,11 +477,11 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 			}	
 			
 #ifdef __MPI
-	MPI_Allreduce(psi_nu_core_R,psi_nu_R,4*NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
-	MPI_Allreduce(psi_nu_core_I,psi_nu_I,4*NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+	MPI_Allreduce(psi_nu_core_R,psi_nu_R,4*GlobalV::NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+	MPI_Allreduce(psi_nu_core_I,psi_nu_I,4*GlobalV::NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 #endif
 
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		for(int ikb=0; ikb<ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)	
 			{

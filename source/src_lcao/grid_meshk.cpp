@@ -50,8 +50,8 @@ void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dz
 	this->minu2 = (-dye+1) / pw.nby - 1; 
 	this->minu3 = (-dze+1) / pw.nbz - 1; 
 
-	if(test_gridt)OUT(ofs_running,"MaxUnitcell",maxu1,maxu2,maxu3);
-	if(test_gridt)OUT(ofs_running,"MinUnitcell",minu1,minu2,minu3);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"MaxUnitcell",maxu1,maxu2,maxu3);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"MinUnitcell",minu1,minu2,minu3);
 
 	//--------------------------------------
 	// number of unitcell in each direction.
@@ -61,9 +61,9 @@ void Grid_MeshK::cal_extended_cell(const int &dxe, const int &dye, const int &dz
 	this->nu3 = maxu3 - minu3 + 1;
 	this->nutot = nu1 * nu2 * nu3;
 
-	if(test_gridt)OUT(ofs_running,"UnitCellNumber",nu1,nu2,nu3);
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") OUT(ofs_running,"UnitCellTotal",nutot);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"UnitCellNumber",nu1,nu2,nu3);
+	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"UnitCellTotal",nutot);
 
 //	cout << " nu1 = " << nu1 << " nu2 = " << nu2 << " nu3 = " << nu3 << endl;
 //	cout << " nutot = " << nutot << endl;

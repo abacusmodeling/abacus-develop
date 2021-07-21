@@ -22,16 +22,16 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 	{
 		case 'S':
 		{
-			for(int i=0; i<NLOCAL; i++)
+			for(int i=0; i<GlobalV::NLOCAL; i++)
 			{
 				const int mu = ParaO.trace_loc_row[i];
 				if(mu < 0)continue;
-				for(int j=0; j<NLOCAL; j++)
+				for(int j=0; j<GlobalV::NLOCAL; j++)
 				{
 					const int nu = ParaO.trace_loc_col[j];
 					if(nu < 0)continue;
 					
-					if(NSPIN!=4)
+					if(GlobalV::NSPIN!=4)
 					{
 						complex<double> v = ZERO;
 						for (int ig = 0; ig < kv.ngk[ik]; ig++) 
@@ -61,7 +61,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 						LM.Sloc2_soc(2, mu * ParaO.ncol + nu) = v2;
 						LM.Sloc2_soc(3, mu * ParaO.ncol + nu) = v3;*/
 						complex<double> v0 = ZERO;
-						for (int ig = 0; ig < wf.npwx*NPOL; ig++)
+						for (int ig = 0; ig < wf.npwx*GlobalV::NPOL; ig++)
 							v0 += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig);
 						LM.Sloc2[ mu * ParaO.ncol + nu ] = v0;
 
@@ -77,11 +77,11 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 			//------------------------------------
 			wf.ekin(ik);
 
-			for(int i=0; i<NLOCAL; i++)
+			for(int i=0; i<GlobalV::NLOCAL; i++)
 			{
 				const int mu = ParaO.trace_loc_row[i];
 				if(mu < 0)continue;
-				for(int j=0; j<NLOCAL; j++)
+				for(int j=0; j<GlobalV::NLOCAL; j++)
 				{
 					const int nu = ParaO.trace_loc_col[j];
 					if(nu < 0)continue;
@@ -91,7 +91,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					{
 						v += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig) * wf.g2kin[ig];
 					}
-					if(NSPIN==4)
+					if(GlobalV::NSPIN==4)
 					for (int ig = 0; ig < kv.ngk[ik]; ig++)
 					{
 						v += conj(wf.wanf2[ik](mu, ig + wf.npwx)) * wf.wanf2[ik](nu, ig + wf.npwx) * wf.g2kin[ig];
@@ -115,8 +115,8 @@ void Build_ST_pw::set_local(const int &ik)
 {
 	TITLE("Build_ST_pw","set_local");
 	timer::tick("Build_ST_pw","set_local");
-	assert(NLOCAL>0);
-	assert(!GAMMA_ONLY_LOCAL);
+	assert(GlobalV::NLOCAL>0);
+	assert(!GlobalV::GAMMA_ONLY_LOCAL);
 
     const int npw = kv.ngk[ik];
     complex<double> *psi_one = new complex<double>[npw];
@@ -128,11 +128,11 @@ void Build_ST_pw::set_local(const int &ik)
 		fft_index[ig] = pw.ig2fftw[ wf.igk(ik, ig) ];
 	}
 
-//	ComplexMatrix vij(NLOCAL, NLOCAL);
+//	ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
 
-	for(int i=0; i<NLOCAL; i++)
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		if(NSPIN!=4)
+		if(GlobalV::NSPIN!=4)
 		{
 			for(int ig=0; ig<npw; ig++)
 			{
@@ -161,7 +161,7 @@ void Build_ST_pw::set_local(const int &ik)
 				hpsi[ig] = psic[ fft_index[ig] ];
 			}
 
-			for(int j=i; j<NLOCAL; j++)
+			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
 				complex<double> v = ZERO;
 				for(int ig=0; ig<npw; ig++)
@@ -181,8 +181,8 @@ void Build_ST_pw::set_local(const int &ik)
 			complex<double>* psi_down = new complex<double> [npw];
 			complex<double> *psic1 = new complex<double>[pw.nrxx];
 			delete[] hpsi;
-			hpsi = new complex<double> [wf.npwx*NPOL];
-			ZEROS(hpsi, wf.npwx*NPOL);
+			hpsi = new complex<double> [wf.npwx*GlobalV::NPOL];
+			ZEROS(hpsi, wf.npwx*GlobalV::NPOL);
 			
 			for(int ig=0; ig<npw; ig++)
 			{
@@ -224,7 +224,7 @@ void Build_ST_pw::set_local(const int &ik)
 				hpsi[ig+wf.npwx] = psic1[ fft_index[ig] ];
 			}
 
-			for(int j=i; j<NLOCAL; j++)
+			for(int j=i; j<GlobalV::NLOCAL; j++)
 			{
 				complex<double> v = ZERO;
 				for(int ig=0; ig<npw; ig++)

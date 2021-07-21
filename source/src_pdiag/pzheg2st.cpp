@@ -14,7 +14,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
  * pzheg2st transforms generalized  Hermitian eigenproblem into standard  
  * eigenproblem 
  * computes Cholesky factorization of an N-by-N real
- * symmetric positive definite matrix B and  L-1AL-T »òU -TAU -1 with a 
+ * symmetric positive definite matrix B and  L-1AL-T ï¿½ï¿½U -TAU -1 with a 
  * 2D-block-cyclic in parallel. The routine introduces a new parallelization which 
  * combines the Cholesky into the transformation from generalized to standard form.
  * Arguments
@@ -28,7 +28,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
  *  comm_2D. (input) MPI_Comm 
  *            2-D grid MPI communicator
  *  N_A  (global input) INTEGER
- *      The number of columns and rows to be operated on matrices A£¬N >= 0. 
+ *      The number of columns and rows to be operated on matrices Aï¿½ï¿½N >= 0. 
  *  NB  (input) INTEGER
  *       blocked size of 2D blocked cyclic matrix
  *  A       (local input/local output) double precision complex pointer,
@@ -265,15 +265,15 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                     MPI_Send(C_A1,NB*NB,MPI_DOUBLE_COMPLEX,rp,tag,DIAG_HPSEPS_WORLD);
                     MPI_Send(C_B1,NB*NB,MPI_DOUBLE_COMPLEX,rp,tag,DIAG_HPSEPS_WORLD);
 
-//					ofs_running << "\n MPI_Send done. " << " tag = " << tag << endl;
+//					GlobalV::ofs_running << "\n MPI_Send done. " << " tag = " << tag << endl;
                 }
                 else if (coord[0]==iarow2&&coord[1]==iacol2)
                 {
-					//ofs_running << "\n MPI_Recv prepare for tag = " << tag << endl;
+					//GlobalV::ofs_running << "\n MPI_Recv prepare for tag = " << tag << endl;
                     MPI_Recv(C_A1,NB*NB,MPI_DOUBLE_COMPLEX,sp,tag,DIAG_HPSEPS_WORLD,&status1);
                     MPI_Recv(C_B1,NB*NB,MPI_DOUBLE_COMPLEX,sp,tag,DIAG_HPSEPS_WORLD,&status2);
 
-					//ofs_running << "\n MPI_Recv done. " << endl;
+					//GlobalV::ofs_running << "\n MPI_Recv done. " << endl;
                     for (k=0; k<bm1; k++)
                         for (j=0; j<bn1; j++)
                         {

@@ -61,7 +61,7 @@ void Diago_CG::diag
 
     for (int m=0; m<n_band; m++)
     {
-        if (test_cg>2) ofs_running << "Diagonal Band : " << m << endl;
+        if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << endl;
         for (int i=0; i<dim; i++) phi_m[i] = phi(m, i);
 
         hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>

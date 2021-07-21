@@ -59,10 +59,10 @@ void Grid_MeshCell::set_grid_dim(
 		WARNING_QUIT("Grid_MeshCell::set_grid_dim","nbxx is <=0 !");
 	}
 
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") OUT(ofs_running,"real space grid",ncx,ncy,ncz); // real space uniform grid
-	if(OUT_LEVEL != "m") OUT(ofs_running,"big cell numbers in grid",nbx,nby,nbz); // reduced by BIG_CELL
-	if(OUT_LEVEL != "m") OUT(ofs_running,"meshcell numbers in big cell",bx,by,bz); // is small integer, typical number 2*2*2
+	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"real space grid",ncx,ncy,ncz); // real space uniform grid
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"big cell numbers in grid",nbx,nby,nbz); // reduced by BIG_CELL
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"meshcell numbers in big cell",bx,by,bz); // is small integer, typical number 2*2*2
 
 	//cout << " bx=" << bx << " by=" << by << " bz=" << bz << endl;
 	//cout << " nbx=" << nbx << " nby=" << nby << " nbz=" << nbz << endl; 
@@ -117,22 +117,22 @@ void Grid_MeshCell::init_latvec(void)
 	// (x,y,z) * meshcell_latvec0^(-1) = (i,j,k)
 	this->meshcell_GT = this->meshcell_latvec0.Inverse();
 
-	if(test_gridt)
+	if(GlobalV::test_gridt)
 	{
-		ofs_running << " the VECTORS of MESHCELL are (Bohr): " << endl;
-		ofs_running << " vec1( " 
+		GlobalV::ofs_running << " the VECTORS of MESHCELL are (Bohr): " << endl;
+		GlobalV::ofs_running << " vec1( " 
 			<< setw(15) << meshcell_vec1[0]
 			<< setw(15) << meshcell_vec1[1]
 			<< setw(15) << meshcell_vec1[2] 
 			<< ")" << endl;
 
-		ofs_running << " vec2( " 
+		GlobalV::ofs_running << " vec2( " 
 			<< setw(15) << meshcell_vec2[0]
 			<< setw(15) << meshcell_vec2[1]
 			<< setw(15) << meshcell_vec2[2]
 			<< ")" << endl;
 
-		ofs_running << " vec3( " 
+		GlobalV::ofs_running << " vec3( " 
 			<< setw(15) << meshcell_vec3[0]
 			<< setw(15) << meshcell_vec3[1]
 			<< setw(15) << meshcell_vec3[2]

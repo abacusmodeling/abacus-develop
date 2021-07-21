@@ -11,27 +11,27 @@ void Print_Info::setup_parameters(void)
 {
 	TITLE("Print_Info","setup_parameters");
 	
-    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax" || CALCULATION=="nscf"
-	        || CALCULATION=="istate" || CALCULATION=="ienvelope" || CALCULATION=="md")
+    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax" || GlobalV::CALCULATION=="nscf"
+	        || GlobalV::CALCULATION=="istate" || GlobalV::CALCULATION=="ienvelope" || GlobalV::CALCULATION=="md")
 	{
 		cout << " ---------------------------------------------------------" << endl;
-		if(CALCULATION=="scf")
+		if(GlobalV::CALCULATION=="scf")
 		{
 			cout << " Self-consistent calculations for electrons" << endl;
 		}
-		else if(CALCULATION=="test")
+		else if(GlobalV::CALCULATION=="test")
 		{
 			cout << " Test run" << endl;
 		}
-		if(CALCULATION=="relax")
+		if(GlobalV::CALCULATION=="relax")
 		{
             cout << " Ion relaxation calculations" << endl;
 		}
-        if(CALCULATION=="cell-relax")
+        if(GlobalV::CALCULATION=="cell-relax")
         {
             cout << " Cell relaxation calculations" << endl;
         }
-		if(CALCULATION=="md")
+		if(GlobalV::CALCULATION=="md")
 		{
 			cout << " Molecular Dynamics simulations" << endl;
 
@@ -56,7 +56,7 @@ void Print_Info::setup_parameters(void)
 		     << setw(16) << "KPOINTS"
 		     << setw(12) << "PROCESSORS";
 
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			cout << setw(12) << "NBASE";
 		}
@@ -65,11 +65,11 @@ void Print_Info::setup_parameters(void)
 
 
 
-		cout << " " << setw(8) << NSPIN;
+		cout << " " << setw(8) << GlobalV::NSPIN;
 
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				// red
 				//printf( "\e[31m%-16s\e[0m", "Gamma");
@@ -82,7 +82,7 @@ void Print_Info::setup_parameters(void)
 		}
 		else
 		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				// zi
 				//printf( "\e[35m%-16d\e[0m", kv.nkstot);
@@ -94,11 +94,11 @@ void Print_Info::setup_parameters(void)
 			}
 		}
 
-		cout << setw(12) << NPROC;
+		cout << setw(12) << GlobalV::NPROC;
 
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			cout << setw(12) << NLOCAL;
+			cout << setw(12) << GlobalV::NLOCAL;
 		}
 
 		cout << endl;
@@ -107,13 +107,13 @@ void Print_Info::setup_parameters(void)
 
 
 		cout << " ---------------------------------------------------------" << endl;
-		if(CALCULATION=="md" && INPUT.mdp.md_potential)
+		if(GlobalV::CALCULATION=="md" && INPUT.mdp.md_potential)
 		{
 			cout << " Classic Molecular Dynamics simulations" << endl;
 		}
-		else if(BASIS_TYPE=="lcao") 
+		else if(GlobalV::BASIS_TYPE=="lcao") 
 		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				string a = "Use Systematically Improvable Atomic bases";
 				//printf( " \e[36m%-45s\e[0m\n", a.c_str());
@@ -124,11 +124,11 @@ void Print_Info::setup_parameters(void)
 				cout << " Use Systematically Improvable Atomic bases" << endl;
 			}
 		}
-		else if(BASIS_TYPE=="lcao_in_pw")
+		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			cout << " Expand Atomic bases into plane waves" << endl;
 		}
-		else if(BASIS_TYPE=="pw")
+		else if(GlobalV::BASIS_TYPE=="pw")
 		{
 			cout << " Use plane wave basis" << endl;
 		}
@@ -142,7 +142,7 @@ void Print_Info::setup_parameters(void)
 
 		cout << " " << setw(8) << "ELEMENT";
 
-		if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			cout << setw(16) << "ORBITALS";
 			cout << setw(12) << "NBASE";
@@ -156,7 +156,7 @@ void Print_Info::setup_parameters(void)
 
 		for(int it=0; it<ucell.ntype; ++it)
 		{
-			if(COLOUR && MY_RANK==0)
+			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
 				printf( " [36m%-8s[0m", ucell.atoms[it].label.c_str());
 			}
@@ -165,7 +165,7 @@ void Print_Info::setup_parameters(void)
 				cout << " " << setw(8) << ucell.atoms[it].label;
 			}
 
-			if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+			if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 			{
 				stringstream orb;
 
@@ -199,7 +199,7 @@ void Print_Info::setup_parameters(void)
 				}
 				orb << "-" << ucell.atoms[it].Rcut << "au";
 
-				if(COLOUR && MY_RANK==0)
+				if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 				{
 					//printf( "\e[36m%-16s\e[0m", orb.str().c_str());
 					//printf( "\e[36m%-12d\e[0m", norb);

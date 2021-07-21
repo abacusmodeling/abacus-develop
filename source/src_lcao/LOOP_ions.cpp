@@ -31,7 +31,7 @@ void LOOP_ions::opt_ions(void)
     TITLE("LOOP_ions","opt_ions");
     timer::tick("LOOP_ions","opt_ions");
 
-    if(OUT_LEVEL=="i")
+    if(GlobalV::OUT_LEVEL=="i")
     {
         cout << setprecision(12);
         cout<< " " << setw(7)<< "ISTEP"
@@ -44,7 +44,7 @@ void LOOP_ions::opt_ions(void)
     }
 
     // Geometry optimization algorithm setup.
-    if(FORCE)
+    if(GlobalV::FORCE)
     {
         //Ions_Move_Methods
         IMM.allocate();
@@ -53,7 +53,7 @@ void LOOP_ions::opt_ions(void)
     }
 
     // pengfei Li 2018-05-14
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         // allocate arrays related to changes of lattice vectors
         LCM.allocate();
@@ -65,45 +65,45 @@ void LOOP_ions::opt_ions(void)
     int force_step = 1;
     int stress_step = 1;
     bool stop = false;
-    while(istep <= NSTEP && !stop)
+    while(istep <= GlobalV::NSTEP && !stop)
     {
         time_t estart = time(NULL);
 
 		// xiaohui add "m" option, 2015-09-16
-        if(OUT_LEVEL=="ie" || OUT_LEVEL=="m")
+        if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
         {
             cout << " ---------------------------------------------------------" << endl;
-            if(CALCULATION=="relax")
+            if(GlobalV::CALCULATION=="relax")
             {
                 cout << " RELAX IONS : " << istep << endl;
             }
-            else if(CALCULATION=="cell-relax")
+            else if(GlobalV::CALCULATION=="cell-relax")
             {
                 cout << " RELAX CELL : " << stress_step << endl;
                 cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
             }
-            else if(CALCULATION=="scf")
+            else if(GlobalV::CALCULATION=="scf")
             {
                 cout << " SELF-CONSISTENT : " << endl;
             }
             cout << " ---------------------------------------------------------" << endl;
 
-            ofs_running << " ---------------------------------------------------------" << endl;
-            if(CALCULATION=="relax")
+            GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+            if(GlobalV::CALCULATION=="relax")
             {
-                ofs_running << " RELAX IONS : " << istep << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX IONS : " << istep << endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
             }
-            else if(CALCULATION=="cell-relax")
+            else if(GlobalV::CALCULATION=="cell-relax")
             {
-                ofs_running << " RELAX CELL : " << stress_step << endl;
-                ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX CELL : " << stress_step << endl;
+                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
             }
-            else if(CALCULATION=="scf")
+            else if(GlobalV::CALCULATION=="scf")
             {
-                ofs_running << " SELF-CONSISTENT" << endl;
-                ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " SELF-CONSISTENT" << endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
             }
         }
 
@@ -144,7 +144,7 @@ void LOOP_ions::opt_ions(void)
 		time_t eend = time(NULL);
 
 		//for second-order extrapolation
-        if(CALCULATION=="relax" || CALCULATION=="cell-relax")
+        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
             CE.update_all_pos(ucell);
         }
@@ -157,8 +157,8 @@ void LOOP_ions::opt_ions(void)
         {
             stringstream ssp;
             stringstream ssp_ave;
-            ssp << global_out_dir << "ElecStaticPot";
-            ssp_ave << global_out_dir << "ElecStaticPot_AVE";
+            ssp << GlobalV::global_out_dir << "ElecStaticPot";
+            ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
             pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
@@ -180,7 +180,7 @@ void LOOP_ions::opt_ions(void)
                 ld.cal_v_delta(INPUT.model_file);
                 ld.print_H_V_delta();
                 ld.save_npy_d();
-                if (FORCE)
+                if (GlobalV::FORCE)
                 {
                     ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
                     ld.print_F_delta();
@@ -190,7 +190,7 @@ void LOOP_ions::opt_ions(void)
         }
 #endif
         time_t fstart = time(NULL);
-        if (CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+        if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
             stop = this->force_stress(istep, force_step, stress_step);
         }
@@ -199,17 +199,17 @@ void LOOP_ions::opt_ions(void)
 		// PLEASE move the details of CE to other places
 		// mohan add 2021-03-25
         //xiaohui add 2014-07-07, for second-order extrapolation
-        if(FORCE)
+        if(GlobalV::FORCE)
         {
             CE.save_pos_next(ucell);
         }
 
-        if(OUT_LEVEL=="i")
+        if(GlobalV::OUT_LEVEL=="i")
         {
             double etime_min = difftime(eend, estart)/60.0;
             double ftime_min = difftime(fend, fstart)/60.0;
             stringstream ss;
-            ss << MOVE_IONS << istep;
+            ss << GlobalV::MOVE_IONS << istep;
 
             cout << setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
@@ -238,12 +238,12 @@ void LOOP_ions::opt_ions(void)
         ++istep;
     }
 
-    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        ofs_running << "\n\n --------------------------------------------" << endl;
-        ofs_running << setprecision(16);
-        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
-        ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+        GlobalV::ofs_running << setprecision(16);
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     }
 
@@ -260,7 +260,7 @@ bool LOOP_ions::force_stress(
 {
     TITLE("LOOP_ions","force_stress");
 
-    if(!FORCE && !STRESS)
+    if(!GlobalV::FORCE && !GlobalV::STRESS)
     {
         return 1;
     }
@@ -272,29 +272,29 @@ bool LOOP_ions::force_stress(
 	matrix scs;
 	Force_Stress_LCAO FSL;
 	FSL.allocate ();
-	FSL.getForceStress(FORCE, STRESS, TEST_FORCE, TEST_STRESS, fcs, scs);
+	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, scs);
 
 	//--------------------------------------------------
 	// only forces are needed, no stresses are needed
 	//--------------------------------------------------
-    if(FORCE && !STRESS)
+    if(GlobalV::FORCE && !GlobalV::STRESS)
     {
 
 #ifdef __MPI
         atom_arrange::delete_vector(
-			ofs_running,
-			SEARCH_PBC,
+			GlobalV::ofs_running,
+			GlobalV::SEARCH_PBC,
 			GridD,
 			ucell,
-			SEARCH_RADIUS,
-			test_atom_input);
+			GlobalV::SEARCH_RADIUS,
+			GlobalV::test_atom_input);
 #endif
 
-        if(CALCULATION=="relax")
+        if(GlobalV::CALCULATION=="relax")
         {
             IMM.cal_movement(istep, istep, fcs, en.etot);
 
-            if(IMM.get_converged() || (istep==NSTEP))
+            if(IMM.get_converged() || (istep==GlobalV::NSTEP))
             {
                 return 1; // 1 means converged
             }
@@ -346,19 +346,19 @@ xiaohui modify 2014-08-09*/
 //    static bool converged_force = false;
     static bool converged_stress = false;
 
-    if(!FORCE&&STRESS)
+    if(!GlobalV::FORCE&&GlobalV::STRESS)
     {
 
 #ifdef __MPI
 		atom_arrange::delete_vector(
-			ofs_running,
-			SEARCH_PBC,
+			GlobalV::ofs_running,
+			GlobalV::SEARCH_PBC,
 			GridD,
 			ucell,
-			SEARCH_RADIUS,
-			test_atom_input);
+			GlobalV::SEARCH_RADIUS,
+			GlobalV::test_atom_input);
 #endif
-		if(CALCULATION=="cell-relax")
+		if(GlobalV::CALCULATION=="cell-relax")
 		{
            	LCM.cal_lattice_change(stress_step, scs, en.etot);
            	converged_stress = LCM.get_converged();
@@ -381,17 +381,17 @@ xiaohui modify 2014-08-09*/
         }
 	}
 
-    if(FORCE&&STRESS)
+    if(GlobalV::FORCE&&GlobalV::STRESS)
     {
         atom_arrange::delete_vector(
-			ofs_running,
-			SEARCH_PBC,
+			GlobalV::ofs_running,
+			GlobalV::SEARCH_PBC,
 			GridD,
 			ucell,
-			SEARCH_RADIUS,
-			test_atom_input);
+			GlobalV::SEARCH_RADIUS,
+			GlobalV::test_atom_input);
 
-        if(CALCULATION=="relax" || CALCULATION=="cell-relax")
+        if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
             IMM.cal_movement(istep, force_step, fcs, en.etot);
 
@@ -400,7 +400,7 @@ xiaohui modify 2014-08-09*/
                 force_step = 1;
 
 
-			    if(CALCULATION=="cell-relax")
+			    if(GlobalV::CALCULATION=="cell-relax")
 			    {
             	    LCM.cal_lattice_change(stress_step, scs, en.etot);
             	    converged_stress = LCM.get_converged();
@@ -454,26 +454,26 @@ void LOOP_ions::final_scf(void)
 {
     TITLE("LOOP_ions","final_scf");
 
-    FINAL_SCF = true;
+    GlobalV::FINAL_SCF = true;
 
     Variable_Cell::final_calculation_after_vc();
 
 	//------------------------------------------------------------------
 	// THIS PART IS THE SAME AS LOOP_elec::set_matrix_grid
-    SEARCH_RADIUS = atom_arrange::set_sr_NL(
-		ofs_running,
-		OUT_LEVEL,
+    GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+		GlobalV::ofs_running,
+		GlobalV::OUT_LEVEL,
 		ORB.get_rcutmax_Phi(),
 		ORB.get_rcutmax_Beta(),
-		GAMMA_ONLY_LOCAL);
+		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
-		SEARCH_PBC,
-		ofs_running,
+		GlobalV::SEARCH_PBC,
+		GlobalV::ofs_running,
 		GridD,
 		ucell,
-		SEARCH_RADIUS,
-		test_atom_input);
+		GlobalV::SEARCH_RADIUS,
+		GlobalV::test_atom_input);
 
     GridT.set_pbc_grid(
         pw.ncx, pw.ncy, pw.ncz,
@@ -482,7 +482,7 @@ void LOOP_ions::final_scf(void)
         pw.nbxx, pw.nbzp_start, pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
-    if(!GAMMA_ONLY_LOCAL)
+    if(!GlobalV::GAMMA_ONLY_LOCAL)
     {
         // For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
@@ -532,12 +532,12 @@ void LOOP_ions::final_scf(void)
 	ELEC_scf es;
 	es.scf(0);
 
-    if(CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax")
+    if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        ofs_running << "\n\n --------------------------------------------" << endl;
-        ofs_running << setprecision(16);
-        ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
-        ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+        GlobalV::ofs_running << setprecision(16);
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
     }
 
     return;

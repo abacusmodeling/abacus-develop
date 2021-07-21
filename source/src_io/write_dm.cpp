@@ -26,7 +26,7 @@
 // now we want to reduce them and print out,
 // we plan to reduce them one row by one row,
 // then for the first row, we need to set the
-// temparary array to 4 (NLOCAL in code),
+// temparary array to 4 (GlobalV::NLOCAL in code),
 // then we reduce first row, it will become
 // 2.2 2.3 3.6 8.4,
 // we notice that the first element and fourth
@@ -57,7 +57,7 @@ void Local_Orbital_Charge::write_dm(
 	time_t start, end;
 	ofstream ofs;
 
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		start = time(NULL);
 
@@ -67,7 +67,7 @@ void Local_Orbital_Charge::write_dm(
 			WARNING("Charge::write_rho","Can't create Charge File!");
 		}
 
-		//ofs_running << "\n Output charge file." << endl;
+		//GlobalV::ofs_running << "\n Output charge file." << endl;
 
 		ofs << ucell.latName << endl;//1
 		ofs << " " << ucell.lat0 * BOHR_TO_A << endl;
@@ -98,12 +98,12 @@ void Local_Orbital_Charge::write_dm(
 			}
 		}
 
-		ofs << "\n " << NSPIN;
-		if(NSPIN==1||NSPIN==4)
+		ofs << "\n " << GlobalV::NSPIN;
+		if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 		{
 			ofs << "\n " << en.ef << " (fermi energy)";
 		}
-		else if(NSPIN==2)
+		else if(GlobalV::NSPIN==2)
 		{
 			if(is==0)ofs << "\n " << en.ef_up << " (fermi energy for spin=1)";
 			else if(is==1)ofs << "\n " << en.ef_dw << " (fermi energy for spin=2)";
@@ -114,20 +114,20 @@ void Local_Orbital_Charge::write_dm(
 		}
 
 
-		ofs << "\n  " << NLOCAL << " " << NLOCAL << endl;
+		ofs << "\n  " << GlobalV::NLOCAL << " " << GlobalV::NLOCAL << endl;
 
 		ofs << setprecision(precision);
 		ofs << scientific;
 
 	}
 
-    //ofs << "\n " << GAMMA_ONLY_LOCAL << " (GAMMA ONLY LOCAL)" << endl;
+    //ofs << "\n " << GlobalV::GAMMA_ONLY_LOCAL << " (GAMMA ONLY LOCAL)" << endl;
 #ifndef __MPI
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        for(int i=0; i<NLOCAL; ++i)
+        for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            for(int j=0; j<NLOCAL; ++j)
+            for(int j=0; j<GlobalV::NLOCAL; ++j)
             {
                 if(j%8==0) ofs << "\n";
                 ofs << " " << this->DM[is][i][j];
@@ -145,20 +145,20 @@ void Local_Orbital_Charge::write_dm(
         }
     }
 #else
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         //xiaohui modify 2014-06-18
         
-        double* tmp = new double[NLOCAL];
-        int* count = new int[NLOCAL];
-        for (int i=0; i<NLOCAL; ++i)
+        double* tmp = new double[GlobalV::NLOCAL];
+        int* count = new int[GlobalV::NLOCAL];
+        for (int i=0; i<GlobalV::NLOCAL; ++i)
         {
             // when reduce, there may be 'redundance', we need to count them.
-            ZEROS(count, NLOCAL);
+            ZEROS(count, GlobalV::NLOCAL);
             const int mu = GridT.trace_lo[i];
             if (mu >= 0)
             {
-                for (int j=0; j<NLOCAL; ++j)
+                for (int j=0; j<GlobalV::NLOCAL; ++j)
                 {
                     const int nu = GridT.trace_lo[j];
                     if (nu >= 0)
@@ -167,27 +167,27 @@ void Local_Orbital_Charge::write_dm(
                     }
                 }
             }
-            Parallel_Reduce::reduce_int_all( count, NLOCAL );
+            Parallel_Reduce::reduce_int_all( count, GlobalV::NLOCAL );
 
             // reduce the density matrix for 'i' line.
-            ZEROS(tmp, NLOCAL);
+            ZEROS(tmp, GlobalV::NLOCAL);
             if (mu >= 0)
             {
-                for (int j=0; j<NLOCAL; j++)
+                for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
                     const int nu = GridT.trace_lo[j];
                     if (nu >=0)
                     {
                         tmp[j] = DM[is][mu][nu];
-                        //ofs_running << " dmi=" << i << " j=" << j << " " << DM[is][mu][nu] << endl;
+                        //GlobalV::ofs_running << " dmi=" << i << " j=" << j << " " << DM[is][mu][nu] << endl;
                     }
                 }
             }
-            Parallel_Reduce::reduce_double_all( tmp, NLOCAL );
+            Parallel_Reduce::reduce_double_all( tmp, GlobalV::NLOCAL );
 
-            if(MY_RANK==0)
+            if(GlobalV::MY_RANK==0)
             {
-                for (int j=0; j<NLOCAL; j++)
+                for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
                     if(j%8==0) ofs << "\n";
                     if(count[j]>0)
@@ -205,9 +205,9 @@ void Local_Orbital_Charge::write_dm(
         delete[] count;
         
         //xiaohui add 2014-06-18
-        //for(int i=0; i<NLOCAL; ++i)
+        //for(int i=0; i<GlobalV::NLOCAL; ++i)
         //{
-        //  for(int j=0; j<NLOCAL; ++j)
+        //  for(int j=0; j<GlobalV::NLOCAL; ++j)
         //  {
         //      if(j%8==0) ofs << "\n";
         //      ofs << " " << this->DM[is][i][j];
@@ -221,7 +221,7 @@ void Local_Orbital_Charge::write_dm(
         WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
 		end = time(NULL);
 		OUT_TIME("write_rho",start,end);

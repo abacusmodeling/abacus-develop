@@ -18,7 +18,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 	TITLE("UnitCell_pseudo","read_cell_pseudopots");
 	// setup reading log for pseudopot_upf
 	stringstream ss;
-	ss << global_out_dir << "atom_pseudo.log";
+	ss << GlobalV::global_out_dir << "atom_pseudo.log";
 	
 	// Read in the atomic pseudo potentials
 	string pp_address;
@@ -30,7 +30,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 		int error = 0;
 		int error_ap = 0;
 		
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
 			pp_address = pp_dir + this->pseudo_fn[i];
 			error = upf.init_pseudo_reader( pp_address ); //xiaohui add 2013-06-23
@@ -59,7 +59,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 		if(error==1)
 		{
 			cout << " Pseudopotential directory now is : " << pp_address << endl;
-			ofs_warning << " Pseudopotential directory now is : " << pp_address << endl;
+			GlobalV::ofs_warning << " Pseudopotential directory now is : " << pp_address << endl;
 			WARNING_QUIT("read_pseudopot","Couldn't find pseudopotential file.");
 		}
 		else if(error==2)
@@ -81,34 +81,34 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 			WARNING_QUIT("Pseudopot_upf::read_pseudo_header","input xc functional does not match that in pseudopot file");
 		}
 
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
 //			upf.print_pseudo_upf( ofs );
 			atoms[i].set_pseudo_nc( upf );
 
-			ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << endl;
-			OUT(ofs_running,"pseudopotential type",atoms[i].pp_type);
-			OUT(ofs_running,"functional Ex", atoms[i].dft[0]);
-			OUT(ofs_running,"functional Ec", atoms[i].dft[1]);
-			OUT(ofs_running,"functional GCEx", atoms[i].dft[2]);
-			OUT(ofs_running,"functional GCEc", atoms[i].dft[3]);
-			OUT(ofs_running,"nonlocal core correction", atoms[i].nlcc);
-//			OUT(ofs_running,"spin orbital",atoms[i].has_so);
-			OUT(ofs_running,"valence electrons", atoms[i].zv);
-			OUT(ofs_running,"lmax", atoms[i].lmax);
-			OUT(ofs_running,"number of zeta", atoms[i].nchi);
-			OUT(ofs_running,"number of projectors", atoms[i].nbeta);
+			GlobalV::ofs_running << "\n Read in pseudopotential file is " << pseudo_fn[i] << endl;
+			OUT(GlobalV::ofs_running,"pseudopotential type",atoms[i].pp_type);
+			OUT(GlobalV::ofs_running,"functional Ex", atoms[i].dft[0]);
+			OUT(GlobalV::ofs_running,"functional Ec", atoms[i].dft[1]);
+			OUT(GlobalV::ofs_running,"functional GCEx", atoms[i].dft[2]);
+			OUT(GlobalV::ofs_running,"functional GCEc", atoms[i].dft[3]);
+			OUT(GlobalV::ofs_running,"nonlocal core correction", atoms[i].nlcc);
+//			OUT(GlobalV::ofs_running,"spin orbital",atoms[i].has_so);
+			OUT(GlobalV::ofs_running,"valence electrons", atoms[i].zv);
+			OUT(GlobalV::ofs_running,"lmax", atoms[i].lmax);
+			OUT(GlobalV::ofs_running,"number of zeta", atoms[i].nchi);
+			OUT(GlobalV::ofs_running,"number of projectors", atoms[i].nbeta);
 			for(int ib=0; ib<atoms[i].nbeta; ib++)
 			{
-				OUT(ofs_running,"L of projector", atoms[i].lll[ib]);
+				OUT(GlobalV::ofs_running,"L of projector", atoms[i].lll[ib]);
 			}
-//			OUT(ofs_running,"Grid Mesh Number", atoms[i].mesh);
+//			OUT(GlobalV::ofs_running,"Grid Mesh Number", atoms[i].mesh);
 		}
 			
 		//atoms[i].print_pseudo_us(ofs);
 	}
 
-//	if(MY_RANK==0)
+//	if(GlobalV::MY_RANK==0)
 //	{
 //		ofs.close();
 //	}
@@ -118,7 +118,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 
 void UnitCell_pseudo::print_unitcell_pseudo(const string &fn, output &outp)
 {
-	if(test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
+	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
 	ofstream ofs( fn.c_str() );
 
 	this->print_cell(ofs, outp);

@@ -19,7 +19,7 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::Allreduce(
 	 lock_insert(ATOMIC_FLAG_INIT),
 	 lock_atom_unset_read(0)
 {
-	data_all.resize(NSPIN);
+	data_all.resize(GlobalV::NSPIN);
 	
 	set<Abfs::Vector3_Order<int>> Born_Von_Karman_boxes;
 	for( int ix=0; ix!=Born_von_Karman_period.x; ++ix )
@@ -65,7 +65,7 @@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::Allreduce(
 
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::~Allreduce()
 {
-//ofstream ofs_mpi("allreduce_"+TO_STRING(MY_RANK),ofstream::app);
+//ofstream ofs_mpi("allreduce_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 //ofs_mpi<<"delete_begin\t"<<__FILE__<<__LINE__<<endl;
 	for( auto &oarp_isend_data : oarps_isend_data )
 		if(oarp_isend_data)
@@ -93,7 +93,7 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::grid_to_exx()
 {
 timeval t_start;
-ofstream ofs_mpi("allreduce_"+TO_STRING(MY_RANK),ofstream::app);
+ofstream ofs_mpi("allreduce_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 	
 	auto clear_oars = [&]( vector<MPI_Request> &requests, boost::dynamic_bitset<> &flags, vector<boost::mpi::packed_oarchive*> &oarps, const string &s )
 	{
@@ -265,7 +265,7 @@ void Exx_Abfs::Parallel::Communicate::DM::Allreduce::ask( const int rank_delta_n
 	if( rank_delta_now < comm_sz )
 	{
 timeval t_start;		
-ofstream ofs_thread("allreduce_"+TO_STRING(MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
+ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
 		const int rank_ask = ( my_rank + rank_delta_now ) % comm_sz;
 ofs_thread<<"ask_begin\t"<<rank_delta_now<<"\t"<<rank_ask<<endl;
 gettimeofday(&t_start, NULL);
@@ -294,7 +294,7 @@ void Exx_Abfs::Parallel::Communicate::DM::Allreduce::recv_data_process( const in
 		return true;
 	};
 timeval t_start;	
-ofstream ofs_thread("allreduce_"+TO_STRING(MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
+ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
 ofs_thread<<"recv\t"<<rank_data<<endl;
 
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> data_rank;
@@ -340,34 +340,34 @@ ofs_thread.close();
 void Exx_Abfs::Parallel::Communicate::DM::Allreduce::insert_data( 
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank )
 {
-	vector<const map<size_t,map<Abfs::Vector3_Order<int>,matrix>>*> data_rank_Ap(NSPIN,nullptr);
-	vector<const map<Abfs::Vector3_Order<int>,matrix>*> data_rank_Bp(NSPIN,nullptr);
-	vector<const matrix*> data_rank_Cp(NSPIN,nullptr);
-ofstream ofs_mpi("allreduce_"+TO_STRING(MY_RANK),ofstream::app);	
+	vector<const map<size_t,map<Abfs::Vector3_Order<int>,matrix>>*> data_rank_Ap(GlobalV::NSPIN,nullptr);
+	vector<const map<Abfs::Vector3_Order<int>,matrix>*> data_rank_Bp(GlobalV::NSPIN,nullptr);
+	vector<const matrix*> data_rank_Cp(GlobalV::NSPIN,nullptr);
+ofstream ofs_mpi("allreduce_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);	
 ofs_mpi<<"insert_data"<<endl;
 	
 	for( auto atom_unset_Ap=atom_unset.begin(); atom_unset_Ap!=atom_unset.end(); )
 	{
 		const size_t iat1 = atom_unset_Ap->first;
-		for( int is=0; is!=NSPIN; ++is )	data_rank_Ap[is] = static_cast<const map<size_t,map<Abfs::Vector3_Order<int>,matrix>>*>( MAP_EXIST( data_rank[is], iat1 ) );
+		for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Ap[is] = static_cast<const map<size_t,map<Abfs::Vector3_Order<int>,matrix>>*>( MAP_EXIST( data_rank[is], iat1 ) );
 		if( !data_rank_Ap[0] ){ ++atom_unset_Ap; continue; }
 //ofs_mpi<<" "<<iat1<<endl;
 		
 		for( auto atom_unset_Bp=atom_unset_Ap->second.begin(); atom_unset_Bp!=atom_unset_Ap->second.end(); )
 		{
 			const size_t iat2 = atom_unset_Bp->first;
-			for( int is=0; is!=NSPIN; ++is )	data_rank_Bp[is] = static_cast<const map<Abfs::Vector3_Order<int>,matrix>*>( MAP_EXIST( *data_rank_Ap[is], iat2 ) );
+			for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Bp[is] = static_cast<const map<Abfs::Vector3_Order<int>,matrix>*>( MAP_EXIST( *data_rank_Ap[is], iat2 ) );
 			if( !data_rank_Bp[0] ){ ++atom_unset_Bp; continue; }
 //ofs_mpi<<"  "<<iat2<<endl;
 		
 			for( auto atom_unset_Cp=atom_unset_Bp->second.begin(); atom_unset_Cp!=atom_unset_Bp->second.end(); )
 			{
 				const Abfs::Vector3_Order<int> &box2 = *atom_unset_Cp;
-				for( int is=0; is!=NSPIN; ++is )	data_rank_Cp[is] = static_cast<const matrix*>( MAP_EXIST( *data_rank_Bp[is], box2 ) );
+				for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Cp[is] = static_cast<const matrix*>( MAP_EXIST( *data_rank_Bp[is], box2 ) );
 				if( !data_rank_Cp[0] ){ ++atom_unset_Cp; continue; }
 //ofs_mpi<<"   "<<box2<<endl;
 				
-				for( int is=0; is!=NSPIN; ++is )
+				for( int is=0; is!=GlobalV::NSPIN; ++is )
 					if( data_rank_Cp[is]->c )
 					{
 						auto &data_all_C = data_all[is][iat1][iat2][box2];
@@ -394,34 +394,34 @@ ofs_mpi.close();
 void Exx_Abfs::Parallel::Communicate::DM::Allreduce::insert_data( 
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank )
 {
-	vector<map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>*> data_rank_Ap(NSPIN,nullptr);
-	vector<map<Abfs::Vector3_Order<int>,Matrix_Wrapper>*> data_rank_Bp(NSPIN,nullptr);
-	vector<Matrix_Wrapper*> data_rank_Cp(NSPIN,nullptr);
-ofstream ofs_thread("allreduce_"+TO_STRING(MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
+	vector<map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>*> data_rank_Ap(GlobalV::NSPIN,nullptr);
+	vector<map<Abfs::Vector3_Order<int>,Matrix_Wrapper>*> data_rank_Bp(GlobalV::NSPIN,nullptr);
+	vector<Matrix_Wrapper*> data_rank_Cp(GlobalV::NSPIN,nullptr);
+ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
 ofs_thread<<"insert_data"<<endl;
 	
 	for( auto atom_unset_Ap=atom_unset.begin(); atom_unset_Ap!=atom_unset.end(); )
 	{
 		const size_t iat1 = atom_unset_Ap->first;
-		for( int is=0; is!=NSPIN; ++is )	data_rank_Ap[is] = static_cast<map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>*>(MAP_EXIST( data_rank[is], iat1 ));
+		for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Ap[is] = static_cast<map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>*>(MAP_EXIST( data_rank[is], iat1 ));
 		if( !data_rank_Ap[0] ){ ++atom_unset_Ap; continue; }
 //ofs_thread<<" "<<iat1<<endl;
 		
 		for( auto atom_unset_Bp=atom_unset_Ap->second.begin(); atom_unset_Bp!=atom_unset_Ap->second.end(); )
 		{
 			const size_t iat2 = atom_unset_Bp->first;
-			for( int is=0; is!=NSPIN; ++is )	data_rank_Bp[is] = static_cast<map<Abfs::Vector3_Order<int>,Matrix_Wrapper>*>(MAP_EXIST( *data_rank_Ap[is], iat2 ));
+			for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Bp[is] = static_cast<map<Abfs::Vector3_Order<int>,Matrix_Wrapper>*>(MAP_EXIST( *data_rank_Ap[is], iat2 ));
 			if( !data_rank_Bp[0] ){ ++atom_unset_Bp; continue; }
 //ofs_thread<<"  "<<iat2<<endl;
 		
 			for( auto atom_unset_Cp=atom_unset_Bp->second.begin(); atom_unset_Cp!=atom_unset_Bp->second.end(); )
 			{
 				const Abfs::Vector3_Order<int> &box2 = *atom_unset_Cp;
-				for( int is=0; is!=NSPIN; ++is )	data_rank_Cp[is] = static_cast<Matrix_Wrapper*>(MAP_EXIST( *data_rank_Bp[is], box2 ));
+				for( int is=0; is!=GlobalV::NSPIN; ++is )	data_rank_Cp[is] = static_cast<Matrix_Wrapper*>(MAP_EXIST( *data_rank_Bp[is], box2 ));
 				if( !data_rank_Cp[0] ){ ++atom_unset_Cp; continue; }
 //ofs_thread<<"   "<<box2<<endl;
 				
-				for( int is=0; is!=NSPIN; ++is )
+				for( int is=0; is!=GlobalV::NSPIN; ++is )
 					if( data_rank_Cp[is]->c )
 					{
 						auto & data_all_C = data_all[is][iat1][iat2][box2];
@@ -450,7 +450,7 @@ ofs_thread.close();
 void Exx_Abfs::Parallel::Communicate::DM::Allreduce::send_data_process( const int rank_asked )
 {
 timeval t_start;
-ofstream ofs_thread("allreduce_"+TO_STRING(MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
+ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
 ofs_thread<<"send\t"<<rank_asked<<endl;
 	
 	map<size_t,map<size_t,set<Abfs::Vector3_Order<int>>>> atom_asked;
@@ -481,11 +481,11 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::get_data_local_wrapper( 
 	const map<size_t,map<size_t,set<Abfs::Vector3_Order<int>>>> & atom_asked ) const
 {
-//ofstream ofs_thread("allreduce_"+TO_STRING(MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
+//ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
 //ofs_thread<<"get_data_local_wrapper"<<endl;	
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(NSPIN);
-	for( int is=0; is!=NSPIN; ++is )
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &mw_is = mw[is];
 		const auto &data_local_is = data_local[is];
@@ -523,11 +523,11 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::get_data_local_wrapper( 
 	const map<size_t,map<size_t,set<Abfs::Vector3_Order<int>>>> & atom_asked ) const
 {
-ofstream ofs_thread("allreduce_"+TO_STRING(MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
+ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
 ofs_thread<<"get_data_local_wrapper"<<endl;	
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(NSPIN);
-	for( int is=0; is!=NSPIN; ++is )
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &mw_is = mw[is];
 		const auto &data_localw_is = data_localw[is];
@@ -563,11 +563,11 @@ ofs_thread.close();
 vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>>
 Exx_Abfs::Parallel::Communicate::DM::Allreduce::get_data_local_wrapper() const
 {
-ofstream ofs_thread("allreduce_"+TO_STRING(MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
+ofstream ofs_thread("allreduce_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(this_thread::get_id()),ofstream::app);
 ofs_thread<<"get_data_local_wrapper"<<endl;	
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(NSPIN);
-	for( int is=0; is!=NSPIN; ++is )
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> mw(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		const auto &data_local_is = data_local[is];
 		auto &mw_is = mw[is];

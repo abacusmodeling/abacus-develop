@@ -20,8 +20,8 @@ void Stress_Func::stress_nl(matrix& sigma){
 	}
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
-	ComplexMatrix dbecp( nkb, NBANDS);
-	ComplexMatrix becp( nkb, NBANDS);
+	ComplexMatrix dbecp( nkb, GlobalV::NBANDS);
+	ComplexMatrix becp( nkb, GlobalV::NBANDS);
 
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
 	ComplexMatrix vkb1( nkb, wf.npwx );
@@ -37,7 +37,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 		}
 		vkb2.zero_out();      
 		  
-		if (NSPIN==2) CURRENT_SPIN = kv.isk[ik];
+		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = kv.isk[ik];
 		wf.npw = kv.ngk[ik];
 		// generate vkb
 		if (ppcell.nkb > 0)
@@ -50,7 +50,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 		// vkb: Beta(nkb,npw)
 		// becp(nkb,nbnd): <Beta(nkb,npw)|psi(nbnd,npw)>
 		becp.zero_out();
-		for (int ib=0; ib<NBANDS; ib++)
+		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			for (int i=0;i<nkb;i++)
 			{
@@ -119,7 +119,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 				}//end nkb
  
 
-				for (int ib=0; ib<NBANDS; ib++)
+				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
 					for (int i=0; i<nkb; i++)
 					{
@@ -149,7 +149,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 
 //              double *cf = new double[ucell.nat*3];
 //              ZEROS(cf, ucell.nat);
-				for (int ib=0; ib<NBANDS; ib++)
+				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
 					double fac = wf.wg(ik, ib) * 1.0;
 					int iat = 0;
@@ -161,7 +161,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 						{
 							for (int ip=0; ip<Nprojs; ip++)
 							{
-								double ps = ppcell.deeq(CURRENT_SPIN, iat, ip, ip) ;
+								double ps = ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
 								const int inkb = sum + ip;
 								//out<<"\n ps = "<<ps;
 
@@ -213,7 +213,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 		symm.stress_symmetry(sigma, ucell);
 	}//end symmetry
 	
-	//  this->print(ofs_running, "nonlocal stress", stresnl);
+	//  this->print(GlobalV::ofs_running, "nonlocal stress", stresnl);
 	timer::tick("Stress_Func","stres_nl");
 	return;
 }
@@ -225,7 +225,7 @@ void Stress_Func::get_dvnl1
 	const int ipol
 )
 {
-	if(test_pp) TITLE("Stress_Func","get_dvnl1");
+	if(GlobalV::test_pp) TITLE("Stress_Func","get_dvnl1");
 
 	const int lmaxkb = ppcell.lmaxkb;
 	if(lmaxkb < 0)
@@ -253,16 +253,16 @@ void Stress_Func::get_dvnl1
 	int jkb = 0;
 	for(int it = 0;it < ucell.ntype;it++)
 	{
-		if(test_pp>1) OUT("it",it);
+		if(GlobalV::test_pp>1) OUT("it",it);
 		// calculate beta in G-space using an interpolation table
 		const int nbeta = ucell.atoms[it].nbeta;
 		const int nh = ucell.atoms[it].nh;
 
-		if(test_pp>1) OUT("nbeta",nbeta);
+		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
 
 		for (nb = 0;nb < nbeta;nb++)
 		{
-			if(test_pp>1) OUT("ib",nb);
+			if(GlobalV::test_pp>1) OUT("ib",nb);
 			for (ig = 0;ig < npw;ig++)
 			{
 				const double gnorm = gk[ig].norm() * ucell.tpiba;
@@ -271,7 +271,7 @@ void Stress_Func::get_dvnl1
 				//cout << "\n gk.norm = " << gnorm;
 
 				vq [ig] = PolyInt::Polynomial_Interpolation(
-						ppcell.tab, it, nb, NQX, DQ, gnorm );
+						ppcell.tab, it, nb, GlobalV::NQX, GlobalV::DQ, gnorm );
 
 			} // enddo
 
@@ -317,7 +317,7 @@ void Stress_Func::get_dvnl1
 void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 		const int ik)
 {
-	if(test_pp) TITLE("Stress","get_dvnl2");
+	if(GlobalV::test_pp) TITLE("Stress","get_dvnl2");
 //	timer::tick("Stress","get_dvnl2");
 
 	const int lmaxkb = ppcell.lmaxkb;
@@ -344,23 +344,23 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 	int jkb = 0;
 	for(int it = 0;it < ucell.ntype;it++)
 	{
-		if(test_pp>1) OUT("it",it);
+		if(GlobalV::test_pp>1) OUT("it",it);
 		// calculate beta in G-space using an interpolation table
 		const int nbeta = ucell.atoms[it].nbeta;
 		const int nh = ucell.atoms[it].nh;
 
-		if(test_pp>1) OUT("nbeta",nbeta);
+		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
 
 		for (nb = 0;nb < nbeta;nb++)
 		{
-			if(test_pp>1) OUT("ib",nb);
+			if(GlobalV::test_pp>1) OUT("ib",nb);
 			for (ig = 0;ig < npw;ig++)
 			{
 				const double gnorm = gk[ig].norm() * ucell.tpiba;
 	//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 	//cout << "\n gk.norm = " << gnorm;
 				vq [ig] = Polynomial_Interpolation_nl(
-						ppcell.tab, it, nb, DQ, gnorm );
+						ppcell.tab, it, nb, GlobalV::DQ, gnorm );
 
 			} // enddo
 

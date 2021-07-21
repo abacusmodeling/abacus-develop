@@ -16,7 +16,7 @@ void Run_MD_PW::md_ions_pw(void)
     TITLE("Run_MD_PW", "md_ions_pw");
     timer::tick("Run_MD_PW", "md_ions_pw");
 
-    if (OUT_LEVEL == "i")
+    if (GlobalV::OUT_LEVEL == "i")
     {
         cout << setprecision(12);
         cout << " " << setw(7) << "ISTEP"
@@ -32,13 +32,13 @@ void Run_MD_PW::md_ions_pw(void)
     }
 
     // allocation for ion movement.
-    if (FORCE)
+    if (GlobalV::FORCE)
     {
         IMM.allocate();
         CE.allocate_ions();
     }
 
-    if (STRESS) // pengfei Li 2018-05-14
+    if (GlobalV::STRESS) // pengfei Li 2018-05-14
     {
         LCM.allocate();
     }
@@ -49,18 +49,18 @@ void Run_MD_PW::md_ions_pw(void)
     this->istep = 1;
     bool stop = false;
 
-    while (istep <= NSTEP && !stop)
+    while (istep <= GlobalV::NSTEP && !stop)
     {
         time_t estart = time(NULL);
 
-        if (OUT_LEVEL == "ie")
+        if (GlobalV::OUT_LEVEL == "ie")
         {
             cout << " -------------------------------------------" << endl;    
             cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
             cout << " -------------------------------------------" << endl;
-            ofs_running << " -------------------------------------------" << endl;
-            ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            ofs_running << " -------------------------------------------" << endl;
+            GlobalV::ofs_running << " -------------------------------------------" << endl;
+            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
+            GlobalV::ofs_running << " -------------------------------------------" << endl;
         }
 
     //----------------------------------------------------------
@@ -91,7 +91,7 @@ void Run_MD_PW::md_ions_pw(void)
 
         // mohan added eiter to count for the electron iteration number, 2021-01-28
         int eiter = 0;
-        if (CALCULATION == "md")
+        if (GlobalV::CALCULATION == "md")
         {
 #ifdef __LCAO
             if (Exx_Global::Hybrid_Type::No == exx_global.info.hybrid_type)
@@ -131,7 +131,7 @@ void Run_MD_PW::md_ions_pw(void)
 #endif
         }
         // mohan added 2021-01-28, perform stochastic calculations
-        else if (CALCULATION == "md-sto")
+        else if (GlobalV::CALCULATION == "md-sto")
         {
             elec_sto.scf_stochastic(istep - 1);
             eiter = elec_sto.iter;
@@ -143,8 +143,8 @@ void Run_MD_PW::md_ions_pw(void)
         {
             stringstream ssp;
             stringstream ssp_ave;
-            ssp << global_out_dir << "ElecStaticPot";
-            ssp_ave << global_out_dir << "ElecStaticPot_AVE";
+            ssp << GlobalV::global_out_dir << "ElecStaticPot";
+            ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
             pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
@@ -180,15 +180,15 @@ void Run_MD_PW::md_ions_pw(void)
 
         //reset local potential and initial wave function
         pot.init_pot(istep, pw.strucFac);
-        ofs_running << " Setup the new wave functions?" << endl;
+        GlobalV::ofs_running << " Setup the new wave functions?" << endl;
         wf.wfcinit();
 
-        if (OUT_LEVEL == "i")
+        if (GlobalV::OUT_LEVEL == "i")
         {
             double etime_min = difftime(eend, estart) / 60.0;
             double ftime_min = difftime(fend, fstart) / 60.0;
             stringstream ss;
-            ss << MOVE_IONS << istep;
+            ss << GlobalV::MOVE_IONS << istep;
 
             cout << " " << setw(7) << ss.str()
                  << setw(5) << eiter
@@ -205,7 +205,7 @@ void Run_MD_PW::md_ions_pw(void)
         ++istep;
     }
 
-    if (OUT_LEVEL == "i")
+    if (GlobalV::OUT_LEVEL == "i")
     {
         cout << " ION DYNAMICS FINISHED :)" << endl;
     }
@@ -232,19 +232,19 @@ void Run_MD_PW::md_cells_pw()
     // init hamiltonian
     // only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.allocate(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
     ppcell.init_vloc(pw.nggm, ppcell.vloc);
-    DONE(ofs_running, "LOCAL POTENTIAL");
+    DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
     ppcell.init_vnl(ucell);
-    DONE(ofs_running, "NON-LOCAL POTENTIAL");
+    DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
     // calculate the total local pseudopotential in real space
@@ -253,7 +253,7 @@ void Run_MD_PW::md_cells_pw()
 
     pot.newd();
 
-    DONE(ofs_running, "INIT POTENTIAL");
+    DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //==================================================
     // create ppcell.tab_at , for trial wave functions.
@@ -263,7 +263,7 @@ void Run_MD_PW::md_cells_pw()
     //================================
     // Initial start wave functions
     //================================
-    if (NBANDS != 0 || (CALCULATION != "scf-sto" && CALCULATION != "relax-sto" && CALCULATION != "md-sto")) //qianrui add
+    if (GlobalV::NBANDS != 0 || (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto" && GlobalV::CALCULATION != "md-sto")) //qianrui add
     {
         wf.wfcinit();
     }
@@ -283,17 +283,17 @@ void Run_MD_PW::md_cells_pw()
     }
 #endif
 
-    DONE(ofs_running, "INIT BASIS");
+    DONE(GlobalV::ofs_running, "INIT BASIS");
 
     // ion optimization begins
     // electron density optimization is included in ion optimization
 
     this->md_ions_pw();
 
-    ofs_running << "\n\n --------------------------------------------" << endl;
-    ofs_running << setprecision(16);
-    ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
-    ofs_running << " --------------------------------------------\n\n" << endl;
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+    GlobalV::ofs_running << setprecision(16);
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     timer::tick("Run_MD_PW", "md_cells_pw");
 }

@@ -18,19 +18,19 @@ void Cell_PW::opt_cells_pw()
     // init hamiltonian
     // only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.allocate(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
     ppcell.init_vloc(pw.nggm, ppcell.vloc);
-    DONE(ofs_running, "LOCAL POTENTIAL");
+    DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
     ppcell.init_vnl(ucell);
-    DONE(ofs_running, "NON-LOCAL POTENTIAL");
+    DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
     // calculate the total local pseudopotential in real space
@@ -39,7 +39,7 @@ void Cell_PW::opt_cells_pw()
 
     pot.newd();
 
-    DONE(ofs_running, "INIT POTENTIAL");
+    DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //==================================================
     // create ppcell.tab_at , for trial wave functions.
@@ -49,7 +49,7 @@ void Cell_PW::opt_cells_pw()
     //================================
     // Initial start wave functions
     //================================
-    if (NBANDS != 0 || (CALCULATION != "scf-sto" && CALCULATION != "relax-sto" && CALCULATION != "md-sto")) //qianrui add
+    if (GlobalV::NBANDS != 0 || (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto" && GlobalV::CALCULATION != "md-sto")) //qianrui add
     {
         wf.wfcinit();
     }
@@ -69,7 +69,7 @@ void Cell_PW::opt_cells_pw()
     }
 #endif
 
-    DONE(ofs_running, "INIT BASIS");
+    DONE(GlobalV::ofs_running, "INIT BASIS");
 
     // ion optimization begins
     // electron density optimization is included in ion optimization

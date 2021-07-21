@@ -78,22 +78,22 @@ void Grid_BigCell::init_big_latvec(void)
 	// (x,y,z) * bigcell_latvec0^(-1) = (i,j,k)
 	this->bigcell_GT = this->bigcell_latvec0.Inverse();
 
-	if(test_gridt)
+	if(GlobalV::test_gridt)
 	{
-		ofs_running << " the VECTORS of BIGCELL are (Bohr): " << endl;
-		ofs_running << " vec1( " 
+		GlobalV::ofs_running << " the VECTORS of BIGCELL are (Bohr): " << endl;
+		GlobalV::ofs_running << " vec1( " 
 			<< setw(15) << bigcell_vec1[0]
 			<< setw(15) << bigcell_vec1[1]
 			<< setw(15) << bigcell_vec1[2] 
 			<< ")" << endl;
 
-		ofs_running << " vec2( " 
+		GlobalV::ofs_running << " vec2( " 
 			<< setw(15) << bigcell_vec2[0]
 			<< setw(15) << bigcell_vec2[1]
 			<< setw(15) << bigcell_vec2[2]
 			<< ")" << endl;
 
-		ofs_running << " vec3( " 
+		GlobalV::ofs_running << " vec3( " 
 			<< setw(15) << bigcell_vec3[0]
 			<< setw(15) << bigcell_vec3[1]
 			<< setw(15) << bigcell_vec3[2]
@@ -113,7 +113,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	{
 		this->orbital_rmax = std::max( ORB.Phi[T].getRcut(), this->orbital_rmax);
 	}
-	if(test_gridt)OUT(ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
 
 	// calculate the distance between bigcell.
 	// in other word, calculate the distance one bigcell point
@@ -124,7 +124,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->bigcell_dy = ucell.a2.norm() * ucell.lat0 / (double)nby;	
 	this->bigcell_dz = ucell.a3.norm() * ucell.lat0 / (double)nbz;
 
-	if(test_gridt)OUT(ofs_running,"Length of Meshcell (Bohr): ",bigcell_dx,bigcell_dy,bigcell_dz);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Length of Meshcell (Bohr): ",bigcell_dx,bigcell_dy,bigcell_dz);
 	
 	assert( bigcell_dx > 0.0);
 	assert( bigcell_dy > 0.0);
@@ -164,8 +164,8 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->dye = static_cast<int>( this->orbital_rmax * g2) +1;
 	this->dze = static_cast<int>( this->orbital_rmax * g3) +1;
 
-	//xiaohui add 'OUT_LEVEL' line, 2015-09-16
-	if(OUT_LEVEL != "m") OUT(ofs_running,"extended fft grid",dxe,dye,dze);
+	//xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"extended fft grid",dxe,dye,dze);
 
 	// calculate the dimension of expanded grid.
 	// +1 in order to cover the spillage atom on the right side.
@@ -178,7 +178,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	this->nze = nbz + 2*dze +1;
 	this->nxyze = this->nxe * this->nye * this->nze;
 
-	if(OUT_LEVEL != "m") OUT(ofs_running,"dimension of extened grid",nxe,nye,nze);
+	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"dimension of extened grid",nxe,nye,nze);
 	return;
 }
 
@@ -322,7 +322,7 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 	timer::tick("Grid_BigCell","grid_expansion_index");
 //	cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << endl;
 //	stringstream ss;
-//	ss << global_out_dir << "expand_grid.dat";
+//	ss << GlobalV::global_out_dir << "expand_grid.dat";
 //	ofstream ofs(ss.str().c_str());
 	
 	int ii,jj,kk,in_ext,in_normal;

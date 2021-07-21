@@ -20,25 +20,25 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 {
 	/*{
 		static int istep=0;
-		ofstream ofs("HR_exx_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofstream ofs("HR_exx_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		ofs<<HR_exx<<endl;
 	}*/
 
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D");
 	
-//ofstream ofs_time("time_"+TO_STRING(MY_RANK),ofstream::app);
+//ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 //timeval t_start;	
 
 //gettimeofday( &t_start, NULL);	
 	MPI_Barrier(MPI_COMM_WORLD);		// Peize Lin test
 //ofs_time<<"TIME@ MPI_Barrier\t"<<time_during(t_start)<<endl;
-//ofs_matrixes( exx_lcao.test_dir+"test-HR_exx_"+TO_STRING(MY_RANK), HR_exx );
+//ofs_matrixes( exx_lcao.test_dir+"test-HR_exx_"+TO_STRING(GlobalV::MY_RANK), HR_exx );
 	
 //gettimeofday( &t_start, NULL);
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HR_a2D;
 	if(io_HR_a2D.first)
 		HR_a2D = Exx_Abfs::IO::input_binary<vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>>(
-			global_out_dir+"HR_exx_"+TO_STRING(MY_RANK));
+			GlobalV::global_out_dir+"HR_exx_"+TO_STRING(GlobalV::MY_RANK));
 	else
 	{
 		#if EXX_H_COMM==1
@@ -51,25 +51,25 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 		#endif
 	}
 	if(io_HR_a2D.second)
-		Exx_Abfs::IO::output_binary( HR_a2D, global_out_dir+"HR_exx_"+TO_STRING(MY_RANK) );
+		Exx_Abfs::IO::output_binary( HR_a2D, GlobalV::global_out_dir+"HR_exx_"+TO_STRING(GlobalV::MY_RANK) );
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D\t"<<time_during(t_start)<<endl;
-//ofs_matrixes( exx_lcao.test_dir+"test-HR_a2D_"+TO_STRING(MY_RANK), HR_a2D );
+//ofs_matrixes( exx_lcao.test_dir+"test-HR_a2D_"+TO_STRING(GlobalV::MY_RANK), HR_a2D );
 
 	/*{
 		static int istep=0;
-		ofstream ofs("HR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
+		ofstream ofs("HR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		ofs<<HR_a2D<<endl;
 	}*/
 
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 		Ra2D_to_Km2D_mixing(HR_a2D, HK_Gamma_m2D, HK_Gamma_m2D_pulay_seq);
 	else
 		Ra2D_to_Km2D_mixing(HR_a2D, HK_K_m2D, HK_K_m2D_pulay_seq);
 
 	/*{
 		static int istep=0;
-		ofstream ofs("HK_m2D_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
-		if(GAMMA_ONLY_LOCAL)
+		ofstream ofs("HK_m2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 			ofs<<HK_Gamma_m2D<<endl;
 		else
 			ofs<<HK_K_m2D<<endl;

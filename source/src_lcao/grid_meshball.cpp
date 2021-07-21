@@ -70,7 +70,7 @@ void Grid_MeshBall::init_meshball(void)
 			}
 		}
 	}
-	if(test_gridt)OUT(ofs_running, "how many cells in meshball",this->meshball_ncells);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running, "how many cells in meshball",this->meshball_ncells);
 
 	// prepare for the second calculation.
 	if(!flag_mp)

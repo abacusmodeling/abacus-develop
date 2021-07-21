@@ -25,7 +25,7 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 		wfc[ik] = read_wfc( "hvec/hvec_"+TO_STRING(istep)+"_"+TO_STRING(ik) );	
 	
 	
-	const double SPIN_multiple = 0.5*NSPIN;
+	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
 	map<size_t,map<size_t,vector<ComplexMatrix>>> DMk_raw;
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
@@ -44,7 +44,7 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 			{
 				for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
 				{
-					for( size_t ib=0; ib!=NBANDS; ++ib )
+					for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 					{
 							DMk_raw[iat1][iat2][ik](iw1,iw2) += wf_wg(ik,ib) * conj(wfc[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)]) * wfc[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)];
 					}
@@ -60,11 +60,11 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 
 vector<vector<complex<double>>> Exx_Abfs_DM_Test::read_wfc( const string &file_name )
 {
-	vector<vector<complex<double>>> wfc(NBANDS,vector<complex<double>>(NLOCAL));
+	vector<vector<complex<double>>> wfc(GlobalV::NBANDS,vector<complex<double>>(GlobalV::NLOCAL));
 	ifstream ifs(file_name);
-	for( size_t iw=0; iw!=NLOCAL; ++iw )
+	for( size_t iw=0; iw!=GlobalV::NLOCAL; ++iw )
 	{
-		for( size_t ib=0; ib!=NBANDS; ++ib )
+		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 		{
 			double a,b;
 			ifs>>a>>b;
@@ -79,11 +79,11 @@ vector<vector<complex<double>>> Exx_Abfs_DM_Test::read_wfc( const string &file_n
 
 matrix Exx_Abfs_DM_Test::read_wg( const string &file_name )
 {
-	matrix wf_wg(kv.nks,NBANDS);
+	matrix wf_wg(kv.nks,GlobalV::NBANDS);
 	ifstream ifs(file_name);
 	for( size_t ik=0; ik!=kv.nks; ++ik )
 	{
-		for( size_t ib=0; ib!=NBANDS; ++ib )
+		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 		{
 			ifs>>wf_wg(ik,ib);
 		}

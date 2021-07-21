@@ -30,38 +30,38 @@ void energy::perform_dos(void)
 
     if(out_dos !=0 || out_band !=0)
     {
-        ofs_running << "\n\n\n\n";
-        ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-        ofs_running << " |                                                                    |" << endl;
-        ofs_running << " | Post-processing of data:                                           |" << endl;
-        ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
-        ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
-        ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
-        ofs_running << " | done here.                                                         |" << endl;
-        ofs_running << " |                                                                    |" << endl;
-        ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-        ofs_running << "\n\n\n\n";
+        GlobalV::ofs_running << "\n\n\n\n";
+        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+        GlobalV::ofs_running << " |                                                                    |" << endl;
+        GlobalV::ofs_running << " | Post-processing of data:                                           |" << endl;
+        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
+        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
+        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
+        GlobalV::ofs_running << " | done here.                                                         |" << endl;
+        GlobalV::ofs_running << " |                                                                    |" << endl;
+        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        GlobalV::ofs_running << "\n\n\n\n";
     }
 
 
-/*	if(MY_RANK==0)
+/*	if(GlobalV::MY_RANK==0)
 	{
-		if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
+		if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
 		{
 			stringstream ss;
-			ss << global_out_dir << "istate.info" ;
+			ss << GlobalV::global_out_dir << "istate.info" ;
 			ofstream ofsi( ss.str().c_str() );
-			*for(int ib=0; ib<NBANDS; ++ib)
+			*for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				ofsi << "0 " << ib+1;
-				for(int is=0; is<NSPIN; ++is)
+				for(int is=0; is<GlobalV::NSPIN; ++is)
 				{
 					ofsi << " " << wf.ekb[is][ib];
 					}
 					ofsi << endl;
 					}
 			// pengfei 2015-4-1
-			if(NSPIN == 1||NSPIN == 4)
+			if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 			{ 
 				for (int ik = 0;ik < kv.nks;ik++)
 				{                       
@@ -70,7 +70,7 @@ void energy::perform_dos(void)
 					<<setw(25)<<"Occupation"
 					<<setw(25)<<"Kpoint = "<<ik+1
 					<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
-					for(int ib=0;ib<NBANDS;ib++)
+					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
 						ofsi<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<wf.wg(ik,ib)<<endl;
 					}
@@ -88,7 +88,7 @@ void energy::perform_dos(void)
 					<<setw(25)<<"Occupation"
 					<<setw(25)<<"Kpoint = "<<ik+1
 					<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
-					for(int ib=0;ib<NBANDS;ib++)
+					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
 						ofsi<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV
 						<<setw(25)<<wf.wg(ik,ib)
@@ -107,23 +107,23 @@ void energy::perform_dos(void)
 */
 
 	//qianrui modify 2020-10-18
-	if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax")
+	if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax")
 	{
 		stringstream ss;
-		ss << global_out_dir << "istate.info" ;
-		if(MY_RANK==0)
+		ss << GlobalV::global_out_dir << "istate.info" ;
+		if(GlobalV::MY_RANK==0)
 		{
 			ofstream ofsi( ss.str().c_str() ); // clear istate.info
 			ofsi.close();
 		}
-		for(int ip=0; ip<NPOOL; ip++)
+		for(int ip=0; ip<GlobalV::NPOOL; ip++)
 		{
 			MPI_Barrier(MPI_COMM_WORLD);
-			if( MY_POOL == ip )
+			if( GlobalV::MY_POOL == ip )
 			{
-				if( RANK_IN_POOL != 0 ) continue;
+				if( GlobalV::RANK_IN_POOL != 0 ) continue;
 				ofstream ofsi2( ss.str().c_str(), ios::app );
-				if(NSPIN == 1||NSPIN == 4)
+				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 				{
 					for (int ik = 0;ik < kv.nks;ik++)
 					{
@@ -132,7 +132,7 @@ void energy::perform_dos(void)
 						<<setw(25)<<"Occupation"
 						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
 						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
-						for(int ib=0;ib<NBANDS;ib++)
+						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<wf.wg(ik,ib)<<endl;
 						}
@@ -152,7 +152,7 @@ void energy::perform_dos(void)
 						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
 						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
 
-						for(int ib=0;ib<NBANDS;ib++)
+						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1
 							<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV
@@ -172,9 +172,9 @@ void energy::perform_dos(void)
 	}
 
 
-	// mulliken charge analysis
+	// GlobalV::mulliken charge analysis
 #ifdef __LCAO
-	if(mulliken == 1)
+	if(GlobalV::mulliken == 1)
 	{
 		Mulliken_Charge   MC;
 		MC.stdout_mulliken();			
@@ -182,7 +182,7 @@ void energy::perform_dos(void)
 #endif
 
 	int nspin0=1;
-	if(NSPIN==2) nspin0=2;
+	if(GlobalV::NSPIN==2) nspin0=2;
 
 	if(this->out_dos)
 	{
@@ -191,7 +191,7 @@ void energy::perform_dos(void)
 		double emin = wf.ekb[0][0];
 		for(int ik=0; ik<kv.nks; ++ik)
 		{
-			for(int ib=0; ib<NBANDS; ++ib)
+			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				emax = std::max( emax, wf.ekb[ik][ib] );
 				emin = std::min( emin, wf.ekb[ik][ib] );
@@ -212,22 +212,22 @@ void energy::perform_dos(void)
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
-			//	OUT(ofs_running,"minimal energy is (eV)", emin);
-			//	OUT(ofs_running,"maximal energy is (eV)", emax);
+			//	OUT(GlobalV::ofs_running,"minimal energy is (eV)", emin);
+			//	OUT(GlobalV::ofs_running,"maximal energy is (eV)", emax);
 		//  output the PDOS file.////qifeng-2019-01-21
 		// 		atom_arrange::set_sr_NL();
-		//		atom_arrange::search( SEARCH_RADIUS );//qifeng-2019-01-21
+		//		atom_arrange::search( GlobalV::SEARCH_RADIUS );//qifeng-2019-01-21
 		const double de_ev = this->dos_edelta_ev;
 
 
 		const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
 
-		int NUM=NLOCAL*npoints;
+		int NUM=GlobalV::NLOCAL*npoints;
 		Wfc_Dm_2d D;
 		D.init();
-		if(GAMMA_ONLY_LOCAL)
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			for(int in=0;in<NSPIN;in++)
+			for(int in=0;in<GlobalV::NSPIN;in++)
 			{
 
 				D.wfc_gamma[in]=LOC.wfc_dm_2d.wfc_gamma[in];
@@ -252,7 +252,7 @@ void energy::perform_dos(void)
 		{
 
 
-			pdosk[is].create(NLOCAL,np,true);
+			pdosk[is].create(GlobalV::NLOCAL,np,true);
 
 
 
@@ -260,7 +260,7 @@ void energy::perform_dos(void)
 		matrix*  pdos = new matrix[nspin0];
 		for(int is=0; is<nspin0; ++is)
 		{
-			pdos[is].create(NLOCAL,np,true);
+			pdos[is].create(GlobalV::NLOCAL,np,true);
 
 		}
 
@@ -268,13 +268,13 @@ void energy::perform_dos(void)
 		double c=2*3.141592653;
 		double b = sqrt(c)*a;                                         
 
-		complex<double>*waveg = new complex<double>[NLOCAL];
+		complex<double>*waveg = new complex<double>[GlobalV::NLOCAL];
 
 		double*Gauss = new double[np];
 
 		for(int is=0; is<nspin0; ++is)
 		{
-			if(GAMMA_ONLY_LOCAL)
+			if(GlobalV::GAMMA_ONLY_LOCAL)
 			{
 				std::vector<matrix>   Mulk;
 				Mulk.resize(1);
@@ -282,9 +282,9 @@ void energy::perform_dos(void)
 
 
 				matrix Dwf = D.wfc_gamma[is];
-				for (int i=0; i<NBANDS; ++i)		  
+				for (int i=0; i<GlobalV::NBANDS; ++i)		  
 				{     
-					ZEROS(waveg, NLOCAL);
+					ZEROS(waveg, GlobalV::NLOCAL);
 
 					ZEROS(Gauss,np);
 					for (int n=0; n<npoints; ++n)		  
@@ -305,7 +305,7 @@ void energy::perform_dos(void)
 					const char T_char='T';		
 					pdgemv_(
 							&T_char,
-							&NLOCAL,&NLOCAL,
+							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
 							LM.Sloc, &one_int, &one_int, ParaO.desc,
 							Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
@@ -313,7 +313,7 @@ void energy::perform_dos(void)
 							Mulk[0].c, &one_int, &NB, ParaO.desc,
 							&one_int);
 
-					for (int j=0; j<NLOCAL; ++j)
+					for (int j=0; j<GlobalV::NLOCAL; ++j)
 					{
 
 						if ( ParaO.in_this_processor(j,i) )
@@ -330,24 +330,24 @@ void energy::perform_dos(void)
 			}//if
 			else
 			{
-				SEARCH_RADIUS = atom_arrange::set_sr_NL(
-					ofs_running,
-					OUT_LEVEL,
+				GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
+					GlobalV::ofs_running,
+					GlobalV::OUT_LEVEL,
 					ORB.get_rcutmax_Phi(), 
 					ORB.get_rcutmax_Beta(), 
-					GAMMA_ONLY_LOCAL);
+					GlobalV::GAMMA_ONLY_LOCAL);
 
 				atom_arrange::search(
-					SEARCH_PBC,
-					ofs_running,
+					GlobalV::SEARCH_PBC,
+					GlobalV::ofs_running,
 					GridD, 
 					ucell, 
-					SEARCH_RADIUS, 
-					test_atom_input);//qifeng-2019-01-21
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
 				LOWF.orb_con.set_orb_tables(
-						ofs_running,
+						GlobalV::ofs_running,
 						UOT, 
 						ORB,
 						ucell.ntype,
@@ -360,8 +360,8 @@ void energy::perform_dos(void)
 						INPUT.out_descriptor,
 						INPUT.out_r_matrix,
 						Exx_Abfs::Lmax,
-						FORCE,
-						MY_RANK);
+						GlobalV::FORCE,
+						GlobalV::MY_RANK);
 
 				LM.allocate_HS_R(LNNR.nnr);
 				LM.zeros_HSR('S', LNNR.nnr);
@@ -384,10 +384,10 @@ void energy::perform_dos(void)
 
 						ComplexMatrix Dwfc = conj(D.wfc_k[ik]);
 
-						for (int i=0; i<NBANDS; ++i)		  
+						for (int i=0; i<GlobalV::NBANDS; ++i)		  
 						{     
 
-							ZEROS(waveg, NLOCAL);
+							ZEROS(waveg, GlobalV::NLOCAL);
 
 
 							ZEROS(Gauss,np);
@@ -409,7 +409,7 @@ void energy::perform_dos(void)
 
 							pzgemv_(
 									&T_char,
-									&NLOCAL,&NLOCAL,
+									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float,
 									LM.Sloc2, &one_int, &one_int, ParaO.desc,
 									Dwfc.c, &one_int, &NB, ParaO.desc, &one_int,
@@ -419,7 +419,7 @@ void energy::perform_dos(void)
 
 
 
-							for (int j=0; j<NLOCAL; ++j)
+							for (int j=0; j<GlobalV::NLOCAL; ++j)
 							{
 
 								if ( ParaO.in_this_processor(j,i) )
@@ -442,12 +442,12 @@ void energy::perform_dos(void)
 				}//ik
 #ifdef __MPI
 				atom_arrange::delete_vector(
-					ofs_running,
-					SEARCH_PBC, 
+					GlobalV::ofs_running,
+					GlobalV::SEARCH_PBC, 
 					GridD, 
 					ucell, 
-					SEARCH_RADIUS, 
-					test_atom_input);
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
 				LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
@@ -457,18 +457,18 @@ void energy::perform_dos(void)
 	 }//is                                              
 	 delete[] pdosk;                                               
 	 delete[] waveg;
-	 if(MY_RANK == 0)
+	 if(GlobalV::MY_RANK == 0)
 	 {
 		 {  stringstream ps;
-			 ps << global_out_dir << "TDOS";
+			 ps << GlobalV::global_out_dir << "TDOS";
 			 ofstream out(ps.str().c_str());
-			 if (NSPIN==1)
+			 if (GlobalV::NSPIN==1)
 			 {
 
 				 for (int n=0; n<npoints; ++n)
 				 { double y=0.0;
 					 double en=emin + n * de_ev;
-					 for (int i=0; i<NLOCAL; i++)
+					 for (int i=0; i<GlobalV::NLOCAL; i++)
 					 {
 						 y +=  pdos[0](i,n);
 					 }  
@@ -476,13 +476,13 @@ void energy::perform_dos(void)
 					 out <<setw(20)<< en <<setw(30)<< y << endl;
 				 }
 			 }
-			 else if (NSPIN==2)
+			 else if (GlobalV::NSPIN==2)
 			 {
 				 for (int n=0; n<npoints; ++n)
 				 { double y=0.0;
 					 double z=0.0;
 					 double en=emin + n * de_ev;
-					 for (int i=0; i<NLOCAL; i++)
+					 for (int i=0; i<GlobalV::NLOCAL; i++)
 					 {
 						 y +=  pdos[0](i,n);
 						 z +=  pdos[1](i,n);
@@ -525,12 +525,12 @@ void energy::perform_dos(void)
 		 Name_Angular[4][8] = "g9         ";
 
 		 {stringstream as;
-			 as << global_out_dir << "PDOS";
+			 as << GlobalV::global_out_dir << "PDOS";
 			 ofstream out(as.str().c_str());
 
 			 out << "<"<<"pdos"<<">" <<endl;
-			 out << "<"<<"nspin"<<">" << NSPIN<< "<"<<"/"<<"nspin"<<">"<< endl;
-			 out << "<"<<"norbitals"<<">" <<setw(2) <<NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< endl;
+			 out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< endl;
+			 out << "<"<<"norbitals"<<">" <<setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< endl;
 			 out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<endl;
 
 			 for (int n=0; n<npoints; ++n)
@@ -561,7 +561,7 @@ void energy::perform_dos(void)
 					 out <<setw(2)<< "z"<<"="<<"\""<<setw(40)<<N1+1<<"\""<<endl;
 					 out << ">" <<endl;
 					 out << "<"<<"data"<<">" <<endl;
-					 if (NSPIN==1)
+					 if (GlobalV::NSPIN==1)
 					 {
 						 for (int n=0; n<npoints; ++n)
 						 {
@@ -570,7 +570,7 @@ void energy::perform_dos(void)
 							 out <<setw(13)<< pdos[0](w,n)<<endl;
 						 }//n
 					 }
-					 else if (NSPIN==2)
+					 else if (GlobalV::NSPIN==2)
 					 {
 						 for (int n=0; n<npoints; ++n)
 						 {
@@ -586,7 +586,7 @@ void energy::perform_dos(void)
 			 out << "<"<<"/"<<"pdos"<<">" <<endl;
 			 out.close();}
 		 {  stringstream os;
-			 os<<global_out_dir<<"Orbital";
+			 os<<GlobalV::global_out_dir<<"Orbital";
 			 ofstream out(os.str().c_str());
 			 out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<endl;
 
@@ -621,7 +621,7 @@ void energy::perform_dos(void)
 	 for(int is=0; is<nspin0; ++is)
 	 {
 		 stringstream ss;
-		 ss << global_out_dir << "DOS" << is+1;
+		 ss << GlobalV::global_out_dir << "DOS" << is+1;
 
 		 Dos::calculate_dos(
 				 is,
@@ -630,7 +630,7 @@ void energy::perform_dos(void)
 				 this->dos_edelta_ev, 
 				 emax, 
 				 emin, 
-				 kv.nks, kv.nkstot, kv.wk, wf.wg, NBANDS, wf.ekb );
+				 kv.nks, kv.nkstot, kv.wk, wf.wg, GlobalV::NBANDS, wf.ekb );
 		 ifstream in(ss.str().c_str());
 		 if(!in)
 		 {
@@ -697,7 +697,7 @@ void energy::perform_dos(void)
 		 // EXPLAIN : output DOS2.txt
 		 //----------------------------------------------------------
 		 stringstream sss;
-		 sss << global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
+		 sss << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
 		 ofstream out(sss.str().c_str());
 		 double sum2=0.0;
 		 for(int i=0;i<number;i++)
@@ -725,22 +725,22 @@ void energy::perform_dos(void)
 	 }
 
 
-		// mulliken charge analysis
+		// GlobalV::mulliken charge analysis
 		if(out_dos == 2)
 		{
 			stringstream sp;
-			sp << global_out_dir << "Mulliken.dat";
+			sp << GlobalV::global_out_dir << "Mulliken.dat";
 			Dos::calculate_Mulliken(sp.str());
 		}
 	
 		if(nspin0==1)
 		{
-			ofs_running << " Fermi energy is " << this->ef << " Rydberg" << endl;
+			GlobalV::ofs_running << " Fermi energy is " << this->ef << " Rydberg" << endl;
 		}
 		else if(nspin0==2)
 		{
-			ofs_running << " Fermi energy (spin = 1) is " << this->ef_up << " Rydberg" << endl;
-			ofs_running << " Fermi energy (spin = 2) is " << this->ef_dw << " Rydberg" << endl;
+			GlobalV::ofs_running << " Fermi energy (spin = 1) is " << this->ef_up << " Rydberg" << endl;
+			GlobalV::ofs_running << " Fermi energy (spin = 2) is " << this->ef_dw << " Rydberg" << endl;
 		}
 
 		//int nks;
@@ -749,12 +749,12 @@ void energy::perform_dos(void)
 
 
 
-		/*for(int is=0; is<NSPIN; is++)
+		/*for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			stringstream ss2;
-			ss2 << global_out_dir << "BANDS_" << is+1 << ".dat";
-			ofs_running << "\n Output bands in file: " << ss2.str() << endl;
-			Dos::nscf_band(is, ss2.str(), nks, NBANDS, this->ef, wf.ekb);
+			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
+			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << endl;
+			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef, wf.ekb);
 		}*/
 		
 		if(out_dos==3)
@@ -762,8 +762,8 @@ void energy::perform_dos(void)
 			for(int i=0; i<nspin0; i++)
 			{
 				stringstream ss3;
-				ss3 << global_out_dir << "Fermi_Surface_" << i << ".bxsf";
-				Dos::nscf_fermi_surface(ss3.str(),kv.nks,NBANDS,wf.ekb);
+				ss3 << GlobalV::global_out_dir << "Fermi_Surface_" << i << ".bxsf";
+				Dos::nscf_fermi_surface(ss3.str(),kv.nks,GlobalV::NBANDS,wf.ekb);
 			}
 		}
 	}
@@ -782,9 +782,9 @@ void energy::perform_dos(void)
 		for(int is=0; is<nspin0; is++)
 		{
 			stringstream ss2;
-			ss2 << global_out_dir << "BANDS_" << is+1 << ".dat";
-			ofs_running << "\n Output bands in file: " << ss2.str() << endl;
-			Dos::nscf_band(is, ss2.str(), nks, NBANDS, this->ef*0, wf.ekb);
+			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
+			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << endl;
+			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, wf.ekb);
 		}
 
 	}

@@ -61,9 +61,9 @@ void Hamilt_PW::init_k(const int ik)
 	
 	// mohan add 2010-09-30
 	// (1) Which spin to use.
-	if(NSPIN==2)
+	if(GlobalV::NSPIN==2)
 	{
-		CURRENT_SPIN = kv.isk[ik];
+		GlobalV::CURRENT_SPIN = kv.isk[ik];
 	}
 
 	// (2) Kinetic energy.
@@ -72,12 +72,12 @@ void Hamilt_PW::init_k(const int ik)
 	// (3) Take the local potential.
 	for (int ir=0; ir<pw.nrxx; ir++)
 	{
-		pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);//mohan add 2007-11-12
+		pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
 
 	// (4) Calculate nonlocal pseudopotential vkb
 	//if (ppcell.nkb > 0 && !LINEAR_SCALING) xiaohui modify 2013-09-02
-	if(ppcell.nkb > 0 && (BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
+	if(ppcell.nkb > 0 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
 	{
 		ppcell.getvnl(ik);
 	}
@@ -121,15 +121,15 @@ void Hamilt_PW::diagH_subspace(
 	int dmax=0;
 	const int npw = kv.ngk[ik];
 
-	if(NSPIN != 4)
+	if(GlobalV::NSPIN != 4)
 	{
 		dmin= npw;
 		dmax = wf.npwx;
 	}
 	else 
 	{
-		dmin = wf.npwx*NPOL;
-		dmax = wf.npwx*NPOL;
+		dmin = wf.npwx*GlobalV::NPOL;
+		dmax = wf.npwx*GlobalV::NPOL;
 	}
 
 	//qianrui improve this part 2021-3-14
@@ -152,7 +152,7 @@ void Hamilt_PW::diagH_subspace(
 
 	// Peize Lin add 2019-03-09
 #ifdef __LCAO
-	if(BASIS_TYPE=="lcao_in_pw")
+	if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{
 		auto add_Hexx = [&](const double alpha)
 		{
@@ -179,7 +179,7 @@ void Hamilt_PW::diagH_subspace(
 	}
 #endif
 
-	if(NPROC_IN_POOL>1)
+	if(GlobalV::NPROC_IN_POOL>1)
 	{
 		Parallel_Reduce::reduce_complex_double_pool( hc.c, nstart*nstart );
 		Parallel_Reduce::reduce_complex_double_pool( sc.c, nstart*nstart );
@@ -191,7 +191,7 @@ void Hamilt_PW::diagH_subspace(
 
 	// Peize Lin add 2019-03-09
 #ifdef __LCAO
-	if("lcao_in_pw"==BASIS_TYPE)
+	if("lcao_in_pw"==GlobalV::BASIS_TYPE)
 	{
 		switch(exx_global.info.hybrid_type)
 		{
@@ -211,7 +211,7 @@ void Hamilt_PW::diagH_subspace(
 // for tests
 /*
 		cout << setprecision(3);
-		out.printV3(ofs_running,kv.kvec_c[ik]);
+		out.printV3(GlobalV::ofs_running,kv.kvec_c[ik]);
 		out.printcm_norm("sc",sc,1.0e-4);
 		out.printcm_norm("hvec",hvec,1.0e-4);
 		out.printcm_norm("hc",hc,1.0e-4);
@@ -225,9 +225,9 @@ void Hamilt_PW::diagH_subspace(
 //--------------------------
 /*
 	cout << "  hc matrix" << endl;
-	for(int i=0; i<NLOCAL; i++)
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			double a = hc(i,j).real();
 			if(abs(a) < 1.0e-5) a = 0;
@@ -237,9 +237,9 @@ void Hamilt_PW::diagH_subspace(
 	}
 
 	cout << "  sc matrix" << endl;
-	for(int i=0; i<NLOCAL; i++)
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			double a = sc(i,j).real();
 			if(abs(a) < 1.0e-5) a = 0;
@@ -249,7 +249,7 @@ void Hamilt_PW::diagH_subspace(
 	}
 
 	cout << "\n Band Energy" << endl;
-	for(int i=0; i<NBANDS; i++)
+	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
 		cout << " e[" << i+1 << "]=" << en[i] * Ry_to_eV << endl;
 	}
@@ -259,12 +259,12 @@ void Hamilt_PW::diagH_subspace(
 //--------------------------
 
 
-	if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") && CALCULATION=="nscf" && !Optical::opt_epsilon2)
+	if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") && GlobalV::CALCULATION=="nscf" && !Optical::opt_epsilon2)
 	{
-		ofs_running << " Not do zgemm to get evc." << endl;
+		GlobalV::ofs_running << " Not do zgemm to get evc." << endl;
 	}
-	else if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") 
-		&& ( CALCULATION == "scf" || CALCULATION == "md" || CALCULATION == "relax")) //pengfei 2014-10-13
+	else if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") 
+		&& ( GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "relax")) //pengfei 2014-10-13
 	{
 		// because psi and evc are different here,
 		// I think if psi and evc are the same, 
@@ -352,16 +352,16 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
     int j = 0;
     int ig= 0;
 
-	//if(NSPIN!=4) ZEROS(hpsi, wf.npw);
-	//else ZEROS(hpsi, wf.npwx * NPOL);//added by zhengdy-soc
-	int dmax = wf.npwx * NPOL;
+	//if(GlobalV::NSPIN!=4) ZEROS(hpsi, wf.npw);
+	//else ZEROS(hpsi, wf.npwx * GlobalV::NPOL);//added by zhengdy-soc
+	int dmax = wf.npwx * GlobalV::NPOL;
 
 	//------------------------------------
 	//(1) the kinetical energy.
 	//------------------------------------
 	complex<double> *tmhpsi;
 	const complex<double> *tmpsi_in;
- 	if(T_IN_H)
+ 	if(GlobalV::T_IN_H)
 	{	
 		tmhpsi = hpsi;
 		tmpsi_in = psi_in;
@@ -371,7 +371,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 			{
 				tmhpsi[ig] = wf.g2kin[ig] * tmpsi_in[ig];
 			}
-			if(NSPIN==4){
+			if(GlobalV::NSPIN==4){
 				for(ig=wf.npw; ig < wf.npwx; ++ig)
 				{
 					tmhpsi[ig] = 0;
@@ -396,13 +396,13 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 	//(2) the local potential.
 	//-----------------------------------
 	timer::tick("Hamilt_PW","vloc");
-	if(VL_IN_H)
+	if(GlobalV::VL_IN_H)
 	{
 		tmhpsi = hpsi;
 		tmpsi_in = psi_in;
 		for(int ib = 0 ; ib < m; ++ib)
 		{
-			if(NSPIN!=4){
+			if(GlobalV::NSPIN!=4){
 				ZEROS( UFFT.porter, pw.nrxx);
 				UFFT.RoundTrip( tmpsi_in, pot.vr_eff1, GR_index, UFFT.porter );
 				for (j = 0;j < wf.npw;j++)
@@ -457,49 +457,49 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 	// (3) the nonlocal pseudopotential.
 	//------------------------------------
 	timer::tick("Hamilt_PW","vnl");
-	if(VNL_IN_H)
+	if(GlobalV::VNL_IN_H)
 	{
 		if ( ppcell.nkb > 0)
 		{
 			//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			//qianrui optimize 2021-3-31
 			int nkb=ppcell.nkb;
-			ComplexMatrix becp(NPOL * m, nkb, false);
+			ComplexMatrix becp(GlobalV::NPOL * m, nkb, false);
 			char transa = 'C';
 			char transb = 'N';
-			if(m==1 && NPOL==1)
+			if(m==1 && GlobalV::NPOL==1)
 			{
 				int inc = 1;
 				zgemv_(&transa, &wf.npw, &nkb, &ONE, ppcell.vkb.c, &wf.npwx, psi_in, &inc, &ZERO, becp.c, &inc);
 			}
 			else
 			{
-				int npm = NPOL * m;
+				int npm = GlobalV::NPOL * m;
 				zgemm_(&transa,&transb,&nkb,&npm,&wf.npw,&ONE,ppcell.vkb.c,&wf.npwx,psi_in,&wf.npwx,&ZERO,becp.c,&nkb);
 				//add_nonlocal_pp is moddified, thus tranpose not needed here.
-				//if(NONCOLIN)
+				//if(GlobalV::NONCOLIN)
 				//{
-				//	ComplexMatrix partbecp(NPOL, nkb ,false);
+				//	ComplexMatrix partbecp(GlobalV::NPOL, nkb ,false);
 				//	for(int ib = 0; ib < m; ++ib)
 				//	{
 //
-				//		for ( i = 0;i < NPOL;i++)
+				//		for ( i = 0;i < GlobalV::NPOL;i++)
 				//			for (j = 0;j < nkb;j++)
 				//				partbecp(i, j) = tmbecp[i*nkb+j];
 				//		for (j = 0; j < nkb; j++)
-				//			for (i = 0;i < NPOL;i++)
-				//				tmbecp[j*NPOL+i] = partbecp(i, j);
-				//		tmbecp += NPOL * nkb;
+				//			for (i = 0;i < GlobalV::NPOL;i++)
+				//				tmbecp[j*GlobalV::NPOL+i] = partbecp(i, j);
+				//		tmbecp += GlobalV::NPOL * nkb;
 				//	}
 				//}
 			}
 
-			Parallel_Reduce::reduce_complex_double_pool( becp.c, nkb * NPOL * m);
+			Parallel_Reduce::reduce_complex_double_pool( becp.c, nkb * GlobalV::NPOL * m);
 
 			this->add_nonlocal_pp(hpsi, becp.c, m);
 			//======================================================================
-			/*complex<double> *becp = new complex<double>[ ppcell.nkb * NPOL ];
-			ZEROS(becp,ppcell.nkb * NPOL);
+			/*complex<double> *becp = new complex<double>[ ppcell.nkb * GlobalV::NPOL ];
+			ZEROS(becp,ppcell.nkb * GlobalV::NPOL);
 			for (i=0;i< ppcell.nkb;i++)
 			{
 				const complex<double>* p = &ppcell.vkb(i,0);
@@ -507,14 +507,14 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 				const complex<double>* psip = psi_in; 
 				for (;p<p_end;++p,++psip)
 				{
-					if(!NONCOLIN) becp[i] += psip[0]* conj( p[0] );
+					if(!GlobalV::NONCOLIN) becp[i] += psip[0]* conj( p[0] );
 					else{
 						becp[i*2] += psip[0]* conj( p[0] );
 						becp[i*2+1] += psip[wf.npwx]* conj( p[0] );
 					}
 				}
 			}
-			Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * NPOL);
+			Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * GlobalV::NPOL);
 			this->add_nonlocal_pp(hpsi, becp);
 			delete[] becp;*/
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -538,12 +538,12 @@ void Hamilt_PW::add_nonlocal_pp(
 	// number of projectors
 	int nkb = ppcell.nkb;
 
-	complex<double> *ps  = new complex<double> [nkb * NPOL * m];
-    ZEROS(ps, NPOL * m * nkb);
+	complex<double> *ps  = new complex<double> [nkb * GlobalV::NPOL * m];
+    ZEROS(ps, GlobalV::NPOL * m * nkb);
 
     int sum = 0;
     int iat = 0;
-    if(NSPIN!=4)
+    if(GlobalV::NSPIN!=4)
 	{
 		for (int it=0; it<ucell.ntype; it++)
 		{
@@ -560,7 +560,7 @@ void Hamilt_PW::add_nonlocal_pp(
 						for(int ib = 0; ib < m ; ++ib)
 						{
 							ps[(sum + ip2) * m + ib] += 
-							ppcell.deeq(CURRENT_SPIN, iat, ip, ip2) 
+							ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) 
 							* becp[ib * nkb + sum + ip];
 						}//end ib
 					}// end ih
@@ -624,7 +624,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	//qianrui optimize 2021-3-31
 	char transa = 'N';
 	char transb = 'T';
-	if(NPOL==1 && m==1)
+	if(GlobalV::NPOL==1 && m==1)
 	{
 		int inc = 1;
 		zgemv_(&transa, 
@@ -641,7 +641,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	}
 	else
 	{
-		int npm = NPOL*m;
+		int npm = GlobalV::NPOL*m;
 		zgemm_(&transa,
 			&transb,
 			&wf.npw,
@@ -658,7 +658,7 @@ void Hamilt_PW::add_nonlocal_pp(
 	}
 
 	//======================================================================
-	/*if(!NONCOLIN)
+	/*if(!GlobalV::NONCOLIN)
 	for(int i=0; i<ppcell.nkb; i++)
 	{
 		complex<double>* p = &ppcell.vkb(i,0);
@@ -961,7 +961,7 @@ complex<double> Hamilt_PW::ddot(
 	// mohan add 2010-10-11
 	zdotc_(&result, &dim, psi_L, &incx, psi_R, &incy); 
     
-	if(NPROC_IN_POOL>1)
+	if(GlobalV::NPROC_IN_POOL>1)
 	{
 		Parallel_Reduce::reduce_complex_double_pool( result );
 	}
@@ -983,8 +983,8 @@ complex<double> Hamilt_PW::just_ddot(
 	static int warn_about_zdotc=true;
 	if(warn_about_zdotc)
 	{
-		ofs_warning << " in Hamilt_PW::just_ddot, sometimes zdotc is not available due to GNU compiler!!!" << endl;
-		ofs_warning << " So here I use simple for cicle to replace zdotc, but it will affect the speed." << endl;
+		GlobalV::ofs_warning << " in Hamilt_PW::just_ddot, sometimes zdotc is not available due to GNU compiler!!!" << endl;
+		GlobalV::ofs_warning << " So here I use simple for cicle to replace zdotc, but it will affect the speed." << endl;
 		warn_about_zdotc=false;
 	}
 	for(int i=0; i<dim; ++i)

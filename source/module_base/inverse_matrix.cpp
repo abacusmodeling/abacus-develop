@@ -17,7 +17,7 @@ Inverse_Matrix_Complex::~Inverse_Matrix_Complex()
 
 void Inverse_Matrix_Complex::init(const int &dim_in)
 {
-//	ofs_running << " allocate=" << allocate << endl;
+//	GlobalV::ofs_running << " allocate=" << allocate << endl;
 	if(allocate)
 	{
 		delete[] e; //mohan fix bug 2012-04-02

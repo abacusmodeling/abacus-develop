@@ -26,19 +26,19 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
     set_ethr();
     
-	if(OUT_LEVEL=="ie")
+	if(GlobalV::OUT_LEVEL=="ie")
 	{
 		cout << setprecision(12);
     	cout<< " " << setw(7)<< "ITER"; 
 
-		if(NSPIN==2)
+		if(GlobalV::NSPIN==2)
 		{
 			cout<<setw(10)<<"TMAG";
 			cout<<setw(10)<<"AMAG";
 		}
 	
-        cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
-		if(KS_SOLVER=="cg") 
+        cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "GlobalV::DRHO2"; // pengfei Li added 2015-1-31
+		if(GlobalV::KS_SOLVER=="cg") 
 		{
 			cout<<setw(11)<<"CG_ITER";
 		}
@@ -49,7 +49,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	}
 
 	Symmetry_rho srho;
-	for(int is=0; is<NSPIN; is++)
+	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		srho.begin(is, CHR, pw, Pgrid, symm);
 	}
@@ -62,9 +62,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	STO_WF.init();
 	int chetype = 1;
 
-	for (this->iter = 1;iter <= NITER;iter++)
+	for (this->iter = 1;iter <= GlobalV::NITER;iter++)
     {
-		ofs_running 
+		GlobalV::ofs_running 
 		<< "\n PW-STOCHASTIC ALGO --------- ION=" << setw(4) << istep + 1
 		<< "  ELEC=" << setw(4) << iter 
 		<< "--------------------------------\n";
@@ -76,7 +76,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			CHR.new_e_iteration = false;
 		}
-		if(FINAL_SCF && iter==1)
+		if(GlobalV::FINAL_SCF && iter==1)
         {
             CHR.irstep=0;
             CHR.idstep=0;
@@ -90,17 +90,17 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		//(1) set converged threshold, 
 		// automatically updated during self consistency.
         //this->update_ethr(iter);
-        if(FINAL_SCF && iter==1) 
+        if(GlobalV::FINAL_SCF && iter==1) 
 		{
-			ETHR = 1.0e-4/CHR.nelec; //smaller ETHR than KS-DFT
+			GlobalV::ETHR = 1.0e-4/CHR.nelec; //smaller GlobalV::ETHR than KS-DFT
 		}
         else 
 		{
 			if (iter == 2)
         	{
-            	ETHR = 1.0e-4/CHR.nelec;
+            	GlobalV::ETHR = 1.0e-4/CHR.nelec;
         	}
-			ETHR = std::min( ETHR, 0.1*dr2/ std::max(1.0, CHR.nelec));
+			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.1*dr2/ std::max(1.0, CHR.nelec));
         }
 
         
@@ -113,7 +113,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
 		//(2) calculate band energy using cg or davidson method.
 		// output the new eigenvalues and wave functions.
-		if(NBANDS > 0 && MY_POOL == 0)
+		if(GlobalV::NBANDS > 0 && GlobalV::MY_POOL == 0)
 		{
 			this->c_bands(istep+1);
 		}
@@ -134,17 +134,17 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		//(3) save change density as previous charge,
 		// prepared fox mixing.
-		if(MY_POOL == 0)
+		if(GlobalV::MY_POOL == 0)
 		{
         	CHR.save_rho_before_sum_band();
 		}
 
 		//prepare wavefunction&eband for other pools
 #ifdef __MPI
-		if(NBANDS > 0)
+		if(GlobalV::NBANDS > 0)
 		{
-			MPI_Bcast(wf.evc[0].c, wf.npwx*NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
-			MPI_Bcast(wf.ekb[0], NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
+			MPI_Bcast(wf.evc[0].c, wf.npwx*GlobalV::NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
+			MPI_Bcast(wf.ekb[0], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
 		}
 #endif
 		
@@ -172,20 +172,20 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		//(5) calculate new charge density 
 		// calculate KS rho.
-		if(NBANDS > 0)
+		if(GlobalV::NBANDS > 0)
 		{
-			if(MY_POOL == 0)
+			if(GlobalV::MY_POOL == 0)
 			{
 				CHR.sum_band();
 			}
 			else
 			{
-				for(int is=0; is<NSPIN; is++)
+				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
 					ZEROS(CHR.rho[is], pw.nrxx);
 				}
 			}
-			//for(int is = 0; is < NSPIN; ++is)
+			//for(int is = 0; is < GlobalV::NSPIN; ++is)
 			//{
 			//	MPI_Bcast(CHR.rho[is], pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
 			//}
@@ -195,7 +195,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		}
 		else
 		{
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
 				ZEROS(CHR.rho[is], pw.nrxx);
 			}
@@ -212,7 +212,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 
 		Symmetry_rho srho;
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			srho.begin(is, CHR, pw, Pgrid, symm);
 		}
@@ -228,10 +228,10 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		double diago_error = 0.0;
 		if(iter==1) 
 		{
-			// if 'dr2 < ETHR * nelec' happen,
+			// if 'dr2 < GlobalV::ETHR * nelec' happen,
 			// in other word, 'dr2 < diago_error'
-			// we update ETHR.
-			diago_error = ETHR*std::max(1.0, CHR.nelec);
+			// we update GlobalV::ETHR.
+			diago_error = GlobalV::ETHR*std::max(1.0, CHR.nelec);
 		}
 
 		// if converged is achieved, or the self-consistent error(dr2)
@@ -241,9 +241,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// rho contain the output charge density.
 		// in other cases rhoin contains the mixed charge density
 		// (the new input density) while rho is unchanged.
-		if(MY_POOL == 0)
+		if(GlobalV::MY_POOL == 0)
 		{
-			CHR.mix_rho(dr2,diago_error,DRHO2,iter,conv_elec);
+			CHR.mix_rho(dr2,diago_error,GlobalV::DRHO2,iter,conv_elec);
 		}
 
 #ifdef __MPI
@@ -252,7 +252,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		MPI_Bcast(CHR.rho[0], pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
 #endif
 
-		//			if(MY_RANK==0)
+		//			if(GlobalV::MY_RANK==0)
 		//			{
 		//				ofs_mix << setw(5) << iter << setw(20) << dr2 << endl; 
 		//			}
@@ -261,15 +261,15 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			if (dr2 < diago_error)
 			{
-				ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
+				GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
 				WARNING("scf","Threshold on eigenvalues was too large.");
-				ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << endl;
+				GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << endl;
 
-				// update ETHR.
-				ofs_running << " Origin ETHR = " << ETHR << endl;
-				ETHR = dr2 / CHR.nelec;
-				ofs_running << " New    ETHR = " << ETHR << endl;
+				// update GlobalV::ETHR.
+				GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << endl;
+				GlobalV::ETHR = dr2 / CHR.nelec;
+				GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << endl;
 				//                  goto first_iter_again;
 			}
 		}
@@ -288,7 +288,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         }
         else
         {
-			for(int is=0; is<NSPIN; ++is)
+			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				for(int ir=0; ir<pw.nrxx; ++ir)
 				{
@@ -308,10 +308,10 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
             
 
 		// output for tmp.
-		for(int is=0; is<NSPIN; is++)
+		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
 			stringstream ssc;
-			ssc << global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
+			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
 			CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
 		}
         
@@ -319,42 +319,42 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 			pot.set_vr_eff();
         
-        //print_eigenvalue(ofs_running);
+        //print_eigenvalue(GlobalV::ofs_running);
 		en.calculate_etot();
 
 	
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		en.print_etot(conv_elec, istep, iter, dr2, duration, ETHR, avg_iter);	
-        if (conv_elec || iter==NITER)
+		en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);	
+        if (conv_elec || iter==GlobalV::NITER)
         {
-			for(int is=0; is<NSPIN; is++)
+			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
         		stringstream ssc;
-        		ssc << global_out_dir << "SPIN" << is + 1 << "_CHG";
+        		ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
         		CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 			}
               	 
 			if(conv_elec)
 			{
-				//ofs_running << " convergence is achieved" << endl;			
-				//ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
-				ofs_running << " charge density convergence is achieved" << endl;
-                                ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+				//GlobalV::ofs_running << " convergence is achieved" << endl;			
+				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+				GlobalV::ofs_running << " charge density convergence is achieved" << endl;
+                                GlobalV::ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
 			}
 			else
 			{
-				ofs_running << " convergence has NOT been achieved!" << endl;			
+				GlobalV::ofs_running << " convergence has NOT been achieved!" << endl;			
 			}
 							
-			iter_end(ofs_running);
+			iter_end(GlobalV::ofs_running);
 			timer::tick("Elec_Stochastic","scf_stochastic");
             return;
         }
 		
         //if ( imix >= 0 )  CHR.rho = CHR.rho_save;
-        //ofs_running << "\n start next iterate for idum ";
+        //GlobalV::ofs_running << "\n start next iterate for idum ";
 		
     } 
 	
@@ -378,18 +378,18 @@ bool Stochastic_Elec::check_stop_now(void)
 
 void Stochastic_Elec::c_bands(const int &istep)
 {
-	if (test_elec) TITLE("electrons","c_bands");
+	if (GlobalV::test_elec) TITLE("electrons","c_bands");
 	timer::tick("Elec_Stochastic","c_bands");
 
 	int precondition_type = 2;
 
-	double *h_diag = new double[wf.npwx * NPOL];//added by zhengdy-soc
-	ZEROS(h_diag, wf.npwx * NPOL);
+	double *h_diag = new double[wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
+	ZEROS(h_diag, wf.npwx * GlobalV::NPOL);
     
 	avg_iter = 0.0;
        
-	ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
-	ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
+	GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
+	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
 
 	for (int ik = 0;ik < kv.nks;ik++)
 	{
@@ -405,7 +405,7 @@ void Stochastic_Elec::c_bands(const int &istep)
             for (int ig = 0;ig < wf.npw; ig++)
 			{
 				h_diag[ig] = max(1.0, wf.g2kin[ig]);
-				if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+				if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
 			}
         }
         else if (precondition_type==2)
@@ -413,11 +413,11 @@ void Stochastic_Elec::c_bands(const int &istep)
             for (int ig = 0;ig < wf.npw; ig++)
 			{
 				h_diag[ig] = 1 + wf.g2kin[ig] + sqrt( 1 + (wf.g2kin[ig] - 1) * (wf.g2kin[ig] - 1));
-				if(NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+				if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
 			}
         }
 		//h_diag can't be zero!  //zhengdy-soc
-		if(NPOL==2)
+		if(GlobalV::NPOL==2)
 		{
 			for(int ig = wf.npw;ig < wf.npwx; ig++)
 			{
@@ -439,17 +439,17 @@ void Stochastic_Elec::c_bands(const int &istep)
 		const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
 
-		ofs_running << " " << setw(8) 
+		GlobalV::ofs_running << " " << setw(8) 
 			<< ik+1 << setw(15) 
 			<< avg_iter_k << setw(15) << duration << endl;
 	}//End K Loop
 
 
-	if(BASIS_TYPE=="pw")
+	if(GlobalV::BASIS_TYPE=="pw")
 	{
-		//		ofs_running << " avg_iteri " << avg_iter << endl;
+		//		GlobalV::ofs_running << " avg_iteri " << avg_iter << endl;
 		//Parallel_Reduce::reduce_double_allpool(avg_iter); //mohan fix bug 2012-06-05
-		//		ofs_running << " avg_iter_after " << avg_iter << endl;
+		//		GlobalV::ofs_running << " avg_iter_after " << avg_iter << endl;
 		//avg_iter /= static_cast<double>(kv.nkstot);
 	}
 

@@ -22,7 +22,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 	{
 		igcc_is_lyp = true;
 	}
-	const int nspin_in = NSPIN;
+	const int nspin_in = GlobalV::NSPIN;
 	assert(nspin_in>0);
 	const double fac = 1.0/ nspin_in;
 

@@ -30,8 +30,8 @@ vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Order::distribute(
 			if(neighbour(iat1,iat2))
 				pairs.push_back( {iat1,iat2} );
 			
-	const size_t work = std::ceil(static_cast<double>(pairs.size())/NPROC);
+	const size_t work = std::ceil(static_cast<double>(pairs.size())/GlobalV::NPROC);
 	return vector<pair<size_t,size_t>>{ 
-		std::min( pairs.begin()+ MY_RANK   *work, pairs.end() ),
-		std::min( pairs.begin()+(MY_RANK+1)*work, pairs.end() )};
+		std::min( pairs.begin()+ GlobalV::MY_RANK   *work, pairs.end() ),
+		std::min( pairs.begin()+(GlobalV::MY_RANK+1)*work, pairs.end() )};
 }

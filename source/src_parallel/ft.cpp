@@ -106,7 +106,7 @@ void FFT::FFT3D(matrix &psi, const int sign)
 
 void FFT::setupFFT3D(const int nx, const int ny, const int nz)
 {
-	if(test_fft) TITLE("FFT","setupFFT3D");
+	if(GlobalV::test_fft) TITLE("FFT","setupFFT3D");
 
 	this->plan_nx = nx;
 	this->plan_ny = ny;
@@ -216,7 +216,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 {
 	//timer::tick("FFT","Setup_MPI_FFT3D");
 	
-	if(test_fft) TITLE("FFT","setup_MPI_FFT3D");
+	if(GlobalV::test_fft) TITLE("FFT","setup_MPI_FFT3D");
 	this->plan_nx = nx;
 	this->plan_ny = ny;
 	this->plan_nz = nz;
@@ -227,13 +227,13 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 	if (in_pool)
 	{
-		this->rank_use = RANK_IN_POOL;
-		this->nproc_use = NPROC_IN_POOL;
+		this->rank_use = GlobalV::RANK_IN_POOL;
+		this->nproc_use = GlobalV::NPROC_IN_POOL;
 	}
 	else
 	{
-		this->rank_use = MY_RANK;
-		this->nproc_use = NPROC;
+		this->rank_use = GlobalV::MY_RANK;
+		this->nproc_use = GlobalV::NPROC;
 	}
 
 	/*
@@ -394,7 +394,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 
 	//timer::tick("FFT","Setup_MPI_FFT3D");
 
-	if(test_fft)cout << "\n FFTW setup done";
+	if(GlobalV::test_fft)cout << "\n FFTW setup done";
 	return;
 }
 
