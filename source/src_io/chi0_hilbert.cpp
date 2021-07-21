@@ -1647,7 +1647,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	}
 	else if(GlobalV::NSPIN == 4)
 	{
-		cout<<"GlobalV::NSPIN = "<<GlobalV::NSPIN<<endl;
+		cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
 		for(int ik=0; ik<kv.nks; ik++)
 		{
 			int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);

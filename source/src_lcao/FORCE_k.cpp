@@ -205,7 +205,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 	// 2d means this adjacent information is for HPSEPS's kind
 	// of division of H matrix.
 	//----------------------------------------------------------
- 	//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+ 	//xiaohui add "OUT_LEVEL", 2015-09-16
 	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " Calculate the energy density matrix with k " << endl;
 	Record_adj RA;
 	RA.for_2d();
@@ -938,7 +938,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 //		ZEROS (LM.DHloc_fixedR_x, LNNR.nnr);
 //		ZEROS (LM.DHloc_fixedR_y, LNNR.nnr);
 //		ZEROS (LM.DHloc_fixedR_z, LNNR.nnr);
-//		cout << " GlobalV::CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
+//		cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
 
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{

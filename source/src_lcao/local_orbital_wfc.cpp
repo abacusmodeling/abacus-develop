@@ -73,7 +73,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 	TITLE("Local_Orbital_wfc","allocate_k");
 	if(GlobalV::NLOCAL < GlobalV::NBANDS)
 	{
-		WARNING_QUIT("Local_Orbital_wfc::allocate","GlobalV::NLOCAL<GlobalV::NBANDS");
+		WARNING_QUIT("Local_Orbital_wfc::allocate","NLOCAL<GlobalV::NBANDS");
 	}
 
 	// mohan add the flag 2011-03-02

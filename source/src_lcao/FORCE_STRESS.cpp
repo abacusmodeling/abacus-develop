@@ -270,7 +270,7 @@ void Force_Stress_LCAO::getForceStress(
 				fcs(iat, i) -= sum/nat;
 			}
 
-			//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+			//xiaohui add "OUT_LEVEL", 2015-09-16
 			if(GlobalV::OUT_LEVEL != "m")
 			{
 				GlobalV::ofs_running << " correction force for each atom along direction "
@@ -329,7 +329,7 @@ void Force_Stress_LCAO::getForceStress(
 			//-------------------------------
 			if(GlobalV::EFIELD)
 			{
-				this->print_force("GlobalV::EFIELD     FORCE",fefield,1,ry);
+				this->print_force("EFIELD     FORCE",fefield,1,ry);
 			}
 			if(vdwd2_para.flag_vdwd2||vdwd3_para.flag_vdwd3)
 			{

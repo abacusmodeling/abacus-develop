@@ -460,8 +460,8 @@ void UnitCell_pseudo::cal_nwfc(void)
 //		OUT(GlobalV::ofs_running,"start position of local orbitals",atoms[it].stapos_wf);
 	}
 	
-	//OUT(GlobalV::ofs_running,"GlobalV::NLOCAL",GlobalV::NLOCAL);
-	GlobalV::ofs_running << " " << setw(40) << "GlobalV::NLOCAL" << " = " << GlobalV::NLOCAL <<endl;
+	//OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
+	GlobalV::ofs_running << " " << setw(40) << "NLOCAL" << " = " << GlobalV::NLOCAL <<endl;
 	//========================================================
 	// (4) set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
 	//========================================================
@@ -553,7 +553,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	//=====================
 	if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
 	{
-		AUTO_SET("GlobalV::NBANDS",GlobalV::NBANDS);
+		AUTO_SET("NBANDS",GlobalV::NBANDS);
 	}
 	else // plane wave basis
 	{
@@ -561,7 +561,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 		//{
 		//	if(GlobalV::NBANDS < GlobalV::NLOCAL)
 		//	{
-		//		WARNING_QUIT("cal_nwfc","GlobalV::NBANDS must > GlobalV::NLOCAL !");
+		//		WARNING_QUIT("cal_nwfc","NBANDS must > GlobalV::NLOCAL !");
 		//	}
 		//}
 	}

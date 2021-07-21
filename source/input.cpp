@@ -93,8 +93,8 @@ void Input::Init(const string &fn)
 	cout << setiosflags(ios::left);
 
 	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << endl;
-	OUT(GlobalV::ofs_running,"GlobalV::global_out_dir", GlobalV::global_out_dir);
-	OUT(GlobalV::ofs_running,"GlobalV::global_in_card", GlobalV::global_in_card);
+	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
+	OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
 	OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
 
 	OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
@@ -1515,11 +1515,11 @@ bool Input::Read(const string &fn)
 	             ifs >> qcar[i][0]; ifs >> qcar[i][1]; read_value(ifs, qcar[i][2]);
 	         }
 	    }
-        else if (strcmp("GlobalV::ocp", word) == 0)
+        else if (strcmp("ocp", word) == 0)
         {
             read_value(ifs, GlobalV::ocp);
         }
-		else if (strcmp("GlobalV::ocp_set", word) == 0)
+		else if (strcmp("ocp_set", word) == 0)
 		{
 			getline(ifs, GlobalV::ocp_set);
 //			ifs.ignore(150, '\n');
@@ -1528,7 +1528,7 @@ bool Input::Read(const string &fn)
         // {
             // read_value(ifs, ocp_n);
         // }
-        // else if (strcmp("GlobalV::ocp_kb", word) == 0)
+        // else if (strcmp("ocp_kb", word) == 0)
         // {
              // for(int i=0; i<(ocp_n-1); i++)
              // {
@@ -1536,7 +1536,7 @@ bool Input::Read(const string &fn)
              // }
 			// read_value(ifs, GlobalV::ocp_kb[ocp_n-1]);
         // }
-		else if (strcmp("GlobalV::mulliken", word) == 0)
+		else if (strcmp("mulliken", word) == 0)
 		{
 			read_value(ifs, GlobalV::mulliken);
 		}//qifeng add 2019/9/10
@@ -2349,12 +2349,12 @@ void Input::Check(void)
     TITLE("Input","Check");
 
 	if(nbands < 0) WARNING_QUIT("Input","NBANDS must > 0");
-//	if(nbands_istate < 0) WARNING_QUIT("Input","GlobalV::NBANDS_ISTATE must > 0");
+//	if(nbands_istate < 0) WARNING_QUIT("Input","NBANDS_ISTATE must > 0");
 	if(nb2d < 0) WARNING_QUIT("Input","nb2d must > 0");
 	if(ntype < 0) WARNING_QUIT("Input","ntype must > 0");
 
 	//cout << "diago_proc=" << diago_proc << endl;
-	//cout << " GlobalV::NPROC=" << GlobalV::NPROC << endl;
+	//cout << " NPROC=" << GlobalV::NPROC << endl;
 	if(diago_proc<=0)
 	{
 		diago_proc = GlobalV::NPROC;

@@ -1133,7 +1133,7 @@ void Charge::cal_nelec(void)
 			int nbands4 = 1.2 * nelec;
 			GlobalV::NBANDS = max(nbands3, nbands4);
 		}
-		AUTO_SET("GlobalV::NBANDS",GlobalV::NBANDS);
+		AUTO_SET("NBANDS",GlobalV::NBANDS);
 	}
 	//else if ( GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 	else
@@ -1157,15 +1157,15 @@ void Charge::cal_nelec(void)
     {
         if( GlobalV::NBANDS > GlobalV::NLOCAL )
         {
-            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","GlobalV::NLOCAL < GlobalV::NBANDS");
+            WARNING_QUIT("UnitCell_pseudo::cal_nwfc","NLOCAL < GlobalV::NBANDS");
         }
         else
         {
-            OUT(GlobalV::ofs_running,"GlobalV::NLOCAL",GlobalV::NLOCAL);
-            OUT(GlobalV::ofs_running,"GlobalV::NBANDS",GlobalV::NBANDS);
+            OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
+            OUT(GlobalV::ofs_running,"NBANDS",GlobalV::NBANDS);
         }
     }
 
-	OUT(GlobalV::ofs_running,"GlobalV::NBANDS",GlobalV::NBANDS);
+	OUT(GlobalV::ofs_running,"NBANDS",GlobalV::NBANDS);
 	return;
 }

@@ -126,7 +126,7 @@ void Record_adj::for_2d(void)
 		}//end I1
 	}//end T1
 
- 	//xiaohui add "GlobalV::OUT_LEVEL", 2015-09-16
+ 	//xiaohui add "OUT_LEVEL", 2015-09-16
 	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"irr",irr);
 	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"LNNR.nnr",LNNR.nnr);
 

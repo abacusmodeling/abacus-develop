@@ -185,7 +185,7 @@ inline void cal_DM_ATOM_nc(
 
     if(GlobalV::NSPIN !=4 ) 
 	{
-		WARNING_QUIT("Local_Orbital_Charge","GlobalV::NSPIN not match!");
+		WARNING_QUIT("Local_Orbital_Charge","NSPIN not match!");
 	}
 
     const char transa='N';

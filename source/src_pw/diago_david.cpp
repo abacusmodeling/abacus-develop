@@ -224,7 +224,7 @@ void Diago_David::cal_grad
     complex<double>* respsi
 )
 {
-    if ( test_david ==1 ) TITLE("GlobalV::DIAGO_DAVID","cal_grad");
+    if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_grad");
     timer::tick("Diago_David", "cal_grad"
     );
 
@@ -280,7 +280,7 @@ void Diago_David::cal_elem
     ComplexMatrix &sc
 )
 {
-    if ( test_david ==1 ) TITLE("GlobalV::DIAGO_DAVID","cal_elem");
+    if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_elem");
     timer::tick("Diago_David","cal_elem");
 
     // updat the reduced Hamiltonian
@@ -344,7 +344,7 @@ void Diago_David::diag_zhegvx
     ComplexMatrix &vc
 )
 {
-//	TITLE("GlobalV::DIAGO_DAVID","diag_zhegvx");
+//	TITLE("DIAGO_DAVID","diag_zhegvx");
     timer::tick("Diago_David","diag_zhegvx");
     assert( ldh >= max(1,n) );
     int lwork ;

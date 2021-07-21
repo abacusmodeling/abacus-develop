@@ -101,7 +101,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
             nCol_in_proc[trace_2D_pcol[iLocalGrid]]++;
         }
     }
-    // OUT(GlobalV::ofs_running,"GlobalV::NLOCAL",GlobalV::NLOCAL);
+    // OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
     receiver_displacement_process[0]=0;
     // OUT(GlobalV::ofs_running,"receiver_displacement_process[0]",receiver_displacement_process[0]);
     for(int pnum=0; pnum<nprocs; ++pnum)
