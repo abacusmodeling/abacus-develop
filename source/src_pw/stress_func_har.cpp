@@ -8,7 +8,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	timer::tick("Stress_Func","stress_har");
 	double shart;
 
-	complex<double> *Porter = UFFT.porter;
+	complex<double> *Porter = GlobalC::UFFT.porter;
 
 	//  Hartree potential VH(r) from n(r)
 	ZEROS( Porter, pw.nrxx );

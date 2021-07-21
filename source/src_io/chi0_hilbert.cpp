@@ -1045,13 +1045,13 @@ void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
 	complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ZEROS( UFFT.porter, (pw.nrxx) );
+		ZEROS( GlobalC::UFFT.porter, (pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[iq] ; ig++)
 		{
-			UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig)] ] = wf.evc[iq](ib,ig);
+			GlobalC::UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig)] ] = wf.evc[iq](ib,ig);
 		}
 		
-		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		int ir=0;
 		for(int ix=0; ix<pw.ncx; ix++)
 		{
@@ -1063,7 +1063,7 @@ void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
 				{
 					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/pw.ncz) *TWO_PI;
 					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
-					psi_r[ib][ir] = UFFT.porter[ir]*exp_tmp;
+					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
 				}
 					
@@ -1081,13 +1081,13 @@ void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
 	complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ZEROS( UFFT.porter, (pw.nrxx) );
+		ZEROS( GlobalC::UFFT.porter, (pw.nrxx) );
 		for(int ig = wf.npwx; ig < wf.npwx + GlobalC::kv.ngk[iq] ; ig++)
 		{
-			UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig - wf.npwx)] ] = wf.evc[iq](ib,ig);
+			GlobalC::UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig - wf.npwx)] ] = wf.evc[iq](ib,ig);
 		}
 		
-		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		int ir=0;
 		for(int ix=0; ix<pw.ncx; ix++)
 		{
@@ -1099,7 +1099,7 @@ void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
 				{
 					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/pw.ncz) *TWO_PI;
 					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
-					psi_r[ib][ir] = UFFT.porter[ir]*exp_tmp;
+					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
 				}
 					
@@ -1285,20 +1285,20 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 					{
 						phase_xyz = (phase_xy + q.z*iz/pw.ncz) *TWO_PI;
 						exp_tmp = complex<double>(cos(-phase_xyz), sin(-phase_xyz));
-						UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
+						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
 					}
 				}
 			}
 			
-			pw.FFT_chg.FFT3D( UFFT.porter, -1);
+			pw.FFT_chg.FFT3D( GlobalC::UFFT.porter, -1);
 			//for(int g0=0; g0<dim; g0++)
 			//{
-			//	b[g0][ib1][ib2] = UFFT.porter[ pw.ig2fftc[g0] ];
+			//	b[g0][ib1][ib2] = GlobalC::UFFT.porter[ pw.ig2fftc[g0] ];
 			//}
 			for(int g0=0;g0<pw.ngmc; g0++)
 			{
-				b_core[g0] = UFFT.porter[ pw.ig2fftc[g0] ];
+				b_core[g0] = GlobalC::UFFT.porter[ pw.ig2fftc[g0] ];
 			}
 			
 #ifdef __MPI

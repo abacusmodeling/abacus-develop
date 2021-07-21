@@ -67,7 +67,7 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
 {
 	// (1) set value
 	complex<double> result(0.0,0.0);
-	complex<double> *phase = UFFT.porter;
+	complex<double> *phase = GlobalC::UFFT.porter;
 	complex<double> *psi_r = new complex<double>[pw.nrxx]; // 实空间的波函数
 
 	ZEROS( phase, pw.nrxx);
@@ -182,7 +182,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 {
 	// (1) set value
 	complex<double> result(0.0,0.0);
-	complex<double> *phase = UFFT.porter;
+	complex<double> *phase = GlobalC::UFFT.porter;
 	complex<double> *psi_up = new complex<double>[pw.nrxx];
 	complex<double> *psi_down = new complex<double>[pw.nrxx];
 	ZEROS( phase, pw.nrxx);

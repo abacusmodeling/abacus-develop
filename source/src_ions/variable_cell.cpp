@@ -115,7 +115,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     {
         wf.allocate_ekb_wg(GlobalC::kv.nks);
     }
-    UFFT.allocate();
+    GlobalC::UFFT.allocate();
 
     //=======================
     // init pseudopotential

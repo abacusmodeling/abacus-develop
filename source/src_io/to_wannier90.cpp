@@ -371,7 +371,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
 			if(!tag_cal_band[ib]) continue;
-			//complex<double> *porter = UFFT.porter;
+			//complex<double> *porter = GlobalC::UFFT.porter;
 			//  u_k in real space
 			ZEROS(porter, pw.nrxx);
 			for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
@@ -1470,7 +1470,7 @@ void toWannier90::integral(const int meshr, const double *psir, const double *r,
 void toWannier90::ToRealSpace(const int &ik, const int &ib, const ComplexMatrix *evc, complex<double> *psir, const Vector3<double> G)
 {
 	// (1) set value
-	complex<double> *phase = UFFT.porter;
+	complex<double> *phase = GlobalC::UFFT.porter;
     ZEROS( psir, pw.nrxx );
 	ZEROS( phase, pw.nrxx);
 
@@ -1506,7 +1506,7 @@ complex<double> toWannier90::unkdotb(const complex<double> *psir, const int ikb,
 {
 	complex<double> result(0.0,0.0);
 	int knumber = GlobalC::kv.ngk[ikb];
-	complex<double> *porter = UFFT.porter;
+	complex<double> *porter = GlobalC::UFFT.porter;
 	ZEROS( porter, pw.nrxx);
 	for (int ir = 0; ir < pw.nrxx; ir++)
 	{
@@ -1528,7 +1528,7 @@ complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &
 	// (1) set value
 	complex<double> result(0.0,0.0);
 	complex<double> *psir = new complex<double>[pw.nrxx];
-	complex<double> *phase = UFFT.porter;
+	complex<double> *phase = GlobalC::UFFT.porter;
     ZEROS( psir, pw.nrxx );
 	ZEROS( phase, pw.nrxx);
 

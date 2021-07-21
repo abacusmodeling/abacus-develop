@@ -33,7 +33,7 @@ void Charge_Mixing::set_rhor(complex<double> *rhog, double *rho)const
     if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhor");
     for (int is=0; is < GlobalV::NSPIN; is++)
     {
-		UFFT.ToRealSpace(rhog, rho);
+		GlobalC::UFFT.ToRealSpace(rhog, rho);
     }
     return;
 }
@@ -42,7 +42,7 @@ void Charge_Mixing::set_rhor(complex<double> *rhog, double *rho)const
 void Charge_Mixing::set_rhog(const double *rho_in, complex<double> *rhog_in)const
 {
     if (GlobalV::test_charge)TITLE("Charge_Mixing","set_rhog");
-	UFFT.ToReciSpace(rho_in, rhog_in);
+	GlobalC::UFFT.ToReciSpace(rho_in, rhog_in);
     return;
 }
 

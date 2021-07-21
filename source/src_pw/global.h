@@ -32,8 +32,9 @@
 namespace GlobalC
 {
 extern K_Vectors kv;
-}
 extern Use_FFT UFFT;
+}
+
 extern FFT fftwan;
 
 extern output out;

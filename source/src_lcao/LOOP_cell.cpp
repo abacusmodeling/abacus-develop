@@ -21,7 +21,7 @@ void LOOP_cell::opt_cell(void)
 
     // Initialize the FFT.
     // this function belongs to cell LOOP
-    UFFT.allocate();
+    GlobalC::UFFT.allocate();
 
     // output is ppcell.vloc 3D local pseudopotentials
 	// without structure factors
