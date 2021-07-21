@@ -231,8 +231,8 @@ void energy::print_etot(
 		{
 			if(GlobalV::MY_RANK==0)
 			{
-				//printf( "\e[36m%-15f\e[0m", en.etot);	
-				printf( "[36m%-15f[0m", en.etot);	
+				printf( "\e[36m%-15f\e[0m", en.etot);	
+				//printf( "[36m%-15f[0m", en.etot);	
 				if(GlobalV::NSPIN==2)
 				{
 					cout << setprecision(2);
@@ -250,18 +250,18 @@ void energy::print_etot(
 				if(dr2>1.0)
 				{
 					// 31 is red
-					//printf( "\e[31m%-14e\e[0m", dr2);
-					printf( "[31m%-14e[0m", dr2);
+					printf( "\e[31m%-14e\e[0m", dr2);
+					//printf( "[31m%-14e[0m", dr2);
 				}
 				else
 				{
 					// 32 is green
-					//printf( "\e[32m%-14e\e[0m", dr2);
-					printf( "[32m%-14e[0m", dr2);
+					printf( "\e[32m%-14e\e[0m", dr2);
+					//printf( "[32m%-14e[0m", dr2);
 				}
 				// 34 is blue
-				//printf( "\e[36m%-15f\e[0m", en.etot*Ry_to_eV);	
-				printf( "[36m%-15f[0m", en.etot*Ry_to_eV);	
+				printf( "\e[36m%-15f\e[0m", en.etot*Ry_to_eV);	
+				//printf( "[36m%-15f[0m", en.etot*Ry_to_eV);	
 				cout << setprecision(3);
 	//			cout << setw(11) << en.eband;
 	//			cout << setw(11) << H_Hartree_pw::hartree_energy;
