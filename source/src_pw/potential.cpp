@@ -76,7 +76,7 @@ void Potential::init_pot(
 		this->vltot, // 3D local pseudopotentials 
 		ucell.ntype,
 		GlobalC::pw.ngmc,
-		ppcell.vloc,
+		GlobalC::ppcell.vloc,
 		GlobalC::pw.ig2ngg,
 		sf // structure factors		
 	);
@@ -394,36 +394,36 @@ void Potential::newd(void)
 				{
 					if(GlobalV::LSPINORB)
 					{
-						ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
-						ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
+						GlobalC::ppcell.deeq_nc(is , iat , ih , jh)= GlobalC::ppcell.dvan_so(is , it , ih , jh);
+						GlobalC::ppcell.deeq_nc(is , iat , jh , ih)= GlobalC::ppcell.dvan_so(is , it , jh , ih);
 					}
 					else if( GlobalV::NSPIN==4 )
 					{
 						if(is==0)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-							ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = GlobalC::ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = GlobalC::ppcell.dvan(it, ih, jh);
 						}
 						else if(is==1)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
 						}
 						else if(is==2)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
 						}
 						else if(is==3)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-							ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = GlobalC::ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = GlobalC::ppcell.dvan(it, ih, jh);
 						}
 					}
 					else
 					{
-						ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-						ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+						GlobalC::ppcell.deeq(is, iat, ih, jh) = GlobalC::ppcell.dvan(it, ih, jh);
+						GlobalC::ppcell.deeq(is, iat, jh, ih) = GlobalC::ppcell.dvan(it, ih, jh);
 					}
 				}
 			}

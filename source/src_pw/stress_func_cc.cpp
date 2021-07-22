@@ -72,7 +72,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 		{
 			//drhoc();
 			CHR.non_linear_core_correction(
-				ppcell.numeric,
+				GlobalC::ppcell.numeric,
 				ucell.atoms[nt].msh,
 				ucell.atoms[nt].r,
 				ucell.atoms[nt].rab,
@@ -91,7 +91,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 					GlobalC::pw.strucFac (nt, ng) * rhocg [GlobalC::pw.ig2ngg[ng] ] * fact;
 			}
 			this->deriv_drhoc (
-				ppcell.numeric,
+				GlobalC::ppcell.numeric,
 				ucell.atoms[nt].msh,
 				ucell.atoms[nt].r,
 				ucell.atoms[nt].rab,

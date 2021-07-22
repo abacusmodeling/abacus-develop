@@ -318,14 +318,14 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 	int inc = 1;
 	if(GlobalV::VNL_IN_H)
 	{
-		if ( ppcell.nkb > 0)
+		if ( GlobalC::ppcell.nkb > 0)
 		{
-			complex<double> *becp = new complex<double>[ ppcell.nkb * GlobalV::NPOL ];
-			ZEROS(becp,ppcell.nkb * GlobalV::NPOL);
+			complex<double> *becp = new complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
+			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
 
-			for (int i=0;i< ppcell.nkb;++i)
+			for (int i=0;i< GlobalC::ppcell.nkb;++i)
 			{
-				const complex<double>* p = &ppcell.vkb(i,0);
+				const complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 				zdotc_(&becp[i],&GlobalC::wf.npw,p,&inc,chig,&inc);
 				//for (int ig=0; ig< GlobalC::wf.npw; ++ig)
 				//{
@@ -333,9 +333,9 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 				//} 
 			}
 
-			//Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * GlobalV::NPOL);
-			complex<double> * Ps = new complex<double> [ppcell.nkb * GlobalV::NPOL];
-			ZEROS( Ps, ppcell.nkb * GlobalV::NPOL );
+			//Parallel_Reduce::reduce_complex_double_pool( becp, GlobalC::ppcell.nkb * GlobalV::NPOL);
+			complex<double> * Ps = new complex<double> [GlobalC::ppcell.nkb * GlobalV::NPOL];
+			ZEROS( Ps, GlobalC::ppcell.nkb * GlobalV::NPOL );
 			int sum = 0;
     		int iat = 0;
     		// this function sum up each non-local pseudopotential located in each atom,
@@ -354,7 +354,7 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
     		            for (int ip2=0; ip2<Nprojs; ++ip2)
     		            {
 							if(GlobalV::NSPIN!=4)
-								Ps[sum+ip2] += ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
+								Ps[sum+ip2] += GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) * becp[sum+ip];
     		            }// end ih
     		        }//end jh
 					if(GlobalV::NSPIN!=4) sum += Nprojs;
@@ -365,9 +365,9 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 			// use simple method.
 			ZEROS(chig, GlobalC::wf.npw);
 			if(GlobalV::NSPIN!=4)
-				for(int i=0; i<ppcell.nkb; ++i)
+				for(int i=0; i<GlobalC::ppcell.nkb; ++i)
 				{
-					complex<double>* p = &ppcell.vkb(i,0);
+					complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 					//LapackConnector::axpy(GlobalC::wf.npw,Ps[i],p,1,chig,1);
 					for(int ig=0; ig< GlobalC::wf.npw; ++ig)
 					{
@@ -487,20 +487,20 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 	timer::tick("Stochastic_hchi","vnl");
 	if(GlobalV::VNL_IN_H)
 	{
-		if ( ppcell.nkb > 0)
+		if ( GlobalC::ppcell.nkb > 0)
 		{
-			int nkb = ppcell.nkb;
+			int nkb = GlobalC::ppcell.nkb;
 			complex<double> *becp = new complex<double>[ nkb * GlobalV::NPOL * m ];
 			char transc = 'C';
 			char transn = 'N';
 			char transt = 'T';
 			if(m==1 && GlobalV::NPOL ==1)
 			{
-				zgemv_(&transc, &npw, &nkb, &ONE, ppcell.vkb.c, &GlobalC::wf.npwx, chig, &inc, &ZERO, becp, &inc);
+				zgemv_(&transc, &npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, chig, &inc, &ZERO, becp, &inc);
 			}
 			else
 			{
-				zgemm_(&transc,&transn,&nkb,&npm,&npw,&ONE,ppcell.vkb.c,&GlobalC::wf.npwx,chig,&npw,&ZERO,becp,&nkb);
+				zgemm_(&transc,&transn,&nkb,&npm,&npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,chig,&npw,&ZERO,becp,&nkb);
 			}
 			Parallel_Reduce::reduce_complex_double_pool( becp, nkb * GlobalV::NPOL * m);
 
@@ -524,7 +524,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 							for(int ib = 0; ib < m ; ++ib)
 							{
 								Ps[(sum + ip2) * m + ib] += 
-								ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) * becp[ib * nkb + sum + ip];
+								GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) * becp[ib * nkb + sum + ip];
 							}//end ib
     		            }// end ih
     		        }//end jh 
@@ -535,11 +535,11 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 
 			if(GlobalV::NPOL==1 && m==1)
 			{
-				zgemv_(&transn, &npw, &nkb, &ONE, ppcell.vkb.c, &GlobalC::wf.npwx, Ps, &inc, &ONE, hchig, &inc);
+				zgemv_(&transn, &npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, Ps, &inc, &ONE, hchig, &inc);
 			}
 			else
 			{
-				zgemm_(&transn,&transt,&npw,&npm,&nkb,&ONE,ppcell.vkb.c,&GlobalC::wf.npwx,Ps,&npm,&ONE,hchig,&npw);
+				zgemm_(&transn,&transt,&npw,&npm,&nkb,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,Ps,&npm,&ONE,hchig,&npw);
 			}
 
 			delete[] becp;

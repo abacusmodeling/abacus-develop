@@ -41,6 +41,7 @@ extern wavefunc wf;
 extern Hamilt hm;
 extern Exx_Global exx_global;
 extern Exx_Lip exx_lip;
+extern pseudopot_cell_vnl ppcell;
 }
 
 
@@ -48,7 +49,6 @@ extern Exx_Lip exx_lip;
 #include "../module_cell/unitcell_pseudo.h"
 #include "../src_parallel/parallel_grid.h"
 #include "../src_parallel/parallel_kpoints.h"
-extern pseudopot_cell_vnl ppcell;
 extern xcfunc xcf;
 extern Charge_Broyden CHR;
 extern Potential pot;

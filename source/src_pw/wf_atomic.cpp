@@ -49,7 +49,7 @@ void WF_atomic::init_at_1(void)
 
     // needed to normalize atomic wfcs (not a bad idea in general and
     // necessary to compute correctly lda+U projections)
-    ppcell.tab_at.zero_out();
+    GlobalC::ppcell.tab_at.zero_out();
 //----------------------------------------------------------
 // EXPLAIN : If use gauss orbitals to represent aotmic
 // orbitals (controlled by parameters)
@@ -132,7 +132,7 @@ void WF_atomic::init_at_1(void)
                     double vqint = 0.0;
                     Integral::Simpson_Integral(atom->msh, vchi, atom->rab, vqint);
 
-                    ppcell.tab_at(it, ic, iq) =  vqint * pref;
+                    GlobalC::ppcell.tab_at(it, ic, iq) =  vqint * pref;
                     //				if( it == 0 && ic == 0 )
                     //				{
                     //
@@ -310,7 +310,7 @@ void WF_atomic::atomic_wfc
                                       {
                                           if(fabs(fact[is])>1e-8)
                                           {
-                                              const int ind = ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
+                                              const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(l,j,m,is);
                                               ZEROS(aux, np);
                                               for(int n1=0;n1<2*l+1;n1++){
                                                  const int lm = l*l +n1;

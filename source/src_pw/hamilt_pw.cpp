@@ -76,10 +76,10 @@ void Hamilt_PW::init_k(const int ik)
 	}
 
 	// (4) Calculate nonlocal pseudopotential vkb
-	//if (ppcell.nkb > 0 && !LINEAR_SCALING) xiaohui modify 2013-09-02
-	if(ppcell.nkb > 0 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
+	//if (GlobalC::ppcell.nkb > 0 && !LINEAR_SCALING) xiaohui modify 2013-09-02
+	if(GlobalC::ppcell.nkb > 0 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
 	{
-		ppcell.getvnl(ik);
+		GlobalC::ppcell.getvnl(ik);
 	}
 
 	// (5) The number of wave functions.
@@ -459,23 +459,23 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 	timer::tick("Hamilt_PW","vnl");
 	if(GlobalV::VNL_IN_H)
 	{
-		if ( ppcell.nkb > 0)
+		if ( GlobalC::ppcell.nkb > 0)
 		{
 			//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			//qianrui optimize 2021-3-31
-			int nkb=ppcell.nkb;
+			int nkb=GlobalC::ppcell.nkb;
 			ComplexMatrix becp(GlobalV::NPOL * m, nkb, false);
 			char transa = 'C';
 			char transb = 'N';
 			if(m==1 && GlobalV::NPOL==1)
 			{
 				int inc = 1;
-				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ONE, ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ZERO, becp.c, &inc);
+				zgemv_(&transa, &GlobalC::wf.npw, &nkb, &ONE, GlobalC::ppcell.vkb.c, &GlobalC::wf.npwx, psi_in, &inc, &ZERO, becp.c, &inc);
 			}
 			else
 			{
 				int npm = GlobalV::NPOL * m;
-				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ONE,ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ZERO,becp.c,&nkb);
+				zgemm_(&transa,&transb,&nkb,&npm,&GlobalC::wf.npw,&ONE,GlobalC::ppcell.vkb.c,&GlobalC::wf.npwx,psi_in,&GlobalC::wf.npwx,&ZERO,becp.c,&nkb);
 				//add_nonlocal_pp is moddified, thus tranpose not needed here.
 				//if(GlobalV::NONCOLIN)
 				//{
@@ -498,11 +498,11 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 
 			this->add_nonlocal_pp(hpsi, becp.c, m);
 			//======================================================================
-			/*complex<double> *becp = new complex<double>[ ppcell.nkb * GlobalV::NPOL ];
-			ZEROS(becp,ppcell.nkb * GlobalV::NPOL);
-			for (i=0;i< ppcell.nkb;i++)
+			/*complex<double> *becp = new complex<double>[ GlobalC::ppcell.nkb * GlobalV::NPOL ];
+			ZEROS(becp,GlobalC::ppcell.nkb * GlobalV::NPOL);
+			for (i=0;i< GlobalC::ppcell.nkb;i++)
 			{
-				const complex<double>* p = &ppcell.vkb(i,0);
+				const complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 				const complex<double>* const p_end = p + GlobalC::wf.npw;
 				const complex<double>* psip = psi_in; 
 				for (;p<p_end;++p,++psip)
@@ -514,7 +514,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 					}
 				}
 			}
-			Parallel_Reduce::reduce_complex_double_pool( becp, ppcell.nkb * GlobalV::NPOL);
+			Parallel_Reduce::reduce_complex_double_pool( becp, GlobalC::ppcell.nkb * GlobalV::NPOL);
 			this->add_nonlocal_pp(hpsi, becp);
 			delete[] becp;*/
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -536,7 +536,7 @@ void Hamilt_PW::add_nonlocal_pp(
     timer::tick("Hamilt_PW","add_nonlocal_pp");
 
 	// number of projectors
-	int nkb = ppcell.nkb;
+	int nkb = GlobalC::ppcell.nkb;
 
 	complex<double> *ps  = new complex<double> [nkb * GlobalV::NPOL * m];
     ZEROS(ps, GlobalV::NPOL * m * nkb);
@@ -560,7 +560,7 @@ void Hamilt_PW::add_nonlocal_pp(
 						for(int ib = 0; ib < m ; ++ib)
 						{
 							ps[(sum + ip2) * m + ib] += 
-							ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) 
+							GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) 
 							* becp[ib * nkb + sum + ip];
 						}//end ib
 					}// end ih
@@ -595,10 +595,10 @@ void Hamilt_PW::add_nonlocal_pp(
 							becpind = ib*nkb*2 + sum + ip;
 							becp1 =  becp[becpind];
 							becp2 =  becp[becpind + nkb];
-							ps[psind] += ppcell.deeq_nc(0, iat, ip2, ip) * becp1
-								+ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
-							ps[psind +1] += ppcell.deeq_nc(2, iat, ip2, ip) * becp1
-								+ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
+							ps[psind] += GlobalC::ppcell.deeq_nc(0, iat, ip2, ip) * becp1
+								+GlobalC::ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
+							ps[psind +1] += GlobalC::ppcell.deeq_nc(2, iat, ip2, ip) * becp1
+								+GlobalC::ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
 						}//end ib
 					}// end ih
 				}//end jh
@@ -611,9 +611,9 @@ void Hamilt_PW::add_nonlocal_pp(
 	/*
     for (int ig=0;ig<GlobalC::wf.npw;ig++)
     {
-        for (int i=0;i< ppcell.nkb;i++)
+        for (int i=0;i< GlobalC::ppcell.nkb;i++)
         {
-            hpsi_in[ig]+=ps[i]*ppcell.vkb(i,ig);
+            hpsi_in[ig]+=ps[i]*GlobalC::ppcell.vkb(i,ig);
         }
     }
 	*/
@@ -629,9 +629,9 @@ void Hamilt_PW::add_nonlocal_pp(
 		int inc = 1;
 		zgemv_(&transa, 
 			&GlobalC::wf.npw, 
-			&ppcell.nkb, 
+			&GlobalC::ppcell.nkb, 
 			&ONE, 
-			ppcell.vkb.c, 
+			GlobalC::ppcell.vkb.c, 
 			&GlobalC::wf.npwx, 
 			ps, 
 			&inc, 
@@ -646,9 +646,9 @@ void Hamilt_PW::add_nonlocal_pp(
 			&transb,
 			&GlobalC::wf.npw,
 			&npm,
-			&ppcell.nkb,
+			&GlobalC::ppcell.nkb,
 			&ONE,
-			ppcell.vkb.c,
+			GlobalC::ppcell.vkb.c,
 			&GlobalC::wf.npwx,
 			ps,
 			&npm,
@@ -659,9 +659,9 @@ void Hamilt_PW::add_nonlocal_pp(
 
 	//======================================================================
 	/*if(!GlobalV::NONCOLIN)
-	for(int i=0; i<ppcell.nkb; i++)
+	for(int i=0; i<GlobalC::ppcell.nkb; i++)
 	{
-		complex<double>* p = &ppcell.vkb(i,0);
+		complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 		complex<double>* p_end = p + GlobalC::wf.npw;
 		complex<double>* hp = hpsi_in;
 		complex<double>* psp = &ps[i];
@@ -671,9 +671,9 @@ void Hamilt_PW::add_nonlocal_pp(
 		}
 	}
 	else
-	for(int i=0; i<ppcell.nkb; i++)
+	for(int i=0; i<GlobalC::ppcell.nkb; i++)
 	{
-		complex<double>* p = &ppcell.vkb(i,0);
+		complex<double>* p = &GlobalC::ppcell.vkb(i,0);
 		complex<double>* p_end = p + GlobalC::wf.npw;
 		complex<double>* hp = hpsi_in;
 		complex<double>* hp1 = hpsi_in + GlobalC::wf.npwx;

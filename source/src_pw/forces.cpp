@@ -375,7 +375,7 @@ void Forces::cal_force_loc(matrix& forcelc)
             for (int ig = gstart_here; ig < GlobalC::pw.ngmc; ig++)
             {
                 const double phase = TWO_PI * (GlobalC::pw.get_G_cartesian(ig) * ucell.atoms[it].tau[ia]);
-                const double factor = ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) *
+                const double factor = GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) *
 									  ( cos(phase) * aux[ GlobalC::pw.ig2fftc[ig] ].imag()
                                       + sin(phase) * aux[ GlobalC::pw.ig2fftc[ig] ].real()); 
                 forcelc(iat, 0) += GlobalC::pw.get_G_cartesian_projection(ig, 0) * factor;
@@ -588,7 +588,7 @@ void Forces::cal_force_cc(matrix& forcecc)
         {
             //call drhoc
             CHR.non_linear_core_correction(
-                ppcell.numeric,
+                GlobalC::ppcell.numeric,
                 ucell.atoms[T1].msh,
                 ucell.atoms[T1].r,
                 ucell.atoms[T1].rab,
@@ -637,7 +637,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 	TITLE("Forces","cal_force_nl");
 	timer::tick("Forces","cal_force_nl");
 
-    const int nkb = ppcell.nkb;
+    const int nkb = GlobalC::ppcell.nkb;
 	if(nkb == 0) return; // mohan add 2010-07-25
 	
 	// dbecp: conj( -iG * <Beta(nkb,npw)|psi(nbnd,npw)> )
@@ -653,9 +653,9 @@ void Forces::cal_force_nl(matrix& forcenl)
         if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
         GlobalC::wf.npw = GlobalC::kv.ngk[ik];
         // generate vkb
-        if (ppcell.nkb > 0)
+        if (GlobalC::ppcell.nkb > 0)
         {
-            ppcell.getvnl(ik);
+            GlobalC::ppcell.getvnl(ik);
         }
 
         // get becp according to wave functions and vkb
@@ -669,7 +669,7 @@ void Forces::cal_force_nl(matrix& forcenl)
             {
                 for (int ig=0; ig<GlobalC::wf.npw; ig++)
                 {
-                    becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+                    becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
                 }
             }
         }
@@ -686,17 +686,17 @@ void Forces::cal_force_nl(matrix& forcenl)
 				if (ipol==0)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
                 }
 				if (ipol==1)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
                 }
 				if (ipol==2)
 				{
 					for (int ig=0; ig<GlobalC::wf.npw; ig++)
-                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
+                        vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
                 }
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -729,7 +729,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 				{
 					for (int ip=0; ip<Nprojs; ip++)
 					{
-						double ps = ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
+						double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
 						const int inkb = sum + ip; 
 						//out<<"\n ps = "<<ps;
 
@@ -753,7 +753,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 						//if ( ip != ip2 )
 						//{
 							const int jnkb = sum + ip2;
-							double ps = ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip2, ip) ;
+							double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip2, ip) ;
 
 							for (int ipol=0; ipol<3; ipol++)
 							{

@@ -549,7 +549,7 @@ void Charge::set_rho_core(
 // each shell of g vec
 //----------------------------------------------------------
             this->non_linear_core_correction(
-                ppcell.numeric,
+                GlobalC::ppcell.numeric,
                 ucell.atoms[it].msh,
                 ucell.atoms[it].r,
                 ucell.atoms[it].rab,

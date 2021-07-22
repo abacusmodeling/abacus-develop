@@ -35,18 +35,18 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 	ZEROS( vg, GlobalC::pw.ngmc );
 	for (int it=0; it<ucell.ntype; it++)
 	{
-		if (GlobalC::pw.gstart==1) evloc += ppcell.vloc(it, GlobalC::pw.ig2ngg[0]) * (GlobalC::pw.strucFac(it,0) * conj(Porter[GlobalC::pw.ig2fftc[0]])).real();
+		if (GlobalC::pw.gstart==1) evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[0]) * (GlobalC::pw.strucFac(it,0) * conj(Porter[GlobalC::pw.ig2fftc[0]])).real();
 		for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 		{
 			const int j = GlobalC::pw.ig2fftc[ig];
-			evloc += ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
+			evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
 		}
 	}
 	for(int nt = 0;nt< ucell.ntype; nt++)
 	{
 		const Atom* atom = &ucell.atoms[nt];
 		//mark by zhengdy for check
-		// if ( ppcell.vloc == NULL ){
+		// if ( GlobalC::ppcell.vloc == NULL ){
 		if(0)
 		{
 		//

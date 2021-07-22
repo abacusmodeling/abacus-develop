@@ -23,10 +23,10 @@ void LOOP_cell::opt_cell(void)
     // this function belongs to cell LOOP
     GlobalC::UFFT.allocate();
 
-    // output is ppcell.vloc 3D local pseudopotentials
+    // output is GlobalC::ppcell.vloc 3D local pseudopotentials
 	// without structure factors
     // this function belongs to cell LOOP
-    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
+    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
 
     // Initialize the sum of all local potentials.
     // if ion_step==0, read in/initialize the potentials

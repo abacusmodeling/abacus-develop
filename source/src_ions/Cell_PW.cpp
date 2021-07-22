@@ -12,24 +12,24 @@ void Cell_PW::opt_cells_pw()
     //=======================
     // init pseudopotential
     //=======================
-    ppcell.init(ucell.ntype);
+    GlobalC::ppcell.init(ucell.ntype);
 
     //=====================
     // init hamiltonian
     // only allocate in the beginning of ELEC LOOP!
     //=====================
-    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
+    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
+    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
     DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    ppcell.init_vnl(ucell);
+    GlobalC::ppcell.init_vnl(ucell);
     DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
@@ -42,7 +42,7 @@ void Cell_PW::opt_cells_pw()
     DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //==================================================
-    // create ppcell.tab_at , for trial wave functions.
+    // create GlobalC::ppcell.tab_at , for trial wave functions.
     //==================================================
     GlobalC::wf.init_at_1();
 

@@ -7,7 +7,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 	TITLE("Stress_Func","stres_nl");
 	timer::tick("Stress_Func","stres_nl");
 	
-	const int nkb = ppcell.nkb;
+	const int nkb = GlobalC::ppcell.nkb;
 	if(nkb == 0) return;
 
 	double sigmanlc[3][3];
@@ -40,9 +40,9 @@ void Stress_Func::stress_nl(matrix& sigma){
 		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 		// generate vkb
-		if (ppcell.nkb > 0)
+		if (GlobalC::ppcell.nkb > 0)
 		{
-			ppcell.getvnl(ik);
+			GlobalC::ppcell.getvnl(ik);
 		}
 
 		// get becp according to wave functions and vkb
@@ -56,7 +56,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 			{
 				for (int ig=0; ig<GlobalC::wf.npw; ig++)
 				{
-					becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+					becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
 				}
 			}
 		}
@@ -96,7 +96,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 						for (int ig=0; ig<GlobalC::wf.npw; ig++)
 						{
 							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
-							vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.x;
+							vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.x;
 						}
 					}
 					if (kpol==1)
@@ -104,7 +104,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 						for (int ig=0; ig<GlobalC::wf.npw; ig++)
 						{
 							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
-							vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.y;
+							vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.y;
 						}
 					}
 					if (kpol==2)
@@ -112,7 +112,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 						for (int ig=0; ig<GlobalC::wf.npw; ig++)
 						{
 							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
-							vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.z;
+							vkb1(i, ig) = GlobalC::ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.z;
 						}
 					}*/
 					  
@@ -129,7 +129,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 							dbecp(i,ib) = dbecp(i,ib) - 2.0 * GlobalC::wf.evc[ik](ib,ig) * conj( vkb1(i,ig) ) ;
 							//second termi
 							if(ipol == jpol)
-								 dbecp(i,ib) += -1.0 * GlobalC::wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+								 dbecp(i,ib) += -1.0 * GlobalC::wf.evc[ik](ib,ig)* conj( GlobalC::ppcell.vkb(i,ig) );
 							//third term
 							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
 							qvec0[0] = qvec.x;
@@ -161,7 +161,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 						{
 							for (int ip=0; ip<Nprojs; ip++)
 							{
-								double ps = ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
+								double ps = GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip) ;
 								const int inkb = sum + ip;
 								//out<<"\n ps = "<<ps;
 
@@ -227,14 +227,14 @@ void Stress_Func::get_dvnl1
 {
 	if(GlobalV::test_pp) TITLE("Stress_Func","get_dvnl1");
 
-	const int lmaxkb = ppcell.lmaxkb;
+	const int lmaxkb = GlobalC::ppcell.lmaxkb;
 	if(lmaxkb < 0)
 	{
 		return;
 	}
 
 	const int npw = GlobalC::kv.ngk[ik];
-	const int nhm = ppcell.nhm;
+	const int nhm = GlobalC::ppcell.nhm;
 	int ig, ia, nb, ih;
 	matrix vkb1(nhm, npw);
 	vkb1.zero_out();
@@ -271,16 +271,16 @@ void Stress_Func::get_dvnl1
 				//cout << "\n gk.norm = " << gnorm;
 
 				vq [ig] = PolyInt::Polynomial_Interpolation(
-						ppcell.tab, it, nb, GlobalV::NQX, GlobalV::DQ, gnorm );
+						GlobalC::ppcell.tab, it, nb, GlobalV::NQX, GlobalV::DQ, gnorm );
 
 			} // enddo
 
 			// add spherical harmonic part
 			for (ih = 0;ih < nh;ih++)
 			{
-				if (nb == ppcell.indv(it, ih))
+				if (nb == GlobalC::ppcell.indv(it, ih))
 				{
-					const int lm = static_cast<int>( ppcell.nhtolm(it, ih) );
+					const int lm = static_cast<int>( GlobalC::ppcell.nhtolm(it, ih) );
 					for (ig = 0;ig < npw;ig++)
 					{
 						vkb1(ih, ig) = dylm(lm, ig) * vq [ig];
@@ -299,7 +299,7 @@ void Stress_Func::get_dvnl1
 			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?
+				complex<double> pref = pow( NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
 				for (ig = 0;ig < npw;ig++)
 				{
 					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -320,14 +320,14 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 	if(GlobalV::test_pp) TITLE("Stress","get_dvnl2");
 //	timer::tick("Stress","get_dvnl2");
 
-	const int lmaxkb = ppcell.lmaxkb;
+	const int lmaxkb = GlobalC::ppcell.lmaxkb;
 	if(lmaxkb < 0)
 	{
 		return;
 	}
 
 	const int npw = GlobalC::kv.ngk[ik];
-	const int nhm = ppcell.nhm;
+	const int nhm = GlobalC::ppcell.nhm;
 	int ig, ia, nb, ih;
 	matrix vkb1(nhm, npw);
 	double *vq = new double[npw];
@@ -360,16 +360,16 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 	//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 	//cout << "\n gk.norm = " << gnorm;
 				vq [ig] = Polynomial_Interpolation_nl(
-						ppcell.tab, it, nb, GlobalV::DQ, gnorm );
+						GlobalC::ppcell.tab, it, nb, GlobalV::DQ, gnorm );
 
 			} // enddo
 
 							// add spherical harmonic part
 			for (ih = 0;ih < nh;ih++)
 			{
-				if (nb == ppcell.indv(it, ih))
+				if (nb == GlobalC::ppcell.indv(it, ih))
 				{
-					const int lm = static_cast<int>( ppcell.nhtolm(it, ih) );
+					const int lm = static_cast<int>( GlobalC::ppcell.nhtolm(it, ih) );
 					for (ig = 0;ig < npw;ig++)
 					{
 						vkb1(ih, ig) = ylm(lm, ig) * vq [ig];
@@ -385,7 +385,7 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?
+				complex<double> pref = pow( NEG_IMAG_UNIT, GlobalC::ppcell.nhtol(it, ih));      //?
 				for (ig = 0;ig < npw;ig++)
 				{
 					vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;

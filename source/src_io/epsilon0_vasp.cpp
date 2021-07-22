@@ -62,7 +62,7 @@ void Epsilon0_vasp::cal_epsilon0()
 		init_finish = true;
 	}
 	
-	//ppcell.init_vnl_alpha();
+	//GlobalC::ppcell.init_vnl_alpha();
 	
 	Cal_epsilon0s();
 	
@@ -131,8 +131,8 @@ void Epsilon0_vasp:: Init()
 	psi_nu = new complex<double> **[GlobalV::NBANDS];
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_nu[ib] = new complex<double> *[ppcell.nkb];
-		for(int u=0; u<ppcell.nkb; u++)
+		psi_nu[ib] = new complex<double> *[GlobalC::ppcell.nkb];
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
 			psi_nu[ib][u] = new complex<double>[4];
 		}
@@ -189,7 +189,7 @@ void Epsilon0_vasp:: Delete()
 	
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int u=0; u<ppcell.nkb; u++)
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
 			delete[] psi_nu[ib][u];
 		}
@@ -391,11 +391,11 @@ void Epsilon0_vasp:: Cal_b(int ik)
 					for(int jh=0; jh<nht; jh++)
 					{
 						int jkb = count1 + jh;
-						b[ib1][ib2][0] += IMAG_UNIT * ppcell.deeq(0, iat, ih, jh) * 
+						b[ib1][ib2][0] += IMAG_UNIT * GlobalC::ppcell.deeq(0, iat, ih, jh) * 
 						(psi_nu[ib1][ikb][3] * conj(psi_nu[oband+ib2][jkb][0]) -  psi_nu[ib1][ikb][0] * conj(psi_nu[oband+ib2][jkb][3]) ); 
-						b[ib1][ib2][1] += IMAG_UNIT * ppcell.deeq(0, iat, ih, jh) * 
+						b[ib1][ib2][1] += IMAG_UNIT * GlobalC::ppcell.deeq(0, iat, ih, jh) * 
 						(psi_nu[ib1][ikb][3] * conj(psi_nu[oband+ib2][jkb][1]) -  psi_nu[ib1][ikb][1] * conj(psi_nu[oband+ib2][jkb][3]) );
-						b[ib1][ib2][2] += IMAG_UNIT * ppcell.deeq(0, iat, ih, jh) * 
+						b[ib1][ib2][2] += IMAG_UNIT * GlobalC::ppcell.deeq(0, iat, ih, jh) * 
 						(psi_nu[ib1][ikb][3] * conj(psi_nu[oband+ib2][jkb][2]) -  psi_nu[ib1][ikb][2] * conj(psi_nu[oband+ib2][jkb][3]) );
 
 					}
@@ -410,12 +410,12 @@ void Epsilon0_vasp:: Cal_b(int ik)
 #ifdef __LCAO
 void Epsilon0_vasp:: Cal_psi_nu(int ik)
 {
-	ppcell.getvnl_alpha(ik);
+	GlobalC::ppcell.getvnl_alpha(ik);
 	
-	complex<double> psi_nu_core[GlobalV::NBANDS][ppcell.nkb][4];
+	complex<double> psi_nu_core[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
 	
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
-		for(int ikb=0; ikb<ppcell.nkb; ikb++)
+		for(int ikb=0; ikb<GlobalC::ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)
 			{
 				psi_nu_core[ib][ikb][i] = complex<double>(0.0,0.0);
@@ -423,16 +423,16 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 	
 	/*for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int u=0; u<ppcell.nkb; u++)
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
 			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
-				cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<ppcell.vkb_alpha[0][u][ig]<<endl;
+				cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<endl;
 			}
 		}
 	}*/
 
-	/*for(int u=0; u<ppcell.nkb; u++)
+	/*for(int u=0; u<GlobalC::ppcell.nkb; u++)
 	{
 		for(int ig=0; ig<GlobalC::kv.ngk[ik];ig++)
 		{
@@ -440,36 +440,36 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 		}
 	}*/
 
-	for(int u=0; u<ppcell.nkb; u++)
+	for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 		{
-			cout<<"ik = "<<ik<<" u = "<<u<<" ig = "<<ig<<"  ppcell.vkb["<<u<<"]["<<ig<<"] = "<<ppcell.vkb(u,ig)<<endl;
+			cout<<"ik = "<<ik<<" u = "<<u<<" ig = "<<ig<<"  GlobalC::ppcell.vkb["<<u<<"]["<<ig<<"] = "<<GlobalC::ppcell.vkb(u,ig)<<endl;
 		}	 
 
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int u=0; u<ppcell.nkb; u++)
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
 			ZEROS(psi_nu[ib][u], 4);
 			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
-				//cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<ppcell.vkb_alpha[0][u][ig]<<endl;
+				//cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<endl;
 				//cout<<"psi_nu = "<<psi_nu[ib][u][0]<<endl;
-				psi_nu_core[ib][u][0] += conj(GlobalC::wf.evc[ik](ib,ig)) * ppcell.vkb_alpha[0][u][ig];
-				psi_nu_core[ib][u][1] += conj(GlobalC::wf.evc[ik](ib,ig)) * ppcell.vkb_alpha[1][u][ig];
-				psi_nu_core[ib][u][2] += conj(GlobalC::wf.evc[ik](ib,ig)) * ppcell.vkb_alpha[2][u][ig];
-				psi_nu_core[ib][u][3] += conj(GlobalC::wf.evc[ik](ib,ig)) * ppcell.vkb(u,ig);
+				psi_nu_core[ib][u][0] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[0][u][ig];
+				psi_nu_core[ib][u][1] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[1][u][ig];
+				psi_nu_core[ib][u][2] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[2][u][ig];
+				psi_nu_core[ib][u][3] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb(u,ig);
 			}
 		}
 	}
 	
-	double psi_nu_core_R[GlobalV::NBANDS][ppcell.nkb][4];
-	double psi_nu_core_I[GlobalV::NBANDS][ppcell.nkb][4];
-	double psi_nu_R[GlobalV::NBANDS][ppcell.nkb][4];
-	double psi_nu_I[GlobalV::NBANDS][ppcell.nkb][4];
+	double psi_nu_core_R[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
+	double psi_nu_core_I[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
+	double psi_nu_R[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
+	double psi_nu_I[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
 	
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
-		for(int ikb=0; ikb<ppcell.nkb; ikb++)
+		for(int ikb=0; ikb<GlobalC::ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)
 			{
 				psi_nu_core_R[ib][ikb][i] = psi_nu_core[ib][ikb][i].real();
@@ -477,12 +477,12 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 			}	
 			
 #ifdef __MPI
-	MPI_Allreduce(psi_nu_core_R,psi_nu_R,4*GlobalV::NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
-	MPI_Allreduce(psi_nu_core_I,psi_nu_I,4*GlobalV::NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+	MPI_Allreduce(psi_nu_core_R,psi_nu_R,4*GlobalV::NBANDS*GlobalC::ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+	MPI_Allreduce(psi_nu_core_I,psi_nu_I,4*GlobalV::NBANDS*GlobalC::ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 #endif
 
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
-		for(int ikb=0; ikb<ppcell.nkb; ikb++)
+		for(int ikb=0; ikb<GlobalC::ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)	
 			{
 				psi_nu[ib][ikb][i] = complex<double>( psi_nu_R[ib][ikb][i], psi_nu_I[ib][ikb][i]);

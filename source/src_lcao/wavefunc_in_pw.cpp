@@ -513,7 +513,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 											{
 												if(fabs(fact[is])>1e-8)
 												{
-													const int ind = ppcell.lmaxkb + soc.sph_ind(L,j,m,is);
+													const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(L,j,m,is);
 													ZEROS(aux, npw);
 													for(int n1=0;n1<2*L+1;n1++){
 														const int lm = L*L +n1;

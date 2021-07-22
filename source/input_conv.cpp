@@ -528,7 +528,7 @@ void Input_Conv::Convert(void)
 	}
 #endif
 
-    ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
+    GlobalC::ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
 //    NEW_DM=INPUT.new_dm;  // Shen Yu add 2019/5/9
 

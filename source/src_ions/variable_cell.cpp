@@ -35,7 +35,7 @@ void Variable_Cell::init_after_vc(void)
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
+    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
     DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
 
     //======================================
@@ -43,7 +43,7 @@ void Variable_Cell::init_after_vc(void)
     //======================================
     if(GlobalV::BASIS_TYPE=="pw")
     {
-        ppcell.init_vnl(ucell);
+        GlobalC::ppcell.init_vnl(ucell);
         DONE(GlobalV::ofs_running,"NON-LOCAL POTENTIAL");
     }
 
@@ -122,25 +122,25 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=======================
     if(GlobalV::BASIS_TYPE=="pw")
 	{
-		ppcell.init(ucell.ntype);
+		GlobalC::ppcell.init(ucell.ntype);
 	}
 
     //=====================
     // init hamiltonian
     //=====================
-    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
+    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
+    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
     DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
     //======================================
     // Initalize non local pseudopotential
     //======================================
     if(GlobalV::BASIS_TYPE=="pw")
     {
-        ppcell.init_vnl(ucell);
+        GlobalC::ppcell.init_vnl(ucell);
         DONE(GlobalV::ofs_running,"NON-LOCAL POTENTIAL");
     }
     //=========================================================
@@ -149,7 +149,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     pot.init_pot(0, GlobalC::pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
     //==================================================
-    // Create ppcell.tab_at , for trial wave functions.
+    // Create GlobalC::ppcell.tab_at , for trial wave functions.
     // Initial start wave functions
     //================================
     if(GlobalV::BASIS_TYPE=="pw")
