@@ -81,8 +81,7 @@ void Occupy::calculate_weights(void)
 		}
 
         //qianrui fix a bug on 2021-7-21
-        en.demet /= GlobalV:: NPROC_IN_POOL;
-	    Parallel_Reduce::reduce_double_all( en.demet );
+        Parallel_Reduce::reduce_double_allpool(en.demet);
     }
     else if (fixed_occupations)
     {

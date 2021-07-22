@@ -115,7 +115,7 @@ void Stress_Func::stress_kin(matrix& sigma)
 	{
 		for(int m=0;m<3;m++)
 		{
-			Parallel_Reduce::reduce_double_pool( s_kin[l][m] );
+			Parallel_Reduce::reduce_double_all( s_kin[l][m] ); //qianrui fix a bug for npool > 1
 		}
 	}
 

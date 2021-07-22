@@ -186,7 +186,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 			{
 				sigmanlc[l][m] = sigmanlc[m][l];
 			}
-			Parallel_Reduce::reduce_double_pool( sigmanlc[l][m] );
+			Parallel_Reduce::reduce_double_all( sigmanlc[l][m] ); //qianrui fix a bug for npool > 1
 		}
 	}
 
