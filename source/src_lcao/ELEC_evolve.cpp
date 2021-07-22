@@ -99,13 +99,12 @@ void ELEC_evolve::evolve_psi(
 
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
-		{		
-			dftu.cal_eff_pot_mat(ik, istep);
-
+		{
+      vector<complex<double>> eff_pot(ParaO.nloc);
+			dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
+      
 			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				LM.Hloc2[irc] += dftu.pot_eff_k.at(ik).at(irc);
-			}							
+				LM.Hloc2[irc] += eff_pot[irc];					
 		}
 
 		// Peize Lin add at 2020.04.04
