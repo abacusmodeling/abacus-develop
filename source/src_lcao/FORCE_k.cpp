@@ -240,12 +240,12 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 			//----------------
 			// circle for k
 			//----------------
-			for(int ik=0; ik<kv.nks; ++ik)
+			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				// set the spin direction
 				if(GlobalV::NSPIN==2)
 				{
-					ispin = kv.isk[ik];
+					ispin = GlobalC::kv.isk[ik];
 				}
 				dm = vvv[ispin];
 				//------------------
@@ -271,9 +271,9 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 							// exp[i * R * k]
 							//-----------------
 							const complex<double> phase = w1 * exp(TWO_PI * IMAG_UNIT * (
-										kv.kvec_d[ik].x * RA.info[iat][cb][0] +
-										kv.kvec_d[ik].y * RA.info[iat][cb][1] +
-										kv.kvec_d[ik].z * RA.info[iat][cb][2]
+										GlobalC::kv.kvec_d[ik].x * RA.info[iat][cb][0] +
+										GlobalC::kv.kvec_d[ik].y * RA.info[iat][cb][1] +
+										GlobalC::kv.kvec_d[ik].z * RA.info[iat][cb][2]
 										) );
 
 							const int start2 = ucell.itiaiw2iwt(T2,I2,0);

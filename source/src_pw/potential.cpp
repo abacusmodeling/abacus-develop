@@ -253,7 +253,7 @@ void Potential::set_local_pot(
         }
     }
 
-    UFFT.ToRealSpace(vg, vl_pseudo); 
+    GlobalC::UFFT.ToRealSpace(vg, vl_pseudo); 
 
     delete[] vg;
 

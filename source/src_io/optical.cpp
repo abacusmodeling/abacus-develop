@@ -38,7 +38,7 @@ void Optical::cal_epsilon2(const int &nbands)
 	double maxe = wf.ekb[0][0];
 	double mine = wf.ekb[0][0];
 
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		for(int ib=0; ib<nbands; ib++)
 		{
@@ -78,7 +78,7 @@ void Optical::cal_epsilon2(const int &nbands)
 	double *epsilon2 = new double[np];
 	ZEROS(epsilon2, np);
 
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		for(int iv=0; iv<n_occ; iv++)
 		{
@@ -88,7 +88,7 @@ void Optical::cal_epsilon2(const int &nbands)
 				const double ec = wf.ekb[ik][ic];
 				const int ie = int((ec - ev)*Ry_to_eV/de);
 				assert(ie < np);
-				epsilon2[ie] += kv.wk[ik] * this->element_cvk(ik, iv, ic);
+				epsilon2[ie] += GlobalC::kv.wk[ik] * this->element_cvk(ik, iv, ic);
 			}
 		}
 	}
@@ -100,7 +100,7 @@ void Optical::cal_epsilon2(const int &nbands)
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs << np << endl;
-		ofs << kv.nkstot << endl;
+		ofs << GlobalC::kv.nkstot << endl;
 		for(int ie=0; ie<np; ie++)
 		{
 			ofs << ie*de << " " << epsilon2[ie] << endl;
@@ -120,7 +120,7 @@ double Optical::element_cvk(const int &ik, const int &iv, const int &ic)
 
 	complex<double> tmp[3];
 	ZEROS(tmp, 3);
-	for(int ig=0; ig<kv.ngk[ik]; ig++)
+	for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 	{
 		const complex<double> uvc = conj( wf.evc[ik](ic,ig) ) * wf.evc[ik](iv, ig);
 		tmp[0] += uvc * pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 0);

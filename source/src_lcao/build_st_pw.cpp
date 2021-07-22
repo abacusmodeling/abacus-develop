@@ -34,7 +34,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					if(GlobalV::NSPIN!=4)
 					{
 						complex<double> v = ZERO;
-						for (int ig = 0; ig < kv.ngk[ik]; ig++) 
+						for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++) 
 						{
 							v += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig);
 						}
@@ -49,7 +49,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					else//added by zhengdy-soc
 					{
 /*						complex<double> v0 = ZERO, v1 = ZERO, v2 = ZERO, v3 = ZERO;
-						for (int ig = 0; ig < kv.ngk[ik]; ig++)
+						for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 						{
 							v0 += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig);
 							v1 += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig + wf.npwx);
@@ -87,12 +87,12 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					if(nu < 0)continue;
 					
 					complex<double> v = ZERO;
-					for (int ig = 0; ig < kv.ngk[ik]; ig++) 
+					for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++) 
 					{
 						v += conj(wf.wanf2[ik](mu, ig)) * wf.wanf2[ik](nu, ig) * wf.g2kin[ig];
 					}
 					if(GlobalV::NSPIN==4)
-					for (int ig = 0; ig < kv.ngk[ik]; ig++)
+					for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 					{
 						v += conj(wf.wanf2[ik](mu, ig + wf.npwx)) * wf.wanf2[ik](nu, ig + wf.npwx) * wf.g2kin[ig];
 					}
@@ -118,7 +118,7 @@ void Build_ST_pw::set_local(const int &ik)
 	assert(GlobalV::NLOCAL>0);
 	assert(!GlobalV::GAMMA_ONLY_LOCAL);
 
-    const int npw = kv.ngk[ik];
+    const int npw = GlobalC::kv.ngk[ik];
     complex<double> *psi_one = new complex<double>[npw];
     complex<double> *hpsi = new complex<double>[npw];
 	complex<double> *psic = new complex<double>[pw.nrxx];

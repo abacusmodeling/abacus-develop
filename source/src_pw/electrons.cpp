@@ -1,7 +1,7 @@
 #include "tools.h"
 #include "global.h"
 #include "electrons.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "../src_io/wf_io.h"
 #include "../src_io/chi0_hilbert.h"
 #include "../src_io/chi0_standard.h"
@@ -39,27 +39,27 @@ void Electrons::non_self_consistent(const int &istep)
     GlobalV::ofs_running << " End of Band Structure Calculation " << endl;
     GlobalV::ofs_running << " Band eigenvalue (eV) :" << endl;
 
-    for (int ik = 0; ik < kv.nks; ik++)
+    for (int ik = 0; ik < GlobalC::kv.nks; ik++)
     {
         if (GlobalV::NSPIN==2)
         {
             if (ik == 0) GlobalV::ofs_running << " spin up :" << endl;
-            if (ik == ( kv.nks / 2)) GlobalV::ofs_running << " spin down :" << endl;
+            if (ik == ( GlobalC::kv.nks / 2)) GlobalV::ofs_running << " spin down :" << endl;
         }
-        //out.printV3(GlobalV::ofs_running, kv.kvec_c[ik]);
+        //out.printV3(GlobalV::ofs_running, GlobalC::kv.kvec_c[ik]);
 
         GlobalV::ofs_running << " k-points" << ik+1 
-        << "(" << kv.nkstot << "): " 
-        << kv.kvec_c[ik].x 
-        << " " << kv.kvec_c[ik].y 
-        << " " << kv.kvec_c[ik].z << endl;
+        << "(" << GlobalC::kv.nkstot << "): " 
+        << GlobalC::kv.kvec_c[ik].x 
+        << " " << GlobalC::kv.kvec_c[ik].y 
+        << " " << GlobalC::kv.kvec_c[ik].z << endl;
 
         for (int ib = 0; ib < GlobalV::NBANDS; ib++)
         {			
-            GlobalV::ofs_running << " spin" << kv.isk[ik]+1 
+            GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
             << "_final_band " << ib+1 
             << " " << wf.ekb[ik][ib] * Ry_to_eV 
-            << " " << wf.wg(ik, ib)*kv.nks << endl;
+            << " " << wf.wg(ik, ib)*GlobalC::kv.nks << endl;
         }
         GlobalV::ofs_running << endl;
     }
@@ -67,7 +67,7 @@ void Electrons::non_self_consistent(const int &istep)
     // add by jingan in 2018.11.7
     if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
-        toWannier90 myWannier(kv.nkstot,ucell.G);
+        toWannier90 myWannier(GlobalC::kv.nkstot,ucell.G);
         myWannier.init_wannier();
     }
 
@@ -461,7 +461,7 @@ void Electrons::c_bands(const int &istep)
 
     GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
     GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
-    for (int ik = 0;ik < kv.nks;ik++)
+    for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         hm.hpw.init_k(ik);
 
@@ -527,7 +527,7 @@ void Electrons::c_bands(const int &istep)
         //GlobalV::ofs_running << " avg_iteri " << avg_iter << endl;
         Parallel_Reduce::reduce_double_allpool(avg_iter); //mohan fix bug 2012-06-05
         //GlobalV::ofs_running << " avg_iter_after " << avg_iter << endl;
-        avg_iter /= static_cast<double>(kv.nkstot);
+        avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
     }
     delete [] h_diag;
     timer::tick("electrons","c_bands");

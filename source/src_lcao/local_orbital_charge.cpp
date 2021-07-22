@@ -102,7 +102,7 @@ void Local_Orbital_Charge::sum_bands(void)
     en.eband = 0.0;
 
     //xiaohui add 2013-09-02
-    for(int ik=0; ik<kv.nks; ik++)
+    for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
         for (int ib=0; ib<GlobalV::NBANDS; ib++)
         {

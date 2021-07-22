@@ -238,7 +238,7 @@ void Stochastic_Iter::itermu(int &iter)
             double *en=wf.ekb[ikk];
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
-                wf.wg(ikk,iksb) = fd(en[iksb])*kv.wk[ikk];
+                wf.wg(ikk,iksb) = fd(en[iksb])*GlobalC::kv.wk[ikk];
             }
         }
     }
@@ -309,10 +309,10 @@ double Stochastic_Iter::calne()
             //number of electrons in KS orbitals
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
-                KS_ne += fd(en[iksb]) * kv.wk[ikk];
+                KS_ne += fd(en[iksb]) * GlobalC::kv.wk[ikk];
             }
         }
-        sto_ne += stok_ne * kv.wk[ikk]; 
+        sto_ne += stok_ne * GlobalC::kv.wk[ikk]; 
     }
 
 #ifdef __MPI
@@ -352,10 +352,10 @@ void Stochastic_Iter::sum_stoband()
             //number of electrons in KS orbitals
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
-                en.demet += fdlnfd(enb[iksb]) * kv.wk[ikk];
+                en.demet += fdlnfd(enb[iksb]) * GlobalC::kv.wk[ikk];
             }
         }
-        stodemet += stok_demet * kv.wk[ikk];
+        stodemet += stok_demet * GlobalC::kv.wk[ikk];
     }
 
     //cal eband & rho
@@ -388,7 +388,7 @@ void Stochastic_Iter::sum_stoband()
     ZEROS(sto_rho, nrxx);
 
     complex<double> * pchi;
-    complex<double>* porter = UFFT.porter;
+    complex<double>* porter = GlobalC::UFFT.porter;
     int* GRA_index = stohchi.GRA_index;
     double out2;
 
@@ -415,7 +415,7 @@ void Stochastic_Iter::sum_stoband()
                 stohchi.hchi_reciprocal(out,hout,nchip);
                 stok_eband = Diago_CG::ddot_real(npwall, out, hout,false) * DeltaE 
                             +  Diago_CG::ddot_real(npwall, out, out,false) * Ebar;
-                sto_eband += stok_eband * kv.wk[ik];
+                sto_eband += stok_eband * GlobalC::kv.wk[ik];
                 complex<double> *tmpout = out;
             for(int ichi = 0; ichi < nchip ; ++ichi)
             {
@@ -424,7 +424,7 @@ void Stochastic_Iter::sum_stoband()
                 {
                     porter[ GRA_index[ig] ] = tmpout[ig];
                 }
-                pw.FFT_wfc.FFT3D(UFFT.porter, 1);
+                pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
                 for(int ir = 0 ; ir < nrxx ; ++ir)
                 {
                     CHR.rho[0][ir] += norm(porter[ir]);
@@ -436,7 +436,7 @@ void Stochastic_Iter::sum_stoband()
 #endif
             for(int ir = 0; ir < nrxx ; ++ir)
             {
-                tmprho = CHR.rho[0][ir] * kv.wk[ik] / ucell.omega;
+                tmprho = CHR.rho[0][ir] * GlobalC::kv.wk[ik] / ucell.omega;
                 sto_rho[ir] = tmprho;
                 sto_ne += tmprho;
             }
@@ -461,13 +461,13 @@ void Stochastic_Iter::sum_stoband()
                 {
                     out2 = norm(out[ir]);
                     //out2 = real(conj(pchi[ir]) * out[ir]);
-                    tmpne = out2 * kv.wk[ik];
+                    tmpne = out2 * GlobalC::kv.wk[ik];
                     stok_eband += real(conj(out[ir]) * hout[ir]) * DeltaE + Ebar * out2;
                     sto_rho[ir] += tmpne; 
                     sto_ne += tmpne;
                 } 
             }
-            sto_eband += stok_eband * kv.wk[ik];
+            sto_eband += stok_eband * GlobalC::kv.wk[ik];
         }
         delete [] hout;
            
@@ -797,7 +797,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
             ne += real(conj(wave[ir]) * waveout[ir]);
             norm1 += norm(wave[ir]);
         }
-        cout<<"Ne of Band "<<ib+1<<" is "<<ne/norm1 * kv.wk[0]<<endl;
+        cout<<"Ne of Band "<<ib+1<<" is "<<ne/norm1 * GlobalC::kv.wk[0]<<endl;
     }
     delete []wave;
     delete []waveout;*/

@@ -23,8 +23,8 @@ void Wfc_Dm_2d::init()
 	}
 	else
 	{
-		wfc_k.resize(kv.nks);
-		dm_k.resize(kv.nks);
+		wfc_k.resize(GlobalC::kv.nks);
+		dm_k.resize(GlobalC::kv.nks);
 	}
 }
 
@@ -89,8 +89,8 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	}
 	else
 	{
-		assert(wg.nr==kv.nks);
-		for(int ik=0; ik!=kv.nks; ++ik)
+		assert(wg.nr==GlobalC::kv.nks);
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
 			std::vector<double> wg_local(ParaO.ncol,0.0);
 			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)

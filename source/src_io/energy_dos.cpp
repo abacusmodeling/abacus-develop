@@ -63,13 +63,13 @@ void energy::perform_dos(void)
 			// pengfei 2015-4-1
 			if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 			{ 
-				for (int ik = 0;ik < kv.nks;ik++)
+				for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 				{                       
 					ofsi<<"BAND"
 					<<setw(25)<<"Energy(ev)"
 					<<setw(25)<<"Occupation"
 					<<setw(25)<<"Kpoint = "<<ik+1
-					<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
+					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
 						ofsi<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<wf.wg(ik,ib)<<endl;
@@ -80,20 +80,20 @@ void energy::perform_dos(void)
 			}
 			else
 			{
-				for (int ik = 0;ik < kv.nks/2;ik++)
+				for (int ik = 0;ik < GlobalC::kv.nks/2;ik++)
 				{
 					ofsi<<"BAND"<<setw(25)<<"Spin up Energy(ev)"
 					<<setw(25)<<"Occupation"
 					<<setw(25)<<"Spin down Energy(ev)"
 					<<setw(25)<<"Occupation"
 					<<setw(25)<<"Kpoint = "<<ik+1
-					<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
+					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
 						ofsi<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV
 						<<setw(25)<<wf.wg(ik,ib)
-						<<setw(25)<<wf.ekb[(ik+kv.nks/2)][ib]* Ry_to_eV
-						<<setw(25)<<wf.wg(ik+kv.nks/2,ib)<<endl;
+						<<setw(25)<<wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+						<<setw(25)<<wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
 					}
 					ofsi <<endl;
 					ofsi <<endl;
@@ -125,13 +125,13 @@ void energy::perform_dos(void)
 				ofstream ofsi2( ss.str().c_str(), ios::app );
 				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 				{
-					for (int ik = 0;ik < kv.nks;ik++)
+					for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 					{
 						ofsi2<<"BAND"
 						<<setw(25)<<"Energy(ev)"
 						<<setw(25)<<"Occupation"
 						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
-						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<wf.wg(ik,ib)<<endl;
@@ -142,7 +142,7 @@ void energy::perform_dos(void)
 				}
 				else
 				{
-					for (int ik = 0;ik < kv.nks/2;ik++)
+					for (int ik = 0;ik < GlobalC::kv.nks/2;ik++)
 					{
 						ofsi2<<"BAND"
 						<<setw(25)<<"Spin up Energy(ev)"
@@ -150,15 +150,15 @@ void energy::perform_dos(void)
 						<<setw(25)<<"Spin down Energy(ev)"
 						<<setw(25)<<"Occupation"
 						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
-						<<setw(25)<<"("<<kv.kvec_d[ik].x<<" "<<kv.kvec_d[ik].y<<" "<<kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1
 							<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV
 							<<setw(25)<<wf.wg(ik,ib)
-							<<setw(25)<<wf.ekb[(ik+kv.nks/2)][ib]* Ry_to_eV
-							<<setw(25)<<wf.wg(ik+kv.nks/2,ib)<<endl;
+							<<setw(25)<<wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<setw(25)<<wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
 						}
 						ofsi2 <<endl;
 						ofsi2 <<endl;
@@ -189,7 +189,7 @@ void energy::perform_dos(void)
 		// find the maximal and minimal band energy.
 		double emax = wf.ekb[0][0];
 		double emin = wf.ekb[0][0];
-		for(int ik=0; ik<kv.nks; ++ik)
+		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
@@ -237,7 +237,7 @@ void energy::perform_dos(void)
 		else 
 		{
 
-			for(int in=0;in<kv.nks;in++)
+			for(int in=0;in<GlobalC::kv.nks;in++)
 			{
 
 				D.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
@@ -293,7 +293,7 @@ void energy::perform_dos(void)
 						double en0=wf.ekb[0][i]*Ry_to_eV;
 						double de = en-en0;
 						double de2 = 0.5*de * de;
-						Gauss[n] = kv.wk[0]*exp(-de2/a/a)/b;
+						Gauss[n] = GlobalC::kv.wk[0]*exp(-de2/a/a)/b;
 					}
 
 					const int NB= i+1;
@@ -372,10 +372,10 @@ void energy::perform_dos(void)
 				Mulk[0].create(ParaO.ncol,ParaO.nrow);
 
 
-				for(int ik=0;ik<kv.nks;ik++)
+				for(int ik=0;ik<GlobalC::kv.nks;ik++)
 				{
 
-					if(is == kv.isk[ik])
+					if(is == GlobalC::kv.isk[ik])
 					{
 						LM.allocate_HS_k(ParaO.nloc);
 						LM.zeros_HSk('S');
@@ -397,7 +397,7 @@ void energy::perform_dos(void)
 								double en0=wf.ekb[ik][i]*Ry_to_eV;
 								double de = en-en0;
 								double de2 = 0.5*de * de;
-								Gauss[n] = kv.wk[ik]*exp(-de2/a/a)/b;
+								Gauss[n] = GlobalC::kv.wk[ik]*exp(-de2/a/a)/b;
 							}
 
 							const int NB= i+1;
@@ -625,12 +625,12 @@ void energy::perform_dos(void)
 
 		 Dos::calculate_dos(
 				 is,
-				 kv.isk,
+				 GlobalC::kv.isk,
 				 ss.str(), 
 				 this->dos_edelta_ev, 
 				 emax, 
 				 emin, 
-				 kv.nks, kv.nkstot, kv.wk, wf.wg, GlobalV::NBANDS, wf.ekb );
+				 GlobalC::kv.nks, GlobalC::kv.nkstot, GlobalC::kv.wk, wf.wg, GlobalV::NBANDS, wf.ekb );
 		 ifstream in(ss.str().c_str());
 		 if(!in)
 		 {
@@ -744,8 +744,8 @@ void energy::perform_dos(void)
 		}
 
 		//int nks;
-		//if(nspin0==1) nks = kv.nkstot;
-		//else if(nspin0==2) nks = kv.nkstot/2;
+		//if(nspin0==1) nks = GlobalC::kv.nkstot;
+		//else if(nspin0==2) nks = GlobalC::kv.nkstot/2;
 
 
 
@@ -763,7 +763,7 @@ void energy::perform_dos(void)
 			{
 				stringstream ss3;
 				ss3 << GlobalV::global_out_dir << "Fermi_Surface_" << i << ".bxsf";
-				Dos::nscf_fermi_surface(ss3.str(),kv.nks,GlobalV::NBANDS,wf.ekb);
+				Dos::nscf_fermi_surface(ss3.str(),GlobalC::kv.nks,GlobalV::NBANDS,wf.ekb);
 			}
 		}
 	}
@@ -772,11 +772,11 @@ void energy::perform_dos(void)
 		int nks=0;
 		if(nspin0==1) 
 		{
-			nks = kv.nkstot;
+			nks = GlobalC::kv.nkstot;
 		}
 		else if(nspin0==2) 
 		{
-			nks = kv.nkstot/2;
+			nks = GlobalC::kv.nkstot/2;
 		}
 
 		for(int is=0; is<nspin0; is++)

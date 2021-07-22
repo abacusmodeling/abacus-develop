@@ -31,11 +31,11 @@ void Run_MD_LCAO::opt_cell(void)
     // npwx, eigenvalues, and weights
     // npwx may change according to cell change
     // this function belongs to cell LOOP
-    wf.allocate_ekb_wg(kv.nks);
+    wf.allocate_ekb_wg(GlobalC::kv.nks);
 
     // Initialize the FFT.
     // this function belongs to cell LOOP
-    UFFT.allocate();
+    GlobalC::UFFT.allocate();
 
     // output is ppcell.vloc 3D local pseudopotentials
     // this function belongs to cell LOOP

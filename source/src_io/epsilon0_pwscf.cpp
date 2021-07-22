@@ -61,7 +61,7 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 		
 	if(GlobalV::NSPIN == 1)
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			Cal_dipole(ik);
 			for(int ib1=0; ib1<GlobalV::NBANDS; ib1++)
@@ -131,7 +131,7 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 			}
 		}
 		
-		double coff = 64 * PI /ucell.omega/kv.nks;
+		double coff = 64 * PI /ucell.omega/GlobalC::kv.nks;
 		cout << "all finish" << endl;
 		
 		for(int iw=0; iw<nomega; iw++)
@@ -182,7 +182,7 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 	}
 	else if(GlobalV::NSPIN == 2)
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			Cal_dipole(ik);
 			for(int ib1=0; ib1<GlobalV::NBANDS; ib1++)
@@ -252,7 +252,7 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 			}
 		}
 		
-		double coff = 128 * PI /ucell.omega/kv.nks;
+		double coff = 128 * PI /ucell.omega/GlobalC::kv.nks;
 		cout << "all finish" << endl;
 
 		for(int iw=0; iw<nomega; iw++)
@@ -392,9 +392,9 @@ double Epsilon0_pwscf:: wgrid(int iw)
 double Epsilon0_pwscf:: focc(int ib, int ik)
 {
 	if(GlobalV::NSPIN == 1)
-		return (wf.wg(ik,ib) * 2.0/ kv.wk[ik] );
+		return (wf.wg(ik,ib) * 2.0/ GlobalC::kv.wk[ik] );
 	else if(GlobalV::NSPIN == 2)
-		return (wf.wg(ik,ib) * 1.0/ kv.wk[ik] );
+		return (wf.wg(ik,ib) * 1.0/ GlobalC::kv.wk[ik] );
 	else				// Peize Lin add 2019-05-01
 		throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 } 
@@ -421,7 +421,7 @@ void Epsilon0_pwscf:: Cal_dipole(int ik)
 					continue;
 				if( focc(ib1,ik) > 0.0001)
 				{
-					for(int ig=0; ig<kv.ngk[ik]; ig++)
+					for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 					{
 						dipole_aux_core[0][ib1][ib2] += conj(wf.evc[ik](ib1, ig)) * pw.get_G_cartesian_projection(ig, 0) * (TWO_PI / ucell.lat0) * wf.evc[ik](ib2, ig);
 						dipole_aux_core[1][ib1][ib2] += conj(wf.evc[ik](ib1, ig)) * pw.get_G_cartesian_projection(ig, 1) * (TWO_PI / ucell.lat0) * wf.evc[ik](ib2,ig);
@@ -437,7 +437,7 @@ void Epsilon0_pwscf:: Cal_dipole(int ik)
 	{
 		for(int ib1=0; ib1<GlobalV::NBANDS; ib1++)
 		{
-			for(int ig=0; ig<kv.ngk[ik]; ig++)
+			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
 				dipole_aux_core[0][ib1][ib1] += conj(wf.evc[ik](ib1, ig)) * pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI / ucell.lat0) * wf.evc[ik](ib1,ig);
 				dipole_aux_core[1][ib1][ib1] += conj(wf.evc[ik](ib1, ig)) * pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / ucell.lat0) * wf.evc[ik](ib1, ig);

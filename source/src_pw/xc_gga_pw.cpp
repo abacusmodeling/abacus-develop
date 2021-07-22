@@ -363,7 +363,7 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 	complex<double> *gdrtmpg = new complex<double>[pw.ngmc];
 	ZEROS(gdrtmpg, pw.ngmc);
 
-	complex<double> *Porter = UFFT.porter;
+	complex<double> *Porter = GlobalC::UFFT.porter;
 
 	// the formula is : rho(r)^prime = \int iG * rho(G)e^{iGr} dG
 	for(int ig=0; ig<pw.ngmc; ig++)

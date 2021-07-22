@@ -49,7 +49,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
     GlobalV::ofs_running << " end of band structure calculation " << endl;
     GlobalV::ofs_running << " band eigenvalue in this processor (eV) :" << endl;
 
-    for (int ik = 0; ik < kv.nks; ik++)
+    for (int ik = 0; ik < GlobalC::kv.nks; ik++)
     {
         if (GlobalV::NSPIN==2)
         {
@@ -57,22 +57,22 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 			{
 				GlobalV::ofs_running << " spin up :" << endl;
 			}
-            if (ik==( kv.nks / 2)) 
+            if (ik==( GlobalC::kv.nks / 2)) 
 			{
 				GlobalV::ofs_running << " spin down :" << endl;
 			}
         }
 
 		GlobalV::ofs_running << " k-points" 
-			<< ik+1 << "(" << kv.nkstot << "): " 
-			<< kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z << endl;
+			<< ik+1 << "(" << GlobalC::kv.nkstot << "): " 
+			<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << endl;
 
         for (int ib = 0; ib < GlobalV::NBANDS; ib++)
         {			
-            GlobalV::ofs_running << " spin" << kv.isk[ik]+1 
+            GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
 			<< "final_state " << ib+1 << " " 
 			<< wf.ekb[ik][ib] * Ry_to_eV 
-			<< " " << wf.wg(ik, ib)*kv.nks << endl;
+			<< " " << wf.wg(ik, ib)*GlobalC::kv.nks << endl;
         }
 		GlobalV::ofs_running << endl;
     }
@@ -80,7 +80,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	// add by jingan in 2018.11.7
 	if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
-        toWannier90 myWannier(kv.nkstot,ucell.G);
+        toWannier90 myWannier(GlobalC::kv.nkstot,ucell.G);
         myWannier.init_wannier();
     }
 	

@@ -63,7 +63,7 @@ void Hamilt_PW::init_k(const int ik)
 	// (1) Which spin to use.
 	if(GlobalV::NSPIN==2)
 	{
-		GlobalV::CURRENT_SPIN = kv.isk[ik];
+		GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 	}
 
 	// (2) Kinetic energy.
@@ -83,7 +83,7 @@ void Hamilt_PW::init_k(const int ik)
 	}
 
 	// (5) The number of wave functions.
-	wf.npw = kv.ngk[ik];
+	wf.npw = GlobalC::kv.ngk[ik];
 
 	// (6) The index of plane waves.
     for (int ig = 0;ig < wf.npw;ig++)
@@ -119,7 +119,7 @@ void Hamilt_PW::diagH_subspace(
 
 	int dmin=0;
 	int dmax=0;
-	const int npw = kv.ngk[ik];
+	const int npw = GlobalC::kv.ngk[ik];
 
 	if(GlobalV::NSPIN != 4)
 	{
@@ -211,7 +211,7 @@ void Hamilt_PW::diagH_subspace(
 // for tests
 /*
 		cout << setprecision(3);
-		out.printV3(GlobalV::ofs_running,kv.kvec_c[ik]);
+		out.printV3(GlobalV::ofs_running,GlobalC::kv.kvec_c[ik]);
 		out.printcm_norm("sc",sc,1.0e-4);
 		out.printcm_norm("hvec",hvec,1.0e-4);
 		out.printcm_norm("hc",hc,1.0e-4);
@@ -403,43 +403,43 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 		for(int ib = 0 ; ib < m; ++ib)
 		{
 			if(GlobalV::NSPIN!=4){
-				ZEROS( UFFT.porter, pw.nrxx);
-				UFFT.RoundTrip( tmpsi_in, pot.vr_eff1, GR_index, UFFT.porter );
+				ZEROS( GlobalC::UFFT.porter, pw.nrxx);
+				GlobalC::UFFT.RoundTrip( tmpsi_in, pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
 				for (j = 0;j < wf.npw;j++)
 				{
-					tmhpsi[j] += UFFT.porter[ GR_index[j] ];
+					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
 				}
 			}
 			else
 			{
 				complex<double>* porter1 = new complex<double>[pw.nrxx];
-				ZEROS( UFFT.porter, pw.nrxx);
+				ZEROS( GlobalC::UFFT.porter, pw.nrxx);
 				ZEROS( porter1, pw.nrxx);
 				for (int ig=0; ig< wf.npw; ig++)
 				{
-					UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
+					GlobalC::UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
 					porter1[ GR_index[ig]  ] = tmpsi_in[ig + wf.npwx];
 				}
 				// (2) fft to real space and doing things.
-				pw.FFT_wfc.FFT3D( UFFT.porter, 1);
+				pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, 1);
 				pw.FFT_wfc.FFT3D( porter1, 1);
 				complex<double> sup,sdown;
 				for (int ir=0; ir< pw.nrxx; ir++)
 				{
-					sup = UFFT.porter[ir] * (pot.vr_eff(0,ir) + pot.vr_eff(3,ir)) +
+					sup = GlobalC::UFFT.porter[ir] * (pot.vr_eff(0,ir) + pot.vr_eff(3,ir)) +
 						porter1[ir] * (pot.vr_eff(1,ir) - complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
 					sdown = porter1[ir] * (pot.vr_eff(0,ir) - pot.vr_eff(3,ir)) +
-					UFFT.porter[ir] * (pot.vr_eff(1,ir) + complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
-					UFFT.porter[ir] = sup;
+					GlobalC::UFFT.porter[ir] * (pot.vr_eff(1,ir) + complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
+					GlobalC::UFFT.porter[ir] = sup;
 					porter1[ir] = sdown;
 				}
 				// (3) fft back to G space.
-				pw.FFT_wfc.FFT3D( UFFT.porter, -1);
+				pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, -1);
 				pw.FFT_wfc.FFT3D( porter1, -1);
 
 				for (j = 0;j < wf.npw;j++)
 				{
-					tmhpsi[j] += UFFT.porter[ GR_index[j] ];
+					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
 				}
 				for (j = 0;j < wf.npw;j++ )
 				{

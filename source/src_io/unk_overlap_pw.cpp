@@ -24,12 +24,12 @@ complex<double> unkOverlap_pw::unkdotp_G(const int ik_L, const int ik_R, const i
 	ZEROS(unk_R,number_pw);
 	
 
-	for (int ig = 0; ig < kv.ngk[ik_L]; ig++)
+	for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
 	{
 		unk_L[wf.igk(ik_L,ig)] = evc[ik_L](iband_L, ig);
 	}
 	
-	for (int ig = 0; ig < kv.ngk[ik_R]; ig++)
+	for (int ig = 0; ig < GlobalC::kv.ngk[ik_R]; ig++)
 	{
 		unk_R[wf.igk(ik_R,ig)] = evc[ik_R](iband_R, ig);
 	}
@@ -67,14 +67,14 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
 {
 	// (1) set value
 	complex<double> result(0.0,0.0);
-	complex<double> *phase = UFFT.porter;
+	complex<double> *phase = GlobalC::UFFT.porter;
 	complex<double> *psi_r = new complex<double>[pw.nrxx]; // 实空间的波函数
 
 	ZEROS( phase, pw.nrxx);
 	ZEROS( psi_r, pw.nrxx );
 
 
-	for (int ig = 0; ig < kv.ngk[ik_L]; ig++)
+	for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
 	{
 		psi_r[ pw.ig2fftw[ wf.igk(ik_L,ig) ] ] = evc[ik_L](iband_L, ig);
 
@@ -105,7 +105,7 @@ complex<double> unkOverlap_pw::unkdotp_G0(const int ik_L, const int ik_R, const 
 	pw.FFT_wfc.FFT3D( psi_r, -1);
 	
 
-	for(int ig = 0; ig < kv.ngk[ik_R]; ig++)
+	for(int ig = 0; ig < GlobalC::kv.ngk[ik_R]; ig++)
 	{
 		result = result + conj( psi_r[ pw.ig2fftw[wf.igk(ik_R,ig)] ] ) * evc[ik_R](iband_R, ig);
 	}
@@ -139,12 +139,12 @@ complex<double> unkOverlap_pw::unkdotp_soc_G(const int ik_L, const int ik_R, con
 	
 	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
-		for (int ig = 0; ig < kv.ngk[ik_L]; ig++)
+		for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
 		{
 			unk_L[wf.igk(ik_L,ig)+i*number_pw] = evc[ik_L](iband_L, ig+i*wf.npwx);
 		}
 	
-		for (int ig = 0; ig < kv.ngk[ik_R]; ig++)
+		for (int ig = 0; ig < GlobalC::kv.ngk[ik_R]; ig++)
 		{
 			unk_R[wf.igk(ik_R,ig)+i*number_pw] = evc[ik_R](iband_R, ig+i*wf.npwx);
 		}
@@ -182,7 +182,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 {
 	// (1) set value
 	complex<double> result(0.0,0.0);
-	complex<double> *phase = UFFT.porter;
+	complex<double> *phase = GlobalC::UFFT.porter;
 	complex<double> *psi_up = new complex<double>[pw.nrxx];
 	complex<double> *psi_down = new complex<double>[pw.nrxx];
 	ZEROS( phase, pw.nrxx);
@@ -191,7 +191,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 
 	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
-		for (int ig = 0; ig < kv.ngk[ik_L]; ig++)
+		for (int ig = 0; ig < GlobalC::kv.ngk[ik_L]; ig++)
 		{
 			if( i == 0 ) psi_up[ pw.ig2fftw[ wf.igk(ik_L,ig) ] ] = evc[ik_L](iband_L, ig);
 			if( i == 1 ) psi_down[ pw.ig2fftw[ wf.igk(ik_L,ig) ] ] = evc[ik_L](iband_L, ig+i*wf.npwx);
@@ -226,7 +226,7 @@ complex<double> unkOverlap_pw::unkdotp_soc_G0(const int ik_L, const int ik_R, co
 	
 	for(int i = 0; i < GlobalV::NPOL; i++)
 	{
-		for(int ig = 0; ig < kv.ngk[ik_R]; ig++)
+		for(int ig = 0; ig < GlobalC::kv.ngk[ik_R]; ig++)
 		{
 			if( i == 0 ) result = result + conj( psi_up[ pw.ig2fftw[wf.igk(ik_R,ig)] ] ) * evc[ik_R](iband_R, ig);
 			if( i == 1 ) result = result + conj( psi_down[ pw.ig2fftw[wf.igk(ik_R,ig)] ] ) * evc[ik_R](iband_R, ig+i*wf.npwx);
@@ -255,7 +255,7 @@ void unkOverlap_pw::test_for_unkOverlap_pw()
 	const int number_pw = pw.ngmw;
 	GlobalV::ofs_running << "the pw.ngmw is " << number_pw << endl;
 	complex<double> *unk_L = new complex<double>[number_pw];
-	for (int ig = 0; ig < kv.ngk[0]; ig++)
+	for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
 	{
 		unk_L[wf.igk(0,ig)] = wf.evc[0](0, ig);
 	}

@@ -47,7 +47,7 @@ Mulliken_Charge::Mulliken_Charge()
 	else 
 	{
 
-		for(int in=0;in<kv.nks;in++)
+		for(int in=0;in<GlobalC::kv.nks;in++)
 		{
 
 			M.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
@@ -210,9 +210,9 @@ void Mulliken_Charge::cal_mulliken(void)
 			UHM.genH.calculate_S_no();
 			UHM.genH.build_ST_new('S', false);
 
-			for(int ik=0;ik<kv.nks;ik++)
+			for(int ik=0;ik<GlobalC::kv.nks;ik++)
 			{
-				if(is == kv.isk[ik])
+				if(is == GlobalC::kv.isk[ik])
 				{
 					LM.allocate_HS_k(ParaO.nloc);
 					LM.zeros_HSk('S');

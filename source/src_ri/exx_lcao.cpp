@@ -393,18 +393,18 @@ void Exx_Lcao::init()
 
 	auto test_exp = [&]()
 	{
-		cout<<"kv.kvec_d:"<<endl;
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		cout<<"GlobalC::kv.kvec_d:"<<endl;
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
-			cout<<kv.kvec_d[ik]<<endl;
+			cout<<GlobalC::kv.kvec_d[ik]<<endl;
 		}
-		cout<<"kv.kvec_c:"<<endl;
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		cout<<"GlobalC::kv.kvec_c:"<<endl;
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
-			cout<<kv.kvec_c[ik]<<endl;
+			cout<<GlobalC::kv.kvec_c[ik]<<endl;
 		}
 
-		const Vector3<int>BvK_period( kv.nmp[0], kv.nmp[1], kv.nmp[2] );
+		const Vector3<int>BvK_period( GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2] );
 		vector<Vector3<double>> boxes;
 		for( int x=0; x!=BvK_period.x; ++x )
 		{
@@ -429,38 +429,38 @@ void Exx_Lcao::init()
 		}
 
 		cout<<"k R"<<endl;
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				cout<<kv.kvec_c[ik] * (boxes[i]*ucell.latvec)<<"\t";
+				cout<<GlobalC::kv.kvec_c[ik] * (boxes[i]*ucell.latvec)<<"\t";
 			}
 			cout<<endl;
 		}
 		cout<<"exp( - 2 pi i k R )"<<endl;
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				cout<<exp( -TWO_PI*IMAG_UNIT* (kv.kvec_c[ik]* (boxes[i]*ucell.latvec)) )<<"\t";
+				cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (boxes[i]*ucell.latvec)) )<<"\t";
 			}
 			cout<<endl;
 		}
 		cout<<"k R"<<endl;
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				cout<<kv.kvec_d[ik] * static_cast<Vector3<double>>(boxes[i])<<"\t";
+				cout<<GlobalC::kv.kvec_d[ik] * static_cast<Vector3<double>>(boxes[i])<<"\t";
 			}
 			cout<<endl;
 		}
 		cout<<"exp( - 2 pi i k R )"<<endl;
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				cout<<exp( -TWO_PI*IMAG_UNIT* (kv.kvec_d[ik]* static_cast<Vector3<double>>(boxes[i])) )<<"\t";
+				cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_d[ik]* static_cast<Vector3<double>>(boxes[i])) )<<"\t";
 			}
 			cout<<endl;
 		}
@@ -722,7 +722,7 @@ ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial\t"<<time_during(t_start)<<endl;
 //	m_abfslcaos_lcaos.init_radial_table();
 //ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<endl;
 
-	Born_von_Karman_period = Vector3<int>{kv.nmp[0],kv.nmp[1],kv.nmp[2]};
+	Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
 ofs_mpi<<"TIME@ Exx_Lcao::init\t"<<time_during(t_start_all)<<endl;
 ofs_mpi.close();
 
@@ -1054,7 +1054,7 @@ ofs_mpi.close();
 	{
 		if( GlobalV::GAMMA_ONLY_LOCAL )
 		{
-			for( size_t ik=0; ik!=kv.nks; ++ik )
+			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
 				ofstream ofs("LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
@@ -1076,7 +1076,7 @@ ofs_mpi.close();
 		}
 		else
 		{
-			for( size_t ik=0; ik!=kv.nks; ++ik )
+			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
 				ofstream ofs("LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
@@ -1102,7 +1102,7 @@ ofs_mpi.close();
 		}
 		else
 		{
-			for(int ik=0; ik<kv.nks; ++ik)
+			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
 				ofs<<exx_lcao.Hexx_para.HK_K_m2D[ik]<<endl;
@@ -1122,7 +1122,7 @@ ofs_mpi.close();
 		}
 		else
 		{
-			for(int ik=0; ik<kv.nks; ++ik)
+			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
 				ofs<<LOC.wfc_dm_2d.wfc_gamma[ik]<<endl;
@@ -1132,7 +1132,7 @@ ofs_mpi.close();
 
 	auto print_ekb=[&]()		// Peize Lin test 2019-11-14
 	{
-		for(int ik=0; ik<kv.nks; ++ik)
+		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
 			ofstream ofs("ekb_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)

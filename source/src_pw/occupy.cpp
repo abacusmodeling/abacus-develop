@@ -41,14 +41,14 @@ void Occupy::calculate_weights(void)
     {
         if (GlobalV::TWO_EFERMI)
         {
-            iweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, kv.isk);
-            iweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, GlobalC::kv.isk);
 			//ef = ( ef_up + ef_dw ) / 2.0_dp need??? mohan add 2012-04-16
         }
         else
         {
 			// -1 means don't need to consider spin.
-            iweights(kv.nks, kv.wk, GlobalV::NBANDS, CHR.nelec, wf.ekb, en.ef, wf.wg, -1, kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, CHR.nelec, wf.ekb, en.ef, wf.wg, -1, GlobalC::kv.isk);
         }
     }
     else if (use_tetrahedron_method)
@@ -56,7 +56,7 @@ void Occupy::calculate_weights(void)
         WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
 //		if(my_rank == 0)
 //		{
-//			tweights(kv.nkstot, nspin, GlobalV::NBANDS, CHR.nelec, ntetra,tetra, wf.et, en.ef, wf.wg);
+//			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, CHR.nelec, ntetra,tetra, wf.et, en.ef, wf.wg);
 //		}
     }
     else if (use_gaussian_broadening)
@@ -65,18 +65,18 @@ void Occupy::calculate_weights(void)
 		{
 			double demet_up = 0.0;
 			double demet_dw = 0.0;
-			Occupy::gweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
-			                 wf.ekb, en.ef_up, demet_up, wf.wg, 0, kv.isk);
-			Occupy::gweights(kv.nks, kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
-			                 wf.ekb, en.ef_dw, demet_dw, wf.wg, 1, kv.isk);
+			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
+			                 wf.ekb, en.ef_up, demet_up, wf.wg, 0, GlobalC::kv.isk);
+			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
+			                 wf.ekb, en.ef_dw, demet_dw, wf.wg, 1, GlobalC::kv.isk);
 			en.demet = demet_up + demet_dw;
                         
 		}
 		else
 		{
 			// -1 means is no related to spin.
-        	Occupy::gweights(kv.nks, kv.wk, GlobalV::NBANDS, CHR.nelec, gaussian_parameter, gaussian_type,
-                 wf.ekb, en.ef, en.demet, wf.wg, -1, kv.isk);
+        	Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, CHR.nelec, gaussian_parameter, gaussian_type,
+                 wf.ekb, en.ef, en.demet, wf.wg, -1, GlobalC::kv.isk);
 
 		}
 
@@ -89,7 +89,7 @@ void Occupy::calculate_weights(void)
 		// fix occupations need nelup and neldw.
 		// mohan add 2011-04-03
 		en.ef = - 1.0e+20;
-		for (int ik = 0;ik < kv.nks ;ik++)
+		for (int ik = 0;ik < GlobalC::kv.nks ;ik++)
 		{
 			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
@@ -110,7 +110,7 @@ void Occupy::calculate_weights(void)
     {
 		double ebotom = wf.ekb[0][0];
 		double etop = wf.ekb[0][0];
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ib++)
 			{

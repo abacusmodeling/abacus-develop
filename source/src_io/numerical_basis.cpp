@@ -38,7 +38,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
         Numerical_Basis::init_mu_index();
         Numerical_Basis::init_label = true;
     }
-    this->numerical_atomic_wfc(ik, kv.ngk[ik], psi);
+    this->numerical_atomic_wfc(ik, GlobalC::kv.ngk[ik], psi);
     return;
 }
 
@@ -70,7 +70,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         ofs.open(ss.str().c_str());
     }
 
-    const int nks = kv.nks;
+    const int nks = GlobalC::kv.nks;
     const int ne = Numerical_Basis::bessel_basis.get_ecut_number();
 
 	// OVERLAP : < J_mu | Psi >
@@ -105,7 +105,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     // nks now is the reduced k-points.
     for (int ik=0; ik<nks; ik++)
     {
-        const int npw= kv.ngk[ik];
+        const int npw= GlobalC::kv.ngk[ik];
 		GlobalV::ofs_running << " --------------------------------------------------------" << endl;
 		GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint";
         GlobalV::ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";
@@ -203,7 +203,7 @@ void Numerical_Basis::output_overlap_Sq(
     }
 
     int count = 0;
-    for (int ik=0; ik< kv.nkstot; ik++)
+    for (int ik=0; ik< GlobalC::kv.nkstot; ik++)
     {
         if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
         {
@@ -257,7 +257,7 @@ void Numerical_Basis::output_overlap_Q(
     // (1)
     if (GlobalV::MY_RANK==0)
     {
-        ofs << kv.nkstot << " nks" << endl;
+        ofs << GlobalC::kv.nkstot << " nks" << endl;
         ofs	<< overlap_Q1.getBound2() << " nbands" << endl;
         ofs	<< overlap_Q1.getBound3() << " nwfc" << endl;
         ofs	<< overlap_Q1.getBound4() << " ne";
@@ -265,7 +265,7 @@ void Numerical_Basis::output_overlap_Q(
     }
 
     // (2)
-    for (int ik=0; ik<kv.nkstot; ik++)
+    for (int ik=0; ik<GlobalC::kv.nkstot; ik++)
     {
         double kx, ky, kz, wknow;
 #ifdef __MPI
@@ -277,10 +277,10 @@ void Numerical_Basis::output_overlap_Q(
             {
                 if (pool==0)
                 {
-                    kx = kv.kvec_c[ik].x;
-                    ky = kv.kvec_c[ik].y;
-                    kz = kv.kvec_c[ik].z;
-                    wknow = kv.wk[ik];
+                    kx = GlobalC::kv.kvec_c[ik].x;
+                    ky = GlobalC::kv.kvec_c[ik].y;
+                    kz = GlobalC::kv.kvec_c[ik].z;
+                    wknow = GlobalC::kv.wk[ik];
                 }
                 else
                 {
@@ -295,10 +295,10 @@ void Numerical_Basis::output_overlap_Q(
             {
                 if (GlobalV::MY_POOL == pool)
                 {
-                    MPI_Send(&kv.kvec_c[iknow].x, 1, MPI_DOUBLE, 0, ik*4, MPI_COMM_WORLD);
-                    MPI_Send(&kv.kvec_c[iknow].y, 1, MPI_DOUBLE, 0, ik*4+1, MPI_COMM_WORLD);
-                    MPI_Send(&kv.kvec_c[iknow].z, 1, MPI_DOUBLE, 0, ik*4+2, MPI_COMM_WORLD);
-                    MPI_Send(&kv.wk[iknow], 1, MPI_DOUBLE, 0, ik*4+3, MPI_COMM_WORLD);
+                    MPI_Send(&GlobalC::kv.kvec_c[iknow].x, 1, MPI_DOUBLE, 0, ik*4, MPI_COMM_WORLD);
+                    MPI_Send(&GlobalC::kv.kvec_c[iknow].y, 1, MPI_DOUBLE, 0, ik*4+1, MPI_COMM_WORLD);
+                    MPI_Send(&GlobalC::kv.kvec_c[iknow].z, 1, MPI_DOUBLE, 0, ik*4+2, MPI_COMM_WORLD);
+                    MPI_Send(&GlobalC::kv.wk[iknow], 1, MPI_DOUBLE, 0, ik*4+3, MPI_COMM_WORLD);
                 }
             }
         }
@@ -307,10 +307,10 @@ void Numerical_Basis::output_overlap_Q(
 #else
         if (GlobalV::MY_RANK==0)
         {
-            kx = kv.kvec_c[ik].x;
-            ky = kv.kvec_c[ik].y;
-            kz = kv.kvec_c[ik].z;
-            wknow = kv.wk[ik];
+            kx = GlobalC::kv.kvec_c[ik].x;
+            ky = GlobalC::kv.kvec_c[ik].y;
+            kz = GlobalC::kv.kvec_c[ik].z;
+            wknow = GlobalC::kv.wk[ik];
         }
 #endif
 
@@ -346,7 +346,7 @@ void Numerical_Basis::output_overlap_Q(
     double *Qtmp2 = new double[dim];
     int count = 0;
 
-    for (int ik=0; ik<kv.nkstot; ik++)
+    for (int ik=0; ik<GlobalC::kv.nkstot; ik++)
     {
         ZEROS(Qtmp1, dim);
         ZEROS(Qtmp2, dim);

@@ -2,7 +2,7 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 
@@ -37,7 +37,7 @@ void ELEC_evolve::evolve_psi(
 	uhm.GK.allocate_pvpR();
 						
 	// pool parallization in future -- mohan note 2021-02-09
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	
 		//-----------------------------------------
 		//(1) prepare data for this k point.
@@ -45,9 +45,9 @@ void ELEC_evolve::evolve_psi(
 		//-----------------------------------------
 		if(GlobalV::NSPIN==2) 
 		{
-			GlobalV::CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
-		wf.npw = kv.ngk[ik];
+		wf.npw = GlobalC::kv.ngk[ik];
 
 		for(int ir=0; ir<pw.nrxx; ir++)
 		{

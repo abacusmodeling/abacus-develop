@@ -308,7 +308,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 	
 	// check in plane wave basis.	
 	Build_ST_pw bsp;
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		cout << " ik=" << ik << " ------------------------------------------" << endl;
 	

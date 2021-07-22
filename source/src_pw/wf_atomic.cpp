@@ -218,7 +218,7 @@ void WF_atomic::check_psi(const ComplexMatrix *evc)const
         OUT("sum_evc",sum_evc);
     }
 
-    for (int ik=0;ik<kv.nks;ik++)
+    for (int ik=0;ik<GlobalC::kv.nks;ik++)
     {
         double sum_evc = abs2(this->evc[ik]);
         OUT("ik",ik);
@@ -474,7 +474,7 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
 {
     assert(iw_start >= 0);
     assert(psi.nr >= iw_end);
-    const int ng = kv.ngk[ik];
+    const int ng = GlobalC::kv.ngk[ik];
     for (int iw = iw_start ;iw < iw_end;iw++)
     {
         for (int ig = 0;ig < ng;ig++)

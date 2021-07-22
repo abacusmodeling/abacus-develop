@@ -20,8 +20,8 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 	static int istep=-1;	++istep;	
 	TITLE("cal_DMk_raw_readfile_"+TO_STRING(istep));
 	matrix wf_wg = read_wg( "wf.wg/wf.wg_"+TO_STRING(istep) );
-	vector<vector<vector<complex<double>>>> wfc(kv.nks);
-	for( size_t ik=0; ik!=kv.nks; ++ik )
+	vector<vector<vector<complex<double>>>> wfc(GlobalC::kv.nks);
+	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		wfc[ik] = read_wfc( "hvec/hvec_"+TO_STRING(istep)+"_"+TO_STRING(ik) );	
 	
 	
@@ -37,8 +37,8 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 		const size_t ia1 = ucell.iat2ia[iat1];
 		const size_t ia2 = ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( kv.nks, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
-		for( size_t ik=0; ik!=kv.nks; ++ik )
+		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
+		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
 			{
@@ -79,9 +79,9 @@ vector<vector<complex<double>>> Exx_Abfs_DM_Test::read_wfc( const string &file_n
 
 matrix Exx_Abfs_DM_Test::read_wg( const string &file_name )
 {
-	matrix wf_wg(kv.nks,GlobalV::NBANDS);
+	matrix wf_wg(GlobalC::kv.nks,GlobalV::NBANDS);
 	ifstream ifs(file_name);
-	for( size_t ik=0; ik!=kv.nks; ++ik )
+	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 		{
