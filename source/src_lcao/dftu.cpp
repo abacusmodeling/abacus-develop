@@ -1163,44 +1163,8 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	const int  one_int = 1;
   const complex<double> alpha_c(1.0,0.0), beta_c(0.0,0.0), half_c(0.5,0.0), one_c(1.0,0.0);
 
-	vector<complex<double>> VU(ParaO.nloc, complex<double>(0.0, 0.0));
-	for(int ir=0; ir<ParaO.nrow; ir++)
-	{
-		const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-		const int T1 = this->iwt2it.at(iwt1);
-		const int iat1 = this->iwt2iat.at(iwt1);
-		const int L1 = this->iwt2l.at(iwt1);
-		const int n1 = this->iwt2n.at(iwt1);
-		const int m1 = this->iwt2m.at(iwt1);
-		const int ipol1 = this->iwt2ipol.at(iwt1);
-		for(int ic=0; ic<ParaO.ncol; ic++)
-		{
-			const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-			const int T2 = this->iwt2it.at(iwt2);
-			const int iat2 = this->iwt2iat.at(iwt2);
-			const int L2 = this->iwt2l.at(iwt2);
-			const int n2 = this->iwt2n.at(iwt2);
-			const int m2 = this->iwt2m.at(iwt2);
-			const int ipol2 = this->iwt2ipol.at(iwt2);
-			int irc = ic*ParaO.nrow + ir;			
-			if(INPUT.orbital_corr[T1]==-1 || INPUT.orbital_corr[T2]==-1) continue;
-			if(iat1!=iat2) continue;			
-			// if(Yukawa)
-			// {
-				// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
-			// }
-			// else
-			// {
-				if(L1!=INPUT.orbital_corr[T1] || L2!=INPUT.orbital_corr[T2] || n1!=0 || n2!=0) continue;
-			// }
-			if(L1!=L2 || n1!=n2) continue;
-			// if(m1==m2 && iwt1==iwt2) delta.at(irc) = 1.0;
-			int m1_all = m1 + (2*L1+1)*ipol1;
-			int m2_all = m2 + (2*L2+1)*ipol2;
-			double val = get_onebody_eff_pot(T1, iat1, L1, n1, spin, m1_all, m2_all, cal_type, 1);
-			VU.at(irc) = complex<double>(val, 0.0);
-		}
-	}
+	vector<complex<double>> VU(ParaO.nloc);
+  this->cal_VU_pot_mat_complex(spin, 1, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&NLOCAL, &NLOCAL, &NLOCAL,
@@ -1282,43 +1246,9 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0, half=0.5, one=1.0;
 
-	vector<double> VU(ParaO.nloc, 0.0);
-	for(int ir=0; ir<ParaO.nrow; ir++)
-	{
-		const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-		const int T1 = this->iwt2it.at(iwt1);
-		const int iat1 = this->iwt2iat.at(iwt1);
-		const int L1 = this->iwt2l.at(iwt1);
-		const int n1 = this->iwt2n.at(iwt1);
-		const int m1 = this->iwt2m.at(iwt1);
-		const int ipol1 = this->iwt2ipol.at(iwt1);
+	vector<double> VU(ParaO.nloc);
+  this->cal_VU_pot_mat_real(spin, 1, &VU[0]);
 
-		for(int ic=0; ic<ParaO.ncol; ic++)
-		{
-			const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-			const int T2 = this->iwt2it.at(iwt2);
-			const int iat2 = this->iwt2iat.at(iwt2);
-			const int L2 = this->iwt2l.at(iwt2);
-			const int n2 = this->iwt2n.at(iwt2);
-			const int m2 = this->iwt2m.at(iwt2);
-			const int ipol2 = this->iwt2ipol.at(iwt2);
-			int irc = ic*ParaO.nrow + ir;			
-			if(INPUT.orbital_corr[T1]==-1 || INPUT.orbital_corr[T2]==-1) continue;
-			if(iat1!=iat2) continue;			
-			// if(Yukawa)
-			// {
-				// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
-			// }
-			// else
-			// {
-				if(L1!=INPUT.orbital_corr[T1] || L2!=INPUT.orbital_corr[T2] || n1!=0 || n2!=0) continue;
-			// }
-			if(L1!=L2 || n1!=n2) continue;
-			VU.at(irc) = get_onebody_eff_pot(T1, iat1, L1, n1, spin, m1, m2, cal_type, 1);
-		}
-	}
-		
-	// The first term
 	pdgemm_(&transN, &transN,
 		&NLOCAL, &NLOCAL, &NLOCAL,
 		&half, 
@@ -1504,47 +1434,9 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 
   for(int i=0; i<ParaO.nloc; i++) HR[i] = 0.0;
 
-  vector<double> VU(ParaO.nloc, 0.0);
+  vector<double> VU(ParaO.nloc);
+  this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
 
-	for(int ir=0; ir<ParaO.nrow; ir++)
-	{
-		const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-		const int T1 = this->iwt2it.at(iwt1);
-		const int iat1 = this->iwt2iat.at(iwt1);
-		const int L1 = this->iwt2l.at(iwt1);
-		const int n1 = this->iwt2n.at(iwt1);
-		const int m1 = this->iwt2m.at(iwt1);
-		const int ipol1 = this->iwt2ipol.at(iwt1);
-
-		for(int ic=0; ic<ParaO.ncol; ic++)
-		{
-			const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-			const int T2 = this->iwt2it.at(iwt2);
-			const int iat2 = this->iwt2iat.at(iwt2);
-			const int L2 = this->iwt2l.at(iwt2);
-			const int n2 = this->iwt2n.at(iwt2);
-			const int m2 = this->iwt2m.at(iwt2);
-			const int ipol2 = this->iwt2ipol.at(iwt2);
-
-			int irc = ic*ParaO.nrow + ir;			
-
-			if(INPUT.orbital_corr[T1]==-1 || INPUT.orbital_corr[T2]==-1) continue;
-			if(iat1!=iat2) continue;			
-			// if(Yukawa)
-			// {
-				// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
-			// }
-			// else
-			// {
-				if(L1!=INPUT.orbital_corr[T1] || L2!=INPUT.orbital_corr[T2] || n1!=0 || n2!=0) continue;
-			// }
-			if(L1!=L2 || n1!=n2) continue;
-
-			VU.at(irc) = get_onebody_eff_pot(T1, iat1, L1, n1, ispin, m1, m2, cal_type, 1);
-	  }//ic
-  }//ir
-
-	// The first term
 	pdgemm_(&transN, &transN,
 		&NLOCAL, &NLOCAL, &NLOCAL,
 		&half, 
@@ -1575,55 +1467,9 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
 
   for(int i=0; i<ParaO.nloc; i++) HR[i] = zero;
 
-  vector<complex<double>> VU(ParaO.nloc, complex<double>(0.0, 0.0));
+  vector<complex<double>> VU(ParaO.nloc);
+  this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
 
-	for(int ir=0; ir<ParaO.nrow; ir++)
-	{
-		const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-		const int T1 = this->iwt2it.at(iwt1);
-		const int iat1 = this->iwt2iat.at(iwt1);
-		const int L1 = this->iwt2l.at(iwt1);
-		const int n1 = this->iwt2n.at(iwt1);
-		const int m1 = this->iwt2m.at(iwt1);
-		const int ipol1 = this->iwt2ipol.at(iwt1);
-
-		for(int ic=0; ic<ParaO.ncol; ic++)
-		{
-			const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-			const int T2 = this->iwt2it.at(iwt2);
-			const int iat2 = this->iwt2iat.at(iwt2);
-			const int L2 = this->iwt2l.at(iwt2);
-			const int n2 = this->iwt2n.at(iwt2);
-			const int m2 = this->iwt2m.at(iwt2);
-			const int ipol2 = this->iwt2ipol.at(iwt2);
-
-			int irc = ic*ParaO.nrow + ir;			
-
-			if(INPUT.orbital_corr[T1]==-1 || INPUT.orbital_corr[T2]==-1) continue;
-			if(iat1!=iat2) continue;			
-			// if(Yukawa)
-			// {
-				// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
-			// }
-			// else
-			// {
-				if(L1!=INPUT.orbital_corr[T1] || L2!=INPUT.orbital_corr[T2] || n1!=0 || n2!=0) continue;
-			// }
-			if(L1!=L2 || n1!=n2) continue;
-
-			// if(m1==m2 && iwt1==iwt2) delta.at(irc) = 1.0;
-
-			int m1_all = m1 + (2*L1+1)*ipol1;
-			int m2_all = m2 + (2*L2+1)*ipol2;
-
-			double val = get_onebody_eff_pot(T1, iat1, L1, n1, ispin, m1_all, m2_all, cal_type, 1);
-
-			VU.at(irc) = complex<double>(val, 0.0);
-		}
-	}
-	// vector<complex<double>> potm_tmp(ParaO.nloc, complex<double>(0.0, 0.0));
-
-	// The first term
 	pzgemm_(&transN, &transN,
 		&NLOCAL, &NLOCAL, &NLOCAL,
 		&half, 
@@ -1794,4 +1640,117 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 
   // timer::tick("DFTU","folding_overlap_matrix");
 	return;
+}
+
+void DFTU::cal_VU_pot_mat_complex(const int spin, const int newlocale, complex<double>* VU)
+{
+  TITLE("DFTU","cal_VU_pot_mat_complex"); 
+	// timer::tick("DFTU","folding_overlap_matrix");
+  ZEROS(VU, ParaO.nloc);
+
+  for(int it=0; it<ucell.ntype; ++it)
+	{
+    if(INPUT.orbital_corr[it]==-1) continue;
+		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		{
+      const int iat = ucell.itia2iat(it, ia);
+			for(int L=0; L<=ucell.atoms[it].nwl; L++)
+			{			
+        if(L!=INPUT.orbital_corr[it] ) continue;
+
+				for(int n=0; n<ucell.atoms[it].l_nchi[L]; n++)
+				{
+					// if(Yukawa)
+			    // {
+			    	// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
+			    // }
+			    // else
+			    // {
+			    	if(n!=0) continue;
+			    // }
+          for(int m1=0; m1<2*L+1; m1++)
+          {
+            for(int ipol1=0; ipol1<NPOL; ipol1++)
+		  		  {
+		  			  const int mu = ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
+              if(mu<0) continue;
+
+              for(int m2=0; m2<2*L+1; m2++)
+              {
+                for(int ipol2=0; ipol2<NPOL; ipol2++)
+                {
+                  const int nu = ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
+                  if(nu<0) continue;
+
+                  int m1_all = m1 + (2*L+1)*ipol1;
+			            int m2_all = m2 + (2*L+1)*ipol2;
+                  
+                  double val = get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
+			            VU[nu*ParaO.nrow + mu] = complex<double>(val, 0.0);
+                }//ipol2
+              }//m2
+            }//ipol1
+          }//m1
+				}//n
+			}//l
+		}//ia	
+	}//it
+
+  return;
+}
+
+void DFTU::cal_VU_pot_mat_real(const int spin, const int newlocale, double* VU)
+{
+  TITLE("DFTU","cal_VU_pot_mat_real"); 
+	// timer::tick("DFTU","folding_overlap_matrix");
+  ZEROS(VU, ParaO.nloc);
+
+  for(int it=0; it<ucell.ntype; ++it)
+	{
+    if(INPUT.orbital_corr[it]==-1) continue;
+		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		{
+      const int iat = ucell.itia2iat(it, ia);
+			for(int L=0; L<=ucell.atoms[it].nwl; L++)
+			{			
+        if(L!=INPUT.orbital_corr[it] ) continue;
+
+				for(int n=0; n<ucell.atoms[it].l_nchi[L]; n++)
+				{
+					// if(Yukawa)
+			    // {
+			    	// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
+			    // }
+			    // else
+			    // {
+			    	if(n!=0) continue;
+			    // }
+          for(int m1=0; m1<2*L+1; m1++)
+          {
+            for(int ipol1=0; ipol1<NPOL; ipol1++)
+		  		  {
+		  			  const int mu = ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
+              if(mu<0) continue;
+              for(int m2=0; m2<2*L+1; m2++)
+              {
+                for(int ipol2=0; ipol2<NPOL; ipol2++)
+                {
+                  const int nu = ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
+                  if(nu<0) continue;
+
+                  int m1_all = m1 + (2*L+1)*ipol1;
+			            int m2_all = m2 + (2*L+1)*ipol2;
+                  
+                  VU[nu*ParaO.nrow + mu] = get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
+
+                }//ipol2
+              }//m2
+            }//ipol1
+          }//m1
+				}//n
+			}//l
+		}//ia	
+	}//it
+
+  return;
 }
