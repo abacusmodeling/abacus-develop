@@ -151,7 +151,7 @@ void Run_pw::plane_wave_line(void)
 	}
 
 	// compute density of states
-	en.perform_dos_pw();
+	GlobalC::en.perform_dos_pw();
 
 	timer::tick("Run_pw","plane_wave_line");
     return;

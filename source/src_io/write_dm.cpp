@@ -101,12 +101,12 @@ void Local_Orbital_Charge::write_dm(
 		ofs << "\n " << GlobalV::NSPIN;
 		if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 		{
-			ofs << "\n " << en.ef << " (fermi energy)";
+			ofs << "\n " << GlobalC::en.ef << " (fermi energy)";
 		}
 		else if(GlobalV::NSPIN==2)
 		{
-			if(is==0)ofs << "\n " << en.ef_up << " (fermi energy for spin=1)";
-			else if(is==1)ofs << "\n " << en.ef_dw << " (fermi energy for spin=2)";
+			if(is==0)ofs << "\n " << GlobalC::en.ef_up << " (fermi energy for spin=1)";
+			else if(is==1)ofs << "\n " << GlobalC::en.ef_dw << " (fermi energy for spin=2)";
 		}
 		else
 		{

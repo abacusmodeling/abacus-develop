@@ -59,7 +59,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 	clock_t start,finish;
 	double duration = 0.0;	
-	STO_WF.init();
+	GlobalC::sto_wf.init();
 	int chetype = 1;
 
 	for (this->iter = 1;iter <= GlobalV::NITER;iter++)
@@ -107,7 +107,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
-		//en.calculate_harris(1);
+		//GlobalC::en.calculate_harris(1);
 	
 		// first_iter_again:					// Peize Lin delete 2019-05-01
 		
@@ -126,11 +126,11 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
         if (check_stop_now()) return;
         
-		en.eband  = 0.0;
-        en.demet  = 0.0;
-        en.ef     = 0.0;
-        en.ef_up  = 0.0;
-        en.ef_dw  = 0.0;
+		GlobalC::en.eband  = 0.0;
+        GlobalC::en.demet  = 0.0;
+        GlobalC::en.ef     = 0.0;
+        GlobalC::en.ef_up  = 0.0;
+        GlobalC::en.ef_dw  = 0.0;
 
 		//(3) save change density as previous charge,
 		// prepared fox mixing.
@@ -150,7 +150,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		
 		//(4) calculate fermi energy.
 		int ndim;
-    	if(STO_WF.stotype == "pw")
+    	if(GlobalC::sto_wf.stotype == "pw")
 		{
     	    ndim = wf.npw;
 		}
@@ -190,7 +190,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			//	MPI_Bcast(CHR.rho[is], GlobalC::pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
 			//}
 #ifdef __MPI
-			MPI_Bcast(&en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
+			MPI_Bcast(&GlobalC::en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
 #endif
 		}
 		else
@@ -208,7 +208,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
 		// mohan add 2009-01-23
-		//en.calculate_harris(2);
+		//GlobalC::en.calculate_harris(2);
 
 
 		Symmetry_rho srho;
@@ -221,7 +221,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		//(8) deband is calculated from "output" charge density calculated 
 		// in sum_band
 		// need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
-        en.deband = en.delta_e();
+        GlobalC::en.deband = GlobalC::en.delta_e();
 	
 	
 		// tr2_min used only in first scf iteraton
@@ -281,10 +281,10 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 			// because <T+V(ionic)> = <eband+deband> are calculated after sum
 			// band, using output charge density.
-			// but E_Hartree(en.ehart) and Exc(en.etxc) are calculated in v_of_rho above,
+			// but E_Hartree(GlobalC::en.ehart) and Exc(GlobalC::en.etxc) are calculated in v_of_rho above,
 			// using the mixed charge density.
 			// so delta_escf corrects for this difference at first order. 
-            en.delta_escf();
+            GlobalC::en.delta_escf();
         }
         else
         {
@@ -301,7 +301,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
             //( vnew used later for scf correction to the forces )
 	    	pot.vnew = pot.vr - pot.vnew;
-            en.descf = 0.0;
+            GlobalC::en.descf = 0.0;
 
         }
 		
@@ -320,13 +320,13 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			pot.set_vr_eff();
         
         //print_eigenvalue(GlobalV::ofs_running);
-		en.calculate_etot();
+		GlobalC::en.calculate_etot();
 
 	
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);	
+		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);	
         if (conv_elec || iter==GlobalV::NITER)
         {
 			for(int is=0; is<GlobalV::NSPIN; is++)
@@ -339,9 +339,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			if(conv_elec)
 			{
 				//GlobalV::ofs_running << " convergence is achieved" << endl;			
-				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
 				GlobalV::ofs_running << " charge density convergence is achieved" << endl;
-                                GlobalV::ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
 			}
 			else
 			{
@@ -433,7 +433,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 		avg_iter += avg_iter_k;
 
-		en.print_band(ik);
+		GlobalC::en.print_band(ik);
 
 		clock_t finish=clock();
 		const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;

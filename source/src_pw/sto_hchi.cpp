@@ -58,7 +58,7 @@ void Stochastic_hchi:: init()
         delete[] rl_chi;
 		delete[] GRA_index;
 		GRA_index = new int [wf.npw];
-		if(STO_WF.stotype != "pw")
+		if(GlobalC::sto_wf.stotype != "pw")
 		{
 			rp_chi = new complex<double> [nrxx];
 			rl_chi = new complex<double> [nrxx];
@@ -88,7 +88,7 @@ void Stochastic_hchi:: init()
 void Stochastic_hchi::get_GRA_index()
 {
 	
-	if(STO_WF.stotype == "pw")
+	if(GlobalC::sto_wf.stotype == "pw")
 	{
 		for(int ig = 0 ; ig < wf.npw; ++ig)
 		{
@@ -206,7 +206,7 @@ void Stochastic_hchi::orthogonal_to_psi_reciprocal(complex<double> *wfgin, compl
 {
 
 	TITLE("Stochastic_hchi","orthogonal_to_psi0");
-	int nchip=STO_WF.nchip;
+	int nchip=GlobalC::sto_wf.nchip;
 	int npw = wf.npw;
 	for(int ig = 0 ; ig < npw * nchip; ++ig)
 	{

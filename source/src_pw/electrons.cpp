@@ -176,7 +176,7 @@ void Electrons::self_consistent(const int &istep)
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
-		en.calculate_harris(1);
+		GlobalC::en.calculate_harris(1);
 	
 		// first_iter_again:					// Peize Lin delete 2019-05-01
 		
@@ -204,11 +204,11 @@ void Electrons::self_consistent(const int &istep)
 
         if (check_stop_now()) return;
 
-        en.eband  = 0.0;
-        en.demet  = 0.0;
-        en.ef     = 0.0;
-        en.ef_up  = 0.0;
-        en.ef_dw  = 0.0;
+        GlobalC::en.eband  = 0.0;
+        GlobalC::en.demet  = 0.0;
+        GlobalC::en.ef     = 0.0;
+        GlobalC::en.ef_up  = 0.0;
+        GlobalC::en.ef_dw  = 0.0;
 
         //(4) calculate weights of each band.
         Occupy::calculate_weights();
@@ -222,13 +222,13 @@ void Electrons::self_consistent(const int &istep)
 
 		// add exx
 #ifdef __LCAO
-		en.set_exx();		// Peize Lin add 2019-03-09
+		GlobalC::en.set_exx();		// Peize Lin add 2019-03-09
 #endif
 
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
 		// mohan add 2009-01-23
-		en.calculate_harris(2);
+		GlobalC::en.calculate_harris(2);
 
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
@@ -242,7 +242,7 @@ void Electrons::self_consistent(const int &istep)
         //(8) deband is calculated from "output" charge density calculated 
         // in sum_band
         // need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
-        en.deband = en.delta_e();
+        GlobalC::en.deband = GlobalC::en.delta_e();
 
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
@@ -302,10 +302,10 @@ void Electrons::self_consistent(const int &istep)
 
             // because <T+V(ionic)> = <eband+deband> are calculated after sum
             // band, using output charge density.
-            // but E_Hartree and Exc(en.etxc) are calculated in v_of_rho above,
+            // but E_Hartree and Exc(GlobalC::en.etxc) are calculated in v_of_rho above,
             // using the mixed charge density.
             // so delta_escf corrects for this difference at first order. 
-            en.delta_escf();
+            GlobalC::en.delta_escf();
         }
         else
         {
@@ -321,10 +321,10 @@ void Electrons::self_consistent(const int &istep)
             // mohan fix bug 2012-06-05,
             // the new potential V(PL)+V(H)+V(xc)
             pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
-            //cout<<"Exc = "<<en.etxc<<endl;
+            //cout<<"Exc = "<<GlobalC::en.etxc<<endl;
             //( vnew used later for scf correction to the forces )
             pot.vnew = pot.vr - pot.vnew;
-            en.descf = 0.0;
+            GlobalC::en.descf = 0.0;
         }
 
         stringstream ssw;
@@ -354,13 +354,13 @@ void Electrons::self_consistent(const int &istep)
 			pot.set_vr_eff();
 
         //print_eigenvalue(GlobalV::ofs_running);
-        en.calculate_etot();
+        GlobalC::en.calculate_etot();
 
 		// the clock is not accurate, needs to be fixed 2021-03-15 mohan
         clock_t finish=clock();
         double duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
 
         if (conv_elec || iter==GlobalV::NITER)
         {
@@ -411,9 +411,9 @@ void Electrons::self_consistent(const int &istep)
             if(conv_elec)
             {
                 //GlobalV::ofs_running << " convergence is achieved" << endl;			
-                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
                 GlobalV::ofs_running << " charge density convergence is achieved" << endl;
-                GlobalV::ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
             }
             else
             {
@@ -511,7 +511,7 @@ void Electrons::c_bands(const int &istep)
 
         avg_iter += avg_iter_k;
 
-        en.print_band(ik); //mohan add 2012-04-16
+        GlobalC::en.print_band(ik); //mohan add 2012-04-16
 
         clock_t finish=clock();
         const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;

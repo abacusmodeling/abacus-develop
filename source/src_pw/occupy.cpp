@@ -41,14 +41,14 @@ void Occupy::calculate_weights(void)
     {
         if (GlobalV::TWO_EFERMI)
         {
-            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup() , wf.ekb, en.ef_up, wf.wg, 0, GlobalC::kv.isk);
-            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw() , wf.ekb, en.ef_dw, wf.wg, 1, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup() , wf.ekb, GlobalC::en.ef_up, wf.wg, 0, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw() , wf.ekb, GlobalC::en.ef_dw, wf.wg, 1, GlobalC::kv.isk);
 			//ef = ( ef_up + ef_dw ) / 2.0_dp need??? mohan add 2012-04-16
         }
         else
         {
 			// -1 means don't need to consider spin.
-            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, CHR.nelec, wf.ekb, en.ef, wf.wg, -1, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, CHR.nelec, wf.ekb, GlobalC::en.ef, wf.wg, -1, GlobalC::kv.isk);
         }
     }
     else if (use_tetrahedron_method)
@@ -56,7 +56,7 @@ void Occupy::calculate_weights(void)
         WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
 //		if(my_rank == 0)
 //		{
-//			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, CHR.nelec, ntetra,tetra, wf.et, en.ef, wf.wg);
+//			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, CHR.nelec, ntetra,tetra, wf.et, GlobalC::en.ef, wf.wg);
 //		}
     }
     else if (use_gaussian_broadening)
@@ -66,35 +66,35 @@ void Occupy::calculate_weights(void)
 			double demet_up = 0.0;
 			double demet_dw = 0.0;
 			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
-			                 wf.ekb, en.ef_up, demet_up, wf.wg, 0, GlobalC::kv.isk);
+			                 wf.ekb, GlobalC::en.ef_up, demet_up, wf.wg, 0, GlobalC::kv.isk);
 			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
-			                 wf.ekb, en.ef_dw, demet_dw, wf.wg, 1, GlobalC::kv.isk);
-			en.demet = demet_up + demet_dw;
+			                 wf.ekb, GlobalC::en.ef_dw, demet_dw, wf.wg, 1, GlobalC::kv.isk);
+			GlobalC::en.demet = demet_up + demet_dw;
                         
 		}
 		else
 		{
 			// -1 means is no related to spin.
         	Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, CHR.nelec, gaussian_parameter, gaussian_type,
-                 wf.ekb, en.ef, en.demet, wf.wg, -1, GlobalC::kv.isk);
+                 wf.ekb, GlobalC::en.ef, GlobalC::en.demet, wf.wg, -1, GlobalC::kv.isk);
 
 		}
 
         //qianrui fix a bug on 2021-7-21
-        Parallel_Reduce::reduce_double_allpool(en.demet);
+        Parallel_Reduce::reduce_double_allpool(GlobalC::en.demet);
     }
     else if (fixed_occupations)
     {
 		// fix occupations need nelup and neldw.
 		// mohan add 2011-04-03
-		en.ef = - 1.0e+20;
+		GlobalC::en.ef = - 1.0e+20;
 		for (int ik = 0;ik < GlobalC::kv.nks ;ik++)
 		{
 			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
 				if (wf.wg(ik, ibnd) > 0.0)
 				{
-					en.ef = std::max( en.ef, wf.ekb[ik][ibnd]);
+					GlobalC::en.ef = std::max( GlobalC::en.ef, wf.ekb[ik][ibnd]);
 				}
 			}
 		}
@@ -102,8 +102,8 @@ void Occupy::calculate_weights(void)
 	
     if (GlobalV::TWO_EFERMI==2)
     {
-		Parallel_Reduce::gather_max_double_all( en.ef_up );
-		Parallel_Reduce::gather_max_double_all( en.ef_dw );	
+		Parallel_Reduce::gather_max_double_all( GlobalC::en.ef_up );
+		Parallel_Reduce::gather_max_double_all( GlobalC::en.ef_dw );	
     }
     else
     {
@@ -119,13 +119,13 @@ void Occupy::calculate_weights(void)
 		}
 
 		// parallel
-		Parallel_Reduce::gather_max_double_all( en.ef );
+		Parallel_Reduce::gather_max_double_all( GlobalC::en.ef );
 		Parallel_Reduce::gather_max_double_all( etop );
 		Parallel_Reduce::gather_min_double_all( ebotom );
 		
 		//not parallel yet!
 //		OUT(GlobalV::ofs_running,"Top    Energy (eV)", etop * Ry_to_eV);
-//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", en.ef * Ry_to_eV);
+//      OUT(GlobalV::ofs_running,"Fermi  Energy (eV)", GlobalC::en.ef * Ry_to_eV);
 //		OUT(GlobalV::ofs_running,"Bottom Energy (eV)", ebotom * Ry_to_eV);
 //		OUT(GlobalV::ofs_running,"Range  Energy (eV)", etop-ebotom * Ry_to_eV);
     }
@@ -290,7 +290,7 @@ void Occupy::iweights
 		}
 	}
 
-    if(conv == false && en.iter == 2)
+    if(conv == false && GlobalC::en.iter == 2)
     {
        WARNING_QUIT("Occupied","not converged, change 'smearing' method.");
     }

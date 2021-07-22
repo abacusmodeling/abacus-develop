@@ -506,7 +506,7 @@ void Charge::set_rho_core(
     timer::tick("Charge","set_rho_core");
 
     //double eps = 1.e-10;
-    en.etxcc = 0.0;
+    GlobalC::en.etxcc = 0.0;
 //----------------------------------------------------------
 // LOCAL VARIABLES :
 // counter on mesh points
@@ -694,7 +694,7 @@ void Charge::sum_band(void)
 void Charge::sum_band_k(void)
 {
 	TITLE("Charge","sum_band_k");
-	en.eband = 0.0;
+	GlobalC::en.eband = 0.0;
 
 	complex<double>* porter = GlobalC::UFFT.porter;
 	complex<double>* porter1 = nullptr;
@@ -710,7 +710,7 @@ void Charge::sum_band_k(void)
 		{
 			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
-				en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
+				GlobalC::en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
 				ZEROS( porter, GlobalC::pw.nrxx );
 				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
  				{
@@ -764,7 +764,7 @@ void Charge::sum_band_k(void)
 		else
 		for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 		{
-			en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
+			GlobalC::en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
 			//cout << "\n ekb = " << wf.ekb[ik][ibnd] << " wg = " << wf.wg(ik, ibnd);
 
 			ZEROS( porter, GlobalC::pw.nrxx );
@@ -794,8 +794,8 @@ void Charge::sum_band_k(void)
     //==================================
     // Reduce all the Energy in each cpu
     //==================================
-	en.eband /= GlobalV::NPROC_IN_POOL;
-	Parallel_Reduce::reduce_double_all( en.eband );
+	GlobalC::en.eband /= GlobalV::NPROC_IN_POOL;
+	Parallel_Reduce::reduce_double_all( GlobalC::en.eband );
 	}
 #endif
 	

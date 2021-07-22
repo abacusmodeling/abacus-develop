@@ -57,7 +57,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 			}
 		}
 	}
-	//	Parallel_Reduce::reduce_double_pool( en.ehart );
+	//	Parallel_Reduce::reduce_double_pool( GlobalC::en.ehart );
 	//	ehart *= 0.5 * ucell.omega;
 	for(int l=0;l<3;l++)
 	{

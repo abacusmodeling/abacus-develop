@@ -146,7 +146,7 @@ void Run_lcao::lcao_line(void)
 	LOOP_cell lc;
 	lc.opt_cell();
 
-	en.perform_dos();
+	GlobalC::en.perform_dos();
 
 	timer::tick("Run_lcao","lcao_line");
     return;

@@ -254,13 +254,13 @@ void Chi0_hilbert::Chi()
 		//cout << "dim_para = "<<dim_para<<endl;
 	}
 
-	//cout <<"en.ef = "<<en.ef<<endl;
+	//cout <<"GlobalC::en.ef = "<<GlobalC::en.ef<<endl;
 	//cout <<"degauss = "<<INPUT.degauss<<endl;
 	
 	//------------------------------------------------------------------
 	// change the fermi level or not 
 	//------------------------------------------------------------------
-	double energy = en.ef + fermi_level;
+	double energy = GlobalC::en.ef + fermi_level;
 	//cout <<"energy = "<<energy<<endl;
 	
 	cweight = new double*[GlobalC::kv.nks]; 

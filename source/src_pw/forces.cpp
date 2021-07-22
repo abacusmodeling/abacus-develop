@@ -438,7 +438,7 @@ void Forces::cal_force_ew(matrix& forceion)
                      erfc(sqrt(ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
     }
     while (upperbound > 1.0e-6);
-//	cout << " en.alpha = " << alpha << endl;
+//	cout << " GlobalC::en.alpha = " << alpha << endl;
 //	cout << " upperbound = " << upperbound << endl;
 	
 

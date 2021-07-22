@@ -80,13 +80,13 @@ void Run_MD_PW::md_ions_pw(void)
         {
             Vdwd2 vdwd2(ucell, vdwd2_para);
             vdwd2.cal_energy();
-            en.evdw = vdwd2.get_energy();
+            GlobalC::en.evdw = vdwd2.get_energy();
         }
         if (vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
         {
             Vdwd3 vdwd3(ucell, vdwd3_para);
             vdwd3.cal_energy();
-            en.evdw = vdwd3.get_energy();
+            GlobalC::en.evdw = vdwd3.get_energy();
         }
 
         // mohan added eiter to count for the electron iteration number, 2021-01-28
@@ -192,7 +192,7 @@ void Run_MD_PW::md_ions_pw(void)
 
             cout << " " << setw(7) << ss.str()
                  << setw(5) << eiter
-                 << setw(15) << setprecision(6) << en.etot * Ry_to_eV
+                 << setw(15) << setprecision(6) << GlobalC::en.etot * Ry_to_eV
                  << setw(15) << IMM.get_ediff() * Ry_to_eV
                  << setprecision(3)
                  << setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
@@ -292,7 +292,7 @@ void Run_MD_PW::md_cells_pw()
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
     GlobalV::ofs_running << setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl;
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
     GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     timer::tick("Run_MD_PW", "md_cells_pw");

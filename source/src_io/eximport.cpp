@@ -706,12 +706,12 @@ void eximport::out_energy(ofstream &out_data)
 {
 	//cout << "\n ==> out_energy" << endl;
 	out_data << setw(20) << "ENERGY" << endl;				//6.0
-	out_data << setw(20) << en.etot << endl;                //6.2
+	out_data << setw(20) << GlobalC::en.etot << endl;                //6.2
 	//out_data << setw(20) << elec.dE << endl;              //6.3
-	out_data << setw(20) << en.eband << endl;				//6.4
-	out_data << setw(20) << en.eband + en.deband << endl;   //6.5
+	out_data << setw(20) << GlobalC::en.eband << endl;				//6.4
+	out_data << setw(20) << GlobalC::en.eband + GlobalC::en.deband << endl;   //6.5
 	out_data << setw(20) << H_Hartree_pw::hartree_energy << endl;
-	out_data << setw(20) << H_XC_pw::etxc - en.etxcc << endl;     //6.7
+	out_data << setw(20) << H_XC_pw::etxc - GlobalC::en.etxcc << endl;     //6.7
 	out_data << setw(20) << H_Ewald_pw::ewald_energy << endl;                //6.8
 }
 

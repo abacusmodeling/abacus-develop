@@ -285,7 +285,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 					ofs << "   #" << endl;
 					ofs << "   # Case: " << ucell.latName << endl;
 					ofs << "   #" << endl;	
-					ofs << " Fermi Energy: " << en.ef << endl;
+					ofs << " Fermi Energy: " << GlobalC::en.ef << endl;
 					ofs << " END_INFO" << endl;
 					ofs << " BEGIN_BLOCK_BANDGRID_3D" << endl;
 					ofs << " band_energies" << endl;

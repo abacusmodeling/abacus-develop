@@ -99,14 +99,14 @@ void Local_Orbital_Charge::sum_bands(void)
     TITLE("Local_Orbital_Charge","sum_bands");
     timer::tick("Local_Orbital_Cha","sum_bands");
 
-    en.eband = 0.0;
+    GlobalC::en.eband = 0.0;
 
     //xiaohui add 2013-09-02
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
         for (int ib=0; ib<GlobalV::NBANDS; ib++)
         {
-            en.eband += wf.ekb[ik][ib] * wf.wg(ik, ib);
+            GlobalC::en.eband += wf.ekb[ik][ib] * wf.wg(ik, ib);
         }
     } 
 

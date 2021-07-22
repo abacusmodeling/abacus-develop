@@ -49,12 +49,12 @@ void Input_Conv::Convert(void)
     GlobalV::RENORMWITHMESH = INPUT.renormwithmesh;
 
 	// qianrui add 2021-2-5
-	STO_WF.nchi = INPUT.nbands_sto;
-	STO_WF.nche_sto = INPUT.nche_sto;
-	STO_WF.seed_sto = INPUT.seed_sto;
-	STO_WF.emax_sto = INPUT.emax_sto;
-	STO_WF.emin_sto = INPUT.emin_sto;
-	STO_WF.stotype = INPUT.stotype;
+	GlobalC::sto_wf.nchi = INPUT.nbands_sto;
+	GlobalC::sto_wf.nche_sto = INPUT.nche_sto;
+	GlobalC::sto_wf.seed_sto = INPUT.seed_sto;
+	GlobalC::sto_wf.emax_sto = INPUT.emax_sto;
+	GlobalC::sto_wf.emin_sto = INPUT.emin_sto;
+	GlobalC::sto_wf.stotype = INPUT.stotype;
 
 	// Electrical Field
 	GlobalV::EFIELD = INPUT.efield;
@@ -192,7 +192,7 @@ void Input_Conv::Convert(void)
     GlobalV::RESTART_MODE = INPUT.restart_mode;
     wf.start_wfc = INPUT.start_wfc;
 	wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
-	en.printe    = INPUT.printe; // mohan add 2011-03-16
+	GlobalC::en.printe    = INPUT.printe; // mohan add 2011-03-16
 
     
 //----------------------------------------------------------
@@ -563,8 +563,8 @@ void Input_Conv::Convert(void)
 	CHR.nelec = INPUT.nelec;
 	pot.out_potential = INPUT.out_potential;
     wf.out_wf = INPUT.out_wf;
-	en.out_dos = INPUT.out_dos;
-    en.out_band = INPUT.out_band;
+	GlobalC::en.out_dos = INPUT.out_dos;
+    GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
 	LOC.out_dm = INPUT.out_dm;
 	ParaO.out_hs = INPUT.out_hs;
@@ -572,11 +572,11 @@ void Input_Conv::Convert(void)
 	ParaO.out_lowf = INPUT.out_lowf;
 #endif
 
-	en.dos_emin_ev = INPUT.dos_emin_ev;
-	en.dos_emax_ev = INPUT.dos_emax_ev;
-	en.dos_edelta_ev = INPUT.dos_edelta_ev;
-	en.dos_scale= INPUT.dos_scale;
-    en.bcoeff = INPUT.b_coef;
+	GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;
+	GlobalC::en.dos_emax_ev = INPUT.dos_emax_ev;
+	GlobalC::en.dos_edelta_ev = INPUT.dos_edelta_ev;
+	GlobalC::en.dos_scale= INPUT.dos_scale;
+    GlobalC::en.bcoeff = INPUT.b_coef;
 
 //----------------------------------------------------------
 // About LCAO

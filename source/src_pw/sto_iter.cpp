@@ -22,8 +22,8 @@ Stochastic_Iter::~Stochastic_Iter()
 
 void Stochastic_Iter::init(int &dim, int& chetype)
 {
-    nchip = STO_WF.nchip;
-    stotype = STO_WF.stotype;
+    nchip = GlobalC::sto_wf.nchip;
+    stotype = GlobalC::sto_wf.stotype;
     //wait for init
     targetne = CHR.nelec;
     stoche.init( dim, chetype );
@@ -45,13 +45,13 @@ void Stochastic_Iter::orthog()
         {
             if(stotype == "pw")
             {
-                    stohchi.orthogonal_to_psi_reciprocal(STO_WF.chi0[ik].c,STO_WF.chiortho[ik].c,ik);
+                    stohchi.orthogonal_to_psi_reciprocal(GlobalC::sto_wf.chi0[ik].c,GlobalC::sto_wf.chiortho[ik].c,ik);
             }
             else
             for(int ichi = 0; ichi < nchip; ++ichi)
             {
-                complex<double> * p0 = &STO_WF.chi0[ik](ichi,0);
-                complex<double> * pchi = &STO_WF.chiortho[ik](ichi,0);
+                complex<double> * p0 = &GlobalC::sto_wf.chi0[ik](ichi,0);
+                complex<double> * pchi = &GlobalC::sto_wf.chiortho[ik](ichi,0);
                 stohchi.orthogonal_to_psi_real(p0,pchi,ik);
             }
         }
@@ -62,8 +62,8 @@ void Stochastic_Iter::checkemm(int &iter)
 {
     if(iter == 1)
     {
-        Stochastic_hchi:: Emin = STO_WF.emin_sto;
-        Stochastic_hchi:: Emax = STO_WF.emax_sto;
+        Stochastic_hchi:: Emin = GlobalC::sto_wf.emin_sto;
+        Stochastic_hchi:: Emax = GlobalC::sto_wf.emax_sto;
     }
     else if(iter > 5)
 	{
@@ -87,11 +87,11 @@ void Stochastic_Iter::checkemm(int &iter)
     {
         if(GlobalV::NBANDS > 0)
         {
-            pchi = &STO_WF.chiortho[0](ichi,0);
+            pchi = &GlobalC::sto_wf.chiortho[0](ichi,0);
         }  
         else
         {
-            pchi = &STO_WF.chi0[0](ichi,0);
+            pchi = &GlobalC::sto_wf.chi0[0](ichi,0);
         }
         while(1)
         {
@@ -228,7 +228,7 @@ void Stochastic_Iter::itermu(int &iter)
     }
     cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<endl;
 
-    en.ef = mu = mu0 = mu3;
+    GlobalC::en.ef = mu = mu0 = mu3;
     
     //Set wf.wg 
     if(GlobalV::NBANDS > 0)
@@ -259,16 +259,16 @@ void Stochastic_Iter:: sumpolyval()
     {
         if(stotype == "pw")
         {
-            if(GlobalV::NBANDS > 0)  pchi = STO_WF.chiortho[ik].c; 
-            else            pchi = STO_WF.chi0[ik].c;
+            if(GlobalV::NBANDS > 0)  pchi = GlobalC::sto_wf.chiortho[ik].c; 
+            else            pchi = GlobalC::sto_wf.chi0[ik].c;
             stoche.calpolyval(stohchi.hchi_reciprocal, pchi, nchip);
             DCOPY(stoche.polyvalue, spolyv, norder);
         }
         else
         for(int ichi = 0; ichi < nchip; ++ichi)
         {
-            if(GlobalV::NBANDS > 0)  pchi = &STO_WF.chiortho[ik](ichi,0);
-            else            pchi = &STO_WF.chi0[ik](ichi,0);
+            if(GlobalV::NBANDS > 0)  pchi = &GlobalC::sto_wf.chiortho[ik](ichi,0);
+            else            pchi = &GlobalC::sto_wf.chi0[ik](ichi,0);
             stoche.calpolyval(stohchi.hchi_real , pchi);
             for(int ior = 0; ior < norder; ++ior)
             {
@@ -352,7 +352,7 @@ void Stochastic_Iter::sum_stoband()
             //number of electrons in KS orbitals
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
-                en.demet += fdlnfd(enb[iksb]) * GlobalC::kv.wk[ikk];
+                GlobalC::en.demet += fdlnfd(enb[iksb]) * GlobalC::kv.wk[ikk];
             }
         }
         stodemet += stok_demet * GlobalC::kv.wk[ikk];
@@ -406,9 +406,9 @@ void Stochastic_Iter::sum_stoband()
         if(stotype == "pw")
         {
                 if(GlobalV::NBANDS > 0)
-                    out = pchi = STO_WF.chiortho[ik].c;
+                    out = pchi = GlobalC::sto_wf.chiortho[ik].c;
                 else
-                    pchi = STO_WF.chi0[ik].c;
+                    pchi = GlobalC::sto_wf.chi0[ik].c;
                 
                 stoche.calfinalvec(stohchi.hchi_reciprocal, pchi, out, nchip);
                 hout = new complex<double> [npwall];
@@ -449,11 +449,11 @@ void Stochastic_Iter::sum_stoband()
             {
                 if(GlobalV::NBANDS > 0)
                 {
-                    pchi = &STO_WF.chiortho[ik](ichi,0);
+                    pchi = &GlobalC::sto_wf.chiortho[ik](ichi,0);
                 }  
                 else
                 {
-                    pchi = &STO_WF.chi0[ik](ichi,0);
+                    pchi = &GlobalC::sto_wf.chi0[ik](ichi,0);
                 }
                 stoche.calfinalvec(stohchi.hchi_real, pchi, out);
                 stohchi.hchi_real(out,hout);
@@ -481,9 +481,9 @@ void Stochastic_Iter::sum_stoband()
     MPI_Allreduce(MPI_IN_PLACE,&sto_ne,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
     MPI_Allreduce(MPI_IN_PLACE,sto_rho,nrxx,MPI_DOUBLE,MPI_SUM,PARAPW_WORLD);
 #endif
-    en.eband += sto_eband;
-    en.demet += stodemet;
-    en.demet *= Occupy::gaussian_parameter;
+    GlobalC::en.eband += sto_eband;
+    GlobalC::en.demet += stodemet;
+    GlobalC::en.demet *= Occupy::gaussian_parameter;
 
     cout.precision(12);
     cout<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
@@ -777,7 +777,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     Emin = -100;
     Stochastic_hchi:: Emin = this->Emin;
     Stochastic_hchi:: Emax = this->Emax;
-    mu = en.ef;
+    mu = GlobalC::en.ef;
     stoche.calcoef(this->nfd);
     fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
     for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
@@ -807,14 +807,14 @@ double Stochastic_Iter:: nfdlnfd(double e)
     /*int npw=wf.npw;
     char transC='C';
     char transN='N';
-    int nchip = STO_WF.nchip;
+    int nchip = GlobalC::sto_wf.nchip;
     complex<double> *wave = new complex<double> [nchip*npw];
     for(int i = 0; i < nchip*npw; ++i)
     {
-        wave[i]=STO_WF.chi0[0].c[i];
+        wave[i]=GlobalC::sto_wf.chi0[0].c[i];
     }
     complex<double> *sum = new complex<double> [nchip * nchip];
-	zgemm_(&transC, &transN, &nchip, &nchip, &npw, &ONE, STO_WF.chi0[0].c, &npw, wave, &npw, &ZERO, sum, &nchip);
+	zgemm_(&transC, &transN, &nchip, &nchip, &npw, &ONE, GlobalC::sto_wf.chi0[0].c, &npw, wave, &npw, &ZERO, sum, &nchip);
 	Parallel_Reduce::reduce_complex_double_pool(sum, nchip * nchip);
 	if(GlobalV::MY_RANK!=0) cout.clear();
     double abs2 = 0;

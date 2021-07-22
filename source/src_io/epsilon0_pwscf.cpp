@@ -121,8 +121,8 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 								double w = wgrid(iw);
 								for(int j=0; j<9; j++)
 								{
-									epsi[j][iw] += dipole[j][ib1][ib1].real() * intrasmear * w * exp((wf.ekb[ik][ib1]- en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
-									epsr[j][iw] -= dipole[j][ib1][ib1].real() * w * w  * exp((wf.ekb[ik][ib1]- en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
+									epsi[j][iw] += dipole[j][ib1][ib1].real() * intrasmear * w * exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
+									epsr[j][iw] -= dipole[j][ib1][ib1].real() * w * w  * exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
 								}
 							}
 						}
@@ -242,8 +242,8 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 								double w = wgrid(iw);
 								for(int j=0; j<9; j++)
 								{
-									epsi[j][iw] += dipole[j][ib1][ib1].real() * intrasmear * w * exp((wf.ekb[ik][ib1]- en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
-									epsr[j][iw] -= dipole[j][ib1][ib1].real() * w * w  * exp((wf.ekb[ik][ib1]- en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
+									epsi[j][iw] += dipole[j][ib1][ib1].real() * intrasmear * w * exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
+									epsr[j][iw] -= dipole[j][ib1][ib1].real() * w * w  * exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss)/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/(1.0 + exp((wf.ekb[ik][ib1]- GlobalC::en.ef)/degauss))/degauss/(w*w*w*w + intrasmear * intrasmear * w * w);
 								}
 							}
 						}

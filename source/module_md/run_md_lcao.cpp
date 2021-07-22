@@ -120,14 +120,14 @@ void Run_MD_LCAO::opt_ions(void)
         {
             Vdwd2 vdwd2(ucell,vdwd2_para);
             vdwd2.cal_energy();
-            en.evdw = vdwd2.get_energy();
+            GlobalC::en.evdw = vdwd2.get_energy();
         }
         // jiyy add 2019-05-18, update 2021.05.02
         else if(vdwd3_para.flag_vdwd3)
         {
             Vdwd3 vdwd3(ucell,vdwd3_para);
             vdwd3.cal_energy();
-            en.evdw = vdwd3.get_energy();
+            GlobalC::en.evdw = vdwd3.get_energy();
         }
 
 
@@ -199,7 +199,7 @@ void Run_MD_LCAO::opt_ions(void)
             cout << setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
             << setw(5) << ELEC_scf::iter
-            << setw(18) << setprecision(6) << en.etot * Ry_to_eV;
+            << setw(18) << setprecision(6) << GlobalC::en.etot * Ry_to_eV;
 
             cout << setprecision(2) << setiosflags(ios::scientific)
             << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
@@ -292,13 +292,13 @@ void Run_MD_LCAO::final_scf(void)
     {
         Vdwd2 vdwd2(ucell,vdwd2_para);
         vdwd2.cal_energy();
-        en.evdw = vdwd2.get_energy();
+        GlobalC::en.evdw = vdwd2.get_energy();
     }
 	else if(vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
     {
         Vdwd3 vdwd3(ucell,vdwd3_para);
         vdwd3.cal_energy();
-        en.evdw = vdwd3.get_energy();
+        GlobalC::en.evdw = vdwd3.get_energy();
     }												  
     
 	ELEC_scf es;
@@ -306,7 +306,7 @@ void Run_MD_LCAO::final_scf(void)
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
     GlobalV::ofs_running << setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     return;

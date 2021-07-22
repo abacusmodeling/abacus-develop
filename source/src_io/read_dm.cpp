@@ -70,13 +70,13 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             CHECK_INT(ifs, GlobalV::NSPIN);
             if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
             {
-                READ_VALUE(ifs, en.ef);
-                GlobalV::ofs_running << " read in fermi energy = " << en.ef << endl;
+                READ_VALUE(ifs, GlobalC::en.ef);
+                GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << endl;
             }
             else if(GlobalV::NSPIN == 2)
             {
-                if(is==0)READ_VALUE(ifs, en.ef_up);
-                else if(is==1)READ_VALUE(ifs, en.ef_dw);
+                if(is==0)READ_VALUE(ifs, GlobalC::en.ef_up);
+                else if(is==1)READ_VALUE(ifs, GlobalC::en.ef_dw);
             }
             else
             {
@@ -127,12 +127,12 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 
     if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
     {
-        Parallel_Common::bcast_double(en.ef);
+        Parallel_Common::bcast_double(GlobalC::en.ef);
     }
     else if(GlobalV::NSPIN==2)
     {
-        Parallel_Common::bcast_double(en.ef_up);
-        Parallel_Common::bcast_double(en.ef_dw);
+        Parallel_Common::bcast_double(GlobalC::en.ef_up);
+        Parallel_Common::bcast_double(GlobalC::en.ef_dw);
     }
 
 

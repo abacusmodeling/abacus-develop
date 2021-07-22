@@ -231,8 +231,8 @@ void energy::print_etot(
 		{
 			if(GlobalV::MY_RANK==0)
 			{
-				printf( "\e[36m%-15f\e[0m", en.etot);	
-				//printf( "[36m%-15f[0m", en.etot);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot);	
 				if(GlobalV::NSPIN==2)
 				{
 					cout << setprecision(2);
@@ -260,12 +260,12 @@ void energy::print_etot(
 					//printf( "[32m%-14e[0m", dr2);
 				}
 				// 34 is blue
-				printf( "\e[36m%-15f\e[0m", en.etot*Ry_to_eV);	
-				//printf( "[36m%-15f[0m", en.etot*Ry_to_eV);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*Ry_to_eV);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot*Ry_to_eV);	
 				cout << setprecision(3);
-	//			cout << setw(11) << en.eband;
+	//			cout << setw(11) << GlobalC::en.eband;
 	//			cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//			cout << setw(11) << en.etxc - en.etxcc;
+	//			cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
 				cout << resetiosflags(ios::scientific);
 				//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
 				if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
@@ -285,7 +285,7 @@ void energy::print_etot(
 		else
 		{
 			cout << setprecision(prec);
-			//cout << setw(15) << en.etot;
+			//cout << setw(15) << GlobalC::en.etot;
 			if(GlobalV::NSPIN==2)
 			{
 				cout << setprecision(2);
@@ -293,14 +293,14 @@ void energy::print_etot(
 				cout<<setw(10)<<ucell.magnet.abs_magnetization;
 			}
 			cout << setprecision(6);
-			cout << setw(15) << en.etot*Ry_to_eV;
-                        cout << setw(15) << (en.etot - en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
+			cout << setw(15) << GlobalC::en.etot*Ry_to_eV;
+                        cout << setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
                         cout << setprecision(3);
                         cout << setw(11) << dr2;
 			cout << setprecision(3);
-	//		cout << setw(11) << en.eband;
+	//		cout << setw(11) << GlobalC::en.eband;
 	//		cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//		cout << setw(11) << en.etxc - en.etxcc;
+	//		cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
 			//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
 			if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 			{

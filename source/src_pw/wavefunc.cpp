@@ -143,7 +143,7 @@ void wavefunc::wfcinit(void)
 
     this->wfcinit_k();
 
-    en.demet = 0.0;
+    GlobalC::en.demet = 0.0;
 
     //================================
     // Occupations are computed here

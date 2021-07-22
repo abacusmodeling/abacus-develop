@@ -62,13 +62,13 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	}
 	if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 	{
-		READ_VALUE(ifs, en.ef);
-		GlobalV::ofs_running << " read in fermi energy = " << en.ef << endl;
+		READ_VALUE(ifs, GlobalC::en.ef);
+		GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << endl;
 	}
 	else if(GlobalV::NSPIN == 2)
 	{
-		if(is==0)READ_VALUE(ifs, en.ef_up);
-		else if(is==1)READ_VALUE(ifs, en.ef_dw);
+		if(is==0)READ_VALUE(ifs, GlobalC::en.ef_up);
+		else if(is==1)READ_VALUE(ifs, GlobalC::en.ef_dw);
 	}
 	else 
 	{

@@ -110,13 +110,13 @@ void Ions::opt_ions_pw(void)
 		{
 			Vdwd2 vdwd2(ucell,vdwd2_para);
 			vdwd2.cal_energy();
-			en.evdw = vdwd2.get_energy();
+			GlobalC::en.evdw = vdwd2.get_energy();
 		}
 		if(vdwd3_para.flag_vdwd3)		//jiyy add 2019-05-18, update 2021-05-02
 		{
 			Vdwd3 vdwd3(ucell,vdwd3_para);
 			vdwd3.cal_energy();
-			en.evdw = vdwd3.get_energy();
+			GlobalC::en.evdw = vdwd3.get_energy();
 		}
 
 
@@ -208,7 +208,7 @@ void Ions::opt_ions_pw(void)
 			
 			cout << " " << setw(7) << ss.str() 
 			<< setw(5) << eiter 
-			<< setw(15) << setprecision(6) << en.etot * Ry_to_eV 
+			<< setw(15) << setprecision(6) << GlobalC::en.etot * Ry_to_eV 
 			<< setw(15) << IMM.get_ediff() * Ry_to_eV
 			<< setprecision(3)
 			<< setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
@@ -226,7 +226,7 @@ void Ions::opt_ions_pw(void)
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
         GlobalV::ofs_running << setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
         GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
     }
 
@@ -266,11 +266,11 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		//}
 		//else	
 		//{
-			//IMM.cal_movement(istep, fcs.force, en.etot);
+			//IMM.cal_movement(istep, fcs.force, GlobalC::en.etot);
 		//}
 		if(GlobalV::CALCULATION=="relax")
 		{
-			IMM.cal_movement(istep, istep, force, en.etot);
+			IMM.cal_movement(istep, istep, force, GlobalC::en.etot);
 			converged = IMM.get_converged();
 
             if(converged || (istep==GlobalV::NSTEP) ) 
@@ -320,7 +320,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		GlobalV::PRESSURE = (stress(0,0)+stress(1,1)+stress(2,2))/3;
 		if(GlobalV::CALCULATION=="cell-relax")
 		{
-			LCM.cal_lattice_change(stress_step, stress, en.etot);
+			LCM.cal_lattice_change(stress_step, stress, GlobalC::en.etot);
 			converged_stress = LCM.get_converged();
             //cout <<"converged_stress = "<<converged_stress<<endl;
             if(converged_stress)
@@ -353,10 +353,10 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 matrix stress;
                 Stress_PW ss;
                 ss.cal_stress(stress);
-		//IMM.cal_movement(force_step, fcs.force, en.etot);
+		//IMM.cal_movement(force_step, fcs.force, GlobalC::en.etot);
         if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-            IMM.cal_movement(istep, force_step, force, en.etot);
+            IMM.cal_movement(istep, force_step, force, GlobalC::en.etot);
             converged_force = IMM.get_converged();
 
             //cout<<"converged_force = "<<converged_force<<endl;
@@ -376,7 +376,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 
                 if(GlobalV::CALCULATION=="cell-relax")
                 {
-                    LCM.cal_lattice_change(stress_step, stress, en.etot);
+                    LCM.cal_lattice_change(stress_step, stress, GlobalC::en.etot);
                     converged_stress = LCM.get_converged();
                     //cout <<"converged_stress = "<<converged_stress<<endl;
                     if(converged_stress)
