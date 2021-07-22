@@ -24,12 +24,12 @@ void Stress_Func::stress_nl(matrix& sigma){
 	ComplexMatrix becp( nkb, GlobalV::NBANDS);
 
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ComplexMatrix vkb1( nkb, wf.npwx );
+	ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
 	ComplexMatrix vkb0[3];
 	for(int i=0;i<3;i++){
-		vkb0[i].create(nkb, wf.npwx);
+		vkb0[i].create(nkb, GlobalC::wf.npwx);
 	}
-	ComplexMatrix vkb2( nkb, wf.npwx );
+	ComplexMatrix vkb2( nkb, GlobalC::wf.npwx );
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
 		for(int i=0;i<3;i++){
@@ -38,7 +38,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 		vkb2.zero_out();      
 		  
 		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-		wf.npw = GlobalC::kv.ngk[ik];
+		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 		// generate vkb
 		if (ppcell.nkb > 0)
 		{
@@ -54,9 +54,9 @@ void Stress_Func::stress_nl(matrix& sigma){
 		{
 			for (int i=0;i<nkb;i++)
 			{
-				for (int ig=0; ig<wf.npw; ig++)
+				for (int ig=0; ig<GlobalC::wf.npw; ig++)
 				{
-					becp(i,ib) += wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+					becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
 				}
 			}
 		}
@@ -79,9 +79,9 @@ void Stress_Func::stress_nl(matrix& sigma){
 				vkb1.zero_out();
 				for (int i = 0;i < nkb;i++)
 				{
-					for (int ig=0; ig<wf.npw; ig++)  
+					for (int ig=0; ig<GlobalC::wf.npw; ig++)  
 					{
-						qvec = wf.get_1qvec_cartesian(ik,ig) ;
+						qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig) ;
 						qvec0[0] = qvec.x;
 						qvec0[1] = qvec.y;
 						qvec0[2] = qvec.z;
@@ -93,25 +93,25 @@ void Stress_Func::stress_nl(matrix& sigma){
 							
 				/*  if (kpol==0)
 					{
-						for (int ig=0; ig<wf.npw; ig++)
+						for (int ig=0; ig<GlobalC::wf.npw; ig++)
 						{
-							qvec = wf.get_1qvec_cartesian(ik,ig);
+							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
 							vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.x;
 						}
 					}
 					if (kpol==1)
 					{
-						for (int ig=0; ig<wf.npw; ig++)
+						for (int ig=0; ig<GlobalC::wf.npw; ig++)
 						{
-							qvec = wf.get_1qvec_cartesian(ik,ig);
+							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
 							vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.y;
 						}
 					}
 					if (kpol==2)
 					{
-						for (int ig=0; ig<wf.npw; ig++)
+						for (int ig=0; ig<GlobalC::wf.npw; ig++)
 						{
-							qvec = wf.get_1qvec_cartesian(ik,ig);
+							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
 							vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * qvec.z;
 						}
 					}*/
@@ -123,22 +123,22 @@ void Stress_Func::stress_nl(matrix& sigma){
 				{
 					for (int i=0; i<nkb; i++)
 					{
-						for (int ig=0; ig<wf.npw; ig++)
+						for (int ig=0; ig<GlobalC::wf.npw; ig++)
 						{
 							//first term
-							dbecp(i,ib) = dbecp(i,ib) - 2.0 * wf.evc[ik](ib,ig) * conj( vkb1(i,ig) ) ;
+							dbecp(i,ib) = dbecp(i,ib) - 2.0 * GlobalC::wf.evc[ik](ib,ig) * conj( vkb1(i,ig) ) ;
 							//second termi
 							if(ipol == jpol)
-								 dbecp(i,ib) += -1.0 * wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+								 dbecp(i,ib) += -1.0 * GlobalC::wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
 							//third term
-							qvec = wf.get_1qvec_cartesian(ik,ig);
+							qvec = GlobalC::wf.get_1qvec_cartesian(ik,ig);
 							qvec0[0] = qvec.x;
 							qvec0[1] = qvec.y;
 							qvec0[2] = qvec.z;
 							double qm1; 
 							if(qvec.norm() > 1e-8) qm1 = 1.0 / qvec.norm();
 							else qm1 = 0;
-							dbecp(i,ib) +=  -2.0 * wf.evc[ik](ib,ig) * conj(vkb2(i,ig)) * qvec0[ipol] * qvec0[jpol] * qm1 * ucell.tpiba;
+							dbecp(i,ib) +=  -2.0 * GlobalC::wf.evc[ik](ib,ig) * conj(vkb2(i,ig)) * qvec0[ipol] * qvec0[jpol] * qm1 * ucell.tpiba;
 						}//end ig
 					}//end i
 				}//end ib
@@ -151,7 +151,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 //              ZEROS(cf, ucell.nat);
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					double fac = wf.wg(ik, ib) * 1.0;
+					double fac = GlobalC::wf.wg(ik, ib) * 1.0;
 					int iat = 0;
 					int sum = 0;
 					for (int it=0; it<ucell.ntype; it++)
@@ -245,7 +245,7 @@ void Stress_Func::get_dvnl1
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
-		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 			   
 	dylmr2(x1, npw, gk, dylm, ipol);
@@ -296,7 +296,7 @@ void Stress_Func::get_dvnl1
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<ucell.atoms[it].na; ia++)
 		{
-			complex<double> *sk = wf.get_sk(ik, it, ia);
+			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
 				complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?
@@ -337,7 +337,7 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++)
 	{
-		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 	YlmReal::Ylm_Real(x1, npw, gk, ylm);
 
@@ -382,7 +382,7 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<ucell.atoms[it].na; ia++)
 		{
-			complex<double> *sk = wf.get_sk(ik, it, ia);
+			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
 				complex<double> pref = pow( NEG_IMAG_UNIT, ppcell.nhtol(it, ih));      //?

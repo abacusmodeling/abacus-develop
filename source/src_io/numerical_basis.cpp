@@ -398,7 +398,7 @@ void Numerical_Basis::Sq_overlap(
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
@@ -435,12 +435,12 @@ void Numerical_Basis::Sq_overlap(
     {
         for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++) // 1.2
         {
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
+            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
             for (int T2=0; T2<ucell.ntype; T2++) // 2.1
             {
                 for (int I2=0; I2<ucell.atoms[T2].na; I2++) // 2.2
                 {
-                    complex<double> *sk2 = wf.get_sk(ik, T2, I2);
+                    complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2);
                     for (int l = 0; l < ucell.atoms[T1].nwl+1; l++) // 1.3
                     {
                         complex<double> lphase = normalization * pow(IMAG_UNIT, l);			// Peize Lin add normalization 2015-12-29
@@ -530,7 +530,7 @@ void Numerical_Basis::jlq3d_overlap(
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
@@ -549,7 +549,7 @@ void Numerical_Basis::jlq3d_overlap(
         for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++)
         {
             //OUT("I1",I1);
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
+            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
             for (int L=0; L< ucell.atoms[T1].nwl+1; L++)
             {
                 GlobalV::ofs_running << " " << setw(5) << ik+1
@@ -648,7 +648,7 @@ void Numerical_Basis::numerical_atomic_wfc(
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
@@ -661,7 +661,7 @@ void Numerical_Basis::numerical_atomic_wfc(
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
         {
             //OUT("ia",ia);
-            complex<double> *sk = wf.get_sk(ik, it, ia);
+            complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
             for (int l = 0; l < ucell.atoms[it].nwl+1; l++)
             {
                 //OUT("l",l);

@@ -181,7 +181,7 @@ void Run_MD_PW::md_ions_pw(void)
         //reset local potential and initial wave function
         pot.init_pot(istep, GlobalC::pw.strucFac);
         GlobalV::ofs_running << " Setup the new wave functions?" << endl;
-        wf.wfcinit();
+        GlobalC::wf.wfcinit();
 
         if (GlobalV::OUT_LEVEL == "i")
         {
@@ -219,7 +219,7 @@ void Run_MD_PW::md_cells_pw()
     TITLE("Run_MD_PW", "md_cells_pw");
     timer::tick("Run_MD_PW", "md_cells_pw");
 
-    wf.allocate(GlobalC::kv.nks);
+    GlobalC::wf.allocate(GlobalC::kv.nks);
 
     GlobalC::UFFT.allocate();
 
@@ -232,7 +232,7 @@ void Run_MD_PW::md_cells_pw()
     // init hamiltonian
     // only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
+    hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
@@ -258,14 +258,14 @@ void Run_MD_PW::md_cells_pw()
     //==================================================
     // create ppcell.tab_at , for trial wave functions.
     //==================================================
-    wf.init_at_1();
+    GlobalC::wf.init_at_1();
 
     //================================
     // Initial start wave functions
     //================================
     if (GlobalV::NBANDS != 0 || (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto" && GlobalV::CALCULATION != "md-sto")) //qianrui add
     {
-        wf.wfcinit();
+        GlobalC::wf.wfcinit();
     }
 #ifdef __LCAO
     switch (exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
@@ -273,7 +273,7 @@ void Run_MD_PW::md_cells_pw()
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        exx_lip.init(&GlobalC::kv, &wf, &GlobalC::pw, &GlobalC::UFFT, &ucell);
+        exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;

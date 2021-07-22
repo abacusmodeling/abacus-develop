@@ -58,8 +58,8 @@ void Electrons::non_self_consistent(const int &istep)
         {			
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
             << "_final_band " << ib+1 
-            << " " << wf.ekb[ik][ib] * Ry_to_eV 
-            << " " << wf.wg(ik, ib)*GlobalC::kv.nks << endl;
+            << " " << GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
+            << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << endl;
         }
         GlobalV::ofs_running << endl;
     }
@@ -342,12 +342,12 @@ void Electrons::self_consistent(const int &istep)
             CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
         }
 
-        if(wf.out_wf)
+        if(GlobalC::wf.out_wf)
         {
-            //WF_io::write_wfc( ssw.str(), wf.evc );
+            //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
-            WF_io::write_wfc2( ssw.str(), wf.evc, GlobalC::pw.gcar);
+            WF_io::write_wfc2( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
             //DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
@@ -454,8 +454,8 @@ void Electrons::c_bands(const int &istep)
 
     int precondition_type = 2;
 
-    double *h_diag = new double[wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
-    ZEROS(h_diag, wf.npwx * GlobalV::NPOL);
+    double *h_diag = new double[GlobalC::wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
+    ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
 
     avg_iter = 0.0;
 
@@ -472,27 +472,27 @@ void Electrons::c_bands(const int &istep)
         //===========================================
         if (precondition_type==1)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = max(1.0, wf.g2kin[ig]);
-                if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+                h_diag[ig] = max(1.0, GlobalC::wf.g2kin[ig]);
+                if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }
         else if (precondition_type==2)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = 1 + wf.g2kin[ig] + sqrt( 1 + (wf.g2kin[ig] - 1) * (wf.g2kin[ig] - 1));
-                if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+                h_diag[ig] = 1 + GlobalC::wf.g2kin[ig] + sqrt( 1 + (GlobalC::wf.g2kin[ig] - 1) * (GlobalC::wf.g2kin[ig] - 1));
+                if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }
         //h_diag can't be zero!  //zhengdy-soc
 		if(GlobalV::NPOL==2)
         {
-            for(int ig = wf.npw;ig < wf.npwx; ig++)
+            for(int ig = GlobalC::wf.npw;ig < GlobalC::wf.npwx; ig++)
             {
                 h_diag[ig] = 1.0;
-                h_diag[ig+ wf.npwx] = 1.0;
+                h_diag[ig+ GlobalC::wf.npwx] = 1.0;
             }
         }
 

@@ -220,9 +220,9 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string
 		//output wannier functions in G space.
 		for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)
 		{
-			double g1 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 0);
-			double g2 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 1);
-			double g3 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 2);
+			double g1 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 0);
+			double g2 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 1);
+			double g3 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 2);
 			out_gwan 
 			<< setw(15) << g1*factor 
 			<< setw(15) << g2*factor
@@ -465,7 +465,7 @@ void eximport::out_igk(ofstream &out_data)
 		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 		{
 			if(ig%10==0) out_data<<"\n";
-			out_data << setw(10) << wf.igk(ik, ig);
+			out_data << setw(10) << GlobalC::wf.igk(ik, ig);
 		}
 	}
 	out_data << "\n<KG_INDEX>";
@@ -589,7 +589,7 @@ void eximport::out_band(ofstream &out_data)
 	{
 		for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
-			out_data << setw(10) << setprecision(6) << wf.ekb[ik][ib]*Ry_to_eV;//6.1
+			out_data << setw(10) << setprecision(6) << GlobalC::wf.ekb[ik][ib]*Ry_to_eV;//6.1
 		}
 		out_data << endl;
 	}
@@ -643,7 +643,7 @@ void eximport::out_evc(ofstream &out_data)
 
 			for (ig = 0;ig < npw;ig++)
 			{
-				out_data << setw(20) << wf.evc[ik](iw, ig).real() << setw(20) << wf.evc[ik](iw, ig).imag() << endl;//4.2
+				out_data << setw(20) << GlobalC::wf.evc[ik](iw, ig).real() << setw(20) << GlobalC::wf.evc[ik](iw, ig).imag() << endl;//4.2
 			}
 		}
 	}

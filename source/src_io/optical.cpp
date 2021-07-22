@@ -19,8 +19,8 @@ void Optical::cal_epsilon2(const int &nbands)
 		opt_nbands = GlobalV::NBANDS;
 	}
 
-	assert( wf.ekb!=0 );
-	assert( wf.evc!=0 );
+	assert( GlobalC::wf.ekb!=0 );
+	assert( GlobalC::wf.evc!=0 );
 
 	cout << " begin to calculate the epsilon2." << endl;
 	
@@ -35,15 +35,15 @@ void Optical::cal_epsilon2(const int &nbands)
 
 	const double de = 0.01; // unit: eV
 
-	double maxe = wf.ekb[0][0];
-	double mine = wf.ekb[0][0];
+	double maxe = GlobalC::wf.ekb[0][0];
+	double mine = GlobalC::wf.ekb[0][0];
 
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		for(int ib=0; ib<nbands; ib++)
 		{
-			maxe = std::max( wf.ekb[ik][ib], maxe);
-			mine = std::min( wf.ekb[ik][ib], mine);
+			maxe = std::max( GlobalC::wf.ekb[ik][ib], maxe);
+			mine = std::min( GlobalC::wf.ekb[ik][ib], mine);
 		}
 	}
 
@@ -82,10 +82,10 @@ void Optical::cal_epsilon2(const int &nbands)
 	{
 		for(int iv=0; iv<n_occ; iv++)
 		{
-			const double ev = wf.ekb[ik][iv];
+			const double ev = GlobalC::wf.ekb[ik][iv];
 			for(int ic=n_occ; ic<opt_nbands; ic++)
 			{
-				const double ec = wf.ekb[ik][ic];
+				const double ec = GlobalC::wf.ekb[ik][ic];
 				const int ie = int((ec - ev)*Ry_to_eV/de);
 				assert(ie < np);
 				epsilon2[ie] += GlobalC::kv.wk[ik] * this->element_cvk(ik, iv, ic);
@@ -122,10 +122,10 @@ double Optical::element_cvk(const int &ik, const int &iv, const int &ic)
 	ZEROS(tmp, 3);
 	for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 	{
-		const complex<double> uvc = conj( wf.evc[ik](ic,ig) ) * wf.evc[ik](iv, ig);
-		tmp[0] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 0);
-		tmp[1] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 1);
-		tmp[2] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 2);
+		const complex<double> uvc = conj( GlobalC::wf.evc[ik](ic,ig) ) * GlobalC::wf.evc[ik](iv, ig);
+		tmp[0] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 0);
+		tmp[1] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 1);
+		tmp[2] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 2);
 	}
 
 	Parallel_Reduce::reduce_complex_double_pool( tmp,3 );

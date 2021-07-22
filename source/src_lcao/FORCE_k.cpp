@@ -253,7 +253,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 				//------------------
 				for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				{
-					const double w1=wf.wg(ik,ib);
+					const double w1=GlobalC::wf.wg(ik,ib);
 					if(w1>0)
 					{
 						//-----------------------------
@@ -299,7 +299,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 									if(mug >= 0 && nug >= 0)
 									{
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										wfc[mug], wfc[nug], wf.ekb[ik][ib]); 
+										wfc[mug], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug >= 0 && nug <= 0)
 									{
@@ -308,14 +308,14 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 										//assert(a4>=0);
 
 										dm[count] += set_EDM_k_element(phase, with_energy, wfc[mug], 
-										LOWF.WFC_K_aug[ik][ib][a4], wf.ekb[ik][ib]); 
+										LOWF.WFC_K_aug[ik][ib][a4], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug <= 0 && nug >= 0)
 									{
 										const int a3 = LOWF.trace_aug[iw1_all]; 
 
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										LOWF.WFC_K_aug[ik][ib][a3], wfc[nug], wf.ekb[ik][ib]); 
+										LOWF.WFC_K_aug[ik][ib][a3], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug <=0 && nug <=0 )
 									{
@@ -323,7 +323,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 										const int a2 = LOWF.trace_aug[iw2_all];
 
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										LOWF.WFC_K_aug[ik][ib][a1], LOWF.WFC_K_aug[ik][ib][a2], wf.ekb[ik][ib]); 
+										LOWF.WFC_K_aug[ik][ib][a1], LOWF.WFC_K_aug[ik][ib][a2], GlobalC::wf.ekb[ik][ib]); 
 									}
 									assert(count<irr);
 									++ count;

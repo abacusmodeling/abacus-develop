@@ -158,7 +158,7 @@ void ELEC_scf::scf(const int &istep)
 		// so the smearing can not be done.
 		if(iter>1)Occupy::calculate_weights();
 
-		if(wf.start_wfc == "file")
+		if(GlobalC::wf.start_wfc == "file")
 		{
 			if(iter==1)
 			{
@@ -288,7 +288,7 @@ void ELEC_scf::scf(const int &istep)
 
 //		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 //		{
-//			cout << ib+1 << " " << wf.ekb[0][ib] << endl;
+//			cout << ib+1 << " " << GlobalC::wf.ekb[0][ib] << endl;
 //		}
 
 		//-----------------------------------------------------------
@@ -327,7 +327,7 @@ void ELEC_scf::scf(const int &istep)
 			{
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					wf.wg(ik,ib)=GlobalV::ocp_kb[ik*GlobalV::NBANDS+ib];
+					GlobalC::wf.wg(ik,ib)=GlobalV::ocp_kb[ik*GlobalV::NBANDS+ib];
 				}
 			}
 		}

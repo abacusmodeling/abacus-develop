@@ -261,11 +261,11 @@ double berryphase::stringPhase(int index_str, int nbands)
 								G = tem_G;
 							}
 							
-							mat(nb,mb) = pw_method.unkdotp_G0(ik_1, ik_2, nb, mb, wf.evc, G);
+							mat(nb,mb) = pw_method.unkdotp_G0(ik_1, ik_2, nb, mb, GlobalC::wf.evc, G);
 						}
 						else 
 						{
-							mat(nb, mb) = pw_method.unkdotp_G(ik_1, ik_2, nb, mb, wf.evc);
+							mat(nb, mb) = pw_method.unkdotp_G(ik_1, ik_2, nb, mb, GlobalC::wf.evc);
 						}
 					}
 					else
@@ -288,9 +288,9 @@ double berryphase::stringPhase(int index_str, int nbands)
 								G = tem_G;
 							}
 							
-							mat(nb,mb) = pw_method.unkdotp_soc_G0(ik_1, ik_2, nb, mb, wf.evc, G);							
+							mat(nb,mb) = pw_method.unkdotp_soc_G0(ik_1, ik_2, nb, mb, GlobalC::wf.evc, G);							
 						}
-						else  mat(nb, mb) = pw_method.unkdotp_soc_G(ik_1, ik_2, nb, mb, wf.evc);
+						else  mat(nb, mb) = pw_method.unkdotp_soc_G(ik_1, ik_2, nb, mb, GlobalC::wf.evc);
 					}
 					
 				} // nb

@@ -646,12 +646,12 @@ void Forces::cal_force_nl(matrix& forcenl)
     
 	
 	// vkb1: |Beta(nkb,npw)><Beta(nkb,npw)|psi(nbnd,npw)>
-	ComplexMatrix vkb1( nkb, wf.npwx );
+	ComplexMatrix vkb1( nkb, GlobalC::wf.npwx );
 
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-        wf.npw = GlobalC::kv.ngk[ik];
+        GlobalC::wf.npw = GlobalC::kv.ngk[ik];
         // generate vkb
         if (ppcell.nkb > 0)
         {
@@ -667,9 +667,9 @@ void Forces::cal_force_nl(matrix& forcenl)
         {
             for (int i=0;i<nkb;i++)
             {
-                for (int ig=0; ig<wf.npw; ig++)
+                for (int ig=0; ig<GlobalC::wf.npw; ig++)
                 {
-                    becp(i,ib) += wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
+                    becp(i,ib) += GlobalC::wf.evc[ik](ib,ig)* conj( ppcell.vkb(i,ig) );
                 }
             }
         }
@@ -685,27 +685,27 @@ void Forces::cal_force_nl(matrix& forcenl)
 			{
 				if (ipol==0)
 				{
-					for (int ig=0; ig<wf.npw; ig++)
-                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(wf.igk(ik, ig), 0);
+					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 0);
                 }
 				if (ipol==1)
 				{
-					for (int ig=0; ig<wf.npw; ig++)
-                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(wf.igk(ik, ig), 1);
+					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 1);
                 }
 				if (ipol==2)
 				{
-					for (int ig=0; ig<wf.npw; ig++)
-                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(wf.igk(ik, ig), 2);
+					for (int ig=0; ig<GlobalC::wf.npw; ig++)
+                        vkb1(i, ig) = ppcell.vkb(i, ig) * NEG_IMAG_UNIT * GlobalC::pw.get_G_cartesian_projection(GlobalC::wf.igk(ik, ig), 2);
                 }
 			}
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
             {
                 for (int i=0; i<nkb; i++)
                 {
-                    for (int ig=0; ig<wf.npw; ig++)
+                    for (int ig=0; ig<GlobalC::wf.npw; ig++)
                     {
-                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * wf.evc[ik](ib,ig) ;
+                        dbecp(i,ib, ipol) += conj( vkb1(i,ig) ) * GlobalC::wf.evc[ik](ib,ig) ;
                     }
                 }
             }
@@ -719,7 +719,7 @@ void Forces::cal_force_nl(matrix& forcenl)
 //		ZEROS(cf, ucell.nat);
 		for (int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			double fac = wf.wg(ik, ib) * 2.0 * ucell.tpiba;
+			double fac = GlobalC::wf.wg(ik, ib) * 2.0 * ucell.tpiba;
         	int iat = 0;
         	int sum = 0;
 			for (int it=0; it<ucell.ntype; it++)

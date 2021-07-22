@@ -37,9 +37,9 @@ void Stress_Func::stress_kin(matrix& sigma)
 		npw = GlobalC::kv.ngk[ik];
 		for(int i=0;i<npw;i++)
 		{
-			gk[0][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 0) * factor;
-			gk[1][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 1) * factor;
-			gk[2][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 2) * factor;
+			gk[0][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 0) * factor;
+			gk[1][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 1) * factor;
+			gk[2][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, i), 2) * factor;
 		}
 
 		//kinetic contribution
@@ -55,16 +55,16 @@ void Stress_Func::stress_kin(matrix& sigma)
 						if(0)
 						{
 							s_kin[l][m] +=
-								wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]
-								*(double((conj(wf.evc[ik](ibnd, i))
-								*wf.evc[ik](ibnd, i)).real())+
-								double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i+npwx)).real()));
+								GlobalC::wf.wg(ik,ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+								*(double((conj(GlobalC::wf.evc[ik](ibnd, i))
+								*GlobalC::wf.evc[ik](ibnd, i)).real())+
+								double((conj(GlobalC::wf.evc[ik](ibnd, i))*GlobalC::wf.evc[ik](ibnd, i+npwx)).real()));
 						}
 						else
 						{
 							s_kin[l][m] +=
-								wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
-								*(double((conj(wf.evc[ik](ibnd, i))*wf.evc[ik](ibnd, i)).real()));
+								GlobalC::wf.wg(ik, ibnd)*gk[l][i]*gk[m][i]*kfac[i]
+								*(double((conj(GlobalC::wf.evc[ik](ibnd, i))*GlobalC::wf.evc[ik](ibnd, i)).real()));
 						}
 					}
 				}

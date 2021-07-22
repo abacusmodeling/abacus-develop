@@ -41,10 +41,10 @@ void toWannier90::init_wannier()
 	
 	if(GlobalV::BASIS_TYPE == "pw")
 	{
-		writeUNK(wf.evc);
+		writeUNK(GlobalC::wf.evc);
 		outEIG();
-		cal_Mmn(wf.evc);
-		cal_Amn(wf.evc);
+		cal_Mmn(GlobalC::wf.evc);
+		cal_Amn(GlobalC::wf.evc);
 	}
 #ifdef __LCAO
 	else if(GlobalV::BASIS_TYPE == "lcao")
@@ -62,9 +62,9 @@ void toWannier90::init_wannier()
 	{
 		if(GlobalV::BASIS_TYPE == "pw")
 		{
-			cal_Amn(wf.evc);
-			cal_Mmn(wf.evc);
-			writeUNK(wf.evc);
+			cal_Amn(GlobalC::wf.evc);
+			cal_Mmn(GlobalC::wf.evc);
+			writeUNK(GlobalC::wf.evc);
 			outEIG();
 		}
 		else if(GlobalV::BASIS_TYPE == "lcao")
@@ -336,7 +336,7 @@ void toWannier90::outEIG()
 				index_band++;
 				eig_file << setw(5) << index_band << setw(5) << ik+1-start_k_index
 						 << setw(18) << showpoint << fixed << setprecision(12) 
-						 << wf.ekb[ik][ib] * Ry_to_eV << endl;
+						 << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << endl;
 			}
 		}
 		
@@ -376,7 +376,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 			ZEROS(porter, GlobalC::pw.nrxx);
 			for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 			{
-				porter[GlobalC::pw.ig2fftw[wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
+				porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
 			}
 			GlobalC::pw.FFT_wfc.FFT3D(porter, 1);
 			
@@ -494,7 +494,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 				ZEROS(porter, GlobalC::pw.nrxx);
 				for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
 				{
-					porter[GlobalC::pw.ig2fftw[wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
+					porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = wfc_pw[ik](ib, ig);
 				}
 				GlobalC::pw.FFT_wfc.FFT3D(porter, 1);
 
@@ -579,7 +579,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 	// ��һ��������ʵ��г����lm��ĳ��k���µ�ƽ�沨�����µı��񣨾���	
 	// �ڶ���������̽����ľ��򲿷���ĳ��k����ƽ�沨ͶӰ
 	// ����������ȡ��̽�����ĳ��k����ƽ�沨�����µ�ͶӰ
-	const int pwNumberMax = wf.npwx;
+	const int pwNumberMax = GlobalC::wf.npwx;
 	
 	ofstream Amn_file;
 	
@@ -767,7 +767,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	}
 	
 	const int npw = GlobalC::kv.ngk[ik];
-	const int npwx = wf.npwx;
+	const int npwx = GlobalC::wf.npwx;
 	const int total_lm = 16;
 	matrix ylm(total_lm,npw);               //�������͵���г����
 	//matrix wannier_ylm(num_wannier,npw);    //Ҫ��̽�����ʹ�õ���г����
@@ -780,7 +780,7 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for(int ig = 0; ig < npw; ig++)
 	{
-		gk[ig] = wf.get_1qvec_cartesian(ik, ig);  // k+Gʸ��
+		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);  // k+Gʸ��
 	}
 	
 	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
@@ -1389,7 +1389,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	
 	// 4.����������̽�����ĳ��k����ƽ�沨�����ͶӰ
 	complex<double> lphase = pow(NEG_IMAG_UNIT, orbital_L);
-	for(int ig = 0; ig < wf.npwx; ig++)
+	for(int ig = 0; ig < GlobalC::wf.npwx; ig++)
 	{
 		if(ig < npw)
 		{
@@ -1401,7 +1401,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	
 	// 5.��һ��
 	complex<double> anorm(0.0,0.0);
-	for(int ig = 0; ig < wf.npwx; ig++)
+	for(int ig = 0; ig < GlobalC::wf.npwx; ig++)
 	{
 		anorm = anorm + conj(trial_orbitals_k(wannier_index,ig)) * trial_orbitals_k(wannier_index,ig);
 	}
@@ -1413,7 +1413,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	anorm_tem=anorm;
 #endif
 	
-	for(int ig = 0; ig < wf.npwx; ig++)
+	for(int ig = 0; ig < GlobalC::wf.npwx; ig++)
 	{
 		trial_orbitals_k(wannier_index,ig) = trial_orbitals_k(wannier_index,ig) / sqrt(anorm_tem);
 	}
@@ -1477,7 +1477,7 @@ void toWannier90::ToRealSpace(const int &ik, const int &ib, const ComplexMatrix 
 
     for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
     {
-        psir[ GlobalC::pw.ig2fftw[ wf.igk(ik,ig) ] ] = evc[ik](ib, ig);
+        psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik,ig) ] ] = evc[ik](ib, ig);
     }
 	
 	// get the phase value in realspace
@@ -1517,7 +1517,7 @@ complex<double> toWannier90::unkdotb(const complex<double> *psir, const int ikb,
 	
 	for (int ig = 0; ig < knumber; ig++)
 	{
-		result = result + conj( porter[ GlobalC::pw.ig2fftw[wf.igk(ikb, ig)] ] ) * wfc_pw[ikb](bandindex,ig);	
+		result = result + conj( porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ikb, ig)] ] ) * wfc_pw[ikb](bandindex,ig);	
 		
 	}
 	return result;
@@ -1535,7 +1535,7 @@ complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &
 
     for (int ig = 0; ig < GlobalC::kv.ngk[ik]; ig++)
     {
-        psir[ GlobalC::pw.ig2fftw[ wf.igk(ik,ig) ] ] = wfc_pw[ik](iband_L, ig);
+        psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik,ig) ] ] = wfc_pw[ik](iband_L, ig);
     }
 	
 	// get the phase value in realspace
@@ -1563,7 +1563,7 @@ complex<double> toWannier90::unkdotkb(const int &ik, const int &ikb, const int &
 	
 	for (int ig = 0; ig < GlobalC::kv.ngk[ikb]; ig++)
 	{
-		result_tem = result_tem + conj( psir[ GlobalC::pw.ig2fftw[wf.igk(ikb, ig)] ] ) * wfc_pw[ikb](iband_R,ig);	
+		result_tem = result_tem + conj( psir[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ikb, ig)] ] ) * wfc_pw[ikb](iband_R,ig);	
 		
 	}
 #ifdef __MPI
@@ -1587,8 +1587,8 @@ complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, co
 
     for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
     {
-        //psir[ GlobalC::pw.ig2fftw[ wf.igk(0,ig) ] ] = wfc_pw[0](ib_L, ig);
-		psir[ GlobalC::pw.ig2fftw[ wf.igk(0,ig) ] ] = complex<double> ( abs(wfc_pw[0](ib_L, ig)), 0.0 );
+        //psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig) ] ] = wfc_pw[0](ib_L, ig);
+		psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig) ] ] = complex<double> ( abs(wfc_pw[0](ib_L, ig)), 0.0 );
     }
 	
 	// get the phase value in realspace
@@ -1621,9 +1621,9 @@ complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, co
 	
 	for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
 	{
-		//result = result + conj(psir_2[ GlobalC::pw.ig2fftw[wf.igk(0,ig)] ]) * wfc_pw[0](ib_R,ig) + psir[ GlobalC::pw.ig2fftw[ wf.igk(0,ig)] ] * conj(wfc_pw[0](ib_R,ig));
+		//result = result + conj(psir_2[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(0,ig)] ]) * wfc_pw[0](ib_R,ig) + psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig)] ] * conj(wfc_pw[0](ib_R,ig));
 		//complex<double> tem = complex<double>( abs(wfc_pw[0](ib_R,ig)), 0.0 );
-		result = result +  conj(psir[ GlobalC::pw.ig2fftw[ wf.igk(0,ig)] ]);// * tem;
+		result = result +  conj(psir[ GlobalC::pw.ig2fftw[ GlobalC::wf.igk(0,ig)] ]);// * tem;
 	}
 	
 	delete[] phase;
@@ -1669,7 +1669,7 @@ void toWannier90::getUnkFromLcao()
 		get_lcao_wfc_global_ik(lcao_wfc_global[ik],LOWF.WFC_K[ik]);
 	
 		int npw = GlobalC::kv.ngk[ik];
-		unk_inLcao[ik].create(GlobalV::NBANDS,wf.npwx);
+		unk_inLcao[ik].create(GlobalV::NBANDS,GlobalC::wf.npwx);
 		orbital_in_G[ik].create(GlobalV::NLOCAL,npw);
 		this->lcao2pw_basis(ik,orbital_in_G[ik]);
 	

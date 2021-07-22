@@ -62,7 +62,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
     for(int ik=0;ik<GlobalC::kv.nkstot;ik++)
     {
         stringstream wfss;
-        if(wf.out_wf==1)
+        if(GlobalC::wf.out_wf==1)
             wfss<<fn<<ik+1<<".txt";
         else
         {
@@ -71,7 +71,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
         wfilename[ik]=wfss.str();
         if ( GlobalV::MY_RANK == 0 )
         {
-            if(wf.out_wf==1)
+            if(GlobalC::wf.out_wf==1)
             {
                 ofstream ofs(wfss.str().c_str()); //clear all wavefunc files.
                 ofs.close();
@@ -117,7 +117,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 #else
                     int id=0;               
 #endif
-                    if(wf.out_wf==1)
+                    if(GlobalC::wf.out_wf==1)
                     {
                         ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
                         if(id==0)
@@ -188,7 +188,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 #else
                     int id=0;
 #endif
-                        if(wf.out_wf==1)
+                        if(GlobalC::wf.out_wf==1)
                         {
                             ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
                             if(id==0)   ofs2 << "\n< Band "<<ib+1 <<" >" <<endl; 

@@ -10,10 +10,9 @@ output out;
 PW_Basis pw;
 Stochastic_WF sto_wf;
 energy en;
+wavefunc wf;
 }
 
-
-wavefunc wf;
 Hamilt hm;
 #ifdef __LCAO
 Exx_Global exx_global;

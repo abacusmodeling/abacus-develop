@@ -17,7 +17,7 @@ void LOOP_cell::opt_cell(void)
     // npwx, eigenvalues, and weights
     // npwx may change according to cell change
     // this function belongs to cell LOOP
-    wf.allocate_ekb_wg(GlobalC::kv.nks);
+    GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
 
     // Initialize the FFT.
     // this function belongs to cell LOOP

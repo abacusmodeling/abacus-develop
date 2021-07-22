@@ -230,15 +230,15 @@ void Stochastic_Iter::itermu(int &iter)
 
     GlobalC::en.ef = mu = mu0 = mu3;
     
-    //Set wf.wg 
+    //Set GlobalC::wf.wg 
     if(GlobalV::NBANDS > 0)
     {
         for(int ikk = 0; ikk < nkk; ++ikk)
         {
-            double *en=wf.ekb[ikk];
+            double *en=GlobalC::wf.ekb[ikk];
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
-                wf.wg(ikk,iksb) = fd(en[iksb])*GlobalC::kv.wk[ikk];
+                GlobalC::wf.wg(ikk,iksb) = fd(en[iksb])*GlobalC::kv.wk[ikk];
             }
         }
     }
@@ -305,7 +305,7 @@ double Stochastic_Iter::calne()
         //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
         if(GlobalV::NBANDS > 0)
         {
-            double *en=wf.ekb[ikk];
+            double *en=GlobalC::wf.ekb[ikk];
             //number of electrons in KS orbitals
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
@@ -329,7 +329,7 @@ void Stochastic_Iter::sum_stoband()
     timer::tick("Stochastic_Iter","sum_stoband");
     int nkk=1;// We temporarily use gamma k point.
     int nrxx = stohchi.nrxx;
-    int npw = wf.npw;
+    int npw = GlobalC::wf.npw;
     int norder = stoche.norder;
 
     //cal demet
@@ -348,7 +348,7 @@ void Stochastic_Iter::sum_stoband()
         //cout<<endl;
         if(GlobalV::NBANDS > 0)
         {
-            double *enb=wf.ekb[ikk];
+            double *enb=GlobalC::wf.ekb[ikk];
             //number of electrons in KS orbitals
             for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
             {
@@ -616,8 +616,8 @@ double Stochastic_Iter:: nfdlnfd(double e)
     /*
     complex<double> *in = new complex<double> [GlobalC::pw.nrxx];
     
-    complex<double> *chig1 = new complex<double> [wf.npw];
-    complex<double> *chig2 = new complex<double> [wf.npw];
+    complex<double> *chig1 = new complex<double> [GlobalC::wf.npw];
+    complex<double> *chig2 = new complex<double> [GlobalC::wf.npw];
     ZEROS(in,GlobalC::pw.nrxx);
     ZEROS(in2,GlobalC::pw.nrxx);*/
 
@@ -665,23 +665,23 @@ double Stochastic_Iter:: nfdlnfd(double e)
     Emax = 1;
     Stochastic_hchi:: Emin = this -> Emin;
     Stochastic_hchi:: Emax = this -> Emax;
-    complex<double> *chig1 = new complex<double> [wf.npw];
-    complex<double> *chig2 = new complex<double> [wf.npw];
-    complex<double> *kswf = &wf.evc[0](0,0);
+    complex<double> *chig1 = new complex<double> [GlobalC::wf.npw];
+    complex<double> *chig2 = new complex<double> [GlobalC::wf.npw];
+    complex<double> *kswf = &GlobalC::wf.evc[0](0,0);
     
     
     stohchi.hchi_reciprocal(kswf,chig1);
     
     hm.hpw.h_psi( kswf , chig2);
     if(GlobalV::MY_RANK==0)
-    for(int i = 0; i<wf.npw;++i)
+    for(int i = 0; i<GlobalC::wf.npw;++i)
     {
         if(i % 100 == 0)
             cout<<kswf[i]<<" "<<chig1[i]<<" "<<chig2[i]<<endl;
     }
     MPI_Barrier(MPI_COMM_WORLD);
     if(GlobalV::MY_RANK==1)
-    for(int i = 0; i<wf.npw;++i)
+    for(int i = 0; i<GlobalC::wf.npw;++i)
     {
         cout.clear();
         if(i % 100 == 0)
@@ -698,8 +698,8 @@ double Stochastic_Iter:: nfdlnfd(double e)
     Stochastic_hchi:: Emax = this -> Emax;
     int * GRA_index = stohchi.GRA_index;
     ZEROS(in,GlobalC::pw.nrxx);
-    complex<double> *kswf = &wf.evc[0](0,0);
-    for ( int ig = 0 ; ig< wf.npw; ++ig)
+    complex<double> *kswf = &GlobalC::wf.evc[0](0,0);
+    for ( int ig = 0 ; ig< GlobalC::wf.npw; ++ig)
     {
         in[GRA_index[ig]] = kswf [ig];
     }
@@ -708,13 +708,13 @@ double Stochastic_Iter:: nfdlnfd(double e)
     stohchi.hchi_real(in2,out);
     fftw_plan pp2=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)out,(fftw_complex *)out, FFTW_FORWARD, FFTW_ESTIMATE);
     fftw_execute(pp2);
-    for(int i  = 0; i <wf.npw;++i)
+    for(int i  = 0; i <GlobalC::wf.npw;++i)
     {
         chig1[i] = out[GRA_index[i]] / GlobalC::pw.nrxx; 
     }
 
     hm.hpw.h_psi( kswf , chig2);
-    for(int i = 0; i<wf.npw;++i)
+    for(int i = 0; i<GlobalC::wf.npw;++i)
     {
         if(i % 100 == 0)
         cout<<kswf[i]<<" "<<in[GRA_index[i]]<<" "<<chig1[i]<<" "<<chig2[i]<<endl;
@@ -726,7 +726,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     //compare eigen energy
     /*
     int * GRA_index = stohchi.GRA_index;
-    complex<double> *chigout = new complex<double> [wf.npw];
+    complex<double> *chigout = new complex<double> [GlobalC::wf.npw];
     complex<double> *wave = new complex<double> [GlobalC::pw.nrxx];
     complex<double> *waveout = new complex<double> [GlobalC::pw.nrxx];
     Emax = 1000;
@@ -738,12 +738,12 @@ double Stochastic_Iter:: nfdlnfd(double e)
     fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
     for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
-        complex<double> *kswf = &wf.evc[0](ib,0);
+        complex<double> *kswf = &GlobalC::wf.evc[0](ib,0);
         hm.hpw.h_psi( kswf , chigout);
         double energy = 0;
         double norm1 =0;
         ZEROS(wave,GlobalC::pw.nrxx);
-        for(int ig = 0 ; ig < wf.npw ; ++ig)
+        for(int ig = 0 ; ig < GlobalC::wf.npw ; ++ig)
         {
             energy += real(conj(kswf[ig]) * chigout[ig]);
             norm1 += norm (kswf[ig]);
@@ -783,8 +783,8 @@ double Stochastic_Iter:: nfdlnfd(double e)
     for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
         ZEROS(wave,GlobalC::pw.nrxx);
-        complex<double> *kswf = &wf.evc[0](ib,0);
-        for(int ig = 0 ; ig < wf.npw ; ++ig)
+        complex<double> *kswf = &GlobalC::wf.evc[0](ib,0);
+        for(int ig = 0 ; ig < GlobalC::wf.npw ; ++ig)
         {
             wave[GRA_index[ig]] = kswf[ig];
         }
@@ -804,7 +804,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
 
     //-------------------------------------------------------------
 	//test orthogonal
-    /*int npw=wf.npw;
+    /*int npw=GlobalC::wf.npw;
     char transC='C';
     char transN='N';
     int nchip = GlobalC::sto_wf.nchip;

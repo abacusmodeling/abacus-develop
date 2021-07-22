@@ -257,7 +257,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 	int start = 1;
 	int end = GlobalV::NBANDS;
 
-	assert(wf.allocate_ekb);
+	assert(GlobalC::wf.allocate_ekb);
 
 	ofstream ofs;
 	if(GlobalV::MY_RANK==0)

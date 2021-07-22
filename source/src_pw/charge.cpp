@@ -710,11 +710,11 @@ void Charge::sum_band_k(void)
 		{
 			for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 			{
-				GlobalC::en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
+				GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
 				ZEROS( porter, GlobalC::pw.nrxx );
 				for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
  				{
-					porter[ GlobalC::pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
+					porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig);
 				}
 				GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
 				if(GlobalV::NPOL ==2)
@@ -722,11 +722,11 @@ void Charge::sum_band_k(void)
 					ZEROS( porter1, GlobalC::pw.nrxx );
 					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 					{
-						porter1[ GlobalC::pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig + wf.npwx);
+						porter1[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig + GlobalC::wf.npwx);
 					}
 					GlobalC::pw.FFT_wfc.FFT3D(porter1, 1);
 				}
-				const double w1 = wf.wg(ik, ibnd) / ucell.omega;
+				const double w1 = GlobalC::wf.wg(ik, ibnd) / ucell.omega;
 
 				// Increment the charge density in chr.rho for real space
 				if (w1 != 0.0)
@@ -764,17 +764,17 @@ void Charge::sum_band_k(void)
 		else
 		for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 		{
-			GlobalC::en.eband += wf.ekb[ik][ibnd] * wf.wg(ik, ibnd);
-			//cout << "\n ekb = " << wf.ekb[ik][ibnd] << " wg = " << wf.wg(ik, ibnd);
+			GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
+			//cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
 
 			ZEROS( porter, GlobalC::pw.nrxx );
 			for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
 			{
-				porter[ GlobalC::pw.ig2fftw[wf.igk(ik, ig)] ] = wf.evc[ik](ibnd, ig);
+				porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig);
 			}
 			GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
 
-			const double w1 = wf.wg(ik, ibnd) / ucell.omega;
+			const double w1 = GlobalC::wf.wg(ik, ibnd) / ucell.omega;
 
 			if (w1 != 0.0)
 			{

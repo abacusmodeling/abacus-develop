@@ -47,7 +47,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
 	// Peize Lin test 2019-01-16 
     wfc_dm_2d.init();
-	if(wf.start_wfc=="file")
+	if(GlobalC::wf.start_wfc=="file")
 	{
 		this->kpt_file(GridT);
 	}
@@ -142,7 +142,7 @@ inline void cal_DM_ATOM(
             int nRow=0;
             for(int ib=0; ib<GlobalV::NBANDS; ++ib)
             {
-                const double wg_local=wf.wg(ik,ib);
+                const double wg_local=GlobalC::wf.wg(ik,ib);
                 if(wg_local>0)
                 {
                     if(nRow==0) ibStart=ib;
@@ -223,7 +223,7 @@ inline void cal_DM_ATOM_nc(
                     int nRow=0;
                     for(int ib=0; ib<GlobalV::NBANDS; ++ib)
                     {
-                        const double w1=wf.wg(ik,ib);
+                        const double w1=GlobalC::wf.wg(ik,ib);
                         if(w1>0)
                         {
                             if(nRow==0) 
@@ -372,7 +372,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     {
         for(int ib=0; ib<GlobalV::NBANDS; ++ib)
         {
-            cout << " ik=" << ik << " ib=" << ib << " occ=" << wf.wg(ik,ib) << " e=" << wf.ekb[ik][ib] << endl;
+            cout << " ik=" << ik << " ib=" << ib << " occ=" << GlobalC::wf.wg(ik,ib) << " e=" << GlobalC::wf.ekb[ik][ib] << endl;
         }
     }
 

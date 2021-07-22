@@ -159,7 +159,7 @@ void Mulliken_Charge::cal_mulliken(void)
 
 						const double x = mug[j].real();
 
-						MecMulP[is][j] +=x*wf.wg(0,i);
+						MecMulP[is][j] +=x*GlobalC::wf.wg(0,i);
 					}
 				} 
 			}//ib
@@ -252,7 +252,7 @@ void Mulliken_Charge::cal_mulliken(void)
 
 								mug[j] = mud[0](ic,ir)*M.wfc_k[ik](ic,ir);
 								const double x = mug[j].real();
-								MecMulP[is][j] +=x*wf.wg(ik,i);
+								MecMulP[is][j] +=x*GlobalC::wf.wg(ik,i);
 								// cout <<   wavog[j] << endl; 
 							}
 						}                             

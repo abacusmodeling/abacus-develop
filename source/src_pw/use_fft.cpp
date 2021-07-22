@@ -29,7 +29,7 @@ void Use_FFT::RoundTrip(
     complex<double> *psic)
 {
 	// (1) set value
-    for (int ig=0; ig< wf.npw; ig++)
+    for (int ig=0; ig< GlobalC::wf.npw; ig++)
     {
         psic[ fft_index[ig]  ] = psi[ig];
     }
@@ -67,9 +67,9 @@ void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr)
 void Use_FFT::ToRealSpace_psi(const int &ik, const complex<double> *psig, complex<double> *psir)
 {
 	ZEROS(psir, GlobalC::pw.nrxx);
-	for(int ig=0; ig<wf.npw; ig++)
+	for(int ig=0; ig<GlobalC::wf.npw; ig++)
 	{
-		psir[ GlobalC::pw.ig2fftc[ wf.igk(ik,ig) ] ] = psig[ig];
+		psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = psig[ig];
 	}
 	// 1: to real space.
 	GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
@@ -82,9 +82,9 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix 
 {
 	// (1) set value
     ZEROS( psir, GlobalC::pw.nrxx );
-    for (int ig=0; ig<wf.npw; ig++)
+    for (int ig=0; ig<GlobalC::wf.npw; ig++)
     {
-        psir[ GlobalC::pw.ig2fftc[ wf.igk(ik,ig) ] ] = evc(ib, ig);
+        psir[ GlobalC::pw.ig2fftc[ GlobalC::wf.igk(ik,ig) ] ] = evc(ib, ig);
     }
 
 	// (2) fft and get value

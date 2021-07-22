@@ -1136,7 +1136,7 @@ ofs_mpi.close();
 		{
 			ofstream ofs("ekb_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
-				ofs<<wf.ekb[ik][ib]<<"\t";
+				ofs<<GlobalC::wf.ekb[ik][ib]<<"\t";
 			ofs<<endl;
 		}
 	};	

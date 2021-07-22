@@ -29,7 +29,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		{
 			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
-		wf.npw = GlobalC::kv.ngk[ik];
+		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{

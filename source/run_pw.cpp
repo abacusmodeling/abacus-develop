@@ -101,7 +101,7 @@ void Run_pw::plane_wave_line(void)
     if(GlobalV::BASIS_TYPE=="pw" && INPUT.out_descriptor==1)
     {
         Numerical_Descriptor nc;
-        nc.output_descriptor(wf.evc, INPUT.lmax_descriptor);
+        nc.output_descriptor(GlobalC::wf.evc, INPUT.lmax_descriptor);
         DONE(GlobalV::ofs_running,"GENERATE DESCRIPTOR FOR DEEPKS");
     }
 
@@ -118,19 +118,19 @@ void Run_pw::plane_wave_line(void)
 
             for (int ik=0; ik<GlobalC::kv.nks; ik++)
             {
-                wf.wanf2[ik].create(GlobalV::NLOCAL, wf.npwx);
+                GlobalC::wf.wanf2[ik].create(GlobalV::NLOCAL, GlobalC::wf.npwx);
 				if(GlobalV::BASIS_TYPE=="pw")
                 {
 					cout << " ik=" << ik + 1 << endl;
 
                     GlobalV::BASIS_TYPE="lcao_in_pw";
-					wf.LCAO_in_pw_k(ik, wf.wanf2[ik]);
+					GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
                     GlobalV::BASIS_TYPE="pw";
                 }
             }
 
             //Spillage sp;
-            //sp.get_both(GlobalV::NBANDS, GlobalV::NLOCAL, wf.wanf2, wf.evc);
+            //sp.get_both(GlobalV::NBANDS, GlobalV::NLOCAL, GlobalC::wf.wanf2, GlobalC::wf.evc);
         }
 #endif
 
@@ -138,7 +138,7 @@ void Run_pw::plane_wave_line(void)
         if ( winput::out_spillage <= 2 )
         {
             Numerical_Basis numerical_basis;
-            numerical_basis.output_overlap(wf.evc);
+            numerical_basis.output_overlap(GlobalC::wf.evc);
             DONE(GlobalV::ofs_running,"BASIS OVERLAP (Q and S) GENERATION.");
         }
     }

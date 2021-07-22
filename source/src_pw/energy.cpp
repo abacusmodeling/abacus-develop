@@ -426,9 +426,9 @@ void energy::print_band(const int &ik)
     bool wrong = false;
 	for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 	{
-		if( abs( wf.ekb[ik][ib] ) > 1.0e10)
+		if( abs( GlobalC::wf.ekb[ik][ib] ) > 1.0e10)
 		{
-			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << wf.ekb[ik][ib] << " Ry" << endl;
+			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << endl;
 			wrong = true;
 		}
 	}
@@ -457,10 +457,10 @@ void energy::print_band(const int &ik)
 				for(int ib=0;ib<GlobalV::NBANDS;ib++)
 				{
 					GlobalV::ofs_running << " "<< setw(6) << ib+1  
-						<< setw(15) << wf.ekb[ik][ib] * Ry_to_eV;
+						<< setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV;
 					// for the first electron iteration, we don't have the energy
 					// spectrum, so we can't get the occupations. 
-					GlobalV::ofs_running << setw(15) << wf.wg(ik,ib);
+					GlobalV::ofs_running << setw(15) << GlobalC::wf.wg(ik,ib);
 					GlobalV::ofs_running << endl;
 				}
 			}

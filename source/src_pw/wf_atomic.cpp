@@ -370,7 +370,7 @@ void WF_atomic::atomic_wfc
                               for(int m = 0;m<2*l+1;m++)
                               {
                                  const int lm = l*l +m;
-                                 if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+                                 if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
@@ -405,7 +405,7 @@ void WF_atomic::atomic_wfc
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;
-                                if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+                                if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
@@ -460,7 +460,7 @@ void WF_atomic::atomic_wfc
 
     if (index != ucell.natomwfc)
     {
-        WARNING_QUIT("wf.atomic_wfc()","index != ucell.natomwfc");
+        WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != ucell.natomwfc");
     }
     delete[] flq;
     delete [] gk;

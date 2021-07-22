@@ -27,8 +27,8 @@ void Variable_Cell::init_after_vc(void)
 
     if(GlobalV::BASIS_TYPE=="pw")
     {
-        wf.init_after_vc(GlobalC::kv.nks);
-        wf.init_at_1();
+        GlobalC::wf.init_after_vc(GlobalC::kv.nks);
+        GlobalC::wf.init_at_1();
     }
 
     GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
@@ -109,11 +109,11 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=====================
     if(GlobalV::BASIS_TYPE=="pw")
     {
-        wf.allocate(GlobalC::kv.nks);
+        GlobalC::wf.allocate(GlobalC::kv.nks);
     }
     else
     {
-        wf.allocate_ekb_wg(GlobalC::kv.nks);
+        GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
     }
     GlobalC::UFFT.allocate();
 
@@ -128,7 +128,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=====================
     // init hamiltonian
     //=====================
-    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
+    hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
@@ -156,9 +156,9 @@ void Variable_Cell::final_calculation_after_vc(void)
     {
 		pot.newd();
 
-		wf.init_at_1();
+		GlobalC::wf.init_at_1();
 
-        wf.wfcinit();
+        GlobalC::wf.wfcinit();
         DONE(GlobalV::ofs_running,"INIT BASIS");
     }
 

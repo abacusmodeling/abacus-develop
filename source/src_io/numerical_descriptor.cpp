@@ -247,7 +247,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
@@ -264,7 +264,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     {
         for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++)
         {
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
+            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
             for (int L=0; L< lmax+1; L++)
             {
                 GlobalV::ofs_running << " " << setw(5) << ik+1

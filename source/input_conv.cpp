@@ -190,8 +190,8 @@ void Input_Conv::Convert(void)
 // wavefunction / charge / potential / (2/4)
 //----------------------------------------------------------
     GlobalV::RESTART_MODE = INPUT.restart_mode;
-    wf.start_wfc = INPUT.start_wfc;
-	wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
+    GlobalC::wf.start_wfc = INPUT.start_wfc;
+	GlobalC::wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
 	GlobalC::en.printe    = INPUT.printe; // mohan add 2011-03-16
 
     
@@ -562,7 +562,7 @@ void Input_Conv::Convert(void)
     CHR.out_charge = INPUT.out_charge;
 	CHR.nelec = INPUT.nelec;
 	pot.out_potential = INPUT.out_potential;
-    wf.out_wf = INPUT.out_wf;
+    GlobalC::wf.out_wf = INPUT.out_wf;
 	GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO

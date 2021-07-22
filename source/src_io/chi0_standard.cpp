@@ -226,7 +226,7 @@ void Chi0_standard:: Chi()
 		occ_flag = false;
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			if( wf.wg(ik,ib)> 0.0001)
+			if( GlobalC::wf.wg(ik,ib)> 0.0001)
 			{
 				occ_flag = true;
 				continue;
@@ -525,7 +525,7 @@ void Chi0_standard::Cal_Psi(int iq, complex<double> **psi_r)
 		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[iq] ; ig++)
 		{
-			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[wf.igk(iq,ig)] ] = wf.evc[iq](ib,ig);
+			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(iq,ig)] ] = GlobalC::wf.evc[iq](ib,ig);
 		}
 		
 		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
@@ -621,8 +621,8 @@ void Chi0_standard:: Cal_weight(int iq, int ik, double omega)
 	for(int ib1=0; ib1<oband; ib1++)
 		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
-			complex<double> factor = complex<double>( (omega + wf.ekb[ik][ib1] - wf.ekb[iqk][ib2]), eta);
-			weight[ib2+ib1*GlobalV::NBANDS] = ( wf.wg(ik,ib1)  - wf.wg(iqk,ib2) )/factor/ucell.omega;
+			complex<double> factor = complex<double>( (omega + GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[iqk][ib2]), eta);
+			weight[ib2+ib1*GlobalV::NBANDS] = ( GlobalC::wf.wg(ik,ib1)  - GlobalC::wf.wg(iqk,ib2) )/factor/ucell.omega;
 		}
 		
 	return;

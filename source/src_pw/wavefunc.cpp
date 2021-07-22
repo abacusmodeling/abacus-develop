@@ -89,7 +89,7 @@ void wavefunc::allocate(const int nks)
 
 	const int nks2 = nks;
 
-	if(GlobalV::CALCULATION=="nscf" && wf.mem_saver==1)
+	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
 	{
 		// mohan add 2010-09-07
 		this->evc = new ComplexMatrix[1];
@@ -228,7 +228,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	Wavefunc_in_pw::produce_local_basis_in_pw(ik, wvf, this->table_local);
 
 	//-------------------------------------------------------------
-	// (2) diago to get wf.ekb, then the weights can be calculated.
+	// (2) diago to get GlobalC::wf.ekb, then the weights can be calculated.
 	//-------------------------------------------------------------
     hm.hpw.allocate(this->npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
 	hm.hpw.init_k(ik);
@@ -364,14 +364,14 @@ void wavefunc::wfcinit_k(void)
 			// get the wave functions 
 			// by first diagolize PAO
 			// wave functions.
-			this->diago_PAO_in_pw_k(ik, wf.evc[ik]);
+			this->diago_PAO_in_pw_k(ik, GlobalC::wf.evc[ik]);
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			// just get the numerical local basis wave functions
 			// in plane wave basis
-			this->LCAO_in_pw_k(ik, wf.wanf2[ik]);
+			this->LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
 		}
 #endif
 	}
@@ -532,12 +532,12 @@ void wavefunc::wfcinit_k(void)
 						{
 							for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)    // loop over ig
 							{
-								gkqg = GlobalC::pw.get_GPlusK_cartesian(ik, wf.igk(ik, ig)) + qg;
+								gkqg = GlobalC::pw.get_GPlusK_cartesian(ik, GlobalC::wf.igk(ik, ig)) + qg;
 								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
 								{
 									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
 									phase = complex<double>( cos(arg),  -sin(arg) );
-									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) 
+									overlap_aux[iw1][iw2][g][ir] += conj(GlobalC::wf.wanf2[ik](iw1,ig)) 
 									* wanf2_q[ik][iw2][ig] * phase/static_cast<double>(GlobalC::kv.nks);		
 									// Peize Lin add static_cast 2018-07-14
 								}
@@ -809,7 +809,7 @@ void wavefunc::init_after_vc(const int nks)
 
     const int nks2 = nks * prefactor;
 
-    if(GlobalV::CALCULATION=="nscf" && wf.mem_saver==1)
+    if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
     {
         this->evc = new ComplexMatrix[1];
         this->wanf2 = new ComplexMatrix[1];

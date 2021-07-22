@@ -89,7 +89,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 
 	if (nkb > 0 && allocate_vkb )
 	{
-		vkb.create(nkb, wf.npwx);
+		vkb.create(nkb, GlobalC::wf.npwx);
 	}
 
 	//this->nqx = 10000;		// calculted in allocate_nlpot.f90
@@ -157,7 +157,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{
-		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
 	YlmReal::Ylm_Real(x1, npw, gk, ylm);
@@ -200,7 +200,7 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<ucell.atoms[it].na; ia++) 
 		{
-			complex<double> *sk = wf.get_sk(ik, it, ia);
+			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
 				complex<double> pref = pow( NEG_IMAG_UNIT, nhtol(it, ih));	//?
@@ -451,7 +451,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for (ig = 0;ig < npw;ig++) 
 	{
-		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
 	vkb1_alpha = new complex<double>**[3];
@@ -470,7 +470,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 		vkb_alpha[i] = new complex<double>*[nkb];
 		for(int j=0; j<nkb; j++)
 		{
-			vkb_alpha[i][j] = new complex<double>[wf.npwx];
+			vkb_alpha[i][j] = new complex<double>[GlobalC::wf.npwx];
 		}
 	}
 	
@@ -528,7 +528,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 
 		for (ia=0; ia<ucell.atoms[it].na; ia++) 
 		{
-			complex<double> *sk = wf.get_sk(ik, it, ia);
+			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
 				for (ig = 0;ig < npw;ig++)

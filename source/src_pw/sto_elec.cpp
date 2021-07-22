@@ -120,7 +120,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		else
 		{
 			hm.hpw.init_k(0); //only GAMMA
-			//In fact, hm.hpw.init_k has been done in wf.wfcinit();
+			//In fact, hm.hpw.init_k has been done in GlobalC::wf.wfcinit();
 		}
 		GlobalC::kv.wk[0] = 2;// GAMMA temporary
 		
@@ -143,8 +143,8 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #ifdef __MPI
 		if(GlobalV::NBANDS > 0)
 		{
-			MPI_Bcast(wf.evc[0].c, wf.npwx*GlobalV::NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
-			MPI_Bcast(wf.ekb[0], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
+			MPI_Bcast(GlobalC::wf.evc[0].c, GlobalC::wf.npwx*GlobalV::NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
+			MPI_Bcast(GlobalC::wf.ekb[0], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
 		}
 #endif
 		
@@ -152,7 +152,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		int ndim;
     	if(GlobalC::sto_wf.stotype == "pw")
 		{
-    	    ndim = wf.npw;
+    	    ndim = GlobalC::wf.npw;
 		}
     	else
 		{
@@ -383,8 +383,8 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	int precondition_type = 2;
 
-	double *h_diag = new double[wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
-	ZEROS(h_diag, wf.npwx * GlobalV::NPOL);
+	double *h_diag = new double[GlobalC::wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
+	ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
     
 	avg_iter = 0.0;
        
@@ -402,27 +402,27 @@ void Stochastic_Elec::c_bands(const int &istep)
         //===========================================
         if (precondition_type==1)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
 			{
-				h_diag[ig] = max(1.0, wf.g2kin[ig]);
-				if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+				h_diag[ig] = max(1.0, GlobalC::wf.g2kin[ig]);
+				if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
 			}
         }
         else if (precondition_type==2)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
 			{
-				h_diag[ig] = 1 + wf.g2kin[ig] + sqrt( 1 + (wf.g2kin[ig] - 1) * (wf.g2kin[ig] - 1));
-				if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+				h_diag[ig] = 1 + GlobalC::wf.g2kin[ig] + sqrt( 1 + (GlobalC::wf.g2kin[ig] - 1) * (GlobalC::wf.g2kin[ig] - 1));
+				if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
 			}
         }
 		//h_diag can't be zero!  //zhengdy-soc
 		if(GlobalV::NPOL==2)
 		{
-			for(int ig = wf.npw;ig < wf.npwx; ig++)
+			for(int ig = GlobalC::wf.npw;ig < GlobalC::wf.npwx; ig++)
 			{
 				h_diag[ig] = 1.0;
-				h_diag[ig+ wf.npwx] = 1.0;
+				h_diag[ig+ GlobalC::wf.npwx] = 1.0;
 			}
 		}
 
