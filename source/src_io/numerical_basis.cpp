@@ -435,13 +435,11 @@ void Numerical_Basis::cal_overlap_Sq(
     const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    std::vector<Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
-    {
         gk[ig] = wf.get_1qvec_cartesian(ik, ig);
-    }
 
-    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
+    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
 
     const int enumber = Numerical_Basis::bessel_basis.get_ecut_number();
 
@@ -460,72 +458,72 @@ void Numerical_Basis::cal_overlap_Sq(
         }
     }
 
-    complex<double> *about_ig = new complex<double>[np];
-	ZEROS(about_ig, np);
+    std::vector<std::complex<double>> about_ig(np, std::complex<double>(0.0,0.0));
 
-    ofs_running << "\n " << setw(5) << "ik"
-    << setw(8) << "Type1"
-    << setw(8) << "Atom1"
-    << setw(8) << "L1"
-    << setw(8) << "Type2"
-    << setw(8) << "Atom2"
-    << setw(8) << "L2" << endl;
+    ofs_running << "\n " << setw(5)
+        << "ik" << setw(8) 
+        << "Type1" << setw(8) 
+        << "Atom1" << setw(8) 
+        << "L1" << setw(8) 
+        << "Type2" << setw(8) 
+        << "Atom2" << setw(8) 
+        << "L2" << endl;
 
     for (int T1 = 0; T1 < ucell.ntype; T1++) // 1.1
     {
         for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++) // 1.2
         {
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
+            complex<double> *sk1 = wf.get_sk(ik, T1, I1);
             for (int T2=0; T2<ucell.ntype; T2++) // 2.1
             {
                 for (int I2=0; I2<ucell.atoms[T2].na; I2++) // 2.2
                 {
                     complex<double> *sk2 = wf.get_sk(ik, T2, I2);
-                    for (int l = 0; l < ucell.atoms[T1].nwl+1; l++) // 1.3
+                    for (int l1 = 0; l1 < ucell.atoms[T1].nwl+1; l1++) // 1.3
                     {
-                        complex<double> lphase = normalization * pow(IMAG_UNIT, l);			// Peize Lin add normalization 2015-12-29
+                        complex<double> lphase1 = normalization * pow(IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
                         for (int l2 = 0; l2 < ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
                             ofs_running << " " << setw(5) << ik+1
                             << setw(8) << ucell.atoms[T1].label
                             << setw(8) << I1+1
-                            << setw(8) << l
+                            << setw(8) << l1
                             << setw(8) << ucell.atoms[T2].label
                             << setw(8) << I2+1
                             << setw(8) << l2
                             << endl;
 
                             complex<double> lphase2 = pow(IMAG_UNIT, l2);
-                            for (int ic=0; ic < ucell.nmax; ic++) // 1.5
+                            for (int ic1=0; ic1 < ucell.nmax; ic1++) // 1.5
                             {
                                 for (int ic2=0; ic2 < ucell.nmax; ic2++) // 2.5
                                 {
-                                    for (int m=0; m<2*l+1; m++) // 1.6
+                                    for (int m1=0; m1<2*l1+1; m1++) // 1.6
                                     {
-                                        const int lm = l*l+m;
+                                        const int lm1 = l1*l1+m1;
                                         for (int ig=0; ig<np; ig++)
                                         {
-//                                          about_ig[ig] = conj( lphase * sk[ig] * ylm(lm, ig) );
-                                            about_ig[ig] = conj( lphase * sk[ig] * ylm(lm, ig) ) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
+//                                          about_ig[ig] = conj( lphase1 * sk1[ig] * ylm(lm1, ig) );
+                                            about_ig[ig] = conj( lphase1 * sk1[ig] * ylm(lm1, ig) ) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
                                         }
                                         for (int m2=0; m2<2*l2+1; m2++) // 2.6
                                         {
                                             const int lm2 = l2*l2+m2;
-                                            const int mu = mu_index[T1](I1, l, ic, m);
-                                            const int nu = mu_index[T2](I2,l2,ic2,m2);
+                                            const int iwt1 = mu_index[T1](I1,l1,ic1,m1);
+                                            const int iwt2 = mu_index[T2](I2,l2,ic2,m2);
                                             for (int ig=0; ig<np; ig++)
                                             {
                                                 const complex<double> about_ig3= lphase2 * sk2[ig] * ylm(lm2, ig)
                                                                                  * about_ig[ig];
 
-                                                for (int ie=0; ie < enumber; ie++) // 1.4
+                                                for (int ie1=0; ie1 < enumber; ie1++) // 1.4
                                                 {
                                                     for (int ie2=0; ie2 < enumber; ie2++) // 2.4
                                                     {
                                                         const complex<double> s =
-                                                            about_ig3 * flq(l,ie,ig) * flq(l2,ie2,ig);
-                                                        Sq_real( mu, nu, ie, ie2) += s.real();
-                                                        Sq_imag( mu, nu, ie, ie2) += s.imag();
+                                                            about_ig3 * flq(l1,ie1,ig) * flq(l2,ie2,ig);
+                                                        Sq_real( iwt1, iwt2, ie1, ie2) += s.real();
+                                                        Sq_imag( iwt1, iwt2, ie1, ie2) += s.imag();
 
                                                     }
                                                 }
@@ -536,15 +534,13 @@ void Numerical_Basis::cal_overlap_Sq(
                             }
                         }
                     }
-                    delete[] sk2;
+                    delete[] sk2;   sk2=nullptr;
                 }
             }
-            delete[] sk;
+            delete[] sk1;   sk1=nullptr;
         }
     }
 
-    delete[] about_ig;
-	delete[] gk; //mohan fix bug 2011-06-24
     timer::tick("Numerical_Basis","cal_overlap_Sq");
     return;
 }
@@ -569,13 +565,11 @@ void Numerical_Basis::cal_overlap_Q(
     const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    std::vector<Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
-    {
         gk[ig] = wf.get_1qvec_cartesian(ik, ig);
-    }
 
-    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
+    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
 
     ofs_running << "\n " << setw(5) << "ik"
     << setw(8) << "Type1"
@@ -583,19 +577,19 @@ void Numerical_Basis::cal_overlap_Q(
 	<< setw(8) << "L"
 	<< endl;
 
-    double *flq = new double[np];
-    for (int T1 = 0; T1 < ucell.ntype; T1++)
+    std::vector<double> flq(np);
+    for (int T = 0; T < ucell.ntype; T++)
     {
-        //OUT("T1",T1);
-        for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++)
+        //OUT("T",T);
+        for (int I = 0; I < ucell.atoms[T].na; I++)
         {
-            //OUT("I1",I1);
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
-            for (int L=0; L< ucell.atoms[T1].nwl+1; L++)
+            //OUT("I",I);
+            complex<double> *sk = wf.get_sk(ik, T, I);
+            for (int L=0; L< ucell.atoms[T].nwl+1; L++)
             {
                 ofs_running << " " << setw(5) << ik+1
-                            << setw(8) << ucell.atoms[T1].label
-                            << setw(8) << I1+1 
+                            << setw(8) << ucell.atoms[T].label
+                            << setw(8) << I+1 
 							<< setw(8) << L
 							<< endl;
                 //OUT("l",l);
@@ -622,18 +616,16 @@ void Numerical_Basis::cal_overlap_Q(
                                 const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig] * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
                                 overlap_tmp += conj( local_tmp ) * psi(ib, ig); // psi is bloch orbitals
                             }
-                            overlap_Q1(ik_ibz, ib, mu_index[T1](I1, L, N, m), ie) = overlap_tmp.real();
-                            overlap_Q2(ik_ibz, ib, mu_index[T1](I1, L, N, m), ie) = overlap_tmp.imag();
+                            overlap_Q1(ik_ibz, ib, mu_index[T](I, L, N, m), ie) = overlap_tmp.real();
+                            overlap_Q2(ik_ibz, ib, mu_index[T](I, L, N, m), ie) = overlap_tmp.imag();
                         }
                     }
                 }//end ie
             }//end l
-            delete[] sk;
+            delete[] sk;    sk=nullptr;
         }
     }
 
-    delete[] flq;
-    delete[] gk;
     timer::tick("Numerical_Basis","cal_overlap_Q");
     return;
 }
@@ -706,15 +698,13 @@ void Numerical_Basis::numerical_atomic_wfc(
     const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
-    Vector3<double> *gk = new Vector3 <double> [np];
+    std::vector<Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
-    {
         gk[ig] = wf.get_1qvec_cartesian(ik, ig);
-    }
 
-    YlmReal::Ylm_Real(total_lm, np, gk, ylm);
+    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
 
-    double *flq = new double[np];
+    std::vector<double> flq(np);
     for (int it = 0; it < ucell.ntype; it++)
     {
         //OUT("it",it);
@@ -747,9 +737,7 @@ void Numerical_Basis::numerical_atomic_wfc(
                     }
                 }
             }
-            delete[] sk;
+            delete[] sk;    sk=nullptr;
         }
     }
-    delete[] flq;
-    delete[] gk;
 }
