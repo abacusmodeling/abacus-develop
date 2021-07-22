@@ -3,14 +3,15 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [symmetry](#symmetry) | [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [nb2d](#nb2d) | [symmetry](#symmetry) | [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [lmaxmax](#lmaxmax) | [tot_magnetization](#tot-magnetization)
+
     - [Plane wave related variables](#plane-wave-related-variables)
     
-        [ecutwfc](#ecutwfc) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
+        [ecutwfc](#ecutwfc)| [nx,ny,nz](#nx) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
 
     - [Electronic structure and geometry relaxation](#electronic-structure-and-geometry-relaxation)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [mulliken](#mulliken) | [out_alllog](#out-alllog) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [diago_proc](#diago_proc) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [mulliken](#mulliken) | [out_alllog](#out-alllog) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold)
     
     - [Electric field](#electric-field)
     
@@ -29,6 +30,10 @@
     - [Berry phase and wannier90 interface](#berry-phase-and-wannier90-interface)
     
         [berry_phase](#berry-phase) | [gdir](#gdir) | [towannier90](#towannier90) | [nnkpfile](#nnkpfile) | [wannier_spin](#wannier-spin) | [tddft](#tddft)  [vext](#vext) | [vext_dire](#vext-dire) 
+
+    - [Variables useful for debugging](#variables-useful-for-debugging)
+
+        [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour)
 
     [back to main page](../README.md)
 
@@ -202,6 +207,16 @@ This part of variables are used to control general system parameters.
 
     [back to top](#input-file)
 
+- nb2d<a id="nb2d"></a>
+    - *Type*: Integer
+    - *Description*: In LCAO calculations, we arrange the total number of processors in an 2D array, so that we can partition the wavefunction matrix (number of bands*total size of atomic orbital basis) and distribute them in this 2D array. When the system is large, we group processors into sizes of nb2d, so that multiple processors take care of one row block (a group of atomic orbitals) in the wavefunction matrix. If set to 0, nb2d will be automatically set in the program according to the size of atomic orbital basis: 
+        - if size <= 500 : nb2d = 1
+        - if 500 < size <= 1000 : nb2d = 32
+        - if size > 1000 : nb2d = 64;
+    - *Default*: 0
+
+    [back to top](#input-file)
+
 - symmetry<a id="symmetry"></a>
     - *Type*: Integer
     - *Description*: takes value 0 and 1, if set to 1, symmetry analysis will be performed to determine the type of Bravais lattice and associated symmetry operations.
@@ -230,6 +245,41 @@ This part of variables are used to control general system parameters.
 
     [back to top](#input-file)
 
+- pseudo_rcut<a id="pseudo-rcut"></a>
+    - *Type*: Real
+    - *Description*: Cut-off of radial integration for pseudopotentials, in Bohr.
+    - *Default*: 15
+
+    [back to top](#input-file)
+
+- renormwithmesh<a id="renormwithmesh"></a>
+    - *Type*: Integer
+    - *Description*: If set to 0, then use our own mesh for radial integration of pseudopotentials; if set to 1, then use the mesh that is consistent with quantum espresso.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- nelec<a id="nelec"></a>
+    - *Type*: Real
+    - *Description*: If >0.0, this denotes total number of electrons in the system. Must be less than 2*nbands. If set to 0.0, the total number of electrons will be calculated by the sum of valence electrons (i.e. assuming neutral system).
+    - *Default*: 0.0
+
+    [back to top](#input-file)
+
+- lmaxmax<a id="lmaxmax"></a>
+    - *Type*: Integer
+    - *Description*: If not equals to 2, then the maximum l channels on LCAO is set to lmaxmax. If 2, then the number of l channels will be read from the LCAO data sets. Normally no input should be supplied for this variable so that it is kept as its default.
+    - *Default*: 2.
+
+    [back to top](#input-file)
+
+- tot_magnetization<a id="tot-magnetization"></a>
+    - *Type*: Real
+    - *Description*: Total magnetization of the system.
+    - *Default*: 0.0
+
+    [back to top](#input-file)
+
 ### Plane wave related variables
 This part of variables are used to control the plane wave related parameters.
 
@@ -239,6 +289,14 @@ This part of variables are used to control the plane wave related parameters.
     - *Default*: 50
 
     [back to top](#input-file)
+
+- nx, ny, nz<a id="nx"></a>
+    - *Type*: Integer
+    - *Description*: If set to a positive number, then the three variables specify the numbers of FFT grid points in x, y, z directions, respectively. If set to 0, the number will be calculated from ecutwfc.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
 - ethr<a id="ethr"></a>
     - *Type*: Real
     - *Description*: Only used when you use diago_type = cg or diago_type = david. It indicates the threshold for the first electronic iteration, from the second iteration the ethr will be updated automatically. **For nscf calculations with planewave basis set, ethr should be <= 1d-3.**
@@ -370,6 +428,14 @@ calculations.
     - *Default*: 10
 
     [back to top](#input-file)
+
+- diago_proc<a id="diago-proc"></a>
+    - *Type*: Integer
+    - *Descrption*: If set to a positive number, then it specifies the number of threads used for carrying out diagonalization. Must be less than or equal to total number of MPI threads. Also, when cg diagonalization is used, diago_proc must be same as total number of MPI threads. If set to 0, then it will be set to the number of MPI threads. Normally, it is fine just leaving it to default value.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
 - dr2<a id="dr2"></a>
     - *Type*: Real
     - *Description*: An important parameter in ABACUS. It’s the threshold for electronic iteration. It represents the charge density error between two sequential density from electronic iterations. Usually for local orbitals, usually 1e-6 may be accurate enough.
@@ -419,10 +485,30 @@ calculations.
     - *Type*: Integer
     - *Description*: Controls whether to output the density of state (DOS). For more information, refer to the [worked example](examples/dos.md).
     - *Default*: 0
+
+    [back to top](#input-file)
+
 - out_band<a id="out-band"></a>
     - *Type*: Integer
     - *Description*: Controls whether to output the band structure. For mroe information, refer to the [worked example](examples/band-struc.md)
     - *Default*: 0
+    
+    [back to top](#input-file)
+
+- out_stru<a id="out-stru"></a>
+    - *Type*: Boolean
+    - *Description*: If set to 1, then tje structure files will be written after each ion step
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- out_level<a id="out-level"></a>
+    - *Type*: String
+    - *Description*: Controls the level of output. "ie" means write output at electron level; "i" means write output at ions level.
+    - *Default*: ie
+
+    [back to top](#input-file)
+
 - mulliken<a id="mulliken"></a>
     - *Type*: Integer
     - *Description*: If set to 1, ABACUS will output the Mulliken population analysis result. The name of the output file is mulliken.txt
@@ -458,6 +544,14 @@ calculations.
     - *Default*: 0.01 eV/Angstrom
 
     [back to top](#input-file)
+
+- force_set<a id="force-set"></a>
+    - *Type*: Integer
+    - *Description*: Determines whether to output the force_set into a file named `Force.dat` or not. If 1, then force will be written; if 0, then the force will not be written.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
 - bfgs_w1<a id="bfgs-w1"></a>
     - *Type*: Real
     - *Description*: This variable controls the Wolfe condition for BFGS algorithm used in geometry relaxation. You can look into paper Phys.Chem.Chem.Phys.,2000,2,2177 for more information.
@@ -525,6 +619,13 @@ calculations.
     - *Type*: String
     - *Description*: The method to do geometry optimizations. If set to bfgs, using BFGS algorithm. If set to cg, using cg algorithm. If set to sd, using steepest-descent lgorithm.
     - *Default*: cg
+
+    [back to top](#input-file)
+
+- cg_threshold<a id="cg-threshold"></a>
+    - *Type*: Double
+    - *Description*: When move-method is set to 'cg-bfgs', a mixed cg-bfgs algorithm is used. The ions first move according to cg method, then switched to bfgs when maximum of force on atoms is reduced below cg-threshold. Unit is eV/Angstrom.
+    - *Default*: 0.5
 
     [back to top](#input-file)
 
@@ -840,5 +941,63 @@ This part of variables are used to control berry phase and wannier90 interfacae 
         - 2: the direction of external light field is along y axis.
         - 3: the direction of external light field is along z axis.
     - *Default*: 1
+
+    [back to top](#input-file)
+
+### Variables useful for debugging
+
+- nurse(#nurse)
+
+    - *Type*: Boolean
+    - *Description*: If set to 1, the Hamiltonian matrix and S matrix in each iteration will be written in output.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- t_in_h<a id="t-in-h"></a>
+
+    - *Type*: Boolean
+    - *Description*: If set to 0, then kinetic term will not be included in obtaining the Hamiltonian.
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- vl_in_h<a id="vl-in-h"></a>
+
+    - *Type*: Boolean
+    - *Description*: If set to 0, then local pseudopotential term will not be included in obtaining the Hamiltonian.
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- vnl_in_h<a id="vnl-in-h"></a>
+
+    - *Type*: Boolean
+    - *Description*:  If set to 0, then non-local pseudopotential term will not be included in obtaining the Hamiltonian.
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- test_force<a id="test-force"></a>
+
+    - *Type*: Boolean
+    - *Description*: If set to 1, then detailed components in forces will be written to output.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- test_stress<a id="test-stress"></a>
+
+    - *Type*: Boolean
+    - *Description*: If set to 1, then detailed components in stress will be written to output.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- colour<a id="colour"></a>
+
+    - *Type*: Boolean
+    - *Description*: If set to 1, output to terminal will have some color.
+    - *Default*: 0
 
     [back to top](#input-file)
