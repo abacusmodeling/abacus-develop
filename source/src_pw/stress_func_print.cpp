@@ -37,6 +37,7 @@ void Stress_Func::print_stress(const string &name, const matrix& f, const bool s
 
 		if(screen)
 		{
+			cout<<fixed;
 			if( abs(f(i,0)) >output_acc) cout << setw(15) << f(i,0)*fac;
 			else cout << setw(15) << "0";
 			if( abs(f(i,1)) >output_acc) cout << setw(15) << f(i,1)*fac;

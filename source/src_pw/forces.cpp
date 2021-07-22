@@ -309,6 +309,7 @@ void Forces::print(const string &name, const matrix &f, bool ry)
 			if(GlobalV::TEST_FORCE && ry)
 			{
 				cout << " " << setw(8) << ss.str();
+                cout<<fixed;
 				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0);
 				else cout << setw(15) << "0";
 				if( abs(f(iat,1)) > Forces::output_acc) cout << setw(15) << f(iat,1);
@@ -320,6 +321,7 @@ void Forces::print(const string &name, const matrix &f, bool ry)
 			else if (GlobalV::TEST_FORCE)
 			{
 				cout << " " << setw(8) << ss.str();
+                cout<<fixed;
 				if( abs(f(iat,0)) > Forces::output_acc) cout << setw(15) << f(iat,0)*fac;
 				else cout << setw(15) << "0";
 				if( abs(f(iat,1)) > Forces::output_acc) cout << setw(15) << f(iat,1)*fac;
@@ -626,7 +628,7 @@ void Forces::cal_force_cc(matrix& forcecc)
     assert(iat == ucell.nat);
     delete [] rhocg;
 	delete [] psiv; // mohan fix bug 2012-03-22
-    Parallel_Reduce::reduce_double_all(forcecc.c, forcecc.nr * forcecc.nc);
+    Parallel_Reduce::reduce_double_pool(forcecc.c, forcecc.nr * forcecc.nc); //qianrui fix a bug for npool > 1
 	return;
 }
 
