@@ -31,18 +31,18 @@ class Numerical_Basis
 
 	void numerical_atomic_wfc(const int &ik,const int &np,ComplexMatrix &psi);
 
-	void Sq_overlap( 
+	void cal_overlap_Sq( 
 		realArray &Sq_imag,
 		realArray &Sq_real,
 		const int &ik, 
 		const int &np,
 		const int derivative_order ) const;
 
-	void jlq3d_overlap(realArray &overlap_Q1, realArray &overlap_Q2,
+	void cal_overlap_Q(realArray &overlap_Q1, realArray &overlap_Q2,
 		const int &ik_ibz, const int &ik, const int &np, const ComplexMatrix &psi,
 		const int derivative_order ) const;
 		
-	matrix psi_overlap(const ComplexMatrix *psi, const int derivative_order) const;
+	matrix cal_overlap_V(const ComplexMatrix *psi, const int derivative_order) const;
 	
 	void output_k(ofstream &ofs) const;
 

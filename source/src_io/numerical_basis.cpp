@@ -118,18 +118,18 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
             ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << endl;
             ofs_running << " --------------------------------------------------------" << endl;
             // search for all k-points.
-            this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik], derivative_order);
-            DONE(ofs_running,"jlq3d_overlap");
+            this->cal_overlap_Q(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik], derivative_order);
+            DONE(ofs_running,"cal_overlap_Q");
 
             // (2) generate Sq matrix if necessary.
             if (winput::out_spillage == 2)
             {
-                this->Sq_overlap( Sq_real[ik], Sq_imag[ik], ik, npw, derivative_order );
-                DONE(ofs_running,"Sq_overlap");
+                this->cal_overlap_Sq( Sq_real[ik], Sq_imag[ik], ik, npw, derivative_order );
+                DONE(ofs_running,"cal_overlap_Sq");
             }
         }
 
-        const matrix overlap_V = this->psi_overlap(psi, derivative_order);		// Peize Lin add 2020.04.23
+        const matrix overlap_V = this->cal_overlap_V(psi, derivative_order);		// Peize Lin add 2020.04.23
 
     #ifdef __MPI
         Parallel_Reduce::reduce_double_pool( overlap_Q1.ptr, overlap_Q1.getSize() );
@@ -417,15 +417,15 @@ void Numerical_Basis::output_overlap_V(
 	}
 }
 
-void Numerical_Basis::Sq_overlap(
+void Numerical_Basis::cal_overlap_Sq(
     realArray &Sq_real,
     realArray &Sq_imag,
     const int &ik,
     const int &np,
 	const int derivative_order) const
 {
-    TITLE("Numerical_Basis","Sq_overlap");
-    timer::tick("Numerical_Basis","Sq_overlap");
+    TITLE("Numerical_Basis","cal_overlap_Sq");
+    timer::tick("Numerical_Basis","cal_overlap_Sq");
 
 	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << endl;
 	ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << endl; 
@@ -545,11 +545,11 @@ void Numerical_Basis::Sq_overlap(
 
     delete[] about_ig;
 	delete[] gk; //mohan fix bug 2011-06-24
-    timer::tick("Numerical_Basis","Sq_overlap");
+    timer::tick("Numerical_Basis","cal_overlap_Sq");
     return;
 }
 
-void Numerical_Basis::jlq3d_overlap(
+void Numerical_Basis::cal_overlap_Q(
     realArray &overlap_Q1,
     realArray &overlap_Q2,
     const int &ik_ibz,
@@ -558,8 +558,8 @@ void Numerical_Basis::jlq3d_overlap(
     const ComplexMatrix &psi,
 	const int derivative_order) const
 {
-    TITLE("Numerical_Basis","jlq3d_overlap");
-    timer::tick("Numerical_Basis","jlq3d_overlap");
+    TITLE("Numerical_Basis","cal_overlap_Q");
+    timer::tick("Numerical_Basis","cal_overlap_Q");
 
 	ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
 	ofs_running << " Q = < J_mu, q | Psi_n, k > " << endl;
@@ -634,12 +634,12 @@ void Numerical_Basis::jlq3d_overlap(
 
     delete[] flq;
     delete[] gk;
-    timer::tick("Numerical_Basis","jlq3d_overlap");
+    timer::tick("Numerical_Basis","cal_overlap_Q");
     return;
 }
 
 // Peize Lin add for dpsi 2020.04.23
-matrix Numerical_Basis::psi_overlap(
+matrix Numerical_Basis::cal_overlap_V(
 	const ComplexMatrix *psi,
 	const int derivative_order) const
 {
