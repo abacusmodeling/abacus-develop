@@ -12,12 +12,12 @@ Stochastic_WF sto_wf;
 energy en;
 wavefunc wf;
 Hamilt hm;
-}
-
 #ifdef __LCAO
 Exx_Global exx_global;
 Exx_Lip exx_lip(exx_global.info);
 #endif
+}
+
 
 UnitCell_pseudo ucell;
 pseudopot_cell_vnl ppcell;

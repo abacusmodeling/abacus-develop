@@ -133,12 +133,12 @@ void Run_lcao::lcao_line(void)
 	// Peize Lin add 2018-11-30
 	if(GlobalV::CALCULATION=="nscf")
 	{
-		switch(exx_global.info.hybrid_type)
+		switch(GlobalC::exx_global.info.hybrid_type)
 		{
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(xcf);
 				break;
 		}
 	}

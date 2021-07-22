@@ -40,7 +40,7 @@ void LOOP_cell::opt_cell(void)
 	// Peize Lin 2016-12-03
 	if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
 	{
-		switch(exx_global.info.hybrid_type)
+		switch(GlobalC::exx_global.info.hybrid_type)
 		{
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:

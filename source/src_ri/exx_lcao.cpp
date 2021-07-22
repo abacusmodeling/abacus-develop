@@ -525,7 +525,7 @@ gettimeofday( &t_start_all, NULL);
 //	DM.flag_mix = info.separate_loop ? false : true;
 //	DM.flag_mix = false;		// Peize Lin test
 
-	if(exx_global.info.separate_loop)
+	if(GlobalC::exx_global.info.separate_loop)
 	{
 		Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
 		Hexx_para.mixing_beta = 0;

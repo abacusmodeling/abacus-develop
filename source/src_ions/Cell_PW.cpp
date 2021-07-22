@@ -54,12 +54,12 @@ void Cell_PW::opt_cells_pw()
         GlobalC::wf.wfcinit();
     }
 #ifdef __LCAO
-    switch (exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
+    switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &ucell);
+        GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;

@@ -473,31 +473,31 @@ void Input_Conv::Convert(void)
 #ifdef __LCAO
 	if(INPUT.exx_hybrid_type=="no")
 	{
-		exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
 	}
 	else
 	{
 		if(INPUT.exx_hybrid_type=="hf")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
 		}
 		else if(INPUT.exx_hybrid_type=="pbe0")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
 		}
 		else if(INPUT.exx_hybrid_type=="hse")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
 		}
 		else if(INPUT.exx_hybrid_type=="opt_orb")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
 		}
-		exx_global.info.hybrid_alpha    = INPUT.exx_hybrid_alpha      ;
-		exx_global.info.hse_omega       = INPUT.exx_hse_omega         ;
-		exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
-		exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
-		exx_lip.info.lambda             = INPUT.exx_lambda            ;
+		GlobalC::exx_global.info.hybrid_alpha    = INPUT.exx_hybrid_alpha      ;
+		GlobalC::exx_global.info.hse_omega       = INPUT.exx_hse_omega         ;
+		GlobalC::exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
+		GlobalC::exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
+		GlobalC::exx_lip.info.lambda             = INPUT.exx_lambda            ;
 		exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
 		exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
 		exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;

@@ -90,11 +90,11 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 			}
 			else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
 			{
-				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+				exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 			}
 			else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
 			{
-				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+				exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 			}
 		}
 
@@ -224,11 +224,11 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 		}
 		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
 		{
-			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+			exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 		}
 		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
 		{
-			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+			exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 		}
 	}
 

@@ -39,10 +39,10 @@ extern Stochastic_WF sto_wf; //qianrui add 2021-2-5
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;
-}
-
 extern Exx_Global exx_global;
 extern Exx_Lip exx_lip;
+}
+
 
 #include "../module_symmetry/symmetry.h"
 #include "../module_cell/unitcell_pseudo.h"

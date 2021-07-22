@@ -174,12 +174,12 @@ void LOOP_elec::solver(const int &istep)
 		}
 
 		// No exx
-		if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
+		if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 		{
 			ELEC_scf es;
 			es.scf(istep-1);
 		}
-		else if( Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type )
+		else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 		{
 			Exx_Opt_Orb exx_opt_orb;
 			exx_opt_orb.generate_matrix();
@@ -188,11 +188,11 @@ void LOOP_elec::solver(const int &istep)
 		{
 			ELEC_scf es;
 			es.scf(istep-1);
-			if( exx_global.info.separate_loop )
+			if( GlobalC::exx_global.info.separate_loop )
 			{
-				for( size_t hybrid_step=0; hybrid_step!=exx_global.info.hybrid_step; ++hybrid_step )
+				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
-					exx_global.info.set_xcfunc(xcf);
+					GlobalC::exx_global.info.set_xcfunc(xcf);
 					exx_lcao.cal_exx_elec();
 					
 					ELEC_scf es;
@@ -205,7 +205,7 @@ void LOOP_elec::solver(const int &istep)
 			}
 			else
 			{
-				exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(xcf);
 
 				ELEC_scf es;
 				es.scf(istep-1);

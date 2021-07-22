@@ -8,4 +8,4 @@ Local_Orbital_wfc LOWF;
 LCAO_Matrix LM;
 LCAO_Hamilt UHM;
 SubGrid_oper SGO; //mohan add 2012-01-12
-Exx_Lcao exx_lcao(exx_global.info); // Peize Lin add 2016-12-03
+Exx_Lcao exx_lcao(GlobalC::exx_global.info); // Peize Lin add 2016-12-03

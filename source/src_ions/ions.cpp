@@ -125,36 +125,36 @@ void Ions::opt_ions_pw(void)
         if (GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")  // pengfei 2014-10-13
         {
 #ifdef __LCAO
-			if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
+			if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 			{	
 #endif		
 				elec.self_consistent(istep-1);
 				eiter = elec.iter;
 #ifdef __LCAO
 			}
-			else if( Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type )
+			else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 			{
 				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 			}
 			else	// Peize Lin add 2019-03-09
 			{
-				if( exx_global.info.separate_loop )
+				if( GlobalC::exx_global.info.separate_loop )
 				{
-					for( size_t hybrid_step=0; hybrid_step!=exx_global.info.hybrid_step; ++hybrid_step )
+					for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 					{
 						elec.self_consistent(istep-1);
 						eiter += elec.iter;
-						if( elec.iter==1 || hybrid_step==exx_global.info.hybrid_step-1 )		// exx converge
+						if( elec.iter==1 || hybrid_step==GlobalC::exx_global.info.hybrid_step-1 )		// exx converge
 							break;
-						exx_global.info.set_xcfunc(xcf);							
-						exx_lip.cal_exx();
+						GlobalC::exx_global.info.set_xcfunc(xcf);							
+						GlobalC::exx_lip.cal_exx();
 					}						
 				}
 				else
 				{
 					elec.self_consistent(istep-1);	
 					eiter += elec.iter;
-					exx_global.info.set_xcfunc(xcf);
+					GlobalC::exx_global.info.set_xcfunc(xcf);
 					elec.self_consistent(istep-1);
 					eiter += elec.iter;
 				}

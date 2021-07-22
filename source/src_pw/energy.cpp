@@ -479,7 +479,7 @@ void energy::set_exx()
 	{
 		if("lcao_in_pw"==GlobalV::BASIS_TYPE)
 		{
-			return exx_lip.get_exx_energy();
+			return GlobalC::exx_lip.get_exx_energy();
 		}
 		else if("lcao"==GlobalV::BASIS_TYPE)
 		{
@@ -496,11 +496,11 @@ void energy::set_exx()
 	}
 	else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
 	{
-		this->exx = exx_global.info.hybrid_alpha * exx_energy();
+		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
 	}
 	else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
 	{
-		this->exx = exx_global.info.hybrid_alpha * exx_energy();
+		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
 	}
 
 	return;

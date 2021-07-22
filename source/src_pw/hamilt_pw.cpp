@@ -160,7 +160,7 @@ void Hamilt_PW::diagH_subspace(
 			{
 				for (int n=0; n<nstart; ++n)
 				{
-					hc(m,n) += alpha * exx_lip.get_exx_matrix()[ik][m][n];
+					hc(m,n) += alpha * GlobalC::exx_lip.get_exx_matrix()[ik][m][n];
 				}
 			}
 		};
@@ -170,11 +170,11 @@ void Hamilt_PW::diagH_subspace(
 		}
 		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
 		{
-			add_Hexx(exx_global.info.hybrid_alpha);
+			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
 		}
 		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
 		{
-			add_Hexx(exx_global.info.hybrid_alpha);		
+			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);		
 		}
 	}
 #endif
@@ -193,12 +193,12 @@ void Hamilt_PW::diagH_subspace(
 #ifdef __LCAO
 	if("lcao_in_pw"==GlobalV::BASIS_TYPE)
 	{
-		switch(exx_global.info.hybrid_type)
+		switch(GlobalC::exx_global.info.hybrid_type)
 		{
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				exx_lip.k_pack->hvec_array[ik] = hvec;
+				GlobalC::exx_lip.k_pack->hvec_array[ik] = hvec;
 				break;
 		}
 	}

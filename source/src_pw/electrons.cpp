@@ -185,9 +185,9 @@ void Electrons::self_consistent(const int &istep)
 		switch(xcf.iexch_now)						// Peize Lin add 2019-03-09
 		{
 			case 5:    case 6:   case 9:
-				if( !exx_global.info.separate_loop )				
+				if( !GlobalC::exx_global.info.separate_loop )				
 				{
-					exx_lip.cal_exx();			
+					GlobalC::exx_lip.cal_exx();			
 				}
 				break;
 		}

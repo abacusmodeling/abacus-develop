@@ -255,7 +255,7 @@ void ELEC_scf::scf(const int &istep)
 		switch(xcf.iexch_now)						// Peize Lin add 2018-10-30
 		{
 			case 5:    case 6:   case 9:
-				if( !exx_global.info.separate_loop )
+				if( !GlobalC::exx_global.info.separate_loop )
 				{
 					exx_lcao.cal_exx_elec();
 				}
@@ -353,7 +353,7 @@ void ELEC_scf::scf(const int &istep)
 		{
 			if(restart.info_load.load_H && restart.info_load.load_H_finish && !restart.info_load.restart_exx)
 			{
-				exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(xcf);
 				exx_lcao.cal_exx_elec();
 				restart.info_load.restart_exx = true;
 			}
