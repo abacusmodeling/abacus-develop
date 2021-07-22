@@ -14,8 +14,7 @@ public:
 	int ndata;  // number of data elements;
 //	const static int datasize;	// = sizeof(complex);
 	complex<double> *ptr; // data array
-	int bound1, bound2, bound3, bound4;
-
+	
 	ComplexArray(int bnd1 = 1);
 	ComplexArray(int bnd1, int bnd2, int bnd3);
 	ComplexArray(int bnd1, int bnd2, int bnd3, int bnd4);
@@ -67,6 +66,15 @@ public:
 //  void writea(char *fname);
 //  void read(char *fname);
 	void print();
+	
+	int getBound1()const{ return bound1; }
+	int getBound2()const{ return bound2; }
+	int getBound3()const{ return bound3; }
+	int getBound4()const{ return bound4; }
+	int getSize()const{ return bound1*bound2*bound3*bound4; }
+
+private:
+	int bound1, bound2, bound3, bound4;	
 };
 
 ComplexArray operator*(double r, const ComplexArray &cd);

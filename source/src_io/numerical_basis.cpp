@@ -80,33 +80,27 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         const int ne = Numerical_Basis::bessel_basis.get_ecut_number();
 
         // OVERLAP : < J_mu | Psi >
-        realArray overlap_Q1(nks, NBANDS, NLOCAL, ne );
-        realArray overlap_Q2(nks, NBANDS, NLOCAL, ne );
+        ComplexArray overlap_Q(nks, NBANDS, NLOCAL, ne );
 
         // OVERLAP : < J_mu | J_nu >
-        realArray *Sq_real = new realArray[nks];
-        realArray *Sq_imag = new realArray[nks];
+        ComplexArray *overlap_Sq = new ComplexArray[nks];
 
         // (1) allocate Sq matrix.
         if (winput::out_spillage == 2)
         {
-            for (int ik=0; ik<nks; ik++) Sq_real[ik].create( NLOCAL, NLOCAL, ne, ne );
-            for (int ik=0; ik<nks; ik++) Sq_imag[ik].create( NLOCAL, NLOCAL, ne, ne );
+            for (int ik=0; ik<nks; ik++)
+                overlap_Sq[ik].create( NLOCAL, NLOCAL, ne, ne );
         }
 
-        ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
-        ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
+        ZEROS(overlap_Q.ptr, overlap_Q.getSize());
 
         for (int ik=0; ik<nks; ik++)
-        {
-            ZEROS(Sq_real[ik].ptr, Sq_real[ik].getSize() );
-            ZEROS(Sq_imag[ik].ptr, Sq_imag[ik].getSize() );
-        }
+            ZEROS(overlap_Sq[ik].ptr, overlap_Sq[ik].getSize());
 
-        OUT(ofs_running,"number of k points",overlap_Q1.getBound1());
-        OUT(ofs_running,"number of bands",overlap_Q1.getBound2());
-        OUT(ofs_running,"number of local orbitals",overlap_Q1.getBound3());
-        OUT(ofs_running,"number of eigenvalues of Jl(x)",overlap_Q1.getBound4());
+        OUT(ofs_running,"number of k points",overlap_Q.getBound1());
+        OUT(ofs_running,"number of bands",overlap_Q.getBound2());
+        OUT(ofs_running,"number of local orbitals",overlap_Q.getBound3());
+        OUT(ofs_running,"number of eigenvalues of Jl(x)",overlap_Q.getBound4());
 
         // nks now is the reduced k-points.
         for (int ik=0; ik<nks; ik++)
@@ -118,13 +112,13 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
             ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << endl;
             ofs_running << " --------------------------------------------------------" << endl;
             // search for all k-points.
-            this->cal_overlap_Q(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik], derivative_order);
+            this->cal_overlap_Q(overlap_Q, ik, ik, npw, psi[ik], derivative_order);
             DONE(ofs_running,"cal_overlap_Q");
 
             // (2) generate Sq matrix if necessary.
             if (winput::out_spillage == 2)
             {
-                this->cal_overlap_Sq( Sq_real[ik], Sq_imag[ik], ik, npw, derivative_order );
+                this->cal_overlap_Sq( overlap_Sq[ik], ik, npw, derivative_order );
                 DONE(ofs_running,"cal_overlap_Sq");
             }
         }
@@ -132,12 +126,10 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         const matrix overlap_V = this->cal_overlap_V(psi, derivative_order);		// Peize Lin add 2020.04.23
 
     #ifdef __MPI
-        Parallel_Reduce::reduce_double_pool( overlap_Q1.ptr, overlap_Q1.getSize() );
-        Parallel_Reduce::reduce_double_pool( overlap_Q2.ptr, overlap_Q2.getSize() );
+        Parallel_Reduce::reduce_complex_double_pool( overlap_Q.ptr, overlap_Q.getSize() );
         for (int ik=0; ik<nks; ik++)
         {
-            Parallel_Reduce::reduce_double_pool( Sq_real[ik].ptr, Sq_real[ik].getSize() );
-            Parallel_Reduce::reduce_double_pool( Sq_imag[ik].ptr, Sq_imag[ik].getSize() );
+            Parallel_Reduce::reduce_complex_double_pool( overlap_Sq[ik].ptr, overlap_Sq[ik].getSize() );
         }
         Parallel_Reduce::reduce_double_pool(overlap_V.c, overlap_V.nr*overlap_V.nc);		// Peize Lin add 2020.04.23
     #endif
@@ -195,17 +187,16 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         
         this->output_k( ofs );
 
-       this->output_overlap_Q( ofs, overlap_Q1, overlap_Q2 );
+       this->output_overlap_Q( ofs, overlap_Q );
 
         if (winput::out_spillage == 2)
         {
-            this->output_overlap_Sq(ss.str(), ofs, Sq_real, Sq_imag);
+            this->output_overlap_Sq(ss.str(), ofs, overlap_Sq);
         }
 
         this->output_overlap_V(ofs, overlap_V);		// Peize Lin add 2020.04.23
 
-        delete[] Sq_real;
-        delete[] Sq_imag;
+        delete[] overlap_Sq;
 
         if (MY_RANK==0) ofs.close();
     }
@@ -215,8 +206,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
 void Numerical_Basis::output_overlap_Sq(
     const string &name,
     ofstream &ofs,
-    const realArray *Sq_real,
-    const realArray *Sq_imag) const
+    const ComplexArray *overlap_Sq) const
 {
     if (MY_RANK==0)
     {
@@ -233,10 +223,11 @@ void Numerical_Basis::output_overlap_Sq(
             {
                 ofs.open(name.c_str(), ios::app);
                 const int ik_now = ik - Pkpoints.startk_pool[MY_POOL];
-                for (int i=0; i< Sq_real[ik_now].getSize(); i++)
+                const int size = overlap_Sq[ik_now].getSize();
+                for (int i=0; i<size; i++)
                 {
                     if (count%2==0) ofs << "\n";
-                    ofs << " " << Sq_real[ik_now].ptr[i] << " " << Sq_imag[ik_now].ptr[i];
+                    ofs << " " << overlap_Sq[ik_now].ptr[i].real() << " " << overlap_Sq[ik_now].ptr[i].imag();
                     ++count;
                 }
 
@@ -345,8 +336,7 @@ void Numerical_Basis::output_k(
 
 void Numerical_Basis::output_overlap_Q(
     ofstream &ofs,
-    const realArray &overlap_Q1,
-    const realArray &overlap_Q2) const
+    const ComplexArray &overlap_Q) const
 {
     // (3)
     if (MY_RANK==0)
@@ -366,17 +356,15 @@ void Numerical_Basis::output_overlap_Q(
     }
     */
 
-    const int ne = overlap_Q1.getBound4();
+    const int ne = overlap_Q.getBound4();
     const int dim = NBANDS * NLOCAL * ne;
-    double *Qtmp1 = new double[dim];
-    double *Qtmp2 = new double[dim];
+    std::complex<double> *Qtmp = new std::complex<double>[dim];
     int count = 0;
 
     for (int ik=0; ik<kv.nkstot; ik++)
     {
-        ZEROS(Qtmp1, dim);
-        ZEROS(Qtmp2, dim);
-        Pkpoints.pool_collection(Qtmp1, Qtmp2, overlap_Q1, overlap_Q2, ik);
+        ZEROS(Qtmp, dim);
+        Pkpoints.pool_collection(Qtmp, overlap_Q, ik);
         if (MY_RANK==0)
         {
     //        ofs << "\n ik=" << ik;
@@ -384,7 +372,7 @@ void Numerical_Basis::output_overlap_Q(
             for (int i=0; i<dim; i++)
             {
                 if ( count%4==0 ) ofs << "\n";
-                ofs << " " << Qtmp1[i] << " " << Qtmp2[i];
+                ofs << " " << Qtmp[i].real() << " " << Qtmp[i].imag();
                 ++count;
             }
             // end data writing.
@@ -393,8 +381,7 @@ void Numerical_Basis::output_overlap_Q(
         MPI_Barrier(MPI_COMM_WORLD);
 #endif
     }
-    delete[] Qtmp1;
-    delete[] Qtmp2;
+    delete[] Qtmp;
 
     // (5)
     if (MY_RANK==0)
@@ -418,8 +405,7 @@ void Numerical_Basis::output_overlap_V(
 }
 
 void Numerical_Basis::cal_overlap_Sq(
-    realArray &Sq_real,
-    realArray &Sq_imag,
+    ComplexArray &overlap_Sq,
     const int &ik,
     const int &np,
 	const int derivative_order) const
@@ -520,11 +506,8 @@ void Numerical_Basis::cal_overlap_Sq(
                                                 {
                                                     for (int ie2=0; ie2 < enumber; ie2++) // 2.4
                                                     {
-                                                        const complex<double> s =
+                                                        overlap_Sq( iwt1, iwt2, ie1, ie2) += 
                                                             about_ig3 * flq(l1,ie1,ig) * flq(l2,ie2,ig);
-                                                        Sq_real( iwt1, iwt2, ie1, ie2) += s.real();
-                                                        Sq_imag( iwt1, iwt2, ie1, ie2) += s.imag();
-
                                                     }
                                                 }
                                             }
@@ -546,8 +529,7 @@ void Numerical_Basis::cal_overlap_Sq(
 }
 
 void Numerical_Basis::cal_overlap_Q(
-    realArray &overlap_Q1,
-    realArray &overlap_Q2,
+    ComplexArray &overlap_Q,
     const int &ik_ibz,
     const int &ik,
     const int &np,
@@ -616,8 +598,7 @@ void Numerical_Basis::cal_overlap_Q(
                                 const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig] * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
                                 overlap_tmp += conj( local_tmp ) * psi(ib, ig); // psi is bloch orbitals
                             }
-                            overlap_Q1(ik_ibz, ib, mu_index[T](I, L, N, m), ie) = overlap_tmp.real();
-                            overlap_Q2(ik_ibz, ib, mu_index[T](I, L, N, m), ie) = overlap_tmp.imag();
+                            overlap_Q(ik_ibz, ib, mu_index[T](I, L, N, m), ie) = overlap_tmp;
                         }
                     }
                 }//end ie
