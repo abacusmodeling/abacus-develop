@@ -3,16 +3,24 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [nb2d](#nb2d) | [symmetry](#symmetry) | [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [lmaxmax](#lmaxmax) | [tot_magnetization](#tot-magnetization)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [nb2d](#nb2d) | [symmetry](#symmetry) | [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [lmaxmax](#lmaxmax) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver)
 
     - [Plane wave related variables](#plane-wave-related-variables)
     
-        [ecutwfc](#ecutwfc)| [nx,ny,nz](#nx) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge)
+        [ecutwfc](#ecutwfc)| [nx,ny,nz](#nx) | [ethr](#ethr) | [start_wfc](#start-wfc) | [start_charge](#start-charge) | [start_pot](#start-pot)
 
     - [Electronic structure and geometry relaxation](#electronic-structure-and-geometry-relaxation)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [diago_proc](#diago_proc) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [mulliken](#mulliken) | [out_alllog](#out-alllog) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [occupations](#occupations) | [smearing](#smearing) | [degauss](#degauss) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [diago_proc](#diago_proc) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [mulliken](#mulliken) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold) | [cell_factor](#cell-factor)
+
+    - [Variables related to program output](#variables-related-to-program-output)
+
+         [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [out_stru](#out-stru) | [out_level](#out_level) | [out_alllog](#out-alllog) | [out_hs](#out-hs) | [out_r](#out-r) | [out_hs2](#out-hs2)
     
+    - [Variables related to two-center integrals](#variables-related-to-two-center-integrals)
+
+        [lcao_ecut](lcao-ecut) | [lcao_dk](#lcao-dk) | [lcao_dr](#lcao-dr) | [lcao_rmax](#lcao-rmax) | [search_radius](#search-radius) | [search_pbc](#search-pbc)
+
     - [Electric field](#electric-field)
     
         [efield](#efield) | [edir](#edir) | [emaxpos](#emaxpos) | [eopreg](#eopreg) | [eamp](#eamp)
@@ -23,7 +31,8 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_nresn](#md-nresn) | [md_dumpmdfred](#md-dumpmdfred) | [md_domsd](#md-domsd) | [md_fixtemperature](#md-fixtemperature) | [md_msdstarttime](#md-msdstarttime)
+        [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [md_potential](#md-potential) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg)
+
     - [VdW correction](#vdw-correction)
 
         [vdw_method](#vdw-method) | [vdw_s6](#vdw-s6) | [vdw_s8](#vdw-s8) | [vdw_a1](#vdw-a1) | [vdw_a2](#vdw-a2) | [vdw_d](#vdw-d) | [vdw_abc](#vdw-abc) | [vdw_C6_file](#vdw-C6-file) | [vdw_C6_unit](#vdw-C6-unit) | [vdw_R0_file](#vdw-R0-file) | [vdw_R0_unit](#vdw-R0-unit) | [vdw_model](#vdw-model) | [vdw_radius](#vdw-radius) | [vdw_radius_unit](#vdw-radius-unit) | [vdw_cn_radius](#vdw-cn-radius) | [vdw_cn_radius_unit](#vdw-cn-radius-unit) | [vdw_period](#vdw-period)
@@ -33,7 +42,7 @@
 
     - [Variables useful for debugging](#variables-useful-for-debugging)
 
-        [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour)
+        [nurse](#nurse) | [t_in_h](#t-in-h) | [vl_in_h](#vl-in-h) | [vnl_in_h](#vnl-in-h) | [test_force](#test-force) | [test_stress](#test-stress) | [colour](#colour) | [new_dm](#new-dm) | [test_just_neighbor](#test-just-neighbor)
 
     [back to main page](../README.md)
 
@@ -280,6 +289,11 @@ This part of variables are used to control general system parameters.
 
     [back to top](#input-file)
 
+- mem_saver<a id="mem-saver"></a>
+    - *Type*: Boolean
+    - *Description*: Used only for nscf calculations. If set to 1, then a memory saving technique will be used for many k point calculations.
+    - *Default*: 0
+
 ### Plane wave related variables
 This part of variables are used to control the plane wave related parameters.
 
@@ -314,11 +328,17 @@ This part of variables are used to control the plane wave related parameters.
 - start_charge<a id="start-charge"></a>
     - *Type*: String
     - *Description*: This variable is used for both plane wave set and localized orbitals set. It indicates the type of starting density. If set this to ‘atomic’, the density is starting from summation of atomic density of single atoms. If set this to ‘file’, the density will be read in from file. The file should be in the output directory. Besides, when you do ‘nspin=1’ calculation, you only need the density file SPIN1_CHGCAR. However, if you do ‘nspin=2’ calculation, you also need the density file SPIN2_CHGCAR. The density file should be output with these names if you set out_charge = 1 in INPUT file.
-        - atomic:
-        - file:
     - *Default*:atomic
 
     [back to top](#input-file)
+
+- start_pot<a id="start-pot"></a>
+    - *Type*: String
+    - *Description*: It indicates the type of starting potential. If set this to ‘atomic’, the density is starting from summation of atomic potentials of single atoms. If set this to ‘file’, the density will be read in from file.
+    - *Default*:atomic
+
+    [back to top](#input-file)
+
 ### Electronic structure and geometry relaxation
 This part of variables are used to control the electronic structure and geometry relaxation
 calculations.
@@ -354,6 +374,17 @@ calculations.
     - *Default*: cg (pw) or genelpa (lcao)
 
     [back to top](#input-file)
+
+- occupations<a id="occupations"></a>
+    - *Type*: String
+    - *Description*: Specifies how to calculate the occupations of bands. Available options are:
+        - 'smearing' : gaussian smearing for metals; see also variables `smearing` and `degauss`.
+        - 'tetrahedra' : Tetrahedron method, Bloechl's version: [P.E. Bloechl, PRB 49, 16223 (1994)](https://journals.aps.org/prb/abstract/10.1103/PhysRevB.49.16223). Requires a uniform grid of k-points that are automatically generated. Well suited for calculation of DOS, less so (because not variational) for force/optimization/dynamics calculations.
+        - 'fixed' : for insulators with a gap
+    - *Default*: 'smearing'
+
+    [back to top](#input-file)
+
 - smearing<a id="smearing"></a>
     - *Type*: String
     - *Description*: It indicates which occupation and smearing method is used in the calculation.
@@ -363,6 +394,14 @@ calculations.
     - *Default*: fixed
 
     [back to top](#input-file)
+
+- degauss<a id="degauss"></a>
+    - *Type*: Real
+    - *Description*: Value of the gaussian spreading (Ry) for brillouin-zone integration in metals.
+    - *Default*: 0.01
+
+    [back to top](#input-file)
+
 - sigma<a id="sigma"></a>
     - *Type*: Real
     - *Description*: energy range for smearing, the unit is Rydberg.
@@ -451,63 +490,6 @@ calculations.
     - *Default*:atomic
 
     [back to top](#input-file)
-- out_charge<a id="out-charge"></a>
-    - *Type*: Integer
-    - *Description*: If set to 1, ABACUS will output the charge density on real space grid. The name of the density file is SPIN1_CHGCAR and SPIN2_CHGCAR (if nspin = 2). Suppose each density on grid has coordinate (x; y; z). The circle order of the density on real space grid is: z is the outer loop, then y and finally x (x is moving fastest).
-    - *Default*: 0
-
-    [back to top](#input-file)
-- out_potential<a id="out-potential"></a>
-    - *Type*: Integer
-    - *Description*: If set to 1, ABACUS will output the local potential on real space grid. The name of the file is SPIN1_POT and SPIN2_POT (if nspin = 2). If set to 2, ABACUS will output the electrostatic potential on real space grid. The name of the file is ElecStaticPot and ElecStaticP ot_AV E (along the z-axis).
-    - *Default*: 0
-
-    [back to top](#input-file)
-- out_dm<a id="out-dm"></a>
-    - *Type*: Integer
-    - *Description*: If set to 1, ABACUS will output the density matrix of localized orbitals, only useful for localized orbitals set. The name of the output file is SPIN1_DM and SPIN2_DM in the output directory.
-    - *Default*: 0
-
-    [back to top](#input-file)
-- out_wf<a id="out-wf"></a>
-    - *Type*: Integer
-    - *Description*: Only used in **planewave basis** set. When set this variable to 1, it outputs the coefficients of wave functions. The file names are WAVEFUNC.dat$K.txt, where $K is the index of k point.
-    - *Default*: 0
-
-    [back to top](#input-file)
-- out_lowf<a id="out-lowf"></a>
-    - *Type*: Integer
-    - *Description*: **Only used in localized orbitals set**. If set to 1, ABACUS will output the wave functions coefficients.
-    - *Default*: 0
-
-    [back to top](#input-file)
-- out_dos<a id="out-dos"></a>
-    - *Type*: Integer
-    - *Description*: Controls whether to output the density of state (DOS). For more information, refer to the [worked example](examples/dos.md).
-    - *Default*: 0
-
-    [back to top](#input-file)
-
-- out_band<a id="out-band"></a>
-    - *Type*: Integer
-    - *Description*: Controls whether to output the band structure. For mroe information, refer to the [worked example](examples/band-struc.md)
-    - *Default*: 0
-    
-    [back to top](#input-file)
-
-- out_stru<a id="out-stru"></a>
-    - *Type*: Boolean
-    - *Description*: If set to 1, then tje structure files will be written after each ion step
-    - *Default*: 0
-
-    [back to top](#input-file)
-
-- out_level<a id="out-level"></a>
-    - *Type*: String
-    - *Description*: Controls the level of output. "ie" means write output at electron level; "i" means write output at ions level.
-    - *Default*: ie
-
-    [back to top](#input-file)
 
 - mulliken<a id="mulliken"></a>
     - *Type*: Integer
@@ -515,12 +497,7 @@ calculations.
     - *Default*: 0
 
     [back to top](#input-file)
-- out_alllog<a id="out-alllog"></a>
-    - *Type*: Integer
-    - *Description*: When set to 1, ABACUS will generate a log file for each processor when parallel, it is very useful for debugging.
-    - *Default*: 0
 
-    [back to top](#input-file)
 - force<a id="force"></a>
     - *Description*: If set to 1, calculate the force at the end of the electronic iteration. 0 means the force calculation is turned off.
     - *Default*: 0
@@ -623,9 +600,154 @@ calculations.
     [back to top](#input-file)
 
 - cg_threshold<a id="cg-threshold"></a>
-    - *Type*: Double
+    - *Type*: Real
     - *Description*: When move-method is set to 'cg-bfgs', a mixed cg-bfgs algorithm is used. The ions first move according to cg method, then switched to bfgs when maximum of force on atoms is reduced below cg-threshold. Unit is eV/Angstrom.
     - *Default*: 0.5
+
+    [back to top](#input-file)
+
+- cell_factor<a id="cell-factor"></a>
+    - *Type*: Real
+    - *Description*: Used in the construction of the pseudopotential tables. It should exceed the maximum linear contraction of the cell during a simulation.
+    - *Default*: 1.2
+
+    [back to top](#input-file)
+
+### Variables related to program output
+
+- out_charge<a id="out-charge"></a>
+    - *Type*: Integer
+    - *Description*: If set to 1, ABACUS will output the charge density on real space grid. The name of the density file is SPIN1_CHGCAR and SPIN2_CHGCAR (if nspin = 2). Suppose each density on grid has coordinate (x; y; z). The circle order of the density on real space grid is: z is the outer loop, then y and finally x (x is moving fastest).
+    - *Default*: 0
+
+    [back to top](#input-file)
+- out_potential<a id="out-potential"></a>
+    - *Type*: Integer
+    - *Description*: If set to 1, ABACUS will output the local potential on real space grid. The name of the file is SPIN1_POT and SPIN2_POT (if nspin = 2). If set to 2, ABACUS will output the electrostatic potential on real space grid. The name of the file is ElecStaticPot and ElecStaticP ot_AV E (along the z-axis).
+    - *Default*: 0
+
+    [back to top](#input-file)
+- out_dm<a id="out-dm"></a>
+    - *Type*: Integer
+    - *Description*: If set to 1, ABACUS will output the density matrix of localized orbitals, only useful for localized orbitals set. The name of the output file is SPIN1_DM and SPIN2_DM in the output directory.
+    - *Default*: 0
+
+    [back to top](#input-file)
+- out_wf<a id="out-wf"></a>
+    - *Type*: Integer
+    - *Description*: Only used in **planewave basis** set. When set this variable to 1, it outputs the coefficients of wave functions. The file names are WAVEFUNC.dat$K.txt, where $K is the index of k point.
+    - *Default*: 0
+
+    [back to top](#input-file)
+- out_lowf<a id="out-lowf"></a>
+    - *Type*: Integer
+    - *Description*: **Only used in localized orbitals set**. If set to 1, ABACUS will output the wave functions coefficients.
+    - *Default*: 0
+
+    [back to top](#input-file)
+- out_dos<a id="out-dos"></a>
+    - *Type*: Integer
+    - *Description*: Controls whether to output the density of state (DOS). For more information, refer to the [worked example](examples/dos.md).
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- out_band<a id="out-band"></a>
+    - *Type*: Integer
+    - *Description*: Controls whether to output the band structure. For mroe information, refer to the [worked example](examples/band-struc.md)
+    - *Default*: 0
+    
+    [back to top](#input-file)
+
+- out_stru<a id="out-stru"></a>
+    - *Type*: Boolean
+    - *Description*: If set to 1, then tje structure files will be written after each ion step
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- out_level<a id="out-level"></a>
+    - *Type*: String
+    - *Description*: Controls the level of output. "ie" means write output at electron level; "i" means write additional output at ions level.
+    - *Default*: ie
+
+    [back to top](#input-file)
+
+- out_alllog<a id="out-alllog"></a>
+    - *Type*: Integer
+    - *Description*: When set to 1, ABACUS will generate a log file for each processor when parallel, it is very useful for debugging.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- out_hs<a id="out-hs"></a>
+    - *Type*: Boolean
+    - *Description*: Only for LCAO calculations. When set to 1, ABACUS will generate two files `data-H` and `data-S` that store the Hamiltonian and S matrix in k space, respectively.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- out_r<a id="out-r"></a>
+    - *Type*: Boolean
+    - *Description*: Only for LCAO and not gamma_only calculations. When set to 1, ABACUS will generate a file with name staring with `data-rR-tr` which stores overlap matrix as a function of R, in units of lattice vectors.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- out_hs2<a id="out-hs2"></a>
+    - *Type*: Boolean
+    - *Description*: Only for LCAO and not gamma_only calculations. When set to 1, ABACUS will generate two files starting with `data-HR-sparse` and `data-SR-sparse` that store the Hamiltonian and S matrix in real space, respectively, as functions of R, in units of lattice vectors.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+### Variables related to two-center integrals
+
+- lcao_ecut<a id="lcao-ecut"></a>
+
+    - *Type*: Real
+    - *Description*: Energy cutoff when calculating LCAO two-center integrals. In Ry.
+    - *Default*: 50
+
+    [back to top](#input-file)
+    
+- lcao_dk<a id="lcao-dk"></a>
+
+    - *Type*: Real
+    - *Description*: Delta k for 1D integration in LCAO
+    - *Default*: 0.01
+
+    [back to top](#input-file)
+
+- lcao_dr<a id="lcao-dr"></a>
+
+    - *Type*: Real
+    - *Description*: Delta r for 1D integration in LCAO
+    - *Default*: 0.01
+
+    [back to top](#input-file)
+
+- lcao_rmax<a id="lcao-rmax"></a>
+
+    - *Type*: Real
+    - *Description*: Max R for 1D two-center integration table
+    - *Default*: 30
+
+    [back to top](#input-file)
+
+- search_radius<a id="search-radius"></a>
+
+    - *Type*: Real
+    - *Description*: Set the search radius for finding neighbouring atoms. If set to -1, then the radius will be set to maximum of projector and orbital cut-off.
+    - *Default*: -1
+
+    [back to top](#input-file)
+
+- search_pbc<a id="search-pbc"></a>
+
+    - *Type*: Boolean
+    - *Description*: In searching for neighbouring atoms, if set to 1, then periodic images will also be searched. If set to 0, then periodic images will not be searched.
+    - *Default*: 1
 
     [back to top](#input-file)
 
@@ -741,24 +863,14 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 0
 
     [back to top](#input-file)
-- md_nresn & md_nyosh<a id="md-nresn"></a>
-    - *Type*: Integer
-    - *Description*: Used when md_type is 1 or 2, control the Nose-Hoover thermostat extended-system, you can only set them at 1,3,5.
-    - *Default*: md_nresn=md_nyosh=3
-
-    [back to top](#input-file)
-- md_dumpmdfred<a id="md_dumpmdfred"></a>
+- md_dumpmdfred<a id="md-dumpmdfred"></a>
     - *Type*: Integer
     - *Description*:This is the steps to control the frequence to output md information
     - *Default*: 1
 
     [back to top](#input-file)
-- md_domsd<a id="md_domsd"></a>
-    - *Type*: Integer
-    - *Description*:when set to 1, ABACUS will calculate mean square displacement and the diffusion of each element.
-    - *Default*: 1
 
-    [back to top](#input-file)
+
 - md_fixtemperature<a id="md-fixtemperature"></a>
     - *Type*: Integer
     - *Description*:
@@ -767,10 +879,49 @@ This part of variables are used to control the molecular dynamics calculations.
     - *Default*: 1
 
     [back to top](#input-file)
-- md_msdstarttime<a id="md-msdstarttime"></a>
-    - *Type*: Integer
-    - *Description*:when set to n, ABACUS will calculate mean square displacement and the diffusion of each element from nth step.
+
+- md_potential<a id="md-potential"></a>
+    - *Type*: Boolean
+    - *Description*: If set to 1, then ab-initio MD is carried out; if set to 0, then classi MD. Currently, only ab-initio MD is implemented.
     - *Default*: 1
+
+    [back to top](#input-file)
+
+- NVT_control<a id="nvt-control"></a> 
+    - *Type*: Integer
+    - *Description*: Specifies which type of thermostat is used.
+        - 1: Nose-Hoover
+        - 2: Langevin
+        - 3: Andersen
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- NVT_tau<a id="nvt-tau"></a>
+    - *Type*: Real
+    - *Description*: Parameter for adjust effect of thermostat corresponding to the time scale of collision, in fs. If te input value is less than 1d-10, then it is automatically set in ABACUS.
+    - *Default*: 0 
+
+    [back to top](#input-file)
+
+- MNHC<a id="mnhc"></a>
+    - *Type*: Integer
+    - *Description*: Number of Nose-Hoover chains.
+    - *Default*: 4
+
+    [back to top](#input-file)
+
+- md_ediff<a id="md-ediff"></a>
+    - *Type*: Real
+    - *Description*: Parameter for constraining total energy change.
+    - *Default*: 0.0001
+
+    [back to top](#input-file)
+
+- md_ediffg<a id="md-ediffg"></a>
+    - *Type*: Real
+    - *Description*: Parameter for constraining max force change
+    - *Default*: 0.001
 
     [back to top](#input-file)
 
@@ -998,6 +1149,24 @@ This part of variables are used to control berry phase and wannier90 interfacae 
 
     - *Type*: Boolean
     - *Description*: If set to 1, output to terminal will have some color.
+    - *Default*: 0
+
+    [back to top](#input-file)
+
+- new_dm<a id="new-dm"></a>
+
+    - *Type*: Integer
+    - *Description*: Controls output of some debug information related to our density matrix data-structures.
+        - 1: show no debug information
+        - 2: only show key debug information
+        - 3: show all detail debug information
+    - *Default*: 1
+
+    [back to top](#input-file)
+
+- test_just_neighbor<a id="test-just-neighbor"></a>
+    - *Type*: Boolean
+    - *Description*: If set to 1, then only perform the neighboring atoms search.
     - *Default*: 0
 
     [back to top](#input-file)

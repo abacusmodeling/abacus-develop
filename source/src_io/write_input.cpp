@@ -64,6 +64,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nx",nx,"number of points along x axis for FFT grid");
 	OUTP(ofs,"ny",ny,"number of points along y axis for FFT grid");
 	OUTP(ofs,"nz",nz,"number of points along z axis for FFT grid");	
+	OUTP(ofs,"cell_factor",cell_factor,"used in the construction of the pseudopotential tables");	
 	
 	ofs << "\n#Parameters (3.Relaxation)" << endl;
 	OUTP(ofs,"ks_solver",GlobalV::KS_SOLVER,"cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
@@ -108,6 +109,8 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"lcao_dr",lcao_dr,"delta r for 1D integration in LCAO");
 	OUTP(ofs,"lcao_rmax",lcao_rmax,"max R for 1D two-center integration table");
 	OUTP(ofs,"out_hs",out_hs,"output H and S matrix");
+	OUTP(ofs,"out_hs2",out_hs2,"output H(R) and S(R) matrix");
+	OUTP(ofs,"out_r",out_r_matrix,"output r(R) matrix");
 	OUTP(ofs,"out_lowf",out_lowf,"ouput LCAO wave functions");
 	OUTP(ofs,"bx",bx,"division of an element grid in FFT grid along x");
 	OUTP(ofs,"by",by,"division of an element grid in FFT grid along y");
