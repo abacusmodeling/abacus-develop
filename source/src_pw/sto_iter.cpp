@@ -672,7 +672,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     
     stohchi.hchi_reciprocal(kswf,chig1);
     
-    hm.hpw.h_psi( kswf , chig2);
+    GlobalC::hm.hpw.h_psi( kswf , chig2);
     if(GlobalV::MY_RANK==0)
     for(int i = 0; i<GlobalC::wf.npw;++i)
     {
@@ -713,7 +713,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
         chig1[i] = out[GRA_index[i]] / GlobalC::pw.nrxx; 
     }
 
-    hm.hpw.h_psi( kswf , chig2);
+    GlobalC::hm.hpw.h_psi( kswf , chig2);
     for(int i = 0; i<GlobalC::wf.npw;++i)
     {
         if(i % 100 == 0)
@@ -739,7 +739,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
     for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
         complex<double> *kswf = &GlobalC::wf.evc[0](ib,0);
-        hm.hpw.h_psi( kswf , chigout);
+        GlobalC::hm.hpw.h_psi( kswf , chigout);
         double energy = 0;
         double norm1 =0;
         ZEROS(wave,GlobalC::pw.nrxx);

@@ -230,10 +230,10 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	//-------------------------------------------------------------
 	// (2) diago to get GlobalC::wf.ekb, then the weights can be calculated.
 	//-------------------------------------------------------------
-    hm.hpw.allocate(this->npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
-	hm.hpw.init_k(ik);
+    GlobalC::hm.hpw.allocate(this->npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
+	GlobalC::hm.hpw.init_k(ik);
 	
-	//hm.diagH_subspace(ik ,GlobalV::NLOCAL, GlobalV::NBANDS, wvf, wvf, ekb[ik]);
+	//GlobalC::hm.diagH_subspace(ik ,GlobalV::NLOCAL, GlobalV::NBANDS, wvf, wvf, ekb[ik]);
 //	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 //	{
 //		cout << " ib=" << ib << " e=" << ekb[ik][ib] << endl;
@@ -265,7 +265,7 @@ void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k");
 
-	hm.hpw.init_k(ik);
+	GlobalC::hm.hpw.init_k(ik);
     this->diago_PAO_in_pw_k2(ik, wvf);
 
 	return;
@@ -319,7 +319,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	//if(GlobalV::DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
 	if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 	{
-		hm.diagH_subspace(ik ,starting_nw, GlobalV::NBANDS, wfcatom, wfcatom, etatom);
+		GlobalC::hm.diagH_subspace(ik ,starting_nw, GlobalV::NBANDS, wfcatom, wfcatom, etatom);
 	}
 
 	/*

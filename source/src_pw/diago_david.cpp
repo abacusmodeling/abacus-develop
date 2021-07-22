@@ -81,7 +81,7 @@ void Diago_David::diag
 
         this->SchmitOrth(npw, nband, m, basis, psi_m, spsi);
 
-        hm.hpw.h_1psi(npw, psi_m, hpsi, spsi);
+        GlobalC::hm.hpw.h_1psi(npw, psi_m, hpsi, spsi);
 
         // basis(m) = psi_m, hp(m) = H |psi_m>, sp(m) = S |psi_m>
         for ( int ig = 0; ig < npw; ig++ )
@@ -254,7 +254,7 @@ void Diago_David::cal_grad
 */
         this->SchmitOrth(npw, nbase+notconv, nbase+m, basis, ppsi, spsi);
 
-        hm.hpw.h_1psi(npw, ppsi, hpsi, spsi);
+        GlobalC::hm.hpw.h_1psi(npw, ppsi, hpsi, spsi);
 
         for ( int ig = 0; ig < npw; ig++ )
         {
@@ -530,7 +530,7 @@ void Diago_David::SchmitOrth
     assert(m >= 0);
     assert(m < n_band);
 
-    hm.hpw.s_1psi(npw, psi_m, spsi);
+    GlobalC::hm.hpw.s_1psi(npw, psi_m, spsi);
 
     complex<double>* lagrange = new complex<double>[m+1];
     ZEROS( lagrange, m+1 );
@@ -585,7 +585,7 @@ void Diago_David::SchmitOrth
         }
     }
 
-    hm.hpw.s_1psi(npw, psi_m, spsi);
+    GlobalC::hm.hpw.s_1psi(npw, psi_m, spsi);
 
     delete[] lagrange;
     timer::tick("Diago_David","SchmitOrth");

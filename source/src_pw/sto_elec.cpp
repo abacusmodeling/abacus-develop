@@ -119,8 +119,8 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		}
 		else
 		{
-			hm.hpw.init_k(0); //only GAMMA
-			//In fact, hm.hpw.init_k has been done in GlobalC::wf.wfcinit();
+			GlobalC::hm.hpw.init_k(0); //only GAMMA
+			//In fact, GlobalC::hm.hpw.init_k has been done in GlobalC::wf.wfcinit();
 		}
 		GlobalC::kv.wk[0] = 2;// GAMMA temporary
 		
@@ -393,7 +393,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
-		hm.hpw.init_k(ik);
+		GlobalC::hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization
@@ -429,7 +429,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 		clock_t start=clock();
 
 		double avg_iter_k = 0.0;
-		hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
+		GlobalC::hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
 
 		avg_iter += avg_iter_k;
 

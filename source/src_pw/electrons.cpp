@@ -463,7 +463,7 @@ void Electrons::c_bands(const int &istep)
     GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
-        hm.hpw.init_k(ik);
+        GlobalC::hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization
@@ -507,7 +507,7 @@ void Electrons::c_bands(const int &istep)
         // only use diagH_subspace.
         //=============================================================
         double avg_iter_k = 0.0;
-        hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
+        GlobalC::hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
 
         avg_iter += avg_iter_k;
 

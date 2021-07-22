@@ -232,7 +232,7 @@ void Run_MD_PW::md_cells_pw()
     // init hamiltonian
     // only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
+    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential

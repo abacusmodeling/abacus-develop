@@ -64,10 +64,10 @@ void Diago_CG::diag
         if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << endl;
         for (int i=0; i<dim; i++) phi_m[i] = phi(m, i);
 
-        hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
+        GlobalC::hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
         this->schmit_orth(dim, dmx, m, phi, sphi, phi_m);
 
-        hm.hpw.h_1psi(dim , phi_m, hphi, sphi);
+        GlobalC::hm.hpw.h_1psi(dim , phi_m, hphi, sphi);
 
         e[m] = this->ddot_real(dim, phi_m, hphi );
 
@@ -208,7 +208,7 @@ void Diago_CG::orthogonal_gradient( const int &dim, const int &dmx,
     if (test_cg==1) TITLE("Diago_CG","orthogonal_gradient");
     //timer::tick("Diago_CG","orth_grad");
 
-    hm.hpw.s_1psi(dim , g, sg);
+    GlobalC::hm.hpw.s_1psi(dim , g, sg);
     int inc=1;
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     //qianrui replace 2021-3-15
@@ -339,7 +339,7 @@ bool Diago_CG::update_psi(
 {
     if (test_cg==1) TITLE("Diago_CG","update_psi");
     //timer::tick("Diago_CG","update");
-    hm.hpw.h_1psi(dim, cg, hcg, scg);
+    GlobalC::hm.hpw.h_1psi(dim, cg, hcg, scg);
     cg_norm = sqrt( this->ddot_real(dim, cg, scg) );
 
     if (cg_norm < 1.0e-10 ) return 1;
@@ -474,7 +474,7 @@ void Diago_CG::schmit_orth
     {
         psi_m[ig] /= psi_norm;
     }
-    hm.hpw.s_1psi(dim, psi_m, sphi); // sphi = S|psi(m)>
+    GlobalC::hm.hpw.s_1psi(dim, psi_m, sphi); // sphi = S|psi(m)>
 
     delete [] lagrange ;
     //timer::tick("Diago_CG","schmit_orth");
