@@ -61,6 +61,10 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         Numerical_Basis::init_label = true;
     }
 
+    const string command0 =  "test -d " + winput::spillage_outdir + " || mkdir " + winput::spillage_outdir;
+    if(MY_RANK==0)
+        system( command0.c_str() );
+
 	for(int derivative_order=0; derivative_order<=1; ++derivative_order)            // Peize Lin add 2020.04.23
 	{
         ofstream ofs;
@@ -181,7 +185,17 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         ofs << setprecision(8);
         // NOTICE: ofs_warning << "\n The precison may affect the optimize result.";
         
-        this->output_overlap_Q( ofs, overlap_Q1, overlap_Q2 );
+        if (MY_RANK==0)
+        {
+            ofs << kv.nkstot << " nks" << endl;
+            ofs << NBANDS << " nbands" << endl;
+            ofs << NLOCAL << " nwfc" << endl;
+            ofs << ne << " ne " << endl;        
+        }
+        
+        this->output_k( ofs );
+
+       this->output_overlap_Q( ofs, overlap_Q1, overlap_Q2 );
 
         if (winput::out_spillage == 2)
         {
@@ -202,7 +216,7 @@ void Numerical_Basis::output_overlap_Sq(
     const string &name,
     ofstream &ofs,
     const realArray *Sq_real,
-    const realArray *Sq_imag)
+    const realArray *Sq_imag) const
 {
     if (MY_RANK==0)
     {
@@ -257,19 +271,13 @@ void Numerical_Basis::output_overlap_Sq(
     return;
 }
 
-void Numerical_Basis::output_overlap_Q(
-    ofstream &ofs,
-    const realArray &overlap_Q1,
-    const realArray &overlap_Q2)
+void Numerical_Basis::output_k(
+    ofstream &ofs) const
 {
     // (1)
     if (MY_RANK==0)
     {
-        ofs << kv.nkstot << " nks" << endl;
-        ofs	<< overlap_Q1.getBound2() << " nbands" << endl;
-        ofs	<< overlap_Q1.getBound3() << " nwfc" << endl;
-        ofs	<< overlap_Q1.getBound4() << " ne";
-        ofs << "\n<WEIGHT_OF_KPOINTS>";
+        ofs << "<WEIGHT_OF_KPOINTS>";
     }
 
     // (2)
@@ -328,11 +336,21 @@ void Numerical_Basis::output_overlap_Q(
             ofs << " " << wknow * 0.5;
         }
     }
-
-    // (3)
+    
     if (MY_RANK==0)
     {
         ofs << "\n</WEIGHT_OF_KPOINTS>" << endl;
+    }
+}
+
+void Numerical_Basis::output_overlap_Q(
+    ofstream &ofs,
+    const realArray &overlap_Q1,
+    const realArray &overlap_Q2) const
+{
+    // (3)
+    if (MY_RANK==0)
+    {
         ofs << "\n<OVERLAP_Q>";
     }
 
@@ -404,7 +422,7 @@ void Numerical_Basis::Sq_overlap(
     realArray &Sq_imag,
     const int &ik,
     const int &np,
-	const int derivative_order)
+	const int derivative_order) const
 {
     TITLE("Numerical_Basis","Sq_overlap");
     timer::tick("Numerical_Basis","Sq_overlap");
@@ -538,7 +556,7 @@ void Numerical_Basis::jlq3d_overlap(
     const int &ik,
     const int &np,
     const ComplexMatrix &psi,
-	const int derivative_order)
+	const int derivative_order) const
 {
     TITLE("Numerical_Basis","jlq3d_overlap");
     timer::tick("Numerical_Basis","jlq3d_overlap");

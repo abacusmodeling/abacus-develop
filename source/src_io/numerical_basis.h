@@ -36,23 +36,25 @@ class Numerical_Basis
 		realArray &Sq_real,
 		const int &ik, 
 		const int &np,
-		const int derivative_order );
+		const int derivative_order ) const;
 
 	void jlq3d_overlap(realArray &overlap_Q1, realArray &overlap_Q2,
 		const int &ik_ibz, const int &ik, const int &np, const ComplexMatrix &psi,
-		const int derivative_order );
+		const int derivative_order ) const;
 		
 	matrix psi_overlap(const ComplexMatrix *psi, const int derivative_order) const;
 	
+	void output_k(ofstream &ofs) const;
+
 	void output_overlap_Sq(
 		const string &name,
 		ofstream &ofs, 
-		const realArray *Sq_real, const realArray *Sq_imag);
+		const realArray *Sq_real, const realArray *Sq_imag) const;
 
 	void output_overlap_Q(
 		ofstream &ofs,
 		const realArray &overlap_Q1,
-		const realArray &overlap_Q2);
+		const realArray &overlap_Q2) const;
 
 	void output_overlap_V(
 		ofstream &ofs,
