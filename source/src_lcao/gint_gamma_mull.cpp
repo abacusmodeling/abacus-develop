@@ -43,12 +43,12 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	bool** cal_flag;
 	if(max_size!=0) 
 	{
-		dr = new double**[pw.bxyz];
-		distance = new double*[pw.bxyz];
-		psir_ylm = new double**[pw.bxyz];
-		cal_flag = new bool*[pw.bxyz];
+		dr = new double**[GlobalC::pw.bxyz];
+		distance = new double*[GlobalC::pw.bxyz];
+		psir_ylm = new double**[GlobalC::pw.bxyz];
+		cal_flag = new bool*[GlobalC::pw.bxyz];
 
-		for(int i=0; i<pw.bxyz; i++)
+		for(int i=0; i<GlobalC::pw.bxyz; i++)
 		{
 			dr[i] = new double*[max_size];
 			distance[i] = new double[max_size];
@@ -69,11 +69,11 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	}
 
 	double mt[3]={0,0,0};
-	double *vldr3 = new double[pw.bxyz];
+	double *vldr3 = new double[GlobalC::pw.bxyz];
 	double v1 = 0.0;
-	int* vindex=new int[pw.bxyz];
-	ZEROS(vldr3, pw.bxyz);
-	ZEROS(vindex, pw.bxyz);
+	int* vindex=new int[GlobalC::pw.bxyz];
+	ZEROS(vldr3, GlobalC::pw.bxyz);
+	ZEROS(vindex, GlobalC::pw.bxyz);
 	double phi=0.0;
 
 	const int nbx = GridT.nbx;
@@ -117,7 +117,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 					mt[1] = GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
 					mt[2] = GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
 
-					for(int ib=0; ib<pw.bxyz; ib++)
+					for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 					{
 						// meshcell_pos: z is the fastest
 						dr[ib][id][0] = GridT.meshcell_pos[ib][0] + mt[0]; 
@@ -235,7 +235,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
 								double *rhop = CHR.rho[is];
-								for (int ib=0; ib<pw.bxyz; ib++)
+								for (int ib=0; ib<GlobalC::pw.bxyz; ib++)
 								{
 									if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 									{
@@ -293,7 +293,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 	
 	if(max_size!=0) 
 	{
-		for(int i=0; i<pw.bxyz; i++)
+		for(int i=0; i<GlobalC::pw.bxyz; i++)
 		{
 			for(int j=0; j<max_size; j++) 
 			{

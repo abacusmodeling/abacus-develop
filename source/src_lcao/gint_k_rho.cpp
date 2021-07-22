@@ -12,13 +12,13 @@ inline void setVindex(const int ncyz, const int ibx, const int jby, const int kb
 {				
 	int bindex = 0;
 	// z is the fastest, 
-	for(int ii=0; ii<pw.bx; ii++)
+	for(int ii=0; ii<GlobalC::pw.bx; ii++)
 	{
 		const int ipart = (ibx + ii) * ncyz + kbz;
-		for(int jj=0; jj<pw.by; jj++)
+		for(int jj=0; jj<GlobalC::pw.by; jj++)
 		{
-			const int jpart = (jby + jj) * pw.nczp + ipart;
-			for(int kk=0; kk<pw.bz; kk++)
+			const int jpart = (jby + jj) * GlobalC::pw.nczp + ipart;
+			for(int kk=0; kk<GlobalC::pw.bz; kk++)
 			{
 				vindex[bindex] = kk + jpart; 
 				++bindex;
@@ -74,7 +74,7 @@ inline void cal_psir_ylm(
 		mt[1]=GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
 		mt[2]=GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
 
-		for(int ib=0; ib<pw.bxyz; ib++)
+		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 		{
 			double *p=&psir_ylm[ib][block_index[id]];
 			// meshcell_pos: z is the fastest
@@ -157,7 +157,7 @@ inline void cal_band_rho(
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
-		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
+		ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
 		for (int ia1=0; ia1<size; ++ia1)
 		{
 			const int iw1_lo=block_iw[ia1];
@@ -172,14 +172,14 @@ inline void cal_band_rho(
 			int* find_end = LNNR.find_R2[iat1] + LNNR.nad[iat1];
 			//ia2==ia1
 			cal_num=0;
-			for(int ib=0; ib<pw.bxyz; ++ib)
+			for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 			{
     			if(cal_flag[ib][ia1])
 				{
     			    ++cal_num;
 				}
 			}
-			if(cal_num>pw.bxyz/4)
+			if(cal_num>GlobalC::pw.bxyz/4)
 			{
 				//find offset
 				const int dRx=0;
@@ -213,7 +213,7 @@ inline void cal_band_rho(
 				assert(offset < LNNR.nad[iat1]);
 				
 				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];					
-				dgemm_(&trans, &trans, &block_size[ia1], &pw.bxyz, &block_size[ia1], &alpha_diag,
+				dgemm_(&trans, &trans, &block_size[ia1], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_diag,
 					&LOC.DM_R[is][DM_start], &block_size[ia1], 
 					&psir_ylm[0][idx1], &LD_pool,  
 					&beta, &psir_DM[0][idx1], &LD_pool);
@@ -252,7 +252,7 @@ inline void cal_band_rho(
 				assert(offset < LNNR.nad[iat1]);
 				
 				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
-				for(int ib=0; ib<pw.bxyz; ++ib					)
+				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib					)
 				{
     				if(cal_flag[ib][ia1])
     				{
@@ -267,12 +267,12 @@ inline void cal_band_rho(
 			for(int ia2=ia1+1; ia2<size; ++ia2)
 			{			
 			    cal_num=0;
-    			for(int ib=0; ib<pw.bxyz; ++ib)
+    			for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
     			{
         			if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
         			    ++cal_num;
     			}
-				if(cal_num>pw.bxyz/4)
+				if(cal_num>GlobalC::pw.bxyz/4)
 				{
     				const int iw2_lo=block_iw[ia2];
     				const int iat2=at[ia2];
@@ -316,7 +316,7 @@ inline void cal_band_rho(
 
     				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
 
-    				dgemm_(&trans, &trans, &block_size[ia2], &pw.bxyz, &block_size[ia1], &alpha_nondiag,
+    				dgemm_(&trans, &trans, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_nondiag,
     					&LOC.DM_R[is][DM_start], &block_size[ia2], 
     					&psir_ylm[0][idx1], &LD_pool,
     					&beta, &psir_DM[0][idx2], &LD_pool);
@@ -364,7 +364,7 @@ inline void cal_band_rho(
     				assert(offset < LNNR.nad[iat1]);
 
     				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
-    				for(int ib=0; ib<pw.bxyz; ++ib					)
+    				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib					)
     				{
         				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
         				{
@@ -380,7 +380,7 @@ inline void cal_band_rho(
 		
 		// calculate rho
 		double *rhop = CHR.rho[is];
-		for(int ib=0; ib<pw.bxyz; ++ib)
+		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
 			double r=ddot_(&block_index[size], psir_ylm[ib], &inc, psir_DM[ib], &inc);
 			const int grid = vindex[ib];
@@ -415,12 +415,12 @@ void Gint_k::cal_rho_k(void)
 
     if(max_size!=0)
     {
-		psir_ylm_pool=new double[pw.bxyz*LD_pool];
-		ZEROS(psir_ylm_pool, pw.bxyz*LD_pool);
-		psir_ylm=new double *[pw.bxyz];
-		psir_DM_pool=new double[pw.bxyz*LD_pool];
-		ZEROS(psir_DM_pool, pw.bxyz*LD_pool);
-		psir_DM=new double *[pw.bxyz];
+		psir_ylm_pool=new double[GlobalC::pw.bxyz*LD_pool];
+		ZEROS(psir_ylm_pool, GlobalC::pw.bxyz*LD_pool);
+		psir_ylm=new double *[GlobalC::pw.bxyz];
+		psir_DM_pool=new double[GlobalC::pw.bxyz*LD_pool];
+		ZEROS(psir_DM_pool, GlobalC::pw.bxyz*LD_pool);
+		psir_DM=new double *[GlobalC::pw.bxyz];
 		block_iw=new int[max_size];
 		block_size=new int[max_size];
 		at=new int[max_size];
@@ -434,12 +434,12 @@ void Gint_k::cal_rho_k(void)
 			nn = max(nn,(ucell.atoms[it].nwl+1)*(ucell.atoms[it].nwl+1));
 		}
 
-		vindex = new int[pw.bxyz];
-		ZEROS(vindex, pw.bxyz);
+		vindex = new int[GlobalC::pw.bxyz];
+		ZEROS(vindex, GlobalC::pw.bxyz);
 		
-        cal_flag = new bool*[pw.bxyz];
+        cal_flag = new bool*[GlobalC::pw.bxyz];
 
-        for(int i=0; i<pw.bxyz; i++)
+        for(int i=0; i<GlobalC::pw.bxyz; i++)
         {
 			psir_ylm[i]=&psir_ylm_pool[i*LD_pool];
 			psir_DM[i]=&psir_DM_pool[i*LD_pool];
@@ -451,17 +451,17 @@ void Gint_k::cal_rho_k(void)
 	const int nbz_start = GridT.nbzp_start;
 	const int nbz = GridT.nbzp;
 	
-	const int ncyz = pw.ncy*pw.nczp;
+	const int ncyz = GlobalC::pw.ncy*GlobalC::pw.nczp;
 	const int nbyz = nby*nbz;	
 	for(int i=0; i<nbx; i++)
 	{
-		const int ibx = i*pw.bx; // mohan add 2012-03-25
+		const int ibx = i*GlobalC::pw.bx; // mohan add 2012-03-25
 		for(int j=0; j<nby; j++)
 		{
-			const int jby = j*pw.by; // mohan add 2012-03-25
+			const int jby = j*GlobalC::pw.by; // mohan add 2012-03-25
 			for(int k=nbz_start; k<nbz_start+nbz; k++)
 			{
-				const int kbz = k*pw.bz-pw.nczp_start; //mohan add 2012-03-25
+				const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; //mohan add 2012-03-25
 				const int grid_index = (k-nbz_start) + j * nbz + i * nbyz;
 				const int size = GridT.how_many_atoms[grid_index];
 				if(size==0) continue;
@@ -493,7 +493,7 @@ void Gint_k::cal_rho_k(void)
 
 	if(max_size!=0)
     {
-        for(int i=0; i<pw.bxyz; i++)
+        for(int i=0; i<GlobalC::pw.bxyz; i++)
         {
         	delete[] cal_flag[i];
         }
@@ -529,15 +529,15 @@ void Gint_k::evaluate_pDMp(
 	double **tchg = new double*[GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		tchg[is] = new double[pw.bxyz];
-		ZEROS(tchg[is], pw.bxyz);
+		tchg[is] = new double[GlobalC::pw.bxyz];
+		ZEROS(tchg[is], GlobalC::pw.bxyz);
 	}
 
 	bool *all_out_of_range = new bool[size];
 	for(int ia=0; ia<size; ia++)
 	{
 		all_out_of_range[ia] = true;
-		for(int ib=0; ib<pw.bxyz; ib++)
+		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 		{
 			if(cal_flag[ib][ia])
 			{
@@ -583,7 +583,7 @@ void Gint_k::evaluate_pDMp(
 		
 			
 			bool same_flag = false;
-			for(int ib=0; ib<pw.bxyz; ib++)
+			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 			{
 				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 				{
@@ -660,7 +660,7 @@ void Gint_k::evaluate_pDMp(
 				{
 					dm = LOC.DM_R[is];
 					tchgs = tchg[is];
-					for(int ib=0; ib<pw.bxyz; ib++)
+					for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 					{
 						if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 						{
@@ -721,7 +721,7 @@ void Gint_k::evaluate_pDMp(
 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ib=0; ib<pw.bxyz; ib++)
+		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 		{
 			CHR.rho[is][vindex[ib]] += tchg[is][ib];
 		}

@@ -32,7 +32,7 @@ void Dos::calculate_Mulliken(const string &fa)
 			{
 				for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
-					mulliken[is][iw] *= ucell.omega/pw.ncxyz;
+					mulliken[is][iw] *= ucell.omega/GlobalC::pw.ncxyz;
 					if( abs(mulliken[is][iw]) < 1.0e-10 ) mulliken[is][iw] = 0.0; 
 				}
 			}

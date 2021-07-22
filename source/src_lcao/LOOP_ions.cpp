@@ -308,7 +308,7 @@ bool LOOP_ions::force_stress(
                 }
                 else
                 {
-                    pot.init_pot( istep, pw.strucFac );
+                    pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
             }
             return 0;
@@ -325,7 +325,7 @@ bool LOOP_ions::force_stress(
         // force calculations.
 
         //xiaohui modify 2014-08-09
-        //pw.setup_structure_factor();
+        //GlobalC::pw.setup_structure_factor();
 
         // charge extrapolation if istep>0.
         //xiaohui modify 2014-08-09
@@ -369,7 +369,7 @@ xiaohui modify 2014-08-09*/
            	else
            	{
                	Variable_Cell::init_after_vc();
-               	pot.init_pot(stress_step, pw.strucFac);
+               	pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                	++stress_step;
                	return 0;
@@ -411,7 +411,7 @@ xiaohui modify 2014-08-09*/
             	    else
             	    {
                 	    Variable_Cell::init_after_vc();
-                	    pot.init_pot(stress_step, pw.strucFac);
+                	    pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                 	    ++stress_step;
                 	    return 0;
@@ -433,7 +433,7 @@ xiaohui modify 2014-08-09*/
                 }
                 else
                 {
-                    pot.init_pot( istep, pw.strucFac );
+                    pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
                 ++force_step;
                 return 0;
@@ -476,10 +476,10 @@ void LOOP_ions::final_scf(void)
 		GlobalV::test_atom_input);
 
     GridT.set_pbc_grid(
-        pw.ncx, pw.ncy, pw.ncz,
-        pw.bx, pw.by, pw.bz,
-        pw.nbx, pw.nby, pw.nbz,
-        pw.nbxx, pw.nbzp_start, pw.nbzp);
+        GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+        GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
+        GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
+        GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
     if(!GlobalV::GAMMA_ONLY_LOCAL)

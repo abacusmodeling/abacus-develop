@@ -98,9 +98,9 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 		stringstream ss;
 		ss << GlobalV::global_out_dir << "PW_GK" << GlobalV::MY_RANK+1 << ".dat";
 		ofstream ofs( ss.str().c_str() );
-		ofs << pw.ggpsi << " (ggpsi, Ry)" << endl;
-		ofs << pw.ggwfc << " (ggwfc, Ry)" << endl;
-		ofs << pw.ggwfc2 << " (ggwfc2, Ry)" << endl;
+		ofs << GlobalC::pw.ggpsi << " (ggpsi, Ry)" << endl;
+		ofs << GlobalC::pw.ggwfc << " (ggwfc, Ry)" << endl;
+		ofs << GlobalC::pw.ggwfc2 << " (ggwfc2, Ry)" << endl;
 		Vector3<double> f;
 		for(int ik=0; ik < nks; ++ik)
 		{
@@ -133,7 +133,7 @@ void WF_igk::ekin(const int ik)
 //--------------------------------------------------------
 // EXPLAIN : Put the correct units on the kinetic energy
 //--------------------------------------------------------
-        this->g2kin[ig] = pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2() * ucell.tpiba2;
+        this->g2kin[ig] = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2() * ucell.tpiba2;
     }
     timer::tick("WF_igk","ekin");
     return ;
@@ -142,15 +142,15 @@ void WF_igk::ekin(const int ik)
 
 Vector3<double> WF_igk::get_1qvec_cartesian(const int ik,const int ig)const
 {
-    Vector3<double> qvec = pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
+    Vector3<double> qvec = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
 
     /*
 	if(igk(ik,ig)==0)
 	{
-		cout << " g add = " << pw.gcar << endl;
+		cout << " g add = " << GlobalC::pw.gcar << endl;
 		cout << "\n igk = " << igk(ik,ig);
 		cout << " k=" << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z;
-		cout << " g=" << pw.gcar[ this->igk(ik, ig) ].x << " " << pw.gcar[ this->igk(ik, ig) ].y << " " << pw.gcar[ this->igk(ik, ig) ].z;
+		cout << " g=" << GlobalC::pw.gcar[ this->igk(ik, ig) ].x << " " << GlobalC::pw.gcar[ this->igk(ik, ig) ].y << " " << GlobalC::pw.gcar[ this->igk(ik, ig) ].z;
 	}
 	*/
 	
@@ -165,7 +165,7 @@ double* WF_igk::get_qvec_cartesian(const int &ik)
     {
         // cartesian coordinate
         // modulus, in ucell.tpiba unit.
-        const double q2 = pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2();
+        const double q2 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2();
         qmod[ig] = ucell.tpiba * sqrt(q2);//sqrt(q2) * ucell.tpiba;
     }
     return qmod;
@@ -183,9 +183,9 @@ complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
         const int iig = this->igk(ik, ig);
         const int iat = ucell.itia2iat(it, ia);
         sk[ig] = kphase
-                 * pw.eigts1(iat, pw.ig1[iig])
-                 * pw.eigts2(iat, pw.ig2[iig])
-                 * pw.eigts3(iat, pw.ig3[iig]);
+                 * GlobalC::pw.eigts1(iat, GlobalC::pw.ig1[iig])
+                 * GlobalC::pw.eigts2(iat, GlobalC::pw.ig2[iig])
+                 * GlobalC::pw.eigts3(iat, GlobalC::pw.ig3[iig]);
     }
     timer::tick("WF_igk","get_sk");
     return sk;
@@ -198,7 +198,7 @@ complex<double>* WF_igk::get_skq(int ik, const int it, const int ia, Vector3<dou
 
     for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
     {
-        Vector3<double> qkq = pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)) + q;
+        Vector3<double> qkq = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)) + q;
         double arg = (qkq * ucell.atoms[it].tau[ia]) * TWO_PI;
         skq[ig] = complex<double>(cos(arg), -sin(arg));
     }

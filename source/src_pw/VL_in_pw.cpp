@@ -70,7 +70,7 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 void pseudopot_cell_vl::allocate(void)
 {
 	if(GlobalV::test_pp>0) TITLE("pseudopot_cell_vl","allocate");
-	this->vloc.create(ucell.ntype, pw.nggm);
+	this->vloc.create(ucell.ntype, GlobalC::pw.nggm);
 
 	delete[] numeric;
 	this->numeric = new bool[ucell.ntype];
@@ -143,12 +143,12 @@ void pseudopot_cell_vl::vloc_of_g(
 	}
 	Integral::Simpson_Integral(msh, aux, rab, vloc_1d[0] );
 	vloc_1d[0] *= 4*3.1415926;
-	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/pw.ngmc << endl;
-	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/pw.ncxyz << endl;
+	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ngmc << endl;
+	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ncxyz << endl;
 	*/
 
 	// (1)
-	if(pw.ggs[0] < 1.0e-8)
+	if(GlobalC::pw.ggs[0] < 1.0e-8)
 	{
 		// first the g=0 term
 		for (ir=0; ir<msh; ir++) 
@@ -177,9 +177,9 @@ void pseudopot_cell_vl::vloc_of_g(
 
 	// here we perform the integral, after multiplying for the |G|
 	// dependent part
-	for (ig = igl0;ig < pw.nggm;ig++) 
+	for (ig = igl0;ig < GlobalC::pw.nggm;ig++) 
 	{
-		double gx2= pw.ggs [ig] * ucell.tpiba2;
+		double gx2= GlobalC::pw.ggs [ig] * ucell.tpiba2;
 		double gx = std::sqrt(gx2);
 		for (ir = 0;ir < msh;ir++) 
 		{
@@ -191,7 +191,7 @@ void pseudopot_cell_vl::vloc_of_g(
 	} // enddo
 
 	const double d_fpi_omega = FOUR_PI/ucell.omega;//mohan add 2008-06-04
-	for (ig = 0;ig < pw.nggm; ig++)
+	for (ig = 0;ig < GlobalC::pw.nggm; ig++)
 	{
 		vloc_1d[ig] *= d_fpi_omega;
 	}
@@ -213,9 +213,9 @@ void pseudopot_cell_vl::print_vloc(void)const
 			stringstream ss ;
 			ss << GlobalV::global_out_dir << ucell.atoms[it].label << "/v_loc_g.dat" ;
 			ofstream ofs_vg( ss.str().c_str() );
-			for(int ig=0;ig<pw.nggm;ig++)
+			for(int ig=0;ig<GlobalC::pw.nggm;ig++)
 			{
-				ofs_vg << setw(15) << pw.ggs [ig] * ucell.tpiba2 
+				ofs_vg << setw(15) << GlobalC::pw.ggs [ig] * ucell.tpiba2 
 				   	<< setw(15) << this->vloc(it, ig) << endl;
 			}
 			ofs_vg.close();

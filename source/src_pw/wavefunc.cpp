@@ -30,7 +30,7 @@ wavefunc::~wavefunc()
 void wavefunc::allocate_ekb_wg(const int nks)
 {
     TITLE("wavefunc","init_local");
-    this->npwx = this->setupIndGk(pw, nks);
+    this->npwx = this->setupIndGk(GlobalC::pw, nks);
 
 	// band energies
 	this->ekb = new double*[nks];
@@ -53,7 +53,7 @@ void wavefunc::allocate(const int nks)
 {	
 	TITLE("wavefunc","allocate");
 
-	this->npwx = this->setupIndGk(pw, nks);
+	this->npwx = this->setupIndGk(GlobalC::pw, nks);
 	OUT(GlobalV::ofs_running,"npwx",npwx);
 
 	assert(npwx > 0);
@@ -230,7 +230,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	//-------------------------------------------------------------
 	// (2) diago to get wf.ekb, then the weights can be calculated.
 	//-------------------------------------------------------------
-    hm.hpw.allocate(this->npwx, GlobalV::NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(this->npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
 	hm.hpw.init_k(ik);
 	
 	//hm.diagH_subspace(ik ,GlobalV::NLOCAL, GlobalV::NBANDS, wvf, wvf, ekb[ik]);
@@ -382,7 +382,7 @@ void wavefunc::wfcinit_k(void)
 #ifdef __LCAO
 	if((!chi0_hilbert.epsilon) && chi0_hilbert.kmesh_interpolation )    // pengfei  2016-11-23
 	{
-		chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(pw.gcars))  are the same
+		chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(GlobalC::pw.gcars))  are the same
 		
 		// iw1->i, iw2->j, R store the positions of the neighbor unitcells that |i,0> and |j,R> have overlaps
 		R = new Vector3<int>** [GlobalV::NLOCAL];
@@ -532,7 +532,7 @@ void wavefunc::wfcinit_k(void)
 						{
 							for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)    // loop over ig
 							{
-								gkqg = pw.get_GPlusK_cartesian(ik, wf.igk(ik, ig)) + qg;
+								gkqg = GlobalC::pw.get_GPlusK_cartesian(ik, wf.igk(ik, ig)) + qg;
 								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
 								{
 									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
@@ -776,7 +776,7 @@ void wavefunc::init_after_vc(const int nks)
     }
 
     TITLE("wavefunc","init");
-    //this->npwx = this->setupIndGk(pw, nks);
+    //this->npwx = this->setupIndGk(GlobalC::pw, nks);
     OUT(GlobalV::ofs_running,"npwx",npwx);
 
     assert(npwx > 0);

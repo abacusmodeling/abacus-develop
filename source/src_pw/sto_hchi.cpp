@@ -48,10 +48,10 @@ void Stochastic_hchi:: init()
 	//wait for init--------------------------------------
 		//nrxx
 	//---------------------------------------------------
-	nrxx = pw.nrxx;
-	nx = pw.nx;
-	ny = pw.ny;
-	nz = pw.nz;
+	nrxx = GlobalC::pw.nrxx;
+	nx = GlobalC::pw.nx;
+	ny = GlobalC::pw.ny;
+	nz = GlobalC::pw.nz;
     if(nrxx != 0)
     {
         delete[] rp_chi;
@@ -92,7 +92,7 @@ void Stochastic_hchi::get_GRA_index()
 	{
 		for(int ig = 0 ; ig < wf.npw; ++ig)
 		{
-			GRA_index[ig] = pw.ig2fftw[wf.igk(0,ig)]; //GAMMA POINT temporarily
+			GRA_index[ig] = GlobalC::pw.ig2fftw[wf.igk(0,ig)]; //GAMMA POINT temporarily
 		}
 	}
 	else
@@ -102,9 +102,9 @@ void Stochastic_hchi::get_GRA_index()
 		ZEROS(GRA_index,wf.npw);
 		for(int ig = 0 ; ig < wf.npw; ++ig)
 		{
-			ix = floor(pw.get_G_cartesian_projection(wf.igk(0, ig), 0) + 0.1);
-			iy = floor(pw.get_G_cartesian_projection(wf.igk(0, ig), 1) + 0.1);
-			iz = floor(pw.get_G_cartesian_projection(wf.igk(0, ig), 2) + 0.1);
+			ix = floor(GlobalC::pw.get_G_cartesian_projection(wf.igk(0, ig), 0) + 0.1);
+			iy = floor(GlobalC::pw.get_G_cartesian_projection(wf.igk(0, ig), 1) + 0.1);
+			iz = floor(GlobalC::pw.get_G_cartesian_projection(wf.igk(0, ig), 2) + 0.1);
 			if(ix < 0) ix += nx;
 			if(iy < 0) iy += ny;
 			if(iz < 0) iz += nz;
@@ -179,7 +179,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	/*//test orthogonal in real space
 	complex<double> overlap;
 	complex<double> * kswf = new complex<double> [nrxx];
-	fftw_plan pp=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)kswf,(fftw_complex *)kswf, FFTW_BACKWARD, FFTW_ESTIMATE);
+	fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)kswf,(fftw_complex *)kswf, FFTW_BACKWARD, FFTW_ESTIMATE);
 	for(int iksb = 0; iksb < GlobalV::NBANDS; ++iksb)
 	{
 		ZEROS(kswf,nrxx);
@@ -467,7 +467,7 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 		hchibg = hchig;
 		for(int ib = 0 ; ib < m ; ++ib)
 		{
-			ZEROS( GlobalC::UFFT.porter, pw.nrxx);
+			ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 			GlobalC::UFFT.RoundTrip( chibg, pot.vr_eff1, GRA_index, GlobalC::UFFT.porter );
 			for (int ig = 0; ig < npw; ++ig)
 			{

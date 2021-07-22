@@ -123,16 +123,16 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 
 				int bindex = 0;
 				// z is the fastest,
-				for(int ii=0; ii<pw.bx; ii++)
+				for(int ii=0; ii<GlobalC::pw.bx; ii++)
 				{
-					for(int jj=0; jj<pw.by; jj++)
+					for(int jj=0; jj<GlobalC::pw.by; jj++)
 					{
-						for(int kk=0; kk<pw.bz; kk++)
+						for(int kk=0; kk<GlobalC::pw.bz; kk++)
 						{
-							const int iii = i*pw.bx + ii;
-							const int jjj = j*pw.by + jj;
-							const int kkk = k*pw.bz + kk;
-							vl_index = (kkk-pw.nczp_start) + jjj*pw.nczp + iii*pw.ncy*pw.nczp;
+							const int iii = i*GlobalC::pw.bx + ii;
+							const int jjj = j*GlobalC::pw.by + jj;
+							const int kkk = k*GlobalC::pw.bz + kk;
+							vl_index = (kkk-GlobalC::pw.nczp_start) + jjj*GlobalC::pw.nczp + iii*GlobalC::pw.ncy*GlobalC::pw.nczp;
 							vldr3[bindex] = vl[ vl_index ] * dv;
 							//vldr3[bindex] = dv; // for overlap test
 				
@@ -166,7 +166,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
     delete[] vldr3;
     if(max_size!=0)
     {
-        for(int i=0; i<pw.bxyz; i++)
+        for(int i=0; i<GlobalC::pw.bxyz; i++)
         {
             for(int j=0; j<max_size; j++)
             {
@@ -333,16 +333,16 @@ void Gint_k::svl_k_RealSpace(
 
 				int bindex = 0;
 				// z is the fastest,
-				for(int ii=0; ii<pw.bx; ii++)
+				for(int ii=0; ii<GlobalC::pw.bx; ii++)
 				{
-					for(int jj=0; jj<pw.by; jj++)
+					for(int jj=0; jj<GlobalC::pw.by; jj++)
 					{
-						for(int kk=0; kk<pw.bz; kk++)
+						for(int kk=0; kk<GlobalC::pw.bz; kk++)
 						{
-							const int iii = i*pw.bx + ii;
-							const int jjj = j*pw.by + jj;
-							const int kkk = k*pw.bz + kk;
-							vl_index = (kkk-pw.nczp_start) + jjj*pw.nczp + iii*pw.ncy*pw.nczp;
+							const int iii = i*GlobalC::pw.bx + ii;
+							const int jjj = j*GlobalC::pw.by + jj;
+							const int kkk = k*GlobalC::pw.bz + kk;
+							vl_index = (kkk-GlobalC::pw.nczp_start) + jjj*GlobalC::pw.nczp + iii*GlobalC::pw.ncy*GlobalC::pw.nczp;
 							vldr3[bindex] = vl[ vl_index ] * dv;
 							//        vldr3[bindex] = dv; // for overlap test
 
@@ -383,7 +383,7 @@ void Gint_k::svl_k_RealSpace(
 	delete[] vldr3;
 	if(max_size!=0)
 	{
-		for(int i=0; i<pw.bxyz; i++)
+		for(int i=0; i<GlobalC::pw.bxyz; i++)
 		{
 			for(int j=0; j<max_size; j++)
 			{
@@ -1007,7 +1007,7 @@ void Gint_k::set_ijk_atom_force(
 		mt[1] = GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
 		mt[2] = GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
 
-		for(int ib=0; ib<pw.bxyz; ++ib)
+		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
 			// meshcell_pos: z is the fastest
 			dr[ib][id][0] = GridT.meshcell_pos[ib][0] + mt[0];

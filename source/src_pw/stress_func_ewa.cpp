@@ -23,14 +23,14 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
        alpha-=0.1;
        if(alpha==0.0)
           WARNING_QUIT("stres_ew", "optimal alpha not found");
-       upperbound =e2 * pow(charge,2) * sqrt( 2 * alpha / (TWO_PI)) * erfc(sqrt(ucell.tpiba2 * pw.ggchg / 4.0 / alpha));
+       upperbound =e2 * pow(charge,2) * sqrt( 2 * alpha / (TWO_PI)) * erfc(sqrt(ucell.tpiba2 * GlobalC::pw.ggchg / 4.0 / alpha));
     }
     while(upperbound>1e-7);
 
     //G-space sum here
     //Determine if this processor contains G=0 and set the constant term 
     double sdewald;
-    if(pw.gstart == 1)
+    if(GlobalC::pw.gstart == 1)
 	{
        sdewald = (TWO_PI) * e2 / 4.0 / alpha * pow(charge/ucell.omega,2);
     }
@@ -49,18 +49,18 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
     double arg;
     complex<double> rhostar;
     double sewald;
-    for(int ng=pw.gstart;ng<pw.ngmc;ng++)
+    for(int ng=GlobalC::pw.gstart;ng<GlobalC::pw.ngmc;ng++)
 	{
-		g2 = pw.gg[ng]* ucell.tpiba2;
+		g2 = GlobalC::pw.gg[ng]* ucell.tpiba2;
 		g2a = g2 /4.0/alpha;
 		rhostar=complex<double>(0.0,0.0);
 		for(int it=0; it < ucell.ntype; it++)
 		{
 			for(int i=0; i<ucell.atoms[it].na; i++)
 			{
-				arg = (pw.get_G_cartesian_projection(ng, 0) * ucell.atoms[it].tau[i].x + 
-					pw.get_G_cartesian_projection(ng, 1) * ucell.atoms[it].tau[i].y + 
-					pw.get_G_cartesian_projection(ng, 2) * ucell.atoms[it].tau[i].z) * (TWO_PI);
+				arg = (GlobalC::pw.get_G_cartesian_projection(ng, 0) * ucell.atoms[it].tau[i].x + 
+					GlobalC::pw.get_G_cartesian_projection(ng, 1) * ucell.atoms[it].tau[i].y + 
+					GlobalC::pw.get_G_cartesian_projection(ng, 2) * ucell.atoms[it].tau[i].z) * (TWO_PI);
 				rhostar = rhostar + complex<double>(ucell.atoms[it].zv * cos(arg),ucell.atoms[it].zv * sin(arg));
 			}
 		}
@@ -71,7 +71,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
 		{
 			for(int m=0;m<l+1;m++)
 			{
-				sigma(l, m) += sewald * ucell.tpiba2 * 2.0 * pw.get_G_cartesian_projection(ng, l) * pw.get_G_cartesian_projection(ng, m) / g2 * (g2a + 1);
+				sigma(l, m) += sewald * ucell.tpiba2 * 2.0 * GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) / g2 * (g2a + 1);
 			}
 		}
 	}
@@ -94,7 +94,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
     double rmax=0.0;
     int nrm=0;
     double fac;
-	if(pw.gstart==1)
+	if(GlobalC::pw.gstart==1)
 	{
 		rmax = 4.0/sqrt(alpha)/ucell.lat0;
 		//with this choice terms up to ZiZj*erfc(5) are counted (erfc(5)=2*10^-1)

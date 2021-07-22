@@ -32,7 +32,7 @@ void Magnetism::compute_magnetization()
 
 		//CHR.check_ne(CHR.rho[0]);
 		//CHR.check_ne(CHR.rho[1]);
-        for (int ir=0; ir<pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
             double diff = CHR.rho[0][ir] - CHR.rho[1][ir];
             this->tot_magnetization += diff;
@@ -41,8 +41,8 @@ void Magnetism::compute_magnetization()
 
         Parallel_Reduce::reduce_double_pool( this->tot_magnetization );
         Parallel_Reduce::reduce_double_pool( this->abs_magnetization );
-        this->tot_magnetization *= ucell.omega / pw.ncxyz;
-        this->abs_magnetization *= ucell.omega / pw.ncxyz;
+        this->tot_magnetization *= ucell.omega / GlobalC::pw.ncxyz;
+        this->abs_magnetization *= ucell.omega / GlobalC::pw.ncxyz;
 
 		OUT(GlobalV::ofs_running,"total magnetism (Bohr mag/cell)",this->tot_magnetization);
 		OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
@@ -65,7 +65,7 @@ void Magnetism::compute_magnetization()
 	{
 		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] = 0.00;
 		this->abs_magnetization = 0.00;
-		for (int ir=0; ir<pw.nrxx; ir++)
+		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			double diff = sqrt(pow(CHR.rho[1][ir], 2) + pow(CHR.rho[2][ir], 2) +pow(CHR.rho[3][ir], 2));
  
@@ -75,8 +75,8 @@ void Magnetism::compute_magnetization()
 		Parallel_Reduce::reduce_double_pool( this->tot_magnetization_nc, 3 );
 		Parallel_Reduce::reduce_double_pool( this->abs_magnetization );
 
-		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= ucell.omega / pw.ncxyz;
-		this->abs_magnetization *= ucell.omega / pw.ncxyz;
+		for(int i=0;i<3;i++)this->tot_magnetization_nc[i] *= ucell.omega / GlobalC::pw.ncxyz;
+		this->abs_magnetization *= ucell.omega / GlobalC::pw.ncxyz;
 		GlobalV::ofs_running<<"total magnetism (Bohr mag/cell)"<<'\t'<<this->tot_magnetization_nc[0]<<'\t'<<this->tot_magnetization_nc[1]<<'\t'<<this->tot_magnetization_nc[2]<<'\n';
 		OUT(GlobalV::ofs_running,"absolute magnetism (Bohr mag/cell)",this->abs_magnetization);
 	}
@@ -105,9 +105,9 @@ double Magnetism::get_nelup(void)
     // nelup = ( nelec + mcons(3,1) ) * 0.5D0
 
 //	double nelup = 0.0;
-//	for(int i=0; i<pw.ntype; i++)
+//	for(int i=0; i<GlobalC::pw.ntype; i++)
 //	{
-//		nelup += CHR.nelec * (1.0+start_magnetization[i])/2.0/pw.ntype;
+//		nelup += CHR.nelec * (1.0+start_magnetization[i])/2.0/GlobalC::pw.ntype;
 //	}
 //	return nelup;
 }
@@ -130,9 +130,9 @@ double Magnetism::get_neldw(void)
     return neldw ;
 
 //	double neldw = 0.0;
-//	for(int i=0; i<pw.ntype; i++)
+//	for(int i=0; i<GlobalC::pw.ntype; i++)
 //	{
-//		neldw += pw.nelec * (1.0-start_magnetization[i])/2.0/pw.ntype;
+//		neldw += GlobalC::pw.nelec * (1.0-start_magnetization[i])/2.0/GlobalC::pw.ntype;
 //	}
 //	return neldw;
 }

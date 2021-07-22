@@ -150,7 +150,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        ZEROS( CHR.rho[is], pw.nrxx ); // mohan 2009-11-10
+        ZEROS( CHR.rho[is], GlobalC::pw.nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------

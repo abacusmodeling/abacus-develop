@@ -39,7 +39,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
     int ne = 0; 
 	
     // 0 stands for : 'Faln' is not used.
-    this->bessel_basis.init( 0, pw.ecutwfc, ucell.ntype, this->lmax );
+    this->bessel_basis.init( 0, GlobalC::pw.ecutwfc, ucell.ntype, this->lmax );
 	this->nmax = Numerical_Descriptor::bessel_basis.get_ecut_number();
     this->init_mu_index();
     this->init_label = true;

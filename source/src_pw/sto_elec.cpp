@@ -22,7 +22,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	timer::tick("Elec_Stochastic","scf_stochastic");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell,pw); 
+	H_Ewald_pw::compute_ewald(ucell, GlobalC::pw); 
 
     set_ethr();
     
@@ -51,7 +51,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	Symmetry_rho srho;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, CHR, pw, Pgrid, symm);
+		srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 	}
 
 	// conv_elec is a member of Threshold_Elec
@@ -156,7 +156,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		}
     	else
 		{
-    	    ndim = pw.nrxx;
+    	    ndim = GlobalC::pw.nrxx;
 		}
 
 		if(iter == 1)	
@@ -182,12 +182,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
-					ZEROS(CHR.rho[is], pw.nrxx);
+					ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
 				}
 			}
 			//for(int is = 0; is < GlobalV::NSPIN; ++is)
 			//{
-			//	MPI_Bcast(CHR.rho[is], pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
+			//	MPI_Bcast(CHR.rho[is], GlobalC::pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
 			//}
 #ifdef __MPI
 			MPI_Bcast(&en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
@@ -197,7 +197,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS(CHR.rho[is], pw.nrxx);
+				ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
 			}
 		}
 
@@ -214,7 +214,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR, pw, Pgrid, symm);
+			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 		}
 
 
@@ -249,7 +249,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #ifdef __MPI
 		MPI_Bcast(&dr2, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
 		MPI_Bcast(&conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
-		MPI_Bcast(CHR.rho[0], pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
+		MPI_Bcast(CHR.rho[0], GlobalC::pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
 #endif
 
 		//			if(GlobalV::MY_RANK==0)
@@ -290,7 +290,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         {
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				for(int ir=0; ir<pw.nrxx; ++ir)
+				for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 				{
 					pot.vnew(is,ir) = pot.vr(is,ir);
 				}

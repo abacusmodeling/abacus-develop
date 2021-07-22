@@ -70,7 +70,7 @@ void Hamilt_PW::init_k(const int ik)
 	wf.ekin(ik);
 
 	// (3) Take the local potential.
-	for (int ir=0; ir<pw.nrxx; ir++)
+	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
 		pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
@@ -88,7 +88,7 @@ void Hamilt_PW::init_k(const int ik)
 	// (6) The index of plane waves.
     for (int ig = 0;ig < wf.npw;ig++)
     {
-        this->GR_index[ig] = pw.ig2fftw[ wf.igk(ik, ig) ];
+        this->GR_index[ig] = GlobalC::pw.ig2fftw[ wf.igk(ik, ig) ];
     }
     return;
 }
@@ -403,7 +403,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 		for(int ib = 0 ; ib < m; ++ib)
 		{
 			if(GlobalV::NSPIN!=4){
-				ZEROS( GlobalC::UFFT.porter, pw.nrxx);
+				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
 				GlobalC::UFFT.RoundTrip( tmpsi_in, pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
 				for (j = 0;j < wf.npw;j++)
 				{
@@ -412,19 +412,19 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 			}
 			else
 			{
-				complex<double>* porter1 = new complex<double>[pw.nrxx];
-				ZEROS( GlobalC::UFFT.porter, pw.nrxx);
-				ZEROS( porter1, pw.nrxx);
+				complex<double>* porter1 = new complex<double>[GlobalC::pw.nrxx];
+				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
+				ZEROS( porter1, GlobalC::pw.nrxx);
 				for (int ig=0; ig< wf.npw; ig++)
 				{
 					GlobalC::UFFT.porter[ GR_index[ig]  ] = tmpsi_in[ig];
 					porter1[ GR_index[ig]  ] = tmpsi_in[ig + wf.npwx];
 				}
 				// (2) fft to real space and doing things.
-				pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, 1);
-				pw.FFT_wfc.FFT3D( porter1, 1);
+				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, 1);
+				GlobalC::pw.FFT_wfc.FFT3D( porter1, 1);
 				complex<double> sup,sdown;
-				for (int ir=0; ir< pw.nrxx; ir++)
+				for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
 				{
 					sup = GlobalC::UFFT.porter[ir] * (pot.vr_eff(0,ir) + pot.vr_eff(3,ir)) +
 						porter1[ir] * (pot.vr_eff(1,ir) - complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
@@ -434,8 +434,8 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 					porter1[ir] = sdown;
 				}
 				// (3) fft back to G space.
-				pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, -1);
-				pw.FFT_wfc.FFT3D( porter1, -1);
+				GlobalC::pw.FFT_wfc.FFT3D( GlobalC::UFFT.porter, -1);
+				GlobalC::pw.FFT_wfc.FFT3D( porter1, -1);
 
 				for (j = 0;j < wf.npw;j++)
 				{

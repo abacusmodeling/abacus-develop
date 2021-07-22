@@ -92,7 +92,7 @@ void Electrons::self_consistent(const int &istep)
     timer::tick("Electrons","self_consistent");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell,pw); 
+	H_Ewald_pw::compute_ewald(ucell, GlobalC::pw); 
 
     set_ethr();
 
@@ -127,7 +127,7 @@ void Electrons::self_consistent(const int &istep)
     Symmetry_rho srho;
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        srho.begin(is, CHR, pw, Pgrid, symm);
+        srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
     }
 
     // conv_elec is a member of Threshold_Elec
@@ -233,7 +233,7 @@ void Electrons::self_consistent(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR, pw, Pgrid, symm);
+			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
@@ -312,7 +312,7 @@ void Electrons::self_consistent(const int &istep)
             // mohan add 2012-06-05
             for(int is=0; is<GlobalV::NSPIN; ++is)
             {
-                for(int ir=0; ir<pw.nrxx; ++ir)
+                for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
                 {
                     pot.vnew(is,ir) = pot.vr(is,ir);
                 }
@@ -347,7 +347,7 @@ void Electrons::self_consistent(const int &istep)
             //WF_io::write_wfc( ssw.str(), wf.evc );
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
-            WF_io::write_wfc2( ssw.str(), wf.evc, pw.gcar);
+            WF_io::write_wfc2( ssw.str(), wf.evc, GlobalC::pw.gcar);
             //DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 

@@ -220,9 +220,9 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string
 		//output wannier functions in G space.
 		for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)
 		{
-			double g1 = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 0);
-			double g2 = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 1);
-			double g3 = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 2);
+			double g1 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 0);
+			double g2 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 1);
+			double g3 = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, ig), 2);
 			out_gwan 
 			<< setw(15) << g1*factor 
 			<< setw(15) << g2*factor
@@ -443,13 +443,13 @@ void eximport::out_planewave(ofstream &out_data)
 	//cout << "\n ==> out_planewave" << endl;
 	out_data << "\n<PLANEWAVE>";
 	out_data << "\n" << ucell.lat0 << " Lattice constant";
-	out_data << "\n" << pw.ngmc_g << " Number of plane waves."<<endl;
-	for(int i=0; i<pw.ngmc_g; i++)
+	out_data << "\n" << GlobalC::pw.ngmc_g << " Number of plane waves."<<endl;
+	for(int i=0; i<GlobalC::pw.ngmc_g; i++)
 	{
 		if(i%4==0) out_data<<"\n";
-		out_data << setw(8) << pw.get_G_cartesian_projection(i, 0)
-				 << setw(8) << pw.get_G_cartesian_projection(i, 1)
-				 << setw(8) << pw.get_G_cartesian_projection(i, 2);
+		out_data << setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 0)
+				 << setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 1)
+				 << setw(8) << GlobalC::pw.get_G_cartesian_projection(i, 2);
 	}
 	out_data << "\n<PLANEWAVE>";
 	return;
@@ -520,7 +520,7 @@ void eximport::out_input(ofstream &out_data)
 	}
 */
 
-	out_data << "\n" << pw.ecutwfc << " Energy Cutoff for wave functions.";//1.3
+	out_data << "\n" << GlobalC::pw.ecutwfc << " Energy Cutoff for wave functions.";//1.3
 
 	out_data << "\n" << ucell.nat << " Number of atoms.";
 
@@ -536,10 +536,10 @@ void eximport::out_input(ofstream &out_data)
 
 /*
 	out_data << setw(20) << tr2 << endl;                 //1.5
-	out_data << setw(20) << pw.nx 
-			 << setw(20) << pw.ny 
-			 << setw(20) << pw.nz 
-			 << setw(20) << pw.nxyz << endl;//1.6
+	out_data << setw(20) << GlobalC::pw.nx 
+			 << setw(20) << GlobalC::pw.ny 
+			 << setw(20) << GlobalC::pw.nz 
+			 << setw(20) << GlobalC::pw.nxyz << endl;//1.6
 	out_data << setw(20) << pot.startingpot << endl;//1.7
 	out_data << setw(20) << CHR.mixing_beta << endl;//1.8
 */
@@ -564,7 +564,7 @@ void eximport::in_input(ifstream &in)
 	in >> this->calculation;//1.2
 	double ecut_in = 0.0;
 	in >> ecut_in;//1.3
-	if(ecut_in != pw.ecutwfc)
+	if(ecut_in != GlobalC::pw.ecutwfc)
 	{
 		cout<<"Charge don't match!"<<endl;
 		exit(0);
@@ -737,7 +737,7 @@ void eximport::in_energy(ifstream &in)
 void eximport::in_charge_mpi(const string &dir)
 {
 	cout << "\n ==> eximport::in_charge()" << endl;
-	double *rho_tmp = new double[pw.ncxyz]();
+	double *rho_tmp = new double[GlobalC::pw.ncxyz]();
 	assert(rho_tmp!=0);
 
 	if(GlobalV::MY_RANK == 0)
@@ -756,12 +756,12 @@ void eximport::in_charge_mpi(const string &dir)
 		in >>ncx >> ncy >> ncz;
 		int ncxyz;
 		in >> ncxyz;
-		if(ncxyz != pw.ncxyz)
+		if(ncxyz != GlobalC::pw.ncxyz)
 		{	
 			cout<<"\n Read in ncxzy in charge file = "<<ncxyz<<endl;
 			QUIT();
 		}
-		for (int ir = 0;ir < pw.ncxyz;ir++)
+		for (int ir = 0;ir < GlobalC::pw.ncxyz;ir++)
 		{
 			in >> rho_tmp[ir];
 		}
@@ -773,7 +773,7 @@ void eximport::in_charge_mpi(const string &dir)
 	//=========================
 	// Read in rho , bcast it 
 	//=========================
-	MPI_Bcast(rho_tmp,pw.ncxyz,MPI_DOUBLE,0,MPI_COMM_WORLD);
+	MPI_Bcast(rho_tmp,GlobalC::pw.ncxyz,MPI_DOUBLE,0,MPI_COMM_WORLD);
 
 	int ir = 0; // counters on read space mesh points
 	int iz = 0; // counters on planes
@@ -782,7 +782,7 @@ void eximport::in_charge_mpi(const string &dir)
     // Find number of planes for each cpu in this pool
     //=================================================
     int *num_z = new int[GlobalV::NPROC_IN_POOL]();
-    for(iz=0;iz<pw.ncz;iz++)
+    for(iz=0;iz<GlobalC::pw.ncz;iz++)
     {
         ip = iz % GlobalV::NPROC_IN_POOL;
         num_z[ip]++;
@@ -797,11 +797,11 @@ void eximport::in_charge_mpi(const string &dir)
         cur_z[ip] = cur_z[ip-1]+num_z[ip-1];
     }
 
-	for(ir =0;ir<pw.ncx * pw.ncy;ir++)
+	for(ir =0;ir<GlobalC::pw.ncx * GlobalC::pw.ncy;ir++)
     {
         for(iz=0;iz<num_z[GlobalV::RANK_IN_POOL];iz++)
         {
-            CHR.rho[0][ ir*num_z[GlobalV::RANK_IN_POOL]+iz ]= rho_tmp[ir*pw.ncz + cur_z[GlobalV::RANK_IN_POOL] + iz ];
+            CHR.rho[0][ ir*num_z[GlobalV::RANK_IN_POOL]+iz ]= rho_tmp[ir*GlobalC::pw.ncz + cur_z[GlobalV::RANK_IN_POOL] + iz ];
         }
     }
 
@@ -822,12 +822,12 @@ void eximport::out_charge_mpi(const string &dir,double* rho_in)
 	}
 	out_data << setw(20) << "CHARGE" << endl;	//7.0
 	out_data << setw(20) << ucell.omega << endl;	//7.1
-	out_data << setw(20) << pw.ncx 
-			 << setw(20) << pw.ncy 
-			 << setw(20) << pw.ncz << endl;		//7.2
-	out_data << setw(20) << pw.ncxyz << endl;
+	out_data << setw(20) << GlobalC::pw.ncx 
+			 << setw(20) << GlobalC::pw.ncy 
+			 << setw(20) << GlobalC::pw.ncz << endl;		//7.2
+	out_data << setw(20) << GlobalC::pw.ncxyz << endl;
 
-	for (int ir = 0;ir < pw.ncxyz;ir++)
+	for (int ir = 0;ir < GlobalC::pw.ncxyz;ir++)
 	{
 		if(ir%4==0) out_data << "\n";
 		out_data << setw(20) << setprecision(10) << rho_in[ir] << "\t" ;//7.4
@@ -846,10 +846,10 @@ void eximport::out_charge(ofstream &out_data)
 	/*
 	GlobalV::ofs_running << "\n Output charge file." << endl;
 	out_data << setw(20) << "CHARGE" << endl;	//7.0
-	out_data << setw(20) << pw.omega << endl;	//7.1
-	out_data << setw(20) << pw.ncx 
-			 << setw(20) << pw.ncy 
-			 << setw(20) << pw.ncz << endl;		//7.2
+	out_data << setw(20) << GlobalC::pw.omega << endl;	//7.1
+	out_data << setw(20) << GlobalC::pw.ncx 
+			 << setw(20) << GlobalC::pw.ncy 
+			 << setw(20) << GlobalC::pw.ncz << endl;		//7.2
 	out_data << setw(20) << CHR.rho.nr			//7.3 
 			 << setw(20) << CHR.rho.nc << endl;
 

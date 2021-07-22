@@ -128,7 +128,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
                             <<"ngtot"<<setw(10)<<"nband"<<setw(10)<<"ecut"<<setw(10)<<"lat0"<<setw(10)<<"2pi/lat0"<<endl;
                             ofs2<<setw(10)<<ikstot+1<<setw(10)<<GlobalC::kv.nkstot<<setw(10)<<GlobalC::kv.kvec_c[ik].x<<setw(10)
                             <<GlobalC::kv.kvec_c[ik].y<<setw(10)<<GlobalC::kv.kvec_c[ik].z<<setw(10)<<GlobalC::kv.wk[ik]<<setw(10)
-                            <<ikngtot<<setw(10)<<GlobalV::NBANDS<<setw(10)<<pw.ecutwfc<<setw(10)<<ucell.lat0<<setw(10)<<ucell.tpiba<<endl;
+                            <<ikngtot<<setw(10)<<GlobalV::NBANDS<<setw(10)<<GlobalC::pw.ecutwfc<<setw(10)<<ucell.lat0<<setw(10)<<ucell.tpiba<<endl;
                             ofs2<<"\n<Reciprocal Lattice Vector>"<<endl;
                             ofs2<<setw(10)<<ucell.G.e11<<setw(10)<<ucell.G.e12<<setw(10)<<ucell.G.e13<<endl;
                             ofs2<<setw(10)<<ucell.G.e21<<setw(10)<<ucell.G.e22<<setw(10)<<ucell.G.e23<<endl;
@@ -153,7 +153,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
                         {
                             wfs2<<int(72)<<ikstot+1<<GlobalC::kv.nkstot<<GlobalC::kv.kvec_c[ik].x
                                 <<GlobalC::kv.kvec_c[ik].y<<GlobalC::kv.kvec_c[ik].z<<GlobalC::kv.wk[ik]
-                                <<ikngtot<<GlobalV::NBANDS<<pw.ecutwfc<<ucell.lat0<<ucell.tpiba<<72; //4 int + 7 double is 72B
+                                <<ikngtot<<GlobalV::NBANDS<<GlobalC::pw.ecutwfc<<ucell.lat0<<ucell.tpiba<<72; //4 int + 7 double is 72B
                             wfs2<<72<<ucell.G.e11<<ucell.G.e12<<ucell.G.e13
                                     <<ucell.G.e21<<ucell.G.e22<<ucell.G.e23
                                     <<ucell.G.e31<<ucell.G.e32<<ucell.G.e33<<72; //9 double is 72B

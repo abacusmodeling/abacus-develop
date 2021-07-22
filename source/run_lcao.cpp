@@ -103,10 +103,10 @@ void Run_lcao::lcao_line(void)
 //--------------------------------------
 
     // Initalize the plane wave basis set
-    pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
+    GlobalC::pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
+    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
+    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
 
     // the symmetry of a variety of systems.
     if(GlobalV::CALCULATION == "test")
@@ -117,16 +117,16 @@ void Run_lcao::lcao_line(void)
 
     // initialize the real-space uniform grid for FFT and parallel
     // distribution of plane waves
-    Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
-        pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+        GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 
 	// Inititlize the charge density.
-    CHR.allocate(GlobalV::NSPIN, pw.nrxx, pw.ngmc);
+    CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
-    pot.allocate(pw.nrxx);
+    pot.allocate(GlobalC::pw.nrxx);
     DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 

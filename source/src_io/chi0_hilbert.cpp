@@ -677,18 +677,18 @@ void Chi0_hilbert::Init()
 	TITLE("Chi0_hilbert","Init");
 	//cout << "nbands(init) = " <<GlobalV::NBANDS <<endl;
 	//cout << "oband = " <<oband <<endl;
-	//cout << "nrxx = "<<pw.nrxx<<endl;
-	//cout << "ngmc = " << pw.ngmc <<endl;
+	//cout << "nrxx = "<<GlobalC::pw.nrxx<<endl;
+	//cout << "ngmc = " << GlobalC::pw.ngmc <<endl;
 	//cout << "GlobalC::kv.ngk[0] = "<<GlobalC::kv.ngk[0]<<endl;
 	//cout << "dim = "<<dim<<endl;
 	//cout << "GlobalC::kv.nks = " <<GlobalC::kv.nks <<endl;
 	//cout << "GlobalC::kv.nmp = " << GlobalC::kv.nmp[0]<<"  "<<GlobalC::kv.nmp[1]<<"  "<<GlobalC::kv.nmp[2]<<endl;
 	
-	b_core = new complex<double>[pw.ngmc];  
+	b_core = new complex<double>[GlobalC::pw.ngmc];  
 	
-	b_summary = new complex<double>[pw.ngmc_g]; 
+	b_summary = new complex<double>[GlobalC::pw.ngmc_g]; 
 	
-	b_order = new complex<double>[pw.ngmc_g];
+	b_order = new complex<double>[GlobalC::pw.ngmc_g];
 	
 	/*psi_r = new complex<double>**[GlobalC::kv.nks];
 	for(int iq=0; iq<GlobalC::kv.nks; iq++)
@@ -696,7 +696,7 @@ void Chi0_hilbert::Init()
 		psi_r[iq] = new complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r[iq][ib] = new complex<double>[pw.nrxx];
+			psi_r[iq][ib] = new complex<double>[GlobalC::pw.nrxx];
 		}
 	}*/
 	
@@ -705,13 +705,13 @@ void Chi0_hilbert::Init()
 		psi_r1 = new complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r1[ib] = new complex<double>[pw.nrxx];
+			psi_r1[ib] = new complex<double>[GlobalC::pw.nrxx];
 		}
 		
 		psi_r2 = new complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r2[ib] = new complex<double>[pw.nrxx];
+			psi_r2[ib] = new complex<double>[GlobalC::pw.nrxx];
 		}
 	}
 	//cout << "psi1 OK" <<endl;
@@ -963,16 +963,16 @@ void Chi0_hilbert::Parallel_G()
 	//----------------------------
 	num_G_core = new int[GlobalV::DSIZE];
 	num_G_dis = new int[GlobalV::DSIZE];
-	G_r_core = new double[pw.ngmc];
+	G_r_core = new double[GlobalC::pw.ngmc];
 	num_Gvector_core = new int[GlobalV::DSIZE];
 	num_Gvector_dis = new int[GlobalV::DSIZE];
-	G_r = new double[pw.ngmc_g];
-	Gvec_core = new double[3*pw.ngmc];
-	Gvec = new double[3*pw.ngmc_g];
-	all_gcar = new Vector3<double>[pw.ngmc_g];
-	flag = new int[pw.ngmc_g];
+	G_r = new double[GlobalC::pw.ngmc_g];
+	Gvec_core = new double[3*GlobalC::pw.ngmc];
+	Gvec = new double[3*GlobalC::pw.ngmc_g];
+	all_gcar = new Vector3<double>[GlobalC::pw.ngmc_g];
+	flag = new int[GlobalC::pw.ngmc_g];
 	
-	for(int i=0;i<pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		flag[i] = i;
 	}
@@ -983,7 +983,7 @@ void Chi0_hilbert::Parallel_G()
 	ZEROS( num_Gvector_core, GlobalV::DSIZE);
 	
 #ifdef __MPI
-	MPI_Allgather( &pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
+	MPI_Allgather( &GlobalC::pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
 #endif
 	
 	memset(num_G_dis,0,GlobalV::DSIZE*sizeof(int));
@@ -1001,23 +1001,23 @@ void Chi0_hilbert::Parallel_G()
 		num_Gvector_core[i] = num_G_core[i] * 3;
 	}
 	
-	for(int g0=0;g0<pw.ngmc; g0++)
+	for(int g0=0;g0<GlobalC::pw.ngmc; g0++)
 	{
-		G_r_core[g0] = pw.get_NormG_cartesian(g0);
-		Gvec_core[3*g0] = pw.get_G_cartesian_projection(g0 , 0);
-		Gvec_core[3 * g0 + 1] = pw.get_G_cartesian_projection(g0, 1);
-		Gvec_core[3 * g0 + 2] = pw.get_G_cartesian_projection(g0, 2);
+		G_r_core[g0] = GlobalC::pw.get_NormG_cartesian(g0);
+		Gvec_core[3*g0] = GlobalC::pw.get_G_cartesian_projection(g0 , 0);
+		Gvec_core[3 * g0 + 1] = GlobalC::pw.get_G_cartesian_projection(g0, 1);
+		Gvec_core[3 * g0 + 2] = GlobalC::pw.get_G_cartesian_projection(g0, 2);
 	}
 	
 #ifdef __MPI
-	MPI_Allgatherv( G_r_core, pw.ngmc, MPI_DOUBLE, G_r, num_G_core, num_G_dis, MPI_DOUBLE, POOL_WORLD);
-	MPI_Allgatherv( Gvec_core, 3*pw.ngmc, MPI_DOUBLE, Gvec, num_Gvector_core, num_Gvector_dis, MPI_DOUBLE, POOL_WORLD);
+	MPI_Allgatherv( G_r_core, GlobalC::pw.ngmc, MPI_DOUBLE, G_r, num_G_core, num_G_dis, MPI_DOUBLE, POOL_WORLD);
+	MPI_Allgatherv( Gvec_core, 3*GlobalC::pw.ngmc, MPI_DOUBLE, Gvec, num_Gvector_core, num_Gvector_dis, MPI_DOUBLE, POOL_WORLD);
 #endif
 	
 	double t1; int t2;
-	for(int i=0;i<pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
-		for(int j=0;j<pw.ngmc_g-i-1;j++)
+		for(int j=0;j<GlobalC::pw.ngmc_g-i-1;j++)
 		{
 			if(G_r[j]>G_r[j+1])
 			{
@@ -1030,7 +1030,7 @@ void Chi0_hilbert::Parallel_G()
 		}
 	}
 	
-	for(int i=0;i<pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		all_gcar[i].x = Gvec[3*i]; all_gcar[i].y = Gvec[3*i+1]; all_gcar[i].z = Gvec[3*i+2];
 		//cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
@@ -1045,23 +1045,23 @@ void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
 	complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ZEROS( GlobalC::UFFT.porter, (pw.nrxx) );
+		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = 0; ig < GlobalC::kv.ngk[iq] ; ig++)
 		{
-			GlobalC::UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig)] ] = wf.evc[iq](ib,ig);
+			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[wf.igk(iq,ig)] ] = wf.evc[iq](ib,ig);
 		}
 		
-		pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
+		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		int ir=0;
-		for(int ix=0; ix<pw.ncx; ix++)
+		for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 		{
-			phase_x = GlobalC::kv.kvec_d[iq].x*ix/pw.ncx;
-			for(int iy=0; iy<pw.ncy; iy++)
+			phase_x = GlobalC::kv.kvec_d[iq].x*ix/GlobalC::pw.ncx;
+			for(int iy=0; iy<GlobalC::pw.ncy; iy++)
 			{
-				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/pw.ncy;
-				for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; iz++)
+				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
+				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
 					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
@@ -1081,23 +1081,23 @@ void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
 	complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ZEROS( GlobalC::UFFT.porter, (pw.nrxx) );
+		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
 		for(int ig = wf.npwx; ig < wf.npwx + GlobalC::kv.ngk[iq] ; ig++)
 		{
-			GlobalC::UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig - wf.npwx)] ] = wf.evc[iq](ib,ig);
+			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[wf.igk(iq,ig - wf.npwx)] ] = wf.evc[iq](ib,ig);
 		}
 		
-		pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
+		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		int ir=0;
-		for(int ix=0; ix<pw.ncx; ix++)
+		for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 		{
-			phase_x = GlobalC::kv.kvec_d[iq].x*ix/pw.ncx;
-			for(int iy=0; iy<pw.ncy; iy++)
+			phase_x = GlobalC::kv.kvec_d[iq].x*ix/GlobalC::pw.ncx;
+			for(int iy=0; iy<GlobalC::pw.ncy; iy++)
 			{
-				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/pw.ncy;
-				for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; iz++)
+				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
+				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
 					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
@@ -1275,15 +1275,15 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			int ir=0;
-			for(int ix=0; ix<pw.ncx; ix++)
+			for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 			{
-				phase_x = q.x*ix/pw.ncx;
-				for(int iy=0; iy<pw.ncy; iy++)
+				phase_x = q.x*ix/GlobalC::pw.ncx;
+				for(int iy=0; iy<GlobalC::pw.ncy; iy++)
 				{
-					phase_xy = phase_x + q.y*iy/pw.ncy;
-					for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; iz++)
+					phase_xy = phase_x + q.y*iy/GlobalC::pw.ncy;
+					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 					{
-						phase_xyz = (phase_xy + q.z*iz/pw.ncz) *TWO_PI;
+						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *TWO_PI;
 						exp_tmp = complex<double>(cos(-phase_xyz), sin(-phase_xyz));
 						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
@@ -1291,21 +1291,21 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 				}
 			}
 			
-			pw.FFT_chg.FFT3D( GlobalC::UFFT.porter, -1);
+			GlobalC::pw.FFT_chg.FFT3D( GlobalC::UFFT.porter, -1);
 			//for(int g0=0; g0<dim; g0++)
 			//{
-			//	b[g0][ib1][ib2] = GlobalC::UFFT.porter[ pw.ig2fftc[g0] ];
+			//	b[g0][ib1][ib2] = GlobalC::UFFT.porter[ GlobalC::pw.ig2fftc[g0] ];
 			//}
-			for(int g0=0;g0<pw.ngmc; g0++)
+			for(int g0=0;g0<GlobalC::pw.ngmc; g0++)
 			{
-				b_core[g0] = GlobalC::UFFT.porter[ pw.ig2fftc[g0] ];
+				b_core[g0] = GlobalC::UFFT.porter[ GlobalC::pw.ig2fftc[g0] ];
 			}
 			
 #ifdef __MPI
-			MPI_Allgatherv( b_core, pw.ngmc, mpicomplex, b_summary, num_G_core, num_G_dis, mpicomplex, POOL_WORLD);
+			MPI_Allgatherv( b_core, GlobalC::pw.ngmc, mpicomplex, b_summary, num_G_core, num_G_dis, mpicomplex, POOL_WORLD);
 #endif
 			
-			for(int i=0;i<pw.ngmc_g;i++)
+			for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 			{
 				b_order[i] = b_summary[flag[i]];
 			}
@@ -1337,7 +1337,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	//		{
 	//			for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 	//			{
-	//				b[ig][ib1][ib2] += conj(wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+pw.gcar[ig])*(-TWO_PI/ucell.lat0)).norm2()) * wf.evc[ik](ib2,ig);
+	//				b[ig][ib1][ib2] += conj(wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+GlobalC::pw.gcar[ig])*(-TWO_PI/ucell.lat0)).norm2()) * wf.evc[ik](ib2,ig);
 	//			}
 	//			b[ig][ib1][ib2] /=(wf.ekb[ik][ib1] - wf.ekb[ik][ib2]);
 	//		}
@@ -1381,15 +1381,15 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
         //            for(int ig=0; ig<dim; ig++)
         //            {
         //                int ir=0;
-        //                for(int ix=0; ix<pw.ncx; ix++)
+        //                for(int ix=0; ix<GlobalC::pw.ncx; ix++)
         //                {
-        //                        phase_x = (q.x + pw.gdirect[ig].x)*ix/pw.ncx;
-        //                        for(int iy=0; iy<pw.ncy; iy++)
+        //                        phase_x = (q.x + GlobalC::pw.gdirect[ig].x)*ix/GlobalC::pw.ncx;
+        //                        for(int iy=0; iy<GlobalC::pw.ncy; iy++)
         //                        {
-        //                                phase_xy = phase_x + (q.y + pw.gdirect[ig].y)*iy/pw.ncy;
-        //                                for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; ++iz)
+        //                                phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
+        //                                for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
         //                                {
-        //                                        phase_xyz = (phase_xy + (q.z + pw.gdirect[ig].z)*iz/pw.ncz) *TWO_PI;
+        //                                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *TWO_PI;
         //                                        exp_tmp.real() = cos(-phase_xyz);
         //                                        exp_tmp.imag() = sin(-phase_xyz);
         //                                        b[ig][ib1][ib2] = b[ig][ib1][ib2] +  conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
@@ -1406,15 +1406,15 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
         for(int ig=0;ig<dim;ig++)
         {
             int ir=0;
-            for(int ix=0;ix<pw.ncx;ix++)
+            for(int ix=0;ix<GlobalC::pw.ncx;ix++)
             {
-                phase_x = (q.x + pw.gdirect[ig].x)*ix/pw.ncx;
-                for(int iy=0; iy<pw.ncy; iy++)
+                phase_x = (q.x + GlobalC::pw.gdirect[ig].x)*ix/GlobalC::pw.ncx;
+                for(int iy=0; iy<GlobalC::pw.ncy; iy++)
                 {
-                    phase_xy = phase_x + (q.y + pw.gdirect[ig].y)*iy/pw.ncy;
-                    for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; ++iz)
+                    phase_xy = phase_x + (q.y + GlobalC::pw.gdirect[ig].y)*iy/GlobalC::pw.ncy;
+                    for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; ++iz)
                     {
-                        phase_xyz = (phase_xy + (q.z + pw.gdirect[ig].z)*iz/pw.ncz) *TWO_PI;
+                        phase_xyz = (phase_xy + (q.z + GlobalC::pw.gdirect[ig].z)*iz/GlobalC::pw.ncz) *TWO_PI;
                         exp_tmp.real() = cos(-phase_xyz);
                         exp_tmp.imag() = sin(-phase_xyz);
                         for(int ib1=0;ib1<oband;ib1++)
@@ -1435,7 +1435,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
             for(int ib2=0;ib2<GlobalV::NBANDS; ib2++)
                 for(int ig=0;ig<dim;ig++)
                 {
-                    b[ig][ib1][ib2] = b[ig][ib1][ib2]/pw.ncxyz; 
+                    b[ig][ib1][ib2] = b[ig][ib1][ib2]/GlobalC::pw.ncxyz; 
                 }
 
         return;
@@ -2331,7 +2331,7 @@ int Chi0_hilbert::parallel_g()
 	for(int i=0;i<dim;i++)
 	{
 		cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
-		cout <<"G_direct["<<i<<"] = "<<pw.gdirect[i].x<<" "<<pw.gdirect[i].y<<" "<<pw.gdirect[i].z<<endl;
+		cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<endl;
 		cout <<"flag1["<<i<<"] = "<<flag1[i]<<endl;
 		cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<endl;  
 	}
@@ -2442,13 +2442,13 @@ complex<double> Chi0_hilbert:: Cal_g(int iq)
 {	
     complex<double> g;
     double L = ucell.latvec.e33 * ucell.lat0;
-    double dz = L/pw.ncz;
+    double dz = L/GlobalC::pw.ncz;
     double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/ucell.lat0)).norm2());
     
     g = complex<double>(0.0,0.0);
 
-    for(int z0=0;z0<pw.ncz;z0++)
-        for(int z1=0;z1<pw.ncz;z1++)
+    for(int z0=0;z0<GlobalC::pw.ncz;z0++)
+        for(int z1=0;z1<GlobalC::pw.ncz;z1++)
         {
             double exp_phase = exp(-q*(z0+z1)*dz);
             g += chi_para[z0][z1] * exp_phase * dz * dz;

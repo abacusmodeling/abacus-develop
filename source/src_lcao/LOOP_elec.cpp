@@ -65,10 +65,10 @@ void LOOP_elec::set_matrix_grid(void)
 
 	// (3) Periodic condition search for each grid.
 	GridT.set_pbc_grid(
-			pw.ncx, pw.ncy, pw.ncz,
-			pw.bx, pw.by, pw.bz,
-			pw.nbx, pw.nby, pw.nbz,
-			pw.nbxx, pw.nbzp_start, pw.nbzp);
+			GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+			GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
+			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
+			GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
 	// (2) If k point is used here, allocate HlocR after atom_arrange.
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
@@ -117,7 +117,7 @@ void LOOP_elec::before_solver(const int &istep)
 	{
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			ZEROS(CHR.rho[is], pw.nrxx);
+			ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
 			stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
@@ -138,7 +138,7 @@ void LOOP_elec::before_solver(const int &istep)
 		CHR.renormalize_rho();
 
 		// initialize the potential
-		pot.init_pot( istep-1, pw.strucFac );
+		pot.init_pot( istep-1, GlobalC::pw.strucFac );
 	}
 
 

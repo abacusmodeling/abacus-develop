@@ -12,34 +12,34 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 
 	if (INPUT.gamma_only && is_pw) fact=2.0;
 
-    dvloc = new double[pw.ngmc];
+    dvloc = new double[GlobalC::pw.ngmc];
 
 	complex<double> *Porter = GlobalC::UFFT.porter;
 
-	ZEROS( Porter, pw.nrxx );
+	ZEROS( Porter, GlobalC::pw.nrxx );
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for (int ir=0; ir<pw.nrxx; ir++)
+		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			Porter[ir] += complex<double>(CHR.rho[is][ir], 0.0 );
 		}
 	}
-	pw.FFT_chg.FFT3D(Porter, -1);
+	GlobalC::pw.FFT_chg.FFT3D(Porter, -1);
 
 //    if(INPUT.gamma_only==1) fact=2.0;
 //    else fact=1.0;
 
 	evloc=0.0;
 
-	complex<double> *vg = new complex<double>[pw.ngmc];
-	ZEROS( vg, pw.ngmc );
+	complex<double> *vg = new complex<double>[GlobalC::pw.ngmc];
+	ZEROS( vg, GlobalC::pw.ngmc );
 	for (int it=0; it<ucell.ntype; it++)
 	{
-		if (pw.gstart==1) evloc += ppcell.vloc(it, pw.ig2ngg[0]) * (pw.strucFac(it,0) * conj(Porter[pw.ig2fftc[0]])).real();
-		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+		if (GlobalC::pw.gstart==1) evloc += ppcell.vloc(it, GlobalC::pw.ig2ngg[0]) * (GlobalC::pw.strucFac(it,0) * conj(Porter[GlobalC::pw.ig2fftc[0]])).real();
+		for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 		{
-			const int j = pw.ig2fftc[ig];
-			evloc += ppcell.vloc(it, pw.ig2ngg[ig]) * (pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
+			const int j = GlobalC::pw.ig2fftc[ig];
+			evloc += ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
 		}
 	}
 	for(int nt = 0;nt< ucell.ntype; nt++)
@@ -65,16 +65,16 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 		//
 		}
 
-		for(int ng = 0;ng< pw.ngmc;ng++)
+		for(int ng = 0;ng< GlobalC::pw.ngmc;ng++)
 		{
-			const int j = pw.ig2fftc[ng];
+			const int j = GlobalC::pw.ig2fftc[ng];
 			for (int l = 0;l< 3;l++)
 			{
 				for (int m = 0; m<l+1;m++)
 				{
-					sigma(l, m) = sigma(l, m) + (conj(Porter[j]) * pw.strucFac(nt, ng)).real() 
-						* 2.0 * dvloc[pw.ig2ngg[ng]] * ucell.tpiba2 * 
-						pw.get_G_cartesian_projection(ng, l) * pw.get_G_cartesian_projection(ng, m) * fact;
+					sigma(l, m) = sigma(l, m) + (conj(Porter[j]) * GlobalC::pw.strucFac(nt, ng)).real() 
+						* 2.0 * dvloc[GlobalC::pw.ig2ngg[ng]] * ucell.tpiba2 * 
+						GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) * fact;
 				}
 			}
 		}
@@ -136,7 +136,7 @@ double*  dvloc
 	ZEROS(aux1, msh);
 
 	// the  G=0 component is not computed
-	if (pw.ggs[0] < 1.0e-8)
+	if (GlobalC::pw.ggs[0] < 1.0e-8)
 	{
 		dvloc[0] = 0.0;
 		igl0 = 1;
@@ -158,10 +158,10 @@ double*  dvloc
 	{
 		aux1[i] = r [i] * vloc_at [i] + zp * e2 * erf(r[i]);
 	}
-	for(int igl = igl0;igl< pw.nggm;igl++)
+	for(int igl = igl0;igl< GlobalC::pw.nggm;igl++)
 	{
-		double gx = sqrt (pw.ggs [igl] * ucell.tpiba2);
-		double gx2 = pw.ggs [igl] * ucell.tpiba2;
+		double gx = sqrt (GlobalC::pw.ggs [igl] * ucell.tpiba2);
+		double gx2 = GlobalC::pw.ggs [igl] * ucell.tpiba2;
 		//
 		//    and here we perform the integral, after multiplying for the |G|
 		//    dependent  part
@@ -205,7 +205,7 @@ double* dvloc
 	// first shell with g != 0
 
 	// the  G=0 component is 0
-	if (pw.ggs[0] < 1.0e-8)
+	if (GlobalC::pw.ggs[0] < 1.0e-8)
 	{
 		dvloc[0] = 0.0;
 		igl0 = 1;
@@ -214,9 +214,9 @@ double* dvloc
 	{
 		igl0 = 0;
 	}
-	for(int i=igl0;i<pw.nggm;i++)
+	for(int i=igl0;i<GlobalC::pw.nggm;i++)
 	{
-		dvloc[i] = FOUR_PI * zp * e2 / ucell.omega / pow(( ucell.tpiba2 * pw.ggs[i] ),2);
+		dvloc[i] = FOUR_PI * zp * e2 / ucell.omega / pow(( ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
 	}
 	
 	return;

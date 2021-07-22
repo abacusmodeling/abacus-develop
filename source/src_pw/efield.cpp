@@ -157,9 +157,9 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		ofstream ofs(ss.str().c_str());
 		
 		int npoi;
-		if(edir==1) npoi = pw.ncx;
-		else if(edir == 2) npoi = pw.ncy;
-		else if(edir == 3) npoi = pw.ncz;
+		if(edir==1) npoi = GlobalC::pw.ncx;
+		else if(edir == 2) npoi = GlobalC::pw.ncy;
+		else if(edir == 3) npoi = GlobalC::pw.ncz;
 		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
 		for(int ip=0; ip<npoi; ++ip)
@@ -173,19 +173,19 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	}
 	
 	// compared this to gint_gamma_vl.cpp	
-	const int yz = pw.ncy*pw.nczp;
-	for(int ir=0; ir<pw.nrxx; ++ir)
+	const int yz = GlobalC::pw.ncy*GlobalC::pw.nczp;
+	for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 	{
 		index = ir;
 		i     = index / yz; // get the z, z is the fastest
 		index = index - yz * i;// get (x,y)
-		j     = index / pw.nczp;// get y
-		k 	  = index - pw.nczp*j + pw.nczp_start;// get x
+		j     = index / GlobalC::pw.nczp;// get y
+		k 	  = index - GlobalC::pw.nczp*j + GlobalC::pw.nczp_start;// get x
 
 		double sawarg;
-		if (edir == 1) sawarg = (double)i/(double)pw.ncx;
-		else if (edir == 2) sawarg = (double)j/(double)pw.ncy;
-		else if (edir == 3) sawarg = (double)k/(double)pw.ncz;
+		if (edir == 1) sawarg = (double)i/(double)GlobalC::pw.ncx;
+		else if (edir == 2) sawarg = (double)j/(double)GlobalC::pw.ncy;
+		else if (edir == 3) sawarg = (double)k/(double)GlobalC::pw.ncz;
 		else throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 
      	value = e2 * (eamp - tot_dipole) * 

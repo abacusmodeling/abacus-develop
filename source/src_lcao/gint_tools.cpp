@@ -16,18 +16,18 @@ namespace Gint_Tools
 		const int jby,
 		const int kbz)
 	{
-		int *vindex = (int*)malloc(pw.bxyz*sizeof(int));
+		int *vindex = (int*)malloc(GlobalC::pw.bxyz*sizeof(int));
 		int bindex=0;
 		// z is the fastest,
 		// ipart can be obtained by using a previously stored array
-		for(int ii=0; ii<pw.bx; ii++)
+		for(int ii=0; ii<GlobalC::pw.bx; ii++)
 		{
 			const int ipart = (ibx+ii)*ncyz;
-			for(int jj=0; jj<pw.by; jj++)
+			for(int jj=0; jj<GlobalC::pw.by; jj++)
 			{
 				// jpart can be obtained by using a previously stored array
-				const int jpart = (jby+jj)*pw.nczp + ipart;
-				for(int kk=0; kk<pw.bz; kk++)
+				const int jpart = (jby+jj)*GlobalC::pw.nczp + ipart;
+				for(int kk=0; kk<GlobalC::pw.bz; kk++)
 				{
 					vindex[bindex] = kbz+kk + jpart;
 					++bindex;
@@ -93,8 +93,8 @@ namespace Gint_Tools
 		const int na_grid, 			// number of atoms on this grid 
 		const int grid_index)		// 1d index of FFT index (i,j,k) 
 	{
-		bool** cal_flag = (bool**)malloc(pw.bxyz*sizeof(bool*));
-		for(int ib=0; ib<pw.bxyz; ++ib)
+		bool** cal_flag = (bool**)malloc(GlobalC::pw.bxyz*sizeof(bool*));
+		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 			cal_flag[ib] = (bool*)malloc(na_grid*sizeof(bool));
 
 		for (int id=0; id<na_grid; id++)
@@ -118,7 +118,7 @@ namespace Gint_Tools
 				GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1],
 				GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2]};
 
-			for(int ib=0; ib<pw.bxyz; ib++)
+			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 			{
 				// meshcell_pos: z is the fastest
 				const double dr[3] = {
@@ -143,9 +143,9 @@ namespace Gint_Tools
 		const double delta_r, 				// delta_r of the uniform FFT grid
 		const int*const block_index,  		// block_index[na_grid+1], count total number of atomis orbitals
 		const int*const block_size, 		// block_size[na_grid],	number of columns of a band
-		const bool*const*const cal_flag) 	// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const bool*const*const cal_flag) 	// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
 	{
-		Array_Pool<double> psir_ylm(pw.bxyz, LD_pool);
+		Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
 		for (int id=0; id<na_grid; id++)
 		{
 			// there are two parameters we want to know here:
@@ -170,7 +170,7 @@ namespace Gint_Tools
 				GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2]};
 
 			// number of grids in each big cell (bxyz)
-			for(int ib=0; ib<pw.bxyz; ib++)
+			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 			{
 				double *p=&psir_ylm.ptr_2D[ib][block_index[id]];
 				if(!cal_flag[ib][id]) 

@@ -26,13 +26,13 @@ void LOOP_cell::opt_cell(void)
     // output is ppcell.vloc 3D local pseudopotentials
 	// without structure factors
     // this function belongs to cell LOOP
-    ppcell.init_vloc(pw.nggm, ppcell.vloc);
+    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
 
     // Initialize the sum of all local potentials.
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step=0;
-    pot.init_pot(ion_step, pw.strucFac);
+    pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 
 	// PLEASE simplify the Exx_Global interface

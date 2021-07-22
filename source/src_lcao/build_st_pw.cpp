@@ -121,11 +121,11 @@ void Build_ST_pw::set_local(const int &ik)
     const int npw = GlobalC::kv.ngk[ik];
     complex<double> *psi_one = new complex<double>[npw];
     complex<double> *hpsi = new complex<double>[npw];
-	complex<double> *psic = new complex<double>[pw.nrxx];
+	complex<double> *psic = new complex<double>[GlobalC::pw.nrxx];
 	int *fft_index = new int[npw];
 	for(int ig=0; ig<npw; ig++)
 	{
-		fft_index[ig] = pw.ig2fftw[ wf.igk(ik, ig) ];
+		fft_index[ig] = GlobalC::pw.ig2fftw[ wf.igk(ik, ig) ];
 	}
 
 //	ComplexMatrix vij(GlobalV::NLOCAL, GlobalV::NLOCAL);
@@ -139,7 +139,7 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_one[ig] = wf.wanf2[ik](i, ig);
 			}
 
-			ZEROS( psic, pw.nrxx);
+			ZEROS( psic, GlobalC::pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{
@@ -147,14 +147,14 @@ void Build_ST_pw::set_local(const int &ik)
 			}
 
 			// (2) fft to real space and doing things.
-			pw.FFT_wfc.FFT3D( psic, 1);
-			for (int ir=0; ir< pw.nrxx; ir++)
+			GlobalC::pw.FFT_wfc.FFT3D( psic, 1);
+			for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
 			{
 				psic[ir] *= pot.vr_eff1[ir];
 			}
 
 			// (3) fft back to G space.
-			pw.FFT_wfc.FFT3D( psic, -1);
+			GlobalC::pw.FFT_wfc.FFT3D( psic, -1);
 
 			for(int ig=0; ig<npw; ig++)
 			{
@@ -179,7 +179,7 @@ void Build_ST_pw::set_local(const int &ik)
 		else//noncolinear case
 		{
 			complex<double>* psi_down = new complex<double> [npw];
-			complex<double> *psic1 = new complex<double>[pw.nrxx];
+			complex<double> *psic1 = new complex<double>[GlobalC::pw.nrxx];
 			delete[] hpsi;
 			hpsi = new complex<double> [wf.npwx*GlobalV::NPOL];
 			ZEROS(hpsi, wf.npwx*GlobalV::NPOL);
@@ -190,8 +190,8 @@ void Build_ST_pw::set_local(const int &ik)
 				psi_down[ig] = wf.wanf2[ik](i, ig+ wf.npwx);
 			}
 
-			ZEROS( psic, pw.nrxx);
-			ZEROS( psic1, pw.nrxx);
+			ZEROS( psic, GlobalC::pw.nrxx);
+			ZEROS( psic1, GlobalC::pw.nrxx);
 			// (1) set value
 			for (int ig=0; ig< npw; ig++)
 			{
@@ -200,10 +200,10 @@ void Build_ST_pw::set_local(const int &ik)
 			}
 
 			// (2) fft to real space and doing things.
-			pw.FFT_wfc.FFT3D( psic, 1);
-			pw.FFT_wfc.FFT3D( psic1, 1);
+			GlobalC::pw.FFT_wfc.FFT3D( psic, 1);
+			GlobalC::pw.FFT_wfc.FFT3D( psic1, 1);
 			complex<double> sup,sdown;
-			for (int ir=0; ir< pw.nrxx; ir++)
+			for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
 			{
 				sup = psic[ir] * (pot.vr_eff(0,ir) + pot.vr_eff(3,ir)) +
 					psic1[ir] * (pot.vr_eff(1,ir) - complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
@@ -215,8 +215,8 @@ void Build_ST_pw::set_local(const int &ik)
 			}
 	
 			// (3) fft back to G space.
-			pw.FFT_wfc.FFT3D( psic, -1);
-			pw.FFT_wfc.FFT3D( psic1, -1);
+			GlobalC::pw.FFT_wfc.FFT3D( psic, -1);
+			GlobalC::pw.FFT_wfc.FFT3D( psic1, -1);
 	
 			for(int ig=0; ig<npw; ig++)
 			{

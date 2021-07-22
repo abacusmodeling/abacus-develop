@@ -34,7 +34,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
     if (!Numerical_Basis::init_label)
     {
         // 1 stands for : start_from_file
-        Numerical_Basis::bessel_basis.init( 1, pw.ecutwfc, ucell.ntype, ucell.lmax );
+        Numerical_Basis::bessel_basis.init( 1, GlobalC::pw.ecutwfc, ucell.ntype, ucell.lmax );
         Numerical_Basis::init_mu_index();
         Numerical_Basis::init_label = true;
     }
@@ -56,7 +56,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     if (!Numerical_Basis::init_label)
     {
         // 0 stands for : 'Faln' is not used.
-        Numerical_Basis::bessel_basis.init( 0, pw.ecutwfc, ucell.ntype, ucell.lmax );
+        Numerical_Basis::bessel_basis.init( 0, GlobalC::pw.ecutwfc, ucell.ntype, ucell.lmax );
         Numerical_Basis::init_mu_index();
         Numerical_Basis::init_label = true;
     }
@@ -156,7 +156,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
             }
         }
         // ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
-        ofs << pw.ecutwfc << " ecutwfc" << endl; // mohan add 2009-09-08
+        ofs << GlobalC::pw.ecutwfc << " ecutwfc" << endl; // mohan add 2009-09-08
 
         // this parameter determine the total number of jlq.
         ofs << Numerical_Basis::bessel_basis.get_ecut() << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08

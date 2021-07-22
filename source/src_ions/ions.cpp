@@ -280,7 +280,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             else
             {
                 GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
-                pw.setup_structure_factor();
+                GlobalC::pw.setup_structure_factor();
 
                 GlobalV::ofs_running << " Setup the extrapolated charge." << endl;
                 // charge extrapolation if istep>0.
@@ -289,7 +289,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
                 // calculate the new potential accordint to
                 // the new charge density.
-                pot.init_pot( istep, pw.strucFac );
+                pot.init_pot( istep, GlobalC::pw.strucFac );
 
                 GlobalV::ofs_running << " Setup the new wave functions?" << endl;
                 wf.wfcinit();
@@ -330,7 +330,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             else
             {
                 Variable_Cell::init_after_vc();
-                pot.init_pot(stress_step, pw.strucFac); //LiuXh add 20180619
+                pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
                 GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                 wf.wfcinit(); //LiuXh add 20180619
                 ++stress_step;
@@ -386,7 +386,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                     else
                     {
                         Variable_Cell::init_after_vc();
-                        pot.init_pot(stress_step, pw.strucFac); //LiuXh add 20180619
+                        pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
 
                         GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                         wf.wfcinit(); //LiuXh add 20180619
@@ -403,13 +403,13 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             else
             {
 				GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
-                pw.setup_structure_factor();
+                GlobalC::pw.setup_structure_factor();
 				GlobalV::ofs_running << " Setup the extrapolated charge." << endl;
                 CE.save_pos_next(ucell);
                 CE.update_istep(force_step);
                 CE.extrapolate_charge();
 				GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
-                pot.init_pot( istep, pw.strucFac );
+                pot.init_pot( istep, GlobalC::pw.strucFac );
 				GlobalV::ofs_running << " Setup the new wave functions?" << endl;
                 wf.wfcinit();
                 ++force_step;

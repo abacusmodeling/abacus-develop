@@ -3,7 +3,7 @@
 
 Use_FFT::Use_FFT()
 {
-	porter = new complex<double>[pw.nrxx];	
+	porter = new complex<double>[GlobalC::pw.nrxx];	
 }
 
 Use_FFT::~Use_FFT()
@@ -16,8 +16,8 @@ void Use_FFT::allocate(void)
     TITLE("Use_FFT","allocate");
 
     delete[] porter;
-    porter = new complex<double>[pw.nrxx];
-    Memory::record("Use_FFT","porter",pw.nrxx,"complexmatrix");
+    porter = new complex<double>[GlobalC::pw.nrxx];
+    Memory::record("Use_FFT","porter",GlobalC::pw.nrxx,"complexmatrix");
 
     return;
 }
@@ -35,29 +35,29 @@ void Use_FFT::RoundTrip(
     }
 
 	// (2) fft to real space and doing things.
-    pw.FFT_wfc.FFT3D( psic, 1);
-    for (int ir=0; ir< pw.nrxx; ir++)
+    GlobalC::pw.FFT_wfc.FFT3D( psic, 1);
+    for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
     {
         psic[ir] *= vr[ir];
     }
 
 	// (3) fft back to G space.
-    pw.FFT_wfc.FFT3D( psic, -1);
+    GlobalC::pw.FFT_wfc.FFT3D( psic, -1);
     return;
 }
 
 void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr)
 {
 	// (1) set value
-    ZEROS( porter, pw.nrxx );
-    for (int ig=0; ig<pw.ngmc; ig++)
+    ZEROS( porter, GlobalC::pw.nrxx );
+    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {
-        porter[ pw.ig2fftc[ig] ] = vg(is, ig);
+        porter[ GlobalC::pw.ig2fftc[ig] ] = vg(is, ig);
     }
 
 	// (2) fft and get value
-    pw.FFT_chg.FFT3D(porter, 1);
-    for (int ir = 0; ir < pw.nrxx; ir++)
+    GlobalC::pw.FFT_chg.FFT3D(porter, 1);
+    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
     {
         vr[ir] = porter[ir].real();
     }
@@ -66,13 +66,13 @@ void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, double *vr)
 
 void Use_FFT::ToRealSpace_psi(const int &ik, const complex<double> *psig, complex<double> *psir)
 {
-	ZEROS(psir, pw.nrxx);
+	ZEROS(psir, GlobalC::pw.nrxx);
 	for(int ig=0; ig<wf.npw; ig++)
 	{
-		psir[ pw.ig2fftc[ wf.igk(ik,ig) ] ] = psig[ig];
+		psir[ GlobalC::pw.ig2fftc[ wf.igk(ik,ig) ] ] = psig[ig];
 	}
 	// 1: to real space.
-	pw.FFT_wfc.FFT3D(psir, 1);
+	GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
 
 	return;
 }
@@ -81,14 +81,14 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const complex<double> *psig, comple
 void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix &evc, complex<double> *psir)
 {
 	// (1) set value
-    ZEROS( psir, pw.nrxx );
+    ZEROS( psir, GlobalC::pw.nrxx );
     for (int ig=0; ig<wf.npw; ig++)
     {
-        psir[ pw.ig2fftc[ wf.igk(ik,ig) ] ] = evc(ib, ig);
+        psir[ GlobalC::pw.ig2fftc[ wf.igk(ik,ig) ] ] = evc(ib, ig);
     }
 
 	// (2) fft and get value
-    pw.FFT_wfc.FFT3D(psir, 1);
+    GlobalC::pw.FFT_wfc.FFT3D(psir, 1);
     return;
 }
 
@@ -97,15 +97,15 @@ void Use_FFT::ToRealSpace_psi(const int &ik, const int &ib, const ComplexMatrix 
 void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, matrix &vr)
 {
 	// (1) set value
-    ZEROS( porter, pw.nrxx);
-    for (int ig=0; ig<pw.ngmc; ig++)
+    ZEROS( porter, GlobalC::pw.nrxx);
+    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {
-        porter [pw.ig2fftc[ig]] = vg(is,ig);
+        porter [GlobalC::pw.ig2fftc[ig]] = vg(is,ig);
     }
 
 	// (2) fft and get value
-    pw.FFT_chg.FFT3D(porter, 1);
-    for (int ir = 0; ir < pw.nrxx; ir++)
+    GlobalC::pw.FFT_chg.FFT3D(porter, 1);
+    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
     {
         vr(is,ir) = porter[ir].real();
     }
@@ -117,13 +117,13 @@ void Use_FFT::ToRealSpace(const int &is, const ComplexMatrix &vg, matrix &vr)
 // then put vg into vr.
 void Use_FFT::ToRealSpace(const complex<double> *vg, double *vr)
 {
-    ZEROS( porter, pw.nrxx);
-    for (int ig=0; ig<pw.ngmc; ig++)
+    ZEROS( porter, GlobalC::pw.nrxx);
+    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {
-        porter[pw.ig2fftc[ig]] = vg[ig];
+        porter[GlobalC::pw.ig2fftc[ig]] = vg[ig];
     }
-    pw.FFT_chg.FFT3D(porter, 1);
-    for (int ir = 0; ir < pw.nrxx; ir++)
+    GlobalC::pw.FFT_chg.FFT3D(porter, 1);
+    for (int ir = 0; ir < GlobalC::pw.nrxx; ir++)
     {
         vr[ir] = porter[ir].real();
     }
@@ -132,15 +132,15 @@ void Use_FFT::ToRealSpace(const complex<double> *vg, double *vr)
 
 void Use_FFT::ToReciSpace(const double* vr, complex<double> *vg)
 {
-	ZEROS( porter, pw.nrxx);
-	for (int ir=0; ir<pw.nrxx; ir++)
+	ZEROS( porter, GlobalC::pw.nrxx);
+	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
 		porter[ir] = complex<double>(vr[ir], 0.0);
 	}
-	pw.FFT_chg.FFT3D( porter, -1);
-	for (int ig=0; ig<pw.ngmc; ig++)
+	GlobalC::pw.FFT_chg.FFT3D( porter, -1);
+	for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
 	{
-		vg[ig] = porter[ pw.ig2fftc[ig] ];
+		vg[ig] = porter[ GlobalC::pw.ig2fftc[ig] ];
 	}
 	return;
 }

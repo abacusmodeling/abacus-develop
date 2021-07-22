@@ -377,7 +377,7 @@ void Stochastic_Iter::sum_stoband()
         out = new complex<double> [nrxx];
     }
 
-    double dr3 = ucell.omega / pw.ncxyz;
+    double dr3 = ucell.omega / GlobalC::pw.ncxyz;
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
    
@@ -419,12 +419,12 @@ void Stochastic_Iter::sum_stoband()
                 complex<double> *tmpout = out;
             for(int ichi = 0; ichi < nchip ; ++ichi)
             {
-                ZEROS( porter, pw.nrxx );
+                ZEROS( porter, GlobalC::pw.nrxx );
                 for(int ig = 0; ig < npw; ++ig)
                 {
                     porter[ GRA_index[ig] ] = tmpout[ig];
                 }
-                pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
+                GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
                 for(int ir = 0 ; ir < nrxx ; ++ir)
                 {
                     CHR.rho[0][ir] += norm(porter[ir]);
@@ -614,12 +614,12 @@ double Stochastic_Iter:: nfdlnfd(double e)
  {
      //=====================test============================
     /*
-    complex<double> *in = new complex<double> [pw.nrxx];
+    complex<double> *in = new complex<double> [GlobalC::pw.nrxx];
     
     complex<double> *chig1 = new complex<double> [wf.npw];
     complex<double> *chig2 = new complex<double> [wf.npw];
-    ZEROS(in,pw.nrxx);
-    ZEROS(in2,pw.nrxx);*/
+    ZEROS(in,GlobalC::pw.nrxx);
+    ZEROS(in2,GlobalC::pw.nrxx);*/
 
     //---------------------------------------------------
     /*//test hermit property of  hchi matrix
@@ -627,8 +627,8 @@ double Stochastic_Iter:: nfdlnfd(double e)
     Emax = 1;
     Stochastic_hchi:: Emin = this -> Emin;
     Stochastic_hchi:: Emax = this -> Emax;
-    complex<double> *out = new complex<double> [pw.nrxx];
-    complex<double> *in2 = new complex<double> [pw.nrxx];
+    complex<double> *out = new complex<double> [GlobalC::pw.nrxx];
+    complex<double> *in2 = new complex<double> [GlobalC::pw.nrxx];
     cout<<"------------------------------------"<<endl;
     complex<double> cij,cji;
     double dc;
@@ -697,20 +697,20 @@ double Stochastic_Iter:: nfdlnfd(double e)
     Stochastic_hchi:: Emin = this -> Emin;
     Stochastic_hchi:: Emax = this -> Emax;
     int * GRA_index = stohchi.GRA_index;
-    ZEROS(in,pw.nrxx);
+    ZEROS(in,GlobalC::pw.nrxx);
     complex<double> *kswf = &wf.evc[0](0,0);
     for ( int ig = 0 ; ig< wf.npw; ++ig)
     {
         in[GRA_index[ig]] = kswf [ig];
     }
-    fftw_plan pp=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)in,(fftw_complex *)in2, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)in,(fftw_complex *)in2, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(pp);
     stohchi.hchi_real(in2,out);
-    fftw_plan pp2=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)out,(fftw_complex *)out, FFTW_FORWARD, FFTW_ESTIMATE);
+    fftw_plan pp2=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)out,(fftw_complex *)out, FFTW_FORWARD, FFTW_ESTIMATE);
     fftw_execute(pp2);
     for(int i  = 0; i <wf.npw;++i)
     {
-        chig1[i] = out[GRA_index[i]] / pw.nrxx; 
+        chig1[i] = out[GRA_index[i]] / GlobalC::pw.nrxx; 
     }
 
     hm.hpw.h_psi( kswf , chig2);
@@ -727,22 +727,22 @@ double Stochastic_Iter:: nfdlnfd(double e)
     /*
     int * GRA_index = stohchi.GRA_index;
     complex<double> *chigout = new complex<double> [wf.npw];
-    complex<double> *wave = new complex<double> [pw.nrxx];
-    complex<double> *waveout = new complex<double> [pw.nrxx];
+    complex<double> *wave = new complex<double> [GlobalC::pw.nrxx];
+    complex<double> *waveout = new complex<double> [GlobalC::pw.nrxx];
     Emax = 1000;
     Emin = 0;
     Stochastic_hchi:: Emin = this->Emin;
     Stochastic_hchi:: Emax = this->Emax;
     double Ebar = (Emax + Emin)/2;
     double DeltaE = (Emax - Emin)/2;
-    fftw_plan pp=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
     for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
         complex<double> *kswf = &wf.evc[0](ib,0);
         hm.hpw.h_psi( kswf , chigout);
         double energy = 0;
         double norm1 =0;
-        ZEROS(wave,pw.nrxx);
+        ZEROS(wave,GlobalC::pw.nrxx);
         for(int ig = 0 ; ig < wf.npw ; ++ig)
         {
             energy += real(conj(kswf[ig]) * chigout[ig]);
@@ -753,7 +753,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
         stohchi.hchi_real(wave,waveout);
         double energy2 = 0;
         double norm2 =0;
-        for(int ir = 0 ; ir < pw.nrxx ; ++ir)
+        for(int ir = 0 ; ir < GlobalC::pw.nrxx ; ++ir)
         {
             energy2 += real(conj(wave[ir]) * waveout[ir]) * DeltaE + Ebar * norm(wave[ir]);
             norm2 += norm(wave[ir]);
@@ -771,18 +771,18 @@ double Stochastic_Iter:: nfdlnfd(double e)
     //test ne
     /*
     int * GRA_index = stohchi.GRA_index;
-    complex<double> *wave = new complex<double> [pw.nrxx];
-    complex<double> *waveout = new complex<double> [pw.nrxx];
+    complex<double> *wave = new complex<double> [GlobalC::pw.nrxx];
+    complex<double> *waveout = new complex<double> [GlobalC::pw.nrxx];
     Emax = 750;
     Emin = -100;
     Stochastic_hchi:: Emin = this->Emin;
     Stochastic_hchi:: Emax = this->Emax;
     mu = en.ef;
     stoche.calcoef(this->nfd);
-    fftw_plan pp=fftw_plan_dft_3d(pw.nx,pw.ny,pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_plan pp=fftw_plan_dft_3d(GlobalC::pw.nx,GlobalC::pw.ny,GlobalC::pw.nz,(fftw_complex *)wave,(fftw_complex *)wave, FFTW_BACKWARD, FFTW_ESTIMATE);
     for(int ib = 0 ; ib < GlobalV::NBANDS ; ++ib)
     {
-        ZEROS(wave,pw.nrxx);
+        ZEROS(wave,GlobalC::pw.nrxx);
         complex<double> *kswf = &wf.evc[0](ib,0);
         for(int ig = 0 ; ig < wf.npw ; ++ig)
         {
@@ -791,8 +791,8 @@ double Stochastic_Iter:: nfdlnfd(double e)
         fftw_execute(pp);
         double ne =0;
         double norm1 = 0;
-        stoche.calresult(stohchi.hchi_real, pw.nrxx, wave, waveout);
-        for(int ir = 0 ; ir < pw.nrxx ; ++ir)
+        stoche.calresult(stohchi.hchi_real, GlobalC::pw.nrxx, wave, waveout);
+        for(int ir = 0 ; ir < GlobalC::pw.nrxx ; ++ir)
         {   
             ne += real(conj(wave[ir]) * waveout[ir]);
             norm1 += norm(wave[ir]);

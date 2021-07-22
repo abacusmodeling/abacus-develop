@@ -122,7 +122,7 @@ void IState_Charge::begin(void)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS( CHR.rho[is], pw.nrxx );
+				ZEROS( CHR.rho[is], GlobalC::pw.nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 

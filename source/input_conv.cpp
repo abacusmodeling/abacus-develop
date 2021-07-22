@@ -148,7 +148,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // planewave (8/8)
 //----------------------------------------------------------
-    pw.set(
+    GlobalC::pw.set(
         INPUT.gamma_only,
         INPUT.ecutwfc,
         INPUT.ecutrho,

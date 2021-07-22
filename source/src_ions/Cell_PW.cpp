@@ -18,12 +18,12 @@ void Cell_PW::opt_cells_pw()
     // init hamiltonian
     // only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(pw.nggm, ppcell.vloc);
+    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
     DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
@@ -35,7 +35,7 @@ void Cell_PW::opt_cells_pw()
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0, pw.strucFac); //atomic_rho, v_of_rho, set_vrs
+    pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
 
     pot.newd();
 
@@ -59,7 +59,7 @@ void Cell_PW::opt_cells_pw()
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        exx_lip.init(&GlobalC::kv, &wf, &pw, &GlobalC::UFFT, &ucell);
+        exx_lip.init(&GlobalC::kv, &wf, &GlobalC::pw, &GlobalC::UFFT, &ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;

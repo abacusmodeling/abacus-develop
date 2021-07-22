@@ -49,7 +49,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
 	// mohan add 2021, needs reconstruction!!!
     int istep = 1;
-    pot.init_pot(istep, pw.strucFac);
+    pot.init_pot(istep, GlobalC::pw.strucFac);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
@@ -59,7 +59,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_z, ParaO.nloc);
 
-        for(int ir=0; ir<pw.nrxx; ++ir)
+        for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
             pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
@@ -188,7 +188,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     //calculate <dphi | VL | phi>
 
     int istep = 1;
-    pot.init_pot(istep, pw.strucFac);
+    pot.init_pot(istep, GlobalC::pw.strucFac);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
@@ -198,7 +198,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_z, ParaO.nloc);
 
-        for(int ir=0; ir<pw.nrxx; ++ir)
+        for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
             pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }

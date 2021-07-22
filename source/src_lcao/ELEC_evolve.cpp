@@ -49,7 +49,7 @@ void ELEC_evolve::evolve_psi(
 		}
 		wf.npw = GlobalC::kv.ngk[ik];
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
@@ -74,7 +74,7 @@ void ELEC_evolve::evolve_psi(
 			{
 				for(int is=1;is<4;is++)
 				{
-					for(int ir=0; ir<pw.nrxx; ir++)
+					for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 					{
 						pot.vr_eff1[ir] = pot.vr_eff(is, ir);
 					}

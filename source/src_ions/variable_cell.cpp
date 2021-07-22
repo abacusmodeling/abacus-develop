@@ -21,9 +21,9 @@ void Variable_Cell::init_after_vc(void)
     GlobalC::kv.set_after_vc(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec);
     DONE(GlobalV::ofs_running, "INIT K-POINTS");
 
-    pw.update_gvectors(GlobalV::ofs_running, ucell);
+    GlobalC::pw.update_gvectors(GlobalV::ofs_running, ucell);
 
-    pw.setup_structure_factor();
+    GlobalC::pw.setup_structure_factor();
 
     if(GlobalV::BASIS_TYPE=="pw")
     {
@@ -35,7 +35,7 @@ void Variable_Cell::init_after_vc(void)
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(pw.nggm, ppcell.vloc);
+    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
     DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
 
     //======================================
@@ -88,21 +88,21 @@ void Variable_Cell::final_calculation_after_vc(void)
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // (1) Init the plane wave.
-    pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
+    GlobalC::pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
+    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
+    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
 
     // init the grid, then the charge
     // on grid can be distributed.
-    Pgrid.init_final_scf(pw.ncx, pw.ncy, pw.ncz, 
-		pw.nczp, pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, 
+		GlobalC::pw.nczp, GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
     //=====================
     // init potential
     //=====================
     CHR.init_final_scf();
-    pot.allocate(pw.nrxx);
+    pot.allocate(GlobalC::pw.nrxx);
 
     //=====================
     // init wave functions
@@ -128,12 +128,12 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=====================
     // init hamiltonian
     //=====================
-    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, pw.nrxx);
+    hm.hpw.allocate(wf.npwx, GlobalV::NPOL, ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(pw.nggm, ppcell.vloc);
+    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
     DONE(GlobalV::ofs_running,"LOCAL POTENTIAL");
     //======================================
     // Initalize non local pseudopotential
@@ -146,7 +146,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0, pw.strucFac);//atomic_rho, v_of_rho, set_vrs
+    pot.init_pot(0, GlobalC::pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
     //==================================================
     // Create ppcell.tab_at , for trial wave functions.

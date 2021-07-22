@@ -59,7 +59,7 @@ void Potential::write_potential(
                     << " " << ucell.atoms[it].taud[ia].z << endl;
             }
         }
-        ofs << pw.ncx << " " << pw.ncy << " " << pw.ncz;
+        ofs << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
         ofs << setprecision(precision);
         ofs << scientific; 
         if(!ofs)
@@ -70,23 +70,23 @@ void Potential::write_potential(
 
 #ifndef __MPI
     int count=0;
-    for(int k=0; k<pw.ncz; k++)
+    for(int k=0; k<GlobalC::pw.ncz; k++)
     {
         ofs << "\n" << k << " iz";
         double value = 0.0;
         double ave = 0.0;
-        for(int j=0; j<pw.ncy; j++)
+        for(int j=0; j<GlobalC::pw.ncy; j++)
         {
-            for(int i=0; i<pw.ncx; i++)
+            for(int i=0; i<GlobalC::pw.ncx; i++)
             {
                 if(count%8==0) ofs << "\n";
-                value = v(is, i*pw.ncy*pw.ncz + j*pw.ncz + k);
+                value = v(is, i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k);
                 ofs << " " << value;
                 ave += value;
                 ++count;
             }
         }
-        ofs << "\n" << ave/pw.ncx/pw.ncy << " average";
+        ofs << "\n" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy << " average";
     }
 #else
     MPI_Barrier(MPI_COMM_WORLD);
@@ -96,7 +96,7 @@ void Potential::write_potential(
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
         ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-        for (int iz=0;iz<pw.ncz;iz++)
+        for (int iz=0;iz<GlobalC::pw.ncz;iz++)
         {
             int ip = iz % GlobalV::NPROC_IN_POOL;
             num_z[ip]++;
@@ -112,9 +112,9 @@ void Potential::write_potential(
         }
 
         // which_ip: found iz belongs to which ip.
-        int *which_ip = new int[pw.ncz];
-        ZEROS(which_ip, pw.ncz);
-        for(int iz=0; iz<pw.ncz; iz++)
+        int *which_ip = new int[GlobalC::pw.ncz];
+        ZEROS(which_ip, GlobalC::pw.ncz);
+        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
             {
@@ -132,10 +132,10 @@ void Potential::write_potential(
             //GlobalV::ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
         }
         int count=0;
-        int nxy = pw.ncx * pw.ncy;
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
         double* zpiece = new double[nxy];
         // save the rho one z by one z.
-        for(int iz=0; iz<pw.ncz; iz++)
+        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             //GlobalV::ofs_running << "\n" << iz << " iz"; //LiuXh modify 20200624
             // tag must be different for different iz.
@@ -148,8 +148,8 @@ void Potential::write_potential(
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] );
-                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+                    zpiece[ir] = v(is, ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] );
+                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
                 }
             }
             // case 2: > first part rho: send the rho to
@@ -158,7 +158,7 @@ void Potential::write_potential(
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v(is, ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]);
+                    zpiece[ir] = v(is, ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]);
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }
@@ -202,17 +202,17 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     timer::tick("Potential","write_elecstat_pot");
 
     double *v_elecstat;
-    v_elecstat = new double[pw.nrxx];
-    ZEROS(v_elecstat, pw.nrxx);
+    v_elecstat = new double[GlobalC::pw.nrxx];
+    ZEROS(v_elecstat, GlobalC::pw.nrxx);
 
     complex<double> *Porter = GlobalC::UFFT.porter;
-    ZEROS( Porter, pw.nrxx );
+    ZEROS( Porter, GlobalC::pw.nrxx );
     
     int nspin0 = 1;
     if(GlobalV::NSPIN==2) nspin0 = GlobalV::NSPIN;
     for(int is=0; is<nspin0; is++)
     {
-        for(int ir=0; ir<pw.nrxx; ir++)
+        for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
             Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
         }
@@ -221,39 +221,39 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     //=============================
     //  bring rho (aux) to G space
     //=============================
-    pw.FFT_chg.FFT3D(Porter, -1);
+    GlobalC::pw.FFT_chg.FFT3D(Porter, -1);
 
     //=======================================================
     // calculate hartree potential in G-space (NB: V(G=0)=0 )
     //=======================================================
-    complex<double> *vh_g  = new complex<double>[pw.ngmc];
-    ZEROS(vh_g, pw.ngmc);
+    complex<double> *vh_g  = new complex<double>[GlobalC::pw.ngmc];
+    ZEROS(vh_g, GlobalC::pw.ngmc);
 
-    for(int ig = pw.gstart; ig<pw.ngmc; ig++)
+    for(int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
     {
-        const int j = pw.ig2fftc[ig];
-        if(pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
+        const int j = GlobalC::pw.ig2fftc[ig];
+        if(GlobalC::pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
         {
-            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * pw.gg [ig]);
+            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * GlobalC::pw.gg [ig]);
             vh_g[ig] = fac * Porter[j];
         }
     }
 
-    ZEROS(Porter, pw.nrxx);
+    ZEROS(Porter, GlobalC::pw.nrxx);
 
-    for (int ig = 0;ig < pw.ngmc;ig++)
+    for (int ig = 0;ig < GlobalC::pw.ngmc;ig++)
     {
-        Porter[pw.ig2fftc[ig]] = vh_g[ig];
+        Porter[GlobalC::pw.ig2fftc[ig]] = vh_g[ig];
     }
 
     //==========================================
     //transform hartree potential to real space
     //==========================================
-    pw.FFT_chg.FFT3D(Porter, 1);
+    GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
     //==========================================
     //Add hartree potential and local pseudopot
     //==========================================
-    for (int ir = 0;ir < pw.nrxx;ir++)
+    for (int ir = 0;ir < GlobalC::pw.nrxx;ir++)
     {
         v_elecstat[ir] = Porter[ir].real() + this->vltot[ir];
     }
@@ -313,8 +313,8 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
             }
         }
 
-        ofs << pw.ncx << " " << pw.ncy << " " << pw.ncz;
-        ofs_ave << pw.ncx << " " << pw.ncy << " " << pw.ncz;
+        ofs << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
+        ofs_ave << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
 
         int precision = 9;
         ofs << setprecision(precision);
@@ -329,26 +329,26 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
 
 #ifndef __MPI
     int count=0;
-    for(int k=0; k<pw.ncz; k++)
+    for(int k=0; k<GlobalC::pw.ncz; k++)
     {
         ofs << "\n" << k << " iz";
         double value = 0.0;
         double ave = 0.0;
-        for(int j=0; j<pw.ncy; j++)
+        for(int j=0; j<GlobalC::pw.ncy; j++)
         {
-            for(int i=0; i<pw.ncx; i++)
+            for(int i=0; i<GlobalC::pw.ncx; i++)
             {
                 //if(count%8==0) ofs << "\n";
                 if(count%5==0) ofs << "\n";
-                value = v_elecstat[i*pw.ncy*pw.ncz + j*pw.ncz + k];
+                value = v_elecstat[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k];
                 ofs << " " << value;
                 ave += value;
                 ++count;
             }
         }
-        //ofs << "\n" << ave/pw.ncx/pw.ncy << " average";
+        //ofs << "\n" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy << " average";
         if(k==0) ofs_ave << "iz" << "\taverage";
-        ofs_ave << "\n" << k << "\t" << ave/pw.ncx/pw.ncy;
+        ofs_ave << "\n" << k << "\t" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy;
     }
 #else
     MPI_Barrier(MPI_COMM_WORLD);
@@ -358,15 +358,15 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         // num_z: how many planes on processor 'ip'
         int *num_z = new int[GlobalV::NPROC_IN_POOL];
         ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-        //for (int iz=0;iz<pw.ncz;iz++)
+        //for (int iz=0;iz<GlobalC::pw.ncz;iz++)
         //{
         //    int ip = iz % GlobalV::NPROC_IN_POOL;
         //    num_z[ip]++;
         //}
-        for (int iz=0;iz<pw.nbz;iz++)
+        for (int iz=0;iz<GlobalC::pw.nbz;iz++)
         {
             int ip = iz % GlobalV::NPROC_IN_POOL;
-            num_z[ip] += pw.bz;
+            num_z[ip] += GlobalC::pw.bz;
         }
 
         // start_z: start position of z in
@@ -379,9 +379,9 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         }
 
         // which_ip: found iz belongs to which ip.
-        int *which_ip = new int[pw.ncz];
-        ZEROS(which_ip, pw.ncz);
-        for(int iz=0; iz<pw.ncz; iz++)
+        int *which_ip = new int[GlobalC::pw.ncz];
+        ZEROS(which_ip, GlobalC::pw.ncz);
+        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
             {
@@ -399,10 +399,10 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
             //GlobalV::ofs_running << "\n iz=" << iz << " ip=" << which_ip[iz];
         }
         int count=0;
-        int nxy = pw.ncx * pw.ncy;
+        int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
         double* zpiece = new double[nxy];
         // save the rho one z by one z.
-        for(int iz=0; iz<pw.ncz; iz++)
+        for(int iz=0; iz<GlobalC::pw.ncz; iz++)
         {
             //GlobalV::ofs_running << "\n" << iz << " iz";
             // tag must be different for different iz.
@@ -415,8 +415,8 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] ];
-                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+                    zpiece[ir] = v_elecstat[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL] ];
+                    //GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
                 }
             }
             // case 2: > first part rho: send the rho to
@@ -425,7 +425,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
             {
                 for(int ir=0; ir<nxy; ir++)
                 {
-                    zpiece[ir] = v_elecstat[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+                    zpiece[ir] = v_elecstat[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
                 }
                 MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
             }
@@ -455,20 +455,20 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
                 }
                 //ofs << "\n" << ave/nxy << " average"; 
                 */
-                for(int iy=0; iy<pw.ncy; iy++)
+                for(int iy=0; iy<GlobalC::pw.ncy; iy++)
                 {
-                    for(int ix=0; ix<pw.ncx; ix++)
+                    for(int ix=0; ix<GlobalC::pw.ncx; ix++)
                     {
                         //if(count%8==0) ofs << "\n";
                         if(count%5==0) ofs << "\n";
                         //ofs << " " << zpiece[ir];
-                        ofs << setw(17) << zpiece[ix*pw.ncy+iy];
-                        ave += zpiece[ix*pw.ncy+iy];
+                        ofs << setw(17) << zpiece[ix*GlobalC::pw.ncy+iy];
+                        ave += zpiece[ix*GlobalC::pw.ncy+iy];
                         ++count;
                     }
                 }
                 if(iz==0) ofs_ave << "\niz" << "\taverage";
-                ofs_ave << "\n" << iz << "\t" << ave/pw.ncx/pw.ncy;
+                ofs_ave << "\n" << iz << "\t" << ave/GlobalC::pw.ncx/GlobalC::pw.ncy;
             }
         }
         delete[] num_z;

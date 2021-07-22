@@ -74,39 +74,39 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 	{
 		WARNING_QUIT("read_rho","check nspin!");
 	}
-	CHECK_INT(ifs, pw.ncx);	
-	CHECK_INT(ifs, pw.ncy);	
-	CHECK_INT(ifs, pw.ncz);	
+	CHECK_INT(ifs, GlobalC::pw.ncx);	
+	CHECK_INT(ifs, GlobalC::pw.ncy);	
+	CHECK_INT(ifs, GlobalC::pw.ncz);	
 
 #ifndef __MPI
 	GlobalV::ofs_running << " Read SPIN = " << is+1 << " charge now." << endl;
-	for(int k=0; k<pw.ncz; k++)
+	for(int k=0; k<GlobalC::pw.ncz; k++)
 	{
 		// consistent with the write_rho, something is
 		// wrong.... but it works now.
-		for(int j=0; j<pw.ncy; j++)
+		for(int j=0; j<GlobalC::pw.ncy; j++)
 		{
-			for(int i=0; i<pw.ncx; i++)
+			for(int i=0; i<GlobalC::pw.ncx; i++)
 			{
-				ifs >> rho[i*pw.ncy*pw.ncz + j*pw.ncz +k];
+				ifs >> rho[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz +k];
 			}
 		}
 	}
 #else
 	
-	const int nxy = pw.ncx * pw.ncy;
+	const int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
 	double *zpiece = new double[nxy];
-	for(int iz=0; iz<pw.ncz; iz++)
+	for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 	{
 		ZEROS(zpiece, nxy);
 		if(GlobalV::MY_RANK==0)
 		{
 			//				GlobalV::ofs_running << " Read charge density iz=" << iz << endl;
-			for(int j=0; j<pw.ncy; j++)
+			for(int j=0; j<GlobalC::pw.ncy; j++)
 			{
-				for(int i=0; i<pw.ncx; i++)
+				for(int i=0; i<GlobalC::pw.ncx; i++)
 				{
-					ifs >> zpiece[ i*pw.ncy + j ];
+					ifs >> zpiece[ i*GlobalC::pw.ncy + j ];
 				}
 			}
 		}

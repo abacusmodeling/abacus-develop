@@ -47,14 +47,14 @@ void Cal_Test::test_memory(void)
 {
 	TITLE("Cal_Test","test_memory");
 
-	const int ngmw = Cal_Test::cal_np(pw.ggwfc2, pw.ncx, pw.ncy, pw.ncz);
-	const int ngmc = Cal_Test::cal_np(pw.ggchg, pw.ncx, pw.ncy, pw.ncz);
+	const int ngmw = Cal_Test::cal_np(GlobalC::pw.ggwfc2, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);
+	const int ngmc = Cal_Test::cal_np(GlobalC::pw.ggchg, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);
 
 	cout << " number of atoms = " << ucell.nat << endl;
 	cout << " plane wave number for wave functions = " << ngmw << endl;
 	cout << " plane wave number for chage density  = " << ngmc << endl;
 
-	mporter = Memory::calculate_mem ( pw.ncxyz, "double");
+	mporter = Memory::calculate_mem ( GlobalC::pw.ncxyz, "double");
 
 	mrho = mporter;
 	mrho_save = mrho;
@@ -95,7 +95,7 @@ void Cal_Test::test_memory(void)
 	mgg = Memory::calculate_mem( ngmc, "double");
 	mig123 = Memory::calculate_mem( ngmc*3, "int");
 	mstrucFac = Memory::calculate_mem( ucell.ntype*ngmc, "cdouble");
-	meigts123 = Memory::calculate_mem( ucell.nat * (2*pw.ncx+1+2*pw.ncy+1+2*pw.ncz+1), "cdouble");
+	meigts123 = Memory::calculate_mem( ucell.nat * (2*GlobalC::pw.ncx+1+2*GlobalC::pw.ncy+1+2*GlobalC::pw.ncz+1), "cdouble");
 
 //	cout << " Memory for "
 

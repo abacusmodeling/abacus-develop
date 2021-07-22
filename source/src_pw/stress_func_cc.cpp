@@ -33,18 +33,18 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	}
 
 	//recalculate the exchange-correlation potential
-    const auto etxc_vtxc_v = H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core);
+    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
 	const matrix vxc = std::get<2>(etxc_vtxc_v);
 
-	complex<double> * psic = new complex<double> [pw.nrxx];
+	complex<double> * psic = new complex<double> [GlobalC::pw.nrxx];
 
-	ZEROS(psic, pw.nrxx);
+	ZEROS(psic, GlobalC::pw.nrxx);
 
 	if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
 	{
-		for(ir=0;ir<pw.nrxx;ir++)
+		for(ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
 			// psic[ir] = vxc(0,ir);
 			psic[ir] = complex<double>(vxc(0, ir),  0.0);
@@ -52,18 +52,18 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	}
 	else
 	{
-		for(ir=0;ir<pw.nrxx;ir++)
+		for(ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
 			psic[ir] = 0.5 * (vxc(0, ir) + vxc(1, ir));
 		}
 	}
 
 	// to G space
-	pw.FFT_chg.FFT3D(psic, -1);
+	GlobalC::pw.FFT_chg.FFT3D(psic, -1);
 
 	//psic cantains now Vxc(G)
-	rhocg= new double [pw.nggm];
-	ZEROS(rhocg, pw.nggm);
+	rhocg= new double [GlobalC::pw.nggm];
+	ZEROS(rhocg, GlobalC::pw.nggm);
 
 	sigmadiag=0.0;
 	for(nt=0;nt<ucell.ntype;nt++)
@@ -81,14 +81,14 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 
 
 			//diagonal term 
-			if (pw.gstart==1) 
+			if (GlobalC::pw.gstart==1) 
 			{
-				sigmadiag += conj(psic [pw.ig2fftc[0]] ) * pw.strucFac (nt, 0) * rhocg [pw.ig2ngg[0] ];
+				sigmadiag += conj(psic [GlobalC::pw.ig2fftc[0]] ) * GlobalC::pw.strucFac (nt, 0) * rhocg [GlobalC::pw.ig2ngg[0] ];
 			}
-			for( ng = pw.gstart;ng< pw.ngmc;ng++)
+			for( ng = GlobalC::pw.gstart;ng< GlobalC::pw.ngmc;ng++)
 			{
-				sigmadiag +=  conj(psic[pw.ig2fftc[ng]] ) *
-					pw.strucFac (nt, ng) * rhocg [pw.ig2ngg[ng] ] * fact;
+				sigmadiag +=  conj(psic[GlobalC::pw.ig2fftc[ng]] ) *
+					GlobalC::pw.strucFac (nt, ng) * rhocg [GlobalC::pw.ig2ngg[ng] ] * fact;
 			}
 			this->deriv_drhoc (
 				ppcell.numeric,
@@ -98,16 +98,16 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 				ucell.atoms[nt].rho_atc,
 				rhocg);
 			// non diagonal term (g=0 contribution missing)
-			for( ng = pw.gstart;ng< pw.ngmc;ng++)
+			for( ng = GlobalC::pw.gstart;ng< GlobalC::pw.ngmc;ng++)
 			{
-				double norm_g = sqrt(pw.get_NormG_cartesian(ng));
+				double norm_g = sqrt(GlobalC::pw.get_NormG_cartesian(ng));
 				assert(norm_g != 0.000);
 				for (l = 0; l < 3; l++)
 				{
 					for (m = 0;m< 3;m++)
 					{
-						const complex<double> t = conj(psic[pw.ig2fftc[ng]]) * pw.strucFac(nt, ng) * rhocg[pw.ig2ngg[ng]] * ucell.tpiba *
-												  pw.get_G_cartesian_projection(ng, l) * pw.get_G_cartesian_projection(ng, m) 
+						const complex<double> t = conj(psic[GlobalC::pw.ig2fftc[ng]]) * GlobalC::pw.strucFac(nt, ng) * rhocg[GlobalC::pw.ig2ngg[ng]] * ucell.tpiba *
+												  GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) 
 												  / norm_g * fact;
 						//						sigmacc [l][ m] += t.real();
 						sigma(l,m) += t.real();
@@ -163,7 +163,7 @@ void Stress_Func::deriv_drhoc
 	//
 	// G=0 term
 	//
-	if (pw.ggs[0] < 1.0e-8)
+	if (GlobalC::pw.ggs[0] < 1.0e-8)
 	{
 		drhocg [0] = 0.0;
 		igl0 = 1;
@@ -176,9 +176,9 @@ void Stress_Func::deriv_drhoc
 	// G <> 0 term
 	//
 	
-	for(int igl = igl0;igl< pw.nggm;igl++)
+	for(int igl = igl0;igl< GlobalC::pw.nggm;igl++)
 	{
-		gx = sqrt(pw.ggs [igl] * ucell.tpiba2);
+		gx = sqrt(GlobalC::pw.ggs [igl] * ucell.tpiba2);
 		for( int ir = 0;ir< mesh; ir++)
 		{
 			aux [ir] = r [ir] * rhoc [ir] * (r [ir] * cos (gx * r [ir] ) / gx - sin (gx * r [ir] ) / pow(gx,2));

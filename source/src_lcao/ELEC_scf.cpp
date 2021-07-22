@@ -27,7 +27,7 @@ void ELEC_scf::scf(const int &istep)
 
 	// (1) calculate ewald energy.
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell,pw);
+	H_Ewald_pw::compute_ewald(ucell, GlobalC::pw);
 
 	// mohan add 2012-02-08
     set_ethr();
@@ -37,7 +37,7 @@ void ELEC_scf::scf(const int &istep)
 	Symmetry_rho srho;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, CHR, pw, Pgrid, symm);
+		srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 	}
 
 //	cout << scientific;
@@ -379,7 +379,7 @@ void ELEC_scf::scf(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR, pw, Pgrid, symm);
+			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 		}
 
 		// (6) compute magnetization, only for spin==2

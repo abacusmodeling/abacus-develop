@@ -43,7 +43,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
 		this->calculate_STNR_k();
 
 		// calculate the grid integration of 'Vl' matrix for l-points algorithms.
-		this->GK.init(pw.nbx, pw.nby, pw.nbzp, pw.nbzp_start, pw.ncxyz);
+		this->GK.init(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz);
 
 	}
 

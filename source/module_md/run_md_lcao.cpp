@@ -39,13 +39,13 @@ void Run_MD_LCAO::opt_cell(void)
 
     // output is ppcell.vloc 3D local pseudopotentials
     // this function belongs to cell LOOP
-    ppcell.init_vloc(pw.nggm, ppcell.vloc);
+    ppcell.init_vloc(GlobalC::pw.nggm, ppcell.vloc);
 
     // Initialize the sum of all local potentials.
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step=0;
-    pot.init_pot(ion_step, pw.strucFac);
+    pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 	
 	opt_ions();
@@ -185,7 +185,7 @@ void Run_MD_LCAO::opt_ions(void)
 		}
 		else
 		{
-			pot.init_pot( istep, pw.strucFac );
+			pot.init_pot( istep, GlobalC::pw.strucFac );
 		}
 
 
@@ -249,10 +249,10 @@ void Run_MD_LCAO::final_scf(void)
 		GlobalV::test_atom_input);
 
     GridT.set_pbc_grid(
-        pw.ncx, pw.ncy, pw.ncz,
-        pw.bx, pw.by, pw.bz,
-        pw.nbx, pw.nby, pw.nbz,
-        pw.nbxx, pw.nbzp_start, pw.nbzp);
+        GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+        GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
+        GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
+        GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
     if(!GlobalV::GAMMA_ONLY_LOCAL)

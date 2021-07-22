@@ -446,7 +446,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					if(Coordinate=="Direct")
 					{
 						// change v from direct to cartesian,
-						// the unit is pw.lat0
+						// the unit is GlobalC::pw.lat0
 						atoms[it].taud[ia] = v;
 						atoms[it].tau[ia] = v * latvec;
 					}

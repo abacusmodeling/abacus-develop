@@ -21,7 +21,7 @@ void Potential::set_vrs_tddft(const int istep)
         //const int timescale = 1;  // get the time that vext influences;
         if (istep >= ELEC_evolve::td_timescale)
         {
-            for (int i = 0;i < pw.nrxx;i++)
+            for (int i = 0;i < GlobalC::pw.nrxx;i++)
             {
                 this->vr_eff(is, i) = this->vltot[i] + this->vr(is, i);
             }
@@ -29,62 +29,62 @@ void Potential::set_vrs_tddft(const int istep)
         }
         else
         {
-            this->vextold = new double[pw.nrxx];
-            this->vext = new double[pw.nrxx];
-            const int yz = pw.ncy*pw.nczp;
+            this->vextold = new double[GlobalC::pw.nrxx];
+            this->vext = new double[GlobalC::pw.nrxx];
+            const int yz = GlobalC::pw.ncy*GlobalC::pw.nczp;
             int index, i, j, k;
 
-            for(int ir=0; ir<pw.nrxx; ++ir)
+            for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
             {
                 index = ir;
                 i     = index / yz; // get the z, z is the fastest
                 index = index - yz * i;// get (x,y)
-                j     = index / pw.nczp;// get y
-                k     = index - pw.nczp*j + pw.nczp_start;// get x
+                j     = index / GlobalC::pw.nczp;// get y
+                k     = index - GlobalC::pw.nczp*j + GlobalC::pw.nczp_start;// get x
 
                 if(ELEC_evolve::td_vext_dire == 1)
                 {
-                    if (k<pw.ncx*0.05) 
+                    if (k<GlobalC::pw.ncx*0.05) 
 					{
-						this->vextold[ir] = (0.019447*k/pw.ncx-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*k/GlobalC::pw.ncx-0.001069585)*ucell.lat0;
 					}
-                    else if (k>=pw.ncx*0.05 && k<pw.ncx*0.95) 
+                    else if (k>=GlobalC::pw.ncx*0.05 && k<GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = -0.0019447*k/pw.ncx*ucell.lat0;
+						this->vextold[ir] = -0.0019447*k/GlobalC::pw.ncx*ucell.lat0;
 					}
-                    else if (k>=pw.ncx*0.95) 
+                    else if (k>=GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = (0.019447*(1.0*k/pw.ncx-1)-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*k/GlobalC::pw.ncx-1)-0.001069585)*ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 2)
                 {
-                    if (j<pw.ncx*0.05) 
+                    if (j<GlobalC::pw.ncx*0.05) 
 					{
-						this->vextold[ir] = (0.019447*j/pw.ncx-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*j/GlobalC::pw.ncx-0.001069585)*ucell.lat0;
 					}
-                    else if (j>=pw.ncx*0.05 && j<pw.ncx*0.95)	
+                    else if (j>=GlobalC::pw.ncx*0.05 && j<GlobalC::pw.ncx*0.95)	
 					{
-						this->vextold[ir] = -0.0019447*j/pw.ncx*ucell.lat0;
+						this->vextold[ir] = -0.0019447*j/GlobalC::pw.ncx*ucell.lat0;
 					}
-                    else if (j>=pw.ncx*0.95) 
+                    else if (j>=GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = (0.019447*(1.0*j/pw.ncx-1)-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*j/GlobalC::pw.ncx-1)-0.001069585)*ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 3)
                 {
-                    if (i<pw.ncx*0.05) 
+                    if (i<GlobalC::pw.ncx*0.05) 
 					{
-						this->vextold[ir] = (0.019447*i/pw.ncx-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*i/GlobalC::pw.ncx-0.001069585)*ucell.lat0;
 					}
-                    else if (i>=pw.ncx*0.05 && i<pw.ncx*0.95) 
+                    else if (i>=GlobalC::pw.ncx*0.05 && i<GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = -0.0019447*i/pw.ncx*ucell.lat0;
+						this->vextold[ir] = -0.0019447*i/GlobalC::pw.ncx*ucell.lat0;
 					}
-                    else if (i>=pw.ncx*0.95) 
+                    else if (i>=GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = (0.019447*(1.0*i/pw.ncx-1)-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*i/GlobalC::pw.ncx-1)-0.001069585)*ucell.lat0;
 					}
                 }
 

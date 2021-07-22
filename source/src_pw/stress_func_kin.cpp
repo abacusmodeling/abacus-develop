@@ -37,9 +37,9 @@ void Stress_Func::stress_kin(matrix& sigma)
 		npw = GlobalC::kv.ngk[ik];
 		for(int i=0;i<npw;i++)
 		{
-			gk[0][i] = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 0) * factor;
-			gk[1][i] = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 1) * factor;
-			gk[2][i] = pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 2) * factor;
+			gk[0][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 0) * factor;
+			gk[1][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 1) * factor;
+			gk[2][i] = GlobalC::pw.get_GPlusK_cartesian_projection(ik, wf.igk(ik, i), 2) * factor;
 		}
 
 		//kinetic contribution

@@ -929,7 +929,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	int istep = 1;
 
 	// if Vna potential is not used.
-	pot.init_pot(istep, pw.strucFac);
+	pot.init_pot(istep, GlobalC::pw.strucFac);
 
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
@@ -940,7 +940,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 //		ZEROS (LM.DHloc_fixedR_z, LNNR.nnr);
 //		cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
 		}
