@@ -61,132 +61,140 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         Numerical_Basis::init_label = true;
     }
 
-    ofstream ofs;
-    stringstream ss;
-    // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/" << ucell.latName << "." << ucell.lat0 << ".dat";
-    if (MY_RANK==0)
-    {
-        ofs.open(ss.str().c_str());
-    }
+	for(int derivative_order=0; derivative_order<=1; ++derivative_order)            // Peize Lin add 2020.04.23
+	{
+        ofstream ofs;
+        stringstream ss;
+        // the parameter 'winput::spillage_outdir' is read from INPUTw.
+        ss << winput::spillage_outdir << "/" << ucell.latName << "." << derivative_order << ".dat";
+        if (MY_RANK==0)
+        {
+            ofs.open(ss.str().c_str());
+        }
 
-    const int nks = kv.nks;
-    const int ne = Numerical_Basis::bessel_basis.get_ecut_number();
+        const int nks = kv.nks;
+        const int ne = Numerical_Basis::bessel_basis.get_ecut_number();
 
-	// OVERLAP : < J_mu | Psi >
-    realArray overlap_Q1(nks, NBANDS, NLOCAL, ne );
-    realArray overlap_Q2(nks, NBANDS, NLOCAL, ne );
+        // OVERLAP : < J_mu | Psi >
+        realArray overlap_Q1(nks, NBANDS, NLOCAL, ne );
+        realArray overlap_Q2(nks, NBANDS, NLOCAL, ne );
 
-	// OVERLAP : < J_mu | J_nu >
-    realArray *Sq_real = new realArray[nks];
-    realArray *Sq_imag = new realArray[nks];
+        // OVERLAP : < J_mu | J_nu >
+        realArray *Sq_real = new realArray[nks];
+        realArray *Sq_imag = new realArray[nks];
 
-    // (1) allocate Sq matrix.
-    if (winput::out_spillage == 2)
-    {
-        for (int ik=0; ik<nks; ik++) Sq_real[ik].create( NLOCAL, NLOCAL, ne, ne );
-        for (int ik=0; ik<nks; ik++) Sq_imag[ik].create( NLOCAL, NLOCAL, ne, ne );
-    }
-
-    ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
-    ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
-
-    for (int ik=0; ik<nks; ik++)
-    {
-        ZEROS(Sq_real[ik].ptr, Sq_real[ik].getSize() );
-        ZEROS(Sq_imag[ik].ptr, Sq_imag[ik].getSize() );
-    }
-
-	OUT(ofs_running,"number of k points",overlap_Q1.getBound1());
-	OUT(ofs_running,"number of bands",overlap_Q1.getBound2());
-	OUT(ofs_running,"number of local orbitals",overlap_Q1.getBound3());
-	OUT(ofs_running,"number of eigenvalues of Jl(x)",overlap_Q1.getBound4());
-
-    // nks now is the reduced k-points.
-    for (int ik=0; ik<nks; ik++)
-    {
-        const int npw= kv.ngk[ik];
-		ofs_running << " --------------------------------------------------------" << endl;
-		ofs_running << " Print the overlap matrixs Q and S for this kpoint";
-        ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";
-        ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << endl;
-		ofs_running << " --------------------------------------------------------" << endl;
-        // search for all k-points.
-        this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
-        DONE(ofs_running,"jlq3d_overlap");
-
-        // (2) generate Sq matrix if necessary.
+        // (1) allocate Sq matrix.
         if (winput::out_spillage == 2)
         {
-            this->Sq_overlap( Sq_real[ik], Sq_imag[ik], ik, npw );
-            DONE(ofs_running,"Sq_overlap");
+            for (int ik=0; ik<nks; ik++) Sq_real[ik].create( NLOCAL, NLOCAL, ne, ne );
+            for (int ik=0; ik<nks; ik++) Sq_imag[ik].create( NLOCAL, NLOCAL, ne, ne );
         }
-    }
 
-#ifdef __MPI
-    Parallel_Reduce::reduce_double_pool( overlap_Q1.ptr, overlap_Q1.getSize() );
-    Parallel_Reduce::reduce_double_pool( overlap_Q2.ptr, overlap_Q2.getSize() );
-    for (int ik=0; ik<nks; ik++)
-    {
-        Parallel_Reduce::reduce_double_pool( Sq_real[ik].ptr, Sq_real[ik].getSize() );
-        Parallel_Reduce::reduce_double_pool( Sq_imag[ik].ptr, Sq_imag[ik].getSize() );
-    }
-#endif
+        ZEROS(overlap_Q1.ptr, overlap_Q1.getSize() );
+        ZEROS(overlap_Q2.ptr, overlap_Q2.getSize() );
 
-	// only print out to the information by the first processor
-    if (MY_RANK==0)
-    {
-        ofs.precision(10);
-        ofs << ucell.lat0 << endl;
-
-        ofs << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-        ofs << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-        ofs << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
-
-        ofs << ucell.ntype << " ntype" << endl;
-        for (int it=0; it<ucell.ntype; it++)
+        for (int ik=0; ik<nks; ik++)
         {
-            ofs << ucell.atoms[it].label << " label" << endl; // mohan add 2009-07-23
-            ofs << ucell.atoms[it].na << " na" << endl;
-            for (int ia=0; ia<ucell.atoms[it].na; ia++)
+            ZEROS(Sq_real[ik].ptr, Sq_real[ik].getSize() );
+            ZEROS(Sq_imag[ik].ptr, Sq_imag[ik].getSize() );
+        }
+
+        OUT(ofs_running,"number of k points",overlap_Q1.getBound1());
+        OUT(ofs_running,"number of bands",overlap_Q1.getBound2());
+        OUT(ofs_running,"number of local orbitals",overlap_Q1.getBound3());
+        OUT(ofs_running,"number of eigenvalues of Jl(x)",overlap_Q1.getBound4());
+
+        // nks now is the reduced k-points.
+        for (int ik=0; ik<nks; ik++)
+        {
+            const int npw= kv.ngk[ik];
+            ofs_running << " --------------------------------------------------------" << endl;
+            ofs_running << " Print the overlap matrixs Q and S for this kpoint";
+            ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";
+            ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << endl;
+            ofs_running << " --------------------------------------------------------" << endl;
+            // search for all k-points.
+            this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik], derivative_order);
+            DONE(ofs_running,"jlq3d_overlap");
+
+            // (2) generate Sq matrix if necessary.
+            if (winput::out_spillage == 2)
             {
-                ofs << ucell.atoms[it].tau[ia].x
-                << " " << ucell.atoms[it].tau[ia].y
-                << " " << ucell.atoms[it].tau[ia].z << endl;
+                this->Sq_overlap( Sq_real[ik], Sq_imag[ik], ik, npw, derivative_order );
+                DONE(ofs_running,"Sq_overlap");
             }
         }
-        // ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
-        ofs << pw.ecutwfc << " ecutwfc" << endl; // mohan add 2009-09-08
 
-        // this parameter determine the total number of jlq.
-        ofs << Numerical_Basis::bessel_basis.get_ecut() << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
-        ofs << Numerical_Basis::bessel_basis.get_rcut() << " rcut_Jlq" << endl;
+        const matrix overlap_V = this->psi_overlap(psi, derivative_order);		// Peize Lin add 2020.04.23
 
-        // mohan add 'smooth' and 'sigma' 2009-08-28
-        ofs << Numerical_Basis::bessel_basis.get_smooth() << " smooth" << endl;
-        ofs << Numerical_Basis::bessel_basis.get_sigma() << " sigma" << endl;
+    #ifdef __MPI
+        Parallel_Reduce::reduce_double_pool( overlap_Q1.ptr, overlap_Q1.getSize() );
+        Parallel_Reduce::reduce_double_pool( overlap_Q2.ptr, overlap_Q2.getSize() );
+        for (int ik=0; ik<nks; ik++)
+        {
+            Parallel_Reduce::reduce_double_pool( Sq_real[ik].ptr, Sq_real[ik].getSize() );
+            Parallel_Reduce::reduce_double_pool( Sq_imag[ik].ptr, Sq_imag[ik].getSize() );
+        }
+        Parallel_Reduce::reduce_double_pool(overlap_V.c, overlap_V.nr*overlap_V.nc);		// Peize Lin add 2020.04.23
+    #endif
 
-        ofs << Numerical_Basis::bessel_basis.get_tolerence() << " tolerence" << endl;
+        // only print out to the information by the first processor
+        if (MY_RANK==0)
+        {
+            ofs.precision(10);
+            ofs << ucell.lat0 << endl;
 
-        ofs << ucell.lmax << " lmax" << endl;
+            ofs << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
+            ofs << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
+            ofs << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+
+            ofs << ucell.ntype << " ntype" << endl;
+            for (int it=0; it<ucell.ntype; it++)
+            {
+                ofs << ucell.atoms[it].label << " label" << endl; // mohan add 2009-07-23
+                ofs << ucell.atoms[it].na << " na" << endl;
+                for (int ia=0; ia<ucell.atoms[it].na; ia++)
+                {
+                    ofs << ucell.atoms[it].tau[ia].x
+                    << " " << ucell.atoms[it].tau[ia].y
+                    << " " << ucell.atoms[it].tau[ia].z << endl;
+                }
+            }
+            // ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
+            ofs << pw.ecutwfc << " ecutwfc" << endl; // mohan add 2009-09-08
+
+            // this parameter determine the total number of jlq.
+            ofs << Numerical_Basis::bessel_basis.get_ecut() << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
+            ofs << Numerical_Basis::bessel_basis.get_rcut() << " rcut_Jlq" << endl;
+
+            // mohan add 'smooth' and 'sigma' 2009-08-28
+            ofs << Numerical_Basis::bessel_basis.get_smooth() << " smooth" << endl;
+            ofs << Numerical_Basis::bessel_basis.get_sigma() << " sigma" << endl;
+
+            ofs << Numerical_Basis::bessel_basis.get_tolerence() << " tolerence" << endl;
+
+            ofs << ucell.lmax << " lmax" << endl;
+        }
+
+        ofs << scientific;
+
+        ofs << setprecision(8);
+        // NOTICE: ofs_warning << "\n The precison may affect the optimize result.";
+        
+        this->output_overlap_Q( ofs, overlap_Q1, overlap_Q2 );
+
+        if (winput::out_spillage == 2)
+        {
+            this->output_overlap_Sq(ss.str(), ofs, Sq_real, Sq_imag);
+        }
+
+        this->output_overlap_V(ofs, overlap_V);		// Peize Lin add 2020.04.23
+
+        delete[] Sq_real;
+        delete[] Sq_imag;
+
+        if (MY_RANK==0) ofs.close();
     }
-
-    ofs << scientific;
-
-    ofs << setprecision(8);
-    // NOTICE: ofs_warning << "\n The precison may affect the optimize result.";
-    
-    this->output_overlap_Q( ofs, overlap_Q1, overlap_Q2 );
-
-    if (winput::out_spillage == 2)
-    {
-        this->output_overlap_Sq(ss.str(), ofs, Sq_real, Sq_imag);
-    }
-
-    delete[] Sq_real;
-    delete[] Sq_imag;
-
-    if (MY_RANK==0) ofs.close();
     return;
 }
 
@@ -378,11 +386,25 @@ void Numerical_Basis::output_overlap_Q(
     return;
 }
 
+// Peize Lin add 2020.04.23
+void Numerical_Basis::output_overlap_V(
+    ofstream &ofs,
+	const matrix &overlap_V) const
+{
+	if (MY_RANK==0)
+    {
+        ofs << "\n<OVERLAP_V>" <<endl;;
+		ofs << overlap_V;
+		ofs << "</OVERLAP_V>" <<endl;
+	}
+}
+
 void Numerical_Basis::Sq_overlap(
     realArray &Sq_real,
     realArray &Sq_imag,
     const int &ik,
-    const int &np)
+    const int &np,
+	const int derivative_order)
 {
     TITLE("Numerical_Basis","Sq_overlap");
     timer::tick("Numerical_Basis","Sq_overlap");
@@ -465,7 +487,8 @@ void Numerical_Basis::Sq_overlap(
                                         const int lm = l*l+m;
                                         for (int ig=0; ig<np; ig++)
                                         {
-                                            about_ig[ig] = conj( lphase * sk[ig] * ylm(lm, ig) );
+//                                          about_ig[ig] = conj( lphase * sk[ig] * ylm(lm, ig) );
+                                            about_ig[ig] = conj( lphase * sk[ig] * ylm(lm, ig) ) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
                                         }
                                         for (int m2=0; m2<2*l2+1; m2++) // 2.6
                                         {
@@ -514,7 +537,8 @@ void Numerical_Basis::jlq3d_overlap(
     const int &ik_ibz,
     const int &ik,
     const int &np,
-    const ComplexMatrix &psi)
+    const ComplexMatrix &psi,
+	const int derivative_order)
 {
     TITLE("Numerical_Basis","jlq3d_overlap");
     timer::tick("Numerical_Basis","jlq3d_overlap");
@@ -542,7 +566,6 @@ void Numerical_Basis::jlq3d_overlap(
 	<< endl;
 
     double *flq = new double[np];
-    complex<double> overlapQ = ZERO;
     for (int T1 = 0; T1 < ucell.ntype; T1++)
     {
         //OUT("T1",T1);
@@ -577,7 +600,8 @@ void Numerical_Basis::jlq3d_overlap(
                             complex<double> overlap_tmp = ZERO;
                             for (int ig=0; ig<np; ig++)
                             {
-                                const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
+//                              const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
+                                const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig] * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
                                 overlap_tmp += conj( local_tmp ) * psi(ib, ig); // psi is bloch orbitals
                             }
                             overlap_Q1(ik_ibz, ib, mu_index[T1](I1, L, N, m), ie) = overlap_tmp.real();
@@ -594,6 +618,25 @@ void Numerical_Basis::jlq3d_overlap(
     delete[] gk;
     timer::tick("Numerical_Basis","jlq3d_overlap");
     return;
+}
+
+// Peize Lin add for dpsi 2020.04.23
+matrix Numerical_Basis::psi_overlap(
+	const ComplexMatrix *psi,
+	const int derivative_order) const
+{
+	matrix overlap_V(kv.nks, NBANDS);
+	for(int ik=0; ik<kv.nks; ++ik)
+	{
+		for(int ib=0; ib<NBANDS; ++ib)
+		{
+			for(int ig=0; ig<kv.ngk[ik]; ++ig)
+			{
+				overlap_V(ik,ib)+= norm(psi[ik](ib,ig)) * pow(wf.get_1qvec_cartesian(ik,ig).norm2(),derivative_order);
+			}
+		}
+	}
+	return overlap_V;
 }
 
 void Numerical_Basis::init_mu_index(void)
@@ -653,7 +696,6 @@ void Numerical_Basis::numerical_atomic_wfc(
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
-    int index = 0;
     double *flq = new double[np];
     for (int it = 0; it < ucell.ntype; it++)
     {
