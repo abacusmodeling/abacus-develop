@@ -34,11 +34,11 @@ public:
 
     double get_onebody_eff_pot
     (
-        const int T, const int iat,
+      const int T, const int iat,
 	    const int L, const int N, const int spin, 
 	    const int m0,
-        const int m1,
-        const int type, const bool newlocale
+      const int m1,
+      const int type, const bool newlocale
     );
 
     //forces and stress
