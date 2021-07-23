@@ -137,6 +137,10 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 			ifa >> latvec.e31 >> latvec.e32;
 			READ_VALUE(ifa, latvec.e33);
 		}
+		if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+		{
+			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_PARAMETERS without explicit specification of lattice type");
+		}
 	}//supply lattice vectors
 	else{
 		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
