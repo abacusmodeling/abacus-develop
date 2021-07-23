@@ -11,7 +11,7 @@ const matrix &Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 matrix Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 	const ComplexMatrix &DK, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return (DK * exp( -TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*ucell.latvec)) )).real();
+	return (DK * exp( -TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) )).real();
 }
 
 
@@ -47,13 +47,13 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<Tmatrix> &DK_2D, const
 			for(int iwt1_local=0; iwt1_local!=DR_2D[is_2D].nr; ++iwt1_local)
 			{
 				const int iwt1 = ParaO.MatrixInfo.col_set[iwt1_local];
-				const int iat1 = ucell.iwt2iat[iwt1];
-				const int iw1 = ucell.iwt2iw[iwt1];
+				const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
+				const int iw1 = GlobalC::ucell.iwt2iw[iwt1];
 				for(int iwt2_local=0; iwt2_local!=DR_2D[is_2D].nc; ++iwt2_local)
 				{
 					const int iwt2 = ParaO.MatrixInfo.row_set[iwt2_local];
-					const int iat2 = ucell.iwt2iat[iwt2];
-					const int iw2 = ucell.iwt2iw[iwt2];
+					const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
+					const int iw2 = GlobalC::ucell.iwt2iw[iwt2];
 					
 					int is_R=is_2D, iw1_R=iw1, iw2_R=iw2;
 					if(GlobalV::NSPIN==4)
@@ -64,7 +64,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<Tmatrix> &DK_2D, const
 					}
 					matrix &DR_a2D_tmp = DR_a2D_box2[is_R][iat1][iat2];
 					if(!DR_a2D_tmp.c)
-						DR_a2D_tmp.create(ucell.atoms[ucell.iat2it[iat1]].nw, ucell.atoms[ucell.iat2it[iat2]].nw);
+						DR_a2D_tmp.create(GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
 					DR_a2D_tmp(iw1_R,iw2_R) = DR_2D[is_2D](iwt1_local,iwt2_local) * SPIN_multiple.at(GlobalV::NSPIN);
 				}
 			}

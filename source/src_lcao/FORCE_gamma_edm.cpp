@@ -678,7 +678,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
+            const int iat = GlobalC::ucell.iwt2iat[i];
             for(int j=0; j<GlobalV::NLOCAL; j++)
             {
                 const int mu = ParaO.trace_loc_row[j];
@@ -733,7 +733,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
+            const int iat = GlobalC::ucell.iwt2iat[i];
             for(int j=0; j<GlobalV::NLOCAL; j++)
             {
                 const int mu = ParaO.trace_loc_row[j];
@@ -784,7 +784,7 @@ void Force_LCAO_gamma::cal_foverlap(
             for(int j=0;j<3;j++)
             {
                 if(i<j) soverlap(j,i) = soverlap(i,j);
-				soverlap(i,j) *=  ucell.lat0 / ucell.omega;
+				soverlap(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
             }
         }
     }

@@ -138,7 +138,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 							double qm1; 
 							if(qvec.norm() > 1e-8) qm1 = 1.0 / qvec.norm();
 							else qm1 = 0;
-							dbecp(i,ib) +=  -2.0 * GlobalC::wf.evc[ik](ib,ig) * conj(vkb2(i,ig)) * qvec0[ipol] * qvec0[jpol] * qm1 * ucell.tpiba;
+							dbecp(i,ib) +=  -2.0 * GlobalC::wf.evc[ik](ib,ig) * conj(vkb2(i,ig)) * qvec0[ipol] * qvec0[jpol] * qm1 * GlobalC::ucell.tpiba;
 						}//end ig
 					}//end i
 				}//end ib
@@ -147,17 +147,17 @@ void Stress_Func::stress_nl(matrix& sigma){
 //              and at last sum up all the forces.
 //              Parallel_Reduce::reduce_complex_double_pool( dbecp.ptr, dbecp.ndata);
 
-//              double *cf = new double[ucell.nat*3];
-//              ZEROS(cf, ucell.nat);
+//              double *cf = new double[GlobalC::ucell.nat*3];
+//              ZEROS(cf, GlobalC::ucell.nat);
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
 					double fac = GlobalC::wf.wg(ik, ib) * 1.0;
 					int iat = 0;
 					int sum = 0;
-					for (int it=0; it<ucell.ntype; it++)
+					for (int it=0; it<GlobalC::ucell.ntype; it++)
 					{
-						const int Nprojs = ucell.atoms[it].nh;
-						for (int ia=0; ia<ucell.atoms[it].na; ia++)
+						const int Nprojs = GlobalC::ucell.atoms[it].nh;
+						for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 						{
 							for (int ip=0; ip<Nprojs; ip++)
 							{
@@ -196,7 +196,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 	{
 		for(int jpol = 0; jpol < 3; jpol++)
 		{
-			sigmanlc[ipol][jpol] *= 1.0 / ucell.omega;
+			sigmanlc[ipol][jpol] *= 1.0 / GlobalC::ucell.omega;
 		}
 	}
 	
@@ -210,7 +210,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 	//do symmetry
 	if(Symmetry::symm_flag)
 	{
-		symm.stress_symmetry(sigma, ucell);
+		symm.stress_symmetry(sigma, GlobalC::ucell);
 	}//end symmetry
 	
 	//  this->print(GlobalV::ofs_running, "nonlocal stress", stresnl);
@@ -251,12 +251,12 @@ void Stress_Func::get_dvnl1
 	dylmr2(x1, npw, gk, dylm, ipol);
 
 	int jkb = 0;
-	for(int it = 0;it < ucell.ntype;it++)
+	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
 		if(GlobalV::test_pp>1) OUT("it",it);
 		// calculate beta in G-space using an interpolation table
-		const int nbeta = ucell.atoms[it].nbeta;
-		const int nh = ucell.atoms[it].nh;
+		const int nbeta = GlobalC::ucell.atoms[it].nbeta;
+		const int nh = GlobalC::ucell.atoms[it].nh;
 
 		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
 
@@ -265,7 +265,7 @@ void Stress_Func::get_dvnl1
 			if(GlobalV::test_pp>1) OUT("ib",nb);
 			for (ig = 0;ig < npw;ig++)
 			{
-				const double gnorm = gk[ig].norm() * ucell.tpiba;
+				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
 
 				//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 				//cout << "\n gk.norm = " << gnorm;
@@ -294,7 +294,7 @@ void Stress_Func::get_dvnl1
 
 		// vkb1 contains all betas including angular part for type nt
 		// now add the structure factor and factor (-i)^l
-		for (ia=0; ia<ucell.atoms[it].na; ia++)
+		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
@@ -342,12 +342,12 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 	YlmReal::Ylm_Real(x1, npw, gk, ylm);
 
 	int jkb = 0;
-	for(int it = 0;it < ucell.ntype;it++)
+	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
 		if(GlobalV::test_pp>1) OUT("it",it);
 		// calculate beta in G-space using an interpolation table
-		const int nbeta = ucell.atoms[it].nbeta;
-		const int nh = ucell.atoms[it].nh;
+		const int nbeta = GlobalC::ucell.atoms[it].nbeta;
+		const int nh = GlobalC::ucell.atoms[it].nh;
 
 		if(GlobalV::test_pp>1) OUT("nbeta",nbeta);
 
@@ -356,7 +356,7 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 			if(GlobalV::test_pp>1) OUT("ib",nb);
 			for (ig = 0;ig < npw;ig++)
 			{
-				const double gnorm = gk[ig].norm() * ucell.tpiba;
+				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
 	//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
 	//cout << "\n gk.norm = " << gnorm;
 				vq [ig] = Polynomial_Interpolation_nl(
@@ -380,7 +380,7 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 
 		// vkb1 contains all betas including angular part for type nt
 		// now add the structure factor and factor (-i)^l
-		for (ia=0; ia<ucell.atoms[it].na; ia++)
+		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)

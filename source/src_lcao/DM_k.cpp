@@ -127,8 +127,8 @@ inline void cal_DM_ATOM(
             complex<double> *DM=&DM_ATOM[ispin][atom2start];
             const int T2 = RA.info[ia1][ia2][3];
             const int I2 = RA.info[ia1][ia2][4];
-            Atom* atom2 = &ucell.atoms[T2];
-            const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+            Atom* atom2 = &GlobalC::ucell.atoms[T2];
+            const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
             const int iw2_lo=gt.trace_lo[start2];
             const int nw2=atom2->nw;
             complex<double> exp_R= exp( fac * (
@@ -208,8 +208,8 @@ inline void cal_DM_ATOM_nc(
                     complex<double> *DM=&DM_ATOM[ispin][atom2start];
                     const int T2 = RA.info[ia1][ia2][3];
                     const int I2 = RA.info[ia1][ia2][4];
-                    Atom* atom2 = &ucell.atoms[T2];
-                    const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+                    Atom* atom2 = &GlobalC::ucell.atoms[T2];
+                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
                     const int iw2_lo=gt.trace_lo[start2]/GlobalV::NPOL + gt.lgd/GlobalV::NPOL*is2;
                     const int nw2=atom2->nw;
                     complex<double> exp_R= exp( fac * (
@@ -270,7 +270,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     int ca = 0;
     complex<double> fac = TWO_PI * IMAG_UNIT;
 
-    complex<double> *WFC_PHASE=new complex<double>[GlobalV::NLOCAL*ucell.nwmax];
+    complex<double> *WFC_PHASE=new complex<double>[GlobalV::NLOCAL*GlobalC::ucell.nwmax];
     
     int DM_ATOM_SIZE=1; 
     complex<double> **DM_ATOM=new complex<double> *[GlobalV::NSPIN];
@@ -280,15 +280,15 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
         DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
         ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
     }
-    for(int T1=0; T1<ucell.ntype; T1++)
+    for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
         for(int I1=0; I1<atom1->na; I1++)
         {
-            const int iat = ucell.itia2iat(T1,I1);
+            const int iat = GlobalC::ucell.itia2iat(T1,I1);
             if(gt.in_this_processor[iat])
             {
-                const int start1 = ucell.itiaiw2iwt(T1,I1,0);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
                 const int gstart = LNNR.nlocstartg[iat];
                 const int ng = LNNR.nlocdimg[iat];
                 const int iw1_lo=gt.trace_lo[start1]/GlobalV::NPOL;

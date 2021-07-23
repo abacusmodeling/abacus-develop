@@ -57,11 +57,11 @@ inline void cal_psir_ylm(
 		at[id]=iat;
 		uc[id]=GridT.which_unitcell[mcell_index];
 		
-		const int it=ucell.iat2it[iat];
-		const int ia=ucell.iat2ia[iat];
-		const int start=ucell.itiaiw2iwt(it, ia, 0);
+		const int it=GlobalC::ucell.iat2it[iat];
+		const int ia=GlobalC::ucell.iat2ia[iat];
+		const int start=GlobalC::ucell.itiaiw2iwt(it, ia, 0);
 		block_iw[id]=GridT.trace_lo[start]/GlobalV::NPOL;
-		Atom* atom=&ucell.atoms[it];
+		Atom* atom=&GlobalC::ucell.atoms[it];
 		block_size[id]=atom->nw;
 		block_index[id+1]=block_index[id]+atom->nw;
 		// meshball_positions should be the bigcell position in meshball
@@ -97,7 +97,7 @@ inline void cal_psir_ylm(
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance < 1.0E-9) distance += 1.0E-9;
 			
-			Ylm::sph_harm (	ucell.atoms[it].nwl,
+			Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 					dr[0] / distance,
 					dr[1] / distance,
 					dr[2] / distance,
@@ -167,7 +167,7 @@ inline void cal_band_rho(
 			const int R1x = GridT.ucell_index2x[id1];
 			const int R1y = GridT.ucell_index2y[id1];
 			const int R1z = GridT.ucell_index2z[id1];
-			const int T1 = ucell.iat2it[iat1];
+			const int T1 = GlobalC::ucell.iat2it[iat1];
 			int* find_start = LNNR.find_R2[iat1];
 			int* find_end = LNNR.find_R2[iat1] + LNNR.nad[iat1];
 			//ia2==ia1
@@ -276,7 +276,7 @@ inline void cal_band_rho(
 				{
     				const int iw2_lo=block_iw[ia2];
     				const int iat2=at[ia2];
-    				const int T2 = ucell.iat2it[iat2];
+    				const int T2 = GlobalC::ucell.iat2it[iat2];
     				
     				// find offset
     				const int id2=uc[ia2];
@@ -325,7 +325,7 @@ inline void cal_band_rho(
 				{
     				const int iw2_lo=block_iw[ia2];
     				const int iat2=at[ia2];
-    				const int T2 = ucell.iat2it[iat2];
+    				const int T2 = GlobalC::ucell.iat2it[iat2];
     				
     				// find offset
     				const int id2=uc[ia2];
@@ -411,7 +411,7 @@ void Gint_k::cal_rho_k(void)
 	int* vindex;	
 	bool** cal_flag;
 	//int** AllOffset;
-	int LD_pool=max_size*ucell.nwmax;
+	int LD_pool=max_size*GlobalC::ucell.nwmax;
 
     if(max_size!=0)
     {
@@ -429,9 +429,9 @@ void Gint_k::cal_rho_k(void)
 
 		// mohan fix bug 2011-05-02
 		int nn = 0;
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			nn = max(nn,(ucell.atoms[it].nwl+1)*(ucell.atoms[it].nwl+1));
+			nn = max(nn,(GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
 		}
 
 		vindex = new int[GlobalC::pw.bxyz];
@@ -561,10 +561,10 @@ void Gint_k::evaluate_pDMp(
 		if(all_out_of_range[ia1]) continue;
 		const int mcell_index1 = GridT.bcell_start[grid_index] + ia1;
 		const int iat = GridT.which_atom[mcell_index1];
-		const int T1 = ucell.iat2it[iat];
-		const int I1 = ucell.iat2ia[iat];
-		const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
-		Atom *atom1 = &ucell.atoms[T1];
+		const int T1 = GlobalC::ucell.iat2it[iat];
+		const int I1 = GlobalC::ucell.iat2ia[iat];
+		const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+		Atom *atom1 = &GlobalC::ucell.atoms[T1];
 		const int nw1 = atom1->nw;
 
 		//~~~~~~~~~~~~~~~~
@@ -597,14 +597,14 @@ void Gint_k::evaluate_pDMp(
 
 			const int mcell_index2 = GridT.bcell_start[grid_index] + ia2;
 			const int iat2 = GridT.which_atom[mcell_index2];
-			const int T2 = ucell.iat2it[iat2];
+			const int T2 = GlobalC::ucell.iat2it[iat2];
 
 			if (T2 >= T1)
 			{
-				Atom *atom2 = &ucell.atoms[T2];
+				Atom *atom2 = &GlobalC::ucell.atoms[T2];
 				const int nw2 = atom2->nw;
-				const int I2 = ucell.iat2ia[iat2];
-				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+				const int I2 = GlobalC::ucell.iat2ia[iat2];
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 				//~~~~~~~~~~~~~~~~
 				// get cell R2.

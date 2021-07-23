@@ -33,7 +33,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 
 	complex<double> *vg = new complex<double>[GlobalC::pw.ngmc];
 	ZEROS( vg, GlobalC::pw.ngmc );
-	for (int it=0; it<ucell.ntype; it++)
+	for (int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 		if (GlobalC::pw.gstart==1) evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[0]) * (GlobalC::pw.strucFac(it,0) * conj(Porter[GlobalC::pw.ig2fftc[0]])).real();
 		for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
@@ -42,9 +42,9 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 			evloc += GlobalC::ppcell.vloc(it, GlobalC::pw.ig2ngg[ig]) * (GlobalC::pw.strucFac(it,ig) * conj(Porter[j]) * fact).real();
 		}
 	}
-	for(int nt = 0;nt< ucell.ntype; nt++)
+	for(int nt = 0;nt< GlobalC::ucell.ntype; nt++)
 	{
-		const Atom* atom = &ucell.atoms[nt];
+		const Atom* atom = &GlobalC::ucell.atoms[nt];
 		//mark by zhengdy for check
 		// if ( GlobalC::ppcell.vloc == NULL ){
 		if(0)
@@ -73,7 +73,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 				for (int m = 0; m<l+1;m++)
 				{
 					sigma(l, m) = sigma(l, m) + (conj(Porter[j]) * GlobalC::pw.strucFac(nt, ng)).real() 
-						* 2.0 * dvloc[GlobalC::pw.ig2ngg[ng]] * ucell.tpiba2 * 
+						* 2.0 * dvloc[GlobalC::pw.ig2ngg[ng]] * GlobalC::ucell.tpiba2 * 
 						GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) * fact;
 				}
 			}
@@ -160,8 +160,8 @@ double*  dvloc
 	}
 	for(int igl = igl0;igl< GlobalC::pw.nggm;igl++)
 	{
-		double gx = sqrt (GlobalC::pw.ggs [igl] * ucell.tpiba2);
-		double gx2 = GlobalC::pw.ggs [igl] * ucell.tpiba2;
+		double gx = sqrt (GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2);
+		double gx2 = GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2;
 		//
 		//    and here we perform the integral, after multiplying for the |G|
 		//    dependent  part
@@ -174,10 +174,10 @@ double*  dvloc
 		// simpson (msh, aux, rab, vlcp);
 		Integral::Simpson_Integral(msh, aux, rab, vlcp );
 		// DV(g^2)/Dg^2 = (DV(g)/Dg)/2g
-		vlcp *= FOUR_PI / ucell.omega / 2.0 / gx;
+		vlcp *= FOUR_PI / GlobalC::ucell.omega / 2.0 / gx;
 		// subtract the long-range term
 		double g2a = gx2 / 4.0;
-		vlcp += FOUR_PI / ucell.omega * zp * e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
+		vlcp += FOUR_PI / GlobalC::ucell.omega * zp * e2 * exp ( - g2a) * (g2a + 1) / pow(gx2 , 2);
 		dvloc [igl] = vlcp;
 	}
 	delete[] aux1;
@@ -216,7 +216,7 @@ double* dvloc
 	}
 	for(int i=igl0;i<GlobalC::pw.nggm;i++)
 	{
-		dvloc[i] = FOUR_PI * zp * e2 / ucell.omega / pow(( ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
+		dvloc[i] = FOUR_PI * zp * e2 / GlobalC::ucell.omega / pow(( GlobalC::ucell.tpiba2 * GlobalC::pw.ggs[i] ),2);
 	}
 	
 	return;

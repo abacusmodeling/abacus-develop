@@ -377,7 +377,7 @@ void Stochastic_Iter::sum_stoband()
         out = new complex<double> [nrxx];
     }
 
-    double dr3 = ucell.omega / GlobalC::pw.ncxyz;
+    double dr3 = GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     double Ebar = (Emin + Emax)/2;
 	double DeltaE = (Emax - Emin)/2;
    
@@ -436,7 +436,7 @@ void Stochastic_Iter::sum_stoband()
 #endif
             for(int ir = 0; ir < nrxx ; ++ir)
             {
-                tmprho = CHR.rho[0][ir] * GlobalC::kv.wk[ik] / ucell.omega;
+                tmprho = CHR.rho[0][ir] * GlobalC::kv.wk[ik] / GlobalC::ucell.omega;
                 sto_rho[ir] = tmprho;
                 sto_ne += tmprho;
             }

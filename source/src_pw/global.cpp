@@ -17,10 +17,9 @@ Exx_Global exx_global;
 Exx_Lip exx_lip(exx_global.info);
 #endif
 pseudopot_cell_vnl ppcell;
+UnitCell_pseudo ucell;
 }
 
-
-UnitCell_pseudo ucell;
 xcfunc xcf;
 Charge_Broyden CHR;
 //Magnetism mag;

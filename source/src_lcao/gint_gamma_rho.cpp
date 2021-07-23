@@ -227,7 +227,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 						bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
 
 						// set up band matrix psir_ylm and psir_DM
-						const int LD_pool = max_size*ucell.nwmax;
+						const int LD_pool = max_size*GlobalC::ucell.nwmax;
 						
 						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
 							na_grid, LD_pool, grid_index, delta_r,
@@ -285,9 +285,9 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
     Parallel_Reduce::reduce_double_pool( sum );
 #endif
     timer::tick("Gint_Gamma","reduce_charge");
-    OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * ucell.omega/ GlobalC::pw.ncxyz);
+    OUT(GlobalV::ofs_warning,"charge density sumed from grid", sum * GlobalC::ucell.omega/ GlobalC::pw.ncxyz);
 
-    const double ne = sum * ucell.omega / GlobalC::pw.ncxyz;
+    const double ne = sum * GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     //xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
     if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running, "ne", ne);
     timer::tick("Gint_Gamma","gamma_charge");

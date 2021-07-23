@@ -25,10 +25,10 @@ void Grid_Base_Beta::prepare(
 	this->latvec0 *= this->lat0;
 
 	delete[] this->nnn;
-	this->nnn = new int[ucell.ntype];
-	for(int T1=0; T1<ucell.ntype; T1++)
+	this->nnn = new int[GlobalC::ucell.ntype];
+	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 	{
-		this->nnn[T1] = (ucell.atoms[T1].nwl+1) * (ucell.atoms[T1].nwl+1);
+		this->nnn[T1] = (GlobalC::ucell.atoms[T1].nwl+1) * (GlobalC::ucell.atoms[T1].nwl+1);
 	//	cout << "\n nnn = " << nnn[T1];
 	}	
 	return;

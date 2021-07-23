@@ -79,7 +79,7 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 		set_rhog(Rrho, kerpulay);
 
 		const double fac = this->mixing_gg0;
-		const double gg0 = std::pow(fac * 0.529177 / ucell.tpiba, 2);
+		const double gg0 = std::pow(fac * 0.529177 / GlobalC::ucell.tpiba, 2);
 		double* filter_g = new double[GlobalC::pw.ngmc];
 		for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
 		{
@@ -138,7 +138,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 
 	// mohan fixed bug 2010/03/25
 	// suggested by VASP, 1.5(angstrom^-1) is always satisfied.
-    const double gg0 = std::pow(1.5 * 0.529177 / ucell.tpiba, 2);
+    const double gg0 = std::pow(1.5 * 0.529177 / GlobalC::ucell.tpiba, 2);
     double *filter_g = new double[GlobalC::pw.ngmc];
     for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {
@@ -178,7 +178,7 @@ double Charge_Mixing::rhog_dot_product(
 {
     TITLE("Charge_Mixing","rhog_dot_product");
 	timer::tick("Charge_Mixing","rhog_dot_product");
-    static const double fac = e2 * FOUR_PI / ucell.tpiba2;
+    static const double fac = e2 * FOUR_PI / GlobalC::ucell.tpiba2;
     static const double fac2 = e2 * FOUR_PI / (TWO_PI * TWO_PI);
 
     double sum = 0.0;
@@ -273,7 +273,7 @@ double Charge_Mixing::rhog_dot_product(
 
 	timer::tick("Charge_Mixing","rhog_dot_product");
 
-	sum *= ucell.omega * 0.5;
+	sum *= GlobalC::ucell.omega * 0.5;
 
 	//bool dft_is_meta = false;
 	//bool lda_plus_u = false;

@@ -30,11 +30,11 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 	for( const auto & Cs1 : Cs )
 	{
 		const size_t iat1 = Cs1.first;
-		const size_t it1 = ucell.iat2it[iat1];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
 		for( const auto & Cs2 : Cs1.second )
 		{
 			const size_t iat2 = Cs2.first;
-			const size_t it2 = ucell.iat2it[iat2];
+			const size_t it2 = GlobalC::ucell.iat2it[iat2];
 			for( const auto & Cs3 : Cs2.second )
 			{
 				const Abfs::Vector3_Order<int> &box2 = Cs3.first;

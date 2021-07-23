@@ -67,7 +67,7 @@ void Electrons::non_self_consistent(const int &istep)
     // add by jingan in 2018.11.7
     if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
-        toWannier90 myWannier(GlobalC::kv.nkstot,ucell.G);
+        toWannier90 myWannier(GlobalC::kv.nkstot,GlobalC::ucell.G);
         myWannier.init_wannier();
     }
 
@@ -92,7 +92,7 @@ void Electrons::self_consistent(const int &istep)
     timer::tick("Electrons","self_consistent");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell, GlobalC::pw); 
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
 
     set_ethr();
 
@@ -237,7 +237,7 @@ void Electrons::self_consistent(const int &istep)
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
-        ucell.magnet.compute_magnetization();
+        GlobalC::ucell.magnet.compute_magnetization();
 
         //(8) deband is calculated from "output" charge density calculated 
         // in sum_band

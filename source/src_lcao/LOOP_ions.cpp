@@ -114,7 +114,7 @@ void LOOP_ions::opt_ions(void)
         {
             // setup vdwd2 parameters
 	        vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(ucell);
+	        vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
@@ -123,14 +123,14 @@ void LOOP_ions::opt_ions(void)
         // Peize Lin add 2014.04.04, update 2021.03.09
         if(vdwd2_para.flag_vdwd2)
         {
-            Vdwd2 vdwd2(ucell,vdwd2_para);
+            Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
             vdwd2.cal_energy();
             GlobalC::en.evdw = vdwd2.get_energy();
         }
         // jiyy add 2019-05-18, update 2021.05.02
         else if(vdwd3_para.flag_vdwd3)
         {
-            Vdwd3 vdwd3(ucell,vdwd3_para);
+            Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
             vdwd3.cal_energy();
             GlobalC::en.evdw = vdwd3.get_energy();
         }
@@ -146,7 +146,7 @@ void LOOP_ions::opt_ions(void)
 		//for second-order extrapolation
         if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
         {
-            CE.update_all_pos(ucell);
+            CE.update_all_pos(GlobalC::ucell);
         }
 
 		// PLEASE design a proper interface to output potentials,
@@ -170,7 +170,7 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (INPUT.out_descriptor)
         {
-            ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
+            ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), GlobalC::ucell.nat* ORB.Alpha[0].getTotal_nchi());
             ld.build_S_descriptor(0);  //derivation not needed yet
             ld.cal_projected_DM();
             ld.cal_descriptor();
@@ -201,7 +201,7 @@ void LOOP_ions::opt_ions(void)
         //xiaohui add 2014-07-07, for second-order extrapolation
         if(GlobalV::FORCE)
         {
-            CE.save_pos_next(ucell);
+            CE.save_pos_next(GlobalC::ucell);
         }
 
         if(GlobalV::OUT_LEVEL=="i")
@@ -229,9 +229,9 @@ void LOOP_ions::opt_ions(void)
 
 //#ifdef __MPI
 //    MPI_Barrier(MPI_COMM_WORLD);
-//    for (int i=0;i<ucell.ntype;i++)
+//    for (int i=0;i<GlobalC::ucell.ntype;i++)
 //    {
-//        ucell.atoms[i].bcast_atom(); // bcast tau array
+//        GlobalC::ucell.atoms[i].bcast_atom(); // bcast tau array
 //    }
 //#endif
 
@@ -285,7 +285,7 @@ bool LOOP_ions::force_stress(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
 			GridD,
-			ucell,
+			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
 #endif
@@ -354,7 +354,7 @@ xiaohui modify 2014-08-09*/
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
 			GridD,
-			ucell,
+			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
 #endif
@@ -387,7 +387,7 @@ xiaohui modify 2014-08-09*/
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
 			GridD,
-			ucell,
+			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
 
@@ -471,7 +471,7 @@ void LOOP_ions::final_scf(void)
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
 		GridD,
-		ucell,
+		GlobalC::ucell,
 		GlobalV::SEARCH_RADIUS,
 		GlobalV::test_atom_input);
 
@@ -516,13 +516,13 @@ void LOOP_ions::final_scf(void)
 
     if(vdwd2_para.flag_vdwd2)							//Peize Lin add 2014-04-04, update 2021-03-09
     {
-        Vdwd2 vdwd2(ucell,vdwd2_para);
+        Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
         vdwd2.cal_energy();
         GlobalC::en.evdw = vdwd2.get_energy();
     }
 	else if(vdwd3_para.flag_vdwd3)							//jiyy add 2019-05-18, update 2021-05-02
     {
-        Vdwd3 vdwd3(ucell,vdwd3_para);
+        Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
         vdwd3.cal_energy();
         GlobalC::en.evdw = vdwd3.get_energy();
     }

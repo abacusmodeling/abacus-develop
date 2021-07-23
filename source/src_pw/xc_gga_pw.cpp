@@ -24,7 +24,7 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	if(GlobalV::NSPIN==4&&(GlobalV::DOMAG||GlobalV::DOMAG_Z)) nspin0 = 2;
 	if(GlobalV::NSPIN==4)
 	{
-		if(xcf.igcx != 0  ||  xcf.igcc != 0) ucell.magnet.cal_ux(ucell.ntype);
+		if(xcf.igcx != 0  ||  xcf.igcc != 0) GlobalC::ucell.magnet.cal_ux(GlobalC::ucell.ntype);
 	}
 
 	assert(nspin0>0);
@@ -377,7 +377,7 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 	// remember to multily 2pi/a0, which belongs to G vectors.
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		gdr[ir].x = Porter[ir].real() * ucell.tpiba;
+		gdr[ir].x = Porter[ir].real() * GlobalC::ucell.tpiba;
 
 	// calculate the charge density gradient in reciprocal space.
 	ZEROS(Porter, GlobalC::pw.nrxx);
@@ -387,7 +387,7 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 	// remember to multily 2pi/a0, which belongs to G vectors.
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		gdr[ir].y = Porter[ir].real() * ucell.tpiba;
+		gdr[ir].y = Porter[ir].real() * GlobalC::ucell.tpiba;
 
 	// calculate the charge density gradient in reciprocal space.
 	ZEROS(Porter, GlobalC::pw.nrxx);
@@ -397,7 +397,7 @@ void GGA_PW::grad_rho( const complex<double> *rhog, Vector3<double> *gdr )
 	GlobalC::pw.FFT_chg.FFT3D(Porter, 1);
 	// remember to multily 2pi/a0, which belongs to G vectors.
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		gdr[ir].z = Porter[ir].real() * ucell.tpiba;
+		gdr[ir].z = Porter[ir].real() * GlobalC::ucell.tpiba;
 
 	delete[] gdrtmpg;
 	return;
@@ -440,7 +440,7 @@ void GGA_PW::grad_dot(const Vector3<double> *h, double *dh)
 	// bring back to R space
 	GlobalC::pw.FFT_chg.FFT3D(aux, 1);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
-		dh[ir] = aux[ir].real() * ucell.tpiba;
+		dh[ir] = aux[ir].real() * GlobalC::ucell.tpiba;
 	
 	delete[] aux;	
 	delete[] gaux; //mohan fix 2012-04-02
@@ -455,11 +455,11 @@ void GGA_PW::noncolin_rho(double *rhoout1,double *rhoout2, double *neg)
 	//ux, otherwise rho + |m| is always rhoup and rho-|m| is always rhodw.
 	double amag=0;
 	for(int ir = 0;ir<GlobalC::pw.nrxx;ir++) neg[ir] = 1.0;
-	if(ucell.magnet.lsign_)
+	if(GlobalC::ucell.magnet.lsign_)
 	{
 		for(int ir = 0;ir<GlobalC::pw.nrxx;ir++)
 		{
-			if(CHR.rho[1][ir]*ucell.magnet.ux_[0] + CHR.rho[2][ir]*ucell.magnet.ux_[1] + CHR.rho[3][ir]*ucell.magnet.ux_[2]>0) neg[ir] = 1.0;
+			if(CHR.rho[1][ir]*GlobalC::ucell.magnet.ux_[0] + CHR.rho[2][ir]*GlobalC::ucell.magnet.ux_[1] + CHR.rho[3][ir]*GlobalC::ucell.magnet.ux_[2]>0) neg[ir] = 1.0;
 			else neg[ir] = -1.0;
 		}
 	}

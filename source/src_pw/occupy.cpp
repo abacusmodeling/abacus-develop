@@ -41,8 +41,8 @@ void Occupy::calculate_weights(void)
     {
         if (GlobalV::TWO_EFERMI)
         {
-            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup() , GlobalC::wf.ekb, GlobalC::en.ef_up, GlobalC::wf.wg, 0, GlobalC::kv.isk);
-            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw() , GlobalC::wf.ekb, GlobalC::en.ef_dw, GlobalC::wf.wg, 1, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_nelup() , GlobalC::wf.ekb, GlobalC::en.ef_up, GlobalC::wf.wg, 0, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_neldw() , GlobalC::wf.ekb, GlobalC::en.ef_dw, GlobalC::wf.wg, 1, GlobalC::kv.isk);
 			//ef = ( ef_up + ef_dw ) / 2.0_dp need??? mohan add 2012-04-16
         }
         else
@@ -65,9 +65,9 @@ void Occupy::calculate_weights(void)
 		{
 			double demet_up = 0.0;
 			double demet_dw = 0.0;
-			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
+			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_nelup(), gaussian_parameter, gaussian_type,
 			                 GlobalC::wf.ekb, GlobalC::en.ef_up, demet_up, GlobalC::wf.wg, 0, GlobalC::kv.isk);
-			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
+			Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::ucell.magnet.get_neldw(), gaussian_parameter, gaussian_type,
 			                 GlobalC::wf.ekb, GlobalC::en.ef_dw, demet_dw, GlobalC::wf.wg, 1, GlobalC::kv.isk);
 			GlobalC::en.demet = demet_up + demet_dw;
                         

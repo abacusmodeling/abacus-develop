@@ -27,7 +27,7 @@ void ELEC_scf::scf(const int &istep)
 
 	// (1) calculate ewald energy.
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell, GlobalC::pw);
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
 	// mohan add 2012-02-08
     set_ethr();
@@ -383,7 +383,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// (6) compute magnetization, only for spin==2
-        ucell.magnet.compute_magnetization();
+        GlobalC::ucell.magnet.compute_magnetization();
 
 		// resume codes!
 		//-------------------------------------------------------------------------

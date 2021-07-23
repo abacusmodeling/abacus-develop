@@ -247,7 +247,7 @@ void Chi0_standard:: Chi()
 	
 	for(int iq=start_q;iq< (start_q + interval_q * nq); iq=iq+interval_q)
 	{
-		double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/ucell.lat0)).norm2());
+		double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
 		double gather[nomega];
 		
 		int count =0;
@@ -622,7 +622,7 @@ void Chi0_standard:: Cal_weight(int iq, int ik, double omega)
 		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			complex<double> factor = complex<double>( (omega + GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[iqk][ib2]), eta);
-			weight[ib2+ib1*GlobalV::NBANDS] = ( GlobalC::wf.wg(ik,ib1)  - GlobalC::wf.wg(iqk,ib2) )/factor/ucell.omega;
+			weight[ib2+ib1*GlobalV::NBANDS] = ( GlobalC::wf.wg(ik,ib1)  - GlobalC::wf.wg(iqk,ib2) )/factor/GlobalC::ucell.omega;
 		}
 		
 	return;
@@ -738,7 +738,7 @@ void Chi0_standard:: Cal_chi()
 double Chi0_standard::qg2( int iq, int g0)
 {
 	double qg2;
-	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/ucell.lat0)).norm2();
+	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/GlobalC::ucell.lat0)).norm2();
 	
 	return qg2;
 }

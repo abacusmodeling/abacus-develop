@@ -46,45 +46,45 @@ void Potential::set_vrs_tddft(const int istep)
                 {
                     if (k<GlobalC::pw.ncx*0.05) 
 					{
-						this->vextold[ir] = (0.019447*k/GlobalC::pw.ncx-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*k/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
 					}
                     else if (k>=GlobalC::pw.ncx*0.05 && k<GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = -0.0019447*k/GlobalC::pw.ncx*ucell.lat0;
+						this->vextold[ir] = -0.0019447*k/GlobalC::pw.ncx*GlobalC::ucell.lat0;
 					}
                     else if (k>=GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = (0.019447*(1.0*k/GlobalC::pw.ncx-1)-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*k/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 2)
                 {
                     if (j<GlobalC::pw.ncx*0.05) 
 					{
-						this->vextold[ir] = (0.019447*j/GlobalC::pw.ncx-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*j/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
 					}
                     else if (j>=GlobalC::pw.ncx*0.05 && j<GlobalC::pw.ncx*0.95)	
 					{
-						this->vextold[ir] = -0.0019447*j/GlobalC::pw.ncx*ucell.lat0;
+						this->vextold[ir] = -0.0019447*j/GlobalC::pw.ncx*GlobalC::ucell.lat0;
 					}
                     else if (j>=GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = (0.019447*(1.0*j/GlobalC::pw.ncx-1)-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*j/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
                 else if(ELEC_evolve::td_vext_dire == 3)
                 {
                     if (i<GlobalC::pw.ncx*0.05) 
 					{
-						this->vextold[ir] = (0.019447*i/GlobalC::pw.ncx-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*i/GlobalC::pw.ncx-0.001069585)*GlobalC::ucell.lat0;
 					}
                     else if (i>=GlobalC::pw.ncx*0.05 && i<GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = -0.0019447*i/GlobalC::pw.ncx*ucell.lat0;
+						this->vextold[ir] = -0.0019447*i/GlobalC::pw.ncx*GlobalC::ucell.lat0;
 					}
                     else if (i>=GlobalC::pw.ncx*0.95) 
 					{
-						this->vextold[ir] = (0.019447*(1.0*i/GlobalC::pw.ncx-1)-0.001069585)*ucell.lat0;
+						this->vextold[ir] = (0.019447*(1.0*i/GlobalC::pw.ncx-1)-0.001069585)*GlobalC::ucell.lat0;
 					}
                 }
 

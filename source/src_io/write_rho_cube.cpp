@@ -26,37 +26,37 @@ void Charge::write_rho_cube(
 		ofs << "Cubefile created from ABACUS SCF calculation" << endl;
 		ofs << "Contains the selected quantity on a FFT grid" << endl;
 
-		ofs << ucell.nat << " 0.0 0.0 0.0 " << endl;
-		double fac=ucell.lat0;
+		ofs << GlobalC::ucell.nat << " 0.0 0.0 0.0 " << endl;
+		double fac=GlobalC::ucell.lat0;
 		ofs << GlobalC::pw.ncx 
-			<< " " << fac*ucell.latvec.e11/double(GlobalC::pw.ncx) 
-			<< " " << fac*ucell.latvec.e12/double(GlobalC::pw.ncx) 
-			<< " " << fac*ucell.latvec.e13/double(GlobalC::pw.ncx) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e11/double(GlobalC::pw.ncx) 
+			<< " " << fac*GlobalC::ucell.latvec.e12/double(GlobalC::pw.ncx) 
+			<< " " << fac*GlobalC::ucell.latvec.e13/double(GlobalC::pw.ncx) << endl;
 		ofs << GlobalC::pw.ncy 
-			<< " " << fac*ucell.latvec.e21/double(GlobalC::pw.ncy) 
-			<< " " << fac*ucell.latvec.e22/double(GlobalC::pw.ncy) 
-			<< " " << fac*ucell.latvec.e23/double(GlobalC::pw.ncy) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e21/double(GlobalC::pw.ncy) 
+			<< " " << fac*GlobalC::ucell.latvec.e22/double(GlobalC::pw.ncy) 
+			<< " " << fac*GlobalC::ucell.latvec.e23/double(GlobalC::pw.ncy) << endl;
 		ofs << GlobalC::pw.ncz 
-			<< " " << fac*ucell.latvec.e31/double(GlobalC::pw.ncz) 
-			<< " " << fac*ucell.latvec.e32/double(GlobalC::pw.ncz) 
-			<< " " << fac*ucell.latvec.e33/double(GlobalC::pw.ncz) << endl;
+			<< " " << fac*GlobalC::ucell.latvec.e31/double(GlobalC::pw.ncz) 
+			<< " " << fac*GlobalC::ucell.latvec.e32/double(GlobalC::pw.ncz) 
+			<< " " << fac*GlobalC::ucell.latvec.e33/double(GlobalC::pw.ncz) << endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
 				//convert from label to atomic number
 				int z = 0;
 				for(int j=0; j!=element_name.size(); j++)
-					if (ucell.atoms[it].label == element_name[j])
+					if (GlobalC::ucell.atoms[it].label == element_name[j])
 					{
 						z=j+1;
 						break;
 					}
 				ofs << " " << z << " " << z
-					<< " " << fac*ucell.atoms[it].taud[ia].x
-					<< " " << fac*ucell.atoms[it].taud[ia].y
-					<< " " << fac*ucell.atoms[it].taud[ia].z << endl;
+					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].x
+					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].y
+					<< " " << fac*GlobalC::ucell.atoms[it].taud[ia].z << endl;
 			}
 		}
 

@@ -80,7 +80,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	// add by jingan in 2018.11.7
 	if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
-        toWannier90 myWannier(GlobalC::kv.nkstot,ucell.G);
+        toWannier90 myWannier(GlobalC::kv.nkstot,GlobalC::ucell.G);
         myWannier.init_wannier();
     }
 	

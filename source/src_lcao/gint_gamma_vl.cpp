@@ -342,7 +342,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 			ZEROS(GridVlocal_thread.ptr_1D, lgd_now*lgd_now);
 			Memory::record("Gint_Gamma","GridVlocal_therad",lgd_now*lgd_now,"double");
 
-			const int LD_pool = max_size*ucell.nwmax;
+			const int LD_pool = max_size*GlobalC::ucell.nwmax;
 
 #ifdef __OPENMP
 			#pragma omp for

@@ -480,12 +480,12 @@ void Chi0_hilbert::Chi()
 				{
 					for(int i=0; i<Rmax[iw1][iw2]; i++)
 					{
-						Rcar[iw1][iw2][i].x = ucell.latvec.e11 * R[iw1][iw2][i].x 
-						+ ucell.latvec.e21 * R[iw1][iw2][i].y + ucell.latvec.e31 * R[iw1][iw2][i].z;
-						Rcar[iw1][iw2][i].y = ucell.latvec.e12 * R[iw1][iw2][i].x 
-						+ ucell.latvec.e22 * R[iw1][iw2][i].y + ucell.latvec.e32 * R[iw1][iw2][i].z;
-						Rcar[iw1][iw2][i].z = ucell.latvec.e13 * R[iw1][iw2][i].x 
-						+ ucell.latvec.e23 * R[iw1][iw2][i].y + ucell.latvec.e33 * R[iw1][iw2][i].z;
+						Rcar[iw1][iw2][i].x = GlobalC::ucell.latvec.e11 * R[iw1][iw2][i].x 
+						+ GlobalC::ucell.latvec.e21 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e31 * R[iw1][iw2][i].z;
+						Rcar[iw1][iw2][i].y = GlobalC::ucell.latvec.e12 * R[iw1][iw2][i].x 
+						+ GlobalC::ucell.latvec.e22 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e32 * R[iw1][iw2][i].z;
+						Rcar[iw1][iw2][i].z = GlobalC::ucell.latvec.e13 * R[iw1][iw2][i].x 
+						+ GlobalC::ucell.latvec.e23 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e33 * R[iw1][iw2][i].z;
 					}
 				}
 			}
@@ -1337,7 +1337,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	//		{
 	//			for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 	//			{
-	//				b[ig][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+GlobalC::pw.gcar[ig])*(-TWO_PI/ucell.lat0)).norm2()) * GlobalC::wf.evc[ik](ib2,ig);
+	//				b[ig][ib1][ib2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * sqrt(((GlobalC::kv.kvec_c[ik]+GlobalC::pw.gcar[ig])*(-TWO_PI/GlobalC::ucell.lat0)).norm2()) * GlobalC::wf.evc[ik](ib2,ig);
 	//			}
 	//			b[ig][ib1][ib2] /=(GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[ik][ib2]);
 	//		}
@@ -1501,8 +1501,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
-						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/ucell.omega, 0.0);
+						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1517,7 +1517,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
+						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1560,10 +1560,10 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/ucell.omega, 0.0);                        
-						//weight2 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/ucell.omega, 0.0);
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
-						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/ucell.omega, 0.0);
+						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);                        
+						//weight2 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1578,8 +1578,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/ucell.omega, 0.0);
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
+						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1613,10 +1613,10 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/ucell.omega, 0.0);
-						//weight2 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/ucell.omega, 0.0);  
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
-						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/ucell.omega, 0.0);						
+						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						//weight2 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);  
+						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);						
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1631,8 +1631,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/ucell.omega, 0.0);
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
+						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1678,8 +1678,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 							int n = int(delta_e/domega);
 							e1 = double(n) * domega;
 							e2 = double(n+1) * domega;
-							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
-							weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/ucell.omega, 0.0);
+							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+							weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
 							for(int g0=0; g0<dim; g0++)
 							{
 								for(int g1=0; g1<dim; g1++)
@@ -1694,7 +1694,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 							int n = int(delta_e/domega);
 							e1 = double(n) * domega;
 							e2 = double(n+1) * domega;
-							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/ucell.omega, 0.0);
+							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 							for(int g0=0; g0<dim; g0++)
 							{
 								for(int g1=0; g1<dim; g1++)
@@ -1811,7 +1811,7 @@ complex<double> Chi0_hilbert::f(int k, int j)
 void Chi0_hilbert::Cal_Chi(int iq)
 {
 	TITLE("Chi0_hilbert","Cal_Chi");
-	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/ucell.lat0)).norm2());
+	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
 	vector<complex<double>> gather_chi(nomega);			// Peize Lin change ptr to vector at 2020.01.31
 	for(int i=0; i<nomega; i++)
 	{
@@ -1865,7 +1865,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 			// -Im{epsilon^-1} = -4pi/|q|^2 * (1 - exp^{-q*lz/2}) * Im{chi}
 			//---------------------------------------------------------------------
 			double factor;
-			factor = 1.0 - exp(-q * (ucell.latvec.e33 * ucell.lat0)/2.0);
+			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
 			cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q * factor * chi[0][0].real()<<"  "<<8*PI/q/q * factor * chi[0][0].imag()<<endl; 
 		}
 		
@@ -1906,7 +1906,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		else
 		{
 			double factor;
-			factor = 1.0 - exp(-q * (ucell.latvec.e33 * ucell.lat0)/2.0);
+			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
 			for(int i=0;i<nomega;i++)
 			{
 				ofseps << i * domega <<"   "<<-8*PI/q/q*factor*gather_chi[i].imag()<<endl;
@@ -1975,13 +1975,13 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 			double sign;
 			for(int g0=0; g0<dim; g0++)
 			{
-				int nz = int(fabs(all_gcar[g0].z * ucell.latvec.e33) + 0.5 );
+				int nz = int(fabs(all_gcar[g0].z * GlobalC::ucell.latvec.e33) + 0.5 );
 				sign = (nz%2==0)?1.0:-1.0;
 				for(int g1=0; g1<dim; g1++)
 				{
 					if(g0 == g1)
 					{
-						kernel[g0][g1] = 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(ucell.latvec.e33 * ucell.lat0)/2.0));
+						kernel[g0][g1] = 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0));
 					}
 					else
 					{
@@ -2028,18 +2028,18 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 		double sign;
 		for(int g0=0; g0<dim; g0++)
 		{
-			int nz = int(fabs(all_gcar[g0].z * ucell.latvec.e33) + 0.5 );
+			int nz = int(fabs(all_gcar[g0].z * GlobalC::ucell.latvec.e33) + 0.5 );
 			sign = (nz%2==0)?1.0:-1.0;
 			//cout <<"g0= "<<g0<<" nz= "<<nz<<"  sign= "<<sign<<endl;
 			for(int g1=0; g1<dim; g1++)
 			{
 				if(g0 != g1)
 				{
-					rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(ucell.latvec.e33 * ucell.lat0)/2.0)) * chi0_gg[g0][g1];
+					rpa[g0][g1] = -8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
 				}
 				else
 				{
-					rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(ucell.latvec.e33 * ucell.lat0)/2.0)) * chi0_gg[g0][g1];
+					rpa[g0][g1] = 1.0 - 8.0 * PI/qg2(iq,g0) * (1 - sign * exp(-qG(iq,g0)*(GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0)) * chi0_gg[g0][g1];
 				}
 			}
 			
@@ -2124,7 +2124,7 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 double Chi0_hilbert::qg2( int iq, int g0)
 {
 	double qg2;
-	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/ucell.lat0)).norm2();
+	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/GlobalC::ucell.lat0)).norm2();
 	
 	return qg2;
 }
@@ -2371,7 +2371,7 @@ void Chi0_hilbert::Cal_kernel_2D(int iq)
 			{
 				if(g0 == g1)
 				{
-					kernel[g0][g1] = 4* PI/qg(iq,g0) * (ucell.latvec.e33 * ucell.lat0);
+					kernel[g0][g1] = 4* PI/qg(iq,g0) * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0);
 				}
 				else
 				{
@@ -2390,7 +2390,7 @@ void Chi0_hilbert::Cal_kernel_2D(int iq)
 double Chi0_hilbert::qG(int iq, int g0)
 {
 	double qG;
-	qG = sqrt((GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) * (GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) + (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y) * (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y)) * (TWO_PI/ucell.lat0);
+	qG = sqrt((GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) * (GlobalC::kv.kvec_c[iq].x + all_gcar[g0].x) + (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y) * (GlobalC::kv.kvec_c[iq].y + all_gcar[g0].y)) * (TWO_PI/GlobalC::ucell.lat0);
      	
 	return qG;
 }
@@ -2398,7 +2398,7 @@ double Chi0_hilbert::qG(int iq, int g0)
 double Chi0_hilbert::qg(int iq, int g0)
 {
 	double qg;
-	qg = sqrt((GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) * (GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) + (GlobalC::kv.kvec_c[iq].y + para_g[g0][1]) * (GlobalC::kv.kvec_c[iq].y + para_g[g0][1])) * (TWO_PI/ucell.lat0);
+	qg = sqrt((GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) * (GlobalC::kv.kvec_c[iq].x + para_g[g0][0]) + (GlobalC::kv.kvec_c[iq].y + para_g[g0][1]) * (GlobalC::kv.kvec_c[iq].y + para_g[g0][1])) * (TWO_PI/GlobalC::ucell.lat0);
 	
 	return qg;
 }
@@ -2441,9 +2441,9 @@ void Chi0_hilbert::chi_para_g()
 complex<double> Chi0_hilbert:: Cal_g(int iq)
 {	
     complex<double> g;
-    double L = ucell.latvec.e33 * ucell.lat0;
+    double L = GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0;
     double dz = L/GlobalC::pw.ncz;
-    double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/ucell.lat0)).norm2());
+    double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
     
     g = complex<double>(0.0,0.0);
 

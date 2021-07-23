@@ -154,15 +154,15 @@ void Print_Info::setup_parameters(void)
 
 
 
-		for(int it=0; it<ucell.ntype; ++it)
+		for(int it=0; it<GlobalC::ucell.ntype; ++it)
 		{
 			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
-				printf( "\e[36m%-8s\e[0m", ucell.atoms[it].label.c_str());
+				printf( "\e[36m%-8s\e[0m", GlobalC::ucell.atoms[it].label.c_str());
 			}
 			else
 			{
-				cout << " " << setw(8) << ucell.atoms[it].label;
+				cout << " " << setw(8) << GlobalC::ucell.atoms[it].label;
 			}
 
 			if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -185,10 +185,10 @@ void Print_Info::setup_parameters(void)
 				orb << "-" << ORB.Phi[it].getRcut() << "au";*/
 
 
-				for(int L=0; L<=ucell.atoms[it].nwl; ++L)        // pengfei Li 16-2-29
+				for(int L=0; L<=GlobalC::ucell.atoms[it].nwl; ++L)        // pengfei Li 16-2-29
 				{
-					norb += (2*L+1)* ucell.atoms[it].l_nchi[L];
-					orb << ucell.atoms[it].l_nchi[L];
+					norb += (2*L+1)* GlobalC::ucell.atoms[it].l_nchi[L];
+					orb << GlobalC::ucell.atoms[it].l_nchi[L];
 					if(L==0) orb << "s";
 					else if(L==1) orb << "p";
 					else if(L==2) orb << "d";
@@ -197,7 +197,7 @@ void Print_Info::setup_parameters(void)
 					else if(L==5) orb << "h";
 					else if(L==6) orb << "i";
 				}
-				orb << "-" << ucell.atoms[it].Rcut << "au";
+				orb << "-" << GlobalC::ucell.atoms[it].Rcut << "au";
 
 				if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 				{
@@ -214,16 +214,16 @@ void Print_Info::setup_parameters(void)
 			}
 
 
-			cout << setw(12) << ucell.atoms[it].na;
+			cout << setw(12) << GlobalC::ucell.atoms[it].na;
 
-//				if(ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
+//				if(GlobalC::ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
 //				{
 //					//cout << setw(12) << "PZ-LDA";
 //
 //				}
 //				else
 //				{
-//					//cout << setw(12) << ucell.atoms[it].dft[0];
+//					//cout << setw(12) << GlobalC::ucell.atoms[it].dft[0];
 //                                        cout << setw(12) << "PBE";
 //				}
 			xcf.ostreamdft(cout); // zws add 20150108

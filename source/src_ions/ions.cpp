@@ -100,7 +100,7 @@ void Ions::opt_ions_pw(void)
         {
 			// setup vdwd2 parameters
 			vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(ucell);
+	        vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
@@ -108,13 +108,13 @@ void Ions::opt_ions_pw(void)
         }
 		if(vdwd2_para.flag_vdwd2)		//Peize Lin add 2014-04-03, update 2021-03-09
 		{
-			Vdwd2 vdwd2(ucell,vdwd2_para);
+			Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
 			vdwd2.cal_energy();
 			GlobalC::en.evdw = vdwd2.get_energy();
 		}
 		if(vdwd3_para.flag_vdwd3)		//jiyy add 2019-05-18, update 2021-05-02
 		{
-			Vdwd3 vdwd3(ucell,vdwd3_para);
+			Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
 			vdwd3.cal_energy();
 			GlobalC::en.evdw = vdwd3.get_energy();
 		}
@@ -176,7 +176,7 @@ void Ions::opt_ions_pw(void)
 
 		if(GlobalV::CALCULATION=="relax"|| GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="cell-relax")
 		{
-			CE.update_all_pos(ucell);
+			CE.update_all_pos(GlobalC::ucell);
 		}
 
 		if(pot.out_potential == 2)
@@ -405,7 +405,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 				GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
                 GlobalC::pw.setup_structure_factor();
 				GlobalV::ofs_running << " Setup the extrapolated charge." << endl;
-                CE.save_pos_next(ucell);
+                CE.save_pos_next(GlobalC::ucell);
                 CE.update_istep(force_step);
                 CE.extrapolate_charge();
 				GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;

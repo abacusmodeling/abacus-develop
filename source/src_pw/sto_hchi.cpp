@@ -240,9 +240,9 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 
 	//wait for init--------------------------------------	
 	double dk1,dk2,dk3;
-	dk1 = ucell.tpiba;
-	dk2 = ucell.tpiba;
-	dk3 = ucell.tpiba;
+	dk1 = GlobalC::ucell.tpiba;
+	dk2 = GlobalC::ucell.tpiba;
+	dk3 = GlobalC::ucell.tpiba;
 		
 	//---------------------------------------------------
 	if(!initplan) WARNING_QUIT("Stochastic_hchi", "Please init hchi first!");
@@ -341,10 +341,10 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
     		// this function sum up each non-local pseudopotential located in each atom,
     		// all we need to do is put the right Dij coefficient to each becp, which
     		// is calculated before.
-    		for (int it=0; it<ucell.ntype; ++it)
+    		for (int it=0; it<GlobalC::ucell.ntype; ++it)
     		{
-    		    const int Nprojs = ucell.atoms[it].nh;
-    		    for (int ia=0; ia<ucell.atoms[it].na; ++ia)
+    		    const int Nprojs = GlobalC::ucell.atoms[it].nh;
+    		    for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ++ia)
     		    {
     		        // each atom has Nprojs, means this is with structure factor;
     		        // each projector (each atom) must multiply coefficient
@@ -509,10 +509,10 @@ void Stochastic_hchi:: hchi_reciprocal(complex<double> *chig, complex<double> *h
 			
 			int sum = 0;
     		int iat = 0;
-    		for (int it=0; it<ucell.ntype; it++)
+    		for (int it=0; it<GlobalC::ucell.ntype; it++)
     		{
-    		    const int Nprojs = ucell.atoms[it].nh;
-    		    for (int ia=0; ia<ucell.atoms[it].na; ia++)
+    		    const int Nprojs = GlobalC::ucell.atoms[it].nh;
+    		    for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
     		    {
     		        // each atom has Nprojs, means this is with structure factor;
     		        // each projector (each atom) must multiply coefficient

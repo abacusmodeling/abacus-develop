@@ -38,10 +38,10 @@ inline void cal_psir_ylm_dphi(
         const int mcell_index = GridT.bcell_start[grid_index] + id;
         const int imcell = GridT.which_bigcell[mcell_index];
         int iat = GridT.which_atom[mcell_index];
-        const int it = ucell.iat2it[iat];
-        const int ia = ucell.iat2ia[iat];
-        const int start = ucell.itiaiw2iwt(it, ia, 0);
-        Atom *atom = &ucell.atoms[it];
+        const int it = GlobalC::ucell.iat2it[iat];
+        const int ia = GlobalC::ucell.iat2ia[iat];
+        const int start = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
+        Atom *atom = &GlobalC::ucell.atoms[it];
 
 		const double mt[3]={
 			GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0],
@@ -88,11 +88,11 @@ inline void cal_psir_ylm_dphi(
             vector<vector<double>> grly;
             // >>> the old method
             // ylma[id] = new double[nnn[it]]; // liaochen found this bug 2010/03/29
-            // Ylm::get_ylm_real(ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
+            // Ylm::get_ylm_real(GlobalC::ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
             // <<<
-            // Ylm::rlylm(ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            // Ylm::rlylm(ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            Ylm::grad_rl_sph_harm(ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
+            // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
+            // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
+            Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
 
             // 1E-7 is necessary in case of R is just on one grid
             // the following code is about interpolation,
@@ -515,7 +515,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = ORB.dr_uniform;
 
-    int LD_pool=max_size*ucell.nwmax;
+    int LD_pool=max_size*GlobalC::ucell.nwmax;
     double* dphi_pool;
     
     double** dphix;

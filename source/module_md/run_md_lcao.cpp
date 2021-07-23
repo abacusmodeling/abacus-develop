@@ -86,7 +86,7 @@ void Run_MD_LCAO::opt_ions(void)
         LCM.allocate();
     }
 
-    MD_basic mdb(INPUT.mdp, ucell);
+    MD_basic mdb(INPUT.mdp, GlobalC::ucell);
     int mdtype = INPUT.mdp.mdtype;
 
     this->istep = 1;
@@ -109,7 +109,7 @@ void Run_MD_LCAO::opt_ions(void)
 		{
 			// setup vdwd2 parameters
 			vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(ucell);
+	        vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
@@ -118,14 +118,14 @@ void Run_MD_LCAO::opt_ions(void)
         // Peize Lin add 2014.04.04, update 2021.03.09
         if(vdwd2_para.flag_vdwd2)
         {
-            Vdwd2 vdwd2(ucell,vdwd2_para);
+            Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
             vdwd2.cal_energy();
             GlobalC::en.evdw = vdwd2.get_energy();
         }
         // jiyy add 2019-05-18, update 2021.05.02
         else if(vdwd3_para.flag_vdwd3)
         {
-            Vdwd3 vdwd3(ucell,vdwd3_para);
+            Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
             vdwd3.cal_energy();
             GlobalC::en.evdw = vdwd3.get_energy();
         }
@@ -139,7 +139,7 @@ void Run_MD_LCAO::opt_ions(void)
 		time_t eend = time(NULL);
 
         //xiaohui add 2014-07-07, for second-order extrapolation
-		CE.update_all_pos(ucell);
+		CE.update_all_pos(GlobalC::ucell);
 
 		if(mdtype==1||mdtype==2)   
 		{
@@ -171,7 +171,7 @@ void Run_MD_LCAO::opt_ions(void)
         time_t fend = time(NULL);
 
         //xiaohui add 2014-07-07, for second-order extrapolation
-		CE.save_pos_next(ucell);
+		CE.save_pos_next(GlobalC::ucell);
 
 		//xiaohui add CE.istep = istep 2014-07-07
 		CE.update_istep(istep);
@@ -244,7 +244,7 @@ void Run_MD_LCAO::final_scf(void)
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
 		GridD, 
-		ucell, 
+		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 
@@ -290,13 +290,13 @@ void Run_MD_LCAO::final_scf(void)
 
     if(vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
     {
-        Vdwd2 vdwd2(ucell,vdwd2_para);
+        Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
         vdwd2.cal_energy();
         GlobalC::en.evdw = vdwd2.get_energy();
     }
 	else if(vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
     {
-        Vdwd3 vdwd3(ucell,vdwd3_para);
+        Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
         vdwd3.cal_energy();
         GlobalC::en.evdw = vdwd3.get_energy();
     }												  

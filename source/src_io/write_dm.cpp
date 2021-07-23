@@ -69,28 +69,28 @@ void Local_Orbital_Charge::write_dm(
 
 		//GlobalV::ofs_running << "\n Output charge file." << endl;
 
-		ofs << ucell.latName << endl;//1
-		ofs << " " << ucell.lat0 * BOHR_TO_A << endl;
-		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-		ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-		ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		ofs << GlobalC::ucell.latName << endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * BOHR_TO_A << endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].label;
+			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
 		ofs << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].na;
+			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
 		ofs << endl;
 		ofs << "Direct" << endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			Atom* atom = &ucell.atoms[it];
+			Atom* atom = &GlobalC::ucell.atoms[it];
 			ofs << setprecision(15);
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
 				ofs << " " << atom->taud[ia].x
 					<< " " << atom->taud[ia].y

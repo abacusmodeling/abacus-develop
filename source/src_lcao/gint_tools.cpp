@@ -48,9 +48,9 @@ namespace Gint_Tools
 		{
 			const int mcell_index=GridT.bcell_start[grid_index] + id;
 			const int iat=GridT.which_atom[mcell_index]; // index of atom
-			const int it=ucell.iat2it[ iat ]; // index of atom type
-			const int ia=ucell.iat2ia[ iat ]; // index of atoms within each type
-			const int start=ucell.itiaiw2iwt(it, ia, 0); // the index of the first wave function for atom (it,ia)
+			const int it=GlobalC::ucell.iat2it[ iat ]; // index of atom type
+			const int ia=GlobalC::ucell.iat2ia[ iat ]; // index of atoms within each type
+			const int start=GlobalC::ucell.itiaiw2iwt(it, ia, 0); // the index of the first wave function for atom (it,ia)
 			block_iw[id]=GridT.trace_lo[start];
 		}
 		return block_iw;
@@ -66,8 +66,8 @@ namespace Gint_Tools
 		{
 			const int mcell_index = GridT.bcell_start[grid_index] + id;
 			const int iat = GridT.which_atom[mcell_index]; // index of atom
-			const int it = ucell.iat2it[iat]; // index of atom type
-			block_index[id+1] = block_index[id]+ucell.atoms[it].nw;
+			const int it = GlobalC::ucell.iat2it[iat]; // index of atom type
+			block_index[id+1] = block_index[id]+GlobalC::ucell.atoms[it].nw;
 		}
 		return block_index;
 	}
@@ -82,8 +82,8 @@ namespace Gint_Tools
 		{
 			const int mcell_index=GridT.bcell_start[grid_index] + id;
 			const int iat=GridT.which_atom[mcell_index]; // index of atom
-			const int it=ucell.iat2it[ iat ]; // index of atom type
-			block_size[id]=ucell.atoms[it].nw;	
+			const int it=GlobalC::ucell.iat2it[ iat ]; // index of atom type
+			block_size[id]=GlobalC::ucell.atoms[it].nw;	
 		}
 		return block_size;
 	}
@@ -104,7 +104,7 @@ namespace Gint_Tools
 			// what's the cartesian coordinate of the bigcell?
 			const int mcell_index=GridT.bcell_start[grid_index] + id;
 			const int iat=GridT.which_atom[mcell_index];		
-			const int it=ucell.iat2it[iat];
+			const int it=GlobalC::ucell.iat2it[iat];
 
 			// meshball_positions should be the bigcell position in meshball
 			// to the center of meshball.
@@ -154,8 +154,8 @@ namespace Gint_Tools
 			const int mcell_index=GridT.bcell_start[grid_index] + id;
 
 			const int iat=GridT.which_atom[mcell_index]; // index of atom
-			const int it=ucell.iat2it[iat]; // index of atom type
-			const Atom*const atom=&ucell.atoms[it];
+			const int it=GlobalC::ucell.iat2it[iat]; // index of atom type
+			const Atom*const atom=&GlobalC::ucell.atoms[it];
 
 			// meshball_positions should be the bigcell position in meshball
 			// to the center of meshball.
@@ -193,7 +193,7 @@ namespace Gint_Tools
 					//------------------------------------------------------
 					std::vector<double> ylma;
 					//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
-					Ylm::sph_harm ( ucell.atoms[it].nwl,
+					Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 							dr[0] / distance,
 							dr[1] / distance,
 							dr[2] / distance,

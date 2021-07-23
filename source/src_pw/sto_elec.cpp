@@ -22,7 +22,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	timer::tick("Elec_Stochastic","scf_stochastic");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell, GlobalC::pw); 
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
 
     set_ethr();
     

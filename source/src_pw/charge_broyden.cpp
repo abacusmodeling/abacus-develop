@@ -119,9 +119,9 @@ void Charge_Broyden::mix_rho
 
 	Parallel_Reduce::reduce_double_pool( dr22 );
 	assert( nelec != 0);
-	assert( ucell.omega > 0);
+	assert( GlobalC::ucell.omega > 0);
 	assert( GlobalC::pw.ncxyz > 0);
-	dr22 *= ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+	dr22 *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 	dr22 /= nelec;
 	if(GlobalV::test_charge)GlobalV::ofs_running << " dr2 from real space grid is " << dr22 << endl;
 

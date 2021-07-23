@@ -545,10 +545,10 @@ void Hamilt_PW::add_nonlocal_pp(
     int iat = 0;
     if(GlobalV::NSPIN!=4)
 	{
-		for (int it=0; it<ucell.ntype; it++)
+		for (int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			const int nproj = ucell.atoms[it].nh;
-			for (int ia=0; ia<ucell.atoms[it].na; ia++)
+			const int nproj = GlobalC::ucell.atoms[it].nh;
+			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
 				// each atom has nproj, means this is with structure factor;
 				// each projector (each atom) must multiply coefficient
@@ -572,15 +572,15 @@ void Hamilt_PW::add_nonlocal_pp(
 	}
 	else
 	{
-		for (int it=0; it<ucell.ntype; it++)
+		for (int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			int psind=0;
 			int becpind=0;
 			complex<double> becp1=complex<double>(0.0,0.0);
 			complex<double> becp2=complex<double>(0.0,0.0);
 
-			const int nproj = ucell.atoms[it].nh;
-			for (int ia=0; ia<ucell.atoms[it].na; ia++)
+			const int nproj = GlobalC::ucell.atoms[it].nh;
+			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
 				// each atom has nproj, means this is with structure factor;
 				// each projector (each atom) must multiply coefficient

@@ -341,7 +341,7 @@ void energy::perform_dos(void)
 					GlobalV::SEARCH_PBC,
 					GlobalV::ofs_running,
 					GridD, 
-					ucell, 
+					GlobalC::ucell, 
 					GlobalV::SEARCH_RADIUS, 
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
@@ -350,13 +350,13 @@ void energy::perform_dos(void)
 						GlobalV::ofs_running,
 						UOT, 
 						ORB,
-						ucell.ntype,
-						ucell.lmax,
+						GlobalC::ucell.ntype,
+						GlobalC::ucell.lmax,
 						INPUT.lcao_ecut,
 						INPUT.lcao_dk,
 						INPUT.lcao_dr,
 						INPUT.lcao_rmax, 
-						ucell.lat0, 
+						GlobalC::ucell.lat0, 
 						INPUT.out_descriptor,
 						INPUT.out_r_matrix,
 						Exx_Abfs::Lmax,
@@ -445,7 +445,7 @@ void energy::perform_dos(void)
 					GlobalV::ofs_running,
 					GlobalV::SEARCH_PBC, 
 					GridD, 
-					ucell, 
+					GlobalC::ucell, 
 					GlobalV::SEARCH_RADIUS, 
 					GlobalV::test_atom_input);
 #endif
@@ -539,23 +539,23 @@ void energy::perform_dos(void)
 				 out <<setw(20)<< en << endl;
 			 }
 			 out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<endl;
-			 for (int i=0; i<ucell.nat; i++)
+			 for (int i=0; i<GlobalC::ucell.nat; i++)
 			 {   
-				 int a = ucell.iat2ia[i];
-				 int t = ucell.iat2it[i];
-				 Atom* atom1 = &ucell.atoms[t];
+				 int a = GlobalC::ucell.iat2ia[i];
+				 int t = GlobalC::ucell.iat2it[i];
+				 Atom* atom1 = &GlobalC::ucell.atoms[t];
 				 for(int j=0; j<atom1->nw; ++j)
 				 {
 					 const int L1 = atom1->iw2l[j];
 					 const int N1 = atom1->iw2n[j];
 					 const int m1 = atom1->iw2m[j];
-					 const int w = ucell.itiaiw2iwt(t, a, j);
+					 const int w = GlobalC::ucell.itiaiw2iwt(t, a, j);
 
 					 //out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<endl;
 					 out << "<"<<"orbital" <<endl;
 					 out <<setw(6)<< "index"<<"="<<"\""<<setw(40) <<w+1<<"\""<<endl;
 					 out <<setw(5)<< "atom"<<"_"<<"index"<<"="<<"\""<<setw(40) <<i+1<<"\""<<endl;
-					 out <<setw(8)<< "species"<<"="<<"\""<<ucell.atoms[t].label<<"\""<<endl;
+					 out <<setw(8)<< "species"<<"="<<"\""<<GlobalC::ucell.atoms[t].label<<"\""<<endl;
 					 out<<setw(2)<< "l"<<"="<<"\""<<setw(40)<<L1<<"\""<<endl;
 					 out <<setw(2)<< "m"<<"="<<"\""<<setw(40)<<m1<<"\""<<endl;
 					 out <<setw(2)<< "z"<<"="<<"\""<<setw(40)<<N1+1<<"\""<<endl;
@@ -591,17 +591,17 @@ void energy::perform_dos(void)
 			 out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<endl;
 
 
-			 for (int i=0; i<ucell.nat; i++)
+			 for (int i=0; i<GlobalC::ucell.nat; i++)
 			 {
-				 int   t = ucell.iat2it[i];
-				 Atom* atom1 = &ucell.atoms[t];  
+				 int   t = GlobalC::ucell.iat2it[i];
+				 Atom* atom1 = &GlobalC::ucell.atoms[t];  
 				 for(int j=0; j<atom1->nw; ++j)
 				 {
 					 const int L1 = atom1->iw2l[j];
 					 const int N1 = atom1->iw2n[j];
 					 const int m1 = atom1->iw2m[j];
 					 out <<setw(5) << i << setw(8) 
-						<< ucell.atoms[t].label <<setw(5)
+						<< GlobalC::ucell.atoms[t].label <<setw(5)
 							<<L1<<setw(5) <<m1<<setw(5)<<N1+1<<setw(15)<< Name_Angular[L1][m1] << endl;
 				 }
 			 }

@@ -74,12 +74,12 @@ Mulliken_Charge::Mulliken_Charge()
 	ADecMulP = new double**[GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		ADecMulP[is] = new double*[ucell.nat];
+		ADecMulP[is] = new double*[GlobalC::ucell.nat];
 
-		for (int i=0; i<ucell.nat; i++)
+		for (int i=0; i<GlobalC::ucell.nat; i++)
 		{
-			ADecMulP[is][i] = new double[(2*ucell.lmax+1)*(2*ucell.lmax+1)*ucell.nmax];
-			ZEROS(ADecMulP[is][i], (2*ucell.lmax+1)*(2*ucell.lmax+1)*ucell.nmax);
+			ADecMulP[is][i] = new double[(2*GlobalC::ucell.lmax+1)*(2*GlobalC::ucell.lmax+1)*GlobalC::ucell.nmax];
+			ZEROS(ADecMulP[is][i], (2*GlobalC::ucell.lmax+1)*(2*GlobalC::ucell.lmax+1)*GlobalC::ucell.nmax);
 		}
 	}
 }
@@ -102,7 +102,7 @@ Mulliken_Charge::~Mulliken_Charge()
 
 	for (int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for (int i=0; i<ucell.nat; i++)
+		for (int i=0; i<GlobalC::ucell.nat; i++)
 		{
 			delete[] ADecMulP[is][i]; 
 		}
@@ -181,7 +181,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::SEARCH_PBC,
 				GlobalV::ofs_running,
 				GridD, 
-				ucell, 
+				GlobalC::ucell, 
 				GlobalV::SEARCH_RADIUS,
 				GlobalV::test_atom_input);//qifeng-2019-01-21
 
@@ -190,13 +190,13 @@ void Mulliken_Charge::cal_mulliken(void)
 					GlobalV::ofs_running,
 					UOT, 
 					ORB,
-					ucell.ntype,
-					ucell.lmax,
+					GlobalC::ucell.ntype,
+					GlobalC::ucell.lmax,
 					INPUT.lcao_ecut,
 					INPUT.lcao_dk,
 					INPUT.lcao_dr,
 					INPUT.lcao_rmax, 
-					ucell.lat0, 
+					GlobalC::ucell.lat0, 
 					INPUT.out_descriptor,
 					INPUT.out_r_matrix,
 					Exx_Abfs::Lmax,
@@ -264,7 +264,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::ofs_running,
 				GlobalV::SEARCH_PBC,
 				GridD, 
-				ucell, 
+				GlobalC::ucell, 
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input);
 #endif
@@ -275,14 +275,14 @@ void Mulliken_Charge::cal_mulliken(void)
 
 		if(GlobalV::MY_RANK == 0)
 		{
-			for (int i=0; i<ucell.nat; i++)
+			for (int i=0; i<GlobalC::ucell.nat; i++)
 			{   
-				int a = ucell.iat2ia[i];
-				int t = ucell.iat2it[i];
-				Atom* atom1 = &ucell.atoms[t];
+				int a = GlobalC::ucell.iat2ia[i];
+				int t = GlobalC::ucell.iat2it[i];
+				Atom* atom1 = &GlobalC::ucell.atoms[t];
 				for(int j=0; j<atom1->nw; ++j)
 				{
-					int k = ucell.itiaiw2iwt(t,a,j);
+					int k = GlobalC::ucell.itiaiw2iwt(t,a,j);
 					ADecMulP[is][i][j] = DecMulP[is][k];
 
 				}
@@ -361,11 +361,11 @@ void Mulliken_Charge::stdout_mulliken(void)
 		fout << sch << " (Total charge of the system)" << endl;
 		fout << "  Decomposed Mulliken populations" << endl;
 
-		/*for (int i=0; i<ucell.nat; i++)
+		/*for (int i=0; i<GlobalC::ucell.nat; i++)
 		  {
-		  int   t = ucell.iat2it[i];
-		  Atom* atom1 = &ucell.atoms[t];  
-		  fout << i << "         " << ucell.atoms[t].label << "			" << "Up spin" << "                    " << "Down spin" << endl;
+		  int   t = GlobalC::ucell.iat2it[i];
+		  Atom* atom1 = &GlobalC::ucell.atoms[t];  
+		  fout << i << "         " << GlobalC::ucell.atoms[t].label << "			" << "Up spin" << "                    " << "Down spin" << endl;
 		  fout << "            " << "multiple" << endl;
 		//num = 0;
 		for(int j=0; j<atom1->nw; ++j)
@@ -376,13 +376,13 @@ void Mulliken_Charge::stdout_mulliken(void)
 		fout << Name_Angular[L1][m1] << "      " << N1 << "          " << ADecMulP[0][i][j] << "               " << ADecMulP[0][i][j] << endl;
 		}
 		}*/
-		for (int i=0; i<ucell.nat; i++)
+		for (int i=0; i<GlobalC::ucell.nat; i++)
 		{
 			Tcharge = 0.0;
-			int t = ucell.iat2it[i];
+			int t = GlobalC::ucell.iat2it[i];
 			if (GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 			{
-				fout << i << setw(25) << ucell.atoms[t].label 
+				fout << i << setw(25) << GlobalC::ucell.atoms[t].label 
 					<< setw(30) << "Up spin" 
 					<< setw(30) << "Down spin" 
 					<< setw(30) << "Sum"<< setw(30) << "Diff"<< endl;
@@ -390,7 +390,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 			fout << setw(29) << "multiple" <<endl;
 
 			num = 0;
-			int lm = ucell.atoms[t].nwl;
+			int lm = GlobalC::ucell.atoms[t].nwl;
 
 			for (l=0; l<=lm; l++)
 			{             
@@ -407,7 +407,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 				   sum_l[0] = 0.0;
 				   sum_l[1] = 0.0;
 				   }*/
-				for (mul=0; mul<ucell.atoms[t].l_nchi[l]; mul++)
+				for (mul=0; mul<GlobalC::ucell.atoms[t].l_nchi[l]; mul++)
 				{                 
 					if (GlobalV::NSPIN==1){
 						sum_mul[0] = 0.0;
@@ -466,7 +466,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 
 				}
 
-				if (ucell.atoms[t].l_nchi[l]!=0)
+				if (GlobalC::ucell.atoms[t].l_nchi[l]!=0)
 				{
 					if (GlobalV::NSPIN==1)
 					{
@@ -486,7 +486,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 					}
 				}
 			}
-			fout <<"Total Charge on atom  "<< ucell.atoms[t].label <<  setw(20) << Tcharge <<endl<<endl<<endl;
+			fout <<"Total Charge on atom  "<< GlobalC::ucell.atoms[t].label <<  setw(20) << Tcharge <<endl<<endl<<endl;
 		}
 		fout.close();
 		delete[] sum_l;

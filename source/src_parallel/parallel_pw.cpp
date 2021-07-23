@@ -144,7 +144,7 @@ void Parallel_PW::columns_map(void)
 			{
 				Vector3<double> f(i,j,k);
 				// g2= |f|^2 in the unit of (2Pi/lat0)^2
-				double g2 = f * (ucell.GGT * f);
+				double g2 = f * (GlobalC::ucell.GGT * f);
 
 				// gcut is from input.
 				if (g2 <= this->gcut)
@@ -439,7 +439,7 @@ void Parallel_PW::fft_map(
 				{
 					// set 
 					GlobalC::pw.gdirect[ngm_i] = GlobalC::pw.gdirect_global[ig];
-					GlobalC::pw.gcar[ngm_i] = GlobalC::pw.gdirect[ngm_i]*ucell.G;
+					GlobalC::pw.gcar[ngm_i] = GlobalC::pw.gdirect[ngm_i]*GlobalC::ucell.G;
 					GlobalC::pw.gg[ngm_i] = GlobalC::pw.gg_global[ig];
 				}
 				++ngm_i;
@@ -568,7 +568,7 @@ void Parallel_PW::fft_map_after_vc(
     {
         if(this->gcut == GlobalC::pw.ggchg)
         {
-            GlobalC::pw.gcar[ig] = GlobalC::pw.gdirect[ig]*ucell.G;
+            GlobalC::pw.gcar[ig] = GlobalC::pw.gdirect[ig]*GlobalC::ucell.G;
             GlobalC::pw.gg[ig] = GlobalC::pw.get_NormG_cartesian(ig);
         }
     }
@@ -619,7 +619,7 @@ void Parallel_PW::fft_map_final_scf(
 				{
 					// set 
 					GlobalC::pw.gdirect[ngm_i_final_scf] = GlobalC::pw.gdirect_global[ig];
-					GlobalC::pw.gcar[ngm_i_final_scf] = GlobalC::pw.gdirect[ngm_i_final_scf]*ucell.G;
+					GlobalC::pw.gcar[ngm_i_final_scf] = GlobalC::pw.gdirect[ngm_i_final_scf]*GlobalC::ucell.G;
 					GlobalC::pw.gg[ngm_i_final_scf] = GlobalC::pw.gg_global[ig];
 				}
 				++ngm_i_final_scf;

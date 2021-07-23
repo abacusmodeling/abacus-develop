@@ -45,10 +45,10 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	for (int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 	{
 		const int j = GlobalC::pw.ig2fftc[ig];
-		//const double fac = e2 * FOUR_PI / (ucell.tpiba2 * GlobalC::pw.gg [ig]);
+		//const double fac = e2 * FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
 		//ehart += ( conj( Porter[j] ) * Porter[j] ).real() * fac;
 		//vh_g[ig] = fac * Porter[j];
-		shart= ( conj( Porter[j] ) * Porter[j] ).real()/(ucell.tpiba2 * GlobalC::pw.gg [ig]);
+		shart= ( conj( Porter[j] ) * Porter[j] ).real()/(GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
 		for(int l=0;l<3;l++)
 		{
 			for(int m=0;m<l+1;m++)
@@ -58,7 +58,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 		}
 	}
 	//	Parallel_Reduce::reduce_double_pool( GlobalC::en.ehart );
-	//	ehart *= 0.5 * ucell.omega;
+	//	ehart *= 0.5 * GlobalC::ucell.omega;
 	for(int l=0;l<3;l++)
 	{
 		for(int m=0;m<l+1;m++)
@@ -68,7 +68,7 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	}
 
 //        Parallel_Reduce::reduce_double_pool( ehart );
-//        ehart *= 0.5 * ucell.omega;
+//        ehart *= 0.5 * GlobalC::ucell.omega;
         //psic(:)=(0.0,0.0)
 	if(is_pw&&INPUT.gamma_only)
 	{
@@ -93,8 +93,8 @@ void Stress_Func::stress_har(matrix& sigma, const bool is_pw)
 	
 	for(int l=0;l<3;l++)
 	{
-		if(is_pw) sigma(l,l) -= H_Hartree_pw::hartree_energy /ucell.omega;
-		else sigma(l,l) += H_Hartree_pw::hartree_energy /ucell.omega;
+		if(is_pw) sigma(l,l) -= H_Hartree_pw::hartree_energy /GlobalC::ucell.omega;
+		else sigma(l,l) += H_Hartree_pw::hartree_energy /GlobalC::ucell.omega;
 		for(int m=0;m<l;m++)
 		{
 			sigma(m,l)=sigma(l,m);

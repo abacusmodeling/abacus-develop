@@ -175,23 +175,23 @@ void Gint_k::folding_force(
 	}
 	
 	Vector3<double> tau1, dtau;
-	for(int T1=0; T1<ucell.ntype; ++T1)
+	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 	{
-		Atom* atom1 = &ucell.atoms[T1];
+		Atom* atom1 = &GlobalC::ucell.atoms[T1];
 		for(int I1=0; I1< atom1->na; ++I1)
 		{
-			const int iat = ucell.itia2iat(T1,I1);
+			const int iat = GlobalC::ucell.itia2iat(T1,I1);
 			if(GridT.in_this_processor[iat])
 			{
 				assert( lgd > 0 );
 
-				const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 				// get the start positions of elements.
 				const int DM_start = LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
 				//GridD.Find_atom(tau1);
-				GridD.Find_atom(ucell, tau1, T1, I1);
+				GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 				// search for the adjacent atoms.
 				int nad = 0;
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
@@ -199,16 +199,16 @@ void Gint_k::folding_force(
 					// get iat2
 					const int T2 = GridD.getType(ad);
 					const int I2 = GridD.getNatom(ad);
-					const int iat2 = ucell.itia2iat(T2, I2);
+					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 					if(GridT.in_this_processor[iat2])
 					{
-						Atom* atom2 = &ucell.atoms[T2];
+						Atom* atom2 = &GlobalC::ucell.atoms[T2];
 						dtau = GridD.getAdjacentTau(ad) - tau1;
-						double distance = dtau.norm() * ucell.lat0;
+						double distance = dtau.norm() * GlobalC::ucell.lat0;
 						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 						if(distance < rcut)
 						{
-							const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 							int ixxx = DM_start + LNNR.find_R2st[iat][nad];
 							for(int iw=0; iw<atom1->nw; iw++)
 							{
@@ -283,7 +283,7 @@ void Gint_k::folding_force(
 			{
 				continue;
 			}
-			const int iat = ucell.iwt2iat[i];
+			const int iat = GlobalC::ucell.iwt2iat[i];
 			const int index = 3*j;
 			fvl_dphi(iat,0) += 2.0*tmp[index];	
 			fvl_dphi(iat,1) += 2.0*tmp[index+1];	
@@ -383,24 +383,24 @@ void Gint_k::folding_stress(
 		}
 	}
 	Vector3<double> tau1, dtau;
-	for(int T1=0; T1<ucell.ntype; ++T1)
+	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 	{
-		const Atom* atom1 = &ucell.atoms[T1];
+		const Atom* atom1 = &GlobalC::ucell.atoms[T1];
                 
 		for (int I1 =0; I1< atom1->na; ++I1)
 		{
-			const int iat = ucell.itia2iat(T1,I1);
+			const int iat = GlobalC::ucell.itia2iat(T1,I1);
 			if(GridT.in_this_processor[iat])
 			{
 				assert( lgd > 0 );
 
-				const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 				// get the start positions of elements.
 				const int DM_start = LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
 				//GridD.Find_atom(tau1);
-				GridD.Find_atom(ucell, tau1, T1, I1);
+				GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 				// search for the adjacent atoms.
 				int nad = 0;
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
@@ -410,16 +410,16 @@ void Gint_k::folding_stress(
 					const int I2 = GridD.getNatom(ad);
 
 					const Vector3<double> tau2 = GridD.getAdjacentTau(ad);
-					const int iat2 = ucell.itia2iat(T2, I2);
+					const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 					if(GridT.in_this_processor[iat2])
 					{
-						Atom* atom2 = &ucell.atoms[T2];
+						Atom* atom2 = &GlobalC::ucell.atoms[T2];
 						dtau = GridD.getAdjacentTau(ad) - tau1;
-						double distance = dtau.norm() * ucell.lat0;
+						double distance = dtau.norm() * GlobalC::ucell.lat0;
 						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 						if(distance < rcut)
 						{
-							const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 							int ixxx = DM_start + LNNR.find_R2st[iat][nad];
 							for(int iw=0; iw<atom1->nw; iw++)
 							{
@@ -520,7 +520,7 @@ void Gint_k::folding_stress(
 			{
 				continue;
 			}
-			const int iat = ucell.iwt2iat[i];
+			const int iat = GlobalC::ucell.iwt2iat[i];
 			const int index = 3*j;
 			const int index1 = 6*j;
 			fvl_dphi(iat,0) += 2.0*tmp[index];
@@ -650,25 +650,25 @@ void Gint_k::folding_vl_k(const int &ik)
 	{
 		int lgd = 0;
 		Vector3<double> tau1, dtau, dR;
-		for(int T1=0; T1<ucell.ntype; ++T1)
+		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 		{
-			for(int I1=0; I1<ucell.atoms[T1].na; ++I1)
+			for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
 			{
 				// get iat
-				const int iat = ucell.itia2iat(T1,I1);
+				const int iat = GlobalC::ucell.itia2iat(T1,I1);
 				// atom in this grid piece.
 				if(GridT.in_this_processor[iat])
 				{
-					Atom* atom1 = &ucell.atoms[T1];
-					const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+					Atom* atom1 = &GlobalC::ucell.atoms[T1];
+					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 					// get the start positions of elements.
 					const int DM_start = LNNR.nlocstartg[iat];
 
 					// get the coordinates of adjacent atoms.
-					tau1 = ucell.atoms[T1].tau[I1];
+					tau1 = GlobalC::ucell.atoms[T1].tau[I1];
 					//GridD.Find_atom(tau1);	
-					GridD.Find_atom(ucell, tau1, T1, I1);	
+					GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);	
 					// search for the adjacent atoms.
 					int nad = 0;
 
@@ -678,22 +678,22 @@ void Gint_k::folding_vl_k(const int &ik)
 						// get iat2
 						const int T2 = GridD.getType(ad);
 						const int I2 = GridD.getNatom(ad);
-						const int iat2 = ucell.itia2iat(T2, I2);
+						const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
 
 						// adjacent atom is also on the grid.
 						if(GridT.in_this_processor[iat2])
 						{
-							Atom* atom2 = &ucell.atoms[T2];
+							Atom* atom2 = &GlobalC::ucell.atoms[T2];
 							dtau = GridD.getAdjacentTau(ad) - tau1;
-							double distance = dtau.norm() * ucell.lat0;
+							double distance = dtau.norm() * GlobalC::ucell.lat0;
 							double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
 							// for the local part, only need to calculate <phi_i | phi_j> within range
 							// mohan note 2012-07-06
 							if(distance < rcut)
 							{
-								const int start2 = ucell.itiaiw2iwt(T2, I2, 0); 
+								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0); 
 
 								// calculate the distance between iat1 and iat2.
 								// Vector3<double> dR = GridD.getAdjacentTau(ad) - tau1;
@@ -898,25 +898,25 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	{
 		int lgd = 0;
 		Vector3<double> tau1, dtau, dR;
-		for(int T1=0; T1<ucell.ntype; ++T1)
+		for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
 		{
-			for(int I1=0; I1<ucell.atoms[T1].na; ++I1)
+			for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
 			{
 				// get iat
-				const int iat = ucell.itia2iat(T1,I1);
+				const int iat = GlobalC::ucell.itia2iat(T1,I1);
 				// atom in this grid piece.
 				if(GridT.in_this_processor[iat])
 				{
-					Atom* atom1 = &ucell.atoms[T1];
-					const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+					Atom* atom1 = &GlobalC::ucell.atoms[T1];
+					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 					// get the start positions of elements.
 					const int DM_start = LNNR.nlocstartg[iat];
 
 					// get the coordinates of adjacent atoms.
-					tau1 = ucell.atoms[T1].tau[I1];
+					tau1 = GlobalC::ucell.atoms[T1].tau[I1];
 					//GridD.Find_atom(tau1);	
-					GridD.Find_atom(ucell, tau1, T1, I1);	
+					GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);	
 					// search for the adjacent atoms.
 					int nad = 0;
 
@@ -926,22 +926,22 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 						// get iat2
 						const int T2 = GridD.getType(ad);
 						const int I2 = GridD.getNatom(ad);
-						const int iat2 = ucell.itia2iat(T2, I2);
+						const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
 
 						// adjacent atom is also on the grid.
 						if(GridT.in_this_processor[iat2])
 						{
-							Atom* atom2 = &ucell.atoms[T2];
+							Atom* atom2 = &GlobalC::ucell.atoms[T2];
 							dtau = GridD.getAdjacentTau(ad) - tau1;
-							double distance = dtau.norm() * ucell.lat0;
+							double distance = dtau.norm() * GlobalC::ucell.lat0;
 							double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
 							// for the local part, only need to calculate <phi_i | phi_j> within range
 							// mohan note 2012-07-06
 							if(distance < rcut)
 							{
-								const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+								const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 								// calculate the distance between iat1 and iat2.
 								// Vector3<double> dR = GridD.getAdjacentTau(ad) - tau1;
@@ -1161,8 +1161,8 @@ void Gint_k::set_ijk_atom(
 		const int mcell_index = GridT.bcell_start[grid_index] + id;	
 		const int imcell = GridT.which_bigcell[mcell_index];
 		const int iat = GridT.which_atom[mcell_index];
-		const int it = ucell.iat2it[ iat ];
-		const int ia = ucell.iat2ia[ iat ];
+		const int it = GlobalC::ucell.iat2it[ iat ];
+		const int ia = GlobalC::ucell.iat2ia[ iat ];
 
 		// (2.2) get the distance between the grid and the atom.
 		mt[0] = GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0];
@@ -1201,7 +1201,7 @@ void Gint_k::set_ijk_atom(
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 
 			std::vector<double> ylma;
-			Ylm::sph_harm ( ucell.atoms[it].nwl,
+			Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 					dr[ib][id][0] / distance[ib][id],
 					dr[ib][id][1] / distance[ib][id],
 					dr[ib][id][2] / distance[ib][id],
@@ -1224,7 +1224,7 @@ void Gint_k::set_ijk_atom(
 			const double c2 = (dx-2.0*dx2+dx3)*delta_r;
 			const double c4 = (dx3-dx2)*delta_r;
 
-			Atom* atom1 = &ucell.atoms[it];
+			Atom* atom1 = &GlobalC::ucell.atoms[it];
 			double tmp=0.0;//mohan fix bug 2011-05-04
 			for (int iw=0; iw< atom1->nw; iw++)
 			{
@@ -1467,38 +1467,38 @@ void Gint_k::cal_vlocal_R(const int current_spin)
     int R_z;
 
     Vector3<double> tau1, dtau, dR;
-    for(int T1=0; T1<ucell.ntype; ++T1)
+    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
-        for(int I1=0; I1<ucell.atoms[T1].na; ++I1)
+        for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
         {
-            const int iat = ucell.itia2iat(T1,I1);
+            const int iat = GlobalC::ucell.itia2iat(T1,I1);
             if(GridT.in_this_processor[iat])
             {
-                Atom* atom1 = &ucell.atoms[T1];
-                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+                Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
                 const int DM_start = LNNR.nlocstartg[iat];
-                tau1 = ucell.atoms[T1].tau[I1];
+                tau1 = GlobalC::ucell.atoms[T1].tau[I1];
                 //GridD.Find_atom(tau1);        
-                GridD.Find_atom(ucell, tau1, T1, I1);
+                GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
                 int nad2 = 0;
 
                 for(int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
                 {
                     const int T2 = GridD.getType(ad);
                     const int I2 = GridD.getNatom(ad);
-                    const int iat2 = ucell.itia2iat(T2, I2);
+                    const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
                     if(GridT.in_this_processor[iat2])
                     {
-                        Atom* atom2 = &ucell.atoms[T2];
+                        Atom* atom2 = &GlobalC::ucell.atoms[T2];
                         dtau = GridD.getAdjacentTau(ad) - tau1;
-                        double distance = dtau.norm() * ucell.lat0;
+                        double distance = dtau.norm() * GlobalC::ucell.lat0;
                         double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
                         if(distance < rcut)
                         {
-                            const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                            const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
                             dR.x = GridD.getBox(ad).x;
                             dR.y = GridD.getBox(ad).y;
@@ -1858,38 +1858,38 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
     int R_z;
 
     Vector3<double> tau1, dtau, dR;
-    for(int T1=0; T1<ucell.ntype; ++T1)
+    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
-        for(int I1=0; I1<ucell.atoms[T1].na; ++I1)
+        for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; ++I1)
         {
-            const int iat = ucell.itia2iat(T1,I1);
+            const int iat = GlobalC::ucell.itia2iat(T1,I1);
             if(GridT.in_this_processor[iat])
             {
-                Atom* atom1 = &ucell.atoms[T1];
-                const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+                Atom* atom1 = &GlobalC::ucell.atoms[T1];
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
                 const int DM_start = LNNR.nlocstartg[iat];
-                tau1 = ucell.atoms[T1].tau[I1];
+                tau1 = GlobalC::ucell.atoms[T1].tau[I1];
                 //GridD.Find_atom(tau1);        
-                GridD.Find_atom(ucell, tau1, T1, I1);
+                GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
                 int nad2 = 0;
 
                 for(int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
                 {
                     const int T2 = GridD.getType(ad);
                     const int I2 = GridD.getNatom(ad);
-                    const int iat2 = ucell.itia2iat(T2, I2);
+                    const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 
                     if(GridT.in_this_processor[iat2])
                     {
-                        Atom* atom2 = &ucell.atoms[T2];
+                        Atom* atom2 = &GlobalC::ucell.atoms[T2];
                         dtau = GridD.getAdjacentTau(ad) - tau1;
-                        double distance = dtau.norm() * ucell.lat0;
+                        double distance = dtau.norm() * GlobalC::ucell.lat0;
                         double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
                         if(distance < rcut)
                         {
-                            const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                            const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
                             dR.x = GridD.getBox(ad).x;
                             dR.y = GridD.getBox(ad).y;

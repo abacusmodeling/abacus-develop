@@ -133,7 +133,7 @@ void WF_igk::ekin(const int ik)
 //--------------------------------------------------------
 // EXPLAIN : Put the correct units on the kinetic energy
 //--------------------------------------------------------
-        this->g2kin[ig] = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2() * ucell.tpiba2;
+        this->g2kin[ig] = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2() * GlobalC::ucell.tpiba2;
     }
     timer::tick("WF_igk","ekin");
     return ;
@@ -164,9 +164,9 @@ double* WF_igk::get_qvec_cartesian(const int &ik)
     for (int ig=0; ig< GlobalC::kv.ngk[ik]; ig++)
     {
         // cartesian coordinate
-        // modulus, in ucell.tpiba unit.
+        // modulus, in GlobalC::ucell.tpiba unit.
         const double q2 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)).norm2();
-        qmod[ig] = ucell.tpiba * sqrt(q2);//sqrt(q2) * ucell.tpiba;
+        qmod[ig] = GlobalC::ucell.tpiba * sqrt(q2);//sqrt(q2) * GlobalC::ucell.tpiba;
     }
     return qmod;
 }
@@ -175,13 +175,13 @@ double* WF_igk::get_qvec_cartesian(const int &ik)
 complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
 {
     timer::tick("WF_igk","get_sk");
-    const double arg = (GlobalC::kv.kvec_c[ik] * ucell.atoms[it].tau[ia]) * TWO_PI;
+    const double arg = (GlobalC::kv.kvec_c[ik] * GlobalC::ucell.atoms[it].tau[ia]) * TWO_PI;
     const complex<double> kphase = complex <double> ( cos(arg),  -sin(arg) );
     complex<double> *sk = new complex<double>[ GlobalC::kv.ngk[ik] ];
     for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
     {
         const int iig = this->igk(ik, ig);
-        const int iat = ucell.itia2iat(it, ia);
+        const int iat = GlobalC::ucell.itia2iat(it, ia);
         sk[ig] = kphase
                  * GlobalC::pw.eigts1(iat, GlobalC::pw.ig1[iig])
                  * GlobalC::pw.eigts2(iat, GlobalC::pw.ig2[iig])
@@ -199,7 +199,7 @@ complex<double>* WF_igk::get_skq(int ik, const int it, const int ia, Vector3<dou
     for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
     {
         Vector3<double> qkq = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)) + q;
-        double arg = (qkq * ucell.atoms[it].tau[ia]) * TWO_PI;
+        double arg = (qkq * GlobalC::ucell.atoms[it].tau[ia]) * TWO_PI;
         skq[ig] = complex<double>(cos(arg), -sin(arg));
     }
 

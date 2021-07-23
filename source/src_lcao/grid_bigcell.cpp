@@ -26,7 +26,7 @@ Grid_BigCell::~Grid_BigCell()
 	// delete tau positions.
 	if(this->flag_tib)
 	{
-		for(int i=0; i<ucell.nat; i++)
+		for(int i=0; i<GlobalC::ucell.nat; i++)
 		{
 			delete[] tau_in_bigcell[i];
 		}
@@ -44,17 +44,17 @@ void Grid_BigCell::init_big_latvec(void)
 	assert(nbz>0);
 
 	//size of each big room (same shape with unitcell)
-	this->bigcell_vec1[0]= ucell.a1.x / (double)nbx * ucell.lat0;
-	this->bigcell_vec1[1]= ucell.a1.y / (double)nbx * ucell.lat0;
-	this->bigcell_vec1[2]= ucell.a1.z / (double)nbx * ucell.lat0;
+	this->bigcell_vec1[0]= GlobalC::ucell.a1.x / (double)nbx * GlobalC::ucell.lat0;
+	this->bigcell_vec1[1]= GlobalC::ucell.a1.y / (double)nbx * GlobalC::ucell.lat0;
+	this->bigcell_vec1[2]= GlobalC::ucell.a1.z / (double)nbx * GlobalC::ucell.lat0;
 
-	this->bigcell_vec2[0]= ucell.a2.x / (double)nby * ucell.lat0;
-	this->bigcell_vec2[1]= ucell.a2.y / (double)nby * ucell.lat0;
-	this->bigcell_vec2[2]= ucell.a2.z / (double)nby * ucell.lat0;
+	this->bigcell_vec2[0]= GlobalC::ucell.a2.x / (double)nby * GlobalC::ucell.lat0;
+	this->bigcell_vec2[1]= GlobalC::ucell.a2.y / (double)nby * GlobalC::ucell.lat0;
+	this->bigcell_vec2[2]= GlobalC::ucell.a2.z / (double)nby * GlobalC::ucell.lat0;
 
-	this->bigcell_vec3[0]= ucell.a3.x / (double)nbz * ucell.lat0;
-	this->bigcell_vec3[1]= ucell.a3.y / (double)nbz * ucell.lat0;
-	this->bigcell_vec3[2]= ucell.a3.z / (double)nbz * ucell.lat0;
+	this->bigcell_vec3[0]= GlobalC::ucell.a3.x / (double)nbz * GlobalC::ucell.lat0;
+	this->bigcell_vec3[1]= GlobalC::ucell.a3.y / (double)nbz * GlobalC::ucell.lat0;
+	this->bigcell_vec3[2]= GlobalC::ucell.a3.z / (double)nbz * GlobalC::ucell.lat0;
 
 	this->bigcell_latvec0.e11 = this->bigcell_vec1[0];
 	this->bigcell_latvec0.e12 = this->bigcell_vec1[1];
@@ -109,7 +109,7 @@ void Grid_BigCell::init_grid_expansion(void)
 
 	// calculate the max cutoff radius among all orbitals.
 	// then we will use this parameter to generate grid expansion.
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		this->orbital_rmax = std::max( ORB.Phi[T].getRcut(), this->orbital_rmax);
 	}
@@ -120,9 +120,9 @@ void Grid_BigCell::init_grid_expansion(void)
 	// can describe.
 
 	//length of each edge at room
-	this->bigcell_dx = ucell.a1.norm() * ucell.lat0 / (double)nbx;	
-	this->bigcell_dy = ucell.a2.norm() * ucell.lat0 / (double)nby;	
-	this->bigcell_dz = ucell.a3.norm() * ucell.lat0 / (double)nbz;
+	this->bigcell_dx = GlobalC::ucell.a1.norm() * GlobalC::ucell.lat0 / (double)nbx;	
+	this->bigcell_dy = GlobalC::ucell.a2.norm() * GlobalC::ucell.lat0 / (double)nby;	
+	this->bigcell_dz = GlobalC::ucell.a3.norm() * GlobalC::ucell.lat0 / (double)nbz;
 
 	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Length of Meshcell (Bohr): ",bigcell_dx,bigcell_dy,bigcell_dz);
 	
@@ -192,8 +192,8 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 
 	if(!flag_tib)
 	{
-		this->tau_in_bigcell = new double* [ucell.nat];
-		for(int i=0; i<ucell.nat; i++)
+		this->tau_in_bigcell = new double* [GlobalC::ucell.nat];
+		for(int i=0; i<GlobalC::ucell.nat; i++)
 		{
 			this->tau_in_bigcell[i] = new double[3];
 		}
@@ -202,9 +202,9 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 		// allocate space, these arrays record which meshcell
 		// the atom is in.
 		delete[] index_atom;
-		this->index_atom = new int[ucell.nat];
+		this->index_atom = new int[GlobalC::ucell.nat];
 
-		Memory::record("Grid_BigCell","tau_in_bigcell",ucell.nat*3,"double");
+		Memory::record("Grid_BigCell","tau_in_bigcell",GlobalC::ucell.nat*3,"double");
 	}
 	
 	// get the fraction number of (i,j,k)
@@ -212,22 +212,22 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 	int iat=0;
 	int ii,jj,kk;
 	double delta[3];
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			// direct positions of atoms calculated from cartesian coordinates.
 			// not used because the factrion may be <0 (although very small, such as
 			// -1.0e-15) mohan note 2012-07-03
-			//fraction = ( ucell.atoms[it].tau[ia] * ucell.lat0 )* this->bigcell_GT;
+			//fraction = ( GlobalC::ucell.atoms[it].tau[ia] * GlobalC::ucell.lat0 )* this->bigcell_GT;
 
 			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			// mohan add 2012-07-03,
 			// this can make sure faction are always larger than 0.
 			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			fraction.x = ucell.atoms[it].taud[ia].x / (1.0/(double)nbx);
-			fraction.y = ucell.atoms[it].taud[ia].y / (1.0/(double)nby);
-			fraction.z = ucell.atoms[it].taud[ia].z / (1.0/(double)nbz);
+			fraction.x = GlobalC::ucell.atoms[it].taud[ia].x / (1.0/(double)nbx);
+			fraction.y = GlobalC::ucell.atoms[it].taud[ia].y / (1.0/(double)nby);
+			fraction.z = GlobalC::ucell.atoms[it].taud[ia].z / (1.0/(double)nbz);
 
 			// never use the following, especially for k-algorithm,
 			// it may move the atom to a cell that it doesn't belong 
@@ -245,9 +245,9 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 			if( fraction.x < 0 || fraction.y < 0 || fraction.z < 0)
 			{
 				cout << " Atom positions " << endl;
-				cout << ucell.atoms[it].tau[ia].x << " " ;
-				cout << ucell.atoms[it].tau[ia].y << " " ;
-				cout << ucell.atoms[it].tau[ia].z << " " ;
+				cout << GlobalC::ucell.atoms[it].tau[ia].x << " " ;
+				cout << GlobalC::ucell.atoms[it].tau[ia].y << " " ;
+				cout << GlobalC::ucell.atoms[it].tau[ia].z << " " ;
 				cout << " fraction " << endl;
 				cout << fraction.x << " ";
 				cout << fraction.y << " ";

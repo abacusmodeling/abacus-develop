@@ -179,17 +179,17 @@ int wavefunc::get_starting_nw(void)const
     }
     else if (start_wfc.substr(0,6) == "atomic")
     {
-        if (ucell.natomwfc >= GlobalV::NBANDS)
+        if (GlobalC::ucell.natomwfc >= GlobalV::NBANDS)
         {
             if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all pseudo atomic wave functions." << endl;
         }
         else
         {
             if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are atomic + "
-            << GlobalV::NBANDS - ucell.natomwfc
+            << GlobalV::NBANDS - GlobalC::ucell.natomwfc
             << " random wave functions." << endl;
         }
-        return max(ucell.natomwfc,  GlobalV::NBANDS);
+        return max(GlobalC::ucell.natomwfc,  GlobalV::NBANDS);
     }
     else if (start_wfc == "random")
     {
@@ -217,7 +217,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 
 	if(!ltable)
 	{
-		this->table_local.create(ucell.ntype, ucell.nmax_total, GlobalV::NQX);
+		this->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
 
 		// ORB.orbital_file: file name of the numerical atomic orbitals (NAOs)
 		// table_local: generate one-dimensional table for NAOs
@@ -282,8 +282,8 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
 	if(start_wfc.substr(0,6)=="atomic")
 	{
-		this->atomic_wfc(ik, this->npw, ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
-		if( start_wfc == "atomic+random" && starting_nw == ucell.natomwfc )//added by qianrui 2021-5-16
+		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
+		if( start_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
 		{
 			double rr, arg;
 			for(int ib = 0 ; ib < starting_nw ; ++ib )
@@ -306,7 +306,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 		// If not enough atomic wfc are available, complete
 		// with random wfcs
 		//====================================================
-		this->random(wfcatom, ucell.natomwfc, GlobalV::NBANDS, ik);
+		this->random(wfcatom, GlobalC::ucell.natomwfc, GlobalV::NBANDS, ik);
 	}
 	else if(start_wfc=="random")
 	{
@@ -466,12 +466,12 @@ void wavefunc::wfcinit_k(void)
 			{
 				for(int i=0; i<Rmax[iw1][iw2]; i++)
 				{
-					Rcar[iw1][iw2][i].x = ucell.latvec.e11 * R[iw1][iw2][i].x 
-					+ ucell.latvec.e21 * R[iw1][iw2][i].y + ucell.latvec.e31 * R[iw1][iw2][i].z;
-					Rcar[iw1][iw2][i].y = ucell.latvec.e12 * R[iw1][iw2][i].x 
-					+ ucell.latvec.e22 * R[iw1][iw2][i].y + ucell.latvec.e32 * R[iw1][iw2][i].z;
-					Rcar[iw1][iw2][i].z = ucell.latvec.e13 * R[iw1][iw2][i].x 
-					+ ucell.latvec.e23 * R[iw1][iw2][i].y + ucell.latvec.e33 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].x = GlobalC::ucell.latvec.e11 * R[iw1][iw2][i].x 
+					+ GlobalC::ucell.latvec.e21 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e31 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].y = GlobalC::ucell.latvec.e12 * R[iw1][iw2][i].x 
+					+ GlobalC::ucell.latvec.e22 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e32 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].z = GlobalC::ucell.latvec.e13 * R[iw1][iw2][i].x 
+					+ GlobalC::ucell.latvec.e23 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e33 * R[iw1][iw2][i].z;
 				}
 			}
 		}
@@ -667,19 +667,19 @@ int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
 					{
 						//cout <<"count = "<<count<<endl;
 						//cout<<"nx= "<<nx<<" ny= "<<ny<<" nz= "<<nz<<endl;
-						r1.x = ucell.atoms[it1].tau[ia1].x * ucell.lat0;
-						r1.y = ucell.atoms[it1].tau[ia1].y * ucell.lat0;
-						r1.z = ucell.atoms[it1].tau[ia1].z * ucell.lat0;
-						r2.x = (ucell.atoms[it2].tau[ia2].x 
-						+ ucell.latvec.e11 * nx + ucell.latvec.e21 * ny + ucell.latvec.e31 * nz) * ucell.lat0;
-						r2.y = (ucell.atoms[it2].tau[ia2].y 
-						+ ucell.latvec.e12 * nx + ucell.latvec.e22 * ny + ucell.latvec.e32 * nz) * ucell.lat0;
-						r2.z = (ucell.atoms[it2].tau[ia2].z 
-						+ ucell.latvec.e13 * nx + ucell.latvec.e23 * ny + ucell.latvec.e33 * nz) * ucell.lat0;
+						r1.x = GlobalC::ucell.atoms[it1].tau[ia1].x * GlobalC::ucell.lat0;
+						r1.y = GlobalC::ucell.atoms[it1].tau[ia1].y * GlobalC::ucell.lat0;
+						r1.z = GlobalC::ucell.atoms[it1].tau[ia1].z * GlobalC::ucell.lat0;
+						r2.x = (GlobalC::ucell.atoms[it2].tau[ia2].x 
+						+ GlobalC::ucell.latvec.e11 * nx + GlobalC::ucell.latvec.e21 * ny + GlobalC::ucell.latvec.e31 * nz) * GlobalC::ucell.lat0;
+						r2.y = (GlobalC::ucell.atoms[it2].tau[ia2].y 
+						+ GlobalC::ucell.latvec.e12 * nx + GlobalC::ucell.latvec.e22 * ny + GlobalC::ucell.latvec.e32 * nz) * GlobalC::ucell.lat0;
+						r2.z = (GlobalC::ucell.atoms[it2].tau[ia2].z 
+						+ GlobalC::ucell.latvec.e13 * nx + GlobalC::ucell.latvec.e23 * ny + GlobalC::ucell.latvec.e33 * nz) * GlobalC::ucell.lat0;
 						r = r2 - r1;
 						double distance = sqrt(r*r);
 
-						if(distance < (ucell.atoms[it1].Rcut + ucell.atoms[it2].Rcut))
+						if(distance < (GlobalC::ucell.atoms[it1].Rcut + GlobalC::ucell.atoms[it2].Rcut))
 						{
 							R[iw1][iw2][count].x = nx; 
 							R[iw1][iw2][count].y = ny; 
@@ -713,13 +713,13 @@ int wavefunc::iw2it( int iw)    // pengfei 2016-11-23
 {
     int ic, type;
     ic =0;
-    for(int it =0; it<ucell.ntype; it++)
+    for(int it =0; it<GlobalC::ucell.ntype; it++)
 	{
-        for(int ia = 0; ia<ucell.atoms[it].na; ia++)
+        for(int ia = 0; ia<GlobalC::ucell.atoms[it].na; ia++)
         {
-            for(int L=0; L<ucell.atoms[it].nwl+1; L++)
+            for(int L=0; L<GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-                for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+                for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
                 {
                     for(int i=0; i<(2*L+1); i++)
                     {
@@ -740,12 +740,12 @@ int wavefunc::iw2ia( int iw)    // pengfei 2016-11-23
 {
 	int ic, na;
 	ic =0;
-	for(int it =0; it<ucell.ntype; it++)
+	for(int it =0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia = 0; ia<ucell.atoms[it].na; ia++)
+		for(int ia = 0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			for(int L=0; L<ucell.atoms[it].nwl+1; L++)
-				for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+			for(int L=0; L<GlobalC::ucell.atoms[it].nwl+1; L++)
+				for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
 					for(int i=0; i<(2*L+1); i++)
 					{

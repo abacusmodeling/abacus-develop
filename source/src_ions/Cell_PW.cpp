@@ -12,7 +12,7 @@ void Cell_PW::opt_cells_pw()
     //=======================
     // init pseudopotential
     //=======================
-    GlobalC::ppcell.init(ucell.ntype);
+    GlobalC::ppcell.init(GlobalC::ucell.ntype);
 
     //=====================
     // init hamiltonian
@@ -29,7 +29,7 @@ void Cell_PW::opt_cells_pw()
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    GlobalC::ppcell.init_vnl(ucell);
+    GlobalC::ppcell.init_vnl(GlobalC::ucell);
     DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
@@ -59,7 +59,7 @@ void Cell_PW::opt_cells_pw()
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &ucell);
+        GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &GlobalC::ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;

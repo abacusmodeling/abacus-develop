@@ -35,31 +35,31 @@ void Charge::write_rho(
 
 		//GlobalV::ofs_running << "\n Output charge file." << endl;
 
-		ofs << ucell.latName << endl;//1
-		ofs << " " << ucell.lat0 * 0.529177 << endl;
-		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-		ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-		ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latName << endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].label;
+			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
 		ofs << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].na;
+			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
 		ofs << endl;
 		ofs << "Direct" << endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
-				ofs << " " << ucell.atoms[it].taud[ia].x
-					<< " " << ucell.atoms[it].taud[ia].y
-					<< " " << ucell.atoms[it].taud[ia].z << endl;
+				ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].y
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
 			}
 		}
 

@@ -32,31 +32,31 @@ void Potential::write_potential(
     {
         ofs.open( fn.c_str() );
 
-        ofs << ucell.latName << endl;//1
-        ofs << " " << ucell.lat0 * 0.529177 << endl;
-        ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-        ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-        ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+        ofs << GlobalC::ucell.latName << endl;//1
+        ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
+        ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+        ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+        ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            ofs << " " << ucell.atoms[it].label;
+            ofs << " " << GlobalC::ucell.atoms[it].label;
         }
         ofs << endl;
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            ofs << " " << ucell.atoms[it].na;
+            ofs << " " << GlobalC::ucell.atoms[it].na;
         }
         ofs << endl;
         ofs << "Direct" << endl;
 
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            for(int ia=0; ia<ucell.atoms[it].na; ia++)
+            for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
             {
-                ofs << " " << ucell.atoms[it].taud[ia].x
-                    << " " << ucell.atoms[it].taud[ia].y
-                    << " " << ucell.atoms[it].taud[ia].z << endl;
+                ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].y
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
             }
         }
         ofs << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
@@ -234,7 +234,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         const int j = GlobalC::pw.ig2fftc[ig];
         if(GlobalC::pw.gg[ig] >= 1.0e-12) //LiuXh 20180410
         {
-            const double fac = e2 * FOUR_PI / (ucell.tpiba2 * GlobalC::pw.gg [ig]);
+            const double fac = e2 * FOUR_PI / (GlobalC::ucell.tpiba2 * GlobalC::pw.gg [ig]);
             vh_g[ig] = fac * Porter[j];
         }
     }
@@ -269,29 +269,29 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         ofs.open( fn.c_str() );
         ofs_ave.open( fn_ave.c_str() );
 
-        ofs << ucell.latName << endl;//1
-        ofs << " " << ucell.lat0 * 0.529177 << endl;
-        ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-        ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-        ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+        ofs << GlobalC::ucell.latName << endl;//1
+        ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
+        ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+        ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+        ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 
-        ofs_ave << ucell.latName << endl;//1
-        ofs_ave << " " << ucell.lat0 * 0.529177 << endl;
-        ofs_ave << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-        ofs_ave << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-        ofs_ave << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+        ofs_ave << GlobalC::ucell.latName << endl;//1
+        ofs_ave << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
+        ofs_ave << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+        ofs_ave << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+        ofs_ave << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            ofs << " " << ucell.atoms[it].label;
-            ofs_ave << " " << ucell.atoms[it].label;
+            ofs << " " << GlobalC::ucell.atoms[it].label;
+            ofs_ave << " " << GlobalC::ucell.atoms[it].label;
         }
         ofs << endl;
         ofs_ave << endl;
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            ofs << " " << ucell.atoms[it].na;
-            ofs_ave << " " << ucell.atoms[it].na;
+            ofs << " " << GlobalC::ucell.atoms[it].na;
+            ofs_ave << " " << GlobalC::ucell.atoms[it].na;
         }
         ofs << endl;
         ofs << "Direct" << endl;
@@ -299,17 +299,17 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
         ofs_ave << endl;
         ofs_ave << "Direct" << endl;
 
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            for(int ia=0; ia<ucell.atoms[it].na; ia++)
+            for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
             {
-                ofs << " " << ucell.atoms[it].taud[ia].x
-                    << " " << ucell.atoms[it].taud[ia].y
-                    << " " << ucell.atoms[it].taud[ia].z << endl;
+                ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].y
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
 
-                ofs_ave << " " << ucell.atoms[it].taud[ia].x
-                    << " " << ucell.atoms[it].taud[ia].y
-                    << " " << ucell.atoms[it].taud[ia].z << endl;
+                ofs_ave << " " << GlobalC::ucell.atoms[it].taud[ia].x
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].y
+                    << " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
             }
         }
 

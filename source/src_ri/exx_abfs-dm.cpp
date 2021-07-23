@@ -22,15 +22,15 @@ void Exx_Abfs::DM::cal_DM(
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
-		const size_t it1 = ucell.iat2it[iat1];
-		const size_t it2 = ucell.iat2it[iat2];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
+		const size_t it2 = GlobalC::ucell.iat2it[iat2];
 
 		for( const Vector3<int> &box : Born_von_Karman_boxes )
 		{
-			DMr[iat1][iat2][box] = vector<matrix>( GlobalV::NSPIN, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
+			DMr[iat1][iat2][box] = vector<matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*ucell.latvec)) ) ).real();
+				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*GlobalC::ucell.latvec)) ) ).real();
 			}
 		}
 	}
@@ -94,17 +94,17 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
-		const size_t it1 = ucell.iat2it[iat1];
-		const size_t it2 = ucell.iat2it[iat2];
-		const size_t ia1 = ucell.iat2ia[iat1];
-		const size_t ia2 = ucell.iat2ia[iat2];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
+		const size_t it2 = GlobalC::ucell.iat2it[iat2];
+		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
+		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
+		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
-			for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
+			for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
 			{
-				for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
+				for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
 				{
 					for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 					{
@@ -117,14 +117,14 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 							//---------------------------------------------------------
 							WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update LOWF.WFC_GAMMA");
 //							DMk_raw[iat1][iat2][ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) 
-//								* LOWF.WFC_GAMMA[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)] 
-//								* LOWF.WFC_GAMMA[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)];
+//								* LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
+//								* LOWF.WFC_GAMMA[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)];
 						}
 						else
 						{
 							DMk_raw[iat1][iat2][ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) 
-								* LOWF.WFC_K[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)] 
-								* conj(LOWF.WFC_K[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)]);
+								* LOWF.WFC_K[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)] 
+								* conj(LOWF.WFC_K[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)]);
 						}
 					}
 				}

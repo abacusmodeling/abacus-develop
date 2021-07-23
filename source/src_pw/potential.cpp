@@ -74,7 +74,7 @@ void Potential::init_pot(
 	//-------------------------------------------------------------------
 	this->set_local_pot(
 		this->vltot, // 3D local pseudopotentials 
-		ucell.ntype,
+		GlobalC::ucell.ntype,
 		GlobalC::pw.ngmc,
 		GlobalC::ppcell.vloc,
 		GlobalC::pw.ig2ngg,
@@ -300,7 +300,7 @@ matrix Potential::v_of_rho(
 	#ifdef USE_LIBXC
     const std::tuple<double,double,matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, CHR.rho_core);
 	#else
-    const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, ucell.omega, rho_in, CHR.rho_core);
+    const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, CHR.rho_core);
 	#endif
 	H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
 	H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
@@ -309,7 +309,7 @@ matrix Potential::v_of_rho(
 //----------------------------------------------------------
 //  calculate the Hartree potential
 //----------------------------------------------------------
-	v += H_Hartree_pw::v_hartree(ucell,GlobalC::pw, GlobalV::NSPIN, rho_in);
+	v += H_Hartree_pw::v_hartree(GlobalC::ucell,GlobalC::pw, GlobalV::NSPIN, rho_in);
 
     // mohan add 2011-06-20
     if(GlobalV::EFIELD && GlobalV::DIPOLE)
@@ -381,10 +381,10 @@ void Potential::newd(void)
 	// no ultrasoft potentials: use bare coefficients for projectors
 	// if( spin_orbital) ....
 	// else if(noncolin) ....
-	for (int iat=0; iat<ucell.nat; iat++)
+	for (int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
-		const int it = ucell.iat2it[iat];
-		const int nht = ucell.atoms[it].nh;
+		const int it = GlobalC::ucell.iat2it[iat];
+		const int nht = GlobalC::ucell.atoms[it].nh;
 		// nht: number of beta functions per atom type
 		for (int is = 0; is < GlobalV::NSPIN; is++)
 		{

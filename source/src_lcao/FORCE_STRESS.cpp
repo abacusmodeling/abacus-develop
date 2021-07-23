@@ -54,7 +54,7 @@ void Force_Stress_LCAO::getForceStress(
 	
 	if(!isforce&&!isstress) return;
 
-	const int nat = ucell.nat;
+	const int nat = GlobalC::ucell.nat;
 
 	//total force : matrix fcs;
 
@@ -142,9 +142,9 @@ void Force_Stress_LCAO::getForceStress(
 		if(isforce)
 		{
 			force_vdw.create(nat,3);
-			Vdwd2 vdwd2(ucell,vdwd2_para);
+			Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
 			vdwd2.cal_force();
-			for(int iat=0; iat<ucell.nat; ++iat)
+			for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 			{
 				force_vdw(iat,0) = vdwd2.get_force()[iat].x;
 				force_vdw(iat,1) = vdwd2.get_force()[iat].y;
@@ -153,7 +153,7 @@ void Force_Stress_LCAO::getForceStress(
 		}
 		if(isstress)
 		{
-			Vdwd2 vdwd2(ucell,vdwd2_para);
+			Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
 			vdwd2.cal_stress();
 			stress_vdw = vdwd2.get_stress().to_matrix();
 		}
@@ -164,9 +164,9 @@ void Force_Stress_LCAO::getForceStress(
 		if(isforce)
 		{
 			force_vdw.create(nat,3);
-			Vdwd3 vdwd3(ucell,vdwd3_para);
+			Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
 			vdwd3.cal_force();
-			for(int iat=0; iat<ucell.nat; ++iat)
+			for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 			{
 				force_vdw(iat,0) = vdwd3.get_force()[iat].x;
 				force_vdw(iat,1) = vdwd3.get_force()[iat].y;
@@ -175,7 +175,7 @@ void Force_Stress_LCAO::getForceStress(
 		}
 		if(isstress)
 		{
-			Vdwd3 vdwd3(ucell,vdwd3_para);
+			Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
 			vdwd3.cal_stress();
 			stress_vdw = vdwd3.get_stress().to_matrix();
 		}
@@ -351,7 +351,7 @@ void Force_Stress_LCAO::getForceStress(
 		{
 			GlobalV::ofs_running << "\n FORCE INVALID TABLE." << endl;
 			GlobalV::ofs_running << " " << setw(8) << "atom" << setw(5) << "x" << setw(5) << "y" << setw(5) << "z" << endl;
-			for(int iat=0; iat<ucell.nat; iat++)
+			for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 			{
 				GlobalV::ofs_running << " " << setw(8) << iat;
 				for(int i=0; i<3; i++)
@@ -405,7 +405,7 @@ void Force_Stress_LCAO::getForceStress(
 
 		if(Symmetry::symm_flag)
 		{
-			symm.stress_symmetry(scs, ucell);
+			symm.stress_symmetry(scs, GlobalC::ucell);
 		}//end symmetry
 
 		// print Rydberg stress or not
@@ -499,12 +499,12 @@ void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool sc
 	}
 
     int iat = 0;
-    for (int it = 0;it < ucell.ntype;it++)
+    for (int it = 0;it < GlobalC::ucell.ntype;it++)
     {
-        for (int ia = 0;ia < ucell.atoms[it].na;ia++)
+        for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
 			stringstream ss;
-			ss << ucell.atoms[it].label << ia+1;
+			ss << GlobalC::ucell.atoms[it].label << ia+1;
 
 			GlobalV::ofs_running << " " << setw(8) << ss.str();
 			if( abs(f(iat,0)) >output_acc) GlobalV::ofs_running << setw(15) << f(iat,0)*fac;
@@ -564,7 +564,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 			cout << "open FORCE.dat error !" <<endl;
 		}
 
-		for(int iat=0; iat<ucell.nat; iat++)
+		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
 			ofs << "   " << fcs(iat,0)*Ry_to_eV / 0.529177
 				<< "   " << fcs(iat,1)*Ry_to_eV / 0.529177
@@ -582,12 +582,12 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 	}
 
     iat=0;
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
-        for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+        for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
             stringstream ss;
-            ss << ucell.atoms[it].label << ia+1;
+            ss << GlobalC::ucell.atoms[it].label << ia+1;
 
 			if(istestf)
 			{
@@ -719,7 +719,7 @@ void Force_Stress_LCAO::calStressPwPart(
 	//--------------------------------------------------------
 	for(int i=0;i<3;i++)
 	{
-		sigmaxc(i,i) =  -(H_XC_pw::etxc) / ucell.omega;
+		sigmaxc(i,i) =  -(H_XC_pw::etxc) / GlobalC::ucell.omega;
 	}
 	//Exchange-correlation for PBE
 	sc_pw.stress_gga(sigmaxc);
@@ -731,16 +731,16 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 {
 	double *pos;
 	double d1,d2,d3;
-	pos = new double[ucell.nat*3];
-	ZEROS(pos, ucell.nat*3);
+	pos = new double[GlobalC::ucell.nat*3];
+	ZEROS(pos, GlobalC::ucell.nat*3);
 	int iat = 0;
-	for(int it = 0;it < ucell.ntype;it++)
+	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
-		for(int ia =0;ia< ucell.atoms[it].na;ia++)
+		for(int ia =0;ia< GlobalC::ucell.atoms[it].na;ia++)
 		{
-			pos[3*iat  ] = ucell.atoms[it].taud[ia].x ;
-			pos[3*iat+1] = ucell.atoms[it].taud[ia].y ;
-			pos[3*iat+2] = ucell.atoms[it].taud[ia].z;
+			pos[3*iat  ] = GlobalC::ucell.atoms[it].taud[ia].x ;
+			pos[3*iat+1] = GlobalC::ucell.atoms[it].taud[ia].y ;
+			pos[3*iat+2] = GlobalC::ucell.atoms[it].taud[ia].z;
 			for(int k=0; k<3; ++k)
 			{
 				symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
@@ -750,23 +750,23 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 		}
 	}
 
-	for(int iat=0; iat<ucell.nat; iat++)
+	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		Mathzone::Cartesian_to_Direct(fcs(iat,0),fcs(iat,1),fcs(iat,2),
-							ucell.a1.x, ucell.a1.y, ucell.a1.z,
-							ucell.a2.x, ucell.a2.y, ucell.a2.z,
-							ucell.a3.x, ucell.a3.y, ucell.a3.z,
+							GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
+							GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
+							GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
 							d1,d2,d3);
 
 		fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
 	}
-	symm.force_symmetry(fcs , pos, ucell);
-	for(int iat=0; iat<ucell.nat; iat++)
+	symm.force_symmetry(fcs , pos, GlobalC::ucell);
+	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		Mathzone::Direct_to_Cartesian(fcs(iat,0),fcs(iat,1),fcs(iat,2),
-							ucell.a1.x, ucell.a1.y, ucell.a1.z,
-							ucell.a2.x, ucell.a2.y, ucell.a2.z,
-							ucell.a3.x, ucell.a3.y, ucell.a3.z,
+							GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
+							GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
+							GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
 							d1,d2,d3);
 
 		fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;

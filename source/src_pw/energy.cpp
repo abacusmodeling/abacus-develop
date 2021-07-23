@@ -236,16 +236,16 @@ void energy::print_etot(
 				if(GlobalV::NSPIN==2)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<ucell.magnet.tot_magnetization;
-					cout<<setw(10)<<ucell.magnet.abs_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
 				else if(GlobalV::NSPIN==4 && GlobalV::NONCOLIN)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<ucell.magnet.tot_magnetization_nc[0]
-					<<setw(10)<<ucell.magnet.tot_magnetization_nc[1]
-					<<setw(10)<<ucell.magnet.tot_magnetization_nc[2];
-					cout<<setw(10)<<ucell.magnet.abs_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[0]
+					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[1]
+					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[2];
+					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
 				if(dr2>1.0)
 				{
@@ -289,8 +289,8 @@ void energy::print_etot(
 			if(GlobalV::NSPIN==2)
 			{
 				cout << setprecision(2);
-				cout<<setw(10)<<ucell.magnet.tot_magnetization;
-				cout<<setw(10)<<ucell.magnet.abs_magnetization;
+				cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+				cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 			}
 			cout << setprecision(6);
 			cout << setw(15) << GlobalC::en.etot*Ry_to_eV;
@@ -372,7 +372,7 @@ double energy::delta_e(void)
     deband0 = deband_aux;
 #endif
 
-    deband0 *= ucell.omega / GlobalC::pw.ncxyz;
+    deband0 *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 	
 	// \int rho(r) v_{exx}(r) dr = 2 E_{exx}[rho]
 	deband0 -= 2*exx;				// Peize Lin add 2017-10-16
@@ -415,7 +415,7 @@ void energy::delta_escf(void)
 
     Parallel_Reduce::reduce_double_pool( descf );
 
-    this->descf *= ucell.omega / GlobalC::pw.ncxyz;
+    this->descf *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     return;
 }
 

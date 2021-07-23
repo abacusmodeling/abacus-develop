@@ -73,10 +73,10 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
+            const int iat = GlobalC::ucell.iwt2iat[i];
             for(int j=0; j<GlobalV::NLOCAL; j++)
             {
-                //const int iat2 = ucell.iwt2iat[j];
+                //const int iat2 = GlobalC::ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];
                 const int nu = ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0 )
@@ -109,7 +109,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         }
 
 //          cout << "fvl_dphi:" << endl;
-//          for(int iat=0; iat<ucell.nat; ++iat)
+//          for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 //          {
 //              cout << setw(5) << iat << setw(15) << fvl_dphi[iat][0] 
 //              << setw(15) << fvl_dphi[iat][1]
@@ -128,7 +128,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             for(int j=0;j<3;j++)
             {
                 if(i<j) svl_dphi(j,i) = svl_dphi(i,j);
-				svl_dphi(i,j) /= ucell.omega;
+				svl_dphi(i,j) /= GlobalC::ucell.omega;
             }
         }
     }
@@ -211,10 +211,10 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
+            const int iat = GlobalC::ucell.iwt2iat[i];
             for(int j=0; j<GlobalV::NLOCAL; j++)
             {
-                //const int iat2 = ucell.iwt2iat[j];
+                //const int iat2 = GlobalC::ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];
                 const int nu = ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0 )
@@ -247,7 +247,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         }
 
         //cout << "fvl_dphi:" << endl;
-        //for(int iat=0; iat<ucell.nat; ++iat)
+        //for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
         //{
         //cout << setw(5) << iat << setw(15) << fvl_dphi[iat][0] 
         //<< setw(15) << fvl_dphi[iat][1]
@@ -265,7 +265,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             for(int j=0;j<3;j++)
             {
                 if(i<j) svl_dphi(j,i) = svl_dphi(i,j);
-				svl_dphi(i,j) /= ucell.omega;
+				svl_dphi(i,j) /= GlobalC::ucell.omega;
             }
         }
     }

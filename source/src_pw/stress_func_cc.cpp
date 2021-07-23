@@ -19,9 +19,9 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	double* rhocg;
 
 	int judge=0;
-	for(nt=0;nt<ucell.ntype;nt++)
+	for(nt=0;nt<GlobalC::ucell.ntype;nt++)
 	{
-		if(ucell.atoms[nt].nlcc) 
+		if(GlobalC::ucell.atoms[nt].nlcc) 
 		{
 			judge++;
 		}
@@ -33,7 +33,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	}
 
 	//recalculate the exchange-correlation potential
-    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, ucell.omega, CHR.rho, CHR.rho_core);
+    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, CHR.rho, CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
 	const matrix vxc = std::get<2>(etxc_vtxc_v);
@@ -66,17 +66,17 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 	ZEROS(rhocg, GlobalC::pw.nggm);
 
 	sigmadiag=0.0;
-	for(nt=0;nt<ucell.ntype;nt++)
+	for(nt=0;nt<GlobalC::ucell.ntype;nt++)
 	{
-		if(ucell.atoms[nt].nlcc)
+		if(GlobalC::ucell.atoms[nt].nlcc)
 		{
 			//drhoc();
 			CHR.non_linear_core_correction(
 				GlobalC::ppcell.numeric,
-				ucell.atoms[nt].msh,
-				ucell.atoms[nt].r,
-				ucell.atoms[nt].rab,
-				ucell.atoms[nt].rho_atc,
+				GlobalC::ucell.atoms[nt].msh,
+				GlobalC::ucell.atoms[nt].r,
+				GlobalC::ucell.atoms[nt].rab,
+				GlobalC::ucell.atoms[nt].rho_atc,
 				rhocg);
 
 
@@ -92,10 +92,10 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 			}
 			this->deriv_drhoc (
 				GlobalC::ppcell.numeric,
-				ucell.atoms[nt].msh,
-				ucell.atoms[nt].r,
-				ucell.atoms[nt].rab,
-				ucell.atoms[nt].rho_atc,
+				GlobalC::ucell.atoms[nt].msh,
+				GlobalC::ucell.atoms[nt].r,
+				GlobalC::ucell.atoms[nt].rab,
+				GlobalC::ucell.atoms[nt].rho_atc,
 				rhocg);
 			// non diagonal term (g=0 contribution missing)
 			for( ng = GlobalC::pw.gstart;ng< GlobalC::pw.ngmc;ng++)
@@ -106,7 +106,7 @@ void Stress_Func::stress_cc(matrix& sigma, const bool is_pw)
 				{
 					for (m = 0;m< 3;m++)
 					{
-						const complex<double> t = conj(psic[GlobalC::pw.ig2fftc[ng]]) * GlobalC::pw.strucFac(nt, ng) * rhocg[GlobalC::pw.ig2ngg[ng]] * ucell.tpiba *
+						const complex<double> t = conj(psic[GlobalC::pw.ig2fftc[ng]]) * GlobalC::pw.strucFac(nt, ng) * rhocg[GlobalC::pw.ig2ngg[ng]] * GlobalC::ucell.tpiba *
 												  GlobalC::pw.get_G_cartesian_projection(ng, l) * GlobalC::pw.get_G_cartesian_projection(ng, m) 
 												  / norm_g * fact;
 						//						sigmacc [l][ m] += t.real();
@@ -178,13 +178,13 @@ void Stress_Func::deriv_drhoc
 	
 	for(int igl = igl0;igl< GlobalC::pw.nggm;igl++)
 	{
-		gx = sqrt(GlobalC::pw.ggs [igl] * ucell.tpiba2);
+		gx = sqrt(GlobalC::pw.ggs [igl] * GlobalC::ucell.tpiba2);
 		for( int ir = 0;ir< mesh; ir++)
 		{
 			aux [ir] = r [ir] * rhoc [ir] * (r [ir] * cos (gx * r [ir] ) / gx - sin (gx * r [ir] ) / pow(gx,2));
 		}//ir
 		Integral::Simpson_Integral(mesh, aux, rab, rhocg1);
-		drhocg [igl] = FOUR_PI / ucell.omega * rhocg1;
+		drhocg [igl] = FOUR_PI / GlobalC::ucell.omega * rhocg1;
 	}//igl
 	
 	delete [] aux;

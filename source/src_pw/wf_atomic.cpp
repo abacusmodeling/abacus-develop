@@ -41,9 +41,9 @@ void WF_atomic::init_at_1(void)
 // EXPLAIN : Find the type of atom that has most mesh points.
 //----------------------------------------------------------
     int ndm = 0;
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
-        ndm = (ucell.atoms[it].msh > ndm) ? ucell.atoms[it].msh : ndm;
+        ndm = (GlobalC::ucell.atoms[it].msh > ndm) ? GlobalC::ucell.atoms[it].msh : ndm;
     }
 	OUT(GlobalV::ofs_running,"max mesh points in Pseudopotential",ndm);
 
@@ -55,21 +55,21 @@ void WF_atomic::init_at_1(void)
 // orbitals (controlled by parameters)
 //
 // USE GLOBAL CLASS VARIABLES :
-// NAME : ucell.atoms.nchi
-// NAME : ucell.atoms.msh(number of mesh points)
-// NAME : ucell.atoms.r
+// NAME : GlobalC::ucell.atoms.nchi
+// NAME : GlobalC::ucell.atoms.msh(number of mesh points)
+// NAME : GlobalC::ucell.atoms.r
 //----------------------------------------------------------
     const int startq = 0;
-    const double pref = FOUR_PI / sqrt(ucell.omega);
+    const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
     double *aux = new double[ndm];
     double *vchi = new double[ndm];
 
 	OUT(GlobalV::ofs_running,"dq(describe PAO in reciprocal space)",GlobalV::DQ);
 	OUT(GlobalV::ofs_running,"max q",GlobalV::NQX);
 
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
-		Atom* atom = &ucell.atoms[it];
+		Atom* atom = &GlobalC::ucell.atoms[it];
 
 		GlobalV::ofs_running <<"\n number of pseudo atomic orbitals for "
 		<< atom->label << " is " << atom->nchi << endl;
@@ -136,10 +136,10 @@ void WF_atomic::init_at_1(void)
                     //				if( it == 0 && ic == 0 )
                     //				{
                     //
-                    //					for (ir = 0;ir < ucell.atoms[it].msh;ir++)
+                    //					for (ir = 0;ir < GlobalC::ucell.atoms[it].msh;ir++)
                     //						GlobalV::ofs_running << setprecision(20) << "\n vchi(" << ir << ")=" << vchi[ir];
                     //					GlobalV::ofs_running<<"\n aux[0] = "<<aux[0];
-                    //					GlobalV::ofs_running<<"\n msh = "<< ucell.atoms[it].msh;
+                    //					GlobalV::ofs_running<<"\n msh = "<< GlobalC::ucell.atoms[it].msh;
                     //					GlobalV::ofs_running<<"\n tab_at : "<<ppcell.tab_at(it, ic, iq) ;
                     //					GlobalV::ofs_running<<"\n pref = "<<pref;
                     //				}
@@ -157,9 +157,9 @@ void WF_atomic::init_at_1(void)
 void WF_atomic::print_PAOs(void)const
 {
     if (GlobalV::MY_RANK!=0) return;
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
-        for (int icc=0; icc<ucell.atoms[it].nchi ;icc++)
+        for (int icc=0; icc<GlobalC::ucell.atoms[it].nchi ;icc++)
         {
             int ic = icc;
             if(GlobalV::NSPIN==4) ic = icc/2;
@@ -171,27 +171,27 @@ void WF_atomic::print_PAOs(void)const
 			else if (ic == 4) orbital_type = "G"; // liuyu add 2021-05-07
             else
             {
-				GlobalV::ofs_warning << "\n nchi = " << ucell.atoms[it].nchi << endl;
+				GlobalV::ofs_warning << "\n nchi = " << GlobalC::ucell.atoms[it].nchi << endl;
                 WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
             }
 
             stringstream ss;
             ss << GlobalV::global_out_dir
-            << ucell.atoms[it].label << "/"
-            << ucell.atoms[it].label << "-"
+            << GlobalC::ucell.atoms[it].label << "/"
+            << GlobalC::ucell.atoms[it].label << "-"
             << orbital_type << ".ORBITAL";
 
             ofstream ofs(ss.str().c_str());
-            ofs << "Mesh " << ucell.atoms[it].msh;
+            ofs << "Mesh " << GlobalC::ucell.atoms[it].msh;
             ofs << "\n" << setw(15) << "Radial"
             << setw(15) << "Psi"
             << setw(15) << "Rab";
 
-            for (int i=0;i<ucell.atoms[it].msh;i++)
+            for (int i=0;i<GlobalC::ucell.atoms[it].msh;i++)
             {
-                ofs << "\n" << setw(15) << ucell.atoms[it].r[i]
-                << setw(15) << ucell.atoms[it].chi(icc,i)
-                << setw(15) << ucell.atoms[it].rab[i];
+                ofs << "\n" << setw(15) << GlobalC::ucell.atoms[it].r[i]
+                << setw(15) << GlobalC::ucell.atoms[it].chi(icc,i)
+                << setw(15) << GlobalC::ucell.atoms[it].rab[i];
             }
             ofs.close();
         }
@@ -260,20 +260,20 @@ void WF_atomic::atomic_wfc
     // Calculate G space 3D wave functions
     //---------------------------------------------------------
     double *flq = new double[np];
-    for (int it = 0;it < ucell.ntype;it++)
+    for (int it = 0;it < GlobalC::ucell.ntype;it++)
     {
-        for (int ia = 0;ia < ucell.atoms[it].na;ia++)
+        for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
 			//cout << "\n it = " << it << " ia = " << ia << endl;
             complex<double> *sk = this->get_sk(ik, it, ia);
             //-------------------------------------------------------
             // Calculate G space 3D wave functions
             //-------------------------------------------------------
-            for (int iw = 0;iw < ucell.atoms[it].nchi;iw++)
+            for (int iw = 0;iw < GlobalC::ucell.atoms[it].nchi;iw++)
             {
-                if (ucell.atoms[it].oc[iw] >= 0.0)
+                if (GlobalC::ucell.atoms[it].oc[iw] >= 0.0)
                 {
-                    const int l = ucell.atoms[it].lchi[iw];
+                    const int l = GlobalC::ucell.atoms[it].lchi[iw];
                     complex<double> lphase = pow(NEG_IMAG_UNIT, l);
                     //-----------------------------------------------------
                     //  the factor i^l MUST BE PRESENT in order to produce
@@ -287,16 +287,16 @@ void WF_atomic::atomic_wfc
                     {
                         flq[ig] =
                             PolyInt::Polynomial_Interpolation(table_q,
-                                                               it, iw, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
+                                                               it, iw, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
                     }
 
                     if(GlobalV::NSPIN==4)
                     {
-                        if(ucell.atoms[it].has_so)
+                        if(GlobalC::ucell.atoms[it].has_so)
                         {
                             Soc soc;
 						    soc.rot_ylm(l+1);
-                            const double j = ucell.atoms[it].jchi[iw];
+                            const double j = GlobalC::ucell.atoms[it].jchi[iw];
                             if ( !(GlobalV::DOMAG||GlobalV::DOMAG_Z))
                             {//atomic_wfc_so
                                 double fact[2];
@@ -345,9 +345,9 @@ void WF_atomic::atomic_wfc
                                  }
                               else
                               {
-                                 for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
+                                 for(int ib = 0;ib < GlobalC::ucell.atoms[it].nchi;ib++)
                                  {
-                                    if((ucell.atoms[it].lchi[ib] == l)&&(fabs(ucell.atoms[it].jchi[ib]-l+0.5)<1e-4))
+                                    if((GlobalC::ucell.atoms[it].lchi[ib] == l)&&(fabs(GlobalC::ucell.atoms[it].jchi[ib]-l+0.5)<1e-4))
                                     {
                                        nc=ib;
                                        break;
@@ -357,20 +357,20 @@ void WF_atomic::atomic_wfc
                                  {//Average the two functions
                                     chiaux[ig] =  l *
                                          PolyInt::Polynomial_Interpolation(table_q,
-                                                               it, nc, table_dimension, dq, gk[ig].norm() * ucell.tpiba );
+                                                               it, nc, table_dimension, dq, gk[ig].norm() * GlobalC::ucell.tpiba );
 
                                     chiaux[ig] += flq[ig] * (l+1.0) ;
                                     chiaux[ig] *= 1/(2.0*l+1.0);
                                  }
                               }
                               //and construct the starting wavefunctions as in the noncollinear case.
-                              alpha = ucell.magnet.angle1_[it];
-                              gamma = -1 * ucell.magnet.angle2_[it] + 0.5 * PI;
+                              alpha = GlobalC::ucell.magnet.angle1_[it];
+                              gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * PI;
 
                               for(int m = 0;m<2*l+1;m++)
                               {
                                  const int lm = l*l +m;
-                                 if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+                                 if(index+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                  for(int ig = 0;ig<np;ig++)
                                  {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
@@ -400,12 +400,12 @@ void WF_atomic::atomic_wfc
                         {//atomic_wfc_nc
                             double alpha, gamman;
                             complex<double> fup, fdown;
-                            alpha = ucell.magnet.angle1_[it];
-                            gamman = -ucell.magnet.angle2_[it] + 0.5*PI;
+                            alpha = GlobalC::ucell.magnet.angle1_[it];
+                            gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
                             for(int m = 0;m<2*l+1;m++)
                             {
                                 const int lm = l*l +m;
-                                if(index+2*l+1>ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
+                                if(index+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
                                 for(int ig = 0;ig<np;ig++)
                                 {
                                      aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
@@ -458,9 +458,9 @@ void WF_atomic::atomic_wfc
 
 	if(GlobalV::test_wf)OUT(GlobalV::ofs_running,"wf_index",index);
 
-    if (index != ucell.natomwfc)
+    if (index != GlobalC::ucell.natomwfc)
     {
-        WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != ucell.natomwfc");
+        WARNING_QUIT("GlobalC::wf.atomic_wfc()","index != GlobalC::ucell.natomwfc");
     }
     delete[] flq;
     delete [] gk;

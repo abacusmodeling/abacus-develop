@@ -663,7 +663,7 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 			set_rhog(Rrho[is][irstep], kerpulay);
 
 			const double fac = this->mixing_gg0;
-			const double gg0 = std::pow(fac * 0.529177 /ucell.tpiba, 2);
+			const double gg0 = std::pow(fac * 0.529177 /GlobalC::ucell.tpiba, 2);
 			double* filter_g = new double[GlobalC::pw.ngmc];
 			for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
 			{

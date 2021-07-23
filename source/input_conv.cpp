@@ -36,9 +36,9 @@ void Input_Conv::Convert(void)
     if(INPUT.kpoint_file!= "") GlobalV::global_kpoint_card = INPUT.kpoint_file;
     if(INPUT.pseudo_dir != "") GlobalV::global_pseudo_dir = INPUT.pseudo_dir + "/";
     GlobalV::global_pseudo_type = INPUT.pseudo_type;
-	ucell.latName = INPUT.latname; 
-	ucell.ntype = INPUT.ntype;
-	ucell.lmaxmax = INPUT.lmaxmax;
+	GlobalC::ucell.latName = INPUT.latname; 
+	GlobalC::ucell.ntype = INPUT.ntype;
+	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
 
     GlobalV::NBANDS = INPUT.nbands;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
@@ -96,39 +96,39 @@ void Input_Conv::Convert(void)
 	// pengfei Li add 2018-11-11
 	if(INPUT.fixed_axes == "None")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "volume")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "a")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "b")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "c")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "ab")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "ac")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "bc")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "abc")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 0;
 	}
 	else
 	{
@@ -321,25 +321,25 @@ void Input_Conv::Convert(void)
 		}
 		GlobalV::LSPINORB = INPUT.lspinorb;
 
-		delete[] ucell.magnet.m_loc_;
-		delete[] ucell.magnet.angle1_;
-		delete[] ucell.magnet.angle2_;
-		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
-		ucell.magnet.angle1_ = new double[INPUT.ntype];
-		ucell.magnet.angle2_ = new double[INPUT.ntype];
+		delete[] GlobalC::ucell.magnet.m_loc_;
+		delete[] GlobalC::ucell.magnet.angle1_;
+		delete[] GlobalC::ucell.magnet.angle2_;
+		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
+		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
-			ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
-			ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
 		}
 #ifdef __MPI
-//			Parallel_Common::bcast_double(ucell.magnet.angle1_[i]);
-//			Parallel_Common::bcast_double(ucell.magnet.angle2_[i]);
+//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
+//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle2_[i]);
 #endif
 	}
 	else{
-		delete[] ucell.magnet.m_loc_;
-		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		delete[] GlobalC::ucell.magnet.m_loc_;
+		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;

@@ -90,7 +90,7 @@ void Charge_Extra::allocate_ions(void)
 	this->dim = 0;
 	
 	// for the second-order extrapolation	
-	pos_dim = ucell.nat * 3;
+	pos_dim = GlobalC::ucell.nat * 3;
 
 	delete[] this->pos_old1;
 	delete[] this->pos_old2;
@@ -372,10 +372,10 @@ void Charge_Extra::find_alpha_and_beta(void)
 	if(istep >= 3)
 	{
 		int iat=0;
-		for(int it = 0;it < ucell.ntype;it++)
+		for(int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
-			//Atom* atom = &ucell.atoms[it];
-			for(int ia =0;ia< ucell.atoms[it].na;ia++)
+			//Atom* atom = &GlobalC::ucell.atoms[it];
+			for(int ia =0;ia< GlobalC::ucell.atoms[it].na;ia++)
 			{
 				a11 += (pos_now[3*iat  ] - pos_old1[3*iat  ]) * (pos_now[3*iat  ] - pos_old1[3*iat  ]) + 
 					(pos_now[3*iat+1] - pos_old1[3*iat+1]) * (pos_now[3*iat+1] - pos_old1[3*iat+1]) + 
@@ -426,7 +426,7 @@ void Charge_Extra::find_alpha_and_beta(void)
 
 void Charge_Extra::save_pos_next(const UnitCell_pseudo& ucell)
 {
-	ucell.save_cartesian_position(this->pos_next);
+	GlobalC::ucell.save_cartesian_position(this->pos_next);
 	return;
 }
 
@@ -438,12 +438,12 @@ void Charge_Extra::update_istep(const int &step)
 
 void Charge_Extra::update_all_pos(const UnitCell_pseudo& ucell)
 {
-	const int total_freedom = ucell.nat * 3;
+	const int total_freedom = GlobalC::ucell.nat * 3;
 	for(int i=0;i<total_freedom;i++)
 	{
 		this->pos_old2[i] = this->pos_old1[i];
 		this->pos_old1[i] = this->pos_now[i];
 	}
-	ucell.save_cartesian_position(this->pos_now);
+	GlobalC::ucell.save_cartesian_position(this->pos_now);
 	return;
 }

@@ -31,30 +31,30 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 
 		//GlobalV::ofs_running << "\n Output charge file." << endl;
 
-		ofs << ucell.latName << endl;//1
-		ofs << " " << ucell.lat0 * 0.529177 << endl;
-		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-		ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-		ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		ofs << GlobalC::ucell.latName << endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].label;
+			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
 		ofs << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].na;
+			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
 		ofs << endl;
 		ofs << "Direct" << endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
-				ofs << " " << ucell.atoms[it].taud[ia].x
-					<< " " << ucell.atoms[it].taud[ia].y
-					<< " " << ucell.atoms[it].taud[ia].z << endl;
+				ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].y
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
 			}
 		}
 
@@ -96,15 +96,15 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		{
 			for(int i=0; i<GlobalC::pw.ncx; i++)
 			{
-				dipole_elec_x += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*i*ucell.lat0*0.529177/GlobalC::pw.ncx;
-				dipole_elec_y += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*j*ucell.lat0*0.529177/GlobalC::pw.ncy;
-				dipole_elec_z += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*k*ucell.lat0*0.529177/GlobalC::pw.ncz;
+				dipole_elec_x += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*i*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;
+				dipole_elec_y += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*j*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;
+				dipole_elec_z += rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k]*k*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;
 			}
 		}
 	}
-	dipole_elec_x *= ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-	dipole_elec_y *= ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-	dipole_elec_z *= ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+	dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+	dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+	dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 	Parallel_Reduce::reduce_double_pool( dipole_elec_x );
 	Parallel_Reduce::reduce_double_pool( dipole_elec_y );
 	Parallel_Reduce::reduce_double_pool( dipole_elec_z );
@@ -120,7 +120,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 	double dipole_elec_x=0.0, dipole_elec_y=0.0, dipole_elec_z=0.0;
 	//cout << "GlobalC::pw.nrxx: " << GlobalC::pw.nrxx <<endl;
 	//cout << "GlobalC::pw.ncxyz: " << GlobalC::pw.ncxyz <<endl;
-	//cout << "ucell.omega: " << ucell.omega <<endl;
+	//cout << "GlobalC::ucell.omega: " << GlobalC::ucell.omega <<endl;
 
 //	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
 //	GlobalV::ofs_running << "\n GlobalV::RANK_IN_POOL = " << GlobalV::RANK_IN_POOL;
@@ -224,21 +224,21 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 					{
 /*
 						if(ix<GlobalC::pw.ncx/2)
-							{dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*ix*ucell.lat0*0.529177/GlobalC::pw.ncx;}
+							{dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*ix*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;}
 						else
-							{dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*(ix-GlobalC::pw.ncx)*ucell.lat0*0.529177/GlobalC::pw.ncx;}
+							{dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*(ix-GlobalC::pw.ncx)*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;}
 						if(iy<GlobalC::pw.ncy/2)
-							{dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*iy*ucell.lat0*0.529177/GlobalC::pw.ncy;}
+							{dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*iy*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;}
 						else
-							{dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*(iy-GlobalC::pw.ncy)*ucell.lat0*0.529177/GlobalC::pw.ncy;}
+							{dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*(iy-GlobalC::pw.ncy)*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;}
 						if(iz<GlobalC::pw.ncz/2)
-							{dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*iz*ucell.lat0*0.529177/GlobalC::pw.ncz;}
+							{dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*iz*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;}
 						else
-							{dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*(iz-GlobalC::pw.ncz)*ucell.lat0*0.529177/GlobalC::pw.ncz;}
+							{dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*(iz-GlobalC::pw.ncz)*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;}
 */
-						dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*ix*ucell.lat0*0.529177/GlobalC::pw.ncx;
-						dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*iy*ucell.lat0*0.529177/GlobalC::pw.ncy;
-						dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*iz*ucell.lat0*0.529177/GlobalC::pw.ncz;
+						dipole_elec_x += zpiece[ix*GlobalC::pw.ncy+iy]*ix*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncx;
+						dipole_elec_y += zpiece[ix*GlobalC::pw.ncy+iy]*iy*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncy;
+						dipole_elec_z += zpiece[ix*GlobalC::pw.ncy+iy]*iz*GlobalC::ucell.lat0*0.529177/GlobalC::pw.ncz;
 
 					}
 				}
@@ -247,9 +247,9 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 
 		delete[] zpiece;
 
-		dipole_elec_x *= ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-		dipole_elec_y *= ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-		dipole_elec_z *= ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+		dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+		dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
+		dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 		//cout << setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<endl;
 		//cout << setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<endl;
 		//cout << setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<endl;
@@ -260,49 +260,49 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		ofs << " " << "dipole_elec_z: " << dipole_elec_z << endl;
 
 		double dipole_ion_x=0.0, dipole_ion_y=0.0, dipole_ion_z=0.0;	// dipole_sum=0.0;
-		if(ucell.ntype == 1)
+		if(GlobalC::ucell.ntype == 1)
 		{
-			for(int ia=0; ia<ucell.atoms[0].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[0].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
-				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
-				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_x += GlobalC::ucell.atoms[0].taud[ia].x*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_y += GlobalC::ucell.atoms[0].taud[ia].y*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_z += GlobalC::ucell.atoms[0].taud[ia].z*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
 			}
 		}
-		else if(ucell.ntype == 2)
+		else if(GlobalC::ucell.ntype == 2)
 		{
-			for(int ia=0; ia<ucell.atoms[0].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[0].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
-				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
-				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_x += GlobalC::ucell.atoms[0].taud[ia].x*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_y += GlobalC::ucell.atoms[0].taud[ia].y*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_z += GlobalC::ucell.atoms[0].taud[ia].z*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
 			}
-			for(int ia=0; ia<ucell.atoms[1].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[1].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[1].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
-				dipole_ion_y += ucell.atoms[1].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
-				dipole_ion_z += ucell.atoms[1].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_x += GlobalC::ucell.atoms[1].taud[ia].x*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_y += GlobalC::ucell.atoms[1].taud[ia].y*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_z += GlobalC::ucell.atoms[1].taud[ia].z*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
 			}
 		}
-		else if(ucell.ntype == 3)
+		else if(GlobalC::ucell.ntype == 3)
 		{
-			for(int ia=0; ia<ucell.atoms[0].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[0].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[0].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
-				dipole_ion_y += ucell.atoms[0].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
-				dipole_ion_z += ucell.atoms[0].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_x += GlobalC::ucell.atoms[0].taud[ia].x*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_y += GlobalC::ucell.atoms[0].taud[ia].y*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
+				dipole_ion_z += GlobalC::ucell.atoms[0].taud[ia].z*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_01;
 			}
-			for(int ia=0; ia<ucell.atoms[1].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[1].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[1].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
-				dipole_ion_y += ucell.atoms[1].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
-				dipole_ion_z += ucell.atoms[1].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_x += GlobalC::ucell.atoms[1].taud[ia].x*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_y += GlobalC::ucell.atoms[1].taud[ia].y*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
+				dipole_ion_z += GlobalC::ucell.atoms[1].taud[ia].z*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_02;
 			}
-			for(int ia=0; ia<ucell.atoms[2].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[2].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[2].taud[ia].x*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
-				dipole_ion_y += ucell.atoms[2].taud[ia].y*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
-				dipole_ion_z += ucell.atoms[2].taud[ia].z*ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
+				dipole_ion_x += GlobalC::ucell.atoms[2].taud[ia].x*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
+				dipole_ion_y += GlobalC::ucell.atoms[2].taud[ia].y*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
+				dipole_ion_z += GlobalC::ucell.atoms[2].taud[ia].z*GlobalC::ucell.lat0*0.529177*ELEC_evolve::td_val_elec_03;
 			}
 		}
 		else
@@ -312,27 +312,27 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 
 
 /*
-		for(int it=1; it<(ucell.ntype); it++)
+		for(int it=1; it<(GlobalC::ucell.ntype); it++)
 		{
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[it].taud[ia].x*ucell.lat0*0.529177*6;
-				dipole_ion_y += ucell.atoms[it].taud[ia].y*ucell.lat0*0.529177*6;
-				dipole_ion_z += ucell.atoms[it].taud[ia].z*ucell.lat0*0.529177*6;
+				dipole_ion_x += GlobalC::ucell.atoms[it].taud[ia].x*GlobalC::ucell.lat0*0.529177*6;
+				dipole_ion_y += GlobalC::ucell.atoms[it].taud[ia].y*GlobalC::ucell.lat0*0.529177*6;
+				dipole_ion_z += GlobalC::ucell.atoms[it].taud[ia].z*GlobalC::ucell.lat0*0.529177*6;
 
 			}
-				dipole_ion_x += ucell.atoms[it-1].taud[0].x*ucell.lat0*0.529177*1;
-				dipole_ion_y += ucell.atoms[it-1].taud[0].y*ucell.lat0*0.529177*1;
-				dipole_ion_z += ucell.atoms[it-1].taud[0].z*ucell.lat0*0.529177*1;
+				dipole_ion_x += GlobalC::ucell.atoms[it-1].taud[0].x*GlobalC::ucell.lat0*0.529177*1;
+				dipole_ion_y += GlobalC::ucell.atoms[it-1].taud[0].y*GlobalC::ucell.lat0*0.529177*1;
+				dipole_ion_z += GlobalC::ucell.atoms[it-1].taud[0].z*GlobalC::ucell.lat0*0.529177*1;
 		}
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
-				dipole_ion_x += ucell.atoms[it].taud[ia].x*ucell.lat0*0.529177*5;
-				dipole_ion_y += ucell.atoms[it].taud[ia].y*ucell.lat0*0.529177*5;
-				dipole_ion_z += ucell.atoms[it].taud[ia].z*ucell.lat0*0.529177*5;
+				dipole_ion_x += GlobalC::ucell.atoms[it].taud[ia].x*GlobalC::ucell.lat0*0.529177*5;
+				dipole_ion_y += GlobalC::ucell.atoms[it].taud[ia].y*GlobalC::ucell.lat0*0.529177*5;
+				dipole_ion_z += GlobalC::ucell.atoms[it].taud[ia].z*GlobalC::ucell.lat0*0.529177*5;
 
 			}
 		}

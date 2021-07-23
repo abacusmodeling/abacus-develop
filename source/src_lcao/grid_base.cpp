@@ -126,12 +126,12 @@ void Grid_Base::init(
 	}
 
 	int tot_pairs = 0;
-	for(int T1=0; T1<ucell.ntype; T1++)
+	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 	{
-		for(int I1=0; I1<ucell.atoms[T1].na; I1++)
+		for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
 		{
-			//GridD.Find_atom(ucell.atoms[T1].tau[I1]);
-			GridD.Find_atom(ucell, ucell.atoms[T1].tau[I1], T1, I1);
+			//GridD.Find_atom(GlobalC::ucell.atoms[T1].tau[I1]);
+			GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[T1].tau[I1], T1, I1);
 			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
 			{
 				++tot_pairs;
@@ -160,9 +160,9 @@ void Grid_Base::get_rcut_max(void)
 	for(int it=0; it<ORB.get_ntype(); it++)
 	{
 		this->Rcut_max[it] = 0.0;
-		for (int L = 0; L < ucell.atoms[it].nwl + 1; L++)
+		for (int L = 0; L < GlobalC::ucell.atoms[it].nwl + 1; L++)
 		{
-			for (int N = 0; N < ucell.atoms[it].l_nchi[L]; N++)
+			for (int N = 0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 			{
 				Rcut_max[it] = max(ORB.Phi[it].getRcut(),
 			               Rcut_max[it]);

@@ -101,25 +101,25 @@ void toWannier90::read_nnkp()
 				  >> real_lattice_nnkp.e21 >> real_lattice_nnkp.e22 >> real_lattice_nnkp.e23
 				  >> real_lattice_nnkp.e31 >> real_lattice_nnkp.e32 >> real_lattice_nnkp.e33;
 				  
-		real_lattice_nnkp = real_lattice_nnkp / ucell.lat0_angstrom;
+		real_lattice_nnkp = real_lattice_nnkp / GlobalC::ucell.lat0_angstrom;
 		
-		if(abs(real_lattice_nnkp.e11 - ucell.latvec.e11) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e11 - GlobalC::ucell.latvec.e11) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e12 - ucell.latvec.e12) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e12 - GlobalC::ucell.latvec.e12) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e13 - ucell.latvec.e13) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e13 - GlobalC::ucell.latvec.e13) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e21 - ucell.latvec.e21) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e21 - GlobalC::ucell.latvec.e21) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e22 - ucell.latvec.e22) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e22 - GlobalC::ucell.latvec.e22) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e23 - ucell.latvec.e23) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e23 - GlobalC::ucell.latvec.e23) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e31 - ucell.latvec.e31) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e31 - GlobalC::ucell.latvec.e31) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e32 - ucell.latvec.e32) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e32 - GlobalC::ucell.latvec.e32) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
-		if(abs(real_lattice_nnkp.e33 - ucell.latvec.e33) > 1.0e-4) 
+		if(abs(real_lattice_nnkp.e33 - GlobalC::ucell.latvec.e33) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error real_lattice in *.nnkp file");
 		
 	}
@@ -131,26 +131,26 @@ void toWannier90::read_nnkp()
 				  >> recip_lattice_nnkp.e21 >> recip_lattice_nnkp.e22 >> recip_lattice_nnkp.e23
 				  >> recip_lattice_nnkp.e31 >> recip_lattice_nnkp.e32 >> recip_lattice_nnkp.e33;
 		
-		const double tpiba_angstrom = TWO_PI / ucell.lat0_angstrom;
+		const double tpiba_angstrom = TWO_PI / GlobalC::ucell.lat0_angstrom;
 		recip_lattice_nnkp = recip_lattice_nnkp / tpiba_angstrom;
 		
-		if(abs(recip_lattice_nnkp.e11 - ucell.G.e11) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e11 - GlobalC::ucell.G.e11) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e12 - ucell.G.e12) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e12 - GlobalC::ucell.G.e12) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e13 - ucell.G.e13) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e13 - GlobalC::ucell.G.e13) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e21 - ucell.G.e21) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e21 - GlobalC::ucell.G.e21) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e22 - ucell.G.e22) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e22 - GlobalC::ucell.G.e22) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e23 - ucell.G.e23) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e23 - GlobalC::ucell.G.e23) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e31 - ucell.G.e31) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e31 - GlobalC::ucell.G.e31) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e32 - ucell.G.e32) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e32 - GlobalC::ucell.G.e32) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
-		if(abs(recip_lattice_nnkp.e33 - ucell.G.e33) > 1.0e-4) 
+		if(abs(recip_lattice_nnkp.e33 - GlobalC::ucell.G.e33) > 1.0e-4) 
 			WARNING_QUIT("toWannier90::read_nnkp","Error recip_lattice in *.nnkp file");
 	}
 	
@@ -279,7 +279,7 @@ void toWannier90::read_nnkp()
 	// ������̽�������
 	for(int i = 0; i < num_wannier; i++)
 	{
-		R_centre[i] = R_centre[i] * ucell.latvec;
+		R_centre[i] = R_centre[i] * GlobalC::ucell.latvec;
 		m[i] = m[i] - 1; // ABACUS and wannier90 �ԴŽǶ���m�Ķ��岻һ����ABACUS�Ǵ�0��ʼ�ģ�wannier90�Ǵ�1��ʼ��
 	}
 	
@@ -1360,7 +1360,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 	// ��GlobalV::NQX��G���в�ֵ�����npw��G���ֵ
 	for(int ig = 0; ig < npw; ig++)
 	{
-		psik[ig] = PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * ucell.tpiba);
+		psik[ig] = PolyInt::Polynomial_Interpolation(psik_tem, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba);
 	}
 	
 	
@@ -1433,7 +1433,7 @@ void toWannier90::get_trial_orbitals_lm_k(const int wannier_index, const int orb
 
 void toWannier90::integral(const int meshr, const double *psir, const double *r, const double *rab, const int &l, double* table)
 {
-	const double pref = FOUR_PI / sqrt(ucell.omega);
+	const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
 	
 	double *inner_part = new double[meshr];
 	for(int ir=0; ir<meshr; ir++)
@@ -1638,7 +1638,7 @@ complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, co
 #ifdef __LCAO
 void toWannier90::lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G)
 {
-	this->table_local.create(ucell.ntype, ucell.nmax_total, GlobalV::NQX);
+	this->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
 	Wavefunc_in_pw::make_table_q(ORB.orbital_file, this->table_local);
 	Wavefunc_in_pw::produce_local_basis_in_pw(ik, orbital_in_G, this->table_local);
 }

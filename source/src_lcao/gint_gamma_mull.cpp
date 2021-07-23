@@ -32,7 +32,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 
 	// allocate 1
 	int nnnmax=0;
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		nnnmax = max(nnnmax, nnn[T]);
 	}
@@ -61,9 +61,9 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 			for(int j=0; j<max_size; j++) 
 			{
 				dr[i][j] = new double[3];
-				psir_ylm[i][j] = new double[ucell.nwmax];
+				psir_ylm[i][j] = new double[GlobalC::ucell.nwmax];
 				ZEROS(dr[i][j],3);
-				ZEROS(psir_ylm[i][j],ucell.nwmax);
+				ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
 			}
 		}
 	}
@@ -104,8 +104,8 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 
                     int iat = GridT.which_atom[mcell_index];
 
-                    const int it = ucell.iat2it[ iat ];
-                    const int ia = ucell.iat2ia[ iat ];
+                    const int it = GlobalC::ucell.iat2it[ iat ];
+                    const int ia = GlobalC::ucell.iat2ia[ iat ];
 
                     // meshball_positions should be the bigcell position in meshball
                     // to the center of meshball.
@@ -143,7 +143,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 						//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 						if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 						
-						Ylm::sph_harm (	ucell.atoms[it].nwl,
+						Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 								dr[ib][id][0] / distance[ib][id],
 								dr[ib][id][1] / distance[ib][id],
 								dr[ib][id][2] / distance[ib][id],
@@ -182,7 +182,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 						//		double coef1 = (A*A*A-A)/6.0*delta_r*delta_r;
 						//		double coef2 = (B*B*B-B)/6.0*delta_r*delta_r;
 
-						Atom* atom1 = &ucell.atoms[it];
+						Atom* atom1 = &GlobalC::ucell.atoms[it];
 						for (int iw=0; iw< atom1->nw; iw++)
 						{
 							if ( atom1->iw2_new[iw] )
@@ -202,11 +202,11 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
                 for (int ia1=0; ia1<size; ia1++)
                 {
                     const int mcell_index1 = GridT.bcell_start[grid_index] + ia1;
-					const int T1 = ucell.iat2it[ GridT.which_atom[mcell_index1] ];
-					Atom *atom1 = &ucell.atoms[T1];
-					const int I1 = ucell.iat2ia[ GridT.which_atom[mcell_index1] ];
+					const int T1 = GlobalC::ucell.iat2it[ GridT.which_atom[mcell_index1] ];
+					Atom *atom1 = &GlobalC::ucell.atoms[T1];
+					const int I1 = GlobalC::ucell.iat2ia[ GridT.which_atom[mcell_index1] ];
 					// get the start index of local orbitals.
-					const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 					// call to get real spherical harmonic values according to
 					// a particular number: (lmax+1)^2 and vectors between
@@ -221,16 +221,16 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 					for (int ia2=0; ia2<size; ia2++)
 					{
 						const int mcell_index2 = GridT.bcell_start[grid_index] + ia2;
-						const int T2 = ucell.iat2it[ GridT.which_atom[mcell_index2]];
+						const int T2 = GlobalC::ucell.iat2it[ GridT.which_atom[mcell_index2]];
 
 						// only do half part of matrix(including diago part)
 						// for T2 > T1, we done all elements, for T2 == T1,
 						// we done about half.
 						if (T2 >= T1)
 						{
-							Atom *atom2 = &ucell.atoms[T2];
-							const int I2 = ucell.iat2ia[ GridT.which_atom[mcell_index2]];
-							const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+							Atom *atom2 = &GlobalC::ucell.atoms[T2];
+							const int I2 = GlobalC::ucell.iat2ia[ GridT.which_atom[mcell_index2]];
+							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{

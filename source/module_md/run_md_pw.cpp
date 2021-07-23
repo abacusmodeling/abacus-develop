@@ -43,7 +43,7 @@ void Run_MD_PW::md_ions_pw(void)
         LCM.allocate();
     }
 
-    MD_basic mdb(INPUT.mdp, ucell);
+    MD_basic mdb(INPUT.mdp, GlobalC::ucell);
     int mdtype = INPUT.mdp.mdtype;
 
     this->istep = 1;
@@ -70,7 +70,7 @@ void Run_MD_PW::md_ions_pw(void)
         {
             // setup vdwd2 parameters
 	        vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(ucell);
+	        vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
@@ -78,13 +78,13 @@ void Run_MD_PW::md_ions_pw(void)
         }
         if (vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-03, update 2021-03-09
         {
-            Vdwd2 vdwd2(ucell, vdwd2_para);
+            Vdwd2 vdwd2(GlobalC::ucell, vdwd2_para);
             vdwd2.cal_energy();
             GlobalC::en.evdw = vdwd2.get_energy();
         }
         if (vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
         {
-            Vdwd3 vdwd3(ucell, vdwd3_para);
+            Vdwd3 vdwd3(GlobalC::ucell, vdwd3_para);
             vdwd3.cal_energy();
             GlobalC::en.evdw = vdwd3.get_energy();
         }
@@ -137,7 +137,7 @@ void Run_MD_PW::md_ions_pw(void)
             eiter = elec_sto.iter;
         }
 
-        CE.update_all_pos(ucell);
+        CE.update_all_pos(GlobalC::ucell);
 
         if (pot.out_potential == 2)
         {
@@ -170,7 +170,7 @@ void Run_MD_PW::md_ions_pw(void)
 
         time_t fend = time(NULL);
 
-        CE.save_pos_next(ucell);
+        CE.save_pos_next(GlobalC::ucell);
 
         //xiaohui add CE.istep = istep 2014-07-07
         CE.update_istep(istep);
@@ -226,7 +226,7 @@ void Run_MD_PW::md_cells_pw()
     //=======================
     // init pseudopotential
     //=======================
-    GlobalC::ppcell.init(ucell.ntype);
+    GlobalC::ppcell.init(GlobalC::ucell.ntype);
 
     //=====================
     // init hamiltonian
@@ -243,7 +243,7 @@ void Run_MD_PW::md_cells_pw()
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    GlobalC::ppcell.init_vnl(ucell);
+    GlobalC::ppcell.init_vnl(GlobalC::ucell);
     DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
@@ -273,7 +273,7 @@ void Run_MD_PW::md_cells_pw()
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &ucell);
+        GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &GlobalC::ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;

@@ -32,7 +32,7 @@ void Dos::calculate_Mulliken(const string &fa)
 			{
 				for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
-					mulliken[is][iw] *= ucell.omega/GlobalC::pw.ncxyz;
+					mulliken[is][iw] *= GlobalC::ucell.omega/GlobalC::pw.ncxyz;
 					if( abs(mulliken[is][iw]) < 1.0e-10 ) mulliken[is][iw] = 0.0; 
 				}
 			}
@@ -54,9 +54,9 @@ void Dos::calculate_Mulliken(const string &fa)
 			 
 			 // output information for each atom.
 			int iw_all=0;
-			for(int it=0; it<ucell.ntype; ++it)
+			for(int it=0; it<GlobalC::ucell.ntype; ++it)
 			{
-				Atom* atom = &ucell.atoms[it];
+				Atom* atom = &GlobalC::ucell.atoms[it];
 				ofs << setw(5) << "TYPE" << setw(8) << "ATOM" << setw(5) << "SPIN";
 				ofs << setprecision(3);
 				for(int l=0; l<= atom->nwl; ++l)
@@ -283,7 +283,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 					ofs << "   # this is a Band-XCRYSDEN-Structure-File" << endl;
 					ofs << "   # aimed at Visualization of Fermi Surface" << endl;
 					ofs << "   #" << endl;
-					ofs << "   # Case: " << ucell.latName << endl;
+					ofs << "   # Case: " << GlobalC::ucell.latName << endl;
 					ofs << "   #" << endl;	
 					ofs << " Fermi Energy: " << GlobalC::en.ef << endl;
 					ofs << " END_INFO" << endl;
@@ -293,9 +293,9 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 					ofs << " " << end-start+1 << endl;
 					ofs << " NKX NKY NKZ" << endl;
 					ofs << " 0 0 0" << endl;
-					ofs << " " << ucell.G.e11 << " " << ucell.G.e12 << " " << ucell.G.e13 << endl; 
-					ofs << " " << ucell.G.e21 << " " << ucell.G.e22 << " " << ucell.G.e23 << endl; 
-					ofs << " " << ucell.G.e31 << " " << ucell.G.e32 << " " << ucell.G.e33 << endl; 
+					ofs << " " << GlobalC::ucell.G.e11 << " " << GlobalC::ucell.G.e12 << " " << GlobalC::ucell.G.e13 << endl; 
+					ofs << " " << GlobalC::ucell.G.e21 << " " << GlobalC::ucell.G.e22 << " " << GlobalC::ucell.G.e23 << endl; 
+					ofs << " " << GlobalC::ucell.G.e31 << " " << GlobalC::ucell.G.e32 << " " << GlobalC::ucell.G.e33 << endl; 
 				}
 
 				const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];

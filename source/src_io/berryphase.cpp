@@ -461,25 +461,25 @@ void berryphase::Macroscopic_polarization()
 	double polarization_ion[3]; // 指的是晶格矢量R1，R2，R3方向
 	ZEROS(polarization_ion,3);
 	// 倒格矢
-	Vector3<double> rcell_1(ucell.G.e11,ucell.G.e12,ucell.G.e13);
-	Vector3<double> rcell_2(ucell.G.e21,ucell.G.e22,ucell.G.e23);
-	Vector3<double> rcell_3(ucell.G.e31,ucell.G.e32,ucell.G.e33);
-	int *mod_ion = new int[ucell.nat];
-	double *pdl_ion_R1 = new double[ucell.nat];
-	double *pdl_ion_R2 = new double[ucell.nat];
-	double *pdl_ion_R3 = new double[ucell.nat];  
-	ZEROS(mod_ion,ucell.nat);
-	ZEROS(pdl_ion_R1,ucell.nat);
-	ZEROS(pdl_ion_R2,ucell.nat);
-	ZEROS(pdl_ion_R3,ucell.nat);
+	Vector3<double> rcell_1(GlobalC::ucell.G.e11,GlobalC::ucell.G.e12,GlobalC::ucell.G.e13);
+	Vector3<double> rcell_2(GlobalC::ucell.G.e21,GlobalC::ucell.G.e22,GlobalC::ucell.G.e23);
+	Vector3<double> rcell_3(GlobalC::ucell.G.e31,GlobalC::ucell.G.e32,GlobalC::ucell.G.e33);
+	int *mod_ion = new int[GlobalC::ucell.nat];
+	double *pdl_ion_R1 = new double[GlobalC::ucell.nat];
+	double *pdl_ion_R2 = new double[GlobalC::ucell.nat];
+	double *pdl_ion_R3 = new double[GlobalC::ucell.nat];  
+	ZEROS(mod_ion,GlobalC::ucell.nat);
+	ZEROS(pdl_ion_R1,GlobalC::ucell.nat);
+	ZEROS(pdl_ion_R2,GlobalC::ucell.nat);
+	ZEROS(pdl_ion_R3,GlobalC::ucell.nat);
 	
 	bool lodd = false;
 	int atom_index = 0;
-	for(int it = 0; it < ucell.ntype; it++)
+	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-		for(int ia = 0; ia < ucell.atoms[it].na; ia++)
+		for(int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
 		{
-			if(ucell.atoms[it].zv % 2 == 1)
+			if(GlobalC::ucell.atoms[it].zv % 2 == 1)
 			{
 				mod_ion[atom_index] = 1;
 				lodd = true;
@@ -494,20 +494,20 @@ void berryphase::Macroscopic_polarization()
 	}
 	
 	atom_index = 0;
-	for(int it = 0; it < ucell.ntype; it++)
+	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-		for(int ia = 0; ia < ucell.atoms[it].na; ia++)
+		for(int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
 		{
-			pdl_ion_R1[atom_index] = ucell.atoms[it].zv * (ucell.atoms[it].tau[ia] * rcell_1);
-			pdl_ion_R2[atom_index] = ucell.atoms[it].zv * (ucell.atoms[it].tau[ia] * rcell_2);
-			pdl_ion_R3[atom_index] = ucell.atoms[it].zv * (ucell.atoms[it].tau[ia] * rcell_3);
+			pdl_ion_R1[atom_index] = GlobalC::ucell.atoms[it].zv * (GlobalC::ucell.atoms[it].tau[ia] * rcell_1);
+			pdl_ion_R2[atom_index] = GlobalC::ucell.atoms[it].zv * (GlobalC::ucell.atoms[it].tau[ia] * rcell_2);
+			pdl_ion_R3[atom_index] = GlobalC::ucell.atoms[it].zv * (GlobalC::ucell.atoms[it].tau[ia] * rcell_3);
 			atom_index++;
 		}
 	}
 	
 
 	
-	for(int i = 0; i < ucell.nat; i++)
+	for(int i = 0; i < GlobalC::ucell.nat; i++)
 	{		
 		if(mod_ion[i] == 1) 
 		{
@@ -568,10 +568,10 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			const double rmod = ucell.a1.norm() * ucell.lat0;
+			const double rmod = GlobalC::ucell.a1.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
-			const double unit2 = rmod / ucell.omega;
-			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			const double unit2 = rmod / GlobalC::ucell.omega;
+			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
 			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
 			GlobalV::ofs_running << endl;
@@ -582,7 +582,7 @@ void berryphase::Macroscopic_polarization()
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[0] ;
 			
-			Vector3<double> polarization_xyz = ucell.a1;
+			Vector3<double> polarization_xyz = GlobalC::ucell.a1;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 
@@ -603,10 +603,10 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			const double rmod = ucell.a2.norm() * ucell.lat0;
+			const double rmod = GlobalC::ucell.a2.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
-			const double unit2 = rmod / ucell.omega;
-			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			const double unit2 = rmod / GlobalC::ucell.omega;
+			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
 			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
 			GlobalV::ofs_running << endl;
@@ -617,7 +617,7 @@ void berryphase::Macroscopic_polarization()
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[1] ;
 			
-			Vector3<double> polarization_xyz = ucell.a2;
+			Vector3<double> polarization_xyz = GlobalC::ucell.a2;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 		
@@ -638,10 +638,10 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			const double rmod = ucell.a3.norm() * ucell.lat0;
+			const double rmod = GlobalC::ucell.a3.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
-			const double unit2 = rmod / ucell.omega;
-			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			const double unit2 = rmod / GlobalC::ucell.omega;
+			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
 			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
 			GlobalV::ofs_running << endl;
@@ -652,7 +652,7 @@ void berryphase::Macroscopic_polarization()
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[2] ;
 			
-			Vector3<double> polarization_xyz = ucell.a3;
+			Vector3<double> polarization_xyz = GlobalC::ucell.a3;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 

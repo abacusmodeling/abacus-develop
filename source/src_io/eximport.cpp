@@ -213,7 +213,7 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string
 		}
 	}
 	int nks = GlobalC::kv.nks;
-	double factor = TWO_PI/ucell.lat0;
+	double factor = TWO_PI/GlobalC::ucell.lat0;
 	out_gwan << qtot << endl;
 	for(int ik=0;ik<nks;ik++)
 	{
@@ -348,23 +348,23 @@ void eximport::out_unitcell(ofstream &out_data)
 {
 	//cout << "\n ==> out_unitcell" << endl;
 	out_data << setw(20) << "UNITCELL" << endl;		//2.0
-	out_data << setw(20) << ucell.lat0 << endl;        //2.1
+	out_data << setw(20) << GlobalC::ucell.lat0 << endl;        //2.1
 
-	out_data << setw(20) << ucell.latvec.e11 
-			 << setw(20) << ucell.latvec.e12 
-			 << setw(20) << ucell.latvec.e13 << endl;	//2.2
-	out_data << setw(20) << ucell.latvec.e21 
-			 << setw(20) << ucell.latvec.e22 
-			 << setw(20) << ucell.latvec.e23 << endl;
-	out_data << setw(20) << ucell.latvec.e31 
-			 << setw(20) << ucell.latvec.e32 
-			 << setw(20) << ucell.latvec.e33 << endl;
+	out_data << setw(20) << GlobalC::ucell.latvec.e11 
+			 << setw(20) << GlobalC::ucell.latvec.e12 
+			 << setw(20) << GlobalC::ucell.latvec.e13 << endl;	//2.2
+	out_data << setw(20) << GlobalC::ucell.latvec.e21 
+			 << setw(20) << GlobalC::ucell.latvec.e22 
+			 << setw(20) << GlobalC::ucell.latvec.e23 << endl;
+	out_data << setw(20) << GlobalC::ucell.latvec.e31 
+			 << setw(20) << GlobalC::ucell.latvec.e32 
+			 << setw(20) << GlobalC::ucell.latvec.e33 << endl;
 
-	out_data << setw(20) << ucell.ntype << endl;		//2.3
+	out_data << setw(20) << GlobalC::ucell.ntype << endl;		//2.3
 
-	for (int i = 0;i < ucell.ntype;i++)
+	for (int i = 0;i < GlobalC::ucell.ntype;i++)
 	{
-		out_data << setw(20) << ucell.atoms[i].na ;     //2.4
+		out_data << setw(20) << GlobalC::ucell.atoms[i].na ;     //2.4
 	}
 	out_data << endl;
 	return;
@@ -442,7 +442,7 @@ void eximport::out_planewave(ofstream &out_data)
 {
 	//cout << "\n ==> out_planewave" << endl;
 	out_data << "\n<PLANEWAVE>";
-	out_data << "\n" << ucell.lat0 << " Lattice constant";
+	out_data << "\n" << GlobalC::ucell.lat0 << " Lattice constant";
 	out_data << "\n" << GlobalC::pw.ngmc_g << " Number of plane waves."<<endl;
 	for(int i=0; i<GlobalC::pw.ngmc_g; i++)
 	{
@@ -507,7 +507,7 @@ void eximport::out_input(ofstream &out_data)
 {
 	//cout << "\n ==> out_input" << endl;
 	out_data << "<HEADER>";			//1.0
-	out_data << "\n" << ucell.latName << " Lattice Name";//1.1
+	out_data << "\n" << GlobalC::ucell.latName << " Lattice Name";//1.1
 
 /*
 	if (SCF)
@@ -522,9 +522,9 @@ void eximport::out_input(ofstream &out_data)
 
 	out_data << "\n" << GlobalC::pw.ecutwfc << " Energy Cutoff for wave functions.";//1.3
 
-	out_data << "\n" << ucell.nat << " Number of atoms.";
+	out_data << "\n" << GlobalC::ucell.nat << " Number of atoms.";
 
-	out_data << "\n" << ucell.ntype << " Types of atoms.";
+	out_data << "\n" << GlobalC::ucell.ntype << " Types of atoms.";
 
 //	out_data << "\n" << GlobalV::NBANDS << " Number of wave functions.";//1.4
 	//out_data << "\n" << LOCAL_BASIS << " 1 for Local Basis"; xiaohui modify 2013-09-02
@@ -630,12 +630,12 @@ void eximport::out_evc(ofstream &out_data)
 {
 	//cout << "=== out_evc ===" << endl;
 	out_data << setw(20) << "EVC" << endl;
-	out_data << setw(20) << ucell.natomwfc << endl; //4.1
+	out_data << setw(20) << GlobalC::ucell.natomwfc << endl; //4.1
 	int iw;
 	int ik;
 	int ig;
 
-	for (iw = 0;iw < ucell.natomwfc;iw++)
+	for (iw = 0;iw < GlobalC::ucell.natomwfc;iw++)
 	{
 		for (ik = 0;ik < GlobalC::kv.nks;ik++)
 		{
@@ -821,7 +821,7 @@ void eximport::out_charge_mpi(const string &dir,double* rho_in)
 		cout<<"\n Can't write charge file!"<<endl;
 	}
 	out_data << setw(20) << "CHARGE" << endl;	//7.0
-	out_data << setw(20) << ucell.omega << endl;	//7.1
+	out_data << setw(20) << GlobalC::ucell.omega << endl;	//7.1
 	out_data << setw(20) << GlobalC::pw.ncx 
 			 << setw(20) << GlobalC::pw.ncy 
 			 << setw(20) << GlobalC::pw.ncz << endl;		//7.2

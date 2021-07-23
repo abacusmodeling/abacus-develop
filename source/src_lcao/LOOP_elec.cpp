@@ -57,7 +57,7 @@ void LOOP_elec::set_matrix_grid(void)
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
 		GridD, 
-		ucell, 
+		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 
