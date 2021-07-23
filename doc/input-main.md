@@ -3,7 +3,7 @@
 - [List of keywords](#list-of-keywords)
     - [System variables](#system-variables)
 
-        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [nb2d](#nb2d) | [symmetry](#symmetry) | [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [lmaxmax](#lmaxmax) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver)
+        [suffix](#suffix) | [ntype](#ntype) | [nbands](#nbands) | [atom_file](#atom-file) | [kpoint_file](#kpoint-file) | [pseudo_dir](#pseudo-dir) | [nbands_istate](#nbands-istate) | [nspin](#nspin) | [calculation](#calculation) | [dft_functional](#dft-functional) | [read_file_dir](#read-file-dir) | [pseudo_type](#pseudo-type) | [out_alllog](#out-alllog) | [npool](#npool) | [nb2d](#nb2d) | [symmetry](#symmetry) | [dos_edelta_ev](#dos-edelta-ev) | [dos_sigma](#dos-sigma) | [dos_scale](#dos-scale) | [pseudo_rcut](#pseudo-rcut) | [renormwithmesh](#renormwithmesh) | [nelec](#nelec) | [lmaxmax](#lmaxmax) | [tot_magnetization](#tot-magnetization) | [mem_saver](#mem-saver) | [latname](#latname)
 
     - [Plane wave related variables](#plane-wave-related-variables)
     
@@ -11,7 +11,7 @@
 
     - [Electronic structure and geometry relaxation](#electronic-structure-and-geometry-relaxation)
     
-        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [occupations](#occupations) | [smearing](#smearing) | [degauss](#degauss) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [diago_proc](#diago_proc) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [mulliken](#mulliken) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold) | [cell_factor](#cell-factor)
+        [basis_type](#basis-type) | [ks_solver](#ks-solver) | [occupations](#occupations) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [diago_proc](#diago_proc) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [mulliken](#mulliken) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [force_set](#force-set) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method) | [cg_threshold](#cg-threshold) | [cell_factor](#cell-factor)
 
     - [Variables related to program output](#variables-related-to-program-output)
 
@@ -294,6 +294,31 @@ This part of variables are used to control general system parameters.
     - *Description*: Used only for nscf calculations. If set to 1, then a memory saving technique will be used for many k point calculations.
     - *Default*: 0
 
+    [back to top](#input-file)
+
+- latname<a id="latname"></a>
+    - *Type*: String
+    - *Description*: Specifies the type of Bravias lattice. When set to "test", the three lattice vectors are supplied explicitly in STRU file. When set to certain Bravais lattice type, there is no need to provide lattice vector, but a few lattice parameters might be required. For more information regarding this parameter, consult the [page on STRU file](input-stru.md).
+    Available options are:
+        - "test": free strcture.
+        - "sc": simple cubie.
+        - "fcc": face-centered cubic.
+        - "bcc": body-centered cubic.
+        - "hexagonal": hexagonal.
+        - "trigonal": trigonal.
+        - "st": simple tetragonal.
+        - "bct": body-centered tetragonal.
+        - "so": orthorhombic.
+        - "baco": base-centered orthorhombic.
+        - "fco": face-centered orthorhombic.
+        - "bco": body-centered orthorhombic.
+        - "sm": simple monoclinic.
+        - "bacm": base-centered monoclinic.
+        - "triclinic": triclinic.
+    - *Default*: "test"
+
+    [back to top](#input-file)
+
 ### Plane wave related variables
 This part of variables are used to control the plane wave related parameters.
 
@@ -378,7 +403,7 @@ calculations.
 - occupations<a id="occupations"></a>
     - *Type*: String
     - *Description*: Specifies how to calculate the occupations of bands. Available options are:
-        - 'smearing' : gaussian smearing for metals; see also variables `smearing` and `degauss`.
+        - 'smearing' : gaussian smearing for metals; see also variables `smearing` and `sigma`.
         - 'tetrahedra' : Tetrahedron method, Bloechl's version: [P.E. Bloechl, PRB 49, 16223 (1994)](https://journals.aps.org/prb/abstract/10.1103/PhysRevB.49.16223). Requires a uniform grid of k-points that are automatically generated. Well suited for calculation of DOS, less so (because not variational) for force/optimization/dynamics calculations.
         - 'fixed' : for insulators with a gap
     - *Default*: 'smearing'
@@ -392,13 +417,6 @@ calculations.
         - gauss or gaussian: use gaussian smearing method.
         - mp: use methfessel-paxton smearing method.
     - *Default*: fixed
-
-    [back to top](#input-file)
-
-- degauss<a id="degauss"></a>
-    - *Type*: Real
-    - *Description*: Value of the gaussian spreading (Ry) for brillouin-zone integration in metals.
-    - *Default*: 0.01
 
     [back to top](#input-file)
 
