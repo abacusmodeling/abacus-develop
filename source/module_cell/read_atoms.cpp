@@ -124,32 +124,205 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 	//===========================
 	// Read in latticies vector
 	//===========================
-	if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
-	{
-		// Reading lattice vectors. notice
-		// here that only one cpu read these
-		// parameters.
-		ifa >> latvec.e11 >> latvec.e12;
-		READ_VALUE(ifa, latvec.e13);
-		ifa >> latvec.e21 >> latvec.e22;
-		READ_VALUE(ifa, latvec.e23);
-		ifa >> latvec.e31 >> latvec.e32;
-		READ_VALUE(ifa, latvec.e33);
-
-		// lattice vectors in another form.
-		a1.x = latvec.e11;
-		a1.y = latvec.e12;
-		a1.z = latvec.e13;
-
-		a2.x = latvec.e21;
-		a2.y = latvec.e22;
-		a2.z = latvec.e23;
-
-		a3.x = latvec.e31;
-		a3.y = latvec.e32;
-		a3.z = latvec.e33;
+	if(latName=="test"){	
+		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
+		{
+			// Reading lattice vectors. notice
+			// here that only one cpu read these
+			// parameters.
+			ifa >> latvec.e11 >> latvec.e12;
+			READ_VALUE(ifa, latvec.e13);
+			ifa >> latvec.e21 >> latvec.e22;
+			READ_VALUE(ifa, latvec.e23);
+			ifa >> latvec.e31 >> latvec.e32;
+			READ_VALUE(ifa, latvec.e33);
+		}
+	}//supply lattice vectors
+	else{
+		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
+		{
+			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_VECTORS along with explicit specification of lattice type");
+		}
+		if(latName=="sc"){//simple-cubic
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = 0.0; latvec.e22 = 1.0;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 1.0;
+		}
+		else if(latName=="fcc"){//face-centered cubic
+			latvec.e11 =-0.5; latvec.e12 = 0.0; latvec.e13 = 0.5;
+			latvec.e21 = 0.0; latvec.e22 = 0.5;	latvec.e23 = 0.5;
+			latvec.e31 =-0.5; latvec.e32 = 0.5;	latvec.e33 = 0.0;
+		}
+		else if(latName=="bcc"){//body-centered cubic
+			latvec.e11 = 0.5; latvec.e12 = 0.5; latvec.e13 = 0.5;
+			latvec.e21 =-0.5; latvec.e22 = 0.5;	latvec.e23 = 0.5;
+			latvec.e31 =-0.5; latvec.e32 =-0.5;	latvec.e33 = 0.5;
+		}
+		else if(latName=="hexagonal"){//hexagonal
+			double e22 = sqrt(3.0) / 2.0;
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 =-0.5; latvec.e22 = e22; latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="trigonal"){//trigonal
+			double t1 = 0.0;
+			double t2 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				double cosab=0.0;
+				READ_VALUE(ifa, cosab);
+				t1 = sqrt(1.0 + 2.0*cosab);
+				t2 = sqrt(1.0 - cosab);
+			}
+			double e11 = t2 / sqrt(2.0);
+			double e12 = -t2 / sqrt(6.0);
+			double e13 = t1 / sqrt(3.0);
+			double e22 = sqrt(2.0) * t2 / sqrt(3.0);
 		
+			latvec.e11 = e11; latvec.e12 = e12; latvec.e13 = e13;
+			latvec.e21 = 0.0; latvec.e22 = e22;	latvec.e23 = e13;
+			latvec.e31 =-e11; latvec.e32 = e12;	latvec.e33 = e13;
+		}
+		else if(latName=="st"){//simple tetragonal
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = 0.0; latvec.e22 = 1.0; latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="bct"){//body-centered tetragonal
+			double cba = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				READ_VALUE(ifa, cba);
+				cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 =-0.5; latvec.e13 = cba;
+			latvec.e21 = 0.5; latvec.e22 = 0.5; latvec.e23 = cba;
+			latvec.e31 =-0.5; latvec.e32 =-0.5;	latvec.e33 = cba;
+		}
+		else if(latName=="so"){//simple orthorhombic
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = 0.0; latvec.e22 = 0.0;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> latvec.e22;
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="baco"){//base-centered orthorhombic
+			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 =-0.5; latvec.e22 = 0.0;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> latvec.e12;
+				latvec.e12 = latvec.e12 / 2.0;
+				latvec.e22 = latvec.e12;
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="fco"){//face-centered orthorhombic
+			double bba = 0.0; double cba = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba;
+				READ_VALUE(ifa, cba);
+				bba = bba / 2.0; cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 = cba;
+			latvec.e21 = 0.5; latvec.e22 = bba;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = bba;	latvec.e33 = cba;
+		}
+		else if(latName=="bco"){//body-centered orthorhombic
+			double bba = 0.0; double cba = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba;
+				READ_VALUE(ifa, cba);
+				bba = bba / 2.0; cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 = bba; latvec.e13 = cba;
+			latvec.e21 =-0.5; latvec.e22 = bba;	latvec.e23 = cba;
+			latvec.e31 =-0.5; latvec.e32 =-bba;	latvec.e33 = cba;
+		}
+		else if(latName=="sm"){//simple monoclinic
+			double bba = 0.0; double cba = 0.0;
+			double cosab = 0.0;
+			double e21 = 0.0; double e22 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba >> cba;
+				READ_VALUE(ifa, cosab);
+				e21 = bba * cosab;
+				e22 = bba * sqrt(1.0-cosab*cosab);
+			}
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = e21; latvec.e22 = e22;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = cba;
+		}
+		else if(latName=="bacm"){//base-centered monoclinic
+			double bba = 0.0; double cba = 0.0;
+			double cosab = 0.0;
+			double e21 = 0.0; double e22 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba >> cba;
+				READ_VALUE(ifa, cosab);
+				e21 = bba * cosab;
+				e22 = bba * sqrt(1.0-cosab*cosab);
+				cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 =-cba;
+			latvec.e21 = e21; latvec.e22 = e22;	latvec.e23 = 0.0;
+			latvec.e31 = 0.5; latvec.e32 = 0.0;	latvec.e33 = cba;
+		}
+		else if(latName=="triclinic"){//triclinic
+			double bba = 0.0; double cba = 0.0;
+			double cosab = 0.0; double cosac = 0.0;
+			double cosbc = 0.0; double sinab = 0.0;
+			double term = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba >> cba >> cosab >> cosac;
+				READ_VALUE(ifa, cosbc);
+				sinab = sqrt(1.0-cosab*cosab);
+			}
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = bba * cosab;
+			latvec.e22 = bba * sinab;
+			latvec.e23 = 0.0;
+			latvec.e31 = cba * cosac;
+			latvec.e32 = cba * (cosbc - cosac*cosab/sinab);
+			term = 1.0 + 2.0 * cosab*cosac*cosbc - cosab*cosab - cosac*cosac - cosbc*cosbc;
+			term = sqrt(term)/sinab;
+			latvec.e33 = cba * term;
+		}
+		else{ 
+			cout << "latname is : " << latName << endl;
+			WARNING_QUIT("UnitCell_pseudo::read_atom_species","latname not supported!");
+		}
 	}
+
+	// lattice vectors in another form.
+	a1.x = latvec.e11;
+	a1.y = latvec.e12;
+	a1.z = latvec.e13;
+
+	a2.x = latvec.e21;
+	a2.y = latvec.e22;
+	a2.z = latvec.e23;
+
+	a3.x = latvec.e31;
+	a3.y = latvec.e32;
+	a3.z = latvec.e33;
 	return;
 }
 
