@@ -101,5 +101,5 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 fi
 
 #echo $total_band
-ttot=`grep $word $running_path | awk '{print $4}'`
+ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1
