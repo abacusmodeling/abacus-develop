@@ -1,7 +1,6 @@
 #include "LCAO_nnr.h"
 #include "../src_pw/global.h"
 #include "record_adj.h" //mohan add 2012-07-06
-#include "dftu.h"       //quxin add 2020-10-29
 
 //----------------------------
 // define a global class obj.
@@ -564,12 +563,6 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 	TITLE("LCAO_nnr","folding_fixedH");
 	timer::tick("LCAO_nnr","folding_fixedH");
 
-	//Quxin added for DFT+U calculation
- 	if(INPUT.dft_plus_u) 
-	{
-		ZEROS( VECTOR_TO_PTR(dftu.Sm_k.at(ik)), ParaO.nloc);
-	}
-
 	int iat = 0;
 	int index = 0;
 	Vector3<double> dtau;
@@ -695,20 +688,11 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							{
 								LM.Sloc2[iic] += LM.SlocR[index] * kphase;
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;
-
-								//quxin added for DFT+U calculation
-							 	if(INPUT.dft_plus_u) dftu.Sm_k.at(ik).at(iic) += LM.SlocR[index] * kphase;
 							}
 							else
 							{
 								LM.Sloc2[iic] += LM.SlocR_soc[index] * kphase;
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR_soc[index] * kphase;
-
-								//quxin added for DFT+U calculation
-							 	if(INPUT.dft_plus_u) 
-								{
-									dftu.Sm_k.at(ik).at(iic) += LM.SlocR_soc[index] * kphase;
-								}
 							}
 							++index;
 
