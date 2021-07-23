@@ -13,6 +13,8 @@ project(ABACUS
 
 option(ENABLE_DEEPKS "Enable DeePKS functionality" OFF)
 option(ENABLE_ASAN "Enable AddressSanitizer" OFF)
+option(BUILD_UNIT_TESTS "Build ABACUS unit tests" ON)
+option(GENERATE_TEST_REPORTS "Enable test report generation" OFF)
 
 if(ENABLE_DEEPKS)
   set(CMAKE_CXX_STANDARD 14)
@@ -162,9 +164,10 @@ endif()
 
 install(PROGRAMS ${ABACUS_BIN_PATH}
     TYPE BIN
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    #DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 enable_testing()
-
-add_subdirectory(tests)
+IF (BUILD_UNIT_TESTS)
+  add_subdirectory(tests)
+endif()
