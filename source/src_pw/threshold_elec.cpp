@@ -106,9 +106,9 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 	{
 		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 		{
-			if( abs( wf.ekb[ik][ib] ) > 1.0e10)
+			if( abs( GlobalC::wf.ekb[ik][ib] ) > 1.0e10)
 			{
-				GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << wf.ekb[ik][ib] << " Ry" << endl;
+				GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << endl;
 				wrong = true;
 			}
 		}
@@ -184,7 +184,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
 				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << setw(8) << ib+1 
-				<< setw(15) << wf.ekb[ik][ib] * Ry_to_eV << setw(15) << wf.wg(ik, ib) << endl;
+				<< setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << setw(15) << GlobalC::wf.wg(ik, ib) << endl;
 			}
 			ofs << endl;
 		}

@@ -34,7 +34,7 @@ void Numerical_Basis::start_from_file_k( const int &ik, ComplexMatrix &psi)
     if (!Numerical_Basis::init_label)
     {
         // 1 stands for : start_from_file
-        Numerical_Basis::bessel_basis.init( 1, pw.ecutwfc, ucell.ntype, ucell.lmax );
+        Numerical_Basis::bessel_basis.init( 1, GlobalC::pw.ecutwfc, GlobalC::ucell.ntype, GlobalC::ucell.lmax );
         Numerical_Basis::init_mu_index();
         Numerical_Basis::init_label = true;
     }
@@ -56,7 +56,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     if (!Numerical_Basis::init_label)
     {
         // 0 stands for : 'Faln' is not used.
-        Numerical_Basis::bessel_basis.init( 0, pw.ecutwfc, ucell.ntype, ucell.lmax );
+        Numerical_Basis::bessel_basis.init( 0, GlobalC::pw.ecutwfc, GlobalC::ucell.ntype, GlobalC::ucell.lmax );
         Numerical_Basis::init_mu_index();
         Numerical_Basis::init_label = true;
     }
@@ -64,7 +64,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
-    ss << winput::spillage_outdir << "/" << ucell.latName << "." << ucell.lat0 << ".dat";
+    ss << winput::spillage_outdir << "/" << GlobalC::ucell.latName << "." << GlobalC::ucell.lat0 << ".dat";
     if (GlobalV::MY_RANK==0)
     {
         ofs.open(ss.str().c_str());
@@ -137,26 +137,26 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
     if (GlobalV::MY_RANK==0)
     {
         ofs.precision(10);
-        ofs << ucell.lat0 << endl;
+        ofs << GlobalC::ucell.lat0 << endl;
 
-        ofs << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-        ofs << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-        ofs << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+        ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+        ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+        ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 
-        ofs << ucell.ntype << " ntype" << endl;
-        for (int it=0; it<ucell.ntype; it++)
+        ofs << GlobalC::ucell.ntype << " ntype" << endl;
+        for (int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            ofs << ucell.atoms[it].label << " label" << endl; // mohan add 2009-07-23
-            ofs << ucell.atoms[it].na << " na" << endl;
-            for (int ia=0; ia<ucell.atoms[it].na; ia++)
+            ofs << GlobalC::ucell.atoms[it].label << " label" << endl; // mohan add 2009-07-23
+            ofs << GlobalC::ucell.atoms[it].na << " na" << endl;
+            for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
             {
-                ofs << ucell.atoms[it].tau[ia].x
-                << " " << ucell.atoms[it].tau[ia].y
-                << " " << ucell.atoms[it].tau[ia].z << endl;
+                ofs << GlobalC::ucell.atoms[it].tau[ia].x
+                << " " << GlobalC::ucell.atoms[it].tau[ia].y
+                << " " << GlobalC::ucell.atoms[it].tau[ia].z << endl;
             }
         }
         // ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
-        ofs << pw.ecutwfc << " ecutwfc" << endl; // mohan add 2009-09-08
+        ofs << GlobalC::pw.ecutwfc << " ecutwfc" << endl; // mohan add 2009-09-08
 
         // this parameter determine the total number of jlq.
         ofs << Numerical_Basis::bessel_basis.get_ecut() << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
@@ -168,7 +168,7 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
 
         ofs << Numerical_Basis::bessel_basis.get_tolerence() << " tolerence" << endl;
 
-        ofs << ucell.lmax << " lmax" << endl;
+        ofs << GlobalC::ucell.lmax << " lmax" << endl;
     }
 
     ofs << scientific;
@@ -390,32 +390,32 @@ void Numerical_Basis::Sq_overlap(
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << endl;
 	GlobalV::ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << endl; 
 
-	const double normalization = (4 * PI) * (4 * PI) / ucell.omega;			// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * PI) * (4 * PI) / GlobalC::ucell.omega;			// Peize Lin add normalization 2015-12-29
 	
-    const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
+    const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
     const int enumber = Numerical_Basis::bessel_basis.get_ecut_number();
 
-    realArray flq(ucell.lmax+1, enumber, np);
+    realArray flq(GlobalC::ucell.lmax+1, enumber, np);
 
     // get flq(G) = \int f(r)jl(G*r) from interpolation table.
-    for (int l=0; l<ucell.lmax+1; l++)
+    for (int l=0; l<GlobalC::ucell.lmax+1; l++)
     {
         for (int ie=0; ie<enumber; ie++)
         {
             for (int ig=0; ig<np; ig++)
             {
                 flq(l,ie,ig) = Numerical_Basis::bessel_basis.
-                               Polynomial_Interpolation2(l, ie, gk[ig].norm() * ucell.tpiba );
+                               Polynomial_Interpolation2(l, ie, gk[ig].norm() * GlobalC::ucell.tpiba );
             }
         }
     }
@@ -431,34 +431,34 @@ void Numerical_Basis::Sq_overlap(
     << setw(8) << "Atom2"
     << setw(8) << "L2" << endl;
 
-    for (int T1 = 0; T1 < ucell.ntype; T1++) // 1.1
+    for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++) // 1.1
     {
-        for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++) // 1.2
+        for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++) // 1.2
         {
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
-            for (int T2=0; T2<ucell.ntype; T2++) // 2.1
+            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
+            for (int T2=0; T2<GlobalC::ucell.ntype; T2++) // 2.1
             {
-                for (int I2=0; I2<ucell.atoms[T2].na; I2++) // 2.2
+                for (int I2=0; I2<GlobalC::ucell.atoms[T2].na; I2++) // 2.2
                 {
-                    complex<double> *sk2 = wf.get_sk(ik, T2, I2);
-                    for (int l = 0; l < ucell.atoms[T1].nwl+1; l++) // 1.3
+                    complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2);
+                    for (int l = 0; l < GlobalC::ucell.atoms[T1].nwl+1; l++) // 1.3
                     {
                         complex<double> lphase = normalization * pow(IMAG_UNIT, l);			// Peize Lin add normalization 2015-12-29
-                        for (int l2 = 0; l2 < ucell.atoms[T2].nwl+1; l2++) // 2.3
+                        for (int l2 = 0; l2 < GlobalC::ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
                             GlobalV::ofs_running << " " << setw(5) << ik+1
-                            << setw(8) << ucell.atoms[T1].label
+                            << setw(8) << GlobalC::ucell.atoms[T1].label
                             << setw(8) << I1+1
                             << setw(8) << l
-                            << setw(8) << ucell.atoms[T2].label
+                            << setw(8) << GlobalC::ucell.atoms[T2].label
                             << setw(8) << I2+1
                             << setw(8) << l2
                             << endl;
 
                             complex<double> lphase2 = pow(IMAG_UNIT, l2);
-                            for (int ic=0; ic < ucell.nmax; ic++) // 1.5
+                            for (int ic=0; ic < GlobalC::ucell.nmax; ic++) // 1.5
                             {
-                                for (int ic2=0; ic2 < ucell.nmax; ic2++) // 2.5
+                                for (int ic2=0; ic2 < GlobalC::ucell.nmax; ic2++) // 2.5
                                 {
                                     for (int m=0; m<2*l+1; m++) // 1.6
                                     {
@@ -522,15 +522,15 @@ void Numerical_Basis::jlq3d_overlap(
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
 	GlobalV::ofs_running << " Q = < J_mu, q | Psi_n, k > " << endl;
 
-	const double normalization = (4 * PI) / sqrt(ucell.omega);			// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);			// Peize Lin add normalization 2015-12-29
 
-    const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
+    const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
@@ -543,17 +543,17 @@ void Numerical_Basis::jlq3d_overlap(
 
     double *flq = new double[np];
     complex<double> overlapQ = ZERO;
-    for (int T1 = 0; T1 < ucell.ntype; T1++)
+    for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
     {
         //OUT("T1",T1);
-        for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++)
+        for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
         {
             //OUT("I1",I1);
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
-            for (int L=0; L< ucell.atoms[T1].nwl+1; L++)
+            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
+            for (int L=0; L< GlobalC::ucell.atoms[T1].nwl+1; L++)
             {
                 GlobalV::ofs_running << " " << setw(5) << ik+1
-                            << setw(8) << ucell.atoms[T1].label
+                            << setw(8) << GlobalC::ucell.atoms[T1].label
                             << setw(8) << I1+1 
 							<< setw(8) << L
 							<< endl;
@@ -564,11 +564,11 @@ void Numerical_Basis::jlq3d_overlap(
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] = Numerical_Basis::bessel_basis.Polynomial_Interpolation2
-                                  (L, ie, gk[ig].norm() * ucell.tpiba );
+                                  (L, ie, gk[ig].norm() * GlobalC::ucell.tpiba );
                     }
 
                     const int N = 0;
-                    assert( ucell.nmax == 1);
+                    assert( GlobalC::ucell.nmax == 1);
                     for (int m=0; m<2*L+1; m++)
                     {
                         const int lm = L*L+m;
@@ -599,29 +599,29 @@ void Numerical_Basis::jlq3d_overlap(
 void Numerical_Basis::init_mu_index(void)
 {
 	GlobalV::ofs_running << " Initialize the mu index" << endl;
-    Numerical_Basis::mu_index = new IntArray[ucell.ntype];
+    Numerical_Basis::mu_index = new IntArray[GlobalC::ucell.ntype];
 
     int mu = 0;
-    for (int it=0; it<ucell.ntype; it++)
+    for (int it=0; it<GlobalC::ucell.ntype; it++)
     {
         Numerical_Basis::mu_index[it].create(
-            ucell.atoms[it].na,
-            ucell.atoms[it].nwl+1,
-            ucell.nmax,
-            2*(ucell.atoms[it].nwl+1)+1); // m ==> 2*l+1
+            GlobalC::ucell.atoms[it].na,
+            GlobalC::ucell.atoms[it].nwl+1,
+            GlobalC::ucell.nmax,
+            2*(GlobalC::ucell.atoms[it].nwl+1)+1); // m ==> 2*l+1
 
 		// mohan added 2021-01-03
 		GlobalV::ofs_running << "Type " << it+1 
-		<< " number_of_atoms " << ucell.atoms[it].na
-		<< " number_of_L " << ucell.atoms[it].nwl+1
-		<< " number_of_n " << ucell.nmax
-		<< " number_of_m " << 2*(ucell.atoms[it].nwl+1)+1 << endl;
+		<< " number_of_atoms " << GlobalC::ucell.atoms[it].na
+		<< " number_of_L " << GlobalC::ucell.atoms[it].nwl+1
+		<< " number_of_n " << GlobalC::ucell.nmax
+		<< " number_of_m " << 2*(GlobalC::ucell.atoms[it].nwl+1)+1 << endl;
 
-        for (int ia=0; ia<ucell.atoms[it].na; ia++)
+        for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
         {
-            for (int l=0; l< ucell.atoms[it].nwl+1; l++)
+            for (int l=0; l< GlobalC::ucell.atoms[it].nwl+1; l++)
             {
-                for (int n=0; n< ucell.atoms[it].l_nchi[l]; n++)
+                for (int n=0; n< GlobalC::ucell.atoms[it].l_nchi[l]; n++)
                 {
                     for (int m=0; m<2*l+1; m++)
                     {
@@ -642,37 +642,37 @@ void Numerical_Basis::numerical_atomic_wfc(
 {
     TITLE("Numerical_Basis", "numerical_atomic_wfc");
 
-    const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
+    const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
     matrix ylm(total_lm, np);
 
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
     int index = 0;
     double *flq = new double[np];
-    for (int it = 0; it < ucell.ntype; it++)
+    for (int it = 0; it < GlobalC::ucell.ntype; it++)
     {
         //OUT("it",it);
-        for (int ia = 0; ia < ucell.atoms[it].na; ia++)
+        for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
             //OUT("ia",ia);
-            complex<double> *sk = wf.get_sk(ik, it, ia);
-            for (int l = 0; l < ucell.atoms[it].nwl+1; l++)
+            complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+            for (int l = 0; l < GlobalC::ucell.atoms[it].nwl+1; l++)
             {
                 //OUT("l",l);
                 complex<double> lphase = pow(IMAG_UNIT, l);
-                for (int ic=0; ic < ucell.atoms[it].l_nchi[l]; ic++)
+                for (int ic=0; ic < GlobalC::ucell.atoms[it].l_nchi[l]; ic++)
                 {
                     //OUT("ic",ic);
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] = Numerical_Basis::bessel_basis.
-                                  Polynomial_Interpolation(it, l, ic, gk[ig].norm() * ucell.tpiba );
+                                  Polynomial_Interpolation(it, l, ic, gk[ig].norm() * GlobalC::ucell.tpiba );
                     }
 
                     for (int m=0; m<2*l+1; m++)

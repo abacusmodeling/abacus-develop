@@ -74,7 +74,7 @@ void BFGS_Basic::update_inverse_hessian(void)
 //      s[i] = this->pos[i] - this->pos_p[i];
 //		mohan update 2010-07-27
 		s[i] = this->check_move( pos[i], pos_p[i] );     	
-		s[i] *= ucell.lat0;
+		s[i] *= GlobalC::ucell.lat0;
 	 
 	    y[i] = this->grad[i] - this->grad_p[i];
     }
@@ -393,9 +393,9 @@ void BFGS_Basic::compute_trust_radius(void)
 double BFGS_Basic::check_move(const double &pos, const double &pos_p)
 {
 	// this must be careful.
-	// unit is ucell.lat0.
-	assert(ucell.lat0>0.0);
-	const double direct_move = (pos - pos_p)/ucell.lat0;
+	// unit is GlobalC::ucell.lat0.
+	assert(GlobalC::ucell.lat0>0.0);
+	const double direct_move = (pos - pos_p)/GlobalC::ucell.lat0;
 	double shortest_move = direct_move;
 	for(int cell=-1; cell<=1; ++cell)
 	{

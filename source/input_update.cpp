@@ -160,10 +160,10 @@ bool Update_input::Read(const string &fn)
         else if (strcmp("printe", word) == 0)
         {
             read_value(ifs, printe);
-			if(printe!=en.printe)
+			if(printe!=GlobalC::en.printe)
 			{
-				this->change(GlobalV::ofs_warning,"printe",en.printe,printe);
-				en.printe = this->printe; // mohan add 2011-03-16
+				this->change(GlobalV::ofs_warning,"printe",GlobalC::en.printe,printe);
+				GlobalC::en.printe = this->printe; // mohan add 2011-03-16
 			}
         }
 		// 9 
@@ -212,10 +212,10 @@ bool Update_input::Read(const string &fn)
         else if (strcmp("out_dos", word) == 0)
         {
             read_value(ifs, out_dos);
-			if(out_dos!=en.out_dos)
+			if(out_dos!=GlobalC::en.out_dos)
 			{
-				this->change(GlobalV::ofs_warning,"out_dos",en.out_dos,out_dos);
-				en.out_dos = this->out_dos;
+				this->change(GlobalV::ofs_warning,"out_dos",GlobalC::en.out_dos,out_dos);
+				GlobalC::en.out_dos = this->out_dos;
 			}
         }
 		// 13
@@ -278,10 +278,10 @@ void Update_input::Bcast()
     Parallel_Common::bcast_int( GlobalV::NITER );
     Parallel_Common::bcast_int( GlobalV::NSTEP );
     Parallel_Common::bcast_double( CHR.mixing_beta );
-    Parallel_Common::bcast_int( en.printe );
+    Parallel_Common::bcast_int( GlobalC::en.printe );
     Parallel_Common::bcast_string( pot.extra_pot );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( CHR.out_charge );
-	Parallel_Common::bcast_int( en.out_dos );
+	Parallel_Common::bcast_int( GlobalC::en.out_dos );
     Parallel_Common::bcast_double( CHR.nelec );
 	
 

@@ -95,11 +95,11 @@ void Exx_Abfs::test_all() const
 
 	auto test_GriD = []()
 	{
-		for (int T1 = 0; T1 < ucell.ntype; ++T1)
-			for (int I1 = 0; I1 < ucell.atoms[T1].na; ++I1)
+		for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
+			for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; ++I1)
 			{
 				cout<<"@\t"<<T1<<"\t"<<I1<<endl;
-				GridD.Find_atom(ucell,  ucell.atoms[T1].tau[I1], T1, I1 );
+				GridD.Find_atom(GlobalC::ucell,  GlobalC::ucell.atoms[T1].tau[I1], T1, I1 );
 				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
 					cout<<GridD.getBox(ad).x<<"\t"<<GridD.getBox(ad).y<<"\t"<<GridD.getBox(ad).z<<endl;
 			}
@@ -1057,7 +1057,7 @@ void density_matrix()
 			{
 				for( size_t iw2=0; iw2!=GlobalV::NLOCAL; ++iw2 )
 				{
-					DM_k[ik](iw1,iw2) += wf.wg(ik,ib) * conj(LOWF.WFC_K[ik][ib][iw1]) * LOWF.WFC_K[ik][ib][iw2];
+					DM_k[ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) * conj(LOWF.WFC_K[ik][ib][iw1]) * LOWF.WFC_K[ik][ib][iw2];
 				}
 			}
 		}

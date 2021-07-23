@@ -67,17 +67,17 @@ void Potential::init_pot(
     this->vr_eff.zero_out();
 
     // the vltot should and must be zero here.
-    ZEROS(this->vltot, pw.nrxx);
+    ZEROS(this->vltot, GlobalC::pw.nrxx);
 
 	//-------------------------------------------------------------------
 	// (1) local pseudopotential + electric field (if any) in vltot
 	//-------------------------------------------------------------------
 	this->set_local_pot(
 		this->vltot, // 3D local pseudopotentials 
-		ucell.ntype,
-		pw.ngmc,
-		ppcell.vloc,
-		pw.ig2ngg,
+		GlobalC::ucell.ntype,
+		GlobalC::pw.ngmc,
+		GlobalC::ppcell.vloc,
+		GlobalC::pw.ig2ngg,
 		sf // structure factors		
 	);
 
@@ -91,14 +91,14 @@ void Potential::init_pot(
 
 	for(int is=0; is<nspin0; ++is)
 	{
-		for(int ir=0; ir<pw.nrxx; ++ir)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 		{
 			this->vr_eff(is,ir) = this->vltot[ir];	
 		}
 	}
 
 	// core correction potential.
-	CHR.set_rho_core( pw.strucFac );
+	CHR.set_rho_core( GlobalC::pw.strucFac );
 
 	//--------------------------------------------------------------------
 	// (2) other effective potentials need charge density,
@@ -133,7 +133,7 @@ void Potential::init_pot(
 					if(GlobalV::PRENSPIN == 1)
 					{
 						GlobalV::ofs_running << " Didn't read in the charge density but autoset it for spin " <<is+1<< endl;
-						for(int ir=0;ir<pw.nrxx;ir++)
+						for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
 						{
 							CHR.rho[is][ir] = 0.0;
 						}
@@ -152,7 +152,7 @@ void Potential::init_pot(
 						else if(is==3)
 						{
 							GlobalV::ofs_running << " rearrange charge density " << endl;
-							for(int ir=0;ir<pw.nrxx;ir++)
+							for(int ir=0;ir<GlobalC::pw.nrxx;ir++)
 							{
 								CHR.rho[3][ir] = CHR.rho[0][ir] - CHR.rho[1][ir];
 								CHR.rho[0][ir] = CHR.rho[0][ir] + CHR.rho[1][ir];
@@ -220,7 +220,7 @@ void Potential::init_pot(
 	
 
 	// plots
-    //figure::picture(this->vr_eff1,pw.ncx,pw.ncy,pw.ncz);
+    //figure::picture(this->vr_eff1,GlobalC::pw.ncx,GlobalC::pw.ncy,GlobalC::pw.ncz);
     timer::tick("Potential","init_pot");
     return;
 }
@@ -291,7 +291,7 @@ matrix Potential::v_of_rho(
     TITLE("Potential","v_of_rho");
     timer::tick("Potential","v_of_rho");
 
-    matrix v(GlobalV::NSPIN,pw.nrxx);
+    matrix v(GlobalV::NSPIN,GlobalC::pw.nrxx);
 
 //----------------------------------------------------------
 //  calculate the exchange-correlation potential
@@ -300,7 +300,7 @@ matrix Potential::v_of_rho(
 	#ifdef USE_LIBXC
     const std::tuple<double,double,matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, CHR.rho_core);
 	#else
-    const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(pw.nrxx, pw.ncxyz, ucell.omega, rho_in, CHR.rho_core);
+    const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, CHR.rho_core);
 	#endif
 	H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
 	H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
@@ -309,7 +309,7 @@ matrix Potential::v_of_rho(
 //----------------------------------------------------------
 //  calculate the Hartree potential
 //----------------------------------------------------------
-	v += H_Hartree_pw::v_hartree(ucell, pw, GlobalV::NSPIN, rho_in);
+	v += H_Hartree_pw::v_hartree(GlobalC::ucell,GlobalC::pw, GlobalV::NSPIN, rho_in);
 
     // mohan add 2011-06-20
     if(GlobalV::EFIELD && GlobalV::DIPOLE)
@@ -317,7 +317,7 @@ matrix Potential::v_of_rho(
         Efield EFID;
         for (int is = 0;is < GlobalV::NSPIN;is++)
         {
-            EFID.add_efield(rho_in[is], &v.c[is*pw.nrxx]);
+            EFID.add_efield(rho_in[is], &v.c[is*GlobalC::pw.nrxx]);
         }
     }
     timer::tick("Potential","v_of_rho");
@@ -344,14 +344,14 @@ void Potential::set_vr_eff(void)
         //=================================================================
 		if(GlobalV::NSPIN==4&&is>0)
 		{
-			for (int i = 0;i < pw.nrxx; i++)
+			for (int i = 0;i < GlobalC::pw.nrxx; i++)
 			{
 				this->vr_eff(is, i) = this->vr(is, i);
 			}
 		}
 		else        
 		{
-			for (int i = 0;i < pw.nrxx; i++)
+			for (int i = 0;i < GlobalC::pw.nrxx; i++)
 	        {
 	            this->vr_eff(is, i) = this->vltot[i] + this->vr(is, i);
 			}
@@ -381,10 +381,10 @@ void Potential::newd(void)
 	// no ultrasoft potentials: use bare coefficients for projectors
 	// if( spin_orbital) ....
 	// else if(noncolin) ....
-	for (int iat=0; iat<ucell.nat; iat++)
+	for (int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
-		const int it = ucell.iat2it[iat];
-		const int nht = ucell.atoms[it].nh;
+		const int it = GlobalC::ucell.iat2it[iat];
+		const int nht = GlobalC::ucell.atoms[it].nh;
 		// nht: number of beta functions per atom type
 		for (int is = 0; is < GlobalV::NSPIN; is++)
 		{
@@ -394,36 +394,36 @@ void Potential::newd(void)
 				{
 					if(GlobalV::LSPINORB)
 					{
-						ppcell.deeq_nc(is , iat , ih , jh)= ppcell.dvan_so(is , it , ih , jh);
-						ppcell.deeq_nc(is , iat , jh , ih)= ppcell.dvan_so(is , it , jh , ih);
+						GlobalC::ppcell.deeq_nc(is , iat , ih , jh)= GlobalC::ppcell.dvan_so(is , it , ih , jh);
+						GlobalC::ppcell.deeq_nc(is , iat , jh , ih)= GlobalC::ppcell.dvan_so(is , it , jh , ih);
 					}
 					else if( GlobalV::NSPIN==4 )
 					{
 						if(is==0)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-							ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = GlobalC::ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = GlobalC::ppcell.dvan(it, ih, jh);
 						}
 						else if(is==1)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
 						}
 						else if(is==2)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
 						}
 						else if(is==3)
 						{
-							ppcell.deeq_nc(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-							ppcell.deeq_nc(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = GlobalC::ppcell.dvan(it, ih, jh);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = GlobalC::ppcell.dvan(it, ih, jh);
 						}
 					}
 					else
 					{
-						ppcell.deeq(is, iat, ih, jh) = ppcell.dvan(it, ih, jh);
-						ppcell.deeq(is, iat, jh, ih) = ppcell.dvan(it, ih, jh);
+						GlobalC::ppcell.deeq(is, iat, ih, jh) = GlobalC::ppcell.dvan(it, ih, jh);
+						GlobalC::ppcell.deeq(is, iat, jh, ih) = GlobalC::ppcell.dvan(it, ih, jh);
 					}
 				}
 			}

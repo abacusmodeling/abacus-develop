@@ -33,50 +33,50 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             ifs >> name;
 
             // check lattice constant, unit is Angstrom
-            CHECK_DOUBLE(ifs,ucell.lat0 * BOHR_TO_A,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e11,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e12,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e13,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e21,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e22,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e23,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e31,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e32,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e33,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.lat0 * BOHR_TO_A,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e11,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e12,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e13,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e21,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e22,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e23,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e31,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e32,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e33,quit);
 
-            for(int it=0; it<ucell.ntype; it++)
+            for(int it=0; it<GlobalC::ucell.ntype; it++)
             {
-                CHECK_STRING(ifs,ucell.atoms[it].label,quit);
+                CHECK_STRING(ifs,GlobalC::ucell.atoms[it].label,quit);
             }
 
-            for(int it=0; it<ucell.ntype; it++)
+            for(int it=0; it<GlobalC::ucell.ntype; it++)
             {
-                CHECK_DOUBLE(ifs,ucell.atoms[it].na,quit);
+                CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
             }
 
             string coordinate;
             ifs >> coordinate;
 
-            for(int it=0; it<ucell.ntype; it++)
+            for(int it=0; it<GlobalC::ucell.ntype; it++)
             {
-                for(int ia=0; ia<ucell.atoms[it].na; ia++)
+                for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
                 {
-                    CHECK_DOUBLE(ifs,ucell.atoms[it].taud[ia].x,quit);
-                    CHECK_DOUBLE(ifs,ucell.atoms[it].taud[ia].y,quit);
-                    CHECK_DOUBLE(ifs,ucell.atoms[it].taud[ia].z,quit);
+                    CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].x,quit);
+                    CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].y,quit);
+                    CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].z,quit);
                 }
             }
 
             CHECK_INT(ifs, GlobalV::NSPIN);
             if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
             {
-                READ_VALUE(ifs, en.ef);
-                GlobalV::ofs_running << " read in fermi energy = " << en.ef << endl;
+                READ_VALUE(ifs, GlobalC::en.ef);
+                GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << endl;
             }
             else if(GlobalV::NSPIN == 2)
             {
-                if(is==0)READ_VALUE(ifs, en.ef_up);
-                else if(is==1)READ_VALUE(ifs, en.ef_dw);
+                if(is==0)READ_VALUE(ifs, GlobalC::en.ef_up);
+                else if(is==1)READ_VALUE(ifs, GlobalC::en.ef_dw);
             }
             else
             {
@@ -127,12 +127,12 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
 
     if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
     {
-        Parallel_Common::bcast_double(en.ef);
+        Parallel_Common::bcast_double(GlobalC::en.ef);
     }
     else if(GlobalV::NSPIN==2)
     {
-        Parallel_Common::bcast_double(en.ef_up);
-        Parallel_Common::bcast_double(en.ef_dw);
+        Parallel_Common::bcast_double(GlobalC::en.ef_up);
+        Parallel_Common::bcast_double(GlobalC::en.ef_dw);
     }
 
 

@@ -71,8 +71,8 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
         {			
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
 			<< "final_state " << ib+1 << " " 
-			<< wf.ekb[ik][ib] * Ry_to_eV 
-			<< " " << wf.wg(ik, ib)*GlobalC::kv.nks << endl;
+			<< GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
+			<< " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << endl;
         }
 		GlobalV::ofs_running << endl;
     }
@@ -80,7 +80,7 @@ void ELEC_nscf::nscf(LCAO_Hamilt &uhm)
 	// add by jingan in 2018.11.7
 	if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
-        toWannier90 myWannier(GlobalC::kv.nkstot,ucell.G);
+        toWannier90 myWannier(GlobalC::kv.nkstot,GlobalC::ucell.G);
         myWannier.init_wannier();
     }
 	

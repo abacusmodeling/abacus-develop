@@ -35,8 +35,8 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	
 	// pre-cal Vws on same atom, speed up DPcal_V()
-	vector<shared_ptr<matrix>> Vs_same_atom(ucell.ntype);
-	for(size_t it=0; it!=ucell.ntype; ++it)
+	vector<shared_ptr<matrix>> Vs_same_atom(GlobalC::ucell.ntype);
+	for(size_t it=0; it!=GlobalC::ucell.ntype; ++it)
 		Vs_same_atom[it] = Abfs::DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true, rwlock_Vw,Vws );	
 	
 	// m_out( i1, i2, i3 ) = m_in( i2, i1, i3 )
@@ -80,27 +80,27 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,double>>> max_pair_fock_DP;
 	for(const size_t iat1 : atom_centres)
 	{	
-		const size_t it1 = ucell.iat2it[iat1];
-		const size_t ia1 = ucell.iat2ia[iat1];
-		const Abfs::Vector3_Order<double> tau1( ucell.atoms[it1].tau[ia1] );
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
+		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
+		const Abfs::Vector3_Order<double> tau1( GlobalC::ucell.atoms[it1].tau[ia1] );
 		
 		const map<size_t,vector<Abfs::Vector3_Order<int>>> adj = Abfs::get_adjs(iat1);
 		for( const auto & atom2 : adj )
 		{
 			const int iat2 = atom2.first;
-			const int it2 = ucell.iat2it[iat2];
-			const int ia2 = ucell.iat2ia[iat2];
-			const Abfs::Vector3_Order<double> tau2( ucell.atoms[it2].tau[ia2] );
+			const int it2 = GlobalC::ucell.iat2it[iat2];
+			const int ia2 = GlobalC::ucell.iat2ia[iat2];
+			const Abfs::Vector3_Order<double> tau2( GlobalC::ucell.atoms[it2].tau[ia2] );
 			
 			map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> pair_fock_s;
 			for( const Abfs::Vector3_Order<int> &box2 : atom2.second )
 			{
 				const Abfs::Vector3_Order<int> box2p = box2%Born_von_Karman_period;
-				if(const double*max_pair_fock_ptr=static_cast<const double*>(MAP_EXIST(max_pair_fock_DP,it1,it2,-tau1+tau2+box2p*ucell.latvec)))
+				if(const double*max_pair_fock_ptr=static_cast<const double*>(MAP_EXIST(max_pair_fock_DP,it1,it2,-tau1+tau2+box2p*GlobalC::ucell.latvec)))
 					max_pair_fock[iat1][iat2][box2p] = *max_pair_fock_ptr;
 				else
 				{
-					const Abfs::Vector3_Order<double> R = -tau1+tau2+box2*ucell.latvec;
+					const Abfs::Vector3_Order<double> R = -tau1+tau2+box2*GlobalC::ucell.latvec;
 					const matrix C_12 = *Abfs::DPcal_C( it1,it2,R,  m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false, rwlock_Cw,rwlock_Vw,Cws,Vws );
 					const matrix C_21 = change_matrix_order( 
 						*Abfs::DPcal_C( it2,it1,-R, m_abfs_abfs,m_abfslcaos_lcaos, index_abfs,index_lcaos, 0,false, rwlock_Cw,rwlock_Vw,Cws,Vws ),
@@ -124,7 +124,7 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 			for( const auto & pair_fock_p : pair_fock_ps )
 			{
 				const Abfs::Vector3_Order<int> & box2p = pair_fock_p.first;
-				max_pair_fock[iat1][iat2][box2p] = max_pair_fock_DP[it1][it2][-tau1+tau2+box2p*ucell.latvec] = max_diagnal(*pair_fock_p.second);
+				max_pair_fock[iat1][iat2][box2p] = max_pair_fock_DP[it1][it2][-tau1+tau2+box2p*GlobalC::ucell.latvec] = max_diagnal(*pair_fock_p.second);
 			}
 		}
 	}

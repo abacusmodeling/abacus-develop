@@ -231,21 +231,21 @@ void energy::print_etot(
 		{
 			if(GlobalV::MY_RANK==0)
 			{
-				printf( "\e[36m%-15f\e[0m", en.etot);	
-				//printf( "[36m%-15f[0m", en.etot);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot);	
 				if(GlobalV::NSPIN==2)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<ucell.magnet.tot_magnetization;
-					cout<<setw(10)<<ucell.magnet.abs_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
 				else if(GlobalV::NSPIN==4 && GlobalV::NONCOLIN)
 				{
 					cout << setprecision(2);
-					cout<<setw(10)<<ucell.magnet.tot_magnetization_nc[0]
-					<<setw(10)<<ucell.magnet.tot_magnetization_nc[1]
-					<<setw(10)<<ucell.magnet.tot_magnetization_nc[2];
-					cout<<setw(10)<<ucell.magnet.abs_magnetization;
+					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[0]
+					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[1]
+					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[2];
+					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
 				if(dr2>1.0)
 				{
@@ -260,12 +260,12 @@ void energy::print_etot(
 					//printf( "[32m%-14e[0m", dr2);
 				}
 				// 34 is blue
-				printf( "\e[36m%-15f\e[0m", en.etot*Ry_to_eV);	
-				//printf( "[36m%-15f[0m", en.etot*Ry_to_eV);	
+				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*Ry_to_eV);	
+				//printf( "[36m%-15f[0m", GlobalC::en.etot*Ry_to_eV);	
 				cout << setprecision(3);
-	//			cout << setw(11) << en.eband;
+	//			cout << setw(11) << GlobalC::en.eband;
 	//			cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//			cout << setw(11) << en.etxc - en.etxcc;
+	//			cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
 				cout << resetiosflags(ios::scientific);
 				//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
 				if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
@@ -285,22 +285,22 @@ void energy::print_etot(
 		else
 		{
 			cout << setprecision(prec);
-			//cout << setw(15) << en.etot;
+			//cout << setw(15) << GlobalC::en.etot;
 			if(GlobalV::NSPIN==2)
 			{
 				cout << setprecision(2);
-				cout<<setw(10)<<ucell.magnet.tot_magnetization;
-				cout<<setw(10)<<ucell.magnet.abs_magnetization;
+				cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+				cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 			}
 			cout << setprecision(6);
-			cout << setw(15) << en.etot*Ry_to_eV;
-                        cout << setw(15) << (en.etot - en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
+			cout << setw(15) << GlobalC::en.etot*Ry_to_eV;
+                        cout << setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
                         cout << setprecision(3);
                         cout << setw(11) << dr2;
 			cout << setprecision(3);
-	//		cout << setw(11) << en.eband;
+	//		cout << setw(11) << GlobalC::en.eband;
 	//		cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//		cout << setw(11) << en.etxc - en.etxcc;
+	//		cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
 			//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
 			if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 			{
@@ -346,11 +346,11 @@ double energy::delta_e(void)
 
     double deband_aux = 0.0;
 
-    for (int ir=0; ir<pw.nrxx; ir++) deband_aux -= CHR.rho[0][ir] * pot.vr(0, ir);
+    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) deband_aux -= CHR.rho[0][ir] * pot.vr(0, ir);
 
     if (GlobalV::NSPIN == 2)
     {
-        for (int ir=0; ir<pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
             deband_aux -= CHR.rho[1][ir] * pot.vr(1, ir);
         }
@@ -358,7 +358,7 @@ double energy::delta_e(void)
     }
     else if(GlobalV::NSPIN == 4)
     {
-        for (int ir=0; ir<pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
             deband_aux -= CHR.rho[1][ir] * pot.vr(1, ir);
             deband_aux -= CHR.rho[2][ir] * pot.vr(2, ir);
@@ -372,7 +372,7 @@ double energy::delta_e(void)
     deband0 = deband_aux;
 #endif
 
-    deband0 *= ucell.omega / pw.ncxyz;
+    deband0 *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
 	
 	// \int rho(r) v_{exx}(r) dr = 2 E_{exx}[rho]
 	deband0 -= 2*exx;				// Peize Lin add 2017-10-16
@@ -391,21 +391,21 @@ void energy::delta_escf(void)
 	// and rho1_save is "output" charge density
 	// because in "deband" the energy is calculated from "output" charge density,
 	// so here is the correction.
-    for (int ir=0; ir<pw.nrxx; ir++) 
+    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) 
 	{
 		this->descf -= ( CHR.rho[0][ir]- CHR.rho_save[0][ir] ) * pot.vr(0,ir);
 	}
 
     if (GlobalV::NSPIN==2)
     {
-        for (int ir=0; ir<pw.nrxx; ir++)
+        for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
             this->descf -= ( CHR.rho[1][ir] - CHR.rho_save[1][ir] ) * pot.vr(1, ir);
         }
     }
     if (GlobalV::NSPIN==4)
     {
-        for(int ir=0; ir<pw.nrxx; ir++)
+        for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
             this->descf -= ( CHR.rho[1][ir] - CHR.rho_save[1][ir] ) * pot.vr(1, ir);
             this->descf -= ( CHR.rho[2][ir] - CHR.rho_save[2][ir] ) * pot.vr(2, ir);
@@ -415,7 +415,7 @@ void energy::delta_escf(void)
 
     Parallel_Reduce::reduce_double_pool( descf );
 
-    this->descf *= ucell.omega / pw.ncxyz;
+    this->descf *= GlobalC::ucell.omega / GlobalC::pw.ncxyz;
     return;
 }
 
@@ -426,9 +426,9 @@ void energy::print_band(const int &ik)
     bool wrong = false;
 	for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 	{
-		if( abs( wf.ekb[ik][ib] ) > 1.0e10)
+		if( abs( GlobalC::wf.ekb[ik][ib] ) > 1.0e10)
 		{
-			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << wf.ekb[ik][ib] << " Ry" << endl;
+			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << endl;
 			wrong = true;
 		}
 	}
@@ -457,10 +457,10 @@ void energy::print_band(const int &ik)
 				for(int ib=0;ib<GlobalV::NBANDS;ib++)
 				{
 					GlobalV::ofs_running << " "<< setw(6) << ib+1  
-						<< setw(15) << wf.ekb[ik][ib] * Ry_to_eV;
+						<< setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV;
 					// for the first electron iteration, we don't have the energy
 					// spectrum, so we can't get the occupations. 
-					GlobalV::ofs_running << setw(15) << wf.wg(ik,ib);
+					GlobalV::ofs_running << setw(15) << GlobalC::wf.wg(ik,ib);
 					GlobalV::ofs_running << endl;
 				}
 			}
@@ -479,7 +479,7 @@ void energy::set_exx()
 	{
 		if("lcao_in_pw"==GlobalV::BASIS_TYPE)
 		{
-			return exx_lip.get_exx_energy();
+			return GlobalC::exx_lip.get_exx_energy();
 		}
 		else if("lcao"==GlobalV::BASIS_TYPE)
 		{
@@ -496,11 +496,11 @@ void energy::set_exx()
 	}
 	else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
 	{
-		this->exx = exx_global.info.hybrid_alpha * exx_energy();
+		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
 	}
 	else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
 	{
-		this->exx = exx_global.info.hybrid_alpha * exx_energy();
+		this->exx = GlobalC::exx_global.info.hybrid_alpha * exx_energy();
 	}
 
 	return;

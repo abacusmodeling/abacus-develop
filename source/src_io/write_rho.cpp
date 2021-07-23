@@ -35,31 +35,31 @@ void Charge::write_rho(
 
 		//GlobalV::ofs_running << "\n Output charge file." << endl;
 
-		ofs << ucell.latName << endl;//1
-		ofs << " " << ucell.lat0 * 0.529177 << endl;
-		ofs << " " << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-		ofs << " " << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-		ofs << " " << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latName << endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].label;
+			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
 		ofs << endl;
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			ofs << " " << ucell.atoms[it].na;
+			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
 		ofs << endl;
 		ofs << "Direct" << endl;
 
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			for(int ia=0; ia<ucell.atoms[it].na; ia++)
+			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
-				ofs << " " << ucell.atoms[it].taud[ia].x
-					<< " " << ucell.atoms[it].taud[ia].y
-					<< " " << ucell.atoms[it].taud[ia].z << endl;
+				ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].y
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
 			}
 		}
 
@@ -73,19 +73,19 @@ void Charge::write_rho(
 			ofs << "\n  " << GlobalV::NSPIN;
 			if(GlobalV::NSPIN==1 || GlobalV::NSPIN == 4)
 			{
-				ofs << "\n " << en.ef << " (fermi energy)";
+				ofs << "\n " << GlobalC::en.ef << " (fermi energy)";
 			}
 			else if(GlobalV::NSPIN==2)
 			{
-				if(is==0)ofs << "\n " << en.ef_up << " (fermi energy for spin=1)"; 
-				else if(is==1)ofs << "\n " << en.ef_dw << " (fermi energy for spin=2)";
+				if(is==0)ofs << "\n " << GlobalC::en.ef_up << " (fermi energy for spin=1)"; 
+				else if(is==1)ofs << "\n " << GlobalC::en.ef_dw << " (fermi energy for spin=2)";
 			}
 			else
 			{
 				WARNING_QUIT("write_rho","check nspin!");
 			}
 		}
-		ofs << "\n  " << pw.ncx << " " << pw.ncy << " " << pw.ncz << endl;
+		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << endl;
 
 		ofs << setprecision(precision);
 		ofs << scientific;
@@ -95,20 +95,20 @@ void Charge::write_rho(
 	
 #ifndef __MPI
 	int count=0;
-	for(int k=0; k<pw.ncz; k++)
+	for(int k=0; k<GlobalC::pw.ncz; k++)
 	{
-		for(int j=0; j<pw.ncy; j++)
+		for(int j=0; j<GlobalC::pw.ncy; j++)
 		{
-			for(int i=0; i<pw.ncx; i++)
+			for(int i=0; i<GlobalC::pw.ncx; i++)
 			{
 				if(count%8==0) ofs << "\n";
-				ofs << " " << rho_save[i*pw.ncy*pw.ncz + j*pw.ncz + k];
+				ofs << " " << rho_save[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k];
 				++count;
 			}
 		}
 	}
 #else
-//	for(int ir=0; ir<pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
+//	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) chr.rho[0][ir]=1; // for testing
 //	GlobalV::ofs_running << "\n GlobalV::RANK_IN_POOL = " << GlobalV::RANK_IN_POOL;
 	
 	// only do in the first pool.
@@ -117,10 +117,10 @@ void Charge::write_rho(
 		// num_z: how many planes on processor 'ip'
     	int *num_z = new int[GlobalV::NPROC_IN_POOL];
     	ZEROS(num_z, GlobalV::NPROC_IN_POOL);
-    	for (int iz=0;iz<pw.nbz;iz++)
+    	for (int iz=0;iz<GlobalC::pw.nbz;iz++)
     	{
         	int ip = iz % GlobalV::NPROC_IN_POOL;
-        	num_z[ip] += pw.bz;
+        	num_z[ip] += GlobalC::pw.bz;
     	}	
 
 		// start_z: start position of z in 
@@ -133,9 +133,9 @@ void Charge::write_rho(
     	}	
 
 		// which_ip: found iz belongs to which ip.
-		int *which_ip = new int[pw.ncz];
-		ZEROS(which_ip, pw.ncz);
-		for(int iz=0; iz<pw.ncz; iz++)
+		int *which_ip = new int[GlobalC::pw.ncz];
+		ZEROS(which_ip, GlobalC::pw.ncz);
+		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
 			for(int ip=0; ip<GlobalV::NPROC_IN_POOL; ip++)
 			{
@@ -155,11 +155,11 @@ void Charge::write_rho(
 
 		
 		int count=0;
-		int nxy = pw.ncx * pw.ncy;
+		int nxy = GlobalC::pw.ncx * GlobalC::pw.ncy;
 		double* zpiece = new double[nxy];
 
 		// save the rho one z by one z.
-		for(int iz=0; iz<pw.ncz; iz++)
+		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
 			//	cout << "\n iz=" << iz << endl;
 			// tag must be different for different iz.
@@ -175,8 +175,8 @@ void Charge::write_rho(
 					// mohan change to rho_save on 2012-02-10
 					// because this can make our next restart calculation lead
 					// to the same dr2 as the one saved.
-					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
-					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+					zpiece[ir] = rho_save[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
 				}
 			}
 			// case 2: > first part rho: send the rho to 
@@ -186,8 +186,8 @@ void Charge::write_rho(
 				for(int ir=0; ir<nxy; ir++)
 				{
 					//						zpiece[ir] = rho[is][ir*num_z[GlobalV::RANK_IN_POOL]+iz];
-					zpiece[ir] = rho_save[ir*pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
-					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*pw.nczp+iz=" << ir*pw.nczp+iz;
+					zpiece[ir] = rho_save[ir*GlobalC::pw.nczp+iz-start_z[GlobalV::RANK_IN_POOL]];
+					//						GlobalV::ofs_running << "\n get zpiece[" << ir << "]=" << zpiece[ir] << " ir*GlobalC::pw.nczp+iz=" << ir*GlobalC::pw.nczp+iz;
 				}
 				MPI_Send(zpiece, nxy, MPI_DOUBLE, 0, tag, POOL_WORLD);
 			}
@@ -205,12 +205,12 @@ void Charge::write_rho(
 			{
 				//	ofs << "\niz=" << iz;
 				// mohan update 2011-03-30
-				for(int iy=0; iy<pw.ncy; iy++)
+				for(int iy=0; iy<GlobalC::pw.ncy; iy++)
 				{
-					for(int ix=0; ix<pw.ncx; ix++)
+					for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 					{
 						if(count%8==0) ofs << "\n";
-						ofs << " " << zpiece[ix*pw.ncy+iy];
+						ofs << " " << zpiece[ix*GlobalC::pw.ncy+iy];
 						++count;
 					}
 				}

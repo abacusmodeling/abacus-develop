@@ -22,7 +22,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	timer::tick("Elec_Stochastic","scf_stochastic");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell,pw); 
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
 
     set_ethr();
     
@@ -51,7 +51,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	Symmetry_rho srho;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, CHR, pw, Pgrid, symm);
+		srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 	}
 
 	// conv_elec is a member of Threshold_Elec
@@ -59,7 +59,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 	clock_t start,finish;
 	double duration = 0.0;	
-	STO_WF.init();
+	GlobalC::sto_wf.init();
 	int chetype = 1;
 
 	for (this->iter = 1;iter <= GlobalV::NITER;iter++)
@@ -107,7 +107,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
-		//en.calculate_harris(1);
+		//GlobalC::en.calculate_harris(1);
 	
 		// first_iter_again:					// Peize Lin delete 2019-05-01
 		
@@ -119,18 +119,18 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		}
 		else
 		{
-			hm.hpw.init_k(0); //only GAMMA
-			//In fact, hm.hpw.init_k has been done in wf.wfcinit();
+			GlobalC::hm.hpw.init_k(0); //only GAMMA
+			//In fact, GlobalC::hm.hpw.init_k has been done in GlobalC::wf.wfcinit();
 		}
 		GlobalC::kv.wk[0] = 2;// GAMMA temporary
 		
         if (check_stop_now()) return;
         
-		en.eband  = 0.0;
-        en.demet  = 0.0;
-        en.ef     = 0.0;
-        en.ef_up  = 0.0;
-        en.ef_dw  = 0.0;
+		GlobalC::en.eband  = 0.0;
+        GlobalC::en.demet  = 0.0;
+        GlobalC::en.ef     = 0.0;
+        GlobalC::en.ef_up  = 0.0;
+        GlobalC::en.ef_dw  = 0.0;
 
 		//(3) save change density as previous charge,
 		// prepared fox mixing.
@@ -143,20 +143,20 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #ifdef __MPI
 		if(GlobalV::NBANDS > 0)
 		{
-			MPI_Bcast(wf.evc[0].c, wf.npwx*GlobalV::NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
-			MPI_Bcast(wf.ekb[0], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
+			MPI_Bcast(GlobalC::wf.evc[0].c, GlobalC::wf.npwx*GlobalV::NBANDS*2, MPI_DOUBLE , 0, PARAPW_WORLD);
+			MPI_Bcast(GlobalC::wf.ekb[0], GlobalV::NBANDS, MPI_DOUBLE, 0, PARAPW_WORLD);
 		}
 #endif
 		
 		//(4) calculate fermi energy.
 		int ndim;
-    	if(STO_WF.stotype == "pw")
+    	if(GlobalC::sto_wf.stotype == "pw")
 		{
-    	    ndim = wf.npw;
+    	    ndim = GlobalC::wf.npw;
 		}
     	else
 		{
-    	    ndim = pw.nrxx;
+    	    ndim = GlobalC::pw.nrxx;
 		}
 
 		if(iter == 1)	
@@ -182,22 +182,22 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
-					ZEROS(CHR.rho[is], pw.nrxx);
+					ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
 				}
 			}
 			//for(int is = 0; is < GlobalV::NSPIN; ++is)
 			//{
-			//	MPI_Bcast(CHR.rho[is], pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
+			//	MPI_Bcast(CHR.rho[is], GlobalC::pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
 			//}
 #ifdef __MPI
-			MPI_Bcast(&en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
+			MPI_Bcast(&GlobalC::en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
 #endif
 		}
 		else
 		{
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS(CHR.rho[is], pw.nrxx);
+				ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
 			}
 		}
 
@@ -208,20 +208,20 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
 		// mohan add 2009-01-23
-		//en.calculate_harris(2);
+		//GlobalC::en.calculate_harris(2);
 
 
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR, pw, Pgrid, symm);
+			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 		}
 
 
 		//(8) deband is calculated from "output" charge density calculated 
 		// in sum_band
 		// need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
-        en.deband = en.delta_e();
+        GlobalC::en.deband = GlobalC::en.delta_e();
 	
 	
 		// tr2_min used only in first scf iteraton
@@ -249,7 +249,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 #ifdef __MPI
 		MPI_Bcast(&dr2, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
 		MPI_Bcast(&conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
-		MPI_Bcast(CHR.rho[0], pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
+		MPI_Bcast(CHR.rho[0], GlobalC::pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
 #endif
 
 		//			if(GlobalV::MY_RANK==0)
@@ -281,16 +281,16 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 			// because <T+V(ionic)> = <eband+deband> are calculated after sum
 			// band, using output charge density.
-			// but E_Hartree(en.ehart) and Exc(en.etxc) are calculated in v_of_rho above,
+			// but E_Hartree(GlobalC::en.ehart) and Exc(GlobalC::en.etxc) are calculated in v_of_rho above,
 			// using the mixed charge density.
 			// so delta_escf corrects for this difference at first order. 
-            en.delta_escf();
+            GlobalC::en.delta_escf();
         }
         else
         {
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				for(int ir=0; ir<pw.nrxx; ++ir)
+				for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 				{
 					pot.vnew(is,ir) = pot.vr(is,ir);
 				}
@@ -301,7 +301,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
             //( vnew used later for scf correction to the forces )
 	    	pot.vnew = pot.vr - pot.vnew;
-            en.descf = 0.0;
+            GlobalC::en.descf = 0.0;
 
         }
 		
@@ -320,13 +320,13 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			pot.set_vr_eff();
         
         //print_eigenvalue(GlobalV::ofs_running);
-		en.calculate_etot();
+		GlobalC::en.calculate_etot();
 
 	
         finish=clock();
         duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);	
+		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);	
         if (conv_elec || iter==GlobalV::NITER)
         {
 			for(int is=0; is<GlobalV::NSPIN; is++)
@@ -339,9 +339,9 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			if(conv_elec)
 			{
 				//GlobalV::ofs_running << " convergence is achieved" << endl;			
-				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
 				GlobalV::ofs_running << " charge density convergence is achieved" << endl;
-                                GlobalV::ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
 			}
 			else
 			{
@@ -383,8 +383,8 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	int precondition_type = 2;
 
-	double *h_diag = new double[wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
-	ZEROS(h_diag, wf.npwx * GlobalV::NPOL);
+	double *h_diag = new double[GlobalC::wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
+	ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
     
 	avg_iter = 0.0;
        
@@ -393,7 +393,7 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
-		hm.hpw.init_k(ik);
+		GlobalC::hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization
@@ -402,38 +402,38 @@ void Stochastic_Elec::c_bands(const int &istep)
         //===========================================
         if (precondition_type==1)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
 			{
-				h_diag[ig] = max(1.0, wf.g2kin[ig]);
-				if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+				h_diag[ig] = max(1.0, GlobalC::wf.g2kin[ig]);
+				if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
 			}
         }
         else if (precondition_type==2)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
 			{
-				h_diag[ig] = 1 + wf.g2kin[ig] + sqrt( 1 + (wf.g2kin[ig] - 1) * (wf.g2kin[ig] - 1));
-				if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+				h_diag[ig] = 1 + GlobalC::wf.g2kin[ig] + sqrt( 1 + (GlobalC::wf.g2kin[ig] - 1) * (GlobalC::wf.g2kin[ig] - 1));
+				if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
 			}
         }
 		//h_diag can't be zero!  //zhengdy-soc
 		if(GlobalV::NPOL==2)
 		{
-			for(int ig = wf.npw;ig < wf.npwx; ig++)
+			for(int ig = GlobalC::wf.npw;ig < GlobalC::wf.npwx; ig++)
 			{
 				h_diag[ig] = 1.0;
-				h_diag[ig+ wf.npwx] = 1.0;
+				h_diag[ig+ GlobalC::wf.npwx] = 1.0;
 			}
 		}
 
 		clock_t start=clock();
 
 		double avg_iter_k = 0.0;
-		hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
+		GlobalC::hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
 
 		avg_iter += avg_iter_k;
 
-		en.print_band(ik);
+		GlobalC::en.print_band(ik);
 
 		clock_t finish=clock();
 		const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;

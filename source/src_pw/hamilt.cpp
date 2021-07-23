@@ -23,18 +23,18 @@ void Hamilt::diagH_pw(
 	// but if mem_saver is used, ik0=0.
 	int ik0 = ik;
 
-	if(GlobalV::CALCULATION=="nscf" && wf.mem_saver==1)
+	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
 	{
 		if(GlobalV::BASIS_TYPE=="pw")
 		{
 			// generate PAOs first, then diagonalize to get
 			// inital wavefunctions.
-			wf.diago_PAO_in_pw_k2(ik, wf.evc[0]);	
+			GlobalC::wf.diago_PAO_in_pw_k2(ik, GlobalC::wf.evc[0]);	
 		}
 #ifdef __LCAO
 		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			wf.LCAO_in_pw_k(ik, wf.wanf2[0]);
+			GlobalC::wf.LCAO_in_pw_k(ik, GlobalC::wf.wanf2[0]);
 		}
 #endif
 		ik0 = 0;
@@ -49,9 +49,9 @@ void Hamilt::diagH_pw(
 				ik, 
 				GlobalV::NLOCAL, 
 				GlobalV::NBANDS, 
-				wf.wanf2[ik0], 
-				wf.evc[ik0], 
-				wf.ekb[ik]);
+				GlobalC::wf.wanf2[ik0], 
+				GlobalC::wf.evc[ik0], 
+				GlobalC::wf.ekb[ik]);
 		}
 		else
 		{
@@ -75,9 +75,9 @@ void Hamilt::diagH_pw(
 						ik,
 						GlobalV::NBANDS, 
 						GlobalV::NBANDS, 
-						wf.evc[ik0], 
-						wf.evc[ik0], 
-						wf.ekb[ik]);
+						GlobalC::wf.evc[ik0], 
+						GlobalC::wf.evc[ik0], 
+						GlobalC::wf.ekb[ik]);
 
                     avg_iter += 1.0;
                 }
@@ -87,13 +87,13 @@ void Hamilt::diagH_pw(
 
 				if(GlobalV::NPOL==1) 
 				{
-						cg.diag(wf.evc[ik0], wf.ekb[ik], GlobalC::kv.ngk[ik], wf.npwx,
+						cg.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik], GlobalC::wf.npwx,
 						GlobalV::NBANDS, precondition, GlobalV::ETHR,
 						GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 				}
 				else
 				{
-					cg.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*GlobalV::NPOL, wf.npwx*GlobalV::NPOL,
+					cg.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::wf.npwx*GlobalV::NPOL, GlobalC::wf.npwx*GlobalV::NPOL,
 						GlobalV::NBANDS, precondition, GlobalV::ETHR,
 						GlobalV::DIAGO_CG_MAXITER, reorder, notconv, avg);
 				}
@@ -108,13 +108,13 @@ void Hamilt::diagH_pw(
 				Diago_David david;
 				if(GlobalV::NPOL==1) 
 				{
-					david.diag(wf.evc[ik0], wf.ekb[ik], GlobalC::kv.ngk[ik],
+					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::kv.ngk[ik],
 						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
 				 		GlobalV::ETHR, GlobalV::DIAGO_CG_MAXITER, notconv, avg);
 				}
 				else
 				{
-					david.diag(wf.evc[ik0], wf.ekb[ik], wf.npwx*GlobalV::NPOL,
+					david.diag(GlobalC::wf.evc[ik0], GlobalC::wf.ekb[ik], GlobalC::wf.npwx*GlobalV::NPOL,
 						GlobalV::NBANDS, precondition, GlobalV::DIAGO_DAVID_NDIM,
 						GlobalV::ETHR, GlobalV::DIAGO_CG_MAXITER, notconv, avg);
 				}

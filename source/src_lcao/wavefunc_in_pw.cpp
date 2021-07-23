@@ -12,12 +12,12 @@ void Wavefunc_in_pw::make_table_q(
 {
 	TITLE("Wavefunc_in_pw","make_table_q");
 
-	if( fn.size() != static_cast<size_t>(ucell.ntype) )
+	if( fn.size() != static_cast<size_t>(GlobalC::ucell.ntype) )
 	{
 		WARNING_QUIT("Wavefunc_in_pw::make_table_q","maybe NUMERICAL_ORBITAL is not read in, please check.");
 	}
 
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 		ifstream in(fn[it].c_str());
 		if(!in)
@@ -28,19 +28,19 @@ void Wavefunc_in_pw::make_table_q(
 		else
 		{
 			stringstream ss;
-			ss << "Orbital of species " << ucell.atoms[it].label;
+			ss << "Orbital of species " << GlobalC::ucell.atoms[it].label;
 			OUT(GlobalV::ofs_running,ss.str(),fn[it]);
 		}
 		in.close();
 	}
 
 	table_local.zero_out();
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
 		int ic=0;
-		for(int L=0; L<ucell.atoms[it].nwl+1; L++)
+		for(int L=0; L<GlobalC::ucell.atoms[it].nwl+1; L++)
 		{
-			for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+			for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 			{
 				GlobalV::ofs_running << " L=" << L << " N=" << N;
 				ifstream in(fn[it].c_str());
@@ -150,19 +150,19 @@ void Wavefunc_in_pw::make_table_q(
 
 	if(GlobalV::MY_RANK==0)
 	{
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			stringstream ss;
-			ss << GlobalV::global_out_dir << ucell.atoms[it].label << "/LOCAL_G.dat";
+			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/LOCAL_G.dat";
 			ofstream ofs(ss.str().c_str());
 			for(int iq=0; iq<GlobalV::NQX; iq++)
 			{
 				int ic=0;
 				double energy_q = pow((double)iq*GlobalV::DQ,2);
 				ofs << energy_q; // unit (Ry)
-				for(int L=0; L<ucell.atoms[it].nwl+1; L++)
+				for(int L=0; L<GlobalC::ucell.atoms[it].nwl+1; L++)
 				{
-					for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+					for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 					{
 						ofs << " " << table_local(it,ic,iq);
 						++ic;
@@ -212,7 +212,7 @@ double Wavefunc_in_pw::smearing(const double &energy_x,
 void Wavefunc_in_pw::integral(const int meshr, const double *psir, const double *r,
 const double *rab, const int &l, double* table)
 {
-	const double pref = FOUR_PI / sqrt(ucell.omega);
+	const double pref = FOUR_PI / sqrt(GlobalC::ucell.omega);
 
 	double *inner_part = new double[meshr];
 	for(int ir=0; ir<meshr; ir++)
@@ -252,7 +252,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
-	const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
+	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
 	complex<double> *aux = new complex<double>[npw];
 	double *chiaux = new double[1];
@@ -260,7 +260,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	Vector3<double> *gk = new Vector3<double>[npw];
 	for(int ig=0;ig<npw;ig++)
 	{
-		gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
 	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
@@ -268,23 +268,23 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	//int index = 0;
 	double *flq = new double[npw];
 	int iwall=0;
-	for (int it = 0;it < ucell.ntype;it++)
+	for (int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
-		for (int ia = 0;ia < ucell.atoms[it].na;ia++)
+		for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
 		{
-			complex<double> *sk = wf.get_sk(ik, it, ia);
+			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			int ic=0;
-			for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+			for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
 				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
-				for(int N=0; N < ucell.atoms[it].l_nchi[L]; N++)
+				for(int N=0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
 //					GlobalV::ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << endl;
 
 					for(int ig=0; ig<npw; ig++)
 					{
 						flq[ig] = PolyInt::Polynomial_Interpolation(table_local,
-						it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * ucell.tpiba );
+						it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba );
 					}
 
 					if(GlobalV::NSPIN==4)
@@ -293,7 +293,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 						for(int is_N = 0; is_N < 1; is_N++)
 						{
 							if(L==0 && is_N==1) continue;
-							if(ucell.atoms[it].has_so)
+							if(GlobalC::ucell.atoms[it].has_so)
 							{
 								const double j = abs(double(L+is_N) - 0.5);
 								if (!(GlobalV::DOMAG||GlobalV::DOMAG_Z))
@@ -308,7 +308,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 											psi(iwall, ig) =
 											lphase * sk[ig] * ylm(lm, ig) * flq[ig];
 											//else
-											psi(iwall+1, ig+wf.npwx) =
+											psi(iwall+1, ig+GlobalC::wf.npwx) =
 											lphase * sk[ig] * ylm(lm, ig) * flq[ig];
 
 										}
@@ -331,9 +331,9 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 									}
 									else
 									{
-										/*for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
+										/*for(int ib = 0;ib < GlobalC::ucell.atoms[it].nchi;ib++)
 										{
-											if((ucell.atoms[it].lchi[ib] == L)&&(fabs(ucell.atoms[it].jjj[ib]-L+0.5)<1e-4))
+											if((GlobalC::ucell.atoms[it].lchi[ib] == L)&&(fabs(GlobalC::ucell.atoms[it].jjj[ib]-L+0.5)<1e-4))
 											{
 											nc=ib;
 											break;
@@ -343,20 +343,20 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 										{//Average the two functions
 											chiaux[ig] =  L *
 												PolyInt::Polynomial_Interpolation(table_local,
-												it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * ucell.tpiba );
+												it, ic, GlobalV::NQX, GlobalV::DQ, gk[ig].norm() * GlobalC::ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;
 											chiaux[ig] *= 1/(2.0*L+1.0);
 										}
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
-									alpha = ucell.magnet.angle1_[it];
-									gamma = -1 * ucell.magnet.angle2_[it] + 0.5 * PI;
+									alpha = GlobalC::ucell.magnet.angle1_[it];
+									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * PI;
 
 									for(int m = 0;m<2*L+1;m++)
 									{
 										const int lm = L*L +m;
-										if(iwall+2*L+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+										if(iwall+2*L+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 										for(int ig = 0;ig<npw;ig++)
 										{
 											aux[ig] = sk[ig] * ylm(lm,ig) * chiaux[ig];
@@ -370,28 +370,28 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 											//build the orthogonal wfc
 											//first rotation with angle (alpha + PI) around (OX)
 											psi(iwall,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
-											psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
+											psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
 											//second rotation with angle gamma around(OZ)
 											fup = cos(0.5 * (alpha + PI))*aux[ig];
 											fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
 											psi(iwall+2*L+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
-											psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
+											psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
 										}
 										iwall++;
 									}
 									iwall += 2*L +1;
 								} // end else INPUT.starting_spin_angle || !GlobalV::DOMAG
-							} // end if ucell.atoms[it].has_so
+							} // end if GlobalC::ucell.atoms[it].has_so
 							else
 							{//atomic_wfc_nc
 								double alpha, gamman;
 								complex<double> fup, fdown;
-								alpha = ucell.magnet.angle1_[it];
-								gamman = -ucell.magnet.angle2_[it] + 0.5*PI;
+								alpha = GlobalC::ucell.magnet.angle1_[it];
+								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
-									if(iwall+2*L+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+									if(iwall+2*L+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 									for(int ig = 0;ig<npw;ig++)
 									{
 										aux[ig] = sk[ig] * ylm(lm,ig) * flq[ig];
@@ -405,17 +405,17 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 										//build the orthogonal wfc
 										//first rotation with angle(alpha+PI) around(OX)
 										psi(iwall,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
-										psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
+										psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
 										//second rotation with angle gamma around(OZ)
 										fup = cos(0.5 * (alpha + PI)) * aux[ig];
 										fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
 										psi(iwall+2*L+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
-										psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
+										psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
 									} // end ig
 									iwall++;
 								} // end m
 								iwall += 2*L+1;
-							} // end else ucell.atoms[it].has_so
+							} // end else GlobalC::ucell.atoms[it].has_so
 						} // end for is_N
                     } // end if GlobalV::NONCOLIN
                     else{//LSDA and nomagnet case
@@ -449,7 +449,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 	TITLE("Wavefunc_in_pw","produce_local_basis_in_pw");
 	assert(ik>=0);
 	const int npw = GlobalC::kv.ngk[ik];
-	const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
+	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
 	complex<double> *aux = new complex<double>[npw];
 	double *chiaux = new double[1];
@@ -458,7 +458,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 
 	for(int ig=0;ig<npw;ig++)
 	{
-		gkq[ig] = wf.get_1qvec_cartesian(ik, ig) + q;
+		gkq[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig) + q;
 	}
 
 	YlmReal::Ylm_Real(total_lm, npw, gkq, ylm);
@@ -466,26 +466,26 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 	//int index = 0;
 	double *flq = new double[npw];
 	int iwall=0;
-	for (int it = 0;it < ucell.ntype;it++)
+	for (int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
-		for (int ia = 0;ia < ucell.atoms[it].na;ia++)
+		for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
 		{
-			complex<double> *skq = wf.get_skq(ik, it, ia, q);
+			complex<double> *skq = GlobalC::wf.get_skq(ik, it, ia, q);
 			int ic=0;
-			for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+			for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
 				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
-				for(int N=0; N < ucell.atoms[it].l_nchi[L]; N++)
+				for(int N=0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
 					for(int ig=0; ig<npw; ig++)
 					{
-						if(gkq[ig].norm() * ucell.tpiba > ((GlobalV::NQX-4) * GlobalV::DQ) )
+						if(gkq[ig].norm() * GlobalC::ucell.tpiba > ((GlobalV::NQX-4) * GlobalV::DQ) )
 						{
 						   flq[ig] = 0.0;
 						}
 						else
 						{
-						   flq[ig] = PolyInt::Polynomial_Interpolation(table_local, it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * ucell.tpiba );
+						   flq[ig] = PolyInt::Polynomial_Interpolation(table_local, it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
 						}
 					}
 
@@ -493,11 +493,11 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 					if(GlobalV::NSPIN==4)
                     {
 						Soc soc;
-						soc.rot_ylm(ucell.atoms[it].nwl+1);
+						soc.rot_ylm(GlobalC::ucell.atoms[it].nwl+1);
 						for(int is_N = 0; is_N < 2; is_N++)
 						{
 							if(L==0&&is_N==1) continue;
-							if(ucell.atoms[it].has_so)
+							if(GlobalC::ucell.atoms[it].has_so)
 							{
 								const double j = double(L+is_N) - 0.5;
 								if ( !(GlobalV::DOMAG||GlobalV::DOMAG_Z))
@@ -513,7 +513,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 											{
 												if(fabs(fact[is])>1e-8)
 												{
-													const int ind = ppcell.lmaxkb + soc.sph_ind(L,j,m,is);
+													const int ind = GlobalC::ppcell.lmaxkb + soc.sph_ind(L,j,m,is);
 													ZEROS(aux, npw);
 													for(int n1=0;n1<2*L+1;n1++){
 														const int lm = L*L +n1;
@@ -522,10 +522,10 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 															aux[ig] += soc.rotylm(n1,ind)* ylm(lm,ig);
 													}
 													for(int ig=0; ig<npw;ig++)
-														psi(iwall, ig + wf.npwx*is ) = lphase * fact[is] * skq[ig] * aux[ig] * flq[ig];
+														psi(iwall, ig + GlobalC::wf.npwx*is ) = lphase * fact[is] * skq[ig] * aux[ig] * flq[ig];
 												}
 												else
-													for(int ig=0; ig<npw;ig++) psi(iwall,ig+ wf.npwx*is) = complex<double>(0.0 , 0.0);
+													for(int ig=0; ig<npw;ig++) psi(iwall,ig+ GlobalC::wf.npwx*is) = complex<double>(0.0 , 0.0);
 											}//is
 											iwall++;
 									}//if
@@ -548,9 +548,9 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 										}
 									else
 									{
-										/*for(int ib = 0;ib < ucell.atoms[it].nchi;ib++)
+										/*for(int ib = 0;ib < GlobalC::ucell.atoms[it].nchi;ib++)
 										{
-											if((ucell.atoms[it].lchi[ib] == L)&&(fabs(ucell.atoms[it].jjj[ib]-L+0.5)<1e-4))
+											if((GlobalC::ucell.atoms[it].lchi[ib] == L)&&(fabs(GlobalC::ucell.atoms[it].jjj[ib]-L+0.5)<1e-4))
 											{
 											nc=ib;
 											break;
@@ -560,20 +560,20 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 										{//Average the two functions
 											chiaux[ig] =  L *
 												PolyInt::Polynomial_Interpolation(table_local,
-																	it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * ucell.tpiba );
+																	it, ic, GlobalV::NQX, GlobalV::DQ, gkq[ig].norm() * GlobalC::ucell.tpiba );
 
 											chiaux[ig] += flq[ig] * (L+1.0) ;
 											chiaux[ig] *= 1/(2.0*L+1.0);
 										}
 									}
 									//and construct the starting wavefunctions as in the noncollinear case.
-									alpha = ucell.magnet.angle1_[it];
-									gamma = -1 * ucell.magnet.angle2_[it] + 0.5 * PI;
+									alpha = GlobalC::ucell.magnet.angle1_[it];
+									gamma = -1 * GlobalC::ucell.magnet.angle2_[it] + 0.5 * PI;
 
 									for(int m = 0;m<2*L+1;m++)
 									{
 										const int lm = L*L +m;
-										//if(iwall+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+										//if(iwall+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 										for(int ig = 0;ig<npw;ig++)
 										{
 											aux[ig] = skq[ig] * ylm(lm,ig) * chiaux[ig];
@@ -587,12 +587,12 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 											//build the orthogonal wfc
 											//first rotation with angle (alpha + PI) around (OX)
 											psi(iwall,ig) = (cos(0.5 * gamma) + IMAG_UNIT * sin(0.5*gamma)) * fup;
-											psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
+											psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamma) - IMAG_UNIT * sin(0.5*gamma)) * fdown;
 											//second rotation with angle gamma around(OZ)
 											fup = cos(0.5 * (alpha + PI))*aux[ig];
 											fdown = IMAG_UNIT * sin(0.5 * (alpha + PI))*aux[ig];
 											psi(iwall+2*L+1,ig) = (cos(0.5*gamma) + IMAG_UNIT*sin(0.5*gamma))*fup;
-											psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
+											psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamma) - IMAG_UNIT*sin(0.5*gamma))*fdown;
 										}
 										iwall++;
 									}
@@ -603,12 +603,12 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 							{//atomic_wfc_nc
 								double alpha, gamman;
 								complex<double> fup, fdown;
-								alpha = ucell.magnet.angle1_[it];
-								gamman = -ucell.magnet.angle2_[it] + 0.5*PI;
+								alpha = GlobalC::ucell.magnet.angle1_[it];
+								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)
 								{
 									const int lm = L*L +m;
-								//   if(iwall+2*l+1>ucell.natomwfc) WARNING_QUIT("wf.atomic_wfc()","error: too many wfcs");
+								//   if(iwall+2*l+1>GlobalC::ucell.natomwfc) WARNING_QUIT("GlobalC::wf.atomic_wfc()","error: too many wfcs");
 									for(int ig = 0;ig<npw;ig++)
 									{
 										aux[ig] = skq[ig] * ylm(lm,ig) * flq[ig];
@@ -622,12 +622,12 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 										//build the orthogonal wfc
 										//first rotation with angle(alpha+PI) around(OX)
 										psi(iwall,ig) = (cos(0.5 * gamman) + IMAG_UNIT * sin(0.5*gamman)) * fup;
-										psi(iwall,ig+ wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
+										psi(iwall,ig+ GlobalC::wf.npwx) = (cos(0.5 * gamman) - IMAG_UNIT * sin(0.5*gamman)) * fdown;
 										//second rotation with angle gamma around(OZ)
 										fup = cos(0.5 * (alpha + PI)) * aux[ig];
 										fdown = IMAG_UNIT * sin(0.5 * (alpha + PI)) * aux[ig];
 										psi(iwall+2*L+1,ig) = (cos(0.5*gamman) + IMAG_UNIT*sin(0.5*gamman))*fup;
-										psi(iwall+2*L+1,ig+ wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
+										psi(iwall+2*L+1,ig+ GlobalC::wf.npwx) = (cos(0.5*gamman) - IMAG_UNIT*sin(0.5*gamman))*fdown;
 									}
 									iwall++;
 								}

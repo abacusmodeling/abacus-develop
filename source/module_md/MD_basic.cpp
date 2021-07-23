@@ -29,7 +29,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	ionmbl=new Vector3<int>[ucell.nat];
 	force=new Vector3<double>[ucell.nat];
 
-	energy_=en.etot/2;
+	energy_=GlobalC::en.etot/2;
 
 	//MD starting setup
 	if(!mdp.rstMD){
@@ -155,7 +155,7 @@ void MD_basic::runNVT(int step1){
 		if(ionmbl[k].z==0)force[k].z=0;
 	}
 	double maxForce = mdf.MAXVALF(ucell.nat, force);
-	energy_=en.etot/2;
+	energy_=GlobalC::en.etot/2;
     double hamiltonian;
 	//----------------------------------------------
 	// big loop
@@ -326,7 +326,7 @@ void MD_basic::runNVE(int step1){
     //cout<<"begin maxForce"<<endl;
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
-    energy_=en.etot/2;
+    energy_=GlobalC::en.etot/2;
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
     cout<< "NVE_STEP "<<" "<<"SystemEnergy"<<" "<< "Conserved"<<" "<< "DeltaE"<<" "<< "Temperature"<<endl;
@@ -467,7 +467,7 @@ bool MD_basic::runFIRE(int step1){
     //cout<<"begin maxForce"<<endl;
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
-    energy_ = en.etot/2;
+    energy_ = GlobalC::en.etot/2;
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
     cout<<"------------------------------------------------------------------------------"<<endl;

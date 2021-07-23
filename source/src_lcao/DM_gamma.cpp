@@ -268,7 +268,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
 
 	// Peize Lin test 2019-01-16
     wfc_dm_2d.init();
-	if(wf.start_wfc=="file")
+	if(GlobalC::wf.start_wfc=="file")
 	{
 		this->gamma_file(gt);
 	}
@@ -503,7 +503,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 			{
 				for (int ib=0; ib<bands_local[myid]; ib++)
 				{
-					wg_local(is,ib) = wf.wg(is,Total_Bands+ib);
+					wg_local(is,ib) = GlobalC::wf.wg(is,Total_Bands+ib);
 				}
 			}
 		}

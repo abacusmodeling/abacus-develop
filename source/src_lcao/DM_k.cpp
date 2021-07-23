@@ -47,7 +47,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 
 	// Peize Lin test 2019-01-16 
     wfc_dm_2d.init();
-	if(wf.start_wfc=="file")
+	if(GlobalC::wf.start_wfc=="file")
 	{
 		this->kpt_file(GridT);
 	}
@@ -127,8 +127,8 @@ inline void cal_DM_ATOM(
             complex<double> *DM=&DM_ATOM[ispin][atom2start];
             const int T2 = RA.info[ia1][ia2][3];
             const int I2 = RA.info[ia1][ia2][4];
-            Atom* atom2 = &ucell.atoms[T2];
-            const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+            Atom* atom2 = &GlobalC::ucell.atoms[T2];
+            const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
             const int iw2_lo=gt.trace_lo[start2];
             const int nw2=atom2->nw;
             complex<double> exp_R= exp( fac * (
@@ -142,7 +142,7 @@ inline void cal_DM_ATOM(
             int nRow=0;
             for(int ib=0; ib<GlobalV::NBANDS; ++ib)
             {
-                const double wg_local=wf.wg(ik,ib);
+                const double wg_local=GlobalC::wf.wg(ik,ib);
                 if(wg_local>0)
                 {
                     if(nRow==0) ibStart=ib;
@@ -208,8 +208,8 @@ inline void cal_DM_ATOM_nc(
                     complex<double> *DM=&DM_ATOM[ispin][atom2start];
                     const int T2 = RA.info[ia1][ia2][3];
                     const int I2 = RA.info[ia1][ia2][4];
-                    Atom* atom2 = &ucell.atoms[T2];
-                    const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+                    Atom* atom2 = &GlobalC::ucell.atoms[T2];
+                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
                     const int iw2_lo=gt.trace_lo[start2]/GlobalV::NPOL + gt.lgd/GlobalV::NPOL*is2;
                     const int nw2=atom2->nw;
                     complex<double> exp_R= exp( fac * (
@@ -223,7 +223,7 @@ inline void cal_DM_ATOM_nc(
                     int nRow=0;
                     for(int ib=0; ib<GlobalV::NBANDS; ++ib)
                     {
-                        const double w1=wf.wg(ik,ib);
+                        const double w1=GlobalC::wf.wg(ik,ib);
                         if(w1>0)
                         {
                             if(nRow==0) 
@@ -270,7 +270,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     int ca = 0;
     complex<double> fac = TWO_PI * IMAG_UNIT;
 
-    complex<double> *WFC_PHASE=new complex<double>[GlobalV::NLOCAL*ucell.nwmax];
+    complex<double> *WFC_PHASE=new complex<double>[GlobalV::NLOCAL*GlobalC::ucell.nwmax];
     
     int DM_ATOM_SIZE=1; 
     complex<double> **DM_ATOM=new complex<double> *[GlobalV::NSPIN];
@@ -280,15 +280,15 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
         DM_ATOM[is]=new complex<double>[DM_ATOM_SIZE];
         ZEROS(DM_ATOM[is], DM_ATOM_SIZE);
     }
-    for(int T1=0; T1<ucell.ntype; T1++)
+    for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
         for(int I1=0; I1<atom1->na; I1++)
         {
-            const int iat = ucell.itia2iat(T1,I1);
+            const int iat = GlobalC::ucell.itia2iat(T1,I1);
             if(gt.in_this_processor[iat])
             {
-                const int start1 = ucell.itiaiw2iwt(T1,I1,0);
+                const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
                 const int gstart = LNNR.nlocstartg[iat];
                 const int ng = LNNR.nlocdimg[iat];
                 const int iw1_lo=gt.trace_lo[start1]/GlobalV::NPOL;
@@ -372,7 +372,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     {
         for(int ib=0; ib<GlobalV::NBANDS; ++ib)
         {
-            cout << " ik=" << ik << " ib=" << ib << " occ=" << wf.wg(ik,ib) << " e=" << wf.ekb[ik][ib] << endl;
+            cout << " ik=" << ik << " ib=" << ib << " occ=" << GlobalC::wf.wg(ik,ib) << " e=" << GlobalC::wf.ekb[ik][ib] << endl;
         }
     }
 

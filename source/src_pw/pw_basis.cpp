@@ -1,5 +1,5 @@
 // MPI BUG FIX STEPS:
-// 1. add pw.nrxx_mpi ,used in sum_band_k , rho's Allgather
+// 1. add GlobalC::pw.nrxx_mpi ,used in sum_band_k , rho's Allgather
 // 2. change ./src_parallel/ft.cpp 's some group size
 // 3. delete condition justification in pw_and_columns distributins 2
 
@@ -114,7 +114,7 @@ void PW_Basis::set
         this->wfac = ecutrho/ecutwfc;
         if (wfac <= 1.0)
         {
-            WARNING_QUIT("input","pw.wfac <= 1.0 is not allowed !");
+            WARNING_QUIT("input","GlobalC::pw.wfac <= 1.0 is not allowed !");
         }
     }
     return;

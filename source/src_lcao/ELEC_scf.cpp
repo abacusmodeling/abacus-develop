@@ -27,7 +27,7 @@ void ELEC_scf::scf(const int &istep)
 
 	// (1) calculate ewald energy.
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell,pw);
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw);
 
 	// mohan add 2012-02-08
     set_ethr();
@@ -37,7 +37,7 @@ void ELEC_scf::scf(const int &istep)
 	Symmetry_rho srho;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, CHR, pw, Pgrid, symm);
+		srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 	}
 
 //	cout << scientific;
@@ -148,17 +148,17 @@ void ELEC_scf::scf(const int &istep)
         }
 
 		// mohan update 2012-06-05
-		en.calculate_harris(1);
+		GlobalC::en.calculate_harris(1);
 
 		// mohan move it outside 2011-01-13
 		// first need to calculate the weight according to
 		// electrons number.
 		// mohan add iter > 1 on 2011-04-02
-		// because the en.ekb has not value now.
+		// because the GlobalC::en.ekb has not value now.
 		// so the smearing can not be done.
 		if(iter>1)Occupy::calculate_weights();
 
-		if(wf.start_wfc == "file")
+		if(GlobalC::wf.start_wfc == "file")
 		{
 			if(iter==1)
 			{
@@ -193,7 +193,7 @@ void ELEC_scf::scf(const int &istep)
 				// rho1 and rho2 are the same rho.
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 				pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
-				en.delta_escf();
+				GlobalC::en.delta_escf();
 				if (ELEC_evolve::td_vext == 0)
 				{
 					pot.set_vr_eff();
@@ -255,7 +255,7 @@ void ELEC_scf::scf(const int &istep)
 		switch(xcf.iexch_now)						// Peize Lin add 2018-10-30
 		{
 			case 5:    case 6:   case 9:
-				if( !exx_global.info.separate_loop )
+				if( !GlobalC::exx_global.info.separate_loop )
 				{
 					exx_lcao.cal_exx_elec();
 				}
@@ -288,7 +288,7 @@ void ELEC_scf::scf(const int &istep)
 
 //		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 //		{
-//			cout << ib+1 << " " << wf.ekb[0][ib] << endl;
+//			cout << ib+1 << " " << GlobalC::wf.ekb[0][ib] << endl;
 //		}
 
 		//-----------------------------------------------------------
@@ -304,15 +304,15 @@ void ELEC_scf::scf(const int &istep)
 			return;
 		}
 
-		en.eband  = 0.0;
-		en.ef     = 0.0;
-		en.ef_up  = 0.0;
-		en.ef_dw  = 0.0;
+		GlobalC::en.eband  = 0.0;
+		GlobalC::en.ef     = 0.0;
+		GlobalC::en.ef_up  = 0.0;
+		GlobalC::en.ef_dw  = 0.0;
 
 		// demet is included into eband.
 		//if(GlobalV::DIAGO_TYPE!="selinv")
 		{
-			en.demet  = 0.0;
+			GlobalC::en.demet  = 0.0;
 		}
 
 		// (2)
@@ -327,7 +327,7 @@ void ELEC_scf::scf(const int &istep)
 			{
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					wf.wg(ik,ib)=GlobalV::ocp_kb[ik*GlobalV::NBANDS+ib];
+					GlobalC::wf.wg(ik,ib)=GlobalV::ocp_kb[ik*GlobalV::NBANDS+ib];
 				}
 			}
 		}
@@ -335,7 +335,7 @@ void ELEC_scf::scf(const int &istep)
 
 		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
-			en.print_band(ik);
+			GlobalC::en.print_band(ik);
 		}
 
 		// if selinv is used, we need this to calculate the charge
@@ -344,7 +344,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// add exx
 		// Peize Lin add 2016-12-03
-		en.set_exx();
+		GlobalC::en.set_exx();
 
 		// Peize Lin add 2020.04.04
 		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type
@@ -353,7 +353,7 @@ void ELEC_scf::scf(const int &istep)
 		{
 			if(restart.info_load.load_H && restart.info_load.load_H_finish && !restart.info_load.restart_exx)
 			{
-				exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(xcf);
 				exx_lcao.cal_exx_elec();
 				restart.info_load.restart_exx = true;
 			}
@@ -373,17 +373,17 @@ void ELEC_scf::scf(const int &istep)
 
 		// (4) mohan add 2010-06-24
 		// using new charge density.
-		en.calculate_harris(2);
+		GlobalC::en.calculate_harris(2);
 
 		// (5) symmetrize the charge density
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR, pw, Pgrid, symm);
+			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 		}
 
 		// (6) compute magnetization, only for spin==2
-        ucell.magnet.compute_magnetization();
+        GlobalC::ucell.magnet.compute_magnetization();
 
 		// resume codes!
 		//-------------------------------------------------------------------------
@@ -393,7 +393,7 @@ void ELEC_scf::scf(const int &istep)
 		//-------------------------------------------------------------------------
 
 		// (7) calculate delta energy
-		en.deband = en.delta_e();
+		GlobalC::en.deband = GlobalC::en.delta_e();
 
 		// (8) Mix charge density
 		CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
@@ -421,7 +421,7 @@ void ELEC_scf::scf(const int &istep)
 		{
 			// option 1
 			pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
-			en.delta_escf();
+			GlobalC::en.delta_escf();
 
 			// option 2
 			//------------------------------
@@ -430,10 +430,10 @@ void ELEC_scf::scf(const int &istep)
 			//------------------------------
 			/*
 			pot.vr = pot.v_of_rho(CHR.rho_save, CHR.rho);
-			en.calculate_etot();
-			en.print_etot(conv_elec, istep, iter, dr2, 0.0, GlobalV::ETHR, avg_iter,0);
+			GlobalC::en.calculate_etot();
+			GlobalC::en.print_etot(conv_elec, istep, iter, dr2, 0.0, GlobalV::ETHR, avg_iter,0);
 			pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
-			en.delta_escf();
+			GlobalC::en.delta_escf();
 			*/
 		}
 		else
@@ -441,7 +441,7 @@ void ELEC_scf::scf(const int &istep)
 			pot.vnew = pot.v_of_rho(CHR.rho, CHR.rho_core);
 			//(used later for scf correction to the forces )
 			pot.vnew -= pot.vr;
-			en.descf = 0.0;
+			GlobalC::en.descf = 0.0;
 		}
 
 		//-----------------------------------
@@ -492,14 +492,14 @@ void ELEC_scf::scf(const int &istep)
 		//cout<<duration<<"\t"<<duration_time<<endl;
 
 		// (11) calculate the total energy.
-		en.calculate_etot();
+		GlobalC::en.calculate_etot();
 
 		// avg_iter is an useless variable in LCAO,
 		// will fix this interface in future -- mohan 2021-02-10
 		int avg_iter=0;
-		en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
 
-		en.etot_old = en.etot;
+		GlobalC::en.etot_old = GlobalC::en.etot;
 
 		if (conv_elec || iter==GlobalV::NITER)
 		{
@@ -569,15 +569,15 @@ void ELEC_scf::scf(const int &istep)
 			{
  				//xiaohui add "OUT_LEVEL", 2015-09-16
 				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << setprecision(16);
-				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << en.ef * Ry_to_eV << " eV" << endl;
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << endl;
 				if(GlobalV::OUT_LEVEL=="ie")
 				{
-					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
 				}
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
 				{
-					ld.save_npy_e(en.etot);//ebase = etot, no deepks E_delta including
+					ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
 				}
 #endif
 			}

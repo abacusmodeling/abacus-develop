@@ -59,14 +59,14 @@ void Bessel_Basis::init(
 	if( start_from_file )	
 	{
 		// setup C4
-		this->allocate_C4(ntype, lmax_in, ucell.nmax, Ecut_number);
+		this->allocate_C4(ntype, lmax_in, GlobalC::ucell.nmax, Ecut_number);
 
 		// check tolerence
 		this->readin_C4("INPUTs", ntype, ecut, rcut, Ecut_number, tolerence);
 #ifdef __MPI
 		Parallel_Common::bcast_double( C4.ptr, C4.getSize() );
 #endif
-		this->init_Faln(ntype, lmax_in, ucell.nmax, Ecut_number);
+		this->init_Faln(ntype, lmax_in, GlobalC::ucell.nmax, Ecut_number);
 	}
 
 	return;
@@ -131,9 +131,9 @@ void Bessel_Basis::init_Faln(
 	this->nwfc = 0;
 	for(int it=0; it<ntype; it++)
 	{
-		for(int il=0; il<ucell.atoms[it].nwl+1; il++)
+		for(int il=0; il<GlobalC::ucell.atoms[it].nwl+1; il++)
 		{
-			for(int in=0; in<ucell.atoms[it].l_nchi[il]; in++)
+			for(int in=0; in<GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 			{
 				for(int ie=0; ie<ecut_number; ie++)
 				{
@@ -357,9 +357,9 @@ void Bessel_Basis::readin_C4(
 		{
 			string filec4;
 			ifs >> filec4;
-			for(int il=0; il< ucell.atoms[it].nwl+1; il++)
+			for(int il=0; il< GlobalC::ucell.atoms[it].nwl+1; il++)
 			{
-				for(int in=0; in< ucell.atoms[it].l_nchi[il]; in++)
+				for(int in=0; in< GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 				{
 					//for tests
 					//cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
@@ -452,9 +452,9 @@ void Bessel_Basis::allocate_C4(
 
 	for(int it=0; it<ntype; it++)
 	{
-		for(int il=0; il<ucell.atoms[it].nwl+1; il++)
+		for(int il=0; il<GlobalC::ucell.atoms[it].nwl+1; il++)
 		{
-			for(int in=0; in<ucell.atoms[it].l_nchi[il]; in++)
+			for(int in=0; in<GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 			{
 				for(int ie=0; ie<ecut_number; ie++)
 				{

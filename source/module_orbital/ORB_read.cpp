@@ -280,7 +280,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	TITLE("LCAO_Orbitals","Set_NonLocal");
 
 	// set a pointer
-	Atom* atom = &ucell.atoms[it];
+	Atom* atom = &GlobalC::ucell.atoms[it];
 
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
@@ -361,7 +361,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		}
 		Soc soc;
 		soc.rot_ylm(lmaxkb);
-		soc.fcoef.create(ucell.ntype, atom->nh, atom->nh);
+		soc.fcoef.create(GlobalC::ucell.ntype, atom->nh, atom->nh);
 
 		int ip1=0;
 		for(int p1 = 0; p1<n_projectors; p1++)//nbeta
@@ -534,12 +534,12 @@ void LCAO_Orbitals::Read_NonLocal(
 	if( nlmax != -1 )
 	{
 		bool find_lmax = false;
-		for(int ic=0; ic<ucell.atoms[it].nbeta; ic++)
+		for(int ic=0; ic<GlobalC::ucell.atoms[it].nbeta; ic++)
 		{
-			if( nlmax == ucell.atoms[it].lll[ic] )
+			if( nlmax == GlobalC::ucell.atoms[it].lll[ic] )
 			{
 				//			cout << " nlmax = " << nlmax << endl;
-				//			cout << " lchi = " << ucell.atoms[it].lll[ic] << endl;
+				//			cout << " lchi = " << GlobalC::ucell.atoms[it].lll[ic] << endl;
 				find_lmax = true;
 				break;
 			}
@@ -549,11 +549,11 @@ void LCAO_Orbitals::Read_NonLocal(
 		{
 			cout << " For element " << label << endl;
 			cout << " Max L Read in from NONLOCAL = " << nlmax << endl;
-			for(int ib=0; ib<ucell.atoms[it].nbeta; ++ib)
+			for(int ib=0; ib<GlobalC::ucell.atoms[it].nbeta; ++ib)
 			{
-				cout << " Max L Read in from pseudopotential file = " << ucell.atoms[it].lll[ib] << endl;
+				cout << " Max L Read in from pseudopotential file = " << GlobalC::ucell.atoms[it].lll[ib] << endl;
 			}
-			WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != ucell.atoms[it].lll");
+			WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != GlobalC::ucell.atoms[it].lll");
 		}
 	}
 

@@ -152,8 +152,8 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
 			// read the eigenvalues!
 			// very important to determine the occupations.
 			//------------------------------------------------
-			READ_VALUE(ifs, wf.ekb[ik][ib]);
-			READ_VALUE(ifs, wf.wg(ik,ib));
+			READ_VALUE(ifs, GlobalC::wf.ekb[ik][ib]);
+			READ_VALUE(ifs, GlobalC::wf.wg(ik,ib));
             assert( i==ib );
 			double a, b;
             for (int j=0; j<GlobalV::NLOCAL; ++j)
@@ -297,8 +297,8 @@ int WF_Local::read_lowf(double **c, const int &is)
         {
             int ib;
             READ_VALUE(ifs, ib);
-			READ_VALUE(ifs, wf.ekb[GlobalV::CURRENT_SPIN][i]);
-			READ_VALUE(ifs, wf.wg(GlobalV::CURRENT_SPIN,i));
+			READ_VALUE(ifs, GlobalC::wf.ekb[GlobalV::CURRENT_SPIN][i]);
+			READ_VALUE(ifs, GlobalC::wf.wg(GlobalV::CURRENT_SPIN,i));
             assert( (i+1)==ib);
 			//cout << " ib=" << ib << endl;
             for (int j=0; j<GlobalV::NLOCAL; j++)
@@ -313,8 +313,8 @@ int WF_Local::read_lowf(double **c, const int &is)
 
 #ifdef __MPI
     Parallel_Common::bcast_int(error);
-	Parallel_Common::bcast_double( wf.ekb[is], GlobalV::NBANDS);
-	Parallel_Common::bcast_double( wf.wg.c, GlobalV::NSPIN*GlobalV::NBANDS);
+	Parallel_Common::bcast_double( GlobalC::wf.ekb[is], GlobalV::NBANDS);
+	Parallel_Common::bcast_double( GlobalC::wf.wg.c, GlobalV::NSPIN*GlobalV::NBANDS);
 #endif
 	if(error==2) return 2;
 	if(error==3) return 3;
@@ -380,8 +380,8 @@ void WF_Local::write_lowf(const string &name, double **ctot)
             // +1 to mean more clearly.
             // band index start from 1.
             ofs << "\n" << i+1 << " (band)";
-			ofs << "\n" << wf.ekb[GlobalV::CURRENT_SPIN][i] << " (Ry)"; //mohan add 2012-03-26
-			ofs << "\n" << wf.wg(GlobalV::CURRENT_SPIN,i) << " (Occupations)";
+			ofs << "\n" << GlobalC::wf.ekb[GlobalV::CURRENT_SPIN][i] << " (Ry)"; //mohan add 2012-03-26
+			ofs << "\n" << GlobalC::wf.wg(GlobalV::CURRENT_SPIN,i) << " (Occupations)";
             for (int j=0; j<GlobalV::NLOCAL; j++)
             {
                 if (j % 5 == 0) ofs << "\n";
@@ -420,8 +420,8 @@ void WF_Local::write_lowf_complex(const string &name, complex<double> **ctot, co
             // +1 to mean more clearly.
             // band index start from 1.
             ofs << "\n" << i+1 << " (band)";
-			ofs << "\n" << wf.ekb[ik][i] << " (Ry)";
-			ofs << "\n" << wf.wg(ik,i) << " (Occupations)";
+			ofs << "\n" << GlobalC::wf.ekb[ik][i] << " (Ry)";
+			ofs << "\n" << GlobalC::wf.wg(ik,i) << " (Occupations)";
             for (int j=0; j<GlobalV::NLOCAL; j++)
             {
                 if (j % 5 == 0) ofs << "\n";
