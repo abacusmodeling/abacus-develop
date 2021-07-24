@@ -338,7 +338,6 @@ class Input
 	//added by zhengdy-soc
 	bool noncolin;
 	bool lspinorb;
-	double soc_lambda;
 
 	//	bool starting_spin_angle;
 	double *angle1;
