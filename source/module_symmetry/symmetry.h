@@ -15,7 +15,7 @@ public:
 	// mohan add 2021-02-21
 	static bool symm_flag;
 
-	void analy_sys(const UnitCell_pseudo &ucell, const output &out);
+	void analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstream &ofs_running);
 	bool available;
 
 	Vector3<double> s1, s2, s3;
@@ -84,7 +84,7 @@ public:
 
 	// check if the input cell is a primitive cell.
 	//void pricell(const UnitCell_pseudo &ucell);
-	void getgroup(int &nrot, int &nrotk);
+	void getgroup(int &nrot, int &nrotk, ofstream &ofs_running);
 	void checksym(Matrix3 &s, Vector3<double> &gtrans, double *pos);
 	void rho_symmetry(double *rho, const int &nr1, const int &nr2, const int &nr3);
 	void force_symmetry(matrix &force, double* pos, const UnitCell_pseudo &ucell);

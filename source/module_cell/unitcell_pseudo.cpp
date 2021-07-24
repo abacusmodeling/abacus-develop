@@ -300,7 +300,13 @@ void UnitCell_pseudo::setup_cell(
 	return;
 }
 
-void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstream &log)
+void UnitCell_pseudo::setup_cell_classic(
+	const string &fn, 
+	output &outp, 
+	ofstream &ofs,
+	ofstream &ofs_running,
+	ofstream &ofs_warning)
+
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 
@@ -322,27 +328,27 @@ void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstrea
 		ifstream ifa(fn.c_str(), ios::in);
 		if (!ifa)
 		{
-			GlobalV::ofs_warning << fn;
+			ofs_warning << fn;
 			ok = false;
 		}
 
 		if(ok)
 		{
-			GlobalV::ofs_running << "\n\n\n\n";
-			GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-			GlobalV::ofs_running << " |                                                                    |" << endl;
-			GlobalV::ofs_running << " | Reading atom information in unitcell for classic MD:               |" << endl;
-			GlobalV::ofs_running << " | From the input file and the structure file we know the number of   |" << endl;
-			GlobalV::ofs_running << " | different elments in this unitcell, then we list the detail        |" << endl;
-			GlobalV::ofs_running << " | information for each element. The total atom number is counted.    |" << endl;
-			GlobalV::ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << endl;
-			GlobalV::ofs_running << " | Cartesian and Direct coordinates for each atom.                    |" << endl;
-			GlobalV::ofs_running << " | The volume and the lattice vectors in real space is also shown.    |" << endl;
-			GlobalV::ofs_running << " |                                                                    |" << endl;
-			GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-			GlobalV::ofs_running << "\n\n\n\n";
+			ofs_running << "\n\n\n\n";
+			ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+			ofs_running << " |                                                                    |" << endl;
+			ofs_running << " | Reading atom information in unitcell for classic MD:               |" << endl;
+			ofs_running << " | From the input file and the structure file we know the number of   |" << endl;
+			ofs_running << " | different elments in this unitcell, then we list the detail        |" << endl;
+			ofs_running << " | information for each element. The total atom number is counted.    |" << endl;
+			ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << endl;
+			ofs_running << " | Cartesian and Direct coordinates for each atom.                    |" << endl;
+			ofs_running << " | The volume and the lattice vectors in real space is also shown.    |" << endl;
+			ofs_running << " |                                                                    |" << endl;
+			ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+			ofs_running << "\n\n\n\n";
 
-			GlobalV::ofs_running << " READING UNITCELL INFORMATION" << endl;
+			ofs_running << " READING UNITCELL INFORMATION" << endl;
 			//========================
 			// call read_atom_species
 			//========================
@@ -390,13 +396,13 @@ void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstrea
 	}
 	else
 	{
-		GlobalV::ofs_running << endl;
-		OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
-		OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ofs_running << endl;
+		OUT(ofs_running,"Volume (Bohr^3)", this->omega);
+		OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
 	}
 
-	GlobalV::ofs_running << endl;
-	outp.printM3(GlobalV::ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
+	ofs_running << endl;
+	outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
 
 }
 

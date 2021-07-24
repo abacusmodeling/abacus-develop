@@ -834,7 +834,7 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 	return;
 }	
 
-void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, const Matrix3* gmatrix)
+void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, const Matrix3* gmatrix, ofstream &ofs_running)
 {
 	//-------------------------------------------------------------------------
 	//PGROUP (L1760 symlib.f VASP)
