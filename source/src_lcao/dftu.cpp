@@ -1147,7 +1147,7 @@ void DFTU::cal_energy_correction(const int istep)
 
 void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double>* eff_pot)
 {
-	TITLE("DFTU", "cal_eff_pot_mat");
+	TITLE("DFTU", "cal_eff_pot_mat_complex");
 
  	if((CALCULATION=="scf" || CALCULATION=="relax" || CALCULATION=="cell-relax") && (!INPUT.omc) && istep==0 && this->iter_dftu==1) return;
 	
@@ -1164,7 +1164,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
   const complex<double> alpha_c(1.0,0.0), beta_c(0.0,0.0), half_c(0.5,0.0), one_c(1.0,0.0);
 
 	vector<complex<double>> VU(ParaO.nloc);
-  this->cal_VU_pot_mat_complex(spin, 1, &VU[0]);
+  this->cal_VU_pot_mat_complex(spin, true, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&NLOCAL, &NLOCAL, &NLOCAL,
@@ -1176,7 +1176,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 
   for(int irc=0; irc<ParaO.nloc; irc++)
     VU[irc] = eff_pot[irc];
-  
+
   // pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
   pztranc_(&NLOCAL, &NLOCAL, 
            &one_c, 
@@ -1468,7 +1468,7 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
   for(int i=0; i<ParaO.nloc; i++) HR[i] = zero;
 
   vector<complex<double>> VU(ParaO.nloc);
-  this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
+  this->cal_VU_pot_mat_complex(ispin, true, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&NLOCAL, &NLOCAL, &NLOCAL,
