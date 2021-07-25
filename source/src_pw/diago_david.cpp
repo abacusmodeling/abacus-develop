@@ -34,7 +34,10 @@ void Diago_David::diag
     timer::tick("Diago_David", "diag");
 
     assert( order > 1 );
-    //assert( order*nband < npw ); qianrui delete it 2021-7-25
+    assert( order*nband < npw * GlobalV::NPROC_IN_POOL ); 
+    //qianrui change it 2021-7-25. 
+    //In strictly speaking, it shoule be order*nband < npw sum of all pools. We roughly estimate it here.
+    //However, in most cases, total number of plane waves should be much larger than nband*order
 
     int nbase_x = order * nband ;				// maximum dimension of the reduced basis set
 
