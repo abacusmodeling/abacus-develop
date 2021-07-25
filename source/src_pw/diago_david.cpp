@@ -34,7 +34,7 @@ void Diago_David::diag
     timer::tick("Diago_David", "diag");
 
     assert( order > 1 );
-    assert( order*nband < npw );
+    //assert( order*nband < npw ); qianrui delete it 2021-7-25
 
     int nbase_x = order * nband ;				// maximum dimension of the reduced basis set
 
