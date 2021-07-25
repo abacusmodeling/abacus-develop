@@ -209,7 +209,7 @@ void Input::Default(void)
 	diago_proc = 0; //if 0, then diago_proc = GlobalV::NPROC
     diago_cg_maxiter = 50;
 	diago_cg_prec=1; //mohan add 2012-03-31
-    diago_david_ndim = 10;
+    diago_david_ndim = 4;
     ethr = 1.0e-2;
 	nb2d = 0;
 	nurse = 0;

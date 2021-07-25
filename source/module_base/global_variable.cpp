@@ -54,7 +54,7 @@ bool	SPARSE_MATRIX = false;
 int		DIAGO_PROC = 0;
 int 	DIAGO_CG_MAXITER = 30;
 int		DIAGO_CG_PREC = 1; //mohan add 2012-03-31
-int 	DIAGO_DAVID_NDIM = 2;
+int 	DIAGO_DAVID_NDIM = 4;
 double 	ETHR = 1.0e-2;
 int		NB2D = 1;
 
