@@ -271,11 +271,9 @@ void Hamilt::diagH_LAPACK(
         //=====================================
         // calculate only m lowest eigenvalues
         //=====================================
-        double *work2 = new double[2*lwork];
         int *iwork = new int [5*nstart];
         int *ifail = new int[nstart];
 
-        ZEROS(work2,2*lwork);
         ZEROS(rwork,7*nstart);
         ZEROS(iwork,5*nstart);
         ZEROS(ifail,nstart);
@@ -316,7 +314,6 @@ void Hamilt::diagH_LAPACK(
                 info    //INTEGER
         );
 
-        delete[] work2;
         delete[] iwork;
         delete[] ifail;
     }

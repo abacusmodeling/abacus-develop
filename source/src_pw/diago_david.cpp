@@ -360,13 +360,13 @@ void Diago_David::diag_zhegvx
     }
     if (nb == 1 || nb >= n)
     {
-        lwork = 2 * n - 1;
+        lwork = 2 * n; //qianrui fix a bug 2021-7-25 : lwork should be at least max(1,2*n)
     }
     else
     {
         lwork = (nb + 1) * n;
     }
-    complex<double> *work = new complex<double>[2*lwork]();
+    complex<double> *work = new complex<double>[2*lwork];
     assert(work != 0);
     double *rwork = new double[7*n];
     assert(rwork != 0);
@@ -374,8 +374,7 @@ void Diago_David::diag_zhegvx
     assert(iwork != 0);
     int *ifail = new int[n];
     assert(ifail != 0);
-
-    ZEROS(work,2*lwork);
+    ZEROS(work,lwork); //qianrui change it, only first lwork numbers are used in zhegvx
     ZEROS(rwork,7*n);
     ZEROS(iwork,5*n);
     ZEROS(ifail,n);
