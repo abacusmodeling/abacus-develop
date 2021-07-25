@@ -60,7 +60,7 @@ void Run_md::ai_md_line(void)
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
-        symm.analy_sys(GlobalC::ucell, GlobalC::out);
+        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
