@@ -170,13 +170,13 @@ ofs_matrixes(exx_lcao.test_dir.matrix+"ms_abfs_abfs",ms_abfs_abfs);
 ofs_matrixes(exx_lcao.test_dir.matrix+"ms_lcaoslcaos_abfs",ms_lcaoslcaos_abfs);
 ofs_matrixes(exx_lcao.test_dir.matrix+"ms_jys_abfs",ms_jys_abfs);
 
-	for( size_t TA=0; TA!=ucell.ntype; ++TA )
+	for( size_t TA=0; TA!=GlobalC::ucell.ntype; ++TA )
 	{
-		for( size_t IA=0; IA!=ucell.atoms[TA].na; ++IA )
+		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
 		{
-			for( size_t TB=0; TB!=ucell.ntype; ++TB )
+			for( size_t TB=0; TB!=GlobalC::ucell.ntype; ++TB )
 			{
-				for( size_t IB=0; IB!=ucell.atoms[TB].na; ++IB )
+				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
 					if( TA==TB && IA==IB )
 					{
@@ -362,13 +362,13 @@ map<size_t,map<size_t,set<double>>> Exx_Opt_Orb::get_radial_R() const
 {
 	TITLE("Exx_Opt_Orb::get_radial_R");
 	map<size_t,map<size_t,set<double>>> radial_R;
-	for( size_t TA=0; TA!=ucell.ntype; ++TA )
-		for( size_t IA=0; IA!=ucell.atoms[TA].na; ++IA )
-			for( size_t TB=0; TB!=ucell.ntype; ++TB )
-				for( size_t IB=0; IB!=ucell.atoms[TB].na; ++IB )
+	for( size_t TA=0; TA!=GlobalC::ucell.ntype; ++TA )
+		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
+			for( size_t TB=0; TB!=GlobalC::ucell.ntype; ++TB )
+				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauA = ucell.atoms[TA].tau[IA];
-					const Vector3<double> &tauB = ucell.atoms[TB].tau[IB];
+					const Vector3<double> &tauA = GlobalC::ucell.atoms[TA].tau[IA];
+					const Vector3<double> &tauB = GlobalC::ucell.atoms[TB].tau[IB];
 					const double delta_R = (-tauA+tauB).norm();
 					radial_R[TA][TB].insert( delta_R );
 					radial_R[TB][TA].insert( delta_R );

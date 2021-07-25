@@ -27,7 +27,7 @@ void Stochastic_WF::init(void)
     }
     else
     {
-        ndim = pw.nrxx;
+        ndim = GlobalC::pw.nrxx;
     }
     int totnpw=0;
 #ifdef __MPI

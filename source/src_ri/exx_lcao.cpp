@@ -422,10 +422,10 @@ void Exx_Lcao::init()
 		{
 			cout<<boxes[i]<<endl;
 		}
-		cout<<"box * ucell.latvec:"<<endl;
+		cout<<"box * GlobalC::ucell.latvec:"<<endl;
 		for( size_t i=0; i!=boxes.size(); ++i )
 		{
-			cout<<boxes[i]*ucell.latvec<<endl;
+			cout<<boxes[i]*GlobalC::ucell.latvec<<endl;
 		}
 
 		cout<<"k R"<<endl;
@@ -433,7 +433,7 @@ void Exx_Lcao::init()
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				cout<<GlobalC::kv.kvec_c[ik] * (boxes[i]*ucell.latvec)<<"\t";
+				cout<<GlobalC::kv.kvec_c[ik] * (boxes[i]*GlobalC::ucell.latvec)<<"\t";
 			}
 			cout<<endl;
 		}
@@ -442,7 +442,7 @@ void Exx_Lcao::init()
 		{
 			for( size_t i=0; i!=boxes.size(); ++i )
 			{
-				cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (boxes[i]*ucell.latvec)) )<<"\t";
+				cout<<exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (boxes[i]*GlobalC::ucell.latvec)) )<<"\t";
 			}
 			cout<<endl;
 		}
@@ -471,22 +471,22 @@ void Exx_Lcao::init()
 			cout<<ORB.Phi[T].getRcut()<<endl;
 		}
 		cout<<"tau:"<<endl;
-		for( size_t iat=0; iat!=ucell.nat; ++iat )
+		for( size_t iat=0; iat!=GlobalC::ucell.nat; ++iat )
 		{
-			cout<<ucell.atoms[ ucell.iat2it[iat] ].tau[ ucell.iat2ia[iat] ]<<endl;
+			cout<<GlobalC::ucell.atoms[ GlobalC::ucell.iat2it[iat] ].tau[ GlobalC::ucell.iat2ia[iat] ]<<endl;
 		}
 		cout<<"taud:"<<endl;
-		for( size_t iat=0; iat!=ucell.nat; ++iat )
+		for( size_t iat=0; iat!=GlobalC::ucell.nat; ++iat )
 		{
-			cout<<ucell.atoms[ ucell.iat2it[iat] ].taud[ ucell.iat2ia[iat] ]<<endl;
+			cout<<GlobalC::ucell.atoms[ GlobalC::ucell.iat2it[iat] ].taud[ GlobalC::ucell.iat2ia[iat] ]<<endl;
 		}
 		cout<<"taud * latvec:"<<endl;
-		for( size_t iat=0; iat!=ucell.nat; ++iat )
+		for( size_t iat=0; iat!=GlobalC::ucell.nat; ++iat )
 		{
-			cout<<ucell.atoms[ ucell.iat2it[iat] ].taud[ ucell.iat2ia[iat] ] * ucell.latvec<<endl;
+			cout<<GlobalC::ucell.atoms[ GlobalC::ucell.iat2it[iat] ].taud[ GlobalC::ucell.iat2ia[iat] ] * GlobalC::ucell.latvec<<endl;
 		}
-		cout<<"ucell.latvec:"<<endl;
-		ucell.latvec.print();
+		cout<<"GlobalC::ucell.latvec:"<<endl;
+		GlobalC::ucell.latvec.print();
 	};
 
 	auto test_matrix = []()
@@ -525,7 +525,7 @@ gettimeofday( &t_start_all, NULL);
 //	DM.flag_mix = info.separate_loop ? false : true;
 //	DM.flag_mix = false;		// Peize Lin test
 
-	if(exx_global.info.separate_loop)
+	if(GlobalC::exx_global.info.separate_loop)
 	{
 		Hexx_para.mixing_mode = Exx_Abfs::Parallel::Communicate::Hexx::Mixing_Mode::No;
 		Hexx_para.mixing_beta = 0;
@@ -698,8 +698,8 @@ ofs_mpi<<range_abfs<<endl;
 		mll.init_radial(ORB,ORB);
 		mll.init_radial_table();
 		ofstream ofsS("S.dat");
-		ofsS<<mll.cal_overlap_matrix(0,0,ucell.atoms[0].tau[0],ucell.atoms[0].tau[0],index_lcaos,index_lcaos)<<endl<<endl;
-		ofsS<<mll.cal_overlap_matrix(0,0,ucell.atoms[0].tau[0],ucell.atoms[0].tau[1],index_lcaos,index_lcaos)<<endl<<endl;
+		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[0],index_lcaos,index_lcaos)<<endl<<endl;
+		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[1],index_lcaos,index_lcaos)<<endl<<endl;
 	};
 
 gettimeofday( &t_start, NULL);
@@ -994,15 +994,15 @@ ofs_mpi.close();
 		{
 			ofstream ofs("LOC.DM.dat",ofstream::app);
 			const int it1=0, it2=0;
-			for( size_t ia1=0; ia1!=ucell.atoms[it1].na; ++ia1 )
-				for( size_t ia2=0; ia2!=ucell.atoms[it2].na; ++ia2 )
+			for( size_t ia1=0; ia1!=GlobalC::ucell.atoms[it1].na; ++ia1 )
+				for( size_t ia2=0; ia2!=GlobalC::ucell.atoms[it2].na; ++ia2 )
 					for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 					{
 						ofs<<"@\t"<<ia1<<"\t"<<ia2<<"\t"<<is<<endl;
-						for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
+						for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
 						{
-							for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
-								ofs<<LOC.DM[is][ucell.itiaiw2iwt(it1,ia1,iw1)][ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
+							for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
+								ofs<<LOC.DM[is][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)][GlobalC::ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
 							ofs<<endl;
 						}
 						ofs<<endl;
@@ -1017,11 +1017,11 @@ ofs_mpi.close();
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
 				ofstream ofs("LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
-				for(int T1=0; T1<ucell.ntype; T1++)
+				for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 				{
-					for(int I1=0; I1<ucell.atoms[T1].na; I1++)
+					for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
 					{
-						const int iat1 = ucell.itia2iat(T1,I1);
+						const int iat1 = GlobalC::ucell.itia2iat(T1,I1);
 
 						int iv=0;
 						for( const auto & atom2 : adjs )
@@ -1030,9 +1030,9 @@ ofs_mpi.close();
 							for( const Abfs::Vector3_Order<int> & box2 : atom2.second )
 							{
 								ofs<<"@\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
-								for( int iw1=0; iw1!=ucell.atoms[T1].nw; ++iw1 )
+								for( int iw1=0; iw1!=GlobalC::ucell.atoms[T1].nw; ++iw1 )
 								{
-									for( int iw2=0; iw2!=ucell.atoms[ucell.iat2it[iat2]].nw; ++iw2 )
+									for( int iw2=0; iw2!=GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw; ++iw2 )
 									{
 										ofs<<LOC.DM_R[is][LNNR.nlocstartg[iat1]+iv]<<"\t";
 										++iv;
@@ -1136,7 +1136,7 @@ ofs_mpi.close();
 		{
 			ofstream ofs("ekb_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
-				ofs<<wf.ekb[ik][ib]<<"\t";
+				ofs<<GlobalC::wf.ekb[ik][ib]<<"\t";
 			ofs<<endl;
 		}
 	};	
@@ -1175,25 +1175,25 @@ void Exx_Lcao::cal_Hexx_gamma( const set<pair<size_t,size_t>> &atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
-		const size_t it1 = ucell.iat2it[iat1];
-		const size_t it2 = ucell.iat2it[iat2];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
+		const size_t it2 = GlobalC::ucell.iat2it[iat2];
 
-		const vector<Abfs::Atom_Info> adj1s = Abfs::get_adjs( ucell.atoms[it1].tau[ucell.iat2ia[iat2]] );
-		const vector<Abfs::Atom_Info> adj2s = Abfs::get_adjs( ucell.atoms[it2].tau[ucell.iat2ia[iat2]] );
+		const vector<Abfs::Atom_Info> adj1s = Abfs::get_adjs( GlobalC::ucell.atoms[it1].tau[GlobalC::ucell.iat2ia[iat2]] );
+		const vector<Abfs::Atom_Info> adj2s = Abfs::get_adjs( GlobalC::ucell.atoms[it2].tau[GlobalC::ucell.iat2ia[iat2]] );
 		for( const Abfs::Atom_Info & atom3 : adj1s )
 		{
-			const size_t iat3 = ucell.itia2iat( atom3.T, atom3.I );
+			const size_t iat3 = GlobalC::ucell.itia2iat( atom3.T, atom3.I );
 			for( const Abfs::Atom_Info & atom4 : adj2s )
 			{
-				const size_t iat4 = ucell.itia2iat( atom4.T, atom4.I );
+				const size_t iat4 = GlobalC::ucell.itia2iat( atom4.T, atom4.I );
 				const matrix matrix_1342 = *Cs[iat1][iat3][atom3.box] * *Vps_gamma[iat1][iat2] * *Cs[iat2][iat4][atom4.box];
 
-				for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
-					for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
-						for( size_t iw3=0; iw3!=ucell.atoms[atom3.T].nw; ++iw3 )
-							for( size_t iw4=0; iw4!=ucell.atoms[atom4.T].nw; ++iw4 )
+				for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
+					for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
+						for( size_t iw3=0; iw3!=GlobalC::ucell.atoms[atom3.T].nw; ++iw3 )
+							for( size_t iw4=0; iw4!=GlobalC::ucell.atoms[atom4.T].nw; ++iw4 )
 							{
-								const double matrix_element_1342 = matrix_1342( iw1*ucell.atoms[atom3.T].nw+iw3, iw2*ucell.atoms[atom4.T].nw+iw4 );
+								const double matrix_element_1342 = matrix_1342( iw1*GlobalC::ucell.atoms[atom3.T].nw+iw3, iw2*GlobalC::ucell.atoms[atom4.T].nw+iw4 );
 								for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 								{
 									Hexx_gamma[iat1][iat2][is](iw1,iw2) = matrix_element_1342 * DM_Gamma[iat3][iat4][is](iw3,iw4);
@@ -1314,7 +1314,7 @@ timeval t_start;
 		}
 	};
 	
-	for(int it=0; it!=ucell.ntype; ++it)
+	for(int it=0; it!=GlobalC::ucell.ntype; ++it)
 	{
 		radial_R[it][it].insert(0.0);
 	}
@@ -1328,24 +1328,24 @@ timeval t_start;
 gettimeofday( &t_start, NULL);
 	for( const int iat1 : atom_centres_core )
 	{
-		const size_t it1 = ucell.iat2it[iat1];
-		const size_t ia1 = ucell.iat2ia[iat1];
-		const Vector3<double> tau1 = ucell.atoms[it1].tau[ia1];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
+		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
+		const Vector3<double> tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
 
 		const map<size_t,vector<Abfs::Vector3_Order<int>>> adjs = Abfs::get_adjs(iat1);
 		for( const auto & atom2 : adjs )
 		{
 			const size_t iat2 = atom2.first;
-			const size_t it2 = ucell.iat2it[iat2];
-			const size_t ia2 = ucell.iat2ia[iat2];
-			const Vector3<double> &tau2 = ucell.atoms[it2].tau[ia2];
+			const size_t it2 = GlobalC::ucell.iat2it[iat2];
+			const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
+			const Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
 			for( const Abfs::Vector3_Order<int> &box2 : atom2.second )
 			{
-				const double delta_R = (-tau1+tau2+(box2*ucell.latvec)).norm();
+				const double delta_R = (-tau1+tau2+(box2*GlobalC::ucell.latvec)).norm();
 //				const double delta_R = (-tau1+tau2).norm();
 
 				#if TEST_EXX_LCAO==1
-					ofs_C<<-tau1+tau2+(box2*ucell.latvec)<<"\t"<<delta_R<<endl;
+					ofs_C<<-tau1+tau2+(box2*GlobalC::ucell.latvec)<<"\t"<<delta_R<<endl;
 				#elif TEST_EXX_LCAO==-1
 					#error "TEST_EXX_LCAO"
 				#endif
@@ -1382,25 +1382,25 @@ gettimeofday( &t_start, NULL);
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
-		const size_t it1 = ucell.iat2it[iat1];
-		const size_t ia1 = ucell.iat2ia[iat1];
-		const size_t it2 = ucell.iat2it[iat2];
-		const size_t ia2 = ucell.iat2ia[iat2];
-		const Vector3<double> &tau1 = ucell.atoms[it1].tau[ia1];
-		const Vector3<double> &tau2 = ucell.atoms[it2].tau[ia2];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
+		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
+		const size_t it2 = GlobalC::ucell.iat2it[iat2];
+		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
+		const Vector3<double> &tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
+		const Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
 		const double Rcut = std::min( ORB.Phi[it1].getRcut()*info.ccp_rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*info.ccp_rmesh_times );
 
 		for( const Vector3<int> &box2 : Coulomb_potential_boxes )
 		{
-			const double delta_R = (-tau1+tau2+(box2*ucell.latvec)).norm();
+			const double delta_R = (-tau1+tau2+(box2*GlobalC::ucell.latvec)).norm();
 
 			#if TEST_EXX_LCAO==1
-				ofs_V<<-tau1+tau2+(box2*ucell.latvec)<<"\t"<<delta_R<<endl;
+				ofs_V<<-tau1+tau2+(box2*GlobalC::ucell.latvec)<<"\t"<<delta_R<<endl;
 			#elif TEST_EXX_LCAO==-1
 				#error "TEST_EXX_LCAO"
 			#endif
 
-			if( delta_R*ucell.lat0 < Rcut )
+			if( delta_R*GlobalC::ucell.lat0 < Rcut )
 			{
 				radial_R[it1][it2].insert( delta_R );
 				radial_R[it2][it1].insert( delta_R );
@@ -1547,10 +1547,10 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::c
 				{
 					const size_t iat4 = Cp2s.first;
 
-					const size_t it1 = ucell.iat2it[iat1];
-					const size_t it2 = ucell.iat2it[iat2];
-					const size_t it3 = ucell.iat2it[iat3];
-					const size_t it4 = ucell.iat2it[iat4];
+					const size_t it1 = GlobalC::ucell.iat2it[iat1];
+					const size_t it2 = GlobalC::ucell.iat2it[iat2];
+					const size_t it3 = GlobalC::ucell.iat2it[iat3];
+					const size_t it4 = GlobalC::ucell.iat2it[iat4];
 
 					for( const auto & Cp1 : Cp1s.second )
 					{

@@ -83,7 +83,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &
 
 	// Distribution of matrix for 
 	// prallel eigensolver.
-	ParaO.diago_double_begin(ik, wfc, wfc_2d, LM.Hloc, LM.Sloc, wf.ekb[ik]);
+	ParaO.diago_double_begin(ik, wfc, wfc_2d, LM.Hloc, LM.Sloc, GlobalC::wf.ekb[ik]);
 
 	return;
 }
@@ -99,7 +99,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, ParaO.out_hs); //LiuXh, 2017-03-21
 	GlobalV::ofs_running << setprecision(6); //LiuXh, 2017-03-21
 
-	ParaO.diago_complex_begin(ik, wfc, wfc_2d, LM.Hloc2, LM.Sloc2, wf.ekb[ik]);
+	ParaO.diago_complex_begin(ik, wfc, wfc_2d, LM.Hloc2, LM.Sloc2, GlobalC::wf.ekb[ik]);
 
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
 	if(GlobalV::NSPIN==4)
@@ -151,7 +151,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	ZEROS(en, GlobalV::NLOCAL);
 
 	ComplexMatrix hvec(GlobalV::NLOCAL, GlobalV::NBANDS);
-	hm.diagH_LAPACK(GlobalV::NLOCAL, GlobalV::NBANDS, Htmp, Stmp, GlobalV::NLOCAL, en, hvec);
+	GlobalC::hm.diagH_LAPACK(GlobalV::NLOCAL, GlobalV::NBANDS, Htmp, Stmp, GlobalV::NLOCAL, en, hvec);
 
 	if(GlobalV::NSPIN!=4)
 	{
@@ -178,7 +178,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	// energy for k-point ik
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		wf.ekb[ik][ib] = en[ib];
+		GlobalC::wf.ekb[ik][ib] = en[ib];
 	}
 
 	return;
@@ -235,7 +235,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
 		// eigenvalues
-		wf.ekb[ik][i] = w[i]; 
+		GlobalC::wf.ekb[ik][i] = w[i]; 
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			wfc[i][j] = Htmp(j,i);
@@ -250,7 +250,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	cout << "\n Lapack, wfc after diago:" << endl;
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		cout << " Eigenvalue from LAPACK : " << setw(5) << setw(12) << wf.ekb[ik][i] << endl;
+		cout << " Eigenvalue from LAPACK : " << setw(5) << setw(12) << GlobalC::wf.ekb[ik][i] << endl;
 		cout << " Eigenfunctions" << endl;
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{

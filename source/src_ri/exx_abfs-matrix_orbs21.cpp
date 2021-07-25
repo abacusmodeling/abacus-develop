@@ -163,7 +163,7 @@ gettimeofday(&t_small, NULL);
 				set<size_t> radials;
 				for( const double &R : RsB.second )
 				{
-					const double position = R * ucell.lat0 / MOT.dr;
+					const double position = R * GlobalC::ucell.lat0 / MOT.dr;
 					const size_t iq = static_cast<size_t>(position);
 					for( size_t i=0; i!=4; ++i )
 						radials.insert(iq+i);
@@ -194,9 +194,9 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Matrix_Abfsphi_Ph
 	for( auto &co1 : center2_orb21_s )
 	{
 		const size_t TA = co1.first;
-		for (size_t IA=0; IA!=ucell.atoms[TA].na; ++IA)
+		for (size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA)
 		{
-			const Vector3<double> &tauA( ucell.atoms[TA].tau[IA] );
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
 			GridD.Find_atom(tauA);
 
 			for( auto &co2 : co1.second )
@@ -296,7 +296,7 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 									const size_t NB = co8.first;
 									for( size_t MB=0; MB!=2*LB+1; ++MB )
 									{
-										const double overlap = co8.second.cal_overlap( tauA*ucell.lat0, tauB*ucell.lat0, MA1, MA2, MB );
+										const double overlap = co8.second.cal_overlap( tauA*GlobalC::ucell.lat0, tauB*GlobalC::ucell.lat0, MA1, MA2, MB );
 
 										switch(matrix_order)
 										{
@@ -366,7 +366,7 @@ vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 									const size_t NB = co8.first;
 									for( size_t MB=0; MB!=2*LB+1; ++MB )
 									{
-										const double overlap = co8.second.cal_overlap( tauA*ucell.lat0, tauB*ucell.lat0, MA1, MA2, MB );
+										const double overlap = co8.second.cal_overlap( tauA*GlobalC::ucell.lat0, tauB*GlobalC::ucell.lat0, MA1, MA2, MB );
 
 										m_A2B_A1(
 											Exx_Abfs::Abfs_Index::get_index_index(
@@ -407,16 +407,16 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::Matrix_
 	for( const auto &co1 : center2_orb21_s )
 	{
 		const size_t TA = co1.first;
-		for( size_t IA=0; IA!=ucell.atoms[TA].na; ++IA )
+		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
 		{
-			const Vector3<double> &tauA( ucell.atoms[TA].tau[IA] );
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
 
 			for( const auto &co2 : co1.second )
 			{
 				const size_t TB = co2.first;
-				for( size_t IB=0; IB!=ucell.atoms[TB].na; ++IB )
+				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauB( ucell.atoms[TB].tau[IB] );
+					const Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );
 
 					const vector<matrix> &&m = cal_overlap_matrix( TA, TB, tauA, tauB, index_A1, index_A2, index_B );
 					matrixes[TA][IA][TB][IB].resize(2);

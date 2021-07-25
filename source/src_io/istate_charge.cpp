@@ -122,7 +122,7 @@ void IState_Charge::begin(void)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS( CHR.rho[is], pw.nrxx );
+				ZEROS( CHR.rho[is], GlobalC::pw.nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 
@@ -182,7 +182,7 @@ void IState_Charge::idmatrix(const int &ib)
 	return;
 */
 
-		assert(wf.wg.nr==GlobalV::NSPIN);
+		assert(GlobalC::wf.wg.nr==GlobalV::NSPIN);
 		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
 			std::vector<double> wg_local(ParaO.ncol,0.0);
@@ -195,11 +195,11 @@ void IState_Charge::idmatrix(const int &ib)
 			{
 				if(ib<fermi_band)
 				{
-					wg_local[ib_local] = wf.wg(is,ib);
+					wg_local[ib_local] = GlobalC::wf.wg(is,ib);
 				}
 				else
 				{
-					wg_local[ib_local] = wf.wg(is,fermi_band-1);
+					wg_local[ib_local] = GlobalC::wf.wg(is,fermi_band-1);
 				}//unoccupied bands, use occupation of homo
 			}
 		
@@ -219,7 +219,7 @@ void IState_Charge::idmatrix(const int &ib)
 
 			pdgemm_(
 				&N_char, &T_char,
-				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wf.wg.nc,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalC::wf.wg.nc,
 				&one_float,
 				wg_wfc.c, &one_int, &one_int, ParaO.desc,
 				LOC.wfc_dm_2d.wfc_gamma[is].c, &one_int, &one_int, ParaO.desc,

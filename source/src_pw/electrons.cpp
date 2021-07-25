@@ -58,8 +58,8 @@ void Electrons::non_self_consistent(const int &istep)
         {			
             GlobalV::ofs_running << " spin" << GlobalC::kv.isk[ik]+1 
             << "_final_band " << ib+1 
-            << " " << wf.ekb[ik][ib] * Ry_to_eV 
-            << " " << wf.wg(ik, ib)*GlobalC::kv.nks << endl;
+            << " " << GlobalC::wf.ekb[ik][ib] * Ry_to_eV 
+            << " " << GlobalC::wf.wg(ik, ib)*GlobalC::kv.nks << endl;
         }
         GlobalV::ofs_running << endl;
     }
@@ -67,7 +67,7 @@ void Electrons::non_self_consistent(const int &istep)
     // add by jingan in 2018.11.7
     if(GlobalV::CALCULATION == "nscf" && INPUT.towannier90)
     {
-        toWannier90 myWannier(GlobalC::kv.nkstot,ucell.G);
+        toWannier90 myWannier(GlobalC::kv.nkstot,GlobalC::ucell.G);
         myWannier.init_wannier();
     }
 
@@ -92,7 +92,7 @@ void Electrons::self_consistent(const int &istep)
     timer::tick("Electrons","self_consistent");
 
 	// mohan update 2021-02-25
-	H_Ewald_pw::compute_ewald(ucell,pw); 
+	H_Ewald_pw::compute_ewald(GlobalC::ucell, GlobalC::pw); 
 
     set_ethr();
 
@@ -127,7 +127,7 @@ void Electrons::self_consistent(const int &istep)
     Symmetry_rho srho;
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        srho.begin(is, CHR, pw, Pgrid, symm);
+        srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
     }
 
     // conv_elec is a member of Threshold_Elec
@@ -176,7 +176,7 @@ void Electrons::self_consistent(const int &istep)
 
 		// mohan move harris functional to here, 2012-06-05
 		// use 'rho(in)' and 'v_h and v_xc'(in)
-		en.calculate_harris(1);
+		GlobalC::en.calculate_harris(1);
 	
 		// first_iter_again:					// Peize Lin delete 2019-05-01
 		
@@ -185,9 +185,9 @@ void Electrons::self_consistent(const int &istep)
 		switch(xcf.iexch_now)						// Peize Lin add 2019-03-09
 		{
 			case 5:    case 6:   case 9:
-				if( !exx_global.info.separate_loop )				
+				if( !GlobalC::exx_global.info.separate_loop )				
 				{
-					exx_lip.cal_exx();			
+					GlobalC::exx_lip.cal_exx();			
 				}
 				break;
 		}
@@ -204,11 +204,11 @@ void Electrons::self_consistent(const int &istep)
 
         if (check_stop_now()) return;
 
-        en.eband  = 0.0;
-        en.demet  = 0.0;
-        en.ef     = 0.0;
-        en.ef_up  = 0.0;
-        en.ef_dw  = 0.0;
+        GlobalC::en.eband  = 0.0;
+        GlobalC::en.demet  = 0.0;
+        GlobalC::en.ef     = 0.0;
+        GlobalC::en.ef_up  = 0.0;
+        GlobalC::en.ef_dw  = 0.0;
 
         //(4) calculate weights of each band.
         Occupy::calculate_weights();
@@ -222,27 +222,27 @@ void Electrons::self_consistent(const int &istep)
 
 		// add exx
 #ifdef __LCAO
-		en.set_exx();		// Peize Lin add 2019-03-09
+		GlobalC::en.set_exx();		// Peize Lin add 2019-03-09
 #endif
 
 		//(6) calculate the delta_harris energy 
 		// according to new charge density.
 		// mohan add 2009-01-23
-		en.calculate_harris(2);
+		GlobalC::en.calculate_harris(2);
 
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR, pw, Pgrid, symm);
+			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
-        ucell.magnet.compute_magnetization();
+        GlobalC::ucell.magnet.compute_magnetization();
 
         //(8) deband is calculated from "output" charge density calculated 
         // in sum_band
         // need 'rho(out)' and 'vr (v_h(in) and v_xc(in))'
-        en.deband = en.delta_e();
+        GlobalC::en.deband = GlobalC::en.delta_e();
 
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
@@ -302,17 +302,17 @@ void Electrons::self_consistent(const int &istep)
 
             // because <T+V(ionic)> = <eband+deband> are calculated after sum
             // band, using output charge density.
-            // but E_Hartree and Exc(en.etxc) are calculated in v_of_rho above,
+            // but E_Hartree and Exc(GlobalC::en.etxc) are calculated in v_of_rho above,
             // using the mixed charge density.
             // so delta_escf corrects for this difference at first order. 
-            en.delta_escf();
+            GlobalC::en.delta_escf();
         }
         else
         {
             // mohan add 2012-06-05
             for(int is=0; is<GlobalV::NSPIN; ++is)
             {
-                for(int ir=0; ir<pw.nrxx; ++ir)
+                for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
                 {
                     pot.vnew(is,ir) = pot.vr(is,ir);
                 }
@@ -321,10 +321,10 @@ void Electrons::self_consistent(const int &istep)
             // mohan fix bug 2012-06-05,
             // the new potential V(PL)+V(H)+V(xc)
             pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
-            //cout<<"Exc = "<<en.etxc<<endl;
+            //cout<<"Exc = "<<GlobalC::en.etxc<<endl;
             //( vnew used later for scf correction to the forces )
             pot.vnew = pot.vr - pot.vnew;
-            en.descf = 0.0;
+            GlobalC::en.descf = 0.0;
         }
 
         stringstream ssw;
@@ -342,25 +342,25 @@ void Electrons::self_consistent(const int &istep)
             CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
         }
 
-        if(wf.out_wf)
+        if(GlobalC::wf.out_wf)
         {
-            //WF_io::write_wfc( ssw.str(), wf.evc );
+            //WF_io::write_wfc( ssw.str(), GlobalC::wf.evc );
             // mohan update 2011-02-21
 			//qianrui update 2020-10-17
-            WF_io::write_wfc2( ssw.str(), wf.evc, pw.gcar);
+            WF_io::write_wfc2( ssw.str(), GlobalC::wf.evc, GlobalC::pw.gcar);
             //DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
 			pot.set_vr_eff();
 
         //print_eigenvalue(GlobalV::ofs_running);
-        en.calculate_etot();
+        GlobalC::en.calculate_etot();
 
 		// the clock is not accurate, needs to be fixed 2021-03-15 mohan
         clock_t finish=clock();
         double duration = (double)(finish - start) / CLOCKS_PER_SEC;
 
-		en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
+		GlobalC::en.print_etot(conv_elec, istep, iter, dr2, duration, GlobalV::ETHR, avg_iter);
 
         if (conv_elec || iter==GlobalV::NITER)
         {
@@ -411,9 +411,9 @@ void Electrons::self_consistent(const int &istep)
             if(conv_elec)
             {
                 //GlobalV::ofs_running << " convergence is achieved" << endl;			
-                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+                //GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
                 GlobalV::ofs_running << " charge density convergence is achieved" << endl;
-                GlobalV::ofs_running << " final etot is " << en.etot * Ry_to_eV << " eV" << endl;
+                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
             }
             else
             {
@@ -454,8 +454,8 @@ void Electrons::c_bands(const int &istep)
 
     int precondition_type = 2;
 
-    double *h_diag = new double[wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
-    ZEROS(h_diag, wf.npwx * GlobalV::NPOL);
+    double *h_diag = new double[GlobalC::wf.npwx * GlobalV::NPOL];//added by zhengdy-soc
+    ZEROS(h_diag, GlobalC::wf.npwx * GlobalV::NPOL);
 
     avg_iter = 0.0;
 
@@ -463,7 +463,7 @@ void Electrons::c_bands(const int &istep)
     GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
-        hm.hpw.init_k(ik);
+        GlobalC::hm.hpw.init_k(ik);
 
         //===========================================
         // Conjugate-Gradient diagonalization
@@ -472,27 +472,27 @@ void Electrons::c_bands(const int &istep)
         //===========================================
         if (precondition_type==1)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = max(1.0, wf.g2kin[ig]);
-                if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+                h_diag[ig] = max(1.0, GlobalC::wf.g2kin[ig]);
+                if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }
         else if (precondition_type==2)
         {
-            for (int ig = 0;ig < wf.npw; ig++)
+            for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = 1 + wf.g2kin[ig] + sqrt( 1 + (wf.g2kin[ig] - 1) * (wf.g2kin[ig] - 1));
-                if(GlobalV::NPOL==2) h_diag[ig+wf.npwx] = h_diag[ig];
+                h_diag[ig] = 1 + GlobalC::wf.g2kin[ig] + sqrt( 1 + (GlobalC::wf.g2kin[ig] - 1) * (GlobalC::wf.g2kin[ig] - 1));
+                if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }
         //h_diag can't be zero!  //zhengdy-soc
 		if(GlobalV::NPOL==2)
         {
-            for(int ig = wf.npw;ig < wf.npwx; ig++)
+            for(int ig = GlobalC::wf.npw;ig < GlobalC::wf.npwx; ig++)
             {
                 h_diag[ig] = 1.0;
-                h_diag[ig+ wf.npwx] = 1.0;
+                h_diag[ig+ GlobalC::wf.npwx] = 1.0;
             }
         }
 
@@ -507,11 +507,11 @@ void Electrons::c_bands(const int &istep)
         // only use diagH_subspace.
         //=============================================================
         double avg_iter_k = 0.0;
-        hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
+        GlobalC::hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
 
         avg_iter += avg_iter_k;
 
-        en.print_band(ik); //mohan add 2012-04-16
+        GlobalC::en.print_band(ik); //mohan add 2012-04-16
 
         clock_t finish=clock();
         const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;

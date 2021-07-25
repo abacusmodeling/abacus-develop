@@ -40,7 +40,7 @@ void Restart::read_file2(const std::string &file_name, void*const ptr, const siz
 void Restart::save_disk(const std::string mode, const int i) const
 {
 	if("charge"==mode)
-		write_file2(folder+"charge_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], pw.nrxx*sizeof(double));
+		write_file2(folder+"charge_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], GlobalC::pw.nrxx*sizeof(double));
 #ifdef __LCAO
 	if("H"==mode)
 	{
@@ -55,7 +55,7 @@ void Restart::save_disk(const std::string mode, const int i) const
 void Restart::load_disk(const std::string mode, const int i) const
 {
 	if("charge"==mode)
-		read_file2(folder+"charge_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], pw.nrxx*sizeof(double));
+		read_file2(folder+"charge_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), CHR.rho[i], GlobalC::pw.nrxx*sizeof(double));
 #ifdef __LCAO
 	if("H"==mode)
 	{

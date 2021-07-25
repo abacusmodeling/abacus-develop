@@ -32,7 +32,7 @@ Stochastic_Chebychev::~Stochastic_Chebychev()
 void Stochastic_Chebychev::init(int &dim, int &chetype)
 {
     this->ndim = dim;
-    norder = STO_WF.nche_sto;
+    norder = GlobalC::sto_wf.nche_sto;
 
     if(norder<5)
     {

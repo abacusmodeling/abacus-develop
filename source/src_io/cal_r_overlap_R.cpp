@@ -70,7 +70,7 @@ void cal_r_overlap_R::init()
 
 	int T = 0;  // atom type
 	int mat_Nr = ORB.Phi[0].PhiLN(0,0).getNr();
-	for(int it = 0; it < ucell.ntype; it++)
+	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
 		int count_Nr = ORB.Phi[it].PhiLN(0,0).getNr();
 		if(count_Nr > mat_Nr) 
@@ -104,8 +104,8 @@ void cal_r_overlap_R::init()
 	true, GlobalV::FORCE);
 
 /*
-	orbital_phi.resize(ucell.ntype);
-	for(int it = 0; it < ucell.ntype; it++)
+	orbital_phi.resize(GlobalC::ucell.ntype);
+	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
 		orbital_phi[it].resize(ORB.Phi[it].getLmax()+1);
 		for(int iL = 0; iL <= ORB.Phi[it].getLmax(); iL++)
@@ -138,9 +138,9 @@ void cal_r_overlap_R::init()
 
 */
 
-	for(int TA = 0; TA < ucell.ntype; TA++)
+	for(int TA = 0; TA < GlobalC::ucell.ntype; TA++)
 	{
-		for (int TB = 0;  TB < ucell.ntype; TB++)
+		for (int TB = 0;  TB < GlobalC::ucell.ntype; TB++)
 		{
 			for (int LA=0; LA <= ORB.Phi[TA].getLmax() ; LA++)
 			{
@@ -168,9 +168,9 @@ void cal_r_overlap_R::init()
 		}
 	}
 
-	for(int TA = 0; TA < ucell.ntype; TA++)
+	for(int TA = 0; TA < GlobalC::ucell.ntype; TA++)
 	{
-		for (int TB = 0;  TB < ucell.ntype; TB++)
+		for (int TB = 0;  TB < GlobalC::ucell.ntype; TB++)
 		{
 			for (int LA=0; LA <= ORB.Phi[TA].getLmax() ; LA++)
 			{
@@ -268,7 +268,7 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
             {
                 int dRz = iz + R_minZ;	
 
-				Vector3<double> R_car = Vector3<double>(dRx,dRy,dRz) * ucell.latvec;
+				Vector3<double> R_car = Vector3<double>(dRx,dRy,dRz) * GlobalC::ucell.latvec;
 				
 				int ir,ic;
 				for(int iw1 = 0; iw1 < GlobalV::NLOCAL; iw1++)
@@ -304,8 +304,8 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 									int L2 = iw2iL(orb_index_col);  
 									int m2 = iw2im(orb_index_col);
 
-									Vector3<double> r_distance = ( ucell.atoms[it2].tau[ia2] 
-									- ucell.atoms[it1].tau[ia1] + R_car ) * ucell.lat0;	
+									Vector3<double> r_distance = ( GlobalC::ucell.atoms[it2].tau[ia2] 
+									- GlobalC::ucell.atoms[it1].tau[ia1] + R_car ) * GlobalC::ucell.lat0;	
 
 double overlap_o = center2_orb11[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, m2 );
 									double overlap_x = -1 * factor * 
@@ -316,7 +316,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distance, m1, 0, m2 ); // m = 0	
 
 									psi_r_psi[ix][iy][iz][icc] = Vector3<double>( overlap_x,overlap_y,overlap_z ) 
-+ ucell.atoms[it1].tau[ia1] * ucell.lat0 * overlap_o;
++ GlobalC::ucell.atoms[it1].tau[ia1] * GlobalC::ucell.lat0 * overlap_o;
 
 								}
 								else
@@ -425,13 +425,13 @@ int cal_r_overlap_R::iw2it(int iw)
 {
     int ic, type;
     ic = 0;
-    for(int it = 0; it < ucell.ntype; it++)
+    for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-        for(int ia = 0; ia < ucell.atoms[it].na; ia++)
+        for(int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
-            for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+            for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-                for(int N = 0; N < ucell.atoms[it].l_nchi[L]; N++)
+                for(int N = 0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
                 {
                     for(int i=0; i<(2*L+1); i++)
                     {
@@ -453,13 +453,13 @@ int cal_r_overlap_R::iw2ia(int iw)
 {
     int ic, na;
     ic = 0;
-    for(int it = 0; it < ucell.ntype; it++)
+    for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-        for(int ia = 0; ia<  ucell.atoms[it].na; ia++)
+        for(int ia = 0; ia<  GlobalC::ucell.atoms[it].na; ia++)
         {
-            for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+            for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-                for(int N = 0; N < ucell.atoms[it].l_nchi[L]; N++)
+                for(int N = 0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
                 {
                     for(int i = 0; i < (2*L+1); i++)
                     {
@@ -480,13 +480,13 @@ int cal_r_overlap_R::iw2iL(int iw)
 {
 	int ic, iL;
     ic = 0;
-    for(int it = 0; it < ucell.ntype; it++)
+    for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-        for(int ia = 0; ia<  ucell.atoms[it].na; ia++)
+        for(int ia = 0; ia<  GlobalC::ucell.atoms[it].na; ia++)
         {
-            for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+            for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-                for(int N = 0; N < ucell.atoms[it].l_nchi[L]; N++)
+                for(int N = 0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
                 {
                     for(int i = 0; i < (2*L+1); i++)
                     {
@@ -507,13 +507,13 @@ int cal_r_overlap_R::iw2iN(int iw)
 {
 	int ic, iN;
     ic = 0;
-    for(int it = 0; it < ucell.ntype; it++)
+    for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-        for(int ia = 0; ia<  ucell.atoms[it].na; ia++)
+        for(int ia = 0; ia<  GlobalC::ucell.atoms[it].na; ia++)
         {
-            for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+            for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-                for(int N = 0; N < ucell.atoms[it].l_nchi[L]; N++)
+                for(int N = 0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
                 {
                     for(int i = 0; i < (2*L+1); i++)
                     {
@@ -535,13 +535,13 @@ int cal_r_overlap_R::iw2im(int iw)
 {
 	int ic, im;
     ic = 0;
-    for(int it = 0; it < ucell.ntype; it++)
+    for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-        for(int ia = 0; ia<  ucell.atoms[it].na; ia++)
+        for(int ia = 0; ia<  GlobalC::ucell.atoms[it].na; ia++)
         {
-            for(int L = 0; L < ucell.atoms[it].nwl+1; L++)
+            for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-                for(int N = 0; N < ucell.atoms[it].l_nchi[L]; N++)
+                for(int N = 0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
                 {
                     for(int i = 0; i < (2*L+1); i++)
                     {

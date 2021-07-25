@@ -93,10 +93,10 @@ class Gint_Gamma : public Grid_Base_Beta
 		const int*const block_iw,					// block_iw[na_grid],	index of wave functions for each block
 		const int*const block_size, 				// block_size[na_grid],	number of columns of a band
 		const int*const block_index,				// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag,			// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const vldr3,					// vldr3[pw.bxyz]
-		const double*const*const psir_ylm,			// psir_ylm[pw.bxyz][LD_pool]
-		const double*const*const psir_vlbr3,		// psir_vlbr3[pw.bxyz][LD_pool]
+		const bool*const*const cal_flag,			// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const vldr3,					// vldr3[GlobalC::pw.bxyz]
+		const double*const*const psir_ylm,			// psir_ylm[GlobalC::pw.bxyz][LD_pool]
+		const double*const*const psir_vlbr3,		// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 		const int lgd_now,
 		double*const*const GridVlocal) const;		// GridVlocal[lgd_now][lgd_now]
 
@@ -106,14 +106,14 @@ class Gint_Gamma : public Grid_Base_Beta
 		const int*const block_iw, 						// block_iw[na_grid],	index of wave functions for each block
 		const int*const block_size, 					// block_size[na_grid],	band size: number of columns of a band
 		const int*const block_index,					// block_index[na_grid+1], count total number of atomis orbitals
-		const bool*const*const cal_flag, 				// cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-		const double*const*const psir_ylm,				// psir_ylm[pw.bxyz][LD_pool]
-		const int*const vindex,							// vindex[pw.bxyz]
+		const bool*const*const cal_flag, 				// cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+		const double*const*const psir_ylm,				// psir_ylm[GlobalC::pw.bxyz][LD_pool]
+		const int*const vindex,							// vindex[GlobalC::pw.bxyz]
 		const double*const*const*const DM,				// DM[GlobalV::NSPIN][lgd_now][lgd_now]
-		Gint_Tools::Array_Pool<double> &rho) const;		// rho[GlobalV::NSPIN][pw.nrxx]
+		Gint_Tools::Array_Pool<double> &rho) const;		// rho[GlobalV::NSPIN][GlobalC::pw.nrxx]
 	
 	// extract the local potentials.
-	// vldr3[pw.bxyz]
+	// vldr3[GlobalC::pw.bxyz]
 	double* get_vldr3(const double*const vlocal, const int ncyz, const int ibx, const int jby, const int kbz) const;
 };
 

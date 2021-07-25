@@ -114,12 +114,12 @@ map<size_t,map<size_t,ComplexMatrix>> Exx_Abfs::Parallel::Communicate::Hexx::R_t
 			const size_t iat2 = HRB.first;
 			
 			ComplexMatrix HK_tmp(
-				ucell.atoms[ucell.iat2it[iat1]].nw,
-				ucell.atoms[ucell.iat2it[iat2]].nw);
+				GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw,
+				GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
 			for( auto & HRC : HRB.second )
 			{
 				const Abfs::Vector3_Order<int> & box2 = HRC.first;
-				HK_tmp += ComplexMatrix(HRC.second) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*ucell.latvec)) );
+				HK_tmp += ComplexMatrix(HRC.second) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
 			}
 			HK[iat1][iat2] = std::move(HK_tmp);
 		}

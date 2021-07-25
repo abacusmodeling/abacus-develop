@@ -292,7 +292,7 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 		GlobalV::ofs_running, 
 		GlobalV::SEARCH_PBC, 
 		GridD, 
-		ucell, 
+		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 #endif //2015-10-01, xiaohui

@@ -72,7 +72,7 @@ void IState_Envelope::begin(void)
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				cout << " Perform envelope function for band " << ib+1 << endl;
-				ZEROS(CHR.rho[is],pw.nrxx);	
+				ZEROS(CHR.rho[is],GlobalC::pw.nrxx);	
 
 
 				//---------------------------------------------------------

@@ -90,7 +90,7 @@ void Force_LCAO_k::ftable_k (
 	// test the force.
 	/*
 	cout << " overlap force" << endl;
-	for(int iat=0; iat<ucell.nat; ++iat)
+	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
 		const double fac = Ry_to_eV / 0.529177;
 		cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
@@ -213,13 +213,13 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 	//------------------------
 	// circle for each atom
 	//------------------------
-	for(int T1=0; T1<ucell.ntype; ++T1)
+	for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
 		for(int I1=0; I1<atom1->na; ++I1)
 		{
-			const int iat = ucell.itia2iat(T1,I1);
-			const int start1 = ucell.itiaiw2iwt(T1,I1,0);
+			const int iat = GlobalC::ucell.itia2iat(T1,I1);
+			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 			const int gstart = LNNR.nlocstart[iat];
 			const int irr = LNNR.nlocdim[iat];//number of adjacet orbitals
 
@@ -253,7 +253,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 				//------------------
 				for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				{
-					const double w1=wf.wg(ik,ib);
+					const double w1=GlobalC::wf.wg(ik,ib);
 					if(w1>0)
 					{
 						//-----------------------------
@@ -265,7 +265,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 						{
 							const int T2 = RA.info[iat][cb][3];
 							const int I2 = RA.info[iat][cb][4];
-							Atom* atom2 = &ucell.atoms[T2];
+							Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
 							//-----------------
 							// exp[i * R * k]
@@ -276,7 +276,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 										GlobalC::kv.kvec_d[ik].z * RA.info[iat][cb][2]
 										) );
 
-							const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+							const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
 							for(int jj=0; jj<atom1->nw; ++jj)
 							{
@@ -299,7 +299,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 									if(mug >= 0 && nug >= 0)
 									{
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										wfc[mug], wfc[nug], wf.ekb[ik][ib]); 
+										wfc[mug], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug >= 0 && nug <= 0)
 									{
@@ -308,14 +308,14 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 										//assert(a4>=0);
 
 										dm[count] += set_EDM_k_element(phase, with_energy, wfc[mug], 
-										LOWF.WFC_K_aug[ik][ib][a4], wf.ekb[ik][ib]); 
+										LOWF.WFC_K_aug[ik][ib][a4], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug <= 0 && nug >= 0)
 									{
 										const int a3 = LOWF.trace_aug[iw1_all]; 
 
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										LOWF.WFC_K_aug[ik][ib][a3], wfc[nug], wf.ekb[ik][ib]); 
+										LOWF.WFC_K_aug[ik][ib][a3], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug <=0 && nug <=0 )
 									{
@@ -323,7 +323,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 										const int a2 = LOWF.trace_aug[iw2_all];
 
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										LOWF.WFC_K_aug[ik][ib][a1], LOWF.WFC_K_aug[ik][ib][a2], wf.ekb[ik][ib]); 
+										LOWF.WFC_K_aug[ik][ib][a1], LOWF.WFC_K_aug[ik][ib][a2], GlobalC::wf.ekb[ik][ib]); 
 									}
 									assert(count<irr);
 									++ count;
@@ -427,19 +427,19 @@ void Force_LCAO_k::cal_foverlap_k(
 
 	int irr = 0;
 	int iat = 0;
-    for(int T1=0; T1<ucell.ntype; ++T1)
+    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
         for(int I1=0; I1<atom1->na; ++I1)
         {
-			const int start1 = ucell.itiaiw2iwt(T1,I1,0);
+			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 			for (int cb = 0; cb < RA.na_each[iat]; ++cb)
 			{
 				const int T2 = RA.info[iat][cb][3];
 				const int I2 = RA.info[iat][cb][4];
-				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
-				Atom* atom2 = &ucell.atoms[T2];
+				Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
 				for(int jj=0; jj<atom1->nw; jj++)
 				{
@@ -494,7 +494,7 @@ void Force_LCAO_k::cal_foverlap_k(
 	//-----------------
 	/*
 	cout << " overlap force" << endl;
-	for(int iat=0; iat<ucell.nat; ++iat)
+	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
 		const double fac = Ry_to_eV / 0.529177;
 		cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
@@ -506,7 +506,7 @@ void Force_LCAO_k::cal_foverlap_k(
 		{
 			for(int j=0;j<3;j++)
 			{
-				soverlap(i,j) *=  ucell.lat0 / ucell.omega;
+				soverlap(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
 			}
 		}
 	}
@@ -546,19 +546,19 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	RA.for_2d();
 
 	int irr = 0;
-    for(int T1=0; T1<ucell.ntype; ++T1)
+    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
         for(int I1=0; I1<atom1->na; ++I1)
         {
-			const int iat = ucell.itia2iat(T1,I1);
-			const int start1 = ucell.itiaiw2iwt(T1,I1,0);
+			const int iat = GlobalC::ucell.itia2iat(T1,I1);
+			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 			for (int cb = 0; cb < RA.na_each[iat]; ++cb)
 			{
 				const int T2 = RA.info[iat][cb][3];
 				const int I2 = RA.info[iat][cb][4];
-				const int start2 = ucell.itiaiw2iwt(T2,I2,0);
-				Atom* atom2 = &ucell.atoms[T2];
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
+				Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
 				for(int jj=0; jj<atom1->nw; ++jj)
 				{
@@ -612,7 +612,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 			for(int j=0;j<3;j++)
 			{
 				if(i<j) stvnl_dphi(j,i) = stvnl_dphi(i,j);
-				stvnl_dphi(i,j) *=  ucell.lat0 / ucell.omega;
+				stvnl_dphi(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
 			}
 		}
 	}
@@ -639,19 +639,19 @@ void Force_LCAO_k::test(double* mmm, const string &name)
 	test = new double[GlobalV::NLOCAL * GlobalV::NLOCAL];
 	ZEROS(test, GlobalV::NLOCAL *GlobalV::NLOCAL);
 	
-	for(int T1=0; T1<ucell.ntype; T1++)
+	for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
         for(int I1=0; I1<atom1->na; I1++)
         {
-			//const int iat = ucell.itia2iat(T1,I1);
-			const int start1 = ucell.itiaiw2iwt(T1,I1,0);
+			//const int iat = GlobalC::ucell.itia2iat(T1,I1);
+			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 			for (int cb = 0; cb < RA.na_each[ca]; cb++ )
 			{
 				const int T2 = RA.info[ca][cb][3];
 				const int I2 = RA.info[ca][cb][4];
-				Atom* atom2 = &ucell.atoms[T2];
-				const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+				Atom* atom2 = &GlobalC::ucell.atoms[T2];
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
 				for(int jj=0; jj<atom1->nw; jj++)
 				{
@@ -716,29 +716,29 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 	double distance1;
 	double distance2;
 	
-	for (int T1 = 0; T1 < ucell.ntype; ++T1)
+	for (int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
 	{
-		const Atom* atom1 = &ucell.atoms[T1];
+		const Atom* atom1 = &GlobalC::ucell.atoms[T1];
 
 		for (int I1 =0; I1< atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
 			//GridD.Find_atom( tau1 );
-			GridD.Find_atom(ucell, tau1 ,T1, I1);
-			//const int iat = ucell.itia2iat(T1, I1);
-			const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+			GridD.Find_atom(GlobalC::ucell, tau1 ,T1, I1);
+			//const int iat = GlobalC::ucell.itia2iat(T1, I1);
+			const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 			for (int ad2=0; ad2<GridD.getAdjacentNum()+1 ; ++ad2)
 			{
 				const int T2 = GridD.getType(ad2);
-				const Atom* atom2 = &ucell.atoms[T2];
+				const Atom* atom2 = &GlobalC::ucell.atoms[T2];
 				const int I2 = GridD.getNatom(ad2);
-				//const int iat2 = ucell.itia2iat(T2, I2);
-				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+				//const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 				tau2 = GridD.getAdjacentTau(ad2);
 
 				dtau = tau2 - tau1;
-				distance = dtau.norm() * ucell.lat0;
+				distance = dtau.norm() * GlobalC::ucell.lat0;
 				rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
 				// check if this a adjacent atoms.
@@ -751,16 +751,16 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 						const int T0 = GridD.getType(ad0);
 						if( ORB.nproj[T0] == 0) continue;
 						const int I0 = GridD.getNatom(ad0);
-						//const int iat0 = ucell.itia2iat(T0, I0);
-						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+						//const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+						//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
 						tau0 = GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
-						distance1 = dtau1.norm() * ucell.lat0;
+						distance1 = dtau1.norm() * GlobalC::ucell.lat0;
 						rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
 
 						dtau2 = tau0 - tau2;
-						distance2 = dtau2.norm() * ucell.lat0;
+						distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 						rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max(); 
 
 						if( distance1 < rcut1 && distance2 < rcut2 )
@@ -791,16 +791,16 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 								const int T0 = GridD.getType(ad0);
 								if( ORB.nproj[T0] == 0) continue;
 								const int I0 = GridD.getNatom(ad0);
-								const int iat0 = ucell.itia2iat(T0, I0);
-								//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+								const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+								//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 								tau0 = GridD.getAdjacentTau(ad0);
 
 								dtau1 = tau0 - tau1;
-								distance1 = dtau1.norm() * ucell.lat0;
+								distance1 = dtau1.norm() * GlobalC::ucell.lat0;
 								rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
 
 								dtau2 = tau0 - tau2;
-								distance2 = dtau2.norm() * ucell.lat0;
+								distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 								rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
 
 								double r0[3];
@@ -814,7 +814,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 
 								if(distance1 < rcut1 && distance2 < rcut2)
 								{
-									//const Atom* atom0 = &ucell.atoms[T0];
+									//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
 									double nlm[3]={0,0,0};
 
 									UOT.snap_psibeta(
@@ -829,12 +829,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											atom1->iw2l[ j ], // L1
 											atom1->iw2m[ j ], // m1
 											atom1->iw2n[ j ], // N1
-											tau0, T0, ucell.atoms[T0].dion, GlobalV::NSPIN,
-											ucell.atoms[T0].d_so,
-											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
-											ucell.atoms[T0].index1_soc[0],
-											ucell.atoms[T0].index2_soc[0],
-											ucell.atoms[T0].nproj_soc
+											tau0, T0, GlobalC::ucell.atoms[T0].dion, GlobalV::NSPIN,
+											GlobalC::ucell.atoms[T0].d_so,
+											GlobalC::ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
+											GlobalC::ucell.atoms[T0].index1_soc[0],
+											GlobalC::ucell.atoms[T0].index2_soc[0],
+											GlobalC::ucell.atoms[T0].nproj_soc
 											); // mohan  add 2021-05-07
 
 									double nlm1[3]={0,0,0};
@@ -852,12 +852,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 											atom2->iw2l[ k ], // L2
 											atom2->iw2m[ k ], // m2
 											atom2->iw2n[ k ], // N2
-											tau0, T0, ucell.atoms[T0].dion, GlobalV::NSPIN,
-											ucell.atoms[T0].d_so,
-											ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
-											ucell.atoms[T0].index1_soc[0],
-											ucell.atoms[T0].index2_soc[0],
-											ucell.atoms[T0].nproj_soc
+											tau0, T0, GlobalC::ucell.atoms[T0].dion, GlobalV::NSPIN,
+											GlobalC::ucell.atoms[T0].d_so,
+											GlobalC::ucell.atoms[T0].non_zero_count_soc[0], // index stands for spin
+											GlobalC::ucell.atoms[T0].index1_soc[0],
+											GlobalC::ucell.atoms[T0].index2_soc[0],
+											GlobalC::ucell.atoms[T0].nproj_soc
 											); // mohan  add 2021-05-07
 									}
 									/// only one projector for each atom force, but another projector for stress
@@ -900,7 +900,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 		{
 			for(int j=0;j<3;j++)
 			{
-				svnl_dbeta(i,j) *=  ucell.lat0 / ucell.omega;
+				svnl_dbeta(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
 			}
 		}
 	}
@@ -929,7 +929,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	int istep = 1;
 
 	// if Vna potential is not used.
-	pot.init_pot(istep, pw.strucFac);
+	pot.init_pot(istep, GlobalC::pw.strucFac);
 
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
@@ -940,7 +940,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 //		ZEROS (LM.DHloc_fixedR_z, LNNR.nnr);
 //		cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
 		}
@@ -964,7 +964,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		for(int ipol=0;ipol<3;ipol++){
 			for(int jpol=0;jpol<3;jpol++){
 				if(ipol < jpol) svl_dphi(jpol, ipol) = svl_dphi(ipol, jpol);
-				svl_dphi(ipol, jpol) /= ucell.omega;
+				svl_dphi(ipol, jpol) /= GlobalC::ucell.omega;
 			}
 		}
 	}

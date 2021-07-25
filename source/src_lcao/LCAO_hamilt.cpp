@@ -31,7 +31,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
 	{
 		// mohan add 2012-03-29
 		// calculate the grid integration of 'Vl' matrix for gamma algorithms.
-		this->GG.prepare(ucell.latvec, ucell.lat0);
+		this->GG.prepare(GlobalC::ucell.latvec, GlobalC::ucell.lat0);
 	
 		// calulate the 'S', 'T' and 'Vnl' matrix for gamma algorithms.
 	    this->calculate_STNR_gamma();	
@@ -43,7 +43,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
 		this->calculate_STNR_k();
 
 		// calculate the grid integration of 'Vl' matrix for l-points algorithms.
-		this->GK.init(pw.nbx, pw.nby, pw.nbzp, pw.nbzp_start, pw.ncxyz);
+		this->GK.init(GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbzp, GlobalC::pw.nbzp_start, GlobalC::pw.ncxyz);
 
 	}
 
@@ -90,11 +90,11 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 			}
 			else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
 			{
-				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+				exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 			}
 			else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
 			{
-				exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+				exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 			}
 		}
 
@@ -224,11 +224,11 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 		}
 		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
 		{
-			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+			exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 		}
 		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
 		{
-			exx_lcao.add_Hexx(ik,exx_global.info.hybrid_alpha);
+			exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 		}
 	}
 
@@ -386,26 +386,26 @@ void LCAO_Hamilt::calculate_STN_R(void)
     int R_y;
     int R_z;
 
-    for(int T1 = 0; T1 < ucell.ntype; ++T1)
+    for(int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
         for(int I1 = 0; I1 < atom1->na; ++I1)
         {
             tau1 = atom1->tau[I1];
             //GridD.Find_atom(tau1);
-            GridD.Find_atom(ucell, tau1, T1, I1);
-            Atom* atom1 = &ucell.atoms[T1];
-            const int start = ucell.itiaiw2iwt(T1,I1,0);
+            GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            Atom* atom1 = &GlobalC::ucell.atoms[T1];
+            const int start = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 
             for(int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
             {
                 const int T2 = GridD.getType(ad);
                 const int I2 = GridD.getNatom(ad);
-                Atom* atom2 = &ucell.atoms[T2];
+                Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
                 tau2 = GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
-                double distance = dtau.norm() * ucell.lat0;
+                double distance = dtau.norm() * GlobalC::ucell.lat0;
                 double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
                 bool adj = false;
@@ -417,15 +417,15 @@ void LCAO_Hamilt::calculate_STN_R(void)
                     {
                         const int T0 = GridD.getType(ad0);
                         //const int I0 = GridD.getNatom(ad0);
-                        //const int iat0 = ucell.itia2iat(T0, I0);
-                        //const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+                        //const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+                        //const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
                         tau0 = GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;
                         dtau2 = tau0 - tau2;
 
-                        double distance1 = dtau1.norm() * ucell.lat0;
-                        double distance2 = dtau2.norm() * ucell.lat0;
+                        double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+                        double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
                         double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
                         double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
@@ -440,7 +440,7 @@ void LCAO_Hamilt::calculate_STN_R(void)
 
                 if(adj)
                 {
-                    const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
                     Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z);
                     R_x = (int) (dR.x - R_minX);
@@ -512,26 +512,26 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
     int R_y;
     int R_z;
 
-    for(int T1 = 0; T1 < ucell.ntype; ++T1)
+    for(int T1 = 0; T1 < GlobalC::ucell.ntype; ++T1)
     {
-        Atom* atom1 = &ucell.atoms[T1];
+        Atom* atom1 = &GlobalC::ucell.atoms[T1];
         for(int I1 = 0; I1 < atom1->na; ++I1)
         {
             tau1 = atom1->tau[I1];
             //GridD.Find_atom(tau1);
-            GridD.Find_atom(ucell, tau1, T1, I1);
-            Atom* atom1 = &ucell.atoms[T1];
-            const int start = ucell.itiaiw2iwt(T1,I1,0);
+            GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            Atom* atom1 = &GlobalC::ucell.atoms[T1];
+            const int start = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 
             for(int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
             {
                 const int T2 = GridD.getType(ad);
                 const int I2 = GridD.getNatom(ad);
-                Atom* atom2 = &ucell.atoms[T2];
+                Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
                 tau2 = GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
-                double distance = dtau.norm() * ucell.lat0;
+                double distance = dtau.norm() * GlobalC::ucell.lat0;
                 double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
                 bool adj = false;
@@ -543,15 +543,15 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                     {
                         const int T0 = GridD.getType(ad0);
                         //const int I0 = GridD.getNatom(ad0);
-                        //const int iat0 = ucell.itia2iat(T0, I0);
-                        //const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+                        //const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+                        //const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
                         tau0 = GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;
                         dtau2 = tau0 - tau2;
 
-                        double distance1 = dtau1.norm() * ucell.lat0;
-                        double distance2 = dtau2.norm() * ucell.lat0;
+                        double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+                        double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
                         double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
                         double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
@@ -566,7 +566,7 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 
                 if(adj)
                 {
-                    const int start2 = ucell.itiaiw2iwt(T2,I2,0);
+                    const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
                     Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z);
                     R_x = (int) (dR.x - R_minX);

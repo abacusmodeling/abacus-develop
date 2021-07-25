@@ -12,8 +12,8 @@ void Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx( const set<pair<size_t
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx");
 	
-	atom_in_exx.row.resize(ucell.nat);
-	atom_in_exx.col.resize(ucell.nat);
+	atom_in_exx.row.resize(GlobalC::ucell.nat);
+	atom_in_exx.col.resize(GlobalC::ucell.nat);
 	for( const auto pair : H_atom_pairs_core )
 	{
 		atom_in_exx.row[pair.first]  = true;
@@ -33,15 +33,15 @@ Exx_Abfs::Parallel::Communicate::DM::m2D_to_a2Dexx(
 	for( int iwt1_m2D=0; iwt1_m2D<DM_m2D.nr; ++iwt1_m2D )
 	{
 		const int iwt1 = GridT.trace_lo[iwt1_index_begin+iwt1_m2D];
-		const size_t iat1 = ucell.iwt2iat[iwt1];
+		const size_t iat1 = GlobalC::ucell.iwt2iat[iwt1];
 		if(!atom_in_exx.row[iat1])	continue;
-		const size_t iw1 = ucell.iwt2iw[iwt1];
+		const size_t iw1 = GlobalC::ucell.iwt2iw[iwt1];
 		for( int iwt2_m2D=0; iwt2_m2D<DM_m2D.nc; ++iwt2_m2D )
 		{
 			const int iwt1 = GridT.trace_lo[iwt2_index_begin+iwt2_m2D];
-			const size_t iat2 = ucell.iwt2iat[iwt2];
+			const size_t iat2 = GlobalC::ucell.iwt2iat[iwt2];
 			if(!atom_in_exx.col[iat2])	continue;
-			const size_t iw2 = ucell.iwt2iw[iwt2];
+			const size_t iw2 = GlobalC::ucell.iwt2iw[iwt2];
 			
 			try
 			{ 
@@ -50,8 +50,8 @@ Exx_Abfs::Parallel::Communicate::DM::m2D_to_a2Dexx(
 			catch(const std::out_of_range&)
 			{ 
 				DM_a2Dexx[iat1][iat2][Abfs::Vector3_Order<int>(0,0,0)].creat( 
-					ucell.atoms[ucell.iat2it[iat1]].nw, 
-					ucell.atoms[ucell.iat2it[iat2]].nw); 
+					GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, 
+					GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw); 
 				DM_a2Dexx[iat1][iat2][Abfs::Vector3_Order<int>(0,0,0)](iw1,iw2) = DM_m2D(iwt1_m2D,iwt2_m2D);
 			}
 		}
@@ -186,14 +186,14 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 }		
 		for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 		{			
-			for( int iat1=0, iwt1_index=0; iat1!=ucell.nat; ++iat1 )
+			for( int iat1=0, iwt1_index=0; iat1!=GlobalC::ucell.nat; ++iat1 )
 			{
 				if(!GridT.in_this_processor[iat1])	continue;
-				const int nw1 = ucell.atoms[ucell.iat2it[iat1]].nw;
-				for( int iat2=0, iwt2_index=0; iat2!=ucell.nat; ++iat2 )
+				const int nw1 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw;
+				for( int iat2=0, iwt2_index=0; iat2!=GlobalC::ucell.nat; ++iat2 )
 				{
 					if(!GridT.in_this_processor[iat2])	continue;
-					const int nw2 = ucell.atoms[ucell.iat2it[iat2]].nw;
+					const int nw2 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 					
 					matrix DM_grid_2D(nw1,nw2);
 					for( int iw1=0; iw1!=nw1; ++iw1 )
@@ -216,14 +216,14 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 			for( int iwt1_grid=0; iwt1_grid<GridT.lgd; ++iwt1_grid )
 			{				
 				const int iwt1 = ParaO.MatrixInfo.row_set[iwt1_grid];
-				const int iat1 = ucell.iwt2iat[iwt1];
-				const int iw1  = ucell.iwt2iw[iwt1];
+				const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
+				const int iw1  = GlobalC::ucell.iwt2iw[iwt1];
 cout<<iwt1_grid<<"\t"<<iwt1<<"\t"<<iat1<<"\t"<<iw1<<endl;
 				for( int iwt2_grid=0; iwt2_grid<GridT.lgd; ++iwt2_grid )
 				{				
 					const int iwt2 = ParaO.MatrixInfo.col_set[iwt2_grid];
-					const int iat2 = ucell.iwt2iat[iwt2];
-					const int iw2  = ucell.iwt2iw[iwt2];
+					const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
+					const int iw2  = GlobalC::ucell.iwt2iw[iwt2];
 cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;
 					try
 					{
@@ -232,8 +232,8 @@ cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;
 					catch(const std::out_of_range&)
 					{
 						DM_grid[is][iat1][iat2][{0,0,0}].create(
-							ucell.atoms[ucell.iat2it[iat1]].nw,
-							ucell.atoms[ucell.iat2it[iat2]].nw);
+							GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw,
+							GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
 						DM_grid[is][iat1][iat2][{0,0,0}](iw1,iw2) = LOC.DM[is][iwt1_grid][iwt2_grid];
 					}
 				}
@@ -253,17 +253,17 @@ ofs_LOC_DM<<endl<<endl;
 
 		for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 		{
-			for( size_t iat1=0; iat1<ucell.nat; ++iat1 )
+			for( size_t iat1=0; iat1<GlobalC::ucell.nat; ++iat1 )
 			{
 				if(!GridT.in_this_processor[iat1])	continue;
 				int iw_index = 0;
 				for( size_t iat2_2D=0; iat2_2D<RA.na_each[iat1]; ++iat2_2D )
 				{
-					const size_t iat2 = ucell.itia2iat( RA.info[iat1][iat2_2D][3], RA.info[iat1][iat2_2D][4] );
+					const size_t iat2 = GlobalC::ucell.itia2iat( RA.info[iat1][iat2_2D][3], RA.info[iat1][iat2_2D][4] );
 					const Abfs::Vector3_Order<int> box2( RA.info[iat1][iat2_2D][0], RA.info[iat1][iat2_2D][1], RA.info[iat1][iat2_2D][2] );
 					const Abfs::Vector3_Order<int> boxp2 = box2%Born_von_Karman_period;
-					const int nw1 = ucell.atoms[ucell.iat2it[iat1]].nw;
-					const int nw2 = ucell.atoms[ucell.iat2it[iat2]].nw;	
+					const int nw1 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw;
+					const int nw2 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;	
 {
 	ofs_LOC_DM<<"@\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
 	for( int iw1=0; iw1!=nw1; ++iw1 )

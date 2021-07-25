@@ -269,19 +269,19 @@ void DFTU::cal_occup_m_k(const int iter)
 {
 	TITLE("DFTU", "cal_occup_m_k");
 
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		if(INPUT.orbital_corr[T]==-1) continue;
 
 		//const int LC = INPUT.orbital_corr[T];
 		
-		for(int I=0; I<ucell.atoms[T].na; I++)
+		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
-		 	const int iat = ucell.itia2iat(T, I);
+		 	const int iat = GlobalC::ucell.itia2iat(T, I);
 			
-			for(int l=0; l<ucell.atoms[T].nwl+1; l++)
+			for(int l=0; l<GlobalC::ucell.atoms[T].nwl+1; l++)
 			{
-				const int N = ucell.atoms[T].l_nchi[l];
+				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 
 				for(int n=0; n<N; n++)
 				{						
@@ -353,16 +353,16 @@ void DFTU::cal_occup_m_k(const int iter)
 
 	//=================Part 2======================
 	//get the local occupation number matrix from the product of S and density matrix, i.e. srho。
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		const int NL = ucell.atoms[it].nwl + 1;
+		const int NL = GlobalC::ucell.atoms[it].nwl + 1;
 		const int LC = INPUT.orbital_corr[it];
 		
 		if(LC == -1) continue;
 
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{		
-			const int iat = ucell.itia2iat(it, ia);
+			const int iat = GlobalC::ucell.itia2iat(it, ia);
 
 			for(int l=0; l<NL; l++)
 			{				
@@ -376,7 +376,7 @@ void DFTU::cal_occup_m_k(const int iter)
 				// }
 				if(l!=INPUT.orbital_corr[it]) continue;
 
-				const int N = ucell.atoms[it].l_nchi[l];
+				const int N = GlobalC::ucell.atoms[it].l_nchi[l];
 						
 				for(int n=0; n<N; n++)
 				{
@@ -617,18 +617,18 @@ void DFTU::cal_occup_m_gamma(const int iter)
 {
 	TITLE("DFTU", "cal_occup_m_gamma");	
 
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		if(INPUT.orbital_corr[T]==-1) continue;
 		const int L = INPUT.orbital_corr[T];
 		
-		for(int I=0; I<ucell.atoms[T].na; I++)
+		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
-			const int iat = ucell.itia2iat(T, I);
+			const int iat = GlobalC::ucell.itia2iat(T, I);
 			
-			for(int l=L; l<ucell.atoms[T].nwl+1; l++)
+			for(int l=L; l<GlobalC::ucell.atoms[T].nwl+1; l++)
 			{
-				const int N = ucell.atoms[T].l_nchi[l];
+				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 
 				for(int n=0; n<N; n++)
 				{									
@@ -689,13 +689,13 @@ void DFTU::cal_occup_m_gamma(const int iter)
 
 	//=================Part 2======================
 	//get the local occupation number matrix from the product of S and density matrix, i.e. srho。
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		const int NL = ucell.atoms[it].nwl + 1;
+		const int NL = GlobalC::ucell.atoms[it].nwl + 1;
 		if(INPUT.orbital_corr[it] == -1) continue;
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			const int iat = ucell.itia2iat(it, ia);
+			const int iat = GlobalC::ucell.itia2iat(it, ia);
 
 			for(int l=0; l<NL; l++)
 			{				
@@ -709,7 +709,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 				// }
 				if(l!=INPUT.orbital_corr[it]) continue;
 
-				const int N = ucell.atoms[it].l_nchi[l];
+				const int N = GlobalC::ucell.atoms[it].l_nchi[l];
 
 				for(int n=0; n<N; n++)
 				{
@@ -846,15 +846,15 @@ void DFTU::write_occup_m(const string &fn)
 		exit(0);
     }
 
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		if(INPUT.orbital_corr[T]==-1) continue;
-		const int NL = ucell.atoms[T].nwl+1;
+		const int NL = GlobalC::ucell.atoms[T].nwl+1;
 		const int LC = INPUT.orbital_corr[T];
 
-		for(int I=0; I<ucell.atoms[T].na; I++)
+		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
-			const int iat = ucell.itia2iat(T, I);
+			const int iat = GlobalC::ucell.itia2iat(T, I);
 			ofdftu << "atoms" << "  " << iat << endl;
 
 			for(int l=0; l<NL; l++)
@@ -869,7 +869,7 @@ void DFTU::write_occup_m(const string &fn)
 				// }
 				if(l!=INPUT.orbital_corr[T]) continue;
 				
-				const int N = ucell.atoms[T].l_nchi[l];
+				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 				ofdftu << "L" << "  " << l << endl;
 
 				for(int n=0; n<N; n++)		
@@ -967,7 +967,7 @@ void DFTU::read_occup_m(const string &fn)
 			ifdftu.ignore(150, '\n');
 
 			T= this->iat2it.at(iat);
-			const int NL = ucell.atoms[T].nwl + 1;
+			const int NL = GlobalC::ucell.atoms[T].nwl + 1;
 			const int LC = INPUT.orbital_corr[T];
 	
 			for(int l=0; l<NL; l++)			
@@ -989,7 +989,7 @@ void DFTU::read_occup_m(const string &fn)
 					ifdftu >> L;
 					ifdftu.ignore(150, '\n');
 
-					const int N = ucell.atoms[T].l_nchi[L];
+					const int N = GlobalC::ucell.atoms[T].l_nchi[L];
 					for(int n=0; n<N; n++)
 					{
 						// if(!Yukawa && n!=0) continue;
@@ -1088,16 +1088,16 @@ void DFTU::local_occup_bcast()
 {
 	TITLE("DFTU", "local_occup_bcast");
 
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		if(INPUT.orbital_corr[T]==-1) continue;
 
-		for(int I=0; I<ucell.atoms[T].na; I++)
+		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
-			const int iat = ucell.itia2iat(T,I);
+			const int iat = GlobalC::ucell.itia2iat(T,I);
 			const int L = INPUT.orbital_corr[T];
 
-			for(int l=0; l<=ucell.atoms[T].nwl; l++)
+			for(int l=0; l<=GlobalC::ucell.atoms[T].nwl; l++)
 			{
 				// if(Yukawa)
 				// {
@@ -1109,7 +1109,7 @@ void DFTU::local_occup_bcast()
 				// }
 				if(l!=INPUT.orbital_corr[T]) continue;
 
-				for(int n=0; n<ucell.atoms[T].l_nchi[l]; n++)
+				for(int n=0; n<GlobalC::ucell.atoms[T].l_nchi[l]; n++)
 				{
 					// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
@@ -1164,15 +1164,15 @@ void DFTU::cal_energy_correction(const int istep)
 	this->EU = 0.0;
 	double EU_dc = 0.0;
 	
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		const int NL = ucell.atoms[T].nwl + 1;
+		const int NL = GlobalC::ucell.atoms[T].nwl + 1;
 		const int LC = INPUT.orbital_corr[T]; 
-		for(int I=0; I<ucell.atoms[T].na; I++)
+		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
 			if(LC == -1) continue;
 
-			const int iat = ucell.itia2iat(T, I);
+			const int iat = GlobalC::ucell.itia2iat(T, I);
 			const int L = INPUT.orbital_corr[T];
 
 			for(int l=0; l<NL; l++)
@@ -1184,7 +1184,7 @@ void DFTU::cal_energy_correction(const int istep)
 				// else if(l!=INPUT.orbital_corr[T]) continue;
 				if(l!=INPUT.orbital_corr[T]) continue;
 
-				const int N = ucell.atoms[T].l_nchi[l];
+				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 
 				const int m_tot = 2*l+1;
 
@@ -1548,13 +1548,13 @@ void DFTU::output()
 	
 	GlobalV::ofs_running << "//=========================L(S)DA+U===========================//" << endl;
 
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{			
-		const int NL = ucell.atoms[T].nwl + 1;
+		const int NL = GlobalC::ucell.atoms[T].nwl + 1;
 
 		for(int L=0; L<NL; L++)
 		{
-			const int N = ucell.atoms[T].l_nchi[L];
+			const int N = GlobalC::ucell.atoms[T].l_nchi[L];
 
 			if(L>=INPUT.orbital_corr[T] && INPUT.orbital_corr[T]!=-1)
 			{
@@ -1580,15 +1580,15 @@ void DFTU::output()
 	}
 
 	GlobalV::ofs_running << "Local occupation matrices" << endl;
-	for(int T=0; T<ucell.ntype; T++)
+	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		if(INPUT.orbital_corr[T]==-1) continue;
-		const int NL = ucell.atoms[T].nwl+1;
+		const int NL = GlobalC::ucell.atoms[T].nwl+1;
 		const int LC = INPUT.orbital_corr[T];
 
-		for(int I=0; I<ucell.atoms[T].na; I++)
+		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
-			const int iat = ucell.itia2iat(T, I);
+			const int iat = GlobalC::ucell.itia2iat(T, I);
 			GlobalV::ofs_running << "atoms" << " " << iat ;
 
 			for(int l=0; l<NL; l++)
@@ -1603,7 +1603,7 @@ void DFTU::output()
 				// }
 				if(l!=INPUT.orbital_corr[T]) continue;
 				
-				const int N = ucell.atoms[T].l_nchi[l];
+				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
 				GlobalV::ofs_running << "   L" << " " << l ;
 
 				for(int n=0; n<N; n++)		

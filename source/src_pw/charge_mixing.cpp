@@ -62,35 +62,35 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 	// mohan modify 2010-02-05
 	// after mixing, the charge density become 
 	// the input charge density of next iteration.
-    //double* rho_tmp = new double[pw.nrxx];
-    //DCOPY( rho, rho_tmp, pw.nrxx);
+    //double* rho_tmp = new double[GlobalC::pw.nrxx];
+    //DCOPY( rho, rho_tmp, GlobalC::pw.nrxx);
 
 //xiaohui add 2014-12-09
 	if(this->mixing_gg0 > 0.0)
 	{
-		double* Rrho = new double[pw.nrxx];
-		complex<double> *kerpulay = new complex<double>[pw.ngmc];
-		double* kerpulayR = new double[pw.nrxx];
+		double* Rrho = new double[GlobalC::pw.nrxx];
+		complex<double> *kerpulay = new complex<double>[GlobalC::pw.ngmc];
+		double* kerpulayR = new double[GlobalC::pw.nrxx];
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			Rrho[ir] = rho[ir] - rho_save_in[ir];
 		}
 		set_rhog(Rrho, kerpulay);
 
 		const double fac = this->mixing_gg0;
-		const double gg0 = std::pow(fac * 0.529177 / ucell.tpiba, 2);
-		double* filter_g = new double[pw.ngmc];
-		for(int ig=0; ig<pw.ngmc; ig++)
+		const double gg0 = std::pow(fac * 0.529177 / GlobalC::ucell.tpiba, 2);
+		double* filter_g = new double[GlobalC::pw.ngmc];
+		for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
 		{
-			double gg = pw.get_NormG_cartesian(ig);
+			double gg = GlobalC::pw.get_NormG_cartesian(ig);
 			filter_g[ig] = max(gg / (gg + gg0), 0.1);
 
 			kerpulay[ig] = (1 - filter_g[ig]) * kerpulay[ig];
 		}
 		set_rhor(kerpulay, kerpulayR);
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			Rrho[ir] = Rrho[ir] - kerpulayR[ir];
 			rho[ir] = Rrho[ir] * mixing_beta + rho_save_in[ir];
@@ -103,13 +103,13 @@ void Charge_Mixing::plain_mixing( double *rho, double *rho_save_in ) const
 	}
 	else
 	{
-		for (int ir=0; ir<pw.nrxx; ir++)
+		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			rho[ir] = rho[ir]*mixing_beta + mix_old*rho_save_in[ir];
 		}
 	}
 
-	DCOPY( rho, rho_save_in, pw.nrxx);
+	DCOPY( rho, rho_save_in, GlobalC::pw.nrxx);
 //    delete[] rho_tmp;
 
     return;
@@ -126,8 +126,8 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 //	this->check_ne(rho_save);
 
     // (1) do kerker mixing in reciprocal space.
-    complex<double> *rhog = new complex<double>[pw.ngmc];
-    ZEROS(rhog, pw.ngmc);
+    complex<double> *rhog = new complex<double>[GlobalC::pw.ngmc];
+    ZEROS(rhog, GlobalC::pw.ngmc);
 
 	// mohan modify 2010-02-03, rhog should store the old
 	// charge density. " rhog = FFT^{-1}(rho_save) "
@@ -138,17 +138,17 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 
 	// mohan fixed bug 2010/03/25
 	// suggested by VASP, 1.5(angstrom^-1) is always satisfied.
-    const double gg0 = std::pow(1.5 * 0.529177 / ucell.tpiba, 2);
-    double *filter_g = new double[pw.ngmc];
-    for (int ig=0; ig<pw.ngmc; ig++)
+    const double gg0 = std::pow(1.5 * 0.529177 / GlobalC::ucell.tpiba, 2);
+    double *filter_g = new double[GlobalC::pw.ngmc];
+    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {
-        double gg = pw.get_NormG_cartesian(ig);
+        double gg = GlobalC::pw.get_NormG_cartesian(ig);
 //      filter_g[ig] = a * gg / (gg+gg0);
 		filter_g[ig] = mixing_beta * gg / (gg+gg0);//mohan modify 2010/03/25
     }
 
     // (3)
-    for (int ig=0; ig<pw.ngmc; ig++)
+    for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
     {
         rhog[ig] += filter_g[ig] * residual_g[ig];
     }
@@ -159,7 +159,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 
     // (5)
 	// mohan change the order of (4) (5), 2010-02-05
-    DCOPY(rho, rho_save, pw.nrxx);
+    DCOPY(rho, rho_save, GlobalC::pw.nrxx);
 
     //this->renormalize_rho();
 
@@ -178,16 +178,16 @@ double Charge_Mixing::rhog_dot_product(
 {
     TITLE("Charge_Mixing","rhog_dot_product");
 	timer::tick("Charge_Mixing","rhog_dot_product");
-    static const double fac = e2 * FOUR_PI / ucell.tpiba2;
+    static const double fac = e2 * FOUR_PI / GlobalC::ucell.tpiba2;
     static const double fac2 = e2 * FOUR_PI / (TWO_PI * TWO_PI);
 
     double sum = 0.0;
 	
 	auto part_of_noncolin = [&]()			// Peize Lin change goto to function at 2020.01.31
 	{
-		for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+		for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 		{
-			sum += ( conj( rhog1[0][ig] )* rhog2[0][ig] ).real() / pw.gg[ig];
+			sum += ( conj( rhog1[0][ig] )* rhog2[0][ig] ).real() / GlobalC::pw.gg[ig];
 		}
 		sum *= fac;
 	};
@@ -201,9 +201,9 @@ double Charge_Mixing::rhog_dot_product(
 	case 2:
 		{
 			// (1) First part of density error.
-			for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+			for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 			{
-				sum += ( conj( rhog1[0][ig]+rhog1[1][ig] ) * (rhog2[0][ig]+rhog2[1][ig]) ).real() / pw.gg[ig];
+				sum += ( conj( rhog1[0][ig]+rhog1[1][ig] ) * (rhog2[0][ig]+rhog2[1][ig]) ).real() / GlobalC::pw.gg[ig];
 			}
 			sum *= fac;
 
@@ -219,7 +219,7 @@ double Charge_Mixing::rhog_dot_product(
 			sum2 += fac2 * ( conj( rhog1[0][0]-rhog1[1][0] ) * ( rhog2[0][0]-rhog2[1][0] ) ).real();
 
 			double mag = 0.0;
-			for (int ig=0; ig<pw.ngmc; ig++)
+			for (int ig=0; ig<GlobalC::pw.ngmc; ig++)
 			{
 				mag += ( conj( rhog1[0][ig]-rhog1[1][ig] ) * ( rhog2[0][ig]-rhog2[1][ig] ) ).real();
 			}
@@ -243,12 +243,12 @@ double Charge_Mixing::rhog_dot_product(
 		else
 		{
 			//another part with magnetization
-			for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+			for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 			{
-				sum += ( conj( rhog1[0][ig] )* rhog2[0][ig] ).real() / pw.gg[ig];
+				sum += ( conj( rhog1[0][ig] )* rhog2[0][ig] ).real() / GlobalC::pw.gg[ig];
 			}
 			sum *= fac;
-			if(pw.gstart == 2)
+			if(GlobalC::pw.gstart == 2)
 			{
 				sum += fac2 * ((conj( rhog1[1][0])*rhog2[1][0]).real() +
 					(conj( rhog1[2][0])*rhog2[2][0]).real() +
@@ -259,7 +259,7 @@ double Charge_Mixing::rhog_dot_product(
 			{
 				fac3 *= 2.0;
 			}
-			for (int ig=pw.gstart; ig<pw.ngmc; ig++)
+			for (int ig=GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)
 			{
 				sum += fac3 * ((conj( rhog1[1][ig])*rhog2[1][ig]).real() +
 					(conj( rhog1[2][ig])*rhog2[2][ig]).real() +
@@ -273,7 +273,7 @@ double Charge_Mixing::rhog_dot_product(
 
 	timer::tick("Charge_Mixing","rhog_dot_product");
 
-	sum *= ucell.omega * 0.5;
+	sum *= GlobalC::ucell.omega * 0.5;
 
 	//bool dft_is_meta = false;
 	//bool lda_plus_u = false;

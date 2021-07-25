@@ -26,8 +26,8 @@ inline void cal_psir_ylm_dphi(
 	const double delta_r,
 	const int*const block_index,			// block_index[na_grid+1], count total number of atomis orbitals
 	const int*const block_size,  			// block_size[na_grid],	number of columns of a band
-	bool*const*const cal_flag,		        // cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-	double*const*const psir_ylm,	    	// psir_ylm[pw.bxyz][LD_pool] 
+	bool*const*const cal_flag,		        // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	double*const*const psir_ylm,	    	// psir_ylm[GlobalC::pw.bxyz][LD_pool] 
 	double*const*const dphix, 
 	double*const*const dphiy, 
 	double*const*const dphiz,
@@ -38,17 +38,17 @@ inline void cal_psir_ylm_dphi(
         const int mcell_index = GridT.bcell_start[grid_index] + id;
         const int imcell = GridT.which_bigcell[mcell_index];
         int iat = GridT.which_atom[mcell_index];
-        const int it = ucell.iat2it[iat];
-        const int ia = ucell.iat2ia[iat];
-        const int start = ucell.itiaiw2iwt(it, ia, 0);
-        Atom *atom = &ucell.atoms[it];
+        const int it = GlobalC::ucell.iat2it[iat];
+        const int ia = GlobalC::ucell.iat2ia[iat];
+        const int start = GlobalC::ucell.itiaiw2iwt(it, ia, 0);
+        Atom *atom = &GlobalC::ucell.atoms[it];
 
 		const double mt[3]={
 			GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0],
 			GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1],
 			GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2]};
 
-        for(int ib=0; ib<pw.bxyz; ib++)
+        for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
         {
             double*const p_psir_ylm=&psir_ylm[ib][block_index[id]];
             double*const p_dphix=&dphix[ib][block_index[id]];
@@ -88,11 +88,11 @@ inline void cal_psir_ylm_dphi(
             vector<vector<double>> grly;
             // >>> the old method
             // ylma[id] = new double[nnn[it]]; // liaochen found this bug 2010/03/29
-            // Ylm::get_ylm_real(ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
+            // Ylm::get_ylm_real(GlobalC::ucell.atoms[it].nwl+1, this->dr[id], ylma[id]);
             // <<<
-            // Ylm::rlylm(ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            // Ylm::rlylm(ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
-            Ylm::grad_rl_sph_harm(ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
+            // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
+            // Ylm::rlylm(GlobalC::ucell.atoms[it].nwl+1, dr[id].x, dr[id].y, dr[id].z, rly, grly);
+            Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[0], dr[1], dr[2], rly, grly);
 
             // 1E-7 is necessary in case of R is just on one grid
             // the following code is about interpolation,
@@ -250,10 +250,10 @@ inline void cal_meshball_DGridV(
 	const int*const block_index,	    	    	// block_index[na_grid+1], count total number of atomis orbitals
 	const int*const block_iw, 		    	    	// block_iw[na_grid],	index of wave functions for each block
 	const int*const block_size, 	    	    	// block_size[na_grid],	number of columns of a band
-	const bool*const*const cal_flag,		        // cal_flag[pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
-	const double*const vldr3,               	    // vldr3[pw.bxyz]
-	const double*const*const psir_ylm,		        // psir_ylm[pw.bxyz][LD_pool]
-	double*const*const psir_vlbr3,              	// psir_vlbr3[pw.bxyz][LD_pool]
+	const bool*const*const cal_flag,		        // cal_flag[GlobalC::pw.bxyz][na_grid],	whether the atom-grid distance is larger than cutoff
+	const double*const vldr3,               	    // vldr3[GlobalC::pw.bxyz]
+	const double*const*const psir_ylm,		        // psir_ylm[GlobalC::pw.bxyz][LD_pool]
+	double*const*const psir_vlbr3,              	// psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 	const double*const*const dphix, const double*const*const dphiy, const double*const*const dphiz, 
 	double*const*const DGridV_x,  double*const*const DGridV_y,  double*const*const DGridV_z,
 	double*const*const DGridV_11, double*const*const DGridV_12, double*const*const DGridV_13,
@@ -264,7 +264,7 @@ inline void cal_meshball_DGridV(
     const double alpha=-1.0, beta=1.0;
     
     const int allnw=block_index[na_grid];
-    for(int i=0; i<pw.bxyz; ++i)
+    for(int i=0; i<GlobalC::pw.bxyz; ++i)
     {
         for(int j=0; j<allnw; ++j)
         {
@@ -288,7 +288,7 @@ inline void cal_meshball_DGridV(
             const int idx2=block_index[ia2];
             const int n=block_size[ia2];
 			
-           //  for(int ib=0; ib<pw.bxyz; ++ib)
+           //  for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
            //  {
            //      if(cal_flag[ib][ia1]&&cal_flag[ib][ia2]) 
            //      {
@@ -313,16 +313,16 @@ inline void cal_meshball_DGridV(
 
             
             int cal_num=0;
-            for(int ib=0; ib<pw.bxyz; ++ib)
+            for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
             {
                 if(cal_flag[ib][ia1]&&cal_flag[ib][ia2]) ++cal_num;
             }
             //++cal_flag_true;
             //OUT(GlobalV::ofs_running,"cal_num:", cal_num);
-            if (cal_num > pw.bxyz/2)
+            if (cal_num > GlobalC::pw.bxyz/2)
 //            if(0)
             {
-                int k=pw.bxyz;
+                int k=GlobalC::pw.bxyz;
                 // OUT(GlobalV::ofs_running,"ia2", ia2);
                 // OUT(GlobalV::ofs_running,"iw2_lo", iw2_lo);
                 // OUT(GlobalV::ofs_running,"n", n);
@@ -348,7 +348,7 @@ inline void cal_meshball_DGridV(
                 if(GlobalV::STRESS)
                 {
 					k=1;
-					for(int ib=0; ib<pw.bxyz; ++ib)
+					for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 					{
 						double stress_alpha1 = alpha * drr(ia2,ib,0);
 						double stress_alpha2 = alpha * drr(ia2,ib,1);
@@ -389,7 +389,7 @@ inline void cal_meshball_DGridV(
             else if (cal_num > 0)
             {
                 int k=1;
-                for(int ib=0; ib<pw.bxyz; ++ib)
+                for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
                 {
                     if(cal_flag[ib][ia1]&&cal_flag[ib][ia2])
                     {
@@ -515,7 +515,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const double delta_r = ORB.dr_uniform;
 
-    int LD_pool=max_size*ucell.nwmax;
+    int LD_pool=max_size*GlobalC::ucell.nwmax;
     double* dphi_pool;
     
     double** dphix;
@@ -524,7 +524,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 
     bool** cal_flag;
 
-    const int ncyz=pw.ncy*pw.nczp;
+    const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
 
 /*    if(max_size<=0 || GridT.lgd <= 0) 
     {
@@ -534,25 +534,25 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     }*/
     if(max_size>0 && GridT.lgd > 0)
     {    
-        dphi_pool=new double [3*pw.bxyz*LD_pool];
-        ZEROS(dphi_pool, 3*pw.bxyz*LD_pool);
-        dphix = new double*[pw.bxyz];
-        dphiy = new double*[pw.bxyz];
-        dphiz = new double*[pw.bxyz];    
+        dphi_pool=new double [3*GlobalC::pw.bxyz*LD_pool];
+        ZEROS(dphi_pool, 3*GlobalC::pw.bxyz*LD_pool);
+        dphix = new double*[GlobalC::pw.bxyz];
+        dphiy = new double*[GlobalC::pw.bxyz];
+        dphiz = new double*[GlobalC::pw.bxyz];    
         
-        cal_flag=new bool*[pw.bxyz];
-        for(int i=0; i<pw.bxyz; i++)
+        cal_flag=new bool*[GlobalC::pw.bxyz];
+        for(int i=0; i<GlobalC::pw.bxyz; i++)
         {
             dphix[i] = &dphi_pool[i*LD_pool];
-            dphiy[i] = &dphi_pool[i*LD_pool+pw.bxyz*LD_pool];
-            dphiz[i] = &dphi_pool[i*LD_pool+2*pw.bxyz*LD_pool];
+            dphiy[i] = &dphi_pool[i*LD_pool+GlobalC::pw.bxyz*LD_pool];
+            dphiz[i] = &dphi_pool[i*LD_pool+2*GlobalC::pw.bxyz*LD_pool];
             cal_flag[i] = new bool[max_size];
         }
 
         realArray drr;//rewrite drr form by zhengdy-2019-04-02
         if(GlobalV::STRESS)
         {
-            drr.create(max_size, pw.bxyz, 3);
+            drr.create(max_size, GlobalC::pw.bxyz, 3);
             drr.zero_out();
         }    
 /*        double ***drr;//store dr for stress calculate, added by zhengdy
@@ -561,8 +561,8 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     		drr = new double**[max_size];
     		for(int id=0; id<max_size; id++)
     		{
-    			drr[id] = new double*[pw.bxyz];
-    			for(int ib=0; ib<pw.bxyz; ib++)
+    			drr[id] = new double*[GlobalC::pw.bxyz];
+    			for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
     			{
     				drr[id][ib] = new double[3];
     				ZEROS(drr[id][ib],3);
@@ -573,15 +573,15 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         //timer::tick("Gint_Gamma","prepare");
         for (int i=0; i< GridT.nbx; i++)
         {
-            const int ibx = i*pw.bx; 
+            const int ibx = i*GlobalC::pw.bx; 
 
             for (int j=0; j< GridT.nby; j++)
             {
-                const int jby = j*pw.by;
+                const int jby = j*GlobalC::pw.by;
 
                 for (int k= GridT.nbzp_start; k< GridT.nbzp_start+GridT.nbzp; k++)
                 {
-                    const int kbz = k*pw.bz-pw.nczp_start; 
+                    const int kbz = k*GlobalC::pw.bz-GlobalC::pw.nczp_start; 
                     const int grid_index = (k-GridT.nbzp_start) + j * GridT.nbzp + i * GridT.nby * GridT.nbzp;
                     const int na_grid = GridT.how_many_atoms[ grid_index ];
                     if(na_grid==0)continue;
@@ -603,8 +603,8 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 					//------------------------------------------------------------------
 					int* block_size = Gint_Tools::get_block_size(na_grid, grid_index);
 
-					Gint_Tools::Array_Pool<double> psir_vlbr3(pw.bxyz, LD_pool);
-					Gint_Tools::Array_Pool<double> psir_ylm(pw.bxyz, LD_pool);
+					Gint_Tools::Array_Pool<double> psir_vlbr3(GlobalC::pw.bxyz, LD_pool);
+					Gint_Tools::Array_Pool<double> psir_ylm(GlobalC::pw.bxyz, LD_pool);
     
                     cal_psir_ylm_dphi(na_grid, grid_index, delta_r, 
                             block_index, block_size, cal_flag, psir_ylm.ptr_2D, dphix, dphiy, dphiz, drr);
@@ -628,7 +628,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
         delete[] dphiy;
         delete[] dphiz;
         delete[] dphi_pool;
-        for(int ib=0; ib<pw.bxyz; ++ib)
+        for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
             delete[] cal_flag[ib];
 		}

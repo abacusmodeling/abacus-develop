@@ -60,9 +60,9 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 
         // mohan fix bug 2011-05-02
         int nn = 0;
-        for(int it=0; it<ucell.ntype; it++)
+        for(int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            nn = max(nn, (ucell.atoms[it].nwl+1)*(ucell.atoms[it].nwl+1));
+            nn = max(nn, (GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
         }
         ylma = new double[nn];
         ZEROS(ylma, nn);
@@ -83,21 +83,21 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
             for(int j=0; j<max_size; j++)
             {
                 dr[i][j] = new double[3];
-                psir_ylm[i][j] = new double[ucell.nwmax];
-				dphi_x[i][j] = new double[ucell.nwmax];
-				dphi_y[i][j] = new double[ucell.nwmax];
-				dphi_z[i][j] = new double[ucell.nwmax];
+                psir_ylm[i][j] = new double[GlobalC::ucell.nwmax];
+				dphi_x[i][j] = new double[GlobalC::ucell.nwmax];
+				dphi_y[i][j] = new double[GlobalC::ucell.nwmax];
+				dphi_z[i][j] = new double[GlobalC::ucell.nwmax];
                 ZEROS(dr[i][j],3);
-                ZEROS(psir_ylm[i][j],ucell.nwmax);
-                ZEROS(dphi_x[i][j],ucell.nwmax);
-                ZEROS(dphi_y[i][j],ucell.nwmax);
-                ZEROS(dphi_z[i][j],ucell.nwmax);
+                ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+                ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
+                ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
+                ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
             }
         }
     }
 
     assert(this->ncxyz!=0);
-    const double dv = ucell.omega/this->ncxyz;
+    const double dv = GlobalC::ucell.omega/this->ncxyz;
     int vl_index=0;
     double* vldr3 = new double[bxyz];
     ZEROS(vldr3, bxyz);
@@ -123,16 +123,16 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 
 				int bindex = 0;
 				// z is the fastest,
-				for(int ii=0; ii<pw.bx; ii++)
+				for(int ii=0; ii<GlobalC::pw.bx; ii++)
 				{
-					for(int jj=0; jj<pw.by; jj++)
+					for(int jj=0; jj<GlobalC::pw.by; jj++)
 					{
-						for(int kk=0; kk<pw.bz; kk++)
+						for(int kk=0; kk<GlobalC::pw.bz; kk++)
 						{
-							const int iii = i*pw.bx + ii;
-							const int jjj = j*pw.by + jj;
-							const int kkk = k*pw.bz + kk;
-							vl_index = (kkk-pw.nczp_start) + jjj*pw.nczp + iii*pw.ncy*pw.nczp;
+							const int iii = i*GlobalC::pw.bx + ii;
+							const int jjj = j*GlobalC::pw.by + jj;
+							const int kkk = k*GlobalC::pw.bz + kk;
+							vl_index = (kkk-GlobalC::pw.nczp_start) + jjj*GlobalC::pw.nczp + iii*GlobalC::pw.ncy*GlobalC::pw.nczp;
 							vldr3[bindex] = vl[ vl_index ] * dv;
 							//vldr3[bindex] = dv; // for overlap test
 				
@@ -166,7 +166,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
     delete[] vldr3;
     if(max_size!=0)
     {
-        for(int i=0; i<pw.bxyz; i++)
+        for(int i=0; i<GlobalC::pw.bxyz; i++)
         {
             for(int j=0; j<max_size; j++)
             {
@@ -270,9 +270,9 @@ void Gint_k::svl_k_RealSpace(
 
 		// mohan fix bug 2011-05-02
 		int nn = 0;
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			nn = max(nn, (ucell.atoms[it].nwl+1)*(ucell.atoms[it].nwl+1));
+			nn = max(nn, (GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
 		}
 		ylma = new double[nn];
 		ZEROS(ylma, nn);
@@ -293,21 +293,21 @@ void Gint_k::svl_k_RealSpace(
 			for(int j=0; j<max_size; j++)
 			{
 				dr[i][j] = new double[3];
-				psir_ylm[i][j] = new double[ucell.nwmax];
-				dphi_x[i][j] = new double[ucell.nwmax];
-				dphi_y[i][j] = new double[ucell.nwmax];
-				dphi_z[i][j] = new double[ucell.nwmax];
+				psir_ylm[i][j] = new double[GlobalC::ucell.nwmax];
+				dphi_x[i][j] = new double[GlobalC::ucell.nwmax];
+				dphi_y[i][j] = new double[GlobalC::ucell.nwmax];
+				dphi_z[i][j] = new double[GlobalC::ucell.nwmax];
 				ZEROS(dr[i][j],3);
-				ZEROS(psir_ylm[i][j],ucell.nwmax);
-				ZEROS(dphi_x[i][j],ucell.nwmax);
-				ZEROS(dphi_y[i][j],ucell.nwmax);
-				ZEROS(dphi_z[i][j],ucell.nwmax);
+				ZEROS(psir_ylm[i][j],GlobalC::ucell.nwmax);
+				ZEROS(dphi_x[i][j],GlobalC::ucell.nwmax);
+				ZEROS(dphi_y[i][j],GlobalC::ucell.nwmax);
+				ZEROS(dphi_z[i][j],GlobalC::ucell.nwmax);
 			}
 		}
 	}
 
 	assert(this->ncxyz!=0);
-	const double dv = ucell.omega/this->ncxyz;
+	const double dv = GlobalC::ucell.omega/this->ncxyz;
 	int vl_index=0;
 	double* vldr3 = new double[bxyz];
 	ZEROS(vldr3, bxyz);
@@ -333,16 +333,16 @@ void Gint_k::svl_k_RealSpace(
 
 				int bindex = 0;
 				// z is the fastest,
-				for(int ii=0; ii<pw.bx; ii++)
+				for(int ii=0; ii<GlobalC::pw.bx; ii++)
 				{
-					for(int jj=0; jj<pw.by; jj++)
+					for(int jj=0; jj<GlobalC::pw.by; jj++)
 					{
-						for(int kk=0; kk<pw.bz; kk++)
+						for(int kk=0; kk<GlobalC::pw.bz; kk++)
 						{
-							const int iii = i*pw.bx + ii;
-							const int jjj = j*pw.by + jj;
-							const int kkk = k*pw.bz + kk;
-							vl_index = (kkk-pw.nczp_start) + jjj*pw.nczp + iii*pw.ncy*pw.nczp;
+							const int iii = i*GlobalC::pw.bx + ii;
+							const int jjj = j*GlobalC::pw.by + jj;
+							const int kkk = k*GlobalC::pw.bz + kk;
+							vl_index = (kkk-GlobalC::pw.nczp_start) + jjj*GlobalC::pw.nczp + iii*GlobalC::pw.ncy*GlobalC::pw.nczp;
 							vldr3[bindex] = vl[ vl_index ] * dv;
 							//        vldr3[bindex] = dv; // for overlap test
 
@@ -383,7 +383,7 @@ void Gint_k::svl_k_RealSpace(
 	delete[] vldr3;
 	if(max_size!=0)
 	{
-		for(int i=0; i<pw.bxyz; i++)
+		for(int i=0; i<GlobalC::pw.bxyz; i++)
 		{
 			for(int j=0; j<max_size; j++)
 			{
@@ -480,11 +480,11 @@ void Gint_k::evaluate_vl_stress(
 
         const int mcell_index1 = gt.bcell_start[grid_index] + ia1;
 		const int iat = gt.which_atom[mcell_index1];
-        const int T1 = ucell.iat2it[iat];
-        const int I1 = ucell.iat2ia[iat];
-        const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+        const int T1 = GlobalC::ucell.iat2it[iat];
+        const int I1 = GlobalC::ucell.iat2ia[iat];
+        const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 		const int iw1_start = gt.trace_lo[start1];
-        Atom *atom1 = &ucell.atoms[T1];
+        Atom *atom1 = &GlobalC::ucell.atoms[T1];
 	
         //~~~~~~~~~~~~~~~~
         // get cell R1.
@@ -517,16 +517,16 @@ void Gint_k::evaluate_vl_stress(
 			if(!same_flag) continue;
 
             const int bcell2 = gt.bcell_start[grid_index] + ia2;
-            const int T2 = ucell.iat2it[ gt.which_atom[bcell2]];
+            const int T2 = GlobalC::ucell.iat2it[ gt.which_atom[bcell2]];
 			const int iat2 = gt.which_atom[bcell2];
 
 //---------------------------------------------------------
 //            if (T2 >= T1 ) //mohan fix bug 2012-07-10
 //---------------------------------------------------------
             {
-                Atom *atom2 = &ucell.atoms[T2];
-                const int I2 = ucell.iat2ia[iat2];
-                const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                Atom *atom2 = &GlobalC::ucell.atoms[T2];
+                const int I2 = GlobalC::ucell.iat2ia[iat2];
+                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 				const int iw2_start = gt.trace_lo[start2];
 
 	            //---------------
@@ -547,9 +547,9 @@ void Gint_k::evaluate_vl_stress(
 
                 double rt[3];
                 Mathzone::Direct_to_Cartesian(dRx,dRy,dRz,
-                                              ucell.a1.x, ucell.a1.y, ucell.a1.z,
-                                              ucell.a2.x, ucell.a2.y, ucell.a2.z,
-                                              ucell.a3.x, ucell.a3.y, ucell.a3.z,
+                                              GlobalC::ucell.a1.x, GlobalC::ucell.a1.y, GlobalC::ucell.a1.z,
+                                              GlobalC::ucell.a2.x, GlobalC::ucell.a2.y, GlobalC::ucell.a2.z,
+                                              GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
                                               rt[0],rt[1],rt[2]);
 	
 				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
@@ -762,11 +762,11 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
 
         const int mcell_index1 = gt.bcell_start[grid_index] + ia1;
                 const int iat = gt.which_atom[mcell_index1];
-        const int T1 = ucell.iat2it[iat];
-        const int I1 = ucell.iat2ia[iat];
-        const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
+        const int T1 = GlobalC::ucell.iat2it[iat];
+        const int I1 = GlobalC::ucell.iat2ia[iat];
+        const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
                 const int iw1_start = gt.trace_lo[start1];
-        Atom *atom1 = &ucell.atoms[T1];
+        Atom *atom1 = &GlobalC::ucell.atoms[T1];
 
         //~~~~~~~~~~~~~~~~
         // get cell R1.
@@ -799,16 +799,16 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                         if(!same_flag) continue;
 
             const int bcell2 = gt.bcell_start[grid_index] + ia2;
-            const int T2 = ucell.iat2it[ gt.which_atom[bcell2]];
+            const int T2 = GlobalC::ucell.iat2it[ gt.which_atom[bcell2]];
                         const int iat2 = gt.which_atom[bcell2];
 
 //---------------------------------------------------------
 //            if (T2 >= T1 ) //mohan fix bug 2012-07-10
 //---------------------------------------------------------
             {
-                Atom *atom2 = &ucell.atoms[T2];
-                const int I2 = ucell.iat2ia[iat2];
-                const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+                Atom *atom2 = &GlobalC::ucell.atoms[T2];
+                const int I2 = GlobalC::ucell.iat2ia[iat2];
+                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
                                 const int iw2_start = gt.trace_lo[start2];
 
                     //---------------
@@ -998,16 +998,16 @@ void Gint_k::set_ijk_atom_force(
 		const int mcell_index = GridT.bcell_start[grid_index] + id;	
 		const int imcell = GridT.which_bigcell[mcell_index];
 		const int iat = GridT.which_atom[mcell_index];
-		const int it = ucell.iat2it[ iat ];
-		const int ia = ucell.iat2ia[ iat ];
-		Atom *atom = &ucell.atoms[it];
+		const int it = GlobalC::ucell.iat2it[ iat ];
+		const int ia = GlobalC::ucell.iat2ia[ iat ];
+		Atom *atom = &GlobalC::ucell.atoms[it];
 
 		// (2.2) get the distance between the grid and the atom.
 		mt[0] = GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0];
 		mt[1] = GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
 		mt[2] = GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
 
-		for(int ib=0; ib<pw.bxyz; ++ib)
+		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
 			// meshcell_pos: z is the fastest
 			dr[ib][id][0] = GridT.meshcell_pos[ib][0] + mt[0];
@@ -1028,9 +1028,9 @@ void Gint_k::set_ijk_atom_force(
 			}
 
 			// get the 'phi' and 'dphi'.
-			Ylm::grad_rl_sph_harm(ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
+			Ylm::grad_rl_sph_harm(GlobalC::ucell.atoms[it].nwl, dr[ib][id][0], dr[ib][id][1], dr[ib][id][2], rly, grly);
 
-//			Ylm::sph_harm ( ucell.atoms[it].nwl,
+//			Ylm::sph_harm ( GlobalC::ucell.atoms[it].nwl,
 //					dr[ib][id][0] / distance[ib][id],
 //					dr[ib][id][1] / distance[ib][id],
 //					dr[ib][id][2] / distance[ib][id],
