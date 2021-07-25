@@ -51,8 +51,6 @@ public:
     void cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot);
     void cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR);
     void cal_eff_pot_mat_R_complex_double(const int ispin, complex<double>* SR, complex<double>* HR);
-    void cal_VU_pot_mat_complex(const int spin, const int newlocale, complex<double>* VU);
-    void cal_VU_pot_mat_real(const int spin, const int newlocale, double* VU);
 
     void print(const int T, const int iat, const int L, const int N, const int iter);
 
