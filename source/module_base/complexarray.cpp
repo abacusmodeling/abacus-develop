@@ -156,6 +156,43 @@ ComplexArray::create(int bnd1, int bnd2, int bnd3, int bnd4)
 //	 << "     ptr = " << ptr << endl;
 }
 
+ComplexArray::ComplexArray(const ComplexArray &cd)
+{
+	this->freemem();
+	this->init(cd.ndata);
+
+	for (int i = 0; i < ndata; i++)
+		ptr[i] = cd.ptr[i];
+		
+	this->bound1 = cd.bound1;
+	this->bound2 = cd.bound2;
+	this->bound3 = cd.bound3;
+	this->bound4 = cd.bound4;
+}
+
+ComplexArray::ComplexArray(ComplexArray &&cd)
+{
+	delete [] this->ptr;
+	this->ptr   =cd.ptr;	cd.ptr   =nullptr;
+	this->bound1=cd.bound1;	cd.bound1=0;
+	this->bound2=cd.bound2;	cd.bound2=0;
+	this->bound3=cd.bound3;	cd.bound3=0;
+	this->bound4=cd.bound4;	cd.bound4=0;
+	this->ndata=cd.ndata;	cd.ndata=0;
+}
+
+ComplexArray& ComplexArray::operator=(ComplexArray &&cd)
+{
+	delete [] this->ptr;
+	this->ptr   =cd.ptr;	cd.ptr   =nullptr;
+	this->bound1=cd.bound1;	cd.bound1=0;
+	this->bound2=cd.bound2;	cd.bound2=0;
+	this->bound3=cd.bound3;	cd.bound3=0;
+	this->bound4=cd.bound4;	cd.bound4=0;
+	this->ndata=cd.ndata;	cd.ndata=0;
+	return *this;
+}
+
 //////////////////////////////////////
 //                                  //
 // Operator functions               //
@@ -165,7 +202,7 @@ ComplexArray::create(int bnd1, int bnd2, int bnd3, int bnd4)
 /* Assignment:  nonstandard in that it returns void.  To make it standard,
  * replace void -> ComplexArray and uncomment the return *this; */
 //#line 200
-void ComplexArray::operator=(const ComplexArray & cd)
+ComplexArray &ComplexArray::operator=(const ComplexArray & cd)
 {
 	if (ndata != cd.ndata)
 	{
@@ -176,7 +213,7 @@ void ComplexArray::operator=(const ComplexArray & cd)
 	for (int i = 0; i < ndata; i++)
 		ptr[i] = cd.ptr[i];
 
-	/* return *this; */
+	return *this;
 }
 
 // Assignment of scalar:  all entries set to c

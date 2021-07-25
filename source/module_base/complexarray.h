@@ -27,11 +27,15 @@ public:
 	void create(int bnd1, int bnd2, int bnd3);
 	void create(int bnd1, int bnd2, int bnd3, int bnd4);
 
+	ComplexArray(const ComplexArray &cd);
+	ComplexArray(ComplexArray &&cd);
+	ComplexArray& operator=(ComplexArray &&cd);
+
 	// get and release scratch space
 //  void get_temp(int);
 //  void release_temp();
 
-	void operator=(const ComplexArray &cd);
+	ComplexArray &operator=(const ComplexArray &cd);
 	inline void operator=(complex <double> c);
 //  inline std::complex < double>  &operator()(int i, int j, int k)const
 //{return d[(i * bound2 + j) * bound3 +k];}
@@ -71,7 +75,7 @@ public:
 	int getBound2()const{ return bound2; }
 	int getBound3()const{ return bound3; }
 	int getBound4()const{ return bound4; }
-	int getSize()const{ return bound1*bound2*bound3*bound4; }
+	int getSize()const{ return ndata; }
 
 private:
 	int bound1, bound2, bound3, bound4;	
