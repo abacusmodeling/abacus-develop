@@ -126,7 +126,8 @@ xc_2.o\
 xc_3.o \
 xc_gga_pw.o \
 xc_type.o \
-xc_functional.o
+xc_functional.o \
+diago_cg_gpu.o
 
 OBJS_IO=berryphase.o\
 epsilon0_pwscf.o\
