@@ -174,7 +174,7 @@ vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_
 		for(int rank_send=0; rank_send<comm_sz; ++rank_send)
 		{
 			if(atom_in_2D_list[rank_send].first[iat1] && atom_in_2D_list[rank_send].second[iat2])
-				send_size_list[rank_send] += ucell.atoms[ucell.iat2it[iat1]].nw * ucell.atoms[ucell.iat2it[iat2]].nw * sizeof(double);
+				send_size_list[rank_send] += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw * GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw * sizeof(double);
 		}
 	}
 	return send_size_list;

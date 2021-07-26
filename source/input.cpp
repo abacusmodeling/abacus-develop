@@ -209,7 +209,7 @@ void Input::Default(void)
 	diago_proc = 0; //if 0, then diago_proc = GlobalV::NPROC
     diago_cg_maxiter = 50;
 	diago_cg_prec=1; //mohan add 2012-03-31
-    diago_david_ndim = 10;
+    diago_david_ndim = 4;
     ethr = 1.0e-2;
 	nb2d = 0;
 	nurse = 0;
@@ -2464,13 +2464,13 @@ void Input::Check(void)
 		out_stru = 0;
         
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
-		/*if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
+		if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
 		{
 			if (ethr>1.0e-3)
         	{
-        	    WARNING_QUIT("Input::Check","nscf : ethr > 1.0e-3, ethr too large.");
+        	    ethr = 1.0e-5;
         	}
-		}*/
+		}
 		if(force) // mohan add 2010-09-07
 		{
 			force = false;

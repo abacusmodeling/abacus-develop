@@ -201,16 +201,16 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::set_atom_in_2D()
 {
-	atom_in_2D.first.resize(ucell.nat,false);
-	atom_in_2D.second.resize(ucell.nat,false);
-	for( size_t it=0; it!=ucell.ntype; ++it )
+	atom_in_2D.first.resize(GlobalC::ucell.nat,false);
+	atom_in_2D.second.resize(GlobalC::ucell.nat,false);
+	for( size_t it=0; it!=GlobalC::ucell.ntype; ++it )
 	{
-		for( size_t ia=0; ia!=ucell.atoms[it].na; ++ia )
+		for( size_t ia=0; ia!=GlobalC::ucell.atoms[it].na; ++ia )
 		{
-			const size_t iat = ucell.itia2iat(it,ia);
-			for( size_t iw=0; iw!=ucell.atoms[it].nw; ++iw )
+			const size_t iat = GlobalC::ucell.itia2iat(it,ia);
+			for( size_t iw=0; iw!=GlobalC::ucell.atoms[it].nw; ++iw )
 			{
-				const size_t iwt = ucell.itiaiw2iwt(it,ia,iw);
+				const size_t iwt = GlobalC::ucell.itiaiw2iwt(it,ia,iw);
 				if( ParaO.trace_loc_row[iwt]>=0 )
 					atom_in_2D.first[iat] = true;
 				if( ParaO.trace_loc_col[iwt]>=0 )

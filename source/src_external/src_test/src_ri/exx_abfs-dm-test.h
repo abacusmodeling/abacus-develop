@@ -32,21 +32,21 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 	{
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
-		const size_t it1 = ucell.iat2it[iat1];
-		const size_t it2 = ucell.iat2it[iat2];
-		const size_t ia1 = ucell.iat2ia[iat1];
-		const size_t ia2 = ucell.iat2ia[iat2];
+		const size_t it1 = GlobalC::ucell.iat2it[iat1];
+		const size_t it2 = GlobalC::ucell.iat2it[iat2];
+		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
+		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {ucell.atoms[it1].nw,ucell.atoms[it2].nw} );
+		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
-			for( size_t iw1=0; iw1!=ucell.atoms[it1].nw; ++iw1 )
+			for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
 			{
-				for( size_t iw2=0; iw2!=ucell.atoms[it2].nw; ++iw2 )
+				for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
 				{
 					for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 					{
-							DMk_raw[iat1][iat2][ik](iw1,iw2) += wf_wg(ik,ib) * conj(wfc[ik][ib][ucell.itiaiw2iwt(it1,ia1,iw1)]) * wfc[ik][ib][ucell.itiaiw2iwt(it2,ia2,iw2)];
+							DMk_raw[iat1][iat2][ik](iw1,iw2) += wf_wg(ik,ib) * conj(wfc[ik][ib][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)]) * wfc[ik][ib][GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2)];
 					}
 				}
 			}

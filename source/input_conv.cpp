@@ -36,9 +36,9 @@ void Input_Conv::Convert(void)
     if(INPUT.kpoint_file!= "") GlobalV::global_kpoint_card = INPUT.kpoint_file;
     if(INPUT.pseudo_dir != "") GlobalV::global_pseudo_dir = INPUT.pseudo_dir + "/";
     GlobalV::global_pseudo_type = INPUT.pseudo_type;
-	ucell.latName = INPUT.latname; 
-	ucell.ntype = INPUT.ntype;
-	ucell.lmaxmax = INPUT.lmaxmax;
+	GlobalC::ucell.latName = INPUT.latname; 
+	GlobalC::ucell.ntype = INPUT.ntype;
+	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
 
     GlobalV::NBANDS = INPUT.nbands;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
@@ -49,12 +49,12 @@ void Input_Conv::Convert(void)
     GlobalV::RENORMWITHMESH = INPUT.renormwithmesh;
 
 	// qianrui add 2021-2-5
-	STO_WF.nchi = INPUT.nbands_sto;
-	STO_WF.nche_sto = INPUT.nche_sto;
-	STO_WF.seed_sto = INPUT.seed_sto;
-	STO_WF.emax_sto = INPUT.emax_sto;
-	STO_WF.emin_sto = INPUT.emin_sto;
-	STO_WF.stotype = INPUT.stotype;
+	GlobalC::sto_wf.nchi = INPUT.nbands_sto;
+	GlobalC::sto_wf.nche_sto = INPUT.nche_sto;
+	GlobalC::sto_wf.seed_sto = INPUT.seed_sto;
+	GlobalC::sto_wf.emax_sto = INPUT.emax_sto;
+	GlobalC::sto_wf.emin_sto = INPUT.emin_sto;
+	GlobalC::sto_wf.stotype = INPUT.stotype;
 
 	// Electrical Field
 	GlobalV::EFIELD = INPUT.efield;
@@ -96,39 +96,39 @@ void Input_Conv::Convert(void)
 	// pengfei Li add 2018-11-11
 	if(INPUT.fixed_axes == "None")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "volume")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "a")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "b")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "c")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "ab")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "ac")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "bc")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "abc")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 0;
 	}
 	else
 	{
@@ -148,7 +148,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // planewave (8/8)
 //----------------------------------------------------------
-    pw.set(
+    GlobalC::pw.set(
         INPUT.gamma_only,
         INPUT.ecutwfc,
         INPUT.ecutrho,
@@ -190,9 +190,9 @@ void Input_Conv::Convert(void)
 // wavefunction / charge / potential / (2/4)
 //----------------------------------------------------------
     GlobalV::RESTART_MODE = INPUT.restart_mode;
-    wf.start_wfc = INPUT.start_wfc;
-	wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
-	en.printe    = INPUT.printe; // mohan add 2011-03-16
+    GlobalC::wf.start_wfc = INPUT.start_wfc;
+	GlobalC::wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
+	GlobalC::en.printe    = INPUT.printe; // mohan add 2011-03-16
 
     
 //----------------------------------------------------------
@@ -321,25 +321,25 @@ void Input_Conv::Convert(void)
 		}
 		GlobalV::LSPINORB = INPUT.lspinorb;
 
-		delete[] ucell.magnet.m_loc_;
-		delete[] ucell.magnet.angle1_;
-		delete[] ucell.magnet.angle2_;
-		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
-		ucell.magnet.angle1_ = new double[INPUT.ntype];
-		ucell.magnet.angle2_ = new double[INPUT.ntype];
+		delete[] GlobalC::ucell.magnet.m_loc_;
+		delete[] GlobalC::ucell.magnet.angle1_;
+		delete[] GlobalC::ucell.magnet.angle2_;
+		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
+		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
-			ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
-			ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
 		}
 #ifdef __MPI
-//			Parallel_Common::bcast_double(ucell.magnet.angle1_[i]);
-//			Parallel_Common::bcast_double(ucell.magnet.angle2_[i]);
+//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
+//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle2_[i]);
 #endif
 	}
 	else{
-		delete[] ucell.magnet.m_loc_;
-		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		delete[] GlobalC::ucell.magnet.m_loc_;
+		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
 		GlobalV::LSPINORB = false;
 		GlobalV::NONCOLIN = false;
 		GlobalV::DOMAG = false;
@@ -473,31 +473,31 @@ void Input_Conv::Convert(void)
 #ifdef __LCAO
 	if(INPUT.exx_hybrid_type=="no")
 	{
-		exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
 	}
 	else
 	{
 		if(INPUT.exx_hybrid_type=="hf")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
 		}
 		else if(INPUT.exx_hybrid_type=="pbe0")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
 		}
 		else if(INPUT.exx_hybrid_type=="hse")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
 		}
 		else if(INPUT.exx_hybrid_type=="opt_orb")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
 		}
-		exx_global.info.hybrid_alpha    = INPUT.exx_hybrid_alpha      ;
-		exx_global.info.hse_omega       = INPUT.exx_hse_omega         ;
-		exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
-		exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
-		exx_lip.info.lambda             = INPUT.exx_lambda            ;
+		GlobalC::exx_global.info.hybrid_alpha    = INPUT.exx_hybrid_alpha      ;
+		GlobalC::exx_global.info.hse_omega       = INPUT.exx_hse_omega         ;
+		GlobalC::exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
+		GlobalC::exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
+		GlobalC::exx_lip.info.lambda             = INPUT.exx_lambda            ;
 		exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
 		exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
 		exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
@@ -528,7 +528,7 @@ void Input_Conv::Convert(void)
 	}
 #endif
 
-    ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
+    GlobalC::ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
 //    NEW_DM=INPUT.new_dm;  // Shen Yu add 2019/5/9
 
@@ -562,9 +562,9 @@ void Input_Conv::Convert(void)
     CHR.out_charge = INPUT.out_charge;
 	CHR.nelec = INPUT.nelec;
 	pot.out_potential = INPUT.out_potential;
-    wf.out_wf = INPUT.out_wf;
-	en.out_dos = INPUT.out_dos;
-    en.out_band = INPUT.out_band;
+    GlobalC::wf.out_wf = INPUT.out_wf;
+	GlobalC::en.out_dos = INPUT.out_dos;
+    GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
 	LOC.out_dm = INPUT.out_dm;
 	ParaO.out_hs = INPUT.out_hs;
@@ -572,11 +572,11 @@ void Input_Conv::Convert(void)
 	ParaO.out_lowf = INPUT.out_lowf;
 #endif
 
-	en.dos_emin_ev = INPUT.dos_emin_ev;
-	en.dos_emax_ev = INPUT.dos_emax_ev;
-	en.dos_edelta_ev = INPUT.dos_edelta_ev;
-	en.dos_scale= INPUT.dos_scale;
-    en.bcoeff = INPUT.b_coef;
+	GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;
+	GlobalC::en.dos_emax_ev = INPUT.dos_emax_ev;
+	GlobalC::en.dos_edelta_ev = INPUT.dos_edelta_ev;
+	GlobalC::en.dos_scale= INPUT.dos_scale;
+    GlobalC::en.bcoeff = INPUT.b_coef;
 
 //----------------------------------------------------------
 // About LCAO

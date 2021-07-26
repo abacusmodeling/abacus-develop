@@ -94,7 +94,7 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 			set<size_t> radials;
 			for( const double &R : Rs[co1.first][co2.first] )
 			{
-				const double position = R * ucell.lat0 / MOT.dr;
+				const double position = R * GlobalC::ucell.lat0 / MOT.dr;
 				const size_t iq = static_cast<size_t>(position);
 				for( size_t i=0; i!=4; ++i )
 					radials.insert(iq+i);
@@ -113,9 +113,9 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 	for( auto &co1 : center2_orb22_s )
 	{
 		const size_t T = co1.first;
-		for (size_t IA=0; IA!=ucell.atoms[T].na; ++IA)
+		for (size_t IA=0; IA!=GlobalC::ucell.atoms[T].na; ++IA)
 		{
-			const Vector3<double> &tauA( ucell.atoms[T].tau[IA] );
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[T].tau[IA] );
 			GridD.Find_atom(tauA);
 
 			for( auto &co2 : co1.second )
@@ -162,16 +162,16 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	for( auto &co1 : center2_orb22_s )
 	{
 		const int TA = co1.first;
-		for (int IA=0; IA!=ucell.atoms[TA].na; ++IA)
+		for (int IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA)
 		{
-			const Vector3<double> &tauA( ucell.atoms[TA].tau[IA] );
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
 
 			for( auto &co2 : co1.second )
 			{
 				const size_t TB = co2.first;
-				for ( int IB=0; IB!=ucell.atoms[TB].na; ++IB )
+				for ( int IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauB( ucell.atoms[TB].tau[IB] );	
+					const Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );	
 					
 					matrixes[TA][IA][TB][IB].create( index_r[TA].count_size, index_c[TB].count_size );			
 														
@@ -192,7 +192,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 										for( int MB=0; MB!=2*LB+1; ++MB)
 										{
 											matrixes[TA][IA][TB][IB]( index_r[TA][LA][NA][MA], index_c[TB][LB][NB][MB] ) 
-											= co6.second.cal_overlap( tauA*ucell.lat0, tauB*ucell.lat0, MA, MA, MB, MB );
+											= co6.second.cal_overlap( tauA*GlobalC::ucell.lat0, tauB*GlobalC::ucell.lat0, MA, MA, MB, MB );
 											
 											// Peize Lin test
 //											cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<"\t"<<LA<<"\t"<<MA<<"\t"<<NA<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<"\t"<<endl; //co6.second.olm[0]<<endl;
@@ -224,7 +224,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<T<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }		
-		for (int IA=0; IA!=ucell.atoms[T].na; ++IA)
+		for (int IA=0; IA!=GlobalC::ucell.atoms[T].na; ++IA)
 		{
 // Peize Lin test 2015-04-05
 {
@@ -232,7 +232,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<" "<<IA<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }			
-			const Vector3<double> &tauA( ucell.atoms[T].tau[IA] );
+			const Vector3<double> &tauA( GlobalC::ucell.atoms[T].tau[IA] );
 
 			for( auto &co2 : co1.second )
 			{
@@ -259,7 +259,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<"    "<<co3.first<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }						
-						for (int IB=0; IB!=ucell.atoms[T].na; ++IB)
+						for (int IB=0; IB!=GlobalC::ucell.atoms[T].na; ++IB)
 						{
 // Peize Lin test 2015-04-05
 {
@@ -267,7 +267,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 	ss<<"     "<<IB<<endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }							
-							const Vector3<double> &tauB( ucell.atoms[T].tau[IB] );
+							const Vector3<double> &tauB( GlobalC::ucell.atoms[T].tau[IB] );
 
 							for( auto &co4 : co3.second )
 							{

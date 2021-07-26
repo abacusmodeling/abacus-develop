@@ -57,7 +57,7 @@ void LOOP_elec::set_matrix_grid(void)
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
 		GridD, 
-		ucell, 
+		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 
@@ -65,10 +65,10 @@ void LOOP_elec::set_matrix_grid(void)
 
 	// (3) Periodic condition search for each grid.
 	GridT.set_pbc_grid(
-			pw.ncx, pw.ncy, pw.ncz,
-			pw.bx, pw.by, pw.bz,
-			pw.nbx, pw.nby, pw.nbz,
-			pw.nbxx, pw.nbzp_start, pw.nbzp);
+			GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+			GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
+			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
+			GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
 	// (2) If k point is used here, allocate HlocR after atom_arrange.
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
@@ -117,7 +117,7 @@ void LOOP_elec::before_solver(const int &istep)
 	{
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			ZEROS(CHR.rho[is], pw.nrxx);
+			ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
 			stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
@@ -138,7 +138,7 @@ void LOOP_elec::before_solver(const int &istep)
 		CHR.renormalize_rho();
 
 		// initialize the potential
-		pot.init_pot( istep-1, pw.strucFac );
+		pot.init_pot( istep-1, GlobalC::pw.strucFac );
 	}
 
 
@@ -174,12 +174,12 @@ void LOOP_elec::solver(const int &istep)
 		}
 
 		// No exx
-		if( Exx_Global::Hybrid_Type::No==exx_global.info.hybrid_type  )
+		if( Exx_Global::Hybrid_Type::No==GlobalC::exx_global.info.hybrid_type  )
 		{
 			ELEC_scf es;
 			es.scf(istep-1);
 		}
-		else if( Exx_Global::Hybrid_Type::Generate_Matrix == exx_global.info.hybrid_type )
+		else if( Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type )
 		{
 			Exx_Opt_Orb exx_opt_orb;
 			exx_opt_orb.generate_matrix();
@@ -188,11 +188,11 @@ void LOOP_elec::solver(const int &istep)
 		{
 			ELEC_scf es;
 			es.scf(istep-1);
-			if( exx_global.info.separate_loop )
+			if( GlobalC::exx_global.info.separate_loop )
 			{
-				for( size_t hybrid_step=0; hybrid_step!=exx_global.info.hybrid_step; ++hybrid_step )
+				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
-					exx_global.info.set_xcfunc(xcf);
+					GlobalC::exx_global.info.set_xcfunc(xcf);
 					exx_lcao.cal_exx_elec();
 					
 					ELEC_scf es;
@@ -205,7 +205,7 @@ void LOOP_elec::solver(const int &istep)
 			}
 			else
 			{
-				exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(xcf);
 
 				ELEC_scf es;
 				es.scf(istep-1);

@@ -39,7 +39,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
     int ne = 0; 
 	
     // 0 stands for : 'Faln' is not used.
-    this->bessel_basis.init( 0, pw.ecutwfc, ucell.ntype, this->lmax );
+    this->bessel_basis.init( 0, GlobalC::pw.ecutwfc, GlobalC::ucell.ntype, this->lmax );
 	this->nmax = Numerical_Descriptor::bessel_basis.get_ecut_number();
     this->init_mu_index();
     this->init_label = true;
@@ -106,10 +106,10 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 	// 5. Generate descriptors for each atom 
 	//-------------------------------------
 	
-	for (int it=0; it<ucell.ntype; it++)
+	for (int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		GlobalV::ofs_running << ucell.atoms[it].label << " label" << endl;
-		for (int ia=0; ia<ucell.atoms[it].na; ia++)
+		GlobalV::ofs_running << GlobalC::ucell.atoms[it].label << " label" << endl;
+		for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			//--------------------------------------------------
 			// compute the number of descriptors for each atom
@@ -128,7 +128,7 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
 			// for each 'lmax' we have 'n' up to 'ecut_number'
 			this->generate_descriptor(overlap_Q1, overlap_Q2, it ,ia, d, nd);
 
-			ofs << ucell.atoms[it].label << " atom_index " << ia+1 << " n_descriptor " << nd << endl;
+			ofs << GlobalC::ucell.atoms[it].label << " atom_index " << ia+1 << " n_descriptor " << nd << endl;
 			for(int id=0; id<nd; ++id)
 			{
 				if(id>0 && id%8==0) ofs << endl;
@@ -239,7 +239,7 @@ void Numerical_Descriptor::jlq3d_overlap(
 	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
 	GlobalV::ofs_running << " Q = < J_it_ia_il_in_im | Psi_n, k > " << endl;
 
-	const double normalization = (4 * PI) / sqrt(ucell.omega);// Peize Lin add normalization 2015-12-29
+	const double normalization = (4 * PI) / sqrt(GlobalC::ucell.omega);// Peize Lin add normalization 2015-12-29
 
     const int total_lm = ( this->lmax + 1) * ( this->lmax + 1);
     matrix ylm(total_lm, np);
@@ -247,7 +247,7 @@ void Numerical_Descriptor::jlq3d_overlap(
     Vector3<double> *gk = new Vector3 <double> [np];
     for (int ig=0; ig<np; ig++)
     {
-        gk[ig] = wf.get_1qvec_cartesian(ik, ig);
+        gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
     }
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
@@ -260,15 +260,15 @@ void Numerical_Descriptor::jlq3d_overlap(
 
     double *flq = new double[np];
     complex<double> overlapQ = ZERO;
-    for (int T1 = 0; T1 < ucell.ntype; T1++)
+    for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
     {
-        for (int I1 = 0; I1 < ucell.atoms[T1].na; I1++)
+        for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
         {
-            complex<double> *sk = wf.get_sk(ik, T1, I1);
+            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
             for (int L=0; L< lmax+1; L++)
             {
                 GlobalV::ofs_running << " " << setw(5) << ik+1
-                            << setw(8) << ucell.atoms[T1].label
+                            << setw(8) << GlobalC::ucell.atoms[T1].label
                             << setw(8) << I1+1 
 							<< setw(8) << L
 							<< endl;
@@ -279,7 +279,7 @@ void Numerical_Descriptor::jlq3d_overlap(
                     for (int ig=0; ig<np; ig++)
                     {
                         flq[ig] = Numerical_Descriptor::bessel_basis.Polynomial_Interpolation2
-                                  (L, ie, gk[ig].norm() * ucell.tpiba );
+                                  (L, ie, gk[ig].norm() * GlobalC::ucell.tpiba );
                     }
 
                     for (int m=0; m<2*L+1; m++)
@@ -315,27 +315,27 @@ void Numerical_Descriptor::init_mu_index(void)
 	GlobalV::ofs_running << " Initialize the mu index for deepks" << endl;
 	GlobalV::ofs_running << " lmax = " << this->lmax << endl;
 	GlobalV::ofs_running << " nmax = " << this->nmax << endl;
-    Numerical_Descriptor::mu_index = new IntArray[ucell.ntype];
+    Numerical_Descriptor::mu_index = new IntArray[GlobalC::ucell.ntype];
 
 	assert(lmax>=0);
 	assert(nmax>0);
 	
 	int mu=0;
-	for (int it=0; it<ucell.ntype; ++it)
+	for (int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
 		this->mu_index[it].create(
-			ucell.atoms[it].na,
+			GlobalC::ucell.atoms[it].na,
 			lmax+1, // l starts from 0
 			nmax,
 			2*lmax+1); // m ==> 2*l+1
 
 		GlobalV::ofs_running << "Type " << it+1 
-		<< " number_of_atoms " << ucell.atoms[it].na
+		<< " number_of_atoms " << GlobalC::ucell.atoms[it].na
 		<< " number_of_L " << lmax+1
 		<< " number_of_n " << nmax
 		<< " number_of_m " << 2*lmax+1 << endl;
 
-        for (int ia=0; ia<ucell.atoms[it].na; ia++)
+        for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 				for (int l=0; l<lmax+1; l++)
 				{

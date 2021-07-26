@@ -117,11 +117,11 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		}
 	}
 
-	if(wf.start_wfc == "atomic" )
+	if(GlobalC::wf.start_wfc == "atomic" )
 	{
 		
 	}
-	else if(wf.start_wfc == "file")
+	else if(GlobalC::wf.start_wfc == "file")
 	{
 		int error;
 		cout << " Read in wave functions files: " << GlobalC::kv.nkstot << endl;

@@ -266,47 +266,47 @@ void Exx_Abfs::IO::print_matrix(
 {
 	auto print_header = [&]( ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
 	{
-		ofs << ucell.lat0 << endl;
+		ofs << GlobalC::ucell.lat0 << endl;
 
-		ofs << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-		ofs << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-		ofs << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+		ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+		ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 		
 		if( TA==TB )
 		{
 			ofs << 1 << " ntype" << endl;
-			ofs << ucell.atoms[TA].label << " label" << endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
 			if( IA==IB )
 			{
 				ofs << 1 << " na" << endl;
-				ofs << ucell.atoms[TA].tau[IA].x << " " 
-					<< ucell.atoms[TA].tau[IA].y << " " 
-					<< ucell.atoms[TA].tau[IA].z << endl;
+				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
+					<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
 			}
 			else
 			{
 				ofs << 2 << " na" << endl;
-				ofs << ucell.atoms[TA].tau[IA].x << " " 
-					<< ucell.atoms[TA].tau[IA].y << " "
-					<< ucell.atoms[TA].tau[IA].z << endl;
-				ofs << ucell.atoms[TB].tau[IB].x << " " 
-					<< ucell.atoms[TB].tau[IB].y << " " 
-					<< ucell.atoms[TB].tau[IB].z << endl;
+				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
+					<< GlobalC::ucell.atoms[TA].tau[IA].y << " "
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+				ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
+					<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
+					<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
 			}
 		}
 		else
 		{
 			ofs << 2 << " ntype" << endl;
-			ofs << ucell.atoms[TA].label << " label" << endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
 			ofs << 1 << " na" << endl;
-			ofs << ucell.atoms[TA].tau[IA].x << " " 
-				<< ucell.atoms[TA].tau[IA].y << " " 
-				<< ucell.atoms[TA].tau[IA].z << endl;
-			ofs << ucell.atoms[TB].label << " label" << endl;
+			ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
+				<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
+				<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+			ofs << GlobalC::ucell.atoms[TB].label << " label" << endl;
 			ofs << 1 << " na" << endl;
-			ofs << ucell.atoms[TB].tau[IB].x << " " 
-				<< ucell.atoms[TB].tau[IB].y << " " 
-				<< ucell.atoms[TB].tau[IB].z << endl;
+			ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
+				<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
+				<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
 		}
 		
 		// ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
@@ -486,18 +486,18 @@ void Exx_Abfs::IO::print_matrix(
 	
 	auto cal_R2 = []( const size_t TA, const size_t IA, const size_t TB, const size_t IB ) ->double	
 	{
-		Numerical_Orbital::set_position( ucell.atoms[TA].tau[IA], ucell.atoms[TB].tau[IB] );
-		const double R = Numerical_Orbital::get_distance()*ucell.lat0;
+		Numerical_Orbital::set_position( GlobalC::ucell.atoms[TA].tau[IA], GlobalC::ucell.atoms[TB].tau[IB] );
+		const double R = Numerical_Orbital::get_distance()*GlobalC::ucell.lat0;
 		return R*R;
 	};
 	
-	for( size_t TA=0; TA!=ucell.ntype; ++TA )
+	for( size_t TA=0; TA!=GlobalC::ucell.ntype; ++TA )
 	{
-		for( size_t IA=0; IA!=ucell.atoms[TA].na; ++IA )
+		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
 		{
-			for( size_t TB=TA; TB!=ucell.ntype; ++TB )
+			for( size_t TB=TA; TB!=GlobalC::ucell.ntype; ++TB )
 			{
-				for( size_t IB=((TB==TA)?IA:0); IB!=ucell.atoms[TB].na; ++IB )
+				for( size_t IB=((TB==TA)?IA:0); IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
 					ofstream ofs(( file_name_prefix+"matrix_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB) ).c_str());
 					print_header( ofs, TA, IA, TB, IB );

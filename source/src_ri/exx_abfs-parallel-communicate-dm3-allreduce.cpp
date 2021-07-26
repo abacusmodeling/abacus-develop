@@ -175,10 +175,10 @@ ofs<<__LINE__<<endl;
 /*
 vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_atom_in_2D() const
 {
-	vector<pair<bool,bool>> atom_in_2D(ucell.nat,{false,false});
+	vector<pair<bool,bool>> atom_in_2D(GlobalC::ucell.nat,{false,false});
 	for(int iwt=0; iwt<GlobalV::NLOCAL; ++iwt)
 	{
-		const int iat = ucell.iwt2iat[iwt];
+		const int iat = GlobalC::ucell.iwt2iat[iwt];
 		if(GlobalV::KS_SOLVER=="genelpa")
 		{
 			if(ParaO.trace_loc_col[iwt]>=0)
@@ -337,7 +337,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 		{
 			const size_t iat1 = H_pairs_tmp.first;
 			for(const size_t iat2 : H_pairs_tmp.second)
-				send_size_list[rank] += ucell.atoms[ucell.iat2it[iat1]].nw * ucell.atoms[ucell.iat2it[iat2]].nw;
+				send_size_list[rank] += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw * GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 		}
 		send_size_list[rank] *= sizeof(double);
 	}
@@ -347,9 +347,9 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 	{
 		size_t nw1=0, nw2=0;
 		for(size_t iat1 : pairs.first)
-			nw1 += ucell.atoms[ucell.iat2it[iat1]].nw;
+			nw1 += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw;
 		for(size_t iat2 : pairs.second)
-			nw2 += ucell.atoms[ucell.iat2it[iat2]].nw;
+			nw2 += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 		recv_size += nw1*nw1;
 	}
 	recv_size *= sizeof(double);

@@ -7,7 +7,7 @@ Ions_Move_Methods::~Ions_Move_Methods(){}
 
 void Ions_Move_Methods::allocate()
 {
-	Ions_Move_Basic::dim = ucell.nat * 3;
+	Ions_Move_Basic::dim = GlobalC::ucell.nat * 3;
 
 	if(GlobalV::MOVE_IONS=="bfgs")
 	{
@@ -76,9 +76,9 @@ void Ions_Move_Methods::cal_movement(const int &istep, const int &force_step, co
 	}
 	
 	//xiaohui modify 2015-03-15, cancel outputfile "STRU_ION"
-	//ucell.print_stru_file(ss.str(),1);
+	//GlobalC::ucell.print_stru_file(ss.str(),1);
 	ss << "_D";
-	ucell.print_stru_file(ss.str(),2);
+	GlobalC::ucell.print_stru_file(ss.str(),2);
 
 	return;
 }

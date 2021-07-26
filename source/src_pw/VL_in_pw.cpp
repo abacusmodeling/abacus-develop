@@ -30,9 +30,9 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 
 	this->allocate();
 	
-	for (int it = 0; it < ucell.ntype; it++) 
+	for (int it = 0; it < GlobalC::ucell.ntype; it++) 
 	{
-		const Atom* atom = &ucell.atoms[it];
+		const Atom* atom = &GlobalC::ucell.atoms[it];
 
 		ZEROS(vloc1d, nggm);
 
@@ -70,13 +70,13 @@ void pseudopot_cell_vl::init_vloc(const int &nggm, matrix &vloc_in)
 void pseudopot_cell_vl::allocate(void)
 {
 	if(GlobalV::test_pp>0) TITLE("pseudopot_cell_vl","allocate");
-	this->vloc.create(ucell.ntype, pw.nggm);
+	this->vloc.create(GlobalC::ucell.ntype, GlobalC::pw.nggm);
 
 	delete[] numeric;
-	this->numeric = new bool[ucell.ntype];
-	ZEROS(numeric, ucell.ntype);
+	this->numeric = new bool[GlobalC::ucell.ntype];
+	ZEROS(numeric, GlobalC::ucell.ntype);
 
-	for (int it = 0; it < ucell.ntype; it++)
+	for (int it = 0; it < GlobalC::ucell.ntype; it++)
 	{ 
 		this->numeric[it] = true; 
 	}
@@ -139,16 +139,16 @@ void pseudopot_cell_vl::vloc_of_g(
 	/*
 	for(ir=0; ir<msh; ir++)
 	{
-		aux[ir] = r[ir] * zp_in * e2 / ucell.omega;
+		aux[ir] = r[ir] * zp_in * e2 / GlobalC::ucell.omega;
 	}
 	Integral::Simpson_Integral(msh, aux, rab, vloc_1d[0] );
 	vloc_1d[0] *= 4*3.1415926;
-	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/pw.ngmc << endl;
-	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/pw.ncxyz << endl;
+	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ngmc << endl;
+	cout << "  vloc_1d[0]=" <<  vloc_1d[0]/GlobalC::pw.ncxyz << endl;
 	*/
 
 	// (1)
-	if(pw.ggs[0] < 1.0e-8)
+	if(GlobalC::pw.ggs[0] < 1.0e-8)
 	{
 		// first the g=0 term
 		for (ir=0; ir<msh; ir++) 
@@ -177,9 +177,9 @@ void pseudopot_cell_vl::vloc_of_g(
 
 	// here we perform the integral, after multiplying for the |G|
 	// dependent part
-	for (ig = igl0;ig < pw.nggm;ig++) 
+	for (ig = igl0;ig < GlobalC::pw.nggm;ig++) 
 	{
-		double gx2= pw.ggs [ig] * ucell.tpiba2;
+		double gx2= GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2;
 		double gx = std::sqrt(gx2);
 		for (ir = 0;ir < msh;ir++) 
 		{
@@ -190,8 +190,8 @@ void pseudopot_cell_vl::vloc_of_g(
 		vloc_1d[ig] -= fac * exp(- gx2 * 0.25)/ gx2;
 	} // enddo
 
-	const double d_fpi_omega = FOUR_PI/ucell.omega;//mohan add 2008-06-04
-	for (ig = 0;ig < pw.nggm; ig++)
+	const double d_fpi_omega = FOUR_PI/GlobalC::ucell.omega;//mohan add 2008-06-04
+	for (ig = 0;ig < GlobalC::pw.nggm; ig++)
 	{
 		vloc_1d[ig] *= d_fpi_omega;
 	}
@@ -208,14 +208,14 @@ void pseudopot_cell_vl::print_vloc(void)const
 	bool check_vl = true;
 	if(check_vl)
 	{
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			stringstream ss ;
-			ss << GlobalV::global_out_dir << ucell.atoms[it].label << "/v_loc_g.dat" ;
+			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/v_loc_g.dat" ;
 			ofstream ofs_vg( ss.str().c_str() );
-			for(int ig=0;ig<pw.nggm;ig++)
+			for(int ig=0;ig<GlobalC::pw.nggm;ig++)
 			{
-				ofs_vg << setw(15) << pw.ggs [ig] * ucell.tpiba2 
+				ofs_vg << setw(15) << GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2 
 				   	<< setw(15) << this->vloc(it, ig) << endl;
 			}
 			ofs_vg.close();

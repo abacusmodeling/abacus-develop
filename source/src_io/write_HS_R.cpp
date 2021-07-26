@@ -42,7 +42,7 @@ void LOOP_ions::output_HS_R(void)
         //     if(ik==0 || ik==GlobalC::kv.nks/2)
         //     {
         //         if(GlobalV::NSPIN==2)GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
-        //         for(int ir=0; ir<pw.nrxx; ir++)
+        //         for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         //         {
         //             pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
         //         }
@@ -71,7 +71,7 @@ void LOOP_ions::output_HS_R(void)
                     GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
                 }
 
-                for(int ir = 0; ir < pw.nrxx; ir++)
+                for(int ir = 0; ir < GlobalC::pw.nrxx; ir++)
                 {
                     pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
                 }

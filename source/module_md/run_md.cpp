@@ -38,7 +38,7 @@ void Run_md::ai_md_line(void)
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
-    ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
 
 	// setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
@@ -49,23 +49,23 @@ void Run_md::ai_md_line(void)
 	// because the number of element type
 	// will easily be ignored, so here
 	// I warn the user again for each type.
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		xcf.which_dft(ucell.atoms[it].dft);
+		xcf.which_dft(GlobalC::ucell.atoms[it].dft);
 	}
 
-    //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
+    //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
-        symm.analy_sys(ucell, GlobalC::out);
+        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    GlobalC::kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
+    GlobalC::kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
@@ -82,13 +82,13 @@ void Run_md::ai_md_line(void)
 		GlobalV::ofs_running,
 		UOT, 
 		ORB,
-		ucell.ntype,
-		ucell.lmax,
+		GlobalC::ucell.ntype,
+		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax, 
-		ucell.lat0, 
+		GlobalC::ucell.lat0, 
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
 		Exx_Abfs::Lmax,
@@ -102,10 +102,10 @@ void Run_md::ai_md_line(void)
 #endif
 
     // Initalize the plane wave basis set
-    pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
+    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
+    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
+    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
 
     // the symmetry of a variety of systems.
     if(GlobalV::CALCULATION == "test")
@@ -116,15 +116,15 @@ void Run_md::ai_md_line(void)
 
     // initialize the real-space uniform grid for FFT and parallel
     // distribution of plane waves
-    Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
-        pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+        GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 	// Inititlize the charge density.
-    CHR.allocate(GlobalV::NSPIN, pw.nrxx, pw.ngmc);
+    CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
-    pot.allocate(pw.nrxx);
+    pot.allocate(GlobalC::pw.nrxx);
     DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -146,7 +146,7 @@ void Run_md::ai_md_line(void)
 void Run_md::classic_md_line(void)
 {
 	// Setup the unitcell.
-    ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
 	DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
 	Print_Info PI;

@@ -22,19 +22,19 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<matrix> &DK_2D, const 
 		for(int iwt1_local=0; iwt1_local!=DK_2D[is].nr; ++iwt1_local)
 		{
 			const int iwt1 = ParaO.MatrixInfo.col_set[iwt1_local];
-			const int iat1 = ucell.iwt2iat[iwt1];
-			const int iw1 = ucell.iwt2iw[iwt1];
+			const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
+			const int iw1 = GlobalC::ucell.iwt2iw[iwt1];
 			for(int iwt2_local=0; iwt2_local!=DK_2D[is].nc; ++iwt2_local)
 			{
 				const int iwt2 = ParaO.MatrixInfo.row_set[iwt2_local];
-				const int iat2 = ucell.iwt2iat[iwt2];
-				const int iw2 = ucell.iwt2iw[iwt2];
+				const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
+				const int iw2 = GlobalC::ucell.iwt2iw[iwt2];
 				const double dm = DK_2D[is](iwt1_local,iwt2_local);
 				if(abs(dm) > threshold_D)
 				{
 					matrix &DR_a2D_box2 = DR_a2D[is][iat1][iat2][{0,0,0}];
 					if(!DR_a2D_box2.c)
-						DR_a2D_box2.create(ucell.atoms[ucell.iat2it[iat1]].nw, ucell.atoms[ucell.iat2it[iat2]].nw);
+						DR_a2D_box2.create(GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
 					DR_a2D_box2(iw1,iw2) = DK_2D[is](iwt1_local,iwt2_local) * SPIN_multiple;
 				}
 			}
@@ -65,19 +65,19 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 		for(int iwt1_local=0; iwt1_local!=DK_2D[ik].nr; ++iwt1_local)
 		{
 			const int iwt1 = ParaO.MatrixInfo.col_set[iwt1_local];
-			const int iat1 = ucell.iwt2iat[iwt1];
-			const int iw1 = ucell.iwt2iw[iwt1];
+			const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
+			const int iw1 = GlobalC::ucell.iwt2iw[iwt1];
 			for(int iwt2_local=0; iwt2_local!=DK_2D[ik].nc; ++iwt2_local)
 			{
 				const int iwt2 = ParaO.MatrixInfo.row_set[iwt2_local];
-				const int iat2 = ucell.iwt2iat[iwt2];
-				const int iw2 = ucell.iwt2iw[iwt2];
+				const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
+				const int iw2 = GlobalC::ucell.iwt2iw[iwt2];
 				for(const Abfs::Vector3_Order<int> &box2 : supercell_boxes)
 				{
 					matrix &DR_a2D_box2 = DR_a2D[GlobalC::kv.isk[ik]][iat1][iat2][box2];
 					if(!DR_a2D_box2.c)
-						DR_a2D_box2.create(ucell.atoms[ucell.iat2it[iat1]].nw, ucell.atoms[ucell.iat2it[iat2]].nw);
-					DR_a2D_box2(iw1,iw2) += real( DK_2D[ik](iwt1_local,iwt2_local) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*ucell.latvec))) ) * SPIN_multiple;
+						DR_a2D_box2.create(GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw);
+					DR_a2D_box2(iw1,iw2) += real( DK_2D[ik](iwt1_local,iwt2_local) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec))) ) * SPIN_multiple;
 				}
 			}
 		}

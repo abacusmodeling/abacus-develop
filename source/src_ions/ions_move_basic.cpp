@@ -24,10 +24,10 @@ void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const matrix &fo
 {
 	TITLE("Ions_Move_Basic","setup_gradient");
 	
-	assert(ucell.ntype>0);
+	assert(GlobalC::ucell.ntype>0);
 	assert(pos!=NULL);
 	assert(grad!=NULL);
-	assert(dim == 3*ucell.nat);
+	assert(dim == 3*GlobalC::ucell.nat);
 
 	ZEROS(pos, dim);
 	ZEROS(grad, dim);
@@ -36,25 +36,25 @@ void Ions_Move_Basic::setup_gradient(double* pos, double *grad, const matrix &fo
 	// the unit of pos: Bohr.
 	// the unit of force: Ry/Bohr.
 	// the unit of gradient: 
-	ucell.save_cartesian_position(pos);
+	GlobalC::ucell.save_cartesian_position(pos);
 	int iat=0;
-	for(int it = 0;it < ucell.ntype;it++)
+	for(int it = 0;it < GlobalC::ucell.ntype;it++)
 	{
-		Atom* atom = &ucell.atoms[it];
-		for(int ia =0;ia< ucell.atoms[it].na;ia++)
+		Atom* atom = &GlobalC::ucell.atoms[it];
+		for(int ia =0;ia< GlobalC::ucell.atoms[it].na;ia++)
 		{	
 			if(atom->mbl[ia].x == 1)
 			{
-				grad[3*iat  ] = -force(iat, 0)*ucell.lat0;
+				grad[3*iat  ] = -force(iat, 0)*GlobalC::ucell.lat0;
 				//this->grad[3*iat  ] = -force(iat, 0);
 			}
 			if(atom->mbl[ia].y == 1)
 			{
-				grad[3*iat+1] = -force(iat, 1)*ucell.lat0;
+				grad[3*iat+1] = -force(iat, 1)*GlobalC::ucell.lat0;
 			}
 			if(atom->mbl[ia].z == 1)
 			{
-				grad[3*iat+2] = -force(iat, 2)*ucell.lat0;
+				grad[3*iat+2] = -force(iat, 2)*GlobalC::ucell.lat0;
 				//cout << " grad=" << grad[3*iat+2] << endl;
 			}
 			++iat;
@@ -79,12 +79,12 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 		int iat=0;
 		GlobalV::ofs_running << "\n movement of ions (unit is Bohr) : " << endl;
 		GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
-		for(int it = 0;it < ucell.ntype;it++)
+		for(int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
-			for(int ia =0;ia< ucell.atoms[it].na;ia++)
+			for(int ia =0;ia< GlobalC::ucell.atoms[it].na;ia++)
 			{
 				stringstream ss;
-				ss << "move_" << ucell.atoms[it].label << ia+1;
+				ss << "move_" << GlobalC::ucell.atoms[it].label << ia+1;
 				GlobalV::ofs_running << " " 
 					<< setw(12) << ss.str().c_str()
 					<< setw(15) << move[3*iat+0] 
@@ -93,11 +93,11 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 				iat++;
 			}
 		}
-		assert( iat == ucell.nat );
+		assert( iat == GlobalC::ucell.nat );
 	}
 
 	const double move_threshold = 1.0e-10;
-	const int total_freedom = ucell.nat * 3;
+	const int total_freedom = GlobalC::ucell.nat * 3;
 	for(int i =0;i<total_freedom;i++)
 	{
 		if( abs(move[i]) > move_threshold )
@@ -105,20 +105,20 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 			pos[i] += move[i];
 		}
 	}
-	ucell.update_pos_tau(pos);
+	GlobalC::ucell.update_pos_tau(pos);
 
-	ucell.periodic_boundary_adjustment();
+	GlobalC::ucell.periodic_boundary_adjustment();
 	
-	ucell.bcast_atoms_tau();
+	GlobalC::ucell.bcast_atoms_tau();
 
 	//--------------------------------------------
 	// Print out the structure file.
 	//--------------------------------------------
-	ucell.print_tau();
+	GlobalC::ucell.print_tau();
 	//xiaohui modify 2015-03-15, cancel outputfile "STRU_NOW.xyz"
-	//ucell.print_cell_xyz("STRU_NOW.xyz");
+	//GlobalC::ucell.print_cell_xyz("STRU_NOW.xyz");
 	//xiaohui add out_stru, 2015-09-30
-	if(out_stru==1) ucell.print_cell_cif("STRU_NOW.cif");
+	if(out_stru==1) GlobalC::ucell.print_cell_cif("STRU_NOW.cif");
 	return;
 }
 
@@ -139,7 +139,7 @@ void Ions_Move_Basic::check_converged(const double *grad)
 		}
 	}
 	// mohan add 2010-08-06
-	Ions_Move_Basic::largest_grad /= ucell.lat0;
+	Ions_Move_Basic::largest_grad /= GlobalC::ucell.lat0;
 
 	if(GlobalV::test_ion_dynamics)
 	{	
@@ -219,9 +219,9 @@ void Ions_Move_Basic::terminate(void)
 	//-----------------------------------------------------------
 	// Print the structure.
 	//-----------------------------------------------------------
-	ucell.print_tau();
+	GlobalC::ucell.print_tau();
 	//xiaohui modify 2015-03-15, cancel outputfile "STRU_NOW.xyz"
-	//ucell.print_cell_xyz("STRU_NOW.xyz");
+	//GlobalC::ucell.print_cell_xyz("STRU_NOW.xyz");
 	return;
 }
 

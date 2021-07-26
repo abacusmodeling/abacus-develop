@@ -99,14 +99,14 @@ void Local_Orbital_Charge::sum_bands(void)
     TITLE("Local_Orbital_Charge","sum_bands");
     timer::tick("Local_Orbital_Cha","sum_bands");
 
-    en.eband = 0.0;
+    GlobalC::en.eband = 0.0;
 
     //xiaohui add 2013-09-02
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
         for (int ib=0; ib<GlobalV::NBANDS; ib++)
         {
-            en.eband += wf.ekb[ik][ib] * wf.wg(ik, ib);
+            GlobalC::en.eband += GlobalC::wf.ekb[ik][ib] * GlobalC::wf.wg(ik, ib);
         }
     } 
 
@@ -124,7 +124,7 @@ void Local_Orbital_Charge::sum_bands(void)
                 //density matrix has already been calculated.
                 timer::tick("LCAO_Charge","cal_dm_2d");
 
-                wfc_dm_2d.cal_dm(wf.wg);        // Peize Lin test 2019-01-16
+                wfc_dm_2d.cal_dm(GlobalC::wf.wg);        // Peize Lin test 2019-01-16
 
                 timer::tick("LCAO_Charge","cal_dm_2d");
 
@@ -143,14 +143,14 @@ void Local_Orbital_Charge::sum_bands(void)
         this->cal_dk_k( GridT );
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
-            wfc_dm_2d.cal_dm(wf.wg);
+            wfc_dm_2d.cal_dm(GlobalC::wf.wg);
 		}
     }
 
 
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        ZEROS( CHR.rho[is], pw.nrxx ); // mohan 2009-11-10
+        ZEROS( CHR.rho[is], GlobalC::pw.nrxx ); // mohan 2009-11-10
     }
 
     //------------------------------------------------------------

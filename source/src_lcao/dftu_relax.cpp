@@ -58,7 +58,7 @@ void DFTU_RELAX::force_stress()
 
 	if(GlobalV::FORCE)
 	{
-		for(int iat=0; iat<ucell.nat; iat++)
+		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
 			for(int dim=0; dim<3; dim++)
 			{
@@ -221,8 +221,8 @@ void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
   const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
   const complex<double> zero(0.0,0.0);
 	
-	vector<vector<complex<double>>> ftmp(ucell.nat);
-	for(int ia=0; ia<ucell.nat; ia++)
+	vector<vector<complex<double>>> ftmp(GlobalC::ucell.nat);
+	for(int ia=0; ia<GlobalC::ucell.nat; ia++)
 	{
 		ftmp.at(ia).resize(3, complex<double>(0.0,0.0)); //three dimension
 	}
@@ -309,7 +309,7 @@ void DFTU_RELAX::cal_force_k(const vector<vector<complex<double>>>& VU)
 			}//end ic
 		}//end ir
 
-		for(int iat=0; iat<ucell.nat; iat++)
+		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
 			complex<double> val = ftmp.at(iat).at(dim);
 			MPI_Allreduce(&val, &ftmp.at(iat).at(dim), 1, MPI_DOUBLE_COMPLEX, MPI_SUM, MPI_COMM_WORLD);
@@ -430,7 +430,7 @@ void DFTU_RELAX::cal_stress_k(const vector<vector<complex<double>>>& VU)
 	{
 		for(int j=0;j<3;j++)
 		{
-			this->stress_dftu.at(i).at(j) *=  ucell.lat0 / ucell.omega;
+			this->stress_dftu.at(i).at(j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
 		}
 	}
 
@@ -557,8 +557,8 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 	}//end ik
 
 	vector<vector<double>> ftmp;
-	ftmp.resize(ucell.nat);
-	for(int iat=0; iat<ucell.nat; iat++)
+	ftmp.resize(GlobalC::ucell.nat);
+	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		ftmp.at(iat).resize(3, 0.0);
 	}
@@ -586,7 +586,7 @@ void DFTU_RELAX::cal_force_gamma(const vector<vector<double>> &VU)
 	}//end dim
 
 
-	for(int iat=0; iat<ucell.nat; iat++)
+	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		for(int dim=0; dim<3; dim++)
 		{
@@ -705,7 +705,7 @@ void DFTU_RELAX::cal_stress_gamma(const vector<vector<double>> &VU)
 	{
 		for(int j=0;j<3;j++)
 		{
-			this->stress_dftu.at(i).at(j) *=  ucell.lat0 / ucell.omega;
+			this->stress_dftu.at(i).at(j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
 		}
 	}
 
@@ -754,27 +754,27 @@ void DFTU_RELAX::folding_dSm_soverlap()
 
 	  Vector3<double> tau1, tau2, dtau;
 	  Vector3<double> dtau1, dtau2, tau0;
-    for(int T1=0; T1<ucell.ntype; ++T1)
+    for(int T1=0; T1<GlobalC::ucell.ntype; ++T1)
     {
-		  Atom* atom1 = &ucell.atoms[T1];
+		  Atom* atom1 = &GlobalC::ucell.atoms[T1];
       for(int I1=0; I1<atom1->na; ++I1)
       {
 			  tau1 = atom1->tau[I1];
-        const int start1 = ucell.itiaiw2iwt(T1,I1,0);    
+        const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
 
-        GridD.Find_atom(ucell, tau1, T1, I1);
+        GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
         for(int ad=0; ad<GridD.getAdjacentNum()+1; ++ad)
         {
           const int T2 = GridD.getType(ad);
 				  const int I2 = GridD.getNatom(ad);
-          const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+          const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
-				  Atom* atom2 = &ucell.atoms[T2];
+				  Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
 				  tau2 = GridD.getAdjacentTau(ad);
 				  dtau = tau2 - tau1;
 
-				  double distance = dtau.norm() * ucell.lat0;
+				  double distance = dtau.norm() * GlobalC::ucell.lat0;
 				  double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
 
           bool adj = false;
@@ -785,15 +785,15 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  	{
 				  		const int T0 = GridD.getType(ad0); 
 				  		const int I0 = GridD.getNatom(ad0); 
-				  		const int iat0 = ucell.itia2iat(T0, I0);
-				  		const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
+				  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
+				  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
 				  		tau0 = GridD.getAdjacentTau(ad0);
 				  		dtau1 = tau0 - tau1;
 				  		dtau2 = tau0 - tau2;
 
-				  		double distance1 = dtau1.norm() * ucell.lat0;
-				  		double distance2 = dtau2.norm() * ucell.lat0;
+				  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
+				  		double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
 				  		double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
 				  		double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
@@ -885,8 +885,8 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  }// adj
 				  // else if(distance>=rcut)
 				  // {
-				  	// int start1 = ucell.itiaiw2iwt( T1, I1, 0);
-				  	// int start2 = ucell.itiaiw2iwt( T2, I2, 0);
+				  	// int start1 = GlobalC::ucell.itiaiw2iwt( T1, I1, 0);
+				  	// int start2 = GlobalC::ucell.itiaiw2iwt( T2, I2, 0);
 				  	// bool is_adj = false;
 				  	// for (int ad0=0; ad0<GridD.getAdjacentNum()+1; ++ad0)
 				  	// {
@@ -894,10 +894,10 @@ void DFTU_RELAX::folding_dSm_soverlap()
 				  		
 				  	// 	tau0 = GridD.getAdjacentTau(ad0);
 				  	// 	dtau1 = tau0 - tau1;
-				  	// 	double distance1 = dtau1.norm() * ucell.lat0;
+				  	// 	double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
 				  	// 	double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
 				  	// 	dtau2 = tau0 - tau2;
-				  	// 	double distance2 = dtau2.norm() * ucell.lat0;
+				  	// 	double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 				  	// 	double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
 				  	// 	if(distance1<rcut1 && distance2<rcut2)
 				  	// 	{

@@ -55,7 +55,7 @@ void energy::perform_dos_pw(void)
 						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<setw(6)<<ib+1<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<wf.wg(ik,ib)<<endl;
+							ofsi2<<setw(6)<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<endl;
 						}
 						ofsi2 <<endl;
 						ofsi2 <<endl;
@@ -80,10 +80,10 @@ void energy::perform_dos_pw(void)
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
 							ofsi2<<setw(6)<<ib+1
-							<<setw(25)<<wf.ekb[ik][ib]* Ry_to_eV
-							<<setw(25)<<wf.wg(ik,ib)
-							<<setw(25)<<wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
-							<<setw(25)<<wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
+							<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+							<<setw(25)<<GlobalC::wf.wg(ik,ib)
+							<<setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
 						}
 						ofsi2 <<endl;
 						ofsi2 <<endl;
@@ -104,14 +104,14 @@ void energy::perform_dos_pw(void)
 	if(this->out_dos)
 	{
 //find energy range
-		double emax = wf.ekb[0][0];
-		double emin = wf.ekb[0][0];
+		double emax = GlobalC::wf.ekb[0][0];
+		double emin = GlobalC::wf.ekb[0][0];
 		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
-				emax = std::max( emax, wf.ekb[ik][ib] );
-				emin = std::min( emin, wf.ekb[ik][ib] );
+				emax = std::max( emax, GlobalC::wf.ekb[ik][ib] );
+				emin = std::min( emin, GlobalC::wf.ekb[ik][ib] );
 			}
 		}
 
@@ -155,7 +155,7 @@ void energy::perform_dos_pw(void)
 					 this->dos_edelta_ev, 
 					 emax, 
 					 emin, 
-					 GlobalC::kv.nks, GlobalC::kv.nkstot, GlobalC::kv.wk, wf.wg, GlobalV::NBANDS, wf.ekb );
+					 GlobalC::kv.nks, GlobalC::kv.nkstot, GlobalC::kv.wk, GlobalC::wf.wg, GlobalV::NBANDS, GlobalC::wf.ekb );
 			 ifstream in(ss.str().c_str());
 			 if(!in)
 			 {
@@ -252,5 +252,26 @@ void energy::perform_dos_pw(void)
 	 }
 
 	}//out_dos=1
+	if(this->out_band) //pengfei 2014-10-13
+	{
+		int nks=0;
+		if(nspin0==1) 
+		{
+			nks = GlobalC::kv.nkstot;
+		}
+		else if(nspin0==2) 
+		{
+			nks = GlobalC::kv.nkstot/2;
+		}
+
+		for(int is=0; is<nspin0; is++)
+		{
+			stringstream ss2;
+			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
+			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << endl;
+			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);
+		}
+
+	}
 }
 

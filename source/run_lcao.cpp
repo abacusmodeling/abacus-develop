@@ -21,7 +21,7 @@ void Run_lcao::lcao_line(void)
     // Setup the unitcell.
     // improvement: a) separating the first reading of the atom_card and subsequent
     // cell relaxation. b) put GlobalV::NLOCAL and GlobalV::NBANDS as input parameters
-    ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
+    GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir, GlobalC::out, GlobalV::global_atom_card, GlobalV::ofs_running);
 	if(INPUT.test_just_neighbor)
 	{
 		//test_search_neighbor();
@@ -36,7 +36,7 @@ void Run_lcao::lcao_line(void)
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
 			GridD, 
-			ucell, 
+			GlobalC::ucell, 
 			GlobalV::SEARCH_RADIUS, 
 			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
@@ -50,23 +50,23 @@ void Run_lcao::lcao_line(void)
 	// because the number of element type
 	// will easily be ignored, so here
 	// I warn the user again for each type.
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		xcf.which_dft(ucell.atoms[it].dft);
+		xcf.which_dft(GlobalC::ucell.atoms[it].dft);
 	}
 
-    //ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
+    //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
-        symm.analy_sys(ucell, GlobalC::out);
+        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    GlobalC::kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, ucell.G, ucell.latvec );
+    GlobalC::kv.set(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information
@@ -81,13 +81,13 @@ void Run_lcao::lcao_line(void)
 		GlobalV::ofs_running,
 		UOT, 
 		ORB,
-		ucell.ntype,
-		ucell.lmax,
+		GlobalC::ucell.ntype,
+		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
 		INPUT.lcao_dk,
 		INPUT.lcao_dr,
 		INPUT.lcao_rmax, 
-		ucell.lat0, 
+		GlobalC::ucell.lat0, 
 		INPUT.out_descriptor,
 		INPUT.out_r_matrix,
 		Exx_Abfs::Lmax,
@@ -103,10 +103,10 @@ void Run_lcao::lcao_line(void)
 //--------------------------------------
 
     // Initalize the plane wave basis set
-    pw.gen_pw(GlobalV::ofs_running, ucell, GlobalC::kv);
+    GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
-    cout << " UNIFORM GRID DIM     : " << pw.nx <<" * " << pw.ny <<" * "<< pw.nz << endl;
-    cout << " UNIFORM GRID DIM(BIG): " << pw.nbx <<" * " << pw.nby <<" * "<< pw.nbz << endl;
+    cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << endl;
+    cout << " UNIFORM GRID DIM(BIG): " << GlobalC::pw.nbx <<" * " << GlobalC::pw.nby <<" * "<< GlobalC::pw.nbz << endl;
 
     // the symmetry of a variety of systems.
     if(GlobalV::CALCULATION == "test")
@@ -117,28 +117,28 @@ void Run_lcao::lcao_line(void)
 
     // initialize the real-space uniform grid for FFT and parallel
     // distribution of plane waves
-    Pgrid.init(pw.ncx, pw.ncy, pw.ncz, pw.nczp,
-        pw.nrxx, pw.nbz, pw.bz); // mohan add 2010-07-22, update 2011-05-04
+    Pgrid.init(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, GlobalC::pw.nczp,
+        GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 
 	// Inititlize the charge density.
-    CHR.allocate(GlobalV::NSPIN, pw.nrxx, pw.ngmc);
+    CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
-    pot.allocate(pw.nrxx);
+    pot.allocate(GlobalC::pw.nrxx);
     DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 
 	// Peize Lin add 2018-11-30
 	if(GlobalV::CALCULATION=="nscf")
 	{
-		switch(exx_global.info.hybrid_type)
+		switch(GlobalC::exx_global.info.hybrid_type)
 		{
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(xcf);
 				break;
 		}
 	}
@@ -146,7 +146,7 @@ void Run_lcao::lcao_line(void)
 	LOOP_cell lc;
 	lc.opt_cell();
 
-	en.perform_dos();
+	GlobalC::en.perform_dos();
 
 	timer::tick("Run_lcao","lcao_line");
     return;

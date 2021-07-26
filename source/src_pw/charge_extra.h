@@ -35,7 +35,7 @@ class Charge_Extra
 
 	private:
 
-	double*** rho_ion; //(dim, nspin, pw.nrxx)
+	double*** rho_ion; //(dim, nspin, GlobalC::pw.nrxx)
 	bool init_rho;
 	int dim;
 

@@ -9,12 +9,12 @@ double Force_LCAO_gamma::set_EDM_element(
     double ene = 0.0;
     for (int ib = 0; ib < GlobalV::NBANDS; ib++)
     {
-        const double w1 = wf.wg(is,ib);
+        const double w1 = GlobalC::wf.wg(is,ib);
         if(w1>0.0)
         {
             if(with_energy)
             {
-                ene += w1 * wf.ekb[is][ib] * coef1[is][ib][ii] * coef2[is][ib][jj];
+                ene += w1 * GlobalC::wf.ekb[is][ib] * coef1[is][ib][ii] * coef2[is][ib][jj];
             }
             else
             {
@@ -121,11 +121,11 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 				{
 					if(with_energy)
 					{
-						w1[ispin][ib] = wf.wg(ispin, ib + Total_Bands) * wf.ekb[ispin][ib + Total_Bands];
+						w1[ispin][ib] = GlobalC::wf.wg(ispin, ib + Total_Bands) * GlobalC::wf.ekb[ispin][ib + Total_Bands];
 					}
 					else
 					{
-						w1[ispin][ib] = wf.wg(ispin, ib + Total_Bands);
+						w1[ispin][ib] = GlobalC::wf.wg(ispin, ib + Total_Bands);
 					}
 				}
 			}
@@ -665,7 +665,7 @@ void Force_LCAO_gamma::cal_foverlap(
         {
             for(int ib=0; ib<GlobalV::NBANDS; ib++)
             {
-                wgEkb(is,ib) = wf.wg(is,ib) * wf.ekb[is][ib];
+                wgEkb(is,ib) = GlobalC::wf.wg(is,ib) * GlobalC::wf.ekb[is][ib];
             }
         }
 
@@ -678,7 +678,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
+            const int iat = GlobalC::ucell.iwt2iat[i];
             for(int j=0; j<GlobalV::NLOCAL; j++)
             {
                 const int mu = ParaO.trace_loc_row[j];
@@ -733,7 +733,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
+            const int iat = GlobalC::ucell.iwt2iat[i];
             for(int j=0; j<GlobalV::NLOCAL; j++)
             {
                 const int mu = ParaO.trace_loc_row[j];
@@ -784,7 +784,7 @@ void Force_LCAO_gamma::cal_foverlap(
             for(int j=0;j<3;j++)
             {
                 if(i<j) soverlap(j,i) = soverlap(i,j);
-				soverlap(i,j) *=  ucell.lat0 / ucell.omega;
+				soverlap(i,j) *=  GlobalC::ucell.lat0 / GlobalC::ucell.omega;
             }
         }
     }

@@ -31,21 +31,21 @@ void Run_MD_LCAO::opt_cell(void)
     // npwx, eigenvalues, and weights
     // npwx may change according to cell change
     // this function belongs to cell LOOP
-    wf.allocate_ekb_wg(GlobalC::kv.nks);
+    GlobalC::wf.allocate_ekb_wg(GlobalC::kv.nks);
 
     // Initialize the FFT.
     // this function belongs to cell LOOP
     GlobalC::UFFT.allocate();
 
-    // output is ppcell.vloc 3D local pseudopotentials
+    // output is GlobalC::ppcell.vloc 3D local pseudopotentials
     // this function belongs to cell LOOP
-    ppcell.init_vloc(pw.nggm, ppcell.vloc);
+    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
 
     // Initialize the sum of all local potentials.
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step=0;
-    pot.init_pot(ion_step, pw.strucFac);
+    pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 	
 	opt_ions();
@@ -86,7 +86,7 @@ void Run_MD_LCAO::opt_ions(void)
         LCM.allocate();
     }
 
-    MD_basic mdb(INPUT.mdp, ucell);
+    MD_basic mdb(INPUT.mdp, GlobalC::ucell);
     int mdtype = INPUT.mdp.mdtype;
 
     this->istep = 1;
@@ -109,7 +109,7 @@ void Run_MD_LCAO::opt_ions(void)
 		{
 			// setup vdwd2 parameters
 			vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(ucell);
+	        vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
@@ -118,16 +118,16 @@ void Run_MD_LCAO::opt_ions(void)
         // Peize Lin add 2014.04.04, update 2021.03.09
         if(vdwd2_para.flag_vdwd2)
         {
-            Vdwd2 vdwd2(ucell,vdwd2_para);
+            Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
             vdwd2.cal_energy();
-            en.evdw = vdwd2.get_energy();
+            GlobalC::en.evdw = vdwd2.get_energy();
         }
         // jiyy add 2019-05-18, update 2021.05.02
         else if(vdwd3_para.flag_vdwd3)
         {
-            Vdwd3 vdwd3(ucell,vdwd3_para);
+            Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
             vdwd3.cal_energy();
-            en.evdw = vdwd3.get_energy();
+            GlobalC::en.evdw = vdwd3.get_energy();
         }
 
 
@@ -139,7 +139,7 @@ void Run_MD_LCAO::opt_ions(void)
 		time_t eend = time(NULL);
 
         //xiaohui add 2014-07-07, for second-order extrapolation
-		CE.update_all_pos(ucell);
+		CE.update_all_pos(GlobalC::ucell);
 
 		if(mdtype==1||mdtype==2)   
 		{
@@ -171,7 +171,7 @@ void Run_MD_LCAO::opt_ions(void)
         time_t fend = time(NULL);
 
         //xiaohui add 2014-07-07, for second-order extrapolation
-		CE.save_pos_next(ucell);
+		CE.save_pos_next(GlobalC::ucell);
 
 		//xiaohui add CE.istep = istep 2014-07-07
 		CE.update_istep(istep);
@@ -185,7 +185,7 @@ void Run_MD_LCAO::opt_ions(void)
 		}
 		else
 		{
-			pot.init_pot( istep, pw.strucFac );
+			pot.init_pot( istep, GlobalC::pw.strucFac );
 		}
 
 
@@ -199,7 +199,7 @@ void Run_MD_LCAO::opt_ions(void)
             cout << setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
             << setw(5) << ELEC_scf::iter
-            << setw(18) << setprecision(6) << en.etot * Ry_to_eV;
+            << setw(18) << setprecision(6) << GlobalC::en.etot * Ry_to_eV;
 
             cout << setprecision(2) << setiosflags(ios::scientific)
             << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
@@ -244,15 +244,15 @@ void Run_MD_LCAO::final_scf(void)
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
 		GridD, 
-		ucell, 
+		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 
     GridT.set_pbc_grid(
-        pw.ncx, pw.ncy, pw.ncz,
-        pw.bx, pw.by, pw.bz,
-        pw.nbx, pw.nby, pw.nbz,
-        pw.nbxx, pw.nbzp_start, pw.nbzp);
+        GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
+        GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
+        GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
+        GlobalC::pw.nbxx, GlobalC::pw.nbzp_start, GlobalC::pw.nbzp);
 
     // (2) If k point is used here, allocate HlocR after atom_arrange.
     if(!GlobalV::GAMMA_ONLY_LOCAL)
@@ -290,15 +290,15 @@ void Run_MD_LCAO::final_scf(void)
 
     if(vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
     {
-        Vdwd2 vdwd2(ucell,vdwd2_para);
+        Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
         vdwd2.cal_energy();
-        en.evdw = vdwd2.get_energy();
+        GlobalC::en.evdw = vdwd2.get_energy();
     }
 	else if(vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
     {
-        Vdwd3 vdwd3(ucell,vdwd3_para);
+        Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
         vdwd3.cal_energy();
-        en.evdw = vdwd3.get_energy();
+        GlobalC::en.evdw = vdwd3.get_energy();
     }												  
     
 	ELEC_scf es;
@@ -306,7 +306,7 @@ void Run_MD_LCAO::final_scf(void)
 
     GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
     GlobalV::ofs_running << setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << en.etot * Ry_to_eV << " eV" << endl; 
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
     GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
 
     return;

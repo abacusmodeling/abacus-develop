@@ -22,6 +22,9 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"kpoint_file",GlobalV::global_kpoint_card,"the name of file containing k points");
 	OUTP(ofs,"pseudo_dir",GlobalV::global_pseudo_dir,"the directory containing pseudo files");
 	OUTP(ofs,"pseudo_type",GlobalV::global_pseudo_type,"the type pseudo files");
+	OUTP(ofs,"pseudo_rcut",pseudo_rcut,"cut-off radius for radial integration");
+	OUTP(ofs,"renormwithmesh",renormwithmesh,"0: use our own mesh to do radial renormalization; 1: use mesh as in QE");
+	OUTP(ofs,"lmaxmax",lmaxmax,"maximum of l channels used");
 	OUTP(ofs,"dft_functional",dft_functional,"exchange correlation functional");
 	OUTP(ofs,"calculation",calculation,"test; scf; relax; nscf; ienvelope; istate;");
 	OUTP(ofs,"ntype",ntype,"atom species number");
@@ -32,6 +35,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
+	OUTP(ofs,"tot_magnetization",tot_magnetization,"total magnetization of the system");
 
 	ofs << "\n#Parameters (2.PW)" << endl;
 	OUTP(ofs,"ecutwfc",ecutwfc,"#energy cutoff for wave functions");
@@ -60,6 +64,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nx",nx,"number of points along x axis for FFT grid");
 	OUTP(ofs,"ny",ny,"number of points along y axis for FFT grid");
 	OUTP(ofs,"nz",nz,"number of points along z axis for FFT grid");	
+	OUTP(ofs,"cell_factor",cell_factor,"used in the construction of the pseudopotential tables");	
 	
 	ofs << "\n#Parameters (3.Relaxation)" << endl;
 	OUTP(ofs,"ks_solver",GlobalV::KS_SOLVER,"cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
@@ -70,6 +75,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"force_thr",force_thr,"force threshold, unit: Ry/Bohr");
 	OUTP(ofs,"force_thr_ev",force_thr*13.6058/0.529177,"force threshold, unit: eV/Angstrom");
 	OUTP(ofs,"force_thr_ev2",force_thr_ev2,"force invalid threshold, unit: eV/Angstrom");
+	OUTP(ofs,"cg_threshold",cg_threshold,"threshold for switching from cg to bfgs, unit: eV/Angstrom");
 	OUTP(ofs,"stress_thr",stress_thr,"stress threshold");
 	OUTP(ofs,"press1",press1,"target pressure, unit: KBar");
 	OUTP(ofs,"press2",press2,"target pressure, unit: KBar");
@@ -103,6 +109,8 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"lcao_dr",lcao_dr,"delta r for 1D integration in LCAO");
 	OUTP(ofs,"lcao_rmax",lcao_rmax,"max R for 1D two-center integration table");
 	OUTP(ofs,"out_hs",out_hs,"output H and S matrix");
+	OUTP(ofs,"out_hs2",out_hs2,"output H(R) and S(R) matrix");
+	OUTP(ofs,"out_r",out_r_matrix,"output r(R) matrix");
 	OUTP(ofs,"out_lowf",out_lowf,"ouput LCAO wave functions");
 	OUTP(ofs,"bx",bx,"division of an element grid in FFT grid along x");
 	OUTP(ofs,"by",by,"division of an element grid in FFT grid along y");

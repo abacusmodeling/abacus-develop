@@ -131,8 +131,8 @@ void Grid_Technique::init_atoms_on_grid(void)
 	// (4) Find the atoms using
 	// when doing grid integration. 
 	delete[] in_this_processor;
-	this->in_this_processor = new bool[ucell.nat];
-	for(int i=0; i<ucell.nat; i++)
+	this->in_this_processor = new bool[GlobalC::ucell.nat];
+	for(int i=0; i<GlobalC::ucell.nat; i++)
 	{
 		in_this_processor[i] = false;
 	}
@@ -150,9 +150,9 @@ void Grid_Technique::init_atoms_on_grid(void)
 	int iat=0;
 	int normal;
 	this->total_atoms_on_grid = 0;
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			for(int im=0; im< this->meshball_ncells; im++)
 			{
@@ -259,9 +259,9 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	int count = 0;
 	int iat = 0;
 	ZEROS(this->how_many_atoms, nbxx);
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			// zero bigcell of meshball indicate ?
 			for(int im=0; im< this->meshball_ncells; im++)
@@ -359,7 +359,7 @@ void Grid_Technique::cal_trace_beta(void)
 
 	// mohan modify 2021-04-06
 	//int nkb=ORB.nkb;
-	int nkb=ppcell.nkb;
+	int nkb=GlobalC::ppcell.nkb;
 
 	this->trace_beta = new int[nkb];
 	for(int i=0; i<nkb; i++)
@@ -372,9 +372,9 @@ void Grid_Technique::cal_trace_beta(void)
 	int ih_local = 0;
 
 	GlobalV::ofs_running << "trace_beta" << endl;
-	for(int it=0; it<ucell.ntype; ++it)
+	for(int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
-		Atom* atom = &ucell.atoms[it];
+		Atom* atom = &GlobalC::ucell.atoms[it];
 		for(int ia=0; ia<atom->na; ++ia)
 		{
 			if(this->in_this_processor[iat])
@@ -408,7 +408,7 @@ void Grid_Technique::cal_trace_lo(void)
 	TITLE("Grid_Technique","cal_trace_lo");
 	// save the atom information in trace_lo,
 	// in fact the trace_lo dimension can be reduced
-	// to ucell.nat, but I think this is another way.
+	// to GlobalC::ucell.nat, but I think this is another way.
 	delete[] trace_lo;
 	this->trace_lo = new int[GlobalV::NLOCAL];
 	for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -423,14 +423,14 @@ void Grid_Technique::cal_trace_lo(void)
 	int iw_all=0;
 	int iw_local=0;
 
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			if(this->in_this_processor[iat])
 			{
 				++lnat;
-				int nw0 = ucell.atoms[it].nw;
+				int nw0 = GlobalC::ucell.atoms[it].nw;
 				if(GlobalV::NSPIN==4)
 				{//added by zhengdy-soc, need to be double in soc
 					nw0 *= 2;
@@ -438,7 +438,7 @@ void Grid_Technique::cal_trace_lo(void)
 				}
 				else
 				{
-					this->lgd += ucell.atoms[it].nw;
+					this->lgd += GlobalC::ucell.atoms[it].nw;
 				}
 				
 				for(int iw=0; iw<nw0; iw++)
@@ -451,8 +451,8 @@ void Grid_Technique::cal_trace_lo(void)
 			else
 			{
 				// global index of atomic orbitals
-				iw_all += ucell.atoms[it].nw;
-				if(GlobalV::NSPIN==4) iw_all += ucell.atoms[it].nw;
+				iw_all += GlobalC::ucell.atoms[it].nw;
+				if(GlobalV::NSPIN==4) iw_all += GlobalC::ucell.atoms[it].nw;
 			}
 			++iat;
 		}

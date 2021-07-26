@@ -28,13 +28,13 @@ T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const map<size_t,map<size_t
 			
 			for( int iw1=0; iw1!=H.nr; ++iw1 )
 			{
-				const int iwt1 = ucell.itiaiw2iwt( ucell.iat2it[iat1], ucell.iat2ia[iat1], iw1 );
+				const int iwt1 = GlobalC::ucell.itiaiw2iwt( GlobalC::ucell.iat2it[iat1], GlobalC::ucell.iat2ia[iat1], iw1 );
 				const int iwt1_m2D = ParaO.trace_loc_row[iwt1];
 				if( iwt1_m2D == -1 )	continue;
 				
 				for( int iw2=0; iw2!=H.nc; ++iw2 )
 				{
-					const int iwt2 = ucell.itiaiw2iwt( ucell.iat2it[iat2], ucell.iat2ia[iat2], iw2 );
+					const int iwt2 = GlobalC::ucell.itiaiw2iwt( GlobalC::ucell.iat2it[iat2], GlobalC::ucell.iat2ia[iat2], iw2 );
 					const int iwt2_m2D = ParaO.trace_loc_col[iwt2];
 					if( iwt2_m2D == -1 )	continue;
 					
@@ -62,7 +62,7 @@ template<>
 ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ComplexMatrix>(
 	matrix &&HR, const int ik, const Abfs::Vector3_Order<int> &box2) const
 {
-	return ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*ucell.latvec)) );
+	return ComplexMatrix(HR) * exp( TWO_PI*IMAG_UNIT * (GlobalC::kv.kvec_c[ik] * (box2*GlobalC::ucell.latvec)) );
 }
 
 template<typename Tmatrix>
@@ -84,13 +84,13 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 		for(auto & HR_a2D_A : HR_a2D[is])
 		{
 			const size_t iat1 = HR_a2D_A.first;
-			const size_t it1 = ucell.iat2it[iat1];
-			const size_t ia1 = ucell.iat2ia[iat1];
+			const size_t it1 = GlobalC::ucell.iat2it[iat1];
+			const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 			for(auto & HR_a2D_B : HR_a2D_A.second)
 			{
 				const size_t iat2 = HR_a2D_B.first;
-				const size_t it2 = ucell.iat2it[iat2];
-				const size_t ia2 = ucell.iat2ia[iat2];
+				const size_t it2 = GlobalC::ucell.iat2it[iat2];
+				const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
 				Tmatrix HK_a2D;
 				for(auto & HR_a2D_C : HR_a2D_B.second)
@@ -107,7 +107,7 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 					const int iw1_tmp = (GlobalV::NSPIN==4)
 						? (iw1*2+is/2)
 						: iw1;
-					const int iwt1 = ucell.itiaiw2iwt(it1,ia1,iw1_tmp);
+					const int iwt1 = GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1_tmp);
 					const int iwt1_m2D = ParaO.trace_loc_row[iwt1];
 					if(iwt1_m2D<0) continue;
 					for(int iw2=0; iw2!=HK_a2D.nc; ++iw2)
@@ -115,7 +115,7 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 						const int iw2_tmp = (GlobalV::NSPIN==4)
 							? (iw2*2+is%2)
 							: iw2;
-						const int iwt2 = ucell.itiaiw2iwt(it2,ia2,iw2_tmp);
+						const int iwt2 = GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2_tmp);
 						const int iwt2_m2D = ParaO.trace_loc_col[iwt2];
 						if(iwt2_m2D<0) continue;
 
