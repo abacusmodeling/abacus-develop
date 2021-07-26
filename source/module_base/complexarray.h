@@ -11,21 +11,16 @@ using namespace std;
 class ComplexArray
 {
 public:
-	int ndata;  // number of data elements;
 //	const static int datasize;	// = sizeof(complex);
-	complex<double> *ptr; // data array
+	complex<double> *ptr=nullptr; // data array
 	
-	ComplexArray(int bnd1 = 1);
-	ComplexArray(int bnd1, int bnd2, int bnd3);
-	ComplexArray(int bnd1, int bnd2, int bnd3, int bnd4);
+	ComplexArray(const int bnd1=0, const int bnd2=1, const int bnd3=1, const int bnd4=1);
 
 	~ComplexArray();
 
-	void init(int);
 	void freemem();
 
-	void create(int bnd1, int bnd2, int bnd3);
-	void create(int bnd1, int bnd2, int bnd3, int bnd4);
+	void create(const int bnd1=0, const int bnd2=1, const int bnd3=1, const int bnd4=1);
 
 	ComplexArray(const ComplexArray &cd);
 	ComplexArray(ComplexArray &&cd);
@@ -53,12 +48,12 @@ public:
 	void operator*=(const ComplexArray &in);
 
 	// subscript operator
-	complex < double> &operator()(int, int, int);
-	complex < double> &operator()(int, int, int, int);
+	complex < double> &operator()
+		(const int ind1=0, const int ind2=0, const int ind3=0, const int ind4=0);
 //  complex < double> &operator()(int, int, int, int, int);
 
-	const complex < double> &operator()(int, int, int)const;
-	const complex < double> &operator()(int, int, int, int)const;
+	const complex < double> &operator()
+		(const int ind1=0, const int ind2=0, const int ind3=0, const int ind4=0)const;
 //  const complex < double> &operator()(int, int, int, int, int)const;
 
 	void zero_out(void);
@@ -75,10 +70,11 @@ public:
 	int getBound2()const{ return bound2; }
 	int getBound3()const{ return bound3; }
 	int getBound4()const{ return bound4; }
-	int getSize()const{ return ndata; }
+	int getSize()const{ return bound1*bound2*bound3*bound4; }
 
 private:
 	int bound1, bound2, bound3, bound4;	
+	void init(const int size);
 };
 
 ComplexArray operator*(double r, const ComplexArray &cd);
