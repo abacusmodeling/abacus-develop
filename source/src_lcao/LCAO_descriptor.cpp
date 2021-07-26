@@ -15,15 +15,16 @@
 #include <npy.hpp>
 
 LCAO_Descriptor ld;
+
 LCAO_Descriptor::LCAO_Descriptor()
 {
     alpha_index = new IntArray[1];
     inl_index = new IntArray[1];
     inl_l = new int[1];
     d = new double[1];
-    H_V_delta = new double[1];
-    
+    H_V_delta = new double[1]; 
 }
+
 LCAO_Descriptor::~LCAO_Descriptor()
 {
     delete[] alpha_index;
@@ -129,7 +130,9 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
     
     return;
 }
-void LCAO_Descriptor::init_index()
+
+
+void LCAO_Descriptor::init_index(void)
 {
     
     delete[] this->alpha_index;
@@ -181,7 +184,10 @@ void LCAO_Descriptor::init_index()
     assert(GlobalC::ucell.nat * ORB.Alpha[0].getTotal_nchi() == inl);
     GlobalV::ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
     GlobalV::ofs_running << "total_descriptors " << this->n_descriptor << endl;
+	
+	return;
 }
+
 
 void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 {
@@ -235,7 +241,11 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                                 T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
                                         {
-                                            this->set_S_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0]);
+                                            this->set_S_mu_alpha(
+												iw1_all,  // index of numerical atomic orbital mu
+												inl_index[T2](I2,L2,N2), // index of alpha (for descriptor)
+												m2, 
+												olm[0]);// overlap value
                                         }
                                     }
                                     else
@@ -245,7 +255,13 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                             T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
                                         {
-                                            this->set_DS_mu_alpha(iw1_all, inl_index[T2](I2,L2,N2), m2, olm[0], olm[1], olm[2]);
+                                            this->set_DS_mu_alpha(
+												iw1_all, 
+												inl_index[T2](I2,L2,N2), 
+												m2, 
+												olm[0], // derivative for x direction 
+												olm[1], // derivative for y direction
+												olm[2]);// derivative for z direction
                                         }
                                     }
 
@@ -260,10 +276,12 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     }     // T1
     if (!GlobalV::GAMMA_ONLY_LOCAL)
     {
-        WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", "muti-kpoint method for descriptor is not implemented yet! ");
+        WARNING_QUIT("LCAO_Descriptor::build_S_descriptor", 
+		"muti-kpoint method for descriptor is not implemented yet! ");
     }
     return;
 }
+
 
 void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const int &im, const double &v)
 {
@@ -273,7 +291,7 @@ void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const i
     const int ir = iw1_all;
     const int ic = im;
     //const int index = ir * ParaO.ncol + ic;
-    int index;
+    int index=0; // mohan add 2021-07-26
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
     {
         index = ic * GlobalV::NLOCAL + ir;
@@ -286,7 +304,8 @@ void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const i
     return;
 }
 
-void LCAO_Descriptor::cal_projected_DM()
+
+void LCAO_Descriptor::cal_projected_DM(void)
 {
     TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
@@ -314,11 +333,39 @@ void LCAO_Descriptor::cal_projected_DM()
         double *a = dm;
         double *b = ss[inl];
         double *c = tmp_pdm;
-        dgemm_(&nt, &nt, &GlobalV::NLOCAL, &nm, &GlobalV::NLOCAL, &alpha, a, &GlobalV::NLOCAL, b, &GlobalV::NLOCAL, &beta, c, &GlobalV::NLOCAL); //DM*S
+
+        dgemm_(&nt, 
+			&nt, 
+			&GlobalV::NLOCAL, 
+			&nm, 
+			&GlobalV::NLOCAL, 
+			&alpha, 
+			a, 
+			&GlobalV::NLOCAL, 
+			b, 
+			&GlobalV::NLOCAL, 
+			&beta, 
+			c, 
+			&GlobalV::NLOCAL); //DM*S
+
         a = ss[inl];
         b = c;
         c = this->pdm[inl];
-        dgemm_(&t, &nt, &nm, &nm, &GlobalV::NLOCAL, &alpha, a, &GlobalV::NLOCAL, b, &GlobalV::NLOCAL, &beta, c, &nm); //ST*DM*S
+
+        dgemm_(
+			&t, 
+			&nt, 
+			&nm, 
+			&nm, 
+			&GlobalV::NLOCAL, 
+			&alpha, 
+			a, 
+			&GlobalV::NLOCAL, 
+			b, 
+			&GlobalV::NLOCAL, 
+			&beta, 
+			c, 
+			&nm); //ST*DM*S
     }
     
     delete[] tmp_pdm;
@@ -326,11 +373,12 @@ void LCAO_Descriptor::cal_projected_DM()
     return;
 }
 
-void LCAO_Descriptor::cal_descriptor()
+void LCAO_Descriptor::cal_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
     d = new double[this->n_descriptor];
+
     //==========print preparation=============
     GlobalV::ofs_running << " print out each DM_inl" << endl;
     ofstream ofs;
@@ -348,7 +396,10 @@ void LCAO_Descriptor::cal_descriptor()
     {
         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
-            ofs << GlobalC::ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << endl;
+            ofs << GlobalC::ucell.atoms[it].label << " atom_index " 
+			<< ia + 1 << " n_descriptor " 
+			<< this->des_per_atom << endl;
+
             for (int l = 0; l <= lmax; l++)
             {
                 int nmax = ORB.Alpha[0].getNchi(l);
@@ -411,7 +462,13 @@ void LCAO_Descriptor::cal_descriptor()
 
 
 
-void LCAO_Descriptor::print_projected_DM(ofstream& ofs, ComplexMatrix& des, const int& it, const int& ia, const int& l, const int& n)
+void LCAO_Descriptor::print_projected_DM(
+	ofstream& ofs, 
+	ComplexMatrix& des, 
+	const int& it, 
+	const int& ia, 
+	const int& l, 
+	const int& n)
 {
     ofs << "L=" << l << "   N=" << n << endl;
     for (int i = 0; i < 2 * l + 1; i++)
@@ -424,7 +481,8 @@ void LCAO_Descriptor::print_projected_DM(ofstream& ofs, ComplexMatrix& des, cons
     }
     return;
 }
-void LCAO_Descriptor::print_descriptor()
+
+void LCAO_Descriptor::print_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "print_descriptor");
     ofstream ofs;
@@ -440,12 +498,17 @@ void LCAO_Descriptor::print_descriptor()
     {
         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
-            ofs << GlobalC::ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << endl;
+            ofs << GlobalC::ucell.atoms[it].label << " atom_index " 
+			<< ia + 1 << " n_descriptor " << this->des_per_atom << endl;
+
             int id0 = this->alpha_index[it](ia, 0, 0, 0);
+
             for (int id = id0; id < id0 + this->des_per_atom; ++id)
             {
                 if ((id - id0) > 0 && (id - id0) % 8 == 0)
+				{
                     ofs << endl;
+				}
                 ofs << d[id] << " ";
             }
             ofs << endl << endl;
@@ -456,8 +519,13 @@ void LCAO_Descriptor::print_descriptor()
     return;
 }
 
-void LCAO_Descriptor::set_DS_mu_alpha(const int& iw1_all, const int& inl, const int& im,
-    const double& vx, const double& vy, const double& vz)
+void LCAO_Descriptor::set_DS_mu_alpha(
+	const int& iw1_all, 
+	const int& inl, 
+	const int& im,
+    const double& vx, 
+	const double& vy, 
+	const double& vz)
 {
     //const int ir = ParaO.trace_loc_row[iw1_all];
     //const int ic = ParaO.trace_loc_col[iw2_all];
@@ -563,7 +631,7 @@ void LCAO_Descriptor::init_gdmx()
     return;
 }
 
-void LCAO_Descriptor::del_gdmx()
+void LCAO_Descriptor::del_gdmx(void)
 {
     for (int iat = 0;iat < GlobalC::ucell.nat;iat++)
     {
