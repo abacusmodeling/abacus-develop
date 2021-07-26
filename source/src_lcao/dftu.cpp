@@ -96,18 +96,14 @@ void DFTU::init(
 	{
 		this->force_dftu.resize(cell.nat);
 		for(int ia=0; ia<cell.nat; ia++)
-		{
 			this->force_dftu.at(ia).resize(3, 0.0);
-		}
 	}
 
 	if(STRESS)
 	{
 		this->stress_dftu.resize(3);
 		for(int dim=0; dim<3; dim++)
-		{
 			this->stress_dftu.at(dim).resize(3, 0.0);
-		}
 	}
 
 	this->locale.resize(cell.nat);
@@ -1640,117 +1636,4 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 
   // timer::tick("DFTU","folding_overlap_matrix");
 	return;
-}
-
-void DFTU::cal_VU_pot_mat_complex(const int spin, const int newlocale, complex<double>* VU)
-{
-  TITLE("DFTU","cal_VU_pot_mat_complex"); 
-	// timer::tick("DFTU","folding_overlap_matrix");
-  ZEROS(VU, ParaO.nloc);
-
-  for(int it=0; it<ucell.ntype; ++it)
-	{
-    if(INPUT.orbital_corr[it]==-1) continue;
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
-		{
-      const int iat = ucell.itia2iat(it, ia);
-			for(int L=0; L<=ucell.atoms[it].nwl; L++)
-			{			
-        if(L!=INPUT.orbital_corr[it] ) continue;
-
-				for(int n=0; n<ucell.atoms[it].l_nchi[L]; n++)
-				{
-					// if(Yukawa)
-			    // {
-			    	// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
-			    // }
-			    // else
-			    // {
-			    	if(n!=0) continue;
-			    // }
-          for(int m1=0; m1<2*L+1; m1++)
-          {
-            for(int ipol1=0; ipol1<NPOL; ipol1++)
-		  		  {
-		  			  const int mu = ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
-              if(mu<0) continue;
-
-              for(int m2=0; m2<2*L+1; m2++)
-              {
-                for(int ipol2=0; ipol2<NPOL; ipol2++)
-                {
-                  const int nu = ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
-                  if(nu<0) continue;
-
-                  int m1_all = m1 + (2*L+1)*ipol1;
-			            int m2_all = m2 + (2*L+1)*ipol2;
-                  
-                  double val = get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
-			            VU[nu*ParaO.nrow + mu] = complex<double>(val, 0.0);
-                }//ipol2
-              }//m2
-            }//ipol1
-          }//m1
-				}//n
-			}//l
-		}//ia	
-	}//it
-
-  return;
-}
-
-void DFTU::cal_VU_pot_mat_real(const int spin, const int newlocale, double* VU)
-{
-  TITLE("DFTU","cal_VU_pot_mat_real"); 
-	// timer::tick("DFTU","folding_overlap_matrix");
-  ZEROS(VU, ParaO.nloc);
-
-  for(int it=0; it<ucell.ntype; ++it)
-	{
-    if(INPUT.orbital_corr[it]==-1) continue;
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
-		{
-      const int iat = ucell.itia2iat(it, ia);
-			for(int L=0; L<=ucell.atoms[it].nwl; L++)
-			{			
-        if(L!=INPUT.orbital_corr[it] ) continue;
-
-				for(int n=0; n<ucell.atoms[it].l_nchi[L]; n++)
-				{
-					// if(Yukawa)
-			    // {
-			    	// if(L1<INPUT.orbital_corr[T1] || L2<INPUT.orbital_corr[T2]) continue;
-			    // }
-			    // else
-			    // {
-			    	if(n!=0) continue;
-			    // }
-          for(int m1=0; m1<2*L+1; m1++)
-          {
-            for(int ipol1=0; ipol1<NPOL; ipol1++)
-		  		  {
-		  			  const int mu = ParaO.trace_loc_row[this->iatlnmipol2iwt[iat][L][n][m1][ipol1]];
-              if(mu<0) continue;
-              for(int m2=0; m2<2*L+1; m2++)
-              {
-                for(int ipol2=0; ipol2<NPOL; ipol2++)
-                {
-                  const int nu = ParaO.trace_loc_col[this->iatlnmipol2iwt[iat][L][n][m2][ipol2]];
-                  if(nu<0) continue;
-
-                  int m1_all = m1 + (2*L+1)*ipol1;
-			            int m2_all = m2 + (2*L+1)*ipol2;
-                  
-                  VU[nu*ParaO.nrow + mu] = get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
-
-                }//ipol2
-              }//m2
-            }//ipol1
-          }//m1
-				}//n
-			}//l
-		}//ia	
-	}//it
-
-  return;
 }
