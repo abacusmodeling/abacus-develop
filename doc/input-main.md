@@ -13,6 +13,10 @@
     
         [basis_type](#basis-type) | [ks_solver](#ks-solver) | [smearing](#smearing) | [sigma](#sigma) | [mixing_type](#mixing-type) | [mixing_beta](#mixing-beta) | [mixing_ndim](#mixing-ndim) | [mixing_gg0](#mixing-gg0) | [gamma_only](#gamma-only) | [printe](#printe) | [niter](#niter) | [diago_cg_maxiter](#diago-cg-maxiter) | [diago_david_ndim](#diago-david-ndim) | [dr2](#dr2) | [charge_extrap](#charge-extrap) | [out_charge](#out-charge) | [out_potential](#out-potential) | [out_dm](#out-dm) | [out_wf](#out-wf) | [out_lowf](#out-lowf) | [out_dos](#out-dos) | [out_band](#out-band) | [mulliken](#mulliken) | [out_alllog](#out-alllog) | [force](#force) | [nstep](#nstep) | [force_thr](#force-thr) | [force_thr_ev](#force-thr-ev) | [bfgs_w1](#bfgs-w1) | [bfgs_w2](#bfgs-w2) | [trust_radius_max](#trust-radius-max) | [trust_radius_min](#trust-radius-min) | [trust_radius_ini](#trust-radius-ini) | [stress](#stress) | [stress_thr](#stress-thr) | [press](#press) | [fixed_axes](#fixed-axes) | [move_method](#move-method)
         
+    - [exact_exchange](#exact_exchange)
+    
+        [exx_hybrid_type](#exx_hybrid_type) | [exx_hybrid_alpha](#exx_hybrid_alpha) | [exx_hse_omega](#exx_hse_omega) | [exx_separate_loop](#exx_separate_loop) | [exx_hybrid_step](#exx_hybrid_step) | [exx_lambda](#exx_lambda) | 
+        
     - [Molecular dynamics](#molecular-dynamics)
     
         [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_nresn](#md-nresn) | [md_dumpmdfred](#md-dumpmdfred) | [md_domsd](#md-domsd) | [md_fixtemperature](#md-fixtemperature) | [md_msdstarttime](#md-msdstarttime)
