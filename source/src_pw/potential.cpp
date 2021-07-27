@@ -179,13 +179,13 @@ void Potential::init_pot(
         }
 		
 		// Peize Lin add 2020.04.04
-		if(restart.info_load.load_charge && !restart.info_load.load_charge_finish)
+		if(GlobalC::restart.info_load.load_charge && !GlobalC::restart.info_load.load_charge_finish)
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				restart.load_disk("charge", is);
+				GlobalC::restart.load_disk("charge", is);
 			}
-			restart.info_load.load_charge_finish = true;
+			GlobalC::restart.info_load.load_charge_finish = true;
 		}
     }
     else

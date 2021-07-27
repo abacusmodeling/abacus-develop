@@ -439,31 +439,31 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------	
 	if(INPUT.restart_save)
 	{
-		restart.folder = GlobalV::global_out_dir + "restart/";
-		const string command0 =  "test -d " + restart.folder + " || mkdir " + restart.folder;
+		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
+		const string command0 =  "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if(GlobalV::MY_RANK==0)
 			system( command0.c_str() );
 		if(INPUT.exx_hybrid_type=="no")
 		{
-			restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_charge = true;
 		}
 		else
 		{
-			restart.info_save.save_charge = true;
-			restart.info_save.save_H = true;
+			GlobalC::restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_H = true;
 		}
 	}
 	if(INPUT.restart_load)
 	{
-		restart.folder = GlobalV::global_out_dir + "restart/";
+		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
 		if(INPUT.exx_hybrid_type=="no")
 		{
-			restart.info_load.load_charge = true;
+			GlobalC::restart.info_load.load_charge = true;
 		}
 		else
 		{
-			restart.info_load.load_charge = true;
-			restart.info_load.load_H = true;
+			GlobalC::restart.info_load.load_charge = true;
+			GlobalC::restart.info_load.load_H = true;
 		}
 	}
 

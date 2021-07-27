@@ -109,14 +109,14 @@ void ELEC_evolve::evolve_psi(
 		}
 
 		// Peize Lin add at 2020.04.04
-		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
+		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			restart.load_disk("H", ik);
-			restart.info_load.load_H_finish = true;
+			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.info_load.load_H_finish = true;
 		}			
-		if(restart.info_save.save_H)
+		if(GlobalC::restart.info_save.save_H)
 		{
-			restart.save_disk("H", ik);
+			GlobalC::restart.save_disk("H", ik);
 		}
 
 		bool diago = true;

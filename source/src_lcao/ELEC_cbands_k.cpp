@@ -101,14 +101,14 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		timer::tick("Efficience","H_k");
 
 		// Peize Lin add at 2020.04.04
-		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
+		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			restart.load_disk("H", ik);
-			restart.info_load.load_H_finish = true;
+			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.info_load.load_H_finish = true;
 		}			
-		if(restart.info_save.save_H)
+		if(GlobalC::restart.info_save.save_H)
 		{
-			restart.save_disk("H", ik);
+			GlobalC::restart.save_disk("H", ik);
 		}
 
 		// write the wave functions into LOWF.WFC_K[ik].

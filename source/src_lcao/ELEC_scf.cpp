@@ -351,11 +351,11 @@ void ELEC_scf::scf(const int &istep)
 			|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type
 			|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type)
 		{
-			if(restart.info_load.load_H && restart.info_load.load_H_finish && !restart.info_load.restart_exx)
+			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 				exx_lcao.cal_exx_elec();
-				restart.info_load.restart_exx = true;
+				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
 
@@ -399,11 +399,11 @@ void ELEC_scf::scf(const int &istep)
 		GlobalC::CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
 
 		// Peize Lin add 2020.04.04
-		if(restart.info_save.save_charge)
+		if(GlobalC::restart.info_save.save_charge)
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
-				restart.save_disk("charge", is);
+				GlobalC::restart.save_disk("charge", is);
 			}
 		}
 
