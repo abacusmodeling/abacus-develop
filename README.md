@@ -80,6 +80,7 @@ make sure these files are prepared and stored in the working directory.
 
     Specifications of the STRU file can be found in this [short instruction](doc/input-stru.md).
 - The k-point file
+- 
     The default name is KPT. It contains the information of the k-grid setting for the Brillouin zone sampling.
 
     Specification of the k-point file can be found in this [short instruction](doc/input-kpt.md).
