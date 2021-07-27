@@ -51,7 +51,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	Symmetry_rho srho;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, GlobalC::symm);
+		srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
 	}
 
 	// conv_elec is a member of Threshold_Elec
@@ -214,7 +214,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, GlobalC::symm);
+			srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
 		}
 
 
