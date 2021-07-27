@@ -674,8 +674,8 @@ void Exx_Lip::read_q_pack()
 
 	q_pack->kv_ptr = new K_Vectors();
 	const string exx_kpoint_card = GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card;
-	q_pack->kv_ptr->set( symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec );
-//	q_pack->kv_ptr->set( symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec, &Pkpoints );
+	q_pack->kv_ptr->set( GlobalC::symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec );
+//	q_pack->kv_ptr->set( GlobalC::symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec, &Pkpoints );
 
 
 	q_pack->wf_ptr = new wavefunc();

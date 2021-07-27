@@ -21,9 +21,9 @@ UnitCell_pseudo ucell;
 xcfunc xcf;
 Charge_Broyden CHR;
 Potential pot;
+Symmetry symm;
 }
 
-Symmetry symm;
 //Magnetism mag;
 
 Parallel_Grid Pgrid; //mohan add 2010-06-06 

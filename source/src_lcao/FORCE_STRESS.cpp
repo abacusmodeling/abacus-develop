@@ -405,7 +405,7 @@ void Force_Stress_LCAO::getForceStress(
 
 		if(Symmetry::symm_flag)
 		{
-			symm.stress_symmetry(scs, GlobalC::ucell);
+			GlobalC::symm.stress_symmetry(scs, GlobalC::ucell);
 		}//end symmetry
 
 		// print Rydberg stress or not
@@ -743,8 +743,8 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 			pos[3*iat+2] = GlobalC::ucell.atoms[it].taud[ia].z;
 			for(int k=0; k<3; ++k)
 			{
-				symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
-				symm.check_boundary( pos[iat*3+k] );
+				GlobalC::symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
+				GlobalC::symm.check_boundary( pos[iat*3+k] );
 			}
 			iat++;
 		}
@@ -760,7 +760,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 
 		fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
 	}
-	symm.force_symmetry(fcs , pos, GlobalC::ucell);
+	GlobalC::symm.force_symmetry(fcs , pos, GlobalC::ucell);
 	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
 		Mathzone::Direct_to_Cartesian(fcs(iat,0),fcs(iat,1),fcs(iat,2),
@@ -771,7 +771,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 
 		fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
 	}
-	//cout << "nrotk =" << symm.nrotk << endl;
+	//cout << "nrotk =" << GlobalC::symm.nrotk << endl;
 	delete[] pos;
 	return;
 }

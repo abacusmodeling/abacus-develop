@@ -132,8 +132,8 @@ void Forces::init(matrix& force)
 				pos[3*iat+2] = GlobalC::ucell.atoms[it].taud[ia].z;
 				for(int k=0; k<3; ++k)
 				{
-					symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
-					symm.check_boundary( pos[iat*3+k] );
+					GlobalC::symm.check_translation( pos[iat*3+k], -floor(pos[iat*3+k]));
+					GlobalC::symm.check_boundary( pos[iat*3+k] );
 				}
 				iat++;				
 			}
@@ -149,7 +149,7 @@ void Forces::init(matrix& force)
 			
 			force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
 		}
-		symm.force_symmetry(force , pos, GlobalC::ucell);
+		GlobalC::symm.force_symmetry(force , pos, GlobalC::ucell);
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
 			Mathzone::Direct_to_Cartesian(force(iat,0),force(iat,1),force(iat,2),
@@ -159,7 +159,7 @@ void Forces::init(matrix& force)
                                         d1,d2,d3);
 			force(iat,0) = d1;force(iat,1) = d2;force(iat,2) = d3;
 		}
-		// cout << "nrotk =" << symm.nrotk << endl;
+		// cout << "nrotk =" << GlobalC::symm.nrotk << endl;
 		delete[] pos;
 		
 	}

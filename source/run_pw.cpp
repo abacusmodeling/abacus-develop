@@ -44,12 +44,12 @@ void Run_pw::plane_wave_line(void)
     // symmetry analysis should be performed every time the cell is changed
     if (Symmetry::symm_flag)
     {
-        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
     // Setup the k points according to symmetry.
-    GlobalC::kv.set( symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
+    GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // print information

@@ -127,7 +127,7 @@ void Electrons::self_consistent(const int &istep)
     Symmetry_rho srho;
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, symm);
+        srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, GlobalC::symm);
     }
 
     // conv_elec is a member of Threshold_Elec
@@ -233,7 +233,7 @@ void Electrons::self_consistent(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, symm);
+			srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, GlobalC::symm);
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)

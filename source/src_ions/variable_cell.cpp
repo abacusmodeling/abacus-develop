@@ -14,11 +14,11 @@ void Variable_Cell::init_after_vc(void)
 
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
-    GlobalC::kv.set_after_vc(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
+    GlobalC::kv.set_after_vc(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
     DONE(GlobalV::ofs_running, "INIT K-POINTS");
 
     GlobalC::pw.update_gvectors(GlobalV::ofs_running, GlobalC::ucell);
@@ -78,13 +78,13 @@ void Variable_Cell::final_calculation_after_vc(void)
     // (6) symmetry analysize.
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
 
     // (7) Setup the k points according to symmetry.
-    GlobalC::kv.set( symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
+    GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // (1) Init the plane wave.
