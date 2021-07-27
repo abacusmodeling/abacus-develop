@@ -36,9 +36,9 @@ void Forces::init(matrix& force)
 	matrix stress_vdw_pw;//.create(3,3);
     matrix force_vdw;
     force_vdw.create(nat, 3);
-	if(vdwd2_para.flag_vdwd2)													//Peize Lin add 2014.04.03, update 2021.03.09
+	if(GlobalC::vdwd2_para.flag_vdwd2)													//Peize Lin add 2014.04.03, update 2021.03.09
 	{
-        Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
+        Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
 		vdwd2.cal_force();
 		for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 		{
@@ -51,9 +51,9 @@ void Forces::init(matrix& force)
 			Forces::print("VDW      FORCE (Ry/Bohr)", force_vdw);
 		}
 	}
-	else if(vdwd3_para.flag_vdwd3)													//jiyy add 2019-05-18, update 2021-05-02
+	else if(GlobalC::vdwd3_para.flag_vdwd3)													//jiyy add 2019-05-18, update 2021-05-02
 	{
-        Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
+        Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
 		vdwd3.cal_force();
 		for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 		{
@@ -92,7 +92,7 @@ void Forces::init(matrix& force)
 					+ forcecc(iat, ipol)
 					+ forcescc(iat, ipol);
 
-				if(vdwd2_para.flag_vdwd2 || vdwd3_para.flag_vdwd3)		//linpz and jiyy added vdw force, modified by zhengdy
+				if(GlobalC::vdwd2_para.flag_vdwd2 || GlobalC::vdwd3_para.flag_vdwd3)		//linpz and jiyy added vdw force, modified by zhengdy
 				{
                     force(iat, ipol) += force_vdw(iat, ipol);
                 }																										   

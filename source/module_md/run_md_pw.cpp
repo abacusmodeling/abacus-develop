@@ -69,22 +69,22 @@ void Run_MD_PW::md_ions_pw(void)
         if(INPUT.vdw_method=="d2")
         {
             // setup vdwd2 parameters
-	        vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(GlobalC::ucell);
+	        GlobalC::vdwd2_para.initial_parameters(INPUT);
+	        GlobalC::vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
-            vdwd3_para.initial_parameters(INPUT);
+            GlobalC::vdwd3_para.initial_parameters(INPUT);
         }
-        if (vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-03, update 2021-03-09
+        if (GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-03, update 2021-03-09
         {
-            Vdwd2 vdwd2(GlobalC::ucell, vdwd2_para);
+            Vdwd2 vdwd2(GlobalC::ucell, GlobalC::vdwd2_para);
             vdwd2.cal_energy();
             GlobalC::en.evdw = vdwd2.get_energy();
         }
-        if (vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
+        if (GlobalC::vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
         {
-            Vdwd3 vdwd3(GlobalC::ucell, vdwd3_para);
+            Vdwd3 vdwd3(GlobalC::ucell, GlobalC::vdwd3_para);
             vdwd3.cal_energy();
             GlobalC::en.evdw = vdwd3.get_energy();
         }
