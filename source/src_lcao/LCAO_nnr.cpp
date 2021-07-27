@@ -438,7 +438,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							find_R2[iat][count] = this->cal_RindexAtom(b1, b2, b3, iat2);
 
 
-							if(iat==50 && iat2==96)
+							/*if(iat==50 && iat2==96)
 							{
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
@@ -449,7 +449,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
 								<< " rcut=" << rcut <<endl;
-							}
+							}*/
 
 							// find_R2st
 							// note: the first must be zero.
