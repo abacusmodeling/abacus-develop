@@ -124,7 +124,7 @@ void Run_md::ai_md_line(void)
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
-    pot.allocate(GlobalC::pw.nrxx);
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
     DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")

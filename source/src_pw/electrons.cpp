@@ -298,7 +298,7 @@ void Electrons::self_consistent(const int &istep)
         if (!conv_elec)
         {
             // not converged yet, calculate new potential from mixed charge density
-            pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+            GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 
             // because <T+V(ionic)> = <eband+deband> are calculated after sum
             // band, using output charge density.
@@ -314,16 +314,16 @@ void Electrons::self_consistent(const int &istep)
             {
                 for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
                 {
-                    pot.vnew(is,ir) = pot.vr(is,ir);
+                    GlobalC::pot.vnew(is,ir) = GlobalC::pot.vr(is,ir);
                 }
             }
 
             // mohan fix bug 2012-06-05,
             // the new potential V(PL)+V(H)+V(xc)
-            pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+            GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
             //cout<<"Exc = "<<GlobalC::en.etxc<<endl;
             //( vnew used later for scf correction to the forces )
-            pot.vnew = pot.vr - pot.vnew;
+            GlobalC::pot.vnew = GlobalC::pot.vr - GlobalC::pot.vnew;
             GlobalC::en.descf = 0.0;
         }
 
@@ -351,7 +351,7 @@ void Electrons::self_consistent(const int &istep)
             //DONE(GlobalV::ofs_running,"write wave functions into file WAVEFUNC.dat");
         }
 
-			pot.set_vr_eff();
+			GlobalC::pot.set_vr_eff();
 
         //print_eigenvalue(GlobalV::ofs_running);
         GlobalC::en.calculate_etot();

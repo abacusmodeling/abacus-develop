@@ -179,13 +179,13 @@ void Ions::opt_ions_pw(void)
 			CE.update_all_pos(GlobalC::ucell);
 		}
 
-		if(pot.out_potential == 2)
+		if(GlobalC::pot.out_potential == 2)
 		{
 			stringstream ssp;
 			stringstream ssp_ave;
 			ssp << GlobalV::global_out_dir << "ElecStaticPot";
 			ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-			pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+			GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
 		}
 
 		time_t eend = time(NULL);
@@ -289,7 +289,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
                 // calculate the new potential accordint to
                 // the new charge density.
-                pot.init_pot( istep, GlobalC::pw.strucFac );
+                GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
 
                 GlobalV::ofs_running << " Setup the new wave functions?" << endl;
                 GlobalC::wf.wfcinit();
@@ -330,7 +330,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             else
             {
                 Variable_Cell::init_after_vc();
-                pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
+                GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
                 GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                 GlobalC::wf.wfcinit(); //LiuXh add 20180619
                 ++stress_step;
@@ -386,7 +386,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                     else
                     {
                         Variable_Cell::init_after_vc();
-                        pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
+                        GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
 
                         GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
                         GlobalC::wf.wfcinit(); //LiuXh add 20180619
@@ -409,7 +409,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 CE.update_istep(force_step);
                 CE.extrapolate_charge();
 				GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
-                pot.init_pot( istep, GlobalC::pw.strucFac );
+                GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
 				GlobalV::ofs_running << " Setup the new wave functions?" << endl;
                 GlobalC::wf.wfcinit();
                 ++force_step;

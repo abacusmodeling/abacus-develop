@@ -45,7 +45,7 @@ void Run_MD_LCAO::opt_cell(void)
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step=0;
-    pot.init_pot(ion_step, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 	
 	opt_ions();
@@ -158,13 +158,13 @@ void Run_MD_LCAO::opt_ions(void)
             WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
 
-        if(pot.out_potential == 2)
+        if(GlobalC::pot.out_potential == 2)
         {
             stringstream ssp;
             stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-            pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
         time_t fstart = time(NULL);
@@ -179,13 +179,13 @@ void Run_MD_LCAO::opt_ions(void)
 		// charge extrapolation if istep>0.
 		CE.extrapolate_charge();
 
-		if(pot.extra_pot=="dm")//xiaohui modify 2015-02-01
+		if(GlobalC::pot.extra_pot=="dm")//xiaohui modify 2015-02-01
 		{
 			// done after grid technique.
 		}
 		else
 		{
-			pot.init_pot( istep, GlobalC::pw.strucFac );
+			GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
 		}
 
 

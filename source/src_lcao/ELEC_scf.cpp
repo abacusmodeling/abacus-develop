@@ -192,15 +192,15 @@ void ELEC_scf::scf(const int &istep)
 				// so be careful here, make sure
 				// rho1 and rho2 are the same rho.
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-				pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+				GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 				GlobalC::en.delta_escf();
 				if (ELEC_evolve::td_vext == 0)
 				{
-					pot.set_vr_eff();
+					GlobalC::pot.set_vr_eff();
 				}
 				else
 				{
-					pot.set_vrs_tddft(istep);
+					GlobalC::pot.set_vrs_tddft(istep);
 				}
 			}
 		}
@@ -411,16 +411,16 @@ void ELEC_scf::scf(const int &istep)
 
 		if(conv_elec || iter==GlobalV::NITER)
 		{
-			if(pot.out_potential<0) //mohan add 2011-10-10
+			if(GlobalC::pot.out_potential<0) //mohan add 2011-10-10
 			{
-				pot.out_potential = -2;
+				GlobalC::pot.out_potential = -2;
 			}
 		}
 
 		if(!conv_elec)
 		{
 			// option 1
-			pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 
 			// option 2
@@ -429,18 +429,18 @@ void ELEC_scf::scf(const int &istep)
 			// use real E_tot functional.
 			//------------------------------
 			/*
-			pot.vr = pot.v_of_rho(GlobalC::CHR.rho_save, GlobalC::CHR.rho);
+			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho_save, GlobalC::CHR.rho);
 			GlobalC::en.calculate_etot();
 			GlobalC::en.print_etot(conv_elec, istep, iter, dr2, 0.0, GlobalV::ETHR, avg_iter,0);
-			pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+			GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 			*/
 		}
 		else
 		{
-			pot.vnew = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
+			GlobalC::pot.vnew = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			//(used later for scf correction to the forces )
-			pot.vnew -= pot.vr;
+			GlobalC::pot.vnew -= GlobalC::pot.vr;
 			GlobalC::en.descf = 0.0;
 		}
 
@@ -471,18 +471,18 @@ void ELEC_scf::scf(const int &istep)
 			/*
 			stringstream ssp;
 			ssp << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_POT";
-			pot.write_potential( is, iter, ssp.str(), pot.vr, precision );
+			GlobalC::pot.write_potential( is, iter, ssp.str(), GlobalC::pot.vr, precision );
 			*/
 		}
 
 		// (10) add Vloc to Vhxc.
 		if(ELEC_evolve::td_vext == 0)
 		{
-			pot.set_vr_eff();
+			GlobalC::pot.set_vr_eff();
 		}
 		else
 		{
-			pot.set_vrs_tddft(istep);
+			GlobalC::pot.set_vrs_tddft(istep);
 		}
 
 		//time_finish=std::time(NULL);
@@ -547,11 +547,11 @@ void ELEC_scf::scf(const int &istep)
 				}
 				LOC.write_dm( is, 0, ssd.str(), precision );
 
-				if(pot.out_potential == 1) //LiuXh add 20200701
+				if(GlobalC::pot.out_potential == 1) //LiuXh add 20200701
 				{
 					stringstream ssp;
 					ssp << GlobalV::global_out_dir << "SPIN" << is + 1 << "_POT";
-					pot.write_potential( is, 0, ssp.str(), pot.vr_eff, precision );
+					GlobalC::pot.write_potential( is, 0, ssp.str(), GlobalC::pot.vr_eff, precision );
 				}
 
 				//LiuXh modify 20200701

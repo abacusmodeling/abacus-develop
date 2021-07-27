@@ -102,7 +102,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     // init potential
     //=====================
     GlobalC::CHR.init_final_scf();
-    pot.allocate(GlobalC::pw.nrxx);
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
     //=====================
     // init wave functions
@@ -146,7 +146,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0, GlobalC::pw.strucFac);//atomic_rho, v_of_rho, set_vrs
+    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
     //==================================================
     // Create GlobalC::ppcell.tab_at , for trial wave functions.
@@ -154,7 +154,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //================================
     if(GlobalV::BASIS_TYPE=="pw")
     {
-		pot.newd();
+		GlobalC::pot.newd();
 
 		GlobalC::wf.init_at_1();
 

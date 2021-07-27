@@ -791,7 +791,7 @@ void Forces::cal_force_scc(matrix& forcescc)
     {
         for (int i = 0;i < GlobalC::pw.nrxx;i++)
         {
-            psic[i] = pot.vnew(0,i);
+            psic[i] = GlobalC::pot.vnew(0,i);
         }
     }
     else
@@ -800,7 +800,7 @@ void Forces::cal_force_scc(matrix& forcescc)
         int isdw = 1;
         for (int i = 0;i < GlobalC::pw.nrxx;i++)
         {
-            psic[i] = (pot.vnew(isup, i) + pot.vnew(isdw, i)) * 0.5;
+            psic[i] = (GlobalC::pot.vnew(isup, i) + GlobalC::pot.vnew(isdw, i)) * 0.5;
         }
     }
 

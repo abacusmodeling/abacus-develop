@@ -33,7 +33,7 @@ void Threshold_Elec::set_ethr(void) const
     {
         if (abs(GlobalV::ETHR - 1.0e-2 < 1.0e-10))
         {
-            if (pot.start_pot == "file")
+            if (GlobalC::pot.start_pot == "file")
             {
                 //======================================================
                 // if you think that the starting potential is good

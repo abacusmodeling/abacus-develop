@@ -113,7 +113,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// REALLOCATE DENSITY MATRIX FIRST, THEN READ IN DENSITY MATRIX,
 	// AND USE DENSITY MATRIX TO DO RHO GlobalV::CALCULATION.-- mohan 2013-03-31
 	//======================================
-	if(pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
+	if(GlobalC::pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
 	{
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
@@ -138,7 +138,7 @@ void LOOP_elec::before_solver(const int &istep)
 		GlobalC::CHR.renormalize_rho();
 
 		// initialize the potential
-		pot.init_pot( istep-1, GlobalC::pw.strucFac );
+		GlobalC::pot.init_pot( istep-1, GlobalC::pw.strucFac );
 	}
 
 

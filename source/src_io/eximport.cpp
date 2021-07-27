@@ -540,7 +540,7 @@ void eximport::out_input(ofstream &out_data)
 			 << setw(20) << GlobalC::pw.ny 
 			 << setw(20) << GlobalC::pw.nz 
 			 << setw(20) << GlobalC::pw.nxyz << endl;//1.6
-	out_data << setw(20) << pot.startingpot << endl;//1.7
+	out_data << setw(20) << GlobalC::pot.startingpot << endl;//1.7
 	out_data << setw(20) << GlobalC::CHR.mixing_beta << endl;//1.8
 */
 	out_data << "\n<HEADER>"<<endl;			//1.0

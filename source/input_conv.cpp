@@ -557,11 +557,11 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // wavefunction / charge / potential / (2/4)
 //----------------------------------------------------------
-    pot.start_pot = INPUT.start_pot;
-	pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
+    GlobalC::pot.start_pot = INPUT.start_pot;
+	GlobalC::pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
     GlobalC::CHR.out_charge = INPUT.out_charge;
 	GlobalC::CHR.nelec = INPUT.nelec;
-	pot.out_potential = INPUT.out_potential;
+	GlobalC::pot.out_potential = INPUT.out_potential;
     GlobalC::wf.out_wf = INPUT.out_wf;
 	GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;

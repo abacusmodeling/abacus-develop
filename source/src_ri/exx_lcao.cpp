@@ -961,7 +961,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Exx_Lcao::cal_energy\t"<<time_during(t_start)<<endl;
 
 gettimeofday( &t_start, NULL);
-	Hexx_para.Rexx_to_Km2D( HexxR, {pot.start_pot=="file",GlobalC::CHR.out_charge} );
+	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 ofs_mpi<<"TIME@ Hexx_para.Rexx_to_Km2D\t"<<time_during(t_start)<<endl;
 
 ofs_mpi<<"sizeof_Hexx2D\t"<<get_sizeof(Hexx_para.HK_Gamma_m2D)+get_sizeof(Hexx_para.HK_K_m2D)<<endl;
@@ -1165,7 +1165,7 @@ ofs_mpi.close();
 void Exx_Lcao::cal_exx_elec_nscf()
 {
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR;
-	Hexx_para.Rexx_to_Km2D( HexxR, {pot.start_pot=="file",GlobalC::CHR.out_charge} );
+	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 }
 
 /*

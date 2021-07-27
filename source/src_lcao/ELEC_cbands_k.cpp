@@ -33,7 +33,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		//--------------------------------------------
@@ -54,7 +54,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			if(GlobalV::VL_IN_H)
 			{
 				// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-				uhm.GK.cal_vlocal_k(pot.vr_eff1,GridT);
+				uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1,GridT);
 				// added by zhengdy-soc, for non-collinear case
 				// integral 4 times, is there any method to simplify?
 				if(GlobalV::NSPIN==4)
@@ -63,9 +63,9 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 					{
 						for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 						{
-							pot.vr_eff1[ir] = pot.vr_eff( is, ir);
+							GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( is, ir);
 						}
-						uhm.GK.cal_vlocal_k(pot.vr_eff1, GridT, is);
+						uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, is);
 					}
 				}
 			}

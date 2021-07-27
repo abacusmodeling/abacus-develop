@@ -139,13 +139,13 @@ void Run_MD_PW::md_ions_pw(void)
 
         CE.update_all_pos(GlobalC::ucell);
 
-        if (pot.out_potential == 2)
+        if (GlobalC::pot.out_potential == 2)
         {
             stringstream ssp;
             stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-            pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
         time_t eend = time(NULL);
@@ -179,7 +179,7 @@ void Run_MD_PW::md_ions_pw(void)
         CE.extrapolate_charge();
 
         //reset local potential and initial wave function
-        pot.init_pot(istep, GlobalC::pw.strucFac);
+        GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
         GlobalV::ofs_running << " Setup the new wave functions?" << endl;
         GlobalC::wf.wfcinit();
 
@@ -249,9 +249,9 @@ void Run_MD_PW::md_cells_pw()
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
+    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
 
-    pot.newd();
+    GlobalC::pot.newd();
 
     DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 

@@ -171,10 +171,10 @@ bool Update_input::Read(const string &fn)
         {
             read_value(ifs, charge_extrap);
 
-			if(charge_extrap!=pot.extra_pot)
+			if(charge_extrap!=GlobalC::pot.extra_pot)
 			{
-				this->change(GlobalV::ofs_warning,"extra_pot",pot.extra_pot,charge_extrap);
-				pot.extra_pot = this->charge_extrap;
+				this->change(GlobalV::ofs_warning,"extra_pot",GlobalC::pot.extra_pot,charge_extrap);
+				GlobalC::pot.extra_pot = this->charge_extrap;
 				if(out_dm==0) 
 				{
 					out_dm = 10000;
@@ -279,7 +279,7 @@ void Update_input::Bcast()
     Parallel_Common::bcast_int( GlobalV::NSTEP );
     Parallel_Common::bcast_double( GlobalC::CHR.mixing_beta );
     Parallel_Common::bcast_int( GlobalC::en.printe );
-    Parallel_Common::bcast_string( pot.extra_pot );//xiaohui modify 2015-02-01
+    Parallel_Common::bcast_string( GlobalC::pot.extra_pot );//xiaohui modify 2015-02-01
     Parallel_Common::bcast_int( GlobalC::CHR.out_charge );
 	Parallel_Common::bcast_int( GlobalC::en.out_dos );
     Parallel_Common::bcast_double( GlobalC::CHR.nelec );

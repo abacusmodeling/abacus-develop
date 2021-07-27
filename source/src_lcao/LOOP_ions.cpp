@@ -153,13 +153,13 @@ void LOOP_ions::opt_ions(void)
 		// not only electrostatic potential but also others
 		// mohan add 2021-03-25
 		// we need to have a proper
-        if(pot.out_potential == 2)
+        if(GlobalC::pot.out_potential == 2)
         {
             stringstream ssp;
             stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-            pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
         if(ParaO.out_hsR)
@@ -303,12 +303,12 @@ bool LOOP_ions::force_stress(
                 CE.update_istep(istep);
                 CE.extrapolate_charge();
 
-                if(pot.extra_pot=="dm")
+                if(GlobalC::pot.extra_pot=="dm")
                 {
                 }
                 else
                 {
-                    pot.init_pot( istep, GlobalC::pw.strucFac );
+                    GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
             }
             return 0;
@@ -332,13 +332,13 @@ bool LOOP_ions::force_stress(
         //CE.extrapolate_charge();
 
 /*xiaohui modify 2014-08-09
-        if(pot.extra_pot==4)
+        if(GlobalC::pot.extra_pot==4)
         {
             // done after grid technique.
         }
         else
         {
-            pot.init_pot( istep );
+            GlobalC::pot.init_pot( istep );
         }
 xiaohui modify 2014-08-09*/
     }
@@ -369,7 +369,7 @@ xiaohui modify 2014-08-09*/
            	else
            	{
                	Variable_Cell::init_after_vc();
-               	pot.init_pot(stress_step, GlobalC::pw.strucFac);
+               	GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                	++stress_step;
                	return 0;
@@ -411,7 +411,7 @@ xiaohui modify 2014-08-09*/
             	    else
             	    {
                 	    Variable_Cell::init_after_vc();
-                	    pot.init_pot(stress_step, GlobalC::pw.strucFac);
+                	    GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac);
 
                 	    ++stress_step;
                 	    return 0;
@@ -428,12 +428,12 @@ xiaohui modify 2014-08-09*/
                 CE.update_istep(force_step);
                 CE.extrapolate_charge();
 
-                if(pot.extra_pot=="dm")
+                if(GlobalC::pot.extra_pot=="dm")
                 {
                 }
                 else
                 {
-                    pot.init_pot( istep, GlobalC::pw.strucFac );
+                    GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
                 }
                 ++force_step;
                 return 0;

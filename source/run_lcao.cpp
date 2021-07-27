@@ -126,7 +126,7 @@ void Run_lcao::lcao_line(void)
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
-    pot.allocate(GlobalC::pw.nrxx);
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
     DONE(GlobalV::ofs_running,"INIT POTENTIAL");
 
 

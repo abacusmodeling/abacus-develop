@@ -72,7 +72,7 @@ void Hamilt_PW::init_k(const int ik)
 	// (3) Take the local potential.
 	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
-		pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
+		GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
 	}
 
 	// (4) Calculate nonlocal pseudopotential vkb
@@ -404,7 +404,7 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 		{
 			if(GlobalV::NSPIN!=4){
 				ZEROS( GlobalC::UFFT.porter, GlobalC::pw.nrxx);
-				GlobalC::UFFT.RoundTrip( tmpsi_in, pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
+				GlobalC::UFFT.RoundTrip( tmpsi_in, GlobalC::pot.vr_eff1, GR_index, GlobalC::UFFT.porter );
 				for (j = 0;j < GlobalC::wf.npw;j++)
 				{
 					tmhpsi[j] += GlobalC::UFFT.porter[ GR_index[j] ];
@@ -426,10 +426,10 @@ void Hamilt_PW::h_psi(const complex<double> *psi_in, complex<double> *hpsi, cons
 				complex<double> sup,sdown;
 				for (int ir=0; ir< GlobalC::pw.nrxx; ir++)
 				{
-					sup = GlobalC::UFFT.porter[ir] * (pot.vr_eff(0,ir) + pot.vr_eff(3,ir)) +
-						porter1[ir] * (pot.vr_eff(1,ir) - complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
-					sdown = porter1[ir] * (pot.vr_eff(0,ir) - pot.vr_eff(3,ir)) +
-					GlobalC::UFFT.porter[ir] * (pot.vr_eff(1,ir) + complex<double>(0.0,1.0) * pot.vr_eff(2,ir));
+					sup = GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(0,ir) + GlobalC::pot.vr_eff(3,ir)) +
+						porter1[ir] * (GlobalC::pot.vr_eff(1,ir) - complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
+					sdown = porter1[ir] * (GlobalC::pot.vr_eff(0,ir) - GlobalC::pot.vr_eff(3,ir)) +
+					GlobalC::UFFT.porter[ir] * (GlobalC::pot.vr_eff(1,ir) + complex<double>(0.0,1.0) * GlobalC::pot.vr_eff(2,ir));
 					GlobalC::UFFT.porter[ir] = sup;
 					porter1[ir] = sdown;
 				}

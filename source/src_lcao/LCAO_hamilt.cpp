@@ -81,7 +81,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 		// calculate the 'Vl' matrix using gamma-algorithms.
 		if(GlobalV::VL_IN_H)
 		{	
-			this->GG.cal_vlocal(pot.vr_eff1);
+			this->GG.cal_vlocal(GlobalC::pot.vr_eff1);
 
 			// Peize Lin add 2016-12-03
 			if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF

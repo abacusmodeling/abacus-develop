@@ -929,7 +929,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	int istep = 1;
 
 	// if Vna potential is not used.
-	pot.init_pot(istep, GlobalC::pw.strucFac);
+	GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
 
 
 	for(int is=0; is<GlobalV::NSPIN; ++is)
@@ -942,7 +942,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
 		}
 
 		//--------------------------------
@@ -951,11 +951,11 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// fvl_dphi can not be set to zero here if Vna is used
 		if(isstress&&isforce) 
 		{
-			UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,pot.vr_eff1);
+			UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
 		}
 		else if(isforce) 
 		{
-			UHM.GK.fvl_k_RealSpace(fvl_dphi,pot.vr_eff1);
+			UHM.GK.fvl_k_RealSpace(fvl_dphi,GlobalC::pot.vr_eff1);
 		}
 	}
 

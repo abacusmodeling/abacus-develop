@@ -346,13 +346,13 @@ double energy::delta_e(void)
 
     double deband_aux = 0.0;
 
-    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) deband_aux -= GlobalC::CHR.rho[0][ir] * pot.vr(0, ir);
+    for (int ir=0; ir<GlobalC::pw.nrxx; ir++) deband_aux -= GlobalC::CHR.rho[0][ir] * GlobalC::pot.vr(0, ir);
 
     if (GlobalV::NSPIN == 2)
     {
         for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            deband_aux -= GlobalC::CHR.rho[1][ir] * pot.vr(1, ir);
+            deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
         }
 
     }
@@ -360,9 +360,9 @@ double energy::delta_e(void)
     {
         for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            deband_aux -= GlobalC::CHR.rho[1][ir] * pot.vr(1, ir);
-            deband_aux -= GlobalC::CHR.rho[2][ir] * pot.vr(2, ir);
-            deband_aux -= GlobalC::CHR.rho[3][ir] * pot.vr(3, ir);
+            deband_aux -= GlobalC::CHR.rho[1][ir] * GlobalC::pot.vr(1, ir);
+            deband_aux -= GlobalC::CHR.rho[2][ir] * GlobalC::pot.vr(2, ir);
+            deband_aux -= GlobalC::CHR.rho[3][ir] * GlobalC::pot.vr(3, ir);
         }
     }
 
@@ -393,23 +393,23 @@ void energy::delta_escf(void)
 	// so here is the correction.
     for (int ir=0; ir<GlobalC::pw.nrxx; ir++) 
 	{
-		this->descf -= ( GlobalC::CHR.rho[0][ir]- GlobalC::CHR.rho_save[0][ir] ) * pot.vr(0,ir);
+		this->descf -= ( GlobalC::CHR.rho[0][ir]- GlobalC::CHR.rho_save[0][ir] ) * GlobalC::pot.vr(0,ir);
 	}
 
     if (GlobalV::NSPIN==2)
     {
         for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * pot.vr(1, ir);
+            this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
         }
     }
     if (GlobalV::NSPIN==4)
     {
         for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * pot.vr(1, ir);
-            this->descf -= ( GlobalC::CHR.rho[2][ir] - GlobalC::CHR.rho_save[2][ir] ) * pot.vr(2, ir);
-            this->descf -= ( GlobalC::CHR.rho[3][ir] - GlobalC::CHR.rho_save[3][ir] ) * pot.vr(3, ir);
+            this->descf -= ( GlobalC::CHR.rho[1][ir] - GlobalC::CHR.rho_save[1][ir] ) * GlobalC::pot.vr(1, ir);
+            this->descf -= ( GlobalC::CHR.rho[2][ir] - GlobalC::CHR.rho_save[2][ir] ) * GlobalC::pot.vr(2, ir);
+            this->descf -= ( GlobalC::CHR.rho[3][ir] - GlobalC::CHR.rho_save[3][ir] ) * GlobalC::pot.vr(3, ir);
         }
     }
 

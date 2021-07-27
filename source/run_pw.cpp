@@ -91,7 +91,7 @@ void Run_pw::plane_wave_line(void)
     // init charge/potential/wave functions
     //=====================================
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
-    pot.allocate(GlobalC::pw.nrxx);
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
     Cell_PW cpws;
     cpws.opt_cells_pw();

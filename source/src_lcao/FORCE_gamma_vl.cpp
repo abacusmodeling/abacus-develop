@@ -49,7 +49,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
 	// mohan add 2021, needs reconstruction!!!
     int istep = 1;
-    pot.init_pot(istep, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
@@ -61,14 +61,14 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
-            pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
+            GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
         //  should not be set zero if VNA is used.
         //  ZEROS(LM.DHloc_fixed_x,ParaO.nloc);
         //  ZEROS(LM.DHloc_fixed_y,ParaO.nloc);
         //  ZEROS(LM.DHloc_fixed_z,ParaO.nloc);
-        UHM.GG.cal_force(pot.vr_eff1);
+        UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -188,7 +188,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     //calculate <dphi | VL | phi>
 
     int istep = 1;
-    pot.init_pot(istep, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
 
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
@@ -200,14 +200,14 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
         for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
-            pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
+            GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
         //should not be set zero if VNA is used.
         //ZEROS(LM.DHloc_fixed_x,ParaO.nloc);
         //ZEROS(LM.DHloc_fixed_y,ParaO.nloc);
         //ZEROS(LM.DHloc_fixed_z,ParaO.nloc);
-        UHM.GG.cal_force(pot.vr_eff1);
+        UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {

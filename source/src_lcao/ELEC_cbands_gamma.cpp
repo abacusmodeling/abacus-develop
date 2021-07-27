@@ -33,7 +33,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		if(!uhm.init_s)
