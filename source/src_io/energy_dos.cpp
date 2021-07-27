@@ -130,7 +130,7 @@ void energy::perform_dos(void)
 						ofsi2<<"BAND"
 						<<setw(25)<<"Energy(ev)"
 						<<setw(25)<<"Occupation"
-						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
+						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
 						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
@@ -149,7 +149,7 @@ void energy::perform_dos(void)
 						<<setw(25)<<"Occupation"
 						<<setw(25)<<"Spin down Energy(ev)"
 						<<setw(25)<<"Occupation"
-						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
+						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
 						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
 
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)

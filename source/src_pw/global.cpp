@@ -23,11 +23,11 @@ Charge_Broyden CHR;
 Potential pot;
 Symmetry symm;
 Parallel_Grid Pgrid; //mohan add 2010-06-06 
+Parallel_Kpoints Pkpoints; // mohan add 2010-06-07
 }
 
 //Magnetism mag;
 
-Parallel_Kpoints Pkpoints; // mohan add 2010-06-07
 Vdwd2_Parameters vdwd2_para;	// Peize Lin add 2021-03-09
 Vdwd3_Parameters vdwd3_para;	// jiyy add 2021-05-02															
 
