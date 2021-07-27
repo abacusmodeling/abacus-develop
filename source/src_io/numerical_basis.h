@@ -42,6 +42,10 @@ class Numerical_Basis
 		const int derivative_order ) const;
 
 	static matrix cal_overlap_V(const ComplexMatrix *psi, const int derivative_order);
+
+	realArray cal_flq(const int ik, const std::vector<Vector3<double>> &gk) const;
+
+	static matrix cal_ylm(const std::vector<Vector3<double>> &gk);
 	
 	static void output_info(
 		ofstream &ofs,

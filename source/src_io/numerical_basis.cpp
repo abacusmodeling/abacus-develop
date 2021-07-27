@@ -149,14 +149,13 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
 
 	const double normalization = (4 * PI) / sqrt(ucell.omega);			// Peize Lin add normalization 2015-12-29
 
-    const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
-    matrix ylm(total_lm, np);
-
     std::vector<Vector3<double>> gk(np);
     for (int ig=0; ig<np; ig++)
         gk[ig] = wf.get_1qvec_cartesian(ik, ig);
 
-    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
+	const realArray flq = this->cal_flq(ik, gk);
+
+    const matrix ylm = Numerical_Basis::cal_ylm(gk);
 
     ofs_running << "\n " << setw(5)
         << "ik" << setw(8) 
@@ -164,7 +163,6 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
         << "Atom1" << setw(8) 
         << "L" << endl;
 
-    std::vector<double> flq(np);
     for (int T = 0; T < ucell.ntype; T++)
     {
         //OUT("T",T);
@@ -183,12 +181,6 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
                 complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < this->bessel_basis.get_ecut_number(); ie++)
                 {
-                    for (int ig=0; ig<np; ig++)
-                    {
-                        flq[ig] = this->bessel_basis.Polynomial_Interpolation2
-                                  (L, ie, gk[ig].norm() * ucell.tpiba );
-                    }
-
                     const int N = 0;
                     assert( ucell.nmax == 1);
                     for (int m=0; m<2*L+1; m++)
@@ -200,7 +192,7 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
                             for (int ig=0; ig<np; ig++)
                             {
 //                              const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
-                                const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig] * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
+                                const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq(L,ie,ig) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
                                 overlap_tmp += conj( local_tmp ) * psi(ib, ig); // psi is bloch orbitals
                             }
                             overlap_Q(ib, this->mu_index[T](I, L, N, m), ie) = overlap_tmp;
@@ -237,22 +229,9 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
     for (int ig=0; ig<np; ig++)
         gk[ig] = wf.get_1qvec_cartesian(ik, ig);
 
-    const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
-    matrix ylm(total_lm, np);
-    YlmReal::Ylm_Real(total_lm, np, gk.data(), ylm);
+	const realArray flq = this->cal_flq(ik, gk);
 
-    // get flq(G) = \int f(r)jl(G*r) from interpolation table.
-    realArray flq(ucell.lmax+1, enumber, np);
-    for (int l=0; l<ucell.lmax+1; l++)
-    {
-        for (int ie=0; ie<enumber; ie++)
-        {
-            for (int ig=0; ig<np; ig++)
-            {
-                flq(l,ie,ig) = this->bessel_basis.Polynomial_Interpolation2(l, ie, gk[ig].norm() * ucell.tpiba );
-            }
-        }
-    }
+    const matrix ylm = Numerical_Basis::cal_ylm(gk);
 
     ofs_running << "\n " << setw(5)
         << "ik" << setw(8) 
@@ -354,6 +333,28 @@ matrix Numerical_Basis::cal_overlap_V(
 		}
 	}
 	return overlap_V;
+}
+
+realArray Numerical_Basis::cal_flq(const int ik, const std::vector<Vector3<double>> &gk) const
+{
+	const int np = gk.size();
+	const int enumber = this->bessel_basis.get_ecut_number();
+
+    // get flq(G) = \int f(r)jl(G*r) from interpolation table.
+    realArray flq(ucell.lmax+1, enumber, np);
+    for (int il=0; il<ucell.lmax+1; il++)
+        for (int ie=0; ie<enumber; ie++)
+            for (int ig=0; ig<np; ig++)
+                flq(il,ie,ig) = this->bessel_basis.Polynomial_Interpolation2(il, ie, gk[ig].norm() * ucell.tpiba );
+	return flq;	
+}
+
+matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
+{
+    const int total_lm = ( ucell.lmax + 1) * ( ucell.lmax + 1);
+    matrix ylm(total_lm, gk.size());
+    YlmReal::Ylm_Real(total_lm, gk.size(), gk.data(), ylm);
+    return ylm;
 }
 
 std::vector<IntArray> Numerical_Basis::init_mu_index(void)
@@ -662,6 +663,7 @@ void Numerical_Basis::output_overlap_Sq(
             {
                 ofs.open(name.c_str(), ios::app);
                 const int ik_now = ik - Pkpoints.startk_pool[MY_POOL];
+
                 const int size = overlap_Sq[ik_now].getSize();
                 for (int i=0; i<size; i++)
                 {
