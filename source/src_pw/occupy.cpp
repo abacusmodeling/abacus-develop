@@ -48,7 +48,7 @@ void Occupy::calculate_weights(void)
         else
         {
 			// -1 means don't need to consider spin.
-            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, CHR.nelec, GlobalC::wf.ekb, GlobalC::en.ef, GlobalC::wf.wg, -1, GlobalC::kv.isk);
+            iweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::CHR.nelec, GlobalC::wf.ekb, GlobalC::en.ef, GlobalC::wf.wg, -1, GlobalC::kv.isk);
         }
     }
     else if (use_tetrahedron_method)
@@ -56,7 +56,7 @@ void Occupy::calculate_weights(void)
         WARNING_QUIT("calculate_weights","not implemented yet,coming soon!");
 //		if(my_rank == 0)
 //		{
-//			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, CHR.nelec, ntetra,tetra, GlobalC::wf.et, GlobalC::en.ef, GlobalC::wf.wg);
+//			tweights(GlobalC::kv.nkstot, nspin, GlobalV::NBANDS, GlobalC::CHR.nelec, ntetra,tetra, GlobalC::wf.et, GlobalC::en.ef, GlobalC::wf.wg);
 //		}
     }
     else if (use_gaussian_broadening)
@@ -75,7 +75,7 @@ void Occupy::calculate_weights(void)
 		else
 		{
 			// -1 means is no related to spin.
-        	Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, CHR.nelec, gaussian_parameter, gaussian_type,
+        	Occupy::gweights(GlobalC::kv.nks, GlobalC::kv.wk, GlobalV::NBANDS, GlobalC::CHR.nelec, gaussian_parameter, gaussian_type,
                  GlobalC::wf.ekb, GlobalC::en.ef, GlobalC::en.demet, GlobalC::wf.wg, -1, GlobalC::kv.isk);
 
 		}

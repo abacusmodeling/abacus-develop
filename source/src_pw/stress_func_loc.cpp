@@ -21,7 +21,7 @@ void Stress_Func::stress_loc(matrix& sigma, const bool is_pw)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			Porter[ir] += complex<double>(CHR.rho[is][ir], 0.0 );
+			Porter[ir] += complex<double>(GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
 	GlobalC::pw.FFT_chg.FFT3D(Porter, -1);

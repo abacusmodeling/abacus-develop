@@ -40,13 +40,13 @@ void IState_Charge::begin(void)
 
 	// (1.2) read in LOWF_GAMMA.dat
 	OUT(GlobalV::ofs_running,"LOWF.allocate_flag",LOWF.get_allocate_flag());	
-	cout << " number of electrons = " << CHR.nelec << endl;
+	cout << " number of electrons = " << GlobalC::CHR.nelec << endl;
 
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
 	// if ucell is even, it's also correct.
 	// +1.0e-8 in case like (2.999999999+1)/2
-	fermi_band = static_cast<int>( (CHR.nelec+1)/2 + 1.0e-8 ) ;
+	fermi_band = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 ) ;
 	cout << " number of occupied bands = " << fermi_band << endl;
 
 	if(mode == 1)
@@ -122,13 +122,13 @@ void IState_Charge::begin(void)
 			// (3) zero out of charge density array. 
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS( CHR.rho[is], GlobalC::pw.nrxx );
+				ZEROS( GlobalC::CHR.rho[is], GlobalC::pw.nrxx );
 			}
 			
 			// (4) calculate charge density for a particular 
 			// band.
    			UHM.GG.cal_rho(LOC.DM);
-			CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
+			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			stringstream ss;
 			stringstream ss1;
 			ss << GlobalV::global_out_dir << "BAND" << ib + 1 << "_CHG";
@@ -137,8 +137,8 @@ void IState_Charge::begin(void)
 			{
 				ss1 << GlobalV::global_out_dir << "BAND" << ib + 1 << "_SPIN" << is << "_CHG.cube";
 				bool for_plot = true;
-				CHR.write_rho(CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
-				CHR.write_rho_cube(CHR.rho_save[is], is, ss1.str(), 3);
+				GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ss.str(), 3, for_plot );
+				GlobalC::CHR.write_rho_cube(GlobalC::CHR.rho_save[is], is, ss1.str(), 3);
 			}
 		}
 	}
@@ -189,7 +189,7 @@ void IState_Charge::idmatrix(const int &ib)
 			const int ib_local = ParaO.trace_loc_col[ib];
 
 			int fermi_band=0;
-			fermi_band = static_cast<int>( (CHR.nelec+1)/2 + 1.0e-8 ) ;
+			fermi_band = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 ) ;
 
 			if(ib_local>=0)
 			{

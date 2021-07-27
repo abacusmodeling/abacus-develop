@@ -545,7 +545,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // charge mixing(3/3)
 //----------------------------------------------------------
-    CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, 
+    GlobalC::CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, 
 	INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
 
 //----------------------------------------------------------
@@ -559,8 +559,8 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
     pot.start_pot = INPUT.start_pot;
 	pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
-    CHR.out_charge = INPUT.out_charge;
-	CHR.nelec = INPUT.nelec;
+    GlobalC::CHR.out_charge = INPUT.out_charge;
+	GlobalC::CHR.nelec = INPUT.nelec;
 	pot.out_potential = INPUT.out_potential;
     GlobalC::wf.out_wf = INPUT.out_wf;
 	GlobalC::en.out_dos = INPUT.out_dos;

@@ -35,7 +35,7 @@ void DFTU_Yukawa::cal_yukawa_lambda()
 	{
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++) 
 		{
-			double rho_ir = CHR.rho[is][ir];
+			double rho_ir = GlobalC::CHR.rho[is][ir];
 			sum_rho += rho_ir;
 
 			double lambda_ir = 2*pow(3*rho_ir/PI, (double)1.0/6.0);

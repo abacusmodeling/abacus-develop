@@ -541,7 +541,7 @@ void eximport::out_input(ofstream &out_data)
 			 << setw(20) << GlobalC::pw.nz 
 			 << setw(20) << GlobalC::pw.nxyz << endl;//1.6
 	out_data << setw(20) << pot.startingpot << endl;//1.7
-	out_data << setw(20) << CHR.mixing_beta << endl;//1.8
+	out_data << setw(20) << GlobalC::CHR.mixing_beta << endl;//1.8
 */
 	out_data << "\n<HEADER>"<<endl;			//1.0
 
@@ -801,7 +801,7 @@ void eximport::in_charge_mpi(const string &dir)
     {
         for(iz=0;iz<num_z[GlobalV::RANK_IN_POOL];iz++)
         {
-            CHR.rho[0][ ir*num_z[GlobalV::RANK_IN_POOL]+iz ]= rho_tmp[ir*GlobalC::pw.ncz + cur_z[GlobalV::RANK_IN_POOL] + iz ];
+            GlobalC::CHR.rho[0][ ir*num_z[GlobalV::RANK_IN_POOL]+iz ]= rho_tmp[ir*GlobalC::pw.ncz + cur_z[GlobalV::RANK_IN_POOL] + iz ];
         }
     }
 
@@ -850,16 +850,16 @@ void eximport::out_charge(ofstream &out_data)
 	out_data << setw(20) << GlobalC::pw.ncx 
 			 << setw(20) << GlobalC::pw.ncy 
 			 << setw(20) << GlobalC::pw.ncz << endl;		//7.2
-	out_data << setw(20) << CHR.rho.nr			//7.3 
-			 << setw(20) << CHR.rho.nc << endl;
+	out_data << setw(20) << GlobalC::CHR.rho.nr			//7.3 
+			 << setw(20) << GlobalC::CHR.rho.nc << endl;
 
-	for (int i = 0;i < CHR.rho.nr;i++)
+	for (int i = 0;i < GlobalC::CHR.rho.nr;i++)
 	{
-		for (int j = 0;j < CHR.rho.nc;j++)
+		for (int j = 0;j < GlobalC::CHR.rho.nc;j++)
 		{
-			out_data << setw(20) << setprecision(10) << CHR.rho.c[i*CHR.rho.nr+j] << "\t" ;//7.4
+			out_data << setw(20) << setprecision(10) << GlobalC::CHR.rho.c[i*GlobalC::CHR.rho.nr+j] << "\t" ;//7.4
 
-			if ((i*CHR.rho.nr + j) % 4 == 3) out_data << endl;
+			if ((i*GlobalC::CHR.rho.nr + j) % 4 == 3) out_data << endl;
 		}
 		out_data << endl;
 	}
@@ -920,15 +920,15 @@ void eximport::nscf_chgfile(const string &chg_file)
 	cout<<"rho_nc = "<<rho_nc<<endl;
 	cout<<"rho_nr = "<<rho_nr<<endl;
 	rho = new double[rho_nc];
-	CHR.rho.nr = rho_nr;
-	CHR.rho.nc = rho_nc;
+	GlobalC::CHR.rho.nr = rho_nr;
+	GlobalC::CHR.rho.nc = rho_nc;
 
 	for (int i = 0;i < rho_nr;i++)
 	{
 		for (int j = 0;j < rho_nc;j++)
 		{
 //			cout<<"j="<<j<<endl;
-			in >> CHR.rho.c[j];
+			in >> GlobalC::CHR.rho.c[j];
 		}
 	}
 	in.close();

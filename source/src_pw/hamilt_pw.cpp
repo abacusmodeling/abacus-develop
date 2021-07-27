@@ -164,15 +164,15 @@ void Hamilt_PW::diagH_subspace(
 				}
 			}
 		};
-		if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+		if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
 		{
 			add_Hexx(1);
 		}
-		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+		else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
 		{
 			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);
 		}
-		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+		else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
 		{
 			add_Hexx(GlobalC::exx_global.info.hybrid_alpha);		
 		}

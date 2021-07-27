@@ -43,7 +43,7 @@ void Run_lcao::lcao_line(void)
 	}
 	// setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
-	CHR.cal_nelec();
+	GlobalC::CHR.cal_nelec();
 
 	// mohan add 2010-09-06
 	// Yu Liu move here 2021-06-27
@@ -52,7 +52,7 @@ void Run_lcao::lcao_line(void)
 	// I warn the user again for each type.
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		xcf.which_dft(GlobalC::ucell.atoms[it].dft);
+		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
 	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
@@ -122,7 +122,7 @@ void Run_lcao::lcao_line(void)
 
 
 	// Inititlize the charge density.
-    CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.
@@ -138,7 +138,7 @@ void Run_lcao::lcao_line(void)
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				GlobalC::exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 				break;
 		}
 	}

@@ -621,7 +621,7 @@ void Exx_Lip::exx_energy_cal()
 
 void Exx_Lip::write_q_pack() const
 {
-    if (CHR.out_charge==0)
+    if (GlobalC::CHR.out_charge==0)
 		return;
 
 	if(!GlobalV::RANK_IN_POOL)

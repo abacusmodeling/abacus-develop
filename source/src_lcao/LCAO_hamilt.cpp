@@ -84,15 +84,15 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 			this->GG.cal_vlocal(pot.vr_eff1);
 
 			// Peize Lin add 2016-12-03
-			if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+			if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
 			{
 				exx_lcao.add_Hexx(ik,1);
 			}
-			else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+			else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
 			{
 				exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 			}
-			else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+			else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
 			{
 				exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 			}
@@ -218,15 +218,15 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 		}
 
 		// Peize Lin add 2016-12-03
-		if( 5==xcf.iexch_now && 0==xcf.igcx_now )				// HF
+		if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF
 		{
 			exx_lcao.add_Hexx(ik,1);
 		}
-		else if( 6==xcf.iexch_now && 8==xcf.igcx_now )			// PBE0
+		else if( 6==GlobalC::xcf.iexch_now && 8==GlobalC::xcf.igcx_now )			// PBE0
 		{
 			exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 		}
-		else if( 9==xcf.iexch_now && 12==xcf.igcx_now )			// HSE
+		else if( 9==GlobalC::xcf.iexch_now && 12==GlobalC::xcf.igcx_now )			// HSE
 		{
 			exx_lcao.add_Hexx(ik,GlobalC::exx_global.info.hybrid_alpha);
 		}

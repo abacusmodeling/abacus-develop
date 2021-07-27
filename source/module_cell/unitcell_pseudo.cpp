@@ -277,7 +277,7 @@ void UnitCell_pseudo::setup_cell(
 	// I warn the user again for each type.
 	//for(int it=0; it<ntype; it++)
 	//{
-	//	xcf.which_dft(atoms[it].dft);
+	//	GlobalC::xcf.which_dft(atoms[it].dft);
 	//}
 
 	// setup the total number of PAOs

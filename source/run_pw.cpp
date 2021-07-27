@@ -27,7 +27,7 @@ void Run_pw::plane_wave_line(void)
 
     // setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
-	CHR.cal_nelec();
+	GlobalC::CHR.cal_nelec();
 
     // mohan add 2010-09-06
 	// Yu Liu move here 2021-06-27
@@ -36,7 +36,7 @@ void Run_pw::plane_wave_line(void)
 	// I warn the user again for each type.
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		xcf.which_dft(GlobalC::ucell.atoms[it].dft);
+		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
     }
 
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
@@ -90,7 +90,7 @@ void Run_pw::plane_wave_line(void)
     //=====================================
     // init charge/potential/wave functions
     //=====================================
-    CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     pot.allocate(GlobalC::pw.nrxx);
 
     Cell_PW cpws;

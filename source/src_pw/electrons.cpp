@@ -127,7 +127,7 @@ void Electrons::self_consistent(const int &istep)
     Symmetry_rho srho;
     for(int is=0; is<GlobalV::NSPIN; is++)
     {
-        srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
+        srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, symm);
     }
 
     // conv_elec is a member of Threshold_Elec
@@ -154,8 +154,8 @@ void Electrons::self_consistent(const int &istep)
         << "  ELEC=" << setw(4) << iter 
         << "--------------------------------\n";
         // mohan add 2010-07-16
-        if(iter==1) CHR.set_new_e_iteration(true);
-        else CHR.set_new_e_iteration(false);
+        if(iter==1) GlobalC::CHR.set_new_e_iteration(true);
+        else GlobalC::CHR.set_new_e_iteration(false);
 
         // record the start time.
 		// the clock is not accurate, needs to be fixed 2021-03-15 mohan
@@ -169,9 +169,9 @@ void Electrons::self_consistent(const int &istep)
         if(GlobalV::FINAL_SCF && iter==1)
         {
             init_mixstep_final_scf();
-            //CHR.irstep=0;
-            //CHR.idstep=0;
-            //CHR.totstep=0;
+            //GlobalC::CHR.irstep=0;
+            //GlobalC::CHR.idstep=0;
+            //GlobalC::CHR.totstep=0;
         }
 
 		// mohan move harris functional to here, 2012-06-05
@@ -182,7 +182,7 @@ void Electrons::self_consistent(const int &istep)
 		
 		// calculate exact-exchange
 #ifdef __LCAO
-		switch(xcf.iexch_now)						// Peize Lin add 2019-03-09
+		switch(GlobalC::xcf.iexch_now)						// Peize Lin add 2019-03-09
 		{
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )				
@@ -194,7 +194,7 @@ void Electrons::self_consistent(const int &istep)
 #endif
         //(2) save change density as previous charge,
         // prepared fox mixing.
-        CHR.save_rho_before_sum_band();
+        GlobalC::CHR.save_rho_before_sum_band();
 
 		bool onescf = false; 
     scf_step:
@@ -217,7 +217,7 @@ void Electrons::self_consistent(const int &istep)
         // new wave functions.
 
         // calculate the new eband here.
-        CHR.sum_band();
+        GlobalC::CHR.sum_band();
         
 
 		// add exx
@@ -233,7 +233,7 @@ void Electrons::self_consistent(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
+			srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, symm);
 		}
 
         //(7) compute magnetization, only for LSDA(spin==2)
@@ -247,7 +247,7 @@ void Electrons::self_consistent(const int &istep)
         //if (LOCAL_BASIS) xiaohui modify 2013-09-02
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02
         {
-            CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
+            GlobalC::CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
         }
         else
         {
@@ -258,7 +258,7 @@ void Electrons::self_consistent(const int &istep)
                 // if 'dr2 < GlobalV::ETHR * nelec' happen,
                 // in other word, 'dr2 < diago_error'
                 // we update GlobalV::ETHR.
-                diago_error = GlobalV::ETHR*std::max(1.0, CHR.nelec);
+                diago_error = GlobalV::ETHR*std::max(1.0, GlobalC::CHR.nelec);
             }
 
             // if converged is achieved, or the self-consistent error(dr2)
@@ -268,7 +268,7 @@ void Electrons::self_consistent(const int &istep)
             // rho contain the output charge density.
             // in other cases rhoin contains the mixed charge density
             // (the new input density) while rho is unchanged.
-            CHR.mix_rho(dr2,diago_error,GlobalV::DRHO2,iter,conv_elec);
+            GlobalC::CHR.mix_rho(dr2,diago_error,GlobalV::DRHO2,iter,conv_elec);
 
             //if(GlobalV::MY_RANK==0)
             //{
@@ -287,7 +287,7 @@ void Electrons::self_consistent(const int &istep)
 
                     // update GlobalV::ETHR.
                     GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << endl;
-                    GlobalV::ETHR = 0.1 * dr2 / CHR.nelec;
+                    GlobalV::ETHR = 0.1 * dr2 / GlobalC::CHR.nelec;
                     GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << endl;
                     //goto first_iter_again;
                     goto scf_step;
@@ -298,7 +298,7 @@ void Electrons::self_consistent(const int &istep)
         if (!conv_elec)
         {
             // not converged yet, calculate new potential from mixed charge density
-            pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
+            pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 
             // because <T+V(ionic)> = <eband+deband> are calculated after sum
             // band, using output charge density.
@@ -320,7 +320,7 @@ void Electrons::self_consistent(const int &istep)
 
             // mohan fix bug 2012-06-05,
             // the new potential V(PL)+V(H)+V(xc)
-            pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
+            pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
             //cout<<"Exc = "<<GlobalC::en.etxc<<endl;
             //( vnew used later for scf correction to the forces )
             pot.vnew = pot.vr - pot.vnew;
@@ -339,7 +339,7 @@ void Electrons::self_consistent(const int &istep)
         {
             stringstream ssc;
             ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-            CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
+            GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
         }
 
         if(GlobalC::wf.out_wf)
@@ -405,7 +405,7 @@ void Electrons::self_consistent(const int &istep)
             {
                 stringstream ssc;
                 ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
-                CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
+                GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
             }
 
             if(conv_elec)
@@ -424,7 +424,7 @@ void Electrons::self_consistent(const int &istep)
             return;
         }
 
-        //if ( imix >= 0 )  CHR.rho = CHR.rho_save;
+        //if ( imix >= 0 )  GlobalC::CHR.rho = GlobalC::CHR.rho_save;
         //GlobalV::ofs_running << "\n start next iterate for idum ";
     } //END DO
 
@@ -539,9 +539,9 @@ void Electrons::init_mixstep_final_scf(void)
 {
     TITLE("electrons","init_mixstep_final_scf");
 
-    CHR.irstep=0;
-    CHR.idstep=0;
-    CHR.totstep=0;
+    GlobalC::CHR.irstep=0;
+    GlobalC::CHR.idstep=0;
+    GlobalC::CHR.totstep=0;
 
     return;
 }

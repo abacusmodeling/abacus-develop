@@ -101,7 +101,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=====================
     // init potential
     //=====================
-    CHR.init_final_scf();
+    GlobalC::CHR.init_final_scf();
     pot.allocate(GlobalC::pw.nrxx);
 
     //=====================

@@ -629,7 +629,7 @@ void Pdiag_Double::diago_double_begin(
         int THIS_REAL_ELPA_KERNEL_API=12;
         int useQR=0;						// may be changed to input parameter sometime
 
-        if(CHR.get_new_e_iteration())
+        if(GlobalC::CHR.get_new_e_iteration())
         {
             timer::tick("Diago_LCAO_Matrix","genelpa1");
             method=0;

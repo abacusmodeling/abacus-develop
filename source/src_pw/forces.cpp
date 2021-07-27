@@ -355,7 +355,7 @@ void Forces::cal_force_loc(matrix& forcelc)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-        	aux[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+        	aux[ir] += complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
 		}
 	}
 
@@ -553,7 +553,7 @@ void Forces::cal_force_ew(matrix& forceion)
 void Forces::cal_force_cc(matrix& forcecc)
 {
 	// recalculate the exchange-correlation potential.
-    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, CHR.rho, CHR.rho_core);
+    const auto etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 	H_XC_pw::etxc    = std::get<0>(etxc_vtxc_v);			// may delete?
 	H_XC_pw::vtxc    = std::get<1>(etxc_vtxc_v);			// may delete?
 	const matrix vxc = std::get<2>(etxc_vtxc_v);
@@ -587,7 +587,7 @@ void Forces::cal_force_cc(matrix& forcecc)
         if (GlobalC::ucell.atoms[T1].nlcc)
         {
             //call drhoc
-            CHR.non_linear_core_correction(
+            GlobalC::CHR.non_linear_core_correction(
                 GlobalC::ppcell.numeric,
                 GlobalC::ucell.atoms[T1].msh,
                 GlobalC::ucell.atoms[T1].r,

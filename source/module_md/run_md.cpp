@@ -42,7 +42,7 @@ void Run_md::ai_md_line(void)
 
 	// setup GlobalV::NBANDS 
 	// Yu Liu add 2021-07-03
-	CHR.cal_nelec();
+	GlobalC::CHR.cal_nelec();
 
 	// mohan add 2010-09-06
 	// Yu Liu move here 2021-06-27
@@ -51,7 +51,7 @@ void Run_md::ai_md_line(void)
 	// I warn the user again for each type.
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		xcf.which_dft(GlobalC::ucell.atoms[it].dft);
+		GlobalC::xcf.which_dft(GlobalC::ucell.atoms[it].dft);
 	}
 
     //GlobalC::ucell.setup_cell( GlobalV::global_pseudo_dir , GlobalV::global_atom_card , GlobalV::ofs_running, GlobalV::NLOCAL, GlobalV::NBANDS);
@@ -120,7 +120,7 @@ void Run_md::ai_md_line(void)
         GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
 	// Inititlize the charge density.
-    CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
+    GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     DONE(GlobalV::ofs_running,"INIT CHARGE");
 
 	// Initializee the potential.

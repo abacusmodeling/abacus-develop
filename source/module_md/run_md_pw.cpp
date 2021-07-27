@@ -115,7 +115,7 @@ void Run_MD_PW::md_ions_pw(void)
                         eiter += elec.iter;
                         if (elec.iter == 1 || hybrid_step == GlobalC::exx_global.info.hybrid_step - 1) // exx converge
                             break;
-                        GlobalC::exx_global.info.set_xcfunc(xcf);
+                        GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
                         GlobalC::exx_lip.cal_exx();
                     }
                 }
@@ -123,7 +123,7 @@ void Run_MD_PW::md_ions_pw(void)
                 {
                     elec.self_consistent(istep - 1);
                     eiter += elec.iter;
-                    GlobalC::exx_global.info.set_xcfunc(xcf);
+                    GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
                     elec.self_consistent(istep - 1);
                     eiter += elec.iter;
                 }

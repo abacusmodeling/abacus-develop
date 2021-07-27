@@ -234,7 +234,7 @@ void Gint_Gamma::gamma_mulliken(double** mulliken)
 
 							for(int is=0; is<GlobalV::NSPIN; is++)
 							{
-								double *rhop = CHR.rho[is];
+								double *rhop = GlobalC::CHR.rho[is];
 								for (int ib=0; ib<GlobalC::pw.bxyz; ib++)
 								{
 									if(cal_flag[ib][ia1] && cal_flag[ib][ia2])

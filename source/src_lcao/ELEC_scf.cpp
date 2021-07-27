@@ -37,7 +37,7 @@ void ELEC_scf::scf(const int &istep)
 	Symmetry_rho srho;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
+		srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, symm);
 	}
 
 //	cout << scientific;
@@ -129,11 +129,11 @@ void ELEC_scf::scf(const int &istep)
 		// used for pulay mixing.
 		if(iter==1)
 		{
-			CHR.set_new_e_iteration(true);
+			GlobalC::CHR.set_new_e_iteration(true);
 		}
 		else
 		{
-			CHR.set_new_e_iteration(false);
+			GlobalC::CHR.set_new_e_iteration(false);
 		}
 
 		// set converged threshold,
@@ -142,9 +142,9 @@ void ELEC_scf::scf(const int &istep)
         if(GlobalV::FINAL_SCF && iter==1)
         {
             init_mixstep_final_scf();
-            //CHR.irstep=0;
-            //CHR.idstep=0;
-            //CHR.totstep=0;
+            //GlobalC::CHR.irstep=0;
+            //GlobalC::CHR.idstep=0;
+            //GlobalC::CHR.totstep=0;
         }
 
 		// mohan update 2012-06-05
@@ -192,7 +192,7 @@ void ELEC_scf::scf(const int &istep)
 				// so be careful here, make sure
 				// rho1 and rho2 are the same rho.
 				// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-				pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
+				pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 				GlobalC::en.delta_escf();
 				if (ELEC_evolve::td_vext == 0)
 				{
@@ -252,7 +252,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// calculate exact-exchange
-		switch(xcf.iexch_now)						// Peize Lin add 2018-10-30
+		switch(GlobalC::xcf.iexch_now)						// Peize Lin add 2018-10-30
 		{
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )
@@ -316,7 +316,7 @@ void ELEC_scf::scf(const int &istep)
 		}
 
 		// (2)
-		CHR.save_rho_before_sum_band();
+		GlobalC::CHR.save_rho_before_sum_band();
 
 		// (3) sum bands to calculate charge density
 		Occupy::calculate_weights();
@@ -353,7 +353,7 @@ void ELEC_scf::scf(const int &istep)
 		{
 			if(restart.info_load.load_H && restart.info_load.load_H_finish && !restart.info_load.restart_exx)
 			{
-				GlobalC::exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 				exx_lcao.cal_exx_elec();
 				restart.info_load.restart_exx = true;
 			}
@@ -379,7 +379,7 @@ void ELEC_scf::scf(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
+			srho.begin(is, GlobalC::CHR,GlobalC::pw, Pgrid, symm);
 		}
 
 		// (6) compute magnetization, only for spin==2
@@ -388,7 +388,7 @@ void ELEC_scf::scf(const int &istep)
 		// resume codes!
 		//-------------------------------------------------------------------------
 		// this->LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
-		// CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
+		// GlobalC::CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
 		// but must has evc first!
 		//-------------------------------------------------------------------------
 
@@ -396,7 +396,7 @@ void ELEC_scf::scf(const int &istep)
 		GlobalC::en.deband = GlobalC::en.delta_e();
 
 		// (8) Mix charge density
-		CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
+		GlobalC::CHR.mix_rho(dr2,0,GlobalV::DRHO2,iter,conv_elec);
 
 		// Peize Lin add 2020.04.04
 		if(restart.info_save.save_charge)
@@ -420,7 +420,7 @@ void ELEC_scf::scf(const int &istep)
 		if(!conv_elec)
 		{
 			// option 1
-			pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
+			pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 
 			// option 2
@@ -429,16 +429,16 @@ void ELEC_scf::scf(const int &istep)
 			// use real E_tot functional.
 			//------------------------------
 			/*
-			pot.vr = pot.v_of_rho(CHR.rho_save, CHR.rho);
+			pot.vr = pot.v_of_rho(GlobalC::CHR.rho_save, GlobalC::CHR.rho);
 			GlobalC::en.calculate_etot();
 			GlobalC::en.print_etot(conv_elec, istep, iter, dr2, 0.0, GlobalV::ETHR, avg_iter,0);
-			pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
+			pot.vr = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			GlobalC::en.delta_escf();
 			*/
 		}
 		else
 		{
-			pot.vnew = pot.v_of_rho(CHR.rho, CHR.rho_core);
+			pot.vnew = pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 			//(used later for scf correction to the forces )
 			pot.vnew -= pot.vr;
 			GlobalC::en.descf = 0.0;
@@ -453,7 +453,7 @@ void ELEC_scf::scf(const int &istep)
 
 			stringstream ssc;
 			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-			CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), precision );//mohan add 2007-10-17
+			GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), precision );//mohan add 2007-10-17
 
 			stringstream ssd;
 
@@ -520,7 +520,7 @@ void ELEC_scf::scf(const int &istep)
 			//quxin add for DFT+U for nscf calculation
 			if(INPUT.dft_plus_u)
 			{
-				if(CHR.out_charge)
+				if(GlobalC::CHR.out_charge)
 				{
 					stringstream sst;
 					sst << GlobalV::global_out_dir << "onsite.dm";
@@ -534,7 +534,7 @@ void ELEC_scf::scf(const int &istep)
 
 				stringstream ssc;
 				ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
-				CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
+				GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 
 				stringstream ssd;
 				if(GlobalV::GAMMA_ONLY_LOCAL)
@@ -559,7 +559,7 @@ void ELEC_scf::scf(const int &istep)
 				//fuxiang add 2017-03-15
 				stringstream sse;
 				sse << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DIPOLE_ELEC";
-				CHR.write_rho_dipole(CHR.rho_save, is, 0, sse.str());
+				GlobalC::CHR.write_rho_dipole(GlobalC::CHR.rho_save, is, 0, sse.str());
 				*/
 			}
 
@@ -609,9 +609,9 @@ void ELEC_scf::init_mixstep_final_scf(void)
 {
     TITLE("ELEC_scf","init_mixstep_final_scf");
 
-    CHR.irstep=0;
-    CHR.idstep=0;
-    CHR.totstep=0;
+    GlobalC::CHR.irstep=0;
+    GlobalC::CHR.idstep=0;
+    GlobalC::CHR.totstep=0;
 
     return;
 }
