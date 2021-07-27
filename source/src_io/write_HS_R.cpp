@@ -44,15 +44,15 @@ void LOOP_ions::output_HS_R(void)
         //         if(GlobalV::NSPIN==2)GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
         //         for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         //         {
-        //             pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
+        //             GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
         //         }
         	    	
         //         if(!GlobalV::GAMMA_ONLY_LOCAL)
         //         {
         //             if(GlobalV::VL_IN_H)
         //             {
-		// 				//UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-		// 				UHM.GK.cal_vlocal_k(pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
+		// 				//UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
+		// 				UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
         //             }
         //         }
         //         UHM.GK.cal_vlocal_R(GlobalV::CURRENT_SPIN);
@@ -73,15 +73,15 @@ void LOOP_ions::output_HS_R(void)
 
                 for(int ir = 0; ir < GlobalC::pw.nrxx; ir++)
                 {
-                    pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
+                    GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
                 }
         	    	
                 if(!GlobalV::GAMMA_ONLY_LOCAL)
                 {
                     if(GlobalV::VL_IN_H)
                     {
-						//UHM.GK.cal_vlocal_k(pot.vrs1,GridT);
-						UHM.GK.cal_vlocal_k(pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
+						//UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
+						UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
                     }
                 }
                 UHM.calculate_HSR_sparse(GlobalV::CURRENT_SPIN, sparse_threshold);

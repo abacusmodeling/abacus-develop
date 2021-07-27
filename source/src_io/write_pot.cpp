@@ -214,7 +214,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     {
         for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            Porter[ir] += complex<double>( CHR.rho[is][ir], 0.0 );
+            Porter[ir] += complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
         }
     }
 

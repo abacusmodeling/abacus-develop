@@ -124,7 +124,7 @@ void K_Vectors::set(
     // It's very important in parallel case,
     // firstly do the mpi_k() and then
     // do set_kup_and_kdw()
-	Pkpoints.kinfo(nkstot);
+	GlobalC::Pkpoints.kinfo(nkstot);
 #ifdef __MPI
     this->mpi_k();//2008-4-29
 #endif
@@ -843,7 +843,7 @@ void K_Vectors::mpi_k(void)
 
     Parallel_Common::bcast_double(koffset, 3);
 
-    this->nks = Pkpoints.nks_pool[GlobalV::MY_POOL];
+    this->nks = GlobalC::Pkpoints.nks_pool[GlobalV::MY_POOL];
 
 	GlobalV::ofs_running << endl;
 	OUT(GlobalV::ofs_running,"k-point number in this process",nks);
@@ -897,7 +897,7 @@ void K_Vectors::mpi_k(void)
     for (int i = 0;i < nks;i++)
     {
         // 3 is because each k point has three value:kx, ky, kz
-        k_index = i + Pkpoints.startk_pool[GlobalV::MY_POOL] ;
+        k_index = i + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] ;
         kvec_c[i].x = kvec_c_aux[k_index*3];
         kvec_c[i].y = kvec_c_aux[k_index*3+1];
         kvec_c[i].z = kvec_c_aux[k_index*3+2];
@@ -1056,7 +1056,7 @@ void K_Vectors::mpi_k_after_vc(void)
     Parallel_Common::bcast_int(nmp, 3);
     Parallel_Common::bcast_double(koffset, 3);
 
-    this->nks = Pkpoints.nks_pool[GlobalV::MY_POOL];
+    this->nks = GlobalC::Pkpoints.nks_pool[GlobalV::MY_POOL];
     GlobalV::ofs_running << endl;
     OUT(GlobalV::ofs_running,"k-point number in this process",nks);
     int nks_minimum = this->nks;
@@ -1100,7 +1100,7 @@ void K_Vectors::mpi_k_after_vc(void)
     int k_index = 0;
     for (int i = 0;i < nks;i++)
     {
-        k_index = i + Pkpoints.startk_pool[GlobalV::MY_POOL] ;
+        k_index = i + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] ;
         kvec_c[i].x = kvec_c_aux[k_index*3];
         kvec_c[i].y = kvec_c_aux[k_index*3+1];
         kvec_c[i].z = kvec_c_aux[k_index*3+2];

@@ -16,7 +16,7 @@ void Exx_Abfs::DM::cal_DM(
 {
 	TITLE("Exx_Abfs::DM::cal_DM");
 	
-	cal_DMk_mixing( CHR, atom_pairs );
+	cal_DMk_mixing( GlobalC::CHR, atom_pairs );
 
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
 	{

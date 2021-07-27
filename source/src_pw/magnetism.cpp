@@ -30,11 +30,11 @@ void Magnetism::compute_magnetization()
         this->tot_magnetization = 0.00;
         this->abs_magnetization = 0.00;
 
-		//CHR.check_ne(CHR.rho[0]);
-		//CHR.check_ne(CHR.rho[1]);
+		//GlobalC::CHR.check_ne(GlobalC::CHR.rho[0]);
+		//GlobalC::CHR.check_ne(GlobalC::CHR.rho[1]);
         for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            double diff = CHR.rho[0][ir] - CHR.rho[1][ir];
+            double diff = GlobalC::CHR.rho[0][ir] - GlobalC::CHR.rho[1][ir];
             this->tot_magnetization += diff;
             this->abs_magnetization += abs(diff);
         }
@@ -54,7 +54,7 @@ void Magnetism::compute_magnetization()
 		}
 		else
 		{
-			OUT(GlobalV::ofs_running,"nelec",CHR.nelec);
+			OUT(GlobalV::ofs_running,"nelec",GlobalC::CHR.nelec);
 		}
 
 //        cout << "\n tot_mag = " << setprecision(6) << this->tot_magnetization << " Bohr mag/cell" << endl;
@@ -67,9 +67,9 @@ void Magnetism::compute_magnetization()
 		this->abs_magnetization = 0.00;
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			double diff = sqrt(pow(CHR.rho[1][ir], 2) + pow(CHR.rho[2][ir], 2) +pow(CHR.rho[3][ir], 2));
+			double diff = sqrt(pow(GlobalC::CHR.rho[1][ir], 2) + pow(GlobalC::CHR.rho[2][ir], 2) +pow(GlobalC::CHR.rho[3][ir], 2));
  
-			for(int i=0;i<3;i++)this->tot_magnetization_nc[i] += CHR.rho[i+1][ir];
+			for(int i=0;i<3;i++)this->tot_magnetization_nc[i] += GlobalC::CHR.rho[i+1][ir];
 			this->abs_magnetization += abs(diff);
 		}
 		Parallel_Reduce::reduce_double_pool( this->tot_magnetization_nc, 3 );
@@ -93,11 +93,11 @@ double Magnetism::get_nelup(void)
 //===============================================================
 //  this type of electrons are used as "fixed" magnetization.
 //===============================================================
-		nelup = 0.5 * CHR.nelec + 0.5 * tot_magnetization;
+		nelup = 0.5 * GlobalC::CHR.nelec + 0.5 * tot_magnetization;
 	}
 	else
 	{
-		nelup = 0.5 * CHR.nelec;
+		nelup = 0.5 * GlobalC::CHR.nelec;
 	}
     return nelup;
 
@@ -107,7 +107,7 @@ double Magnetism::get_nelup(void)
 //	double nelup = 0.0;
 //	for(int i=0; i<GlobalC::pw.ntype; i++)
 //	{
-//		nelup += CHR.nelec * (1.0+start_magnetization[i])/2.0/GlobalC::pw.ntype;
+//		nelup += GlobalC::CHR.nelec * (1.0+start_magnetization[i])/2.0/GlobalC::pw.ntype;
 //	}
 //	return nelup;
 }
@@ -121,11 +121,11 @@ double Magnetism::get_neldw(void)
 //===============================================================
 //  this type of electrons are used as "fixed" magnetization.
 //===============================================================
-		neldw = 0.5 * CHR.nelec - 0.5 * tot_magnetization;
+		neldw = 0.5 * GlobalC::CHR.nelec - 0.5 * tot_magnetization;
 	}
 	else
 	{
-		neldw = 0.5 * CHR.nelec;
+		neldw = 0.5 * GlobalC::CHR.nelec;
 	}
     return neldw ;
 
