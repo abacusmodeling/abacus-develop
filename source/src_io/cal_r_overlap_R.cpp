@@ -43,7 +43,7 @@ void cal_r_overlap_R::init()
 			psi_r_psi[ix][iy] = new Vector3<double> *[R_z_num];
 			for(int iz = 0; iz < R_z_num; iz++)
 			{				
-				psi_r_psi[ix][iy][iz] = new Vector3<double> [ParaO.nloc];				
+				psi_r_psi[ix][iy][iz] = new Vector3<double> [GlobalC::ParaO.nloc];				
 			}
 		}
 	}
@@ -273,15 +273,15 @@ void cal_r_overlap_R::out_r_overlap_R(const int nspin)
 				int ir,ic;
 				for(int iw1 = 0; iw1 < GlobalV::NLOCAL; iw1++)
 				{
-					ir = ParaO.trace_loc_row[iw1];	
+					ir = GlobalC::ParaO.trace_loc_row[iw1];	
 					if(ir >= 0)
 					{
 						for(int iw2 = 0; iw2 < GlobalV::NLOCAL; iw2++)
 						{							
-							ic = ParaO.trace_loc_col[iw2];
+							ic = GlobalC::ParaO.trace_loc_col[iw2];
 							if(ic >= 0)
 							{
-								int icc = ir + ic * ParaO.nrow;
+								int icc = ir + ic * GlobalC::ParaO.nrow;
 								
 								int orb_index_row = iw1 / GlobalV::NPOL;
 								int orb_index_col = iw2 / GlobalV::NPOL;
@@ -362,16 +362,16 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 					ZEROS(liner_y,GlobalV::NLOCAL);
 					ZEROS(liner_z,GlobalV::NLOCAL);
 					
-					ir = ParaO.trace_loc_row[i];
+					ir = GlobalC::ParaO.trace_loc_row[i];
 					
 					if(ir >= 0)
 					{
 						for(int j = 0; j < GlobalV::NLOCAL; j++)
 						{
-							ic = ParaO.trace_loc_col[j];
+							ic = GlobalC::ParaO.trace_loc_col[j];
 							if(ic >= 0)
 							{
-								int iic = ir + ic * ParaO.nrow;
+								int iic = ir + ic * GlobalC::ParaO.nrow;
 								liner_x[j] = psi_r_psi[ix][iy][iz][iic].x;
 								liner_y[j] = psi_r_psi[ix][iy][iz][iic].y;
 								liner_z[j] = psi_r_psi[ix][iy][iz][iic].z;

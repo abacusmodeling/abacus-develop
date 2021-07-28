@@ -264,7 +264,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
         WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
     }
     
-    setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
+    setAlltoallvParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
 
 	// Peize Lin test 2019-01-16
     wfc_dm_2d.init();
@@ -288,7 +288,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 
-		LOC.wfc_dm_2d.wfc_gamma[is].create(ParaO.ncol, ParaO.nrow);
+		LOC.wfc_dm_2d.wfc_gamma[is].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
 		LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << is << endl;
@@ -333,7 +333,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
         if(INPUT.new_dm>1)
-        // outputDM( ParaO.blacs_ctxt, ParaO.nb);
+        // outputDM( GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
         {
             // int myid;
             // MPI_Comm_rank(MPI_COMM_WORLD, &myid);
@@ -345,7 +345,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             //     GlobalV::ofs_running<<"DM(1,0)"<<wfc_dm_2d.dm_gamma[is](0,1)<<" ";
             //     GlobalV::ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<endl;
             // }
-            GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<ParaO.nb<<endl;
+            GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<GlobalC::ParaO.nb<<endl;
             GlobalV::ofs_running<<"DM in 2D format:\n_________________________________________\n";
             for(int i=0; i<wfc_dm_2d.dm_gamma[is].nr; ++i)
             {
@@ -378,7 +378,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
         }
         // transform data via MPI_Alltoallv
         MPI_Alltoallv(sender_buffer, sender_size_process, sender_displacement_process, MPI_DOUBLE,
-                      receiver_buffer, receiver_size_process, receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
+                      receiver_buffer, receiver_size_process, receiver_displacement_process, MPI_DOUBLE, GlobalC::ParaO.comm_2D);
         // put data from receiver buffer to this->DM[is]
         nNONZERO=0;
         // init DM[is]
@@ -519,7 +519,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 			{
 				for(int ib=0; ib<bands_local[myid]; ib++)
 				{
-					Z_wg(iw,ib) = ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
+					Z_wg(iw,ib) = GlobalC::ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
 				}
 			}
 		}
@@ -558,7 +558,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 					const int col_index = i_col +col_count*300;
 					for(int ib=0; ib<band_local; ib++)
 					{
-						Z_col(i_col,ib) = ParaO.Z_LOC[is][col_index*band_local+ib] ;
+						Z_col(i_col,ib) = GlobalC::ParaO.Z_LOC[is][col_index*band_local+ib] ;
 					}
 				}
 

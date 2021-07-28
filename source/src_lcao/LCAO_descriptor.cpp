@@ -285,12 +285,12 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 
 void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const int &im, const double &v)
 {
-    //const int ir = ParaO.trace_loc_row[iw1_all];
-    //const int ic = ParaO.trace_loc_col[iw2_all];
+    //const int ir = GlobalC::ParaO.trace_loc_row[iw1_all];
+    //const int ic = GlobalC::ParaO.trace_loc_col[iw2_all];
     //no parellel yet
     const int ir = iw1_all;
     const int ic = im;
-    //const int index = ir * ParaO.ncol + ic;
+    //const int index = ir * GlobalC::ParaO.ncol + ic;
     int index=0; // mohan add 2021-07-26
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
     {
@@ -527,12 +527,12 @@ void LCAO_Descriptor::set_DS_mu_alpha(
 	const double& vy, 
 	const double& vz)
 {
-    //const int ir = ParaO.trace_loc_row[iw1_all];
-    //const int ic = ParaO.trace_loc_col[iw2_all];
+    //const int ir = GlobalC::ParaO.trace_loc_row[iw1_all];
+    //const int ic = GlobalC::ParaO.trace_loc_col[iw2_all];
     //no parellel yet
     const int ir = iw1_all;
     const int ic = im;
-    //const int index = ir * ParaO.ncol + ic;
+    //const int index = ir * GlobalC::ParaO.ncol + ic;
     int index;
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
     {
@@ -576,8 +576,8 @@ void LCAO_Descriptor::cal_gdmx(matrix &dm)
             const int iat = GlobalC::ucell.iwt2iat[i];//the atom whose force being calculated
             for (int j= 0;j < GlobalV::NLOCAL; ++j)
             {
-                const int mu = ParaO.trace_loc_row[j];
-                const int nu = ParaO.trace_loc_col[i];
+                const int mu = GlobalC::ParaO.trace_loc_row[j];
+                const int nu = GlobalC::ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0)
                 {
                     for (int m1 = 0;m1 < nm;++m1)

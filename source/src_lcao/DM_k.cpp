@@ -67,7 +67,7 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 	for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 	{
 
-		LOC.wfc_dm_2d.wfc_k[ik].create(ParaO.ncol, ParaO.nrow);
+		LOC.wfc_dm_2d.wfc_k[ik].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
 		LOC.wfc_dm_2d.wfc_k[ik].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << endl;

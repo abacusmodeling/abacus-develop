@@ -567,9 +567,9 @@ void Input_Conv::Convert(void)
     GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
 	LOC.out_dm = INPUT.out_dm;
-	ParaO.out_hs = INPUT.out_hs;
-	ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
-	ParaO.out_lowf = INPUT.out_lowf;
+	GlobalC::ParaO.out_hs = INPUT.out_hs;
+	GlobalC::ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
+	GlobalC::ParaO.out_lowf = INPUT.out_lowf;
 #endif
 
 	GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;

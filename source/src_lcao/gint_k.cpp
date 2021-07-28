@@ -279,7 +279,7 @@ void Gint_k::folding_force(
 		Parallel_Reduce::reduce_double_pool( tmp, GlobalV::NLOCAL*3 );
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
@@ -516,7 +516,7 @@ void Gint_k::folding_stress(
 		Parallel_Reduce::reduce_double_pool( tmp1, GlobalV::NLOCAL*6 );
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
@@ -805,7 +805,7 @@ void Gint_k::folding_vl_k(const int &ik)
 		//-----------------------------------------------------
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
@@ -1119,7 +1119,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		//-----------------------------------------------------
 		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			if (!ParaO.in_this_processor(i,j))
+			if (!GlobalC::ParaO.in_this_processor(i,j))
 			{
 				continue;
 			}
@@ -1428,7 +1428,7 @@ void Gint_k::distribute_pvpR_tr(void)
                     else Parallel_Reduce::reduce_complex_double_pool( tmp_soc, GlobalV::NLOCAL );
                     for(int j=0; j<GlobalV::NLOCAL; j++)
                     {
-                        if(!ParaO.in_this_processor(i,j))
+                        if(!GlobalC::ParaO.in_this_processor(i,j))
                         {
                             continue;
                         }
@@ -1783,11 +1783,11 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 						Parallel_Reduce::reduce_complex_double_pool(tmp_soc, GlobalV::NLOCAL);
 					}
 
-					if (ParaO.trace_loc_row[row] >= 0)
+					if (GlobalC::ParaO.trace_loc_row[row] >= 0)
 					{
 						for(int col = 0; col < GlobalV::NLOCAL; ++col)
 						{
-							if(ParaO.trace_loc_col[col] >= 0)
+							if(GlobalC::ParaO.trace_loc_col[col] >= 0)
 							{
 								if (GlobalV::NSPIN != 4)
 								{

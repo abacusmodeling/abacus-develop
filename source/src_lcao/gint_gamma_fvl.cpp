@@ -728,16 +728,16 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
 
         for (int j=0; j<GlobalV::NLOCAL; j++)
         {
-            if (!ParaO.in_this_processor(i,j))
+            if (!GlobalC::ParaO.in_this_processor(i,j))
             {
                 continue;
             }
             LM.set_force (i,j,tmpx[j], tmpy[j], tmpz[j],'N');
             if(GlobalV::STRESS)
             {
-                const int irr = ParaO.trace_loc_row[ i ];
-                const int icc = ParaO.trace_loc_col[ j ];
-                const int index = irr * ParaO.ncol + icc;
+                const int irr = GlobalC::ParaO.trace_loc_row[ i ];
+                const int icc = GlobalC::ParaO.trace_loc_col[ j ];
+                const int index = irr * GlobalC::ParaO.ncol + icc;
                 LM.DHloc_fixed_11[index] += tmp11[j];
                 LM.DHloc_fixed_12[index] += tmp12[j];
                 LM.DHloc_fixed_13[index] += tmp13[j];
@@ -796,7 +796,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     // {
     //     for(int j=0; j<GlobalV::NLOCAL; ++j)
     //     {
-    //         if(ParaO.in_this_processor(i,j))
+    //         if(GlobalC::ParaO.in_this_processor(i,j))
     //             LM.set_force (i,j,DGridV_x[i][j], DGridV_y[i][j], DGridV_z[i][j],'N');
     //     }
     // }

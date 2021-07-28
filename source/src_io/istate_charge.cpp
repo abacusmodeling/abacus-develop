@@ -185,8 +185,8 @@ void IState_Charge::idmatrix(const int &ib)
 		assert(GlobalC::wf.wg.nr==GlobalV::NSPIN);
 		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
-			std::vector<double> wg_local(ParaO.ncol,0.0);
-			const int ib_local = ParaO.trace_loc_col[ib];
+			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
+			const int ib_local = GlobalC::ParaO.trace_loc_col[ib];
 
 			int fermi_band=0;
 			fermi_band = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 ) ;
@@ -221,10 +221,10 @@ void IState_Charge::idmatrix(const int &ib)
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalC::wf.wg.nc,
 				&one_float,
-				wg_wfc.c, &one_int, &one_int, ParaO.desc,
-				LOC.wfc_dm_2d.wfc_gamma[is].c, &one_int, &one_int, ParaO.desc,
+				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
+				LOC.wfc_dm_2d.wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				LOC.wfc_dm_2d.dm_gamma[is].c, &one_int, &one_int, ParaO.desc);
+				LOC.wfc_dm_2d.dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 
 		cout << " finished calc dm_2d : " << endl;

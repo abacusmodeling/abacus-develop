@@ -278,7 +278,7 @@ void energy::perform_dos(void)
 			{
 				std::vector<matrix>   Mulk;
 				Mulk.resize(1);
-				Mulk[0].create(ParaO.ncol,ParaO.nrow);
+				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 
 				matrix Dwf = D.wfc_gamma[is];
@@ -307,20 +307,20 @@ void energy::perform_dos(void)
 							&T_char,
 							&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 							&one_float,
-							LM.Sloc, &one_int, &one_int, ParaO.desc,
-							Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+							LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
+							Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 							&zero_float,
-							Mulk[0].c, &one_int, &NB, ParaO.desc,
+							Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 							&one_int);
 
 					for (int j=0; j<GlobalV::NLOCAL; ++j)
 					{
 
-						if ( ParaO.in_this_processor(j,i) )
+						if ( GlobalC::ParaO.in_this_processor(j,i) )
 						{
 
-							const int ir = ParaO.trace_loc_row[j];
-							const int ic = ParaO.trace_loc_col[i];
+							const int ir = GlobalC::ParaO.trace_loc_row[j];
+							const int ic = GlobalC::ParaO.trace_loc_col[i];
 							waveg[j] = Mulk[0](ic,ir)*D.wfc_gamma[is](ic,ir);
 							const double x = waveg[j].real();
 							LapackConnector::axpy(np , x,Gauss, 1,pdosk[is].c+j*pdosk[is].nc,1);
@@ -369,7 +369,7 @@ void energy::perform_dos(void)
 				UHM.genH.build_ST_new('S', false);
 				std::vector<ComplexMatrix> Mulk;
 				Mulk.resize(1);
-				Mulk[0].create(ParaO.ncol,ParaO.nrow);
+				Mulk[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 
 				for(int ik=0;ik<GlobalC::kv.nks;ik++)
@@ -377,7 +377,7 @@ void energy::perform_dos(void)
 
 					if(is == GlobalC::kv.isk[ik])
 					{
-						LM.allocate_HS_k(ParaO.nloc);
+						LM.allocate_HS_k(GlobalC::ParaO.nloc);
 						LM.zeros_HSk('S');
 						LNNR.folding_fixedH(ik);
 
@@ -411,10 +411,10 @@ void energy::perform_dos(void)
 									&T_char,
 									&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 									&one_float,
-									LM.Sloc2, &one_int, &one_int, ParaO.desc,
-									Dwfc.c, &one_int, &NB, ParaO.desc, &one_int,
+									LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
+									Dwfc.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 									&zero_float,
-									Mulk[0].c, &one_int, &NB, ParaO.desc,
+									Mulk[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 									&one_int);
 
 
@@ -422,11 +422,11 @@ void energy::perform_dos(void)
 							for (int j=0; j<GlobalV::NLOCAL; ++j)
 							{
 
-								if ( ParaO.in_this_processor(j,i) )
+								if ( GlobalC::ParaO.in_this_processor(j,i) )
 								{
 
-									const int ir = ParaO.trace_loc_row[j];
-									const int ic = ParaO.trace_loc_col[i];
+									const int ir = GlobalC::ParaO.trace_loc_row[j];
+									const int ic = GlobalC::ParaO.trace_loc_col[i];
 
 									waveg[j] = Mulk[0](ic,ir)*D.wfc_k[ik](ic,ir);
 									const double x = waveg[j].real();

@@ -181,9 +181,9 @@ vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_ato
 		const int iat = GlobalC::ucell.iwt2iat[iwt];
 		if(GlobalV::KS_SOLVER=="genelpa")
 		{
-			if(ParaO.trace_loc_col[iwt]>=0)
+			if(GlobalC::ParaO.trace_loc_col[iwt]>=0)
 				atom_in_2D[iat].first = true;
-			if(ParaO.trace_loc_row[iwt]>=0)
+			if(GlobalC::ParaO.trace_loc_row[iwt]>=0)
 				atom_in_2D[iat].second = true;
 		}
 		else

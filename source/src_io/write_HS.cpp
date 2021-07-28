@@ -149,26 +149,26 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
             ZEROS(lineH, GlobalV::NLOCAL-i);
             ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
                 for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
                         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -242,26 +242,26 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
             ZEROS(lineH, GlobalV::NLOCAL-i);
             ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
                 for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
                         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -321,19 +321,19 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
         int irr,icc;
         for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            irr = ParaO.trace_loc_row[i];
+            irr = GlobalC::ParaO.trace_loc_row[i];
             if (irr>=0)
             {
                 // data collection
                 for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-            icc = ParaO.trace_loc_col[j];
+            icc = GlobalC::ParaO.trace_loc_col[j];
             if (icc>=0)
             {
-                //if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
-                //if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
-                ofs_H << " " << H[irr*ParaO.ncol+icc];
-                ofs_S << " " << S[irr*ParaO.ncol+icc];
+                //if(abs(H[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) H[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                //if(abs(S[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) S[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                ofs_H << " " << H[irr*GlobalC::ParaO.ncol+icc];
+                ofs_S << " " << S[irr*GlobalC::ParaO.ncol+icc];
             }
         }
         ofs_H << endl;
@@ -428,26 +428,26 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
             ZEROS(lineH, GlobalV::NLOCAL-i);
             ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
                 for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
                         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -521,26 +521,26 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
             ZEROS(lineH, GlobalV::NLOCAL-i);
             ZEROS(lineS, GlobalV::NLOCAL-i);
 
-            ir = ParaO.trace_loc_row[i];
+            ir = GlobalC::ParaO.trace_loc_row[i];
             if (ir>=0)
             {
                 // data collection
                 for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    ic = ParaO.trace_loc_col[j];
+                    ic = GlobalC::ParaO.trace_loc_col[j];
                     if (ic>=0)
                     {
                         int iic;
                         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                         {
-                            iic=ir+ic*ParaO.nrow;
+                            iic=ir+ic*GlobalC::ParaO.nrow;
                         }
                         else
                         {
-                            iic=ir*ParaO.ncol+ic;
+                            iic=ir*GlobalC::ParaO.ncol+ic;
                         }
-                        //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                        //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                        //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                        //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                         lineH[j-i] = H[iic];
                         lineS[j-i] = S[iic];
                     }
@@ -600,19 +600,19 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         int irr,icc;
         for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            irr = ParaO.trace_loc_row[i];
+            irr = GlobalC::ParaO.trace_loc_row[i];
             if (irr>=0)
             {
                 // data collection
                 for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        icc = ParaO.trace_loc_col[j];
+                        icc = GlobalC::ParaO.trace_loc_col[j];
                         if (icc>=0)
                         {
-                                //if(abs(H[irr*ParaO.ncol+icc]) < 1.0e-10) H[irr*ParaO.ncol+icc] = 0.0;
-                                //if(abs(S[irr*ParaO.ncol+icc]) < 1.0e-10) S[irr*ParaO.ncol+icc] = 0.0;
-                                ofs_H << " " << H[irr*ParaO.ncol+icc];
-                                ofs_S << " " << S[irr*ParaO.ncol+icc];
+                                //if(abs(H[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) H[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                                //if(abs(S[irr*GlobalC::ParaO.ncol+icc]) < 1.0e-10) S[irr*GlobalC::ParaO.ncol+icc] = 0.0;
+                                ofs_H << " " << H[irr*GlobalC::ParaO.ncol+icc];
+                                ofs_S << " " << S[irr*GlobalC::ParaO.ncol+icc];
                         }
                 }
                 ofs_H << endl;
@@ -727,25 +727,25 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                     //ZEROS(lineH, GlobalV::NLOCAL);
                     //ZEROS(lineS, GlobalV::NLOCAL);
 
-                    ir = ParaO.trace_loc_row[i];
+                    ir = GlobalC::ParaO.trace_loc_row[i];
                     if(ir>=0)
                     {
                         //for(int j=i; j<GlobalV::NLOCAL; j++)
                         for(int j=0; j<GlobalV::NLOCAL; j++)
                         {
-                            ic = ParaO.trace_loc_col[j];
+                            ic = GlobalC::ParaO.trace_loc_col[j];
                             if(ic>=0)
                             {
-                                //lineH[j-i] = H[ir*ParaO.ncol+ic];
-                                //lineS[j-i] = S[ir*ParaO.ncol+ic];
+                                //lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+                                //lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
                                 int iic;
                                 if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                                 {
-                                    iic=ir+ic*ParaO.nrow;
+                                    iic=ir+ic*GlobalC::ParaO.nrow;
                                 }
                                 else
                                 {
-                                    iic=ir*ParaO.ncol+ic;
+                                    iic=ir*GlobalC::ParaO.ncol+ic;
                                 }
                                 if(GlobalV::NSPIN!=4)
                                 {
@@ -1110,7 +1110,7 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
         line = new double[GlobalV::NLOCAL];
         ZEROS(line, GlobalV::NLOCAL);
 
-        if(ParaO.trace_loc_row[row] >= 0)
+        if(GlobalC::ParaO.trace_loc_row[row] >= 0)
         {
             auto iter = XR.find(row);
             if (iter != XR.end())
@@ -1219,7 +1219,7 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
         line = new complex<double>[GlobalV::NLOCAL];
         ZEROS(line, GlobalV::NLOCAL);
 
-        if(ParaO.trace_loc_row[row] >= 0)
+        if(GlobalC::ParaO.trace_loc_row[row] >= 0)
         {
             auto iter = XR.find(row);
             if (iter != XR.end())

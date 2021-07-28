@@ -111,7 +111,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 							// so, here we use ParaO::in_this_processor,
 							// in build_Non... use trace_loc_row
 							// and trace_loc_col directly,
-							if ( !ParaO.in_this_processor(iw1_all,iw2_all) )
+							if ( !GlobalC::ParaO.in_this_processor(iw1_all,iw2_all) )
 							{
 								++iw2_all;
 								continue;
@@ -247,11 +247,11 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 					{
 						for(int jj=0; jj<atom1->nw * GlobalV::NPOL; ++jj)
 						{
-							const int mu = ParaO.trace_loc_row[start1+jj];
+							const int mu = GlobalC::ParaO.trace_loc_row[start1+jj];
 							if(mu<0)continue; 
 							for(int kk=0; kk<atom2->nw * GlobalV::NPOL; ++kk)
 							{
-								const int nu = ParaO.trace_loc_col[start2+kk];
+								const int nu = GlobalC::ParaO.trace_loc_col[start2+kk];
 								if(nu<0)continue;
 								++nnr;
 							}//kk
@@ -282,8 +282,8 @@ void LCAO_gen_fixedH::test_Nonlocal()
 	double distance = 0.0;
 	double rcut = 0.0;
 
-//	double* vnltest = new double[ParaO.nloc];	
-//	ZEROS(vnltest, ParaO.nloc);
+//	double* vnltest = new double[GlobalC::ParaO.nloc];	
+//	ZEROS(vnltest, GlobalC::ParaO.nloc);
 
 	// psi1
 	double sum = 0.0;
@@ -320,13 +320,13 @@ void LCAO_gen_fixedH::test_Nonlocal()
 					{
 						int j0 = j/GlobalV::NPOL;
 						const int iw1_all = start1 + j;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 						if(mu < 0)continue; 
 						for (int k=0; k<atom2->nw*GlobalV::NPOL; k++)
 						{
 							int k0 = k/GlobalV::NPOL;
 							const int iw2_all = start2 + k;
-							const int nu = ParaO.trace_loc_col[iw2_all];						
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];						
 							if(nu < 0)continue;
 							for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ad0++)
 							{
@@ -365,7 +365,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 											GlobalC::ucell.atoms[T0].nproj_soc
 											);
 									
-									//vnltest[ mu * ParaO.ncol + nu ] += nlm[0];
+									//vnltest[ mu * GlobalC::ParaO.ncol + nu ] += nlm[0];
 									sum += abs( nlm[0] );
 								}// distance
 							} // ad0
@@ -387,10 +387,10 @@ void LCAO_gen_fixedH::test_Nonlocal()
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			double a = vnltest[i*ParaO.ncol+j];
+			double a = vnltest[i*GlobalC::ParaO.ncol+j];
 			if( abs(a) > 1.0e-6 )
 			{
-				cout << setw(15) << vnltest[i*ParaO.ncol+j];
+				cout << setw(15) << vnltest[i*GlobalC::ParaO.ncol+j];
 			}
 			else
 			{
@@ -497,7 +497,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 					{
 						const int j0 = j/GlobalV::NPOL;//added by zhengdy-soc
 						const int iw1_all = start1 + j;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 						if(mu < 0)continue; 
 
 						// fix a serious bug: atom2[T2] -> atom2
@@ -506,7 +506,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 						{
 							const int k0 = k/GlobalV::NPOL;
 							const int iw2_all = start2 + k;
-							const int nu = ParaO.trace_loc_col[iw2_all];						
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];						
 							if(nu < 0)continue;
 
 
@@ -724,7 +724,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 						for (int iw1=0; iw1<nw1_tot; ++iw1)
 						{
 							const int iw1_all = start1 + iw1;
-							const int iw1_local = ParaO.trace_loc_row[iw1_all];
+							const int iw1_local = GlobalC::ParaO.trace_loc_row[iw1_all];
 							if(iw1_local < 0)continue;
 							const int iw1_0 = iw1/GlobalV::NPOL;
 
@@ -734,7 +734,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 							for (int iw2=0; iw2<nw2_tot; ++iw2)
 							{
 								const int iw2_all = start2 + iw2;
-								const int iw2_local = ParaO.trace_loc_col[iw2_all];
+								const int iw2_local = GlobalC::ParaO.trace_loc_col[iw2_all];
 								if(iw2_local < 0)continue;
 								const int iw2_0 = iw2/GlobalV::NPOL;
 

@@ -108,13 +108,13 @@ void Record_adj::for_2d(void)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start1 + ii;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
 						for(int jj=0; jj<GlobalC::ucell.atoms[T2].nw * GlobalV::NPOL; ++jj)
 						{
 							const int iw2_all = start2 + jj;
-							const int nu = ParaO.trace_loc_col[iw2_all];
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 							if(nu<0)continue;
 							
 							++irr;

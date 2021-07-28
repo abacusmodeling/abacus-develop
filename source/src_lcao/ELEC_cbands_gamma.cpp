@@ -52,11 +52,11 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
     // Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u) 
 		{
-      vector<double> eff_pot(ParaO.nloc);
+      vector<double> eff_pot(GlobalC::ParaO.nloc);
 			dftu.cal_eff_pot_mat_real(ik, istep, &eff_pot[0]);
 
 			const int spin = GlobalC::kv.isk[ik];
-			for(int irc=0; irc<ParaO.nloc; irc++)
+			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
 				LM.Hloc[irc] += eff_pot[irc];
         
 		}

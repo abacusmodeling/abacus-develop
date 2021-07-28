@@ -123,7 +123,7 @@ void Mulliken_Charge::cal_mulliken(void)
 		{
 			std::vector<matrix>   mud;
 			mud.resize(1);
-			mud[0].create(ParaO.ncol,ParaO.nrow);
+			mud[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 			matrix Dwf = M.wfc_gamma[is];
 			for (int i=0; i<GlobalV::NBANDS; ++i)		  
@@ -140,20 +140,20 @@ void Mulliken_Charge::cal_mulliken(void)
 						&T_char,
 						&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 						&one_float,
-						LM.Sloc, &one_int, &one_int, ParaO.desc,
-						Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+						LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
+						Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 						&zero_float,
-						mud[0].c, &one_int, &NB, ParaO.desc,
+						mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 						&one_int);
 
 				for (int j=0; j<GlobalV::NLOCAL; ++j)
 				{
 
-					if ( ParaO.in_this_processor(j,i) )
+					if ( GlobalC::ParaO.in_this_processor(j,i) )
 					{
 
-						const int ir = ParaO.trace_loc_row[j];
-						const int ic = ParaO.trace_loc_col[i];
+						const int ir = GlobalC::ParaO.trace_loc_row[j];
+						const int ic = GlobalC::ParaO.trace_loc_col[i];
 
 						mug[j] = mud[0](ic,ir)*M.wfc_gamma[is](ic,ir);
 
@@ -168,7 +168,7 @@ void Mulliken_Charge::cal_mulliken(void)
 		{   
 			std::vector<ComplexMatrix> mud;
 			mud.resize(1);
-			mud[0].create(ParaO.ncol,ParaO.nrow);
+			mud[0].create(GlobalC::ParaO.ncol,GlobalC::ParaO.nrow);
 
 			GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 				GlobalV::ofs_running,
@@ -214,7 +214,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			{
 				if(is == GlobalC::kv.isk[ik])
 				{
-					LM.allocate_HS_k(ParaO.nloc);
+					LM.allocate_HS_k(GlobalC::ParaO.nloc);
 					LM.zeros_HSk('S');
 					LNNR.folding_fixedH(ik);
 					ComplexMatrix Dwf = conj(M.wfc_k[ik]);
@@ -235,20 +235,20 @@ void Mulliken_Charge::cal_mulliken(void)
 								&T_char,
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 								&one_float,
-								LM.Sloc2, &one_int, &one_int, ParaO.desc,
-								Dwf.c, &one_int, &NB, ParaO.desc, &one_int,
+								LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
+								Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 								&zero_float,
-								mud[0].c, &one_int, &NB, ParaO.desc,
+								mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
 								&one_int);
 
 						for (int j=0; j<GlobalV::NLOCAL; ++j)
 						{
 
-							if ( ParaO.in_this_processor(j,i) )
+							if ( GlobalC::ParaO.in_this_processor(j,i) )
 							{
 
-								const int ir = ParaO.trace_loc_row[j];
-								const int ic = ParaO.trace_loc_col[i];
+								const int ir = GlobalC::ParaO.trace_loc_row[j];
+								const int ic = GlobalC::ParaO.trace_loc_col[i];
 
 								mug[j] = mud[0](ic,ir)*M.wfc_k[ik](ic,ir);
 								const double x = mug[j].real();

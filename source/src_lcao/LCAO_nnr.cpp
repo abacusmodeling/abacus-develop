@@ -101,13 +101,13 @@ void LCAO_nnr::cal_nnr(void)
 						// the index of orbitals in this processor
 						// according to HPSEPS's division method.
 						const int iw1_all = start1 + ii;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
 						for(int jj=0; jj<nw2; jj++)
 						{
 							const int iw2_all = start2 + jj;
-							const int nu = ParaO.trace_loc_col[iw2_all];
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 							if(nu<0)continue;
 
 							// orbital numbers for this atom (iat),
@@ -146,13 +146,13 @@ void LCAO_nnr::cal_nnr(void)
 							for(int ii=0; ii<nw1; ++ii)
 							{
 								const int iw1_all = start1 + ii;
-								const int mu = ParaO.trace_loc_row[iw1_all];
+								const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 								if(mu<0)continue;
 
 								for(int jj=0; jj<nw2; ++jj)
 								{
 									const int iw2_all = start2 + jj;
-									const int nu = ParaO.trace_loc_col[iw2_all];
+									const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 									if(nu<0)continue;
 
 									// orbital numbers for this atom (iat),
@@ -650,24 +650,24 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start + ii;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
 						for(int jj=0; jj<atom2->nw*GlobalV::NPOL; jj++)
 						{
 							int iw2_all = start2 + jj;
-							const int nu = ParaO.trace_loc_col[iw2_all];
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 
 							if(nu<0)continue;
-							//const int iic = mu*ParaO.ncol+nu;
+							//const int iic = mu*GlobalC::ParaO.ncol+nu;
                             int iic;
                             if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
                             {
-                                iic=mu+nu*ParaO.nrow;
+                                iic=mu+nu*GlobalC::ParaO.nrow;
                             }
                             else
                             {
-                                iic=mu*ParaO.ncol+nu;
+                                iic=mu*GlobalC::ParaO.ncol+nu;
                             }
 
 							//########################### EXPLAIN ###############################

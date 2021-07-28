@@ -215,13 +215,13 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 			/*
 			for( int iwt1_grid=0; iwt1_grid<GridT.lgd; ++iwt1_grid )
 			{				
-				const int iwt1 = ParaO.MatrixInfo.row_set[iwt1_grid];
+				const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[iwt1_grid];
 				const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
 				const int iw1  = GlobalC::ucell.iwt2iw[iwt1];
 cout<<iwt1_grid<<"\t"<<iwt1<<"\t"<<iat1<<"\t"<<iw1<<endl;
 				for( int iwt2_grid=0; iwt2_grid<GridT.lgd; ++iwt2_grid )
 				{				
-					const int iwt2 = ParaO.MatrixInfo.col_set[iwt2_grid];
+					const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[iwt2_grid];
 					const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
 					const int iw2  = GlobalC::ucell.iwt2iw[iwt2];
 cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;

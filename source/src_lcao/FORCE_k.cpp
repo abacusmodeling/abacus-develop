@@ -138,7 +138,7 @@ void Force_LCAO_k::allocate_k(void)
 	//-----------------------------
 	// calculate dS = <phi | dphi> 
 	//-----------------------------
-    // tips: build_ST_new --> ParaO.set_force 
+    // tips: build_ST_new --> GlobalC::ParaO.set_force 
 	bool cal_deri = true;
 	UHM.genH.build_ST_new ('S', cal_deri);
 
@@ -279,7 +279,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 								const int iw1_all = start1 + jj;
 								
 								// 2D division (HPSEPS)
-								const int mu = ParaO.trace_loc_row[iw1_all];
+								const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 								if(mu<0) continue;
 								const int mug = GridT.trace_lo[iw1_all];
 
@@ -288,7 +288,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 									const int iw2_all = start2 + kk;
 									
 									// 2D division (HPSEPS)
-									const int nu = ParaO.trace_loc_col[iw2_all];
+									const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 									if(nu<0) continue;
 									const int nug = GridT.trace_lo[iw2_all];
 	
@@ -442,7 +442,7 @@ void Force_LCAO_k::cal_foverlap_k(
 					const int iw1_all = start1 + jj; 
 
 					// HPSEPS
-					const int mu = ParaO.trace_loc_row[iw1_all];
+					const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 					if(mu<0)continue;
 
 					for(int kk=0; kk<atom2->nw; kk++)
@@ -450,7 +450,7 @@ void Force_LCAO_k::cal_foverlap_k(
 						const int iw2_all = start2 + kk;
 
 						// HPSEPS
-						const int nu = ParaO.trace_loc_col[iw2_all];
+						const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 						if(nu<0)continue;
 						//==============================================================
 						// here we use 'minus', but in GlobalV::GAMMA_ONLY_LOCAL we use 'plus',
@@ -559,12 +559,12 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 				for(int jj=0; jj<atom1->nw; ++jj)
 				{
 					const int iw1_all = start1 + jj; 
-					const int mu = ParaO.trace_loc_row[iw1_all];
+					const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 					if(mu<0)continue;
 					for(int kk=0; kk<atom2->nw; ++kk)
 					{
 						const int iw2_all = start2 + kk;
-						const int nu = ParaO.trace_loc_col[iw2_all];
+						const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 						if(nu<0)continue;
 						//==============================================================
 						// here we use 'minus', but in GlobalV::GAMMA_ONLY_LOCAL we use 'plus',
@@ -774,12 +774,12 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 					for (int j=0; j<atom1->nw; ++j)
 					{
 						const int iw1_all = start1 + j;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 						if(mu < 0)continue;
 						for (int k=0; k<atom2->nw; ++k)
 						{
 							const int iw2_all = start2 + k;
-							const int nu = ParaO.trace_loc_col[iw2_all];
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 							if(nu < 0)continue;
 							
 							for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)

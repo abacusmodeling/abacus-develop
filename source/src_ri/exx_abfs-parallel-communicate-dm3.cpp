@@ -21,12 +21,12 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<matrix> &DK_2D, const 
 	{
 		for(int iwt1_local=0; iwt1_local!=DK_2D[is].nr; ++iwt1_local)
 		{
-			const int iwt1 = ParaO.MatrixInfo.col_set[iwt1_local];
+			const int iwt1 = GlobalC::ParaO.MatrixInfo.col_set[iwt1_local];
 			const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
 			const int iw1 = GlobalC::ucell.iwt2iw[iwt1];
 			for(int iwt2_local=0; iwt2_local!=DK_2D[is].nc; ++iwt2_local)
 			{
-				const int iwt2 = ParaO.MatrixInfo.row_set[iwt2_local];
+				const int iwt2 = GlobalC::ParaO.MatrixInfo.row_set[iwt2_local];
 				const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
 				const int iw2 = GlobalC::ucell.iwt2iw[iwt2];
 				const double dm = DK_2D[is](iwt1_local,iwt2_local);
@@ -64,12 +64,12 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 	{
 		for(int iwt1_local=0; iwt1_local!=DK_2D[ik].nr; ++iwt1_local)
 		{
-			const int iwt1 = ParaO.MatrixInfo.col_set[iwt1_local];
+			const int iwt1 = GlobalC::ParaO.MatrixInfo.col_set[iwt1_local];
 			const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
 			const int iw1 = GlobalC::ucell.iwt2iw[iwt1];
 			for(int iwt2_local=0; iwt2_local!=DK_2D[ik].nc; ++iwt2_local)
 			{
-				const int iwt2 = ParaO.MatrixInfo.row_set[iwt2_local];
+				const int iwt2 = GlobalC::ParaO.MatrixInfo.row_set[iwt2_local];
 				const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
 				const int iw2 = GlobalC::ucell.iwt2iw[iwt2];
 				for(const Abfs::Vector3_Order<int> &box2 : supercell_boxes)

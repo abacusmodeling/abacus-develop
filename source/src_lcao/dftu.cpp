@@ -318,8 +318,8 @@ void DFTU::cal_occup_m_k(const int iter)
 	const int  one_int = 1;
 	const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
 
-	vector<complex<double>> srho(ParaO.nloc);
-    vector<complex<double>> Sk(ParaO.nloc);
+	vector<complex<double>> srho(GlobalC::ParaO.nloc);
+    vector<complex<double>> Sk(GlobalC::ParaO.nloc);
 	
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
@@ -329,10 +329,10 @@ void DFTU::cal_occup_m_k(const int iter)
 		pzgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
-				&Sk[0], &one_int, &one_int, ParaO.desc, 
-				LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, ParaO.desc,
+				&Sk[0], &one_int, &one_int, GlobalC::ParaO.desc, 
+				LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta, 
-				&srho[0], &one_int, &one_int, ParaO.desc);
+				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
     const int spin = GlobalC::kv.isk[ik];
     for(int it=0; it<GlobalC::ucell.ntype; it++)
@@ -371,19 +371,19 @@ void DFTU::cal_occup_m_k(const int iter)
 		  				for(int ipol0=0; ipol0<GlobalV::NPOL; ipol0++)
 		  				{
 		  					const int iwt0 = this->iatlnmipol2iwt[iat][l][n][m0][ipol0];
-		  					const int mu = ParaO.trace_loc_row[iwt0];
-		  					const int mu_prime = ParaO.trace_loc_col[iwt0];
+		  					const int mu = GlobalC::ParaO.trace_loc_row[iwt0];
+		  					const int mu_prime = GlobalC::ParaO.trace_loc_col[iwt0];
 
 		  					for(int m1=0; m1<2*l+1; m1++)
 		  					{
 		  						for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
 		  						{									
 		  							const int iwt1 = this->iatlnmipol2iwt[iat][l][n][m1][ipol1];
-		  							const int nu = ParaO.trace_loc_col[iwt1];
-		  							const int nu_prime = ParaO.trace_loc_row[iwt1];
+		  							const int nu = GlobalC::ParaO.trace_loc_col[iwt1];
+		  							const int nu_prime = GlobalC::ParaO.trace_loc_row[iwt1];
 
-		  							const int irc = nu*ParaO.nrow + mu;
-		  							const int irc_prime = mu_prime*ParaO.nrow + nu_prime;
+		  							const int irc = nu*GlobalC::ParaO.nrow + mu;
+		  							const int irc_prime = mu_prime*GlobalC::ParaO.nrow + nu_prime;
 
 		  							const int m0_all = m0 + ipol0*(2*l+1);
 		  							const int m1_all = m1 + ipol1*(2*l+1);
@@ -520,17 +520,17 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0;
 
-	vector<double> srho(ParaO.nloc);
+	vector<double> srho(GlobalC::ParaO.nloc);
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		// srho(mu,nu) = \sum_{iw} S(mu,iw)*dm_gamma(iw,nu)
 		pdgemm_(&transN, &transT,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
-				LM.Sloc, &one_int, &one_int, ParaO.desc, 
-				LOC.wfc_dm_2d.dm_gamma.at(is).c, &one_int, &one_int, ParaO.desc,
+				LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc, 
+				LOC.wfc_dm_2d.dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta,
-				&srho[0], &one_int, &one_int, ParaO.desc);
+				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
     for(int it=0; it<GlobalC::ucell.ntype; it++)
 	  {
@@ -565,19 +565,19 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	  					for(int ipol0=0; ipol0<GlobalV::NPOL; ipol0++)
 	  					{
 	  						const int iwt0 = this->iatlnmipol2iwt.at(iat).at(l).at(n).at(m0).at(ipol0);
-	  						const int mu = ParaO.trace_loc_row[iwt0];
-	  						const int mu_prime = ParaO.trace_loc_col[iwt0];
+	  						const int mu = GlobalC::ParaO.trace_loc_row[iwt0];
+	  						const int mu_prime = GlobalC::ParaO.trace_loc_col[iwt0];
 
 	  						for(int m1=0; m1<2*l+1; m1++)
 	  						{	
 	  							for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
 	  							{											
 	  								const int iwt1 = this->iatlnmipol2iwt.at(iat).at(l).at(n).at(m1).at(ipol1);
-	  								const int nu = ParaO.trace_loc_col[iwt1];
-	  								const int nu_prime = ParaO.trace_loc_row[iwt1];
+	  								const int nu = GlobalC::ParaO.trace_loc_col[iwt1];
+	  								const int nu_prime = GlobalC::ParaO.trace_loc_row[iwt1];
 
-	  								const int irc = nu*ParaO.nrow + mu;
-	  								const int irc_prime = mu_prime*ParaO.nrow + nu_prime;
+	  								const int irc = nu*GlobalC::ParaO.nrow + mu;
+	  								const int irc_prime = mu_prime*GlobalC::ParaO.nrow + nu_prime;
 
 	  								if( (nu>=0) && (mu>=0) )
 	  								{																																																
@@ -635,14 +635,14 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	double Nele = 0.0; 
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		for(int ir=0; ir<ParaO.nrow; ir++)
+		for(int ir=0; ir<GlobalC::ParaO.nrow; ir++)
 		{
-			for(int ic=0; ic<ParaO.ncol; ic++)
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ic++)
 			{
-				int row = ParaO.MatrixInfo.row_set[ir];
-				int col = ParaO.MatrixInfo.col_set[ic];
+				int row = GlobalC::ParaO.MatrixInfo.row_set[ir];
+				int col = GlobalC::ParaO.MatrixInfo.col_set[ic];
 
-				if(row==col) elec_tot += srho.at(is).at(ic*ParaO.nrow + ir);
+				if(row==col) elec_tot += srho.at(is).at(ic*GlobalC::ParaO.nrow + ir);
 			}
 		}
 	}	
@@ -1149,7 +1149,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	
 	int spin = GlobalC::kv.isk[ik];
 
-	ZEROS(eff_pot, ParaO.nloc);
+	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
 	//GlobalV::ofs_running << "dftu.cpp "<< __LINE__  << endl;
 	//=============================================================
@@ -1159,26 +1159,26 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	const int  one_int = 1;
   const complex<double> alpha_c(1.0,0.0), beta_c(0.0,0.0), half_c(0.5,0.0), one_c(1.0,0.0);
 
-	vector<complex<double>> VU(ParaO.nloc);
+	vector<complex<double>> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_complex(spin, 1, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half_c, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, ParaO.desc,
-		LM.Sloc2, &one_int, &one_int, ParaO.desc,
+		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+		LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta_c,
-		eff_pot, &one_int, &one_int, ParaO.desc);
+		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
-  for(int irc=0; irc<ParaO.nloc; irc++)
+  for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
     VU[irc] = eff_pot[irc];
   
   // pztranc(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
   pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
            &one_c, 
-           &VU[0], &one_int, &one_int, ParaO.desc, 
+           &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
            &one_c, 
-           eff_pot, &one_int, &one_int, ParaO.desc);
+           eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	//code for testing whther the effective potential is Hermitian
 	/*
@@ -1232,7 +1232,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	
 	int spin = GlobalC::kv.isk[ik];
 
-	ZEROS(eff_pot, ParaO.nloc);
+	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
 	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
 	//=============================================================
@@ -1242,26 +1242,26 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0, half=0.5, one=1.0;
 
-	vector<double> VU(ParaO.nloc);
+	vector<double> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_real(spin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, ParaO.desc, 
-		LM.Sloc, &one_int, &one_int, ParaO.desc,
+		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
+		LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
-		eff_pot, &one_int, &one_int, ParaO.desc);
+		eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
-  for(int irc=0; irc<ParaO.nloc; irc++)
+  for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
     VU[irc] = eff_pot[irc];
   
   // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
   pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
           &one, 
-          &VU[0], &one_int, &one_int, ParaO.desc, 
+          &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
           &one, 
-          eff_pot, &one_int, &one_int, ParaO.desc);
+          eff_pot, &one_int, &one_int, GlobalC::ParaO.desc);
 
 	//code for testing whther the effective potential is Hermitian
 	/*
@@ -1428,27 +1428,27 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0, one=1.0, half=0.5;
 
-  for(int i=0; i<ParaO.nloc; i++) HR[i] = 0.0;
+  for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = 0.0;
 
-  vector<double> VU(ParaO.nloc);
+  vector<double> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, ParaO.desc, 
-		SR, &one_int, &one_int, ParaO.desc,
+		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc, 
+		SR, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
-		HR, &one_int, &one_int, ParaO.desc);
+		HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
-	for(int irc=0; irc<ParaO.nloc; irc++)
+	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
 		VU[irc] = HR[irc];
 
   pdtran_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
           &one, 
-          &VU[0], &one_int, &one_int, ParaO.desc, 
+          &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
           &one, 
-          HR, &one_int, &one_int, ParaO.desc);
+          HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
   return;
 }
@@ -1461,27 +1461,27 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
 	const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
   const complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
-  for(int i=0; i<ParaO.nloc; i++) HR[i] = zero;
+  for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = zero;
 
-  vector<complex<double>> VU(ParaO.nloc);
+  vector<complex<double>> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
 
 	pzgemm_(&transN, &transN,
 		&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 		&half, 
-		VECTOR_TO_PTR(VU), &one_int, &one_int, ParaO.desc,
-		SR, &one_int, &one_int, ParaO.desc,
+		VECTOR_TO_PTR(VU), &one_int, &one_int, GlobalC::ParaO.desc,
+		SR, &one_int, &one_int, GlobalC::ParaO.desc,
 		&beta,
-		HR, &one_int, &one_int, ParaO.desc);
+		HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
-	for(int irc=0; irc<ParaO.nloc; irc++)
+	for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
 	  VU[irc] = HR[irc];
 
   pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
            &one, 
-           &VU[0], &one_int, &one_int, ParaO.desc, 
+           &VU[0], &one_int, &one_int, GlobalC::ParaO.desc, 
            &one, 
-           HR, &one_int, &one_int, ParaO.desc);
+           HR, &one_int, &one_int, GlobalC::ParaO.desc);
 
   return;
 }
@@ -1491,7 +1491,7 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
   TITLE("DFTU","folding_overlap_matrix"); 
 	// timer::tick("DFTU","folding_overlap_matrix");
 
-  ZEROS(Sk, ParaO.nloc);
+  ZEROS(Sk, GlobalC::ParaO.nloc);
 
 	int iat = 0;
 	int index = 0;
@@ -1580,24 +1580,24 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 					{
 						// the index of orbitals in this processor
 						const int iw1_all = start + ii;
-						const int mu = ParaO.trace_loc_row[iw1_all];
+						const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 						if(mu<0)continue;
 
 						for(int jj=0; jj<atom2->nw*GlobalV::NPOL; jj++)
 						{
 							int iw2_all = start2 + jj;
-							const int nu = ParaO.trace_loc_col[iw2_all];
+							const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 
 							if(nu<0)continue;
-							//const int iic = mu*ParaO.ncol+nu;
+							//const int iic = mu*GlobalC::ParaO.ncol+nu;
               int iic;
               if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
               {
-                  iic=mu+nu*ParaO.nrow;
+                  iic=mu+nu*GlobalC::ParaO.nrow;
               }
               else
               {
-                  iic=mu*ParaO.ncol+nu;
+                  iic=mu*GlobalC::ParaO.ncol+nu;
               }
 
 							//########################### EXPLAIN ###############################

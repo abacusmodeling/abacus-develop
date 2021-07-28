@@ -100,10 +100,10 @@ void ELEC_evolve::evolve_psi(
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
 		{
-      vector<complex<double>> eff_pot(ParaO.nloc);
+      vector<complex<double>> eff_pot(GlobalC::ParaO.nloc);
 			dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
-			for(int irc=0; irc<ParaO.nloc; irc++)
+			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
 				LM.Hloc2[irc] += eff_pot[irc];					
 		}
 
@@ -141,7 +141,7 @@ void ELEC_evolve::evolve_psi(
 	} // end k
 			
 	// LiuXh modify 2019-07-15*/
-	if(!ParaO.out_hsR)
+	if(!GlobalC::ParaO.out_hsR)
 	{
 		uhm.GK.destroy_pvpR();
 	}
@@ -189,7 +189,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 //	Calculate the U operator
 
 	bool bit = false;
-	//HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, ParaO.out_hs);
+	//HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, GlobalC::ParaO.out_hs);
 
 	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -300,19 +300,19 @@ void ELEC_evolve::using_LAPACK_complex_2(
 		ZEROS(lineH, GlobalV::NLOCAL-i);
 		ZEROS(lineS, GlobalV::NLOCAL-i);
 
-		ir = ParaO.trace_loc_row[i];
+		ir = GlobalC::ParaO.trace_loc_row[i];
 		if (ir>=0)
 		{
 			// data collection
 			for (int j=i; j<GlobalV::NLOCAL; j++)
 			{
-				ic = ParaO.trace_loc_col[j];
+				ic = GlobalC::ParaO.trace_loc_col[j];
 				if (ic>=0)
 				{
-					//lineH[j-i] = H[ir*ParaO.ncol+ic];
-					lineH[j-i] = LM.Hloc2[ir*ParaO.ncol+ic];
-					//lineS[j-i] = S[ir*ParaO.ncol+ic];
-					lineS[j-i] = LM.Sloc2[ir*ParaO.ncol+ic];
+					//lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
+					lineH[j-i] = LM.Hloc2[ir*GlobalC::ParaO.ncol+ic];
+					//lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
+					lineS[j-i] = LM.Sloc2[ir*GlobalC::ParaO.ncol+ic];
 				}
 			}
 		}

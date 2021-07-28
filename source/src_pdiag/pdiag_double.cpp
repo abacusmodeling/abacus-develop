@@ -509,11 +509,11 @@ void Pdiag_Double::diago_double_begin(
 		auto print_matrix_C = [&](const string &file_name, double*m)
 		{
 			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ic=0; ic<ParaO.ncol; ++ic)
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
-				for(int ir=0; ir<ParaO.nrow; ++ir)
+				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(abs(m[index])>1E-10)
 						ofs<<m[index]<<"\t";
 					else
@@ -525,11 +525,11 @@ void Pdiag_Double::diago_double_begin(
 		auto print_matrix_F = [&](const string &file_name, double*m)
 		{
 			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ir=0; ir<ParaO.nrow; ++ir)
+			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
-				for(int ic=0; ic<ParaO.ncol; ++ic)
+				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(abs(m[index])>1E-10)
 						ofs<<m[index]<<"\t";
 					else
@@ -916,11 +916,11 @@ void Pdiag_Double::diago_complex_begin(
 		auto print_matrix_C = [&](const string &file_name, complex<double>*m)
 		{
 			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ic=0; ic<ParaO.ncol; ++ic)
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
-				for(int ir=0; ir<ParaO.nrow; ++ir)
+				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(std::norm(m[index])>1E-10)
                     {
                         if(std::imag(m[index])>1E-10)
@@ -943,11 +943,11 @@ void Pdiag_Double::diago_complex_begin(
 		auto print_matrix_F = [&](const string &file_name, complex<double>*m)
 		{
 			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ir=0; ir<ParaO.nrow; ++ir)
+			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
-				for(int ic=0; ic<ParaO.ncol; ++ic)
+				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(std::norm(m[index])>1E-10)
                     {
                         if(std::imag(m[index])>1E-10)

@@ -22,7 +22,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	
 	atom_in_2D_list = Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(mpi_comm);
 	send_size_list = get_send_size_list(H_atom_pairs_core, atom_in_2D_list);
-	recv_size = ParaO.nrow * ParaO.ncol * sizeof(double);
+	recv_size = GlobalC::ParaO.nrow * GlobalC::ParaO.ncol * sizeof(double);
 }
 
 vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> 

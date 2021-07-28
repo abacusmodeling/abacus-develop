@@ -443,13 +443,13 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 //1. alloc work array; set some parameters
 
 	long maxnloc; // maximum number of elements in local matrix
-	MPI_Reduce(&ParaO.nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, ParaO.comm_2D);
-	MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, ParaO.comm_2D);
+	MPI_Reduce(&GlobalC::ParaO.nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, GlobalC::ParaO.comm_2D);
+	MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, GlobalC::ParaO.comm_2D);
 	//reduce and bcast could be replaced by allreduce
 	
     int nprocs, myid;
-    MPI_Comm_size(ParaO.comm_2D, &nprocs);
-    MPI_Comm_rank(ParaO.comm_2D, &myid);
+    MPI_Comm_size(GlobalC::ParaO.comm_2D, &nprocs);
+    MPI_Comm_rank(GlobalC::ParaO.comm_2D, &myid);
 
 	double *work=new double[maxnloc]; // work/buffer matrix
 	int nb = 0;
@@ -467,24 +467,24 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 	int naroc[2]; // maximum number of row or column
 	
 //2. copy from ctot to wfc_gamma
-	for(int iprow=0; iprow<ParaO.dim0; ++iprow)
+	for(int iprow=0; iprow<GlobalC::ParaO.dim0; ++iprow)
 	{
-		for(int ipcol=0; ipcol<ParaO.dim1; ++ipcol)
+		for(int ipcol=0; ipcol<GlobalC::ParaO.dim1; ++ipcol)
 		{
 //2.1 get and bcast local 2d matrix info
 			const int coord[2]={iprow, ipcol};
 			int src_rank;
-			MPI_Cart_rank(ParaO.comm_2D, coord, &src_rank);
+			MPI_Cart_rank(GlobalC::ParaO.comm_2D, coord, &src_rank);
 			if(myid==src_rank)
 			{
-				naroc[0]=ParaO.nrow;
-				naroc[1]=ParaO.ncol;
+				naroc[0]=GlobalC::ParaO.nrow;
+				naroc[1]=GlobalC::ParaO.ncol;
 			}
-			info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, ParaO.comm_2D);
+			info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, GlobalC::ParaO.comm_2D);
 
 //2.2 copy from ctot to work, then bcast work
-			info=CTOT2q(myid, naroc, nb, ParaO.dim0, ParaO.dim1, iprow, ipcol, work, ctot);
-			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, 0, ParaO.comm_2D);
+			info=CTOT2q(myid, naroc, nb, GlobalC::ParaO.dim0, GlobalC::ParaO.dim1, iprow, ipcol, work, ctot);
+			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE, 0, GlobalC::ParaO.comm_2D);
 			//GlobalV::ofs_running << "iprow, ipcow : " << iprow << ipcol << endl;
 			//for (int i=0; i<maxnloc; ++i)
 			//{
@@ -495,7 +495,7 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 			const int inc=1;
 			if(myid==src_rank)
 			{
-				LapackConnector::copy(ParaO.nloc, work, inc, LOC.wfc_dm_2d.wfc_gamma[is].c, inc);
+				LapackConnector::copy(GlobalC::ParaO.nloc, work, inc, LOC.wfc_dm_2d.wfc_gamma[is].c, inc);
 			}
 		}//loop ipcol
 	}//loop	iprow
@@ -515,13 +515,13 @@ void WF_Local::distri_lowf_complex_new(complex<double> **ctot, const int &ik)
 //1. alloc work array; set some parameters
 
 	long maxnloc; // maximum number of elements in local matrix
-	MPI_Reduce(&ParaO.nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, ParaO.comm_2D);
-	MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, ParaO.comm_2D);
+	MPI_Reduce(&GlobalC::ParaO.nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, GlobalC::ParaO.comm_2D);
+	MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, GlobalC::ParaO.comm_2D);
 	//reduce and bcast could be replaced by allreduce
 	
     int nprocs, myid;
-    MPI_Comm_size(ParaO.comm_2D, &nprocs);
-    MPI_Comm_rank(ParaO.comm_2D, &myid);
+    MPI_Comm_size(GlobalC::ParaO.comm_2D, &nprocs);
+    MPI_Comm_rank(GlobalC::ParaO.comm_2D, &myid);
 
 	complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
 	int nb = 0;
@@ -539,24 +539,24 @@ void WF_Local::distri_lowf_complex_new(complex<double> **ctot, const int &ik)
 	int naroc[2]; // maximum number of row or column
 	
 //2. copy from ctot to wfc_gamma
-	for(int iprow=0; iprow<ParaO.dim0; ++iprow)
+	for(int iprow=0; iprow<GlobalC::ParaO.dim0; ++iprow)
 	{
-		for(int ipcol=0; ipcol<ParaO.dim1; ++ipcol)
+		for(int ipcol=0; ipcol<GlobalC::ParaO.dim1; ++ipcol)
 		{
 //2.1 get and bcast local 2d matrix info
 			const int coord[2]={iprow, ipcol};
 			int src_rank;
-			MPI_Cart_rank(ParaO.comm_2D, coord, &src_rank);
+			MPI_Cart_rank(GlobalC::ParaO.comm_2D, coord, &src_rank);
 			if(myid==src_rank)
 			{
-				naroc[0]=ParaO.nrow;
-				naroc[1]=ParaO.ncol;
+				naroc[0]=GlobalC::ParaO.nrow;
+				naroc[1]=GlobalC::ParaO.ncol;
 			}
-			info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, ParaO.comm_2D);
+			info=MPI_Bcast(naroc, 2, MPI_INT, src_rank, GlobalC::ParaO.comm_2D);
 
 //2.2 copy from ctot to work, then bcast work
-			info=CTOT2q_c(myid, naroc, nb, ParaO.dim0, ParaO.dim1, iprow, ipcol, work, ctot);
-			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, 0, ParaO.comm_2D);
+			info=CTOT2q_c(myid, naroc, nb, GlobalC::ParaO.dim0, GlobalC::ParaO.dim1, iprow, ipcol, work, ctot);
+			info=MPI_Bcast(work, maxnloc, MPI_DOUBLE_COMPLEX, 0, GlobalC::ParaO.comm_2D);
 			//ofs_running << "iprow, ipcow : " << iprow << ipcol << endl;
 			//for (int i=0; i<maxnloc; ++i)
 			//{
@@ -567,7 +567,7 @@ void WF_Local::distri_lowf_complex_new(complex<double> **ctot, const int &ik)
 			const int inc=1;
 			if(myid==src_rank)
 			{
-				LapackConnector::copy(ParaO.nloc, work, inc, LOC.wfc_dm_2d.wfc_k[ik].c, inc);
+				LapackConnector::copy(GlobalC::ParaO.nloc, work, inc, LOC.wfc_dm_2d.wfc_k[ik].c, inc);
 			}
 		}//loop ipcol
 	}//loop	iprow

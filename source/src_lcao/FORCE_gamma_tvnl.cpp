@@ -16,12 +16,12 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
         const int iat = GlobalC::ucell.iwt2iat[i];
         for(int j=0; j<GlobalV::NLOCAL; j++)
         {
-            const int mu = ParaO.trace_loc_row[j];
-            const int nu = ParaO.trace_loc_col[i];
+            const int mu = GlobalC::ParaO.trace_loc_row[j];
+            const int nu = GlobalC::ParaO.trace_loc_col[i];
 
             if (mu >= 0 && nu >= 0 )
             {
-                const int index = mu * ParaO.ncol + nu;
+                const int index = mu * GlobalC::ParaO.ncol + nu;
                 //contribution from deriv of AO's in T+VNL term
                 
                 double sum = 0.0;
@@ -129,12 +129,12 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                 for (int jj = 0; jj < GlobalC::ucell.atoms[T1].nw; jj++)
                 {
                     const int iw1_all = start1 + jj;
-                    const int mu = ParaO.trace_loc_row[iw1_all];
+                    const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
                     if(mu<0) continue;
                     for (int kk = 0; kk < GlobalC::ucell.atoms[T2].nw; kk++)
                     {
                         const int iw2_all = start2 + kk;
-                        const int nu = ParaO.trace_loc_col[iw2_all];
+                        const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
                         if(nu<0) continue;
                     
                         double nlm[3] = {0,0,0};
@@ -179,7 +179,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 								GlobalC::ucell.atoms[it].nproj_soc);
 						}
 
-                        const int index = mu * ParaO.ncol + nu;
+                        const int index = mu * GlobalC::ParaO.ncol + nu;
 
                         // dbeta is minus, that's consistent.
                         // only one projector for each atom force.
@@ -244,12 +244,12 @@ void Force_LCAO_gamma::cal_ftvnl_dphi(
         const int iat = GlobalC::ucell.iwt2iat[i];
         for(int j=0; j<GlobalV::NLOCAL; j++)
         {
-            const int mu = ParaO.trace_loc_row[j];
-            const int nu = ParaO.trace_loc_col[i];
+            const int mu = GlobalC::ParaO.trace_loc_row[j];
+            const int nu = GlobalC::ParaO.trace_loc_col[i];
 
             if (mu >= 0 && nu >= 0 )
             {
-                const int index = mu * ParaO.ncol + nu;
+                const int index = mu * GlobalC::ParaO.ncol + nu;
                 //contribution from deriv of AO's in T+VNL term
 
                 double sum = 0.0;
@@ -356,12 +356,12 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                 for (int jj = 0; jj < GlobalC::ucell.atoms[T1].nw; jj++)
                 {
                     const int iw1_all = start1 + jj;
-                    const int mu = ParaO.trace_loc_row[iw1_all];
+                    const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
                     if(mu<0) continue;
                     for (int kk = 0; kk < GlobalC::ucell.atoms[T2].nw; kk++)
                     {
                         const int iw2_all = start2 + kk;
-                        const int nu = ParaO.trace_loc_col[iw2_all];
+                        const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
                         if(nu<0) continue;
 
                         double nlm[3] = {0,0,0};
@@ -403,7 +403,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 												   GlobalC::ucell.atoms[it].nproj_soc
 								); // mohan  add 2021-05-07
 
-                        //const int index = mu * ParaO.ncol + nu;
+                        //const int index = mu * GlobalC::ParaO.ncol + nu;
 
                         // dbeta is minus, that's consistent.
                         // only one projector for each atom force.
