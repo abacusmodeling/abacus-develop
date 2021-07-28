@@ -381,14 +381,14 @@ void Electrons::self_consistent(const int &istep)
             }
 #endif
 
-            if(chi0_standard.epsilon)
+            if(GlobalC::chi0_standard.epsilon)
             {
-                cout <<"eta = "<<chi0_standard.eta<<endl;
-                cout <<"domega = "<<chi0_standard.domega<<endl;
-                cout <<"nomega = "<<chi0_standard.nomega<<endl;
-                cout <<"dim = "<<chi0_standard.dim<<endl;
-                //cout <<"oband = "<<chi0_standard.oband<<endl;
-                chi0_standard.Chi();
+                cout <<"eta = "<<GlobalC::chi0_standard.eta<<endl;
+                cout <<"domega = "<<GlobalC::chi0_standard.domega<<endl;
+                cout <<"nomega = "<<GlobalC::chi0_standard.nomega<<endl;
+                cout <<"dim = "<<GlobalC::chi0_standard.dim<<endl;
+                //cout <<"oband = "<<GlobalC::chi0_standard.oband<<endl;
+                GlobalC::chi0_standard.Chi();
             }
 
             if(epsilon0_pwscf.epsilon)

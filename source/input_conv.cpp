@@ -253,24 +253,24 @@ void Input_Conv::Convert(void)
 	//if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
 	if( INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
 	{
-		//chi0_standard.epsilon = INPUT.epsilon;
-		chi0_standard.epsilon = true;
-		chi0_standard.system = INPUT.system_type;
-		chi0_standard.eta = INPUT.eta;
-		chi0_standard.domega = INPUT.domega;
-		chi0_standard.nomega = INPUT.nomega;
-		chi0_standard.dim = INPUT.ecut_chi;
-		//chi0_standard.oband = INPUT.oband;
-		chi0_standard.q_start[0] = INPUT.q_start[0]; 
-	 	chi0_standard.q_start[1] = INPUT.q_start[1]; 
-		chi0_standard.q_start[2] = INPUT.q_start[2];
-		chi0_standard.direct[0] = INPUT.q_direct[0];  
-		chi0_standard.direct[1] = INPUT.q_direct[1]; 
-		chi0_standard.direct[2] = INPUT.q_direct[2];
-		//chi0_standard.start_q = INPUT.start_q;
-		//chi0_standard.interval_q = INPUT.interval_q;
-		chi0_standard.nq = INPUT.nq;
-		chi0_standard.out_epsilon = INPUT.out_epsilon;		
+		//GlobalC::chi0_standard.epsilon = INPUT.epsilon;
+		GlobalC::chi0_standard.epsilon = true;
+		GlobalC::chi0_standard.system = INPUT.system_type;
+		GlobalC::chi0_standard.eta = INPUT.eta;
+		GlobalC::chi0_standard.domega = INPUT.domega;
+		GlobalC::chi0_standard.nomega = INPUT.nomega;
+		GlobalC::chi0_standard.dim = INPUT.ecut_chi;
+		//GlobalC::chi0_standard.oband = INPUT.oband;
+		GlobalC::chi0_standard.q_start[0] = INPUT.q_start[0]; 
+	 	GlobalC::chi0_standard.q_start[1] = INPUT.q_start[1]; 
+		GlobalC::chi0_standard.q_start[2] = INPUT.q_start[2];
+		GlobalC::chi0_standard.direct[0] = INPUT.q_direct[0];  
+		GlobalC::chi0_standard.direct[1] = INPUT.q_direct[1]; 
+		GlobalC::chi0_standard.direct[2] = INPUT.q_direct[2];
+		//GlobalC::chi0_standard.start_q = INPUT.start_q;
+		//GlobalC::chi0_standard.interval_q = INPUT.interval_q;
+		GlobalC::chi0_standard.nq = INPUT.nq;
+		GlobalC::chi0_standard.out_epsilon = INPUT.out_epsilon;		
 	}
 	
 	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 1) )
