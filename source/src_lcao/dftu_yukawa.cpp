@@ -356,8 +356,8 @@ void DFTU::cal_slater_Vsc(const int T, const int L)
 							{
 								int gindex = k*k + q;
 
-								double gaunt1 = UOT.get_Gaunt_coefficients(gindex0, gindex2, gindex);
-								double gaunt2 = UOT.get_Gaunt_coefficients(gindex1, gindex3, gindex);
+								double gaunt1 = GlobalC::UOT.get_Gaunt_coefficients(gindex0, gindex2, gindex);
+								double gaunt2 = GlobalC::UOT.get_Gaunt_coefficients(gindex1, gindex3, gindex);
 
 								this->Vsc.at(T).at(N)(M0, M1) += FOUR_PI*gaunt1*gaunt2*Fk.at(T).at(N).at(l)/(2.0*k+1.0);
 							}

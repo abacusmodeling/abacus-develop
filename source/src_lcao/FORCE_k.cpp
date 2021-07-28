@@ -813,7 +813,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 									//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
 									double nlm[3]={0,0,0};
 
-									UOT.snap_psibeta(
+									GlobalC::UOT.snap_psibeta(
 											nlm, 1,
 											tau2,
 											T2,
@@ -836,7 +836,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 									double nlm1[3]={0,0,0};
 									if(isstress)
 									{
-										UOT.snap_psibeta(
+										GlobalC::UOT.snap_psibeta(
 											nlm1, 1,
 											tau1,
 											T1,

@@ -219,7 +219,7 @@ void Run_MD_LCAO::opt_ions(void)
 	}
 
 	// mohan update 2021-02-10
-    GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, ORB, INPUT.out_descriptor);
 
     timer::tick("Run_MD_LCAO","opt_ions"); 
     return;

@@ -139,7 +139,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                     
                         double nlm[3] = {0,0,0};
                                 
-                        UOT.snap_psibeta(
+                        GlobalC::UOT.snap_psibeta(
                             nlm, 1,
                             tau1, T1,
                             atom1->iw2l[jj], // L2
@@ -161,7 +161,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 
                         if(isstress) 
 						{
-								UOT.snap_psibeta(
+								GlobalC::UOT.snap_psibeta(
                                 nlm1, 1,
                                 tau2, T2,
                                 atom2->iw2l[kk], // L2
@@ -366,7 +366,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 
                         double nlm[3] = {0,0,0};
 
-                        UOT.snap_psibeta(
+                        GlobalC::UOT.snap_psibeta(
                                         nlm, 1,
                                         tau1, T1,
                                         atom1->iw2l[jj], // L2
@@ -385,7 +385,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
 								); // mohan  add 2021-05-07
 
                         double nlm1[3] = {0,0,0};
-                        if(isstress) UOT.snap_psibeta(
+                        if(isstress) GlobalC::UOT.snap_psibeta(
                                                    nlm1, 1,
                                                    tau2, T2,
                                                    atom2->iw2l[kk], // L2

@@ -80,7 +80,7 @@ void Run_md::ai_md_line(void)
 	{
 		GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
-		UOT, 
+		GlobalC::UOT, 
 		ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,

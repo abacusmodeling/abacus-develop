@@ -188,7 +188,7 @@ void Mulliken_Charge::cal_mulliken(void)
 			// 2021-04-16
 			GlobalC::LOWF.orb_con.set_orb_tables(
 					GlobalV::ofs_running,
-					UOT, 
+					GlobalC::UOT, 
 					ORB,
 					GlobalC::ucell.ntype,
 					GlobalC::ucell.lmax,
@@ -268,7 +268,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input);
 #endif
-			GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, ORB, INPUT.out_descriptor);
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , GlobalV::NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);
