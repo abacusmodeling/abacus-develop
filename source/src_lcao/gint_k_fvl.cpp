@@ -36,9 +36,9 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 
     const double delta_r = GlobalC::ORB.dr_uniform;
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
-    const int max_size = GridT.max_atom;
+    const int max_size = GlobalC::GridT.max_atom;
     // how many meshcells in bigcell.
-    const int bxyz = GridT.bxyz;	
+    const int bxyz = GlobalC::GridT.bxyz;	
 
 	double*** dr;// vectors between atom and grid: [bxyz, maxsize, 3]
 	double** distance; // distance between atom and grid: [bxyz, maxsize]
@@ -109,7 +109,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 			for(int k=nbz_start; k<nbz_start+nbz; k++)
 			{
 				const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
-				const int size = GridT.how_many_atoms[ grid_index ];
+				const int size = GlobalC::GridT.how_many_atoms[ grid_index ];
 				if(size==0) continue;
 
 				//---------------------------------
@@ -144,7 +144,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 				this->evaluate_vl_force(grid_index, size,i,j,k,
 					psir_ylm, cal_flag, vldr3, distance,
 					dphi_x, dphi_y, dphi_z,
-					pvdpx, pvdpy, pvdpz, GridT);
+					pvdpx, pvdpy, pvdpz,GlobalC::GridT);
 
 			}// int k
 		}// int j
@@ -245,9 +245,9 @@ void Gint_k::svl_k_RealSpace(
 
 	const double delta_r = GlobalC::ORB.dr_uniform;
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
-	const int max_size = GridT.max_atom;
+	const int max_size = GlobalC::GridT.max_atom;
 	// how many meshcells in bigcell.
-	const int bxyz = GridT.bxyz;
+	const int bxyz = GlobalC::GridT.bxyz;
 
 	double*** dr;// vectors between atom and grid: [bxyz, maxsize, 3]
 	double** distance; // distance between atom and grid: [bxyz, maxsize]
@@ -319,7 +319,7 @@ void Gint_k::svl_k_RealSpace(
 			for(int k=nbz_start; k<nbz_start+nbz; k++)
 			{
 				const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
-				const int size = GridT.how_many_atoms[ grid_index ];
+				const int size = GlobalC::GridT.how_many_atoms[ grid_index ];
 				if(size==0) continue;
 
 				//---------------------------------
@@ -356,7 +356,7 @@ void Gint_k::svl_k_RealSpace(
 						psir_ylm, cal_flag, vldr3, distance,
 						dphi_x, dphi_y, dphi_z,
 						pvdpx, pvdpy, pvdpz,
-						pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23, dr, GridT);
+						pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23, dr,GlobalC::GridT);
 			}// int k
 		}// int j
 	} // int i
@@ -995,24 +995,24 @@ void Gint_k::set_ijk_atom_force(
 	for (int id=0; id<size; ++id)
 	{
 		// (2.1) get the atom type and atom index.
-		const int mcell_index = GridT.bcell_start[grid_index] + id;	
-		const int imcell = GridT.which_bigcell[mcell_index];
-		const int iat = GridT.which_atom[mcell_index];
+		const int mcell_index = GlobalC::GridT.bcell_start[grid_index] + id;	
+		const int imcell = GlobalC::GridT.which_bigcell[mcell_index];
+		const int iat = GlobalC::GridT.which_atom[mcell_index];
 		const int it = GlobalC::ucell.iat2it[ iat ];
 		const int ia = GlobalC::ucell.iat2ia[ iat ];
 		Atom *atom = &GlobalC::ucell.atoms[it];
 
 		// (2.2) get the distance between the grid and the atom.
-		mt[0] = GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0];
-		mt[1] = GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
-		mt[2] = GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
+		mt[0] = GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0];
+		mt[1] = GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
+		mt[2] = GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2];
 
 		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
 			// meshcell_pos: z is the fastest
-			dr[ib][id][0] = GridT.meshcell_pos[ib][0] + mt[0];
-			dr[ib][id][1] = GridT.meshcell_pos[ib][1] + mt[1];
-			dr[ib][id][2] = GridT.meshcell_pos[ib][2] + mt[2];
+			dr[ib][id][0] = GlobalC::GridT.meshcell_pos[ib][0] + mt[0];
+			dr[ib][id][1] = GlobalC::GridT.meshcell_pos[ib][1] + mt[1];
+			dr[ib][id][2] = GlobalC::GridT.meshcell_pos[ib][2] + mt[2];
 
 			distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
 			+ dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);

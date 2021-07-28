@@ -140,7 +140,7 @@ void Local_Orbital_Charge::sum_bands(void)
     else
     {
         NOTE("Calculate the density matrix.");
-        this->cal_dk_k( GridT );
+        this->cal_dk_k( GlobalC::GridT );
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
             wfc_dm_2d.cal_dm(GlobalC::wf.wg);

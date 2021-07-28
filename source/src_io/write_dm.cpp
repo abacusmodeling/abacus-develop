@@ -155,12 +155,12 @@ void Local_Orbital_Charge::write_dm(
         {
             // when reduce, there may be 'redundance', we need to count them.
             ZEROS(count, GlobalV::NLOCAL);
-            const int mu = GridT.trace_lo[i];
+            const int mu = GlobalC::GridT.trace_lo[i];
             if (mu >= 0)
             {
                 for (int j=0; j<GlobalV::NLOCAL; ++j)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if (nu >= 0)
                     {
                         count[j]=1; 
@@ -175,7 +175,7 @@ void Local_Orbital_Charge::write_dm(
             {
                 for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if (nu >=0)
                     {
                         tmp[j] = DM[is][mu][nu];

@@ -281,7 +281,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 								// 2D division (HPSEPS)
 								const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 								if(mu<0) continue;
-								const int mug = GridT.trace_lo[iw1_all];
+								const int mug = GlobalC::GridT.trace_lo[iw1_all];
 
 								for(int kk=0; kk<atom2->nw; ++kk)
 								{
@@ -290,7 +290,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 									// 2D division (HPSEPS)
 									const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 									if(nu<0) continue;
-									const int nug = GridT.trace_lo[iw2_all];
+									const int nug = GlobalC::GridT.trace_lo[iw2_all];
 	
 									if(mug >= 0 && nug >= 0)
 									{

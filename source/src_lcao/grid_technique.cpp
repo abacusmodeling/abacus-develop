@@ -3,7 +3,10 @@
 
 #include "global_fp.h" // mohan add 2021-01-30
 
+namespace GlobalC
+{
 Grid_Technique GridT;
+}
 
 Grid_Technique::Grid_Technique()
 {

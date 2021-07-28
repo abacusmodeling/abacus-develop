@@ -64,7 +64,7 @@ void LOOP_elec::set_matrix_grid(void)
 	//DONE(GlobalV::ofs_running,"SEARCH ADJACENT ATOMS");
 
 	// (3) Periodic condition search for each grid.
-	GridT.set_pbc_grid(
+	GlobalC::GridT.set_pbc_grid(
 			GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
 			GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
 			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
@@ -79,8 +79,8 @@ void LOOP_elec::set_matrix_grid(void)
 		GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 
 		// need to first calculae lgd.
-		// using GridT.init.
-		GlobalC::LNNR.cal_nnrg(GridT);
+		// using GlobalC::GridT.init.
+		GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
 	}
 
     timer::tick("LOOP_elec","set_matrix_grid"); 
@@ -97,10 +97,10 @@ void LOOP_elec::before_solver(const int &istep)
 	// after ParaO and GridT, 
 	// this information is used to calculate
 	// the force.
-	GlobalC::LOWF.set_trace_aug(GridT);
+	GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
 
 	// init density kernel and wave functions.
-	GlobalC::LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
 
 	//======================================
 	// do the charge extrapolation before the density matrix is regenerated.
@@ -108,7 +108,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// because once atoms are moving out of this processor,
 	// the density matrix will not map the new atomic configuration,
 	//======================================
-	// THIS IS A BUG, BECAUSE THE INDEX GridT.trace_lo
+	// THIS IS A BUG, BECAUSE THE INDEX GlobalC::GridT.trace_lo
 	// HAS BEEN REGENERATED, SO WE NEED TO
 	// REALLOCATE DENSITY MATRIX FIRST, THEN READ IN DENSITY MATRIX,
 	// AND USE DENSITY MATRIX TO DO RHO GlobalV::CALCULATION.-- mohan 2013-03-31

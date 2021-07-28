@@ -248,7 +248,7 @@ void Run_MD_LCAO::final_scf(void)
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 
-    GridT.set_pbc_grid(
+    GlobalC::GridT.set_pbc_grid(
         GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
         GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
         GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
@@ -263,26 +263,26 @@ void Run_MD_LCAO::final_scf(void)
         GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
         
 		// need to first calculae lgd.
-        // using GridT.init.
-        GlobalC::LNNR.cal_nnrg(GridT);
+        // using GlobalC::GridT.init.
+        GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
     }
 
     // (4) set the augmented orbitals index.
     // after ParaO and GridT, 
     // this information is used to calculate
     // the force.
-    GlobalC::LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
 		
     // (5) init density kernel
     // (6) init wave functions.
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         // here we reset the density matrix dimension.
-        GlobalC::LOC.allocate_gamma(GridT);
+        GlobalC::LOC.allocate_gamma(GlobalC::GridT);
     }
     else
     {
-        GlobalC::LOWF.allocate_k(GridT);
+        GlobalC::LOWF.allocate_k(GlobalC::GridT);
         GlobalC::LOC.allocate_DM_k();
     }
 

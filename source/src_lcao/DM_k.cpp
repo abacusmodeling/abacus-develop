@@ -49,7 +49,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     wfc_dm_2d.init();
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->kpt_file(GridT);
+		this->kpt_file(GlobalC::GridT);
 	}
 
     return;

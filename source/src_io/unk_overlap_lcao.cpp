@@ -570,7 +570,7 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(complex<double> **ctot, complex<dou
 				// save them in the matrix 'c'.
 				for (int iw=0; iw<GlobalV::NLOCAL; iw++)
 				{
-					const int mu_local = GridT.trace_lo[iw];
+					const int mu_local = GlobalC::GridT.trace_lo[iw];
 					if (mu_local >= 0)
 					{
 						for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -627,30 +627,30 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(complex<double> **ctot, complex<dou
 		{
 			int tag;
 
-			// send GridT.lgd
+			// send GlobalC::GridT.lgd
 			tag = GlobalV::DRANK * 3;
-			MPI_Send(&GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
+			MPI_Send(&GlobalC::GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
-			if(GridT.lgd != 0)
+			if(GlobalC::GridT.lgd != 0)
 			{
 				// send trace_lo
 				tag = GlobalV::DRANK * 3 + 1;
-				MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+				MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
 				// send cc
-				complex<double>* csend = new complex<double>[GlobalV::NBANDS*GridT.lgd];
-				ZEROS(csend, GlobalV::NBANDS*GridT.lgd);
+				complex<double>* csend = new complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
+				ZEROS(csend, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					for (int mu=0; mu<GridT.lgd; mu++)
+					for (int mu=0; mu<GlobalC::GridT.lgd; mu++)
 					{
 						csend[mu*GlobalV::NBANDS+ib] = cc[ib][mu];
 					}
 				}
 			
 				tag = GlobalV::DRANK * 3 + 2;
-				MPI_Send(csend, GlobalV::NBANDS*GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD);
+				MPI_Send(csend, GlobalV::NBANDS*GlobalC::GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD);
 
 			
 

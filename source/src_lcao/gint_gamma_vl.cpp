@@ -204,7 +204,7 @@ inline int setBufferParameter(
     // the global index to be received from other pro (r_global_index),
     // the send/receive siz/dis for data exchange by MPI_Alltoall
 	//---------------------------------------------------------------------
-    s_index_siz=GridT.lgd*GridT.lgd*2;
+    s_index_siz=GlobalC::GridT.lgd*GlobalC::GridT.lgd*2;
 
     delete[] s_local_index;
     s_local_index=new int[s_index_siz];
@@ -226,14 +226,14 @@ inline int setBufferParameter(
         for(int irow=0, grow=0; grow<GlobalV::NLOCAL; ++irow)
         {
             grow=globalIndex(irow, nblk, nprows, iprow);
-            int lrow=GridT.trace_lo[grow];
+            int lrow=GlobalC::GridT.trace_lo[grow];
 
             if(lrow < 0 || grow >= GlobalV::NLOCAL) continue;
 
             for(int icol=0, gcol=0; gcol<GlobalV::NLOCAL; ++icol)
             {
                 gcol=globalIndex(icol,nblk, npcols, ipcol);
-                int lcol=GridT.trace_lo[gcol];
+                int lcol=GlobalC::GridT.trace_lo[gcol];
                 if(lcol < 0 || gcol >= GlobalV::NLOCAL) continue;
                 // if(pos<0 || pos >= current_s_index_siz)
                 // {
@@ -307,13 +307,13 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
     TITLE("Gint_Gamma","gamma_vlocal");
     timer::tick("Gint_Gamma","gamma_vlocal");
 
-	Gint_Tools::Array_Pool<double> GridVlocal(GridT.lgd, GridT.lgd);
-	ZEROS(GridVlocal.ptr_1D, GridT.lgd*GridT.lgd);
-    Memory::record("Gint_Gamma","GridVlocal",GridT.lgd*GridT.lgd,"double");
+	Gint_Tools::Array_Pool<double> GridVlocal(GlobalC::GridT.lgd, GlobalC::GridT.lgd);
+	ZEROS(GridVlocal.ptr_1D, GlobalC::GridT.lgd*GlobalC::GridT.lgd);
+    Memory::record("Gint_Gamma","GridVlocal",GlobalC::GridT.lgd*GlobalC::GridT.lgd,"double");
 
 #ifdef __MKL
     const int mkl_threads = mkl_get_max_threads();
-	mkl_set_num_threads(std::max(1,mkl_threads/GridT.nbx));		// Peize Lin update 2021.01.20
+	mkl_set_num_threads(std::max(1,mkl_threads/GlobalC::GridT.nbx));		// Peize Lin update 2021.01.20
 #endif
 
 #ifdef __OPENMP
@@ -325,14 +325,14 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 		// it's a uniform grid to save orbital values, so the delta_r is a constant.
 		const double delta_r=GlobalC::ORB.dr_uniform;
 
-		const int nbx=GridT.nbx;
-		const int nby=GridT.nby;
-		const int nbz_start=GridT.nbzp_start;
-		const int nbz=GridT.nbzp;
+		const int nbx=GlobalC::GridT.nbx;
+		const int nby=GlobalC::GridT.nby;
+		const int nbz_start=GlobalC::GridT.nbzp_start;
+		const int nbz=GlobalC::GridT.nbzp;
 
 		const int ncyz=GlobalC::pw.ncy*GlobalC::pw.nczp;
 
-		const int lgd_now=GridT.lgd;
+		const int lgd_now=GlobalC::GridT.lgd;
 		if(max_size>0 && lgd_now>0)
 		{
 			//------------------------------------------------------
@@ -360,7 +360,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						//------------------------------------------------------------------
 						// get the value: how many atoms are involved in this grid (big cell)
 						//------------------------------------------------------------------
-						const int na_grid=GridT.how_many_atoms[ grid_index ];
+						const int na_grid=GlobalC::GridT.how_many_atoms[ grid_index ];
 						if(na_grid==0) continue;
 
 						//------------------------------------------------------------------
@@ -519,7 +519,7 @@ void Gint_Gamma::cal_vlocal(
     );
 
     this->job=cal_local;
-    this->save_atoms_on_grid(GridT);
+    this->save_atoms_on_grid(GlobalC::GridT);
 
     const Gint_Tools::Array_Pool<double> GridVlocal = this->gamma_vlocal(vlocal);
 	vl_grid_to_2D(GridVlocal);

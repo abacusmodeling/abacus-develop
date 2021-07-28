@@ -475,7 +475,7 @@ void LOOP_ions::final_scf(void)
 		GlobalV::SEARCH_RADIUS,
 		GlobalV::test_atom_input);
 
-    GridT.set_pbc_grid(
+    GlobalC::GridT.set_pbc_grid(
         GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
         GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
         GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
@@ -490,8 +490,8 @@ void LOOP_ions::final_scf(void)
         GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 
 		// need to first calculae lgd.
-        // using GridT.init.
-        GlobalC::LNNR.cal_nnrg(GridT);
+        // using GlobalC::GridT.init.
+        GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
     }
 	//------------------------------------------------------------------
 
@@ -504,9 +504,9 @@ void LOOP_ions::final_scf(void)
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.
-    GlobalC::LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
 
-	GlobalC::LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
 
     GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------

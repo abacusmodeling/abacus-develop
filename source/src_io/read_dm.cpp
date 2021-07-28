@@ -140,7 +140,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     {
         //GlobalV::ofs_running << " NLOCAL=" << GlobalV::NLOCAL << endl;
         //GlobalV::ofs_running << " lgd_now=" << lgd_now << endl;
-        //GlobalV::ofs_running << " GridT.lgd=" << GridT.lgd << endl;
+        //GlobalV::ofs_running << " GlobalC::GridT.lgd=" << GlobalC::GridT.lgd << endl;
 
         double *tmp = new double[GlobalV::NLOCAL];
         for(int i=0; i<GlobalV::NLOCAL; ++i)
@@ -156,12 +156,12 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             }
             Parallel_Common::bcast_double(tmp, GlobalV::NLOCAL);
 
-            const int mu = GridT.trace_lo[i];
+            const int mu = GlobalC::GridT.trace_lo[i];
             if(mu >= 0)
             {   
                 for(int j=0; j<GlobalV::NLOCAL; ++j)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if(nu >= 0)
                     {
                         DM[is][mu][nu] = tmp[j];
