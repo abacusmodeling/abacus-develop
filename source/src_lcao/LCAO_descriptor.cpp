@@ -14,7 +14,10 @@
 #include <torch/csrc/autograd/autograd.h>
 #include <npy.hpp>
 
+namespace GlobalC
+{
 LCAO_Descriptor ld;
+}
 
 LCAO_Descriptor::LCAO_Descriptor()
 {

@@ -287,7 +287,7 @@ void Force_Stress_LCAO::getForceStress(
 		//DeePKS force, caoyu add 2021-06-03
 		if (INPUT.deepks_scf)
 		{
-			ld.save_npy_f(fcs);	//save fbase
+			GlobalC::ld.save_npy_f(fcs);	//save fbase
 		}
 #endif
 		// print Rydberg force or not
@@ -339,7 +339,7 @@ void Force_Stress_LCAO::getForceStress(
 			//caoyu add 2021-06-03
 			if (INPUT.deepks_scf)
 			{
-				this->print_force("DeePKS 	FORCE", ld.F_delta, 1, ry);
+				this->print_force("DeePKS 	FORCE", GlobalC::ld.F_delta, 1, ry);
 			}
 #endif
 		}

@@ -577,7 +577,7 @@ void ELEC_scf::scf(const int &istep)
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
 				{
-					ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
+					GlobalC::ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
 				}
 #endif
 			}

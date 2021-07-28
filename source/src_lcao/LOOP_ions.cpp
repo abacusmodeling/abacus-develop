@@ -170,20 +170,20 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (INPUT.out_descriptor)
         {
-            ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat* GlobalC::ORB.Alpha[0].getTotal_nchi());
-            ld.build_S_descriptor(0);  //derivation not needed yet
-            ld.cal_projected_DM();
-            ld.cal_descriptor();
+            GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat* GlobalC::ORB.Alpha[0].getTotal_nchi());
+            GlobalC::ld.build_S_descriptor(0);  //derivation not needed yet
+            GlobalC::ld.cal_projected_DM();
+            GlobalC::ld.cal_descriptor();
             if (INPUT.deepks_scf)
             {
-                ld.build_S_descriptor(1);   //for F_delta calculation
-                ld.cal_v_delta(INPUT.model_file);
-                ld.print_H_V_delta();
-                ld.save_npy_d();
+                GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
+                GlobalC::ld.cal_v_delta(INPUT.model_file);
+                GlobalC::ld.print_H_V_delta();
+                GlobalC::ld.save_npy_d();
                 if (GlobalV::FORCE)
                 {
-                    ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
-                    ld.print_F_delta();
+                    GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+                    GlobalC::ld.print_F_delta();
                 }
 
             }
