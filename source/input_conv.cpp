@@ -590,6 +590,12 @@ void Input_Conv::Convert(void)
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
 
+	// wenfei 2021-7-28
+	if(GlobalV::DFT_FUNCTIONAL == "scan")
+	{
+		GlobalV::DFT_META = 1;
+	}
+
 	timer::tick("Input_Conv","Convert");
     return;
 }

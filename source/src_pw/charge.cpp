@@ -76,6 +76,10 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 	rhog = new complex<double>*[nspin];
 	rho_save = new double*[nspin];
 	rhog_save = new complex<double>*[nspin];
+	if(GlobalV::DFT_META)
+	{
+		kin_r = new double*[GlobalV::NSPIN];
+	}
 
 	for(int is=0; is<nspin; is++)
 	{
@@ -87,12 +91,18 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		ZEROS(rhog[is], ngmc);
 		ZEROS(rho_save[is], nrxx);
 		ZEROS(rhog_save[is], ngmc);
+		if(GlobalV::DFT_META)
+		{
+			kin_r[is] = new double[GlobalC::pw.nrxx];
+			ZEROS(kin_r[is], GlobalC::pw.nrxx);
+		}
 	}
 
     Memory::record("Charge","rho",nspin*nrxx,"double");
     Memory::record("Charge","rho_save",nspin*nrxx,"double");
     Memory::record("Charge","rhog",nspin*ngmc,"double");
     Memory::record("Charge","rhog_save",nspin*ngmc,"double");
+    Memory::record("Charge","kin_r",GlobalV::NSPIN*GlobalC::pw.ngmc,"double");
 
     this->rho_core = new double[nrxx]; // core charge in real space
     ZEROS( rho_core, nrxx);
