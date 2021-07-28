@@ -275,7 +275,7 @@ inline int q2WFC_complex(
         for(int i=0; i<naroc[0]; ++i)
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GridT.trace_lo[igrow];
+	        int mu_local=GlobalC::GridT.trace_lo[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -303,7 +303,7 @@ inline int q2WFC_WFCAUG_complex(
         for(int i=0; i<naroc[0]; ++i)
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GridT.trace_lo[igrow];
+	        int mu_local=GlobalC::GridT.trace_lo[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -337,7 +337,7 @@ inline int q2WFC_CTOT_complex(
         for(int i=0; i<naroc[0]; ++i)
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GridT.trace_lo[igrow];
+	        int mu_local=GlobalC::GridT.trace_lo[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -368,7 +368,7 @@ inline int q2WFC_WFCAUG_CTOT_complex(
         for(int i=0; i<naroc[0]; ++i)
         {
             int igrow=globalIndex(i, nb, dim0, iprow);
-	        int mu_local=GridT.trace_lo[igrow];
+	        int mu_local=GlobalC::GridT.trace_lo[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];

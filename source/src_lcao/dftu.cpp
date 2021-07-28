@@ -60,7 +60,10 @@ extern "C"
     double *C, const int *IC, const int *JC, const int *DESCC);
 }
 
+namespace GlobalC
+{
 DFTU dftu;
+}
 
 DFTU::DFTU(){}
 
@@ -269,7 +272,7 @@ void DFTU::init(
 
 	//this->out_numorb();
 
-  //GlobalV::ofs_running << "dftu.cpp "<< __LINE__ << endl;
+  //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << endl;
     return;
 }
 
@@ -481,7 +484,7 @@ void DFTU::cal_occup_m_k(const int iter)
 	  }//end ia
 	}//end it
 
-	//GlobalV::ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	return;
 }
 
@@ -655,7 +658,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	}
 	*/
 
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	return;
 }
 
@@ -1151,7 +1154,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 
 	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//GlobalV::ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
@@ -1219,7 +1222,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	}
 	*/
 
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 
 	return;	
 }
@@ -1234,7 +1237,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 
 	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
@@ -1302,7 +1305,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	}
 	*/
 	
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 
 	return;	
 }
@@ -1524,7 +1527,7 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
-				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 				bool adj = false;
 
@@ -1548,8 +1551,8 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 						double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
 						double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-						double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-						double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{
@@ -1632,7 +1635,7 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 		}// end I1
 	} // end T1
 
-	assert(index==LNNR.nnr);
+	assert(index==GlobalC::LNNR.nnr);
 
   // timer::tick("DFTU","folding_overlap_matrix");
 	return;

@@ -24,13 +24,13 @@ gettimeofday( &t_start, NULL);
 	// (1) MOT: make overlap table.
 	//=========================================
 	MOT.allocate(
-		ORB.get_ntype(),							// number of atom types
-		ORB.get_lmax(),								// max L used to calculate overlap
-		static_cast<int>(ORB.get_kmesh() * kmesh_times) | 1,			// kpoints, for integration in k space
-		ORB.get_Rmax() * rmesh_times,				// max value of radial table
-		ORB.get_dR(),								// delta R, for making radial table
-//		ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
-		ORB.get_dk());											// Peize Lin change 2017-04-16
+		GlobalC::ORB.get_ntype(),							// number of atom types
+		GlobalC::ORB.get_lmax(),								// max L used to calculate overlap
+		static_cast<int>(GlobalC::ORB.get_kmesh() * kmesh_times) | 1,			// kpoints, for integration in k space
+		GlobalC::ORB.get_Rmax() * rmesh_times,				// max value of radial table
+		GlobalC::ORB.get_dR(),								// delta R, for making radial table
+//		GlobalC::ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
+		GlobalC::ORB.get_dk());											// Peize Lin change 2017-04-16
 	int Lmax_used, Lmax;
 	MOT.init_Table_Spherical_Bessel (4,mode, Lmax_used, Lmax, Exx_Abfs::Lmax);
 //	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1

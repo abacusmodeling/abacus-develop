@@ -116,7 +116,7 @@ void UnitCell_pseudo::setup_cell(
 
 	// mohan add 2010-09-29
 	#ifdef __LCAO
-	ORB.bcast_files(ntype, GlobalV::MY_RANK);
+	GlobalC::ORB.bcast_files(ntype, GlobalV::MY_RANK);
 	#endif
 #endif
 	

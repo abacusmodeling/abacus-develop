@@ -8,7 +8,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 {
     TITLE("Local_Orbital_Charge","allocate_k");
 
-    this->nnrg_now = LNNR.nnrg;
+    this->nnrg_now = GlobalC::LNNR.nnrg;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
     if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
     if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
@@ -49,7 +49,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     wfc_dm_2d.init();
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->kpt_file(GridT);
+		this->kpt_file(GlobalC::GridT);
 	}
 
     return;
@@ -289,8 +289,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
             if(gt.in_this_processor[iat])
             {
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-                const int gstart = LNNR.nlocstartg[iat];
-                const int ng = LNNR.nlocdimg[iat];
+                const int gstart = GlobalC::LNNR.nlocstartg[iat];
+                const int ng = GlobalC::LNNR.nlocdimg[iat];
                 const int iw1_lo=gt.trace_lo[start1]/GlobalV::NPOL;
                 const int nw1=atom1->nw;
 

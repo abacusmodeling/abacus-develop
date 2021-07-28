@@ -67,7 +67,7 @@ void ELEC_evolve::evolve_psi(
 			uhm.GK.reset_spin( GlobalV::CURRENT_SPIN );
 
 			// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-			uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1,GridT);
+			uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1,GlobalC::GridT);
 			// added by zhengdy-soc, for non-collinear case
 			// integral 4 times, is there any method to simplify?
 			if(GlobalV::NSPIN==4)
@@ -78,7 +78,7 @@ void ELEC_evolve::evolve_psi(
 					{
 						GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
 					}
-					uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, is);
+					uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, is);
 				}
 			}
 		}
@@ -101,7 +101,7 @@ void ELEC_evolve::evolve_psi(
 		if(INPUT.dft_plus_u)
 		{
       vector<complex<double>> eff_pot(GlobalC::ParaO.nloc);
-			dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
+			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
 				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					

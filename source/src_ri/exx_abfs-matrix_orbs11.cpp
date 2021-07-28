@@ -26,13 +26,13 @@ void Exx_Abfs::Matrix_Orbs11::init(
 //timeval t_start;	
 //gettimeofday( &t_start, NULL);
 	MOT.allocate(
-		ORB.get_ntype(),							// number of atom types
-		std::max( ORB.get_lmax(), Exx_Abfs::Lmax ),	// max L used to calculate overlap
-		static_cast<int>(ORB.get_kmesh() * kmesh_times) | 1,				// kpoints, for integration in k space
-		ORB.get_Rmax() * rmesh_times,				// max value of radial table
-		ORB.get_dR(),								// delta R, for making radial table
-//		ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
-		ORB.get_dk());											// Peize Lin change 2017-04-16
+		GlobalC::ORB.get_ntype(),							// number of atom types
+		std::max( GlobalC::ORB.get_lmax(), Exx_Abfs::Lmax ),	// max L used to calculate overlap
+		static_cast<int>(GlobalC::ORB.get_kmesh() * kmesh_times) | 1,				// kpoints, for integration in k space
+		GlobalC::ORB.get_Rmax() * rmesh_times,				// max value of radial table
+		GlobalC::ORB.get_dR(),								// delta R, for making radial table
+//		GlobalC::ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
+		GlobalC::ORB.get_dk());											// Peize Lin change 2017-04-16
 //ofs<<"TIME@Exx_Abfs::Matrix_Orbs11::init::MOT.allocate\t"<<time_during(t_start)<<endl;
 	int Lmax_used, Lmax;
 //gettimeofday( &t_start, NULL);

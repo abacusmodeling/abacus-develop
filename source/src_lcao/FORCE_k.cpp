@@ -38,10 +38,10 @@ void Force_LCAO_k::ftable_k (
 	double** dm2d = new double*[GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		dm2d[is] = new double[LNNR.nnr];
-		ZEROS(dm2d[is], LNNR.nnr);
+		dm2d[is] = new double[GlobalC::LNNR.nnr];
+		ZEROS(dm2d[is], GlobalC::LNNR.nnr);
 	}
-	Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*LNNR.nnr, "double");	
+	Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 	bool with_energy = false;
 
 	
@@ -50,7 +50,7 @@ void Force_LCAO_k::ftable_k (
 	this->cal_ftvnl_dphi_k(dm2d, isforce, isstress, ftvnl_dphi, stvnl_dphi);
 
 	//Quxin add for DFT+U on 20201029
-	if(INPUT.dft_plus_u) dftu.force_stress();
+	if(INPUT.dft_plus_u) GlobalC::dftu.force_stress();
 
 	// ---------------------------------------
 	// doing on the real space grid.
@@ -105,7 +105,7 @@ void Force_LCAO_k::allocate_k(void)
 	TITLE("Force_LCAO_k","allocate_k");
 	timer::tick("Force_LCAO_k","allocate_k");
 
-	const int nnr = LNNR.nnr;
+	const int nnr = GlobalC::LNNR.nnr;
 	//--------------------------------
     // (1) allocate for dSx dSy & dSz
 	//--------------------------------
@@ -216,8 +216,8 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T1,I1);
 			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-			const int gstart = LNNR.nlocstart[iat];
-			const int irr = LNNR.nlocdim[iat];//number of adjacet orbitals
+			const int gstart = GlobalC::LNNR.nlocstart[iat];
+			const int irr = GlobalC::LNNR.nlocdim[iat];//number of adjacet orbitals
 
 			complex<double> **vvv = new complex<double>*[GlobalV::NSPIN];
          //xiaohui add 2014-03-17, add "if(irr > 0)", 
@@ -281,7 +281,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 								// 2D division (HPSEPS)
 								const int mu = GlobalC::ParaO.trace_loc_row[iw1_all];
 								if(mu<0) continue;
-								const int mug = GridT.trace_lo[iw1_all];
+								const int mug = GlobalC::GridT.trace_lo[iw1_all];
 
 								for(int kk=0; kk<atom2->nw; ++kk)
 								{
@@ -290,7 +290,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 									// 2D division (HPSEPS)
 									const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 									if(nu<0) continue;
-									const int nug = GridT.trace_lo[iw2_all];
+									const int nug = GlobalC::GridT.trace_lo[iw2_all];
 	
 									if(mug >= 0 && nug >= 0)
 									{
@@ -327,7 +327,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 							}//jj
 						}// cb
 //						GlobalV::ofs_running << " count = " << count << endl;
-						assert(count == LNNR.nlocdim[iat]);
+						assert(count == GlobalC::LNNR.nlocdim[iat]);
 					}// w1
 				}//ib
 			}//ik
@@ -402,8 +402,8 @@ void Force_LCAO_k::cal_foverlap_k(
 	double** edm2d = new double*[GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		edm2d[is] = new double[LNNR.nnr];
-		ZEROS(edm2d[is], LNNR.nnr);
+		edm2d[is] = new double[GlobalC::LNNR.nnr];
+		ZEROS(edm2d[is], GlobalC::LNNR.nnr);
 	}
 	bool with_energy = true;
 
@@ -507,11 +507,11 @@ void Force_LCAO_k::cal_foverlap_k(
 		}
 	}
 
-	if(irr!=LNNR.nnr)
+	if(irr!=GlobalC::LNNR.nnr)
 	{
 		OUT(GlobalV::ofs_running,"wrong irr",irr);
-		OUT(GlobalV::ofs_running,"wrong LNNR.nnr",LNNR.nnr);
-		WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=LNNR.nnr");
+		OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
+		WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
 	}
 	
 	for(int is=0; is<GlobalV::NSPIN; is++)
@@ -597,7 +597,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 			}// end cb
 		}
 	}
-	assert(irr==LNNR.nnr);
+	assert(irr==GlobalC::LNNR.nnr);
 	
 //	test(GlobalC::LM.DSloc_Rx);
 //	test(dm2d[0],"dm2d");
@@ -655,7 +655,7 @@ void Force_LCAO_k::test(double* mmm, const string &name)
 					for(int kk=0; kk<atom2->nw; kk++)
 					{
 						const int iw2_all = start2+kk;
-						assert(irr<LNNR.nnr);
+						assert(irr<GlobalC::LNNR.nnr);
 						//test[iw1_all*GlobalV::NLOCAL+iw2_all] += GlobalC::LM.DHloc_fixedR_x[irr];
 						test[iw1_all*GlobalV::NLOCAL+iw2_all] += mmm[irr];
 						++irr;
@@ -735,7 +735,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 
 				dtau = tau2 - tau1;
 				distance = dtau.norm() * GlobalC::ucell.lat0;
-				rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 				// check if this a adjacent atoms.
 				bool is_adj = false;
@@ -745,7 +745,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 					for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
 					{
 						const int T0 = GlobalC::GridD.getType(ad0);
-						if( ORB.nproj[T0] == 0) continue;
+						if( GlobalC::ORB.nproj[T0] == 0) continue;
 						const int I0 = GlobalC::GridD.getNatom(ad0);
 						//const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
 						//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
@@ -753,11 +753,11 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
 						distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-						rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
+						rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 						dtau2 = tau0 - tau2;
 						distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-						rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max(); 
+						rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max(); 
 
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{
@@ -785,7 +785,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 							for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
 							{
 								const int T0 = GlobalC::GridD.getType(ad0);
-								if( ORB.nproj[T0] == 0) continue;
+								if( GlobalC::ORB.nproj[T0] == 0) continue;
 								const int I0 = GlobalC::GridD.getNatom(ad0);
 								const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
 								//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
@@ -793,11 +793,11 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 
 								dtau1 = tau0 - tau1;
 								distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-								rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
+								rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 								dtau2 = tau0 - tau2;
 								distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-								rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+								rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 								double r0[3];
 								double r1[3];
@@ -813,7 +813,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 									//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
 									double nlm[3]={0,0,0};
 
-									UOT.snap_psibeta(
+									GlobalC::UOT.snap_psibeta(
 											nlm, 1,
 											tau2,
 											T2,
@@ -836,7 +836,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 									double nlm1[3]={0,0,0};
 									if(isstress)
 									{
-										UOT.snap_psibeta(
+										GlobalC::UOT.snap_psibeta(
 											nlm1, 1,
 											tau1,
 											T1,
@@ -888,7 +888,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 		}// I1
 	}// T1
 
-	assert( iir == LNNR.nnr );
+	assert( iir == GlobalC::LNNR.nnr );
 
 	if(isstress)
 	{
@@ -931,9 +931,9 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		GlobalV::CURRENT_SPIN = is;
-//		ZEROS (GlobalC::LM.DHloc_fixedR_x, LNNR.nnr);
-//		ZEROS (GlobalC::LM.DHloc_fixedR_y, LNNR.nnr);
-//		ZEROS (GlobalC::LM.DHloc_fixedR_z, LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_x, GlobalC::LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_y, GlobalC::LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_z, GlobalC::LNNR.nnr);
 //		cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)

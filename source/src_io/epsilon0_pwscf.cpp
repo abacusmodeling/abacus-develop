@@ -16,7 +16,10 @@
 
 using namespace std;
 
+namespace GlobalC
+{
 Epsilon0_pwscf epsilon0_pwscf;
+}
 
 Epsilon0_pwscf::Epsilon0_pwscf()
           :init_finish(false)

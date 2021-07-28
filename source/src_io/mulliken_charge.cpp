@@ -173,8 +173,8 @@ void Mulliken_Charge::cal_mulliken(void)
 			GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 				GlobalV::ofs_running,
 				GlobalV::OUT_LEVEL,
-				ORB.get_rcutmax_Phi(), 
-				ORB.get_rcutmax_Beta(), 
+				GlobalC::ORB.get_rcutmax_Phi(), 
+				GlobalC::ORB.get_rcutmax_Beta(), 
 				GlobalV::GAMMA_ONLY_LOCAL);
 
 			atom_arrange::search(
@@ -188,8 +188,8 @@ void Mulliken_Charge::cal_mulliken(void)
 			// 2021-04-16
 			GlobalC::LOWF.orb_con.set_orb_tables(
 					GlobalV::ofs_running,
-					UOT, 
-					ORB,
+					GlobalC::UOT, 
+					GlobalC::ORB,
 					GlobalC::ucell.ntype,
 					GlobalC::ucell.lmax,
 					INPUT.lcao_ecut,
@@ -205,8 +205,8 @@ void Mulliken_Charge::cal_mulliken(void)
 
 
 
-			GlobalC::LM.allocate_HS_R(LNNR.nnr);
-			GlobalC::LM.zeros_HSR('S', LNNR.nnr);
+			GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
+			GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
 			GlobalC::UHM.genH.calculate_S_no();
 			GlobalC::UHM.genH.build_ST_new('S', false);
 
@@ -216,7 +216,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				{
 					GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
 					GlobalC::LM.zeros_HSk('S');
-					LNNR.folding_fixedH(ik);
+					GlobalC::LNNR.folding_fixedH(ik);
 					ComplexMatrix Dwf = conj(M.wfc_k[ik]);
 
 					for (int i=0; i<GlobalV::NBANDS; ++i)		  
@@ -268,7 +268,7 @@ void Mulliken_Charge::cal_mulliken(void)
 				GlobalV::SEARCH_RADIUS, 
 				GlobalV::test_atom_input);
 #endif
-			GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+			GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
 
 		}//else                     
 		MPI_Reduce(MecMulP[is], DecMulP[is] , GlobalV::NLOCAL , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

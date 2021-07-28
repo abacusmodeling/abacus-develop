@@ -63,9 +63,9 @@ void Exx_Opt_Orb::print_matrix(
 		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
 
 		if(TA==TB)
-			ofs << ORB.Phi[TA].getRcut() << " rcut_Jlq" << endl;
+			ofs << GlobalC::ORB.Phi[TA].getRcut() << " rcut_Jlq" << endl;
 		else
-			ofs << ORB.Phi[TA].getRcut() << " " << ORB.Phi[TB].getRcut() << " rcut_Jlq" << endl;
+			ofs << GlobalC::ORB.Phi[TA].getRcut() << " " << GlobalC::ORB.Phi[TB].getRcut() << " rcut_Jlq" << endl;
 
 		// mohan add 'smooth' and 'sigma' 2009-08-28
 		ofs << 0 << " smooth" << endl;
@@ -89,8 +89,8 @@ void Exx_Opt_Orb::print_matrix(
 		const size_t nwfc = (TA==TB && IA==IB) ? cal_sum_M(TA) : cal_sum_M(TA)+cal_sum_M(TB);
 		ofs	<< nwfc << " nwfc" << endl;
 		
-		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
-		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
 		if(TA==TB)
 			ofs	<< ecut_numberA << " ne" << endl;
 		else

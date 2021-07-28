@@ -88,7 +88,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     // count the number of elements to be received from each process
     for(int iGlobal=0; iGlobal<GlobalV::NLOCAL; ++iGlobal)
     {
-        int iLocalGrid=GridT.trace_lo[iGlobal];
+        int iLocalGrid=GlobalC::GridT.trace_lo[iGlobal];
         if(iLocalGrid>=0)
         {
             //trace_global[iLocalGrid]=iGlobal;
@@ -405,8 +405,8 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             OUT(GlobalV::ofs_running,"receiver_size",receiver_size);
             OUT(GlobalV::ofs_running,"last receiver_buffer",receiver_buffer[receiver_size-1]);
             // GlobalV::ofs_running<<"DM[0][0:1][0:1] after receiver:"<<endl;
-            // int idx0=GridT.trace_lo[0];
-            // int idx1=GridT.trace_lo[1];
+            // int idx0=GlobalC::GridT.trace_lo[0];
+            // int idx1=GlobalC::GridT.trace_lo[1];
             // if(idx0>=0)
             // {
             //     GlobalV::ofs_running<<"DM(0,0)"<<DM[0][idx0][idx0]<<" ";
@@ -425,11 +425,11 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             GlobalV::ofs_running<<"DM in local grid:\n_________________________________________\n";
             for(int i=0; i<GlobalV::NLOCAL; ++i)
             {
-                int ii=GridT.trace_lo[i];
+                int ii=GlobalC::GridT.trace_lo[i];
                 if(ii < 0) continue;
                 for(int j=0; j<GlobalV::NLOCAL; ++j)
                 {
-                    int jj=GridT.trace_lo[j];
+                    int jj=GlobalC::GridT.trace_lo[j];
                     if(jj<0) continue;
                     GlobalV::ofs_running<<DM[is][ii][jj]<<" ";
                 }
@@ -582,12 +582,12 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 					for(int i_row=0; i_row<row_remain; i_row++)
 					{
 						const int row_index = row_count*300 + i_row;
-						const int row_mu = GridT.trace_lo[row_index];
+						const int row_mu = GlobalC::GridT.trace_lo[row_index];
 						if(row_mu<0)    continue;
 						for(int i_col=0; i_col<col_remain; i_col++)
 						{
 							const int col_index = col_count*300 + i_col;
-							const int col_nu = GridT.trace_lo[col_index];
+							const int col_nu = GlobalC::GridT.trace_lo[col_index];
 							if(col_nu<0)    continue;
 							this->DM[is][row_mu][col_nu] = rho_row_col(i_row,i_col);
 						}
@@ -607,8 +607,8 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 		GlobalV::ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<endl;
 
-		int idx0=GridT.trace_lo[0];
-		int idx1=GridT.trace_lo[1];
+		int idx0=GlobalC::GridT.trace_lo[0];
+		int idx1=GlobalC::GridT.trace_lo[1];
 
 		if(idx0>=0)
 		{

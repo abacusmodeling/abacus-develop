@@ -120,7 +120,7 @@ void ELEC_scf::scf(const int &istep)
 		Update_input UI;
 		UI.init(ufile);
 
-		if(INPUT.dft_plus_u) dftu.iter_dftu = iter;
+		if(INPUT.dft_plus_u) GlobalC::dftu.iter_dftu = iter;
 		//time_start= std::time(NULL);
 		clock_start = std::clock();
 		conv_elec = false;//mohan add 2008-05-25
@@ -264,7 +264,7 @@ void ELEC_scf::scf(const int &istep)
 
 		if(INPUT.dft_plus_u)
 		{
-			dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
+			GlobalC::dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
 		}
 
 		// (1) calculate the bands.
@@ -364,11 +364,11 @@ void ELEC_scf::scf(const int &istep)
 		// the local occupation number matrix and energy correction
 		if(INPUT.dft_plus_u)
 		{
-			if(GlobalV::GAMMA_ONLY_LOCAL) dftu.cal_occup_m_gamma(iter);
-			else dftu.cal_occup_m_k(iter);
+			if(GlobalV::GAMMA_ONLY_LOCAL) GlobalC::dftu.cal_occup_m_gamma(iter);
+			else GlobalC::dftu.cal_occup_m_k(iter);
 
-		 	dftu.cal_energy_correction(istep);
-			dftu.output();
+		 	GlobalC::dftu.cal_energy_correction(istep);
+			GlobalC::dftu.output();
 		}
 
 		// (4) mohan add 2010-06-24
@@ -507,14 +507,14 @@ void ELEC_scf::scf(const int &istep)
 			// output charge density for converged,
 			// 0 means don't need to consider iter,
 			//--------------------------------------
-			if( chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
+			if( GlobalC::chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
 			{
-				cout <<"eta = "<<chi0_hilbert.eta<<endl;
-				cout <<"domega = "<<chi0_hilbert.domega<<endl;
-				cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
-				cout <<"dim = "<<chi0_hilbert.dim<<endl;
-				//cout <<"oband = "<<chi0_hilbert.oband<<endl;
-				chi0_hilbert.Chi();
+				cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<endl;
+				cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<endl;
+				cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<endl;
+				cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<endl;
+				//cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<endl;
+				GlobalC::chi0_hilbert.Chi();
 			}
 
 			//quxin add for DFT+U for nscf calculation
@@ -524,7 +524,7 @@ void ELEC_scf::scf(const int &istep)
 				{
 					stringstream sst;
 					sst << GlobalV::global_out_dir << "onsite.dm";
-					dftu.write_occup_m( sst.str() );
+					GlobalC::dftu.write_occup_m( sst.str() );
 				}
 			}
 
@@ -577,7 +577,7 @@ void ELEC_scf::scf(const int &istep)
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
 				{
-					ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
+					GlobalC::ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
 				}
 #endif
 			}

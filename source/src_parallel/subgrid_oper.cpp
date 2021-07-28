@@ -104,7 +104,7 @@ void SubGrid_oper::cal_totwfc()
 	ZEROS(occupy, GlobalV::NLOCAL);	
 	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
-		if(GridT.trace_lo[iw] >= 0)
+		if(GlobalC::GridT.trace_lo[iw] >= 0)
 		{
 			occupy[iw] = 1;
 		}
@@ -156,7 +156,7 @@ void SubGrid_oper::cal_totwfc()
 	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
 		GlobalV::ofs_running << " iw=" << iw << " trace_lo_tot=" << trace_lo_tot[iw] 
-		<< " trace_lo=" << GridT.trace_lo[iw] 
+		<< " trace_lo=" << GlobalC::GridT.trace_lo[iw] 
 		<< " occupy=" << occupy[iw] 
 		<< endl;
 	}
@@ -266,7 +266,7 @@ void SubGrid_oper::dis_subwfc()
 				//---------------------------------------------
 				for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
-					const int mu1 = GridT.trace_lo[iw];
+					const int mu1 = GlobalC::GridT.trace_lo[iw];
 					if(mu1 >= 0)
 					{
 						const int mu2 = this->trace_lo_tot[iw];
@@ -315,7 +315,7 @@ void SubGrid_oper::dis_subwfc()
 						if(mu2<0)
 						{
 							GlobalV::ofs_running << " iw = " << iw << endl;
-							GlobalV::ofs_running << " GridT.trace_lo=" << mu1 << endl;
+							GlobalV::ofs_running << " GlobalC::GridT.trace_lo=" << mu1 << endl;
 							GlobalV::ofs_running << " trace_lo_tot=" << mu2 << endl;
 							assert(mu2>=0);
 						}
@@ -341,29 +341,29 @@ void SubGrid_oper::dis_subwfc()
 			int tag;
 			// send trace_lo
 			tag = GlobalV::GRANK * 10;
-			MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, GRID_WORLD);
+			MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, GRID_WORLD);
 
 			//GlobalV::ofs_running << " send1." << endl;
 
-			// send GridT.lgd
+			// send GlobalC::GridT.lgd
 			tag = GlobalV::GRANK * 10 + 1;
-			MPI_Send(&GridT.lgd, 1, MPI_INT, 0, tag, GRID_WORLD);
+			MPI_Send(&GlobalC::GridT.lgd, 1, MPI_INT, 0, tag, GRID_WORLD);
 
 			//GlobalV::ofs_running << " send2." << endl;
 
 			// receive c
-			double* crecv = new double[GlobalV::NBANDS*GridT.lgd];
-			ZEROS(crecv, GlobalV::NBANDS*GridT.lgd);
+			double* crecv = new double[GlobalV::NBANDS*GlobalC::GridT.lgd];
+			ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 			tag = GlobalV::GRANK * 10 + 2;
 //			GlobalV::ofs_running << " receive=" << tag << endl;
-			MPI_Recv(crecv, GlobalV::NBANDS*GridT.lgd, MPI_DOUBLE, 0, tag, GRID_WORLD, &status);
+			MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd, MPI_DOUBLE, 0, tag, GRID_WORLD, &status);
 //			GlobalV::ofs_running << " receive done." << endl;
 
 
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
-				for (int mu=0; mu<GridT.lgd; ++mu)
+				for (int mu=0; mu<GlobalC::GridT.lgd; ++mu)
 				{
 		// mohan comment out 2021-02-09
 		//			GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu] = crecv[mu*GlobalV::NBANDS+ib];
@@ -385,7 +385,7 @@ void SubGrid_oper::dis_subwfc()
 	{
 		for(int j=0; j<GlobalV::NLOCAL; ++j)
 		{
-			const int mu = GridT.trace_lo[j];
+			const int mu = GlobalC::GridT.trace_lo[j];
 			if(mu>=0)
 			{
 				//				if( abs(GlobalC::LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
@@ -405,7 +405,7 @@ void SubGrid_oper::dis_subwfc()
 	//---------------------------------------------
 	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
-		const int mu1 = GridT.trace_lo[iw];
+		const int mu1 = GlobalC::GridT.trace_lo[iw];
 		if(mu1 >= 0)
 		{
 			const int mu2 = this->trace_lo_tot[iw];

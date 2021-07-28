@@ -61,7 +61,7 @@ vector<pair<size_t,pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::
 		const int it2 = GlobalC::ucell.iat2it[iat2];
 		const Vector3<double> tau1 = GlobalC::ucell.atoms[it1].tau[GlobalC::ucell.iat2ia[iat1]];
 		const Vector3<double> tau2 = GlobalC::ucell.atoms[it2].tau[GlobalC::ucell.iat2ia[iat2]];
-		const double Rcut = std::min( ORB.Phi[it1].getRcut()*rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*rmesh_times );
+		const double Rcut = std::min( GlobalC::ORB.Phi[it1].getRcut()*rmesh_times+GlobalC::ORB.Phi[it2].getRcut(), GlobalC::ORB.Phi[it1].getRcut()+GlobalC::ORB.Phi[it2].getRcut()*rmesh_times );
 		int Nadj_box = 0;
 		for(const Vector3<int> box2 : Coulomb_potential_boxes)
 		{
