@@ -749,13 +749,13 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                                 }
                                 if(GlobalV::NSPIN!=4)
                                 {
-                                    lineH[j] = LM.HR_tr[ix][iy][iz][iic];
-                                    lineS[j] = LM.SlocR_tr[ix][iy][iz][iic];
+                                    lineH[j] = GlobalC::LM.HR_tr[ix][iy][iz][iic];
+                                    lineS[j] = GlobalC::LM.SlocR_tr[ix][iy][iz][iic];
                                 }
                                 else
                                 {
-                                    lineH_soc[j] = LM.HR_tr_soc[ix][iy][iz][iic];
-                                    lineS_soc[j] = LM.SlocR_tr_soc[ix][iy][iz][iic];
+                                    lineH_soc[j] = GlobalC::LM.HR_tr_soc[ix][iy][iz][iic];
+                                    lineS_soc[j] = GlobalC::LM.SlocR_tr_soc[ix][iy][iz][iic];
                                 }
                             }
                         }
@@ -866,10 +866,10 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
     TITLE("HS_Matrix","save_HSR_sparse");
     timer::tick("HS_Matrix","save_HSR_sparse");
 
-    auto &HR_sparse_ptr = LM.HR_sparse;
-    auto &HR_soc_sparse_ptr = LM.HR_soc_sparse;
-    auto &SR_sparse_ptr = LM.SR_sparse;
-    auto &SR_soc_sparse_ptr = LM.SR_soc_sparse;
+    auto &HR_sparse_ptr = GlobalC::LM.HR_sparse;
+    auto &HR_soc_sparse_ptr = GlobalC::LM.HR_soc_sparse;
+    auto &SR_sparse_ptr = GlobalC::LM.SR_sparse;
+    auto &SR_soc_sparse_ptr = GlobalC::LM.SR_soc_sparse;
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();

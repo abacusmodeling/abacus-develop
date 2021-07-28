@@ -44,7 +44,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 						// The results are saved in Sloc2.
 						// 2 stands for k points.
 						//-----------------------------------
-						LM.Sloc2[ mu * GlobalC::ParaO.ncol + nu ] = v;
+						GlobalC::LM.Sloc2[ mu * GlobalC::ParaO.ncol + nu ] = v;
 					}
 					else//added by zhengdy-soc
 					{
@@ -56,14 +56,14 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 							v2 += conj(GlobalC::wf.wanf2[ik](mu, ig + GlobalC::wf.npwx)) * GlobalC::wf.wanf2[ik](nu, ig);
 							v3 += conj(GlobalC::wf.wanf2[ik](mu, ig + GlobalC::wf.npwx)) * GlobalC::wf.wanf2[ik](nu, ig + GlobalC::wf.npwx);
 						}
-						LM.Sloc2_soc(0, mu * GlobalC::ParaO.ncol + nu) = v0;
-						LM.Sloc2_soc(1, mu * GlobalC::ParaO.ncol + nu) = v1;
-						LM.Sloc2_soc(2, mu * GlobalC::ParaO.ncol + nu) = v2;
-						LM.Sloc2_soc(3, mu * GlobalC::ParaO.ncol + nu) = v3;*/
+						GlobalC::LM.Sloc2_soc(0, mu * GlobalC::ParaO.ncol + nu) = v0;
+						GlobalC::LM.Sloc2_soc(1, mu * GlobalC::ParaO.ncol + nu) = v1;
+						GlobalC::LM.Sloc2_soc(2, mu * GlobalC::ParaO.ncol + nu) = v2;
+						GlobalC::LM.Sloc2_soc(3, mu * GlobalC::ParaO.ncol + nu) = v3;*/
 						complex<double> v0 = ZERO;
 						for (int ig = 0; ig < GlobalC::wf.npwx*GlobalV::NPOL; ig++)
 							v0 += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
-						LM.Sloc2[ mu * GlobalC::ParaO.ncol + nu ] = v0;
+						GlobalC::LM.Sloc2[ mu * GlobalC::ParaO.ncol + nu ] = v0;
 
 					}
 				}
@@ -101,7 +101,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 					//-----------------------------------------
 					// The results are saved in Hloc_fixed2.
 					//-----------------------------------------
-					LM.Hloc_fixed2[ mu * GlobalC::ParaO.ncol + nu ] = v;
+					GlobalC::LM.Hloc_fixed2[ mu * GlobalC::ParaO.ncol + nu ] = v;
 				}
 			}
 			break;
@@ -169,10 +169,10 @@ void Build_ST_pw::set_local(const int &ik)
 					v += conj( GlobalC::wf.wanf2[ik](j,ig) ) * hpsi[ig];
 				}
 	//			vij(j, i) = v;
-				LM.set_HSk(j,i,v,'L');
+				GlobalC::LM.set_HSk(j,i,v,'L');
 				if(i!=j)
 				{
-					LM.set_HSk(i,j,conj(v),'L');
+					GlobalC::LM.set_HSk(i,j,conj(v),'L');
 				}
 			}
 		}
@@ -233,10 +233,10 @@ void Build_ST_pw::set_local(const int &ik)
 					v += conj( GlobalC::wf.wanf2[ik](j,ig + GlobalC::wf.npwx) ) * hpsi[ig + GlobalC::wf.npwx];
 				}
 //			vij(j, i) = v;
-				LM.set_HSk(j,i,v,'L');
+				GlobalC::LM.set_HSk(j,i,v,'L');
 				if(i!=j)
 				{
-					LM.set_HSk(i,j,conj(v),'L');
+					GlobalC::LM.set_HSk(i,j,conj(v),'L');
 				}
 			}
 			delete[] psi_down;

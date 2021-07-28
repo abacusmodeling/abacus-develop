@@ -109,29 +109,29 @@ void Force_LCAO_k::allocate_k(void)
 	//--------------------------------
     // (1) allocate for dSx dSy & dSz
 	//--------------------------------
-	LM.DSloc_Rx = new double [nnr];
-    LM.DSloc_Ry = new double [nnr];
-    LM.DSloc_Rz = new double [nnr];
-    ZEROS(LM.DSloc_Rx, nnr);
-    ZEROS(LM.DSloc_Ry, nnr);
-    ZEROS(LM.DSloc_Rz, nnr);
+	GlobalC::LM.DSloc_Rx = new double [nnr];
+    GlobalC::LM.DSloc_Ry = new double [nnr];
+    GlobalC::LM.DSloc_Rz = new double [nnr];
+    ZEROS(GlobalC::LM.DSloc_Rx, nnr);
+    ZEROS(GlobalC::LM.DSloc_Ry, nnr);
+    ZEROS(GlobalC::LM.DSloc_Rz, nnr);
 	Memory::record("force_lo", "dS", nnr*3, "double");
     
 	if(GlobalV::STRESS){
-		LM.DH_r = new double [3* nnr];
-		ZEROS(LM.DH_r, 3 * nnr);
-		LM.stvnl11 = new double [nnr];
-		LM.stvnl12 = new double [nnr];
-		LM.stvnl13 = new double [nnr];
-		LM.stvnl22 = new double [nnr];
-		LM.stvnl23 = new double [nnr];
-		LM.stvnl33 = new double [nnr];
-		ZEROS(LM.stvnl11,  nnr);
-		ZEROS(LM.stvnl12,  nnr);
-		ZEROS(LM.stvnl13,  nnr);
-		ZEROS(LM.stvnl22,  nnr);
-		ZEROS(LM.stvnl23,  nnr);
-		ZEROS(LM.stvnl33,  nnr);
+		GlobalC::LM.DH_r = new double [3* nnr];
+		ZEROS(GlobalC::LM.DH_r, 3 * nnr);
+		GlobalC::LM.stvnl11 = new double [nnr];
+		GlobalC::LM.stvnl12 = new double [nnr];
+		GlobalC::LM.stvnl13 = new double [nnr];
+		GlobalC::LM.stvnl22 = new double [nnr];
+		GlobalC::LM.stvnl23 = new double [nnr];
+		GlobalC::LM.stvnl33 = new double [nnr];
+		ZEROS(GlobalC::LM.stvnl11,  nnr);
+		ZEROS(GlobalC::LM.stvnl12,  nnr);
+		ZEROS(GlobalC::LM.stvnl13,  nnr);
+		ZEROS(GlobalC::LM.stvnl22,  nnr);
+		ZEROS(GlobalC::LM.stvnl23,  nnr);
+		ZEROS(GlobalC::LM.stvnl33,  nnr);
 		Memory::record("stress_lo", "dSR", nnr*6, "double");
 	}
 
@@ -145,22 +145,22 @@ void Force_LCAO_k::allocate_k(void)
 	//-----------------------------------------
 	// (2) allocate for <phi | T + Vnl | dphi>
 	//-----------------------------------------
-    LM.DHloc_fixedR_x = new double [nnr];
-    LM.DHloc_fixedR_y = new double [nnr];
-    LM.DHloc_fixedR_z = new double [nnr];
-    ZEROS (LM.DHloc_fixedR_x, nnr);
-    ZEROS (LM.DHloc_fixedR_y, nnr);
-    ZEROS (LM.DHloc_fixedR_z, nnr);
+    GlobalC::LM.DHloc_fixedR_x = new double [nnr];
+    GlobalC::LM.DHloc_fixedR_y = new double [nnr];
+    GlobalC::LM.DHloc_fixedR_z = new double [nnr];
+    ZEROS (GlobalC::LM.DHloc_fixedR_x, nnr);
+    ZEROS (GlobalC::LM.DHloc_fixedR_y, nnr);
+    ZEROS (GlobalC::LM.DHloc_fixedR_z, nnr);
 	Memory::record("force_lo", "dTVNL", nnr*3, "double");
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
     UHM.genH.build_ST_new ('T', cal_deri);
-	//test(LM.DHloc_fixedR_x,"LM.DHloc_fixedR_x T part");
+	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
 	UHM.genH.build_Nonlocal_mu (cal_deri);
-	//test(LM.DHloc_fixedR_x,"LM.DHloc_fixedR_x Vnl part");
+	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
 	timer::tick("Force_LCAO_k","allocate");
 	return;
@@ -168,21 +168,21 @@ void Force_LCAO_k::allocate_k(void)
 
 void Force_LCAO_k::finish_k(void)
 {
-    delete [] LM.DSloc_Rx;
-    delete [] LM.DSloc_Ry;
-    delete [] LM.DSloc_Rz;
-    delete [] LM.DHloc_fixedR_x;
-    delete [] LM.DHloc_fixedR_y;
-    delete [] LM.DHloc_fixedR_z;
+    delete [] GlobalC::LM.DSloc_Rx;
+    delete [] GlobalC::LM.DSloc_Ry;
+    delete [] GlobalC::LM.DSloc_Rz;
+    delete [] GlobalC::LM.DHloc_fixedR_x;
+    delete [] GlobalC::LM.DHloc_fixedR_y;
+    delete [] GlobalC::LM.DHloc_fixedR_z;
 	if(GlobalV::STRESS)
 	{
-		delete [] LM.DH_r;
-		delete [] LM.stvnl11;
-		delete [] LM.stvnl12;
-		delete [] LM.stvnl13;
-		delete [] LM.stvnl22;
-		delete [] LM.stvnl23;
-		delete [] LM.stvnl33;
+		delete [] GlobalC::LM.DH_r;
+		delete [] GlobalC::LM.stvnl11;
+		delete [] GlobalC::LM.stvnl12;
+		delete [] GlobalC::LM.stvnl13;
+		delete [] GlobalC::LM.stvnl22;
+		delete [] GlobalC::LM.stvnl23;
+		delete [] GlobalC::LM.stvnl33;
 	}
 	return;
 }
@@ -463,17 +463,17 @@ void Force_LCAO_k::cal_foverlap_k(
 							double edm2d2 = 2.0 * edm2d[is][irr];
 							if(isforce)
 							{
-								foverlap(iat,0) -= edm2d2 * LM.DSloc_Rx[irr];
-								foverlap(iat,1) -= edm2d2 * LM.DSloc_Ry[irr];
-								foverlap(iat,2) -= edm2d2 * LM.DSloc_Rz[irr];
+								foverlap(iat,0) -= edm2d2 * GlobalC::LM.DSloc_Rx[irr];
+								foverlap(iat,1) -= edm2d2 * GlobalC::LM.DSloc_Ry[irr];
+								foverlap(iat,2) -= edm2d2 * GlobalC::LM.DSloc_Rz[irr];
 							}
 							if(isstress)
 							{
 								for(int ipol = 0;ipol<3;ipol++)
 								{
-									soverlap(0,ipol) += edm2d[is][irr] * LM.DSloc_Rx[irr] * LM.DH_r[irr * 3 + ipol];
-									soverlap(1,ipol) += edm2d[is][irr] * LM.DSloc_Ry[irr] * LM.DH_r[irr * 3 + ipol];
-									soverlap(2,ipol) += edm2d[is][irr] * LM.DSloc_Rz[irr] * LM.DH_r[irr * 3 + ipol];
+									soverlap(0,ipol) += edm2d[is][irr] * GlobalC::LM.DSloc_Rx[irr] * GlobalC::LM.DH_r[irr * 3 + ipol];
+									soverlap(1,ipol) += edm2d[is][irr] * GlobalC::LM.DSloc_Ry[irr] * GlobalC::LM.DH_r[irr * 3 + ipol];
+									soverlap(2,ipol) += edm2d[is][irr] * GlobalC::LM.DSloc_Rz[irr] * GlobalC::LM.DH_r[irr * 3 + ipol];
 								}
 							}
 						}
@@ -577,18 +577,18 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 							double dm2d2 = 2.0 * dm2d[is][irr];
 							if(isforce)
 							{
-								ftvnl_dphi(iat,0) += dm2d2 * LM.DHloc_fixedR_x[irr];
-								ftvnl_dphi(iat,1) += dm2d2 * LM.DHloc_fixedR_y[irr];
-								ftvnl_dphi(iat,2) += dm2d2 * LM.DHloc_fixedR_z[irr];
+								ftvnl_dphi(iat,0) += dm2d2 * GlobalC::LM.DHloc_fixedR_x[irr];
+								ftvnl_dphi(iat,1) += dm2d2 * GlobalC::LM.DHloc_fixedR_y[irr];
+								ftvnl_dphi(iat,2) += dm2d2 * GlobalC::LM.DHloc_fixedR_z[irr];
 							}
 							if(isstress)
 							{
-								stvnl_dphi(0,0) -= dm2d[is][irr] * LM.stvnl11[irr];
-								stvnl_dphi(0,1) -= dm2d[is][irr] * LM.stvnl12[irr];
-								stvnl_dphi(0,2) -= dm2d[is][irr] * LM.stvnl13[irr];
-								stvnl_dphi(1,1) -= dm2d[is][irr] * LM.stvnl22[irr];
-								stvnl_dphi(1,2) -= dm2d[is][irr] * LM.stvnl23[irr];
-								stvnl_dphi(2,2) -= dm2d[is][irr] * LM.stvnl33[irr];
+								stvnl_dphi(0,0) -= dm2d[is][irr] * GlobalC::LM.stvnl11[irr];
+								stvnl_dphi(0,1) -= dm2d[is][irr] * GlobalC::LM.stvnl12[irr];
+								stvnl_dphi(0,2) -= dm2d[is][irr] * GlobalC::LM.stvnl13[irr];
+								stvnl_dphi(1,1) -= dm2d[is][irr] * GlobalC::LM.stvnl22[irr];
+								stvnl_dphi(1,2) -= dm2d[is][irr] * GlobalC::LM.stvnl23[irr];
+								stvnl_dphi(2,2) -= dm2d[is][irr] * GlobalC::LM.stvnl33[irr];
 							}
 						}
 						++irr;
@@ -599,7 +599,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	}
 	assert(irr==LNNR.nnr);
 	
-//	test(LM.DSloc_Rx);
+//	test(GlobalC::LM.DSloc_Rx);
 //	test(dm2d[0],"dm2d");
 
 	if(isstress){
@@ -656,7 +656,7 @@ void Force_LCAO_k::test(double* mmm, const string &name)
 					{
 						const int iw2_all = start2+kk;
 						assert(irr<LNNR.nnr);
-						//test[iw1_all*GlobalV::NLOCAL+iw2_all] += LM.DHloc_fixedR_x[irr];
+						//test[iw1_all*GlobalV::NLOCAL+iw2_all] += GlobalC::LM.DHloc_fixedR_x[irr];
 						test[iw1_all*GlobalV::NLOCAL+iw2_all] += mmm[irr];
 						++irr;
 					}
@@ -918,9 +918,9 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	timer::tick("Force_LCAO_k","cal_fvl_dphi_k");
 
 	if(!isforce&&!isstress) return;
-	assert(LM.DHloc_fixedR_x!=NULL);
-	assert(LM.DHloc_fixedR_y!=NULL);
-	assert(LM.DHloc_fixedR_z!=NULL);
+	assert(GlobalC::LM.DHloc_fixedR_x!=NULL);
+	assert(GlobalC::LM.DHloc_fixedR_y!=NULL);
+	assert(GlobalC::LM.DHloc_fixedR_z!=NULL);
 
 	int istep = 1;
 
@@ -931,9 +931,9 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		GlobalV::CURRENT_SPIN = is;
-//		ZEROS (LM.DHloc_fixedR_x, LNNR.nnr);
-//		ZEROS (LM.DHloc_fixedR_y, LNNR.nnr);
-//		ZEROS (LM.DHloc_fixedR_z, LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_x, LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_y, LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_z, LNNR.nnr);
 //		cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)

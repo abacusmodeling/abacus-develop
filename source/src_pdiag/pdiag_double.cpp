@@ -564,7 +564,7 @@ void Pdiag_Double::diago_double_begin(
 	// problem.
 	int loc_pos;
 
-	double* Stmp = LM.Sdiag;
+	double* Stmp = GlobalC::LM.Sdiag;
 
     OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
     if(GlobalV::KS_SOLVER=="hpseps")
@@ -992,7 +992,7 @@ void Pdiag_Double::diago_complex_begin(
 	int loc_pos;
 
 	// because the output Stmp will be different from Sloc2, so we need to copy that.
-	complex<double>* Stmp = LM.Sdiag2;
+	complex<double>* Stmp = GlobalC::LM.Sdiag2;
 
 	if(GlobalV::KS_SOLVER=="hpseps")
 	{

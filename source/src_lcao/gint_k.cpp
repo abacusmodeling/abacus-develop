@@ -810,7 +810,7 @@ void Gint_k::folding_vl_k(const int &ik)
 				continue;
 			}
 			// set the matrix value.
-			LM.set_HSk(i,j,tmp[j],'L');
+			GlobalC::LM.set_HSk(i,j,tmp[j],'L');
 		}
 		delete[] tmp;
 	}
@@ -1124,7 +1124,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 				continue;
 			}
 			// set the matrix value.
-			LM.set_HSk(i,j,tmp[j],'L');
+			GlobalC::LM.set_HSk(i,j,tmp[j],'L');
 		}
 		delete[] tmp;
 	}
@@ -1434,9 +1434,9 @@ void Gint_k::distribute_pvpR_tr(void)
                         }
                         else
                         {
-                            //LM.set_HSk(i,j,tmp[j],'L');
-                            if(GlobalV::NSPIN!=4) LM.set_HR_tr(ix,iy,iz,i,j,tmp[j]);
-                            else LM.set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
+                            //GlobalC::LM.set_HSk(i,j,tmp[j],'L');
+                            if(GlobalV::NSPIN!=4) GlobalC::LM.set_HR_tr(ix,iy,iz,i,j,tmp[j]);
+                            else GlobalC::LM.set_HR_tr_soc(ix,iy,iz,i,j,tmp_soc[j]);
                         }
                     }
                     if(GlobalV::NSPIN!=4) delete[] tmp;
@@ -1793,11 +1793,11 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 								{
 									if (abs(tmp[col]) > sparse_threshold)
 									{
-										double &value = LM.HR_sparse[ix][iy][iz][row][col];
+										double &value = GlobalC::LM.HR_sparse[ix][iy][iz][row][col];
 										value += tmp[col];
 										if (abs(value) < sparse_threshold)
 										{
-											LM.HR_sparse[ix][iy][iz][row].erase(col);
+											GlobalC::LM.HR_sparse[ix][iy][iz][row].erase(col);
 										}
 									}
 								}
@@ -1805,11 +1805,11 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 								{
 									if(abs(tmp_soc[col]) > sparse_threshold)
 									{
-										complex<double> &value = LM.HR_soc_sparse[ix][iy][iz][row][col];
+										complex<double> &value = GlobalC::LM.HR_soc_sparse[ix][iy][iz][row][col];
 										value += tmp_soc[col];
 										if (abs(value) < sparse_threshold)
 										{
-											LM.HR_soc_sparse[ix][iy][iz][row].erase(col);
+											GlobalC::LM.HR_soc_sparse[ix][iy][iz][row].erase(col);
 										}
 									}
 								}

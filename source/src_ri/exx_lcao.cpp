@@ -1259,7 +1259,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const matrix & H = Hexx_para.HK_Gamma_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			LM.Hloc[i] += alpha * H.c[i];
+			GlobalC::LM.Hloc[i] += alpha * H.c[i];
 		}
 	}
 	else
@@ -1267,7 +1267,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const ComplexMatrix & H = Hexx_para.HK_K_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			LM.Hloc2[i] += alpha * H.c[i];
+			GlobalC::LM.Hloc2[i] += alpha * H.c[i];
 		}
 	}
 }

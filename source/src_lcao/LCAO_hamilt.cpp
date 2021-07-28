@@ -62,7 +62,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 	timer::tick("LCAO_Hamilt","cal_Hgamma");
 
 	// Set the matrix 'H' to zero.
-	LM.zeros_HSgamma('H'); // 3 stands for Hloc.
+	GlobalC::LM.zeros_HSgamma('H'); // 3 stands for Hloc.
 
 	bool local_pw = false;
 
@@ -103,15 +103,15 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 	}
 
 	//add T+VNL+Vl matrix.
-	LM.update_Hloc();
+	GlobalC::LM.update_Hloc();
 
 
 	//test
 	if(GlobalV::NURSE)
 	{
-		LM.print_HSgamma('S'); // S
-		LM.print_HSgamma('T');
-		LM.print_HSgamma('H');
+		GlobalC::LM.print_HSgamma('S'); // S
+		GlobalC::LM.print_HSgamma('T');
+		GlobalC::LM.print_HSgamma('H');
 	//	WARNING_QUIT("LCAO_Hamilt::calculate_Hgamma","print the H,S matrix");
 //		QUIT();
 	}
@@ -133,24 +133,24 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 	// because some basic parameters should be initialized
 	// in UHM.GG.init();
 
-	LM.zeros_HSgamma('S');    	
+	GlobalC::LM.zeros_HSgamma('S');    	
 
 	this->genH.calculate_S_no();	
 
-	//LM.print_HSgamma('S');
+	//GlobalC::LM.print_HSgamma('S');
 
 	//-------------------------------------
 	// test using plane wave calculations.
-	// all the matrixs are stored in LM.
-	// LM.allocate_HS_k(GlobalC::ParaO.nloc);
+	// all the matrixs are stored in GlobalC::LM.
+	// GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
 	// Build_ST_pw bsp;
 	// bsp.set_ST(0, 'S');
-	// LM.print_HSk('S','R',1.0e-5);
+	// GlobalC::LM.print_HSk('S','R',1.0e-5);
 	//-------------------------------------
 
 	// set T and Vnl matrix to zero.
-	// 2 stands for LM.Hloc_fixed matrix.
-	LM.zeros_HSgamma('T'); 
+	// 2 stands for GlobalC::LM.Hloc_fixed matrix.
+	GlobalC::LM.zeros_HSgamma('T'); 
 
 	//add nonlocal pseudopotential matrix element
 	time_t time_vnl_start = time(NULL);
@@ -167,12 +167,12 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 	if(GlobalV::T_IN_H)
 	{
 		genH.calculate_T_no();
-//		LM.print_HSgamma('T');
+//		GlobalC::LM.print_HSgamma('T');
 	}
 	time_t time_t_end = time(NULL);
 
 	//	GlobalV::ofs_running << " T+Vnl matrix" << endl;
-	//LM.print_HSgamma('T');
+	//GlobalC::LM.print_HSgamma('T');
 
 	OUT_TIME("kinetical matrix",time_t_start, time_t_end);
 	OUT_TIME("vnl matrix",time_vnl_start, time_vnl_end);
@@ -190,7 +190,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
 	// whether you want to calculate the local potential
 	// or not, you need to set this matrix to 0.
-	LM.zeros_HSk('H');
+	GlobalC::LM.zeros_HSk('H');
 
 	if(GlobalV::VL_IN_H)
 	{
@@ -200,13 +200,13 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 		//-------------------------
 //		Build_ST_pw bsp;
 //		bsp.set_local(ik);	
-//		LM.print_HSk('H','C',1.0e-5);
+//		GlobalC::LM.print_HSk('H','C',1.0e-5);
 
 		//--------------------------
 		// set the local potential
 		// in LCAO basis.
 		//--------------------------
-		LM.zeros_HSR('H', LNNR.nnr);
+		GlobalC::LM.zeros_HSR('H', LNNR.nnr);
 
 		if(GlobalV::NSPIN!=4) 
 		{
@@ -238,8 +238,8 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 	// folding matrix here: T(k)+Vnl(k)
 	// (Hloc_fixed->Hloc_fixed2)
 	//-----------------------------------------
-	LM.zeros_HSk('S');
-	LM.zeros_HSk('T');
+	GlobalC::LM.zeros_HSk('S');
+	GlobalC::LM.zeros_HSk('T');
 //	cout << " after folding Hfixed k." << endl;
 	LNNR.folding_fixedH(ik);
 
@@ -248,13 +248,13 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 	// (Hloc2 += Hloc_fixed2), (complex matrix)
 	//------------------------------------------
 //	cout << " Folding matrix here." << endl;
-	LM.update_Hloc2();
+	GlobalC::LM.update_Hloc2();
 
 /*
 	if(GlobalV::NURSE)
 	{
-		LM.print_HSk('H','R',1.0e-5);
-//		LM.print_HSk('S','R',1.0e-5);
+		GlobalC::LM.print_HSk('H','R',1.0e-5);
+//		GlobalC::LM.print_HSk('S','R',1.0e-5);
 	}
 	*/
 	
@@ -272,17 +272,17 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 	// set S(R) to zero.
 	// the total value of S(R) in this processor
 	// is LNNR.nnr.
-	// and store in LM.SlocR.
+	// and store in GlobalC::LM.SlocR.
 	//--------------------------------------------
-	LM.zeros_HSR('S', LNNR.nnr);
+	GlobalC::LM.zeros_HSR('S', LNNR.nnr);
     this->genH.calculate_S_no();	
 
 	//------------------------------
 	// set T(R) and Vnl(R) to zero.
 	// and then calculate it
-	// and store in LM.Hloc_fixedR.
+	// and store in GlobalC::LM.Hloc_fixedR.
 	//------------------------------
-	LM.zeros_HSR('T', LNNR.nnr);
+	GlobalC::LM.zeros_HSR('T', LNNR.nnr);
 	
 
 
@@ -315,49 +315,49 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 		//----------------------------------------------
 		// Check the matrix in plane wave basis.
 		//----------------------------------------------
-		LM.zeros_HSk('S');
-		LM.zeros_HSk('T');
+		GlobalC::LM.zeros_HSk('S');
+		GlobalC::LM.zeros_HSk('T');
 
 		bsp.set_ST(ik, 'S');
 		bsp.set_ST(ik, 'T');
 
 		cout << " --> PW S" << endl;
-		LM.print_HSk('S','R',1.0e-5);
+		GlobalC::LM.print_HSk('S','R',1.0e-5);
 		cout << " --> PW T" << endl;
-		LM.print_HSk('T','R',1.0e-5);
+		GlobalC::LM.print_HSk('T','R',1.0e-5);
 
 		string fn = "Sloc2pw.dat";
-		LM.output_HSk('S', fn);
+		GlobalC::LM.output_HSk('S', fn);
 		
 		//------------------------------------------
 		// folding the SlocR and Hloc_fixedR matrix
 		// into Sloc2 and Hloc_fixed2 matrix.
 		//------------------------------------------
-		LM.zeros_HSk('S');
-		LM.zeros_HSk('T');
+		GlobalC::LM.zeros_HSk('S');
+		GlobalC::LM.zeros_HSk('T');
 		LNNR.folding_fixedH(ik);
 		cout << " --> LCAO S" << endl;
-		LM.print_HSk('S','R',1.0e-5);	
+		GlobalC::LM.print_HSk('S','R',1.0e-5);	
 		cout << " --> LCAO T+Vnl" << endl;
-		LM.print_HSk('T','R',1.0e-5);	
+		GlobalC::LM.print_HSk('T','R',1.0e-5);	
 
 		string fn2 = "Sloc2lcao.dat";
-		LM.output_HSk('S',fn2);
+		GlobalC::LM.output_HSk('S',fn2);
 
 		//----------------
 		// test gamma Vnl	
 		//----------------
 //		GlobalV::GAMMA_ONLY_LOCAL = true;
-//		LM.allocate_HS_gamma(GlobalC::ParaO.nloc);
-//		LM.zeros_HSgamma('H');
+//		GlobalC::LM.allocate_HS_gamma(GlobalC::ParaO.nloc);
+//		GlobalC::LM.zeros_HSgamma('H');
 //		UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
 //		cout << " Correct LCAO Vnl " << endl;
-//		LM.print_HSgamma('H');		
+//		GlobalC::LM.print_HSgamma('H');		
 //		UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
 //		cout << " Correct LCAO Vnl " << endl;
-//		LM.print_HSgamma('H');		
+//		GlobalC::LM.print_HSgamma('H');		
 		
 	}
 	
@@ -374,9 +374,9 @@ void LCAO_Hamilt::calculate_STN_R(void)
     Vector3<double> dtau, tau1, tau2;
     Vector3<double> dtau1, dtau2, tau0;
 
-    LM.allocate_Hloc_fixedR_tr();
-    LM.allocate_HR_tr();
-    LM.allocate_SlocR_tr();
+    GlobalC::LM.allocate_Hloc_fixedR_tr();
+    GlobalC::LM.allocate_HR_tr();
+    GlobalC::LM.allocate_SlocR_tr();
 
     double R_minX = GlobalC::GridD.getD_minX();
     double R_minY = GlobalC::GridD.getD_minY();
@@ -473,13 +473,13 @@ void LCAO_Hamilt::calculate_STN_R(void)
 
                             if(GlobalV::NSPIN!=4)
                             {
-                                LM.SlocR_tr[R_x][R_y][R_z][iic] = LM.SlocR[index];
-                                LM.Hloc_fixedR_tr[R_x][R_y][R_z][iic] = LM.Hloc_fixedR[index];
+                                GlobalC::LM.SlocR_tr[R_x][R_y][R_z][iic] = GlobalC::LM.SlocR[index];
+                                GlobalC::LM.Hloc_fixedR_tr[R_x][R_y][R_z][iic] = GlobalC::LM.Hloc_fixedR[index];
                             }
                             else
                             {
-                                LM.SlocR_tr_soc[R_x][R_y][R_z][iic] = LM.SlocR_soc[index];
-                                LM.Hloc_fixedR_tr_soc[R_x][R_y][R_z][iic] = LM.Hloc_fixedR_soc[index];
+                                GlobalC::LM.SlocR_tr_soc[R_x][R_y][R_z][iic] = GlobalC::LM.SlocR_soc[index];
+                                GlobalC::LM.Hloc_fixedR_tr_soc[R_x][R_y][R_z][iic] = GlobalC::LM.Hloc_fixedR_soc[index];
                             }
 
                             ++index;
@@ -502,7 +502,7 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
     Vector3<double> dtau, tau1, tau2;
     Vector3<double> dtau1, dtau2, tau0;
 
-    LM.allocate_HS_R_sparse();
+    GlobalC::LM.allocate_HS_R_sparse();
 
     double R_minX = GlobalC::GridD.getD_minX();
     double R_minY = GlobalC::GridD.getD_minY();
@@ -589,30 +589,30 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 
                             if(GlobalV::NSPIN!=4)
                             {
-								double temp_value = LM.SlocR[index];
+								double temp_value = GlobalC::LM.SlocR[index];
 								if (abs(temp_value) > sparse_threshold)
 								{
-									LM.SR_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, double>(iw2_all, temp_value));
+									GlobalC::LM.SR_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, double>(iw2_all, temp_value));
 								}
 
-								temp_value = LM.Hloc_fixedR[index];
+								temp_value = GlobalC::LM.Hloc_fixedR[index];
 								if (abs(temp_value) > sparse_threshold)
 								{
-									LM.HR_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, double>(iw2_all, temp_value));
+									GlobalC::LM.HR_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, double>(iw2_all, temp_value));
 								}
                             }
                             else
                             {
-								complex<double> temp_value = LM.SlocR_soc[index];
+								complex<double> temp_value = GlobalC::LM.SlocR_soc[index];
 								if(abs(temp_value) > sparse_threshold)
 								{
-									LM.SR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, complex<double>>(iw2_all, temp_value));
+									GlobalC::LM.SR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, complex<double>>(iw2_all, temp_value));
 								}
 
-								temp_value = LM.Hloc_fixedR_soc[index];
+								temp_value = GlobalC::LM.Hloc_fixedR_soc[index];
 								if(abs(temp_value) > sparse_threshold)
 								{
-									LM.HR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, complex<double>>(iw2_all, temp_value));
+									GlobalC::LM.HR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, complex<double>>(iw2_all, temp_value));
 								}
                             }
 
@@ -676,8 +676,8 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
         {
             for(int iz=0; iz<R_z; iz++)
             {	
-				map<size_t, map<size_t, double>> &temp_HR_sparse = LM.HR_sparse[ix][iy][iz];
-				map<size_t, map<size_t, double>> &temp_SR_sparse = LM.SR_sparse[ix][iy][iz];
+				map<size_t, map<size_t, double>> &temp_HR_sparse = GlobalC::LM.HR_sparse[ix][iy][iz];
+				map<size_t, map<size_t, double>> &temp_SR_sparse = GlobalC::LM.SR_sparse[ix][iy][iz];
 
 				ZEROS(HR_tmp, GlobalC::ParaO.nloc);
 				ZEROS(SR_tmp, GlobalC::ParaO.nloc);
@@ -774,8 +774,8 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
         {
             for(int iz=0; iz<R_z; iz++)
             {
-				map<size_t, map<size_t, complex<double>>> &temp_HR_soc_sparse = LM.HR_soc_sparse[ix][iy][iz];
-				map<size_t, map<size_t, complex<double>>> &temp_SR_soc_sparse = LM.SR_soc_sparse[ix][iy][iz];
+				map<size_t, map<size_t, complex<double>>> &temp_HR_soc_sparse = GlobalC::LM.HR_soc_sparse[ix][iy][iz];
+				map<size_t, map<size_t, complex<double>>> &temp_SR_soc_sparse = GlobalC::LM.SR_soc_sparse[ix][iy][iz];
 
 				ZEROS(HR_soc_tmp, GlobalC::ParaO.nloc);
 				ZEROS(SR_soc_tmp, GlobalC::ParaO.nloc);
@@ -848,5 +848,5 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 
 void LCAO_Hamilt::destroy_all_HSR_sparse(void)
 {
-	LM.destroy_HS_R_sparse();
+	GlobalC::LM.destroy_HS_R_sparse();
 }

@@ -138,7 +138,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 									// according to trace_loc_row and trace_loc_col
 									// the last paramete: 1 for Sloc, 2 for Hloc
 									// and 3 for Hloc_fixed.
-									LM.set_HSgamma(iw1_all, iw2_all, olm[0], dtype);
+									GlobalC::LM.set_HSgamma(iw1_all, iw2_all, olm[0], dtype);
 								}
 								else // k point algorithm
 								{
@@ -147,20 +147,20 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 									// which is a 1D array.
 									if(dtype=='S')
 									{
-										if(GlobalV::NSPIN!=4) LM.SlocR[nnr] = olm[0];
+										if(GlobalV::NSPIN!=4) GlobalC::LM.SlocR[nnr] = olm[0];
 										else
 										{//only has diagonal term here.
 												int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
-											LM.SlocR_soc[nnr] = olm1[is];
+											GlobalC::LM.SlocR_soc[nnr] = olm1[is];
 										}
 									}
 									else if(dtype=='T')
 									{
-										if(GlobalV::NSPIN!=4) LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
+										if(GlobalV::NSPIN!=4) GlobalC::LM.Hloc_fixedR[nnr] = olm[0];// <phi|kin|d phi>
 										else
 										{//only has diagonal term here.
 												int is = (jj-jj0*GlobalV::NPOL) + (kk-kk0*GlobalV::NPOL)*2;
-											LM.Hloc_fixedR_soc[nnr] = olm1[is];
+											GlobalC::LM.Hloc_fixedR_soc[nnr] = olm1[is];
 										}
 									}
 									++nnr;
@@ -175,37 +175,37 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 
 								if(GlobalV::GAMMA_ONLY_LOCAL)
 								{
-									LM.set_force (iw1_all, iw2_all,	olm[0], olm[1], olm[2], dtype);
-									if(GlobalV::STRESS) LM.set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
+									GlobalC::LM.set_force (iw1_all, iw2_all,	olm[0], olm[1], olm[2], dtype);
+									if(GlobalV::STRESS) GlobalC::LM.set_stress (iw1_all, iw2_all, olm[0], olm[1], olm[2], dtype, dtau);
 								}
 								else // k point algorithm
 								{
 									if(dtype=='S')
 									{
-										LM.DSloc_Rx[nnr] = olm[0];
-										LM.DSloc_Ry[nnr] = olm[1];
-										LM.DSloc_Rz[nnr] = olm[2];
+										GlobalC::LM.DSloc_Rx[nnr] = olm[0];
+										GlobalC::LM.DSloc_Ry[nnr] = olm[1];
+										GlobalC::LM.DSloc_Rz[nnr] = olm[2];
 										if(GlobalV::STRESS)
 										{
-											LM.DH_r[nnr*3] = dtau.x;
-											LM.DH_r[nnr*3 + 1] = dtau.y;
-											LM.DH_r[nnr*3 + 2] = dtau.z;
+											GlobalC::LM.DH_r[nnr*3] = dtau.x;
+											GlobalC::LM.DH_r[nnr*3 + 1] = dtau.y;
+											GlobalC::LM.DH_r[nnr*3 + 2] = dtau.z;
 										}
 									}
 									else if(dtype=='T')
 									{
 										// notice the 'sign'
-										LM.DHloc_fixedR_x[nnr] = olm[0];
-										LM.DHloc_fixedR_y[nnr] = olm[1];
-										LM.DHloc_fixedR_z[nnr] = olm[2];
+										GlobalC::LM.DHloc_fixedR_x[nnr] = olm[0];
+										GlobalC::LM.DHloc_fixedR_y[nnr] = olm[1];
+										GlobalC::LM.DHloc_fixedR_z[nnr] = olm[2];
 										if(GlobalV::STRESS)
 										{
-											LM.stvnl11[nnr] = olm[0] * dtau.x;
-											LM.stvnl12[nnr] = olm[0] * dtau.y;
-											LM.stvnl13[nnr] = olm[0] * dtau.z;
-											LM.stvnl22[nnr] = olm[1] * dtau.y;
-											LM.stvnl23[nnr] = olm[1] * dtau.z;
-											LM.stvnl33[nnr] = olm[2] * dtau.z;
+											GlobalC::LM.stvnl11[nnr] = olm[0] * dtau.x;
+											GlobalC::LM.stvnl12[nnr] = olm[0] * dtau.y;
+											GlobalC::LM.stvnl13[nnr] = olm[0] * dtau.z;
+											GlobalC::LM.stvnl22[nnr] = olm[1] * dtau.y;
+											GlobalC::LM.stvnl23[nnr] = olm[1] * dtau.z;
+											GlobalC::LM.stvnl33[nnr] = olm[2] * dtau.z;
 										}
 									}
 									++nnr;
@@ -567,16 +567,16 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 											{
 												// GlobalV::ofs_running << setw(10) << iw1_all << setw(10) 
 												// << iw2_all << setw(20) << nlm[0] << endl; 
-												LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
+												GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
 											}
 										}
 										else
 										{
-											if(GlobalV::NSPIN!=4) LM.Hloc_fixedR[nnr] += nlm[0];
+											if(GlobalV::NSPIN!=4) GlobalC::LM.Hloc_fixedR[nnr] += nlm[0];
 											else
 											{
 												int is = (j-j0*GlobalV::NPOL) + (k-k0*GlobalV::NPOL)*2;
-												LM.Hloc_fixedR_soc[nnr] += nlm1[is];
+												GlobalC::LM.Hloc_fixedR_soc[nnr] += nlm1[is];
 											}
 										}
 									}// calc_deri
@@ -605,7 +605,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 													);
 
 											// sum all projectors for one atom.
-											LM.set_force (iw1_all, iw2_all,	nlm[0], nlm[1], nlm[2], 'N');
+											GlobalC::LM.set_force (iw1_all, iw2_all,	nlm[0], nlm[1], nlm[2], 'N');
 										}
 										else
 										{
@@ -633,9 +633,9 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 													);
 
 
-											LM.DHloc_fixedR_x[nnr] += nlm[0];
-											LM.DHloc_fixedR_y[nnr] += nlm[1];
-											LM.DHloc_fixedR_z[nnr] += nlm[2];
+											GlobalC::LM.DHloc_fixedR_x[nnr] += nlm[0];
+											GlobalC::LM.DHloc_fixedR_y[nnr] += nlm[1];
+											GlobalC::LM.DHloc_fixedR_z[nnr] += nlm[2];
 										}
 									}//!calc_deri
 								}// distance
@@ -762,14 +762,14 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 
 									//if(GlobalV::GAMMA_ONLY_LOCAL)
 									//{
-										LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
-										//if(ad!=ad2) LM.set_HSgamma(iw2_all,iw1_all,nlm[0],'N'); //add by liuyu 20210406
+										GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
+										//if(ad!=ad2) GlobalC::LM.set_HSgamma(iw2_all,iw1_all,nlm[0],'N'); //add by liuyu 20210406
 									//}
 								//	else
 								//	{
 								//		WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
 //										assert( nnr < LNNR.nnr );
-//										LM.Hloc_fixedR[ nnr ] += nlm[0];
+//										GlobalC::LM.Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
 								//	}
 								}
@@ -795,14 +795,14 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 									//if(GlobalV::GAMMA_ONLY_LOCAL)
 									//{
 										//add part of nonlocal ps derivatives to T matrix
-										LM.set_force(iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
+										GlobalC::LM.set_force(iw1_all, iw2_all, nlm[0], nlm[1], nlm[2], 'N');
 									//}
 									//else
 									//{
 										//WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
-										//LM.DHloc_fixedR_x[ nnr ] += nlm[0];
-										//LM.DHloc_fixedR_y[ nnr ] += nlm[1];
-										//LM.DHloc_fixedR_z[ nnr ] += nlm[2];
+										//GlobalC::LM.DHloc_fixedR_x[ nnr ] += nlm[0];
+										//GlobalC::LM.DHloc_fixedR_y[ nnr ] += nlm[1];
+										//GlobalC::LM.DHloc_fixedR_z[ nnr ] += nlm[2];
 										//++nnr;
 									//}
 								}

@@ -305,9 +305,9 @@ void DFTU_RELAX::cal_force_gamma(const int spin, double* rho_VU)
 	for(int dim=0; dim<3; dim++)
 	{
     double* tmp_ptr;
-    if(dim==0) tmp_ptr = LM.DSloc_x;
-    else if(dim==1) tmp_ptr = LM.DSloc_y;
-    else if(dim==2) tmp_ptr = LM.DSloc_z;
+    if(dim==0) tmp_ptr = GlobalC::LM.DSloc_x;
+    else if(dim==1) tmp_ptr = GlobalC::LM.DSloc_y;
+    else if(dim==2) tmp_ptr = GlobalC::LM.DSloc_z;
 
 		pdgemm_(&transN, &transN,
 			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
@@ -636,9 +636,9 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
   ZEROS(dSR_gamma, GlobalC::ParaO.nloc);
 
   double* dS_ptr;
-  if(dim1==0) dS_ptr =  LM.DSloc_Rx;
-  else if(dim1==1) dS_ptr =  LM.DSloc_Ry;
-  else if(dim1==2) dS_ptr =  LM.DSloc_Rz;
+  if(dim1==0) dS_ptr =  GlobalC::LM.DSloc_Rx;
+  else if(dim1==1) dS_ptr =  GlobalC::LM.DSloc_Ry;
+  else if(dim1==2) dS_ptr =  GlobalC::LM.DSloc_Rz;
 
   int nnr = 0;
 	Vector3<double> tau1, tau2, dtau;
@@ -704,7 +704,7 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
 					    const int nu = GlobalC::ParaO.trace_loc_col[iw2_all];
 					    if(nu<0)continue;
 
-              dSR_gamma[nu*GlobalC::ParaO.nrow + mu] += dS_ptr[nnr]*LM.DH_r[nnr*3+dim2];
+              dSR_gamma[nu*GlobalC::ParaO.nrow + mu] += dS_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2];
 
 			  			++nnr;
 			  		}// kk
@@ -724,9 +724,9 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
   ZEROS(dSm_k, GlobalC::ParaO.nloc);
 
   double* dSm_ptr;
-  if(dim==0) dSm_ptr = LM.DSloc_Rx;
-  else if(dim==1) dSm_ptr = LM.DSloc_Ry;
-  else if(dim==2) dSm_ptr = LM.DSloc_Rz;
+  if(dim==0) dSm_ptr = GlobalC::LM.DSloc_Rx;
+  else if(dim==1) dSm_ptr = GlobalC::LM.DSloc_Ry;
+  else if(dim==2) dSm_ptr = GlobalC::LM.DSloc_Rz;
 
   int nnr = 0;
 
@@ -832,9 +832,9 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
   ZEROS(dSR_k, GlobalC::ParaO.nloc);
 
   double* dSm_ptr;
-  if(dim1==0) dSm_ptr = LM.DSloc_Rx;
-  else if(dim1==1) dSm_ptr = LM.DSloc_Ry;
-  else if(dim1==2) dSm_ptr = LM.DSloc_Rz;
+  if(dim1==0) dSm_ptr = GlobalC::LM.DSloc_Rx;
+  else if(dim1==1) dSm_ptr = GlobalC::LM.DSloc_Ry;
+  else if(dim1==2) dSm_ptr = GlobalC::LM.DSloc_Rz;
 
   int nnr = 0;
 	Vector3<double> tau1, tau2, dtau;
@@ -918,7 +918,7 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 			  			const complex<double> kphase( cos(arg),  sin(arg) );
 
-			  			dSR_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*LM.DH_r[nnr*3+dim2]*kphase;														
+			  			dSR_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2]*kphase;														
 
 			  			++nnr;
 			  		}// kk

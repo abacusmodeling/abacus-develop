@@ -57,7 +57,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 
 			const int spin = GlobalC::kv.isk[ik];
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				LM.Hloc[irc] += eff_pot[irc];
+				GlobalC::LM.Hloc[irc] += eff_pot[irc];
         
 		}
 

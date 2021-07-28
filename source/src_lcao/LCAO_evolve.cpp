@@ -49,8 +49,8 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
         {
         	for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                	Htmp(i,j) = LM.Hloc2[i*GlobalV::NLOCAL+j];
-                        Stmp(i,j) = LM.Sloc2[i*GlobalV::NLOCAL+j];
+                	Htmp(i,j) = GlobalC::LM.Hloc2[i*GlobalV::NLOCAL+j];
+                        Stmp(i,j) = GlobalC::LM.Sloc2[i*GlobalV::NLOCAL+j];
                 }
         }
 
@@ -305,8 +305,8 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
         {
         		for(int j=0; j<GlobalV::NLOCAL; j++)
                 	{
-                		Htmp(i,j) = LM.Hloc2[i*GlobalV::NLOCAL+j];
-                           	Stmp(i,j) = LM.Sloc2[i*GlobalV::NLOCAL+j];
+                		Htmp(i,j) = GlobalC::LM.Hloc2[i*GlobalV::NLOCAL+j];
+                           	Stmp(i,j) = GlobalC::LM.Sloc2[i*GlobalV::NLOCAL+j];
                 	}
         }
 
@@ -395,10 +395,10 @@ int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>**
 
 	cout << subMatrixSize << endl;
 
-	for(int i=0; i<subMatrixSize; ++i) S[i]= real(LM.Sloc2[i]);
+	for(int i=0; i<subMatrixSize; ++i) S[i]= real(GlobalC::LM.Sloc2[i]);
 //	for(int i=0; i<subMatrixSize; ++i) cout << S[i] <<endl;
 
-	for(int i=0; i<subMatrixSize; ++i) c[i]= real(LM.Sloc2[i]);
+	for(int i=0; i<subMatrixSize; ++i) c[i]= real(GlobalC::LM.Sloc2[i]);
 
 	int inc=1;
 	DCOPY(&subMatrixSize, &c, &inc, S, &inc);

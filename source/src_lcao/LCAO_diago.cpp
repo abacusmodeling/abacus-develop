@@ -78,12 +78,12 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &
 
 	// save H and S matrix to disk.
 	bool bit = false;
-	HS_Matrix::saving_HS(LM.Hloc, LM.Sloc, bit, GlobalC::ParaO.out_hs);
+	HS_Matrix::saving_HS(GlobalC::LM.Hloc, GlobalC::LM.Sloc, bit, GlobalC::ParaO.out_hs);
 	GlobalV::ofs_running << setprecision(6);
 
 	// Distribution of matrix for 
 	// prallel eigensolver.
-	GlobalC::ParaO.diago_double_begin(ik, wfc, wfc_2d, LM.Hloc, LM.Sloc, GlobalC::wf.ekb[ik]);
+	GlobalC::ParaO.diago_double_begin(ik, wfc, wfc_2d, GlobalC::LM.Hloc, GlobalC::LM.Sloc, GlobalC::wf.ekb[ik]);
 
 	return;
 }
@@ -96,10 +96,10 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	//GlobalC::ParaO.out_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
 	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
-	HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
+	HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
 	GlobalV::ofs_running << setprecision(6); //LiuXh, 2017-03-21
 
-	GlobalC::ParaO.diago_complex_begin(ik, wfc, wfc_2d, LM.Hloc2, LM.Sloc2, GlobalC::wf.ekb[ik]);
+	GlobalC::ParaO.diago_complex_begin(ik, wfc, wfc_2d, GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, GlobalC::wf.ekb[ik]);
 
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
 	if(GlobalV::NSPIN==4)
@@ -136,8 +136,8 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			Htmp(i,j) = LM.Hloc2[i*GlobalV::NLOCAL+j];
-			Stmp(i,j) = LM.Sloc2[i*GlobalV::NLOCAL+j];
+			Htmp(i,j) = GlobalC::LM.Hloc2[i*GlobalV::NLOCAL+j];
+			Stmp(i,j) = GlobalC::LM.Sloc2[i*GlobalV::NLOCAL+j];
 		}
 	}
 
@@ -193,7 +193,7 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	// save H and S matrix to disk.
 //	bool bit = false;
 	bool bit = true;//zhengdy-soc
-	HS_Matrix::saving_HS(LM.Hloc, LM.Sloc, bit, GlobalC::ParaO.out_hs);
+	HS_Matrix::saving_HS(GlobalC::LM.Hloc, GlobalC::LM.Sloc, bit, GlobalC::ParaO.out_hs);
 
 	matrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	matrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -201,8 +201,8 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			Htmp(i,j) = LM.Hloc[i*GlobalV::NLOCAL+j];
-			Stmp(i,j) = LM.Sloc[i*GlobalV::NLOCAL+j];
+			Htmp(i,j) = GlobalC::LM.Hloc[i*GlobalV::NLOCAL+j];
+			Stmp(i,j) = GlobalC::LM.Sloc[i*GlobalV::NLOCAL+j];
 		}
 	}
 

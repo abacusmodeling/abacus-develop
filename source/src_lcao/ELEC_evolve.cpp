@@ -104,7 +104,7 @@ void ELEC_evolve::evolve_psi(
 			dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				LM.Hloc2[irc] += eff_pot[irc];					
+				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					
 		}
 
 		// Peize Lin add at 2020.04.04
@@ -189,7 +189,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 //	Calculate the U operator
 
 	bool bit = false;
-	//HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, GlobalC::ParaO.out_hs);
+	//HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, bit, GlobalC::ParaO.out_hs);
 
 	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
@@ -198,8 +198,8 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			Htmp(i,j) = LM.Hloc2[i*GlobalV::NLOCAL+j];
-			Stmp(i,j) = LM.Sloc2[i*GlobalV::NLOCAL+j];
+			Htmp(i,j) = GlobalC::LM.Hloc2[i*GlobalV::NLOCAL+j];
+			Stmp(i,j) = GlobalC::LM.Sloc2[i*GlobalV::NLOCAL+j];
 		}
 	}
 
@@ -310,9 +310,9 @@ void ELEC_evolve::using_LAPACK_complex_2(
 				if (ic>=0)
 				{
 					//lineH[j-i] = H[ir*GlobalC::ParaO.ncol+ic];
-					lineH[j-i] = LM.Hloc2[ir*GlobalC::ParaO.ncol+ic];
+					lineH[j-i] = GlobalC::LM.Hloc2[ir*GlobalC::ParaO.ncol+ic];
 					//lineS[j-i] = S[ir*GlobalC::ParaO.ncol+ic];
-					lineS[j-i] = LM.Sloc2[ir*GlobalC::ParaO.ncol+ic];
+					lineS[j-i] = GlobalC::LM.Sloc2[ir*GlobalC::ParaO.ncol+ic];
 				}
 			}
 		}

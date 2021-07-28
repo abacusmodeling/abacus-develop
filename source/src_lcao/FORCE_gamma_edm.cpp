@@ -54,7 +54,7 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
             job=2;
         }
         Selinv::dm_ptr = dm;
-        Selinv::using_SELINV(ik, job, LM.Hloc, LM.Sloc);    
+        Selinv::using_SELINV(ik, job, GlobalC::LM.Hloc, GlobalC::LM.Sloc);    
 
         return;
     }
@@ -695,19 +695,19 @@ void Force_LCAO_gamma::cal_foverlap(
 
 					if(isforce)
 					{
-						foverlap(iat,0) += sum * LM.DSloc_x[index];
-						foverlap(iat,1) += sum * LM.DSloc_y[index];
-						foverlap(iat,2) += sum * LM.DSloc_z[index];
+						foverlap(iat,0) += sum * GlobalC::LM.DSloc_x[index];
+						foverlap(iat,1) += sum * GlobalC::LM.DSloc_y[index];
+						foverlap(iat,2) += sum * GlobalC::LM.DSloc_z[index];
 					}
 
                     if(isstress)
                     {
-                        soverlap(0,0) += sum/2.0 * LM.DSloc_11[index];
-                        soverlap(0,1) += sum/2.0 * LM.DSloc_12[index];
-                        soverlap(0,2) += sum/2.0 * LM.DSloc_13[index];
-                        soverlap(1,1) += sum/2.0 * LM.DSloc_22[index];
-                        soverlap(1,2) += sum/2.0 * LM.DSloc_23[index];
-                        soverlap(2,2) += sum/2.0 * LM.DSloc_33[index];
+                        soverlap(0,0) += sum/2.0 * GlobalC::LM.DSloc_11[index];
+                        soverlap(0,1) += sum/2.0 * GlobalC::LM.DSloc_12[index];
+                        soverlap(0,2) += sum/2.0 * GlobalC::LM.DSloc_13[index];
+                        soverlap(1,1) += sum/2.0 * GlobalC::LM.DSloc_22[index];
+                        soverlap(1,2) += sum/2.0 * GlobalC::LM.DSloc_23[index];
+                        soverlap(2,2) += sum/2.0 * GlobalC::LM.DSloc_33[index];
                     }
                 }
 
@@ -758,19 +758,19 @@ void Force_LCAO_gamma::cal_foverlap(
 
                     if(isforce)
 					{
-						foverlap(iat,0) += sum * LM.DSloc_x[index];
-						foverlap(iat,1) += sum * LM.DSloc_y[index];
-						foverlap(iat,2) += sum * LM.DSloc_z[index];
+						foverlap(iat,0) += sum * GlobalC::LM.DSloc_x[index];
+						foverlap(iat,1) += sum * GlobalC::LM.DSloc_y[index];
+						foverlap(iat,2) += sum * GlobalC::LM.DSloc_z[index];
 					}
 
                     if(isstress)
                     {
-                        soverlap(0,0) += sum/2.0 * LM.DSloc_11[index];
-                        soverlap(0,1) += sum/2.0 * LM.DSloc_12[index];
-                        soverlap(0,2) += sum/2.0 * LM.DSloc_13[index];
-                        soverlap(1,1) += sum/2.0 * LM.DSloc_22[index];
-                        soverlap(1,2) += sum/2.0 * LM.DSloc_23[index];
-                        soverlap(2,2) += sum/2.0 * LM.DSloc_33[index];
+                        soverlap(0,0) += sum/2.0 * GlobalC::LM.DSloc_11[index];
+                        soverlap(0,1) += sum/2.0 * GlobalC::LM.DSloc_12[index];
+                        soverlap(0,2) += sum/2.0 * GlobalC::LM.DSloc_13[index];
+                        soverlap(1,1) += sum/2.0 * GlobalC::LM.DSloc_22[index];
+                        soverlap(1,2) += sum/2.0 * GlobalC::LM.DSloc_23[index];
+                        soverlap(2,2) += sum/2.0 * GlobalC::LM.DSloc_33[index];
 					}
                 }
             }

@@ -156,7 +156,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	//---------------------------------------
 
 
-	//LM.DHloc_fixedR_x
+	//GlobalC::LM.DHloc_fixedR_x
 	this->folding_force(fvl_dphi,pvdpx, pvdpy, pvdpz);
 
 	delete[] pvdpx;
@@ -366,7 +366,7 @@ void Gint_k::svl_k_RealSpace(
 	// Folding R here
 	//---------------------------------------
 
-	//LM.DHloc_fixedR_x
+	//GlobalC::LM.DHloc_fixedR_x
 	this->folding_stress(fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
 			pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23);
 
@@ -635,9 +635,9 @@ void Gint_k::evaluate_vl_stress(
 							//---------------------------------
 							// only correct for one processor
 							//---------------------------------
-//							pvp1 = &LM.DHloc_fixedR_x[iww];
-//							pvp2 = &LM.DHloc_fixedR_y[iww];
-//							pvp3 = &LM.DHloc_fixedR_z[iww];
+//							pvp1 = &GlobalC::LM.DHloc_fixedR_x[iww];
+//							pvp2 = &GlobalC::LM.DHloc_fixedR_y[iww];
+//							pvp3 = &GlobalC::LM.DHloc_fixedR_z[iww];
 
 							//--------------------------------------
 							// store phi_i(r) vlocal(r) * dphi_j(r)
@@ -903,9 +903,9 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                                                         //---------------------------------
                                                         // only correct for one processor
                                                         //---------------------------------
-//                                                      pvp1 = &LM.DHloc_fixedR_x[iww];
-//                                                      pvp2 = &LM.DHloc_fixedR_y[iww];
-//                                                      pvp3 = &LM.DHloc_fixedR_z[iww];
+//                                                      pvp1 = &GlobalC::LM.DHloc_fixedR_x[iww];
+//                                                      pvp2 = &GlobalC::LM.DHloc_fixedR_y[iww];
+//                                                      pvp3 = &GlobalC::LM.DHloc_fixedR_z[iww];
 
                                                         //--------------------------------------
                                                         // store phi_i(r) vlocal(r) * dphi_j(r)

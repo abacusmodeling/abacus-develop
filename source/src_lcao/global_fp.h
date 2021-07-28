@@ -20,8 +20,8 @@ extern Grid_Driver GridD;
 extern Parallel_Orbitals ParaO;
 extern Local_Orbital_Charge LOC;
 extern Local_Orbital_wfc LOWF;
-}
 extern LCAO_Matrix LM;
+}
 extern LCAO_Hamilt UHM;
 extern SubGrid_oper SGO; //mohan add 2012-01-12
 extern Exx_Lcao exx_lcao; // Peize Lin add 2016-12-03

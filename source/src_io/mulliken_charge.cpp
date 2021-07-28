@@ -140,7 +140,7 @@ void Mulliken_Charge::cal_mulliken(void)
 						&T_char,
 						&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 						&one_float,
-						LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
+						GlobalC::LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc,
 						Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 						&zero_float,
 						mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,
@@ -205,8 +205,8 @@ void Mulliken_Charge::cal_mulliken(void)
 
 
 
-			LM.allocate_HS_R(LNNR.nnr);
-			LM.zeros_HSR('S', LNNR.nnr);
+			GlobalC::LM.allocate_HS_R(LNNR.nnr);
+			GlobalC::LM.zeros_HSR('S', LNNR.nnr);
 			UHM.genH.calculate_S_no();
 			UHM.genH.build_ST_new('S', false);
 
@@ -214,8 +214,8 @@ void Mulliken_Charge::cal_mulliken(void)
 			{
 				if(is == GlobalC::kv.isk[ik])
 				{
-					LM.allocate_HS_k(GlobalC::ParaO.nloc);
-					LM.zeros_HSk('S');
+					GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
+					GlobalC::LM.zeros_HSk('S');
 					LNNR.folding_fixedH(ik);
 					ComplexMatrix Dwf = conj(M.wfc_k[ik]);
 
@@ -235,7 +235,7 @@ void Mulliken_Charge::cal_mulliken(void)
 								&T_char,
 								&GlobalV::NLOCAL,&GlobalV::NLOCAL,
 								&one_float,
-								LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
+								GlobalC::LM.Sloc2, &one_int, &one_int, GlobalC::ParaO.desc,
 								Dwf.c, &one_int, &NB, GlobalC::ParaO.desc, &one_int,
 								&zero_float,
 								mud[0].c, &one_int, &NB, GlobalC::ParaO.desc,

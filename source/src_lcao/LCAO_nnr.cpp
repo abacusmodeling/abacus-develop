@@ -672,12 +672,12 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 
 							//########################### EXPLAIN ###############################
 							// 1. overlap matrix with k point
-							// LM.SlocR = < phi_0i | phi_Rj >, where 0, R are the cell index
+							// GlobalC::LM.SlocR = < phi_0i | phi_Rj >, where 0, R are the cell index
 							// while i,j are the orbital index.
 
 							// 2. H_fixed=T+Vnl matrix element with k point (if Vna is not used).
 							// H_fixed=T+Vnl+Vna matrix element with k point (if Vna is used).
-							// LM.Hloc_fixed = < phi_0i | H_fixed | phi_Rj>
+							// GlobalC::LM.Hloc_fixed = < phi_0i | H_fixed | phi_Rj>
 
 							// 3. H(k) |psi(k)> = S(k) | psi(k)> 
 							// Sloc2 is used to diagonalize for a give k point.
@@ -686,13 +686,13 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							
 							if(GlobalV::NSPIN!=4)
 							{
-								LM.Sloc2[iic] += LM.SlocR[index] * kphase;
-								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;
+								GlobalC::LM.Sloc2[iic] += GlobalC::LM.SlocR[index] * kphase;
+								GlobalC::LM.Hloc_fixed2[iic] += GlobalC::LM.Hloc_fixedR[index] * kphase;
 							}
 							else
 							{
-								LM.Sloc2[iic] += LM.SlocR_soc[index] * kphase;
-								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR_soc[index] * kphase;
+								GlobalC::LM.Sloc2[iic] += GlobalC::LM.SlocR_soc[index] * kphase;
+								GlobalC::LM.Hloc_fixed2[iic] += GlobalC::LM.Hloc_fixedR_soc[index] * kphase;
 							}
 							++index;
 

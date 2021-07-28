@@ -94,7 +94,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 			dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
-				LM.Hloc2[irc] += eff_pot[irc];					
+				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					
 		}
 
 		timer::tick("Efficience","H_k");
