@@ -16,7 +16,10 @@
 
 using namespace std;
 
+namespace GlobalC
+{
 Epsilon0_vasp epsilon0_vasp;
+}
 
 Epsilon0_vasp::Epsilon0_vasp()
                :init_finish(false)

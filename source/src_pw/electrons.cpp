@@ -391,14 +391,14 @@ void Electrons::self_consistent(const int &istep)
                 GlobalC::chi0_standard.Chi();
             }
 
-            if(epsilon0_pwscf.epsilon)
+            if(GlobalC::epsilon0_pwscf.epsilon)
             {
-                epsilon0_pwscf.Cal_epsilon0();
+                GlobalC::epsilon0_pwscf.Cal_epsilon0();
             }
 
-            if(epsilon0_vasp.epsilon)
+            if(GlobalC::epsilon0_vasp.epsilon)
             {
-                epsilon0_vasp.cal_epsilon0();
+                GlobalC::epsilon0_vasp.cal_epsilon0();
             }
 
             for(int is=0; is<GlobalV::NSPIN; is++)

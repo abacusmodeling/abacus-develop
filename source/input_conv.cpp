@@ -276,25 +276,25 @@ void Input_Conv::Convert(void)
 	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 1) )
 	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 1)
 	{
-		//epsilon0_pwscf.epsilon = INPUT.epsilon0;
-		epsilon0_pwscf.epsilon = true;
-		epsilon0_pwscf.intersmear = INPUT.eta;
-		epsilon0_pwscf.intrasmear = INPUT.intrasmear;
-		epsilon0_pwscf.domega = INPUT.domega;
-		epsilon0_pwscf.nomega = INPUT.nomega;
-		epsilon0_pwscf.shift = INPUT.shift;
-		epsilon0_pwscf.metalcalc = INPUT.metalcalc;
-		epsilon0_pwscf.degauss = INPUT.eps_degauss;
+		//GlobalC::epsilon0_pwscf.epsilon = INPUT.epsilon0;
+		GlobalC::epsilon0_pwscf.epsilon = true;
+		GlobalC::epsilon0_pwscf.intersmear = INPUT.eta;
+		GlobalC::epsilon0_pwscf.intrasmear = INPUT.intrasmear;
+		GlobalC::epsilon0_pwscf.domega = INPUT.domega;
+		GlobalC::epsilon0_pwscf.nomega = INPUT.nomega;
+		GlobalC::epsilon0_pwscf.shift = INPUT.shift;
+		GlobalC::epsilon0_pwscf.metalcalc = INPUT.metalcalc;
+		GlobalC::epsilon0_pwscf.degauss = INPUT.eps_degauss;
 	}
 	
 	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 0))
 	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 0)
 	{
-		//epsilon0_vasp.epsilon = INPUT.epsilon0;
-		epsilon0_vasp.epsilon = true;
-		epsilon0_vasp.domega = INPUT.domega;
-		epsilon0_vasp.nomega = INPUT.nomega;
-		epsilon0_vasp.eta = INPUT.eta;
+		//GlobalC::epsilon0_vasp.epsilon = INPUT.epsilon0;
+		GlobalC::epsilon0_vasp.epsilon = true;
+		GlobalC::epsilon0_vasp.domega = INPUT.domega;
+		GlobalC::epsilon0_vasp.nomega = INPUT.nomega;
+		GlobalC::epsilon0_vasp.eta = INPUT.eta;
 	}
 
 //--------------------------------------------
