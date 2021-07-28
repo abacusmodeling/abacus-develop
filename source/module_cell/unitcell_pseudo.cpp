@@ -77,12 +77,12 @@ void UnitCell_pseudo::setup_cell(
 			//========================
 			// call read_atom_species
 			//========================
-			this->read_atom_species(ifa);
+			this->read_atom_species(ifa, GlobalV::ofs_running);
 
 			//==========================
 			// call read_atom_positions
 			//==========================
-			ok2 = this->read_atom_positions(ifa);
+			ok2 = this->read_atom_positions(ifa, GlobalV::ofs_running, GlobalV::ofs_warning);
 
 			if(ok2)
 			{
@@ -352,13 +352,12 @@ void UnitCell_pseudo::setup_cell_classic(
 			//========================
 			// call read_atom_species
 			//========================
-			this->read_atom_species(ifa);
-
+			this->read_atom_species(ifa, ofs_running);
 			//==========================
 			// call read_atom_positions
 			//==========================
-			ok2 = this->read_atom_positions(ifa);
-
+			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
+			cout << "read_atom_positions done." << endl;
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)

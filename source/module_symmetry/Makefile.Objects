@@ -2,7 +2,7 @@
 # The ABACUS-cell module
 #
 
-VERSION= ABACUS-cell
+VERSION= ABACUS-symmetry
 HEADERS= *.h
 
 OBJS_IO=output.o\
