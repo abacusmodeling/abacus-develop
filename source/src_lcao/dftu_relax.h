@@ -24,10 +24,10 @@ public:
     ~DFTU_RELAX();
 
     void force_stress();
-    void cal_force_k(const int ik, complex<double>* rho_VU);
-    void cal_stress_k(const int ik, complex<double>* rho_VU);
-    void cal_force_gamma(const int spin, double* rho_VU);
-    void cal_stress_gamma(const int spin, double* rho_VU);
+    void cal_force_k(const int ik, const complex<double>* rho_VU);
+    void cal_stress_k(const int ik, const complex<double>* rho_VU);
+    void cal_force_gamma(const double* rho_VU);
+    void cal_stress_gamma(const double* rho_VU);
 
     void fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamma);
     void fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k);
@@ -50,7 +50,6 @@ public:
     //transform between iwt index and it, ia, L, N and m index
     vector<vector<vector<vector<vector<int>>>>> iatlnmipol2iwt;   //iatlnm2iwt[iat][l][n][m][ipol]
     vector<int> iwt2it;                               //iwt2it[iwt]
-    vector<int> iwt2iat;                              //iwt2iat[iwt]
     vector<int> iwt2l;                                //iwt2l[iwt]
     vector<int> iwt2n;                                //iwt2n[iwt]
     vector<int> iwt2m;                                //iwt2m[iwt]

@@ -42,27 +42,11 @@ extern "C"
 		const double *B, const int *IB, const int *JB, const int *DESCB,
 		const double *beta,
 		double *C, const int *IC, const int *JC, const int *DESCC);
-  
-  void pztranc_(
-    const int *M, const int *N,
-    const std::complex<double> *alpha,
-    const std::complex<double> *A, const int *IA, const int *JA, const int *DESCA,
-    const std::complex<double> *beta,
-    std::complex<double> *C, const int *IC, const int *JC, const int *DESCC);
-
-  void pdtran_(
-    const int *M, const int *N,
-    const double *alpha,
-    const double *A, const int *IA, const int *JA, const int *DESCA,
-    const double *beta,
-    double *C, const int *IC, const int *JC, const int *DESCC);
 }
 
 DFTU_RELAX::DFTU_RELAX(){}
 
-
 DFTU_RELAX::~DFTU_RELAX(){}
-
 
 void DFTU_RELAX::force_stress()
 {
@@ -105,12 +89,12 @@ void DFTU_RELAX::force_stress()
 					    LOC.wfc_dm_2d.dm_gamma[spin].c, &one_int, &one_int, ParaO.desc, 
 					    VU, &one_int, &one_int, ParaO.desc,
 					    &beta,
-					    &rho_VU[0], &one_int, &one_int, ParaO.desc); 
+					    &rho_VU[0], &one_int, &one_int, ParaO.desc);
 
       delete [] VU;
 
-      this->cal_force_gamma(spin, &rho_VU[0]);
-      if(STRESS) this->cal_stress_gamma(spin, &rho_VU[0]);
+      if(FORCE) this->cal_force_gamma(&rho_VU[0]);
+      if(STRESS) this->cal_stress_gamma(&rho_VU[0]);
     }//ik
   }
   else
@@ -129,7 +113,7 @@ void DFTU_RELAX::force_stress()
       this->cal_VU_pot_mat_complex(spin, false, VU);
       pzgemm_(&transT, &transN,
 					    &NLOCAL, &NLOCAL, &NLOCAL,
-					    &alpha, 
+					    &alpha,
 					    LOC.wfc_dm_2d.dm_k[ik].c, &one_int, &one_int, ParaO.desc, 
 					    VU, &one_int, &one_int, ParaO.desc,
 					    &beta,
@@ -137,16 +121,19 @@ void DFTU_RELAX::force_stress()
 
       delete [] VU;
 
-      this->cal_force_k(ik, &rho_VU[0]);
+      if(FORCE) this->cal_force_k(ik, &rho_VU[0]);
       if(STRESS) cal_stress_k(ik, &rho_VU[0]);
     }//ik
   }
 
-  for(int iat=0; iat<ucell.nat; iat++)
-	{
-    vector<double> tmp = this->force_dftu[iat];
-		MPI_Allreduce(&tmp[0], &this->force_dftu[iat][0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-	}
+  if(FORCE)
+  {
+    for(int iat=0; iat<ucell.nat; iat++)
+	  {
+      vector<double> tmp = this->force_dftu[iat];
+	  	MPI_Allreduce(&tmp[0], &this->force_dftu[iat][0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+	  }
+  }
 
   if(STRESS)
   {
@@ -171,30 +158,21 @@ void DFTU_RELAX::force_stress()
 	return;
 }
 
-void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
+void DFTU_RELAX::cal_force_k(const int ik, const complex<double>* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_force_k");
 
-	const char transN = 'N', transT = 'T', transC='C';
+	const char transN = 'N';
 	const int  one_int = 1;
-  const complex<double> zero(0.0,0.0), one(1.0,0.0), minus_one(-1.0,0.0);
-	
-	vector<vector<complex<double>>> ftmp(ucell.nat);
-	for(int ia=0; ia<ucell.nat; ia++)
-	{
-		ftmp.at(ia).resize(3, complex<double>(0.0,0.0)); //three dimension
-	}
+  const complex<double> zero(0.0,0.0), one(1.0,0.0);
 
 	vector<complex<double>> dm_VU_dSm(ParaO.nloc);
   vector<complex<double>> dSm_k(ParaO.nloc);
 
 	for(int dim=0; dim<3; dim++)
 	{
-		vector<complex<double>> mat_tmp(ParaO.nloc);
-		vector<complex<double>> force_tmp(ParaO.nloc);
-
     this->fold_dSm_k(ik, dim, &dSm_k[0]);
-
+    
 		pzgemm_(&transN, &transN,
 			&NLOCAL, &NLOCAL, &NLOCAL,
 			&one, 
@@ -203,30 +181,18 @@ void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, ParaO.desc);
 
-    for(int irc=0; irc<ParaO.nloc; irc++)
-        rho_VU[irc] = dm_VU_dSm[irc];
-  
-    // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
-    pztranc_(&NLOCAL, &NLOCAL, 
-            &one, 
-            &rho_VU[0], &one_int, &one_int, ParaO.desc, 
-            &one, 
-            &dm_VU_dSm[0], &one_int, &one_int, ParaO.desc);
-
     for(int ir=0; ir<ParaO.nrow; ir++)
 		{
 			const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-			const int iat1 = this->iwt2iat.at(iwt1);
+			const int iat1 = ucell.iwt2iat[iwt1];
 
 			for(int ic=0; ic<ParaO.ncol; ic++)
 			{
 				const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-				const int iat2 = this->iwt2iat.at(iwt2);
-
 				const int irc = ic*ParaO.nrow + ir;
 
-				if(iat1==iat2 && iwt1==iwt2)
-					this->force_dftu[iat1][dim] += dm_VU_dSm[irc].real();
+				if(iwt1==iwt2) this->force_dftu[iat1][dim] += 2.0*dm_VU_dSm[irc].real();
+
 			}//end ic
 		}//end ir
 
@@ -235,13 +201,13 @@ void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
 	return;
 }
 
-void DFTU_RELAX::cal_stress_k(const int ik, complex<double>* rho_VU)
+void DFTU_RELAX::cal_stress_k(const int ik, const complex<double>* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_stress_k");
 
-	const char transN = 'N', transT = 'T', transC='C';
+	const char transN = 'N';
 	const int  one_int = 1;
-	const complex<double> one(1.0,0.0), minus_half(-0.5,0.0), zero(0.0,0.0);
+	const complex<double> minus_half(-0.5,0.0), zero(0.0,0.0), one(1.0,0.0);
 
   vector<complex<double>> dm_VU_sover(ParaO.nloc);
   vector<complex<double>> dSR_k(ParaO.nloc);
@@ -260,16 +226,6 @@ void DFTU_RELAX::cal_stress_k(const int ik, complex<double>* rho_VU)
 				&zero,
 				&dm_VU_sover[0], &one_int, &one_int, ParaO.desc);
 
-      for(int irc=0; irc<ParaO.nloc; irc++)
-        rho_VU[irc] = dm_VU_sover[irc];
-  
-      // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
-      pztranc_(&NLOCAL, &NLOCAL, 
-              &one, 
-              &rho_VU[0], &one_int, &one_int, ParaO.desc, 
-              &one, 
-              &dm_VU_sover[0], &one_int, &one_int, ParaO.desc);
-
 			for(int ir=0; ir<ParaO.nrow; ir++)
 			{
 				const int iwt1 = ParaO.MatrixInfo.row_set[ir];
@@ -278,23 +234,23 @@ void DFTU_RELAX::cal_stress_k(const int ik, complex<double>* rho_VU)
 					const int iwt2 = ParaO.MatrixInfo.col_set[ic];
 					const int irc = ic*ParaO.nrow + ir;
 
-					if(iwt1==iwt2) stress_dftu[dim1][dim2] += dm_VU_sover[irc].real();
+					if(iwt1==iwt2) stress_dftu[dim1][dim2] += 2.0*dm_VU_sover[irc].real();
 				}//end ic
 			}//end ir
-				
+
 		}//end dim2	
 	}//end dim1
 	
 	return;
 }
 
-void DFTU_RELAX::cal_force_gamma(const int spin, double* rho_VU)
+void DFTU_RELAX::cal_force_gamma(const double* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_force_gamma");
 
-	const char transN = 'N', transT = 'T';
+	const char transN = 'N';
 	const int  one_int = 1;
-	const double one = 1.0, zero = 0.0, minus_one=1.0;
+	const double one = 1.0, zero = 0.0, minus_one=-1.0;
 	
 	vector<double> dm_VU_dSm(ParaO.nloc);
 	
@@ -313,30 +269,17 @@ void DFTU_RELAX::cal_force_gamma(const int spin, double* rho_VU)
 			&zero,
 			&dm_VU_dSm[0], &one_int, &one_int, ParaO.desc);
 
-    for(int irc=0; irc<ParaO.nloc; irc++)
-      rho_VU[irc] = dm_VU_dSm[irc];
-  
-    // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
-    pdtran_(&NLOCAL, &NLOCAL, 
-            &one, 
-            &rho_VU[0], &one_int, &one_int, ParaO.desc, 
-            &one, 
-            &dm_VU_dSm[0], &one_int, &one_int, ParaO.desc);
-
     for(int ir=0; ir<ParaO.nrow; ir++)
 		{
 			const int iwt1 = ParaO.MatrixInfo.row_set[ir];
-			const int iat1 = this->iwt2iat.at(iwt1);
+			const int iat1 = ucell.iwt2iat[iwt1];
 
 			for(int ic=0; ic<ParaO.ncol; ic++)
 			{
 				const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-				const int iat2 = this->iwt2iat.at(iwt2);
-
 				const int irc = ic*ParaO.nrow + ir;
 
-				if(iat1==iat2 && iwt1==iwt2)
-					this->force_dftu[iat1][dim] += dm_VU_dSm[irc];
+				if(iwt1==iwt2) this->force_dftu[iat1][dim] += 2.0*dm_VU_dSm[irc];
 
 			}//end ic
 		}//end ir
@@ -345,13 +288,13 @@ void DFTU_RELAX::cal_force_gamma(const int spin, double* rho_VU)
 	return;
 }
 
-void DFTU_RELAX::cal_stress_gamma(const int spin, double* rho_VU)
+void DFTU_RELAX::cal_stress_gamma(const double* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_stress_gamma");
 
-	const char transN = 'N', transT = 'T';
+	const char transN = 'N';
 	const int  one_int = 1;
-	const double alpha = 1.0, beta = 0.0, one=1.0, nius_one_half=-0.5;
+	const double zero = 0.0, minus_half=-0.5, one=1.0;
 
   vector<double> dSR_gamma(ParaO.nloc);
   vector<double> dm_VU_sover(ParaO.nloc);
@@ -364,21 +307,11 @@ void DFTU_RELAX::cal_stress_gamma(const int spin, double* rho_VU)
 
 			pdgemm_(&transN, &transN,
 				&NLOCAL, &NLOCAL, &NLOCAL,
-				&nius_one_half, 
-				&rho_VU[0], &one_int, &one_int, ParaO.desc, 
+				&minus_half, 
+				rho_VU, &one_int, &one_int, ParaO.desc, 
 				&dSR_gamma[0], &one_int, &one_int, ParaO.desc,
-				&beta,
+				&zero,
 				&dm_VU_sover[0], &one_int, &one_int, ParaO.desc);
-
-      for(int irc=0; irc<ParaO.nloc; irc++)
-        rho_VU[irc] = dm_VU_sover[irc];
-  
-      // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
-      pdtran_(&NLOCAL, &NLOCAL, 
-              &one, 
-              &rho_VU[0], &one_int, &one_int, ParaO.desc, 
-              &one, 
-              &dm_VU_sover[0], &one_int, &one_int, ParaO.desc);
 
 			for(int ir=0; ir<ParaO.nrow; ir++)
 			{
@@ -387,11 +320,9 @@ void DFTU_RELAX::cal_stress_gamma(const int spin, double* rho_VU)
 				for(int ic=0; ic<ParaO.ncol; ic++)
 				{
 					const int iwt2 = ParaO.MatrixInfo.col_set[ic];
-
 					const int irc = ic*ParaO.nrow + ir;
 
-					if(iwt1==iwt2) stress_dftu[dim1][dim2] += dm_VU_sover[irc];
-
+					if(iwt1==iwt2) stress_dftu[dim1][dim2] += 2.0*dm_VU_sover[irc];
 				}//end ic
 			}//end ir
 
@@ -555,7 +486,7 @@ void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, co
                   int m1_all = m1 + (2*L+1)*ipol1;
 			            int m2_all = m2 + (2*L+1)*ipol2;
                   
-                  double val = this->get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
+                  double val = get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
 			            VU[nu*ParaO.nrow + mu] = complex<double>(val, 0.0);
                 }//ipol2
               }//m2
@@ -632,9 +563,9 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
   ZEROS(dSR_gamma, ParaO.nloc);
 
   double* dS_ptr;
-  if(dim1==0) dS_ptr =  LM.DSloc_Rx;
-  else if(dim1==1) dS_ptr =  LM.DSloc_Ry;
-  else if(dim1==2) dS_ptr =  LM.DSloc_Rz;
+  if(dim1==0) dS_ptr =  LM.DSloc_x;
+  else if(dim1==1) dS_ptr =  LM.DSloc_y;
+  else if(dim1==2) dS_ptr =  LM.DSloc_z;
 
   int nnr = 0;
 	Vector3<double> tau1, tau2, dtau;
@@ -690,9 +621,7 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
             const int iw1_all = start1 + jj0; 
             const int mu = ParaO.trace_loc_row[iw1_all];
 				    if(mu<0)continue;
-			  		const int L1 = atom1->iw2l[jj0];
-			  		const int N1 = atom1->iw2n[jj0];
-			  		const int m1 = atom1->iw2m[jj0];
+
 			  		for(int kk=0; kk<atom2->nw*NPOL; ++kk)
 			  		{
               const int kk0 = kk/NPOL;
@@ -725,8 +654,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
   else if(dim==2) dSm_ptr = LM.DSloc_Rz;
 
   int nnr = 0;
-
-	Vector3<double> tau1, tau2, dtau;
+  Vector3<double> tau1, tau2, dtau;
 	Vector3<double> dtau1, dtau2, tau0;
   for(int T1=0; T1<ucell.ntype; ++T1)
   {
@@ -785,35 +713,28 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
 			  	for(int jj=0; jj<atom1->nw*NPOL; ++jj)
 			  	{
             const int jj0 = jj/NPOL;
-
             const int iw1_all = start1 + jj0; 
             const int mu = ParaO.trace_loc_row[iw1_all];
-				    if(mu<0)continue;
-
-			  		const int L1 = atom1->iw2l[jj0];
-			  		const int N1 = atom1->iw2n[jj0];
-			  		const int m1 = atom1->iw2m[jj0];
-
+				    if(mu<0) continue;
 
 			  		for(int kk=0; kk<atom2->nw*NPOL; ++kk)
 			  		{
               const int kk0 = kk/NPOL;
-
               const int iw2_all = start2 + kk0;
 					    const int nu = ParaO.trace_loc_col[iw2_all];
-					    if(nu<0)continue;
+					    if(nu<0) continue;
 
 			  			Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z); 
 			  			const double arg = ( kv.kvec_d[ik] * dR ) * TWO_PI;
 			  			const complex<double> kphase( cos(arg),  sin(arg) );
 
-			  			dSm_k[nu*ParaO.nrow + mu] += dSm_ptr[nnr]*kphase;
+              dSm_k[nu*ParaO.nrow + mu] += dSm_ptr[nnr]*kphase;
 
 			  			++nnr;
 			  		}// kk
 			    }// jj
 			  }// adj
-			
+
 		  }// ad
 	  }// I1
 	}// T1
@@ -892,20 +813,13 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
 			  	for(int jj=0; jj<atom1->nw*NPOL; ++jj)
 			  	{
             const int jj0 = jj/NPOL;
-
             const int iw1_all = start1 + jj0; 
             const int mu = ParaO.trace_loc_row[iw1_all];
 				    if(mu<0)continue;
 
-			  		const int L1 = atom1->iw2l[jj0];
-			  		const int N1 = atom1->iw2n[jj0];
-			  		const int m1 = atom1->iw2m[jj0];
-
-
 			  		for(int kk=0; kk<atom2->nw*NPOL; ++kk)
 			  		{
               const int kk0 = kk/NPOL;
-
               const int iw2_all = start2 + kk0;
 					    const int nu = ParaO.trace_loc_col[iw2_all];
 					    if(nu<0)continue;
