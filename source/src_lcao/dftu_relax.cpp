@@ -650,14 +650,14 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
     {
 		  tau1 = atom1->tau[I1];
       const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
-      GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-      for(int ad=0; ad<GridD.getAdjacentNum()+1; ++ad)
+      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
       {
-        const int T2 = GridD.getType(ad);
-			  const int I2 = GridD.getNatom(ad);
+        const int T2 = GlobalC::GridD.getType(ad);
+			  const int I2 = GlobalC::GridD.getNatom(ad);
         const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
-			  tau2 = GridD.getAdjacentTau(ad);
+			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
 			  dtau = tau2 - tau1;
 			  double distance = dtau.norm() * GlobalC::ucell.lat0;
 			  double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
@@ -665,13 +665,13 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
 			  if(distance < rcut) adj = true;
 			  else if(distance >= rcut)
 			  {
-			  	for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
 			  	{
-			  		const int T0 = GridD.getType(ad0); 
-			  		const int I0 = GridD.getNatom(ad0); 
+			  		const int T0 = GlobalC::GridD.getType(ad0); 
+			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
 			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
 			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-			  		tau0 = GridD.getAdjacentTau(ad0);
+			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 			  		dtau1 = tau0 - tau1;
 			  		dtau2 = tau0 - tau2;
 			  		double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
@@ -740,16 +740,16 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
 		  tau1 = atom1->tau[I1];
       const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
 
-      GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-      for(int ad=0; ad<GridD.getAdjacentNum()+1; ++ad)
+      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
       {
-        const int T2 = GridD.getType(ad);
-			  const int I2 = GridD.getNatom(ad);
+        const int T2 = GlobalC::GridD.getType(ad);
+			  const int I2 = GlobalC::GridD.getNatom(ad);
         const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
-			  tau2 = GridD.getAdjacentTau(ad);
+			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
 			  dtau = tau2 - tau1;
 
 			  double distance = dtau.norm() * GlobalC::ucell.lat0;
@@ -759,14 +759,14 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
 			  if(distance < rcut) adj = true;
 			  else if(distance >= rcut)
 			  {
-			  	for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
 			  	{
-			  		const int T0 = GridD.getType(ad0); 
-			  		const int I0 = GridD.getNatom(ad0); 
+			  		const int T0 = GlobalC::GridD.getType(ad0); 
+			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
 			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
 			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
-			  		tau0 = GridD.getAdjacentTau(ad0);
+			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 			  		dtau1 = tau0 - tau1;
 			  		dtau2 = tau0 - tau2;
 
@@ -807,7 +807,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
 					    const int nu = ParaO.trace_loc_col[iw2_all];
 					    if(nu<0)continue;
 
-			  			Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z); 
+			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 			  			const complex<double> kphase( cos(arg),  sin(arg) );
 
@@ -847,16 +847,16 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
 		  tau1 = atom1->tau[I1];
       const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);    
 
-      GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
-      for(int ad=0; ad<GridD.getAdjacentNum()+1; ++ad)
+      GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+      for(int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad)
       {
-        const int T2 = GridD.getType(ad);
-			  const int I2 = GridD.getNatom(ad);
+        const int T2 = GlobalC::GridD.getType(ad);
+			  const int I2 = GlobalC::GridD.getNatom(ad);
         const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 			  Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
-			  tau2 = GridD.getAdjacentTau(ad);
+			  tau2 = GlobalC::GridD.getAdjacentTau(ad);
 			  dtau = tau2 - tau1;
 
 			  double distance = dtau.norm() * GlobalC::ucell.lat0;
@@ -866,14 +866,14 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
 			  if(distance < rcut) adj = true;
 			  else if(distance >= rcut)
 			  {
-			  	for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+			  	for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
 			  	{
-			  		const int T0 = GridD.getType(ad0); 
-			  		const int I0 = GridD.getNatom(ad0); 
+			  		const int T0 = GlobalC::GridD.getType(ad0); 
+			  		const int I0 = GlobalC::GridD.getNatom(ad0); 
 			  		const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
 			  		const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
-			  		tau0 = GridD.getAdjacentTau(ad0);
+			  		tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 			  		dtau1 = tau0 - tau1;
 			  		dtau2 = tau0 - tau2;
 
@@ -914,7 +914,7 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
 					    const int nu = ParaO.trace_loc_col[iw2_all];
 					    if(nu<0)continue;
               	
-			  			Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z); 
+			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 			  			const complex<double> kphase( cos(arg),  sin(arg) );
 

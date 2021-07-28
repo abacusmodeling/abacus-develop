@@ -719,19 +719,19 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 		for (int I1 =0; I1< atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
-			//GridD.Find_atom( tau1 );
-			GridD.Find_atom(GlobalC::ucell, tau1 ,T1, I1);
+			//GlobalC::GridD.Find_atom( tau1 );
+			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1 ,T1, I1);
 			//const int iat = GlobalC::ucell.itia2iat(T1, I1);
 			const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
-			for (int ad2=0; ad2<GridD.getAdjacentNum()+1 ; ++ad2)
+			for (int ad2=0; ad2<GlobalC::GridD.getAdjacentNum()+1 ; ++ad2)
 			{
-				const int T2 = GridD.getType(ad2);
+				const int T2 = GlobalC::GridD.getType(ad2);
 				const Atom* atom2 = &GlobalC::ucell.atoms[T2];
-				const int I2 = GridD.getNatom(ad2);
+				const int I2 = GlobalC::GridD.getNatom(ad2);
 				//const int iat2 = GlobalC::ucell.itia2iat(T2, I2);
 				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-				tau2 = GridD.getAdjacentTau(ad2);
+				tau2 = GlobalC::GridD.getAdjacentTau(ad2);
 
 				dtau = tau2 - tau1;
 				distance = dtau.norm() * GlobalC::ucell.lat0;
@@ -742,15 +742,15 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 				if(distance < rcut) is_adj = true;
 				else if(distance >= rcut)
 				{
-					for (int ad0=0; ad0 < GridD.getAdjacentNum()+1 ; ++ad0)
+					for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
 					{
-						const int T0 = GridD.getType(ad0);
+						const int T0 = GlobalC::GridD.getType(ad0);
 						if( ORB.nproj[T0] == 0) continue;
-						const int I0 = GridD.getNatom(ad0);
+						const int I0 = GlobalC::GridD.getNatom(ad0);
 						//const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
 						//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
-						tau0 = GridD.getAdjacentTau(ad0);
+						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
 						distance1 = dtau1.norm() * GlobalC::ucell.lat0;
 						rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
@@ -782,14 +782,14 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 							const int nu = ParaO.trace_loc_col[iw2_all];
 							if(nu < 0)continue;
 							
-							for (int ad0=0; ad0 < GridD.getAdjacentNum()+1 ; ++ad0)
+							for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ++ad0)
 							{
-								const int T0 = GridD.getType(ad0);
+								const int T0 = GlobalC::GridD.getType(ad0);
 								if( ORB.nproj[T0] == 0) continue;
-								const int I0 = GridD.getNatom(ad0);
+								const int I0 = GlobalC::GridD.getNatom(ad0);
 								const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
 								//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
-								tau0 = GridD.getAdjacentTau(ad0);
+								tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 
 								dtau1 = tau0 - tau1;
 								distance1 = dtau1.norm() * GlobalC::ucell.lat0;

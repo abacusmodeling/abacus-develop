@@ -35,7 +35,7 @@ void Run_lcao::lcao_line(void)
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GridD, 
+			GlobalC::GridD, 
 			GlobalC::ucell, 
 			GlobalV::SEARCH_RADIUS, 
 			GlobalV::test_atom_input,

@@ -673,17 +673,17 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
         g2 << "Matrix Dimension of S(R): "<<GlobalV::NLOCAL<<endl;
     }
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
 //cout<<"R_x: "<<R_x<<endl;
 //cout<<"R_y: "<<R_y<<endl;
 //cout<<"R_z: "<<R_z<<endl;
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     //int dRx, dRy, dRz;
 
@@ -871,13 +871,13 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
     auto &SR_sparse_ptr = LM.SR_sparse;
     auto &SR_soc_sparse_ptr = LM.SR_soc_sparse;
 
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     int total_R_number = R_x * R_y * R_z;
     int output_R_number = 0;

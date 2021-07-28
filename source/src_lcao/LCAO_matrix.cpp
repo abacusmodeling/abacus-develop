@@ -593,9 +593,9 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
     if(GlobalV::NSPIN!=4)
     {
@@ -668,9 +668,9 @@ void LCAO_Matrix::allocate_HR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
     if(GlobalV::NSPIN!=4)
     {
@@ -717,9 +717,9 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
     if(GlobalV::NSPIN!=4)
     {
@@ -766,9 +766,9 @@ void LCAO_Matrix::destroy_Hloc_fixedR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
     if(GlobalV::NSPIN!=4)
     {
@@ -895,9 +895,9 @@ void LCAO_Matrix::allocate_HS_R_sparse(void)
 {
 	TITLE("LCAO_Matrix","allocate_HS_R_sparse");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
 	if (GlobalV::NSPIN != 4)
 	{
@@ -937,8 +937,8 @@ void LCAO_Matrix::destroy_HS_R_sparse(void)
 {
 	TITLE("LCAO_Matrix","destroy_HS_R_sparse");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
 
 	if (GlobalV::NSPIN != 4)
 	{

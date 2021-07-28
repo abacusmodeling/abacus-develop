@@ -1509,19 +1509,19 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 		for (int I1 = 0; I1 < atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
-			//GridD.Find_atom(tau1);
-			GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+			//GlobalC::GridD.Find_atom(tau1);
+			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 			Atom* atom1 = &GlobalC::ucell.atoms[T1];
 			const int start = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 
 			// (2) search among all adjacent atoms.
-			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 			{
-				const int T2 = GridD.getType(ad);
-				const int I2 = GridD.getNatom(ad);
+				const int T2 = GlobalC::GridD.getType(ad);
+				const int I2 = GlobalC::GridD.getNatom(ad);
 				Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
-				tau2 = GridD.getAdjacentTau(ad);
+				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
 				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
@@ -1534,14 +1534,14 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 				}
 				else if(distance >= rcut)
 				{
-					for (int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+					for (int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
 					{
-						const int T0 = GridD.getType(ad0); 
-						const int I0 = GridD.getNatom(ad0); 
+						const int T0 = GlobalC::GridD.getType(ad0); 
+						const int I0 = GlobalC::GridD.getNatom(ad0); 
 						//const int iat0 = ucell.itia2iat(T0, I0);
 						//const int start0 = ucell.itiaiw2iwt(T0, I0, 0);
 
-						tau0 = GridD.getAdjacentTau(ad0);
+						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
 						dtau2 = tau0 - tau2;
 
@@ -1567,9 +1567,9 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 					// exp(k dot dR)
 					// dR is the index of box in Crystal coordinates
 					//------------------------------------------------
-					Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z); 
+					Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
-					//const double arg = ( kv.kvec_d[ik] * GridD.getBox(ad) ) * TWO_PI;
+					//const double arg = ( kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * TWO_PI;
 					const complex<double> kphase = complex <double> ( cos(arg),  sin(arg) );
 
 					//--------------------------------------------------

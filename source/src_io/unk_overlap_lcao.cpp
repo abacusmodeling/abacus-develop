@@ -391,18 +391,18 @@ void unkOverlap_lcao::cal_R_number()
 		for (int I1 = 0; I1 < atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
-			GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 			
-			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 			{
-				const int T2 = GridD.getType(ad);
-				const int I2 = GridD.getNatom(ad);
+				const int T2 = GlobalC::GridD.getType(ad);
+				const int I2 = GlobalC::GridD.getNatom(ad);
 				Atom* atom2 = &GlobalC::ucell.atoms[T2];
-				const double R_direct_x = (double)GridD.getBox(ad).x;
-				const double R_direct_y = (double)GridD.getBox(ad).y;
-				const double R_direct_z = (double)GridD.getBox(ad).z;
+				const double R_direct_x = (double)GlobalC::GridD.getBox(ad).x;
+				const double R_direct_y = (double)GlobalC::GridD.getBox(ad).y;
+				const double R_direct_z = (double)GlobalC::GridD.getBox(ad).z;
 			
-				tau2 = GridD.getAdjacentTau(ad);
+				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
 				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();

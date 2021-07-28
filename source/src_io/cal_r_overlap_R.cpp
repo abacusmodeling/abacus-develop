@@ -26,12 +26,12 @@ void cal_r_overlap_R::init()
 {
 	TITLE("cal_r_overlap_R","init");
 
-	this->R_x_num = GridD.getCellX();
-    this->R_y_num = GridD.getCellY();
-    this->R_z_num = GridD.getCellZ();
-	this->R_minX = (int)GridD.getD_minX();
-	this->R_minY = (int)GridD.getD_minY();
-	this->R_minZ = (int)GridD.getD_minZ();
+	this->R_x_num = GlobalC::GridD.getCellX();
+    this->R_y_num = GlobalC::GridD.getCellY();
+    this->R_z_num = GlobalC::GridD.getCellZ();
+	this->R_minX = (int)GlobalC::GridD.getD_minX();
+	this->R_minY = (int)GlobalC::GridD.getD_minY();
+	this->R_minZ = (int)GlobalC::GridD.getD_minZ();
 	
 	// allocate for psi_r_psi	
 	psi_r_psi = new Vector3<double> ***[R_x_num];

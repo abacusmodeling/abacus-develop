@@ -204,15 +204,15 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
         for (int I1 = 0; I1 < atom1->na; ++I1)
         {
             tau1 = atom1->tau[I1];
-            //GridD.Find_atom(tau1);
-            GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            //GlobalC::GridD.Find_atom(tau1);
+            GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 
-            for (int ad = 0; ad < GridD.getAdjacentNum() + 1; ++ad)
+            for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum() + 1; ++ad)
             {
-                const int T2 = GridD.getType(ad);
-                const int I2 = GridD.getNatom(ad);
+                const int T2 = GlobalC::GridD.getType(ad);
+                const int I2 = GlobalC::GridD.getNatom(ad);
                 //Atom *atom2 = &GlobalC::ucell.atoms[T2];
-                tau2 = GridD.getAdjacentTau(ad);
+                tau2 = GlobalC::GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * GlobalC::ucell.lat0;
                 double rcut = ORB.Phi[T1].getRcut() + ORB.Alpha[0].getRcut(); //Rcut is subject to ORB.Phi to keep dimension of S_mu_alpha same as Sloc
@@ -237,7 +237,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                     if (!calc_deri)
                                     {
                                         UOT.snap_psipsi(olm, 0, 'D', tau1,
-                                                T1, L1, m1, N1, GridD.getAdjacentTau(ad),
+                                                T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                                 T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
                                         {
@@ -251,7 +251,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                     else
                                     {
                                         UOT.snap_psipsi(olm, 1, 'D', tau1,
-                                            T1, L1, m1, N1, GridD.getAdjacentTau(ad),
+                                            T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                             T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
                                         {

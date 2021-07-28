@@ -243,7 +243,7 @@ void Run_MD_LCAO::final_scf(void)
     atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD, 
+		GlobalC::GridD, 
 		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);

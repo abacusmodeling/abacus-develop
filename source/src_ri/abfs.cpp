@@ -409,14 +409,14 @@ map<size_t,vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
 	const Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
 	
 	map<size_t,vector<Vector3_Order<int>>> adjs;
-	GridD.Find_atom(GlobalC::ucell,  tau, it, ia );
-	for( int ad=0; ad<GridD.getAdjacentNum()+1; ++ad )
+	GlobalC::GridD.Find_atom(GlobalC::ucell,  tau, it, ia );
+	for( int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad )
 	{
-		const size_t it_ad = GridD.getType(ad);
-		const size_t ia_ad = GridD.getNatom(ad);
+		const size_t it_ad = GlobalC::GridD.getType(ad);
+		const size_t ia_ad = GlobalC::GridD.getNatom(ad);
 		const int iat_ad = GlobalC::ucell.itia2iat(it_ad,ia_ad);
-		const Vector3<int> box_ad = GridD.getBox(ad);
-		const Vector3<double> tau_ad = GridD.getAdjacentTau(ad);
+		const Vector3<int> box_ad = GlobalC::GridD.getBox(ad);
+		const Vector3<double> tau_ad = GlobalC::GridD.getAdjacentTau(ad);
 		
 		if( (tau-tau_ad).norm()*GlobalC::ucell.lat0 < ORB.Phi[it].getRcut()+ORB.Phi[it_ad].getRcut() )
 			adjs[iat_ad].push_back(box_ad);

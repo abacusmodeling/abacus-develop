@@ -56,7 +56,7 @@ void LOOP_elec::set_matrix_grid(void)
 	atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD, 
+		GlobalC::GridD, 
 		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);

@@ -378,9 +378,9 @@ void LCAO_Hamilt::calculate_STN_R(void)
     LM.allocate_HR_tr();
     LM.allocate_SlocR_tr();
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     int R_x;
     int R_y;
@@ -392,18 +392,18 @@ void LCAO_Hamilt::calculate_STN_R(void)
         for(int I1 = 0; I1 < atom1->na; ++I1)
         {
             tau1 = atom1->tau[I1];
-            //GridD.Find_atom(tau1);
-            GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            //GlobalC::GridD.Find_atom(tau1);
+            GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
             Atom* atom1 = &GlobalC::ucell.atoms[T1];
             const int start = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 
-            for(int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+            for(int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
             {
-                const int T2 = GridD.getType(ad);
-                const int I2 = GridD.getNatom(ad);
+                const int T2 = GlobalC::GridD.getType(ad);
+                const int I2 = GlobalC::GridD.getNatom(ad);
                 Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
-                tau2 = GridD.getAdjacentTau(ad);
+                tau2 = GlobalC::GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * GlobalC::ucell.lat0;
                 double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
@@ -413,14 +413,14 @@ void LCAO_Hamilt::calculate_STN_R(void)
                 if(distance < rcut) adj = true;
                 else if(distance >= rcut)
                 {
-                    for(int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+                    for(int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
                     {
-                        const int T0 = GridD.getType(ad0);
-                        //const int I0 = GridD.getNatom(ad0);
+                        const int T0 = GlobalC::GridD.getType(ad0);
+                        //const int I0 = GlobalC::GridD.getNatom(ad0);
                         //const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
                         //const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
-                        tau0 = GridD.getAdjacentTau(ad0);
+                        tau0 = GlobalC::GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;
                         dtau2 = tau0 - tau2;
 
@@ -442,7 +442,7 @@ void LCAO_Hamilt::calculate_STN_R(void)
                 {
                     const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
-                    Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z);
+                    Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z);
                     R_x = (int) (dR.x - R_minX);
                     R_y = (int) (dR.y - R_minY);
                     R_z = (int) (dR.z - R_minZ);
@@ -504,9 +504,9 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
 
     LM.allocate_HS_R_sparse();
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
     int R_x;
     int R_y;
@@ -518,18 +518,18 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
         for(int I1 = 0; I1 < atom1->na; ++I1)
         {
             tau1 = atom1->tau[I1];
-            //GridD.Find_atom(tau1);
-            GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            //GlobalC::GridD.Find_atom(tau1);
+            GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
             Atom* atom1 = &GlobalC::ucell.atoms[T1];
             const int start = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
 
-            for(int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+            for(int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
             {
-                const int T2 = GridD.getType(ad);
-                const int I2 = GridD.getNatom(ad);
+                const int T2 = GlobalC::GridD.getType(ad);
+                const int I2 = GlobalC::GridD.getNatom(ad);
                 Atom* atom2 = &GlobalC::ucell.atoms[T2];
 
-                tau2 = GridD.getAdjacentTau(ad);
+                tau2 = GlobalC::GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * GlobalC::ucell.lat0;
                 double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
@@ -539,14 +539,14 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                 if(distance < rcut) adj = true;
                 else if(distance >= rcut)
                 {
-                    for(int ad0 = 0; ad0 < GridD.getAdjacentNum()+1; ++ad0)
+                    for(int ad0 = 0; ad0 < GlobalC::GridD.getAdjacentNum()+1; ++ad0)
                     {
-                        const int T0 = GridD.getType(ad0);
-                        //const int I0 = GridD.getNatom(ad0);
+                        const int T0 = GlobalC::GridD.getType(ad0);
+                        //const int I0 = GlobalC::GridD.getNatom(ad0);
                         //const int iat0 = GlobalC::ucell.itia2iat(T0, I0);
                         //const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 
-                        tau0 = GridD.getAdjacentTau(ad0);
+                        tau0 = GlobalC::GridD.getAdjacentTau(ad0);
                         dtau1 = tau0 - tau1;
                         dtau2 = tau0 - tau2;
 
@@ -568,7 +568,7 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                 {
                     const int start2 = GlobalC::ucell.itiaiw2iwt(T2,I2,0);
 
-                    Vector3<double> dR(GridD.getBox(ad).x, GridD.getBox(ad).y, GridD.getBox(ad).z);
+                    Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z);
                     R_x = (int) (dR.x - R_minX);
                     R_y = (int) (dR.y - R_minY);
                     R_z = (int) (dR.z - R_minZ);
@@ -655,13 +655,13 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
 	TITLE("LCAO_Hamilt","calculat_HR_dftu_sparse");
 	timer::tick("LCAO_Hamilt","calculat_HR_dftu_sparse");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
 	double *HR_tmp = new double[ParaO.nloc];
 	double *SR_tmp = new double[ParaO.nloc];
@@ -753,13 +753,13 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 	TITLE("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
 	timer::tick("LCAO_Hamilt","calculat_HR_dftu_soc_sparse");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    double R_minX = GridD.getD_minX();
-    double R_minY = GridD.getD_minY();
-    double R_minZ = GridD.getD_minZ();
+    double R_minX = GlobalC::GridD.getD_minX();
+    double R_minY = GlobalC::GridD.getD_minY();
+    double R_minZ = GlobalC::GridD.getD_minZ();
 
 	complex<double> *HR_soc_tmp = new complex<double>[ParaO.nloc];
 	complex<double> *SR_soc_tmp = new complex<double>[ParaO.nloc];

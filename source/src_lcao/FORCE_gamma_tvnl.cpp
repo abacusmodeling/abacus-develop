@@ -84,28 +84,28 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
         const int ia = GlobalC::ucell.iat2ia[iat];
         const Vector3<double> tau0 = GlobalC::ucell.atoms[it].tau[ia];
         //find ajacent atom of atom ia
-        //GridD.Find_atom( GlobalC::ucell.atoms[it].tau[ia] );
-		GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
+        //GlobalC::GridD.Find_atom( GlobalC::ucell.atoms[it].tau[ia] );
+		GlobalC::GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
 		const double Rcut_Beta = ORB.Beta[it].get_rcut_max();
 
         //FOLLOWING ARE CONTRIBUTIONS FROM
         //VNL DUE TO PROJECTOR'S DISPLACEMENT
-        for (int ad1 =0 ; ad1 < GridD.getAdjacentNum()+1; ad1++)
+        for (int ad1 =0 ; ad1 < GlobalC::GridD.getAdjacentNum()+1; ad1++)
         {
-            const int T1 = GridD.getType (ad1);
+            const int T1 = GlobalC::GridD.getType (ad1);
             const Atom* atom1 = &GlobalC::ucell.atoms[T1];
-            const int I1 = GridD.getNatom (ad1);
+            const int I1 = GlobalC::GridD.getNatom (ad1);
             const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-			const Vector3<double> tau1 = GridD.getAdjacentTau (ad1);
+			const Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
 			const double Rcut_AO1 = ORB.Phi[T1].getRcut();
 
-            for (int ad2 =0 ; ad2 < GridD.getAdjacentNum()+1; ad2++)
+            for (int ad2 =0 ; ad2 < GlobalC::GridD.getAdjacentNum()+1; ad2++)
             {
-                const int T2 = GridD.getType (ad2);
+                const int T2 = GlobalC::GridD.getType (ad2);
                 const Atom* atom2 = &GlobalC::ucell.atoms[T2];
-                const int I2 = GridD.getNatom (ad2);
+                const int I2 = GlobalC::GridD.getNatom (ad2);
                 const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                const Vector3<double> tau2 = GridD.getAdjacentTau (ad2);
+                const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
                 const double Rcut_AO2 = ORB.Phi[T2].getRcut();
 
                 const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
@@ -308,26 +308,26 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
         const int ia = GlobalC::ucell.iat2ia[iat];
         const Vector3<double> tau0 = GlobalC::ucell.atoms[it].tau[ia];
         //find ajacent atom of atom ia
-        //GridD.Find_atom( GlobalC::ucell.atoms[it].tau[ia] );
-        GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
+        //GlobalC::GridD.Find_atom( GlobalC::ucell.atoms[it].tau[ia] );
+        GlobalC::GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
 
         //FOLLOWING ARE CONTRIBUTIONS FROM
         //VNL DUE TO PROJECTOR'S DISPLACEMENT
-        for (int ad1 =0 ; ad1 < GridD.getAdjacentNum()+1; ad1++)
+        for (int ad1 =0 ; ad1 < GlobalC::GridD.getAdjacentNum()+1; ad1++)
         {
-            const int T1 = GridD.getType (ad1);
+            const int T1 = GlobalC::GridD.getType (ad1);
             const Atom* atom1 = &GlobalC::ucell.atoms[T1];
-            const int I1 = GridD.getNatom (ad1);
+            const int I1 = GlobalC::GridD.getNatom (ad1);
             const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
-            const Vector3<double> tau1 = GridD.getAdjacentTau (ad1);
+            const Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
 
-            for (int ad2 =0 ; ad2 < GridD.getAdjacentNum()+1; ad2++)
+            for (int ad2 =0 ; ad2 < GlobalC::GridD.getAdjacentNum()+1; ad2++)
             {
-                const int T2 = GridD.getType (ad2);
+                const int T2 = GlobalC::GridD.getType (ad2);
                 const Atom* atom2 = &GlobalC::ucell.atoms[T2];
-                const int I2 = GridD.getNatom (ad2);
+                const int I2 = GlobalC::GridD.getNatom (ad2);
                 const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-                const Vector3<double> tau2 = GridD.getAdjacentTau (ad2);
+                const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
 
                 const double Rcut_Beta = ORB.Beta[it].get_rcut_max();
                 const double Rcut_AO1 = ORB.Phi[T1].getRcut();

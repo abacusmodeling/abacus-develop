@@ -284,7 +284,7 @@ bool LOOP_ions::force_stress(
         atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -353,7 +353,7 @@ xiaohui modify 2014-08-09*/
 		atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -386,7 +386,7 @@ xiaohui modify 2014-08-09*/
         atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -470,7 +470,7 @@ void LOOP_ions::final_scf(void)
     atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD,
+		GlobalC::GridD,
 		GlobalC::ucell,
 		GlobalV::SEARCH_RADIUS,
 		GlobalV::test_atom_input);

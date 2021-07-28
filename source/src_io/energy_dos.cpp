@@ -340,7 +340,7 @@ void energy::perform_dos(void)
 				atom_arrange::search(
 					GlobalV::SEARCH_PBC,
 					GlobalV::ofs_running,
-					GridD, 
+					GlobalC::GridD, 
 					GlobalC::ucell, 
 					GlobalV::SEARCH_RADIUS, 
 					GlobalV::test_atom_input);//qifeng-2019-01-21
@@ -444,7 +444,7 @@ void energy::perform_dos(void)
 				atom_arrange::delete_vector(
 					GlobalV::ofs_running,
 					GlobalV::SEARCH_PBC, 
-					GridD, 
+					GlobalC::GridD, 
 					GlobalC::ucell, 
 					GlobalV::SEARCH_RADIUS, 
 					GlobalV::test_atom_input);
