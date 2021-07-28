@@ -31,6 +31,7 @@ extern int 		DIPOLE;				// 7 add dipole correction
 
 
 extern std::string   DFT_FUNCTIONAL;		// 6.5 change the DFT functional from input file.
+extern bool		DFT_META;		// whether is meta-GGA
 extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8

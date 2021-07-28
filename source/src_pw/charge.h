@@ -33,6 +33,9 @@ public:
     complex<double>** rhog;
     complex<double>** rhog_save;
 
+	double** kin_r; //kinetic energy density in real space, for meta-GGA
+						     //wenfei 2021-07-28
+
     double *rho_core;
 	complex<double> *rhog_core;
 
