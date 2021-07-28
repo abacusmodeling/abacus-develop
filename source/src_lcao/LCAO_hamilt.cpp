@@ -206,7 +206,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 		// set the local potential
 		// in LCAO basis.
 		//--------------------------
-		GlobalC::LM.zeros_HSR('H', LNNR.nnr);
+		GlobalC::LM.zeros_HSR('H', GlobalC::LNNR.nnr);
 
 		if(GlobalV::NSPIN!=4) 
 		{
@@ -241,7 +241,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 	GlobalC::LM.zeros_HSk('S');
 	GlobalC::LM.zeros_HSk('T');
 //	cout << " after folding Hfixed k." << endl;
-	LNNR.folding_fixedH(ik);
+	GlobalC::LNNR.folding_fixedH(ik);
 
 	//------------------------------------------
 	// Add T(k)+Vnl(k)+Vlocal(k)
@@ -271,10 +271,10 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 	//--------------------------------------------
 	// set S(R) to zero.
 	// the total value of S(R) in this processor
-	// is LNNR.nnr.
+	// is GlobalC::LNNR.nnr.
 	// and store in GlobalC::LM.SlocR.
 	//--------------------------------------------
-	GlobalC::LM.zeros_HSR('S', LNNR.nnr);
+	GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
     this->genH.calculate_S_no();	
 
 	//------------------------------
@@ -282,7 +282,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 	// and then calculate it
 	// and store in GlobalC::LM.Hloc_fixedR.
 	//------------------------------
-	GlobalC::LM.zeros_HSR('T', LNNR.nnr);
+	GlobalC::LM.zeros_HSR('T', GlobalC::LNNR.nnr);
 	
 
 
@@ -335,7 +335,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 		//------------------------------------------
 		GlobalC::LM.zeros_HSk('S');
 		GlobalC::LM.zeros_HSk('T');
-		LNNR.folding_fixedH(ik);
+		GlobalC::LNNR.folding_fixedH(ik);
 		cout << " --> LCAO S" << endl;
 		GlobalC::LM.print_HSk('S','R',1.0e-5);	
 		cout << " --> LCAO T+Vnl" << endl;

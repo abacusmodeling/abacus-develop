@@ -363,8 +363,8 @@ void energy::perform_dos(void)
 						GlobalV::FORCE,
 						GlobalV::MY_RANK);
 
-				GlobalC::LM.allocate_HS_R(LNNR.nnr);
-				GlobalC::LM.zeros_HSR('S', LNNR.nnr);
+				GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
+				GlobalC::LM.zeros_HSR('S', GlobalC::LNNR.nnr);
 				GlobalC::UHM.genH.calculate_S_no();
 				GlobalC::UHM.genH.build_ST_new('S', false);
 				std::vector<ComplexMatrix> Mulk;
@@ -379,7 +379,7 @@ void energy::perform_dos(void)
 					{
 						GlobalC::LM.allocate_HS_k(GlobalC::ParaO.nloc);
 						GlobalC::LM.zeros_HSk('S');
-						LNNR.folding_fixedH(ik);
+						GlobalC::LNNR.folding_fixedH(ik);
 
 
 						ComplexMatrix Dwfc = conj(D.wfc_k[ik]);

@@ -137,8 +137,8 @@ void Local_Orbital_Charge::write_dm(
     else
     {
         WARNING_QUIT("write_dm","not ready yet");
-        ofs << " " << LNNR.nnrg << " (nnrg)" << endl;
-        for(int i=0; i<LNNR.nnrg; ++i)
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << endl;
+        for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
             if(i%8==0) ofs << "\n";
             ofs << " " << this->DM_R[is][i];
@@ -217,7 +217,7 @@ void Local_Orbital_Charge::write_dm(
     }
     else
     {
-        ofs << " " << LNNR.nnrg << " (nnrg)" << endl;
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << endl;
         WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif

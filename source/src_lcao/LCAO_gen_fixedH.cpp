@@ -264,11 +264,11 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		if(nnr != LNNR.nnr)
+		if(nnr != GlobalC::LNNR.nnr)
 		{
-			cout << " nnr=" << nnr << " LNNR.nnr=" << LNNR.nnr << endl;
-			GlobalV::ofs_running << " nnr=" << nnr << " LNNR.nnr=" << LNNR.nnr << endl;
-			WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != LNNR.nnr");
+			cout << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
+			GlobalV::ofs_running << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
+			WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
 		}
 	}
 
@@ -653,12 +653,12 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
 //		cout << " nr="  << nnr << endl;
-//		cout << " LNNR.nnr=" << LNNR.nnr << endl;
+//		cout << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
 //		GlobalV::ofs_running << " nr="  << nnr << endl;
-//		GlobalV::ofs_running << " LNNR.nnr=" << LNNR.nnr << endl;
-		if( nnr!=LNNR.nnr)
+//		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
+		if( nnr!=GlobalC::LNNR.nnr)
 		{
-			WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=LNNR.nnr");
+			WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=GlobalC::LNNR.nnr");
 		}
 	}
 
@@ -700,7 +700,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
 				// use to label < mu | H | nu(prime) >
-				//int nnr = LNNR.nlocstart[iat];
+				//int nnr = GlobalC::LNNR.nlocstart[iat];
             
 				//(3)
 				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
@@ -768,7 +768,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								//	else
 								//	{
 								//		WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
-//										assert( nnr < LNNR.nnr );
+//										assert( nnr < GlobalC::LNNR.nnr );
 //										GlobalC::LM.Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
 								//	}
@@ -816,11 +816,11 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 				{
 					if( iat < GlobalC::ucell.nat-1 )
 					{
-						if( nnr != LNNR.nlocstart[iat+1] )
+						if( nnr != GlobalC::LNNR.nlocstart[iat+1] )
 						{
 							cout << " nnr = " << nnr << endl;
-							cout << " nlocstart[iat] = " << LNNR.nlocstart[iat] << endl;
-							cout << " nlocstart[iat+1] = " << LNNR.nlocstart[iat+1] << endl;
+							cout << " nlocstart[iat] = " << GlobalC::LNNR.nlocstart[iat] << endl;
+							cout << " nlocstart[iat+1] = " << GlobalC::LNNR.nlocstart[iat+1] << endl;
 							WARNING_QUIT("build_Nonlocal_beta","nnr");
 						}
 					}

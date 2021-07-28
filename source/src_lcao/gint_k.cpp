@@ -45,15 +45,15 @@ void Gint_k::allocate_pvpR(void)
 
 	if(this->reduced)
 	{
-		// the number of matrix element <phi_0 | V | phi_R> is LNNR.nnrg.
+		// the number of matrix element <phi_0 | V | phi_R> is GlobalC::LNNR.nnrg.
 		this->pvpR_reduced = new double*[GlobalV::NSPIN];
 		for(int is =0;is<GlobalV::NSPIN;is++)
 		{
-			this->pvpR_reduced[is] = new double[LNNR.nnrg];	
-			ZEROS( pvpR_reduced[is], LNNR.nnrg);
+			this->pvpR_reduced[is] = new double[GlobalC::LNNR.nnrg];	
+			ZEROS( pvpR_reduced[is], GlobalC::LNNR.nnrg);
 		}
 
-		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", LNNR.nnrg * GlobalV::NSPIN , "double");
+		double mem = Memory::record("allocate_pvpR", "pvpR_reduced", GlobalC::LNNR.nnrg * GlobalV::NSPIN , "double");
 
         if(GlobalV::OUT_LEVEL != "m") 
 		{
@@ -187,7 +187,7 @@ void Gint_k::folding_force(
 
 				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 				// get the start positions of elements.
-				const int DM_start = LNNR.nlocstartg[iat];
+				const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
 				//GlobalC::GridD.Find_atom(tau1);
@@ -209,7 +209,7 @@ void Gint_k::folding_force(
 						if(distance < rcut)
 						{
 							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-							int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+							int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 							for(int iw=0; iw<atom1->nw; iw++)
 							{
 								const int iw_all = start1+iw;
@@ -396,7 +396,7 @@ void Gint_k::folding_stress(
 
 				const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 				// get the start positions of elements.
-				const int DM_start = LNNR.nlocstartg[iat];
+				const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 				// get the coordinates of adjacent atoms.
 				tau1 = atom1->tau[I1];
 				//GlobalC::GridD.Find_atom(tau1);
@@ -420,7 +420,7 @@ void Gint_k::folding_stress(
 						if(distance < rcut)
 						{
 							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
-							int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+							int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 							for(int iw=0; iw<atom1->nw; iw++)
 							{
 								const int iw_all = start1+iw;
@@ -663,7 +663,7 @@ void Gint_k::folding_vl_k(const int &ik)
 					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 					// get the start positions of elements.
-					const int DM_start = LNNR.nlocstartg[iat];
+					const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
 					// get the coordinates of adjacent atoms.
 					tau1 = GlobalC::ucell.atoms[T1].tau[I1];
@@ -704,7 +704,7 @@ void Gint_k::folding_vl_k(const int &ik)
 								// calculate the phase factor exp(ikR).
 								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 								complex<double> phase = complex<double>(cos(arg), sin(arg));
-								int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
 								{
 									// iw1_lo
@@ -737,9 +737,9 @@ void Gint_k::folding_vl_k(const int &ik)
 		// To test the pvpR
 		//------------------
 /*
-		for(int i=0; i<LNNR.nlocdimg[0]; i++)
+		for(int i=0; i<GlobalC::LNNR.nlocdimg[0]; i++)
 		{
-			const int DM_start = LNNR.nlocstartg[0];
+			const int DM_start = GlobalC::LNNR.nlocstartg[0];
 			const int j = i + DM_start;
 			if( abs(pvpR_reduced[j]) > 1.0e-5  )
 			{
@@ -911,7 +911,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 					const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
 					// get the start positions of elements.
-					const int DM_start = LNNR.nlocstartg[iat];
+					const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
 					// get the coordinates of adjacent atoms.
 					tau1 = GlobalC::ucell.atoms[T1].tau[I1];
@@ -952,7 +952,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 								// calculate the phase factor exp(ikR).
 								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
 								complex<double> phase = complex<double>(cos(arg), sin(arg));
-								int ixxx = DM_start + LNNR.find_R2st[iat][nad];
+								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
 								{
 									// iw1_lo
@@ -995,9 +995,9 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 		// To test the pvpR
 		//------------------
 /*
-		for(int i=0; i<LNNR.nlocdimg[0]; i++)
+		for(int i=0; i<GlobalC::LNNR.nlocdimg[0]; i++)
 		{
-			const int DM_start = LNNR.nlocstartg[0];
+			const int DM_start = GlobalC::LNNR.nlocstartg[0];
 			const int j = i + DM_start;
 			if( abs(pvpR_reduced[j]) > 1.0e-5  )
 			{
@@ -1477,7 +1477,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
                 Atom* atom1 = &GlobalC::ucell.atoms[T1];
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
-                const int DM_start = LNNR.nlocstartg[iat];
+                const int DM_start = GlobalC::LNNR.nlocstartg[iat];
                 tau1 = GlobalC::ucell.atoms[T1].tau[I1];
                 //GlobalC::GridD.Find_atom(tau1);        
                 GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
@@ -1508,7 +1508,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
                             R_y = (int) (dR.y -R_minY);
                             R_z = (int) (dR.z -R_minZ);
 
-                            int ixxx = DM_start + LNNR.find_R2st[iat][nad2];
+                            int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad2];
                             for(int iw=0; iw<atom1->nw * GlobalV::NPOL; iw++)
                             {
                                 int* iw2_lo = &GridT.trace_lo[start2];
@@ -1868,7 +1868,7 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
                 Atom* atom1 = &GlobalC::ucell.atoms[T1];
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 
-                const int DM_start = LNNR.nlocstartg[iat];
+                const int DM_start = GlobalC::LNNR.nlocstartg[iat];
                 tau1 = GlobalC::ucell.atoms[T1].tau[I1];
                 //GlobalC::GridD.Find_atom(tau1);        
                 GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
@@ -1899,7 +1899,7 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
                             R_y = (int) (dR.y -R_minY);
                             R_z = (int) (dR.z -R_minZ);
 
-                            int ixxx = DM_start + LNNR.find_R2st[iat][nad2];
+                            int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad2];
                             for(int iw=0; iw<atom1->nw * GlobalV::NPOL; iw++)
                             {
 								for(int iw2=0;iw2<atom2->nw * GlobalV::NPOL; iw2++)

@@ -38,10 +38,10 @@ void Force_LCAO_k::ftable_k (
 	double** dm2d = new double*[GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		dm2d[is] = new double[LNNR.nnr];
-		ZEROS(dm2d[is], LNNR.nnr);
+		dm2d[is] = new double[GlobalC::LNNR.nnr];
+		ZEROS(dm2d[is], GlobalC::LNNR.nnr);
 	}
-	Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*LNNR.nnr, "double");	
+	Memory::record ("Force_LCAO_k", "dm2d", GlobalV::NSPIN*GlobalC::LNNR.nnr, "double");	
 	bool with_energy = false;
 
 	
@@ -105,7 +105,7 @@ void Force_LCAO_k::allocate_k(void)
 	TITLE("Force_LCAO_k","allocate_k");
 	timer::tick("Force_LCAO_k","allocate_k");
 
-	const int nnr = LNNR.nnr;
+	const int nnr = GlobalC::LNNR.nnr;
 	//--------------------------------
     // (1) allocate for dSx dSy & dSz
 	//--------------------------------
@@ -216,8 +216,8 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T1,I1);
 			const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-			const int gstart = LNNR.nlocstart[iat];
-			const int irr = LNNR.nlocdim[iat];//number of adjacet orbitals
+			const int gstart = GlobalC::LNNR.nlocstart[iat];
+			const int irr = GlobalC::LNNR.nlocdim[iat];//number of adjacet orbitals
 
 			complex<double> **vvv = new complex<double>*[GlobalV::NSPIN];
          //xiaohui add 2014-03-17, add "if(irr > 0)", 
@@ -327,7 +327,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 							}//jj
 						}// cb
 //						GlobalV::ofs_running << " count = " << count << endl;
-						assert(count == LNNR.nlocdim[iat]);
+						assert(count == GlobalC::LNNR.nlocdim[iat]);
 					}// w1
 				}//ib
 			}//ik
@@ -402,8 +402,8 @@ void Force_LCAO_k::cal_foverlap_k(
 	double** edm2d = new double*[GlobalV::NSPIN];
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		edm2d[is] = new double[LNNR.nnr];
-		ZEROS(edm2d[is], LNNR.nnr);
+		edm2d[is] = new double[GlobalC::LNNR.nnr];
+		ZEROS(edm2d[is], GlobalC::LNNR.nnr);
 	}
 	bool with_energy = true;
 
@@ -507,11 +507,11 @@ void Force_LCAO_k::cal_foverlap_k(
 		}
 	}
 
-	if(irr!=LNNR.nnr)
+	if(irr!=GlobalC::LNNR.nnr)
 	{
 		OUT(GlobalV::ofs_running,"wrong irr",irr);
-		OUT(GlobalV::ofs_running,"wrong LNNR.nnr",LNNR.nnr);
-		WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=LNNR.nnr");
+		OUT(GlobalV::ofs_running,"wrong GlobalC::LNNR.nnr",GlobalC::LNNR.nnr);
+		WARNING_QUIT("Force_LCAO_k::cal_foverlap_k","irr!=GlobalC::LNNR.nnr");
 	}
 	
 	for(int is=0; is<GlobalV::NSPIN; is++)
@@ -597,7 +597,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 			}// end cb
 		}
 	}
-	assert(irr==LNNR.nnr);
+	assert(irr==GlobalC::LNNR.nnr);
 	
 //	test(GlobalC::LM.DSloc_Rx);
 //	test(dm2d[0],"dm2d");
@@ -655,7 +655,7 @@ void Force_LCAO_k::test(double* mmm, const string &name)
 					for(int kk=0; kk<atom2->nw; kk++)
 					{
 						const int iw2_all = start2+kk;
-						assert(irr<LNNR.nnr);
+						assert(irr<GlobalC::LNNR.nnr);
 						//test[iw1_all*GlobalV::NLOCAL+iw2_all] += GlobalC::LM.DHloc_fixedR_x[irr];
 						test[iw1_all*GlobalV::NLOCAL+iw2_all] += mmm[irr];
 						++irr;
@@ -888,7 +888,7 @@ void Force_LCAO_k::cal_fvnl_dbeta_k(
 		}// I1
 	}// T1
 
-	assert( iir == LNNR.nnr );
+	assert( iir == GlobalC::LNNR.nnr );
 
 	if(isstress)
 	{
@@ -931,9 +931,9 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 		GlobalV::CURRENT_SPIN = is;
-//		ZEROS (GlobalC::LM.DHloc_fixedR_x, LNNR.nnr);
-//		ZEROS (GlobalC::LM.DHloc_fixedR_y, LNNR.nnr);
-//		ZEROS (GlobalC::LM.DHloc_fixedR_z, LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_x, GlobalC::LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_y, GlobalC::LNNR.nnr);
+//		ZEROS (GlobalC::LM.DHloc_fixedR_z, GlobalC::LNNR.nnr);
 //		cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)

@@ -15,13 +15,13 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 		WARNING_QUIT("Gint_k::cal_force_k","The force with k can only with reduced H.");
 	}
 
-	int nnrg = LNNR.nnrg;
+	int nnrg = GlobalC::LNNR.nnrg;
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
-	if(LNNR.nnrg == 0)
+	if(GlobalC::LNNR.nnrg == 0)
 	{
 		nnrg = 1;
 	}
@@ -211,13 +211,13 @@ void Gint_k::svl_k_RealSpace(
 		WARNING_QUIT("Gint_k::cal_stress_k","The stress with k can only with reduced H.");
 	}
 
-	int nnrg = LNNR.nnrg;
+	int nnrg = GlobalC::LNNR.nnrg;
 
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
-	if(LNNR.nnrg == 0)
+	if(GlobalC::LNNR.nnrg == 0)
 	{
 		nnrg = 1;
 	}
@@ -493,7 +493,7 @@ void Gint_k::evaluate_vl_stress(
         const int R1x = gt.ucell_index2x[id1];
         const int R1y = gt.ucell_index2y[id1];
         const int R1z = gt.ucell_index2z[id1];
-        const int DM_start = LNNR.nlocstartg[iat];
+        const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
         // get (j,beta,R2)
         for (int ia2=0; ia2<size; ++ia2)
@@ -552,11 +552,11 @@ void Gint_k::evaluate_vl_stress(
                                               GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
                                               rt[0],rt[1],rt[2]);
 	
-				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+				const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
                 int offset = -1;
 
-				int* find_start = LNNR.find_R2[iat];
-				int* findend = LNNR.find_R2[iat] + LNNR.nad[iat];
+				int* find_start = GlobalC::LNNR.find_R2[iat];
+				int* findend = GlobalC::LNNR.find_R2[iat] + GlobalC::LNNR.nad[iat];
 				
 				// the nad should be a large expense of time.
 				for(int* find=find_start; find < findend; find++)
@@ -572,7 +572,7 @@ void Gint_k::evaluate_vl_stress(
                 {
                     WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
-                assert(offset < LNNR.nad[iat]);
+                assert(offset < GlobalC::LNNR.nad[iat]);
 
 				//--------------------------------------------------------------- 
 				// what I do above is to get 'offset' for atom pair (iat1, iat2)
@@ -580,7 +580,7 @@ void Gint_k::evaluate_vl_stress(
 				// I should take advantage of gt.which_unitcell.
 				//--------------------------------------------------------------- 
 
-				const int iatw = DM_start + LNNR.find_R2st[iat][offset];
+				const int iatw = DM_start + GlobalC::LNNR.find_R2st[iat][offset];
 				
 				for(int ib=0; ib<gt.bxyz; ++ib)
 				{
@@ -775,7 +775,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         const int R1x = gt.ucell_index2x[id1];
         const int R1y = gt.ucell_index2y[id1];
         const int R1z = gt.ucell_index2z[id1];
-        const int DM_start = LNNR.nlocstartg[iat];
+        const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
         // get (j,beta,R2)
         for (int ia2=0; ia2<size; ++ia2)
@@ -827,11 +827,11 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                 const int dRy = R1y - R2y;
                 const int dRz = R1z - R2z;
 
-                                const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+                                const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
                 int offset = -1;
 
-                                int* find_start = LNNR.find_R2[iat];
-                                int* findend = LNNR.find_R2[iat] + LNNR.nad[iat];
+                                int* find_start = GlobalC::LNNR.find_R2[iat];
+                                int* findend = GlobalC::LNNR.find_R2[iat] + GlobalC::LNNR.nad[iat];
 
                                 // the nad should be a large expense of time.
                                 for(int* find=find_start; find < findend; find++)
@@ -847,7 +847,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                 {
                     WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
-                assert(offset < LNNR.nad[iat]);
+                assert(offset < GlobalC::LNNR.nad[iat]);
 
                                 //--------------------------------------------------------------- 
                                 // what I do above is to get 'offset' for atom pair (iat1, iat2)
@@ -855,7 +855,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                                 // I should take advantage of gt.which_unitcell.
                                 //--------------------------------------------------------------- 
 
-                                const int iatw = DM_start + LNNR.find_R2st[iat][offset];
+                                const int iatw = DM_start + GlobalC::LNNR.find_R2st[iat][offset];
 
                                 for(int ib=0; ib<gt.bxyz; ++ib)
                                 {

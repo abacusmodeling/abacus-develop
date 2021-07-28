@@ -168,8 +168,8 @@ inline void cal_band_rho(
 			const int R1y = GridT.ucell_index2y[id1];
 			const int R1z = GridT.ucell_index2z[id1];
 			const int T1 = GlobalC::ucell.iat2it[iat1];
-			int* find_start = LNNR.find_R2[iat1];
-			int* find_end = LNNR.find_R2[iat1] + LNNR.nad[iat1];
+			int* find_start = GlobalC::LNNR.find_R2[iat1];
+			int* find_end = GlobalC::LNNR.find_R2[iat1] + GlobalC::LNNR.nad[iat1];
 			//ia2==ia1
 			cal_num=0;
 			for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
@@ -185,7 +185,7 @@ inline void cal_band_rho(
 				const int dRx=0;
 				const int dRy=0;
 				const int dRz=0;				
-				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat1);
+				const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat1);
 				int offset = -1;
 				for(int* find=find_start; find < find_end; find++)
 				{
@@ -210,9 +210,9 @@ inline void cal_band_rho(
 					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
-				assert(offset < LNNR.nad[iat1]);
+				assert(offset < GlobalC::LNNR.nad[iat1]);
 				
-				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];					
+				const int DM_start = GlobalC::LNNR.nlocstartg[iat1]+ GlobalC::LNNR.find_R2st[iat1][offset];					
 				dgemm_(&trans, &trans, &block_size[ia1], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_diag,
 					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia1], 
 					&psir_ylm[0][idx1], &LD_pool,  
@@ -224,7 +224,7 @@ inline void cal_band_rho(
 				const int dRx=0;
 				const int dRy=0;
 				const int dRz=0;				
-				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat1);
+				const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat1);
 				int offset = -1;
 				for(int* find=find_start; find < find_end; find++)
 				{
@@ -249,9 +249,9 @@ inline void cal_band_rho(
 					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
 				//const int offset=AllOffset[ia1][ia2];
-				assert(offset < LNNR.nad[iat1]);
+				assert(offset < GlobalC::LNNR.nad[iat1]);
 				
-				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
+				const int DM_start = GlobalC::LNNR.nlocstartg[iat1]+ GlobalC::LNNR.find_R2st[iat1][offset];
 				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib					)
 				{
     				if(cal_flag[ib][ia1])
@@ -287,7 +287,7 @@ inline void cal_band_rho(
     				const int dRx = R1x - R2x;
     				const int dRy = R1y - R2y;
     				const int dRz = R1z - R2z;
-    				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+    				const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
     				int offset = -1;
     				for(int* find=find_start; find < find_end; find++)
     				{
@@ -312,9 +312,9 @@ inline void cal_band_rho(
                         cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
     					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
-    				assert(offset < LNNR.nad[iat1]);
+    				assert(offset < GlobalC::LNNR.nad[iat1]);
 
-    				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
+    				const int DM_start = GlobalC::LNNR.nlocstartg[iat1]+ GlobalC::LNNR.find_R2st[iat1][offset];
 
     				dgemm_(&trans, &trans, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_nondiag,
     					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia2], 
@@ -336,7 +336,7 @@ inline void cal_band_rho(
     				const int dRx = R1x - R2x;
     				const int dRy = R1y - R2y;
     				const int dRz = R1z - R2z;
-    				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+    				const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
     				int offset = -1;
     				for(int* find=find_start; find < find_end; find++)
     				{
@@ -361,9 +361,9 @@ inline void cal_band_rho(
                         cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
     					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
     				}				
-    				assert(offset < LNNR.nad[iat1]);
+    				assert(offset < GlobalC::LNNR.nad[iat1]);
 
-    				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
+    				const int DM_start = GlobalC::LNNR.nlocstartg[iat1]+ GlobalC::LNNR.find_R2st[iat1][offset];
     				for(int ib=0; ib<GlobalC::pw.bxyz; ++ib					)
     				{
         				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
@@ -574,7 +574,7 @@ void Gint_k::evaluate_pDMp(
 		const int R1x = GridT.ucell_index2x[id1];
 		const int R1y = GridT.ucell_index2y[id1];
 		const int R1z = GridT.ucell_index2z[id1];
-		const int DM_start = LNNR.nlocstartg[iat];
+		const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
 		// get (j,beta,R2)
 		for (int ia2=0; ia2<size; ia2++)
@@ -620,11 +620,11 @@ void Gint_k::evaluate_pDMp(
 
 // get the index from dRx, dRy, dRz.				
 // in fact I can calculate this once, and update only when meshcell is changed.
-				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+				const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
 
 				int offset = -1;
-				int* find_start = LNNR.find_R2[iat];
-				int* find_end = LNNR.find_R2[iat] + LNNR.nad[iat];
+				int* find_start = GlobalC::LNNR.find_R2[iat];
+				int* find_end = GlobalC::LNNR.find_R2[iat] + GlobalC::LNNR.nad[iat];
 
 				for(int* find=find_start; find < find_end; find++)
 				{
@@ -650,11 +650,11 @@ void Gint_k::evaluate_pDMp(
                     cout << " R2=" << R2x << " " << R2y << " " << R2z << endl;
 					WARNING_QUIT("gint_k","evaluate_pDMp wrong");
 				}
-				assert(offset < LNNR.nad[iat]);
+				assert(offset < GlobalC::LNNR.nad[iat]);
 
 
 				// key variable:
-				ixxx = DM_start + LNNR.find_R2st[iat][offset];	
+				ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][offset];	
 				
 				for(int is=0; is<GlobalV::NSPIN; is++)
 				{

@@ -75,12 +75,12 @@ void LOOP_elec::set_matrix_grid(void)
 	{
 		// For each atom, calculate the adjacent atoms in different cells
 		// and allocate the space for H(R) and S(R).
-		LNNR.cal_nnr();
-		GlobalC::LM.allocate_HS_R(LNNR.nnr);
+		GlobalC::LNNR.cal_nnr();
+		GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 
 		// need to first calculae lgd.
 		// using GridT.init.
-		LNNR.cal_nnrg(GridT);
+		GlobalC::LNNR.cal_nnrg(GridT);
 	}
 
     timer::tick("LOOP_elec","set_matrix_grid"); 

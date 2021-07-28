@@ -1632,7 +1632,7 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 		}// end I1
 	} // end T1
 
-	assert(index==LNNR.nnr);
+	assert(index==GlobalC::LNNR.nnr);
 
   // timer::tick("DFTU","folding_overlap_matrix");
 	return;

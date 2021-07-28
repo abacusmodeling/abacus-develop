@@ -5,7 +5,10 @@
 //----------------------------
 // define a global class obj.
 //----------------------------
+namespace GlobalC
+{
 LCAO_nnr LNNR;
+}
 
 LCAO_nnr::LCAO_nnr()
 {

@@ -104,9 +104,9 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     else
     {
         WARNING_QUIT("Local_Orbital_Charge::read_dm","The nnrg should not be update");
-        CHECK_INT(ifs,LNNR.nnrg);
+        CHECK_INT(ifs,GlobalC::LNNR.nnrg);
 
-        for(int i=0; i<LNNR.nnrg; ++i)
+        for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
             ifs >> DM_R[is][i];
         }

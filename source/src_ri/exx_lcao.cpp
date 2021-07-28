@@ -1034,7 +1034,7 @@ ofs_mpi.close();
 								{
 									for( int iw2=0; iw2!=GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw; ++iw2 )
 									{
-										ofs<<GlobalC::LOC.DM_R[is][LNNR.nlocstartg[iat1]+iv]<<"\t";
+										ofs<<GlobalC::LOC.DM_R[is][GlobalC::LNNR.nlocstartg[iat1]+iv]<<"\t";
 										++iv;
 									}
 									ofs<<endl;
