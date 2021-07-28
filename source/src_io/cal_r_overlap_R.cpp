@@ -54,12 +54,12 @@ void cal_r_overlap_R::init()
 	int Lmax=0;
 	
 	MOT.allocate(
-		ORB.get_ntype(),// number of atom types
-		ORB.get_lmax(),// max L used to calculate overlap
-		ORB.get_kmesh(), // kpoints, for integration in k space
-		ORB.get_Rmax(),// max value of radial table
-		ORB.get_dR(),// delta R, for making radial table
-		ORB.get_dk()); // delta k, for integration in k space
+		GlobalC::ORB.get_ntype(),// number of atom types
+		GlobalC::ORB.get_lmax(),// max L used to calculate overlap
+		GlobalC::ORB.get_kmesh(), // kpoints, for integration in k space
+		GlobalC::ORB.get_Rmax(),// max value of radial table
+		GlobalC::ORB.get_dR(),// delta R, for making radial table
+		GlobalC::ORB.get_dk()); // delta k, for integration in k space
 		
 	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax);
 
@@ -69,10 +69,10 @@ void cal_r_overlap_R::init()
 	MGT.init_Gaunt( Lmax );	
 
 	int T = 0;  // atom type
-	int mat_Nr = ORB.Phi[0].PhiLN(0,0).getNr();
+	int mat_Nr = GlobalC::ORB.Phi[0].PhiLN(0,0).getNr();
 	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-		int count_Nr = ORB.Phi[it].PhiLN(0,0).getNr();
+		int count_Nr = GlobalC::ORB.Phi[it].PhiLN(0,0).getNr();
 		if(count_Nr > mat_Nr) 
 		{
 			mat_Nr = count_Nr;
@@ -80,26 +80,26 @@ void cal_r_overlap_R::init()
 		}
 	}
 
-//	int new_kmesh = ORB.Phi[T].PhiLN(0,0).getNk() * 4;
+//	int new_kmesh = GlobalC::ORB.Phi[T].PhiLN(0,0).getNk() * 4;
 //  if(new_kmesh%2 == 0) new_kmesh++;
 
-	int new_kmesh = ORB.Phi[T].PhiLN(0,0).getNk();
+	int new_kmesh = GlobalC::ORB.Phi[T].PhiLN(0,0).getNk();
 //	cout << "new_kmesh = " << new_kmesh << endl;
 
 
 	orb_r.set_orbital_info(
-	ORB.Phi[T].PhiLN(0,0).getLabel(),  //atom label
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getLabel(),  //atom label
 	T,    //atom type
 	1,    //angular momentum L
 	1,    //number of orbitals of this L , just N
-	ORB.Phi[T].PhiLN(0,0).getNr(),  //number of radial mesh
-	ORB.Phi[T].PhiLN(0,0).getRab(), //the mesh interval in radial mesh 
-	ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial mesh value(a.u.)
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getNr(),  //number of radial mesh
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getRab(), //the mesh interval in radial mesh 
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial mesh value(a.u.)
 	Numerical_Orbital_Lm::Psi_Type::Psi,
-	ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial wave function
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial wave function
 	new_kmesh,
-	ORB.Phi[T].PhiLN(0,0).getDk(),
-	ORB.Phi[T].PhiLN(0,0).getDruniform(),
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getDk(),
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getDruniform(),
 	false,
 	true, GlobalV::FORCE);
 
@@ -107,31 +107,31 @@ void cal_r_overlap_R::init()
 	orbital_phi.resize(GlobalC::ucell.ntype);
 	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-		orbital_phi[it].resize(ORB.Phi[it].getLmax()+1);
-		for(int iL = 0; iL <= ORB.Phi[it].getLmax(); iL++)
+		orbital_phi[it].resize(GlobalC::ORB.Phi[it].getLmax()+1);
+		for(int iL = 0; iL <= GlobalC::ORB.Phi[it].getLmax(); iL++)
 		{	
-			orbital_phi[it][iL].resize(ORB.Phi[it].getNchi(iL));
-			for(int iN = 0; iN < ORB.Phi[it].getNchi(iL); iN++)
+			orbital_phi[it][iL].resize(GlobalC::ORB.Phi[it].getNchi(iL));
+			for(int iN = 0; iN < GlobalC::ORB.Phi[it].getNchi(iL); iN++)
 			{
 				orbital_phi[it][iL][iN].set_orbital_info(
-					ORB.Phi[it].PhiLN(iL,iN).getLabel(),  //atom label
-					ORB.Phi[it].PhiLN(iL,iN).getType(),    //atom type
-					ORB.Phi[it].PhiLN(iL,iN).getL(),    //angular momentum L
-					ORB.Phi[it].PhiLN(iL,iN).getChi(),    //number of orbitals of this L , just N
-					ORB.Phi[it].PhiLN(iL,iN).getNr(),  //number of radial mesh
-					ORB.Phi[it].PhiLN(iL,iN).getRab(), //the mesh interval in radial mesh 
-					ORB.Phi[it].PhiLN(iL,iN).getRadial(),  // radial mesh value(a.u.)
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getLabel(),  //atom label
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getType(),    //atom type
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getL(),    //angular momentum L
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getChi(),    //number of orbitals of this L , just N
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getNr(),  //number of radial mesh
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getRab(), //the mesh interval in radial mesh 
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getRadial(),  // radial mesh value(a.u.)
 					Numerical_Orbital_Lm::Psi_Type::Psi,
-					ORB.Phi[it].PhiLN(iL,iN).getPsi(),  // radial wave function
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getPsi(),  // radial wave function
 					new_kmesh,
-					ORB.Phi[it].PhiLN(iL,iN).getDk(),
-					ORB.Phi[it].PhiLN(iL,iN).getDruniform(),
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDk(),
+					GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDruniform(),
 					false,
 					true);
 					
-				//cout << "getDk:   " << ORB.Phi[it].PhiLN(iL,iN).getDk() << endl;
-				//cout << "getDruniform:   " << ORB.Phi[it].PhiLN(iL,iN).getDruniform() << endl; 
-				//cout << "getNk:   " << ORB.Phi[it].PhiLN(iL,iN).getNk() << endl; 
+				//cout << "getDk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDk() << endl;
+				//cout << "getDruniform:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getDruniform() << endl; 
+				//cout << "getNk:   " << GlobalC::ORB.Phi[it].PhiLN(iL,iN).getNk() << endl; 
 			} 
 		}
 	}
@@ -142,13 +142,13 @@ void cal_r_overlap_R::init()
 	{
 		for (int TB = 0;  TB < GlobalC::ucell.ntype; TB++)
 		{
-			for (int LA=0; LA <= ORB.Phi[TA].getLmax() ; LA++)
+			for (int LA=0; LA <= GlobalC::ORB.Phi[TA].getLmax() ; LA++)
 			{
-				for (int NA = 0; NA < ORB.Phi[TA].getNchi(LA); ++NA)
+				for (int NA = 0; NA < GlobalC::ORB.Phi[TA].getNchi(LA); ++NA)
 				{
-					for (int LB = 0; LB <= ORB.Phi[TB].getLmax(); ++LB)
+					for (int LB = 0; LB <= GlobalC::ORB.Phi[TB].getLmax(); ++LB)
 					{
-						for (int NB = 0; NB < ORB.Phi[TB].getNchi(LB); ++NB)
+						for (int NB = 0; NB < GlobalC::ORB.Phi[TB].getNchi(LB); ++NB)
 						{
 							//center2_orb11[TA][TB][LA][NA][LB].insert( 
 							//	make_pair(NB, Center2_Orb::Orb11(
@@ -158,8 +158,8 @@ void cal_r_overlap_R::init()
 
 							 center2_orb11[TA][TB][LA][NA][LB].insert( 
 							 	make_pair(NB, Center2_Orb::Orb11(
-							 		ORB.Phi[TA].PhiLN(LA,NA),								
-							 		ORB.Phi[TB].PhiLN(LB,NB),
+							 		GlobalC::ORB.Phi[TA].PhiLN(LA,NA),								
+							 		GlobalC::ORB.Phi[TB].PhiLN(LB,NB),
 							 		MOT, MGT)));
 						}
 					}
@@ -172,13 +172,13 @@ void cal_r_overlap_R::init()
 	{
 		for (int TB = 0;  TB < GlobalC::ucell.ntype; TB++)
 		{
-			for (int LA=0; LA <= ORB.Phi[TA].getLmax() ; LA++)
+			for (int LA=0; LA <= GlobalC::ORB.Phi[TA].getLmax() ; LA++)
 			{
-				for (int NA = 0; NA < ORB.Phi[TA].getNchi(LA); ++NA)
+				for (int NA = 0; NA < GlobalC::ORB.Phi[TA].getNchi(LA); ++NA)
 				{
-					for (int LB = 0; LB <= ORB.Phi[TB].getLmax(); ++LB)
+					for (int LB = 0; LB <= GlobalC::ORB.Phi[TB].getLmax(); ++LB)
 					{
-						for (int NB = 0; NB < ORB.Phi[TB].getNchi(LB); ++NB)
+						for (int NB = 0; NB < GlobalC::ORB.Phi[TB].getNchi(LB); ++NB)
 						{
 							//center2_orb21_r[TA][TB][LA][NA][LB].insert( 
 							//	make_pair(NB, Center2_Orb::Orb21(
@@ -189,9 +189,9 @@ void cal_r_overlap_R::init()
 
 							 center2_orb21_r[TA][TB][LA][NA][LB].insert( 
 							 	make_pair(NB, Center2_Orb::Orb21(
-							 		ORB.Phi[TA].PhiLN(LA,NA),	
+							 		GlobalC::ORB.Phi[TA].PhiLN(LA,NA),	
 							 		orb_r,									
-							 		ORB.Phi[TB].PhiLN(LB,NB),
+							 		GlobalC::ORB.Phi[TB].PhiLN(LB,NB),
 							 		MOT, MGT)));
 						}
 					}

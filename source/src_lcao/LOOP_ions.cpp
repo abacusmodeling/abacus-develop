@@ -170,7 +170,7 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (INPUT.out_descriptor)
         {
-            ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), GlobalC::ucell.nat* ORB.Alpha[0].getTotal_nchi());
+            ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat* GlobalC::ORB.Alpha[0].getTotal_nchi());
             ld.build_S_descriptor(0);  //derivation not needed yet
             ld.cal_projected_DM();
             ld.cal_descriptor();
@@ -463,8 +463,8 @@ void LOOP_ions::final_scf(void)
     GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
-		ORB.get_rcutmax_Phi(),
-		ORB.get_rcutmax_Beta(),
+		GlobalC::ORB.get_rcutmax_Phi(),
+		GlobalC::ORB.get_rcutmax_Beta(),
 		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(

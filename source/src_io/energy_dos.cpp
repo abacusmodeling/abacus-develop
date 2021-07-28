@@ -333,8 +333,8 @@ void energy::perform_dos(void)
 				GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 					GlobalV::ofs_running,
 					GlobalV::OUT_LEVEL,
-					ORB.get_rcutmax_Phi(), 
-					ORB.get_rcutmax_Beta(), 
+					GlobalC::ORB.get_rcutmax_Phi(), 
+					GlobalC::ORB.get_rcutmax_Beta(), 
 					GlobalV::GAMMA_ONLY_LOCAL);
 
 				atom_arrange::search(
@@ -349,7 +349,7 @@ void energy::perform_dos(void)
 				GlobalC::LOWF.orb_con.set_orb_tables(
 						GlobalV::ofs_running,
 						GlobalC::UOT, 
-						ORB,
+						GlobalC::ORB,
 						GlobalC::ucell.ntype,
 						GlobalC::ucell.lmax,
 						INPUT.lcao_ecut,
@@ -450,7 +450,7 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, ORB, INPUT.out_descriptor);
+				GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

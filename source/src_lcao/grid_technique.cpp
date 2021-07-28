@@ -358,7 +358,7 @@ void Grid_Technique::cal_trace_beta(void)
 	delete[] trace_beta;
 
 	// mohan modify 2021-04-06
-	//int nkb=ORB.nkb;
+	//int nkb=GlobalC::ORB.nkb;
 	int nkb=GlobalC::ppcell.nkb;
 
 	this->trace_beta = new int[nkb];

@@ -204,7 +204,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_charge(const double*const*const
 						if(na_grid==0) continue;
 
 						// it's a uniform grid to save orbital values, so the delta_r is a constant.
-						const double delta_r = ORB.dr_uniform;						
+						const double delta_r = GlobalC::ORB.dr_uniform;						
 						
 						// here vindex refers to local potentials
 						int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	

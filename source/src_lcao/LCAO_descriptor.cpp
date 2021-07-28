@@ -122,7 +122,7 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
 	this->des_per_atom=0; // mohan add 2021-04-21
     for (int l = 0; l <= this->lmaxd; l++)
     {
-        this->des_per_atom += ORB.Alpha[0].getNchi(l) * (2 * l + 1);
+        this->des_per_atom += GlobalC::ORB.Alpha[0].getNchi(l) * (2 * l + 1);
     }
     this->n_descriptor = GlobalC::ucell.nat * this->des_per_atom;
 
@@ -166,7 +166,7 @@ void LCAO_Descriptor::init_index(void)
             //alpha
             for (int l = 0; l < this->lmaxd + 1; l++)
             {
-                for (int n = 0; n < ORB.Alpha[0].getNchi(l); n++)
+                for (int n = 0; n < GlobalC::ORB.Alpha[0].getNchi(l); n++)
                 {
                     for (int m = 0; m < 2 * l + 1; m++)
                     {
@@ -181,7 +181,7 @@ void LCAO_Descriptor::init_index(void)
         }//end ia
     }//end it
     assert(this->n_descriptor == alpha);
-    assert(GlobalC::ucell.nat * ORB.Alpha[0].getTotal_nchi() == inl);
+    assert(GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi() == inl);
     GlobalV::ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
     GlobalV::ofs_running << "total_descriptors " << this->n_descriptor << endl;
 	
@@ -215,7 +215,7 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                 tau2 = GlobalC::GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * GlobalC::ucell.lat0;
-                double rcut = ORB.Phi[T1].getRcut() + ORB.Alpha[0].getRcut(); //Rcut is subject to ORB.Phi to keep dimension of S_mu_alpha same as Sloc
+                double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Alpha[0].getRcut(); //Rcut is subject to GlobalC::ORB.Phi to keep dimension of S_mu_alpha same as Sloc
                 if (distance < rcut)
                 {
                     int iw1_all = GlobalC::ucell.itiaiw2iwt(T1, I1, 0); //iw1_all = combined index (it, ia, iw)
@@ -227,9 +227,9 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                         const int N1 = atom1->iw2n[jj0];
                         const int m1 = atom1->iw2m[jj0];
 
-                        for (int L2 = 0; L2 <= ORB.Alpha[0].getLmax(); ++L2)
+                        for (int L2 = 0; L2 <= GlobalC::ORB.Alpha[0].getLmax(); ++L2)
                         {
-                            for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); ++N2)
+                            for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); ++N2)
                             {
                                 for (int m2 = 0; m2 < 2 * L2 + 1; ++m2)
                                 {
@@ -390,7 +390,7 @@ void LCAO_Descriptor::cal_descriptor(void)
         ofs.open(ss.str().c_str());
     }
     //==========print preparation=============
-    const int lmax = ORB.get_lmax_d();
+    const int lmax = GlobalC::ORB.get_lmax_d();
     int id = 0;
     for (int it = 0; it < GlobalC::ucell.ntype; it++)
     {
@@ -402,7 +402,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 
             for (int l = 0; l <= lmax; l++)
             {
-                int nmax = ORB.Alpha[0].getNchi(l);
+                int nmax = GlobalC::ORB.Alpha[0].getNchi(l);
                 for (int n = 0; n < nmax; n++)
                 {
                     const int dim = 2 * l + 1;

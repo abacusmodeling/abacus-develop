@@ -63,20 +63,20 @@ inline int find_offset(const int size, const int grid_index,
 				for(int kk=0; kk<bz; kk++)
 				{
 					//const int kkk = kbz + kk;
-					if(distance[bindex][ia1] < ORB.Phi[T1].getRcut() )
+					if(distance[bindex][ia1] < GlobalC::ORB.Phi[T1].getRcut() )
 					{
 						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
 //									<< " ncxyz (" << (kkk-	.nczp_start) + jjj*	.nczp + iii*	.ncy*	.nczp 
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 //						<< " nbxyz (" << i << " " << j << " " << k << ") "
 						<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
-						<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - ORB.Phi[T1].getRcut()
+						<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
 						<< endl;
 					}
 					else
 					{
 						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-						<< " rcut=" << ORB.Phi[T1].getRcut() << endl;
+						<< " rcut=" << GlobalC::ORB.Phi[T1].getRcut() << endl;
 					}
 					++bindex;
 				}
@@ -95,7 +95,7 @@ inline int find_offset(const int size, const int grid_index,
 				for(int kk=0; kk<bz; kk++)
 				{
 					//const int kkk = kbz + kk;
-					if(distance[bindex][ia2] < ORB.Phi[T2].getRcut() )//mohan T1->T2
+					if(distance[bindex][ia2] < GlobalC::ORB.Phi[T2].getRcut() )//mohan T1->T2
 					{
 						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 
 //									<< " ncxyz (" << (kkk-	.nczp_start) + jjj*GlobalC::pw.nczp + iii*	.ncy*GlobalC::pw.nczp 
@@ -107,7 +107,7 @@ inline int find_offset(const int size, const int grid_index,
 					else
 					{
 						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-						<< " rcut=" << ORB.Phi[T2].getRcut() << endl;
+						<< " rcut=" << GlobalC::ORB.Phi[T2].getRcut() << endl;
 					}
 					++bindex;
 				}
@@ -173,7 +173,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			dr[2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
 
 			distance[ib][id]=std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
-			if(distance[ib][id] > (ORB.Phi[it].getRcut()- 1.0e-15)) 
+			if(distance[ib][id] > (GlobalC::ORB.Phi[it].getRcut()- 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
 				ZEROS(p, block_size[id]);
@@ -212,7 +212,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			{
 				if ( atom->iw2_new[iw] )
 				{
-					pointer=&ORB.Phi[it].PhiLN(
+					pointer=&GlobalC::ORB.Phi[it].PhiLN(
 							atom->iw2l[iw],
 							atom->iw2n[iw]);
 					phi=c1*pointer->psi_uniform[ip]+c2*pointer->dpsi_uniform[ip]
@@ -352,7 +352,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	timer::tick("Gint_k","vlocal");
 
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
-	double delta_r = ORB.dr_uniform;
+	double delta_r = GlobalC::ORB.dr_uniform;
 	// possible max atom number in real space grid. 
 	const int max_size = GridT.max_atom;
 	// how many meshcells in bigcell.
@@ -638,20 +638,20 @@ void Gint_k::evaluate_pvpR_reduced(
 								//const int iii = i*gt.bx + ii;
 								//const int jjj = j*gt.by + jj;
 								//const int kkk = k*gt.bz + kk;
-								if(distance[bindex][ia1] < ORB.Phi[T1].getRcut() )
+								if(distance[bindex][ia1] < GlobalC::ORB.Phi[T1].getRcut() )
 								{
 									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
 //									<< " ncxyz (" << (kkk-gt.nczp_start) + jjj*gt.nczp + iii*gt.ncy*gt.nczp 
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 									<< " nbxyz (" << i << " " << j << " " << k << ") "
 									<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
-									<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - ORB.Phi[T1].getRcut()
+									<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
 									<< endl;
 								}
 								else
 								{
 									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-									<< " rcut=" << ORB.Phi[T1].getRcut() << endl;
+									<< " rcut=" << GlobalC::ORB.Phi[T1].getRcut() << endl;
 								}
 								++bindex;
 							}
@@ -671,7 +671,7 @@ void Gint_k::evaluate_pvpR_reduced(
 								//const int iii = i*gt.bx + ii;
 								//const int jjj = j*gt.by + jj;
 								//const int kkk = k*gt.bz + kk;
-								if(distance[bindex][ia2] < ORB.Phi[T2].getRcut() )//mohan T1->T2
+								if(distance[bindex][ia2] < GlobalC::ORB.Phi[T2].getRcut() )//mohan T1->T2
 								{
 									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 
 //									<< " ncxyz (" << (kkk-gt.nczp_start) + jjj*GlobalC::pw.nczp + iii*gt.ncy*GlobalC::pw.nczp 
@@ -683,7 +683,7 @@ void Gint_k::evaluate_pvpR_reduced(
 								else
 								{
 									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-									<< " rcut=" << ORB.Phi[T2].getRcut() << endl;
+									<< " rcut=" << GlobalC::ORB.Phi[T2].getRcut() << endl;
 								}
 								++bindex;
 							}

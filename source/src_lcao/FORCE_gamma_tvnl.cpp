@@ -86,7 +86,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
         //find ajacent atom of atom ia
         //GlobalC::GridD.Find_atom( GlobalC::ucell.atoms[it].tau[ia] );
 		GlobalC::GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[it].tau[ia] ,it, ia);
-		const double Rcut_Beta = ORB.Beta[it].get_rcut_max();
+		const double Rcut_Beta = GlobalC::ORB.Beta[it].get_rcut_max();
 
         //FOLLOWING ARE CONTRIBUTIONS FROM
         //VNL DUE TO PROJECTOR'S DISPLACEMENT
@@ -97,7 +97,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
             const int I1 = GlobalC::GridD.getNatom (ad1);
             const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
 			const Vector3<double> tau1 = GlobalC::GridD.getAdjacentTau (ad1);
-			const double Rcut_AO1 = ORB.Phi[T1].getRcut();
+			const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
 
             for (int ad2 =0 ; ad2 < GlobalC::GridD.getAdjacentNum()+1; ad2++)
             {
@@ -106,7 +106,7 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                 const int I2 = GlobalC::GridD.getNatom (ad2);
                 const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
                 const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
-                const double Rcut_AO2 = ORB.Phi[T2].getRcut();
+                const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
 
                 const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
                 const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;
@@ -329,9 +329,9 @@ void Force_LCAO_gamma::cal_fvnl_dbeta(
                 const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
                 const Vector3<double> tau2 = GlobalC::GridD.getAdjacentTau (ad2);
 
-                const double Rcut_Beta = ORB.Beta[it].get_rcut_max();
-                const double Rcut_AO1 = ORB.Phi[T1].getRcut();
-                const double Rcut_AO2 = ORB.Phi[T2].getRcut();
+                const double Rcut_Beta = GlobalC::ORB.Beta[it].get_rcut_max();
+                const double Rcut_AO1 = GlobalC::ORB.Phi[T1].getRcut();
+                const double Rcut_AO2 = GlobalC::ORB.Phi[T2].getRcut();
 
                 const double dist1 = (tau1-tau0).norm() * GlobalC::ucell.lat0;
                 const double dist2 = (tau2-tau0).norm() * GlobalC::ucell.lat0;

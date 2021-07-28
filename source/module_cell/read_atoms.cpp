@@ -50,7 +50,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 	{
 		if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
 		{
-			ORB.read_in_flag = true;
+			GlobalC::ORB.read_in_flag = true;
 			for(int i=0; i<ntype; i++)
 			{
 				string ofile;
@@ -68,13 +68,13 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 				//-----------------------------------
 				//READ_VALUE(ifa, nfile);
 				
-				ORB.orbital_file.push_back(ofile);
+				GlobalC::ORB.orbital_file.push_back(ofile);
 
 				//-----------------------------------
 				// Turn off the read in NONLOCAL file
 				// function since 2013-08-02 by mohan
 				//-----------------------------------
-				//ORB.nonlocal_file.push_back(nfile);
+				//GlobalC::ORB.nonlocal_file.push_back(nfile);
 
 //				GlobalV::ofs_running << " For atom type " << i + 1 << endl;
 //			    GlobalV::ofs_running << " Read in numerical orbitals from file " << ofile << endl;
@@ -84,7 +84,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 		}	
 		// caoyu add 2021-03-16
 		if (SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
-			ifa >> ORB.descriptor_file;
+			ifa >> GlobalC::ORB.descriptor_file;
 		}
 	}
 
@@ -451,13 +451,13 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 #ifdef __LCAO
 			if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{    
-				ifstream ifs(ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
+				ifstream ifs(GlobalC::ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
 
 				// mohan add return 2021-04-26
 				if (!ifs)
 				{
 					cout << " Element index " << it+1 << endl;
-					cout << " orbital file: " << ORB.orbital_file[it] << endl;
+					cout << " orbital file: " << GlobalC::ORB.orbital_file[it] << endl;
 					WARNING("read_atom_positions","ABACUS Cannot find the ORBITAL file (basis sets)");
 					return 0; // means something wrong
 				}
@@ -818,9 +818,9 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 			// Turn off the read in NONLOCAL file
 			// function since 2013-08-02 by mohan
 			//-----------------------------------
-//			ofs << ORB.orbital_file[it] << " " << ORB.nonlocal_file[it] << " #local_orbital; non-local projector" << endl;
+//			ofs << GlobalC::ORB.orbital_file[it] << " " << GlobalC::ORB.nonlocal_file[it] << " #local_orbital; non-local projector" << endl;
 			//modified by zhengdy 2015-07-24
-                        ofs << ORB.orbital_file[it] << endl;
+                        ofs << GlobalC::ORB.orbital_file[it] << endl;
 		}
 	}
 #endif

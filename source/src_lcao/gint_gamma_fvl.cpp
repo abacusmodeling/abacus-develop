@@ -71,7 +71,7 @@ inline void cal_psir_ylm_dphi(
 			// distance between atom and grid
             double distance = std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
 
-            if(distance > ORB.Phi[it].getRcut())
+            if(distance > GlobalC::ORB.Phi[it].getRcut())
             {
                 ZEROS(p_psir_ylm, block_size[id]);
                 ZEROS(p_dphix, block_size[id]);
@@ -153,7 +153,7 @@ inline void cal_psir_ylm_dphi(
                 // function from interpolation method.
                 if ( atom->iw2_new[iw] )
                 {
-                    const Numerical_Orbital_Lm &philn = ORB.Phi[it].PhiLN(
+                    const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(
                             atom->iw2l[iw],
                             atom->iw2n[iw]);
 
@@ -209,7 +209,7 @@ inline void cal_psir_ylm_dphi(
                     // and the derivative.
                     else
                     {
-                        const Numerical_Orbital_Lm &philn = ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
+                        const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
 
                         double Zty = philn.zty;
                         p_psir_ylm[iw] = Zty * rly[idx_lm];
@@ -513,7 +513,7 @@ void Gint_Gamma::gamma_force(const double*const vlocal) const
     //OUT(GlobalV::ofs_running,"DGridV was allocated");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
-    const double delta_r = ORB.dr_uniform;
+    const double delta_r = GlobalC::ORB.dr_uniform;
 
     int LD_pool=max_size*GlobalC::ucell.nwmax;
     double* dphi_pool;

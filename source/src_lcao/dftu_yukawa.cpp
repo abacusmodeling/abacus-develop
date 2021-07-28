@@ -68,22 +68,22 @@ void DFTU_Yukawa::cal_slater_Fk(const int L, const int T)
 		for(int chi=0; chi<GlobalC::ucell.atoms[T].l_nchi[L]; chi++)
 		{
 		 //	if(chi!=0) continue;
-			const int mesh = ORB.Phi[T].PhiLN(L,chi).getNr();
+			const int mesh = GlobalC::ORB.Phi[T].PhiLN(L,chi).getNr();
 	
 			for(int k=0; k<=L; k++)
 			{			
 				for(int ir0=1; ir0<mesh; ir0++)
 				{
-					double r0 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
-					const double rab0 = ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
-					const double R_L0 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
+					double r0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
+					const double rab0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
+					const double R_L0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
 	
 					for(int ir1=1; ir1<mesh; ir1++) 
 					{
 						double bslval, hnkval;
-						double r1 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
-						const double rab1 = ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
-						const double R_L1 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
+						double r1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
+						const double rab1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
+						const double R_L1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
 						
 						int l = 2*k;
 						if(ir0<ir1)  //less than
@@ -282,22 +282,22 @@ void DFTU::cal_unscreened_slater_Fk(const int L, const int T)
 
 	for(int chi=0; chi<GlobalC::ucell.atoms[T].l_nchi[L]; chi++)
 	{
-		const int mesh = ORB.Phi[T].PhiLN(L,chi).getNr();
+		const int mesh = GlobalC::ORB.Phi[T].PhiLN(L,chi).getNr();
 
 		for(int k=0; k<=L; k++)
 		{			
 			for(int ir0=1; ir0<mesh; ir0++)
 			{
-				double r0 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
-				const double rab0 = ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
-				const double R_L0 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
+				double r0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir0);
+				const double rab0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir0);
+				const double R_L0 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir0);
 
 				for(int ir1=1; ir1<mesh; ir1++) 
 				{
 					double numerator, denominator;
-					double r1 = ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
-					const double rab1 = ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
-					const double R_L1 = ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
+					double r1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRadial(ir1);
+					const double rab1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getRab(ir1);
+					const double R_L1 = GlobalC::ORB.Phi[T].PhiLN(L,chi).getPsi(ir1);		
 					
 					int l = 2*k;
 					if(ir0<ir1)  //less than

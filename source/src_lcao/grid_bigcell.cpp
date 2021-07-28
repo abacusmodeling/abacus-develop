@@ -111,7 +111,7 @@ void Grid_BigCell::init_grid_expansion(void)
 	// then we will use this parameter to generate grid expansion.
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
-		this->orbital_rmax = std::max( ORB.Phi[T].getRcut(), this->orbital_rmax);
+		this->orbital_rmax = std::max( GlobalC::ORB.Phi[T].getRcut(), this->orbital_rmax);
 	}
 	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"rmax of periodic grid (bohr)",orbital_rmax);
 

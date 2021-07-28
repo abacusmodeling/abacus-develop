@@ -680,10 +680,10 @@ void Exx_Lip::read_q_pack()
 
 	q_pack->wf_ptr = new wavefunc();
 	q_pack->wf_ptr->allocate(q_pack->kv_ptr->nks); // mohan update 2021-02-25
-//	q_pack->wf_ptr->init(q_pack->kv_ptr->nks,q_pack->kv_ptr,ucell_ptr,pw_ptr,&ppcell,&ORB,&hm,&Pkpoints);
+//	q_pack->wf_ptr->init(q_pack->kv_ptr->nks,q_pack->kv_ptr,ucell_ptr,pw_ptr,&ppcell,&GlobalC::ORB,&hm,&Pkpoints);
 	q_pack->wf_ptr->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
 //	q_pack->wf_ptr->table_local.create(q_pack->wf_ptr->ucell_ptr->ntype, q_pack->wf_ptr->ucell_ptr->nmax_total, GlobalV::NQX);
-	Wavefunc_in_pw::make_table_q(ORB.orbital_file, q_pack->wf_ptr->table_local);
+	Wavefunc_in_pw::make_table_q(GlobalC::ORB.orbital_file, q_pack->wf_ptr->table_local);
 //	Wavefunc_in_pw::make_table_q(q_pack->wf_ptr->ORB_ptr->orbital_file, q_pack->wf_ptr->table_local, q_pack->wf_ptr);
 	for(int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 	{

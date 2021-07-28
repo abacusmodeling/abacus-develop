@@ -22,7 +22,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
     TITLE("Grid_Integral","gamma_charge");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
-    const double delta_r = ORB.dr_uniform;
+    const double delta_r = GlobalC::ORB.dr_uniform;
 	const Numerical_Orbital_Lm* pointer;
 
 	// allocate 1
@@ -123,7 +123,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 						+ dr[ib][id][1]*dr[ib][id][1] 
 						+ dr[ib][id][2]*dr[ib][id][2]);
 
-						if(distance[ib][id] <= ORB.Phi[it].getRcut()) 
+						if(distance[ib][id] <= GlobalC::ORB.Phi[it].getRcut()) 
 						{
 							cal_flag[ib][id]=true;
 						}
@@ -182,7 +182,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 						{
 							if ( atom1->iw2_new[iw] )
 							{
-								pointer = &ORB.Phi[it].PhiLN(
+								pointer = &GlobalC::ORB.Phi[it].PhiLN(
 										atom1->iw2l[iw],
 										atom1->iw2n[iw]);
 								phi = c1*pointer->psi_uniform[ip]+c2*pointer->dpsi_uniform[ip]

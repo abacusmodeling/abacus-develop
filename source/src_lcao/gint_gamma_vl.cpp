@@ -323,7 +323,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 		//OUT(GlobalV::ofs_running, "start calculate gamma_vlocal");
 
 		// it's a uniform grid to save orbital values, so the delta_r is a constant.
-		const double delta_r=ORB.dr_uniform;
+		const double delta_r=GlobalC::ORB.dr_uniform;
 
 		const int nbx=GridT.nbx;
 		const int nby=GridT.nby;

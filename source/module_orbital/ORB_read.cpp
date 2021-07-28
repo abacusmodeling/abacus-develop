@@ -12,7 +12,10 @@ using namespace std;
 //==============================
 /// PLEASE avoid using 'ORB' as global variable 
 // mohan note 2021-03-23
+namespace GlobalC
+{
 LCAO_Orbitals ORB;
+}
 
 LCAO_Orbitals::LCAO_Orbitals()
 {

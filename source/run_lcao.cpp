@@ -28,8 +28,8 @@ void Run_lcao::lcao_line(void)
 		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 			GlobalV::ofs_running,
 			GlobalV::OUT_LEVEL,
-			ORB.get_rcutmax_Phi(), 
-			ORB.get_rcutmax_Beta(), 
+			GlobalC::ORB.get_rcutmax_Phi(), 
+			GlobalC::ORB.get_rcutmax_Beta(), 
 			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
@@ -80,7 +80,7 @@ void Run_lcao::lcao_line(void)
 	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
 		GlobalC::UOT, 
-		ORB,
+		GlobalC::ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,

@@ -83,7 +83,7 @@ inline void cal_psir_ylm(
 			dr[2]=GridT.meshcell_pos[ib][2] + mt[2]; 	
 
 			distance=std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);
-			if(distance > (ORB.Phi[it].getRcut() - 1.0e-15)) 
+			if(distance > (GlobalC::ORB.Phi[it].getRcut() - 1.0e-15)) 
 			{
 				cal_flag[ib][id]=false;
 				ZEROS(p, block_size[id]);
@@ -122,7 +122,7 @@ inline void cal_psir_ylm(
 			{
 				if ( atom->iw2_new[iw] )
 				{
-					pointer=&ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
+					pointer=&GlobalC::ORB.Phi[it].PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
 					phi=c1*pointer->psi_uniform[ip]+c2*pointer->dpsi_uniform[ip]
 						+ c3*pointer->psi_uniform[ip+1] + c4*pointer->dpsi_uniform[ip+1];
 				}
@@ -395,7 +395,7 @@ void Gint_k::cal_rho_k(void)
 	TITLE("Gint_k","cal_rho_k");
 	timer::tick("Gint_k","cal_rho_k");
 
-	const double delta_r = ORB.dr_uniform;
+	const double delta_r = GlobalC::ORB.dr_uniform;
 	// it is an uniform grid to save orbital values, so the delta_r is a constant.
 	const int max_size = GridT.max_atom;
 	

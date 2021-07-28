@@ -365,26 +365,26 @@ void Exx_Lcao::init()
 		};
 		if(false)
 		{
-			for( int T=0; T!=ORB.get_ntype(); ++T )
+			for( int T=0; T!=GlobalC::ORB.get_ntype(); ++T )
 			{
-				for( int L=0; L<=ORB.Phi[T].getLmax(); ++L )
+				for( int L=0; L<=GlobalC::ORB.Phi[T].getLmax(); ++L )
 				{
-					for( int N=0; N!=ORB.Phi[T].getNchi(L); ++N )
+					for( int N=0; N!=GlobalC::ORB.Phi[T].getNchi(L); ++N )
 					{
-						pr_orb_all( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), ORB.Phi[T].PhiLN(L,N) );
+						pr_orb_all( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N) );
 					}
 				}
 			}
 		}
 		else
 		{
-			for( int T=0; T!=ORB.get_ntype(); ++T )
+			for( int T=0; T!=GlobalC::ORB.get_ntype(); ++T )
 			{
-				for( int L=0; L<=ORB.Phi[T].getLmax(); ++L )
+				for( int L=0; L<=GlobalC::ORB.Phi[T].getLmax(); ++L )
 				{
-					for( int N=0; N!=ORB.Phi[T].getNchi(L); ++N )
+					for( int N=0; N!=GlobalC::ORB.Phi[T].getNchi(L); ++N )
 					{
-						pr_orb_all_kmesh( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), ORB.Phi[T].PhiLN(L,N), 5 );
+						pr_orb_all_kmesh( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N), 5 );
 					}
 				}
 			}
@@ -466,9 +466,9 @@ void Exx_Lcao::init()
 		}
 
 		cout<<"Rcut:"<<endl;
-		for( size_t T=0; T!=ORB.get_ntype(); ++T )
+		for( size_t T=0; T!=GlobalC::ORB.get_ntype(); ++T )
 		{
-			cout<<ORB.Phi[T].getRcut()<<endl;
+			cout<<GlobalC::ORB.Phi[T].getRcut()<<endl;
 		}
 		cout<<"tau:"<<endl;
 		for( size_t iat=0; iat!=GlobalC::ucell.nat; ++iat )
@@ -548,7 +548,7 @@ gettimeofday( &t_start_all, NULL);
 	}
 
 gettimeofday( &t_start, NULL);
-	this->lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
+	this->lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::change_orbs\t"<<time_during(t_start)<<endl;
 
 ofs_mpi<<info.files_abfs<<endl;
@@ -564,7 +564,7 @@ gettimeofday( &t_start, NULL);
 	}
 	else
 	{
-		this->abfs = Exx_Abfs::IO::construct_abfs( abfs_same_atom, ORB, info.files_abfs, this->kmesh_times );
+		this->abfs = Exx_Abfs::IO::construct_abfs( abfs_same_atom, GlobalC::ORB, info.files_abfs, this->kmesh_times );
 	}
 //	this->abfs = Exx_Abfs::Construct_Orbs::orth_orbs( abfs_origin );		// Peize Lin test
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<endl;
@@ -695,7 +695,7 @@ ofs_mpi<<range_abfs<<endl;
 	{
 		Exx_Abfs::Matrix_Orbs11 mll;
 		mll.init(2,1,1);
-		mll.init_radial(ORB,ORB);
+		mll.init_radial(GlobalC::ORB, GlobalC::ORB);
 		mll.init_radial_table();
 		ofstream ofsS("S.dat");
 		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[0],index_lcaos,index_lcaos)<<endl<<endl;
@@ -765,7 +765,7 @@ ofs_mpi.close();
 
 	auto overlap_test = [&]()
 	{
-		const auto lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, 1 );
+		const auto lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
 		Exx_Abfs::Matrix_Orbs11 m_lcaos_lcaos;
 		m_lcaos_lcaos.init(1,1,1);
 		m_lcaos_lcaos.init_radial(lcaos,lcaos);
@@ -1388,7 +1388,7 @@ gettimeofday( &t_start, NULL);
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 		const Vector3<double> &tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
 		const Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
-		const double Rcut = std::min( ORB.Phi[it1].getRcut()*info.ccp_rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*info.ccp_rmesh_times );
+		const double Rcut = std::min( GlobalC::ORB.Phi[it1].getRcut()*info.ccp_rmesh_times+GlobalC::ORB.Phi[it2].getRcut(), GlobalC::ORB.Phi[it1].getRcut()+GlobalC::ORB.Phi[it2].getRcut()*info.ccp_rmesh_times );
 
 		for( const Vector3<int> &box2 : Coulomb_potential_boxes )
 		{

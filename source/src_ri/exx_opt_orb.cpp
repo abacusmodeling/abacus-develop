@@ -23,7 +23,7 @@ ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::M
 	TITLE("Exx_Opt_Orb::generate_matrix");
 ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
+	const vector<vector<vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, GlobalC::exx_lcao.info.pca_threshold );
 

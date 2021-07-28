@@ -1639,7 +1639,7 @@ complex<double> toWannier90::gamma_only_cal(const int &ib_L, const int &ib_R, co
 void toWannier90::lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G)
 {
 	this->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
-	Wavefunc_in_pw::make_table_q(ORB.orbital_file, this->table_local);
+	Wavefunc_in_pw::make_table_q(GlobalC::ORB.orbital_file, this->table_local);
 	Wavefunc_in_pw::produce_local_basis_in_pw(ik, orbital_in_G, this->table_local);
 }
 

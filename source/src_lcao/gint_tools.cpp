@@ -127,7 +127,7 @@ namespace Gint_Tools
 					GridT.meshcell_pos[ib][2] + mt[2]};
 				const double distance = std::sqrt(dr[0]*dr[0] + dr[1]*dr[1] + dr[2]*dr[2]);	// distance between atom and grid
 
-				if(distance > (ORB.Phi[it].getRcut()-1.0e-15))
+				if(distance > (GlobalC::ORB.Phi[it].getRcut()-1.0e-15))
 					cal_flag[ib][id]=false;
 				else
 					cal_flag[ib][id]=true;
@@ -218,7 +218,7 @@ namespace Gint_Tools
 					{
 						if ( atom->iw2_new[iw] )
 						{
-							const Numerical_Orbital_Lm &philn = ORB.Phi[it].PhiLN(
+							const Numerical_Orbital_Lm &philn = GlobalC::ORB.Phi[it].PhiLN(
 									atom->iw2l[iw],
 									atom->iw2n[iw]);
 							phi = c1*philn.psi_uniform[ip] + c2*philn.dpsi_uniform[ip]			 // radial wave functions
@@ -226,7 +226,7 @@ namespace Gint_Tools
 						}
 						*p=phi * ylma[atom->iw2_ylm[iw]];
 					} // end iw
-				}// end distance<=(ORB.Phi[it].getRcut()-1.0e-15)
+				}// end distance<=(GlobalC::ORB.Phi[it].getRcut()-1.0e-15)
 			}// end ib
 		}// end id
 		return psir_ylm;

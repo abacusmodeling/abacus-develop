@@ -406,7 +406,7 @@ void LCAO_Hamilt::calculate_STN_R(void)
                 tau2 = GlobalC::GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * GlobalC::ucell.lat0;
-                double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+                double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
                 bool adj = false;
 
@@ -427,8 +427,8 @@ void LCAO_Hamilt::calculate_STN_R(void)
                         double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
                         double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-                        double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-                        double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+                        double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+                        double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
                         if( distance1 < rcut1 && distance2 < rcut2 )
                         {
@@ -532,7 +532,7 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                 tau2 = GlobalC::GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * GlobalC::ucell.lat0;
-                double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+                double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
                 bool adj = false;
 
@@ -553,8 +553,8 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                         double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
                         double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-                        double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-                        double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+                        double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+                        double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
                         if( distance1 < rcut1 && distance2 < rcut2 )
                         {

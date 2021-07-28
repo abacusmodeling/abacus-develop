@@ -205,7 +205,7 @@ void Gint_k::folding_force(
 						Atom* atom2 = &GlobalC::ucell.atoms[T2];
 						dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 						double distance = dtau.norm() * GlobalC::ucell.lat0;
-						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+						double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 						if(distance < rcut)
 						{
 							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
@@ -416,7 +416,7 @@ void Gint_k::folding_stress(
 						Atom* atom2 = &GlobalC::ucell.atoms[T2];
 						dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 						double distance = dtau.norm() * GlobalC::ucell.lat0;
-						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+						double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 						if(distance < rcut)
 						{
 							const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
@@ -687,7 +687,7 @@ void Gint_k::folding_vl_k(const int &ik)
 							Atom* atom2 = &GlobalC::ucell.atoms[T2];
 							dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 							double distance = dtau.norm() * GlobalC::ucell.lat0;
-							double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+							double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 							// for the local part, only need to calculate <phi_i | phi_j> within range
 							// mohan note 2012-07-06
@@ -935,7 +935,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 							Atom* atom2 = &GlobalC::ucell.atoms[T2];
 							dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 							double distance = dtau.norm() * GlobalC::ucell.lat0;
-							double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+							double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 							// for the local part, only need to calculate <phi_i | phi_j> within range
 							// mohan note 2012-07-06
@@ -1179,16 +1179,16 @@ void Gint_k::set_ijk_atom(
 			distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
 			+ dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
 
-			//if(distance[ib][id] <= ORB.Phi[it].getRcut())
+			//if(distance[ib][id] <= GlobalC::ORB.Phi[it].getRcut())
 			// mohan reset this 2012-06-27
-			// if(distance[ib][id] < ORB.Phi[it].getRcut() )
+			// if(distance[ib][id] < GlobalC::ORB.Phi[it].getRcut() )
 			// mohan reset this 2013-07-02 in Princeton
-			// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
+			// we should make absolutely sure that the distance is smaller than GlobalC::ORB.Phi[it].getRcut
 			// this should be consistant with LCAO_nnr::cal_nnrg function 
 			// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
 			// distance = 7.0000000000000000
-			// ORB.Phi[it].getRcut = 7.0000000000000008
-			if(distance[ib][id] < (ORB.Phi[it].getRcut() - 1.0e-15) )
+			// GlobalC::ORB.Phi[it].getRcut = 7.0000000000000008
+			if(distance[ib][id] < (GlobalC::ORB.Phi[it].getRcut() - 1.0e-15) )
 			{
 				cal_flag[ib][id]=true;
 			}
@@ -1230,7 +1230,7 @@ void Gint_k::set_ijk_atom(
 			{
 				if ( atom1->iw2_new[iw] )
 				{
-					pointer = &ORB.Phi[it].PhiLN(
+					pointer = &GlobalC::ORB.Phi[it].PhiLN(
 							atom1->iw2l[iw],
 							atom1->iw2n[iw]);
 
@@ -1494,7 +1494,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
                         Atom* atom2 = &GlobalC::ucell.atoms[T2];
                         dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
                         double distance = dtau.norm() * GlobalC::ucell.lat0;
-                        double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+                        double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
                         if(distance < rcut)
                         {
@@ -1885,7 +1885,7 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
                         Atom* atom2 = &GlobalC::ucell.atoms[T2];
                         dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
                         double distance = dtau.norm() * GlobalC::ucell.lat0;
-                        double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+                        double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
                         if(distance < rcut)
                         {

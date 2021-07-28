@@ -34,7 +34,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	ZEROS(pvdpy, nnrg);
 	ZEROS(pvdpz, nnrg); 
 
-    const double delta_r = ORB.dr_uniform;
+    const double delta_r = GlobalC::ORB.dr_uniform;
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
     const int max_size = GridT.max_atom;
     // how many meshcells in bigcell.
@@ -243,7 +243,7 @@ void Gint_k::svl_k_RealSpace(
 	ZEROS(pvdp23, nnrg);
 
 
-	const double delta_r = ORB.dr_uniform;
+	const double delta_r = GlobalC::ORB.dr_uniform;
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
 	const int max_size = GridT.max_atom;
 	// how many meshcells in bigcell.
@@ -1017,7 +1017,7 @@ void Gint_k::set_ijk_atom_force(
 			distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
 			+ dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
 
-			if(distance[ib][id] < ORB.Phi[it].getRcut())
+			if(distance[ib][id] < GlobalC::ORB.Phi[it].getRcut())
 			{
 				cal_flag[ib][id]=true;
 			}
@@ -1067,7 +1067,7 @@ void Gint_k::set_ijk_atom_force(
 			{
 				if ( atom->iw2_new[iw] )
 				{
-					pointer = &ORB.Phi[it].PhiLN(
+					pointer = &GlobalC::ORB.Phi[it].PhiLN(
 							atom->iw2l[iw],
 							atom->iw2n[iw]);
 
@@ -1110,7 +1110,7 @@ void Gint_k::set_ijk_atom_force(
 					}
 					else
 					{
-						pointer = &ORB.Phi[it].
+						pointer = &GlobalC::ORB.Phi[it].
 							PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
 
 						double Zty = pointer->zty;
