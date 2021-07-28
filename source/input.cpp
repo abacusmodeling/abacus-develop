@@ -60,44 +60,44 @@ void Input::Init(const string &fn)
 // OTHRE CLASS MEMBER FUNCTION :
 // NAME : Run::make_dir( dir name : OUT.suffix)
 //----------------------------------------------------------
-	Global_File::make_dir_out( this->suffix , this->calculation, MY_RANK, this->out_alllog); //xiaohui add 2013-09-01
+	Global_File::make_dir_out( this->suffix , this->calculation, GlobalV::MY_RANK, this->out_alllog); //xiaohui add 2013-09-01
 	Check();
 
 	time_t  time_now = time(NULL);
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
-	ofs_running << "                                                                                     " << endl;
-    ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl;
-    ofs_running << "                                                                                     " << endl;
-    ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << endl;
-	ofs_running << "                                                                                     " << endl;
+	GlobalV::ofs_running << "                                                                                     " << endl;
+	GlobalV::ofs_running << "                             WELCOME TO ABACUS                                       " << endl;
+	GlobalV::ofs_running << "                                                                                     " << endl;
+    GlobalV::ofs_running << "               'Atomic-orbital Based Ab-initio Computation at UStc'                  " << endl;
+    GlobalV::ofs_running << "                                                                                     " << endl;
+    GlobalV::ofs_running << "                     Website: http://abacus.ustc.edu.cn/                             " << endl;
+	GlobalV::ofs_running << "                                                                                     " << endl;
 
-	ofs_running << setiosflags(ios::right);
+	GlobalV::ofs_running << setiosflags(ios::right);
                                                                                                                              
 
 #ifdef __MPI
-	//ofs_running << "    Version: Parallel, under ALPHA test" << endl;
-    ofs_running << "    Version: Parallel, in development" << endl;
-	ofs_running << "    Processor Number is " << NPROC << endl;
+	//GlobalV::ofs_running << "    Version: Parallel, under ALPHA test" << endl;
+    GlobalV::ofs_running << "    Version: Parallel, in development" << endl;
+	GlobalV::ofs_running << "    Processor Number is " << GlobalV::NPROC << endl;
 	TITLE("Input","init");
 	TITLE("Input","Bcast");
 #else
-	ofs_running << "    This is SERIES version." << endl;
+	GlobalV::ofs_running << "    This is SERIES version." << endl;
 	TITLE("Input","init");
 #endif
-    	ofs_running << "    Start Time is " << ctime(&time_now);
-	ofs_running << "                                                                                     " << endl;
-	ofs_running << " ------------------------------------------------------------------------------------" << endl;
+    	GlobalV::ofs_running << "    Start Time is " << ctime(&time_now);
+	GlobalV::ofs_running << "                                                                                     " << endl;
+	GlobalV::ofs_running << " ------------------------------------------------------------------------------------" << endl;
 
-	ofs_running << setiosflags(ios::left);
+	GlobalV::ofs_running << setiosflags(ios::left);
 	cout << setiosflags(ios::left);
 
-	ofs_running << "\n READING GENERAL INFORMATION" << endl;
-	OUT(ofs_running,"global_out_dir", global_out_dir);
-	OUT(ofs_running,"global_in_card", global_in_card);
-	OUT(ofs_running,"pseudo_dir", global_pseudo_dir);
+	GlobalV::ofs_running << "\n READING GENERAL INFORMATION" << endl;
+	OUT(GlobalV::ofs_running,"global_out_dir", GlobalV::global_out_dir);
+	OUT(GlobalV::ofs_running,"global_in_card", GlobalV::global_in_card);
+	OUT(GlobalV::ofs_running,"pseudo_dir", GlobalV::global_pseudo_dir);
 
-	OUT(ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, global_pseudo_type -> pseudo_type)
+	OUT(GlobalV::ofs_running,"pseudo_type", pseudo_type); // mohan add 2013-05-20 (xiaohui add 2013-06-23, GlobalV::global_pseudo_type -> pseudo_type)
 
 	timer::tick("Input","Init");
     return;
@@ -206,10 +206,10 @@ void Input::Default(void)
 // diagonalization
 //----------------------------------------------------------
     //diago_type = "default"; xiaohui modify 2013-09-01 //mohan update 2012-02-06
-	diago_proc = 0; //if 0, then diago_proc = NPROC
+	diago_proc = 0; //if 0, then diago_proc = GlobalV::NPROC
     diago_cg_maxiter = 50;
 	diago_cg_prec=1; //mohan add 2012-03-31
-    diago_david_ndim = 10;
+    diago_david_ndim = 4;
     ethr = 1.0e-2;
 	nb2d = 0;
 	nurse = 0;
@@ -437,18 +437,18 @@ void Input::Default(void)
 //----------------------------------------------------------			//Fuxiang He add 2016-10-26
 // constrained DFT
 //----------------------------------------------------------
-	ocp = 0;
+	GlobalV::ocp = 0;
 	//ocp_n = 0;
-	ocp_set = "none";
+	GlobalV::ocp_set = "none";
 	// for(int i=0; i<10000; i++)
 	// {
-	// ocp_kb[i] = 0.0;
+	// GlobalV::ocp_kb[i] = 0.0;
 	// }
 
 	cell_factor = 1.2; //LiuXh add 20180619
 
 	new_dm=1; // Shen Yu add 2019/5/9
-	mulliken=0;// qi feng add 2019/9/10
+	GlobalV::mulliken=0;// qi feng add 2019/9/10
 
 //----------------------------------------------------------			//Peize Lin add 2020-04-04
 // restart
@@ -477,7 +477,7 @@ bool Input::Read(const string &fn)
 {
     TITLE("Input","Read");
 
-    if (MY_RANK!=0) return false;
+    if (GlobalV::MY_RANK!=0) return false;
 
     ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
 
@@ -1517,11 +1517,11 @@ bool Input::Read(const string &fn)
 	    }
         else if (strcmp("ocp", word) == 0)
         {
-            read_value(ifs, ocp);
+            read_value(ifs, GlobalV::ocp);
         }
 		else if (strcmp("ocp_set", word) == 0)
 		{
-			getline(ifs, ocp_set);
+			getline(ifs, GlobalV::ocp_set);
 //			ifs.ignore(150, '\n');
 		}
         // else if (strcmp("ocp_n", word) == 0)
@@ -1532,13 +1532,13 @@ bool Input::Read(const string &fn)
         // {
              // for(int i=0; i<(ocp_n-1); i++)
              // {
-                 // ifs >> ocp_kb[i]; 
+                 // ifs >> GlobalV::ocp_kb[i]; 
              // }
-			// read_value(ifs, ocp_kb[ocp_n-1]);
+			// read_value(ifs, GlobalV::ocp_kb[ocp_n-1]);
         // }
 		else if (strcmp("mulliken", word) == 0)
 		{
-			read_value(ifs, mulliken);
+			read_value(ifs, GlobalV::mulliken);
 		}//qifeng add 2019/9/10
 	    else if (strcmp("supercell_scale", word) == 0)
 	    {
@@ -2241,14 +2241,14 @@ void Input::Bcast()
         Parallel_Common::bcast_double( qcar[i][1] );
         Parallel_Common::bcast_double( qcar[i][2] );
     }
-	Parallel_Common::bcast_int(ocp);
+	Parallel_Common::bcast_int(GlobalV::ocp);
 	// Parallel_Common::bcast_int(ocp_n);
-	Parallel_Common::bcast_string(ocp_set);
+	Parallel_Common::bcast_string(GlobalV::ocp_set);
         // for(int i=0; i<10000; i++)
         // {
-            // Parallel_Common::bcast_double( ocp_kb[i] );
+            // Parallel_Common::bcast_double( GlobalV::ocp_kb[i] );
         // }
-                Parallel_Common::bcast_int( mulliken);//qifeng add 2019/9/10
+                Parallel_Common::bcast_int( GlobalV::mulliken);//qifeng add 2019/9/10
 	Parallel_Common::bcast_int( lcao_box[0] );
 	Parallel_Common::bcast_int( lcao_box[1] );
 	Parallel_Common::bcast_int( lcao_box[2] );
@@ -2283,7 +2283,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_bool( lspinorb );
 	if(noncolin)
 	{
-		if(MY_RANK==0)
+		if(GlobalV::MY_RANK==0)
 		{
 			if((sizeof(angle1) / sizeof(angle1[0]) != this->ntype)){
 				delete[] angle1;
@@ -2296,7 +2296,7 @@ void Input::Bcast()
 				ZEROS(angle2, this->ntype);
 			}
 		}
-		if(MY_RANK!=0)
+		if(GlobalV::MY_RANK!=0)
 		{
 			delete[] angle1;
 			angle1 = new double [this->ntype];
@@ -2325,7 +2325,7 @@ void Input::Bcast()
 	Parallel_Common::bcast_int(dftu_type);
 	Parallel_Common::bcast_int(double_counting);
 	Parallel_Common::bcast_double(yukawa_lambda);
-	if(MY_RANK!=0)
+	if(GlobalV::MY_RANK!=0)
 	{
 		hubbard_u = new double [this->ntype];
 		hund_j = new double [this->ntype];
@@ -2354,14 +2354,14 @@ void Input::Check(void)
 	if(ntype < 0) WARNING_QUIT("Input","ntype must > 0");
 
 	//cout << "diago_proc=" << diago_proc << endl;
-	//cout << " NPROC=" << NPROC << endl;
+	//cout << " NPROC=" << GlobalV::NPROC << endl;
 	if(diago_proc<=0)
 	{
-		diago_proc = NPROC;
+		diago_proc = GlobalV::NPROC;
 	}
-	else if(diago_proc>NPROC)
+	else if(diago_proc>GlobalV::NPROC)
 	{
-		diago_proc = NPROC;
+		diago_proc = GlobalV::NPROC;
 	}
 
 	// mohan add 2010/03/29
@@ -2459,18 +2459,18 @@ void Input::Check(void)
 
     else if (calculation == "nscf")
     {
-		CALCULATION == "nscf";
+		GlobalV::CALCULATION == "nscf";
         nstep = 1;
 		out_stru = 0;
         
 		//if (local_basis == 0 && linear_scaling == 0) xiaohui modify 2013-09-01
-		/*if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
+		if (basis_type == "pw") //xiaohui add 2013-09-01. Attention! maybe there is some problem
 		{
 			if (ethr>1.0e-3)
         	{
-        	    WARNING_QUIT("Input::Check","nscf : ethr > 1.0e-3, ethr too large.");
+        	    ethr = 1.0e-5;
         	}
-		}*/
+		}
 		if(force) // mohan add 2010-09-07
 		{
 			force = false;
@@ -2483,7 +2483,7 @@ void Input::Check(void)
     }
 	else if(calculation == "istate")
 	{
-		CALCULATION = "istate";
+		GlobalV::CALCULATION = "istate";
 		nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
@@ -2504,7 +2504,7 @@ void Input::Check(void)
 	}
 	else if(calculation == "ienvelope")
 	{
-		CALCULATION = "ienvelope"; // mohan fix 2011-11-04
+		GlobalV::CALCULATION = "ienvelope"; // mohan fix 2011-11-04
 		nstep = 1;
 		out_stru = 0;
 		out_dos = 0;
@@ -2524,7 +2524,7 @@ void Input::Check(void)
 	}
 	else if(calculation == "md") // mohan add 2011-11-04
 	{
-		CALCULATION = "md"; 
+		GlobalV::CALCULATION = "md"; 
 		symmetry = false;
 		force = 1;
         if(!out_md_control) out_level = "m";//zhengdy add 2019-04-07
@@ -2604,7 +2604,7 @@ void Input::Check(void)
 	//	}
 	//}
 
-    if (CALCULATION=="nscf" && start_pot != "file")
+    if (GlobalV::CALCULATION=="nscf" && start_pot != "file")
     {
         start_pot = "file";
         AUTO_SET("start_pot",start_pot);
@@ -2639,11 +2639,11 @@ void Input::Check(void)
 		}
 		else if(ks_solver=="cg")
 		{
-			ofs_warning << " It's ok to use cg." << endl;
+			GlobalV::ofs_warning << " It's ok to use cg." << endl;
 		}
 		else if(ks_solver=="dav")
 		{
-			ofs_warning << " It's ok to use dav." << endl;
+			GlobalV::ofs_warning << " It's ok to use dav." << endl;
 		}
 		else if(ks_solver=="genelpa") //yshen add 2016-07-20
 		{
@@ -2684,7 +2684,7 @@ void Input::Check(void)
 			else if (ks_solver == "genelpa")
 			{
 #ifdef __MPI
-//				ofs_warning << "genelpa is under testing" << endl;
+//				GlobalV::ofs_warning << "genelpa is under testing" << endl;
 #else
 				WARNING_QUIT("Input","genelpa can not be used for series version.");
 #endif
@@ -2692,7 +2692,7 @@ void Input::Check(void)
 			else if (ks_solver == "scalapack_gvx")
 			{
 #ifdef __MPI
-				ofs_warning << "scalapack_gvx is under testing" << endl;
+				GlobalV::ofs_warning << "scalapack_gvx is under testing" << endl;
 #else
 				WARNING_QUIT("Input","scalapack_gvx can not be used for series version.");
 #endif
@@ -2700,7 +2700,7 @@ void Input::Check(void)
 			else if (ks_solver == "hpseps")
 			{
 #ifdef __MPI
-				ofs_warning << "It's not a good choice to use hpseps!" << endl;
+				GlobalV::ofs_warning << "It's not a good choice to use hpseps!" << endl;
 				if(gamma_only) WARNING_QUIT("Input","hpseps can not be used for gamma_only.");
 #else
 				WARNING_QUIT("Input","hpseps can not be used for series version.");
@@ -2711,7 +2711,7 @@ void Input::Check(void)
 #ifdef __MPI
 				WARNING_QUIT("Input","ks_solver=lapack is not an option for parallel version of ABACUS (try hpseps).");	
 #else
-				ofs_warning << " It's ok to use lapack." << endl;
+				GlobalV::ofs_warning << " It's ok to use lapack." << endl;
 #endif
 			}
 			else if (ks_solver == "selinv")
@@ -2764,14 +2764,14 @@ void Input::Check(void)
 	//if(diago_type=="cg") xiaohui modify 2013-09-01
 	if(ks_solver=="cg") //xiaohui add 2013-09-01
 	{
-		if(diago_proc!=NPROC)
+		if(diago_proc!=GlobalV::NPROC)
 		{
-			WARNING("Input","when CG is used for diago, diago_proc==NPROC");
-			diago_proc=NPROC;
+			WARNING("Input","when CG is used for diago, diago_proc==GlobalV::NPROC");
+			diago_proc=GlobalV::NPROC;
 		}
 	}
 
-	if(NPROC>1 && ks_solver=="lapack") //xiaohui add 2013-09-01
+	if(GlobalV::NPROC>1 && ks_solver=="lapack") //xiaohui add 2013-09-01
 	{
 		//if(local_basis ==4 && linear_scaling==0) xiaohui modify 2013-09-01
 		if(basis_type=="lcao_in_pw") //xiaohui add 2013-09-01
@@ -2995,7 +2995,7 @@ void Input::Check(void)
 	const string ss = "test -d " + read_file_dir;
 	if(read_file_dir=="auto")
 	{
-		global_readin_dir = global_out_dir;
+		GlobalV::global_readin_dir = GlobalV::global_out_dir;
 	}
 	else if( system( ss.c_str() ))
 	{
@@ -3003,7 +3003,7 @@ void Input::Check(void)
 	}
 	else
 	{
-		global_readin_dir = read_file_dir + '/';
+		GlobalV::global_readin_dir = read_file_dir + '/';
 	}
 	
     return;
@@ -3012,7 +3012,7 @@ void Input::Check(void)
 void Input::close_log(void)const
 {
 	
-    Global_File::close_all_log(MY_RANK, this->out_alllog);
+    Global_File::close_all_log(GlobalV::MY_RANK, this->out_alllog);
 }
 
 void Input::readbool(ifstream &ifs, bool &var)

@@ -79,7 +79,7 @@ fi
 
 #echo $total_charge
 if ! test -z "$has_dos"  && [  $has_dos -eq 1 ]; then
-	total_dos=`sum_file OUT.autotest/DOS1`
+	total_dos=`cat OUT.autotest/DOS1_smearing.dat | awk 'END {print}' | awk '{print $3}'`
 	echo "totaldosref $total_dos" >> $1
 fi
 #	smearing_dos=`sum_file OUT.autotest/DOS1_smearing.dat`
@@ -101,5 +101,5 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
 fi
 
 #echo $total_band
-ttot=`grep $word $running_path | awk '{print $4}'`
+ttot=`grep $word $running_path | awk '{print $3}'`
 echo "totaltimeref $ttot" >>$1

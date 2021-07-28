@@ -139,6 +139,7 @@ read_atoms.o\
 read_cell_pseudopots.o\
 write_pot.o\
 write_rho.o\
+write_rho_cube.o\
 chi0_standard.o\
 numerical_basis.o\
 numerical_descriptor.o\
@@ -148,8 +149,6 @@ unk_overlap_pw.o \
 optical.o\
 cal_test.o\
 winput.o\
-energy_dos_pw.o\
-dos.o
 
 OBJS_CELL=unitcell.o\
 atom_spec.o\

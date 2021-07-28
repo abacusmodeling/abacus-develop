@@ -56,7 +56,7 @@ void LCAO_Orbitals::bcast_files(
 
 	assert(ntype_in > 0 );
 
-	ofs_running << "\n READING ORBITAL FILE NAMES FOR LCAO" << endl;
+	GlobalV::ofs_running << "\n READING ORBITAL FILE NAMES FOR LCAO" << endl;
 	for(int it=0; it<ntype_in; it++)
 	{
 		string ofile;
@@ -91,8 +91,8 @@ void LCAO_Orbitals::bcast_files(
 //			nonlocal_file.push_back ( nfile );
 		}
 
-		ofs_running << " orbital file: " << orbital_file[it] << endl;
-//		ofs_running << " nonlocal file: " << nonlocal_file[it] << endl;
+		GlobalV::ofs_running << " orbital file: " << orbital_file[it] << endl;
+//		GlobalV::ofs_running << " nonlocal file: " << nonlocal_file[it] << endl;
 	}
 	return;
 }
@@ -280,7 +280,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 	TITLE("LCAO_Orbitals","Set_NonLocal");
 
 	// set a pointer
-	Atom* atom = &ucell.atoms[it];
+	Atom* atom = &GlobalC::ucell.atoms[it];
 
 	// get the number of non-local projectors
 	n_projectors = atom->nbeta;
@@ -330,7 +330,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 					this->dk,
 					dr_uniform); // delta k mesh in reciprocal space
 
-			tmpBeta_lm[p1].plot(MY_RANK);
+			tmpBeta_lm[p1].plot(GlobalV::MY_RANK);
 
 			delete[] beta_r;
 				
@@ -361,7 +361,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 		}
 		Soc soc;
 		soc.rot_ylm(lmaxkb);
-		soc.fcoef.create(ucell.ntype, atom->nh, atom->nh);
+		soc.fcoef.create(GlobalC::ucell.ntype, atom->nh, atom->nh);
 
 		int ip1=0;
 		for(int p1 = 0; p1<n_projectors; p1++)//nbeta
@@ -440,7 +440,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 					this->dk,
 					dr_uniform); // delta k mesh in reciprocal space
 
-			tmpBeta_lm[p1].plot(MY_RANK);
+			tmpBeta_lm[p1].plot(GlobalV::MY_RANK);
 
 			delete[] beta_r;
 		}
@@ -497,7 +497,7 @@ void LCAO_Orbitals::Read_NonLocal(
 	}
 	else
 	{
-//		ofs_running << " open nonLocal pseudopotential file: " << nonlocal_file[it] << endl;
+//		GlobalV::ofs_running << " open nonLocal pseudopotential file: " << nonlocal_file[it] << endl;
 	}
 
 
@@ -534,12 +534,12 @@ void LCAO_Orbitals::Read_NonLocal(
 	if( nlmax != -1 )
 	{
 		bool find_lmax = false;
-		for(int ic=0; ic<ucell.atoms[it].nbeta; ic++)
+		for(int ic=0; ic<GlobalC::ucell.atoms[it].nbeta; ic++)
 		{
-			if( nlmax == ucell.atoms[it].lll[ic] )
+			if( nlmax == GlobalC::ucell.atoms[it].lll[ic] )
 			{
 				//			cout << " nlmax = " << nlmax << endl;
-				//			cout << " lchi = " << ucell.atoms[it].lll[ic] << endl;
+				//			cout << " lchi = " << GlobalC::ucell.atoms[it].lll[ic] << endl;
 				find_lmax = true;
 				break;
 			}
@@ -549,19 +549,19 @@ void LCAO_Orbitals::Read_NonLocal(
 		{
 			cout << " For element " << label << endl;
 			cout << " Max L Read in from NONLOCAL = " << nlmax << endl;
-			for(int ib=0; ib<ucell.atoms[it].nbeta; ++ib)
+			for(int ib=0; ib<GlobalC::ucell.atoms[it].nbeta; ++ib)
 			{
-				cout << " Max L Read in from pseudopotential file = " << ucell.atoms[it].lll[ib] << endl;
+				cout << " Max L Read in from pseudopotential file = " << GlobalC::ucell.atoms[it].lll[ib] << endl;
 			}
-			WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != ucell.atoms[it].lll");
+			WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != GlobalC::ucell.atoms[it].lll");
 		}
 	}
 
 
-//	OUT(ofs_running,"Type",it);
-	OUT(ofs_running,"label",label);
-//	OUT(ofs_running,"ps_type",ps_type);
-	OUT(ofs_running,"nlmax",nlmax);
+//	OUT(GlobalV::ofs_running,"Type",it);
+	OUT(GlobalV::ofs_running,"label",label);
+//	OUT(GlobalV::ofs_running,"ps_type",ps_type);
+	OUT(GlobalV::ofs_running,"nlmax",nlmax);
 
 	//-------------------------------------------
 	// if each L has projectors more than once,
@@ -571,7 +571,7 @@ void LCAO_Orbitals::Read_NonLocal(
 	matrix coefficient_D_in(nproj_allowed, nproj_allowed);
 	ComplexMatrix coefficient_D_nc_in(nproj_allowed*2, nproj_allowed*2);
 
-//	OUT(ofs_running,"nproj_allowed",nproj_allowed);
+//	OUT(GlobalV::ofs_running,"nproj_allowed",nproj_allowed);
 
 	if(my_rank==0)
 	{
@@ -581,7 +581,7 @@ void LCAO_Orbitals::Read_NonLocal(
 			// this parameter is very important!!!
 			//--------------------------------------
 			READ_VALUE(ifs, n_projectors);
-			OUT(ofs_running,"n_projectors",n_projectors);
+			OUT(GlobalV::ofs_running,"n_projectors",n_projectors);
 			
 			for (int p1 = 0; p1 < n_projectors; p1++)
         	{
@@ -596,7 +596,7 @@ void LCAO_Orbitals::Read_NonLocal(
                 	
 					ifs >> coefficient_D_in(L1_read, L2_read);
 					
-//					ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << endl;
+//					GlobalV::ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << endl;
             	}
         	}
 			SCAN_END(ifs,"</DIJ>");
@@ -644,7 +644,7 @@ void LCAO_Orbitals::Read_NonLocal(
 			}
 		}// end my_rank==0
 
-//		OUT(ofs_running,"meshr_ps",meshr_ps);
+//		OUT(GlobalV::ofs_running,"meshr_ps",meshr_ps);
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(meshr_ps);
@@ -674,7 +674,7 @@ void LCAO_Orbitals::Read_NonLocal(
 		Parallel_Common::bcast_double(rab_ps, meshr_ps);
 #endif
 			
-//		OUT(ofs_running,"radial_ps max",radial_ps[meshr_ps-1]);
+//		OUT(GlobalV::ofs_running,"radial_ps max",radial_ps[meshr_ps-1]);
 
 //		cout << this->kmesh << endl;
         tmpBeta_lm[p1].set_NL_proj(
@@ -819,7 +819,7 @@ void LCAO_Orbitals::Read_Descriptor(
 
 
 void LCAO_Orbitals::read_orb_file(
-	ofstream &ofs_in, // ofs_running
+	ofstream &ofs_in, // GlobalV::ofs_running
 	ifstream &ifs,
 	const int &it, 
 	int &lmax, 
@@ -875,7 +875,7 @@ void LCAO_Orbitals::read_orb_file(
 		total_nchi += nchi[l];
 	}
 
-	//OUT(ofs_running,"Total number of chi(l,n)",total_nchi);
+	//OUT(GlobalV::ofs_running,"Total number of chi(l,n)",total_nchi);
 	delete[] ao[it].phiLN;
 	ao[it].phiLN = new Numerical_Orbital_Lm[total_nchi];
 

@@ -52,9 +52,9 @@ private:
 	torch::jit::script::Module module;
 
 	// overlap between lcao and descriptor basis
-	double** S_mu_alpha;	//[tot_Inl][NLOCAL][2l+1]	caoyu modified 2021-05-07
+	double** S_mu_alpha;	//[tot_Inl][GlobalV::NLOCAL][2l+1]	caoyu modified 2021-05-07
 
-	//d(S) for f_delta:	<\psi_mu|d\alpha^I_nlm> , [tot_Inl][NLOCAL][2l+1]
+	//d(S) for f_delta:	<\psi_mu|d\alpha^I_nlm> , [tot_Inl][GlobalV::NLOCAL][2l+1]
 	double** DS_mu_alpha_x;
 	double** DS_mu_alpha_y;
 	double** DS_mu_alpha_z;

@@ -17,7 +17,7 @@ In ABACUS, there are 3 types of basis set choices:
 
 2. LCAO
 
-    Localized atomic-orbital basis; these systematically improvable atomic basis are generated with a tool called [SIAB](#doc/generate-basis.md).
+    Localized atomic-orbital basis; these systematically improvable atomic basis are generated with a tool called [SIAB](generate-basis.md).
 
 3. LCAO_in_PW
 
@@ -31,9 +31,9 @@ In the INPUT file, the keyword basis_type controls what basis type to use:
 
 The default value of basis_type is pw. When choosing lcao or lcao_in_pw, the user should prepare atomic orbitals first.
     
-Information on the keyword basis_type can also be found in [the list of input keywords](doc/input-main.md#basis-type).
+Information on the keyword basis_type can also be found in [the list of input keywords](input-main.md#basis-type).
 
-We also provide a [detailed instruction](#doc/generate-basis.md) on generating basis functions.
+We also provide a [detailed instruction](generate-basis.md) on generating basis functions.
 
 [back to top](#features)
 
@@ -83,7 +83,7 @@ hpseps can not be used with plane wave basis.
 
 Then the user has to correct the input file and restart the calculation.
 
-Information on the keyword ks_solver is also given in the [list of input variables](doc/input-main.md#ks-solver).
+Information on the keyword ks_solver is also given in the [list of input variables](input-main.md#ks-solver).
 
 [back to top](#features)
 
@@ -121,6 +121,6 @@ The user can set the XC functional type in INPUT file with the parameter, dft_fu
     
 If the functional specified by the user is not consistent with the pseudopotential file, the program will stop with an error message.
 
-Information on the keyword ks_solver is also given in the [list of input variables](doc/input-main.md#dft-functional).
+Information on the keyword ks_solver is also given in the [list of input variables](input-main.md#dft-functional).
 
 [back to top](#features)

@@ -68,15 +68,16 @@ void DFTU_RELAX::force_stress()
 {
 	TITLE("DFTU_RELAX", "force_stress");
 
-	if(FORCE)
-  {
-		for(int iat=0; iat<ucell.nat; iat++)
+	if(GlobalV::FORCE)
+	{
+		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
+		{
 			for(int dim=0; dim<3; dim++)
 				this->force_dftu.at(iat).at(dim) = 0.0;
   }
 
-	if(STRESS)
-  {
+	if(GlobalV::STRESS)
+	{
 		for(int dim=0; dim<3; dim++)
 		{
 			this->stress_dftu.at(dim).at(0) = 0.0;
@@ -85,7 +86,7 @@ void DFTU_RELAX::force_stress()
 		}
   }
 
-  if(GAMMA_ONLY_LOCAL)
+  if(GlobalV::GAMMA_ONLY_LOCAL)
   {
     const char transN = 'N', transT = 'T';
 	  const int  one_int = 1;
@@ -93,14 +94,14 @@ void DFTU_RELAX::force_stress()
 
     vector<double> rho_VU(ParaO.nloc);
 
-    for(int ik=0; ik<kv.nks; ik++)
+    for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	  {
-	  	const int spin = kv.isk[ik];
+	  	const int spin = GlobalC::kv.isk[ik];
 
       double* VU = new double [ParaO.nloc];
       this->cal_VU_pot_mat_real(spin, false, VU);
       pdgemm_(&transT, &transN,
-					    &NLOCAL, &NLOCAL, &NLOCAL,
+					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
 					    LOC.wfc_dm_2d.dm_gamma[spin].c, &one_int, &one_int, ParaO.desc, 
 					    VU, &one_int, &one_int, ParaO.desc,
@@ -110,7 +111,7 @@ void DFTU_RELAX::force_stress()
       delete [] VU;
 
       this->cal_force_gamma(spin, &rho_VU[0]);
-      if(STRESS) this->cal_stress_gamma(spin, &rho_VU[0]);
+      if(GlobalV::STRESS) this->cal_stress_gamma(spin, &rho_VU[0]);
     }//ik
   }
   else
@@ -128,7 +129,7 @@ void DFTU_RELAX::force_stress()
       complex<double>* VU = new complex<double> [ParaO.nloc];
       this->cal_VU_pot_mat_complex(spin, false, VU);
       pzgemm_(&transT, &transN,
-					    &NLOCAL, &NLOCAL, &NLOCAL,
+					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 					    &alpha, 
 					    LOC.wfc_dm_2d.dm_k[ik].c, &one_int, &one_int, ParaO.desc, 
 					    VU, &one_int, &one_int, ParaO.desc,
@@ -138,17 +139,17 @@ void DFTU_RELAX::force_stress()
       delete [] VU;
 
       this->cal_force_k(ik, &rho_VU[0]);
-      if(STRESS) cal_stress_k(ik, &rho_VU[0]);
+      if(GlobalV::STRESS) cal_stress_k(ik, &rho_VU[0]);
     }//ik
   }
 
-  for(int iat=0; iat<ucell.nat; iat++)
+  for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
     vector<double> tmp = this->force_dftu[iat];
 		MPI_Allreduce(&tmp[0], &this->force_dftu[iat][0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 	}
 
-  if(STRESS)
+  if(GlobalV::STRESS)
   {
     for(int dim1=0; dim1<3; dim1++)
 	  {
@@ -179,8 +180,8 @@ void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
 	const int  one_int = 1;
   const complex<double> zero(0.0,0.0), one(1.0,0.0), minus_one(-1.0,0.0);
 	
-	vector<vector<complex<double>>> ftmp(ucell.nat);
-	for(int ia=0; ia<ucell.nat; ia++)
+	vector<vector<complex<double>>> ftmp(GlobalC::ucell.nat);
+	for(int ia=0; ia<GlobalC::ucell.nat; ia++)
 	{
 		ftmp.at(ia).resize(3, complex<double>(0.0,0.0)); //three dimension
 	}
@@ -196,7 +197,7 @@ void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
     this->fold_dSm_k(ik, dim, &dSm_k[0]);
 
 		pzgemm_(&transN, &transN,
-			&NLOCAL, &NLOCAL, &NLOCAL,
+			&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 			&one, 
 			rho_VU, &one_int, &one_int, ParaO.desc, 
 			&dSm_k[0], &one_int, &one_int, ParaO.desc,
@@ -207,7 +208,7 @@ void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
         rho_VU[irc] = dm_VU_dSm[irc];
   
     // pdtran(m, n, alpha, a, ia, ja, desca, beta, c, ic, jc, descc)
-    pztranc_(&NLOCAL, &NLOCAL, 
+    pztranc_(&GlobalV::NLOCAL, &GlobalV::NLOCAL, 
             &one, 
             &rho_VU[0], &one_int, &one_int, ParaO.desc, 
             &one, 

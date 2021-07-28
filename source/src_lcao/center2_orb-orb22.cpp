@@ -52,7 +52,7 @@ void Center2_Orb::Orb22::init_radial_table()
 			nB_short.getDruniform(),
 			false,
 			true, 
-			FORCE); // mohan add 2021-05-07
+			GlobalV::FORCE); // mohan add 2021-05-07
 
 		orb21s.insert( make_pair( LB, Center2_Orb::Orb21( nA1, nA2, nB[LB], MOT, MGT ) ) );
 
@@ -91,7 +91,7 @@ void Center2_Orb::Orb22::init_radial_table( const set<size_t> &radials )
 			nB_short.getDk(),
 			nB_short.getDruniform(),
 			false,
-			true, FORCE);
+			true, GlobalV::FORCE);
 
 		orb21s.insert( make_pair( LB, Center2_Orb::Orb21( nA1, nA2, nB[LB], MOT, MGT ) ) );
 

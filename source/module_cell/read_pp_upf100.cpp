@@ -173,13 +173,13 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 	
 	// dft functional enforced to modify
 	// mohan add 2010-07-15
-	if(DFT_FUNCTIONAL!="none")
+	if(GlobalV::DFT_FUNCTIONAL!="none")
 	{
 		/*xiaohui modify 2015-03-24
-		dft[0] = DFT_FUNCTIONAL;
-		dft[1] = DFT_FUNCTIONAL;
-		dft[2] = DFT_FUNCTIONAL;
-		dft[3] = DFT_FUNCTIONAL;
+		dft[0] = GlobalV::DFT_FUNCTIONAL;
+		dft[1] = GlobalV::DFT_FUNCTIONAL;
+		dft[2] = GlobalV::DFT_FUNCTIONAL;
+		dft[3] = GlobalV::DFT_FUNCTIONAL;
 		xiaohui modify 2015-03-24*/
 
 		//xiaohui add 2015-03-23
@@ -193,14 +193,14 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 			dft_functional = "pbe";
 		}
 
-		if(dft_functional != DFT_FUNCTIONAL)
+		if(dft_functional != GlobalV::DFT_FUNCTIONAL)
 		{
 			functional_error = 1;
 
-			cout << " dft_functional readin is: " << DFT_FUNCTIONAL << endl;
+			cout << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << endl;
 			cout << " dft_functional in pseudopot file is: " << dft_functional << endl;
-			ofs_warning << " dft_functional readin is: " << DFT_FUNCTIONAL << endl;
-			ofs_warning << " dft_functional in pseudopot file is: " << dft_functional << endl;
+			GlobalV::ofs_warning << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << endl;
+			GlobalV::ofs_warning << " dft_functional in pseudopot file is: " << dft_functional << endl;
 			//WARNING_QUIT("Pseudopot_upf::read_pseudo_header","input xc functional does not match that in pseudopot file");
 		}
 	}

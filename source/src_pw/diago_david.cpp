@@ -34,7 +34,10 @@ void Diago_David::diag
     timer::tick("Diago_David", "diag");
 
     assert( order > 1 );
-    assert( order*nband < npw );
+    assert( order*nband < npw * GlobalV::NPROC_IN_POOL ); 
+    //qianrui change it 2021-7-25. 
+    //In strictly speaking, it shoule be order*nband < npw sum of all pools. We roughly estimate it here.
+    //However, in most cases, total number of plane waves should be much larger than nband*order
 
     int nbase_x = order * nband ;				// maximum dimension of the reduced basis set
 
@@ -81,7 +84,7 @@ void Diago_David::diag
 
         this->SchmitOrth(npw, nband, m, basis, psi_m, spsi);
 
-        hm.hpw.h_1psi(npw, psi_m, hpsi, spsi);
+        GlobalC::hm.hpw.h_1psi(npw, psi_m, hpsi, spsi);
 
         // basis(m) = psi_m, hp(m) = H |psi_m>, sp(m) = S |psi_m>
         for ( int ig = 0; ig < npw; ig++ )
@@ -254,7 +257,7 @@ void Diago_David::cal_grad
 */
         this->SchmitOrth(npw, nbase+notconv, nbase+m, basis, ppsi, spsi);
 
-        hm.hpw.h_1psi(npw, ppsi, hpsi, spsi);
+        GlobalC::hm.hpw.h_1psi(npw, ppsi, hpsi, spsi);
 
         for ( int ig = 0; ig < npw; ig++ )
         {
@@ -360,13 +363,13 @@ void Diago_David::diag_zhegvx
     }
     if (nb == 1 || nb >= n)
     {
-        lwork = 2 * n - 1;
+        lwork = 2 * n; //qianrui fix a bug 2021-7-25 : lwork should be at least max(1,2*n)
     }
     else
     {
         lwork = (nb + 1) * n;
     }
-    complex<double> *work = new complex<double>[2*lwork]();
+    complex<double> *work = new complex<double>[2*lwork];
     assert(work != 0);
     double *rwork = new double[7*n];
     assert(rwork != 0);
@@ -374,8 +377,7 @@ void Diago_David::diag_zhegvx
     assert(iwork != 0);
     int *ifail = new int[n];
     assert(ifail != 0);
-
-    ZEROS(work,2*lwork);
+    ZEROS(work,lwork); //qianrui change it, only first lwork numbers are used in zhegvx
     ZEROS(rwork,7*n);
     ZEROS(iwork,5*n);
     ZEROS(ifail,n);
@@ -530,7 +532,7 @@ void Diago_David::SchmitOrth
     assert(m >= 0);
     assert(m < n_band);
 
-    hm.hpw.s_1psi(npw, psi_m, spsi);
+    GlobalC::hm.hpw.s_1psi(npw, psi_m, spsi);
 
     complex<double>* lagrange = new complex<double>[m+1];
     ZEROS( lagrange, m+1 );
@@ -585,7 +587,7 @@ void Diago_David::SchmitOrth
         }
     }
 
-    hm.hpw.s_1psi(npw, psi_m, spsi);
+    GlobalC::hm.hpw.s_1psi(npw, psi_m, spsi);
 
     delete[] lagrange;
     timer::tick("Diago_David","SchmitOrth");

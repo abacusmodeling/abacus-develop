@@ -13,47 +13,47 @@ void Exx_Opt_Orb::print_matrix(
 {
 	auto print_header = [&]( ofstream &ofs )
 	{
-		ofs << ucell.lat0 << endl;
+		ofs << GlobalC::ucell.lat0 << endl;
 
-		ofs << ucell.latvec.e11 << " " << ucell.latvec.e12 << " " << ucell.latvec.e13 << endl;
-		ofs << ucell.latvec.e21 << " " << ucell.latvec.e22 << " " << ucell.latvec.e23 << endl;
-		ofs << ucell.latvec.e31 << " " << ucell.latvec.e32 << " " << ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
+		ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
+		ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
 		
 		if( TA==TB )
 		{
 			ofs << 1 << " ntype" << endl;
-			ofs << ucell.atoms[TA].label << " label" << endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
 			if( IA==IB )
 			{
 				ofs << 1 << " na" << endl;
-				ofs << ucell.atoms[TA].tau[IA].x << " " 
-					<< ucell.atoms[TA].tau[IA].y << " " 
-					<< ucell.atoms[TA].tau[IA].z << endl;
+				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
+					<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
 			}
 			else
 			{
 				ofs << 2 << " na" << endl;
-				ofs << ucell.atoms[TA].tau[IA].x << " " 
-					<< ucell.atoms[TA].tau[IA].y << " "
-					<< ucell.atoms[TA].tau[IA].z << endl;
-				ofs << ucell.atoms[TB].tau[IB].x << " " 
-					<< ucell.atoms[TB].tau[IB].y << " " 
-					<< ucell.atoms[TB].tau[IB].z << endl;
+				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
+					<< GlobalC::ucell.atoms[TA].tau[IA].y << " "
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+				ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
+					<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
+					<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
 			}
 		}
 		else
 		{
 			ofs << 2 << " ntype" << endl;
-			ofs << ucell.atoms[TA].label << " label" << endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
 			ofs << 1 << " na" << endl;
-			ofs << ucell.atoms[TA].tau[IA].x << " " 
-				<< ucell.atoms[TA].tau[IA].y << " " 
-				<< ucell.atoms[TA].tau[IA].z << endl;
-			ofs << ucell.atoms[TB].label << " label" << endl;
+			ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
+				<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
+				<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+			ofs << GlobalC::ucell.atoms[TB].label << " label" << endl;
 			ofs << 1 << " na" << endl;
-			ofs << ucell.atoms[TB].tau[IB].x << " " 
-				<< ucell.atoms[TB].tau[IB].y << " " 
-				<< ucell.atoms[TB].tau[IB].z << endl;
+			ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
+				<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
+				<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
 		}
 		
 		// ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
@@ -75,7 +75,7 @@ void Exx_Opt_Orb::print_matrix(
 
 		ofs << Exx_Abfs::Jle::Lmax << " lmax" << endl;
 
-		ofs << kv.nkstot << " nks" << endl;
+		ofs << GlobalC::kv.nkstot << " nks" << endl;
 		assert( matrix_V.nr == matrix_V.nc );
 		ofs	<< matrix_V.nr << " nbands" << endl;
 		
@@ -97,10 +97,10 @@ void Exx_Opt_Orb::print_matrix(
 			ofs	<< ecut_numberA << " " << ecut_numberB << " ne" << endl;
 		
 		ofs << "<WEIGHT_OF_KPOINTS>" << endl;
-		for( int ik=0; ik!=kv.nkstot; ++ik )		
+		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )		
 		{
-			ofs << kv.kvec_c[ik].x << " " << kv.kvec_c[ik].y << " " << kv.kvec_c[ik].z;
-			ofs << " " << kv.wk[ik] * 0.5 << endl;
+			ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z;
+			ofs << " " << GlobalC::kv.wk[ik] * 0.5 << endl;
 		}
 		ofs << "</WEIGHT_OF_KPOINTS>" << endl;
 

@@ -117,9 +117,9 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 	//				pbesol	J.P. Perdew et al., PRL 100, 136406 (2008)
 	//				wc		Z. Wu and R. E. Cohen, PRB 73, 235116 (2006)
 	//              hse     Paier J, Marsman M, Hummer K, et al, JPC 124(15): 154709 (2006)
-	//cout << " " << xcf.iexch_now << " " << xcf.icorr_now << " " << xcf.igcx_now << " " << xcf.igcc_now << endl;
+	//cout << " " << GlobalC::xcf.iexch_now << " " << GlobalC::xcf.icorr_now << " " << GlobalC::xcf.igcx_now << " " << GlobalC::xcf.igcc_now << endl;
 
-	switch(xcf.iexch_now)
+	switch(GlobalC::xcf.iexch_now)
 	{
 		case 1:
 			XC_Functional::slater(rs, ex, vx);break;
@@ -139,7 +139,7 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 			ex = vx = 0.0;
 	}
 	
-	switch(xcf.icorr_now)
+	switch(GlobalC::xcf.icorr_now)
 	{
 		case 1:
 			XC_Functional::pz(rs, 0, ec, vc);break;
@@ -184,10 +184,10 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 
 	const double rs = pi34 / pow(rho, third);//wigner_sitz_radius;
 
-//	cout << " xcf.iexch_now=" << xcf.iexch_now << endl;
-//	cout << " xcf.icorr_now=" << xcf.icorr_now << endl;
+//	cout << " GlobalC::xcf.iexch_now=" << GlobalC::xcf.iexch_now << endl;
+//	cout << " GlobalC::xcf.icorr_now=" << GlobalC::xcf.icorr_now << endl;
 
-	switch(xcf.iexch_now)
+	switch(GlobalC::xcf.iexch_now)
 	{
 		case 1:
 			XC_Functional::slater_spin(rho, zeta, ex, vxup, vxdw);	break;
@@ -207,7 +207,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 			ex = vxup = vxdw =0.0;
 	}
 
-	switch(xcf.icorr_now)
+	switch(GlobalC::xcf.icorr_now)
 	{
 		case 0:
 		ec = vcup = vcdw = 0.0; break;
@@ -216,7 +216,7 @@ void XC_Functional::xc_spin(const double &rho, const double &zeta,
 		case 4: //mohan fix bug 2012-05-28, case 2 to 4.
 		XC_Functional::pw_spin(rs, zeta, ec, vcup, vcdw); break;
 		default:
-		WARNING_QUIT("XC_Functional::xc_spin", "xcf.icorr_now wrong!");
+		WARNING_QUIT("XC_Functional::xc_spin", "GlobalC::xcf.icorr_now wrong!");
 	}
 
 	return;
@@ -842,51 +842,51 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
         v1x = 0.00;
         v2x = 0.00;
     }
-    else if (xcf.igcx_now == 1)
+    else if (GlobalC::xcf.igcx_now == 1)
     {
         XC_Functional::becke88(rho, grho, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 2)
+    else if (GlobalC::xcf.igcx_now == 2)
     {
         XC_Functional::ggax(rho, grho, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 3)
+    else if (GlobalC::xcf.igcx_now == 3)
     {
 		//mohan modify 2009-12-15
 		// 0 stands for PBE, 1 stands for revised PBE
         XC_Functional::pbex(rho, grho, 0, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 4)
+    else if (GlobalC::xcf.igcx_now == 4)
     {
 		// revised PBE.
         XC_Functional::pbex(rho, grho, 1, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 5 && xcf.igcc_now == 5)
+    else if (GlobalC::xcf.igcx_now == 5 && GlobalC::xcf.igcc_now == 5)
     {
         hcth(rho, grho, sx, v1x, v2x);
     }
-    else if (xcf.igcx_now == 6)
+    else if (GlobalC::xcf.igcx_now == 6)
     {
         optx(rho, grho, sx, v1x, v2x);
     }
-	else if (xcf.igcx_now == 8)
+	else if (GlobalC::xcf.igcx_now == 8)
 	{
 		XC_Functional::pbex (rho, grho, 0, sx, v1x, v2x);
 		sx *= 0.75;
 		v1x *= 0.75;
 		v2x *= 0.75;
 	}
-	else if (xcf.igcx_now == 10)
+	else if (GlobalC::xcf.igcx_now == 10)
 	{
 		// PBESOL
 		XC_Functional::pbex(rho, grho, 2, sx, v1x, v2x);
 	}
-	else if (xcf.igcx_now == 11)
+	else if (GlobalC::xcf.igcx_now == 11)
 	{
 		// wu cohen
 		XC_Functional::wcx (rho, grho, sx, v1x, v2x);
 	}
-	else if (xcf.igcx_now == 12)
+	else if (GlobalC::xcf.igcx_now == 12)
 	{
 		// HSE
 		throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
@@ -898,8 +898,8 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
         v2x = 0.00;
     } // endif
 
-	//cout << "\n igcx = " << xcf.igcx_now;
-	//cout << "\n igcc = " << xcf.igcc_now << endl;
+	//cout << "\n igcx = " << GlobalC::xcf.igcx_now;
+	//cout << "\n igcc = " << GlobalC::xcf.igcc_now << endl;
 
      // correlation
     if (rho <= small)
@@ -908,23 +908,23 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
         v1c = 0.00;
         v2c = 0.00;
     }
-    else if (xcf.igcc_now == 1)
+    else if (GlobalC::xcf.igcc_now == 1)
     {
         perdew86(rho, grho, sc, v1c, v2c);
     }
-    else if (xcf.igcc_now == 2)
+    else if (GlobalC::xcf.igcc_now == 2)
     {
         XC_Functional::ggac(rho, grho, sc, v1c, v2c);
     }
-    else if (xcf.igcc_now == 3)
+    else if (GlobalC::xcf.igcc_now == 3)
     {
         XC_Functional::glyp(rho, grho, sc, v1c, v2c);
     }
-    else if (xcf.igcc_now == 4)
+    else if (GlobalC::xcf.igcc_now == 4)
     {
         XC_Functional::pbec(rho, grho, 0, sc, v1c, v2c);
     }
-	else if (xcf.igcc_now == 8)
+	else if (GlobalC::xcf.igcc_now == 8)
 	{
 		// PBESOL
 		XC_Functional::pbec(rho, grho, 1, sc, v1c, v2c);

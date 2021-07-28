@@ -84,7 +84,7 @@ void Exx_Abfs::IO::bcast( T &data, const int rank_src, MPI_Comm mpi_comm )
 {
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
 	#ifdef USE_BOOST_SERIALIZATION
-		if(MY_RANK==rank_src)
+		if(GlobalV::MY_RANK==rank_src)
 		{
 			boost::mpi::packed_oarchive oar(mpi_comm);
 			oar << data;

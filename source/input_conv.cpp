@@ -31,33 +31,33 @@ void Input_Conv::Convert(void)
 // main parameters / electrons / spin ( 10/16 )
 //----------------------------------------------------------
 //  suffix
-    if(INPUT.atom_file!="") global_atom_card = INPUT.atom_file;
-	global_wannier_card = INPUT.wannier_card;
-    if(INPUT.kpoint_file!= "") global_kpoint_card = INPUT.kpoint_file;
-    if(INPUT.pseudo_dir != "") global_pseudo_dir = INPUT.pseudo_dir + "/";
-    global_pseudo_type = INPUT.pseudo_type;
-	ucell.latName = INPUT.latname; 
-	ucell.ntype = INPUT.ntype;
-	ucell.lmaxmax = INPUT.lmaxmax;
+    if(INPUT.atom_file!="") GlobalV::global_atom_card = INPUT.atom_file;
+	GlobalV::global_wannier_card = INPUT.wannier_card;
+    if(INPUT.kpoint_file!= "") GlobalV::global_kpoint_card = INPUT.kpoint_file;
+    if(INPUT.pseudo_dir != "") GlobalV::global_pseudo_dir = INPUT.pseudo_dir + "/";
+    GlobalV::global_pseudo_type = INPUT.pseudo_type;
+	GlobalC::ucell.latName = INPUT.latname; 
+	GlobalC::ucell.ntype = INPUT.ntype;
+	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
 
-    NBANDS = INPUT.nbands;
-    NBANDS_ISTATE = INPUT.nbands_istate;
-	NPOOL = INPUT.npool;
-	CALCULATION = INPUT.calculation;
+    GlobalV::NBANDS = INPUT.nbands;
+    GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
+	GlobalV::NPOOL = INPUT.npool;
+	GlobalV::CALCULATION = INPUT.calculation;
 
-	PSEUDORCUT = INPUT.pseudo_rcut; 
-    RENORMWITHMESH = INPUT.renormwithmesh;
+	GlobalV::PSEUDORCUT = INPUT.pseudo_rcut; 
+    GlobalV::RENORMWITHMESH = INPUT.renormwithmesh;
 
 	// qianrui add 2021-2-5
-	STO_WF.nchi = INPUT.nbands_sto;
-	STO_WF.nche_sto = INPUT.nche_sto;
-	STO_WF.seed_sto = INPUT.seed_sto;
-	STO_WF.emax_sto = INPUT.emax_sto;
-	STO_WF.emin_sto = INPUT.emin_sto;
-	STO_WF.stotype = INPUT.stotype;
+	GlobalC::sto_wf.nchi = INPUT.nbands_sto;
+	GlobalC::sto_wf.nche_sto = INPUT.nche_sto;
+	GlobalC::sto_wf.seed_sto = INPUT.seed_sto;
+	GlobalC::sto_wf.emax_sto = INPUT.emax_sto;
+	GlobalC::sto_wf.emin_sto = INPUT.emin_sto;
+	GlobalC::sto_wf.stotype = INPUT.stotype;
 
 	// Electrical Field
-	EFIELD = INPUT.efield;
+	GlobalV::EFIELD = INPUT.efield;
 	Efield::edir = INPUT.edir;
 	Efield::emaxpos = INPUT.emaxpos;
 	Efield::eopreg = INPUT.eopreg;
@@ -67,17 +67,17 @@ void Input_Conv::Convert(void)
 	Optical::opt_epsilon2=INPUT.opt_epsilon2;	// mohan add 2010-03-24	
 	Optical::opt_nbands=INPUT.opt_nbands;		// number of bands for optical transition.	
 
-	DFT_FUNCTIONAL = INPUT.dft_functional;
-    NSPIN = INPUT.nspin;
-    CURRENT_SPIN = 0;
+	GlobalV::DFT_FUNCTIONAL = INPUT.dft_functional;
+    GlobalV::NSPIN = INPUT.nspin;
+    GlobalV::CURRENT_SPIN = 0;
 
-    FORCE = INPUT.force;
-    FORCE_THR = INPUT.force_thr;
+    GlobalV::FORCE = INPUT.force;
+    GlobalV::FORCE_THR = INPUT.force_thr;
 
-    STRESS_THR = INPUT.stress_thr;
-    PRESS1 = INPUT.press1;
-    PRESS2 = INPUT.press2;
-    PRESS3 = INPUT.press3;
+    GlobalV::STRESS_THR = INPUT.stress_thr;
+    GlobalV::PRESS1 = INPUT.press1;
+    GlobalV::PRESS2 = INPUT.press2;
+    GlobalV::PRESS3 = INPUT.press3;
 #ifdef __LCAO
 	Force_Stress_LCAO::force_invalid_threshold_ev = INPUT.force_thr_ev2;
 #endif
@@ -90,65 +90,65 @@ void Input_Conv::Convert(void)
 	Ions_Move_Basic::trust_radius_ini = INPUT.trust_radius_ini;
 	Ions_Move_Basic::out_stru = INPUT.out_stru; //mohan add 2012-03-23
 
-	STRESS = INPUT.stress;
+	GlobalV::STRESS = INPUT.stress;
 
 
 	// pengfei Li add 2018-11-11
 	if(INPUT.fixed_axes == "None")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "volume")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "a")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "b")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "c")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 1; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "ab")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 1;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 1;
 	}
 	else if(INPUT.fixed_axes == "ac")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 1; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 1; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "bc")
 	{
-		ucell.lc[0] = 1; ucell.lc[1] = 0; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 1; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 0;
 	}
 	else if(INPUT.fixed_axes == "abc")
 	{
-		ucell.lc[0] = 0; ucell.lc[1] = 0; ucell.lc[2] = 0;
+		GlobalC::ucell.lc[0] = 0; GlobalC::ucell.lc[1] = 0; GlobalC::ucell.lc[2] = 0;
 	}
 	else
 	{
 		WARNING_QUIT("Input", "fixed_axes should be None,a,b,c,ab,ac,bc or abc!");
 	}
 
-	MOVE_IONS = INPUT.ion_dynamics;
-	OUT_LEVEL = INPUT.out_level;
+	GlobalV::MOVE_IONS = INPUT.ion_dynamics;
+	GlobalV::OUT_LEVEL = INPUT.out_level;
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
 
     Symmetry::symm_flag = INPUT.symmetry;						// 9
-	BASIS_TYPE = INPUT.basis_type;
-	KS_SOLVER = INPUT.ks_solver;
-	SEARCH_RADIUS = INPUT.search_radius;
-	SEARCH_PBC = INPUT.search_pbc;
+	GlobalV::BASIS_TYPE = INPUT.basis_type;
+	GlobalV::KS_SOLVER = INPUT.ks_solver;
+	GlobalV::SEARCH_RADIUS = INPUT.search_radius;
+	GlobalV::SEARCH_PBC = INPUT.search_pbc;
 
 //----------------------------------------------------------
 // planewave (8/8)
 //----------------------------------------------------------
-    pw.set(
+    GlobalC::pw.set(
         INPUT.gamma_only,
         INPUT.ecutwfc,
         INPUT.ecutrho,
@@ -162,37 +162,37 @@ void Input_Conv::Convert(void)
 		INPUT.by,
 		INPUT.bz
     );
-	GAMMA_ONLY_LOCAL = INPUT.gamma_only_local;
+	GlobalV::GAMMA_ONLY_LOCAL = INPUT.gamma_only_local;
 
 //----------------------------------------------------------
 // diagonalization  (5/5)
 //----------------------------------------------------------
-	DIAGO_PROC = INPUT.diago_proc;
-    DIAGO_CG_MAXITER = INPUT.diago_cg_maxiter;
-	DIAGO_CG_PREC = INPUT.diago_cg_prec;
-    DIAGO_DAVID_NDIM = INPUT.diago_david_ndim;
-    ETHR = INPUT.ethr;
-	NB2D = INPUT.nb2d;
-	NURSE = INPUT.nurse;
-	COLOUR = INPUT.colour;
-	T_IN_H = INPUT.t_in_h;
-	VL_IN_H = INPUT.vl_in_h;
-	VNL_IN_H = INPUT.vnl_in_h;
-	TEST_FORCE = INPUT.test_force;
-	TEST_STRESS = INPUT.test_stress;
+	GlobalV::DIAGO_PROC = INPUT.diago_proc;
+    GlobalV::DIAGO_CG_MAXITER = INPUT.diago_cg_maxiter;
+	GlobalV::DIAGO_CG_PREC = INPUT.diago_cg_prec;
+    GlobalV::DIAGO_DAVID_NDIM = INPUT.diago_david_ndim;
+    GlobalV::ETHR = INPUT.ethr;
+	GlobalV::NB2D = INPUT.nb2d;
+	GlobalV::NURSE = INPUT.nurse;
+	GlobalV::COLOUR = INPUT.colour;
+	GlobalV::T_IN_H = INPUT.t_in_h;
+	GlobalV::VL_IN_H = INPUT.vl_in_h;
+	GlobalV::VNL_IN_H = INPUT.vnl_in_h;
+	GlobalV::TEST_FORCE = INPUT.test_force;
+	GlobalV::TEST_STRESS = INPUT.test_stress;
 
 //----------------------------------------------------------
 // iteration (1/3)
 //----------------------------------------------------------
-    DRHO2 = INPUT.dr2;
+    GlobalV::DRHO2 = INPUT.dr2;
 
 //----------------------------------------------------------
 // wavefunction / charge / potential / (2/4)
 //----------------------------------------------------------
-    RESTART_MODE = INPUT.restart_mode;
-    wf.start_wfc = INPUT.start_wfc;
-	wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
-	en.printe    = INPUT.printe; // mohan add 2011-03-16
+    GlobalV::RESTART_MODE = INPUT.restart_mode;
+    GlobalC::wf.start_wfc = INPUT.start_wfc;
+	GlobalC::wf.mem_saver = INPUT.mem_saver; //mohan add 2010-09-07
+	GlobalC::en.printe    = INPUT.printe; // mohan add 2011-03-16
 
     
 //----------------------------------------------------------
@@ -302,49 +302,49 @@ void Input_Conv::Convert(void)
 //--------------------------------------------
 	if(INPUT.noncolin||INPUT.lspinorb) 
 	{
-		NSPIN = 4;
+		GlobalV::NSPIN = 4;
 	}
-	if(NSPIN == 4)
+	if(GlobalV::NSPIN == 4)
 	{
-		NONCOLIN = INPUT.noncolin;
+		GlobalV::NONCOLIN = INPUT.noncolin;
 		//wavefunctions are spinors with 2 components
-		NPOL = 2;
+		GlobalV::NPOL = 2;
 		//set the domag variable to make a spin-orbit calculation with zero magnetization
-		if(NONCOLIN)
+		if(GlobalV::NONCOLIN)
 		{
-			DOMAG = true;
-			DOMAG_Z = false;
+			GlobalV::DOMAG = true;
+			GlobalV::DOMAG_Z = false;
 		}
 		else{
-			DOMAG = false;
-			DOMAG_Z = true;
+			GlobalV::DOMAG = false;
+			GlobalV::DOMAG_Z = true;
 		}
-		LSPINORB = INPUT.lspinorb;
+		GlobalV::LSPINORB = INPUT.lspinorb;
 
-		delete[] ucell.magnet.m_loc_;
-		delete[] ucell.magnet.angle1_;
-		delete[] ucell.magnet.angle2_;
-		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
-		ucell.magnet.angle1_ = new double[INPUT.ntype];
-		ucell.magnet.angle2_ = new double[INPUT.ntype];
+		delete[] GlobalC::ucell.magnet.m_loc_;
+		delete[] GlobalC::ucell.magnet.angle1_;
+		delete[] GlobalC::ucell.magnet.angle2_;
+		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalC::ucell.magnet.angle1_ = new double[INPUT.ntype];
+		GlobalC::ucell.magnet.angle2_ = new double[INPUT.ntype];
 		for(int i = 0;i<INPUT.ntype;i++)
 		{
-			ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
-			ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
+			GlobalC::ucell.magnet.angle1_[i] = INPUT.angle1[i]/180*PI;
+			GlobalC::ucell.magnet.angle2_[i] = INPUT.angle2[i]/180*PI;
 		}
 #ifdef __MPI
-//			Parallel_Common::bcast_double(ucell.magnet.angle1_[i]);
-//			Parallel_Common::bcast_double(ucell.magnet.angle2_[i]);
+//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle1_[i]);
+//			Parallel_Common::bcast_double(GlobalC::ucell.magnet.angle2_[i]);
 #endif
 	}
 	else{
-		delete[] ucell.magnet.m_loc_;
-		ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
-		LSPINORB = false;
-		NONCOLIN = false;
-		DOMAG = false;
-		DOMAG_Z = false;
-		NPOL = 1;
+		delete[] GlobalC::ucell.magnet.m_loc_;
+		GlobalC::ucell.magnet.m_loc_ = new Vector3<double> [INPUT.ntype];
+		GlobalV::LSPINORB = false;
+		GlobalV::NONCOLIN = false;
+		GlobalV::DOMAG = false;
+		GlobalV::DOMAG_Z = false;
+		GlobalV::NPOL = 1;
 	}
 	
 //----------------------------------------------------------
@@ -369,28 +369,28 @@ void Input_Conv::Convert(void)
 
 
 	// jiyy add 2020.10.11	
-	ocp = INPUT.ocp;
+	GlobalV::ocp = INPUT.ocp;
      //ocp_n = INPUT.ocp_n;
-    ocp_set = INPUT.ocp_set;
-    if(ocp == 1)
+    GlobalV::ocp_set = INPUT.ocp_set;
+    if(GlobalV::ocp == 1)
 	{
 		int count = 0;
 		string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
 		vector<string> str;
 		string::size_type pos1, pos2;
 		string c = " ";
-		pos2 = ocp_set.find(c);
+		pos2 = GlobalV::ocp_set.find(c);
 		pos1 = 0;
 		while(string::npos != pos2)
 		{
-			str.push_back(ocp_set.substr(pos1, pos2-pos1));
+			str.push_back(GlobalV::ocp_set.substr(pos1, pos2-pos1));
  
 			pos1 = pos2 + c.size();
-			pos2 = ocp_set.find(c, pos1);
+			pos2 = GlobalV::ocp_set.find(c, pos1);
 		}
-		if(pos1 != ocp_set.length())
+		if(pos1 != GlobalV::ocp_set.length())
 		{
-			str.push_back(ocp_set.substr(pos1));
+			str.push_back(GlobalV::ocp_set.substr(pos1));
 		}
 
 		regex_t reg;
@@ -420,50 +420,50 @@ void Input_Conv::Convert(void)
 				int num = stoi(sub_str.substr(0, pos));
 				double occ = stof(sub_str.substr(pos+1, sub_str.size()));
 				vector<double> ocp_temp(num, occ);
-				const vector<double>::iterator dest = ocp_kb.begin()+count;
+				const vector<double>::iterator dest = GlobalV::ocp_kb.begin()+count;
 				copy(ocp_temp.begin(), ocp_temp.end(), dest);
 				count += num;
 			}
 			else
 			{
-				ocp_kb[count] = stof(sub_str);
+				GlobalV::ocp_kb[count] = stof(sub_str);
 				count += 1;
 			}
 		}
 	}
 		
-    mulliken = INPUT. mulliken;//qifeng add 2019/9/10
+    GlobalV::mulliken = INPUT.mulliken;//qifeng add 2019/9/10
 
 //----------------------------------------------------------
 // about restart, // Peize Lin add 2020-04-04
 //----------------------------------------------------------	
 	if(INPUT.restart_save)
 	{
-		restart.folder = global_out_dir + "restart/";
-		const string command0 =  "test -d " + restart.folder + " || mkdir " + restart.folder;
-		if(MY_RANK==0)
+		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
+		const string command0 =  "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
+		if(GlobalV::MY_RANK==0)
 			system( command0.c_str() );
 		if(INPUT.exx_hybrid_type=="no")
 		{
-			restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_charge = true;
 		}
 		else
 		{
-			restart.info_save.save_charge = true;
-			restart.info_save.save_H = true;
+			GlobalC::restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_H = true;
 		}
 	}
 	if(INPUT.restart_load)
 	{
-		restart.folder = global_out_dir + "restart/";
+		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
 		if(INPUT.exx_hybrid_type=="no")
 		{
-			restart.info_load.load_charge = true;
+			GlobalC::restart.info_load.load_charge = true;
 		}
 		else
 		{
-			restart.info_load.load_charge = true;
-			restart.info_load.load_H = true;
+			GlobalC::restart.info_load.load_charge = true;
+			GlobalC::restart.info_load.load_H = true;
 		}
 	}
 
@@ -473,31 +473,31 @@ void Input_Conv::Convert(void)
 #ifdef __LCAO
 	if(INPUT.exx_hybrid_type=="no")
 	{
-		exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
+		GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::No;
 	}
 	else
 	{
 		if(INPUT.exx_hybrid_type=="hf")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HF;
 		}
 		else if(INPUT.exx_hybrid_type=="pbe0")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::PBE0;
 		}
 		else if(INPUT.exx_hybrid_type=="hse")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::HSE;
 		}
 		else if(INPUT.exx_hybrid_type=="opt_orb")
 		{
-			exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
+			GlobalC::exx_global.info.hybrid_type = Exx_Global::Hybrid_Type::Generate_Matrix;
 		}
-		exx_global.info.hybrid_alpha    = INPUT.exx_hybrid_alpha      ;
-		exx_global.info.hse_omega       = INPUT.exx_hse_omega         ;
-		exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
-		exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
-		exx_lip.info.lambda             = INPUT.exx_lambda            ;
+		GlobalC::exx_global.info.hybrid_alpha    = INPUT.exx_hybrid_alpha      ;
+		GlobalC::exx_global.info.hse_omega       = INPUT.exx_hse_omega         ;
+		GlobalC::exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
+		GlobalC::exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
+		GlobalC::exx_lip.info.lambda             = INPUT.exx_lambda            ;
 		exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
 		exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
 		exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
@@ -528,7 +528,7 @@ void Input_Conv::Convert(void)
 	}
 #endif
 
-    ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
+    GlobalC::ppcell.cell_factor = INPUT.cell_factor; //LiuXh add 20180619
 
 //    NEW_DM=INPUT.new_dm;  // Shen Yu add 2019/5/9
 
@@ -545,26 +545,26 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // charge mixing(3/3)
 //----------------------------------------------------------
-    CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, 
+    GlobalC::CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, 
 	INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
 
 //----------------------------------------------------------
 // iteration 
 //----------------------------------------------------------
-    NITER = INPUT.niter;
-    NSTEP = INPUT.nstep;
+    GlobalV::NITER = INPUT.niter;
+    GlobalV::NSTEP = INPUT.nstep;
 
 //----------------------------------------------------------
 // wavefunction / charge / potential / (2/4)
 //----------------------------------------------------------
-    pot.start_pot = INPUT.start_pot;
-	pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
-    CHR.out_charge = INPUT.out_charge;
-	CHR.nelec = INPUT.nelec;
-	pot.out_potential = INPUT.out_potential;
-    wf.out_wf = INPUT.out_wf;
-	en.out_dos = INPUT.out_dos;
-    en.out_band = INPUT.out_band;
+    GlobalC::pot.start_pot = INPUT.start_pot;
+	GlobalC::pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
+    GlobalC::CHR.out_charge = INPUT.out_charge;
+	GlobalC::CHR.nelec = INPUT.nelec;
+	GlobalC::pot.out_potential = INPUT.out_potential;
+    GlobalC::wf.out_wf = INPUT.out_wf;
+	GlobalC::en.out_dos = INPUT.out_dos;
+    GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
 	LOC.out_dm = INPUT.out_dm;
 	ParaO.out_hs = INPUT.out_hs;
@@ -572,11 +572,11 @@ void Input_Conv::Convert(void)
 	ParaO.out_lowf = INPUT.out_lowf;
 #endif
 
-	en.dos_emin_ev = INPUT.dos_emin_ev;
-	en.dos_emax_ev = INPUT.dos_emax_ev;
-	en.dos_edelta_ev = INPUT.dos_edelta_ev;
-	en.dos_scale= INPUT.dos_scale;
-    en.bcoeff = INPUT.b_coef;
+	GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;
+	GlobalC::en.dos_emax_ev = INPUT.dos_emax_ev;
+	GlobalC::en.dos_edelta_ev = INPUT.dos_edelta_ev;
+	GlobalC::en.dos_scale= INPUT.dos_scale;
+    GlobalC::en.bcoeff = INPUT.b_coef;
 
 //----------------------------------------------------------
 // About LCAO

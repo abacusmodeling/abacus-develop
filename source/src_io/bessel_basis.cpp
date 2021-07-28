@@ -50,23 +50,23 @@ void Bessel_Basis::init(
 //-----------------------------------------------
 // for test.
 //-----------------------------------------------
-//	ofs_running << "\n TableOne:";
+//	GlobalV::ofs_running << "\n TableOne:";
 //	for(int i=0; i<TableOne.getSize(); i++)
 //	{
-//		ofs_running << "\n" << TableOne.ptr[i];
+//		GlobalV::ofs_running << "\n" << TableOne.ptr[i];
 //	}
 
 	if( start_from_file )	
 	{
 		// setup C4
-		this->allocate_C4(ntype, lmax_in, ucell.nmax, Ecut_number);
+		this->allocate_C4(ntype, lmax_in, GlobalC::ucell.nmax, Ecut_number);
 
 		// check tolerence
 		this->readin_C4("INPUTs", ntype, ecut, rcut, Ecut_number, tolerence);
 #ifdef __MPI
 		Parallel_Common::bcast_double( C4.ptr, C4.getSize() );
 #endif
-		this->init_Faln(ntype, lmax_in, ucell.nmax, Ecut_number);
+		this->init_Faln(ntype, lmax_in, GlobalC::ucell.nmax, Ecut_number);
 	}
 
 	return;
@@ -131,9 +131,9 @@ void Bessel_Basis::init_Faln(
 	this->nwfc = 0;
 	for(int it=0; it<ntype; it++)
 	{
-		for(int il=0; il<ucell.atoms[it].nwl+1; il++)
+		for(int il=0; il<GlobalC::ucell.atoms[it].nwl+1; il++)
 		{
-			for(int in=0; in<ucell.atoms[it].l_nchi[il]; in++)
+			for(int in=0; in<GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 			{
 				for(int ie=0; ie<ecut_number; ie++)
 				{
@@ -174,8 +174,8 @@ void Bessel_Basis::init_TableOne(
 	// init kmesh
 	this->kmesh = static_cast<int>(sqrt(ecutwfc) / dk) +1 + 4;
 	if (kmesh % 2 == 0)++kmesh;
-	OUT(ofs_running, "kmesh",kmesh);
-	OUT(ofs_running, "dk",dk);
+	OUT(GlobalV::ofs_running, "kmesh",kmesh);
+	OUT(GlobalV::ofs_running, "dk",dk);
 
 	// init Table One
 	this->TableOne.create(lmax+1, ecut_number, kmesh);
@@ -183,8 +183,8 @@ void Bessel_Basis::init_TableOne(
 	// init rmesh
 	int rmesh = static_cast<int>( rcut / dr ) + 4;
     if (rmesh % 2 == 0) ++rmesh;
-    OUT(ofs_running, "rmesh",rmesh);
-    OUT(ofs_running, "dr",dr);
+    OUT(GlobalV::ofs_running, "rmesh",rmesh);
+    OUT(GlobalV::ofs_running, "dr",dr);
 
 	// allocate rmesh and Jlk and eigenvalue of Jlq
 	double *r = new double[rmesh];
@@ -208,10 +208,10 @@ void Bessel_Basis::init_TableOne(
 	//caoyu add 2021-3-10
 	//=========output .orb format=============
 	stringstream ss;
-	ss << global_out_dir << "jle.orb";
+	ss << GlobalV::global_out_dir << "jle.orb";
 	ofstream ofs(ss.str().c_str());
 	ofs << "---------------------------------------------------------------------------"<< endl;
-	ofs << setiosflags(ios::left) << setw(28) << "Energy Cutoff(Ry)" << ecutwfc << endl;
+	ofs << setiosflags(ios::left) << setw(28) << "Energy Cutoff(Ry)" << ecut << endl;
 	ofs << setiosflags(ios::left) << setw(28) << "Radius Cutoff(a.u.)" << rcut << endl;
 	ofs << setiosflags(ios::left) << setw(28) << "Lmax" << lmax << endl;
 	for (int l = 0; l < lmax + 1; l++) 
@@ -279,7 +279,7 @@ void Bessel_Basis::init_TableOne(
 
 			//====== output ========
 //			stringstream ss;
-//			ss << global_out_dir << l << "." << ie << ".txt";
+//			ss << GlobalV::global_out_dir << l << "." << ie << ".txt";
 //			ofstream ofs(ss.str().c_str());
 
 //			for(int ir=0; ir<rmesh; ir++) ofs << r[ir] << " " << jle[ir] << " " << jle[ir]*g[ir] << endl; 
@@ -340,13 +340,13 @@ void Bessel_Basis::readin_C4(
 {
 	TITLE("Bessel_Basis","readin_C4");
 
-	if(MY_RANK != 0) return;
+	if(GlobalV::MY_RANK != 0) return;
 
 	ifstream ifs( name.c_str() );
 
 	if(!ifs) 
 	{
-		ofs_warning << " File name : " << name << endl;
+		GlobalV::ofs_warning << " File name : " << name << endl;
 		WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 	}
 
@@ -357,9 +357,9 @@ void Bessel_Basis::readin_C4(
 		{
 			string filec4;
 			ifs >> filec4;
-			for(int il=0; il< ucell.atoms[it].nwl+1; il++)
+			for(int il=0; il< GlobalC::ucell.atoms[it].nwl+1; il++)
 			{
-				for(int in=0; in< ucell.atoms[it].l_nchi[il]; in++)
+				for(int in=0; in< GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 				{
 					//for tests
 					//cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
@@ -368,7 +368,7 @@ void Bessel_Basis::readin_C4(
 					
 					if(!inc4) 
 					{
-						ofs_warning << " File name : " << filec4 << endl;
+						GlobalV::ofs_warning << " File name : " << filec4 << endl;
 						WARNING_QUIT("Bessel_Basis::readin_C4","Can not find file.");
 					}
 
@@ -452,9 +452,9 @@ void Bessel_Basis::allocate_C4(
 
 	for(int it=0; it<ntype; it++)
 	{
-		for(int il=0; il<ucell.atoms[it].nwl+1; il++)
+		for(int il=0; il<GlobalC::ucell.atoms[it].nwl+1; il++)
 		{
-			for(int in=0; in<ucell.atoms[it].l_nchi[il]; in++)
+			for(int in=0; in<GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 			{
 				for(int ie=0; ie<ecut_number; ie++)
 				{
@@ -481,10 +481,10 @@ void Bessel_Basis::bcast(void)
 void Bessel_Basis::readin(const string &name)
 {
 	TITLE("Bessel_Basis", "readin");
-	if (MY_RANK == 0)
+	if (GlobalV::MY_RANK == 0)
 	{
 		ifstream ifs(name.c_str());
-		ofs_running << " File name : " << name << endl;
+		GlobalV::ofs_running << " File name : " << name << endl;
 		if (!ifs)
 		{
 			cout << " File name : " << name << endl;
@@ -502,11 +502,11 @@ void Bessel_Basis::readin(const string &name)
 			assert(ecut > 0.0);
 			assert(rcut > 0.0);
 			assert(tolerence > 0.0);
-			OUT(ofs_running, "smooth",smooth);
-			OUT(ofs_running, "sigma",sigma);
-			OUT(ofs_running, "ecut", ecut);
-			OUT(ofs_running, "rcut", rcut);
-			OUT(ofs_running, "tolerence", tolerence);
+			OUT(GlobalV::ofs_running, "smooth",smooth);
+			OUT(GlobalV::ofs_running, "sigma",sigma);
+			OUT(GlobalV::ofs_running, "ecut", ecut);
+			OUT(GlobalV::ofs_running, "rcut", rcut);
+			OUT(GlobalV::ofs_running, "tolerence", tolerence);
 			SCAN_END(ifs, "</SPHERICAL_BESSEL>");
 		}
 		ifs.close();

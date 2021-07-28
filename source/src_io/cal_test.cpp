@@ -47,27 +47,27 @@ void Cal_Test::test_memory(void)
 {
 	TITLE("Cal_Test","test_memory");
 
-	const int ngmw = Cal_Test::cal_np(pw.ggwfc2, pw.ncx, pw.ncy, pw.ncz);
-	const int ngmc = Cal_Test::cal_np(pw.ggchg, pw.ncx, pw.ncy, pw.ncz);
+	const int ngmw = Cal_Test::cal_np(GlobalC::pw.ggwfc2, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);
+	const int ngmc = Cal_Test::cal_np(GlobalC::pw.ggchg, GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz);
 
-	cout << " number of atoms = " << ucell.nat << endl;
+	cout << " number of atoms = " << GlobalC::ucell.nat << endl;
 	cout << " plane wave number for wave functions = " << ngmw << endl;
 	cout << " plane wave number for chage density  = " << ngmc << endl;
 
-	mporter = Memory::calculate_mem ( pw.ncxyz, "double");
+	mporter = Memory::calculate_mem ( GlobalC::pw.ncxyz, "double");
 
 	mrho = mporter;
 	mrho_save = mrho;
 	mrho_core = mrho;
 
 	// (2) memory for charge mixing
-	cout << " Mixing mode = " << CHR.mixing_mode << endl;
-	if(CHR.mixing_mode == "pulay")
+	cout << " Mixing mode = " << GlobalC::CHR.mixing_mode << endl;
+	if(GlobalC::CHR.mixing_mode == "pulay")
 	{
-		cout << " Mixing dimension = " << CHR.mixing_ndim << endl;
-		mRrho = CHR.mixing_ndim * mrho;
-		mdRrho = (CHR.mixing_ndim-1) * mrho;
-		mdrho = (CHR.mixing_ndim-1) * mrho;
+		cout << " Mixing dimension = " << GlobalC::CHR.mixing_ndim << endl;
+		mRrho = GlobalC::CHR.mixing_ndim * mrho;
+		mdRrho = (GlobalC::CHR.mixing_ndim-1) * mrho;
+		mdrho = (GlobalC::CHR.mixing_ndim-1) * mrho;
 		mrho_save2 = mrho;
 //		cout << " Memory for pulay mixing: " << mrho << " MB" << endl;	
 	}
@@ -82,9 +82,9 @@ void Cal_Test::test_memory(void)
 	mrhog_save = Memory::calculate_mem( ngmc, "cdouble");
 	mrhog_core = Memory::calculate_mem( ngmc, "cdouble"); 
 	
-	mhs = Memory::calculate_mem( NLOCAL*NLOCAL, "double" );
-	mwf = Memory::calculate_mem( NLOCAL*NBANDS, "double" );
-	mnonzero = Memory::calculate_mem( NLOCAL*(NLOCAL+1)/2, "bool");
+	mhs = Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NLOCAL, "double" );
+	mwf = Memory::calculate_mem( GlobalV::NLOCAL*GlobalV::NBANDS, "double" );
+	mnonzero = Memory::calculate_mem( GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/2, "bool");
 // mohan comment out 2021-02-11
 //	mspar_hsrho = Memory::calculate_mem( Hnnz*3, "double");
 	
@@ -94,32 +94,32 @@ void Cal_Test::test_memory(void)
 	mig2fftc = Memory::calculate_mem( ngmc , "int");  
 	mgg = Memory::calculate_mem( ngmc, "double");
 	mig123 = Memory::calculate_mem( ngmc*3, "int");
-	mstrucFac = Memory::calculate_mem( ucell.ntype*ngmc, "cdouble");
-	meigts123 = Memory::calculate_mem( ucell.nat * (2*pw.ncx+1+2*pw.ncy+1+2*pw.ncz+1), "cdouble");
+	mstrucFac = Memory::calculate_mem( GlobalC::ucell.ntype*ngmc, "cdouble");
+	meigts123 = Memory::calculate_mem( GlobalC::ucell.nat * (2*GlobalC::pw.ncx+1+2*GlobalC::pw.ncy+1+2*GlobalC::pw.ncz+1), "cdouble");
 
 //	cout << " Memory for "
 
 
 	//(3) Memory for H,S matrix.
-	cout << " NLOCAL = " << NLOCAL << endl;
-	cout << " NBANdS = " << NBANDS << endl;
+	cout << " NLOCAL = " << GlobalV::NLOCAL << endl;
+	cout << " NBANdS = " << GlobalV::NBANDS << endl;
 
 //	cout << " Memory for H,S matrix ( " 
-//		<< NLOCAL << ", "
-//		<< NLOCAL << ") = "
+//		<< GlobalV::NLOCAL << ", "
+//		<< GlobalV::NLOCAL << ") = "
 //		<< mhs << " MB" << endl;
 	
 	//(4) Memory for wave functions.
 //	cout << " Memory for wave functions ( " 
-//		<< NLOCAL << ", "
-//		<< NBANDS << ") = "
+//		<< GlobalV::NLOCAL << ", "
+//		<< GlobalV::NBANDS << ") = "
 //		<< mwf << " MB" << endl;
 
 	print_mem(1);
 	print_mem(8);
 	print_mem(16);
 
-	if(ucell.nat > 200)
+	if(GlobalC::ucell.nat > 200)
 	{
 		print_mem(32);
 		print_mem(64);
@@ -145,7 +145,7 @@ int Cal_Test::cal_np(const double &ggcut, const int &n1, const int &n2, const in
 			{
 				Vector3<double> f(i,j,k);
 				// g2= |f|^2 in the unit of (2Pi/lat0)^2
-				double g2 = f * (ucell.GGT * f);
+				double g2 = f * (GlobalC::ucell.GGT * f);
 
 				// gcut is from input.
 				if (g2 <= ggcut)
@@ -169,8 +169,8 @@ void Cal_Test::print_mem(const int &nproc)
 	mgvec + mgg + mig2fftw + mig2fftc + mig123 +
 	mstrucFac + meigts123; 
 
-	//if(DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
-	if(KS_SOLVER=="selinv") //xiaohui add 2013-09-02
+	//if(GlobalV::DIAGO_TYPE=="selinv") xiaohui modify 2013-09-02
+	if(GlobalV::KS_SOLVER=="selinv") //xiaohui add 2013-09-02
 	{
 		mtot += mnonzero + mspar_hsrho;
 	}
@@ -209,5 +209,5 @@ void Cal_Test::print_mem(const int &nproc)
 	cout << " MEMORY FOR eigts1,2,3   : " << setw(15) << meigts123/nproc << " MB" << endl;
 	cout << " TOTAL MEMORY            : " << setw(15) << mtot/nproc << " MB" << endl;
 	
-	cout << " MEMORY FOR nonzero      : " << setw(15) << (double)NLOCAL*(NLOCAL+1)/1028/1028/2.0/nproc << " MB" << endl; //mohan for tmp 
+	cout << " MEMORY FOR nonzero      : " << setw(15) << (double)GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/1028/1028/2.0/nproc << " MB" << endl; //mohan for tmp 
 }

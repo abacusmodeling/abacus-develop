@@ -33,7 +33,7 @@ public:
 		const LCAO_Orbitals &orb_B );
 		
 	void init_radial_table();
-	void init_radial_table( map<size_t,map<size_t,set<double>>> &Rs );		// unit is ucell.lat0
+	void init_radial_table( map<size_t,map<size_t,set<double>>> &Rs );		// unit is GlobalC::ucell.lat0
 	
 	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> cal_overlap_matrix(
 		const Element_Basis_Index::IndexLNM &index_r, 

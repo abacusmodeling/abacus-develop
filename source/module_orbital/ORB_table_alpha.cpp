@@ -68,12 +68,12 @@ void ORB_table_alpha::allocate(
 		++Rmesh;
 	}
 
-	//	OUT(ofs_running,"lmax",lmax);
-	//	OUT(ofs_running,"Rmax (Bohr)",Rmax);
-	//	OUT(ofs_running,"dr (Bohr)",dr);
-	//	OUT(ofs_running,"dk",dk);
-	//	OUT(ofs_running,"nlm",nlm);
-	//	OUT(ofs_running,"kmesh",kmesh);
+	//	OUT(GlobalV::ofs_running,"lmax",lmax);
+	//	OUT(GlobalV::ofs_running,"Rmax (Bohr)",Rmax);
+	//	OUT(GlobalV::ofs_running,"dr (Bohr)",dr);
+	//	OUT(GlobalV::ofs_running,"dk",dk);
+	//	OUT(GlobalV::ofs_running,"nlm",nlm);
+	//	OUT(GlobalV::ofs_running,"kmesh",kmesh);
 
 	delete[] kpoint;
 	delete[] r;
@@ -97,7 +97,7 @@ void ORB_table_alpha::allocate(
 		rab[ir] = dr;
 	}
 
-	//	OUT(ofs_running,"allocate kpoint, r, rab, kab","Done");
+	//	OUT(GlobalV::ofs_running,"allocate kpoint, r, rab, kab","Done");
 	return;
 }
 
@@ -114,8 +114,8 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 
 	if (rmesh <= 0)
 	{
-//		ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
-//		ofs_warning << "\n rmesh = " << rmesh;
+//		GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
+//		GlobalV::ofs_warning << "\n rmesh = " << rmesh;
 		cout << "\n R1 = " << R1 << " R2 = " << R2;
 		cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
@@ -318,7 +318,7 @@ void ORB_table_alpha::init_Table_Alpha(
 	}					  // end T1
 	destroy_nr = true;
 
-	//	OUT(ofs_running,"allocate non-local potential matrix","Done");
+	//	OUT(GlobalV::ofs_running,"allocate non-local potential matrix","Done");
 	timer::tick("ORB_table_alpha", "init_Table_Alpha");
 	return;
 }
@@ -424,7 +424,7 @@ void ORB_table_alpha::print_Table_DSR(void)
 	stringstream ss;
 	// the parameter 'winput::spillage_outdir' is read from INPUTw.
 	ss << "./S_I_mu_alpha.dat";
-	if (MY_RANK == 0)
+	if (GlobalV::MY_RANK == 0)
 	{
 		ofs.open(ss.str().c_str());
 	}

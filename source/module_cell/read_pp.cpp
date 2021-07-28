@@ -65,24 +65,24 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
         return 1;
     }
 
-    if(global_pseudo_type=="auto") //zws
+    if(GlobalV::global_pseudo_type=="auto") //zws
 	{
 		set_pseudo_type(fn);
 	}
 
 	// read in the .UPF type of pseudopotentials
-	if(global_pseudo_type=="upf")
+	if(GlobalV::global_pseudo_type=="upf")
 	{
 		int info = read_pseudo_upf(ifs);
 		return info;
 	}
 	// read in the .vwr type of pseudopotentials
-	else if(global_pseudo_type=="vwr")
+	else if(GlobalV::global_pseudo_type=="vwr")
 	{
 		int info = read_pseudo_vwr(ifs);
 		return info;
 	}
-	else if(global_pseudo_type=="upf201")
+	else if(GlobalV::global_pseudo_type=="upf201")
 	{
 		int info = read_pseudo_upf201(ifs);
 		return info;
@@ -111,11 +111,11 @@ int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
 
 		if ( trim(strversion) == "2.0.1" )
 		{
-			global_pseudo_type = "upf201";
+			GlobalV::global_pseudo_type = "upf201";
 		}
 		else
 		{
-			global_pseudo_type = "upf";
+			GlobalV::global_pseudo_type = "upf";
 		}
 	}
 	return 0;
@@ -144,7 +144,7 @@ string Pseudopot_upf::trimend(string &in_str)
 int Pseudopot_upf::average_p(void)
 {
 	int error = 0;
-	if(!this->has_so && LSPINORB) 
+	if(!this->has_so && GlobalV::LSPINORB) 
 	{
 		error++; 
 		cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<endl; 
@@ -152,7 +152,7 @@ int Pseudopot_upf::average_p(void)
 	}
 	//WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
 
-	if(!this->has_so || LSPINORB) 
+	if(!this->has_so || GlobalV::LSPINORB) 
 	{
 		return error; 
 	}

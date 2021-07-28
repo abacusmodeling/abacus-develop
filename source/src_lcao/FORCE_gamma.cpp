@@ -45,8 +45,8 @@ void Force_LCAO_gamma::ftable_gamma (
         timer::tick("Force_LCAO_gamma","cal_dm_grid");
         // calculate the 'density matrix' here.
         matrix dm2d;
-		dm2d.create(NSPIN, ParaO.nloc);
-        Memory::record ("Force_LCAO_gamma", "dm2d", ParaO.nloc*NSPIN, "double");    
+		dm2d.create(GlobalV::NSPIN, ParaO.nloc);
+        Memory::record ("Force_LCAO_gamma", "dm2d", ParaO.nloc*GlobalV::NSPIN, "double");    
 
         bool with_energy = false;
 
@@ -106,7 +106,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     ZEROS(LM.DSloc_y, ParaO.nloc);
     ZEROS(LM.DSloc_z, ParaO.nloc);
     //allocate stress part in gamma_only-line, added by zhengdy-stress
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         LM.DSloc_11 = new double [ParaO.nloc];
         LM.DSloc_12 = new double [ParaO.nloc];
@@ -178,7 +178,7 @@ void Force_LCAO_gamma::finish_ftable_gamma(void)
     delete [] LM.DHloc_fixed_x;
     delete [] LM.DHloc_fixed_y;
     delete [] LM.DHloc_fixed_z;
-    if(STRESS)//added by zhengdy-stress
+    if(GlobalV::STRESS)//added by zhengdy-stress
     {
         delete [] LM.DSloc_11;
         delete [] LM.DSloc_12;
@@ -201,13 +201,13 @@ void Force_LCAO_gamma::test_gamma(double* mm, const string &name)
 {
     cout << "\n PRINT " << name << endl;
     cout << setprecision(6) << endl;
-    for(int i=0; i<NLOCAL; i++)
+    for(int i=0; i<GlobalV::NLOCAL; i++)
     {
-        for(int j=0; j<NLOCAL; j++)
+        for(int j=0; j<GlobalV::NLOCAL; j++)
         {
-            if( abs(mm[i*NLOCAL+j])>1.0e-5)
+            if( abs(mm[i*GlobalV::NLOCAL+j])>1.0e-5)
             {
-                cout << setw(12) << mm[i*NLOCAL+j];
+                cout << setw(12) << mm[i*GlobalV::NLOCAL+j];
             }
             else
             {
