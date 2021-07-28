@@ -159,12 +159,12 @@ void LOOP_elec::solver(const int &istep)
 			|| GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") //pengfei 2014-10-13
 	{
 		//Peize Lin add 2016-12-03
-		switch(exx_lcao.info.hybrid_type)
+		switch(GlobalC::exx_lcao.info.hybrid_type)
 		{
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				exx_lcao.cal_exx_ions();
+				GlobalC::exx_lcao.cal_exx_ions();
 				break;
 			case Exx_Global::Hybrid_Type::No:
 			case Exx_Global::Hybrid_Type::Generate_Matrix:
@@ -193,7 +193,7 @@ void LOOP_elec::solver(const int &istep)
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
 					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-					exx_lcao.cal_exx_elec();
+					GlobalC::exx_lcao.cal_exx_elec();
 					
 					ELEC_scf es;
 					es.scf(istep-1);

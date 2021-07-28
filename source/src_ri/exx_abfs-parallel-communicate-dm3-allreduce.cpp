@@ -30,7 +30,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	H_atom_pairs_group_rank = get_H_atom_pairs_group_rank(H_atom_pairs_group);
 	get_send_recv_size(H_atom_pairs_group_rank, H_atom_pairs_group, send_size_list, recv_size);
 
-ofstream ofs(exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank));
+ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank));
 //ofs<<H_atom_pairs_group<<endl;
 //ofs<<atom_in_2D<<endl;
 //for(int rank=0; rank!=comm_sz; ++rank)
@@ -48,7 +48,7 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
 	Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx(
 		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
-ofstream ofs(exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstream::app);
+ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstream::app);
 //ofs<<data_local<<endl<<"@@@"<<endl;;
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");

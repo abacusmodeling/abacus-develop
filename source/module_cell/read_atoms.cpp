@@ -89,9 +89,9 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 	}
 
 	// Peize Lin add 2016-09-23
-	if( Exx_Global::Hybrid_Type::HF   == exx_lcao.info.hybrid_type || 
-	    Exx_Global::Hybrid_Type::PBE0 == exx_lcao.info.hybrid_type || 
-		Exx_Global::Hybrid_Type::HSE  == exx_lcao.info.hybrid_type )
+	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
+	    Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+		Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
 	{
 		if( SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
 		{
@@ -99,7 +99,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 			{
 				string ofile;
 				ifa >> ofile;
-				exx_lcao.info.files_abfs.push_back(ofile);
+				GlobalC::exx_lcao.info.files_abfs.push_back(ofile);
 			}
 		}
 	}

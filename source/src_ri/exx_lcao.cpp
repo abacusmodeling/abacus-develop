@@ -1097,7 +1097,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<exx_lcao.Hexx_para.HK_Gamma_m2D[is]<<endl;
+				ofs<<this->Hexx_para.HK_Gamma_m2D[is]<<endl;
 			}
 		}
 		else
@@ -1105,7 +1105,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<exx_lcao.Hexx_para.HK_K_m2D[ik]<<endl;
+				ofs<<this->Hexx_para.HK_K_m2D[ik]<<endl;
 			}
 		}
 	};

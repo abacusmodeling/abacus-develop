@@ -146,7 +146,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial_table()
 
 void Exx_Abfs::Matrix_Orbs21::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
 {
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 gettimeofday(&t_start, NULL);
 

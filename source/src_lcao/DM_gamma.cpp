@@ -452,10 +452,10 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 #ifdef __MPI //2015-09-06, xiaohui
 	#if EXX_DM==2
-	if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
-		|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
-		|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
-		exx_lcao.DM_para.clear_DMr();
+	if( Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type 
+		|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type 
+		|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type )
+		GlobalC::exx_lcao.DM_para.clear_DMr();
 	#endif
 
 	// Peize Lin update 2018-07-02
@@ -595,11 +595,11 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 				}
 						
 				#if EXX_DM==2
-				if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
-					|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
-					|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
+				if( Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type 
+					|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type 
+					|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type )
 				{
-					exx_lcao.DM_para.set_DM_gamma( rho_row_col, is, {row_count*300,col_count*300} );
+					GlobalC::exx_lcao.DM_para.set_DM_gamma( rho_row_col, is, {row_count*300,col_count*300} );
 				}
 				#endif				
 			}  // end for col_count

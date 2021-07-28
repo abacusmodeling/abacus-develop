@@ -45,7 +45,7 @@ void LOOP_cell::opt_cell(void)
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				exx_lcao.init();
+				GlobalC::exx_lcao.init();
 				break;
 			case Exx_Global::Hybrid_Type::No:
 			case Exx_Global::Hybrid_Type::Generate_Matrix:
