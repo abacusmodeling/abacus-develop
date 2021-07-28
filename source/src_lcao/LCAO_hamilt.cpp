@@ -700,7 +700,7 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
 					}
 				}
 
-				dftu.cal_eff_pot_mat_R_double(current_spin, SR_tmp, HR_tmp);
+				GlobalC::dftu.cal_eff_pot_mat_R_double(current_spin, SR_tmp, HR_tmp);
 
 				for (int i = 0; i < GlobalV::NLOCAL; ++i)
 				{
@@ -798,7 +798,7 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 					}
 				}
 
-				dftu.cal_eff_pot_mat_R_complex_double(current_spin, SR_soc_tmp, HR_soc_tmp);
+				GlobalC::dftu.cal_eff_pot_mat_R_complex_double(current_spin, SR_soc_tmp, HR_soc_tmp);
 
 				for (int i = 0; i < GlobalV::NLOCAL; ++i)
 				{

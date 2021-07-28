@@ -60,7 +60,10 @@ extern "C"
     double *C, const int *IC, const int *JC, const int *DESCC);
 }
 
+namespace GlobalC
+{
 DFTU dftu;
+}
 
 DFTU::DFTU(){}
 
@@ -269,7 +272,7 @@ void DFTU::init(
 
 	//this->out_numorb();
 
-  //GlobalV::ofs_running << "dftu.cpp "<< __LINE__ << endl;
+  //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << endl;
     return;
 }
 
@@ -481,7 +484,7 @@ void DFTU::cal_occup_m_k(const int iter)
 	  }//end ia
 	}//end it
 
-	//GlobalV::ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	return;
 }
 
@@ -655,7 +658,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	}
 	*/
 
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	return;
 }
 
@@ -1151,7 +1154,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 
 	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//GlobalV::ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
@@ -1219,7 +1222,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	}
 	*/
 
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 
 	return;	
 }
@@ -1234,7 +1237,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 
 	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
@@ -1302,7 +1305,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	}
 	*/
 	
-	//ofs_running << "dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
 
 	return;	
 }

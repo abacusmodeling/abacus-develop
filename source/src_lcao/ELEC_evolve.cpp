@@ -101,7 +101,7 @@ void ELEC_evolve::evolve_psi(
 		if(INPUT.dft_plus_u)
 		{
       vector<complex<double>> eff_pot(GlobalC::ParaO.nloc);
-			dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
+			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
       
 			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
 				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					

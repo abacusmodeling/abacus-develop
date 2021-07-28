@@ -63,6 +63,9 @@ public:
    
 };
 
+namespace GlobalC
+{
 extern DFTU dftu;
+}
 
 #endif

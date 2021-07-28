@@ -206,14 +206,14 @@ void Force_Stress_LCAO::getForceStress(
 			{
 				for(int j=0; j<3; j++)
 				{
-					stress_dftu(j,i) = dftu.stress_dftu.at(j).at(i);
+					stress_dftu(j,i) = GlobalC::dftu.stress_dftu.at(j).at(i);
 				}
 			}
 			if(isforce)
 			{
 				for (int iat = 0; iat < nat; iat++)
 				{
-					force_dftu(iat, i) = dftu.force_dftu.at(iat).at(i);
+					force_dftu(iat, i) = GlobalC::dftu.force_dftu.at(iat).at(i);
 				}
 			}
 		}
