@@ -495,7 +495,7 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
 			const int inc=1;
 			if(myid==src_rank)
 			{
-				LapackConnector::copy(GlobalC::ParaO.nloc, work, inc, LOC.wfc_dm_2d.wfc_gamma[is].c, inc);
+				LapackConnector::copy(GlobalC::ParaO.nloc, work, inc, GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].c, inc);
 			}
 		}//loop ipcol
 	}//loop	iprow
@@ -567,7 +567,7 @@ void WF_Local::distri_lowf_complex_new(complex<double> **ctot, const int &ik)
 			const int inc=1;
 			if(myid==src_rank)
 			{
-				LapackConnector::copy(GlobalC::ParaO.nloc, work, inc, LOC.wfc_dm_2d.wfc_k[ik].c, inc);
+				LapackConnector::copy(GlobalC::ParaO.nloc, work, inc, GlobalC::LOC.wfc_dm_2d.wfc_k[ik].c, inc);
 			}
 		}//loop ipcol
 	}//loop	iprow

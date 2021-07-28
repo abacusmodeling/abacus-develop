@@ -128,7 +128,7 @@ void ELEC_evolve::evolve_psi(
 		{
 			timer::tick("Efficience","diago_k");
 			Diago_LCAO_Matrix DLM;
-			DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
+			DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
 			timer::tick("Efficience","diago_k");
 		}
 		else

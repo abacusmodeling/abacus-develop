@@ -671,7 +671,7 @@ void Force_LCAO_gamma::cal_foverlap(
 
         Wfc_Dm_2d wfc_edm_2d;
         wfc_edm_2d.init();
-        wfc_edm_2d.wfc_gamma=LOC.wfc_dm_2d.wfc_gamma;
+        wfc_edm_2d.wfc_gamma=GlobalC::LOC.wfc_dm_2d.wfc_gamma;
         wfc_edm_2d.cal_dm(wgEkb);
 
         timer::tick("Force_LCAO_gamma","cal_edm_2d");

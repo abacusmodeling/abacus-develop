@@ -160,7 +160,7 @@ void Local_Orbital_Charge::sum_bands(void)
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        UHM.GG.cal_rho(LOC.DM);
+        UHM.GG.cal_rho(GlobalC::LOC.DM);
     }
     else
     {

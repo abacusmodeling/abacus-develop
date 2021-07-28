@@ -100,7 +100,7 @@ void LOOP_elec::before_solver(const int &istep)
 	LOWF.set_trace_aug(GridT);
 
 	// init density kernel and wave functions.
-	LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GridT);
 
 	//======================================
 	// do the charge extrapolation before the density matrix is regenerated.
@@ -121,13 +121,13 @@ void LOOP_elec::before_solver(const int &istep)
 			stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
-			LOC.read_dm(is, ssd.str() );
+			GlobalC::LOC.read_dm(is, ssd.str() );
 		}
 
 		// calculate the charge density
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			UHM.GG.cal_rho(LOC.DM);
+			UHM.GG.cal_rho(GlobalC::LOC.DM);
 		}
 		else
 		{

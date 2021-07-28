@@ -169,7 +169,7 @@ void ELEC_scf::scf(const int &istep)
 
 				// calculate the density matrix using read in wave functions
 				// and the ncalculate the charge density on grid.
-				LOC.sum_bands();
+				GlobalC::LOC.sum_bands();
 				// calculate the local potential(rho) again.
 				// the grid integration will do in later grid integration.
 
@@ -340,7 +340,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// if selinv is used, we need this to calculate the charge
 		// using density matrix.
-		LOC.sum_bands();
+		GlobalC::LOC.sum_bands();
 
 		// add exx
 		// Peize Lin add 2016-12-03
@@ -465,7 +465,7 @@ void ELEC_scf::scf(const int &istep)
 			{
 				ssd << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_DM_R";
 			}
-			LOC.write_dm( is, iter, ssd.str(), precision );
+			GlobalC::LOC.write_dm( is, iter, ssd.str(), precision );
 
 			//LiuXh modify 20200701
 			/*
@@ -545,7 +545,7 @@ void ELEC_scf::scf(const int &istep)
 				{
 					ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM_R";
 				}
-				LOC.write_dm( is, 0, ssd.str(), precision );
+				GlobalC::LOC.write_dm( is, 0, ssd.str(), precision );
 
 				if(GlobalC::pot.out_potential == 1) //LiuXh add 20200701
 				{

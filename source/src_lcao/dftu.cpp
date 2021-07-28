@@ -330,7 +330,7 @@ void DFTU::cal_occup_m_k(const int iter)
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
 				&Sk[0], &one_int, &one_int, GlobalC::ParaO.desc, 
-				LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, GlobalC::ParaO.desc,
+				GlobalC::LOC.wfc_dm_2d.dm_k.at(ik).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta, 
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
 
@@ -528,7 +528,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
 				&alpha, 
 				LM.Sloc, &one_int, &one_int, GlobalC::ParaO.desc, 
-				LOC.wfc_dm_2d.dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
+				GlobalC::LOC.wfc_dm_2d.dm_gamma.at(is).c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&beta,
 				&srho[0], &one_int, &one_int, GlobalC::ParaO.desc);
 

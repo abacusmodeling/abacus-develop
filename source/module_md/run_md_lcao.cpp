@@ -278,12 +278,12 @@ void Run_MD_LCAO::final_scf(void)
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         // here we reset the density matrix dimension.
-        LOC.allocate_gamma(GridT);
+        GlobalC::LOC.allocate_gamma(GridT);
     }
     else
     {
         LOWF.allocate_k(GridT);
-        LOC.allocate_DM_k();
+        GlobalC::LOC.allocate_DM_k();
     }
 
     UHM.set_lcao_matrices();

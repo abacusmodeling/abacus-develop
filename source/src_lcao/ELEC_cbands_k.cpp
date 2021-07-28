@@ -113,7 +113,7 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		// write the wave functions into LOWF.WFC_K[ik].
 		timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
+		DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
 		timer::tick("Efficience","diago_k");
 
 		timer::tick("Efficience","each_k");

@@ -182,7 +182,7 @@ void LOOP_ions::opt_ions(void)
                 ld.save_npy_d();
                 if (GlobalV::FORCE)
                 {
-                    ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+                    ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
                     ld.print_F_delta();
                 }
 
@@ -506,7 +506,7 @@ void LOOP_ions::final_scf(void)
     // the force.
     LOWF.set_trace_aug(GridT);
 
-	LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GridT);
 
     UHM.set_lcao_matrices();
 	//------------------------------------------------------------------

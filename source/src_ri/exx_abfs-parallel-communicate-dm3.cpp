@@ -99,8 +99,8 @@ void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::cal_DM");
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D = GlobalV::GAMMA_ONLY_LOCAL
-		? K_to_R(LOC.wfc_dm_2d.dm_gamma, threshold_D)
-		: K_to_R(LOC.wfc_dm_2d.dm_k, threshold_D);
+		? K_to_R(GlobalC::LOC.wfc_dm_2d.dm_gamma, threshold_D)
+		: K_to_R(GlobalC::LOC.wfc_dm_2d.dm_k, threshold_D);
 	DMr = allreduce.a2D_to_exx(DR_a2D);
 
 	/*{

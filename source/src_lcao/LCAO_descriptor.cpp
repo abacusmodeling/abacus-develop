@@ -550,11 +550,11 @@ void LCAO_Descriptor::set_DS_mu_alpha(
 
 void LCAO_Descriptor::getdm(double* dm)
 {
-    for (int i = 0; i < LOC.wfc_dm_2d.dm_gamma[0].nr; i++)
+    for (int i = 0; i < GlobalC::LOC.wfc_dm_2d.dm_gamma[0].nr; i++)
     {
-        for (int j = 0; j < LOC.wfc_dm_2d.dm_gamma[0].nc; j++)
+        for (int j = 0; j < GlobalC::LOC.wfc_dm_2d.dm_gamma[0].nc; j++)
         {
-            dm[i * GlobalV::NLOCAL + j] = LOC.wfc_dm_2d.dm_gamma[0](i, j); //only consider default GlobalV::NSPIN = 1
+            dm[i * GlobalV::NLOCAL + j] = GlobalC::LOC.wfc_dm_2d.dm_gamma[0](i, j); //only consider default GlobalV::NSPIN = 1
         }
     }
 }

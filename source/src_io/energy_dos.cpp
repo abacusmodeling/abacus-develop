@@ -230,7 +230,7 @@ void energy::perform_dos(void)
 			for(int in=0;in<GlobalV::NSPIN;in++)
 			{
 
-				D.wfc_gamma[in]=LOC.wfc_dm_2d.wfc_gamma[in];
+				D.wfc_gamma[in]=GlobalC::LOC.wfc_dm_2d.wfc_gamma[in];
 			}
 
 		}
@@ -240,7 +240,7 @@ void energy::perform_dos(void)
 			for(int in=0;in<GlobalC::kv.nks;in++)
 			{
 
-				D.wfc_k[in] = LOC.wfc_dm_2d.wfc_k[in];
+				D.wfc_k[in] = GlobalC::LOC.wfc_dm_2d.wfc_k[in];
 			}
 		}
 

@@ -113,7 +113,7 @@ void IState_Charge::begin(void)
 			// (1)
 			// This has been done once in LOOP_ions.
 			// but here we need to done for each band.
-			//LOC.allocate_gamma(GridT);	
+			//GlobalC::LOC.allocate_gamma(GridT);	
 			
 			// (2) calculate the density matrix for a partuclar 
 			// band, whenever it is occupied or not.
@@ -127,7 +127,7 @@ void IState_Charge::begin(void)
 			
 			// (4) calculate charge density for a particular 
 			// band.
-   			UHM.GG.cal_rho(LOC.DM);
+   			UHM.GG.cal_rho(GlobalC::LOC.DM);
 			GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09
 			stringstream ss;
 			stringstream ss1;
@@ -160,7 +160,7 @@ void IState_Charge::idmatrix(const int &ib)
 			if ( mu_local >= 0)
 			{
 				// set a pointer.
-				//double *alpha = LOC.DM[is][mu_local];
+				//double *alpha = GlobalC::LOC.DM[is][mu_local];
 				for (int j=i; j<GlobalV::NLOCAL; j++)
 				{
 					const int nu_local = GridT.trace_lo[j];
@@ -204,7 +204,7 @@ void IState_Charge::idmatrix(const int &ib)
 			}
 		
 			// wg_wfc(ib,iw) = wg[ib] * wfc(ib,iw);
-			matrix wg_wfc(LOC.wfc_dm_2d.wfc_gamma[is]);
+			matrix wg_wfc(GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]);
 	
 			for(int ir=0; ir!=wg_wfc.nr; ++ir)
 			{
@@ -215,21 +215,21 @@ void IState_Charge::idmatrix(const int &ib)
 			const double one_float=1.0, zero_float=0.0;
 			const int one_int=1;
 			const char N_char='N', T_char='T';
-			LOC.wfc_dm_2d.dm_gamma[is].create( wg_wfc.nr, wg_wfc.nc );
+			GlobalC::LOC.wfc_dm_2d.dm_gamma[is].create( wg_wfc.nr, wg_wfc.nc );
 
 			pdgemm_(
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalC::wf.wg.nc,
 				&one_float,
 				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
-				LOC.wfc_dm_2d.wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
+				GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				LOC.wfc_dm_2d.dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
+				GlobalC::LOC.wfc_dm_2d.dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 
 		cout << " finished calc dm_2d : " << endl;
 
-		LOC.cal_dk_gamma_from_2D_pub();
+		GlobalC::LOC.cal_dk_gamma_from_2D_pub();
 		
 		cout << " finished convert : " << endl;
 

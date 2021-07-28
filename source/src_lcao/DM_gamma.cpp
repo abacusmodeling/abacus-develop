@@ -288,8 +288,8 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 
-		LOC.wfc_dm_2d.wfc_gamma[is].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
-		LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
+		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
+		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << is << endl;
 		error = WF_Local::read_lowf( ctot , is);

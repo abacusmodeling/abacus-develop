@@ -18,9 +18,9 @@ namespace GlobalC
 {
 extern Grid_Driver GridD;
 extern Parallel_Orbitals ParaO;
+extern Local_Orbital_Charge LOC;
 }
 extern Local_Orbital_wfc LOWF;
-extern Local_Orbital_Charge LOC;
 extern LCAO_Matrix LM;
 extern LCAO_Hamilt UHM;
 extern SubGrid_oper SGO; //mohan add 2012-01-12

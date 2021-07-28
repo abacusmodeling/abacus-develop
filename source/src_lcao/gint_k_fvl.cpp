@@ -471,7 +471,7 @@ void Gint_k::evaluate_vl_stress(
 	}
 
 
-	double* dmR = LOC.DM_R[GlobalV::CURRENT_SPIN];
+	double* dmR = GlobalC::LOC.DM_R[GlobalV::CURRENT_SPIN];
 
 	double* dmR2;
 	for (int ia1=0; ia1<size; ++ia1)
@@ -754,7 +754,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         }
 
 
-        double* dmR = LOC.DM_R[GlobalV::CURRENT_SPIN];
+        double* dmR = GlobalC::LOC.DM_R[GlobalV::CURRENT_SPIN];
         double* dmR2;
         for (int ia1=0; ia1<size; ++ia1)
         {

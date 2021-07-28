@@ -214,7 +214,7 @@ inline void cal_band_rho(
 				
 				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];					
 				dgemm_(&trans, &trans, &block_size[ia1], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_diag,
-					&LOC.DM_R[is][DM_start], &block_size[ia1], 
+					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia1], 
 					&psir_ylm[0][idx1], &LD_pool,  
 					&beta, &psir_DM[0][idx1], &LD_pool);
 			}
@@ -257,7 +257,7 @@ inline void cal_band_rho(
     				if(cal_flag[ib][ia1])
     				{
         				dgemv_(&trans, &block_size[ia1], &block_size[ia1], &alpha_diag,
-					            &LOC.DM_R[is][DM_start], &block_size[ia1], 
+					            &GlobalC::LOC.DM_R[is][DM_start], &block_size[ia1], 
 					            &psir_ylm[ib][idx1], &inc,  
 					            &beta, &psir_DM[ib][idx1], &inc);
     				}
@@ -317,7 +317,7 @@ inline void cal_band_rho(
     				const int DM_start = LNNR.nlocstartg[iat1]+ LNNR.find_R2st[iat1][offset];
 
     				dgemm_(&trans, &trans, &block_size[ia2], &GlobalC::pw.bxyz, &block_size[ia1], &alpha_nondiag,
-    					&LOC.DM_R[is][DM_start], &block_size[ia2], 
+    					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia2], 
     					&psir_ylm[0][idx1], &LD_pool,
     					&beta, &psir_DM[0][idx2], &LD_pool);
 				}
@@ -369,7 +369,7 @@ inline void cal_band_rho(
         				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
         				{
             				dgemv_(&trans, &block_size[ia2], &block_size[ia1], &alpha_nondiag,
-            					&LOC.DM_R[is][DM_start], &block_size[ia2], 
+            					&GlobalC::LOC.DM_R[is][DM_start], &block_size[ia2], 
             					&psir_ylm[ib][idx1], &inc,
             					&beta, &psir_DM[ib][idx2], &inc);
         				}
@@ -658,7 +658,7 @@ void Gint_k::evaluate_pDMp(
 				
 				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
-					dm = LOC.DM_R[is];
+					dm = GlobalC::LOC.DM_R[is];
 					tchgs = tchg[is];
 					for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 					{
