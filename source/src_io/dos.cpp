@@ -269,7 +269,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 
 	for(int ik=0; ik<GlobalC::kv.nkstot; ik++)
 	{
-		if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
+		if ( GlobalV::MY_POOL == GlobalC::Pkpoints.whichpool[ik] )
 		{
 			if( GlobalV::RANK_IN_POOL == 0)
 			{
@@ -298,7 +298,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 					ofs << " " << GlobalC::ucell.G.e31 << " " << GlobalC::ucell.G.e32 << " " << GlobalC::ucell.G.e33 << endl; 
 				}
 
-				const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
+				const int ik_now = ik - GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL];
 				ofs << "ik= " << ik << endl;
 				ofs << GlobalC::kv.kvec_c[ik_now].x << " " << GlobalC::kv.kvec_c[ik_now].y << " " << GlobalC::kv.kvec_c[ik_now].z << endl;  
 
@@ -349,9 +349,9 @@ void Dos::nscf_band(
 
 	for(int ik=0; ik<nks; ik++)
 	{
-		if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
+		if ( GlobalV::MY_POOL == GlobalC::Pkpoints.whichpool[ik] )
 		{
-			const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
+			const int ik_now = ik - GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL];
 			if( GlobalC::kv.isk[ik_now+is*nks] == is )
 			{ 
 				if ( GlobalV::RANK_IN_POOL == 0)

@@ -179,11 +179,11 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 			k_pack->hvec_array[ik].create(GlobalV::NLOCAL,GlobalV::NBANDS);
 		}
 
-		if (pot.start_pot=="atomic")
+		if (GlobalC::pot.start_pot=="atomic")
 		{
 			q_pack = k_pack;
 		}
-		else if(pot.start_pot=="file")
+		else if(GlobalC::pot.start_pot=="file")
 		{
 			read_q_pack();
 		}
@@ -300,11 +300,11 @@ Exx_Lip::~Exx_Lip()
 		delete[] k_pack->hvec_array;	k_pack->hvec_array=NULL;
 		delete k_pack;
 
-		if (pot.start_pot=="atomic")
+		if (GlobalC::pot.start_pot=="atomic")
 		{
 			q_pack = NULL;
 		}
-		else if(pot.start_pot=="file")
+		else if(GlobalC::pot.start_pot=="file")
 		{
 			delete q_pack->kv_ptr;	q_pack->kv_ptr=NULL;
 			delete q_pack->wf_ptr;	q_pack->wf_ptr=NULL;
@@ -357,7 +357,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 void Exx_Lip::psi_cal()
 {
 	TITLE("Exx_Lip","psi_cal");
-	if (pot.start_pot=="atomic")
+	if (GlobalC::pot.start_pot=="atomic")
 	{
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
@@ -388,7 +388,7 @@ void Exx_Lip::psi_cal()
 			}
 		}
 	}
-	else if(pot.start_pot=="file")
+	else if(GlobalC::pot.start_pot=="file")
 	{
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 		{
@@ -413,11 +413,11 @@ void Exx_Lip::psi_cal()
 
 void Exx_Lip::judge_singularity( int ik)
 {
-	if (pot.start_pot=="atomic")
+	if (GlobalC::pot.start_pot=="atomic")
 	{
 		iq_vecik = ik;
 	}
-	else if(pot.start_pot=="file")
+	else if(GlobalC::pot.start_pot=="file")
 	{
 		double min_q_minus_k(numeric_limits<double>::max());
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
@@ -621,7 +621,7 @@ void Exx_Lip::exx_energy_cal()
 
 void Exx_Lip::write_q_pack() const
 {
-    if (CHR.out_charge==0)
+    if (GlobalC::CHR.out_charge==0)
 		return;
 
 	if(!GlobalV::RANK_IN_POOL)
@@ -674,8 +674,8 @@ void Exx_Lip::read_q_pack()
 
 	q_pack->kv_ptr = new K_Vectors();
 	const string exx_kpoint_card = GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card;
-	q_pack->kv_ptr->set( symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec );
-//	q_pack->kv_ptr->set( symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec, &Pkpoints );
+	q_pack->kv_ptr->set( GlobalC::symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec );
+//	q_pack->kv_ptr->set( GlobalC::symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec, &Pkpoints );
 
 
 	q_pack->wf_ptr = new wavefunc();

@@ -226,8 +226,8 @@ void Print_Info::setup_parameters(void)
 //					//cout << setw(12) << GlobalC::ucell.atoms[it].dft[0];
 //                                        cout << setw(12) << "PBE";
 //				}
-			xcf.ostreamdft(cout); // zws add 20150108
-			//cout << " ( "  << setw(3) << xcf.iexch << setw(3) << xcf.icorr << setw(3) << xcf.igcx << setw(3) << xcf.igcc << ")";
+			GlobalC::xcf.ostreamdft(cout); // zws add 20150108
+			//cout << " ( "  << setw(3) << GlobalC::xcf.iexch << setw(3) << GlobalC::xcf.icorr << setw(3) << GlobalC::xcf.igcx << setw(3) << GlobalC::xcf.igcc << ")";
 			cout << endl;
 		}
 

@@ -210,7 +210,7 @@ void Stress_Func::stress_nl(matrix& sigma){
 	//do symmetry
 	if(Symmetry::symm_flag)
 	{
-		symm.stress_symmetry(sigma, GlobalC::ucell);
+		GlobalC::symm.stress_symmetry(sigma, GlobalC::ucell);
 	}//end symmetry
 	
 	//  this->print(GlobalV::ofs_running, "nonlocal stress", stresnl);

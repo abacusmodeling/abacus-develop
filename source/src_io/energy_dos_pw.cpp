@@ -48,7 +48,7 @@ void energy::perform_dos_pw(void)
 						<<setw(25)<<"Energy(ev)"
 						<<setw(25)<<"Occupation"
 #ifdef __MPI
-						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
+						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
 #else
 						<<setw(25)<<"Kpoint = "<<ik+1
 #endif
@@ -71,7 +71,7 @@ void energy::perform_dos_pw(void)
 						<<setw(25)<<"Spin down Energy(ev)"
 						<<setw(25)<<"Occupation"
 #ifdef __MPI
-						<<setw(25)<<"Kpoint = "<<Pkpoints.startk_pool[ip]+ik+1
+						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
 #else
 						<<setw(25)<<"Kpoint = "<<ik+1
 #endif

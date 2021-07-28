@@ -42,7 +42,7 @@ void calculate()
 	ofs,
 	ofs_running,
 	ofs_warning)
-	symm.analy_sys(ucell, out, ofs_running);
+	GlobalC::symm.analy_sys(ucell, out, ofs_running);
 	ofs_running.close();
 //	ooo.set_orb_tables();
 

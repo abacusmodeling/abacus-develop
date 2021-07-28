@@ -14,11 +14,11 @@ void Variable_Cell::init_after_vc(void)
 
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
-    GlobalC::kv.set_after_vc(symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
+    GlobalC::kv.set_after_vc(GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec);
     DONE(GlobalV::ofs_running, "INIT K-POINTS");
 
     GlobalC::pw.update_gvectors(GlobalV::ofs_running, GlobalC::ucell);
@@ -78,13 +78,13 @@ void Variable_Cell::final_calculation_after_vc(void)
     // (6) symmetry analysize.
     if(Symmetry::symm_flag)
     {
-        symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
+        GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");
     }
 
 
     // (7) Setup the k points according to symmetry.
-    GlobalC::kv.set( symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
+    GlobalC::kv.set( GlobalC::symm, GlobalV::global_kpoint_card, GlobalV::NSPIN, GlobalC::ucell.G, GlobalC::ucell.latvec );
     DONE(GlobalV::ofs_running,"INIT K-POINTS");
 
     // (1) Init the plane wave.
@@ -95,14 +95,14 @@ void Variable_Cell::final_calculation_after_vc(void)
 
     // init the grid, then the charge
     // on grid can be distributed.
-    Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, 
+    GlobalC::Pgrid.init_final_scf(GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz, 
 		GlobalC::pw.nczp, GlobalC::pw.nrxx, GlobalC::pw.nbz, GlobalC::pw.bz); // mohan add 2010-07-22, update 2011-05-04
 
     //=====================
     // init potential
     //=====================
-    CHR.init_final_scf();
-    pot.allocate(GlobalC::pw.nrxx);
+    GlobalC::CHR.init_final_scf();
+    GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
     //=====================
     // init wave functions
@@ -146,7 +146,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0, GlobalC::pw.strucFac);//atomic_rho, v_of_rho, set_vrs
+    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac);//atomic_rho, v_of_rho, set_vrs
 
     //==================================================
     // Create GlobalC::ppcell.tab_at , for trial wave functions.
@@ -154,7 +154,7 @@ void Variable_Cell::final_calculation_after_vc(void)
     //================================
     if(GlobalV::BASIS_TYPE=="pw")
     {
-		pot.newd();
+		GlobalC::pot.newd();
 
 		GlobalC::wf.init_at_1();
 

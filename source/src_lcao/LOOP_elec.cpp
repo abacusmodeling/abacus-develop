@@ -113,11 +113,11 @@ void LOOP_elec::before_solver(const int &istep)
 	// REALLOCATE DENSITY MATRIX FIRST, THEN READ IN DENSITY MATRIX,
 	// AND USE DENSITY MATRIX TO DO RHO GlobalV::CALCULATION.-- mohan 2013-03-31
 	//======================================
-	if(pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
+	if(GlobalC::pot.extra_pot=="dm" && istep>1)//xiaohui modify 2015-02-01
 	{
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
+			ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
 			stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
@@ -135,10 +135,10 @@ void LOOP_elec::before_solver(const int &istep)
 		}
 
 		// renormalize the charge density
-		CHR.renormalize_rho();
+		GlobalC::CHR.renormalize_rho();
 
 		// initialize the potential
-		pot.init_pot( istep-1, GlobalC::pw.strucFac );
+		GlobalC::pot.init_pot( istep-1, GlobalC::pw.strucFac );
 	}
 
 
@@ -192,7 +192,7 @@ void LOOP_elec::solver(const int &istep)
 			{
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
-					GlobalC::exx_global.info.set_xcfunc(xcf);
+					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 					exx_lcao.cal_exx_elec();
 					
 					ELEC_scf es;
@@ -205,7 +205,7 @@ void LOOP_elec::solver(const int &istep)
 			}
 			else
 			{
-				GlobalC::exx_global.info.set_xcfunc(xcf);
+				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
 
 				ELEC_scf es;
 				es.scf(istep-1);

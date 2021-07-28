@@ -450,7 +450,7 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
 {
     // setup send buffer and receive buffer size
     // OUT(GlobalV::ofs_running, "Start transforming vlocal from grid distribute to 2D block");
-    if(CHR.get_new_e_iteration())
+    if(GlobalC::CHR.get_new_e_iteration())
     {
         timer::tick("Gint_Gamma","distri_vl_index");
         setBufferParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb,

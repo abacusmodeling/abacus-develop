@@ -205,12 +205,12 @@ void Numerical_Basis::output_overlap_Sq(
     int count = 0;
     for (int ik=0; ik< GlobalC::kv.nkstot; ik++)
     {
-        if ( GlobalV::MY_POOL == Pkpoints.whichpool[ik] )
+        if ( GlobalV::MY_POOL == GlobalC::Pkpoints.whichpool[ik] )
         {
             if ( GlobalV::RANK_IN_POOL == 0)
             {
                 ofs.open(name.c_str(), ios::app);
-                const int ik_now = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
+                const int ik_now = ik - GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL];
                 for (int i=0; i< Sq_real[ik_now].getSize(); i++)
                 {
                     if (count%2==0) ofs << "\n";
@@ -269,8 +269,8 @@ void Numerical_Basis::output_overlap_Q(
     {
         double kx, ky, kz, wknow;
 #ifdef __MPI
-        const int pool = Pkpoints.whichpool[ik];
-        const int iknow = ik - Pkpoints.startk_pool[GlobalV::MY_POOL];
+        const int pool = GlobalC::Pkpoints.whichpool[ik];
+        const int iknow = ik - GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL];
         if (GlobalV::RANK_IN_POOL==0)
         {
             if (GlobalV::MY_POOL==0)
@@ -285,10 +285,10 @@ void Numerical_Basis::output_overlap_Q(
                 else
                 {
                     MPI_Status ierror;
-                    MPI_Recv(&kx, 1, MPI_DOUBLE, Pkpoints.startpro_pool[pool], ik*4, MPI_COMM_WORLD,&ierror);
-                    MPI_Recv(&ky, 1, MPI_DOUBLE, Pkpoints.startpro_pool[pool], ik*4+1, MPI_COMM_WORLD,&ierror);
-                    MPI_Recv(&kz, 1, MPI_DOUBLE, Pkpoints.startpro_pool[pool], ik*4+2, MPI_COMM_WORLD,&ierror);
-                    MPI_Recv(&wknow, 1, MPI_DOUBLE, Pkpoints.startpro_pool[pool], ik*4+3, MPI_COMM_WORLD,&ierror);
+                    MPI_Recv(&kx, 1, MPI_DOUBLE, GlobalC::Pkpoints.startpro_pool[pool], ik*4, MPI_COMM_WORLD,&ierror);
+                    MPI_Recv(&ky, 1, MPI_DOUBLE, GlobalC::Pkpoints.startpro_pool[pool], ik*4+1, MPI_COMM_WORLD,&ierror);
+                    MPI_Recv(&kz, 1, MPI_DOUBLE, GlobalC::Pkpoints.startpro_pool[pool], ik*4+2, MPI_COMM_WORLD,&ierror);
+                    MPI_Recv(&wknow, 1, MPI_DOUBLE, GlobalC::Pkpoints.startpro_pool[pool], ik*4+3, MPI_COMM_WORLD,&ierror);
                 }
             }
             else
@@ -350,7 +350,7 @@ void Numerical_Basis::output_overlap_Q(
     {
         ZEROS(Qtmp1, dim);
         ZEROS(Qtmp2, dim);
-        Pkpoints.pool_collection(Qtmp1, Qtmp2, overlap_Q1, overlap_Q2, ik);
+        GlobalC::Pkpoints.pool_collection(Qtmp1, Qtmp2, overlap_Q1, overlap_Q2, ik);
         if (GlobalV::MY_RANK==0)
         {
     //        ofs << "\n ik=" << ik;

@@ -32,7 +32,7 @@ void LOOP_cell::opt_cell(void)
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step=0;
-    pot.init_pot(ion_step, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 
 	// PLEASE simplify the Exx_Global interface
