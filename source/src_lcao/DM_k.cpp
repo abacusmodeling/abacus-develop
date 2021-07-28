@@ -67,8 +67,8 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 	for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 	{
 
-		LOC.wfc_dm_2d.wfc_k[ik].create(ParaO.ncol, ParaO.nrow);
-		LOC.wfc_dm_2d.wfc_k[ik].zero_out();
+		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
+		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << endl;
 		error = WF_Local::read_lowf_complex( ctot , ik , 1);
@@ -79,7 +79,7 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
@@ -118,7 +118,7 @@ inline void cal_DM_ATOM(
 
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
-        complex<double> **wfc = LOWF.WFC_K[ik];
+        complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
         const int ispin = GlobalC::kv.isk[ik];
         int atom2start=0;
 
@@ -200,7 +200,7 @@ inline void cal_DM_ATOM_nc(
         {
             for(int ik=0; ik<GlobalC::kv.nks; ik++)
             {
-                complex<double> **wfc = LOWF.WFC_K[ik];
+                complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
                 int atom2start=0;
 
                 for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)

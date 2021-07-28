@@ -78,7 +78,7 @@ void Run_md::ai_md_line(void)
 	// * construct the interpolation tables.
 	if(GlobalV::BASIS_TYPE=="lcao")
 	{
-		LOWF.orb_con.set_orb_tables(
+		GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
 		UOT, 
 		ORB,
@@ -97,7 +97,7 @@ void Run_md::ai_md_line(void)
 
 		// * allocate H and S matrices according to computational resources
 		// * set the 'trace' between local H/S and global H/S
-		LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, ParaO);
+		GlobalC::LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
 	}
 #endif
 

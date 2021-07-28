@@ -35,7 +35,7 @@ void Run_lcao::lcao_line(void)
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GridD, 
+			GlobalC::GridD, 
 			GlobalC::ucell, 
 			GlobalV::SEARCH_RADIUS, 
 			GlobalV::test_atom_input,
@@ -77,7 +77,7 @@ void Run_lcao::lcao_line(void)
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
 
-	LOWF.orb_con.set_orb_tables(
+	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
 		UOT, 
 		ORB,
@@ -96,7 +96,7 @@ void Run_lcao::lcao_line(void)
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
-	LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, ParaO);
+	GlobalC::LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
 
 //--------------------------------------
 // cell relaxation should begin here

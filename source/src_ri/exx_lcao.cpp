@@ -992,7 +992,7 @@ ofs_mpi.close();
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ofstream ofs("LOC.DM.dat",ofstream::app);
+			ofstream ofs("GlobalC::LOC.DM.dat",ofstream::app);
 			const int it1=0, it2=0;
 			for( size_t ia1=0; ia1!=GlobalC::ucell.atoms[it1].na; ++ia1 )
 				for( size_t ia2=0; ia2!=GlobalC::ucell.atoms[it2].na; ++ia2 )
@@ -1002,7 +1002,7 @@ ofs_mpi.close();
 						for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
 						{
 							for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
-								ofs<<LOC.DM[is][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)][GlobalC::ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
+								ofs<<GlobalC::LOC.DM[is][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)][GlobalC::ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
 							ofs<<endl;
 						}
 						ofs<<endl;
@@ -1016,7 +1016,7 @@ ofs_mpi.close();
 			static int istep=0;
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
-				ofstream ofs("LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
+				ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
 				for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 				{
 					for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
@@ -1034,7 +1034,7 @@ ofs_mpi.close();
 								{
 									for( int iw2=0; iw2!=GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw; ++iw2 )
 									{
-										ofs<<LOC.DM_R[is][LNNR.nlocstartg[iat1]+iv]<<"\t";
+										ofs<<GlobalC::LOC.DM_R[is][LNNR.nlocstartg[iat1]+iv]<<"\t";
 										++iv;
 									}
 									ofs<<endl;
@@ -1056,18 +1056,18 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				ofstream ofs("GlobalC::LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
 					{
 						//---------------------------------------------------------
-						// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+						// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 						// we need to fix this function in near future.
 						// -- mohan add 2021-02-09
 						//---------------------------------------------------------
-						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update LOWF.WFC_GAMMA");
-						//ofs<<LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
+						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
+						//ofs<<GlobalC::LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
 					}
 					ofs<<endl;
 				}
@@ -1078,11 +1078,11 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				ofstream ofs("GlobalC::LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
-						ofs<<LOWF.WFC_K[ik][ib][iwt]<<"\t";
+						ofs<<GlobalC::LOWF.WFC_K[ik][ib][iwt]<<"\t";
 					ofs<<endl;
 				}
 				ofs.close();
@@ -1097,7 +1097,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<exx_lcao.Hexx_para.HK_Gamma_m2D[is]<<endl;
+				ofs<<this->Hexx_para.HK_Gamma_m2D[is]<<endl;
 			}
 		}
 		else
@@ -1105,7 +1105,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<exx_lcao.Hexx_para.HK_K_m2D[ik]<<endl;
+				ofs<<this->Hexx_para.HK_K_m2D[ik]<<endl;
 			}
 		}
 	};
@@ -1117,7 +1117,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<LOC.wfc_dm_2d.wfc_gamma[is]<<endl;
+				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]<<endl;
 			}
 		}
 		else
@@ -1125,7 +1125,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<LOC.wfc_dm_2d.wfc_gamma[ik]<<endl;
+				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]<<endl;
 			}
 		}
 	};
@@ -1259,7 +1259,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const matrix & H = Hexx_para.HK_Gamma_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			LM.Hloc[i] += alpha * H.c[i];
+			GlobalC::LM.Hloc[i] += alpha * H.c[i];
 		}
 	}
 	else
@@ -1267,7 +1267,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const ComplexMatrix & H = Hexx_para.HK_K_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			LM.Hloc2[i] += alpha * H.c[i];
+			GlobalC::LM.Hloc2[i] += alpha * H.c[i];
 		}
 	}
 }

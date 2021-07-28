@@ -30,7 +30,7 @@ void SubGrid_oper::cal_totwfc_aug()
 	ZEROS(occupy, GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		if(LOWF.trace_aug[i]>=0)
+		if(GlobalC::LOWF.trace_aug[i]>=0)
 		{
 			occupy[i] += 1;
 		}
@@ -46,7 +46,7 @@ void SubGrid_oper::cal_totwfc_aug()
 	ZEROS(trace_aug_tot,GlobalV::NLOCAL);
 	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		trace_aug_tot[i]=LOWF.trace_aug[i];
+		trace_aug_tot[i]=GlobalC::LOWF.trace_aug[i];
 	}
 
 	// how many occupied wave functions.	
@@ -84,7 +84,7 @@ void SubGrid_oper::cal_totwfc_aug()
 			}
 		}
 
-		OUT(GlobalV::ofs_running,"SGO.lgd_aug",lgd);
+		OUT(GlobalV::ofs_running,"GlobalC::SGO.lgd_aug",lgd);
 	
 
 
@@ -165,7 +165,7 @@ void SubGrid_oper::cal_totwfc()
 	if(GlobalV::GRANK==0)
 	{
           	//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-		if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"SGO.lgd",lgd);
+		if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"GlobalC::SGO.lgd",lgd);
 	
 		if(lgd==0)
 		{
@@ -187,7 +187,7 @@ void SubGrid_oper::cal_totwfc()
 		static bool first_time=true;
 		if(first_time)
 		{
-//			LOWF.init_Cij(1);
+//			GlobalC::LOWF.init_Cij(1);
 			first_time=false;
 		}
 
@@ -222,7 +222,7 @@ void SubGrid_oper::cal_totwfc()
 					for(int i=0; i<lgd; ++i)
 					{
 		// mohan comment out 2021-02-09
-		//				this->totwfc[is][ib][i] = LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
+		//				this->totwfc[is][ib][i] = GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
 					}
 				}
 			}	
@@ -274,7 +274,7 @@ void SubGrid_oper::dis_subwfc()
 						for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 						{
 		// mohan comment out 2021-02-09
-		//					LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
+		//					GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
 						}//ib
 					}//mu1>=0
 				}//iw
@@ -366,7 +366,7 @@ void SubGrid_oper::dis_subwfc()
 				for (int mu=0; mu<GridT.lgd; ++mu)
 				{
 		// mohan comment out 2021-02-09
-		//			LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu] = crecv[mu*GlobalV::NBANDS+ib];
+		//			GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu] = crecv[mu*GlobalV::NBANDS+ib];
 				}
 			}
 
@@ -388,9 +388,9 @@ void SubGrid_oper::dis_subwfc()
 			const int mu = GridT.trace_lo[j];
 			if(mu>=0)
 			{
-				//				if( abs(LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
+				//				if( abs(GlobalC::LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
 				GlobalV::ofs_running << setw(5) << i+1 << setw(8) << j+1 
-					<< setw(15) << LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][i][mu] << endl; 
+					<< setw(15) << GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][i][mu] << endl; 
 			}
 		}
 	}
@@ -413,7 +413,7 @@ void SubGrid_oper::dis_subwfc()
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 		// mohan comment out 2021-02-09
-//				LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
+//				GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
 			}//ib
 		}//mu1>=0
 	}//iw

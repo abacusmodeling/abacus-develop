@@ -498,29 +498,29 @@ void Input_Conv::Convert(void)
 		GlobalC::exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
 		GlobalC::exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
 		GlobalC::exx_lip.info.lambda             = INPUT.exx_lambda            ;
-		exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
-		exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
-		exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
-		exx_lcao.info.dm_threshold      = INPUT.exx_dm_threshold      ;
-		exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold ;
-		exx_lcao.info.cauchy_threshold  = INPUT.exx_cauchy_threshold  ;
-		exx_lcao.info.ccp_threshold     = INPUT.exx_ccp_threshold     ;
-		exx_lcao.info.ccp_rmesh_times   = INPUT.exx_ccp_rmesh_times   ;
+		GlobalC::exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
+		GlobalC::exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
+		GlobalC::exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
+		GlobalC::exx_lcao.info.dm_threshold      = INPUT.exx_dm_threshold      ;
+		GlobalC::exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold ;
+		GlobalC::exx_lcao.info.cauchy_threshold  = INPUT.exx_cauchy_threshold  ;
+		GlobalC::exx_lcao.info.ccp_threshold     = INPUT.exx_ccp_threshold     ;
+		GlobalC::exx_lcao.info.ccp_rmesh_times   = INPUT.exx_ccp_rmesh_times   ;
 		if(INPUT.exx_distribute_type=="htime")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
 		}
 		else if(INPUT.exx_distribute_type=="kmeans2")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans2;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans2;
 		}
 		else if(INPUT.exx_distribute_type=="kmeans1")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans1;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans1;
 		}
 		else if(INPUT.exx_distribute_type=="order")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
 		}
 		Exx_Abfs::Jle::Lmax      = INPUT.exx_opt_orb_lmax;
 		Exx_Abfs::Jle::Ecut_exx  = INPUT.exx_opt_orb_ecut;
@@ -566,10 +566,10 @@ void Input_Conv::Convert(void)
 	GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
-	LOC.out_dm = INPUT.out_dm;
-	ParaO.out_hs = INPUT.out_hs;
-	ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
-	ParaO.out_lowf = INPUT.out_lowf;
+	GlobalC::LOC.out_dm = INPUT.out_dm;
+	GlobalC::ParaO.out_hs = INPUT.out_hs;
+	GlobalC::ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
+	GlobalC::ParaO.out_lowf = INPUT.out_lowf;
 #endif
 
 	GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;

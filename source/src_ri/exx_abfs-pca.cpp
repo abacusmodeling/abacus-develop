@@ -22,7 +22,7 @@ vector<vector<pair<vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA(
 	const double kmesh_times )
 {
 	TITLE("Exx_Abfs::PCA::cal_PCA");
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 	
 	const Element_Basis_Index::Range

@@ -124,7 +124,7 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table()
 
 void Exx_Abfs::Matrix_Orbs11::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
 {	
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","init_radial_table_Rs");
@@ -204,7 +204,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Matrix_Orbs11::cal_overla
 		for (size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA)
 		{
 			const Vector3<double> &tauA( GlobalC::ucell.atoms[TA].tau[IA] );
-			GridD.Find_atom(tauA);
+			GlobalC::GridD.Find_atom(tauA);
 
 			for( auto &co2 : co1.second )
 			{
@@ -214,15 +214,15 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Matrix_Orbs11::cal_overla
 					for( auto &co3 : co2.second )
 					{
 						const size_t NA = co3.first;
-						for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+						for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 						{
 							for( auto &co4 : co3.second )
 							{
 								const size_t TB = co4.first;
-								if( TB != GridD.getType(ad) )
+								if( TB != GlobalC::GridD.getType(ad) )
 									continue;
-								const Vector3<double> &tauB( GridD.getAdjacentTau(ad) );
-								const size_t IB = GridD.getNatom(ad);
+								const Vector3<double> &tauB( GlobalC::GridD.getAdjacentTau(ad) );
+								const size_t IB = GlobalC::GridD.getNatom(ad);
 																					
 								for( auto &co5 : co4.second )
 								{
@@ -294,7 +294,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs11::
 	const Element_Basis_Index::IndexLNM &index_r, 
 	const Element_Basis_Index::IndexLNM &index_c ) const
 {
-ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","cal_overlap_matrix");

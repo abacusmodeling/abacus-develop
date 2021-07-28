@@ -22,19 +22,19 @@ void Force_Stress_LCAO::allocate(void)
     TITLE("Force_Stress_LCAO","allocate");
 
     // reduce memory occupy by vlocal
-    delete[] ParaO.sender_local_index;
-    delete[] ParaO.sender_size_process;
-    delete[] ParaO.sender_displacement_process;
-    delete[] ParaO.receiver_global_index;
-    delete[] ParaO.receiver_size_process;
-    delete[] ParaO.receiver_displacement_process;
+    delete[] GlobalC::ParaO.sender_local_index;
+    delete[] GlobalC::ParaO.sender_size_process;
+    delete[] GlobalC::ParaO.sender_displacement_process;
+    delete[] GlobalC::ParaO.receiver_global_index;
+    delete[] GlobalC::ParaO.receiver_size_process;
+    delete[] GlobalC::ParaO.receiver_displacement_process;
 
-    ParaO.sender_local_index = new int[1];
-    ParaO.sender_size_process = new int[1];
-    ParaO.sender_displacement_process = new int[1];
-    ParaO.receiver_global_index = new int[1];
-    ParaO.receiver_size_process = new int[1];
-    ParaO.receiver_displacement_process = new int[1];
+    GlobalC::ParaO.sender_local_index = new int[1];
+    GlobalC::ParaO.sender_size_process = new int[1];
+    GlobalC::ParaO.sender_displacement_process = new int[1];
+    GlobalC::ParaO.receiver_global_index = new int[1];
+    GlobalC::ParaO.receiver_size_process = new int[1];
+    GlobalC::ParaO.receiver_displacement_process = new int[1];
 
     return;
 }

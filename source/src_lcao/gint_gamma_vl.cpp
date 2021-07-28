@@ -453,57 +453,57 @@ void vl_grid_to_2D(const Gint_Tools::Array_Pool<double> &GridVlocal)
     if(GlobalC::CHR.get_new_e_iteration())
     {
         timer::tick("Gint_Gamma","distri_vl_index");
-        setBufferParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb,
-                           ParaO.sender_index_size, ParaO.sender_local_index,
-                           ParaO.sender_size_process, ParaO.sender_displacement_process,
-                           ParaO.sender_size, ParaO.sender_buffer,
-                           ParaO.receiver_index_size, ParaO.receiver_global_index,
-                           ParaO.receiver_size_process, ParaO.receiver_displacement_process,
-                           ParaO.receiver_size, ParaO.receiver_buffer);
+        setBufferParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb,
+                           GlobalC::ParaO.sender_index_size, GlobalC::ParaO.sender_local_index,
+                           GlobalC::ParaO.sender_size_process, GlobalC::ParaO.sender_displacement_process,
+                           GlobalC::ParaO.sender_size, GlobalC::ParaO.sender_buffer,
+                           GlobalC::ParaO.receiver_index_size, GlobalC::ParaO.receiver_global_index,
+                           GlobalC::ParaO.receiver_size_process, GlobalC::ParaO.receiver_displacement_process,
+                           GlobalC::ParaO.receiver_size, GlobalC::ParaO.receiver_buffer);
         OUT(GlobalV::ofs_running, "vlocal exchange index is built");
-        OUT(GlobalV::ofs_running, "buffer size(M):", (ParaO.sender_size+ParaO.receiver_size)*sizeof(double)/1024/1024);
-        OUT(GlobalV::ofs_running, "buffer index size(M):", (ParaO.sender_index_size+ParaO.receiver_index_size)*sizeof(int)/1024/1024);
+        OUT(GlobalV::ofs_running, "buffer size(M):", (GlobalC::ParaO.sender_size+GlobalC::ParaO.receiver_size)*sizeof(double)/1024/1024);
+        OUT(GlobalV::ofs_running, "buffer index size(M):", (GlobalC::ParaO.sender_index_size+GlobalC::ParaO.receiver_index_size)*sizeof(int)/1024/1024);
         timer::tick("Gint_Gamma","distri_vl_index");
     }
 
     timer::tick("Gint_Gamma","distri_vl_value");
 
     // put data to send buffer
-    for(int i=0; i<ParaO.sender_index_size; i+=2)
+    for(int i=0; i<GlobalC::ParaO.sender_index_size; i+=2)
     {
-        const int irow=ParaO.sender_local_index[i];
-        const int icol=ParaO.sender_local_index[i+1];
+        const int irow=GlobalC::ParaO.sender_local_index[i];
+        const int icol=GlobalC::ParaO.sender_local_index[i+1];
         if(irow<=icol)
 		{
-            ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[irow][icol];
+            GlobalC::ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[irow][icol];
 		}
         else
 		{
-            ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[icol][irow];
+            GlobalC::ParaO.sender_buffer[i/2]=GridVlocal.ptr_2D[icol][irow];
 		}
     }
-    OUT(GlobalV::ofs_running, "vlocal data are put in sender_buffer, size(M):", ParaO.sender_size*8/1024/1024);
+    OUT(GlobalV::ofs_running, "vlocal data are put in sender_buffer, size(M):", GlobalC::ParaO.sender_size*8/1024/1024);
 
     // use mpi_alltoall to get local data
-    MPI_Alltoallv(ParaO.sender_buffer, ParaO.sender_size_process, ParaO.sender_displacement_process, MPI_DOUBLE,
-                  ParaO.receiver_buffer, ParaO.receiver_size_process,
-					ParaO.receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
+    MPI_Alltoallv(GlobalC::ParaO.sender_buffer, GlobalC::ParaO.sender_size_process, GlobalC::ParaO.sender_displacement_process, MPI_DOUBLE,
+                  GlobalC::ParaO.receiver_buffer, GlobalC::ParaO.receiver_size_process,
+					GlobalC::ParaO.receiver_displacement_process, MPI_DOUBLE, GlobalC::ParaO.comm_2D);
 
-    OUT(GlobalV::ofs_running, "vlocal data are exchanged, received size(M):", ParaO.receiver_size*8/1024/1024);
+    OUT(GlobalV::ofs_running, "vlocal data are exchanged, received size(M):", GlobalC::ParaO.receiver_size*8/1024/1024);
 
     // put local data to H matrix
-    for(int i=0; i<ParaO.receiver_index_size; i+=2)
+    for(int i=0; i<GlobalC::ParaO.receiver_index_size; i+=2)
     {
-        const int g_row=ParaO.receiver_global_index[i];
-        const int g_col=ParaO.receiver_global_index[i+1];
+        const int g_row=GlobalC::ParaO.receiver_global_index[i];
+        const int g_col=GlobalC::ParaO.receiver_global_index[i+1];
         // if(g_col<0 || g_col>=GlobalV::NLOCAL||g_row<0 || g_row>=GlobalV::NLOCAL)
         // {
         //     OUT(GlobalV::ofs_running, "index error, i:", i);
-        //     OUT(GlobalV::ofs_running, "index：", ParaO.receiver_global_index[i]);
+        //     OUT(GlobalV::ofs_running, "index：", GlobalC::ParaO.receiver_global_index[i]);
         //     OUT(GlobalV::ofs_running, "g_col:", g_col);
         //     OUT(GlobalV::ofs_running, "g_col:", g_col);
         // }
-        LM.set_HSgamma(g_row,g_col,ParaO.receiver_buffer[i/2],'L');
+        GlobalC::LM.set_HSgamma(g_row,g_col,GlobalC::ParaO.receiver_buffer[i/2],'L');
     }
 
     timer::tick("Gint_Gamma","distri_vl_value");

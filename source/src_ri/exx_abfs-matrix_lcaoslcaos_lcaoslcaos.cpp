@@ -116,7 +116,7 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 		for (size_t IA=0; IA!=GlobalC::ucell.atoms[T].na; ++IA)
 		{
 			const Vector3<double> &tauA( GlobalC::ucell.atoms[T].tau[IA] );
-			GridD.Find_atom(tauA);
+			GlobalC::GridD.Find_atom(tauA);
 
 			for( auto &co2 : co1.second )
 			{
@@ -126,11 +126,11 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 					for( auto &co3 : co2.second )
 					{
 
-						for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+						for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 						{
-							if( T != GridD.getType(ad) )
+							if( T != GlobalC::GridD.getType(ad) )
 								continue;
-							const Vector3<double> &tauB( GridD.getAdjacentTau(ad) );
+							const Vector3<double> &tauB( GlobalC::GridD.getAdjacentTau(ad) );
 
 							for( auto &co4 : co3.second )
 							{

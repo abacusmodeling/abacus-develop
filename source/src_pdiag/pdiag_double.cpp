@@ -114,7 +114,7 @@ inline int q2ZLOC_WFC(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0 && igrow<GlobalV::NBANDS)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -159,12 +159,12 @@ inline int q2ZLOC_WFC_WFCAUG(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -203,7 +203,7 @@ inline int q2ZLOC_WFC_CTOT(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -242,12 +242,12 @@ inline int q2ZLOC_WFC_WFCAUG_CTOT(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -308,7 +308,7 @@ inline int q2WFC_WFCAUG_complex(
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -373,7 +373,7 @@ inline int q2WFC_WFCAUG_CTOT_complex(
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -509,11 +509,11 @@ void Pdiag_Double::diago_double_begin(
 		auto print_matrix_C = [&](const string &file_name, double*m)
 		{
 			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ic=0; ic<ParaO.ncol; ++ic)
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
-				for(int ir=0; ir<ParaO.nrow; ++ir)
+				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(abs(m[index])>1E-10)
 						ofs<<m[index]<<"\t";
 					else
@@ -525,11 +525,11 @@ void Pdiag_Double::diago_double_begin(
 		auto print_matrix_F = [&](const string &file_name, double*m)
 		{
 			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ir=0; ir<ParaO.nrow; ++ir)
+			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
-				for(int ic=0; ic<ParaO.ncol; ++ic)
+				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(abs(m[index])>1E-10)
 						ofs<<m[index]<<"\t";
 					else
@@ -564,7 +564,7 @@ void Pdiag_Double::diago_double_begin(
 	// problem.
 	int loc_pos;
 
-	double* Stmp = LM.Sdiag;
+	double* Stmp = GlobalC::LM.Sdiag;
 
     OUT(GlobalV::ofs_running,"start solver, GlobalV::KS_SOLVER",GlobalV::KS_SOLVER);
     if(GlobalV::KS_SOLVER=="hpseps")
@@ -700,7 +700,7 @@ void Pdiag_Double::diago_double_begin(
 						// mohan delete Bfield option 2021-02-12
 						info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
 							dim0, dim1, iprow, ipcol, this->loc_size,
-							work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
+							work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
 					}
 					else
 					{
@@ -714,7 +714,7 @@ void Pdiag_Double::diago_double_begin(
 					// mohan update 2021-02-12, delete Bfield option
 					info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
 						dim0, dim1, iprow, ipcol, this->loc_size,
-						work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
+						work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
 				}
 			}//loop ipcol
 		}//loop iprow
@@ -916,11 +916,11 @@ void Pdiag_Double::diago_complex_begin(
 		auto print_matrix_C = [&](const string &file_name, complex<double>*m)
 		{
 			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ic=0; ic<ParaO.ncol; ++ic)
+			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
-				for(int ir=0; ir<ParaO.nrow; ++ir)
+				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(std::norm(m[index])>1E-10)
                     {
                         if(std::imag(m[index])>1E-10)
@@ -943,11 +943,11 @@ void Pdiag_Double::diago_complex_begin(
 		auto print_matrix_F = [&](const string &file_name, complex<double>*m)
 		{
 			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			for(int ir=0; ir<ParaO.nrow; ++ir)
+			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
-				for(int ic=0; ic<ParaO.ncol; ++ic)
+				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 				{
-					const int index=ic*ParaO.nrow+ir;
+					const int index=ic*GlobalC::ParaO.nrow+ir;
 					if(std::norm(m[index])>1E-10)
                     {
                         if(std::imag(m[index])>1E-10)
@@ -992,7 +992,7 @@ void Pdiag_Double::diago_complex_begin(
 	int loc_pos;
 
 	// because the output Stmp will be different from Sloc2, so we need to copy that.
-	complex<double>* Stmp = LM.Sdiag2;
+	complex<double>* Stmp = GlobalC::LM.Sdiag2;
 
 	if(GlobalV::KS_SOLVER=="hpseps")
 	{
@@ -1098,7 +1098,7 @@ void Pdiag_Double::diago_complex_begin(
 					// mohan update 2021-02-12, delete BFIELD option
 					info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
 							dim0, dim1, iprow, ipcol,
-							work, wfc, LOWF.WFC_K_aug[ik], ctot);
+							work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
                     stringstream ss;
 	                ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
                     // mohan add 2012-04-03, because we need the occupations for the
@@ -1118,7 +1118,7 @@ void Pdiag_Double::diago_complex_begin(
 					// mohan update 2021-02-12, delte BFIELD option
 					info=q2WFC_WFCAUG_complex(naroc, nb,
 							dim0, dim1, iprow, ipcol,
-							work, wfc, LOWF.WFC_K_aug[ik]);
+							work, wfc, GlobalC::LOWF.WFC_K_aug[ik]);
 				}
             }
         }
@@ -1217,7 +1217,7 @@ void Pdiag_Double::diago_complex_begin(
 						// mohan update 2021-02-12, delete BFIELD option
 						info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
 								dim0, dim1, iprow, ipcol,
-								work, wfc, LOWF.WFC_K_aug[ik], ctot);
+								work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
 						stringstream ss;
 						ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
 						// mohan add 2012-04-03, because we need the occupations for the
@@ -1237,7 +1237,7 @@ void Pdiag_Double::diago_complex_begin(
 						// mohan update 2021-02-12, delte BFIELD option
 						info=q2WFC_WFCAUG_complex(naroc, nb,
 								dim0, dim1, iprow, ipcol,
-								work, wfc, LOWF.WFC_K_aug[ik]);
+								work, wfc, GlobalC::LOWF.WFC_K_aug[ik]);
 					}
 				}
 			}

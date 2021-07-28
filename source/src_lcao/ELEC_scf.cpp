@@ -169,7 +169,7 @@ void ELEC_scf::scf(const int &istep)
 
 				// calculate the density matrix using read in wave functions
 				// and the ncalculate the charge density on grid.
-				LOC.sum_bands();
+				GlobalC::LOC.sum_bands();
 				// calculate the local potential(rho) again.
 				// the grid integration will do in later grid integration.
 
@@ -231,7 +231,7 @@ void ELEC_scf::scf(const int &istep)
 					{
 						for (int i=0; i<GlobalV::NLOCAL; i++)
 						{
-							WFC_init[ik][ib][i] = LOWF.WFC_K[ik][ib][i];
+							WFC_init[ik][ib][i] = GlobalC::LOWF.WFC_K[ik][ib][i];
 						}
 					}
 				}
@@ -257,7 +257,7 @@ void ELEC_scf::scf(const int &istep)
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )
 				{
-					exx_lcao.cal_exx_elec();
+					GlobalC::exx_lcao.cal_exx_elec();
 				}
 				break;
 		}
@@ -271,17 +271,17 @@ void ELEC_scf::scf(const int &istep)
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, UHM);
+			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM);
 		}
 		else
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, UHM, this->WFC_init);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, this->WFC_init);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, UHM);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM);
 			}
 		}
 
@@ -340,21 +340,21 @@ void ELEC_scf::scf(const int &istep)
 
 		// if selinv is used, we need this to calculate the charge
 		// using density matrix.
-		LOC.sum_bands();
+		GlobalC::LOC.sum_bands();
 
 		// add exx
 		// Peize Lin add 2016-12-03
 		GlobalC::en.set_exx();
 
 		// Peize Lin add 2020.04.04
-		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type)
+		if(Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type
+			|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type
+			|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type)
 		{
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-				exx_lcao.cal_exx_elec();
+				GlobalC::exx_lcao.cal_exx_elec();
 				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
@@ -387,7 +387,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// resume codes!
 		//-------------------------------------------------------------------------
-		// this->LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
+		// this->GlobalC::LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
 		// GlobalC::CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
 		// but must has evc first!
 		//-------------------------------------------------------------------------
@@ -465,7 +465,7 @@ void ELEC_scf::scf(const int &istep)
 			{
 				ssd << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_DM_R";
 			}
-			LOC.write_dm( is, iter, ssd.str(), precision );
+			GlobalC::LOC.write_dm( is, iter, ssd.str(), precision );
 
 			//LiuXh modify 20200701
 			/*
@@ -545,7 +545,7 @@ void ELEC_scf::scf(const int &istep)
 				{
 					ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM_R";
 				}
-				LOC.write_dm( is, 0, ssd.str(), precision );
+				GlobalC::LOC.write_dm( is, 0, ssd.str(), precision );
 
 				if(GlobalC::pot.out_potential == 1) //LiuXh add 20200701
 				{

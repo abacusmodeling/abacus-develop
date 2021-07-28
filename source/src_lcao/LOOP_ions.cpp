@@ -162,7 +162,7 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        if(ParaO.out_hsR)
+        if(GlobalC::ParaO.out_hsR)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
@@ -182,7 +182,7 @@ void LOOP_ions::opt_ions(void)
                 ld.save_npy_d();
                 if (GlobalV::FORCE)
                 {
-                    ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
+                    ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
                     ld.print_F_delta();
                 }
 
@@ -284,7 +284,7 @@ bool LOOP_ions::force_stress(
         atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -353,7 +353,7 @@ xiaohui modify 2014-08-09*/
 		atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -386,7 +386,7 @@ xiaohui modify 2014-08-09*/
         atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -470,7 +470,7 @@ void LOOP_ions::final_scf(void)
     atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD,
+		GlobalC::GridD,
 		GlobalC::ucell,
 		GlobalV::SEARCH_RADIUS,
 		GlobalV::test_atom_input);
@@ -487,7 +487,7 @@ void LOOP_ions::final_scf(void)
         // For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
         LNNR.cal_nnr();
-        LM.allocate_HS_R(LNNR.nnr);
+        GlobalC::LM.allocate_HS_R(LNNR.nnr);
 
 		// need to first calculae lgd.
         // using GridT.init.
@@ -504,11 +504,11 @@ void LOOP_ions::final_scf(void)
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.
-    LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GridT);
 
-	LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GridT);
 
-    UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
 
 

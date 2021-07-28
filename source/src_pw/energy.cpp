@@ -483,7 +483,7 @@ void energy::set_exx()
 		}
 		else if("lcao"==GlobalV::BASIS_TYPE)
 		{
-			return exx_lcao.get_energy();
+			return GlobalC::exx_lcao.get_energy();
 		}
 		else
 		{

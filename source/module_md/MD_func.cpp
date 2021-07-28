@@ -291,7 +291,7 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 	atom_arrange::delete_vector(
 		GlobalV::ofs_running, 
 		GlobalV::SEARCH_PBC, 
-		GridD, 
+		GlobalC::GridD, 
 		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);

@@ -121,7 +121,7 @@ void unkOverlap_lcao::init()
 	//获取每个cpu核的原子轨道系数
 	for(int ik = 0; ik < kpoints_number; ik++)
 	{
-		get_lcao_wfc_global_ik(lcao_wfc_global[ik],LOWF.WFC_K[ik]);
+		get_lcao_wfc_global_ik(lcao_wfc_global[ik],GlobalC::LOWF.WFC_K[ik]);
 	}
 	
 	// 并行方案
@@ -391,18 +391,18 @@ void unkOverlap_lcao::cal_R_number()
 		for (int I1 = 0; I1 < atom1->na; ++I1)
 		{
 			tau1 = atom1->tau[I1];
-			GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 			
-			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 			{
-				const int T2 = GridD.getType(ad);
-				const int I2 = GridD.getNatom(ad);
+				const int T2 = GlobalC::GridD.getType(ad);
+				const int I2 = GlobalC::GridD.getNatom(ad);
 				Atom* atom2 = &GlobalC::ucell.atoms[T2];
-				const double R_direct_x = (double)GridD.getBox(ad).x;
-				const double R_direct_y = (double)GridD.getBox(ad).y;
-				const double R_direct_z = (double)GridD.getBox(ad).z;
+				const double R_direct_x = (double)GlobalC::GridD.getBox(ad).x;
+				const double R_direct_y = (double)GlobalC::GridD.getBox(ad).y;
+				const double R_direct_z = (double)GlobalC::GridD.getBox(ad).z;
 			
-				tau2 = GridD.getAdjacentTau(ad);
+				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
 				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
@@ -456,7 +456,7 @@ void unkOverlap_lcao::cal_orb_overlap()
 	{
 		for(int iw2 = 0; iw2 < GlobalV::NLOCAL; iw2++)
 		{
-			//if ( !ParaO.in_this_processor(iw1,iw2) ) continue;
+			//if ( !GlobalC::ParaO.in_this_processor(iw1,iw2) ) continue;
 			
 			// iw1 和 iw2 永远没有overlap
 			if( orb1_orb2_R[iw1][iw2].empty() ) continue;
@@ -497,7 +497,7 @@ complex<double> unkOverlap_lcao::unkdotp_LCAO(const int ik_L, const int ik_R, co
 	{
 		for(int iw2 = 0; iw2 < GlobalV::NLOCAL; iw2++)
 		{
-			//if ( !ParaO.in_this_processor(iw1,iw2) ) continue;
+			//if ( !GlobalC::ParaO.in_this_processor(iw1,iw2) ) continue;
 			if( !cal_tag[iw1][iw2] ) 
 			{
 				//GlobalV::ofs_running << "the no calculate iw1 and iw2 is " << iw1 << "," << iw2 << endl;
@@ -679,18 +679,18 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(complex<double> **ctot, complex<dou
 void unkOverlap_lcao::prepare_midmatrix_pblas(const int ik_L, const int ik_R, const Vector3<double> dk, complex<double> *&midmatrix)
 {
 	//Vector3<double> dk = GlobalC::kv.kvec_c[ik_R] - GlobalC::kv.kvec_c[ik_L];
-	midmatrix = new complex<double>[ParaO.nloc];
-	ZEROS(midmatrix,ParaO.nloc);
+	midmatrix = new complex<double>[GlobalC::ParaO.nloc];
+	ZEROS(midmatrix,GlobalC::ParaO.nloc);
 	for (int iw_row = 0; iw_row < GlobalV::NLOCAL; iw_row++) // global
 	{
 		for (int iw_col = 0; iw_col < GlobalV::NLOCAL; iw_col++) // global
 		{
-			int ir = ParaO.trace_loc_row[ iw_row ]; // local
-			int ic = ParaO.trace_loc_col[ iw_col ]; // local
+			int ir = GlobalC::ParaO.trace_loc_row[ iw_row ]; // local
+			int ic = GlobalC::ParaO.trace_loc_col[ iw_col ]; // local
 			
 			if(ir >= 0 && ic >= 0)
 			{
-				int index = ic*ParaO.nrow+ir;
+				int index = ic*GlobalC::ParaO.nrow+ir;
 				Vector3<double> tau1 = GlobalC::ucell.atoms[ iw2it(iw_row) ].tau[ iw2ia(iw_row) ];		
 				for(int iR = 0; iR < orb1_orb2_R[iw_row][iw_col].size(); iR++)
 				{
@@ -710,14 +710,14 @@ complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int ik_R, 
 	const complex<double> minus = complex<double>(-1.0,0.0);
 	complex<double> det = complex<double>(1.0,0.0);
 	complex<double> *midmatrix = NULL;
-	complex<double> *C_matrix = new complex<double>[ParaO.nloc];
-	complex<double> *out_matrix = new complex<double>[ParaO.nloc];
-	ZEROS(C_matrix,ParaO.nloc);
-	ZEROS(out_matrix,ParaO.nloc);
+	complex<double> *C_matrix = new complex<double>[GlobalC::ParaO.nloc];
+	complex<double> *out_matrix = new complex<double>[GlobalC::ParaO.nloc];
+	ZEROS(C_matrix,GlobalC::ParaO.nloc);
+	ZEROS(out_matrix,GlobalC::ParaO.nloc);
 	
 	this->prepare_midmatrix_pblas(ik_L,ik_R,dk,midmatrix);
 	
-	//LOC.wfc_dm_2d.wfc_k
+	//GlobalC::LOC.wfc_dm_2d.wfc_k
 	char transa = 'C';
 	char transb = 'N';
 	int occBands = occ_bands;
@@ -725,30 +725,30 @@ complex<double> unkOverlap_lcao::det_berryphase(const int ik_L, const int ik_R, 
 	double alpha=1.0, beta=0.0;
 	int one = 1;
 	pzgemm_(&transa,&transb,&occBands,&nlocal,&nlocal,&alpha,
-			LOC.wfc_dm_2d.wfc_k[ik_L].c,&one,&one,ParaO.desc,
-							  midmatrix,&one,&one,ParaO.desc,
+			GlobalC::LOC.wfc_dm_2d.wfc_k[ik_L].c,&one,&one,GlobalC::ParaO.desc,
+							  midmatrix,&one,&one,GlobalC::ParaO.desc,
 													   &beta,
-							   C_matrix,&one,&one,ParaO.desc);
+							   C_matrix,&one,&one,GlobalC::ParaO.desc);
 							   
 	pzgemm_(&transb,&transb,&occBands,&occBands,&nlocal,&alpha,
-								 C_matrix,&one,&one,ParaO.desc,
-			  LOC.wfc_dm_2d.wfc_k[ik_R].c,&one,&one,ParaO.desc,
+								 C_matrix,&one,&one,GlobalC::ParaO.desc,
+			  GlobalC::LOC.wfc_dm_2d.wfc_k[ik_R].c,&one,&one,GlobalC::ParaO.desc,
 														 &beta,
-							   out_matrix,&one,&one,ParaO.desc);
+							   out_matrix,&one,&one,GlobalC::ParaO.desc);
 	
 
-	//int *ipiv = new int[ ParaO.nrow+ParaO.desc[4] ];
-	int *ipiv = new int[ ParaO.nrow ];
+	//int *ipiv = new int[ GlobalC::ParaO.nrow+GlobalC::ParaO.desc[4] ];
+	int *ipiv = new int[ GlobalC::ParaO.nrow ];
 	int info;
-	pzgetrf_(&occBands,&occBands,out_matrix,&one,&one,ParaO.desc,ipiv,&info);
+	pzgetrf_(&occBands,&occBands,out_matrix,&one,&one,GlobalC::ParaO.desc,ipiv,&info);
 	
 	for(int i = 0; i < occBands; i++) // global
 	{	
-		int ir = ParaO.trace_loc_row[ i ]; // local
-		int ic = ParaO.trace_loc_col[ i ]; // local
+		int ir = GlobalC::ParaO.trace_loc_row[ i ]; // local
+		int ic = GlobalC::ParaO.trace_loc_col[ i ]; // local
 		if(ir >= 0 && ic >= 0)
 		{
-			int index = ic*ParaO.nrow+ir;
+			int index = ic*GlobalC::ParaO.nrow+ir;
 			if(ipiv[ir] != (i+1))
 			{
 				det = minus * det * out_matrix[index];
@@ -827,7 +827,7 @@ void unkOverlap_lcao::test()
 	double result = 0;
 	for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
 	{
-		cout << "the wfc 11 is " << LOWF.WFC_K[11][13][iw] << " and the 23 is " << LOWF.WFC_K[23][13][iw] << endl;
+		cout << "the wfc 11 is " << GlobalC::LOWF.WFC_K[11][13][iw] << " and the 23 is " << GlobalC::LOWF.WFC_K[23][13][iw] << endl;
 	}
 	*/
 }

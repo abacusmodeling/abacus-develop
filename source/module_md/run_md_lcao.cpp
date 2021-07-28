@@ -219,7 +219,7 @@ void Run_MD_LCAO::opt_ions(void)
 	}
 
 	// mohan update 2021-02-10
-    LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
     timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
@@ -243,7 +243,7 @@ void Run_MD_LCAO::final_scf(void)
     atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD, 
+		GlobalC::GridD, 
 		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
@@ -260,7 +260,7 @@ void Run_MD_LCAO::final_scf(void)
         // For each atom, calculate the adjacent atoms in different cells 
         // and allocate the space for H(R) and S(R).
         LNNR.cal_nnr();
-        LM.allocate_HS_R(LNNR.nnr);
+        GlobalC::LM.allocate_HS_R(LNNR.nnr);
         
 		// need to first calculae lgd.
         // using GridT.init.
@@ -271,22 +271,22 @@ void Run_MD_LCAO::final_scf(void)
     // after ParaO and GridT, 
     // this information is used to calculate
     // the force.
-    LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GridT);
 		
     // (5) init density kernel
     // (6) init wave functions.
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         // here we reset the density matrix dimension.
-        LOC.allocate_gamma(GridT);
+        GlobalC::LOC.allocate_gamma(GridT);
     }
     else
     {
-        LOWF.allocate_k(GridT);
-        LOC.allocate_DM_k();
+        GlobalC::LOWF.allocate_k(GridT);
+        GlobalC::LOC.allocate_DM_k();
     }
 
-    UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
 
     if(GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
     {
