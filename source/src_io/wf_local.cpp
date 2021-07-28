@@ -173,14 +173,14 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
 	if(error==4) return 4;
 
 	// mohan add 2012-02-15,
-	// SGO.cal_totwfc();
+	// GlobalC::SGO.cal_totwfc();
 
 	// distri_lowf need all processors.
 	// otherwise, read in sucessfully.
     // if GlobalV::DRANK!=0, ctot is not used,
     // so it's save.
 	
-    //WF_Local::distri_lowf(ctot, SGO.totwfc[0]);
+    //WF_Local::distri_lowf(ctot, GlobalC::SGO.totwfc[0]);
     if(newdm==0)
 	{
 		WF_Local::distri_lowf_complex(ctot, c); 
@@ -193,7 +193,7 @@ int WF_Local::read_lowf_complex(complex<double> **c, const int &ik, const bool &
 	// mohan add 2012-02-15,
 	// still have bugs, but can solve it later.
 	// distribute the wave functions again.
-	// SGO.dis_subwfc();
+	// GlobalC::SGO.dis_subwfc();
 
     if (GlobalV::DRANK==0)
     {
@@ -321,7 +321,7 @@ int WF_Local::read_lowf(double **c, const int &is)
 
 	// mohan add 2012-02-15,
 	// mohan comment out 2021-02-09
-	//SGO.cal_totwfc();
+	//GlobalC::SGO.cal_totwfc();
 
 	// distri_lowf need all processors.
 	// otherwise, read in sucessfully.
@@ -330,7 +330,7 @@ int WF_Local::read_lowf(double **c, const int &is)
 
 	if(INPUT.new_dm==0)
 	{	
-		WF_Local::distri_lowf(ctot, SGO.totwfc[0]);
+		WF_Local::distri_lowf(ctot, GlobalC::SGO.totwfc[0]);
 	}
 	else
 	{
@@ -341,7 +341,7 @@ int WF_Local::read_lowf(double **c, const int &is)
 	// still have bugs, but can solve it later.
 	// distribute the wave functions again.
 	// mohan comment out 2021-02-09
-	// SGO.dis_subwfc();
+	// GlobalC::SGO.dis_subwfc();
 
     if (GlobalV::MY_RANK==0)
     {
@@ -597,7 +597,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
                 {
 					// mohan update 2012-01-12
 //                  const int mu_local = GridT.trace_lo[iw]; 
-                    const int mu_local = SGO.trace_lo_tot[iw];
+                    const int mu_local = GlobalC::SGO.trace_lo_tot[iw];
 
                     if (mu_local >= 0)
                     {
@@ -652,13 +652,13 @@ void WF_Local::distri_lowf(double **ctot, double **c)
             tag = GlobalV::DRANK * 3;
 			// mohan update 2012-01-12
             //MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
-            MPI_Send(SGO.trace_lo_tot, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+            MPI_Send(GlobalC::SGO.trace_lo_tot, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
             // send lgd
             tag = GlobalV::DRANK * 3 + 1;
 
 			// mohan update 2012-01-12
-			int lgdnow = SGO.lgd;
+			int lgdnow = GlobalC::SGO.lgd;
             MPI_Send(&lgdnow, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
             // receive c

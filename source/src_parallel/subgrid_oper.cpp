@@ -84,7 +84,7 @@ void SubGrid_oper::cal_totwfc_aug()
 			}
 		}
 
-		OUT(GlobalV::ofs_running,"SGO.lgd_aug",lgd);
+		OUT(GlobalV::ofs_running,"GlobalC::SGO.lgd_aug",lgd);
 	
 
 
@@ -165,7 +165,7 @@ void SubGrid_oper::cal_totwfc()
 	if(GlobalV::GRANK==0)
 	{
           	//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
-		if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"SGO.lgd",lgd);
+		if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"GlobalC::SGO.lgd",lgd);
 	
 		if(lgd==0)
 		{

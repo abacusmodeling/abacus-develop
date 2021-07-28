@@ -114,7 +114,7 @@ inline int q2ZLOC_WFC(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0 && igrow<GlobalV::NBANDS)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -159,7 +159,7 @@ inline int q2ZLOC_WFC_WFCAUG(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -203,7 +203,7 @@ inline int q2ZLOC_WFC_CTOT(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
@@ -242,7 +242,7 @@ inline int q2ZLOC_WFC_WFCAUG_CTOT(
             {
                 ZLOC[igrow*loc_size+zcol]=work[j*naroc[0]+i];
             }
-	        int mu_local=SGO.trace_lo_tot[igrow];
+	        int mu_local=GlobalC::SGO.trace_lo_tot[igrow];
             if(mu_local>=0)
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
