@@ -504,7 +504,7 @@ void LOOP_ions::final_scf(void)
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.
-    LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GridT);
 
 	GlobalC::LOC.allocate_dm_wfc(GridT);
 

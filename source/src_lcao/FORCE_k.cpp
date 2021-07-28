@@ -255,7 +255,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 						//-----------------------------
 						// start the adjacent cycle.
 						//-----------------------------
-						complex<double> *wfc = LOWF.WFC_K[ik][ib];
+						complex<double> *wfc = GlobalC::LOWF.WFC_K[ik][ib];
 						int count = 0;
 						for (int cb = 0; cb < RA.na_each[iat]; ++cb)
 						{
@@ -299,27 +299,27 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 									}
 									else if( mug >= 0 && nug <= 0)
 									{
-										const int a4 = LOWF.trace_aug[iw2_all];
+										const int a4 = GlobalC::LOWF.trace_aug[iw2_all];
 									
 										//assert(a4>=0);
 
 										dm[count] += set_EDM_k_element(phase, with_energy, wfc[mug], 
-										LOWF.WFC_K_aug[ik][ib][a4], GlobalC::wf.ekb[ik][ib]); 
+										GlobalC::LOWF.WFC_K_aug[ik][ib][a4], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug <= 0 && nug >= 0)
 									{
-										const int a3 = LOWF.trace_aug[iw1_all]; 
+										const int a3 = GlobalC::LOWF.trace_aug[iw1_all]; 
 
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										LOWF.WFC_K_aug[ik][ib][a3], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
+										GlobalC::LOWF.WFC_K_aug[ik][ib][a3], wfc[nug], GlobalC::wf.ekb[ik][ib]); 
 									}
 									else if( mug <=0 && nug <=0 )
 									{
-										const int a1 = LOWF.trace_aug[iw1_all];
-										const int a2 = LOWF.trace_aug[iw2_all];
+										const int a1 = GlobalC::LOWF.trace_aug[iw1_all];
+										const int a2 = GlobalC::LOWF.trace_aug[iw2_all];
 
 										dm[count] += set_EDM_k_element(phase, with_energy, 
-										LOWF.WFC_K_aug[ik][ib][a1], LOWF.WFC_K_aug[ik][ib][a2], GlobalC::wf.ekb[ik][ib]); 
+										GlobalC::LOWF.WFC_K_aug[ik][ib][a1], GlobalC::LOWF.WFC_K_aug[ik][ib][a2], GlobalC::wf.ekb[ik][ib]); 
 									}
 									assert(count<irr);
 									++ count;

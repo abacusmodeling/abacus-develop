@@ -86,7 +86,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 	}
 	else
 	{
-		LOWF.allocate_k(gt);
+		GlobalC::LOWF.allocate_k(gt);
 		this->allocate_DM_k();
 	}
 

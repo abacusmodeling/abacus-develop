@@ -136,7 +136,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{

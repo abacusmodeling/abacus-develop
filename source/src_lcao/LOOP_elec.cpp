@@ -97,7 +97,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// after ParaO and GridT, 
 	// this information is used to calculate
 	// the force.
-	LOWF.set_trace_aug(GridT);
+	GlobalC::LOWF.set_trace_aug(GridT);
 
 	// init density kernel and wave functions.
 	GlobalC::LOC.allocate_dm_wfc(GridT);

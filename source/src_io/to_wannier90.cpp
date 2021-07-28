@@ -1666,7 +1666,7 @@ void toWannier90::getUnkFromLcao()
 	for(int ik = 0; ik < num_kpts; ik++)
 	{
 		// ��ȡȫ�ֵ�lcao�Ĳ�����ϵ��
-		get_lcao_wfc_global_ik(lcao_wfc_global[ik],LOWF.WFC_K[ik]);
+		get_lcao_wfc_global_ik(lcao_wfc_global[ik],GlobalC::LOWF.WFC_K[ik]);
 	
 		int npw = GlobalC::kv.ngk[ik];
 		unk_inLcao[ik].create(GlobalV::NBANDS,GlobalC::wf.npwx);

@@ -1174,7 +1174,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 					{
 						for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 						{
-							b[ig][ib1][ib2] += conj(LOWF.WFC_K[ik][ib1][iw1]) * LOWF.WFC_K[iqk][ib2][iw2] * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir];
+							b[ig][ib1][ib2] += conj(GlobalC::LOWF.WFC_K[ik][ib1][iw1]) * GlobalC::LOWF.WFC_K[iqk][ib2][iw2] * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir];
 						}
 					}
 				}				 					
@@ -1199,7 +1199,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 				{
 					for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 					{
-						left[ib1][r] = conj(LOWF.WFC_K[ik][ib1][iw1]) * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir]; 
+						left[ib1][r] = conj(GlobalC::LOWF.WFC_K[ik][ib1][iw1]) * overlap[iw1][iw2][ig][ir] * phase[iw1][iw2][ir]; 
 						r++;
 					}
 				}
@@ -1215,7 +1215,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 				{
 					for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 					{
-						right[r][ib2] = LOWF.WFC_K[iqk][ib2][iw2];
+						right[r][ib2] = GlobalC::LOWF.WFC_K[iqk][ib2][iw2];
 						r++;
 					}
 				}

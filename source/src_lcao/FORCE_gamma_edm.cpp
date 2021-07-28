@@ -602,33 +602,33 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 				const int index = mu * GlobalC::ParaO.ncol + nu;
 				double ene = 0.0;
 
-				// (1) density matrix can be generated from LOWF.WFC_GAMMA directly.
+				// (1) density matrix can be generated from GlobalC::LOWF.WFC_GAMMA directly.
 				if(ii>=0 && jj>=0)
 				{
-					ene = this->set_EDM_element(ii, jj, with_energy, LOWF.WFC_GAMMA, LOWF.WFC_GAMMA, ispin);
+					ene = this->set_EDM_element(ii, jj, with_energy, GlobalC::LOWF.WFC_GAMMA, GlobalC::LOWF.WFC_GAMMA, ispin);
 				}
 
 				// (2)
 				else if(ii>=0 && jj<0)
 				{
-					const int a4 = LOWF.trace_aug[j];
+					const int a4 = GlobalC::LOWF.trace_aug[j];
 					assert(a4>=0);
-					ene = this->set_EDM_element(ii, a4, with_energy,  LOWF.WFC_GAMMA,  LOWF.WFC_GAMMA_aug, ispin);
+					ene = this->set_EDM_element(ii, a4, with_energy,  GlobalC::LOWF.WFC_GAMMA,  GlobalC::LOWF.WFC_GAMMA_aug, ispin);
 				}
 				else if(ii<0 && jj>=0)
 				{
-					const int a3 = LOWF.trace_aug[i];
+					const int a3 = GlobalC::LOWF.trace_aug[i];
 					assert(a3>=0);
 					// mohan fix serious bug 2011-07-01 (ii, a3) -> (a3, jj) !!!!!!!!!!!!
-					ene = this->set_EDM_element(a3, jj, with_energy, LOWF.WFC_GAMMA_aug, LOWF.WFC_GAMMA, ispin);
+					ene = this->set_EDM_element(a3, jj, with_energy, GlobalC::LOWF.WFC_GAMMA_aug, GlobalC::LOWF.WFC_GAMMA, ispin);
 				}
 				else if(ii<0 && jj<0)
 				{
-					const int a3 = LOWF.trace_aug[i];
-					const int a4 = LOWF.trace_aug[j];
+					const int a3 = GlobalC::LOWF.trace_aug[i];
+					const int a4 = GlobalC::LOWF.trace_aug[j];
 					assert(a3>=0);
 					assert(a4>=0);
-					ene = this->set_EDM_element(a3, a4, with_energy, LOWF.WFC_GAMMA_aug, LOWF.WFC_GAMMA_aug, ispin);
+					ene = this->set_EDM_element(a3, a4, with_energy, GlobalC::LOWF.WFC_GAMMA_aug, GlobalC::LOWF.WFC_GAMMA_aug, ispin);
 				}
 
 				dm(ispin, index) = ene;

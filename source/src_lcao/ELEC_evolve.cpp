@@ -128,14 +128,14 @@ void ELEC_evolve::evolve_psi(
 		{
 			timer::tick("Efficience","diago_k");
 			Diago_LCAO_Matrix DLM;
-			DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
+			DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
 			timer::tick("Efficience","diago_k");
 		}
 		else
 		{
 			timer::tick("Efficience","evolve_k");
 			Evolve_LCAO_Matrix ELM;
-			ELM.evolve_complex_matrix(ik, LOWF.WFC_K[ik], wfc[ik]);
+			ELM.evolve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], wfc[ik]);
 			timer::tick("Efficience","evolve_k");
 		}
 	} // end k
@@ -272,7 +272,7 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			c[i][j] = ccc[j];
-			LOWF.WFC_K[ik][i][j] = ccc[j];
+			GlobalC::LOWF.WFC_K[ik][i][j] = ccc[j];
 		}	
 	}
 
@@ -414,7 +414,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			c[i][j] = ccc[j];
-			LOWF.WFC_K[ik][i][j] = ccc[j];
+			GlobalC::LOWF.WFC_K[ik][i][j] = ccc[j];
 		}	
 	}
 

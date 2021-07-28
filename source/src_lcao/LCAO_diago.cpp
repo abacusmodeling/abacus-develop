@@ -110,12 +110,12 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 		{
 			for(int iw=0; iw<row / GlobalV::NPOL; iw++)
 			{
-				tmp[iw] = LOWF.WFC_K[ik][ib][iw * GlobalV::NPOL];
-				tmp[iw + row / GlobalV::NPOL] = LOWF.WFC_K[ik][ib][iw * GlobalV::NPOL + 1];
+				tmp[iw] = GlobalC::LOWF.WFC_K[ik][ib][iw * GlobalV::NPOL];
+				tmp[iw + row / GlobalV::NPOL] = GlobalC::LOWF.WFC_K[ik][ib][iw * GlobalV::NPOL + 1];
 			}
 			for(int iw=0; iw<row; iw++)
 			{
-				LOWF.WFC_K[ik][ib][iw] = tmp[iw];
+				GlobalC::LOWF.WFC_K[ik][ib][iw] = tmp[iw];
 			}
 		}
 	}
@@ -159,7 +159,7 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 		{
 			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{
-				LOWF.WFC_K[ik][ib][iw] = hvec(iw,ib);
+				GlobalC::LOWF.WFC_K[ik][ib][iw] = hvec(iw,ib);
 			}
 		}
 	}
@@ -169,8 +169,8 @@ void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wf
 		{
 			for(int iw=0; iw<GlobalV::NLOCAL / GlobalV::NPOL; iw++)
 			{
-				LOWF.WFC_K[ik][ib][iw] = hvec(iw * GlobalV::NPOL, ib);
-				LOWF.WFC_K[ik][ib][iw + GlobalV::NLOCAL / GlobalV::NPOL] = hvec(iw * GlobalV::NPOL + 1, ib);
+				GlobalC::LOWF.WFC_K[ik][ib][iw] = hvec(iw * GlobalV::NPOL, ib);
+				GlobalC::LOWF.WFC_K[ik][ib][iw + GlobalV::NLOCAL / GlobalV::NPOL] = hvec(iw * GlobalV::NPOL + 1, ib);
 			}
 		}
 	}

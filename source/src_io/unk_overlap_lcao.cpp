@@ -121,7 +121,7 @@ void unkOverlap_lcao::init()
 	//获取每个cpu核的原子轨道系数
 	for(int ik = 0; ik < kpoints_number; ik++)
 	{
-		get_lcao_wfc_global_ik(lcao_wfc_global[ik],LOWF.WFC_K[ik]);
+		get_lcao_wfc_global_ik(lcao_wfc_global[ik],GlobalC::LOWF.WFC_K[ik]);
 	}
 	
 	// 并行方案
@@ -827,7 +827,7 @@ void unkOverlap_lcao::test()
 	double result = 0;
 	for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
 	{
-		cout << "the wfc 11 is " << LOWF.WFC_K[11][13][iw] << " and the 23 is " << LOWF.WFC_K[23][13][iw] << endl;
+		cout << "the wfc 11 is " << GlobalC::LOWF.WFC_K[11][13][iw] << " and the 23 is " << GlobalC::LOWF.WFC_K[23][13][iw] << endl;
 	}
 	*/
 }

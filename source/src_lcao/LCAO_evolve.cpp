@@ -220,7 +220,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 	{
                 for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			cout << LOWF.WFC_K[ik][i][j] << "\t";
+			cout << GlobalC::LOWF.WFC_K[ik][i][j] << "\t";
 		}
 		cout <<endl;
 	}
@@ -241,7 +241,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			c[i][j] = ccc[j];
-			LOWF.WFC_K[ik][i][j] = ccc[j];
+			GlobalC::LOWF.WFC_K[ik][i][j] = ccc[j];
 		}	
 	}
 
@@ -249,7 +249,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 	{
                 for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			cout << LOWF.WFC_K[ik][i][j] << "\t";
+			cout << GlobalC::LOWF.WFC_K[ik][i][j] << "\t";
 		}
 		cout <<endl;
 	}

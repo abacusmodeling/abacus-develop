@@ -67,7 +67,7 @@ void LOOP_cell::opt_cell(void)
 	ions.opt_ions();
 
 	// mohan update 2021-02-10
-    LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 	
 	return;
 }

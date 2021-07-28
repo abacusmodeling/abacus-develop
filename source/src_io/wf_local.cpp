@@ -868,7 +868,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
 				//-------------------------------------
                 for (int iw=0; iw<GlobalV::NLOCAL; iw++)
                 {
-					const int mu = LOWF.trace_aug[iw];
+					const int mu = GlobalC::LOWF.trace_aug[iw];
 					if( mu < 0 ) continue;
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
@@ -930,35 +930,35 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
 
 			// mohan add 2010-09-26
 			//--------------------------------------------
-            // (1) LOWF.trace_aug : trace c_aug
+            // (1) GlobalC::LOWF.trace_aug : trace c_aug
 			// tell processor 0 that which wave functions
 			// they need
 			//--------------------------------------------
             tag = GlobalV::DRANK * 3;
-            MPI_Send(LOWF.trace_aug, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+            MPI_Send(GlobalC::LOWF.trace_aug, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
 			//--------------------------------------------
-			// (2) LOWF.daug: dimension of c_aug
+			// (2) GlobalC::LOWF.daug: dimension of c_aug
 			// and RANK=0 will receive the information.
 			//--------------------------------------------
             tag = GlobalV::DRANK * 3 + 1;
-            MPI_Send(&LOWF.daug, 1, MPI_INT, 0, tag, DIAG_WORLD);
+            MPI_Send(&GlobalC::LOWF.daug, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
 			//--------------------------------------------
             // (3) receive the augmented wave functions
 			//--------------------------------------------
-            double* crecv = new double[GlobalV::NBANDS*LOWF.daug];
-            ZEROS(crecv, GlobalV::NBANDS*LOWF.daug);
+            double* crecv = new double[GlobalV::NBANDS*GlobalC::LOWF.daug];
+            ZEROS(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug);
 
             tag = GlobalV::DRANK * 3 + 2;
-            MPI_Recv(crecv, GlobalV::NBANDS*LOWF.daug, MPI_DOUBLE, 0, tag, DIAG_WORLD, &status);
+            MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug, MPI_DOUBLE, 0, tag, DIAG_WORLD, &status);
 
 			//--------------------------------------------
             // (4) copy the augmented wave functions
 			//--------------------------------------------
             for (int ib=0; ib<GlobalV::NBANDS; ib++)
             {
-                for (int mu=0; mu<LOWF.daug; mu++)
+                for (int mu=0; mu<GlobalC::LOWF.daug; mu++)
                 {
                     c_aug[ib][mu] = crecv[mu*GlobalV::NBANDS+ib];
                 }
@@ -989,7 +989,7 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
     GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
-        for(int j=0; j<LOWF.daug; j++)
+        for(int j=0; j<GlobalC::LOWF.daug; j++)
         {
             if(j%8==0) GlobalV::ofs_running << endl;
             if( abs(c[i][j]) > 1.0e-5  )
@@ -1037,7 +1037,7 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
 				//-------------------------------------
                 for (int iw=0; iw<GlobalV::NLOCAL; iw++)
                 {
-					const int mu = LOWF.trace_aug[iw];
+					const int mu = GlobalC::LOWF.trace_aug[iw];
 					if( mu < 0 ) continue;
 					for (int ib=0; ib<GlobalV::NBANDS; ib++)
 					{
@@ -1095,41 +1095,41 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
 
 			// mohan add 2010-09-26
 			//--------------------------------------------
-            // (1) LOWF.trace_aug : trace c_aug
+            // (1) GlobalC::LOWF.trace_aug : trace c_aug
 			// tell processor 0 that which wave functions
 			// they need
 			//--------------------------------------------
             tag = GlobalV::DRANK * 3;
-            MPI_Send(LOWF.trace_aug, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+            MPI_Send(GlobalC::LOWF.trace_aug, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 //			for(int i=0; i<GlobalV::NLOCAL; ++i)
 //			{
-//				GlobalV::ofs_running << " trace_aug = " << LOWF.trace_aug[i] << endl; 
+//				GlobalV::ofs_running << " trace_aug = " << GlobalC::LOWF.trace_aug[i] << endl; 
 //			}
 
 			//--------------------------------------------
-			// (2) LOWF.daug: dimension of c_aug
+			// (2) GlobalC::LOWF.daug: dimension of c_aug
 			// and RANK=0 will receive the information.
 			//--------------------------------------------
             tag = GlobalV::DRANK * 3 + 1;
-            MPI_Send(&LOWF.daug, 1, MPI_INT, 0, tag, DIAG_WORLD);
+            MPI_Send(&GlobalC::LOWF.daug, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
-			if(LOWF.daug!=0)
+			if(GlobalC::LOWF.daug!=0)
 			{
 				//--------------------------------------------
 				// (3) receive the augmented wave functions
 				//--------------------------------------------
-				complex<double>* crecv = new complex<double>[GlobalV::NBANDS*LOWF.daug];
-				ZEROS(crecv, GlobalV::NBANDS*LOWF.daug);
+				complex<double>* crecv = new complex<double>[GlobalV::NBANDS*GlobalC::LOWF.daug];
+				ZEROS(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug);
 
 				tag = GlobalV::DRANK * 3 + 2;
-				MPI_Recv(crecv, GlobalV::NBANDS*LOWF.daug, mpicomplex, 0, tag, DIAG_WORLD, &status);
+				MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::LOWF.daug, mpicomplex, 0, tag, DIAG_WORLD, &status);
 
 				//--------------------------------------------
 				// (4) copy the augmented wave functions
 				//--------------------------------------------
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					for (int mu=0; mu<LOWF.daug; mu++)
+					for (int mu=0; mu<GlobalC::LOWF.daug; mu++)
 					{
 						c_aug[ib][mu] = crecv[mu*GlobalV::NBANDS+ib];
 					}
@@ -1161,7 +1161,7 @@ void WF_Local::distri_lowf_aug_complex(complex<double> **ctot, complex<double> *
     GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
-        for(int j=0; j<LOWF.daug; j++)
+        for(int j=0; j<GlobalC::LOWF.daug; j++)
         {
             if(j%8==0) GlobalV::ofs_running << endl;
             if( abs(c_aug[i][j]) > 1.0e-5  )

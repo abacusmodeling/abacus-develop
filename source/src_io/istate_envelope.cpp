@@ -21,11 +21,11 @@ void IState_Envelope::begin(void)
 	}
 
 	// (1) 
-	// (1.1) allocate the space for LOWF.WFC_GAMMA
+	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
 
-	OUT(GlobalV::ofs_running,"LOWF.allocate_flag",LOWF.get_allocate_flag());	
+	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 
 	// mohan update 2011-03-21
 	// if ucell is odd, it's correct,
@@ -76,13 +76,13 @@ void IState_Envelope::begin(void)
 
 
 				//---------------------------------------------------------
-				// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+				// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 				// we need to fix this function in near future.
 				// -- mohan add 2021-02-09
 				//---------------------------------------------------------
-				WARNING_QUIT("IState_Charge::idmatrix","need to update LOWF.WFC_GAMMA");
+				WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
 
-				//UHM.GG.cal_env( LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
+				//UHM.GG.cal_env( GlobalC::LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
 
 
 				GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09

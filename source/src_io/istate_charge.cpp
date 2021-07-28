@@ -36,10 +36,10 @@ void IState_Charge::begin(void)
 	ZEROS(bands_picked, GlobalV::NBANDS);
 
 	// (1) 
-	// (1.1) allocate the space for LOWF.WFC_GAMMA
+	// (1.1) allocate the space for GlobalC::LOWF.WFC_GAMMA
 
 	// (1.2) read in LOWF_GAMMA.dat
-	OUT(GlobalV::ofs_running,"LOWF.allocate_flag",LOWF.get_allocate_flag());	
+	OUT(GlobalV::ofs_running,"GlobalC::LOWF.allocate_flag",GlobalC::LOWF.get_allocate_flag());	
 	cout << " number of electrons = " << GlobalC::CHR.nelec << endl;
 
 	// mohan update 2011-03-21
@@ -167,13 +167,13 @@ void IState_Charge::idmatrix(const int &ib)
 					if ( nu_local >= 0)
 					{
 						//---------------------------------------------------------
-						// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+						// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 						// we need to fix this function in near future.
 						// -- mohan add 2021-02-09
 						//---------------------------------------------------------
-						WARNING_QUIT("IState_Charge::idmatrix","need to update LOWF.WFC_GAMMA");
+						WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
 						// 2 stands for degeneracy.
-						//alpha[nu_local] += 2.0 * LOWF.WFC_GAMMA[is][ib][mu_local] * LOWF.WFC_GAMMA[is][ib][nu_local];
+						//alpha[nu_local] += 2.0 * GlobalC::LOWF.WFC_GAMMA[is][ib][mu_local] * GlobalC::LOWF.WFC_GAMMA[is][ib][nu_local];
 					}
 				}
 			}

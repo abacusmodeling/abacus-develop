@@ -164,7 +164,7 @@ inline int q2ZLOC_WFC_WFCAUG(
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -247,7 +247,7 @@ inline int q2ZLOC_WFC_WFCAUG_CTOT(
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -308,7 +308,7 @@ inline int q2WFC_WFCAUG_complex(
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -373,7 +373,7 @@ inline int q2WFC_WFCAUG_CTOT_complex(
             {
                 WFC[igcol][mu_local]=work[j*naroc[0]+i];
             }
-	        int mu_aug=LOWF.trace_aug[igrow];
+	        int mu_aug=GlobalC::LOWF.trace_aug[igrow];
             if(mu_aug>=0)
             {
                 WFCAUG[igcol][mu_aug]=work[j*naroc[0]+i];
@@ -700,7 +700,7 @@ void Pdiag_Double::diago_double_begin(
 						// mohan delete Bfield option 2021-02-12
 						info=q2ZLOC_WFC_WFCAUG_CTOT(myid, pos, naroc, nb,
 							dim0, dim1, iprow, ipcol, this->loc_size,
-							work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
+							work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN], ctot);
 					}
 					else
 					{
@@ -714,7 +714,7 @@ void Pdiag_Double::diago_double_begin(
 					// mohan update 2021-02-12, delete Bfield option
 					info=q2ZLOC_WFC_WFCAUG(pos, naroc, nb,
 						dim0, dim1, iprow, ipcol, this->loc_size,
-						work, Z_LOC[ik], wfc, LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
+						work, Z_LOC[ik], wfc, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]);
 				}
 			}//loop ipcol
 		}//loop iprow
@@ -1098,7 +1098,7 @@ void Pdiag_Double::diago_complex_begin(
 					// mohan update 2021-02-12, delete BFIELD option
 					info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
 							dim0, dim1, iprow, ipcol,
-							work, wfc, LOWF.WFC_K_aug[ik], ctot);
+							work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
                     stringstream ss;
 	                ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
                     // mohan add 2012-04-03, because we need the occupations for the
@@ -1118,7 +1118,7 @@ void Pdiag_Double::diago_complex_begin(
 					// mohan update 2021-02-12, delte BFIELD option
 					info=q2WFC_WFCAUG_complex(naroc, nb,
 							dim0, dim1, iprow, ipcol,
-							work, wfc, LOWF.WFC_K_aug[ik]);
+							work, wfc, GlobalC::LOWF.WFC_K_aug[ik]);
 				}
             }
         }
@@ -1217,7 +1217,7 @@ void Pdiag_Double::diago_complex_begin(
 						// mohan update 2021-02-12, delete BFIELD option
 						info=q2WFC_WFCAUG_CTOT_complex(myid, naroc, nb,
 								dim0, dim1, iprow, ipcol,
-								work, wfc, LOWF.WFC_K_aug[ik], ctot);
+								work, wfc, GlobalC::LOWF.WFC_K_aug[ik], ctot);
 						stringstream ss;
 						ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 << ".dat";
 						// mohan add 2012-04-03, because we need the occupations for the
@@ -1237,7 +1237,7 @@ void Pdiag_Double::diago_complex_begin(
 						// mohan update 2021-02-12, delte BFIELD option
 						info=q2WFC_WFCAUG_complex(naroc, nb,
 								dim0, dim1, iprow, ipcol,
-								work, wfc, LOWF.WFC_K_aug[ik]);
+								work, wfc, GlobalC::LOWF.WFC_K_aug[ik]);
 					}
 				}
 			}

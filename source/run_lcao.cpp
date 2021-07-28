@@ -77,7 +77,7 @@ void Run_lcao::lcao_line(void)
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
 
-	LOWF.orb_con.set_orb_tables(
+	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
 		UOT, 
 		ORB,

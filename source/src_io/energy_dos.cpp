@@ -346,7 +346,7 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);//qifeng-2019-01-21
 
 				// mohan update 2021-04-16
-				LOWF.orb_con.set_orb_tables(
+				GlobalC::LOWF.orb_con.set_orb_tables(
 						GlobalV::ofs_running,
 						UOT, 
 						ORB,
@@ -450,7 +450,7 @@ void energy::perform_dos(void)
 					GlobalV::test_atom_input);
 #endif
 				// mohan update 2021-02-10
-				LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+				GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 			}//else
 
 		 MPI_Reduce(pdosk[is].c, pdos[is].c , NUM , MPI_DOUBLE , MPI_SUM, 0, MPI_COMM_WORLD);

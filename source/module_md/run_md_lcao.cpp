@@ -219,7 +219,7 @@ void Run_MD_LCAO::opt_ions(void)
 	}
 
 	// mohan update 2021-02-10
-    LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
 
     timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
@@ -271,7 +271,7 @@ void Run_MD_LCAO::final_scf(void)
     // after ParaO and GridT, 
     // this information is used to calculate
     // the force.
-    LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GridT);
 		
     // (5) init density kernel
     // (6) init wave functions.
@@ -282,7 +282,7 @@ void Run_MD_LCAO::final_scf(void)
     }
     else
     {
-        LOWF.allocate_k(GridT);
+        GlobalC::LOWF.allocate_k(GridT);
         GlobalC::LOC.allocate_DM_k();
     }
 

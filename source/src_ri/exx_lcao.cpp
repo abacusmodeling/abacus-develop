@@ -1056,18 +1056,18 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				ofstream ofs("GlobalC::LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
 					{
 						//---------------------------------------------------------
-						// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+						// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 						// we need to fix this function in near future.
 						// -- mohan add 2021-02-09
 						//---------------------------------------------------------
-						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update LOWF.WFC_GAMMA");
-						//ofs<<LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
+						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
+						//ofs<<GlobalC::LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
 					}
 					ofs<<endl;
 				}
@@ -1078,11 +1078,11 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				ofstream ofs("GlobalC::LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
-						ofs<<LOWF.WFC_K[ik][ib][iwt]<<"\t";
+						ofs<<GlobalC::LOWF.WFC_K[ik][ib][iwt]<<"\t";
 					ofs<<endl;
 				}
 				ofs.close();

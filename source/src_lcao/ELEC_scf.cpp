@@ -231,7 +231,7 @@ void ELEC_scf::scf(const int &istep)
 					{
 						for (int i=0; i<GlobalV::NLOCAL; i++)
 						{
-							WFC_init[ik][ib][i] = LOWF.WFC_K[ik][ib][i];
+							WFC_init[ik][ib][i] = GlobalC::LOWF.WFC_K[ik][ib][i];
 						}
 					}
 				}
@@ -387,7 +387,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// resume codes!
 		//-------------------------------------------------------------------------
-		// this->LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
+		// this->GlobalC::LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
 		// GlobalC::CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
 		// but must has evc first!
 		//-------------------------------------------------------------------------

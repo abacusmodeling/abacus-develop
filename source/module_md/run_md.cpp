@@ -78,7 +78,7 @@ void Run_md::ai_md_line(void)
 	// * construct the interpolation tables.
 	if(GlobalV::BASIS_TYPE=="lcao")
 	{
-		LOWF.orb_con.set_orb_tables(
+		GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
 		UOT, 
 		ORB,
