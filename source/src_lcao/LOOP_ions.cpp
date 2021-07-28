@@ -508,7 +508,7 @@ void LOOP_ions::final_scf(void)
 
 	GlobalC::LOC.allocate_dm_wfc(GridT);
 
-    UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
 
 

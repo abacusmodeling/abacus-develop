@@ -23,20 +23,20 @@ void LOOP_ions::output_HS_R(void)
 
     if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
     {
-        // UHM.calculate_STN_R();
-        // UHM.GK.cal_vlocal_R(0);
-        // UHM.GK.distribute_pvpR_tr();
+        // GlobalC::UHM.calculate_STN_R();
+        // GlobalC::UHM.GK.cal_vlocal_R(0);
+        // GlobalC::UHM.GK.distribute_pvpR_tr();
         // HS_Matrix::save_HSR_tr(0);
 
         // jingan add 2021-6-4
-        UHM.calculate_HSR_sparse(0, sparse_threshold);
+        GlobalC::UHM.calculate_HSR_sparse(0, sparse_threshold);
         HS_Matrix::save_HSR_sparse(0, sparse_threshold, binary);
-        UHM.destroy_all_HSR_sparse();
+        GlobalC::UHM.destroy_all_HSR_sparse();
     }
     ///*
     else if(GlobalV::NSPIN==2)
     {
-        // UHM.calculate_STN_R();
+        // GlobalC::UHM.calculate_STN_R();
         // for(int ik=0; ik<GlobalC::kv.nks; ik++)
         // {
         //     if(ik==0 || ik==GlobalC::kv.nks/2)
@@ -51,12 +51,12 @@ void LOOP_ions::output_HS_R(void)
         //         {
         //             if(GlobalV::VL_IN_H)
         //             {
-		// 				//UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
-		// 				UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
+		// 				//GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
+		// 				GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
         //             }
         //         }
-        //         UHM.GK.cal_vlocal_R(GlobalV::CURRENT_SPIN);
-        //         UHM.GK.distribute_pvpR_tr();
+        //         GlobalC::UHM.GK.cal_vlocal_R(GlobalV::CURRENT_SPIN);
+        //         GlobalC::UHM.GK.distribute_pvpR_tr();
         //         HS_Matrix::save_HSR_tr(GlobalV::CURRENT_SPIN);
         //     }
         // }
@@ -80,20 +80,20 @@ void LOOP_ions::output_HS_R(void)
                 {
                     if(GlobalV::VL_IN_H)
                     {
-						//UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
-						UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
+						//GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vrs1,GridT);
+						GlobalC::UHM.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, GlobalV::CURRENT_SPIN);
                     }
                 }
-                UHM.calculate_HSR_sparse(GlobalV::CURRENT_SPIN, sparse_threshold);
+                GlobalC::UHM.calculate_HSR_sparse(GlobalV::CURRENT_SPIN, sparse_threshold);
                 HS_Matrix::save_HSR_sparse(GlobalV::CURRENT_SPIN, sparse_threshold, binary);
-                UHM.destroy_all_HSR_sparse();
+                GlobalC::UHM.destroy_all_HSR_sparse();
             }
         }
     }
 
     if(!GlobalV::GAMMA_ONLY_LOCAL) //LiuXh 20181011
     {
-        UHM.GK.destroy_pvpR();
+        GlobalC::UHM.GK.destroy_pvpR();
     } //LiuXh 20181011
 
     timer::tick("LOOP_ions","output_HS_R"); 

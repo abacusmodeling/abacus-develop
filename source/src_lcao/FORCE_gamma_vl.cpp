@@ -68,7 +68,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         //  ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
         //  ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
         //  ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
-        UHM.GG.cal_force(GlobalC::pot.vr_eff1);
+        GlobalC::UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
@@ -207,7 +207,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         //ZEROS(GlobalC::LM.DHloc_fixed_x,GlobalC::ParaO.nloc);
         //ZEROS(GlobalC::LM.DHloc_fixed_y,GlobalC::ParaO.nloc);
         //ZEROS(GlobalC::LM.DHloc_fixed_z,GlobalC::ParaO.nloc);
-        UHM.GG.cal_force(GlobalC::pot.vr_eff1);
+        GlobalC::UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
         for(int i=0; i<GlobalV::NLOCAL; i++)
         {

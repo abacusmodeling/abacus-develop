@@ -127,11 +127,11 @@ void LOOP_elec::before_solver(const int &istep)
 		// calculate the charge density
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			UHM.GG.cal_rho(GlobalC::LOC.DM);
+			GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
 		}
 		else
 		{
-			UHM.GK.cal_rho_k();
+			GlobalC::UHM.GK.cal_rho_k();
 		}
 
 		// renormalize the charge density
@@ -143,7 +143,7 @@ void LOOP_elec::before_solver(const int &istep)
 
 
 	// (9) compute S, T, Vnl, Vna matrix.
-	UHM.set_lcao_matrices();
+	GlobalC::UHM.set_lcao_matrices();
 
     timer::tick("LOOP_elec","before_solver"); 
 	return;
@@ -215,7 +215,7 @@ void LOOP_elec::solver(const int &istep)
 	}
 	else if (GlobalV::CALCULATION=="nscf")
 	{
-		ELEC_nscf::nscf(UHM);
+		ELEC_nscf::nscf(GlobalC::UHM);
 	}
 	else if (GlobalV::CALCULATION=="istate")
 	{

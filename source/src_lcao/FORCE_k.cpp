@@ -140,7 +140,7 @@ void Force_LCAO_k::allocate_k(void)
 	//-----------------------------
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
 	bool cal_deri = true;
-	UHM.genH.build_ST_new ('S', cal_deri);
+	GlobalC::UHM.genH.build_ST_new ('S', cal_deri);
 
 	//-----------------------------------------
 	// (2) allocate for <phi | T + Vnl | dphi>
@@ -155,11 +155,11 @@ void Force_LCAO_k::allocate_k(void)
     
     // calculate dT=<phi|kin|dphi> in LCAO
     // calculate T + VNL(P1) in LCAO basis
-    UHM.genH.build_ST_new ('T', cal_deri);
+    GlobalC::UHM.genH.build_ST_new ('T', cal_deri);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x T part");
    
    	// calculate dVnl=<phi|dVnl|dphi> in LCAO 
-	UHM.genH.build_Nonlocal_mu (cal_deri);
+	GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
 	//test(GlobalC::LM.DHloc_fixedR_x,"GlobalC::LM.DHloc_fixedR_x Vnl part");
 
 	timer::tick("Force_LCAO_k","allocate");
@@ -947,11 +947,11 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		// fvl_dphi can not be set to zero here if Vna is used
 		if(isstress&&isforce) 
 		{
-			UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
+			GlobalC::UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);
 		}
 		else if(isforce) 
 		{
-			UHM.GK.fvl_k_RealSpace(fvl_dphi,GlobalC::pot.vr_eff1);
+			GlobalC::UHM.GK.fvl_k_RealSpace(fvl_dphi,GlobalC::pot.vr_eff1);
 		}
 	}
 

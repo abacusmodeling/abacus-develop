@@ -271,17 +271,17 @@ void ELEC_scf::scf(const int &istep)
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, UHM);
+			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM);
 		}
 		else
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, UHM, this->WFC_init);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, this->WFC_init);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, UHM);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM);
 			}
 		}
 

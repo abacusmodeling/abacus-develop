@@ -131,7 +131,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 
 	// must be done after "setup_this_ion_iter"
 	// because some basic parameters should be initialized
-	// in UHM.GG.init();
+	// in GlobalC::UHM.GG.init();
 
 	GlobalC::LM.zeros_HSgamma('S');    	
 
@@ -350,11 +350,11 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 //		GlobalV::GAMMA_ONLY_LOCAL = true;
 //		GlobalC::LM.allocate_HS_gamma(GlobalC::ParaO.nloc);
 //		GlobalC::LM.zeros_HSgamma('H');
-//		UHM.genH.calculate_NL_no( nstart );
+//		GlobalC::UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
 //		cout << " Correct LCAO Vnl " << endl;
 //		GlobalC::LM.print_HSgamma('H');		
-//		UHM.genH.calculate_NL_no( nstart );
+//		GlobalC::UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
 //		cout << " Correct LCAO Vnl " << endl;
 //		GlobalC::LM.print_HSgamma('H');		

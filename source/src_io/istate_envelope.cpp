@@ -82,7 +82,7 @@ void IState_Envelope::begin(void)
 				//---------------------------------------------------------
 				WARNING_QUIT("IState_Charge::idmatrix","need to update GlobalC::LOWF.WFC_GAMMA");
 
-				//UHM.GG.cal_env( GlobalC::LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
+				//GlobalC::UHM.GG.cal_env( GlobalC::LOWF.WFC_GAMMA[is][ib], GlobalC::CHR.rho[is] );
 
 
 				GlobalC::CHR.save_rho_before_sum_band(); //xiaohui add 2014-12-09

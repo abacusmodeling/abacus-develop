@@ -207,8 +207,8 @@ void Mulliken_Charge::cal_mulliken(void)
 
 			GlobalC::LM.allocate_HS_R(LNNR.nnr);
 			GlobalC::LM.zeros_HSR('S', LNNR.nnr);
-			UHM.genH.calculate_S_no();
-			UHM.genH.build_ST_new('S', false);
+			GlobalC::UHM.genH.calculate_S_no();
+			GlobalC::UHM.genH.build_ST_new('S', false);
 
 			for(int ik=0;ik<GlobalC::kv.nks;ik++)
 			{

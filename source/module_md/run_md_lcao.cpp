@@ -286,7 +286,7 @@ void Run_MD_LCAO::final_scf(void)
         GlobalC::LOC.allocate_DM_k();
     }
 
-    UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
 
     if(GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
     {

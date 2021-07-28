@@ -136,7 +136,7 @@ void Force_LCAO_gamma::allocate_gamma(void)
     //calculate dS in LCAO basis
     // tips: build_ST_new --> GlobalC::ParaO.set_force 
     //timer::tick("Force_LCAO_gamma","build_S_new");
-    UHM.genH.build_ST_new ('S', cal_deri);
+    GlobalC::UHM.genH.build_ST_new ('S', cal_deri);
     //timer::tick("Force_LCAO_gamma","build_S_new");
 
     Memory::record("force_lo", "dS", GlobalC::ParaO.nloc*3, "double");
@@ -154,13 +154,13 @@ void Force_LCAO_gamma::allocate_gamma(void)
     //calculate dT
     //calculate T + VNL(P1) in LCAO basis
     //timer::tick("Force_LCAO_gamma","build_T_new");
-    UHM.genH.build_ST_new ('T', cal_deri);
+    GlobalC::UHM.genH.build_ST_new ('T', cal_deri);
     //timer::tick("Force_LCAO_gamma","build_T_new");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x T part");
     
-    //UHM.genH.build_Nonlocal_beta (cal_deri);
+    //GlobalC::UHM.genH.build_Nonlocal_beta (cal_deri);
     //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
-    UHM.genH.build_Nonlocal_mu (cal_deri);
+    GlobalC::UHM.genH.build_Nonlocal_mu (cal_deri);
     //timer::tick("Force_LCAO_gamma","build_Nonlocal_mu");
     //test_gamma(GlobalC::LM.DHloc_fixed_x, "dHloc_fixed_x Vnl part");
 
