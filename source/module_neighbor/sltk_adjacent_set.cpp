@@ -48,7 +48,7 @@ void AdjacentSet::set
 	if (test_grid_in > 3)
 	{
 /*
-		ofs_running << "\n box(" << box_x
+		GlobalV::ofs_running << "\n box(" << box_x
 		<< " " << box_y
 		<< " " << box_z
 		<< " ) offset=" << offset_in
@@ -93,7 +93,7 @@ void AdjacentSet::getBox
 		now = now -  3 * (y + 1);
 		z = now - 1;
 
-//		if (test_grid > 3) ofs_running << "\n value=" << value << " x=" << x << " y=" << y << " z=" << z;
+//		if (GlobalV::test_grid > 3) GlobalV::ofs_running << "\n value=" << value << " x=" << x << " y=" << y << " z=" << z;
 	}
 	else
 	{

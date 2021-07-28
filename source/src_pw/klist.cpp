@@ -65,22 +65,22 @@ void K_Vectors::set(
 {
     TITLE("K_Vectors", "set");
 
-	ofs_running << "\n\n\n\n";
-	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " | Setup K-points                                                     |" << endl;
-	ofs_running << " | We setup the k-points according to input parameters.               |" << endl;
-	ofs_running << " | The reduced k-points are set according to symmetry operations.     |" << endl;
-	ofs_running << " | We treat the spin as another set of k-points.                      |" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-	ofs_running << "\n\n\n\n";
+	GlobalV::ofs_running << "\n\n\n\n";
+	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+	GlobalV::ofs_running << " |                                                                    |" << endl;
+	GlobalV::ofs_running << " | Setup K-points                                                     |" << endl;
+	GlobalV::ofs_running << " | We setup the k-points according to input parameters.               |" << endl;
+	GlobalV::ofs_running << " | The reduced k-points are set according to symmetry operations.     |" << endl;
+	GlobalV::ofs_running << " | We treat the spin as another set of k-points.                      |" << endl;
+	GlobalV::ofs_running << " |                                                                    |" << endl;
+	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	GlobalV::ofs_running << "\n\n\n\n";
 
-	ofs_running << "\n SETUP K-POINTS" << endl;
+	GlobalV::ofs_running << "\n SETUP K-POINTS" << endl;
 
 	// (1) set nspin, read kpoints.
 	this->nspin = nspin_in;
-	OUT(ofs_running,"nspin",nspin);
+	OUT(GlobalV::ofs_running,"nspin",nspin);
 	if(this->nspin==4) 
 	{
 		this->nspin = 1;//zhengdy-soc
@@ -107,11 +107,11 @@ void K_Vectors::set(
     this->set_both_kvec(reciprocal_vec, latvec);
 
 	int deg = 0;
-	if(NSPIN == 1)
+	if(GlobalV::NSPIN == 1)
 	{
 		deg = 2;
 	}
-	else if(NSPIN == 2||NSPIN==4)
+	else if(GlobalV::NSPIN == 2||GlobalV::NSPIN==4)
 	{
 		deg = 1;
 	}
@@ -124,14 +124,14 @@ void K_Vectors::set(
     // It's very important in parallel case,
     // firstly do the mpi_k() and then
     // do set_kup_and_kdw()
-	Pkpoints.kinfo(nkstot);
+	GlobalC::Pkpoints.kinfo(nkstot);
 #ifdef __MPI
     this->mpi_k();//2008-4-29
 #endif
 
     this->set_kup_and_kdw();
 
-    this->print_klists(ofs_running);
+    this->print_klists(GlobalV::ofs_running);
 
 	//cout << " NUMBER OF K-POINTS   : " << nkstot << endl;
 
@@ -164,12 +164,12 @@ void K_Vectors::renew(const int &kpoint_number)
 bool K_Vectors::read_kpoints(const string &fn)
 {
     TITLE("K_Vectors", "read_kpoints");
-    if (MY_RANK != 0) return 1;
+    if (GlobalV::MY_RANK != 0) return 1;
 
 	// mohan add 2010-09-04
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		ofs_warning << " Auto generating k-points file: " << fn << endl;
+		GlobalV::ofs_warning << " Auto generating k-points file: " << fn << endl;
 		ofstream ofs(fn.c_str());
 		ofs << "K_POINTS" << endl;
 		ofs << "0" << endl;
@@ -181,7 +181,7 @@ bool K_Vectors::read_kpoints(const string &fn)
     ifstream ifk(fn.c_str());
     if (!ifk) 
 	{
-		ofs_warning << " Can't find File name : " << fn << endl;
+		GlobalV::ofs_warning << " Can't find File name : " << fn << endl;
 		return 0;
     }
 
@@ -212,7 +212,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 
     if (ierr == 0)
     {
-		ofs_warning << " symbol K_POINTS not found." << endl;
+		GlobalV::ofs_warning << " symbol K_POINTS not found." << endl;
 		return 0;
     }
 
@@ -230,7 +230,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 	int max_kpoints = 100000;
     if (nkstot > 100000)
     {
-		ofs_warning << " nkstot > MAX_KPOINTS" << endl;
+		GlobalV::ofs_warning << " nkstot > MAX_KPOINTS" << endl;
         return 0;
     }
 
@@ -240,16 +240,16 @@ bool K_Vectors::read_kpoints(const string &fn)
         if (kword == "Gamma")
         {
             k_type = 0;
-			OUT(ofs_running,"Input type of k points","Monkhorst-Pack(Gamma)");
+			OUT(GlobalV::ofs_running,"Input type of k points","Monkhorst-Pack(Gamma)");
         }
         else if (kword == "Monkhorst-Pack" || kword == "MP" || kword == "mp")
         {
             k_type = 1;
-			OUT(ofs_running,"Input type of k points","Monkhorst-Pack");
+			OUT(GlobalV::ofs_running,"Input type of k points","Monkhorst-Pack");
         }
         else
         {
-			ofs_warning << " Error: neither Gamma nor Monkhorst-Pack." << endl;
+			GlobalV::ofs_warning << " Error: neither Gamma nor Monkhorst-Pack." << endl;
 			return 0;
         }
 
@@ -334,7 +334,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 				double dx = (ksx[iks] - ksx[iks-1]) / nkl[iks-1];
 				double dy = (ksy[iks] - ksy[iks-1]) / nkl[iks-1];
 				double dz = (ksz[iks] - ksz[iks-1]) / nkl[iks-1];
-//				ofs_running << " dx=" << dx << " dy=" << dy << " dz=" << dz << endl;
+//				GlobalV::ofs_running << " dx=" << dx << " dy=" << dy << " dz=" << dz << endl;
 				for(int is=0; is<nkl[iks-1]; is++)
 				{
 					kvec_c[count].x = ksx[iks-1] + is*dx;
@@ -358,7 +358,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 				wk[ik] = 1.0;
 			}
 			
-			ofs_warning << " Error : nkstot == -1, not implemented yet." << endl;
+			GlobalV::ofs_warning << " Error : nkstot == -1, not implemented yet." << endl;
 
 			delete[] nkl;
 			delete[] ksx;
@@ -422,7 +422,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 				double dx = (ksx[iks] - ksx[iks-1]) / nkl[iks-1];
 				double dy = (ksy[iks] - ksy[iks-1]) / nkl[iks-1];
 				double dz = (ksz[iks] - ksz[iks-1]) / nkl[iks-1];
-//				ofs_running << " dx=" << dx << " dy=" << dy << " dz=" << dz << endl;
+//				GlobalV::ofs_running << " dx=" << dx << " dy=" << dy << " dz=" << dz << endl;
 				for(int is=0; is<nkl[iks-1]; is++)
 				{
 					kvec_d[count].x = ksx[iks-1] + is*dx;
@@ -446,7 +446,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 				wk[ik] = 1.0;
 			}
 			
-			ofs_warning << " Error : nkstot == -1, not implemented yet." << endl;
+			GlobalV::ofs_warning << " Error : nkstot == -1, not implemented yet." << endl;
 
 			delete[] nkl;
 			delete[] ksx;
@@ -459,14 +459,14 @@ bool K_Vectors::read_kpoints(const string &fn)
 
         else
         {
-			ofs_warning << " Error : neither Cartesian nor Direct kpoint." << endl;
+			GlobalV::ofs_warning << " Error : neither Cartesian nor Direct kpoint." << endl;
 			return 0;
         }
     }
 
     this->nks = this->nkstot;
 
-	OUT(ofs_running,"nkstot",nkstot);
+	OUT(GlobalV::ofs_running,"nkstot",nkstot);
     return 1;
 } // END SUBROUTINE
 
@@ -483,7 +483,7 @@ double K_Vectors::Monkhorst_Pack_formula( const int &k_type, const double &offse
 //add by dwan
 void K_Vectors::Monkhorst_Pack(const int *nmp_in, const double *koffset_in, const int k_type)
 {
-    if (test_kpoint) TITLE("K_Vectors", "Monkhorst_Pack");
+    if (GlobalV::test_kpoint) TITLE("K_Vectors", "Monkhorst_Pack");
     const int mpnx = nmp_in[0];
     const int mpny = nmp_in[1];
     const int mpnz = nmp_in[2];
@@ -523,14 +523,14 @@ void K_Vectors::Monkhorst_Pack(const int *nmp_in, const double *koffset_in, cons
 
 void K_Vectors::update_use_ibz( void )
 {
-    if (MY_RANK!=0) return;
+    if (GlobalV::MY_RANK!=0) return;
     TITLE("K_Vectors","update_use_ibz");
     assert( nkstot_ibz > 0 );
 
 	// update nkstot
     this->nkstot = this->nkstot_ibz;
 
-	OUT(ofs_running,"nkstot now",nkstot);
+	OUT(GlobalV::ofs_running,"nkstot now",nkstot);
 
     delete[] kvec_d;
     this->kvec_d = new Vector3<double>[ this->nkstot * nspin]; //qianrui fix a bug 2021-7-13 for nspin=2 in set_kup_and_kdw()
@@ -550,7 +550,7 @@ void K_Vectors::update_use_ibz( void )
 
 void K_Vectors::ibz_kpoint(const Symmetry &symm)
 {
-    if (MY_RANK!=0) return;
+    if (GlobalV::MY_RANK!=0) return;
     TITLE("K_Vectors", "ibz_kpoint");
     //===============================================
     // search in all space group operations
@@ -694,14 +694,14 @@ void K_Vectors::ibz_kpoint(const Symmetry &symm)
 		}
 //		BLOCK_HERE("check k point");
     }
-	OUT(ofs_running,"nkstot_ibz",nkstot_ibz);
+	OUT(GlobalV::ofs_running,"nkstot_ibz",nkstot_ibz);
 
-	ofs_running << " " << setw(8) << "IBZ" << setw(20) << "DirectX"
+	GlobalV::ofs_running << " " << setw(8) << "IBZ" << setw(20) << "DirectX"
 	<< setw(20) << "DirectY" << setw(20) << "DirectZ" 
 	<< setw(20) << "Weight" << setw(10) << "ibz2bz" << endl;
     for (int ik=0; ik<nkstot_ibz; ik++)
     {
-        ofs_running << " "
+        GlobalV::ofs_running << " "
 			<< setw(8) << ik+1
             << setw(20) << this->kvec_d_ibz[ik].x
             << setw(20) << this->kvec_d_ibz[ik].y
@@ -718,7 +718,7 @@ void K_Vectors::ibz_kpoint(const Symmetry &symm)
 void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
 {
 
-    if(FINAL_SCF) //LiuXh add 20180606
+    if(GlobalV::FINAL_SCF) //LiuXh add 20180606
     {
         if(k_nkstot == 0)
         {
@@ -739,7 +739,7 @@ void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
 	    }
             else
             {
-                ofs_warning << " Error : neither Cartesian nor Direct kpoint." << endl;
+                GlobalV::ofs_warning << " Error : neither Cartesian nor Direct kpoint." << endl;
             }
         }
     }
@@ -782,7 +782,7 @@ void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
         kd_done = true;
     }
 
-	ofs_running << "\n " << setw(8) << "KPOINTS" 
+	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
 	<< setw(20) << "DIRECT_X"
 	<< setw(20) << "DIRECT_Y"
 	<< setw(20) << "DIRECT_Z"
@@ -790,7 +790,7 @@ void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
 
 	for(int i=0; i<nkstot; i++)
 	{
-        ofs_running << " "
+        GlobalV::ofs_running << " "
 			<< setw(8) << i+1
              << setw(20) << this->kvec_d[i].x
              << setw(20) << this->kvec_d[i].y
@@ -804,7 +804,7 @@ void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
 
 void K_Vectors::normalize_wk(const int &degspin)
 {
-	if(MY_RANK!=0) return;
+	if(GlobalV::MY_RANK!=0) return;
     double sum = 0.0;
 
     for (int ik = 0;ik < nkstot;ik++)
@@ -843,10 +843,10 @@ void K_Vectors::mpi_k(void)
 
     Parallel_Common::bcast_double(koffset, 3);
 
-    this->nks = Pkpoints.nks_pool[MY_POOL];
+    this->nks = GlobalC::Pkpoints.nks_pool[GlobalV::MY_POOL];
 
-	ofs_running << endl;
-	OUT(ofs_running,"k-point number in this process",nks);
+	GlobalV::ofs_running << endl;
+	OUT(GlobalV::ofs_running,"k-point number in this process",nks);
     int nks_minimum = this->nks;
 
 	Parallel_Reduce::gather_min_int_all( nks_minimum );
@@ -857,7 +857,7 @@ void K_Vectors::mpi_k(void)
     }
     else
     {
-		OUT(ofs_running,"minimum distributed K point number",nks_minimum);
+		OUT(GlobalV::ofs_running,"minimum distributed K point number",nks_minimum);
     }
 
     int *isk_aux = new int[nkstot];
@@ -868,7 +868,7 @@ void K_Vectors::mpi_k(void)
 
     double *kvec_d_aux = new double[nkstot*3];
 
-    if (MY_RANK == 0)
+    if (GlobalV::MY_RANK == 0)
     {
         for (int ik = 0;ik < nkstot;ik++)
         {
@@ -897,7 +897,7 @@ void K_Vectors::mpi_k(void)
     for (int i = 0;i < nks;i++)
     {
         // 3 is because each k point has three value:kx, ky, kz
-        k_index = i + Pkpoints.startk_pool[MY_POOL] ;
+        k_index = i + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] ;
         kvec_c[i].x = kvec_c_aux[k_index*3];
         kvec_c[i].y = kvec_c_aux[k_index*3+1];
         kvec_c[i].z = kvec_c_aux[k_index*3+2];
@@ -954,8 +954,8 @@ void K_Vectors::set_kup_and_kdw(void)
         this->nks *= 2;
         this->nkstot *= 2;
 
-		OUT(ofs_running,"nks(nspin=2)",nks);
-		OUT(ofs_running,"nkstot(nspin=2)",nkstot);
+		OUT(GlobalV::ofs_running,"nks(nspin=2)",nks);
+		OUT(GlobalV::ofs_running,"nkstot(nspin=2)",nkstot);
         break;
     case 4:
 
@@ -982,14 +982,14 @@ void K_Vectors::print_klists(ofstream &ofs)
         WARNING_QUIT("print_klists","nkstot < nks");
     }
 
-	ofs_running << "\n " << setw(8) << "KPOINTS" 
+	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
 	<< setw(20) << "CARTESIAN_X"
 	<< setw(20) << "CARTESIAN_Y"
 	<< setw(20) << "CARTESIAN_Z"
 	<< setw(20) << "WEIGHT" << endl;
 	for(int i=0; i<nks; i++)
 	{
-        ofs_running << " "
+        GlobalV::ofs_running << " "
 			<< setw(8) << i+1
              << setw(20) << this->kvec_c[i].x
              << setw(20) << this->kvec_c[i].y
@@ -997,14 +997,14 @@ void K_Vectors::print_klists(ofstream &ofs)
              << setw(20) << this->wk[i] << endl;
 	}
 
-	ofs_running << "\n " << setw(8) << "KPOINTS" 
+	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
 	<< setw(20) << "DIRECT_X"
 	<< setw(20) << "DIRECT_Y"
 	<< setw(20) << "DIRECT_Z"
 	<< setw(20) << "WEIGHT" << endl;
 	for(int i=0; i<nks; i++)
 	{
-        ofs_running << " "
+        GlobalV::ofs_running << " "
 			<< setw(8) << i+1
              << setw(20) << this->kvec_d[i].x
              << setw(20) << this->kvec_d[i].y
@@ -1026,9 +1026,9 @@ void K_Vectors::set_after_vc(
 {
     TITLE("K_Vectors", "set_after_vc");
 
-    ofs_running << "\n SETUP K-POINTS" << endl;
+    GlobalV::ofs_running << "\n SETUP K-POINTS" << endl;
     this->nspin = nspin_in;
-    OUT(ofs_running,"nspin",nspin);
+    OUT(GlobalV::ofs_running,"nspin",nspin);
 
     this->set_both_kvec_after_vc(reciprocal_vec, latvec);
     //this->set_both_kvec(reciprocal_vec, latvec);
@@ -1037,7 +1037,7 @@ void K_Vectors::set_after_vc(
 
     this->set_kup_and_kdw_after_vc();
 
-    this->print_klists(ofs_running);
+    this->print_klists(GlobalV::ofs_running);
 
     return;
 }
@@ -1056,9 +1056,9 @@ void K_Vectors::mpi_k_after_vc(void)
     Parallel_Common::bcast_int(nmp, 3);
     Parallel_Common::bcast_double(koffset, 3);
 
-    this->nks = Pkpoints.nks_pool[MY_POOL];
-    ofs_running << endl;
-    OUT(ofs_running,"k-point number in this process",nks);
+    this->nks = GlobalC::Pkpoints.nks_pool[GlobalV::MY_POOL];
+    GlobalV::ofs_running << endl;
+    OUT(GlobalV::ofs_running,"k-point number in this process",nks);
     int nks_minimum = this->nks;
 
     Parallel_Reduce::gather_min_int_all( nks_minimum );
@@ -1069,7 +1069,7 @@ void K_Vectors::mpi_k_after_vc(void)
     }
     else
     {
-        OUT(ofs_running,"minimum distributed K point number",nks_minimum);
+        OUT(GlobalV::ofs_running,"minimum distributed K point number",nks_minimum);
     }
 
     int *isk_aux = new int[nkstot];
@@ -1077,7 +1077,7 @@ void K_Vectors::mpi_k_after_vc(void)
     double *kvec_c_aux = new double[nkstot*3];
     double *kvec_d_aux = new double[nkstot*3];
 
-    if (MY_RANK == 0)
+    if (GlobalV::MY_RANK == 0)
     {
         for (int ik = 0;ik < nkstot;ik++)
         {
@@ -1100,7 +1100,7 @@ void K_Vectors::mpi_k_after_vc(void)
     int k_index = 0;
     for (int i = 0;i < nks;i++)
     {
-        k_index = i + Pkpoints.startk_pool[MY_POOL] ;
+        k_index = i + GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL] ;
         kvec_c[i].x = kvec_c_aux[k_index*3];
         kvec_c[i].y = kvec_c_aux[k_index*3+1];
         kvec_c[i].z = kvec_c_aux[k_index*3+2];
@@ -1160,7 +1160,7 @@ void K_Vectors::set_both_kvec_after_vc(const Matrix3 &G, const Matrix3 &R)
         kd_done = true;
     }
 
-	ofs_running << "\n " << setw(8) << "KPOINTS" 
+	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
 	<< setw(20) << "DIRECT_X"
 	<< setw(20) << "DIRECT_Y"
 	<< setw(20) << "DIRECT_Z"
@@ -1168,7 +1168,7 @@ void K_Vectors::set_both_kvec_after_vc(const Matrix3 &G, const Matrix3 &R)
 
 	for(int i=0; i<nkstot; i++)
 	{
-        ofs_running << " "
+        GlobalV::ofs_running << " "
 			<< setw(8) << i+1
              << setw(20) << this->kvec_d[i].x
              << setw(20) << this->kvec_d[i].y
@@ -1213,8 +1213,8 @@ void K_Vectors::set_kup_and_kdw_after_vc(void)
         this->nks *= 2;
         //this->nkstot *= 2;
 
-        OUT(ofs_running,"nks(nspin=2)",nks);
-        OUT(ofs_running,"nkstot(nspin=2)",nkstot);
+        OUT(GlobalV::ofs_running,"nks(nspin=2)",nks);
+        OUT(GlobalV::ofs_running,"nkstot(nspin=2)",nkstot);
 
         break;
 

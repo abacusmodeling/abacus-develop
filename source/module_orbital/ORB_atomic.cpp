@@ -28,7 +28,7 @@ void Numerical_Orbital::set_orbital_info
     const int& total_nchi_in
 )
 {
-	//what is test_overlap
+	//what is GlobalV::test_overlap
 	TITLE("Numerical_Orbital", "set_type_info");
 
 	// (1) set type,label,lmax

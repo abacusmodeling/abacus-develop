@@ -2,7 +2,7 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 
@@ -37,48 +37,48 @@ void ELEC_evolve::evolve_psi(
 	uhm.GK.allocate_pvpR();
 						
 	// pool parallization in future -- mohan note 2021-02-09
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	
 		//-----------------------------------------
 		//(1) prepare data for this k point.
 		// copy the local potential from array.
 		//-----------------------------------------
-		if(NSPIN==2) 
+		if(GlobalV::NSPIN==2) 
 		{
-			CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
-		wf.npw = kv.ngk[ik];
+		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		//--------------------------------------------
 		//(2) check if we need to calculate 
 		// pvpR = < phi0 | v(spin) | phiR> for a new spin.
 		//--------------------------------------------
-		if(CURRENT_SPIN == uhm.GK.get_spin() )
+		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
 		{
-			//ofs_running << " Same spin, same vlocal integration." << endl;
+			//GlobalV::ofs_running << " Same spin, same vlocal integration." << endl;
 		}
 		else
 		{
-			uhm.GK.reset_spin( CURRENT_SPIN );
+			uhm.GK.reset_spin( GlobalV::CURRENT_SPIN );
 
 			// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-			uhm.GK.cal_vlocal_k(pot.vr_eff1,GridT);
+			uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1,GridT);
 			// added by zhengdy-soc, for non-collinear case
 			// integral 4 times, is there any method to simplify?
-			if(NSPIN==4)
+			if(GlobalV::NSPIN==4)
 			{
 				for(int is=1;is<4;is++)
 				{
-					for(int ir=0; ir<pw.nrxx; ir++)
+					for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 					{
-						pot.vr_eff1[ir] = pot.vr_eff(is, ir);
+						GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(is, ir);
 					}
-					uhm.GK.cal_vlocal_k(pot.vr_eff1, GridT, is);
+					uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GridT, is);
 				}
 			}
 		}
@@ -108,14 +108,14 @@ void ELEC_evolve::evolve_psi(
 		}
 
 		// Peize Lin add at 2020.04.04
-		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
+		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			restart.load_disk("H", ik);
-			restart.info_load.load_H_finish = true;
+			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.info_load.load_H_finish = true;
 		}			
-		if(restart.info_save.save_H)
+		if(GlobalC::restart.info_save.save_H)
 		{
-			restart.save_disk("H", ik);
+			GlobalC::restart.save_disk("H", ik);
 		}
 
 		bool diago = true;
@@ -158,7 +158,7 @@ void ELEC_evolve::evolve_complex_matrix(
 {
 	TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
-	ofs_running << " Start Time : " << ctime(&time_start);
+	GlobalV::ofs_running << " Start Time : " << ctime(&time_start);
 
 	if (INPUT.tddft==1)
 	{
@@ -191,38 +191,38 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 	bool bit = false;
 	//HS_Matrix::saving_HS_complex(LM.Hloc2, LM.Sloc2, bit, ParaO.out_hs);
 
-	ComplexMatrix Htmp(NLOCAL,NLOCAL);
-	ComplexMatrix Stmp(NLOCAL,NLOCAL);
+	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 
-	for(int i=0; i<NLOCAL; i++)
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			Htmp(i,j) = LM.Hloc2[i*NLOCAL+j];
-			Stmp(i,j) = LM.Sloc2[i*NLOCAL+j];
+			Htmp(i,j) = LM.Hloc2[i*GlobalV::NLOCAL+j];
+			Stmp(i,j) = LM.Sloc2[i*GlobalV::NLOCAL+j];
 		}
 	}
 
 
 	int INFO;
 
-	int LWORK=3*NLOCAL-1; //tmp
+	int LWORK=3*GlobalV::NLOCAL-1; //tmp
 	complex<double> * WORK = new complex<double>[LWORK];
 	ZEROS(WORK, LWORK);
-	int IPIV[NLOCAL];
+	int IPIV[GlobalV::NLOCAL];
 
-	LapackConnector::zgetrf( NLOCAL, NLOCAL, Stmp, NLOCAL, IPIV, &INFO);
-	LapackConnector::zgetri( NLOCAL, Stmp, NLOCAL, IPIV, WORK, LWORK, &INFO);
+	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
+	LapackConnector::zgetri( GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
 
 
-	ComplexMatrix S_plus_H(NLOCAL,NLOCAL);
+	ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	S_plus_H = Stmp*Htmp;
 
 
-	ComplexMatrix Denominator(NLOCAL,NLOCAL);
-	for (int i=0; i<NLOCAL; i++)
+	ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for (int j=0; j<NLOCAL; j++)
+		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			/*   real(Denominator(i,j)) = -imag(S_plus_H(i,j));
 				 imag(Denominator(i,j)) = real(S_plus_H(i,j));*/
@@ -230,10 +230,10 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 		}
 	}
 
-	ComplexMatrix Idmat(NLOCAL,NLOCAL);
-	for(int i=0; i<NLOCAL; i++)
+	ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			if(i==j) Idmat(i,j) = complex<double>(1.0, 0.0);
 			else Idmat(i,j) = complex<double>(0.0, 0.0);
@@ -241,35 +241,35 @@ void ELEC_evolve::using_LAPACK_complex(const int &ik, complex<double>** c, compl
 	}
 	double delta_t;
 	//      delta_t = 0.2;	//identity: fs;
-	ComplexMatrix Numerator(NLOCAL,NLOCAL);
+	ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
 	Denominator = Idmat + 0.5*INPUT.mdp.dt*41.34*Denominator;
 
 	int info;
-	int lwork=3*NLOCAL-1; //tmp
+	int lwork=3*GlobalV::NLOCAL-1; //tmp
 	complex<double> * work = new complex<double>[lwork];
 	ZEROS(work, lwork);
-	int ipiv[NLOCAL];
+	int ipiv[GlobalV::NLOCAL];
 
-	LapackConnector::zgetrf( NLOCAL, NLOCAL, Denominator, NLOCAL, ipiv, &info);
-	LapackConnector::zgetri( NLOCAL, Denominator, NLOCAL, ipiv, work, lwork, &info);
+	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, &info);
+	LapackConnector::zgetri( GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, work, lwork, &info);
 
-	ComplexMatrix U_operator(NLOCAL,NLOCAL);
+	ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 
 	U_operator = Numerator*Denominator;
 
-	for(int i=0; i<NBANDS; i++)
+	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		complex<double> ccc[NLOCAL];
-		for(int j=0; j<NLOCAL; j++)
+		complex<double> ccc[GlobalV::NLOCAL];
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{	
 			ccc[j] = (0.0,0.0);
-			for(int k=0; k<NLOCAL; k++)
+			for(int k=0; k<GlobalV::NLOCAL; k++)
 			{
 				 ccc[j] += U_operator(j,k)*c_init[i][k];
 			}
 		}
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			c[i][j] = ccc[j];
 			LOWF.WFC_K[ik][i][j] = ccc[j];
@@ -288,23 +288,23 @@ void ELEC_evolve::using_LAPACK_complex_2(
 	complex<double>** c_init)const
 {
 
-	ComplexMatrix Htmp(NLOCAL,NLOCAL);
-	ComplexMatrix Stmp(NLOCAL,NLOCAL);
+	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	ComplexMatrix Stmp(GlobalV::NLOCAL,GlobalV::NLOCAL);
 
 	int ir=0;
 	int ic=0;
-	for (int i=0; i<NLOCAL; i++)
+	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		complex<double>* lineH = new complex<double>[NLOCAL-i];
-		complex<double>* lineS = new complex<double>[NLOCAL-i];
-		ZEROS(lineH, NLOCAL-i);
-		ZEROS(lineS, NLOCAL-i);
+		complex<double>* lineH = new complex<double>[GlobalV::NLOCAL-i];
+		complex<double>* lineS = new complex<double>[GlobalV::NLOCAL-i];
+		ZEROS(lineH, GlobalV::NLOCAL-i);
+		ZEROS(lineS, GlobalV::NLOCAL-i);
 
 		ir = ParaO.trace_loc_row[i];
 		if (ir>=0)
 		{
 			// data collection
-			for (int j=i; j<NLOCAL; j++)
+			for (int j=i; j<GlobalV::NLOCAL; j++)
 			{
 				ic = ParaO.trace_loc_col[j];
 				if (ic>=0)
@@ -321,12 +321,12 @@ void ELEC_evolve::using_LAPACK_complex_2(
 			//do nothing
 		}
 
-		Parallel_Reduce::reduce_complex_double_pool(lineH,NLOCAL-i);
-		Parallel_Reduce::reduce_complex_double_pool(lineS,NLOCAL-i);
+		Parallel_Reduce::reduce_complex_double_pool(lineH,GlobalV::NLOCAL-i);
+		Parallel_Reduce::reduce_complex_double_pool(lineS,GlobalV::NLOCAL-i);
 
-		if (DRANK==0)
+		if (GlobalV::DRANK==0)
 		{
-			for (int j=i; j<NLOCAL; j++)
+			for (int j=i; j<GlobalV::NLOCAL; j++)
 			{
 				//g1 << " " << lineH[j-i];
 				Htmp(i,j) = lineH[j-i];
@@ -340,21 +340,21 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	int INFO=0;
 
-	int LWORK=3*NLOCAL-1; //tmp
+	int LWORK=3*GlobalV::NLOCAL-1; //tmp
 	complex<double> * WORK = new complex<double>[LWORK];
 	ZEROS(WORK, LWORK);
-	int IPIV[NLOCAL];
+	int IPIV[GlobalV::NLOCAL];
 
-	LapackConnector::zgetrf( NLOCAL, NLOCAL, Stmp, NLOCAL, IPIV, &INFO);
-	LapackConnector::zgetri( NLOCAL, Stmp, NLOCAL, IPIV, WORK, LWORK, &INFO);
+	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, &INFO);
+	LapackConnector::zgetri( GlobalV::NLOCAL, Stmp, GlobalV::NLOCAL, IPIV, WORK, LWORK, &INFO);
 
-	ComplexMatrix S_plus_H(NLOCAL,NLOCAL);
+	ComplexMatrix S_plus_H(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	S_plus_H = Stmp*Htmp;
 
-	ComplexMatrix Denominator(NLOCAL,NLOCAL);
-	for (int i=0; i<NLOCAL; i++)
+	ComplexMatrix Denominator(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for (int j=0; j<NLOCAL; j++)
+		for (int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			/*   real(Denominator(i,j)) = -imag(S_plus_H(i,j));
 				 imag(Denominator(i,j)) = real(S_plus_H(i,j));*/
@@ -362,10 +362,10 @@ void ELEC_evolve::using_LAPACK_complex_2(
 		}
 	}
 
-	ComplexMatrix Idmat(NLOCAL,NLOCAL);
-	for(int i=0; i<NLOCAL; i++)
+	ComplexMatrix Idmat(GlobalV::NLOCAL,GlobalV::NLOCAL);
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			if(i==j) 
 			{
@@ -380,38 +380,38 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	double delta_t=0.0;
 
-	ComplexMatrix Numerator(NLOCAL,NLOCAL);
+	ComplexMatrix Numerator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	Numerator = Idmat - 0.5*INPUT.mdp.dt*41.34*Denominator;
 	Denominator = Idmat + 0.5*INPUT.mdp.dt*41.34*Denominator;
 
 	int info=0;
-	int lwork=3*NLOCAL-1; //tmp
+	int lwork=3*GlobalV::NLOCAL-1; //tmp
 	complex<double>* work = new complex<double>[lwork];
 	ZEROS(work, lwork);
-	int ipiv[NLOCAL];
+	int ipiv[GlobalV::NLOCAL];
 
-	LapackConnector::zgetrf( NLOCAL, NLOCAL, Denominator, NLOCAL, ipiv, &info);
-	LapackConnector::zgetri( NLOCAL, Denominator, NLOCAL, ipiv, work, lwork, &info);
+	LapackConnector::zgetrf( GlobalV::NLOCAL, GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, &info);
+	LapackConnector::zgetri( GlobalV::NLOCAL, Denominator, GlobalV::NLOCAL, ipiv, work, lwork, &info);
 
-	ComplexMatrix U_operator(NLOCAL,NLOCAL);
+	ComplexMatrix U_operator(GlobalV::NLOCAL,GlobalV::NLOCAL);
 	U_operator = Numerator*Denominator;
 
 	// Calculate wave function at t+delta t
 
 	//	cout << "wave function coe at t+delta t !" << endl;
 
-	for(int i=0; i<NBANDS; i++)
+	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		complex<double> ccc[NLOCAL];
-		for(int j=0; j<NLOCAL; j++)
+		complex<double> ccc[GlobalV::NLOCAL];
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{	
 			ccc[j] = (0.0,0.0);
-			for(int k=0; k<NLOCAL; k++)
+			for(int k=0; k<GlobalV::NLOCAL; k++)
 			{
 				ccc[j] += U_operator(j,k)*c_init[i][k];
 			}
 		}
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			c[i][j] = ccc[j];
 			LOWF.WFC_K[ik][i][j] = ccc[j];

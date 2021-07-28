@@ -20,20 +20,20 @@ using namespace std;
 void NOTE(const string &words)
 {
 	return;
-	if(ofs_running)
+	if(GlobalV::ofs_running)
 	{
-		//ofs_running << " *********************************************************************************" << endl;
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		ofs_running << " " << words << endl;
-		ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		//GlobalV::ofs_running << " *********************************************************************************" << endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		GlobalV::ofs_running << " " << words << endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 	}
 }
 
 void NEW_PART(const string &words)
 {
-	ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><" << endl;
-	ofs_running << "\n " << words << endl;
-	ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><\n" << endl;
+	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><" << endl;
+	GlobalV::ofs_running << "\n " << words << endl;
+	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><\n" << endl;
 	return;
 }
 
@@ -55,7 +55,7 @@ void OUT(ofstream &ofs,const string &name)
 void MAKE_DIR(const string &fn)
 {
 //	TITLE("global_function","MAKE_DIR");
-    if (MY_RANK==0)
+    if (GlobalV::MY_RANK==0)
     {
         stringstream ss;
         ss << " test -d " << fn << " || mkdir " << fn ;
@@ -78,7 +78,7 @@ void DONE(ofstream &ofs,const string &description, const bool only_rank0)
 {
     if (only_rank0)
     {
-        if (MY_RANK==0)
+        if (GlobalV::MY_RANK==0)
         {
      //       ofs << " ---------------------------------------------------------------------------------\n";
             ofs << " DONE : " << description;
@@ -113,32 +113,32 @@ void TEST_LEVEL(const string &name)
 
     if (name == "none")
     {
-        test_wf = 0;
-        test_potential = 0;
-        test_charge = 0;
+        GlobalV::test_wf = 0;
+        GlobalV::test_potential = 0;
+        GlobalV::test_charge = 0;
     }
     else if (name == "init_potential")
     {
-        test_wf = 1;
-        test_potential = 1;
-        test_charge = 1;
+        GlobalV::test_wf = 1;
+        GlobalV::test_potential = 1;
+        GlobalV::test_charge = 1;
     }
     else if (name == "init_read")
     {
-        test_input = 1;
-        test_winput = 1;
-        test_kpoint = 1;
-        test_atom = 1;
-        test_unitcell = 1;
+        GlobalV::test_input = 1;
+        GlobalV::test_winput = 1;
+        GlobalV::test_kpoint = 1;
+        GlobalV::test_atom = 1;
+        GlobalV::test_unitcell = 1;
 #ifndef __EPM
-        test_pseudo_cell = 1;
+        GlobalV::test_pseudo_cell = 1;
 #else
         test_epm_unitcell = 1;
 #endif
     }
     else if (name == "pw_init")
     {
-        test_pw = 1;
+        GlobalV::test_pw = 1;
 
     }
 
@@ -167,7 +167,7 @@ bool SCAN_BEGIN(ifstream &ifs, const string &TargetName, const bool restart)
     }
     if (!find)
     {
-        ofs_warning<<" In SCAN_BEGIN, can't find: "<<TargetName<<" block."<<endl;
+        GlobalV::ofs_warning<<" In SCAN_BEGIN, can't find: "<<TargetName<<" block."<<endl;
     }
     return find;
 }
@@ -179,7 +179,7 @@ void SCAN_END(ifstream &ifs, const string &TargetName)
     ifs >> SearchName;
     if ( SearchName != TargetName)
     {
-        ofs_warning<<" In SCAN_END, can't find: "<<TargetName<<" block."<<endl;
+        GlobalV::ofs_warning<<" In SCAN_END, can't find: "<<TargetName<<" block."<<endl;
     }
     return;
 }
@@ -192,16 +192,16 @@ void BLOCK_HERE( const string &description)
     cout << "\n " << description;
 	cout << "\n********************************************" << endl;
     bool go_on = false;
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
     	cin >> go_on;
 	}
 
 #ifdef __MPI
 	int swap = go_on;
-	if(MY_RANK == 0)swap = go_on;
+	if(GlobalV::MY_RANK == 0)swap = go_on;
 	MPI_Bcast(&swap, 1, MPI_INT, 0, MPI_COMM_WORLD);
-	if(MY_RANK != 0)go_on = static_cast<bool>( swap );
+	if(GlobalV::MY_RANK != 0)go_on = static_cast<bool>( swap );
 #endif
 	if(go_on)
 	{
@@ -219,13 +219,13 @@ void OUT_TIME(const string &name, time_t &start, time_t &end)
 	double mini = difftime(end, start)/60.0;
 	if(mini>0.1)
 	{
-		ofs_warning << setprecision(2);
-		ofs_warning << " -------------------------------------------------------" << endl;
-		ofs_warning << " NAME < " << name << " > = " << endl;
-		ofs_warning << " -> " << ctime(&start) << " -> " << ctime(&end);	
-		ofs_warning << " TIME = " << mini << " [Minutes]" << endl;
-		ofs_warning << " -------------------------------------------------------" << endl;
-		ofs_warning << setprecision(6);
+		GlobalV::ofs_warning << setprecision(2);
+		GlobalV::ofs_warning << " -------------------------------------------------------" << endl;
+		GlobalV::ofs_warning << " NAME < " << name << " > = " << endl;
+		GlobalV::ofs_warning << " -> " << ctime(&start) << " -> " << ctime(&end);	
+		GlobalV::ofs_warning << " TIME = " << mini << " [Minutes]" << endl;
+		GlobalV::ofs_warning << " -------------------------------------------------------" << endl;
+		GlobalV::ofs_warning << setprecision(6);
 	}
 }
 

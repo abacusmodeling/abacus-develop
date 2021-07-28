@@ -16,16 +16,16 @@ class Local_Orbital_wfc
 	// which is used to calculate the charge density. 
 	// which is got after the diagonalization of 
 	// complex Hamiltonian matrix.
-	complex<double>*** WFC_K; // [NK, NBANDS, NLOCAL]	
-	complex<double>* WFC_K_POOL; // [NK*NBANDS*NLOCAL]
+	complex<double>*** WFC_K; // [NK, GlobalV::NBANDS, GlobalV::NLOCAL]	
+	complex<double>* WFC_K_POOL; // [NK*GlobalV::NBANDS*GlobalV::NLOCAL]
 
 	// augmented wave functions to 'c',
 	// used to generate density matrix 
 	// according to 2D data block.
 	// mohan add 2010-09-26
 	// daug means : dimension of augmented wave functions
-	double*** WFC_GAMMA_aug; // [NSPIN, NBANDS, daug];
-	complex<double>*** WFC_K_aug; // [NK, NBANDS, daug];
+	double*** WFC_GAMMA_aug; // [GlobalV::NSPIN, GlobalV::NBANDS, daug];
+	complex<double>*** WFC_K_aug; // [NK, GlobalV::NBANDS, daug];
 	int* trace_aug;
 	
 	// how many elements are missing. 

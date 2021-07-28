@@ -8,7 +8,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 {
 	timer::tick("Stress_Func","stress_gga");
      
-	if (xcf.igcx == 0  &&  xcf.igcc == 0)
+	if (GlobalC::xcf.igcx == 0  &&  GlobalC::xcf.igcc == 0)
 	{
 		return;
 	} 
@@ -18,21 +18,21 @@ void Stress_Func::stress_gga(matrix& sigma)
 		*p++ = 0;
 
 	bool igcc_is_lyp = false;
-	if( xcf.igcc == 3 || xcf.igcc == 7)
+	if( GlobalC::xcf.igcc == 3 || GlobalC::xcf.igcc == 7)
 	{
 		igcc_is_lyp = true;
 	}
-	const int nspin_in = NSPIN;
+	const int nspin_in = GlobalV::NSPIN;
 	assert(nspin_in>0);
 	const double fac = 1.0/ nspin_in;
 
 	// doing FFT to get rho in G space: rhog1 
-	CHR.set_rhog(CHR.rho[0], CHR.rhog[0]);
+	GlobalC::CHR.set_rhog(GlobalC::CHR.rho[0], GlobalC::CHR.rhog[0]);
 	if(nspin_in==2)//mohan fix bug 2012-05-28
 	{
-		CHR.set_rhog(CHR.rho[1], CHR.rhog[1]);
+		GlobalC::CHR.set_rhog(GlobalC::CHR.rho[1], GlobalC::CHR.rhog[1]);
 	}
-	CHR.set_rhog(CHR.rho_core, CHR.rhog_core);
+	GlobalC::CHR.set_rhog(GlobalC::CHR.rho_core, GlobalC::CHR.rhog_core);
 		
 	double* rhotmp1;
 	double* rhotmp2;
@@ -41,34 +41,34 @@ void Stress_Func::stress_gga(matrix& sigma)
 	Vector3<double>* gdr1;
 	Vector3<double>* gdr2;
  
-	rhotmp1 = new double[pw.nrxx];
-	rhogsum1 = new complex<double>[pw.ngmc];
-	ZEROS(rhotmp1, pw.nrxx);
-	ZEROS(rhogsum1, pw.ngmc);
-	for(int ir=0; ir<pw.nrxx; ir++) rhotmp1[ir] = CHR.rho[0][ir] + fac * CHR.rho_core[ir];
-	for(int ig=0; ig<pw.ngmc; ig++) rhogsum1[ig] = CHR.rhog[0][ig] + fac * CHR.rhog_core[ig];
-	gdr1 = new Vector3<double>[pw.nrxx];
-	ZEROS(gdr1, pw.nrxx);
+	rhotmp1 = new double[GlobalC::pw.nrxx];
+	rhogsum1 = new complex<double>[GlobalC::pw.ngmc];
+	ZEROS(rhotmp1, GlobalC::pw.nrxx);
+	ZEROS(rhogsum1, GlobalC::pw.ngmc);
+	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] = GlobalC::CHR.rho[0][ir] + fac * GlobalC::CHR.rho_core[ir];
+	for(int ig=0; ig<GlobalC::pw.ngmc; ig++) rhogsum1[ig] = GlobalC::CHR.rhog[0][ig] + fac * GlobalC::CHR.rhog_core[ig];
+	gdr1 = new Vector3<double>[GlobalC::pw.nrxx];
+	ZEROS(gdr1, GlobalC::pw.nrxx);
 
 	GGA_PW::grad_rho( rhogsum1 , gdr1 );
 
 	if(nspin_in==2)
 	{
-		rhotmp2 = new double[pw.nrxx];
-		rhogsum2 = new complex<double>[pw.ngmc];
-		ZEROS(rhotmp2, pw.nrxx);
-		ZEROS(rhogsum2, pw.ngmc);
-		for(int ir=0; ir<pw.nrxx; ir++)
+		rhotmp2 = new double[GlobalC::pw.nrxx];
+		rhogsum2 = new complex<double>[GlobalC::pw.ngmc];
+		ZEROS(rhotmp2, GlobalC::pw.nrxx);
+		ZEROS(rhogsum2, GlobalC::pw.ngmc);
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			rhotmp2[ir] = CHR.rho[1][ir] + fac * CHR.rho_core[ir];
+			rhotmp2[ir] = GlobalC::CHR.rho[1][ir] + fac * GlobalC::CHR.rho_core[ir];
 		}
-		for(int ig=0; ig<pw.ngmc; ig++)
+		for(int ig=0; ig<GlobalC::pw.ngmc; ig++)
 		{
-			rhogsum2[ig] = CHR.rhog[1][ig] + fac * CHR.rhog_core[ig];
+			rhogsum2[ig] = GlobalC::CHR.rhog[1][ig] + fac * GlobalC::CHR.rhog_core[ig];
 		}
 		
-		gdr2 = new Vector3<double>[pw.nrxx];
-		ZEROS(gdr2, pw.nrxx);
+		gdr2 = new Vector3<double>[GlobalC::pw.nrxx];
+		ZEROS(gdr2, GlobalC::pw.nrxx);
 
 		GGA_PW::grad_rho( rhogsum2 , gdr2 );
 	}
@@ -88,7 +88,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 	if(nspin_in==1||nspin_in==4)
 	{
 		//double segno;
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			const double arho = std::abs( rhotmp1[ir] );
 			if(arho > epsr)
@@ -127,7 +127,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 		double v2xdw = 0.0;
 		double v2cud = 0.0;
 		double v2c = 0.0;
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			double rh = rhotmp1[ir] + rhotmp2[ir];
 			grho2a = gdr1[ir].norm2();;
@@ -207,7 +207,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 /*	p= &sigma_gradcorr[0][0];
 	double* p1 = &sigmaxc[0][0];
 	for(int i=0;i<9;i++){
-		*p /= pw.ncxyz ;
+		*p /= GlobalC::pw.ncxyz ;
 		*p1++ += *p++;  
 	}*/
 	
@@ -215,7 +215,7 @@ void Stress_Func::stress_gga(matrix& sigma)
 	{
 		for(int j=0;j<3;j++)
 		{
-			sigma(i,j) += sigma_gradcorr[i][j] / pw.ncxyz;
+			sigma(i,j) += sigma_gradcorr[i][j] / GlobalC::pw.ncxyz;
 		}
 	}
 

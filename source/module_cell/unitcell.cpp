@@ -10,7 +10,7 @@ using namespace std;
 
 UnitCell::UnitCell()
 {
-    if (test_unitcell) TITLE("unitcell","Constructor");
+    if (GlobalV::test_unitcell) TITLE("unitcell","Constructor");
     Coordinate = "Direct";
     latName = "none";
     lat0 = 0.0;
@@ -58,7 +58,7 @@ UnitCell::~UnitCell()
 #ifdef __MPI
 void UnitCell::bcast_unitcell(void)
 {
-    if (test_unitcell)TITLE("UnitCell","bcast_unitcell");
+    if (GlobalV::test_unitcell)TITLE("UnitCell","bcast_unitcell");
     Parallel_Common::bcast_string( Coordinate );
     Parallel_Common::bcast_int( nat );
 
@@ -111,14 +111,14 @@ void UnitCell::bcast_unitcell(void)
 
     Parallel_Common::bcast_double( magnet.start_magnetization, ntype );
 
-    if(NSPIN != 1)
+    if(GlobalV::NSPIN != 1)
     for(int it = 0;it<ntype;it++)
     {
          Parallel_Common::bcast_double( magnet.m_loc_[it].x );
          Parallel_Common::bcast_double( magnet.m_loc_[it].y );
          Parallel_Common::bcast_double( magnet.m_loc_[it].z );
     }
-    if(NSPIN==4)
+    if(GlobalV::NSPIN==4)
     {
          Parallel_Common::bcast_double( magnet.ux_[0] );
          Parallel_Common::bcast_double( magnet.ux_[1] );
@@ -144,7 +144,7 @@ void UnitCell::bcast_unitcell2(void)
 
 void UnitCell::print_cell(ofstream &ofs, output &outp)const
 {
-    if (test_unitcell) TITLE("UnitCell","print_cell");
+    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell");
 
     OUT(ofs,"print_unitcell()");
 
@@ -167,12 +167,12 @@ void UnitCell::print_cell(ofstream &ofs, output &outp)const
 
 void UnitCell::print_cell_cif(const string &fn)const
 {
-	if (test_unitcell) TITLE("UnitCell","print_cell_cif");
+	if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_cif");
 	
-	if(MY_RANK!=0) return;//xiaohui add 2015-03-15
+	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
 	stringstream ss;
-	ss << global_out_dir << fn;
+	ss << GlobalV::global_out_dir << fn;
 	
 	ofstream ofs( ss.str().c_str() );
 	ofs << "data_" << latName << endl;
@@ -220,12 +220,12 @@ void UnitCell::print_cell_cif(const string &fn)const
 
 void UnitCell::print_cell_xyz(const string &fn)const
 {
-    if (test_unitcell) TITLE("UnitCell","print_cell_xyz");
+    if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_xyz");
 
-	if(MY_RANK!=0) return;//xiaohui add 2015-03-15
+	if(GlobalV::MY_RANK!=0) return;//xiaohui add 2015-03-15
 
     stringstream ss;
-    ss << global_out_dir << fn;
+    ss << GlobalV::global_out_dir << fn;
 
     ofstream ofs( ss.str().c_str() );
 
@@ -336,8 +336,8 @@ void UnitCell::periodic_boundary_adjustment()
 				atom->taud[ia].y>=1.0 ||
 				atom->taud[ia].z>=1.0)
 			{
-				ofs_warning << " it=" << it+1 << " ia=" << ia+1 << endl;
-				ofs_warning << "d=" << atom->taud[ia].x << " " << 
+				GlobalV::ofs_warning << " it=" << it+1 << " ia=" << ia+1 << endl;
+				GlobalV::ofs_warning << "d=" << atom->taud[ia].x << " " << 
 				atom->taud[ia].y << " " << atom->taud[ia].z << endl;
 				WARNING_QUIT("Ions_Move_Basic::move_ions","the movement of atom is larger than the length of cell.");
 			}

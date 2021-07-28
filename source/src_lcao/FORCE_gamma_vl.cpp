@@ -49,34 +49,34 @@ void Force_LCAO_gamma::cal_fvl_dphi(
 
 	// mohan add 2021, needs reconstruction!!!
     int istep = 1;
-    pot.init_pot(istep, pw.strucFac);
+    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
 
-    for(int is=0; is<NSPIN; ++is)
+    for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        CURRENT_SPIN = is;
+        GlobalV::CURRENT_SPIN = is;
 
         ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_z, ParaO.nloc);
 
-        for(int ir=0; ir<pw.nrxx; ++ir)
+        for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
-            pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);
+            GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
         //  should not be set zero if VNA is used.
         //  ZEROS(LM.DHloc_fixed_x,ParaO.nloc);
         //  ZEROS(LM.DHloc_fixed_y,ParaO.nloc);
         //  ZEROS(LM.DHloc_fixed_z,ParaO.nloc);
-        UHM.GG.cal_force(pot.vr_eff1);
+        UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
 
-        for(int i=0; i<NLOCAL; i++)
+        for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
-            for(int j=0; j<NLOCAL; j++)
+            const int iat = GlobalC::ucell.iwt2iat[i];
+            for(int j=0; j<GlobalV::NLOCAL; j++)
             {
-                //const int iat2 = ucell.iwt2iat[j];
+                //const int iat2 = GlobalC::ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];
                 const int nu = ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0 )
@@ -109,7 +109,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         }
 
 //          cout << "fvl_dphi:" << endl;
-//          for(int iat=0; iat<ucell.nat; ++iat)
+//          for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 //          {
 //              cout << setw(5) << iat << setw(15) << fvl_dphi[iat][0] 
 //              << setw(15) << fvl_dphi[iat][1]
@@ -128,7 +128,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             for(int j=0;j<3;j++)
             {
                 if(i<j) svl_dphi(j,i) = svl_dphi(i,j);
-				svl_dphi(i,j) /= ucell.omega;
+				svl_dphi(i,j) /= GlobalC::ucell.omega;
             }
         }
     }
@@ -157,7 +157,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
     ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
     ZEROS (LM.DHloc_fixed_z, ParaO.nloc);
-    if(STRESS)
+    if(GlobalV::STRESS)
     {
         ZEROS (LM.DHloc_fixed_11, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_12, ParaO.nloc);
@@ -188,33 +188,33 @@ void Force_LCAO_gamma::cal_fvl_dphi(
     //calculate <dphi | VL | phi>
 
     int istep = 1;
-    pot.init_pot(istep, pw.strucFac);
+    GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
 
-    for(int is=0; is<NSPIN; ++is)
+    for(int is=0; is<GlobalV::NSPIN; ++is)
     {
-        CURRENT_SPIN = is;
+        GlobalV::CURRENT_SPIN = is;
 
         ZEROS (LM.DHloc_fixed_x, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_y, ParaO.nloc);
         ZEROS (LM.DHloc_fixed_z, ParaO.nloc);
 
-        for(int ir=0; ir<pw.nrxx; ++ir)
+        for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
         {
-            pot.vr_eff1[ir] = pot.vr_eff(CURRENT_SPIN, ir);
+            GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff(GlobalV::CURRENT_SPIN, ir);
         }
 
         //should not be set zero if VNA is used.
         //ZEROS(LM.DHloc_fixed_x,ParaO.nloc);
         //ZEROS(LM.DHloc_fixed_y,ParaO.nloc);
         //ZEROS(LM.DHloc_fixed_z,ParaO.nloc);
-        UHM.GG.cal_force(pot.vr_eff1);
+        UHM.GG.cal_force(GlobalC::pot.vr_eff1);
 
-        for(int i=0; i<NLOCAL; i++)
+        for(int i=0; i<GlobalV::NLOCAL; i++)
         {
-            const int iat = ucell.iwt2iat[i];
-            for(int j=0; j<NLOCAL; j++)
+            const int iat = GlobalC::ucell.iwt2iat[i];
+            for(int j=0; j<GlobalV::NLOCAL; j++)
             {
-                //const int iat2 = ucell.iwt2iat[j];
+                //const int iat2 = GlobalC::ucell.iwt2iat[j];
                 const int mu = ParaO.trace_loc_row[j];
                 const int nu = ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0 )
@@ -247,7 +247,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
         }
 
         //cout << "fvl_dphi:" << endl;
-        //for(int iat=0; iat<ucell.nat; ++iat)
+        //for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
         //{
         //cout << setw(5) << iat << setw(15) << fvl_dphi[iat][0] 
         //<< setw(15) << fvl_dphi[iat][1]
@@ -265,7 +265,7 @@ void Force_LCAO_gamma::cal_fvl_dphi(
             for(int j=0;j<3;j++)
             {
                 if(i<j) svl_dphi(j,i) = svl_dphi(i,j);
-				svl_dphi(i,j) /= ucell.omega;
+				svl_dphi(i,j) /= GlobalC::ucell.omega;
             }
         }
     }

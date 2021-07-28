@@ -34,7 +34,7 @@ timeval t_all;	gettimeofday(&t_all,NULL);
 
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D");
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(NSPIN);
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
 //ofs<<__LINE__<<endl;
 
 	vector<atomic<Flag_Send>> flags_send(comm_sz);
@@ -174,7 +174,7 @@ vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_
 		for(int rank_send=0; rank_send<comm_sz; ++rank_send)
 		{
 			if(atom_in_2D_list[rank_send].first[iat1] && atom_in_2D_list[rank_send].second[iat2])
-				send_size_list[rank_send] += ucell.atoms[ucell.iat2it[iat1]].nw * ucell.atoms[ucell.iat2it[iat2]].nw * sizeof(double);
+				send_size_list[rank_send] += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw * GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw * sizeof(double);
 		}
 	}
 	return send_size_list;
@@ -226,9 +226,9 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::send_data_process(
 {
 ofstream ofs(exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), ofstream::app);
 timeval t;	gettimeofday(&t, NULL);	
-	valarray<size_t> send_size(NSPIN);
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,const matrix*>>>> mw(NSPIN);
-	for( int is=0; is!=NSPIN; ++is )
+	valarray<size_t> send_size(GlobalV::NSPIN);
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,const matrix*>>>> mw(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		send_size[is]=0;
 		auto &data_local_is = data_local[is];
@@ -254,9 +254,9 @@ timeval t;	gettimeofday(&t, NULL);
 	}
 ofs<<"get_send_data_wrapper\t"<<rank_send_now<<"\t"<<cut_time(t)<<endl;
 	
-	oarps_isend[rank_send_now].resize(send_size.sum()+NSPIN);
+	oarps_isend[rank_send_now].resize(send_size.sum()+GlobalV::NSPIN);
 	double * ptr = VECTOR_TO_PTR(oarps_isend[rank_send_now]);
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		ptr[0] = send_size[is];
 		ptr += 1;
@@ -297,9 +297,9 @@ timeval t;	gettimeofday(&t, NULL);
 		return true;
 	};
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(NSPIN);
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(GlobalV::NSPIN);
 	double *ptr = VECTOR_TO_PTR(iarps_irecv[rank_recv]);
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		const size_t recv_size = ptr[0];
 		ptr += 1;
@@ -333,7 +333,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::insert_data(
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
 {
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_rank_is = data_rank[is];
 		auto &data_all_is = data_all[is];

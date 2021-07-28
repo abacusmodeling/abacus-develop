@@ -11,7 +11,7 @@ HONG_LAPACK        = -D__MKL -DMKL_ILP64
 LAPACK_INCLUDE_DIR = ${LAPACK_DIR}/include
 LAPACK_LIB_DIR     = ${LAPACK_DIR}/lib/intel64
 LAPACK_LIB         = -L${LAPACK_LIB_DIR} -Wl,--start-group -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -Wl,--end-group -Wl,-rpath=${LAPACK_LIB_DIR}
-OBJ_DIR = obj
+OBJ_DIR = base_obj
 NP      = 4
 
 #==========================

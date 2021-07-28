@@ -12,10 +12,10 @@ bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 {
 	int error(0);
 	double *vell=new double[numIon*3];
-	if (!MY_RANK)
+	if (!GlobalV::MY_RANK)
 	{
 		stringstream ssc;
-		ssc << global_readin_dir << "Restart_md.dat";
+		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
 		ifstream file(ssc.str().c_str());
 
 		if(!file)
@@ -86,9 +86,9 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 		pass =1;
 	if (!pass) return;
 
-	if(!MY_RANK){
+	if(!GlobalV::MY_RANK){
 		stringstream ssc;
-		ssc << global_out_dir << "Restart_md.dat";
+		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		ofstream file(ssc.str().c_str());
 		file<<"MD_RESTART"<<endl;
 		file<<"ATOM_NUMBERS: "<<numIon<<endl;
@@ -127,7 +127,7 @@ void MD_func::InitVelocity(
 	const double* allmass,
 	Vector3<double>* vel)
 {
-	if(!MY_RANK){ //xiaohui add 2015-09-25
+	if(!GlobalV::MY_RANK){ //xiaohui add 2015-09-25
 		srand(time(0));
 		int iy=rand()%21,im=rand()%11,id=rand()%21,ih=rand()%31,in=rand()%61,is=rand()%41;
 		int jy=rand()%21,jm=rand()%11,jd=rand()%21,jh=rand()%31,jn=rand()%61,js=rand()%41;
@@ -280,7 +280,7 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 	matrix fcs;//temp force matrix
 	Force_Stress_LCAO FSL;
 	FSL.allocate (); 
-	FSL.getForceStress(FORCE, STRESS, TEST_FORCE, TEST_STRESS, fcs, stress_lcao);
+	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, stress_lcao);
 	for(int ion=0;ion<numIon;ion++){
 		force[ion].x =fcs(ion, 0)/2.0;
 		force[ion].y =fcs(ion, 1)/2.0;
@@ -289,12 +289,12 @@ void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, ma
 
 #ifdef __MPI //2015-10-01, xiaohui
 	atom_arrange::delete_vector(
-		ofs_running, 
-		SEARCH_PBC, 
+		GlobalV::ofs_running, 
+		GlobalV::SEARCH_PBC, 
 		GridD, 
-		ucell, 
-		SEARCH_RADIUS, 
-		test_atom_input);
+		GlobalC::ucell, 
+		GlobalV::SEARCH_RADIUS, 
+		GlobalV::test_atom_input);
 #endif //2015-10-01, xiaohui
 
 	return;
@@ -311,7 +311,7 @@ void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matr
 		force[ion].y =fcs(ion, 1)/2.0;
 		force[ion].z =fcs(ion, 2)/2.0;
 	}
-	if(STRESS)
+	if(GlobalV::STRESS)
 	{
 		Stress_PW ss;
 		ss.cal_stress(stress_pw);
@@ -332,13 +332,13 @@ void MD_func::printpos(const string& file, const int& iter, const int& recordFre
 	string file1=file+".xyz";
 	string file2=file+".cif";
 
-	//xiaohui add 'OUT_LEVEL', 2015-09-16
-	if(OUT_LEVEL == "i"||OUT_LEVEL == "ie") unit_in.print_tau();
-	if(OUT_LEVEL == "i"||OUT_LEVEL == "ie") unit_in.print_cell_xyz(file1);
+	//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
+	if(GlobalV::OUT_LEVEL == "i"||GlobalV::OUT_LEVEL == "ie") unit_in.print_tau();
+	if(GlobalV::OUT_LEVEL == "i"||GlobalV::OUT_LEVEL == "ie") unit_in.print_cell_xyz(file1);
 	unit_in.print_cell_cif(file2);
 	stringstream ss;
 
-	ss << global_out_dir << "STRU_MD";
+	ss << GlobalV::global_out_dir << "STRU_MD";
 
 	//zhengdy modify 2015-05-06, outputfile "STRU_Restart"
 	unit_in.print_stru_file(ss.str(),2);
@@ -379,12 +379,12 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
 
    	Conserved = KE + PE ;
    
-	if (!MY_RANK)
+	if (!GlobalV::MY_RANK)
 	{                 
-		ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<endl;
-		ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/K_BOLTZMAN_AU<<" (K)"<<endl;
-		ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<endl;
-		ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<endl;
+		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<endl;
+		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/K_BOLTZMAN_AU<<" (K)"<<endl;
+		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<endl;
+		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<endl;
 	}
    	return Conserved;
 }

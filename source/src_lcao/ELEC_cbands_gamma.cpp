@@ -2,7 +2,7 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 
@@ -16,24 +16,24 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 	TITLE("ELEC_cbands_gamma","cal_bands");
 	timer::tick("ELEC_cband_gamma","cal_bands");
 
-	assert(NSPIN == kv.nks);
+	assert(GlobalV::NSPIN == GlobalC::kv.nks);
 						
 	// pool parallization in future -- mohan note 2021-02-09
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	
 		//-----------------------------------------
 		//(1) prepare data for this k point.
 		// copy the local potential from array.
 		//-----------------------------------------
-		if(NSPIN==2) 
+		if(GlobalV::NSPIN==2) 
 		{
-			CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
-		wf.npw = kv.ngk[ik];
+		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		if(!uhm.init_s)
@@ -55,21 +55,21 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
       vector<double> eff_pot(ParaO.nloc);
 			dftu.cal_eff_pot_mat_real(ik, istep, &eff_pot[0]);
 
-			const int spin = kv.isk[ik];
+			const int spin = GlobalC::kv.isk[ik];
 			for(int irc=0; irc<ParaO.nloc; irc++)
 				LM.Hloc[irc] += eff_pot[irc];
         
 		}
 
 		// Peize Lin add at 2020.04.04
-		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
+		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			restart.load_disk("H", ik);
-			restart.info_load.load_H_finish = true;
+			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.info_load.load_H_finish = true;
 		}			
-		if(restart.info_save.save_H)
+		if(GlobalC::restart.info_save.save_H)
 		{
-			restart.save_disk("H", ik);
+			GlobalC::restart.save_disk("H", ik);
 		}
 
 		// SGO: sub_grid_operation
@@ -78,7 +78,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//--------------------------------------
 		// DIAG GROUP OPERATION HERE
 		//--------------------------------------
-		if(DCOLOR==0)
+		if(GlobalV::DCOLOR==0)
 		{
 			Diago_LCAO_Matrix DLM;
 			// the temperary array totwfc only have one spin direction.
@@ -87,9 +87,9 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		else
 		{
 #ifdef __MPI
-			ofs_running << " no diagonalization." << endl;
+			GlobalV::ofs_running << " no diagonalization." << endl;
 #else
-			cout << " DCOLOR=" << DCOLOR << endl;
+			cout << " DCOLOR=" << GlobalV::DCOLOR << endl;
 			WARNING_QUIT("ELEC_cbands_gamma::cal_bands","no diagonalization");
 #endif
 

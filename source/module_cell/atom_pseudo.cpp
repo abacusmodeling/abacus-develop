@@ -52,7 +52,7 @@ void Atom_pseudo::set_d_so(
 	}
 	else //zhengdy-soc
 	{
-		this->d_so.create(NSPIN,  nproj_soc+1,  nproj_soc+1);
+		this->d_so.create(GlobalV::NSPIN,  nproj_soc+1,  nproj_soc+1);
 
 		// optimize
 		for(int is=0;is<4;is++)
@@ -68,7 +68,7 @@ void Atom_pseudo::set_d_so(
 
 		if(this->lmax > -1)
 		{
-			if(LSPINORB)
+			if(GlobalV::LSPINORB)
 			{
 				int is = 0;
 				for (int is1 = 0; is1 < 2; is1++)
@@ -105,7 +105,7 @@ void Atom_pseudo::set_d_so(
 				{
 					for (int is2 = 0; is2 < 2; is2++)
 					{
-						if(is>=NSPIN) break;
+						if(is>=GlobalV::NSPIN) break;
 						for (int L1 = 0; L1 < nproj_soc; L1++)
 						{
 							for (int L2 = 0; L2 < nproj_soc; L2++)
@@ -142,7 +142,7 @@ void Atom_pseudo::set_d_so(
 
 void Atom_pseudo::print_atom(ofstream &ofs)
 {
-	if(test_atom) TITLE("atom_pseudo","print_atom");
+	if(GlobalV::test_atom) TITLE("atom_pseudo","print_atom");
 
 	OUT(ofs,"mass",mass);
 	OUT(ofs,"pseudo_fn",pseudo_fn);
@@ -157,7 +157,7 @@ void Atom_pseudo::bcast_atom_pseudo(const int &na)
 	Parallel_Common::bcast_double( mass );
 	Parallel_Common::bcast_string( pseudo_fn );
 
-	if(MY_RANK!=0)
+	if(GlobalV::MY_RANK!=0)
 	{
 		delete[] mbl;
 		mbl = new Vector3<int>[na];
@@ -199,7 +199,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 	Parallel_Common::bcast_string( pp_type );
 	Parallel_Common::bcast_string( dft, 4 );
 
-	if(MY_RANK!=0)
+	if(GlobalV::MY_RANK!=0)
 	{
 		delete[] jjj;
 		delete[] els;
@@ -226,7 +226,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 // == pseudo_atom ==
 	Parallel_Common::bcast_int( msh );
 	Parallel_Common::bcast_double( rcut );
-	if(MY_RANK != 0)
+	if(GlobalV::MY_RANK != 0)
 	{
 		assert(mesh!=0);
 		delete[] r;
@@ -248,7 +248,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 // == end of pseudo_atom ==
 	
 // == pseudo_vl ==
-	if(MY_RANK != 0)
+	if(GlobalV::MY_RANK != 0)
 	{
 		delete[] vloc_at;
 		vloc_at = new double[mesh];
@@ -257,7 +257,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 // == end of pseudo_vl ==
 
 // == pseudo_nc ==
-	if(MY_RANK != 0)
+	if(GlobalV::MY_RANK != 0)
 	{
 		delete[] lll;
 		lll = new int[nbeta];
@@ -267,7 +267,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 	Parallel_Common::bcast_int( nh );
 
 	int nr,nc;
-	if(MY_RANK == 0)
+	if(GlobalV::MY_RANK == 0)
 	{
 		nr = betar.nr;
 		nc = betar.nc;
@@ -275,7 +275,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 	Parallel_Common::bcast_int( nr );
 	Parallel_Common::bcast_int( nc );
 
-	if(MY_RANK != 0)
+	if(GlobalV::MY_RANK != 0)
 	{
 		betar.create(nr,nc);
 		dion.create(nbeta, nbeta);

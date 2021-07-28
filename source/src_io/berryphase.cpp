@@ -9,23 +9,23 @@ berryphase::berryphase()
 
 berryphase::~berryphase()
 {
-	//ofs_running << "this is ~berryphase()" << endl;
+	//GlobalV::ofs_running << "this is ~berryphase()" << endl;
 }
 
 void berryphase::get_occupation_bands()
 {
-	double occupied_bands = static_cast<double>(CHR.nelec/DEGSPIN);	
+	double occupied_bands = static_cast<double>(GlobalC::CHR.nelec/DEGSPIN);	
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
 	{
 		occupied_bands = std::floor(occupied_bands) + 1.0;
 	}
 	
 	occ_nbands = (int) occupied_bands;
-	if(occ_nbands > NBANDS) 
+	if(occ_nbands > GlobalV::NBANDS) 
 	{
 		WARNING_QUIT("berryphase::get_occupation_bands","not enough bands for berryphase, increase band numbers.");
 	}
-	//ofs_running << "the berryphase's occ_nbands is " << occ_nbands << endl;
+	//GlobalV::ofs_running << "the berryphase's occ_nbands is " << occ_nbands << endl;
 }
 
 void berryphase::lcao_init()
@@ -44,21 +44,21 @@ void berryphase::set_kpoints(const int direction)
 {
 	TITLE("berryphase","set_kpoints");
 
-	const int mp_x = kv.nmp[0]; // x,y,z方向k点的数目
-	const int mp_y = kv.nmp[1];
-	const int mp_z = kv.nmp[2];
-	const int num_k = int(kv.nkstot/2);	
+	const int mp_x = GlobalC::kv.nmp[0]; // x,y,z方向k点的数目
+	const int mp_y = GlobalC::kv.nmp[1];
+	const int mp_z = GlobalC::kv.nmp[2];
+	const int num_k = int(GlobalC::kv.nkstot/2);	
 
 	if( direction == 1 ) // 计算x方向
 	{
 		const int num_string = mp_y * mp_z;
 		
-		if( NSPIN == 1 || NSPIN == 4 )
+		if( GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4 )
 		{
 			total_string = num_string;
 			k_index.resize(total_string);
 		}
-		else if( NSPIN == 2 )
+		else if( GlobalV::NSPIN == 2 )
 		{
 			total_string = 2 * num_string;
 			k_index.resize(total_string);
@@ -84,7 +84,7 @@ void berryphase::set_kpoints(const int direction)
 			}
 		}
 		
-		if( NSPIN == 2 )
+		if( GlobalV::NSPIN == 2 )
 		{
 			for(int istring = num_string; istring < total_string; istring++)
 			{
@@ -102,12 +102,12 @@ void berryphase::set_kpoints(const int direction)
 	{
 		const int num_string = mp_x * mp_z;
 		
-		if( NSPIN == 1 || NSPIN == 4 )
+		if( GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4 )
 		{
 			total_string = num_string;
 			k_index.resize(total_string);
 		}
-		else if( NSPIN == 2 )
+		else if( GlobalV::NSPIN == 2 )
 		{
 			total_string = 2 * num_string;
 			k_index.resize(total_string);
@@ -132,7 +132,7 @@ void berryphase::set_kpoints(const int direction)
 			}
 		}
 		
-		if( NSPIN == 2 )
+		if( GlobalV::NSPIN == 2 )
 		{
 			for(int istring = num_string; istring < total_string; istring++)
 			{
@@ -150,12 +150,12 @@ void berryphase::set_kpoints(const int direction)
 	{
 		const int num_string = mp_x * mp_y;
 		
-		if( NSPIN == 1 || NSPIN == 4 )
+		if( GlobalV::NSPIN == 1 || GlobalV::NSPIN == 4 )
 		{
 			total_string = num_string;
 			k_index.resize(total_string);
 		}
-		else if( NSPIN == 2 )
+		else if( GlobalV::NSPIN == 2 )
 		{
 			total_string = 2 * num_string;
 			k_index.resize(total_string);
@@ -180,7 +180,7 @@ void berryphase::set_kpoints(const int direction)
 			}
 		}
 		
-		if( NSPIN == 2 )
+		if( GlobalV::NSPIN == 2 )
 		{
 			for(int istring = num_string; istring < total_string; istring++)
 			{
@@ -197,17 +197,17 @@ void berryphase::set_kpoints(const int direction)
 
 	// test by jingan
 	/*
-	ofs_running << "direction is " << direction << endl;
-	ofs_running << "nppstr = " << nppstr << endl;
-	ofs_running << "total string is " << total_string << endl;
+	GlobalV::ofs_running << "direction is " << direction << endl;
+	GlobalV::ofs_running << "nppstr = " << nppstr << endl;
+	GlobalV::ofs_running << "total string is " << total_string << endl;
 	for(int istring = 0; istring < total_string; istring++)
 	{
-		ofs_running << " the string is " << istring << endl;
+		GlobalV::ofs_running << " the string is " << istring << endl;
 		for(int count = 0; count < nppstr; count++)
 		{
-			ofs_running << "(" << kv.kvec_c[ k_index[istring][count] ].x << ","
-							   << kv.kvec_c[ k_index[istring][count] ].y << ","
-							   << kv.kvec_c[ k_index[istring][count] ].z << ")" << endl;
+			GlobalV::ofs_running << "(" << GlobalC::kv.kvec_c[ k_index[istring][count] ].x << ","
+							   << GlobalC::kv.kvec_c[ k_index[istring][count] ].y << ","
+							   << GlobalC::kv.kvec_c[ k_index[istring][count] ].z << ")" << endl;
 		}
 		
 	}
@@ -224,15 +224,15 @@ double berryphase::stringPhase(int index_str, int nbands)
 	int ik_1;
 	int ik_2;
 	Vector3<double> G(0.0,0.0,0.0);
-	Vector3<double> dk = kv.kvec_c[ k_index[index_str][1] ] - kv.kvec_c[ k_index[index_str][0] ];
-	//ofs_running << "the string index is " << index_str << endl;
+	Vector3<double> dk = GlobalC::kv.kvec_c[ k_index[index_str][1] ] - GlobalC::kv.kvec_c[ k_index[index_str][0] ];
+	//GlobalV::ofs_running << "the string index is " << index_str << endl;
 	
 	for(int k_start = 0; k_start < (nppstr-1); k_start++)
 	{
 		ik_1 = k_index[index_str][k_start];
 		ik_2 = k_index[index_str][k_start+1];
 		
-		if(BASIS_TYPE=="pw")
+		if(GlobalV::BASIS_TYPE=="pw")
 		{
 			for (int mb = 0; mb < nbands; mb++)
 			{
@@ -241,7 +241,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 				{
 					
 					
-					if(NSPIN!=4)
+					if(GlobalV::NSPIN!=4)
 					{
 						if ( k_start == (nppstr-2) )
 						{
@@ -261,11 +261,11 @@ double berryphase::stringPhase(int index_str, int nbands)
 								G = tem_G;
 							}
 							
-							mat(nb,mb) = pw_method.unkdotp_G0(ik_1, ik_2, nb, mb, wf.evc, G);
+							mat(nb,mb) = pw_method.unkdotp_G0(ik_1, ik_2, nb, mb, GlobalC::wf.evc, G);
 						}
 						else 
 						{
-							mat(nb, mb) = pw_method.unkdotp_G(ik_1, ik_2, nb, mb, wf.evc);
+							mat(nb, mb) = pw_method.unkdotp_G(ik_1, ik_2, nb, mb, GlobalC::wf.evc);
 						}
 					}
 					else
@@ -288,9 +288,9 @@ double berryphase::stringPhase(int index_str, int nbands)
 								G = tem_G;
 							}
 							
-							mat(nb,mb) = pw_method.unkdotp_soc_G0(ik_1, ik_2, nb, mb, wf.evc, G);							
+							mat(nb,mb) = pw_method.unkdotp_soc_G0(ik_1, ik_2, nb, mb, GlobalC::wf.evc, G);							
 						}
-						else  mat(nb, mb) = pw_method.unkdotp_soc_G(ik_1, ik_2, nb, mb, wf.evc);
+						else  mat(nb, mb) = pw_method.unkdotp_soc_G(ik_1, ik_2, nb, mb, GlobalC::wf.evc);
 					}
 					
 				} // nb
@@ -312,14 +312,14 @@ double berryphase::stringPhase(int index_str, int nbands)
 			delete[] ipiv;
 		}
 		#ifdef __LCAO
-		else if(BASIS_TYPE=="lcao")
+		else if(GlobalV::BASIS_TYPE=="lcao")
 		{
-			if(NSPIN!=4)
+			if(GlobalV::NSPIN!=4)
 			{
 				//complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
 				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
 				// test by jingan
-				//ofs_running << "methon 1: det = " << my_det << endl;
+				//GlobalV::ofs_running << "methon 1: det = " << my_det << endl;
 				// test by jingan
 			}
 			else
@@ -351,7 +351,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 			
 			zeta = zeta*det;
 			
-			ofs_running << "methon 2: det = " << det << endl;
+			GlobalV::ofs_running << "methon 2: det = " << det << endl;
 			
 			delete[] ipiv;
 			*/
@@ -381,7 +381,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	for(int istring = 0; istring < total_string; istring++)
 	{
 		wistring[istring] = 1.0 / total_string;
-		if(NSPIN == 2) wistring[istring] = wistring[istring] * 2;
+		if(GlobalV::NSPIN == 2) wistring[istring] = wistring[istring] * 2;
 	}
 	
 	for(int istring = 0; istring < total_string; istring++)
@@ -402,25 +402,25 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 		phik[istring] = (theta0 + dtheta) / (2 * PI);
 		phik_ave = phik_ave + wistring[istring] * phik[istring];
 		// test by jingan
-		//ofs_running << "phik[" << istring << "] = " << phik[istring] << endl;
+		//GlobalV::ofs_running << "phik[" << istring << "] = " << phik[istring] << endl;
 		// test by jingan
 	}
 	
-	if(NSPIN == 1)
+	if(GlobalV::NSPIN == 1)
 	{
 		pdl_elec_tot = 2 * phik_ave;
 	}
-	else if( NSPIN == 2 || NSPIN == 4 )
+	else if( GlobalV::NSPIN == 2 || GlobalV::NSPIN == 4 )
 	{
 		pdl_elec_tot = phik_ave;
 	}
 	
-	if(NSPIN == 1)  // remap to [-1,1]
+	if(GlobalV::NSPIN == 1)  // remap to [-1,1]
 	{
 		pdl_elec_tot = pdl_elec_tot - 2.0 * round(pdl_elec_tot/2.0);
 		mod_elec_tot = 2;
 	}
-	else if( NSPIN == 2 || NSPIN == 4 )  // remap to [-0.5,0.5]
+	else if( GlobalV::NSPIN == 2 || GlobalV::NSPIN == 4 )  // remap to [-0.5,0.5]
 	{
 		pdl_elec_tot = pdl_elec_tot - 1.0 * round(pdl_elec_tot/1.0);
 		mod_elec_tot = 1;
@@ -433,7 +433,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	delete[] wistring;
 	
 	
-	//ofs_running << "Berry_Phase end " << endl;
+	//GlobalV::ofs_running << "Berry_Phase end " << endl;
 
 }
 
@@ -442,44 +442,44 @@ void berryphase::Macroscopic_polarization()
 {	
 	get_occupation_bands();
 	
-	if( BASIS_TYPE == "lcao" ) this->lcao_init();
+	if( GlobalV::BASIS_TYPE == "lcao" ) this->lcao_init();
 	
 	
-	ofs_running << "\n\n\n\n";
-	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " | POLARIZATION CALCULATION:                                          |" << endl;
-	ofs_running << " |                  Modern Theory of Polarization                     |" << endl;
-	ofs_running << " | calculate the Macroscopic polarization of a crystalline insulator  |" << endl;
-	ofs_running << " | by using Berry Phase method.                                       |" << endl;
-	ofs_running << " |                                                                    |" << endl;
-	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-	ofs_running << "\n\n\n\n";
+	GlobalV::ofs_running << "\n\n\n\n";
+	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+	GlobalV::ofs_running << " |                                                                    |" << endl;
+	GlobalV::ofs_running << " | POLARIZATION GlobalV::CALCULATION:                                          |" << endl;
+	GlobalV::ofs_running << " |                  Modern Theory of Polarization                     |" << endl;
+	GlobalV::ofs_running << " | calculate the Macroscopic polarization of a crystalline insulator  |" << endl;
+	GlobalV::ofs_running << " | by using Berry Phase method.                                       |" << endl;
+	GlobalV::ofs_running << " |                                                                    |" << endl;
+	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	GlobalV::ofs_running << "\n\n\n\n";
 	
 	
 	// ion polarization	
 	double polarization_ion[3]; // 指的是晶格矢量R1，R2，R3方向
 	ZEROS(polarization_ion,3);
 	// 倒格矢
-	Vector3<double> rcell_1(ucell.G.e11,ucell.G.e12,ucell.G.e13);
-	Vector3<double> rcell_2(ucell.G.e21,ucell.G.e22,ucell.G.e23);
-	Vector3<double> rcell_3(ucell.G.e31,ucell.G.e32,ucell.G.e33);
-	int *mod_ion = new int[ucell.nat];
-	double *pdl_ion_R1 = new double[ucell.nat];
-	double *pdl_ion_R2 = new double[ucell.nat];
-	double *pdl_ion_R3 = new double[ucell.nat];  
-	ZEROS(mod_ion,ucell.nat);
-	ZEROS(pdl_ion_R1,ucell.nat);
-	ZEROS(pdl_ion_R2,ucell.nat);
-	ZEROS(pdl_ion_R3,ucell.nat);
+	Vector3<double> rcell_1(GlobalC::ucell.G.e11,GlobalC::ucell.G.e12,GlobalC::ucell.G.e13);
+	Vector3<double> rcell_2(GlobalC::ucell.G.e21,GlobalC::ucell.G.e22,GlobalC::ucell.G.e23);
+	Vector3<double> rcell_3(GlobalC::ucell.G.e31,GlobalC::ucell.G.e32,GlobalC::ucell.G.e33);
+	int *mod_ion = new int[GlobalC::ucell.nat];
+	double *pdl_ion_R1 = new double[GlobalC::ucell.nat];
+	double *pdl_ion_R2 = new double[GlobalC::ucell.nat];
+	double *pdl_ion_R3 = new double[GlobalC::ucell.nat];  
+	ZEROS(mod_ion,GlobalC::ucell.nat);
+	ZEROS(pdl_ion_R1,GlobalC::ucell.nat);
+	ZEROS(pdl_ion_R2,GlobalC::ucell.nat);
+	ZEROS(pdl_ion_R3,GlobalC::ucell.nat);
 	
 	bool lodd = false;
 	int atom_index = 0;
-	for(int it = 0; it < ucell.ntype; it++)
+	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-		for(int ia = 0; ia < ucell.atoms[it].na; ia++)
+		for(int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
 		{
-			if(ucell.atoms[it].zv % 2 == 1)
+			if(GlobalC::ucell.atoms[it].zv % 2 == 1)
 			{
 				mod_ion[atom_index] = 1;
 				lodd = true;
@@ -494,20 +494,20 @@ void berryphase::Macroscopic_polarization()
 	}
 	
 	atom_index = 0;
-	for(int it = 0; it < ucell.ntype; it++)
+	for(int it = 0; it < GlobalC::ucell.ntype; it++)
 	{
-		for(int ia = 0; ia < ucell.atoms[it].na; ia++)
+		for(int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
 		{
-			pdl_ion_R1[atom_index] = ucell.atoms[it].zv * (ucell.atoms[it].tau[ia] * rcell_1);
-			pdl_ion_R2[atom_index] = ucell.atoms[it].zv * (ucell.atoms[it].tau[ia] * rcell_2);
-			pdl_ion_R3[atom_index] = ucell.atoms[it].zv * (ucell.atoms[it].tau[ia] * rcell_3);
+			pdl_ion_R1[atom_index] = GlobalC::ucell.atoms[it].zv * (GlobalC::ucell.atoms[it].tau[ia] * rcell_1);
+			pdl_ion_R2[atom_index] = GlobalC::ucell.atoms[it].zv * (GlobalC::ucell.atoms[it].tau[ia] * rcell_2);
+			pdl_ion_R3[atom_index] = GlobalC::ucell.atoms[it].zv * (GlobalC::ucell.atoms[it].tau[ia] * rcell_3);
 			atom_index++;
 		}
 	}
 	
 
 	
-	for(int i = 0; i < ucell.nat; i++)
+	for(int i = 0; i < GlobalC::ucell.nat; i++)
 	{		
 		if(mod_ion[i] == 1) 
 		{
@@ -549,11 +549,11 @@ void berryphase::Macroscopic_polarization()
 	
 	// calculate Macroscopic polarization modulus because berry phase
 	int modulus;
-	if( (!lodd) && (NSPIN==1) ) modulus = 2;
+	if( (!lodd) && (GlobalV::NSPIN==1) ) modulus = 2;
 	else modulus = 1;
 	
 	// test by jingan
-	//ofs_running << "ion polarization end" << endl;
+	//GlobalV::ofs_running << "ion polarization end" << endl;
 	// test by jingan
 
 
@@ -568,29 +568,29 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			const double rmod = ucell.a1.norm() * ucell.lat0;
+			const double rmod = GlobalC::ucell.a1.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
-			const double unit2 = rmod / ucell.omega;
-			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			const double unit2 = rmod / GlobalC::ucell.omega;
+			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
-			ofs_running << " VALUES OF POLARIZATION" << endl;
-			ofs_running << endl;
-			ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[0] << endl;
-			ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
-			//ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R1 direction" << endl;
+			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
+			GlobalV::ofs_running << endl;
+			GlobalV::ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[0] << endl;
+			GlobalV::ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
+			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R1 direction" << endl;
 			
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[0] ;
 			
-			Vector3<double> polarization_xyz = ucell.a1;
+			Vector3<double> polarization_xyz = GlobalC::ucell.a1;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 
-			ofs_running << "\n" << "The calculated polarization direction is in R1 direction" << endl;
-			ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
-			ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
-			ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;			   
-			ofs_running << endl;
+			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R1 direction" << endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;			   
+			GlobalV::ofs_running << endl;
 		
 			break;
 		
@@ -603,29 +603,29 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			const double rmod = ucell.a2.norm() * ucell.lat0;
+			const double rmod = GlobalC::ucell.a2.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
-			const double unit2 = rmod / ucell.omega;
-			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			const double unit2 = rmod / GlobalC::ucell.omega;
+			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
-			ofs_running << " VALUES OF POLARIZATION" << endl;
-			ofs_running << endl;
-			ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[1] << endl;
-			ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
-			//ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R2 direction" << endl;
+			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
+			GlobalV::ofs_running << endl;
+			GlobalV::ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[1] << endl;
+			GlobalV::ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
+			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R2 direction" << endl;
 		
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[1] ;
 			
-			Vector3<double> polarization_xyz = ucell.a2;
+			Vector3<double> polarization_xyz = GlobalC::ucell.a2;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 		
-			ofs_running << "\n" << "The calculated polarization direction is in R2 direction" << endl;
-			ofs_running << "\n"  << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
-			ofs_running << "\n"  << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
-			ofs_running << "\n"  << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
-			ofs_running << endl;
+			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R2 direction" << endl;
+			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
+			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
+			GlobalV::ofs_running << "\n"  << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
+			GlobalV::ofs_running << endl;
 			
 			break;
 		
@@ -638,36 +638,36 @@ void berryphase::Macroscopic_polarization()
 			int mod_elec_tot = 0;
 			Berry_Phase(occ_nbands, pdl_elec_tot, mod_elec_tot);
 		
-			const double rmod = ucell.a3.norm() * ucell.lat0;
+			const double rmod = GlobalC::ucell.a3.norm() * GlobalC::ucell.lat0;
 			const double unit1 = rmod;
-			const double unit2 = rmod / ucell.omega;
-			const double unit3 = ( rmod / ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
+			const double unit2 = rmod / GlobalC::ucell.omega;
+			const double unit3 = ( rmod / GlobalC::ucell.omega ) * ( 1.60097e-19/pow(5.29177e-11,2) );
 			
-			ofs_running << " VALUES OF POLARIZATION" << endl;
-			ofs_running << endl;
-			ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[2] << endl;
-			ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
-			//ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R3 direction" << endl;
+			GlobalV::ofs_running << " VALUES OF POLARIZATION" << endl;
+			GlobalV::ofs_running << endl;
+			GlobalV::ofs_running << "  The Ionic Phase: " << setw(10) << fixed << setprecision(5) << polarization_ion[2] << endl;
+			GlobalV::ofs_running << " Electronic Phase: " << setw(10) << fixed << setprecision(5) << pdl_elec_tot << endl;
+			//GlobalV::ofs_running << " the electronic part polarization is P(ele) = " << rmod * pdl_elec_tot << "   (e/Omega).bohr   in R3 direction" << endl;
 		
 			// calculate total polarization,add electron part and ions part
 			double total_polarization = pdl_elec_tot + polarization_ion[2] ;
 			
-			Vector3<double> polarization_xyz = ucell.a3;
+			Vector3<double> polarization_xyz = GlobalC::ucell.a3;
 			polarization_xyz.normalize();
 			polarization_xyz = total_polarization * polarization_xyz;
 
-			ofs_running << "\n" << "The calculated polarization direction is in R3 direction" << endl;
-			ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
-			ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
-			ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
-			ofs_running << endl;
+			GlobalV::ofs_running << "\n" << "The calculated polarization direction is in R3 direction" << endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit1*total_polarization, unit1*modulus, unit1*polarization_xyz) << "(e/Omega).bohr" << endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit2*total_polarization, unit2*modulus, unit2*polarization_xyz) << "e/bohr^2" << endl;
+			GlobalV::ofs_running << "\n" << " P = " << outFormat(unit3*total_polarization, unit3*modulus, unit3*polarization_xyz) << "C/m^2" << endl;
+			GlobalV::ofs_running << endl;
 		
 			break;
 		}
 	
 	}
 
-	//ofs_running << "the Macroscopic_polarization is over" << endl;
+	//GlobalV::ofs_running << "the Macroscopic_polarization is over" << endl;
 	
 	return;
 }

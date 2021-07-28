@@ -63,7 +63,7 @@ delete[] ngm_i_number;
 void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in, const int &n3_in,
 		const int &bz, const int &nproc_in,const int &rank_in)
 {
-	if(test_pw) TITLE("Parallel_PW","init");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","init");
 
 	this->gcut=gcut_in;
 	this->n1=n1_in;
@@ -89,9 +89,9 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 		npps[ip] *= bz;//mohan update 2011-04-22
 		if(ip < nb3%nproc_use) this->npps[ip]+=bz;
 		
-		if(test_pw)
+		if(GlobalV::test_pw)
 		{
-			ofs_running << " processor="<<ip<<" npps="<<npps[ip] << endl;
+			GlobalV::ofs_running << " processor="<<ip<<" npps="<<npps[ip] << endl;
 		}
 	}
 
@@ -104,7 +104,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 
 void Parallel_PW::columns_map(void)
 {
-	if(test_pw) TITLE("Parallel_PW","columns_map");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","columns_map");
 	timer::tick("Parallel_PW","columns_map");
 		
 	int ibox[3];
@@ -144,7 +144,7 @@ void Parallel_PW::columns_map(void)
 			{
 				Vector3<double> f(i,j,k);
 				// g2= |f|^2 in the unit of (2Pi/lat0)^2
-				double g2 = f * (ucell.GGT * f);
+				double g2 = f * (GlobalC::ucell.GGT * f);
 
 				// gcut is from input.
 				if (g2 <= this->gcut)
@@ -182,8 +182,8 @@ void Parallel_PW::columns_map(void)
 		}
 	}
 
-	OUT(ofs_running,"number of plane waves",ng);
-	OUT(ofs_running,"number of sticks", nst);
+	OUT(GlobalV::ofs_running,"number of plane waves",ng);
+	OUT(GlobalV::ofs_running,"number of sticks", nst);
 
 	timer::tick("Parallel_PW","columns_map");
 	return;
@@ -191,7 +191,7 @@ void Parallel_PW::columns_map(void)
 
 void Parallel_PW::restore_st(void)
 {
-	if(test_pw) TITLE("Parallel_PW","restore_st");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","restore_st");
 	
 	// assert the number of total sticks has
 	// been calculated.
@@ -240,7 +240,7 @@ void Parallel_PW::restore_st(void)
 
 void Parallel_PW::columns_and_pw_distribution(void)
 {
-	if(test_pw) TITLE("Parallel_PW","columns_and_pw_distribution");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","columns_and_pw_distribution");
 
 	// number of sticks of each processor in one pool.
 	delete[] nst_per;
@@ -408,7 +408,7 @@ void Parallel_PW::fft_map(
         int ggchg_time
 )
 {
-	if(test_pw) TITLE("Parallel_PW","fft_map");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i == ngm) return;
@@ -422,8 +422,8 @@ void Parallel_PW::fft_map(
 
 	for (int ig = 0;ig < ngmc_g_in ;ig++)
 	{
-		int m1 = (int)pw.gdirect_global[ig].x;
-		int m2 = (int)pw.gdirect_global[ig].y;
+		int m1 = (int)GlobalC::pw.gdirect_global[ig].x;
+		int m2 = (int)GlobalC::pw.gdirect_global[ig].y;
 
 		if (m1 < 0){m1 += this->n1;}
 		if (m2 < 0){m2 += this->n2;}
@@ -432,15 +432,15 @@ void Parallel_PW::fft_map(
 
 		if (this->isind[mc] >= 0)
 		{
-			if (pw.gg_global[ig] <= this->gcut)
+			if (GlobalC::pw.gg_global[ig] <= this->gcut)
 			{
 				this->ig_l2g[ngm_i] = ig;
-				if(this->gcut == pw.ggchg) // for charge, not for wave functions.
+				if(this->gcut == GlobalC::pw.ggchg) // for charge, not for wave functions.
 				{
 					// set 
-					pw.gdirect[ngm_i] = pw.gdirect_global[ig];
-					pw.gcar[ngm_i] = pw.gdirect[ngm_i]*ucell.G;
-					pw.gg[ngm_i] = pw.gg_global[ig];
+					GlobalC::pw.gdirect[ngm_i] = GlobalC::pw.gdirect_global[ig];
+					GlobalC::pw.gcar[ngm_i] = GlobalC::pw.gdirect[ngm_i]*GlobalC::ucell.G;
+					GlobalC::pw.gg[ngm_i] = GlobalC::pw.gg_global[ig];
 				}
 				++ngm_i;
 			}
@@ -465,11 +465,11 @@ void Parallel_PW::fft_map(
 		//	ig_l2g[i] is the index of ig_global
 		//	it tells the position in ig_global
 		//  for each plane wave in local processor
-		//  The local plane wave number is ngm_i = pw.ngmc
-		//  The total plane wave number is pw.ngmc_g
-		int x = int(pw.gdirect_global[this->ig_l2g[ig]].x);
-		int y = int(pw.gdirect_global[this->ig_l2g[ig]].y);
-		int z = int(pw.gdirect_global[this->ig_l2g[ig]].z);
+		//  The local plane wave number is ngm_i = GlobalC::pw.ngmc
+		//  The total plane wave number is GlobalC::pw.ngmc_g
+		int x = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].x);
+		int y = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].y);
+		int z = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].z);
 
 		if (x < 0) x += this->n1;
 		if (y < 0) y += this->n2;
@@ -554,7 +554,7 @@ void Parallel_PW::fft_map_after_vc(
         int ggchg_time
 )
 {
-    if(test_pw) TITLE("Parallel_PW","fft_map_after_vc");
+    if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map_after_vc");
 
     if(!allocate_igl2g)
     {
@@ -563,18 +563,18 @@ void Parallel_PW::fft_map_after_vc(
         allocate_igl2g = true;
     }
 
-    if(this->gcut == pw.ggchg) ngm_i2 = ngm_i_number[ggchg_time-1];
+    if(this->gcut == GlobalC::pw.ggchg) ngm_i2 = ngm_i_number[ggchg_time-1];
     for (int ig = ngm_i_record2;ig < ngm_i2;ig++)
     {
-        if(this->gcut == pw.ggchg)
+        if(this->gcut == GlobalC::pw.ggchg)
         {
-            pw.gcar[ig] = pw.gdirect[ig]*ucell.G;
-            pw.gg[ig] = pw.get_NormG_cartesian(ig);
+            GlobalC::pw.gcar[ig] = GlobalC::pw.gdirect[ig]*GlobalC::ucell.G;
+            GlobalC::pw.gg[ig] = GlobalC::pw.get_NormG_cartesian(ig);
         }
     }
 
 
-    if(this->gcut == pw.ggchg) ngm_i_record2 = ngm_i2;
+    if(this->gcut == GlobalC::pw.ggchg) ngm_i_record2 = ngm_i2;
 
     if(ggchg_time == 10) {ngm_i2 = 0; ngm_i_record2 = 0;}
 
@@ -588,7 +588,7 @@ void Parallel_PW::fft_map_final_scf(
 	const int &ngmc_g_in // cutgg_num
 )
 {
-	if(test_pw) TITLE("Parallel_PW","fft_map_final_scf");
+	if(GlobalV::test_pw) TITLE("Parallel_PW","fft_map_final_scf");
 
 	// if already found all the plane waves in this process, return.
 	if(ngm_i_final_scf == ngm) return;
@@ -602,8 +602,8 @@ void Parallel_PW::fft_map_final_scf(
 
 	for (int ig = 0;ig < ngmc_g_in ;ig++)
 	{
-		int m1 = (int)pw.gdirect_global[ig].x;
-		int m2 = (int)pw.gdirect_global[ig].y;
+		int m1 = (int)GlobalC::pw.gdirect_global[ig].x;
+		int m2 = (int)GlobalC::pw.gdirect_global[ig].y;
 
 		if (m1 < 0){m1 += this->n1;}
 		if (m2 < 0){m2 += this->n2;}
@@ -612,15 +612,15 @@ void Parallel_PW::fft_map_final_scf(
 
 		if (this->isind[mc] >= 0)
 		{
-			if (pw.gg_global[ig] <= this->gcut)
+			if (GlobalC::pw.gg_global[ig] <= this->gcut)
 			{
 				this->ig_l2g[ngm_i_final_scf] = ig;
-				if(this->gcut == pw.ggchg) // for charge, not for wave functions.
+				if(this->gcut == GlobalC::pw.ggchg) // for charge, not for wave functions.
 				{
 					// set 
-					pw.gdirect[ngm_i_final_scf] = pw.gdirect_global[ig];
-					pw.gcar[ngm_i_final_scf] = pw.gdirect[ngm_i_final_scf]*ucell.G;
-					pw.gg[ngm_i_final_scf] = pw.gg_global[ig];
+					GlobalC::pw.gdirect[ngm_i_final_scf] = GlobalC::pw.gdirect_global[ig];
+					GlobalC::pw.gcar[ngm_i_final_scf] = GlobalC::pw.gdirect[ngm_i_final_scf]*GlobalC::ucell.G;
+					GlobalC::pw.gg[ngm_i_final_scf] = GlobalC::pw.gg_global[ig];
 				}
 				++ngm_i_final_scf;
 			}
@@ -633,11 +633,11 @@ void Parallel_PW::fft_map_final_scf(
 		//	ig_l2g[i] is the index of ig_global
 		//	it tells the position in ig_global
 		//  for each plane wave in local processor
-		//  The local plane wave number is ngm_i = pw.ngmc
-		//  The total plane wave number is pw.ngmc_g
-		int x = int(pw.gdirect_global[this->ig_l2g[ig]].x);
-		int y = int(pw.gdirect_global[this->ig_l2g[ig]].y);
-		int z = int(pw.gdirect_global[this->ig_l2g[ig]].z);
+		//  The local plane wave number is ngm_i = GlobalC::pw.ngmc
+		//  The total plane wave number is GlobalC::pw.ngmc_g
+		int x = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].x);
+		int y = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].y);
+		int z = int(GlobalC::pw.gdirect_global[this->ig_l2g[ig]].z);
 
 		if (x < 0) x += this->n1;
 		if (y < 0) y += this->n2;

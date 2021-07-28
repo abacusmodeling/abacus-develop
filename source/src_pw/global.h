@@ -29,35 +29,41 @@
 //==========================================================
 // EXPLAIN : define "GLOBAL CLASS"
 //==========================================================
-extern Use_FFT UFFT;
-extern FFT fftwan;
+namespace GlobalC
+{
 extern K_Vectors kv;
+extern Use_FFT UFFT;
 extern output out;
-
 extern PW_Basis pw;
-extern Stochastic_WF STO_WF; //qianrui add 2021-2-5
+extern Stochastic_WF sto_wf; //qianrui add 2021-2-5
 extern energy en;
 extern wavefunc wf;
 extern Hamilt hm;
 extern Exx_Global exx_global;
 extern Exx_Lip exx_lip;
+extern pseudopot_cell_vnl ppcell;
+}
+
 
 #include "../module_symmetry/symmetry.h"
 #include "../module_cell/unitcell_pseudo.h"
 #include "../src_parallel/parallel_grid.h"
 #include "../src_parallel/parallel_kpoints.h"
-extern pseudopot_cell_vnl ppcell;
+namespace GlobalC
+{
+extern UnitCell_pseudo ucell;
 extern xcfunc xcf;
 extern Charge_Broyden CHR;
 extern Potential pot;
 extern Symmetry symm;
-//extern Magnetism mag;
-extern UnitCell_pseudo ucell;
 extern Parallel_Grid Pgrid; 
 extern Parallel_Kpoints Pkpoints;
 extern Vdwd2_Parameters vdwd2_para;		// Peize Lin add 2021.03.09
 extern Vdwd3_Parameters vdwd3_para;		// jiyy add 2021-05-02	
 extern Restart restart;	// Peize Lin add 2020.04.04
+}
+
+//extern Magnetism mag;
 
 #ifdef __LCAO
 #include "../src_lcao/global_fp.h"

@@ -53,7 +53,7 @@ ofstream ofs(exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstream::app)
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(NSPIN);
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
 
 	vector<atomic<Flag_Send>> flags_send(comm_sz);
     vector<atomic<Flag_Recv>> flags_recv(comm_sz);
@@ -175,11 +175,11 @@ ofs<<__LINE__<<endl;
 /*
 vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_atom_in_2D() const
 {
-	vector<pair<bool,bool>> atom_in_2D(ucell.nat,{false,false});
-	for(int iwt=0; iwt<NLOCAL; ++iwt)
+	vector<pair<bool,bool>> atom_in_2D(GlobalC::ucell.nat,{false,false});
+	for(int iwt=0; iwt<GlobalV::NLOCAL; ++iwt)
 	{
-		const int iat = ucell.iwt2iat[iwt];
-		if(KS_SOLVER=="genelpa")
+		const int iat = GlobalC::ucell.iwt2iat[iwt];
+		if(GlobalV::KS_SOLVER=="genelpa")
 		{
 			if(ParaO.trace_loc_col[iwt]>=0)
 				atom_in_2D[iat].first = true;
@@ -337,7 +337,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 		{
 			const size_t iat1 = H_pairs_tmp.first;
 			for(const size_t iat2 : H_pairs_tmp.second)
-				send_size_list[rank] += ucell.atoms[ucell.iat2it[iat1]].nw * ucell.atoms[ucell.iat2it[iat2]].nw;
+				send_size_list[rank] += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw * GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 		}
 		send_size_list[rank] *= sizeof(double);
 	}
@@ -347,9 +347,9 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 	{
 		size_t nw1=0, nw2=0;
 		for(size_t iat1 : pairs.first)
-			nw1 += ucell.atoms[ucell.iat2it[iat1]].nw;
+			nw1 += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw;
 		for(size_t iat2 : pairs.second)
-			nw2 += ucell.atoms[ucell.iat2it[iat2]].nw;
+			nw2 += GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;
 		recv_size += nw1*nw1;
 	}
 	recv_size *= sizeof(double);
@@ -409,7 +409,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
 	vector<double> &oarp = oarps_isend[rank_send_now];
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		oarp.push_back(-999);		const size_t index_size = oarp.size()-1;
 		auto ptr_data_A = data_local[is].begin();
@@ -465,7 +465,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 		const_cast<vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>&>(data_local));
 
 	vector<double> &oarp = oarps_isend[rank_send_now];
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		oarp.push_back(-999);		const size_t index_size = oarp.size()-1;
 		for(const auto data_A : data_intersection[is])
@@ -495,8 +495,8 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> Exx_Abfs::
 	const int rank_send_now,
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection(NSPIN);
-	for( int is=0; is!=NSPIN; ++is )
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection(GlobalV::NSPIN);
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto ptr_data_A = data_local[is].begin();
 		auto ptr_atom_A = H_atom_pairs_group_rank[rank_send_now].begin();
@@ -547,9 +547,9 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process(
 		return true;
 	};
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(NSPIN);
+	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(GlobalV::NSPIN);
 	auto ptr = iarps_irecv[rank_recv].begin();
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		const size_t recv_size = ptr[0];
 		ptr += 1;
@@ -587,7 +587,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data(
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data");
-	for( int is=0; is!=NSPIN; ++is )
+	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto &data_rank_is = data_rank[is];
 		auto &data_all_is = data_all[is];

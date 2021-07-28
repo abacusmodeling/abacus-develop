@@ -12,9 +12,9 @@ double Exx_Abfs::Jle::tolerence = 1.0e-12;
 
 void Exx_Abfs::Jle::init_jle( const double kmesh_times )
 {
-	jle.resize( ucell.ntype );
+	jle.resize( GlobalC::ucell.ntype );
 
-	for (int T = 0;  T < ucell.ntype ; T++)
+	for (int T = 0;  T < GlobalC::ucell.ntype ; T++)
 	{
 		jle[T].resize( Lmax+1 );
 		for (int L=0; L <= Lmax ; ++L)
@@ -50,7 +50,7 @@ void Exx_Abfs::Jle::init_jle( const double kmesh_times )
 					ORB.Phi[T].PhiLN(0,0).getDk(),
 					ORB.Phi[T].PhiLN(0,0).getDruniform(),
 					false,
-					true, FORCE);
+					true, GlobalV::FORCE);
 			}
 		}
 	}

@@ -26,9 +26,9 @@ void SubGrid_oper::cal_totwfc_aug()
 {
 	TITLE("SubGrid_oper","cal_totwfc_aug");
 
-	int *occupy = new int[NLOCAL];
-	ZEROS(occupy, NLOCAL);
-	for(int i=0; i<NLOCAL; ++i)
+	int *occupy = new int[GlobalV::NLOCAL];
+	ZEROS(occupy, GlobalV::NLOCAL);
+	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
 		if(LOWF.trace_aug[i]>=0)
 		{
@@ -38,26 +38,26 @@ void SubGrid_oper::cal_totwfc_aug()
 
 	// reduce occupy and get the full occupations.
 #ifdef __MPI
-	Parallel_Reduce::reduce_int_grid(occupy, NLOCAL);
+	Parallel_Reduce::reduce_int_grid(occupy, GlobalV::NLOCAL);
 #endif
 
 	delete[] trace_aug_tot;
-	trace_aug_tot = new int[NLOCAL];
-	ZEROS(trace_aug_tot,NLOCAL);
-	for(int i=0; i<NLOCAL; ++i)
+	trace_aug_tot = new int[GlobalV::NLOCAL];
+	ZEROS(trace_aug_tot,GlobalV::NLOCAL);
+	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
 		trace_aug_tot[i]=LOWF.trace_aug[i];
 	}
 
 	// how many occupied wave functions.	
 #ifdef __MPI
-	Parallel_Reduce::reduce_int_grid(trace_aug_tot, NLOCAL);
+	Parallel_Reduce::reduce_int_grid(trace_aug_tot, GlobalV::NLOCAL);
 #endif
 
-	if(GRANK==0)
+	if(GlobalV::GRANK==0)
 	{
 		// rescale trace_lo_tot
-		for(int i=0; i<NLOCAL; ++i)
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
 			if(occupy[i]!=0)
 			{
@@ -66,17 +66,17 @@ void SubGrid_oper::cal_totwfc_aug()
 		}	
 		delete[] occupy;
 
-		ofs_running << " Second" << endl;
-		for(int i=0; i<NLOCAL; ++i)
+		GlobalV::ofs_running << " Second" << endl;
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
-			ofs_running << " i=" << i << " trace_lo_tot=" << trace_lo_tot[i] << endl;
+			GlobalV::ofs_running << " i=" << i << " trace_lo_tot=" << trace_lo_tot[i] << endl;
 		}
 
 		//-----------------------------------------
 		// calculate the total lgd.
 		//-----------------------------------------
 		this->lgd_aug = 0;
-		for(int i=0; i<NLOCAL; ++i)
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
 			if(trace_aug_tot[i]>=0)
 			{
@@ -84,7 +84,7 @@ void SubGrid_oper::cal_totwfc_aug()
 			}
 		}
 
-		OUT(ofs_running,"SGO.lgd_aug",lgd);
+		OUT(GlobalV::ofs_running,"SGO.lgd_aug",lgd);
 	
 
 
@@ -100,9 +100,9 @@ void SubGrid_oper::cal_totwfc()
 	// combine the wave functions index in the 
 	// 'Grid group'
 	//-----------------------------------------
-	int *occupy = new int[NLOCAL];
-	ZEROS(occupy, NLOCAL);	
-	for(int iw=0; iw<NLOCAL; ++iw)
+	int *occupy = new int[GlobalV::NLOCAL];
+	ZEROS(occupy, GlobalV::NLOCAL);	
+	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
 		if(GridT.trace_lo[iw] >= 0)
 		{
@@ -113,23 +113,23 @@ void SubGrid_oper::cal_totwfc()
 	// reduce occupy and get the full occupations.
 #ifdef __MPI
 	// mohan 2012-02-23
-	Parallel_Reduce::reduce_int_grid(occupy, NLOCAL);
+	Parallel_Reduce::reduce_int_grid(occupy, GlobalV::NLOCAL);
 #endif
 
 	/*
-	for(int i=0; i<NLOCAL; ++i)
+	for(int i=0; i<GlobalV::NLOCAL; ++i)
 	{
-		ofs_running << " i=" << i << " occupy=" << occupy[i] << endl;
+		GlobalV::ofs_running << " i=" << i << " occupy=" << occupy[i] << endl;
 	}
 	*/
 
 	delete[] trace_lo_tot;
-	trace_lo_tot = new int[NLOCAL];
-	ZEROS(trace_lo_tot, NLOCAL);
+	trace_lo_tot = new int[GlobalV::NLOCAL];
+	ZEROS(trace_lo_tot, GlobalV::NLOCAL);
 
 
 	int count = 0;
-	for(int iw=0; iw<NLOCAL; ++iw)
+	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
 		// mohan fix bug 2012-02-23, shoud > 0,
 		// not >= 0.
@@ -152,20 +152,20 @@ void SubGrid_oper::cal_totwfc()
 	// for test
 	//------------
 	/*
-	ofs_running << " trace_lo_tot" << endl;
-	for(int iw=0; iw<NLOCAL; ++iw)
+	GlobalV::ofs_running << " trace_lo_tot" << endl;
+	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
-		ofs_running << " iw=" << iw << " trace_lo_tot=" << trace_lo_tot[iw] 
+		GlobalV::ofs_running << " iw=" << iw << " trace_lo_tot=" << trace_lo_tot[iw] 
 		<< " trace_lo=" << GridT.trace_lo[iw] 
 		<< " occupy=" << occupy[iw] 
 		<< endl;
 	}
 	*/
 
-	if(GRANK==0)
+	if(GlobalV::GRANK==0)
 	{
-          	//xiaohui add 'OUT_LEVEL', 2015-09-16
-		if(OUT_LEVEL != "m") OUT(ofs_running,"SGO.lgd",lgd);
+          	//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
+		if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"SGO.lgd",lgd);
 	
 		if(lgd==0)
 		{
@@ -176,7 +176,7 @@ void SubGrid_oper::cal_totwfc()
 			this->totwfc = new double**[1];
 			for(int is=0; is<1; ++is)
 			{
-				this->totwfc[is] = new double*[NBANDS];
+				this->totwfc[is] = new double*[GlobalV::NBANDS];
 			}
 			this->allocate_totwfc=false;
 			return;
@@ -195,17 +195,17 @@ void SubGrid_oper::cal_totwfc()
 		this->totwfc = new double**[1];
 		for(int is=0; is<1; ++is)
 		{
-			this->totwfc[is] = new double*[NBANDS];
-			for(int ib=0; ib<NBANDS; ++ib)
+			this->totwfc[is] = new double*[GlobalV::NBANDS];
+			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				this->totwfc[is][ib] = new double[lgd];	
 				ZEROS(totwfc[is][ib], lgd);
 
 				// mohan update 2012-02-10
-				//if(DIAGO_TYPE!="cg") xiaohui modify 2013-09-02
-				if(KS_SOLVER!="cg") //xiaohui add 2013-09-02
+				//if(GlobalV::DIAGO_TYPE!="cg") xiaohui modify 2013-09-02
+				if(GlobalV::KS_SOLVER!="cg") //xiaohui add 2013-09-02
 				{	
-					for(int i=0; i<NLOCAL; ++i)
+					for(int i=0; i<GlobalV::NLOCAL; ++i)
 					{
 						if(occupy[i])
 						{
@@ -222,7 +222,7 @@ void SubGrid_oper::cal_totwfc()
 					for(int i=0; i<lgd; ++i)
 					{
 		// mohan comment out 2021-02-09
-		//				this->totwfc[is][ib][i] = LOWF.WFC_GAMMA[CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
+		//				this->totwfc[is][ib][i] = LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][i]; //mohan update 2012-02-07	
 					}
 				}
 			}	
@@ -248,33 +248,33 @@ void SubGrid_oper::dis_subwfc()
 	//------------------------------------------
 	// bcast the eigenvalues
 	//------------------------------------------
-	for(int ik=0; ik<kv.nks; ++ik)
+	for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 	{
-		MPI_Bcast(wf.ekb[ik], NBANDS, MPI_DOUBLE, 0, GRID_WORLD);
+		MPI_Bcast(GlobalC::wf.ekb[ik], GlobalV::NBANDS, MPI_DOUBLE, 0, GRID_WORLD);
 	}	
 
 	MPI_Status status;
 
-	for(int i=0; i<GSIZE; ++i)
+	for(int i=0; i<GlobalV::GSIZE; ++i)
 	{
-		if(GRANK==0)
+		if(GlobalV::GRANK==0)
 		{
 			if(i==0)
 			{
 				//---------------------------------------------
 				// Transfer the data from totwfc to WFC_GAMMA.
 				//---------------------------------------------
-				for(int iw=0; iw<NLOCAL; ++iw)
+				for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 				{
 					const int mu1 = GridT.trace_lo[iw];
 					if(mu1 >= 0)
 					{
 						const int mu2 = this->trace_lo_tot[iw];
 
-						for(int ib=0; ib<NBANDS; ++ib)
+						for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 						{
 		// mohan comment out 2021-02-09
-		//					LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
+		//					LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
 						}//ib
 					}//mu1>=0
 				}//iw
@@ -284,14 +284,14 @@ void SubGrid_oper::dis_subwfc()
 				int tag;
 				// receive trace_lo2
 				tag = i * 10;
-				int* trace_lo2 = new int[NLOCAL];
-				MPI_Recv(trace_lo2, NLOCAL, MPI_INT, i, tag, GRID_WORLD, &status);
+				int* trace_lo2 = new int[GlobalV::NLOCAL];
+				MPI_Recv(trace_lo2, GlobalV::NLOCAL, MPI_INT, i, tag, GRID_WORLD, &status);
 
 /*
-				ofs_running << " Proc " << i << endl;
-				for(int i=0; i<NLOCAL; ++i)
+				GlobalV::ofs_running << " Proc " << i << endl;
+				for(int i=0; i<GlobalV::NLOCAL; ++i)
 				{
-					ofs_running << setw(5) << i << setw(10) << trace_lo2[i] << endl;
+					GlobalV::ofs_running << setw(5) << i << setw(10) << trace_lo2[i] << endl;
 				}
 				*/
 
@@ -300,13 +300,13 @@ void SubGrid_oper::dis_subwfc()
 				tag = i * 10 + 1;
 				MPI_Recv(&lgd2, 1, MPI_INT, i, tag, GRID_WORLD, &status);
 
-//				ofs_running << " receive=" << tag << endl;
+//				GlobalV::ofs_running << " receive=" << tag << endl;
 				
 				// send csend
-				double* csend = new double[NBANDS*lgd2];
-				ZEROS(csend, NBANDS*lgd2);
+				double* csend = new double[GlobalV::NBANDS*lgd2];
+				ZEROS(csend, GlobalV::NBANDS*lgd2);
 
-				for (int iw=0; iw<NLOCAL; iw++)
+				for (int iw=0; iw<GlobalV::NLOCAL; iw++)
 				{
 					const int mu1 = trace_lo2[iw];
 					if (mu1>=0)
@@ -314,59 +314,59 @@ void SubGrid_oper::dis_subwfc()
 						const int mu2 = this->trace_lo_tot[iw]; 
 						if(mu2<0)
 						{
-							ofs_running << " iw = " << iw << endl;
-							ofs_running << " GridT.trace_lo=" << mu1 << endl;
-							ofs_running << " trace_lo_tot=" << mu2 << endl;
+							GlobalV::ofs_running << " iw = " << iw << endl;
+							GlobalV::ofs_running << " GridT.trace_lo=" << mu1 << endl;
+							GlobalV::ofs_running << " trace_lo_tot=" << mu2 << endl;
 							assert(mu2>=0);
 						}
 
-						for (int ib=0; ib<NBANDS; ib++)
+						for (int ib=0; ib<GlobalV::NBANDS; ib++)
 						{
-							csend[mu1*NBANDS+ib] = this->totwfc[0][ib][mu2];
+							csend[mu1*GlobalV::NBANDS+ib] = this->totwfc[0][ib][mu2];
 						}
 					}
 				}
 
 				tag = i * 10 + 2;
-//				ofs_running << " send=" << tag << endl;
-				MPI_Send(csend,NBANDS*lgd2,MPI_DOUBLE,i,tag,GRID_WORLD);
-//				ofs_running << " send done." << endl;
+//				GlobalV::ofs_running << " send=" << tag << endl;
+				MPI_Send(csend,GlobalV::NBANDS*lgd2,MPI_DOUBLE,i,tag,GRID_WORLD);
+//				GlobalV::ofs_running << " send done." << endl;
 
 				delete[] csend;
 				delete[] trace_lo2;
 			}
-		}//GRANK=0
-		else if(i==GRANK)
+		}//GlobalV::GRANK=0
+		else if(i==GlobalV::GRANK)
 		{
 			int tag;
 			// send trace_lo
-			tag = GRANK * 10;
-			MPI_Send(GridT.trace_lo, NLOCAL, MPI_INT, 0, tag, GRID_WORLD);
+			tag = GlobalV::GRANK * 10;
+			MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, GRID_WORLD);
 
-			//ofs_running << " send1." << endl;
+			//GlobalV::ofs_running << " send1." << endl;
 
 			// send GridT.lgd
-			tag = GRANK * 10 + 1;
+			tag = GlobalV::GRANK * 10 + 1;
 			MPI_Send(&GridT.lgd, 1, MPI_INT, 0, tag, GRID_WORLD);
 
-			//ofs_running << " send2." << endl;
+			//GlobalV::ofs_running << " send2." << endl;
 
 			// receive c
-			double* crecv = new double[NBANDS*GridT.lgd];
-			ZEROS(crecv, NBANDS*GridT.lgd);
+			double* crecv = new double[GlobalV::NBANDS*GridT.lgd];
+			ZEROS(crecv, GlobalV::NBANDS*GridT.lgd);
 
-			tag = GRANK * 10 + 2;
-//			ofs_running << " receive=" << tag << endl;
-			MPI_Recv(crecv, NBANDS*GridT.lgd, MPI_DOUBLE, 0, tag, GRID_WORLD, &status);
-//			ofs_running << " receive done." << endl;
+			tag = GlobalV::GRANK * 10 + 2;
+//			GlobalV::ofs_running << " receive=" << tag << endl;
+			MPI_Recv(crecv, GlobalV::NBANDS*GridT.lgd, MPI_DOUBLE, 0, tag, GRID_WORLD, &status);
+//			GlobalV::ofs_running << " receive done." << endl;
 
 
-			for(int ib=0; ib<NBANDS; ++ib)
+			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				for (int mu=0; mu<GridT.lgd; ++mu)
 				{
 		// mohan comment out 2021-02-09
-		//			LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu] = crecv[mu*NBANDS+ib];
+		//			LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu] = crecv[mu*GlobalV::NBANDS+ib];
 				}
 			}
 
@@ -380,17 +380,17 @@ void SubGrid_oper::dis_subwfc()
 	// Test
 	//-------------------
 	/*
-	ofs_running << " WFC " << " CURRENT_SPIN=" << CURRENT_SPIN << endl;
-	for(int i=0; i<NBANDS; ++i)
+	GlobalV::ofs_running << " WFC " << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
+	for(int i=0; i<GlobalV::NBANDS; ++i)
 	{
-		for(int j=0; j<NLOCAL; ++j)
+		for(int j=0; j<GlobalV::NLOCAL; ++j)
 		{
 			const int mu = GridT.trace_lo[j];
 			if(mu>=0)
 			{
 				//				if( abs(LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
-				ofs_running << setw(5) << i+1 << setw(8) << j+1 
-					<< setw(15) << LOWF.WFC_GAMMA[CURRENT_SPIN][i][mu] << endl; 
+				GlobalV::ofs_running << setw(5) << i+1 << setw(8) << j+1 
+					<< setw(15) << LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][i][mu] << endl; 
 			}
 		}
 	}
@@ -403,17 +403,17 @@ void SubGrid_oper::dis_subwfc()
 	//---------------------------------------------
 	// Transfer the data from totwfc to WFC_GAMMA.
 	//---------------------------------------------
-	for(int iw=0; iw<NLOCAL; ++iw)
+	for(int iw=0; iw<GlobalV::NLOCAL; ++iw)
 	{
 		const int mu1 = GridT.trace_lo[iw];
 		if(mu1 >= 0)
 		{
 			const int mu2 = this->trace_lo_tot[iw];
 
-			for(int ib=0; ib<NBANDS; ++ib)
+			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 		// mohan comment out 2021-02-09
-//				LOWF.WFC_GAMMA[CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
+//				LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][ib][mu1] = this->totwfc[0][ib][mu2];
 			}//ib
 		}//mu1>=0
 	}//iw
@@ -421,13 +421,13 @@ void SubGrid_oper::dis_subwfc()
 
 #endif //mohan fix bug 2012-02-04
 
-	if(GRANK==0)
+	if(GlobalV::GRANK==0)
 	{
 		// 1 spin because it can not be calculated two spin
 		// at the same time.
 		for(int is=0; is<1; ++is)
 		{
-			for(int ib=0; ib<NBANDS; ++ib)
+			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				if(allocate_totwfc)
 				{

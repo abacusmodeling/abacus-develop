@@ -32,7 +32,7 @@ void IF_MATCH(const T &a,const T &b)
 {
 	if(a!=b)
 	{
-		if(MY_RANK == 0)
+		if(GlobalV::MY_RANK == 0)
 		{
 			cout<<"\n Can not match : "<<a<<"  "<<b<<endl;
 		}

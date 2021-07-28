@@ -57,8 +57,8 @@ class Potential_Libxc
 	//----------------------------
 	static int nspin0() // may need updates from SOC
 	{
-		if     (NSPIN==1 || (NSPIN==4 && (!DOMAG && !DOMAG_Z)))		return 1;
-		else if(NSPIN==2 || (NSPIN==4 && ( DOMAG ||  DOMAG_Z)))		return 2;
+		if     (GlobalV::NSPIN==1 || (GlobalV::NSPIN==4 && (!GlobalV::DOMAG && !GlobalV::DOMAG_Z)))		return 1;
+		else if(GlobalV::NSPIN==2 || (GlobalV::NSPIN==4 && ( GlobalV::DOMAG ||  GlobalV::DOMAG_Z)))		return 2;
 		else throw runtime_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
 };

@@ -121,5 +121,5 @@ void Conv_Coulomb_Pot::cal_orbs_ccp<Numerical_Orbital_Lm>(
 		orbs.getDruniform(),
 		false,
 		true,
-		FORCE); // mohan add 2021-05-07
+		GlobalV::FORCE); // mohan add 2021-05-07
 }

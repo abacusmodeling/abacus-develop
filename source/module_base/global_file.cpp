@@ -39,23 +39,23 @@ void Global_File::make_dir_out(
     prefix = "OUT.";
 #endif
 
-    global_out_dir = prefix + suffix + "/";
+    GlobalV::global_out_dir = prefix + suffix + "/";
 
 #ifdef __MPI
     MPI_Barrier(MPI_COMM_WORLD);
 #endif
     int make_dir = 0;
 	// mohan update 2011-05-03
-	string command0 =  "test -d " + global_out_dir + " || mkdir " + global_out_dir;	
+	string command0 =  "test -d " + GlobalV::global_out_dir + " || mkdir " + GlobalV::global_out_dir;	
 
 	int times = 0;
-	while(times<NPROC)
+	while(times<GlobalV::NPROC)
 	{
 		if(rank==times)
 		{
 			if ( system( command0.c_str() ) == 0 )
 			{
-				cout << " MAKE THE DIR         : " << global_out_dir << endl;
+				cout << " MAKE THE DIR         : " << GlobalV::global_out_dir << endl;
 				make_dir = 1;
 			}
 			else
@@ -86,20 +86,20 @@ void Global_File::make_dir_out(
     if(out_alllog)
     {
 	    ss << "running_" << calculation << "_" << rank + 1;
-	    open_log(ofs_running,ss.str());
+	    open_log(GlobalV::ofs_running,ss.str());
     }
     else
     {
 	    if(rank==0)
 	    {
 		    ss << "running_" << calculation;
-		    open_log(ofs_running,ss.str());
+		    open_log(GlobalV::ofs_running,ss.str());
 	    }
     }
 
     if(rank==0)
     {
-	    open_log(ofs_warning,"warning");
+	    open_log(GlobalV::ofs_warning,"warning");
     }
     return;
 }
@@ -110,7 +110,7 @@ void Global_File::make_dir_atom(const std::string &label)
 // EXPLAIN : generate atom dir for each type of atom
 //----------------------------------------------------------
     stringstream ss;
-    ss << global_out_dir << label << "/";
+    ss << GlobalV::global_out_dir << label << "/";
 
     string command1 = "test -d " + ss.str() + " || mkdir " + ss.str();
     std::system( command1.c_str() );
@@ -121,10 +121,10 @@ void Global_File::open_log(std::ofstream &ofs,const std::string &fn)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLE :
-// global_out_dir : (default dir to store "*.log" file)
+// GlobalV::global_out_dir : (default dir to store "*.log" file)
 //----------------------------------------------------------
     stringstream ss;
-    ss << global_out_dir << fn << ".log";
+    ss << GlobalV::global_out_dir << fn << ".log";
 
     ofs.open( ss.str().c_str() );
 //	ofs << " WELCOME TO MESIA PROGRAM." << endl;
@@ -146,8 +146,8 @@ void Global_File::close_all_log(const int rank, const bool out_alllog)
 {
 //----------------------------------------------------------
 // USE GLOBAL VARIABLES :
-// NAME : ofs_running
-// NAME : ofs_warning
+// NAME : GlobalV::ofs_running
+// NAME : GlobalV::ofs_warning
 // NAME : ofs_recon
 // NAME : ofs_sph_proj
 // NAME : ofs_build
@@ -157,21 +157,21 @@ void Global_File::close_all_log(const int rank, const bool out_alllog)
     stringstream ss;
 	if(out_alllog)
 	{
-    	ss << "running_" << CALCULATION << "_cpu" << rank << ".log";
-    	close_log(ofs_running,ss.str());
+    	ss << "running_" << GlobalV::CALCULATION << "_cpu" << rank << ".log";
+    	close_log(GlobalV::ofs_running,ss.str());
 	}
 	else
 	{
 		if(rank==0)
 		{
-    		ss << "running_" << CALCULATION << ".log";
-    		close_log(ofs_running,ss.str());
+    		ss << "running_" << GlobalV::CALCULATION << ".log";
+    		close_log(GlobalV::ofs_running,ss.str());
 		}
 	}
 
     if (rank==0)
     {
-        close_log(ofs_warning,"warning.log");
+        close_log(GlobalV::ofs_warning,"warning.log");
     }
     return;
 }

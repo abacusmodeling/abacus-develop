@@ -16,15 +16,15 @@
 void Wfc_Dm_2d::init()
 {
 	TITLE("Wfc_Dm_2d", "init");
-	if(GAMMA_ONLY_LOCAL)
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		wfc_gamma.resize(NSPIN);
-		dm_gamma.resize(NSPIN);
+		wfc_gamma.resize(GlobalV::NSPIN);
+		dm_gamma.resize(GlobalV::NSPIN);
 	}
 	else
 	{
-		wfc_k.resize(kv.nks);
-		dm_k.resize(kv.nks);
+		wfc_k.resize(GlobalC::kv.nks);
+		dm_k.resize(GlobalC::kv.nks);
 	}
 }
 
@@ -35,8 +35,8 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	#ifdef TEST_DIAG
 	{
 		static int istep=0;
-		ofstream ofs("wfc_"+TO_STRING(istep++)+"_"+TO_STRING(MY_RANK));
-		if(GAMMA_ONLY_LOCAL)
+		ofstream ofs("wfc_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			ofs<<wfc_gamma<<endl;
 		}
@@ -49,11 +49,11 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	
 	// dm = wfc.T * wg * wfc.conj()
 	// dm[ik](iw1,iw2) = \sum_{ib} wfc[ik](ib,iw1).T * wg(ik,ib) * wfc[ik](ib,iw2).conj()
-	assert(wg.nc<=NLOCAL);
-	if(GAMMA_ONLY_LOCAL)
+	assert(wg.nc<=GlobalV::NLOCAL);
+	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		assert(wg.nr==NSPIN);
-		for(int is=0; is!=NSPIN; ++is)
+		assert(wg.nr==GlobalV::NSPIN);
+		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
 			std::vector<double> wg_local(ParaO.ncol,0.0);
 			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
@@ -79,7 +79,7 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 			dm_gamma[is].create( wfc_gamma[is].nr, wfc_gamma[is].nc );
 			pdgemm_(
 				&N_char, &T_char,
-				&NLOCAL, &NLOCAL, &wg.nc,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
 				&one_float,
 				wg_wfc.c, &one_int, &one_int, ParaO.desc,
 				wfc_gamma[is].c, &one_int, &one_int, ParaO.desc,
@@ -89,8 +89,8 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	}
 	else
 	{
-		assert(wg.nr==kv.nks);
-		for(int ik=0; ik!=kv.nks; ++ik)
+		assert(wg.nr==GlobalC::kv.nks);
+		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
 			std::vector<double> wg_local(ParaO.ncol,0.0);
 			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
@@ -116,7 +116,7 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 			dm_k[ik].create( wfc_k[ik].nr, wfc_k[ik].nc );
 			pzgemm_(
 				&N_char, &T_char,
-				&NLOCAL, &NLOCAL, &wg.nc,
+				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
 				&one_float,
 				wg_wfc.c, &one_int, &one_int, ParaO.desc,
 				wfc_k[ik].c, &one_int, &one_int, ParaO.desc,
@@ -128,8 +128,8 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 	#ifdef TEST_DIAG
 	{
 		static int istep=0;
-		ofstream ofs("dm_"+TO_STRING(istep)+"_"+TO_STRING(MY_RANK));
-		if(GAMMA_ONLY_LOCAL)
+		ofstream ofs("dm_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
 			ofs<<dm_gamma<<endl;
 		}

@@ -54,9 +54,9 @@ void Grid_Technique::set_pbc_grid(
 	TITLE("Grid_Technique","init");
 	timer::tick("Grid_Technique","init");
 
-	if(OUT_LEVEL != "m") 
+	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		ofs_running << "\n SETUP EXTENDED REAL SPACE GRID FOR GRID INTEGRATION" << endl;
+		GlobalV::ofs_running << "\n SETUP EXTENDED REAL SPACE GRID FOR GRID INTEGRATION" << endl;
 	}
 
 	// (1) init_meshcell cell and big cell.
@@ -116,8 +116,8 @@ void Grid_Technique::init_atoms_on_grid(void)
 	// mohan add 2010-07-01
 	const int zstart = nbzp_start;
 	const int zend = nbzp + zstart;
-	if(test_gridt)OUT(ofs_running,"zstart",zstart);
-	if(test_gridt)OUT(ofs_running,"zend",zend);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"zstart",zstart);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"zend",zend);
 	int iz_now = -1;
 	
 	// (3) information about gloabl grid
@@ -131,8 +131,8 @@ void Grid_Technique::init_atoms_on_grid(void)
 	// (4) Find the atoms using
 	// when doing grid integration. 
 	delete[] in_this_processor;
-	this->in_this_processor = new bool[ucell.nat];
-	for(int i=0; i<ucell.nat; i++)
+	this->in_this_processor = new bool[GlobalC::ucell.nat];
+	for(int i=0; i<GlobalC::ucell.nat; i++)
 	{
 		in_this_processor[i] = false;
 	}
@@ -150,9 +150,9 @@ void Grid_Technique::init_atoms_on_grid(void)
 	int iat=0;
 	int normal;
 	this->total_atoms_on_grid = 0;
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			for(int im=0; im< this->meshball_ncells; im++)
 			{
@@ -191,12 +191,12 @@ void Grid_Technique::init_atoms_on_grid(void)
 		}
 	}
 
-	if(test_gridt)OUT(ofs_running,"Total_atoms_on_grid",total_atoms_on_grid);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Total_atoms_on_grid",total_atoms_on_grid);
 	
 	int stop = 0;
 	if(total_atoms_on_grid == 0)
 	{
-		ofs_running << " No atoms on this sub-FFT-mesh." << endl;
+		GlobalV::ofs_running << " No atoms on this sub-FFT-mesh." << endl;
 		stop = 1;
 	} 	
 	Parallel_Reduce::reduce_int_all( stop );
@@ -259,9 +259,9 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 	int count = 0;
 	int iat = 0;
 	ZEROS(this->how_many_atoms, nbxx);
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			// zero bigcell of meshball indicate ?
 			for(int im=0; im< this->meshball_ncells; im++)
@@ -334,21 +334,21 @@ void Grid_Technique::cal_grid_integration_index(void)
 	}
 
 #ifdef __MPI
-	int* all = new int[NPROC];
-	ZEROS(all, NPROC);
+	int* all = new int[GlobalV::NPROC];
+	ZEROS(all, GlobalV::NPROC);
 	Parallel_Reduce::gather_int_all(max_atom,all);
-	if(MY_RANK==0)
+	if(GlobalV::MY_RANK==0)
 	{
-		ofs_warning << setw(15) << "Processor" << setw(15) << "Atom" << endl;
-		for(int i=0; i<NPROC; i++)
+		GlobalV::ofs_warning << setw(15) << "Processor" << setw(15) << "Atom" << endl;
+		for(int i=0; i<GlobalV::NPROC; i++)
 		{
-			ofs_warning << setw(15) << i+1 << setw(15) << all[i] << endl; 
+			GlobalV::ofs_warning << setw(15) << i+1 << setw(15) << all[i] << endl; 
 		}
 	}
 	delete[] all;
 #endif
 
-	if(test_gridt)OUT(ofs_running,"Max atom on bigcell",max_atom);
+	if(GlobalV::test_gridt)OUT(GlobalV::ofs_running,"Max atom on bigcell",max_atom);
 	return;
 }
 
@@ -359,7 +359,7 @@ void Grid_Technique::cal_trace_beta(void)
 
 	// mohan modify 2021-04-06
 	//int nkb=ORB.nkb;
-	int nkb=ppcell.nkb;
+	int nkb=GlobalC::ppcell.nkb;
 
 	this->trace_beta = new int[nkb];
 	for(int i=0; i<nkb; i++)
@@ -371,10 +371,10 @@ void Grid_Technique::cal_trace_beta(void)
 	int ih_all = 0;
 	int ih_local = 0;
 
-	ofs_running << "trace_beta" << endl;
-	for(int it=0; it<ucell.ntype; ++it)
+	GlobalV::ofs_running << "trace_beta" << endl;
+	for(int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
-		Atom* atom = &ucell.atoms[it];
+		Atom* atom = &GlobalC::ucell.atoms[it];
 		for(int ia=0; ia<atom->na; ++ia)
 		{
 			if(this->in_this_processor[iat])
@@ -382,7 +382,7 @@ void Grid_Technique::cal_trace_beta(void)
 				for(int ih=0; ih<atom->nh; ih++)
 				{
 					this->trace_beta[ih_all] = ih_local;
-					ofs_running << setw(5) << ih_all << setw(15) << trace_beta[ih_all] << endl;
+					GlobalV::ofs_running << setw(5) << ih_all << setw(15) << trace_beta[ih_all] << endl;
 					++ih_local;
 					++ih_all;
 				}
@@ -396,7 +396,7 @@ void Grid_Technique::cal_trace_beta(void)
 	}
 	this->lgbeta = ih_local;
 	assert(lgbeta>=0);
-	OUT(ofs_running,"lgbeta",lgbeta);
+	OUT(GlobalV::ofs_running,"lgbeta",lgbeta);
 
 	return;
 }
@@ -408,14 +408,14 @@ void Grid_Technique::cal_trace_lo(void)
 	TITLE("Grid_Technique","cal_trace_lo");
 	// save the atom information in trace_lo,
 	// in fact the trace_lo dimension can be reduced
-	// to ucell.nat, but I think this is another way.
+	// to GlobalC::ucell.nat, but I think this is another way.
 	delete[] trace_lo;
-	this->trace_lo = new int[NLOCAL];
-	for(int i=0; i<NLOCAL; i++)
+	this->trace_lo = new int[GlobalV::NLOCAL];
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		this->trace_lo[i] = -1;
 	}
-	Memory::record("atoms_on_grid","trace_lo",NLOCAL,"int");
+	Memory::record("atoms_on_grid","trace_lo",GlobalV::NLOCAL,"int");
 
 	this->lnat = 0;
 	this->lgd = 0;
@@ -423,22 +423,22 @@ void Grid_Technique::cal_trace_lo(void)
 	int iw_all=0;
 	int iw_local=0;
 
-	for(int it=0; it<ucell.ntype; it++)
+	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia=0; ia<ucell.atoms[it].na; ia++)
+		for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
 			if(this->in_this_processor[iat])
 			{
 				++lnat;
-				int nw0 = ucell.atoms[it].nw;
-				if(NSPIN==4)
+				int nw0 = GlobalC::ucell.atoms[it].nw;
+				if(GlobalV::NSPIN==4)
 				{//added by zhengdy-soc, need to be double in soc
 					nw0 *= 2;
 					this->lgd += nw0;
 				}
 				else
 				{
-					this->lgd += ucell.atoms[it].nw;
+					this->lgd += GlobalC::ucell.atoms[it].nw;
 				}
 				
 				for(int iw=0; iw<nw0; iw++)
@@ -451,8 +451,8 @@ void Grid_Technique::cal_trace_lo(void)
 			else
 			{
 				// global index of atomic orbitals
-				iw_all += ucell.atoms[it].nw;
-				if(NSPIN==4) iw_all += ucell.atoms[it].nw;
+				iw_all += GlobalC::ucell.atoms[it].nw;
+				if(GlobalV::NSPIN==4) iw_all += GlobalC::ucell.atoms[it].nw;
 			}
 			++iat;
 		}
@@ -461,18 +461,18 @@ void Grid_Technique::cal_trace_lo(void)
 	//------------
 	// for test
 	//------------
-//	for(int i=0; i<NLOCAL; ++i)
+//	for(int i=0; i<GlobalV::NLOCAL; ++i)
 //	{
-//		ofs_running << " i=" << i+1 << " trace_lo=" << trace_lo[i] << endl;
+//		GlobalV::ofs_running << " i=" << i+1 << " trace_lo=" << trace_lo[i] << endl;
 //	}
 
-	if(OUT_LEVEL != "m") 
+	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		OUT(ofs_running,"Atom number in sub-FFT-grid",lnat);
-		OUT(ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
+		OUT(GlobalV::ofs_running,"Atom number in sub-FFT-grid",lnat);
+		OUT(GlobalV::ofs_running,"Local orbitals number in sub-FFT-grid",lgd);
 	}
 
 	assert(iw_local == lgd);
-	assert(iw_all == NLOCAL);
+	assert(iw_all == GlobalV::NLOCAL);
 	return;
 }

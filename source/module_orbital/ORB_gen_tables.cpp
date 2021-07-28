@@ -944,7 +944,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with NSPIN>1 has not implemented yet!");
+						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
 					}
 					break;
 				}

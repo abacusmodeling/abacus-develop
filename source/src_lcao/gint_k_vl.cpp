@@ -39,19 +39,19 @@ inline int find_offset(const int size, const int grid_index,
 
 	if(offset == -1 )
 	{
-		ofs_running << "================ BUG REPORT ===================" << endl;
-		ofs_running << " grid_index = " << grid_index << endl;
-		ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
-    	ofs_running << " find list:"<<endl;
+		GlobalV::ofs_running << "================ BUG REPORT ===================" << endl;
+		GlobalV::ofs_running << " grid_index = " << grid_index << endl;
+		GlobalV::ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
+    	GlobalV::ofs_running << " find list:"<<endl;
 		for(int* find=find_start; find < find_end; ++find)
-			ofs_running << *find << endl;
-		ofs_running << " id2 = " << id2 << endl;
-		ofs_running << " T1=" << ucell.atoms[T1].label << " T2=" << ucell.atoms[T2].label << endl;
-		ofs_running << " size (how many atoms on this grid) = " << size << endl;
-		ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << endl;
-		ofs_running << " iat1=" << iat1 << " iat2=" << iat2 << endl;
-		ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-		ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << endl;
+			GlobalV::ofs_running << *find << endl;
+		GlobalV::ofs_running << " id2 = " << id2 << endl;
+		GlobalV::ofs_running << " T1=" << GlobalC::ucell.atoms[T1].label << " T2=" << GlobalC::ucell.atoms[T2].label << endl;
+		GlobalV::ofs_running << " size (how many atoms on this grid) = " << size << endl;
+		GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << endl;
+		GlobalV::ofs_running << " iat1=" << iat1 << " iat2=" << iat2 << endl;
+		GlobalV::ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << endl;
+		GlobalV::ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << endl;
 		int bindex = 0;
 		// z is the fastest,
 		for(int ii=0; ii<bx; ii++)
@@ -65,7 +65,7 @@ inline int find_offset(const int size, const int grid_index,
 					//const int kkk = kbz + kk;
 					if(distance[bindex][ia1] < ORB.Phi[T1].getRcut() )
 					{
-						ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
+						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
 //									<< " ncxyz (" << (kkk-	.nczp_start) + jjj*	.nczp + iii*	.ncy*	.nczp 
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 //						<< " nbxyz (" << i << " " << j << " " << k << ") "
@@ -75,7 +75,7 @@ inline int find_offset(const int size, const int grid_index,
 					}
 					else
 					{
-						ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
+						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
 						<< " rcut=" << ORB.Phi[T1].getRcut() << endl;
 					}
 					++bindex;
@@ -83,7 +83,7 @@ inline int find_offset(const int size, const int grid_index,
 			}
 		}
 
-		ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << endl;
+		GlobalV::ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << endl;
 		bindex = 0;
 		// z is the fastest,
 		for(int ii=0; ii<bx; ii++)
@@ -97,8 +97,8 @@ inline int find_offset(const int size, const int grid_index,
 					//const int kkk = kbz + kk;
 					if(distance[bindex][ia2] < ORB.Phi[T2].getRcut() )//mohan T1->T2
 					{
-						ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 
-//									<< " ncxyz (" << (kkk-	.nczp_start) + jjj*pw.nczp + iii*	.ncy*pw.nczp 
+						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 
+//									<< " ncxyz (" << (kkk-	.nczp_start) + jjj*GlobalC::pw.nczp + iii*	.ncy*GlobalC::pw.nczp 
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 //						<< " nbxyz (" << i << " " << j << " " << k << ") "
 						<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
@@ -106,7 +106,7 @@ inline int find_offset(const int size, const int grid_index,
 					}
 					else
 					{
-						ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
+						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
 						<< " rcut=" << ORB.Phi[T2].getRcut() << endl;
 					}
 					++bindex;
@@ -114,13 +114,13 @@ inline int find_offset(const int size, const int grid_index,
 			}
 		}
 
-		ofs_running << " target index = " << index << endl;
-		ofs_running << " iat=" << iat1 << " nad=" << LNNR.nad[iat1] << endl;
+		GlobalV::ofs_running << " target index = " << index << endl;
+		GlobalV::ofs_running << " iat=" << iat1 << " nad=" << LNNR.nad[iat1] << endl;
 		for(int iii = 0; iii < LNNR.nad[iat1]; iii++)
 		{
-			ofs_running << " ad=" << iii << " find_R2=" << LNNR.find_R2[iat1][iii] << endl;
+			GlobalV::ofs_running << " ad=" << iii << " find_R2=" << LNNR.find_R2[iat1][iii] << endl;
 		}
-		ofs_warning << " The adjacent atom found by 	 is not found by SLTK_Adjacent program!" << endl;
+		GlobalV::ofs_warning << " The adjacent atom found by 	 is not found by SLTK_Adjacent program!" << endl;
 		WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
 	}
 	assert(offset < LNNR.nad[iat1]);
@@ -147,11 +147,11 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 		const int iat=GridT.which_atom[mcell_index];
 		at[id]=iat;
 		
-		const int it=ucell.iat2it[iat];
-		const int ia=ucell.iat2ia[iat];
-		const int start=ucell.itiaiw2iwt(it, ia, 0);
-		block_iw[id]=GridT.trace_lo[start]/NPOL;
-		Atom* atom=&ucell.atoms[it];
+		const int it=GlobalC::ucell.iat2it[iat];
+		const int ia=GlobalC::ucell.iat2ia[iat];
+		const int start=GlobalC::ucell.itiaiw2iwt(it, ia, 0);
+		block_iw[id]=GridT.trace_lo[start]/GlobalV::NPOL;
+		Atom* atom=&GlobalC::ucell.atoms[it];
 		block_size[id]=atom->nw;
 		block_index[id+1]=block_index[id]+atom->nw;
 		// meshball_positions should be the bigcell position in meshball
@@ -164,7 +164,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 		mt[1]=GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
 		mt[2]=GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
 
-		for(int ib=0; ib<pw.bxyz; ib++)
+		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 		{
 			double *p=&psir_ylm[ib][block_index[id]];
 			// meshcell_pos: z is the fastest
@@ -187,7 +187,7 @@ inline void cal_psir_ylm(int size, int grid_index, double delta_r,
 			//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 			if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 			
-			Ylm::sph_harm (	ucell.atoms[it].nwl,
+			Ylm::sph_harm (	GlobalC::ucell.atoms[it].nwl,
 					dr[0] / distance[ib][id],
 					dr[1] / distance[ib][id],
 					dr[2] / distance[ib][id],
@@ -233,7 +233,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 	char transa='N', transb='T';
 	double alpha=1, beta=1;
 	int allnw=block_index[size];
-	for(int i=0; i<pw.bxyz; ++i)
+	for(int i=0; i<GlobalC::pw.bxyz; ++i)
 	{
 		for(int j=0; j<allnw; ++j)
 		{
@@ -241,7 +241,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 		}
 	}
 
-	int k=pw.bxyz;
+	int k=GlobalC::pw.bxyz;
 	for(int ia1=0; ia1<size; ++ia1)
 	{
 		//if(all_out_of_range[ia1]) continue;
@@ -249,7 +249,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 		const int idx1=block_index[ia1];
 		int m=block_size[ia1];
 		const int iat1=at[ia1];
-		const int T1 = ucell.iat2it[iat1];
+		const int T1 = GlobalC::ucell.iat2it[iat1];
 		const int mcell_index1 = GridT.bcell_start[grid_index] + ia1;
 		const int id1 = GridT.which_unitcell[mcell_index1];
 		const int DM_start = LNNR.nlocstartg[iat1];
@@ -259,11 +259,11 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
 		for(int ia2=0; ia2<size; ++ia2)
 		{
 			const int iat2=at[ia2];
-			const int T2 = ucell.iat2it[iat2];
+			const int T2 = GlobalC::ucell.iat2it[iat2];
 			if (T1 <= T2)
 			{
     			int cal_num=0;
-    			for(int ib=0; ib<pw.bxyz; ++ib)
+    			for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
     			{
     				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
     				    ++cal_num;
@@ -274,25 +274,25 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
     			//const int iw2_lo=block_iw[ia2];
                 const int idx2=block_index[ia2];
         		int n=block_size[ia2];
-				//const int I2 = ucell.iat2ia[iat2];
+				//const int I2 = GlobalC::ucell.iat2ia[iat2];
 				const int mcell_index2 = GridT.bcell_start[grid_index] + ia2;
 				const int id2 = GridT.which_unitcell[mcell_index2];
 				int offset;
 
 				offset=find_offset(size, grid_index, 
 						ibx, jby, kbz, 
-						pw.bx, pw.by, pw.bz, 
+						GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz, 
 						ia1, iat1, id1, T1, 
 						ia2, iat2, id2, T2, 
 						distance, find_start, find_end);
 
 				const int iatw = DM_start + LNNR.find_R2st[iat1][offset];	
 
-			    if(cal_num>pw.bxyz/4)
+			    if(cal_num>GlobalC::pw.bxyz/4)
 			    {
     				//if(iw1_lo<=iw2_lo)
     				//{
-    			        k=pw.bxyz;
+    			        k=GlobalC::pw.bxyz;
     					dgemm_(&transa, &transb, &n, &m, &k, &alpha,
     						&psir_vlbr3[0][idx2], &LD_pool, 
     						&psir_ylm[0][idx1], &LD_pool,
@@ -303,7 +303,7 @@ inline void cal_pvpR_reduced(int size, int LD_pool, int grid_index,
     			{
         			//if(iw1_lo<=iw2_lo)
     				//{
-            			for(int ib=0; ib<pw.bxyz; ++ib)
+            			for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
             			{
                 			if(cal_flag[ib][ia1]&&cal_flag[ib][ia2])
                 			{
@@ -356,8 +356,8 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	// possible max atom number in real space grid. 
 	const int max_size = GridT.max_atom;
 	// how many meshcells in bigcell.
-	const int bxyz = pw.bxyz;
-	const int LD_pool=max_size*ucell.nwmax;
+	const int bxyz = GlobalC::pw.bxyz;
+	const int LD_pool=max_size*GlobalC::ucell.nwmax;
 	
 	double **distance = nullptr; // distance between atom and grid: [bxyz, maxsize]
 	double *psir_ylm_pool = nullptr;
@@ -388,9 +388,9 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 		// mohan fix bug 2011-05-02
 		// possible number of atom configureation (l,m)
 		int nn = 0;
-		for(int it=0; it<ucell.ntype; it++)
+		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
-			nn = std::max(nn, (ucell.atoms[it].nwl+1)*(ucell.atoms[it].nwl+1));
+			nn = std::max(nn, (GlobalC::ucell.atoms[it].nwl+1)*(GlobalC::ucell.atoms[it].nwl+1));
 		}
 
 		for(int i=0; i<bxyz; i++)
@@ -407,7 +407,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 	}
 	
 	assert(this->ncxyz!=0);
-	const double dv = ucell.omega/this->ncxyz;
+	const double dv = GlobalC::ucell.omega/this->ncxyz;
 	int vl_index=0;
 
 	// array to store local potential for each small box in
@@ -417,14 +417,14 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 
 	for(int i=0; i<nbx; i++)
 	{
-		const int ibx=i*pw.bx;
+		const int ibx=i*GlobalC::pw.bx;
 		for(int j=0; j<nby; j++)
 		{
-			const int jby=j*pw.by;
+			const int jby=j*GlobalC::pw.by;
 			// count the z according to big box.
 			for(int k=nbz_start; k<nbz_start+nbz; k++)
 			{
-				const int kbz=k*pw.bz-pw.nczp_start;
+				const int kbz=k*GlobalC::pw.bz-GlobalC::pw.nczp_start;
 				const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 				const int size = GridT.how_many_atoms[ grid_index ];
 				if(size==0) continue;
@@ -439,16 +439,16 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 
 				int bindex = 0;
 				// z is the fastest,
-				for(int ii=0; ii<pw.bx; ii++)
+				for(int ii=0; ii<GlobalC::pw.bx; ii++)
 				{
 					const int iii = ibx + ii;
-					for(int jj=0; jj<pw.by; jj++)
+					for(int jj=0; jj<GlobalC::pw.by; jj++)
 					{
 						const int jjj = jby + jj;
-						for(int kk=0; kk<pw.bz; kk++)
+						for(int kk=0; kk<GlobalC::pw.bz; kk++)
 						{
 							const int kkk = kbz + kk;
-							vl_index = kkk + jjj*pw.nczp + iii*pw.ncy*pw.nczp;
+							vl_index = kkk + jjj*GlobalC::pw.nczp + iii*GlobalC::pw.ncy*GlobalC::pw.nczp;
 							vldr3[bindex] = vrs1[ vl_index ] * dv;
 							++bindex;
 						}
@@ -533,11 +533,11 @@ void Gint_k::evaluate_pvpR_reduced(
 
         const int mcell_index1 = gt.bcell_start[grid_index] + ia1;
 		const int iat = gt.which_atom[mcell_index1];
-        const int T1 = ucell.iat2it[iat];
-        const int I1 = ucell.iat2ia[iat];
-        const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
-		const int iw1_start = gt.trace_lo[start1]/NPOL;
-        Atom *atom1 = &ucell.atoms[T1];
+        const int T1 = GlobalC::ucell.iat2it[iat];
+        const int I1 = GlobalC::ucell.iat2ia[iat];
+        const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+		const int iw1_start = gt.trace_lo[start1]/GlobalV::NPOL;
+        Atom *atom1 = &GlobalC::ucell.atoms[T1];
 	
         //~~~~~~~~~~~~~~~~
         // get cell R1.
@@ -561,8 +561,8 @@ void Gint_k::evaluate_pvpR_reduced(
 			{
 				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 				{
-//					ofs_running << " ia1=" << ia1 << " ia2=" << ia2;
-//					ofs_running << " cal_flag1=" << cal_flag[ib][ia1] << " cal_flag2=" << cal_flag[ib][ia2] << endl;
+//					GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2;
+//					GlobalV::ofs_running << " cal_flag1=" << cal_flag[ib][ia1] << " cal_flag2=" << cal_flag[ib][ia2] << endl;
 					same_flag = true;
 					break;
 				}
@@ -572,14 +572,14 @@ void Gint_k::evaluate_pvpR_reduced(
 
             const int bcell2 = gt.bcell_start[grid_index] + ia2;
 			const int iat2 = gt.which_atom[bcell2];
-            const int T2 = ucell.iat2it[iat2];
+            const int T2 = GlobalC::ucell.iat2it[iat2];
 
             if (T2 >= T1)
             {
-                Atom *atom2 = &ucell.atoms[T2];
-                const int I2 = ucell.iat2ia[iat2];
-                const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
-				const int iw2_start = gt.trace_lo[start2]/NPOL;
+                Atom *atom2 = &GlobalC::ucell.atoms[T2];
+                const int I2 = GlobalC::ucell.iat2ia[iat2];
+                const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
+				const int iw2_start = gt.trace_lo[start2]/GlobalV::NPOL;
 
 	            //~~~~~~~~~~~~~~~~
                 // get cell R2.
@@ -616,17 +616,17 @@ void Gint_k::evaluate_pvpR_reduced(
 
 				if(offset == -1 )
                 {
-					ofs_running << "================ BUG REPORT ===================" << endl;
-					ofs_running << " grid_index = " << grid_index << endl;
-                    ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
-					ofs_running << " id2 = " << id2 << endl;
-					ofs_running << " T1=" << ucell.atoms[T1].label << " T2=" << ucell.atoms[T2].label << endl;
-					ofs_running << " size (how many atoms on this grid) = " << size << endl;
-					ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << endl;
-                    ofs_running << " iat=" << iat << " iat2=" << iat2 << endl;
-                    ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << endl;
+					GlobalV::ofs_running << "================ BUG REPORT ===================" << endl;
+					GlobalV::ofs_running << " grid_index = " << grid_index << endl;
+                    GlobalV::ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
+					GlobalV::ofs_running << " id2 = " << id2 << endl;
+					GlobalV::ofs_running << " T1=" << GlobalC::ucell.atoms[T1].label << " T2=" << GlobalC::ucell.atoms[T2].label << endl;
+					GlobalV::ofs_running << " size (how many atoms on this grid) = " << size << endl;
+					GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << endl;
+                    GlobalV::ofs_running << " iat=" << iat << " iat2=" << iat2 << endl;
+                    GlobalV::ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << endl;
 
-                    ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << endl;
+                    GlobalV::ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << endl;
 					int bindex = 0;
 					// z is the fastest,
 					for(int ii=0; ii<gt.bx; ii++)
@@ -640,7 +640,7 @@ void Gint_k::evaluate_pvpR_reduced(
 								//const int kkk = k*gt.bz + kk;
 								if(distance[bindex][ia1] < ORB.Phi[T1].getRcut() )
 								{
-									ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
+									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia1] 
 //									<< " ncxyz (" << (kkk-gt.nczp_start) + jjj*gt.nczp + iii*gt.ncy*gt.nczp 
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 									<< " nbxyz (" << i << " " << j << " " << k << ") "
@@ -650,7 +650,7 @@ void Gint_k::evaluate_pvpR_reduced(
 								}
 								else
 								{
-									ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
+									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
 									<< " rcut=" << ORB.Phi[T1].getRcut() << endl;
 								}
 								++bindex;
@@ -659,7 +659,7 @@ void Gint_k::evaluate_pvpR_reduced(
 					}
 
 
-                    ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << endl;
+                    GlobalV::ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << endl;
 					bindex = 0;
 					// z is the fastest,
 					for(int ii=0; ii<gt.bx; ii++)
@@ -673,8 +673,8 @@ void Gint_k::evaluate_pvpR_reduced(
 								//const int kkk = k*gt.bz + kk;
 								if(distance[bindex][ia2] < ORB.Phi[T2].getRcut() )//mohan T1->T2
 								{
-									ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 
-//									<< " ncxyz (" << (kkk-gt.nczp_start) + jjj*pw.nczp + iii*gt.ncy*pw.nczp 
+									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2] 
+//									<< " ncxyz (" << (kkk-gt.nczp_start) + jjj*GlobalC::pw.nczp + iii*gt.ncy*GlobalC::pw.nczp 
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 									<< " nbxyz (" << i << " " << j << " " << k << ") "
 									<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
@@ -682,7 +682,7 @@ void Gint_k::evaluate_pvpR_reduced(
 								}
 								else
 								{
-									ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
+									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
 									<< " rcut=" << ORB.Phi[T2].getRcut() << endl;
 								}
 								++bindex;
@@ -690,13 +690,13 @@ void Gint_k::evaluate_pvpR_reduced(
 						}
 					}
 
-					ofs_running << " target index = " << index << endl;
-					ofs_running << " iat=" << iat << " nad=" << LNNR.nad[iat] << endl;
+					GlobalV::ofs_running << " target index = " << index << endl;
+					GlobalV::ofs_running << " iat=" << iat << " nad=" << LNNR.nad[iat] << endl;
                     for(int iii = 0; iii < LNNR.nad[iat]; iii++)
                     {
-                        ofs_running << " ad=" << iii << " find_R2=" << LNNR.find_R2[iat][iii] << endl;
+                        GlobalV::ofs_running << " ad=" << iii << " find_R2=" << LNNR.find_R2[iat][iii] << endl;
                     }
-					ofs_warning << " The adjacent atom found by gt is not found by SLTK_Adjacent program!" << endl;
+					GlobalV::ofs_warning << " The adjacent atom found by gt is not found by SLTK_Adjacent program!" << endl;
                     WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
                 }
                 assert(offset < LNNR.nad[iat]);
@@ -767,10 +767,10 @@ void Gint_k::evaluate_pvpR_full(const int &grid_index, const int &size, double**
 	for (int ia1=0; ia1<size; ia1++)
 	{
 		const int mcell_index1 = GridT.bcell_start[grid_index] + ia1;
-		const int T1 = ucell.iat2it[ GridT.which_atom[mcell_index1] ];
-		const int I1 = ucell.iat2ia[ GridT.which_atom[mcell_index1] ];
-		const int start1 = ucell.itiaiw2iwt(T1, I1, 0);
-		Atom *atom1 = &ucell.atoms[T1];
+		const int T1 = GlobalC::ucell.iat2it[ GridT.which_atom[mcell_index1] ];
+		const int I1 = GlobalC::ucell.iat2ia[ GridT.which_atom[mcell_index1] ];
+		const int start1 = GlobalC::ucell.itiaiw2iwt(T1, I1, 0);
+		Atom *atom1 = &GlobalC::ucell.atoms[T1];
 
 		//~~~~~~~~~~~~~~~~
 		// get cell R1.
@@ -782,13 +782,13 @@ void Gint_k::evaluate_pvpR_full(const int &grid_index, const int &size, double**
 		for (int ia2=0; ia2<size; ia2++)
 		{
 			const int mcell_index2 = GridT.bcell_start[grid_index] + ia2;
-			const int T2 = ucell.iat2it[ GridT.which_atom[mcell_index2]];
+			const int T2 = GlobalC::ucell.iat2it[ GridT.which_atom[mcell_index2]];
 
 			if (T2 >= T1)
 			{
-				Atom *atom2 = &ucell.atoms[T2];
-				const int I2 = ucell.iat2ia[ GridT.which_atom[mcell_index2]];
-				const int start2 = ucell.itiaiw2iwt(T2, I2, 0);
+				Atom *atom2 = &GlobalC::ucell.atoms[T2];
+				const int I2 = GlobalC::ucell.iat2ia[ GridT.which_atom[mcell_index2]];
+				const int start2 = GlobalC::ucell.itiaiw2iwt(T2, I2, 0);
 
 				//~~~~~~~~~~~~~~~~
 				// get cell R2.
@@ -797,18 +797,18 @@ void Gint_k::evaluate_pvpR_full(const int &grid_index, const int &size, double**
 				const int dim2 = id2 * GridT.lgd;
 
 				// circle for wave functions of atom 1.
-				for(int ib=0; ib<pw.bxyz; ib++)
+				for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 				{
 					if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 					{
 						double *psi1 = psir_ylm[ib][ia1];
 						double *psi2 = psir_ylm[ib][ia2];
 						
-						int iw1_lo = GridT.trace_lo[start1]/NPOL;
+						int iw1_lo = GridT.trace_lo[start1]/GlobalV::NPOL;
 						for (int iw=0; iw< atom1->nw; iw++)
 						{
 							const double vpsir1 = psi1[iw] * vldr3[ib];
-							int iw2_lo = GridT.trace_lo[start2]/NPOL;
+							int iw2_lo = GridT.trace_lo[start2]/GlobalV::NPOL;
 							double *ppp = this->pvpR[iw1_lo + dim1];
 							double *pppp = &ppp[iw2_lo+dim2];
 							double *pppp_end = &ppp[iw2_lo+dim2] + atom2->nw;

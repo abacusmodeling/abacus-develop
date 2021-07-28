@@ -5,7 +5,7 @@ static double output_acc = 1.0e-8;
 //print target stress term 
 void Stress_Func::print_stress(const string &name, const matrix& f, const bool screen, bool ry)const
 {
-	ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
+	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
 	
 	
 	double fac = 1.0;
@@ -26,17 +26,18 @@ void Stress_Func::print_stress(const string &name, const matrix& f, const bool s
 
 	for (int i=0;i<3;i++)
 	{
-		ofs_running << setw(15)<< " ";
-		if( abs(f(i,0)) >output_acc) ofs_running << setw(15) << f(i,0) * fac;
-		else ofs_running << setw(15) << "0";
-		if( abs(f(i,1)) >output_acc) ofs_running << setw(15) << f(i,1) * fac;
-		else ofs_running << setw(15) << "0";
-		if( abs(f(i,2)) >output_acc) ofs_running << setw(15) << f(i,2) * fac;
-		else ofs_running << setw(15) << "0";
-		ofs_running << endl;
+		GlobalV::ofs_running << setw(15)<< " ";
+		if( abs(f(i,0)) >output_acc) GlobalV::ofs_running << setw(15) << f(i,0) * fac;
+		else GlobalV::ofs_running << setw(15) << "0";
+		if( abs(f(i,1)) >output_acc) GlobalV::ofs_running << setw(15) << f(i,1) * fac;
+		else GlobalV::ofs_running << setw(15) << "0";
+		if( abs(f(i,2)) >output_acc) GlobalV::ofs_running << setw(15) << f(i,2) * fac;
+		else GlobalV::ofs_running << setw(15) << "0";
+		GlobalV::ofs_running << endl;
 
 		if(screen)
 		{
+			cout<<fixed;
 			if( abs(f(i,0)) >output_acc) cout << setw(15) << f(i,0)*fac;
 			else cout << setw(15) << "0";
 			if( abs(f(i,1)) >output_acc) cout << setw(15) << f(i,1)*fac;
@@ -66,38 +67,38 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 //	cout.setf(ios::fixed);
 
 
-	//ofs_running << setiosflags(ios::right);
- 	ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
+	//GlobalV::ofs_running << setiosflags(ios::right);
+ 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
 	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
     cout << " ><><><><><><><><><><><><><><><><><><><><><><" << endl;
     cout << " TOTAL-STRESS (KBAR):" << endl;
     cout << " ><><><><><><><><><><><><><><><><><><><><><><" << endl;
 
 //        if(INPUT.stress_set == 1)
-//        int TEST_STRESS = 1;
+//        int GlobalV::TEST_STRESS = 1;
 
- 	if(TEST_STRESS) 
+ 	if(GlobalV::TEST_STRESS) 
 	{
 		cout << setiosflags(ios::fixed) << setprecision(6);
 		cout << setiosflags(ios::showpos);
 		cout << " ------------------- TOTAL      STRESS --------------------" << endl;
     	cout << " " << setw(8) << "STRESS" << endl;
-    	ofs_running << " " << setw(12) << "STRESS" << endl;
+    	GlobalV::ofs_running << " " << setw(12) << "STRESS" << endl;
 	}
 
     
 	for (int i=0; i<3; i++)
 	{
 
-		//if(TEST_STRESS)
+		//if(GlobalV::TEST_STRESS)
 		cout << " " << setw(15) << scs(i,0)*unit_transform << setw(15)
 			<< scs(i,1)*unit_transform << setw(15) << scs(i,2)*unit_transform << endl;
 
-		ofs_running << " " << setw(15) << scs(i,0)*unit_transform << setw(15)
+		GlobalV::ofs_running << " " << setw(15) << scs(i,0)*unit_transform << setw(15)
 			<< scs(i,1)*unit_transform << setw(15) << scs(i,2)*unit_transform << endl;
 
 	}
-	ofs_running << setiosflags(ios::left);
+	GlobalV::ofs_running << setiosflags(ios::left);
 	cout << resetiosflags(ios::showpos);
 
     return;

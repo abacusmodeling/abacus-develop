@@ -39,33 +39,33 @@ void Driver::reading(void)
 	timer::tick("Driver","reading");
 
 	// (1) read INPUT 
-	INPUT.Init( global_in_card );
+	INPUT.Init( GlobalV::global_in_card );
 
 	// (2) copy the variables from INPUT to each class
 	Input_Conv::Convert();
 
 	// (3) define the 'DIAGONALIZATION' world in MPI
-	Parallel_Global::split_diag_world(DIAGO_PROC);
-	Parallel_Global::split_grid_world(DIAGO_PROC);
-	OUT(ofs_running,"DRANK",DRANK+1);
-	OUT(ofs_running,"DSIZE",DSIZE);
-	OUT(ofs_running,"DCOLOR",DCOLOR+1);
-	OUT(ofs_running,"GRANK",GRANK+1);
-	OUT(ofs_running,"GSIZE",GSIZE);
+	Parallel_Global::split_diag_world(GlobalV::DIAGO_PROC);
+	Parallel_Global::split_grid_world(GlobalV::DIAGO_PROC);
+	OUT(GlobalV::ofs_running,"DRANK",GlobalV::DRANK+1);
+	OUT(GlobalV::ofs_running,"DSIZE",GlobalV::DSIZE);
+	OUT(GlobalV::ofs_running,"DCOLOR",GlobalV::DCOLOR+1);
+	OUT(GlobalV::ofs_running,"GRANK",GlobalV::GRANK+1);
+	OUT(GlobalV::ofs_running,"GSIZE",GlobalV::GSIZE);
 
 #ifdef __MPI
-    // (4)  divide the NPROC processors into NPOOL for k-points parallelization.
-    Pkpoints.init_pools();
+    // (4)  divide the GlobalV::NPROC processors into GlobalV::NPOOL for k-points parallelization.
+    GlobalC::Pkpoints.init_pools();
 #endif
 
     // (5) Read in parameters about wannier functions.
-    winput::Init( global_wannier_card );
+    winput::Init( GlobalV::global_wannier_card );
 
     // (6) Print the parameters into INPUT file.
     stringstream ss1;
-    ss1 << global_out_dir << global_in_card;
+    ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
-    //DONE(ofs_running,"READING CARDS");
+    //DONE(GlobalV::ofs_running,"READING CARDS");
 
 	timer::tick("Driver","reading");
 	return;
@@ -82,28 +82,28 @@ void Driver::atomic_world(void)
 	// lcao: linear combination of atomic orbitals
 	//--------------------------------------------------
 #ifndef __NOMD //qianrui do not want to add md to pw module temporarily before md is compeletly built.
-	if(CALCULATION=="md" || CALCULATION=="md-sto") // Yu Liu 2021-07-12
+	if(GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="md-sto") // Yu Liu 2021-07-12
 	{
 		Run_md::md_line();
 	}
-	else if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+	else if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 #else
-	if(BASIS_TYPE=="pw" || BASIS_TYPE=="lcao_in_pw")
+	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 #endif
 	{
 
 		Run_pw::plane_wave_line();
 	}
 #ifdef __LCAO
-	else if(BASIS_TYPE=="lcao")
+	else if(GlobalV::BASIS_TYPE=="lcao")
 	{
 		Run_lcao::lcao_line();
 	}
 #endif
 
-	timer::finish( ofs_running );
+	timer::finish( GlobalV::ofs_running );
 
-	Memory::print_all( ofs_running ) ;
+	Memory::print_all( GlobalV::ofs_running ) ;
 
 	return;
 }
