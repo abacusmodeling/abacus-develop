@@ -439,31 +439,31 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------	
 	if(INPUT.restart_save)
 	{
-		restart.folder = GlobalV::global_out_dir + "restart/";
-		const string command0 =  "test -d " + restart.folder + " || mkdir " + restart.folder;
+		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
+		const string command0 =  "test -d " + GlobalC::restart.folder + " || mkdir " + GlobalC::restart.folder;
 		if(GlobalV::MY_RANK==0)
 			system( command0.c_str() );
 		if(INPUT.exx_hybrid_type=="no")
 		{
-			restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_charge = true;
 		}
 		else
 		{
-			restart.info_save.save_charge = true;
-			restart.info_save.save_H = true;
+			GlobalC::restart.info_save.save_charge = true;
+			GlobalC::restart.info_save.save_H = true;
 		}
 	}
 	if(INPUT.restart_load)
 	{
-		restart.folder = GlobalV::global_out_dir + "restart/";
+		GlobalC::restart.folder = GlobalV::global_out_dir + "restart/";
 		if(INPUT.exx_hybrid_type=="no")
 		{
-			restart.info_load.load_charge = true;
+			GlobalC::restart.info_load.load_charge = true;
 		}
 		else
 		{
-			restart.info_load.load_charge = true;
-			restart.info_load.load_H = true;
+			GlobalC::restart.info_load.load_charge = true;
+			GlobalC::restart.info_load.load_H = true;
 		}
 	}
 
@@ -545,7 +545,7 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // charge mixing(3/3)
 //----------------------------------------------------------
-    CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, 
+    GlobalC::CHR.set_mixing(INPUT.mixing_mode, INPUT.mixing_beta, 
 	INPUT.mixing_ndim, INPUT.mixing_gg0); //mohan modify 2014-09-27, add mixing_gg0
 
 //----------------------------------------------------------
@@ -557,11 +557,11 @@ void Input_Conv::Convert(void)
 //----------------------------------------------------------
 // wavefunction / charge / potential / (2/4)
 //----------------------------------------------------------
-    pot.start_pot = INPUT.start_pot;
-	pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
-    CHR.out_charge = INPUT.out_charge;
-	CHR.nelec = INPUT.nelec;
-	pot.out_potential = INPUT.out_potential;
+    GlobalC::pot.start_pot = INPUT.start_pot;
+	GlobalC::pot.extra_pot = INPUT.charge_extrap;//xiaohui modify 2015-02-01
+    GlobalC::CHR.out_charge = INPUT.out_charge;
+	GlobalC::CHR.nelec = INPUT.nelec;
+	GlobalC::pot.out_potential = INPUT.out_potential;
     GlobalC::wf.out_wf = INPUT.out_wf;
 	GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;

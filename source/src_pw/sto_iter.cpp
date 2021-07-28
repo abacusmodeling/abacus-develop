@@ -25,7 +25,7 @@ void Stochastic_Iter::init(int &dim, int& chetype)
     nchip = GlobalC::sto_wf.nchip;
     stotype = GlobalC::sto_wf.stotype;
     //wait for init
-    targetne = CHR.nelec;
+    targetne = GlobalC::CHR.nelec;
     stoche.init( dim, chetype );
     stohchi.init();
     stohchi.get_GRA_index();
@@ -153,13 +153,13 @@ void Stochastic_Iter::itermu(int &iter)
     if(iter == 1)
     {
         dmu = 2;
-        th_ne = 0.1 * GlobalV::DRHO2 * CHR.nelec;
+        th_ne = 0.1 * GlobalV::DRHO2 * GlobalC::CHR.nelec;
         cout<<"th_ne "<<th_ne<<endl;
     }
     else
     {
         dmu = 0.1;
-        th_ne = GlobalV::DRHO2 * 1e-2 * CHR.nelec;
+        th_ne = GlobalV::DRHO2 * 1e-2 * GlobalC::CHR.nelec;
     }
     sumpolyval();
     mu = mu0 - dmu;
@@ -396,8 +396,8 @@ void Stochastic_Iter::sum_stoband()
     if(GlobalV::NBANDS > 0 && GlobalV::MY_POOL==0 && stotype == "pw")
     {
         ksrho = new double [nrxx];
-        DCOPY(CHR.rho[0],ksrho,nrxx);
-        ZEROS(CHR.rho[0],nrxx);
+        DCOPY(GlobalC::CHR.rho[0],ksrho,nrxx);
+        ZEROS(GlobalC::CHR.rho[0],nrxx);
     }
     
     for(int ik = 0; ik < nkk; ++ik)
@@ -427,16 +427,16 @@ void Stochastic_Iter::sum_stoband()
                 GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
                 for(int ir = 0 ; ir < nrxx ; ++ir)
                 {
-                    CHR.rho[0][ir] += norm(porter[ir]);
+                    GlobalC::CHR.rho[0][ir] += norm(porter[ir]);
                 }
                 tmpout+=npw;
             }
 #ifdef __MPI
-            CHR.rho_mpi();
+            GlobalC::CHR.rho_mpi();
 #endif
             for(int ir = 0; ir < nrxx ; ++ir)
             {
-                tmprho = CHR.rho[0][ir] * GlobalC::kv.wk[ik] / GlobalC::ucell.omega;
+                tmprho = GlobalC::CHR.rho[0][ir] * GlobalC::kv.wk[ik] / GlobalC::ucell.omega;
                 sto_rho[ir] = tmprho;
                 sto_ne += tmprho;
             }
@@ -508,9 +508,9 @@ void Stochastic_Iter::sum_stoband()
     if(GlobalV::MY_POOL==0 && stotype == "pw")
     {
         if(GlobalV::NBANDS > 0)
-            DCOPY(ksrho,CHR.rho[0],nrxx);
+            DCOPY(ksrho,GlobalC::CHR.rho[0],nrxx);
         else
-            ZEROS(CHR.rho[0],nrxx);
+            ZEROS(GlobalC::CHR.rho[0],nrxx);
     }
     
     
@@ -519,7 +519,7 @@ void Stochastic_Iter::sum_stoband()
     {
         for(int ir = 0; ir < nrxx ; ++ir)
         {
-            CHR.rho[is][ir] += sto_rho[ir] * factor;
+            GlobalC::CHR.rho[is][ir] += sto_rho[ir] * factor;
         }
     }
 

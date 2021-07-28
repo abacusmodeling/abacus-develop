@@ -33,7 +33,7 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		if(!uhm.init_s)
@@ -49,27 +49,27 @@ void ELEC_cbands_gamma::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		// Peize Lin add ik 2016-12-03
 		uhm.calculate_Hgamma(ik);
 
-		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
+    // Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u) 
 		{
-			dftu.cal_eff_pot_mat(ik, istep);
+      vector<double> eff_pot(ParaO.nloc);
+			dftu.cal_eff_pot_mat_real(ik, istep, &eff_pot[0]);
 
 			const int spin = GlobalC::kv.isk[ik];
 			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				LM.Hloc[irc] += dftu.pot_eff_gamma.at(spin).at(irc);
-			}
+				LM.Hloc[irc] += eff_pot[irc];
+        
 		}
 
 		// Peize Lin add at 2020.04.04
-		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
+		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			restart.load_disk("H", ik);
-			restart.info_load.load_H_finish = true;
+			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.info_load.load_H_finish = true;
 		}			
-		if(restart.info_save.save_H)
+		if(GlobalC::restart.info_save.save_H)
 		{
-			restart.save_disk("H", ik);
+			GlobalC::restart.save_disk("H", ik);
 		}
 
 		// SGO: sub_grid_operation

@@ -102,7 +102,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
                 int ikstot=0;//ikstot : the index within all k-points
 #ifdef __MPI
                 MPI_Allreduce(&GlobalC::kv.ngk[ik],&ikngtot,1,MPI_INT,MPI_SUM,POOL_WORLD);
-                ikstot=Pkpoints.startk_pool[ip]+ik;
+                ikstot=GlobalC::Pkpoints.startk_pool[ip]+ik;
 #else
                 ikngtot=GlobalC::kv.ngk[ik];
                 ikstot=ik;

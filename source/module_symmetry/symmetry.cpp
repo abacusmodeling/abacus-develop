@@ -18,24 +18,24 @@ Symmetry::~Symmetry()
 bool Symmetry::symm_flag=false;
 
 
-void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out)
+void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstream &ofs_running)
 {
     if (available == false) return;
     TITLE("Symmetry","init");
 	timer::tick("Symmetry","analy_sys");
 
-	GlobalV::ofs_running << "\n\n\n\n";
-	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	GlobalV::ofs_running << " |                                                                    |" << endl;
-	GlobalV::ofs_running << " | Doing symmetry analysis:                                           |" << endl;
-	GlobalV::ofs_running << " | We calculate the norm of 3 vectors and the angles between them,    |" << endl;
-	GlobalV::ofs_running << " | the type of Bravais lattice is given. We can judge if the unticell |" << endl;
-	GlobalV::ofs_running << " | is a primitive cell. Finally we give the point group operation for |" << endl;
-	GlobalV::ofs_running << " | this unitcell. We we use the point group operations to do symmetry |" << endl;
-	GlobalV::ofs_running << " | analysis on given k-point mesh and the charge density.             |" << endl;
-	GlobalV::ofs_running << " |                                                                    |" << endl;
-	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-	GlobalV::ofs_running << "\n\n\n\n";
+	ofs_running << "\n\n\n\n";
+	ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+	ofs_running << " |                                                                    |" << endl;
+	ofs_running << " | Doing symmetry analysis:                                           |" << endl;
+	ofs_running << " | We calculate the norm of 3 vectors and the angles between them,    |" << endl;
+	ofs_running << " | the type of Bravais lattice is given. We can judge if the unticell |" << endl;
+	ofs_running << " | is a primitive cell. Finally we give the point group operation for |" << endl;
+	ofs_running << " | this unitcell. We we use the point group operations to do symmetry |" << endl;
+	ofs_running << " | analysis on given k-point mesh and the charge density.             |" << endl;
+	ofs_running << " |                                                                    |" << endl;
+	ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	ofs_running << "\n\n\n\n";
 
 
     this->ibrav = 0;
@@ -73,7 +73,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out)
 //  cout << "a1 = " << a2.x << " " << a2.y << " " << a2.z <<endl;
 //  cout << "a1 = " << a3.x << " " << a3.y << " " << a3.z <<endl;
 
-	out.printM3(GlobalV::ofs_running,"LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",latvec1);
+	out.printM3(ofs_running,"LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",latvec1);
 
     int count = 0;
     istart[0] = 0;
@@ -121,7 +121,7 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out)
 	new_lat.e11=a1.x; new_lat.e12=a1.y; new_lat.e13=a1.z;
 	new_lat.e21=a2.x; new_lat.e22=a2.y; new_lat.e23=a2.z;
 	new_lat.e31=a3.x; new_lat.e32=a3.y; new_lat.e33=a3.z;
-	out.printM3(GlobalV::ofs_running,"STANDARD LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",new_lat);
+	out.printM3(ofs_running,"STANDARD LATTICE VECTORS: (CARTESIAN COORDINATE: IN UNIT OF A0)",new_lat);
 
 	int iat=0;
 	for(int it=0; it<ucell.ntype; ++it)
@@ -150,20 +150,20 @@ void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out)
 	}
 
 
-	Symm_Other::print1(ibrav, cel_const);
+	Symm_Other::print1(ibrav, cel_const, ofs_running);
 
 	this->change_lattice();
     //this->pricell();         // pengfei Li 2018-05-14 
          //for( iat =0 ; iat < ucell.nat ; iat++)   
 //         cout << " newpos_now = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << endl;
-	OUT(GlobalV::ofs_running,"ibrav",ibrav);
+	OUT(ofs_running,"ibrav",ibrav);
     this->setgroup(this->symop, this->nop, this->ibrav);
     //now select all symmetry operations which reproduce the lattice
     //to find those symmetry operations which reproduce the entire crystal
-    this->getgroup(this->nrot, this->nrotk);
+    this->getgroup(this->nrot, this->nrotk, ofs_running);
     // find the name of point group
-    this->pointgroup(this->nrot, this->pgnumber, this->pgname, this->gmatrix);
-    OUT(GlobalV::ofs_running,"POINT GROUP", this->pgname);
+    this->pointgroup(this->nrot, this->pgnumber, this->pgname, this->gmatrix, ofs_running);
+    OUT(ofs_running,"POINT GROUP", this->pgname);
     //write();
 
     delete[] dirpos;
@@ -1121,7 +1121,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 }*/
 
 
-void Symmetry::getgroup(int &nrot, int &nrotk)
+void Symmetry::getgroup(int &nrot, int &nrotk, ofstream &ofs_running)
 {
     TITLE("Symmetry","getgroup");
 
@@ -1203,8 +1203,8 @@ void Symmetry::getgroup(int &nrot, int &nrotk)
     //total number of space group operations
 	//-----------------------------------------------------
     nrotk += nrot;
-	OUT(GlobalV::ofs_running,"PURE POINT GROUP OPERATIONS",nrot);
-    OUT(GlobalV::ofs_running,"SPACE GROUP OPERATIONS",nrotk);
+	OUT(ofs_running,"PURE POINT GROUP OPERATIONS",nrot);
+    OUT(ofs_running,"SPACE GROUP OPERATIONS",nrotk);
 
 	//-----------------------------------------------------
     //fill the rest of matrices and vectors with zeros

@@ -45,7 +45,7 @@ void Run_MD_LCAO::opt_cell(void)
     // if ion_step==0, read in/initialize the potentials
     // this function belongs to ions LOOP
     int ion_step=0;
-    pot.init_pot(ion_step, GlobalC::pw.strucFac);
+    GlobalC::pot.init_pot(ion_step, GlobalC::pw.strucFac);
 
 	
 	opt_ions();
@@ -108,24 +108,24 @@ void Run_MD_LCAO::opt_ions(void)
 		if(INPUT.vdw_method=="d2")
 		{
 			// setup vdwd2 parameters
-			vdwd2_para.initial_parameters(INPUT);
-	        vdwd2_para.initset(GlobalC::ucell);
+			GlobalC::vdwd2_para.initial_parameters(INPUT);
+	        GlobalC::vdwd2_para.initset(GlobalC::ucell);
         }
         if(INPUT.vdw_method=="d3_0" || INPUT.vdw_method=="d3_bj")
         {
-            vdwd3_para.initial_parameters(INPUT);
+            GlobalC::vdwd3_para.initial_parameters(INPUT);
         }
         // Peize Lin add 2014.04.04, update 2021.03.09
-        if(vdwd2_para.flag_vdwd2)
+        if(GlobalC::vdwd2_para.flag_vdwd2)
         {
-            Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
+            Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
             vdwd2.cal_energy();
             GlobalC::en.evdw = vdwd2.get_energy();
         }
         // jiyy add 2019-05-18, update 2021.05.02
-        else if(vdwd3_para.flag_vdwd3)
+        else if(GlobalC::vdwd3_para.flag_vdwd3)
         {
-            Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
+            Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
             vdwd3.cal_energy();
             GlobalC::en.evdw = vdwd3.get_energy();
         }
@@ -158,13 +158,13 @@ void Run_MD_LCAO::opt_ions(void)
             WARNING_QUIT("opt_ions", "mdtype should be -1~2!");
         }
 
-        if(pot.out_potential == 2)
+        if(GlobalC::pot.out_potential == 2)
         {
             stringstream ssp;
             stringstream ssp_ave;
             ssp << GlobalV::global_out_dir << "ElecStaticPot";
             ssp_ave << GlobalV::global_out_dir << "ElecStaticPot_AVE";
-            pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
+            GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
         time_t fstart = time(NULL);
@@ -179,13 +179,13 @@ void Run_MD_LCAO::opt_ions(void)
 		// charge extrapolation if istep>0.
 		CE.extrapolate_charge();
 
-		if(pot.extra_pot=="dm")//xiaohui modify 2015-02-01
+		if(GlobalC::pot.extra_pot=="dm")//xiaohui modify 2015-02-01
 		{
 			// done after grid technique.
 		}
 		else
 		{
-			pot.init_pot( istep, GlobalC::pw.strucFac );
+			GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
 		}
 
 
@@ -288,15 +288,15 @@ void Run_MD_LCAO::final_scf(void)
 
     UHM.set_lcao_matrices();
 
-    if(vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
+    if(GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
     {
-        Vdwd2 vdwd2(GlobalC::ucell,vdwd2_para);
+        Vdwd2 vdwd2(GlobalC::ucell,GlobalC::vdwd2_para);
         vdwd2.cal_energy();
         GlobalC::en.evdw = vdwd2.get_energy();
     }
-	else if(vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
+	else if(GlobalC::vdwd3_para.flag_vdwd3) //jiyy add 2019-05-18, update 2021-05-02
     {
-        Vdwd3 vdwd3(GlobalC::ucell,vdwd3_para);
+        Vdwd3 vdwd3(GlobalC::ucell,GlobalC::vdwd3_para);
         vdwd3.cal_energy();
         GlobalC::en.evdw = vdwd3.get_energy();
     }												  

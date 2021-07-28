@@ -26,10 +26,14 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 
 	double cost = 0.0; // must initialized.
 	double sint = cut0;
-	double phi;
+	double phi = 0.0;
 	
 	double vnorm = vec.norm();
-	if(vnorm < cut0) vnorm += cut0;
+
+	if(vnorm < cut0) 
+	{
+		vnorm += cut0;
+	}
 	
 	cost = vec.z / vnorm; 
 		
@@ -41,11 +45,17 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	sint = sqrt(1.0 - cost*cost);  
 
 	if(vec.x > cut0)
-	{ phi = std::atan( vec.y / vec.x );}
+	{ 
+		phi = std::atan( vec.y / vec.x );
+	}
 	else if( vec.x < -cut0 )
-	{ phi = std::atan( vec.y / vec.x ) + PI;}
+	{ 
+		phi = std::atan( vec.y / vec.x ) + PI;
+	}
 	else
-	{phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);}
+	{
+		phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
+	}
 
 	//===============================
 	// NAME : p(Legendre Polynomials)
@@ -53,9 +63,10 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	static double p[20][20];
 	assert(Lmax <= 20);
 
-	int m;
-	double x1;	// x2;
+	int m=0;
+	double x1=0.0;	// x2;
 	int lm = -1; // must initialized!
+
 	for (int l=0; l<Lmax; l++)
 	{
 		const double c = sqrt((2*l+1) / FOUR_PI);
@@ -111,9 +122,6 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}// end do
 
-//	for(int l=0; l<Lmax; l++) delete[] p[l];
-//	delete[] p;
-
 	timer::tick ("Ylm", "get_ylm_real");
 	return;
 }
@@ -136,36 +144,37 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}
 
-	//double x1, x2;
-
 	double cost = 0.0; // must initialized.
 	double sint = 0.0;
-	double phi;
+	double phi = 0.0;
 
 	double vnorm = vec.norm();
-//	cout << "\nvnorm = " << vnorm << endl;
 	
-	if(vnorm < cut0) vnorm += cut0;
+	if(vnorm < cut0) 
+	{
+		vnorm += cut0;
+	}
 	
 	cost = vec.z / vnorm; 
 		
-//	cout << "\nvec.z = " << vec.z << " cost = " << cost << endl;
-//	cout << "\nfabs(cost = " << fabs(cost) << "1-cut0 = " << 1.0-cut0 << endl;
 	if(fabs(cost) > 1.0-cut0) 
 	{
 		cost = sgn(cost) * (1.0 - cut0);
-//		cout << "\ncost = " << cost << endl;
 	}
 	sint = sqrt(1.0 - cost*cost);
 
-//	cout << "\ncost = " << cost << " sint = " << sint << endl;
-	
 	if(vec.x > cut0)
-	{ phi = std::atan( vec.y / vec.x );}
+	{ 
+		phi = std::atan( vec.y / vec.x );
+	}
 	else if( vec.x < -cut0 )
-	{ phi = std::atan( vec.y / vec.x ) + PI;}
+	{ 
+		phi = std::atan( vec.y / vec.x ) + PI;
+	}
 	else
-	{phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);}
+	{
+		phi = PI_HALF * ((vec.y >= 0.0) ? 1.0 : -1.0);
+	}
 
 	//===============================
 	// NAME : p(Legendre Polynomials)
@@ -174,7 +183,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 	static double dp[20][20];
 	assert(Lmax <= 20);
 
-	int m;
+	int m = 0;
 	int lm = -1; // must initialized!
 	for (int l=0; l<Lmax; l++)
 	{
@@ -202,7 +211,7 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 			{
 				p[m][l] = (cost * l3 * p[m][l1] -
 					      (l1 + m ) * p[m][l2]) / (l - m);
-			} // end do
+			}
 
 			p[l1][l] = cost * l3 * p[l1][l1];
 			
@@ -211,11 +220,10 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 			{
 				p[l][l] = -p[l][l];
 			}
-		} // end if
+		}
 
 		for(m=0; m <= l; m++)
 		{
-	//		cout << "\n l = " << l << " m = " << m << " cost = " << cost << " sint = " << sint << endl;
 			if( m == l )
 			{
 				dp[l][l] = l * cost * p[l][l] / sint;
@@ -224,8 +232,6 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 			{
 				dp[m][l] = (l * cost * p[m][l] - (l+m) * p[m][l-1]) / sint;
 			}
-
-	//		cout << "\ndp = " << dp[m][l] << endl;
 		}
 		
 		// Y_lm, m = 0
@@ -267,8 +273,6 @@ void Ylm::get_ylm_real( const int &Lmax, const Vector3<double> &vec, double ylmr
 		}
 	}// end do
 
-//	for(int l=0; l<Lmax; l++) delete[] p[l];
-//	delete[] p;
 	return;
 }
 

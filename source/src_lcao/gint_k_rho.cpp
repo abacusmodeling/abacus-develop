@@ -379,7 +379,7 @@ inline void cal_band_rho(
 		} // ia1
 		
 		// calculate rho
-		double *rhop = CHR.rho[is];
+		double *rhop = GlobalC::CHR.rho[is];
 		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
 			double r=ddot_(&block_index[size], psir_ylm[ib], &inc, psir_DM[ib], &inc);
@@ -723,7 +723,7 @@ void Gint_k::evaluate_pDMp(
 	{
 		for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 		{
-			CHR.rho[is][vindex[ib]] += tchg[is][ib];
+			GlobalC::CHR.rho[is][vindex[ib]] += tchg[is][ib];
 		}
 	}
 

@@ -12,7 +12,7 @@
 104_PW_FM_magnetic
 105_PW_FD_smearing
 105_PW_FX_smearing
-#105_PW_GA_smearing
+105_PW_GA_smearing
 105_PW_M2_smearing
 105_PW_MP_smearing
 105_PW_MV_smearing
@@ -22,7 +22,7 @@
 106_PW_PL_chargemixing
 106_PW_PU_chargemixing
 107_PW_OB_outputbands
-#107_PW_OD_outputdos
+107_PW_OD_outputdos
 108_PW_RE
 108_PW_RE_MB
 108_PW_RE_MG
@@ -38,9 +38,9 @@
 120_PW_KP_MD_NVTrestart
 127_PW_15_PK_AF
 133_PW_DJ_PK
-# 135_PW_15_PK
-# 140_PW_15_SO
-# 150_PW_15_CR_VDW3
+135_PW_15_PK
+140_PW_15_SO
+150_PW_15_CR_VDW3
 
 201_NO_KP_15_CF_CS_Si
 201_NO_KP_DJ_CF_CS_GaAs

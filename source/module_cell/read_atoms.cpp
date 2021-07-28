@@ -8,7 +8,7 @@
 #endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
-void UnitCell_pseudo::read_atom_species(ifstream &ifa)
+void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 {
 	TITLE("UnitCell_pseudo","read_atom_species");
 
@@ -21,19 +21,19 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 	// read in information of each type of atom
 	//==========================================
 	if( SCAN_BEGIN(ifa, "ATOMIC_SPECIES") )
-	{
-		OUT(GlobalV::ofs_running,"ntype",ntype);
+	{	
+		OUT(ofs_running,"ntype",ntype);
 		for (int i = 0;i < ntype;i++)
 		{
 			ifa >> atom_label[i] >> atom_mass[i];
 			
 			stringstream ss;
 			ss << "atom label for species " << i+1;
-			OUT(GlobalV::ofs_running,ss.str(),atom_label[i]);	
+			OUT(ofs_running,ss.str(),atom_label[i]);	
 			READ_VALUE(ifa, pseudo_fn[i]);
 			if(GlobalV::test_pseudo_cell==2) 
 			{
-				GlobalV::ofs_running << "\n" << setw(6) << atom_label[i] 
+				ofs_running << "\n" << setw(6) << atom_label[i] 
 						<< setw(12) << atom_mass[i] 
 						<< setw(18) << pseudo_fn[i];
 			}
@@ -115,8 +115,8 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 			WARNING_QUIT("read_atom_species","lat0<=0.0");
 		}
 		lat0_angstrom = lat0 * 0.529177 ;
-		OUT(GlobalV::ofs_running,"lattice constant (Bohr)",lat0);
-		OUT(GlobalV::ofs_running,"lattice constant (Angstrom)",lat0_angstrom);
+		OUT(ofs_running,"lattice constant (Bohr)",lat0);
+		OUT(ofs_running,"lattice constant (Angstrom)",lat0_angstrom);
 		this->tpiba  = TWO_PI / lat0;
 		this->tpiba2 = tpiba * tpiba;
 	}
@@ -333,7 +333,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.
-bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
+bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running, ofstream &ofs_warning)
 {
 	TITLE("UnitCell_pseudo","read_atom_positions");
 
@@ -359,14 +359,14 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			)
 		{
 			WARNING("read_atom_position","Cartesian or Direct?");
-			GlobalV::ofs_warning << " There are several options for you:" << endl;
-			GlobalV::ofs_warning << " Direct" << endl;
-			GlobalV::ofs_warning << " Cartesian_angstrom" << endl;
-			GlobalV::ofs_warning << " Cartesian_au" << endl;
-			GlobalV::ofs_warning << " Cartesian_angstrom_center_xy" << endl;
-			GlobalV::ofs_warning << " Cartesian_angstrom_center_xz" << endl;
-			GlobalV::ofs_warning << " Cartesian_angstrom_center_yz" << endl;
-			GlobalV::ofs_warning << " Cartesian_angstrom_center_xyz" << endl;
+			ofs_warning << " There are several options for you:" << endl;
+			ofs_warning << " Direct" << endl;
+			ofs_warning << " Cartesian_angstrom" << endl;
+			ofs_warning << " Cartesian_au" << endl;
+			ofs_warning << " Cartesian_angstrom_center_xy" << endl;
+			ofs_warning << " Cartesian_angstrom_center_xz" << endl;
+			ofs_warning << " Cartesian_angstrom_center_yz" << endl;
+			ofs_warning << " Cartesian_angstrom_center_xyz" << endl;
 			return 0; // means something wrong
 		}
 
@@ -382,7 +382,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 		assert(ntype>0);
 		for (int it = 0;it < ntype; it++)
 		{
-			GlobalV::ofs_running << "\n READING ATOM TYPE " << it+1 << endl;
+			ofs_running << "\n READING ATOM TYPE " << it+1 << endl;
 			
 			//=======================================
 			// (1) read in atom label
@@ -399,14 +399,14 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			}
 			if(!found)
 			{
-				GlobalV::ofs_warning << " Label read from ATOMIC_POSITIONS is " << this->atoms[it].label << endl; 
-				GlobalV::ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << endl;
+				ofs_warning << " Label read from ATOMIC_POSITIONS is " << this->atoms[it].label << endl; 
+				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << endl;
 				return 0;
 			}
 			READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
-			OUT(GlobalV::ofs_running, "atom label",atoms[it].label);
-
+			OUT(ofs_running, "atom label",atoms[it].label);
+			#ifndef __SYMMETRY
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
 			{
 				if(GlobalV::NONCOLIN)
@@ -425,27 +425,29 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					magnet.m_loc_[it].z = magnet.start_magnetization[it];
 				}
 
-				OUT(GlobalV::ofs_running, "noncollinear magnetization_x",magnet.m_loc_[it].x);
-				OUT(GlobalV::ofs_running, "noncollinear magnetization_y",magnet.m_loc_[it].y);
-				OUT(GlobalV::ofs_running, "noncollinear magnetization_z",magnet.m_loc_[it].z);
+				OUT(ofs_running, "noncollinear magnetization_x",magnet.m_loc_[it].x);
+				OUT(ofs_running, "noncollinear magnetization_y",magnet.m_loc_[it].y);
+				OUT(ofs_running, "noncollinear magnetization_z",magnet.m_loc_[it].z);
 
 				ZEROS(magnet.ux_ ,3);
 			}
 			else if(GlobalV::NSPIN==2)
 			{
 				magnet.m_loc_[it].x = magnet.start_magnetization[it];
-				OUT(GlobalV::ofs_running, "start magnetization",magnet.start_magnetization[it]);
+				OUT(ofs_running, "start magnetization",magnet.start_magnetization[it]);
 			}
 			else if(GlobalV::NSPIN==1)
 			{
-				OUT(GlobalV::ofs_running, "start magnetization","FALSE");
+				OUT(ofs_running, "start magnetization","FALSE");
 			}
+			#endif
 
 			//===========================================
 			// (2) read in numerical orbital information
 			// int atoms[it].nwl
 			// int* atoms[it].l_nchi;
 			//===========================================
+#ifndef __SYMMETRY
 #ifdef __LCAO
 			if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{    
@@ -486,7 +488,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						OUT(GlobalV::ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Porbital-->", word) == 0)
@@ -495,7 +497,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						OUT(GlobalV::ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Dorbital-->", word) == 0)
@@ -504,7 +506,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						OUT(GlobalV::ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Forbital-->", word) == 0)
@@ -513,7 +515,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						OUT(GlobalV::ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 					if (strcmp("Gorbital-->", word) == 0)
@@ -522,7 +524,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 						this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 						stringstream ss;
 						ss << "L=" << L << ", number of zeta";
-						OUT(GlobalV::ofs_running,ss.str(),atoms[it].l_nchi[L]);
+						OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 						L++;
 					}
 				}
@@ -550,9 +552,10 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					this->atoms[it].nw += (2*L + 1) * this->atoms[it].l_nchi[L];
 					stringstream ss;
 					ss << "L=" << L << ", number of zeta";
-					OUT(GlobalV::ofs_running,ss.str(),atoms[it].l_nchi[L]);
+					OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 				}
 			} // end basis type
+#endif
 
 
 			//OUT(GlobalV::ofs_running,"Total number of local orbitals",atoms[it].nw);
@@ -563,7 +566,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			READ_VALUE(ifpos, na);
 			this->atoms[it].na = na;
 
-			OUT(GlobalV::ofs_running,"number of atom for this type",na);
+			OUT(ofs_running,"number of atom for this type",na);
 
 			this->nat += na;
 			if (na <= 0) 
@@ -702,8 +705,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 	}// end scan_begin
 
 
-	GlobalV::ofs_running << endl;
-	OUT(GlobalV::ofs_running,"TOTAL ATOM NUMBER",nat);
+	ofs_running << endl;
+	OUT(ofs_running,"TOTAL ATOM NUMBER",nat);
 
 	// mohan add 2010-06-30	
 	//xiaohui modify 2015-03-15, cancel outputfile "STRU_READIN.xyz"

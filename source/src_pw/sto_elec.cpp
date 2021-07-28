@@ -51,7 +51,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	Symmetry_rho srho;
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
-		srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
+		srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
 	}
 
 	// conv_elec is a member of Threshold_Elec
@@ -70,17 +70,17 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		<< "--------------------------------\n";
 		if(iter==1) 
 		{
-			CHR.new_e_iteration = true;
+			GlobalC::CHR.new_e_iteration = true;
         }
 		else 
 		{
-			CHR.new_e_iteration = false;
+			GlobalC::CHR.new_e_iteration = false;
 		}
 		if(GlobalV::FINAL_SCF && iter==1)
         {
-            CHR.irstep=0;
-            CHR.idstep=0;
-            CHR.totstep=0;
+            GlobalC::CHR.irstep=0;
+            GlobalC::CHR.idstep=0;
+            GlobalC::CHR.totstep=0;
         }
 		
 		// record the start time.
@@ -92,15 +92,15 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         //this->update_ethr(iter);
         if(GlobalV::FINAL_SCF && iter==1) 
 		{
-			GlobalV::ETHR = 1.0e-4/CHR.nelec; //smaller GlobalV::ETHR than KS-DFT
+			GlobalV::ETHR = 1.0e-4/GlobalC::CHR.nelec; //smaller GlobalV::ETHR than KS-DFT
 		}
         else 
 		{
 			if (iter == 2)
         	{
-            	GlobalV::ETHR = 1.0e-4/CHR.nelec;
+            	GlobalV::ETHR = 1.0e-4/GlobalC::CHR.nelec;
         	}
-			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.1*dr2/ std::max(1.0, CHR.nelec));
+			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.1*dr2/ std::max(1.0, GlobalC::CHR.nelec));
         }
 
         
@@ -136,7 +136,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// prepared fox mixing.
 		if(GlobalV::MY_POOL == 0)
 		{
-        	CHR.save_rho_before_sum_band();
+        	GlobalC::CHR.save_rho_before_sum_band();
 		}
 
 		//prepare wavefunction&eband for other pools
@@ -176,18 +176,18 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			if(GlobalV::MY_POOL == 0)
 			{
-				CHR.sum_band();
+				GlobalC::CHR.sum_band();
 			}
 			else
 			{
 				for(int is=0; is<GlobalV::NSPIN; is++)
 				{
-					ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
+					ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
 				}
 			}
 			//for(int is = 0; is < GlobalV::NSPIN; ++is)
 			//{
-			//	MPI_Bcast(CHR.rho[is], GlobalC::pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
+			//	MPI_Bcast(GlobalC::CHR.rho[is], GlobalC::pw.nrxx, MPI_DOUBLE , 0,PARAPW_WORLD);
 			//}
 #ifdef __MPI
 			MPI_Bcast(&GlobalC::en.eband,1, MPI_DOUBLE, 0,PARAPW_WORLD);
@@ -197,7 +197,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			for(int is=0; is<GlobalV::NSPIN; is++)
 			{
-				ZEROS(CHR.rho[is], GlobalC::pw.nrxx);
+				ZEROS(GlobalC::CHR.rho[is], GlobalC::pw.nrxx);
 			}
 		}
 
@@ -214,7 +214,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		Symmetry_rho srho;
 		for(int is=0; is<GlobalV::NSPIN; is++)
 		{
-			srho.begin(is, CHR,GlobalC::pw, Pgrid, symm);
+			srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
 		}
 
 
@@ -231,7 +231,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			// if 'dr2 < GlobalV::ETHR * nelec' happen,
 			// in other word, 'dr2 < diago_error'
 			// we update GlobalV::ETHR.
-			diago_error = GlobalV::ETHR*std::max(1.0, CHR.nelec);
+			diago_error = GlobalV::ETHR*std::max(1.0, GlobalC::CHR.nelec);
 		}
 
 		// if converged is achieved, or the self-consistent error(dr2)
@@ -243,13 +243,13 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		// (the new input density) while rho is unchanged.
 		if(GlobalV::MY_POOL == 0)
 		{
-			CHR.mix_rho(dr2,diago_error,GlobalV::DRHO2,iter,conv_elec);
+			GlobalC::CHR.mix_rho(dr2,diago_error,GlobalV::DRHO2,iter,conv_elec);
 		}
 
 #ifdef __MPI
 		MPI_Bcast(&dr2, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
 		MPI_Bcast(&conv_elec, 1, MPI_DOUBLE , 0, PARAPW_WORLD);
-		MPI_Bcast(CHR.rho[0], GlobalC::pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
+		MPI_Bcast(GlobalC::CHR.rho[0], GlobalC::pw.nrxx, MPI_DOUBLE, 0, PARAPW_WORLD);
 #endif
 
 		//			if(GlobalV::MY_RANK==0)
@@ -268,7 +268,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 				// update GlobalV::ETHR.
 				GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << endl;
-				GlobalV::ETHR = dr2 / CHR.nelec;
+				GlobalV::ETHR = dr2 / GlobalC::CHR.nelec;
 				GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << endl;
 				//                  goto first_iter_again;
 			}
@@ -277,7 +277,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         if (!conv_elec)
         {
 			// not converged yet, calculate new potential from mixed charge density
-            pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
+            GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 
 			// because <T+V(ionic)> = <eband+deband> are calculated after sum
 			// band, using output charge density.
@@ -292,15 +292,15 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
 				for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 				{
-					pot.vnew(is,ir) = pot.vr(is,ir);
+					GlobalC::pot.vnew(is,ir) = GlobalC::pot.vr(is,ir);
 				}
 			}
 
 			// the new potential V(PL)+V(H)+V(xc)
-            pot.vr = pot.v_of_rho(CHR.rho, CHR.rho_core);
+            GlobalC::pot.vr = GlobalC::pot.v_of_rho(GlobalC::CHR.rho, GlobalC::CHR.rho_core);
 
             //( vnew used later for scf correction to the forces )
-	    	pot.vnew = pot.vr - pot.vnew;
+	    	GlobalC::pot.vnew = GlobalC::pot.vr - GlobalC::pot.vnew;
             GlobalC::en.descf = 0.0;
 
         }
@@ -312,12 +312,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 		{
 			stringstream ssc;
 			ssc << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_CHG";
-			CHR.write_rho(CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
+			GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, iter, ssc.str(), 3);//mohan add 2007-10-17
 		}
         
 		
 
-			pot.set_vr_eff();
+			GlobalC::pot.set_vr_eff();
         
         //print_eigenvalue(GlobalV::ofs_running);
 		GlobalC::en.calculate_etot();
@@ -333,7 +333,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 			{
         		stringstream ssc;
         		ssc << GlobalV::global_out_dir << "SPIN" << is + 1 << "_CHG";
-        		CHR.write_rho(CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
+        		GlobalC::CHR.write_rho(GlobalC::CHR.rho_save[is], is, 0, ssc.str() );//mohan add 2007-10-17
 			}
               	 
 			if(conv_elec)
@@ -353,7 +353,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
             return;
         }
 		
-        //if ( imix >= 0 )  CHR.rho = CHR.rho_save;
+        //if ( imix >= 0 )  GlobalC::CHR.rho = GlobalC::CHR.rho_save;
         //GlobalV::ofs_running << "\n start next iterate for idum ";
 		
     } 

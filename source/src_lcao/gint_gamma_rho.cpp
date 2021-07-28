@@ -266,7 +266,7 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			CHR.rho[is][ir] += rho.ptr_2D[is][ir];
+			GlobalC::CHR.rho[is][ir] += rho.ptr_2D[is][ir];
 		}
 	}
 
@@ -275,7 +275,7 @@ double sum_up_rho(const Gint_Tools::Array_Pool<double> &rho)
 	{
 		for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			sum += CHR.rho[is][ir];
+			sum += GlobalC::CHR.rho[is][ir];
 		}
 	}
     if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running, "sum", sum);

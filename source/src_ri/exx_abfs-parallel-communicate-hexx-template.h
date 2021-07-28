@@ -177,7 +177,7 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing(
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing");
 
 	Tmatrix H_pulay;
-	if( 0==CHR.totstep )
+	if( 0==GlobalC::CHR.totstep )
 	{
 		H_seq.clear();
 		H_pulay = H_new;
@@ -185,8 +185,8 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing(
 	else
 	{
 		H_seq.push_back( 
-			(1-CHR.mixing_beta) * H_pulay_old + CHR.mixing_beta * H_new );
-		if( H_seq.size() > CHR.dstep+1 )
+			(1-GlobalC::CHR.mixing_beta) * H_pulay_old + GlobalC::CHR.mixing_beta * H_new );
+		if( H_seq.size() > GlobalC::CHR.dstep+1 )
 			H_seq.pop_front();
 		
 		if( 1==H_seq.size() )
@@ -199,13 +199,13 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing(
 			auto index = [&](const int i) -> int
 			{
 				const int alpha_size = H_seq.size()-1;
-				const int alpha_begin = CHR.idstep - alpha_size;
-				return pos_mod( alpha_begin+i, CHR.dstep );
+				const int alpha_begin = GlobalC::CHR.idstep - alpha_size;
+				return pos_mod( alpha_begin+i, GlobalC::CHR.dstep );
 			};
-			H_pulay = (1+CHR.alpha[index(H_seq.size()-2)]) * H_seq[H_seq.size()-1];
+			H_pulay = (1+GlobalC::CHR.alpha[index(H_seq.size()-2)]) * H_seq[H_seq.size()-1];
 			for( int i=1; i<=H_seq.size()-2; ++i )
-				H_pulay += ( CHR.alpha[index(i-1)] - CHR.alpha[index(i)] ) * H_seq[i];
-			H_pulay -= CHR.alpha[index(0)] * H_seq[0];
+				H_pulay += ( GlobalC::CHR.alpha[index(i-1)] - GlobalC::CHR.alpha[index(i)] ) * H_seq[i];
+			H_pulay -= GlobalC::CHR.alpha[index(0)] * H_seq[0];
 		}
 	}
 	return H_pulay;

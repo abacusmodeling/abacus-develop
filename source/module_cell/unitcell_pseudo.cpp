@@ -77,12 +77,12 @@ void UnitCell_pseudo::setup_cell(
 			//========================
 			// call read_atom_species
 			//========================
-			this->read_atom_species(ifa);
+			this->read_atom_species(ifa, GlobalV::ofs_running);
 
 			//==========================
 			// call read_atom_positions
 			//==========================
-			ok2 = this->read_atom_positions(ifa);
+			ok2 = this->read_atom_positions(ifa, GlobalV::ofs_running, GlobalV::ofs_warning);
 
 			if(ok2)
 			{
@@ -277,7 +277,7 @@ void UnitCell_pseudo::setup_cell(
 	// I warn the user again for each type.
 	//for(int it=0; it<ntype; it++)
 	//{
-	//	xcf.which_dft(atoms[it].dft);
+	//	GlobalC::xcf.which_dft(atoms[it].dft);
 	//}
 
 	// setup the total number of PAOs
@@ -300,7 +300,13 @@ void UnitCell_pseudo::setup_cell(
 	return;
 }
 
-void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstream &log)
+void UnitCell_pseudo::setup_cell_classic(
+	const string &fn, 
+	output &outp, 
+	ofstream &ofs,
+	ofstream &ofs_running,
+	ofstream &ofs_warning)
+
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 
@@ -322,37 +328,36 @@ void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstrea
 		ifstream ifa(fn.c_str(), ios::in);
 		if (!ifa)
 		{
-			GlobalV::ofs_warning << fn;
+			ofs_warning << fn;
 			ok = false;
 		}
 
 		if(ok)
 		{
-			GlobalV::ofs_running << "\n\n\n\n";
-			GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-			GlobalV::ofs_running << " |                                                                    |" << endl;
-			GlobalV::ofs_running << " | Reading atom information in unitcell for classic MD:               |" << endl;
-			GlobalV::ofs_running << " | From the input file and the structure file we know the number of   |" << endl;
-			GlobalV::ofs_running << " | different elments in this unitcell, then we list the detail        |" << endl;
-			GlobalV::ofs_running << " | information for each element. The total atom number is counted.    |" << endl;
-			GlobalV::ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << endl;
-			GlobalV::ofs_running << " | Cartesian and Direct coordinates for each atom.                    |" << endl;
-			GlobalV::ofs_running << " | The volume and the lattice vectors in real space is also shown.    |" << endl;
-			GlobalV::ofs_running << " |                                                                    |" << endl;
-			GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
-			GlobalV::ofs_running << "\n\n\n\n";
+			ofs_running << "\n\n\n\n";
+			ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
+			ofs_running << " |                                                                    |" << endl;
+			ofs_running << " | Reading atom information in unitcell for classic MD:               |" << endl;
+			ofs_running << " | From the input file and the structure file we know the number of   |" << endl;
+			ofs_running << " | different elments in this unitcell, then we list the detail        |" << endl;
+			ofs_running << " | information for each element. The total atom number is counted.    |" << endl;
+			ofs_running << " | We calculate the nearest atom distance for each atom and show the  |" << endl;
+			ofs_running << " | Cartesian and Direct coordinates for each atom.                    |" << endl;
+			ofs_running << " | The volume and the lattice vectors in real space is also shown.    |" << endl;
+			ofs_running << " |                                                                    |" << endl;
+			ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+			ofs_running << "\n\n\n\n";
 
-			GlobalV::ofs_running << " READING UNITCELL INFORMATION" << endl;
+			ofs_running << " READING UNITCELL INFORMATION" << endl;
 			//========================
 			// call read_atom_species
 			//========================
-			this->read_atom_species(ifa);
-
+			this->read_atom_species(ifa, ofs_running);
 			//==========================
 			// call read_atom_positions
 			//==========================
-			ok2 = this->read_atom_positions(ifa);
-
+			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
+			cout << "read_atom_positions done." << endl;
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)
@@ -390,13 +395,13 @@ void UnitCell_pseudo::setup_cell_classic(const string &fn, output &outp, ofstrea
 	}
 	else
 	{
-		GlobalV::ofs_running << endl;
-		OUT(GlobalV::ofs_running,"Volume (Bohr^3)", this->omega);
-		OUT(GlobalV::ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
+		ofs_running << endl;
+		OUT(ofs_running,"Volume (Bohr^3)", this->omega);
+		OUT(ofs_running,"Volume (A^3)", this->omega * pow(BOHR_TO_A, 3));
 	}
 
-	GlobalV::ofs_running << endl;
-	outp.printM3(GlobalV::ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
+	ofs_running << endl;
+	outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
 
 }
 

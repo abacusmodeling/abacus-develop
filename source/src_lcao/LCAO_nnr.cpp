@@ -1,7 +1,6 @@
 #include "LCAO_nnr.h"
 #include "../src_pw/global.h"
 #include "record_adj.h" //mohan add 2012-07-06
-#include "dftu.h"       //quxin add 2020-10-29
 
 //----------------------------
 // define a global class obj.
@@ -438,7 +437,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							find_R2[iat][count] = this->cal_RindexAtom(b1, b2, b3, iat2);
 
 
-							if(iat==50 && iat2==96)
+							/*if(iat==50 && iat2==96)
 							{
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
@@ -449,7 +448,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
 								<< " rcut=" << rcut <<endl;
-							}
+							}*/
 
 							// find_R2st
 							// note: the first must be zero.
@@ -563,12 +562,6 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 {
 	TITLE("LCAO_nnr","folding_fixedH");
 	timer::tick("LCAO_nnr","folding_fixedH");
-
-	//Quxin added for DFT+U calculation
- 	if(INPUT.dft_plus_u) 
-	{
-		ZEROS( VECTOR_TO_PTR(dftu.Sm_k.at(ik)), ParaO.nloc);
-	}
 
 	int iat = 0;
 	int index = 0;
@@ -695,20 +688,11 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 							{
 								LM.Sloc2[iic] += LM.SlocR[index] * kphase;
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR[index] * kphase;
-
-								//quxin added for DFT+U calculation
-							 	if(INPUT.dft_plus_u) dftu.Sm_k.at(ik).at(iic) += LM.SlocR[index] * kphase;
 							}
 							else
 							{
 								LM.Sloc2[iic] += LM.SlocR_soc[index] * kphase;
 								LM.Hloc_fixed2[iic] += LM.Hloc_fixedR_soc[index] * kphase;
-
-								//quxin added for DFT+U calculation
-							 	if(INPUT.dft_plus_u) 
-								{
-									dftu.Sm_k.at(ik).at(iic) += LM.SlocR_soc[index] * kphase;
-								}
 							}
 							++index;
 

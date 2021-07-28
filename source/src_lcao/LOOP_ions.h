@@ -28,7 +28,7 @@ class LOOP_ions
 	
 	// PLEASE move 'force_stress()'  function to other places, such as FORCE_STRESS.cpp or
 	// you might think to create a new file, it is because 'force_stress' do not
-	// belong to 'LOOP_ions', 'pot.init_pot' also do not belong to force_stress()
+	// belong to 'LOOP_ions', 'GlobalC::pot.init_pot' also do not belong to force_stress()
 	// the renew of structure factors, etc. should be ran in other places
 	// the 'IMM' and 'LCM' objects should be passed to force_stress() via parameters list
 	// mohan note 2021-03-23
