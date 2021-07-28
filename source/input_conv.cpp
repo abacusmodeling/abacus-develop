@@ -206,47 +206,47 @@ void Input_Conv::Convert(void)
 	{
 		if(INPUT.spectral_type == "eels")
 		{
-			chi0_hilbert.epsilon = true;
+			GlobalC::chi0_hilbert.epsilon = true;
 		}
 		else if(INPUT.spectral_type == "None")
 		{
-			chi0_hilbert.epsilon = false;
+			GlobalC::chi0_hilbert.epsilon = false;
 		}
-		//chi0_hilbert.epsilon = INPUT.epsilon;
-		chi0_hilbert.kernel_type = INPUT.kernel_type;
-		chi0_hilbert.system = INPUT.system_type;
-		chi0_hilbert.eta = INPUT.eta;
-		chi0_hilbert.domega = INPUT.domega;
-		chi0_hilbert.nomega = INPUT.nomega;
-		chi0_hilbert.dim = INPUT.ecut_chi; 
-		//chi0_hilbert.oband = INPUT.oband;
+		//GlobalC::chi0_hilbert.epsilon = INPUT.epsilon;
+		GlobalC::chi0_hilbert.kernel_type = INPUT.kernel_type;
+		GlobalC::chi0_hilbert.system = INPUT.system_type;
+		GlobalC::chi0_hilbert.eta = INPUT.eta;
+		GlobalC::chi0_hilbert.domega = INPUT.domega;
+		GlobalC::chi0_hilbert.nomega = INPUT.nomega;
+		GlobalC::chi0_hilbert.dim = INPUT.ecut_chi; 
+		//GlobalC::chi0_hilbert.oband = INPUT.oband;
 
-		chi0_hilbert.q_start[0] = INPUT.q_start[0];  
-		chi0_hilbert.q_start[1] = INPUT.q_start[1]; 
-		chi0_hilbert.q_start[2] = INPUT.q_start[2];
+		GlobalC::chi0_hilbert.q_start[0] = INPUT.q_start[0];  
+		GlobalC::chi0_hilbert.q_start[1] = INPUT.q_start[1]; 
+		GlobalC::chi0_hilbert.q_start[2] = INPUT.q_start[2];
 
-		chi0_hilbert.direct[0] = INPUT.q_direct[0]; 
-		chi0_hilbert.direct[1] = INPUT.q_direct[1]; 
-		chi0_hilbert.direct[2] = INPUT.q_direct[2];
+		GlobalC::chi0_hilbert.direct[0] = INPUT.q_direct[0]; 
+		GlobalC::chi0_hilbert.direct[1] = INPUT.q_direct[1]; 
+		GlobalC::chi0_hilbert.direct[2] = INPUT.q_direct[2];
 
-		//chi0_hilbert.start_q = INPUT.start_q;
-		//chi0_hilbert.interval_q = INPUT.interval_q;
-		chi0_hilbert.nq = INPUT.nq;
-		chi0_hilbert.out_epsilon = INPUT.out_epsilon;
-		chi0_hilbert.out_chi = INPUT.out_chi;
-		chi0_hilbert.out_chi0 = INPUT.out_chi0;
-		chi0_hilbert.fermi_level = INPUT.fermi_level;
-		chi0_hilbert.coulomb_cutoff = INPUT.coulomb_cutoff;
-		chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
+		//GlobalC::chi0_hilbert.start_q = INPUT.start_q;
+		//GlobalC::chi0_hilbert.interval_q = INPUT.interval_q;
+		GlobalC::chi0_hilbert.nq = INPUT.nq;
+		GlobalC::chi0_hilbert.out_epsilon = INPUT.out_epsilon;
+		GlobalC::chi0_hilbert.out_chi = INPUT.out_chi;
+		GlobalC::chi0_hilbert.out_chi0 = INPUT.out_chi0;
+		GlobalC::chi0_hilbert.fermi_level = INPUT.fermi_level;
+		GlobalC::chi0_hilbert.coulomb_cutoff = INPUT.coulomb_cutoff;
+		GlobalC::chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
 		for(int i=0; i<100; i++)
 		{
-			chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; 
-			chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; 
-			chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
+			GlobalC::chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; 
+			GlobalC::chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; 
+			GlobalC::chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
 		}
-		chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; 
-		chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
-		chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
+		GlobalC::chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; 
+		GlobalC::chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
+		GlobalC::chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
 	}
 #endif
 	

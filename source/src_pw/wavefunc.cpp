@@ -380,9 +380,9 @@ void wavefunc::wfcinit_k(void)
 	//  calculte the overlap <i,0 | e^{i(q+G)r} | j,R>
 	//---------------------------------------------------
 #ifdef __LCAO
-	if((!chi0_hilbert.epsilon) && chi0_hilbert.kmesh_interpolation )    // pengfei  2016-11-23
+	if((!GlobalC::chi0_hilbert.epsilon) && GlobalC::chi0_hilbert.kmesh_interpolation )    // pengfei  2016-11-23
 	{
-		chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(GlobalC::pw.gcars))  are the same
+		GlobalC::chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(GlobalC::pw.gcars))  are the same
 		
 		// iw1->i, iw2->j, R store the positions of the neighbor unitcells that |i,0> and |j,R> have overlaps
 		R = new Vector3<int>** [GlobalV::NLOCAL];
@@ -391,7 +391,7 @@ void wavefunc::wfcinit_k(void)
 			R[iw1] = new Vector3<int>* [GlobalV::NLOCAL];
 			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
-				R[iw1][iw2] = new Vector3<int>[chi0_hilbert.lcao_box[0]*chi0_hilbert.lcao_box[1]*chi0_hilbert.lcao_box[2]];
+				R[iw1][iw2] = new Vector3<int>[GlobalC::chi0_hilbert.lcao_box[0]*GlobalC::chi0_hilbert.lcao_box[1]*GlobalC::chi0_hilbert.lcao_box[2]];
 			}
 		}
 		
@@ -402,7 +402,7 @@ void wavefunc::wfcinit_k(void)
 		}
 		
 		int NR; // The Max number of the overlaps for each iw1,iw2; 
-		NR = get_R(chi0_hilbert.lcao_box[0],chi0_hilbert.lcao_box[1],chi0_hilbert.lcao_box[2]); 
+		NR = get_R(GlobalC::chi0_hilbert.lcao_box[0],GlobalC::chi0_hilbert.lcao_box[1],GlobalC::chi0_hilbert.lcao_box[2]); 
 		
 		// store the overlap relationship to "nearest.dat"
 		stringstream ss;
@@ -423,7 +423,7 @@ void wavefunc::wfcinit_k(void)
 		}
 		ofs.close();
 		
-		int NG = chi0_hilbert.dim;  // chi0's dimension
+		int NG = GlobalC::chi0_hilbert.dim;  // chi0's dimension
 		
 		complex<double> ***wanf2_q;    // <j,0 | k+G+q>
 		
@@ -479,7 +479,7 @@ void wavefunc::wfcinit_k(void)
 		
 		double arg; 
 		complex<double> phase;
-		for(int iq=0; iq<chi0_hilbert.nq; iq++)
+		for(int iq=0; iq<GlobalC::chi0_hilbert.nq; iq++)
 		{
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
@@ -494,7 +494,7 @@ void wavefunc::wfcinit_k(void)
 		}
 		
 		// main
-		for(int iq=0; iq<chi0_hilbert.nq; iq++)    // loop over iq 
+		for(int iq=0; iq<GlobalC::chi0_hilbert.nq; iq++)    // loop over iq 
 		{
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
@@ -509,9 +509,9 @@ void wavefunc::wfcinit_k(void)
 			
 			for(int g=0; g<NG; g++)    // loop over ig
 			{
-				qg.x = chi0_hilbert.qcar[iq][0] + chi0_hilbert.all_gcar[g].x;   
-				qg.y = chi0_hilbert.qcar[iq][1] + chi0_hilbert.all_gcar[g].y; 
-				qg.z = chi0_hilbert.qcar[iq][2] + chi0_hilbert.all_gcar[g].z;
+				qg.x = GlobalC::chi0_hilbert.qcar[iq][0] + GlobalC::chi0_hilbert.all_gcar[g].x;   
+				qg.y = GlobalC::chi0_hilbert.qcar[iq][1] + GlobalC::chi0_hilbert.all_gcar[g].y; 
+				qg.z = GlobalC::chi0_hilbert.qcar[iq][2] + GlobalC::chi0_hilbert.all_gcar[g].z;
 				cout <<"qg = "<<qg.x<<" "<<qg.y<<" "<<qg.z<<endl;
 				for(int ik=0; ik<GlobalC::kv.nks; ik++)
 				{

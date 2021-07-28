@@ -20,7 +20,10 @@
 
 using namespace std;
 
+namespace GlobalC
+{
 Chi0_hilbert chi0_hilbert;
+}
 
 Chi0_hilbert::Chi0_hilbert()
          :init_finish(false)

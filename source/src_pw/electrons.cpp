@@ -370,14 +370,14 @@ void Electrons::self_consistent(const int &istep)
             // 0 means don't need to consider iter,
             //--------------------------------------
 #ifdef __LCAO
-            if(chi0_hilbert.epsilon)                 // pengfei 2016-11-23
+            if(GlobalC::chi0_hilbert.epsilon)                 // pengfei 2016-11-23
             {
-                cout <<"eta = "<<chi0_hilbert.eta<<endl;
-                cout <<"domega = "<<chi0_hilbert.domega<<endl;
-                cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
-                cout <<"dim = "<<chi0_hilbert.dim<<endl;
-                //cout <<"oband = "<<chi0_hilbert.oband<<endl;
-                chi0_hilbert.Chi();
+                cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<endl;
+                cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<endl;
+                cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<endl;
+                cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<endl;
+                //cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<endl;
+                GlobalC::chi0_hilbert.Chi();
             }
 #endif
 
