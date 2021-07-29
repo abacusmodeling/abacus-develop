@@ -62,12 +62,12 @@ void unkOverlap_lcao::init()
 	int Lmax_used, Lmax;
 
 	MOT.allocate(
-		ORB.get_ntype(),// number of atom types
-		ORB.get_lmax(),// max L used to calculate overlap
-		ORB.get_kmesh(), // kpoints, for integration in k space
-		ORB.get_Rmax(),// max value of radial table
-		ORB.get_dR(),// delta R, for making radial table
-		ORB.get_dk()); // delta k, for integration in k space
+		GlobalC::ORB.get_ntype(),// number of atom types
+		GlobalC::ORB.get_lmax(),// max L used to calculate overlap
+		GlobalC::ORB.get_kmesh(), // kpoints, for integration in k space
+		GlobalC::ORB.get_Rmax(),// max value of radial table
+		GlobalC::ORB.get_dR(),// delta R, for making radial table
+		GlobalC::ORB.get_dk()); // delta k, for integration in k space
 		
 	MOT.init_Table_Spherical_Bessel (2, 3, Lmax_used, Lmax, Exx_Abfs::Lmax);
 
@@ -78,18 +78,18 @@ void unkOverlap_lcao::init()
 
 	const int T = 0;  //任意选择的元素类型
 	orb_r.set_orbital_info(
-	ORB.Phi[T].PhiLN(0,0).getLabel(),  //atom label
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getLabel(),  //atom label
 	T,    //atom type
 	1,    //angular momentum L
 	1,    //number of orbitals of this L , just N
-	ORB.Phi[T].PhiLN(0,0).getNr(),  //number of radial mesh
-	ORB.Phi[T].PhiLN(0,0).getRab(), //the mesh interval in radial mesh 
-	ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial mesh value(a.u.)
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getNr(),  //number of radial mesh
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getRab(), //the mesh interval in radial mesh 
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial mesh value(a.u.)
 	Numerical_Orbital_Lm::Psi_Type::Psi,
-	ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial wave function
-	ORB.Phi[T].PhiLN(0,0).getNk(),
-	ORB.Phi[T].PhiLN(0,0).getDk(),
-	ORB.Phi[T].PhiLN(0,0).getDruniform(),
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getRadial(),  // radial wave function
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getNk(),
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getDk(),
+	GlobalC::ORB.Phi[T].PhiLN(0,0).getDruniform(),
 	false,
 	true, GlobalV::FORCE);
 	
@@ -169,18 +169,18 @@ void unkOverlap_lcao::init()
 	{
 		for (int TB = 0;  TB < GlobalC::ucell.ntype; TB++)
 		{
-			for (int LA=0; LA <= ORB.Phi[TA].getLmax() ; LA++)
+			for (int LA=0; LA <= GlobalC::ORB.Phi[TA].getLmax() ; LA++)
 			{
-				for (int NA = 0; NA < ORB.Phi[TA].getNchi(LA); ++NA)
+				for (int NA = 0; NA < GlobalC::ORB.Phi[TA].getNchi(LA); ++NA)
 				{
-					for (int LB = 0; LB <= ORB.Phi[TB].getLmax(); ++LB)
+					for (int LB = 0; LB <= GlobalC::ORB.Phi[TB].getLmax(); ++LB)
 					{
-						for (int NB = 0; NB < ORB.Phi[TB].getNchi(LB); ++NB)
+						for (int NB = 0; NB < GlobalC::ORB.Phi[TB].getNchi(LB); ++NB)
 						{
 							center2_orb11[TA][TB][LA][NA][LB].insert( 
 								make_pair(NB, Center2_Orb::Orb11(
-									ORB.Phi[TA].PhiLN(LA,NA),								
-									ORB.Phi[TB].PhiLN(LB,NB),
+									GlobalC::ORB.Phi[TA].PhiLN(LA,NA),								
+									GlobalC::ORB.Phi[TB].PhiLN(LB,NB),
 									MOT, MGT)));
 						}
 					}
@@ -193,19 +193,19 @@ void unkOverlap_lcao::init()
 	{
 		for (int TB = 0;  TB < GlobalC::ucell.ntype; TB++)
 		{
-			for (int LA=0; LA <= ORB.Phi[TA].getLmax() ; LA++)
+			for (int LA=0; LA <= GlobalC::ORB.Phi[TA].getLmax() ; LA++)
 			{
-				for (int NA = 0; NA < ORB.Phi[TA].getNchi(LA); ++NA)
+				for (int NA = 0; NA < GlobalC::ORB.Phi[TA].getNchi(LA); ++NA)
 				{
-					for (int LB = 0; LB <= ORB.Phi[TB].getLmax(); ++LB)
+					for (int LB = 0; LB <= GlobalC::ORB.Phi[TB].getLmax(); ++LB)
 					{
-						for (int NB = 0; NB < ORB.Phi[TB].getNchi(LB); ++NB)
+						for (int NB = 0; NB < GlobalC::ORB.Phi[TB].getNchi(LB); ++NB)
 						{
 							center2_orb21_r[TA][TB][LA][NA][LB].insert( 
 								make_pair(NB, Center2_Orb::Orb21(
-									ORB.Phi[TA].PhiLN(LA,NA),	
+									GlobalC::ORB.Phi[TA].PhiLN(LA,NA),	
 									orb_r,									
-									ORB.Phi[TB].PhiLN(LB,NB),
+									GlobalC::ORB.Phi[TB].PhiLN(LB,NB),
 									MOT, MGT)));
 						}
 					}
@@ -405,7 +405,7 @@ void unkOverlap_lcao::cal_R_number()
 				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
-				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 				if(distance < rcut - 1.0e-15)
 				{
 					// R_car 单位是 GlobalC::ucell.lat0
@@ -570,7 +570,7 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(complex<double> **ctot, complex<dou
 				// save them in the matrix 'c'.
 				for (int iw=0; iw<GlobalV::NLOCAL; iw++)
 				{
-					const int mu_local = GridT.trace_lo[iw];
+					const int mu_local = GlobalC::GridT.trace_lo[iw];
 					if (mu_local >= 0)
 					{
 						for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -627,30 +627,30 @@ void unkOverlap_lcao::get_lcao_wfc_global_ik(complex<double> **ctot, complex<dou
 		{
 			int tag;
 
-			// send GridT.lgd
+			// send GlobalC::GridT.lgd
 			tag = GlobalV::DRANK * 3;
-			MPI_Send(&GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
+			MPI_Send(&GlobalC::GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
-			if(GridT.lgd != 0)
+			if(GlobalC::GridT.lgd != 0)
 			{
 				// send trace_lo
 				tag = GlobalV::DRANK * 3 + 1;
-				MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+				MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
 				// send cc
-				complex<double>* csend = new complex<double>[GlobalV::NBANDS*GridT.lgd];
-				ZEROS(csend, GlobalV::NBANDS*GridT.lgd);
+				complex<double>* csend = new complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
+				ZEROS(csend, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					for (int mu=0; mu<GridT.lgd; mu++)
+					for (int mu=0; mu<GlobalC::GridT.lgd; mu++)
 					{
 						csend[mu*GlobalV::NBANDS+ib] = cc[ib][mu];
 					}
 				}
 			
 				tag = GlobalV::DRANK * 3 + 2;
-				MPI_Send(csend, GlobalV::NBANDS*GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD);
+				MPI_Send(csend, GlobalV::NBANDS*GlobalC::GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD);
 
 			
 

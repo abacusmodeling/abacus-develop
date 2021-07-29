@@ -19,7 +19,10 @@
 
 using namespace std;
 
+namespace GlobalC
+{
 Chi0_standard chi0_standard;
+}
 
 Chi0_standard:: Chi0_standard()
                 :init_finish(false)

@@ -596,7 +596,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
                 for (int iw=0; iw<GlobalV::NLOCAL; iw++)
                 {
 					// mohan update 2012-01-12
-//                  const int mu_local = GridT.trace_lo[iw]; 
+//                  const int mu_local = GlobalC::GridT.trace_lo[iw]; 
                     const int mu_local = GlobalC::SGO.trace_lo_tot[iw];
 
                     if (mu_local >= 0)
@@ -651,7 +651,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
             // send trace_lo
             tag = GlobalV::DRANK * 3;
 			// mohan update 2012-01-12
-            //MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+            //MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
             MPI_Send(GlobalC::SGO.trace_lo_tot, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
             // send lgd
@@ -688,7 +688,7 @@ void WF_Local::distri_lowf(double **ctot, double **c)
     GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
-        for(int j=0; j<GridT.lgd; j++)
+        for(int j=0; j<GlobalC::GridT.lgd; j++)
         {
             if(j%8==0) GlobalV::ofs_running << endl;
             if( abs(c[i][j]) > 1.0e-5  )
@@ -727,7 +727,7 @@ void WF_Local::distri_lowf_complex(complex<double> **ctot, complex<double> **cc)
                 // save them in the matrix 'c'.
                 for (int iw=0; iw<GlobalV::NLOCAL; iw++)
                 {
-                    const int mu_local = GridT.trace_lo[iw];
+                    const int mu_local = GlobalC::GridT.trace_lo[iw];
                     if (mu_local >= 0)
                     {
                         for (int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -781,26 +781,26 @@ void WF_Local::distri_lowf_complex(complex<double> **ctot, complex<double> **cc)
 		{
 			int tag;
 
-			// send GridT.lgd
+			// send GlobalC::GridT.lgd
 			tag = GlobalV::DRANK * 3;
-			MPI_Send(&GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
+			MPI_Send(&GlobalC::GridT.lgd, 1, MPI_INT, 0, tag, DIAG_WORLD);
 
-			if(GridT.lgd != 0)
+			if(GlobalC::GridT.lgd != 0)
 			{
 				// send trace_lo
 				tag = GlobalV::DRANK * 3 + 1;
-				MPI_Send(GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
+				MPI_Send(GlobalC::GridT.trace_lo, GlobalV::NLOCAL, MPI_INT, 0, tag, DIAG_WORLD);
 
 				// receive cc
-				complex<double>* crecv = new complex<double>[GlobalV::NBANDS*GridT.lgd];
-				ZEROS(crecv, GlobalV::NBANDS*GridT.lgd);
+				complex<double>* crecv = new complex<double>[GlobalV::NBANDS*GlobalC::GridT.lgd];
+				ZEROS(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd);
 
 				tag = GlobalV::DRANK * 3 + 2;
-				MPI_Recv(crecv, GlobalV::NBANDS*GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD, &status);
+				MPI_Recv(crecv, GlobalV::NBANDS*GlobalC::GridT.lgd, mpicomplex, 0, tag, DIAG_WORLD, &status);
 
 				for (int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					for (int mu=0; mu<GridT.lgd; mu++)
+					for (int mu=0; mu<GlobalC::GridT.lgd; mu++)
 					{
 						cc[ib][mu] = crecv[mu*GlobalV::NBANDS+ib];
 					}
@@ -820,7 +820,7 @@ void WF_Local::distri_lowf_complex(complex<double> **ctot, complex<double> **cc)
     GlobalV::ofs_running << " Wave Functions in local basis: " << endl;
     for(int i=0; i<GlobalV::NBANDS; i++)
     {
-        for(int j=0; j<GridT.lgd; j++)
+        for(int j=0; j<GlobalC::GridT.lgd; j++)
         {
             if(j%8==0) GlobalV::ofs_running << endl;
             if( abs(c[i][j]) > 1.0e-5  )

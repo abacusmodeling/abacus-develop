@@ -84,7 +84,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
-				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 				if(distance < rcut)
 				{
 					int iw1_all = GlobalC::ucell.itiaiw2iwt( T1, I1, 0) ; //iw1_all = combined index (it, ia, iw)
@@ -125,7 +125,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 							{
 								// PLEASE use UOT as an input parameter of this subroutine
 								// mohan add 2021-03-30
-								UOT.snap_psipsi( olm, 0, dtype, tau1, 
+								GlobalC::UOT.snap_psipsi( olm, 0, dtype, tau1, 
 										T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad), 
 										T2, L2, m2, N2, GlobalV::NSPIN,
 										olm2//for soc
@@ -168,7 +168,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 							}
 							else // calculate the derivative
 							{
-								UOT.snap_psipsi( olm, 1, dtype, 
+								GlobalC::UOT.snap_psipsi( olm, 1, dtype, 
 									tau1, T1, L1, m1, N1,
 									GlobalC::GridD.getAdjacentTau(ad), T2, L2, m2, N2, GlobalV::NSPIN
 									);
@@ -231,10 +231,10 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1;
 						double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-						double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
+						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 						dtau2 = tau0 - tau2;
 						double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-						double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{
 							is_adj = true;
@@ -264,11 +264,11 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
-		if(nnr != LNNR.nnr)
+		if(nnr != GlobalC::LNNR.nnr)
 		{
-			cout << " nnr=" << nnr << " LNNR.nnr=" << LNNR.nnr << endl;
-			GlobalV::ofs_running << " nnr=" << nnr << " LNNR.nnr=" << LNNR.nnr << endl;
-			WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != LNNR.nnr");
+			cout << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
+			GlobalV::ofs_running << " nnr=" << nnr << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
+			WARNING_QUIT("LCAO_gen_fixedH::build_ST_new","nnr != GlobalC::LNNR.nnr");
 		}
 	}
 
@@ -312,7 +312,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 
 				dtau_12 = tau2 - tau1;
 				distance = dtau_12.norm() * GlobalC::ucell.lat0;
-				rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 				if(distance >= rcut)
 				{
@@ -331,7 +331,7 @@ void LCAO_gen_fixedH::test_Nonlocal()
 							for (int ad0=0; ad0 < GlobalC::GridD.getAdjacentNum()+1 ; ad0++)
 							{
 								const int T0 = GlobalC::GridD.getType(ad0);
-								if( ORB.nproj[T0] == 0) continue; 
+								if( GlobalC::ORB.nproj[T0] == 0) continue; 
 								//const int I0 = GlobalC::GridD.getNatom(ad0);
 								//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
 								tau0 = GlobalC::GridD.getAdjacentTau(ad0);
@@ -341,14 +341,14 @@ void LCAO_gen_fixedH::test_Nonlocal()
 								double distance1 = dtau_10.norm() * GlobalC::ucell.lat0;
 								double distance2 = dtau_20.norm() * GlobalC::ucell.lat0;
 
-								double rcut_10 = ORB.Phi[T1].getRcut() + ORB.Phi[T0].getRcut();
-								double rcut_20 = ORB.Phi[T2].getRcut() + ORB.Phi[T0].getRcut();
+								double rcut_10 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T0].getRcut();
+								double rcut_20 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Phi[T0].getRcut();
 
 								if(distance1 < rcut_10 && distance2 < rcut_20)
 								{
 									++count;
 									double nlm[3]={0,0,0};
-									UOT.snap_psibeta(
+									GlobalC::UOT.snap_psibeta(
 											nlm, 0, tau1, T1,
 											atom1->iw2l[ j0 ], // L1
 											atom1->iw2m[ j0 ], // m1
@@ -457,7 +457,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 				distance = dtau.norm() * GlobalC::ucell.lat0;
 				// this rcut is in order to make nnr consistent 
 				// with other matrix.
-				rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 				if(distance < rcut) is_adj = true;
 				else if(distance >= rcut)
 				{
@@ -477,8 +477,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
                         double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
                         double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-                        rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-                        rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+                        rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+                        rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
                         if( distance1 < rcut1 && distance2 < rcut2 )
                         {
@@ -516,7 +516,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 								const int T0 = GlobalC::GridD.getType(ad0);
 
 								// mohan add 2010-12-19
-								if( ORB.nproj[T0] == 0) continue; 
+								if( GlobalC::ORB.nproj[T0] == 0) continue; 
 
 								//const int I0 = GlobalC::GridD.getNatom(ad0);
 								//const int start0 = GlobalC::ucell.itiaiw2iwt(T0, I0, 0);
@@ -528,8 +528,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 								distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
 								// seems a bug here!! mohan 2011-06-17
-								rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-								rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+								rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+								rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 								if(distance1 < rcut1 && distance2 < rcut2)
 								{
@@ -541,7 +541,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 									if(!calc_deri)
 									{
 										int is0 = (j-j0*GlobalV::NPOL) + (k-k0*GlobalV::NPOL)*2;
-										UOT.snap_psibeta(
+										GlobalC::UOT.snap_psibeta(
 												nlm, 0, tau1, T1,
 												atom1->iw2l[ j0 ], // L1
 												atom1->iw2m[ j0 ], // m1
@@ -584,7 +584,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 									{
 										if(GlobalV::GAMMA_ONLY_LOCAL)
 										{
-											UOT.snap_psibeta(
+											GlobalC::UOT.snap_psibeta(
 													nlm, 1, 
 													tau1, 
 													T1,
@@ -612,7 +612,7 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 											// mohan change the order on 2011-06-17
 											// origin: < psi1 | beta > < beta | dpsi2/dtau >
 											//now: < psi1/dtau | beta > < beta | psi2 >
-											UOT.snap_psibeta(
+											GlobalC::UOT.snap_psibeta(
 													nlm, 1, 
 													tau2, 
 													T2,
@@ -653,12 +653,12 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 	if(!GlobalV::GAMMA_ONLY_LOCAL)
 	{
 //		cout << " nr="  << nnr << endl;
-//		cout << " LNNR.nnr=" << LNNR.nnr << endl;
+//		cout << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
 //		GlobalV::ofs_running << " nr="  << nnr << endl;
-//		GlobalV::ofs_running << " LNNR.nnr=" << LNNR.nnr << endl;
-		if( nnr!=LNNR.nnr)
+//		GlobalV::ofs_running << " GlobalC::LNNR.nnr=" << GlobalC::LNNR.nnr << endl;
+		if( nnr!=GlobalC::LNNR.nnr)
 		{
-			WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=LNNR.nnr");
+			WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_mu","nnr!=GlobalC::LNNR.nnr");
 		}
 	}
 
@@ -677,7 +677,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 	matrix Rcut(GlobalC::ucell.ntype, GlobalC::ucell.ntype);
 	for(int it1=0; it1<GlobalC::ucell.ntype; ++it1)
         for(int it2=0; it2<GlobalC::ucell.ntype; ++it2)
-            Rcut(it1,it2) = ORB.Phi[it1].getRcut() + ORB.Phi[it2].getRcut();
+            Rcut(it1,it2) = GlobalC::ORB.Phi[it1].getRcut() + GlobalC::ORB.Phi[it2].getRcut();
 	
     for (int T0 = 0; T0 < GlobalC::ucell.ntype; T0++)
     {
@@ -700,7 +700,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 				const int nw1_tot = atom1->nw*GlobalV::NPOL;
 
 				// use to label < mu | H | nu(prime) >
-				//int nnr = LNNR.nlocstart[iat];
+				//int nnr = GlobalC::LNNR.nlocstart[iat];
             
 				//(3)
 				for (int ad2=0; ad2 < GlobalC::GridD.getAdjacentNum()+1 ; ad2++)
@@ -716,7 +716,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 					Vector3<double> dtau = tau2 - tau1;
 					double distance = dtau.norm() * GlobalC::ucell.lat0;
 					double rcut = Rcut(T1,T2);
-					//double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+					//double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 					if(distance < rcut)
 					{
 						// ------------- enter the nnr increaing zone --------------
@@ -743,7 +743,7 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 
 								if(!calc_deri)
 								{
-									UOT.snap_psibeta(
+									GlobalC::UOT.snap_psibeta(
 											nlm, 0, tau1, T1,
 											atom1->iw2l[ iw1_0 ], // L1
 											atom1->iw2m[ iw1_0 ], // m1
@@ -768,14 +768,14 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 								//	else
 								//	{
 								//		WARNING_QUIT("LCAO_gen_fixedH::build_Nonlocal_beta","not consistent with k point algorithm.");
-//										assert( nnr < LNNR.nnr );
+//										assert( nnr < GlobalC::LNNR.nnr );
 //										GlobalC::LM.Hloc_fixedR[ nnr ] += nlm[0];
 //										++nnr;
 								//	}
 								}
 								else  // calculate force
 								{
-									UOT.snap_psibeta(
+									GlobalC::UOT.snap_psibeta(
 											nlm, 1, tau1, T1,
 											atom1->iw2l[ iw1_0 ], // L1
 											atom1->iw2m[ iw1_0 ], // m1
@@ -816,11 +816,11 @@ void LCAO_gen_fixedH::build_Nonlocal_beta(const bool& calc_deri) //update by liu
 				{
 					if( iat < GlobalC::ucell.nat-1 )
 					{
-						if( nnr != LNNR.nlocstart[iat+1] )
+						if( nnr != GlobalC::LNNR.nlocstart[iat+1] )
 						{
 							cout << " nnr = " << nnr << endl;
-							cout << " nlocstart[iat] = " << LNNR.nlocstart[iat] << endl;
-							cout << " nlocstart[iat+1] = " << LNNR.nlocstart[iat+1] << endl;
+							cout << " nlocstart[iat] = " << GlobalC::LNNR.nlocstart[iat] << endl;
+							cout << " nlocstart[iat+1] = " << GlobalC::LNNR.nlocstart[iat+1] << endl;
 							WARNING_QUIT("build_Nonlocal_beta","nnr");
 						}
 					}

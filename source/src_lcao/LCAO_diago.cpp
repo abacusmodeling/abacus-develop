@@ -104,7 +104,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	//added by zhengdy-soc, rearrange the WFC_K from [up,down,up,down...] to [up,up...down,down...], 
 	if(GlobalV::NSPIN==4)
 	{
-		int row = GridT.lgd;
+		int row = GlobalC::GridT.lgd;
 		vector<complex<double>> tmp(row);
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{

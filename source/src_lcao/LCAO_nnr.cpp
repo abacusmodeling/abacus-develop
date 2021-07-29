@@ -5,7 +5,10 @@
 //----------------------------
 // define a global class obj.
 //----------------------------
+namespace GlobalC
+{
 LCAO_nnr LNNR;
+}
 
 LCAO_nnr::LCAO_nnr()
 {
@@ -89,7 +92,7 @@ void LCAO_nnr::cal_nnr(void)
 
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
-				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 				
 				if(distance < rcut)
 				{
@@ -135,11 +138,11 @@ void LCAO_nnr::cal_nnr(void)
 						tau0 = GlobalC::GridD.getAdjacentTau(ad0);
 						dtau1 = tau0 - tau1; 
 						double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
-						double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
+						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 						dtau2 = tau0 - tau2;
 						double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
-						double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{
@@ -248,16 +251,16 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						tau2 = GlobalC::GridD.getAdjacentTau(ad);
 						dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
 						double distance = dtau.norm() * GlobalC::ucell.lat0;
-						double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+						double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 
 						//if(distance < rcut)
 						// mohan reset this 2013-07-02 in Princeton
-						// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
+						// we should make absolutely sure that the distance is smaller than GlobalC::ORB.Phi[it].getRcut
 						// this should be consistant with LCAO_nnr::cal_nnrg function 
 						// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
 						// distance = 7.0000000000000000
-						// ORB.Phi[it].getRcut = 7.0000000000000008
+						// GlobalC::ORB.Phi[it].getRcut = 7.0000000000000008
 						if(distance < rcut - 1.0e-15)
 						{
 							const int nelement = atom1->nw * atom2->nw;//modified by zhengdy-soc, no need to double
@@ -296,8 +299,8 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 								double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
 								double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-								double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-								double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+								double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+								double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 								if( distance1 < rcut1 && distance2 < rcut2 )
 								{
@@ -390,7 +393,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 					{
 						dtau = GlobalC::GridD.getAdjacentTau(ad) - tau1;
                         double distance = dtau.norm() * GlobalC::ucell.lat0;
-                        double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+                        double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 						const int b1 = GlobalC::GridD.getBox(ad).x;
 						const int b2 = GlobalC::GridD.getBox(ad).y;
@@ -422,11 +425,11 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						//			if(distance < rcut)
 
 						// mohan reset this 2013-07-02 in Princeton
-						// we should make absolutely sure that the distance is smaller than ORB.Phi[it].getRcut
+						// we should make absolutely sure that the distance is smaller than GlobalC::ORB.Phi[it].getRcut
 						// this should be consistant with LCAO_nnr::cal_nnrg function 
 						// typical example : 7 Bohr cutoff Si orbital in 14 Bohr length of cell.
 						// distance = 7.0000000000000000
-						// ORB.Phi[it].getRcut = 7.0000000000000008
+						// GlobalC::ORB.Phi[it].getRcut = 7.0000000000000008
 						if(distance < rcut - 1.0e-15)
 						{
 						//	assert( count < nad[iat] );
@@ -594,7 +597,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 				tau2 = GlobalC::GridD.getAdjacentTau(ad);
 				dtau = tau2 - tau1;
 				double distance = dtau.norm() * GlobalC::ucell.lat0;
-				double rcut = ORB.Phi[T1].getRcut() + ORB.Phi[T2].getRcut();
+				double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Phi[T2].getRcut();
 
 				bool adj = false;
 
@@ -618,8 +621,8 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 						double distance1 = dtau1.norm() * GlobalC::ucell.lat0;
 						double distance2 = dtau2.norm() * GlobalC::ucell.lat0;
 
-						double rcut1 = ORB.Phi[T1].getRcut() + ORB.Beta[T0].get_rcut_max();
-						double rcut2 = ORB.Phi[T2].getRcut() + ORB.Beta[T0].get_rcut_max();
+						double rcut1 = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
+						double rcut2 = GlobalC::ORB.Phi[T2].getRcut() + GlobalC::ORB.Beta[T0].get_rcut_max();
 
 						if( distance1 < rcut1 && distance2 < rcut2 )
 						{

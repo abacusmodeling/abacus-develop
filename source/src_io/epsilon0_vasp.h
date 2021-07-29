@@ -46,6 +46,9 @@ private:
 		complex<double> **T;
 };
 
+namespace GlobalC
+{
 extern Epsilon0_vasp epsilon0_vasp;
+}
 
 #endif	

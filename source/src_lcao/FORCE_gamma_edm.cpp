@@ -591,13 +591,13 @@ void Force_LCAO_gamma::set_EDM_gamma(matrix& dm, bool with_energy)
 		{
 			const int mu = GlobalC::ParaO.trace_loc_row[i];
 			if(mu<0) continue;
-			const int ii = GridT.trace_lo[i];
+			const int ii = GlobalC::GridT.trace_lo[i];
 			// orbital 2
 			for(int j=0; j<GlobalV::NLOCAL; j++)
 			{
 				const int nu = GlobalC::ParaO.trace_loc_col[j];
 				if(nu<0) continue;
-				const int jj = GridT.trace_lo[j];
+				const int jj = GlobalC::GridT.trace_lo[j];
 				// energy density matrix
 				const int index = mu * GlobalC::ParaO.ncol + nu;
 				double ene = 0.0;

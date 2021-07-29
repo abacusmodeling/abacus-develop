@@ -165,7 +165,7 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	TITLE("Local_Orbital_wfc","set_trace_aug");
 	timer::tick("Local_Orbital_wfc","set_trace_aug");
 	// this function must be called after GlobalC::ParaO.trace_loc_row
-	// , GlobalC::ParaO.trace_loc_col and GridT.trace_lo have been called.
+	// , GlobalC::ParaO.trace_loc_col and GlobalC::GridT.trace_lo have been called.
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{

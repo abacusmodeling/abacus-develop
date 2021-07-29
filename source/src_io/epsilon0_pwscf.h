@@ -39,6 +39,9 @@ private:
 		 
 };
 
+namespace GlobalC
+{
 extern Epsilon0_pwscf epsilon0_pwscf;
+}
 
 #endif		 

@@ -60,14 +60,14 @@ void LOOP_cell::opt_cell(void)
 	// Quxin added for DFT+U
 	if(INPUT.dft_plus_u) 
 	{
-		dftu.init(GlobalC::ucell, GlobalC::ParaO);
+		GlobalC::dftu.init(GlobalC::ucell, GlobalC::ParaO);
 	}
 
 	LOOP_ions ions;
 	ions.opt_ions();
 
 	// mohan update 2021-02-10
-    GlobalC::LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
 	
 	return;
 }
