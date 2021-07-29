@@ -66,7 +66,8 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 	// "psx"    PBEsol exchange                igcx =10
 	// "wcx"    Wu-Cohen                       igcx =11
 	// "hsex"   HSE06                          igcx =12
-
+	// "scan"	SCAN						   igcx =13
+	
 	// Gradient Correction on Correlation:
 	// "nogc"   none                           igcc =0 (default)
 	// "p86"    Perdew86                       igcc =1
@@ -77,6 +78,7 @@ void XC_Functional::xc(const double &rho, double &ex, double &ec, double &vx, do
 	// "meta"   TPSS meta-gga                  igcc =6
 	// "b3lp"   B3LYP (Lee-Yang-Parr*0.81)     igcc =7
 	// "psc"    PBEsol corr                    igcc =8
+	// "scan"   SCAN						   igcx =9
 
 	// Special cases (dft_shortname):
 	// "bp"    = "b88+p86"           = Becke-Perdew grad.corr.
@@ -890,6 +892,12 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
 	{
 		// HSE
 		throw domain_error("HSE unfinished in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	}
+	else if (GlobalC::xcf.igcx_now == 13)
+	{
+		//SCAN
+		cout << "to use SCAN, please link LIBXC" << endl;
+		throw domain_error("Check "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 	}
     else
     {
