@@ -107,11 +107,7 @@ void Print_Info::setup_parameters(void)
 
 
 		cout << " ---------------------------------------------------------" << endl;
-		if(GlobalV::CALCULATION=="md" && INPUT.mdp.md_potential)
-		{
-			cout << " Classic Molecular Dynamics simulations" << endl;
-		}
-		else if(GlobalV::BASIS_TYPE=="lcao") 
+		if(GlobalV::BASIS_TYPE=="lcao") 
 		{
 			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
@@ -170,10 +166,10 @@ void Print_Info::setup_parameters(void)
 				stringstream orb;
 
 				int norb = 0;
-				/*for(int L=0; L<=ORB.Phi[it].getLmax(); ++L)
+				/*for(int L=0; L<=GlobalC::ORB.Phi[it].getLmax(); ++L)
 				{
-					norb += (2*L+1)*ORB.Phi[it].getNchi(L);
-					orb << ORB.Phi[it].getNchi(L);
+					norb += (2*L+1)*GlobalC::ORB.Phi[it].getNchi(L);
+					orb << GlobalC::ORB.Phi[it].getNchi(L);
 					if(L==0) orb << "s";
 					else if(L==1) orb << "p";
 					else if(L==2) orb << "d";
@@ -182,7 +178,7 @@ void Print_Info::setup_parameters(void)
 					else if(L==5) orb << "h";
 					else if(L==6) orb << "i";
 				}
-				orb << "-" << ORB.Phi[it].getRcut() << "au";*/
+				orb << "-" << GlobalC::ORB.Phi[it].getRcut() << "au";*/
 
 
 				for(int L=0; L<=GlobalC::ucell.atoms[it].nwl; ++L)        // pengfei Li 16-2-29

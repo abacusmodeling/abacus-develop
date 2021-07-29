@@ -49,14 +49,14 @@ void LOOP_elec::set_matrix_grid(void)
 	GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
-		ORB.get_rcutmax_Phi(), 
-		ORB.get_rcutmax_Beta(), 
+		GlobalC::ORB.get_rcutmax_Phi(), 
+		GlobalC::ORB.get_rcutmax_Beta(), 
 		GlobalV::GAMMA_ONLY_LOCAL);
 
 	atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD, 
+		GlobalC::GridD, 
 		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
@@ -64,7 +64,7 @@ void LOOP_elec::set_matrix_grid(void)
 	//DONE(GlobalV::ofs_running,"SEARCH ADJACENT ATOMS");
 
 	// (3) Periodic condition search for each grid.
-	GridT.set_pbc_grid(
+	GlobalC::GridT.set_pbc_grid(
 			GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
 			GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
 			GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
@@ -75,12 +75,12 @@ void LOOP_elec::set_matrix_grid(void)
 	{
 		// For each atom, calculate the adjacent atoms in different cells
 		// and allocate the space for H(R) and S(R).
-		LNNR.cal_nnr();
-		LM.allocate_HS_R(LNNR.nnr);
+		GlobalC::LNNR.cal_nnr();
+		GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 
 		// need to first calculae lgd.
-		// using GridT.init.
-		LNNR.cal_nnrg(GridT);
+		// using GlobalC::GridT.init.
+		GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
 	}
 
     timer::tick("LOOP_elec","set_matrix_grid"); 
@@ -97,10 +97,10 @@ void LOOP_elec::before_solver(const int &istep)
 	// after ParaO and GridT, 
 	// this information is used to calculate
 	// the force.
-	LOWF.set_trace_aug(GridT);
+	GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
 
 	// init density kernel and wave functions.
-	LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
 
 	//======================================
 	// do the charge extrapolation before the density matrix is regenerated.
@@ -108,7 +108,7 @@ void LOOP_elec::before_solver(const int &istep)
 	// because once atoms are moving out of this processor,
 	// the density matrix will not map the new atomic configuration,
 	//======================================
-	// THIS IS A BUG, BECAUSE THE INDEX GridT.trace_lo
+	// THIS IS A BUG, BECAUSE THE INDEX GlobalC::GridT.trace_lo
 	// HAS BEEN REGENERATED, SO WE NEED TO
 	// REALLOCATE DENSITY MATRIX FIRST, THEN READ IN DENSITY MATRIX,
 	// AND USE DENSITY MATRIX TO DO RHO GlobalV::CALCULATION.-- mohan 2013-03-31
@@ -121,17 +121,17 @@ void LOOP_elec::before_solver(const int &istep)
 			stringstream ssd;
 			ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM" ;
 			// reading density matrix,
-			LOC.read_dm(is, ssd.str() );
+			GlobalC::LOC.read_dm(is, ssd.str() );
 		}
 
 		// calculate the charge density
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			UHM.GG.cal_rho(LOC.DM);
+			GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
 		}
 		else
 		{
-			UHM.GK.cal_rho_k();
+			GlobalC::UHM.GK.cal_rho_k();
 		}
 
 		// renormalize the charge density
@@ -143,7 +143,7 @@ void LOOP_elec::before_solver(const int &istep)
 
 
 	// (9) compute S, T, Vnl, Vna matrix.
-	UHM.set_lcao_matrices();
+	GlobalC::UHM.set_lcao_matrices();
 
     timer::tick("LOOP_elec","before_solver"); 
 	return;
@@ -159,12 +159,12 @@ void LOOP_elec::solver(const int &istep)
 			|| GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax") //pengfei 2014-10-13
 	{
 		//Peize Lin add 2016-12-03
-		switch(exx_lcao.info.hybrid_type)
+		switch(GlobalC::exx_lcao.info.hybrid_type)
 		{
 			case Exx_Global::Hybrid_Type::HF:
 			case Exx_Global::Hybrid_Type::PBE0:
 			case Exx_Global::Hybrid_Type::HSE:
-				exx_lcao.cal_exx_ions();
+				GlobalC::exx_lcao.cal_exx_ions();
 				break;
 			case Exx_Global::Hybrid_Type::No:
 			case Exx_Global::Hybrid_Type::Generate_Matrix:
@@ -193,7 +193,7 @@ void LOOP_elec::solver(const int &istep)
 				for( size_t hybrid_step=0; hybrid_step!=GlobalC::exx_global.info.hybrid_step; ++hybrid_step )
 				{
 					GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-					exx_lcao.cal_exx_elec();
+					GlobalC::exx_lcao.cal_exx_elec();
 					
 					ELEC_scf es;
 					es.scf(istep-1);
@@ -215,7 +215,7 @@ void LOOP_elec::solver(const int &istep)
 	}
 	else if (GlobalV::CALCULATION=="nscf")
 	{
-		ELEC_nscf::nscf(UHM);
+		ELEC_nscf::nscf(GlobalC::UHM);
 	}
 	else if (GlobalV::CALCULATION=="istate")
 	{

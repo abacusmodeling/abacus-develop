@@ -8,7 +8,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
 {
     TITLE("Local_Orbital_Charge","allocate_k");
 
-    this->nnrg_now = LNNR.nnrg;
+    this->nnrg_now = GlobalC::LNNR.nnrg;
     //xiaohui add 'GlobalV::OUT_LEVEL' line, 2015-09-16
     if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_last",nnrg_last);
     if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnrg_now",nnrg_now);
@@ -49,7 +49,7 @@ void Local_Orbital_Charge::allocate_DM_k(void)
     wfc_dm_2d.init();
 	if(GlobalC::wf.start_wfc=="file")
 	{
-		this->kpt_file(GridT);
+		this->kpt_file(GlobalC::GridT);
 	}
 
     return;
@@ -67,8 +67,8 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 	for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
 	{
 
-		LOC.wfc_dm_2d.wfc_k[ik].create(ParaO.ncol, ParaO.nrow);
-		LOC.wfc_dm_2d.wfc_k[ik].zero_out();
+		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
+		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << endl;
 		error = WF_Local::read_lowf_complex( ctot , ik , 1);
@@ -79,7 +79,7 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
@@ -118,7 +118,7 @@ inline void cal_DM_ATOM(
 
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
     {
-        complex<double> **wfc = LOWF.WFC_K[ik];
+        complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
         const int ispin = GlobalC::kv.isk[ik];
         int atom2start=0;
 
@@ -200,7 +200,7 @@ inline void cal_DM_ATOM_nc(
         {
             for(int ik=0; ik<GlobalC::kv.nks; ik++)
             {
-                complex<double> **wfc = LOWF.WFC_K[ik];
+                complex<double> **wfc = GlobalC::LOWF.WFC_K[ik];
                 int atom2start=0;
 
                 for (int ia2 = 0; ia2 < RA.na_each[ia1]; ++ia2)
@@ -289,8 +289,8 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
             if(gt.in_this_processor[iat])
             {
                 const int start1 = GlobalC::ucell.itiaiw2iwt(T1,I1,0);
-                const int gstart = LNNR.nlocstartg[iat];
-                const int ng = LNNR.nlocdimg[iat];
+                const int gstart = GlobalC::LNNR.nlocstartg[iat];
+                const int ng = GlobalC::LNNR.nlocdimg[iat];
                 const int iw1_lo=gt.trace_lo[start1]/GlobalV::NPOL;
                 const int nw1=atom1->nw;
 

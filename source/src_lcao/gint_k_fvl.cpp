@@ -15,13 +15,13 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 		WARNING_QUIT("Gint_k::cal_force_k","The force with k can only with reduced H.");
 	}
 
-	int nnrg = LNNR.nnrg;
+	int nnrg = GlobalC::LNNR.nnrg;
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
-	if(LNNR.nnrg == 0)
+	if(GlobalC::LNNR.nnrg == 0)
 	{
 		nnrg = 1;
 	}
@@ -34,11 +34,11 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	ZEROS(pvdpy, nnrg);
 	ZEROS(pvdpz, nnrg); 
 
-    const double delta_r = ORB.dr_uniform;
+    const double delta_r = GlobalC::ORB.dr_uniform;
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
-    const int max_size = GridT.max_atom;
+    const int max_size = GlobalC::GridT.max_atom;
     // how many meshcells in bigcell.
-    const int bxyz = GridT.bxyz;	
+    const int bxyz = GlobalC::GridT.bxyz;	
 
 	double*** dr;// vectors between atom and grid: [bxyz, maxsize, 3]
 	double** distance; // distance between atom and grid: [bxyz, maxsize]
@@ -109,7 +109,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 			for(int k=nbz_start; k<nbz_start+nbz; k++)
 			{
 				const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
-				const int size = GridT.how_many_atoms[ grid_index ];
+				const int size = GlobalC::GridT.how_many_atoms[ grid_index ];
 				if(size==0) continue;
 
 				//---------------------------------
@@ -144,7 +144,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 				this->evaluate_vl_force(grid_index, size,i,j,k,
 					psir_ylm, cal_flag, vldr3, distance,
 					dphi_x, dphi_y, dphi_z,
-					pvdpx, pvdpy, pvdpz, GridT);
+					pvdpx, pvdpy, pvdpz,GlobalC::GridT);
 
 			}// int k
 		}// int j
@@ -156,7 +156,7 @@ void Gint_k::fvl_k_RealSpace(matrix& fvl_dphi, const double *vl)
 	//---------------------------------------
 
 
-	//LM.DHloc_fixedR_x
+	//GlobalC::LM.DHloc_fixedR_x
 	this->folding_force(fvl_dphi,pvdpx, pvdpy, pvdpz);
 
 	delete[] pvdpx;
@@ -211,13 +211,13 @@ void Gint_k::svl_k_RealSpace(
 		WARNING_QUIT("Gint_k::cal_stress_k","The stress with k can only with reduced H.");
 	}
 
-	int nnrg = LNNR.nnrg;
+	int nnrg = GlobalC::LNNR.nnrg;
 
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " LNNR.nnrg in cal_force_k = " << LNNR.nnrg << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " GlobalC::LNNR.nnrg in cal_force_k = " << GlobalC::LNNR.nnrg << endl;
 	assert(nnrg>=0);
 
 	// just because to make thea arrys meaningful.
-	if(LNNR.nnrg == 0)
+	if(GlobalC::LNNR.nnrg == 0)
 	{
 		nnrg = 1;
 	}
@@ -243,11 +243,11 @@ void Gint_k::svl_k_RealSpace(
 	ZEROS(pvdp23, nnrg);
 
 
-	const double delta_r = ORB.dr_uniform;
+	const double delta_r = GlobalC::ORB.dr_uniform;
 	// it's a uniform grid to save orbital values, so the delta_r is a constant.
-	const int max_size = GridT.max_atom;
+	const int max_size = GlobalC::GridT.max_atom;
 	// how many meshcells in bigcell.
-	const int bxyz = GridT.bxyz;
+	const int bxyz = GlobalC::GridT.bxyz;
 
 	double*** dr;// vectors between atom and grid: [bxyz, maxsize, 3]
 	double** distance; // distance between atom and grid: [bxyz, maxsize]
@@ -319,7 +319,7 @@ void Gint_k::svl_k_RealSpace(
 			for(int k=nbz_start; k<nbz_start+nbz; k++)
 			{
 				const int grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
-				const int size = GridT.how_many_atoms[ grid_index ];
+				const int size = GlobalC::GridT.how_many_atoms[ grid_index ];
 				if(size==0) continue;
 
 				//---------------------------------
@@ -356,7 +356,7 @@ void Gint_k::svl_k_RealSpace(
 						psir_ylm, cal_flag, vldr3, distance,
 						dphi_x, dphi_y, dphi_z,
 						pvdpx, pvdpy, pvdpz,
-						pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23, dr, GridT);
+						pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23, dr,GlobalC::GridT);
 			}// int k
 		}// int j
 	} // int i
@@ -366,7 +366,7 @@ void Gint_k::svl_k_RealSpace(
 	// Folding R here
 	//---------------------------------------
 
-	//LM.DHloc_fixedR_x
+	//GlobalC::LM.DHloc_fixedR_x
 	this->folding_stress(fvl_dphi, svl_dphi, pvdpx, pvdpy, pvdpz,
 			pvdp11, pvdp22, pvdp33, pvdp12, pvdp13, pvdp23);
 
@@ -471,7 +471,7 @@ void Gint_k::evaluate_vl_stress(
 	}
 
 
-	double* dmR = LOC.DM_R[GlobalV::CURRENT_SPIN];
+	double* dmR = GlobalC::LOC.DM_R[GlobalV::CURRENT_SPIN];
 
 	double* dmR2;
 	for (int ia1=0; ia1<size; ++ia1)
@@ -493,7 +493,7 @@ void Gint_k::evaluate_vl_stress(
         const int R1x = gt.ucell_index2x[id1];
         const int R1y = gt.ucell_index2y[id1];
         const int R1z = gt.ucell_index2z[id1];
-        const int DM_start = LNNR.nlocstartg[iat];
+        const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
         // get (j,beta,R2)
         for (int ia2=0; ia2<size; ++ia2)
@@ -552,11 +552,11 @@ void Gint_k::evaluate_vl_stress(
                                               GlobalC::ucell.a3.x, GlobalC::ucell.a3.y, GlobalC::ucell.a3.z,
                                               rt[0],rt[1],rt[2]);
 	
-				const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+				const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
                 int offset = -1;
 
-				int* find_start = LNNR.find_R2[iat];
-				int* findend = LNNR.find_R2[iat] + LNNR.nad[iat];
+				int* find_start = GlobalC::LNNR.find_R2[iat];
+				int* findend = GlobalC::LNNR.find_R2[iat] + GlobalC::LNNR.nad[iat];
 				
 				// the nad should be a large expense of time.
 				for(int* find=find_start; find < findend; find++)
@@ -572,7 +572,7 @@ void Gint_k::evaluate_vl_stress(
                 {
                     WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
-                assert(offset < LNNR.nad[iat]);
+                assert(offset < GlobalC::LNNR.nad[iat]);
 
 				//--------------------------------------------------------------- 
 				// what I do above is to get 'offset' for atom pair (iat1, iat2)
@@ -580,7 +580,7 @@ void Gint_k::evaluate_vl_stress(
 				// I should take advantage of gt.which_unitcell.
 				//--------------------------------------------------------------- 
 
-				const int iatw = DM_start + LNNR.find_R2st[iat][offset];
+				const int iatw = DM_start + GlobalC::LNNR.find_R2st[iat][offset];
 				
 				for(int ib=0; ib<gt.bxyz; ++ib)
 				{
@@ -635,9 +635,9 @@ void Gint_k::evaluate_vl_stress(
 							//---------------------------------
 							// only correct for one processor
 							//---------------------------------
-//							pvp1 = &LM.DHloc_fixedR_x[iww];
-//							pvp2 = &LM.DHloc_fixedR_y[iww];
-//							pvp3 = &LM.DHloc_fixedR_z[iww];
+//							pvp1 = &GlobalC::LM.DHloc_fixedR_x[iww];
+//							pvp2 = &GlobalC::LM.DHloc_fixedR_y[iww];
+//							pvp3 = &GlobalC::LM.DHloc_fixedR_z[iww];
 
 							//--------------------------------------
 							// store phi_i(r) vlocal(r) * dphi_j(r)
@@ -754,7 +754,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         }
 
 
-        double* dmR = LOC.DM_R[GlobalV::CURRENT_SPIN];
+        double* dmR = GlobalC::LOC.DM_R[GlobalV::CURRENT_SPIN];
         double* dmR2;
         for (int ia1=0; ia1<size; ++ia1)
         {
@@ -775,7 +775,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
         const int R1x = gt.ucell_index2x[id1];
         const int R1y = gt.ucell_index2y[id1];
         const int R1z = gt.ucell_index2z[id1];
-        const int DM_start = LNNR.nlocstartg[iat];
+        const int DM_start = GlobalC::LNNR.nlocstartg[iat];
 
         // get (j,beta,R2)
         for (int ia2=0; ia2<size; ++ia2)
@@ -827,11 +827,11 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                 const int dRy = R1y - R2y;
                 const int dRz = R1z - R2z;
 
-                                const int index = LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
+                                const int index = GlobalC::LNNR.cal_RindexAtom(dRx, dRy, dRz, iat2);
                 int offset = -1;
 
-                                int* find_start = LNNR.find_R2[iat];
-                                int* findend = LNNR.find_R2[iat] + LNNR.nad[iat];
+                                int* find_start = GlobalC::LNNR.find_R2[iat];
+                                int* findend = GlobalC::LNNR.find_R2[iat] + GlobalC::LNNR.nad[iat];
 
                                 // the nad should be a large expense of time.
                                 for(int* find=find_start; find < findend; find++)
@@ -847,7 +847,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                 {
                     WARNING_QUIT("gint_k","evaluate_vl_force wrong");
                 }
-                assert(offset < LNNR.nad[iat]);
+                assert(offset < GlobalC::LNNR.nad[iat]);
 
                                 //--------------------------------------------------------------- 
                                 // what I do above is to get 'offset' for atom pair (iat1, iat2)
@@ -855,7 +855,7 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                                 // I should take advantage of gt.which_unitcell.
                                 //--------------------------------------------------------------- 
 
-                                const int iatw = DM_start + LNNR.find_R2st[iat][offset];
+                                const int iatw = DM_start + GlobalC::LNNR.find_R2st[iat][offset];
 
                                 for(int ib=0; ib<gt.bxyz; ++ib)
                                 {
@@ -903,9 +903,9 @@ void Gint_k::evaluate_vl_force(const int &grid_index, const int &size, const int
                                                         //---------------------------------
                                                         // only correct for one processor
                                                         //---------------------------------
-//                                                      pvp1 = &LM.DHloc_fixedR_x[iww];
-//                                                      pvp2 = &LM.DHloc_fixedR_y[iww];
-//                                                      pvp3 = &LM.DHloc_fixedR_z[iww];
+//                                                      pvp1 = &GlobalC::LM.DHloc_fixedR_x[iww];
+//                                                      pvp2 = &GlobalC::LM.DHloc_fixedR_y[iww];
+//                                                      pvp3 = &GlobalC::LM.DHloc_fixedR_z[iww];
 
                                                         //--------------------------------------
                                                         // store phi_i(r) vlocal(r) * dphi_j(r)
@@ -995,29 +995,29 @@ void Gint_k::set_ijk_atom_force(
 	for (int id=0; id<size; ++id)
 	{
 		// (2.1) get the atom type and atom index.
-		const int mcell_index = GridT.bcell_start[grid_index] + id;	
-		const int imcell = GridT.which_bigcell[mcell_index];
-		const int iat = GridT.which_atom[mcell_index];
+		const int mcell_index = GlobalC::GridT.bcell_start[grid_index] + id;	
+		const int imcell = GlobalC::GridT.which_bigcell[mcell_index];
+		const int iat = GlobalC::GridT.which_atom[mcell_index];
 		const int it = GlobalC::ucell.iat2it[ iat ];
 		const int ia = GlobalC::ucell.iat2ia[ iat ];
 		Atom *atom = &GlobalC::ucell.atoms[it];
 
 		// (2.2) get the distance between the grid and the atom.
-		mt[0] = GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0];
-		mt[1] = GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
-		mt[2] = GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
+		mt[0] = GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0];
+		mt[1] = GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
+		mt[2] = GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2];
 
 		for(int ib=0; ib<GlobalC::pw.bxyz; ++ib)
 		{
 			// meshcell_pos: z is the fastest
-			dr[ib][id][0] = GridT.meshcell_pos[ib][0] + mt[0];
-			dr[ib][id][1] = GridT.meshcell_pos[ib][1] + mt[1];
-			dr[ib][id][2] = GridT.meshcell_pos[ib][2] + mt[2];
+			dr[ib][id][0] = GlobalC::GridT.meshcell_pos[ib][0] + mt[0];
+			dr[ib][id][1] = GlobalC::GridT.meshcell_pos[ib][1] + mt[1];
+			dr[ib][id][2] = GlobalC::GridT.meshcell_pos[ib][2] + mt[2];
 
 			distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
 			+ dr[ib][id][1]*dr[ib][id][1] + dr[ib][id][2]*dr[ib][id][2]);
 
-			if(distance[ib][id] < ORB.Phi[it].getRcut())
+			if(distance[ib][id] < GlobalC::ORB.Phi[it].getRcut())
 			{
 				cal_flag[ib][id]=true;
 			}
@@ -1067,7 +1067,7 @@ void Gint_k::set_ijk_atom_force(
 			{
 				if ( atom->iw2_new[iw] )
 				{
-					pointer = &ORB.Phi[it].PhiLN(
+					pointer = &GlobalC::ORB.Phi[it].PhiLN(
 							atom->iw2l[iw],
 							atom->iw2n[iw]);
 
@@ -1110,7 +1110,7 @@ void Gint_k::set_ijk_atom_force(
 					}
 					else
 					{
-						pointer = &ORB.Phi[it].
+						pointer = &GlobalC::ORB.Phi[it].
 							PhiLN(atom->iw2l[iw], atom->iw2n[iw]);
 
 						double Zty = pointer->zty;

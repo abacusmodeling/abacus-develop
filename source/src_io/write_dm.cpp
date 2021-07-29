@@ -137,8 +137,8 @@ void Local_Orbital_Charge::write_dm(
     else
     {
         WARNING_QUIT("write_dm","not ready yet");
-        ofs << " " << LNNR.nnrg << " (nnrg)" << endl;
-        for(int i=0; i<LNNR.nnrg; ++i)
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << endl;
+        for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
             if(i%8==0) ofs << "\n";
             ofs << " " << this->DM_R[is][i];
@@ -155,12 +155,12 @@ void Local_Orbital_Charge::write_dm(
         {
             // when reduce, there may be 'redundance', we need to count them.
             ZEROS(count, GlobalV::NLOCAL);
-            const int mu = GridT.trace_lo[i];
+            const int mu = GlobalC::GridT.trace_lo[i];
             if (mu >= 0)
             {
                 for (int j=0; j<GlobalV::NLOCAL; ++j)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if (nu >= 0)
                     {
                         count[j]=1; 
@@ -175,7 +175,7 @@ void Local_Orbital_Charge::write_dm(
             {
                 for (int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if (nu >=0)
                     {
                         tmp[j] = DM[is][mu][nu];
@@ -217,7 +217,7 @@ void Local_Orbital_Charge::write_dm(
     }
     else
     {
-        ofs << " " << LNNR.nnrg << " (nnrg)" << endl;
+        ofs << " " << GlobalC::LNNR.nnrg << " (nnrg)" << endl;
         WARNING_QUIT("local_orbital_charge","not ready to output DM_R");
     }
 #endif

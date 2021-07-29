@@ -23,7 +23,7 @@ void Dos::calculate_Mulliken(const string &fa)
 			ZEROS(mulliken[is], GlobalV::NLOCAL);
 		}
 		
-		UHM.GG.cal_mulliken( mulliken );	
+		GlobalC::UHM.GG.cal_mulliken( mulliken );	
 
 		if(GlobalV::MY_RANK==0)
 		{

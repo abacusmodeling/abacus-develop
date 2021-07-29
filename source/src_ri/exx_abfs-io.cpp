@@ -315,8 +315,8 @@ void Exx_Abfs::IO::print_matrix(
 		// this parameter determine the total number of jlq.
 		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
 
-		assert( ORB.Phi[TA].getRcut() == ORB.Phi[TB].getRcut() );
-		ofs << ORB.Phi[TA].getRcut() << " rcut_Jlq" << endl;
+		assert( GlobalC::ORB.Phi[TA].getRcut() == GlobalC::ORB.Phi[TB].getRcut() );
+		ofs << GlobalC::ORB.Phi[TA].getRcut() << " rcut_Jlq" << endl;
 
 		// mohan add 'smooth' and 'sigma' 2009-08-28
 		ofs << 0 << " smooth" << endl;
@@ -339,8 +339,8 @@ void Exx_Abfs::IO::print_matrix(
 		const size_t nwfc = (TA==TB && IA==IB) ? cal_sum_M(TA) : cal_sum_M(TA)+cal_sum_M(TB);
 		ofs	<< nwfc << " nwfc" << endl;
 		
-		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
-		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
+		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
 		assert( ecut_numberA == ecut_numberB );
 		ofs	<< ecut_numberA << " ne" << endl;
 		

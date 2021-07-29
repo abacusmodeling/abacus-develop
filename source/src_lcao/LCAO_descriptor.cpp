@@ -14,7 +14,10 @@
 #include <torch/csrc/autograd/autograd.h>
 #include <npy.hpp>
 
+namespace GlobalC
+{
 LCAO_Descriptor ld;
+}
 
 LCAO_Descriptor::LCAO_Descriptor()
 {
@@ -122,7 +125,7 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
 	this->des_per_atom=0; // mohan add 2021-04-21
     for (int l = 0; l <= this->lmaxd; l++)
     {
-        this->des_per_atom += ORB.Alpha[0].getNchi(l) * (2 * l + 1);
+        this->des_per_atom += GlobalC::ORB.Alpha[0].getNchi(l) * (2 * l + 1);
     }
     this->n_descriptor = GlobalC::ucell.nat * this->des_per_atom;
 
@@ -166,7 +169,7 @@ void LCAO_Descriptor::init_index(void)
             //alpha
             for (int l = 0; l < this->lmaxd + 1; l++)
             {
-                for (int n = 0; n < ORB.Alpha[0].getNchi(l); n++)
+                for (int n = 0; n < GlobalC::ORB.Alpha[0].getNchi(l); n++)
                 {
                     for (int m = 0; m < 2 * l + 1; m++)
                     {
@@ -181,7 +184,7 @@ void LCAO_Descriptor::init_index(void)
         }//end ia
     }//end it
     assert(this->n_descriptor == alpha);
-    assert(GlobalC::ucell.nat * ORB.Alpha[0].getTotal_nchi() == inl);
+    assert(GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi() == inl);
     GlobalV::ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
     GlobalV::ofs_running << "total_descriptors " << this->n_descriptor << endl;
 	
@@ -204,18 +207,18 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
         for (int I1 = 0; I1 < atom1->na; ++I1)
         {
             tau1 = atom1->tau[I1];
-            //GridD.Find_atom(tau1);
-            GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
+            //GlobalC::GridD.Find_atom(tau1);
+            GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 
-            for (int ad = 0; ad < GridD.getAdjacentNum() + 1; ++ad)
+            for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum() + 1; ++ad)
             {
-                const int T2 = GridD.getType(ad);
-                const int I2 = GridD.getNatom(ad);
+                const int T2 = GlobalC::GridD.getType(ad);
+                const int I2 = GlobalC::GridD.getNatom(ad);
                 //Atom *atom2 = &GlobalC::ucell.atoms[T2];
-                tau2 = GridD.getAdjacentTau(ad);
+                tau2 = GlobalC::GridD.getAdjacentTau(ad);
                 dtau = tau2 - tau1;
                 double distance = dtau.norm() * GlobalC::ucell.lat0;
-                double rcut = ORB.Phi[T1].getRcut() + ORB.Alpha[0].getRcut(); //Rcut is subject to ORB.Phi to keep dimension of S_mu_alpha same as Sloc
+                double rcut = GlobalC::ORB.Phi[T1].getRcut() + GlobalC::ORB.Alpha[0].getRcut(); //Rcut is subject to GlobalC::ORB.Phi to keep dimension of S_mu_alpha same as Sloc
                 if (distance < rcut)
                 {
                     int iw1_all = GlobalC::ucell.itiaiw2iwt(T1, I1, 0); //iw1_all = combined index (it, ia, iw)
@@ -227,17 +230,17 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                         const int N1 = atom1->iw2n[jj0];
                         const int m1 = atom1->iw2m[jj0];
 
-                        for (int L2 = 0; L2 <= ORB.Alpha[0].getLmax(); ++L2)
+                        for (int L2 = 0; L2 <= GlobalC::ORB.Alpha[0].getLmax(); ++L2)
                         {
-                            for (int N2 = 0; N2 < ORB.Alpha[0].getNchi(L2); ++N2)
+                            for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); ++N2)
                             {
                                 for (int m2 = 0; m2 < 2 * L2 + 1; ++m2)
                                 {
                                     olm[0] = olm[1] = olm[2] = 0.0;
                                     if (!calc_deri)
                                     {
-                                        UOT.snap_psipsi(olm, 0, 'D', tau1,
-                                                T1, L1, m1, N1, GridD.getAdjacentTau(ad),
+                                        GlobalC::UOT.snap_psipsi(olm, 0, 'D', tau1,
+                                                T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                                 T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
                                         {
@@ -250,8 +253,8 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
                                     }
                                     else
                                     {
-                                        UOT.snap_psipsi(olm, 1, 'D', tau1,
-                                            T1, L1, m1, N1, GridD.getAdjacentTau(ad),
+                                        GlobalC::UOT.snap_psipsi(olm, 1, 'D', tau1,
+                                            T1, L1, m1, N1, GlobalC::GridD.getAdjacentTau(ad),
                                             T2, L2, m2, N2, GlobalV::NSPIN);
                                         if (GlobalV::GAMMA_ONLY_LOCAL)
                                         {
@@ -285,12 +288,12 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 
 void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const int &im, const double &v)
 {
-    //const int ir = ParaO.trace_loc_row[iw1_all];
-    //const int ic = ParaO.trace_loc_col[iw2_all];
+    //const int ir = GlobalC::ParaO.trace_loc_row[iw1_all];
+    //const int ic = GlobalC::ParaO.trace_loc_col[iw2_all];
     //no parellel yet
     const int ir = iw1_all;
     const int ic = im;
-    //const int index = ir * ParaO.ncol + ic;
+    //const int index = ir * GlobalC::ParaO.ncol + ic;
     int index=0; // mohan add 2021-07-26
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
     {
@@ -390,7 +393,7 @@ void LCAO_Descriptor::cal_descriptor(void)
         ofs.open(ss.str().c_str());
     }
     //==========print preparation=============
-    const int lmax = ORB.get_lmax_d();
+    const int lmax = GlobalC::ORB.get_lmax_d();
     int id = 0;
     for (int it = 0; it < GlobalC::ucell.ntype; it++)
     {
@@ -402,7 +405,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 
             for (int l = 0; l <= lmax; l++)
             {
-                int nmax = ORB.Alpha[0].getNchi(l);
+                int nmax = GlobalC::ORB.Alpha[0].getNchi(l);
                 for (int n = 0; n < nmax; n++)
                 {
                     const int dim = 2 * l + 1;
@@ -527,12 +530,12 @@ void LCAO_Descriptor::set_DS_mu_alpha(
 	const double& vy, 
 	const double& vz)
 {
-    //const int ir = ParaO.trace_loc_row[iw1_all];
-    //const int ic = ParaO.trace_loc_col[iw2_all];
+    //const int ir = GlobalC::ParaO.trace_loc_row[iw1_all];
+    //const int ic = GlobalC::ParaO.trace_loc_col[iw2_all];
     //no parellel yet
     const int ir = iw1_all;
     const int ic = im;
-    //const int index = ir * ParaO.ncol + ic;
+    //const int index = ir * GlobalC::ParaO.ncol + ic;
     int index;
     if (GlobalV::KS_SOLVER == "genelpa" || GlobalV::KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
     {
@@ -550,11 +553,11 @@ void LCAO_Descriptor::set_DS_mu_alpha(
 
 void LCAO_Descriptor::getdm(double* dm)
 {
-    for (int i = 0; i < LOC.wfc_dm_2d.dm_gamma[0].nr; i++)
+    for (int i = 0; i < GlobalC::LOC.wfc_dm_2d.dm_gamma[0].nr; i++)
     {
-        for (int j = 0; j < LOC.wfc_dm_2d.dm_gamma[0].nc; j++)
+        for (int j = 0; j < GlobalC::LOC.wfc_dm_2d.dm_gamma[0].nc; j++)
         {
-            dm[i * GlobalV::NLOCAL + j] = LOC.wfc_dm_2d.dm_gamma[0](i, j); //only consider default GlobalV::NSPIN = 1
+            dm[i * GlobalV::NLOCAL + j] = GlobalC::LOC.wfc_dm_2d.dm_gamma[0](i, j); //only consider default GlobalV::NSPIN = 1
         }
     }
 }
@@ -576,8 +579,8 @@ void LCAO_Descriptor::cal_gdmx(matrix &dm)
             const int iat = GlobalC::ucell.iwt2iat[i];//the atom whose force being calculated
             for (int j= 0;j < GlobalV::NLOCAL; ++j)
             {
-                const int mu = ParaO.trace_loc_row[j];
-                const int nu = ParaO.trace_loc_col[i];
+                const int mu = GlobalC::ParaO.trace_loc_row[j];
+                const int nu = GlobalC::ParaO.trace_loc_col[i];
                 if (mu >= 0 && nu >= 0)
                 {
                     for (int m1 = 0;m1 < nm;++m1)

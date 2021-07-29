@@ -86,7 +86,7 @@ void Local_Orbital_Charge::allocate_dm_wfc(const Grid_Technique &gt)
 	}
 	else
 	{
-		LOWF.allocate_k(gt);
+		GlobalC::LOWF.allocate_k(gt);
 		this->allocate_DM_k();
 	}
 
@@ -140,7 +140,7 @@ void Local_Orbital_Charge::sum_bands(void)
     else
     {
         NOTE("Calculate the density matrix.");
-        this->cal_dk_k( GridT );
+        this->cal_dk_k( GlobalC::GridT );
         if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")        // Peize Lin test 2019-05-15
 		{
             wfc_dm_2d.cal_dm(GlobalC::wf.wg);
@@ -160,12 +160,12 @@ void Local_Orbital_Charge::sum_bands(void)
 
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        UHM.GG.cal_rho(LOC.DM);
+        GlobalC::UHM.GG.cal_rho(GlobalC::LOC.DM);
     }
     else
     {
         NOTE("Calculate the charge on real space grid!");
-        UHM.GK.cal_rho_k();
+        GlobalC::UHM.GK.cal_rho_k();
     }
 
      time_t end = time(NULL);

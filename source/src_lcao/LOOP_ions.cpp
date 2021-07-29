@@ -162,7 +162,7 @@ void LOOP_ions::opt_ions(void)
             GlobalC::pot.write_elecstat_pot(ssp.str(), ssp_ave.str()); //output 'Hartree + local pseudopot'
         }
 
-        if(ParaO.out_hsR)
+        if(GlobalC::ParaO.out_hsR)
 		{
 			this->output_HS_R(); //LiuXh add 2019-07-15
 		}
@@ -170,20 +170,20 @@ void LOOP_ions::opt_ions(void)
 #ifdef __DEEPKS
         if (INPUT.out_descriptor)
         {
-            ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), GlobalC::ucell.nat* ORB.Alpha[0].getTotal_nchi());
-            ld.build_S_descriptor(0);  //derivation not needed yet
-            ld.cal_projected_DM();
-            ld.cal_descriptor();
+            GlobalC::ld.init(GlobalC::ORB.get_lmax_d(), GlobalC::ORB.get_nchimax_d(), GlobalC::ucell.nat* GlobalC::ORB.Alpha[0].getTotal_nchi());
+            GlobalC::ld.build_S_descriptor(0);  //derivation not needed yet
+            GlobalC::ld.cal_projected_DM();
+            GlobalC::ld.cal_descriptor();
             if (INPUT.deepks_scf)
             {
-                ld.build_S_descriptor(1);   //for F_delta calculation
-                ld.cal_v_delta(INPUT.model_file);
-                ld.print_H_V_delta();
-                ld.save_npy_d();
+                GlobalC::ld.build_S_descriptor(1);   //for F_delta calculation
+                GlobalC::ld.cal_v_delta(INPUT.model_file);
+                GlobalC::ld.print_H_V_delta();
+                GlobalC::ld.save_npy_d();
                 if (GlobalV::FORCE)
                 {
-                    ld.cal_f_delta(LOC.wfc_dm_2d.dm_gamma[0]);
-                    ld.print_F_delta();
+                    GlobalC::ld.cal_f_delta(GlobalC::LOC.wfc_dm_2d.dm_gamma[0]);
+                    GlobalC::ld.print_F_delta();
                 }
 
             }
@@ -284,7 +284,7 @@ bool LOOP_ions::force_stress(
         atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -353,7 +353,7 @@ xiaohui modify 2014-08-09*/
 		atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -386,7 +386,7 @@ xiaohui modify 2014-08-09*/
         atom_arrange::delete_vector(
 			GlobalV::ofs_running,
 			GlobalV::SEARCH_PBC,
-			GridD,
+			GlobalC::GridD,
 			GlobalC::ucell,
 			GlobalV::SEARCH_RADIUS,
 			GlobalV::test_atom_input);
@@ -463,19 +463,19 @@ void LOOP_ions::final_scf(void)
     GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 		GlobalV::ofs_running,
 		GlobalV::OUT_LEVEL,
-		ORB.get_rcutmax_Phi(),
-		ORB.get_rcutmax_Beta(),
+		GlobalC::ORB.get_rcutmax_Phi(),
+		GlobalC::ORB.get_rcutmax_Beta(),
 		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD,
+		GlobalC::GridD,
 		GlobalC::ucell,
 		GlobalV::SEARCH_RADIUS,
 		GlobalV::test_atom_input);
 
-    GridT.set_pbc_grid(
+    GlobalC::GridT.set_pbc_grid(
         GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
         GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
         GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
@@ -486,12 +486,12 @@ void LOOP_ions::final_scf(void)
     {
         // For each atom, calculate the adjacent atoms in different cells
         // and allocate the space for H(R) and S(R).
-        LNNR.cal_nnr();
-        LM.allocate_HS_R(LNNR.nnr);
+        GlobalC::LNNR.cal_nnr();
+        GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
 
 		// need to first calculae lgd.
-        // using GridT.init.
-        LNNR.cal_nnrg(GridT);
+        // using GlobalC::GridT.init.
+        GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
     }
 	//------------------------------------------------------------------
 
@@ -504,11 +504,11 @@ void LOOP_ions::final_scf(void)
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.
-    LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
 
-	LOC.allocate_dm_wfc(GridT);
+	GlobalC::LOC.allocate_dm_wfc(GlobalC::GridT);
 
-    UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
 	//------------------------------------------------------------------
 
 

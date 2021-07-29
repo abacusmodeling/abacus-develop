@@ -30,6 +30,7 @@ int		EFIELD = 0; // 5: add electric field
 int		DIPOLE = 0; // 7: add dipole field
 
 std::string  DFT_FUNCTIONAL = "none";
+bool	DFT_META = 0;
 int 	NSPIN = 1; // LDA
 bool	TWO_EFERMI = 0; // two fermi energy, exist only magnetization is fixed.
 int 	CURRENT_SPIN = 0;

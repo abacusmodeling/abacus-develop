@@ -109,6 +109,7 @@ void UnitCell::bcast_unitcell(void)
     Parallel_Common::bcast_double( latvec_supercell.e32 );
     Parallel_Common::bcast_double( latvec_supercell.e33 );
 
+#ifndef __CMD
     Parallel_Common::bcast_double( magnet.start_magnetization, ntype );
 
     if(GlobalV::NSPIN != 1)
@@ -124,6 +125,7 @@ void UnitCell::bcast_unitcell(void)
          Parallel_Common::bcast_double( magnet.ux_[1] );
          Parallel_Common::bcast_double( magnet.ux_[2] );
     }
+#endif
 
     for (int i=0;i<ntype;i++)
     {

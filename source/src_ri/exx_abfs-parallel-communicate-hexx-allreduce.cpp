@@ -211,9 +211,9 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::set_atom_in_2D()
 			for( size_t iw=0; iw!=GlobalC::ucell.atoms[it].nw; ++iw )
 			{
 				const size_t iwt = GlobalC::ucell.itiaiw2iwt(it,ia,iw);
-				if( ParaO.trace_loc_row[iwt]>=0 )
+				if( GlobalC::ParaO.trace_loc_row[iwt]>=0 )
 					atom_in_2D.first[iat] = true;
-				if( ParaO.trace_loc_col[iwt]>=0 )
+				if( GlobalC::ParaO.trace_loc_col[iwt]>=0 )
 					atom_in_2D.second[iat] = true;
 			}
 		}

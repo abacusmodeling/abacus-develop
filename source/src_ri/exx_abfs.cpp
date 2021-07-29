@@ -39,7 +39,7 @@ void Exx_Abfs::test_all() const
 	auto test_abfs = []()
 	{
 		const vector<vector<vector<Numerical_Orbital_Lm>>>
-			&&lcaos = Construct_Orbs::change_orbs( ORB, 1 );
+			&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
 		const vector<vector<vector<Numerical_Orbital_Lm>>>
 			&&abfs = Construct_Orbs::abfs_same_atom( lcaos, 1 );
 
@@ -67,7 +67,7 @@ void Exx_Abfs::test_all() const
 	auto test_svd = []()
 	{
 		const vector<vector<vector<Numerical_Orbital_Lm>>>
-			&&lcaos = Construct_Orbs::change_orbs( ORB, 1 );
+			&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
 		const vector<vector<vector<Numerical_Orbital_Lm>>>
 			&&abfs = Construct_Orbs::abfs_same_atom( lcaos, 1 );
 
@@ -80,13 +80,13 @@ void Exx_Abfs::test_all() const
 			&&index_abfs = Element_Basis_Index::construct_index( range_abfs );
 
 		const Element_Basis_Index::Range
-			&&range_lcaos = Abfs_Index::construct_range( ORB );
+			&&range_lcaos = Abfs_Index::construct_range( GlobalC::ORB );
 		const Element_Basis_Index::IndexLNM
 			&&index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
 
 		Matrix_Orbs21 m_abfslcaos_lcaos;
 		m_abfslcaos_lcaos.init( 1, 1, 1 );
-		m_abfslcaos_lcaos.init_radial( abfs, ORB, ORB );
+		m_abfslcaos_lcaos.init_radial( abfs, GlobalC::ORB, GlobalC::ORB );
 		m_abfslcaos_lcaos.init_radial_table();
 		const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
 			&&ms_lcaos2_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
@@ -99,9 +99,9 @@ void Exx_Abfs::test_all() const
 			for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; ++I1)
 			{
 				cout<<"@\t"<<T1<<"\t"<<I1<<endl;
-				GridD.Find_atom(GlobalC::ucell,  GlobalC::ucell.atoms[T1].tau[I1], T1, I1 );
-				for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
-					cout<<GridD.getBox(ad).x<<"\t"<<GridD.getBox(ad).y<<"\t"<<GridD.getBox(ad).z<<endl;
+				GlobalC::GridD.Find_atom(GlobalC::ucell,  GlobalC::ucell.atoms[T1].tau[I1], T1, I1 );
+				for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
+					cout<<GlobalC::GridD.getBox(ad).x<<"\t"<<GlobalC::GridD.getBox(ad).y<<"\t"<<GlobalC::GridD.getBox(ad).z<<endl;
 			}
 	};
 
@@ -123,7 +123,7 @@ cout<<"A"<<endl;
 cout<<"A1"<<endl;
 
 //	const vector<vector<vector<Numerical_Orbital_Lm>>>
-//		&&abfs_same_atom = Construct_Orbs::abfs_same_atom( ORB );
+//		&&abfs_same_atom = Construct_Orbs::abfs_same_atom( GlobalC::ORB );
 
 	Exx_Abfs::Lmax = Jle::Lmax;
 //	for( size_t T=0; T!=abfs_same_atom.size(); ++T )
@@ -156,14 +156,14 @@ cout<<"C"<<endl;
 
 	Matrix_Orbs21 m_jyslcaos_lcaos;
 	m_jyslcaos_lcaos.init(1);
-	m_jyslcaos_lcaos.init_radial( jle.jle, ORB, ORB );
+	m_jyslcaos_lcaos.init_radial( jle.jle, GlobalC::ORB, GlobalC::ORB );
 	m_jyslcaos_lcaos.init_radial_table();
 
 cout<<"D"<<endl;
 
 	Matrix_Lcaoslcaos_Lcaoslcaos mllll;
 	mllll.init(1);
-	mllll.init_radial( ORB, ORB );
+	mllll.init_radial( GlobalC::ORB, GlobalC::ORB );
 	mllll.init_radial_table();
 
 cout<<"D1"<<endl;
@@ -172,7 +172,7 @@ cout<<"D1"<<endl;
 //cout<<"D11"<<endl;
 //	m_asalcaos_lcaos.init(1);
 //cout<<"D12"<<endl;
-//	m_asalcaos_lcaos.init_radial( abfs_same_atom, ORB, ORB );
+//	m_asalcaos_lcaos.init_radial( abfs_same_atom, GlobalC::ORB, GlobalC::ORB );
 //cout<<"D13"<<endl;
 //	m_asalcaos_lcaos.init_radial_table();
 
@@ -199,7 +199,7 @@ cout<<"D3"<<endl;
 cout<<"E"<<endl;
 
 	const Element_Basis_Index::Range
-		&&range_lcaos = Abfs_Index::construct_range( ORB );
+		&&range_lcaos = Abfs_Index::construct_range( GlobalC::ORB );
 	const Element_Basis_Index::IndexLNM
 		&&index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
 
@@ -311,12 +311,12 @@ cout<<"A1"<<endl;
 //	cout<<f<<endl;
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>>
-		&&lcaos = Construct_Orbs::change_orbs( ORB, this->kmesh_times );
+		&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 	const vector<vector<vector<Numerical_Orbital_Lm>>>
 		&&abfs_same_atom = Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times );
 	// Peize Lin test
 //	vector<vector<vector<Numerical_Orbital_Lm>>>
-//		&&abfs_same_atom = IO::Abfs_Same_Atom::construct( ORB );
+//		&&abfs_same_atom = IO::Abfs_Same_Atom::construct( GlobalC::ORB );
 //	for( size_t T=0; T!=abfs_same_atom.size(); ++T )
 //		if( abfs_same_atom[T].size()>4 )
 //			abfs_same_atom[T].resize(4);
@@ -328,8 +328,8 @@ cout<<__FILE__<<__LINE__<<endl;
 throw exception();
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>>
-//		&&abfs = IO::construct_abfs( ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
-//		&&abfs = IO::construct_abfs( abfs_same_atom, ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
+//		&&abfs = IO::construct_abfs( GlobalC::ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
+//		&&abfs = IO::construct_abfs( abfs_same_atom, GlobalC::ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
 		&abfs = abfs_same_atom;
 
 	for( size_t T=0; T!=abfs.size(); ++T )
@@ -361,7 +361,7 @@ cout<<"D"<<endl;
 
 	Matrix_Lcaoslcaos_Lcaoslcaos mllll;
 	mllll.init(1);
-	mllll.init_radial( ORB, ORB );
+	mllll.init_radial( GlobalC::ORB, GlobalC::ORB );
 	mllll.init_radial_table();
 
 cout<<"D1"<<endl;
@@ -389,7 +389,7 @@ cout<<"D3"<<endl;
 cout<<"E"<<endl;
 
 	const Element_Basis_Index::Range
-		&&range_lcaos = Abfs_Index::construct_range( ORB );
+		&&range_lcaos = Abfs_Index::construct_range( GlobalC::ORB );
 	const Element_Basis_Index::IndexLNM
 		&&index_lcaos = Element_Basis_Index::construct_index( range_lcaos );
 
@@ -494,8 +494,8 @@ void Exx_Abfs::cal_exx() const
 cout<<"A"<<endl;
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>>
-		&&lcaos = Construct_Orbs::change_orbs( ORB, this->kmesh_times );
-//		&&lcaos = Construct_Orbs::change_orbs( ORB, 1 );
+		&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
+//		&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
 
 cout<<"A1"<<endl;
 
@@ -503,8 +503,8 @@ cout<<"A1"<<endl;
 		&&abfs_same_atom = Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times );
 cout<<"A2"<<endl;
 //	const vector<vector<vector<Numerical_Orbital_Lm>>>
-//		&&abfs_origin = IO::construct_abfs( abfs_same_atom, ORB, this->files_abfs, this->kmesh_times );		// Peize Lin test
-//		&&abfs = IO::construct_abfs( ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
+//		&&abfs_origin = IO::construct_abfs( abfs_same_atom, GlobalC::ORB, this->files_abfs, this->kmesh_times );		// Peize Lin test
+//		&&abfs = IO::construct_abfs( GlobalC::ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
 cout<<"A3"<<endl;
 	const vector<vector<vector<Numerical_Orbital_Lm>>>
 //		&&abfs = Construct_Orbs::orth_orbs( abfs_origin );		// Peize Lin test
@@ -540,7 +540,7 @@ cout<<"D"<<endl;
 	{
 		Matrix_Orbs11 m_lcaos_lcaos;
 		m_lcaos_lcaos.init(1);
-		m_lcaos_lcaos.init_radial( ORB, ORB );
+		m_lcaos_lcaos.init_radial( GlobalC::ORB, GlobalC::ORB );
 		m_lcaos_lcaos.init_radial_table();
 		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
 			&&matrix_V = m_lcaos_lcaos.cal_overlap_matrix(index_lcaos,index_lcaos);
@@ -609,7 +609,7 @@ cout<<"D"<<endl;
 cout<<"D0"<<endl;
 		m_ll2_ll2.init( 1, this->kmesh_times, this->rmesh_times );
 cout<<"D1"<<endl;
-		m_ll2_ll2.init_radial( ORB, ORB );
+		m_ll2_ll2.init_radial( GlobalC::ORB, GlobalC::ORB );
 cout<<"D2"<<endl;
 		m_ll2_ll2.init_radial_table();
 cout<<"D3"<<endl;
@@ -1057,7 +1057,7 @@ void density_matrix()
 			{
 				for( size_t iw2=0; iw2!=GlobalV::NLOCAL; ++iw2 )
 				{
-					DM_k[ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) * conj(LOWF.WFC_K[ik][ib][iw1]) * LOWF.WFC_K[ik][ib][iw2];
+					DM_k[ik](iw1,iw2) += GlobalC::wf.wg(ik,ib) * conj(GlobalC::LOWF.WFC_K[ik][ib][iw1]) * GlobalC::LOWF.WFC_K[ik][ib][iw2];
 				}
 			}
 		}

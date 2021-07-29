@@ -9,7 +9,6 @@
 #include "src_pw/global.h"
 #include "src_io/cal_test.h"
 #include "src_io/winput.h"
-#include "module_md/run_md.h"
 
 Driver::Driver(){}
 
@@ -81,17 +80,8 @@ void Driver::atomic_world(void)
 	// lcao_in_pw: LCAO expaned by plane wave basis set
 	// lcao: linear combination of atomic orbitals
 	//--------------------------------------------------
-#ifndef __NOMD //qianrui do not want to add md to pw module temporarily before md is compeletly built.
-	if(GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="md-sto") // Yu Liu 2021-07-12
-	{
-		Run_md::md_line();
-	}
-	else if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
-#else
 	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
-#endif
 	{
-
 		Run_pw::plane_wave_line();
 	}
 #ifdef __LCAO

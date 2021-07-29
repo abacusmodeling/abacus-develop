@@ -130,9 +130,9 @@ void Grid_Base::init(
 	{
 		for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
 		{
-			//GridD.Find_atom(GlobalC::ucell.atoms[T1].tau[I1]);
-			GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[T1].tau[I1], T1, I1);
-			for (int ad = 0; ad < GridD.getAdjacentNum()+1; ad++)
+			//GlobalC::GridD.Find_atom(GlobalC::ucell.atoms[T1].tau[I1]);
+			GlobalC::GridD.Find_atom(GlobalC::ucell, GlobalC::ucell.atoms[T1].tau[I1], T1, I1);
+			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
 			{
 				++tot_pairs;
 			}
@@ -146,7 +146,7 @@ void Grid_Base::init(
 
 void Grid_Base::get_rcut_max(void)
 {
-	assert( ORB.get_ntype() > 0 );
+	assert( GlobalC::ORB.get_ntype() > 0 );
 
 	this->da_d.x = 1.0 / this->a1_len;
 	this->da_d.y = 1.0 / this->a2_len;
@@ -154,17 +154,17 @@ void Grid_Base::get_rcut_max(void)
 
 	delete[] Rcut_max;
 	delete[] Rcut_max_direct;
-	this->Rcut_max = new double[ ORB.get_ntype() ];
-	this->Rcut_max_direct = new Vector3<double>[ ORB.get_ntype() ];
+	this->Rcut_max = new double[ GlobalC::ORB.get_ntype() ];
+	this->Rcut_max_direct = new Vector3<double>[ GlobalC::ORB.get_ntype() ];
 
-	for(int it=0; it<ORB.get_ntype(); it++)
+	for(int it=0; it<GlobalC::ORB.get_ntype(); it++)
 	{
 		this->Rcut_max[it] = 0.0;
 		for (int L = 0; L < GlobalC::ucell.atoms[it].nwl + 1; L++)
 		{
 			for (int N = 0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 			{
-				Rcut_max[it] = max(ORB.Phi[it].getRcut(),
+				Rcut_max[it] = max(GlobalC::ORB.Phi[it].getRcut(),
 			               Rcut_max[it]);
 			}
 		}

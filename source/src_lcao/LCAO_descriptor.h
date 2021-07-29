@@ -127,7 +127,10 @@ private:
 	void cal_descriptor_tensor();
 
 };
+namespace GlobalC
+{
 extern LCAO_Descriptor ld;
+}
 
 #endif
 

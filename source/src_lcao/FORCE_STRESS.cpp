@@ -22,19 +22,19 @@ void Force_Stress_LCAO::allocate(void)
     TITLE("Force_Stress_LCAO","allocate");
 
     // reduce memory occupy by vlocal
-    delete[] ParaO.sender_local_index;
-    delete[] ParaO.sender_size_process;
-    delete[] ParaO.sender_displacement_process;
-    delete[] ParaO.receiver_global_index;
-    delete[] ParaO.receiver_size_process;
-    delete[] ParaO.receiver_displacement_process;
+    delete[] GlobalC::ParaO.sender_local_index;
+    delete[] GlobalC::ParaO.sender_size_process;
+    delete[] GlobalC::ParaO.sender_displacement_process;
+    delete[] GlobalC::ParaO.receiver_global_index;
+    delete[] GlobalC::ParaO.receiver_size_process;
+    delete[] GlobalC::ParaO.receiver_displacement_process;
 
-    ParaO.sender_local_index = new int[1];
-    ParaO.sender_size_process = new int[1];
-    ParaO.sender_displacement_process = new int[1];
-    ParaO.receiver_global_index = new int[1];
-    ParaO.receiver_size_process = new int[1];
-    ParaO.receiver_displacement_process = new int[1];
+    GlobalC::ParaO.sender_local_index = new int[1];
+    GlobalC::ParaO.sender_size_process = new int[1];
+    GlobalC::ParaO.sender_displacement_process = new int[1];
+    GlobalC::ParaO.receiver_global_index = new int[1];
+    GlobalC::ParaO.receiver_size_process = new int[1];
+    GlobalC::ParaO.receiver_displacement_process = new int[1];
 
     return;
 }
@@ -206,14 +206,14 @@ void Force_Stress_LCAO::getForceStress(
 			{
 				for(int j=0; j<3; j++)
 				{
-					stress_dftu(j,i) = dftu.stress_dftu.at(j).at(i);
+					stress_dftu(j,i) = GlobalC::dftu.stress_dftu.at(j).at(i);
 				}
 			}
 			if(isforce)
 			{
 				for (int iat = 0; iat < nat; iat++)
 				{
-					force_dftu(iat, i) = dftu.force_dftu.at(iat).at(i);
+					force_dftu(iat, i) = GlobalC::dftu.force_dftu.at(iat).at(i);
 				}
 			}
 		}
@@ -287,7 +287,7 @@ void Force_Stress_LCAO::getForceStress(
 		//DeePKS force, caoyu add 2021-06-03
 		if (INPUT.deepks_scf)
 		{
-			ld.save_npy_f(fcs);	//save fbase
+			GlobalC::ld.save_npy_f(fcs);	//save fbase
 		}
 #endif
 		// print Rydberg force or not
@@ -339,7 +339,7 @@ void Force_Stress_LCAO::getForceStress(
 			//caoyu add 2021-06-03
 			if (INPUT.deepks_scf)
 			{
-				this->print_force("DeePKS 	FORCE", ld.F_delta, 1, ry);
+				this->print_force("DeePKS 	FORCE", GlobalC::ld.F_delta, 1, ry);
 			}
 #endif
 		}
