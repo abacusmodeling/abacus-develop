@@ -121,9 +121,9 @@ void Parallel_Reduce::reduce_double_pool(double *object, const int n)
 // (2) we need to reduce the value from different pool.
 void Parallel_Reduce::reduce_double_allpool(double &object)
 {
-	if(NPOOL==1) return;
+	if(GlobalV::NPOOL==1) return;
 #ifdef __MPI
-	double swap = object / NPROC_IN_POOL;
+	double swap = object / GlobalV::NPROC_IN_POOL;
 	MPI_Allreduce(&swap , &object , 1, MPI_DOUBLE , MPI_SUM , MPI_COMM_WORLD);
 #endif
 }
@@ -132,12 +132,12 @@ void Parallel_Reduce::reduce_double_allpool(double &object)
 // (2) we need to reduce the value from different pool.
 void Parallel_Reduce::reduce_double_allpool(double *object, const int n)
 {
-	if(NPOOL==1) return;
+	if(GlobalV::NPOOL==1) return;
 #ifdef __MPI
 	double *swap = new double[n];
 	for(int i=0; i<n; i++)
 	{
-		swap[i] = object[i] / NPROC_IN_POOL;
+		swap[i] = object[i] / GlobalV::NPROC_IN_POOL;
 	}
 	MPI_Allreduce(swap , object , n, MPI_DOUBLE , MPI_SUM , MPI_COMM_WORLD);
 	delete[] swap;
@@ -179,7 +179,7 @@ void Parallel_Reduce::reduce_complex_double_pool(complex<double> &object)
 void Parallel_Reduce::reduce_complex_double_pool(complex <double> *object, const int n)
 {
 #ifdef __MPI
-	if(NPROC_IN_POOL == 1) return;
+	if(GlobalV::NPROC_IN_POOL == 1) return;
 	complex<double> *swap = new complex<double>[n];
 	for(int i=0;i<n;i++) swap[i] = object[i];
 	MPI_Allreduce(swap, object, n, mpicomplex, myOp, POOL_WORLD);
@@ -201,9 +201,9 @@ void Parallel_Reduce::gather_int_all(int &v, int *all)
 void Parallel_Reduce::gather_min_int_all(int &v)
 {
 #ifdef __MPI
-	int *all = new int[NPROC];
+	int *all = new int[GlobalV::NPROC];
 	MPI_Allgather(&v, 1, MPI_INT, all, 1, MPI_INT, MPI_COMM_WORLD);
-	for(int i=0; i<NPROC; i++)
+	for(int i=0; i<GlobalV::NPROC; i++)
 	{
 		if(v>all[i])
 		{
@@ -218,10 +218,10 @@ void Parallel_Reduce::gather_min_int_all(int &v)
 void Parallel_Reduce::gather_max_double_all(double &v)
 {
 #ifdef __MPI
-	double *value=new double[NPROC];
-	ZEROS(value, NPROC);
+	double *value=new double[GlobalV::NPROC];
+	ZEROS(value, GlobalV::NPROC);
 	MPI_Allgather(&v, 1, MPI_DOUBLE, value, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-	for(int i=0; i<NPROC; i++)
+	for(int i=0; i<GlobalV::NPROC; i++)
 	{
 		if(v<value[i])
 		{
@@ -235,11 +235,11 @@ void Parallel_Reduce::gather_max_double_all(double &v)
 void Parallel_Reduce::gather_max_double_pool(double &v)
 {
 #ifdef __MPI
-	if(NPROC_IN_POOL == 1) return;
-	double *value=new double[NPROC_IN_POOL];
-	ZEROS(value, NPROC_IN_POOL);
+	if(GlobalV::NPROC_IN_POOL == 1) return;
+	double *value=new double[GlobalV::NPROC_IN_POOL];
+	ZEROS(value, GlobalV::NPROC_IN_POOL);
 	MPI_Allgather(&v, 1, MPI_DOUBLE, value, 1, MPI_DOUBLE, POOL_WORLD);
-	for(int i=0; i<NPROC_IN_POOL; i++)
+	for(int i=0; i<GlobalV::NPROC_IN_POOL; i++)
 	{
 		if(v<value[i])
 		{
@@ -253,11 +253,11 @@ void Parallel_Reduce::gather_max_double_pool(double &v)
 void Parallel_Reduce::gather_min_double_pool(double &v)
 {
 #ifdef __MPI
-	if(NPROC_IN_POOL == 1) return;
-	double *value=new double[NPROC_IN_POOL];
-	ZEROS(value, NPROC_IN_POOL);
+	if(GlobalV::NPROC_IN_POOL == 1) return;
+	double *value=new double[GlobalV::NPROC_IN_POOL];
+	ZEROS(value, GlobalV::NPROC_IN_POOL);
 	MPI_Allgather(&v, 1, MPI_DOUBLE, value, 1, MPI_DOUBLE, POOL_WORLD);
-	for(int i=0; i<NPROC_IN_POOL; i++)
+	for(int i=0; i<GlobalV::NPROC_IN_POOL; i++)
 	{
 		if(v>value[i])
 		{
@@ -271,10 +271,10 @@ void Parallel_Reduce::gather_min_double_pool(double &v)
 void Parallel_Reduce::gather_min_double_all(double &v)
 {
 #ifdef __MPI
-	double *value=new double[NPROC];
-	ZEROS(value, NPROC);
+	double *value=new double[GlobalV::NPROC];
+	ZEROS(value, GlobalV::NPROC);
 	MPI_Allgather(&v, 1, MPI_DOUBLE, value, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-	for(int i=0; i<NPROC; i++)
+	for(int i=0; i<GlobalV::NPROC; i++)
 	{
 		if(v>value[i])
 		{
@@ -288,13 +288,13 @@ void Parallel_Reduce::gather_min_double_all(double &v)
 bool Parallel_Reduce::check_if_equal(double &v)
 {
 #ifdef __MPI
-	double *all=new double[NPROC];
+	double *all=new double[GlobalV::NPROC];
 	MPI_Allgather(&v, 1, MPI_DOUBLE, all, 1, MPI_DOUBLE, MPI_COMM_WORLD);
-	for(int i=0; i<NPROC; i++)
+	for(int i=0; i<GlobalV::NPROC; i++)
 	{
 		if( abs(all[i] - all[0]) > 1.0e-9 )
 		{
-			for(int j=0; j<NPROC; j++)
+			for(int j=0; j<GlobalV::NPROC; j++)
 			{
 				cout << "\n processor = " << j << " value = " << all[j];
 			}

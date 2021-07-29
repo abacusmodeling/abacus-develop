@@ -8,13 +8,13 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     TITLE("Local_Orbital_Charge","read_dm");
     timer::tick("Local_Orbital_Charge","read_dm");
 
-    ofs_running << "\n processor 0 is reading density matrix from file < " << fn << " > " << endl;
+    GlobalV::ofs_running << "\n processor 0 is reading density matrix from file < " << fn << " > " << endl;
     //xiaohui modify 2015-03-25
     //bool quit_mesia = false;
     bool quit_abacus = false;
 
     ifstream ifs;
-    if(MY_RANK==0)
+    if(GlobalV::MY_RANK==0)
     {
         ifs.open(fn.c_str());
         if (!ifs)
@@ -33,69 +33,69 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             ifs >> name;
 
             // check lattice constant, unit is Angstrom
-            CHECK_DOUBLE(ifs,ucell.lat0 * BOHR_TO_A,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e11,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e12,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e13,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e21,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e22,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e23,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e31,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e32,quit);
-            CHECK_DOUBLE(ifs,ucell.latvec.e33,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.lat0 * BOHR_TO_A,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e11,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e12,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e13,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e21,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e22,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e23,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e31,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e32,quit);
+            CHECK_DOUBLE(ifs,GlobalC::ucell.latvec.e33,quit);
 
-            for(int it=0; it<ucell.ntype; it++)
+            for(int it=0; it<GlobalC::ucell.ntype; it++)
             {
-                CHECK_STRING(ifs,ucell.atoms[it].label,quit);
+                CHECK_STRING(ifs,GlobalC::ucell.atoms[it].label,quit);
             }
 
-            for(int it=0; it<ucell.ntype; it++)
+            for(int it=0; it<GlobalC::ucell.ntype; it++)
             {
-                CHECK_DOUBLE(ifs,ucell.atoms[it].na,quit);
+                CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
             }
 
             string coordinate;
             ifs >> coordinate;
 
-            for(int it=0; it<ucell.ntype; it++)
+            for(int it=0; it<GlobalC::ucell.ntype; it++)
             {
-                for(int ia=0; ia<ucell.atoms[it].na; ia++)
+                for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
                 {
-                    CHECK_DOUBLE(ifs,ucell.atoms[it].taud[ia].x,quit);
-                    CHECK_DOUBLE(ifs,ucell.atoms[it].taud[ia].y,quit);
-                    CHECK_DOUBLE(ifs,ucell.atoms[it].taud[ia].z,quit);
+                    CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].x,quit);
+                    CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].y,quit);
+                    CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].taud[ia].z,quit);
                 }
             }
 
-            CHECK_INT(ifs, NSPIN);
-            if(NSPIN == 1||NSPIN == 4)
+            CHECK_INT(ifs, GlobalV::NSPIN);
+            if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
             {
-                READ_VALUE(ifs, en.ef);
-                ofs_running << " read in fermi energy = " << en.ef << endl;
+                READ_VALUE(ifs, GlobalC::en.ef);
+                GlobalV::ofs_running << " read in fermi energy = " << GlobalC::en.ef << endl;
             }
-            else if(NSPIN == 2)
+            else if(GlobalV::NSPIN == 2)
             {
-                if(is==0)READ_VALUE(ifs, en.ef_up);
-                else if(is==1)READ_VALUE(ifs, en.ef_dw);
+                if(is==0)READ_VALUE(ifs, GlobalC::en.ef_up);
+                else if(is==1)READ_VALUE(ifs, GlobalC::en.ef_dw);
             }
             else
             {
                 WARNING_QUIT("read_dm","check nspin!");
             }
-            CHECK_INT(ifs, NLOCAL);
-            CHECK_INT(ifs, NLOCAL);
+            CHECK_INT(ifs, GlobalV::NLOCAL);
+            CHECK_INT(ifs, GlobalV::NLOCAL);
         }// If file exist, read in data.
     } // Finish reading the first part of density matrix.
 
 
 #ifndef __MPI
-    ofs_running << " Read SPIN = " << is+1 << " density matrix now." << endl;
+    GlobalV::ofs_running << " Read SPIN = " << is+1 << " density matrix now." << endl;
 
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        for(int i=0; i<NLOCAL; ++i)
+        for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            for(int j=0; j<NLOCAL; ++j)
+            for(int j=0; j<GlobalV::NLOCAL; ++j)
             {
                 ifs >> DM[is][i][j];
             }
@@ -104,9 +104,9 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     else
     {
         WARNING_QUIT("Local_Orbital_Charge::read_dm","The nnrg should not be update");
-        CHECK_INT(ifs,LNNR.nnrg);
+        CHECK_INT(ifs,GlobalC::LNNR.nnrg);
 
-        for(int i=0; i<LNNR.nnrg; ++i)
+        for(int i=0; i<GlobalC::LNNR.nnrg; ++i)
         {
             ifs >> DM_R[is][i];
         }
@@ -125,43 +125,43 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     }
 
 
-    if(NSPIN==1||NSPIN==4)
+    if(GlobalV::NSPIN==1||GlobalV::NSPIN==4)
     {
-        Parallel_Common::bcast_double(en.ef);
+        Parallel_Common::bcast_double(GlobalC::en.ef);
     }
-    else if(NSPIN==2)
+    else if(GlobalV::NSPIN==2)
     {
-        Parallel_Common::bcast_double(en.ef_up);
-        Parallel_Common::bcast_double(en.ef_dw);
+        Parallel_Common::bcast_double(GlobalC::en.ef_up);
+        Parallel_Common::bcast_double(GlobalC::en.ef_dw);
     }
 
 
-    if(GAMMA_ONLY_LOCAL)
+    if(GlobalV::GAMMA_ONLY_LOCAL)
     {
-        //ofs_running << " NLOCAL=" << NLOCAL << endl;
-        //ofs_running << " lgd_now=" << lgd_now << endl;
-        //ofs_running << " GridT.lgd=" << GridT.lgd << endl;
+        //GlobalV::ofs_running << " NLOCAL=" << GlobalV::NLOCAL << endl;
+        //GlobalV::ofs_running << " lgd_now=" << lgd_now << endl;
+        //GlobalV::ofs_running << " GlobalC::GridT.lgd=" << GlobalC::GridT.lgd << endl;
 
-        double *tmp = new double[NLOCAL];
-        for(int i=0; i<NLOCAL; ++i)
+        double *tmp = new double[GlobalV::NLOCAL];
+        for(int i=0; i<GlobalV::NLOCAL; ++i)
         {
-            //ofs_running << " i=" << i << endl;
-            ZEROS(tmp, NLOCAL);
-            if(MY_RANK==0)
+            //GlobalV::ofs_running << " i=" << i << endl;
+            ZEROS(tmp, GlobalV::NLOCAL);
+            if(GlobalV::MY_RANK==0)
             {
-                for(int j=0; j<NLOCAL; ++j)
+                for(int j=0; j<GlobalV::NLOCAL; ++j)
                 {
                     ifs >> tmp[j];
                 }
             }
-            Parallel_Common::bcast_double(tmp, NLOCAL);
+            Parallel_Common::bcast_double(tmp, GlobalV::NLOCAL);
 
-            const int mu = GridT.trace_lo[i];
+            const int mu = GlobalC::GridT.trace_lo[i];
             if(mu >= 0)
             {   
-                for(int j=0; j<NLOCAL; ++j)
+                for(int j=0; j<GlobalV::NLOCAL; ++j)
                 {
-                    const int nu = GridT.trace_lo[j];
+                    const int nu = GlobalC::GridT.trace_lo[j];
                     if(nu >= 0)
                     {
                         DM[is][mu][nu] = tmp[j];
@@ -176,9 +176,9 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
         WARNING_QUIT("Local_Orbital_Charge::read_dm","not ready to readin DM_R");
     }
 #endif
-    if(MY_RANK==0) ifs.close();
+    if(GlobalV::MY_RANK==0) ifs.close();
 
-    ofs_running << " Finish reading density matrix." << endl;
+    GlobalV::ofs_running << " Finish reading density matrix." << endl;
 
     timer::tick("Local_Orbital_Charge","read_dm");
     return;

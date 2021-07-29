@@ -3,9 +3,9 @@
 // DATE : 2007-9
 //==========================================================
 #include "symmetry.h"
-#include "../src_pw/global.h"
+//#include "../src_pw/global.h"
 #include "../module_base/mymath.h"
-#include "symm_other.h"
+//#include "symm_other.h"
 
 Symmetry_Basic::Symmetry_Basic()
 {
@@ -464,13 +464,13 @@ void Symmetry_Basic::veccon(
 		)
 {
 
-	ofs_running << "\n old1:" << old1.x << " " << old1.y << " " << old1.z;
-	ofs_running << "\n old2:" << old2.x << " " << old2.y << " " << old2.z;
-	ofs_running << "\n old3:" << old3.x << " " << old3.y << " " << old3.z;
+	GlobalV::ofs_running << "\n old1:" << old1.x << " " << old1.y << " " << old1.z;
+	GlobalV::ofs_running << "\n old2:" << old2.x << " " << old2.y << " " << old2.z;
+	GlobalV::ofs_running << "\n old3:" << old3.x << " " << old3.y << " " << old3.z;
 
-	ofs_running << "\n new1:" << new1.x << " " << new1.y << " " << new1.z;
-	ofs_running << "\n new2:" << new2.x << " " << new2.y << " " << new2.z;
-	ofs_running << "\n new3:" << new3.x << " " << new3.y << " " << new3.z;
+	GlobalV::ofs_running << "\n new1:" << new1.x << " " << new1.y << " " << new1.z;
+	GlobalV::ofs_running << "\n new2:" << new2.x << " " << new2.y << " " << new2.z;
+	GlobalV::ofs_running << "\n new3:" << new3.x << " " << new3.y << " " << new3.z;
 
 	Matrix3 oldlat;
 	oldlat.e11 = old1.x;
@@ -704,7 +704,7 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 //--------------------------------------------------------------
 void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 {
-	if(test_symmetry) TITLE("Symmetry_Basic","setgroup");
+	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","setgroup");
 
 	Matrix3 symgen[3];
 
@@ -808,14 +808,14 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 		this->matrigen(symgen, 3, symop, nop);
 	}
 
-	OUT(ofs_running,"ROTATION MATRICES",nop);
-	if(test_symmetry > 1)
+	OUT(GlobalV::ofs_running,"ROTATION MATRICES",nop);
+	if(GlobalV::test_symmetry > 1)
 	{
-		ofs_running<<" THERE ARE " << nop << " ROTATION MATRICES FOR THE PURE BRAVAIS LATTICE"<<endl;
-		ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<endl;
+		GlobalV::ofs_running<<" THERE ARE " << nop << " ROTATION MATRICES FOR THE PURE BRAVAIS LATTICE"<<endl;
+		GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<endl;
 		for(int i = 0; i < nop; ++i)
 		{
-			ofs_running << " " 
+			GlobalV::ofs_running << " " 
 			<< setw(3) << i + 1
 			<< setw(4) << symop[i].e11
 			<< setw(4) << symop[i].e12
@@ -827,14 +827,14 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 			<< setw(4) << symop[i].e32
 			<< setw(4) << symop[i].e33 << endl;
 //			out.printM3("",symop[i]);
-//			ofs_running<<endl;
+//			GlobalV::ofs_running<<endl;
 		}
 	}
 
 	return;
 }	
 
-void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, const Matrix3* gmatrix)
+void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, const Matrix3* gmatrix, ofstream &ofs_running)
 {
 	//-------------------------------------------------------------------------
 	//PGROUP (L1760 symlib.f VASP)
@@ -852,7 +852,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 
 	//there are four trivial cases which could be easily determined
 	//because the number of their elements are exclusive
-	if(test_symmetry) TITLE("Symmetry_Basic","pointgroup");
+	if(GlobalV::test_symmetry) TITLE("Symmetry_Basic","pointgroup");
 
 	if(nrot == 1)
 	{
@@ -905,7 +905,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 	int ns4 = 0;
 	int ns6 = 0; //mohan add 2012-01-15
 
-//	ofs_running << " " << setw(5) << "NROT" << setw(15) << "TRACE" << setw(15) << "DET" << endl;
+//	GlobalV::ofs_running << " " << setw(5) << "NROT" << setw(15) << "TRACE" << setw(15) << "DET" << endl;
 	for(int i = 0; i < nrot; ++i)
 	{
 		//calculate the trace of a matrix
@@ -913,7 +913,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		//calculate the determinant of a matrix
 		det = int(gmatrix[i].Det());
 
-//		ofs_running << " " << setw(5) << i+1 << setw(15) << trace << setw(15) << det << endl;
+//		GlobalV::ofs_running << " " << setw(5) << i+1 << setw(15) << trace << setw(15) << det << endl;
 
 		if(trace == 3)
 		{
@@ -936,14 +936,14 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		else if(trace == -2 && det == -1) ++ns3; //mohan add 2012-01-15
 	}
 
-	OUT(ofs_running,"C2",nc2);
-	OUT(ofs_running,"C3",nc3);
-	OUT(ofs_running,"C4",nc4);
-	OUT(ofs_running,"C6",nc6);
-	OUT(ofs_running,"S1",ns1);
-	OUT(ofs_running,"S3",ns3);
-	OUT(ofs_running,"S4",ns4);
-	OUT(ofs_running,"S6",ns6);
+	OUT(GlobalV::ofs_running,"C2",nc2);
+	OUT(GlobalV::ofs_running,"C3",nc3);
+	OUT(GlobalV::ofs_running,"C4",nc4);
+	OUT(GlobalV::ofs_running,"C6",nc6);
+	OUT(GlobalV::ofs_running,"S1",ns1);
+	OUT(GlobalV::ofs_running,"S3",ns3);
+	OUT(GlobalV::ofs_running,"S4",ns4);
+	OUT(GlobalV::ofs_running,"S6",ns6);
 	
 	if(nrot == 2)
 	{
@@ -1132,7 +1132,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		}
 	}
 
-	ofs_running <<"\n No point group found!"<<endl;
+	GlobalV::ofs_running <<"\n No point group found!"<<endl;
 	return;
 }
 

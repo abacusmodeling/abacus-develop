@@ -15,8 +15,8 @@ double* Gint_Gamma::get_vldr3(
 {
 	// set the index for obtaining local potentials
 	int* vindex = Gint_Tools::get_vindex(ncyz, ibx, jby, kbz);	
-	double *vldr3 = (double*)malloc(pw.bxyz*sizeof(double));					
-	for(int ib=0; ib<pw.bxyz; ib++)
+	double *vldr3 = (double*)malloc(GlobalC::pw.bxyz*sizeof(double));					
+	for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 	{
 		vldr3[ib]=vlocal[vindex[ib]] * this->vfactor;
 	}

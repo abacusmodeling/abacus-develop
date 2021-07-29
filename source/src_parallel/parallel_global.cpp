@@ -47,9 +47,9 @@ void Parallel_Global::split_diag_world(const int &diag_np)
 	int* group_grid_np = new int[diag_np];
 	ZEROS(group_grid_np, diag_np);
 	// average processors in each 'grid group'
-	int ave = NPROC/diag_np;
+	int ave = GlobalV::NPROC/diag_np;
 	// remain processors.
-	int remain = NPROC - ave * diag_np;
+	int remain = GlobalV::NPROC - ave * diag_np;
 
 	for(int i=0; i<diag_np; ++i)
 	{
@@ -69,25 +69,25 @@ void Parallel_Global::split_diag_world(const int &diag_np)
 	for(int i=0; i<diag_np; ++i)
 	{
 		np_now += group_grid_np[i];
-		if(MY_RANK < np_now)
+		if(GlobalV::MY_RANK < np_now)
 		{
 			key = i;
-			color = group_grid_np[i] - (np_now - MY_RANK);
+			color = group_grid_np[i] - (np_now - GlobalV::MY_RANK);
 			break;
 		}
 	}
 
 	MPI_Comm_split(MPI_COMM_WORLD, color, key, &DIAG_WORLD);
-	MPI_Comm_rank(DIAG_WORLD, &DRANK);
-	MPI_Comm_size(DIAG_WORLD, &DSIZE);
-	DCOLOR=color;
+	MPI_Comm_rank(DIAG_WORLD, &GlobalV::DRANK);
+	MPI_Comm_size(DIAG_WORLD, &GlobalV::DSIZE);
+	GlobalV::DCOLOR=color;
 
 
 	delete[] group_grid_np;
 #else
-	DCOLOR=0; //mohan fix bug 2012-02-04
-	DRANK=0;
-	DSIZE=1;
+	GlobalV::DCOLOR=0; //mohan fix bug 2012-02-04
+	GlobalV::DRANK=0;
+	GlobalV::DSIZE=1;
 #endif
 	return;
 }
@@ -102,9 +102,9 @@ void Parallel_Global::split_grid_world(const int &diag_np)
 	int* group_grid_np = new int[diag_np];
 	ZEROS(group_grid_np, diag_np);
 	// average processors in each 'grid group'
-	int ave = NPROC/diag_np;
+	int ave = GlobalV::NPROC/diag_np;
 	// remain processors.
-	int remain = NPROC - ave * diag_np;
+	int remain = GlobalV::NPROC - ave * diag_np;
 
 	for(int i=0; i<diag_np; ++i)
 	{
@@ -124,22 +124,22 @@ void Parallel_Global::split_grid_world(const int &diag_np)
 	for(int i=0; i<diag_np; ++i)
 	{
 		np_now += group_grid_np[i];
-		if(MY_RANK < np_now)
+		if(GlobalV::MY_RANK < np_now)
 		{
 			color = i;
-			key = group_grid_np[i] - (np_now - MY_RANK);
+			key = group_grid_np[i] - (np_now - GlobalV::MY_RANK);
 			break;
 		}
 	}
 
 	MPI_Comm_split(MPI_COMM_WORLD, color, key, &GRID_WORLD);
-	MPI_Comm_rank(GRID_WORLD, &GRANK);
-	MPI_Comm_size(GRID_WORLD, &GSIZE);
+	MPI_Comm_rank(GRID_WORLD, &GlobalV::GRANK);
+	MPI_Comm_size(GRID_WORLD, &GlobalV::GSIZE);
 
 	delete[] group_grid_np;
 #else
-	GRANK=0;  //mohan fix bug 2012-02-04
-	GSIZE=1;
+	GlobalV::GRANK=0;  //mohan fix bug 2012-02-04
+	GlobalV::GSIZE=1;
 #endif
 	return;
 }
@@ -165,26 +165,26 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	int provided;
 	MPI_Init_thread(&argc,&argv,MPI_THREAD_FUNNELED,&provided);
 	if( provided != MPI_THREAD_FUNNELED )
-		ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<endl;
+		GlobalV::ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<endl;
 //----------------------------------------------------------
 // int atoi ( const char * str );
 // atoi : Convert string to int type
 // atof : Convert string to double type
 // atol : Convert string to long int type
 //----------------------------------------------------------
-//  NPOOL = atoi(argv[1]); // mohan abandon 2010-06-09
+//  GlobalV::NPOOL = atoi(argv[1]); // mohan abandon 2010-06-09
 
-	// get the size --> NPROC
-	// get the rank --> MY_RANK
-	MPI_Comm_size(MPI_COMM_WORLD,&NPROC);
-	MPI_Comm_rank(MPI_COMM_WORLD,&MY_RANK);
+	// get the size --> GlobalV::NPROC
+	// get the rank --> GlobalV::MY_RANK
+	MPI_Comm_size(MPI_COMM_WORLD,&GlobalV::NPROC);
+	MPI_Comm_rank(MPI_COMM_WORLD,&GlobalV::MY_RANK);
 
 
 
 	// for test
-	for (int i=0; i<NPROC; i++)
+	for (int i=0; i<GlobalV::NPROC; i++)
     {
-        if (MY_RANK == i)
+        if (GlobalV::MY_RANK == i)
         {
 			if(i==0)
 			{
@@ -222,14 +222,14 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
     			time_t  time_now = time(NULL);
     			cout << " " << ctime(&time_now);
 			}
-//            cout << " PROCESSOR " << setw(4) << MY_RANK+1 << " IS READY." << endl;
+//            cout << " PROCESSOR " << setw(4) << GlobalV::MY_RANK+1 << " IS READY." << endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }
 
 	// This section can be chosen !!
 	// mohan 2011-03-15
-    if (MY_RANK != 0 )
+    if (GlobalV::MY_RANK != 0 )
     {
         //cout.rdbuf(NULL);
 		cout.setstate(ios::failbit);//qianrui modify 2020-10-14

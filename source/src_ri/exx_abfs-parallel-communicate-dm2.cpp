@@ -8,9 +8,9 @@ void Exx_Abfs::Parallel::Communicate::DM2::init(
 {
 	threshold = threshold_in;
 	
-	atom_in_exx.row.resize(ucell.nat,false);
-	atom_in_exx.col.resize(ucell.nat,false);
-	atom_in_exx.row_col.resize(ucell.nat,vector<bool>(ucell.nat,false));
+	atom_in_exx.row.resize(GlobalC::ucell.nat,false);
+	atom_in_exx.col.resize(GlobalC::ucell.nat,false);
+	atom_in_exx.row_col.resize(GlobalC::ucell.nat,vector<bool>(GlobalC::ucell.nat,false));
 	
 	for( const auto &pair : H_atom_pairs_core )
 	{
@@ -23,7 +23,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::init(
 void Exx_Abfs::Parallel::Communicate::DM2::clear_DMr()
 {
 	DMr.clear();
-	DMr.resize(NSPIN);
+	DMr.resize(GlobalV::NSPIN);
 }
 
 void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, const int is, const pair<int,int> &index_begin )
@@ -33,13 +33,13 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 		map<int,pair<int,int>> iats;
 		for( int i=0; i<n; ++i )
 		{
-			const int iat = ucell.iwt2iat[i+i_begin];
+			const int iat = GlobalC::ucell.iwt2iat[i+i_begin];
 			if( in_exx[iat] )
 				iats[iat].second=i;
 		}
 		for( int i=n-1; i>=0; --i )
 		{
-			const int iat = ucell.iwt2iat[i+i_begin];
+			const int iat = GlobalC::ucell.iwt2iat[i+i_begin];
 			if( in_exx[iat] )
 				iats[iat].first=i;
 		}
@@ -48,7 +48,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 	const map<int,pair<int,int>> iat1s = get_iats( DM_2D.nr, index_begin.first, atom_in_exx.row );
 	const map<int,pair<int,int>> iat2s = get_iats( DM_2D.nc, index_begin.second, atom_in_exx.col );
 	
-	const double SPIN_multiple = 0.5*NSPIN;	
+	const double SPIN_multiple = 0.5*GlobalV::NSPIN;	
 	for( const auto &iat1sA : iat1s )
 	{
 		const int iat1 = iat1sA.first;
@@ -59,11 +59,11 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 			const auto &iat2_range = iat2sA.second;
 			if( !atom_in_exx.row_col[iat1][iat2] )	continue;
 			
-			matrix DM_local( ucell.atoms[ucell.iat2it[iat1]].nw, ucell.atoms[ucell.iat2it[iat2]].nw );
-			const int iw2_begin = ucell.iwt2iw[ iat2_range.first + index_begin.second ];
+			matrix DM_local( GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw, GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw );
+			const int iw2_begin = GlobalC::ucell.iwt2iw[ iat2_range.first + index_begin.second ];
 			for( int iw1_2D=iat1_range.first; iw1_2D<=iat1_range.second; ++iw1_2D )
 			{
-				const int iw1 = ucell.iwt2iw[ iw1_2D + index_begin.first ];
+				const int iw1 = GlobalC::ucell.iwt2iw[ iw1_2D + index_begin.first ];
 				memcpy(
 					&DM_local( iw1, iw2_begin ), 
 					&DM_2D( iw1_2D, iat2_range.first ), 
@@ -102,7 +102,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::cal_DM_k(
 	dm_my.cal_DM( H_atom_pairs_core, Born_von_Karman_boxes );
 	
 	this->DMr.clear();
-	this->DMr.resize(NSPIN);
+	this->DMr.resize(GlobalV::NSPIN);
 	for( const auto &DMrA : dm_my.DMr )
 	{
 		const size_t iat1 = DMrA.first;

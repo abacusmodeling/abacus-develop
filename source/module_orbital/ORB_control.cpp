@@ -60,7 +60,7 @@ void ORB_control::set_orb_tables(
 #ifdef __NORMAL
 
 #else
-	if(CALCULATION=="test")
+	if(GlobalV::CALCULATION=="test")
 	{
 		timer::tick("ORB_control","set_orb_tables");
 		return;

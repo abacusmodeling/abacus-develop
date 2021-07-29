@@ -36,13 +36,13 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 {
 	TITLE("LCAO_Matrix","divide_HS_in_frag");
 
-	ofs_running << "\n SETUP THE DIVISION OF H/S MATRIX" << endl;
+	GlobalV::ofs_running << "\n SETUP THE DIVISION OF H/S MATRIX" << endl;
 	
 	// (1) calculate nrow, ncol, nloc.
-	if (KS_SOLVER=="genelpa" || KS_SOLVER=="hpseps" || KS_SOLVER=="scalpack" 
-		|| KS_SOLVER=="selinv" || KS_SOLVER=="scalapack_gvx")
+	if (GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="hpseps" || GlobalV::KS_SOLVER=="scalpack" 
+		|| GlobalV::KS_SOLVER=="selinv" || GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
-		ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
+		GlobalV::ofs_running << " divide the H&S matrix using 2D block algorithms." << endl;
 #ifdef __MPI
 		// storage form of H and S matrices on each processor
 		// is determined in 'divide_HS_2d' subroutine
@@ -54,7 +54,7 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 	else
 	{
 		// the full matrix
-		po.nloc = NLOCAL * NLOCAL;
+		po.nloc = GlobalV::NLOCAL * GlobalV::NLOCAL;
 	}
 
 	// (2) set the trace, then we can calculate the nnr.
@@ -80,7 +80,7 @@ void LCAO_Matrix::allocate_HS_gamma(const long &nloc)
 {
 	TITLE("LCAO_Matrix","allocate_HS_gamma");
 
-	OUT(ofs_running,"nloc",nloc);
+	OUT(GlobalV::ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
 
 	// because we initilize in the constructor function
@@ -109,7 +109,7 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 {
 	TITLE("LCAO_Matrix","allocate_HS_k");
 
-	OUT(ofs_running,"nloc",nloc);
+	OUT(GlobalV::ofs_running,"nloc",nloc);
 	if(nloc==0) return; //mohan fix bug 2012-05-25
 
 	// because we initilize in the constructor function
@@ -134,7 +134,7 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 
 void LCAO_Matrix::allocate_HS_R(const int &nnR)
 {
-	if(NSPIN!=4)
+	if(GlobalV::NSPIN!=4)
 	{
 		delete[] HlocR;
 		delete[] SlocR;
@@ -171,27 +171,27 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
-    const int ir = ParaO.trace_loc_row[ iw1_all ];
-    const int ic = ParaO.trace_loc_col[ iw2_all ];
-    //const int index = ir * ParaO.ncol + ic;
+    const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
+    const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
+    //const int index = ir * GlobalC::ParaO.ncol + ic;
 	long index;
-	if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+	if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
 	{
-		index=ic*ParaO.nrow+ir;
+		index=ic*GlobalC::ParaO.nrow+ir;
 	}
 	else
 	{
-		index=ir*ParaO.ncol+ic;
+		index=ir*GlobalC::ParaO.ncol+ic;
   	}
    
-   	if( index >= ParaO.nloc)
+   	if( index >= GlobalC::ParaO.nloc)
 	{
 		cout << " iw1_all = " << iw1_all << endl;
 		cout << " iw2_all = " << iw2_all << endl;
 		cout << " ir = " << ir << endl;
 		cout << " ic = " << ic << endl;
 		cout << " index = " << index << endl;
-		cout << " ParaO.nloc = " << ParaO.nloc << endl;
+		cout << " GlobalC::ParaO.nloc = " << GlobalC::ParaO.nloc << endl;
 		WARNING_QUIT("LCAO_Matrix","set_HSgamma");
 	}	 
 
@@ -220,19 +220,19 @@ void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
-    const int ir = ParaO.trace_loc_row[ iw1_all ];
-    const int ic = ParaO.trace_loc_col[ iw2_all ];
-    //const int index = ir * ParaO.ncol + ic;
+    const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
+    const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
+    //const int index = ir * GlobalC::ParaO.ncol + ic;
 	long index;
-	if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+	if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
 	{
-		index=ic*ParaO.nrow+ir;
+		index=ic*GlobalC::ParaO.nrow+ir;
 	}
 	else
 	{
-		index=ir*ParaO.ncol+ic;
+		index=ir*GlobalC::ParaO.ncol+ic;
   	}
-    assert(index < ParaO.nloc);
+    assert(index < GlobalC::ParaO.nloc);
 	if (dtype=='S')//overlap Hamiltonian.
 	{
 		this->Sloc2[index] += v;
@@ -265,18 +265,18 @@ void LCAO_Matrix::set_force
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
-    const int ir = ParaO.trace_loc_row[ iw1_all ];
-    const int ic = ParaO.trace_loc_col[ iw2_all ];
-    const long index = ir * ParaO.ncol + ic;
+    const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
+    const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
+    const long index = ir * GlobalC::ParaO.ncol + ic;
 	
-	if( index >= ParaO.nloc)
+	if( index >= GlobalC::ParaO.nloc)
 	{
 		cout << " iw1_all = " << iw1_all << endl;
 		cout << " iw2_all = " << iw2_all << endl;
 		cout << " ir = " << ir << endl;
 		cout << " ic = " << ic << endl;
 		cout << " index = " << index << endl;
-		cout << " ParaO.nloc = " << ParaO.nloc << endl;
+		cout << " GlobalC::ParaO.nloc = " << GlobalC::ParaO.nloc << endl;
 		WARNING_QUIT("LCAO_Matrix","set_force");
 	}	 
 
@@ -315,18 +315,18 @@ void LCAO_Matrix::set_stress
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
-    const int ir = ParaO.trace_loc_row[ iw1_all ];
-    const int ic = ParaO.trace_loc_col[ iw2_all ];
-    const long index = ir * ParaO.ncol + ic;
+    const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
+    const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
+    const long index = ir * GlobalC::ParaO.ncol + ic;
 
-	if( index >= ParaO.nloc)
+	if( index >= GlobalC::ParaO.nloc)
 	{
 		cout << " iw1_all = " << iw1_all << endl;
 		cout << " iw2_all = " << iw2_all << endl;
 		cout << " ir = " << ir << endl;
 		cout << " ic = " << ic << endl;
 		cout << " index = " << index << endl;
-		cout << " ParaO.nloc = " << ParaO.nloc << endl;
+		cout << " GlobalC::ParaO.nloc = " << GlobalC::ParaO.nloc << endl;
 		WARNING_QUIT("LCAO_Matrix","set_stress");
 	}
 
@@ -364,23 +364,23 @@ void LCAO_Matrix::set_stress
 
 void LCAO_Matrix::zeros_HSgamma(const char &mtype)
 {
-	if (mtype=='S') ZEROS(Sloc,ParaO.nloc);
-	else if (mtype=='T') ZEROS(Hloc_fixed,ParaO.nloc);
-	else if (mtype=='H') ZEROS(Hloc,ParaO.nloc);
+	if (mtype=='S') ZEROS(Sloc,GlobalC::ParaO.nloc);
+	else if (mtype=='T') ZEROS(Hloc_fixed,GlobalC::ParaO.nloc);
+	else if (mtype=='H') ZEROS(Hloc,GlobalC::ParaO.nloc);
 	return;
 }
 
 void LCAO_Matrix::zeros_HSk(const char &mtype)
 {
-	if (mtype=='S') ZEROS(Sloc2,ParaO.nloc);
-	else if (mtype=='T') ZEROS(Hloc_fixed2,ParaO.nloc);
-	else if (mtype=='H') ZEROS(Hloc2,ParaO.nloc);
+	if (mtype=='S') ZEROS(Sloc2,GlobalC::ParaO.nloc);
+	else if (mtype=='T') ZEROS(Hloc_fixed2,GlobalC::ParaO.nloc);
+	else if (mtype=='H') ZEROS(Hloc2,GlobalC::ParaO.nloc);
 	return;
 }
 
 void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 {
-	if(NSPIN!=4)
+	if(GlobalV::NSPIN!=4)
 	{
 		if (mtype=='S') ZEROS(SlocR, nnr);
 		else if (mtype=='T') ZEROS(Hloc_fixedR, nnr);
@@ -414,12 +414,12 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 
 
 	os << setprecision(8) << endl;
-	for(int i=0; i<ParaO.nrow; i++)
+	for(int i=0; i<GlobalC::ParaO.nrow; i++)
 	{
 		os << " " ;
-		for(int j=0; j<ParaO.ncol; j++)
+		for(int j=0; j<GlobalC::ParaO.ncol; j++)
 		{
-			const int index = i * ParaO.ncol + j;
+			const int index = i * GlobalC::ParaO.ncol + j;
 			if(vtype=='A')
 			{
 				complex<double> v;
@@ -475,20 +475,20 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 {
 	TITLE("Parallel_Orbitals","print_HSgamma");
 
-	ofs_running << " " << mtype << " matrix" << endl;
-	ofs_running << " nrow=" << ParaO.nrow << endl;
-	ofs_running << " ncol=" << ParaO.ncol << endl;
-	ofs_running << " element number = " << ParaO.ncol << endl;
+	GlobalV::ofs_running << " " << mtype << " matrix" << endl;
+	GlobalV::ofs_running << " nrow=" << GlobalC::ParaO.nrow << endl;
+	GlobalV::ofs_running << " ncol=" << GlobalC::ParaO.ncol << endl;
+	GlobalV::ofs_running << " element number = " << GlobalC::ParaO.ncol << endl;
 
 	if (mtype=='S')
 	{
 		os << setprecision(8);
 		os << " print Sloc" << endl;
-		for(int i=0; i<NLOCAL; ++i)
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
-			for(int j=0; j<NLOCAL; ++j)
+			for(int j=0; j<GlobalV::NLOCAL; ++j)
 			{
-				double v = Sloc[i*ParaO.ncol+j];
+				double v = Sloc[i*GlobalC::ParaO.ncol+j];
 				if( abs(v) > 1.0e-8)
 				{
 					os << setw(15) << v;
@@ -504,11 +504,11 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 	if (mtype=='T')
 	{
 		os << " print Hloc_fixed" << endl;
-		for(int i=0; i<NLOCAL; ++i)
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
-			for(int j=0; j<NLOCAL; ++j)
+			for(int j=0; j<GlobalV::NLOCAL; ++j)
 			{
-				double v = Hloc_fixed[i*ParaO.ncol+j];
+				double v = Hloc_fixed[i*GlobalC::ParaO.ncol+j];
 				if( abs(v) > 1.0e-8)
 				{
 					os << setw(15) << v;
@@ -524,11 +524,11 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 	if (mtype=='H')
 	{
 		os << " print Hloc" << endl;
-		for(int i=0; i<NLOCAL; ++i)
+		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
-			for(int j=0; j<NLOCAL; ++j)
+			for(int j=0; j<GlobalV::NLOCAL; ++j)
 			{
-				double v = Hloc[i*ParaO.ncol+j];
+				double v = Hloc[i*GlobalC::ParaO.ncol+j];
 				if( abs(v) > 1.0e-8)
 				{
 					os << setw(15) << v;
@@ -548,7 +548,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
 // becareful! Update Hloc, we add new members to it.
 void LCAO_Matrix::update_Hloc(void)
 {
-	for (long i=0; i<ParaO.nloc; i++)
+	for (long i=0; i<GlobalC::ParaO.nloc; i++)
 	{
 		Hloc[i] += Hloc_fixed[i];
 	}
@@ -557,7 +557,7 @@ void LCAO_Matrix::update_Hloc(void)
 
 void LCAO_Matrix::update_Hloc2(void)
 {
-	for (long i=0; i<ParaO.nloc; i++)
+	for (long i=0; i<GlobalC::ParaO.nloc; i++)
 	{
 		Hloc2[i] += Hloc_fixed2[i];
 	}
@@ -569,14 +569,14 @@ void LCAO_Matrix::output_HSk(const char &mtype, string &fn)
 {
 	TITLE("LCAO_Matrix","output_HSk");
 	stringstream ss;
-	ss << global_out_dir << fn;
+	ss << GlobalV::global_out_dir << fn;
 	ofstream ofs(ss.str().c_str());
-	ofs << NLOCAL << endl;
-	for(int i=0; i<NLOCAL; i++)
+	ofs << GlobalV::NLOCAL << endl;
+	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		for(int j=0; j<NLOCAL; j++)
+		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{	
-			const int index = i * NLOCAL + j;
+			const int index = i * GlobalV::NLOCAL + j;
 			if(mtype=='S') ofs << Sloc2[index].real() << " " << Sloc2[index].imag() << endl;
 			else if(mtype=='T') ofs << Hloc_fixed2[index].real() << " " << Hloc_fixed2[index].imag() << endl;
 			else if(mtype=='H') ofs << Hloc2[index].real() << " " << Hloc2[index].imag() << endl;
@@ -593,11 +593,11 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    if(NSPIN!=4)
+    if(GlobalV::NSPIN!=4)
     {
         Hloc_fixedR_tr = new double***[R_x];
         //HR_tr = new double***[R_x];
@@ -614,12 +614,12 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
                 //SlocR_tr[ix][iy] = new double*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    Hloc_fixedR_tr[ix][iy][iz] = new double[ParaO.nloc];
-                    //HR_tr[ix][iy][iz] = new double[ParaO.nloc];
-                    //SlocR_tr[ix][iy][iz] = new double[ParaO.nloc];
-                    ZEROS(Hloc_fixedR_tr[ix][iy][iz], ParaO.nloc);
-                    //ZEROS(HR_tr[ix][iy][iz], ParaO.nloc);
-                    //ZEROS(SlocR_tr[ix][iy][iz], ParaO.nloc);
+                    Hloc_fixedR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
+                    //HR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
+                    //SlocR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
+                    ZEROS(Hloc_fixedR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -641,12 +641,12 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
                 //SlocR_tr[ix][iy] = new double*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    Hloc_fixedR_tr_soc[ix][iy][iz] = new complex<double>[ParaO.nloc];
-                    //HR_tr[ix][iy][iz] = new double[ParaO.nloc];
-                    //SlocR_tr[ix][iy][iz] = new double[ParaO.nloc];
-                    ZEROS(Hloc_fixedR_tr_soc[ix][iy][iz], ParaO.nloc);
-                    //ZEROS(HR_tr[ix][iy][iz], ParaO.nloc);
-                    //ZEROS(SlocR_tr[ix][iy][iz], ParaO.nloc);
+                    Hloc_fixedR_tr_soc[ix][iy][iz] = new complex<double>[GlobalC::ParaO.nloc];
+                    //HR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
+                    //SlocR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
+                    ZEROS(Hloc_fixedR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
+                    //ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -654,7 +654,7 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
 //cout<<"R_x: "<<R_x<<endl;
 //cout<<"R_y: "<<R_y<<endl;
 //cout<<"R_z: "<<R_z<<endl;
-//cout<<"ParaO.nloc: "<<ParaO.nloc<<endl;
+//cout<<"GlobalC::ParaO.nloc: "<<GlobalC::ParaO.nloc<<endl;
 //cout<<"SlocR_tr 1-3-3-27: "<<SlocR_tr[1][3][3][27]<<endl;
 //cout<<"Hloc_fixedR_tr 1-3-3-27: "<<Hloc_fixedR_tr[1][3][3][27]<<endl;
 
@@ -668,11 +668,11 @@ void LCAO_Matrix::allocate_HR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    if(NSPIN!=4)
+    if(GlobalV::NSPIN!=4)
     {
         HR_tr = new double***[R_x];
         for(int ix=0; ix<R_x; ix++)
@@ -683,8 +683,8 @@ void LCAO_Matrix::allocate_HR_tr(void)
                 HR_tr[ix][iy] = new double*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    HR_tr[ix][iy][iz] = new double[ParaO.nloc];
-                    ZEROS(HR_tr[ix][iy][iz], ParaO.nloc);
+                    HR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
+                    ZEROS(HR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -700,8 +700,8 @@ void LCAO_Matrix::allocate_HR_tr(void)
                 HR_tr_soc[ix][iy] = new complex<double>*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    HR_tr_soc[ix][iy][iz] = new complex<double>[ParaO.nloc];
-                    ZEROS(HR_tr_soc[ix][iy][iz], ParaO.nloc);
+                    HR_tr_soc[ix][iy][iz] = new complex<double>[GlobalC::ParaO.nloc];
+                    ZEROS(HR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -717,11 +717,11 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    if(NSPIN!=4)
+    if(GlobalV::NSPIN!=4)
     {
         SlocR_tr = new double***[R_x];
         for(int ix=0; ix<R_x; ix++)
@@ -732,8 +732,8 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
                 SlocR_tr[ix][iy] = new double*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    SlocR_tr[ix][iy][iz] = new double[ParaO.nloc];
-                    ZEROS(SlocR_tr[ix][iy][iz], ParaO.nloc);
+                    SlocR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
+                    ZEROS(SlocR_tr[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -749,8 +749,8 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
                 SlocR_tr_soc[ix][iy] = new complex<double>*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    SlocR_tr_soc[ix][iy][iz] = new complex<double>[ParaO.nloc];
-                    ZEROS(SlocR_tr_soc[ix][iy][iz], ParaO.nloc);
+                    SlocR_tr_soc[ix][iy][iz] = new complex<double>[GlobalC::ParaO.nloc];
+                    ZEROS(SlocR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
         }
@@ -766,11 +766,11 @@ void LCAO_Matrix::destroy_Hloc_fixedR_tr(void)
     //int R_x = 10;
     //int R_y = 10;
     //int R_z = 10;
-    int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+    int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-    if(NSPIN!=4)
+    if(GlobalV::NSPIN!=4)
     {
         for(int ix=0; ix<R_x; ix++)
         {
@@ -824,25 +824,25 @@ void LCAO_Matrix::destroy_Hloc_fixedR_tr(void)
 
 void LCAO_Matrix::set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const double &v)
 {
-    const int ir = ParaO.trace_loc_row[ iw1_all ];
-    const int ic = ParaO.trace_loc_col[ iw2_all ];
+    const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
+    const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
 
 //cout<<"ir: "<<ir<<endl;
 //cout<<"ic: "<<ic<<endl;
     long index;
-    if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
+    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
     {
-        index=ic*ParaO.nrow+ir;
+        index=ic*GlobalC::ParaO.nrow+ir;
 //cout<<"index: "<<index<<endl;
     }
     else
     {
-        index=ir*ParaO.ncol+ic;
+        index=ir*GlobalC::ParaO.ncol+ic;
 //cout<<"index: "<<index<<endl;
     }
 
-//cout<<"ParaO.nloc: "<<ParaO.nloc<<endl;
-    assert(index < ParaO.nloc);
+//cout<<"GlobalC::ParaO.nloc: "<<GlobalC::ParaO.nloc<<endl;
+    assert(index < GlobalC::ParaO.nloc);
 //cout<<"Rx: "<<Rx<<endl;
 //cout<<"Ry: "<<Ry<<endl;
 //cout<<"Rz: "<<Rz<<endl;
@@ -859,25 +859,25 @@ void LCAO_Matrix::set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const i
 //LiuXh add 2019-07-16
 void LCAO_Matrix::set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const complex<double> &v)
 {
-    const int ir = ParaO.trace_loc_row[ iw1_all ];
-    const int ic = ParaO.trace_loc_col[ iw2_all ];
+    const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
+    const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
 
 //cout<<"ir: "<<ir<<endl;
 //cout<<"ic: "<<ic<<endl;
     long index;
-    if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
+    if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")
     {
-        index=ic*ParaO.nrow+ir;
+        index=ic*GlobalC::ParaO.nrow+ir;
 //cout<<"index: "<<index<<endl;
     }
     else
     {
-        index=ir*ParaO.ncol+ic;
+        index=ir*GlobalC::ParaO.ncol+ic;
 //cout<<"index: "<<index<<endl;
     }
 
-//cout<<"ParaO.nloc: "<<ParaO.nloc<<endl;
-    assert(index < ParaO.nloc);
+//cout<<"GlobalC::ParaO.nloc: "<<GlobalC::ParaO.nloc<<endl;
+    assert(index < GlobalC::ParaO.nloc);
 //cout<<"Rx: "<<Rx<<endl;
 //cout<<"Ry: "<<Ry<<endl;
 //cout<<"Rz: "<<Rz<<endl;
@@ -895,11 +895,11 @@ void LCAO_Matrix::allocate_HS_R_sparse(void)
 {
 	TITLE("LCAO_Matrix","allocate_HS_R_sparse");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
-    int R_z = GridD.getCellZ();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
+    int R_z = GlobalC::GridD.getCellZ();
 
-	if (NSPIN != 4)
+	if (GlobalV::NSPIN != 4)
 	{
 		HR_sparse = new map<size_t, map<size_t, double>> **[R_x];
 		SR_sparse = new map<size_t, map<size_t, double>> **[R_x];
@@ -937,10 +937,10 @@ void LCAO_Matrix::destroy_HS_R_sparse(void)
 {
 	TITLE("LCAO_Matrix","destroy_HS_R_sparse");
 
-	int R_x = GridD.getCellX();
-    int R_y = GridD.getCellY();
+	int R_x = GlobalC::GridD.getCellX();
+    int R_y = GlobalC::GridD.getCellY();
 
-	if (NSPIN != 4)
+	if (GlobalV::NSPIN != 4)
 	{
 		for (int ix = 0; ix < R_x; ++ix)
 		{

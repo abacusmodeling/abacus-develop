@@ -18,14 +18,14 @@
 
 void Exx_Opt_Orb::generate_matrix() const
 {
-ofstream ofs_mpi(exx_lcao.test_dir.process+"time_"+TO_STRING(MY_RANK),ofstream::app);
+ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 
 	TITLE("Exx_Opt_Orb::generate_matrix");
 ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
+	const vector<vector<vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, exx_lcao.info.pca_threshold );
+	const vector<vector<vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, GlobalC::exx_lcao.info.pca_threshold );
 
 ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 	
@@ -163,25 +163,25 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
 ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 
-ofs_matrixes(exx_lcao.test_dir.matrix+"ms_jys_jys",ms_jys_jys);
-ofs_matrixes(exx_lcao.test_dir.matrix+"ms_lcaoslcaos_jys",ms_lcaoslcaos_jys);
-ofs_matrixes(exx_lcao.test_dir.matrix+"ms_lcaoslcaos_lcaoslcaos",ms_lcaoslcaos_lcaoslcaos);
-ofs_matrixes(exx_lcao.test_dir.matrix+"ms_abfs_abfs",ms_abfs_abfs);
-ofs_matrixes(exx_lcao.test_dir.matrix+"ms_lcaoslcaos_abfs",ms_lcaoslcaos_abfs);
-ofs_matrixes(exx_lcao.test_dir.matrix+"ms_jys_abfs",ms_jys_abfs);
+ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_jys_jys",ms_jys_jys);
+ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_lcaoslcaos_jys",ms_lcaoslcaos_jys);
+ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_lcaoslcaos_lcaoslcaos",ms_lcaoslcaos_lcaoslcaos);
+ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_abfs_abfs",ms_abfs_abfs);
+ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_lcaoslcaos_abfs",ms_lcaoslcaos_abfs);
+ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_jys_abfs",ms_jys_abfs);
 
-	for( size_t TA=0; TA!=ucell.ntype; ++TA )
+	for( size_t TA=0; TA!=GlobalC::ucell.ntype; ++TA )
 	{
-		for( size_t IA=0; IA!=ucell.atoms[TA].na; ++IA )
+		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
 		{
-			for( size_t TB=0; TB!=ucell.ntype; ++TB )
+			for( size_t TB=0; TB!=GlobalC::ucell.ntype; ++TB )
 			{
-				for( size_t IB=0; IB!=ucell.atoms[TB].na; ++IB )
+				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
 					if( TA==TB && IA==IB )
 					{
 						const size_t T=TA, I=IA;
-						if(exx_lcao.info.pca_threshold<=1)
+						if(GlobalC::exx_lcao.info.pca_threshold<=1)
 						{
 							// < abfs | abfs >.I
 							const vector<vector<matrix>> ms_abfs_abfs_I = cal_I( ms_abfs_abfs, T,I,T,I );
@@ -227,7 +227,7 @@ ofs_matrixes(exx_lcao.test_dir.matrix+"ms_jys_abfs",ms_jys_abfs);
 					}
 					else
 					{
-						if(exx_lcao.info.pca_threshold<=1)
+						if(GlobalC::exx_lcao.info.pca_threshold<=1)
 						{
 							// < abfs | abfs >.I
 							const vector<vector<matrix>> ms_abfs_abfs_I = cal_I( ms_abfs_abfs, TA,IA,TB,IB );
@@ -362,13 +362,13 @@ map<size_t,map<size_t,set<double>>> Exx_Opt_Orb::get_radial_R() const
 {
 	TITLE("Exx_Opt_Orb::get_radial_R");
 	map<size_t,map<size_t,set<double>>> radial_R;
-	for( size_t TA=0; TA!=ucell.ntype; ++TA )
-		for( size_t IA=0; IA!=ucell.atoms[TA].na; ++IA )
-			for( size_t TB=0; TB!=ucell.ntype; ++TB )
-				for( size_t IB=0; IB!=ucell.atoms[TB].na; ++IB )
+	for( size_t TA=0; TA!=GlobalC::ucell.ntype; ++TA )
+		for( size_t IA=0; IA!=GlobalC::ucell.atoms[TA].na; ++IA )
+			for( size_t TB=0; TB!=GlobalC::ucell.ntype; ++TB )
+				for( size_t IB=0; IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					const Vector3<double> &tauA = ucell.atoms[TA].tau[IA];
-					const Vector3<double> &tauB = ucell.atoms[TB].tau[IB];
+					const Vector3<double> &tauA = GlobalC::ucell.atoms[TA].tau[IA];
+					const Vector3<double> &tauB = GlobalC::ucell.atoms[TB].tau[IB];
 					const double delta_R = (-tauA+tauB).norm();
 					radial_R[TA][TB].insert( delta_R );
 					radial_R[TB][TA].insert( delta_R );

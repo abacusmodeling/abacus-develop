@@ -19,7 +19,10 @@
 
 using namespace std;
 
+namespace GlobalC
+{
 Chi0_standard chi0_standard;
+}
 
 Chi0_standard:: Chi0_standard()
                 :init_finish(false)
@@ -49,11 +52,11 @@ void Chi0_standard:: Chi()
 	//  the serial number of q
 	//---------------------------------------
 	bool exist_q = false;
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		double dx = fabs( kv.kvec_d[ik].x - q_start[0]);
-		double dy = fabs( kv.kvec_d[ik].y - q_start[1]);
-		double dz = fabs( kv.kvec_d[ik].z - q_start[2]);
+		double dx = fabs( GlobalC::kv.kvec_d[ik].x - q_start[0]);
+		double dy = fabs( GlobalC::kv.kvec_d[ik].y - q_start[1]);
+		double dz = fabs( GlobalC::kv.kvec_d[ik].z - q_start[2]);
 		if( dx<0.0001 && dy<0.0001 && dz<0.0001)
 		{
 			start_q = ik; exist_q = true;
@@ -72,18 +75,18 @@ void Chi0_standard:: Chi()
 
 	
 	int icount = 0;
-	std::vector<int> qc(kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
-	std::vector<double> ql(kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<int> qc(GlobalC::kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<double> ql(GlobalC::kv.nks);		// Peize Lin change ptr to vector at 2020.01.31
 	int total_icount=0;
 	int temp1; double temp2;
 	
 	if( direct[0]!=0 && direct[1]!=0 && direct[2]!=0)
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			double x = kv.kvec_d[ik].x - kv.kvec_d[start_q].x;
-			double y = kv.kvec_d[ik].y - kv.kvec_d[start_q].y;
-			double z = kv.kvec_d[ik].z - kv.kvec_d[start_q].z;
+			double x = GlobalC::kv.kvec_d[ik].x - GlobalC::kv.kvec_d[start_q].x;
+			double y = GlobalC::kv.kvec_d[ik].y - GlobalC::kv.kvec_d[start_q].y;
+			double z = GlobalC::kv.kvec_d[ik].z - GlobalC::kv.kvec_d[start_q].z;
 			
 			double p0 = x/direct[0]; double p1 = y/direct[1]; double p2 = z/direct[2];
 			if( p0>0.0001 && fabs(p0-p1)<0.0001 && fabs(p0-p2)<0.0001)
@@ -94,11 +97,11 @@ void Chi0_standard:: Chi()
 	}
 	else if( direct[0]==0 && direct[1]!=0 && direct[2]!=0 )
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			double x = kv.kvec_d[ik].x - kv.kvec_d[start_q].x;
-			double y = kv.kvec_d[ik].y - kv.kvec_d[start_q].y;
-			double z = kv.kvec_d[ik].z - kv.kvec_d[start_q].z;
+			double x = GlobalC::kv.kvec_d[ik].x - GlobalC::kv.kvec_d[start_q].x;
+			double y = GlobalC::kv.kvec_d[ik].y - GlobalC::kv.kvec_d[start_q].y;
+			double z = GlobalC::kv.kvec_d[ik].z - GlobalC::kv.kvec_d[start_q].z;
 			
 			double p1 = y/direct[1]; double p2 = z/direct[2];
 			if( fabs(x)<0.0001 && p1>0.0001 && fabs(p1-p2)<0.0001)
@@ -109,11 +112,11 @@ void Chi0_standard:: Chi()
 	}
 	else if( direct[0]!=0 && direct[1]==0 && direct[2]!=0 )
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			double x = kv.kvec_d[ik].x - kv.kvec_d[start_q].x;
-			double y = kv.kvec_d[ik].y - kv.kvec_d[start_q].y;
-			double z = kv.kvec_d[ik].z - kv.kvec_d[start_q].z;
+			double x = GlobalC::kv.kvec_d[ik].x - GlobalC::kv.kvec_d[start_q].x;
+			double y = GlobalC::kv.kvec_d[ik].y - GlobalC::kv.kvec_d[start_q].y;
+			double z = GlobalC::kv.kvec_d[ik].z - GlobalC::kv.kvec_d[start_q].z;
 			
 			double p0 = x/direct[0]; double p2 = z/direct[2];
 			if( fabs(y)<0.0001 && p0>0.0001 && fabs(p0-p2)<0.0001)
@@ -124,11 +127,11 @@ void Chi0_standard:: Chi()
 	}		
 	else if( direct[0]!=0 && direct[1]!=0 && direct[2]==0 )
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			double x = kv.kvec_d[ik].x - kv.kvec_d[start_q].x;
-			double y = kv.kvec_d[ik].y - kv.kvec_d[start_q].y;
-			double z = kv.kvec_d[ik].z - kv.kvec_d[start_q].z;
+			double x = GlobalC::kv.kvec_d[ik].x - GlobalC::kv.kvec_d[start_q].x;
+			double y = GlobalC::kv.kvec_d[ik].y - GlobalC::kv.kvec_d[start_q].y;
+			double z = GlobalC::kv.kvec_d[ik].z - GlobalC::kv.kvec_d[start_q].z;
 			
 			double p0 = x/direct[0]; double p1 = y/direct[1];
 			if( fabs(z)<0.0001 && p0>0.0001 && fabs(p0-p1)<0.0001)
@@ -139,11 +142,11 @@ void Chi0_standard:: Chi()
 	}
 	else if( direct[0]==0 && direct[1]==0 && direct[2]!=0 )
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			double x = kv.kvec_d[ik].x - kv.kvec_d[start_q].x;
-			double y = kv.kvec_d[ik].y - kv.kvec_d[start_q].y;
-			double z = kv.kvec_d[ik].z - kv.kvec_d[start_q].z;
+			double x = GlobalC::kv.kvec_d[ik].x - GlobalC::kv.kvec_d[start_q].x;
+			double y = GlobalC::kv.kvec_d[ik].y - GlobalC::kv.kvec_d[start_q].y;
+			double z = GlobalC::kv.kvec_d[ik].z - GlobalC::kv.kvec_d[start_q].z;
 			
 			double p2 = z/direct[2];
 			if( fabs(x)<0.0001 && fabs(y)<0.0001 && p2 > 0.0001)
@@ -154,11 +157,11 @@ void Chi0_standard:: Chi()
 	}
 	else if( direct[0]==0 && direct[1]!=0 && direct[2]==0 )
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			double x = kv.kvec_d[ik].x - kv.kvec_d[start_q].x;
-			double y = kv.kvec_d[ik].y - kv.kvec_d[start_q].y;
-			double z = kv.kvec_d[ik].z - kv.kvec_d[start_q].z;
+			double x = GlobalC::kv.kvec_d[ik].x - GlobalC::kv.kvec_d[start_q].x;
+			double y = GlobalC::kv.kvec_d[ik].y - GlobalC::kv.kvec_d[start_q].y;
+			double z = GlobalC::kv.kvec_d[ik].z - GlobalC::kv.kvec_d[start_q].z;
 			
 			double p1 = y/direct[1];
 			if( fabs(x)<0.0001 && fabs(z)<0.0001 && p1 > 0.0001)
@@ -169,11 +172,11 @@ void Chi0_standard:: Chi()
 	}
 	else if( direct[0]!=0 && direct[1]==0 && direct[2]==0 )
 	{
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			double x = kv.kvec_d[ik].x - kv.kvec_d[start_q].x;
-			double y = kv.kvec_d[ik].y - kv.kvec_d[start_q].y;
-			double z = kv.kvec_d[ik].z - kv.kvec_d[start_q].z;
+			double x = GlobalC::kv.kvec_d[ik].x - GlobalC::kv.kvec_d[start_q].x;
+			double y = GlobalC::kv.kvec_d[ik].y - GlobalC::kv.kvec_d[start_q].y;
+			double z = GlobalC::kv.kvec_d[ik].z - GlobalC::kv.kvec_d[start_q].z;
 			
 			double p0 = x/direct[0];
 			if( fabs(y)<0.0001 && fabs(z)<0.0001 && p0 > 0.0001)
@@ -221,12 +224,12 @@ void Chi0_standard:: Chi()
 	//----------------------------------------------------------	
 	int occ_bands = 0;
 	bool occ_flag;
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		occ_flag = false;
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			if( wf.wg(ik,ib)> 0.0001)
+			if( GlobalC::wf.wg(ik,ib)> 0.0001)
 			{
 				occ_flag = true;
 				continue;
@@ -247,7 +250,7 @@ void Chi0_standard:: Chi()
 	
 	for(int iq=start_q;iq< (start_q + interval_q * nq); iq=iq+interval_q)
 	{
-		double q = sqrt(((kv.kvec_c[iq])*(TWO_PI/ucell.lat0)).norm2());
+		double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
 		double gather[nomega];
 		
 		int count =0;
@@ -271,7 +274,7 @@ void Chi0_standard:: Chi()
 		if(out_epsilon)
 		{
 			stringstream sseps;
-			sseps << global_out_dir << "Imeps^-1_"<<iq<<".dat";
+			sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
 			ofstream ofseps(sseps.str().c_str());
 			ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<endl;
 			for(int i=0; i<nomega; i++)
@@ -292,33 +295,33 @@ void Chi0_standard::Parallel_G()
 	//----------------------------
 	// init
 	//----------------------------
-	num_G_core = new int[DSIZE];
-	num_G_dis = new int[DSIZE];
-	G_r_core = new double[pw.ngmc];
-	num_Gvector_core = new int[DSIZE];
-	num_Gvector_dis = new int[DSIZE];
-	G_r = new double[pw.ngmc_g];
-	Gvec_core = new double[3*pw.ngmc];
-	Gvec = new double[3*pw.ngmc_g];
-	all_gcar = new Vector3<double>[pw.ngmc_g];
-	flag = new int[pw.ngmc_g];
+	num_G_core = new int[GlobalV::DSIZE];
+	num_G_dis = new int[GlobalV::DSIZE];
+	G_r_core = new double[GlobalC::pw.ngmc];
+	num_Gvector_core = new int[GlobalV::DSIZE];
+	num_Gvector_dis = new int[GlobalV::DSIZE];
+	G_r = new double[GlobalC::pw.ngmc_g];
+	Gvec_core = new double[3*GlobalC::pw.ngmc];
+	Gvec = new double[3*GlobalC::pw.ngmc_g];
+	all_gcar = new Vector3<double>[GlobalC::pw.ngmc_g];
+	flag = new int[GlobalC::pw.ngmc_g];
 	
-	for(int i=0;i<pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		flag[i] = i;
 	}
 	
-	ZEROS( num_G_dis, DSIZE);
-	ZEROS( num_G_core, DSIZE);
-	ZEROS( num_Gvector_dis, DSIZE);
-	ZEROS( num_Gvector_core, DSIZE);
+	ZEROS( num_G_dis, GlobalV::DSIZE);
+	ZEROS( num_G_core, GlobalV::DSIZE);
+	ZEROS( num_Gvector_dis, GlobalV::DSIZE);
+	ZEROS( num_Gvector_core, GlobalV::DSIZE);
 	
 #ifdef __MPI
-	MPI_Allgather( &pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
+	MPI_Allgather( &GlobalC::pw.ngmc, 1, MPI_INT, num_G_core, 1, MPI_INT, POOL_WORLD);
 #endif
 	
-	memset(num_G_dis,0,DSIZE*sizeof(int));
-	for(int i=0; i<DSIZE; i++)
+	memset(num_G_dis,0,GlobalV::DSIZE*sizeof(int));
+	for(int i=0; i<GlobalV::DSIZE; i++)
 	{
 		for(int j=0; j<i; j++)
 		{
@@ -326,29 +329,29 @@ void Chi0_standard::Parallel_G()
 		}
 	}
 	
-	for(int i=0;i<DSIZE;i++)
+	for(int i=0;i<GlobalV::DSIZE;i++)
 	{
 		num_Gvector_dis[i] = num_G_dis[i] * 3;
 		num_Gvector_core[i] = num_G_core[i] * 3;
 	}
 	
-	for(int g0=0;g0<pw.ngmc; g0++)
+	for(int g0=0;g0<GlobalC::pw.ngmc; g0++)
 	{
-		G_r_core[g0] = pw.get_NormG_cartesian(g0);
-		Gvec_core[3 * g0] = pw.get_G_cartesian_projection(g0, 0);
-		Gvec_core[3 * g0 + 1] = pw.get_G_cartesian_projection(g0, 1);
-		Gvec_core[3 * g0 + 2] = pw.get_G_cartesian_projection(g0, 2);
+		G_r_core[g0] = GlobalC::pw.get_NormG_cartesian(g0);
+		Gvec_core[3 * g0] = GlobalC::pw.get_G_cartesian_projection(g0, 0);
+		Gvec_core[3 * g0 + 1] = GlobalC::pw.get_G_cartesian_projection(g0, 1);
+		Gvec_core[3 * g0 + 2] = GlobalC::pw.get_G_cartesian_projection(g0, 2);
 	}
 	
 #ifdef __MPI
-	MPI_Allgatherv( G_r_core, pw.ngmc, MPI_DOUBLE, G_r, num_G_core, num_G_dis, MPI_DOUBLE, POOL_WORLD);
-	MPI_Allgatherv( Gvec_core, 3*pw.ngmc, MPI_DOUBLE, Gvec, num_Gvector_core, num_Gvector_dis, MPI_DOUBLE, POOL_WORLD);
+	MPI_Allgatherv( G_r_core, GlobalC::pw.ngmc, MPI_DOUBLE, G_r, num_G_core, num_G_dis, MPI_DOUBLE, POOL_WORLD);
+	MPI_Allgatherv( Gvec_core, 3*GlobalC::pw.ngmc, MPI_DOUBLE, Gvec, num_Gvector_core, num_Gvector_dis, MPI_DOUBLE, POOL_WORLD);
 #endif
 	
 	double t1; int t2;
-	for(int i=0;i<pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
-		for(int j=0;j<pw.ngmc_g-i-1;j++)
+		for(int j=0;j<GlobalC::pw.ngmc_g-i-1;j++)
 		{
 			if(G_r[j]>G_r[j+1])
 			{
@@ -361,7 +364,7 @@ void Chi0_standard::Parallel_G()
 		}
 	}
 	
-	for(int i=0;i<pw.ngmc_g;i++)
+	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		all_gcar[i].x = Gvec[3*i]; all_gcar[i].y = Gvec[3*i+1]; all_gcar[i].z = Gvec[3*i+2];
 		//cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
@@ -373,47 +376,47 @@ void Chi0_standard::Parallel_G()
 void Chi0_standard:: Init()
 {
 
-	b_core = new complex<double>[pw.ngmc];  
+	b_core = new complex<double>[GlobalC::pw.ngmc];  
 	
-	b_summary = new complex<double>[pw.ngmc_g]; 
+	b_summary = new complex<double>[GlobalC::pw.ngmc_g]; 
 	
-	b_order = new complex<double>[pw.ngmc_g];
+	b_order = new complex<double>[GlobalC::pw.ngmc_g];
 
-	psi_r1 = new complex<double>*[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_r1 = new complex<double>*[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_r1[ib] = new complex<double>[pw.nrxx];
+		psi_r1[ib] = new complex<double>[GlobalC::pw.nrxx];
 	}
 		
-	psi_r2 = new complex<double>*[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_r2 = new complex<double>*[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_r2[ib] = new complex<double>[pw.nrxx];
+		psi_r2[ib] = new complex<double>[GlobalC::pw.nrxx];
 	}	
 	cout << "psi OK" <<endl;
 	
 	b = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		b[g0] = new complex<double>[oband*NBANDS];
+		b[g0] = new complex<double>[oband*GlobalV::NBANDS];
 	}
 	cout << "b ok"<<endl;
 	
 	A = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		A[g0] = new complex<double>[oband*NBANDS];
+		A[g0] = new complex<double>[oband*GlobalV::NBANDS];
 	}
 	cout << "A ok"<<endl;	
 	
-	B = new complex<double>*[oband*NBANDS];
-	for(int ib=0; ib<(oband*NBANDS); ib++)
+	B = new complex<double>*[oband*GlobalV::NBANDS];
+	for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 	{
 		B[ib] = new complex<double>[dim];
 	}
 	cout << "B ok" << endl;
 	
-	weight = new complex<double> [oband*NBANDS];
+	weight = new complex<double> [oband*GlobalV::NBANDS];
 	cout << "weight OK"<<endl;
 	
 	chi0 = new complex<double>*[dim];
@@ -457,13 +460,13 @@ void Chi0_standard::Delete()
 		delete[] b_summary;
 		delete[] b_order;
 		
-		for(int ib=0; ib<NBANDS; ib++)
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			delete[] psi_r1[ib];
 		}
 		delete[] psi_r1;
 			
-		for(int ib=0; ib<NBANDS; ib++)
+		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			delete[] psi_r2[ib];
 		}
@@ -481,7 +484,7 @@ void Chi0_standard::Delete()
 		}
 		delete[] A;
 
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 		{
 			delete[] B[ib];
 		}
@@ -520,27 +523,27 @@ void Chi0_standard::Cal_Psi(int iq, complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
 	complex<double> exp_tmp;
-	for(int ib = 0; ib < NBANDS; ib++)
+	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
-		ZEROS( UFFT.porter, (pw.nrxx) );
-		for(int ig = 0; ig < kv.ngk[iq] ; ig++)
+		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		for(int ig = 0; ig < GlobalC::kv.ngk[iq] ; ig++)
 		{
-			UFFT.porter[ pw.ig2fftw[wf.igk(iq,ig)] ] = wf.evc[iq](ib,ig);
+			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(iq,ig)] ] = GlobalC::wf.evc[iq](ib,ig);
 		}
 		
-		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 		int ir=0;
-		for(int ix=0; ix<pw.ncx; ix++)
+		for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 		{
-			phase_x = kv.kvec_d[iq].x*ix/pw.ncx;
-			for(int iy=0; iy<pw.ncy; iy++)
+			phase_x = GlobalC::kv.kvec_d[iq].x*ix/GlobalC::pw.ncx;
+			for(int iy=0; iy<GlobalC::pw.ncy; iy++)
 			{
-				phase_xy = phase_x + kv.kvec_d[iq].y*iy/pw.ncy;
-				for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; iz++)
+				phase_xy = phase_x + GlobalC::kv.kvec_d[iq].y*iy/GlobalC::pw.ncy;
+				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
-					phase_xyz = (phase_xy + kv.kvec_d[iq].z*iz/pw.ncz) *TWO_PI;
+					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
 					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
-					psi_r[ib][ir] = UFFT.porter[ir]*exp_tmp;
+					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
 				}
 					
@@ -555,10 +558,10 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 {
 	TITLE("Chi0_standard","Cal_b");
 	Vector3<double> qk;
-	qk = kv.kvec_c[iq] + kv.kvec_c[ik];
+	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
 	//cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<endl;
 	double phase_x, phase_xy, phase_xyz;
-	Vector3<double> q = kv.kvec_d[iq];
+	Vector3<double> q = GlobalC::kv.kvec_d[iq];
 	complex<double> exp_tmp;
 	
 	Cal_Psi(ik, psi_r1);
@@ -566,47 +569,47 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 	
 	for(int ib1=0; ib1< oband; ib1++)
 	{
-		for(int ib2=0; ib2<NBANDS; ib2++)
+		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
 			int ir=0;
-			for(int ix=0; ix<pw.ncx; ix++)
+			for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 			{
-				phase_x = q.x*ix/pw.ncx;
-				for(int iy=0; iy<pw.ncy; iy++)
+				phase_x = q.x*ix/GlobalC::pw.ncx;
+				for(int iy=0; iy<GlobalC::pw.ncy; iy++)
 				{
-					phase_xy = phase_x + q.y*iy/pw.ncy;
-					for(int iz=pw.nczp_start; iz<pw.nczp_start+pw.nczp; iz++)
+					phase_xy = phase_x + q.y*iy/GlobalC::pw.ncy;
+					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 					{
-						phase_xyz = (phase_xy + q.z*iz/pw.ncz) *TWO_PI;
+						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *TWO_PI;
 						exp_tmp = complex<double>(cos(-phase_xyz), sin(-phase_xyz));
-						UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
+						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
 					}
 				}
 			}
 			
-			pw.FFT_chg.FFT3D( UFFT.porter, -1);
+			GlobalC::pw.FFT_chg.FFT3D( GlobalC::UFFT.porter, -1);
 			//for(int g0=0; g0<dim; g0++)
 			//{
-			//	b[g0][ib1][ib2] = UFFT.porter[ pw.ig2fftc[g0] ];
+			//	b[g0][ib1][ib2] = GlobalC::UFFT.porter[ GlobalC::pw.ig2fftc[g0] ];
 			//}
-			for(int g0=0;g0<pw.ngmc; g0++)
+			for(int g0=0;g0<GlobalC::pw.ngmc; g0++)
 			{
-				b_core[g0] = UFFT.porter[ pw.ig2fftc[g0] ];
+				b_core[g0] = GlobalC::UFFT.porter[ GlobalC::pw.ig2fftc[g0] ];
 			}
 			
 #ifdef __MPI
-			MPI_Allgatherv( b_core, pw.ngmc, mpicomplex, b_summary, num_G_core, num_G_dis, mpicomplex, POOL_WORLD);
+			MPI_Allgatherv( b_core, GlobalC::pw.ngmc, mpicomplex, b_summary, num_G_core, num_G_dis, mpicomplex, POOL_WORLD);
 #endif
 			
-			for(int i=0;i<pw.ngmc_g;i++)
+			for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 			{
 				b_order[i] = b_summary[flag[i]];
 			}
 			
 			for(int g0=0; g0<dim; g0++)
 			{
-				b[g0][ib2+ib1*NBANDS] = b_order[g0];
+				b[g0][ib2+ib1*GlobalV::NBANDS] = b_order[g0];
 			}
 
 		}
@@ -617,12 +620,12 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 
 void Chi0_standard:: Cal_weight(int iq, int ik, double omega)
 {
-	int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
+	int iqk = Cal_iq(ik, iq, GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]);
 	for(int ib1=0; ib1<oband; ib1++)
-		for(int ib2=0; ib2<NBANDS; ib2++)
+		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 		{
-			complex<double> factor = complex<double>( (omega + wf.ekb[ik][ib1] - wf.ekb[iqk][ib2]), eta);
-			weight[ib2+ib1*NBANDS] = ( wf.wg(ik,ib1)  - wf.wg(iqk,ib2) )/factor/ucell.omega;
+			complex<double> factor = complex<double>( (omega + GlobalC::wf.ekb[ik][ib1] - GlobalC::wf.ekb[iqk][ib2]), eta);
+			weight[ib2+ib1*GlobalV::NBANDS] = ( GlobalC::wf.wg(ik,ib1)  - GlobalC::wf.wg(iqk,ib2) )/factor/GlobalC::ucell.omega;
 		}
 		
 	return;
@@ -632,7 +635,7 @@ void Chi0_standard:: Cal_weight(int iq, int ik, double omega)
 void Chi0_standard:: Cal_last()
 {
 	for(int g0=0; g0<dim; g0++)
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 		{
 			B[ib][g0] = conj(b[g0][ib]);
 		}
@@ -643,7 +646,7 @@ void Chi0_standard:: Cal_last()
 void Chi0_standard:: Cal_first()
 {
 	for(int g0=0; g0<dim; g0++)
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 		{
 			A[g0][ib] = weight[ib] * b[g0][ib];
 		}
@@ -659,24 +662,24 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 			chi0[g0][g1] = complex<double>(0.0,0.0);
 		}
 	
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		int iqk = Cal_iq(ik, iq, kv.nmp[0], kv.nmp[1], kv.nmp[2]);
+		int iqk = Cal_iq(ik, iq, GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]);
 		Cal_b(iq, ik, iqk);
 		Cal_weight(iq, ik, omega);
 		Cal_last();
 		Cal_first();
-		std::vector<std::vector<complex<double>>> A1(dim, std::vector<complex<double>>(oband*NBANDS));       // Peize Lin change ptr to vector at 2020.01.31
-		std::vector<std::vector<complex<double>>> B1(oband*NBANDS, std::vector<complex<double>>(dim));       // Peize Lin change ptr to vector at 2020.01.31
+		std::vector<std::vector<complex<double>>> A1(dim, std::vector<complex<double>>(oband*GlobalV::NBANDS));       // Peize Lin change ptr to vector at 2020.01.31
+		std::vector<std::vector<complex<double>>> B1(oband*GlobalV::NBANDS, std::vector<complex<double>>(dim));       // Peize Lin change ptr to vector at 2020.01.31
 		std::vector<std::vector<complex<double>>> C(dim, std::vector<complex<double>>(dim));                 // Peize Lin change ptr to vector at 2020.01.31
 		
 		for(int g0=0; g0<dim; g0++)
-			for(int ib=0; ib<(oband*NBANDS); ib++)
+			for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 			{
 				A1[g0][ib] = A[g0][ib];
 			}
 		
-		for(int ib=0; ib<(oband*NBANDS); ib++)
+		for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 			for(int g0=0; g0<dim; g0++)
 			{
 				B1[ib][g0] = B[ib][g0];
@@ -688,9 +691,9 @@ void Chi0_standard:: Cal_chi0(int iq, double omega)
 		char transb = 'N';
 		int M = dim;
 		int N = dim;
-		int K = oband*NBANDS;
+		int K = oband*GlobalV::NBANDS;
 		int lda = dim;
-		int ldb = oband*NBANDS;
+		int ldb = oband*GlobalV::NBANDS;
 		int ldc = dim;
 		zgemm_(&transa, &transb, &M, &N, &K, &alpha, VECTOR_TO_PTR(B1[0]), &lda, VECTOR_TO_PTR(A1[0]), &ldb, &beta, VECTOR_TO_PTR(C[0]), &ldc);
 		
@@ -738,7 +741,7 @@ void Chi0_standard:: Cal_chi()
 double Chi0_standard::qg2( int iq, int g0)
 {
 	double qg2;
-	qg2 = ((kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/ucell.lat0)).norm2();
+	qg2 = ((GlobalC::kv.kvec_c[iq]+all_gcar[g0])*(TWO_PI/GlobalC::ucell.lat0)).norm2();
 	
 	return qg2;
 }
@@ -932,7 +935,7 @@ int Chi0_standard::parallel_g()
 	for(int i=0;i<dim;i++)
 	{
 		cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
-		cout <<"G_direct["<<i<<"] = "<<pw.gdirect[i].x<<" "<<pw.gdirect[i].y<<" "<<pw.gdirect[i].z<<endl;
+		cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<endl;
 		cout <<"flag1["<<i<<"] = "<<flag1[i]<<endl;
 		cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<endl;  
 	}

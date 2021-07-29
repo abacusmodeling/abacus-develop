@@ -483,7 +483,7 @@ void YlmReal::Ylm_Real
 
 
 
-    /*	ofs_running<<"\n Unit Condition About Ylm_Real"<<endl;
+    /*	GlobalV::ofs_running<<"\n Unit Condition About Ylm_Real"<<endl;
     	int count=0;
     	for(int l=0; l<=lmax; l++)
     	{
@@ -510,7 +510,7 @@ void YlmReal::Ylm_Real
     				sum_before += ylm(count, ig) * ylm(count, ig);
     			}
     			sum_before *= FOUR_PI/ng;
-    			ofs_running<<setw(5)<<l<<setw(5)<<m<<setw(15)<<sum_before;
+    			GlobalV::ofs_running<<setw(5)<<l<<setw(5)<<m<<setw(15)<<sum_before;
 
 
     //			for(int ig=0; ig<ng; ig++)
@@ -523,12 +523,12 @@ void YlmReal::Ylm_Real
     //				sum += ylm(count, ig) * ylm(count, ig);
     //			}
     //			count++;
-    //			ofs_running<<setw(15)<<sum*FOUR_PI/ng;
+    //			GlobalV::ofs_running<<setw(15)<<sum*FOUR_PI/ng;
 
-    			ofs_running<<endl;
+    			GlobalV::ofs_running<<endl;
     		}
     	}
-    	ofs_running<<endl;
+    	GlobalV::ofs_running<<endl;
     */
 
 

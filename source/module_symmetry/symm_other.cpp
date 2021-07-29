@@ -1,7 +1,7 @@
 #include "symm_other.h"
 
 
-void Symm_Other::print1(const int &ibrav, const double *cel_const)
+void Symm_Other::print1(const int &ibrav, const double *cel_const, ofstream &ofs_running)
 {
 	TITLE("Symm_Other","print1");
 

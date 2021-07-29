@@ -16,7 +16,10 @@
 
 using namespace std;
 
+namespace GlobalC
+{
 Epsilon0_vasp epsilon0_vasp;
+}
 
 Epsilon0_vasp::Epsilon0_vasp()
                :init_finish(false)
@@ -37,13 +40,13 @@ void Epsilon0_vasp::cal_epsilon0()
 	cout << "nomega = "<<nomega<<endl;
 	cout << "eta = "<<eta<<endl;
 	
-	double occupied_bands = static_cast<double>(CHR.nelec/DEGSPIN);
+	double occupied_bands = static_cast<double>(GlobalC::CHR.nelec/DEGSPIN);
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
 	{
 		occupied_bands = std::floor(occupied_bands) + 1.0;
 	}
 
-	if(NSPIN == 1 || NSPIN == 2)
+	if(GlobalV::NSPIN == 1 || GlobalV::NSPIN == 2)
 	{
 		oband = int(occupied_bands + 0.5);
 	}	
@@ -51,7 +54,7 @@ void Epsilon0_vasp::cal_epsilon0()
 	{
 		oband = 2 * int(occupied_bands + 0.5);
 	}
-	uband = NBANDS - oband;
+	uband = GlobalV::NBANDS - oband;
 	
 	cout << "oband = "<<oband<<endl;
 	cout << "uband = "<<uband<<endl;
@@ -62,33 +65,33 @@ void Epsilon0_vasp::cal_epsilon0()
 		init_finish = true;
 	}
 	
-	//ppcell.init_vnl_alpha();
+	//GlobalC::ppcell.init_vnl_alpha();
 	
 	Cal_epsilon0s();
 	
 	Cal_T();
 	Cal_epsilon0();
 	
-	ofs_running<<endl; 
-	ofs_running<<" The real part of the macroscopic dielectric constant:"<<endl;
-	ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
+	GlobalV::ofs_running<<endl; 
+	GlobalV::ofs_running<<" The real part of the macroscopic dielectric constant:"<<endl;
+	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
 	for(int i=0; i<nomega; i++)
 	{
-		ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<eps0[0][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][i].real()<<setprecision(2)<<setw(15)<<eps0[2][i].real()<<setprecision(2)<<setw(15)<<eps0[3][i].real()<<setprecision(2)<<setw(15)<<eps0[4][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][i].real()<<setprecision(2)<<setw(15)<<eps0[6][i].real()<<setprecision(2)<<setw(15)<<eps0[7][i].real()<<setprecision(2)<<setw(15)<<eps0[8][i].real()+1.0<<endl;
+		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<eps0[0][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][i].real()<<setprecision(2)<<setw(15)<<eps0[2][i].real()<<setprecision(2)<<setw(15)<<eps0[3][i].real()<<setprecision(2)<<setw(15)<<eps0[4][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][i].real()<<setprecision(2)<<setw(15)<<eps0[6][i].real()<<setprecision(2)<<setw(15)<<eps0[7][i].real()<<setprecision(2)<<setw(15)<<eps0[8][i].real()+1.0<<endl;
 	}
 	
-	ofs_running<<endl; 
-	ofs_running<<" The imag part of the macroscopic dielectric constant:"<<endl;
-	ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
+	GlobalV::ofs_running<<endl; 
+	GlobalV::ofs_running<<" The imag part of the macroscopic dielectric constant:"<<endl;
+	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
 	for(int i=0; i<nomega; i++)
 	{
-		ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<-eps0[0][i].imag()<<setprecision(2)<<setw(15)<<-eps0[1][i].imag()<<setprecision(2)<<setw(15)<<-eps0[2][i].imag()<<setprecision(2)<<setw(15)<<-eps0[3][i].imag()<<setprecision(2)<<setw(15)<<-eps0[4][i].imag()<<setprecision(2)<<setw(15)<<-eps0[5][i].imag()<<setprecision(2)<<setw(15)<<-eps0[6][i].imag()<<setprecision(2)<<setw(15)<<-eps0[7][i].imag()<<setprecision(2)<<setw(15)<<-eps0[8][i].imag()<<endl;
+		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<-eps0[0][i].imag()<<setprecision(2)<<setw(15)<<-eps0[1][i].imag()<<setprecision(2)<<setw(15)<<-eps0[2][i].imag()<<setprecision(2)<<setw(15)<<-eps0[3][i].imag()<<setprecision(2)<<setw(15)<<-eps0[4][i].imag()<<setprecision(2)<<setw(15)<<-eps0[5][i].imag()<<setprecision(2)<<setw(15)<<-eps0[6][i].imag()<<setprecision(2)<<setw(15)<<-eps0[7][i].imag()<<setprecision(2)<<setw(15)<<-eps0[8][i].imag()<<endl;
 	}
 	
-	ofs_running<<" Macroscopic dielectric constant matrix :"<<endl;
-	ofs_running<<setprecision(2)<<setw(15)<<eps0[0][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][0].real()<<setprecision(2)<<setw(15)<<eps0[2][0].real()<<endl;
-	ofs_running<<setprecision(2)<<setw(15)<<eps0[3][0].real()<<setprecision(2)<<setw(15)<<eps0[4][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][0].real()<<endl;
-	ofs_running<<setprecision(2)<<setw(15)<<eps0[6][0].real()<<setprecision(2)<<setw(15)<<eps0[7][0].real()<<setprecision(2)<<setw(15)<<eps0[8][0].real()+1.0<<endl;	
+	GlobalV::ofs_running<<" Macroscopic dielectric constant matrix :"<<endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[0][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][0].real()<<setprecision(2)<<setw(15)<<eps0[2][0].real()<<endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[3][0].real()<<setprecision(2)<<setw(15)<<eps0[4][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][0].real()<<endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[6][0].real()<<setprecision(2)<<setw(15)<<eps0[7][0].real()<<setprecision(2)<<setw(15)<<eps0[8][0].real()+1.0<<endl;	
 	
 	//cout <<"Macroscopic dielectric constant matrix :"<<endl;
 	//cout << eps0[0][0].real()+1.0 <<"  "<<eps0[1][0].real() <<"  "<<eps0[2][0].real() <<"  "<<endl;
@@ -112,27 +115,27 @@ void Epsilon0_vasp:: Init()
 		}
 	}
 
-	psi = new complex<double> *[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi = new complex<double> *[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi[ib] = new complex<double>[pw.nrxx];
+		psi[ib] = new complex<double>[GlobalC::pw.nrxx];
 	}
 	
-	psi_nabla =new complex<double> **[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_nabla =new complex<double> **[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_nabla[ib] = new complex<double> *[pw.nrxx];
-		for(int ir=0; ir<pw.nrxx; ir++)
+		psi_nabla[ib] = new complex<double> *[GlobalC::pw.nrxx];
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			psi_nabla[ib][ir] = new complex<double>[3];
 		}
 	}
 	
-	psi_nu = new complex<double> **[NBANDS];
-	for(int ib=0; ib<NBANDS; ib++)
+	psi_nu = new complex<double> **[GlobalV::NBANDS];
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		psi_nu[ib] = new complex<double> *[ppcell.nkb];
-		for(int u=0; u<ppcell.nkb; u++)
+		psi_nu[ib] = new complex<double> *[GlobalC::ppcell.nkb];
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
 			psi_nu[ib][u] = new complex<double>[4];
 		}
@@ -171,15 +174,15 @@ void Epsilon0_vasp:: Delete()
 	}
 	delete[] b;
 
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		delete[] psi[ib];
 	}
 	delete[] psi;
 	
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
 			delete[] psi_nabla[ib][ir];
 		}
@@ -187,9 +190,9 @@ void Epsilon0_vasp:: Delete()
 	}
 	delete[] psi_nabla;
 	
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int u=0; u<ppcell.nkb; u++)
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
 			delete[] psi_nu[ib][u];
 		}
@@ -220,18 +223,18 @@ void Epsilon0_vasp:: Delete()
 
 void Epsilon0_vasp:: Cal_psi(int ik)      // pengfei Li 2018-11-13
 {
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		ZEROS( UFFT.porter, (pw.nrxx) );
-		for(int ig = 0; ig < kv.ngk[ik] ; ig++)
+		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
-			UFFT.porter[ pw.ig2fftw[wf.igk(ik,ig)] ] = wf.evc[ik](ib,ig);
+			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig)] ] = GlobalC::wf.evc[ik](ib,ig);
 		}
-		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			psi[ib][ir] = UFFT.porter[ir];
+			psi[ib][ir] = GlobalC::UFFT.porter[ir];
 		}
 	}
 	
@@ -240,41 +243,41 @@ void Epsilon0_vasp:: Cal_psi(int ik)      // pengfei Li 2018-11-13
 
 void Epsilon0_vasp:: Cal_psi_nabla(int ik)      // pengfei Li 2018-11-13
 {
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		ZEROS( UFFT.porter, (pw.nrxx) );
-		for(int ig = 0; ig < kv.ngk[ik] ; ig++)
+		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
-			UFFT.porter[ pw.ig2fftw[wf.igk(ik,ig)] ] = wf.evc[ik](ib,ig) * (pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI/ucell.lat0));
+			GlobalC::UFFT.porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik,ig)] ] = GlobalC::wf.evc[ik](ib,ig) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI/GlobalC::ucell.lat0));
 		}
-		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			psi_nabla[ib][ir][0] = UFFT.porter[ir];
+			psi_nabla[ib][ir][0] = GlobalC::UFFT.porter[ir];
 		}
 		
-		ZEROS( UFFT.porter, (pw.nrxx) );
-		for(int ig = 0; ig < kv.ngk[ik] ; ig++)
+		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
-			UFFT.porter[pw.ig2fftw[wf.igk(ik, ig)]] = wf.evc[ik](ib, ig) * (pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / ucell.lat0));
+			GlobalC::UFFT.porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = GlobalC::wf.evc[ik](ib, ig) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / GlobalC::ucell.lat0));
 		}
-		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			psi_nabla[ib][ir][1] = UFFT.porter[ir];
+			psi_nabla[ib][ir][1] = GlobalC::UFFT.porter[ir];
 		}
-		ZEROS( UFFT.porter, (pw.nrxx) );
-		for(int ig = 0; ig < kv.ngk[ik] ; ig++)
+		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
+		for(int ig = 0; ig < GlobalC::kv.ngk[ik] ; ig++)
 		{
-			UFFT.porter[pw.ig2fftw[wf.igk(ik, ig)]] = wf.evc[ik](ib, ig) * (pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / ucell.lat0));
+			GlobalC::UFFT.porter[GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)]] = GlobalC::wf.evc[ik](ib, ig) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / GlobalC::ucell.lat0));
 		}
-		pw.FFT_wfc.FFT3D(UFFT.porter,1);
+		GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter,1);
 
-		for(int ir=0; ir<pw.nrxx; ir++)
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			psi_nabla[ib][ir][2] = UFFT.porter[ir];
+			psi_nabla[ib][ir][2] = GlobalC::UFFT.porter[ir];
 		}
 	}
 	
@@ -295,56 +298,56 @@ void Epsilon0_vasp:: Cal_b(int ik)
 	//Cal_psi(ik);
 	//Cal_psi_nabla(ik);	
 
-	if(NSPIN == 1 || NSPIN == 2)
+	if(GlobalV::NSPIN == 1 || GlobalV::NSPIN == 2)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
 			for(int ib2=0; ib2<uband; ib2++)
 			{
-				for(int ig =0; ig< kv.ngk[ik]; ig++)
+				for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 				{
-					/*b_core[ib1][ib2][0] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].x)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][1] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].y)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][2] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].z)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);*/
-					b_core[ib1][ib2][0] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
-					b_core[ib1][ib2][1] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
-					b_core[ib1][ib2][2] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
+					/*b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].x)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
+					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].y)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
+					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].z)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);*/
+					b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
+					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
+					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 
-					/*for(int ir=0; ir<pw.nrxx; ir++)
+					/*for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 					{	
-						b_core[ib1][ib2][0] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][0]/pw.nrxx;
-						b_core[ib1][ib2][1] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][1]/pw.nrxx;
-						b_core[ib1][ib2][2] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][2]/pw.nrxx;
+						b_core[ib1][ib2][0] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][0]/GlobalC::pw.nrxx;
+						b_core[ib1][ib2][1] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][1]/GlobalC::pw.nrxx;
+						b_core[ib1][ib2][2] += conj(psi[ib1][ir]) * psi_nabla[oband+ib2][ir][2]/GlobalC::pw.nrxx;
 					}*/					
 				}
 			}
 	}
-	else if(NSPIN == 4)
+	else if(GlobalV::NSPIN == 4)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
 			for(int ib2=0; ib2<uband; ib2++)
 			{
-				for(int ig =0; ig< kv.ngk[ik]; ig++)
+				for(int ig =0; ig< GlobalC::kv.ngk[ik]; ig++)
 				{
-					/*b_core[ib1][ib2][0] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].x)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][1] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].y)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][2] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].z)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);*/
-					b_core[ib1][ib2][0] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
-					b_core[ib1][ib2][1] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
-					b_core[ib1][ib2][2] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
+					/*b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].x)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
+					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].y)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
+					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].z)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);*/
+					b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 0) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
+					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 1) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
+					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig, 2) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 				}
 			}
 
 		for(int ib1=0; ib1<oband; ib1++)
 			for(int ib2=0; ib2<uband; ib2++)
 			{
-				for(int ig =wf.npwx; ig< wf.npwx + kv.ngk[ik]; ig++)
+				for(int ig =GlobalC::wf.npwx; ig< GlobalC::wf.npwx + GlobalC::kv.ngk[ik]; ig++)
 				{
-					/*b_core[ib1][ib2][0] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].x)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][1] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].y)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);
-					b_core[ib1][ib2][2] += conj(wf.evc[ik](ib1,ig)) * ((pw.gcar[ig].z)*(TWO_PI/ucell.lat0)) * wf.evc[ik](oband+ib2,ig);*/
-					b_core[ib1][ib2][0] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig - wf.npwx, 0) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
-					b_core[ib1][ib2][1] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig - wf.npwx, 1) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
-					b_core[ib1][ib2][2] += conj(wf.evc[ik](ib1, ig)) * (pw.get_GPlusK_cartesian_projection(ik, ig - wf.npwx, 2) * (TWO_PI / ucell.lat0)) * wf.evc[ik](oband + ib2, ig);
+					/*b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].x)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
+					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].y)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);
+					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1,ig)) * ((GlobalC::pw.gcar[ig].z)*(TWO_PI/GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband+ib2,ig);*/
+					b_core[ib1][ib2][0] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig - GlobalC::wf.npwx, 0) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
+					b_core[ib1][ib2][1] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig - GlobalC::wf.npwx, 1) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
+					b_core[ib1][ib2][2] += conj(GlobalC::wf.evc[ik](ib1, ig)) * (GlobalC::pw.get_GPlusK_cartesian_projection(ik, ig - GlobalC::wf.npwx, 2) * (TWO_PI / GlobalC::ucell.lat0)) * GlobalC::wf.evc[ik](oband + ib2, ig);
 				}
 			}			
 	}
@@ -380,10 +383,10 @@ void Epsilon0_vasp:: Cal_b(int ik)
 		for(int ib2=0; ib2<uband; ib2++)
 		{
 			int count = 0;
-			for(int iat=0; iat<ucell.nat; iat++)
+			for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 			{
-				int it =  ucell.iat2it[iat];
-				int nht = ucell.atoms[it].nh;
+				int it =  GlobalC::ucell.iat2it[iat];
+				int nht = GlobalC::ucell.atoms[it].nh;
 				int count1 = count;
 				for(int ih=0; ih<nht; ih++)
 				{
@@ -391,11 +394,11 @@ void Epsilon0_vasp:: Cal_b(int ik)
 					for(int jh=0; jh<nht; jh++)
 					{
 						int jkb = count1 + jh;
-						b[ib1][ib2][0] += IMAG_UNIT * ppcell.deeq(0, iat, ih, jh) * 
+						b[ib1][ib2][0] += IMAG_UNIT * GlobalC::ppcell.deeq(0, iat, ih, jh) * 
 						(psi_nu[ib1][ikb][3] * conj(psi_nu[oband+ib2][jkb][0]) -  psi_nu[ib1][ikb][0] * conj(psi_nu[oband+ib2][jkb][3]) ); 
-						b[ib1][ib2][1] += IMAG_UNIT * ppcell.deeq(0, iat, ih, jh) * 
+						b[ib1][ib2][1] += IMAG_UNIT * GlobalC::ppcell.deeq(0, iat, ih, jh) * 
 						(psi_nu[ib1][ikb][3] * conj(psi_nu[oband+ib2][jkb][1]) -  psi_nu[ib1][ikb][1] * conj(psi_nu[oband+ib2][jkb][3]) );
-						b[ib1][ib2][2] += IMAG_UNIT * ppcell.deeq(0, iat, ih, jh) * 
+						b[ib1][ib2][2] += IMAG_UNIT * GlobalC::ppcell.deeq(0, iat, ih, jh) * 
 						(psi_nu[ib1][ikb][3] * conj(psi_nu[oband+ib2][jkb][2]) -  psi_nu[ib1][ikb][2] * conj(psi_nu[oband+ib2][jkb][3]) );
 
 					}
@@ -410,66 +413,66 @@ void Epsilon0_vasp:: Cal_b(int ik)
 #ifdef __LCAO
 void Epsilon0_vasp:: Cal_psi_nu(int ik)
 {
-	ppcell.getvnl_alpha(ik);
+	GlobalC::ppcell.getvnl_alpha(ik);
 	
-	complex<double> psi_nu_core[NBANDS][ppcell.nkb][4];
+	complex<double> psi_nu_core[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
 	
-	for(int ib=0; ib<NBANDS; ib++)
-		for(int ikb=0; ikb<ppcell.nkb; ikb++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
+		for(int ikb=0; ikb<GlobalC::ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)
 			{
 				psi_nu_core[ib][ikb][i] = complex<double>(0.0,0.0);
 			}
 	
-	/*for(int ib=0; ib<NBANDS; ib++)
+	/*for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int u=0; u<ppcell.nkb; u++)
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
-			for(int ig=0; ig<kv.ngk[ik]; ig++)
+			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
-				cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<ppcell.vkb_alpha[0][u][ig]<<endl;
+				cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<endl;
 			}
 		}
 	}*/
 
-	/*for(int u=0; u<ppcell.nkb; u++)
+	/*for(int u=0; u<GlobalC::ppcell.nkb; u++)
 	{
-		for(int ig=0; ig<kv.ngk[ik];ig++)
+		for(int ig=0; ig<GlobalC::kv.ngk[ik];ig++)
 		{
 			cout<<
 		}
 	}*/
 
-	for(int u=0; u<ppcell.nkb; u++)
-		for(int ig=0; ig<kv.ngk[ik]; ig++)
+	for(int u=0; u<GlobalC::ppcell.nkb; u++)
+		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 		{
-			cout<<"ik = "<<ik<<" u = "<<u<<" ig = "<<ig<<"  ppcell.vkb["<<u<<"]["<<ig<<"] = "<<ppcell.vkb(u,ig)<<endl;
+			cout<<"ik = "<<ik<<" u = "<<u<<" ig = "<<ig<<"  GlobalC::ppcell.vkb["<<u<<"]["<<ig<<"] = "<<GlobalC::ppcell.vkb(u,ig)<<endl;
 		}	 
 
-	for(int ib=0; ib<NBANDS; ib++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
-		for(int u=0; u<ppcell.nkb; u++)
+		for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		{
 			ZEROS(psi_nu[ib][u], 4);
-			for(int ig=0; ig<kv.ngk[ik]; ig++)
+			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
-				//cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<ppcell.vkb_alpha[0][u][ig]<<endl;
+				//cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<endl;
 				//cout<<"psi_nu = "<<psi_nu[ib][u][0]<<endl;
-				psi_nu_core[ib][u][0] += conj(wf.evc[ik](ib,ig)) * ppcell.vkb_alpha[0][u][ig];
-				psi_nu_core[ib][u][1] += conj(wf.evc[ik](ib,ig)) * ppcell.vkb_alpha[1][u][ig];
-				psi_nu_core[ib][u][2] += conj(wf.evc[ik](ib,ig)) * ppcell.vkb_alpha[2][u][ig];
-				psi_nu_core[ib][u][3] += conj(wf.evc[ik](ib,ig)) * ppcell.vkb(u,ig);
+				psi_nu_core[ib][u][0] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[0][u][ig];
+				psi_nu_core[ib][u][1] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[1][u][ig];
+				psi_nu_core[ib][u][2] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[2][u][ig];
+				psi_nu_core[ib][u][3] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb(u,ig);
 			}
 		}
 	}
 	
-	double psi_nu_core_R[NBANDS][ppcell.nkb][4];
-	double psi_nu_core_I[NBANDS][ppcell.nkb][4];
-	double psi_nu_R[NBANDS][ppcell.nkb][4];
-	double psi_nu_I[NBANDS][ppcell.nkb][4];
+	double psi_nu_core_R[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
+	double psi_nu_core_I[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
+	double psi_nu_R[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
+	double psi_nu_I[GlobalV::NBANDS][GlobalC::ppcell.nkb][4];
 	
-	for(int ib=0; ib<NBANDS; ib++)
-		for(int ikb=0; ikb<ppcell.nkb; ikb++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
+		for(int ikb=0; ikb<GlobalC::ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)
 			{
 				psi_nu_core_R[ib][ikb][i] = psi_nu_core[ib][ikb][i].real();
@@ -477,12 +480,12 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 			}	
 			
 #ifdef __MPI
-	MPI_Allreduce(psi_nu_core_R,psi_nu_R,4*NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
-	MPI_Allreduce(psi_nu_core_I,psi_nu_I,4*NBANDS*ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+	MPI_Allreduce(psi_nu_core_R,psi_nu_R,4*GlobalV::NBANDS*GlobalC::ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+	MPI_Allreduce(psi_nu_core_I,psi_nu_I,4*GlobalV::NBANDS*GlobalC::ppcell.nkb,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 #endif
 
-	for(int ib=0; ib<NBANDS; ib++)
-		for(int ikb=0; ikb<ppcell.nkb; ikb++)
+	for(int ib=0; ib<GlobalV::NBANDS; ib++)
+		for(int ikb=0; ikb<GlobalC::ppcell.nkb; ikb++)
 			for(int i=0; i<4; i++)	
 			{
 				psi_nu[ib][ikb][i] = complex<double>( psi_nu_R[ib][ikb][i], psi_nu_I[ib][ikb][i]);
@@ -500,7 +503,7 @@ void Epsilon0_vasp:: Cal_epsilon0s()
 			eps0s[i][j] = complex<double>(0.0, 0.0);
 		}
 		
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
 		Cal_b(ik);
 		/*for(int ib1=0; ib1<oband; ib1++)
@@ -512,14 +515,14 @@ void Epsilon0_vasp:: Cal_epsilon0s()
 		for(int ib1=0; ib1<oband; ib1++)
 			for(int ib2=0; ib2<uband; ib2++)
 			{
-				double delta_e = wf.ekb[ik][oband+ib2] - wf.ekb[ik][ib1];
+				double delta_e = GlobalC::wf.ekb[ik][oband+ib2] - GlobalC::wf.ekb[ik][ib1];
 				if ((delta_e > 0 || delta_e == 0) && delta_e < ((nomega-1) * domega) )
 				{
 					int n = int(delta_e/domega);
 					double e1 = double(n) * domega;
 					double e2 = double(n+1) * domega;
-					complex<double> weight1 = complex<double>(32 * (wf.wg(ik,ib1) - wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
-					complex<double> weight2 = complex<double>(32 * (wf.wg(ik,ib1) - wf.wg(ik,oband+ib2)) * (delta_e - e1)/domega/ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
+					complex<double> weight1 = complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
+					complex<double> weight2 = complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
 					
 					eps0s[0][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][0]);
 					eps0s[1][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][1]);
@@ -547,7 +550,7 @@ void Epsilon0_vasp:: Cal_epsilon0s()
 					int n = int(delta_e/domega);
 					double e1 = double(n) * domega;
 					double e2 = double(n+1) * domega;					
-					complex<double> weight1 = complex<double>(32 * (wf.wg(ik,ib1) - wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
+					complex<double> weight1 = complex<double>(32 * (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(ik,oband+ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega * PI * PI /delta_e/delta_e/domega, 0.0);
 
 					eps0s[0][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][0]);
 					eps0s[1][n] += weight1 * b[ib1][ib2][0] * conj(b[ib1][ib2][1]);

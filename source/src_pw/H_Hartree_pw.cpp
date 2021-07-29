@@ -28,7 +28,7 @@ matrix H_Hartree_pw::v_hartree(
     //double charge;
     //if (pwb.gstart == 1)
     //    charge = cell.omega * Porter[pwb.ig2fftc[0]].real();
-    //OUT(ofs_running, "v_h charge", charge);
+    //OUT(GlobalV::ofs_running, "v_h charge", charge);
 
     //=======================================================
     // calculate hartree potential in G-space (NB: V(G=0)=0 )
@@ -94,7 +94,7 @@ matrix H_Hartree_pw::v_hartree(
 		int precision = 3;
 		string fn = "VH.dat";
 		stringstream ss;
-		ss << global_out_dir << fn;
+		ss << GlobalV::global_out_dir << fn;
 		matrix v;
 		v.create(1,pwb.nrxx);
 		for(int ir=0; ir<pwb.nrxx; ++ir)

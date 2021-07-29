@@ -3,8 +3,11 @@
 #include "../module_base/ylm.h"
 #include "../module_base/math_polyint.h"
 
+namespace GlobalC
+{
 ///here is a member of ORB_gen_tables class
 ORB_gen_tables UOT;
+}
 
 ORB_gen_tables::ORB_gen_tables() {}
 ORB_gen_tables::~ORB_gen_tables() {}
@@ -152,7 +155,7 @@ void ORB_gen_tables::snap_psibeta(
 		has_so = 1;
 	}
 
-	const int nproj = ORB.nproj[T0];
+	const int nproj = GlobalC::ORB.nproj[T0];
 	assert(nproj>0); // mohan add 2021-04-25
 	
 	bool *calproj = new bool[nproj];
@@ -160,8 +163,8 @@ void ORB_gen_tables::snap_psibeta(
 	int *rmesh2 = new int[nproj];
 
 	//rcut of orbtials and projectors
-	const double Rcut1 = ORB.Phi[T1].getRcut();
-	const double Rcut2 = ORB.Phi[T2].getRcut();
+	const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
+	const double Rcut2 = GlobalC::ORB.Phi[T2].getRcut();
 
 	//in our calculation, we always put orbital phi at the left side of <phi|beta>
 	//because <phi|beta> = <beta|phi>
@@ -178,7 +181,7 @@ void ORB_gen_tables::snap_psibeta(
 	bool all_out = true;
 	for (int ip = 0; ip < nproj; ip++)
 	{
-		const double Rcut0 = ORB.Beta[T0].Proj[ip].getRcut();
+		const double Rcut0 = GlobalC::ORB.Beta[T0].Proj[ip].getRcut();
 		if (distance10 > (Rcut1 + Rcut0) || distance20 > (Rcut2 + Rcut0))
 		{
 			calproj[ip] = false;
@@ -293,7 +296,7 @@ void ORB_gen_tables::snap_psibeta(
 	int nprojections = 1;
 	if (has_so)
 	{
-//		nprojections = ORB.Beta[T0].get_nproj_soc();
+//		nprojections = GlobalC::ORB.Beta[T0].get_nproj_soc();
 		nprojections = nproj_in; // mohan add 2021-05-07 
 	}
 
@@ -308,8 +311,8 @@ void ORB_gen_tables::snap_psibeta(
 			continue;
 		}
 
-		//const int L0 = ORB.Beta[T0].getL_Beta(nb); // mohan delete the variable 2021-05-07
-		const int L0 = ORB.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
+		//const int L0 = GlobalC::ORB.Beta[T0].getL_Beta(nb); // mohan delete the variable 2021-05-07
+		const int L0 = GlobalC::ORB.Beta[T0].Proj[nb].getL(); // mohan add 2021-05-07
 		//const int next_ip = 2* L0 +1;
 
 		//////////////////////////////////////////////////////
@@ -594,8 +597,8 @@ void ORB_gen_tables::snap_psipsi(
 	/// judge if there exist overlap
 	double distance = Numerical_Orbital::get_distance() * this->lat0;
 
-	const double Rcut1 = ORB.Phi[T1].getRcut();
-	const double Rcut2 = (dtype == 'D' ? ORB.Alpha[0].getRcut() : ORB.Phi[T2].getRcut());	//caoyu modified 2021-05-08
+	const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
+	const double Rcut2 = (dtype == 'D' ? GlobalC::ORB.Alpha[0].getRcut() : GlobalC::ORB.Phi[T2].getRcut());	//caoyu modified 2021-05-08
 
 	if (job == 0)
 	{
@@ -944,7 +947,7 @@ void ORB_gen_tables::snap_psipsi(
 					}
 					else
 					{
-						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with NSPIN>1 has not implemented yet!");
+						WARNING_QUIT("ORB_gen_tables::snap_psialpha", "deepks with GlobalV::NSPIN>1 has not implemented yet!");
 					}
 					break;
 				}

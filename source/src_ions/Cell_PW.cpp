@@ -5,61 +5,61 @@ void Cell_PW::opt_cells_pw()
 {
     TITLE("Cell_PW", "opt_cells_pw");
     timer::tick("Cell_PW", "opt_cells_pw");
-    wf.allocate(kv.nks);
+    GlobalC::wf.allocate(GlobalC::kv.nks);
 
-    UFFT.allocate();
+    GlobalC::UFFT.allocate();
 
     //=======================
     // init pseudopotential
     //=======================
-    ppcell.init(ucell.ntype);
+    GlobalC::ppcell.init(GlobalC::ucell.ntype);
 
     //=====================
     // init hamiltonian
     // only allocate in the beginning of ELEC LOOP!
     //=====================
-    hm.hpw.allocate(wf.npwx, NPOL, ppcell.nkb, pw.nrxx);
+    GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
 
     //=================================
     // initalize local pseudopotential
     //=================================
-    ppcell.init_vloc(pw.nggm, ppcell.vloc);
-    DONE(ofs_running, "LOCAL POTENTIAL");
+    GlobalC::ppcell.init_vloc(GlobalC::pw.nggm, GlobalC::ppcell.vloc);
+    DONE(GlobalV::ofs_running, "LOCAL POTENTIAL");
 
     //======================================
     // Initalize non local pseudopotential
     //======================================
-    ppcell.init_vnl(ucell);
-    DONE(ofs_running, "NON-LOCAL POTENTIAL");
+    GlobalC::ppcell.init_vnl(GlobalC::ucell);
+    DONE(GlobalV::ofs_running, "NON-LOCAL POTENTIAL");
 
     //=========================================================
     // calculate the total local pseudopotential in real space
     //=========================================================
-    pot.init_pot(0, pw.strucFac); //atomic_rho, v_of_rho, set_vrs
+    GlobalC::pot.init_pot(0, GlobalC::pw.strucFac); //atomic_rho, v_of_rho, set_vrs
 
-    pot.newd();
+    GlobalC::pot.newd();
 
-    DONE(ofs_running, "INIT POTENTIAL");
+    DONE(GlobalV::ofs_running, "INIT POTENTIAL");
 
     //==================================================
-    // create ppcell.tab_at , for trial wave functions.
+    // create GlobalC::ppcell.tab_at , for trial wave functions.
     //==================================================
-    wf.init_at_1();
+    GlobalC::wf.init_at_1();
 
     //================================
     // Initial start wave functions
     //================================
-    if (NBANDS != 0 || (CALCULATION != "scf-sto" && CALCULATION != "relax-sto" && CALCULATION != "md-sto")) //qianrui add
+    if (GlobalV::NBANDS != 0 || (GlobalV::CALCULATION != "scf-sto" && GlobalV::CALCULATION != "relax-sto" && GlobalV::CALCULATION != "md-sto")) //qianrui add
     {
-        wf.wfcinit();
+        GlobalC::wf.wfcinit();
     }
 #ifdef __LCAO
-    switch (exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
+    switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
     case Exx_Global::Hybrid_Type::HF:
     case Exx_Global::Hybrid_Type::PBE0:
     case Exx_Global::Hybrid_Type::HSE:
-        exx_lip.init(&kv, &wf, &pw, &UFFT, &ucell);
+        GlobalC::exx_lip.init(&GlobalC::kv, &GlobalC::wf, &GlobalC::pw, &GlobalC::UFFT, &GlobalC::ucell);
         break;
     case Exx_Global::Hybrid_Type::No:
         break;
@@ -69,7 +69,7 @@ void Cell_PW::opt_cells_pw()
     }
 #endif
 
-    DONE(ofs_running, "INIT BASIS");
+    DONE(GlobalV::ofs_running, "INIT BASIS");
 
     // ion optimization begins
     // electron density optimization is included in ion optimization

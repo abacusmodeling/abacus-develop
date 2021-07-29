@@ -8,7 +8,7 @@
 #endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
-void UnitCell_pseudo::read_atom_species(ifstream &ifa)
+void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 {
 	TITLE("UnitCell_pseudo","read_atom_species");
 
@@ -21,7 +21,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 	// read in information of each type of atom
 	//==========================================
 	if( SCAN_BEGIN(ifa, "ATOMIC_SPECIES") )
-	{
+	{	
 		OUT(ofs_running,"ntype",ntype);
 		for (int i = 0;i < ntype;i++)
 		{
@@ -31,7 +31,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 			ss << "atom label for species " << i+1;
 			OUT(ofs_running,ss.str(),atom_label[i]);	
 			READ_VALUE(ifa, pseudo_fn[i]);
-			if(test_pseudo_cell==2) 
+			if(GlobalV::test_pseudo_cell==2) 
 			{
 				ofs_running << "\n" << setw(6) << atom_label[i] 
 						<< setw(12) << atom_mass[i] 
@@ -46,11 +46,11 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 		}
 	}
 #ifdef __LCAO
-	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+	if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{
 		if( SCAN_BEGIN(ifa, "NUMERICAL_ORBITAL") )
 		{
-			ORB.read_in_flag = true;
+			GlobalC::ORB.read_in_flag = true;
 			for(int i=0; i<ntype; i++)
 			{
 				string ofile;
@@ -68,30 +68,30 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 				//-----------------------------------
 				//READ_VALUE(ifa, nfile);
 				
-				ORB.orbital_file.push_back(ofile);
+				GlobalC::ORB.orbital_file.push_back(ofile);
 
 				//-----------------------------------
 				// Turn off the read in NONLOCAL file
 				// function since 2013-08-02 by mohan
 				//-----------------------------------
-				//ORB.nonlocal_file.push_back(nfile);
+				//GlobalC::ORB.nonlocal_file.push_back(nfile);
 
-//				ofs_running << " For atom type " << i + 1 << endl;
-//			    ofs_running << " Read in numerical orbitals from file " << ofile << endl;
-//			    ofs_running << " Read in nonlocal projectors from file " << nfile << endl;
+//				GlobalV::ofs_running << " For atom type " << i + 1 << endl;
+//			    GlobalV::ofs_running << " Read in numerical orbitals from file " << ofile << endl;
+//			    GlobalV::ofs_running << " Read in nonlocal projectors from file " << nfile << endl;
 				
 			}
 		}	
 		// caoyu add 2021-03-16
 		if (SCAN_BEGIN(ifa, "NUMERICAL_DESCRIPTOR")) {
-			ifa >> ORB.descriptor_file;
+			ifa >> GlobalC::ORB.descriptor_file;
 		}
 	}
 
 	// Peize Lin add 2016-09-23
-	if( Exx_Global::Hybrid_Type::HF   == exx_lcao.info.hybrid_type || 
-	    Exx_Global::Hybrid_Type::PBE0 == exx_lcao.info.hybrid_type || 
-		Exx_Global::Hybrid_Type::HSE  == exx_lcao.info.hybrid_type )
+	if( Exx_Global::Hybrid_Type::HF   == GlobalC::exx_lcao.info.hybrid_type || 
+	    Exx_Global::Hybrid_Type::PBE0 == GlobalC::exx_lcao.info.hybrid_type || 
+		Exx_Global::Hybrid_Type::HSE  == GlobalC::exx_lcao.info.hybrid_type )
 	{
 		if( SCAN_BEGIN(ifa, "ABFS_ORBITAL") )
 		{
@@ -99,7 +99,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 			{
 				string ofile;
 				ifa >> ofile;
-				exx_lcao.info.files_abfs.push_back(ofile);
+				GlobalC::exx_lcao.info.files_abfs.push_back(ofile);
 			}
 		}
 	}
@@ -124,39 +124,216 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa)
 	//===========================
 	// Read in latticies vector
 	//===========================
-	if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
-	{
-		// Reading lattice vectors. notice
-		// here that only one cpu read these
-		// parameters.
-		ifa >> latvec.e11 >> latvec.e12;
-		READ_VALUE(ifa, latvec.e13);
-		ifa >> latvec.e21 >> latvec.e22;
-		READ_VALUE(ifa, latvec.e23);
-		ifa >> latvec.e31 >> latvec.e32;
-		READ_VALUE(ifa, latvec.e33);
-
-		// lattice vectors in another form.
-		a1.x = latvec.e11;
-		a1.y = latvec.e12;
-		a1.z = latvec.e13;
-
-		a2.x = latvec.e21;
-		a2.y = latvec.e22;
-		a2.z = latvec.e23;
-
-		a3.x = latvec.e31;
-		a3.y = latvec.e32;
-		a3.z = latvec.e33;
+	if(latName=="test"){	
+		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
+		{
+			// Reading lattice vectors. notice
+			// here that only one cpu read these
+			// parameters.
+			ifa >> latvec.e11 >> latvec.e12;
+			READ_VALUE(ifa, latvec.e13);
+			ifa >> latvec.e21 >> latvec.e22;
+			READ_VALUE(ifa, latvec.e23);
+			ifa >> latvec.e31 >> latvec.e32;
+			READ_VALUE(ifa, latvec.e33);
+		}
+		if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+		{
+			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_PARAMETERS without explicit specification of lattice type");
+		}
+	}//supply lattice vectors
+	else{
+		if( SCAN_BEGIN(ifa, "LATTICE_VECTORS") )
+		{
+			WARNING_QUIT("UnitCell_pseudo::read_atom_species","do not use LATTICE_VECTORS along with explicit specification of lattice type");
+		}
+		if(latName=="sc"){//simple-cubic
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = 0.0; latvec.e22 = 1.0;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 1.0;
+		}
+		else if(latName=="fcc"){//face-centered cubic
+			latvec.e11 =-0.5; latvec.e12 = 0.0; latvec.e13 = 0.5;
+			latvec.e21 = 0.0; latvec.e22 = 0.5;	latvec.e23 = 0.5;
+			latvec.e31 =-0.5; latvec.e32 = 0.5;	latvec.e33 = 0.0;
+		}
+		else if(latName=="bcc"){//body-centered cubic
+			latvec.e11 = 0.5; latvec.e12 = 0.5; latvec.e13 = 0.5;
+			latvec.e21 =-0.5; latvec.e22 = 0.5;	latvec.e23 = 0.5;
+			latvec.e31 =-0.5; latvec.e32 =-0.5;	latvec.e33 = 0.5;
+		}
+		else if(latName=="hexagonal"){//hexagonal
+			double e22 = sqrt(3.0) / 2.0;
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 =-0.5; latvec.e22 = e22; latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="trigonal"){//trigonal
+			double t1 = 0.0;
+			double t2 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				double cosab=0.0;
+				READ_VALUE(ifa, cosab);
+				t1 = sqrt(1.0 + 2.0*cosab);
+				t2 = sqrt(1.0 - cosab);
+			}
+			double e11 = t2 / sqrt(2.0);
+			double e12 = -t2 / sqrt(6.0);
+			double e13 = t1 / sqrt(3.0);
+			double e22 = sqrt(2.0) * t2 / sqrt(3.0);
 		
+			latvec.e11 = e11; latvec.e12 = e12; latvec.e13 = e13;
+			latvec.e21 = 0.0; latvec.e22 = e22;	latvec.e23 = e13;
+			latvec.e31 =-e11; latvec.e32 = e12;	latvec.e33 = e13;
+		}
+		else if(latName=="st"){//simple tetragonal
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = 0.0; latvec.e22 = 1.0; latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="bct"){//body-centered tetragonal
+			double cba = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				READ_VALUE(ifa, cba);
+				cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 =-0.5; latvec.e13 = cba;
+			latvec.e21 = 0.5; latvec.e22 = 0.5; latvec.e23 = cba;
+			latvec.e31 =-0.5; latvec.e32 =-0.5;	latvec.e33 = cba;
+		}
+		else if(latName=="so"){//simple orthorhombic
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = 0.0; latvec.e22 = 0.0;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> latvec.e22;
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="baco"){//base-centered orthorhombic
+			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 =-0.5; latvec.e22 = 0.0;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> latvec.e12;
+				latvec.e12 = latvec.e12 / 2.0;
+				latvec.e22 = latvec.e12;
+				READ_VALUE(ifa, latvec.e33);
+			}
+		}
+		else if(latName=="fco"){//face-centered orthorhombic
+			double bba = 0.0; double cba = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba;
+				READ_VALUE(ifa, cba);
+				bba = bba / 2.0; cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 = cba;
+			latvec.e21 = 0.5; latvec.e22 = bba;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = bba;	latvec.e33 = cba;
+		}
+		else if(latName=="bco"){//body-centered orthorhombic
+			double bba = 0.0; double cba = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba;
+				READ_VALUE(ifa, cba);
+				bba = bba / 2.0; cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 = bba; latvec.e13 = cba;
+			latvec.e21 =-0.5; latvec.e22 = bba;	latvec.e23 = cba;
+			latvec.e31 =-0.5; latvec.e32 =-bba;	latvec.e33 = cba;
+		}
+		else if(latName=="sm"){//simple monoclinic
+			double bba = 0.0; double cba = 0.0;
+			double cosab = 0.0;
+			double e21 = 0.0; double e22 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba >> cba;
+				READ_VALUE(ifa, cosab);
+				e21 = bba * cosab;
+				e22 = bba * sqrt(1.0-cosab*cosab);
+			}
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = e21; latvec.e22 = e22;	latvec.e23 = 0.0;
+			latvec.e31 = 0.0; latvec.e32 = 0.0;	latvec.e33 = cba;
+		}
+		else if(latName=="bacm"){//base-centered monoclinic
+			double bba = 0.0; double cba = 0.0;
+			double cosab = 0.0;
+			double e21 = 0.0; double e22 = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba >> cba;
+				READ_VALUE(ifa, cosab);
+				e21 = bba * cosab;
+				e22 = bba * sqrt(1.0-cosab*cosab);
+				cba = cba / 2.0;
+			}
+			latvec.e11 = 0.5; latvec.e12 = 0.0; latvec.e13 =-cba;
+			latvec.e21 = e21; latvec.e22 = e22;	latvec.e23 = 0.0;
+			latvec.e31 = 0.5; latvec.e32 = 0.0;	latvec.e33 = cba;
+		}
+		else if(latName=="triclinic"){//triclinic
+			double bba = 0.0; double cba = 0.0;
+			double cosab = 0.0; double cosac = 0.0;
+			double cosbc = 0.0; double sinab = 0.0;
+			double term = 0.0;
+			if( SCAN_BEGIN(ifa, "LATTICE_PARAMETERS") )
+			{
+				ifa >> bba >> cba >> cosab >> cosac;
+				READ_VALUE(ifa, cosbc);
+				sinab = sqrt(1.0-cosab*cosab);
+			}
+			latvec.e11 = 1.0; latvec.e12 = 0.0; latvec.e13 = 0.0;
+			latvec.e21 = bba * cosab;
+			latvec.e22 = bba * sinab;
+			latvec.e23 = 0.0;
+			latvec.e31 = cba * cosac;
+			latvec.e32 = cba * (cosbc - cosac*cosab/sinab);
+			term = 1.0 + 2.0 * cosab*cosac*cosbc - cosab*cosab - cosac*cosac - cosbc*cosbc;
+			term = sqrt(term)/sinab;
+			latvec.e33 = cba * term;
+		}
+		else{ 
+			cout << "latname is : " << latName << endl;
+			WARNING_QUIT("UnitCell_pseudo::read_atom_species","latname not supported!");
+		}
 	}
+
+	// lattice vectors in another form.
+	a1.x = latvec.e11;
+	a1.y = latvec.e12;
+	a1.z = latvec.e13;
+
+	a2.x = latvec.e21;
+	a2.y = latvec.e22;
+	a2.z = latvec.e23;
+
+	a3.x = latvec.e31;
+	a3.y = latvec.e32;
+	a3.z = latvec.e33;
 	return;
 }
 
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.
-bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
+bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running, ofstream &ofs_warning)
 {
 	TITLE("UnitCell_pseudo","read_atom_positions");
 
@@ -231,9 +408,10 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 #ifndef __CMD
 			READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
-			if(NSPIN==4)//added by zhengdy-soc
+#ifndef __SYMMETRY
+			if(GlobalV::NSPIN==4)//added by zhengdy-soc
 			{
-				if(NONCOLIN)
+				if(GlobalV::NONCOLIN)
 				{
 					magnet.m_loc_[it].x = magnet.start_magnetization[it] *
 							sin(magnet.angle1_[it]) * cos(magnet.angle2_[it]);
@@ -255,12 +433,12 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 
 				ZEROS(magnet.ux_ ,3);
 			}
-			else if(NSPIN==2)
+			else if(GlobalV::NSPIN==2)
 			{
 				magnet.m_loc_[it].x = magnet.start_magnetization[it];
 				OUT(ofs_running, "start magnetization",magnet.start_magnetization[it]);
 			}
-			else if(NSPIN==1)
+			else if(GlobalV::NSPIN==1)
 			{
 				OUT(ofs_running, "start magnetization","FALSE");
 			}
@@ -271,15 +449,15 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			// int* atoms[it].l_nchi;
 			//===========================================
 #ifdef __LCAO
-			if (BASIS_TYPE == "lcao" || BASIS_TYPE == "lcao_in_pw")
+			if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{    
-				ifstream ifs(ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
+				ifstream ifs(GlobalC::ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
 
 				// mohan add return 2021-04-26
 				if (!ifs)
 				{
 					cout << " Element index " << it+1 << endl;
-					cout << " orbital file: " << ORB.orbital_file[it] << endl;
+					cout << " orbital file: " << GlobalC::ORB.orbital_file[it] << endl;
 					WARNING("read_atom_positions","ABACUS Cannot find the ORBITAL file (basis sets)");
 					return 0; // means something wrong
 				}
@@ -354,7 +532,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 			}
 			else
 #else
-			if(BASIS_TYPE == "pw")
+			if(GlobalV::BASIS_TYPE == "pw")
 #endif
 			{
 				this->atoms[it].nw = 0;
@@ -377,6 +555,8 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					OUT(ofs_running,ss.str(),atoms[it].l_nchi[L]);
 				}
 			} // end basis type
+#endif
+
 #else
 			ifpos.ignore(150, '\n');
 #endif
@@ -457,7 +637,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos)
 					if(Coordinate=="Direct")
 					{
 						// change v from direct to cartesian,
-						// the unit is pw.lat0
+						// the unit is GlobalC::pw.lat0
 						atoms[it].taud[ia] = v;
 						atoms[it].tau[ia] = v * latvec;
 					}
@@ -569,8 +749,8 @@ bool UnitCell_pseudo::check_tau(void)const
 	double norm = 0.0;
 	double tolerence_bohr = 1.0e-3;
 
-	//ofs_running << "\n Output nearest atom not considering periodic boundary condition" << endl;
-	//ofs_running << " " << setw(5) << "TYPE" << setw(6) << "INDEX" 
+	//GlobalV::ofs_running << "\n Output nearest atom not considering periodic boundary condition" << endl;
+	//GlobalV::ofs_running << " " << setw(5) << "TYPE" << setw(6) << "INDEX" 
 	//<< setw(20) << "NEAREST(Bohr)" 
 	//<< setw(20) << "NEAREST(Angstrom)" << endl; 
 	for(int T1=0; T1< this->ntype; T1++)
@@ -603,16 +783,16 @@ bool UnitCell_pseudo::check_tau(void)const
 						}
 						if( norm < tolerence_bohr ) // unit is Bohr
 						{	
-							ofs_warning << " two atoms are too close!" << endl;
-							ofs_warning << " type:" << this->atoms[T1].label << " atom " << I1 + 1 << endl; 
-							ofs_warning << " type:" << this->atoms[T2].label << " atom " << I2 + 1 << endl; 
-							ofs_warning << " distance = " << norm << " Bohr" << endl;
+							GlobalV::ofs_warning << " two atoms are too close!" << endl;
+							GlobalV::ofs_warning << " type:" << this->atoms[T1].label << " atom " << I1 + 1 << endl; 
+							GlobalV::ofs_warning << " type:" << this->atoms[T2].label << " atom " << I2 + 1 << endl; 
+							GlobalV::ofs_warning << " distance = " << norm << " Bohr" << endl;
 							return 0;
 						}
 					}
 				}
 			}
-			//ofs_running << " " << setw(5) << atoms[T1].label << setw(6) << I1+1 
+			//GlobalV::ofs_running << " " << setw(5) << atoms[T1].label << setw(6) << I1+1 
 			//<< setw(20) << shortest_norm  
 			//<< setw(20) << shortest_norm * BOHR_TO_A << endl;
 		}
@@ -626,7 +806,7 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 {
 	TITLE("UnitCell_pseudo","print_stru_file");
 	
-	if(MY_RANK!=0) return;
+	if(GlobalV::MY_RANK!=0) return;
 
 	ofstream ofs(fn.c_str());
 
@@ -640,7 +820,7 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 	}
 
 #ifdef __LCAO
-	if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02. Attention...
+	if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") //xiaohui add 2013-09-02. Attention...
 	{	
 		ofs << "\nNUMERICAL_ORBITAL" << endl;
 		for(int it=0; it<ntype; it++)
@@ -649,9 +829,9 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 			// Turn off the read in NONLOCAL file
 			// function since 2013-08-02 by mohan
 			//-----------------------------------
-//			ofs << ORB.orbital_file[it] << " " << ORB.nonlocal_file[it] << " #local_orbital; non-local projector" << endl;
+//			ofs << GlobalC::ORB.orbital_file[it] << " " << GlobalC::ORB.nonlocal_file[it] << " #local_orbital; non-local projector" << endl;
 			//modified by zhengdy 2015-07-24
-                        ofs << ORB.orbital_file[it] << endl;
+                        ofs << GlobalC::ORB.orbital_file[it] << endl;
 		}
 	}
 #endif
@@ -734,8 +914,8 @@ void UnitCell_pseudo::print_tau(void)const
     TITLE("UnitCell_pseudo","print_tau");
     if(Coordinate == "Cartesian" || Coordinate == "Cartesian_angstrom")
     {
-        ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << lat0 << " Bohr )." << endl;
-        ofs_running << setw(13) << " atom"
+        GlobalV::ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << lat0 << " Bohr )." << endl;
+        GlobalV::ofs_running << setw(13) << " atom"
         //<< setw(20) << "x" 
         //<< setw(20) << "y" 
         //<< setw(20) << "z" 
@@ -748,7 +928,7 @@ void UnitCell_pseudo::print_tau(void)const
         << setw(20) << "vy"
         << setw(20) << "vz"
         << endl;
-        ofs_running << setprecision(12);
+        GlobalV::ofs_running << setprecision(12);
 
         int iat=0;
         for(int it=0; it<ntype; it++)
@@ -758,7 +938,7 @@ void UnitCell_pseudo::print_tau(void)const
                 stringstream ss;
                 ss << "tauc_" << atoms[it].label << ia+1;
 
-                ofs_running << " " << setw(12) << ss.str()
+                GlobalV::ofs_running << " " << setw(12) << ss.str()
                 //<< setw(20) << atoms[it].tau[ia].x 
                 //<< setw(20) << atoms[it].tau[ia].y
                 //<< setw(20) << atoms[it].tau[ia].z
@@ -783,8 +963,8 @@ void UnitCell_pseudo::print_tau(void)const
 
     if(Coordinate == "Direct")
     {
-        ofs_running << "\n DIRECT COORDINATES" << endl;
-        ofs_running << setw(13) << " atom"
+        GlobalV::ofs_running << "\n DIRECT COORDINATES" << endl;
+        GlobalV::ofs_running << setw(13) << " atom"
         //<< setw(20) << "x"
         //<< setw(20) << "y"
         //<< setw(20) << "z"
@@ -806,7 +986,7 @@ void UnitCell_pseudo::print_tau(void)const
                 stringstream ss;
                 ss << "taud_" << atoms[it].label << ia+1;
 
-                ofs_running << " " << setw(12) << ss.str()
+                GlobalV::ofs_running << " " << setw(12) << ss.str()
                 //<< setw(20) << atoms[it].taud[ia].x
                 //<< setw(20) << atoms[it].taud[ia].y
                 //<< setw(20) << atoms[it].taud[ia].z
@@ -829,14 +1009,14 @@ void UnitCell_pseudo::print_tau(void)const
         }
     }
 
-	ofs_running << endl;
+	GlobalV::ofs_running << endl;
 	return;
 }	
 
 
 int UnitCell_pseudo::find_type(const string &label)
 {
-	if(test_pseudo_cell) TITLE("UnitCell_pseudo","find_type");
+	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","find_type");
 	assert(ntype>0);
 	for(int it=0;it<ntype;it++)
 	{
@@ -864,33 +1044,33 @@ void UnitCell_pseudo::check_dtau(void)
 			// mohan add 2011-04-07			
 			while(dx2 >= 1) 
 			{
-				ofs_warning << " dx2 is >=1 " << endl;
+				GlobalV::ofs_warning << " dx2 is >=1 " << endl;
 				dx2 -= 1.0;
 			}
 			while(dy2 >= 1) 
 			{
-				ofs_warning << " dy2 is >=1 " << endl;
+				GlobalV::ofs_warning << " dy2 is >=1 " << endl;
 				dy2 -= 1.0;
 			}
 			while(dz2 >= 1) 
 			{
-				ofs_warning << " dz2 is >=1 " << endl;
+				GlobalV::ofs_warning << " dz2 is >=1 " << endl;
 				dz2 -= 1.0;
 			}
 			// mohan add 2011-04-07			
 			while(dx2<0) 
 			{
-				ofs_warning << " dx2 is <0 " << endl;
+				GlobalV::ofs_warning << " dx2 is <0 " << endl;
 				dx2 += 1.0;
 			}
 			while(dy2<0) 
 			{
-				ofs_warning << " dy2 is <0 " << endl;
+				GlobalV::ofs_warning << " dy2 is <0 " << endl;
 				dy2 += 1.0;
 			}
 			while(dz2<0) 
 			{
-				ofs_warning << " dz2 is <0 " << endl;
+				GlobalV::ofs_warning << " dz2 is <0 " << endl;
 				dz2 += 1.0;
 			}
 

@@ -118,6 +118,9 @@ private:
 	complex<double> ****overlap;
 };
 
+namespace GlobalC
+{
 extern Chi0_hilbert chi0_hilbert;
+}
 
 #endif

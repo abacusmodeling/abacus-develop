@@ -11,7 +11,7 @@ wavefunc::wavefunc()
 
 wavefunc::~wavefunc()
 { 
-	if(test_deconstructor)
+	if(GlobalV::test_deconstructor)
 	{
 		cout << " ~wavefunc()" << endl;
 	}
@@ -22,7 +22,7 @@ wavefunc::~wavefunc()
 		// may be in diagH_LAPACK.
 		// I don't know why.......
 		// mohan 2010-08-08
-		//for(int ik=0; ik<kv.nks-1; ik++) delete[] ekb[ik];
+		//for(int ik=0; ik<GlobalC::kv.nks-1; ik++) delete[] ekb[ik];
 		//delete[] ekb;
 	}
 }
@@ -30,21 +30,21 @@ wavefunc::~wavefunc()
 void wavefunc::allocate_ekb_wg(const int nks)
 {
     TITLE("wavefunc","init_local");
-    this->npwx = this->setupIndGk(pw, nks);
+    this->npwx = this->setupIndGk(GlobalC::pw, nks);
 
 	// band energies
 	this->ekb = new double*[nks];
 	for(int ik=0; ik<nks; ik++)
 	{
-		ekb[ik] = new double[NBANDS];
-		ZEROS(ekb[ik],NBANDS);
+		ekb[ik] = new double[GlobalV::NBANDS];
+		ZEROS(ekb[ik],GlobalV::NBANDS);
 	}
 	this->allocate_ekb = true;
 
 	// the weight of each k point and band
-    this->wg.create(nks, NBANDS);
-    Memory::record("wavefunc","ekb",nks*NBANDS,"double");
-    Memory::record("wavefunc","wg",nks*NBANDS,"double");
+    this->wg.create(nks, GlobalV::NBANDS);
+    Memory::record("wavefunc","ekb",nks*GlobalV::NBANDS,"double");
+    Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
 
     return;
 }
@@ -53,13 +53,13 @@ void wavefunc::allocate(const int nks)
 {	
 	TITLE("wavefunc","allocate");
 
-	this->npwx = this->setupIndGk(pw, nks);
-	OUT(ofs_running,"npwx",npwx);
+	this->npwx = this->setupIndGk(GlobalC::pw, nks);
+	OUT(GlobalV::ofs_running,"npwx",npwx);
 
 	assert(npwx > 0);
 	assert(nks > 0);
-	if( (CALCULATION!="scf-sto" && CALCULATION!="relax-sto" && CALCULATION!="md-sto") ) //qianrui add 
-	assert(NBANDS > 0);
+	if( (GlobalV::CALCULATION!="scf-sto" && GlobalV::CALCULATION!="relax-sto" && GlobalV::CALCULATION!="md-sto") ) //qianrui add 
+	assert(GlobalV::NBANDS > 0);
 
 	// allocate for kinetic energy
 	delete[] g2kin;
@@ -69,43 +69,43 @@ void wavefunc::allocate(const int nks)
 
 	// if use spin orbital, do not double nks but double allocate evc and wanf2.
 	int prefactor = 1;
-	if(NSPIN==4) prefactor = NPOL;//added by zhengdy-soc
+	if(GlobalV::NSPIN==4) prefactor = GlobalV::NPOL;//added by zhengdy-soc
 	
 	this->ekb = new double*[nks];
 	for(int ik=0; ik<nks; ik++)
 	{
-		ekb[ik] = new double[NBANDS];
-		ZEROS(ekb[ik], NBANDS);
+		ekb[ik] = new double[GlobalV::NBANDS];
+		ZEROS(ekb[ik], GlobalV::NBANDS);
 	}
 	this->allocate_ekb = true;
 	
 	// the weight of each k point and band
-	this->wg.create(nks, NBANDS);
-	Memory::record("wavefunc","et",nks*NBANDS,"double");
-	Memory::record("wavefunc","wg",nks*NBANDS,"double");
+	this->wg.create(nks, GlobalV::NBANDS);
+	Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
+	Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
 
 	delete[] evc;
 	delete[] wanf2;
 
 	const int nks2 = nks;
 
-	if(CALCULATION=="nscf" && wf.mem_saver==1)
+	if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
 	{
 		// mohan add 2010-09-07
 		this->evc = new ComplexMatrix[1];
 		this->wanf2 = new ComplexMatrix[1];
 		
 		// //added by zhengdy-soc
-		evc[0].create(NBANDS, npwx * NPOL);
+		evc[0].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);
 
-		if(BASIS_TYPE=="lcao_in_pw")
+		if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			wanf2[0].create(NLOCAL, npwx * NPOL);
+			wanf2[0].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);
 			cout << " Memory for wanf2 (MB): " << 
-				Memory::record("wavefunc","wanf2",NLOCAL*(prefactor*npwx),"complexmatrix") << endl;
+				Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << endl;
 		}
 		cout << " MEMORY FOR PSI (MB)  : " << 
-			Memory::record("wavefunc","evc",NBANDS*(prefactor*npwx),"complexmatrix") << endl;
+			Memory::record("wavefunc","evc",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << endl;
 	}
 	else
 	{
@@ -114,17 +114,17 @@ void wavefunc::allocate(const int nks)
 
 		for (int ik = 0; ik < nks2; ik++)
 		{
-			this->evc[ik].create(NBANDS, npwx * NPOL);//added by zhengdy-soc
+			this->evc[ik].create(GlobalV::NBANDS, npwx * GlobalV::NPOL);//added by zhengdy-soc
 
 			//Mohan add 2010-1-10
-			if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
+			if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
 			{
-				this->wanf2[ik].create(NLOCAL, npwx * NPOL);//added by zhengdy-soc
+				this->wanf2[ik].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);//added by zhengdy-soc
 			}
 		};
 
 		cout << " MEMORY FOR PSI (MB)  : " << 
-		Memory::record("wavefunc","evc",nks2*NBANDS*(prefactor*npwx),"complexmatrix") << endl;
+		Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << endl;
 	}
 
 	//showMemStats();
@@ -143,23 +143,23 @@ void wavefunc::wfcinit(void)
 
     this->wfcinit_k();
 
-    en.demet = 0.0;
+    GlobalC::en.demet = 0.0;
 
     //================================
     // Occupations are computed here
     //================================
-	if(BASIS_TYPE=="pw")
+	if(GlobalV::BASIS_TYPE=="pw")
 	{
 		// mohan fix bug 2011-02-25,
 		// in nscf, occupations is not needed,
-		if(CALCULATION=="scf" || CALCULATION=="md" || CALCULATION=="relax") //pengfei 2014-10-13
+		if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="md" || GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 		{
     		Occupy::calculate_weights();
 		}
 	}
-    if (test_wf>2)
+    if (GlobalV::test_wf>2)
     {
-        out.printrm(ofs_running, " wg  ",  wg);
+        GlobalC::out.printrm(GlobalV::ofs_running, " wg  ",  wg);
         this->check_psi(evc);
     }
 
@@ -179,22 +179,22 @@ int wavefunc::get_starting_nw(void)const
     }
     else if (start_wfc.substr(0,6) == "atomic")
     {
-        if (ucell.natomwfc >= NBANDS)
+        if (GlobalC::ucell.natomwfc >= GlobalV::NBANDS)
         {
-            if(test_wf)ofs_running << " Start wave functions are all pseudo atomic wave functions." << endl;
+            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all pseudo atomic wave functions." << endl;
         }
         else
         {
-            if(test_wf)ofs_running << " Start wave functions are atomic + "
-            << NBANDS - ucell.natomwfc
+            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are atomic + "
+            << GlobalV::NBANDS - GlobalC::ucell.natomwfc
             << " random wave functions." << endl;
         }
-        return max(ucell.natomwfc,  NBANDS);
+        return max(GlobalC::ucell.natomwfc,  GlobalV::NBANDS);
     }
     else if (start_wfc == "random")
     {
-        if(test_wf)ofs_running << " Start wave functions are all random." << endl;
-        return NBANDS;
+        if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all random." << endl;
+        return GlobalV::NBANDS;
     }
     else
     {
@@ -211,35 +211,35 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	TITLE("wavefunc","LCAO_in_pw_k");
 	timer::tick("wavefunc","LCAO_in_pw_k");
 
-	assert(BASIS_TYPE=="lcao_in_pw");
+	assert(GlobalV::BASIS_TYPE=="lcao_in_pw");
 	
 	static bool ltable = false;
 
 	if(!ltable)
 	{
-		this->table_local.create(ucell.ntype, ucell.nmax_total, NQX);
+		this->table_local.create(GlobalC::ucell.ntype, GlobalC::ucell.nmax_total, GlobalV::NQX);
 
-		// ORB.orbital_file: file name of the numerical atomic orbitals (NAOs)
+		// GlobalC::ORB.orbital_file: file name of the numerical atomic orbitals (NAOs)
 		// table_local: generate one-dimensional table for NAOs
-		Wavefunc_in_pw::make_table_q(ORB.orbital_file, this->table_local);
+		Wavefunc_in_pw::make_table_q(GlobalC::ORB.orbital_file, this->table_local);
 		ltable = true;
 	}
 	
 	Wavefunc_in_pw::produce_local_basis_in_pw(ik, wvf, this->table_local);
 
 	//-------------------------------------------------------------
-	// (2) diago to get wf.ekb, then the weights can be calculated.
+	// (2) diago to get GlobalC::wf.ekb, then the weights can be calculated.
 	//-------------------------------------------------------------
-    hm.hpw.allocate(this->npwx, NPOL, ppcell.nkb, pw.nrxx);
-	hm.hpw.init_k(ik);
+    GlobalC::hm.hpw.allocate(this->npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
+	GlobalC::hm.hpw.init_k(ik);
 	
-	//hm.diagH_subspace(ik ,NLOCAL, NBANDS, wvf, wvf, ekb[ik]);
-//	for(int ib=0; ib<NBANDS; ib++)
+	//GlobalC::hm.diagH_subspace(ik ,GlobalV::NLOCAL, GlobalV::NBANDS, wvf, wvf, ekb[ik]);
+//	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 //	{
 //		cout << " ib=" << ib << " e=" << ekb[ik][ib] << endl;
 //	}
 
-//	DONE(ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
+//	DONE(GlobalV::ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
 
 	timer::tick("wavefunc","LCAO_in_pw_k");
 	return;
@@ -251,7 +251,7 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double>
 	TITLE("wavefunc","LCAO_in_pw_k_q");
 	timer::tick("wavefunc","LCAO_in_pw_k_q");
 	//assert(LOCAL_BASIS==4); xiaohui modify 2013-09-01
-	assert(BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
+	assert(GlobalV::BASIS_TYPE=="lcao_in_pw"); //xiaohui add 2013-09-01. Attention! How about "BASIS_TYPE=="lcao""???
 
 	Wavefunc_in_pw::produce_local_basis_q_in_pw(ik, wvf, this->table_local, q);
 
@@ -265,7 +265,7 @@ void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k");
 
-	hm.hpw.init_k(ik);
+	GlobalC::hm.hpw.init_k(ik);
     this->diago_PAO_in_pw_k2(ik, wvf);
 
 	return;
@@ -278,18 +278,18 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	const int starting_nw = this->get_starting_nw();
 	assert(starting_nw > 0);
 
-	ComplexMatrix wfcatom(starting_nw, npwx * NPOL);//added by zhengdy-soc
-	if(test_wf)OUT(ofs_running, "starting_nw", starting_nw);
+	ComplexMatrix wfcatom(starting_nw, npwx * GlobalV::NPOL);//added by zhengdy-soc
+	if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "starting_nw", starting_nw);
 	if(start_wfc.substr(0,6)=="atomic")
 	{
-		this->atomic_wfc(ik, this->npw, ucell.lmax_ppwf, wfcatom, ppcell.tab_at, NQX, DQ);
-		if( start_wfc == "atomic+random" && starting_nw == ucell.natomwfc )//added by qianrui 2021-5-16
+		this->atomic_wfc(ik, this->npw, GlobalC::ucell.lmax_ppwf, wfcatom, GlobalC::ppcell.tab_at, GlobalV::NQX, GlobalV::DQ);
+		if( start_wfc == "atomic+random" && starting_nw == GlobalC::ucell.natomwfc )//added by qianrui 2021-5-16
 		{
 			double rr, arg;
 			for(int ib = 0 ; ib < starting_nw ; ++ib )
 			{
 				int startig = 0;
-				for(int ip = 0 ; ip < NPOL; ++ip)
+				for(int ip = 0 ; ip < GlobalV::NPOL; ++ip)
 				{
 					for(int ig = 0 ; ig < npw ; ++ig)
 					{
@@ -306,37 +306,37 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 		// If not enough atomic wfc are available, complete
 		// with random wfcs
 		//====================================================
-		this->random(wfcatom, ucell.natomwfc, NBANDS, ik);
+		this->random(wfcatom, GlobalC::ucell.natomwfc, GlobalV::NBANDS, ik);
 	}
 	else if(start_wfc=="random")
 	{
-		this->random(wfcatom,0,NBANDS,ik);
+		this->random(wfcatom,0,GlobalV::NBANDS,ik);
 	}
 
 	// (7) Diago with cg method.
 	double *etatom  = new double[starting_nw];
 	ZEROS(etatom, starting_nw);
-	//if(DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
-	if(KS_SOLVER=="cg") //xiaohui add 2013-09-02
+	//if(GlobalV::DIAGO_TYPE == "cg") xiaohui modify 2013-09-02
+	if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 	{
-		hm.diagH_subspace(ik ,starting_nw, NBANDS, wfcatom, wfcatom, etatom);
+		GlobalC::hm.diagH_subspace(ik ,starting_nw, GlobalV::NBANDS, wfcatom, wfcatom, etatom);
 	}
 
 	/*
-	ofs_running << " " << "ik = " << ik << " Bands(eV)" << endl;
+	GlobalV::ofs_running << " " << "ik = " << ik << " Bands(eV)" << endl;
 	for (int ib=0;ib<starting_nw;ib++)
 	{
-		ofs_running << " " << setw(15) << etatom[ib]*Ry_to_eV << endl;
+		GlobalV::ofs_running << " " << setw(15) << etatom[ib]*Ry_to_eV << endl;
 	}
 	*/
 
 	assert(wvf.nr <= wfcatom.nr);
-	for (int ib=0; ib<NBANDS; ib++)
+	for (int ib=0; ib<GlobalV::NBANDS; ib++)
 	{
 		for (int ig=0; ig<this->npwx; ig++)
 		{
 			wvf(ib, ig) = wfcatom(ib, ig);
-			if(NPOL==2) wvf(ib,ig + this->npwx) = wfcatom(ib,ig + this->npwx);
+			if(GlobalV::NPOL==2) wvf(ib,ig + this->npwx) = wfcatom(ib,ig + this->npwx);
 		}
 	}
 
@@ -357,21 +357,21 @@ void wavefunc::wfcinit_k(void)
 		return;
 	}
 
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		if (BASIS_TYPE=="pw")
+		if (GlobalV::BASIS_TYPE=="pw")
 		{
 			// get the wave functions 
 			// by first diagolize PAO
 			// wave functions.
-			this->diago_PAO_in_pw_k(ik, wf.evc[ik]);
+			this->diago_PAO_in_pw_k(ik, GlobalC::wf.evc[ik]);
 		}
 #ifdef __LCAO
-		else if(BASIS_TYPE=="lcao_in_pw")
+		else if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			// just get the numerical local basis wave functions
 			// in plane wave basis
-			this->LCAO_in_pw_k(ik, wf.wanf2[ik]);
+			this->LCAO_in_pw_k(ik, GlobalC::wf.wanf2[ik]);
 		}
 #endif
 	}
@@ -380,39 +380,39 @@ void wavefunc::wfcinit_k(void)
 	//  calculte the overlap <i,0 | e^{i(q+G)r} | j,R>
 	//---------------------------------------------------
 #ifdef __LCAO
-	if((!chi0_hilbert.epsilon) && chi0_hilbert.kmesh_interpolation )    // pengfei  2016-11-23
+	if((!GlobalC::chi0_hilbert.epsilon) && GlobalC::chi0_hilbert.kmesh_interpolation )    // pengfei  2016-11-23
 	{
-		chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(pw.gcars))  are the same
+		GlobalC::chi0_hilbert.Parallel_G();    // for parallel: make sure in each core, G(all_gcars(GlobalC::pw.gcars))  are the same
 		
 		// iw1->i, iw2->j, R store the positions of the neighbor unitcells that |i,0> and |j,R> have overlaps
-		R = new Vector3<int>** [NLOCAL];
-		for(int iw1=0; iw1<NLOCAL; iw1++)
+		R = new Vector3<int>** [GlobalV::NLOCAL];
+		for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 		{
-			R[iw1] = new Vector3<int>* [NLOCAL];
-			for(int iw2=0; iw2<NLOCAL; iw2++)
+			R[iw1] = new Vector3<int>* [GlobalV::NLOCAL];
+			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
-				R[iw1][iw2] = new Vector3<int>[chi0_hilbert.lcao_box[0]*chi0_hilbert.lcao_box[1]*chi0_hilbert.lcao_box[2]];
+				R[iw1][iw2] = new Vector3<int>[GlobalC::chi0_hilbert.lcao_box[0]*GlobalC::chi0_hilbert.lcao_box[1]*GlobalC::chi0_hilbert.lcao_box[2]];
 			}
 		}
 		
-		Rmax = new int* [NLOCAL];
-		for(int iw=0; iw<NLOCAL; iw++)
+		Rmax = new int* [GlobalV::NLOCAL];
+		for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 		{
-			Rmax[iw] = new int[NLOCAL];
+			Rmax[iw] = new int[GlobalV::NLOCAL];
 		}
 		
 		int NR; // The Max number of the overlaps for each iw1,iw2; 
-		NR = get_R(chi0_hilbert.lcao_box[0],chi0_hilbert.lcao_box[1],chi0_hilbert.lcao_box[2]); 
+		NR = get_R(GlobalC::chi0_hilbert.lcao_box[0],GlobalC::chi0_hilbert.lcao_box[1],GlobalC::chi0_hilbert.lcao_box[2]); 
 		
 		// store the overlap relationship to "nearest.dat"
 		stringstream ss;
-		ss << global_out_dir <<"nearest.dat";
+		ss << GlobalV::global_out_dir <<"nearest.dat";
 		ofstream ofs(ss.str().c_str());
 		ofs << NR << endl;
 		cout <<"NR = "<<NR<<endl;    // Max
-		for(int iw1=0; iw1<NLOCAL; iw1++)
+		for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 		{
-			for(int iw2=0; iw2<NLOCAL; iw2++)
+			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
 				ofs<<iw1<<"   "<<iw2<<"    "<<Rmax[iw1][iw2]<<endl;   // iw1, iw2, and how many overlaps between iw1 and iw2
 				for(int i=0; i<Rmax[iw1][iw2]; i++)
@@ -423,35 +423,35 @@ void wavefunc::wfcinit_k(void)
 		}
 		ofs.close();
 		
-		int NG = chi0_hilbert.dim;  // chi0's dimension
+		int NG = GlobalC::chi0_hilbert.dim;  // chi0's dimension
 		
 		complex<double> ***wanf2_q;    // <j,0 | k+G+q>
 		
-		wanf2_q = new complex<double> **[kv.nks];
-		for(int ik=0; ik<kv.nks; ik++)
+		wanf2_q = new complex<double> **[GlobalC::kv.nks];
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			wanf2_q[ik] = new complex<double> *[NLOCAL];
-			for(int iw=0; iw<NLOCAL; iw++)
+			wanf2_q[ik] = new complex<double> *[GlobalV::NLOCAL];
+			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{
 				wanf2_q[ik][iw] = new complex<double>[npwx];
 			}
 		}
 		
-		complex<double> overlap_aux[NLOCAL][NLOCAL][NG][NR];     // <i,0 | e^{i(q+G)r} | j,R> 
-		complex<double> overlap[NLOCAL][NLOCAL][NG][NR];
-		double overlap_aux_R[NLOCAL][NLOCAL][NG][NR];       //real part
-		double overlap_R[NLOCAL][NLOCAL][NG][NR];
-		double overlap_aux_I[NLOCAL][NLOCAL][NG][NR];       //imag part
-		double overlap_I[NLOCAL][NLOCAL][NG][NR];
+		complex<double> overlap_aux[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];     // <i,0 | e^{i(q+G)r} | j,R> 
+		complex<double> overlap[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
+		double overlap_aux_R[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];       //real part
+		double overlap_R[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
+		double overlap_aux_I[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];       //imag part
+		double overlap_I[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
 		
 		ComplexMatrix Mat;
-		Mat.create(NLOCAL,npwx);
+		Mat.create(GlobalV::NLOCAL,npwx);
 		Vector3<double> qg; // q+G
-		Vector3<double> gkqg, Rcar[NLOCAL][NLOCAL][NR];  // k+G+qg, Rcartesian
+		Vector3<double> gkqg, Rcar[GlobalV::NLOCAL][GlobalV::NLOCAL][NR];  // k+G+qg, Rcartesian
 		
-		for(int iw1=0;iw1<NLOCAL; iw1++)
+		for(int iw1=0;iw1<GlobalV::NLOCAL; iw1++)
 		{
-			for(int iw2=0; iw2<NLOCAL; iw2++)
+			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
 				for(int i=0; i<NR; i++)
 				{
@@ -460,18 +460,18 @@ void wavefunc::wfcinit_k(void)
 			}
 		}
 
-		for(int iw1=0; iw1<NLOCAL; iw1++)
+		for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 		{
-			for(int iw2=0; iw2<NLOCAL; iw2++)
+			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
 				for(int i=0; i<Rmax[iw1][iw2]; i++)
 				{
-					Rcar[iw1][iw2][i].x = ucell.latvec.e11 * R[iw1][iw2][i].x 
-					+ ucell.latvec.e21 * R[iw1][iw2][i].y + ucell.latvec.e31 * R[iw1][iw2][i].z;
-					Rcar[iw1][iw2][i].y = ucell.latvec.e12 * R[iw1][iw2][i].x 
-					+ ucell.latvec.e22 * R[iw1][iw2][i].y + ucell.latvec.e32 * R[iw1][iw2][i].z;
-					Rcar[iw1][iw2][i].z = ucell.latvec.e13 * R[iw1][iw2][i].x 
-					+ ucell.latvec.e23 * R[iw1][iw2][i].y + ucell.latvec.e33 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].x = GlobalC::ucell.latvec.e11 * R[iw1][iw2][i].x 
+					+ GlobalC::ucell.latvec.e21 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e31 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].y = GlobalC::ucell.latvec.e12 * R[iw1][iw2][i].x 
+					+ GlobalC::ucell.latvec.e22 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e32 * R[iw1][iw2][i].z;
+					Rcar[iw1][iw2][i].z = GlobalC::ucell.latvec.e13 * R[iw1][iw2][i].x 
+					+ GlobalC::ucell.latvec.e23 * R[iw1][iw2][i].y + GlobalC::ucell.latvec.e33 * R[iw1][iw2][i].z;
 				}
 			}
 		}
@@ -479,11 +479,11 @@ void wavefunc::wfcinit_k(void)
 		
 		double arg; 
 		complex<double> phase;
-		for(int iq=0; iq<chi0_hilbert.nq; iq++)
+		for(int iq=0; iq<GlobalC::chi0_hilbert.nq; iq++)
 		{
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					for(int ig=0; ig<NG; ig++)
 					{
@@ -494,11 +494,11 @@ void wavefunc::wfcinit_k(void)
 		}
 		
 		// main
-		for(int iq=0; iq<chi0_hilbert.nq; iq++)    // loop over iq 
+		for(int iq=0; iq<GlobalC::chi0_hilbert.nq; iq++)    // loop over iq 
 		{
-			for(int iw1=0; iw1<NLOCAL; iw1++)
+			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				for(int iw2=0; iw2<NLOCAL; iw2++)
+				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
 					for(int ig=0; ig<NG; ig++)
 					{
@@ -509,36 +509,36 @@ void wavefunc::wfcinit_k(void)
 			
 			for(int g=0; g<NG; g++)    // loop over ig
 			{
-				qg.x = chi0_hilbert.qcar[iq][0] + chi0_hilbert.all_gcar[g].x;   
-				qg.y = chi0_hilbert.qcar[iq][1] + chi0_hilbert.all_gcar[g].y; 
-				qg.z = chi0_hilbert.qcar[iq][2] + chi0_hilbert.all_gcar[g].z;
+				qg.x = GlobalC::chi0_hilbert.qcar[iq][0] + GlobalC::chi0_hilbert.all_gcar[g].x;   
+				qg.y = GlobalC::chi0_hilbert.qcar[iq][1] + GlobalC::chi0_hilbert.all_gcar[g].y; 
+				qg.z = GlobalC::chi0_hilbert.qcar[iq][2] + GlobalC::chi0_hilbert.all_gcar[g].z;
 				cout <<"qg = "<<qg.x<<" "<<qg.y<<" "<<qg.z<<endl;
-				for(int ik=0; ik<kv.nks; ik++)
+				for(int ik=0; ik<GlobalC::kv.nks; ik++)
 				{
 					this->LCAO_in_pw_k_q(ik, Mat, qg);
-					for(int iw=0; iw<NLOCAL; iw++)
+					for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 					{
-						for(int ig=0; ig<kv.ngk[ik]; ig++)
+						for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 						{
 							wanf2_q[ik][iw][ig] = Mat(iw,ig);
 						}										
 					}
 				}
-				for(int iw1=0; iw1<NLOCAL; iw1++)    // loop over iw1
+				for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)    // loop over iw1
 				{
-					for(int iw2=0; iw2<NLOCAL; iw2++)  // loop over iw2
+					for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)  // loop over iw2
 					{
-						for(int ik=0;ik<kv.nks;ik++)         // loop over ik
+						for(int ik=0;ik<GlobalC::kv.nks;ik++)         // loop over ik
 						{
-							for(int ig=0;ig<kv.ngk[ik];ig++)    // loop over ig
+							for(int ig=0;ig<GlobalC::kv.ngk[ik];ig++)    // loop over ig
 							{
-								gkqg = pw.get_GPlusK_cartesian(ik, wf.igk(ik, ig)) + qg;
+								gkqg = GlobalC::pw.get_GPlusK_cartesian(ik, GlobalC::wf.igk(ik, ig)) + qg;
 								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
 								{
 									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
 									phase = complex<double>( cos(arg),  -sin(arg) );
-									overlap_aux[iw1][iw2][g][ir] += conj(wf.wanf2[ik](iw1,ig)) 
-									* wanf2_q[ik][iw2][ig] * phase/static_cast<double>(kv.nks);		
+									overlap_aux[iw1][iw2][g][ir] += conj(GlobalC::wf.wanf2[ik](iw1,ig)) 
+									* wanf2_q[ik][iw2][ig] * phase/static_cast<double>(GlobalC::kv.nks);		
 									// Peize Lin add static_cast 2018-07-14
 								}
 							}
@@ -549,9 +549,9 @@ void wavefunc::wfcinit_k(void)
 			
 			for(int g=0; g<NG; g++)
 			{
-				for(int iw1=0; iw1<NLOCAL; iw1++)
+				for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 				{
-					for(int iw2=0; iw2<NLOCAL; iw2++)
+					for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 					{
 						for(int ir=0; ir<NR; ir++)
 						{
@@ -563,15 +563,15 @@ void wavefunc::wfcinit_k(void)
 			}
 			
 #ifdef __MPI
-			MPI_Allreduce(overlap_aux_R,overlap_R,NLOCAL * NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
-			MPI_Allreduce(overlap_aux_I,overlap_I,NLOCAL * NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+			MPI_Allreduce(overlap_aux_R,overlap_R,GlobalV::NLOCAL * GlobalV::NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+			MPI_Allreduce(overlap_aux_I,overlap_I,GlobalV::NLOCAL * GlobalV::NLOCAL * NG * NR,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
 #endif
 			
 			for(int g=0; g<NG; g++)
 			{
-				for(int iw1=0; iw1<NLOCAL; iw1++)
+				for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 				{
-					for(int iw2=0; iw2<NLOCAL; iw2++)
+					for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 					{
 						for(int ir=0; ir<NR; ir++)
 						{
@@ -586,14 +586,14 @@ void wavefunc::wfcinit_k(void)
 			// store the overlap in q_(iq)
 			//------------------------------
 			stringstream ss1;
-			ss1 << global_out_dir <<"q_"<<iq;
+			ss1 << GlobalV::global_out_dir <<"q_"<<iq;
 			ofstream ofs1(ss1.str().c_str());
 			ofs1<<NG<<endl;
 			for(int g=0; g<NG; g++)
 			{
-				for(int iw1=0; iw1<NLOCAL; iw1++)
+				for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 				{
-					for(int iw2=0; iw2<NLOCAL; iw2++)
+					for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 					{
 						for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 						{
@@ -608,9 +608,9 @@ void wavefunc::wfcinit_k(void)
 			ofs1.close();
 		}
 		
-		for(int iw1=0; iw1<NLOCAL; iw1++)
+		for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 		{
-			for(int iw2=0; iw2<NLOCAL; iw2++)
+			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
 				delete[] R[iw1][iw2];
 			}
@@ -618,15 +618,15 @@ void wavefunc::wfcinit_k(void)
 		}
 		delete[] R;
 		
-		for(int iw=0; iw<NLOCAL; iw++)
+		for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 		{
 			delete[] Rmax[iw];
 		}
 		delete[] Rmax;
 		
-		for(int ik=0; ik<kv.nks; ik++)
+		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			for(int iw=0; iw<NLOCAL; iw++)
+			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{
 				delete[] wanf2_q[ik][iw];
 			}
@@ -650,9 +650,9 @@ int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
 	int count;
 	Vector3<double> r,r1,r2;
 
-	for(int iw1=0; iw1<NLOCAL; iw1++)
+	for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 	{
-		for(int iw2=0; iw2<NLOCAL; iw2++)
+		for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 		{
 			int it1 = iw2it(iw1); int ia1 = iw2ia(iw1);
 			int it2 = iw2it(iw2); int ia2 = iw2ia(iw2);
@@ -667,19 +667,19 @@ int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
 					{
 						//cout <<"count = "<<count<<endl;
 						//cout<<"nx= "<<nx<<" ny= "<<ny<<" nz= "<<nz<<endl;
-						r1.x = ucell.atoms[it1].tau[ia1].x * ucell.lat0;
-						r1.y = ucell.atoms[it1].tau[ia1].y * ucell.lat0;
-						r1.z = ucell.atoms[it1].tau[ia1].z * ucell.lat0;
-						r2.x = (ucell.atoms[it2].tau[ia2].x 
-						+ ucell.latvec.e11 * nx + ucell.latvec.e21 * ny + ucell.latvec.e31 * nz) * ucell.lat0;
-						r2.y = (ucell.atoms[it2].tau[ia2].y 
-						+ ucell.latvec.e12 * nx + ucell.latvec.e22 * ny + ucell.latvec.e32 * nz) * ucell.lat0;
-						r2.z = (ucell.atoms[it2].tau[ia2].z 
-						+ ucell.latvec.e13 * nx + ucell.latvec.e23 * ny + ucell.latvec.e33 * nz) * ucell.lat0;
+						r1.x = GlobalC::ucell.atoms[it1].tau[ia1].x * GlobalC::ucell.lat0;
+						r1.y = GlobalC::ucell.atoms[it1].tau[ia1].y * GlobalC::ucell.lat0;
+						r1.z = GlobalC::ucell.atoms[it1].tau[ia1].z * GlobalC::ucell.lat0;
+						r2.x = (GlobalC::ucell.atoms[it2].tau[ia2].x 
+						+ GlobalC::ucell.latvec.e11 * nx + GlobalC::ucell.latvec.e21 * ny + GlobalC::ucell.latvec.e31 * nz) * GlobalC::ucell.lat0;
+						r2.y = (GlobalC::ucell.atoms[it2].tau[ia2].y 
+						+ GlobalC::ucell.latvec.e12 * nx + GlobalC::ucell.latvec.e22 * ny + GlobalC::ucell.latvec.e32 * nz) * GlobalC::ucell.lat0;
+						r2.z = (GlobalC::ucell.atoms[it2].tau[ia2].z 
+						+ GlobalC::ucell.latvec.e13 * nx + GlobalC::ucell.latvec.e23 * ny + GlobalC::ucell.latvec.e33 * nz) * GlobalC::ucell.lat0;
 						r = r2 - r1;
 						double distance = sqrt(r*r);
 
-						if(distance < (ucell.atoms[it1].Rcut + ucell.atoms[it2].Rcut))
+						if(distance < (GlobalC::ucell.atoms[it1].Rcut + GlobalC::ucell.atoms[it2].Rcut))
 						{
 							R[iw1][iw2][count].x = nx; 
 							R[iw1][iw2][count].y = ny; 
@@ -694,9 +694,9 @@ int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
 	}
 
 	int NR = 0;
-	for(int iw1=0;iw1<NLOCAL;iw1++)
+	for(int iw1=0;iw1<GlobalV::NLOCAL;iw1++)
 	{
-		for(int iw2=0;iw2<NLOCAL;iw2++)
+		for(int iw2=0;iw2<GlobalV::NLOCAL;iw2++)
 		{
 			if(Rmax[iw1][iw2] > NR)
 			{
@@ -713,13 +713,13 @@ int wavefunc::iw2it( int iw)    // pengfei 2016-11-23
 {
     int ic, type;
     ic =0;
-    for(int it =0; it<ucell.ntype; it++)
+    for(int it =0; it<GlobalC::ucell.ntype; it++)
 	{
-        for(int ia = 0; ia<ucell.atoms[it].na; ia++)
+        for(int ia = 0; ia<GlobalC::ucell.atoms[it].na; ia++)
         {
-            for(int L=0; L<ucell.atoms[it].nwl+1; L++)
+            for(int L=0; L<GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-                for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+                for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
                 {
                     for(int i=0; i<(2*L+1); i++)
                     {
@@ -740,12 +740,12 @@ int wavefunc::iw2ia( int iw)    // pengfei 2016-11-23
 {
 	int ic, na;
 	ic =0;
-	for(int it =0; it<ucell.ntype; it++)
+	for(int it =0; it<GlobalC::ucell.ntype; it++)
 	{
-		for(int ia = 0; ia<ucell.atoms[it].na; ia++)
+		for(int ia = 0; ia<GlobalC::ucell.atoms[it].na; ia++)
 		{
-			for(int L=0; L<ucell.atoms[it].nwl+1; L++)
-				for(int N=0; N<ucell.atoms[it].l_nchi[L]; N++)
+			for(int L=0; L<GlobalC::ucell.atoms[it].nwl+1; L++)
+				for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
 					for(int i=0; i<(2*L+1); i++)
 					{
@@ -776,53 +776,53 @@ void wavefunc::init_after_vc(const int nks)
     }
 
     TITLE("wavefunc","init");
-    //this->npwx = this->setupIndGk(pw, nks);
-    OUT(ofs_running,"npwx",npwx);
+    //this->npwx = this->setupIndGk(GlobalC::pw, nks);
+    OUT(GlobalV::ofs_running,"npwx",npwx);
 
     assert(npwx > 0);
     assert(nks > 0);
-    assert(NBANDS > 0);
+    assert(GlobalV::NBANDS > 0);
 
     delete[] g2kin;
     this->g2kin = new double[npwx];   // [npw],kinetic energy
     ZEROS(g2kin, npwx);
     Memory::record("wavefunc","g2kin",npwx,"double");
-    if(test_wf)OUT(ofs_running,"g2kin allocation","Done");
+    if(GlobalV::test_wf)OUT(GlobalV::ofs_running,"g2kin allocation","Done");
 
     int prefactor = 1;
     this->ekb = new double*[nks];
     for(int ik=0; ik<nks; ik++)
     {
-        ekb[ik] = new double[NBANDS];
-        ZEROS(ekb[ik], NBANDS);
+        ekb[ik] = new double[GlobalV::NBANDS];
+        ZEROS(ekb[ik], GlobalV::NBANDS);
     }
     this->allocate_ekb = true;
 
-    this->wg.create(nks, NBANDS);       // the weight of each k point and band
-    Memory::record("wavefunc","et",nks*NBANDS,"double");
-    Memory::record("wavefunc","wg",nks*NBANDS,"double");
-    if(test_wf)OUT(ofs_running, "et allocation","Done");
-    if(test_wf)OUT(ofs_running, "wg allocation","Done");
+    this->wg.create(nks, GlobalV::NBANDS);       // the weight of each k point and band
+    Memory::record("wavefunc","et",nks*GlobalV::NBANDS,"double");
+    Memory::record("wavefunc","wg",nks*GlobalV::NBANDS,"double");
+    if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "et allocation","Done");
+    if(GlobalV::test_wf)OUT(GlobalV::ofs_running, "wg allocation","Done");
 
     delete[] evc;
     delete[] wanf2;
 
     const int nks2 = nks * prefactor;
 
-    if(CALCULATION=="nscf" && wf.mem_saver==1)
+    if(GlobalV::CALCULATION=="nscf" && GlobalC::wf.mem_saver==1)
     {
         this->evc = new ComplexMatrix[1];
         this->wanf2 = new ComplexMatrix[1];
 
-        evc[0].create(NBANDS*prefactor, npwx);
-        if(BASIS_TYPE=="lcao_in_pw")
+        evc[0].create(GlobalV::NBANDS*prefactor, npwx);
+        if(GlobalV::BASIS_TYPE=="lcao_in_pw")
         {
-            wanf2[0].create(NLOCAL*prefactor, npwx);
+            wanf2[0].create(GlobalV::NLOCAL*prefactor, npwx);
             cout << " Memory for wanf2 (MB): " <<
-            Memory::record("wavefunc","wanf2",(NLOCAL*prefactor)*npwx,"complexmatrix") << endl;
+            Memory::record("wavefunc","wanf2",(GlobalV::NLOCAL*prefactor)*npwx,"complexmatrix") << endl;
         }
         cout << " MEMORY FOR PSI (MB)  : " <<
-        Memory::record("wavefunc","evc",(NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+        Memory::record("wavefunc","evc",(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << endl;
     }
     else
     {
@@ -831,24 +831,24 @@ void wavefunc::init_after_vc(const int nks)
 
         for (int ik = 0; ik < nks2; ik++)
         {
-            this->evc[ik].create(NBANDS*prefactor, npwx);
+            this->evc[ik].create(GlobalV::NBANDS*prefactor, npwx);
 
-            if((BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
+            if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") || winput::out_spillage==2)
             {
-                this->wanf2[ik].create(NLOCAL, npwx);
+                this->wanf2[ik].create(GlobalV::NLOCAL, npwx);
             }
         }
 
         cout << " MEMORY FOR PSI (MB)  : " <<
-        Memory::record("wavefunc","evc",(nks*prefactor)*(NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+        Memory::record("wavefunc","evc",(nks*prefactor)*(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << endl;
     }
 
-    if(test_wf)
+    if(GlobalV::test_wf)
     {
-        OUT(ofs_running,"evc allocation","Done");
-        if(BASIS_TYPE=="lcao" || BASIS_TYPE=="lcao_in_pw")
+        OUT(GlobalV::ofs_running,"evc allocation","Done");
+        if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
         {
-            OUT(ofs_running,"wanf2 allocation","Done");
+            OUT(GlobalV::ofs_running,"wanf2 allocation","Done");
         }
     }
 

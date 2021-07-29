@@ -2,7 +2,7 @@
 #include "LOOP_elec.h"
 #include "LCAO_diago.h"
 #include "../src_pw/global.h"
-#include "../module_symmetry/symmetry_rho.h"
+#include "../src_pw/symmetry_rho.h"
 #include "LCAO_evolve.h"
 #include "dftu.h"
 
@@ -20,52 +20,52 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 	uhm.GK.allocate_pvpR();
 						
 	// pool parallization in future -- mohan note 2021-02-09
-	for(int ik=0; ik<kv.nks; ik++)
+	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{	
 		//-----------------------------------------
 		//(1) prepare data for this k point.
 		// copy the local potential from array.
 		//-----------------------------------------
-		if(NSPIN==2) 
+		if(GlobalV::NSPIN==2) 
 		{
-			CURRENT_SPIN = kv.isk[ik];
+			GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		}
-		wf.npw = kv.ngk[ik];
-		for(int ir=0; ir<pw.nrxx; ir++)
+		GlobalC::wf.npw = GlobalC::kv.ngk[ik];
+		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{
-			pot.vr_eff1[ir] = pot.vr_eff( CURRENT_SPIN, ir);
+			GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( GlobalV::CURRENT_SPIN, ir);
 		}
 		
 		//--------------------------------------------
 		//(2) check if we need to calculate 
 		// pvpR = < phi0 | v(spin) | phiR> for a new spin.
 		//--------------------------------------------
-		if(CURRENT_SPIN == uhm.GK.get_spin() )
+		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
 		{
-			//ofs_running << " Same spin, same vlocal integration." << endl;
+			//GlobalV::ofs_running << " Same spin, same vlocal integration." << endl;
 		}
 		else
 		{
-			//ofs_running << " (spin change)" << endl;
-			uhm.GK.reset_spin( CURRENT_SPIN );
+			//GlobalV::ofs_running << " (spin change)" << endl;
+			uhm.GK.reset_spin( GlobalV::CURRENT_SPIN );
 
 			// if you change the place of the following code,
 			// rememeber to delete the #include	
-			if(VL_IN_H)
+			if(GlobalV::VL_IN_H)
 			{
 				// vlocal = Vh[rho] + Vxc[rho] + Vl(pseudo)
-				uhm.GK.cal_vlocal_k(pot.vr_eff1,GridT);
+				uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1,GlobalC::GridT);
 				// added by zhengdy-soc, for non-collinear case
 				// integral 4 times, is there any method to simplify?
-				if(NSPIN==4)
+				if(GlobalV::NSPIN==4)
 				{
 					for(int is=1;is<4;is++)
 					{
-						for(int ir=0; ir<pw.nrxx; ir++)
+						for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 						{
-							pot.vr_eff1[ir] = pot.vr_eff( is, ir);
+							GlobalC::pot.vr_eff1[ir] = GlobalC::pot.vr_eff( is, ir);
 						}
-						uhm.GK.cal_vlocal_k(pot.vr_eff1, GridT, is);
+						uhm.GK.cal_vlocal_k(GlobalC::pot.vr_eff1, GlobalC::GridT, is);
 					}
 				}
 			}
@@ -89,39 +89,38 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 
 		// Effective potential of DFT+U is added to total Hamiltonian here; Quxin adds on 20201029
 		if(INPUT.dft_plus_u)
-		{		
-			dftu.cal_eff_pot_mat(ik, istep);
-
-			for(int irc=0; irc<ParaO.nloc; irc++)
-			{
-				LM.Hloc2[irc] += dftu.pot_eff_k.at(ik).at(irc);
-			}							
+		{
+      vector<complex<double>> eff_pot(GlobalC::ParaO.nloc);
+			GlobalC::dftu.cal_eff_pot_mat_complex(ik, istep, &eff_pot[0]);
+      
+			for(int irc=0; irc<GlobalC::ParaO.nloc; irc++)
+				GlobalC::LM.Hloc2[irc] += eff_pot[irc];					
 		}
 
 		timer::tick("Efficience","H_k");
 
 		// Peize Lin add at 2020.04.04
-		if(restart.info_load.load_H && !restart.info_load.load_H_finish)
+		if(GlobalC::restart.info_load.load_H && !GlobalC::restart.info_load.load_H_finish)
 		{
-			restart.load_disk("H", ik);
-			restart.info_load.load_H_finish = true;
+			GlobalC::restart.load_disk("H", ik);
+			GlobalC::restart.info_load.load_H_finish = true;
 		}			
-		if(restart.info_save.save_H)
+		if(GlobalC::restart.info_save.save_H)
 		{
-			restart.save_disk("H", ik);
+			GlobalC::restart.save_disk("H", ik);
 		}
 
-		// write the wave functions into LOWF.WFC_K[ik].
+		// write the wave functions into GlobalC::LOWF.WFC_K[ik].
 		timer::tick("Efficience","diago_k");
 		Diago_LCAO_Matrix DLM;
-		DLM.solve_complex_matrix(ik, LOWF.WFC_K[ik], LOC.wfc_dm_2d.wfc_k[ik]);
+		DLM.solve_complex_matrix(ik, GlobalC::LOWF.WFC_K[ik], GlobalC::LOC.wfc_dm_2d.wfc_k[ik]);
 		timer::tick("Efficience","diago_k");
 
 		timer::tick("Efficience","each_k");
 	} // end k
 			
 	// LiuXh modify 2019-07-15*/
-	if(!ParaO.out_hsR)
+	if(!GlobalC::ParaO.out_hsR)
 	{
 		uhm.GK.destroy_pvpR();
 	}

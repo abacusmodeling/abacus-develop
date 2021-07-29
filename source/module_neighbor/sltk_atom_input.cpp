@@ -76,7 +76,7 @@ Atom_input::Atom_input
 	vec3[1] = ucell.latvec.e32;
 	vec3[2] = ucell.latvec.e33;
 
-	if(test_grid)
+	if(GlobalV::test_grid)
 	{
 		ofs_in << " Output lattice vectors now (unit:lat0):" << endl;
 		ofs_in << " " << setw(5) << "Vec1" 
@@ -174,7 +174,7 @@ Atom_input::Atom_input
 		this->Expand_Grid(ucell, ntype);
 	}
 
-	if(test_grid) OUT(ofs_in, "expand_flag", expand_flag);
+	if(GlobalV::test_grid) OUT(ofs_in, "expand_flag", expand_flag);
 
 //----------------------------------------------------------
 // CALL MEMBER FUNCTION :
@@ -205,7 +205,7 @@ Atom_input::~Atom_input()
 //============================================
 void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 {
-//	TITLE(ofs_running, "Atom_input", "Check_Expand_Condition");
+//	TITLE(GlobalV::ofs_running, "Atom_input", "Check_Expand_Condition");
 
 	if (!periodic_boundary) return;
 
@@ -251,7 +251,7 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 	}
 
 
-	if(test_atom_input)OUT(ofs_running,"Radius",radius);
+	if(test_atom_input)OUT(GlobalV::ofs_running,"Radius",radius);
 
 /*2016-07-19, LiuXh
 	// the unit of extent_1DX,Y,Z is lat0.
@@ -283,10 +283,10 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 	glayerZ++;
 	if(test_atom_input)
 	{
-		ofs_running << " Extend distance from the (maxX,maxY,maxZ) direct position in this unitcell: " << endl;
+		GlobalV::ofs_running << " Extend distance from the (maxX,maxY,maxZ) direct position in this unitcell: " << endl;
 	}
 	
-	if(test_atom_input)OUT(ofs_running,"ExtentDim+",extent_1DX,extent_1DY,extent_1DZ);
+	if(test_atom_input)OUT(GlobalV::ofs_running,"ExtentDim+",extent_1DX,extent_1DY,extent_1DZ);
 
 	double extent_1DX_minus = glayerX_minus * clength0 + dminX;
 	while (radius > extent_1DX_minus)
@@ -369,10 +369,10 @@ void Atom_input::Check_Expand_Condition(const UnitCell &ucell)
 /*	
 	if(test_atom_input)
 	{
-		ofs_running << " Extend distance from the (minX,minY,minZ) direct position in this unitcell: " << endl;
+		GlobalV::ofs_running << " Extend distance from the (minX,minY,minZ) direct position in this unitcell: " << endl;
 	}
 
-	if(test_atom_input)OUT(ofs_running,"ExtentDim-",extent_1DX_minus,extent_1DY_minus,extent_1DZ_minus);
+	if(test_atom_input)OUT(GlobalV::ofs_running,"ExtentDim-",extent_1DX_minus,extent_1DY_minus,extent_1DZ_minus);
 */
 //----------------------------------------------------------
 // EXPLAIN : if extent don't satisfty the searching
@@ -400,13 +400,13 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 
 	if(test_atom_input)
 	{
-		ofs_running << " Be careful of thie grid adjacent searching program!" << endl;
-		ofs_running << " Here I would like to say some gudlines:" << endl;
-		ofs_running << " You are using Expand_Grid now, which means now you treat" << endl;
-		ofs_running << " your 'unitcell' as a Cell Class which defined in grid class" << endl;
-		ofs_running << " This Cell is diffenent from the 'Not expand' cell." << endl;
-		ofs_running << " In most cases, it may not be a cubic, so please do it more carefully." << endl;
-		ofs_running << " Good luck! " << endl;
+		GlobalV::ofs_running << " Be careful of thie grid adjacent searching program!" << endl;
+		GlobalV::ofs_running << " Here I would like to say some gudlines:" << endl;
+		GlobalV::ofs_running << " You are using Expand_Grid now, which means now you treat" << endl;
+		GlobalV::ofs_running << " your 'unitcell' as a Cell Class which defined in grid class" << endl;
+		GlobalV::ofs_running << " This Cell is diffenent from the 'Not expand' cell." << endl;
+		GlobalV::ofs_running << " In most cases, it may not be a cubic, so please do it more carefully." << endl;
+		GlobalV::ofs_running << " Good luck! " << endl;
 	}
 
 	double *x_old = new double[d_amount];
@@ -436,11 +436,11 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 	    (glayerY + glayerY_minus) *
 	    (glayerZ + glayerZ_minus) ;
 
-	if(test_atom_input)OUT(ofs_running,"Grid_copy_times",gcopy);
+	if(test_atom_input)OUT(GlobalV::ofs_running,"Grid_copy_times",gcopy);
 
 	this->d_amount_expand = d_amount * gcopy;
 
-	if(test_atom_input)OUT(ofs_running,"Atom_number_now",d_amount_expand);
+	if(test_atom_input)OUT(GlobalV::ofs_running,"Atom_number_now",d_amount_expand);
 
 	// store new atom positions.
 	this->store_x = new double[d_amount_expand];
@@ -448,7 +448,7 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 	this->store_z = new double[d_amount_expand];
 
 	double mem = Memory::record("Expand_grid","Expanded Atom",d_amount_expand*3,"double");
-	if(test_atom_input)OUT(ofs_running, "Memory for store_x,y,z",mem);
+	if(test_atom_input)OUT(GlobalV::ofs_running, "Memory for store_x,y,z",mem);
 
 	// store which grid the atom is in.
 	store_cell_x = new int[d_amount_expand];
@@ -459,7 +459,7 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 	this->store_natom = new int[d_amount_expand];
 
 	mem = Memory::record("Expand_grid","Exapanded atom info",d_amount_expand*5,"int");
-	if(test_atom_input)OUT(ofs_running, "Memory for storo other info",mem);
+	if(test_atom_input)OUT(GlobalV::ofs_running, "Memory for storo other info",mem);
 
 	int ia_all = 0;
 
@@ -486,7 +486,7 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 					{
 						if (d_amount_expand < 1000)
 						{
-							ofs_running << "\n" << setw(6) << ia_all
+							GlobalV::ofs_running << "\n" << setw(6) << ia_all
 							<< setw(10) << x_old[ia]
 							<< setw(10) << y_old[ia]
 							<< setw(10) << z_old[ia]
@@ -548,11 +548,11 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 
 	if(test_atom_input)
 	{
-		ofs_running << " New Xmin=" << x_min_expand
+		GlobalV::ofs_running << " New Xmin=" << x_min_expand
 			<< " Ymin=" << y_min_expand
 			<< " Zmin=" << z_min_expand << endl;
 
-		ofs_running << " New Xmax=" << x_max_expand
+		GlobalV::ofs_running << " New Xmax=" << x_max_expand
 			<< " Ymax=" << y_max_expand
 			<< " Zmax=" << z_max_expand << endl;
 	}
@@ -640,11 +640,11 @@ void Atom_input::set_FAtom(const UnitCell &ucell, FAtom &a)const
 		a.setZ(z);
 		a.setType(type);
 		a.setNatom(natom);
-//		ofs_running<<"\n x = "<<x;
-//		ofs_running<<"\n y = "<<y;
-//		ofs_running<<"\n z = "<<z;
-//		ofs_running<<"\n Type = "<<type;
-//		ofs_running<<"\n natom = "<<natom;
+//		GlobalV::ofs_running<<"\n x = "<<x;
+//		GlobalV::ofs_running<<"\n y = "<<y;
+//		GlobalV::ofs_running<<"\n z = "<<z;
+//		GlobalV::ofs_running<<"\n Type = "<<type;
+//		GlobalV::ofs_running<<"\n natom = "<<natom;
 	}
 
 	return;

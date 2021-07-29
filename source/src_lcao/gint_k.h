@@ -236,7 +236,7 @@ class Gint_k : public Gint_k_init
 	//----------------------------
 	// key variable 
 	//----------------------------
-	// dimension: [LNNR.nnrg] 
+	// dimension: [GlobalC::LNNR.nnrg] 
 	// save the < phi_0i | V | phi_Rj > in sparse H matrix.
 	double** pvpR_reduced;
 
