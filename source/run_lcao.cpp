@@ -7,7 +7,7 @@
 #include "module_neighbor/sltk_atom_arrange.h"
 #include "src_lcao/LOOP_cell.h"
 #include "src_io/print_info.h"
-#include "module_symmery/symmetry.h"
+#include "module_symmetry/symmetry.h"
 #include "src_lcao/run_md_lcao.h"
 
 Run_lcao::Run_lcao(){}
@@ -144,7 +144,7 @@ void Run_lcao::lcao_line(void)
 		}
 	}
 
-	if(CALCULATION=="md")
+	if(GlobalV::CALCULATION=="md")
 	{
 		Run_MD_LCAO run_md_lcao;
 		run_md_lcao.opt_cell();
@@ -154,10 +154,8 @@ void Run_lcao::lcao_line(void)
 		LOOP_cell lc;
 		lc.opt_cell();
 
-		en.perform_dos();
+		GlobalC::en.perform_dos();
 	}
-
-	GlobalC::en.perform_dos();
 
 	timer::tick("Run_lcao","lcao_line");
     return;

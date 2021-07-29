@@ -303,9 +303,7 @@ void UnitCell_pseudo::setup_cell(
 }
 
 void UnitCell_pseudo::setup_cell_classic(
-	const string &fn, 
-	output &outp, 
-	ofstream &ofs,
+	const string &fn,
 	ofstream &ofs_running,
 	ofstream &ofs_warning)
 

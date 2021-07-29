@@ -94,7 +94,7 @@ void Run_pw::plane_wave_line(void)
     GlobalC::CHR.allocate(GlobalV::NSPIN, GlobalC::pw.nrxx, GlobalC::pw.ngmc);
     GlobalC::pot.allocate(GlobalC::pw.nrxx);
 
-    if(CALCULATION == "md")
+    if(GlobalV::CALCULATION == "md")
     {
         Run_MD_PW run_md_pw;
         run_md_pw.md_cells_pw();

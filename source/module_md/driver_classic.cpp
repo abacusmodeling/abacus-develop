@@ -47,11 +47,11 @@ void Driver_classic::convert(UnitCell_pseudo &ucell_c)
 	timer::tick("Driver_classic","convert");
 
     if(INPUT.atom_file!="") global_atom_card = INPUT.atom_file;
-    CALCULATION = INPUT.calculation;
-    OUT_LEVEL = INPUT.out_level;
-    SEARCH_RADIUS = INPUT.search_radius;
-	SEARCH_PBC = INPUT.search_pbc;
-    NSTEP = INPUT.nstep;
+    GlobalV::CALCULATION = INPUT.calculation;
+    GlobalV::OUT_LEVEL = INPUT.out_level;
+    GlobalV::SEARCH_RADIUS = INPUT.search_radius;
+	GlobalV::SEARCH_PBC = INPUT.search_pbc;
+    GlobalV::NSTEP = INPUT.nstep;
 
     ucell_c.latName = INPUT.latname; 
 	ucell_c.ntype = INPUT.ntype;
@@ -69,9 +69,9 @@ void Driver_classic::classic_world(void)
 
     run_md_classic.classic_md_line();
 
-	timer::finish( ofs_running );
+	timer::finish( GlobalV::ofs_running );
 
-	Memory::print_all( ofs_running ) ;
+	Memory::print_all( GlobalV::ofs_running ) ;
 
 	return;
 }

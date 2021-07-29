@@ -1,11 +1,11 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
 #include "../input.h"
-//#include "../src_pw/global.h"
+#include "../src_pw/global.h"
 #include "../src_io/print_info.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 
-Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(test_deconstructor, test_grid_driver, test_grid)
+Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(GlobalV::test_deconstructor, GlobalV::test_grid_driver, GlobalV::test_grid)
 {
     pos_old1 = new double[1];
 	pos_old2 = new double[1];
@@ -24,24 +24,22 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 void Run_MD_CLASSIC::classic_md_line(void)
 {
 	// Setup the unitcell.
-    ucell_c.setup_cell_classic(global_atom_card, ofs_running);
-	DONE(ofs_running, "SETUP UNITCELL");
-
-	Run_MD_CLASSIC run_md_classic;
+    ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
+	DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
 	atom_arrange::search(
-			SEARCH_PBC,
-			ofs_running,
+			GlobalV::SEARCH_PBC,
+			GlobalV::ofs_running,
 			this->grid_neigh,
 			ucell_c, 
-			SEARCH_RADIUS, 
-			test_atom_input,
+			GlobalV::SEARCH_RADIUS, 
+			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);
 
 	//Print_Info PI;
     //PI.setup_parameters();
 
-	run_md_classic.md_cells_classic();
+	this->md_cells_classic();
 
 	return;
 }
@@ -59,18 +57,18 @@ void Run_MD_CLASSIC::md_cells_classic(void)
     this->istep = 1;
     bool stop = false;
 
-    while (istep <= NSTEP && !stop)
+    while (istep <= GlobalV::NSTEP && !stop)
     {
         time_t estart = time(NULL);
 
-        if (OUT_LEVEL == "ie")
+        if (GlobalV::OUT_LEVEL == "ie")
         {
             cout << " -------------------------------------------" << endl;    
             cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
             cout << " -------------------------------------------" << endl;
-            ofs_running << " -------------------------------------------" << endl;
-            ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            ofs_running << " -------------------------------------------" << endl;
+            GlobalV::ofs_running << " -------------------------------------------" << endl;
+            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
+            GlobalV::ofs_running << " -------------------------------------------" << endl;
         }
 
 		this->update_pos_classic();

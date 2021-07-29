@@ -34,8 +34,6 @@ public: // member functions
 	void setup_cell(const string &s_pseudopot_dir, output &outp, const string &fn, ofstream &log);
 	void setup_cell_classic(
 	const string &fn, 
-	output &outp, 
-	ofstream &log,
 	ofstream &ofs_running,
 	ofstream &ofs_warning); // Yu Liu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
 	void read_atom_species(ifstream &ifa, ofstream &ofs_running); // read in the atom information for each type of atom
