@@ -32,8 +32,10 @@ void UnitCell_pseudo::setup_cell(
 	TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag
 	assert(ntype>0);
+#ifndef __CMD
 	delete[] magnet.start_magnetization;
 	magnet.start_magnetization = new double[this->ntype];
+#endif
 
 	// (2) init *Atom class array.
 	this->atoms = new Atom[this->ntype]; // atom species.
@@ -301,21 +303,16 @@ void UnitCell_pseudo::setup_cell(
 }
 
 void UnitCell_pseudo::setup_cell_classic(
-	const string &fn, 
-	output &outp, 
-	ofstream &ofs,
+	const string &fn,
 	ofstream &ofs_running,
 	ofstream &ofs_warning)
 
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 
-	// (1) init magnetization (useless for classic MD)
 	assert(ntype>0);
-	delete[] magnet.start_magnetization;
-	magnet.start_magnetization = new double[this->ntype];
 
-	// (2) init *Atom class array.
+	// (1) init *Atom class array.
 	this->atoms = new Atom[this->ntype];
 	this->set_atom_flag = true;
 
@@ -401,8 +398,6 @@ void UnitCell_pseudo::setup_cell_classic(
 	}
 
 	ofs_running << endl;
-	outp.printM3(ofs_running,"Lattice vectors: (Cartesian coordinate: in unit of a_0)",latvec); 
-
 }
 
 

@@ -1,15 +1,15 @@
 #include "run_md_pw.h"
-#include "../src_pw/forces.h"
-#include "../src_pw/stress_pw.h"
-#include "../src_pw/global.h" // use chr.
-#include "../src_pw/vdwd2.h"
-#include "../src_pw/vdwd3.h"
-#include "../src_pw/vdwd2_parameters.h"
-#include "../src_pw/vdwd3_parameters.h"
-#include "../src_pw/pw_complement.h"
-#include "../src_pw/pw_basis.h"
+#include "forces.h"
+#include "stress_pw.h"
+#include "global.h" // use chr.
+#include "vdwd2.h"
+#include "vdwd3.h"
+#include "vdwd2_parameters.h"
+#include "vdwd3_parameters.h"
+#include "pw_complement.h"
+#include "pw_basis.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
-#include "MD_basic.h"
+#include "../module_md/MD_basic.h"
 
 void Run_MD_PW::md_ions_pw(void)
 {

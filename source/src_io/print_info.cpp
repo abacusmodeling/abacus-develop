@@ -107,11 +107,7 @@ void Print_Info::setup_parameters(void)
 
 
 		cout << " ---------------------------------------------------------" << endl;
-		if(GlobalV::CALCULATION=="md" && INPUT.mdp.md_potential)
-		{
-			cout << " Classic Molecular Dynamics simulations" << endl;
-		}
-		else if(GlobalV::BASIS_TYPE=="lcao") 
+		if(GlobalV::BASIS_TYPE=="lcao") 
 		{
 			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
