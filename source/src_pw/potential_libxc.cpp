@@ -282,6 +282,10 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	{
 		add_func( XC_GGA_X_PBE );
 	}
+	else if(GlobalC::xcf.igcx_now == 13 ) //SCAN_X
+	{
+		add_func(263);
+	}
 	else
 	{
 		throw domain_error("iexch="+TO_STRING(GlobalC::xcf.iexch_now)+", igcx="+TO_STRING(GlobalC::xcf.igcx_now)
@@ -298,6 +302,10 @@ std::vector<xc_func_type> Potential_Libxc::init_func()
 	else if( 4==GlobalC::xcf.icorr_now && 4==GlobalC::xcf.igcc_now )
 	{
 		add_func( XC_GGA_C_PBE );
+	}
+	else if (GlobalC::xcf.igcc_now == 9)
+	{
+		add_func( 267 );
 	}
 	else
 	{
@@ -426,6 +434,7 @@ Potential_Libxc::cal_input(
 				break;
 			case XC_FAMILY_GGA:
 			case XC_FAMILY_HYB_GGA:
+			case XC_FAMILY_MGGA:
 				cal_rho();
 				cal_gdr();
 				cal_sigma();
