@@ -594,6 +594,10 @@ void Input_Conv::Convert(void)
 	// wenfei 2021-7-28
 	if(GlobalV::DFT_FUNCTIONAL == "scan")
 	{
+		if(GlobalV::BASIS_TYPE != "pw")
+		{
+			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+		}
 		GlobalV::DFT_META = 1;
 	}
 

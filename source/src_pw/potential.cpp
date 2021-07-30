@@ -17,7 +17,7 @@ Potential::Potential()
 {
     vltot = new double[1];
     vr_eff1 = new double[1];
-    this->out_potential = 0;
+	this->out_potential = 0;
 }
 
 Potential::~Potential()
@@ -39,6 +39,12 @@ void Potential::allocate(const int nrxx)
     this->vr_eff.create(GlobalV::NSPIN,nrxx);
     Memory::record("Potential","vr",GlobalV::NSPIN*nrxx,"double");
     Memory::record("Potential","vr_eff",GlobalV::NSPIN*nrxx,"double");
+	
+	if(GlobalV::DFT_META)
+	{
+		this->vofk.create(GlobalV::NSPIN,nrxx);
+    	Memory::record("Potential","vork",GlobalV::NSPIN*nrxx,"double");
+	}
 
     delete[] this->vr_eff1;
     this->vr_eff1 = new double[nrxx];
@@ -68,6 +74,11 @@ void Potential::init_pot(
 
     // the vltot should and must be zero here.
     ZEROS(this->vltot, GlobalC::pw.nrxx);
+
+	if(GlobalV::DFT_META)
+	{
+		this->vofk.zero_out();
+	}
 
 	//-------------------------------------------------------------------
 	// (1) local pseudopotential + electric field (if any) in vltot
