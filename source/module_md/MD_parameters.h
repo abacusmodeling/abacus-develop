@@ -7,7 +7,6 @@ public:
     MD_parameters()
 	{
 		mdtype=1;
-		//md_potential=0;
 		NVT_tau=0;
 		NVT_control=1;
 		dt=1;
@@ -21,13 +20,17 @@ public:
 		ediff=1e-4;
 		ediffg=1e-3;
 		MNHC=4;
+
+		rcut_lj = 16.0;
+		epsilon = 0.01032;  // eV
+		sigma = 3.405;      // Angstrom
+		list_step = 5;
 	};
     ~MD_parameters(){};
 
     int rstMD;          // 1 : restart MD, vel.restart and ion.restart files will be read
                         // 0 : not restart from ion and vel files
 	int mdtype;         // 1: NVT:Nose Hoover, 2:NVT:velocity scaling 3: NPT, 0: NVE 
-	//int md_potential;   // 0: Pseudopotential, 1: LJ potential   Yu Liu 2021-07-12
     double Qmass;       // Inertia of extended system variable
     double dt ;         // Time increment (hbar/E_hartree)
     double tfirst; //Temperature (in Hartree, 1 Hartree ~ 3E5 K)
@@ -41,6 +44,11 @@ public:
 	double ediffg;      //parameter for constrain
     int fixTemperature;
 
+	/*Classic MD*/      // liuyu 2021-07-30
+	double rcut_lj;     // cutoff radius of LJ potential (Bohr)
+	double epsilon;     // the value of epsilon for LJ potential
+	double sigma;       // the value of sigma for LJ potential
+	int list_step;      // update neighbor list every list_step
 };
 
 

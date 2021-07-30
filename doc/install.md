@@ -172,7 +172,7 @@ The source directory further contains the following folders, where the source fi
 - module_base
 - module_cell
 - module_grid
-- module_grid
+- module_md
 - module_neighbor
 - module_orbital
 - obj

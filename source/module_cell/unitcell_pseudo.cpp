@@ -32,10 +32,8 @@ void UnitCell_pseudo::setup_cell(
 	TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag
 	assert(ntype>0);
-#ifndef __CMD
 	delete[] magnet.start_magnetization;
 	magnet.start_magnetization = new double[this->ntype];
-#endif
 
 	// (2) init *Atom class array.
 	this->atoms = new Atom[this->ntype]; // atom species.
@@ -319,7 +317,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	bool ok = true;
 	bool ok2 = true;
 
-	// (3) read in atom information
+	// (2) read in atom information
 	if(GlobalV::MY_RANK == 0)
 	{
 		ifstream ifa(fn.c_str(), ios::in);
@@ -354,7 +352,6 @@ void UnitCell_pseudo::setup_cell_classic(
 			// call read_atom_positions
 			//==========================
 			ok2 = this->read_atom_positions(ifa, ofs_running, ofs_warning);
-			cout << "read_atom_positions done." << endl;
 			if(ok2)
 			{
 				for(int i=0;i<this->ntype;i++)

@@ -1166,10 +1166,6 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs, mdp.mdtype);
 		}
-		//else if (strcmp("md_potential",word) == 0)
-		//{
-		//	read_value(ifs, mdp.md_potential);
-		//}
 		else if (strcmp("NVT_tau",word) == 0)
 		{
 			read_value(ifs, mdp.NVT_tau);
@@ -1223,6 +1219,26 @@ bool Input::Read(const string &fn)
 			read_value(ifs,mdp.ediffg );
 		}
 //added by zheng daye
+//----------------------------------------------------------
+// Classic MD
+// Yu Liu add 2021-07-30
+//----------------------------------------------------------
+		else if (strcmp("rcut_lj",word) == 0)
+		{
+			read_value(ifs,mdp.rcut_lj );
+		}
+		else if (strcmp("epsilon",word) == 0)
+		{
+			read_value(ifs,mdp.epsilon );
+		}
+		else if (strcmp("sigma",word) == 0)
+		{
+			read_value(ifs,mdp.sigma );
+		}
+		else if (strcmp("list_step",word) == 0)
+		{
+			read_value(ifs,mdp.list_step );
+		}
 //----------------------------------------------------------
 // tddft
 // Fuxiang He add 2016-10-26
@@ -2149,7 +2165,6 @@ void Input::Bcast()
 */
 	//zheng daye add 2014/5/5
         Parallel_Common::bcast_int(mdp.mdtype);
-		//Parallel_Common::bcast_int(mdp.md_potential);
         Parallel_Common::bcast_double(mdp.NVT_tau);
         Parallel_Common::bcast_int(mdp.NVT_control);
         Parallel_Common::bcast_double(mdp.dt);
@@ -2163,6 +2178,10 @@ void Input::Bcast()
         Parallel_Common::bcast_int(mdp.fixTemperature);
         Parallel_Common::bcast_double(mdp.ediff);
         Parallel_Common::bcast_double(mdp.ediffg);
+		Parallel_Common::bcast_int(mdp.rcut_lj);
+		Parallel_Common::bcast_int(mdp.epsilon);
+		Parallel_Common::bcast_int(mdp.sigma);
+		Parallel_Common::bcast_int(mdp.list_step);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
 	Parallel_Common::bcast_double( vdwD2_scaling );

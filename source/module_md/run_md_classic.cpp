@@ -31,7 +31,7 @@ void Run_MD_CLASSIC::classic_md_line(void)
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
 			this->grid_neigh,
-			ucell_c, 
+			this->ucell_c, 
 			GlobalV::SEARCH_RADIUS, 
 			GlobalV::test_atom_input,
 			INPUT.test_just_neighbor);

@@ -30,11 +30,11 @@ void Driver_classic::reading(void)
 	timer::tick("Driver_classic", "reading");
 
 	// (1) read INPUT 
-	INPUT.Init( global_in_card );
+	INPUT.Init( GlobalV::global_in_card );
 
     // (2) Print the parameters into INPUT file.
     stringstream ss1;
-    ss1 << global_out_dir << global_in_card;
+    ss1 << GlobalV::global_out_dir << GlobalV::global_in_card;
     INPUT.Print( ss1.str() );
 
 	timer::tick("Driver_classic","reading");
@@ -46,7 +46,7 @@ void Driver_classic::convert(UnitCell_pseudo &ucell_c)
     TITLE("Driver_classic","convert");
 	timer::tick("Driver_classic","convert");
 
-    if(INPUT.atom_file!="") global_atom_card = INPUT.atom_file;
+    if(INPUT.atom_file!="") GlobalV::global_atom_card = INPUT.atom_file;
     GlobalV::CALCULATION = INPUT.calculation;
     GlobalV::OUT_LEVEL = INPUT.out_level;
     GlobalV::SEARCH_RADIUS = INPUT.search_radius;
