@@ -937,6 +937,12 @@ void XC_Functional::gcxc(const double &rho, const double &grho, double &sx, doub
 		// PBESOL
 		XC_Functional::pbec(rho, grho, 1, sc, v1c, v2c);
 	}
+	else if (GlobalC::xcf.igcc_now == 9)
+	{
+		//SCAN
+		cout << "to use SCAN, please link LIBXC" << endl;
+		throw domain_error("Check "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+	}
     else
     {
         // note that if igcc == 5 the hcth functional is called above

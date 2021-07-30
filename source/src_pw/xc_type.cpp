@@ -177,6 +177,7 @@ void xcfunc::which_dft(const string *dft)
 		set_dft_value(icorr, 0);
 		set_dft_value(igcx, 13);
 		set_dft_value(igcc, 9);
+		GlobalV::DFT_META = 1;
 	}
 
 	if (igcx == 6)
