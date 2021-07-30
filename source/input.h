@@ -51,6 +51,8 @@ class Input
 	double emin_sto;
 	string stotype;
 
+	bool set_vel;           // read velocity from STRU or not  liuyu 2021-07-14
+
     bool symmetry;			// turn on symmetry or not
 	int npool; 				// ecch pool is for one k point
 

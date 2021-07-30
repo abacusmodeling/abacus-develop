@@ -39,6 +39,7 @@ void Input_Conv::Convert(void)
 	GlobalC::ucell.latName = INPUT.latname; 
 	GlobalC::ucell.ntype = INPUT.ntype;
 	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
+	GlobalC::ucell.set_vel = INPUT.set_vel;
 
     GlobalV::NBANDS = INPUT.nbands;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;

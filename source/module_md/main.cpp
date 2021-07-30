@@ -1,20 +1,18 @@
-//#include "timer.h"
-#include <cstdlib>
+//==========================================================
+// AUTHOR : liuyu
+// DATE : 2021-07-15
+//==========================================================
+#include "driver_classic.h"
+#include "../src_parallel/parallel_global.h"
+#include "../module_base/global_variable.h"
+#include "../module_base/timer.h"
 #include <ctime>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-#include <iomanip>
-
-using namespace std;
 
 void calculate();
 
 int main(int argc, char **argv)
 {
-
-	cout << "Hello, this is the cell module of ABACUS." << endl;
+	Parallel_Global::read_mpi_parameters(argc,argv);
 
     calculate();
 
@@ -25,26 +23,15 @@ int main(int argc, char **argv)
 void calculate()
 {
 
-	ofstream ofs("log.txt");
-
-//	ooo.set_orb_tables();
-
-	ofs.close();
-
-	cout << "--------------------" << endl;
-	cout << " Have a great day! " << endl;
-	cout << "--------------------" << endl;
-
-/*
 	time_t time_start = std::time(NULL);
 
-//	timer::start();
+	timer::start();
 
 	//----------------------------------------------------------
 	// main program for doing electronic structure calculations
 	//----------------------------------------------------------
-//	Driver DD;
-//	DD.init();
+	Driver_classic DD;
+	DD.init();
 
 	time_t	time_finish= std::time(NULL);
 
@@ -52,15 +39,22 @@ void calculate()
 	cout << "\n START  Time  : " << ctime(&time_start);
 	cout << " FINISH Time  : " << ctime(&time_finish);
 	cout << " TOTAL  Time  : " << difftime(time_finish, time_start) << endl;
+	cout << " SEE INFORMATION IN : " << global_out_dir << endl;
+
+	ofs_running << "\n Start  Time  : " << ctime(&time_start);
+	ofs_running << " Finish Time  : " << ctime(&time_finish);
 
 	double total_time = difftime(time_finish, time_start);
 	int hour = total_time / 3600;
 	int mins = ( total_time - 3600 * hour ) / 60;
 	int secs = total_time - 3600 * hour - 60 * mins ;
-	cout << " Total  Time  : " << hour << " h "
+	ofs_running << " Total  Time  : " << hour << " h "
 	            << mins << " mins "
-	            << secs << " secs "<< endl;
-*/
+	            << secs << " secs " << endl;
+
+#ifdef __MPI
+    MPI_Finalize();
+#endif
 
     return;
 }

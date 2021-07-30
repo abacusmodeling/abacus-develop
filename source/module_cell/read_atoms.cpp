@@ -403,10 +403,12 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 				ofs_warning << " Lable from ATOMIC_SPECIES is " << this->atom_label[it] << endl;
 				return 0;
 			}
+			OUT(ofs_running, "atom label",atoms[it].label);
+
+#ifndef __CMD
 			READ_VALUE(ifpos, magnet.start_magnetization[it] );
 
-			OUT(ofs_running, "atom label",atoms[it].label);
-			#ifndef __SYMMETRY
+#ifndef __SYMMETRY
 			if(GlobalV::NSPIN==4)//added by zhengdy-soc
 			{
 				if(GlobalV::NONCOLIN)
@@ -440,14 +442,12 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 			{
 				OUT(ofs_running, "start magnetization","FALSE");
 			}
-			#endif
 
 			//===========================================
 			// (2) read in numerical orbital information
 			// int atoms[it].nwl
 			// int* atoms[it].l_nchi;
 			//===========================================
-#ifndef __SYMMETRY
 #ifdef __LCAO
 			if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{    
@@ -557,8 +557,9 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 			} // end basis type
 #endif
 
-
-			//OUT(GlobalV::ofs_running,"Total number of local orbitals",atoms[it].nw);
+#else
+			ifpos.ignore(150, '\n');
+#endif
 
 			//=========================
 			// (3) read in atom number
@@ -578,10 +579,12 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 			{
        			delete[] atoms[it].tau;
 				delete[] atoms[it].taud;
+				delete[] atoms[it].vel;
        			delete[] atoms[it].mbl;
 				delete[] atoms[it].mag;
        			atoms[it].tau = new Vector3<double>[na];
        			atoms[it].taud = new Vector3<double>[na];
+				atoms[it].vel = new Vector3<double>[na];
        			atoms[it].mbl = new Vector3<int>[na];
 				atoms[it].mag = new double[na];
 				atoms[it].mass = this->atom_mass[it]; //mohan add 2011-11-07 
@@ -616,6 +619,14 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 					{
 						ifpos >> v.x >> v.y >> v.z
 							>> mv.x >> mv.y >> mv.z;
+						if(set_vel)
+						{
+							ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
+						}
+						else
+						{
+							atoms[it].vel[ia].set(0,0,0);
+						}
 						string mags;
 						std::getline( ifpos, mags );
 						// change string to double.
@@ -843,7 +854,11 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		{
 			ofs << endl;
 			ofs << atoms[it].label << " #label" << endl;
+#ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << endl;
+#else
+			ofs << "0" << " #magnetism" << endl;
+#endif
 			//2015-05-07, modify
 			//ofs << atoms[it].nwl << " #max angular momentum" << endl;
 			//xiaohui modify 2015-03-15
@@ -855,7 +870,8 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
 				ofs << atoms[it].tau[ia].x << " " << atoms[it].tau[ia].y << " " << atoms[it].tau[ia].z << " " 
-					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << endl;
+					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << " "
+					<< atoms[it].vel[ia].x << " " << atoms[it].vel[ia].y << " " << atoms[it].vel[ia].z << endl;
 			}
 		}
 	}
@@ -866,7 +882,11 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 		{
 			ofs << endl;
 			ofs << atoms[it].label << " #label" << endl;
+#ifndef __CMD
 			ofs << magnet.start_magnetization[it] << " #magnetism" << endl;
+#else
+			ofs << "0" << " #magnetism" << endl;
+#endif
 			//ofs << atoms[it].nwl << " #max angular momentum" << endl;
 			//xiaohui modify 2015-03-15
 			//for(int l=0; l<=atoms[it].nwl; l++)
@@ -877,7 +897,8 @@ void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
 			for(int ia=0; ia<atoms[it].na; ia++)
 			{
 				ofs << atoms[it].taud[ia].x << " " << atoms[it].taud[ia].y << " " << atoms[it].taud[ia].z << " " 
-					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << endl;
+					<< atoms[it].mbl[ia].x << " " << atoms[it].mbl[ia].y << " " << atoms[it].mbl[ia].z << " "
+					<< atoms[it].vel[ia].x << " " << atoms[it].vel[ia].y << " " << atoms[it].vel[ia].z << endl;
 			}
 		}
 	}
@@ -903,6 +924,9 @@ void UnitCell_pseudo::print_tau(void)const
         << setw(20) << "y"
         << setw(20) << "z"
         << setw(20) << "mag"
+		<< setw(20) << "vx"
+        << setw(20) << "vy"
+        << setw(20) << "vz"
         << endl;
         GlobalV::ofs_running << setprecision(12);
 
@@ -922,8 +946,14 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].tau[ia].x
                 << setw(20) << atoms[it].tau[ia].y
                 << setw(20) << atoms[it].tau[ia].z
-                //<< setw(20) << atoms[it].mag[ia]
-                << setw(20) << magnet.start_magnetization[it]
+#ifndef __CMD
+				<< setw(20) << magnet.start_magnetization[it]
+#else
+				<< setw(20) << 0
+#endif
+				<< setw(20) << atoms[it].vel[ia].x
+                << setw(20) << atoms[it].vel[ia].y
+                << setw(20) << atoms[it].vel[ia].z
                 << endl;
 
                 ++iat;
@@ -943,6 +973,9 @@ void UnitCell_pseudo::print_tau(void)const
         << setw(20) << "y"
         << setw(20) << "z"
         << setw(20) << "mag"
+		<< setw(20) << "vx"
+        << setw(20) << "vy"
+        << setw(20) << "vz"
         << endl;
 
         int iat=0;
@@ -961,8 +994,14 @@ void UnitCell_pseudo::print_tau(void)const
                 << setw(20) << atoms[it].taud[ia].x
                 << setw(20) << atoms[it].taud[ia].y
                 << setw(20) << atoms[it].taud[ia].z
-                //<< setw(20) << atoms[it].mag[ia]
-                << setw(20) << magnet.start_magnetization[it]
+#ifndef __CMD
+				<< setw(20) << magnet.start_magnetization[it]
+#else
+				<< setw(20) << 0
+#endif
+				<< setw(20) << atoms[it].vel[ia].x
+                << setw(20) << atoms[it].vel[ia].y
+                << setw(20) << atoms[it].vel[ia].z
                 << endl;
 
                 ++iat;
