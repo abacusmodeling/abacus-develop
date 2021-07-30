@@ -17,6 +17,12 @@ std::tuple<double,double,matrix> H_XC_pw::v_xc
     TITLE("H_XC_pw","v_xc");
     timer::tick("H_XC_pw","v_xc");
 
+	#ifndef USE_LIBXC
+	if(GlobalV::DFT_META)
+	{
+		WARNING_QUIT("Potential::v_of_rho","to use metaGGA, please link LIBXC");
+	}
+	#endif
     //Exchange-Correlation potential Vxc(r) from n(r)
     double et_xc = 0.0;
     double vt_xc = 0.0;

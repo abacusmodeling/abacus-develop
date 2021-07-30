@@ -309,13 +309,28 @@ matrix Potential::v_of_rho(
 //----------------------------------------------------------
 	
 	#ifdef USE_LIBXC
-    const std::tuple<double,double,matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, GlobalC::CHR.rho_core);
+	if(GlobalV::DFT_META)
+	{
+    	const std::tuple<double,double,matrix,matrix> etxc_vtxc_v = Potential_Libxc::v_xc_meta(rho_in, GlobalC::CHR.rho_core, GlobalC::CHR.kin_r);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+		v            += std::get<2>(etxc_vtxc_v);
+		vofk		  = std::get<3>(etxc_vtxc_v);	
+	}
+	else
+	{	
+    	const std::tuple<double,double,matrix> etxc_vtxc_v = Potential_Libxc::v_xc(rho_in, GlobalC::CHR.rho_core);
+		H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
+		H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
+		v            += std::get<2>(etxc_vtxc_v);
+	}
 	#else
-    const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
-	#endif
+	const std::tuple<double,double,matrix> etxc_vtxc_v = H_XC_pw::v_xc(GlobalC::pw.nrxx, GlobalC::pw.ncxyz, GlobalC::ucell.omega, rho_in, GlobalC::CHR.rho_core);
+	
 	H_XC_pw::etxc = std::get<0>(etxc_vtxc_v);
 	H_XC_pw::vtxc = std::get<1>(etxc_vtxc_v);
 	v            += std::get<2>(etxc_vtxc_v);
+	#endif
 
 //----------------------------------------------------------
 //  calculate the Hartree potential
