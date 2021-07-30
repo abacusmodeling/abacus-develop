@@ -149,13 +149,17 @@ void LOOP_elec::before_solver(const int &istep)
 
 #ifdef __DEEPKS
 	//init deepks
-	ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat * ORB.Alpha[0].getTotal_nchi());
-    ld.build_S_descriptor(0);  //init overlap table
-	if (INPUT.deepks_scf)
+	if (INPUT.out_descriptor)
 	{
-		//load a model
-		ld.deepks_pre_scf(INPUT.model_file);	//caoyu add 2021-07-26
+		ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat * ORB.Alpha[0].getTotal_nchi());
+		ld.build_S_descriptor(0);  //init overlap table
+		if (INPUT.deepks_scf)
+		{
+			//load a model
+			ld.deepks_pre_scf(INPUT.model_file);	//caoyu add 2021-07-26
+		}
 	}
+		
 #endif
     timer::tick("LOOP_elec","before_solver"); 
 	return;
