@@ -33,7 +33,7 @@ class Potential_Libxc
 	static std::tuple<double,double,matrix,matrix> v_xc_meta(
 		const double * const * const rho_in,
 		const double * const rho_core_in,
-		const double * const * const kin_r);
+		const double * const * const kin_r_in);
 		
 	private:
 
