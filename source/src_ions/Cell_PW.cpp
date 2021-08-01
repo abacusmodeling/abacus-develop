@@ -7,7 +7,11 @@ void Cell_PW::opt_cells_pw()
     timer::tick("Cell_PW", "opt_cells_pw");
     GlobalC::wf.allocate(GlobalC::kv.nks);
 
+    cout<<GlobalC::pw.nrxx<<endl;
+    cout<<"before ufft allocate"<<endl;
     GlobalC::UFFT.allocate();
+
+    cout<<"after ufft allocate"<<endl;
 
     //=======================
     // init pseudopotential
@@ -19,7 +23,7 @@ void Cell_PW::opt_cells_pw()
     // only allocate in the beginning of ELEC LOOP!
     //=====================
     GlobalC::hm.hpw.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
-
+    GlobalC::hm.hpw_gpu.allocate(GlobalC::wf.npwx, GlobalV::NPOL, GlobalC::ppcell.nkb, GlobalC::pw.nrxx);
     //=================================
     // initalize local pseudopotential
     //=================================
@@ -53,6 +57,8 @@ void Cell_PW::opt_cells_pw()
     {
         GlobalC::wf.wfcinit();
     }
+    
+    cout<<"wf init SUCCESS"<<endl;
 #ifdef __LCAO
     switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {

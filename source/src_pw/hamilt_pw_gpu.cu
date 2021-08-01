@@ -1,0 +1,569 @@
+#include "tools.h"
+#include "global.h"
+#include "hamilt_pw.h"
+#include "../module_base/blas_connector.h"
+#include "../src_io/optical.h" // only get judgement to calculate optical matrix or not.
+#include "myfunc.h"
+
+__global__ void kernel_copy(int size, CUFFT_COMPLEX* dst, const CUFFT_COMPLEX *src)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if(idx < size)
+    {
+        dst[idx].x = src[idx].x;
+        dst[idx].y = src[idx].y;
+    }
+}
+
+__global__ void kernel_get_tmhpsi(int size, CUFFT_COMPLEX *dst, const CUFFT_COMPLEX *src, double *g2kin)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if(idx < size)
+    {
+        dst[idx].x = src[idx].x * g2kin[idx];
+        dst[idx].y = src[idx].y * g2kin[idx];
+    }
+}
+
+__global__ void kernel_add_tmhpsi(int size, CUFFT_COMPLEX *dst, CUFFT_COMPLEX *src, int *index)
+{
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    int p = index[idx];
+    if(idx < size)
+    {
+        dst[idx].x += src[p].x;
+        dst[idx].y += src[p].y;
+    }
+}
+
+int Hamilt_PW_GPU::moved = 0;
+
+Hamilt_PW_GPU::Hamilt_PW_GPU()
+{
+    // hpsi = new complex<double>[1];
+    // spsi = new complex<double>[1];
+    // GR_index = new int[1];
+    // Bec = new complex<double>[1];
+    cudaMalloc((void**)&GR_index, sizeof(int)); // Only use this member now.
+}
+
+Hamilt_PW_GPU::~Hamilt_PW_GPU()
+{
+    // delete[] hpsi;
+    // delete[] spsi;
+    // delete[] GR_index;
+    // delete[] Bec;
+    cudaFree(GR_index);
+}
+
+
+void Hamilt_PW_GPU::allocate(
+	const int &npwx, 
+	const int &npol, 
+	const int &nkb, 
+	const int &nrxx)
+{
+    TITLE("Hamilt_PW_GPU","allocate");
+
+	assert(npwx > 0);
+	assert(npol > 0);
+	assert(nkb >=0);
+	assert(nrxx > 0);
+
+    // delete[] hpsi;
+    // delete[] spsi;
+    // delete[] GR_index;
+    // delete[] Bec;
+
+    cudaFree(GR_index);
+    // this->hpsi = new complex<double> [npwx * npol];
+    // this->spsi = new complex<double> [npwx * npol];
+    cudaMalloc((void**)&GR_index, nrxx*sizeof(int));
+    // this->Bec = new complex<double> [nkb];
+
+    // ZEROS(this->hpsi, npwx * npol);
+    // ZEROS(this->spsi, npwx * npol);
+    // ZEROS(this->GR_index, nrxx);
+
+    return;
+}
+
+
+void Hamilt_PW_GPU::init_k(const int ik)
+{
+    TITLE("Hamilt_PW_GPU","init_k");	
+	// mohan add 2010-09-30
+	// (1) Which spin to use.
+	if(GlobalV::NSPIN==2)
+	{
+		GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
+	}
+
+	// (2) Kinetic energy.
+	GlobalC::wf.ekin(ik);
+	// cout<<"ekin end"<<endl;
+
+	// (3) Take the local potential.
+	// cout<<"nrxx="<<GlobalC::pw.nrxx<<endl;
+
+	for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
+	{
+		pot.vr_eff1[ir] = pot.vr_eff(GlobalV::CURRENT_SPIN, ir);//mohan add 2007-11-12
+	}
+
+	// cout<<"local pp end"<<endl;
+
+	// (4) Calculate nonlocal pseudopotential vkb
+	//if (GlobalC::ppcell.nkb > 0 && !LINEAR_SCALING) xiaohui modify 2013-09-02
+	if(GlobalC::ppcell.nkb > 0 && (GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")) //xiaohui add 2013-09-02. Attention...
+	{
+		GlobalC::ppcell.getvnl(ik);
+	}
+
+	// (5) The number of wave functions.
+	GlobalC::wf.npw = GlobalC::kv.ngk[ik];
+
+	// (6) The index of plane waves.
+    int *GR_index_tmp = new int[GlobalC::pw.nrxx];
+    for (int ig = 0;ig < GlobalC::wf.npw;ig++)
+    {
+        GR_index_tmp[ig] = GlobalC::pw.ig2fftw[ GlobalC::wf.igk(ik, ig) ];
+    }
+    cudaMemcpy(this->GR_index, GR_index_tmp, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyHostToDevice);
+    delete [] GR_index_tmp;
+    return;
+}
+
+void Hamilt_PW_GPU::s_1psi(const int dim, const CUFFT_COMPLEX *psi, CUFFT_COMPLEX *spsi)
+{
+    cudaMemcpy(spsi, psi, dim*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToDevice);
+    return;
+}
+
+void Hamilt_PW_GPU::h_1psi( const int npw_in, const CUFFT_COMPLEX *psi,
+            CUFFT_COMPLEX *hpsi, CUFFT_COMPLEX *spsi)
+{
+    this->h_psi(psi, hpsi);
+
+    int thread = 512;
+    int block = npw_in / thread + 1;
+    kernel_copy<<<thread, block>>>(npw_in, spsi, psi);
+    return;
+}
+
+void Hamilt_PW_GPU::h_psi(const CUFFT_COMPLEX *psi_in, CUFFT_COMPLEX *hpsi, const int m)
+{
+    cout<<"m in hpsi:"<<m<<endl;
+    timer::tick("Hamilt_PW_GPU","h_psi");
+    int i = 0;
+    int j = 0;
+    int ig= 0;
+
+	//if(NSPIN!=4) ZEROS(hpsi, wf.npw);
+	//else ZEROS(hpsi, wf.npwx * NPOL);//added by zhengdy-soc
+	int dmax = GlobalC::wf.npwx * GlobalV::NPOL;
+
+    cout<<"dim insise="<<GlobalC::wf.npwx * GlobalV::NPOL<<endl;
+
+	//------------------------------------
+	//(1) the kinetical energy.
+	//------------------------------------
+	CUFFT_COMPLEX *tmhpsi;
+	const CUFFT_COMPLEX *tmpsi_in;
+
+    // cout<<"Test part1 hpsi ... "<<endl;
+    // complex<double> *test_hpsi = new complex<double>[15];
+    // cudaMemcpy(test_hpsi, psi_in, 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+    // for(int i=0;i<15;i++)
+    // {
+    //     cout<<test_hpsi[i].real()<<" "<<test_hpsi[i].imag()<<endl;
+    // }
+    // delete [] test_hpsi;
+
+ 	if(GlobalV::T_IN_H)
+	{	
+        tmhpsi = hpsi;
+        tmpsi_in = psi_in;
+
+        double* d_g2kin;
+        cudaMalloc((void**)&d_g2kin, GlobalC::wf.npwx*sizeof(double));
+
+        // ib 有用，每个循环会调整指针的指向
+        for(int ib = 0 ; ib < m; ++ib)
+        {
+            cout<<"in hpsi-Kinetic, iband = "<<ib<<endl;
+
+            cudaMemcpy(d_g2kin, GlobalC::wf.g2kin, GlobalC::wf.npw*sizeof(double), cudaMemcpyHostToDevice);
+
+            int thread = 512;
+            int block = GlobalC::wf.npw / thread + 1;
+            kernel_get_tmhpsi<<<block, thread>>>(GlobalC::wf.npw, tmhpsi, tmpsi_in, d_g2kin);
+            
+            // TODO
+            // if(GlobalC::::NSPIN==4){
+            //     for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
+            //     {
+            //         tmhpsi[ig] = 0;
+            //     }
+            //     // 指针的加法
+            //     tmhpsi += GlobalC::wf.npwx;
+            //     tmpsi_in += GlobalC::wf.npwx;
+            //     for (ig = 0;ig < GlobalC::wf.npw ;++ig)
+            //     {
+            //         tmhpsi[ig] = GlobalC::wf.g2kin[ig] * tmpsi_in[ig];
+            //     }
+            //     // TODO: setup with 0
+            //     for(ig=GlobalC::wf.npw; ig < GlobalC::wf.npwx; ++ig)
+            //     {
+            //         tmhpsi[ig] =0;
+            //     }
+            // }
+            
+            // tmhpsi += wf.npwx;
+            // tmpsi_in += wf.npwx;
+            tmhpsi += GlobalC::wf.npwx;
+            tmpsi_in += GlobalC::wf.npwx;
+        }
+        cudaFree(d_g2kin);
+	}
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess)
+    {
+        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
+    }
+        
+    // cout<<"hpsi part1 end ... "<<endl;
+    // complex<double> *test_hpsi = new complex<double>[15];
+    // cudaMemcpy(test_hpsi, hpsi, 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+    // for(int i=0;i<15;i++)
+    // {
+    //     cout<<test_hpsi[i].real()<<" "<<test_hpsi[i].imag()<<endl;
+    // }
+    // delete [] test_hpsi;
+
+	//------------------------------------
+	//(2) the local potential.
+	//-----------------------------------
+	timer::tick("Hamilt_PW_GPU","vloc");
+    //  ...
+	if(GlobalV::VL_IN_H)
+	{
+        tmhpsi = hpsi;
+        tmpsi_in = psi_in;
+        // int *d_GR_index;
+        double *d_vr_eff1;
+        CUFFT_COMPLEX *d_porter;
+
+        // cudaMalloc((void**)&d_GR_index, GlobalC::wf.npwx * sizeof(int));
+        cudaMalloc((void**)&d_vr_eff1, GlobalC::pw.nrxx * sizeof(double));
+        cudaMalloc((void**)&d_porter, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX));
+
+        // cout<<GlobalC::wf.npwx<<" "<<GlobalC::pw.nrxx<<endl;
+
+        // cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
+        for(int ib = 0 ; ib < m; ++ib)
+        {
+            cout<<"in hpsi:loacl_pot, iband = "<<ib<<endl;
+            // if(NSPIN!=4){
+            // ZEROS( UFFT.porter, pw.nrxx);
+            cudaMemset(d_porter, 0, GlobalC::pw.nrxx * sizeof(CUFFT_COMPLEX));
+            // UFFT.RoundTrip( tmpsi_in, pot.vr_eff1, GR_index, UFFT.porter );
+            // cudaMemcpy(d_GR_index, GR_index, GlobalC::wf.npw*sizeof(int), cudaMemcpyHostToDevice);
+            cudaMemcpy(d_vr_eff1, pot.vr_eff1, GlobalC::pw.nrxx*sizeof(double), cudaMemcpyHostToDevice);
+            
+            // cout<<"tmpsi_in:"<<endl;
+            // complex<double> *test_tmpsi_in = new complex<double>[30];
+            // cudaMemcpy(test_tmpsi_in, tmpsi_in, 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+            // for(int i=0;i<30;i++)
+            // {
+            //     cout<<test_tmpsi_in[i].real()<<" "<<test_tmpsi_in[i].imag()<<endl;
+            // }
+            // delete [] test_tmpsi_in;
+
+            GlobalC::UFFT.RoundTrip_GPU( tmpsi_in, d_vr_eff1, GR_index, d_porter );
+
+            // cout<<"d_porter:"<<endl;
+            // complex<double> *test_porter = new complex<double>[50];
+            // cudaMemcpy(test_porter, &d_porter[0], 50*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+
+            // for(int i=0;i<50;i++){
+            //     cout<<test_porter[i].real() <<" "<<test_porter[i].imag()<<endl;
+            // }
+            // cudaMemcpy(test_porter, tmhpsi, 50*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+            // cout<<"================"<<endl;
+            // for(int i=0;i<50;i++){
+            //     cout<<test_porter[i].real() <<" "<<test_porter[i].imag()<<endl;
+            // }
+            
+            // delete [] test_porter;
+
+            // for (j = 0;j < wf.npw;j++)
+            // {
+            //     tmhpsi[j] += UFFT.porter[ GR_index[j] ];
+            // }
+            // int thread = 512;
+            // int block = GlobalC::wf.npw / thread + 1;
+            // kernel_add_tmhpsi<<<block, thread>>>(GlobalC::wf.npw, tmhpsi, d_porter, GR_index);
+
+            complex<double> *tmhpsi_cpu = new complex<double>[GlobalC::wf.npw];
+            int *GR_index_cpu = new int[GlobalC::pw.nrxx];
+            complex<double> *c_porter = new complex<double>[GlobalC::pw.nrxx];
+
+            cudaMemcpy(tmhpsi_cpu, tmhpsi, GlobalC::wf.npw*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+            cudaMemcpy(c_porter, d_porter, GlobalC::pw.nrxx*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+            cudaMemcpy(GR_index_cpu, GR_index, GlobalC::pw.nrxx*sizeof(int), cudaMemcpyDeviceToHost);
+
+            for(int i=0;i<GlobalC::wf.npw;i++)
+            {
+                // if(i<20)
+                // {
+                //     cout<<tmhpsi_cpu[i].real()<<" "<<tmhpsi_cpu[i].imag()<<endl;
+                //     cout<<"------------"<<endl;
+                //     cout<<GR_index_cpu[i]<<endl;
+                //     cout<< c_porter[ GR_index_cpu[i] ].real()<<" "<<c_porter[ GR_index_cpu[i] ].imag()<<endl;
+                // }
+                tmhpsi_cpu[i] += c_porter[GR_index_cpu[i]];
+            }
+
+            cudaMemcpy(tmhpsi, tmhpsi_cpu, GlobalC::wf.npw*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
+            delete [] tmhpsi_cpu;
+            delete [] c_porter;
+            delete [] GR_index_cpu;
+            
+            // }
+
+            tmhpsi += dmax;
+            tmpsi_in += dmax;
+        }
+        // cudaFree(d_GR_index);
+        cudaFree(d_vr_eff1);
+        cudaFree(d_porter);
+	}
+	timer::tick("Hamilt_PW_GPU","vloc");
+
+    // cout<<"hpsi part2 end ... "<<endl;
+    // test_hpsi = new complex<double>[15];
+    // cudaMemcpy(test_hpsi, hpsi, 15*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+    // for(int i=0;i<15;i++)
+    // {
+    //     cout<<test_hpsi[i].real()<<" "<<test_hpsi[i].imag()<<endl;
+    // }
+    // delete [] test_hpsi;
+    
+	//------------------------------------
+	// (3) the nonlocal pseudopotential.
+	//------------------------------------
+	// timer::tick("Hamilt_PW_GPU","vnl",'H');
+    // cout<<"part 2 SUCCESS"<<endl;
+    err = cudaGetLastError();
+    if (err != cudaSuccess)
+    {
+        cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
+    }
+	
+    if(GlobalV::VNL_IN_H)
+	{        
+        if ( GlobalC::ppcell.nkb > 0)
+        {
+            int nkb = GlobalC::ppcell.nkb;
+            // CUFFT_COMPLEX *becp(NPOL * m, nkb); 
+            CUFFT_COMPLEX *becp;
+            CUFFT_COMPLEX *d_vkb_c;
+            cout<<GlobalC::ppcell.vkb.nr<<" "<<GlobalC::ppcell.vkb.nc<<endl;
+            cudaMalloc((void**)&becp, GlobalV::NPOL*m*nkb*sizeof(CUFFT_COMPLEX));
+            cudaMalloc((void**)&d_vkb_c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX));
+            
+            cudaMemcpy(d_vkb_c, GlobalC::ppcell.vkb.c, GlobalC::wf.npwx*nkb*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
+
+            cublasOperation_t transa = CUBLAS_OP_C;
+            cublasOperation_t transb = CUBLAS_OP_N;
+            cublasHandle_t handle;
+            cublasCreate(&handle);
+
+            cout<<"handle create SUCCESS"<<endl;
+            cout<<"vkbc dim: "<<GlobalC::wf.npw<<" "<<nkb<<endl;
+            cout<<m<<" "<<GlobalV::NPOL<<endl;
+            
+            CUFFT_COMPLEX ONE, ZERO, NEG_ONE;
+            ONE.y = ZERO.x = ZERO.y = 0.0;
+            ONE.x = 1.0;
+            NEG_ONE.x = -1.0;
+            
+            if(m==1 && GlobalV::NPOL==1)
+            {
+                int inc = 1;
+                // zgemv_(&transa, &wf.npw, &nkb, &ONE, ppcell.vkb.c, &wf.npwx, psi_in, &inc, &ZERO, becp.c, &inc);
+                cublasZgemv(handle, transa, GlobalC::wf.npw, nkb, &ONE, d_vkb_c, GlobalC::wf.npwx, psi_in, inc, &ZERO, becp, inc);
+                
+            }
+            else
+            {
+                int npm = GlobalV::NPOL * m;
+                // zgemm_(&transa,&transb,&nkb,&npm,&wf.npw,&ONE,ppcell.vkb.c,&wf.npwx,psi_in,&wf.npwx,&ZERO,becp.c,&nkb);
+                cublasZgemm(handle, transa, transb, nkb, npm, GlobalC::wf.npw, &ONE, d_vkb_c, GlobalC::wf.npwx, psi_in, GlobalC::wf.npwx, &ZERO, becp, nkb);
+                
+            }
+
+            cout<<"Do gemm/gemv end"<<endl;
+            // TODO
+            complex<double> *hpsi_cpu = new complex<double>[GlobalC::wf.npw*GlobalV::NPOL];
+            complex<double> *becp_cpu = new complex<double>[GlobalV::NPOL*m*nkb];
+            
+            cudaMemcpy(becp_cpu, becp, GlobalV::NPOL*m*nkb*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+
+            cudaMemcpy(hpsi_cpu, hpsi, GlobalC::wf.npw*GlobalV::NPOL*sizeof(CUFFT_COMPLEX), cudaMemcpyDeviceToHost);
+            
+            this->add_nonlocal_pp(hpsi_cpu, becp_cpu, m);
+
+            cudaMemcpy(hpsi, hpsi_cpu, GlobalC::wf.npw*GlobalV::NPOL*sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
+            
+            delete [] hpsi_cpu;
+            delete [] becp_cpu;
+            // this->add_nonlocal_pp(hpsi, becp, m);
+
+            cublasDestroy(handle);
+            cudaFree(becp);
+            cudaFree(d_vkb_c);
+            cout<<"nonlocal end"<<endl;
+
+        }
+    }
+    
+    timer::tick("Hamilt_PW_GPU","vnl");
+    timer::tick("Hamilt_PW_GPU","h_psi");
+    return;
+}
+
+void Hamilt_PW_GPU::add_nonlocal_pp(
+	complex<double> *hpsi_in,
+	const complex<double> *becp,
+	const int m)
+{
+    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
+
+	// number of projectors
+	int nkb = GlobalC::ppcell.nkb;
+
+	complex<double> *ps  = new complex<double> [nkb * GlobalV::NPOL * m];
+    ZEROS(ps, GlobalV::NPOL * m * nkb);
+
+    int sum = 0;
+    int iat = 0;
+    if(GlobalV::NSPIN!=4)
+	{
+		for (int it=0; it<GlobalC::ucell.ntype; it++)
+		{
+			const int nproj = GlobalC::ucell.atoms[it].nh;
+			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+			{
+				// each atom has nproj, means this is with structure factor;
+				// each projector (each atom) must multiply coefficient
+				// with all the other projectors.
+				for (int ip=0; ip<nproj; ip++)
+				{
+					for (int ip2=0; ip2<nproj; ip2++)
+					{
+						for(int ib = 0; ib < m ; ++ib)
+						{
+							ps[(sum + ip2) * m + ib] += 
+							GlobalC::ppcell.deeq(GlobalV::CURRENT_SPIN, iat, ip, ip2) 
+							* becp[ib * nkb + sum + ip];
+						}//end ib
+					}// end ih
+				}//end jh 
+				sum += nproj;
+				++iat;
+			} //end na
+		} //end nt
+	}
+	else
+	{
+		for (int it=0; it<GlobalC::ucell.ntype; it++)
+		{
+			int psind=0;
+			int becpind=0;
+			complex<double> becp1=complex<double>(0.0,0.0);
+			complex<double> becp2=complex<double>(0.0,0.0);
+
+			const int nproj = GlobalC::ucell.atoms[it].nh;
+			for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
+			{
+				// each atom has nproj, means this is with structure factor;
+				// each projector (each atom) must multiply coefficient
+				// with all the other projectors.
+				for (int ip=0; ip<nproj; ip++)
+				{
+					for (int ip2=0; ip2<nproj; ip2++)
+					{
+						for(int ib = 0; ib < m ; ++ib)
+						{
+							psind = (sum+ip2) * 2 * m + ib * 2;
+							becpind = ib*nkb*2 + sum + ip;
+							becp1 =  becp[becpind];
+							becp2 =  becp[becpind + nkb];
+							ps[psind] += GlobalC::ppcell.deeq_nc(0, iat, ip2, ip) * becp1
+								+GlobalC::ppcell.deeq_nc(1, iat, ip2, ip) * becp2;
+							ps[psind +1] += GlobalC::ppcell.deeq_nc(2, iat, ip2, ip) * becp1
+								+GlobalC::ppcell.deeq_nc(3, iat, ip2, ip) * becp2;
+						}//end ib
+					}// end ih
+				}//end jh
+				sum += nproj;
+				++iat;
+			} //end na
+		} //end nt
+	}
+
+	/*
+    for (int ig=0;ig<GlobalC::wf.npw;ig++)
+    {
+        for (int i=0;i< GlobalC::ppcell.nkb;i++)
+        {
+            hpsi_in[ig]+=ps[i]*GlobalC::ppcell.vkb(i,ig);
+        }
+    }
+	*/
+
+
+	// use simple method.
+	//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//qianrui optimize 2021-3-31
+	char transa = 'N';
+	char transb = 'T';
+	if(GlobalV::NPOL==1 && m==1)
+	{
+		int inc = 1;
+		zgemv_(&transa, 
+			&GlobalC::wf.npw, 
+			&GlobalC::ppcell.nkb, 
+			&ONE, 
+			GlobalC::ppcell.vkb.c, 
+			&GlobalC::wf.npwx, 
+			ps, 
+			&inc, 
+			&ONE, 
+			hpsi_in, 
+			&inc);
+	}
+	else
+	{
+		int npm = GlobalV::NPOL*m;
+		zgemm_(&transa,
+			&transb,
+			&GlobalC::wf.npw,
+			&npm,
+			&GlobalC::ppcell.nkb,
+			&ONE,
+			GlobalC::ppcell.vkb.c,
+			&GlobalC::wf.npwx,
+			ps,
+			&npm,
+			&ONE,
+			hpsi_in,
+			&GlobalC::wf.npwx);
+	}
+
+	delete[] ps;
+    timer::tick("Hamilt_PW_GPU","add_nonlocal_pp");
+    return;
+}

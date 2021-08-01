@@ -15,6 +15,8 @@ int main(int argc, char **argv)
 {
     Parallel_Global::read_mpi_parameters(argc,argv);
 
+	cout<<"before calcu"<<endl;
+
     calculate();
 
     return 0;

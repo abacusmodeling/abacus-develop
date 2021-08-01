@@ -27,6 +27,8 @@ void Driver::init()
 	// (2) welcome to the atomic world!
 	this->atomic_world();
 
+	cout<<"Atomic SUCCESS"<<endl;
+
 	// (3) close all of the running logs 
 	INPUT.close_log();
 
