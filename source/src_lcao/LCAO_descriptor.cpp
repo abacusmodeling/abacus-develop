@@ -346,7 +346,7 @@ void LCAO_Descriptor::cal_projected_DM(void)
     return;
 }
 
-void LCAO_Descriptor::cal_descriptor()
+void LCAO_Descriptor::cal_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
@@ -430,7 +430,13 @@ void LCAO_Descriptor::cal_descriptor()
 
 
 
-void LCAO_Descriptor::print_projected_DM(ofstream& ofs, ComplexMatrix& des, const int& it, const int& ia, const int& l, const int& n)
+void LCAO_Descriptor::print_projected_DM(
+	ofstream& ofs, 
+	ComplexMatrix& des, 
+	const int& it, // index for atom type
+	const int& ia, // index for atoms
+	const int& l, // index for angular momentum quantum number L
+	const int& n) // index for principal quantum number n
 {
     ofs << "L=" << l << "   N=" << n << endl;
     for (int i = 0; i < 2 * l + 1; i++)
@@ -443,7 +449,9 @@ void LCAO_Descriptor::print_projected_DM(ofstream& ofs, ComplexMatrix& des, cons
     }
     return;
 }
-void LCAO_Descriptor::print_descriptor()
+
+
+void LCAO_Descriptor::print_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "print_descriptor");
     ofstream ofs;
@@ -475,8 +483,14 @@ void LCAO_Descriptor::print_descriptor()
     return;
 }
 
-void LCAO_Descriptor::set_DS_mu_alpha(const int& iw1_all, const int& inl, const int& im,
-    const double& vx, const double& vy, const double& vz)
+
+void LCAO_Descriptor::set_DS_mu_alpha(
+	const int& iw1_all, 
+	const int& inl, 
+	const int& im,
+    const double& vx, 
+	const double& vy, 
+	const double& vz)
 {
     //const int ir = ParaO.trace_loc_row[iw1_all];
     //const int ic = ParaO.trace_loc_col[iw2_all];
@@ -499,7 +513,7 @@ void LCAO_Descriptor::set_DS_mu_alpha(const int& iw1_all, const int& inl, const 
     return;
 }
 
-void LCAO_Descriptor::getdm()
+void LCAO_Descriptor::getdm(void)
 {
     for (int i = 0; i < LOC.wfc_dm_2d.dm_gamma[0].nr; i++)
     {
@@ -508,7 +522,9 @@ void LCAO_Descriptor::getdm()
             this->dm[i * NLOCAL + j] = LOC.wfc_dm_2d.dm_gamma[0](i, j); //only consider default NSPIN = 1
         }
     }
+	return;
 }
+
 
 void LCAO_Descriptor::cal_gdmx(matrix &dm)
 {
@@ -537,17 +553,24 @@ void LCAO_Descriptor::cal_gdmx(matrix &dm)
                         {
                             for (int is = 0;is < NSPIN;++is)
                             {
-                                if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
+								//  save the matrix as column major format
+                                if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx")
                                 {
-                                    gdmx[iat][inl][m1 * nm + m2] += 4 * dsx[inl][m1 * NLOCAL + mu] * dm(mu, nu) * ss[inl][m2 * NLOCAL + nu];
-                                    gdmy[iat][inl][m1 * nm + m2] += 4 * dsy[inl][m1 * NLOCAL + mu] *  dm(mu, nu)  * ss[inl][m2 * NLOCAL + nu];
-                                    gdmz[iat][inl][m1 * nm + m2] += 4 * dsz[inl][m1 * NLOCAL + mu] * dm(mu, nu)  * ss[inl][m2 * NLOCAL + nu];
+                                    gdmx[iat][inl][m1*nm + m2] += 
+									4 * dsx[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
+                                    gdmy[iat][inl][m1*nm + m2] += 
+									4 * dsy[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
+                                    gdmz[iat][inl][m1*nm + m2] += 
+									4 * dsz[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
                                 }
                                 else
                                 {
-                                    gdmx[iat][inl][m1 * nm + m2] += 4 * dsx[inl][mu * nm + m1] * dm(mu, nu) * ss[inl][nu * nm + m2];
-                                    gdmy[iat][inl][m1 * nm + m2] += 4 * dsy[inl][mu * nm + m1] * dm(mu, nu) * ss[inl][nu * nm + m2];
-                                    gdmz[iat][inl][m1 * nm + m2] += 4 * dsz[inl][mu * nm + m1] *  dm(mu, nu) * ss[inl][nu * nm + m2];
+                                    gdmx[iat][inl][m1*nm + m2] += 
+									4 * dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmy[iat][inl][m1*nm + m2] += 
+									4 * dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmz[iat][inl][m1*nm + m2] += 
+									4 * dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                 }
                             }
                         }//end m2
@@ -559,7 +582,8 @@ void LCAO_Descriptor::cal_gdmx(matrix &dm)
     return;
 }
 
-void LCAO_Descriptor::init_gdmx()
+
+void LCAO_Descriptor::init_gdmx(void)
 {
     this->gdmx = new double** [ucell.nat];
     this->gdmy = new double** [ucell.nat];
@@ -582,7 +606,8 @@ void LCAO_Descriptor::init_gdmx()
     return;
 }
 
-void LCAO_Descriptor::del_gdmx()
+
+void LCAO_Descriptor::del_gdmx(void)
 {
     for (int iat = 0;iat < ucell.nat;iat++)
     {
@@ -601,6 +626,7 @@ void LCAO_Descriptor::del_gdmx()
     delete[] this->gdmz;
     return;
 }
+
 
 void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 {
@@ -622,7 +648,8 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
     return;
 }
 
-void LCAO_Descriptor::cal_v_delta()
+
+void LCAO_Descriptor::cal_v_delta(void)
 {
     TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv> (descriptor changes in every scf iter)
@@ -669,7 +696,9 @@ void LCAO_Descriptor::cal_v_delta()
     ofs_running << "finish calculating H_V_delta" << endl;
     return;
 }
-void LCAO_Descriptor::add_v_delta()
+
+
+void LCAO_Descriptor::add_v_delta(void)
 {
     TITLE("LCAO_DESCRIPTOR", "add_v_delta");
     if (GAMMA_ONLY_LOCAL)
@@ -678,15 +707,21 @@ void LCAO_Descriptor::add_v_delta()
         {
             for (int iw2 = 0;iw2 < NLOCAL;++iw2)
             {
+				if (!ParaO.in_this_processor(iw1,iw2))
+				{
+					continue;
+				}
                 LM.set_HSgamma(iw1, iw2, this->H_V_delta[iw1 * NLOCAL + iw2], 'L');
             }
         }
     }
     else
     {
+		WARNING_QUIT("add_v_delta","not implemented yet.");
         //call set_HSk, complex Matrix
     }
 }
+
 
 void LCAO_Descriptor::cal_f_delta(matrix& dm)
 {
@@ -724,6 +759,7 @@ void LCAO_Descriptor::cal_f_delta(matrix& dm)
     this->del_gdmx();
     return;
 }
+
 
 void LCAO_Descriptor::cal_descriptor_tensor(void)
 {
