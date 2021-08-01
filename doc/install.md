@@ -5,7 +5,9 @@
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Building the program](#building-the-program)
-
+- [Installation with DeePKS](#installation-with-deepks)
+  - [Extra prerequisites](#extra-prerequisites)
+  - [Extra settings for building](#extra-settings-for-building)
   [back to main page](#../install.md)  
 
 # Structure of the package
@@ -138,5 +140,50 @@ After modifying the `Makefile.vars` file, to build the program, simply type
 make
 ```
 If the compilation finishes without error messages (except perhaps for some warnings), an executable program `ABACUS.mpi` will be created in directory `bin/`
+
+[back to top](#download-and-install)
+
+
+# Installation with DeePKS
+
+This part of installation is based on [Installation](#installation). If DeePKS feature is requied for [DeePKS-kit](https://github.com/deepmodeling/deepks-kit), the following prerequisites and steps are needed:
+
+## Extra prerequisites
+- C++ compiler, supporting **C++14**. For example, Intel C++ compiler 18
+- [LibTorch](https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.0%2Bcpu.zip) for cpu, with c++11 ABI;
+- [Libnpy](https://github.com.cnpmjs.org/llohse/libnpy/);
+
+## Extra settings for building
+
+### Using Cmake
+
+```
+cmake -B build -DENABLE_DEEPKS=1
+``` 
+
+### Using Makefile
+Set `LIBTORCH_DIR`and `LIBNPY_DIR`in `Makefile.vars`. For example: 
+```
+LIBTORCH_DIR = /opt/libtorch/
+LIBNPY_DIR = /opt/libnpy/
+```
+
+In `Makefile.system`, add `LIBTORCH_LIB` to  `LIBS`, then set `-std=c++14` in `OPTS`:
+```
+LIBS = -lifcore -lm -lpthread ${LIBTORCH_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}	#for DeePKS
+#LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}
+```
+```
+OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+```
+
+In `Makefile`, set the Macro as `HONG_DEEPKS`:
+```
+#!!!!!!!!!!!!!!!!!!!! CHANE HERE IF YOU LIKE !!!!!!!!!!!!!!
+#! change series version or parallel version~~~
+#HONG=${HONG_MPI_SELINV_20210523}
+#HONG=${HONG_SER_SELINV}
+HONG=${HONG_DEEPKS}
+```
 
 [back to top](#download-and-install)
