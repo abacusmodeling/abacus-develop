@@ -12,6 +12,7 @@ Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(GlobalV::test_deconstructor, GlobalV
 	pos_old2 = new double[1];
 	pos_now = new double[1];
 	pos_next = new double[1];
+	force=new Vector3<double>[ucell_c.nat];
 }
 
 Run_MD_CLASSIC::~Run_MD_CLASSIC()
@@ -20,6 +21,7 @@ Run_MD_CLASSIC::~Run_MD_CLASSIC()
 	delete[] pos_old2;
 	delete[] pos_now;
 	delete[] pos_next;
+	delete[] force;
 }
 
 void Run_MD_CLASSIC::classic_md_line(void)
@@ -51,7 +53,7 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
     while (istep <= GlobalV::NSTEP && !stop)
     {
-        time_t estart = time(NULL);
+		time_t fstart = time(NULL);
 
         if (GlobalV::OUT_LEVEL == "ie")
         {
@@ -84,20 +86,17 @@ void Run_MD_CLASSIC::md_cells_classic(void)
 
 		this->update_pos_classic();
 
-		time_t eend = time(NULL);
-        time_t fstart = time(NULL);
-
 		if (mdtype == 1 || mdtype == 2)
         {
-            mdb.runNVT(istep);
+            mdb.runNVT(istep, force, stress);
         }
         else if (mdtype == 0)
         {
-            mdb.runNVE(istep);
+            mdb.runNVE(istep, force, stress);
         }
         else if (mdtype == -1)
         {
-            stop = mdb.runFIRE(istep);
+            stop = mdb.runFIRE(istep, force, stress);
         }
         else
         {

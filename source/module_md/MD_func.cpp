@@ -273,56 +273,6 @@ int MD_func::getMassMbl(const UnitCell_pseudo &unit_in, double* allmass, Vector3
 	return nfrozen;
 }
 
-#ifndef __CMD
-
-#ifdef __LCAO
-void MD_func::callInteraction_LCAO(const int& numIon, Vector3<double>* force, matrix& stress_lcao)
-{
-//to call the force of each atom
-	matrix fcs;//temp force matrix
-	Force_Stress_LCAO FSL;
-	FSL.allocate (); 
-	FSL.getForceStress(GlobalV::FORCE, GlobalV::STRESS, GlobalV::TEST_FORCE, GlobalV::TEST_STRESS, fcs, stress_lcao);
-	for(int ion=0;ion<numIon;ion++){
-		force[ion].x =fcs(ion, 0)/2.0;
-		force[ion].y =fcs(ion, 1)/2.0;
-		force[ion].z =fcs(ion, 2)/2.0;
-	}
-
-#ifdef __MPI //2015-10-01, xiaohui
-	atom_arrange::delete_vector(
-		GlobalV::ofs_running, 
-		GlobalV::SEARCH_PBC, 
-		GlobalC::GridD, 
-		GlobalC::ucell, 
-		GlobalV::SEARCH_RADIUS, 
-		GlobalV::test_atom_input);
-#endif //2015-10-01, xiaohui
-
-	return;
-}
-#endif
-
-void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matrix& stress_pw)
-{
-//to call the force of each atom
-	matrix fcs;//temp force matrix
-	Forces ff;
-	ff.init(fcs);
-	for(int ion=0;ion<numIon;ion++){
-		force[ion].x =fcs(ion, 0)/2.0;
-		force[ion].y =fcs(ion, 1)/2.0;
-		force[ion].z =fcs(ion, 2)/2.0;
-	}
-	if(GlobalV::STRESS)
-	{
-		Stress_PW ss;
-		ss.cal_stress(stress_pw);
-	}
-	return;
-}
-#endif
-
 void MD_func::printpos(const string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
 {
 //intend to output the positions of atoms to ordered file

@@ -28,6 +28,8 @@ private:
 	double* pos_now;
 	double* pos_next;
     int pos_dim;
+    Vector3<double> *force;  //force of each atom
+	matrix stress;           //stress for this lattice
    
 };
 
