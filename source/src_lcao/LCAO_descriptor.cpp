@@ -84,7 +84,12 @@ void LCAO_Descriptor::init(
     this->inlmax = tot_inl;
     ofs_running << " lmax of descriptor = " << this->lmaxd << endl;
     ofs_running << " nmax of descriptor= " << nmaxd << endl;
-
+    
+    //initialize the density matrix (dm)
+    delete[] this->dm_double;
+    this->dm_double = new double[NLOCAL * NLOCAL];
+    ZEROS(this->dm_double, NLOCAL * NLOCAL);
+    
     //init S_mu_alpha**
     this->S_mu_alpha = new double* [this->inlmax];    //inl
     for (int inl = 0;inl < this->inlmax;inl++)
@@ -348,24 +353,12 @@ void LCAO_Descriptor::cal_descriptor(void)
     TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
     d = new double[this->n_descriptor];
-    //==========print preparation=============
-    ofs_running << " print out each DM_inl" << endl;
-    ofstream ofs;
-    stringstream ss;
-    ss << winput::spillage_outdir << "/"
-       << "projected_DM.dat";
-    if (MY_RANK == 0)
-    {
-        ofs.open(ss.str().c_str());
-    }
-    //==========print preparation=============
     const int lmax = ORB.get_lmax_d();
     int id = 0;
     for (int it = 0; it < ucell.ntype; it++)
     {
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
         {
-            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << endl;
             for (int l = 0; l <= lmax; l++)
             {
                 int nmax = ORB.Alpha[0].getNchi(l);
@@ -384,10 +377,7 @@ void LCAO_Descriptor::cal_descriptor(void)
                             des(m, m2) += tmp;
                         }
                     }
-
-                    //this->print_projected_DM(ofs, des, it, ia, l, n);
-
-                    //ofs_running << "dimension of des is " << 2 * l + 1 << endl;
+                    
                     if (l == 0)
                     {
                         this->d[id] = des(0, 0).real();
@@ -631,11 +621,6 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 
 	// load the DeePKS model from deep neural network
     this->load_model(model_file);
-   
-    //initialize the density matrix (dm)
-    delete[] this->dm_double;
-    this->dm_double = new double[NLOCAL * NLOCAL];
-    ZEROS(this->dm_double, NLOCAL * NLOCAL);
     
     //initialize the H matrix H_V_delta
     delete[] this->H_V_delta;

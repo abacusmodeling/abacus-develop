@@ -31,8 +31,7 @@ public:
 	void print_descriptor(void);
 
 	// 1. Load DeePKS model
-	// 2. Initialize the density matrix
-	// 3. Initialize the deltaV Hamiltonian matrix
+	// 2. Initialize the deltaV Hamiltonian matrix
 	void deepks_pre_scf(const string& model_file);
 
 	// compute <psi|deltaV|psi>
