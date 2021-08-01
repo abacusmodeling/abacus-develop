@@ -22,7 +22,7 @@ public:
     void build_S_descriptor(const bool &calc_deri);
 
 	// cal pdm: S_alpha_mu * inv(Sloc) * DM * inv(Sloc) * S_nu_beta
-    void cal_projected_DM(void);
+    void cal_projected_DM(matrix& dm);
 
 	// cal d: EIGENVALUE of pdm in block of I_n_l
     void cal_descriptor(void);
@@ -36,7 +36,7 @@ public:
 	void deepks_pre_scf(const string& model_file);
 
 	// compute <psi|deltaV|psi>
-	void cal_v_delta(void);
+	void cal_v_delta(matrix& dm);
 
 	// add <psi|deltaV|psi> to the Hamiltonian matrix
 	void add_v_delta(void);
@@ -72,7 +72,7 @@ private:
 	torch::jit::script::Module module;
 	
 	//density matrix: dm_gamma
-	double* dm;
+	double* dm_double;
 	// overlap between lcao and descriptor basis
 	double** S_mu_alpha;	//[tot_Inl][NLOCAL][2l+1]	caoyu modified 2021-05-07
 
@@ -139,11 +139,11 @@ private:
 
 	void init_gdmx();
 	void load_model(const string& model_file);
-	void cal_gedm();	//need to load model in this step
+	void cal_gedm(matrix& dm);	//need to load model in this step
 	void cal_gdmx(matrix& dm);	//dD/dX
 	void del_gdmx();
 
-	void getdm();
+	void getdm_double(matrix& dm);
 
 	void cal_descriptor_tensor();
 

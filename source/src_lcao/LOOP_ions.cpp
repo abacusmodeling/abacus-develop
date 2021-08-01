@@ -172,13 +172,12 @@ void LOOP_ions::opt_ions(void)
         {
             //ld.init(ORB.get_lmax_d(), ORB.get_nchimax_d(), ucell.nat* ORB.Alpha[0].getTotal_nchi());
             //ld.build_S_descriptor(0);  //cal overlap, no need dm
-            ld.cal_projected_DM();  //need dm
+            ld.cal_projected_DM(LOC.wfc_dm_2d.dm_gamma[0]);  //need dm
             ld.cal_descriptor();    //final descriptor
+            ld.save_npy_d();            //libnpy needed
             if (INPUT.deepks_scf)
             {
-                ld.cal_v_delta();
-                ld.print_H_V_delta();   //final H_delta
-                ld.save_npy_d();
+                //ld.print_H_V_delta();   //final H_delta
                 if (FORCE)
                 {
                     ld.build_S_descriptor(1);   //for F_delta calculation

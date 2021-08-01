@@ -22,7 +22,7 @@ LCAO_Descriptor::LCAO_Descriptor()
     inl_l = new int[1];
     d = new double[1];
     H_V_delta = new double[1];
-    dm = new double[1];
+    dm_double = new double[1];
 }
 
 
@@ -33,7 +33,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
     delete[] inl_l;
     delete[] d;
     delete[] H_V_delta;
-    delete[] dm;
+    delete[] dm_double;
     //delete S_mu_alpha**
     for (int inl = 0;inl < this->inlmax;inl++)
     {
@@ -305,15 +305,12 @@ void LCAO_Descriptor::set_S_mu_alpha(
 }
 
 
-void LCAO_Descriptor::cal_projected_DM(void)
+void LCAO_Descriptor::cal_projected_DM(matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
-    //init dm
-    delete[] this->dm;
-    this->dm = new double [NLOCAL * NLOCAL];
-    ZEROS(this->dm, NLOCAL * NLOCAL);
-    this->getdm();
+    //now,  dm is an input arg of this func, but needed converting to double*
+    this->getdm_double(dm);
 
     //step 2: get S_alpha_mu and S_nu_beta
     double **ss = this->S_mu_alpha;
@@ -332,7 +329,7 @@ void LCAO_Descriptor::cal_projected_DM(void)
         const char nt = 'N'; //non transpose
         const double alpha = 1;
         const double beta = 0;
-        double *a = dm;
+        double *a = this->dm_double;
         double *b = ss[inl];
         double *c = tmp_pdm;
         dgemm_(&nt, &nt, &NLOCAL, &nm, &NLOCAL, &alpha, a, &NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //DM*S
@@ -388,7 +385,7 @@ void LCAO_Descriptor::cal_descriptor(void)
                         }
                     }
 
-                    this->print_projected_DM(ofs, des, it, ia, l, n);
+                    //this->print_projected_DM(ofs, des, it, ia, l, n);
 
                     //ofs_running << "dimension of des is " << 2 * l + 1 << endl;
                     if (l == 0)
@@ -513,13 +510,13 @@ void LCAO_Descriptor::set_DS_mu_alpha(
     return;
 }
 
-void LCAO_Descriptor::getdm(void)
+void LCAO_Descriptor::getdm_double(matrix& dm)
 {
-    for (int i = 0; i < LOC.wfc_dm_2d.dm_gamma[0].nr; i++)
+    for (int i = 0; i < dm.nr; i++)
     {
-        for (int j = 0; j < LOC.wfc_dm_2d.dm_gamma[0].nc; j++)
+        for (int j = 0; j < dm.nc; j++)
         {
-            this->dm[i * NLOCAL + j] = LOC.wfc_dm_2d.dm_gamma[0](i, j); //only consider default NSPIN = 1
+            this->dm_double[i * NLOCAL + j] = dm(i, j); //only consider default NSPIN = 1
         }
     }
 	return;
@@ -634,12 +631,12 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 
 	// load the DeePKS model from deep neural network
     this->load_model(model_file);
-
+   
     //initialize the density matrix (dm)
-    delete[] this->dm;
-    this->dm = new double[NLOCAL * NLOCAL];
-    ZEROS(this->dm, NLOCAL * NLOCAL);
-
+    delete[] this->dm_double;
+    this->dm_double = new double[NLOCAL * NLOCAL];
+    ZEROS(this->dm_double, NLOCAL * NLOCAL);
+    
     //initialize the H matrix H_V_delta
     delete[] this->H_V_delta;
     this->H_V_delta = new double[NLOCAL * NLOCAL];
@@ -649,13 +646,11 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 }
 
 
-void LCAO_Descriptor::cal_v_delta(void)
+void LCAO_Descriptor::cal_v_delta(matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv> (descriptor changes in every scf iter)
-    this->cal_projected_DM();
-    this->cal_descriptor_tensor();  //use torch::symeig
-    this->cal_gedm();
+    this->cal_gedm(dm);
     
     //2. multiply overlap matrice and sum
     double* tmp_v1 = new double[(2 * lmaxd + 1) * NLOCAL];
@@ -734,12 +729,14 @@ void LCAO_Descriptor::cal_f_delta(matrix& dm)
             for (int inl = 0;inl < inlmax;++inl)
             {
                 int nm = 2 * inl_l[inl] + 1;
-                
-                //1. cal gdmx
+
+                //1. cal gedm
+                this->cal_gedm(dm);
+                //2. cal gdmx
                 this->init_gdmx();
                 this->cal_gdmx(dm);
 
-                //2.multiply and sum for each atom
+                //3.multiply and sum for each atom
                 // \sum_{Inl}\sum_{mm'} <gedm, gdmx>_{mm'}
                 //notice: sum of multiplied corresponding element(mm') , not matrix multiplication !
                 for (int m1 = 0;m1 < nm;++m1)
@@ -822,9 +819,14 @@ void LCAO_Descriptor::load_model(const string& model_file)
 }
 
 
-void LCAO_Descriptor::cal_gedm(void)
+void LCAO_Descriptor::cal_gedm(matrix& dm)
 {
+    //using this->pdm_tensor
     TITLE("LCAO_Descriptor", "cal_gedm");
+    //-----prepare for autograd---------
+    this->cal_projected_DM(dm);
+    this->cal_descriptor_tensor();  //use torch::symeig
+    //-----prepared-----------------------
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
