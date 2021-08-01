@@ -24,6 +24,8 @@ LCAO_Descriptor::LCAO_Descriptor()
     H_V_delta = new double[1];
     dm = new double[1];
 }
+
+
 LCAO_Descriptor::~LCAO_Descriptor()
 {
     delete[] alpha_index;
@@ -64,7 +66,11 @@ LCAO_Descriptor::~LCAO_Descriptor()
     delete[] gedm;
 }
 
-void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
+
+void LCAO_Descriptor::init(
+	const int lm, // max L for descriptor 
+	const int nm, // max n for descriptor
+	const int tot_inl) // 
 {
     TITLE("LCAO_Descriptor", "init");
     ofs_running << " Initialize the descriptor index for deepks (lcao line)" << endl;
@@ -102,6 +108,7 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
         ZEROS(DS_mu_alpha_y[inl], NLOCAL * (2 * this->lmaxd + 1));
         ZEROS(DS_mu_alpha_z[inl], NLOCAL * (2 * this->lmaxd + 1));
     }
+
     //init pdm**
     const int PDM_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
     this->pdm = new double* [this->inlmax];
@@ -110,6 +117,7 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
         this->pdm[inl] = new double[PDM_size];
         ZEROS(this->pdm[inl], PDM_size);
     }
+
     //init gedm**
     this->gedm = new double* [this->inlmax];
     for (int inl = 0;inl < this->inlmax;inl++)
@@ -117,21 +125,24 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
         this->gedm[inl] = new double[PDM_size];
         ZEROS(this->gedm[inl], PDM_size);
     }
+
     // cal n(descriptor) per atom , related to Lmax, nchi(L) and m. (not total_nchi!)
 	this->des_per_atom=0; // mohan add 2021-04-21
     for (int l = 0; l <= this->lmaxd; l++)
     {
         this->des_per_atom += ORB.Alpha[0].getNchi(l) * (2 * l + 1);
     }
+
     this->n_descriptor = ucell.nat * this->des_per_atom;
 
     this->init_index();
     
     return;
 }
-void LCAO_Descriptor::init_index()
+
+
+void LCAO_Descriptor::init_index(void)
 {
-    
     delete[] this->alpha_index;
     this->alpha_index = new IntArray[ucell.ntype];
     delete[] this->inl_index;
@@ -181,7 +192,9 @@ void LCAO_Descriptor::init_index()
     assert(ucell.nat * ORB.Alpha[0].getTotal_nchi() == inl);
     ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
     ofs_running << "total_descriptors " << this->n_descriptor << endl;
+	return;
 }
+
 
 void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 {
@@ -265,7 +278,12 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     return;
 }
 
-void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const int &im, const double &v)
+
+void LCAO_Descriptor::set_S_mu_alpha(
+	const int &iw1_all, 
+	const int &inl, 
+	const int &im, 
+	const double &v)
 {
     //const int ir = ParaO.trace_loc_row[iw1_all];
     //const int ic = ParaO.trace_loc_col[iw2_all];
@@ -286,7 +304,8 @@ void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const i
     return;
 }
 
-void LCAO_Descriptor::cal_projected_DM()
+
+void LCAO_Descriptor::cal_projected_DM(void)
 {
     TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
@@ -586,15 +605,20 @@ void LCAO_Descriptor::del_gdmx()
 void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 {
     TITLE("LCAO_Descriptor", "deepks_pre_scf");
+
+	// load the DeePKS model from deep neural network
     this->load_model(model_file);
-    //init dm
+
+    //initialize the density matrix (dm)
     delete[] this->dm;
     this->dm = new double[NLOCAL * NLOCAL];
     ZEROS(this->dm, NLOCAL * NLOCAL);
-    //init H_V_delta
+
+    //initialize the H matrix H_V_delta
     delete[] this->H_V_delta;
     this->H_V_delta = new double[NLOCAL * NLOCAL];
     ZEROS(this->H_V_delta, NLOCAL * NLOCAL);
+
     return;
 }
 
@@ -701,7 +725,7 @@ void LCAO_Descriptor::cal_f_delta(matrix& dm)
     return;
 }
 
-void LCAO_Descriptor::cal_descriptor_tensor()
+void LCAO_Descriptor::cal_descriptor_tensor(void)
 {
     TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
     //init pdm_tensor and d_tensor
@@ -745,18 +769,24 @@ void LCAO_Descriptor::cal_descriptor_tensor()
     return;
 }
 
+
 void LCAO_Descriptor::load_model(const string& model_file)
 {
     TITLE("LCAO_Descriptor", "load_model");
-    try {
+    try 
+	{
         this->module = torch::jit::load(model_file);
     }
-    catch (const c10::Error& e) {
+    catch (const c10::Error& e) 
+	{
         std::cerr << "error loading the model" << std::endl;
         return;
     }
+	return;
 }
-void LCAO_Descriptor::cal_gedm()
+
+
+void LCAO_Descriptor::cal_gedm(void)
 {
     TITLE("LCAO_Descriptor", "cal_gedm");
     //forward
@@ -789,21 +819,27 @@ void LCAO_Descriptor::cal_gedm()
     return;
 }
 
-void LCAO_Descriptor::print_H_V_delta()
+
+void LCAO_Descriptor::print_H_V_delta(void)
 {
     TITLE("LCAO_Descriptor", "print_H_V_delta");
+
     ofstream ofs;
     stringstream ss;
+
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
        << "H_V_delta.dat";
+
     if (MY_RANK == 0)
     {
         ofs.open(ss.str().c_str());
     }
+
     ofs << "E_delta(Ry) from deepks model: " << this->E_delta << endl;
     ofs << "E_delta(eV) from deepks model: " << this->E_delta * Hartree_to_eV << endl;
     ofs << "H_delta(Hartree)(gamma only)) from deepks model: " << endl;
+
     for (int i = 0;i < NLOCAL;++i)
     {
         for (int j = 0;j < NLOCAL;++j)
@@ -813,6 +849,7 @@ void LCAO_Descriptor::print_H_V_delta()
         ofs << endl;
     }
     ofs << "H_delta(eV)(gamma only)) from deepks model: " << endl;
+
     for (int i = 0;i < NLOCAL;++i)
     {
         for (int j = 0;j < NLOCAL;++j)
@@ -821,24 +858,31 @@ void LCAO_Descriptor::print_H_V_delta()
         }
         ofs << endl;
     }
+
     ofs_running << "H_delta is printed" << endl;
+
     return;
 }
 
-void LCAO_Descriptor::print_F_delta()
+
+void LCAO_Descriptor::print_F_delta(void)
 {
     TITLE("LCAO_Descriptor", "print_F_delta");
+
     ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
        << "F_delta.dat";
+
     if (MY_RANK == 0)
     {
         ofs.open(ss.str().c_str());
     }
+
     ofs << "F_delta(Hatree/Bohr) from deepks model: " << endl;
     ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << endl;
+
     for (int it = 0;it < ucell.ntype;++it)
     {
         for (int ia = 0;ia < ucell.atoms[it].na;++ia)
@@ -849,8 +893,10 @@ void LCAO_Descriptor::print_F_delta()
                 << setw(15) << this->F_delta(iat, 2) / 2 << endl;
         }
     }
+
     ofs << "F_delta(eV/Angstrom) from deepks model: " << endl;
     ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << endl;
+
     for (int it = 0;it < ucell.ntype;++it)
     {
         for (int ia = 0;ia < ucell.atoms[it].na;++ia)
@@ -866,7 +912,8 @@ void LCAO_Descriptor::print_F_delta()
     return;
 }
 
-void LCAO_Descriptor::save_npy_d()
+
+void LCAO_Descriptor::save_npy_d(void)
 {
     TITLE("LCAO_Descriptor", "save_npy_d");
     //save descriptor in .npy format
@@ -880,6 +927,7 @@ void LCAO_Descriptor::save_npy_d()
     return;
 }
 
+
 void LCAO_Descriptor::save_npy_e(double& ebase)
 {
     TITLE("LCAO_Descriptor", "save_npy_e");
@@ -890,6 +938,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
     npy::SaveArrayAsNumpy("e_base.npy", false, 1, eshape, npy_ebase);
     return;
 }
+
 
 void LCAO_Descriptor::save_npy_f(matrix& fbase)
 {
@@ -908,5 +957,4 @@ void LCAO_Descriptor::save_npy_f(matrix& fbase)
     npy::SaveArrayAsNumpy("f_base.npy", false, 2, fshape, npy_fbase);
     return;
 }
-
 #endif

@@ -15,7 +15,9 @@ public:
     explicit LCAO_Descriptor();
     ~LCAO_Descriptor();
 
-	void init(int lm, int nm, int tot_inl);	// index of descriptor in all atoms
+	// index of descriptor in all atoms
+	void init(const int lm, const int nm, const int tot_inl);
+
 	// cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
     void build_S_descriptor(const bool &calc_deri);
 
@@ -24,14 +26,29 @@ public:
 
 	// cal d: EIGENVALUE of pdm in block of I_n_l
     void cal_descriptor(void);
+
+	// print descriptors
 	void print_descriptor(void);
 
+	// 1. Load DeePKS model
+	// 2. Initialize the density matrix
+	// 3. Initialize the deltaV Hamiltonian matrix
 	void deepks_pre_scf(const string& model_file);
-	void cal_v_delta();//<psi|V_delta|psi>
-	void add_v_delta();
+
+	// compute <psi|deltaV|psi>
+	void cal_v_delta(void);
+
+	// add <psi|deltaV|psi> to the Hamiltonian matrix
+	void add_v_delta(void);
+
+	// compute the force related to deltaV, input dm is density matrix
 	void cal_f_delta(matrix& dm);
-	void print_H_V_delta();
-	void print_F_delta();
+
+	// print the deltaV matrix in LCAO basis set
+	void print_H_V_delta(void);
+
+	// print the force related to deltaV for each atom
+	void print_F_delta(void);
 
 	/*These 3 func save the [dm_eig], [e_base], [f_base]
 	of current configuration as .npy file, when deepks_scf = 1.
@@ -44,8 +61,10 @@ public:
 
 	//deepks E_delta(Ry)
 	double E_delta = 0.0;
+
 	//deepks V_delta, to be added to Hamiltonian matrix
 	double* H_V_delta;
+
 	//deepks F_delta(Ry/Bohr), to be added to atom force
 	matrix	F_delta;
 
@@ -80,7 +99,6 @@ private:
 
 	//dE/dD, autograd from loaded model(E: Ry)
 	double** gedm;	//[tot_Inl][2l+1][2l+1]
-
 
 	int n_descriptor;
 
