@@ -21,9 +21,9 @@ public:
 		ediffg=1e-3;
 		MNHC=4;
 
-		rcut_lj = 16.0;
-		epsilon = 0.01032;  // eV
-		sigma = 3.405;      // Angstrom
+		rcut_lj = 16.0;     // Bohr
+		epsilon_lj = 0.01032;  // eV
+		sigma_lj = 3.405;      // Angstrom
 		list_step = 5;
 	};
     ~MD_parameters(){};
@@ -46,8 +46,8 @@ public:
 
 	/*Classic MD*/      // liuyu 2021-07-30
 	double rcut_lj;     // cutoff radius of LJ potential (Bohr)
-	double epsilon;     // the value of epsilon for LJ potential
-	double sigma;       // the value of sigma for LJ potential
+	double epsilon_lj;  // the value of epsilon for LJ potential
+	double sigma_lj;    // the value of sigma for LJ potential
 	int list_step;      // update neighbor list every list_step
 };
 

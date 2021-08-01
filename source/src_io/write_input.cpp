@@ -166,8 +166,8 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"NVT_tau",mdp.NVT_tau,"parameter for adjust effect of thermostat");
 	OUTP(ofs,"NVT_control",mdp.NVT_control,"choose which thermostat used in NVT ensemble");
 	OUTP(ofs,"rcut_lj",mdp.rcut_lj,"cutoff radius of LJ potential");
-	OUTP(ofs,"epsilon",mdp.epsilon,"the value of epsilon for LJ potential");
-	OUTP(ofs,"sigma",mdp.sigma,"the value of sigma for LJ potential");
+	OUTP(ofs,"epsilon_lj",mdp.epsilon_lj,"the value of epsilon for LJ potential");
+	OUTP(ofs,"sigma_lj",mdp.sigma_lj,"the value of sigma for LJ potential");
 	OUTP(ofs,"list_step",mdp.list_step,"update neighbor list every list_step");
 
 	ofs << "\n#Parameters (11.Efield)" << endl;

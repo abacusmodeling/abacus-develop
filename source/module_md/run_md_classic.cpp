@@ -1,7 +1,8 @@
 #include "run_md_classic.h"
 #include "MD_basic.h"
+#include "LJ_potential.h"
 #include "../input.h"
-#include "../src_pw/global.h"
+#include "../module_base/global_variable.h"
 #include "../src_io/print_info.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 
@@ -26,15 +27,6 @@ void Run_MD_CLASSIC::classic_md_line(void)
 	// Setup the unitcell.
     ucell_c.setup_cell_classic(GlobalV::global_atom_card, GlobalV::ofs_running, GlobalV::ofs_warning);
 	DONE(GlobalV::ofs_running, "SETUP UNITCELL");
-
-	atom_arrange::search(
-			GlobalV::SEARCH_PBC,
-			GlobalV::ofs_running,
-			this->grid_neigh,
-			this->ucell_c, 
-			GlobalV::SEARCH_RADIUS, 
-			GlobalV::test_atom_input,
-			INPUT.test_just_neighbor);
 
 	//Print_Info PI;
     //PI.setup_parameters();
@@ -70,6 +62,25 @@ void Run_MD_CLASSIC::md_cells_classic(void)
             GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
             GlobalV::ofs_running << " -------------------------------------------" << endl;
         }
+
+		// search adjent atoms
+		if((istep-1)%INPUT.mdp.list_step==0)
+		{
+			atom_arrange::search(
+					GlobalV::SEARCH_PBC,
+					GlobalV::ofs_running,
+					this->grid_neigh,
+					this->ucell_c, 
+					GlobalV::SEARCH_RADIUS, 
+					GlobalV::test_atom_input,
+					INPUT.test_just_neighbor);
+		}
+
+		/*double potential = LJ_potential::Lennard_Jones(
+									this->ucell_c,
+									this->grid_neigh,
+									mdb.force,
+									mdb.stress);*/
 
 		this->update_pos_classic();
 

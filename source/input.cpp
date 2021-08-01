@@ -1227,13 +1227,13 @@ bool Input::Read(const string &fn)
 		{
 			read_value(ifs,mdp.rcut_lj );
 		}
-		else if (strcmp("epsilon",word) == 0)
+		else if (strcmp("epsilon_lj",word) == 0)
 		{
-			read_value(ifs,mdp.epsilon );
+			read_value(ifs,mdp.epsilon_lj );
 		}
-		else if (strcmp("sigma",word) == 0)
+		else if (strcmp("sigma_lj",word) == 0)
 		{
-			read_value(ifs,mdp.sigma );
+			read_value(ifs,mdp.sigma_lj );
 		}
 		else if (strcmp("list_step",word) == 0)
 		{
@@ -2178,9 +2178,9 @@ void Input::Bcast()
         Parallel_Common::bcast_int(mdp.fixTemperature);
         Parallel_Common::bcast_double(mdp.ediff);
         Parallel_Common::bcast_double(mdp.ediffg);
-		Parallel_Common::bcast_int(mdp.rcut_lj);
-		Parallel_Common::bcast_int(mdp.epsilon);
-		Parallel_Common::bcast_int(mdp.sigma);
+		Parallel_Common::bcast_double(mdp.rcut_lj);
+		Parallel_Common::bcast_double(mdp.epsilon_lj);
+		Parallel_Common::bcast_double(mdp.sigma_lj);
 		Parallel_Common::bcast_int(mdp.list_step);
 /* 	// Peize Lin add 2014-04-07
 	Parallel_Common::bcast_bool( vdwD2 );
