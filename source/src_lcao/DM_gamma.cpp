@@ -88,7 +88,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
     // count the number of elements to be received from each process
     for(int iGlobal=0; iGlobal<GlobalV::NLOCAL; ++iGlobal)
     {
-        int iLocalGrid=GridT.trace_lo[iGlobal];
+        int iLocalGrid=GlobalC::GridT.trace_lo[iGlobal];
         if(iLocalGrid>=0)
         {
             //trace_global[iLocalGrid]=iGlobal;
@@ -264,7 +264,7 @@ void Local_Orbital_Charge::allocate_gamma(const Grid_Technique &gt)
         WARNING_QUIT("Local_Orbital_Charge::allocate","lgd<0!Something Wrong!");
     }
     
-    setAlltoallvParameter(ParaO.comm_2D, ParaO.blacs_ctxt, ParaO.nb);
+    setAlltoallvParameter(GlobalC::ParaO.comm_2D, GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
 
 	// Peize Lin test 2019-01-16
     wfc_dm_2d.init();
@@ -288,8 +288,8 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 	for(int is=0; is<GlobalV::NSPIN; ++is)
 	{
 
-		LOC.wfc_dm_2d.wfc_gamma[is].create(ParaO.ncol, ParaO.nrow);
-		LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
+		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
+		GlobalC::LOC.wfc_dm_2d.wfc_gamma[is].zero_out();
 
 		GlobalV::ofs_running << " Read in wave functions " << is << endl;
 		error = WF_Local::read_lowf( ctot , is);
@@ -299,7 +299,7 @@ void Local_Orbital_Charge::gamma_file(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
@@ -333,7 +333,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
     for(int is=0; is<GlobalV::NSPIN; ++is)
     {
         if(INPUT.new_dm>1)
-        // outputDM( ParaO.blacs_ctxt, ParaO.nb);
+        // outputDM( GlobalC::ParaO.blacs_ctxt, GlobalC::ParaO.nb);
         {
             // int myid;
             // MPI_Comm_rank(MPI_COMM_WORLD, &myid);
@@ -345,7 +345,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             //     GlobalV::ofs_running<<"DM(1,0)"<<wfc_dm_2d.dm_gamma[is](0,1)<<" ";
             //     GlobalV::ofs_running<<"DM(1,1)"<<wfc_dm_2d.dm_gamma[is](1,1)<<endl;
             // }
-            GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<ParaO.nb<<endl;
+            GlobalV::ofs_running<<"2D block parameters:\n"<<"nblk: "<<GlobalC::ParaO.nb<<endl;
             GlobalV::ofs_running<<"DM in 2D format:\n_________________________________________\n";
             for(int i=0; i<wfc_dm_2d.dm_gamma[is].nr; ++i)
             {
@@ -378,7 +378,7 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
         }
         // transform data via MPI_Alltoallv
         MPI_Alltoallv(sender_buffer, sender_size_process, sender_displacement_process, MPI_DOUBLE,
-                      receiver_buffer, receiver_size_process, receiver_displacement_process, MPI_DOUBLE, ParaO.comm_2D);
+                      receiver_buffer, receiver_size_process, receiver_displacement_process, MPI_DOUBLE, GlobalC::ParaO.comm_2D);
         // put data from receiver buffer to this->DM[is]
         nNONZERO=0;
         // init DM[is]
@@ -405,8 +405,8 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             OUT(GlobalV::ofs_running,"receiver_size",receiver_size);
             OUT(GlobalV::ofs_running,"last receiver_buffer",receiver_buffer[receiver_size-1]);
             // GlobalV::ofs_running<<"DM[0][0:1][0:1] after receiver:"<<endl;
-            // int idx0=GridT.trace_lo[0];
-            // int idx1=GridT.trace_lo[1];
+            // int idx0=GlobalC::GridT.trace_lo[0];
+            // int idx1=GlobalC::GridT.trace_lo[1];
             // if(idx0>=0)
             // {
             //     GlobalV::ofs_running<<"DM(0,0)"<<DM[0][idx0][idx0]<<" ";
@@ -425,11 +425,11 @@ void Local_Orbital_Charge::cal_dk_gamma_from_2D(void)
             GlobalV::ofs_running<<"DM in local grid:\n_________________________________________\n";
             for(int i=0; i<GlobalV::NLOCAL; ++i)
             {
-                int ii=GridT.trace_lo[i];
+                int ii=GlobalC::GridT.trace_lo[i];
                 if(ii < 0) continue;
                 for(int j=0; j<GlobalV::NLOCAL; ++j)
                 {
-                    int jj=GridT.trace_lo[j];
+                    int jj=GlobalC::GridT.trace_lo[j];
                     if(jj<0) continue;
                     GlobalV::ofs_running<<DM[is][ii][jj]<<" ";
                 }
@@ -452,10 +452,10 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 #ifdef __MPI //2015-09-06, xiaohui
 	#if EXX_DM==2
-	if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
-		|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
-		|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
-		exx_lcao.DM_para.clear_DMr();
+	if( Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type 
+		|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type 
+		|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type )
+		GlobalC::exx_lcao.DM_para.clear_DMr();
 	#endif
 
 	// Peize Lin update 2018-07-02
@@ -519,7 +519,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 			{
 				for(int ib=0; ib<bands_local[myid]; ib++)
 				{
-					Z_wg(iw,ib) = ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
+					Z_wg(iw,ib) = GlobalC::ParaO.Z_LOC[is][iw*bands_local[myid]+ib] * wg_local(is,ib);
 				}
 			}
 		}
@@ -558,7 +558,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 					const int col_index = i_col +col_count*300;
 					for(int ib=0; ib<band_local; ib++)
 					{
-						Z_col(i_col,ib) = ParaO.Z_LOC[is][col_index*band_local+ib] ;
+						Z_col(i_col,ib) = GlobalC::ParaO.Z_LOC[is][col_index*band_local+ib] ;
 					}
 				}
 
@@ -582,12 +582,12 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 					for(int i_row=0; i_row<row_remain; i_row++)
 					{
 						const int row_index = row_count*300 + i_row;
-						const int row_mu = GridT.trace_lo[row_index];
+						const int row_mu = GlobalC::GridT.trace_lo[row_index];
 						if(row_mu<0)    continue;
 						for(int i_col=0; i_col<col_remain; i_col++)
 						{
 							const int col_index = col_count*300 + i_col;
-							const int col_nu = GridT.trace_lo[col_index];
+							const int col_nu = GlobalC::GridT.trace_lo[col_index];
 							if(col_nu<0)    continue;
 							this->DM[is][row_mu][col_nu] = rho_row_col(i_row,i_col);
 						}
@@ -595,11 +595,11 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 				}
 						
 				#if EXX_DM==2
-				if( Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type 
-					|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type 
-					|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type )
+				if( Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type 
+					|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type 
+					|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type )
 				{
-					exx_lcao.DM_para.set_DM_gamma( rho_row_col, is, {row_count*300,col_count*300} );
+					GlobalC::exx_lcao.DM_para.set_DM_gamma( rho_row_col, is, {row_count*300,col_count*300} );
 				}
 				#endif				
 			}  // end for col_count
@@ -607,8 +607,8 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 		GlobalV::ofs_running<<"DM[0][0:1][0:1] in cal_dk_gamma:"<<endl;
 
-		int idx0=GridT.trace_lo[0];
-		int idx1=GridT.trace_lo[1];
+		int idx0=GlobalC::GridT.trace_lo[0];
+		int idx1=GlobalC::GridT.trace_lo[1];
 
 		if(idx0>=0)
 		{

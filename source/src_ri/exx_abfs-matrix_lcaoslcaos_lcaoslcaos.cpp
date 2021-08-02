@@ -13,13 +13,13 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init(
 	// (1) MOT: make overlap table.
 	//=========================================
 	MOT.allocate(
-		ORB.get_ntype(),							// number of atom types
-		ORB.get_lmax(),								// max L used to calculate overlap
-		static_cast<int>(ORB.get_kmesh() * kmesh_times) | 1,			// kpoints, for integration in k space
-		ORB.get_Rmax() * rmesh_times,				// max value of radial table
-		ORB.get_dR(),								// delta R, for making radial table
-//		ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
-		ORB.get_dk());											// Peize Lin change 2017-04-16
+		GlobalC::ORB.get_ntype(),							// number of atom types
+		GlobalC::ORB.get_lmax(),								// max L used to calculate overlap
+		static_cast<int>(GlobalC::ORB.get_kmesh() * kmesh_times) | 1,			// kpoints, for integration in k space
+		GlobalC::ORB.get_Rmax() * rmesh_times,				// max value of radial table
+		GlobalC::ORB.get_dR(),								// delta R, for making radial table
+//		GlobalC::ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
+		GlobalC::ORB.get_dk());											// Peize Lin change 2017-04-16
 	int Lmax_used, Lmax;
 	MOT.init_Table_Spherical_Bessel (4,mode, Lmax_used, Lmax, Exx_Abfs::Lmax);
 //	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1
@@ -116,7 +116,7 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 		for (size_t IA=0; IA!=GlobalC::ucell.atoms[T].na; ++IA)
 		{
 			const Vector3<double> &tauA( GlobalC::ucell.atoms[T].tau[IA] );
-			GridD.Find_atom(tauA);
+			GlobalC::GridD.Find_atom(tauA);
 
 			for( auto &co2 : co1.second )
 			{
@@ -126,11 +126,11 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 					for( auto &co3 : co2.second )
 					{
 
-						for (int ad = 0; ad < GridD.getAdjacentNum()+1; ++ad)
+						for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ++ad)
 						{
-							if( T != GridD.getType(ad) )
+							if( T != GlobalC::GridD.getType(ad) )
 								continue;
-							const Vector3<double> &tauB( GridD.getAdjacentTau(ad) );
+							const Vector3<double> &tauB( GlobalC::GridD.getAdjacentTau(ad) );
 
 							for( auto &co4 : co3.second )
 							{

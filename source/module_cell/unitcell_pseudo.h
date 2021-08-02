@@ -25,6 +25,7 @@ public: // member variables
 	int nmax_total;//mohan add 2009-09-10
 	int lmax_ppwf;
 	int lmaxmax; // liuyu 2021-07-04
+	bool set_vel; // liuyu 2021-07-15
 	//double nelec;
 
 public: // member functions
@@ -33,12 +34,10 @@ public: // member functions
 	void setup_cell(const string &s_pseudopot_dir, output &outp, const string &fn, ofstream &log);
 	void setup_cell_classic(
 	const string &fn, 
-	output &outp, 
-	ofstream &log,
 	ofstream &ofs_running,
 	ofstream &ofs_warning); // Yu Liu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
-	void read_atom_species(ifstream &ifa); // read in the atom information for each type of atom
-	bool read_atom_positions(ifstream &ifpos); // read in atomic positions
+	void read_atom_species(ifstream &ifa, ofstream &ofs_running); // read in the atom information for each type of atom
+	bool read_atom_positions(ifstream &ifpos, ofstream &ofs_running, ofstream &ofs_warning); // read in atomic positions
 	int find_type(const string &label);
 	void print_tau(void)const;
 	void print_stru_file(const string &fn, const int &type=1)const; // mohan add 2011-03-22

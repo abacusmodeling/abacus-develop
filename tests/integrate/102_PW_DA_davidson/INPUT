@@ -22,6 +22,6 @@ sigma			0.002
 
 #Parameters (5.Mixing)
 mixing_type		plain
-mixing_beta		0.7
+mixing_beta		0.5
 
 ks_solver      dav

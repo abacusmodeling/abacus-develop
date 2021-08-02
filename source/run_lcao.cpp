@@ -8,6 +8,7 @@
 #include "src_lcao/LOOP_cell.h"
 #include "src_io/print_info.h"
 #include "module_symmetry/symmetry.h"
+#include "src_lcao/run_md_lcao.h"
 
 Run_lcao::Run_lcao(){}
 Run_lcao::~Run_lcao(){}
@@ -28,14 +29,14 @@ void Run_lcao::lcao_line(void)
 		GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 			GlobalV::ofs_running,
 			GlobalV::OUT_LEVEL,
-			ORB.get_rcutmax_Phi(), 
-			ORB.get_rcutmax_Beta(), 
+			GlobalC::ORB.get_rcutmax_Phi(), 
+			GlobalC::ORB.get_rcutmax_Beta(), 
 			GlobalV::GAMMA_ONLY_LOCAL);
 
 		atom_arrange::search(
 			GlobalV::SEARCH_PBC,
 			GlobalV::ofs_running,
-			GridD, 
+			GlobalC::GridD, 
 			GlobalC::ucell, 
 			GlobalV::SEARCH_RADIUS, 
 			GlobalV::test_atom_input,
@@ -77,10 +78,10 @@ void Run_lcao::lcao_line(void)
     // * reading the localized orbitals/projectors 
 	// * construct the interpolation tables.
 
-	LOWF.orb_con.set_orb_tables(
+	GlobalC::LOWF.orb_con.set_orb_tables(
 		GlobalV::ofs_running,
-		UOT, 
-		ORB,
+		GlobalC::UOT, 
+		GlobalC::ORB,
 		GlobalC::ucell.ntype,
 		GlobalC::ucell.lmax,
 		INPUT.lcao_ecut,
@@ -96,7 +97,7 @@ void Run_lcao::lcao_line(void)
 
 	// * allocate H and S matrices according to computational resources
 	// * set the 'trace' between local H/S and global H/S
-	LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, ParaO);
+	GlobalC::LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
 
 //--------------------------------------
 // cell relaxation should begin here
@@ -143,10 +144,18 @@ void Run_lcao::lcao_line(void)
 		}
 	}
 
-	LOOP_cell lc;
-	lc.opt_cell();
+	if(GlobalV::CALCULATION=="md")
+	{
+		Run_MD_LCAO run_md_lcao;
+		run_md_lcao.opt_cell();
+	}
+	else // cell relaxations
+	{
+		LOOP_cell lc;
+		lc.opt_cell();
 
-	GlobalC::en.perform_dos();
+		GlobalC::en.perform_dos();
+	}
 
 	timer::tick("Run_lcao","lcao_line");
     return;

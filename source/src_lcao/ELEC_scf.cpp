@@ -120,7 +120,7 @@ void ELEC_scf::scf(const int &istep)
 		Update_input UI;
 		UI.init(ufile);
 
-		if(INPUT.dft_plus_u) dftu.iter_dftu = iter;
+		if(INPUT.dft_plus_u) GlobalC::dftu.iter_dftu = iter;
 		//time_start= std::time(NULL);
 		clock_start = std::clock();
 		conv_elec = false;//mohan add 2008-05-25
@@ -169,7 +169,7 @@ void ELEC_scf::scf(const int &istep)
 
 				// calculate the density matrix using read in wave functions
 				// and the ncalculate the charge density on grid.
-				LOC.sum_bands();
+				GlobalC::LOC.sum_bands();
 				// calculate the local potential(rho) again.
 				// the grid integration will do in later grid integration.
 
@@ -231,7 +231,7 @@ void ELEC_scf::scf(const int &istep)
 					{
 						for (int i=0; i<GlobalV::NLOCAL; i++)
 						{
-							WFC_init[ik][ib][i] = LOWF.WFC_K[ik][ib][i];
+							WFC_init[ik][ib][i] = GlobalC::LOWF.WFC_K[ik][ib][i];
 						}
 					}
 				}
@@ -257,31 +257,31 @@ void ELEC_scf::scf(const int &istep)
 			case 5:    case 6:   case 9:
 				if( !GlobalC::exx_global.info.separate_loop )
 				{
-					exx_lcao.cal_exx_elec();
+					GlobalC::exx_lcao.cal_exx_elec();
 				}
 				break;
 		}
 
 		if(INPUT.dft_plus_u)
 		{
-			dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
+			GlobalC::dftu.cal_slater_UJ(istep, iter); // Calculate U and J if Yukawa potential is used
 		}
 
 		// (1) calculate the bands.
 		// mohan add 2021-02-09
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ELEC_cbands_gamma::cal_bands(istep, UHM);
+			ELEC_cbands_gamma::cal_bands(istep, GlobalC::UHM);
 		}
 		else
 		{
 			if(ELEC_evolve::tddft && istep >= 1 && iter > 1)
 			{
-				ELEC_evolve::evolve_psi(istep, UHM, this->WFC_init);
+				ELEC_evolve::evolve_psi(istep, GlobalC::UHM, this->WFC_init);
 			}
 			else
 			{
-				ELEC_cbands_k::cal_bands(istep, UHM);
+				ELEC_cbands_k::cal_bands(istep, GlobalC::UHM);
 			}
 		}
 
@@ -340,21 +340,21 @@ void ELEC_scf::scf(const int &istep)
 
 		// if selinv is used, we need this to calculate the charge
 		// using density matrix.
-		LOC.sum_bands();
+		GlobalC::LOC.sum_bands();
 
 		// add exx
 		// Peize Lin add 2016-12-03
 		GlobalC::en.set_exx();
 
 		// Peize Lin add 2020.04.04
-		if(Exx_Global::Hybrid_Type::HF==exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::PBE0==exx_lcao.info.hybrid_type
-			|| Exx_Global::Hybrid_Type::HSE==exx_lcao.info.hybrid_type)
+		if(Exx_Global::Hybrid_Type::HF==GlobalC::exx_lcao.info.hybrid_type
+			|| Exx_Global::Hybrid_Type::PBE0==GlobalC::exx_lcao.info.hybrid_type
+			|| Exx_Global::Hybrid_Type::HSE==GlobalC::exx_lcao.info.hybrid_type)
 		{
 			if(GlobalC::restart.info_load.load_H && GlobalC::restart.info_load.load_H_finish && !GlobalC::restart.info_load.restart_exx)
 			{
 				GlobalC::exx_global.info.set_xcfunc(GlobalC::xcf);
-				exx_lcao.cal_exx_elec();
+				GlobalC::exx_lcao.cal_exx_elec();
 				GlobalC::restart.info_load.restart_exx = true;
 			}
 		}
@@ -364,11 +364,11 @@ void ELEC_scf::scf(const int &istep)
 		// the local occupation number matrix and energy correction
 		if(INPUT.dft_plus_u)
 		{
-			if(GlobalV::GAMMA_ONLY_LOCAL) dftu.cal_occup_m_gamma(iter);
-			else dftu.cal_occup_m_k(iter);
+			if(GlobalV::GAMMA_ONLY_LOCAL) GlobalC::dftu.cal_occup_m_gamma(iter);
+			else GlobalC::dftu.cal_occup_m_k(iter);
 
-		 	dftu.cal_energy_correction(istep);
-			dftu.output();
+		 	GlobalC::dftu.cal_energy_correction(istep);
+			GlobalC::dftu.output();
 		}
 
 		// (4) mohan add 2010-06-24
@@ -387,7 +387,7 @@ void ELEC_scf::scf(const int &istep)
 
 		// resume codes!
 		//-------------------------------------------------------------------------
-		// this->LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
+		// this->GlobalC::LOWF.init_Cij( 0 ); // check the orthogonality of local orbital.
 		// GlobalC::CHR.sum_band(); use local orbital in plane wave basis to calculate bands.
 		// but must has evc first!
 		//-------------------------------------------------------------------------
@@ -465,7 +465,7 @@ void ELEC_scf::scf(const int &istep)
 			{
 				ssd << GlobalV::global_out_dir << "tmp" << "_SPIN" << is + 1 << "_DM_R";
 			}
-			LOC.write_dm( is, iter, ssd.str(), precision );
+			GlobalC::LOC.write_dm( is, iter, ssd.str(), precision );
 
 			//LiuXh modify 20200701
 			/*
@@ -507,14 +507,14 @@ void ELEC_scf::scf(const int &istep)
 			// output charge density for converged,
 			// 0 means don't need to consider iter,
 			//--------------------------------------
-			if( chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
+			if( GlobalC::chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
 			{
-				cout <<"eta = "<<chi0_hilbert.eta<<endl;
-				cout <<"domega = "<<chi0_hilbert.domega<<endl;
-				cout <<"nomega = "<<chi0_hilbert.nomega<<endl;
-				cout <<"dim = "<<chi0_hilbert.dim<<endl;
-				//cout <<"oband = "<<chi0_hilbert.oband<<endl;
-				chi0_hilbert.Chi();
+				cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<endl;
+				cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<endl;
+				cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<endl;
+				cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<endl;
+				//cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<endl;
+				GlobalC::chi0_hilbert.Chi();
 			}
 
 			//quxin add for DFT+U for nscf calculation
@@ -524,7 +524,7 @@ void ELEC_scf::scf(const int &istep)
 				{
 					stringstream sst;
 					sst << GlobalV::global_out_dir << "onsite.dm";
-					dftu.write_occup_m( sst.str() );
+					GlobalC::dftu.write_occup_m( sst.str() );
 				}
 			}
 
@@ -545,7 +545,7 @@ void ELEC_scf::scf(const int &istep)
 				{
 					ssd << GlobalV::global_out_dir << "SPIN" << is + 1 << "_DM_R";
 				}
-				LOC.write_dm( is, 0, ssd.str(), precision );
+				GlobalC::LOC.write_dm( is, 0, ssd.str(), precision );
 
 				if(GlobalC::pot.out_potential == 1) //LiuXh add 20200701
 				{
@@ -577,7 +577,7 @@ void ELEC_scf::scf(const int &istep)
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
 				{
-					ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
+					GlobalC::ld.save_npy_e(GlobalC::en.etot);//ebase = etot, no deepks E_delta including
 				}
 #endif
 			}

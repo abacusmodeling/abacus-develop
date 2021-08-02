@@ -365,26 +365,26 @@ void Exx_Lcao::init()
 		};
 		if(false)
 		{
-			for( int T=0; T!=ORB.get_ntype(); ++T )
+			for( int T=0; T!=GlobalC::ORB.get_ntype(); ++T )
 			{
-				for( int L=0; L<=ORB.Phi[T].getLmax(); ++L )
+				for( int L=0; L<=GlobalC::ORB.Phi[T].getLmax(); ++L )
 				{
-					for( int N=0; N!=ORB.Phi[T].getNchi(L); ++N )
+					for( int N=0; N!=GlobalC::ORB.Phi[T].getNchi(L); ++N )
 					{
-						pr_orb_all( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), ORB.Phi[T].PhiLN(L,N) );
+						pr_orb_all( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N) );
 					}
 				}
 			}
 		}
 		else
 		{
-			for( int T=0; T!=ORB.get_ntype(); ++T )
+			for( int T=0; T!=GlobalC::ORB.get_ntype(); ++T )
 			{
-				for( int L=0; L<=ORB.Phi[T].getLmax(); ++L )
+				for( int L=0; L<=GlobalC::ORB.Phi[T].getLmax(); ++L )
 				{
-					for( int N=0; N!=ORB.Phi[T].getNchi(L); ++N )
+					for( int N=0; N!=GlobalC::ORB.Phi[T].getNchi(L); ++N )
 					{
-						pr_orb_all_kmesh( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), ORB.Phi[T].PhiLN(L,N), 5 );
+						pr_orb_all_kmesh( "orb_"+TO_STRING(T)+"_"+TO_STRING(L)+"_"+TO_STRING(N), GlobalC::ORB.Phi[T].PhiLN(L,N), 5 );
 					}
 				}
 			}
@@ -466,9 +466,9 @@ void Exx_Lcao::init()
 		}
 
 		cout<<"Rcut:"<<endl;
-		for( size_t T=0; T!=ORB.get_ntype(); ++T )
+		for( size_t T=0; T!=GlobalC::ORB.get_ntype(); ++T )
 		{
-			cout<<ORB.Phi[T].getRcut()<<endl;
+			cout<<GlobalC::ORB.Phi[T].getRcut()<<endl;
 		}
 		cout<<"tau:"<<endl;
 		for( size_t iat=0; iat!=GlobalC::ucell.nat; ++iat )
@@ -548,7 +548,7 @@ gettimeofday( &t_start_all, NULL);
 	}
 
 gettimeofday( &t_start, NULL);
-	this->lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, this->kmesh_times );
+	this->lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::change_orbs\t"<<time_during(t_start)<<endl;
 
 ofs_mpi<<info.files_abfs<<endl;
@@ -564,7 +564,7 @@ gettimeofday( &t_start, NULL);
 	}
 	else
 	{
-		this->abfs = Exx_Abfs::IO::construct_abfs( abfs_same_atom, ORB, info.files_abfs, this->kmesh_times );
+		this->abfs = Exx_Abfs::IO::construct_abfs( abfs_same_atom, GlobalC::ORB, info.files_abfs, this->kmesh_times );
 	}
 //	this->abfs = Exx_Abfs::Construct_Orbs::orth_orbs( abfs_origin );		// Peize Lin test
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<endl;
@@ -695,7 +695,7 @@ ofs_mpi<<range_abfs<<endl;
 	{
 		Exx_Abfs::Matrix_Orbs11 mll;
 		mll.init(2,1,1);
-		mll.init_radial(ORB,ORB);
+		mll.init_radial(GlobalC::ORB, GlobalC::ORB);
 		mll.init_radial_table();
 		ofstream ofsS("S.dat");
 		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[0],index_lcaos,index_lcaos)<<endl<<endl;
@@ -765,7 +765,7 @@ ofs_mpi.close();
 
 	auto overlap_test = [&]()
 	{
-		const auto lcaos = Exx_Abfs::Construct_Orbs::change_orbs( ORB, 1 );
+		const auto lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
 		Exx_Abfs::Matrix_Orbs11 m_lcaos_lcaos;
 		m_lcaos_lcaos.init(1,1,1);
 		m_lcaos_lcaos.init_radial(lcaos,lcaos);
@@ -992,7 +992,7 @@ ofs_mpi.close();
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ofstream ofs("LOC.DM.dat",ofstream::app);
+			ofstream ofs("GlobalC::LOC.DM.dat",ofstream::app);
 			const int it1=0, it2=0;
 			for( size_t ia1=0; ia1!=GlobalC::ucell.atoms[it1].na; ++ia1 )
 				for( size_t ia2=0; ia2!=GlobalC::ucell.atoms[it2].na; ++ia2 )
@@ -1002,7 +1002,7 @@ ofs_mpi.close();
 						for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )
 						{
 							for( size_t iw2=0; iw2!=GlobalC::ucell.atoms[it2].nw; ++iw2 )
-								ofs<<LOC.DM[is][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)][GlobalC::ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
+								ofs<<GlobalC::LOC.DM[is][GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1)][GlobalC::ucell.itiaiw2iwt(it2, ia2, iw2)]<<"\t";
 							ofs<<endl;
 						}
 						ofs<<endl;
@@ -1016,7 +1016,7 @@ ofs_mpi.close();
 			static int istep=0;
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
-				ofstream ofs("LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
+				ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
 				for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 				{
 					for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
@@ -1034,7 +1034,7 @@ ofs_mpi.close();
 								{
 									for( int iw2=0; iw2!=GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw; ++iw2 )
 									{
-										ofs<<LOC.DM_R[is][LNNR.nlocstartg[iat1]+iv]<<"\t";
+										ofs<<GlobalC::LOC.DM_R[is][GlobalC::LNNR.nlocstartg[iat1]+iv]<<"\t";
 										++iv;
 									}
 									ofs<<endl;
@@ -1056,18 +1056,18 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				ofstream ofs("GlobalC::LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
 					{
 						//---------------------------------------------------------
-						// LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
+						// GlobalC::LOWF.WFC_GAMMA has been replaced by wfc_dm_2d.cpp 
 						// we need to fix this function in near future.
 						// -- mohan add 2021-02-09
 						//---------------------------------------------------------
-						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update LOWF.WFC_GAMMA");
-						//ofs<<LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
+						WARNING_QUIT("Exx_Abfs::DM::cal_DMk_raw","need to update GlobalC::LOWF.WFC_GAMMA");
+						//ofs<<GlobalC::LOWF.WFC_GAMMA[ik][ib][iwt]<<"\t";
 					}
 					ofs<<endl;
 				}
@@ -1078,11 +1078,11 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				ofstream ofs("GlobalC::LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
-						ofs<<LOWF.WFC_K[ik][ib][iwt]<<"\t";
+						ofs<<GlobalC::LOWF.WFC_K[ik][ib][iwt]<<"\t";
 					ofs<<endl;
 				}
 				ofs.close();
@@ -1097,7 +1097,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<exx_lcao.Hexx_para.HK_Gamma_m2D[is]<<endl;
+				ofs<<this->Hexx_para.HK_Gamma_m2D[is]<<endl;
 			}
 		}
 		else
@@ -1105,7 +1105,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<exx_lcao.Hexx_para.HK_K_m2D[ik]<<endl;
+				ofs<<this->Hexx_para.HK_K_m2D[ik]<<endl;
 			}
 		}
 	};
@@ -1117,7 +1117,7 @@ ofs_mpi.close();
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
 				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<LOC.wfc_dm_2d.wfc_gamma[is]<<endl;
+				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]<<endl;
 			}
 		}
 		else
@@ -1125,7 +1125,7 @@ ofs_mpi.close();
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
 				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
-				ofs<<LOC.wfc_dm_2d.wfc_gamma[ik]<<endl;
+				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]<<endl;
 			}
 		}
 	};
@@ -1259,7 +1259,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const matrix & H = Hexx_para.HK_Gamma_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			LM.Hloc[i] += alpha * H.c[i];
+			GlobalC::LM.Hloc[i] += alpha * H.c[i];
 		}
 	}
 	else
@@ -1267,7 +1267,7 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 		const ComplexMatrix & H = Hexx_para.HK_K_m2D[ik];
 		for( size_t i=0; i<H.nr*H.nc; ++i )
 		{
-			LM.Hloc2[i] += alpha * H.c[i];
+			GlobalC::LM.Hloc2[i] += alpha * H.c[i];
 		}
 	}
 }
@@ -1388,7 +1388,7 @@ gettimeofday( &t_start, NULL);
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 		const Vector3<double> &tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
 		const Vector3<double> &tau2 = GlobalC::ucell.atoms[it2].tau[ia2];
-		const double Rcut = std::min( ORB.Phi[it1].getRcut()*info.ccp_rmesh_times+ORB.Phi[it2].getRcut(), ORB.Phi[it1].getRcut()+ORB.Phi[it2].getRcut()*info.ccp_rmesh_times );
+		const double Rcut = std::min( GlobalC::ORB.Phi[it1].getRcut()*info.ccp_rmesh_times+GlobalC::ORB.Phi[it2].getRcut(), GlobalC::ORB.Phi[it1].getRcut()+GlobalC::ORB.Phi[it2].getRcut()*info.ccp_rmesh_times );
 
 		for( const Vector3<int> &box2 : Coulomb_potential_boxes )
 		{

@@ -78,6 +78,9 @@ private:
 	  	
 };
 
+namespace GlobalC
+{
 extern Chi0_standard chi0_standard;
+}
 
 #endif

@@ -148,7 +148,6 @@ ELEC_nscf.o\
 LOOP_cell.o\
 LOOP_elec.o\
 LOOP_ions.o\
-run_md.o\
 run_md_lcao.o\
 DM_gamma.o\
 DM_k.o\
@@ -251,6 +250,7 @@ write_HS.o\
 write_HS_R.o\
 write_dm.o\
 potential_libxc.o \
+potential_libxc_meta.o \
 efield.o \
 magnetism.o\
 optical.o\

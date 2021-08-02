@@ -852,7 +852,8 @@ This part of variables are relevant when using hybrid functionals
 
 - exx_hybrid_type<a id="exx-hybrid-type"></a>
     - *Type*: String
-    - *Description*: Type of hybrid functional used. Options are "hf" (pure Hartree-Fock), "pbe0"(PBE0), "hse" (Note: HSE functional is not inplemented yet).
+    - *Description*: Type of hybrid functional used. Options are "hf" (pure Hartree-Fock), "pbe0"(PBE0), "hse" (Note: in order to use HSE functional, LIBXC is required).
+
     
         If set to "no", then no hybrid functional is used (i.e.,Fock exchange is not included.)
 

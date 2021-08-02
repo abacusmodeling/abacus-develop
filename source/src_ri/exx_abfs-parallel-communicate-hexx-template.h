@@ -14,9 +14,9 @@ T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const map<size_t,map<size_t
 	
 	T H_m2D;
 	if(GlobalV::KS_SOLVER=="genelpa")
-		H_m2D.create( ParaO.ncol, ParaO.nrow );
+		H_m2D.create( GlobalC::ParaO.ncol, GlobalC::ParaO.nrow );
 	else
-		H_m2D.create( ParaO.nrow, ParaO.ncol );
+		H_m2D.create( GlobalC::ParaO.nrow, GlobalC::ParaO.ncol );
 	
 	for( const auto H_a2DA : H_a2D )
 	{
@@ -29,13 +29,13 @@ T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const map<size_t,map<size_t
 			for( int iw1=0; iw1!=H.nr; ++iw1 )
 			{
 				const int iwt1 = GlobalC::ucell.itiaiw2iwt( GlobalC::ucell.iat2it[iat1], GlobalC::ucell.iat2ia[iat1], iw1 );
-				const int iwt1_m2D = ParaO.trace_loc_row[iwt1];
+				const int iwt1_m2D = GlobalC::ParaO.trace_loc_row[iwt1];
 				if( iwt1_m2D == -1 )	continue;
 				
 				for( int iw2=0; iw2!=H.nc; ++iw2 )
 				{
 					const int iwt2 = GlobalC::ucell.itiaiw2iwt( GlobalC::ucell.iat2it[iat2], GlobalC::ucell.iat2ia[iat2], iw2 );
-					const int iwt2_m2D = ParaO.trace_loc_col[iwt2];
+					const int iwt2_m2D = GlobalC::ParaO.trace_loc_col[iwt2];
 					if( iwt2_m2D == -1 )	continue;
 					
 					if(GlobalV::KS_SOLVER=="genelpa")
@@ -73,9 +73,9 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 
 	Tmatrix HK_m2D;
 	if(GlobalV::KS_SOLVER=="genelpa")
-		HK_m2D.create( ParaO.ncol, ParaO.nrow );
+		HK_m2D.create( GlobalC::ParaO.ncol, GlobalC::ParaO.nrow );
 	else
-		HK_m2D.create( ParaO.nrow, ParaO.ncol );
+		HK_m2D.create( GlobalC::ParaO.nrow, GlobalC::ParaO.ncol );
 
 	const int is_begin = (GlobalV::NSPIN==4) ? 0 : GlobalC::kv.isk[ik];
 	const int is_end = (GlobalV::NSPIN==4) ? 4 : GlobalC::kv.isk[ik]+1;
@@ -108,7 +108,7 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 						? (iw1*2+is/2)
 						: iw1;
 					const int iwt1 = GlobalC::ucell.itiaiw2iwt(it1,ia1,iw1_tmp);
-					const int iwt1_m2D = ParaO.trace_loc_row[iwt1];
+					const int iwt1_m2D = GlobalC::ParaO.trace_loc_row[iwt1];
 					if(iwt1_m2D<0) continue;
 					for(int iw2=0; iw2!=HK_a2D.nc; ++iw2)
 					{
@@ -116,7 +116,7 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 							? (iw2*2+is%2)
 							: iw2;
 						const int iwt2 = GlobalC::ucell.itiaiw2iwt(it2,ia2,iw2_tmp);
-						const int iwt2_m2D = ParaO.trace_loc_col[iwt2];
+						const int iwt2_m2D = GlobalC::ParaO.trace_loc_col[iwt2];
 						if(iwt2_m2D<0) continue;
 
 						if(GlobalV::KS_SOLVER=="genelpa" || GlobalV::KS_SOLVER=="scalapack_gvx")

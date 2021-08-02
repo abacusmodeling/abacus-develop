@@ -354,3 +354,66 @@ void Parallel_Kpoints::pool_collection(double *valuea, double *valueb, const rea
 #endif
     return;
 }
+
+
+void Parallel_Kpoints::pool_collection(std::complex<double> *value, const ComplexArray &w, const int &ik)
+{
+    const int dim2 = w.getBound2();
+    const int dim3 = w.getBound3();
+    const int dim4 = w.getBound4();
+    const int dim = dim2 * dim3 * dim4;
+#ifdef __MPI
+    const int ik_now = ik - this->startk_pool[GlobalV::MY_POOL];
+    const int begin = ik_now * dim2 * dim3 * dim4;
+    std::complex<double>* p = &w.ptr[begin];
+
+    const int pool = this->whichpool[ik];
+
+	GlobalV::ofs_running << "\n ik=" << ik;
+
+    if (GlobalV::RANK_IN_POOL==0)
+    {
+        if (GlobalV::MY_POOL==0)
+        {
+            if (pool==0)
+            {
+                for (int i=0; i<dim ; i++)
+                {
+                    value[i] = *p;
+                    ++p;
+                }
+            }
+            else
+            {
+				GlobalV::ofs_running << " receive data.";
+                MPI_Status ierror;
+                MPI_Recv(value, dim, MPI_DOUBLE, this->startpro_pool[pool], ik*2+0, MPI_COMM_WORLD,&ierror);
+            }
+        }
+        else
+        {
+            if (GlobalV::MY_POOL == pool)
+            {
+				GlobalV::ofs_running << " send data.";
+                MPI_Send(p, dim, MPI_DOUBLE, 0, ik*2+0, MPI_COMM_WORLD);
+            }
+        }
+    }
+	else
+	{
+		GlobalV::ofs_running << "\n do nothing.";
+	}
+    MPI_Barrier(MPI_COMM_WORLD);
+
+#else
+    // data transfer ends.
+    const int begin = ik * dim2 * dim3 * dim4;
+    double* p = &w.ptr[begin];
+    for (int i=0; i<dim; i++)
+    {
+        value[i] = *p;
+        ++p;
+    }
+    // data transfer ends.
+#endif
+}

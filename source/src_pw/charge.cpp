@@ -43,6 +43,10 @@ Charge::~Charge()
 			delete[] rhog[i];
 			delete[] rho_save[i];
 			delete[] rhog_save[i];
+			if(GlobalV::DFT_META)
+			{
+				delete[] kin_r[i];
+			}
 		}
 		delete[] rho;
 		delete[] rhog;
@@ -50,6 +54,10 @@ Charge::~Charge()
 		delete[] rhog_save;
     	delete[] rho_core;
 		delete[] rhog_core;
+		if(GlobalV::DFT_META)
+		{
+			delete[] kin_r;
+		}
 	}
 }
 
@@ -76,6 +84,10 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 	rhog = new complex<double>*[nspin];
 	rho_save = new double*[nspin];
 	rhog_save = new complex<double>*[nspin];
+	if(GlobalV::DFT_META)
+	{
+		kin_r = new double*[nspin];
+	}
 
 	for(int is=0; is<nspin; is++)
 	{
@@ -87,12 +99,18 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 		ZEROS(rhog[is], ngmc);
 		ZEROS(rho_save[is], nrxx);
 		ZEROS(rhog_save[is], ngmc);
+		if(GlobalV::DFT_META)
+		{
+			kin_r[is] = new double[nrxx];
+			ZEROS(kin_r[is], nrxx);
+		}
 	}
 
     Memory::record("Charge","rho",nspin*nrxx,"double");
     Memory::record("Charge","rho_save",nspin*nrxx,"double");
     Memory::record("Charge","rhog",nspin*ngmc,"double");
     Memory::record("Charge","rhog_save",nspin*ngmc,"double");
+    Memory::record("Charge","kin_r",nspin*ngmc,"double");
 
     this->rho_core = new double[nrxx]; // core charge in real space
     ZEROS( rho_core, nrxx);
@@ -481,6 +499,21 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	for(int is=0; is<spin_number_need; ++is)
 		for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
 			rho_in[is][ir] = rho_in[is][ir] / ne_tot * nelec;
+
+	//wenfei 2021-7-29 : initial tau = 3/5 rho^2/3, Thomas-Fermi
+	if(GlobalV::DFT_META)
+	{
+		const double pi = 3.141592653589790;
+		double fact = (3.0/5.0)*pow(3.0*pi*pi,2.0/3.0);
+		int nspin = spin_number_need;
+		//ofstream test_tau0("tau0");
+		for(int is=0; is<spin_number_need; ++is)
+			for(int ir=0; ir<GlobalC::pw.nrxx; ++ir)
+			{
+				kin_r[is][ir] = fact * pow(abs(rho_in[is][ir])*nspin,5.0/3.0)/nspin;
+				//test_tau0 << rho_in[is][ir] << " " << kin_r[is][ir] << endl;
+			}
+	}
 
 	// if TWO_EFEMI, 
 	// the total magnetism will affect the calculation of

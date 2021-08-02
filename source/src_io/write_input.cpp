@@ -34,6 +34,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nbands_istate",nbands_istate,"number of bands around Fermi level for istate calulation");
 	OUTP(ofs,"nche_sto",nche_sto,"number of orders for Chebyshev expansion in stochastic DFT");
 	OUTP(ofs,"symmetry",symmetry,"turn symmetry on or off");	
+	OUTP(ofs,"set_vel",set_vel,"read velocity from STRU or not");
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
 	OUTP(ofs,"tot_magnetization",tot_magnetization,"total magnetization of the system");
 
@@ -151,7 +152,7 @@ void Input::Print(const string &fn)const
 
 	ofs << "\n#Parameters (10.Molecular dynamics)" << endl;
 	OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
-	OUTP(ofs,"md_potential",mdp.md_potential,"choose potential for md");
+	//OUTP(ofs,"md_potential",mdp.md_potential,"choose potential for md");
 	OUTP(ofs,"md_dt",mdp.dt,"time step");
 	OUTP(ofs,"mnhc",mdp.MNHC,"number of Nose-Hoover chains");
 	OUTP(ofs,"md_qmass",mdp.Qmass,"mass of thermostat");

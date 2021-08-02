@@ -39,6 +39,7 @@ void Input_Conv::Convert(void)
 	GlobalC::ucell.latName = INPUT.latname; 
 	GlobalC::ucell.ntype = INPUT.ntype;
 	GlobalC::ucell.lmaxmax = INPUT.lmaxmax;
+	GlobalC::ucell.set_vel = INPUT.set_vel;
 
     GlobalV::NBANDS = INPUT.nbands;
     GlobalV::NBANDS_ISTATE = INPUT.nbands_istate;
@@ -206,95 +207,95 @@ void Input_Conv::Convert(void)
 	{
 		if(INPUT.spectral_type == "eels")
 		{
-			chi0_hilbert.epsilon = true;
+			GlobalC::chi0_hilbert.epsilon = true;
 		}
 		else if(INPUT.spectral_type == "None")
 		{
-			chi0_hilbert.epsilon = false;
+			GlobalC::chi0_hilbert.epsilon = false;
 		}
-		//chi0_hilbert.epsilon = INPUT.epsilon;
-		chi0_hilbert.kernel_type = INPUT.kernel_type;
-		chi0_hilbert.system = INPUT.system_type;
-		chi0_hilbert.eta = INPUT.eta;
-		chi0_hilbert.domega = INPUT.domega;
-		chi0_hilbert.nomega = INPUT.nomega;
-		chi0_hilbert.dim = INPUT.ecut_chi; 
-		//chi0_hilbert.oband = INPUT.oband;
+		//GlobalC::chi0_hilbert.epsilon = INPUT.epsilon;
+		GlobalC::chi0_hilbert.kernel_type = INPUT.kernel_type;
+		GlobalC::chi0_hilbert.system = INPUT.system_type;
+		GlobalC::chi0_hilbert.eta = INPUT.eta;
+		GlobalC::chi0_hilbert.domega = INPUT.domega;
+		GlobalC::chi0_hilbert.nomega = INPUT.nomega;
+		GlobalC::chi0_hilbert.dim = INPUT.ecut_chi; 
+		//GlobalC::chi0_hilbert.oband = INPUT.oband;
 
-		chi0_hilbert.q_start[0] = INPUT.q_start[0];  
-		chi0_hilbert.q_start[1] = INPUT.q_start[1]; 
-		chi0_hilbert.q_start[2] = INPUT.q_start[2];
+		GlobalC::chi0_hilbert.q_start[0] = INPUT.q_start[0];  
+		GlobalC::chi0_hilbert.q_start[1] = INPUT.q_start[1]; 
+		GlobalC::chi0_hilbert.q_start[2] = INPUT.q_start[2];
 
-		chi0_hilbert.direct[0] = INPUT.q_direct[0]; 
-		chi0_hilbert.direct[1] = INPUT.q_direct[1]; 
-		chi0_hilbert.direct[2] = INPUT.q_direct[2];
+		GlobalC::chi0_hilbert.direct[0] = INPUT.q_direct[0]; 
+		GlobalC::chi0_hilbert.direct[1] = INPUT.q_direct[1]; 
+		GlobalC::chi0_hilbert.direct[2] = INPUT.q_direct[2];
 
-		//chi0_hilbert.start_q = INPUT.start_q;
-		//chi0_hilbert.interval_q = INPUT.interval_q;
-		chi0_hilbert.nq = INPUT.nq;
-		chi0_hilbert.out_epsilon = INPUT.out_epsilon;
-		chi0_hilbert.out_chi = INPUT.out_chi;
-		chi0_hilbert.out_chi0 = INPUT.out_chi0;
-		chi0_hilbert.fermi_level = INPUT.fermi_level;
-		chi0_hilbert.coulomb_cutoff = INPUT.coulomb_cutoff;
-		chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
+		//GlobalC::chi0_hilbert.start_q = INPUT.start_q;
+		//GlobalC::chi0_hilbert.interval_q = INPUT.interval_q;
+		GlobalC::chi0_hilbert.nq = INPUT.nq;
+		GlobalC::chi0_hilbert.out_epsilon = INPUT.out_epsilon;
+		GlobalC::chi0_hilbert.out_chi = INPUT.out_chi;
+		GlobalC::chi0_hilbert.out_chi0 = INPUT.out_chi0;
+		GlobalC::chi0_hilbert.fermi_level = INPUT.fermi_level;
+		GlobalC::chi0_hilbert.coulomb_cutoff = INPUT.coulomb_cutoff;
+		GlobalC::chi0_hilbert.kmesh_interpolation = INPUT.kmesh_interpolation;
 		for(int i=0; i<100; i++)
 		{
-			chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; 
-			chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; 
-			chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
+			GlobalC::chi0_hilbert.qcar[i][0] = INPUT.qcar[i][0]; 
+			GlobalC::chi0_hilbert.qcar[i][1] = INPUT.qcar[i][1]; 
+			GlobalC::chi0_hilbert.qcar[i][2] = INPUT.qcar[i][2]; 
 		}
-		chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; 
-		chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
-		chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
+		GlobalC::chi0_hilbert.lcao_box[0] = INPUT.lcao_box[0]; 
+		GlobalC::chi0_hilbert.lcao_box[1] = INPUT.lcao_box[1]; 
+		GlobalC::chi0_hilbert.lcao_box[2] = INPUT.lcao_box[2];
 	}
 #endif
 	
 	//if( INPUT.epsilon && (INPUT.epsilon_choice == 1))
 	if( INPUT.spectral_type == "eels" && INPUT.eels_method == 1)
 	{
-		//chi0_standard.epsilon = INPUT.epsilon;
-		chi0_standard.epsilon = true;
-		chi0_standard.system = INPUT.system_type;
-		chi0_standard.eta = INPUT.eta;
-		chi0_standard.domega = INPUT.domega;
-		chi0_standard.nomega = INPUT.nomega;
-		chi0_standard.dim = INPUT.ecut_chi;
-		//chi0_standard.oband = INPUT.oband;
-		chi0_standard.q_start[0] = INPUT.q_start[0]; 
-	 	chi0_standard.q_start[1] = INPUT.q_start[1]; 
-		chi0_standard.q_start[2] = INPUT.q_start[2];
-		chi0_standard.direct[0] = INPUT.q_direct[0];  
-		chi0_standard.direct[1] = INPUT.q_direct[1]; 
-		chi0_standard.direct[2] = INPUT.q_direct[2];
-		//chi0_standard.start_q = INPUT.start_q;
-		//chi0_standard.interval_q = INPUT.interval_q;
-		chi0_standard.nq = INPUT.nq;
-		chi0_standard.out_epsilon = INPUT.out_epsilon;		
+		//GlobalC::chi0_standard.epsilon = INPUT.epsilon;
+		GlobalC::chi0_standard.epsilon = true;
+		GlobalC::chi0_standard.system = INPUT.system_type;
+		GlobalC::chi0_standard.eta = INPUT.eta;
+		GlobalC::chi0_standard.domega = INPUT.domega;
+		GlobalC::chi0_standard.nomega = INPUT.nomega;
+		GlobalC::chi0_standard.dim = INPUT.ecut_chi;
+		//GlobalC::chi0_standard.oband = INPUT.oband;
+		GlobalC::chi0_standard.q_start[0] = INPUT.q_start[0]; 
+	 	GlobalC::chi0_standard.q_start[1] = INPUT.q_start[1]; 
+		GlobalC::chi0_standard.q_start[2] = INPUT.q_start[2];
+		GlobalC::chi0_standard.direct[0] = INPUT.q_direct[0];  
+		GlobalC::chi0_standard.direct[1] = INPUT.q_direct[1]; 
+		GlobalC::chi0_standard.direct[2] = INPUT.q_direct[2];
+		//GlobalC::chi0_standard.start_q = INPUT.start_q;
+		//GlobalC::chi0_standard.interval_q = INPUT.interval_q;
+		GlobalC::chi0_standard.nq = INPUT.nq;
+		GlobalC::chi0_standard.out_epsilon = INPUT.out_epsilon;		
 	}
 	
 	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 1) )
 	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 1)
 	{
-		//epsilon0_pwscf.epsilon = INPUT.epsilon0;
-		epsilon0_pwscf.epsilon = true;
-		epsilon0_pwscf.intersmear = INPUT.eta;
-		epsilon0_pwscf.intrasmear = INPUT.intrasmear;
-		epsilon0_pwscf.domega = INPUT.domega;
-		epsilon0_pwscf.nomega = INPUT.nomega;
-		epsilon0_pwscf.shift = INPUT.shift;
-		epsilon0_pwscf.metalcalc = INPUT.metalcalc;
-		epsilon0_pwscf.degauss = INPUT.eps_degauss;
+		//GlobalC::epsilon0_pwscf.epsilon = INPUT.epsilon0;
+		GlobalC::epsilon0_pwscf.epsilon = true;
+		GlobalC::epsilon0_pwscf.intersmear = INPUT.eta;
+		GlobalC::epsilon0_pwscf.intrasmear = INPUT.intrasmear;
+		GlobalC::epsilon0_pwscf.domega = INPUT.domega;
+		GlobalC::epsilon0_pwscf.nomega = INPUT.nomega;
+		GlobalC::epsilon0_pwscf.shift = INPUT.shift;
+		GlobalC::epsilon0_pwscf.metalcalc = INPUT.metalcalc;
+		GlobalC::epsilon0_pwscf.degauss = INPUT.eps_degauss;
 	}
 	
 	//if( INPUT.epsilon0 && (INPUT.epsilon0_choice == 0))
 	if( INPUT.spectral_type == "absorption" && INPUT.absorption_method == 0)
 	{
-		//epsilon0_vasp.epsilon = INPUT.epsilon0;
-		epsilon0_vasp.epsilon = true;
-		epsilon0_vasp.domega = INPUT.domega;
-		epsilon0_vasp.nomega = INPUT.nomega;
-		epsilon0_vasp.eta = INPUT.eta;
+		//GlobalC::epsilon0_vasp.epsilon = INPUT.epsilon0;
+		GlobalC::epsilon0_vasp.epsilon = true;
+		GlobalC::epsilon0_vasp.domega = INPUT.domega;
+		GlobalC::epsilon0_vasp.nomega = INPUT.nomega;
+		GlobalC::epsilon0_vasp.eta = INPUT.eta;
 	}
 
 //--------------------------------------------
@@ -498,29 +499,29 @@ void Input_Conv::Convert(void)
 		GlobalC::exx_global.info.separate_loop   = INPUT.exx_separate_loop     ;
 		GlobalC::exx_global.info.hybrid_step     = INPUT.exx_hybrid_step       ;
 		GlobalC::exx_lip.info.lambda             = INPUT.exx_lambda            ;
-		exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
-		exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
-		exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
-		exx_lcao.info.dm_threshold      = INPUT.exx_dm_threshold      ;
-		exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold ;
-		exx_lcao.info.cauchy_threshold  = INPUT.exx_cauchy_threshold  ;
-		exx_lcao.info.ccp_threshold     = INPUT.exx_ccp_threshold     ;
-		exx_lcao.info.ccp_rmesh_times   = INPUT.exx_ccp_rmesh_times   ;
+		GlobalC::exx_lcao.info.pca_threshold     = INPUT.exx_pca_threshold     ;
+		GlobalC::exx_lcao.info.c_threshold       = INPUT.exx_c_threshold       ;
+		GlobalC::exx_lcao.info.v_threshold       = INPUT.exx_v_threshold       ;
+		GlobalC::exx_lcao.info.dm_threshold      = INPUT.exx_dm_threshold      ;
+		GlobalC::exx_lcao.info.schwarz_threshold = INPUT.exx_schwarz_threshold ;
+		GlobalC::exx_lcao.info.cauchy_threshold  = INPUT.exx_cauchy_threshold  ;
+		GlobalC::exx_lcao.info.ccp_threshold     = INPUT.exx_ccp_threshold     ;
+		GlobalC::exx_lcao.info.ccp_rmesh_times   = INPUT.exx_ccp_rmesh_times   ;
 		if(INPUT.exx_distribute_type=="htime")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Htime;
 		}
 		else if(INPUT.exx_distribute_type=="kmeans2")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans2;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans2;
 		}
 		else if(INPUT.exx_distribute_type=="kmeans1")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans1;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Kmeans1;
 		}
 		else if(INPUT.exx_distribute_type=="order")
 		{
-			exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
+			GlobalC::exx_lcao.info.distribute_type = Exx_Lcao::Distribute_Type::Order;
 		}
 		Exx_Abfs::Jle::Lmax      = INPUT.exx_opt_orb_lmax;
 		Exx_Abfs::Jle::Ecut_exx  = INPUT.exx_opt_orb_ecut;
@@ -566,10 +567,10 @@ void Input_Conv::Convert(void)
 	GlobalC::en.out_dos = INPUT.out_dos;
     GlobalC::en.out_band = INPUT.out_band;
 #ifdef __LCAO
-	LOC.out_dm = INPUT.out_dm;
-	ParaO.out_hs = INPUT.out_hs;
-	ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
-	ParaO.out_lowf = INPUT.out_lowf;
+	GlobalC::LOC.out_dm = INPUT.out_dm;
+	GlobalC::ParaO.out_hs = INPUT.out_hs;
+	GlobalC::ParaO.out_hsR = INPUT.out_hs2; //LiuXh add 2019-07-16
+	GlobalC::ParaO.out_lowf = INPUT.out_lowf;
 #endif
 
 	GlobalC::en.dos_emin_ev = INPUT.dos_emin_ev;
@@ -589,6 +590,16 @@ void Input_Conv::Convert(void)
 
 	// mohan add 2021-02-16
 	berryphase::berry_phase_flag = INPUT.berry_phase;
+
+	// wenfei 2021-7-28
+	if(GlobalV::DFT_FUNCTIONAL == "scan")
+	{
+		if(GlobalV::BASIS_TYPE != "pw")
+		{
+			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+		}
+		GlobalV::DFT_META = 1;
+	}
 
 	timer::tick("Input_Conv","Convert");
     return;

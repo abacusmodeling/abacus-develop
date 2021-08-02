@@ -765,10 +765,10 @@ void ORB_table_phi::init_Lmax (
 	auto cal_Lmax_Phi = [](int &Lmax)
 	{
 		//obtain maxL of all type
-		const int ntype = ORB.get_ntype();
+		const int ntype = GlobalC::ORB.get_ntype();
 		for (int it = 0; it < ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Phi[it].getLmax());
+			Lmax = std::max(Lmax, GlobalC::ORB.Phi[it].getLmax());
 		}
 	};
 
@@ -777,10 +777,10 @@ void ORB_table_phi::init_Lmax (
 		// fix bug.
 		// mohan add the nonlocal part.
 		// 2011-03-07
-		const int ntype = ORB.get_ntype();
+		const int ntype = GlobalC::ORB.get_ntype();
 		for(int it=0; it< ntype; it++)
 		{
-			Lmax = std::max(Lmax, ORB.Beta[it].getLmax());
+			Lmax = std::max(Lmax, GlobalC::ORB.Beta[it].getLmax());
 		}
 	};
 

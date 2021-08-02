@@ -709,7 +709,7 @@ MPI_Barrier(comm);
 	// to give reports to it.
 	//	cout << " block distri_lowf_aug" << endl;
 	// mohan update 2021-02-12, delte BFIELD option
-	WF_Local::distri_lowf_aug( ctot, LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]); 
+	WF_Local::distri_lowf_aug( ctot, GlobalC::LOWF.WFC_GAMMA_aug[GlobalV::CURRENT_SPIN]); 
 
 	// clean staff.
 	if(myid==0)
@@ -893,7 +893,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
 	// 
 	// for complex
 	// mohan update 2021-02-12, delete BFIELD option
-	WF_Local::distri_lowf_aug_complex( ctot, LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
+	WF_Local::distri_lowf_aug_complex( ctot, GlobalC::LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
 	
 	
 	// clean staff.

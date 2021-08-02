@@ -136,7 +136,7 @@ void Local_Orbital_wfc::allocate_k(const Grid_Technique &gt)
 		GlobalV::ofs_running << " Error=" << error << endl;
 		if(error==1)
 		{
-			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: LOWF.dat");
+			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
 		}
 		else if(error==2)
 		{
@@ -164,8 +164,8 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 {
 	TITLE("Local_Orbital_wfc","set_trace_aug");
 	timer::tick("Local_Orbital_wfc","set_trace_aug");
-	// this function must be called after ParaO.trace_loc_row
-	// , ParaO.trace_loc_col and GridT.trace_lo have been called.
+	// this function must be called after GlobalC::ParaO.trace_loc_row
+	// , GlobalC::ParaO.trace_loc_col and GlobalC::GridT.trace_lo have been called.
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
@@ -185,8 +185,8 @@ void Local_Orbital_wfc::set_trace_aug(const Grid_Technique &gt)
 	//------------------------------
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		const int mu = ParaO.trace_loc_row[i];
-		const int nu = ParaO.trace_loc_col[i];
+		const int mu = GlobalC::ParaO.trace_loc_row[i];
+		const int nu = GlobalC::ParaO.trace_loc_col[i];
 		if(mu>=0 || nu>=0)
 		{
 			occ2d[i] = true;

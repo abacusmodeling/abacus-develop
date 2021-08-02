@@ -30,6 +30,9 @@ class Potential
     matrix vr;
     matrix vr_eff;
     matrix vnew;
+	
+	matrix vofk; //kinetic energy density, for meta-GGA; wenfei 2021-07-28
+
     double *vr_eff1; 
     double *vltot;
 	int out_potential; // mohan add 2011-02-28

@@ -9,7 +9,7 @@ void Gint_Gamma::cal_env(const double* wfc, double* rho)
     TITLE("Gint_Gamma","cal_env");
     timer::tick("Gint_Gamma","cal_env");
 
-    this->save_atoms_on_grid(GridT);
+    this->save_atoms_on_grid(GlobalC::GridT);
     this->gamma_envelope(wfc, rho);
 
     timer::tick("Gint_Gamma","cal_env");
@@ -22,7 +22,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
     TITLE("Grid_Integral","gamma_charge");
 
     // it's a uniform grid to save orbital values, so the delta_r is a constant.
-    const double delta_r = ORB.dr_uniform;
+    const double delta_r = GlobalC::ORB.dr_uniform;
 	const Numerical_Orbital_Lm* pointer;
 
 	// allocate 1
@@ -71,10 +71,10 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 	ZEROS(vindex, GlobalC::pw.bxyz);
 	double phi=0.0;
 
-	const int nbx = GridT.nbx;
-	const int nby = GridT.nby;
-	const int nbz_start = GridT.nbzp_start;
-	const int nbz = GridT.nbzp;
+	const int nbx = GlobalC::GridT.nbx;
+	const int nby = GlobalC::GridT.nby;
+	const int nbz_start = GlobalC::GridT.nbzp_start;
+	const int nbz = GlobalC::GridT.nbzp;
 
     for (int i=0; i<nbx; i++)
     {
@@ -85,7 +85,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
                 this->grid_index = (k-nbz_start) + j * nbz + i * nby * nbz;
 
                 // get the value: how many atoms has orbital value on this grid.
-                const int size = GridT.how_many_atoms[ this->grid_index ];
+                const int size = GlobalC::GridT.how_many_atoms[ this->grid_index ];
 				if(size==0) continue;
 
 				// (1) initialized the phi * Ylm.
@@ -94,10 +94,10 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
                     // there are two parameters we want to know here:
                     // in which bigcell of the meshball the atom in?
                     // what's the cartesian coordinate of the bigcell?
-                    const int mcell_index = GridT.bcell_start[grid_index] + id;
-                    const int imcell = GridT.which_bigcell[mcell_index];
+                    const int mcell_index = GlobalC::GridT.bcell_start[grid_index] + id;
+                    const int imcell = GlobalC::GridT.which_bigcell[mcell_index];
 
-                    int iat = GridT.which_atom[mcell_index];
+                    int iat = GlobalC::GridT.which_atom[mcell_index];
 
                     const int it = GlobalC::ucell.iat2it[ iat ];
                     const int ia = GlobalC::ucell.iat2ia[ iat ];
@@ -108,22 +108,22 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
                     // the vector from the grid which is now being operated to the atom position.
                     // in meshball language, is the vector from imcell to the center cel, plus
                     // tau_in_bigcell.
-					mt[0] = GridT.meshball_positions[imcell][0] - GridT.tau_in_bigcell[iat][0];
-					mt[1] = GridT.meshball_positions[imcell][1] - GridT.tau_in_bigcell[iat][1];
-					mt[2] = GridT.meshball_positions[imcell][2] - GridT.tau_in_bigcell[iat][2];
+					mt[0] = GlobalC::GridT.meshball_positions[imcell][0] - GlobalC::GridT.tau_in_bigcell[iat][0];
+					mt[1] = GlobalC::GridT.meshball_positions[imcell][1] - GlobalC::GridT.tau_in_bigcell[iat][1];
+					mt[2] = GlobalC::GridT.meshball_positions[imcell][2] - GlobalC::GridT.tau_in_bigcell[iat][2];
 
 					for(int ib=0; ib<GlobalC::pw.bxyz; ib++)
 					{
 						// meshcell_pos: z is the fastest
-						dr[ib][id][0] = GridT.meshcell_pos[ib][0] + mt[0]; 
-						dr[ib][id][1] = GridT.meshcell_pos[ib][1] + mt[1]; 
-						dr[ib][id][2] = GridT.meshcell_pos[ib][2] + mt[2]; 	
+						dr[ib][id][0] = GlobalC::GridT.meshcell_pos[ib][0] + mt[0]; 
+						dr[ib][id][1] = GlobalC::GridT.meshcell_pos[ib][1] + mt[1]; 
+						dr[ib][id][2] = GlobalC::GridT.meshcell_pos[ib][2] + mt[2]; 	
 
 						distance[ib][id] = std::sqrt(dr[ib][id][0]*dr[ib][id][0] 
 						+ dr[ib][id][1]*dr[ib][id][1] 
 						+ dr[ib][id][2]*dr[ib][id][2]);
 
-						if(distance[ib][id] <= ORB.Phi[it].getRcut()) 
+						if(distance[ib][id] <= GlobalC::ORB.Phi[it].getRcut()) 
 						{
 							cal_flag[ib][id]=true;
 						}
@@ -134,7 +134,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 						}
 						
 						std::vector<double> ylma;
-						//if(distance[id] > GridT.orbital_rmax) continue;
+						//if(distance[id] > GlobalC::GridT.orbital_rmax) continue;
 						//	Ylm::get_ylm_real(this->nnn[it], this->dr[id], ylma);
 						if (distance[ib][id] < 1.0E-9) distance[ib][id] += 1.0E-9;
 						
@@ -182,7 +182,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 						{
 							if ( atom1->iw2_new[iw] )
 							{
-								pointer = &ORB.Phi[it].PhiLN(
+								pointer = &GlobalC::ORB.Phi[it].PhiLN(
 										atom1->iw2l[iw],
 										atom1->iw2n[iw]);
 								phi = c1*pointer->psi_uniform[ip]+c2*pointer->dpsi_uniform[ip]
@@ -214,8 +214,8 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 
                 for (int ia1=0; ia1<size; ia1++)
                 {
-                    const int mcell_index1 = GridT.bcell_start[grid_index] + ia1;
-					const int iat = GridT.which_atom[mcell_index1];
+                    const int mcell_index1 = GlobalC::GridT.bcell_start[grid_index] + ia1;
+					const int iat = GlobalC::GridT.which_atom[mcell_index1];
 					const int T1 = GlobalC::ucell.iat2it[iat];
 					Atom *atom1 = &GlobalC::ucell.atoms[T1];
 					const int I1 = GlobalC::ucell.iat2ia[iat];
@@ -225,7 +225,7 @@ void Gint_Gamma::gamma_envelope(const double* wfc, double* rho)
 					{
 						if(cal_flag[ib][ia1])
 						{
-							int iw1_lo = GridT.trace_lo[start1];
+							int iw1_lo = GlobalC::GridT.trace_lo[start1];
 							double* psi1 = psir_ylm[ib][ia1];
 							double tmp = 0.0;
 							for (int iw=0; iw< atom1->nw; ++iw, ++iw1_lo)

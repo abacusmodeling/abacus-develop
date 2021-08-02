@@ -55,10 +55,10 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 		assert(wg.nr==GlobalV::NSPIN);
 		for(int is=0; is!=GlobalV::NSPIN; ++is)
 		{
-			std::vector<double> wg_local(ParaO.ncol,0.0);
+			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
 			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
 			{
-				const int ib_local = ParaO.trace_loc_col[ib_global];
+				const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
 				if(ib_local>=0)
 				{
 					wg_local[ib_local] = wg(is,ib_global);
@@ -81,10 +81,10 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
 				&one_float,
-				wg_wfc.c, &one_int, &one_int, ParaO.desc,
-				wfc_gamma[is].c, &one_int, &one_int, ParaO.desc,
+				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
+				wfc_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				dm_gamma[is].c, &one_int, &one_int, ParaO.desc);
+				dm_gamma[is].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 	}
 	else
@@ -92,10 +92,10 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 		assert(wg.nr==GlobalC::kv.nks);
 		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
-			std::vector<double> wg_local(ParaO.ncol,0.0);
+			std::vector<double> wg_local(GlobalC::ParaO.ncol,0.0);
 			for(int ib_global=0; ib_global!=wg.nc; ++ib_global)
 			{
-				const int ib_local = ParaO.trace_loc_col[ib_global];
+				const int ib_local = GlobalC::ParaO.trace_loc_col[ib_global];
 				if(ib_local>=0)
 				{
 					wg_local[ib_local] = wg(ik,ib_global);
@@ -118,10 +118,10 @@ void Wfc_Dm_2d::cal_dm(const matrix &wg)
 				&N_char, &T_char,
 				&GlobalV::NLOCAL, &GlobalV::NLOCAL, &wg.nc,
 				&one_float,
-				wg_wfc.c, &one_int, &one_int, ParaO.desc,
-				wfc_k[ik].c, &one_int, &one_int, ParaO.desc,
+				wg_wfc.c, &one_int, &one_int, GlobalC::ParaO.desc,
+				wfc_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc,
 				&zero_float,
-				dm_k[ik].c, &one_int, &one_int, ParaO.desc);
+				dm_k[ik].c, &one_int, &one_int, GlobalC::ParaO.desc);
 		}
 	}
 	

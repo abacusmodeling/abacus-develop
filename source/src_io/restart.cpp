@@ -45,9 +45,9 @@ void Restart::save_disk(const std::string mode, const int i) const
 	if("H"==mode)
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
-			write_file2(folder+"Hgamma_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), LM.Hloc, ParaO.nloc*sizeof(double));
+			write_file2(folder+"Hgamma_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), GlobalC::LM.Hloc, GlobalC::ParaO.nloc*sizeof(double));
 		else
-			write_file2(folder+"Hk_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), LM.Hloc2, ParaO.nloc*sizeof(complex<double>));
+			write_file2(folder+"Hk_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), GlobalC::LM.Hloc2, GlobalC::ParaO.nloc*sizeof(complex<double>));
 	}
 #endif 
 }
@@ -60,9 +60,9 @@ void Restart::load_disk(const std::string mode, const int i) const
 	if("H"==mode)
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
-			read_file2(folder+"Hgamma_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), LM.Hloc, ParaO.nloc*sizeof(double));
+			read_file2(folder+"Hgamma_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), GlobalC::LM.Hloc, GlobalC::ParaO.nloc*sizeof(double));
 		else
-			read_file2(folder+"Hk_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), LM.Hloc2, ParaO.nloc*sizeof(complex<double>));
+			read_file2(folder+"Hk_"+TO_STRING(GlobalV::MY_RANK)+"_"+TO_STRING(i), GlobalC::LM.Hloc2, GlobalC::ParaO.nloc*sizeof(complex<double>));
 	}
 #endif
 }

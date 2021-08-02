@@ -2,15 +2,15 @@
 #include "../src_pw/global.h"
 #include "../src_parallel/parallel_orbitals.h"
 #include "../src_pdiag/pdiag_double.h"
-#include "../src_lcao/LCAO_nnr.h"
-#include "../src_lcao/FORCE_STRESS.h"
+#include "LCAO_nnr.h"
+#include "FORCE_STRESS.h"
 #include "../module_base/global_function.h"
 #include "../src_io/write_HS.h"
 #include "../src_io/cal_r_overlap_R.h"
 #include "../src_ions/variable_cell.h" // mohan add 2021-02-01
 #include "../src_ri/exx_abfs.h"
 #include "../src_ri/exx_opt_orb.h"
-#include "../src_lcao/ELEC_scf.h"
+#include "ELEC_scf.h"
 #include "../module_neighbor/sltk_atom_arrange.h"
 #include "../src_pw/vdwd2.h"
 #include "../src_pw/vdwd2_parameters.h"
@@ -219,7 +219,7 @@ void Run_MD_LCAO::opt_ions(void)
 	}
 
 	// mohan update 2021-02-10
-    LOWF.orb_con.clear_after_ions(UOT, ORB, INPUT.out_descriptor);
+    GlobalC::LOWF.orb_con.clear_after_ions(GlobalC::UOT, GlobalC::ORB, INPUT.out_descriptor);
 
     timer::tick("Run_MD_LCAO","opt_ions"); 
     return;
@@ -236,19 +236,19 @@ void Run_MD_LCAO::final_scf(void)
     GlobalV::SEARCH_RADIUS = atom_arrange::set_sr_NL(
 		GlobalV::ofs_running, 
 		GlobalV::OUT_LEVEL, 
-		ORB.get_rcutmax_Phi(), 
-		ORB.get_rcutmax_Beta(), 
+		GlobalC::ORB.get_rcutmax_Phi(), 
+		GlobalC::ORB.get_rcutmax_Beta(), 
 		GlobalV::GAMMA_ONLY_LOCAL);
 
     atom_arrange::search(
 		GlobalV::SEARCH_PBC,
 		GlobalV::ofs_running,
-		GridD, 
+		GlobalC::GridD, 
 		GlobalC::ucell, 
 		GlobalV::SEARCH_RADIUS, 
 		GlobalV::test_atom_input);
 
-    GridT.set_pbc_grid(
+    GlobalC::GridT.set_pbc_grid(
         GlobalC::pw.ncx, GlobalC::pw.ncy, GlobalC::pw.ncz,
         GlobalC::pw.bx, GlobalC::pw.by, GlobalC::pw.bz,
         GlobalC::pw.nbx, GlobalC::pw.nby, GlobalC::pw.nbz,
@@ -259,34 +259,34 @@ void Run_MD_LCAO::final_scf(void)
     {
         // For each atom, calculate the adjacent atoms in different cells 
         // and allocate the space for H(R) and S(R).
-        LNNR.cal_nnr();
-        LM.allocate_HS_R(LNNR.nnr);
+        GlobalC::LNNR.cal_nnr();
+        GlobalC::LM.allocate_HS_R(GlobalC::LNNR.nnr);
         
 		// need to first calculae lgd.
-        // using GridT.init.
-        LNNR.cal_nnrg(GridT);
+        // using GlobalC::GridT.init.
+        GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
     }
 
     // (4) set the augmented orbitals index.
     // after ParaO and GridT, 
     // this information is used to calculate
     // the force.
-    LOWF.set_trace_aug(GridT);
+    GlobalC::LOWF.set_trace_aug(GlobalC::GridT);
 		
     // (5) init density kernel
     // (6) init wave functions.
     if(GlobalV::GAMMA_ONLY_LOCAL)
     {
         // here we reset the density matrix dimension.
-        LOC.allocate_gamma(GridT);
+        GlobalC::LOC.allocate_gamma(GlobalC::GridT);
     }
     else
     {
-        LOWF.allocate_k(GridT);
-        LOC.allocate_DM_k();
+        GlobalC::LOWF.allocate_k(GlobalC::GridT);
+        GlobalC::LOC.allocate_DM_k();
     }
 
-    UHM.set_lcao_matrices();
+    GlobalC::UHM.set_lcao_matrices();
 
     if(GlobalC::vdwd2_para.flag_vdwd2) //Peize Lin add 2014-04-04, update 2021-03-09
     {
