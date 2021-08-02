@@ -715,6 +715,10 @@ void Charge::sum_band(void)
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		ZEROS(rho[is], GlobalC::pw.nrxx);
+		if (GlobalV::DFT_META)
+		{
+			ZEROS(kin_r[is], GlobalC::pw.nrxx);	
+		}
 	}
 	
     sum_band_k();
@@ -815,6 +819,25 @@ void Charge::sum_band_k(void)
 				{
 					rho[GlobalV::CURRENT_SPIN][ir]+=w1* norm( porter[ir] );
 				}
+			}
+
+			//kinetic energy density
+			if (GlobalV::DFT_META)
+			{
+				for (int j=0; j<3; j++)
+				{
+					ZEROS( porter, GlobalC::pw.nrxx );
+					for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
+					{
+						double fact = GlobalC::pw.get_GPlusK_cartesian_projection(ik,ig,j) * GlobalC::ucell.tpiba;
+						porter[ GlobalC::pw.ig2fftw[GlobalC::wf.igk(ik, ig)] ] = GlobalC::wf.evc[ik](ibnd, ig) * complex<double>(0.0,fact);
+					}
+					GlobalC::pw.FFT_wfc.FFT3D(GlobalC::UFFT.porter, 1);
+					for (int ir=0; ir<GlobalC::pw.nrxx; ir++) 
+					{
+						kin_r[GlobalV::CURRENT_SPIN][ir]+=w1* norm( porter[ir] );
+					}
+				}	
 			}
 		}
 	} // END DO k_loop
@@ -929,6 +952,18 @@ void Charge::rho_mpi(void)
     double *rho_tot_aux = new double[GlobalC::pw.ncxyz];
 	ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
 
+	double *tau_tmp;
+	double *tau_tot;
+	double *tau_tot_aux;
+
+	if(GlobalV::DFT_META)
+	{
+    	double *tau_tmp = new double[GlobalC::pw.nrxx];
+	    double *tau_tot = new double[GlobalC::pw.ncxyz];
+    	double *tau_tot_aux = new double[GlobalC::pw.ncxyz];
+		ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
+	}
+
     for (int is=0; is< GlobalV::NSPIN; is++)
     {
         ZEROS(rho_tot, GlobalC::pw.ncxyz);
@@ -936,14 +971,27 @@ void Charge::rho_mpi(void)
 		for (ir=0;ir<GlobalC::pw.nrxx;ir++)
 		{
 			rho_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
+			if(GlobalV::DFT_META)
+			{
+				tau_tmp[ir] = this->rho[is][ir] / static_cast<double>(GlobalV::NPROC_IN_POOL);
+			}
 		}
 
         MPI_Allgatherv(rho_tmp, GlobalC::pw.nrxx, MPI_DOUBLE, rho_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
+		if(GlobalV::DFT_META)
+		{
+        	MPI_Allgatherv(tau_tmp, GlobalC::pw.nrxx, MPI_DOUBLE, tau_tot, rec, dis, MPI_DOUBLE, POOL_WORLD);
+		}
         //=================================================================
         // Change the order of rho_tot in each pool , make them consistent
         // this is the most complicated part !!
         //=================================================================
         ZEROS(rho_tot_aux, GlobalC::pw.ncxyz);
+		if(GlobalV::DFT_META)
+		{
+        	ZEROS(tau_tot_aux, GlobalC::pw.ncxyz);
+		}
+
         for (ip=0;ip<GlobalV::NPROC_IN_POOL;ip++)
         {
             for (ir=0;ir<ncxy;ir++)
@@ -982,6 +1030,11 @@ void Charge::rho_mpi(void)
 					// -------------------------------------------------
                     rho_tot_aux[GlobalC::pw.ncz*ir    + start_z[ip]      + iz]
                       = rho_tot[num_z[ip]*ir + start_z[ip]*ncxy + iz];
+					if(GlobalV::DFT_META)
+					{
+                    	tau_tot_aux[GlobalC::pw.ncz*ir    + start_z[ip]      + iz]
+                      	  = tau_tot[num_z[ip]*ir + start_z[ip]*ncxy + iz];
+					}	
                 }
             }
         }
@@ -991,9 +1044,17 @@ void Charge::rho_mpi(void)
 		if(GlobalV::CALCULATION=="scf-sto" || GlobalV::CALCULATION=="relax-sto" || GlobalV::CALCULATION=="md-sto") //qinarui add it temporarily.
 		{
 			MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+			if(GlobalV::DFT_META)
+			{
+				MPI_Allreduce(tau_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,POOL_WORLD);
+			}
 		}
 		else
         MPI_Allreduce(rho_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+		if(GlobalV::DFT_META)
+		{
+   	    	MPI_Allreduce(tau_tot_aux,rho_tot,GlobalC::pw.ncxyz,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+		}
         
 		//=====================================
         // Change the order of rho in each cpu
@@ -1003,13 +1064,23 @@ void Charge::rho_mpi(void)
             for (iz=0;iz<num_z[GlobalV::RANK_IN_POOL];iz++)
             {
                 this->rho[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = rho_tot[GlobalC::pw.ncz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
+				if(GlobalV::DFT_META)
+				{
+                	this->kin_r[is][num_z[GlobalV::RANK_IN_POOL]*ir+iz] = tau_tot[GlobalC::pw.ncz*ir + start_z[GlobalV::RANK_IN_POOL] + iz ];
+				}	
             }
         }
     }
     delete[] rho_tot_aux;
     delete[] rho_tot;
     delete[] rho_tmp;
-
+    
+	if(GlobalV::DFT_META)
+	{
+		delete[] tau_tot_aux;
+    	delete[] tau_tot;
+	    delete[] tau_tmp;
+	}
     delete[] rec;
     delete[] dis;
 
