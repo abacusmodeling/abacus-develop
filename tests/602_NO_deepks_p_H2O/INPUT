@@ -13,7 +13,7 @@ dr2                     1e-8
 niter                   50
 
 #Parameters (3.Basis)
-basis_type              pw
+basis_type              lcao 
 gamma_only              1
 
 #Parameters (4.Smearing)
@@ -24,7 +24,9 @@ sigma                   0.02
 mixing_type             pulay
 mixing_beta             0.4
 
-#Parameters (6.File)
-out_band                0
-out_descriptor          1 
-lmax_descriptor			2
+#Parameters (6.Deepks)
+out_descriptor          1
+lmax_descriptor			1
+newdm		1
+deepks_scf	1
+model_file	model.ptg

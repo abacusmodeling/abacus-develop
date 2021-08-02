@@ -71,5 +71,9 @@
 401_NP_KP_sp
 401_NP_KP_spd
 
-601_PW_deepks_H2O
-602_NO_deepks_H2O
+601_PW_deepks_s_H2O
+601_PW_deepks_p_H2O
+601_PW_deepks_d_H2O
+602_NO_deepks_s_H2O
+602_NO_deepks_p_H2O
+602_NO_deepks_d_H2O

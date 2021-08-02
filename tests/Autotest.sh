@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ABACUS executable path
-abacus=abacus
+abacus=/home/mohan/Liuyu/DeePKS/abacus-develop/bin/ABACUS.mpi
 # number of mpi processes
 np=1
 # threshold with unit: eV
@@ -9,7 +9,8 @@ threshold=0.0000001
 # check accuracy
 ca=8
 # regex of case name
-case="^[^#].*01_PW_.*$"
+case="602_NO_deepks_H2O"
+#case="^[^#].*01_PW_.*$"
 # enable AddressSanitizer
 sanitize=false
 
@@ -159,11 +160,16 @@ check_file(){
 		return 0
 	fi
 
-	for irow in `seq 1 $row_ref`; do
+	# Temporary treatment
+	#if [ $row_ref -gt 100 ]; then
+	#	row_ref=100
+	#fi
 
-		if [ $(( $irow % 100 )) == "0" ]; then
-			echo "$1  Compare No.$irow row ~"
-		fi
+	for irow in `seq 1 $row_ref`; do
+	
+		#if [ $(( $irow % 100 )) == "0" ]; then
+		#	echo "$1  Compare No.$irow row ~"
+		#fi
 
 		sum1=`awk -F " " 'NR=="'"$irow"'" {print NF}' $reffile`
 		sum2=`awk -F " " 'NR=="'"$irow"'" {print NF}' $outfile`
