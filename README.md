@@ -141,7 +141,6 @@ ABACUS provides a wide variety of functionalities, with explanation and examples
 - [Real-time time dependent density functional theory](doc/examples/tddft.md)
 - [Electrostatic potential](doc/examples/potential.md)
 - [Mulliken charge](doc/examples/mulliken.md)
-- [Hybrid functional](doc/examples/hybrid.md)
 
 [back to top](#readme-top)
 
