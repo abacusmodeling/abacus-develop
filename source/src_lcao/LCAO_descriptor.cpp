@@ -22,8 +22,10 @@ LCAO_Descriptor::LCAO_Descriptor()
     inl_l = new int[1];
     d = new double[1];
     H_V_delta = new double[1];
-    dm = new double[1];
+    dm_double = new double[1];
 }
+
+
 LCAO_Descriptor::~LCAO_Descriptor()
 {
     delete[] alpha_index;
@@ -31,7 +33,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
     delete[] inl_l;
     delete[] d;
     delete[] H_V_delta;
-    delete[] dm;
+    delete[] dm_double;
     //delete S_mu_alpha**
     for (int inl = 0;inl < this->inlmax;inl++)
     {
@@ -64,7 +66,11 @@ LCAO_Descriptor::~LCAO_Descriptor()
     delete[] gedm;
 }
 
-void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
+
+void LCAO_Descriptor::init(
+	const int lm, // max L for descriptor 
+	const int nm, // max n for descriptor
+	const int tot_inl) // 
 {
     TITLE("LCAO_Descriptor", "init");
     ofs_running << " Initialize the descriptor index for deepks (lcao line)" << endl;
@@ -78,7 +84,12 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
     this->inlmax = tot_inl;
     ofs_running << " lmax of descriptor = " << this->lmaxd << endl;
     ofs_running << " nmax of descriptor= " << nmaxd << endl;
-
+    
+    //initialize the density matrix (dm)
+    delete[] this->dm_double;
+    this->dm_double = new double[NLOCAL * NLOCAL];
+    ZEROS(this->dm_double, NLOCAL * NLOCAL);
+    
     //init S_mu_alpha**
     this->S_mu_alpha = new double* [this->inlmax];    //inl
     for (int inl = 0;inl < this->inlmax;inl++)
@@ -102,6 +113,7 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
         ZEROS(DS_mu_alpha_y[inl], NLOCAL * (2 * this->lmaxd + 1));
         ZEROS(DS_mu_alpha_z[inl], NLOCAL * (2 * this->lmaxd + 1));
     }
+
     //init pdm**
     const int PDM_size = (this->lmaxd * 2 + 1) * (this->lmaxd * 2 + 1);
     this->pdm = new double* [this->inlmax];
@@ -110,6 +122,7 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
         this->pdm[inl] = new double[PDM_size];
         ZEROS(this->pdm[inl], PDM_size);
     }
+
     //init gedm**
     this->gedm = new double* [this->inlmax];
     for (int inl = 0;inl < this->inlmax;inl++)
@@ -117,21 +130,24 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
         this->gedm[inl] = new double[PDM_size];
         ZEROS(this->gedm[inl], PDM_size);
     }
+
     // cal n(descriptor) per atom , related to Lmax, nchi(L) and m. (not total_nchi!)
 	this->des_per_atom=0; // mohan add 2021-04-21
     for (int l = 0; l <= this->lmaxd; l++)
     {
         this->des_per_atom += ORB.Alpha[0].getNchi(l) * (2 * l + 1);
     }
+
     this->n_descriptor = ucell.nat * this->des_per_atom;
 
     this->init_index();
     
     return;
 }
-void LCAO_Descriptor::init_index()
+
+
+void LCAO_Descriptor::init_index(void)
 {
-    
     delete[] this->alpha_index;
     this->alpha_index = new IntArray[ucell.ntype];
     delete[] this->inl_index;
@@ -181,7 +197,9 @@ void LCAO_Descriptor::init_index()
     assert(ucell.nat * ORB.Alpha[0].getTotal_nchi() == inl);
     ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
     ofs_running << "total_descriptors " << this->n_descriptor << endl;
+	return;
 }
+
 
 void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
 {
@@ -265,7 +283,12 @@ void LCAO_Descriptor::build_S_descriptor(const bool& calc_deri)
     return;
 }
 
-void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const int &im, const double &v)
+
+void LCAO_Descriptor::set_S_mu_alpha(
+	const int &iw1_all, 
+	const int &inl, 
+	const int &im, 
+	const double &v)
 {
     //const int ir = ParaO.trace_loc_row[iw1_all];
     //const int ic = ParaO.trace_loc_col[iw2_all];
@@ -286,15 +309,13 @@ void LCAO_Descriptor::set_S_mu_alpha(const int &iw1_all, const int &inl, const i
     return;
 }
 
-void LCAO_Descriptor::cal_projected_DM()
+
+void LCAO_Descriptor::cal_projected_DM(matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
-    //init dm
-    delete[] this->dm;
-    this->dm = new double [NLOCAL * NLOCAL];
-    ZEROS(this->dm, NLOCAL * NLOCAL);
-    this->getdm();
+    //now,  dm is an input arg of this func, but needed converting to double*
+    this->getdm_double(dm);
 
     //step 2: get S_alpha_mu and S_nu_beta
     double **ss = this->S_mu_alpha;
@@ -313,7 +334,7 @@ void LCAO_Descriptor::cal_projected_DM()
         const char nt = 'N'; //non transpose
         const double alpha = 1;
         const double beta = 0;
-        double *a = dm;
+        double *a = this->dm_double;
         double *b = ss[inl];
         double *c = tmp_pdm;
         dgemm_(&nt, &nt, &NLOCAL, &nm, &NLOCAL, &alpha, a, &NLOCAL, b, &NLOCAL, &beta, c, &NLOCAL); //DM*S
@@ -327,29 +348,17 @@ void LCAO_Descriptor::cal_projected_DM()
     return;
 }
 
-void LCAO_Descriptor::cal_descriptor()
+void LCAO_Descriptor::cal_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "cal_descriptor");
     delete[] d;
     d = new double[this->n_descriptor];
-    //==========print preparation=============
-    ofs_running << " print out each DM_inl" << endl;
-    ofstream ofs;
-    stringstream ss;
-    ss << winput::spillage_outdir << "/"
-       << "projected_DM.dat";
-    if (MY_RANK == 0)
-    {
-        ofs.open(ss.str().c_str());
-    }
-    //==========print preparation=============
     const int lmax = ORB.get_lmax_d();
     int id = 0;
     for (int it = 0; it < ucell.ntype; it++)
     {
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
         {
-            ofs << ucell.atoms[it].label << " atom_index " << ia + 1 << " n_descriptor " << this->des_per_atom << endl;
             for (int l = 0; l <= lmax; l++)
             {
                 int nmax = ORB.Alpha[0].getNchi(l);
@@ -368,10 +377,7 @@ void LCAO_Descriptor::cal_descriptor()
                             des(m, m2) += tmp;
                         }
                     }
-
-                    this->print_projected_DM(ofs, des, it, ia, l, n);
-
-                    //ofs_running << "dimension of des is " << 2 * l + 1 << endl;
+                    
                     if (l == 0)
                     {
                         this->d[id] = des(0, 0).real();
@@ -411,7 +417,13 @@ void LCAO_Descriptor::cal_descriptor()
 
 
 
-void LCAO_Descriptor::print_projected_DM(ofstream& ofs, ComplexMatrix& des, const int& it, const int& ia, const int& l, const int& n)
+void LCAO_Descriptor::print_projected_DM(
+	ofstream& ofs, 
+	ComplexMatrix& des, 
+	const int& it, // index for atom type
+	const int& ia, // index for atoms
+	const int& l, // index for angular momentum quantum number L
+	const int& n) // index for principal quantum number n
 {
     ofs << "L=" << l << "   N=" << n << endl;
     for (int i = 0; i < 2 * l + 1; i++)
@@ -424,7 +436,9 @@ void LCAO_Descriptor::print_projected_DM(ofstream& ofs, ComplexMatrix& des, cons
     }
     return;
 }
-void LCAO_Descriptor::print_descriptor()
+
+
+void LCAO_Descriptor::print_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "print_descriptor");
     ofstream ofs;
@@ -456,8 +470,14 @@ void LCAO_Descriptor::print_descriptor()
     return;
 }
 
-void LCAO_Descriptor::set_DS_mu_alpha(const int& iw1_all, const int& inl, const int& im,
-    const double& vx, const double& vy, const double& vz)
+
+void LCAO_Descriptor::set_DS_mu_alpha(
+	const int& iw1_all, 
+	const int& inl, 
+	const int& im,
+    const double& vx, 
+	const double& vy, 
+	const double& vz)
 {
     //const int ir = ParaO.trace_loc_row[iw1_all];
     //const int ic = ParaO.trace_loc_col[iw2_all];
@@ -480,16 +500,18 @@ void LCAO_Descriptor::set_DS_mu_alpha(const int& iw1_all, const int& inl, const 
     return;
 }
 
-void LCAO_Descriptor::getdm()
+void LCAO_Descriptor::getdm_double(matrix& dm)
 {
-    for (int i = 0; i < LOC.wfc_dm_2d.dm_gamma[0].nr; i++)
+    for (int i = 0; i < dm.nr; i++)
     {
-        for (int j = 0; j < LOC.wfc_dm_2d.dm_gamma[0].nc; j++)
+        for (int j = 0; j < dm.nc; j++)
         {
-            this->dm[i * NLOCAL + j] = LOC.wfc_dm_2d.dm_gamma[0](i, j); //only consider default NSPIN = 1
+            this->dm_double[i * NLOCAL + j] = dm(i, j); //only consider default NSPIN = 1
         }
     }
+	return;
 }
+
 
 void LCAO_Descriptor::cal_gdmx(matrix &dm)
 {
@@ -518,17 +540,24 @@ void LCAO_Descriptor::cal_gdmx(matrix &dm)
                         {
                             for (int is = 0;is < NSPIN;++is)
                             {
-                                if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx") // save the matrix as column major format
+								//  save the matrix as column major format
+                                if (KS_SOLVER == "genelpa" || KS_SOLVER == "scalapack_gvx")
                                 {
-                                    gdmx[iat][inl][m1 * nm + m2] += 4 * dsx[inl][m1 * NLOCAL + mu] * dm(mu, nu) * ss[inl][m2 * NLOCAL + nu];
-                                    gdmy[iat][inl][m1 * nm + m2] += 4 * dsy[inl][m1 * NLOCAL + mu] *  dm(mu, nu)  * ss[inl][m2 * NLOCAL + nu];
-                                    gdmz[iat][inl][m1 * nm + m2] += 4 * dsz[inl][m1 * NLOCAL + mu] * dm(mu, nu)  * ss[inl][m2 * NLOCAL + nu];
+                                    gdmx[iat][inl][m1*nm + m2] += 
+									4 * dsx[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
+                                    gdmy[iat][inl][m1*nm + m2] += 
+									4 * dsy[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
+                                    gdmz[iat][inl][m1*nm + m2] += 
+									4 * dsz[inl][m1*NLOCAL + mu] * dm(mu, nu) * ss[inl][m2*NLOCAL + nu];
                                 }
                                 else
                                 {
-                                    gdmx[iat][inl][m1 * nm + m2] += 4 * dsx[inl][mu * nm + m1] * dm(mu, nu) * ss[inl][nu * nm + m2];
-                                    gdmy[iat][inl][m1 * nm + m2] += 4 * dsy[inl][mu * nm + m1] * dm(mu, nu) * ss[inl][nu * nm + m2];
-                                    gdmz[iat][inl][m1 * nm + m2] += 4 * dsz[inl][mu * nm + m1] *  dm(mu, nu) * ss[inl][nu * nm + m2];
+                                    gdmx[iat][inl][m1*nm + m2] += 
+									4 * dsx[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmy[iat][inl][m1*nm + m2] += 
+									4 * dsy[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
+                                    gdmz[iat][inl][m1*nm + m2] += 
+									4 * dsz[inl][mu*nm + m1] * dm(mu, nu) * ss[inl][nu*nm + m2];
                                 }
                             }
                         }//end m2
@@ -540,7 +569,8 @@ void LCAO_Descriptor::cal_gdmx(matrix &dm)
     return;
 }
 
-void LCAO_Descriptor::init_gdmx()
+
+void LCAO_Descriptor::init_gdmx(void)
 {
     this->gdmx = new double** [ucell.nat];
     this->gdmy = new double** [ucell.nat];
@@ -563,7 +593,8 @@ void LCAO_Descriptor::init_gdmx()
     return;
 }
 
-void LCAO_Descriptor::del_gdmx()
+
+void LCAO_Descriptor::del_gdmx(void)
 {
     for (int iat = 0;iat < ucell.nat;iat++)
     {
@@ -583,28 +614,28 @@ void LCAO_Descriptor::del_gdmx()
     return;
 }
 
+
 void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 {
     TITLE("LCAO_Descriptor", "deepks_pre_scf");
+
+	// load the DeePKS model from deep neural network
     this->load_model(model_file);
-    //init dm
-    delete[] this->dm;
-    this->dm = new double[NLOCAL * NLOCAL];
-    ZEROS(this->dm, NLOCAL * NLOCAL);
-    //init H_V_delta
+    
+    //initialize the H matrix H_V_delta
     delete[] this->H_V_delta;
     this->H_V_delta = new double[NLOCAL * NLOCAL];
     ZEROS(this->H_V_delta, NLOCAL * NLOCAL);
+
     return;
 }
 
-void LCAO_Descriptor::cal_v_delta()
+
+void LCAO_Descriptor::cal_v_delta(matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv> (descriptor changes in every scf iter)
-    this->cal_projected_DM();
-    this->cal_descriptor_tensor();  //use torch::symeig
-    this->cal_gedm();
+    this->cal_gedm(dm);
     
     //2. multiply overlap matrice and sum
     double* tmp_v1 = new double[(2 * lmaxd + 1) * NLOCAL];
@@ -645,7 +676,9 @@ void LCAO_Descriptor::cal_v_delta()
     ofs_running << "finish calculating H_V_delta" << endl;
     return;
 }
-void LCAO_Descriptor::add_v_delta()
+
+
+void LCAO_Descriptor::add_v_delta(void)
 {
     TITLE("LCAO_DESCRIPTOR", "add_v_delta");
     if (GAMMA_ONLY_LOCAL)
@@ -654,15 +687,21 @@ void LCAO_Descriptor::add_v_delta()
         {
             for (int iw2 = 0;iw2 < NLOCAL;++iw2)
             {
+				if (!ParaO.in_this_processor(iw1,iw2))
+				{
+					continue;
+				}
                 LM.set_HSgamma(iw1, iw2, this->H_V_delta[iw1 * NLOCAL + iw2], 'L');
             }
         }
     }
     else
     {
+		WARNING_QUIT("add_v_delta","not implemented yet.");
         //call set_HSk, complex Matrix
     }
 }
+
 
 void LCAO_Descriptor::cal_f_delta(matrix& dm)
 {
@@ -675,12 +714,14 @@ void LCAO_Descriptor::cal_f_delta(matrix& dm)
             for (int inl = 0;inl < inlmax;++inl)
             {
                 int nm = 2 * inl_l[inl] + 1;
-                
-                //1. cal gdmx
+
+                //1. cal gedm
+                this->cal_gedm(dm);
+                //2. cal gdmx
                 this->init_gdmx();
                 this->cal_gdmx(dm);
 
-                //2.multiply and sum for each atom
+                //3.multiply and sum for each atom
                 // \sum_{Inl}\sum_{mm'} <gedm, gdmx>_{mm'}
                 //notice: sum of multiplied corresponding element(mm') , not matrix multiplication !
                 for (int m1 = 0;m1 < nm;++m1)
@@ -701,7 +742,8 @@ void LCAO_Descriptor::cal_f_delta(matrix& dm)
     return;
 }
 
-void LCAO_Descriptor::cal_descriptor_tensor()
+
+void LCAO_Descriptor::cal_descriptor_tensor(void)
 {
     TITLE("LCAO_Descriptor", "cal_descriptor_tensor");
     //init pdm_tensor and d_tensor
@@ -745,20 +787,31 @@ void LCAO_Descriptor::cal_descriptor_tensor()
     return;
 }
 
+
 void LCAO_Descriptor::load_model(const string& model_file)
 {
     TITLE("LCAO_Descriptor", "load_model");
-    try {
+    try 
+	{
         this->module = torch::jit::load(model_file);
     }
-    catch (const c10::Error& e) {
+    catch (const c10::Error& e) 
+	{
         std::cerr << "error loading the model" << std::endl;
         return;
     }
+	return;
 }
-void LCAO_Descriptor::cal_gedm()
+
+
+void LCAO_Descriptor::cal_gedm(matrix& dm)
 {
+    //using this->pdm_tensor
     TITLE("LCAO_Descriptor", "cal_gedm");
+    //-----prepare for autograd---------
+    this->cal_projected_DM(dm);
+    this->cal_descriptor_tensor();  //use torch::symeig
+    //-----prepared-----------------------
     //forward
     std::vector<torch::jit::IValue> inputs;
     //input_dim:(natom, des_per_atom)
@@ -789,21 +842,27 @@ void LCAO_Descriptor::cal_gedm()
     return;
 }
 
-void LCAO_Descriptor::print_H_V_delta()
+
+void LCAO_Descriptor::print_H_V_delta(void)
 {
     TITLE("LCAO_Descriptor", "print_H_V_delta");
+
     ofstream ofs;
     stringstream ss;
+
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
        << "H_V_delta.dat";
+
     if (MY_RANK == 0)
     {
         ofs.open(ss.str().c_str());
     }
+
     ofs << "E_delta(Ry) from deepks model: " << this->E_delta << endl;
     ofs << "E_delta(eV) from deepks model: " << this->E_delta * Hartree_to_eV << endl;
     ofs << "H_delta(Hartree)(gamma only)) from deepks model: " << endl;
+
     for (int i = 0;i < NLOCAL;++i)
     {
         for (int j = 0;j < NLOCAL;++j)
@@ -813,6 +872,7 @@ void LCAO_Descriptor::print_H_V_delta()
         ofs << endl;
     }
     ofs << "H_delta(eV)(gamma only)) from deepks model: " << endl;
+
     for (int i = 0;i < NLOCAL;++i)
     {
         for (int j = 0;j < NLOCAL;++j)
@@ -821,24 +881,31 @@ void LCAO_Descriptor::print_H_V_delta()
         }
         ofs << endl;
     }
+
     ofs_running << "H_delta is printed" << endl;
+
     return;
 }
 
-void LCAO_Descriptor::print_F_delta()
+
+void LCAO_Descriptor::print_F_delta(void)
 {
     TITLE("LCAO_Descriptor", "print_F_delta");
+
     ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
        << "F_delta.dat";
+
     if (MY_RANK == 0)
     {
         ofs.open(ss.str().c_str());
     }
+
     ofs << "F_delta(Hatree/Bohr) from deepks model: " << endl;
     ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << endl;
+
     for (int it = 0;it < ucell.ntype;++it)
     {
         for (int ia = 0;ia < ucell.atoms[it].na;++ia)
@@ -849,8 +916,10 @@ void LCAO_Descriptor::print_F_delta()
                 << setw(15) << this->F_delta(iat, 2) / 2 << endl;
         }
     }
+
     ofs << "F_delta(eV/Angstrom) from deepks model: " << endl;
     ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << endl;
+
     for (int it = 0;it < ucell.ntype;++it)
     {
         for (int ia = 0;ia < ucell.atoms[it].na;++ia)
@@ -866,7 +935,8 @@ void LCAO_Descriptor::print_F_delta()
     return;
 }
 
-void LCAO_Descriptor::save_npy_d()
+
+void LCAO_Descriptor::save_npy_d(void)
 {
     TITLE("LCAO_Descriptor", "save_npy_d");
     //save descriptor in .npy format
@@ -880,6 +950,7 @@ void LCAO_Descriptor::save_npy_d()
     return;
 }
 
+
 void LCAO_Descriptor::save_npy_e(double& ebase)
 {
     TITLE("LCAO_Descriptor", "save_npy_e");
@@ -890,6 +961,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
     npy::SaveArrayAsNumpy("e_base.npy", false, 1, eshape, npy_ebase);
     return;
 }
+
 
 void LCAO_Descriptor::save_npy_f(matrix& fbase)
 {
@@ -908,5 +980,4 @@ void LCAO_Descriptor::save_npy_f(matrix& fbase)
     npy::SaveArrayAsNumpy("f_base.npy", false, 2, fshape, npy_fbase);
     return;
 }
-
 #endif

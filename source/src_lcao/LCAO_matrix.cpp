@@ -167,15 +167,27 @@ void LCAO_Matrix::allocate_HS_R(const int &nnR)
 	return;
 }
 
-void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype)
+//------------------------------------------------------
+// DESCRIPTION:
+// set 'dtype' matrix element (iw1_all, iw2_all) with 
+// an input value 'v'
+//------------------------------------------------------
+void LCAO_Matrix::set_HSgamma(
+	const int &iw1_all, // index i for atomic orbital (row)
+	const int &iw2_all, // index j for atomic orbital (column)
+	const double &v, // value for matrix element (i,j) 
+	const char &dtype) // type of the matrix
 {
     // use iw1_all and iw2_all to set Hloc
-    // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
+    // becareful! The ir and ic may be < 0 !!!
     const int ir = ParaO.trace_loc_row[ iw1_all ];
     const int ic = ParaO.trace_loc_col[ iw2_all ];
+
     //const int index = ir * ParaO.ncol + ic;
-	long index;
-	if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")  // save the matrix as column major format
+	long index=0;
+
+	// save the matrix as column major format
+	if(KS_SOLVER=="genelpa" || KS_SOLVER=="scalapack_gvx")
 	{
 		index=ic*ParaO.nrow+ir;
 	}
@@ -195,11 +207,13 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
 		WARNING_QUIT("LCAO_Matrix","set_HSgamma");
 	}	 
 
+	//-----------------------------------
+	// dtype: type of the matrix.
 	// S : S matrix element.
 	// T : T matrix element.
 	// N : nonlocal H matrix element.
 	// L : local H matrix element.
-
+	//-----------------------------------
     if (dtype=='S')
     {
         this->Sloc[index] += v;
