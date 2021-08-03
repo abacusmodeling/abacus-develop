@@ -616,12 +616,25 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 						}
 					}
 					else
-					{
+					{   // modify the reading of velocities  -- Yuanbo Li 2021/08/02
 						ifpos >> v.x >> v.y >> v.z
 							>> mv.x >> mv.y >> mv.z;
 						if(set_vel)
 						{
-							ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
+	                        string tmpid1,tmpid2;
+                            tmpid1 = ifpos.get();
+                            if ( tmpid1 != "/n" )
+                            {
+                                ifpos >> tmpid2;
+                                if ( tmpid2 == "v" )
+                                {
+                                    ifpos >> atoms[it].vel[ia].x >> atoms[it].vel[ia].y >> atoms[it].vel[ia].z;
+                                }
+                            }
+                            else
+                            {
+                            atoms[it].vel[ia].set(0,0,0);
+                            }
 						}
 						else
 						{
