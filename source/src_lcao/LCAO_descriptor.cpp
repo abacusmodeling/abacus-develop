@@ -310,7 +310,7 @@ void LCAO_Descriptor::set_S_mu_alpha(
 }
 
 
-void LCAO_Descriptor::cal_projected_DM(matrix& dm)
+void LCAO_Descriptor::cal_projected_DM(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
@@ -500,7 +500,7 @@ void LCAO_Descriptor::set_DS_mu_alpha(
     return;
 }
 
-void LCAO_Descriptor::getdm_double(matrix& dm)
+void LCAO_Descriptor::getdm_double(const matrix &dm)
 {
     for (int i = 0; i < dm.nr; i++)
     {
@@ -513,7 +513,7 @@ void LCAO_Descriptor::getdm_double(matrix& dm)
 }
 
 
-void LCAO_Descriptor::cal_gdmx(matrix &dm)
+void LCAO_Descriptor::cal_gdmx(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
@@ -703,7 +703,7 @@ void LCAO_Descriptor::add_v_delta(void)
 }
 
 
-void LCAO_Descriptor::cal_f_delta(matrix& dm)
+void LCAO_Descriptor::cal_f_delta(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_f_delta");
     int iat = 0;    //check if the index same as ucell.iw2iat or not !!
@@ -804,7 +804,7 @@ void LCAO_Descriptor::load_model(const string& model_file)
 }
 
 
-void LCAO_Descriptor::cal_gedm(matrix& dm)
+void LCAO_Descriptor::cal_gedm(const matrix &dm)
 {
     //using this->pdm_tensor
     TITLE("LCAO_Descriptor", "cal_gedm");

@@ -22,7 +22,7 @@ public:
     void build_S_descriptor(const bool &calc_deri);
 
 	// cal pdm: S_alpha_mu * inv(Sloc) * DM * inv(Sloc) * S_nu_beta
-    void cal_projected_DM(matrix& dm);
+    void cal_projected_DM(const matrix& dm);
 
 	// cal d: EIGENVALUE of pdm in block of I_n_l
     void cal_descriptor(void);
@@ -41,7 +41,7 @@ public:
 	void add_v_delta(void);
 
 	// compute the force related to deltaV, input dm is density matrix
-	void cal_f_delta(matrix& dm);
+	void cal_f_delta(const matrix& dm);
 
 	// print the deltaV matrix in LCAO basis set
 	void print_H_V_delta(void);
@@ -129,22 +129,22 @@ private:
 		const int& n);
 
 	void set_DS_mu_alpha(
-	const int& iw1_all,
-	const int& inl,
-	const int& im,
-	const double& vx,
-	const double& vy,
-	const double& vz);
+		const int& iw1_all,
+		const int& inl,
+		const int& im,
+		const double& vx,
+		const double& vy,
+		const double& vz);
 
-	void init_gdmx();
+	void init_gdmx(void);
 	void load_model(const string& model_file);
-	void cal_gedm(matrix& dm);	//need to load model in this step
-	void cal_gdmx(matrix& dm);	//dD/dX
-	void del_gdmx();
+	void cal_gedm(const matrix& dm);	//need to load model in this step
+	void cal_gdmx(const matrix& dm);	//dD/dX
+	void del_gdmx(void);
 
-	void getdm_double(matrix& dm);
+	void getdm_double(const matrix& dm);
 
-	void cal_descriptor_tensor();
+	void cal_descriptor_tensor(void);
 
 };
 extern LCAO_Descriptor ld;
