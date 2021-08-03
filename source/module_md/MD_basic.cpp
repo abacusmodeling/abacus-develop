@@ -43,6 +43,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	allmass=new double[ucell.nat];
 	ionmbl=new Vector3<int>[ucell.nat];
 	force=new Vector3<double>[ucell.nat];
+    stress.create(3,3);
 
 #ifdef __CMD
     energy_=0;
@@ -649,11 +650,13 @@ int MD_basic::getRealStep()
 void MD_basic::outStressMD(const matrix& stress, const double& twiceKE)
 {
     GlobalV::ofs_running<<"output Pressure for check!"<<endl;
-    double press;
+    double press = 0.0;
     for(int i=0;i<3;i++)
+    {
         press += stress(i,i)/3;
+    }
     press += twiceKE/3/ucell.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
-    double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8 ;
+    const double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8 ;
     GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<endl;
 }
 
