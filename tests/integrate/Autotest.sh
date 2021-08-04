@@ -9,11 +9,11 @@ threshold=0.0000001
 # check accuracy
 ca=8
 # regex of case name
-case="^[^#].*_PW_.*$"
+case="^[^#].*01_PW_.*$"
 # enable AddressSanitizer
 sanitize=false
 
-while getopts a:n:t:c:s:r,g flag
+while getopts a:n:t:c:s:r:g flag
 do
     case "${flag}" in
         a) abacus=${OPTARG};;
@@ -102,6 +102,11 @@ check_out(){
 				echo -e "\e[1;31m [  FAILED  ] \e[0m"\
 					"$key cal=$cal ref=$ref deviation=$deviation"
 				let failed++
+				if [ $(echo "sqrt($deviation*$deviation) < $fatal_threshold"|bc) = 0 ]; then
+					let fatal++
+					echo -e "\e[1;31m [  FAILED  ] \e[0m"\
+						"An unacceptble deviation occurs."
+				fi
 				break
 			else
 				#echo "$key cal=$cal ref=$ref deviation=$deviation"
@@ -125,6 +130,8 @@ which $abacus > /dev/null || exit 0
 testdir=`cat CASES | grep -E $case`
 failed=0
 ok=0
+fatal=0
+fatal_threshold=1
 report=""
 repo="$(realpath ..)/"
 
@@ -183,7 +190,11 @@ then
 	echo -e "\e[1;32m [  PASSED  ] \e[0m $ok test cases passed."
 else
 	echo -e "\e[1;31m [  FAILED  ] \e[0m $failed test cases out of $[ $failed + $ok ] failed."
-	exit 1
+	if [ $fatal -gt 0 ]
+	then
+		echo -e "\e[1;31m [  FAILED  ] \e[0m $fatal test cases out of $[ $failed + $ok ] produced fatal error."
+		exit 1
+	fi
 fi
 else
 echo "Generate test cases complete."
