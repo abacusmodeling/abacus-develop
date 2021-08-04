@@ -64,7 +64,7 @@ std::tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 		for( size_t is=0; is!=nspin0(); ++is )
 			for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 			{
-				kin_r[ir*nspin0()+is] = kin_r_in[is][ir];
+				kin_r[ir*nspin0()+is] = kin_r_in[is][ir] / e2;
 				lapl_rho[ir*nspin0()+is] = 0.0;
 			}
 	}
@@ -85,10 +85,10 @@ std::tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 				for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 				{
 					double atau;
-					atau = abs(kin_r[ir*2])/2.0;
+					atau = abs(kin_r[ir*2]);
 					if ( rho[ir*2]<rho_threshold || sqrt(abs(sigma[ir*3]))<grho_threshold || atau<tau_threshold) 
 						sgn[ir*2] = 0.0;
-					atau = abs(kin_r[ir*2+1])/2.0;
+					atau = abs(kin_r[ir*2+1]);
 					if ( rho[ir*2+1]<rho_threshold || sqrt(abs(sigma[ir*3+2]))<grho_threshold || atau<tau_threshold) 
 						sgn[ir*2+1] = 0.0;
 				}
@@ -118,7 +118,7 @@ std::tuple<double,double,matrix,matrix> Potential_Libxc::v_xc_meta(
 				{
 					for( size_t ir=0; ir!=GlobalC::pw.nrxx; ++ir )
 					{
-						vofk(is,ir) = kedtaur[ir*nspin0()+is] * sgn[ir*nspin0()+is];
+						vofk(is,ir) += e2 * kedtaur[ir*nspin0()+is] * sgn[ir*nspin0()+is];
 					}
 				}
 			}
