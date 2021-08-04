@@ -41,12 +41,14 @@ public:
 	//------------------------------------------------------------------------------
 	// cal_projected_DM: pdm = S_alpha_mu * inv(Sloc) * DM * inv(Sloc) * S_nu_beta
 	// cal_descriptor: EIGENVALUE of pdm in block of I_n_l
+	// cal_dm_as_descriptor: compute the descriptor for each atom
 	// cal_v_delta: compute <psi|deltaV|psi>
 	// add_v_delta: add <psi|deltaV|psi> to the Hamiltonian matrix
 	// cal_f_delta: compute the force related to deltaV, input dm is density matrix
 	//------------------------------------------------------------------------------
-    void cal_projected_DM(const matrix& dm);
+    void cal_projected_DM(const matrix &dm);
     void cal_descriptor(void);
+	void cal_dm_as_descriptor(const matrix &dm); // mohan add 2021-08-04
 	void cal_v_delta(const matrix& dm);
 	void add_v_delta(void);
 	void cal_f_delta(const matrix& dm);

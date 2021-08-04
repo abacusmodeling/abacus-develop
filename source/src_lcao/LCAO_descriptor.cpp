@@ -312,6 +312,28 @@ void LCAO_Descriptor::set_S_mu_alpha(
 }
 
 
+
+// compute the full projected density matrix for each atom
+// save the matrix for each atom in order to minimize the usage of memory
+// --mohan 2021-08-04
+void LCAO_Descriptor::cal_dm_as_descriptor(const matrix &dm)
+{
+	TITLE("LCAO_Descriptor", "cal_proj_dm");
+
+	for(int it=0; it<ucell.ntype; ++it)
+	{
+		for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+		{
+			// compute S^T * dm * S to obtain descriptor
+			// of each atom 
+			// and then diagonalize it
+		}
+	}
+
+	return;
+}
+
+
 void LCAO_Descriptor::cal_projected_DM(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_projected_DM");
@@ -687,6 +709,7 @@ void LCAO_Descriptor::cal_v_delta(const matrix& dm)
 void LCAO_Descriptor::add_v_delta(void)
 {
     TITLE("LCAO_DESCRIPTOR", "add_v_delta");
+
     if (GAMMA_ONLY_LOCAL)
     {
         for (int iw1 = 0;iw1 < NLOCAL;++iw1)
