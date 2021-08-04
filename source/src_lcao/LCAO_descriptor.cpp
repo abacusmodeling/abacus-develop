@@ -173,7 +173,7 @@ void LCAO_Descriptor::init_index(void)
             this->lmaxd + 1,
             this->nmaxd); 
 
-        ofs_running << "Type " << it + 1
+        ofs_running << " Type " << it + 1
                     << " number_of_atoms " << ucell.atoms[it].na << endl;
 
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
@@ -197,8 +197,8 @@ void LCAO_Descriptor::init_index(void)
     }//end it
     assert(this->n_descriptor == alpha);
     assert(ucell.nat * ORB.Alpha[0].getTotal_nchi() == inl);
-    ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
-    ofs_running << "total_descriptors " << this->n_descriptor << endl;
+    ofs_running << " descriptors_per_atom " << this->des_per_atom << endl;
+    ofs_running << " total_descriptors " << this->n_descriptor << endl;
 	return;
 }
 
@@ -468,7 +468,7 @@ void LCAO_Descriptor::print_descriptor(void)
             ofs << endl << endl;
         }
     }
-    ofs_running << "descriptors are printed" << endl;
+    ofs_running << " Descriptors have been printed to " << ss.str() << endl;
 
     return;
 }
@@ -677,7 +677,9 @@ void LCAO_Descriptor::cal_v_delta(const matrix& dm)
     }
     delete[] tmp_v1;
     delete[] tmp_v2;
+
     ofs_running << " Finish calculating H_V_delta" << endl;
+
     return;
 }
 
@@ -887,7 +889,7 @@ void LCAO_Descriptor::print_H_V_delta(void)
         ofs << endl;
     }
 
-    ofs_running << " H_delta is printed" << endl;
+    ofs_running << " H_delta has been printed to " << ss.str() << endl;
     return;
 }
 
@@ -935,7 +937,8 @@ void LCAO_Descriptor::print_F_delta(void)
                 << setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << endl;
         }
     }
-    ofs_running << "F_delta is printed" << endl;
+
+    ofs_running << " F_delta has been printed to " << ss.str() << endl;
     return;
 }
 
