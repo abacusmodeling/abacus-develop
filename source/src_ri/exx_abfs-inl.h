@@ -54,14 +54,14 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &Exx_Abfs::minus_matrixes
 					const size_t i4 = m4.first;
 					
 					// Peize Lin test
-					cout<<i1<<i2<<i3<<i4<<endl;
-					cout<<mAs[i1][i2][i3][i4]<<endl;
-					cout<<m4.second<<endl;
+					std::cout<<i1<<i2<<i3<<i4<<std::endl;
+					std::cout<<mAs[i1][i2][i3][i4]<<std::endl;
+					std::cout<<m4.second<<std::endl;
 					
 					mAs[i1][i2][i3][i4] -= m4.second;
 					
 					// Peize Lin test
-					cout<<mAs[i1][i2][i3][i4]<<endl;
+					std::cout<<mAs[i1][i2][i3][i4]<<std::endl;
 				}
 			}
 		}	

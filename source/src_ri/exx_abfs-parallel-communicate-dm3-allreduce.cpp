@@ -31,16 +31,16 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	get_send_recv_size(H_atom_pairs_group_rank, H_atom_pairs_group, send_size_list, recv_size);
 
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank));
-//ofs<<H_atom_pairs_group<<endl;
-//ofs<<atom_in_2D<<endl;
+//ofs<<H_atom_pairs_group<<std::endl;
+//ofs<<atom_in_2D<<std::endl;
 //for(int rank=0; rank!=comm_sz; ++rank)
 //{
-//	ofs<<rank<<endl;
+//	ofs<<rank<<std::endl;
 //	for(const auto &i:H_atom_pairs_group_rank[rank])
-//		ofs<<"\t"<<i.first<<"\t"<<*i.second<<endl;
+//		ofs<<"\t"<<i.first<<"\t"<<*i.second<<std::endl;
 //}
-ofs<<send_size_list<<endl;
-ofs<<recv_size<<endl;
+ofs<<send_size_list<<std::endl;
+ofs<<recv_size<<std::endl;
 }
 
 
@@ -49,7 +49,7 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
 		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstream::app);
-//ofs<<data_local<<endl<<"@@@"<<endl;;
+//ofs<<data_local<<std::endl<<"@@@"<<std::endl;;
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
 	
@@ -69,28 +69,28 @@ ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstr
 	vector<thread> threads;
 	vector<MPI_Request>requests_isend(comm_sz);
 	vector<MPI_Request>requests_irecv(comm_sz);
-ofs<<__LINE__<<endl;
+ofs<<__LINE__<<std::endl;
 
 	while(!finish_judge(flags_send, flags_recv))
 	{
 		if(rank_send_next()!=my_rank && memory_enough(rank_send_next(), flags_send))
 		{
 			rank_send_now = rank_send_next();
-ofs<<__LINE__<<"\t"<<rank_send_now<<endl;
+ofs<<__LINE__<<"\t"<<rank_send_now<<std::endl;
 			flags_send[rank_send_now] = Flag_Send::begin_oar;
 			threads.push_back(std::thread(
 				&Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process, this,
 				rank_send_now, std::cref(data_local), std::ref(oarps_isend), std::ref(flags_send) ));
-ofs<<__LINE__<<"\t"<<rank_send_now<<endl;
+ofs<<__LINE__<<"\t"<<rank_send_now<<std::endl;
 		}
 		for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 		{
 			if( flags_send[rank_send] == Flag_Send::finish_oar )
 			{
-ofs<<__LINE__<<"\t"<<rank_send<<endl;
+ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 				if(MPI_Isend( VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_send[rank_send] = Flag_Send::begin_isend;
-ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<endl;
+ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<std::endl;
 			}
 		}
 		for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
@@ -101,7 +101,7 @@ ofs<<__LINE__<<"\t"<<rank_send<<"\t"<<oarps_isend[rank_send].size()<<endl;
 				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				if(flag_finish)
 				{
-ofs<<__LINE__<<"\t"<<rank_send<<endl;
+ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 					oarps_isend[rank_send].resize(0);	oarps_isend[rank_send].shrink_to_fit();
 					flags_send[rank_send] = Flag_Send::finish_isend;
 				}
@@ -117,11 +117,11 @@ ofs<<__LINE__<<"\t"<<rank_send<<endl;
 				int message_size;
 				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				const int rank_recv = status.MPI_SOURCE;
-ofs<<__LINE__<<"\t"<<rank_recv<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				iarps_irecv[rank_recv].resize(message_size);
 				if(MPI_Irecv( VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_recv[rank_recv] = Flag_Recv::begin_irecv;
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<std::endl;
 			}
 		}
 		for(int rank_recv=0; rank_recv!=comm_sz; ++rank_recv)
@@ -129,28 +129,28 @@ ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<message_size<<endl;
 			if(flags_recv[rank_recv] == Flag_Recv::begin_irecv)
 			{
 				int flag_finish = 0;
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
 				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
 				if(flag_finish)
 				{
-ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<"\t"<<flag_finish<<std::endl;
 					flags_recv[rank_recv] = Flag_Recv::begin_iar;
 					threads.push_back(std::thread(
 						&Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process, this,
 						rank_recv, std::ref(data_all), std::ref(iarps_irecv), std::ref(flags_recv), std::ref(lock_insert) ));
-ofs<<__LINE__<<"\t"<<rank_recv<<endl;
+ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				}
 			}
 		}
 	}
-ofs<<__LINE__<<endl;
+ofs<<__LINE__<<std::endl;
 
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection = get_intersection(my_rank, data_local);
 	while( lock_insert.test_and_set() );
 	insert_data(data_intersection, data_all);
 	lock_insert.clear();
-ofs<<__LINE__<<endl;
+ofs<<__LINE__<<std::endl;
 
 	for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 	{
@@ -161,12 +161,12 @@ ofs<<__LINE__<<endl;
 			flags_send[rank_send] = Flag_Send::finish_isend;
 		}
 	}
-ofs<<__LINE__<<endl;
+ofs<<__LINE__<<std::endl;
 
 	for(std::thread &t : threads)
 		t.join();
-ofs<<__LINE__<<endl;
-//ofs<<"@@@"<<endl<<data_all<<endl;
+ofs<<__LINE__<<std::endl;
+//ofs<<"@@@"<<std::endl<<data_all<<std::endl;
 
 	return data_all;
 }

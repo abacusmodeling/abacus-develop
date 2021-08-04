@@ -12,44 +12,44 @@ void test_pblas()
 
 	auto ofs_error_code = []()
 	{
-		cout<<"MPI_SUCCESS          "<<MPI_SUCCESS          <<endl;
-		cout<<"MPI_ERR_BUFFER       "<<MPI_ERR_BUFFER       <<endl;
-		cout<<"MPI_ERR_COUNT        "<<MPI_ERR_COUNT        <<endl;
-		cout<<"MPI_ERR_TYPE         "<<MPI_ERR_TYPE         <<endl;
-		cout<<"MPI_ERR_TAG          "<<MPI_ERR_TAG          <<endl;
-		cout<<"MPI_ERR_COMM         "<<MPI_ERR_COMM         <<endl;
-		cout<<"MPI_ERR_RANK         "<<MPI_ERR_RANK         <<endl;
-		cout<<"MPI_ERR_REQUEST      "<<MPI_ERR_REQUEST      <<endl;
-		cout<<"MPI_ERR_ROOT         "<<MPI_ERR_ROOT         <<endl;
-		cout<<"MPI_ERR_GROUP        "<<MPI_ERR_GROUP        <<endl;
-		cout<<"MPI_ERR_OP           "<<MPI_ERR_OP           <<endl;
-		cout<<"MPI_ERR_TOPOLOGY     "<<MPI_ERR_TOPOLOGY     <<endl;
-		cout<<"MPI_ERR_DIMS         "<<MPI_ERR_DIMS         <<endl;
-		cout<<"MPI_ERR_ARG          "<<MPI_ERR_ARG          <<endl;
-		cout<<"MPI_ERR_UNKNOWN      "<<MPI_ERR_UNKNOWN      <<endl;
-		cout<<"MPI_ERR_TRUNCATE     "<<MPI_ERR_TRUNCATE     <<endl;
-		cout<<"MPI_ERR_OTHER        "<<MPI_ERR_OTHER        <<endl;
-		cout<<"MPI_ERR_INTERN       "<<MPI_ERR_INTERN       <<endl;
-		cout<<"MPI_ERR_IN_STATUS    "<<MPI_ERR_IN_STATUS    <<endl;
-		cout<<"MPI_ERR_PENDING      "<<MPI_ERR_PENDING      <<endl;
-		cout<<"MPI_ERR_KEYVAL       "<<MPI_ERR_KEYVAL       <<endl;
-		cout<<"MPI_ERR_NO_MEM       "<<MPI_ERR_NO_MEM       <<endl;
-		cout<<"MPI_ERR_BASE         "<<MPI_ERR_BASE         <<endl;
-		cout<<"MPI_ERR_INFO_KEY     "<<MPI_ERR_INFO_KEY     <<endl;
-		cout<<"MPI_ERR_INFO_VALUE   "<<MPI_ERR_INFO_VALUE   <<endl;
-		cout<<"MPI_ERR_INFO_NOKEY   "<<MPI_ERR_INFO_NOKEY   <<endl;
-		cout<<"MPI_ERR_SPAWN        "<<MPI_ERR_SPAWN        <<endl;
-		cout<<"MPI_ERR_PORT         "<<MPI_ERR_PORT         <<endl;
-		cout<<"MPI_ERR_SERVICE      "<<MPI_ERR_SERVICE      <<endl;
-		cout<<"MPI_ERR_NAME         "<<MPI_ERR_NAME         <<endl;
-		cout<<"MPI_ERR_WIN          "<<MPI_ERR_WIN          <<endl;
-		cout<<"MPI_ERR_SIZE         "<<MPI_ERR_SIZE         <<endl;
-		cout<<"MPI_ERR_DISP         "<<MPI_ERR_DISP         <<endl;
-		cout<<"MPI_ERR_INFO         "<<MPI_ERR_INFO         <<endl;
-		cout<<"MPI_ERR_LOCKTYPE     "<<MPI_ERR_LOCKTYPE     <<endl;
-		cout<<"MPI_ERR_ASSERT       "<<MPI_ERR_ASSERT       <<endl;
-		cout<<"MPI_ERR_RMA_CONFLICT "<<MPI_ERR_RMA_CONFLICT <<endl;
-		cout<<"MPI_ERR_RMA_SYNC     "<<MPI_ERR_RMA_SYNC     <<endl;
+		std::cout<<"MPI_SUCCESS          "<<MPI_SUCCESS          <<std::endl;
+		std::cout<<"MPI_ERR_BUFFER       "<<MPI_ERR_BUFFER       <<std::endl;
+		std::cout<<"MPI_ERR_COUNT        "<<MPI_ERR_COUNT        <<std::endl;
+		std::cout<<"MPI_ERR_TYPE         "<<MPI_ERR_TYPE         <<std::endl;
+		std::cout<<"MPI_ERR_TAG          "<<MPI_ERR_TAG          <<std::endl;
+		std::cout<<"MPI_ERR_COMM         "<<MPI_ERR_COMM         <<std::endl;
+		std::cout<<"MPI_ERR_RANK         "<<MPI_ERR_RANK         <<std::endl;
+		std::cout<<"MPI_ERR_REQUEST      "<<MPI_ERR_REQUEST      <<std::endl;
+		std::cout<<"MPI_ERR_ROOT         "<<MPI_ERR_ROOT         <<std::endl;
+		std::cout<<"MPI_ERR_GROUP        "<<MPI_ERR_GROUP        <<std::endl;
+		std::cout<<"MPI_ERR_OP           "<<MPI_ERR_OP           <<std::endl;
+		std::cout<<"MPI_ERR_TOPOLOGY     "<<MPI_ERR_TOPOLOGY     <<std::endl;
+		std::cout<<"MPI_ERR_DIMS         "<<MPI_ERR_DIMS         <<std::endl;
+		std::cout<<"MPI_ERR_ARG          "<<MPI_ERR_ARG          <<std::endl;
+		std::cout<<"MPI_ERR_UNKNOWN      "<<MPI_ERR_UNKNOWN      <<std::endl;
+		std::cout<<"MPI_ERR_TRUNCATE     "<<MPI_ERR_TRUNCATE     <<std::endl;
+		std::cout<<"MPI_ERR_OTHER        "<<MPI_ERR_OTHER        <<std::endl;
+		std::cout<<"MPI_ERR_INTERN       "<<MPI_ERR_INTERN       <<std::endl;
+		std::cout<<"MPI_ERR_IN_STATUS    "<<MPI_ERR_IN_STATUS    <<std::endl;
+		std::cout<<"MPI_ERR_PENDING      "<<MPI_ERR_PENDING      <<std::endl;
+		std::cout<<"MPI_ERR_KEYVAL       "<<MPI_ERR_KEYVAL       <<std::endl;
+		std::cout<<"MPI_ERR_NO_MEM       "<<MPI_ERR_NO_MEM       <<std::endl;
+		std::cout<<"MPI_ERR_BASE         "<<MPI_ERR_BASE         <<std::endl;
+		std::cout<<"MPI_ERR_INFO_KEY     "<<MPI_ERR_INFO_KEY     <<std::endl;
+		std::cout<<"MPI_ERR_INFO_VALUE   "<<MPI_ERR_INFO_VALUE   <<std::endl;
+		std::cout<<"MPI_ERR_INFO_NOKEY   "<<MPI_ERR_INFO_NOKEY   <<std::endl;
+		std::cout<<"MPI_ERR_SPAWN        "<<MPI_ERR_SPAWN        <<std::endl;
+		std::cout<<"MPI_ERR_PORT         "<<MPI_ERR_PORT         <<std::endl;
+		std::cout<<"MPI_ERR_SERVICE      "<<MPI_ERR_SERVICE      <<std::endl;
+		std::cout<<"MPI_ERR_NAME         "<<MPI_ERR_NAME         <<std::endl;
+		std::cout<<"MPI_ERR_WIN          "<<MPI_ERR_WIN          <<std::endl;
+		std::cout<<"MPI_ERR_SIZE         "<<MPI_ERR_SIZE         <<std::endl;
+		std::cout<<"MPI_ERR_DISP         "<<MPI_ERR_DISP         <<std::endl;
+		std::cout<<"MPI_ERR_INFO         "<<MPI_ERR_INFO         <<std::endl;
+		std::cout<<"MPI_ERR_LOCKTYPE     "<<MPI_ERR_LOCKTYPE     <<std::endl;
+		std::cout<<"MPI_ERR_ASSERT       "<<MPI_ERR_ASSERT       <<std::endl;
+		std::cout<<"MPI_ERR_RMA_CONFLICT "<<MPI_ERR_RMA_CONFLICT <<std::endl;
+		std::cout<<"MPI_ERR_RMA_SYNC     "<<MPI_ERR_RMA_SYNC     <<std::endl;
 	};
 
 //	auto init_ictxt = [&](const char RC, const bool c2f)
@@ -67,7 +67,7 @@ void test_pblas()
 		auto ofs_pro = [&]()
 		{
 			ofstream ofs("ofs_"+TO_STRING(my_rank));
-			ofs<<comm_sz<<"\t"<<dim[0]<<"\t"<<dim[1]<<"\t"<<nprow<<"\t"<<npcol<<"\t"<<myprow<<"\t"<<mypcol<<"\t"<<endl;
+			ofs<<comm_sz<<"\t"<<dim[0]<<"\t"<<dim[1]<<"\t"<<nprow<<"\t"<<npcol<<"\t"<<myprow<<"\t"<<mypcol<<"\t"<<std::endl;
 			ofs.close();
 		};
 		ofs_pro();
@@ -88,7 +88,7 @@ void test_pblas()
 	{
 		ofstream ofs("matrix_"+TO_STRING(my_rank));
 		for(const double i : v )
-			ofs<<i<<endl;
+			ofs<<i<<std::endl;
 		ofs.close();
 	};
 	auto ofs_desc = [&](const vector<int> &descv)
@@ -96,7 +96,7 @@ void test_pblas()
 		ofstream ofs("desc_"+TO_STRING(my_rank));
 		for(int i=0; i<9; ++i)
 			ofs<<descv[i]<<"\t";
-		ofs<<endl;
+		ofs<<std::endl;
 		ofs.close();
 	};
 	
@@ -355,7 +355,7 @@ void test_pblas()
 		const size_t len = min(v1.size(),v2.size());
 		for(int i=0; i<len; ++i)
 			if(v1[i]!=v2[i])
-				cout<<my_rank<<endl;
+				std::cout<<my_rank<<std::endl;
 	};
 	check_matrix(mA5522_32,mC);
 	ofs_matrix(mC);

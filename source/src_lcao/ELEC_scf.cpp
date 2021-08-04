@@ -40,8 +40,8 @@ void ELEC_scf::scf(const int &istep)
 		srho.begin(is, GlobalC::CHR,GlobalC::pw, GlobalC::Pgrid, GlobalC::symm);
 	}
 
-//	cout << scientific;
-//	cout << setiosflags(ios::fixed);
+//	std::cout << scientific;
+//	std::cout << setiosflags(ios::fixed);
 
 	if(GlobalV::OUT_LEVEL=="ie" ||GlobalV::OUT_LEVEL=="m")
 	{
@@ -60,18 +60,18 @@ void ELEC_scf::scf(const int &istep)
 		}
 		else
 		{
-			cout << " " << setw(7)<< "ITER";
+			std::cout << " " << setw(7)<< "ITER";
 
 			if(GlobalV::NSPIN==2)
 			{
-				cout<<setw(10)<<"TMAG";
-				cout<<setw(10)<<"AMAG";
+				std::cout<<setw(10)<<"TMAG";
+				std::cout<<setw(10)<<"AMAG";
 			}
 
-			cout << setw(15) << "ETOT(eV)";
-			cout << setw(15) << "EDIFF(eV)";
-			cout << setw(11) << "DRHO2";
-			cout << setw(11) << "TIME(s)" << endl;
+			std::cout << setw(15) << "ETOT(eV)";
+			std::cout << setw(15) << "EDIFF(eV)";
+			std::cout << setw(11) << "DRHO2";
+			std::cout << setw(11) << "TIME(s)" << std::endl;
 		}
 	}// end GlobalV::OUT_LEVEL
 
@@ -162,7 +162,7 @@ void ELEC_scf::scf(const int &istep)
 		{
 			if(iter==1)
 			{
-				cout << " WAVEFUN -> CHARGE " << endl;
+				std::cout << " WAVEFUN -> CHARGE " << std::endl;
 
 				// The occupation should be read in together.
 				// Occupy::calculate_weights(); //mohan add 2012-02-15
@@ -288,7 +288,7 @@ void ELEC_scf::scf(const int &istep)
 
 //		for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 //		{
-//			cout << ib+1 << " " << GlobalC::wf.ekb[0][ib] << endl;
+//			std::cout << ib+1 << " " << GlobalC::wf.ekb[0][ib] << std::endl;
 //		}
 
 		//-----------------------------------------------------------
@@ -488,8 +488,8 @@ void ELEC_scf::scf(const int &istep)
 		//time_finish=std::time(NULL);
 		double duration = (double)(clock() - clock_start) / CLOCKS_PER_SEC;
 		//double duration_time = difftime(time_finish, time_start);
-		//cout<<"Time_clock\t"<<"Time_time"<<endl;
-		//cout<<duration<<"\t"<<duration_time<<endl;
+		//std::cout<<"Time_clock\t"<<"Time_time"<<std::endl;
+		//std::cout<<duration<<"\t"<<duration_time<<std::endl;
 
 		// (11) calculate the total energy.
 		GlobalC::en.calculate_etot();
@@ -509,11 +509,11 @@ void ELEC_scf::scf(const int &istep)
 			//--------------------------------------
 			if( GlobalC::chi0_hilbert.epsilon)                                    // pengfei 2016-11-23
 			{
-				cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<endl;
-				cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<endl;
-				cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<endl;
-				cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<endl;
-				//cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<endl;
+				std::cout <<"eta = "<<GlobalC::chi0_hilbert.eta<<std::endl;
+				std::cout <<"domega = "<<GlobalC::chi0_hilbert.domega<<std::endl;
+				std::cout <<"nomega = "<<GlobalC::chi0_hilbert.nomega<<std::endl;
+				std::cout <<"dim = "<<GlobalC::chi0_hilbert.dim<<std::endl;
+				//std::cout <<"oband = "<<GlobalC::chi0_hilbert.oband<<std::endl;
 				GlobalC::chi0_hilbert.Chi();
 			}
 
@@ -569,10 +569,10 @@ void ELEC_scf::scf(const int &istep)
 			{
  				//xiaohui add "OUT_LEVEL", 2015-09-16
 				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << setprecision(16);
-				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << endl;
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << std::endl;
 				if(GlobalV::OUT_LEVEL=="ie")
 				{
-					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
+					GlobalV::ofs_running << " " << GlobalV::global_out_dir << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
 				}
 #ifdef __DEEPKS
 				if (INPUT.deepks_scf)	//caoyu add 2021-06-04
@@ -583,9 +583,9 @@ void ELEC_scf::scf(const int &istep)
 			}
 			else
 			{
-				GlobalV::ofs_running << " !! convergence has not been achieved @_@" << endl;
+				GlobalV::ofs_running << " !! convergence has not been achieved @_@" << std::endl;
 				if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add "m" option, 2015-09-16
-				cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << endl;
+				std::cout << " !! CONVERGENCE HAS NOT BEEN ACHIEVED !!" << std::endl;
 			}
 
 //			DONE(GlobalV::ofs_running,"ELECTRONS CONVERGED!");

@@ -274,7 +274,7 @@ void Force_Stress_LCAO::getForceStress(
 			if(GlobalV::OUT_LEVEL != "m")
 			{
 				GlobalV::ofs_running << " correction force for each atom along direction "
-					<< i+1 << " is " << sum/nat << endl;
+					<< i+1 << " is " << sum/nat << std::endl;
 			}
 		}
 
@@ -308,9 +308,9 @@ void Force_Stress_LCAO::getForceStress(
 				}
 			}
 
-			GlobalV::ofs_running << "\n PARTS OF FORCE: " << endl;
+			GlobalV::ofs_running << "\n PARTS OF FORCE: " << std::endl;
 			GlobalV::ofs_running << setiosflags(ios::showpos);
-			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(8) << endl;
+			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(8) << std::endl;
 			//-----------------------------
 			//regular force terms test.
 			//-----------------------------
@@ -349,8 +349,8 @@ void Force_Stress_LCAO::getForceStress(
 		this->printforce_total(ry, istestf, fcs);
 		if(istestf)
 		{
-			GlobalV::ofs_running << "\n FORCE INVALID TABLE." << endl;
-			GlobalV::ofs_running << " " << setw(8) << "atom" << setw(5) << "x" << setw(5) << "y" << setw(5) << "z" << endl;
+			GlobalV::ofs_running << "\n FORCE INVALID TABLE." << std::endl;
+			GlobalV::ofs_running << " " << setw(8) << "atom" << setw(5) << "x" << setw(5) << "y" << setw(5) << "z" << std::endl;
 			for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 			{
 				GlobalV::ofs_running << " " << setw(8) << iat;
@@ -366,7 +366,7 @@ void Force_Stress_LCAO::getForceStress(
 						GlobalV::ofs_running << setw(5) << "0";
 					}
 				}
-				GlobalV::ofs_running << endl;
+				GlobalV::ofs_running << std::endl;
 			}
 		}
 	}//end of force calculation
@@ -428,9 +428,9 @@ void Force_Stress_LCAO::getForceStress(
 				}
 			}
 
-			GlobalV::ofs_running << "\n PARTS OF STRESS: " << endl;
+			GlobalV::ofs_running << "\n PARTS OF STRESS: " << std::endl;
 			GlobalV::ofs_running << setiosflags(ios::showpos);
-			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(10) << endl;
+			GlobalV::ofs_running << setiosflags(ios::fixed) << setprecision(10) << std::endl;
 			sc_pw.print_stress("OVERLAP  STRESS",soverlap,GlobalV::TEST_STRESS,ry);
 			//test
 			sc_pw.print_stress("T        STRESS",stvnl_dphi,GlobalV::TEST_STRESS,ry);
@@ -479,8 +479,8 @@ void Force_Stress_LCAO::getForceStress(
 //print force term for test
 void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool screen, bool ry)const
 {
-	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << endl;
-	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << std::endl;
+	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
 
 	double fac = 1.0;
 
@@ -489,13 +489,13 @@ void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool sc
 	 	fac = Ry_to_eV / 0.529177;
 	}
 
-	cout << setprecision(5);
-	cout << setiosflags(ios::showpos);
+	std::cout << setprecision(5);
+	std::cout << setiosflags(ios::showpos);
 
 	if(screen)
 	{
-		cout << " ------------------- " << name << " --------------------" << endl;
-		cout << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+		std::cout << " ------------------- " << name << " --------------------" << std::endl;
+		std::cout << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
 	}
 
     int iat = 0;
@@ -513,18 +513,18 @@ void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool sc
 			else GlobalV::ofs_running << setw(15) << "0";
 			if( abs(f(iat,2)) >output_acc) GlobalV::ofs_running << setw(15) << f(iat,2)*fac;
 			else GlobalV::ofs_running << setw(15) << "0";
-			GlobalV::ofs_running << endl;
+			GlobalV::ofs_running << std::endl;
 
 			if(screen)
 			{
-				cout << " " << setw(8) << ss.str();
-				if( abs(f(iat,0)) >output_acc) cout << setw(15) << f(iat,0)*fac;
-				else cout << setw(15) << "0";
-				if( abs(f(iat,1)) >output_acc) cout << setw(15) << f(iat,1)*fac;
-				else cout << setw(15) << "0";
-				if( abs(f(iat,2)) >output_acc) cout << setw(15) << f(iat,2)*fac;
-				else cout << setw(15) << "0";
-				cout << endl;
+				std::cout << " " << setw(8) << ss.str();
+				if( abs(f(iat,0)) >output_acc) std::cout << setw(15) << f(iat,0)*fac;
+				else std::cout << setw(15) << "0";
+				if( abs(f(iat,1)) >output_acc) std::cout << setw(15) << f(iat,1)*fac;
+				else std::cout << setw(15) << "0";
+				if( abs(f(iat,2)) >output_acc) std::cout << setw(15) << f(iat,2)*fac;
+				else std::cout << setw(15) << "0";
+				std::cout << std::endl;
 			}
 
             iat++;
@@ -532,7 +532,7 @@ void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool sc
     }
 
 
-	cout << resetiosflags(ios::showpos);
+	std::cout << resetiosflags(ios::showpos);
 
     return;
 }
@@ -547,12 +547,12 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 	{
 		unit_transform = Ry_to_eV / 0.529177;
 	}
-//	cout.setf(ios::fixed);
+//	std::cout.setf(ios::fixed);
 
     int iat=0;
 
 	//GlobalV::ofs_running << setiosflags(ios::right);
- 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
+ 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << std::endl;
 	NEW_PART("TOTAL-FORCE (eV/Angstrom)");
 
 	// print out forces
@@ -561,24 +561,24 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 		ofstream ofs("FORCE.dat");
 		if(!ofs)
 		{
-			cout << "open FORCE.dat error !" <<endl;
+			std::cout << "open FORCE.dat error !" <<std::endl;
 		}
 
 		for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 		{
 			ofs << "   " << fcs(iat,0)*Ry_to_eV / 0.529177
 				<< "   " << fcs(iat,1)*Ry_to_eV / 0.529177
-				<< "   " << fcs(iat,2)*Ry_to_eV / 0.529177 << endl;
+				<< "   " << fcs(iat,2)*Ry_to_eV / 0.529177 << std::endl;
 		}
 		ofs.close();
 	}
 
  	if(istestf)
 	{
-		cout << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
-		cout << " ------------------- TOTAL      FORCE --------------------" << endl;
-    	cout << " " << setw(8) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
-    	GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
+		std::cout << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << std::endl;
+		std::cout << " ------------------- TOTAL      FORCE --------------------" << std::endl;
+    	std::cout << " " << setw(8) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
+    	GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
 	}
 
     iat=0;
@@ -591,22 +591,22 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
 			if(istestf)
 			{
-            	cout << " " << setw(8) << ss.str()
+            	std::cout << " " << setw(8) << ss.str()
 					<< setw(15) << fcs(iat,0)*unit_transform
 					<< setw(15) << fcs(iat,1)*unit_transform
-					<< setw(15) << fcs(iat,2)*unit_transform << endl;
+					<< setw(15) << fcs(iat,2)*unit_transform << std::endl;
 			}
 
             GlobalV::ofs_running << " " << setw(12) << ss.str()
 				<< setw(15) << fcs(iat,0)*unit_transform
 				<< setw(15) << fcs(iat,1)*unit_transform
-				<< setw(15) << fcs(iat,2)*unit_transform << endl;
+				<< setw(15) << fcs(iat,2)*unit_transform << std::endl;
 
             ++iat;
         }
     }
 	GlobalV::ofs_running << setiosflags(ios::left);
-	cout << resetiosflags(ios::showpos);
+	std::cout << resetiosflags(ios::showpos);
 
     return;
 }
@@ -771,7 +771,7 @@ void Force_Stress_LCAO::forceSymmetry(matrix& fcs)
 
 		fcs(iat,0) = d1;fcs(iat,1) = d2;fcs(iat,2) = d3;
 	}
-	//cout << "nrotk =" << GlobalC::symm.nrotk << endl;
+	//std::cout << "nrotk =" << GlobalC::symm.nrotk << std::endl;
 	delete[] pos;
 	return;
 }

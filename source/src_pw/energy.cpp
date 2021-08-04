@@ -72,7 +72,7 @@ void energy::calculate_harris(const int &flag)
 void energy::calculate_etot(void)
 {
 	TITLE("energy","calculate_etot");
-	//cout << "\n demet in etot = " << demet << endl;
+	//std::cout << "\n demet in etot = " << demet << std::endl;
 	this->etot = eband + deband 
 	+ (H_XC_pw::etxc - etxcc) 
 	+ H_Ewald_pw::ewald_energy 
@@ -85,19 +85,19 @@ void energy::calculate_etot(void)
 
     //Quxin adds for DFT+U energy correction on 20201029
 /*
-	cout << resetiosflags(ios::scientific) << endl;
-	cout << setprecision(16) << endl;
-	cout << " eband=" << eband << endl;
-	cout << " deband=" << deband << endl;
-	cout << " etxc-etxcc=" << H_XC_pw::etxc-etxcc << endl;
-	cout << " ewld=" << H_Ewald_pw::ewald_energy << endl;
-	cout << " ehart=" << H_Hartree_pw::hartree_energy << endl;
-	cout << " demet=" << demet << endl;
-	cout << " descf=" << descf << endl;
-	cout << " exx=" << exx << endl;
-	cout << " efiled=" << Efield::etotefield << endl;
-	cout << " total= "<<etot<<endl;
-	cout << " fermienergy= "<<ef<<endl;*/
+	std::cout << resetiosflags(ios::scientific) << std::endl;
+	std::cout << setprecision(16) << std::endl;
+	std::cout << " eband=" << eband << std::endl;
+	std::cout << " deband=" << deband << std::endl;
+	std::cout << " etxc-etxcc=" << H_XC_pw::etxc-etxcc << std::endl;
+	std::cout << " ewld=" << H_Ewald_pw::ewald_energy << std::endl;
+	std::cout << " ehart=" << H_Hartree_pw::hartree_energy << std::endl;
+	std::cout << " demet=" << demet << std::endl;
+	std::cout << " descf=" << descf << std::endl;
+	std::cout << " exx=" << exx << std::endl;
+	std::cout << " efiled=" << Efield::etotefield << std::endl;
+	std::cout << " total= "<<etot<<std::endl;
+	std::cout << " fermienergy= "<<ef<<std::endl;*/
 #ifdef __LCAO
     if(INPUT.dft_plus_u) 
 	{
@@ -123,7 +123,7 @@ void energy::print_etot(
 	GlobalV::ofs_running << setprecision(12);
 	GlobalV::ofs_running << setiosflags(ios::left);
 
-	GlobalV::ofs_running << "\n Density error is " << dr2 << endl;
+	GlobalV::ofs_running << "\n Density error is " << dr2 << std::endl;
 
 	if(GlobalV::OUT_LEVEL != "m") //xiaohui add "OUT_LEVEL", 2015-09-16
 	{
@@ -131,7 +131,7 @@ void energy::print_etot(
 
 		if( this->printe>0 && ( (iter+1) % this->printe == 0 || converged || iter == GlobalV::NITER) )	
 		{
-			GlobalV::ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
+			GlobalV::ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << std::endl;
 			this->print_format("E_KohnSham",etot);
 			this->print_format("E_Harris",etot_harris);
 			this->print_format("E_band",eband);
@@ -154,7 +154,7 @@ void energy::print_etot(
 		}
 		else
 		{
-			GlobalV::ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << endl;
+			GlobalV::ofs_running << "\n " << setw(12) << "Energy" << setw(30) << "Rydberg" << setw(30) << "eV" << std::endl;
 			this->print_format("E_KohnSham",etot);
 			this->print_format("E_Harris",etot_harris);
 		}
@@ -219,12 +219,12 @@ void energy::print_etot(
 
 	if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m") //xiaohui add 'm' option, 2015-09-16
 	{
-		cout << " " << setw(7) << ss.str();
-		//cout << setiosflags(ios::fixed);
-		//cout << setiosflags(ios::showpos);
+		std::cout << " " << setw(7) << ss.str();
+		//std::cout << setiosflags(ios::fixed);
+		//std::cout << setiosflags(ios::showpos);
 		if(scientific)
 		{
-			cout << setiosflags(ios::scientific);
+			std::cout << setiosflags(ios::scientific);
 		}
 
 		if(GlobalV::COLOUR)
@@ -235,17 +235,17 @@ void energy::print_etot(
 				//printf( "[36m%-15f[0m", GlobalC::en.etot);	
 				if(GlobalV::NSPIN==2)
 				{
-					cout << setprecision(2);
-					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
-					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
+					std::cout << setprecision(2);
+					std::cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+					std::cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
 				else if(GlobalV::NSPIN==4 && GlobalV::NONCOLIN)
 				{
-					cout << setprecision(2);
-					cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[0]
+					std::cout << setprecision(2);
+					std::cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[0]
 					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[1]
 					<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization_nc[2];
-					cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
+					std::cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 				}
 				if(dr2>1.0)
 				{
@@ -262,58 +262,58 @@ void energy::print_etot(
 				// 34 is blue
 				printf( "\e[36m%-15f\e[0m", GlobalC::en.etot*Ry_to_eV);	
 				//printf( "[36m%-15f[0m", GlobalC::en.etot*Ry_to_eV);	
-				cout << setprecision(3);
-	//			cout << setw(11) << GlobalC::en.eband;
-	//			cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//			cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
-				cout << resetiosflags(ios::scientific);
+				std::cout << setprecision(3);
+	//			std::cout << setw(11) << GlobalC::en.eband;
+	//			std::cout << setw(11) << H_Hartree_pw::hartree_energy;
+	//			std::cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
+				std::cout << resetiosflags(ios::scientific);
 				//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
 				if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 				{
-					cout << setw(11) << avg_iter;
+					std::cout << setw(11) << avg_iter;
 				}
 				//xiaohui modified 2013-03-23
 				//else if(GlobalV::DIAGO_TYPE=="selinv")
 				//{
 					// because Selinv::iter starts from 0.
-				//	cout << setw(11) << Selinv::iter;
+				//	std::cout << setw(11) << Selinv::iter;
 				//}
-				cout << setw(11) << duration;
-				cout << endl;
+				std::cout << setw(11) << duration;
+				std::cout << std::endl;
 			}
 		}
 		else
 		{
-			cout << setprecision(prec);
-			//cout << setw(15) << GlobalC::en.etot;
+			std::cout << setprecision(prec);
+			//std::cout << setw(15) << GlobalC::en.etot;
 			if(GlobalV::NSPIN==2)
 			{
-				cout << setprecision(2);
-				cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
-				cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
+				std::cout << setprecision(2);
+				std::cout<<setw(10)<<GlobalC::ucell.magnet.tot_magnetization;
+				std::cout<<setw(10)<<GlobalC::ucell.magnet.abs_magnetization;
 			}
-			cout << setprecision(6);
-			cout << setw(15) << GlobalC::en.etot*Ry_to_eV;
-                        cout << setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
-                        cout << setprecision(3);
-                        cout << setw(11) << dr2;
-			cout << setprecision(3);
-	//		cout << setw(11) << GlobalC::en.eband;
-	//		cout << setw(11) << H_Hartree_pw::hartree_energy;
-	//		cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
+			std::cout << setprecision(6);
+			std::cout << setw(15) << GlobalC::en.etot*Ry_to_eV;
+                        std::cout << setw(15) << (GlobalC::en.etot - GlobalC::en.etot_old) *Ry_to_eV;  //pengfei Li added 2015-1-31
+                        std::cout << setprecision(3);
+                        std::cout << setw(11) << dr2;
+			std::cout << setprecision(3);
+	//		std::cout << setw(11) << GlobalC::en.eband;
+	//		std::cout << setw(11) << H_Hartree_pw::hartree_energy;
+	//		std::cout << setw(11) << GlobalC::en.etxc - GlobalC::en.etxcc;
 			//if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
 			if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
 			{
-				cout << setw(11) << avg_iter;
+				std::cout << setw(11) << avg_iter;
 			}
 			//xiaohui modified 2013-03-23
 			//else if(GlobalV::DIAGO_TYPE=="selinv")
 			//{
 				// because Selinv::iter starts from 0.
-			//	cout << setw(11) << Selinv::iter+1;
+			//	std::cout << setw(11) << Selinv::iter+1;
 			//}
-			cout << setw(11) << duration;
-			cout << endl;
+			std::cout << setw(11) << duration;
+			std::cout << std::endl;
 		}
 
 	}
@@ -331,7 +331,7 @@ void energy::print_format(const string &name, const double &value)
 	stringstream name2;
 	name2 << name;
 	GlobalV::ofs_running << " " << setw(12) << name2.str() << setw(30) <<  value 
-	<< setw(30) << value * Ry_to_eV << endl;
+	<< setw(30) << value * Ry_to_eV << std::endl;
 	GlobalV::ofs_running << resetiosflags(ios::showpos);
 	return;
 }
@@ -428,7 +428,7 @@ void energy::print_band(const int &ik)
 	{
 		if( abs( GlobalC::wf.ekb[ik][ib] ) > 1.0e10)
 		{
-			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << endl;
+			GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << std::endl;
 			wrong = true;
 		}
 	}
@@ -444,7 +444,7 @@ void energy::print_band(const int &ik)
 		//if( GlobalV::DIAGO_TYPE == "selinv" ) xiaohui modify 2013-09-02
 		if(GlobalV::KS_SOLVER=="selinv") //xiaohui add 2013-09-02
 		{
-			GlobalV::ofs_running << " No eigenvalues are available for selected inversion methods." << endl;	
+			GlobalV::ofs_running << " No eigenvalues are available for selected inversion methods." << std::endl;	
 		}
 		else
 		{
@@ -452,7 +452,7 @@ void energy::print_band(const int &ik)
 			{
 				//	NEW_PART("ENERGY BANDS (Rydberg), (eV)");
 				GlobalV::ofs_running << setprecision(6);
-				GlobalV::ofs_running << " Energy (eV) & Occupations  for spin=" << GlobalV::CURRENT_SPIN+1 << " K-point=" << ik+1 << endl;
+				GlobalV::ofs_running << " Energy (eV) & Occupations  for spin=" << GlobalV::CURRENT_SPIN+1 << " K-point=" << ik+1 << std::endl;
 				GlobalV::ofs_running << setiosflags(ios::showpoint);
 				for(int ib=0;ib<GlobalV::NBANDS;ib++)
 				{
@@ -461,7 +461,7 @@ void energy::print_band(const int &ik)
 					// for the first electron iteration, we don't have the energy
 					// spectrum, so we can't get the occupations. 
 					GlobalV::ofs_running << setw(15) << GlobalC::wf.wg(ik,ib);
-					GlobalV::ofs_running << endl;
+					GlobalV::ofs_running << std::endl;
 				}
 			}
 		}

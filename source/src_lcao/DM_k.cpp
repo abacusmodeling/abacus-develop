@@ -60,7 +60,7 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 	TITLE("Local_Orbital_Charge","kpt_file");
 
 	int error;
-	cout << " Read in wave functions files: " << GlobalC::kv.nkstot << endl;
+	std::cout << " Read in wave functions files: " << GlobalC::kv.nkstot << std::endl;
 
 	complex<double> **ctot;
 
@@ -70,13 +70,13 @@ void Local_Orbital_Charge::kpt_file(const Grid_Technique &gt)
 		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].create(GlobalC::ParaO.ncol, GlobalC::ParaO.nrow);
 		GlobalC::LOC.wfc_dm_2d.wfc_k[ik].zero_out();
 
-		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << endl;
+		GlobalV::ofs_running << " Read in wave functions " << ik + 1 << std::endl;
 		error = WF_Local::read_lowf_complex( ctot , ik , 1);
 
 #ifdef __MPI
 		Parallel_Common::bcast_int(error);
 #endif
-		GlobalV::ofs_running << " Error=" << error << endl;
+		GlobalV::ofs_running << " Error=" << error << std::endl;
 		if(error==1)
 		{
 			WARNING_QUIT("Local_Orbital_wfc","Can't find the wave function file: GlobalC::LOWF.dat");
@@ -365,14 +365,14 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     //------------
     // for test
     //------------
-/*  cout << setprecision(3);
+/*  std::cout << setprecision(3);
     for(int i=0; i<nnrg_now; i++)
 
     for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)
     {
         for(int ib=0; ib<GlobalV::NBANDS; ++ib)
         {
-            cout << " ik=" << ik << " ib=" << ib << " occ=" << GlobalC::wf.wg(ik,ib) << " e=" << GlobalC::wf.ekb[ik][ib] << endl;
+            std::cout << " ik=" << ik << " ib=" << ib << " occ=" << GlobalC::wf.wg(ik,ib) << " e=" << GlobalC::wf.ekb[ik][ib] << std::endl;
         }
     }
 
@@ -380,7 +380,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     {
         if(DM_R[0][i]>1.0e-8)
         {
-            cout << " i=" << i << " DM_R=" << DM_R[0][i] << endl;
+            std::cout << " i=" << i << " DM_R=" << DM_R[0][i] << std::endl;
         }
     }
 */

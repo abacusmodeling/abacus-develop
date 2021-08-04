@@ -105,7 +105,7 @@ void Charge_Broyden::mix_rho
 	NOTE("Calculate the norm of the Residual vector: < R[rho] | R[rho_save] >");
     dr2 = this->rhog_dot_product( this->rhog, this->rhog);
 	
-	if(GlobalV::test_charge)GlobalV::ofs_running << " dr2 from rhog_dot_product is " << dr2 << endl;
+	if(GlobalV::test_charge)GlobalV::ofs_running << " dr2 from rhog_dot_product is " << dr2 << std::endl;
 
 	// dr2 calculated from real space.
 	double dr22 = 0.0;
@@ -123,7 +123,7 @@ void Charge_Broyden::mix_rho
 	assert( GlobalC::pw.ncxyz > 0);
 	dr22 *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 	dr22 /= nelec;
-	if(GlobalV::test_charge)GlobalV::ofs_running << " dr2 from real space grid is " << dr22 << endl;
+	if(GlobalV::test_charge)GlobalV::ofs_running << " dr2 from real space grid is " << dr22 << std::endl;
 
 	// mohan add 2011-01-22
 	//if(LINEAR_SCALING && LOCAL_BASIS) xiaohui modify 2013-09-01
@@ -133,7 +133,7 @@ void Charge_Broyden::mix_rho
 	}
     if ( dr2 < diago_error )
     {
-        GlobalV::ofs_warning << " dr2 < diago_error, keep charge density unchanged." << endl;
+        GlobalV::ofs_warning << " dr2 < diago_error, keep charge density unchanged." << std::endl;
     	timer::tick("Charge","mix_rho");
         return;
     }
@@ -339,7 +339,7 @@ void Charge_Broyden::Modified_Broyden_mixing(void)
     this->rstep = this->mixing_ndim;
     this->dstep = this->rstep - 1;
 
-	//cout << "\n initb = " << initb << endl;
+	//std::cout << "\n initb = " << initb << std::endl;
     
 	// (1)
 	this->broyden_type=1;
@@ -355,9 +355,9 @@ void Charge_Broyden::Modified_Broyden_mixing(void)
 	if (irstep==rstep) irstep=0;
 	if (idstep==dstep) idstep=0;
 
-	//cout << "\n irstep = " << irstep;
-	//cout << "\n idstep = " << idstep;
-	//cout << "\n totstep = " << totstep;
+	//std::cout << "\n irstep = " << irstep;
+	//std::cout << "\n idstep = " << idstep;
+	//std::cout << "\n totstep = " << totstep;
 
 	this->generate_datas(irstep, idstep, totstep);
 
@@ -541,7 +541,7 @@ void Charge_Broyden::generate_beta(const int &is)
 	
 //	out.printrm("beta",beta,1.0e-15);
 //	out.printrm("betabar",betabar,1.0e-15);
-//	cout << endl;
+//	std::cout << std::endl;
 		
 	return;
 }
@@ -577,10 +577,10 @@ void Charge_Broyden::generate_Zmk(const int &totstep, const int &irstep, const i
 		}
 	}
 
-	cout << "\n irstep=" << irstep;
+	std::cout << "\n irstep=" << irstep;
 	out.printrm("Zmk",Zmk[is],1.0e-15);
 	out.printrm("Zmk_old",Zmk_old[is],1.0e-15);
-	cout << endl;
+	std::cout << std::endl;
 	
 	// save Zmk old
 	// sacrifice liite memory to make coding convenient!
@@ -612,9 +612,9 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 		{
 			gamma[i] += this->Zmk[is](k,i) * this->dRR[k];
 		}
-		//cout << "\n gamma[" << i << "]=" << gamma[i];
+		//std::cout << "\n gamma[" << i << "]=" << gamma[i];
 	}
-	//cout << endl;
+	//std::cout << std::endl;
 	
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
@@ -627,7 +627,7 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 	}
 
 	/*
-	cout << "\n check E: " << endl;
+	std::cout << "\n check E: " << std::endl;
 	
 	double* rhot = new double[GlobalC::pw.nrxx];
 	ZEROS(rhot, GlobalC::pw.nrxx);
@@ -638,7 +638,7 @@ void Charge_Broyden::generate_new_broyden_rho(const int &is, const int &m)
 		{
 			rhot[ir] = this->drho[is][i][ir] + gamma[i] * this->dRrho[is][i][ir];
 		}
-		cout << "\n residual_norm = " << this->calculate_residual_norm(rhot,rhot) << endl;
+		std::cout << "\n residual_norm = " << this->calculate_residual_norm(rhot,rhot) << std::endl;
 	}	
 
 	BLOCK_HERE("haha");

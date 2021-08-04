@@ -109,17 +109,17 @@ timeval t_start;
 //gettimeofday( &t_start, NULL);
 #if false
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid = LOC_to_grid( Born_von_Karman_period, threshold );
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid\t"<<time_during(t_start)<<std::endl;
 ofs_matrixes( "DM_grid_"+TO_STRING(GlobalV::MY_RANK), DM_grid );
 
 //gettimeofday( &t_start, NULL);	
 	MPI_Barrier( MPI_COMM_WORLD );
-//ofs_time<<"TIME@ MPI_Barrier\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ MPI_Barrier\t"<<time_during(t_start)<<std::endl;
 
 //gettimeofday( &t_start, NULL);	
 	Allreduce allreduce( MPI_COMM_WORLD, DM_grid, Born_von_Karman_period, H_atom_pairs_core );
 	this->DMr = allreduce.grid_to_exx();
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::grid_to_exx\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::grid_to_exx\t"<<time_during(t_start)<<std::endl;
 #else
 	auto cal_dm_my = [&]() -> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
 	{
@@ -152,7 +152,7 @@ ofs_matrixes( "DM_grid_"+TO_STRING(GlobalV::MY_RANK), DM_grid );
 	};
 //gettimeofday( &t_start, NULL);	
 	this->DMr = cal_dm_my();
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::cal_dm_my\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::cal_dm_my\t"<<time_during(t_start)<<std::endl;
 #endif	
 //ofs_time.close();
 ofs_matrixes( "DMr_"+TO_STRING(GlobalV::MY_RANK), DMr );
@@ -178,9 +178,9 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 		{
 			for( int i2=0; i2!=GlobalC::GridT.lgd; ++i2 )
 				ofs<<GlobalC::LOC.DM[is][i1][i2]<<"\t";
-			ofs<<endl;
+			ofs<<std::endl;
 		}
-		ofs<<endl;
+		ofs<<std::endl;
 	}
 	ofs.close();
 }		
@@ -218,13 +218,13 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 				const int iwt1 = GlobalC::ParaO.MatrixInfo.row_set[iwt1_grid];
 				const int iat1 = GlobalC::ucell.iwt2iat[iwt1];
 				const int iw1  = GlobalC::ucell.iwt2iw[iwt1];
-cout<<iwt1_grid<<"\t"<<iwt1<<"\t"<<iat1<<"\t"<<iw1<<endl;
+std::cout<<iwt1_grid<<"\t"<<iwt1<<"\t"<<iat1<<"\t"<<iw1<<std::endl;
 				for( int iwt2_grid=0; iwt2_grid<GlobalC::GridT.lgd; ++iwt2_grid )
 				{				
 					const int iwt2 = GlobalC::ParaO.MatrixInfo.col_set[iwt2_grid];
 					const int iat2 = GlobalC::ucell.iwt2iat[iwt2];
 					const int iw2  = GlobalC::ucell.iwt2iw[iwt2];
-cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;
+std::cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<std::endl;
 					try
 					{
 						DM_grid[is].at(iat1).at(iat2).at({0,0,0})(iw1,iw2) = GlobalC::LOC.DM[is][iwt1_grid][iwt2_grid];
@@ -245,11 +245,11 @@ cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<endl;
 ofstream ofs_LOC_DM("GlobalC::LOC.DM_R_"+TO_STRING(GlobalV::MY_RANK));
 for( int i=0; i<100; ++i )
 	ofs_LOC_DM<<GlobalC::LOC.DM_R[0][i]<<"\t";
-ofs_LOC_DM<<endl<<endl;
+ofs_LOC_DM<<std::endl<<std::endl;
 
 		Record_adj RA;
 		RA.for_grid(GlobalC::GridT);
-//cout<<__FILE__<<__LINE__<<endl;
+//std::cout<<__FILE__<<__LINE__<<std::endl;
 
 		for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 		{
@@ -265,14 +265,14 @@ ofs_LOC_DM<<endl<<endl;
 					const int nw1 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat1]].nw;
 					const int nw2 = GlobalC::ucell.atoms[GlobalC::ucell.iat2it[iat2]].nw;	
 {
-	ofs_LOC_DM<<"@\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
+	ofs_LOC_DM<<"@\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 	for( int iw1=0; iw1!=nw1; ++iw1 )
 	{
 		for( int iw2=0; iw2!=nw2; ++iw2 )
 			ofs_LOC_DM<<GlobalC::LOC.DM_R[is][GlobalC::LNNR.nlocstartg[iat1]+iw_index+iw1*nw2+iw2]<<"\t";
-		ofs_LOC_DM<<endl;
+		ofs_LOC_DM<<std::endl;
 	}
-	ofs_LOC_DM<<endl;
+	ofs_LOC_DM<<std::endl;
 }			
 					if( !MAP_EXIST( DM_grid[is], iat1, iat2, boxp2 ) )
 					{					

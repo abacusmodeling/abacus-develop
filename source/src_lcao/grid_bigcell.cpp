@@ -80,24 +80,24 @@ void Grid_BigCell::init_big_latvec(void)
 
 	if(GlobalV::test_gridt)
 	{
-		GlobalV::ofs_running << " the VECTORS of BIGCELL are (Bohr): " << endl;
+		GlobalV::ofs_running << " the VECTORS of BIGCELL are (Bohr): " << std::endl;
 		GlobalV::ofs_running << " vec1( " 
 			<< setw(15) << bigcell_vec1[0]
 			<< setw(15) << bigcell_vec1[1]
 			<< setw(15) << bigcell_vec1[2] 
-			<< ")" << endl;
+			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec2( " 
 			<< setw(15) << bigcell_vec2[0]
 			<< setw(15) << bigcell_vec2[1]
 			<< setw(15) << bigcell_vec2[2]
-			<< ")" << endl;
+			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec3( " 
 			<< setw(15) << bigcell_vec3[0]
 			<< setw(15) << bigcell_vec3[1]
 			<< setw(15) << bigcell_vec3[2]
-			<< ")" << endl;
+			<< ")" << std::endl;
 	}
 	return;
 }
@@ -244,15 +244,15 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 
 			if( fraction.x < 0 || fraction.y < 0 || fraction.z < 0)
 			{
-				cout << " Atom positions " << endl;
-				cout << GlobalC::ucell.atoms[it].tau[ia].x << " " ;
-				cout << GlobalC::ucell.atoms[it].tau[ia].y << " " ;
-				cout << GlobalC::ucell.atoms[it].tau[ia].z << " " ;
-				cout << " fraction " << endl;
-				cout << fraction.x << " ";
-				cout << fraction.y << " ";
-				cout << fraction.z << " ";
-				cout << endl;
+				std::cout << " Atom positions " << std::endl;
+				std::cout << GlobalC::ucell.atoms[it].tau[ia].x << " " ;
+				std::cout << GlobalC::ucell.atoms[it].tau[ia].y << " " ;
+				std::cout << GlobalC::ucell.atoms[it].tau[ia].z << " " ;
+				std::cout << " fraction " << std::endl;
+				std::cout << fraction.x << " ";
+				std::cout << fraction.y << " ";
+				std::cout << fraction.z << " ";
+				std::cout << std::endl;
 				WARNING_QUIT("Grid_BigCell::init_tau_in_bigcell","fraction.x<0 || fraction.y<0 || fraction.z<0");
 			}
 
@@ -279,7 +279,7 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 			/*
 			if(index_atom[iat]==3483935)
 			{
-				cout << "\n i=" << kk+dze << " j=" << jj+dye << " k=" << ii+dxe;
+				std::cout << "\n i=" << kk+dze << " j=" << jj+dye << " k=" << ii+dxe;
 				BLOCK_HERE("check index atom");
 			}
 			*/
@@ -293,8 +293,8 @@ void Grid_BigCell::init_tau_in_bigcell(void)
 			if( abs(delta[1]) < 1.0e-8) delta[1] = 0.0;
 			if( abs(delta[2]) < 1.0e-8) delta[2] = 0.0;
 
-//			cout << " fraction=" << fraction.x << " " << fraction.y << " " << fraction.z << endl;
-//			cout << " delta=" << delta[0] << " " << delta[1] << " " << delta[2] << endl;
+//			std::cout << " fraction=" << fraction.x << " " << fraction.y << " " << fraction.z << std::endl;
+//			std::cout << " delta=" << delta[0] << " " << delta[1] << " " << delta[2] << std::endl;
 
 			// get the true relative cartesian coordinate of each atom to the coresponding
 			// meshcell.
@@ -320,7 +320,7 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 {
 	TITLE("Grid_BigCell","grid_expansion_index");
 	timer::tick("Grid_BigCell","grid_expansion_index");
-//	cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << endl;
+//	std::cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << std::endl;
 //	stringstream ss;
 //	ss << GlobalV::global_out_dir << "expand_grid.dat";
 //	ofstream ofs(ss.str().c_str());
@@ -378,8 +378,8 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 				}
 				else
 				{
-					//cout << "i=" << ii << " j=" << jj << " k=" << kk << endl;
-					//cout << "box1=" << box1 << " box2=" << box2 << " box3=" << box3 << endl;
+					//std::cout << "i=" << ii << " j=" << jj << " k=" << kk << std::endl;
+					//std::cout << "box1=" << box1 << " box2=" << box2 << " box3=" << box3 << std::endl;
 
 					// if ii < 0, we need to make ii > 0.
 					// so we add 10000 layers. It should be enough.
@@ -388,7 +388,7 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 					jj = (jj + 10000 * nby) % nby;
 					kk = (kk + 10000 * nbz) % nbz;
 
-					//cout << "ii=" << ii << " jj=" << jj << " kk=" << kk << endl;				
+					//std::cout << "ii=" << ii << " jj=" << jj << " kk=" << kk << std::endl;				
 					//int ok; cin >> ok;
 
 					assert(ii>=0);
@@ -407,7 +407,7 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 						/*
 						   if(in_ext == 5816805) 
 						   {
-						   cout << "\n index2normal[5816805]=" << in_normal << endl;
+						   std::cout << "\n index2normal[5816805]=" << in_normal << std::endl;
 						   BLOCK_HERE("check index2normal");
 						   }
 						 */

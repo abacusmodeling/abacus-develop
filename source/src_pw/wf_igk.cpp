@@ -10,7 +10,7 @@ WF_igk::~WF_igk()
 { 
 	if(GlobalV::test_deconstructor)
 	{
-		cout << " ~WF_igk()" << endl;
+		std::cout << " ~WF_igk()" << std::endl;
 	}
     delete[] g2kin;
 }
@@ -60,7 +60,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
         {
             npw_max = ng;
         }
-//		GlobalV::ofs_running << " " << setw(8) << ik << setw(10) << GlobalC::kv.ngk[ik] << endl;
+//		GlobalV::ofs_running << " " << setw(8) << ik << setw(10) << GlobalC::kv.ngk[ik] << std::endl;
     }
 
     if (GlobalV::test_wf > 1) OUT("npw_max",npw_max);
@@ -98,18 +98,18 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 		stringstream ss;
 		ss << GlobalV::global_out_dir << "PW_GK" << GlobalV::MY_RANK+1 << ".dat";
 		ofstream ofs( ss.str().c_str() );
-		ofs << GlobalC::pw.ggpsi << " (ggpsi, Ry)" << endl;
-		ofs << GlobalC::pw.ggwfc << " (ggwfc, Ry)" << endl;
-		ofs << GlobalC::pw.ggwfc2 << " (ggwfc2, Ry)" << endl;
+		ofs << GlobalC::pw.ggpsi << " (ggpsi, Ry)" << std::endl;
+		ofs << GlobalC::pw.ggwfc << " (ggwfc, Ry)" << std::endl;
+		ofs << GlobalC::pw.ggwfc2 << " (ggwfc2, Ry)" << std::endl;
 		Vector3<double> f;
 		for(int ik=0; ik < nks; ++ik)
 		{
-			ofs << ik+1 << " (Index of k)" << endl;
-			ofs << pwb.ngmw << " (Number of plane waves)" << endl;	
+			ofs << ik+1 << " (Index of k)" << std::endl;
+			ofs << pwb.ngmw << " (Number of plane waves)" << std::endl;	
 			for(int ig=0; ig < pwb.ngmw; ++ig)
 			{
                 f = pwb.get_GPlusK_cartesian(ik, ig);
-                ofs << f.x << " " << f.y << " " << f.z << " " << f.norm() << endl;
+                ofs << f.x << " " << f.y << " " << f.z << " " << f.norm() << std::endl;
 			}
 		}
 		ofs.close();
@@ -147,10 +147,10 @@ Vector3<double> WF_igk::get_1qvec_cartesian(const int ik,const int ig)const
     /*
 	if(igk(ik,ig)==0)
 	{
-		cout << " g add = " << GlobalC::pw.gcar << endl;
-		cout << "\n igk = " << igk(ik,ig);
-		cout << " k=" << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z;
-		cout << " g=" << GlobalC::pw.gcar[ this->igk(ik, ig) ].x << " " << GlobalC::pw.gcar[ this->igk(ik, ig) ].y << " " << GlobalC::pw.gcar[ this->igk(ik, ig) ].z;
+		std::cout << " g add = " << GlobalC::pw.gcar << std::endl;
+		std::cout << "\n igk = " << igk(ik,ig);
+		std::cout << " k=" << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z;
+		std::cout << " g=" << GlobalC::pw.gcar[ this->igk(ik, ig) ].x << " " << GlobalC::pw.gcar[ this->igk(ik, ig) ].y << " " << GlobalC::pw.gcar[ this->igk(ik, ig) ].z;
 	}
 	*/
 	

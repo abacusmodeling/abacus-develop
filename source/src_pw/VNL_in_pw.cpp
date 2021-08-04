@@ -26,7 +26,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	TITLE("pseudopot_cell_vnl", "init");
 	timer::tick("ppcell_vnl", "init");
 
-	GlobalV::ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << endl;
+	GlobalV::ofs_running << "\n SETUP NONLOCAL PSEUDOPOTENTIALS IN PLANE WAVE BASIS" << std::endl;
 
 	int it = 0;
 //----------------------------------------------------------
@@ -36,10 +36,10 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	this->lmaxkb = - 1;
 	for (it = 0;it < ntype; it++)
 	{
-		GlobalV::ofs_running << " " << GlobalC::ucell.atoms[it].label << " non-local projectors:" << endl;
+		GlobalV::ofs_running << " " << GlobalC::ucell.atoms[it].label << " non-local projectors:" << std::endl;
 		for (int ibeta = 0; ibeta < GlobalC::ucell.atoms[it].nbeta; ibeta++) 
 		{
-			GlobalV::ofs_running << " projector " << ibeta+1 << " L=" << GlobalC::ucell.atoms[it].lll[ibeta] <<  endl;
+			GlobalV::ofs_running << " projector " << ibeta+1 << " L=" << GlobalC::ucell.atoms[it].lll[ibeta] <<  std::endl;
 			this->lmaxkb = max( this->lmaxkb, GlobalC::ucell.atoms[it].lll[ibeta]);
 		}
 	}
@@ -392,7 +392,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 		delete[] jl;
 	}
 	timer::tick("ppcell_vnl","init_vnl");
-	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done." << endl;
+	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done." << std::endl;
 	return;
 }
 
@@ -517,7 +517,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 							complex<double> c = Cal_C(alpha,lu, mu, L, M);
 							/*if(alpha == 0)
 							{
-								cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<endl;
+								std::cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<std::endl;
 							}*/
 							vkb1_alpha[alpha][ih][ig] += c * vq[ig] * ylm(lm, ig) * pow( NEG_IMAG_UNIT, L);
 						}	
@@ -620,7 +620,7 @@ void pseudopot_cell_vnl::init_vnl_alpha(void)          // pengfei Li 2018-3-23
 		delete[] jl;
 	}
 	timer::tick("ppcell_vnl","init_vnl_alpha");
-	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done(including L)." << endl;
+	GlobalV::ofs_running << "\n Init Non-Local-Pseudopotential done(including L)." << std::endl;
 	return;
 }
 
@@ -636,7 +636,7 @@ void pseudopot_cell_vnl::print_vnl(ofstream &ofs)
 int pseudopot_cell_vnl::calculate_nqx(const double &ecutwfc,const double &dq)
 {
 	int points_of_table = static_cast<int>( sqrt(ecutwfc)/dq + 4 ) ;//* cell_factor;
-//	cout<<"\n nqx = "<< points_of_table;
+//	std::cout<<"\n nqx = "<< points_of_table;
 //----------------------------------------------------------
 // EXPLAIN : Plus 1 because the formula is transfered from 
 // fortran code.

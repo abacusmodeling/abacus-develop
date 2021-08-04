@@ -18,8 +18,8 @@ void Run_MD_PW::md_ions_pw(void)
 
     if (GlobalV::OUT_LEVEL == "i")
     {
-        cout << setprecision(12);
-        cout << " " << setw(7) << "ISTEP"
+        std::cout << setprecision(12);
+        std::cout << " " << setw(7) << "ISTEP"
              << setw(5) << "NE"
              << setw(15) << "ETOT(eV)"
              << setw(15) << "EDIFF(eV)"
@@ -28,7 +28,7 @@ void Run_MD_PW::md_ions_pw(void)
              << setw(8) << "UPDATE"
              << setw(11) << "ETIME(MIN)"
              << setw(11) << "FTIME(MIN)"
-             << endl;
+             << std::endl;
     }
 
     // allocation for ion movement.
@@ -55,12 +55,12 @@ void Run_MD_PW::md_ions_pw(void)
 
         if (GlobalV::OUT_LEVEL == "ie")
         {
-            cout << " -------------------------------------------" << endl;    
-            cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            cout << " -------------------------------------------" << endl;
-            GlobalV::ofs_running << " -------------------------------------------" << endl;
-            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
-            GlobalV::ofs_running << " -------------------------------------------" << endl;
+            std::cout << " -------------------------------------------" << std::endl;    
+            std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            std::cout << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
+            GlobalV::ofs_running << " -------------------------------------------" << std::endl;
         }
 
     //----------------------------------------------------------
@@ -180,7 +180,7 @@ void Run_MD_PW::md_ions_pw(void)
 
         //reset local potential and initial wave function
         GlobalC::pot.init_pot(istep, GlobalC::pw.strucFac);
-        GlobalV::ofs_running << " Setup the new wave functions?" << endl;
+        GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
         GlobalC::wf.wfcinit();
 
         if (GlobalV::OUT_LEVEL == "i")
@@ -190,7 +190,7 @@ void Run_MD_PW::md_ions_pw(void)
             stringstream ss;
             ss << GlobalV::MOVE_IONS << istep;
 
-            cout << " " << setw(7) << ss.str()
+            std::cout << " " << setw(7) << ss.str()
                  << setw(5) << eiter
                  << setw(15) << setprecision(6) << GlobalC::en.etot * Ry_to_eV
                  << setw(15) << IMM.get_ediff() * Ry_to_eV
@@ -199,7 +199,7 @@ void Run_MD_PW::md_ions_pw(void)
                  << setw(15) << IMM.get_trust_radius()
                  << setw(8) << IMM.get_update_iter()
                  << setprecision(2) << setw(11) << etime_min
-                 << setw(11) << ftime_min << endl;
+                 << setw(11) << ftime_min << std::endl;
         }
 
         ++istep;
@@ -207,7 +207,7 @@ void Run_MD_PW::md_ions_pw(void)
 
     if (GlobalV::OUT_LEVEL == "i")
     {
-        cout << " ION DYNAMICS FINISHED :)" << endl;
+        std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
     }
 
     timer::tick("Run_MD_PW", "md_ions_pw");
@@ -290,10 +290,10 @@ void Run_MD_PW::md_cells_pw()
 
     this->md_ions_pw();
 
-    GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+    GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
     GlobalV::ofs_running << setprecision(16);
-    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
-    GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
+    GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+    GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     timer::tick("Run_MD_PW", "md_cells_pw");
 }

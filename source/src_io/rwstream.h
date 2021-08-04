@@ -57,7 +57,7 @@ Rwstream& operator>>(Rwstream& rstream,T& data)
     ch=fread(&data,size,n,rstream.fileptr);
 	if(ch<n)
 	{
-		cout<<"Error in Rwstream: Some data didn't be read."<<endl;
+		std::cout<<"Error in Rwstream: Some data didn't be read."<<std::endl;
     	exit(0);
 	}
 	return rstream;
@@ -70,12 +70,12 @@ Rwstream& operator>>(Rwstream& rstream,T* &data)
 {
 	int size=sizeof(T);
 	int n=malloc_usable_size(data)/sizeof(T);
-	cout<<malloc_usable_size(data)<<' '<<sizeof(T)<<' '<<n<<endl;
+	std::cout<<malloc_usable_size(data)<<' '<<sizeof(T)<<' '<<n<<std::endl;
 	size_t ch;
     ch=fread(data,size,n,rstream.fileptr);
 	if(ch<n)
 	{
-		cout<<"Error in Rwstream: Some dynamic memory didn't be read."<<endl;
+		std::cout<<"Error in Rwstream: Some dynamic memory didn't be read."<<std::endl;
 		exit(0);
     }
 	return rstream;
@@ -88,7 +88,7 @@ void rwread(Rwstream& rstream,T* &data,int n)
     ch=fread(data,size,n,rstream.fileptr);
     if(ch<n)
     {
-        cout<<"Error in Rwstream: Some dynamic memory didn't be read."<<endl;
+        std::cout<<"Error in Rwstream: Some dynamic memory didn't be read."<<std::endl;
         exit(0);
     }
     return;

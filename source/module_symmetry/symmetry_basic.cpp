@@ -155,12 +155,12 @@ void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 
 //	for(int i=0; i<natom; i++)
 //	{
-//		cout << "\n subindex[" << i << "]=" << subindex[i];
+//		std::cout << "\n subindex[" << i << "]=" << subindex[i];
 //	}
 	
 	this->order_atoms(posi, natom, subindex);
 
-//	cout << "\n after Order X:" << endl;
+//	std::cout << "\n after Order X:" << std::endl;
 //	print_pos(posi, natom);
 	
 	// order y
@@ -200,7 +200,7 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 //	TITLE("Symmetry_Basic","order_y");
 	// how many atoms need to be reordered according to same x value.
 	const int nat1 = newpos1 - oldpos1;
-//	cout << "\n nat1=" << nat1 << endl; 
+//	std::cout << "\n nat1=" << nat1 << std::endl; 
 	if(nat1 == 1) return;
 
 	double* tmp1 = new double[nat1];
@@ -211,7 +211,7 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 	{
 		//+1 means y
 		tmp1[ia] = pos1[3*ia+1];
-//		cout << "\n ia=" << ia << " y=" << tmp1[ia];
+//		std::cout << "\n ia=" << ia << " y=" << tmp1[ia];
 	}
 
 	heapsort(nat1, tmp1, index1);
@@ -220,7 +220,7 @@ void Symmetry_Basic::order_y(double *pos1, const int &oldpos1, const int &newpos
 	
 //	for(int ia=0; ia<nat1; ia++)
 //	{
-//		cout << "\n index[" << ia << "]=" << index1[ia];
+//		std::cout << "\n index[" << ia << "]=" << index1[ia];
 //	}
 
 	double oldv2 = pos1[1];
@@ -256,7 +256,7 @@ void Symmetry_Basic::order_z(double* pos2, const int &oldpos2, const int &newpos
 {
 //	TITLE("Symmetry_Basic","order_z");
 	const int nat2 = newpos2 - oldpos2;
-//	cout << "\n nat2=" << nat2; 
+//	std::cout << "\n nat2=" << nat2; 
 //	if(nat2==1) return;
 	double* tmp2 = new double[nat2];
 	int* index2 = new int[nat2];
@@ -271,14 +271,14 @@ void Symmetry_Basic::order_z(double* pos2, const int &oldpos2, const int &newpos
 
 //	for(int ia=0; ia<nat2; ia++)
 //	{
-//		cout << "\n Z1 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
+//		std::cout << "\n Z1 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
 //	}
 	
 	this->order_atoms(pos2,nat2,index2);
 
 //	for(int ia=0; ia<nat2; ia++)
 //	{
-//		cout << "\n Z2 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
+//		std::cout << "\n Z2 pos2[" << ia << "]=" << pos2[3*ia] << " " << pos2[3*ia+1] << " " << pos2[3*ia+2];
 //	}
 
 	delete[] index2;
@@ -515,8 +515,8 @@ void Symmetry_Basic::veccon(
 		
 		direct_new = car * GT;
 
-		//cout << "\n car[" << i << "]=" << car.x << " " << car.y << " " << car.z;
-		//cout << "\n dir[" << i << "]=" << direct_new.x << " " << direct_new.y << " " << direct_new.z;
+		//std::cout << "\n car[" << i << "]=" << car.x << " " << car.y << " " << car.z;
+		//std::cout << "\n dir[" << i << "]=" << direct_new.x << " " << direct_new.y << " " << direct_new.z;
 
 		rotpos[i * 3 + 0] = direct_new.x;
 		rotpos[i * 3 + 1] = direct_new.y;
@@ -546,7 +546,7 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 	//take all generators
 	for(int i = 0; i < ngen; ++i)
 	{
-//		cout<<"\n symgen = "<<i<<endl;
+//		std::cout<<"\n symgen = "<<i<<std::endl;
 		sig = symgen[i];
 		flag = 1;
 		for(int j = 0; j < nop; ++j)
@@ -574,31 +574,31 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 			temp1= sig * temp1;
 		//	temp1 = temp2;
 		}
-//		cout<<"\n order = "<<order<<endl;
+//		std::cout<<"\n order = "<<order<<std::endl;
 		now = nop;
 		for(int j = 0; j < nop; ++j)
 		{	
 			temp1 = symop[j];
-		//	cout<<"\n j = "<<j<<endl<<"================================================="<<endl;
+		//	std::cout<<"\n j = "<<j<<std::endl<<"================================================="<<std::endl;
 		//	out.printM3("temp1",temp1);
 			for(int k = 1; k < order; ++k)
 			{
 				temp1 = sig * temp1;
-			//	cout<<"\n k = "<<k<<endl<<"================================================="<<endl;
+			//	std::cout<<"\n k = "<<k<<std::endl<<"================================================="<<std::endl;
 			//	out.printM3("temp1",temp1);
 			//	out.printM3("temp2",temp2);
 
 				//if(i==0 && j==0 && k==1){
-					//cout<<"sig:"<<endl;
+					//std::cout<<"sig:"<<std::endl;
 					//for(l=0; l<3; l++)
-						//for(m=0; m<3; m++) cout<<sig[l][m]<<"\t";
-					//cout<<endl;
+						//for(m=0; m<3; m++) std::cout<<sig[l][m]<<"\t";
+					//std::cout<<std::endl;
 				//}
 
 				for(int l = 0; l < nop; ++l)
 				{
 					temp2 = symop[l] * temp1;
-				//	cout<<"\n l = "<<l<<endl<<"================================================="<<endl;
+				//	std::cout<<"\n l = "<<l<<std::endl<<"================================================="<<std::endl;
 				//	out.printM3("temp1",temp1);
 				//	out.printM3("temp2",temp2);
 					flag = 1;
@@ -616,21 +616,21 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 					}
 
 					//if(i==0 && j==0 && k==1 && l==0){
-						//cout<<"symop[0]:"<<endl;
+						//std::cout<<"symop[0]:"<<std::endl;
 						//for(m=0; m<3; m++)
-							//for(t=0; t<3; t++) cout<<temp2[m][t]<<"\t";
-						//cout<<endl;
+							//for(t=0; t<3; t++) std::cout<<temp2[m][t]<<"\t";
+						//std::cout<<std::endl;
 					//}
 
 					++now;	//the number of elements we found
 					if(now > 48)
 					{
-						cout<<"\n a: now= "<<now<<endl;
-						cout<<"\n There are too many symmetrical matrices!"<<endl;
+						std::cout<<"\n a: now= "<<now<<std::endl;
+						std::cout<<"\n There are too many symmetrical matrices!"<<std::endl;
 						return;
 					}
 					symop[now - 1] = temp2;
-				//	cout<<"\n symop[now]:  "<<now<<endl;
+				//	std::cout<<"\n symop[now]:  "<<now<<std::endl;
 				//	out.printM3("",temp2);
 				}
 			}
@@ -666,8 +666,8 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 					++now;
 					if(now > 48)
 					{
-						cout<<"\n b: now= "<<now<<endl;
-						cout<<"\n There are too many symmetrical matrices!"<<endl;
+						std::cout<<"\n b: now= "<<now<<std::endl;
+						std::cout<<"\n There are too many symmetrical matrices!"<<std::endl;
 						return;
 					}
 					symop[now - 1] = temp1;
@@ -683,14 +683,14 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 		nop = now;
 //		for(int i = 0; i < nop; ++i)
 //		{
-//			cout<<"\n i = "<<i + 1<<endl;
+//			std::cout<<"\n i = "<<i + 1<<std::endl;
 //			out.printM3("",symop[i]);
 //		}
 	}
-//	cout<<"\n in matrigen:"<<endl;
+//	std::cout<<"\n in matrigen:"<<std::endl;
 //	for(int i = 0; i < nop; ++i)
 //	{
-//		cout<<"\n i = "<<i<<endl;
+//		std::cout<<"\n i = "<<i<<std::endl;
 //		out.printM3("",symop[i]);
 //	}
 }
@@ -811,8 +811,8 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 	OUT(GlobalV::ofs_running,"ROTATION MATRICES",nop);
 	if(GlobalV::test_symmetry > 1)
 	{
-		GlobalV::ofs_running<<" THERE ARE " << nop << " ROTATION MATRICES FOR THE PURE BRAVAIS LATTICE"<<endl;
-		GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<endl;
+		GlobalV::ofs_running<<" THERE ARE " << nop << " ROTATION MATRICES FOR THE PURE BRAVAIS LATTICE"<<std::endl;
+		GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<std::endl;
 		for(int i = 0; i < nop; ++i)
 		{
 			GlobalV::ofs_running << " " 
@@ -825,9 +825,9 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 			<< setw(4) << symop[i].e23
 			<< setw(4) << symop[i].e31
 			<< setw(4) << symop[i].e32
-			<< setw(4) << symop[i].e33 << endl;
+			<< setw(4) << symop[i].e33 << std::endl;
 //			out.printM3("",symop[i]);
-//			GlobalV::ofs_running<<endl;
+//			GlobalV::ofs_running<<std::endl;
 		}
 	}
 
@@ -905,7 +905,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 	int ns4 = 0;
 	int ns6 = 0; //mohan add 2012-01-15
 
-//	GlobalV::ofs_running << " " << setw(5) << "NROT" << setw(15) << "TRACE" << setw(15) << "DET" << endl;
+//	GlobalV::ofs_running << " " << setw(5) << "NROT" << setw(15) << "TRACE" << setw(15) << "DET" << std::endl;
 	for(int i = 0; i < nrot; ++i)
 	{
 		//calculate the trace of a matrix
@@ -913,7 +913,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		//calculate the determinant of a matrix
 		det = int(gmatrix[i].Det());
 
-//		GlobalV::ofs_running << " " << setw(5) << i+1 << setw(15) << trace << setw(15) << det << endl;
+//		GlobalV::ofs_running << " " << setw(5) << i+1 << setw(15) << trace << setw(15) << det << std::endl;
 
 		if(trace == 3)
 		{
@@ -1132,7 +1132,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, 
 		}
 	}
 
-	GlobalV::ofs_running <<"\n No point group found!"<<endl;
+	GlobalV::ofs_running <<"\n No point group found!"<<std::endl;
 	return;
 }
 

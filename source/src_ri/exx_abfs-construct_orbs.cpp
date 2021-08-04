@@ -289,13 +289,13 @@ ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RA
 		for( size_t L=0; L!=eig[T].size(); ++L )
 			for( size_t M=0; M!=eig[T][L].first.size(); ++M )
 			{
-ofs<<T<<"\t"<<L<<"\t"<<M<<"\t"<<eig[T][L].first[M]<<endl;
+ofs<<T<<"\t"<<L<<"\t"<<M<<"\t"<<eig[T][L].first[M]<<std::endl;
 				eig_value_max = std::max( eig_value_max, eig[T][L].first[M] );
 			}
 		const double eig_value_threshold = eig_value_max * times_threshold;
 		
-ofs<<"eig_value_max:\t"<<eig_value_max<<endl;
-ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<endl;
+ofs<<"eig_value_max:\t"<<eig_value_max<<std::endl;
+ofs<<"eig_value_threshold:\t"<<eig_value_threshold<<std::endl;
 		
 		if(eig_value_max)
 		{

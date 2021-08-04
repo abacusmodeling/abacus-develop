@@ -18,7 +18,7 @@ void Exx_Abfs::Inverse_Matrix_Double::cal_inverse( const Method &method )
 	#if TEST_EXX_LCAO==1
 		static int i=0;
 		ofstream ofs("inverse_matrix_"+TO_STRING(i));
-		ofs<<A<<endl;
+		ofs<<A<<std::endl;
 		ofs.close();
 		++i;
 	#elif TEST_EXX_LCAO==-1
@@ -38,8 +38,8 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 
 	if(info!=0)
 	{
-		cout << "\n info_dpotrf = " << info <<endl;
-		GlobalV::ofs_warning<<A<<endl;
+		std::cout << "\n info_dpotrf = " << info <<std::endl;
+		GlobalV::ofs_warning<<A<<std::endl;
 		QUIT();
 	}
 
@@ -47,8 +47,8 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 	
 	if(info!=0)
 	{
-		cout << "\n info_dpotri = " << info <<endl;
-		GlobalV::ofs_warning<<A<<endl;
+		std::cout << "\n info_dpotri = " << info <<std::endl;
+		GlobalV::ofs_warning<<A<<std::endl;
 		QUIT();
 	}
 	
@@ -62,8 +62,8 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condi
 	
 	#if TEST_EXX_LCAO==1
 		for( const double &ie : eigen_value )
-			cout<<ie<<"\t";
-		cout<<endl;
+			std::cout<<ie<<"\t";
+		std::cout<<std::endl;
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -74,7 +74,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condi
 	const double threshold = eigen_value_max * threshold_condition_number;
 
 	#if TEST_EXX_LCAO==1
-		cout<<eigen_value_max<<"\t"<<threshold_condition_number<<"\t"<<threshold<<endl;
+		std::cout<<eigen_value_max<<"\t"<<threshold_condition_number<<"\t"<<threshold<<std::endl;
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif

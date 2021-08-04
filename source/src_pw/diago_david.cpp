@@ -140,10 +140,10 @@ void Diago_David::diag
 
         timer::tick("Diago_David","check_update");
         /*
-        		// test_david==2 cout info of each iteration
+        		// test_david==2 std::cout info of each iteration
         		if( test_david==2 )
         		{
-        			cout << "iter = " << dav_iter << " notconv = " << notconv << endl;
+        			std::cout << "iter = " << dav_iter << " notconv = " << notconv << std::endl;
         			out.printr1_d( "energy", en, nband );
         		}
         */
@@ -187,13 +187,13 @@ void Diago_David::diag
 
     avg_iter = static_cast<double>(dav_iter);
     /*
-    	// if( test_david==3 ) cout info of davidson diag
+    	// if( test_david==3 ) std::cout info of davidson diag
     	if( test_david==3 )
     	{
-    		cout << "hamilt davidson diag output " << endl ;
-    		cout << "dav_iter = " << dav_iter <<" notconv = " << notconv << endl;
+    		std::cout << "hamilt davidson diag output " << std::endl ;
+    		std::cout << "dav_iter = " << dav_iter <<" notconv = " << notconv << std::endl;
     		this->cal_err( npw, nband, nbase, vc, hp, basis, en, respsi );
-        	cout << "hamilt davidson diag output  end " << endl ;
+        	std::cout << "hamilt davidson diag output  end " << std::endl ;
     	}
     */
     delete[] e;
@@ -497,11 +497,11 @@ void Diago_David::cal_err
         err[m] = sqrt( err[m] );
     }
 
-    cout << "i       eigenvalues       err (||*||)   " << endl ;
+    std::cout << "i       eigenvalues       err (||*||)   " << std::endl ;
 
     for (int i = 0; i < nband ; i++)
     {
-        cout << i << "\t\t"  << en[i]  << "\t\t" << err[i] << endl ;
+        std::cout << i << "\t\t"  << en[i]  << "\t\t" << err[i] << std::endl ;
     }
 
     delete[] err;
@@ -557,7 +557,7 @@ void Diago_David::SchmitOrth
 
     double psi_norm = lagrange[m].real();
     assert(psi_norm > 0.0);
-//	cout << "m = " << m << endl;
+//	std::cout << "m = " << m << std::endl;
 
     for (int j = 0; j < m; j++)
     {
@@ -574,9 +574,9 @@ void Diago_David::SchmitOrth
 
     if (psi_norm < 1.0e-12 ) 
 	{
-        cout << "Diago_David::SchmitOrth:aborted for psi_norm <1.0e-12" << endl;
-        cout << "n_band = " << n_band << endl;
-        cout << "m = " << m << endl;
+        std::cout << "Diago_David::SchmitOrth:aborted for psi_norm <1.0e-12" << std::endl;
+        std::cout << "n_band = " << n_band << std::endl;
+        std::cout << "m = " << m << std::endl;
         exit(0);
     }
     else 

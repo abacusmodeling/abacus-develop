@@ -10,7 +10,7 @@
 
 PW_Basis::PW_Basis()
 {
-//	cout << "\n PW_Basis " << endl;
+//	std::cout << "\n PW_Basis " << std::endl;
     ig2fftw = nullptr;
     ig2fftc = nullptr;
 
@@ -44,7 +44,7 @@ PW_Basis::~PW_Basis()
 {
 	if(GlobalV::test_deconstructor)
 	{
-		cout << " ~PW_Basis()" << endl;
+		std::cout << " ~PW_Basis()" << std::endl;
 	}
     delete [] ig2fftw;
     delete [] ig2fftc;
@@ -129,21 +129,21 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
 
 
 	GlobalV::ofs_running << "\n\n\n\n";
-	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	GlobalV::ofs_running << " |                                                                    |" << endl;
-	GlobalV::ofs_running << " | Setup plane waves:                                                 |" << endl;
-	GlobalV::ofs_running << " | Use the energy cutoff and the lattice vectors to generate the      |" << endl;
-	GlobalV::ofs_running << " | dimensions of FFT grid. The number of FFT grid on each processor   |" << endl;
-	GlobalV::ofs_running << " | is 'nrxx'. The number of plane wave basis in reciprocal space is   |" << endl;
-	GlobalV::ofs_running << " | different for charege/potential and wave functions. We also set    |" << endl;
-	GlobalV::ofs_running << " | the 'sticks' for the parallel of FFT.                              |" << endl;
-	GlobalV::ofs_running << " |                                                                    |" << endl;
-	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+	GlobalV::ofs_running << " |                                                                    |" << std::endl;
+	GlobalV::ofs_running << " | Setup plane waves:                                                 |" << std::endl;
+	GlobalV::ofs_running << " | Use the energy cutoff and the lattice vectors to generate the      |" << std::endl;
+	GlobalV::ofs_running << " | dimensions of FFT grid. The number of FFT grid on each processor   |" << std::endl;
+	GlobalV::ofs_running << " | is 'nrxx'. The number of plane wave basis in reciprocal space is   |" << std::endl;
+	GlobalV::ofs_running << " | different for charege/potential and wave functions. We also set    |" << std::endl;
+	GlobalV::ofs_running << " | the 'sticks' for the parallel of FFT.                              |" << std::endl;
+	GlobalV::ofs_running << " |                                                                    |" << std::endl;
+	GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 	GlobalV::ofs_running << "\n\n\n\n";
 
 
 
-	GlobalV::ofs_running << "\n SETUP THE PLANE WAVE BASIS" << endl;
+	GlobalV::ofs_running << "\n SETUP THE PLANE WAVE BASIS" << std::endl;
 
     // Now set up a few parameters that related to Ecutwfc
     // read Ecutwfc from the parameter table in input_parametes class
@@ -175,11 +175,11 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
 	//if(winput::out_spillage)
 	//{
 	//	cutgg_flag = false;
-	//	GlobalV::ofs_running << " Turn off the cutgg function." << endl;
+	//	GlobalV::ofs_running << " Turn off the cutgg function." << std::endl;
 	//}
 	//else
 	//{
-	//	GlobalV::ofs_running << " Turn on the cutgg function." << endl;
+	//	GlobalV::ofs_running << " Turn on the cutgg function." << std::endl;
 	//}
 #else
 	// mohan update 2011-09-21
@@ -193,7 +193,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
     if (cutgg_flag)
     {
 #ifdef __MPI
-        GlobalV::ofs_running << "\n SETUP COORDINATES OF PLANE WAVES" << endl;
+        GlobalV::ofs_running << "\n SETUP COORDINATES OF PLANE WAVES" << std::endl;
 		
 		// get the number of total plane waves within a spheri.
         this->ngmc_g = PW_complement::get_total_pw_number(0.0, ggchg, ncx, ncy, ncz, Ucell->GGT);
@@ -220,12 +220,12 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
             // to make sure to get the nearly same plane wave number.
             ggchg_end = cutgg_delta * std::pow( (double)ggchg_time, 2.0/3.0 ) ;
             if ( abs(ggchg_end - ggchg)<1.0e-8 ) ggchg_end = ggchg;
-            //cout << "\n ggchg_start = " << ggchg_start;
-            //cout << "\n ggchg_end = " << ggchg_end << endl;
+            //std::cout << "\n ggchg_start = " << ggchg_start;
+            //std::cout << "\n ggchg_end = " << ggchg_end << std::endl;
 
             // get the number of plane waves between two shells.
             const int cutgg_num_now = PW_complement::get_total_pw_number( ggchg_start, ggchg_end, ncx, ncy, ncz, Ucell->GGT);
-            //cout << "\n cutgg_num_now = " << cutgg_num_now << endl;
+            //std::cout << "\n cutgg_num_now = " << cutgg_num_now << std::endl;
 
             delete[] gg_global;
             delete[] gdirect_global;
@@ -234,7 +234,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
             gdirect_global = new Vector3<double>[cutgg_num_now];
             gcar_global = new Vector3<double>[cutgg_num_now];
 
-			//GlobalV::ofs_running << " setup |g|^2" << endl;
+			//GlobalV::ofs_running << " setup |g|^2" << std::endl;
             PW_complement::get_total_pw(gg_global, gdirect_global, ggchg_start, ggchg_end,
                                         ncx, ncy, ncz, Ucell->GGT, ngmc_g);
             
@@ -258,8 +258,8 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
             ggchg_start = ggchg_end;
             ++ggchg_time;
 
-//			cout << "\n ggchg_end = " << ggchg_end;
-//			cout << "\n ggchg = " << ggchg;
+//			std::cout << "\n ggchg_end = " << ggchg_end;
+//			std::cout << "\n ggchg = " << ggchg;
         } while ( ggchg_end < ggchg );
 
         if(!GlobalV::FINAL_SCF) //LiuXh add 20180619
@@ -269,7 +269,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
 			delete [] cutgg_num_table;
             cutgg_num_table = new int[ggchg_time_global];
             ZEROS(cutgg_num_table, ggchg_time_global);
-            GlobalV::ofs_running << "\n SETUP COORDINATES OF PLANE WAVES" << endl;
+            GlobalV::ofs_running << "\n SETUP COORDINATES OF PLANE WAVES" << std::endl;
 
             double cutgg_pieces2 = 10;
 
@@ -299,17 +299,17 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
         ss << "./out_data/ig2fftc.dat" << cutgg_delta;
         ofstream ofsc( ss.str().c_str() );
 
-        ofsc << "\n ig2fftc" << endl;
+        ofsc << "\n ig2fftc" << std::endl;
         for(int ig=0; ig<ngmc; ig++)
         {
-        	ofsc << setw(10) << ig << setw(20) << ig2fftc[ig] << endl;
+        	ofsc << setw(10) << ig << setw(20) << ig2fftc[ig] << std::endl;
         }
         */
 
 #ifdef __MPI
         this->get_MPI_GVectors();
-        //cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxx << endl;
-        //cout<<" UNIFORM GRID DIM     : "<<this->ncx<<" * "<<this->ncy<<" * "<<this->ncz << "," << this->nrxx  << endl;
+        //std::cout<<" UNIFORM GRID DIM     : "<<this->nx <<" * "<<this->ny <<" * "<<this->nz  << "," << this->nrxx << std::endl;
+        //std::cout<<" UNIFORM GRID DIM     : "<<this->ncx<<" * "<<this->ncy<<" * "<<this->ncz << "," << this->nrxx  << std::endl;
 
         FFT_wfc.setup_MPI_FFT3D(this->nx, this->ny, this->nz,this->nrxx,1);
         FFT_chg.setup_MPI_FFT3D(this->ncx, this->ncy, this->ncz,this->nrxx,1);
@@ -432,7 +432,7 @@ void PW_Basis::setup_FFT_dimension(void)
     }
 	else
 	{
-		GlobalV::ofs_running << " use input fft dimensions for wave functions." << endl;
+		GlobalV::ofs_running << " use input fft dimensions for wave functions." << std::endl;
 	}
 
     if (this->ncxyz == 0)
@@ -442,7 +442,7 @@ void PW_Basis::setup_FFT_dimension(void)
     }
 	else
 	{
-		GlobalV::ofs_running << " use input fft dimensions for charge/potential. " << endl;
+		GlobalV::ofs_running << " use input fft dimensions for charge/potential. " << std::endl;
 	}
 
 	assert(ncxyz >= nxyz);
@@ -515,13 +515,13 @@ void PW_Basis::divide_fft_grid(void)
     // generate nst,st_i,st_j,st_k,npps
     //=====================================
 	
-	GlobalV::ofs_running << "\n SETUP PLANE WAVES FOR CHARGE/POTENTIAL" << endl;
+	GlobalV::ofs_running << "\n SETUP PLANE WAVES FOR CHARGE/POTENTIAL" << std::endl;
     FFT_chg.init(this->ggchg, this->ncx, this->ncy, this->ncz, this->bz, GlobalV::NPROC_IN_POOL,GlobalV::RANK_IN_POOL);
     FFT_chg.columns_map();
     FFT_chg.restore_st();
     FFT_chg.columns_and_pw_distribution();
 
-	GlobalV::ofs_running << "\n SETUP PLANE WAVES FOR WAVE FUNCTIONS" << endl;
+	GlobalV::ofs_running << "\n SETUP PLANE WAVES FOR WAVE FUNCTIONS" << std::endl;
     FFT_wfc.init(this->ggwfc2, this->nx, this->ny, this->nz, this->bz, GlobalV::NPROC_IN_POOL,GlobalV::RANK_IN_POOL);
     FFT_wfc.columns_map();
     FFT_wfc.restore_st();
@@ -584,7 +584,7 @@ void PW_Basis::get_MPI_GVectors(void)
 
 //	for( int i = 0; i < ngmc; ++i)
 //	{
-//		cout << gcar[i].x << " " << gcar[i].y << " " << gcar[i].z << endl;
+//		std::cout << gcar[i].x << " " << gcar[i].y << " " << gcar[i].z << std::endl;
 //	}
 
     //=====================================
@@ -663,7 +663,7 @@ void PW_Basis::get_nggm(const int ngmc_local)
     TITLE("PW_Basis","get_nggm");
     timer::tick("PW_Basis","get_nggm");
 
-//	GlobalV::ofs_running << " calculate the norm of G vectors." << endl;
+//	GlobalV::ofs_running << " calculate the norm of G vectors." << std::endl;
     //*********************************************
     // Group the g vectors that have the same norm
     //*********************************************
@@ -891,7 +891,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
         {
             // search from '0' processor.
             int pw_tmp=FFT_chg.npw_per[0];
-            //cout<<"pw_tmp="<<pw_tmp<<endl;
+            //std::cout<<"pw_tmp="<<pw_tmp<<std::endl;
             for (int ip2=0;ip2<GlobalV::NPROC_IN_POOL;ip2++)
             {
 
@@ -926,10 +926,10 @@ void PW_Basis::columns_and_pw_distribution_2(void)
         {
             FFT_wfc.nst_per[ip1]++;
             FFT_wfc.npw_per[ip1]+=pw_wf;
-            //cout<<setw(12)<<"time"<<setw(12)<<"Cols"<<setw(12)<<"PWs"<<endl;
+            //std::cout<<setw(12)<<"time"<<setw(12)<<"Cols"<<setw(12)<<"PWs"<<std::endl;
             //for(int i=0;i<GlobalV::NPROC_IN_POOL;i++)
             //{
-            //	cout<<setw(12)<<time<<setw(12)<<FFT_wfc.nst_per[i]<<setw(12)<<FFT_wfc.npw_per[i]<<endl;
+            //	std::cout<<setw(12)<<time<<setw(12)<<FFT_wfc.nst_per[i]<<setw(12)<<FFT_wfc.npw_per[i]<<std::endl;
             //}
             
 			//----------------------------------------------------------
@@ -942,65 +942,65 @@ void PW_Basis::columns_and_pw_distribution_2(void)
     int sum_pw=0;
     int i=0;
 
-	//GlobalV::ofs_running << " distribution of plane waves in pool " << GlobalV::MY_POOL << endl;
-	//GlobalV::ofs_running << " number of processors in this pool is " << GlobalV::NPROC_IN_POOL << endl;
+	//GlobalV::ofs_running << " distribution of plane waves in pool " << GlobalV::MY_POOL << std::endl;
+	//GlobalV::ofs_running << " number of processors in this pool is " << GlobalV::NPROC_IN_POOL << std::endl;
     if (1)
     {
-		GlobalV::ofs_running << "\n PARALLEL PW FOR CHARGE/POTENTIAL" << endl;
+		GlobalV::ofs_running << "\n PARALLEL PW FOR CHARGE/POTENTIAL" << std::endl;
         GlobalV::ofs_running << " "
         << setw(8)  << "PROC"
         << setw(15) << "COLUMNS(POT)"
-        << setw(15) << "PW" << endl;
+        << setw(15) << "PW" << std::endl;
 // charge
         for (i = 0;i < GlobalV::NPROC_IN_POOL;i++)
         {
             GlobalV::ofs_running << " "
             << setw(8)  << i+1
             << setw(15) << FFT_chg.nst_per[i]
-            << setw(15) << FFT_chg.npw_per[i] << endl;
+            << setw(15) << FFT_chg.npw_per[i] << std::endl;
             sum_pw += FFT_chg.npw_per[i];
         }
-        GlobalV::ofs_running << " --------------- sum -------------------" << endl;
+        GlobalV::ofs_running << " --------------- sum -------------------" << std::endl;
         GlobalV::ofs_running << " "
         << setw(8)  << GlobalV::NPROC_IN_POOL
         << setw(15) << FFT_chg.nst
-        << setw(15) << sum_pw << endl;
+        << setw(15) << sum_pw << std::endl;
 // wavefunction
 
 
-		GlobalV::ofs_running << "\n PARALLEL PW FOR WAVE FUNCTIONS" << endl;
+		GlobalV::ofs_running << "\n PARALLEL PW FOR WAVE FUNCTIONS" << std::endl;
         sum_pw=0;
         GlobalV::ofs_running << " "
         << setw(8)  << "PROC"
         << setw(15) << "COLUMNS(W)"
-        << setw(15) << "PW" << endl;
+        << setw(15) << "PW" << std::endl;
 
         for (i = 0;i < GlobalV::NPROC_IN_POOL;i++)
         {
             GlobalV::ofs_running << " "
             << setw(8)  << i+1
             << setw(15) << FFT_wfc.nst_per[i]
-            << setw(15) << FFT_wfc.npw_per[i] << endl;
+            << setw(15) << FFT_wfc.npw_per[i] << std::endl;
             sum_pw += FFT_wfc.npw_per[i];
         }
-        GlobalV::ofs_running << " --------------- sum -------------------" << endl;
+        GlobalV::ofs_running << " --------------- sum -------------------" << std::endl;
         GlobalV::ofs_running << " "
         << setw(8)  << GlobalV::NPROC_IN_POOL
         << setw(15) << FFT_wfc.nst
-        << setw(15) << sum_pw << endl;
+        << setw(15) << sum_pw << std::endl;
     }
 
     for (int ip=0;ip<GlobalV::NPROC_IN_POOL;ip++)
     {
-        //	GlobalV::ofs_running<<"\n FFT_chg.npps = "<<FFT_chg.npps[ip]<<endl;
-        //	GlobalV::ofs_running<<"\n FFT_chg.nst_per = "<<FFT_chg.nst_per[ip]<<endl;
+        //	GlobalV::ofs_running<<"\n FFT_chg.npps = "<<FFT_chg.npps[ip]<<std::endl;
+        //	GlobalV::ofs_running<<"\n FFT_chg.nst_per = "<<FFT_chg.nst_per[ip]<<std::endl;
         int ngrid = this->ncx*this->ncy*FFT_chg.npps[ip];
         int non_zero_grid = FFT_chg.nst_per[ip]*this->ncz;
         if (non_zero_grid > ngrid)
         {
-            GlobalV::ofs_running<<" too many sticks for cpu = "<<ip<<endl;
-            GlobalV::ofs_running<<" ngrid is = "<< ngrid << endl;
-            GlobalV::ofs_running<<" In fact , non_zero_grid = "<< non_zero_grid << endl;
+            GlobalV::ofs_running<<" too many sticks for cpu = "<<ip<<std::endl;
+            GlobalV::ofs_running<<" ngrid is = "<< ngrid << std::endl;
+            GlobalV::ofs_running<<" In fact , non_zero_grid = "<< non_zero_grid << std::endl;
             WARNING_QUIT("PW_Basis::columns_and_pw_distribution_2","conflict about pw distribution.");
         }
     }

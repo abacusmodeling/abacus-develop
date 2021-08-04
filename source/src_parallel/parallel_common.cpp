@@ -56,7 +56,7 @@ void Parallel_Common::bcast_complex_double(complex<double> *object, const int n)
 void Parallel_Common::bcast_double(double &object)
 {
 	MPI_Bcast(&object, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-//	cout<<"\n"<<object;
+//	std::cout<<"\n"<<object;
 	return;
 }
 
@@ -69,7 +69,7 @@ void Parallel_Common::bcast_double(double *object,const int n)
 void Parallel_Common::bcast_int(int &object)
 {
 	MPI_Bcast(&object, 1, MPI_INT, 0, MPI_COMM_WORLD);
-//	cout<<"\n"<<object;
+//	std::cout<<"\n"<<object;
 	return;
 }
 
@@ -84,7 +84,7 @@ void Parallel_Common::bcast_bool(bool &object)
 	if(GlobalV::MY_RANK == 0)swap = object;
     MPI_Bcast(&swap, 1, MPI_INT, 0, MPI_COMM_WORLD);
     if(GlobalV::MY_RANK != 0)object = static_cast<bool>( swap );
-//	cout<<"\n"<<object;
+//	std::cout<<"\n"<<object;
 	return;
 }
 

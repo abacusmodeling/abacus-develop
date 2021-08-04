@@ -9,15 +9,15 @@ void energy::perform_dos_pw(void)
 	if(out_dos !=0 || out_band !=0)
     {
         GlobalV::ofs_running << "\n\n\n\n";
-        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-        GlobalV::ofs_running << " |                                                                    |" << endl;
-        GlobalV::ofs_running << " | Post-processing of data:                                           |" << endl;
-        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
-        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
-        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
-        GlobalV::ofs_running << " | done here.                                                         |" << endl;
-        GlobalV::ofs_running << " |                                                                    |" << endl;
-        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+        GlobalV::ofs_running << " |                                                                    |" << std::endl;
+        GlobalV::ofs_running << " | Post-processing of data:                                           |" << std::endl;
+        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << std::endl;
+        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << std::endl;
+        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << std::endl;
+        GlobalV::ofs_running << " | done here.                                                         |" << std::endl;
+        GlobalV::ofs_running << " |                                                                    |" << std::endl;
+        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
         GlobalV::ofs_running << "\n\n\n\n";
     }
 
@@ -52,13 +52,13 @@ void energy::perform_dos_pw(void)
 #else
 						<<setw(25)<<"Kpoint = "<<ik+1
 #endif
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<setw(6)<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<endl;
+							ofsi2<<setw(6)<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
-						ofsi2 <<endl;
-						ofsi2 <<endl;
+						ofsi2 <<std::endl;
+						ofsi2 <<std::endl;
 					}
 				}
 				else
@@ -75,7 +75,7 @@ void energy::perform_dos_pw(void)
 #else
 						<<setw(25)<<"Kpoint = "<<ik+1
 #endif
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
@@ -83,10 +83,10 @@ void energy::perform_dos_pw(void)
 							<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
 							<<setw(25)<<GlobalC::wf.wg(ik,ib)
 							<<setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
-							<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
+							<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
-						ofsi2 <<endl;
-						ofsi2 <<endl;
+						ofsi2 <<std::endl;
+						ofsi2 <<std::endl;
 
 					}
 				}
@@ -126,7 +126,7 @@ void energy::perform_dos_pw(void)
 //scale up a little bit so the end peaks are displaced better
 		const double scl=this->dos_scale;
 		double delta=(emax-emin)*scl;
-		cout << scl;
+		std::cout << scl;
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
@@ -137,7 +137,7 @@ void energy::perform_dos_pw(void)
 		
 //determine #. energy points	
 		const double de_ev = this->dos_edelta_ev;
-		cout << de_ev;
+		std::cout << de_ev;
 
 		const int npoints = static_cast<int>(std::floor ( ( emax - emin ) / de_ev ));
 		const int np=npoints;
@@ -159,7 +159,7 @@ void energy::perform_dos_pw(void)
 			 ifstream in(ss.str().c_str());
 			 if(!in)
 			 {
-				       //cout<<"\n Can't find file : "<< name << endl;
+				       //std::cout<<"\n Can't find file : "<< name << std::endl;
 				       //return 0;
 			 }
 
@@ -191,7 +191,7 @@ void energy::perform_dos_pw(void)
 			 }
 			 if(!in.eof())
 			 {
-				 //cout<<"\n Read Over!"<<endl;
+				 //std::cout<<"\n Read Over!"<<std::endl;
 			 }
 			 in.close();
 
@@ -247,7 +247,7 @@ void energy::perform_dos_pw(void)
 		 delete[] dos2;
 		 delete[] energy;
 
-		 //cout<<" broden spectrum over, success : ) "<<endl;
+		 //std::cout<<" broden spectrum over, success : ) "<<std::endl;
 
 	 }
 
@@ -268,7 +268,7 @@ void energy::perform_dos_pw(void)
 		{
 			stringstream ss2;
 			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
-			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << endl;
+			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
 			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);
 		}
 

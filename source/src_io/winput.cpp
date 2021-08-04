@@ -108,7 +108,7 @@ void winput::Read(const string &fn)
 	}
 	else
 	{
-		GlobalV::ofs_running << "Open file : " << fn << endl;
+		GlobalV::ofs_running << "Open file : " << fn << std::endl;
 	}
 
 	ifs.clear();
@@ -218,15 +218,15 @@ void winput::Read(const string &fn)
 		else if (strcmp("spillage_outdir", word) == 0) {read_value(ifs,  spillage_outdir);}
 		else
 		{
-			cout << " The parametr name '" << word << "' is not used." << endl;
+			std::cout << " The parametr name '" << word << "' is not used." << std::endl;
 			ifs.ignore(150, '\n');
 		}
 
 		ifs.rdstate();
 
 		if (ifs.eof() != 0){break;}
-		else if (ifs.bad() != 0){cout << "bad parameter. " << endl;break;}
-		else if (ifs.fail() != 0){cout << " bad parameter. " << endl;break;}
+		else if (ifs.bad() != 0){std::cout << "bad parameter. " << std::endl;break;}
+		else if (ifs.fail() != 0){std::cout << " bad parameter. " << std::endl;break;}
 		else if (ifs.good() == 0){break;}
 	}
 
@@ -535,9 +535,9 @@ void winput::Print(const string &fn)
  
 	ofstream ofs(fn.c_str());
 	ofs << setiosflags(ios::left);
-	ofs << "WANNIER_PARAMETERS" << endl;
+	ofs << "WANNIER_PARAMETERS" << std::endl;
 
-	ofs << "#Parameters (General)" << endl;
+	ofs << "#Parameters (General)" << std::endl;
 	OUTP(ofs,"target",target);
 	OUTP(ofs,"wlmr_dir",wlmr_dir);
 	OUTP(ofs,"rcut",rcut);
@@ -546,7 +546,7 @@ void winput::Print(const string &fn)
 	OUTP(ofs,"begin_stop_flag",begin_stop_flag);
 	OUTP(ofs,"end_flag",end_flag);
 	
-	ofs << "#Parameters (Build Wannier Functions)" << endl;
+	ofs << "#Parameters (Build Wannier Functions)" << std::endl;
 	OUTP(ofs,"wf_type",wf_type);
 	OUTP(ofs,"build_wf",build_wf);
 	OUTP(ofs,"imp_pao",imp_pao);
@@ -555,7 +555,7 @@ void winput::Print(const string &fn)
 	OUTP(ofs,"b_plot_build",b_plot_build);
 	OUTP(ofs,"b_plot_atomic",b_plot_atomic);
 	
-	ofs << "#Parameters (Select trial wave functions)" << endl;
+	ofs << "#Parameters (Select trial wave functions)" << std::endl;
 	OUTP(ofs,"trial",trial);
 	OUTP(ofs,"bs",bs);
 	OUTP(ofs,"bp",bp);
@@ -563,11 +563,11 @@ void winput::Print(const string &fn)
 	OUTP(ofs,"g1",g1);
 	OUTP(ofs,"g2",g2);
 
-	ofs << "#Parameters (Select bands)" << endl;
+	ofs << "#Parameters (Select bands)" << std::endl;
 	OUTP(ofs,"bloch_begin",bloch_begin);
 	OUTP(ofs,"bloch_end",bloch_end);
 
-	ofs << "#Parameters (Spheri & recon)" << endl;
+	ofs << "#Parameters (Spheri & recon)" << std::endl;
 	OUTP(ofs,"no_center",no_center);	
 	OUTP(ofs,"sph_proj",sph_proj);
 	OUTP(ofs,"sph_type",sph_type);
@@ -577,35 +577,35 @@ void winput::Print(const string &fn)
 	OUTP(ofs,"b_mix_wf",b_mix_wf);
 	OUTP(ofs,"mix_wf",mix_wf);
 
-	ofs << "#Parameters (Multi-center spheri)" << endl;
+	ofs << "#Parameters (Multi-center spheri)" << std::endl;
 	OUTP(ofs,"b_near_atom",b_near_atom);
 	OUTP(ofs,"range0",range0);
 	OUTP(ofs,"range1",range1);
 
-	ofs << "#Parameters (Select L, atom)" << endl;
+	ofs << "#Parameters (Select L, atom)" << std::endl;
 	OUTP(ofs,"L_start",L_start);
 	OUTP(ofs,"L_end",L_end);
 	OUTP(ofs,"atom_start",atom_start);
 	OUTP(ofs,"atom_end",atom_end);
 
-	ofs << "#Parameters (Truncation)" << endl;
+	ofs << "#Parameters (Truncation)" << std::endl;
 	OUTP(ofs,"trunc_ao",trunc_ao);
 	OUTP(ofs,"trunc_wlmr",trunc_wlmr);
 	OUTP(ofs,"trunc_wan",trunc_wan);
 	OUTP(ofs,"fermi_t",fermi_t);
 	OUTP(ofs,"clm2_lowest",clm2_lowest);
 
-	ofs << "#Parameters (Plot wave functions)" << endl;
+	ofs << "#Parameters (Plot wave functions)" << std::endl;
 	OUTP(ofs,"plot_wanq",plot_wanq);
 	OUTP(ofs,"plot_option",plot_option);
 	OUTP(ofs,"n_unitcell",n_unitcell);
 
-	ofs << "#Parameters (out_all || out_charge)" << endl;
+	ofs << "#Parameters (out_all || out_charge)" << std::endl;
 	OUTP(ofs,"out_all",out_all);
 	OUTP(ofs,"out_charge",out_charge);
 	OUTP(ofs,"compare_atomic",compare_atomic);
 
-	ofs << "#Parameters (Other functions: bands & dos)" << endl;
+	ofs << "#Parameters (Other functions: bands & dos)" << std::endl;
 	OUTP(ofs,"cal_bands",cal_bands);
 	OUTP(ofs,"cal_bands2",cal_bands2);
 	OUTP(ofs,"charge_type",charge_type);
@@ -613,7 +613,7 @@ void winput::Print(const string &fn)
 	OUTP(ofs,"out_spillage",out_spillage);
 	OUTP(ofs,"spillage_outdir",spillage_outdir);
 	
-	ofs << "#Parameters (Uniform mesh)" << endl;
+	ofs << "#Parameters (Uniform mesh)" << std::endl;
 	OUTP(ofs,"mesh",mesh);
 	OUTP(ofs,"dr",dr);
 

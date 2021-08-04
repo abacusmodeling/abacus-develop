@@ -42,11 +42,11 @@ void ELEC_cbands_k::cal_bands(const int &istep, LCAO_Hamilt &uhm)
 		//--------------------------------------------
 		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
 		{
-			//GlobalV::ofs_running << " Same spin, same vlocal integration." << endl;
+			//GlobalV::ofs_running << " Same spin, same vlocal integration." << std::endl;
 		}
 		else
 		{
-			//GlobalV::ofs_running << " (spin change)" << endl;
+			//GlobalV::ofs_running << " (spin change)" << std::endl;
 			uhm.GK.reset_spin( GlobalV::CURRENT_SPIN );
 
 			// if you change the place of the following code,

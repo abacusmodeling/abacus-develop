@@ -266,68 +266,68 @@ void Exx_Abfs::IO::print_matrix(
 {
 	auto print_header = [&]( ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
 	{
-		ofs << GlobalC::ucell.lat0 << endl;
+		ofs << GlobalC::ucell.lat0 << std::endl;
 
-		ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-		ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-		ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+		ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+		ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 		
 		if( TA==TB )
 		{
-			ofs << 1 << " ntype" << endl;
-			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
+			ofs << 1 << " ntype" << std::endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << std::endl;
 			if( IA==IB )
 			{
-				ofs << 1 << " na" << endl;
+				ofs << 1 << " na" << std::endl;
 				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
 					<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
-					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << std::endl;
 			}
 			else
 			{
-				ofs << 2 << " na" << endl;
+				ofs << 2 << " na" << std::endl;
 				ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
 					<< GlobalC::ucell.atoms[TA].tau[IA].y << " "
-					<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
+					<< GlobalC::ucell.atoms[TA].tau[IA].z << std::endl;
 				ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
 					<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
-					<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
+					<< GlobalC::ucell.atoms[TB].tau[IB].z << std::endl;
 			}
 		}
 		else
 		{
-			ofs << 2 << " ntype" << endl;
-			ofs << GlobalC::ucell.atoms[TA].label << " label" << endl;
-			ofs << 1 << " na" << endl;
+			ofs << 2 << " ntype" << std::endl;
+			ofs << GlobalC::ucell.atoms[TA].label << " label" << std::endl;
+			ofs << 1 << " na" << std::endl;
 			ofs << GlobalC::ucell.atoms[TA].tau[IA].x << " " 
 				<< GlobalC::ucell.atoms[TA].tau[IA].y << " " 
-				<< GlobalC::ucell.atoms[TA].tau[IA].z << endl;
-			ofs << GlobalC::ucell.atoms[TB].label << " label" << endl;
-			ofs << 1 << " na" << endl;
+				<< GlobalC::ucell.atoms[TA].tau[IA].z << std::endl;
+			ofs << GlobalC::ucell.atoms[TB].label << " label" << std::endl;
+			ofs << 1 << " na" << std::endl;
 			ofs << GlobalC::ucell.atoms[TB].tau[IB].x << " " 
 				<< GlobalC::ucell.atoms[TB].tau[IB].y << " " 
-				<< GlobalC::ucell.atoms[TB].tau[IB].z << endl;
+				<< GlobalC::ucell.atoms[TB].tau[IB].z << std::endl;
 		}
 		
 		// ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
-		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc" << endl; // mohan add 2009-09-08
+		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc" << std::endl; // mohan add 2009-09-08
 
 		// this parameter determine the total number of jlq.
-		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
+		ofs << Exx_Abfs::Jle::Ecut_exx << " ecutwfc_jlq" << std::endl;//mohan modify 2009-09-08
 
 		assert( GlobalC::ORB.Phi[TA].getRcut() == GlobalC::ORB.Phi[TB].getRcut() );
-		ofs << GlobalC::ORB.Phi[TA].getRcut() << " rcut_Jlq" << endl;
+		ofs << GlobalC::ORB.Phi[TA].getRcut() << " rcut_Jlq" << std::endl;
 
 		// mohan add 'smooth' and 'sigma' 2009-08-28
-		ofs << 0 << " smooth" << endl;
-		ofs << 0 << " sigma" << endl;
+		ofs << 0 << " smooth" << std::endl;
+		ofs << 0 << " sigma" << std::endl;
 
-		ofs << Exx_Abfs::Jle::tolerence << " tolerence" << endl;
+		ofs << Exx_Abfs::Jle::tolerence << " tolerence" << std::endl;
 
-		ofs << Exx_Abfs::Jle::Lmax << " lmax" << endl;
+		ofs << Exx_Abfs::Jle::Lmax << " lmax" << std::endl;
 
-		ofs << GlobalC::kv.nkstot << " nks" << endl;
-		ofs	<< index_lcaos[TA].count_size * index_lcaos[TB].count_size << " nbands" << endl;
+		ofs << GlobalC::kv.nkstot << " nks" << std::endl;
+		ofs	<< index_lcaos[TA].count_size * index_lcaos[TB].count_size << " nbands" << std::endl;
 		
 		auto cal_sum_M = [&range_jles](size_t T) -> size_t
 		{
@@ -337,22 +337,22 @@ void Exx_Abfs::IO::print_matrix(
 			return sum_M;
 		};
 		const size_t nwfc = (TA==TB && IA==IB) ? cal_sum_M(TA) : cal_sum_M(TA)+cal_sum_M(TB);
-		ofs	<< nwfc << " nwfc" << endl;
+		ofs	<< nwfc << " nwfc" << std::endl;
 		
 		const size_t ecut_numberA = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TA].getRcut() / PI ); // Rydberg Unit
 		const size_t ecut_numberB = static_cast<size_t>( sqrt( Exx_Abfs::Jle::Ecut_exx ) * GlobalC::ORB.Phi[TB].getRcut() / PI ); // Rydberg Unit
 		assert( ecut_numberA == ecut_numberB );
-		ofs	<< ecut_numberA << " ne" << endl;
+		ofs	<< ecut_numberA << " ne" << std::endl;
 		
-		ofs << "<WEIGHT_OF_KPOINTS>" << endl;
+		ofs << "<WEIGHT_OF_KPOINTS>" << std::endl;
 		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )		
 		{
 			ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z;
-			ofs << " " << GlobalC::kv.wk[ik] * 0.5 << endl;
+			ofs << " " << GlobalC::kv.wk[ik] * 0.5 << std::endl;
 		}
-		ofs << "</WEIGHT_OF_KPOINTS>" << endl;
+		ofs << "</WEIGHT_OF_KPOINTS>" << std::endl;
 
-		ofs << endl;
+		ofs << std::endl;
 	};
 	
 	auto print_Q = [&]( ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
@@ -442,7 +442,7 @@ void Exx_Abfs::IO::print_matrix(
 				}
 		};	
 		
-		ofs<< "<OVERLAP_Sq>" <<endl;
+		ofs<< "<OVERLAP_Sq>" <<std::endl;
 		
 		for( int ik=0; ik!=GlobalC::kv.nkstot; ++ik )
 		{

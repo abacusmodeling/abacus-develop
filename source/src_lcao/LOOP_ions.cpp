@@ -33,14 +33,14 @@ void LOOP_ions::opt_ions(void)
 
     if(GlobalV::OUT_LEVEL=="i")
     {
-        cout << setprecision(12);
-        cout<< " " << setw(7)<< "ISTEP"
+        std::cout << setprecision(12);
+        std::cout<< " " << setw(7)<< "ISTEP"
         <<setw(5)<< "NE"
         <<setw(18)<< "ETOT(eV)"
         <<setw(10)<< "dE(meV)"
         <<setw(10)<< "F(eV/A)"
         <<setw(10)<< "T(MIN)"
-        <<endl;
+        <<std::endl;
     }
 
     // Geometry optimization algorithm setup.
@@ -72,38 +72,38 @@ void LOOP_ions::opt_ions(void)
 		// xiaohui add "m" option, 2015-09-16
         if(GlobalV::OUT_LEVEL=="ie" || GlobalV::OUT_LEVEL=="m")
         {
-            cout << " ---------------------------------------------------------" << endl;
+            std::cout << " ---------------------------------------------------------" << std::endl;
             if(GlobalV::CALCULATION=="relax")
             {
-                cout << " RELAX IONS : " << istep << endl;
+                std::cout << " RELAX IONS : " << istep << std::endl;
             }
             else if(GlobalV::CALCULATION=="cell-relax")
             {
-                cout << " RELAX CELL : " << stress_step << endl;
-                cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
+                std::cout << " RELAX CELL : " << stress_step << std::endl;
+                std::cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
             }
             else if(GlobalV::CALCULATION=="scf")
             {
-                cout << " SELF-CONSISTENT : " << endl;
+                std::cout << " SELF-CONSISTENT : " << std::endl;
             }
-            cout << " ---------------------------------------------------------" << endl;
+            std::cout << " ---------------------------------------------------------" << std::endl;
 
-            GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+            GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             if(GlobalV::CALCULATION=="relax")
             {
-                GlobalV::ofs_running << " RELAX IONS : " << istep << endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX IONS : " << istep << std::endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
             else if(GlobalV::CALCULATION=="cell-relax")
             {
-                GlobalV::ofs_running << " RELAX CELL : " << stress_step << endl;
-                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
+                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
             else if(GlobalV::CALCULATION=="scf")
             {
-                GlobalV::ofs_running << " SELF-CONSISTENT" << endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " SELF-CONSISTENT" << std::endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
         }
 
@@ -211,20 +211,20 @@ void LOOP_ions::opt_ions(void)
             stringstream ss;
             ss << GlobalV::MOVE_IONS << istep;
 
-            cout << setiosflags(ios::scientific)
+            std::cout << setiosflags(ios::scientific)
             << " " << setw(7) << ss.str()
             << setw(5) << ELEC_scf::iter
             << setw(18) << setprecision(6) << GlobalC::en.etot * Ry_to_eV;
 
-            cout << setprecision(2) << setiosflags(ios::scientific)
+            std::cout << setprecision(2) << setiosflags(ios::scientific)
             << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
             << setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
             //<< setw(12) << IMM.get_trust_radius();
 
-            cout << resetiosflags(ios::scientific)
+            std::cout << resetiosflags(ios::scientific)
 //            << setw(8) << IMM.get_update_iter()
             << setprecision(2) << setw(10) << etime_min + ftime_min;
-            cout << endl;
+            std::cout << std::endl;
         }
 
 //#ifdef __MPI
@@ -240,10 +240,10 @@ void LOOP_ions::opt_ions(void)
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
-        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
     }
 
@@ -534,10 +534,10 @@ void LOOP_ions::final_scf(void)
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
-        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }
 
     return;

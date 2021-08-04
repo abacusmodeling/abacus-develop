@@ -37,7 +37,7 @@ void Exx_Lip::cal_exx()
 	};
 	auto cout_t = [](const string &name, const double t)
 	{
-		cout<<name<<"\t"<<t<<endl;
+		std::cout<<name<<"\t"<<t<<std::endl;
 	};
 	
 timeval t;
@@ -104,7 +104,7 @@ cout_t("sum_all",t_sum_all);
 			{
 				for(int j=0; j!=GlobalV::NLOCAL; ++j)
 					ofs<<exx_matrix[ik][i][j]<<"\t";
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 		};
 	};
@@ -574,29 +574,29 @@ void Exx_Lip::exx_energy_cal()
 	{
 		ofstream ofs("exx_matrix.dat",ofstream::app);
 		static int istep=0;
-		ofs<<"istep:\t"<<istep++<<endl;
+		ofs<<"istep:\t"<<istep++<<std::endl;
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 		{
-			ofs<<"ik:\t"<<ik<<endl;
+			ofs<<"ik:\t"<<ik<<std::endl;
 			for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 			{
 				for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
 				{
 					ofs<<exx_matrix[ik][iw_l][iw_r]<<"\t";
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
-			ofs<<endl;
+			ofs<<std::endl;
 		}
 		ofs.close();
 	}
 	{
 		ofstream ofs("DM.dat",ofstream::app);
 		static int istep=0;
-		ofs<<"istep:\t"<<istep++<<endl;
+		ofs<<"istep:\t"<<istep++<<std::endl;
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 		{
-			ofs<<"ik:\t"<<ik<<endl;
+			ofs<<"ik:\t"<<ik<<std::endl;
 			for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 			{
 				for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
@@ -606,9 +606,9 @@ void Exx_Lip::exx_energy_cal()
 						DM += conj(k_pack->hvec_array[ik](iw_l,ib)) *k_pack->hvec_array[ik](iw_r,ib) *k_pack->wf_wg(ik,ib);
 					ofs<<DM<<"\t";
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
-			ofs<<endl;
+			ofs<<std::endl;
 		}
 		ofs.close();
 	}
@@ -643,7 +643,7 @@ void Exx_Lip::write_q_pack() const
 			{
 				ofs_wf_wg<<q_pack->wf_wg(iq,ib)<<"\t";
 			}
-			ofs_wf_wg<<endl;
+			ofs_wf_wg<<std::endl;
 		}
 		ofs_wf_wg.close();
 
@@ -658,7 +658,7 @@ void Exx_Lip::write_q_pack() const
 				{
 					ofs_hvec<<q_pack->hvec_array[iq](iw,ib).real()<<" "<<q_pack->hvec_array[iq](iw,ib).imag()<<" ";
 				}
-				ofs_hvec<<endl;
+				ofs_hvec<<std::endl;
 			}
 		}
 		ofs_hvec.close();
@@ -754,27 +754,27 @@ void Exx_Lip::write_q_pack() const
         	WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
     	}
 
-		ofs<<q_pack->kv_ptr->nks<<endl;
+		ofs<<q_pack->kv_ptr->nks<<std::endl;
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			ofs<<q_pack->kv_ptr->ngk[iq]<<" ";
 		}
-		ofs<<endl;
+		ofs<<std::endl;
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
-			ofs<<q_pack.kvec_c[iq].x<<" "<<q_pack.kvec_c[iq].y<<" "<<q_pack.kvec_c[iq].z<<" "<<endl;
-			ofs<<q_pack.kvec_d[iq].x<<" "<<q_pack.kvec_d[iq].y<<" "<<q_pack.kvec_d[iq].z<<" "<<endl;
+			ofs<<q_pack.kvec_c[iq].x<<" "<<q_pack.kvec_c[iq].y<<" "<<q_pack.kvec_c[iq].z<<" "<<std::endl;
+			ofs<<q_pack.kvec_d[iq].x<<" "<<q_pack.kvec_d[iq].y<<" "<<q_pack.kvec_d[iq].z<<" "<<std::endl;
 		}
-		ofs<<endl;
+		ofs<<std::endl;
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				ofs<<q_pack.wf_wg[iq][ib]<<" ";
 			}
-			ofs<<endl;
+			ofs<<std::endl;
 		}
-		ofs<<endl;
+		ofs<<std::endl;
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
@@ -783,7 +783,7 @@ void Exx_Lip::write_q_pack() const
 				{
 					ofs<<q_pack.hvec_array[iq](iw,ib).real()<<" "<<q_pack.hvec_array[iq](iw,ib).imag()<<" ";
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 		}
 		ofs.close();
@@ -889,27 +889,27 @@ void Exx_Lip::read_q_pack()
 			WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
 		}
 
-		ofs<<q_pack->kv_ptr->nks<<endl;
+		ofs<<q_pack->kv_ptr->nks<<std::endl;
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			ofs<<q_pack->kv_ptr->ngk[iq]<<" ";
 		}
-		ofs<<endl;
+		ofs<<std::endl;
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
-			ofs<<q_pack.kvec_c[iq].x<<" "<<q_pack.kvec_c[iq].y<<" "<<q_pack.kvec_c[iq].z<<" "<<endl;
-			ofs<<q_pack.kvec_d[iq].x<<" "<<q_pack.kvec_d[iq].y<<" "<<q_pack.kvec_d[iq].z<<" "<<endl;
+			ofs<<q_pack.kvec_c[iq].x<<" "<<q_pack.kvec_c[iq].y<<" "<<q_pack.kvec_c[iq].z<<" "<<std::endl;
+			ofs<<q_pack.kvec_d[iq].x<<" "<<q_pack.kvec_d[iq].y<<" "<<q_pack.kvec_d[iq].z<<" "<<std::endl;
 		}
-		ofs<<endl;
+		ofs<<std::endl;
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				ofs<<q_pack.wf_wg[iq][ib]<<" ";
 			}
-			ofs<<endl;
+			ofs<<std::endl;
 		}
-		ofs<<endl;
+		ofs<<std::endl;
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
@@ -918,7 +918,7 @@ void Exx_Lip::read_q_pack()
 				{
 					ofs<<q_pack.hvec_array[iq](iw,ib).real()<<" "<<q_pack.hvec_array[iq](iw,ib).imag()<<" ";
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 		}
 		ofs.close();

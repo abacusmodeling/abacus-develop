@@ -46,7 +46,7 @@ gettimeofday( &t_start, NULL);
 	//=========================================
 	MGT.init_Gaunt_CH( 2*Lmax+1 );			// why +1
 	MGT.init_Gaunt( 2*Lmax+1 );
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init\t"<<time_during(t_start)<<std::endl;
 ofs.close();
 }
 
@@ -80,7 +80,7 @@ gettimeofday( &t_start, NULL);
 													orb_B1[TB][LB1][NB1],
 													orb_B2[TB][LB2][NB2],
 													MOT, MGT)));
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial\t"<<time_during(t_start)<<std::endl;
 ofs.close();
 }
 
@@ -114,7 +114,7 @@ gettimeofday( &t_start, NULL);
 													orb_B1.Phi[TB].PhiLN(LB1,NB1),
 													orb_B2.Phi[TB].PhiLN(LB2,NB2),
 													MOT, MGT)));
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial\t"<<time_during(t_start)<<std::endl;
 ofs.close();
 }
 
@@ -136,7 +136,7 @@ gettimeofday( &t_start, NULL);
 									for( auto &coI : coH.second )
 										for( auto &coJ : coI.second )
 											coJ.second.init_radial_table();
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table\t"<<time_during(t_start)<<std::endl;
 ofs.close();
 }
 
@@ -174,10 +174,10 @@ gettimeofday(&t_small, NULL);
 										for( auto &coI : coH.second )
 											for( auto &coJ : coI.second )
 												coJ.second.init_radial_table(radials);
-ofs<<time_during(t_small)<<endl;
+ofs<<time_during(t_small)<<std::endl;
 			}
 		}
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table_Rs\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table_Rs\t"<<time_during(t_start)<<std::endl;
 ofs.close();
 }
 
@@ -306,7 +306,7 @@ gettimeofday( &t_start, NULL);
 			}
 		}
 	}
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix\t"<<time_during(t_start)<<std::endl;
 ofs.close();
 	return matrixes;
 }

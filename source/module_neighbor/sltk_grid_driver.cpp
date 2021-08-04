@@ -30,7 +30,7 @@ void Grid_Driver::Find_atom(
 	{
 //		GlobalV::ofs_running << " Atom cartesian_pos = " << cartesian_pos.x
 //		<< " " << cartesian_pos.y
-//		<< " " << cartesian_pos.z << endl;
+//		<< " " << cartesian_pos.z << std::endl;
 	}
 
 //----------------------------------------------------------
@@ -41,7 +41,7 @@ void Grid_Driver::Find_atom(
 	//const int offset = this->Locate_offset(cartesian_pos);
 	const int offset = this->Locate_offset(ucell, cartesian_pos, ntype, nnumber);
 
-//	cout << "lenght in Find atom = " << atomlink[offset].fatom.getAdjacentSet()->getLength() << endl;
+//	std::cout << "lenght in Find atom = " << atomlink[offset].fatom.getAdjacentSet()->getLength() << std::endl;
 
 	this->Find_adjacent_atom(offset, this->atomlink[offset].fatom.getAdjacentSet());
 
@@ -113,7 +113,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 //		OUT(GlobalV::ofs_running,"adj_num",this->adj_num);
 	}	
 	
-	//cout << "\n length = " << adj_num << endl;
+	//std::cout << "\n length = " << adj_num << std::endl;
 	//BLOCK_HERE("Find_adjacent_atom");
 
 //----------------------------------------------------------
@@ -147,7 +147,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 		<< setw(10) << "X"
 		<< setw(10) << "Y"
 		<< setw(10) << "Z"
-		<< setw(10) << "Distance" << endl;
+		<< setw(10) << "Distance" << std::endl;
 */
 	}
 
@@ -207,7 +207,7 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 					GlobalV::ofs_running << setw(10) << this->atomlink[offset_i].fatom.x()
 					<< setw(10) << this->atomlink[offset_i].fatom.y()
 					<< setw(10) << this->atomlink[offset_i].fatom.z()
-					<< setw(10) << distance << endl;
+					<< setw(10) << distance << std::endl;
 */
 					assert(distance <= this->sradius);
 				}
@@ -298,15 +298,15 @@ Vector3<double> Grid_Driver::Calculate_adjacent_site
 		<< " " << this->atomlink[offset].fatom.x()
 		<< " " << this->atomlink[offset].fatom.y()
 		<< " " << this->atomlink[offset].fatom.z() 
-		<< endl;
-		GlobalV::ofs_running << " box1 : " << box11 << " " << box12 << " " << box13 << endl;
-		GlobalV::ofs_running << " box2 : " << box21 << " " << box22 << " " << box23 << endl;
-		GlobalV::ofs_running << " box3 : " << box31 << " " << box32 << " " << box33 << endl;
+		<< std::endl;
+		GlobalV::ofs_running << " box1 : " << box11 << " " << box12 << " " << box13 << std::endl;
+		GlobalV::ofs_running << " box2 : " << box21 << " " << box22 << " " << box23 << std::endl;
+		GlobalV::ofs_running << " box3 : " << box31 << " " << box32 << " " << box33 << std::endl;
 		GlobalV::ofs_running << " adjacent site:" 
 		<< " " << adjacent_site.x
 		<< " " << adjacent_site.y
 		<< " " << adjacent_site.z 
-		<< endl;
+		<< std::endl;
 */
 	}
 

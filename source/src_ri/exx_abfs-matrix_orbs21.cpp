@@ -34,20 +34,20 @@ void Exx_Abfs::Matrix_Orbs21::init(
 		GlobalC::ORB.get_dR(),								// delta R, for making radial table
 //		GlobalC::ORB.get_dk() / kmesh_times);				// delta k, for integration in k space
 		GlobalC::ORB.get_dk());											// Peize Lin change 2017-04-16
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::MOT.allocate\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::MOT.allocate\t"<<time_during(t_start)<<std::endl;
 	int Lmax_used, Lmax;
 //gettimeofday( &t_start, NULL);
 	MOT.init_Table_Spherical_Bessel (3,mode, Lmax_used, Lmax, Exx_Abfs::Lmax);
 //	MOT.init_OV_Tpair();							// for MOT.OV_L2plus1
 //	MOT.Destroy_Table_Spherical_Bessel (Lmax_used);				// why?
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::MOT.init_Table_Spherical_Bessel\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::MOT.init_Table_Spherical_Bessel\t"<<time_during(t_start)<<std::endl;
 
 	//=========================================
 	// (2) init Ylm Coef
 	//=========================================
 //gettimeofday( &t_start, NULL);
 	Ylm::set_coefficients ();
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::Ylm\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::Ylm\t"<<time_during(t_start)<<std::endl;
 
 	//=========================================
 	// (3) make Gaunt coefficients table
@@ -55,7 +55,7 @@ void Exx_Abfs::Matrix_Orbs21::init(
 //gettimeofday( &t_start, NULL);
 	MGT.init_Gaunt_CH( 2*Lmax+1 );			// why +1
 	MGT.init_Gaunt( 2*Lmax+1 );
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::MGT\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init::MGT\t"<<time_during(t_start)<<std::endl;
 //ofs.close();
 }
 
@@ -87,7 +87,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial(
 											orb_A2[TA][LA2][NA2],
 											orb_B[TB][LB][NB],
 											MOT, MGT)));
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial\t"<<time_during(t_start)<<std::endl;
 //ofs.close();
 }
 
@@ -118,7 +118,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial(
 											orb_A2.Phi[TA].PhiLN(LA2,NA2),
 											orb_B.Phi[TB].PhiLN(LB,NB),
 											MOT, MGT)));
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial\t"<<time_during(t_start)<<std::endl;
 //ofs.close();
 }
 
@@ -140,7 +140,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial_table()
 							for( auto &coG : coF.second )
 								for( auto &coH : coG.second )
 									coH.second.init_radial_table();
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial_table\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial_table\t"<<time_during(t_start)<<std::endl;
 //ofs.close();
 }
 
@@ -177,10 +177,10 @@ gettimeofday(&t_small, NULL);
 								for( auto &coG : coF.second )
 									for( auto &coH : coG.second )
 										coH.second.init_radial_table(radials);
-ofs<<time_during(t_small)<<endl;
+ofs<<time_during(t_small)<<std::endl;
 			}
 		}
-ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial_table_Rs\t"<<time_during(t_start)<<endl;
+ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::init_radial_table_Rs\t"<<time_during(t_start)<<std::endl;
 ofs.close();
 }
 
@@ -457,27 +457,27 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::Matrix_
 														// Peize Lin test											// Peize Lin test
 //														{
 //															ofstream ofs("orb11-i_exp",ofstream::app);
-//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<endl;
+//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
 //															ofstream ofs("orb11-Gaunt_solid_A_B_AB",ofstream::app);
-//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<endl;
+//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
 //															ofstream ofs("orb11-Gaunt_A_B_AB",ofstream::app);
-//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<endl;
+//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
 //															ofstream ofs("orb11-Interp_Tlm",ofstream::app);
-//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<endl;
+//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
 //															ofstream ofs("orb11-rly",ofstream::app);
-//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<endl;
+//															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 
@@ -517,7 +517,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::Matrix_
 			matrixes[T][I][T][I].resize(1);
 		}
 	}
-//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix\t"<<time_during(t_start)<<endl;
+//ofs<<"TIME@Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix\t"<<time_during(t_start)<<std::endl;
 //ofs.close();
 
 	return matrixes;

@@ -79,7 +79,7 @@ double Memory::calculate_mem(const long &n_in,const string &type)
 	}
 	else
 	{
-		cout<<"not this type in memory storage : "<<type << endl;
+		std::cout<<"not this type in memory storage : "<<type << std::endl;
 	}
 	total += n * mem;	
 	return n*mem;
@@ -125,7 +125,7 @@ double Memory::record
 	}
 	if(n_now >= n_memory)
 	{
-		cout<<" Error! Too many memories required.";
+		std::cout<<" Error! Too many memories required.";
 		return 0.0;
 	}
 
@@ -140,8 +140,8 @@ double Memory::record
 
 void Memory::print(const int find)
 {
-//	cout <<"\n Warning_Memory_Consuming : "
-//	<<class_name[find]<<" "<<name[find]<<" "<<consume[find]<<" MB" << endl;
+//	std::cout <<"\n Warning_Memory_Consuming : "
+//	<<class_name[find]<<" "<<name[find]<<" "<<consume[find]<<" MB" << std::endl;
 	return;
 }
 
@@ -161,14 +161,14 @@ void Memory::finish(ofstream &ofs)
 
 void Memory::print_all(ofstream &ofs)
 {
-//	cout<<"\n init_flag="<<init_flag;
+//	std::cout<<"\n init_flag="<<init_flag;
 	if(!init_flag) return;
 
 	const double small = 1.0; 
-//    cout<<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------";
-    ofs <<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------" << endl;
-//	cout<<"\n"<<setw(41)<< " " <<setprecision(4)<<total;
-	ofs <<setw(41)<< " " <<setprecision(4)<<total << endl;
+//    std::cout<<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------";
+    ofs <<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------" << std::endl;
+//	std::cout<<"\n"<<setw(41)<< " " <<setprecision(4)<<total;
+	ofs <<setw(41)<< " " <<setprecision(4)<<total << std::endl;
     
 	bool *print_flag = new bool[n_memory];
 	for(int i=0; i<n_memory; i++) print_flag[i] = false;
@@ -200,16 +200,16 @@ void Memory::print_all(ofstream &ofs)
         	ofs  << " "
              << setw(20) << class_name[k]
              << setw(20) << name[k]
-             << setw(15) << consume[k] << endl;
+             << setw(15) << consume[k] << std::endl;
 
-//        	cout  << "\n "
+//        	std::cout  << "\n "
 //             << setw(20) << class_name[k]
 //             << setw(20) << name[k]
 //             << setw(15) << consume[k];
 		}
     }
-//    cout<<"\n ----------------------------------------------------------"<<endl;
-    ofs<<" ----------------------------------------------------------"<<endl;
+//    std::cout<<"\n ----------------------------------------------------------"<<std::endl;
+    ofs<<" ----------------------------------------------------------"<<std::endl;
 	delete[] print_flag; //mohan fix by valgrind at 2012-04-02
 	return;
 }

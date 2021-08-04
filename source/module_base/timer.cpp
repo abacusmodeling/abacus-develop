@@ -118,10 +118,10 @@ void timer::print_all(ofstream &ofs)
 		}
 	}
 	
-	cout << setprecision(2);
+	std::cout << setprecision(2);
 	ofs << setprecision(3);
-	cout<<"\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << endl;
-	ofs <<"\n\n\n\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << endl;
+	std::cout<<"\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
+	ofs <<"\n\n\n\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
 	for(auto &timer_pool_order_A : timer_pool_order)
 	{
 		const string &class_name = timer_pool_order_A.first.first;
@@ -139,11 +139,11 @@ void timer::print_all(ofstream &ofs)
 			 << setw(15) << timer_one.cpu_second
 			 << setw(10) << timer_one.calls
 			 << setw(10) << setprecision(2) << timer_one.cpu_second/timer_one.calls
-			 << setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << endl;
+			 << setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << std::endl;
 
-		cout << resetiosflags(ios::scientific);
+		std::cout << resetiosflags(ios::scientific);
 		
-		cout << " " 
+		std::cout << " " 
 			// << setw(2)  << timer_one.level
 			 << setw(2)  << " "
 			 << setw(20) << class_name
@@ -151,20 +151,20 @@ void timer::print_all(ofstream &ofs)
 			 << setw(15) << setprecision(5) << timer_one.cpu_second
 			 << setw(10) << timer_one.calls
 			 << setw(10) << setprecision(2) << timer_one.cpu_second/timer_one.calls
-			 << setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << endl;		
+			 << setw(10) << timer_one.cpu_second / timer_pool_order[0].second.cpu_second * 100 << "%" << std::endl;		
 	}
-	cout<<" ----------------------------------------------------------------------------------------"<<endl;
-	ofs <<" ----------------------------------------------------------------------------------------"<<endl;
+	std::cout<<" ----------------------------------------------------------------------------------------"<<std::endl;
+	ofs <<" ----------------------------------------------------------------------------------------"<<std::endl;
 }
 
 /*
 void timer::print_all(ofstream &ofs)
 {
-//	cout<<"\n timer::print_all()"<<endl;
+//	std::cout<<"\n timer::print_all()"<<std::endl;
 	const double small = 0.1; // cpu = 10^6
 	// if want to print > 1s , set small = 10^6
 
-	cout << setprecision(2);
+	std::cout << setprecision(2);
 
 	// prepare
 	bool *print_flag = new bool[n_clock];
@@ -176,8 +176,8 @@ void timer::print_all(ofstream &ofs)
 	int type = 1; // 2:calls 1:total_time
 	bool non_reorder = 1;
 	
-	cout<<"\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << endl;
-	ofs <<"\n\n\n\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << endl;
+	std::cout<<"\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
+	ofs <<"\n\n\n\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
 	ofs << setprecision(3);
 	for (int i=0; i<n_clock; i++)
 	{
@@ -237,23 +237,23 @@ void timer::print_all(ofstream &ofs)
 			 << setw(15) << spend_time
 			 << setw(10) << calls[k]
 			 << setw(10) << setprecision(2) << average_spend_time
-			 << setw(10) << spend_time / cpu_second[0] * 100 << "%" << endl;
+			 << setw(10) << spend_time / cpu_second[0] * 100 << "%" << std::endl;
 
 
-		cout << resetiosflags(ios::scientific);
+		std::cout << resetiosflags(ios::scientific);
 
-		cout  << " " 
+		std::cout  << " " 
 		     << setw(2) << level[k]
 			 << setw(20) << class_name[k]
 			 << setw(20) << name[k]
 			 << setw(15) << spend_time
 			 << setw(10) << calls[k]
 			 << setw(10) << setprecision(2) << average_spend_time
-			 << setw(10) << spend_time / cpu_second[0] * 100 << "%" << endl;
+			 << setw(10) << spend_time / cpu_second[0] * 100 << "%" << std::endl;
 			
 	}
-	cout<<" ----------------------------------------------------------------------------------------"<<endl;
-	ofs <<" ----------------------------------------------------------------------------------------"<<endl;
+	std::cout<<" ----------------------------------------------------------------------------------------"<<std::endl;
+	ofs <<" ----------------------------------------------------------------------------------------"<<std::endl;
 	delete[] print_flag;
 	return;
 }

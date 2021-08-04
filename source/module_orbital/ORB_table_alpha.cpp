@@ -116,8 +116,8 @@ int ORB_table_alpha::get_rmesh(const double &R1, const double &R2)
 	{
 //		GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
 //		GlobalV::ofs_warning << "\n rmesh = " << rmesh;
-		cout << "\n R1 = " << R1 << " R2 = " << R2;
-		cout << "\n rmesh = " << rmesh;
+		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
+		std::cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_alpha::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
@@ -442,28 +442,28 @@ void ORB_table_alpha::print_Table_DSR(void)
 					for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						const int Opair = this->DS_Opair(T1, L1, L2, N1, N2);	//Opair
-						//ofs <<setw(20)<< "atom_type: " << label << endl;
-						ofs <<setw(20)<< "lcao basis: " << "L1=" << L1 << ", N1=" << N1 << endl;
-						ofs <<setw(20)<< "descriptor basis: " << "L2=" << L2 << ", N2=" << N2 << endl;
+						//ofs <<setw(20)<< "atom_type: " << label << std::endl;
+						ofs <<setw(20)<< "lcao basis: " << "L1=" << L1 << ", N1=" << N1 << std::endl;
+						ofs <<setw(20)<< "descriptor basis: " << "L2=" << L2 << ", N2=" << N2 << std::endl;
 						for (int il = 0; il < this-> DS_2Lplus1[T1]; il++)
 						{
-							ofs << "L=" << il << endl;
+							ofs << "L=" << il << std::endl;
 							const double Rcut1 = GlobalC::ORB.Phi[T1].getRcut();
 							const double Rcut2 = GlobalC::ORB.Alpha[0].getRcut();
 							const int rmesh = this->get_rmesh(Rcut1, Rcut2);
 							
 							if (Table_DSR[0][T1][Opair][il][1]==0)	//remain to be discussed
 							{
-								ofs << "S(R)=0"<<endl<<endl;
+								ofs << "S(R)=0"<<std::endl<<std::endl;
 								continue;
 							}
-							ofs << "Rcut1="<<Rcut1<<", Rcut2="<<Rcut2<<", rmesh="<<rmesh<<", dr="<<this->dr<<";"<<endl;
+							ofs << "Rcut1="<<Rcut1<<", Rcut2="<<Rcut2<<", rmesh="<<rmesh<<", dr="<<this->dr<<";"<<std::endl;
 							for (int ir = 0; ir < rmesh; ir++)
 							{
 								ofs << Table_DSR[0][T1][Opair][il][ir] << " ";
-								if ( (ir+1) % 8 == 0) ofs << endl;
+								if ( (ir+1) % 8 == 0) ofs << std::endl;
 							}
-							ofs << endl <<endl;
+							ofs << std::endl <<std::endl;
 						}// il
 					}// N2
 				}// L2

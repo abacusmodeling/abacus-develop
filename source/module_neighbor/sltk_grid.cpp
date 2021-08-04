@@ -179,7 +179,7 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 			ofs_running<<"\n"<<setw(12)<<"X"<<setw(12)<<"Y"<<setw(12)<<"Z";
 			for(int i=0;i<natom;i++)
 			{
-				cout<<"\n"<<setw(6)<<i
+				std::cout<<"\n"<<setw(6)<<i
 				<<setw(12)<<pointCache[i].fatom.x()
 				<<setw(12)<<pointCache[i].fatom.y()
 				<<setw(12)<<pointCache[i].fatom.z()
@@ -313,12 +313,12 @@ bool Grid::Push(const UnitCell &ucell, const FAtom &atom)
 	if (a < dx && a >= 0 && b < dy && b >= 0 && c < dz && c >= 0)
 	{
 		++ this->Cell[a][b][c].length;
-//		if(test_grid) ofs_running << setw(10) << this->Cell[a][b][c].length << endl;
+//		if(test_grid) ofs_running << setw(10) << this->Cell[a][b][c].length << std::endl;
 		return true;
 	}
 	else
 	{
-//		if(test_grid) ofs_running << setw(10) << " no cell in" << endl; 
+//		if(test_grid) ofs_running << setw(10) << " no cell in" << std::endl; 
 		return false;
 	}
 }
@@ -335,7 +335,7 @@ AtomLink* Grid::Build_Cache(const UnitCell &ucell, const Atom_input &input)
 
 	AtomLink* current = start;
 
-//	if(test_grid) ofs_running << " total atom number is " << natom << endl;
+//	if(test_grid) ofs_running << " total atom number is " << natom << std::endl;
 	for (int i = 0;i < natom;i++)
 	{
 //----------------------------------------------------------
@@ -369,7 +369,7 @@ void Grid::Build_Cell(void)
 
 	AtomLink* cellAddress = this->atomlink;
 
-//	if (test_grid)ofs_running << " Cell_length(number of atoms) " << endl;
+//	if (test_grid)ofs_running << " Cell_length(number of atoms) " << std::endl;
 
 	for (int i = 0; i < this->dx; ++i)
 	{
@@ -387,7 +387,7 @@ void Grid::Build_Cell(void)
 					ofs_running << setw(6) << i 
 					<< setw(6) << j 
 					<< setw(6) << k
-					<< setw(10) << Cell[i][j][k].length << endl;
+					<< setw(10) << Cell[i][j][k].length << std::endl;
 */
 				}
 			}
@@ -444,17 +444,17 @@ void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FA
 
 		//ofs_running << setw(8) << atom.x() << setw(8) << atom.y() << setw(8) << atom.z()
 		//<< setw(12) << directx << setw(12) << directy << setw(12) << directz
-		//<< setw(6) << a << setw(6) << b << setw(6) << c << endl;
+		//<< setw(6) << a << setw(6) << b << setw(6) << c << std::endl;
 	
 	/*	
 		if(a==0 && b==4 && c==0)
 		{
-			cout << setprecision(25) << endl;
-			cout << " save_add=" << save_add << endl;
-			cout << atom.x() << " " << atom.y() << " " << atom.z() << endl;
-			cout << " directy=" << directy << " d_minX=" << d_minY << " b=" << b << endl;
-			cout << " (int)directy=" << (int)directy << " (int)d_minY=" << (int)d_minY << " static_cast<int>( (directx - this->d_minX) )=" << static_cast<int>( (directy - this->d_minY) ) << endl;
-			cout << endl;
+			std::cout << setprecision(25) << std::endl;
+			std::cout << " save_add=" << save_add << std::endl;
+			std::cout << atom.x() << " " << atom.y() << " " << atom.z() << std::endl;
+			std::cout << " directy=" << directy << " d_minX=" << d_minY << " b=" << b << std::endl;
+			std::cout << " (int)directy=" << (int)directy << " (int)d_minY=" << (int)d_minY << " static_cast<int>( (directx - this->d_minX) )=" << static_cast<int>( (directy - this->d_minY) ) << std::endl;
+			std::cout << std::endl;
 			int ok;
 			cin >> ok;
 		}
@@ -477,7 +477,7 @@ void Grid::In_Which_Cell(const UnitCell &ucell, int &a, int &b, int &c, const FA
 		c = static_cast<int>(std::floor((atom.z() - this->d_minZ) / this->cell_z_length));
 
 		/*
-		cout<<"\n"<<setw(12)<<atom.x()
+		std::cout<<"\n"<<setw(12)<<atom.x()
 		<<setw(12)<<atom.y()
 		<<setw(12)<<atom.z()
 		<<setw(6)<<a
@@ -608,7 +608,7 @@ void Grid::Fold_Hash_Table()
 			{
 				AtomLink* current = this->Cell[i][j][k].address;
 				//			ofs_running<<"\n i = "<<i<<" j = "<<j<<" k = "<<k
-				//			<<"\n length = "<<this->Cell[i][j][k].length<<endl;
+				//			<<"\n length = "<<this->Cell[i][j][k].length<<std::endl;
 				const AtomLink* const end = current + this->Cell[i][j][k].length;
 
 				bool *push_i = new bool[Cell[i][j][k].length] ;

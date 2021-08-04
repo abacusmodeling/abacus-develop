@@ -31,15 +31,15 @@ void energy::perform_dos(void)
     if(out_dos !=0 || out_band !=0)
     {
         GlobalV::ofs_running << "\n\n\n\n";
-        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-        GlobalV::ofs_running << " |                                                                    |" << endl;
-        GlobalV::ofs_running << " | Post-processing of data:                                           |" << endl;
-        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << endl;
-        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << endl;
-        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << endl;
-        GlobalV::ofs_running << " | done here.                                                         |" << endl;
-        GlobalV::ofs_running << " |                                                                    |" << endl;
-        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+        GlobalV::ofs_running << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+        GlobalV::ofs_running << " |                                                                    |" << std::endl;
+        GlobalV::ofs_running << " | Post-processing of data:                                           |" << std::endl;
+        GlobalV::ofs_running << " | DOS (density of states) and bands will be output here.             |" << std::endl;
+        GlobalV::ofs_running << " | If atomic orbitals are used, Mulliken charge analysis can be done. |" << std::endl;
+        GlobalV::ofs_running << " | Also the .bxsf file containing fermi surface information can be    |" << std::endl;
+        GlobalV::ofs_running << " | done here.                                                         |" << std::endl;
+        GlobalV::ofs_running << " |                                                                    |" << std::endl;
+        GlobalV::ofs_running << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
         GlobalV::ofs_running << "\n\n\n\n";
     }
 
@@ -58,7 +58,7 @@ void energy::perform_dos(void)
 				{
 					ofsi << " " << GlobalC::wf.ekb[is][ib];
 					}
-					ofsi << endl;
+					ofsi << std::endl;
 					}
 			// pengfei 2015-4-1
 			if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
@@ -69,13 +69,13 @@ void energy::perform_dos(void)
 					<<setw(25)<<"Energy(ev)"
 					<<setw(25)<<"Occupation"
 					<<setw(25)<<"Kpoint = "<<ik+1
-					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
+					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
-						ofsi<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<endl;
+						ofsi<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 					}
-					ofsi <<endl; 
-					ofsi <<endl;                              
+					ofsi <<std::endl; 
+					ofsi <<std::endl;                              
 				}
 			}
 			else
@@ -87,16 +87,16 @@ void energy::perform_dos(void)
 					<<setw(25)<<"Spin down Energy(ev)"
 					<<setw(25)<<"Occupation"
 					<<setw(25)<<"Kpoint = "<<ik+1
-					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
+					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
 						ofsi<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
 						<<setw(25)<<GlobalC::wf.wg(ik,ib)
 						<<setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
-						<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
+						<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 					}
-					ofsi <<endl;
-					ofsi <<endl;
+					ofsi <<std::endl;
+					ofsi <<std::endl;
 
 				}
 			}
@@ -131,13 +131,13 @@ void energy::perform_dos(void)
 						<<setw(25)<<"Energy(ev)"
 						<<setw(25)<<"Occupation"
 						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<setw(6)<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<endl;
+							ofsi2<<setw(6)<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
-						ofsi2 <<endl;
-						ofsi2 <<endl;
+						ofsi2 <<std::endl;
+						ofsi2 <<std::endl;
 					}
 				}
 				else
@@ -150,7 +150,7 @@ void energy::perform_dos(void)
 						<<setw(25)<<"Spin down Energy(ev)"
 						<<setw(25)<<"Occupation"
 						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<endl;
+						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
@@ -158,10 +158,10 @@ void energy::perform_dos(void)
 							<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
 							<<setw(25)<<GlobalC::wf.wg(ik,ib)
 							<<setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
-							<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<endl;
+							<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
-						ofsi2 <<endl;
-						ofsi2 <<endl;
+						ofsi2 <<std::endl;
+						ofsi2 <<std::endl;
 
 					}
 				}
@@ -208,7 +208,7 @@ void energy::perform_dos(void)
 
 //scale up a little bit so the end peaks are displaced better
 		double delta=(emax-emin)*dos_scale;
-		cout << dos_scale;
+		std::cout << dos_scale;
 		emax=emax+delta/2.0;
 		emin=emin-delta/2.0;
 
@@ -473,7 +473,7 @@ void energy::perform_dos(void)
 						 y +=  pdos[0](i,n);
 					 }  
 
-					 out <<setw(20)<< en <<setw(30)<< y << endl;
+					 out <<setw(20)<< en <<setw(30)<< y << std::endl;
 				 }
 			 }
 			 else if (GlobalV::NSPIN==2)
@@ -489,7 +489,7 @@ void energy::perform_dos(void)
 
 					 }  
 
-					 out <<setw(20)<< en <<setw(30)<< y << setw(30)<< z<< endl;
+					 out <<setw(20)<< en <<setw(30)<< y << setw(30)<< z<< std::endl;
 				 }
 			 }
 			 out.close();
@@ -528,17 +528,17 @@ void energy::perform_dos(void)
 			 as << GlobalV::global_out_dir << "PDOS";
 			 ofstream out(as.str().c_str());
 
-			 out << "<"<<"pdos"<<">" <<endl;
-			 out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< endl;
-			 out << "<"<<"norbitals"<<">" <<setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< endl;
-			 out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<endl;
+			 out << "<"<<"pdos"<<">" <<std::endl;
+			 out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< std::endl;
+			 out << "<"<<"norbitals"<<">" <<setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			 out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<std::endl;
 
 			 for (int n=0; n<npoints; ++n)
 			 { double y=0.0;
 				 double en=emin + n * de_ev;
-				 out <<setw(20)<< en << endl;
+				 out <<setw(20)<< en << std::endl;
 			 }
-			 out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<endl;
+			 out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<std::endl;
 			 for (int i=0; i<GlobalC::ucell.nat; i++)
 			 {   
 				 int a = GlobalC::ucell.iat2ia[i];
@@ -551,44 +551,44 @@ void energy::perform_dos(void)
 					 const int m1 = atom1->iw2m[j];
 					 const int w = GlobalC::ucell.itiaiw2iwt(t, a, j);
 
-					 //out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<endl;
-					 out << "<"<<"orbital" <<endl;
-					 out <<setw(6)<< "index"<<"="<<"\""<<setw(40) <<w+1<<"\""<<endl;
-					 out <<setw(5)<< "atom"<<"_"<<"index"<<"="<<"\""<<setw(40) <<i+1<<"\""<<endl;
-					 out <<setw(8)<< "species"<<"="<<"\""<<GlobalC::ucell.atoms[t].label<<"\""<<endl;
-					 out<<setw(2)<< "l"<<"="<<"\""<<setw(40)<<L1<<"\""<<endl;
-					 out <<setw(2)<< "m"<<"="<<"\""<<setw(40)<<m1<<"\""<<endl;
-					 out <<setw(2)<< "z"<<"="<<"\""<<setw(40)<<N1+1<<"\""<<endl;
-					 out << ">" <<endl;
-					 out << "<"<<"data"<<">" <<endl;
+					 //out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<std::endl;
+					 out << "<"<<"orbital" <<std::endl;
+					 out <<setw(6)<< "index"<<"="<<"\""<<setw(40) <<w+1<<"\""<<std::endl;
+					 out <<setw(5)<< "atom"<<"_"<<"index"<<"="<<"\""<<setw(40) <<i+1<<"\""<<std::endl;
+					 out <<setw(8)<< "species"<<"="<<"\""<<GlobalC::ucell.atoms[t].label<<"\""<<std::endl;
+					 out<<setw(2)<< "l"<<"="<<"\""<<setw(40)<<L1<<"\""<<std::endl;
+					 out <<setw(2)<< "m"<<"="<<"\""<<setw(40)<<m1<<"\""<<std::endl;
+					 out <<setw(2)<< "z"<<"="<<"\""<<setw(40)<<N1+1<<"\""<<std::endl;
+					 out << ">" <<std::endl;
+					 out << "<"<<"data"<<">" <<std::endl;
 					 if (GlobalV::NSPIN==1)
 					 {
 						 for (int n=0; n<npoints; ++n)
 						 {
 
 
-							 out <<setw(13)<< pdos[0](w,n)<<endl;
+							 out <<setw(13)<< pdos[0](w,n)<<std::endl;
 						 }//n
 					 }
 					 else if (GlobalV::NSPIN==2)
 					 {
 						 for (int n=0; n<npoints; ++n)
 						 {
-							 out <<setw(20)<< pdos[0](w,n)<< setw(30)<< pdos[1](w,n)<<endl;
+							 out <<setw(20)<< pdos[0](w,n)<< setw(30)<< pdos[1](w,n)<<std::endl;
 						 }//n
 					 }
 
-					 out << "<"<<"/"<<"data"<<">" <<endl;
+					 out << "<"<<"/"<<"data"<<">" <<std::endl;
 
 				 }//j
 			 }//i
-			 out << "<"<<"/"<<"orbital"<<">" <<endl;
-			 out << "<"<<"/"<<"pdos"<<">" <<endl;
+			 out << "<"<<"/"<<"orbital"<<">" <<std::endl;
+			 out << "<"<<"/"<<"pdos"<<">" <<std::endl;
 			 out.close();}
 		 {  stringstream os;
 			 os<<GlobalV::global_out_dir<<"Orbital";
 			 ofstream out(os.str().c_str());
-			 out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<endl;
+			 out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<std::endl;
 
 
 			 for (int i=0; i<GlobalC::ucell.nat; i++)
@@ -602,16 +602,16 @@ void energy::perform_dos(void)
 					 const int m1 = atom1->iw2m[j];
 					 out <<setw(5) << i << setw(8) 
 						<< GlobalC::ucell.atoms[t].label <<setw(5)
-							<<L1<<setw(5) <<m1<<setw(5)<<N1+1<<setw(15)<< Name_Angular[L1][m1] << endl;
+							<<L1<<setw(5) <<m1<<setw(5)<<N1+1<<setw(15)<< Name_Angular[L1][m1] << std::endl;
 				 }
 			 }
-			 out <<endl<<endl;
-			 out <<setw(5)<< "io"<<setw(2)<<"="<<setw(2)<<"Orbital index in supercell"<<endl;
-			 out <<setw(5)<< "spec"<<setw(2)<<"="<<setw(2)<<"Atomic species label"<<endl;
-			 out <<setw(5)<< "l"<<setw(2)<<"="<<setw(2)<<"Angular mumentum quantum number"<<endl;
-			 out <<setw(5)<< "m"<<setw(2)<<"="<<setw(2)<<"Magnetic quantum number"<<endl;
-			 out <<setw(5)<< "z"<<setw(2)<<"="<<setw(2)<<"Zeta index of orbital"<<endl;
-			 out <<setw(5)<< "sym"<<setw(2)<<"="<<setw(2)<<"Symmetry name of real orbital"<<endl;
+			 out <<std::endl<<std::endl;
+			 out <<setw(5)<< "io"<<setw(2)<<"="<<setw(2)<<"Orbital index in supercell"<<std::endl;
+			 out <<setw(5)<< "spec"<<setw(2)<<"="<<setw(2)<<"Atomic species label"<<std::endl;
+			 out <<setw(5)<< "l"<<setw(2)<<"="<<setw(2)<<"Angular mumentum quantum number"<<std::endl;
+			 out <<setw(5)<< "m"<<setw(2)<<"="<<setw(2)<<"Magnetic quantum number"<<std::endl;
+			 out <<setw(5)<< "z"<<setw(2)<<"="<<setw(2)<<"Zeta index of orbital"<<std::endl;
+			 out <<setw(5)<< "sym"<<setw(2)<<"="<<setw(2)<<"Symmetry name of real orbital"<<std::endl;
 			 out.close();}
 
 	 }       
@@ -634,7 +634,7 @@ void energy::perform_dos(void)
 		 ifstream in(ss.str().c_str());
 		 if(!in)
 		 {
-			 //      cout<<"\n Can't find file : "<< name << endl;
+			 //      std::cout<<"\n Can't find file : "<< name << std::endl;
 			 //      return 0;
 		 }
 
@@ -666,7 +666,7 @@ void energy::perform_dos(void)
 		 }
 		 if(!in.eof())
 		 {
-			 //cout<<"\n Read Over!"<<endl;
+			 //std::cout<<"\n Read Over!"<<std::endl;
 		 }
 		 in.close();
 
@@ -720,7 +720,7 @@ void energy::perform_dos(void)
 		 delete[] dos2;
 		 delete[] energy;
 
-		 //cout<<" broden spectrum over, success : ) "<<endl;
+		 //std::cout<<" broden spectrum over, success : ) "<<std::endl;
 
 	 }
 
@@ -735,12 +735,12 @@ void energy::perform_dos(void)
 	
 		if(nspin0==1)
 		{
-			GlobalV::ofs_running << " Fermi energy is " << this->ef << " Rydberg" << endl;
+			GlobalV::ofs_running << " Fermi energy is " << this->ef << " Rydberg" << std::endl;
 		}
 		else if(nspin0==2)
 		{
-			GlobalV::ofs_running << " Fermi energy (spin = 1) is " << this->ef_up << " Rydberg" << endl;
-			GlobalV::ofs_running << " Fermi energy (spin = 2) is " << this->ef_dw << " Rydberg" << endl;
+			GlobalV::ofs_running << " Fermi energy (spin = 1) is " << this->ef_up << " Rydberg" << std::endl;
+			GlobalV::ofs_running << " Fermi energy (spin = 2) is " << this->ef_dw << " Rydberg" << std::endl;
 		}
 
 		//int nks;
@@ -753,7 +753,7 @@ void energy::perform_dos(void)
 		{
 			stringstream ss2;
 			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
-			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << endl;
+			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
 			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef, GlobalC::wf.ekb);
 		}*/
 		
@@ -783,7 +783,7 @@ void energy::perform_dos(void)
 		{
 			stringstream ss2;
 			ss2 << GlobalV::global_out_dir << "BANDS_" << is+1 << ".dat";
-			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << endl;
+			GlobalV::ofs_running << "\n Output bands in file: " << ss2.str() << std::endl;
 			Dos::nscf_band(is, ss2.str(), nks, GlobalV::NBANDS, this->ef*0, GlobalC::wf.ekb);
 		}
 

@@ -102,7 +102,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	// but that's not the term "gamma_only" I want to use in LCAO,  
 	fact = 1.0;
 
-    //GlobalV::ofs_running << "\n pwb.gstart = " << pwb.gstart << endl;
+    //GlobalV::ofs_running << "\n pwb.gstart = " << pwb.gstart << std::endl;
 
     for (int ig=pwb.gstart; ig<pwb.ngmc; ig++)
     {
@@ -120,7 +120,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     ewaldg = FOUR_PI / cell.omega * ewaldg;
 
-//	cout << "\n ewaldg = " << ewaldg;
+//	std::cout << "\n ewaldg = " << ewaldg;
 
     //  Here add the other constant term
 	if(pwb.gstart == 1)

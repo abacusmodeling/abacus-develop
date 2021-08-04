@@ -29,7 +29,7 @@ void matrixAlloc()
 {
 // mohan add 2021-04-25
 #ifdef __NORMAL
-	cout << "Allocation error for Matrix" << endl;
+	std::cout << "Allocation error for Matrix" << std::endl;
 	exit(0);
 #else
 	WARNING_QUIT("matrix","Allocation error for Matrix");

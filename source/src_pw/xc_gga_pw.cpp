@@ -141,8 +141,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 	*/
 	
 	/*
-	cout << "\n sum grad 1= " << sum[0] << " "  << sum[1] << " " << sum[2] << endl;
-	cout << " sum rho = " << sum[3] << " "  << sum[4] << endl;
+	std::cout << "\n sum grad 1= " << sum[0] << " "  << sum[1] << " " << sum[2] << std::endl;
+	std::cout << " sum rho = " << sum[3] << " "  << sum[4] << std::endl;
 	ZEROS(sum,6);
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 	{
@@ -152,8 +152,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 		sum[3] += abs(rhotmp2[ir]);	
 		sum[4] += rhotmp2[ir]*rhotmp2[ir];	
 	}
-	cout << "\n sum grad 2= " << sum[0] << " "  << sum[1] << " " << sum[2] << endl;
-	cout << " sum rho = " << sum[3] << " "  << sum[4] << endl;
+	std::cout << "\n sum grad 2= " << sum[0] << " "  << sum[1] << " " << sum[2] << std::endl;
+	std::cout << " sum rho = " << sum[3] << " "  << sum[4] << std::endl;
 	*/
 	
 	const double epsr = 1.0e-6;
@@ -270,8 +270,8 @@ void GGA_PW::gradcorr(double &etxc, double &vtxc, matrix &v)
 
 	}
 
-	//cout << "\n vtxcgc=" << vtxcgc;
-	//cout << "\n etxcgc=" << etxcgc << endl;
+	//std::cout << "\n vtxcgc=" << vtxcgc;
+	//std::cout << "\n etxcgc=" << etxcgc << std::endl;
 
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp1[ir] -= fac * GlobalC::CHR.rho_core[ir];
 	if(nspin0==2) for(int ir=0; ir<GlobalC::pw.nrxx; ir++) rhotmp2[ir] -= fac * GlobalC::CHR.rho_core[ir];

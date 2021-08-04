@@ -41,7 +41,7 @@ void Gint_k::allocate_pvpR(void)
 
 	//	reduced = GlobalV::NURSE; 
 	//xiaohui modify 2015-05-30
-	//cout << " reduced algorithm for grid integration = " << reduced << endl;
+	//std::cout << " reduced algorithm for grid integration = " << reduced << std::endl;
 
 	if(this->reduced)
 	{
@@ -57,13 +57,13 @@ void Gint_k::allocate_pvpR(void)
 
         if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+			GlobalV::ofs_running << " Memory of pvpR : " << mem << " MB" << std::endl;
 		}
 
         if( mem > 800 )
         {
-            GlobalV::ofs_warning << " memory for pvpR = " << mem << endl;
-            GlobalV::ofs_warning << " which is larger than 800 MB ! " << endl;
+            GlobalV::ofs_warning << " memory for pvpR = " << mem << std::endl;
+            GlobalV::ofs_warning << " which is larger than 800 MB ! " << std::endl;
 			WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
 
@@ -75,13 +75,13 @@ void Gint_k::allocate_pvpR(void)
 
 		if(GlobalV::OUT_LEVEL != "m") 
 		{
-			GlobalV::ofs_running << " Memory of pvpR : " << mem << " MB" << endl;
+			GlobalV::ofs_running << " Memory of pvpR : " << mem << " MB" << std::endl;
 		}
 
 		if( mem > 800 )
 		{
-			GlobalV::ofs_warning << " memory for pvpR = " << mem << endl;
-			GlobalV::ofs_warning << " which is larger than 800 MB ! " << endl;
+			GlobalV::ofs_warning << " memory for pvpR = " << mem << std::endl;
+			GlobalV::ofs_warning << " which is larger than 800 MB ! " << std::endl;
 			WARNING_QUIT("Gint_k","allocate_pvpR");
 		}
 
@@ -252,7 +252,7 @@ void Gint_k::folding_force(
 		// if the row element is on this processor
 		if(mug>=0)
 		{
-			//GlobalV::ofs_running << " i=" << i << " mug=" << mug << endl;
+			//GlobalV::ofs_running << " i=" << i << " mug=" << mug << std::endl;
 			for(int j=0; j<GlobalV::NLOCAL; ++j)
 			{
 				const int nug = GlobalC::GridT.trace_lo[j];
@@ -488,7 +488,7 @@ void Gint_k::folding_stress(
 		// if the row element is on this processor
 		if(mug>=0)
 		{
-			//GlobalV::ofs_running << " i=" << i << " mug=" << mug << endl;
+			//GlobalV::ofs_running << " i=" << i << " mug=" << mug << std::endl;
 			for(int j=0; j<GlobalV::NLOCAL; ++j)
 			{
 				const int nug = GlobalC::GridT.trace_lo[j];
@@ -743,7 +743,7 @@ void Gint_k::folding_vl_k(const int &ik)
 			const int j = i + DM_start;
 			if( abs(pvpR_reduced[j]) > 1.0e-5  )
 			{
-//				cout << " pvpR_reduced[" << i <<"] = " << pvpR_reduced[j] << endl;
+//				std::cout << " pvpR_reduced[" << i <<"] = " << pvpR_reduced[j] << std::endl;
 			}
 		}
 */
@@ -754,14 +754,14 @@ void Gint_k::folding_vl_k(const int &ik)
 	// Print the pvp matrix
 	//----------------------
 /*
-	cout << " pvp matrix:" << endl;
+	std::cout << " pvp matrix:" << std::endl;
 	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
 		for(int j=0; j<GlobalC::GridT.lgd; j++)
 		{
-			cout << setw(15) << pvp[i][j].real();
+			std::cout << setw(15) << pvp[i][j].real();
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	*/
 
@@ -1001,7 +1001,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 			const int j = i + DM_start;
 			if( abs(pvpR_reduced[j]) > 1.0e-5  )
 			{
-//				cout << " pvpR_reduced[" << i <<"] = " << pvpR_reduced[j] << endl;
+//				std::cout << " pvpR_reduced[" << i <<"] = " << pvpR_reduced[j] << std::endl;
 			}
 		}
 */
@@ -1012,14 +1012,14 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	// Print the pvp matrix
 	//----------------------
 /*
-	cout << " pvp matrix:" << endl;
+	std::cout << " pvp matrix:" << std::endl;
 	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
 		for(int j=0; j<GlobalC::GridT.lgd; j++)
 		{
-			cout << setw(15) << pvp[i][j].real();
+			std::cout << setw(15) << pvp[i][j].real();
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	*/
 
@@ -1258,10 +1258,10 @@ void Gint_k::allocate_pvpR_tr(void)
     int R_y = GlobalC::GridD.getCellY();
     int R_z = GlobalC::GridD.getCellZ();
 
-//cout<<"R_x: "<<R_x<<endl;
-//cout<<"R_y: "<<R_y<<endl;
-//cout<<"R_z: "<<R_z<<endl;
-//cout<<"GlobalC::GridT.lgd: "<<GlobalC::GridT.lgd<<endl;
+//std::cout<<"R_x: "<<R_x<<std::endl;
+//std::cout<<"R_y: "<<R_y<<std::endl;
+//std::cout<<"R_z: "<<R_z<<std::endl;
+//std::cout<<"GlobalC::GridT.lgd: "<<GlobalC::GridT.lgd<<std::endl;
     if(GlobalV::NSPIN!=4)
     {
         pvpR_tr = new double****[R_x];
@@ -1278,7 +1278,7 @@ void Gint_k::allocate_pvpR_tr(void)
                     {
                         pvpR_tr[ix][iy][iz][iw] = new double[GlobalC::GridT.lgd];
 //do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
-//co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<endl;
+//co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<std::endl;
                         ZEROS(pvpR_tr[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
@@ -1301,7 +1301,7 @@ void Gint_k::allocate_pvpR_tr(void)
                     {
                         pvpR_tr_soc[ix][iy][iz][iw] = new complex<double>[GlobalC::GridT.lgd];
 //do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
-//co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<endl;
+//co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<std::endl;
                         ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GlobalC::GridT.lgd);
                     }
                 }
@@ -1394,31 +1394,31 @@ void Gint_k::distribute_pvpR_tr(void)
                     }
 
                     const int mug = GlobalC::GridT.trace_lo[i];
-//cout<<"mug: "<<mug<<endl;
+//std::cout<<"mug: "<<mug<<std::endl;
                     if(mug >= 0)
                     {
                         for(int j=0; j<GlobalV::NLOCAL; j++)
                         {
                             const int nug = GlobalC::GridT.trace_lo[j];
-//cout<<"nug: "<<nug<<endl;
+//std::cout<<"nug: "<<nug<<std::endl;
                             if(nug >= 0)
                             {
                                 //if(mug <= nug)
                                 //{
-//cout<<"ix: "<<ix<<endl;
-//cout<<"iy: "<<iy<<endl;
-//cout<<"iz: "<<iz<<endl;
-//cout<<"mug: "<<mug<<endl;
-//cout<<"nug: "<<nug<<endl;
-//cout<<"pvpR_tr: "<<pvpR_tr[ix][iy][iz][mug][nug]<<endl;
+//std::cout<<"ix: "<<ix<<std::endl;
+//std::cout<<"iy: "<<iy<<std::endl;
+//std::cout<<"iz: "<<iz<<std::endl;
+//std::cout<<"mug: "<<mug<<std::endl;
+//std::cout<<"nug: "<<nug<<std::endl;
+//std::cout<<"pvpR_tr: "<<pvpR_tr[ix][iy][iz][mug][nug]<<std::endl;
                                     if(GlobalV::NSPIN!=4) tmp[j] = pvpR_tr[ix][iy][iz][mug][nug];
                                     else tmp_soc[j] = pvpR_tr_soc[ix][iy][iz][mug][nug];
-//cout<<"tmp["<<j<<"]: "<<tmp[j]<<endl;
+//std::cout<<"tmp["<<j<<"]: "<<tmp[j]<<std::endl;
                                 //}
                                 //else
                                 //{
                                     //tmp[j] = pvpR_tr[ix][iy][iz][nug][mug];
-//cout<<"tmp["<<j<<"]: "<<tmp[j]<<endl;
+//std::cout<<"tmp["<<j<<"]: "<<tmp[j]<<std::endl;
                                 //}
                             }
                         }

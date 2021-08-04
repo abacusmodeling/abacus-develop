@@ -85,11 +85,11 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         for (int ik=0; ik<GlobalC::kv.nks; ik++)
         {
             const int npw= GlobalC::kv.ngk[ik];
-            GlobalV::ofs_running << " --------------------------------------------------------" << endl;
-            GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint" << endl;
-            GlobalV::ofs_running << setw(8) << "ik" << setw(8) << "npw" << endl;
-            GlobalV::ofs_running << setw(8) << ik+1 << setw(8) << npw << endl;
-            GlobalV::ofs_running << " --------------------------------------------------------" << endl;
+            GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
+            GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint" << std::endl;
+            GlobalV::ofs_running << setw(8) << "ik" << setw(8) << "npw" << std::endl;
+            GlobalV::ofs_running << setw(8) << ik+1 << setw(8) << npw << std::endl;
+            GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
 
             // search for all k-points.
             overlap_Q[ik] = this->cal_overlap_Q(ik, npw, psi[ik], derivative_order);
@@ -141,8 +141,8 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
     TITLE("Numerical_Basis","cal_overlap_Q");
     timer::tick("Numerical_Basis","cal_overlap_Q");
 
-	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << endl;
-	GlobalV::ofs_running << " Q = < J_mu, q | Psi_n, k > " << endl;
+	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS AND BLOCH WAVE FUNCTIONS" << std::endl;
+	GlobalV::ofs_running << " Q = < J_mu, q | Psi_n, k > " << std::endl;
 
     ComplexArray overlap_Q(GlobalV::NBANDS, GlobalV::NLOCAL, this->bessel_basis.get_ecut_number() );
     overlap_Q.zero_out();
@@ -161,7 +161,7 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
         << "ik" << setw(8) 
         << "Type1" << setw(8) 
         << "Atom1" << setw(8) 
-        << "L" << endl;
+        << "L" << std::endl;
 
     for (int T = 0; T < GlobalC::ucell.ntype; T++)
     {
@@ -176,7 +176,7 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
                             << setw(8) << GlobalC::ucell.atoms[T].label
                             << setw(8) << I+1 
 							<< setw(8) << L
-							<< endl;
+							<< std::endl;
                 //OUT("l",l);
                 complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < this->bessel_basis.get_ecut_number(); ie++)
@@ -216,8 +216,8 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
     TITLE("Numerical_Basis","cal_overlap_Sq");
     timer::tick("Numerical_Basis","cal_overlap_Sq");
 
-	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << endl;
-	GlobalV::ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << endl; 
+	GlobalV::ofs_running << " OUTPUT THE OVERLAP BETWEEN SPHERICAL BESSEL FUNCTIONS"  << std::endl;
+	GlobalV::ofs_running << " S = < J_mu,q1 | J_nu,q2 >" << std::endl; 
 
     const int enumber = this->bessel_basis.get_ecut_number();
     ComplexArray overlap_Sq( GlobalV::NLOCAL, GlobalV::NLOCAL, enumber, enumber );
@@ -240,7 +240,7 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
         << "L1" << setw(8) 
         << "Type2" << setw(8) 
         << "Atom2" << setw(8) 
-        << "L2" << endl;
+        << "L2" << std::endl;
 
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++) // 1.1
     {
@@ -264,7 +264,7 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
                                 << l1 << setw(8)
                                 << GlobalC::ucell.atoms[T2].label << setw(8)
                                 << I2+1 << setw(8)
-                                << l2 << setw(8) << endl;
+                                << l2 << setw(8) << std::endl;
 
                             const complex<double> lphase2 = pow(IMAG_UNIT, l2);
                             for (int ic1=0; ic1 < GlobalC::ucell.nmax; ic1++) // 1.5
@@ -359,7 +359,7 @@ matrix Numerical_Basis::cal_ylm(const std::vector<Vector3<double>> &gk)
 
 std::vector<IntArray> Numerical_Basis::init_mu_index(void)
 {
-	GlobalV::ofs_running << " Initialize the mu index" << endl;
+	GlobalV::ofs_running << " Initialize the mu index" << std::endl;
     std::vector<IntArray> mu_index_(GlobalC::ucell.ntype);
 
     int mu = 0;
@@ -376,7 +376,7 @@ std::vector<IntArray> Numerical_Basis::init_mu_index(void)
             << " number_of_atoms " << GlobalC::ucell.atoms[it].na
             << " number_of_L " << GlobalC::ucell.atoms[it].nwl+1
             << " number_of_n " << GlobalC::ucell.nmax
-            << " number_of_m " << 2*(GlobalC::ucell.atoms[it].nwl+1)+1 << endl;
+            << " number_of_m " << 2*(GlobalC::ucell.atoms[it].nwl+1)+1 << std::endl;
 
         for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
         {
@@ -457,38 +457,38 @@ void Numerical_Basis::output_info(
     if (GlobalV::MY_RANK==0)
     {
         ofs.precision(10);
-        ofs << GlobalC::ucell.lat0 << endl;
+        ofs << GlobalC::ucell.lat0 << std::endl;
 
-        ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-        ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-        ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+        ofs << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+        ofs << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+        ofs << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 
-        ofs << GlobalC::ucell.ntype << " ntype" << endl;
+        ofs << GlobalC::ucell.ntype << " ntype" << std::endl;
         for (int it=0; it<GlobalC::ucell.ntype; it++)
         {
-            ofs << GlobalC::ucell.atoms[it].label << " label" << endl; // mohan add 2009-07-23
-            ofs << GlobalC::ucell.atoms[it].na << " na" << endl;
+            ofs << GlobalC::ucell.atoms[it].label << " label" << std::endl; // mohan add 2009-07-23
+            ofs << GlobalC::ucell.atoms[it].na << " na" << std::endl;
             for (int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
             {
                 ofs << GlobalC::ucell.atoms[it].tau[ia].x << " " 
                     << GlobalC::ucell.atoms[it].tau[ia].y << " " 
-                    << GlobalC::ucell.atoms[it].tau[ia].z << endl;
+                    << GlobalC::ucell.atoms[it].tau[ia].z << std::endl;
             }
         }
         // ecutwfc_jlq determine the jlq corresponding to plane wave calculation.
-        ofs << GlobalC::pw.ecutwfc << " ecutwfc" << endl; // mohan add 2009-09-08
+        ofs << GlobalC::pw.ecutwfc << " ecutwfc" << std::endl; // mohan add 2009-09-08
 
         // this parameter determine the total number of jlq.
-        ofs << bessel_basis.get_ecut() << " ecutwfc_jlq" << endl;//mohan modify 2009-09-08
-        ofs << bessel_basis.get_rcut() << " rcut_Jlq" << endl;
+        ofs << bessel_basis.get_ecut() << " ecutwfc_jlq" << std::endl;//mohan modify 2009-09-08
+        ofs << bessel_basis.get_rcut() << " rcut_Jlq" << std::endl;
 
         // mohan add 'smooth' and 'sigma' 2009-08-28
-        ofs << bessel_basis.get_smooth() << " smooth" << endl;
-        ofs << bessel_basis.get_sigma() << " sigma" << endl;
+        ofs << bessel_basis.get_smooth() << " smooth" << std::endl;
+        ofs << bessel_basis.get_sigma() << " sigma" << std::endl;
 
-        ofs << bessel_basis.get_tolerence() << " tolerence" << endl;
+        ofs << bessel_basis.get_tolerence() << " tolerence" << std::endl;
 
-        ofs << GlobalC::ucell.lmax << " lmax" << endl;
+        ofs << GlobalC::ucell.lmax << " lmax" << std::endl;
     }
 
     ofs << scientific;
@@ -498,10 +498,10 @@ void Numerical_Basis::output_info(
     
     if (GlobalV::MY_RANK==0)
     {
-        ofs << GlobalC::kv.nkstot << " nks" << endl;
-        ofs << GlobalV::NBANDS << " nbands" << endl;
-        ofs << GlobalV::NLOCAL << " nwfc" << endl;
-        ofs << bessel_basis.get_ecut_number() << " ne " << endl;        
+        ofs << GlobalC::kv.nkstot << " nks" << std::endl;
+        ofs << GlobalV::NBANDS << " nbands" << std::endl;
+        ofs << GlobalV::NLOCAL << " nwfc" << std::endl;
+        ofs << bessel_basis.get_ecut_number() << " ne " << std::endl;        
     }
 }
 
@@ -573,7 +573,7 @@ void Numerical_Basis::output_k(
     
     if (GlobalV::MY_RANK==0)
     {
-        ofs << "\n</WEIGHT_OF_KPOINTS>" << endl;
+        ofs << "\n</WEIGHT_OF_KPOINTS>" << std::endl;
     }
 }
 
@@ -639,7 +639,7 @@ void Numerical_Basis::output_overlap_Q(
     // (5)
     if (GlobalV::MY_RANK==0)
     {
-        ofs << "\n</OVERLAP_Q>" << endl;
+        ofs << "\n</OVERLAP_Q>" << std::endl;
     }
 }
 
@@ -698,7 +698,7 @@ void Numerical_Basis::output_overlap_Sq(
     if (GlobalV::MY_RANK==0)
     {
         ofs.open(name.c_str(), ios::app);
-        ofs << "\n</OVERLAP_Sq>" << endl;
+        ofs << "\n</OVERLAP_Sq>" << std::endl;
     }
 }
 
@@ -709,8 +709,8 @@ void Numerical_Basis::output_overlap_V(
 {
 	if (GlobalV::MY_RANK==0)
     {
-        ofs << "\n<OVERLAP_V>" <<endl;;
+        ofs << "\n<OVERLAP_V>" <<std::endl;;
 		ofs << overlap_V;
-		ofs << "</OVERLAP_V>" <<endl;
+		ofs << "</OVERLAP_V>" <<std::endl;
 	}
 }

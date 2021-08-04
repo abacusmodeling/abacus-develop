@@ -56,7 +56,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 		GlobalV::ofs_running << "\n col_set[" << i << "] = " << LM.col_set[i];
 	} 
 	 */
-//	GlobalV::ofs_running << "\n LocalMatrix Information done." << endl;
+//	GlobalV::ofs_running << "\n LocalMatrix Information done." << std::endl;
 
 	if(LM.col_num==0 || LM.row_num==0)
 	{
@@ -65,10 +65,10 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 
 	Parallel_Reduce::reduce_int_all( wrong_input );
 
-	//GlobalV::ofs_running << "\n wrong_input = " << wrong_input << endl;
+	//GlobalV::ofs_running << "\n wrong_input = " << wrong_input << std::endl;
 	if(wrong_input > 0)
 	{
-		GlobalV::ofs_running << "\n col_num == 0 || row_num == 0" << endl;
+		GlobalV::ofs_running << "\n col_num == 0 || row_num == 0" << std::endl;
 		WARNING_QUIT("pzgseps","col_num == 0 || row_num == 0");
 	}
 
@@ -120,7 +120,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 		++loc_size;
 	}
 
-//	GlobalV::ofs_running << "\n loc_size = " << loc_size << endl;
+//	GlobalV::ofs_running << "\n loc_size = " << loc_size << std::endl;
 
 //	printf("loc_pos=%d\n",loc_pos);
 	pzsteiz(n,D,E,&eigen[loc_pos],Z,loc_size);
@@ -137,7 +137,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 		pzst2g(comm_2D,nb,n,B,Z,LM,loc_size,uplo);
 	}
 
-//	GlobalV::ofs_running << "\n local_size = " << loc_size << endl;
+//	GlobalV::ofs_running << "\n local_size = " << loc_size << std::endl;
 	if (uplo=='u'||(uplo=='U'))
 	{
 		for (i=0; i<loc_size; i++)
@@ -145,7 +145,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 			for (j=0; j<n; j++)
 			{
 				Z1[j*loc_size+i]=Z[i*n+j];
-//				cout << " i=" << i << " j=" << j << " Z=" << Z[i*n+j] << endl;
+//				std::cout << " i=" << i << " j=" << j << " Z=" << Z[i*n+j] << std::endl;
 			}
 		}
 		pzst2g(comm_2D,nb,n,B,Z1,LM,loc_size,uplo);
@@ -165,6 +165,6 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
 	delete[] E;
 	delete[] Z1;
 
-//	GlobalV::ofs_running << "\n Finish." << endl;
+//	GlobalV::ofs_running << "\n Finish." << std::endl;
 	return;
 }

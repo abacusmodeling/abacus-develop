@@ -88,7 +88,7 @@ void Atom::print_Atom(ofstream &ofs, output &outp)
     OUT(ofs,"Rcut", Rcut); // pengfei Li 16-2-29
     OUT(ofs,"nw",nw);
     OUT(ofs,"stapos_wf",stapos_wf);
-    ofs<<endl;
+    ofs<<std::endl;
 
     //===================
     // call print atom
@@ -101,10 +101,10 @@ void Atom::print_Atom(ofstream &ofs, output &outp)
     {
     	ofs << setw(15) << this->tau[i].x
     		<< setw(15) << this->tau[i].y
-    		<< setw(15) << this->tau[i].z << endl;
+    		<< setw(15) << this->tau[i].z << std::endl;
     }
     */
-    ofs << endl;
+    ofs << std::endl;
 
     return;
 }

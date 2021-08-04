@@ -13,7 +13,7 @@ wavefunc::~wavefunc()
 { 
 	if(GlobalV::test_deconstructor)
 	{
-		cout << " ~wavefunc()" << endl;
+		std::cout << " ~wavefunc()" << std::endl;
 	}
 	if(allocate_ekb)
 	{
@@ -101,11 +101,11 @@ void wavefunc::allocate(const int nks)
 		if(GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
 			wanf2[0].create(GlobalV::NLOCAL, npwx * GlobalV::NPOL);
-			cout << " Memory for wanf2 (MB): " << 
-				Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << endl;
+			std::cout << " Memory for wanf2 (MB): " << 
+				Memory::record("wavefunc","wanf2",GlobalV::NLOCAL*(prefactor*npwx),"complexmatrix") << std::endl;
 		}
-		cout << " MEMORY FOR PSI (MB)  : " << 
-			Memory::record("wavefunc","evc",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << endl;
+		std::cout << " MEMORY FOR PSI (MB)  : " << 
+			Memory::record("wavefunc","evc",GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 	}
 	else
 	{
@@ -123,8 +123,8 @@ void wavefunc::allocate(const int nks)
 			}
 		};
 
-		cout << " MEMORY FOR PSI (MB)  : " << 
-		Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << endl;
+		std::cout << " MEMORY FOR PSI (MB)  : " << 
+		Memory::record("wavefunc","evc",nks2*GlobalV::NBANDS*(prefactor*npwx),"complexmatrix") << std::endl;
 	}
 
 	//showMemStats();
@@ -181,19 +181,19 @@ int wavefunc::get_starting_nw(void)const
     {
         if (GlobalC::ucell.natomwfc >= GlobalV::NBANDS)
         {
-            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all pseudo atomic wave functions." << endl;
+            if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all pseudo atomic wave functions." << std::endl;
         }
         else
         {
             if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are atomic + "
             << GlobalV::NBANDS - GlobalC::ucell.natomwfc
-            << " random wave functions." << endl;
+            << " random wave functions." << std::endl;
         }
         return max(GlobalC::ucell.natomwfc,  GlobalV::NBANDS);
     }
     else if (start_wfc == "random")
     {
-        if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all random." << endl;
+        if(GlobalV::test_wf)GlobalV::ofs_running << " Start wave functions are all random." << std::endl;
         return GlobalV::NBANDS;
     }
     else
@@ -236,7 +236,7 @@ void wavefunc::LCAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 	//GlobalC::hm.diagH_subspace(ik ,GlobalV::NLOCAL, GlobalV::NBANDS, wvf, wvf, ekb[ik]);
 //	for(int ib=0; ib<GlobalV::NBANDS; ib++)
 //	{
-//		cout << " ib=" << ib << " e=" << ekb[ik][ib] << endl;
+//		std::cout << " ib=" << ib << " e=" << ekb[ik][ib] << std::endl;
 //	}
 
 //	DONE(GlobalV::ofs_running,"CONSTRUCT_LOCAL_BASIS_IN_PW");
@@ -323,10 +323,10 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	}
 
 	/*
-	GlobalV::ofs_running << " " << "ik = " << ik << " Bands(eV)" << endl;
+	GlobalV::ofs_running << " " << "ik = " << ik << " Bands(eV)" << std::endl;
 	for (int ib=0;ib<starting_nw;ib++)
 	{
-		GlobalV::ofs_running << " " << setw(15) << etatom[ib]*Ry_to_eV << endl;
+		GlobalV::ofs_running << " " << setw(15) << etatom[ib]*Ry_to_eV << std::endl;
 	}
 	*/
 
@@ -408,16 +408,16 @@ void wavefunc::wfcinit_k(void)
 		stringstream ss;
 		ss << GlobalV::global_out_dir <<"nearest.dat";
 		ofstream ofs(ss.str().c_str());
-		ofs << NR << endl;
-		cout <<"NR = "<<NR<<endl;    // Max
+		ofs << NR << std::endl;
+		std::cout <<"NR = "<<NR<<std::endl;    // Max
 		for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 		{
 			for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 			{
-				ofs<<iw1<<"   "<<iw2<<"    "<<Rmax[iw1][iw2]<<endl;   // iw1, iw2, and how many overlaps between iw1 and iw2
+				ofs<<iw1<<"   "<<iw2<<"    "<<Rmax[iw1][iw2]<<std::endl;   // iw1, iw2, and how many overlaps between iw1 and iw2
 				for(int i=0; i<Rmax[iw1][iw2]; i++)
 				{
-					ofs<<R[iw1][iw2][i].x<<"  "<<R[iw1][iw2][i].y<<"  "<<R[iw1][iw2][i].z<<endl;   // positions
+					ofs<<R[iw1][iw2][i].x<<"  "<<R[iw1][iw2][i].y<<"  "<<R[iw1][iw2][i].z<<std::endl;   // positions
 				}
 			}
 		}
@@ -512,7 +512,7 @@ void wavefunc::wfcinit_k(void)
 				qg.x = GlobalC::chi0_hilbert.qcar[iq][0] + GlobalC::chi0_hilbert.all_gcar[g].x;   
 				qg.y = GlobalC::chi0_hilbert.qcar[iq][1] + GlobalC::chi0_hilbert.all_gcar[g].y; 
 				qg.z = GlobalC::chi0_hilbert.qcar[iq][2] + GlobalC::chi0_hilbert.all_gcar[g].z;
-				cout <<"qg = "<<qg.x<<" "<<qg.y<<" "<<qg.z<<endl;
+				std::cout <<"qg = "<<qg.x<<" "<<qg.y<<" "<<qg.z<<std::endl;
 				for(int ik=0; ik<GlobalC::kv.nks; ik++)
 				{
 					this->LCAO_in_pw_k_q(ik, Mat, qg);
@@ -588,7 +588,7 @@ void wavefunc::wfcinit_k(void)
 			stringstream ss1;
 			ss1 << GlobalV::global_out_dir <<"q_"<<iq;
 			ofstream ofs1(ss1.str().c_str());
-			ofs1<<NG<<endl;
+			ofs1<<NG<<std::endl;
 			for(int g=0; g<NG; g++)
 			{
 				for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
@@ -599,11 +599,11 @@ void wavefunc::wfcinit_k(void)
 						{
 							ofs1<<overlap[iw1][iw2][g][ir]<<"  ";
 						}
-						ofs1<<endl;
+						ofs1<<std::endl;
 					}
 				}
 				// mohan update 2021-02-24
-				ofs1<<endl; ofs1<<endl;
+				ofs1<<std::endl; ofs1<<std::endl;
 			}
 			ofs1.close();
 		}
@@ -656,7 +656,7 @@ int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
 		{
 			int it1 = iw2it(iw1); int ia1 = iw2ia(iw1);
 			int it2 = iw2it(iw2); int ia2 = iw2ia(iw2);
-			//cout <<"iw1= "<<iw1<<" iw2= "<<iw2<<" it1= "<<it1<<" ia1= "<<ia1<<" it2= "<<it2<<" ia2= "<<ia2<<endl;
+			//std::cout <<"iw1= "<<iw1<<" iw2= "<<iw2<<" it1= "<<it1<<" ia1= "<<ia1<<" it2= "<<it2<<" ia2= "<<ia2<<std::endl;
 			count = 0;
 
 			for(int nx=-int(ix/2);nx<=int(ix/2);nx++)
@@ -665,8 +665,8 @@ int wavefunc::get_R(int ix, int iy, int iz)   // pengfei 2016-11-23
 				{
 					for(int nz=-int(iz/2);nz<=int(iz/2);nz++)
 					{
-						//cout <<"count = "<<count<<endl;
-						//cout<<"nx= "<<nx<<" ny= "<<ny<<" nz= "<<nz<<endl;
+						//std::cout <<"count = "<<count<<std::endl;
+						//std::cout<<"nx= "<<nx<<" ny= "<<ny<<" nz= "<<nz<<std::endl;
 						r1.x = GlobalC::ucell.atoms[it1].tau[ia1].x * GlobalC::ucell.lat0;
 						r1.y = GlobalC::ucell.atoms[it1].tau[ia1].y * GlobalC::ucell.lat0;
 						r1.z = GlobalC::ucell.atoms[it1].tau[ia1].z * GlobalC::ucell.lat0;
@@ -818,11 +818,11 @@ void wavefunc::init_after_vc(const int nks)
         if(GlobalV::BASIS_TYPE=="lcao_in_pw")
         {
             wanf2[0].create(GlobalV::NLOCAL*prefactor, npwx);
-            cout << " Memory for wanf2 (MB): " <<
-            Memory::record("wavefunc","wanf2",(GlobalV::NLOCAL*prefactor)*npwx,"complexmatrix") << endl;
+            std::cout << " Memory for wanf2 (MB): " <<
+            Memory::record("wavefunc","wanf2",(GlobalV::NLOCAL*prefactor)*npwx,"complexmatrix") << std::endl;
         }
-        cout << " MEMORY FOR PSI (MB)  : " <<
-        Memory::record("wavefunc","evc",(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+        std::cout << " MEMORY FOR PSI (MB)  : " <<
+        Memory::record("wavefunc","evc",(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
     }
     else
     {
@@ -839,8 +839,8 @@ void wavefunc::init_after_vc(const int nks)
             }
         }
 
-        cout << " MEMORY FOR PSI (MB)  : " <<
-        Memory::record("wavefunc","evc",(nks*prefactor)*(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << endl;
+        std::cout << " MEMORY FOR PSI (MB)  : " <<
+        Memory::record("wavefunc","evc",(nks*prefactor)*(GlobalV::NBANDS*prefactor)*npwx,"complexmatrix") << std::endl;
     }
 
     if(GlobalV::test_wf)

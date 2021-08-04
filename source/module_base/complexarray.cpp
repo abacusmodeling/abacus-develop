@@ -13,7 +13,7 @@ const std::complex <double> ZERO(0.0, 0.0), ONE(1.0, 0.0);
 
 void complexArrayxAlloc()
 {
-	cout << "\n Allocation error for complexArray " << endl;
+	std::cout << "\n Allocation error for complexArray " << std::endl;
 	abort();
 }
 
@@ -28,7 +28,7 @@ ComplexArray::ComplexArray(const int bnd1, const int bnd2, const int bnd3, const
 
 ComplexArray::~ComplexArray()
 {
-//    cout << "\n Exit ComplexArray()";
+//    std::cout << "\n Exit ComplexArray()";
 	freemem();
 }
 
@@ -49,7 +49,7 @@ void ComplexArray::init(const int size)
 
 void ComplexArray::freemem()
 {
-//	cout << "\n  ComplexArray::freemem() ";
+//	std::cout << "\n  ComplexArray::freemem() ";
 	delete [] ptr;
 	ptr = nullptr;
 	bound1 = 0;
@@ -316,9 +316,9 @@ void ComplexArray::read(char *fname)
 
 void ComplexArray::print()
 {
-	cout << "\n d[i] : \n ";
+	std::cout << "\n d[i] : \n ";
   for(int i = 0; i < size; i++)
-    cout << ptr[i].real() << "+ i"<< ptr[i].imag() << ",";
+    std::cout << ptr[i].real() << "+ i"<< ptr[i].imag() << ",";
 }
 */
 // Sum of absolute squares of all elements in cd

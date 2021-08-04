@@ -59,7 +59,7 @@ void LCAO_Orbitals::bcast_files(
 
 	assert(ntype_in > 0 );
 
-	GlobalV::ofs_running << "\n READING ORBITAL FILE NAMES FOR LCAO" << endl;
+	GlobalV::ofs_running << "\n READING ORBITAL FILE NAMES FOR LCAO" << std::endl;
 	for(int it=0; it<ntype_in; it++)
 	{
 		string ofile;
@@ -94,8 +94,8 @@ void LCAO_Orbitals::bcast_files(
 //			nonlocal_file.push_back ( nfile );
 		}
 
-		GlobalV::ofs_running << " orbital file: " << orbital_file[it] << endl;
-//		GlobalV::ofs_running << " nonlocal file: " << nonlocal_file[it] << endl;
+		GlobalV::ofs_running << " orbital file: " << orbital_file[it] << std::endl;
+//		GlobalV::ofs_running << " nonlocal file: " << nonlocal_file[it] << std::endl;
 	}
 	return;
 }
@@ -115,24 +115,24 @@ void LCAO_Orbitals::Read_Orbitals(
 	timer::tick("LCAO_Orbitals","Read_Orbitals");
 
 	ofs_in << "\n\n\n\n";
-	ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
-	ofs_in << " |                                                                    |" << endl;
-	ofs_in << " | Setup numerical orbitals:                                          |" << endl;
-	ofs_in << " | This part setup: numerical atomic orbitals, non-local projectors   |" << endl;
-	ofs_in << " | and neutral potential (1D). The atomic orbitals information        |" << endl;
-	ofs_in << " | including the radius, angular momentum and zeta number.            |" << endl;
-	ofs_in << " | The neutral potential is the sum of local part of pseudopotential  |" << endl;
-	ofs_in << " | and potential given by atomic charge, they will cancel out beyond  |" << endl;
-	ofs_in << " | a certain radius cutoff, because the Z/r character.                |" << endl;
-	ofs_in << " |                                                                    |" << endl;
-	ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+	ofs_in << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+	ofs_in << " |                                                                    |" << std::endl;
+	ofs_in << " | Setup numerical orbitals:                                          |" << std::endl;
+	ofs_in << " | This part setup: numerical atomic orbitals, non-local projectors   |" << std::endl;
+	ofs_in << " | and neutral potential (1D). The atomic orbitals information        |" << std::endl;
+	ofs_in << " | including the radius, angular momentum and zeta number.            |" << std::endl;
+	ofs_in << " | The neutral potential is the sum of local part of pseudopotential  |" << std::endl;
+	ofs_in << " | and potential given by atomic charge, they will cancel out beyond  |" << std::endl;
+	ofs_in << " | a certain radius cutoff, because the Z/r character.                |" << std::endl;
+	ofs_in << " |                                                                    |" << std::endl;
+	ofs_in << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
 	ofs_in << "\n\n\n\n";	
 
 	//////////////////////
 	/// (1) check dk, dR, Rmax.
 	//////////////////////
 
-	ofs_in << "\n SETUP ONE DIMENSIONAL ORBITALS/POTENTIAL" << endl;
+	ofs_in << "\n SETUP ONE DIMENSIONAL ORBITALS/POTENTIAL" << std::endl;
 
 	if(!read_in_flag)
 	{
@@ -167,7 +167,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	//-----------------------------------------------------------------
 	/// calculate number of k mesh according to energy cutoff.
 	/// Mohan choose ecutwfc according to interpolation requirement.
-	//	cout << " ecutwfc=" << ecutwfc << endl;
+	//	std::cout << " ecutwfc=" << ecutwfc << std::endl;
 	//LiuXh modified 2016-01-25, 2016-07-20
 	if(ecutwfc< 20)
 	{
@@ -246,7 +246,7 @@ void LCAO_Orbitals::Read_Orbitals(
 		this->rcutmax_Beta = std::max(this->rcutmax_Beta, this->Beta[it].get_rcut_max());
 	}
 
-	ofs_in << " max number of nonlocal projetors among all species is " << nprojmax << endl; 
+	ofs_in << " max number of nonlocal projetors among all species is " << nprojmax << std::endl; 
 
 	//caoyu add 2021-3-16
 	///>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -313,7 +313,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 			}
 			if(cut_mesh %2 == 0) ++cut_mesh;
 
-//		cout << " cut_mesh=" << cut_mesh << endl;
+//		std::cout << " cut_mesh=" << cut_mesh << std::endl;
 			double* beta_r = new double[cut_mesh];
 			ZEROS(beta_r, cut_mesh);
 			for(int ir=0; ir<cut_mesh; ++ir)
@@ -465,7 +465,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 
 	delete[] tmpBeta_lm;
 
-	cout << " SET NONLOCAL PSEUDOPOTENTIAL PROJECTORS" << endl;
+	std::cout << " SET NONLOCAL PSEUDOPOTENTIAL PROJECTORS" << std::endl;
 	return;
 }
 
@@ -495,12 +495,12 @@ void LCAO_Orbitals::Read_NonLocal(
 #endif
 	if(!open)
 	{
-		cout << " Non-local File : " << nonlocal_file[it] << endl;
+		std::cout << " Non-local File : " << nonlocal_file[it] << std::endl;
 		WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Can not find the NONLOCAL file.");
 	}
 	else
 	{
-//		GlobalV::ofs_running << " open nonLocal pseudopotential file: " << nonlocal_file[it] << endl;
+//		GlobalV::ofs_running << " open nonLocal pseudopotential file: " << nonlocal_file[it] << std::endl;
 	}
 
 
@@ -521,7 +521,7 @@ void LCAO_Orbitals::Read_NonLocal(
 				WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Only available for NC nonlocal pseudopotential");
 			}
 			READ_VALUE(ifs, nlmax);
-//			cout << " " << label << " " << ps_type << " " << nlmax << endl; 
+//			std::cout << " " << label << " " << ps_type << " " << nlmax << std::endl; 
 			assert(nlmax >= -1);
 			SCAN_END(ifs,"</HEADER>");
 		}
@@ -541,8 +541,8 @@ void LCAO_Orbitals::Read_NonLocal(
 		{
 			if( nlmax == GlobalC::ucell.atoms[it].lll[ic] )
 			{
-				//			cout << " nlmax = " << nlmax << endl;
-				//			cout << " lchi = " << GlobalC::ucell.atoms[it].lll[ic] << endl;
+				//			std::cout << " nlmax = " << nlmax << std::endl;
+				//			std::cout << " lchi = " << GlobalC::ucell.atoms[it].lll[ic] << std::endl;
 				find_lmax = true;
 				break;
 			}
@@ -550,11 +550,11 @@ void LCAO_Orbitals::Read_NonLocal(
 
 		if( !find_lmax )
 		{
-			cout << " For element " << label << endl;
-			cout << " Max L Read in from NONLOCAL = " << nlmax << endl;
+			std::cout << " For element " << label << std::endl;
+			std::cout << " Max L Read in from NONLOCAL = " << nlmax << std::endl;
 			for(int ib=0; ib<GlobalC::ucell.atoms[it].nbeta; ++ib)
 			{
-				cout << " Max L Read in from pseudopotential file = " << GlobalC::ucell.atoms[it].lll[ib] << endl;
+				std::cout << " Max L Read in from pseudopotential file = " << GlobalC::ucell.atoms[it].lll[ib] << std::endl;
 			}
 			WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","nlmax != GlobalC::ucell.atoms[it].lll");
 		}
@@ -599,7 +599,7 @@ void LCAO_Orbitals::Read_NonLocal(
                 	
 					ifs >> coefficient_D_in(L1_read, L2_read);
 					
-//					GlobalV::ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << endl;
+//					GlobalV::ofs_running << " L1=" << L1_read << " L2=" << L2_read << " Coef=" << coefficient_D_in(L1_read,L2_read) << std::endl;
             	}
         	}
 			SCAN_END(ifs,"</DIJ>");
@@ -626,7 +626,7 @@ void LCAO_Orbitals::Read_NonLocal(
 				READ_VALUE(ifs, iproj);
 				if(iproj!=p1)
 				{
-					cout << " iproj=" << iproj << " p1=" << p1 << endl;
+					std::cout << " iproj=" << iproj << " p1=" << p1 << std::endl;
 					WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","Check non-local projector index.");
 				}
 				
@@ -637,7 +637,7 @@ void LCAO_Orbitals::Read_NonLocal(
 				READ_VALUE(ifs, meshr_ps);
 				if(meshr_ps%2==0)
 				{
-					cout << " meshr_ps = " << meshr_ps << endl;
+					std::cout << " meshr_ps = " << meshr_ps << std::endl;
 					WARNING_QUIT("LCAO_Orbitals::Read_NonLocal","meshr_ps must be odd!");
 				}
 			}
@@ -679,7 +679,7 @@ void LCAO_Orbitals::Read_NonLocal(
 			
 //		OUT(GlobalV::ofs_running,"radial_ps max",radial_ps[meshr_ps-1]);
 
-//		cout << this->kmesh << endl;
+//		std::cout << this->kmesh << std::endl;
         tmpBeta_lm[p1].set_NL_proj(
         		label,
                 it, //type
@@ -753,14 +753,14 @@ void LCAO_Orbitals::Read_PAO(
 #endif
 	if(!open)
 	{
-		cout << " Orbital file : " << this->orbital_file[it] << endl;
+		std::cout << " Orbital file : " << this->orbital_file[it] << std::endl;
 		WARNING_QUIT("LCAO_Orbitals::Read_PAO","Couldn't find orbital files");
 	}
 
 	ofs_in << " " << setw(12) << "ORBITAL" << setw(3) << "L" 
 	<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
 	<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
-		<< setw(12) << "NEW_UNIT" << endl;
+		<< setw(12) << "NEW_UNIT" << std::endl;
 	
 	//lmax and nchimax for type it
 	int lmaxt=0;
@@ -789,7 +789,7 @@ void LCAO_Orbitals::Read_Descriptor(
 	ofs_in << " " << setw(12) << "DESCRIPTOR" << setw(3) << "L"
 		<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
 		<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
-		<< setw(12) << "NEW_UNIT" << endl;
+		<< setw(12) << "NEW_UNIT" << std::endl;
 
 	// check if the descriptor file exists.
 	bool open = false;
@@ -806,7 +806,7 @@ void LCAO_Orbitals::Read_Descriptor(
 #endif
 	if (!open)
 	{
-		cout << " Orbital file : " << this->descriptor_file << endl;
+		std::cout << " Orbital file : " << this->descriptor_file << std::endl;
 		WARNING_QUIT("LCAO_Orbitals::Read_Descriptor", "Couldn't find orbital files for descriptor");
 	}
 
@@ -967,8 +967,8 @@ void LCAO_Orbitals::read_orb_file(
 				{
 					if (ifs.eof())
 					{
-						cout << " Can't find l="
-							<< L << " n=" << N << " orbital." << endl;
+						std::cout << " Can't find l="
+							<< L << " n=" << N << " orbital." << std::endl;
 						break;
 					}
 
@@ -1036,7 +1036,7 @@ void LCAO_Orbitals::read_orb_file(
 			}
 			Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
-			ofs_in << setw(12) << unit << endl;
+			ofs_in << setw(12) << unit << std::endl;
 
 			ao[it].phiLN[count].set_orbital_info(
                 orb_label,

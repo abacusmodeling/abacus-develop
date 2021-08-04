@@ -60,7 +60,7 @@ void ELEC_evolve::evolve_psi(
 		//--------------------------------------------
 		if(GlobalV::CURRENT_SPIN == uhm.GK.get_spin() )
 		{
-			//GlobalV::ofs_running << " Same spin, same vlocal integration." << endl;
+			//GlobalV::ofs_running << " Same spin, same vlocal integration." << std::endl;
 		}
 		else
 		{
@@ -398,7 +398,7 @@ void ELEC_evolve::using_LAPACK_complex_2(
 
 	// Calculate wave function at t+delta t
 
-	//	cout << "wave function coe at t+delta t !" << endl;
+	//	std::cout << "wave function coe at t+delta t !" << std::endl;
 
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{

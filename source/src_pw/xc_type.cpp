@@ -84,7 +84,7 @@ void xcfunc::which_dft(const string *dft)
 	++itype;
 	stringstream ss;
 	ss << " ELEMENT " << itype << " FUNCTIONAL : "; 
-//	cout << ss.str() << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << endl;
+//	std::cout << ss.str() << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << std::endl;
 	
 	if( match_one( dft, "PBE0"))
 	{
@@ -197,15 +197,15 @@ void xcfunc::which_dft(const string *dft)
 		set_dft_value(igcc, 0);
 	}
 
-//	cout << "\n iexch = " << iexch; 
-//	cout << "\n icorr = " << icorr; 
-//	cout << "\n igcx = " << igcx; 
-//	cout << "\n igcc = " << igcc << endl; 
+//	std::cout << "\n iexch = " << iexch; 
+//	std::cout << "\n icorr = " << icorr; 
+//	std::cout << "\n igcx = " << igcx; 
+//	std::cout << "\n igcc = " << igcc << std::endl; 
 
-	//cout << "\n corr = " << exc[icorr];
-	//cout << "  corr = " << corr[icorr];
-	//cout << "  gradx = " << gradx[igcx];
-	//cout << "  gradc = " << gradc[igcc] << endl;
+	//std::cout << "\n corr = " << exc[icorr];
+	//std::cout << "  corr = " << corr[icorr];
+	//std::cout << "  gradx = " << gradx[igcx];
+	//std::cout << "  gradc = " << gradc[igcc] << std::endl;
 	//'-'//corr (icorr) //'-'//gradx (igcx) //'-'//gradc (igcc)
 	//      WRITE( stdout,'(a)') dftout
 	

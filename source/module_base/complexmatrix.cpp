@@ -33,7 +33,7 @@ void ComplexMatrix::zero_out(void)
 /*
 void need_more_memory()
 {
-	cout << "\n Sorry to crash... but the running need more momory! Exit." << endl;
+	std::cout << "\n Sorry to crash... but the running need more momory! Exit." << std::endl;
 	exit(0);
 }
 */

@@ -112,7 +112,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 			// mohan add 2010-07-26.
 			// there must be one of the two has the correct sign and value.
 			this->move_p[i] = this->check_move(pos[i], pos_p[i])/trust_radius_old;
-			//cout << " " << setw(20) << move_p[i] << setw(20) << dpmin << endl;
+			//std::cout << " " << setw(20) << move_p[i] << setw(20) << dpmin << std::endl;
 		}
 	}
 	else
@@ -136,7 +136,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 			hess_file >> rank1 >> rank2;
 			if(rank1 == dim && rank2 == dim)
 			{
-				GlobalV::ofs_running << "\n Reading the approximate inverse hessian from file"<<endl;
+				GlobalV::ofs_running << "\n Reading the approximate inverse hessian from file"<<std::endl;
 		
 				for(int i=0;i<dim;i++)
 				{
@@ -221,8 +221,8 @@ void Ions_Move_BFGS::bfgs_routine(void)
 				OUT(GlobalV::ofs_running,"den",den);
 				OUT(GlobalV::ofs_running,"interpolated trust radius",trust_radius);
 			}
-			//cout << " Formula : " << etot << " * s^2 + " << dE0s << " * s + " << etot_p << endl;
-			//cout << " Lowest point : " << trust_radius << endl;
+			//std::cout << " Formula : " << etot << " * s^2 + " << dE0s << " * s + " << etot_p << std::endl;
+			//std::cout << " Lowest point : " << trust_radius << std::endl;
 		}
 		else if(den <= 1.0e-16)
 		{
@@ -230,7 +230,7 @@ void Ions_Move_BFGS::bfgs_routine(void)
 			//then do is again, but smaller raidus.
 			trust_radius = 0.5 * trust_radius_old;
 			
-			GlobalV::ofs_running<<" quadratic interpolation is impossible."<<endl;
+			GlobalV::ofs_running<<" quadratic interpolation is impossible."<<std::endl;
 		}
 		//values from the last succeseful bfgs step are restored
 		etot = etot_p;
@@ -245,11 +245,11 @@ void Ions_Move_BFGS::bfgs_routine(void)
 			//we are trapped in this case..., so the algorithim must be restart
 			//the history is reset
 			//xiaohui add 2013-03-17
-			GlobalV::ofs_running<<"trust_radius = "<<trust_radius<<endl;
-			GlobalV::ofs_running<<"trust_radius_min = "<<trust_radius_min<<endl;
-			GlobalV::ofs_running<<"trust_radius_max = "<<trust_radius_max<<endl;
+			GlobalV::ofs_running<<"trust_radius = "<<trust_radius<<std::endl;
+			GlobalV::ofs_running<<"trust_radius_min = "<<trust_radius_min<<std::endl;
+			GlobalV::ofs_running<<"trust_radius_max = "<<trust_radius_max<<std::endl;
 			//xiaohui add 2013-03-17
-			GlobalV::ofs_running<<" trust_radius < trust_radius_min, reset bfgs history."<<endl;
+			GlobalV::ofs_running<<" trust_radius < trust_radius_min, reset bfgs history."<<std::endl;
 			
 			if(tr_min_hit)
 			{
@@ -287,7 +287,7 @@ void Ions_Move_BFGS::bfgs_routine(void)
 
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
-		cout << " BFGS TRUST (Bohr)    : " << trust_radius << endl;
+		std::cout << " BFGS TRUST (Bohr)    : " << trust_radius << std::endl;
 	}
 	
 	OUT(GlobalV::ofs_running,"istep",Ions_Move_Basic::istep);

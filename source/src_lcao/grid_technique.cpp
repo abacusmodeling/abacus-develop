@@ -59,7 +59,7 @@ void Grid_Technique::set_pbc_grid(
 
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
-		GlobalV::ofs_running << "\n SETUP EXTENDED REAL SPACE GRID FOR GRID INTEGRATION" << endl;
+		GlobalV::ofs_running << "\n SETUP EXTENDED REAL SPACE GRID FOR GRID INTEGRATION" << std::endl;
 	}
 
 	// (1) init_meshcell cell and big cell.
@@ -165,10 +165,10 @@ void Grid_Technique::init_atoms_on_grid(void)
 
 				if(normal >= nbxyz)
 				{
-					cout << " index_atom=" << index_atom[iat] << endl;
-					cout << " index_ball=" << index_ball[im] << endl;
-					cout << " normal=" << normal << endl;
-					cout << " nbxyz=" << nbxyz << endl;
+					std::cout << " index_atom=" << index_atom[iat] << std::endl;
+					std::cout << " index_ball=" << index_ball[im] << std::endl;
+					std::cout << " normal=" << normal << std::endl;
+					std::cout << " nbxyz=" << nbxyz << std::endl;
 					WARNING_QUIT("Grid_Technique::init_atoms_on_grid","normal >= nbxyz");
 				}
 
@@ -199,7 +199,7 @@ void Grid_Technique::init_atoms_on_grid(void)
 	int stop = 0;
 	if(total_atoms_on_grid == 0)
 	{
-		GlobalV::ofs_running << " No atoms on this sub-FFT-mesh." << endl;
+		GlobalV::ofs_running << " No atoms on this sub-FFT-mesh." << std::endl;
 		stop = 1;
 	} 	
 	Parallel_Reduce::reduce_int_all( stop );
@@ -303,7 +303,7 @@ void Grid_Technique::init_atoms_on_grid2(const int* index2normal)
 
 		//		if(im==13651)
 		//		{
-		//			cout << " which_unitcell=" << which_unitcell[index] << endl;
+		//			std::cout << " which_unitcell=" << which_unitcell[index] << std::endl;
 		//		}
 				 
 				++how_many_atoms[f];
@@ -342,10 +342,10 @@ void Grid_Technique::cal_grid_integration_index(void)
 	Parallel_Reduce::gather_int_all(max_atom,all);
 	if(GlobalV::MY_RANK==0)
 	{
-		GlobalV::ofs_warning << setw(15) << "Processor" << setw(15) << "Atom" << endl;
+		GlobalV::ofs_warning << setw(15) << "Processor" << setw(15) << "Atom" << std::endl;
 		for(int i=0; i<GlobalV::NPROC; i++)
 		{
-			GlobalV::ofs_warning << setw(15) << i+1 << setw(15) << all[i] << endl; 
+			GlobalV::ofs_warning << setw(15) << i+1 << setw(15) << all[i] << std::endl; 
 		}
 	}
 	delete[] all;
@@ -374,7 +374,7 @@ void Grid_Technique::cal_trace_beta(void)
 	int ih_all = 0;
 	int ih_local = 0;
 
-	GlobalV::ofs_running << "trace_beta" << endl;
+	GlobalV::ofs_running << "trace_beta" << std::endl;
 	for(int it=0; it<GlobalC::ucell.ntype; ++it)
 	{
 		Atom* atom = &GlobalC::ucell.atoms[it];
@@ -385,7 +385,7 @@ void Grid_Technique::cal_trace_beta(void)
 				for(int ih=0; ih<atom->nh; ih++)
 				{
 					this->trace_beta[ih_all] = ih_local;
-					GlobalV::ofs_running << setw(5) << ih_all << setw(15) << trace_beta[ih_all] << endl;
+					GlobalV::ofs_running << setw(5) << ih_all << setw(15) << trace_beta[ih_all] << std::endl;
 					++ih_local;
 					++ih_all;
 				}
@@ -466,7 +466,7 @@ void Grid_Technique::cal_trace_lo(void)
 	//------------
 //	for(int i=0; i<GlobalV::NLOCAL; ++i)
 //	{
-//		GlobalV::ofs_running << " i=" << i+1 << " trace_lo=" << trace_lo[i] << endl;
+//		GlobalV::ofs_running << " i=" << i+1 << " trace_lo=" << trace_lo[i] << std::endl;
 //	}
 
 	if(GlobalV::OUT_LEVEL != "m") 

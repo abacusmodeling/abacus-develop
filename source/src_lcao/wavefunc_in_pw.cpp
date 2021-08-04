@@ -22,7 +22,7 @@ void Wavefunc_in_pw::make_table_q(
 		ifstream in(fn[it].c_str());
 		if(!in)
 		{
-			GlobalV::ofs_warning << " File name : " << fn[it] << endl;
+			GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
 			WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 		}
 		else
@@ -46,7 +46,7 @@ void Wavefunc_in_pw::make_table_q(
 				ifstream in(fn[it].c_str());
 				if (!in)
 				{
-					GlobalV::ofs_warning << " File name : " << fn[it] << endl;
+					GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
 					WARNING_QUIT("Wavefunc_in_pw::make_table_q","Can not find file.");
 				}
 				int meshr=0;
@@ -89,7 +89,7 @@ void Wavefunc_in_pw::make_table_q(
 					// plus one because we can't read in r = 0 term now.
 					radial[ir] = ir*dr;  //mohan modify 2010-04-19
 				}
-				GlobalV::ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << endl;
+				GlobalV::ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << std::endl;
 
 				string name1;
 				string name2;
@@ -104,7 +104,7 @@ void Wavefunc_in_pw::make_table_q(
 					if(in.eof())
 					{
 						GlobalV::ofs_warning << "\n Can't find l="
-						<< L << " n=" << N << " orbital." << endl;
+						<< L << " n=" << N << " orbital." << std::endl;
 						WARNING_QUIT("Control_Overlap","Read_PAO");
 					}
 					in >> name1 >> name2 >> name3;
@@ -168,7 +168,7 @@ void Wavefunc_in_pw::make_table_q(
 						++ic;
 					}
 				}
-				ofs << endl;
+				ofs << std::endl;
 			}
 			ofs.close();
 		}
@@ -279,7 +279,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
 				for(int N=0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
-//					GlobalV::ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << endl;
+//					GlobalV::ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << std::endl;
 
 					for(int ig=0; ig<npw; ig++)
 					{
@@ -300,7 +300,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 								{//atomic_wfc_so
 									for(int m=0; m<2*L+1; m++)
 									{
-										cout<<"iwall: "<<iwall<<endl;
+										std::cout<<"iwall: "<<iwall<<std::endl;
 										const int lm = L*L+m;
 										for(int ig=0; ig<npw; ig++)
 										{

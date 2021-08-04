@@ -54,7 +54,7 @@ void Stochastic_WF::init(void)
     if(nchi == 0)
     {
         nchi = totnpw-GlobalV::NBANDS;
-        cout<<"Using all normal bases: "<<totnpw<<endl;
+        std::cout<<"Using all normal bases: "<<totnpw<<std::endl;
         allbase = true;
     }
     nchip = int(nchi/GlobalV::NPOOL);

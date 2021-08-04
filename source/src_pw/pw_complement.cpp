@@ -90,14 +90,14 @@ void PW_complement::get_total_pw(
                     /*** g vector indices f=(i,j,k) ***/
                     ig[ng] = f ;
                     gg[ng] = g2;
-                    //cout<<setw(12)<<f.x<<setw(12)<<f.y<<setw(12)<<f.z<<setw(12)<<g2<<endl;
+                    //std::cout<<setw(12)<<f.x<<setw(12)<<f.y<<setw(12)<<f.z<<setw(12)<<g2<<std::endl;
                     ++ng;
                 }
             }
         }
     }
 
-    //cout << "\n ng = " << ng;
+    //std::cout << "\n ng = " << ng;
     timer::tick("PW_complement","get_total_pw");
     return;
 }
@@ -263,7 +263,7 @@ void PW_complement::setup_GVectors(
     for (int i=0;i<ngmc_g_in;i++)
     {
         igsort[i] = ig[ind[i]];
-	//	cout << i << " " << ind[i] << " " << ig[ind[i]].x << " " << ig[ind[i]].y << " " << ig[ind[i]].z << endl;
+	//	std::cout << i << " " << ind[i] << " " << ig[ind[i]].x << " " << ig[ind[i]].y << " " << ig[ind[i]].z << std::endl;
     }
 
 	/* remain to be done by someone. mohan note 2011-07-23
@@ -305,7 +305,7 @@ void PW_complement::setup_GVectors(
     {
         g[i] = ig[i] * G;
         // g vector (in 2*pi/lat0), E_k=g*g*(2*pi/lat0)^2
-	//	cout << i << " " << ig[i].x << " " << ig[i].y << " " << ig[i].z << endl;
+	//	std::cout << i << " " << ig[i].x << " " << ig[i].y << " " << ig[i].z << std::endl;
     }
 
 

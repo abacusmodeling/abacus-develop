@@ -36,8 +36,8 @@ void OUT(ofstream &ofs,const string &name,const T &a)
 {
 	stringstream name2;
 	name2 << name ;
-    ofs<< " " << setw(40) << name2.str() << " = " << a <<endl;
-//	ofs << " " << name << a << endl;
+    ofs<< " " << setw(40) << name2.str() << " = " << a <<std::endl;
+//	ofs << " " << name << a << std::endl;
     return;
 }
 
@@ -46,8 +46,8 @@ void OUT(ofstream &ofs,const string &name,const T &x, const T&y)
 {
 	stringstream name2;
 	name2 << "[" << name << "]";
-    ofs<< " " << setw(40) <<name2.str() << " = " << x << ", " << y << endl;
-//	ofs << " " << name << a << endl;
+    ofs<< " " << setw(40) <<name2.str() << " = " << x << ", " << y << std::endl;
+//	ofs << " " << name << a << std::endl;
     return;
 }
 
@@ -56,7 +56,7 @@ void OUT(ofstream &ofs,const string &name,const T &x, const T &y, const T &z)
 {
 	stringstream name2;
 	name2 << "[" << name << "]";
-    ofs<< " " << setw(40) <<name2.str() << " = " << x << ", " << y << ", " << z << endl;
+    ofs<< " " << setw(40) <<name2.str() << " = " << x << ", " << y << ", " << z << std::endl;
     return;
 }
 
@@ -67,14 +67,14 @@ void OUT(ofstream &ofs,const string &name,const T &x, const T &y, const T &z)
 template <class T>
 void OUTP(ofstream &ofs, const string &name, const T &a, const string &explanation="")
 {
-	ofs << setw(20) << name << a << " #" << explanation << endl;
+	ofs << setw(20) << name << a << " #" << explanation << std::endl;
 }
 
 template <class T>
 void OUT(const string &name,const T &a)
 {
-    cout << " " << setw(40) << name << " = " << a;
-//	cout << " " << name << a << endl;
+    std::cout << " " << setw(40) << name << " = " << a;
+//	std::cout << " " << name << a << std::endl;
     return;
 }
 
@@ -94,7 +94,7 @@ void MAKE_DIR( const string &file );
 template <class T>
 void AUTO_SET(const string &name,const T &a)
 {
-    GlobalV::ofs_warning <<" AUTO_SET "<<name<<" to "<<a << endl;
+    GlobalV::ofs_warning <<" AUTO_SET "<<name<<" to "<<a << std::endl;
     return;
 }
 

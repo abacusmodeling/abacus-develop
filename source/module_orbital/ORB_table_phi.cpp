@@ -103,8 +103,8 @@ int ORB_table_phi::get_rmesh(const double &R1, const double &R2)
 	{
 		//GlobalV::ofs_warning << "\n R1 = " << R1 << " R2 = " << R2;
 		//GlobalV::ofs_warning << "\n rmesh = " << rmesh;
-		cout << "\n R1 = " << R1 << " R2 = " << R2;
-		cout << "\n rmesh = " << rmesh;
+		std::cout << "\n R1 = " << R1 << " R2 = " << R2;
+		std::cout << "\n rmesh = " << rmesh;
 		WARNING_QUIT("ORB_table_phi::get_rmesh", "rmesh <= 0");
 	}
 	return rmesh;
@@ -888,11 +888,11 @@ void ORB_table_phi::init_Table_Spherical_Bessel (
     int lll;
     int ir;
     int ik;
-    cout << " INPUT L:  " ; cin >> lll;
-    cout << " INPUT ir: " ; cin >> ir;
-    cout << " INPUT ik: " ; cin >> ik;
+    std::cout << " INPUT L:  " ; cin >> lll;
+    std::cout << " INPUT ir: " ; cin >> ir;
+    std::cout << " INPUT ik: " ; cin >> ik;
     double kr = r[ir] * kpoint[ik];
-    cout <<  " L=" << lll << " kr=" << kr << " J=" << jlx[lll][ir][ik] << endl;
+    std::cout <<  " L=" << lll << " kr=" << kr << " J=" << jlx[lll][ir][ik] << std::endl;
     goto once_again;
 */
 

@@ -98,15 +98,15 @@ using namespace std;
         {
             t0=double(cur);
             outlog.str("");
-            outlog<<"DEBUG: Process "<<myid<<" Call "<<function<<endl;
-            cout<<outlog.str();
+            outlog<<"DEBUG: Process "<<myid<<" Call "<<function<<std::endl;
+            std::cout<<outlog.str();
         }
         else {
             t1=double(cur);
             outlog.str("");
             outlog<<"DEBUG: Process "<<myid<<" Method "<<method<<" Step "
-                  <<step<<" "<<function<<" time: "<<(t1-t0)/CLOCKS_PER_SEC<<" s"<<endl;
-            cout<<outlog.str();
+                  <<step<<" "<<function<<" time: "<<(t1-t0)/CLOCKS_PER_SEC<<" s"<<std::endl;
+            std::cout<<outlog.str();
         }
     }
 #endif
@@ -128,9 +128,9 @@ int pdSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -182,9 +182,9 @@ int pdSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -234,9 +234,9 @@ int pdDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -310,9 +310,9 @@ int pdDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDecomposeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -392,9 +392,9 @@ int pdCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdCheloskyDecomposeRightMatrix"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdCheloskyDecomposeRightMatrix"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     //info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -545,9 +545,9 @@ int pdDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -627,9 +627,9 @@ int pdDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -710,9 +710,9 @@ int pdSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure
@@ -881,9 +881,9 @@ int pdSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure
@@ -1051,9 +1051,9 @@ int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveGenEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveGenEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -1105,9 +1105,9 @@ int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdSolveGenEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=0;
@@ -1157,9 +1157,9 @@ int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -1233,9 +1233,9 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzDecomposeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     switch(method)
     {
@@ -1320,9 +1320,9 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzCheloskyDecomposeRightMatrix"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzCheloskyDecomposeRightMatrix"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     //info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -1473,9 +1473,9 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzDiagonalizeRightMatrix1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzDiagonalizeRightMatrix1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -1555,9 +1555,9 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pdDiagonalizeRightMatrix2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
     info=1; // for elpa functions, 1 is for success, 0 is for failure
     my_blacs_ctxt=desc[1];
@@ -1638,9 +1638,9 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen1"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen1"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure
@@ -1809,9 +1809,9 @@ int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
         stringstream outlog;
         MPI_Comm_rank(MPI_COMM_WORLD, &myid);
         outlog.str("");
-        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen2"<<endl;
+        outlog<<"DEBUG: Process "<<myid<<" Enter pzSolveEigen2"<<std::endl;
         MPI_Barrier(MPI_COMM_WORLD);
-        cout<<outlog.str();
+        std::cout<<outlog.str();
     #endif
 
     info=1; // for elpa functions, 1 is for success, 0 is for failure

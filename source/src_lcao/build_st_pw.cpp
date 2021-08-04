@@ -39,7 +39,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 							v += conj(GlobalC::wf.wanf2[ik](mu, ig)) * GlobalC::wf.wanf2[ik](nu, ig);
 						}
 						
-		//				cout << "i=" << i << " j=" << j << " v=" << v << endl;
+		//				std::cout << "i=" << i << " j=" << j << " v=" << v << std::endl;
 						//-----------------------------------
 						// The results are saved in Sloc2.
 						// 2 stands for k points.
@@ -97,7 +97,7 @@ void Build_ST_pw::set_ST(const int &ik, const char& dtype)
 						v += conj(GlobalC::wf.wanf2[ik](mu, ig + GlobalC::wf.npwx)) * GlobalC::wf.wanf2[ik](nu, ig + GlobalC::wf.npwx) * GlobalC::wf.g2kin[ig];
 					}
 					
-	//				cout << "i=" << i << " j=" << j << " v=" << v << endl;
+	//				std::cout << "i=" << i << " j=" << j << " v=" << v << std::endl;
 					//-----------------------------------------
 					// The results are saved in Hloc_fixed2.
 					//-----------------------------------------

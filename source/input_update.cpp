@@ -19,7 +19,7 @@ Update_input::~Update_input() {}
 
 void Update_input::init(const string &fn)
 {
-	GlobalV::ofs_warning << "\n CHECK UPDATE INPUT INFORMATION" << endl;
+	GlobalV::ofs_warning << "\n CHECK UPDATE INPUT INFORMATION" << std::endl;
     this->Read(fn);
 #ifdef __MPI
     Bcast();
@@ -62,7 +62,7 @@ bool Update_input::Read(const string &fn)
 
     if (ierr == 0)
     {
-		cout << " Error parameter list." << endl;
+		std::cout << " Error parameter list." << std::endl;
 		return false;// return error : false
     }
 
@@ -233,8 +233,8 @@ bool Update_input::Read(const string &fn)
         }
         else
         {
-            //cout << " THE PARAMETER NAME '" << word
-            //     << "' IS NOT USED!" << endl;
+            //std::cout << " THE PARAMETER NAME '" << word
+            //     << "' IS NOT USED!" << std::endl;
             ifs.ignore(150, '\n');
         }
 
@@ -245,13 +245,13 @@ bool Update_input::Read(const string &fn)
         }
         else if (ifs.bad() != 0)
         {
-			cout << " Bad input parameters. " << endl;
+			std::cout << " Bad input parameters. " << std::endl;
             return false;
         }
         else if (ifs.fail() != 0)
         {
-			cout << " word = " << word << endl;
-			cout << " Fail to read parameters. " << endl; 
+			std::cout << " word = " << word << std::endl;
+			std::cout << " Fail to read parameters. " << std::endl; 
             ifs.clear();
 			return false;
         }

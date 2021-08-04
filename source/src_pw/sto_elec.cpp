@@ -28,24 +28,24 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
     
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
-		cout << setprecision(12);
-    	cout<< " " << setw(7)<< "ITER"; 
+		std::cout << setprecision(12);
+    	std::cout<< " " << setw(7)<< "ITER"; 
 
 		if(GlobalV::NSPIN==2)
 		{
-			cout<<setw(10)<<"TMAG";
-			cout<<setw(10)<<"AMAG";
+			std::cout<<setw(10)<<"TMAG";
+			std::cout<<setw(10)<<"AMAG";
 		}
 	
-        cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
+        std::cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
 		if(GlobalV::KS_SOLVER=="cg") 
 		{
-			cout<<setw(11)<<"CG_ITER";
+			std::cout<<setw(11)<<"CG_ITER";
 		}
 
-		cout<<setw(11)<< "TIME(S)";
+		std::cout<<setw(11)<< "TIME(S)";
 
-        cout<<endl;
+        std::cout<<std::endl;
 	}
 
 	Symmetry_rho srho;
@@ -254,7 +254,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		//			if(GlobalV::MY_RANK==0)
 		//			{
-		//				ofs_mix << setw(5) << iter << setw(20) << dr2 << endl; 
+		//				ofs_mix << setw(5) << iter << setw(20) << dr2 << std::endl; 
 		//			}
 
 		if (iter==1)
@@ -264,12 +264,12 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 				GlobalV::ofs_running << " Notice: Threshold on eigenvalues was too large.\n";
 
 				WARNING("scf","Threshold on eigenvalues was too large.");
-				GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << endl;
+				GlobalV::ofs_running << " dr2=" << dr2 << " < diago_error=" << diago_error << std::endl;
 
 				// update GlobalV::ETHR.
-				GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << endl;
+				GlobalV::ofs_running << " Origin GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
 				GlobalV::ETHR = dr2 / GlobalC::CHR.nelec;
-				GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << endl;
+				GlobalV::ofs_running << " New    GlobalV::ETHR = " << GlobalV::ETHR << std::endl;
 				//                  goto first_iter_again;
 			}
 		}
@@ -338,14 +338,14 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
               	 
 			if(conv_elec)
 			{
-				//GlobalV::ofs_running << " convergence is achieved" << endl;			
-				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
-				GlobalV::ofs_running << " charge density convergence is achieved" << endl;
-                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << endl;
+				//GlobalV::ofs_running << " convergence is achieved" << std::endl;			
+				//GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+				GlobalV::ofs_running << " charge density convergence is achieved" << std::endl;
+                                GlobalV::ofs_running << " final etot is " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
 			}
 			else
 			{
-				GlobalV::ofs_running << " convergence has NOT been achieved!" << endl;			
+				GlobalV::ofs_running << " convergence has NOT been achieved!" << std::endl;			
 			}
 							
 			iter_end(GlobalV::ofs_running);
@@ -388,7 +388,7 @@ void Stochastic_Elec::c_bands(const int &istep)
     
 	avg_iter = 0.0;
        
-	GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< endl;
+	GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< std::endl;
 	GlobalV::ofs_running << setprecision(6) << setiosflags(ios::fixed) << setiosflags(ios::showpoint);
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
@@ -441,15 +441,15 @@ void Stochastic_Elec::c_bands(const int &istep)
 
 		GlobalV::ofs_running << " " << setw(8) 
 			<< ik+1 << setw(15) 
-			<< avg_iter_k << setw(15) << duration << endl;
+			<< avg_iter_k << setw(15) << duration << std::endl;
 	}//End K Loop
 
 
 	if(GlobalV::BASIS_TYPE=="pw")
 	{
-		//		GlobalV::ofs_running << " avg_iteri " << avg_iter << endl;
+		//		GlobalV::ofs_running << " avg_iteri " << avg_iter << std::endl;
 		//Parallel_Reduce::reduce_double_allpool(avg_iter); //mohan fix bug 2012-06-05
-		//		GlobalV::ofs_running << " avg_iter_after " << avg_iter << endl;
+		//		GlobalV::ofs_running << " avg_iter_after " << avg_iter << std::endl;
 		//avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
 	}
 

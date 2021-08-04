@@ -296,7 +296,7 @@ bool Parallel_Reduce::check_if_equal(double &v)
 		{
 			for(int j=0; j<GlobalV::NPROC; j++)
 			{
-				cout << "\n processor = " << j << " value = " << all[j];
+				std::cout << "\n processor = " << j << " value = " << all[j];
 			}
 			delete[] all;
 			return false;

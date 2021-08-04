@@ -82,7 +82,7 @@ void Threshold_Elec::update_ethr(const int &iter)
 		else
 		{
 			GlobalV::ETHR = std::min( GlobalV::ETHR, 0.1*dr2/ std::max(1.0, GlobalC::CHR.nelec));
-			//cout << " new ethr = " << GlobalV::ETHR << endl;
+			//std::cout << " new ethr = " << GlobalV::ETHR << std::endl;
 		}
 
     }
@@ -108,7 +108,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		{
 			if( abs( GlobalC::wf.ekb[ik][ib] ) > 1.0e10)
 			{
-				GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << endl;
+				GlobalV::ofs_warning << " ik=" << ik+1 << " ib=" << ib+1 << " " << GlobalC::wf.ekb[ik][ib] << " Ry" << std::endl;
 				wrong = true;
 			}
 		}
@@ -142,7 +142,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
             {
                 ofs << " " << ik+1 << "/" << GlobalC::kv.nks/2 << " kpoint (Cartesian) = "
                 << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z
-                << " (" << GlobalC::kv.ngk[ik] << " pws)" << endl;
+                << " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl;
 
                 ofs << setprecision(6);
 
@@ -151,7 +151,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
             {
                 ofs << " " << ik+1-GlobalC::kv.nks/2 << "/" << GlobalC::kv.nks/2 << " kpoint (Cartesian) = "
                 << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z
-                << " (" << GlobalC::kv.ngk[ik] << " pws)" << endl;
+                << " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl;
 
                 ofs << setprecision(6);
 
@@ -161,7 +161,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		{
 			ofs << " " << ik+1 << "/" << GlobalC::kv.nks << " kpoint (Cartesian) = " 
 				<< GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z 
-				<< " (" << GlobalC::kv.ngk[ik] << " pws)" << endl; 
+				<< " (" << GlobalC::kv.ngk[ik] << " pws)" << std::endl; 
 
 			ofs << setprecision(6);
 		}
@@ -171,7 +171,7 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 		//----------------------
 		if(GlobalV::KS_SOLVER=="selinv")
 		{
-			ofs << " USING SELINV, NO BAND ENERGY IS AVAILABLE." << endl;
+			ofs << " USING SELINV, NO BAND ENERGY IS AVAILABLE." << std::endl;
 		}
 		//----------------------
 		// output energy
@@ -184,9 +184,9 @@ void Threshold_Elec::print_eigenvalue(ofstream &ofs)
 			for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 			{
 				ofs << " [spin" << GlobalC::kv.isk[ik]+1 << "_state] " << setw(8) << ib+1 
-				<< setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << setw(15) << GlobalC::wf.wg(ik, ib) << endl;
+				<< setw(15) << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << setw(15) << GlobalC::wf.wg(ik, ib) << std::endl;
 			}
-			ofs << endl;
+			ofs << std::endl;
 		}
     }//end ik
     return;

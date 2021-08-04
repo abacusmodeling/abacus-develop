@@ -349,8 +349,8 @@ double ORB_gaunt_table::Get_Gaunt_CH
 	/*	
 	if(l1 == 2 && m1 == -1 && l2 == 2 && m2 == 2 && l3 == 2 && m3 == -1)
 	{
-		cout << L1 << " " << L2 << " " << L3 << endl;
-		cout << M1 << " " << M2 << " " << M3 <<endl;
+		std::cout << L1 << " " << L2 << " " << L3 << std::endl;
+		std::cout << M1 << " " << M2 << " " << M3 <<std::endl;
 	}
 	*/
 	

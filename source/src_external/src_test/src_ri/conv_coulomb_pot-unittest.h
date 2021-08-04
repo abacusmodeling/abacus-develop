@@ -11,7 +11,7 @@ static void test_ccp()
 	stringstream ss;
 	for( int ir=0; ir<=4*GlobalC::ORB.Phi[0].PhiLN(0,0).getNr(); ++ir )
 	{
-		ss<<ccp.get_conv_coulomb_pot(ir)<<endl;
+		ss<<ccp.get_conv_coulomb_pot(ir)<<std::endl;
 	}
 	MPI_RANK_OFSTREAM( "Conv_Coulomb_Pot", ss );
 }

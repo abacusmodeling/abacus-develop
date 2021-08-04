@@ -72,17 +72,17 @@ public:
     template <class T>
     void printr1_d(const string &s, T *u,const int n1) const
     {
-        cout << "\n " << s << "  Dimension = " << n1;
+        std::cout << "\n " << s << "  Dimension = " << n1;
         if (n1 <= 0)return;
         if (u == 0) return;
-        //cout.setf(ios::scientific, ios::floatfield);
+        //std::cout.setf(ios::scientific, ios::floatfield);
         for (int i = 0;i < n1;i++)
         {
-            if (i % 8 == 0) cout << "\n";
-            cout << setw(12) << u[i];
+            if (i % 8 == 0) std::cout << "\n";
+            std::cout << setw(12) << u[i];
         }
-        cout<<endl;
-        //cout.unsetf(ios::scientific);
+        std::cout<<std::endl;
+        //std::cout.unsetf(ios::scientific);
     }
 
     //================================
@@ -93,20 +93,20 @@ public:
     void printV3(ofstream &ofs, const Vector3 <T> v)const
     {
         ofs << " ";
-        ofs << setw(18) << v.x << setw(18) << v.y << setw(18) << v.z << endl;
+        ofs << setw(18) << v.x << setw(18) << v.y << setw(18) << v.z << std::endl;
     }
 
     template <class T>
     void printV3(const Vector3 <T> v)const
     {
-        cout << " ";
-        cout << setw(18) << v.x << setw(18) << v.y << setw(18) << v.z << endl;
+        std::cout << " ";
+        std::cout << setw(18) << v.x << setw(18) << v.y << setw(18) << v.z << std::endl;
     }
 
     template <class T>
     void printv31_d(ofstream &ofs, const string &s, Vector3<T> *u, int n1) const
     {
-        ofs << " " << s << " Dimension = " << n1 << endl;
+        ofs << " " << s << " Dimension = " << n1 << std::endl;
         if (n1 <= 0)return;
         if (u == 0) return;
         for (int i = 0;i < n1;i++)
@@ -118,7 +118,7 @@ public:
     template <class T>
     void printv31_d(const string &s, Vector3<T> *u, int n1) const
     {
-        cout << "\n " << s << "  dimension = " << n1;
+        std::cout << "\n " << s << "  dimension = " << n1;
         if (n1 <= 0)return;
         if (u == 0) return;
         for (int i = 0;i < n1;i++)

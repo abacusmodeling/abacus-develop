@@ -181,8 +181,8 @@ void LCAO_nnr::cal_nnr(void)
 	if(GlobalV::OUT_LEVEL != "m") OUT(GlobalV::ofs_running,"nnr",nnr);
 //	for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 //	{
-//		cout << " nlocdim[" << iat << "]=" << nlocdim[iat];
-//		cout << " nlocstart[" << iat << "]=" << nlocstart[iat] << endl;
+//		std::cout << " nlocdim[" << iat << "]=" << nlocdim[iat];
+//		std::cout << " nlocstart[" << iat << "]=" << nlocstart[iat] << std::endl;
 //	}
 
 	return;
@@ -274,7 +274,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							   << setw(10) << GlobalC::GridD.getBox(ad).x 
 							   << setw(10) << GlobalC::GridD.getBox(ad).y 
 							   << setw(10) << GlobalC::GridD.getBox(ad).z 
-							   << setw(20) << distance << endl;
+							   << setw(20) << distance << std::endl;
 							 */
 						}
 						// there is another possibility that i and j are adjacent atoms.
@@ -316,7 +316,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						*/
 					}// end iat2
 				}// end ad
-//				GlobalV::ofs_running << " iat=" << iat << " nlocstartg=" << nlocstartg[iat] << " nad=" << nad[iat] << endl;
+//				GlobalV::ofs_running << " iat=" << iat << " nlocstartg=" << nlocstartg[iat] << " nad=" << nad[iat] << std::endl;
 			}// end iat
 		}// end I1
 	}// end T1
@@ -365,22 +365,22 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 
 //	GlobalV::ofs_running << setw(5) << "b1" << setw(5) << "b2" << setw(5) << "b3"
 //	<< setw(8) << "iat" << setw(8) << "ad" << setw(8) << "iat2"
-//	<< setw(8) << "find_R2" << setw(8) << "find_R2st" << setw(8) << "dis" << endl;
+//	<< setw(8) << "find_R2" << setw(8) << "find_R2st" << setw(8) << "dis" << std::endl;
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
 	{
 		for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
 		{
-//			cout << " T1=" << T1 << " I1=" << I1 << endl; 
+//			std::cout << " T1=" << T1 << " I1=" << I1 << std::endl; 
 			tau1 = GlobalC::ucell.atoms[T1].tau[I1];
 			GlobalC::GridD.Find_atom(GlobalC::ucell, tau1, T1, I1);
 			const int iat = GlobalC::ucell.itia2iat(T1,I1);
 
-//			cout << " Number of adjacent = " << GlobalC::GridD.getAdjacentNum()+1 << endl;
+//			std::cout << " Number of adjacent = " << GlobalC::GridD.getAdjacentNum()+1 << std::endl;
 			
 			int count=0;
 			for (int ad = 0; ad < GlobalC::GridD.getAdjacentNum()+1; ad++)
 			{
-		//		cout << " ad=" << ad << endl;
+		//		std::cout << " ad=" << ad << std::endl;
 				const int T2 = GlobalC::GridD.getType(ad);
 				const int I2 = GlobalC::GridD.getNatom(ad);
 				const int iat2 = GlobalC::ucell.itia2iat(T2,I2);
@@ -403,23 +403,23 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 						/*
 						if( this->cal_RindexAtom(b1, b2, b3, iat2) == 232 )
 						{
-							cout << " ====== nnrg =========" << endl;
-							cout << " index=" << cal_RindexAtom(b1, b2, b3, iat2) << endl;
-							cout << " iat=" << iat << " iat2=" << iat2 << endl;
-							cout << " R1 = " << tau1.x << " " << tau1.y << " " << tau1.z << endl;
-							cout << " R2 = " << GlobalC::GridD.getAdjacentTau(ad).x 
+							std::cout << " ====== nnrg =========" << std::endl;
+							std::cout << " index=" << cal_RindexAtom(b1, b2, b3, iat2) << std::endl;
+							std::cout << " iat=" << iat << " iat2=" << iat2 << std::endl;
+							std::cout << " R1 = " << tau1.x << " " << tau1.y << " " << tau1.z << std::endl;
+							std::cout << " R2 = " << GlobalC::GridD.getAdjacentTau(ad).x 
 							<< " " << GlobalC::GridD.getAdjacentTau(ad).y 
-							<< " " << GlobalC::GridD.getAdjacentTau(ad).z << endl;
-							cout << setprecision(25);
-							cout << " distance = " << distance << endl;
-							cout << " box = " << b1 << " " << b2 << " " << b3 << endl;
-							cout << " rcut = " << rcut << endl;
+							<< " " << GlobalC::GridD.getAdjacentTau(ad).z << std::endl;
+							std::cout << setprecision(25);
+							std::cout << " distance = " << distance << std::endl;
+							std::cout << " box = " << b1 << " " << b2 << " " << b3 << std::endl;
+							std::cout << " rcut = " << rcut << std::endl;
 						}
 						*/
 						
 
-						//cout << " iat=" << iat << " find_R2=" << this->cal_RindexAtom(b1, b2, b3, iat2) <<
-						// " b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance << endl;
+						//std::cout << " iat=" << iat << " find_R2=" << this->cal_RindexAtom(b1, b2, b3, iat2) <<
+						// " b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance << std::endl;
 					
 						// mohan fix bug 2011-06-26, should be '<', not '<='	
 						//			if(distance < rcut)
@@ -444,13 +444,13 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							{
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
-								<< " rcut=" << rcut <<endl;
+								<< " rcut=" << rcut <<std::endl;
 							}
 							else if(find_R2[iat][count]==10536)
 							{
 								GlobalV::ofs_running << " ************** iat=" << iat << " count=" << count << " find_R2=" << find_R2[iat][count] << 
 								" b1=" << b1 << " b2=" << b2 << " b3=" << b3 << " iat2=" << iat2 << " distance=" << distance 
-								<< " rcut=" << rcut <<endl;
+								<< " rcut=" << rcut <<std::endl;
 							}*/
 
 							// find_R2st
@@ -473,15 +473,15 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	// for test
 	//---------
 	/*
-	GlobalV::ofs_running << " print find_R2 " << endl;
+	GlobalV::ofs_running << " print find_R2 " << std::endl;
 	for(int i=0; i<GlobalC::ucell.nat; i++)
 	{
 		for(int j=0; j<nad[i]; j++)
 		{
-			GlobalV::ofs_running << " i=" << i << " j=" << j << " find_R2=" << find_R2[i][j] << endl;
+			GlobalV::ofs_running << " i=" << i << " j=" << j << " find_R2=" << find_R2[i][j] << std::endl;
 		}
 	}
-	GlobalV::ofs_running << endl;
+	GlobalV::ofs_running << std::endl;
 	*/
 
 	return;
@@ -546,9 +546,9 @@ int LCAO_nnr::cal_RindexAtom(const int &u1, const int &u2, const int &u3, const 
 	
 	if(x1<0 || x2<0 || x3<0)
 	{
-		cout << " u1=" << u1 << " minB1=" << minB1 << endl;
-		cout << " u2=" << u2 << " minB2=" << minB2 << endl;
-		cout << " u3=" << u3 << " minB3=" << minB3 << endl;
+		std::cout << " u1=" << u1 << " minB1=" << minB1 << std::endl;
+		std::cout << " u2=" << u2 << " minB2=" << minB2 << std::endl;
+		std::cout << " u3=" << u3 << " minB3=" << minB3 << std::endl;
 		WARNING_QUIT("LCAO_nnr::cal_Rindex","x1<0 || x2<0 || x3<0 !");
 	}
 

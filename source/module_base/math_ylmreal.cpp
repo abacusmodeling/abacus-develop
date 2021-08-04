@@ -483,7 +483,7 @@ void YlmReal::Ylm_Real
 
 
 
-    /*	GlobalV::ofs_running<<"\n Unit Condition About Ylm_Real"<<endl;
+    /*	GlobalV::ofs_running<<"\n Unit Condition About Ylm_Real"<<std::endl;
     	int count=0;
     	for(int l=0; l<=lmax; l++)
     	{
@@ -525,10 +525,10 @@ void YlmReal::Ylm_Real
     //			count++;
     //			GlobalV::ofs_running<<setw(15)<<sum*FOUR_PI/ng;
 
-    			GlobalV::ofs_running<<endl;
+    			GlobalV::ofs_running<<std::endl;
     		}
     	}
-    	GlobalV::ofs_running<<endl;
+    	GlobalV::ofs_running<<std::endl;
     */
 
 

@@ -35,36 +35,36 @@ timeval t_all;	gettimeofday(&t_all,NULL);
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D");
 	
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 
 	vector<atomic<Flag_Send>> flags_send(comm_sz);
 	vector<atomic<Flag_Recv>> flags_recv(comm_sz);
 	init_flags(flags_send, flags_recv);
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 
 	vector<valarray<double>> oarps_isend(comm_sz);
 	vector<valarray<double>> iarps_irecv(comm_sz);
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 
 	int rank_send_now = my_rank;
 	auto rank_send_next = [&]()->int{ return (rank_send_now+1)%comm_sz; };
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 
 	atomic_flag lock_insert = ATOMIC_FLAG_INIT;
 	vector<thread> threads;
 	vector<MPI_Request>requests_isend(comm_sz);
 	vector<MPI_Request>requests_irecv(comm_sz);
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 
 vector<timeval>t_send(comm_sz);
 vector<timeval>t_recv(comm_sz);
 	while(!finish_judge(flags_send, flags_recv))
 	{
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 		if(rank_send_next()!=my_rank && memory_enough(rank_send_next(), flags_send))
 		{
 			rank_send_now = rank_send_next();
-//ofs<<__LINE__<<"\t"<<rank_send_now<<endl;
+//ofs<<__LINE__<<"\t"<<rank_send_now<<std::endl;
 			flags_send[rank_send_now] = Flag_Send::begin_oar;
 			threads.push_back(std::thread(
 				&Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::send_data_process, this,
@@ -74,7 +74,7 @@ vector<timeval>t_recv(comm_sz);
 		{
 			if( flags_send[rank_send] == Flag_Send::finish_oar )
 			{
-//ofs<<__LINE__<<"\t"<<rank_send<<endl;
+//ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 				if(MPI_Isend( VECTOR_TO_PTR(oarps_isend[rank_send]), oarps_isend[rank_send].size(), MPI_DOUBLE, rank_send, 0, mpi_comm, &requests_isend[rank_send] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_send[rank_send] = Flag_Send::begin_isend;
 gettimeofday(&t_send[rank_send],NULL);
@@ -84,18 +84,18 @@ gettimeofday(&t_send[rank_send],NULL);
 		{
 			if( flags_send[rank_send] == Flag_Send::begin_isend )
 			{
-//ofs<<__LINE__<<"\t"<<rank_send<<endl;
+//ofs<<__LINE__<<"\t"<<rank_send<<std::endl;
 				int flag_finish;
 				if(MPI_Test( &requests_isend[rank_send], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				if(flag_finish)
 				{
 					oarps_isend[rank_send].resize(0);
 					flags_send[rank_send] = Flag_Send::finish_isend;
-ofs<<"isend_finish\t"<<rank_send<<"\t"<<cal_time(t_send[rank_send])<<endl;
+ofs<<"isend_finish\t"<<rank_send<<"\t"<<cal_time(t_send[rank_send])<<std::endl;
 				}
 			}
 		}
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 
 		{
 			MPI_Status status;
@@ -106,7 +106,7 @@ ofs<<"isend_finish\t"<<rank_send<<"\t"<<cal_time(t_send[rank_send])<<endl;
 				int message_size;
 				if(MPI_Get_count( &status, MPI_PACKED, &message_size )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				const int rank_recv = status.MPI_SOURCE;
-//ofs<<__LINE__<<"\t"<<rank_recv<<endl;
+//ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 				iarps_irecv[rank_recv].resize(message_size);
 				if(MPI_Irecv( VECTOR_TO_PTR(iarps_irecv[rank_recv]), message_size, MPI_DOUBLE, rank_recv, 0, mpi_comm, &requests_irecv[rank_recv] )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				flags_recv[rank_recv] = Flag_Recv::begin_irecv;
@@ -121,25 +121,25 @@ gettimeofday(&t_recv[rank_recv],NULL);
 				if(MPI_Test( &requests_irecv[rank_recv], &flag_finish, MPI_STATUS_IGNORE )!=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 				if(flag_finish)
 				{
-//ofs<<__LINE__<<"\t"<<rank_recv<<endl;
+//ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 					flags_recv[rank_recv] = Flag_Recv::begin_iar;
 					threads.push_back(std::thread(
 						&Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::recv_data_process, this,
 						rank_recv, std::ref(data_all), std::ref(iarps_irecv), std::ref(flags_recv), std::ref(lock_insert) ));
-ofs<<"irecv_finish\t"<<rank_recv<<"\t"<<cal_time(t_recv[rank_recv])<<endl;
+ofs<<"irecv_finish\t"<<rank_recv<<"\t"<<cal_time(t_recv[rank_recv])<<std::endl;
 				}
 			}
 		}
 	}
-//ofs<<__LINE__<<endl;
+//ofs<<__LINE__<<std::endl;
 
 timeval t; gettimeofday(&t,NULL);
 	while( lock_insert.test_and_set() );
-ofs<<"wait_lock\t"<<my_rank<<"\t"<<cut_time(t)<<endl;
+ofs<<"wait_lock\t"<<my_rank<<"\t"<<cut_time(t)<<std::endl;
 	insert_data(data_local, data_all);
 	lock_insert.clear();
-ofs<<"insert\t"<<my_rank<<"\t"<<cut_time(t)<<endl;
-//ofs<<__LINE__<<endl;
+ofs<<"insert\t"<<my_rank<<"\t"<<cut_time(t)<<std::endl;
+//ofs<<__LINE__<<std::endl;
 	
 	for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 	{
@@ -150,13 +150,13 @@ ofs<<"insert\t"<<my_rank<<"\t"<<cut_time(t)<<endl;
 			flags_send[rank_send] = Flag_Send::finish_isend;
 		}
 	}
-ofs<<"wait_isend_final\t"<<cut_time(t)<<endl;
+ofs<<"wait_isend_final\t"<<cut_time(t)<<std::endl;
 	
 	for(std::thread &t : threads)
 		t.join();	
-ofs<<"wait_thread\t"<<cut_time(t)<<endl;
+ofs<<"wait_thread\t"<<cut_time(t)<<std::endl;
 	
-ofs<<"all\t\t"<<cal_time(t_all)<<endl;
+ofs<<"all\t\t"<<cal_time(t_all)<<std::endl;
 	return data_all;
 }
 
@@ -252,7 +252,7 @@ timeval t;	gettimeofday(&t, NULL);
 			}
 		}
 	}
-ofs<<"get_send_data_wrapper\t"<<rank_send_now<<"\t"<<cut_time(t)<<endl;
+ofs<<"get_send_data_wrapper\t"<<rank_send_now<<"\t"<<cut_time(t)<<std::endl;
 	
 	oarps_isend[rank_send_now].resize(send_size.sum()+GlobalV::NSPIN);
 	double * ptr = VECTOR_TO_PTR(oarps_isend[rank_send_now]);
@@ -278,7 +278,7 @@ ofs<<"get_send_data_wrapper\t"<<rank_send_now<<"\t"<<cut_time(t)<<endl;
 		}
 	}
 	flags_send[rank_send_now] = Flag_Send::finish_oar;
-ofs<<"oar<<\t"<<rank_send_now<<"\t"<<cut_time(t)<<endl;
+ofs<<"oar<<\t"<<rank_send_now<<"\t"<<cut_time(t)<<std::endl;
 }
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::recv_data_process(
@@ -317,15 +317,15 @@ timeval t;	gettimeofday(&t, NULL);
 	}
 	iarps_irecv[rank_recv].resize(0);
 	flags_recv[rank_recv] = Flag_Recv::finish_iar;
-ofs<<"iar>>\t"<<rank_recv<<"\t"<<cut_time(t)<<endl;
+ofs<<"iar>>\t"<<rank_recv<<"\t"<<cut_time(t)<<std::endl;
 
 	if(!vector_empty(data_rank))
 	{
 		while( lock_insert.test_and_set() );
-ofs<<"wait_lock\t"<<rank_recv<<"\t"<<cut_time(t)<<endl;
+ofs<<"wait_lock\t"<<rank_recv<<"\t"<<cut_time(t)<<std::endl;
 		insert_data(data_rank, data_all);
 		lock_insert.clear();
-ofs<<"insert\t"<<rank_recv<<"\t"<<cut_time(t)<<endl;
+ofs<<"insert\t"<<rank_recv<<"\t"<<cut_time(t)<<std::endl;
 	}
 }
 

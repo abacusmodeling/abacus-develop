@@ -8,12 +8,12 @@ static void test_adjs( ostream & os )
 		{
 			const int iat = GlobalC::ucell.itia2iat(it,ia);
 			const map<size_t,vector<Abfs::Vector3_Order<int>>> adjs = Abfs::get_adjs(iat);
-			os<<"@@@\t"<<iat<<endl;
+			os<<"@@@\t"<<iat<<std::endl;
 			for( const auto & atom2 : adjs )
 			{
 				const size_t iat2 = atom2.first;
 				for( const Abfs::Vector3_Order<int> &box2 : atom2.second )
-					os<<iat2<<"\t"<<box2<<endl;
+					os<<iat2<<"\t"<<box2<<std::endl;
 			}
 		}
 }

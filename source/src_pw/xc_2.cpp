@@ -44,7 +44,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
     // exchange
     double rho = rhoup + rhodw;
 
-	//cout << " GlobalC::xcf.igcx_now=" << GlobalC::xcf.igcx_now << endl;
+	//std::cout << " GlobalC::xcf.igcx_now=" << GlobalC::xcf.igcx_now << std::endl;
 
     if (rho <= small || GlobalC::xcf.igcx_now == 0)
     {
@@ -178,7 +178,7 @@ void gcx_spin(double rhoup, double rhodw, double grhoup2, double grhodw2,
 	}
     else
     {
-        cout << "\n gcx_spin, not implemented, igcx_now";
+        std::cout << "\n gcx_spin, not implemented, igcx_now";
     } //endif
 
     return;
@@ -237,7 +237,7 @@ void gcc_spin(double rho, double &zeta, double grho, double &sc,
     } //endif
 
 
-//	cout << "GlobalC::xcf.igcc_now=" << GlobalC::xcf.igcc_now << endl;
+//	std::cout << "GlobalC::xcf.igcc_now=" << GlobalC::xcf.igcc_now << std::endl;
 
     if (GlobalC::xcf.igcc_now == 0 || rho <= small || sqrt(abs(grho)) <= small)
     {
@@ -256,7 +256,7 @@ void gcc_spin(double rho, double &zeta, double grho, double &sc,
     }
     else if (GlobalC::xcf.igcc_now == 3 || GlobalC::xcf.igcc_now > 4)
     {
-        cout << "\n lsda_functionals, not implemented, igcc_now = "
+        std::cout << "\n lsda_functionals, not implemented, igcc_now = "
              << GlobalC::xcf.igcc_now;
     }
     else if (GlobalC::xcf.igcc_now == 4)

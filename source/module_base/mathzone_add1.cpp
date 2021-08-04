@@ -283,7 +283,7 @@ void Mathzone_Add1::Sph_Bes (double x, int lmax, double *sb, double *dsb)
 
   	if (x < 0.0)
 	{
-		cout << "\nminus x is invalid for Spherical_Bessel" << endl;  
+		std::cout << "\nminus x is invalid for Spherical_Bessel" << std::endl;  
 		exit(0); // mohan add 2021-05-06
 	}
 	 
@@ -434,7 +434,7 @@ void Mathzone_Add1::Sbt_new
 	
 	if (polint_order != 3)
 	{
-		cout << "\nhigh order interpolation is not available!" << endl;
+		std::cout << "\nhigh order interpolation is not available!" << std::endl;
 		exit(0); // mohan add 2021-05-06
 		//QUIT();
 	}
@@ -501,7 +501,7 @@ void Mathzone_Add1::Sbt_new
 	//		double x = k[ik];
 //			double tmp = polint_coef[ct]+x*polint_coef[ct+1]+x*x*polint_coef[ct+2]+x*x*x*polint_coef[ct+3];
 	//		double tmp_ana = fourier_cosine_transform (fr2, r, mshr, dr, x);
-	//		cout << "\ninterp = " << tmp << " ana = " << tmp_ana << " diff = " << log(fabs(tmp-tmp_ana))/log(10);
+	//		std::cout << "\ninterp = " << tmp << " ana = " << tmp_ana << " diff = " << log(fabs(tmp-tmp_ana))/log(10);
 			
 			//update
 			ct += (polint_order+1);
@@ -580,7 +580,7 @@ void Mathzone_Add1::Sbt_new
 //			double x = (k[ik]+k[ik+1])/2;
 //			double x = k[ik];
 //			double tmp = polint_coef[ct]+x*polint_coef[ct+1]+x*x*polint_coef[ct+2]+x*x*x*polint_coef[ct+3];
-//			cout << "\ninterp = " << tmp << " ana = " << fourier_sine_transform (fr2, r, mshr, dr, x);
+//			std::cout << "\ninterp = " << tmp << " ana = " << fourier_sine_transform (fr2, r, mshr, dr, x);
 			//update
 			ct += (polint_order+1);
 			ft_save = ft1;
@@ -600,7 +600,7 @@ void Mathzone_Add1::Sbt_new
 			fac *=  -static_cast<double>((l+twoj+2)*(l-twoj-1))/(twoj+3)/(twoj+2);
 
 			//test
-//			cout << "\ncoef[j] = " << coef[j] << endl;
+//			std::cout << "\ncoef[j] = " << coef[j] << std::endl;
 		}
 		coef[n] = pow (-1.0, n) * dualfac (2*l-1) / factorial (l);
 		
@@ -665,7 +665,7 @@ double Mathzone_Add1::pol_seg_int
 		/*
 		if (ik == 110) 
 		{
-			cout << "i = " << i << " coef = " << coef[cstart+i] << " df = " << kmf-kmb << endl;
+			std::cout << "i = " << i << " coef = " << coef[cstart+i] << " df = " << kmf-kmb << std::endl;
 		}
 		*/	
 		//update
@@ -676,7 +676,7 @@ double Mathzone_Add1::pol_seg_int
 	/*
 	if (ik == 110) 
 	{
-		cout << "val = " << val << endl;
+		std::cout << "val = " << val << std::endl;
 		QUIT ();
 	}
 	*/
@@ -752,8 +752,8 @@ void Mathzone_Add1::test ()
 	for (int ik = 0; ik < dim; ik++)
 	{
 		double diff = fk[ik]- sqrt(PI/4/ci)/pow(2.0*ci, l+1)* std::pow(rad[ik], l) * exp(-rad[ik]*rad[ik]/4/ci);
-		cout << rad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2.0*ci, l+1)*pow(rad[ik], l)*exp(-rad[ik]*rad[ik]/4/ci)
-		<< " "	<< std::log(fabs(diff))/std::log(10.0) << endl;
+		std::cout << rad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2.0*ci, l+1)*pow(rad[ik], l)*exp(-rad[ik]*rad[ik]/4/ci)
+		<< " "	<< std::log(fabs(diff))/std::log(10.0) << std::endl;
 	}
 
 	delete[] rad;
@@ -795,8 +795,8 @@ void Mathzone_Add1::test2 ()
 	for (int ik = 0; ik < N; ik++)
 	{
 		double diff = fk[ik]- sqrt(PI/4/ci)/pow(2*ci, l+1)*pow(kad[ik], l)*exp(-kad[ik]*kad[ik]/4/ci);
-		cout << kad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2*ci, l+1)*pow(kad[ik], l)*exp(-kad[ik]*kad[ik]/4/ci)
-		<< " "	<< log(fabs(diff))/log(10) << endl;
+		std::cout << kad[ik] << " " << fk[ik] << " " << sqrt(PI/4/ci)/pow(2*ci, l+1)*pow(kad[ik], l)*exp(-kad[ik]*kad[ik]/4/ci)
+		<< " "	<< log(fabs(diff))/log(10) << std::endl;
 	}
 	QUIT ();
 */
@@ -804,7 +804,7 @@ void Mathzone_Add1::test2 ()
 
 	for (int ir = 0; ir < N; ir++)
 	{
-		cout << ir*dr << " " << func[ir] << " " << fr[ir] *2.0 / PI << " " << std::log(fabs(fr[ir]*2.0/PI-func[ir]))/std::log(10.0) << endl;
+		std::cout << ir*dr << " " << func[ir] << " " << fr[ir] *2.0 / PI << " " << std::log(fabs(fr[ir]*2.0/PI-func[ir]))/std::log(10.0) << std::endl;
 	}
 	
 
@@ -864,7 +864,7 @@ double Mathzone_Add1::Polynomial_Interpolation
 			den = ho - hp;
 			if(den == 0.0) 
 			{
-				cout << "Two Xs are equal" << endl;
+				std::cout << "Two Xs are equal" << std::endl;
 				// WARNING_QUIT("Mathzone_Add1::Polynomial_Interpolation","Two Xs are equal");
 				exit(0); // mohan update 2021-05-06
 			}
@@ -998,7 +998,7 @@ void Mathzone_Add1::Cubic_Spline_Interpolation
 		const double h = rad[khi] - rad[klo];
 		if(h == 0.0) 
 		{
-			cout << "Cubic_Spline_Interpolation, h == 0.0 so that cannot be divided" << endl;
+			std::cout << "Cubic_Spline_Interpolation, h == 0.0 so that cannot be divided" << std::endl;
 			//WARNING_QUIT("Cubic_Spline_Interpolation","h == 0.0 so that cannot be divided");
 			exit(0);
 		}
@@ -1228,7 +1228,7 @@ void Mathzone_Add1::Uni_Deriv_Phi
 {
 	timer::tick("Mathzone_Add1", "Uni_Deriv_Phi");
 	int FFT_NR = 2*mesh-1;  // FFT_NR = 16019
-	// cout << "\n mesh=" << mesh << ", radf[8010]=" << radf[8010] <<  ", radf[8009]=" << radf[8009] ;
+	// std::cout << "\n mesh=" << mesh << ", radf[8010]=" << radf[8010] <<  ", radf[8009]=" << radf[8009] ;
 	// mesh=8010, radf[8010]=4.396478951532926e-01, radf[8009]=0.000000000000000e+00
 
 	fftw_complex fft_phir[FFT_NR], fft_phik[FFT_NR];
@@ -1268,12 +1268,12 @@ void Mathzone_Add1::Uni_Deriv_Phi
 
 	// FFTW
 #if defined __FFTW3
-	//cout << "\n Call FFTW3 ";
+	//std::cout << "\n Call FFTW3 ";
 	p1 = fftw_plan_dft_1d(FFT_NR, fft_phir, fft_phik, FFTW_FORWARD, FFTW_ESTIMATE);
 	fftw_execute(p1);
 	//fftw_destroy_plan(p1);
 #elif defined __FFTW2
-	//cout << "\n Call FFTW2 ";
+	//std::cout << "\n Call FFTW2 ";
 	p1 = fftw_create_plan(FFT_NR, FFTW_FORWARD, FFTW_ESTIMATE);
 	fftw_one(p1, fft_phir, fft_phik);
 	//fftw_destroy_plan(p1);

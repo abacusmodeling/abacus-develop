@@ -39,19 +39,19 @@ inline int find_offset(const int size, const int grid_index,
 
 	if(offset == -1 )
 	{
-		GlobalV::ofs_running << "================ BUG REPORT ===================" << endl;
-		GlobalV::ofs_running << " grid_index = " << grid_index << endl;
-		GlobalV::ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
-    	GlobalV::ofs_running << " find list:"<<endl;
+		GlobalV::ofs_running << "================ BUG REPORT ===================" << std::endl;
+		GlobalV::ofs_running << " grid_index = " << grid_index << std::endl;
+		GlobalV::ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << std::endl;
+    	GlobalV::ofs_running << " find list:"<<std::endl;
 		for(int* find=find_start; find < find_end; ++find)
-			GlobalV::ofs_running << *find << endl;
-		GlobalV::ofs_running << " id2 = " << id2 << endl;
-		GlobalV::ofs_running << " T1=" << GlobalC::ucell.atoms[T1].label << " T2=" << GlobalC::ucell.atoms[T2].label << endl;
-		GlobalV::ofs_running << " size (how many atoms on this grid) = " << size << endl;
-		GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << endl;
-		GlobalV::ofs_running << " iat1=" << iat1 << " iat2=" << iat2 << endl;
-		GlobalV::ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << endl;
-		GlobalV::ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << endl;
+			GlobalV::ofs_running << *find << std::endl;
+		GlobalV::ofs_running << " id2 = " << id2 << std::endl;
+		GlobalV::ofs_running << " T1=" << GlobalC::ucell.atoms[T1].label << " T2=" << GlobalC::ucell.atoms[T2].label << std::endl;
+		GlobalV::ofs_running << " size (how many atoms on this grid) = " << size << std::endl;
+		GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << std::endl;
+		GlobalV::ofs_running << " iat1=" << iat1 << " iat2=" << iat2 << std::endl;
+		GlobalV::ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
+		GlobalV::ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
 		int bindex = 0;
 		// z is the fastest,
 		for(int ii=0; ii<bx; ii++)
@@ -71,19 +71,19 @@ inline int find_offset(const int size, const int grid_index,
 //						<< " nbxyz (" << i << " " << j << " " << k << ") "
 						<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
 						<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
-						<< endl;
+						<< std::endl;
 					}
 					else
 					{
 						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-						<< " rcut=" << GlobalC::ORB.Phi[T1].getRcut() << endl;
+						<< " rcut=" << GlobalC::ORB.Phi[T1].getRcut() << std::endl;
 					}
 					++bindex;
 				}
 			}
 		}
 
-		GlobalV::ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << endl;
+		GlobalV::ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
 		bindex = 0;
 		// z is the fastest,
 		for(int ii=0; ii<bx; ii++)
@@ -102,25 +102,25 @@ inline int find_offset(const int size, const int grid_index,
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 //						<< " nbxyz (" << i << " " << j << " " << k << ") "
 						<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
-						<< endl;
+						<< std::endl;
 					}
 					else
 					{
 						GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-						<< " rcut=" << GlobalC::ORB.Phi[T2].getRcut() << endl;
+						<< " rcut=" << GlobalC::ORB.Phi[T2].getRcut() << std::endl;
 					}
 					++bindex;
 				}
 			}
 		}
 
-		GlobalV::ofs_running << " target index = " << index << endl;
-		GlobalV::ofs_running << " iat=" << iat1 << " nad=" << GlobalC::LNNR.nad[iat1] << endl;
+		GlobalV::ofs_running << " target index = " << index << std::endl;
+		GlobalV::ofs_running << " iat=" << iat1 << " nad=" << GlobalC::LNNR.nad[iat1] << std::endl;
 		for(int iii = 0; iii < GlobalC::LNNR.nad[iat1]; iii++)
 		{
-			GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat1][iii] << endl;
+			GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat1][iii] << std::endl;
 		}
-		GlobalV::ofs_warning << " The adjacent atom found by 	 is not found by SLTK_Adjacent program!" << endl;
+		GlobalV::ofs_warning << " The adjacent atom found by 	 is not found by SLTK_Adjacent program!" << std::endl;
 		WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
 	}
 	assert(offset < GlobalC::LNNR.nad[iat1]);
@@ -466,7 +466,7 @@ void Gint_k::cal_vlocal_k(const double *vrs1, const Grid_Technique &GridT, const
 				else
 				{
 					//this->evaluate_pvpR_full(grid_index, size, psir_ylm, cal_flag, vldr3);
-					cout<<"call pvpR_full"<<endl;
+					std::cout<<"call pvpR_full"<<std::endl;
 				}
 			}// int k
 		}// int j
@@ -562,7 +562,7 @@ void Gint_k::evaluate_pvpR_reduced(
 				if(cal_flag[ib][ia1] && cal_flag[ib][ia2])
 				{
 //					GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2;
-//					GlobalV::ofs_running << " cal_flag1=" << cal_flag[ib][ia1] << " cal_flag2=" << cal_flag[ib][ia2] << endl;
+//					GlobalV::ofs_running << " cal_flag1=" << cal_flag[ib][ia1] << " cal_flag2=" << cal_flag[ib][ia2] << std::endl;
 					same_flag = true;
 					break;
 				}
@@ -616,17 +616,17 @@ void Gint_k::evaluate_pvpR_reduced(
 
 				if(offset == -1 )
                 {
-					GlobalV::ofs_running << "================ BUG REPORT ===================" << endl;
-					GlobalV::ofs_running << " grid_index = " << grid_index << endl;
-                    GlobalV::ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << endl;
-					GlobalV::ofs_running << " id2 = " << id2 << endl;
-					GlobalV::ofs_running << " T1=" << GlobalC::ucell.atoms[T1].label << " T2=" << GlobalC::ucell.atoms[T2].label << endl;
-					GlobalV::ofs_running << " size (how many atoms on this grid) = " << size << endl;
-					GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << endl;
-                    GlobalV::ofs_running << " iat=" << iat << " iat2=" << iat2 << endl;
-                    GlobalV::ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << endl;
+					GlobalV::ofs_running << "================ BUG REPORT ===================" << std::endl;
+					GlobalV::ofs_running << " grid_index = " << grid_index << std::endl;
+                    GlobalV::ofs_running << " index of adjacent atom according to (dRx, dRy, dRz, iat)= " << index << std::endl;
+					GlobalV::ofs_running << " id2 = " << id2 << std::endl;
+					GlobalV::ofs_running << " T1=" << GlobalC::ucell.atoms[T1].label << " T2=" << GlobalC::ucell.atoms[T2].label << std::endl;
+					GlobalV::ofs_running << " size (how many atoms on this grid) = " << size << std::endl;
+					GlobalV::ofs_running << " ia1=" << ia1 << " ia2=" << ia2 << std::endl;
+                    GlobalV::ofs_running << " iat=" << iat << " iat2=" << iat2 << std::endl;
+                    GlobalV::ofs_running << " dR=" << dRx << " " << dRy << " " << dRz << std::endl;
 
-                    GlobalV::ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << endl;
+                    GlobalV::ofs_running << " R1=" << R1x << " " << R1y << " " << R1z << std::endl;
 					int bindex = 0;
 					// z is the fastest,
 					for(int ii=0; ii<gt.bx; ii++)
@@ -646,12 +646,12 @@ void Gint_k::evaluate_pvpR_reduced(
 									<< " nbxyz (" << i << " " << j << " " << k << ") "
 									<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
 									<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
-									<< endl;
+									<< std::endl;
 								}
 								else
 								{
 									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-									<< " rcut=" << GlobalC::ORB.Phi[T1].getRcut() << endl;
+									<< " rcut=" << GlobalC::ORB.Phi[T1].getRcut() << std::endl;
 								}
 								++bindex;
 							}
@@ -659,7 +659,7 @@ void Gint_k::evaluate_pvpR_reduced(
 					}
 
 
-                    GlobalV::ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << endl;
+                    GlobalV::ofs_running << " R2=" << R2x << " " << R2y << " " << R2z << std::endl;
 					bindex = 0;
 					// z is the fastest,
 					for(int ii=0; ii<gt.bx; ii++)
@@ -678,25 +678,25 @@ void Gint_k::evaluate_pvpR_reduced(
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 									<< " nbxyz (" << i << " " << j << " " << k << ") "
 									<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
-									<< endl;
+									<< std::endl;
 								}
 								else
 								{
 									GlobalV::ofs_running << " ib=" << bindex << " dis=" << distance[bindex][ia2]
-									<< " rcut=" << GlobalC::ORB.Phi[T2].getRcut() << endl;
+									<< " rcut=" << GlobalC::ORB.Phi[T2].getRcut() << std::endl;
 								}
 								++bindex;
 							}
 						}
 					}
 
-					GlobalV::ofs_running << " target index = " << index << endl;
-					GlobalV::ofs_running << " iat=" << iat << " nad=" << GlobalC::LNNR.nad[iat] << endl;
+					GlobalV::ofs_running << " target index = " << index << std::endl;
+					GlobalV::ofs_running << " iat=" << iat << " nad=" << GlobalC::LNNR.nad[iat] << std::endl;
                     for(int iii = 0; iii < GlobalC::LNNR.nad[iat]; iii++)
                     {
-                        GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat][iii] << endl;
+                        GlobalV::ofs_running << " ad=" << iii << " find_R2=" << GlobalC::LNNR.find_R2[iat][iii] << std::endl;
                     }
-					GlobalV::ofs_warning << " The adjacent atom found by gt is not found by SLTK_Adjacent program!" << endl;
+					GlobalV::ofs_warning << " The adjacent atom found by gt is not found by SLTK_Adjacent program!" << std::endl;
                     WARNING_QUIT("gint_k","evaluate_pvpR_reduced wrong");
                 }
                 assert(offset < GlobalC::LNNR.nad[iat]);

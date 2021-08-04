@@ -85,12 +85,12 @@ void Force_LCAO_k::ftable_k (
 
 	// test the force.
 	/*
-	cout << " overlap force" << endl;
+	std::cout << " overlap force" << std::endl;
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
 		const double fac = Ry_to_eV / 0.529177;
-		cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
-		setw(15) << foverlap[iat][2]*fac << endl;
+		std::cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
+		setw(15) << foverlap[iat][2]*fac << std::endl;
 	}
 	*/
 
@@ -202,7 +202,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 	// of division of H matrix.
 	//----------------------------------------------------------
  	//xiaohui add "OUT_LEVEL", 2015-09-16
-	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " Calculate the energy density matrix with k " << endl;
+	if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " Calculate the energy density matrix with k " << std::endl;
 	Record_adj RA;
 	RA.for_2d();
 
@@ -326,7 +326,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 								}//kk
 							}//jj
 						}// cb
-//						GlobalV::ofs_running << " count = " << count << endl;
+//						GlobalV::ofs_running << " count = " << count << std::endl;
 						assert(count == GlobalC::LNNR.nlocdim[iat]);
 					}// w1
 				}//ib
@@ -489,12 +489,12 @@ void Force_LCAO_k::cal_foverlap_k(
 	// test the force
 	//-----------------
 	/*
-	cout << " overlap force" << endl;
+	std::cout << " overlap force" << std::endl;
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
 		const double fac = Ry_to_eV / 0.529177;
-		cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
-		setw(15) << foverlap[iat][2]*fac << endl;
+		std::cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
+		setw(15) << foverlap[iat][2]*fac << std::endl;
 	}
 	*/
 	if(isstress){
@@ -537,7 +537,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 	
 	// get the adjacent atom's information.
 
-//	GlobalV::ofs_running << " calculate the ftvnl_dphi_k force" << endl;
+//	GlobalV::ofs_running << " calculate the ftvnl_dphi_k force" << std::endl;
 	Record_adj RA;
 	RA.for_2d();
 
@@ -622,12 +622,12 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 void Force_LCAO_k::test(double* mmm, const string &name)
 {
 	if(GlobalV::NPROC!=1)return;
-	cout << "test!" << endl;
+	std::cout << "test!" << std::endl;
 
 	int irr = 0;
 	int ca = 0;
 
-	GlobalV::ofs_running << " Calculate the test in Force_LCAO_k" << endl;
+	GlobalV::ofs_running << " Calculate the test in Force_LCAO_k" << std::endl;
 	Record_adj RA;
 	RA.for_2d();
 	
@@ -666,18 +666,18 @@ void Force_LCAO_k::test(double* mmm, const string &name)
 		}
 	}
 		
-	cout << "\n " << name << endl;
-	cout << setprecision(4);
+	std::cout << "\n " << name << std::endl;
+	std::cout << setprecision(4);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			if( abs(test[i*GlobalV::NLOCAL+j]) > 1.0e-5)
-			cout << setw(12) << test[i*GlobalV::NLOCAL+j];
+			std::cout << setw(12) << test[i*GlobalV::NLOCAL+j];
 			else
-			cout << setw(12) << "0";
+			std::cout << setw(12) << "0";
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	delete[] test;	
 
@@ -934,7 +934,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 //		ZEROS (GlobalC::LM.DHloc_fixedR_x, GlobalC::LNNR.nnr);
 //		ZEROS (GlobalC::LM.DHloc_fixedR_y, GlobalC::LNNR.nnr);
 //		ZEROS (GlobalC::LM.DHloc_fixedR_z, GlobalC::LNNR.nnr);
-//		cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << endl;
+//		std::cout << " CURRENT_SPIN=" << GlobalV::CURRENT_SPIN << std::endl;
 
 		for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
 		{

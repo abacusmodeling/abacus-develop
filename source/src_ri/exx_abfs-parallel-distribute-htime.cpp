@@ -9,18 +9,18 @@ vector<pair<size_t,size_t>> Exx_Abfs::Parallel::Distribute::Htime::distribute(
 	const double rmesh_times )
 {
 //ofstream ofs("htime_"+TO_STRING(GlobalV::MY_RANK));
-//ofs<<rmesh_times<<endl;
+//ofs<<rmesh_times<<std::endl;
 
 	TITLE("Exx_Abfs::Parallel::Distribute::Htime::distribute");
 	const vector<size_t> Nadj = cal_Nadj(Born_von_Karman_period);
-//ofs<<Nadj<<endl;
+//ofs<<Nadj<<std::endl;
 
 	const vector<pair<size_t,pair<size_t,size_t>>> pair_costs = cal_pair_costs(Nadj, rmesh_times);
-//ofs<<pair_costs<<endl;
+//ofs<<pair_costs<<std::endl;
 	
 	const vector<vector<pair<size_t,size_t>>> rank_work = cal_rank_work(pair_costs);
 //for( size_t irank=0; irank!=rank_work.size(); ++irank )
-//	ofs<<irank<<"\t"<<rank_work[irank]<<endl;
+//	ofs<<irank<<"\t"<<rank_work[irank]<<std::endl;
 //ofs.close();
 	
 	return rank_work[GlobalV::MY_RANK];
@@ -106,7 +106,7 @@ vector<vector<pair<size_t,size_t>>> Exx_Abfs::Parallel::Distribute::Htime::cal_r
 	for( const auto pair_cost : pair_costs )
 	{
 		pop_heap( rank_cost.begin(), rank_cost.end(), comp );
-//cout<<rank_cost.back().first<<"\t"<<rank_cost.back().second<<"\t"<<pair_cost.first<<"\t"<<pair_cost.second.first<<"\t"<<pair_cost.second.second<<endl;
+//std::cout<<rank_cost.back().first<<"\t"<<rank_cost.back().second<<"\t"<<pair_cost.first<<"\t"<<pair_cost.second.first<<"\t"<<pair_cost.second.second<<std::endl;
 		rank_cost.back().second += pair_cost.first;
 		rank_work[ rank_cost.back().first ].push_back( pair_cost.second );
 		push_heap( rank_cost.begin(), rank_cost.end(), comp );

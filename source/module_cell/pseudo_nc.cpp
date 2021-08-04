@@ -143,7 +143,7 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 	int ndmx = 2000; 
 	if (this->mesh > ndmx)
 	{
-		cout << "\n set_pseudo_h, too many grid points,";
+		std::cout << "\n set_pseudo_h, too many grid points,";
 	}
 
 	this->nchi = upf.nwfc;

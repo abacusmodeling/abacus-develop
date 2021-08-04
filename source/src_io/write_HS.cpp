@@ -71,32 +71,32 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
         ofstream g1(ssh.str().c_str());
         ofstream g2(sss.str().c_str());
 
-        g1 << GlobalV::NLOCAL << " " << Hnnz << endl;
-        g2 << GlobalV::NLOCAL << " " << Hnnz << endl;
+        g1 << GlobalV::NLOCAL << " " << Hnnz << std::endl;
+        g2 << GlobalV::NLOCAL << " " << Hnnz << std::endl;
 
         for(int i=0; i<GlobalV::NLOCAL+1; ++i)
         {
             g1 << colptr_H[i] << " ";
             g2 << colptr_H[i] << " ";
         }
-        g1 << endl;
-        g2 << endl;
+        g1 << std::endl;
+        g2 << std::endl;
 
         for(int i=0; i<Hnnz; ++i)
         {
             g1 << rowind_H[i] << " ";
             g2 << rowind_H[i] << " ";
         }
-        g1 << endl;
-        g2 << endl;
+        g1 << std::endl;
+        g2 << std::endl;
 
         for(int i=0; i<Hnnz; ++i)
         {
             g1 << nzval_H[i] << " ";
             g2 << nzval_S[i] << " ";
         }
-        g1 << endl;
-        g2 << endl;
+        g1 << std::endl;
+        g2 << std::endl;
 
         g1.close();
         g2.close();
@@ -282,8 +282,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                     g1 << " " << lineH[j-i];
                     g2 << " " << lineS[j-i];
                 }
-                g1 << endl;
-                g2 << endl;
+                g1 << std::endl;
+                g2 << std::endl;
             }
             delete[] lineH;
             delete[] lineS;
@@ -336,8 +336,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                 ofs_S << " " << S[irr*GlobalC::ParaO.ncol+icc];
             }
         }
-        ofs_H << endl;
-        ofs_S << endl;
+        ofs_H << std::endl;
+        ofs_S << std::endl;
          }
          }
 //LiuXH add 2015-12-17,end*/
@@ -355,8 +355,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
                 g1 << " " << H[i*GlobalV::NLOCAL+j];
                 g2 << " " << S[i*GlobalV::NLOCAL+j];
             }
-            g1 << endl;
-            g2 << endl;
+            g1 << std::endl;
+            g2 << std::endl;
         }
         g1.close();
         g2.close();
@@ -561,8 +561,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                     g1 << " " << lineH[j-i];
                     g2 << " " << lineS[j-i];
                 }
-                g1 << endl;
-                g2 << endl;
+                g1 << std::endl;
+                g2 << std::endl;
             }
             delete[] lineH;
             delete[] lineS;
@@ -615,8 +615,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                                 ofs_S << " " << S[irr*GlobalC::ParaO.ncol+icc];
                         }
                 }
-                ofs_H << endl;
-                ofs_S << endl;
+                ofs_H << std::endl;
+                ofs_S << std::endl;
              }
          }
 //LiuXH add 2015-12-17,end*/
@@ -634,8 +634,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
                 g1 << " " << H[i*GlobalV::NLOCAL+j];
                 g2 << " " << S[i*GlobalV::NLOCAL+j];
             }
-            g1 << endl;
-            g2 << endl;
+            g1 << std::endl;
+            g2 << std::endl;
         }
         g1.close();
         g2.close();
@@ -669,17 +669,17 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     {
         g1.open(ssh.str().c_str());
         g2.open(sss.str().c_str());
-        g1 << "Matrix Dimension of H(R): "<<GlobalV::NLOCAL<<endl;
-        g2 << "Matrix Dimension of S(R): "<<GlobalV::NLOCAL<<endl;
+        g1 << "Matrix Dimension of H(R): "<<GlobalV::NLOCAL<<std::endl;
+        g2 << "Matrix Dimension of S(R): "<<GlobalV::NLOCAL<<std::endl;
     }
 
     int R_x = GlobalC::GridD.getCellX();
     int R_y = GlobalC::GridD.getCellY();
     int R_z = GlobalC::GridD.getCellZ();
 
-//cout<<"R_x: "<<R_x<<endl;
-//cout<<"R_y: "<<R_y<<endl;
-//cout<<"R_z: "<<R_z<<endl;
+//std::cout<<"R_x: "<<R_x<<std::endl;
+//std::cout<<"R_y: "<<R_y<<std::endl;
+//std::cout<<"R_z: "<<R_z<<std::endl;
 
     double R_minX = GlobalC::GridD.getD_minX();
     double R_minY = GlobalC::GridD.getD_minY();
@@ -696,9 +696,9 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
             for(int iz=0; iz<R_z; iz++)
             {
                 int dRz = iz + R_minZ;
-//cout<<"dRx: "<<dRx<<endl;
-//cout<<"dRy: "<<dRy<<endl;
-//cout<<"dRz: "<<dRz<<endl;
+//std::cout<<"dRx: "<<dRx<<std::endl;
+//std::cout<<"dRy: "<<dRy<<std::endl;
+//std::cout<<"dRz: "<<dRz<<std::endl;
                 int ir,ic;
                 for(int i=0; i<GlobalV::NLOCAL; i++)
                 {
@@ -785,8 +785,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                         {
                             if(i==0 && j==0)
                             {
-                                g1 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
-                                g2 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<endl;
+                                g1 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<std::endl;
+                                g2 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<std::endl;
                             }
                             //g1 << " " << lineH[j-i];
                             //g2 << " " << lineS[j-i];
@@ -807,8 +807,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                                 g2 << " " << lineS_soc[j];
                             }
                         }
-                        g1 << endl;
-                        g2 << endl;
+                        g1 << std::endl;
+                        g2 << std::endl;
                     }
                     if(GlobalV::NSPIN!=4)
                     {
@@ -957,12 +957,12 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
         else
         {
             g1.open(ssh.str().c_str());
-            g1 << "Matrix Dimension of H(R): " << GlobalV::NLOCAL <<endl;
-            g1 << "Matrix number of H(R): " << output_R_number << endl;
+            g1 << "Matrix Dimension of H(R): " << GlobalV::NLOCAL <<std::endl;
+            g1 << "Matrix number of H(R): " << output_R_number << std::endl;
 
             g2.open(sss.str().c_str());
-            g2 << "Matrix Dimension of S(R): " << GlobalV::NLOCAL <<endl;
-            g2 << "Matrix number of S(R): " << output_R_number << endl;
+            g2 << "Matrix Dimension of S(R): " << GlobalV::NLOCAL <<std::endl;
+            g2 << "Matrix number of S(R): " << output_R_number << std::endl;
         }
     }
 
@@ -999,8 +999,8 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
                     }
                     else
                     {
-                        g1 << dRx << " " << dRy << " " << dRz << " " << H_nonzero_number[count_n] << endl;
-                        g2 << dRx << " " << dRy << " " << dRz << " " << S_nonzero_number[count_n] << endl;
+                        g1 << dRx << " " << dRy << " " << dRz << " " << H_nonzero_number[count_n] << std::endl;
+                        g2 << dRx << " " << dRy << " " << dRz << " " << S_nonzero_number[count_n] << std::endl;
                     }
                 }
 
@@ -1010,13 +1010,13 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
                     // {
                     //     if (!binary)
                     //     {
-                    //         g1 << endl;
-                    //         g1 << endl;
+                    //         g1 << std::endl;
+                    //         g1 << std::endl;
                     //         for (int index = 0; index < GlobalV::NLOCAL+1; ++index)
                     //         {
                     //             g1 << 0 << " ";
                     //         }
-                    //         g1 << endl;
+                    //         g1 << std::endl;
                     //     }
                     // }
                 }
@@ -1038,13 +1038,13 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
                     // {
                     //     if (GlobalV::DRANK == 0)
                     //     {
-                    //         g2 << endl;
-                    //         g2 << endl;
+                    //         g2 << std::endl;
+                    //         g2 << std::endl;
                     //         for (int index = 0; index < GlobalV::NLOCAL+1; ++index)
                     //         {
                     //             g2 << 0 << " ";
                     //         }
-                    //         g2 << endl;
+                    //         g2 << std::endl;
                     //     }
                     // }
                 }
@@ -1171,8 +1171,8 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
         }
         else
         {
-            ofs << endl;
-            ofs_tem1 << endl;
+            ofs << std::endl;
+            ofs_tem1 << std::endl;
             ofs_tem1.close();
             ifs_tem1.open(tem1.str().c_str());
             ofs << ifs_tem1.rdbuf();
@@ -1181,7 +1181,7 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
             {
                 ofs << " " << i;
             }
-            ofs << endl;
+            ofs << std::endl;
         }
 
         std::remove(tem1.str().c_str());
@@ -1281,8 +1281,8 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
         }
         else
         {
-            ofs << endl;
-            ofs_tem1 << endl;
+            ofs << std::endl;
+            ofs_tem1 << std::endl;
             ofs_tem1.close();
             ifs_tem1.open(tem1.str().c_str());
             ofs << ifs_tem1.rdbuf();
@@ -1291,7 +1291,7 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
             {
                 ofs << " " << i;
             }
-            ofs << endl;
+            ofs << std::endl;
         }
 
         std::remove(tem1.str().c_str());

@@ -23,7 +23,7 @@ void ORB_gen_tables::gen_tables(
 	TITLE("ORB_gen_tables", "gen_tables");
 	timer::tick("ORB_gen_tables", "gen_tables");
 
-	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << endl;
+	ofs_in << "\n SETUP THE TWO-CENTER INTEGRATION TABLES" << std::endl;
 
 	//////////////////////////////
 	/// (1) MOT: make overlap table.
@@ -769,10 +769,10 @@ void ORB_gen_tables::snap_psipsi(
 					/*
 						if( abs ( tmpOlm0 * rly[ MGT.get_lm_index(L, m) ] ) > 1.0e-3 )
 						{
-						cout << " L=" << L << " m=" << m << " tmpOlm0=" << tmpOlm0
+						std::cout << " L=" << L << " m=" << m << " tmpOlm0=" << tmpOlm0
 						<< " rly=" << rly[ MGT.get_lm_index(L, m) ]
 						<< " r=" << olm[0]
-						<< endl;
+						<< std::endl;
 						}
 						*/
 					break;

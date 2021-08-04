@@ -55,12 +55,12 @@ void Global_File::make_dir_out(
 		{
 			if ( system( command0.c_str() ) == 0 )
 			{
-				cout << " MAKE THE DIR         : " << GlobalV::global_out_dir << endl;
+				std::cout << " MAKE THE DIR         : " << GlobalV::global_out_dir << std::endl;
 				make_dir = 1;
 			}
 			else
 			{
-				cout << " PROC " << rank << " CAN NOT MAKE THE DIR !!! " << endl;	
+				std::cout << " PROC " << rank << " CAN NOT MAKE THE DIR !!! " << std::endl;	
 				make_dir = 0;
 			}
 		}
@@ -74,7 +74,7 @@ void Global_File::make_dir_out(
 #ifdef __MPI
 	if(make_dir==0)
 	{
-		cout << " CAN NOT MAKE THE OUT DIR......." << endl;
+		std::cout << " CAN NOT MAKE THE OUT DIR......." << std::endl;
 		QUIT();		
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -127,8 +127,8 @@ void Global_File::open_log(std::ofstream &ofs,const std::string &fn)
     ss << GlobalV::global_out_dir << fn << ".log";
 
     ofs.open( ss.str().c_str() );
-//	ofs << " WELCOME TO MESIA PROGRAM." << endl;
-//	ofs << " OPEN "<<fn<<".log"<<" DONE."<<endl;
+//	ofs << " WELCOME TO MESIA PROGRAM." << std::endl;
+//	ofs << " OPEN "<<fn<<".log"<<" DONE."<<std::endl;
     return;
 }
 
@@ -138,7 +138,7 @@ void Global_File::close_log( std::ofstream &ofs,const std::string &fn)
 	{
     	ofs.close();
 	}
-    ofs << "CLOSE "<<fn<<".log"<<" DONE."<<endl;
+    ofs << "CLOSE "<<fn<<".log"<<" DONE."<<std::endl;
     return;
 }
 

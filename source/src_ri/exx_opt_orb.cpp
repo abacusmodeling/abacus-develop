@@ -21,18 +21,18 @@ void Exx_Opt_Orb::generate_matrix() const
 ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 
 	TITLE("Exx_Opt_Orb::generate_matrix");
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>> lcaos = Exx_Abfs::Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 
 	const vector<vector<vector<Numerical_Orbital_Lm>>> abfs = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, GlobalC::exx_lcao.info.pca_threshold );
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 	
 	Exx_Abfs::Jle jle;
 	jle.init_jle( this->kmesh_times );
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 	
 	Exx_Abfs::Lmax = Exx_Abfs::Jle::Lmax;
 	for( size_t T=0; T!=abfs.size(); ++T )
@@ -47,9 +47,9 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 	const Element_Basis_Index::Range    range_jys = Exx_Abfs::Abfs_Index::construct_range( jle.jle );
 	const Element_Basis_Index::IndexLNM index_jys = Element_Basis_Index::construct_index( range_jys );
 
-ofs_mpi<<range_lcaos<<endl;
-ofs_mpi<<range_abfs<<endl;
-ofs_mpi<<range_jys<<endl;
+ofs_mpi<<range_lcaos<<std::endl;
+ofs_mpi<<range_abfs<<std::endl;
+ofs_mpi<<range_jys<<std::endl;
 
 	map<size_t,map<size_t,set<double>>> radial_R = get_radial_R();
 #if TEST_EXX_RADIAL==2
@@ -60,12 +60,12 @@ ofs_mpi<<range_jys<<endl;
 				ofs_mpi<<rA.first<<"\t"<<rB.first<<":\t";
 				for(const auto & rC : rB.second)
 					ofs_mpi<<rC<<"\t";
-				ofs_mpi<<endl;
+				ofs_mpi<<std::endl;
 			}
 	}
 #endif
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	// < lcaos lcaos | lcaos lcaos >
 	const auto ms_lcaoslcaos_lcaoslcaos = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> 
@@ -81,7 +81,7 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 		return m_lcaoslcaos_lcaoslcaos.cal_overlap_matrix( index_lcaos, index_lcaos, index_lcaos, index_lcaos);
 	}();
 	
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	// < lcaos lcaos | jys >
 	const auto ms_lcaoslcaos_jys = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
@@ -97,7 +97,7 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 		return m_jyslcaos_lcaos.cal_overlap_matrix( index_jys, index_lcaos, index_lcaos );
 	}();
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	// < jys | jys >
 	const auto ms_jys_jys = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
@@ -113,7 +113,7 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 		return m_jys_jys.cal_overlap_matrix( index_jys, index_jys );
 	}();
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	// < abfs | abfs >
 	const auto ms_abfs_abfs = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
@@ -129,7 +129,7 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 		return m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
 	}();
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	// < lcaos lcaos | abfs >
 	const auto ms_lcaoslcaos_abfs = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
@@ -145,7 +145,7 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 		return m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
 	}();
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 	// < jys | abfs >
 	const auto ms_jys_abfs = [&]() -> map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
@@ -161,7 +161,7 @@ ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
 		return m_jys_abfs.cal_overlap_matrix( index_jys, index_abfs );
 	}();
 
-ofs_mpi<<"memory:\t"<<get_memory(10)<<endl;
+ofs_mpi<<"memory:\t"<<get_memory(10)<<std::endl;
 
 ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_jys_jys",ms_jys_jys);
 ofs_matrixes(GlobalC::exx_lcao.test_dir.matrix+"ms_lcaoslcaos_jys",ms_lcaoslcaos_jys);
@@ -307,7 +307,7 @@ matrix Exx_Opt_Orb::cal_proj(
 {
 	TITLE("Exx_Opt_Orb::cal_proj");
 
-//auto print_nrc = [](const matrix & m){ cout<<"\t"<<m.nr<<"\t"<<m.nc<<endl; };
+//auto print_nrc = [](const matrix & m){ std::cout<<"\t"<<m.nr<<"\t"<<m.nc<<std::endl; };
 
 	matrix m_proj = m_big;
 //print_nrc(m_proj);
@@ -315,7 +315,7 @@ matrix Exx_Opt_Orb::cal_proj(
 	{
 		for( size_t ir=0; ir!=m_right.size(); ++ir )
 		{
-//cout<<il<<"\t"<<ir<<endl;
+//std::cout<<il<<"\t"<<ir<<std::endl;
 //print_nrc(m_left[il]);
 //print_nrc(m_middle[il][ir]);
 //print_nrc(m_right[ir]);

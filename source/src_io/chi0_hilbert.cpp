@@ -64,7 +64,7 @@ void Chi0_hilbert::Chi()
 	// check nomega
 	//---------------------------------------
 	double energy_scale = domega * nomega;
-	cout <<"energy_scale = "<<energy_scale<<endl;
+	std::cout <<"energy_scale = "<<energy_scale<<std::endl;
 	double max_e = 0.0;
 	for(int ik1=0; ik1<GlobalC::kv.nks; ik1++)
 	{
@@ -76,11 +76,11 @@ void Chi0_hilbert::Chi()
 			}			
 		}		 
 	}
-	cout <<"max_e = "<<max_e<<endl;
+	std::cout <<"max_e = "<<max_e<<std::endl;
 	if(max_e > energy_scale)
 	{
 		int nomega_right = int(max_e/domega);
-		cout << "nomega must >= "<<nomega_right<<endl;
+		std::cout << "nomega must >= "<<nomega_right<<std::endl;
 		WARNING_QUIT("chi0_hilbert","nomega is too small!!!!!!!!!");
 	}
 	
@@ -106,7 +106,7 @@ void Chi0_hilbert::Chi()
 	}
 	else
 	{
-		cout <<"start_q = "<<start_q<<endl;
+		std::cout <<"start_q = "<<start_q<<std::endl;
 	}
 		
 	int icount = 0;
@@ -241,10 +241,10 @@ void Chi0_hilbert::Chi()
 	}
 	
 	int temp_q = qc[total_icount-1];
-	//cout <<"temp_q = "<<temp_q<<endl;
+	//std::cout <<"temp_q = "<<temp_q<<std::endl;
 	
 	interval_q = temp_q - start_q;
-	//cout <<"interval_q = "<<interval_q<<endl;
+	//std::cout <<"interval_q = "<<interval_q<<std::endl;
 	
 	//----------------------------------------------------------
 	//    parallel in G     collection and sorting
@@ -254,17 +254,17 @@ void Chi0_hilbert::Chi()
 	if(system == "surface")    // calculate the g_//
 	{
 		dim_para = parallel_g();
-		//cout << "dim_para = "<<dim_para<<endl;
+		//std::cout << "dim_para = "<<dim_para<<std::endl;
 	}
 
-	//cout <<"GlobalC::en.ef = "<<GlobalC::en.ef<<endl;
-	//cout <<"degauss = "<<INPUT.degauss<<endl;
+	//std::cout <<"GlobalC::en.ef = "<<GlobalC::en.ef<<std::endl;
+	//std::cout <<"degauss = "<<INPUT.degauss<<std::endl;
 	
 	//------------------------------------------------------------------
 	// change the fermi level or not 
 	//------------------------------------------------------------------
 	double energy = GlobalC::en.ef + fermi_level;
-	//cout <<"energy = "<<energy<<endl;
+	//std::cout <<"energy = "<<energy<<std::endl;
 	
 	cweight = new double*[GlobalC::kv.nks]; 
 	for(int i=0;i<GlobalC::kv.nks;i++)             // new occupation
@@ -327,7 +327,7 @@ void Chi0_hilbert::Chi()
 		}
 	}
 	
-	cout <<"elec = "<<elec<<endl;
+	std::cout <<"elec = "<<elec<<std::endl;
 	
 	//----------------------------------------------------------
 	// calculate the number of occupied bands
@@ -349,7 +349,7 @@ void Chi0_hilbert::Chi()
 		if(occ_flag == true)
 			occ_bands++;
 	}
-	cout <<"occ_bands = "<<occ_bands<<endl;	
+	std::cout <<"occ_bands = "<<occ_bands<<std::endl;	
 	oband = occ_bands;
 	
 	//----------------------------------------------------------
@@ -378,19 +378,19 @@ void Chi0_hilbert::Chi()
 				start = time(NULL);
 				Cal_Chi0s(iq);  // calculate chi0s
 				end = time(NULL);
-				cout<<"chi0s time:: "<<end-start<<" s"<<endl;
+				std::cout<<"chi0s time:: "<<end-start<<" s"<<std::endl;
 				
 				time_t start1,end1;
 				start1 = time(NULL);
 				Cal_T();
 				end1 = time(NULL);
-				cout<<"T time:: "<<end1-start1<<" s"<<endl;
+				std::cout<<"T time:: "<<end1-start1<<" s"<<std::endl;
 				
 				time_t start2,end2;
 				start2 = time(NULL);
 				Cal_Chi0();   // calculate  chi0
 				end2 = time(NULL);
-				cout<<"chi0 time:: "<<end2-start2<<" s"<<endl;
+				std::cout<<"chi0 time:: "<<end2-start2<<" s"<<std::endl;
 				
 				if(out_chi0)
 				{
@@ -398,7 +398,7 @@ void Chi0_hilbert::Chi()
 				}
 				for(int i=0; i<nomega; i++)
 				{
-					cout <<"iq = "<<iq<<" chi0["<<i<<"] = "<<chi0[0][i].real()<<"  "<<chi0[0][i].imag()<<endl;
+					std::cout <<"iq = "<<iq<<" chi0["<<i<<"] = "<<chi0[0][i].real()<<"  "<<chi0[0][i].imag()<<std::endl;
 				}
 				
 				Cal_kernel(iq);
@@ -407,7 +407,7 @@ void Chi0_hilbert::Chi()
 				start3 = time(NULL);
 				Cal_Chi(iq);  // calculate chi
 				end3 = time(NULL);
-				cout<<"chi time:: "<<end3-start3<<" s"<<endl;
+				std::cout<<"chi time:: "<<end3-start3<<" s"<<std::endl;
 			}					
 		}
 		//-------------------------------------------------
@@ -424,14 +424,14 @@ void Chi0_hilbert::Chi()
 			//------------------------
 			stringstream ss;
 			ss << GlobalV::global_out_dir <<"nearest.dat";
-			cout << ss.str().c_str() << endl;
+			std::cout << ss.str().c_str() << std::endl;
 			ifstream ifsn(ss.str().c_str());
 			if(!ifsn)
 			{
 				WARNING_QUIT("chi0_hilbert", "Can't find the nearest.dat file!");
 			}
 			ifsn >> NR;
-			cout << "NR in = "<<NR << endl;
+			std::cout << "NR in = "<<NR << std::endl;
 			
 			R = new Vector3<int>** [GlobalV::NLOCAL];
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
@@ -463,15 +463,15 @@ void Chi0_hilbert::Chi()
 			{
 				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
-					//cout <<"iw1 = "<<iw1<<" iw2 = "<<iw2<<endl;
+					//std::cout <<"iw1 = "<<iw1<<" iw2 = "<<iw2<<std::endl;
 					ifsn >> tmp; 
 					ifsn >> tmp;
-					ifsn >> Rmax[iw1][iw2]; //cout << Rmax[iw1][iw2] << endl;
+					ifsn >> Rmax[iw1][iw2]; //std::cout << Rmax[iw1][iw2] << std::endl;
 					for(int i=0; i<Rmax[iw1][iw2]; i++)
 					{
-						ifsn >> R[iw1][iw2][i].x; //cout <<R[iw1][iw2][i].x;
-						ifsn >> R[iw1][iw2][i].y; //cout <<R[iw1][iw2][i].y;
-						ifsn >> R[iw1][iw2][i].z; //cout <<R[iw1][iw2][i].z; cout << endl;
+						ifsn >> R[iw1][iw2][i].x; //std::cout <<R[iw1][iw2][i].x;
+						ifsn >> R[iw1][iw2][i].y; //std::cout <<R[iw1][iw2][i].y;
+						ifsn >> R[iw1][iw2][i].z; //std::cout <<R[iw1][iw2][i].z; std::cout << std::endl;
 					}
 				}
 			}
@@ -513,7 +513,7 @@ void Chi0_hilbert::Chi()
 				//--------------------------------
 				// readin overlap_q
 				//--------------------------------
-				//cout << "begin overlap"<<endl;
+				//std::cout << "begin overlap"<<std::endl;
 				stringstream ssq;
 				ssq << GlobalV::global_out_dir <<"q_"<<icount;
 				ifstream ifso(ssq.str().c_str());
@@ -521,7 +521,7 @@ void Chi0_hilbert::Chi()
 				{
 					WARNING_QUIT("chi0_hilbert", "Can't find the overlap_q file!");
 				}
-				ifso >> tmp; //cout << tmp << endl;
+				ifso >> tmp; //std::cout << tmp << std::endl;
 				for(int ig=0; ig<dim; ig++)
 				{
 					for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
@@ -531,7 +531,7 @@ void Chi0_hilbert::Chi()
 							for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 							{
 								ifso >> overlap[iw1][iw2][ig][ir];
-								//cout<<"overlap["<<iw1<<"]["<<iw2<<"]["<<ig<<"]["<<ir<<"] = "<<overlap[iw1][iw2][ig][ir] <<endl;
+								//std::cout<<"overlap["<<iw1<<"]["<<iw2<<"]["<<ig<<"]["<<ir<<"] = "<<overlap[iw1][iw2][ig][ir] <<std::endl;
 							}
 						}
 					}
@@ -542,19 +542,19 @@ void Chi0_hilbert::Chi()
 				start = time(NULL);
 				Cal_Chi0s(iq);  // calculate chi0s
 				end = time(NULL);
-				cout<<"chi0s time:: "<<end-start<<" s"<<endl;
+				std::cout<<"chi0s time:: "<<end-start<<" s"<<std::endl;
 				
 				time_t start1,end1;
 				start1 = time(NULL);
 				Cal_T();
 				end1 = time(NULL);
-				cout<<"T time:: "<<end1-start1<<" s"<<endl;
+				std::cout<<"T time:: "<<end1-start1<<" s"<<std::endl;
 				
 				time_t start2,end2;
 				start2 = time(NULL);
 				Cal_Chi0();   // calculate  chi0
 				end2 = time(NULL);
-				cout<<"chi0 time:: "<<end2-start2<<" s"<<endl;
+				std::cout<<"chi0 time:: "<<end2-start2<<" s"<<std::endl;
 				
 				if(out_chi0)
 				{
@@ -562,7 +562,7 @@ void Chi0_hilbert::Chi()
 				}
 				for(int i=0; i<nomega; i++)
 				{
-					cout <<"iq = "<<iq<<" chi0["<<i<<"] = "<<chi0[0][i].real()<<"  "<<chi0[0][i].imag()<<endl;
+					std::cout <<"iq = "<<iq<<" chi0["<<i<<"] = "<<chi0[0][i].real()<<"  "<<chi0[0][i].imag()<<std::endl;
 				}
 				
 				Cal_kernel(iq);
@@ -571,7 +571,7 @@ void Chi0_hilbert::Chi()
 				start3 = time(NULL);
 				Cal_Chi(iq);  // calculate chi
 				end3 = time(NULL);
-				cout<<"chi time:: "<<end3-start3<<" s"<<endl;
+				std::cout<<"chi time:: "<<end3-start3<<" s"<<std::endl;
 				
 				icount++;
 			}
@@ -633,19 +633,19 @@ void Chi0_hilbert::Chi()
 			start = time(NULL);
 			Cal_Chi0s(iq);
 			end = time(NULL);
-			cout<<"chi0s time:: "<<end-start<<" s"<<endl;
+			std::cout<<"chi0s time:: "<<end-start<<" s"<<std::endl;
 			
 			time_t start1, end1;
 			start1 = time(NULL);
 			Cal_T();
 			end1 = time(NULL);
-			cout<<"T time:: "<<end1-start1<<" s"<<endl;
+			std::cout<<"T time:: "<<end1-start1<<" s"<<std::endl;
 			
 			time_t start2, end2;
 			start2 = time(NULL);
 			Cal_Chi0();
 			end2 = time(NULL);
-			cout<<"chi time:: "<<end2-start2<<" s"<<endl;
+			std::cout<<"chi time:: "<<end2-start2<<" s"<<std::endl;
 			
 			if(out_chi0)
 			{
@@ -653,7 +653,7 @@ void Chi0_hilbert::Chi()
 			}
 			for(int i=0; i<nomega; i++)
 			{
-				cout <<"iq = "<<iq<<" chi0["<<i<<"] = "<<chi0[0][i].real()<<"  "<<chi0[0][i].imag()<<endl;
+				std::cout <<"iq = "<<iq<<" chi0["<<i<<"] = "<<chi0[0][i].real()<<"  "<<chi0[0][i].imag()<<std::endl;
 			}
 			
 			Cal_kernel_2D(iq);
@@ -662,7 +662,7 @@ void Chi0_hilbert::Chi()
 			start3 = time(NULL);
 			Cal_Chi_surface(iq);
 			end3 = time(NULL);
-			cout<<"chi time:: "<<end3-start3<<" s"<<endl;
+			std::cout<<"chi time:: "<<end3-start3<<" s"<<std::endl;
 		}
 	}
 	else
@@ -678,14 +678,14 @@ void Chi0_hilbert::Chi()
 void Chi0_hilbert::Init()
 {
 	TITLE("Chi0_hilbert","Init");
-	//cout << "nbands(init) = " <<GlobalV::NBANDS <<endl;
-	//cout << "oband = " <<oband <<endl;
-	//cout << "nrxx = "<<GlobalC::pw.nrxx<<endl;
-	//cout << "ngmc = " << GlobalC::pw.ngmc <<endl;
-	//cout << "GlobalC::kv.ngk[0] = "<<GlobalC::kv.ngk[0]<<endl;
-	//cout << "dim = "<<dim<<endl;
-	//cout << "GlobalC::kv.nks = " <<GlobalC::kv.nks <<endl;
-	//cout << "GlobalC::kv.nmp = " << GlobalC::kv.nmp[0]<<"  "<<GlobalC::kv.nmp[1]<<"  "<<GlobalC::kv.nmp[2]<<endl;
+	//std::cout << "nbands(init) = " <<GlobalV::NBANDS <<std::endl;
+	//std::cout << "oband = " <<oband <<std::endl;
+	//std::cout << "nrxx = "<<GlobalC::pw.nrxx<<std::endl;
+	//std::cout << "ngmc = " << GlobalC::pw.ngmc <<std::endl;
+	//std::cout << "GlobalC::kv.ngk[0] = "<<GlobalC::kv.ngk[0]<<std::endl;
+	//std::cout << "dim = "<<dim<<std::endl;
+	//std::cout << "GlobalC::kv.nks = " <<GlobalC::kv.nks <<std::endl;
+	//std::cout << "GlobalC::kv.nmp = " << GlobalC::kv.nmp[0]<<"  "<<GlobalC::kv.nmp[1]<<"  "<<GlobalC::kv.nmp[2]<<std::endl;
 	
 	b_core = new complex<double>[GlobalC::pw.ngmc];  
 	
@@ -717,9 +717,9 @@ void Chi0_hilbert::Init()
 			psi_r2[ib] = new complex<double>[GlobalC::pw.nrxx];
 		}
 	}
-	//cout << "psi1 OK" <<endl;
-	//cout << "psi2 OK" <<endl;
-	cout << "psi OK" <<endl;
+	//std::cout << "psi1 OK" <<std::endl;
+	//std::cout << "psi2 OK" <<std::endl;
+	std::cout << "psi OK" <<std::endl;
 	
 	b = new complex<double>**[dim];
 	for(int g0=0; g0<dim; g0++)
@@ -730,44 +730,44 @@ void Chi0_hilbert::Init()
 			b[g0][ib] = new complex<double>[GlobalV::NBANDS];
 		}
 	}
-	cout << "b OK" <<endl;
+	std::cout << "b OK" <<std::endl;
 	
 	chi0s = new complex<double>*[dim*dim];       // calculate the chi0s (imagniary part of chi0)
 	for(int g0=0; g0<dim*dim; g0++)
 	{
 		chi0s[g0] = new complex<double>[nomega];
 	}
-	cout << "chi0s OK" <<endl;
+	std::cout << "chi0s OK" <<std::endl;
 	
 	chi0 = new complex<double>*[dim*dim];
 	for(int g0=0; g0<dim*dim; g0++)
 	{
 		chi0[g0] = new complex<double>[nomega];
 	}
-	cout << "chi0 OK" <<endl;
+	std::cout << "chi0 OK" <<std::endl;
 	
 	chi0_gg = new complex<double>*[dim];       // split the nomega of chi0
 	for(int g0=0; g0<dim; g0++)
 	{
 		chi0_gg[g0] = new complex<double> [dim];
 	}
-	cout << "chi0_gg OK" <<endl;
+	std::cout << "chi0_gg OK" <<std::endl;
 	
 	T = new complex<double>*[nomega];              // tranaslation  matrix
 	for(int i=0; i<nomega; i++)
 	{
 		T[i] = new complex<double>[nomega];
 	}
-	cout << "T OK" <<endl;
+	std::cout << "T OK" <<std::endl;
 		
 	rpa = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
 		rpa[g0] = new complex<double> [dim];
 	}
-	cout << "rpa OK" <<endl;
+	std::cout << "rpa OK" <<std::endl;
 	
-	cout <<"system = "<<system<<endl;
+	std::cout <<"system = "<<system<<std::endl;
 	if(system == "surface")
 	{
 		chi0_para = new complex<double>*[dim_para];
@@ -775,28 +775,28 @@ void Chi0_hilbert::Init()
 		{
 			chi0_para[g0] = new complex<double> [dim_para];
 		}
-		cout << "chi0_para OK" <<endl;
+		std::cout << "chi0_para OK" <<std::endl;
 		
 		kernel = new complex<double>*[dim_para];
 		for(int g0=0; g0<dim_para; g0++)
 		{
 			kernel[g0] = new complex<double> [dim_para];
 		}
-		cout << "kernel OK" <<endl;
+		std::cout << "kernel OK" <<std::endl;
 
 		rpa1 = new complex<double>*[dim_para];
 		for(int g0=0; g0<dim_para; g0++)
 		{
 			rpa1[g0] = new complex<double> [dim_para];
 		}
-		cout << "rpa1 OK" <<endl;
+		std::cout << "rpa1 OK" <<std::endl;
 		
 		chi_para = new complex<double>*[dim_para];
 		for(int g0=0; g0<dim_para; g0++)
 		{
 			chi_para[g0] = new complex<double> [dim_para];
 		}
-		cout << "chi_para" <<endl;
+		std::cout << "chi_para" <<std::endl;
 	}
 	else
 	{
@@ -805,16 +805,16 @@ void Chi0_hilbert::Init()
 		{
 			kernel[g0] = new complex<double> [dim];
 		}
-		cout << "kernel OK" <<endl;
+		std::cout << "kernel OK" <<std::endl;
 		
 		chi = new complex<double>*[dim];
 		for(int g0=0; g0<dim; g0++)
 		{
 			chi[g0] = new complex<double> [dim];
 		}
-		cout << "chi OK" <<endl;
+		std::cout << "chi OK" <<std::endl;
 	}
-	cout << "ALL OK"<<endl;
+	std::cout << "ALL OK"<<std::endl;
 	
 	return;	
 }
@@ -949,7 +949,7 @@ void Chi0_hilbert::Delete()
 		delete[] all_gcar;
 		delete[] flag;
 		
-		cout <<"delete OK"<<endl;		
+		std::cout <<"delete OK"<<std::endl;		
 	}
 	
 	return;
@@ -1036,7 +1036,7 @@ void Chi0_hilbert::Parallel_G()
 	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		all_gcar[i].x = Gvec[3*i]; all_gcar[i].y = Gvec[3*i+1]; all_gcar[i].z = Gvec[3*i+2];
-		//cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
+		//std::cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
 	}
 	
 	return;
@@ -1130,7 +1130,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 	double arg;
 	Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
-	//cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<endl;
+	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	
 	for(int ig=0; ig<dim; ig++)
 	{
@@ -1154,7 +1154,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 				arg = qk * Rcar[iw1][iw2][ir] * TWO_PI;
 				phase[iw1][iw2][ir] = complex<double>( cos(arg),  sin(arg) );
 				MR++;
-				//cout << "phase["<<iw1<<"]["<<iw2<<"]["<<ir<<"] = "<<phase[iw1][iw2][ir]<<endl;
+				//std::cout << "phase["<<iw1<<"]["<<iw2<<"]["<<ir<<"] = "<<phase[iw1][iw2][ir]<<std::endl;
 			}
 		}
 	}
@@ -1257,7 +1257,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	TITLE("Chi0_hilbert","Cal_b");
 	Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
-	//cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<endl;
+	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
 	Vector3<double> q = GlobalC::kv.kvec_d[iq];
 	complex<double> exp_tmp;
@@ -1359,11 +1359,11 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 
         Vector3<double> qk;
         qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
-        //cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<endl;
+        //std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 
         double phase_x, phase_xy, phase_xyz;
         Vector3<double> q = GlobalC::kv.kvec_d[iq];
-        cout <<"q_in = "<<q.x<<" "<<q.y<<" "<<q.z<<endl;
+        std::cout <<"q_in = "<<q.x<<" "<<q.y<<" "<<q.z<<std::endl;
         complex<double> exp_tmp;
         Cal_Psi1(ik);
         Cal_Psi2(iqk);
@@ -1650,7 +1650,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	}
 	else if(GlobalV::NSPIN == 4)
 	{
-		cout<<"NSPIN = "<<GlobalV::NSPIN<<endl;
+		std::cout<<"NSPIN = "<<GlobalV::NSPIN<<std::endl;
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
 			int iqk = Cal_iq(ik, iq, GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2]);
@@ -1664,10 +1664,10 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 				{
 					Cal_b_lcao(iq, ik, iqk);
 				}
-				cout<<"ik = "<<ik<<" ispin = "<<ispin<<endl;
+				std::cout<<"ik = "<<ik<<" ispin = "<<ispin<<std::endl;
 				for(int g=0; g<dim; g++)
 				{
-					cout<<"b["<<g<<"][2][3]"<<" "<<b[g][2][3]<<endl;
+					std::cout<<"b["<<g<<"][2][3]"<<" "<<b[g][2][3]<<std::endl;
 				}	
 
 				for(int ib1=0; ib1<oband; ib1++)	
@@ -1827,7 +1827,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		}
 		
 		Cal_Rpa(iq);
-		//cout <<"rpa ok"<<endl;
+		//std::cout <<"rpa ok"<<std::endl;
 		
 		for(int g0=0; g0<dim; g0++)
 		{
@@ -1846,21 +1846,21 @@ void Chi0_hilbert::Cal_Chi(int iq)
 				chi[g0][g1] = complex<double>( rpa[g0][g1].real(), rpa[g0][g1].imag());
 			}
 		}
-		cout <<"iq = "<<iq<< " epsilon["<<i<<"] = "<<chi[0][0].real()<<"  "<<chi[0][0].imag() <<endl;*/
+		std::cout <<"iq = "<<iq<< " epsilon["<<i<<"] = "<<chi[0][0].real()<<"  "<<chi[0][0].imag() <<std::endl;*/
 		
 		CMatrixMul(dim, dim, dim, chi0_gg, rpa, chi);
-		//cout <<"chi ok"<<endl;
+		//std::cout <<"chi ok"<<std::endl;
 		
 		gather_chi[i] = chi[0][0];
 		
-		cout <<"iq = "<<iq<< " chi["<<i<<"] = "<<chi[0][0].real()<<"  "<<chi[0][0].imag() <<endl;
-		//cout << "coulomb_cutoff = " << coulomb_cutoff << endl;
+		std::cout <<"iq = "<<iq<< " chi["<<i<<"] = "<<chi[0][0].real()<<"  "<<chi[0][0].imag() <<std::endl;
+		//std::cout << "coulomb_cutoff = " << coulomb_cutoff << std::endl;
 		//---------------------------------------------------------------------
 		// -Im{epsilon^-1} = -4pi/|q|^2 * Im{chi}
 		//---------------------------------------------------------------------
 		if(!coulomb_cutoff)
 		{
-			cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q*chi[0][0].real()<<"  "<<8*PI/q/q*chi[0][0].imag()<<endl;
+			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q*chi[0][0].real()<<"  "<<8*PI/q/q*chi[0][0].imag()<<std::endl;
 		}
 		else
 		{
@@ -1869,7 +1869,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 			//---------------------------------------------------------------------
 			double factor;
 			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
-			cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q * factor * chi[0][0].real()<<"  "<<8*PI/q/q * factor * chi[0][0].imag()<<endl; 
+			std::cout <<"iq = "<<iq<<" epsilon["<<i<<"] = "<<8*PI/q/q * factor * chi[0][0].real()<<"  "<<8*PI/q/q * factor * chi[0][0].imag()<<std::endl; 
 		}
 		
 		//--------------------------------------------------------------------
@@ -1877,8 +1877,8 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		//--------------------------------------------------------------------
 		//complex<double> M;
 		//M = 1.0/(8*PI/q/q*chi[0][0]);
-		//cout <<"iq = "<<iq<<" epsMreal["<<i<<"] = "<<M.real()<<endl;
-		//cout <<"iq = "<<iq<<" epsMimag["<<i<<"] = "<<M.imag()<<endl; 
+		//std::cout <<"iq = "<<iq<<" epsMreal["<<i<<"] = "<<M.real()<<std::endl;
+		//std::cout <<"iq = "<<iq<<" epsMimag["<<i<<"] = "<<M.imag()<<std::endl; 
 	}
 	
 	if(out_chi)
@@ -1888,7 +1888,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		ofstream ofschi(sschi.str().c_str());
 		for(int i=0;i<nomega;i++)
 		{
-			ofschi << i * domega <<"   "<<gather_chi[i].real()<<"   "<<gather_chi[i].imag() <<endl;
+			ofschi << i * domega <<"   "<<gather_chi[i].real()<<"   "<<gather_chi[i].imag() <<std::endl;
 		}
 		ofschi.close();
 	}
@@ -1898,12 +1898,12 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		stringstream sseps;
 		sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
 		ofstream ofseps(sseps.str().c_str());
-		ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<endl;
+		ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<std::endl;
 		if(!coulomb_cutoff)
 		{
 			for(int i=0;i<nomega;i++)
 			{
-				ofseps << i * domega <<"   "<<-8*PI/q/q*gather_chi[i].imag()<<endl;
+				ofseps << i * domega <<"   "<<-8*PI/q/q*gather_chi[i].imag()<<std::endl;
 			}
 		}
 		else
@@ -1912,7 +1912,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 			factor = 1.0 - exp(-q * (GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0)/2.0);
 			for(int i=0;i<nomega;i++)
 			{
-				ofseps << i * domega <<"   "<<-8*PI/q/q*factor*gather_chi[i].imag()<<endl;
+				ofseps << i * domega <<"   "<<-8*PI/q/q*factor*gather_chi[i].imag()<<std::endl;
 			}			
 		}
 		ofseps.close();
@@ -1936,12 +1936,12 @@ void Chi0_hilbert::Cal_Chi_surface(int iq)
 		}
 		
 		chi0_para_g();
-		cout <<"iq = "<<iq<< " chi0_para["<<i<<"] = "<<chi0_para[0][0].real()<<"  "<<chi0_para[0][0].imag() <<endl;
+		std::cout <<"iq = "<<iq<< " chi0_para["<<i<<"] = "<<chi0_para[0][0].real()<<"  "<<chi0_para[0][0].imag() <<std::endl;
 		Cal_Rpa1();
-		cout <<"iq = "<<iq<< " epsilon["<<i<<"] = "<<rpa1[0][0].real()<<"  "<<rpa1[0][0].imag() <<endl;
+		std::cout <<"iq = "<<iq<< " epsilon["<<i<<"] = "<<rpa1[0][0].real()<<"  "<<rpa1[0][0].imag() <<std::endl;
 		
 		//g = Cal_g(iq);
-		//cout<<"iq = "<<iq<<" g["<<i<<"] = "<<g.real()<<"  "<<g.imag()<<endl;
+		//std::cout<<"iq = "<<iq<<" g["<<i<<"] = "<<g.real()<<"  "<<g.imag()<<std::endl;
 	}
 	
 	return;
@@ -2033,7 +2033,7 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 		{
 			int nz = int(fabs(all_gcar[g0].z * GlobalC::ucell.latvec.e33) + 0.5 );
 			sign = (nz%2==0)?1.0:-1.0;
-			//cout <<"g0= "<<g0<<" nz= "<<nz<<"  sign= "<<sign<<endl;
+			//std::cout <<"g0= "<<g0<<" nz= "<<nz<<"  sign= "<<sign<<std::endl;
 			for(int g1=0; g1<dim; g1++)
 			{
 				if(g0 != g1)
@@ -2079,9 +2079,9 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 	
 	for(int g0=0;g0<dim*dim;g0++)
 	{
-		cout << a[g0]<<"  ";
+		std::cout << a[g0]<<"  ";
 	}
-	cout <<endl;
+	std::cout <<std::endl;
 
 	char jobvl = 'V';
 	char jobvr = 'V';
@@ -2099,12 +2099,12 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 
 	zgeev_(&jobvl, &jobvr, &N, a, &lda, w, vl , &ldvl , vr, &ldvr, work, &lwork, rwork, &info);
 
-	cout <<"eigen  ";
+	std::cout <<"eigen  ";
 	for(int g0=0;g0<dim;g0++)
 	{
-		cout<<w[g0].real()<<"   "<<w[g0].imag()<<"   ";
+		std::cout<<w[g0].real()<<"   "<<w[g0].imag()<<"   ";
 	}
-	cout<<endl;*/
+	std::cout<<std::endl;*/
 	
 	//-------------------------------------------------------------
 	// inverse the (I -vx)
@@ -2161,7 +2161,7 @@ int Chi0_hilbert::Cinv(int n, complex<double>** a)
 		{
 			delete[] is;
 			delete[] js;
-			cout << "error not inv" << endl;
+			std::cout << "error not inv" << std::endl;
 			return(0);
 		}
 		
@@ -2330,13 +2330,13 @@ int Chi0_hilbert::parallel_g()
 	}
 	
 	int dim1 = num;
-	//cout << "dim1 = "<<dim1<<endl;
+	//std::cout << "dim1 = "<<dim1<<std::endl;
 	for(int i=0;i<dim;i++)
 	{
-		cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
-		cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<endl;
-		cout <<"flag1["<<i<<"] = "<<flag1[i]<<endl;
-		cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<endl;  
+		std::cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
+		std::cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<std::endl;
+		std::cout <<"flag1["<<i<<"] = "<<flag1[i]<<std::endl;
+		std::cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<std::endl;  
 	}
 	
 	return dim1;
@@ -2483,16 +2483,16 @@ complex<double> Chi0_hilbert:: Cal_g(int iq)
              }
          }
           
-         cout<<"a in "<<endl;
+         std::cout<<"a in "<<std::endl;
          for(int i=0; i<n; i++)
          {
              for(int j=0; j<n; j++)
              {
                  int index = i * n + j;
-                 //cout <<M[i][j]<<" ";
-                 cout<<M[index]<<" ";
+                 //std::cout <<M[i][j]<<" ";
+                 std::cout<<M[index]<<" ";
              }
-             cout <<endl;
+             std::cout <<std::endl;
          }
    
          int dim = n;
@@ -2509,16 +2509,16 @@ complex<double> Chi0_hilbert:: Cal_g(int iq)
          zgetri_(&dim, M, &lda, &ipiv, N, &dim, &info);  
 
 
-         cout<<"a out "<<endl;
+         std::cout<<"a out "<<std::endl;
          for(int i=0; i<n; i++)
          {
              for(int j=0; j<n; j++)
              {
                  int index = i * n + j;
-                 //cout <<N[i][j]<<" ";
-                 cout <<M[index]<<" ";
+                 //std::cout <<N[i][j]<<" ";
+                 std::cout <<M[index]<<" ";
              }
-             cout <<endl;
+             std::cout <<std::endl;
          }
 
          for(int i=0; i<n; i++)
@@ -2547,7 +2547,7 @@ void Chi0_hilbert::plot_chi0(int iq)
 	ofstream ofs(ss.str().c_str());
 	for(int i=0;i<nomega;i++)
 	{
-		ofs <<i*domega<<"    "<<chi0[0][i].real()<<"    "<<chi0[0][i].imag()<<endl;
+		ofs <<i*domega<<"    "<<chi0[0][i].real()<<"    "<<chi0[0][i].imag()<<std::endl;
 	}
 	ofs.close();
 	

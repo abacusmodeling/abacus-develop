@@ -71,7 +71,7 @@ LCAO_Descriptor::~LCAO_Descriptor()
 void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
 {
     TITLE("LCAO_Descriptor", "init");
-    GlobalV::ofs_running << " Initialize the descriptor index for deepks (lcao line)" << endl;
+    GlobalV::ofs_running << " Initialize the descriptor index for deepks (lcao line)" << std::endl;
 
     assert(lm >= 0);
     assert(nm >= 0);
@@ -80,8 +80,8 @@ void LCAO_Descriptor::init(int lm, int nm, int tot_inl)
     this->lmaxd = lm;
     this->nmaxd = nm;
     this->inlmax = tot_inl;
-    GlobalV::ofs_running << " lmax of descriptor = " << this->lmaxd << endl;
-    GlobalV::ofs_running << " nmax of descriptor= " << nmaxd << endl;
+    GlobalV::ofs_running << " lmax of descriptor = " << this->lmaxd << std::endl;
+    GlobalV::ofs_running << " nmax of descriptor= " << nmaxd << std::endl;
 
     //init S_mu_alpha**
     this->S_mu_alpha = new double* [this->inlmax];    //inl
@@ -162,7 +162,7 @@ void LCAO_Descriptor::init_index(void)
             this->nmaxd); 
 
         GlobalV::ofs_running << "Type " << it + 1
-                    << " number_of_atoms " << GlobalC::ucell.atoms[it].na << endl;
+                    << " number_of_atoms " << GlobalC::ucell.atoms[it].na << std::endl;
 
         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
@@ -185,8 +185,8 @@ void LCAO_Descriptor::init_index(void)
     }//end it
     assert(this->n_descriptor == alpha);
     assert(GlobalC::ucell.nat * GlobalC::ORB.Alpha[0].getTotal_nchi() == inl);
-    GlobalV::ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
-    GlobalV::ofs_running << "total_descriptors " << this->n_descriptor << endl;
+    GlobalV::ofs_running << "descriptors_per_atom " << this->des_per_atom << std::endl;
+    GlobalV::ofs_running << "total_descriptors " << this->n_descriptor << std::endl;
 	
 	return;
 }
@@ -383,7 +383,7 @@ void LCAO_Descriptor::cal_descriptor(void)
     d = new double[this->n_descriptor];
 
     //==========print preparation=============
-    GlobalV::ofs_running << " print out each DM_inl" << endl;
+    GlobalV::ofs_running << " print out each DM_inl" << std::endl;
     ofstream ofs;
     stringstream ss;
     ss << winput::spillage_outdir << "/"
@@ -401,7 +401,7 @@ void LCAO_Descriptor::cal_descriptor(void)
         {
             ofs << GlobalC::ucell.atoms[it].label << " atom_index " 
 			<< ia + 1 << " n_descriptor " 
-			<< this->des_per_atom << endl;
+			<< this->des_per_atom << std::endl;
 
             for (int l = 0; l <= lmax; l++)
             {
@@ -424,7 +424,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 
                     this->print_projected_DM(ofs, des, it, ia, l, n);
 
-                    //GlobalV::ofs_running << "dimension of des is " << 2 * l + 1 << endl;
+                    //GlobalV::ofs_running << "dimension of des is " << 2 * l + 1 << std::endl;
                     if (l == 0)
                     {
                         this->d[id] = des(0, 0).real();
@@ -473,14 +473,14 @@ void LCAO_Descriptor::print_projected_DM(
 	const int& l, 
 	const int& n)
 {
-    ofs << "L=" << l << "   N=" << n << endl;
+    ofs << "L=" << l << "   N=" << n << std::endl;
     for (int i = 0; i < 2 * l + 1; i++)
     {
         for (int j = 0; j < 2 * l + 1; j++)
         {
             ofs << des(i, j).real() << " ";
         }
-        ofs << endl;
+        ofs << std::endl;
     }
     return;
 }
@@ -502,7 +502,7 @@ void LCAO_Descriptor::print_descriptor(void)
         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
             ofs << GlobalC::ucell.atoms[it].label << " atom_index " 
-			<< ia + 1 << " n_descriptor " << this->des_per_atom << endl;
+			<< ia + 1 << " n_descriptor " << this->des_per_atom << std::endl;
 
             int id0 = this->alpha_index[it](ia, 0, 0, 0);
 
@@ -510,14 +510,14 @@ void LCAO_Descriptor::print_descriptor(void)
             {
                 if ((id - id0) > 0 && (id - id0) % 8 == 0)
 				{
-                    ofs << endl;
+                    ofs << std::endl;
 				}
                 ofs << d[id] << " ";
             }
-            ofs << endl << endl;
+            ofs << std::endl << std::endl;
         }
     }
-    GlobalV::ofs_running << "descriptors are printed" << endl;
+    GlobalV::ofs_running << "descriptors are printed" << std::endl;
 
     return;
 }
@@ -697,7 +697,7 @@ void LCAO_Descriptor::cal_v_delta(const string& model_file)
     }
     delete[] tmp_v1;
     delete[] tmp_v2;
-    GlobalV::ofs_running << "finish calculating H_V_delta" << endl;
+    GlobalV::ofs_running << "finish calculating H_V_delta" << std::endl;
     return;
 }
 
@@ -826,27 +826,27 @@ void LCAO_Descriptor::print_H_V_delta()
     {
         ofs.open(ss.str().c_str());
     }
-    ofs << "E_delta(Ry) from deepks model: " << this->E_delta << endl;
-    ofs << "E_delta(eV) from deepks model: " << this->E_delta * Hartree_to_eV << endl;
-    ofs << "H_delta(Hartree)(gamma only)) from deepks model: " << endl;
+    ofs << "E_delta(Ry) from deepks model: " << this->E_delta << std::endl;
+    ofs << "E_delta(eV) from deepks model: " << this->E_delta * Hartree_to_eV << std::endl;
+    ofs << "H_delta(Hartree)(gamma only)) from deepks model: " << std::endl;
     for (int i = 0;i < GlobalV::NLOCAL;++i)
     {
         for (int j = 0;j < GlobalV::NLOCAL;++j)
         {
             ofs<< setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] << " ";
         }
-        ofs << endl;
+        ofs << std::endl;
     }
-    ofs << "H_delta(eV)(gamma only)) from deepks model: " << endl;
+    ofs << "H_delta(eV)(gamma only)) from deepks model: " << std::endl;
     for (int i = 0;i < GlobalV::NLOCAL;++i)
     {
         for (int j = 0;j < GlobalV::NLOCAL;++j)
         {
             ofs<< setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *Hartree_to_eV<< " ";
         }
-        ofs << endl;
+        ofs << std::endl;
     }
-    GlobalV::ofs_running << "H_delta is printed" << endl;
+    GlobalV::ofs_running << "H_delta is printed" << std::endl;
     return;
 }
 
@@ -862,8 +862,8 @@ void LCAO_Descriptor::print_F_delta()
     {
         ofs.open(ss.str().c_str());
     }
-    ofs << "F_delta(Hatree/Bohr) from deepks model: " << endl;
-    ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << endl;
+    ofs << "F_delta(Hatree/Bohr) from deepks model: " << std::endl;
+    ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << std::endl;
     for (int it = 0;it < GlobalC::ucell.ntype;++it)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;++ia)
@@ -871,11 +871,11 @@ void LCAO_Descriptor::print_F_delta()
             int iat = GlobalC::ucell.itia2iat(it, ia);
             ofs << setw(12) << GlobalC::ucell.atoms[it].label << setw(12) << ia
                 << setw(15) << this->F_delta(iat, 0) / 2 << setw(15) << this->F_delta(iat, 1) / 2
-                << setw(15) << this->F_delta(iat, 2) / 2 << endl;
+                << setw(15) << this->F_delta(iat, 2) / 2 << std::endl;
         }
     }
-    ofs << "F_delta(eV/Angstrom) from deepks model: " << endl;
-    ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << endl;
+    ofs << "F_delta(eV/Angstrom) from deepks model: " << std::endl;
+    ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << std::endl;
     for (int it = 0;it < GlobalC::ucell.ntype;++it)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;++ia)
@@ -884,10 +884,10 @@ void LCAO_Descriptor::print_F_delta()
             ofs << setw(12) << GlobalC::ucell.atoms[it].label << setw(12)
                 << ia << setw(15) << this->F_delta(iat, 0) * Ry_to_eV/BOHR_TO_A
                 << setw(15) << this->F_delta(iat, 1) * Ry_to_eV/BOHR_TO_A
-                << setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << endl;
+                << setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << std::endl;
         }
     }
-    GlobalV::ofs_running << "F_delta is printed" << endl;
+    GlobalV::ofs_running << "F_delta is printed" << std::endl;
     return;
 }
 

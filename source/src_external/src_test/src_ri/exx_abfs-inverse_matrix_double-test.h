@@ -17,10 +17,10 @@ int inverse_matrix_double_test()
 	I.output(mI);
 	
 	ofstream ofs("m_mI.dat");
-	ofs<<m*mI<<endl;
+	ofs<<m*mI<<std::endl;
 	ofs.close();
 	ofs.open("mI_m.dat");
-	ofs<<mI*m<<endl;
+	ofs<<mI*m<<std::endl;
 	ofs.close();
 }
 

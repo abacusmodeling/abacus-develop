@@ -19,8 +19,8 @@ void PolyInt::Polynomial_Interpolation
     const int iq = static_cast<int>(position);
 	if(iq>=table_length-4)
 	{
-		cout << "\n x = " << x;
-		cout << "\n iq = " << iq << " table_length = " << table_length << endl;
+		std::cout << "\n x = " << x;
+		std::cout << "\n iq = " << iq << " table_length = " << table_length << std::endl;
 	}	
     assert(iq < table_length-4);
 
@@ -55,11 +55,11 @@ double PolyInt::Polynomial_Interpolation
     
 	if(iq>table_length-4)
 	{
-		cout << "\n x = " << x;
-		cout << "\n table_interval = " << table_interval;
-		cout << "\n iq=" << iq << " table_length = " << table_length << endl;
-        cout << "\n Not enough space allocated for radial FFT: try restarting with a larger cell_factor" << endl; //LiuXh add 20180619
-        //cout << "\n Now cell_factor is: " << GlobalC::ppcell.cell_factor << endl; //LiuXh add 20180619
+		std::cout << "\n x = " << x;
+		std::cout << "\n table_interval = " << table_interval;
+		std::cout << "\n iq=" << iq << " table_length = " << table_length << std::endl;
+        std::cout << "\n Not enough space allocated for radial FFT: try restarting with a larger cell_factor" << std::endl; //LiuXh add 20180619
+        //std::cout << "\n Now cell_factor is: " << GlobalC::ppcell.cell_factor << std::endl; //LiuXh add 20180619
 		// mohan comment out 2021-05-06
 	}
 
@@ -96,9 +96,9 @@ double PolyInt::Polynomial_Interpolation            // pengfei Li 2018-3-23
     
 	if(iq>table_length-4)
 	{
-		cout << "\n x = " << x;
-		cout << "\n table_interval = " << table_interval;
-		cout << "\n iq=" << iq << " table_length = " << table_length << endl;
+		std::cout << "\n x = " << x;
+		std::cout << "\n table_interval = " << table_interval;
+		std::cout << "\n iq=" << iq << " table_length = " << table_length << std::endl;
 	}
 	assert(iq < table_length-4);
     const double x0 = position - static_cast<double>(iq);
@@ -127,7 +127,7 @@ double PolyInt::Polynomial_Interpolation
     const double position = x / table_interval;
     const int iq = static_cast<int>(position);
 //	if(iq >= table_length-4)
-//		cout << "\n iq = " << iq << " table_length = " << table_length;
+//		std::cout << "\n iq = " << iq << " table_length = " << table_length;
   
    assert(iq < table_length-4);
     const double x0 = position - static_cast<double>(iq);

@@ -137,7 +137,7 @@ void Stochastic_Iter::checkemm(int &iter)
 
     if(change)
 	{
-		cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<endl;
+		std::cout<<"New Emax "<<Stochastic_hchi:: Emax<<" ; new Emin "<<Stochastic_hchi:: Emin<<std::endl;
 	}
 
     Stochastic_hchi:: Emin = Emin;
@@ -154,7 +154,7 @@ void Stochastic_Iter::itermu(int &iter)
     {
         dmu = 2;
         th_ne = 0.1 * GlobalV::DRHO2 * GlobalC::CHR.nelec;
-        cout<<"th_ne "<<th_ne<<endl;
+        std::cout<<"th_ne "<<th_ne<<std::endl;
     }
     else
     {
@@ -177,7 +177,7 @@ void Stochastic_Iter::itermu(int &iter)
     /*for(mu = -5; mu<5;mu+=0.2)
     {
         ne3 = calne();
-        cout<<"mu: "<<mu<<" ; ne: "<<ne3<<endl;
+        std::cout<<"mu: "<<mu<<" ; ne: "<<ne3<<std::endl;
     }
     exit(0);*/
     while(ne1 > targetne)
@@ -187,7 +187,7 @@ void Stochastic_Iter::itermu(int &iter)
         mu1 -= dmu;
         mu = mu1;
         ne1 = calne();
-        cout<<"Reset mu1 from "<<mu1+dmu<<" to "<<mu1<<endl;
+        std::cout<<"Reset mu1 from "<<mu1+dmu<<" to "<<mu1<<std::endl;
         dmu *= 2;
     }
     while(ne2 < targetne)
@@ -197,7 +197,7 @@ void Stochastic_Iter::itermu(int &iter)
         mu2 += dmu;
         mu = mu2;
         ne2 = calne();
-        cout<<"Reset mu2 form "<<mu2-dmu<<" to "<<mu2<<endl;
+        std::cout<<"Reset mu2 form "<<mu2-dmu<<" to "<<mu2<<std::endl;
         dmu *= 2;
     }
     int count = 0;
@@ -217,16 +217,16 @@ void Stochastic_Iter::itermu(int &iter)
             mu2 = mu3;
         }
         Dne = abs(targetne - ne3);
-        //cout<<setw(20)<<"targetne"<<setw(20)<<"ne"<<setw(20)<<"mu"<<setw(20)<<"Dne"<<endl;
-        //cout<<setw(20)<<targetne<<setw(20)<<ne3<<setw(20)<<mu3<<setw(20)<<Dne<<endl;
+        //std::cout<<setw(20)<<"targetne"<<setw(20)<<"ne"<<setw(20)<<"mu"<<setw(20)<<"Dne"<<std::endl;
+        //std::cout<<setw(20)<<targetne<<setw(20)<<ne3<<setw(20)<<mu3<<setw(20)<<Dne<<std::endl;
         count++;
         if(count > 60)
         {
-            cout<<"Fermi energy cannot be converged. Set THNE to "<<th_ne<<endl;
+            std::cout<<"Fermi energy cannot be converged. Set THNE to "<<th_ne<<std::endl;
             th_ne *= 1e4;
         }
     }
-    cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<endl;
+    std::cout<<"Converge fermi energy = "<<mu<<" Ry in "<<count<<" steps."<<std::endl;
 
     GlobalC::en.ef = mu = mu0 = mu3;
     
@@ -299,10 +299,10 @@ double Stochastic_Iter::calne()
         //for(int ior = 0; ior < norder; ++ior)
         //{
         //    stok_ne += stoche.coef[ior] * spolyv[ior];
-        //    //cout<<stoche.coef[ior]<<" "; 
+        //    //std::cout<<stoche.coef[ior]<<" "; 
         //}
-        //cout<<endl;
-        //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
+        //std::cout<<std::endl;
+        //std::cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<std::endl;
         if(GlobalV::NBANDS > 0)
         {
             double *en=GlobalC::wf.ekb[ikk];
@@ -344,8 +344,8 @@ void Stochastic_Iter::sum_stoband()
         //{
         //    stok_demet += stoche.coef[ior] * spolyv[ior];
         //}
-        //cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<endl;
-        //cout<<endl;
+        //std::cout<<"last term "<<stoche.coef[norder-1] * spolyv[norder-1]<<std::endl;
+        //std::cout<<std::endl;
         if(GlobalV::NBANDS > 0)
         {
             double *enb=GlobalC::wf.ekb[ikk];
@@ -485,8 +485,8 @@ void Stochastic_Iter::sum_stoband()
     GlobalC::en.demet += stodemet;
     GlobalC::en.demet *= Occupy::gaussian_parameter;
 
-    cout.precision(12);
-    cout<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<endl;
+    std::cout.precision(12);
+    std::cout<<"Renormalize rho from ne = "<<sto_ne+KS_ne<<" to targetne = "<<targetne<<std::endl;
 
 
     double factor;
@@ -629,13 +629,13 @@ double Stochastic_Iter:: nfdlnfd(double e)
     Stochastic_hchi:: Emax = this -> Emax;
     complex<double> *out = new complex<double> [GlobalC::pw.nrxx];
     complex<double> *in2 = new complex<double> [GlobalC::pw.nrxx];
-    cout<<"------------------------------------"<<endl;
+    std::cout<<"------------------------------------"<<std::endl;
     complex<double> cij,cji;
     double dc;
     for(int i = 0 ; i < 300 ; ++i)
     {
         if( i % 10  == 0)
-            cout<<"We are testing "<<i+1 <<" rows..."<<endl;
+            std::cout<<"We are testing "<<i+1 <<" rows..."<<std::endl;
         for(int j = i+1; j < 300 ; ++j)
         {
             in2[j] = 1;
@@ -649,12 +649,12 @@ double Stochastic_Iter:: nfdlnfd(double e)
             dc = abs(conj(cij)-cji);
             if(dc > 1e-6)
             {
-                cout<<"(i,j) = ("<<i+1<<" , "<<j+1<<") ; cij = "<<cij<<" ; cji = "<<cji<<endl;
+                std::cout<<"(i,j) = ("<<i+1<<" , "<<j+1<<") ; cij = "<<cij<<" ; cji = "<<cji<<std::endl;
             }
 
         }
     }
-    cout<<"------------------------------------"<<endl;
+    std::cout<<"------------------------------------"<<std::endl;
     delete[] out;
     delete[] in2;*/
     //---------------------------------------------------
@@ -677,17 +677,17 @@ double Stochastic_Iter:: nfdlnfd(double e)
     for(int i = 0; i<GlobalC::wf.npw;++i)
     {
         if(i % 100 == 0)
-            cout<<kswf[i]<<" "<<chig1[i]<<" "<<chig2[i]<<endl;
+            std::cout<<kswf[i]<<" "<<chig1[i]<<" "<<chig2[i]<<std::endl;
     }
     MPI_Barrier(MPI_COMM_WORLD);
     if(GlobalV::MY_RANK==1)
     for(int i = 0; i<GlobalC::wf.npw;++i)
     {
-        cout.clear();
+        std::cout.clear();
         if(i % 100 == 0)
-            cout<<kswf[i]<<" "<<chig1[i]<<" "<<chig2[i]<<endl;
+            std::cout<<kswf[i]<<" "<<chig1[i]<<" "<<chig2[i]<<std::endl;
     }
-    cout<<endl;*/
+    std::cout<<std::endl;*/
     //---------------------------------------------------
 
      //-------------------------------------------------------
@@ -717,9 +717,9 @@ double Stochastic_Iter:: nfdlnfd(double e)
     for(int i = 0; i<GlobalC::wf.npw;++i)
     {
         if(i % 100 == 0)
-        cout<<kswf[i]<<" "<<in[GRA_index[i]]<<" "<<chig1[i]<<" "<<chig2[i]<<endl;
+        std::cout<<kswf[i]<<" "<<in[GRA_index[i]]<<" "<<chig1[i]<<" "<<chig2[i]<<std::endl;
     }
-    cout<<endl;*/
+    std::cout<<std::endl;*/
     //---------------------------------------------------
     
     //---------------------------------------------------
@@ -760,7 +760,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
         }
 
 
-        cout<<"BAND "<<ib+1<<" "<<energy/norm1<<"  "<<energy2/norm2<<endl;
+        std::cout<<"BAND "<<ib+1<<" "<<energy/norm1<<"  "<<energy2/norm2<<std::endl;
     }
     delete []chigout;
     delete []wave;
@@ -797,7 +797,7 @@ double Stochastic_Iter:: nfdlnfd(double e)
             ne += real(conj(wave[ir]) * waveout[ir]);
             norm1 += norm(wave[ir]);
         }
-        cout<<"Ne of Band "<<ib+1<<" is "<<ne/norm1 * GlobalC::kv.wk[0]<<endl;
+        std::cout<<"Ne of Band "<<ib+1<<" is "<<ne/norm1 * GlobalC::kv.wk[0]<<std::endl;
     }
     delete []wave;
     delete []waveout;*/
@@ -816,17 +816,17 @@ double Stochastic_Iter:: nfdlnfd(double e)
     complex<double> *sum = new complex<double> [nchip * nchip];
 	zgemm_(&transC, &transN, &nchip, &nchip, &npw, &ONE, GlobalC::sto_wf.chi0[0].c, &npw, wave, &npw, &ZERO, sum, &nchip);
 	Parallel_Reduce::reduce_complex_double_pool(sum, nchip * nchip);
-	if(GlobalV::MY_RANK!=0) cout.clear();
+	if(GlobalV::MY_RANK!=0) std::cout.clear();
     double abs2 = 0;
     for(int i=0;i<nchip * nchip;++i)
     {
         if(i%nchip==int(i%nchip)) continue;
         abs2+=norm(sum[i]);
     }
-	cout<<abs2/nchip<<endl;
+	std::cout<<abs2/nchip<<std::endl;
     delete [] sum;
     delete [] wave;
-	if(GlobalV::MY_RANK!=0) cout.setstate(ios::failbit);*/
+	if(GlobalV::MY_RANK!=0) std::cout.setstate(ios::failbit);*/
 	//-------------------------------------------------------------
 
     

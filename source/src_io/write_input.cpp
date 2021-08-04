@@ -12,10 +12,10 @@ void Input::Print(const string &fn)const
 	//----------------------------------
 	// output the information in INPUT.
 	//----------------------------------
-    ofs << "INPUT_PARAMETERS" << endl;
+    ofs << "INPUT_PARAMETERS" << std::endl;
 	ofs << setiosflags(ios::left);
 	
-	ofs << "#Parameters (1.General)" << endl;
+	ofs << "#Parameters (1.General)" << std::endl;
 	OUTP(ofs,"suffix",suffix,"the name of main output directory");
 	OUTP(ofs,"latname",latname,"the name of lattice name");
 	OUTP(ofs,"atom_file",GlobalV::global_atom_card,"the filename of file containing atom positions");
@@ -38,7 +38,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nelec",nelec,"input number of electrons");
 	OUTP(ofs,"tot_magnetization",tot_magnetization,"total magnetization of the system");
 
-	ofs << "\n#Parameters (2.PW)" << endl;
+	ofs << "\n#Parameters (2.PW)" << std::endl;
 	OUTP(ofs,"ecutwfc",ecutwfc,"#energy cutoff for wave functions");
 	if(ks_solver=="cg")
 	{
@@ -67,7 +67,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"nz",nz,"number of points along z axis for FFT grid");	
 	OUTP(ofs,"cell_factor",cell_factor,"used in the construction of the pseudopotential tables");	
 	
-	ofs << "\n#Parameters (3.Relaxation)" << endl;
+	ofs << "\n#Parameters (3.Relaxation)" << std::endl;
 	OUTP(ofs,"ks_solver",GlobalV::KS_SOLVER,"cg; dav; lapack; genelpa; hpseps; scalapack_gvx");
 	OUTP(ofs,"niter",niter,"#number of electron iterations");
 	OUTP(ofs,"force_set",force_set,"output the force_set or not"); 
@@ -96,7 +96,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"out_descriptor",out_descriptor,">0 compute descriptor for deepks");
 	OUTP(ofs,"lmax_descriptor",lmax_descriptor,">0 lmax used in descriptor for deepks");
 
-	ofs << "\n#Parameters (4.LCAO)" << endl;
+	ofs << "\n#Parameters (4.LCAO)" << std::endl;
 	OUTP(ofs,"basis_type",basis_type,"PW; LCAO in pw; LCAO");
 	OUTP(ofs,"new_dm",new_dm,"Type of density matrix; 0: old 1: new");
 	if(ks_solver=="HPSEPS" || ks_solver=="genelpa" || ks_solver=="scalapack_gvx")
@@ -117,31 +117,31 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"by",by,"division of an element grid in FFT grid along y");
 	OUTP(ofs,"bz",bz,"division of an element grid in FFT grid along z");
 
-	ofs << "\n#Parameters (5.Smearing)" << endl;
+	ofs << "\n#Parameters (5.Smearing)" << std::endl;
 	OUTP(ofs,"smearing",smearing,"type of smearing: gauss; fd; fixed; mp; mp2; mv");
 	OUTP(ofs,"sigma",degauss,"energy range for smearing");
 	
-	ofs << "\n#Parameters (6.Charge Mixing)" << endl;
+	ofs << "\n#Parameters (6.Charge Mixing)" << std::endl;
 	OUTP(ofs,"mixing_type",mixing_mode,"plain; kerker; pulay; pulay-kerker; broyden");
 	OUTP(ofs,"mixing_beta",mixing_beta,"mixing parameter: 0 means no new charge");
 	OUTP(ofs,"mixing_ndim",mixing_ndim,"mixing dimension in pulay");
 	OUTP(ofs,"mixing_gg0",mixing_gg0,"mixing parameter in kerker");
 
-	ofs << "\n#Parameters (7.DOS)" << endl;
+	ofs << "\n#Parameters (7.DOS)" << std::endl;
 	OUTP(ofs,"dos_emin_ev",dos_emin_ev,"minimal range for dos");
 	OUTP(ofs,"dos_emax_ev",dos_emax_ev,"maximal range for dos");
 	OUTP(ofs,"dos_edelta_ev",dos_edelta_ev,"delta energy for dos");
 	OUTP(ofs,"dos_scale",dos_scale,"scale dos range by");
 	OUTP(ofs,"dos_sigma",b_coef,"gauss b coefficeinet(default=0.07)");
 
-	ofs << "\n#Parameters (8.Technique)" << endl;
+	ofs << "\n#Parameters (8.Technique)" << std::endl;
 	OUTP(ofs,"gamma_only",gamma_only,"gamma only, only used in LCAO basis");
 	OUTP(ofs,"diago_proc",GlobalV::DIAGO_PROC,"number of proc used to diago");
 	OUTP(ofs,"npool",npool,"number of pools for k points, pw only");
 	OUTP(ofs,"mem_saver",mem_saver,"memory saver for many k points used");
 	OUTP(ofs,"printe",printe,"print band energy for selectively ionic steps");
 
-	ofs << "\n#Parameters (9.SIAO)" << endl;
+	ofs << "\n#Parameters (9.SIAO)" << std::endl;
 	OUTP(ofs,"selinv_npole",selinv_npole,"number of selected poles");
 	OUTP(ofs,"selinv_temp",selinv_temp,"temperature for Fermi-Dirac distribution");
 	OUTP(ofs,"selinv_gap",selinv_gap,"supposed gap in the calculation");
@@ -150,7 +150,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"selinv_threshold",selinv_threshold,"threshold for calculated electron number");
 	OUTP(ofs,"selinv_niter",selinv_niter,"max number of steps to update mu");
 
-	ofs << "\n#Parameters (10.Molecular dynamics)" << endl;
+	ofs << "\n#Parameters (10.Molecular dynamics)" << std::endl;
 	OUTP(ofs,"md_mdtype",mdp.mdtype,"choose ensemble");
 	//OUTP(ofs,"md_potential",mdp.md_potential,"choose potential for md");
 	OUTP(ofs,"md_dt",mdp.dt,"time step");
@@ -167,7 +167,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"NVT_tau",mdp.NVT_tau,"parameter for adjust effect of thermostat");
 	OUTP(ofs,"NVT_control",mdp.NVT_control,"choose which thermostat used in NVT ensemble");
 
-	ofs << "\n#Parameters (11.Efield)" << endl;
+	ofs << "\n#Parameters (11.Efield)" << std::endl;
 	OUTP(ofs,"efield",efield,"add electric field");
 	OUTP(ofs,"edir",edir,"add electric field");
 	OUTP(ofs,"emaxpos",emaxpos,"maximal position of efield [0,1)");
@@ -175,7 +175,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"eamp",eamp,"amplitute of the efield, unit is a.u.");
 	OUTP(ofs,"eamp_v",eamp*51.44,"amplitute of the efield, unit is V/A");
 
-	ofs << "\n#Parameters (12.Test)" << endl;
+	ofs << "\n#Parameters (12.Test)" << std::endl;
 	OUTP(ofs,"out_alllog",out_alllog,"output information for each processor, when parallel");
 	OUTP(ofs,"nurse", nurse,"for coders");
 	OUTP(ofs,"colour", colour,"for coders, make their live colourful");
@@ -185,12 +185,12 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"test_force", test_force, "test the force");
 	OUTP(ofs,"test_stress", test_stress, "test the force");
 	
-	ofs << "\n#Parameters (13.Other Methods)" << endl;
+	ofs << "\n#Parameters (13.Other Methods)" << std::endl;
 	OUTP(ofs,"mlwf_flag",mlwf_flag,"turn MLWF on or off");
 	OUTP(ofs,"opt_epsilon2",opt_epsilon2,"calculate the dielectic function");
 	OUTP(ofs,"opt_nbands",opt_nbands,"number of bands for optical calculation");
 	
-	ofs << "\n#Parameters (14.VdW Correction)" << endl;								
+	ofs << "\n#Parameters (14.VdW Correction)" << std::endl;								
 	OUTP(ofs,"vdw_method",vdw_method,"the method of calculating vdw (none ; d2 ; d3_0 ; d3_bj");
 	OUTP(ofs,"vdw_s6",vdw_s6,"scale parameter of d2/d3_0/d3_bj");
     OUTP(ofs,"vdw_s8",vdw_s8,"scale parameter of d3_0/d3_bj");
@@ -209,10 +209,10 @@ void Input::Print(const string &fn)const
     OUTP(ofs,"vdw_cn_thr_unit",vdw_cn_thr_unit,"unit of cn_thr, Bohr or Angstrom");
 	ofs << setw(20) << "vdw_period" << vdw_period.x 
 			<< " " << vdw_period.y << " " 
-			<< vdw_period.z<< " #periods of periodic structure" << endl;
+			<< vdw_period.z<< " #periods of periodic structure" << std::endl;
 	
 	
-	ofs << "\n#Parameters (15.spectrum)" << endl;              // pengfei Li add 2016-11-23
+	ofs << "\n#Parameters (15.spectrum)" << std::endl;              // pengfei Li add 2016-11-23
 	OUTP(ofs,"spectral_type",spectral_type,"the type of the calculated spectrum");
 	OUTP(ofs,"spectral_method",spectral_method,"0: tddft(linear response)");
 	OUTP(ofs,"kernel_type",kernel_type,"the kernel type: rpa, tdlda ...");
@@ -225,8 +225,8 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"ecut_chi",ecut_chi,"the dimension of chi matrix");
 	ofs << setw(20) <<"q_start"<<q_start[0]<<"   "
 		<<q_start[1]<<"   "<<q_start[2]
-		<<"  #the position of the first q point in direct coordinate" <<endl;
-	ofs << setw(20) <<"q_direction"<<q_direct[0]<<"   "<<q_direct[1]<<"   "<<q_direct[2]<<"  #the q direction" <<endl;
+		<<"  #the position of the first q point in direct coordinate" <<std::endl;
+	ofs << setw(20) <<"q_direction"<<q_direct[0]<<"   "<<q_direct[1]<<"   "<<q_direct[2]<<"  #the q direction" <<std::endl;
 	OUTP(ofs,"nq",nq,"the total number of qpoints for calculation");
 	OUTP(ofs,"out_epsilon",out_epsilon,"output epsilon or not");
 	OUTP(ofs,"out_chi",out_chi,"output chi or not");
@@ -236,18 +236,18 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"kmesh_interpolation",kmesh_interpolation,"calculting <i,0|j,R>");
 	for(int i=0; i<nq; i++)
 	{
-		ofs << setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << endl;
+		ofs << setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << std::endl;
 	}
 	OUTP(ofs,"ocp",GlobalV::ocp,"change occupation or not");
 	OUTP(ofs,"ocp_set",GlobalV::ocp_set,"set occupation");
 	//OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
 	// for(int i=0; i<ocp_n; i++)
 	// {
-		// ofs << setw(20) <<"ocp_kb" << GlobalV::ocp_kb[i]<< endl;
+		// ofs << setw(20) <<"ocp_kb" << GlobalV::ocp_kb[i]<< std::endl;
 	// }
 	ofs << setw(20) <<"lcao_box"<<lcao_box[0]
 		<<"   "<<lcao_box[1]<<"   "
-		<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<endl;
+		<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<std::endl;
 	OUTP(ofs," mulliken", GlobalV::mulliken," mulliken  charge or not");//qifeng add 2019/9/10
 	
 	//OUTP(ofs,"epsilon0",epsilon0,"calculate the macroscopic dielectric constant or not");
@@ -260,7 +260,7 @@ void Input::Print(const string &fn)const
 	
 	//OUTP(ofs,"epsilon0_choice",epsilon0_choice,"0: vasp's method  1: pwscf's method");
 	
-	ofs << "\n#Parameters (17.exx)" << endl;
+	ofs << "\n#Parameters (17.exx)" << std::endl;
 	OUTP(ofs,"exx_hybrid_type",exx_hybrid_type,"no, hf, pbe0, hse or opt_orb");
 	OUTP(ofs,"exx_hybrid_alpha",exx_hybrid_alpha,"");
 	OUTP(ofs,"exx_hse_omega",exx_hse_omega,"");
@@ -280,7 +280,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"exx_opt_orb_ecut",exx_opt_orb_ecut,"");
 	OUTP(ofs,"exx_opt_orb_tolerence",exx_opt_orb_tolerence,"");
 
-	ofs << "\n#Parameters (17.tddft)" << endl;
+	ofs << "\n#Parameters (17.tddft)" << std::endl;
 	OUTP(ofs,"tddft",tddft,"calculate tddft or not");
 	OUTP(ofs,"td_dr2",td_dr2,"threshold for electronic iteration of tddft");
 	OUTP(ofs,"td_dt",td_dt,"time of ion step");
@@ -296,7 +296,7 @@ void Input::Print(const string &fn)const
 	OUTP(ofs,"td_dipoleout",td_dipoleout,"output dipole or not");
 
 	
-	ofs << "\n#Parameters (18.berry_wannier)" << endl;
+	ofs << "\n#Parameters (18.berry_wannier)" << std::endl;
 	OUTP(ofs,"berry_phase",berry_phase,"calculate berry phase or not");
 	OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice vector");
 	OUTP(ofs,"towannier90",towannier90,"use wannier90 code interface or not");

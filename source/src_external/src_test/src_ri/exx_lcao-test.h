@@ -61,7 +61,7 @@ static void ofs_matrixes( const string & file_name, const map<T1,T2> &ms, const 
 	{
 			ofs<<fixed;
 			const auto precision_old = ofs.precision(15);
-		ofs<<"@\t"<<m.first<<endl;
+		ofs<<"@\t"<<m.first<<std::endl;
 			ofs.precision(precision_old);
 			ofs.unsetf(ostream::floatfield);
 		ofs_matrixes( file_name, m.second, flag_print_content );		
@@ -76,7 +76,7 @@ static void ofs_matrixes( const string & file_name, const vector<T> &ms, const b
 	{
 			ofs<<fixed;
 			const auto precision_old = ofs.precision(15);
-		ofs<<"@\t"<<i<<endl;
+		ofs<<"@\t"<<i<<std::endl;
 			ofs.precision(precision_old);
 			ofs.unsetf(ostream::floatfield);
 		ofs_matrixes( file_name, ms[i], flag_print_content );		
@@ -88,7 +88,7 @@ static void ofs_matrixes( const string & file_name, const weak_ptr<T> & ms, cons
 {
 	ofstream ofs(file_name,ofstream::app);
 	if(flag_print_content)
-		ofs<<*ms.lock()<<endl;
+		ofs<<*ms.lock()<<std::endl;
 	ofs.close();
 }
 template<typename T>
@@ -96,21 +96,21 @@ static void ofs_matrixes( const string & file_name, const shared_ptr<T> & ms, co
 {
 	ofstream ofs(file_name,ofstream::app);
 	if(flag_print_content)
-		ofs<<*ms<<endl;
+		ofs<<*ms<<std::endl;
 	ofs.close();
 }
 static void ofs_matrixes( const string & file_name, const matrix & ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	if(flag_print_content)
-		ofs<<ms<<endl;	
+		ofs<<ms<<std::endl;	
 	ofs.close();
 }
 static void ofs_matrixes( const string & file_name, const ComplexMatrix & ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	if(flag_print_content)
-		ofs<<ms<<endl;	
+		ofs<<ms<<std::endl;	
 	ofs.close();
 }
 
@@ -130,11 +130,11 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,w
 				const auto i3 = m3.first;
 					ofs<<fixed;
 					const auto precision_old = ofs.precision(15);
-				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<endl;
+				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
 					ofs.unsetf(ostream::floatfield);
 				if(flag_print_content)
-					ofs<<*m3.second.lock()<<endl;
+					ofs<<*m3.second.lock()<<std::endl;
 			}
 		}
 	}
@@ -156,11 +156,11 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,s
 				const auto i3 = m3.first;
 					ofs<<fixed;
 					const auto precision_old = ofs.precision(15);
-				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<endl;
+				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
 					ofs.unsetf(ostream::floatfield);
 				if(flag_print_content)
-					ofs<<*m3.second<<endl;
+					ofs<<*m3.second<<std::endl;
 			}
 		}
 	}
@@ -181,11 +181,11 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,vector<M
 			{
 					ofs<<fixed;
 					const auto precision_old = ofs.precision(15);
-				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<endl;
+				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
 					ofs.unsetf(ostream::floatfield);
 				if(flag_print_content)
-					ofs<<m2.second[i3]<<endl;
+					ofs<<m2.second[i3]<<std::endl;
 			}
 		}
 	}
@@ -209,11 +209,11 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,v
 				{
 						ofs<<fixed;
 						const auto precision_old = ofs.precision(15);
-					ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<"\t"<<i4<<endl;
+					ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<"\t"<<i4<<std::endl;
 						ofs.precision(precision_old);
 						ofs.unsetf(ostream::floatfield);
 					if(flag_print_content)
-						ofs<<m3.second[i4]<<endl;
+						ofs<<m3.second[i4]<<std::endl;
 				}
 			}
 		}
@@ -236,11 +236,11 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,M
 				const auto i3 = m3.first;
 					ofs<<fixed;
 					const auto precision_old = ofs.precision(15);
-				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<endl;
+				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
 					ofs.unsetf(ostream::floatfield);
 				if(flag_print_content)
-					ofs<<m3.second<<endl;
+					ofs<<m3.second<<std::endl;
 			}
 		}
 	}

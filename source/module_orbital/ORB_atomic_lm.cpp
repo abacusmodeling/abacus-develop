@@ -249,8 +249,8 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 	//--------------------------------------------------------------------------
 	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 100000.0, 100000.0, y2);
 	//double yp1=(this->psi[1]-this->psi[0])/this->r_radial[1];
-	//cout<<"psi0="<<"  "<<this->psi[0]<<"  "<<"psi1="<<"  "<<this->psi[1]<<"  "<<"r1="<<"  "<<this->r_radial[1]<<endl; 
-	//cout<<"yp1="<<"  "<<yp1<<endl;
+	//std::cout<<"psi0="<<"  "<<this->psi[0]<<"  "<<"psi1="<<"  "<<this->psi[1]<<"  "<<"r1="<<"  "<<this->r_radial[1]<<std::endl; 
+	//std::cout<<"yp1="<<"  "<<yp1<<std::endl;
 	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, yp1, 0.0, y2);
 	
 
@@ -266,18 +266,18 @@ void Numerical_Orbital_Lm::extra_uniform(const double &dr_uniform_in, const bool
 		case 3: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 100000.0, 100000.0, y2); break;
 		case 4: Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 		default: 
-			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
-			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
-			cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << endl;
-			cout << " Check file " << __FILE__ << " line " << __LINE__ <<endl;
+			//GlobalV::ofs_warning << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
+			//GlobalV::ofs_warning << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
+			std::cout << " The angular momentum larger than 4 (g orbitals) may be error about eggbox. " << std::endl;
+			std::cout << " Check file " << __FILE__ << " line " << __LINE__ <<std::endl;
 			Mathzone_Add1::SplineD2 (VECTOR_TO_PTR(r_radial), VECTOR_TO_PTR(psi), nr, 0.0, 0.0, y2); break;
 	}
 
 	//Mathzone_Add1::SplineD2 (r_radial, psi, nr, 0.0, 0.0, y2);
-	//cout<<"angular_momentum_l="<<"  "<<this->angular_momentum_l<<endl;
+	//std::cout<<"angular_momentum_l="<<"  "<<this->angular_momentum_l<<std::endl;
 	//for (int i=0; i<nr; i++)
 	//{
-	//     cout<<r_radial[i]<<"  "<<y2[i]<<endl;
+	//     std::cout<<r_radial[i]<<"  "<<y2[i]<<std::endl;
 	//}
 	//Method 1
 	//	Mathzone_Add1::Uni_Deriv_Phi (psi_uniform, nr_uniform, dr_uniform, 1, dpsi_uniform);
@@ -351,7 +351,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 		orbital_type = "L" + TO_STRING(this->angular_momentum_l);
 	}
 		
-	cout << "===========================================================" << endl;
+	std::cout << "===========================================================" << std::endl;
 	for(int i=0; i<nr_uniform; i++)
 	{
 		this->psi_uniform[i] = 
@@ -379,7 +379,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 
 		for(int i=0; i<nr_uniform; i++)
 		{
-			ofs << setw(15) << i*dr_uniform << setw(20) << psi_uniform[i] << endl;
+			ofs << setw(15) << i*dr_uniform << setw(20) << psi_uniform[i] << std::endl;
 		}
 		ofs.close();
 	}
@@ -674,7 +674,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 //	Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
 	
 	//means nothing.
-	//GlobalV::ofs_running << setw(12) << sumk << endl;
+	//GlobalV::ofs_running << setw(12) << sumk << std::endl;
 
 	delete[] f;
 	return;
@@ -742,22 +742,22 @@ void Numerical_Orbital_Lm::plot(void)const
 
 		for (int i = 0; i < this->nr; i++)
 		{
-			ofsr << this->r_radial[i] << " " << psi[i] << endl;
+			ofsr << this->r_radial[i] << " " << psi[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nk; i++)
 		{
-			ofsk << this->k_radial[i] << " " << psik[i] << endl;
+			ofsk << this->k_radial[i] << " " << psik[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nr_uniform; i++)
 		{
-			ofsru << this->dr_uniform * i << " " << psi_uniform[i] << endl;
+			ofsru << this->dr_uniform * i << " " << psi_uniform[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nr_uniform; i++)
 		{
-			ofsdru << this->dr_uniform * i << " " << dpsi_uniform[i] << endl;// output dphi/dr 2013-08-10  pengfei
+			ofsdru << this->dr_uniform * i << " " << dpsi_uniform[i] << std::endl;// output dphi/dr 2013-08-10  pengfei
 		}
 		ofsr.close();
 		ofsk.close();

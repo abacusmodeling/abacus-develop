@@ -17,7 +17,7 @@ WF_atomic::~WF_atomic()
 {
 	if(GlobalV::test_deconstructor)
 	{
-		cout << " ~WF_atomic()" << endl;
+		std::cout << " ~WF_atomic()" << std::endl;
 	}
     delete[] evc;
     delete[] wanf2;
@@ -33,7 +33,7 @@ void WF_atomic::init_at_1(void)
     if (GlobalV::test_wf) TITLE("WF_atomic","init_at_1");
     timer::tick("WF_atomic","init_at_1");
 
-	GlobalV::ofs_running << "\n Make real space PAO into reciprocal space." << endl;
+	GlobalV::ofs_running << "\n Make real space PAO into reciprocal space." << std::endl;
 
     this->print_PAOs();
 
@@ -72,11 +72,11 @@ void WF_atomic::init_at_1(void)
 		Atom* atom = &GlobalC::ucell.atoms[it];
 
 		GlobalV::ofs_running <<"\n number of pseudo atomic orbitals for "
-		<< atom->label << " is " << atom->nchi << endl;
+		<< atom->label << " is " << atom->nchi << std::endl;
 
         for (int ic=0; ic<atom->nchi ;ic++)
         {
-			//cout << "\n T=" << it << " ic=" << ic << endl;
+			//std::cout << "\n T=" << it << " ic=" << ic << std::endl;
             int nmesh;
             if(GlobalV::RENORMWITHMESH)
                 nmesh = atom->mesh;
@@ -115,7 +115,7 @@ void WF_atomic::init_at_1(void)
             Integral::Simpson_Integral(nmesh, inner_part, atom->rab, unit);
             delete[] inner_part;
 
-			GlobalV::ofs_running << ", renormalize to " << unit << endl;
+			GlobalV::ofs_running << ", renormalize to " << unit << std::endl;
 
             if (atom->oc[ic] >= 0.0)
             {
@@ -171,7 +171,7 @@ void WF_atomic::print_PAOs(void)const
 			else if (ic == 4) orbital_type = "G"; // liuyu add 2021-05-07
             else
             {
-				GlobalV::ofs_warning << "\n nchi = " << GlobalC::ucell.atoms[it].nchi << endl;
+				GlobalV::ofs_warning << "\n nchi = " << GlobalC::ucell.atoms[it].nchi << std::endl;
                 WARNING_QUIT("WF_atomic::print_PAOs", "unknown PAO type.");
             }
 
@@ -209,7 +209,7 @@ void WF_atomic::print_PAOs(void)const
 
 void WF_atomic::check_psi(const ComplexMatrix *evc)const
 {
-    cout<<"\n Check psi : \n";
+    std::cout<<"\n Check psi : \n";
 
     for (int iw=0;iw<GlobalV::NBANDS;iw++)
     {
@@ -264,7 +264,7 @@ void WF_atomic::atomic_wfc
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
-			//cout << "\n it = " << it << " ia = " << ia << endl;
+			//std::cout << "\n it = " << it << " ia = " << ia << std::endl;
             complex<double> *sk = this->get_sk(ik, it, ia);
             //-------------------------------------------------------
             // Calculate G space 3D wave functions
@@ -442,8 +442,8 @@ void WF_atomic::atomic_wfc
                             wfcatom(index, ig) = lphase * sk [ig] * ylm(lm, ig) * flq[ig];
                             // very useful for debug, don't delete this
 //							if(i==24 && index==0){
-//							cout << "\n wfcatom(" << index<<","<<i<<") = " << wfcatom(index,i);
-//							cout << "\n ylm(" << lm <<","<<i<<") = " << ylm (lm,i)
+//							std::cout << "\n wfcatom(" << index<<","<<i<<") = " << wfcatom(index,i);
+//							std::cout << "\n ylm(" << lm <<","<<i<<") = " << ylm (lm,i)
 //							    << " sk[i]=" <<sk[i] << " chiq=" << chiq (it,iw,i) ;
 //							}
                         }

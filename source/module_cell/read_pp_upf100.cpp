@@ -150,7 +150,7 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 	else
 	{
 		// A bug here!!! can't quit together.
-		cout << " pp_type=" << pp_type << endl;
+		std::cout << " pp_type=" << pp_type << std::endl;
 		WARNING_QUIT("Pseudopot_upf::read_pseudo_header","unknown pseudo type");
 	}
 
@@ -207,10 +207,10 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 		{
 			functional_error = 1;
 
-			cout << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << endl;
-			cout << " dft_functional in pseudopot file is: " << dft_tot << endl;
-			GlobalV::ofs_warning << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << endl;
-			GlobalV::ofs_warning << " dft_functional in pseudopot file is: " << dft_tot << endl;
+			std::cout << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << std::endl;
+			std::cout << " dft_functional in pseudopot file is: " << dft_tot << std::endl;
+			GlobalV::ofs_warning << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << std::endl;
+			GlobalV::ofs_warning << " dft_functional in pseudopot file is: " << dft_tot << std::endl;
 			//WARNING_QUIT("Pseudopot_upf::read_pseudo_header","input xc functional does not match that in pseudopot file");
 		}
 	}
@@ -430,7 +430,7 @@ void Pseudopot_upf::read_pseudo_so(ifstream &ifs)
              ifs >> this->els[nw] >>this->nn[nw] >> this->lchi[nw] >> this->jchi[nw] >> this->oc[nw];
              if(this->lchi[nw]-this->jchi[nw]-0.5>1e-7 && this->lchi[nw]-this->jchi[nw]-0.5<1e-7)
              {
-                  cout<<"Ignore ADDINFO section"<<endl;
+                  std::cout<<"Ignore ADDINFO section"<<std::endl;
                   this->has_so = 0;
              }
        }
@@ -440,7 +440,7 @@ void Pseudopot_upf::read_pseudo_so(ifstream &ifs)
              ifs >> this->lll[nb] >> this->jjj[nb];
              if(this->lll[nb]-this->jjj[nb]-0.5>1e-7 && this->lll[nb]-this->jjj[nb]-0.5<1e-7)
              {
-                  cout<<"Ignore ADDINFO section"<<endl;
+                  std::cout<<"Ignore ADDINFO section"<<std::endl;
                   this->has_so = 0;
              }
        }
@@ -451,30 +451,30 @@ void Pseudopot_upf::read_pseudo_so(ifstream &ifs)
 void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
 {
 	TITLE("Pseudopot_upf","print_pseudo_upf");
-	ofs << " ==== read_pseudo_upf === " << endl;
+	ofs << " ==== read_pseudo_upf === " << std::endl;
 
 	// print header
-	ofs << " has_so: " << has_so << endl;
-	ofs << " Version number : " << nv << endl;
-	ofs << " Element label : " << psd << endl;
-	ofs << " pp_type: " << pp_type << endl;
-	ofs << " tvanp: " << tvanp << endl;
-	ofs << " nlcc: " << nlcc << endl; 
-	ofs << " dft: " << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << endl;
-	ofs << " zp: " << zp << endl;
-	ofs << " etotps: " << etotps << endl;
-	ofs << " ecutwfc: " << ecutwfc << endl;
-	ofs << " ecutrho: " << ecutrho << endl;
-	ofs << " lmax: " << lmax << endl;
-	ofs << " mesh: " << mesh << endl;
-	ofs << " nwfc: " << nwfc << endl;
-	ofs << " nbeta: " << nbeta << endl;
+	ofs << " has_so: " << has_so << std::endl;
+	ofs << " Version number : " << nv << std::endl;
+	ofs << " Element label : " << psd << std::endl;
+	ofs << " pp_type: " << pp_type << std::endl;
+	ofs << " tvanp: " << tvanp << std::endl;
+	ofs << " nlcc: " << nlcc << std::endl; 
+	ofs << " dft: " << dft[0] << " " << dft[1] << " " << dft[2] << " " << dft[3] << std::endl;
+	ofs << " zp: " << zp << std::endl;
+	ofs << " etotps: " << etotps << std::endl;
+	ofs << " ecutwfc: " << ecutwfc << std::endl;
+	ofs << " ecutrho: " << ecutrho << std::endl;
+	ofs << " lmax: " << lmax << std::endl;
+	ofs << " mesh: " << mesh << std::endl;
+	ofs << " nwfc: " << nwfc << std::endl;
+	ofs << " nbeta: " << nbeta << std::endl;
 	for(int i=0; i<nwfc; ++i)
 	{
-		ofs << " iw=" << i << " els=" << els[i] << " lchi=" << lchi[i] << " oc=" << oc[i] << endl;
+		ofs << " iw=" << i << " els=" << els[i] << " lchi=" << lchi[i] << " oc=" << oc[i] << std::endl;
 	}
 
-	ofs << " End of pseudopot_upf." << endl;
+	ofs << " End of pseudopot_upf." << std::endl;
 
 	return;
 

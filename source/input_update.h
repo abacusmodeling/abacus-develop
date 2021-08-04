@@ -47,7 +47,7 @@ private:
 	template <class T>
 	static void change(ofstream &ofs, const string &name, T &v1, T &v2)
 	{
-		ofs << " " << name << " change from " << v1 << " to " << v2 << endl;
+		ofs << " " << name << " change from " << v1 << " to " << v2 << std::endl;
 	}
 
     template <class T>

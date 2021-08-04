@@ -326,19 +326,19 @@ inline void cal_meshball_DGridV(
                 // OUT(GlobalV::ofs_running,"ia2", ia2);
                 // OUT(GlobalV::ofs_running,"iw2_lo", iw2_lo);
                 // OUT(GlobalV::ofs_running,"n", n);
-                //std::cout<<"Start calculate DGridV_x"<<endl;
+                //std::cout<<"Start calculate DGridV_x"<<std::endl;
                 //OUT(GlobalV::ofs_running,"Start calculate DGridV_x");
                 dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                     &dphix[0][idx2], &LD_pool, 
                     &psir_vlbr3[0][idx1], &LD_pool,  
                     &beta, &DGridV_x[iw1_lo][iw2_lo], &lgd_now);
-                //std::cout<<"Start calculate DGridV_y"<<endl;
+                //std::cout<<"Start calculate DGridV_y"<<std::endl;
                 //OUT(GlobalV::ofs_running,"Start calculate DGridV_y");
                 dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                     &dphiy[0][idx2], &LD_pool, 
                     &psir_vlbr3[0][idx1], &LD_pool,  
                     &beta, &DGridV_y[iw1_lo][iw2_lo], &lgd_now);
-                //std::cout<<"Start calculate DGridV_z"<<endl;
+                //std::cout<<"Start calculate DGridV_z"<<std::endl;
                 //OUT(GlobalV::ofs_running,"Start calculate DGridV_z");
                 dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                     &dphiz[0][idx2], &LD_pool, 
@@ -398,13 +398,13 @@ inline void cal_meshball_DGridV(
                             &dphix[ib][idx2], &LD_pool, 
                             &psir_vlbr3[ib][idx1], &LD_pool,  
                             &beta, &DGridV_x[iw1_lo][iw2_lo], &lgd_now);
-                        //std::cout<<"Start calculate DGridV_y"<<endl;
+                        //std::cout<<"Start calculate DGridV_y"<<std::endl;
                         //OUT(GlobalV::ofs_running,"Start calculate DGridV_y");
                         dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                             &dphiy[ib][idx2], &LD_pool, 
                             &psir_vlbr3[ib][idx1], &LD_pool,  
                             &beta, &DGridV_y[iw1_lo][iw2_lo], &lgd_now);
-                        //std::cout<<"Start calculate DGridV_z"<<endl;
+                        //std::cout<<"Start calculate DGridV_z"<<std::endl;
                         //OUT(GlobalV::ofs_running,"Start calculate DGridV_z");
                         dgemm_ (&transa, &transb, &n, &m, &k, &alpha,
                             &dphiz[ib][idx2], &LD_pool, 
@@ -446,12 +446,12 @@ inline void cal_meshball_DGridV(
 							// DGridV_22[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][1];
 							// DGridV_23[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_y[iw1_lo][iw2_lo] * drr[ia2][ib][2];
 							// DGridV_33[iw1_lo*GlobalC::GridT.lgd + iw2_lo] += DGridV_z[iw1_lo][iw2_lo] * drr[ia2][ib][2];
-							//cout<<"DGridV: "<<iw1_lo<<" "<<iw2_lo
+							//std::cout<<"DGridV: "<<iw1_lo<<" "<<iw2_lo
 							//<<" "<<iw1_lo*GlobalC::GridT.lgd + iw2_lo<<" "
 							//<<DGridV_x[iw1_lo][iw2_lo]<<" "
 							//<<DGridV_y[iw1_lo][iw2_lo]<<" "
 							//<<DGridV_z[iw1_lo][iw2_lo]<<" "
-							//<<drr[ia2][0][0]<<" "<<drr[ia2][0][1]<<" "<<drr[ia2][0][2]<<endl;
+							//<<drr[ia2][0][0]<<" "<<drr[ia2][0][1]<<" "<<drr[ia2][0][2]<<std::endl;
 						}
 					}                    
                 }

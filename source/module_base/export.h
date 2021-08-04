@@ -19,7 +19,7 @@ using namespace std;
 template <class T>
 void AUTO_SET(ofstream &ofs,const string &name,const T &a)
 {
-	ofs<<" AUTO_SET "<<name<<" : "<<a << endl;
+	ofs<<" AUTO_SET "<<name<<" : "<<a << std::endl;
 	return;
 }
 
@@ -34,14 +34,14 @@ void IF_MATCH(const T &a,const T &b)
 	{
 		if(GlobalV::MY_RANK == 0)
 		{
-			cout<<"\n Can not match : "<<a<<"  "<<b<<endl;
+			std::cout<<"\n Can not match : "<<a<<"  "<<b<<std::endl;
 		}
 #ifdef __MPI
 		MPI_Finalize();
 #endif
 		exit(0);
 	}
-	//cout<<setw(12)<<a<<endl;
+	//std::cout<<setw(12)<<a<<std::endl;
 	return;
 }
 

@@ -208,11 +208,11 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
             }
             MPI_Bcast(W1,NB*loc_A.col_num,MPI_DOUBLE_COMPLEX,iarow,comm_col);
 
-			//cout << "\n Bcast done." << endl;
+			//std::cout << "\n Bcast done." << std::endl;
 			
             MPI_Bcast(W_1,NB*loc_A.col_num,MPI_DOUBLE_COMPLEX,iarow,comm_col);
 
-			//cout << "\n Bcast done." << endl;
+			//std::cout << "\n Bcast done." << std::endl;
             for (i=bt+1; i<b_n; i++)
             {
                 ia1=bt*NB;
@@ -235,7 +235,7 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                 crd[1]=iacol2;
                 MPI_Cart_rank(comm_2D,crd,&rp);
 
-				//cout << "\n MPI_Cart_rank done. " << endl;
+				//std::cout << "\n MPI_Cart_rank done. " << std::endl;
                 lda=ldb=loc_A.col_num;
                 ldc=NB;
 
@@ -265,15 +265,15 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
                     MPI_Send(C_A1,NB*NB,MPI_DOUBLE_COMPLEX,rp,tag,DIAG_HPSEPS_WORLD);
                     MPI_Send(C_B1,NB*NB,MPI_DOUBLE_COMPLEX,rp,tag,DIAG_HPSEPS_WORLD);
 
-//					GlobalV::ofs_running << "\n MPI_Send done. " << " tag = " << tag << endl;
+//					GlobalV::ofs_running << "\n MPI_Send done. " << " tag = " << tag << std::endl;
                 }
                 else if (coord[0]==iarow2&&coord[1]==iacol2)
                 {
-					//GlobalV::ofs_running << "\n MPI_Recv prepare for tag = " << tag << endl;
+					//GlobalV::ofs_running << "\n MPI_Recv prepare for tag = " << tag << std::endl;
                     MPI_Recv(C_A1,NB*NB,MPI_DOUBLE_COMPLEX,sp,tag,DIAG_HPSEPS_WORLD,&status1);
                     MPI_Recv(C_B1,NB*NB,MPI_DOUBLE_COMPLEX,sp,tag,DIAG_HPSEPS_WORLD,&status2);
 
-					//GlobalV::ofs_running << "\n MPI_Recv done. " << endl;
+					//GlobalV::ofs_running << "\n MPI_Recv done. " << std::endl;
                     for (k=0; k<bm1; k++)
                         for (j=0; j<bn1; j++)
                         {
@@ -505,11 +505,11 @@ void pzheg2st(char isuplo,MPI_Comm comm_2D,complex<double> *A,LocalMatrix loc_A,
 	MPI_Comm_free(&comm_col);
 	MPI_Comm_free(&comm_row);
 	//xiaohui add 2014-01-22, test
-	//cout<<"pzhtrsm begin"<<endl;
+	//std::cout<<"pzhtrsm begin"<<std::endl;
 
 	pzhtrsm(isuplo,b_n,comm_2D,NB,N_A,A,B,loc_A,loc_B);
 	//xiaohui add 2014-01-22,test
-	//cout<<"pzhtrsm finish"<<endl;
+	//std::cout<<"pzhtrsm finish"<<std::endl;
 
 	//xiaohui modify 2014-03-05
 	//MPI_Comm_free(&comm_col);

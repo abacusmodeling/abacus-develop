@@ -22,7 +22,7 @@ void Optical::cal_epsilon2(const int &nbands)
 	assert( GlobalC::wf.ekb!=0 );
 	assert( GlobalC::wf.evc!=0 );
 
-	cout << " begin to calculate the epsilon2." << endl;
+	std::cout << " begin to calculate the epsilon2." << std::endl;
 	
 	ofstream ofs;
 
@@ -59,13 +59,13 @@ void Optical::cal_epsilon2(const int &nbands)
 	int np = int(range / de) + 1; 
 	int n_occ = static_cast<int>( (GlobalC::CHR.nelec+1)/2 + 1.0e-8 );
 
-	cout << " n_occ = " << n_occ << endl;
-	cout << " nbands = " << opt_nbands << endl;	
-	cout << " unit is eV" << endl;
-	cout << " maxe = " << maxe << endl;
-	cout << " mine = " << mine << endl;
-	cout << " energy range = " << maxe - mine << endl;
-	cout << " de = " << de << " points = " << np << endl;
+	std::cout << " n_occ = " << n_occ << std::endl;
+	std::cout << " nbands = " << opt_nbands << std::endl;	
+	std::cout << " unit is eV" << std::endl;
+	std::cout << " maxe = " << maxe << std::endl;
+	std::cout << " mine = " << mine << std::endl;
+	std::cout << " energy range = " << maxe - mine << std::endl;
+	std::cout << " de = " << de << " points = " << np << std::endl;
 
 	OUT(GlobalV::ofs_running,"n_occ",n_occ);
 	OUT(GlobalV::ofs_running,"nbands for optical",opt_nbands);
@@ -99,11 +99,11 @@ void Optical::cal_epsilon2(const int &nbands)
 
 	if(GlobalV::MY_RANK==0)
 	{
-		ofs << np << endl;
-		ofs << GlobalC::kv.nkstot << endl;
+		ofs << np << std::endl;
+		ofs << GlobalC::kv.nkstot << std::endl;
 		for(int ie=0; ie<np; ie++)
 		{
-			ofs << ie*de << " " << epsilon2[ie] << endl;
+			ofs << ie*de << " " << epsilon2[ie] << std::endl;
 		}
 		delete[] epsilon2;
 		ofs.close();

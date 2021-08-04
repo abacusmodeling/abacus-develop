@@ -16,17 +16,17 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 	
 	auto init = [&]() -> void
 	{
-//ofs_mpi<<Nc<<endl;
+//ofs_mpi<<Nc<<std::endl;
 		const double volumn = abs(GlobalC::ucell.a1.norm()*GlobalC::ucell.a2.norm()*GlobalC::ucell.a3.norm());
-//ofs_mpi<<volumn<<endl;
+//ofs_mpi<<volumn<<std::endl;
 		const double rate = pow(Nc/volumn,1.0/3.0);
-//ofs_mpi<<rate<<endl;
-//ofs_mpi<<GlobalC::ucell.a1<<"\t"<<GlobalC::ucell.a2<<"\t"<<GlobalC::ucell.a3<<endl;
-//ofs_mpi<<GlobalC::ucell.a1.norm()<<"\t"<<GlobalC::ucell.a2.norm()<<"\t"<<GlobalC::ucell.a3.norm()<<endl;
+//ofs_mpi<<rate<<std::endl;
+//ofs_mpi<<GlobalC::ucell.a1<<"\t"<<GlobalC::ucell.a2<<"\t"<<GlobalC::ucell.a3<<std::endl;
+//ofs_mpi<<GlobalC::ucell.a1.norm()<<"\t"<<GlobalC::ucell.a2.norm()<<"\t"<<GlobalC::ucell.a3.norm()<<std::endl;
 		const int Nx = ceil(GlobalC::ucell.a1.norm()*rate);
 		const int Ny = ceil(GlobalC::ucell.a2.norm()*rate);
 		const int Nz = ceil(GlobalC::ucell.a3.norm()*rate);
-//ofs_mpi<<Nx<<"\t"<<Ny<<"\t"<<Nz<<endl;
+//ofs_mpi<<Nx<<"\t"<<Ny<<"\t"<<Nz<<std::endl;
 
 		vector<bool> flag_is_center(Nx*Ny*Nz,true);
 		for( int ic_big=Nc/2; ic_big<Nc/2+(Nx*Ny*Nz-Nc); ++ic_big )
@@ -40,7 +40,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 		
 //for( int ic_big=0; ic_big<flag_is_center.size(); ++ic_big )
 //	ofs_mpi<<flag_is_center[ic_big]<<"\t";
-//ofs_mpi<<endl;
+//ofs_mpi<<std::endl;
 		
 		Vector3<double> taud_max = {0,0,0},
 		                taud_min = {1,1,1};
@@ -58,7 +58,7 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 			(taud_max.x-taud_min.x)/Nx,
 			(taud_max.y-taud_min.y)/Ny,
 			(taud_max.z-taud_min.z)/Nz);
-//ofs_mpi<<taud_min<<"\t"<<taud_max<<"\t"<<taud_delta<<"\t"<<endl;			
+//ofs_mpi<<taud_min<<"\t"<<taud_max<<"\t"<<taud_delta<<"\t"<<std::endl;			
 		
 		for( int ix=0,ic=0,ic_big=0; ix<Nx; ++ix )
 			for( int iy=0; iy<Ny; ++iy )
@@ -95,16 +95,16 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 		}
 //for( int ic=0; ic<Nc; ++ic )
 //	ofs_mpi<<clusters[ic].tau<<"\t";
-//ofs_mpi<<endl;
+//ofs_mpi<<std::endl;
 //for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 //	ofs_mpi<<atoms[iat].center<<"\t";
-//ofs_mpi<<endl;		
+//ofs_mpi<<std::endl;		
 	};
 							
 							
 	auto update = [&]() -> bool
 	{
-//ofs_mpi<<__FILE__<<__LINE__<<endl;
+//ofs_mpi<<__FILE__<<__LINE__<<std::endl;
 		bool flag_atom_move = false;
 		for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 		{
@@ -131,10 +131,10 @@ Exx_Abfs::Parallel::Distribute::Kmeans::cluster( const int Nc )
 		
 //for( int ic=0; ic<Nc; ++ic )
 //	ofs_mpi<<clusters[ic].tau<<"\t";
-//ofs_mpi<<endl;
+//ofs_mpi<<std::endl;
 //for( int iat=0; iat<GlobalC::ucell.nat; ++iat )
 //	ofs_mpi<<atoms[iat].center<<"\t";
-//ofs_mpi<<endl;
+//ofs_mpi<<std::endl;
 
 		return flag_atom_move;	
 	};
@@ -276,9 +276,9 @@ ofstream ofs_mpi(GlobalC::exx_lcao.test_dir.process+"kmeans_"+TO_STRING(my_rank)
 	const vector<vector<size_t>> clusters_atoms = classify_atom(comm_size,atoms);
 	
 for(const auto cluster_atoms : clusters_atoms)
-	ofs_mpi<<cluster_atoms<<endl;
+	ofs_mpi<<cluster_atoms<<std::endl;
 for(const auto cluster : clusters)
-	ofs_mpi<<cluster.tau<<endl;
+	ofs_mpi<<cluster.tau<<std::endl;
 	
 	vector<pair<size_t,size_t>> rank_work;
 	for(const size_t iat1 : clusters_atoms[my_rank])
@@ -338,7 +338,7 @@ for(const auto cluster : clusters)
 		}
 	}
   
-ofs_mpi<<rank_work<<endl;
+ofs_mpi<<rank_work<<std::endl;
 ofs_mpi.close();
 	return rank_work;
 }

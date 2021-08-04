@@ -121,7 +121,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const complex<double> *residual_
 //  TITLE("Charge_Mixing","Kerker");
     timer::tick("Charge_Mixing","Kerker");
 
-//	cout << " here is Kerker" << endl;
+//	std::cout << " here is Kerker" << std::endl;
 //	this->check_ne(rho);
 //	this->check_ne(rho_save);
 
@@ -231,7 +231,7 @@ double Charge_Mixing::rhog_dot_product(
 				mag *= 2.0;
 			}
 
-			//cout << " sum=" << sum << " mag=" << mag << endl;
+			//std::cout << " sum=" << sum << " mag=" << mag << std::endl;
 			sum2 += mag;
 			sum += sum2;
 			break;

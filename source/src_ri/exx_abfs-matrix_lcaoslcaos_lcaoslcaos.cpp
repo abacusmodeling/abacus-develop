@@ -195,7 +195,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 											= co6.second.cal_overlap( tauA*GlobalC::ucell.lat0, tauB*GlobalC::ucell.lat0, MA, MA, MB, MB );
 											
 											// Peize Lin test
-//											cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<"\t"<<LA<<"\t"<<MA<<"\t"<<NA<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<"\t"<<endl; //co6.second.olm[0]<<endl;
+//											std::cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<"\t"<<LA<<"\t"<<MA<<"\t"<<NA<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<"\t"<<std::endl; //co6.second.olm[0]<<std::endl;
 										}
 									}
 								}
@@ -203,8 +203,8 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 						}
 					}
 					// Peize Lin test
-//					cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<endl;
-//					cout<<matrixes[TA][IA][TB][IB]<<endl;
+//					std::cout<<TA<<"\t"<<IA<<"\t"<<TB<<"\t"<<IB<<std::endl;
+//					std::cout<<matrixes[TA][IA][TB][IB]<<std::endl;
 				}				
 			}
 		}
@@ -221,7 +221,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<T<<endl;
+	ss<<T<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }		
 		for (int IA=0; IA!=GlobalC::ucell.atoms[T].na; ++IA)
@@ -229,7 +229,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<" "<<IA<<endl;
+	ss<<" "<<IA<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }			
 			const Vector3<double> &tauA( GlobalC::ucell.atoms[T].tau[IA] );
@@ -240,7 +240,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<"  "<<LA<<endl;
+	ss<<"  "<<LA<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }				
 				for( int MA=0; MA!=2*LA+1; ++MA)
@@ -248,7 +248,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<"   "<<MA<<endl;
+	ss<<"   "<<MA<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }					
 					for( auto &co3 : co2.second )
@@ -256,7 +256,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<"    "<<co3.first<<endl;
+	ss<<"    "<<co3.first<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }						
 						for (int IB=0; IB!=GlobalC::ucell.atoms[T].na; ++IB)
@@ -264,7 +264,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<"     "<<IB<<endl;
+	ss<<"     "<<IB<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }							
 							const Vector3<double> &tauB( GlobalC::ucell.atoms[T].tau[IB] );
@@ -275,7 +275,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<"      "<<LB<<endl;
+	ss<<"      "<<LB<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }								
 								for( int MB=0; MB!=2*LB+1; ++MB)
@@ -283,7 +283,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<"       "<<MB<<endl;
+	ss<<"       "<<MB<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }								
 									for( auto &co5 : co4.second )
@@ -291,7 +291,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslca
 // Peize Lin test 2015-04-05
 {
 	stringstream ss;
-	ss<<"        "<<co5.first<<endl;
+	ss<<"        "<<co5.first<<std::endl;
 	MPI_RANK_OFSTREAM( "Matrix_Phiphi_Phiphi::cal_overlap_matrix", ss);
 }								
 										co5.second.cal_ST_Phi12_R(tauA, tauB, MA, MA, MB, MB);

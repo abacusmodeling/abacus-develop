@@ -67,7 +67,7 @@ void Charge::allocate(const int &nspin_in, const int &nrxx_in, const int &ngmc_i
 
     if (GlobalV::test_charge > 1)
     {
-        cout << "\n spin_number = " << nspin
+        std::cout << "\n spin_number = " << nspin
              << " real_point_number = " << nrxx;
     }
 
@@ -145,7 +145,7 @@ double Charge::sum_rho(void) const
 	// sum_rho may be smaller than 1, like Na bcc.
     if (sum_rho <= 0.1)
     {
-		GlobalV::ofs_warning << " sum_rho=" << sum_rho << endl;
+		GlobalV::ofs_warning << " sum_rho=" << sum_rho << std::endl;
         WARNING_QUIT("Charge::renormalize_rho","Can't find even an electron!");
     }
 
@@ -267,7 +267,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						}
 						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[0]);
 					}
-					if (GlobalV::test_charge>0) cout<<"\n |G|=0 term done." <<endl;
+					if (GlobalV::test_charge>0) std::cout<<"\n |G|=0 term done." <<std::endl;
 					//----------------------------------------------------------
 					// Here we compute the G<>0 term
 					// But if in parallel case
@@ -294,7 +294,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 						Integral::Simpson_Integral(mesh, rho1d.data(), atom->rab, rho_lgl[ig]);
 					}
 					
-					if (GlobalV::test_charge>0) cout<<" |G|>0 term done." <<endl;
+					if (GlobalV::test_charge>0) std::cout<<" |G|>0 term done." <<std::endl;
 					//----------------------------------------------------------
 					// EXPLAIN : Complete the transfer of rho from real space to
 					// reciprocal space
@@ -340,7 +340,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 							//const double dw = 0.5 * ( 1 - atom->mag[ia] );
 							const double up = 0.5 * ( 1 + atom->mag[ia] / atom->zv );
 							const double dw = 0.5 * ( 1 - atom->mag[ia] / atom->zv );
-							//cout << " atom " << ia << " up=" << up << " dw=" << dw << endl;
+							//std::cout << " atom " << ia << " up=" << up << " dw=" << dw << std::endl;
 
 							for (int ig = 0; ig < GlobalC::pw.ngmc ; ig++)
 							{
@@ -462,18 +462,18 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
             GlobalV::ofs_warning << " Warning: negative or imaginary starting charge : " ;
             GlobalV::ofs_warning << " neg = " << neg
                  << " ima = " << ima
-                 << " SPIN = " << is << endl;
+                 << " SPIN = " << is << std::endl;
         }
 
-//		cout << " sum rho for spin " << is << " = " << sumrea << endl;
-//		cout << " sum rho for spin " << is << " = " << sumrea << endl;
+//		std::cout << " sum rho for spin " << is << " = " << sumrea << std::endl;
+//		std::cout << " sum rho for spin " << is << " = " << sumrea << std::endl;
 
     }//end is
 
 //	for(int it=0; it<GlobalC::ucell.ntype; it++)
 //	{
-		//cout << " nelup_percent = " << GlobalC::ucell.magnet.nelup_percent(it) << endl;
-		//cout << " neldw_percent = " << GlobalC::ucell.magnet.neldw_percent(it) << endl;
+		//std::cout << " nelup_percent = " << GlobalC::ucell.magnet.nelup_percent(it) << std::endl;
+		//std::cout << " neldw_percent = " << GlobalC::ucell.magnet.neldw_percent(it) << std::endl;
 //	}
 
 
@@ -482,7 +482,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	if(spin_number_need == 2) spin0 = spin_number_need;
 	for(int is=0; is<spin0; ++is)
 	{
-		GlobalV::ofs_warning << "\n SETUP ATOMIC RHO FOR SPIN " << is+1 << endl;
+		GlobalV::ofs_warning << "\n SETUP ATOMIC RHO FOR SPIN " << is+1 << std::endl;
 		OUT(GlobalV::ofs_warning,"Electron number from rho",ne[is]);
 		ne_tot += ne[is];
 	}
@@ -497,7 +497,7 @@ void Charge::atomic_rho(const int spin_number_need, double** rho_in)const		// Pe
 	// occupations.
 	// GlobalC::ucell.magnet.compute_magnetization();
 
-	//GlobalV::ofs_running << " Superposition of atomic wave function as First-Charge done." << endl;
+	//GlobalV::ofs_running << " Superposition of atomic wave function as First-Charge done." << std::endl;
 	//2014-06-22
 
     timer::tick("Charge","atomic_rho");
@@ -712,7 +712,7 @@ void Charge::sum_band_k(void)
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
-		//cout << "\n ik=" << ik;
+		//std::cout << "\n ik=" << ik;
 		if (GlobalV::NSPIN==2) GlobalV::CURRENT_SPIN = GlobalC::kv.isk[ik];
 		
 		//  here we compute the band energy: the sum of the eigenvalues
@@ -775,7 +775,7 @@ void Charge::sum_band_k(void)
 		for (int ibnd = 0;ibnd < GlobalV::NBANDS;ibnd++)
 		{
 			GlobalC::en.eband += GlobalC::wf.ekb[ik][ibnd] * GlobalC::wf.wg(ik, ibnd);
-			//cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
+			//std::cout << "\n ekb = " << GlobalC::wf.ekb[ik][ibnd] << " wg = " << GlobalC::wf.wg(ik, ibnd);
 
 			ZEROS( porter, GlobalC::pw.nrxx );
 			for (int ig = 0;ig < GlobalC::kv.ngk[ik] ; ig++)
@@ -816,7 +816,7 @@ void Charge::sum_band_k(void)
 	{
 		sum += rho1[ir];
 	}
-	cout << "\n sum=" << sum * GlobalC::ucell.omega / GlobalC::pw.nrxx << endl;
+	std::cout << "\n sum=" << sum * GlobalC::ucell.omega / GlobalC::pw.nrxx << std::endl;
 	*/
 
     return;
@@ -1017,9 +1017,9 @@ double Charge::check_ne(const double *rho_in) const
 	}
 	Parallel_Reduce::reduce_double_pool( ne );
 	ne = ne * GlobalC::ucell.omega / (double)GlobalC::pw.ncxyz;
-	cout << setprecision(10);
-	cout << " check the electrons number from rho, ne =" << ne << endl;
-	cout << setprecision(6);
+	std::cout << setprecision(10);
+	std::cout << " check the electrons number from rho, ne =" << ne << std::endl;
+	std::cout << setprecision(6);
 	return ne;
 }
 
@@ -1033,7 +1033,7 @@ void Charge::init_final_scf()
 
     if (GlobalV::test_charge > 1)
     {
-        cout << "\n spin_number = " << GlobalV::NSPIN
+        std::cout << "\n spin_number = " << GlobalV::NSPIN
              << " real_point_number = " << GlobalC::pw.nrxx;
     }
 
@@ -1086,7 +1086,7 @@ void Charge::cal_nelec(void)
 	// if nelec <>0; use input number (setup.f90)
 	//=======================================================
 
-	GlobalV::ofs_running << "\n SETUP THE ELECTRONS NUMBER" << endl;
+	GlobalV::ofs_running << "\n SETUP THE ELECTRONS NUMBER" << std::endl;
 
 	if (nelec == 0)
 	{
@@ -1118,7 +1118,7 @@ void Charge::cal_nelec(void)
 	OUT(GlobalV::ofs_running,"occupied bands",occupied_bands);
 	
 	// mohan add 2010-09-04
-    //cout << "nbands(GlobalC::ucell) = " <<GlobalV::NBANDS <<endl;
+    //std::cout << "nbands(GlobalC::ucell) = " <<GlobalV::NBANDS <<std::endl;
 	if(GlobalV::NBANDS==occupied_bands)
 	{
 		if( Occupy::gauss() || Occupy::tetra() )

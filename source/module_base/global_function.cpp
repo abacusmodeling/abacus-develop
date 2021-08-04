@@ -22,18 +22,18 @@ void NOTE(const string &words)
 	return;
 	if(GlobalV::ofs_running)
 	{
-		//GlobalV::ofs_running << " *********************************************************************************" << endl;
-		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		GlobalV::ofs_running << " " << words << endl;
-		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		//GlobalV::ofs_running << " *********************************************************************************" << std::endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		GlobalV::ofs_running << " " << words << std::endl;
+		GlobalV::ofs_running << " !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 	}
 }
 
 void NEW_PART(const string &words)
 {
-	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><" << endl;
-	GlobalV::ofs_running << "\n " << words << endl;
-	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><\n" << endl;
+	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
+	GlobalV::ofs_running << "\n " << words << std::endl;
+	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><\n" << std::endl;
 	return;
 }
 
@@ -44,7 +44,7 @@ void NEW_PART(const string &words)
 //==========================================================
 void OUT(ofstream &ofs,const string &name)
 {
-    ofs<<"\n"<<setw(18)<<name<<endl;
+    ofs<<"\n"<<setw(18)<<name<<std::endl;
     return;
 }
 
@@ -83,7 +83,7 @@ void DONE(ofstream &ofs,const string &description, const bool only_rank0)
      //       ofs << " ---------------------------------------------------------------------------------\n";
             ofs << " DONE : " << description;
             ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
-			ofs << endl << endl;
+			ofs << std::endl << std::endl;
      //       ofs << "\n ---------------------------------------------------------------------------------\n";
         }
     }
@@ -92,12 +92,12 @@ void DONE(ofstream &ofs,const string &description, const bool only_rank0)
      //   ofs << " ---------------------------------------------------------------------------------\n";
         ofs << " DONE : " << description;
         ofs << " Time : "<< timer::print_until_now() << " (SEC)" ;
-		ofs << endl << endl;
+		ofs << std::endl << std::endl;
      //   ofs << "\n ---------------------------------------------------------------------------------\n";
     }
-//   	cout << "\n---------------------------------------------------------------------------------\n";
-    cout << " DONE(" << setw(10) << timer::print_until_now() <<" SEC) : "<< description << endl;
-//   	cout << "\n---------------------------------------------------------------------------------\n";
+//   	std::cout << "\n---------------------------------------------------------------------------------\n";
+    std::cout << " DONE(" << setw(10) << timer::print_until_now() <<" SEC) : "<< description << std::endl;
+//   	std::cout << "\n---------------------------------------------------------------------------------\n";
     return;
 }
 
@@ -167,7 +167,7 @@ bool SCAN_BEGIN(ifstream &ifs, const string &TargetName, const bool restart)
     }
     if (!find)
     {
-        GlobalV::ofs_warning<<" In SCAN_BEGIN, can't find: "<<TargetName<<" block."<<endl;
+        GlobalV::ofs_warning<<" In SCAN_BEGIN, can't find: "<<TargetName<<" block."<<std::endl;
     }
     return find;
 }
@@ -179,7 +179,7 @@ void SCAN_END(ifstream &ifs, const string &TargetName)
     ifs >> SearchName;
     if ( SearchName != TargetName)
     {
-        GlobalV::ofs_warning<<" In SCAN_END, can't find: "<<TargetName<<" block."<<endl;
+        GlobalV::ofs_warning<<" In SCAN_END, can't find: "<<TargetName<<" block."<<std::endl;
     }
     return;
 }
@@ -187,10 +187,10 @@ void SCAN_END(ifstream &ifs, const string &TargetName)
 void BLOCK_HERE( const string &description)
 {
 //	return;
-	cout << "\n********************************************";
-    cout << "\n Here is a Block, 1: go on 0: quit";
-    cout << "\n " << description;
-	cout << "\n********************************************" << endl;
+	std::cout << "\n********************************************";
+    std::cout << "\n Here is a Block, 1: go on 0: quit";
+    std::cout << "\n " << description;
+	std::cout << "\n********************************************" << std::endl;
     bool go_on = false;
 	if(GlobalV::MY_RANK==0)
 	{
@@ -220,11 +220,11 @@ void OUT_TIME(const string &name, time_t &start, time_t &end)
 	if(mini>0.1)
 	{
 		GlobalV::ofs_warning << setprecision(2);
-		GlobalV::ofs_warning << " -------------------------------------------------------" << endl;
-		GlobalV::ofs_warning << " NAME < " << name << " > = " << endl;
+		GlobalV::ofs_warning << " -------------------------------------------------------" << std::endl;
+		GlobalV::ofs_warning << " NAME < " << name << " > = " << std::endl;
 		GlobalV::ofs_warning << " -> " << ctime(&start) << " -> " << ctime(&end);	
-		GlobalV::ofs_warning << " TIME = " << mini << " [Minutes]" << endl;
-		GlobalV::ofs_warning << " -------------------------------------------------------" << endl;
+		GlobalV::ofs_warning << " TIME = " << mini << " [Minutes]" << std::endl;
+		GlobalV::ofs_warning << " -------------------------------------------------------" << std::endl;
 		GlobalV::ofs_warning << setprecision(6);
 	}
 }

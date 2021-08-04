@@ -86,7 +86,7 @@ void eximport::read_data(const string &fn)
 	ifstream ifs(fn.c_str());
 	if(!ifs)
 	{
-		GlobalV::ofs_warning << " File name : " << fn << endl;
+		GlobalV::ofs_warning << " File name : " << fn << std::endl;
 		WARNING_QUIT("eximport::read_data","Can not find file.");
 	}
 
@@ -110,30 +110,30 @@ void eximport::print_data(const string &fn) const
 	TITLE("eximport","print_data");
 	ofstream ofs( fn.c_str() );
 
-	ofs << setw(20) << "basis" << setw(20) << this->basis << endl;
-	ofs << setw(20) << "latname" << setw(20) << this->latname << endl;
-	ofs << setw(20) << "calculation" << setw(20) << this->calculation << endl;
-	ofs << setw(20) << "ecutwfc" << setw(20) << this->ecutwfc << endl;
-	ofs << setw(20) << "nband" << setw(20) << this->nband << endl;
-	ofs << setw(20) << "tr2" << setw(20) << this->tr2 << endl;
-	ofs << setw(20) << "nx" << setw(20) << this->nx << endl;
-	ofs << setw(20) << "ny" << setw(20) << this->ny << endl;
-	ofs << setw(20) << "nz" << setw(20) << this->nz << endl;
-	ofs << setw(20) << "nxyz" << setw(20) << this->nxyz << endl;
-	ofs << setw(20) << "startingpot" << setw(20) << this->startingpot << endl;
-	ofs << setw(20) << "mixing_beta" << setw(20) << this->Mixing_beta << endl;
+	ofs << setw(20) << "basis" << setw(20) << this->basis << std::endl;
+	ofs << setw(20) << "latname" << setw(20) << this->latname << std::endl;
+	ofs << setw(20) << "calculation" << setw(20) << this->calculation << std::endl;
+	ofs << setw(20) << "ecutwfc" << setw(20) << this->ecutwfc << std::endl;
+	ofs << setw(20) << "nband" << setw(20) << this->nband << std::endl;
+	ofs << setw(20) << "tr2" << setw(20) << this->tr2 << std::endl;
+	ofs << setw(20) << "nx" << setw(20) << this->nx << std::endl;
+	ofs << setw(20) << "ny" << setw(20) << this->ny << std::endl;
+	ofs << setw(20) << "nz" << setw(20) << this->nz << std::endl;
+	ofs << setw(20) << "nxyz" << setw(20) << this->nxyz << std::endl;
+	ofs << setw(20) << "startingpot" << setw(20) << this->startingpot << std::endl;
+	ofs << setw(20) << "mixing_beta" << setw(20) << this->Mixing_beta << std::endl;
 
-	ofs << setw(20) << "nks" << setw(20) << this->nks << endl;
+	ofs << setw(20) << "nks" << setw(20) << this->nks << std::endl;
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{ 
-		ofs << setw(20) << "ngk[" << ik << "]" << setw(20) << ngk[ik] << endl; 
+		ofs << setw(20) << "ngk[" << ik << "]" << setw(20) << ngk[ik] << std::endl; 
 	}
 
-	ofs << setw(20) << "qtot" << setw(20) << this->qtot << endl;
-	ofs << setw(20) << "lat0" << setw(20) << this->lat0 << endl;
-	ofs << setw(20) << "ntype" << setw(20) << this->ntype << endl;
-	ofs << setw(20) << "band_energy(k-point,band)" << endl;
+	ofs << setw(20) << "qtot" << setw(20) << this->qtot << std::endl;
+	ofs << setw(20) << "lat0" << setw(20) << this->lat0 << std::endl;
+	ofs << setw(20) << "ntype" << setw(20) << this->ntype << std::endl;
+	ofs << setw(20) << "band_energy(k-point,band)" << std::endl;
 
 	for (int ik = 0;ik < this->nks;ik++)
 	{
@@ -141,19 +141,19 @@ void eximport::print_data(const string &fn) const
 		{
 			ofs << setw(10) << this->band_energy[ik][ib];
 		}
-		ofs << endl;
+		ofs << std::endl;
 	}
 
-	ofs << setw(20) << "Omega" << setw(20) << this->omega << endl;
-	ofs << setw(20) << "rho_nc" << setw(20) << this->rho_nc << endl;
-	ofs << setw(20) << "iter" << setw(20) << this->iter << endl;
-	ofs << setw(20) << "etot" << setw(20) << this->etot << endl;
-	ofs << setw(20) << "eband" << setw(20) << this->eband << endl;
-	ofs << setw(20) << "one-electron" << setw(20) << this->one_electron << endl;
-	ofs << setw(20) << "hartree" << setw(20) << this->hartree << endl;
-	ofs << setw(20) << "exchange-corr" << setw(20) << this->xc << endl;
-	ofs << setw(20) << "ewald" << setw(20) << this->ewald << endl;
-	ofs << setw(20) << "natomwfc" << setw(20) << this->natomwfc << endl;
+	ofs << setw(20) << "Omega" << setw(20) << this->omega << std::endl;
+	ofs << setw(20) << "rho_nc" << setw(20) << this->rho_nc << std::endl;
+	ofs << setw(20) << "iter" << setw(20) << this->iter << std::endl;
+	ofs << setw(20) << "etot" << setw(20) << this->etot << std::endl;
+	ofs << setw(20) << "eband" << setw(20) << this->eband << std::endl;
+	ofs << setw(20) << "one-electron" << setw(20) << this->one_electron << std::endl;
+	ofs << setw(20) << "hartree" << setw(20) << this->hartree << std::endl;
+	ofs << setw(20) << "exchange-corr" << setw(20) << this->xc << std::endl;
+	ofs << setw(20) << "ewald" << setw(20) << this->ewald << std::endl;
+	ofs << setw(20) << "natomwfc" << setw(20) << this->natomwfc << std::endl;
 
 	ofs.close();
 }
@@ -162,7 +162,7 @@ void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const string &fn)
 {
 	if(GlobalV::MY_RANK!=0)
 	{
-		cout<<"\n not the GlobalV::MY_RANK processor , return.";
+		std::cout<<"\n not the GlobalV::MY_RANK processor , return.";
 		return;
 	}
 
@@ -178,7 +178,7 @@ void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const string &fn)
     out_planewave(ofs);
 
     ofs << "\n<WAVEFUNC>";
-    ofs << "\n" << npsi << " Number of wave functions." << endl;
+    ofs << "\n" << npsi << " Number of wave functions." << std::endl;
     ofs << setprecision(6);
 
     for(int i=0; i<npsi; i++)
@@ -202,7 +202,7 @@ void eximport::fir_wf(ComplexMatrix *psi, const int npsi, const string &fn)
 
 void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string &file_name)
 {
-	//cout<<"\n ==> ei.wanG_for_fit";
+	//std::cout<<"\n ==> ei.wanG_for_fit";
 	ofstream out_gwan(file_name.c_str());
 	int qtot = 0;
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
@@ -214,7 +214,7 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string
 	}
 	int nks = GlobalC::kv.nks;
 	double factor = TWO_PI/GlobalC::ucell.lat0;
-	out_gwan << qtot << endl;
+	out_gwan << qtot << std::endl;
 	for(int ik=0;ik<nks;ik++)
 	{
 		//output wannier functions in G space.
@@ -228,7 +228,7 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string
 			<< setw(15) << g2*factor
 			<< setw(15) << g3*factor
 			<< setw(20) << psi[ik](iw,ig).real() 
-			<< setw(20) << psi[ik](iw,ig).imag() << endl;
+			<< setw(20) << psi[ik](iw,ig).imag() << std::endl;
 		}
 	}
 
@@ -238,18 +238,18 @@ void eximport::out_gspace_wan(const ComplexMatrix *psi,const int iw,const string
 
 bool eximport::sec_wf(ComplexMatrix *psi, const int wf_num, const string &fn)const
 {
-	cout<<"\n ==> ei.sec_wf()_1";
+	std::cout<<"\n ==> ei.sec_wf()_1";
 	ifstream sec(fn.c_str());
 
 	if (sec)
 	{
-		cout << "Find the file :"<<endl; 
-		cout << fn << endl;
+		std::cout << "Find the file :"<<std::endl; 
+		std::cout << fn << std::endl;
 	}
 
 	if (!sec)
 	{
-		cout << "Can't open file : " << fn << "\treturn!" << endl;
+		std::cout << "Can't open file : " << fn << "\treturn!" << std::endl;
 		return 0;
 	}
 
@@ -274,18 +274,18 @@ bool eximport::sec_wf(ComplexMatrix *psi, const int wf_num, const string &fn)con
 
 bool eximport::sec_wf(complex < double> ***psi, const int npsi, const string &fn)const
 {
-	cout<<"\n ==> ei.sec_wf()_2";
+	std::cout<<"\n ==> ei.sec_wf()_2";
 	ifstream sec(fn.c_str());
 
 	if (sec)
 	{
-		cout << "\n    Find the file :"<<endl; 
-		cout << fn << endl;
+		std::cout << "\n    Find the file :"<<std::endl; 
+		std::cout << fn << std::endl;
 	}
 
 	if (!sec)
 	{
-		cout << "Can't open file : " << fn << "\treturn!" << endl;
+		std::cout << "Can't open file : " << fn << "\treturn!" << std::endl;
 		return 0;
 	}
 
@@ -319,25 +319,25 @@ bool eximport::sec_wf(complex < double> ***psi, const int npsi, const string &fn
 //******************
 void eximport::out_wannier(ofstream &out_data)
 {
-	//cout<<"\n ==> out_wannier"<<endl;
-	out_data << setw(20) << "WANNIER" << endl; //0
-	//out_data << setw(20) << LOCAL_BASIS << endl;//1 xiaohui modify 2013-09-02
-	out_data << setw(20) << GlobalV::BASIS_TYPE << endl; //xiaohui add 2013-09-02
+	//std::cout<<"\n ==> out_wannier"<<std::endl;
+	out_data << setw(20) << "WANNIER" << std::endl; //0
+	//out_data << setw(20) << LOCAL_BASIS << std::endl;//1 xiaohui modify 2013-09-02
+	out_data << setw(20) << GlobalV::BASIS_TYPE << std::endl; //xiaohui add 2013-09-02
 	return;
 }
 
 void eximport::in_wannier(ifstream &in)
 {
-	cout<<"=== in_wannier ==="<<endl;
+	std::cout<<"=== in_wannier ==="<<std::endl;
 	in >> name;
-	//cout<<name<<endl;		//8.0
+	//std::cout<<name<<std::endl;		//8.0
 	if (name != "WANNIER")
 	{
-		cout << "== wrong in in_wannier ===" << endl;
+		std::cout << "== wrong in in_wannier ===" << std::endl;
 		exit(0);
 	}
 	in >> this->basis;	//8.1
-	//cout<<"basis="<<this->basis<<endl;
+	//std::cout<<"basis="<<this->basis<<std::endl;
 	return;
 }
 
@@ -346,37 +346,37 @@ void eximport::in_wannier(ifstream &in)
 //*************************************
 void eximport::out_unitcell(ofstream &out_data)
 {
-	//cout << "\n ==> out_unitcell" << endl;
-	out_data << setw(20) << "UNITCELL" << endl;		//2.0
-	out_data << setw(20) << GlobalC::ucell.lat0 << endl;        //2.1
+	//std::cout << "\n ==> out_unitcell" << std::endl;
+	out_data << setw(20) << "UNITCELL" << std::endl;		//2.0
+	out_data << setw(20) << GlobalC::ucell.lat0 << std::endl;        //2.1
 
 	out_data << setw(20) << GlobalC::ucell.latvec.e11 
 			 << setw(20) << GlobalC::ucell.latvec.e12 
-			 << setw(20) << GlobalC::ucell.latvec.e13 << endl;	//2.2
+			 << setw(20) << GlobalC::ucell.latvec.e13 << std::endl;	//2.2
 	out_data << setw(20) << GlobalC::ucell.latvec.e21 
 			 << setw(20) << GlobalC::ucell.latvec.e22 
-			 << setw(20) << GlobalC::ucell.latvec.e23 << endl;
+			 << setw(20) << GlobalC::ucell.latvec.e23 << std::endl;
 	out_data << setw(20) << GlobalC::ucell.latvec.e31 
 			 << setw(20) << GlobalC::ucell.latvec.e32 
-			 << setw(20) << GlobalC::ucell.latvec.e33 << endl;
+			 << setw(20) << GlobalC::ucell.latvec.e33 << std::endl;
 
-	out_data << setw(20) << GlobalC::ucell.ntype << endl;		//2.3
+	out_data << setw(20) << GlobalC::ucell.ntype << std::endl;		//2.3
 
 	for (int i = 0;i < GlobalC::ucell.ntype;i++)
 	{
 		out_data << setw(20) << GlobalC::ucell.atoms[i].na ;     //2.4
 	}
-	out_data << endl;
+	out_data << std::endl;
 	return;
 }
 
 void eximport::in_unitcell(ifstream &in)
 {
-	cout << "=== in_unitcell ===" << endl;
+	std::cout << "=== in_unitcell ===" << std::endl;
 	in >> name;
 	if (name != "UNITCELL")
 	{
-		cout << "== wrong in in_unitcell ===" << endl;
+		std::cout << "== wrong in in_unitcell ===" << std::endl;
 		exit(0);
 	}
 
@@ -413,14 +413,14 @@ void eximport::in_unitcell(ifstream &in)
 //***************
 void eximport::out_kpoints(ofstream &out_data)
 {
-	//cout << "\n ==> out_k-points" << endl;
+	//std::cout << "\n ==> out_k-points" << std::endl;
 	out_data << "\n<KPOINT>";
 	out_data << "\n" << GlobalC::kv.nkstot << " Number of total k points";      //3.1
 	int sumq = 0;
 
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		if(ik%10==0) out_data<<endl;
+		if(ik%10==0) out_data<<std::endl;
 		out_data << setw(10) << GlobalC::kv.ngk[ik];
 		sumq += GlobalC::kv.ngk[ik];
 	}
@@ -434,16 +434,16 @@ void eximport::out_kpoints(ofstream &out_data)
 	}
 
 	out_data << "\n" << sumq << " Total Number of K+G points.";//3.4
-	out_data << "\n<KPOINT>" << endl;
+	out_data << "\n<KPOINT>" << std::endl;
 	return;
 }
 
 void eximport::out_planewave(ofstream &out_data)
 {
-	//cout << "\n ==> out_planewave" << endl;
+	//std::cout << "\n ==> out_planewave" << std::endl;
 	out_data << "\n<PLANEWAVE>";
 	out_data << "\n" << GlobalC::ucell.lat0 << " Lattice constant";
-	out_data << "\n" << GlobalC::pw.ngmc_g << " Number of plane waves."<<endl;
+	out_data << "\n" << GlobalC::pw.ngmc_g << " Number of plane waves."<<std::endl;
 	for(int i=0; i<GlobalC::pw.ngmc_g; i++)
 	{
 		if(i%4==0) out_data<<"\n";
@@ -457,7 +457,7 @@ void eximport::out_planewave(ofstream &out_data)
 
 void eximport::out_igk(ofstream &out_data)
 {
-	//cout << "\n ==> out_igk" << endl;
+	//std::cout << "\n ==> out_igk" << std::endl;
 	out_data << "\n<KG_INDEX>";
 
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
@@ -474,11 +474,11 @@ void eximport::out_igk(ofstream &out_data)
 
 void eximport::in_kpoints(ifstream &in)
 {
-	cout << "=== in_kpoints ===" << endl;
+	std::cout << "=== in_kpoints ===" << std::endl;
 	in >> name;
 	if (name != "KPOINT")
 	{
-		cout << "== wrong in in_input ===" << endl;
+		std::cout << "== wrong in in_input ===" << std::endl;
 		exit(0);
 	}
 	int i;
@@ -505,18 +505,18 @@ void eximport::in_kpoints(ifstream &in)
 //*********************************
 void eximport::out_input(ofstream &out_data)
 {
-	//cout << "\n ==> out_input" << endl;
+	//std::cout << "\n ==> out_input" << std::endl;
 	out_data << "<HEADER>";			//1.0
 	out_data << "\n" << GlobalC::ucell.latName << " Lattice Name";//1.1
 
 /*
 	if (SCF)
 	{
-		out_data << setw(20) << "scf" << endl;       	//1.2
+		out_data << setw(20) << "scf" << std::endl;       	//1.2
 	}
 	else
 	{
-		out_data << setw(20) << "nscf" << endl;
+		out_data << setw(20) << "nscf" << std::endl;
 	}
 */
 
@@ -535,27 +535,27 @@ void eximport::out_input(ofstream &out_data)
 	out_data << "\n" << GlobalV::SPARSE_MATRIX << " 1 for Sparse Matrix";
 
 /*
-	out_data << setw(20) << tr2 << endl;                 //1.5
+	out_data << setw(20) << tr2 << std::endl;                 //1.5
 	out_data << setw(20) << GlobalC::pw.nx 
 			 << setw(20) << GlobalC::pw.ny 
 			 << setw(20) << GlobalC::pw.nz 
-			 << setw(20) << GlobalC::pw.nxyz << endl;//1.6
-	out_data << setw(20) << GlobalC::pot.startingpot << endl;//1.7
-	out_data << setw(20) << GlobalC::CHR.mixing_beta << endl;//1.8
+			 << setw(20) << GlobalC::pw.nxyz << std::endl;//1.6
+	out_data << setw(20) << GlobalC::pot.startingpot << std::endl;//1.7
+	out_data << setw(20) << GlobalC::CHR.mixing_beta << std::endl;//1.8
 */
-	out_data << "\n<HEADER>"<<endl;			//1.0
+	out_data << "\n<HEADER>"<<std::endl;			//1.0
 
 	return;
 }
 
 void eximport::in_input(ifstream &in)
 {
-	cout << " in_input ===" << endl;
+	std::cout << " in_input ===" << std::endl;
 	in >> name;
 
 	if (name != "INPUT")
 	{
-		cout << "== wrong in in_input ===" << endl;
+		std::cout << "== wrong in in_input ===" << std::endl;
 		exit(0);
 	}
 
@@ -566,7 +566,7 @@ void eximport::in_input(ifstream &in)
 	in >> ecut_in;//1.3
 	if(ecut_in != GlobalC::pw.ecutwfc)
 	{
-		cout<<"Charge don't match!"<<endl;
+		std::cout<<"Charge don't match!"<<std::endl;
 		exit(0);
 	}
 	this->ecutwfc = ecut_in;
@@ -583,27 +583,27 @@ void eximport::in_input(ifstream &in)
 //**********
 void eximport::out_band(ofstream &out_data)
 {
-	//cout << "\n ==> out_band" << endl;
-	out_data << setw(20) << "BAND" << endl;//6.0
+	//std::cout << "\n ==> out_band" << std::endl;
+	out_data << setw(20) << "BAND" << std::endl;//6.0
 	for (int ik = 0; ik < GlobalC::kv.nks; ik++)
 	{
 		for (int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
 			out_data << setw(10) << setprecision(6) << GlobalC::wf.ekb[ik][ib]*Ry_to_eV;//6.1
 		}
-		out_data << endl;
+		out_data << std::endl;
 	}
-	out_data << endl;
+	out_data << std::endl;
 	return;
 }
 
 void eximport::in_band(ifstream &in)
 {
-	cout << "=== in_band ===" << endl;
+	std::cout << "=== in_band ===" << std::endl;
 	in >> name;
 	if (name != "BAND")
 	{
-		cout << "== wrong in in_band ===" << endl;
+		std::cout << "== wrong in in_band ===" << std::endl;
 		exit(0);
 	}
 
@@ -628,9 +628,9 @@ void eximport::in_band(ifstream &in)
 //*****
 void eximport::out_evc(ofstream &out_data)
 {
-	//cout << "=== out_evc ===" << endl;
-	out_data << setw(20) << "EVC" << endl;
-	out_data << setw(20) << GlobalC::ucell.natomwfc << endl; //4.1
+	//std::cout << "=== out_evc ===" << std::endl;
+	out_data << setw(20) << "EVC" << std::endl;
+	out_data << setw(20) << GlobalC::ucell.natomwfc << std::endl; //4.1
 	int iw;
 	int ik;
 	int ig;
@@ -643,7 +643,7 @@ void eximport::out_evc(ofstream &out_data)
 
 			for (ig = 0;ig < npw;ig++)
 			{
-				out_data << setw(20) << GlobalC::wf.evc[ik](iw, ig).real() << setw(20) << GlobalC::wf.evc[ik](iw, ig).imag() << endl;//4.2
+				out_data << setw(20) << GlobalC::wf.evc[ik](iw, ig).real() << setw(20) << GlobalC::wf.evc[ik](iw, ig).imag() << std::endl;//4.2
 			}
 		}
 	}
@@ -651,12 +651,12 @@ void eximport::out_evc(ofstream &out_data)
 
 void eximport::in_evc(ifstream &in)
 {
-	cout << "=== in_evc ===" << endl;
+	std::cout << "=== in_evc ===" << std::endl;
 	in >> name;
 
 	if (name != "EVC")
 	{
-		cout << "== wrong in in_evc ===" << endl;
+		std::cout << "== wrong in in_evc ===" << std::endl;
 		exit(0);
 	}
 
@@ -704,15 +704,15 @@ void eximport::in_evc(ifstream &in)
 #include "../src_pw/H_XC_pw.h"
 void eximport::out_energy(ofstream &out_data)
 {
-	//cout << "\n ==> out_energy" << endl;
-	out_data << setw(20) << "ENERGY" << endl;				//6.0
-	out_data << setw(20) << GlobalC::en.etot << endl;                //6.2
-	//out_data << setw(20) << elec.dE << endl;              //6.3
-	out_data << setw(20) << GlobalC::en.eband << endl;				//6.4
-	out_data << setw(20) << GlobalC::en.eband + GlobalC::en.deband << endl;   //6.5
-	out_data << setw(20) << H_Hartree_pw::hartree_energy << endl;
-	out_data << setw(20) << H_XC_pw::etxc - GlobalC::en.etxcc << endl;     //6.7
-	out_data << setw(20) << H_Ewald_pw::ewald_energy << endl;                //6.8
+	//std::cout << "\n ==> out_energy" << std::endl;
+	out_data << setw(20) << "ENERGY" << std::endl;				//6.0
+	out_data << setw(20) << GlobalC::en.etot << std::endl;                //6.2
+	//out_data << setw(20) << elec.dE << std::endl;              //6.3
+	out_data << setw(20) << GlobalC::en.eband << std::endl;				//6.4
+	out_data << setw(20) << GlobalC::en.eband + GlobalC::en.deband << std::endl;   //6.5
+	out_data << setw(20) << H_Hartree_pw::hartree_energy << std::endl;
+	out_data << setw(20) << H_XC_pw::etxc - GlobalC::en.etxcc << std::endl;     //6.7
+	out_data << setw(20) << H_Ewald_pw::ewald_energy << std::endl;                //6.8
 }
 
 void eximport::in_energy(ifstream &in)
@@ -721,7 +721,7 @@ void eximport::in_energy(ifstream &in)
 
 	if (name != "ENERGY")
 	{
-		cout << "== wrong in in_energy ===" << endl;
+		std::cout << "== wrong in in_energy ===" << std::endl;
 		exit(0);
 	}
 	in >> iter;//6.1
@@ -736,7 +736,7 @@ void eximport::in_energy(ifstream &in)
 #ifdef __MPI
 void eximport::in_charge_mpi(const string &dir)
 {
-	cout << "\n ==> eximport::in_charge()" << endl;
+	std::cout << "\n ==> eximport::in_charge()" << std::endl;
 	double *rho_tmp = new double[GlobalC::pw.ncxyz]();
 	assert(rho_tmp!=0);
 
@@ -747,7 +747,7 @@ void eximport::in_charge_mpi(const string &dir)
 
 		if (name != "CHARGE")
 		{
-			cout << "== wrong in in_charge ===" << endl;
+			std::cout << "== wrong in in_charge ===" << std::endl;
 			exit(0);
 		}
 	
@@ -758,7 +758,7 @@ void eximport::in_charge_mpi(const string &dir)
 		in >> ncxyz;
 		if(ncxyz != GlobalC::pw.ncxyz)
 		{	
-			cout<<"\n Read in ncxzy in charge file = "<<ncxyz<<endl;
+			std::cout<<"\n Read in ncxzy in charge file = "<<ncxyz<<std::endl;
 			QUIT();
 		}
 		for (int ir = 0;ir < GlobalC::pw.ncxyz;ir++)
@@ -813,26 +813,26 @@ void eximport::in_charge_mpi(const string &dir)
 
 void eximport::out_charge_mpi(const string &dir,double* rho_in)
 {
-	//cout << "\n ==> out_charge" << endl;
-	//cout << dir << endl;
+	//std::cout << "\n ==> out_charge" << std::endl;
+	//std::cout << dir << std::endl;
 	ofstream out_data(dir.c_str());
 	if(!out_data)
 	{
-		cout<<"\n Can't write charge file!"<<endl;
+		std::cout<<"\n Can't write charge file!"<<std::endl;
 	}
-	out_data << setw(20) << "CHARGE" << endl;	//7.0
-	out_data << setw(20) << GlobalC::ucell.omega << endl;	//7.1
+	out_data << setw(20) << "CHARGE" << std::endl;	//7.0
+	out_data << setw(20) << GlobalC::ucell.omega << std::endl;	//7.1
 	out_data << setw(20) << GlobalC::pw.ncx 
 			 << setw(20) << GlobalC::pw.ncy 
-			 << setw(20) << GlobalC::pw.ncz << endl;		//7.2
-	out_data << setw(20) << GlobalC::pw.ncxyz << endl;
+			 << setw(20) << GlobalC::pw.ncz << std::endl;		//7.2
+	out_data << setw(20) << GlobalC::pw.ncxyz << std::endl;
 
 	for (int ir = 0;ir < GlobalC::pw.ncxyz;ir++)
 	{
 		if(ir%4==0) out_data << "\n";
 		out_data << setw(20) << setprecision(10) << rho_in[ir] << "\t" ;//7.4
 	}
-	out_data << endl;
+	out_data << std::endl;
 	out_data.close();
 	return;
 }
@@ -844,14 +844,14 @@ void eximport::out_charge_mpi(const string &dir,double* rho_in)
 void eximport::out_charge(ofstream &out_data)
 {
 	/*
-	GlobalV::ofs_running << "\n Output charge file." << endl;
-	out_data << setw(20) << "CHARGE" << endl;	//7.0
-	out_data << setw(20) << GlobalC::pw.omega << endl;	//7.1
+	GlobalV::ofs_running << "\n Output charge file." << std::endl;
+	out_data << setw(20) << "CHARGE" << std::endl;	//7.0
+	out_data << setw(20) << GlobalC::pw.omega << std::endl;	//7.1
 	out_data << setw(20) << GlobalC::pw.ncx 
 			 << setw(20) << GlobalC::pw.ncy 
-			 << setw(20) << GlobalC::pw.ncz << endl;		//7.2
+			 << setw(20) << GlobalC::pw.ncz << std::endl;		//7.2
 	out_data << setw(20) << GlobalC::CHR.rho.nr			//7.3 
-			 << setw(20) << GlobalC::CHR.rho.nc << endl;
+			 << setw(20) << GlobalC::CHR.rho.nc << std::endl;
 
 	for (int i = 0;i < GlobalC::CHR.rho.nr;i++)
 	{
@@ -859,9 +859,9 @@ void eximport::out_charge(ofstream &out_data)
 		{
 			out_data << setw(20) << setprecision(10) << GlobalC::CHR.rho.c[i*GlobalC::CHR.rho.nr+j] << "\t" ;//7.4
 
-			if ((i*GlobalC::CHR.rho.nr + j) % 4 == 3) out_data << endl;
+			if ((i*GlobalC::CHR.rho.nr + j) % 4 == 3) out_data << std::endl;
 		}
-		out_data << endl;
+		out_data << std::endl;
 	}
 	return;
 	*/
@@ -872,7 +872,7 @@ void eximport::in_charge(ifstream &in)
 	in >> name;
 	if (name != "CHARGE")
 	{
-		cout << "== wrong in in_charge ===" << endl;
+		std::cout << "== wrong in in_charge ===" << std::endl;
 		exit(0);
 	}
 
@@ -895,14 +895,14 @@ void eximport::in_charge(ifstream &in)
 void eximport::nscf_chgfile(const string &chg_file)
 {
 	/*
-	cout<<"\n ==> eximport::nscf_chgfile()";
-	cout<<"       file_name : "<<chg_file<<endl;
+	std::cout<<"\n ==> eximport::nscf_chgfile()";
+	std::cout<<"       file_name : "<<chg_file<<std::endl;
 	//int ok;
 	//cin >> ok;
 	ifstream in(chg_file.c_str());
 	if(!in)
 	{
-		cerr<<"nscf_chgfile : can't find file "<<chg_file<<endl;
+		cerr<<"nscf_chgfile : can't find file "<<chg_file<<std::endl;
 		exit(0);
 	}
 	this->in_input(in);
@@ -910,15 +910,15 @@ void eximport::nscf_chgfile(const string &chg_file)
 	this->in_unitcell(in);
 	this->in_kpoints(in);
 	in >> name;
-	cout<<"name = "<<name<<endl;
+	std::cout<<"name = "<<name<<std::endl;
 
 	in >> omega;
 
 	in >>ncx >> ncy >> ncz;
 	in >> rho_nr;
 	in >> rho_nc;
-	cout<<"rho_nc = "<<rho_nc<<endl;
-	cout<<"rho_nr = "<<rho_nr<<endl;
+	std::cout<<"rho_nc = "<<rho_nc<<std::endl;
+	std::cout<<"rho_nr = "<<rho_nr<<std::endl;
 	rho = new double[rho_nc];
 	GlobalC::CHR.rho.nr = rho_nr;
 	GlobalC::CHR.rho.nc = rho_nc;
@@ -927,7 +927,7 @@ void eximport::nscf_chgfile(const string &chg_file)
 	{
 		for (int j = 0;j < rho_nc;j++)
 		{
-//			cout<<"j="<<j<<endl;
+//			std::cout<<"j="<<j<<std::endl;
 			in >> GlobalC::CHR.rho.c[j];
 		}
 	}

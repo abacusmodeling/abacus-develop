@@ -189,12 +189,12 @@ void Exx_Abfs::DM::pulay_mixing(
 				
 		#if TEST_EXX_LCAO==1
 		{
-			cout<<"charge.alpha"<<endl;
-			cout<<alpha_begin<<"\t"<<alpha_end<<"\t"<<alpha_size<<endl;
-			cout<<charge.alpha[alpha_index(alpha_size-1)]<<endl;
+			std::cout<<"charge.alpha"<<std::endl;
+			std::cout<<alpha_begin<<"\t"<<alpha_end<<"\t"<<alpha_size<<std::endl;
+			std::cout<<charge.alpha[alpha_index(alpha_size-1)]<<std::endl;
 			for( size_t i=1; i<DMk_pulay_seq.size()-1; ++i )
-				cout<<charge.alpha[alpha_index(i-1)]<<"\t"<<charge.alpha[alpha_index(i)]<<endl;
-			cout<<charge.alpha[alpha_index(0)]<<endl;
+				std::cout<<charge.alpha[alpha_index(i-1)]<<"\t"<<charge.alpha[alpha_index(i)]<<std::endl;
+			std::cout<<charge.alpha[alpha_index(0)]<<std::endl;
 		}
 		#elif TEST_EXX_LCAO==-1
 			#error
@@ -203,10 +203,10 @@ void Exx_Abfs::DM::pulay_mixing(
 	
 	#if TEST_EXX_LCAO==1
 	{
-		cout<<"charge.alpha_all"<<endl;
+		std::cout<<"charge.alpha_all"<<std::endl;
 		for( size_t i=0; i!=charge.dstep; ++i )
-			cout<<charge.alpha[i]<<"\t";
-		cout<<endl;
+			std::cout<<charge.alpha[i]<<"\t";
+		std::cout<<std::endl;
 	}
 	#elif TEST_EXX_LCAO==-1
 		#error

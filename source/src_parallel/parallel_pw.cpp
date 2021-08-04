@@ -91,7 +91,7 @@ void Parallel_PW::init(const double &gcut_in, const int &n1_in, const int &n2_in
 		
 		if(GlobalV::test_pw)
 		{
-			GlobalV::ofs_running << " processor="<<ip<<" npps="<<npps[ip] << endl;
+			GlobalV::ofs_running << " processor="<<ip<<" npps="<<npps[ip] << std::endl;
 		}
 	}
 
@@ -161,7 +161,7 @@ void Parallel_PW::columns_map(void)
 
 					this->st[m1][m2]++;
 
-					//cout<<setw(12)<<m1+m2*this->n1<<setw(12)<<this->st[m1][m2]++<<endl;
+					//std::cout<<setw(12)<<m1+m2*this->n1<<setw(12)<<this->st[m1][m2]++<<std::endl;
 					ng++;
 					// ng: plane wave number if spheri.
 				}
@@ -228,8 +228,8 @@ void Parallel_PW::restore_st(void)
 				this->st_j[k] = j; //i1 y
 				this->st_n[k] = this->st[i][j]; 
 
-				//cout<<setw(12)<<i<<setw(12)<<j<<setw(12)<<st_n[k]<<endl;
-				//cout<<setw(12)<<i+j*this->n1<<setw(12)<<st_n[k]<<endl;
+				//std::cout<<setw(12)<<i<<setw(12)<<j<<setw(12)<<st_n[k]<<std::endl;
+				//std::cout<<setw(12)<<i+j*this->n1<<setw(12)<<st_n[k]<<std::endl;
 				k++;
 			}
 		}
@@ -275,7 +275,7 @@ void Parallel_PW::columns_and_pw_distribution(void)
 
 void Parallel_PW::max_pw_column(int &pw, int &max_i, int &max_j)
 {
-//	cout<<"\n ==> Parallel_PW.max_pw_column()";
+//	std::cout<<"\n ==> Parallel_PW.max_pw_column()";
 	// search in all sticks
 	int use=0;
 	for (int i = 0;i < this->nst;i++)
@@ -298,7 +298,7 @@ void Parallel_PW::max_pw_column(int &pw, int &max_i, int &max_j)
 	}
 	
 	/*
-	cout<<"\n use = "<<use
+	std::cout<<"\n use = "<<use
 		<<" index = "<<index[use]
 		<<" max_i = "<<max_i
 		<<" max_j = "<<max_j
@@ -307,7 +307,7 @@ void Parallel_PW::max_pw_column(int &pw, int &max_i, int &max_j)
 	// means the index stick has been used 
 	this->index[use] = 1;
 
-	//cout<<setw(24)<<"End max_pw_column()"<<endl;
+	//std::cout<<setw(24)<<"End max_pw_column()"<<std::endl;
 	return;
 }
 
@@ -328,7 +328,7 @@ void Parallel_PW::fft_dlay_set(void)
 		{
 			this->st_start[ip] += this->nst_per[i];
 		}
-//		cout<<"\n cpu="<<ip<<" st_start="<<this->st_start[ip];
+//		std::cout<<"\n cpu="<<ip<<" st_start="<<this->st_start[ip];
 	}
 
 	int nxy = this->n1 * this->n2;
@@ -346,8 +346,8 @@ void Parallel_PW::fft_dlay_set(void)
 		//so -1 has illegal meaning.
 	}
 
-//	cout << setw(12) << "isind dim" << setw(12) << nxy << endl;
-//	cout << setw(12) << "ismap dim" << setw(12) << this->nst << endl;
+//	std::cout << setw(12) << "isind dim" << setw(12) << nxy << std::endl;
+//	std::cout << setw(12) << "ismap dim" << setw(12) << this->nst << std::endl;
 
 	int *st_move = new int[nproc_use];
 	ZEROS(st_move,nproc_use);
@@ -360,7 +360,7 @@ void Parallel_PW::fft_dlay_set(void)
 
 		if (ip >= 0)
 		{
-			//cout<<setw(12)<<i<<setw(12)<<ip<<setw(12)<<nst[ip]<<endl;
+			//std::cout<<setw(12)<<i<<setw(12)<<ip<<setw(12)<<nst[ip]<<std::endl;
 			int is = st_move[ip] + this->st_start[ip] ;
 			this->ismap[ is ] = i;
 			
@@ -381,19 +381,19 @@ void Parallel_PW::fft_dlay_set(void)
 
 	// Don't delete this test below,it's useful !
 		/*
-		cout<<"========================================"<<endl;
-		cout<<setw(12)<<"col"<<setw(12)<<"nxy"<<endl;
+		std::cout<<"========================================"<<std::endl;
+		std::cout<<setw(12)<<"col"<<setw(12)<<"nxy"<<std::endl;
 		for(i=0;i<this->nst;i++)
 		{
-			cout<<setw(12)<<i<<setw(12)<<ismap[i]<<endl;
+			std::cout<<setw(12)<<i<<setw(12)<<ismap[i]<<std::endl;
 		}
-		cout<<"========================================"<<endl;
-		cout<<setw(12)<<"nxy"<<setw(12)<<"col(per)"<<endl;
+		std::cout<<"========================================"<<std::endl;
+		std::cout<<setw(12)<<"nxy"<<setw(12)<<"col(per)"<<std::endl;
 		for(i=0;i<nxy;i++)
 		{
 			if(this->isind[i]>=0)
 			{
-				cout<<setw(12)<<i<<setw(12)<<isind[i]<<endl;
+				std::cout<<setw(12)<<i<<setw(12)<<isind[i]<<std::endl;
 			}
 		}
 		*/	
@@ -452,13 +452,13 @@ void Parallel_PW::fft_map(
 	/*
 	if (ngm_i != this->npw_per[rank_use])
 	{
-		cout << setw(12) << "ngm_i = " << setw(12) << ngm_i << endl;
-		cout << setw(12) << "npw_per = " << this->npw_per[rank_use] << endl;
+		std::cout << setw(12) << "ngm_i = " << setw(12) << ngm_i << std::endl;
+		std::cout << setw(12) << "npw_per = " << this->npw_per[rank_use] << std::endl;
 		WARNING_QUIT("Parallel_PW::fft_map","ngm_i !=npw_per[rank_use]");
 	}
 	*/
 	
-//	cout<<setw(12)<<"i"<<setw(12)<<"x"<<setw(12)<<"y"<<setw(12)<<"z"<<endl;
+//	std::cout<<setw(12)<<"i"<<setw(12)<<"x"<<setw(12)<<"y"<<setw(12)<<"z"<<std::endl;
 	for (int ig=ngm_i_record; ig<ngm_i; ig++)
 	{
 		//  Mohan fix the bug 2008-4-3 17:19
@@ -477,23 +477,23 @@ void Parallel_PW::fft_map(
 
 		const int index_now = y+x*n2;
 		
-	//	cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<endl;
+	//	std::cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
 		if(this->isind[index_now]==-1)
 		{
-			cerr<<"I don't know this grid !"<<endl;
-			cout<<setw(12)<<"xy"
-				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<endl;
-			cout<<setw(12)<<index_now
-				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<endl;
+			cerr<<"I don't know this grid !"<<std::endl;
+			std::cout<<setw(12)<<"xy"
+				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<std::endl;
+			std::cout<<setw(12)<<index_now
+				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<std::endl;
 			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
-		//cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
+		//std::cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
 	}
 
 	ngm_i_record = ngm_i;
-//	cout << "\n ngm_i_record = " << ngm_i_record;
-	//cout << setw(12) << "ngm_i" << setw(12) << ngm_i << endl;
+//	std::cout << "\n ngm_i_record = " << ngm_i_record;
+	//std::cout << setw(12) << "ngm_i" << setw(12) << ngm_i << std::endl;
 
 	return;
 }
@@ -501,44 +501,44 @@ void Parallel_PW::fft_map(
 
 void Parallel_PW::print_data(ofstream &print)const
 {
-	print<<setw(12)<<"gcut"<<setw(12)<<this->gcut<<endl;
-	print<<setw(12)<<"nst"<<setw(12)<<this->nst<<endl;
-	print<<setw(12)<<"n1"<<setw(12)<<this->n1<<endl;
-	print<<setw(12)<<"n2"<<setw(12)<<this->n2<<endl;
-	print<<setw(12)<<"n3"<<setw(12)<<this->n3<<endl;
+	print<<setw(12)<<"gcut"<<setw(12)<<this->gcut<<std::endl;
+	print<<setw(12)<<"nst"<<setw(12)<<this->nst<<std::endl;
+	print<<setw(12)<<"n1"<<setw(12)<<this->n1<<std::endl;
+	print<<setw(12)<<"n2"<<setw(12)<<this->n2<<std::endl;
+	print<<setw(12)<<"n3"<<setw(12)<<this->n3<<std::endl;
 
 	print<<setw(12)<<"Processor"<<setw(12)<<"Planes"<<setw(12)<<"Columns"
-		 <<setw(12)<<"st_start"<<setw(12)<<"PWs"<<endl;
+		 <<setw(12)<<"st_start"<<setw(12)<<"PWs"<<std::endl;
 	for(int i=0;i<nproc_use;i++)
 	{
 		print<<setw(12)<<i<<setw(12)<<this->npps[i]<<setw(12)<<this->nst_per[i]
-			 <<setw(12)<<this->st_start[i]<<setw(12)<<this->npw_per[i]<<endl;
+			 <<setw(12)<<this->st_start[i]<<setw(12)<<this->npw_per[i]<<std::endl;
 	}
 
 
 	print<<"\n";
-	print<<"====== ismap ======="<<endl;
-	print<<setw(12)<<"Columns"<<setw(12)<<"nxy"<<endl;
+	print<<"====== ismap ======="<<std::endl;
+	print<<setw(12)<<"Columns"<<setw(12)<<"nxy"<<std::endl;
 	for(int i=0;i<this->nst;i++)
 	{
 		if(i>0)
 		{
 			if(this->ismap[i]<this->ismap[i-1])
 			{
-				print<<"--------------------------"<<endl;
+				print<<"--------------------------"<<std::endl;
 			}
 		}
-		print<<setw(12)<<i<<setw(12)<<this->ismap[i]<<endl;
+		print<<setw(12)<<i<<setw(12)<<this->ismap[i]<<std::endl;
 	}
 
 	print<<"\n";
-	print<<"====== isind ======"<<endl;
-	print<<setw(12)<<"nxy"<<setw(12)<<"Columns"<<endl;
+	print<<"====== isind ======"<<std::endl;
+	print<<setw(12)<<"nxy"<<setw(12)<<"Columns"<<std::endl;
 	for(int i=0;i<this->n1*this->n2;i++)
 	{	
 		if(this->isind[i]>=0)
 		{
-			print<<setw(12)<<i<<setw(12)<<this->isind[i]<<endl;
+			print<<setw(12)<<i<<setw(12)<<this->isind[i]<<std::endl;
 		}
 	}
 
@@ -645,23 +645,23 @@ void Parallel_PW::fft_map_final_scf(
 
 		const int index_now = y+x*n2;
 		
-	//	cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<endl;
+	//	std::cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
 		if(this->isind[index_now]==-1)
 		{
-			cerr<<"I don't know this grid !"<<endl;
-			cout<<setw(12)<<"xy"
-				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<endl;
-			cout<<setw(12)<<index_now
-				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<endl;
+			cerr<<"I don't know this grid !"<<std::endl;
+			std::cout<<setw(12)<<"xy"
+				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<std::endl;
+			std::cout<<setw(12)<<index_now
+				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<std::endl;
 			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
-		//cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
+		//std::cout << "\n i=" << i << " ig2fft=" << ig2fft[i];
 	}
 
 	ngm_i_record_final_scf = ngm_i_final_scf;
-//	cout << "\n ngm_i_record = " << ngm_i_record;
-	//cout << setw(12) << "ngm_i" << setw(12) << ngm_i << endl;
+//	std::cout << "\n ngm_i_record = " << ngm_i_record;
+	//std::cout << setw(12) << "ngm_i" << setw(12) << ngm_i << std::endl;
 
 	return;
 }

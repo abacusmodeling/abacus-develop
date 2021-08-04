@@ -17,7 +17,7 @@ Inverse_Matrix_Complex::~Inverse_Matrix_Complex()
 
 void Inverse_Matrix_Complex::init(const int &dim_in)
 {
-//	GlobalV::ofs_running << " allocate=" << allocate << endl;
+//	GlobalV::ofs_running << " allocate=" << allocate << std::endl;
 	if(allocate)
 	{
 		delete[] e; //mohan fix bug 2012-04-02
@@ -83,7 +83,7 @@ void Inverse_Matrix_Complex::using_zpotrf( const ComplexMatrix &Sin)
 
 	if(info!=0)
 	{
-		cout << "\n info_zpotrf = " << info;
+		std::cout << "\n info_zpotrf = " << info;
 		QUIT();
 	}
 	
@@ -91,7 +91,7 @@ void Inverse_Matrix_Complex::using_zpotrf( const ComplexMatrix &Sin)
 	
 	if(info!=0)
 	{
-		cout << "\n info_zpotri = " << info;
+		std::cout << "\n info_zpotri = " << info;
 		QUIT();
 	}
 //	timer::tick("Inverse","using_zpotrf");
@@ -102,8 +102,8 @@ int Inverse_Matrix_Real::using_spotri(matrix &A, const int dim)
 {
 	int info = 0;
 	LapackConnector::spotrf('U',dim,A,dim,&info);
-	cout << "\n info_spotrf = " << info;
+	std::cout << "\n info_spotrf = " << info;
 	LapackConnector::spotri('U',dim,A,dim,&info);
-	cout << "\n info_spotri = " << info;
+	std::cout << "\n info_spotri = " << info;
 	return info;
 }

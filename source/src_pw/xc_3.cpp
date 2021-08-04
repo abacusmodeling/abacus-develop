@@ -16,7 +16,7 @@ void dscal(const int n,const double &alpha,double *y,const int incy)
 {
     if (incy <= 0 || n < 1)
     {
-        cout << "\n error in dscal,incy <= 0 or n < 1";
+        std::cout << "\n error in dscal,incy <= 0 or n < 1";
         return;
     }
 
@@ -153,7 +153,7 @@ void zaxpy(double alpha,
         y(i, j) += alpha * x[j];
     }
 
-//    cout << "\n End daxpy() " << endl;
+//    std::cout << "\n End daxpy() " << std::endl;
 }
 
 // y = alpha * x(i,:) + y
@@ -430,7 +430,7 @@ void dcopy(int n,
            int i,
            int incb)
 {
-    cout << "\n do nothing, in dcopy() ";
+    std::cout << "\n do nothing, in dcopy() ";
 }
 
 
@@ -558,7 +558,7 @@ void dsytrf(char , int iter_used, matrix beta, int maxter, int *iwork,
      A(k,k),  A(k+1,k),  and   A(k+1,k+1),   and   v   overwrites
      A(k+2:n,k:k+1).
     ******************************************************************/
-    cout << "\n do nothing, in dsytrf() ";
+    std::cout << "\n do nothing, in dsytrf() ";
 } // end dsytrf
 
 //--------------------------------------------------------------------
@@ -567,7 +567,7 @@ void dsytrf(char , int iter_used, matrix beta, int maxter, int *iwork,
 void dsytri(char, int iter_used, matrix beta, int maxter, int *iwork,
             double *work, int &info)
 {
-    cout << "\n do nothing, in dsytri() ";
+    std::cout << "\n do nothing, in dsytri() ";
     // dsytri computes the inverse of a real  symmetric  indefinite
     // matrix  A  using  the  factorization  A  =  U*D*U**T  or A =
     // L*D*L**T computed by DSYTRF.
@@ -686,7 +686,7 @@ complex < double> ddot(const ComplexMatrix &a,
 
     if (nr <= 1 || nc <= 1 || i < 0 || i >= nr)
     {
-        cout << "\n error in ddot, nr or nc < 1 or i out of range ";
+        std::cout << "\n error in ddot, nr or nc < 1 or i out of range ";
         return 0;
     }
 
@@ -713,7 +713,7 @@ double ddot(const matrix &a,
 
     if (nr <= 1 || nc <= 1 || i < 0 || i >= nr)
     {
-        cout << "\n error in ddot, nr or nc < 1 or i out of range ";
+        std::cout << "\n error in ddot, nr or nc < 1 or i out of range ";
         return 0;
     }
 
@@ -739,7 +739,7 @@ double ddot(const matrix &a,
     if (nr <= 1 || nc <= 1 || i < 0 || i >= nr ||
             j < 0 || j >= nr)
     {
-        cout << "\n error in ddot, nr or nc < 1 or i or j out of range ";
+        std::cout << "\n error in ddot, nr or nc < 1 or i or j out of range ";
         return 0;
     }
 
@@ -947,9 +947,9 @@ void zgemm(char tra,
         {
             ij = 2*(j+i*ldc);
             c(j,i) = cux[ij] + complex< double>(0,1) * cux[ij+1];
-            //		cout<<setw(12)<<c(j,i);
+            //		std::cout<<setw(12)<<c(j,i);
         }
-        //	cout<<endl;
+        //	std::cout<<std::endl;
     }
 
     delete [] aux;
@@ -1047,7 +1047,7 @@ void dgemm(char tra, char trb, int m, int n, int k, double alpha,
            const matrix  a, int lda, const matrix b, int ldb, double beta,
            matrix &c, int ldc)
 {
-//    cout << "\n === ZGEMM() ===" << endl;
+//    std::cout << "\n === ZGEMM() ===" << std::endl;
     matrix a1;
 
     if (tra == 'n' || tra == 'N')
@@ -1055,8 +1055,8 @@ void dgemm(char tra, char trb, int m, int n, int k, double alpha,
     else
         a1.create(a.nc, a.nr);
 
-//    cout << "\n a1.nr = " << a1.nr
-//	 << "   a1.nc = " << a1.nc << endl;
+//    std::cout << "\n a1.nr = " << a1.nr
+//	 << "   a1.nc = " << a1.nc << std::endl;
 
     c = beta * c;
 
@@ -1071,7 +1071,7 @@ void dgemm(char tra, char trb, int m, int n, int k, double alpha,
         c += a1 * transpose(b);
 
 //    a1.freemem();
-//    cout << "\n end ZGEMM() " << endl;
+//    std::cout << "\n end ZGEMM() " << std::endl;
     return;
 }//end dgemm
 
@@ -1091,7 +1091,7 @@ void ZHPEV(int ,
            complex < double> *aux,
            int naux)
 {
-    cout << "\n do nothing, in ZHPEV() ";
+    std::cout << "\n do nothing, in ZHPEV() ";
 }
 
 complex < double> ZDOTU(int nstart,
@@ -1100,7 +1100,7 @@ complex < double> ZDOTU(int nstart,
                         complex < double> *psi,
                         int npwx)
 {
-    cout << "\n do nothing in ZDOTU(), only return ZERO,";
+    std::cout << "\n do nothing in ZDOTU(), only return ZERO,";
     return ZERO;
 }
 
@@ -1115,7 +1115,7 @@ void zgemv(char ,
            complex < double>  ,
            ComplexMatrix work, int)
 {
-    cout << "\n do nothing, in dgemv () ";
+    std::cout << "\n do nothing, in dgemv () ";
 }
 
 /*
@@ -1151,8 +1151,8 @@ void ZHEGVX(int itype,
     zux = new double[2*ldz*iu]; // mohan fix 2007-10-15
     int i, j;
 	
-	cout << "\n n = " << n;
-	cout << "\n iu = " << iu << endl;
+	std::cout << "\n n = " << n;
+	std::cout << "\n iu = " << iu << std::endl;
 
     for (i = 0;i < n;i++)
     {

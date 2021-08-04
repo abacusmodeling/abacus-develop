@@ -149,12 +149,12 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 #if defined __MPI
 //for test
 /*
-    cout << "\n Hello! Test MPI NOW : argc = "<<argc<<endl;
+    std::cout << "\n Hello! Test MPI NOW : argc = "<<argc<<std::endl;
     for(int i=0;i<argc;i++)
     {
-        cout<<"\n argv["<<i<<"]="<<argv[i];
+        std::cout<<"\n argv["<<i<<"]="<<argv[i];
     }
-    cout<<endl;
+    std::cout<<std::endl;
 */
 
 	#ifdef _OPENMP
@@ -165,7 +165,7 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	int provided;
 	MPI_Init_thread(&argc,&argv,MPI_THREAD_FUNNELED,&provided);
 	if( provided != MPI_THREAD_FUNNELED )
-		GlobalV::ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<endl;
+		GlobalV::ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<std::endl;
 //----------------------------------------------------------
 // int atoi ( const char * str );
 // atoi : Convert string to int type
@@ -198,31 +198,31 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 				*/
 				//xiaohui modify 2015-03-25
 				/*
-				cout << " *********************************************************" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *                  WELCOME TO MESIA                     *" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *       'Massive Electronic simulation based on         *" << endl;
-				cout << " *        Systematically Improvable Atomic bases'        *" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *********************************************************" << endl;
+				std::cout << " *********************************************************" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *                  WELCOME TO MESIA                     *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *       'Massive Electronic simulation based on         *" << std::endl;
+				std::cout << " *        Systematically Improvable Atomic bases'        *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *********************************************************" << std::endl;
 				*/
-				cout << " *********************************************************" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *                  WELCOME TO ABACUS                    *" << endl;
-				cout << " *                                                       *" << endl;
-				cout << " *            'Atomic-orbital Based Ab-initio            *" << endl;
-				cout << " *                  Computation at UStc'                 *" << endl;
-				cout << " *                                                       *" << endl;
-                cout << " *          Website: http://abacus.ustc.edu.cn/          *" << endl;
-                cout << " *                                                       *" << endl;
-				cout << " *********************************************************" << endl;
+				std::cout << " *********************************************************" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *                  WELCOME TO ABACUS                    *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+				std::cout << " *            'Atomic-orbital Based Ab-initio            *" << std::endl;
+				std::cout << " *                  Computation at UStc'                 *" << std::endl;
+				std::cout << " *                                                       *" << std::endl;
+                std::cout << " *          Website: http://abacus.ustc.edu.cn/          *" << std::endl;
+                std::cout << " *                                                       *" << std::endl;
+				std::cout << " *********************************************************" << std::endl;
 
-				//cout << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << endl;
+				//std::cout << " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
     			time_t  time_now = time(NULL);
-    			cout << " " << ctime(&time_now);
+    			std::cout << " " << ctime(&time_now);
 			}
-//            cout << " PROCESSOR " << setw(4) << GlobalV::MY_RANK+1 << " IS READY." << endl;
+//            std::cout << " PROCESSOR " << setw(4) << GlobalV::MY_RANK+1 << " IS READY." << std::endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }
@@ -231,8 +231,8 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 	// mohan 2011-03-15
     if (GlobalV::MY_RANK != 0 )
     {
-        //cout.rdbuf(NULL);
-		cout.setstate(ios::failbit);//qianrui modify 2020-10-14
+        //std::cout.rdbuf(NULL);
+		std::cout.setstate(ios::failbit);//qianrui modify 2020-10-14
     }
 	// end test
 

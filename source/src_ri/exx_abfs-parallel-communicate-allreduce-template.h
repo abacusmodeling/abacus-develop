@@ -39,8 +39,8 @@ double t_probe=0, t_recv=0;
 gettimeofday(&t_start,NULL);
 	boost::mpi::packed_oarchive oar(mpi_comm);
 	oar << data_local;
-ofs_mpi<<"sizeof_oar:\t"<<get_sizeof(data_local)<<"\t"<<oar.size()<<endl;
-ofs_mpi<<"oar<<\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"sizeof_oar:\t"<<get_sizeof(data_local)<<"\t"<<oar.size()<<std::endl;
+ofs_mpi<<"oar<<\t"<<time_during(t_start)<<std::endl;
 
 	vector<MPI_Request> request_isends(comm_sz);
 	boost::dynamic_bitset<> flag_isends(comm_sz,false);
@@ -51,7 +51,7 @@ gettimeofday(&t_start,NULL);
 	insert_function( data_all, data_local );
 	boost::dynamic_bitset<> flag_irecvs(comm_sz,false);
 	flag_irecvs[my_rank] = true;
-ofs_mpi<<"insert\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"insert\t"<<time_during(t_start)<<std::endl;
 
 	vector<boost::mpi::packed_iarchive*> iarps( comm_sz );
 	for( auto &iarp : iarps )
@@ -99,16 +99,16 @@ t_recv+=time_during(t_start);
 					std::ref(iar), std::ref(insert_function), std::ref(data_all),
 					std::ref(rank_delta), std::ref(insert_lock) ));
 				flag_irecvs[rank_recv] = true;
-ofs_mpi<<rank_recv<<"\t"<<threads.back().get_id()<<endl;
+ofs_mpi<<rank_recv<<"\t"<<threads.back().get_id()<<std::endl;
 				break;
 			}
 			default:
 				throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 for( int i=0; i<flag_isends.size(); ++i )
-	ofs_mpi<<flag_isends[i];	ofs_mpi<<endl;
+	ofs_mpi<<flag_isends[i];	ofs_mpi<<std::endl;
 for( int i=0; i<flag_irecvs.size(); ++i )
-	ofs_mpi<<flag_irecvs[i];	ofs_mpi<<endl;
+	ofs_mpi<<flag_irecvs[i];	ofs_mpi<<std::endl;
 	}
 
 gettimeofday(&t_start,NULL);
@@ -119,10 +119,10 @@ gettimeofday(&t_start,NULL);
 			MPI_Wait( &request_isends[i_rank], MPI_STATUS_IGNORE );
 	for( auto &iarp : iarps )
 		delete iarp;
-ofs_mpi<<"final\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"final\t"<<time_during(t_start)<<std::endl;
 
-ofs_mpi<<"t_probe\t"<<t_probe<<endl;
-ofs_mpi<<"t_recv\t"<<t_recv<<endl;
+ofs_mpi<<"t_probe\t"<<t_probe<<std::endl;
+ofs_mpi<<"t_recv\t"<<t_recv<<std::endl;
 
 ofs_mpi.close();
 
@@ -150,16 +150,16 @@ ofs_mpi<<"sizeof_iar:\t"<<iar.size()<<"\t";
 gettimeofday(&t_start,NULL);
 	T data_rank;
 	iar >> data_rank;
-ofs_mpi<<iar.size()<<"\t"<<get_sizeof(data_rank)<<endl;
-ofs_mpi<<"iar>>\t"<<time_during(t_start)<<endl;
+ofs_mpi<<iar.size()<<"\t"<<get_sizeof(data_rank)<<std::endl;
+ofs_mpi<<"iar>>\t"<<time_during(t_start)<<std::endl;
 
 gettimeofday(&t_start,NULL);
 	while( insert_lock.test_and_set() );
-ofs_mpi<<"while\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"while\t"<<time_during(t_start)<<std::endl;
 gettimeofday(&t_start,NULL);
 	insert_function( data_all, data_rank );
 	insert_lock.clear();
-ofs_mpi<<"insert\t"<<time_during(t_start)<<endl;
+ofs_mpi<<"insert\t"<<time_during(t_start)<<std::endl;
 
 	ask(rank_delta++);
 ofs_mpi.close();

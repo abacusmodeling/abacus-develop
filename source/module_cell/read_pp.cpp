@@ -147,7 +147,7 @@ int Pseudopot_upf::average_p(void)
 	if(!this->has_so && GlobalV::LSPINORB) 
 	{
 		error++; 
-		cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<endl; 
+		std::cout<<"warning_quit! no soc upf used for lspinorb calculation, error!"<<std::endl; 
 		return error;
 	}
 	//WARNING_QUIT("average_p", "no soc upf used for lspinorb calculation, error!");
@@ -253,7 +253,7 @@ int Pseudopot_upf::average_p(void)
 			if(abs(this->jchi[old_nwfc] - this->lchi[old_nwfc] + 0.5) < 1e-6)
 			{
 				if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]-0.5)>1e-6) 
-				{error++; cout<<"warning_quit! error chi function 1 !"<<endl; return error;}
+				{error++; std::cout<<"warning_quit! error chi function 1 !"<<std::endl; return error;}
 //					WARNING_QUIT("average_p", "error chi function 1 !");
 				ind = old_nwfc +1;
 				ind1 = old_nwfc;
@@ -261,7 +261,7 @@ int Pseudopot_upf::average_p(void)
 			else
 			{
 				if(abs(this->jchi[old_nwfc+1]-this->lchi[old_nwfc+1]+0.5)>1e-6)
-				{error++; cout<<"warning_quit! error chi function 2 !"<<endl; return error;}
+				{error++; std::cout<<"warning_quit! error chi function 2 !"<<std::endl; return error;}
 //					WARNING_QUIT("average_p", "error chi function 2 !");
 				ind = old_nwfc;
 				ind1 = old_nwfc +1;

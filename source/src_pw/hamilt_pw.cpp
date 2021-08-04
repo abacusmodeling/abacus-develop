@@ -210,48 +210,48 @@ void Hamilt_PW::diagH_subspace(
 
 // for tests
 /*
-		cout << setprecision(3);
+		std::cout << setprecision(3);
 		out.printV3(GlobalV::ofs_running,GlobalC::kv.kvec_c[ik]);
 		out.printcm_norm("sc",sc,1.0e-4);
 		out.printcm_norm("hvec",hvec,1.0e-4);
 		out.printcm_norm("hc",hc,1.0e-4);
-		cout << endl;
+		std::cout << std::endl;
 */
 
-	cout << setprecision(5);
+	std::cout << setprecision(5);
 
 //--------------------------
 // KEEP THIS BLOCK FOR TESTS
 //--------------------------
 /*
-	cout << "  hc matrix" << endl;
+	std::cout << "  hc matrix" << std::endl;
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			double a = hc(i,j).real();
 			if(abs(a) < 1.0e-5) a = 0;
-			cout << setw(6) << a;
+			std::cout << setw(6) << a;
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 
-	cout << "  sc matrix" << endl;
+	std::cout << "  sc matrix" << std::endl;
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			double a = sc(i,j).real();
 			if(abs(a) < 1.0e-5) a = 0;
-			cout << setw(6) << a;
+			std::cout << setw(6) << a;
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 
-	cout << "\n Band Energy" << endl;
+	std::cout << "\n Band Energy" << std::endl;
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		cout << " e[" << i+1 << "]=" << en[i] * Ry_to_eV << endl;
+		std::cout << " e[" << i+1 << "]=" << en[i] * Ry_to_eV << std::endl;
 	}
 */
 //--------------------------
@@ -261,7 +261,7 @@ void Hamilt_PW::diagH_subspace(
 
 	if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") && GlobalV::CALCULATION=="nscf" && !Optical::opt_epsilon2)
 	{
-		GlobalV::ofs_running << " Not do zgemm to get evc." << endl;
+		GlobalV::ofs_running << " Not do zgemm to get evc." << std::endl;
 	}
 	else if((GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw") 
 		&& ( GlobalV::CALCULATION == "scf" || GlobalV::CALCULATION == "md" || GlobalV::CALCULATION == "relax")) //pengfei 2014-10-13
@@ -304,10 +304,10 @@ void Hamilt_PW::diagH_subspace(
 	}
     //out.printr1_d("en",en,n_band);
 
-//	cout << "\n bands" << endl;
+//	std::cout << "\n bands" << std::endl;
 //	for(int ib=0; ib<n_band; ib++)
 //	{
-//		cout << " ib=" << ib << " " << en[ib] * Ry_to_eV << endl; 
+//		std::cout << " ib=" << ib << " " << en[ib] * Ry_to_eV << std::endl; 
 //	}
 
     //out.printcm_norm("hvec",hvec,1.0e-8);
@@ -786,8 +786,8 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
 
     //  change back to plane wave basis.
 
-//  cout << " calling zheev is performed " << endl ;
-//  cout << " zheev output info... " << endl;
+//  std::cout << " calling zheev is performed " << std::endl ;
+//  std::cout << " zheev output info... " << std::endl;
 
     // delete the allocated data array.
 
@@ -795,20 +795,20 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
 
     delete[] rwork ;
 
-    // cout the infomation from zheev...
+    // std::cout the infomation from zheev...
 
-    // cout the infomation from zheev...
+    // std::cout the infomation from zheev...
     if (info == 0)
     {
-        cout << "  successful exit of zheev " << endl ;
+        std::cout << "  successful exit of zheev " << std::endl ;
     }
     else if (info < 0)
     {
-        cout << " the i-th argument had an illegal value. info =  " << info << endl ;
+        std::cout << " the i-th argument had an illegal value. info =  " << info << std::endl ;
     }
     else
     {
-        cout << "the algorithm failed to converge. info = " << info << endl ;
+        std::cout << "the algorithm failed to converge. info = " << info << std::endl ;
     }
 
     ComplexMatrix kpsi(nband, npw_in);
@@ -849,26 +849,26 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
     // calculate error of the last results.
     // err = || H\psi -E\psi||
 
-    cout << " callilng cal_err " << endl ;
+    std::cout << " callilng cal_err " << std::endl ;
 
     cal_err(npw_in, psi, nband, em, err);
 
 
     // out put the results.
-    cout<<setw(6)<<"Bands"
+    std::cout<<setw(6)<<"Bands"
         <<setw(12)<<"energy(ev)"
         <<setw(12)<<"err"
         <<setw(25)<<"||H * psi - E * psi ||\n";
 
     for (int m = 0; m < 5; m++)
     {
-        cout << setw(6) << m
+        std::cout << setw(6) << m
              << setw(12) << em[m] * Ry_to_eV
              << setw(12) << err[m]
-             << setw(25) << tmpen[m] * Ry_to_eV << endl ;
+             << setw(25) << tmpen[m] * Ry_to_eV << std::endl ;
     }
 
-    cout << " end of diag_zheev " << endl ;
+    std::cout << " end of diag_zheev " << std::endl ;
 
     return;
 }
@@ -883,7 +883,7 @@ void Hamilt_PW::cal_err
 )
 {
 //	TITLE("Hamilt_PW", "cal_err");
-//	cout << "\n npw_in = " << npw_in << endl;
+//	std::cout << "\n npw_in = " << npw_in << std::endl;
 
     assert(nband < npw_in);
     timer::tick("Hamilt_PW", "cal_err") ;
@@ -896,7 +896,7 @@ void Hamilt_PW::cal_err
 
     for (int m = 0; m < nband; m++)
     {
-//		cout << "\n m = " << m << endl;
+//		std::cout << "\n m = " << m << std::endl;
         dcopy(psi, m, psitmp) ;
         h_1psi(npw_in, psitmp, hpsitmp, spsitmp);
 
@@ -916,7 +916,7 @@ void Hamilt_PW::cal_err
     delete[] hpsitmp;
     delete[] spsitmp;
 
-//	cout << " calculate error of the wavefunctions " << endl ;
+//	std::cout << " calculate error of the wavefunctions " << std::endl ;
     timer::tick("Hamilt_PW", "cal_err") ;
     return;
 }
@@ -983,8 +983,8 @@ complex<double> Hamilt_PW::just_ddot(
 	static int warn_about_zdotc=true;
 	if(warn_about_zdotc)
 	{
-		GlobalV::ofs_warning << " in Hamilt_PW::just_ddot, sometimes zdotc is not available due to GNU compiler!!!" << endl;
-		GlobalV::ofs_warning << " So here I use simple for cicle to replace zdotc, but it will affect the speed." << endl;
+		GlobalV::ofs_warning << " in Hamilt_PW::just_ddot, sometimes zdotc is not available due to GNU compiler!!!" << std::endl;
+		GlobalV::ofs_warning << " So here I use simple for cicle to replace zdotc, but it will affect the speed." << std::endl;
 		warn_about_zdotc=false;
 	}
 	for(int i=0; i<dim; ++i)

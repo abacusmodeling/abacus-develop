@@ -2,12 +2,12 @@
 
 unkOverlap_pw::unkOverlap_pw()
 {
-	//GlobalV::ofs_running << "this is unkOverlap_pw()" << endl;
+	//GlobalV::ofs_running << "this is unkOverlap_pw()" << std::endl;
 }
 
 unkOverlap_pw::~unkOverlap_pw()
 {
-	//GlobalV::ofs_running << "this is ~unkOverlap_pw()" << endl;
+	//GlobalV::ofs_running << "this is ~unkOverlap_pw()" << std::endl;
 }
 
 
@@ -253,7 +253,7 @@ void unkOverlap_pw::test_for_unkOverlap_pw()
 {
 	
 	const int number_pw = GlobalC::pw.ngmw;
-	GlobalV::ofs_running << "the GlobalC::pw.ngmw is " << number_pw << endl;
+	GlobalV::ofs_running << "the GlobalC::pw.ngmw is " << number_pw << std::endl;
 	complex<double> *unk_L = new complex<double>[number_pw];
 	for (int ig = 0; ig < GlobalC::kv.ngk[0]; ig++)
 	{
@@ -261,7 +261,7 @@ void unkOverlap_pw::test_for_unkOverlap_pw()
 	}
 	for (int ig = 0; ig < GlobalC::pw.ngmw; ig++)
 	{
-		GlobalV::ofs_running << GlobalC::pw.gdirect[ig].x << "," << GlobalC::pw.gdirect[ig].y << "," << GlobalC::pw.gdirect[ig].z << "  = " << unk_L[ig] << endl;
+		GlobalV::ofs_running << GlobalC::pw.gdirect[ig].x << "," << GlobalC::pw.gdirect[ig].y << "," << GlobalC::pw.gdirect[ig].z << "  = " << unk_L[ig] << std::endl;
 	}	
 	
 }

@@ -12,7 +12,7 @@ void Dos::calculate_Mulliken(const string &fa)
 		ofs << setiosflags(ios::left);
 	}
 
-	GlobalV::ofs_running << "\n CALCULATE THE MULLIkEN ANALYSIS FOR EACH ATOM" << endl;
+	GlobalV::ofs_running << "\n CALCULATE THE MULLIkEN ANALYSIS FOR EACH ATOM" << std::endl;
 
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -48,9 +48,9 @@ void Dos::calculate_Mulliken(const string &fa)
 					sch += mulliken[is][iw];
 					sss += mulliken[is][iw];
 				}
-				ofs << sss << " (Total charge all spin " << is+1 << ")" << endl;
+				ofs << sss << " (Total charge all spin " << is+1 << ")" << std::endl;
 			}
-			ofs << sch << " (Total charge of the system)" << endl;
+			ofs << sch << " (Total charge of the system)" << std::endl;
 			 
 			 // output information for each atom.
 			int iw_all=0;
@@ -72,7 +72,7 @@ void Dos::calculate_Mulliken(const string &fa)
 				} 
 
 				ofs << setw(12) << "sum/zv";
-				ofs << endl;
+				ofs << std::endl;
 
 				double scht = 0.0;
 				for(int ia=0; ia<atom->na; ++ia)
@@ -107,7 +107,7 @@ void Dos::calculate_Mulliken(const string &fa)
 						}
 				
 						ofs << sum << "/" << atom->zv/GlobalV::NSPIN;
-						ofs << endl;
+						ofs << std::endl;
 
 						scht += sum;
 					}
@@ -116,7 +116,7 @@ void Dos::calculate_Mulliken(const string &fa)
 				}
 
 				ofs << setprecision(8);
-				ofs << scht << " (Total charge of atom species " << atom->label << ")" << endl;
+				ofs << scht << " (Total charge of atom species " << atom->label << ")" << std::endl;
 			}
 		}
 
@@ -186,11 +186,11 @@ bool Dos::calculate_dos
 	}
 	if(GlobalV::MY_RANK==0)
 	{
-		ofs << npoints << endl;
-		ofs << GlobalC::kv.nkstot << endl;
+		ofs << npoints << std::endl;
+		ofs << GlobalC::kv.nkstot << std::endl;
 	}
 
-	GlobalV::ofs_running << "\n OUTPUT DOS FILE IN: " << fa << endl;
+	GlobalV::ofs_running << "\n OUTPUT DOS FILE IN: " << fa << std::endl;
 	OUT(GlobalV::ofs_running,"min state energy (eV)",emin_ev);
 	OUT(GlobalV::ofs_running,"max state energy (eV)",emax_ev);
 	OUT(GlobalV::ofs_running,"delta energy interval (eV)",  de_ev);
@@ -203,7 +203,7 @@ bool Dos::calculate_dos
 	double e_old = 0.0;
 	while( e_new < emax_ev)
 	{
-//		GlobalV::ofs_running << " enew=" << e_new << endl;
+//		GlobalV::ofs_running << " enew=" << e_new << std::endl;
 		double count = 0.0;
 		e_old = e_new ;
 		e_new += de_ev;
@@ -219,7 +219,7 @@ bool Dos::calculate_dos
 						// because count is 'double' type,so
 						// we can't write count++ or ++count
 						count += wk[ik]*nkstot; //mohanix bug 2012-04-23
-//						GlobalV::ofs_running << " count = " << count << " wk = " << wk[ik] << " nks = " << nks << endl;
+//						GlobalV::ofs_running << " count = " << count << " wk = " << wk[ik] << " nks = " << nks << std::endl;
 					}		
 				}
 			}
@@ -231,7 +231,7 @@ bool Dos::calculate_dos
 		sum += count;
 		if(GlobalV::MY_RANK==0)
 		{
-			ofs << e_new << " " << count << endl;
+			ofs << e_new << " " << count << std::endl;
 		}
 
 	}
@@ -278,41 +278,41 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 
 				if(ik==0)
 				{
-					ofs << " BEGIN_INFO" << endl;
-					ofs << "   #" << endl;
-					ofs << "   # this is a Band-XCRYSDEN-Structure-File" << endl;
-					ofs << "   # aimed at Visualization of Fermi Surface" << endl;
-					ofs << "   #" << endl;
-					ofs << "   # Case: " << GlobalC::ucell.latName << endl;
-					ofs << "   #" << endl;	
-					ofs << " Fermi Energy: " << GlobalC::en.ef << endl;
-					ofs << " END_INFO" << endl;
-					ofs << " BEGIN_BLOCK_BANDGRID_3D" << endl;
-					ofs << " band_energies" << endl;
-					ofs << " BANDGRID_3D_BANDS" << endl;
-					ofs << " " << end-start+1 << endl;
-					ofs << " NKX NKY NKZ" << endl;
-					ofs << " 0 0 0" << endl;
-					ofs << " " << GlobalC::ucell.G.e11 << " " << GlobalC::ucell.G.e12 << " " << GlobalC::ucell.G.e13 << endl; 
-					ofs << " " << GlobalC::ucell.G.e21 << " " << GlobalC::ucell.G.e22 << " " << GlobalC::ucell.G.e23 << endl; 
-					ofs << " " << GlobalC::ucell.G.e31 << " " << GlobalC::ucell.G.e32 << " " << GlobalC::ucell.G.e33 << endl; 
+					ofs << " BEGIN_INFO" << std::endl;
+					ofs << "   #" << std::endl;
+					ofs << "   # this is a Band-XCRYSDEN-Structure-File" << std::endl;
+					ofs << "   # aimed at Visualization of Fermi Surface" << std::endl;
+					ofs << "   #" << std::endl;
+					ofs << "   # Case: " << GlobalC::ucell.latName << std::endl;
+					ofs << "   #" << std::endl;	
+					ofs << " Fermi Energy: " << GlobalC::en.ef << std::endl;
+					ofs << " END_INFO" << std::endl;
+					ofs << " BEGIN_BLOCK_BANDGRID_3D" << std::endl;
+					ofs << " band_energies" << std::endl;
+					ofs << " BANDGRID_3D_BANDS" << std::endl;
+					ofs << " " << end-start+1 << std::endl;
+					ofs << " NKX NKY NKZ" << std::endl;
+					ofs << " 0 0 0" << std::endl;
+					ofs << " " << GlobalC::ucell.G.e11 << " " << GlobalC::ucell.G.e12 << " " << GlobalC::ucell.G.e13 << std::endl; 
+					ofs << " " << GlobalC::ucell.G.e21 << " " << GlobalC::ucell.G.e22 << " " << GlobalC::ucell.G.e23 << std::endl; 
+					ofs << " " << GlobalC::ucell.G.e31 << " " << GlobalC::ucell.G.e32 << " " << GlobalC::ucell.G.e33 << std::endl; 
 				}
 
 				const int ik_now = ik - GlobalC::Pkpoints.startk_pool[GlobalV::MY_POOL];
-				ofs << "ik= " << ik << endl;
-				ofs << GlobalC::kv.kvec_c[ik_now].x << " " << GlobalC::kv.kvec_c[ik_now].y << " " << GlobalC::kv.kvec_c[ik_now].z << endl;  
+				ofs << "ik= " << ik << std::endl;
+				ofs << GlobalC::kv.kvec_c[ik_now].x << " " << GlobalC::kv.kvec_c[ik_now].y << " " << GlobalC::kv.kvec_c[ik_now].z << std::endl;  
 
 				for(int ib = 0; ib < nband; ib++)
 				{
 					ofs << " " << ekb[ik_now][ib] * Ry_to_eV;
 				}
-				ofs << endl;
+				ofs << std::endl;
 
 				// the last k point
 				if(ik==GlobalC::kv.nkstot-1)
 				{
-					ofs << " END_BANDGRID_3D" << endl;
-					ofs << " END_BLOCK_BANDGRID_3D" << endl;
+					ofs << " END_BANDGRID_3D" << std::endl;
+					ofs << " END_BLOCK_BANDGRID_3D" << std::endl;
 				}
 				ofs.close();
 
@@ -364,7 +364,7 @@ void Dos::nscf_band(
 					{
 						ofs << " " << (ekb[ik_now+is*nks][ib]-fermie) * Ry_to_eV;
 					}
-					ofs << endl;
+					ofs << std::endl;
 					ofs.close();	
 				}
 			}
@@ -386,7 +386,7 @@ void Dos::nscf_band(
 				{
 					ofs <<setw(12)<< ekb[ik][ib] * Ry_to_eV;
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 			ofs.close();
 		}
@@ -394,8 +394,8 @@ void Dos::nscf_band(
 	}
 	*/
 #else
-//	cout<<"\n nband = "<<nband<<endl;
-//	cout<<out_band_dir<<endl;
+//	std::cout<<"\n nband = "<<nband<<std::endl;
+//	std::cout<<out_band_dir<<std::endl;
 
 	ofstream ofs(out_band_dir.c_str());
 	for(int ik=0;ik<nks;ik++)
@@ -407,7 +407,7 @@ void Dos::nscf_band(
 			{
 				ofs <<setw(15) << (ekb[ik][ibnd]-fermie) * Ry_to_eV;
 			}
-			ofs<<endl;
+			ofs<<std::endl;
 		}
 	}
 	ofs.close();

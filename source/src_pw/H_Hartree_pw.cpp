@@ -51,7 +51,7 @@ matrix H_Hartree_pw::v_hartree(
 
     Parallel_Reduce::reduce_double_pool( ehart );
     ehart *= 0.5 * cell.omega;
-    //cout << " ehart=" << ehart << endl;
+    //std::cout << " ehart=" << ehart << std::endl;
     H_Hartree_pw::hartree_energy = ehart;
 
     std::fill( Porter.begin(), Porter.end(), complex<double>(0.0,0.0) );
@@ -88,7 +88,7 @@ matrix H_Hartree_pw::v_hartree(
 /*
 	if(out_potential==-2)
 	{
-		cout << " output VH" << endl;
+		std::cout << " output VH" << std::endl;
 		int is = 0;
 		int iter = 0;
 		int precision = 3;

@@ -60,7 +60,7 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 			const Vector3_Order<double> tau2( GlobalC::ucell.atoms[it2].tau[ia2] );
 			for( const Vector3<int> &box2 : atom2.second )
 			{
-//				cout<<"cal_Cs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
+//				std::cout<<"cal_Cs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 				const shared_ptr<matrix> C = DPcal_C( 
 					it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), 
 					m_abfs_abfs, m_abfslcaos_lcaos, index_abfs, index_lcaos, 
@@ -145,7 +145,7 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>>
 		
 		for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
 		{
-cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<endl;
+std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 			const vector<shared_ptr<matrix>> Vs_tmp = DPcal_V( it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), m_abfs_abfs, index_abfs, Vws );
 			Vs[iat1][iat2][box2] = Vs_tmp[0];	Vs[iat2][iat1][-box2] = Vs_tmp[1];
 		}
@@ -198,7 +198,7 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 			const Vector3_Order<double> delta_R = -tau1+tau2+(box2*GlobalC::ucell.latvec);
 			if( delta_R.norm()*GlobalC::ucell.lat0 < Rcut )
 			{
-//				cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*GlobalC::ucell.lat0<<"\t"<<GlobalC::ORB.Phi[it1].getRcut()*rmesh_times+GlobalC::ORB.Phi[it2].getRcut()<<endl;
+//				std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<"\t"<<delta_R<<"\t"<<delta_R.norm()<<"\t"<<delta_R.norm()*GlobalC::ucell.lat0<<"\t"<<GlobalC::ORB.Phi[it1].getRcut()*rmesh_times+GlobalC::ORB.Phi[it2].getRcut()<<std::endl;
 				const shared_ptr<matrix> V = DPcal_V( 
 					it1, it2, delta_R, 
 					m_abfs_abfs, index_abfs, 
@@ -230,9 +230,9 @@ map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> Abfs::cal_mps(
 		ofstream ofs( "mps_index_"+TO_STRING(iat1)+"_"+TO_STRING(iat2)+"_"+TO_STRING(istep++) );
 		for( const auto index : indexs )
 		{
-			ofs<<index.first<<endl;
+			ofs<<index.first<<std::endl;
 			for( const Vector3_Order<int> & box : index.second )
-				ofs<<"\t"<<box<<endl;
+				ofs<<"\t"<<box<<std::endl;
 		}
 		ofs.close();
 	}
@@ -309,7 +309,7 @@ shared_ptr<matrix> Abfs::DPcal_C(
 		return Cws_ptr->lock();
 	else
 	{
-//		cout<<"DPcal_C\t"<<it1<<"\t"<<it2<<"\t"<<R<<endl;
+//		std::cout<<"DPcal_C\t"<<it1<<"\t"<<it2<<"\t"<<R<<std::endl;
 		if( (Vector3<double>(0,0,0)==R) && (it1==it2) )
 		{
 			const shared_ptr<matrix> A = 
@@ -388,7 +388,7 @@ shared_ptr<matrix> Abfs::DPcal_V(
 	}
 	else
 	{
-//		cout<<"DPcal_V\t"<<it1<<"\t"<<it2<<"\t"<<R<<endl;
+//		std::cout<<"DPcal_V\t"<<it1<<"\t"<<it2<<"\t"<<R<<std::endl;
 		shared_ptr<matrix> V = make_shared<matrix>( m_abfs_abfs.cal_overlap_matrix(it1,it2,0,R,index_abfs,index_abfs) );
 		if(V->absmax()<=threshold)	V->create(0,0);
 		if(writable)
@@ -594,7 +594,7 @@ shared_ptr<matrix> Abfs::cal_I( const shared_ptr<matrix> &m )
 	
 	#if TEST_EXX_LCAO==1
 		ofstream ofs("I.dat",ofstream::app);
-		ofs<<"@"<<endl<<I.A<<endl;
+		ofs<<"@"<<std::endl<<I.A<<std::endl;
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -602,7 +602,7 @@ shared_ptr<matrix> Abfs::cal_I( const shared_ptr<matrix> &m )
 	I.cal_inverse( Exx_Abfs::Inverse_Matrix_Double::Method::dsyev );
 
 	#if TEST_EXX_LCAO==1
-		ofs<<"#"<<endl<<I.A<<endl;	
+		ofs<<"#"<<std::endl<<I.A<<std::endl;	
 		ofs.close();
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
@@ -622,7 +622,7 @@ vector<vector<shared_ptr<matrix>>> Abfs::cal_I( const vector<vector<shared_ptr<m
 
 	#if TEST_EXX_LCAO==1
 		ofstream ofs("I.dat",ofstream::app);
-		ofs<<"@"<<endl<<I.A<<endl;
+		ofs<<"@"<<std::endl<<I.A<<std::endl;
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -630,7 +630,7 @@ vector<vector<shared_ptr<matrix>>> Abfs::cal_I( const vector<vector<shared_ptr<m
 	I.cal_inverse( Exx_Abfs::Inverse_Matrix_Double::Method::dsyev );
 
 	#if TEST_EXX_LCAO==1
-		ofs<<"#"<<endl<<I.A<<endl;	
+		ofs<<"#"<<std::endl<<I.A<<std::endl;	
 		ofs.close();
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"

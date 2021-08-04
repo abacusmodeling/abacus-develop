@@ -39,7 +39,7 @@ static std::ostream & operator<<( std::ostream & os, const std::vector<T> &v )
 {
 	os<<"[";
 	for( const T &i : v )
-		os<<i<<endl;
+		os<<i<<std::endl;
 	os<<"]";
 	return os;
 }
@@ -61,7 +61,7 @@ static std::ostream & operator<<( std::ostream & os, const std::map<T1,T2> &v )
 {
 	for( const auto &i : v )
 //		os<<"{"<<i.first<<":"<<i.second<<"}"<<"\t";
-		os<<i.first<<endl<<i.second<<endl;
+		os<<i.first<<std::endl<<i.second<<std::endl;
 	return os;
 }
 

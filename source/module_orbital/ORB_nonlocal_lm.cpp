@@ -173,7 +173,7 @@ void Numerical_Nonlocal_Lm::extra_uniform(const double &dr_uniform_in)
 	this->dr_uniform = dr_uniform_in;
 	this->nr_uniform = static_cast<int>(rcut/dr_uniform) + 10;
 
-//	cout << " nr_uniform = " << nr_uniform << endl;
+//	std::cout << " nr_uniform = " << nr_uniform << std::endl;
 	
 	delete[] this->beta_uniform;
 	this->beta_uniform = new double[nr_uniform];
@@ -304,17 +304,17 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 
 		for (int i = 0; i < this->nr; i++)
 		{
-			ofsr << this->r_radial[i] << " " << this->beta_r[i] << endl;
+			ofsr << this->r_radial[i] << " " << this->beta_r[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nk; i++)
 		{
-			ofsk << this->k_radial[i] << " " << this->beta_k[i] << endl;
+			ofsk << this->k_radial[i] << " " << this->beta_k[i] << std::endl;
 		}
 
 		for (int i = 0; i < this->nr_uniform; i++)
 		{
-			ofsru << i * this->dr_uniform << " " << this->beta_uniform[i] << endl;
+			ofsru << i * this->dr_uniform << " " << this->beta_uniform[i] << std::endl;
 		}
 		
 		ofsr.close();

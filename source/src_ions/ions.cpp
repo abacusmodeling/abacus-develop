@@ -17,8 +17,8 @@ void Ions::opt_ions_pw(void)
 	
 	if(GlobalV::OUT_LEVEL=="i")
 	{
-		cout << setprecision(12);
-    	cout<< " " << setw(7)<< "ISTEP" 
+		std::cout << setprecision(12);
+    	std::cout<< " " << setw(7)<< "ISTEP" 
 		<<setw(5)<< "NE"
 		<<setw(15)<< "ETOT(eV)"
 		<<setw(15)<< "EDIFF(eV)"
@@ -27,7 +27,7 @@ void Ions::opt_ions_pw(void)
 		<<setw(8)<< "UPDATE"
 		<<setw(11)<< "ETIME(MIN)"
 		<<setw(11)<< "FTIME(MIN)"
-        <<endl;
+        <<std::endl;
 	}
 
 	// allocation for ion movement.	
@@ -54,43 +54,43 @@ void Ions::opt_ions_pw(void)
 		if(GlobalV::OUT_LEVEL=="ie")
 		{
 	
-        	cout << " -------------------------------------------" << endl;
+        	std::cout << " -------------------------------------------" << std::endl;
 			if(GlobalV::CALCULATION=="relax") //pengfei 2014-10-13
 			{
-        		cout << " STEP OF ION RELAXATION : " << istep << endl;
+        		std::cout << " STEP OF ION RELAXATION : " << istep << std::endl;
 			}
             else if(GlobalV::CALCULATION=="cell-relax")
             {
-                cout << " RELAX CELL : " << stress_step << endl;
-                cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                cout << " ---------------------------------------------------------" << endl;
+                std::cout << " RELAX CELL : " << stress_step << std::endl;
+                std::cout << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
+                std::cout << " ---------------------------------------------------------" << std::endl;
             }
 			else if(GlobalV::CALCULATION=="scf") //add 4 lines 2015-09-06, xiaohui
 			{
-        			cout << " SELF-CONSISTENT : " << endl;
+        			std::cout << " SELF-CONSISTENT : " << std::endl;
 			}
 			else if(GlobalV::CALCULATION=="md")
 			{
-        		cout << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
+        		std::cout << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
 			}
-        	cout << " -------------------------------------------" << endl;
+        	std::cout << " -------------------------------------------" << std::endl;
 
-        	GlobalV::ofs_running << " -------------------------------------------" << endl;
+        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;
 			if(GlobalV::CALCULATION=="relax")
 			{
-        		GlobalV::ofs_running << " STEP OF ION RELAXATION : " << istep << endl;
+        		GlobalV::ofs_running << " STEP OF ION RELAXATION : " << istep << std::endl;
 			}
             else if(GlobalV::CALCULATION=="cell-relax")
             {
-                GlobalV::ofs_running << " RELAX CELL : " << stress_step << endl;
-                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << endl;
-                GlobalV::ofs_running << " ---------------------------------------------------------" << endl;
+                GlobalV::ofs_running << " RELAX CELL : " << stress_step << std::endl;
+                GlobalV::ofs_running << " RELAX IONS : " << force_step << " (in total: " << istep << ")" << std::endl;
+                GlobalV::ofs_running << " ---------------------------------------------------------" << std::endl;
             }
 			else if(GlobalV::CALCULATION=="md")
 			{
-        		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << endl;
+        		GlobalV::ofs_running << " STEP OF MOLECULAR DYNAMICS : " << istep << std::endl;
 			}
-        	GlobalV::ofs_running << " -------------------------------------------" << endl;
+        	GlobalV::ofs_running << " -------------------------------------------" << std::endl;
 		}
 
 	//----------------------------------------------------------
@@ -206,7 +206,7 @@ void Ions::opt_ions_pw(void)
 			stringstream ss;
 			ss << GlobalV::MOVE_IONS << istep;
 			
-			cout << " " << setw(7) << ss.str() 
+			std::cout << " " << setw(7) << ss.str() 
 			<< setw(5) << eiter 
 			<< setw(15) << setprecision(6) << GlobalC::en.etot * Ry_to_eV 
 			<< setw(15) << IMM.get_ediff() * Ry_to_eV
@@ -215,7 +215,7 @@ void Ions::opt_ions_pw(void)
 			<< setw(15) << IMM.get_trust_radius()
 			<< setw(8) << IMM.get_update_iter()
 			<< setprecision(2) << setw(11) << etime_min
-			<< setw(11) << ftime_min << endl;
+			<< setw(11) << ftime_min << std::endl;
 		}
 
 		++istep;
@@ -224,16 +224,16 @@ void Ions::opt_ions_pw(void)
 
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
-        GlobalV::ofs_running << "\n\n --------------------------------------------" << endl;
+        GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
         GlobalV::ofs_running << setprecision(16);
-        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << endl; 
-        GlobalV::ofs_running << " --------------------------------------------\n\n" << endl;
+        GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
+        GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }
 
 
 	if(GlobalV::OUT_LEVEL=="i")
 	{
-		cout << " ION DYNAMICS FINISHED :)" << endl;
+		std::cout << " ION DYNAMICS FINISHED :)" << std::endl;
 	}
 
 	timer::tick("Ions","opt_ions_pw");
@@ -279,19 +279,19 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             }
             else
             {
-                GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+                GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
                 GlobalC::pw.setup_structure_factor();
 
-                GlobalV::ofs_running << " Setup the extrapolated charge." << endl;
+                GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
                 // charge extrapolation if istep>0.
                 CE.extrapolate_charge();
 			
-                GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
+                GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
                 // calculate the new potential accordint to
                 // the new charge density.
                 GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
 
-                GlobalV::ofs_running << " Setup the new wave functions?" << endl;
+                GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
                 GlobalC::wf.wfcinit();
             }
         }
@@ -322,7 +322,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 		{
 			LCM.cal_lattice_change(stress_step, stress, GlobalC::en.etot);
 			converged_stress = LCM.get_converged();
-            //cout <<"converged_stress = "<<converged_stress<<endl;
+            //std::cout <<"converged_stress = "<<converged_stress<<std::endl;
             if(converged_stress)
             {
                 return 1;
@@ -331,7 +331,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             {
                 Variable_Cell::init_after_vc();
                 GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
-                GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
+                GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
                 GlobalC::wf.wfcinit(); //LiuXh add 20180619
                 ++stress_step;
                 return 0;
@@ -345,7 +345,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
 
 	if(GlobalV::FORCE&&GlobalV::STRESS)
 	{
-		//cout<<" istep  force_step  stress_step  converged_force  converged_stress = "<<istep<<"  "<<force_step<<"  "<<stress_step<<"  "<<converged_force<<"  "<<converged_stress<<endl;
+		//std::cout<<" istep  force_step  stress_step  converged_force  converged_stress = "<<istep<<"  "<<force_step<<"  "<<stress_step<<"  "<<converged_force<<"  "<<converged_stress<<std::endl;
 
 		matrix force;
 		Forces fcs;
@@ -359,7 +359,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             IMM.cal_movement(istep, force_step, force, GlobalC::en.etot);
             converged_force = IMM.get_converged();
 
-            //cout<<"converged_force = "<<converged_force<<endl;
+            //std::cout<<"converged_force = "<<converged_force<<std::endl;
             if(converged_force)
             {
                 force_step = 1;
@@ -378,7 +378,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                 {
                     LCM.cal_lattice_change(stress_step, stress, GlobalC::en.etot);
                     converged_stress = LCM.get_converged();
-                    //cout <<"converged_stress = "<<converged_stress<<endl;
+                    //std::cout <<"converged_stress = "<<converged_stress<<std::endl;
                     if(converged_stress)
                     {
                         return 1;
@@ -388,7 +388,7 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
                         Variable_Cell::init_after_vc();
                         GlobalC::pot.init_pot(stress_step, GlobalC::pw.strucFac); //LiuXh add 20180619
 
-                        GlobalV::ofs_running << " Setup the new wave functions?" << endl; //LiuXh add 20180619
+                        GlobalV::ofs_running << " Setup the new wave functions?" << std::endl; //LiuXh add 20180619
                         GlobalC::wf.wfcinit(); //LiuXh add 20180619
 
                         ++stress_step;
@@ -402,15 +402,15 @@ bool Ions::force_stress(const int &istep, int &force_step, int &stress_step)  //
             }
             else
             {
-				GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << endl;
+				GlobalV::ofs_running << " Setup the structure factor in plane wave basis." << std::endl;
                 GlobalC::pw.setup_structure_factor();
-				GlobalV::ofs_running << " Setup the extrapolated charge." << endl;
+				GlobalV::ofs_running << " Setup the extrapolated charge." << std::endl;
                 CE.save_pos_next(GlobalC::ucell);
                 CE.update_istep(force_step);
                 CE.extrapolate_charge();
-				GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << endl;
+				GlobalV::ofs_running << " Setup the Vl+Vh+Vxc according to new structure factor and new charge." << std::endl;
                 GlobalC::pot.init_pot( istep, GlobalC::pw.strucFac );
-				GlobalV::ofs_running << " Setup the new wave functions?" << endl;
+				GlobalV::ofs_running << " Setup the new wave functions?" << std::endl;
                 GlobalC::wf.wfcinit();
                 ++force_step;
                 return 0;

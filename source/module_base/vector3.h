@@ -88,9 +88,9 @@ template <class T> inline bool operator ==(const Vector3<T> &u, const Vector3<T>
 
 template <class T> void Vector3<T>::print(void)const
 {
-	cout.precision(5) ;
-	cout << "(" << setw(10) << x << "," << setw(10) << y << ","
-	<< setw(10) << z  << ")"  << endl ;
+	std::cout.precision(5) ;
+	std::cout << "(" << setw(10) << x << "," << setw(10) << y << ","
+	<< setw(10) << z  << ")"  << std::endl ;
 	return ;
 }
 template<class T> static std::ostream & operator << ( std::ostream &os, const Vector3<T> &u )

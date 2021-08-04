@@ -70,7 +70,7 @@ void Chi0_standard:: Chi()
 	}
 	else
 	{
-		cout <<"start_q = "<<start_q<<endl;
+		std::cout <<"start_q = "<<start_q<<std::endl;
 	}	
 
 	
@@ -206,17 +206,17 @@ void Chi0_standard:: Chi()
 	}
 	
 	int temp_q = qc[total_icount-1];
-	//cout <<"temp_q = "<<temp_q<<endl;
+	//std::cout <<"temp_q = "<<temp_q<<std::endl;
 	
 	interval_q = temp_q - start_q;
-	//cout <<"interval_q = "<<interval_q<<endl;
+	//std::cout <<"interval_q = "<<interval_q<<std::endl;
 	
 	Parallel_G();
 	
 	if(system == "surface")
 	{
 		dim_para = parallel_g();
-		cout << "dim_para = "<<dim_para<<endl;
+		std::cout << "dim_para = "<<dim_para<<std::endl;
 	}
 	
 	//----------------------------------------------------------
@@ -239,7 +239,7 @@ void Chi0_standard:: Chi()
 		if(occ_flag == true)
 			occ_bands++;
 	}
-	cout <<"occ_bands = "<<occ_bands<<endl;	
+	std::cout <<"occ_bands = "<<occ_bands<<std::endl;	
 	oband = occ_bands;
 	
 	if(!init_finish)
@@ -257,16 +257,16 @@ void Chi0_standard:: Chi()
 		for(double omega=0.0; omega<(domega*nomega); omega=omega+domega)
 		{
 			Cal_chi0(iq,omega);
-			cout<<"chi0 iq= "<<iq<<" omega= "<<omega<<"  "<<chi0[0][0].real()<<" "<<chi0[0][0].imag()<<endl;
+			std::cout<<"chi0 iq= "<<iq<<" omega= "<<omega<<"  "<<chi0[0][0].real()<<" "<<chi0[0][0].imag()<<std::endl;
 			if(system == "surface")
 			{
 				chi0_para_g();
-				cout<<"chi0_para iq= "<<iq<<" omega= "<<omega<<"  "<<chi0_para[0][0].real()<<" "<<chi0_para[0][0].imag()<<endl;
+				std::cout<<"chi0_para iq= "<<iq<<" omega= "<<omega<<"  "<<chi0_para[0][0].real()<<" "<<chi0_para[0][0].imag()<<std::endl;
 			}						
 			Cal_rpa(iq);
 			Cal_chi();
-			cout<<"chi iq= "<<iq<<" omega= "<<omega<<"  "<<chi[0][0].real()<<" "<<chi[0][0].imag()<<endl;
-			cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*PI/q/q*chi[0][0].real()<<" "<<8*PI/q/q*chi[0][0].imag()<<endl;
+			std::cout<<"chi iq= "<<iq<<" omega= "<<omega<<"  "<<chi[0][0].real()<<" "<<chi[0][0].imag()<<std::endl;
+			std::cout<<"epsilon iq= "<<iq<<" omega= "<<omega<<"  "<<8*PI/q/q*chi[0][0].real()<<" "<<8*PI/q/q*chi[0][0].imag()<<std::endl;
 			gather[count] = -8*PI/q/q*chi[0][0].imag();		
 			count++;
 		}
@@ -276,10 +276,10 @@ void Chi0_standard:: Chi()
 			stringstream sseps;
 			sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
 			ofstream ofseps(sseps.str().c_str());
-			ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<endl;
+			ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<std::endl;
 			for(int i=0; i<nomega; i++)
 			{
-				ofseps <<i*domega<<"   "<<gather[i]<<endl;
+				ofseps <<i*domega<<"   "<<gather[i]<<std::endl;
 			}
 			ofseps.close();
 		}		
@@ -367,7 +367,7 @@ void Chi0_standard::Parallel_G()
 	for(int i=0;i<GlobalC::pw.ngmc_g;i++)
 	{
 		all_gcar[i].x = Gvec[3*i]; all_gcar[i].y = Gvec[3*i+1]; all_gcar[i].z = Gvec[3*i+2];
-		//cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
+		//std::cout<<"all_gcar["<<i<<"]= "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
 	}
 	
 	return;
@@ -393,38 +393,38 @@ void Chi0_standard:: Init()
 	{
 		psi_r2[ib] = new complex<double>[GlobalC::pw.nrxx];
 	}	
-	cout << "psi OK" <<endl;
+	std::cout << "psi OK" <<std::endl;
 	
 	b = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
 		b[g0] = new complex<double>[oband*GlobalV::NBANDS];
 	}
-	cout << "b ok"<<endl;
+	std::cout << "b ok"<<std::endl;
 	
 	A = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
 		A[g0] = new complex<double>[oband*GlobalV::NBANDS];
 	}
-	cout << "A ok"<<endl;	
+	std::cout << "A ok"<<std::endl;	
 	
 	B = new complex<double>*[oband*GlobalV::NBANDS];
 	for(int ib=0; ib<(oband*GlobalV::NBANDS); ib++)
 	{
 		B[ib] = new complex<double>[dim];
 	}
-	cout << "B ok" << endl;
+	std::cout << "B ok" << std::endl;
 	
 	weight = new complex<double> [oband*GlobalV::NBANDS];
-	cout << "weight OK"<<endl;
+	std::cout << "weight OK"<<std::endl;
 	
 	chi0 = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
 		chi0[g0] = new complex<double>[dim];
 	}
-	cout << "chi0 OK" <<endl;
+	std::cout << "chi0 OK" <<std::endl;
 	
 	chi0_para = new complex<double>*[dim_para];
 	for(int g0=0; g0<dim_para; g0++)
@@ -437,16 +437,16 @@ void Chi0_standard:: Init()
 	{
 		rpa[g0] = new complex<double>[dim];
 	}
-	cout << "rpa OK" <<endl;
+	std::cout << "rpa OK" <<std::endl;
 
 	chi = new complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
 		chi[g0] = new complex<double>[dim];
 	}
-	cout << "chi OK" <<endl;	
+	std::cout << "chi OK" <<std::endl;	
 	
-	cout << "All ok"<<endl;
+	std::cout << "All ok"<<std::endl;
 		
 	return;
 }
@@ -559,7 +559,7 @@ void Chi0_standard::Cal_b(int iq, int ik, int iqk)
 	TITLE("Chi0_standard","Cal_b");
 	Vector3<double> qk;
 	qk = GlobalC::kv.kvec_c[iq] + GlobalC::kv.kvec_c[ik];
-	//cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<endl;
+	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
 	Vector3<double> q = GlobalC::kv.kvec_d[iq];
 	complex<double> exp_tmp;
@@ -771,7 +771,7 @@ int Chi0_standard::Cinv(int n, complex<double>** a)
 		{
 			delete[] is;
 			delete[] js;
-			cout << "error not inv" << endl;
+			std::cout << "error not inv" << std::endl;
 			return(0);
 		}
 		
@@ -931,13 +931,13 @@ int Chi0_standard::parallel_g()
 	}
 	
 	int dim1 = num;
-	//cout << "dim1 = "<<dim1<<endl;
+	//std::cout << "dim1 = "<<dim1<<std::endl;
 	for(int i=0;i<dim;i++)
 	{
-		cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<endl;
-		cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<endl;
-		cout <<"flag1["<<i<<"] = "<<flag1[i]<<endl;
-		cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<endl;  
+		std::cout <<"G["<<i<<"] = "<<all_gcar[i].x<<" "<<all_gcar[i].y<<" "<<all_gcar[i].z<<std::endl;
+		std::cout <<"G_direct["<<i<<"] = "<<GlobalC::pw.gdirect[i].x<<" "<<GlobalC::pw.gdirect[i].y<<" "<<GlobalC::pw.gdirect[i].z<<std::endl;
+		std::cout <<"flag1["<<i<<"] = "<<flag1[i]<<std::endl;
+		std::cout <<"G_para["<<i<<"] = "<<para_g[i][0]<<"  "<<para_g[i][1]<<std::endl;  
 	}
 	
 	return dim1;

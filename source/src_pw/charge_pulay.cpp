@@ -185,7 +185,7 @@ void Charge_Pulay::Pulay_mixing(void)
 		//	out.printrm("A=<dR|dR>",A);
 
 		opt_rnorm = calculate_residual_norm( Rrho[is][irstep], Rrho[is][irstep] );
-		//				cout << "\n part1 = " << opt_rnorm;
+		//				std::cout << "\n part1 = " << opt_rnorm;
 		for(int i=0; i<dstep; i++)
 		{
 		for(int j=0; j<dstep; j++)
@@ -193,13 +193,13 @@ void Charge_Pulay::Pulay_mixing(void)
 		opt_rnorm += alpha[i] * alpha[j] * A(i,j);
 		}
 		}
-		//				cout << "\n part2 = " << opt_rnorm;
+		//				std::cout << "\n part2 = " << opt_rnorm;
 
 		for(int i=0; i<dstep; i++)
 		{
 		opt_rnorm += 2*alpha[i]*dRR[i];
 		}
-		//				cout << "\n part3 = " << opt_rnorm;
+		//				std::cout << "\n part3 = " << opt_rnorm;
 		}
 		else if(scheme==2)
 		{
@@ -213,7 +213,7 @@ void Charge_Pulay::Pulay_mixing(void)
 		}
 		 */		
 
-		//cout << "\n After optimizing_the residual norm = " << opt_rnorm << endl;
+		//std::cout << "\n After optimizing_the residual norm = " << opt_rnorm << std::endl;
 		//			BLOCK_HERE("haha");
 		/*		
 				double optimal_rnorm = 9999.0; // just need a big number
@@ -234,7 +234,7 @@ void Charge_Pulay::Pulay_mixing(void)
 
 				}
 
-		//cout << "\n rnorm = " << rnorm;
+		//std::cout << "\n rnorm = " << rnorm;
 
 		if(optimal_rnorm > rnorm)
 		{
@@ -245,7 +245,7 @@ void Charge_Pulay::Pulay_mixing(void)
 
 		delete[] atmp;
 
-		cout << "\n optimal_residual_norm = " << optimal_rnorm << endl;
+		std::cout << "\n optimal_residual_norm = " << optimal_rnorm << std::endl;
 		 */
 
 		for(int is=0; is<GlobalV::NSPIN; is++)
@@ -272,12 +272,12 @@ void Charge_Pulay::Pulay_mixing(void)
     }
     */
 	#if TEST_EXX_LCAO==1
-		cout<<"Charge_Pulay::Pulay_mixing\t"<<__FILE__<<"\t"<<__LINE__<<endl;
-		cout<<"irstep:\t"<<irstep<<endl;
-		cout<<"idstep:\t"<<idstep<<endl;
-		cout<<"rstep:\t"<<rstep<<endl;
-		cout<<"dstep:\t"<<dstep<<endl;
-		cout<<"totstep:\t"<<totstep<<endl;
+		std::cout<<"Charge_Pulay::Pulay_mixing\t"<<__FILE__<<"\t"<<__LINE__<<std::endl;
+		std::cout<<"irstep:\t"<<irstep<<std::endl;
+		std::cout<<"idstep:\t"<<idstep<<std::endl;
+		std::cout<<"rstep:\t"<<rstep<<std::endl;
+		std::cout<<"dstep:\t"<<dstep<<std::endl;
+		std::cout<<"totstep:\t"<<totstep<<std::endl;
 	#elif TEST_EXX_LCAO==-1
 		#error
 	#endif
@@ -298,7 +298,7 @@ void Charge_Pulay::set_new_e_iteration( const bool new_e_iteration_in )		// Peiz
 
 void Charge_Pulay::allocate_pulay(const int &scheme)
 {
-	//cout << "\n initp = " << initp << endl;
+	//std::cout << "\n initp = " << initp << std::endl;
 	if(!this->initp)
 	{
 		TITLE("Charge_Pulay","allocate_pulay");
@@ -563,7 +563,7 @@ void Charge_Pulay::generate_alpha(const int &scheme)
 				this->alpha[i] += this->Abar(j,i);
 			}
 			this->alpha[i] /= sum;
-			//cout << "\n alpha[" << i << "]=" << alpha[i];
+			//std::cout << "\n alpha[" << i << "]=" << alpha[i];
 		}
 
 		// test if sum(alpha)=1;
@@ -572,7 +572,7 @@ void Charge_Pulay::generate_alpha(const int &scheme)
 		{
 			suma += alpha[i];
 		}
-//		cout << "\n suma = " << suma << endl;
+//		std::cout << "\n suma = " << suma << std::endl;
 	}
 
 	return;
@@ -582,7 +582,7 @@ void Charge_Pulay::generate_new_rho(const int &is, const int &m)
 {
 //	TITLE("Charge_Pulay","generate_new_rho");
 
-//	cout << " generate_new_rho " << endl;
+//	std::cout << " generate_new_rho " << std::endl;
 //	this->check_ne(rho[is]);
 //	this->check_ne(rho_save[is]);
 	
@@ -618,7 +618,7 @@ void Charge_Pulay::generate_residual_vector(double *residual, const double* rho_
 	{
 		residual[ir]= rho_out[ir] - rho_in[ir];
 	}
-	//cout << "\n Calculate residual norm = " << calculate_residual_norm(residual, residual) << endl;
+	//std::cout << "\n Calculate residual norm = " << calculate_residual_norm(residual, residual) << std::endl;
 	return;
 }
 
@@ -632,7 +632,7 @@ double Charge_Pulay::calculate_residual_norm(double *residual1, double* residual
 		rnorm += residual1[ir]*residual2[ir];
 	}
 	Parallel_Reduce::reduce_double_pool(rnorm); // mohan fix bug 2010-07-22
-	//GlobalV::ofs_running << " rnorm = " << rnorm << endl;
+	//GlobalV::ofs_running << " rnorm = " << rnorm << std::endl;
 	return rnorm;
 }
 
@@ -650,7 +650,7 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 	NOTE("Generate Residual vector from rho and rho_save.");
     for (int is=0; is<GlobalV::NSPIN; is++)
     {
-//		cout << " generate datas , spin=" << is << endl;
+//		std::cout << " generate datas , spin=" << is << std::endl;
 //		double c1=check_ne(rho[is]);
 //		double c2=check_ne(rho_save[is]);
 		this->generate_residual_vector( this->Rrho[is][irstep], this->rho[is], this->rho_save[is]);
@@ -699,8 +699,8 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 		if(GlobalV::test_charge)OUT(GlobalV::ofs_running, "last irstep",lastR); 
 
 		if(lastR < 0) lastR += rstep;
-		//cout << "\n nowR(irstep) = " << nowR;
-		//cout << "\n lastR(irstep-1) = " << lastR;
+		//std::cout << "\n nowR(irstep) = " << nowR;
+		//std::cout << "\n lastR(irstep-1) = " << lastR;
 		for (int is=0; is<GlobalV::NSPIN; is++)
 		{
 			for (int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -708,10 +708,10 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 				this->dRrho[is][idstep][ir] = this->Rrho[is][nowR][ir] - this->Rrho[is][lastR][ir];
 				this->drho[is][idstep][ir] = this->rho_save[is][ir] - this->rho_save2[is][ir];
 			}
-			//cout << "\n Calculate <dR|dR> norm = " 
+			//std::cout << "\n Calculate <dR|dR> norm = " 
 			//<< calculate_residual_norm(dRrho[is][idstep], dRrho[is][idstep]);
-			//cout << "\n Calculate <drho|drho> norm = " 
-			//<< calculate_residual_norm(drho[is][idstep],drho[is][idstep]) << endl;
+			//std::cout << "\n Calculate <drho|drho> norm = " 
+			//<< calculate_residual_norm(drho[is][idstep],drho[is][idstep]) << std::endl;
 		}
 	}
 

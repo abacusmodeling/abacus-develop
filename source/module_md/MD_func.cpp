@@ -20,7 +20,7 @@ bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 
 		if(!file)
 		{
-			cout<<"please ensure whether 'Restart_md.dat' exists!"<<endl;
+			std::cout<<"please ensure whether 'Restart_md.dat' exists!"<<std::endl;
 			error = 1;
 		}
 		if (!error)
@@ -35,7 +35,7 @@ bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 			file>>num;
 			if(num != numIon)
 			{
-				cout<<"please ensure whether 'Restart_md.dat' right!"<<endl;
+				std::cout<<"please ensure whether 'Restart_md.dat' right!"<<std::endl;
 				error = 1;
 			}
 		}
@@ -90,13 +90,13 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 		stringstream ssc;
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
 		ofstream file(ssc.str().c_str());
-		file<<"MD_RESTART"<<endl;
-		file<<"ATOM_NUMBERS: "<<numIon<<endl;
-		file<<"ION_VELOCITIES_(a.u.): "<<endl;
+		file<<"MD_RESTART"<<std::endl;
+		file<<"ATOM_NUMBERS: "<<numIon<<std::endl;
+		file<<"ION_VELOCITIES_(a.u.): "<<std::endl;
 		for(int i=0;i<numIon;i++){
-			file<<setprecision (12)<<vel[i].x<<" "<<setprecision (12)<<vel[i].y<<" "<<setprecision (12)<<vel[i].z<<endl;
+			file<<setprecision (12)<<vel[i].x<<" "<<setprecision (12)<<vel[i].y<<" "<<setprecision (12)<<vel[i].z<<std::endl;
 		}
-		file<<"step: "<<step<<endl;                
+		file<<"step: "<<step<<std::endl;                
 		file.close();
 	}
 	return;
@@ -116,7 +116,7 @@ double MD_func::GetAtomKE(const int& numIon, const Vector3<double>* vel, const d
 		mass = allmass[ion];
 		ke +=   0.5 * mass * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
 	}
-	//cout<<"in GetAtomKE KE="<< ke<<endl;
+	//std::cout<<"in GetAtomKE KE="<< ke<<std::endl;
 	return ke;
 }
 
@@ -162,7 +162,7 @@ void MD_func::InitVelocity(
 				if(M<numIon) vel[M].x=x;
 				else if(M<2*numIon) vel[M-numIon].y=x;
 				else vel[M-2*numIon].z=x;
-					// cout<<"this vel is:"<<x<<endl;
+					// std::cout<<"this vel is:"<<x<<std::endl;
 					M++;
 			}
 		}
@@ -207,7 +207,7 @@ void MD_func::InitVelocity(
 			ifstream file;
 			file.open("ChangeTemp.dat");
 			if (!file){
-				cout<<"ERROR IN OPENING ChangeTemp.dat, CODE STOP!"<<endl;
+				std::cout<<"ERROR IN OPENING ChangeTemp.dat, CODE STOP!"<<std::endl;
 				exit(0);
 			}
 			while((sstep+fixTemperature)<step){
@@ -219,14 +219,14 @@ void MD_func::InitVelocity(
 			// Renew information.
 			intemp =  intemp * K_BOLTZMAN_AU;
 			if ( fabs(intemp-temperature) >1e-6 ) {
-				cout <<"(ReadNewTemp): Read in new temp:"<< intemp/K_BOLTZMAN_AU 
-					<<" previous temp:"<< temperature/K_BOLTZMAN_AU<<endl;
+				std::cout <<"(ReadNewTemp): Read in new temp:"<< intemp/K_BOLTZMAN_AU 
+					<<" previous temp:"<< temperature/K_BOLTZMAN_AU<<std::endl;
 				temperature = intemp;
 			}
 			else{
-				cout<<"(ReadNewTemp): new temp:"<< intemp/K_BOLTZMAN_AU
+				std::cout<<"(ReadNewTemp): new temp:"<< intemp/K_BOLTZMAN_AU
 					<<" previous temp:"<<temperature/K_BOLTZMAN_AU
-					<< ". No change of temp."<<endl;
+					<< ". No change of temp."<<std::endl;
 			}
 		}
 	}
@@ -385,16 +385,16 @@ double MD_func::Conserved(const double KE, const double PE, const int number){
    
 	if (!GlobalV::MY_RANK)
 	{                 
-		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<endl;
-		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/K_BOLTZMAN_AU<<" (K)"<<endl;
-		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<endl;
-		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<endl;
+		GlobalV::ofs_running<< "NVE Conservation     : "<< Conserved<<" (Hartree)"<<std::endl;
+		GlobalV::ofs_running<< "NVE Temperature      : "<< 2*KE/(3*number)/K_BOLTZMAN_AU<<" (K)"<<std::endl;
+		GlobalV::ofs_running<< "NVE Kinetic energy   : "<< KE<<" (Hartree)"<<std::endl;
+		GlobalV::ofs_running<< "NVE Potential energy : "<< PE<<" (Hartree)"<<std::endl;
 	}
    	return Conserved;
 }
 
 double MD_func::MAXVALF(const int numIon, const Vector3<double>* force){
-	//cout<<"enter in MAXVALF"<<endl;
+	//std::cout<<"enter in MAXVALF"<<std::endl;
 	double max=0;
 	for(int i=0;i<numIon;i++){
 		double force0 = pow(force[i].x,2)+pow(force[i].y,2)+pow(force[i].z,2);

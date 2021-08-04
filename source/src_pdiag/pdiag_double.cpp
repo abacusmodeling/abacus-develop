@@ -519,7 +519,7 @@ void Pdiag_Double::diago_double_begin(
 					else
 						ofs<<0<<"\t";
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 		};
 		auto print_matrix_F = [&](const string &file_name, double*m)
@@ -535,7 +535,7 @@ void Pdiag_Double::diago_double_begin(
 					else
 						ofs<<0<<"\t";
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 		};
 		print_matrix_F("H_gamma", h_mat);
@@ -842,7 +842,7 @@ void Pdiag_Double::diago_double_begin(
 			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
 			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
 
-		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<endl;
+		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
 		lwork = work[0];
 		work.resize(lwork,0);
 		liwork = iwork[0];
@@ -854,7 +854,7 @@ void Pdiag_Double::diago_double_begin(
 			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
 			work.data(), &lwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
 
-		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<endl;
+		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
 
 		if(info)
 		{
@@ -883,16 +883,16 @@ void Pdiag_Double::diago_double_begin(
 			ofstream ofs("ekb_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
-				ofs<<ekb[ib]<<endl;
+				ofs<<ekb[ib]<<std::endl;
 			}
 		}
 		{
 			ofstream ofs("wfc-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			ofs<<wfc_2d<<endl;
+			ofs<<wfc_2d<<std::endl;
 		}
 		{
 			ofstream ofs("wfc-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
-			ofs<<transpose(wfc_2d)<<endl;
+			ofs<<transpose(wfc_2d)<<std::endl;
 		}
 		++istep;
 	}
@@ -937,7 +937,7 @@ void Pdiag_Double::diago_complex_begin(
 						ofs<<0<<"\t";
 					}
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 		};
 		auto print_matrix_F = [&](const string &file_name, complex<double>*m)
@@ -964,7 +964,7 @@ void Pdiag_Double::diago_complex_begin(
 						ofs<<0<<"\t";
 					}
 				}
-				ofs<<endl;
+				ofs<<std::endl;
 			}
 		};
 		print_matrix_F("H_gamma", ch_mat);
@@ -1151,7 +1151,7 @@ void Pdiag_Double::diago_complex_begin(
 			work.data(), &lwork, rwork.data(), &lrwork,
 			iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
 
-		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<endl;
+		GlobalV::ofs_running<<"lwork="<<work[0]<<"\t"<<"liwork="<<iwork[0]<<std::endl;
 		lwork = work[0].real();
 		work.resize(lwork,0);
 		lrwork = rwork[0];
@@ -1163,7 +1163,7 @@ void Pdiag_Double::diago_complex_begin(
 			NULL, NULL, &il, &iu, &abstol,
 			&M, &NZ, ekb, &orfac, wfc_2d.c, &one, &one, desc,
 			work.data(), &lwork, rwork.data(), &lrwork, iwork.data(), &liwork, ifail.data(), iclustr.data(), gap.data(), &info);
-		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<endl;
+		GlobalV::ofs_running<<"M="<<M<<"\t"<<"NZ="<<NZ<<std::endl;
 
 		if(info)
 			throw runtime_error("info="+TO_STRING(info)+". "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
@@ -1300,9 +1300,9 @@ void Pdiag_Double::readin(
     ZEROS(B, nloc);
     ZEROS(Z, loc_size * nlocal_tot);
 
-    GlobalV::ofs_running << "\n Data distribution of H." << endl;
+    GlobalV::ofs_running << "\n Data distribution of H." << std::endl;
     this->data_distribution(comm_2D,fa,nlocal_tot,nb,A,MatrixInfo);
-    GlobalV::ofs_running << "\n Data distribution of S." << endl;
+    GlobalV::ofs_running << "\n Data distribution of S." << std::endl;
     this->data_distribution(comm_2D,fb,nlocal_tot,nb,B,MatrixInfo);
 
     time1=MPI_Wtime();
@@ -1315,10 +1315,10 @@ void Pdiag_Double::readin(
 
     //this->gath_eig(comm,n,eigvr,Z);
 
-    GlobalV::ofs_running << "\n " << setw(6) << "Band" << setw(25) << "Ry" << setw(25) << " eV" << endl;
+    GlobalV::ofs_running << "\n " << setw(6) << "Band" << setw(25) << "Ry" << setw(25) << " eV" << std::endl;
     for(int i=0; i<nlocal_tot; i++)
     {
-        GlobalV::ofs_running << " " << setw(6) << i << setw(25) << eigen[i] << setw(25)<< eigen[i] * 13.6058 << endl;
+        GlobalV::ofs_running << " " << setw(6) << i << setw(25) << eigen[i] << setw(25)<< eigen[i] * 13.6058 << std::endl;
     }
 
     delete[] A;

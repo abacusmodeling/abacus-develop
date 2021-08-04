@@ -205,13 +205,13 @@ void Grid_Base::get_small_box(
 	|| tau_dir.y < 0.0 || tau_dir.y > 1.0 
 	|| tau_dir.z < 0.0 || tau_dir.z > 1.0)
 	{
-		cout << "\n tau.x = " << tau.x;
-		cout << "\n tau.y = " << tau.y;
-		cout << "\n tau.z = " << tau.z;
+		std::cout << "\n tau.x = " << tau.x;
+		std::cout << "\n tau.y = " << tau.y;
+		std::cout << "\n tau.z = " << tau.z;
 		
-		cout << "\n tau_dir.x = " << tau_dir.x;
-		cout << "\n tau_dir.y = " << tau_dir.y;
-		cout << "\n tau_dir.z = " << tau_dir.z;
+		std::cout << "\n tau_dir.x = " << tau_dir.x;
+		std::cout << "\n tau_dir.y = " << tau_dir.y;
+		std::cout << "\n tau_dir.z = " << tau_dir.z;
 		WARNING_QUIT("Grid_Base::get_small_box",
 		"Positions(x,y,z) Of tau and R2 in Direct Coordinates should be between 0 and 1!");
 	}
@@ -249,9 +249,9 @@ void Grid_Base::edge_grid_points(
 
 	if(grid_number < 0)
 	{
-		cout << "\n edge_x = " << edge_min.x << " " << edge_max.x;
-		cout << "\n edge_y = " << edge_min.y << " " << edge_max.y;
-		cout << "\n edge_z = " << edge_min.z << " " << edge_max.z << endl;
+		std::cout << "\n edge_x = " << edge_min.x << " " << edge_max.x;
+		std::cout << "\n edge_y = " << edge_min.y << " " << edge_max.y;
+		std::cout << "\n edge_z = " << edge_min.z << " " << edge_max.z << std::endl;
 	}
 
 

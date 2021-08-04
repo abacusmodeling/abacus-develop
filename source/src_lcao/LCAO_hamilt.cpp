@@ -14,7 +14,7 @@ LCAO_Hamilt::~LCAO_Hamilt()
 {
 	if(GlobalV::test_deconstructor)
 	{
-		cout << " ~LCAO_Hamilt()" << endl;	
+		std::cout << " ~LCAO_Hamilt()" << std::endl;	
 	}
 }
 
@@ -49,7 +49,7 @@ void LCAO_Hamilt::set_lcao_matrices(void)
 
 	// initial the overlap matrix is done.	
     this->init_s = true;
-	//cout << " init_s=" << init_s << endl; //delete 2015-09-06, xiaohui
+	//std::cout << " init_s=" << init_s << std::endl; //delete 2015-09-06, xiaohui
 //	OUT(GlobalV::ofs_running,"init_s",init_s);
 
 	timer::tick("LCAO_Hamilt","set_lcao_matrices");
@@ -68,7 +68,7 @@ void LCAO_Hamilt::calculate_Hgamma( const int &ik )				// Peize Lin add ik 2016-
 
 	if(local_pw)
 	{
-		cout << "\n Call build_H in plane wave basis!" << endl;
+		std::cout << "\n Call build_H in plane wave basis!" << std::endl;
 	 	// Use plane wave basis to calculate 'Vl' matrix. 
 		Build_ST_pw bsp;
 		// 0 stands for, 0 stands for k point.
@@ -171,7 +171,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 	}
 	time_t time_t_end = time(NULL);
 
-	//	GlobalV::ofs_running << " T+Vnl matrix" << endl;
+	//	GlobalV::ofs_running << " T+Vnl matrix" << std::endl;
 	//GlobalC::LM.print_HSgamma('T');
 
 	OUT_TIME("kinetical matrix",time_t_start, time_t_end);
@@ -240,14 +240,14 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 	//-----------------------------------------
 	GlobalC::LM.zeros_HSk('S');
 	GlobalC::LM.zeros_HSk('T');
-//	cout << " after folding Hfixed k." << endl;
+//	std::cout << " after folding Hfixed k." << std::endl;
 	GlobalC::LNNR.folding_fixedH(ik);
 
 	//------------------------------------------
 	// Add T(k)+Vnl(k)+Vlocal(k)
 	// (Hloc2 += Hloc_fixed2), (complex matrix)
 	//------------------------------------------
-//	cout << " Folding matrix here." << endl;
+//	std::cout << " Folding matrix here." << std::endl;
 	GlobalC::LM.update_Hloc2();
 
 /*
@@ -310,7 +310,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 	Build_ST_pw bsp;
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
-		cout << " ik=" << ik << " ------------------------------------------" << endl;
+		std::cout << " ik=" << ik << " ------------------------------------------" << std::endl;
 	
 		//----------------------------------------------
 		// Check the matrix in plane wave basis.
@@ -321,9 +321,9 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 		bsp.set_ST(ik, 'S');
 		bsp.set_ST(ik, 'T');
 
-		cout << " --> PW S" << endl;
+		std::cout << " --> PW S" << std::endl;
 		GlobalC::LM.print_HSk('S','R',1.0e-5);
-		cout << " --> PW T" << endl;
+		std::cout << " --> PW T" << std::endl;
 		GlobalC::LM.print_HSk('T','R',1.0e-5);
 
 		string fn = "Sloc2pw.dat";
@@ -336,9 +336,9 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 		GlobalC::LM.zeros_HSk('S');
 		GlobalC::LM.zeros_HSk('T');
 		GlobalC::LNNR.folding_fixedH(ik);
-		cout << " --> LCAO S" << endl;
+		std::cout << " --> LCAO S" << std::endl;
 		GlobalC::LM.print_HSk('S','R',1.0e-5);	
-		cout << " --> LCAO T+Vnl" << endl;
+		std::cout << " --> LCAO T+Vnl" << std::endl;
 		GlobalC::LM.print_HSk('T','R',1.0e-5);	
 
 		string fn2 = "Sloc2lcao.dat";
@@ -352,11 +352,11 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 //		GlobalC::LM.zeros_HSgamma('H');
 //		GlobalC::UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
-//		cout << " Correct LCAO Vnl " << endl;
+//		std::cout << " Correct LCAO Vnl " << std::endl;
 //		GlobalC::LM.print_HSgamma('H');		
 //		GlobalC::UHM.genH.calculate_NL_no( nstart );
 //		GlobalV::GAMMA_ONLY_LOCAL = false;
-//		cout << " Correct LCAO Vnl " << endl;
+//		std::cout << " Correct LCAO Vnl " << std::endl;
 //		GlobalC::LM.print_HSgamma('H');		
 		
 	}

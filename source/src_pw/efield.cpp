@@ -43,7 +43,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		throw range_error("Efield::add_efield, edir is < 1 or > 3. "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		//WARNING_QUIT("Efield::add_efield","edir is < 1 or > 3.");
 	}
-//	cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << endl;
+//	std::cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << std::endl;
 
 	this->bmod = sqrt(pow(bvec[0],2) + pow(bvec[1],2) + pow(bvec[2],2));
 
@@ -70,7 +70,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		// calculate the force
 		if(GlobalV::FORCE)
 		{
-//			cout << "\n dipole force: " << endl;
+//			std::cout << "\n dipole force: " << std::endl;
 			int iat = 0;
 			for(int it=0; it<GlobalC::ucell.ntype; ++it)
 			{
@@ -80,9 +80,9 @@ void Efield::add_efield(const double*const rho, double* v_in)
 					{
 						fdip(iat, jj) = e2 *(eamp - tot_dipole)*GlobalC::ucell.atoms[it].zv*bvec[jj]/bmod;
 					}
-//					cout << setw(15) << fdip(iat, 0) 
+//					std::cout << setw(15) << fdip(iat, 0) 
 //					<< setw(15) << fdip(iat, 1)
-//					<< setw(15) << fdip(iat, 2) << endl;
+//					<< setw(15) << fdip(iat, 2) << std::endl;
 					++iat;
 				}
 			}
@@ -97,7 +97,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 		if(GlobalV::FORCE)
 		{
 			assert(bmod>0);
-//			cout << "\n dipole force: " << endl;
+//			std::cout << "\n dipole force: " << std::endl;
 			int iat = 0;
 			for(int it=0; it<GlobalC::ucell.ntype; ++it)
 			{
@@ -107,9 +107,9 @@ void Efield::add_efield(const double*const rho, double* v_in)
 					{
 						fdip(iat, jj) = e2 *eamp * GlobalC::ucell.atoms[it].zv * bvec[jj]/bmod;
 					}
-//					cout << setw(15) << fdip(iat, 0) 
+//					std::cout << setw(15) << fdip(iat, 0) 
 //					<< setw(15) << fdip(iat, 1)
-//					<< setw(15) << fdip(iat, 2) << endl;
+//					<< setw(15) << fdip(iat, 2) << std::endl;
 					++iat;
 				}
 			}
@@ -124,14 +124,14 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	const double vamp = e2*(eamp-tot_dipole)*length;
 	//const double fac = GlobalC::ucell.omega/FOUR_PI;
 
-//	cout << " Elec. dipole = " << e_dipole << " (Ry au), also = " 
-//	<< e_dipole * debye << " (debye)" << endl; 
+//	std::cout << " Elec. dipole = " << e_dipole << " (Ry au), also = " 
+//	<< e_dipole * debye << " (debye)" << std::endl; 
 	
 	GlobalV::ofs_running << " Ion dipole = " << ion_dipole << " (Ry au), also = " 
-	<< ion_dipole * debye << " (debye)" << endl;
+	<< ion_dipole * debye << " (debye)" << std::endl;
 
-//	cout << " Dipole = " << (tot_dipole* fac) << " (Ry au), also = " 
-//	<< (tot_dipole * fac) * debye << " (debye)" << endl;
+//	std::cout << " Dipole = " << (tot_dipole* fac) << " (Ry au), also = " 
+//	<< (tot_dipole * fac) * debye << " (debye)" << std::endl;
 
 
 	if( abs(eamp) > 0.0) 
@@ -167,7 +167,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 			const double sawarg = (double)ip/(double)npoi;
 			value = e2 * (eamp - tot_dipole) *
 				saw(emaxpos, eopreg, sawarg) * (GlobalC::ucell.lat0/bmod);
-			ofs << ip << " " << value << endl;
+			ofs << ip << " " << value << std::endl;
 		}
 		ofs.close();
 	}
@@ -192,12 +192,12 @@ void Efield::add_efield(const double*const rho, double* v_in)
 			saw(emaxpos, eopreg, sawarg) * (GlobalC::ucell.lat0/bmod);
 
 		/*
-		cout << " eamp=" << eamp << endl;
-		cout << " tot_dipole=" << tot_dipole << endl;
-		cout << " emaxpos=" << emaxpos << endl;
-		cout << " eopreg=" << eopreg << endl;
-		cout << " sawarg=" << sawarg << endl;
-		cout << " bmod=" << bmod << endl;
+		std::cout << " eamp=" << eamp << std::endl;
+		std::cout << " tot_dipole=" << tot_dipole << std::endl;
+		std::cout << " emaxpos=" << emaxpos << std::endl;
+		std::cout << " eopreg=" << eopreg << std::endl;
+		std::cout << " sawarg=" << sawarg << std::endl;
+		std::cout << " bmod=" << bmod << std::endl;
 		*/
 
      	v_in[ir] += value;
@@ -240,12 +240,12 @@ void Efield::compute_ion_dip(const double &emaxpos, const double &eopreg,
 			ion_dipole += atom->zv * this->saw(emaxpos,eopreg, tvectb )
 			 * (GlobalC::ucell.lat0/bmod_in) * (FOUR_PI/GlobalC::ucell.omega);
 
-//			cout << "--------------------------------------" << endl;
-//			cout << " tvectb=" << tvectb << endl;
-//			cout << " tau=" << atom->tau[ia].x << " " << atom->tau[ia].y << " " << atom->tau[ia].z << endl;
-//			cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << endl;
-//			cout << " saw=" << this->saw(emaxpos,eopreg, tvectb ) << endl;
-//			cout << " ion_dipole=" << ion_dipole << endl;
+//			std::cout << "--------------------------------------" << std::endl;
+//			std::cout << " tvectb=" << tvectb << std::endl;
+//			std::cout << " tau=" << atom->tau[ia].x << " " << atom->tau[ia].y << " " << atom->tau[ia].z << std::endl;
+//			std::cout << " bvec=" << bvec[0] << " " << bvec[1] << " " << bvec[2] << std::endl;
+//			std::cout << " saw=" << this->saw(emaxpos,eopreg, tvectb ) << std::endl;
+//			std::cout << " ion_dipole=" << ion_dipole << std::endl;
 		}	
 	}
 

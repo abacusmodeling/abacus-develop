@@ -163,8 +163,8 @@ class LCAO_Matrix
 	void zeros_HSk(const char &mtype);
 	void zeros_HSR(const char &mtype, const int &nnr);
 
-	void print_HSgamma(const char &mtype, ostream &os=cout);
-	void print_HSk(const char &mtype, const char &vtype = 'C', const double &accuracy = 1.0e-5, ostream &os=cout);
+	void print_HSgamma(const char &mtype, ostream &os=std::cout);
+	void print_HSk(const char &mtype, const char &vtype = 'C', const double &accuracy = 1.0e-5, ostream &os=std::cout);
 	void update_Hloc(void);
 	void update_Hloc2(void);
 

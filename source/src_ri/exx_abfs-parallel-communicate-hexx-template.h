@@ -145,7 +145,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 	{
 //gettimeofday( &t_start, NULL);
 //			const map<size_t,map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[ik]);
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<std::endl;
 //ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), HK_a2D );
 //gettimeofday( &t_start, NULL);
 		switch(mixing_mode)
@@ -165,7 +165,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 			default:
 				throw domain_error(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));	break;
 		}
-//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<endl;
+//ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D\t"<<time_during(t_start)<<std::endl;
 	}
 //ofs_matrixes( exx_lcao.test_dir+"test-HK_m2D_"+TO_STRING(GlobalV::MY_RANK), HK_m2D );
 }

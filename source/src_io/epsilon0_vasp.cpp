@@ -36,9 +36,9 @@ Epsilon0_vasp::~Epsilon0_vasp()
 
 void Epsilon0_vasp::cal_epsilon0()
 {
-	cout << "domega = "<<domega<<endl;
-	cout << "nomega = "<<nomega<<endl;
-	cout << "eta = "<<eta<<endl;
+	std::cout << "domega = "<<domega<<std::endl;
+	std::cout << "nomega = "<<nomega<<std::endl;
+	std::cout << "eta = "<<eta<<std::endl;
 	
 	double occupied_bands = static_cast<double>(GlobalC::CHR.nelec/DEGSPIN);
 	if( (occupied_bands - std::floor(occupied_bands)) > 0.0 )
@@ -56,8 +56,8 @@ void Epsilon0_vasp::cal_epsilon0()
 	}
 	uband = GlobalV::NBANDS - oband;
 	
-	cout << "oband = "<<oband<<endl;
-	cout << "uband = "<<uband<<endl;
+	std::cout << "oband = "<<oband<<std::endl;
+	std::cout << "uband = "<<uband<<std::endl;
 	
 	if( !init_finish )
 	{
@@ -72,31 +72,31 @@ void Epsilon0_vasp::cal_epsilon0()
 	Cal_T();
 	Cal_epsilon0();
 	
-	GlobalV::ofs_running<<endl; 
-	GlobalV::ofs_running<<" The real part of the macroscopic dielectric constant:"<<endl;
-	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
+	GlobalV::ofs_running<<std::endl; 
+	GlobalV::ofs_running<<" The real part of the macroscopic dielectric constant:"<<std::endl;
+	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<std::endl;  
 	for(int i=0; i<nomega; i++)
 	{
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<eps0[0][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][i].real()<<setprecision(2)<<setw(15)<<eps0[2][i].real()<<setprecision(2)<<setw(15)<<eps0[3][i].real()<<setprecision(2)<<setw(15)<<eps0[4][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][i].real()<<setprecision(2)<<setw(15)<<eps0[6][i].real()<<setprecision(2)<<setw(15)<<eps0[7][i].real()<<setprecision(2)<<setw(15)<<eps0[8][i].real()+1.0<<endl;
+		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<eps0[0][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][i].real()<<setprecision(2)<<setw(15)<<eps0[2][i].real()<<setprecision(2)<<setw(15)<<eps0[3][i].real()<<setprecision(2)<<setw(15)<<eps0[4][i].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][i].real()<<setprecision(2)<<setw(15)<<eps0[6][i].real()<<setprecision(2)<<setw(15)<<eps0[7][i].real()<<setprecision(2)<<setw(15)<<eps0[8][i].real()+1.0<<std::endl;
 	}
 	
-	GlobalV::ofs_running<<endl; 
-	GlobalV::ofs_running<<" The imag part of the macroscopic dielectric constant:"<<endl;
-	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<endl;  
+	GlobalV::ofs_running<<std::endl; 
+	GlobalV::ofs_running<<" The imag part of the macroscopic dielectric constant:"<<std::endl;
+	GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<std::endl;  
 	for(int i=0; i<nomega; i++)
 	{
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<-eps0[0][i].imag()<<setprecision(2)<<setw(15)<<-eps0[1][i].imag()<<setprecision(2)<<setw(15)<<-eps0[2][i].imag()<<setprecision(2)<<setw(15)<<-eps0[3][i].imag()<<setprecision(2)<<setw(15)<<-eps0[4][i].imag()<<setprecision(2)<<setw(15)<<-eps0[5][i].imag()<<setprecision(2)<<setw(15)<<-eps0[6][i].imag()<<setprecision(2)<<setw(15)<<-eps0[7][i].imag()<<setprecision(2)<<setw(15)<<-eps0[8][i].imag()<<endl;
+		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<-eps0[0][i].imag()<<setprecision(2)<<setw(15)<<-eps0[1][i].imag()<<setprecision(2)<<setw(15)<<-eps0[2][i].imag()<<setprecision(2)<<setw(15)<<-eps0[3][i].imag()<<setprecision(2)<<setw(15)<<-eps0[4][i].imag()<<setprecision(2)<<setw(15)<<-eps0[5][i].imag()<<setprecision(2)<<setw(15)<<-eps0[6][i].imag()<<setprecision(2)<<setw(15)<<-eps0[7][i].imag()<<setprecision(2)<<setw(15)<<-eps0[8][i].imag()<<std::endl;
 	}
 	
-	GlobalV::ofs_running<<" Macroscopic dielectric constant matrix :"<<endl;
-	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[0][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][0].real()<<setprecision(2)<<setw(15)<<eps0[2][0].real()<<endl;
-	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[3][0].real()<<setprecision(2)<<setw(15)<<eps0[4][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][0].real()<<endl;
-	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[6][0].real()<<setprecision(2)<<setw(15)<<eps0[7][0].real()<<setprecision(2)<<setw(15)<<eps0[8][0].real()+1.0<<endl;	
+	GlobalV::ofs_running<<" Macroscopic dielectric constant matrix :"<<std::endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[0][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[1][0].real()<<setprecision(2)<<setw(15)<<eps0[2][0].real()<<std::endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[3][0].real()<<setprecision(2)<<setw(15)<<eps0[4][0].real()+1.0<<setprecision(2)<<setw(15)<<eps0[5][0].real()<<std::endl;
+	GlobalV::ofs_running<<setprecision(2)<<setw(15)<<eps0[6][0].real()<<setprecision(2)<<setw(15)<<eps0[7][0].real()<<setprecision(2)<<setw(15)<<eps0[8][0].real()+1.0<<std::endl;	
 	
-	//cout <<"Macroscopic dielectric constant matrix :"<<endl;
-	//cout << eps0[0][0].real()+1.0 <<"  "<<eps0[1][0].real() <<"  "<<eps0[2][0].real() <<"  "<<endl;
-	//cout << eps0[3][0].real() <<"  "<<eps0[4][0].real()+1.0 <<"  "<<eps0[5][0].real() <<"  "<<endl;
-	//cout << eps0[6][0].real() <<"  "<<eps0[7][0].real() <<"  "<<eps0[8][0].real()+1.0 <<"  "<<endl;
+	//std::cout <<"Macroscopic dielectric constant matrix :"<<std::endl;
+	//std::cout << eps0[0][0].real()+1.0 <<"  "<<eps0[1][0].real() <<"  "<<eps0[2][0].real() <<"  "<<std::endl;
+	//std::cout << eps0[3][0].real() <<"  "<<eps0[4][0].real()+1.0 <<"  "<<eps0[5][0].real() <<"  "<<std::endl;
+	//std::cout << eps0[6][0].real() <<"  "<<eps0[7][0].real() <<"  "<<eps0[8][0].real()+1.0 <<"  "<<std::endl;
 	
 	Delete();
 	
@@ -430,7 +430,7 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 		{
 			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
-				cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<endl;
+				std::cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<std::endl;
 			}
 		}
 	}*/
@@ -439,14 +439,14 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 	{
 		for(int ig=0; ig<GlobalC::kv.ngk[ik];ig++)
 		{
-			cout<<
+			std::cout<<
 		}
 	}*/
 
 	for(int u=0; u<GlobalC::ppcell.nkb; u++)
 		for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 		{
-			cout<<"ik = "<<ik<<" u = "<<u<<" ig = "<<ig<<"  GlobalC::ppcell.vkb["<<u<<"]["<<ig<<"] = "<<GlobalC::ppcell.vkb(u,ig)<<endl;
+			std::cout<<"ik = "<<ik<<" u = "<<u<<" ig = "<<ig<<"  GlobalC::ppcell.vkb["<<u<<"]["<<ig<<"] = "<<GlobalC::ppcell.vkb(u,ig)<<std::endl;
 		}	 
 
 	for(int ib=0; ib<GlobalV::NBANDS; ib++)
@@ -456,8 +456,8 @@ void Epsilon0_vasp:: Cal_psi_nu(int ik)
 			ZEROS(psi_nu[ib][u], 4);
 			for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 			{
-				//cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<endl;
-				//cout<<"psi_nu = "<<psi_nu[ib][u][0]<<endl;
+				//std::cout<<"ib = "<<ib<<" u = "<<u<<" ig = "<<ig<<" vkb_alpha = "<<GlobalC::ppcell.vkb_alpha[0][u][ig]<<std::endl;
+				//std::cout<<"psi_nu = "<<psi_nu[ib][u][0]<<std::endl;
 				psi_nu_core[ib][u][0] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[0][u][ig];
 				psi_nu_core[ib][u][1] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[1][u][ig];
 				psi_nu_core[ib][u][2] += conj(GlobalC::wf.evc[ik](ib,ig)) * GlobalC::ppcell.vkb_alpha[2][u][ig];
@@ -509,7 +509,7 @@ void Epsilon0_vasp:: Cal_epsilon0s()
 		/*for(int ib1=0; ib1<oband; ib1++)
 			for(int ib2=0; ib2<uband; ib2++)
 			{
-				cout<<"ik = "<<ik<<" b["<<ib1<<"]["<<ib2<<"][0]"<<b[ib1][ib2][0]<<endl;
+				std::cout<<"ik = "<<ik<<" b["<<ib1<<"]["<<ib2<<"][0]"<<b[ib1][ib2][0]<<std::endl;
 			}*/
 			
 		for(int ib1=0; ib1<oband; ib1++)

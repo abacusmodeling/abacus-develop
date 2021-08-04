@@ -13,7 +13,7 @@ static void Sph_Bessel_timetest(
 	const size_t kmesh
 )
 {
-	cout<<Lmax<<"\t"<<dR<<"\t"<<Rmesh<<"\t"<<dk<<"\t"<<kmesh<<endl;
+	std::cout<<Lmax<<"\t"<<dR<<"\t"<<Rmesh<<"\t"<<dk<<"\t"<<kmesh<<std::endl;
 	
 	auto generate_point = []( const double d, const size_t mesh ) -> vector<double>
 	{
@@ -36,7 +36,7 @@ static void Sph_Bessel_timetest(
 			SB.jlx( kmesh, VECTOR_TO_PTR(kpoint), rpoint[ir], l, VECTOR_TO_PTR(jlx[ir]) );
 		}
 		timeval t_end;	gettimeofday( &t_end, NULL);
-		cout<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<endl;
+		std::cout<<l<<"\t"<<(double)(t_end.tv_sec-t_start.tv_sec) + (double)(t_end.tv_usec-t_start.tv_usec)/1000000.0<<std::endl;
 	}
 }
 

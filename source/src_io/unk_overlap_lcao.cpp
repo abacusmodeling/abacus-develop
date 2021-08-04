@@ -27,7 +27,7 @@ unkOverlap_lcao::unkOverlap_lcao()
 		ZEROS(cal_tag[iw],GlobalV::NLOCAL);
 	}
 	*/
-	//GlobalV::ofs_running << "this is unkOverlap_lcao()" << endl;
+	//GlobalV::ofs_running << "this is unkOverlap_lcao()" << std::endl;
 }
 
 unkOverlap_lcao::~unkOverlap_lcao()
@@ -51,13 +51,13 @@ unkOverlap_lcao::~unkOverlap_lcao()
 		delete cal_tag;
 	}
 	
-	//GlobalV::ofs_running << "this is ~unkOverlap_lcao()" << endl;
+	//GlobalV::ofs_running << "this is ~unkOverlap_lcao()" << std::endl;
 }
 
 
 void unkOverlap_lcao::init()
 {	
-	//cout << "unkOverlap_lcao::init start" << endl;
+	//std::cout << "unkOverlap_lcao::init start" << std::endl;
 
 	int Lmax_used, Lmax;
 
@@ -232,7 +232,7 @@ void unkOverlap_lcao::init()
 	
 
 	
-	//cout << "unkOverlap_lcao::init end" << endl; 
+	//std::cout << "unkOverlap_lcao::init end" << std::endl; 
 	return;
 	
 }
@@ -438,7 +438,7 @@ void unkOverlap_lcao::cal_R_number()
 
 void unkOverlap_lcao::cal_orb_overlap()
 {
-	//cout << "the cal_orb_overlap is start" << endl;
+	//std::cout << "the cal_orb_overlap is start" << std::endl;
 	psi_psi.resize(GlobalV::NLOCAL);
 	psi_r_psi.resize(GlobalV::NLOCAL);
 	for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
@@ -481,7 +481,7 @@ void unkOverlap_lcao::cal_orb_overlap()
 		}
 	}
 	
-	//cout << "the cal_orb_overlap is end" << endl;
+	//std::cout << "the cal_orb_overlap is end" << std::endl;
 	
 	return;
 }
@@ -489,7 +489,7 @@ void unkOverlap_lcao::cal_orb_overlap()
 // dk 's unit is GlobalC::ucell.tpiba
 complex<double> unkOverlap_lcao::unkdotp_LCAO(const int ik_L, const int ik_R, const int iband_L, const int iband_R, const Vector3<double> dk)
 {	
-	//cout << "unkdotp_LCAO start" << endl;
+	//std::cout << "unkdotp_LCAO start" << std::endl;
 
 	complex<double> result(0.0,0.0);
 	
@@ -500,11 +500,11 @@ complex<double> unkOverlap_lcao::unkdotp_LCAO(const int ik_L, const int ik_R, co
 			//if ( !GlobalC::ParaO.in_this_processor(iw1,iw2) ) continue;
 			if( !cal_tag[iw1][iw2] ) 
 			{
-				//GlobalV::ofs_running << "the no calculate iw1 and iw2 is " << iw1 << "," << iw2 << endl;
+				//GlobalV::ofs_running << "the no calculate iw1 and iw2 is " << iw1 << "," << iw2 << std::endl;
 				continue;
 			}
 			
-			//GlobalV::ofs_running << "the calculate iw1 and iw2 is " << iw1 << "," << iw2 << endl;
+			//GlobalV::ofs_running << "the calculate iw1 and iw2 is " << iw1 << "," << iw2 << std::endl;
 			
 			// iw1 和 iw2 永远没有overlap
 			if( orb1_orb2_R[iw1][iw2].empty() ) continue;
@@ -787,7 +787,7 @@ void unkOverlap_lcao::test()
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 			for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
 			{
-				GlobalV::ofs_running << "the global lcao wfc : ik = " << ik << "  ib = " << ib << "  iw = " << iw << "  valuse = " << lcao_wfc_global[ik][ib][iw] << endl;
+				GlobalV::ofs_running << "the global lcao wfc : ik = " << ik << "  ib = " << ib << "  iw = " << iw << "  valuse = " << lcao_wfc_global[ik][ib][iw] << std::endl;
 			}
 	}
 
@@ -798,7 +798,7 @@ void unkOverlap_lcao::test()
 		{
 			if(!cal_tag[iw1][iw2]) continue;
 			
-			GlobalV::ofs_running << "the cal_tag is not 0: " << iw1 << "  " << iw2 << endl;
+			GlobalV::ofs_running << "the cal_tag is not 0: " << iw1 << "  " << iw2 << std::endl;
 		}
 	}
 	*/
@@ -809,25 +809,25 @@ void unkOverlap_lcao::test()
 	if(!orb1_orb2_R[index_1][index_2].empty())
 	{
 		for(int iR = 0; iR < orb1_orb2_R[index_1][index_2].size(); iR++)
-			cout << "the R is " << orb1_orb2_R[index_1][index_2][iR].x << "," << orb1_orb2_R[index_1][index_2][iR].y << "," << orb1_orb2_R[index_1][index_2][iR].z << " and overlap is " << psi_psi[index_1][index_2][iR] << endl;
+			std::cout << "the R is " << orb1_orb2_R[index_1][index_2][iR].x << "," << orb1_orb2_R[index_1][index_2][iR].y << "," << orb1_orb2_R[index_1][index_2][iR].z << " and overlap is " << psi_psi[index_1][index_2][iR] << std::endl;
 	}
 	
 	*/
 	/*
 	Vector3<double> dk = GlobalC::kv.kvec_c[0] - GlobalC::kv.kvec_c[0];
-	GlobalV::ofs_running << "(" << 0 << "," << 0 << ") = " << abs(this->unkdotp_LCAO(0,0,0,0,dk)) << endl;
+	GlobalV::ofs_running << "(" << 0 << "," << 0 << ") = " << abs(this->unkdotp_LCAO(0,0,0,0,dk)) << std::endl;
 	*/
 	/*
 	Vector3<double> dk = GlobalC::kv.kvec_c[0] - GlobalC::kv.kvec_c[0];
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 		for(int ib2 = 0; ib2 < GlobalV::NBANDS; ib2++)
-			GlobalV::ofs_running << "(" << ib2 << "," << ib << ") = " << abs(this->unkdotp_LCAO(0,0,ib2,ib,dk)) << endl;
+			GlobalV::ofs_running << "(" << ib2 << "," << ib << ") = " << abs(this->unkdotp_LCAO(0,0,ib2,ib,dk)) << std::endl;
 	*/	
 	/*
 	double result = 0;
 	for(int iw = 0; iw < GlobalV::NLOCAL; iw++)
 	{
-		cout << "the wfc 11 is " << GlobalC::LOWF.WFC_K[11][13][iw] << " and the 23 is " << GlobalC::LOWF.WFC_K[23][13][iw] << endl;
+		std::cout << "the wfc 11 is " << GlobalC::LOWF.WFC_K[11][13][iw] << " and the 23 is " << GlobalC::LOWF.WFC_K[23][13][iw] << std::endl;
 	}
 	*/
 }

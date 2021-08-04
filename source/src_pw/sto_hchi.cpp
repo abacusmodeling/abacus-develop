@@ -156,7 +156,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 	//	{
 	//		overlap += conj(kswf[ig]) * chig[ig];
 	//	}
-	//	cout<<"OVERLAP "<<overlap<<endl;
+	//	std::cout<<"OVERLAP "<<overlap<<std::endl;
 	//}
 
 	for(int ig = 0; ig < GlobalC::wf.npw; ++ig)
@@ -193,7 +193,7 @@ void Stochastic_hchi::orthogonal_to_psi_real(complex<double> *wfin, complex<doub
 		{
 			overlap += conj(kswf[ir]) * wfout[ir];
 		}
-		cout<<"OVERLAP "<<overlap<<endl;
+		std::cout<<"OVERLAP "<<overlap<<std::endl;
 	}
 	delete [] kswf;*/
 
@@ -271,13 +271,13 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 		}
 		
 	}
-	/*cout<<"HCHI-------------------------"<<endl;
+	/*std::cout<<"HCHI-------------------------"<<std::endl;
 
 		for(int ir  = 63800 ; ir < 64000; ++ir)
 		{
-			cout<<chi_in[ir] * vr[ir]<<" ";
+			std::cout<<chi_in[ir] * vr[ir]<<" ";
 		}
-		cout<<endl;*/
+		std::cout<<std::endl;*/
 	
 	
 	
@@ -415,7 +415,7 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 	//	sum1 += norm(chi_in[i]);
 	//	sum2 += real(conj(chi_in[i]) * hchi[i]);
 	//}
-	//cout<<setw(15)<<sum2 <<setw(15)<<sum1<<setw(15)<<sum2/sum1<<endl;
+	//std::cout<<setw(15)<<sum2 <<setw(15)<<sum1<<setw(15)<<sum2/sum1<<std::endl;
 	//------------------------------------------------------------
 
 	//test hermit property
@@ -425,7 +425,7 @@ void Stochastic_hchi::hchi_real(complex<double>*chi_in, complex<double> *hchi, c
 	//{
 	//	sum+=conj(chi_in[i]) * hchi[i];
 	//}
-	//cout<<sum<<" must be real numebr."<<endl; //sum must be a real number
+	//std::cout<<sum<<" must be real numebr."<<std::endl; //sum must be a real number
 	//------------------------------------------------------------
 	return;
 }

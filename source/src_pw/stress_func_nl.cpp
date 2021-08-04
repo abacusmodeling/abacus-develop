@@ -267,8 +267,8 @@ void Stress_Func::get_dvnl1
 			{
 				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
 
-				//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
-				//cout << "\n gk.norm = " << gnorm;
+				//std::cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
+				//std::cout << "\n gk.norm = " << gnorm;
 
 				vq [ig] = PolyInt::Polynomial_Interpolation(
 						GlobalC::ppcell.tab, it, nb, GlobalV::NQX, GlobalV::DQ, gnorm );
@@ -357,8 +357,8 @@ void Stress_Func::get_dvnl2(ComplexMatrix &vkb,
 			for (ig = 0;ig < npw;ig++)
 			{
 				const double gnorm = gk[ig].norm() * GlobalC::ucell.tpiba;
-	//cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
-	//cout << "\n gk.norm = " << gnorm;
+	//std::cout << "\n gk[ig] = " << gk[ig].x << " " << gk[ig].y << " " << gk[ig].z;
+	//std::cout << "\n gk.norm = " << gnorm;
 				vq [ig] = Polynomial_Interpolation_nl(
 						GlobalC::ppcell.tab, it, nb, GlobalV::DQ, gnorm );
 

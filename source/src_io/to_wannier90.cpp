@@ -88,7 +88,7 @@ void toWannier90::read_nnkp()
 	wannier_file_name = INPUT.NNKP;
 	wannier_file_name = wannier_file_name.substr(0,wannier_file_name.length() - 5);
 
-	GlobalV::ofs_running << "reading the " << wannier_file_name << ".nnkp file." << endl;
+	GlobalV::ofs_running << "reading the " << wannier_file_name << ".nnkp file." << std::endl;
 	
 	ifstream nnkp_read(INPUT.NNKP.c_str(), ios::in);
 	
@@ -186,7 +186,7 @@ void toWannier90::read_nnkp()
 		{
 			READ_VALUE(nnkp_read, num_wannier);
 			// test
-			//GlobalV::ofs_running << "num_wannier = " << num_wannier << endl;
+			//GlobalV::ofs_running << "num_wannier = " << num_wannier << std::endl;
 			// test
 			if(num_wannier < 0)
 			{
@@ -267,10 +267,10 @@ void toWannier90::read_nnkp()
 	}
 	
 	// test by jingan
-	//GlobalV::ofs_running << "num_exclude_bands = " << num_exclude_bands << endl;
+	//GlobalV::ofs_running << "num_exclude_bands = " << num_exclude_bands << std::endl;
 	//for(int i = 0; i < num_exclude_bands; i++)
 	//{
-	//	GlobalV::ofs_running << "exclude_bands : " << exclude_bands[i] << endl;
+	//	GlobalV::ofs_running << "exclude_bands : " << exclude_bands[i] << std::endl;
 	//}
 	// test by jingan
 	
@@ -284,11 +284,11 @@ void toWannier90::read_nnkp()
 	}
 	
 	// test by jingan
-	//GlobalV::ofs_running << "num_wannier is " << num_wannier << endl;
+	//GlobalV::ofs_running << "num_wannier is " << num_wannier << std::endl;
 	//for(int i = 0; i < num_wannier; i++)
 	//{
-	//	GlobalV::ofs_running << "num_wannier" << endl;
-	//	GlobalV::ofs_running << L[i] << " " << m[i] << " " << rvalue[i] << " " << alfa[i] << endl;
+	//	GlobalV::ofs_running << "num_wannier" << std::endl;
+	//	GlobalV::ofs_running << L[i] << " " << m[i] << " " << rvalue[i] << " " << alfa[i] << std::endl;
 	//}
 	// test by jingan
 	
@@ -336,7 +336,7 @@ void toWannier90::outEIG()
 				index_band++;
 				eig_file << setw(5) << index_band << setw(5) << ik+1-start_k_index
 						 << setw(18) << showpoint << fixed << setprecision(12) 
-						 << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << endl;
+						 << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << std::endl;
 			}
 		}
 		
@@ -366,7 +366,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 		
 		ofstream unkfile(name.str());
 		
-		unkfile << setw(12) << GlobalC::pw.ncx << setw(12) << GlobalC::pw.ncy << setw(12) << GlobalC::pw.ncz << setw(12) << ik+1 << setw(12) << num_bands << endl;
+		unkfile << setw(12) << GlobalC::pw.ncx << setw(12) << GlobalC::pw.ncy << setw(12) << GlobalC::pw.ncz << setw(12) << ik+1 << setw(12) << num_bands << std::endl;
 		
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
@@ -392,7 +392,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 									<< setw(20) << setprecision(9) << setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
 									//jingan test
 									//<< "       " << setw(12) << setprecision(9) << setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
-									<< endl;
+									<< std::endl;
 						}
 						else
 						{
@@ -401,7 +401,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 									<< setw(20) << setprecision(9) << setiosflags(ios::scientific) << zero
 									//jingan test
 									//<< "       " << setw(12) << setprecision(9) << setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
-									<< endl;
+									<< std::endl;
 						}
 					}
 				}
@@ -484,7 +484,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 				
 				unkfile.open(name.str(),ios::out);
 				
-				unkfile << setw(12) << GlobalC::pw.ncx << setw(12) << GlobalC::pw.ncy << setw(12) << GlobalC::pw.ncz << setw(12) << ik+1 << setw(12) << num_bands << endl;
+				unkfile << setw(12) << GlobalC::pw.ncx << setw(12) << GlobalC::pw.ncy << setw(12) << GlobalC::pw.ncz << setw(12) << ik+1 << setw(12) << num_bands << std::endl;
 			}
 			
 			for(int ib = 0; ib < GlobalV::NBANDS; ib++)
@@ -541,7 +541,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 							{
 								unkfile << setw(20) << setprecision(9) << setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].real()
 										<< setw(20) << setprecision(9) << setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].imag() 
-										<< endl;
+										<< std::endl;
 							}
 						}
 					}
@@ -589,7 +589,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 		string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".amn";
 		Amn_file.open( fileaddress.c_str() , ios::out);
 		Amn_file << " Created on " << ctime(&time_now);
-		Amn_file << setw(12) << num_bands << setw(12) << cal_num_kpts << setw(12) << num_wannier << endl;
+		Amn_file << setw(12) << num_bands << setw(12) << cal_num_kpts << setw(12) << num_wannier << std::endl;
 	}
 	
 	ComplexMatrix *trial_orbitals = new ComplexMatrix[cal_num_kpts];
@@ -600,7 +600,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 	}	
 	
 	// test by jingan
-	//GlobalV::ofs_running << __FILE__ << __LINE__ << "start_k_index = " << start_k_index << "  cal_num_kpts = " << cal_num_kpts << endl;
+	//GlobalV::ofs_running << __FILE__ << __LINE__ << "start_k_index = " << start_k_index << "  cal_num_kpts = " << cal_num_kpts << std::endl;
 	// test by jingan
 
 	for(int ik = start_k_index; ik < (cal_num_kpts+start_k_index); ik++)
@@ -631,7 +631,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 							 << setw(18) << showpoint << fixed << setprecision(12) << amn.imag()
 							 //jingan test
 							 //<< "   " << setw(18) << setprecision(13) << abs(amn)
-							 << endl;
+							 << std::endl;
 				}
 			}
 		}
@@ -650,7 +650,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 {	
 	// test by jingan
-	//GlobalV::ofs_running << __FILE__ << __LINE__ << " cal_num_kpts = " << cal_num_kpts << endl;
+	//GlobalV::ofs_running << __FILE__ << __LINE__ << " cal_num_kpts = " << cal_num_kpts << std::endl;
 	// test by jingan
 	
 	ofstream mmn_file;
@@ -662,7 +662,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 		
 		time_t  time_now = time(NULL);
 		mmn_file << " Created on " << ctime(&time_now);
-		mmn_file << setw(12) << num_bands << setw(12) << cal_num_kpts << setw(12) << nntot << endl;
+		mmn_file << setw(12) << num_bands << setw(12) << cal_num_kpts << setw(12) << nntot << std::endl;
 	}
 	
 	/*
@@ -699,7 +699,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 			{
 				mmn_file << setw(5) << ik+1 << setw(5) << ikb+1 << setw(5) 
 						 << int(phase_G.x) << setw(5) << int(phase_G.y) << setw(5) << int(phase_G.z) 
-						 << endl;
+						 << std::endl;
 			}
 		
 			for(int m = 0; m < GlobalV::NBANDS; m++)
@@ -715,7 +715,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 						int cal_ik = ik + start_k_index;
 						int cal_ikb = ikb + start_k_index;												
 						// test by jingan
-						//GlobalV::ofs_running << __FILE__ << __LINE__ << "cal_ik = " << cal_ik << "cal_ikb = " << cal_ikb << endl;
+						//GlobalV::ofs_running << __FILE__ << __LINE__ << "cal_ik = " << cal_ik << "cal_ikb = " << cal_ikb << std::endl;
 						// test by jingan
 						//complex<double> *unk_L_r = new complex<double>[GlobalC::pw.nrxx];
 						//ToRealSpace(cal_ik,n,wfc_pw,unk_L_r,phase_G);				
@@ -725,7 +725,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 					}
 					else
 					{
-						//GlobalV::ofs_running << "gamma only test" << endl;
+						//GlobalV::ofs_running << "gamma only test" << std::endl;
 						//mmn = Mmn(n,m);
 					}
 					
@@ -735,7 +735,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 								 << setw(18) << setprecision(12) << showpoint << fixed << mmn.imag()
 								 // jingan test
 								 //<< "    " << setw(12) << setprecision(9) << abs(mmn)
-								 << endl;				
+								 << std::endl;				
 					}
 				}
 			}
@@ -753,15 +753,15 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	// �������Ƿ���ȷ
 	for(int i =0; i < num_wannier; i++)
 	{
-		if(L[i] < -5 || L[i] > 3) cout << "toWannier90::produce_trial_in_pw() your L angular momentum is wrong , please check !!! " << endl;
+		if(L[i] < -5 || L[i] > 3) std::cout << "toWannier90::produce_trial_in_pw() your L angular momentum is wrong , please check !!! " << std::endl;
 	
 		if(L[i] >= 0) 
 		{
-			if(m[i] < 0 || m[i] > 2*L[i]) cout << "toWannier90::produce_trial_in_pw() your m momentum is wrong , please check !!! " << endl;
+			if(m[i] < 0 || m[i] > 2*L[i]) std::cout << "toWannier90::produce_trial_in_pw() your m momentum is wrong , please check !!! " << std::endl;
 		}
 		else
 		{
-			if(m[i] < 0 || m[i] > -L[i]) cout << "toWannier90::produce_trial_in_pw() your m momentum is wrong , please check !!! " << endl;
+			if(m[i] < 0 || m[i] > -L[i]) std::cout << "toWannier90::produce_trial_in_pw() your m momentum is wrong , please check !!! " << std::endl;
 		
 		}
 	}
@@ -786,8 +786,8 @@ void toWannier90::produce_trial_in_pw(const int &ik, ComplexMatrix &trial_orbita
 	YlmReal::Ylm_Real(total_lm, npw, gk, ylm);
 	
 	// test by jingan
-	//GlobalV::ofs_running << "the mathzone::ylm_real is successful!" << endl;
-	//GlobalV::ofs_running << "produce_trial_in_pw: num_wannier is " << num_wannier << endl;
+	//GlobalV::ofs_running << "the mathzone::ylm_real is successful!" << std::endl;
+	//GlobalV::ofs_running << "produce_trial_in_pw: num_wannier is " << num_wannier << std::endl;
 	// test by jingan
 	
 	

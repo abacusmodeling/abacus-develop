@@ -23,7 +23,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<Tmatrix> &DK_2D, const
 	/*{
 		static int istep=0;
 		ofstream ofs("DK_2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
-		ofs<<DK_2D<<endl;
+		ofs<<DK_2D<<std::endl;
 	}*/
 	
 	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
@@ -90,7 +90,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<Tmatrix> &DK_2D, const
 	/*{
 		static int istep=0;
 		ofstream ofs("DR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
-		ofs<<DR_a2D<<endl;
+		ofs<<DR_a2D<<std::endl;
 	}*/
 	return DR_a2D;
 }

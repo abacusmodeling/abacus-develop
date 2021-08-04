@@ -272,7 +272,7 @@ void DFTU::init(
 
 	//this->out_numorb();
 
-  //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << endl;
+  //GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__ << std::endl;
     return;
 }
 
@@ -474,7 +474,7 @@ void DFTU::cal_occup_m_k(const int iter)
 					  	break;
 
 					  default:
-					  	cout << "Not supported NSPIN parameter" << endl;
+					  	std::cout << "Not supported NSPIN parameter" << std::endl;
 					  	exit(0);			
 					}
 
@@ -484,7 +484,7 @@ void DFTU::cal_occup_m_k(const int iter)
 	  }//end ia
 	}//end it
 
-	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	return;
 }
 
@@ -620,7 +620,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	  				  	break;
 
 	  				  default:
-	  				  	cout << "Not supported NSPIN parameter" << endl;
+	  				  	std::cout << "Not supported NSPIN parameter" << std::endl;
 	  				  	exit(0);			
 	  				}
 
@@ -654,11 +654,11 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	if(GlobalV::MY_RANK==0)
 	{
 		ofstream ofs_elec("nelec.dat", ios_base::app);
-		ofs_elec << "Total number of electrons of the system " << Nele << endl;
+		ofs_elec << "Total number of electrons of the system " << Nele << std::endl;
 	}
 	*/
 
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	return;
 }
 
@@ -672,7 +672,7 @@ void DFTU::write_occup_m(const string &fn)
 	ofdftu.open(fn.c_str());
     if (!ofdftu)
     {
-    	cout << "DFTU::write_occup_m. Can't create file onsite.dm!" << endl;
+    	std::cout << "DFTU::write_occup_m. Can't create file onsite.dm!" << std::endl;
 		exit(0);
     }
 
@@ -685,7 +685,7 @@ void DFTU::write_occup_m(const string &fn)
 		for(int I=0; I<GlobalC::ucell.atoms[T].na; I++)
 		{
 			const int iat = GlobalC::ucell.itia2iat(T, I);
-			ofdftu << "atoms" << "  " << iat << endl;
+			ofdftu << "atoms" << "  " << iat << std::endl;
 
 			for(int l=0; l<NL; l++)
 			{
@@ -700,27 +700,27 @@ void DFTU::write_occup_m(const string &fn)
 				if(l!=INPUT.orbital_corr[T]) continue;
 				
 				const int N = GlobalC::ucell.atoms[T].l_nchi[l];
-				ofdftu << "L" << "  " << l << endl;
+				ofdftu << "L" << "  " << l << std::endl;
 
 				for(int n=0; n<N; n++)		
 				{
 					// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
 
-					ofdftu << "zeta" << "  " << n << endl;
+					ofdftu << "zeta" << "  " << n << std::endl;
 					
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 					{
 						for(int is=0; is<2; is++)
 						{
-							ofdftu << "spin" << "  " << is << endl;
+							ofdftu << "spin" << "  " << is << std::endl;
 							for(int m0=0; m0<2*l+1; m0++)
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
 									ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
 								}
-								ofdftu << endl;
+								ofdftu << std::endl;
 							}
 						}
 					}
@@ -740,7 +740,7 @@ void DFTU::write_occup_m(const string &fn)
 										ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
 									}
 								}
-								ofdftu << endl;
+								ofdftu << std::endl;
 							}							
 						}
 					}					
@@ -764,13 +764,13 @@ void DFTU::read_occup_m(const string &fn)
 	{
 		if(GlobalV::CALCULATION=="nscf") 
 		{
-			cout << "DFTU::read_occup_m. Can not find the file oneite.dm . Please do scf calculation first" << endl;
+			std::cout << "DFTU::read_occup_m. Can not find the file oneite.dm . Please do scf calculation first" << std::endl;
 		}
 		else
 		{
 			if(INPUT.omc) 
 			{
-				cout << "DFTU::read_occup_m. Can not find the file initial_onsite.dm . Please check your initial_onsite.dm" << endl;
+				std::cout << "DFTU::read_occup_m. Can not find the file initial_onsite.dm . Please check your initial_onsite.dm" << std::endl;
 			}
 		}
 		exit(0);
@@ -853,7 +853,7 @@ void DFTU::read_occup_m(const string &fn)
 									}
 									else
 									{								
-										cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+										std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 										exit(0);
 									}	
 								}
@@ -883,21 +883,21 @@ void DFTU::read_occup_m(const string &fn)
 						}
 						else
 						{						
-							cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+							std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 							exit(0);
 						}
 					}
 				}
 				else
 				{				
-					cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+					std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 					exit(0);
 				}								
 			}			
         }
 		else
 		{		
-			cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << endl;
+			std::cout << "WRONG IN READING LOCAL OCCUPATION NUMBER MATRIX FROM DFTU FILE" << std::endl;
 			exit(0);
 		}
 		
@@ -1124,7 +1124,7 @@ void DFTU::cal_energy_correction(const int istep)
 	{
 		ofstream of_eu("energy_correction", ios_base::app);
 		double e=EU*Ry_to_eV;
-		of_eu << "ITERATION STEP " << setw(3) << this->iter_dftu <<"      " << setw(15) << e << "ev" << endl;
+		of_eu << "ITERATION STEP " << setw(3) << this->iter_dftu <<"      " << setw(15) << e << "ev" << std::endl;
 	}
 	*/
 	
@@ -1137,7 +1137,7 @@ void DFTU::cal_energy_correction(const int istep)
 		ofstream of_en("energy_correction.dat",ios_base::app);
 		double val = this->EU*Ry_to_eV;
 
-		of_en << fixed << setprecision(8) << val << "eV" << endl;
+		of_en << fixed << setprecision(8) << val << "eV" << std::endl;
 	}
 	*/
 
@@ -1154,7 +1154,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 
 	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//GlobalV::ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
@@ -1218,11 +1218,11 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	if(MY_RANK==0)
 	{
 		ofstream of_potH("Hermitian_pot.dat",ios_base::app);
-		of_potH << "Hermitian  " << pot_Hermitian << endl;
+		of_potH << "Hermitian  " << pot_Hermitian << std::endl;
 	}
 	*/
 
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 
 	return;	
 }
@@ -1237,7 +1237,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 
 	ZEROS(eff_pot, GlobalC::ParaO.nloc);
 
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 	//=============================================================
 	//   PART2: call pblas to calculate effective potential matrix
 	//=============================================================
@@ -1301,11 +1301,11 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	if(GlobalV::MY_RANK==0)
 	{
 		ofstream of_potH("Hermitian_pot.dat",ios_base::app);
-		of_potH << "Hermitian  " << pot_Hermitian << endl;
+		of_potH << "Hermitian  " << pot_Hermitian << std::endl;
 	}
 	*/
 	
-	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << endl;
+	//ofs_running << "GlobalC::dftu.cpp "<< __LINE__  << std::endl;
 
 	return;	
 }
@@ -1314,7 +1314,7 @@ void DFTU::output()
 {
 	TITLE("DFTU", "output");
 	
-	GlobalV::ofs_running << "//=========================L(S)DA+U===========================//" << endl;
+	GlobalV::ofs_running << "//=========================L(S)DA+U===========================//" << std::endl;
 
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{			
@@ -1331,7 +1331,7 @@ void DFTU::output()
 				if(!Yukawa)
 				{
 					GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << 0 << "    U=" << this->U[T]*Ry_to_eV 
-					<< "ev    J=" << this->J[T]*Ry_to_eV << "ev" << endl;
+					<< "ev    J=" << this->J[T]*Ry_to_eV << "ev" << std::endl;
 				}
 				else
 				{
@@ -1340,14 +1340,14 @@ void DFTU::output()
  						if(n!=0) continue;						
 						double Ueff = (this->U_Yukawa.at(T).at(L).at(n) - this->J_Yukawa.at(T).at(L).at(n))*Ry_to_eV;
 						GlobalV::ofs_running << "atom_type=" << T << "  L=" << L << "  chi=" << n << "    U=" << this->U_Yukawa.at(T).at(L).at(n)*Ry_to_eV << "ev    " << "J=" << this->J_Yukawa.at(T).at(L).at(n)*Ry_to_eV
-						<< "ev" << endl;
+						<< "ev" << std::endl;
 					}
 				}
 			}
 		}
 	}
 
-	GlobalV::ofs_running << "Local occupation matrices" << endl;
+	GlobalV::ofs_running << "Local occupation matrices" << std::endl;
 	for(int T=0; T<GlobalC::ucell.ntype; T++)
 	{
 		if(INPUT.orbital_corr[T]==-1) continue;
@@ -1379,20 +1379,20 @@ void DFTU::output()
 					// if(!Yukawa && n!=0) continue;
 					if(n!=0) continue;
 
-					GlobalV::ofs_running << "   zeta" << " " << n << endl;
+					GlobalV::ofs_running << "   zeta" << " " << n << std::endl;
 					
 					if(GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 					{
 						for(int is=0; is<2; is++)
 						{
-							GlobalV::ofs_running << "spin" << "  " << is << endl;
+							GlobalV::ofs_running << "spin" << "  " << is << std::endl;
 							for(int m0=0; m0<2*l+1; m0++)
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
 									GlobalV::ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
 								}
-								GlobalV::ofs_running << endl;
+								GlobalV::ofs_running << std::endl;
 							}
 						}	
 					}
@@ -1412,7 +1412,7 @@ void DFTU::output()
 										GlobalV::ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
 									}
 								}
-								GlobalV::ofs_running << endl;
+								GlobalV::ofs_running << std::endl;
 							}							
 						}
 					}					
@@ -1420,7 +1420,7 @@ void DFTU::output()
 			}//l
 		}//I
 	}//T
-	GlobalV::ofs_running << "//=======================================================//" << endl;
+	GlobalV::ofs_running << "//=======================================================//" << std::endl;
 	
 	return;
 }

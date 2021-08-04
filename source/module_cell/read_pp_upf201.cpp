@@ -241,7 +241,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			ifs >> dion(i,j);
 			if ( i != j  && dion(i,j) != 0.0 )
 			{
-				cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << endl;
+				std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
 				exit(1);
 			}
 		}
@@ -389,7 +389,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		else if(round==0)
 		{
 			this->has_so = 0;
-			//	cout<<"ignore SPIN_ORB part!"<<endl;
+			//	std::cout<<"ignore SPIN_ORB part!"<<std::endl;
 			break;
 		}
 	}
@@ -409,10 +409,10 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		{
 			functional_error = 1;
 
-			cout << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << endl;
-			cout << " dft_functional in pseudopot file is: " << dft[0] << endl;
-			GlobalV::ofs_warning << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << endl;
-			GlobalV::ofs_warning << " dft_functional in pseudopot file is: " << dft[0] << endl;
+			std::cout << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << std::endl;
+			std::cout << " dft_functional in pseudopot file is: " << dft[0] << std::endl;
+			GlobalV::ofs_warning << " dft_functional readin is: " << GlobalV::DFT_FUNCTIONAL << std::endl;
+			GlobalV::ofs_warning << " dft_functional in pseudopot file is: " << dft[0] << std::endl;
 		}
 	}
 	return 0;
@@ -457,12 +457,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			READ_VALUE(ifs, word);   // is_ultrasoft
 			if ( word.find("\"T\"") < word.length() ) // zws add 20160108
 			{
-				cout << "\n WARNING: ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << endl;
+				std::cout << "\n WARNING: ULTRASOFT PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << std::endl;
 			}
 			READ_VALUE(ifs, word);   // is_paw
 			if ( word.find("\"T\"") < word.length() )
 			{
-				cout << "\n WARNING: PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << endl;
+				std::cout << "\n WARNING: PAW PSEUDOPOTENTIAL IS NOT SUPPORTED !!! \n" << std::endl;
 			}
 
 			READ_VALUE(ifs, word);   // is_coulomb
@@ -496,7 +496,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			string nlc;
 			//char p[13] = "paw_as_gipaw";
 			ifs >> word;             // paw_as_gipaw?
-			//cout << "word.substr(0,30) = " << word.substr(0,30) << "."<< endl;
+			//std::cout << "word.substr(0,30) = " << word.substr(0,30) << "."<< std::endl;
 			if( word.substr(0,13) == "paw_as_gipaw" )
 			{
 				ONCVPSP = 0;
@@ -530,7 +530,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				}
 			}
 
-			//cout << "nlc = " << nlc << endl;
+			//std::cout << "nlc = " << nlc << std::endl;
 
 			if (nlc == "T")
 			{
@@ -542,7 +542,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			}
 
 			READ_VALUE(ifs, word);   // functional
-			//cout << "word = " << word << endl;
+			//std::cout << "word = " << word << std::endl;
 			//                        this->dft[0]="SLA";
 			//                        this->dft[1]="PZ";
 			//                        this->dft[2]="NOGX";
@@ -568,16 +568,16 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			do 
 			{
 				getline(ifs, word);
-				//cout << "word       = " << word << endl;
+				//std::cout << "word       = " << word << std::endl;
 				word.erase(0,word.find_first_not_of(" ") );
 				word.erase(word.find_last_not_of(" ")+1 );
 				//word = trim(word);
-				//cout << "trim(word) = " << word << endl;
+				//std::cout << "trim(word) = " << word << std::endl;
 				get_char(word);
-				//cout << " Number = " << Number[0] << ", " << Number[1] << endl;
-				//cout << word.substr(0,Number[0])  << "__" << word.substr(Number[0]+1, Number[1]-Number[0]-1) << endl;
+				//std::cout << " Number = " << Number[0] << ", " << Number[1] << std::endl;
+				//std::cout << word.substr(0,Number[0])  << "__" << word.substr(Number[0]+1, Number[1]-Number[0]-1) << std::endl;
 				dummy = word.substr(0,Number[0]) ;
-				//cout << " dummy = " << dummy << endl;
+				//std::cout << " dummy = " << dummy << std::endl;
 				if( dummy == "z_valence=" ) 
 				{
 					this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
@@ -611,12 +611,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				//break;
 
 			}while( word.substr(word.length()-1, 1) !=">" ); 
-			//cout << "word.substr(word.length()-1, 1)=" <<  word.substr(word.length()-1, 1)  << endl;
+			//std::cout << "word.substr(word.length()-1, 1)=" <<  word.substr(word.length()-1, 1)  << std::endl;
 			//exit(0);
 
 
 			//ifs >> word;   // zp
-			////cout << "word = " << word << endl;
+			////std::cout << "word = " << word << std::endl;
 			//{
 			//     if(word == "z_valence=\"")
 			//     {
@@ -629,7 +629,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//        get_char(word);
 			//        this->zp = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "zp = " << this->zp << endl;
+			//     //std::cout << "zp = " << this->zp << std::endl;
 			//}
 
 			//ifs >> word;   // total_psenergy
@@ -645,22 +645,22 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//        get_char(word);
 			//        this->etotps = atof(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "etotps = " << this->etotps << endl;
+			//     //std::cout << "etotps = " << this->etotps << std::endl;
 			//}
-			////cout << " word (total_psenergy) = " << word << endl;
+			////std::cout << " word (total_psenergy) = " << word << std::endl;
 
 
 			//if(ONCVPSP == 0)    //zws modify 20160108
 			//{
 			//	READ_VALUE(ifs, word);   // wfc_cutoff
-			//	//cout << "word = " << word << endl;
+			//	//std::cout << "word = " << word << std::endl;
 			//}
 			//READ_VALUE(ifs, word); // rho_cutoff
-			//cout << "word (cutoff) = " << word << endl;
+			//std::cout << "word (cutoff) = " << word << std::endl;
 
 
 			//ifs >> word;             // lmax
-			////cout << "word (lmax) = " << word << endl;
+			////std::cout << "word (lmax) = " << word << std::endl;
 			//{
 			//        if(word == "l_max=\"")
 			//        {
@@ -676,7 +676,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
 			//}
 
-			////cout << "lmax = " << this->lmax << endl;
+			////std::cout << "lmax = " << this->lmax << std::endl;
 
 			//if(ONCVPSP == 0)
 			//{
@@ -686,7 +686,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//READ_VALUE(ifs, word);   // l_local
 
 			//ifs >> word;   // mesh_size
-			////cout << "word (mesh) = " << word << endl;
+			////std::cout << "word (mesh) = " << word << std::endl;
 			//{
 			//     if(word == "mesh_size=\"")
 			//     {
@@ -699,13 +699,13 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//             get_char(word);
 			//             this->mesh = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "mesh = " << this->mesh << endl;
+			//     //std::cout << "mesh = " << this->mesh << std::endl;
 			//}
 
 
 
 			//ifs >> word;  // number_of_wfc
-			////cout << "word = " << word << endl;
+			////std::cout << "word = " << word << std::endl;
 			//{
 			//     if(word == "number_of_wfc=\"")
 			//     {
@@ -719,11 +719,11 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//             get_char(word);
 			//             this->nwfc = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "nwfc = " << this->nwfc << endl;
+			//     //std::cout << "nwfc = " << this->nwfc << std::endl;
 			//}
 			//     
 			//ifs >> word;   // number_of_proj
-			////cout << "word = " << word << endl;
+			////std::cout << "word = " << word << std::endl;
 			//{
 			//     if(word == "number_of_proj=\"")
 			//     {
@@ -737,7 +737,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//             get_char(word);
 			//             this->nbeta = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 			//     }
-			//     //cout << "nbeta = " << this->nbeta << endl;
+			//     //std::cout << "nbeta = " << this->nbeta << std::endl;
 			//}
 
 
@@ -772,13 +772,13 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//                            mesh       -= 1;
 			//                            nmeshdel   += 1;
 			//                        }
-			//                        cout << " mesh =" << mesh << endl;
+			//                        std::cout << " mesh =" << mesh << std::endl;
 			//                    	if (mesh%2 == 0)
 			//                    	{
 			//                    	    mesh     -= 1;
 			//                    	    nmeshdel += 1;
 			//                    	}    //}zws add 20160108
-			//                    	cout << " nmeshdel =" << nmeshdel << endl;
+			//                    	std::cout << " nmeshdel =" << nmeshdel << std::endl;
 
 
 			delete[] r;
@@ -801,7 +801,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//                        {
 			//                            for ( int idel=0; idel < nmeshdel-1; idel++)
 			//                        	{
-			//                            	cout << "skip " << nmeshdel << "grid point(s) in PP mesh" << endl;
+			//                            	std::cout << "skip " << nmeshdel << "grid point(s) in PP mesh" << std::endl;
 			//                        	    double	tmpdel;
 			//                        	    ifs >> tmpdel;
 			//                        	}
@@ -909,7 +909,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 						get_char(word);
 						//idum = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 					}
-					//cout << "idum = " << idum << endl;
+					//std::cout << "idum = " << idum << std::endl;
 				}
 
 				if(ONCVPSP == 0)
@@ -944,7 +944,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					get_char(word);
 					this->kkbeta[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
 				}
-				//cout << "kkbeta[i] = " << this->kkbeta[i] << endl;
+				//std::cout << "kkbeta[i] = " << this->kkbeta[i] << std::endl;
 
 				if(ONCVPSP ==0) 
 				{
@@ -978,7 +978,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					ifs >> dion(i,j);
 					if ( i != j  && dion(i,j) != 0.0 )
 					{
-						cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << endl;
+						std::cout << " error: for i != j, Dij of Pseudopotential must be 0.0 " << std::endl;
 						exit(1);
 					}
 				}
@@ -1050,12 +1050,12 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				}
 				get_char(word);
 				lchi[i] = atoi(word.substr(Number[0]+1,(Number[1]-Number[0]-1)).c_str());
-				//cout << " lchi[i] = " << lchi[i] << endl;
+				//std::cout << " lchi[i] = " << lchi[i] << std::endl;
 
 				ifs >> word; // >
 				if ( word !=  ">" )
 				{
-					cout << " error: bad end while reading CHI" << i <<  " of PSWFC" << endl;
+					std::cout << " error: bad end while reading CHI" << i <<  " of PSWFC" << std::endl;
 					exit(1);
 				}
 
@@ -1159,7 +1159,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 				else if(round==0)
 				{
 					this->has_so = 0;
-					//	cout<<"ignore SPIN_ORB part!"<<endl;
+					//	std::cout<<"ignore SPIN_ORB part!"<<std::endl;
 					break;
 				}
 			}
@@ -1214,7 +1214,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 		}
 		ll=pos2-pos;
 		name[i] = txt.substr(pos,ll);
-		//cout<<i<<" "<<name[i]<<endl;
+		//std::cout<<i<<" "<<name[i]<<std::endl;
 		string mark;
 		bool findmark=false;
 		for(int j = 0; j < 100; ++j)//The mark can be ' or " or .
@@ -1243,7 +1243,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 			else
 				break;
 		}
-		//cout<<name[i]<<"=\""<<val[i]<<"\""<<endl;
+		//std::cout<<name[i]<<"=\""<<val[i]<<"\""<<std::endl;
 	}
 	return;
 }

@@ -33,25 +33,25 @@ void Charge::write_rho(
         	WARNING("Charge::write_rho","Can't create Charge File!");
     	}	
 
-		//GlobalV::ofs_running << "\n Output charge file." << endl;
+		//GlobalV::ofs_running << "\n Output charge file." << std::endl;
 
-		ofs << GlobalC::ucell.latName << endl;//1
-		ofs << " " << GlobalC::ucell.lat0 * 0.529177 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << endl;
-		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << endl;
+		ofs << GlobalC::ucell.latName << std::endl;//1
+		ofs << " " << GlobalC::ucell.lat0 * 0.529177 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e11 << " " << GlobalC::ucell.latvec.e12 << " " << GlobalC::ucell.latvec.e13 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e21 << " " << GlobalC::ucell.latvec.e22 << " " << GlobalC::ucell.latvec.e23 << std::endl;
+		ofs << " " << GlobalC::ucell.latvec.e31 << " " << GlobalC::ucell.latvec.e32 << " " << GlobalC::ucell.latvec.e33 << std::endl;
 
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			ofs << " " << GlobalC::ucell.atoms[it].label;
 		}
-		ofs << endl;
+		ofs << std::endl;
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			ofs << " " << GlobalC::ucell.atoms[it].na;
 		}
-		ofs << endl;
-		ofs << "Direct" << endl;
+		ofs << std::endl;
+		ofs << "Direct" << std::endl;
 
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
@@ -59,7 +59,7 @@ void Charge::write_rho(
 			{
 				ofs << " " << GlobalC::ucell.atoms[it].taud[ia].x
 					<< " " << GlobalC::ucell.atoms[it].taud[ia].y
-					<< " " << GlobalC::ucell.atoms[it].taud[ia].z << endl;
+					<< " " << GlobalC::ucell.atoms[it].taud[ia].z << std::endl;
 			}
 		}
 
@@ -85,7 +85,7 @@ void Charge::write_rho(
 				WARNING_QUIT("write_rho","check nspin!");
 			}
 		}
-		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << endl;
+		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
 
 		ofs << setprecision(precision);
 		ofs << scientific;
@@ -161,7 +161,7 @@ void Charge::write_rho(
 		// save the rho one z by one z.
 		for(int iz=0; iz<GlobalC::pw.ncz; iz++)
 		{
-			//	cout << "\n iz=" << iz << endl;
+			//	std::cout << "\n iz=" << iz << std::endl;
 			// tag must be different for different iz.
 			ZEROS(zpiece, nxy);
 			int tag = iz;

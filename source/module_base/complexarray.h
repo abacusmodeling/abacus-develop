@@ -105,7 +105,7 @@ void zeros(complex <T> *u, int n)
 {
 	if (n == 0 || u == 0)
 	{
-		cout << "\n error in zeros(),n or u = 0";
+		std::cout << "\n error in zeros(),n or u = 0";
 		return;
 	}
 

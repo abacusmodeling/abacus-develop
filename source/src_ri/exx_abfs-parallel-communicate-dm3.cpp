@@ -51,7 +51,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 	{
 		static int istep=0;
 		ofstream ofs("DK_2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
-		ofs<<DK_2D<<endl;
+		ofs<<DK_2D<<std::endl;
 	}
 	
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
@@ -88,7 +88,7 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<ComplexMatrix> &DK_2D,
 	{
 		static int istep=0;
 		ofstream ofs("DR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
-		ofs<<DR_a2D<<endl;
+		ofs<<DR_a2D<<std::endl;
 	}	
 	return DR_a2D;
 }
@@ -106,6 +106,6 @@ void Exx_Abfs::Parallel::Communicate::DM3::cal_DM(const double threshold_D)
 	/*{
 		static int istep=0;
 		ofstream ofs("DMr_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
-		ofs<<DMr<<endl;
+		ofs<<DMr<<std::endl;
 	}*/	
 }

@@ -61,7 +61,7 @@ void Diago_CG::diag
 
     for (int m=0; m<n_band; m++)
     {
-        if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << endl;
+        if (test_cg>2) GlobalV::ofs_running << "Diagonal Band : " << m << std::endl;
         for (int i=0; i<dim; i++) phi_m[i] = phi(m, i);
 
         GlobalC::hm.hpw.s_1psi(dim, phi_m, sphi); // sphi = S|psi(m)>
@@ -367,16 +367,16 @@ bool Diago_CG::update_psi(
     const double cost = cos(theta);
     const double sint_norm = sin(theta)/cg_norm;
 
-//	cout << "\n cg_norm = " << this->ddot(dim, cg, cg);
-//	cout << "\n cg_norm_fac = "<< cg_norm * cg_norm;
-//	cout << "\n overlap = "  << this->ddot(dim, psi_m, psi_m);
+//	std::cout << "\n cg_norm = " << this->ddot(dim, cg, cg);
+//	std::cout << "\n cg_norm_fac = "<< cg_norm * cg_norm;
+//	std::cout << "\n overlap = "  << this->ddot(dim, psi_m, psi_m);
 
     for (int i=0; i<dim; i++)
     {
         psi_m[i] = psi_m[i] * cost + sint_norm * cg[i];
     }
 
-//	cout << "\n overlap2 = "  << this->ddot(dim, psi_m, psi_m);
+//	std::cout << "\n overlap2 = "  << this->ddot(dim, psi_m, psi_m);
 
     if ( abs(eigenvalue-e0)< threshold)
     {
@@ -458,13 +458,13 @@ void Diago_CG::schmit_orth
 
     if ( psi_norm <= 0.0)
     {
-		cout << " m = " << m << endl;
+		std::cout << " m = " << m << std::endl;
 		for(int j=0; j<=m; ++j)
 		{
-			cout << "\n j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real();
+			std::cout << "\n j = " << j << " lagrange norm = " << ( conj(lagrange[j]) * lagrange[j] ).real();
 		}
-        cout << " in diago_cg, psi norm = " << psi_norm << endl;
-		cout << " If you use GNU compiler, it may due to the zdotc is unavailable." << endl;
+        std::cout << " in diago_cg, psi norm = " << psi_norm << std::endl;
+		std::cout << " If you use GNU compiler, it may due to the zdotc is unavailable." << std::endl;
         WARNING_QUIT("schmit_orth","psi_norm <= 0.0");
     }
 

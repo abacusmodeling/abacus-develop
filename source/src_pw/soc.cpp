@@ -29,7 +29,7 @@ void Fcoef::create(const int i1, const int i2, const int i3)
      }
      else
      {
-         cout<<"not allowed!"<<endl;
+         std::cout<<"not allowed!"<<std::endl;
      }
 
      return;
@@ -151,7 +151,7 @@ int Soc::sph_ind(const int l, const double j, const int m, const int spin)
     }
     else 
 	{
-		cout<<"l= "<<l<<" j= "<<j<<endl;
+		std::cout<<"l= "<<l<<" j= "<<j<<std::endl;
 		WARNING_QUIT("sph_ind","l and j not suitable");
 	}
     if(sph_ind0 < -l || sph_ind0 >l )
