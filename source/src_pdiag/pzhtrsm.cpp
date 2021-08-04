@@ -19,7 +19,7 @@ void pzhtrsm(char isuplo,int b_n,MPI_Comm comm_2D,int NB,int N_A,
    *  comm_2D. (input) MPI_Comm 
    *         2-D grid MPI communicator
    *  N_A    (global input) INTEGER
-   *         The number of columns and rows to be operated on matrices A£¬N >= 0. 
+   *         The number of columns and rows to be operated on matrices A, N >= 0. 
    *  NB     (input) INTEGER
    *         blocked size of 2D blocked cyclic matrix
    *  A      (local input/local output) double precision complex pointer,
