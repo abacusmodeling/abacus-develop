@@ -105,7 +105,7 @@ check_out(){
 				if [ $(echo "sqrt($deviation*$deviation) < $fatal_threshold"|bc) = 0 ]; then
 					let fatal++
 					echo -e "\e[1;31m [  FAILED  ] \e[0m"\
-						"An unacceptble deviation occurs."
+						"An unacceptable deviation occurs."
 				fi
 				break
 			else
