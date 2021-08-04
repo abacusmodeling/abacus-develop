@@ -86,7 +86,7 @@ check_out(){
 		# and reference value for descriptors in DeePKS
 		#--------------------------------------------------
 		if [ $key == "descriptor" ]; then
-			../check_file descriptor.dat.ref descriptor.dat
+			../check_file descriptor.dat.ref descriptor.dat $threshold
 			state=`echo $?`
 			if [ $state == "0" ]; then
 				let failed++
@@ -95,7 +95,7 @@ check_out(){
 		fi
 
 		if [ $key == "jle" ]; then
-			../check_file jle.orb.ref OUT.autotest/jle.orb
+			../check_file jle.orb.ref OUT.autotest/jle.orb $threshold
 			state=`echo $?`
 			if [ $state == "0" ]; then
 				let failed++

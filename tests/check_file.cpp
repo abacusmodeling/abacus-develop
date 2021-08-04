@@ -12,6 +12,11 @@ int main(int argc, char **argv)
     string ref_file = argv[1];
     string cal_file = argv[2];
 
+    string temp = argv[3];
+    istringstream string_temp(temp);
+    double threshold;
+    string_temp >> threshold;
+
     ifstream ref(ref_file.c_str(), ios::in);
     ifstream cal(cal_file.c_str(), ios::in);
 
@@ -78,7 +83,7 @@ int main(int argc, char **argv)
                 cout << "Data No." << index+1 << "  cal=" << word_cal 
                      << "  ref=" << word_ref << endl;
             }
-            else if(fabs(data_ref-data_cal) > 1e-8)
+            else if(fabs(data_ref-data_cal) > threshold)
             {
                 cout << "\e[1;31m [  FAILED  ]  \e[0m";
                 cout << "Data No." << index+1 << "  cal=" << data_cal 
