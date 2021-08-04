@@ -72,10 +72,16 @@ int main(int argc, char **argv)
             istringstream string_ref(word_ref);
             string_cal >> data_cal;
             string_ref >> data_ref;
-            if(fabs(data_ref-data_cal) > 1e-8)
+            if(data_ref==0 || data_cal==0)
             {
                 cout << "\e[1;31m [  FAILED  ]  \e[0m";
-                cout << "Data No." << index << "  cal=" << data_cal 
+                cout << "Data No." << index+1 << "  cal=" << word_cal 
+                     << "  ref=" << word_ref << endl;
+            }
+            else if(fabs(data_ref-data_cal) > 1e-8)
+            {
+                cout << "\e[1;31m [  FAILED  ]  \e[0m";
+                cout << "Data No." << index+1 << "  cal=" << data_cal 
                      << "  ref=" << data_ref << "  deviation=" << fabs(data_ref-data_cal) << endl;
                 return 0;
             }

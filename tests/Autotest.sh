@@ -157,9 +157,7 @@ if [ "$sanitize" == true ]; then
 	report=$(realpath ../html/README.md)
 fi
 
-if [ ! -f "check_file" ]; then
-	g++ check_file.cpp -o check_file
-fi
+g++ check_file.cpp -o check_file
 
 for dir in $testdir; do
 	cd $dir
