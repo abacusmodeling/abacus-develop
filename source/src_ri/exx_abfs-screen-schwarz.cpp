@@ -26,8 +26,8 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 	const Element_Basis_Index::IndexLNM &index_abfs,
 	const Element_Basis_Index::IndexLNM &index_lcaos,
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
 	if(!flag_screen_schwarz)	return;
 	TITLE("Exx_Abfs::Screen::Schwarz::cal_max_pair_fock");
@@ -35,7 +35,7 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	
 	// pre-cal Vws on same atom, speed up DPcal_V()
-	vector<shared_ptr<matrix>> Vs_same_atom(GlobalC::ucell.ntype);
+	std::vector<shared_ptr<matrix>> Vs_same_atom(GlobalC::ucell.ntype);
 	for(size_t it=0; it!=GlobalC::ucell.ntype; ++it)
 		Vs_same_atom[it] = Abfs::DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true, rwlock_Vw,Vws );	
 	
@@ -77,14 +77,14 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 		return mm;
 	};
 
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,double>>> max_pair_fock_DP;
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,double>>> max_pair_fock_DP;
 	for(const size_t iat1 : atom_centres)
 	{	
 		const size_t it1 = GlobalC::ucell.iat2it[iat1];
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const Abfs::Vector3_Order<double> tau1( GlobalC::ucell.atoms[it1].tau[ia1] );
 		
-		const map<size_t,vector<Abfs::Vector3_Order<int>>> adj = Abfs::get_adjs(iat1);
+		const std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> adj = Abfs::get_adjs(iat1);
 		for( const auto & atom2 : adj )
 		{
 			const int iat2 = atom2.first;
@@ -92,7 +92,7 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 			const int ia2 = GlobalC::ucell.iat2ia[iat2];
 			const Abfs::Vector3_Order<double> tau2( GlobalC::ucell.atoms[it2].tau[ia2] );
 			
-			map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> pair_fock_s;
+			std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> pair_fock_s;
 			for( const Abfs::Vector3_Order<int> &box2 : atom2.second )
 			{
 				const Abfs::Vector3_Order<int> box2p = box2%Born_von_Karman_period;
@@ -119,7 +119,7 @@ void Exx_Abfs::Screen::Schwarz::cal_max_pair_fock(
 				}
 			}
 			
-			const map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> pair_fock_ps = Abfs::cal_mps( Born_von_Karman_period, pair_fock_s );
+			const std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> pair_fock_ps = Abfs::cal_mps( Born_von_Karman_period, pair_fock_s );
 
 			for( const auto & pair_fock_p : pair_fock_ps )
 			{

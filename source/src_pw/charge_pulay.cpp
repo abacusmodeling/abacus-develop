@@ -62,7 +62,7 @@ void Charge_Pulay::Pulay_mixing(void)
 	const int scheme = 1;
 	
 	// scheme 2 will only work correctly for the first
-	// time to calculate residual vector norm,
+	// time to calculate residual std::vector norm,
 	// which is one way to check if scheme 1 right.
 	// scheme 1 is correct to provide the final charge
 	// density.
@@ -445,7 +445,7 @@ void Charge_Pulay::inverse_preA(const int &dim, matrix &preA)const
 	{
 		for(int j=0; j<dim; j++)
 		{
-			B(i,j) = complex<double> (preA(i,j), 0.0);
+			B(i,j) = std::complex<double> (preA(i,j), 0.0);
 		}
 	}
 	Inverse_Matrix_Complex IMC;
@@ -479,7 +479,7 @@ void Charge_Pulay::inverse_real_symmetry_matrix(const int &scheme, matrix &A)con
 	{
 		for(int j=0; j<step; j++)
 		{
-			B(i,j) = complex<double> (A(i,j),0.0);
+			B(i,j) = std::complex<double> (A(i,j),0.0);
 		}
 	}
 
@@ -624,7 +624,7 @@ void Charge_Pulay::generate_residual_vector(double *residual, const double* rho_
 
 double Charge_Pulay::calculate_residual_norm(double *residual1, double* residual2)const
 {
-	// calculate the norm of the residual vector:
+	// calculate the norm of the residual std::vector:
 	// (the target to minimize in Pulay's algorithm)
 	double rnorm = 0.0;
 	for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
@@ -647,7 +647,7 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 	// which Rrho to be update now? answer: irstep
 	//===============================================
 
-	NOTE("Generate Residual vector from rho and rho_save.");
+	NOTE("Generate Residual std::vector from rho and rho_save.");
     for (int is=0; is<GlobalV::NSPIN; is++)
     {
 //		std::cout << " generate datas , spin=" << is << std::endl;
@@ -657,7 +657,7 @@ void Charge_Pulay::generate_datas(const int &irstep, const int &idstep, const in
 
 		if(this->mixing_gg0 > 0.0)
 		{
-			complex<double> *kerpulay = new complex<double>[GlobalC::pw.ngmc];
+			std::complex<double> *kerpulay = new std::complex<double>[GlobalC::pw.ngmc];
 			double* kerpulayR = new double[GlobalC::pw.nrxx];
 			
 			set_rhog(Rrho[is][irstep], kerpulay);

@@ -357,13 +357,13 @@ bool &flag1)
 	flag2 = false;
 	while(true)
 	{
-		//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest vector is found
+		//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest std::vector is found
 		t1 = t1 - t2;
 		abs0 = t1.norm();//calculate the new value of |t1|
-		if(abs0 > abs1 + epsilon) break;	//the shortest vector has already been found, stop the loop
+		if(abs0 > abs1 + epsilon) break;	//the shortest std::vector has already been found, stop the loop
 		if(abs0 < abs1 - epsilon){
-		//shorter vector is found, go on searching for the shortest
-			flag1 = true;	//sign that the some vector has been changed
+		//shorter std::vector is found, go on searching for the shortest
+			flag1 = true;	//sign that the some std::vector has been changed
 			abs1 = abs0;	//update the value of |t1|
 		}
 		flag2 = true;	//sign that the "t1-t2" method is used
@@ -374,18 +374,18 @@ bool &flag1)
 	if(!flag2){
 		//if "t1-t2" method is used, it is not necessary to use "a1+a2" method
 		while(true){
-			//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest vector is found
+			//the loop won't stop unless abs0>abs1+epsilon, that is, the shortest std::vector is found
 			t1 = t1 + t2;//use "t1+t2" method
 			abs0 = t1.norm();//calculate the new value of |t1|
-			if(abs0 > abs1 + epsilon) break;	//the shortest vector has already been found, stop the loop
+			if(abs0 > abs1 + epsilon) break;	//the shortest std::vector has already been found, stop the loop
 			if(abs0 < abs1 - epsilon){
-				//shorter vector is found, go on searching for the shortest
-				flag1 = true;	//sign that the some vector has been changed
+				//shorter std::vector is found, go on searching for the shortest
+				flag1 = true;	//sign that the some std::vector has been changed
 				abs1 = abs0;	//update the value of |t1|
 			}
 		}
 		//the latest operation is catually not used,
-		//so we must set back the vector t1 by the opposite operation
+		//so we must set back the std::vector t1 by the opposite operation
 		t1 = t1 - t2;
 	}
 }

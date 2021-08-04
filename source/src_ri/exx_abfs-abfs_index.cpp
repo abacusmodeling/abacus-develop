@@ -20,7 +20,7 @@ Element_Basis_Index::Range
 
 
 Element_Basis_Index::Range
-	Exx_Abfs::Abfs_Index::construct_range( const vector<vector<vector<Numerical_Orbital_Lm>>> &orb )
+	Exx_Abfs::Abfs_Index::construct_range( const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb )
 {
 	Element_Basis_Index::Range range;
 	range.resize( orb.size() );

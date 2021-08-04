@@ -306,9 +306,9 @@ bool K_Vectors::read_kpoints(const string &fn)
 			double *ksx = new double[nks_special];
 			double *ksy = new double[nks_special];
 			double *ksz = new double[nks_special];
-			vector<double> kposx;
-			vector<double> kposy;
-			vector<double> kposz;
+			std::vector<double> kposx;
+			std::vector<double> kposy;
+			std::vector<double> kposz;
 			ZEROS(nkl, nks_special);
 			
 			//recalculate nkstot.
@@ -394,9 +394,9 @@ bool K_Vectors::read_kpoints(const string &fn)
 			double *ksx = new double[nks_special];
 			double *ksy = new double[nks_special];
 			double *ksz = new double[nks_special];
-			vector<double> kposx;
-			vector<double> kposy;
-			vector<double> kposz;
+			std::vector<double> kposx;
+			std::vector<double> kposy;
+			std::vector<double> kposz;
 			ZEROS(nkl, nks_special);
 			
 			//recalculate nkstot.

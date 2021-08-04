@@ -254,7 +254,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
-	complex<double> *aux = new complex<double>[npw];
+	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
 	Vector3<double> *gk = new Vector3<double>[npw];
@@ -272,11 +272,11 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 	{
 		for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
 		{
-			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			int ic=0;
 			for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
+				std::complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
 				for(int N=0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
 //					GlobalV::ofs_running << " it=" << it << " ia=" << ia << " L=" << L << " N=" << N << std::endl;
@@ -318,7 +318,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 								else
 								{//atomic_wfc_so_mag
 									double alpha, gamma;
-									complex<double> fup,fdown;
+									std::complex<double> fup,fdown;
                               		//int nc;
                               		//This routine creates two functions only in the case j=l+1/2 or exit in the other case
 									if(fabs(j-L+0.5<1e-4)) continue;
@@ -385,7 +385,7 @@ void Wavefunc_in_pw::produce_local_basis_in_pw(const int &ik,ComplexMatrix &psi,
 							else
 							{//atomic_wfc_nc
 								double alpha, gamman;
-								complex<double> fup, fdown;
+								std::complex<double> fup, fdown;
 								alpha = GlobalC::ucell.magnet.angle1_[it];
 								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)
@@ -451,7 +451,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 	const int npw = GlobalC::kv.ngk[ik];
 	const int total_lm = ( GlobalC::ucell.lmax + 1) * ( GlobalC::ucell.lmax + 1);
 	matrix ylm(total_lm, npw);
-	complex<double> *aux = new complex<double>[npw];
+	std::complex<double> *aux = new std::complex<double>[npw];
 	double *chiaux = new double[1];
 
 	Vector3<double> *gkq = new Vector3<double>[npw];
@@ -470,11 +470,11 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 	{
 		for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
 		{
-			complex<double> *skq = GlobalC::wf.get_skq(ik, it, ia, q);
+			std::complex<double> *skq = GlobalC::wf.get_skq(ik, it, ia, q);
 			int ic=0;
 			for(int L = 0; L < GlobalC::ucell.atoms[it].nwl+1; L++)
 			{
-				complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
+				std::complex<double> lphase = pow(NEG_IMAG_UNIT, L); //mohan 2010-04-19
 				for(int N=0; N < GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 				{
 					for(int ig=0; ig<npw; ig++)
@@ -525,7 +525,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 														psi(iwall, ig + GlobalC::wf.npwx*is ) = lphase * fact[is] * skq[ig] * aux[ig] * flq[ig];
 												}
 												else
-													for(int ig=0; ig<npw;ig++) psi(iwall,ig+ GlobalC::wf.npwx*is) = complex<double>(0.0 , 0.0);
+													for(int ig=0; ig<npw;ig++) psi(iwall,ig+ GlobalC::wf.npwx*is) = std::complex<double>(0.0 , 0.0);
 											}//is
 											iwall++;
 									}//if
@@ -535,7 +535,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 								{//atomic_wfc_so_mag
 
 									double alpha, gamma;
-									complex<double> fup,fdown;
+									std::complex<double> fup,fdown;
 									//int nc;
 									//This routine creates two functions only in the case j=l+1/2 or exit in the other case
 									if(fabs(j-L+0.5<1e-4)) continue;
@@ -602,7 +602,7 @@ void Wavefunc_in_pw::produce_local_basis_q_in_pw(const int &ik, ComplexMatrix &p
 							else
 							{//atomic_wfc_nc
 								double alpha, gamman;
-								complex<double> fup, fdown;
+								std::complex<double> fup, fdown;
 								alpha = GlobalC::ucell.magnet.angle1_[it];
 								gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
 								for(int m = 0;m<2*L+1;m++)

@@ -33,20 +33,20 @@
 	/*  scale and sumsq must be supplied in SCALE and SUMSQ and */
 	/*  scl and smsq are overwritten on SCALE and SUMSQ respectively. */
 
-	/*  The routine makes only one pass through the vector x. */
+	/*  The routine makes only one pass through the std::vector x. */
 
 	/*  Arguments */
 	/*  ========= */
 
 	/*  N       (input) int */
-	/*          The number of elements to be used from the vector X. */
+	/*          The number of elements to be used from the std::vector X. */
 
 	/*  X       (input) DOUBLE PRECISION array, dimension (N) */
-	/*          The vector for which a scaled sum of squares is computed. */
+	/*          The std::vector for which a scaled sum of squares is computed. */
 	/*             x( i )  = X( 1 + ( i - 1 )*INCX ), 1 <= i <= n. */
 
 	/*  INCX    (input) int */
-	/*          The increment between successive values of the vector X. */
+	/*          The increment between successive values of the std::vector X. */
 	/*          INCX > 0. */
 
 	/*  SCALE   (input/output) DOUBLE PRECISION */

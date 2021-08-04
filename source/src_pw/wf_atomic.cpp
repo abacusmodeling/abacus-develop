@@ -245,7 +245,7 @@ void WF_atomic::atomic_wfc
     //=========================================================
     const int total_lm = (lmax_wfc + 1) * (lmax_wfc + 1);
     matrix ylm(total_lm, np);
-    complex<double> *aux = new complex<double>[np];
+    std::complex<double> *aux = new std::complex<double>[np];
     double *chiaux = new double[1];
 
     Vector3<double> *gk = new Vector3 <double> [np];
@@ -265,7 +265,7 @@ void WF_atomic::atomic_wfc
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
 			//std::cout << "\n it = " << it << " ia = " << ia << std::endl;
-            complex<double> *sk = this->get_sk(ik, it, ia);
+            std::complex<double> *sk = this->get_sk(ik, it, ia);
             //-------------------------------------------------------
             // Calculate G space 3D wave functions
             //-------------------------------------------------------
@@ -274,7 +274,7 @@ void WF_atomic::atomic_wfc
                 if (GlobalC::ucell.atoms[it].oc[iw] >= 0.0)
                 {
                     const int l = GlobalC::ucell.atoms[it].lchi[iw];
-                    complex<double> lphase = pow(NEG_IMAG_UNIT, l);
+                    std::complex<double> lphase = pow(NEG_IMAG_UNIT, l);
                     //-----------------------------------------------------
                     //  the factor i^l MUST BE PRESENT in order to produce
                     //  WF_atomictions for k=0 that are real in real space
@@ -322,7 +322,7 @@ void WF_atomic::atomic_wfc
                                                  wfcatom(index, ig + this->npwx*is ) = lphase * fact[is] * sk[ig] * aux[ig] * flq[ig];
                                           }
                                           else
-                                            for(int ig=0; ig<np;ig++) wfcatom(index,ig+ this->npwx*is) = complex<double>(0.0 , 0.0);
+                                            for(int ig=0; ig<np;ig++) wfcatom(index,ig+ this->npwx*is) = std::complex<double>(0.0 , 0.0);
                                       }//is
                                       index++;
                                    }//if
@@ -332,7 +332,7 @@ void WF_atomic::atomic_wfc
                             {//atomic_wfc_so_mag
 
                               double alpha, gamma;
-                              complex<double> fup,fdown;
+                              std::complex<double> fup,fdown;
                               int nc;
                               //This routine creates two functions only in the case j=l+1/2 or exit in the other case
                               if(fabs(j-l+0.5<1e-4)) continue;
@@ -399,7 +399,7 @@ void WF_atomic::atomic_wfc
                         else
                         {//atomic_wfc_nc
                             double alpha, gamman;
-                            complex<double> fup, fdown;
+                            std::complex<double> fup, fdown;
                             alpha = GlobalC::ucell.magnet.angle1_[it];
                             gamman = -GlobalC::ucell.magnet.angle2_[it] + 0.5*PI;
                             for(int m = 0;m<2*l+1;m++)
@@ -482,14 +482,14 @@ void WF_atomic::random(ComplexMatrix &psi,const int iw_start,const int iw_end,co
             const double rr = std::rand()/double(RAND_MAX); //qianrui add RAND_MAX
             const double arg= TWO_PI * std::rand()/double(RAND_MAX);
             Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig));
-            psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
         }
         if(GlobalV::NPOL==2)for (int ig = this->npwx;ig < this->npwx + ng;ig++)
         {
             const double rr = std::rand()/double(RAND_MAX);
             const double arg= TWO_PI * std::rand()/double(RAND_MAX);
             Vector3<double> v3 = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig - this->npwx));
-            psi(iw,ig) = complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
+            psi(iw,ig) = std::complex<double>(rr * cos(arg), rr * sin(arg)) / (v3 * v3 + 1.0);
         }
     }
     return;

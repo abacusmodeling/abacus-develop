@@ -36,10 +36,10 @@ public:
 
 	// Peize Lin add 2016-08-03
 	template< typename Type >
-	static vector<Type> Pointwise_Product( const vector<Type> &f1, const vector<Type> &f2 )
+	static std::vector<Type> Pointwise_Product( const std::vector<Type> &f1, const std::vector<Type> &f2 )
 	{
 		assert(f1.size()==f2.size());
-		vector<Type> f(f1.size());
+		std::vector<Type> f(f1.size());
 		for( int ir=0; ir!=f.size(); ++ir )
 			f[ir] = f1[ir] * f2[ir];
 		return f;
@@ -48,8 +48,8 @@ public:
 //==========================================================
 // MEMBER FUNCTION :
 // NAME : Direct_to_Cartesian
-// use lattice vector matrix R
-// change the direct vector (dx,dy,dz) to cartesuab vectir
+// use lattice std::vector matrix R
+// change the direct std::vector (dx,dy,dz) to cartesuab vectir
 // (cx,cy,cz)
 // (dx,dy,dz) = (cx,cy,cz) * R
 //
@@ -140,18 +140,18 @@ public:
 		return coeff1 * x1 + (1-coeff1) * x2;
 	}
 	template< typename T, typename T_coeff >
-	static vector<T> Linear_Mixing( const vector<T> & x1, const vector<T> & x2, const T_coeff & coeff1 )
+	static std::vector<T> Linear_Mixing( const std::vector<T> & x1, const std::vector<T> & x2, const T_coeff & coeff1 )
 	{
 		assert(x1.size()==x2.size());
-		vector<T> x;
+		std::vector<T> x;
 		for( size_t i=0; i!=x1.size(); ++i )
 			x.push_back( Linear_Mixing( x1[i], x2[i], coeff1 ) );
 		return x;
 	}
 	template< typename T1, typename T2, typename T_coeff >
-	static map<T1,T2> Linear_Mixing( const map<T1,T2> & x1, const map<T1,T2> & x2, const T_coeff & coeff1 )
+	static std::map<T1,T2> Linear_Mixing( const std::map<T1,T2> & x1, const std::map<T1,T2> & x2, const T_coeff & coeff1 )
 	{
-		map<T1,T2> x;
+		std::map<T1,T2> x;
 		for( const auto & x1i : x1 )
 			x.insert( make_pair( x1i.first, Linear_Mixing( x1i.second, x2.at(x1i.first), coeff1 ) ) );
 		return x;

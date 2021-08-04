@@ -45,20 +45,20 @@ class Chi0_hilbert
 	void Delete();
 	void Chi();
 	void Parallel_G();
-	void Cal_Psi(int iq, complex<double> **psi_r);
-	void Cal_Psi_down(int iq, complex<double> **psi_r);
+	void Cal_Psi(int iq, std::complex<double> **psi_r);
+	void Cal_Psi_down(int iq, std::complex<double> **psi_r);
 	void Cal_lcao_psi();
 	void Cal_b(int iq, int ik, int iqk, int ispin);
 	void Cal_b_lcao( int iq, int ik, int iqk);
 	void Cal_Chi0s(int iq);
 	void Cal_T();
 	void Cal_Chi0();
-	complex<double> f(int k, int j);
+	std::complex<double> f(int k, int j);
 	void Cal_Chi(int iq);
 	void Cal_Rpa(int iq);
 	double qg2( int iq, int g0); 
-	int Cinv(int n, complex<double>** a);
-	void CMatrixMul(int m, int n, int l, complex<double>** A, complex<double>** B, complex<double>** C); 
+	int Cinv(int n, std::complex<double>** a);
+	void CMatrixMul(int m, int n, int l, std::complex<double>** A, std::complex<double>** B, std::complex<double>** C); 
 	int Cal_iq(int ik, int iq, int a, int b, int c);
 	
 	void Cal_Chi_surface(int iq);
@@ -70,24 +70,24 @@ class Chi0_hilbert
 	double qG(int iq, int g0);
 	void Cal_Rpa1();
 	void chi_para_g();
-	complex<double> Cal_g(int iq);
-	void C_inverse(int n, complex<double>** a);
+	std::complex<double> Cal_g(int iq);
+	void C_inverse(int n, std::complex<double>** a);
 	void plot_chi0(int iq);
 	
 	Vector3<double> *all_gcar;
-	complex<double> **chi0;
-	complex<double> **chi;
+	std::complex<double> **chi0;
+	std::complex<double> **chi;
 
 private:
 
 
 	bool init_finish;
 
-	complex<double> *b_core;
+	std::complex<double> *b_core;
 	int *num_G_core;
 	int *num_G_dis;
-	complex<double> *b_summary;
-	complex<double> *b_order;
+	std::complex<double> *b_summary;
+	std::complex<double> *b_order;
 	double *G_r_core;
 	int *num_Gvector_core;
 	int *num_Gvector_dis;
@@ -96,26 +96,26 @@ private:
 	double *Gvec_core;
 	double *Gvec;
 	double **cweight;
-	complex<double> **psi_r1;
-	complex<double> **psi_r2;
-	complex<double> ***b;
-	complex<double> **chi0s;
-	complex<double> **chi0_gg;
-	complex<double> **T;
-	complex<double> **kernel;
-	complex<double> **rpa;
+	std::complex<double> **psi_r1;
+	std::complex<double> **psi_r2;
+	std::complex<double> ***b;
+	std::complex<double> **chi0s;
+	std::complex<double> **chi0_gg;
+	std::complex<double> **T;
+	std::complex<double> **kernel;
+	std::complex<double> **rpa;
 
 	int *flag1;
 	double **para_g;
-	complex<double> **chi0_para;
-	complex<double> **rpa1;
-	complex<double> **chi_para;
+	std::complex<double> **chi0_para;
+	std::complex<double> **rpa1;
+	std::complex<double> **chi_para;
 
 	Vector3<int> ***R; 
 	Vector3<double> ***Rcar; 
 	int ** Rmax;
 	int NR;
-	complex<double> ****overlap;
+	std::complex<double> ****overlap;
 };
 
 namespace GlobalC

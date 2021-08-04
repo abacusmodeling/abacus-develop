@@ -10,10 +10,10 @@ LCAO_Matrix::LCAO_Matrix()
 	Sdiag = new double[1];
 
 	// for many k points
-	Sloc2 = new complex<double>[1];
-	Hloc_fixed2 = new complex<double>[1];
-	Hloc2 = new complex<double>[1];
-	Sdiag2 = new complex<double>[1];
+	Sloc2 = new std::complex<double>[1];
+	Hloc_fixed2 = new std::complex<double>[1];
+	Hloc2 = new std::complex<double>[1];
+	Sdiag2 = new std::complex<double>[1];
 }
 
 LCAO_Matrix::~LCAO_Matrix()
@@ -120,10 +120,10 @@ void LCAO_Matrix::allocate_HS_k(const long &nloc)
 	delete[] Hloc2;
 	delete[] Sdiag2;
 
-	this->Sloc2 = new complex<double>[nloc];
-	this->Hloc_fixed2 = new complex<double>[nloc];
-	this->Hloc2 = new complex<double>[nloc];
-	this->Sdiag2 = new complex<double>[nloc];
+	this->Sloc2 = new std::complex<double>[nloc];
+	this->Hloc_fixed2 = new std::complex<double>[nloc];
+	this->Hloc2 = new std::complex<double>[nloc];
+	this->Sdiag2 = new std::complex<double>[nloc];
 
 	ZEROS(Sloc2,nloc);
 	ZEROS(Hloc_fixed2,nloc);
@@ -154,9 +154,9 @@ void LCAO_Matrix::allocate_HS_R(const int &nnR)
 		delete[] SlocR_soc;
 		delete[] Hloc_fixedR_soc;
 
-		this->HlocR_soc = new complex<double>[nnR];
-		this->SlocR_soc = new complex<double>[nnR];
-		this->Hloc_fixedR_soc = new complex<double>[nnR];
+		this->HlocR_soc = new std::complex<double>[nnR];
+		this->SlocR_soc = new std::complex<double>[nnR];
+		this->Hloc_fixedR_soc = new std::complex<double>[nnR];
 		
 		ZEROS(HlocR_soc, nnR);
 		ZEROS(SlocR_soc, nnR);
@@ -216,7 +216,7 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
     return;
 }
 
-void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const complex<double> &v, const char &dtype, const int spin)
+void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const std::complex<double> &v, const char &dtype, const int spin)
 {
     // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
@@ -410,7 +410,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 	if(vtype=='C') os << " Output norm."  << std::endl;
 	else if(vtype=='R') os << " Output real part."  << std::endl;
 	else if(vtype=='I') os << " Output imag part."  << std::endl;
-	else if(vtype=='A') os << " Output complex." << std::endl;
+	else if(vtype=='A') os << " Output std::complex." << std::endl;
 
 
 	os << setprecision(8) << std::endl;
@@ -422,7 +422,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 			const int index = i * GlobalC::ParaO.ncol + j;
 			if(vtype=='A')
 			{
-				complex<double> v;
+				std::complex<double> v;
 				if(mtype=='S')	v = Sloc2[index];
 				else if(mtype=='T') v = Hloc_fixed2[index];
 				else if(mtype=='H') v = Hloc2[index];
@@ -626,22 +626,22 @@ void LCAO_Matrix::allocate_Hloc_fixedR_tr(void)
     }
     else
     {
-        Hloc_fixedR_tr_soc = new complex<double>***[R_x];
+        Hloc_fixedR_tr_soc = new std::complex<double>***[R_x];
         //HR_tr = new double***[R_x];
         //SlocR_tr = new double***[R_x];
         for(int ix=0; ix<R_x; ix++)
         {
-            Hloc_fixedR_tr_soc[ix] = new complex<double>**[R_y];
+            Hloc_fixedR_tr_soc[ix] = new std::complex<double>**[R_y];
             //HR_tr[ix] = new double**[R_y];
             //SlocR_tr[ix] = new double**[R_y];
             for(int iy=0; iy<R_y; iy++)
             {
-                Hloc_fixedR_tr_soc[ix][iy] = new complex<double>*[R_z];
+                Hloc_fixedR_tr_soc[ix][iy] = new std::complex<double>*[R_z];
                 //HR_tr[ix][iy] = new double*[R_z];
                 //SlocR_tr[ix][iy] = new double*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    Hloc_fixedR_tr_soc[ix][iy][iz] = new complex<double>[GlobalC::ParaO.nloc];
+                    Hloc_fixedR_tr_soc[ix][iy][iz] = new std::complex<double>[GlobalC::ParaO.nloc];
                     //HR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
                     //SlocR_tr[ix][iy][iz] = new double[GlobalC::ParaO.nloc];
                     ZEROS(Hloc_fixedR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
@@ -691,16 +691,16 @@ void LCAO_Matrix::allocate_HR_tr(void)
     }
     else
     {
-        HR_tr_soc = new complex<double>***[R_x];
+        HR_tr_soc = new std::complex<double>***[R_x];
         for(int ix=0; ix<R_x; ix++)
         {
-            HR_tr_soc[ix] = new complex<double>**[R_y];
+            HR_tr_soc[ix] = new std::complex<double>**[R_y];
             for(int iy=0; iy<R_y; iy++)
             {
-                HR_tr_soc[ix][iy] = new complex<double>*[R_z];
+                HR_tr_soc[ix][iy] = new std::complex<double>*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    HR_tr_soc[ix][iy][iz] = new complex<double>[GlobalC::ParaO.nloc];
+                    HR_tr_soc[ix][iy][iz] = new std::complex<double>[GlobalC::ParaO.nloc];
                     ZEROS(HR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
@@ -740,16 +740,16 @@ void LCAO_Matrix::allocate_SlocR_tr(void)
     }
     else
     {
-        SlocR_tr_soc = new complex<double>***[R_x];
+        SlocR_tr_soc = new std::complex<double>***[R_x];
         for(int ix=0; ix<R_x; ix++)
         {
-            SlocR_tr_soc[ix] = new complex<double>**[R_y];
+            SlocR_tr_soc[ix] = new std::complex<double>**[R_y];
             for(int iy=0; iy<R_y; iy++)
             {
-                SlocR_tr_soc[ix][iy] = new complex<double>*[R_z];
+                SlocR_tr_soc[ix][iy] = new std::complex<double>*[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    SlocR_tr_soc[ix][iy][iz] = new complex<double>[GlobalC::ParaO.nloc];
+                    SlocR_tr_soc[ix][iy][iz] = new std::complex<double>[GlobalC::ParaO.nloc];
                     ZEROS(SlocR_tr_soc[ix][iy][iz], GlobalC::ParaO.nloc);
                 }
             }
@@ -857,7 +857,7 @@ void LCAO_Matrix::set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const i
 }
 
 //LiuXh add 2019-07-16
-void LCAO_Matrix::set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const complex<double> &v)
+void LCAO_Matrix::set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const std::complex<double> &v)
 {
     const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
     const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
@@ -901,31 +901,31 @@ void LCAO_Matrix::allocate_HS_R_sparse(void)
 
 	if (GlobalV::NSPIN != 4)
 	{
-		HR_sparse = new map<size_t, map<size_t, double>> **[R_x];
-		SR_sparse = new map<size_t, map<size_t, double>> **[R_x];
+		HR_sparse = new std::map<size_t, std::map<size_t, double>> **[R_x];
+		SR_sparse = new std::map<size_t, std::map<size_t, double>> **[R_x];
 		for (int ix = 0; ix < R_x; ++ix)
 		{
-			HR_sparse[ix] = new map<size_t, map<size_t, double>> *[R_y];
-			SR_sparse[ix] = new map<size_t, map<size_t, double>> *[R_y];
+			HR_sparse[ix] = new std::map<size_t, std::map<size_t, double>> *[R_y];
+			SR_sparse[ix] = new std::map<size_t, std::map<size_t, double>> *[R_y];
 			for (int iy = 0; iy < R_y; ++iy)
 			{
-				HR_sparse[ix][iy] = new map<size_t, map<size_t, double>>[R_z];
-				SR_sparse[ix][iy] = new map<size_t, map<size_t, double>>[R_z];
+				HR_sparse[ix][iy] = new std::map<size_t, std::map<size_t, double>>[R_z];
+				SR_sparse[ix][iy] = new std::map<size_t, std::map<size_t, double>>[R_z];
 			}
 		}
 	}
 	else
 	{
-		HR_soc_sparse = new map<size_t, map<size_t, complex<double>>> **[R_x];
-		SR_soc_sparse = new map<size_t, map<size_t, complex<double>>> **[R_x];
+		HR_soc_sparse = new std::map<size_t, std::map<size_t, std::complex<double>>> **[R_x];
+		SR_soc_sparse = new std::map<size_t, std::map<size_t, std::complex<double>>> **[R_x];
 		for (int ix = 0; ix < R_x; ++ix)
 		{
-			HR_soc_sparse[ix] = new map<size_t, map<size_t, complex<double>>> *[R_y];
-			SR_soc_sparse[ix] = new map<size_t, map<size_t, complex<double>>> *[R_y];
+			HR_soc_sparse[ix] = new std::map<size_t, std::map<size_t, std::complex<double>>> *[R_y];
+			SR_soc_sparse[ix] = new std::map<size_t, std::map<size_t, std::complex<double>>> *[R_y];
 			for (int iy = 0; iy < R_y; ++iy)
 			{
-				HR_soc_sparse[ix][iy] = new map<size_t, map<size_t, complex<double>>>[R_z];
-				SR_soc_sparse[ix][iy] = new map<size_t, map<size_t, complex<double>>>[R_z];
+				HR_soc_sparse[ix][iy] = new std::map<size_t, std::map<size_t, std::complex<double>>>[R_z];
+				SR_soc_sparse[ix][iy] = new std::map<size_t, std::map<size_t, std::complex<double>>>[R_z];
 			}
 		}
 	}

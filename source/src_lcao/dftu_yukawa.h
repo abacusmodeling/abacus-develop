@@ -36,10 +36,10 @@ public:
     double *U;           //J (Hund parameter J)
     double *J;           //J (Hund parameter J)
     
-    //vector<vector<matrix>> Vsc; //Vsc[T][N](i,j)
-    vector<vector<vector<vector<double>>>> Fk; //slater integral:Fk[T][L][N][k]
-    vector<vector<vector<double>>> U_Yukawa;   //U_Yukawa[T][L][N]
-    vector<vector<vector<double>>> J_Yukawa;   //J_Yukawa[T]{L][N]
+    //std::vector<std::vector<matrix>> Vsc; //Vsc[T][N](i,j)
+    std::vector<std::vector<std::vector<std::vector<double>>>> Fk; //slater integral:Fk[T][L][N][k]
+    std::vector<std::vector<std::vector<double>>> U_Yukawa;   //U_Yukawa[T][L][N]
+    std::vector<std::vector<std::vector<double>>> J_Yukawa;   //J_Yukawa[T]{L][N]
 
     double Nval;         //Total nmuber of valence electrons of the system 
     double Nc;           //Total nmuber of correlated electrons of the system 

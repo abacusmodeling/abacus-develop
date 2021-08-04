@@ -16,25 +16,25 @@
 #include "../src_external/src_test/src_global/matrix-test.h"		// Peize Lin test
 #include "../src_external/src_test/test_function.h"
 
-map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Cs(
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Cs(
 	const set<size_t> &atom_centres,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Exx_Abfs::Matrix_Orbs21 &m_abfslcaos_lcaos,
 	const Element_Basis_Index::IndexLNM &index_abfs,
 	const Element_Basis_Index::IndexLNM &index_lcaos,
 	const double threshold,
-	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
-	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
 	TITLE("Abfs","cal_Cs");
 	pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 	
-	const vector<size_t> atom_centres_vector( atom_centres.begin(), atom_centres.end() );
-	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs = get_adjs();
+	const std::vector<size_t> atom_centres_vector( atom_centres.begin(), atom_centres.end() );
+	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = get_adjs();
 	
 	// pre-cal Vws on same atom, speed up DPcal_V() in DPcal_C()
-	vector<shared_ptr<matrix>> Vs_same_atom(GlobalC::ucell.ntype);
+	std::vector<shared_ptr<matrix>> Vs_same_atom(GlobalC::ucell.ntype);
 	for(size_t it=0; it!=GlobalC::ucell.ntype; ++it)
 		Vs_same_atom[it] = DPcal_V( it,it,{0,0,0}, m_abfs_abfs, index_abfs, 0,true, rwlock_Vw,Vws );
 	
@@ -43,7 +43,7 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 	mkl_set_num_threads(std::max(1UL,mkl_threads/atom_centres_vector.size()));
 #endif
 	
-	map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> Cs;
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,shared_ptr<matrix>>>> Cs;
 	#pragma omp parallel for
 	for( int i_iat1=0; i_iat1<atom_centres_vector.size(); ++i_iat1 )
 	{
@@ -81,16 +81,16 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 	return Cs;
 }
 
-/*map<size_t,map<size_t,shared_ptr<matrix>>> 
+/*std::map<size_t,std::map<size_t,shared_ptr<matrix>>> 
 	Abfs::cal_Vps(
 		const set<pair<size_t,size_t>> &atom_pairs,
-		const vector<Vector3_Order<int>> &Coulomb_potential_boxes,
+		const std::vector<Vector3_Order<int>> &Coulomb_potential_boxes,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Element_Basis_Index::Index &index_abfs,
-		map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> &Vs,
-		map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
+		std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,shared_ptr<matrix>>>> &Vs,
+		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
-	map<size_t,map<size_t,shared_ptr<matrix>>> Vps;
+	std::map<size_t,std::map<size_t,shared_ptr<matrix>>> Vps;
 	
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
@@ -105,7 +105,7 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 		
 		for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
 		{
-			const vector<shared_ptr<matrix>> Vs_tmp = DPcal_V( it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), m_abfs_abfs, index_abfs, Vws );
+			const std::vector<shared_ptr<matrix>> Vs_tmp = DPcal_V( it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), m_abfs_abfs, index_abfs, Vws );
 			Vs[iat1][iat2][box2] = Vs_tmp[0];	Vs[iat2][iat1][-box2] = Vs_tmp[1];
 		}
 		
@@ -118,19 +118,19 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 */
 
 /*
-map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> 
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> 
 	Abfs::cal_Vps(
-		const vector<pair<size_t,size_t>> &atom_pairs,
-		const vector<Vector3_Order<int>> &Coulomb_potential_boxes,
-		const vector<Vector3_Order<int>> &Born_von_Karman_boxes,
+		const std::vector<pair<size_t,size_t>> &atom_pairs,
+		const std::vector<Vector3_Order<int>> &Coulomb_potential_boxes,
+		const std::vector<Vector3_Order<int>> &Born_von_Karman_boxes,
 		const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 		const Element_Basis_Index::IndexLNM &index_abfs,
-		map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> &Vs,
-		map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
+		std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,shared_ptr<matrix>>>> &Vs,
+		std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
 	TITLE("Abfs","cal_Vps");	
 	
-	map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> Vps;
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,shared_ptr<matrix>>>> Vps;
 	
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
@@ -146,11 +146,11 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>>
 		for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
 		{
 std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
-			const vector<shared_ptr<matrix>> Vs_tmp = DPcal_V( it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), m_abfs_abfs, index_abfs, Vws );
+			const std::vector<shared_ptr<matrix>> Vs_tmp = DPcal_V( it1, it2, -tau1+tau2+(box2*GlobalC::ucell.latvec), m_abfs_abfs, index_abfs, Vws );
 			Vs[iat1][iat2][box2] = Vs_tmp[0];	Vs[iat2][iat1][-box2] = Vs_tmp[1];
 		}
 		
-		vector<ComplexMatrix> Vkps( GlobalC::kv.nks/GlobalV::NSPIN, {Vs[iat1][iat2][{0,0,0}]->nr, Vs[iat1][iat2][{0,0,0}]->nc} );
+		std::vector<ComplexMatrix> Vkps( GlobalC::kv.nks/GlobalV::NSPIN, {Vs[iat1][iat2][{0,0,0}]->nr, Vs[iat1][iat2][{0,0,0}]->nc} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks/GlobalV::NSPIN; ++ik )
 			for( const Vector3_Order<int> &box2 : Coulomb_potential_boxes )
 				Vkps[ik] += static_cast<ComplexMatrix>(*Vs[iat1][iat2][box2]) * exp(-TWO_PI*IMAG_UNIT*(GlobalC::kv.kvec_c[ik]*(box2*GlobalC::ucell.latvec)));
@@ -167,19 +167,19 @@ std::cout<<"cal_Vs\t"<<iat1<<"\t"<<iat2<<"\t"<<box2<<std::endl;
 }
 */
 
-map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Vs(
-	const vector<pair<size_t,size_t>> &atom_pairs,
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_Vs(
+	const std::vector<pair<size_t,size_t>> &atom_pairs,
 	const Exx_Abfs::Matrix_Orbs11 &m_abfs_abfs,
 	const Element_Basis_Index::IndexLNM &index_abfs,
 	const double rmesh_times,
 	const double threshold,
-	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
 	TITLE("Abfs","cal_Vs");
 	pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
-	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = get_Coulomb_potential_boxes(rmesh_times);
+	std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = get_Coulomb_potential_boxes(rmesh_times);
 
-	map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> Vs;
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,shared_ptr<matrix>>>> Vs;
 	#pragma omp parallel for
 	for( int i_atom_pair=0; i_atom_pair<atom_pairs.size(); ++i_atom_pair )
 	{
@@ -213,11 +213,11 @@ map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::c
 	return Vs;
 }
 
-map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> Abfs::cal_mps(
+std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> Abfs::cal_mps(
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const map<Vector3_Order<int>,shared_ptr<matrix>> &ms )
+	const std::map<Vector3_Order<int>,shared_ptr<matrix>> &ms )
 {
-	map< Vector3_Order<int>, vector<Vector3_Order<int>> > indexs;
+	std::map< Vector3_Order<int>, std::vector<Vector3_Order<int>> > indexs;
 	for( const auto & m : ms )
 	{
 		const Vector3_Order<int> & box = m.first;
@@ -240,7 +240,7 @@ map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> Abfs::cal_mps(
 		#error
 	#endif
 	
-	map<Vector3_Order<int>,shared_ptr<matrix>> mps;
+	std::map<Vector3_Order<int>,shared_ptr<matrix>> mps;
 	for( const auto & index : indexs )
 	{
 		const Vector3_Order<int> & boxp = index.first;
@@ -258,12 +258,12 @@ map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> Abfs::cal_mps(
 	return mps;
 }
 
-map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_mps(
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> Abfs::cal_mps(
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> &ms )
+	const std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,shared_ptr<matrix>>>> &ms )
 {
 	TITLE("Abfs","cal_mps");
-	map<size_t,map<size_t,map<Vector3_Order<int>,shared_ptr<matrix>>>> mps;
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<int>,shared_ptr<matrix>>>> mps;
 	for( const auto & m1s : ms )
 		for( const auto & m12s : m1s.second )
 			mps[m1s.first][m12s.first] = cal_mps( Born_von_Karman_period, m12s.second );
@@ -283,8 +283,8 @@ shared_ptr<matrix> Abfs::DPcal_C(
 	const bool writable,
 	pthread_rwlock_t &rwlock_Cw,
 	pthread_rwlock_t &rwlock_Vw,
-	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
-	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws )
 {
 	// Attention: 
 	// 在计算 C[it1,it1,0][it2,R] 后，额外计算 C[it2,it2,0][it1,-R] 几乎不耗时。
@@ -328,7 +328,7 @@ shared_ptr<matrix> Abfs::DPcal_C(
 		}
 		else
 		{
-			const vector<shared_ptr<matrix>> A = 
+			const std::vector<shared_ptr<matrix>> A = 
 				{ make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it1,it2,0,R ,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::A2B_A1) ) ,
 				  make_shared<matrix>( m_abfslcaos_lcaos.cal_overlap_matrix(it2,it1,0,-R,index_abfs,index_lcaos,index_lcaos,Exx_Abfs::Matrix_Orbs21::Matrix_Order::BA2_A1) ) };
 			
@@ -336,11 +336,11 @@ shared_ptr<matrix> Abfs::DPcal_C(
 			const shared_ptr<matrix> V_01 = DPcal_V(it1,it2,R,       m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
 			const shared_ptr<matrix> V_10 = DPcal_V(it2,it1,-R,      m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
 			const shared_ptr<matrix> V_11 = DPcal_V(it2,it2,{0,0,0}, m_abfs_abfs,index_abfs, 0,false, rwlock_Vw,Vws);
-			const vector<vector<shared_ptr<matrix>>> V = 
+			const std::vector<std::vector<shared_ptr<matrix>>> V = 
 				{{ V_00, V_01 },
 				 { V_10, V_11 }};
 
-			const vector<vector<shared_ptr<matrix>>> L = cal_I(V);
+			const std::vector<std::vector<shared_ptr<matrix>>> L = cal_I(V);
 
 			shared_ptr<matrix> C = make_shared<matrix>( *A[0] * *L[0][0] + *A[1] * *L[1][0] );
 			if(C->absmax()<=threshold)	C->create(0,0);
@@ -364,7 +364,7 @@ shared_ptr<matrix> Abfs::DPcal_V(
 	const double threshold,
 	const bool writable,
 	pthread_rwlock_t &rwlock_Vw,
-	map<size_t,map<size_t,map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws)
+	std::map<size_t,std::map<size_t,std::map<Vector3_Order<double>,weak_ptr<matrix>>>> &Vws)
 {
 //	TITLE("Abfs","DPcal_V");
 	pthread_rwlock_rdlock(&rwlock_Vw);
@@ -401,14 +401,14 @@ shared_ptr<matrix> Abfs::DPcal_V(
 	}
 }
 
-map<size_t,vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
+std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
 {
 //	TITLE("Abfs","get_adjs");
 	const int it = GlobalC::ucell.iat2it[iat];
 	const int ia = GlobalC::ucell.iat2ia[iat];
 	const Vector3<double> &tau = GlobalC::ucell.atoms[it].tau[ia];
 	
-	map<size_t,vector<Vector3_Order<int>>> adjs;
+	std::map<size_t,std::vector<Vector3_Order<int>>> adjs;
 	GlobalC::GridD.Find_atom(GlobalC::ucell,  tau, it, ia );
 	for( int ad=0; ad<GlobalC::GridD.getAdjacentNum()+1; ++ad )
 	{
@@ -424,16 +424,16 @@ map<size_t,vector<Abfs::Vector3_Order<int>>> Abfs::get_adjs( const size_t &iat )
 	return adjs;
 }
 
-vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> Abfs::get_adjs()
+std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> Abfs::get_adjs()
 {
-	vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs(GlobalC::ucell.nat);
+	std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs(GlobalC::ucell.nat);
 	for( size_t iat=0; iat!=GlobalC::ucell.nat; ++iat )
 		adjs[iat] = Abfs::get_adjs(iat);
 	return adjs;
 }
 
 /*
-set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t>> &atom_pairs )
+set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Exx_Lcao","allocate_Hexx");
 
@@ -443,8 +443,8 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 		const size_t iat1 = atom_pair.first;
 		const size_t iat2 = atom_pair.second;
 
-		const map<size_t,vector<Abfs::Vector3_Order<int>>> adj1s = Abfs::get_adjs(iat1);
-		const map<size_t,vector<Abfs::Vector3_Order<int>>> adj2s = Abfs::get_adjs(iat2);
+		const std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> adj1s = Abfs::get_adjs(iat1);
+		const std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> adj2s = Abfs::get_adjs(iat2);
 
 		H_atom_pairs_core.insert({iat1,iat2});
 		for( const auto & atom3 : adj1s )
@@ -463,11 +463,11 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 }
 */
 
-map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const vector<pair<size_t,size_t>> &atom_pairs )
+std::map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const std::vector<pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Abfs","get_H_pairs_core_group");
 	
-	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
+	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
 	auto get_set_adjs = [&adjs]( const set<size_t> &as ) -> set<size_t>
 	{
@@ -479,15 +479,15 @@ map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const vector<pair<siz
 	};
 	
 	// {(0,1),(3,5),(0,4),(7,8),(6,5)}
-	const vector<pair<size_t,size_t>> & a1_a2 = atom_pairs;
+	const std::vector<pair<size_t,size_t>> & a1_a2 = atom_pairs;
 	
 	// => {1:{0}, 5:{3,6}, 4:{0}, 8:{7}}
-	map<size_t,set<size_t>> a2_a1s;
+	std::map<size_t,set<size_t>> a2_a1s;
 	for( const auto & a1_a2_i : a1_a2 )
 		a2_a1s[ a1_a2_i.second ].insert( a1_a2_i.first );
 	
 	// => {{0}:{1,4}, {3,6}:{5}, {7}:{8}}
-	map<set<size_t>,set<size_t>> a1s_a2s;
+	std::map<set<size_t>,set<size_t>> a1s_a2s;
 	for( const auto & a2_a1s_i : a2_a1s )
 		a1s_a2s[ a2_a1s_i.second ].insert( a2_a1s_i.first );
 	a2_a1s.clear();
@@ -495,7 +495,7 @@ map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const vector<pair<siz
 	// => {R(0):R(1)UR(4), R(3)UR(6):R(5), R(7):R(8)}
 	// imaging R(0)==R(3)UR(6):   
 	// => {R(0):R(1)UR(4)UR(5), R(7):R(8)}
-	map<set<size_t>,set<size_t>> a1Rs_a2s;
+	std::map<set<size_t>,set<size_t>> a1Rs_a2s;
 	for( const auto & a1s_a2s_i : a1s_a2s )
 	{
 		const set<size_t> a1Rs_i = get_set_adjs(a1s_a2s_i.first);
@@ -507,11 +507,11 @@ map<set<size_t>,set<size_t>> Abfs::get_H_pairs_core_group( const vector<pair<siz
 	return a1Rs_a2s;
 }
 
-set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t>> &atom_pairs )
+set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const std::vector<pair<size_t,size_t>> &atom_pairs )
 {
 	TITLE("Exx_Lcao","get_H_pairs_core");
 	
-	const vector<map<size_t,vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
+	const std::vector<std::map<size_t,std::vector<Abfs::Vector3_Order<int>>>> adjs = Abfs::get_adjs();
 	
 	auto get_set_adjs = [&adjs]( const set<size_t> &as ) -> set<size_t>
 	{
@@ -523,15 +523,15 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 	};
 	
 	// {(0,1),(3,5),(0,4),(7,8),(6,5)}
-	const vector<pair<size_t,size_t>> & a1_a2 = atom_pairs;
+	const std::vector<pair<size_t,size_t>> & a1_a2 = atom_pairs;
 	
 	// => {1:{0}, 5:{3,6}, 4:{0}, 8:{7}}
-	map<size_t,set<size_t>> a2_a1s;
+	std::map<size_t,set<size_t>> a2_a1s;
 	for( const auto & a1_a2_i : a1_a2 )
 		a2_a1s[ a1_a2_i.second ].insert( a1_a2_i.first );
 	
 	// => {{0}:{1,4}, {3,6}:{5}, {7}:{8}}
-	map<set<size_t>,set<size_t>> a1s_a2s;
+	std::map<set<size_t>,set<size_t>> a1s_a2s;
 	for( const auto & a2_a1s_i : a2_a1s )
 		a1s_a2s[ a2_a1s_i.second ].insert( a2_a1s_i.first );
 	a2_a1s.clear();
@@ -539,7 +539,7 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 	// => {R(0):{1,4}, R(3)UR(6):{5}, R(7):{8}}
 	// imaging R(0)==R(3)UR(6):   
 	// => {R(0):{1,4,5}, R(7):{8}}
-	map<set<size_t>,set<size_t>> a1Rs_a2s;
+	std::map<set<size_t>,set<size_t>> a1Rs_a2s;
 	for( const auto & a1s_a2s_i : a1s_a2s )
 	{
 		const set<size_t> a1Rs_i = get_set_adjs(a1s_a2s_i.first);
@@ -561,9 +561,9 @@ set<pair<size_t,size_t>> Abfs::get_H_pairs_core( const vector<pair<size_t,size_t
 	return a1Rs_a2Rs;
 }
 
-vector<Abfs::Vector3_Order<int>> Abfs::get_Coulomb_potential_boxes( const double rmesh_times )
+std::vector<Abfs::Vector3_Order<int>> Abfs::get_Coulomb_potential_boxes( const double rmesh_times )
 {
-	vector<Vector3_Order<int>> Coulomb_potential_boxes;
+	std::vector<Vector3_Order<int>> Coulomb_potential_boxes;
 	const double Rcut = GlobalC::ORB.get_Rmax() * rmesh_times;
 	const int nx = std::ceil(Rcut/std::abs((GlobalC::ucell.a2^GlobalC::ucell.a3).normalize()*GlobalC::ucell.a1*GlobalC::ucell.lat0));
 	const int ny = std::ceil(Rcut/std::abs((GlobalC::ucell.a1^GlobalC::ucell.a3).normalize()*GlobalC::ucell.a2*GlobalC::ucell.lat0));
@@ -575,9 +575,9 @@ vector<Abfs::Vector3_Order<int>> Abfs::get_Coulomb_potential_boxes( const double
 	return Coulomb_potential_boxes;
 }
 
-vector<Abfs::Vector3_Order<int>> Abfs::get_Born_von_Karmen_boxes( const Abfs::Vector3_Order<int> &Born_von_Karman_period )
+std::vector<Abfs::Vector3_Order<int>> Abfs::get_Born_von_Karmen_boxes( const Abfs::Vector3_Order<int> &Born_von_Karman_period )
 {
-	vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
+	std::vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
 	for( int ix=0; ix<Born_von_Karman_period.x; ++ix )
 		for( int iy=0; iy<Born_von_Karman_period.y; ++iy )
 			for( int iz=0; iz<Born_von_Karman_period.z; ++iz )
@@ -613,7 +613,7 @@ shared_ptr<matrix> Abfs::cal_I( const shared_ptr<matrix> &m )
 	return m_new;
 }
 
-vector<vector<shared_ptr<matrix>>> Abfs::cal_I( const vector<vector<shared_ptr<matrix>>> &ms )
+std::vector<std::vector<shared_ptr<matrix>>> Abfs::cal_I( const std::vector<std::vector<shared_ptr<matrix>>> &ms )
 {
 //	TITLE("Abfs","cal_I4");
 	Exx_Abfs::Inverse_Matrix_Double I;
@@ -636,7 +636,7 @@ vector<vector<shared_ptr<matrix>>> Abfs::cal_I( const vector<vector<shared_ptr<m
 		#error "TEST_EXX_LCAO"
 	#endif
 	
-	vector<vector<shared_ptr<matrix>>> ms_new( 2, vector<shared_ptr<matrix>>(2) );
+	std::vector<std::vector<shared_ptr<matrix>>> ms_new( 2, std::vector<shared_ptr<matrix>>(2) );
 	for( size_t i=0; i!=2; ++i )
 		for(size_t j=0; j!=2; ++j )
 			ms_new[i][j] = make_shared<matrix>( ms[i][j]->nr, ms[i][j]->nc );

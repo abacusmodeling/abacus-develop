@@ -413,7 +413,7 @@ void Sphbes::Spherical_Bessel
 (
     const int &msh,	 // number of grid points
     const double *r, // radial grid
-    const double &q, // wave vector
+    const double &q, // wave std::vector
     const int &l,	 // angular momentum
     double *jl		 // jl(1:msh) = j_l(q*r(i)),spherical bessel function
 )

@@ -119,8 +119,8 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 
 							olm[0] = olm[1] = olm[2] = 0.0;
 
-							complex<double> olm1[4]={ZERO, ZERO, ZERO, ZERO};
-							complex<double> *olm2 = &olm1[0];
+							std::complex<double> olm1[4]={ZERO, ZERO, ZERO, ZERO};
+							std::complex<double> *olm2 = &olm1[0];
 							if(!calc_deri)
 							{
 								// PLEASE use UOT as an input parameter of this subroutine
@@ -535,8 +535,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 								{
 									//const Atom* atom0 = &GlobalC::ucell.atoms[T0];
 									double nlm[3]={0,0,0};
-									complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
-									complex<double> *nlm2 = NULL;
+									std::complex<double> nlm1[4]={0,0,0,0};//modified by zhengdy-soc
+									std::complex<double> *nlm2 = NULL;
 									if(GlobalV::NSPIN==4) nlm2 = &nlm1[0];
 									if(!calc_deri)
 									{

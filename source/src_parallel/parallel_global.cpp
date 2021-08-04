@@ -21,7 +21,7 @@ MPI_Comm PARAPW_WORLD; // qianrui add it for sto-dft 2021-4-14
 MPI_Comm GRID_WORLD; // mohan add 2012-01-13z
 MPI_Comm DIAG_WORLD; // mohan add 2012-01-13
 
-void Parallel_Global::myProd(complex<double> *in,complex<double> *inout,int *len,MPI_Datatype *dptr)
+void Parallel_Global::myProd(std::complex<double> *in,std::complex<double> *inout,int *len,MPI_Datatype *dptr)
 {
 	for(int i=0;i<*len;i++)
 	{
@@ -29,7 +29,7 @@ void Parallel_Global::myProd(complex<double> *in,complex<double> *inout,int *len
 //		(*inout).imag()=(*inout).imag()+(*in).imag();
 
 		// mohan updat 2011-09-21
-		(*inout)=complex<double>((*inout).real()+(*in).real(),(*inout).imag()+(*in).imag());
+		(*inout)=std::complex<double>((*inout).real()+(*in).real(),(*inout).imag()+(*in).imag());
 
 		in++;
 		inout++;

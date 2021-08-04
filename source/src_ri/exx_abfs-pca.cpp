@@ -16,9 +16,9 @@
 #include <sys/time.h>			// Peize Lin test
 #include "../src_lcao/global_fp.h"		// Peize Lin test
 
-vector<vector<pair<vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA( 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &lcaos, 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &abfs,
+std::vector<std::vector<pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::cal_PCA( 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &lcaos, 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs,
 	const double kmesh_times )
 {
 	TITLE("Exx_Abfs::PCA::cal_PCA");
@@ -51,7 +51,7 @@ ofs<<range_abfs<<std::endl;
 	m_abfslcaos_lcaos.init_radial( abfs, lcaos, lcaos );
 //ofs<<"TIME@m_abfslcaos_lcaos.init_radial\t"<<time_during(t_start)<<std::endl;
 
-	map<size_t,map<size_t,set<double>>> delta_R;
+	std::map<size_t,std::map<size_t,set<double>>> delta_R;
 	for( size_t it=0; it!=abfs.size(); ++it )
 		delta_R[it][it] = {0.0};
 //gettimeofday( &t_start, NULL);
@@ -60,7 +60,7 @@ ofs<<range_abfs<<std::endl;
 
 	Exx_Abfs::Lmax = Lmax_bak;
 	
-	vector<vector<pair<vector<double>,matrix>>> eig(abfs.size());
+	std::vector<std::vector<pair<std::vector<double>,matrix>>> eig(abfs.size());
 	for( size_t T=0; T!=abfs.size(); ++T )
 	{
 		const matrix && A = m_abfslcaos_lcaos.cal_overlap_matrix(  
@@ -85,7 +85,7 @@ ofs<<range_abfs<<std::endl;
 //ofs<<"mul:"<<std::endl<<transpose(A_sub) * A_sub<<std::endl;
 			matrix mm = transpose(A_sub) * A_sub;
 //ofs<<"mm:"<<std::endl<<mm<<std::endl;
-			vector<double> eig_value(mm.nr);
+			std::vector<double> eig_value(mm.nr);
 			
 			int info;
 gettimeofday( &t_start, NULL);

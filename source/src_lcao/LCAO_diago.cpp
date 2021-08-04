@@ -10,7 +10,7 @@ Diago_LCAO_Matrix::~Diago_LCAO_Matrix(){}
 
 void Diago_LCAO_Matrix::solve_complex_matrix(
 	const int &ik, 
-	complex<double>** wfc, 
+	std::complex<double>** wfc, 
 	ComplexMatrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","solve_complex_matrix");
@@ -31,7 +31,7 @@ void Diago_LCAO_Matrix::solve_complex_matrix(
 
 	time_t time_end = time(NULL);
 
-	OUT_TIME("diago(complex)", time_start, time_end);
+	OUT_TIME("diago(std::complex)", time_start, time_end);
 
 	return;
 }
@@ -89,7 +89,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &
 }
 
 
-void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wfc, ComplexMatrix &wfc_2d)const
+void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>** wfc, ComplexMatrix &wfc_2d)const
 {
 	TITLE("Diago_LCAO_Matrix","using_HPSEPS_complex");
 
@@ -105,7 +105,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 	if(GlobalV::NSPIN==4)
 	{
 		int row = GlobalC::GridT.lgd;
-		vector<complex<double>> tmp(row);
+		std::vector<std::complex<double>> tmp(row);
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
 			for(int iw=0; iw<row / GlobalV::NPOL; iw++)
@@ -124,7 +124,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, complex<double>** wf
 }
 #endif
 
-void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double> **wfc)const
+void Diago_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double> **wfc)const
 {
 	TITLE("Diago_LCAO_Matrix","using_LAPACK_complex");
 

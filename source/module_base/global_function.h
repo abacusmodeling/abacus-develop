@@ -108,16 +108,16 @@ void DONE(ofstream &ofs,const string &description, bool only_rank0 = false);
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : ZEROS
-// set elements of u as zero which u is 1_d complex array
+// set elements of u as zero which u is 1_d std::complex array
 //==========================================================
 template<class T, class TI>
-inline void ZEROS(complex<T> *u,const TI n)		// Peize Lin change int to TI at 2020.03.03
+inline void ZEROS(std::complex<T> *u,const TI n)		// Peize Lin change int to TI at 2020.03.03
 {
     assert(n>=0);
     assert(u!=0);
     for (TI i=0;i<n;i++)
     {
-        u[i] = complex<T>(0.0,0.0);
+        u[i] = std::complex<T>(0.0,0.0);
     }
     return;
 }
@@ -168,7 +168,7 @@ void BLOCK_HERE( const string &description );
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : VECTOR_TO_PTR
-// change vector to pointer
+// change std::vector to pointer
 // Peize Lin add 2016-02-25
 //==========================================================
 template<class T>
@@ -211,7 +211,7 @@ std::string TO_STRING ( const T &n )
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : MAP_EXIST
-// find whether exists the map index
+// find whether exists the std::map index
 // if exist return the ptr called, else return nullptr
 // example: map_exist(ms,i,j,k) -> try to find ms[i][j][k]
 // Peize Lin add 2018-07-16

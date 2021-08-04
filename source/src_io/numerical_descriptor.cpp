@@ -179,8 +179,8 @@ const int &it, const int &ia, double *d, const int &nd)
 								const int jj=mu_index[it](ia,l,n,m2);
 								for(int ib=0; ib<nbands; ib++) // sum for nbands
 								{
-										complex<double> c1(overlap_Q1(ik, ib, ii),  overlap_Q2(ik, ib, ii));
-										complex<double> c2(overlap_Q1(ik, ib, jj), -overlap_Q2(ik, ib, jj));
+										std::complex<double> c1(overlap_Q1(ik, ib, ii),  overlap_Q2(ik, ib, ii));
+										std::complex<double> c2(overlap_Q1(ik, ib, jj), -overlap_Q2(ik, ib, jj));
 										des(m,m2) += c1*c2;
 								}
 			//					GlobalV::ofs_running << setw(15) << des(m,m2);
@@ -203,7 +203,7 @@ const int &it, const int &ia, double *d, const int &nd)
 					int ndim = des.nr;
 					double* tmpd = new double[ndim]();
 					const int lwork = 2*ndim;
-					complex<double>* work = new complex<double>[lwork]();
+					std::complex<double>* work = new std::complex<double>[lwork]();
 					double* rwork = new double[3 * ndim - 2]();
 					int infor = 0;	
 					// diag by calling zheev
@@ -259,12 +259,12 @@ void Numerical_Descriptor::jlq3d_overlap(
 	<< std::endl;
 
     double *flq = new double[np];
-    complex<double> overlapQ = ZERO;
+    std::complex<double> overlapQ = ZERO;
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
     {
         for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
         {
-            complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
             for (int L=0; L< lmax+1; L++)
             {
                 GlobalV::ofs_running << " " << setw(5) << ik+1
@@ -273,7 +273,7 @@ void Numerical_Descriptor::jlq3d_overlap(
 							<< setw(8) << L
 							<< std::endl;
                 //OUT("l",l);
-                complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
+                std::complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < nmax; ie++)
                 {
                     for (int ig=0; ig<np; ig++)
@@ -287,10 +287,10 @@ void Numerical_Descriptor::jlq3d_overlap(
                         const int lm = L*L+m;
                         for (int ib=0; ib<GlobalV::NBANDS; ib++)
                         {
-                            complex<double> overlap_tmp = ZERO;
+                            std::complex<double> overlap_tmp = ZERO;
                             for (int ig=0; ig<np; ig++)
                             {
-                                const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
+                                const std::complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
                                 overlap_tmp += conj( local_tmp ) * psi(ib, ig); // psi is bloch orbitals
                             }
                             overlap_Q1(ik_ibz, ib, mu_index[T1](I1, L, ie, m)) = overlap_tmp.real();

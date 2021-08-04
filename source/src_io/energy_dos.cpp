@@ -268,7 +268,7 @@ void energy::perform_dos(void)
 		double c=2*3.141592653;
 		double b = sqrt(c)*a;                                         
 
-		complex<double>*waveg = new complex<double>[GlobalV::NLOCAL];
+		std::complex<double>*waveg = new std::complex<double>[GlobalV::NLOCAL];
 
 		double*Gauss = new double[np];
 

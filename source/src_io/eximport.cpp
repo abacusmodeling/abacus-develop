@@ -262,7 +262,7 @@ bool eximport::sec_wf(ComplexMatrix *psi, const int wf_num, const string &fn)con
 				// Peize Lin fix bug about rvalue 2016-08-02
 				double tmp_real, tmp_imag;
 				sec >> tmp_real >> tmp_imag ;
-				psi[ik](iw, ig) = complex<double>(tmp_real,tmp_imag);
+				psi[ik](iw, ig) = std::complex<double>(tmp_real,tmp_imag);
 			}
 		}
 	}
@@ -272,7 +272,7 @@ bool eximport::sec_wf(ComplexMatrix *psi, const int wf_num, const string &fn)con
 }
 
 
-bool eximport::sec_wf(complex < double> ***psi, const int npsi, const string &fn)const
+bool eximport::sec_wf(std::complex < double> ***psi, const int npsi, const string &fn)const
 {
 	std::cout<<"\n ==> ei.sec_wf()_2";
 	ifstream sec(fn.c_str());
@@ -298,7 +298,7 @@ bool eximport::sec_wf(complex < double> ***psi, const int npsi, const string &fn
 				// Peize Lin fix bug about rvalue 2016-08-02
 				double tmp_real, tmp_imag;
 				sec >> tmp_real >> tmp_imag ;
-				psi[iw][ik][ig] = complex<double>(tmp_real,tmp_imag);				
+				psi[iw][ik][ig] = std::complex<double>(tmp_real,tmp_imag);				
 			}
 		}
 	}
@@ -662,18 +662,18 @@ void eximport::in_evc(ifstream &in)
 
 	in >> this->natomwfc;//4.1
 
-	this->evc = new complex <double>**[natomwfc];
+	this->evc = new std::complex <double>**[natomwfc];
 	int iw = 0;
 	int ik = 0;
 	int ig = 0;
 
 	for (iw = 0;iw < natomwfc;iw++)
 	{
-		evc[iw] = new complex <double>*[nks];
+		evc[iw] = new std::complex <double>*[nks];
 
 		for (ik = 0;ik < nks;ik++)
 		{
-			evc[iw][ik] = new complex <double>[ngk[ik]];
+			evc[iw][ik] = new std::complex <double>[ngk[ik]];
 		}
 	}
 
@@ -690,7 +690,7 @@ void eximport::in_evc(ifstream &in)
 			for (ig = 0;ig < npw;ig++)
 			{
 				in >> r >> i;//4.2
-				evc[iw][ik][ig] = complex <double>(r, i);
+				evc[iw][ik][ig] = std::complex <double>(r, i);
 			}
 		}
 	}

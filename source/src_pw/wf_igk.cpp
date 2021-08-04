@@ -172,12 +172,12 @@ double* WF_igk::get_qvec_cartesian(const int &ik)
 }
 
 
-complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
+std::complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
 {
     timer::tick("WF_igk","get_sk");
     const double arg = (GlobalC::kv.kvec_c[ik] * GlobalC::ucell.atoms[it].tau[ia]) * TWO_PI;
-    const complex<double> kphase = complex <double> ( cos(arg),  -sin(arg) );
-    complex<double> *sk = new complex<double>[ GlobalC::kv.ngk[ik] ];
+    const std::complex<double> kphase = std::complex <double> ( cos(arg),  -sin(arg) );
+    std::complex<double> *sk = new std::complex<double>[ GlobalC::kv.ngk[ik] ];
     for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
     {
         const int iig = this->igk(ik, ig);
@@ -192,15 +192,15 @@ complex<double>* WF_igk::get_sk(const int ik, const int it, const int ia)const
 }
 
 
-complex<double>* WF_igk::get_skq(int ik, const int it, const int ia, Vector3<double> q)   //pengfei 2016-11-23 
+std::complex<double>* WF_igk::get_skq(int ik, const int it, const int ia, Vector3<double> q)   //pengfei 2016-11-23 
 {
-    complex<double> *skq = new complex<double>[ GlobalC::kv.ngk[ik] ];
+    std::complex<double> *skq = new std::complex<double>[ GlobalC::kv.ngk[ik] ];
 
     for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
     {
         Vector3<double> qkq = GlobalC::pw.get_GPlusK_cartesian(ik, this->igk(ik, ig)) + q;
         double arg = (qkq * GlobalC::ucell.atoms[it].tau[ia]) * TWO_PI;
-        skq[ig] = complex<double>(cos(arg), -sin(arg));
+        skq[ig] = std::complex<double>(cos(arg), -sin(arg));
     }
 
     return skq;

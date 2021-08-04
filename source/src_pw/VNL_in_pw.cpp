@@ -200,10 +200,10 @@ void pseudopot_cell_vnl::getvnl(const int &ik)
 		// now add the structure factor and factor (-i)^l
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++) 
 		{
-			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
-				complex<double> pref = pow( NEG_IMAG_UNIT, nhtol(it, ih));	//?
+				std::complex<double> pref = pow( NEG_IMAG_UNIT, nhtol(it, ih));	//?
 				for (ig = 0;ig < npw;ig++)
 				{
 					this->vkb(jkb, ig) = vkb1(ih, ig) * sk [ig] * pref;
@@ -316,7 +316,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 						{
 							this->dvan_so(ijs,it,ip,ip2) = cell.atoms[it].dion(ir, is) * soc.fcoef(it,is1,is2,ip,ip2);
 							++ijs;
-							if(ir != is) soc.fcoef(it,is1,is2,ip,ip2) = complex<double>(0.0,0.0);
+							if(ir != is) soc.fcoef(it,is1,is2,ip,ip2) = std::complex<double>(0.0,0.0);
 						}
 					}
 				}
@@ -397,9 +397,9 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 }
 
 #ifdef __LCAO
-complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int M)   // pengfei Li  2018-3-23
+std::complex<double> pseudopot_cell_vnl::Cal_C(int alpha, int lu, int mu, int L, int M)   // pengfei Li  2018-3-23
 {
-	complex<double> cf;
+	std::complex<double> cf;
 	if(alpha == 0)
 	{
 		cf = -sqrt(4*PI/3)*CG(lu,mu,1,1,L,M);
@@ -454,23 +454,23 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 		gk[ig] = GlobalC::wf.get_1qvec_cartesian(ik, ig);
 	}
 
-	vkb1_alpha = new complex<double>**[3];
+	vkb1_alpha = new std::complex<double>**[3];
 	for(int i=0; i<3; i++)
 	{
-		vkb1_alpha[i] = new complex<double>*[nhm];
+		vkb1_alpha[i] = new std::complex<double>*[nhm];
 		for(int j=0; j<nhm; j++)
 		{
-			vkb1_alpha[i][j] = new complex<double>[npw];
+			vkb1_alpha[i][j] = new std::complex<double>[npw];
 		}
 	}	
 	
-	vkb_alpha = new complex<double>**[3];
+	vkb_alpha = new std::complex<double>**[3];
 	for(int i=0; i<3; i++)
 	{
-		vkb_alpha[i] = new complex<double>*[nkb];
+		vkb_alpha[i] = new std::complex<double>*[nkb];
 		for(int j=0; j<nkb; j++)
 		{
-			vkb_alpha[i][j] = new complex<double>[GlobalC::wf.npwx];
+			vkb_alpha[i][j] = new std::complex<double>[GlobalC::wf.npwx];
 		}
 	}
 	
@@ -514,7 +514,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 						int lm = L*L + M;
 						for (int alpha=0; alpha<3; alpha++)
 						{
-							complex<double> c = Cal_C(alpha,lu, mu, L, M);
+							std::complex<double> c = Cal_C(alpha,lu, mu, L, M);
 							/*if(alpha == 0)
 							{
 								std::cout<<"lu= "<<lu<<"  mu= "<<mu<<"  L= "<<L<<"  M= "<<M<<" alpha = "<<alpha<<"  "<<c<<std::endl;
@@ -528,7 +528,7 @@ void pseudopot_cell_vnl::getvnl_alpha(const int &ik)           // pengfei Li  20
 
 		for (ia=0; ia<GlobalC::ucell.atoms[it].na; ia++) 
 		{
-			complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+			std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
 			for (ih = 0;ih < nh;ih++)
 			{
 				for (ig = 0;ig < npw;ig++)

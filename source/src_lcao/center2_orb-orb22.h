@@ -6,9 +6,9 @@
 #ifndef CENTER2_ORB_ORB22_H
 #define CENTER2_ORB_ORB22_H
 
-#include<vector>
+#include <vector>
 using std::vector;
-#include<map>
+#include <map>
 using std::map;
 #include<set>
 using std::set;
@@ -46,8 +46,8 @@ protected:								// Peize Lin test 2016-10-07
 	const ORB_table_phi &MOT;
 	const ORB_gaunt_table &MGT;	
 
-	map<int,Numerical_Orbital_Lm> nB;
-	map<int,Center2_Orb::Orb21> orb21s;
+	std::map<int,Numerical_Orbital_Lm> nB;
+	std::map<int,Center2_Orb::Orb21> orb21s;
 };
 
 // this->orb21s[L34].psi2_center2[L12].Table_r[L1234][ir]

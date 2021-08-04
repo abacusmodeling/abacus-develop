@@ -57,7 +57,7 @@ void Exx_Abfs::Inverse_Matrix_Double::using_dpotrf()
 
 void Exx_Abfs::Inverse_Matrix_Double::using_dsyev( const double &threshold_condition_number )
 {
-	vector<double> eigen_value(A.nr);
+	std::vector<double> eigen_value(A.nr);
 	LapackConnector::dsyev('V','U',A,VECTOR_TO_PTR(eigen_value),info);
 	
 	#if TEST_EXX_LCAO==1

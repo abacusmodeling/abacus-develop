@@ -1,14 +1,14 @@
 //column-circle decomposition
 #include "pzt2s.h"
-void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *X,
-           LocalMatrix loc_A,int loc_size,complex <double> *norm,char uplo)
+void pzt2s(MPI_Comm comm2D,int N_A,int NB,std::complex <double> *A,std::complex <double> *X,
+           LocalMatrix loc_A,int loc_size,std::complex <double> *norm,char uplo)
 /*  PSEPS routine (version 1.0) --
  *  Computer Network Information Center, CAS. 
  *  July 15, 2006
  *  Purpose
  *  ========
  *  pzt2s computes the eigenvectors of stardand eigenproblem by the 
- *  eigenvector of  tridiagonal eigenproblem matrix using Householder vector
+ *  eigenvector of  tridiagonal eigenproblem matrix using Householder std::vector
  *  Arguments
  *  =========
  *  uplo    (global input) CHARACTER
@@ -49,9 +49,9 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 	}
 	*/
 
-  complex <double> W[N_A][NB],U[N_A][NB],U1[N_A][NB],UC[NB][loc_size];
-  complex <double> w[N_A],u[N_A],u_c[loc_A.col_num],u_r[loc_A.row_num],p[N_A];
-  complex <double> g,alpha,beta,scal; 
+  std::complex <double> W[N_A][NB],U[N_A][NB],U1[N_A][NB],UC[NB][loc_size];
+  std::complex <double> w[N_A],u[N_A],u_c[loc_A.col_num],u_r[loc_A.row_num],p[N_A];
+  std::complex <double> g,alpha,beta,scal; 
   MPI_Comm comm_col,comm_row;
   int i,j,k,kk,incx=1,incy=1,m,n,tmp,myid;
   int cur_col,cur_row;
@@ -70,8 +70,8 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 
   if (iarow==coord[0]) loc_A.row_pos--;
   if (iacol==coord[1]) loc_A.col_pos--;
-  alpha=complex <double> (0.0,0.0);
-  beta=complex <double> (0.0,0.0);
+  alpha=std::complex <double> (0.0,0.0);
+  beta=std::complex <double> (0.0,0.0);
   bn=N_A/NB;
   if (bn*NB<N_A) bn++;
 
@@ -82,9 +82,9 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 		  for (i=0; i<N_A; i++)
 			  for (j=0; j<NB; j++)
 			  {
-				  W[i][j]=complex <double> (0.0,0.0);
-				  U[i][j]=complex <double> (0.0,0.0);
-				  U1[i][j]=complex <double> (0.0,0.0);
+				  W[i][j]=std::complex <double> (0.0,0.0);
+				  U[i][j]=std::complex <double> (0.0,0.0);
+				  U1[i][j]=std::complex <double> (0.0,0.0);
 			  }
 		  first_col=bt*NB;
 		  end_col=(first_col+NB-1>N_A-2)?(N_A-2):(first_col+NB-1);
@@ -94,8 +94,8 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 			  indxg2p(comm2D,NB,k,k,&iarow,&iacol);
 			  for (i=k+1; i<N_A; i++)
 			  {
-				  u[i]=complex <double> (0.0,0.0);
-				  p[i]=complex <double> (0.0,0.0);
+				  u[i]=std::complex <double> (0.0,0.0);
+				  p[i]=std::complex <double> (0.0,0.0);
 			  }
 			  if (iacol==coord[1]) cur_col=loc_A.col_pos+1;
 			  else cur_col=loc_A.col_pos;
@@ -121,7 +121,7 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 				  U1[i][k-first_col]=conj(u[i]);
 			  }
 			  g=norm[k];
-			  scal=complex<double> (-g.real(),g.imag());
+			  scal=std::complex<double> (-g.real(),g.imag());
 			  if (k==end_col)
 				  zscal_(&N_A,&scal,u,&incx);
 			  else
@@ -130,15 +130,15 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 				  m=N_A-k-1;
 				  n=end_col-k;
 				  yang=beta.imag();
-				  beta=complex<double> (0.0,yang);
+				  beta=std::complex<double> (0.0,yang);
 				  pos=k-first_col+1;
 				  yang=alpha.imag();
-				  alpha=complex<double> (1.0,yang);
+				  alpha=std::complex<double> (1.0,yang);
 				  lda=NB;
 				  zgemv_(&transa,&n,&m,&alpha,&U1[k+1][pos],&lda,&u[k+1],&incx,&beta,w,&incy);
 				  transa='t';
 				  yang=beta.imag();
-				  beta=complex<double> (1.0,yang);
+				  beta=std::complex<double> (1.0,yang);
 				  zgemv_(&transa,&n,&m,&alpha,&W[k+1][pos],&lda,w,&incx,&beta,&u[k+1],&incy);
 				  zscal_(&N_A,&scal,u,&incx);
 			  }
@@ -151,9 +151,9 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 		  kk=N_A-first_col-1;
 		  n=loc_size;
 		  yang=alpha.imag();
-		  alpha=complex<double> (1.0,yang);
+		  alpha=std::complex<double> (1.0,yang);
 		  yang=beta.imag();
-		  beta=complex<double> (0.0,yang);
+		  beta=std::complex<double> (0.0,yang);
 		  lda=N_A;
 		  ldb=NB;
 		  ldc=loc_size;
@@ -171,7 +171,7 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 		  ldb=loc_size;
 		  ldc=N_A;
 		  yang=beta.imag();
-		  beta=complex<double> (1.0,yang);
+		  beta=std::complex<double> (1.0,yang);
 		  pos1=first_col+1;
 		  pos2=first_col+1;
 		  //dgemm_(&transa,&transb,&n,&m,&kk,&alpha,&U[pos1][0],&lda,UC,&ldb,&beta,&X[pos2],&ldc);
@@ -184,9 +184,9 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 		  for (i=0; i<N_A; i++)
 			  for (j=0; j<NB; j++)
 			  {
-				  W[i][j]=complex<double> (0.0,0.0);
-				  U[i][j]=complex<double> (0.0,0.0);
-				  U1[i][j]=complex<double> (0.0,0.0);
+				  W[i][j]=std::complex<double> (0.0,0.0);
+				  U[i][j]=std::complex<double> (0.0,0.0);
+				  U1[i][j]=std::complex<double> (0.0,0.0);
 			  }
 		  first_col=bt*NB;
 		  end_col=(first_col+NB-1>N_A-2)?(N_A-2):(first_col+NB-1);
@@ -196,8 +196,8 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 			  indxg2p(comm2D,NB,k,k,&iarow,&iacol);
 			  for (i=k+1; i<N_A; i++)
 			  {
-				  u[i]=complex<double> (0.0,0.0);
-				  p[i]=complex<double> (0.0,0.0);
+				  u[i]=std::complex<double> (0.0,0.0);
+				  p[i]=std::complex<double> (0.0,0.0);
 			  }
 			  if (iarow==coord[0]) cur_row=loc_A.row_pos+1;
 			  else cur_row=loc_A.row_pos;
@@ -223,7 +223,7 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 				  U[i][k-first_col]=u[i];
 			  }
 			  g=norm[k];
-			  scal=complex<double> (-g.real(),g.imag());
+			  scal=std::complex<double> (-g.real(),g.imag());
 			  if (k==end_col)
 				  zscal_(&N_A,&scal,u,&incx);
 			  else
@@ -232,15 +232,15 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 				  m=N_A-k-1;
 				  n=end_col-k;
 				  yang=beta.imag();
-				  beta=complex<double> (0.0,yang);
+				  beta=std::complex<double> (0.0,yang);
 				  pos=k-first_col+1;
 				  yang=alpha.imag();
-				  alpha=complex<double> (1.0,yang);
+				  alpha=std::complex<double> (1.0,yang);
 				  lda=NB;
 				  zgemv_(&transa,&n,&m,&alpha,&U1[k+1][pos],&lda,&u[k+1],&incx,&beta,w,&incy);
 				  transa='t';
 				  yang=beta.imag();
-				  beta=complex<double> (1.0,yang);
+				  beta=std::complex<double> (1.0,yang);
 				  zgemv_(&transa,&n,&m,&alpha,&W[k+1][pos],&lda,w,&incx,&beta,&u[k+1],&incy);
 				  zscal_(&N_A,&scal,u,&incx);
 			  }
@@ -253,9 +253,9 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 		  kk=N_A-first_col-1;
 		  n=loc_size;
 		  yang=alpha.imag();
-		  alpha=complex<double> (1.0,yang);
+		  alpha=std::complex<double> (1.0,yang);
 		  yang=beta.imag();
-		  beta=complex<double> (0.0,yang);
+		  beta=std::complex<double> (0.0,yang);
 		  lda=N_A;
 		  ldb=NB;
 		  ldc=loc_size;
@@ -272,7 +272,7 @@ void pzt2s(MPI_Comm comm2D,int N_A,int NB,complex <double> *A,complex <double> *
 		  ldb=loc_size;
 		  ldc=N_A;
 		  yang=beta.imag();
-		  beta=complex<double> (1.0,yang);
+		  beta=std::complex<double> (1.0,yang);
 		  pos1=first_col+1;
 		  pos2=first_col+1;
 		  //dgemm_(&transa,&transb,&n,&m,&kk,&alpha,&U[pos1][0],&lda,UC,&ldb,&beta,&X[pos2],&ldc);

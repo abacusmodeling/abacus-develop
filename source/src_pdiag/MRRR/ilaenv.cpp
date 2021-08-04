@@ -255,7 +255,7 @@ int pilaenv(int *ispec, char *name__, char *opts, int *n1, int *n2, int *n3,
 	/*     ISPEC = 1:  block size */
 
 	/*     In these examples, separate code is provided for setting NB for */
-	/*     real and complex.  We assume that NB will take the same value in */
+	/*     real and std::complex.  We assume that NB will take the same value in */
 	/*     single or double precision. */
 
 	nb = 1;

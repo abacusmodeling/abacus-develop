@@ -27,8 +27,8 @@ class Pdiag_Double : public Pdiag_Basic
 		double *h_mat, double *s_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
 	
 	// this subroutine needs reconstruction in near future -- mohan note 2021-03
-	void diago_complex_begin(const int &ik, complex<double> **wfc, ComplexMatrix &wfc_2d,
-		complex<double> *ch_mat, complex<double> *cs_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
+	void diago_complex_begin(const int &ik, std::complex<double> **wfc, ComplexMatrix &wfc_2d,
+		std::complex<double> *ch_mat, std::complex<double> *cs_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
 
 #ifdef __MPI
 	void readin(const string &fa, const string &fb, const int &nlocal, double *eigen, double *eigvr);

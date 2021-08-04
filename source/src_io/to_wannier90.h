@@ -25,9 +25,9 @@ public:
 	//const int k_shells = 12;                                                                // default the shell numbers
 	//const double large_number = 99999999.0;
 	//const double small_number = 0.000001;
-	//vector<Vector3<double>> lmn;                                                            //ÿ��k��ԭ�����
-	//vector<double> dist_shell;                                                              //ÿһ��shell�Ľ���k�����
-	//vector<int> multi;                                                                      //ÿһ��shell�Ľ���k����Ŀ
+	//std::vector<Vector3<double>> lmn;                                                            //ÿ��k��ԭ�����
+	//std::vector<double> dist_shell;                                                              //ÿһ��shell�Ľ���k�����
+	//std::vector<int> multi;                                                                      //ÿһ��shell�Ľ���k����Ŀ
 	//int num_shell_real;                                                                     //����������B1������shell��Ŀ�����ս����(ע��1��ʼ����)
 	//int *shell_list_real;                                                                   //1��12��shell�в�ƽ�в��ȼ۵�shell��ǩ������Ϊnum_shell_real
 	//double *bweight;                                                                        //ÿ��shell��bweight������Ϊnum_shell_real
@@ -35,8 +35,8 @@ public:
 	int num_kpts;                                                                           // k�����Ŀ
 	int cal_num_kpts;                                                                       // ��Ҫ�����k����Ŀ������nspin=2ʱ���ô�
 	Matrix3 recip_lattice;
-	vector<vector<int>> nnlist;                                                             //ÿ��k��Ľ���k�����
-	vector<vector<Vector3<double>>> nncell;                                                 //ÿ��k��Ľ���k�����ڵ�ԭ�����
+	std::vector<std::vector<int>> nnlist;                                                             //ÿ��k��Ľ���k�����
+	std::vector<std::vector<Vector3<double>>> nncell;                                                 //ÿ��k��Ľ���k�����ڵ�ԭ�����
 	int nntot = 0;                                                                          //ÿ��k��Ľ���k����Ŀ   
 	int num_wannier;																		//��Ҫ����wannier�����ĸ���
 	int *L;																					//��̽����Ľ�������ָ��,����Ϊnum_wannier
@@ -65,7 +65,7 @@ public:
 
 	//void kmesh_supercell_sort(); //������ԭ��ľ����С��������lmn
 	//void get_nnkpt_first();      //������12��shell�Ľ���k��ľ���͸���
-	//void kmesh_get_bvectors(int multi, int reference_kpt, double dist_shell, vector<Vector3<double>>& bvector);  //��ȡָ��shell�㣬ָ���ο�k��Ľ���k���bvector
+	//void kmesh_get_bvectors(int multi, int reference_kpt, double dist_shell, std::vector<Vector3<double>>& bvector);  //��ȡָ��shell�㣬ָ���ο�k��Ľ���k���bvector
 	//void get_nnkpt_last(); //��ȡ���յ�shell��Ŀ��bweight
     //void get_nnlistAndnncell();
 
@@ -80,15 +80,15 @@ public:
 										Vector3<double> *gk, const int npw, ComplexMatrix &trial_orbitals_k);
 	void integral(const int meshr, const double *psir, const double *r, const double *rab, const int &l, double* table);
 	void writeUNK(const ComplexMatrix *wfc_pw);
-	void ToRealSpace(const int &ik, const int &ib, const ComplexMatrix *evc, complex<double> *psir, const Vector3<double> G);
-	complex<double> unkdotb(const complex<double> *psir, const int ikb, const int bandindex, const ComplexMatrix *wfc_pw);
-	complex<double> unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ComplexMatrix *wfc_pw);
-	complex<double> gamma_only_cal(const int &ib_L, const int &ib_R, const ComplexMatrix *wfc_pw, const Vector3<double> G);
+	void ToRealSpace(const int &ik, const int &ib, const ComplexMatrix *evc, std::complex<double> *psir, const Vector3<double> G);
+	std::complex<double> unkdotb(const std::complex<double> *psir, const int ikb, const int bandindex, const ComplexMatrix *wfc_pw);
+	std::complex<double> unkdotkb(const int &ik, const int &ikb, const int &iband_L, const int &iband_R, const Vector3<double> G, const ComplexMatrix *wfc_pw);
+	std::complex<double> gamma_only_cal(const int &ib_L, const int &ib_R, const ComplexMatrix *wfc_pw, const Vector3<double> G);
 	
 	// lcao����
 	void lcao2pw_basis(const int ik, ComplexMatrix &orbital_in_G);
 	void getUnkFromLcao();
-	void get_lcao_wfc_global_ik(complex<double> **ctot, complex<double> **cc);
+	void get_lcao_wfc_global_ik(std::complex<double> **ctot, std::complex<double> **cc);
 
 };
 

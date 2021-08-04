@@ -237,7 +237,7 @@ void Hamilt::diagH_LAPACK(
         lwork = (nb + 1) * nstart;
     }
 
-    complex<double> *work = new complex<double>[lwork];
+    std::complex<double> *work = new std::complex<double>[lwork];
 	ZEROS(work, lwork);
 	
     //=====================================================================

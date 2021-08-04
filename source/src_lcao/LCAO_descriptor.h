@@ -65,7 +65,7 @@ private:
 
 	// descriptors
     double *d;
-	vector<torch::Tensor> d_tensor;
+	std::vector<torch::Tensor> d_tensor;
 
 	//gedm:dE/dD, [tot_Inl][2l+1][2l+1]	(E: Hartree)
 	std::vector<torch::Tensor> gedm_tensor;

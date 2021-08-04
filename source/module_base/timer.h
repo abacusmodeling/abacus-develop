@@ -32,7 +32,7 @@ class timer
 		bool start_flag = true;
 	};
 	
-	static map<string,map<string,Timer_One>> timer_pool;
+	static std::map<string,std::map<string,Timer_One>> timer_pool;
 //==========================================================
 // MEMBER FUNCTIONS :
 // NAME : tick(use twice at a time)

@@ -51,7 +51,7 @@ int pdlaev2(double *a, double *b, double *c__, double *rt1, double *rt2,
 
 	/*  CS1     (output) DOUBLE PRECISION */
 	/*  SN1     (output) DOUBLE PRECISION */
-	/*          The vector (CS1, SN1) is a unit right eigenvector for RT1. */
+	/*          The std::vector (CS1, SN1) is a unit right eigenvector for RT1. */
 
 	/*  Further Details */
 	/*  =============== */

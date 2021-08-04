@@ -8,7 +8,7 @@
 
 /*
 template< typename T >
-T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const map<size_t,map<size_t,T>> & H_a2D ) const
+T Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D( const std::map<size_t,std::map<size_t,T>> & H_a2D ) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::a2D_to_m2D");
 	
@@ -67,7 +67,7 @@ ComplexMatrix Exx_Abfs::Parallel::Communicate::Hexx::H_phase<ComplexMatrix>(
 
 template<typename Tmatrix>
 Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D, const int ik) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D, const int ik) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D");
 
@@ -133,9 +133,9 @@ Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D(
 
 template<typename Tmatrix>
 void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D,
-	vector<Tmatrix> &HK_m2D,
-	vector<deque<Tmatrix>> &HK_m2D_pulay_seq) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D,
+	std::vector<Tmatrix> &HK_m2D,
+	std::vector<deque<Tmatrix>> &HK_m2D_pulay_seq) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing");
 
@@ -144,7 +144,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 	for( int ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 //gettimeofday( &t_start, NULL);
-//			const map<size_t,map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[ik]);
+//			const std::map<size_t,std::map<size_t,matrix>> HK_a2D = R_to_K(HR_a2D[ik]);
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::Hexx::R_to_K\t"<<time_during(t_start)<<std::endl;
 //ofs_matrixes( exx_lcao.test_dir+"test-HK_a2D_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), HK_a2D );
 //gettimeofday( &t_start, NULL);

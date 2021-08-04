@@ -23,13 +23,13 @@ void Exx_Abfs::Parallel::Communicate::DM::set_atom_in_exx( const set<pair<size_t
 */
 
 /*
-map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>
+std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>
 Exx_Abfs::Parallel::Communicate::DM::m2D_to_a2Dexx( 
 	const matrix &DM_m2D, 
 	const int iwt1_index_begin, 
 	const int iwt2_index_begin) const
 {
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> DM_a2Dexx;
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> DM_a2Dexx;
 	for( int iwt1_m2D=0; iwt1_m2D<DM_m2D.nr; ++iwt1_m2D )
 	{
 		const int iwt1 = GlobalC::GridT.trace_lo[iwt1_index_begin+iwt1_m2D];
@@ -61,8 +61,8 @@ Exx_Abfs::Parallel::Communicate::DM::m2D_to_a2Dexx(
 
 
 Exx_Abfs::Parallel::Communicate::DM::a2Dexx_to_exx( 
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & m_exx, 
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & m_a2Dexx ) const
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & m_exx, 
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & m_a2Dexx ) const
 {
 	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
@@ -91,7 +91,7 @@ Exx_Abfs::Parallel::Communicate::DM::f(
 	const int iwt1_index_begin, 
 	const int iwt2_index_begin)
 {
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>> & DM_a2Dexx = 
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>> & DM_a2Dexx = 
 		m2D_to_a2Dexx( DM_m2D, iwt1_index_begin, iwt2_index_begin );
 	a2Dexx_to_exx( this->DMr, DM_a2Dexx );
 }
@@ -108,7 +108,7 @@ ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 //gettimeofday( &t_start, NULL);
 #if false
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid = LOC_to_grid( Born_von_Karman_period, threshold );
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid = LOC_to_grid( Born_von_Karman_period, threshold );
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid\t"<<time_during(t_start)<<std::endl;
 ofs_matrixes( "DM_grid_"+TO_STRING(GlobalV::MY_RANK), DM_grid );
 
@@ -121,9 +121,9 @@ ofs_matrixes( "DM_grid_"+TO_STRING(GlobalV::MY_RANK), DM_grid );
 	this->DMr = allreduce.grid_to_exx();
 //ofs_time<<"TIME@ Exx_Abfs::Parallel::Communicate::DM::Allreduce::grid_to_exx\t"<<time_during(t_start)<<std::endl;
 #else
-	auto cal_dm_my = [&]() -> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
+	auto cal_dm_my = [&]() -> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
 	{
-		vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
+		std::vector<Abfs::Vector3_Order<int>> Born_von_Karman_boxes;
 		for( int ix=0; ix<Born_von_Karman_period.x; ++ix )
 			for( int iy=0; iy<Born_von_Karman_period.y; ++iy )
 				for( int iz=0; iz<Born_von_Karman_period.z; ++iz )
@@ -133,7 +133,7 @@ ofs_matrixes( "DM_grid_"+TO_STRING(GlobalV::MY_RANK), DM_grid );
 		dm_my.flag_mix = false;
 		dm_my.cal_DM( H_atom_pairs_core, Born_von_Karman_boxes );
 		
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(GlobalV::NSPIN);
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(GlobalV::NSPIN);
 		for( const auto &DMrA : dm_my.DMr )
 		{
 			const size_t iat1 = DMrA.first;
@@ -158,7 +158,7 @@ ofs_matrixes( "DM_grid_"+TO_STRING(GlobalV::MY_RANK), DM_grid );
 ofs_matrixes( "DMr_"+TO_STRING(GlobalV::MY_RANK), DMr );
 }
 
-vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
 Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid( 
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 	const double threshold ) const
@@ -167,7 +167,7 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 	
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DM_grid(GlobalV::NSPIN);
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 {

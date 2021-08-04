@@ -25,25 +25,25 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init(
 	recv_size = GlobalC::ParaO.nrow * GlobalC::ParaO.ncol * sizeof(double);
 }
 
-vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> 
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> 
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D(
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), ofstream::app);
 timeval t_all;	gettimeofday(&t_all,NULL);
 
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::exx_to_a2D");
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
 //ofs<<__LINE__<<std::endl;
 
-	vector<atomic<Flag_Send>> flags_send(comm_sz);
-	vector<atomic<Flag_Recv>> flags_recv(comm_sz);
+	std::vector<atomic<Flag_Send>> flags_send(comm_sz);
+	std::vector<atomic<Flag_Recv>> flags_recv(comm_sz);
 	init_flags(flags_send, flags_recv);
 //ofs<<__LINE__<<std::endl;
 
-	vector<valarray<double>> oarps_isend(comm_sz);
-	vector<valarray<double>> iarps_irecv(comm_sz);
+	std::vector<valarray<double>> oarps_isend(comm_sz);
+	std::vector<valarray<double>> iarps_irecv(comm_sz);
 //ofs<<__LINE__<<std::endl;
 
 	int rank_send_now = my_rank;
@@ -51,13 +51,13 @@ timeval t_all;	gettimeofday(&t_all,NULL);
 //ofs<<__LINE__<<std::endl;
 
 	atomic_flag lock_insert = ATOMIC_FLAG_INIT;
-	vector<thread> threads;
-	vector<MPI_Request>requests_isend(comm_sz);
-	vector<MPI_Request>requests_irecv(comm_sz);
+	std::vector<thread> threads;
+	std::vector<MPI_Request>requests_isend(comm_sz);
+	std::vector<MPI_Request>requests_irecv(comm_sz);
 //ofs<<__LINE__<<std::endl;
 
-vector<timeval>t_send(comm_sz);
-vector<timeval>t_recv(comm_sz);
+std::vector<timeval>t_send(comm_sz);
+std::vector<timeval>t_recv(comm_sz);
 	while(!finish_judge(flags_send, flags_recv))
 	{
 //ofs<<__LINE__<<std::endl;
@@ -161,12 +161,12 @@ ofs<<"all\t\t"<<cal_time(t_all)<<std::endl;
 }
 
 // the upper limit of size sended to each process
-vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list(
+std::vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list(
 	const set<pair<size_t,size_t>> &H_atom_pairs_core,
-	const vector<pair<vector<bool>,vector<bool>>> &atom_in_2D_list) const
+	const std::vector<pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_list");
-	vector<size_t> send_size_list(comm_sz,0);
+	std::vector<size_t> send_size_list(comm_sz,0);
 	for(const auto &H_atom_pair : H_atom_pairs_core)
 	{
 		const size_t iat1 = H_atom_pair.first;
@@ -181,8 +181,8 @@ vector<size_t> Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::get_send_size_
 }
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init_flags(
-	vector<atomic<Flag_Send>> &flags_send,
-	vector<atomic<Flag_Recv>> &flags_recv) const
+	std::vector<atomic<Flag_Send>> &flags_send,
+	std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
 	for(atomic<Flag_Send> &flag_send : flags_send)
 		flag_send = Flag_Send::undo;
@@ -194,8 +194,8 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::init_flags(
 }
 
 bool Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::finish_judge(
-	const vector<atomic<Flag_Send>> &flags_send,
-	const vector<atomic<Flag_Recv>> &flags_recv) const
+	const std::vector<atomic<Flag_Send>> &flags_send,
+	const std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
 	for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 		if((flags_send[rank_send]!=Flag_Send::begin_isend) && (flags_send[rank_send]!=Flag_Send::finish_isend))
@@ -208,7 +208,7 @@ bool Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::finish_judge(
 
 bool Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::memory_enough(
 	const int rank_send_next,
-	const vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	size_t memory_need = recv_size;
 	for(int rank_send=0; rank_send<comm_sz; ++rank_send)
@@ -220,14 +220,14 @@ bool Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::memory_enough(
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::send_data_process(
 	const int rank_send_now,
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-	vector<valarray<double>> &oarps_isend,
-	vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
+	std::vector<valarray<double>> &oarps_isend,
+	std::vector<atomic<Flag_Send>> &flags_send) const
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), ofstream::app);
 timeval t;	gettimeofday(&t, NULL);	
 	valarray<size_t> send_size(GlobalV::NSPIN);
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,const matrix*>>>> mw(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,const matrix*>>>> mw(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		send_size[is]=0;
@@ -283,21 +283,21 @@ ofs<<"oar<<\t"<<rank_send_now<<"\t"<<cut_time(t)<<std::endl;
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::recv_data_process(
 	const int rank_recv,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
-	vector<valarray<double>> &iarps_irecv,
-	vector<atomic<Flag_Recv>> &flags_recv,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
+	std::vector<valarray<double>> &iarps_irecv,
+	std::vector<atomic<Flag_Recv>> &flags_recv,
 	atomic_flag &lock_insert) const
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"Hmpi_"+TO_STRING(my_rank), ofstream::app);
 timeval t;	gettimeofday(&t, NULL);	
-	auto vector_empty = []( const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &v ) -> bool
+	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &v ) -> bool
 	{
 		for( const auto &i : v )
 			if(!i.empty())	return false;
 		return true;
 	};
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(GlobalV::NSPIN);
 	double *ptr = VECTOR_TO_PTR(iarps_irecv[rank_recv]);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
@@ -330,8 +330,8 @@ ofs<<"insert\t"<<rank_recv<<"\t"<<cut_time(t)<<std::endl;
 }
 
 void Exx_Abfs::Parallel::Communicate::Hexx::Allreduce2::insert_data(
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
 {
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{

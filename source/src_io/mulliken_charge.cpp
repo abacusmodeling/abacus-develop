@@ -54,7 +54,7 @@ Mulliken_Charge::Mulliken_Charge()
 		}
 	}
 
-	mug = new  complex<double>   [GlobalV::NLOCAL];
+	mug = new  std::complex<double>   [GlobalV::NLOCAL];
 
 
 	DecMulP = new double* [GlobalV::NSPIN];

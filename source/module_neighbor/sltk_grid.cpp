@@ -108,7 +108,7 @@ void Grid::setMemberVariables(
 	this->expand_flag = input.getExpandFlag();
 	if(test_grid)OUT(ofs_in,"Expand_flag", expand_flag);
 	
-	// output vector
+	// output std::vector
 	if(test_grid)OUT(ofs_in,"Vec1",vec1[0],vec1[1],vec1[2]);
 	if(test_grid)OUT(ofs_in,"Vec2",vec2[0],vec2[1],vec2[2]);
 	if(test_grid)OUT(ofs_in,"Vec3",vec3[0],vec3[1],vec3[2]);

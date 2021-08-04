@@ -10,7 +10,7 @@
 #include "pzt2s.h"
 #include "pzst2g.h"
 
-void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, complex<double> *B,complex<double> *Z,double *eigen,
+void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, std::complex<double> *A, std::complex<double> *B,std::complex<double> *Z,double *eigen,
              LocalMatrix LM, char uplo, int &loc_size,int &loc_pos)
 {
     TITLE("Parrallel_Diago","pzgseps");
@@ -18,7 +18,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
     int color,key,err;
 
     int dim[2],period[2],coord[2],NPROCS,IAM;
-    complex<double> norm[n];
+    std::complex<double> norm[n];
     double tol=0.00000001;
 
     MPI_Cart_get(comm_2D,2,dim,period,coord);
@@ -29,7 +29,7 @@ void pzgseps(MPI_Comm comm_2D,int n,int nb,int &egnum, complex<double> *A, compl
     double* off_diag = new double[n];
     double* D = new double[n];
     double* E = new double[n];
-    complex<double>* Z1 = new complex<double>[loc_size*n];
+    std::complex<double>* Z1 = new std::complex<double>[loc_size*n];
 
 	int wrong_input = 0;
 

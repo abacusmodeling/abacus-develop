@@ -20,7 +20,7 @@ void Exx_Abfs::Screen::Cauchy::init(
 }
 
 void Exx_Abfs::Screen::Cauchy::cal_norm_C_max( 
-	const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Cs,
+	const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Cs,
 	const Element_Basis_Index::IndexLNM & index_lcaos,
 	const Element_Basis_Index::IndexLNM & index_abfs)
 {
@@ -105,7 +105,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_C_max(
 	}
 }
 
-void Exx_Abfs::Screen::Cauchy::cal_norm_V( const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Vs )
+void Exx_Abfs::Screen::Cauchy::cal_norm_V( const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>>>> & Vs )
 {
 	if(!flag_screen_cauchy)	return;
 	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_V");
@@ -127,7 +127,7 @@ void Exx_Abfs::Screen::Cauchy::cal_norm_V( const map<size_t,map<size_t,map<Abfs:
 	}
 }
 
-void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> & Ds )
+void Exx_Abfs::Screen::Cauchy::cal_norm_D_max( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & Ds )
 {
 	if(!flag_screen_cauchy)	return;
 	TITLE("Exx_Abfs::Screen::Cauchy::cal_norm_D_max");

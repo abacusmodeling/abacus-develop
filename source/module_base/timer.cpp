@@ -4,7 +4,7 @@
 // UPDATE : Peize Lin at 2019-11-21
 //==========================================================
 #include "timer.h"
-#include<vector>
+#include <vector>
 
 #ifdef __MPI
 #include "mpi.h"
@@ -17,7 +17,7 @@ using namespace std;
 //----------------------------------------------------------
 bool timer::disabled = false;
 size_t timer::n_now = 0;
-map<string,map<string,timer::Timer_One>> timer::timer_pool;
+std::map<string,std::map<string,timer::Timer_One>> timer::timer_pool;
 
 void timer::finish(ofstream &ofs,const bool print_flag)
 {
@@ -103,7 +103,7 @@ void timer::print_all(ofstream &ofs)
 	constexpr double small = 0.1; // cpu = 10^6
 	// if want to print > 1s , set small = 10^6
 	
-	vector<pair<pair<string,string>,Timer_One>> timer_pool_order;
+	std::vector<pair<pair<string,string>,Timer_One>> timer_pool_order;
 	for(auto &timer_pool_A : timer_pool)
 	{
 		const string class_name = timer_pool_A.first;

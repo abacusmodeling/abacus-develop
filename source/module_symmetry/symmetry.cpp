@@ -203,9 +203,9 @@ int Symmetry::standard_lat(
     const double aa = a * a;
     const double bb = b * b;
     const double cc = c * c;
-    const double ab = a * b; //vector: a * b * cos(alpha)
-    const double bc = b * c; //vector: b * c * cos(beta)
-    const double ca = c * a; //vector: c * a * cos(gamma)
+    const double ab = a * b; //std::vector: a * b * cos(alpha)
+    const double bc = b * c; //std::vector: b * c * cos(beta)
+    const double ca = c * a; //std::vector: c * a * cos(gamma)
     double norm_a = a.norm();
     double norm_b = b.norm();
     double norm_c = c.norm();
@@ -744,7 +744,7 @@ void Symmetry::lattice_type(
         ss << GlobalV::global_out_dir << "STRU_SIMPLE.cif";
 
         ofstream ofs( ss.str().c_str() );
-        ofs << "Lattice vector  : " << std::endl;
+        ofs << "Lattice std::vector  : " << std::endl;
         ofs << q1.x <<"   "<<q1.y<<"  "<<q1.z<< std::endl;
         ofs << q2.x <<"   "<<q2.y<<"  "<<q2.z<< std::endl;
         ofs << q3.x <<"   "<<q3.y<<"  "<<q3.z<< std::endl;
@@ -899,7 +899,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     ptrans[8] = 1;
 
     //All difference vectors between the first atom and all other atoms
-    //of species ISMIN could be a translation vector that reproduces thelattice
+    //of species ISMIN could be a translation std::vector that reproduces thelattice
     //So test all possibilities:
 
     //std::cout << "\n cartesian" << std::endl;
@@ -912,13 +912,13 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     {
         //	std::cout << "\n ia=" << ia;
         //	std::cout << " dirpos:" << dirpos[ia*3] << " " << dirpos[ia*3+1] << " " << dirpos[ia*3+2];
-        //set up the current test vector "trans"
+        //set up the current test std::vector "trans"
         //and "trans" could possibly contain trivial translations:
         trans[0] = this->get_translation_vector(dirpos[ia*3+0], sptmin.x);
         trans[1] = this->get_translation_vector(dirpos[ia*3+1], sptmin.y);
         trans[2] = this->get_translation_vector(dirpos[ia*3+2], sptmin.z);
 
-        //	std::cout << "\n Trans vector = " << trans[0] << " " << trans[1] << " " << trans[2];
+        //	std::cout << "\n Trans std::vector = " << trans[0] << " " << trans[1] << " " << trans[2];
 
         //translate all the atomic coordinates by "trans"
         for (int it = 0; it < ntype; it++)
@@ -962,7 +962,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 //        std::cout << "\n rotpos:" << std::endl;
 //        print_pos(rotpos, nat);
 
-        //the current test vector is a 'primitive' translation, save the detected translation vector
+        //the current test std::vector is a 'primitive' translation, save the detected translation std::vector
         if (found_tvec)
         {
             ptrans[itrans*3+0] = trans[0];
@@ -1069,7 +1069,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     Vector3<double> zero(0.0,0.0,0.0);
     if (p1 == zero || p2 == zero || p3 == zero)
     {
-		WARNING_QUIT("Symmetry::pricell","At least one of the primitive vector is (0,0,0).");
+		WARNING_QUIT("Symmetry::pricell","At least one of the primitive std::vector is (0,0,0).");
     }
 
     double celvolume = 0;
@@ -1308,7 +1308,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
     sptmin.z = pos[itmin_start*3+2];
     for (int i = itmin_start; i < itmin_start + na[itmin_type]; ++i)
     {
-        //set up the current test vector "gtrans"
+        //set up the current test std::vector "gtrans"
         //and "gtrans" could possibly contain trivial translations:
         gtrans.x = this->get_translation_vector( pos[i*3+0], sptmin.x);
         gtrans.y = this->get_translation_vector( pos[i*3+1], sptmin.y);
@@ -1316,7 +1316,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 
         //If we had already detected some translation,
         //we must only look at the vectors with coordinates smaller than those
-        //of the previously detected vector (find the smallest)
+        //of the previously detected std::vector (find the smallest)
         if (gtrans.x > trans.x + epsilon ||
                 gtrans.y > trans.y + epsilon ||
                 gtrans.z > trans.z + epsilon
@@ -1381,7 +1381,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
         if (no_diff == true)
         {
             s_flag = 1;
-            //save the detected translation vector temporarily
+            //save the detected translation std::vector temporarily
             trans.x = gtrans.x;
             trans.y = gtrans.y;
             trans.z = gtrans.z;

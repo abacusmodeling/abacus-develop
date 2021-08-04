@@ -22,8 +22,8 @@ public:
 		const Element_Basis_Index::IndexLNM &index_abfs,
 		const Element_Basis_Index::IndexLNM &index_lcaos,
 		const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-		map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
-		map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Vws );
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Cws,
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> &Vws );
 	inline bool screen(
 		const size_t iat1, const size_t iat2, const size_t iat3, const size_t iat4,
 		const Abfs::Vector3_Order<int> & box3, const Abfs::Vector3_Order<int> & box4 ) const;
@@ -31,7 +31,7 @@ public:
 private:
 	bool flag_screen_schwarz = false;
 	double threshold = 0;
-	map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> max_pair_fock;
+	std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> max_pair_fock;
 	
 public:
 //	static double num_screen;

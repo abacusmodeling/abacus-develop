@@ -21,7 +21,7 @@ public:
 #endif
 
 	int total_string;
-	vector<vector<int>> k_index;
+	std::vector<std::vector<int>> k_index;
 	int nppstr;
 	int direction;
 	int occ_nbands;

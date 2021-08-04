@@ -4,7 +4,7 @@
 
 void Center2_Orb::Orb22_Ccp::init_radial_table()
 {
-	vector<double> nB_tmp(nB1.getNr());
+	std::vector<double> nB_tmp(nB1.getNr());
 	for( size_t ir=0; ir!=nB_tmp.size(); ++ir)
 	{
 		nB_tmp[ir] = nB1.getPsi(ir) * nB2.getPsi(ir);

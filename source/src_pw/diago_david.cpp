@@ -51,15 +51,15 @@ void Diago_David::diag
     double* e = new double[nbase_x];			// the lowest N eigenvalues of hc
     assert(e != 0) ;
 
-    complex<double>* psi_m = new complex<double>[npw] ;
+    std::complex<double>* psi_m = new std::complex<double>[npw] ;
     assert(psi_m != 0) ;
-    complex<double>* hpsi = new complex<double>[npw] ;
+    std::complex<double>* hpsi = new std::complex<double>[npw] ;
     assert(hpsi != 0) ;
-    complex<double>* spsi = new complex<double>[npw] ;
+    std::complex<double>* spsi = new std::complex<double>[npw] ;
     assert(spsi != 0) ;
-    complex<double>* ppsi = new complex<double>[npw] ;
+    std::complex<double>* ppsi = new std::complex<double>[npw] ;
     assert(ppsi != 0) ;
-    complex<double>* respsi = new complex<double>[npw] ;
+    std::complex<double>* respsi = new std::complex<double>[npw] ;
     assert(respsi != 0) ;
 
     bool* convflag = new bool[nband] ;	// convflag[m] = true if the m th band is convergent
@@ -221,10 +221,10 @@ void Diago_David::cal_grad
     const int* unconv,
     const double* precondition,
     const double* e,
-    complex<double>* hpsi,
-    complex<double>* spsi,
-    complex<double>* ppsi,
-    complex<double>* respsi
+    std::complex<double>* hpsi,
+    std::complex<double>* spsi,
+    std::complex<double>* ppsi,
+    std::complex<double>* respsi
 )
 {
     if ( test_david ==1 ) TITLE("DIAGO_DAVID","cal_grad");
@@ -369,7 +369,7 @@ void Diago_David::diag_zhegvx
     {
         lwork = (nb + 1) * n;
     }
-    complex<double> *work = new complex<double>[2*lwork];
+    std::complex<double> *work = new std::complex<double>[2*lwork];
     assert(work != 0);
     double *rwork = new double[7*n];
     assert(rwork != 0);
@@ -388,7 +388,7 @@ void Diago_David::diag_zhegvx
            0.0, 0.0, 1, m, 0.0, mm, e, vc, n,
            work, lwork, rwork, iwork, ifail, info);
 /*
-		complex<double> vc_norm = 0.0;
+		std::complex<double> vc_norm = 0.0;
 		for(int ib =0; ib < n; ib++)
 		{
 			vc_norm += conj(vc(ib, 0)) * vc(ib, 0);
@@ -475,7 +475,7 @@ void Diago_David::cal_err
     const ComplexMatrix &hp,
     const ComplexMatrix &basis,
     const double* en,
-    complex<double>* respsi
+    std::complex<double>* respsi
 )
 {
     timer::tick("Diago_David","cal_err");
@@ -515,8 +515,8 @@ void Diago_David::SchmitOrth
     const int n_band,
     const int m,
     const ComplexMatrix &psi,
-    complex<double>* psi_m,
-    complex<double>* spsi
+    std::complex<double>* psi_m,
+    std::complex<double>* spsi
 )
 {
 //	if(test_david == 1) TITLE("Diago_David","SchmitOrth");
@@ -534,7 +534,7 @@ void Diago_David::SchmitOrth
 
     GlobalC::hm.hpw.s_1psi(npw, psi_m, spsi);
 
-    complex<double>* lagrange = new complex<double>[m+1];
+    std::complex<double>* lagrange = new std::complex<double>[m+1];
     ZEROS( lagrange, m+1 );
 
     for (int j = 0; j < m; j++)

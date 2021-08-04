@@ -3,7 +3,7 @@
 
 #include<sstream>
 #include<fstream>
-#include<vector>
+#include <vector>
 #include<set>
 #include<string>
 #ifdef __MPI
@@ -82,9 +82,9 @@ static double cut_time( timeval &t )
 }
 
 // Peize Lin add 2019-12-12
-static vector<double> get_memory(const int N)
+static std::vector<double> get_memory(const int N)
 {
-	vector<double> m;
+	std::vector<double> m;
 	string s;
 	ifstream ifs("/proc/meminfo");
 	ifs>>s>>s;

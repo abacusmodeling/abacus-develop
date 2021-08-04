@@ -10,12 +10,12 @@
 #include "../module_base/math_integral.h" // mohan add 2021-04-03
 
 
-vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	const LCAO_Orbitals &orbs,
-	const vector<string> &files_abfs,
+	const std::vector<string> &files_abfs,
 	const double kmesh_times )
 {
-	vector<vector<vector<Numerical_Orbital_Lm>>> abfs( files_abfs.size() );
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs( files_abfs.size() );
 	for( size_t T=0; T!=files_abfs.size(); ++T )
 		abfs[T] = construct_abfs_T( 
 			files_abfs[T],
@@ -28,13 +28,13 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	return abfs;
 }
 
-vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs( 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> & abfs_pre,
+std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs( 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> & abfs_pre,
 	const LCAO_Orbitals &orbs,
-	const vector<string> &files_abfs,
+	const std::vector<string> &files_abfs,
 	const double kmesh_times )
 {
-	vector<vector<vector<Numerical_Orbital_Lm>>> 
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> 
 		&&abfs = construct_abfs( orbs, files_abfs, kmesh_times );
 			
 	assert( abfs.size() == abfs_pre.size() );
@@ -51,7 +51,7 @@ vector<vector<vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	return abfs;
 }
 
-vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T( 
+std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T( 
 	const string & file_name,
 	const int &T,
 	const int &nk,
@@ -60,10 +60,10 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 {
 	string label;
 	size_t L_size;
-	map<size_t,size_t> N_size;
+	std::map<size_t,size_t> N_size;
 	size_t meshr;
 	double dr;
-	map<size_t,map<size_t,vector<double>>> psis;
+	std::map<size_t,std::map<size_t,std::vector<double>>> psis;
 	
 	/*----------------------
 	  1.read abfs
@@ -188,8 +188,8 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	----------------------*/		
 	if(meshr%2==0)	++meshr;
 	
-	vector<double> rab(meshr);
-	vector<double> radial(meshr);
+	std::vector<double> rab(meshr);
+	std::vector<double> radial(meshr);
 	for( int ir=0; ir!=meshr; ++ir )
 	{
 		rab[ir] = dr;
@@ -204,8 +204,8 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	{	
 		for( size_t N=0; N!=N_size[L]; ++N )
 		{
-			vector<double> psir(meshr);
-			vector<double> inner(meshr);
+			std::vector<double> psir(meshr);
+			std::vector<double> inner(meshr);
 			psis[L][N].resize(meshr);
 			for( int ir=0; ir!=meshr; ++ir )
 			{
@@ -225,7 +225,7 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	/*----------------------
 	  5.construct abfs
 	----------------------*/	
-	vector<vector<Numerical_Orbital_Lm>> abfs_T;
+	std::vector<std::vector<Numerical_Orbital_Lm>> abfs_T;
 
 	abfs_T.resize(L_size+1);
 	for( size_t L=0; L<=L_size; ++L )
@@ -256,9 +256,9 @@ vector<vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 
 void Exx_Abfs::IO::print_matrix( 
 		const string &file_name_prefix, 
-		const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> &matrixes_Q, 
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &matrixes_S,
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &matrixes_V,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
 		const Element_Basis_Index::Range &range_jles, 
 		const Element_Basis_Index::IndexLNM &index_jles, 
 		const Element_Basis_Index::Range &range_lcaos,
@@ -371,7 +371,7 @@ void Exx_Abfs::IO::print_matrix(
 							for( size_t NB=0; NB!=range_lcaos[TB][LB].N; ++NB )	
 								for( size_t MB=0; MB!=range_lcaos[TB][LB].M; ++MB )
 								{
-									const vector<matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
+									const std::vector<matrix> & matrix_Q = matrixes_Q.at(TA).at(IA).at(TB).at(IB);
 									const size_t index_lcao 
 										= Exx_Abfs::Abfs_Index::get_index_index( 
 											index_lcaos,TA,LA,NA,MA, 

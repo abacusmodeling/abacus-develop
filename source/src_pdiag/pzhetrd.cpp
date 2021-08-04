@@ -2,7 +2,7 @@
 #include "../module_base/lapack_connector.h"
 
 void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
-             complex<double> *A,double *diag,double *off_diag,complex<double> *norm,char uplo)
+             std::complex<double> *A,double *diag,double *off_diag,std::complex<double> *norm,char uplo)
 {
 /*
  *   PSEPS routine (version 1.0) --
@@ -26,7 +26,7 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
  *            The number of columns and rows to be operated on matrices A��N >= 0. 
  *    NB      (input) INTEGER
  *            blocked size of 2D blocked cyclic matrix
- *    A       (local input/local output) double precision complex pointer,
+ *    A       (local input/local output) double precision std::complex pointer,
  *            pointer into the local memory to an array of dimension (loc_A.row_num, loc_A.col_num).
  *            On entry, this array contains the local pieces of the  N-by-N Hermitian distributed 
  *            matrix sub( A ). If UPLO = 'U',the leading N-by-N upper triangular part of sub( A ) 
@@ -43,13 +43,13 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
  *             This array contains the scalar factors TAU of  the elementary reflectors. 
  */        
 	TITLE("Parallel","pzhetrd");
-	complex<double>  W_R[loc_A.row_num][NB],U_R[loc_A.row_num][NB],
+	std::complex<double>  W_R[loc_A.row_num][NB],U_R[loc_A.row_num][NB],
 		W_C[loc_A.col_num][NB],U_C[loc_A.col_num][NB],
 		W_C1[loc_A.col_num][NB],U_C1[loc_A.col_num][NB];
-	complex<double>  w_r[loc_A.row_num],w_c[loc_A.col_num],u_r[loc_A.row_num],u_c[loc_A.col_num],
+	std::complex<double>  w_r[loc_A.row_num],w_c[loc_A.col_num],u_r[loc_A.row_num],u_c[loc_A.col_num],
 		x_r[loc_A.row_num],x_c[loc_A.col_num];
-	complex<double>   beta,alpha;
-	complex<double>   u[N],tw[N],tu[N],x[N],p[N],w[N],q[N],s,g;
+	std::complex<double>   beta,alpha;
+	std::complex<double>   u[N],tw[N],tu[N],x[N],p[N],w[N],q[N],s,g;
 	double t;
 	int     bt;
 	double z[N],dg[N];
@@ -63,8 +63,8 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 	int m,lm,ln,outi,outj;
 	int bn,fl=0,l,indx=1,indy=1,incx=1,incy;
 	char transa,transb;
-	complex<double>* L = new complex<double>[loc_A.col_num*loc_A.row_num];
-	complex<double>* L1 = new complex<double>[loc_A.col_num*loc_A.row_num];
+	std::complex<double>* L = new std::complex<double>[loc_A.col_num*loc_A.row_num];
+	std::complex<double>* L1 = new std::complex<double>[loc_A.col_num*loc_A.row_num];
 
 
 	MPI_Cart_get(comm2D,2,dim,period,coord);
@@ -78,7 +78,7 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 	for (i=loc_A.row_pos; i<loc_A.row_num; i++)
 		for (j=loc_A.col_pos; j<loc_A.col_num; j++)
 		{
-			L1[i*loc_A.col_num+j]=L[i*loc_A.col_num+j]=complex<double> (0.0,0.0);
+			L1[i*loc_A.col_num+j]=L[i*loc_A.col_num+j]=std::complex<double> (0.0,0.0);
 		}
 
 	if (uplo=='U'||uplo=='u')
@@ -88,14 +88,14 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 			for (i=0; i<loc_A.row_num; i++)
 				for (j=0; j<NB; j++)
 				{
-					U_R[i][j]=W_R[i][j]=complex<double> (0.0,0.0);
+					U_R[i][j]=W_R[i][j]=std::complex<double> (0.0,0.0);
 				}
 
 			for (i=0; i<loc_A.col_num; i++)
 				for (j=0; j<NB; j++)
 				{
-					U_C[i][j]=W_C[i][j]=complex<double> (0.0,0.0);
-					U_C1[i][j]=W_C1[i][j]=complex<double> (0.0,0.0);
+					U_C[i][j]=W_C[i][j]=std::complex<double> (0.0,0.0);
+					U_C1[i][j]=W_C1[i][j]=std::complex<double> (0.0,0.0);
 				}
 			//determain algorithm block size m
 			first_col=bt*NB;
@@ -129,15 +129,15 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 			{
 				for (i=k; i<N; i++)
 				{ 
-					x[i]=p[i]=u[i]=complex<double> (0.0,0.0);
+					x[i]=p[i]=u[i]=std::complex<double> (0.0,0.0);
 				} 
 				for (i=loc_A.row_pos; i<loc_A.row_num; i++)
 				{
-					x_r[i]=u_r[i]=w_r[i]=complex<double> (0.0,0.0);
+					x_r[i]=u_r[i]=w_r[i]=std::complex<double> (0.0,0.0);
 				}
 				for (i=loc_A.col_pos; i<loc_A.col_num; i++)
 				{
-					x_c[i]=u_c[i]=w_c[i]=complex<double> (0.0,0.0);
+					x_c[i]=u_c[i]=w_c[i]=std::complex<double> (0.0,0.0);
 				}
 				indxg2p(comm2D,NB,k,k,&iarow,&iacol);
 				if (iacol==coord[1]) loc_A.col_pos++;
@@ -166,10 +166,10 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				norm[k]=g;
 				if (coord[1]==iacol)
 				{
-					u_c[loc_j]=complex<double> (1.0,0.0);
+					u_c[loc_j]=std::complex<double> (1.0,0.0);
 				}
 				z[k]=alpha.real();
-				u[k+1]=complex<double> (1.0,0.0);
+				u[k+1]=std::complex<double> (1.0,0.0);
 				for (i=loc_A.col_pos; i<loc_A.col_num; i++)
 				{
 					tmp=loc_A.col_set[i];
@@ -188,7 +188,7 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 
 				for (i=k+1; i<N; i++)
 				{
-					x[i]=p[i]=complex<double> (0.0,0.0);
+					x[i]=p[i]=std::complex<double> (0.0,0.0);
 				}
 				for (i=loc_A.row_pos; i<outi; i++)
 				{
@@ -204,11 +204,11 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 						}
 					}
 				}
-				//local matrix-vector production Au
+				//local matrix-std::vector production Au
 				transa='t';
 				lm=loc_A.row_num-loc_A.row_pos;
 				ln=loc_A.col_num-loc_A.col_pos;
-				beta=complex<double> (1.0,0.0);
+				beta=std::complex<double> (1.0,0.0);
 				lda=loc_A.col_num;
 				pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;
 				incx=1;
@@ -231,12 +231,12 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				//correct for out of date entries of A
 				for (i=0; i<k-first_col; i++)
 				{
-					tu[i]=tw[i]=complex<double> (0.0,0.0);
+					tu[i]=tw[i]=std::complex<double> (0.0,0.0);
 				}
 				transa='n';
 				lm=(loc_A.col_num-outj)>0?(loc_A.col_num-outj):0;
 				ln=k-first_col;
-				beta=complex<double> (0.0,0.0);
+				beta=std::complex<double> (0.0,0.0);
 				lda=NB;
 				incx=1;
 				incy=1;
@@ -244,13 +244,13 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				zgemv_(&transa,&ln,&lm,&g,&U_C1[outj][0],&lda,&u_c[outj],&incx,&beta,tu,&incy);
 				for (i=outi; i<loc_A.row_num; i++)
 				{
-					x_r[i]=complex<double> (0.0,0.0);
+					x_r[i]=std::complex<double> (0.0,0.0);
 				}
 				transa='t';
 				lm=(loc_A.row_num-outi)>0?(loc_A.row_num-outi):0;
 				ln=k-first_col;
-				alpha=complex<double> (1.0,0.0);
-				beta=complex<double> (1.0,0.0);
+				alpha=std::complex<double> (1.0,0.0);
+				beta=std::complex<double> (1.0,0.0);
 				lda=NB;
 				incx=1;
 				incy=1;
@@ -263,7 +263,7 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				}
 				MPI_Allreduce(&x[k+1],&q[k+1],N-k-1,MPI_DOUBLE_COMPLEX,MPI_SUM,comm_col);
 				MPI_Allreduce(&q[k+1],&p[k+1],N-k-1,MPI_DOUBLE_COMPLEX,MPI_SUM,comm_row);
-				s=complex<double> (0.0,0.0);
+				s=std::complex<double> (0.0,0.0);
 				lm=N-k-1;
 				//printf("\nincx=%d,incy=%d,lm=%d \n",incx,incy,lm);
 				//for(int mm=0;mm<N;mm++)
@@ -273,19 +273,19 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				for(int yang=0;yang<lm;yang++)
 					s+=conj(p[k+1+yang])*u[k+1+yang];           
 				//printf("\ns=%lf+i%lf\n",s.real(),s.imag());
-				s=complex <double> (-s.real()/2.0,-s.imag()/2.0);
-				alpha=complex<double> (s.real()*g.real()-s.imag()*g.imag(),s.real()*g.imag()+s.imag()*g.real());                 
+				s=std::complex <double> (-s.real()/2.0,-s.imag()/2.0);
+				alpha=std::complex<double> (s.real()*g.real()-s.imag()*g.imag(),s.real()*g.imag()+s.imag()*g.real());                 
 				//              printf("\nalpha=%lf+i%lf\n",alpha.real(),alpha.imag());
 				for (i=loc_A.row_pos; i<loc_A.row_num; i++)
 				{
 					tmp=loc_A.row_set[i];
-					w_r[i]=complex<double>((p[tmp].real()+(alpha.real()*u_r[i].real()-alpha.imag()*u_r[i].imag())),(p[tmp].imag()+(alpha.real()*u_r[i].imag()+alpha.imag()*u_r[i].real())));
+					w_r[i]=std::complex<double>((p[tmp].real()+(alpha.real()*u_r[i].real()-alpha.imag()*u_r[i].imag())),(p[tmp].imag()+(alpha.real()*u_r[i].imag()+alpha.imag()*u_r[i].real())));
 					//                 printf("w_r[%d]=%lf+i%lf",i,w_r[i].real(),w_r[i].imag());         
 				}
 				for (i=loc_A.col_pos; i<loc_A.col_num; i++)
 				{
 					tmp=loc_A.col_set[i];
-					w_c[i]=complex<double> ((p[tmp].real()+(alpha.real()*u_c[i].real()-alpha.imag()*u_c[i].imag())),(p[tmp].imag()+(alpha.real()*u_c[i].imag()+alpha.imag()*u_c[i].real())));
+					w_c[i]=std::complex<double> ((p[tmp].real()+(alpha.real()*u_c[i].real()-alpha.imag()*u_c[i].imag())),(p[tmp].imag()+(alpha.real()*u_c[i].imag()+alpha.imag()*u_c[i].real())));
 					//                              printf("w_c[%d]=%lf+i%lf ",i,w_c[i].real(),w_c[i].imag());   
 				}
 				for (i=loc_A.row_pos; i<loc_A.row_num; i++)
@@ -313,7 +313,7 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				//update remainder of panel block of A
 				lm=(outi-loc_A.row_pos)>0?(outi-loc_A.row_pos):0;
 				ln=loc_A.col_num-loc_A.col_pos;
-				alpha=complex<double>  (-1.0,0.0);
+				alpha=std::complex<double>  (-1.0,0.0);
 				lda=loc_A.col_num;
 				pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;
 				incy=1;
@@ -329,8 +329,8 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 			lm=loc_A.row_num-loc_A.row_pos;
 			ln=loc_A.col_num-loc_A.col_pos;
 			in=end_col-first_col+1;
-			alpha=complex<double> (-1.0,0.0);
-			beta=complex<double> (1.0,0.0);
+			alpha=std::complex<double> (-1.0,0.0);
+			beta=std::complex<double> (1.0,0.0);
 			ldb=NB;
 			ldc=loc_A.col_num;
 			pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;
@@ -350,12 +350,12 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 			for (i=0; i<loc_A.row_num; i++)
 				for (j=0; j<NB; j++)
 				{
-					U_R[i][j]=W_R[i][j]=complex<double> (0.0,0.0);
+					U_R[i][j]=W_R[i][j]=std::complex<double> (0.0,0.0);
 				}
 			for (i=0; i<loc_A.col_num; i++)
 				for (j=0; j<NB; j++)
 				{
-					U_C[i][j]=W_C[i][j]=complex<double> (0.0,0.0);
+					U_C[i][j]=W_C[i][j]=std::complex<double> (0.0,0.0);
 				}
 			// determain algorithm block size m
 			first_col=bt*NB;
@@ -385,12 +385,12 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 			{
 				for (i=k; i<N; i++)
 				{
-					x[i]=p[i]=u[i]=complex<double> (0.0,0.0);
+					x[i]=p[i]=u[i]=std::complex<double> (0.0,0.0);
 				}
 				for (i=loc_A.row_pos; i<loc_A.row_num; i++)
-					x_r[i]=u_r[i]=w_r[i]=complex<double> (0.0,0.0);
+					x_r[i]=u_r[i]=w_r[i]=std::complex<double> (0.0,0.0);
 				for (i=loc_A.col_pos; i<loc_A.col_num; i++)
-					x_c[i]=u_c[i]=w_c[i]=complex<double> (0.0,0.0);
+					x_c[i]=u_c[i]=w_c[i]=std::complex<double> (0.0,0.0);
 				indxg2p(comm2D,NB,k,k,&iarow,&iacol);
 				if (iarow==coord[0]) loc_A.row_pos++;
 				//generate u, tau
@@ -416,10 +416,10 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				norm[k]=g;
 				if (coord[0]==iarow)
 				{
-					u_r[loc_i]=complex<double> (1.0,0.0);
+					u_r[loc_i]=std::complex<double> (1.0,0.0);
 				}
 				z[k]=alpha.real();
-				u[k+1]=complex<double> (1.0,0.0);
+				u[k+1]=std::complex<double> (1.0,0.0);
 				for (i=loc_A.row_pos; i<loc_A.row_num; i++)
 				{
 					tmp=loc_A.row_set[i];
@@ -441,7 +441,7 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 					break;
 				}
 				for (i=k+1; i<N; i++)
-					x[i]=p[i]=complex<double> (0.0,0.0);
+					x[i]=p[i]=std::complex<double> (0.0,0.0);
 
 				for (i=loc_A.row_pos; i<loc_A.row_num; i++)
 				{
@@ -455,11 +455,11 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 							L1[i*loc_A.col_num+j]=conj(A[i*loc_A.col_num+j]);
 					}
 				}
-				//local matrix-vector production
+				//local matrix-std::vector production
 				transa='t';
 				lm=loc_A.row_num-loc_A.row_pos;
 				ln=loc_A.col_num-loc_A.col_pos;
-				beta=complex<double> (0.0,0.0);
+				beta=std::complex<double> (0.0,0.0);
 				lda=loc_A.col_num;
 				pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;
 				incx=1;
@@ -481,23 +481,23 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 					x[tmp]=x[tmp]+x_c[i];
 				}
 				for (i=0; i<k-first_col; i++)
-					tu[i]=tw[i]=complex<double> (0.0,0.0);
+					tu[i]=tw[i]=std::complex<double> (0.0,0.0);
 				transa='n';
 				lm=(loc_A.col_num-outj)>0?(loc_A.col_num-outj):0;
 				ln=k-first_col;
-				beta=complex<double> (0.0,0.0);
+				beta=std::complex<double> (0.0,0.0);
 				lda=NB;
 				incx=1;
 				incy=1;
 				zgemv_(&transa,&ln,&lm,&g,&W_C1[outj][0],&lda,&u_c[outj],&incx,&beta,tw,&incy);
 				zgemv_(&transa,&ln,&lm,&g,&U_C1[outj][0],&lda,&u_c[outj],&incx,&beta,tu,&incy);
 				for (i=outi; i<loc_A.row_num; i++)
-					x_r[i]=complex<double> (0.0,0.0);
+					x_r[i]=std::complex<double> (0.0,0.0);
 				transa='t';
 				lm=(loc_A.row_num-outi)>0?(loc_A.row_num-outi):0;
 				ln=k-first_col;
-				alpha=complex<double> (1.0,0.0);
-				beta=complex<double> (1.0,0.0);
+				alpha=std::complex<double> (1.0,0.0);
+				beta=std::complex<double> (1.0,0.0);
 				lda=NB;
 				incx=1;
 				incy=1;
@@ -510,29 +510,29 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 				}
 				MPI_Allreduce(&x[k+1],&q[k+1],N-k-1,MPI_DOUBLE_COMPLEX,MPI_SUM,comm_col);
 				MPI_Allreduce(&q[k+1],&p[k+1],N-k-1,MPI_DOUBLE_COMPLEX,MPI_SUM,comm_row);
-				s=complex<double> (0.0,0.0);
+				s=std::complex<double> (0.0,0.0);
 				lm=N-k-1;
 
 				// mohan modify 2010-10-23
 				zdotc_(&s, &lm,&p[k+1],&incx,&u[k+1],&incy);
 				//   printf("\ns=%lf+i%lf\n",s.real(),s.imag());
-				s=complex<double>(-s.real()/2.0,-s.imag()/2.0);
-				alpha=complex<double>( s.real()*g.real()-s.imag()*g.imag(),s.real()*g.imag()+s.imag()*g.real());
+				s=std::complex<double>(-s.real()/2.0,-s.imag()/2.0);
+				alpha=std::complex<double>( s.real()*g.real()-s.imag()*g.imag(),s.real()*g.imag()+s.imag()*g.real());
 
 				//update remainder of panel block of A
 				for (i=loc_A.row_pos; i<loc_A.row_num; i++)
 				{
 					tmp=loc_A.row_set[i];
-					w_r[i]=complex<double>((p[tmp].real()+(alpha.real()*u_r[i].real()-alpha.imag()*u_r[i].imag())),(p[tmp].imag()+(alpha.real()*u_r[i].imag()+alpha.imag()*u_r[i].real())));
+					w_r[i]=std::complex<double>((p[tmp].real()+(alpha.real()*u_r[i].real()-alpha.imag()*u_r[i].imag())),(p[tmp].imag()+(alpha.real()*u_r[i].imag()+alpha.imag()*u_r[i].real())));
 				}
 				for (i=loc_A.col_pos; i<loc_A.col_num; i++)
 				{
 					tmp=loc_A.col_set[i];
-					w_c[i]=complex<double>((p[tmp].real()+(alpha.real()*u_c[i].real()-alpha.imag()*u_c[i].imag())),(p[tmp].imag()+(alpha.real()*u_c[i].imag()+alpha.imag()*u_c[i].real())));
+					w_c[i]=std::complex<double>((p[tmp].real()+(alpha.real()*u_c[i].real()-alpha.imag()*u_c[i].imag())),(p[tmp].imag()+(alpha.real()*u_c[i].imag()+alpha.imag()*u_c[i].real())));
 				}
 				lm=loc_A.row_num-loc_A.row_pos;
 				ln=(outj-loc_A.col_pos)>0?(outj-loc_A.col_pos):0;
-				alpha=complex<double>(-1.0,0.0);
+				alpha=std::complex<double>(-1.0,0.0);
 				lda=loc_A.col_num;
 				pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;
 				incy=1;
@@ -568,8 +568,8 @@ void pzhetrd(MPI_Comm comm2D, LocalMatrix loc_A,int N,int NB,
 			lm=loc_A.row_num-loc_A.row_pos;
 			ln=loc_A.col_num-loc_A.col_pos;
 			in=end_col-first_col+1;
-			alpha=  complex<double> (-1.0,0.0);
-			beta= complex<double> (1.0,0.0);
+			alpha=  std::complex<double> (-1.0,0.0);
+			beta= std::complex<double> (1.0,0.0);
 			ldb=NB;
 			ldc=loc_A.col_num;
 			pos=loc_A.row_pos*loc_A.col_num+loc_A.col_pos;

@@ -417,7 +417,7 @@ void LCAO_Descriptor::cal_descriptor(void)
                         for (int m2 = 0; m2 < dim; m2++)
                         {
                             int index = m * dim + m2;
-                            complex<double> tmp(this->pdm[inl][index], 0);
+                            std::complex<double> tmp(this->pdm[inl][index], 0);
                             des(m, m2) += tmp;
                         }
                     }
@@ -439,7 +439,7 @@ void LCAO_Descriptor::cal_descriptor(void)
                         int ndim = des.nr;
                         double *tmpd = new double[ndim]();
                         const int lwork = 2 * ndim;
-                        complex<double> *work = new complex<double>[lwork]();
+                        std::complex<double> *work = new std::complex<double>[lwork]();
                         double *rwork = new double[3 * ndim - 2]();
                         int infor = 0;
                         // diag by calling zheev
@@ -894,7 +894,7 @@ void LCAO_Descriptor::print_F_delta()
 void LCAO_Descriptor::save_npy_d()
 {
     //save descriptor in .npy format
-    vector<double> npy_des;
+    std::vector<double> npy_des;
     for (int i = 0;i < this->n_descriptor;++i)
     {
         npy_des.push_back(this->d[i]);
@@ -908,7 +908,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
 {   
     //save e_base
     const long unsigned eshape[] = { 1 };
-    vector<double> npy_ebase;
+    std::vector<double> npy_ebase;
     npy_ebase.push_back(ebase);
     npy::SaveArrayAsNumpy("e_base.npy", false, 1, eshape, npy_ebase);
     return;
@@ -919,7 +919,7 @@ void LCAO_Descriptor::save_npy_f(matrix& fbase)
     //save f_base
     //caution: unit: Rydberg/Bohr
     const long unsigned fshape[] = {(long unsigned) GlobalC::ucell.nat, 3 };
-    vector<double> npy_fbase;
+    std::vector<double> npy_fbase;
     for (int iat = 0;iat < GlobalC::ucell.nat;++iat)
     {
         for (int i = 0;i < 3;i++)

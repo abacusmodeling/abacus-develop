@@ -18,7 +18,7 @@
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	const MPI_Comm &mpi_comm_in,
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group)
+	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group)
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init");
 	
@@ -26,7 +26,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	MPI_Comm_size(mpi_comm, &comm_sz);
 	MPI_Comm_rank(mpi_comm, &my_rank);
 
-//	const vector<pair<bool,bool>> atom_in_2D = get_atom_in_2D();
+//	const std::vector<pair<bool,bool>> atom_in_2D = get_atom_in_2D();
 	H_atom_pairs_group_rank = get_H_atom_pairs_group_rank(H_atom_pairs_group);
 	get_send_recv_size(H_atom_pairs_group_rank, H_atom_pairs_group, send_size_list, recv_size);
 
@@ -44,31 +44,31 @@ ofs<<recv_size<<std::endl;
 }
 
 
-vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
 	Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx(
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstream::app);
 //ofs<<data_local<<std::endl<<"@@@"<<std::endl;;
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_all(GlobalV::NSPIN);
 
-	vector<atomic<Flag_Send>> flags_send(comm_sz);
-    vector<atomic<Flag_Recv>> flags_recv(comm_sz);
+	std::vector<atomic<Flag_Send>> flags_send(comm_sz);
+    std::vector<atomic<Flag_Recv>> flags_recv(comm_sz);
 	init_flags(flags_send, flags_recv);
 
-	vector<vector<double>> oarps_isend(comm_sz);
-	vector<vector<double>> iarps_irecv(comm_sz);
+	std::vector<std::vector<double>> oarps_isend(comm_sz);
+	std::vector<std::vector<double>> iarps_irecv(comm_sz);
 
 	int rank_send_now = my_rank;
 	auto rank_send_next = [&]()->int{ return (rank_send_now+1)%comm_sz; };
 
 	atomic_flag lock_insert = ATOMIC_FLAG_INIT;
-	vector<thread> threads;
-	vector<MPI_Request>requests_isend(comm_sz);
-	vector<MPI_Request>requests_irecv(comm_sz);
+	std::vector<thread> threads;
+	std::vector<MPI_Request>requests_isend(comm_sz);
+	std::vector<MPI_Request>requests_irecv(comm_sz);
 ofs<<__LINE__<<std::endl;
 
 	while(!finish_judge(flags_send, flags_recv))
@@ -146,7 +146,7 @@ ofs<<__LINE__<<"\t"<<rank_recv<<std::endl;
 	}
 ofs<<__LINE__<<std::endl;
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection = get_intersection(my_rank, data_local);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection = get_intersection(my_rank, data_local);
 	while( lock_insert.test_and_set() );
 	insert_data(data_intersection, data_all);
 	lock_insert.clear();
@@ -173,9 +173,9 @@ ofs<<__LINE__<<std::endl;
 
 
 /*
-vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_atom_in_2D() const
+std::vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_atom_in_2D() const
 {
-	vector<pair<bool,bool>> atom_in_2D(GlobalC::ucell.nat,{false,false});
+	std::vector<pair<bool,bool>> atom_in_2D(GlobalC::ucell.nat,{false,false});
 	for(int iwt=0; iwt<GlobalV::NLOCAL; ++iwt)
 	{
 		const int iat = GlobalC::ucell.iwt2iat[iwt];
@@ -195,11 +195,11 @@ vector<pair<bool,bool>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_ato
 
 
 /*
-vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group,
-	const vector<pair<bool,bool>> &atom_in_2D) const
+std::vector<std::map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
+	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group,
+	const std::vector<pair<bool,bool>> &atom_in_2D) const
 {
-	vector<int> H_atom_pairs_group_vector;
+	std::vector<int> H_atom_pairs_group_vector;
 	for(const auto &pairs : H_atom_pairs_group)
 	{
 		H_atom_pairs_group_vector.push_back(pairs.first.size());
@@ -208,14 +208,14 @@ vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3
 		H_atom_pairs_group_vector.insert(H_atom_pairs_group_vector.end(), pairs.second.begin(), pairs.second.end());
 	}
 
-	vector<int> rank_size(comm_sz);
-	vector<int> rank_index(comm_sz);
+	std::vector<int> rank_size(comm_sz);
+	std::vector<int> rank_index(comm_sz);
 	for(size_t i=0; i<rank_index.size(); ++i)
 		rank_index[i] = i;
 	const int myrank_size = H_atom_pairs_group_vector.size();
 	MPI_Allgatherv(
 		&myrank_size, 1, MPI_INT,
-		VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(vector<int>(comm_sz,1)), VECTOR_TO_PTR(rank_index), MPI_INT,
+		VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(std::vector<int>(comm_sz,1)), VECTOR_TO_PTR(rank_index), MPI_INT,
 		mpi_comm );
 
 	size_t index_accumulate = 0;
@@ -224,13 +224,13 @@ vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3
 		rank_index[i] = index_accumulate;
 		index_accumulate += rank_size[i];
 	}
-	vector<int> H_atom_pairs_group_rank_vector(index_accumulate);
+	std::vector<int> H_atom_pairs_group_rank_vector(index_accumulate);
 	MPI_Allgatherv(
 		VECTOR_TO_PTR(H_atom_pairs_group_vector), H_atom_pairs_group_vector.size(), MPI_INT,
 		VECTOR_TO_PTR(H_atom_pairs_group_rank_vector), VECTOR_TO_PTR(rank_size), VECTOR_TO_PTR(rank_index), MPI_INT,
 		mpi_comm);
 
-	vector<map<size_t,shared_ptr<set<size_t>>>> H_atom_pairs_group_rank(comm_sz);
+	std::vector<std::map<size_t,shared_ptr<set<size_t>>>> H_atom_pairs_group_rank(comm_sz);
 	auto ptr = H_atom_pairs_group_rank_vector.begin();
 	for(int rank=0; rank!=comm_sz; ++rank)
 	{
@@ -266,19 +266,19 @@ vector<map<size_t,shared_ptr<set<size_t>>>> Exx_Abfs::Parallel::Communicate::DM3
 */
 
 
-vector<map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group) const
+std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_H_atom_pairs_group_rank(
+	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group) const
 {
 	constexpr int tag = 0;
 
-	const vector<pair<vector<bool>,vector<bool>>> atom_in_2D_list = Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(mpi_comm);
+	const std::vector<pair<std::vector<bool>,std::vector<bool>>> atom_in_2D_list = Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(mpi_comm);
 
-	vector<MPI_Request> request(comm_sz);
-	vector<string> atom_send_str(comm_sz);
+	std::vector<MPI_Request> request(comm_sz);
+	std::vector<string> atom_send_str(comm_sz);
 	for(int rank_tmp=my_rank; rank_tmp!=comm_sz+my_rank; ++rank_tmp)
 	{
 		const int rank = rank_tmp%comm_sz;
-		map<size_t,set<size_t>> atom_required;
+		std::map<size_t,set<size_t>> atom_required;
 		for(const auto & H_atom_pairs : H_atom_pairs_group)
 			for(const size_t iat1 : H_atom_pairs.first)
 				if(atom_in_2D_list[rank].first[iat1])
@@ -299,7 +299,7 @@ vector<map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce:
 		if( MPI_Isend( atom_send_str[rank].c_str(), atom_send_str[rank].size(), MPI_CHAR, rank, tag, mpi_comm, &request[rank] ) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 	}
 
-	vector<map<size_t,set<size_t>>> H_atom_pairs_group_rank(comm_sz);
+	std::vector<std::map<size_t,set<size_t>>> H_atom_pairs_group_rank(comm_sz);
 	for(int i=0; i!=comm_sz; ++i)
 	{
 		MPI_Status status;
@@ -307,7 +307,7 @@ vector<map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce:
 		int size_recv;
 		if( MPI_Get_count( &status, MPI_CHAR, &size_recv) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 
-		vector<char> ss_buffer(size_recv);
+		std::vector<char> ss_buffer(size_recv);
 		if( MPI_Recv( ss_buffer.data(), size_recv, MPI_CHAR, status.MPI_SOURCE, tag, mpi_comm, MPI_STATUS_IGNORE ) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		stringstream atom_recv_ss;  
 		atom_recv_ss.rdbuf()->pubsetbuf(ss_buffer.data(),size_recv);
@@ -326,9 +326,9 @@ vector<map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce:
 }
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
-	const vector<map<size_t,set<size_t>>> &H_atom_pairs_group_rank,
-	const map<set<size_t>,set<size_t>> &H_atom_pairs_group,
-	vector<size_t> &send_size_list, size_t &recv_size) const
+	const std::vector<std::map<size_t,set<size_t>>> &H_atom_pairs_group_rank,
+	const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group,
+	std::vector<size_t> &send_size_list, size_t &recv_size) const
 {
 	send_size_list.resize(comm_sz,0);
 	for(int rank=0; rank!=comm_sz; ++rank)
@@ -357,8 +357,8 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_send_recv_size(
 
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags(
-	vector<atomic<Flag_Send>> &flags_send,
-	vector<atomic<Flag_Recv>> &flags_recv) const
+	std::vector<atomic<Flag_Send>> &flags_send,
+	std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags");
 	
@@ -373,8 +373,8 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init_flags(
 
 
 bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::finish_judge(
-	const vector<atomic<Flag_Send>> &flags_send,
-	const vector<atomic<Flag_Recv>> &flags_recv) const
+	const std::vector<atomic<Flag_Send>> &flags_send,
+	const std::vector<atomic<Flag_Recv>> &flags_recv) const
 {
 	for(int rank_send=0; rank_send!=comm_sz; ++rank_send)
 		if((flags_send[rank_send]!=Flag_Send::begin_isend) && (flags_send[rank_send]!=Flag_Send::finish_isend))
@@ -388,7 +388,7 @@ bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::finish_judge(
 
 bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::memory_enough(
 	const int rank_send_next,
-	const vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	size_t memory_need = recv_size;
 	for(int rank_send=0; rank_send<comm_sz; ++rank_send)
@@ -402,13 +402,13 @@ bool Exx_Abfs::Parallel::Communicate::DM3::Allreduce::memory_enough(
 /*
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	const int rank_send_now,
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-	vector<vector<double>> &oarps_isend,
-	vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
+	std::vector<std::vector<double>> &oarps_isend,
+	std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
-	vector<double> &oarp = oarps_isend[rank_send_now];
+	std::vector<double> &oarp = oarps_isend[rank_send_now];
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		oarp.push_back(-999);		const size_t index_size = oarp.size()-1;
@@ -454,17 +454,17 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	const int rank_send_now,
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-	vector<vector<double>> &oarps_isend,
-	vector<atomic<Flag_Send>> &flags_send) const
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
+	std::vector<std::vector<double>> &oarps_isend,
+	std::vector<atomic<Flag_Send>> &flags_send) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process");
 	
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection = get_intersection(
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection = get_intersection(
 		rank_send_now,
-		const_cast<vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>&>(data_local));
+		const_cast<std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>&>(data_local));
 
-	vector<double> &oarp = oarps_isend[rank_send_now];
+	std::vector<double> &oarp = oarps_isend[rank_send_now];
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		oarp.push_back(-999);		const size_t index_size = oarp.size()-1;
@@ -491,11 +491,11 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::send_data_process(
 	flags_send[rank_send_now] = Flag_Send::finish_oar;
 }
 
-vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_intersection(
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix*>>>> Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_intersection(
 	const int rank_send_now,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix*>>>> data_intersection(GlobalV::NSPIN);
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		auto ptr_data_A = data_local[is].begin();
@@ -533,21 +533,21 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix*>>>> Exx_Abfs::
 
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process(
 	const int rank_recv,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
-	vector<vector<double>> &iarps_irecv,
-	vector<atomic<Flag_Recv>> &flags_recv,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
+	std::vector<std::vector<double>> &iarps_irecv,
+	std::vector<atomic<Flag_Recv>> &flags_recv,
 	atomic_flag &lock_insert) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::recv_data_process");
 	
-	auto vector_empty = []( const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &v ) -> bool
+	auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &v ) -> bool
 	{
 		for( const auto &i : v )
 			if(!i.empty())	return false;
 		return true;
 	};
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_rank(GlobalV::NSPIN);
 	auto ptr = iarps_irecv[rank_recv].begin();
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
@@ -583,8 +583,8 @@ matrix& Exx_Abfs::Parallel::Communicate::DM3::Allreduce::get_matrix(matrix*pm)co
 
 template<typename M>
 void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data(
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,M>>>> &data_rank,
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,M>>>> &data_rank,
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::insert_data");
 	for( int is=0; is!=GlobalV::NSPIN; ++is )

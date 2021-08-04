@@ -95,7 +95,7 @@ void DFTU_RELAX::force_stress()
 	  const int  one_int = 1;
 	  const double alpha = 1.0, beta = 0.0;
 
-    vector<double> rho_VU(GlobalC::ParaO.nloc);
+    std::vector<double> rho_VU(GlobalC::ParaO.nloc);
 
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	  {
@@ -121,15 +121,15 @@ void DFTU_RELAX::force_stress()
   {
     const char transN = 'N', transT = 'T';
 	  const int  one_int = 1;
-	  const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+	  const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
 
-    vector<complex<double>> rho_VU(GlobalC::ParaO.nloc);
+    std::vector<std::complex<double>> rho_VU(GlobalC::ParaO.nloc);
 
     for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	  {
 	  	const int spin = GlobalC::kv.isk[ik];
 
-      complex<double>* VU = new complex<double> [GlobalC::ParaO.nloc];
+      std::complex<double>* VU = new std::complex<double> [GlobalC::ParaO.nloc];
       this->cal_VU_pot_mat_complex(spin, false, VU);
       pzgemm_(&transT, &transN,
 					    &GlobalV::NLOCAL, &GlobalV::NLOCAL, &GlobalV::NLOCAL,
@@ -148,7 +148,7 @@ void DFTU_RELAX::force_stress()
 
   for(int iat=0; iat<GlobalC::ucell.nat; iat++)
 	{
-    vector<double> tmp = this->force_dftu[iat];
+    std::vector<double> tmp = this->force_dftu[iat];
 		MPI_Allreduce(&tmp[0], &this->force_dftu[iat][0], 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 	}
 
@@ -175,27 +175,27 @@ void DFTU_RELAX::force_stress()
 	return;
 }
 
-void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
+void DFTU_RELAX::cal_force_k(const int ik, std::complex<double>* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_force_k");
 
 	const char transN = 'N', transT = 'T', transC='C';
 	const int  one_int = 1;
-  const complex<double> zero(0.0,0.0), one(1.0,0.0), minus_one(-1.0,0.0);
+  const std::complex<double> zero(0.0,0.0), one(1.0,0.0), minus_one(-1.0,0.0);
 	
-	vector<vector<complex<double>>> ftmp(GlobalC::ucell.nat);
+	std::vector<std::vector<std::complex<double>>> ftmp(GlobalC::ucell.nat);
 	for(int ia=0; ia<GlobalC::ucell.nat; ia++)
 	{
-		ftmp.at(ia).resize(3, complex<double>(0.0,0.0)); //three dimension
+		ftmp.at(ia).resize(3, std::complex<double>(0.0,0.0)); //three dimension
 	}
 
-	vector<complex<double>> dm_VU_dSm(GlobalC::ParaO.nloc);
-  vector<complex<double>> dSm_k(GlobalC::ParaO.nloc);
+	std::vector<std::complex<double>> dm_VU_dSm(GlobalC::ParaO.nloc);
+  std::vector<std::complex<double>> dSm_k(GlobalC::ParaO.nloc);
 
 	for(int dim=0; dim<3; dim++)
 	{
-		vector<complex<double>> mat_tmp(GlobalC::ParaO.nloc);
-		vector<complex<double>> force_tmp(GlobalC::ParaO.nloc);
+		std::vector<std::complex<double>> mat_tmp(GlobalC::ParaO.nloc);
+		std::vector<std::complex<double>> force_tmp(GlobalC::ParaO.nloc);
 
     this->fold_dSm_k(ik, dim, &dSm_k[0]);
 
@@ -239,16 +239,16 @@ void DFTU_RELAX::cal_force_k(const int ik, complex<double>* rho_VU)
 	return;
 }
 
-void DFTU_RELAX::cal_stress_k(const int ik, complex<double>* rho_VU)
+void DFTU_RELAX::cal_stress_k(const int ik, std::complex<double>* rho_VU)
 {
 	TITLE("DFTU_RELAX", "cal_stress_k");
 
 	const char transN = 'N', transT = 'T', transC='C';
 	const int  one_int = 1;
-	const complex<double> one(1.0,0.0), minus_half(-0.5,0.0), zero(0.0,0.0);
+	const std::complex<double> one(1.0,0.0), minus_half(-0.5,0.0), zero(0.0,0.0);
 
-  vector<complex<double>> dm_VU_sover(GlobalC::ParaO.nloc);
-  vector<complex<double>> dSR_k(GlobalC::ParaO.nloc);
+  std::vector<std::complex<double>> dm_VU_sover(GlobalC::ParaO.nloc);
+  std::vector<std::complex<double>> dSR_k(GlobalC::ParaO.nloc);
 
 	for(int dim1=0; dim1<3; dim1++)
 	{
@@ -300,7 +300,7 @@ void DFTU_RELAX::cal_force_gamma(const int spin, double* rho_VU)
 	const int  one_int = 1;
 	const double one = 1.0, zero = 0.0, minus_one=1.0;
 	
-	vector<double> dm_VU_dSm(GlobalC::ParaO.nloc);
+	std::vector<double> dm_VU_dSm(GlobalC::ParaO.nloc);
 	
 	for(int dim=0; dim<3; dim++)
 	{
@@ -357,8 +357,8 @@ void DFTU_RELAX::cal_stress_gamma(const int spin, double* rho_VU)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0, one=1.0, nius_one_half=-0.5;
 
-  vector<double> dSR_gamma(GlobalC::ParaO.nloc);
-  vector<double> dm_VU_sover(GlobalC::ParaO.nloc);
+  std::vector<double> dSR_gamma(GlobalC::ParaO.nloc);
+  std::vector<double> dm_VU_sover(GlobalC::ParaO.nloc);
 
 	for(int dim1=0; dim1<3; dim1++)
 	{
@@ -516,7 +516,7 @@ double DFTU_RELAX::get_onebody_eff_pot
 	return VU;
 }
 
-void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, complex<double>* VU)
+void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, std::complex<double>* VU)
 {
   TITLE("DFTU_RELAX","cal_VU_pot_mat_complex"); 
 	// timer::tick("DFTU","folding_overlap_matrix");
@@ -560,7 +560,7 @@ void DFTU_RELAX::cal_VU_pot_mat_complex(const int spin, const bool newlocale, co
 			            int m2_all = m2 + (2*L+1)*ipol2;
                   
                   double val = this->get_onebody_eff_pot(it, iat, L, n, spin, m1_all, m2_all, cal_type, newlocale);
-			            VU[nu*GlobalC::ParaO.nrow + mu] = complex<double>(val, 0.0);
+			            VU[nu*GlobalC::ParaO.nrow + mu] = std::complex<double>(val, 0.0);
                 }//ipol2
               }//m2
             }//ipol1
@@ -717,7 +717,7 @@ void DFTU_RELAX::fold_dSR_gamma(const int dim1, const int dim2, double* dSR_gamm
 	return;
 }
 
-void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
+void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, std::complex<double>* dSm_k)
 {
   TITLE("DFTU_RELAX","fold_dSm_k");
 
@@ -809,7 +809,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
 
 			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
-			  			const complex<double> kphase( cos(arg),  sin(arg) );
+			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
 
 			  			dSm_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*kphase;
 
@@ -825,7 +825,7 @@ void DFTU_RELAX::fold_dSm_k(const int ik, const int dim, complex<double>* dSm_k)
 	return;
 }
 
-void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, complex<double>* dSR_k)
+void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, std::complex<double>* dSR_k)
 {
   TITLE("DFTU_RELAX","fold_dSR_k");
 
@@ -916,7 +916,7 @@ void DFTU_RELAX::fold_dSR_k(const int ik, const int dim1, const int dim2, comple
               	
 			  			Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 			  			const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
-			  			const complex<double> kphase( cos(arg),  sin(arg) );
+			  			const std::complex<double> kphase( cos(arg),  sin(arg) );
 
 			  			dSR_k[nu*GlobalC::ParaO.nrow + mu] += dSm_ptr[nnr]*GlobalC::LM.DH_r[nnr*3+dim2]*kphase;														
 

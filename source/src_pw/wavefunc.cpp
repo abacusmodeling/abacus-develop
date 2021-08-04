@@ -295,7 +295,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 					{
 						rr = rand()/double(RAND_MAX);
 						arg = TWO_PI * rand()/double(RAND_MAX);
-						wfcatom(ib,startig+ig) *= (1.0 + 0.05 * complex<double>(rr * cos(arg), rr * sin(arg)));
+						wfcatom(ib,startig+ig) *= (1.0 + 0.05 * std::complex<double>(rr * cos(arg), rr * sin(arg)));
 					}
 					startig += npwx;
 				}
@@ -425,20 +425,20 @@ void wavefunc::wfcinit_k(void)
 		
 		int NG = GlobalC::chi0_hilbert.dim;  // chi0's dimension
 		
-		complex<double> ***wanf2_q;    // <j,0 | k+G+q>
+		std::complex<double> ***wanf2_q;    // <j,0 | k+G+q>
 		
-		wanf2_q = new complex<double> **[GlobalC::kv.nks];
+		wanf2_q = new std::complex<double> **[GlobalC::kv.nks];
 		for(int ik=0; ik<GlobalC::kv.nks; ik++)
 		{
-			wanf2_q[ik] = new complex<double> *[GlobalV::NLOCAL];
+			wanf2_q[ik] = new std::complex<double> *[GlobalV::NLOCAL];
 			for(int iw=0; iw<GlobalV::NLOCAL; iw++)
 			{
-				wanf2_q[ik][iw] = new complex<double>[npwx];
+				wanf2_q[ik][iw] = new std::complex<double>[npwx];
 			}
 		}
 		
-		complex<double> overlap_aux[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];     // <i,0 | e^{i(q+G)r} | j,R> 
-		complex<double> overlap[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
+		std::complex<double> overlap_aux[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];     // <i,0 | e^{i(q+G)r} | j,R> 
+		std::complex<double> overlap[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
 		double overlap_aux_R[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];       //real part
 		double overlap_R[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];
 		double overlap_aux_I[GlobalV::NLOCAL][GlobalV::NLOCAL][NG][NR];       //imag part
@@ -478,7 +478,7 @@ void wavefunc::wfcinit_k(void)
  
 		
 		double arg; 
-		complex<double> phase;
+		std::complex<double> phase;
 		for(int iq=0; iq<GlobalC::chi0_hilbert.nq; iq++)
 		{
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
@@ -536,7 +536,7 @@ void wavefunc::wfcinit_k(void)
 								for(int ir=0; ir<Rmax[iw1][iw2]; ir++)   // Rmax
 								{
 									arg = gkqg * Rcar[iw1][iw2][ir] * TWO_PI;
-									phase = complex<double>( cos(arg),  -sin(arg) );
+									phase = std::complex<double>( cos(arg),  -sin(arg) );
 									overlap_aux[iw1][iw2][g][ir] += conj(GlobalC::wf.wanf2[ik](iw1,ig)) 
 									* wanf2_q[ik][iw2][ig] * phase/static_cast<double>(GlobalC::kv.nks);		
 									// Peize Lin add static_cast 2018-07-14
@@ -575,7 +575,7 @@ void wavefunc::wfcinit_k(void)
 					{
 						for(int ir=0; ir<NR; ir++)
 						{
-							overlap[iw1][iw2][g][ir] = complex<double>( overlap_R[iw1][iw2][g][ir], 
+							overlap[iw1][iw2][g][ir] = std::complex<double>( overlap_R[iw1][iw2][g][ir], 
 							overlap_I[iw1][iw2][g][ir]);
 						}
 					}

@@ -219,20 +219,20 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 			const int gstart = GlobalC::LNNR.nlocstart[iat];
 			const int irr = GlobalC::LNNR.nlocdim[iat];//number of adjacet orbitals
 
-			complex<double> **vvv = new complex<double>*[GlobalV::NSPIN];
+			std::complex<double> **vvv = new std::complex<double>*[GlobalV::NSPIN];
          //xiaohui add 2014-03-17, add "if(irr > 0)", 
          //meaing only allocate memory when number of iat-th atom adjacet orbitals are not zero in this processor
          if(irr > 0)
          {
    			for(int is=0; is<GlobalV::NSPIN; is++)
 			   {
-				   vvv[is] = new complex<double>[ irr ];
+				   vvv[is] = new std::complex<double>[ irr ];
 				   ZEROS(vvv[is], irr );
 			   }
          }
 
 			int ispin=0;
-			complex<double> *dm;
+			std::complex<double> *dm;
 			//----------------
 			// circle for k
 			//----------------
@@ -255,7 +255,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 						//-----------------------------
 						// start the adjacent cycle.
 						//-----------------------------
-						complex<double> *wfc = GlobalC::LOWF.WFC_K[ik][ib];
+						std::complex<double> *wfc = GlobalC::LOWF.WFC_K[ik][ib];
 						int count = 0;
 						for (int cb = 0; cb < RA.na_each[iat]; ++cb)
 						{
@@ -266,7 +266,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 							//-----------------
 							// exp[i * R * k]
 							//-----------------
-							const complex<double> phase = w1 * exp(TWO_PI * IMAG_UNIT * (
+							const std::complex<double> phase = w1 * exp(TWO_PI * IMAG_UNIT * (
 										GlobalC::kv.kvec_d[ik].x * RA.info[iat][cb][0] +
 										GlobalC::kv.kvec_d[ik].y * RA.info[iat][cb][1] +
 										GlobalC::kv.kvec_d[ik].z * RA.info[iat][cb][2]
@@ -360,13 +360,13 @@ RA.delete_grid();//xiaohui add 2015-02-04
 }
 
 
-complex<double> Force_LCAO_k::set_EDM_k_element(
-	const complex<double> &phase,
+std::complex<double> Force_LCAO_k::set_EDM_k_element(
+	const std::complex<double> &phase,
 	const bool with_energy,
-	complex<double> &coef1, complex<double> &coef2,
+	std::complex<double> &coef1, std::complex<double> &coef2,
 	const double &ekb)
 {
-	complex<double> dm = complex<double>(0,0);
+	std::complex<double> dm = std::complex<double>(0,0);
 	//--------------------------------------
 	// for energy density matrix
 	// \sum E(i)*exp(iRk)*psi(mu)*psi(nu)

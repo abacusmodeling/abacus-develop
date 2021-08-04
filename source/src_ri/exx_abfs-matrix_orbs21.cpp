@@ -62,9 +62,9 @@ void Exx_Abfs::Matrix_Orbs21::init(
 
 
 void Exx_Abfs::Matrix_Orbs21::init_radial(
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A1,
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A2,
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_B )
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A1,
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A2,
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B )
 {
 //ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 //timeval t_start;
@@ -93,7 +93,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial(
 
 
 void Exx_Abfs::Matrix_Orbs21::init_radial(
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A1,
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A1,
 	const LCAO_Orbitals &orb_A2,
 	const LCAO_Orbitals &orb_B )
 {
@@ -144,7 +144,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial_table()
 //ofs.close();
 }
 
-void Exx_Abfs::Matrix_Orbs21::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
+void Exx_Abfs::Matrix_Orbs21::init_radial_table( const std::map<size_t,std::map<size_t,set<double>>> &Rs )
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
@@ -155,7 +155,7 @@ gettimeofday(&t_start, NULL);
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
 		{
-			if( auto* const center2_orb21_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb21>>>>>>*const>(
+			if( auto* const center2_orb21_sAB = static_cast<std::map<int,std::map<size_t,std::map<int,std::map<size_t,std::map<int,std::map<size_t,Center2_Orb::Orb21>>>>>>*const>(
 						MAP_EXIST(center2_orb21_s, RsA.first, RsB.first)) )
 			{
 timeval t_small;
@@ -185,11 +185,11 @@ ofs.close();
 }
 
 /*
-map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Matrix_Abfsphi_Phi::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Matrix_Abfsphi_Phi::cal_overlap_matrix(
 	const Exx_Abfs::Abfs_Index::Index &index_abfs,
 	const Exx_Abfs::Abfs_Index::Index &index_orb )
 {
-	map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> matrix_A;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> matrix_A;
 
 	for( auto &co1 : center2_orb21_s )
 	{
@@ -330,7 +330,7 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	return m;
 }
 
-vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
+std::vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const size_t TA,
 	const size_t TB,
 	const Vector3<double> &tauA,
@@ -388,10 +388,10 @@ vector<matrix> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 			}
 		}
 	}
-	return vector<matrix>{ std::move(m_A2B_A1), std::move(m_BA2_A1) };
+	return std::vector<matrix>{ std::move(m_A2B_A1), std::move(m_BA2_A1) };
 }
 
-map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	const Element_Basis_Index::IndexLNM &index_A1,
 	const Element_Basis_Index::IndexLNM &index_A2,
 	const Element_Basis_Index::IndexLNM &index_B) const
@@ -402,7 +402,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::Matrix_
 
 	TITLE("Exx_Abfs::Matrix_Orbs21","cal_overlap_matrix");
 
-	map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> matrixes;
 
 	for( const auto &co1 : center2_orb21_s )
 	{
@@ -418,7 +418,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::Matrix_
 				{
 					const Vector3<double> &tauB( GlobalC::ucell.atoms[TB].tau[IB] );
 
-					const vector<matrix> &&m = cal_overlap_matrix( TA, TB, tauA, tauB, index_A1, index_A2, index_B );
+					const std::vector<matrix> &&m = cal_overlap_matrix( TA, TB, tauA, tauB, index_A1, index_A2, index_B );
 					matrixes[TA][IA][TB][IB].resize(2);
 					matrixes[TA][IA][TB][IB][0] = std::move(m[0]);
 					matrixes[TB][IB][TA][IA].resize(2);

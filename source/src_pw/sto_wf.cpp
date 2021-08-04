@@ -60,7 +60,7 @@ void Stochastic_WF::init(void)
     nchip = int(nchi/GlobalV::NPOOL);
     if(GlobalV::NPOOL - GlobalV::MY_POOL - 1 < nchi%GlobalV::NPOOL) ++nchip;
 
-    complex<double> ui(0,1);
+    std::complex<double> ui(0,1);
 
     //We temporarily init one group of orbitals for all k points.
     delete[] chi0;

@@ -60,8 +60,8 @@ void Exx_Abfs::Matrix_Orbs11::init(
 }
 
 void Exx_Abfs::Matrix_Orbs11::init_radial(
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A, 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_B)
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A, 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B)
 { 
 //ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 //timeval t_start;
@@ -122,7 +122,7 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table()
 //ofs.close();
 }
 
-void Exx_Abfs::Matrix_Orbs11::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
+void Exx_Abfs::Matrix_Orbs11::init_radial_table( const std::map<size_t,std::map<size_t,set<double>>> &Rs )
 {	
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
@@ -131,7 +131,7 @@ gettimeofday( &t_start, NULL);
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
 		{
-			if( auto* const center2_orb11_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb11>>>>*const>(
+			if( auto* const center2_orb11_sAB = static_cast<std::map<int,std::map<size_t,std::map<int,std::map<size_t,Center2_Orb::Orb11>>>>*const>(
 						MAP_EXIST(center2_orb11_s, RsA.first, RsB.first)) )
 			{
 timeval t_small;
@@ -192,11 +192,11 @@ void Exx_Abfs::Matrix_Orbs11::init_radial_table()
 }
 */
 /*
-map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Matrix_Orbs11::cal_overlap_matrix( 
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Matrix_Orbs11::cal_overlap_matrix( 
 	const Exx_Abfs::Abfs_Index::Index &index_r, 
 	const Exx_Abfs::Abfs_Index::Index &index_c )
 {
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> matrix_V;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrix_V;
 	
 	for( auto &co1 : center2_orb11_s )
 	{
@@ -290,7 +290,7 @@ matrix Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix(
 	return m;
 }
 
-map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs11::cal_overlap_matrix( 
 	const Element_Basis_Index::IndexLNM &index_r, 
 	const Element_Basis_Index::IndexLNM &index_c ) const
 {
@@ -299,7 +299,7 @@ timeval t_start;
 gettimeofday( &t_start, NULL);
 	TITLE("Exx_Abfs::Matrix_Orbs11","cal_overlap_matrix");
 	
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrixes;
 	
 	for( const auto &co1 : center2_orb11_s )
 	{

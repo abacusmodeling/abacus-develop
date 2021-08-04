@@ -397,7 +397,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 									* soc.fcoef(it, is1, is2, ip1, ip2);
 									if(p1 != p2) 
 									{
-										soc.fcoef(it, is1, is2, ip1, ip2) = complex<double>(0.0,0.0);
+										soc.fcoef(it, is1, is2, ip1, ip2) = std::complex<double>(0.0,0.0);
 									}
 								}// end is2
 							}// end is1

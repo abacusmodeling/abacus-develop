@@ -38,7 +38,7 @@ void ComplexArray::init(const int size)
 //  set_new_handler(complexArrayxAlloc);
 	if(size>0)
 	{
-		ptr = new std::complex<double> [size];	//*sizeof(complex));
+		ptr = new std::complex<double> [size];	//*sizeof(std::complex));
 		assert(ptr != 0);	// terminate if memory not allocated
 	}
 	else
@@ -203,7 +203,7 @@ ComplexArray ComplexArray::operator*(const double r)
 	return cd2;
 }
 
-/* Scale a ComplexArray cd by complex number c */
+/* Scale a ComplexArray cd by std::complex number c */
 ComplexArray operator*(const std::complex < double> c, const ComplexArray &cd)
 {
 	const int size = cd.getSize();
@@ -213,7 +213,7 @@ ComplexArray operator*(const std::complex < double> c, const ComplexArray &cd)
 	return cd2;
 }
 
-/* Scale a ComplexArray by a complex number c */
+/* Scale a ComplexArray by a std::complex number c */
 ComplexArray ComplexArray::operator*(std::complex < double> c)
 {
 	const int size = this->getSize();
@@ -223,7 +223,7 @@ ComplexArray ComplexArray::operator*(std::complex < double> c)
 	return cd;
 }
 
-/* Scale a ComplexArray by complex c in place */
+/* Scale a ComplexArray by std::complex c in place */
 void ComplexArray::operator*=(std::complex < double> c)
 {
 	const int size = this->getSize();
@@ -231,7 +231,7 @@ void ComplexArray::operator*=(std::complex < double> c)
 		ptr[i] *= c;
 }
 
-/* Scale a ComplexArray by complex c in place */
+/* Scale a ComplexArray by std::complex c in place */
 void ComplexArray::operator*=(double r)
 {
 	const int size = this->getSize();
@@ -428,7 +428,7 @@ void point_mult(ComplexArray &in1, ComplexArray &in2, ComplexArray &out)
 	}
 }
 
-// overloaded subscript operator for const complex Array
+// overloaded subscript operator for const std::complex Array
 // const reference return creates an cvakue
 const std::complex < double> &ComplexArray::operator()
 	(const int ind1, const int ind2, const int ind3, const int ind4) const
@@ -441,9 +441,9 @@ const std::complex < double> &ComplexArray::operator()
 	return ptr[ind];
 }
 
-// overloaded subscript operator for non-const complex Array
+// overloaded subscript operator for non-const std::complex Array
 // const reference return creates an lvakue
-complex<double>& ComplexArray::operator()
+std::complex<double>& ComplexArray::operator()
 	(const int ind1, const int ind2, const int ind3, const int ind4)
 {
 	assert(ind1>=0);	assert(ind1<bound1);

@@ -38,8 +38,8 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init(
 }
 
 void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial( 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A, 
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_B )
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A, 
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B )
 {
 	for( size_t TA = 0; TA!=orb_A.size(); ++TA )
 		for( size_t TB=0; TB!=orb_B.size(); ++TB )
@@ -86,7 +86,7 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table()
 							co6.second.init_radial_table();
 }
 
-void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<size_t,set<double>>> &Rs )
+void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( std::map<size_t,std::map<size_t,set<double>>> &Rs )
 {
 	for( auto &co1 : center2_orb22_s )
 		for( auto &co2 : co1.second )
@@ -153,11 +153,11 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( map<size_t,map<s
 	}
 }*/
 
-map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::cal_overlap_matrix(
 	const Element_Basis_Index::IndexLNM &index_r, 
 	const Element_Basis_Index::IndexLNM &index_c )
 {
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrixes;
 
 	for( auto &co1 : center2_orb22_s )
 	{

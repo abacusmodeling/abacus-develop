@@ -65,7 +65,7 @@ public:
 //==========================================================
 	bool sec_wf
 	(
-		complex<double> ***phi,// address of wave functions. 
+		std::complex<double> ***phi,// address of wave functions. 
 		const int npsi, // how many wave functions read in.
 		const string &fn // file address.
 	)const;
@@ -328,7 +328,7 @@ public:
 	void in_evc(ifstream &in);
 
 	int natomwfc;
-	complex <double> ***evc;
+	std::complex <double> ***evc;
 };
 
 #endif

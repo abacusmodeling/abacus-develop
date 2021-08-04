@@ -643,7 +643,7 @@ void LCAO_nnr::folding_fixedH(const int &ik)
 					Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 					//const double arg = ( GlobalC::kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * TWO_PI;
-					const complex<double> kphase = complex <double> ( cos(arg),  sin(arg) );
+					const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
 
 					//--------------------------------------------------
 					// calculate how many matrix elements are in 

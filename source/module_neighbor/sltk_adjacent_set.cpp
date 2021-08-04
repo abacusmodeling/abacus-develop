@@ -117,6 +117,6 @@ void AdjacentSet::getBox
 //2015-05-07
 void AdjacentSet::delete_vector(void)
 {
-	vector<int>().swap(box);
-	vector<int>().swap(offset);
+	std::vector<int>().swap(box);
+	std::vector<int>().swap(offset);
 }

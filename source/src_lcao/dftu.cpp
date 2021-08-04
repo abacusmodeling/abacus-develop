@@ -319,10 +319,10 @@ void DFTU::cal_occup_m_k(const int iter)
 	//call PBLAS routine to calculate the product of the S and density matrix
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-	const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+	const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
 
-	vector<complex<double>> srho(GlobalC::ParaO.nloc);
-    vector<complex<double>> Sk(GlobalC::ParaO.nloc);
+	std::vector<std::complex<double>> srho(GlobalC::ParaO.nloc);
+    std::vector<std::complex<double>> Sk(GlobalC::ParaO.nloc);
 	
 	for(int ik=0; ik<GlobalC::kv.nks; ik++)
 	{
@@ -523,7 +523,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0;
 
-	vector<double> srho(GlobalC::ParaO.nloc);
+	std::vector<double> srho(GlobalC::ParaO.nloc);
 	for(int is=0; is<GlobalV::NSPIN; is++)
 	{
 		// srho(mu,nu) = \sum_{iw} S(mu,iw)*dm_gamma(iw,nu)
@@ -1144,7 +1144,7 @@ void DFTU::cal_energy_correction(const int istep)
 	return;
 }
 
-void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double>* eff_pot)
+void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<double>* eff_pot)
 {
 	TITLE("DFTU", "cal_eff_pot_mat");
 
@@ -1160,9 +1160,9 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 	//=============================================================
 	const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-  const complex<double> alpha_c(1.0,0.0), beta_c(0.0,0.0), half_c(0.5,0.0), one_c(1.0,0.0);
+  const std::complex<double> alpha_c(1.0,0.0), beta_c(0.0,0.0), half_c(0.5,0.0), one_c(1.0,0.0);
 
-	vector<complex<double>> VU(GlobalC::ParaO.nloc);
+	std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_complex(spin, 1, &VU[0]);
 
 	pzgemm_(&transN, &transN,
@@ -1207,7 +1207,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, complex<double
 			{
 				int iic = i*NLOCAL + j;
 				int jjc = j*NLOCAL + i;
-				complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
+				std::complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
 				double tmp_norm = sqrt(std::norm(tmp));
 				if(tmp_norm>1.0e-9) pot_Hermitian = false;
 			}
@@ -1245,7 +1245,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 	const int  one_int = 1;
 	const double alpha = 1.0, beta = 0.0, half=0.5, one=1.0;
 
-	vector<double> VU(GlobalC::ParaO.nloc);
+	std::vector<double> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_real(spin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
@@ -1290,7 +1290,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 			{
 				int iic = i*GlobalV::NLOCAL + j;
 				int jjc = j*GlobalV::NLOCAL + i;
-				complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
+				std::complex<double> tmp = pot_eff_k.at(ik).at(iic) - conj(pot_eff_k.at(ik).at(jjc));
 				double tmp_norm = sqrt(std::norm(tmp));
 				if(tmp_norm>1.0e-9) pot_Hermitian = false;
 			}
@@ -1433,7 +1433,7 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 
   for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = 0.0;
 
-  vector<double> VU(GlobalC::ParaO.nloc);
+  std::vector<double> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_real(ispin, 1, &VU[0]);
 
 	pdgemm_(&transN, &transN,
@@ -1457,16 +1457,16 @@ void DFTU::cal_eff_pot_mat_R_double(const int ispin, double* SR, double* HR)
 }
 
 void DFTU::cal_eff_pot_mat_R_complex_double(
-  const int ispin, complex<double>* SR, complex<double>* HR)
+  const int ispin, std::complex<double>* SR, std::complex<double>* HR)
 {
   const char transN = 'N', transT = 'T';
 	const int  one_int = 1;
-	const complex<double> alpha(1.0,0.0), beta(0.0,0.0);
-  const complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
+	const std::complex<double> alpha(1.0,0.0), beta(0.0,0.0);
+  const std::complex<double> zero(0.0,0.0), half(0.5,0.0), one(1.0,0.0);
 
   for(int i=0; i<GlobalC::ParaO.nloc; i++) HR[i] = zero;
 
-  vector<complex<double>> VU(GlobalC::ParaO.nloc);
+  std::vector<std::complex<double>> VU(GlobalC::ParaO.nloc);
   this->cal_VU_pot_mat_complex(ispin, 1, &VU[0]);
 
 	pzgemm_(&transN, &transN,
@@ -1489,7 +1489,7 @@ void DFTU::cal_eff_pot_mat_R_complex_double(
   return;
 }
 
-void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
+void DFTU::folding_overlap_matrix(const int ik, std::complex<double>* Sk)
 {
   TITLE("DFTU","folding_overlap_matrix"); 
 	// timer::tick("DFTU","folding_overlap_matrix");
@@ -1573,7 +1573,7 @@ void DFTU::folding_overlap_matrix(const int ik, complex<double>* Sk)
 					Vector3<double> dR(GlobalC::GridD.getBox(ad).x, GlobalC::GridD.getBox(ad).y, GlobalC::GridD.getBox(ad).z); 
 					const double arg = ( GlobalC::kv.kvec_d[ik] * dR ) * TWO_PI;
 					//const double arg = ( kv.kvec_d[ik] * GlobalC::GridD.getBox(ad) ) * TWO_PI;
-					const complex<double> kphase = complex <double> ( cos(arg),  sin(arg) );
+					const std::complex<double> kphase = std::complex <double> ( cos(arg),  sin(arg) );
 
 					//--------------------------------------------------
 					// calculate how many matrix elements are in 

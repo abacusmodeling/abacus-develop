@@ -169,7 +169,7 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
         for (int I = 0; I < GlobalC::ucell.atoms[T].na; I++)
         {
             //OUT("I",I);
-            complex<double> *sk = GlobalC::wf.get_sk(ik, T, I);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, T, I);
             for (int L=0; L< GlobalC::ucell.atoms[T].nwl+1; L++)
             {
                 GlobalV::ofs_running << " " << setw(5) << ik+1
@@ -178,7 +178,7 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
 							<< setw(8) << L
 							<< std::endl;
                 //OUT("l",l);
-                complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
+                std::complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
                 for (int ie=0; ie < this->bessel_basis.get_ecut_number(); ie++)
                 {
                     const int N = 0;
@@ -188,11 +188,11 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
                         const int lm = L*L+m;
                         for (int ib=0; ib<GlobalV::NBANDS; ib++)
                         {
-                            complex<double> overlap_tmp = ZERO;
+                            std::complex<double> overlap_tmp = ZERO;
                             for (int ig=0; ig<np; ig++)
                             {
-//                              const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
-                                const complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq(L,ie,ig) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
+//                              const std::complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq[ig];
+                                const std::complex<double> local_tmp = lphase * sk[ig] * ylm(lm, ig) * flq(L,ie,ig) * pow(gk[ig].norm2(),derivative_order);		// Peize Lin add for dpsi 2020.04.23
                                 overlap_tmp += conj( local_tmp ) * psi(ib, ig); // psi is bloch orbitals
                             }
                             overlap_Q(ib, this->mu_index[T](I, L, N, m), ie) = overlap_tmp;
@@ -246,15 +246,15 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
     {
         for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++) // 1.2
         {
-            complex<double> *sk1 = GlobalC::wf.get_sk(ik, T1, I1);
+            std::complex<double> *sk1 = GlobalC::wf.get_sk(ik, T1, I1);
             for (int T2=0; T2<GlobalC::ucell.ntype; T2++) // 2.1
             {
                 for (int I2=0; I2<GlobalC::ucell.atoms[T2].na; I2++) // 2.2
                 {
-                    complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2);
+                    std::complex<double> *sk2 = GlobalC::wf.get_sk(ik, T2, I2);
                     for (int l1 = 0; l1 < GlobalC::ucell.atoms[T1].nwl+1; l1++) // 1.3
                     {
-                        const complex<double> lphase1 = normalization * pow(IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
+                        const std::complex<double> lphase1 = normalization * pow(IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
                         for (int l2 = 0; l2 < GlobalC::ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
                             GlobalV::ofs_running << " " << setw(5)
@@ -266,7 +266,7 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
                                 << I2+1 << setw(8)
                                 << l2 << setw(8) << std::endl;
 
-                            const complex<double> lphase2 = pow(IMAG_UNIT, l2);
+                            const std::complex<double> lphase2 = pow(IMAG_UNIT, l2);
                             for (int ic1=0; ic1 < GlobalC::ucell.nmax; ic1++) // 1.5
                             {
                                 for (int ic2=0; ic2 < GlobalC::ucell.nmax; ic2++) // 2.5
@@ -287,7 +287,7 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
                                             const int iwt2 = this->mu_index[T2](I2,l2,ic2,m2);
                                             for (int ig=0; ig<np; ig++)
                                             {
-                                                const complex<double> about_ig3= lphase2 * sk2[ig] * ylm(lm2, ig)
+                                                const std::complex<double> about_ig3= lphase2 * sk2[ig] * ylm(lm2, ig)
                                                                                  * about_ig[ig];
 
                                                 for (int ie1=0; ie1 < enumber; ie1++) // 1.4
@@ -418,11 +418,11 @@ void Numerical_Basis::numerical_atomic_wfc(
         for (int ia = 0; ia < GlobalC::ucell.atoms[it].na; ia++)
         {
             //OUT("ia",ia);
-            complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
+            std::complex<double> *sk = GlobalC::wf.get_sk(ik, it, ia);
             for (int l = 0; l < GlobalC::ucell.atoms[it].nwl+1; l++)
             {
                 //OUT("l",l);
-                complex<double> lphase = pow(IMAG_UNIT, l);
+                std::complex<double> lphase = pow(IMAG_UNIT, l);
                 for (int ic=0; ic < GlobalC::ucell.atoms[it].l_nchi[l]; ic++)
                 {
                     //OUT("ic",ic);

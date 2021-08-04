@@ -15,9 +15,9 @@
 class Exx_Abfs::PCA
 {
 public:
-	static vector<vector<pair<vector<double>,matrix>>> cal_PCA( 
-		const vector<vector<vector<Numerical_Orbital_Lm>>> &lcaos, 
-		const vector<vector<vector<Numerical_Orbital_Lm>>> &abfs,		// abfs must be orthonormal
+	static std::vector<std::vector<pair<std::vector<double>,matrix>>> cal_PCA( 
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &lcaos, 
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs,		// abfs must be orthonormal
 		const double kmesh_times );
 private:
 	static matrix get_sub_matrix( 

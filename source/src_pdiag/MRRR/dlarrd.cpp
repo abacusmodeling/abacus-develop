@@ -326,7 +326,7 @@ static int c__0 = 0;
 		}
 		return 0;
 	}
-	/*     NB is the minimum vector length for vector bisection, or 0 */
+	/*     NB is the minimum std::vector length for std::vector bisection, or 0 */
 	/*     if only scalar is to be done. */
 	nb = pilaenv(&c__1, "DSTEBZ", " ", n, &c_n1, &c_n1, &c_n1);
 	if (nb <= 1) {

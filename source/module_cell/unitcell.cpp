@@ -159,7 +159,7 @@ void UnitCell::print_cell(ofstream &ofs, output &outp)const
     OUT(ofs,"omega",omega);
 
     outp.printM3(ofs,"Lattices Vector (R) : ", latvec);
-    outp.printM3(ofs ,"Supercell lattice vector : ", latvec_supercell);
+    outp.printM3(ofs ,"Supercell lattice std::vector : ", latvec_supercell);
     outp.printM3(ofs, "Reciprocal lattice Vector (G): ", G);
     outp.printM3(ofs, "GGT : ", GGT);
 

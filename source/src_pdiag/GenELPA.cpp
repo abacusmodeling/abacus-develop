@@ -38,28 +38,28 @@
 //  Method  Step    Function                                    Description
 //  1   1       p?potrf                                     cholesky decomposing B to U
 //  1   2   for-cycle                                   clear_lower_part
-//  1       3       elpa_invert_trm_[real|complex]              invert U to U^-1
+//  1       3       elpa_invert_trm_[real|std::complex]              invert U to U^-1
 //  1       4       p?symm                                      calculating A*U-1
 //  1       5       p?gemm                                      calculating U-^*A*U-1
-//  1       6       elpa_solve_evp_[real|complex]_[1|2]stage    solve eigenvalue
+//  1       6       elpa_solve_evp_[real|std::complex]_[1|2]stage    solve eigenvalue
 //  1       7       p?trmm                                      calculating eigenvector
 //
-//  2       1       elpa_cholesky_[real|complex]                cholesky decomposing B to U
+//  2       1       elpa_cholesky_[real|std::complex]                cholesky decomposing B to U
 //  2   2     for-cycle                     clear_lower_part
-//  2       3       elpa_invert_trm_[real|complex]              invert U to U^-1
+//  2       3       elpa_invert_trm_[real|std::complex]              invert U to U^-1
 //  2       4       p?symm                                      calculating A*U-1
 //  2       5       p?gemm                                      calculating U-^*A*U-1
-//  2       6       elpa_solve_evp_[real|complex]_[1|2]stage    solve eigenvalue
+//  2       6       elpa_solve_evp_[real|std::complex]_[1|2]stage    solve eigenvalue
 //  2       7       p?trmm                                      calculating eigenvector
 //
-//  3       1       elpa_solve_evp_[real|complex]_[1|2]stage    calculating eigenvalue and eigenvector of B
+//  3       1       elpa_solve_evp_[real|std::complex]_[1|2]stage    calculating eigenvalue and eigenvector of B
 //  3   2       for-cycle                       calculating q*ev
 //  3       3       p?gemm                                      calculating B^-1/2
 //  3       4       p?gemm                                      calculating B*A^T
 //  3       5       p?gemm                                      calculating B*(B*A^T)^T
-//  3       6       elpa_solve_evp_[real|complex]_[1|2]stage    solve eigenvalue
+//  3       6       elpa_solve_evp_[real|std::complex]_[1|2]stage    solve eigenvalue
 //  3       7       p?gemm                                      calculating eigenvector
-// ?: d for double precision, z for double complex precision
+// ?: d for double precision, z for double std::complex precision
 //====================================8<----------------------------------------
 #include <complex>
 #include <cmath>
@@ -1035,7 +1035,7 @@ int pdSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
 
 
 int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
-                     complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                     std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                      MPI_Comm mpi_comm_world, int my_blacs_ctxt,
                      int &method,
                      bool wantEigenVector, bool wantDebug)
@@ -1090,7 +1090,7 @@ int pzSolveGenEigen1(int nev, int nFull, int narows, int nacols, int *desc,
 }
 
 int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
-                     complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                     std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                      MPI_Comm mpi_comm_world, int my_blacs_ctxt,
                      int &method, int THIS_REAL_ELPA_KERNEL_API,
                      bool wantEigenVector, bool wantDebug)
@@ -1145,7 +1145,7 @@ int pzSolveGenEigen2(int nev, int nFull, int narows, int nacols, int *desc,
 }
 
 int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
-                           complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                           std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                            MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                            int &method)
 {
@@ -1219,7 +1219,7 @@ int pzDecomposeRightMatrix1(int nFull, int narows, int nacols, int *desc,
 }
 
 int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-                           complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                           std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                            MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                            int &method, int THIS_REAL_ELPA_KERNEL_API)
 {
@@ -1289,7 +1289,7 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
                                            mpi_comm_world, mpi_comm_rows, mpi_comm_cols,
                                            THIS_REAL_ELPA_KERNEL_API);
 //						int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-//						                              complex<doubles> *b, double *ev, complex<double> *q, complex<double> *work,
+//						                              std::complex<doubles> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
 //						                              MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
 //						                              int THIS_REAL_ELPA_KERNEL_API);
             #ifdef _DEBUG
@@ -1302,7 +1302,7 @@ int pzDecomposeRightMatrix2(int nFull, int narows, int nacols, int *desc,
     return info;
 }
 
-int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc, complex<double> *b,
+int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc, std::complex<double> *b,
                                    MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                                    int &method,
                                    bool wantDebug)
@@ -1455,7 +1455,7 @@ int pzCheloskyDecomposeRightMatrix(int nFull, int narows, int nacols, int *desc,
 
 
 int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
-                              complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                              std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                               int mpi_comm_rows, int mpi_comm_cols)
 {
     int info;
@@ -1536,7 +1536,7 @@ int pzDiagonalizeRightMatrix1(int nFull, int narows, int nacols, int *desc,
 }
 
 int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
-                              complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                              std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                               MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols,
                               int THIS_REAL_ELPA_KERNEL_API)
 {
@@ -1620,7 +1620,7 @@ int pzDiagonalizeRightMatrix2(int nFull, int narows, int nacols, int *desc,
 }
 
 int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
-                 complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                 std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                  int mpi_comm_rows, int mpi_comm_cols, int method,
                  bool wantEigenVector, bool wantDebug)
 {
@@ -1790,7 +1790,7 @@ int pzSolveEigen1(int nev, int nFull, int narows, int nacols, int *desc,
 }
 
 int pzSolveEigen2(int nev, int nFull, int narows, int nacols, int *desc,
-                 complex<double> *a, complex<double> *b, double *ev, complex<double> *q, complex<double> *work,
+                 std::complex<double> *a, std::complex<double> *b, double *ev, std::complex<double> *q, std::complex<double> *work,
                  MPI_Comm mpi_comm_world, int mpi_comm_rows, int mpi_comm_cols, int method,
                  int THIS_REAL_ELPA_KERNEL_API,
                  bool wantEigenVector, bool wantDebug)

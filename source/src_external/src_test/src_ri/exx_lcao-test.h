@@ -5,7 +5,7 @@
 #include "../../../module_base/complexmatrix.h"
 #include "../src_global/complexmatrix-test.h"
 #include "../src_global/matrix-test.h"
-#include<map>
+#include <map>
 #include<string>
 #include<memory>
 #include<fstream>
@@ -38,13 +38,13 @@ inline size_t get_sizeof( const shared_ptr<matrix> & m ){	return sizeof(matrix)+
 inline size_t get_sizeof( const shared_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m->nr*m->nc; }
 inline size_t get_sizeof( const weak_ptr<matrix> & m ){	return sizeof(matrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
 inline size_t get_sizeof( const weak_ptr<ComplexMatrix> & m ){	return sizeof(ComplexMatrix)+sizeof(double)*m.lock()->nr*m.lock()->nc; }
-template<typename T> static size_t get_sizeof( const vector<T> & v )
+template<typename T> static size_t get_sizeof( const std::vector<T> & v )
 {
 	size_t length = sizeof(T)*v.size();
 	for( const T & i : v )	length+=get_sizeof(i);
 	return length;
 }
-template<typename T1,typename T2> static size_t get_sizeof( const map<T1,T2> & m )
+template<typename T1,typename T2> static size_t get_sizeof( const std::map<T1,T2> & m )
 {
 	size_t length = (sizeof(T1)+sizeof(T2))*m.size();
 	for( const auto & i : m )	length+=get_sizeof(i.second);
@@ -54,7 +54,7 @@ template<typename T1,typename T2> static size_t get_sizeof( const map<T1,T2> & m
 
 
 template<typename T1,typename T2>
-static void ofs_matrixes( const string & file_name, const map<T1,T2> &ms, const bool flag_print_content=true )
+static void ofs_matrixes( const string & file_name, const std::map<T1,T2> &ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	for( const auto &m : ms )
@@ -69,7 +69,7 @@ static void ofs_matrixes( const string & file_name, const map<T1,T2> &ms, const 
 	ofs.close();
 }
 template<typename T>
-static void ofs_matrixes( const string & file_name, const vector<T> &ms, const bool flag_print_content=true )
+static void ofs_matrixes( const string & file_name, const std::vector<T> &ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	for( size_t i=0; i<ms.size(); ++i )
@@ -116,7 +116,7 @@ static void ofs_matrixes( const string & file_name, const ComplexMatrix & ms, co
 
 /*
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,weak_ptr<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,weak_ptr<M>>>> & ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	for( const auto &m1 : ms )
@@ -142,7 +142,7 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,w
 }
 
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,shared_ptr<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,shared_ptr<M>>>> & ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	for( const auto &m1 : ms )
@@ -168,7 +168,7 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,s
 }
 
 template<typename T1, typename T2, typename M>
-static void ofs_matrixes( const string & file_name, const map<T1,map<T2,vector<M>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::vector<M>>> & ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	for( const auto &m1 : ms )
@@ -193,7 +193,7 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,vector<M
 }
 
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,vector<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,std::vector<M>>>> & ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	for( const auto &m1 : ms )
@@ -222,7 +222,7 @@ static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,v
 }
 
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const map<T1,map<T2,map<T3,M>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,M>>> & ms, const bool flag_print_content=true )
 {
 	ofstream ofs(file_name,ofstream::app);
 	for( const auto &m1 : ms )

@@ -312,23 +312,23 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 void Epsilon0_pwscf:: Init()
 {
     
-	dipole_aux = new complex<double>**[3];
+	dipole_aux = new std::complex<double>**[3];
 	for(int i=0; i<3; i++)
 	{
-		dipole_aux[i] = new complex<double>*[GlobalV::NBANDS];
+		dipole_aux[i] = new std::complex<double>*[GlobalV::NBANDS];
 		for(int j=0; j<GlobalV::NBANDS; j++)
 		{
-			dipole_aux[i][j] = new complex<double>[GlobalV::NBANDS];
+			dipole_aux[i][j] = new std::complex<double>[GlobalV::NBANDS];
 		}
 	}
 	
-	dipole = new complex<double>**[9];
+	dipole = new std::complex<double>**[9];
 	for(int i=0; i<9; i++)
 	{
-		dipole[i] = new complex<double>*[GlobalV::NBANDS];
+		dipole[i] = new std::complex<double>*[GlobalV::NBANDS];
 		for(int j=0; j<GlobalV::NBANDS; j++)
 		{
-			dipole[i][j] = new complex<double>[GlobalV::NBANDS];
+			dipole[i][j] = new std::complex<double>[GlobalV::NBANDS];
 		}
 	}
 	
@@ -404,13 +404,13 @@ double Epsilon0_pwscf:: focc(int ib, int ik)
 void Epsilon0_pwscf:: Cal_dipole(int ik)
 {
 	
-	complex<double> dipole_aux_core[3][GlobalV::NBANDS][GlobalV::NBANDS];
+	std::complex<double> dipole_aux_core[3][GlobalV::NBANDS][GlobalV::NBANDS];
 	
 	for(int i=0; i<3; i++)
 		for(int ib1=0; ib1<GlobalV::NBANDS; ib1++)
 			for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 			{
-				dipole_aux_core[i][ib1][ib2] = complex<double>(0.0,0.0);
+				dipole_aux_core[i][ib1][ib2] = std::complex<double>(0.0,0.0);
 			}
 	
 	
@@ -471,7 +471,7 @@ void Epsilon0_pwscf:: Cal_dipole(int ik)
 		for(int ib1=0; ib1<GlobalV::NBANDS; ib1++)
 			for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 			{
-				dipole_aux[i][ib1][ib2] = complex<double>( dipole_aux_R[i][ib1][ib2], dipole_aux_I[i][ib1][ib2]);
+				dipole_aux[i][ib1][ib2] = std::complex<double>( dipole_aux_R[i][ib1][ib2], dipole_aux_I[i][ib1][ib2]);
 			}
 			
 	

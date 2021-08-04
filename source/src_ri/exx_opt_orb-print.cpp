@@ -4,8 +4,8 @@
 
 void Exx_Opt_Orb::print_matrix(
 	const string &file_name,
-	const vector<matrix> &matrix_Q, 
-	const vector<vector<matrix>> &matrix_S,
+	const std::vector<matrix> &matrix_Q, 
+	const std::vector<std::vector<matrix>> &matrix_S,
 	const matrix &matrix_V,
 	const size_t TA, const size_t IA, const size_t TB, const size_t IB,
 	const Element_Basis_Index::Range &range_jles, 

@@ -734,7 +734,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
 {
     TITLE("PW_Basis","setup_structure_factor");
     timer::tick("PW_Basis","setup_struc_factor");
-    const complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
+    const std::complex<double> ci_tpi = NEG_IMAG_UNIT * TWO_PI;
 
     this->strucFac.create(Ucell->ntype, this->ngmc);
     Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");
@@ -752,7 +752,7 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
         for (int ig=0; ig<this->ngmc; ig++)
         {
 			const Vector3<double> gcar_ig = gcar[ig];
-            complex<double> sum_phase = ZERO;
+            std::complex<double> sum_phase = ZERO;
             for (int ia=0; ia<na; ia++)
             {
                 // e^{-i G*tau}

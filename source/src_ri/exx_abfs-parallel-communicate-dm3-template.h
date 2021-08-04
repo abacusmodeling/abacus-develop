@@ -15,8 +15,8 @@ matrix Exx_Abfs::Parallel::Communicate::DM3::D_phase(
 }
 
 
-template<typename Tmatrix> vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>>
-Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<Tmatrix> &DK_2D, const double threshold_D) const
+template<typename Tmatrix> std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
+Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const std::vector<Tmatrix> &DK_2D, const double threshold_D) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::K_to_R");
 
@@ -26,22 +26,22 @@ Exx_Abfs::Parallel::Communicate::DM3::K_to_R(const vector<Tmatrix> &DK_2D, const
 		ofs<<DK_2D<<std::endl;
 	}*/
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DR_a2D(GlobalV::NSPIN);
 	
-	const map<int,int> nspin_2D = {{1,1}, {2,2}, {4,1}};
-	const map<int,double> SPIN_multiple = {{1,0.5}, {2,1}, {4,1}};							// ???
+	const std::map<int,int> nspin_2D = {{1,1}, {2,2}, {4,1}};
+	const std::map<int,double> SPIN_multiple = {{1,0.5}, {2,1}, {4,1}};							// ???
 	const Abfs::Vector3_Order<int> Born_von_Karman_period = Vector3<int>{GlobalC::kv.nmp[0],GlobalC::kv.nmp[1],GlobalC::kv.nmp[2]};
-	const vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
+	const std::vector<Abfs::Vector3_Order<int>> supercell_boxes = Abfs::get_Born_von_Karmen_boxes(Born_von_Karman_period);
 	for(const Abfs::Vector3_Order<int> &box2 : supercell_boxes)
 	{
-		vector<matrix> DR_2D( nspin_2D.at(GlobalV::NSPIN),
+		std::vector<matrix> DR_2D( nspin_2D.at(GlobalV::NSPIN),
 			{DK_2D[0].nr, DK_2D[0].nc} );
 		for(int ik=0; ik!=DK_2D.size(); ++ik)
 			DR_2D[GlobalC::kv.isk[ik]] += D_phase( DK_2D[ik], ik, box2);
 		
 		// C++: 0 1
 		//      2 3
-		vector<map<size_t,map<size_t,matrix>>> DR_a2D_box2(GlobalV::NSPIN);
+		std::vector<std::map<size_t,std::map<size_t,matrix>>> DR_a2D_box2(GlobalV::NSPIN);
 		for(int is_2D=0; is_2D!=nspin_2D.at(GlobalV::NSPIN); ++is_2D)
 		{
 			for(int iwt1_local=0; iwt1_local!=DR_2D[is_2D].nr; ++iwt1_local)

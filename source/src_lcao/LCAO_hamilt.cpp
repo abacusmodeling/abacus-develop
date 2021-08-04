@@ -245,7 +245,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 
 	//------------------------------------------
 	// Add T(k)+Vnl(k)+Vlocal(k)
-	// (Hloc2 += Hloc_fixed2), (complex matrix)
+	// (Hloc2 += Hloc_fixed2), (std::complex matrix)
 	//------------------------------------------
 //	std::cout << " Folding matrix here." << std::endl;
 	GlobalC::LM.update_Hloc2();
@@ -603,16 +603,16 @@ void LCAO_Hamilt::calculate_STN_R_sparse(const double &sparse_threshold)
                             }
                             else
                             {
-								complex<double> temp_value = GlobalC::LM.SlocR_soc[index];
+								std::complex<double> temp_value = GlobalC::LM.SlocR_soc[index];
 								if(abs(temp_value) > sparse_threshold)
 								{
-									GlobalC::LM.SR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, complex<double>>(iw2_all, temp_value));
+									GlobalC::LM.SR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, std::complex<double>>(iw2_all, temp_value));
 								}
 
 								temp_value = GlobalC::LM.Hloc_fixedR_soc[index];
 								if(abs(temp_value) > sparse_threshold)
 								{
-									GlobalC::LM.HR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, complex<double>>(iw2_all, temp_value));
+									GlobalC::LM.HR_soc_sparse[R_x][R_y][R_z][iw1_all].insert(pair<size_t, std::complex<double>>(iw2_all, temp_value));
 								}
                             }
 
@@ -676,8 +676,8 @@ void LCAO_Hamilt::calculat_HR_dftu_sparse(const int &current_spin, const double 
         {
             for(int iz=0; iz<R_z; iz++)
             {	
-				map<size_t, map<size_t, double>> &temp_HR_sparse = GlobalC::LM.HR_sparse[ix][iy][iz];
-				map<size_t, map<size_t, double>> &temp_SR_sparse = GlobalC::LM.SR_sparse[ix][iy][iz];
+				std::map<size_t, std::map<size_t, double>> &temp_HR_sparse = GlobalC::LM.HR_sparse[ix][iy][iz];
+				std::map<size_t, std::map<size_t, double>> &temp_SR_sparse = GlobalC::LM.SR_sparse[ix][iy][iz];
 
 				ZEROS(HR_tmp, GlobalC::ParaO.nloc);
 				ZEROS(SR_tmp, GlobalC::ParaO.nloc);
@@ -761,8 +761,8 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
     double R_minY = GlobalC::GridD.getD_minY();
     double R_minZ = GlobalC::GridD.getD_minZ();
 
-	complex<double> *HR_soc_tmp = new complex<double>[GlobalC::ParaO.nloc];
-	complex<double> *SR_soc_tmp = new complex<double>[GlobalC::ParaO.nloc];
+	std::complex<double> *HR_soc_tmp = new std::complex<double>[GlobalC::ParaO.nloc];
+	std::complex<double> *SR_soc_tmp = new std::complex<double>[GlobalC::ParaO.nloc];
 
 	int ir;
 	int ic;
@@ -774,8 +774,8 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
         {
             for(int iz=0; iz<R_z; iz++)
             {
-				map<size_t, map<size_t, complex<double>>> &temp_HR_soc_sparse = GlobalC::LM.HR_soc_sparse[ix][iy][iz];
-				map<size_t, map<size_t, complex<double>>> &temp_SR_soc_sparse = GlobalC::LM.SR_soc_sparse[ix][iy][iz];
+				std::map<size_t, std::map<size_t, std::complex<double>>> &temp_HR_soc_sparse = GlobalC::LM.HR_soc_sparse[ix][iy][iz];
+				std::map<size_t, std::map<size_t, std::complex<double>>> &temp_SR_soc_sparse = GlobalC::LM.SR_soc_sparse[ix][iy][iz];
 
 				ZEROS(HR_soc_tmp, GlobalC::ParaO.nloc);
 				ZEROS(SR_soc_tmp, GlobalC::ParaO.nloc);
@@ -821,7 +821,7 @@ void LCAO_Hamilt::calculat_HR_dftu_soc_sparse(const int &current_spin, const dou
 
 								if (abs(HR_soc_tmp[iic]) > sparse_threshold)
 								{
-									complex<double> &value = temp_HR_soc_sparse[i][j];
+									std::complex<double> &value = temp_HR_soc_sparse[i][j];
 									value += HR_soc_tmp[iic];
 									if (abs(value) < sparse_threshold)
 									{

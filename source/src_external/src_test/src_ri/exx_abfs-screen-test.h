@@ -5,7 +5,7 @@
 #include <string>
 #include "../../../src_ri/abfs.h"
 
-static void test_screen( const string & file_name, const map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,double>>> & m )
+static void test_screen( const string & file_name, const std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,double>>> & m )
 {
 	ofstream ofs(file_name);
 	for( const auto m1 : m )

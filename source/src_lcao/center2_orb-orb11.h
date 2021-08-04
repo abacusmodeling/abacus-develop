@@ -6,9 +6,9 @@
 #ifndef CENTER2_ORB_ORB11_H
 #define CENTER2_ORB_ORB11_H
 
-#include<vector>
+#include <vector>
 using std::vector;
-#include<map>
+#include <map>
 using std::map;
 #include<set>
 using std::set;
@@ -46,8 +46,8 @@ class Center2_Orb::Orb11
 	const ORB_table_phi &MOT;
 	const ORB_gaunt_table &MGT;	
 
-	map<int,vector<double>> Table_r;									// unit: Bohr/MOT.dr
-	map<int,vector<double>> Table_dr;
+	std::map<int,std::vector<double>> Table_r;									// unit: Bohr/MOT.dr
+	std::map<int,std::vector<double>> Table_dr;
 };
 
 // this->Table_r[LAB][ir]

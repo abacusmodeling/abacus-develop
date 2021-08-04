@@ -43,10 +43,10 @@ class LCAO_Matrix
 	// these matrix are used to
 	// diagonalize.
 	//------------------------------
-	complex<double> *Hloc2;
-	complex<double> *Sloc2;
-	complex<double> *Hloc_fixed2;
-	complex<double> *Sdiag2; // used in pdiag_double.cpp
+	std::complex<double> *Hloc2;
+	std::complex<double> *Sloc2;
+	std::complex<double> *Hloc_fixed2;
+	std::complex<double> *Sdiag2; // used in pdiag_double.cpp
 	//with soc, zhengdy-soc
 /*	ComplexMatrix Hloc2_soc;
 	ComplexMatrix Sloc2_soc;
@@ -67,24 +67,24 @@ class LCAO_Matrix
 	double* SlocR;
 	double* Hloc_fixedR;
 	//with soc, zhengdy-soc
-	complex<double>* HlocR_soc;
-	complex<double>* SlocR_soc;
-	complex<double>* Hloc_fixedR_soc;
+	std::complex<double>* HlocR_soc;
+	std::complex<double>* SlocR_soc;
+	std::complex<double>* Hloc_fixedR_soc;
 	//LiuXh add 2019-07-15
 	double ****Hloc_fixedR_tr;
 	double ****SlocR_tr;
 	double ****HR_tr;
-	complex<double> ****Hloc_fixedR_tr_soc;
-	complex<double> ****SlocR_tr_soc;
-	complex<double> ****HR_tr_soc;	
+	std::complex<double> ****Hloc_fixedR_tr_soc;
+	std::complex<double> ****SlocR_tr_soc;
+	std::complex<double> ****HR_tr_soc;	
 
 
 	// jingan add 2021-6-4
 	// Sparse form of HR and SR, the format is [R_x][R_y][R_z][orbit_row][orbit_col]
-	map<size_t, map<size_t, double>> ***HR_sparse;
-	map<size_t, map<size_t, double>> ***SR_sparse;
-	map<size_t, map<size_t, complex<double>>> ***HR_soc_sparse;
-	map<size_t, map<size_t, complex<double>>> ***SR_soc_sparse;
+	std::map<size_t, std::map<size_t, double>> ***HR_sparse;
+	std::map<size_t, std::map<size_t, double>> ***SR_sparse;
+	std::map<size_t, std::map<size_t, std::complex<double>>> ***HR_soc_sparse;
+	std::map<size_t, std::map<size_t, std::complex<double>>> ***SR_soc_sparse;
 
 
 	//========================================
@@ -148,7 +148,7 @@ class LCAO_Matrix
 
 
 	void set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype);
-	void set_HSk(const int &iw1_all, const int &iw2_all, const complex<double> &v, const char &dtype, const int spin = 0);
+	void set_HSk(const int &iw1_all, const int &iw2_all, const std::complex<double> &v, const char &dtype, const int spin = 0);
 
 	void set_force (const int& iw1_all, const int& iw2_all, const double& vx, const double& vy, 
 		const double& vz, const char &dtype);
@@ -157,7 +157,7 @@ class LCAO_Matrix
 
 	void set_HR_tr(const int &Rx, const int &Ry, const int &Rz, const int &iw1_all, const int &iw2_all, const double &v);
 	void set_HR_tr_soc(const int &Rx, const int &Ry, const int &Rz, 
-		const int &iw1_all, const int &iw2_all, const complex<double> &v); //LiuXh add 2019-07-16
+		const int &iw1_all, const int &iw2_all, const std::complex<double> &v); //LiuXh add 2019-07-16
 
 	void zeros_HSgamma(const char &mtype);
 	void zeros_HSk(const char &mtype);

@@ -113,12 +113,12 @@ public:
 	// mohan add 2008-4-2
     int ngmc_g; // global ngmc (total number of G vectors)
     int ngmc; // num. of G vectors within ggchg in each proc.
-	// map: 1D G vector -> charge in FFT grid 
+	// std::map: 1D G std::vector -> charge in FFT grid 
     int *ig2fftc; // dimension: [ngmc]
 
 	// PW_complement::get_ngmw(ngmc, ggwfc2, gg_global, ngmw);
     int ngmw; // num. of G vectors within ggwfc2 in each proc.
-	// map: 1D G vector -> wave function in FFT grid
+	// std::map: 1D G std::vector -> wave function in FFT grid
     int *ig2fftw; // dimension: [ngmw]
 
 	// structure factor (ntype, ngmc)
@@ -142,7 +142,7 @@ private:
 public:
     Vector3<double> *gdirect;		//(= *G1d) ; // ig = new Vector igc[ngmc],
     Vector3<double> *gdirect_global;	//(= *G1d) ; // ig = new Vector igc[ngmc],
-    // store the 3D G vector coordinates for charge density grid;
+    // store the 3D G std::vector coordinates for charge density grid;
     // ig.x, ig.y, ig.z should be integers !!!
     // G vectors are in order of increasing G^2
     // can be shared by charge density/potential and wave functions.
@@ -229,7 +229,7 @@ public:
     int nggm;
     double *ggs;	// store |G|^2 for each shell
     int *ig2ngg;	// dimension [ngmc], index from ngmc to nggm
-    int gstart;		// first nonzero g vector
+    int gstart;		// first nonzero g std::vector
 
 private:
     void get_nggm(const int ngmc_local);

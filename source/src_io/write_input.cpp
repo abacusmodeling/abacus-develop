@@ -298,7 +298,7 @@ void Input::Print(const string &fn)const
 	
 	ofs << "\n#Parameters (18.berry_wannier)" << std::endl;
 	OUTP(ofs,"berry_phase",berry_phase,"calculate berry phase or not");
-	OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice vector");
+	OUTP(ofs,"gdir",gdir,"calculate the polarization in the direction of the lattice std::vector");
 	OUTP(ofs,"towannier90",towannier90,"use wannier90 code interface or not");
 	OUTP(ofs,"nnkpfile",NNKP,"the wannier90 code nnkp file name");
 	OUTP(ofs,"wannier_spin",wannier_spin,"calculate spin in wannier90 code interface");

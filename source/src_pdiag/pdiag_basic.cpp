@@ -727,7 +727,7 @@ MPI_Barrier(comm);
     return;
 }
 
-void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,complex<double> *Z, const int &ik)
+void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,std::complex<double> **cc,std::complex<double> *Z, const int &ik)
 {
     TITLE("Pdiag_Basic","gath_eig_complex");
     time_t time_start = time(NULL);
@@ -739,7 +739,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
     MPI_Comm_size(comm,&nprocs);
     MPI_Comm_rank(comm,&myid);
 
-    complex<double> **ctot;
+    std::complex<double> **ctot;
 
 	// mohan add 2010-07-03
 	// the occupied bands are useless
@@ -754,10 +754,10 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
 	// GlobalV::NBANDS * GlobalV::NLOCAL	
 	if(GlobalV::DRANK==0)
 	{
-		ctot = new complex<double>*[GlobalV::NBANDS];
+		ctot = new std::complex<double>*[GlobalV::NBANDS];
     	for (int i=0; i<GlobalV::NBANDS; i++)
     	{
-        	ctot[i] = new complex<double>[GlobalV::NLOCAL];
+        	ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
         	ZEROS(ctot[i], GlobalV::NLOCAL);
     	}
     	Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
@@ -819,7 +819,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
             for (j=0; j<mpi_times; j++)
             {
                 int tag = j;
-                complex<double> *send = new complex<double>[n];
+                std::complex<double> *send = new std::complex<double>[n];
                 int count = 0;
 
                 for (int m=0; m<rows*n; m++)
@@ -844,7 +844,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
             int col=0;
             for (j=0; j<mpi_times; j++)
             {
-                complex<double> *ctmp = new complex<double>[GlobalV::NLOCAL];
+                std::complex<double> *ctmp = new std::complex<double>[GlobalV::NLOCAL];
                 ZEROS(ctmp, GlobalV::NLOCAL);
                 int tag = j;
                 
@@ -891,7 +891,7 @@ void Pdiag_Basic::gath_eig_complex(MPI_Comm comm,int n,complex<double> **cc,comp
 	// to give reports to it.
 	// mohan add 2012-01-09
 	// 
-	// for complex
+	// for std::complex
 	// mohan update 2021-02-12, delete BFIELD option
 	WF_Local::distri_lowf_aug_complex( ctot, GlobalC::LOWF.WFC_K_aug[ik]); //mohan add 2012-01-09 
 	
@@ -1019,7 +1019,7 @@ void Pdiag_Basic::gath_full_eig(MPI_Comm comm,int n,double **c,double *Z)
     return;
 }
 
-void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c,complex<double> *Z)
+void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,std::complex<double> **c,std::complex<double> *Z)
 {
     TITLE("Pdiag_Basic","gath_full_eig_complex");
 
@@ -1072,7 +1072,7 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c,
 			{
 				int tag = j;
 
-				complex<double> *send = new complex<double>[n];
+				std::complex<double> *send = new std::complex<double>[n];
 
 				int count = 0;
 				for (int m=0; m<rows*n; m++)
@@ -1094,7 +1094,7 @@ void Pdiag_Basic::gath_full_eig_complex(MPI_Comm comm,int n,complex<double> **c,
 			int col=0;
 			for (j=0; j<mpi_times; j++)
 			{
-				complex<double> *ctmp = new complex<double>[n];
+				std::complex<double> *ctmp = new std::complex<double>[n];
 				ZEROS(ctmp, n);
 				int tag = j;
 				MPI_Recv(ctmp,n,mpicomplex,i,tag,comm,&status);

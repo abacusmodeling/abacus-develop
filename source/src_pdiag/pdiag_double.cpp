@@ -265,8 +265,8 @@ inline int q2WFC_complex(
 	int dim1,
 	int iprow,
 	int ipcol,
-	complex<double>* work,
-	complex<double>** WFC)
+	std::complex<double>* work,
+	std::complex<double>** WFC)
 {
     for(int j=0; j<naroc[1]; ++j)
     {
@@ -292,9 +292,9 @@ inline int q2WFC_WFCAUG_complex(
 	int dim1,
 	int iprow,
 	int ipcol,
-	complex<double>* work,
-	complex<double>** WFC,
-	complex<double>** WFCAUG)
+	std::complex<double>* work,
+	std::complex<double>** WFC,
+	std::complex<double>** WFCAUG)
 {
     for(int j=0; j<naroc[1]; ++j)
     {
@@ -326,9 +326,9 @@ inline int q2WFC_CTOT_complex(
 	int dim1,
 	int iprow,
 	int ipcol,
-	complex<double>* work,
-	complex<double>** WFC,
-	complex<double>** CTOT)
+	std::complex<double>* work,
+	std::complex<double>** WFC,
+	std::complex<double>** CTOT)
 {
     for(int j=0; j<naroc[1]; ++j)
     {
@@ -356,10 +356,10 @@ inline int q2WFC_WFCAUG_CTOT_complex(
 	int dim1,
 	int iprow,
 	int ipcol,
-	complex<double>* work,
-	complex<double>** WFC,
-	complex<double>** WFCAUG,
-	complex<double>** CTOT)
+	std::complex<double>* work,
+	std::complex<double>** WFC,
+	std::complex<double>** WFCAUG,
+	std::complex<double>** CTOT)
 {
     for(int j=0; j<naroc[1]; ++j)
     {
@@ -742,12 +742,12 @@ void Pdiag_Double::diago_double_begin(
 		memcpy( wfc_2d.c, h_mat, sizeof(double)*this->ncol*this->nrow );
 		matrix s_tmp(this->ncol, this->nrow, false);
 		memcpy( s_tmp.c, s_mat, sizeof(double)*this->ncol*this->nrow );
-		vector<double> ekb_tmp(GlobalV::NLOCAL,0);
+		std::vector<double> ekb_tmp(GlobalV::NLOCAL,0);
 
 		const char jobz='V', uplo='U';
 		const int itype=1;
 		int lwork=-1, info=0;
-		vector<double> work(1,0);
+		std::vector<double> work(1,0);
 		dsygv_(&itype, &jobz, &uplo, &GlobalV::NLOCAL, wfc_2d.c, &GlobalV::NLOCAL,
 			s_tmp.c, &GlobalV::NLOCAL, ekb_tmp.data(), work.data(), &lwork, &info);
 
@@ -785,9 +785,9 @@ void Pdiag_Double::diago_double_begin(
 		const int itype=1, il=1, iu=GlobalV::NBANDS;
 		int M=0, lwork=-1, info=0;
 		const double abstol=0;
-		vector<double> work(1,0);
-		vector<int> iwork(5*GlobalV::NLOCAL,0);
-		vector<int> ifail(GlobalV::NLOCAL,0);
+		std::vector<double> work(1,0);
+		std::vector<int> iwork(5*GlobalV::NLOCAL,0);
+		std::vector<int> ifail(GlobalV::NLOCAL,0);
 
 		dsygvx_(&itype, &jobz, &range, &uplo,
 			&GlobalV::NLOCAL, h_tmp.c, &GlobalV::NLOCAL, s_tmp.c, &GlobalV::NLOCAL, NULL, NULL, &il, &iu, &abstol,
@@ -830,11 +830,11 @@ void Pdiag_Double::diago_double_begin(
 		const int itype=1, il=1, iu=GlobalV::NBANDS, one=1;
 		int M=0, NZ=0, lwork=-1, liwork=-1, info=0;
 		const double abstol=0, orfac=-1;
-		vector<double> work(1,0);
-		vector<int> iwork(1,0);
-		vector<int> ifail(GlobalV::NLOCAL,0);
-		vector<int> iclustr(2*GlobalV::DSIZE);
-		vector<double> gap(GlobalV::DSIZE);
+		std::vector<double> work(1,0);
+		std::vector<int> iwork(1,0);
+		std::vector<int> ifail(GlobalV::NLOCAL,0);
+		std::vector<int> iclustr(2*GlobalV::DSIZE);
+		std::vector<double> gap(GlobalV::DSIZE);
 
 		pdsygvx_(&itype, &jobz, &range, &uplo,
 			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
@@ -904,16 +904,16 @@ void Pdiag_Double::diago_double_begin(
 
 void Pdiag_Double::diago_complex_begin(
 	const int &ik,
-	complex<double> **wfc,
+	std::complex<double> **wfc,
 	ComplexMatrix &wfc_2d,
-	complex<double>* ch_mat,
-	complex<double>* cs_mat,
+	std::complex<double>* ch_mat,
+	std::complex<double>* cs_mat,
 	double *ekb)
 {
     #ifdef TEST_DIAG
    	{
 		static int istep = 0;
-		auto print_matrix_C = [&](const string &file_name, complex<double>*m)
+		auto print_matrix_C = [&](const string &file_name, std::complex<double>*m)
 		{
 			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
@@ -940,7 +940,7 @@ void Pdiag_Double::diago_complex_begin(
 				ofs<<std::endl;
 			}
 		};
-		auto print_matrix_F = [&](const string &file_name, complex<double>*m)
+		auto print_matrix_F = [&](const string &file_name, std::complex<double>*m)
 		{
 			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
@@ -992,7 +992,7 @@ void Pdiag_Double::diago_complex_begin(
 	int loc_pos;
 
 	// because the output Stmp will be different from Sloc2, so we need to copy that.
-	complex<double>* Stmp = GlobalC::LM.Sdiag2;
+	std::complex<double>* Stmp = GlobalC::LM.Sdiag2;
 
 	if(GlobalV::KS_SOLVER=="hpseps")
 	{
@@ -1000,7 +1000,7 @@ void Pdiag_Double::diago_complex_begin(
         ZEROS(eigen, GlobalV::NLOCAL);
 
         assert(loc_size > 0);
-        complex<double>* Z = new complex<double>[this->loc_size * GlobalV::NLOCAL];
+        std::complex<double>* Z = new std::complex<double>[this->loc_size * GlobalV::NLOCAL];
         ZEROS(Z, this->loc_size * GlobalV::NLOCAL);
 
         Memory::record("Pdiag_Double","Z",loc_size * GlobalV::NLOCAL,"cdouble");
@@ -1028,7 +1028,7 @@ void Pdiag_Double::diago_complex_begin(
         MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
         MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
 		wfc_2d.create(this->ncol,this->nrow);			// Fortran order
-        complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
+        std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
         bool wantEigenVector=true;
         bool wantDebug=true;
         int info;
@@ -1084,13 +1084,13 @@ void Pdiag_Double::diago_complex_begin(
 
                 if(this->out_lowf)
                 {
-                    complex<double> **ctot;
+                    std::complex<double> **ctot;
                     if(myid==0)
                     {
-                        ctot = new complex<double>*[GlobalV::NBANDS];
+                        ctot = new std::complex<double>*[GlobalV::NBANDS];
                         for (int i=0; i<GlobalV::NBANDS; i++)
                         {
-                            ctot[i] = new complex<double>[GlobalV::NLOCAL];
+                            ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
                             ZEROS(ctot[i], GlobalV::NLOCAL);
                         }
                         Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");
@@ -1128,21 +1128,21 @@ void Pdiag_Double::diago_complex_begin(
 	else if(GlobalV::KS_SOLVER=="scalapack_gvx")
 	{
 		ComplexMatrix h_tmp(this->ncol, this->nrow, false);
-		memcpy( h_tmp.c, ch_mat, sizeof(complex<double>)*this->ncol*this->nrow );
+		memcpy( h_tmp.c, ch_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
 		ComplexMatrix s_tmp(this->ncol, this->nrow, false);
-		memcpy( s_tmp.c, cs_mat, sizeof(complex<double>)*this->ncol*this->nrow );
+		memcpy( s_tmp.c, cs_mat, sizeof(std::complex<double>)*this->ncol*this->nrow );
 		wfc_2d.create(this->ncol, this->nrow, false);
 
 		const char jobz='V', range='I', uplo='U';
 		const int itype=1, il=1, iu=GlobalV::NBANDS, one=1;
 		int M=0, NZ=0, lwork=-1, lrwork=-1, liwork=-1, info=0;
 		const double abstol=0, orfac=-1;
-		vector<complex<double>> work(1,0);
-		vector<double> rwork(1,0);
-		vector<int> iwork(1,0);
-		vector<int> ifail(GlobalV::NLOCAL,0);
-		vector<int> iclustr(2*GlobalV::DSIZE);
-		vector<double> gap(GlobalV::DSIZE);
+		std::vector<std::complex<double>> work(1,0);
+		std::vector<double> rwork(1,0);
+		std::vector<int> iwork(1,0);
+		std::vector<int> ifail(GlobalV::NLOCAL,0);
+		std::vector<int> iclustr(2*GlobalV::DSIZE);
+		std::vector<double> gap(GlobalV::DSIZE);
 
 		pzhegvx_(&itype, &jobz, &range, &uplo,
 			&GlobalV::NLOCAL, h_tmp.c, &one, &one, desc, s_tmp.c, &one, &one, desc,
@@ -1182,7 +1182,7 @@ void Pdiag_Double::diago_complex_begin(
 			long maxnloc; // maximum number of elements in local matrix
 			MPI_Reduce(&nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, comm_2D);
 			MPI_Bcast(&maxnloc, 1, MPI_LONG, 0, comm_2D);
-			complex<double> *work=new complex<double>[maxnloc]; // work/buffer matrix
+			std::complex<double> *work=new std::complex<double>[maxnloc]; // work/buffer matrix
 
 			int naroc[2]; // maximum number of row or column
 			for(int iprow=0; iprow<dim0; ++iprow)
@@ -1203,13 +1203,13 @@ void Pdiag_Double::diago_complex_begin(
 
 					if(this->out_lowf)
 					{
-						complex<double> **ctot;
+						std::complex<double> **ctot;
 						if(myid==0)
 						{
-							ctot = new complex<double>*[GlobalV::NBANDS];
+							ctot = new std::complex<double>*[GlobalV::NBANDS];
 							for (int i=0; i<GlobalV::NBANDS; i++)
 							{
-								ctot[i] = new complex<double>[GlobalV::NLOCAL];
+								ctot[i] = new std::complex<double>[GlobalV::NLOCAL];
 								ZEROS(ctot[i], GlobalV::NLOCAL);
 							}
 							Memory::record("Pdiag_Basic","ctot",GlobalV::NBANDS*GlobalV::NLOCAL,"cdouble");

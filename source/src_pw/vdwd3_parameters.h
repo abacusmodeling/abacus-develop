@@ -38,11 +38,11 @@ public:
 
     // internal used
     int max_elem = 94;
-    vector<int> mxc;
-    vector<vector<vector<vector<vector<double>>>>> c6ab;
-    vector<double> r2r4;
-    vector<double> rcov;
-    vector<vector<double>> r0ab;
+    std::vector<int> mxc;
+    std::vector<std::vector<std::vector<std::vector<std::vector<double>>>>> c6ab;
+    std::vector<double> r2r4;
+    std::vector<double> rcov;
+    std::vector<std::vector<double>> r0ab;
     double k1 = 16.0, k2 = 4.0/3.0, k3 = -4.0;
     double alp6 = 14.0, alp8 = alp6+2, alp10 = alp8+2;
 

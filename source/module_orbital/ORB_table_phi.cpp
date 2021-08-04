@@ -174,13 +174,13 @@ void ORB_table_phi::cal_ST_Phi12_R
 	
 	double* integrated_func = new double[kmesh];
 	
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l+1];
+	const std::vector<std::vector<double>> &jlm1 = pSB->get_jlx()[l-1];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[l];
+	const std::vector<std::vector<double>> &jlp1 = pSB->get_jlx()[l+1];
 	
 	for (int ir = 0; ir < rmesh; ir++)
 	{
-		const vector<double> &jl_r = jl[ir];
+		const std::vector<double> &jl_r = jl[ir];
 		for (int ik=0; ik<kmesh; ++ik)
 		{
 			integrated_func[ik] = jl_r[ik] * k1_dot_k2[ik];
@@ -192,8 +192,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 		rs[ir] = temp * FOUR_PI ;
 		
 		// Peize Lin accelerate 2017-10-02
-		const vector<double> &jlm1_r = jlm1[ir];
-		const vector<double> &jlp1_r = jlp1[ir];
+		const std::vector<double> &jlm1_r = jlm1[ir];
+		const std::vector<double> &jlp1_r = jlp1[ir];
 		const double fac = l/(l+1.0);
 		if( l==0 )
 		{
@@ -257,7 +257,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 //	TITLE("ORB_table_phi","cal_ST_Phi12_R");
 	timer::tick("ORB_table_phi", "cal_ST_Phi12_R");
 
-	vector<double> k1_dot_k2(kmesh);
+	std::vector<double> k1_dot_k2(kmesh);
 	switch(job)
 	{
 		case 1: // calculate overlap
@@ -292,17 +292,17 @@ void ORB_table_phi::cal_ST_Phi12_R
 			break;
 	}
 	
-	vector<double> k1_dot_k2_dot_kpoint(kmesh);
+	std::vector<double> k1_dot_k2_dot_kpoint(kmesh);
 	for (int ik = 0; ik < kmesh; ik++)
 	{
 		k1_dot_k2_dot_kpoint[ik] = k1_dot_k2[ik] * this->kpoint[ik];
 	}
 
-	vector<double> integrated_func(kmesh);
+	std::vector<double> integrated_func(kmesh);
 	
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l-1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l+1];
+	const std::vector<std::vector<double>> &jlm1 = pSB->get_jlx()[l-1];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[l];
+	const std::vector<std::vector<double>> &jlp1 = pSB->get_jlx()[l+1];
 	
 	for( const size_t &ir : radials )
 	{
@@ -311,7 +311,7 @@ void ORB_table_phi::cal_ST_Phi12_R
 		// Actually, if(ir[ir]||dr[ir]) is enough. Double insurance for the sake of avoiding numerical errors
 		if( rs[ir] && drs[ir] )	continue;			
 		
-		const vector<double> &jl_r = jl[ir];
+		const std::vector<double> &jl_r = jl[ir];
 		for (int ik=0; ik<kmesh; ++ik)
 		{
 			integrated_func[ik] = jl_r[ik] * k1_dot_k2[ik];
@@ -321,8 +321,8 @@ void ORB_table_phi::cal_ST_Phi12_R
 		Integral::Simpson_Integral(kmesh,VECTOR_TO_PTR(integrated_func),dk,temp);
 		rs[ir] = temp * FOUR_PI ;
 		
-		const vector<double> &jlm1_r = jlm1[ir];
-		const vector<double> &jlp1_r = jlp1[ir];
+		const std::vector<double> &jlm1_r = jlm1[ir];
+		const std::vector<double> &jlp1_r = jlp1[ir];
 		const double fac = l/(l+1.0);
 		if( l==0 )
 		{

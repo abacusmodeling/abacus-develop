@@ -8,8 +8,8 @@
 
 Vdwd3_Parameters::Vdwd3_Parameters():
       mxc(max_elem, 1), 
-      r0ab(max_elem, vector<double>(max_elem)),
-      c6ab(3, vector<vector<vector<vector<double>>>>(5, vector<vector<vector<double>>>(5, vector<vector<double>>(max_elem, vector<double>(max_elem)))))
+      r0ab(max_elem, std::vector<double>(max_elem)),
+      c6ab(3, std::vector<std::vector<std::vector<std::vector<double>>>>(5, std::vector<std::vector<std::vector<double>>>(5, std::vector<std::vector<double>>(max_elem, std::vector<double>(max_elem)))))
 {
 	init_C6();
 	init_r2r4();
@@ -54,7 +54,7 @@ void Vdwd3_Parameters::initial_parameters(const Input &input)
 
 void Vdwd3_Parameters::init_C6()
 {
-	vector<double> C6_tmp={
+	std::vector<double> C6_tmp={
       0.30267000E+1,0.100E+1,0.100E+1,0.91180000E+0,0.91180000E+0
      ,0.20835000E+1,0.200E+1,0.100E+1,0.00000000E+0,0.91180000E+0
      ,0.15583000E+1,0.200E+1,0.200E+1,0.00000000E+0,0.00000000E+0
@@ -32532,7 +32532,7 @@ void Vdwd3_Parameters::init_rcov()
 
 void Vdwd3_Parameters::init_r0ab()
 {
-      vector<double> r={
+      std::vector<double> r={
       2.1823,  1.8547,  1.7347,  2.9086,  2.5732,  3.4956,  2.3550,  
       2.5095,  2.9802,  3.0982,  2.5141,  2.3917,  2.9977,  2.9484, 
       3.2160,  2.4492,  2.2527,  3.1933,  3.0214,  2.9531,  2.9103,  

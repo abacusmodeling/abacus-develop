@@ -21,7 +21,7 @@
 	/*  Purpose */
 	/*  ======= */
 
-	/*  DLARNV returns a vector of n random real numbers from a uniform or */
+	/*  DLARNV returns a std::vector of n random real numbers from a uniform or */
 	/*  normal distribution. */
 
 	/*  Arguments */

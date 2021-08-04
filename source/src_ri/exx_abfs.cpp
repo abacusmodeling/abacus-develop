@@ -38,9 +38,9 @@ void Exx_Abfs::test_all() const
 
 	auto test_abfs = []()
 	{
-		const vector<vector<vector<Numerical_Orbital_Lm>>>
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 			&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
-		const vector<vector<vector<Numerical_Orbital_Lm>>>
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 			&&abfs = Construct_Orbs::abfs_same_atom( lcaos, 1 );
 
 		for( size_t T=0; T!=abfs.size(); ++T )
@@ -59,16 +59,16 @@ void Exx_Abfs::test_all() const
 		std::cout<<"D3"<<std::endl;
 		m_abfs_abfs.init_radial_table();
 		std::cout<<"D4"<<std::endl;
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 			&&ms_abfs_abfs = m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
 		ofs_ms("ms_abfs_abfs",ms_abfs_abfs);
 	};
 
 	auto test_svd = []()
 	{
-		const vector<vector<vector<Numerical_Orbital_Lm>>>
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 			&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
-		const vector<vector<vector<Numerical_Orbital_Lm>>>
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 			&&abfs = Construct_Orbs::abfs_same_atom( lcaos, 1 );
 
 		for( size_t T=0; T!=abfs.size(); ++T )
@@ -88,7 +88,7 @@ void Exx_Abfs::test_all() const
 		m_abfslcaos_lcaos.init( 1, 1, 1 );
 		m_abfslcaos_lcaos.init_radial( abfs, GlobalC::ORB, GlobalC::ORB );
 		m_abfslcaos_lcaos.init_radial_table();
-		const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
 			&&ms_lcaos2_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
 		ofs_ms("ms_lcaos2_abfs",ms_lcaos2_abfs);
 	};
@@ -122,7 +122,7 @@ std::cout<<"A"<<std::endl;
 
 std::cout<<"A1"<<std::endl;
 
-//	const vector<vector<vector<Numerical_Orbital_Lm>>>
+//	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 //		&&abfs_same_atom = Construct_Orbs::abfs_same_atom( GlobalC::ORB );
 
 	Exx_Abfs::Lmax = Jle::Lmax;
@@ -217,57 +217,57 @@ std::cout<<"F"<<std::endl;
 
 std::cout<<"G"<<std::endl;
 
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 		&&ms_jys_jys = m_jys_jys.cal_overlap_matrix( index_jys, index_jys );
 
 ofs_ms("ms_jys_jys",ms_jys_jys);
 
-	map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
 		&&ms_lcaos2_jys = m_jyslcaos_lcaos.cal_overlap_matrix( index_jys, index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_jys",ms_lcaos2_jys);
 
 std::cout<<"G2"<<std::endl;
 
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 		&&ms_lcaos2_lcaos2 = mllll.cal_overlap_matrix( index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_lcaos2",ms_lcaos2_lcaos2);
 
 std::cout<<"G3"<<std::endl;
 
-//	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
 //		&&ms_lcaos2_asa = m_asalcaos_lcaos.cal_overlap_matrix( index_asa, index_lcaos, index_lcaos );
 
 //ofs_ms("ms_lcaos2_asa",ms_lcaos2_asa);
 
 std::cout<<"G4"<<std::endl;
 
-//	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 //		&&ms_asa_asa = m_asa_asa.cal_overlap_matrix( index_asa, index_asa );
 
 //ofs_ms("ms_asa_asa",ms_asa_asa);
 
 std::cout<<"G5"<<std::endl;
 
-//	const map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>>
 //		&&ms_asa_asa_I = cal_I( ms_asa_asa, index_asa );
 
 //ofs_ms("ms_asa_asa_I",ms_asa_asa_I);
 
 std::cout<<"G6"<<std::endl;
 
-//	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 //		&&ms_asa_jys = m_asa_jys.cal_overlap_matrix( index_asa, index_jys );
 
 //ofs_ms("ms_asa_jys",ms_asa_jys);
 
-//	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 //		&&ms_lcaos2_lcaos2_proj_asa = cal_lcaos2_lcaos2_proj_asa( ms_lcaos2_asa, ms_asa_asa_I, range_lcaos, index_lcaos );
 
 //ofs_ms("ms_lcaos2_lcaos2_proj_asa",ms_lcaos2_lcaos2_proj_asa);
 
-//	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+//	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
 //		&&ms_lcaos2_jys_proj_asa = cal_lcaos2_jys_proj_asa( ms_lcaos2_asa, ms_asa_asa_I, ms_asa_jys );
 
 //ofs_ms("ms_lcaos2_jys_proj_asa",ms_lcaos2_jys_proj_asa);
@@ -310,12 +310,12 @@ std::cout<<"A1"<<std::endl;
 //for(const auto &f : this->files_abfs)
 //	std::cout<<f<<std::endl;
 
-	const vector<vector<vector<Numerical_Orbital_Lm>>>
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
-	const vector<vector<vector<Numerical_Orbital_Lm>>>
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		&&abfs_same_atom = Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times );
 	// Peize Lin test
-//	vector<vector<vector<Numerical_Orbital_Lm>>>
+//	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 //		&&abfs_same_atom = IO::Abfs_Same_Atom::construct( GlobalC::ORB );
 //	for( size_t T=0; T!=abfs_same_atom.size(); ++T )
 //		if( abfs_same_atom[T].size()>4 )
@@ -327,7 +327,7 @@ std::cout<<range_asa<<std::endl;
 std::cout<<__FILE__<<__LINE__<<std::endl;
 throw exception();
 
-	const vector<vector<vector<Numerical_Orbital_Lm>>>
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 //		&&abfs = IO::construct_abfs( GlobalC::ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
 //		&&abfs = IO::construct_abfs( abfs_same_atom, GlobalC::ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
 		&abfs = abfs_same_atom;
@@ -407,35 +407,35 @@ std::cout<<"G"<<std::endl;
 
 std::cout<<"G2"<<std::endl;
 
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 		&&ms_lcaos2_lcaos2 = mllll.cal_overlap_matrix( index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_lcaos2",ms_lcaos2_lcaos2);
 
 std::cout<<"G3"<<std::endl;
 
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
 		&&ms_lcaos2_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_abfs",ms_lcaos2_abfs);
 
 std::cout<<"G4"<<std::endl;
 
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 		&&ms_abfs_abfs = m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
 
 ofs_ms("ms_abfs_abfs",ms_abfs_abfs);
 
 std::cout<<"G5"<<std::endl;
 
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>>
 		&&ms_abfs_abfs_I = cal_I( ms_abfs_abfs, index_abfs );
 
 ofs_ms("ms_abfs_abfs_I",ms_abfs_abfs_I);
 
 std::cout<<"G6"<<std::endl;
 
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 		&&ms_lcaos2_lcaos2_proj_abfs = cal_lcaos2_lcaos2_proj_asa( ms_lcaos2_abfs, ms_abfs_abfs_I, range_lcaos, index_lcaos );
 
 ofs_ms("ms_lcaos2_lcaos2_proj_abfs",ms_lcaos2_lcaos2_proj_abfs);
@@ -493,25 +493,25 @@ void Exx_Abfs::cal_exx() const
 	// ȫ����ֻһ��
 std::cout<<"A"<<std::endl;
 
-	const vector<vector<vector<Numerical_Orbital_Lm>>>
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, this->kmesh_times );
 //		&&lcaos = Construct_Orbs::change_orbs( GlobalC::ORB, 1 );
 
 std::cout<<"A1"<<std::endl;
 
-	const vector<vector<vector<Numerical_Orbital_Lm>>>
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		&&abfs_same_atom = Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times );
 std::cout<<"A2"<<std::endl;
-//	const vector<vector<vector<Numerical_Orbital_Lm>>>
+//	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 //		&&abfs_origin = IO::construct_abfs( abfs_same_atom, GlobalC::ORB, this->files_abfs, this->kmesh_times );		// Peize Lin test
 //		&&abfs = IO::construct_abfs( GlobalC::ORB, this->files_abfs, this->kmesh_times );						// Peize Lin test
 std::cout<<"A3"<<std::endl;
-	const vector<vector<vector<Numerical_Orbital_Lm>>>
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 //		&&abfs = Construct_Orbs::orth_orbs( abfs_origin );		// Peize Lin test
 		&&abfs = Construct_Orbs::orth_orbs( abfs_same_atom );		// Peize Lin test
 std::cout<<"A4"<<std::endl;
 
-	vector<vector<vector<Numerical_Orbital_Lm>>> abfs_ccp;
+	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs_ccp;
 	Conv_Coulomb_Pot::cal_orbs_ccp( abfs, abfs_ccp, this->rmesh_times, 1 );
 
 	for( size_t T=0; T!=abfs.size(); ++T )
@@ -542,7 +542,7 @@ std::cout<<"D"<<std::endl;
 		m_lcaos_lcaos.init(1);
 		m_lcaos_lcaos.init_radial( GlobalC::ORB, GlobalC::ORB );
 		m_lcaos_lcaos.init_radial_table();
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 			&&matrix_V = m_lcaos_lcaos.cal_overlap_matrix(index_lcaos,index_lcaos);
 
 		ofstream ofs("S_matrix.dat");
@@ -575,7 +575,7 @@ std::cout<<"D"<<std::endl;
 		m_lcaos_lcaos.init(1,this->kmesh_times);
 		m_lcaos_lcaos.init_radial( lcaos, lcaos );
 		m_lcaos_lcaos.init_radial_table();
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 			&&matrix_V = m_lcaos_lcaos.cal_overlap_matrix(index_lcaos,index_lcaos);
 
 		ofstream ofs("S_matrix.dat");
@@ -613,7 +613,7 @@ std::cout<<"D1"<<std::endl;
 std::cout<<"D2"<<std::endl;
 		m_ll2_ll2.init_radial_table();
 std::cout<<"D3"<<std::endl;
-		const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 			&&ms_ll2_ll2 = m_ll2_ll2.cal_overlap_matrix(index_lcaos,index_lcaos);
 std::cout<<"D4"<<std::endl;
 		ofs_ms("ms_ll2_ll2",ms_ll2_ll2);
@@ -640,22 +640,22 @@ std::cout<<"E"<<std::endl;
 std::cout<<"F"<<std::endl;
 
 	// ÿһ�����Ӳ�
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 		&&ms_abfs_abfs = m_abfs_abfs.cal_overlap_matrix( index_abfs, index_abfs );
 ofs_ms("ms_abfs_abfs",ms_abfs_abfs);
 
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
 		&&ms_lcaos2_abfs = m_abfslcaos_lcaos.cal_overlap_matrix( index_abfs, index_lcaos, index_lcaos );
 ofs_ms("ms_lcaos2_abfs",ms_lcaos2_abfs);
 
 std::cout<<"G"<<std::endl;
 
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>>
 		&&ms_abfs_abfs_I = cal_I( ms_abfs_abfs, index_abfs );
 ofs_ms("ms_abfs_abfs_I",ms_abfs_abfs_I);
 
 std::cout<<"G1"<<std::endl;
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>>
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>>
 		&&ms_C = cal_C( ms_lcaos2_abfs, ms_abfs_abfs_I );
 ofs_ms("ms_C",ms_C);
 
@@ -681,11 +681,11 @@ void Exx_Abfs::test_abfs2() const{}
 // &
 // <a|a> <a|b>
 // <b|a> <b|b> .I
-map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> Exx_Abfs::cal_I(
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &ms,
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> Exx_Abfs::cal_I(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms,
 	const Element_Basis_Index::IndexLNM &index )
 {
-	map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> ms_I;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> ms_I;
 
 	for( const auto &m1 : ms )
 	{
@@ -739,7 +739,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> Exx_Abfs:
 					{
 						const size_t size_A = index[TA].count_size;
 
-						ms_I[TA][IA][TB][IB].resize( 1, vector<matrix>(1) );
+						ms_I[TA][IA][TB][IB].resize( 1, std::vector<matrix>(1) );
 						ms_I[TA][IA][TB][IB][0][0].create( size_A, size_A );
 
 						ms_tmp.output(
@@ -750,7 +750,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> Exx_Abfs:
 						const size_t size_A = index[TA].count_size;
 						const size_t size_B = index[TB].count_size;
 
-						ms_I[TA][IA][TB][IB].resize( 2, vector<matrix>(2) );
+						ms_I[TA][IA][TB][IB].resize( 2, std::vector<matrix>(2) );
 						ms_I[TA][IA][TB][IB][0][0].create( size_A, size_A );
 						ms_I[TA][IA][TB][IB][0][1].create( size_A, size_B );
 						ms_I[TA][IA][TB][IB][1][0].create( size_B, size_A );
@@ -770,11 +770,11 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> Exx_Abfs:
 }
 
 // <ij|P> * <P|P>.I
-map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::cal_C(
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> &ms_lcaos2_abfs,
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> &ms_abfs_abfs_I )
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Exx_Abfs::cal_C(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_abfs,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_abfs_abfs_I )
 {
-	map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> ms_C;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> ms_C;
 
 	for( const auto & m1 : ms_lcaos2_abfs )
 	{
@@ -821,8 +821,8 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::cal_C(
 
 // (<ij|P>*<P|P>.I) * <P|P> * (<P|P>.I*<P|kl>)
 void Exx_Abfs::cal_CVC(
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> &ms_C,
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &ms_abfs_abfs ) const
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_C,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms_abfs_abfs ) const
 {
 	ofstream ofs("ms_CVC");
 
@@ -897,13 +897,13 @@ void Exx_Abfs::cal_CVC(
 }
 
 // <ij|P> * <P|P>.I * <P|ij>
-map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::cal_lcaos2_lcaos2_proj_asa(
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> &ms_lcaos2_asa,
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> &ms_asa_asa_I,
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::cal_lcaos2_lcaos2_proj_asa(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
 	const Element_Basis_Index::Range &range,
 	const Element_Basis_Index::IndexLNM &index)
 {
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> ms_lcaos2_lcaos2_proj_asa;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> ms_lcaos2_lcaos2_proj_asa;
 	for( const auto &m1 : ms_lcaos2_asa )
 	{
 		const size_t TA = m1.first;
@@ -919,7 +919,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::cal_lcaos2_lcao
 					const auto & m_lcaos2_asa = m4.second;
 					const auto & m_abfs_abfs_I = ms_asa_asa_I.at(TA).at(IA).at(TB).at(IB);
 
-					vector<matrix> mql(2);
+					std::vector<matrix> mql(2);
 					size_t matrix_num;
 					if( TA==TB && IA==IB )
 					{
@@ -975,12 +975,12 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::cal_lcaos2_lcao
 }
 
 // <ij|P> * <P|P>.I * <P|jY>
-map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::cal_lcaos2_jys_proj_asa(
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> &ms_lcaos2_asa,
-	const map<size_t,map<size_t,map<size_t,map<size_t,vector<vector<matrix>>>>>> &ms_asa_asa_I,
-	const map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> &ms_asa_jys)
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> Exx_Abfs::cal_lcaos2_jys_proj_asa(
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_lcaos2_asa,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<std::vector<matrix>>>>>> &ms_asa_asa_I,
+	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms_asa_jys)
 {
-	map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> ms_lcaos2_jys_proj_asa;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> ms_lcaos2_jys_proj_asa;
 
 	for( const auto & m1 : ms_lcaos2_asa )
 	{
@@ -1006,7 +1006,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::cal_lca
 					}
 					else
 					{
-						vector<matrix> ms_tmp(2);
+						std::vector<matrix> ms_tmp(2);
 						for( size_t i=0; i<2; ++i )
 							ms_tmp[i]
 							= ms_lcaos2_asa.at(TA).at(IA).at(TB).at(IB)[0]
@@ -1038,7 +1038,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,vector<matrix>>>>> Exx_Abfs::cal_lca
 /*
 void cal_R_supercell()
 {
-	vector<Vector3_Exx> R_supercell;
+	std::vector<Vector3_Exx> R_supercell;
 	for( size_t x=0; x!=GlobalC::kv.nmp[0]; ++x)
 		for( size_t y=0; y!=GlobalC::kv.nmp[1]; ++y )
 			for( size_t z=0; z!=GlobalC::kv.nmp[2]; ++z )
@@ -1048,7 +1048,7 @@ void cal_R_supercell()
 /*
 void density_matrix()
 {
-	vector<matrix> DM_k(GlobalC::kv.nks);
+	std::vector<matrix> DM_k(GlobalC::kv.nks);
 	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
@@ -1063,7 +1063,7 @@ void density_matrix()
 		}
 	}
 
-	vector<size_t,vector<matrix>> DM_R( GlobalV::NSPIN, vector<matrix>(R_supercell.size()) );
+	std::vector<size_t,std::vector<matrix>> DM_R( GlobalV::NSPIN, std::vector<matrix>(R_supercell.size()) );
 	for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		const size_t k_start = (GlobalV::NSPIN==1) ? 0 : ((is==0) ? 0 : (GlobalC::kv.nks/2));

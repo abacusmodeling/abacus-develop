@@ -30,7 +30,7 @@ class Mulliken_Charge
 	double***  ADecMulP ;
 	Wfc_Dm_2d M;
 
-	complex<double> *mug;
+	std::complex<double> *mug;
 
 	void cal_mulliken(void);
 

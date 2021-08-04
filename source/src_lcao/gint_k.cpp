@@ -86,7 +86,7 @@ void Gint_k::allocate_pvpR(void)
 		}
 
 		//----------------------------------------------
-		// allocate the complex matrix !!
+		// allocate the std::complex matrix !!
 		// nutot : total number of unitcells involved.
 		// this may be very large, at least 
 		// 3*3*3 = 27.
@@ -597,10 +597,10 @@ void Gint_k::folding_vl_k(const int &ik)
 	// matrix element < phi_0 | Vlocal | phi_R >
 	//#################################################################
 	this->ik_now = ik;
-	this->pvp = new complex<double>*[GlobalC::GridT.lgd];
+	this->pvp = new std::complex<double>*[GlobalC::GridT.lgd];
 	for(int i=0; i<GlobalC::GridT.lgd; i++)
 	{
-		this->pvp[i] = new complex<double>[GlobalC::GridT.lgd];
+		this->pvp[i] = new std::complex<double>[GlobalC::GridT.lgd];
 		ZEROS( this->pvp[i], GlobalC::GridT.lgd);
 	}
 
@@ -608,8 +608,8 @@ void Gint_k::folding_vl_k(const int &ik)
 	{	
 		Vector3<double> dR;
 		double arg;
-		complex<double> phase;
-		complex<double> *pp1;
+		std::complex<double> phase;
+		std::complex<double> *pp1;
 		double *pp2;
 		int count;
 		for(int k=0; k<GlobalC::GridT.nutot; k++)
@@ -630,7 +630,7 @@ void Gint_k::folding_vl_k(const int &ik)
 				dR.z = GlobalC::GridT.ucell_index2z[m] - R1z;
 
 				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
-				phase = complex<double>(cos(arg), sin(arg));
+				phase = std::complex<double>(cos(arg), sin(arg));
 				for(int i=0; i<GlobalC::GridT.lgd; i++)
 				{
 					pp1 = this->pvp[i];
@@ -703,12 +703,12 @@ void Gint_k::folding_vl_k(const int &ik)
 
 								// calculate the phase factor exp(ikR).
 								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
-								complex<double> phase = complex<double>(cos(arg), sin(arg));
+								std::complex<double> phase = std::complex<double>(cos(arg), sin(arg));
 								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
 								{
 									// iw1_lo
-									complex<double> *vij = this->pvp[GlobalC::GridT.trace_lo[start1+iw]];
+									std::complex<double> *vij = this->pvp[GlobalC::GridT.trace_lo[start1+iw]];
 
 
 									int* iw2_lo = &GlobalC::GridT.trace_lo[start2];
@@ -716,7 +716,7 @@ void Gint_k::folding_vl_k(const int &ik)
 
 									// get the <phi | V | phi>(R) Hamiltonian.
 									double *vijR = &pvpR_reduced[0][ixxx];
-									// complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
+									// std::complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
 									for(; iw2_lo<iw2_end; ++iw2_lo, ++vijR)
 									{
 										vij[iw2_lo[0]] += vijR[0] * phase; 
@@ -767,10 +767,10 @@ void Gint_k::folding_vl_k(const int &ik)
 
 	// Distribution of data.
 	timer::tick("Gint_k","Distri");
-	complex<double>* tmp;
+	std::complex<double>* tmp;
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		tmp = new complex<double>[GlobalV::NLOCAL];
+		tmp = new std::complex<double>[GlobalV::NLOCAL];
 		ZEROS(tmp, GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		// if the row element is on this processor.
@@ -841,13 +841,13 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	}
 
 	this->ik_now = ik;
-//	complex<double>** pvp_nc[4];
+//	std::complex<double>** pvp_nc[4];
 	for(int spin=0;spin<4;spin++)
 	{
-		pvp_nc[spin] = new complex<double>*[GlobalC::GridT.lgd];
+		pvp_nc[spin] = new std::complex<double>*[GlobalC::GridT.lgd];
 		for(int i=0; i<GlobalC::GridT.lgd; i++)
 		{
-			pvp_nc[spin][i] = new complex<double>[GlobalC::GridT.lgd];
+			pvp_nc[spin][i] = new std::complex<double>[GlobalC::GridT.lgd];
 			ZEROS( this->pvp_nc[spin][i], GlobalC::GridT.lgd);
 		}
 	}
@@ -856,8 +856,8 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	{	
 		Vector3<double> dR;
 		double arg;
-		complex<double> phase;
-		complex<double> *pp1;
+		std::complex<double> phase;
+		std::complex<double> *pp1;
 		double *pp2;
 		int count;
 		for(int k=0; k<GlobalC::GridT.nutot; k++)
@@ -878,7 +878,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 				dR.z = GlobalC::GridT.ucell_index2z[m] - R1z;
 
 				arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
-				phase = complex<double>(cos(arg), sin(arg));
+				phase = std::complex<double>(cos(arg), sin(arg));
 				for(int i=0; i<GlobalC::GridT.lgd; i++)
 				{
 					pp1 = this->pvp_nc[0][i];
@@ -951,12 +951,12 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 
 								// calculate the phase factor exp(ikR).
 								const double arg = (GlobalC::kv.kvec_d[ this->ik_now ] * dR) * TWO_PI;
-								complex<double> phase = complex<double>(cos(arg), sin(arg));
+								std::complex<double> phase = std::complex<double>(cos(arg), sin(arg));
 								int ixxx = DM_start + GlobalC::LNNR.find_R2st[iat][nad];
 								for(int iw=0; iw<atom1->nw; iw++)
 								{
 									// iw1_lo
-									complex<double> *vij[4];
+									std::complex<double> *vij[4];
 									for(int spin=0;spin<4;spin++)
 										vij[spin] = this->pvp_nc[spin][GlobalC::GridT.trace_lo[start1]/GlobalV::NPOL + iw];
 
@@ -965,7 +965,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 									int iw2_end = iw2_lo + atom2->nw;
 
 									// get the <phi | V | phi>(R) Hamiltonian.
-//									complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
+//									std::complex<double> *vijR_soc = &pvpR_reduced_soc[ixxx];
 									double *vijR[4];
 									for(int spin = 0;spin<4;spin++) 
 									{
@@ -1025,10 +1025,10 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 
 	// Distribution of data.
 	timer::tick("Gint_k","Distri");
-	complex<double>* tmp;
+	std::complex<double>* tmp;
 	for (int i=0; i<GlobalV::NLOCAL; i++)
 	{
-		tmp = new complex<double>[GlobalV::NLOCAL];
+		tmp = new std::complex<double>[GlobalV::NLOCAL];
 		ZEROS(tmp, GlobalV::NLOCAL);
 		const int mug = GlobalC::GridT.trace_lo[i];
 		const int mug0 = mug/GlobalV::NPOL;
@@ -1060,13 +1060,13 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 						{
 							// spin = 1;
 							if(!GlobalV::DOMAG) tmp[j] = 0;
-							else tmp[j] = this->pvp_nc[1][mug0][nug0] - complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
+							else tmp[j] = this->pvp_nc[1][mug0][nug0] - std::complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
 						}
 						else if(i%2==1&&j%2==0) 
 						{
 							//spin = 2;
 							if(!GlobalV::DOMAG) tmp[j] = 0;
-							else tmp[j] = this->pvp_nc[1][mug0][nug0] + complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
+							else tmp[j] = this->pvp_nc[1][mug0][nug0] + std::complex<double>(0.0,1.0) * this->pvp_nc[2][mug0][nug0];
 						}
 						else
 						{
@@ -1092,13 +1092,13 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 						{
 							// spin = 1;
 							if(!GlobalV::DOMAG) tmp[j] = 0;
-							else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] - complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
+							else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] - std::complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
 						}
 						else if(i%2==0&&j%2==1) 
 						{
 							//spin = 2;
 							if(!GlobalV::DOMAG) tmp[j] = 0;
-							else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] + complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
+							else tmp[j] = conj(this->pvp_nc[1][nug0][mug0] + std::complex<double>(0.0,1.0) * this->pvp_nc[2][nug0][mug0]);
 						}
 						else
 						{
@@ -1287,19 +1287,19 @@ void Gint_k::allocate_pvpR_tr(void)
     }
     else
     {
-        pvpR_tr_soc = new complex<double>****[R_x];
+        pvpR_tr_soc = new std::complex<double>****[R_x];
         for(int ix=0; ix<R_x; ix++)
         {
-            pvpR_tr_soc[ix] = new complex<double>***[R_y];
+            pvpR_tr_soc[ix] = new std::complex<double>***[R_y];
             for(int iy=0; iy<R_y; iy++)
             {
-                pvpR_tr_soc[ix][iy] = new complex<double>**[R_z];
+                pvpR_tr_soc[ix][iy] = new std::complex<double>**[R_z];
                 for(int iz=0; iz<R_z; iz++)
                 {
-                    pvpR_tr_soc[ix][iy][iz] = new complex<double>*[GlobalC::GridT.lgd];
+                    pvpR_tr_soc[ix][iy][iz] = new std::complex<double>*[GlobalC::GridT.lgd];
                     for(int iw=0; iw<GlobalC::GridT.lgd; iw++)
                     {
-                        pvpR_tr_soc[ix][iy][iz][iw] = new complex<double>[GlobalC::GridT.lgd];
+                        pvpR_tr_soc[ix][iy][iz][iw] = new std::complex<double>[GlobalC::GridT.lgd];
 //do    uble mem = Memory::record("allocate_pvpR_tr", "pvpR_tr[ix][iy][iz][iw]", GlobalC::GridT.lgd , "double");
 //co    ut<<" Memory of pvpR_tr[ix][iy][iz][iw]: "<<mem<<" MB"<<std::endl;
                         ZEROS(pvpR_tr_soc[ix][iy][iz][iw], GlobalC::GridT.lgd);
@@ -1379,7 +1379,7 @@ void Gint_k::distribute_pvpR_tr(void)
             for(int iz=0; iz<R_z; iz++)
             {
                 double* tmp;
-                complex<double>* tmp_soc;
+                std::complex<double>* tmp_soc;
                 for(int i=0; i<GlobalV::NLOCAL; i++)
                 {
                     if(GlobalV::NSPIN!=4)
@@ -1389,7 +1389,7 @@ void Gint_k::distribute_pvpR_tr(void)
                     }
                     else
                     {
-                        tmp_soc = new complex<double>[GlobalV::NLOCAL];
+                        tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
                         ZEROS(tmp_soc, GlobalV::NLOCAL);
                     }
 
@@ -1519,7 +1519,7 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 								for(int iw2=0;iw2<atom2->nw * GlobalV::NPOL; iw2++)
 								{
                                     double *HlocR;
-                                    complex<double> *HlocR_soc;
+                                    std::complex<double> *HlocR_soc;
                                     if(GlobalV::NSPIN!=4) HlocR = &pvpR_tr[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][GlobalC::GridT.trace_lo[start2+iw2]];
 									else    HlocR_soc = &pvpR_tr_soc[R_x][R_y][R_z][GlobalC::GridT.trace_lo[start1+iw]][GlobalC::GridT.trace_lo[start2+iw2]];
 									const int nw = atom2->nw;
@@ -1537,24 +1537,24 @@ void Gint_k::cal_vlocal_R(const int current_spin)
 												if(iw%2==0&&iw2%2==0)
 												{
 													//spin = 0;
-													HlocR_soc[0] = complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] + complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
+													HlocR_soc[0] = std::complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] + std::complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
 												}	
 												else if(iw%2==1&&iw2%2==1)
 												{
 													//spin = 3;
-													HlocR_soc[0] = complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] - complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
+													HlocR_soc[0] = std::complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] - std::complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
 												}
 												else if(iw%2==0&&iw2%2==1)
 												{
 													// spin = 1;
-													if(!GlobalV::DOMAG) HlocR_soc[0] = complex<double>(0.0,0.0);
-													else HlocR_soc[0] = pvpR_reduced[1][iw_nowg] - complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
+													if(!GlobalV::DOMAG) HlocR_soc[0] = std::complex<double>(0.0,0.0);
+													else HlocR_soc[0] = pvpR_reduced[1][iw_nowg] - std::complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
 												}	
 												else if(iw%2==1&&iw2%2==0) 
 												{
 													//spin = 2;
-													if(!GlobalV::DOMAG) HlocR_soc[0] = complex<double>(0.0,0.0);
-													else HlocR_soc[0] = pvpR_reduced[1][iw_nowg] + complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
+													if(!GlobalV::DOMAG) HlocR_soc[0] = std::complex<double>(0.0,0.0);
+													else HlocR_soc[0] = pvpR_reduced[1][iw_nowg] + std::complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
 												}
 												else
 												{
@@ -1595,25 +1595,25 @@ void Gint_k::allocate_pvpR_sparseMatrix(void)
 
 	if(GlobalV::NSPIN != 4)
     {
-		pvpR_sparseMatrix = new map<size_t, map<size_t, double>>**[R_x];
+		pvpR_sparseMatrix = new std::map<size_t, std::map<size_t, double>>**[R_x];
         for(int ix=0; ix<R_x; ix++)
         {
-			pvpR_sparseMatrix[ix] = new map<size_t, map<size_t, double>>*[R_y];
+			pvpR_sparseMatrix[ix] = new std::map<size_t, std::map<size_t, double>>*[R_y];
             for(int iy=0; iy<R_y; iy++)
             {
-				pvpR_sparseMatrix[ix][iy] = new map<size_t, map<size_t, double>>[R_z];
+				pvpR_sparseMatrix[ix][iy] = new std::map<size_t, std::map<size_t, double>>[R_z];
             }
         }
     }
     else
     {
-		pvpR_soc_sparseMatrix = new map<size_t, map<size_t, complex<double>>>**[R_x];
+		pvpR_soc_sparseMatrix = new std::map<size_t, std::map<size_t, std::complex<double>>>**[R_x];
         for(int ix=0; ix<R_x; ix++)
         {
-			pvpR_soc_sparseMatrix[ix] = new map<size_t, map<size_t, complex<double>>>*[R_y];
+			pvpR_soc_sparseMatrix[ix] = new std::map<size_t, std::map<size_t, std::complex<double>>>*[R_y];
             for(int iy=0; iy<R_y; iy++)
             {
-				pvpR_soc_sparseMatrix[ix][iy] = new map<size_t, map<size_t, complex<double>>>[R_z];
+				pvpR_soc_sparseMatrix[ix][iy] = new std::map<size_t, std::map<size_t, std::complex<double>>>[R_z];
             }
         }
     }
@@ -1671,7 +1671,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
     double R_minZ = GlobalC::GridD.getD_minZ();
 
 	double* tmp = nullptr;
-	complex<double>* tmp_soc = nullptr;
+	std::complex<double>* tmp_soc = nullptr;
 	int minus_ix;
 	int minus_iy;
 	int minus_iz;
@@ -1708,7 +1708,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 					}
 					else
 					{
-						tmp_soc = new complex<double>[GlobalV::NLOCAL];
+						tmp_soc = new std::complex<double>[GlobalV::NLOCAL];
 						ZEROS(tmp_soc, GlobalV::NLOCAL);
 					}
 
@@ -1805,7 +1805,7 @@ void Gint_k::distribute_pvpR_sparseMatrix(const double &sparse_threshold)
 								{
 									if(abs(tmp_soc[col]) > sparse_threshold)
 									{
-										complex<double> &value = GlobalC::LM.HR_soc_sparse[ix][iy][iz][row][col];
+										std::complex<double> &value = GlobalC::LM.HR_soc_sparse[ix][iy][iz][row][col];
 										value += tmp_soc[col];
 										if (abs(value) < sparse_threshold)
 										{
@@ -1913,24 +1913,24 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
 									{		
 										// pvp is symmetric, only half is calculated.
 
-										complex<double> temp_value;
+										std::complex<double> temp_value;
 
 										if(iw%2==0&&iw2%2==0)
 										{
 											//spin = 0;
-											temp_value = complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] + complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
+											temp_value = std::complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] + std::complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
 											if( abs(temp_value) > sparse_threshold )
 											{
-												pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, complex<double>>(start2 + iw2, temp_value));
+												pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, std::complex<double>>(start2 + iw2, temp_value));
 											}
 										}	
 										else if(iw%2==1&&iw2%2==1)
 										{
 											//spin = 3;
-											temp_value = complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] - complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
+											temp_value = std::complex<double>(1.0,0.0) * pvpR_reduced[0][iw_nowg] - std::complex<double>(1.0,0.0) * pvpR_reduced[3][iw_nowg];
 											if( abs(temp_value) > sparse_threshold )
 											{
-												pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, complex<double>>(start2 + iw2, temp_value));
+												pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, std::complex<double>>(start2 + iw2, temp_value));
 											}
 										}
 										else if(iw%2==0&&iw2%2==1)
@@ -1942,10 +1942,10 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
 											}
 											else
 											{
-												temp_value = pvpR_reduced[1][iw_nowg] - complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
+												temp_value = pvpR_reduced[1][iw_nowg] - std::complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
 												if( abs(temp_value) > sparse_threshold )
 												{
-													pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, complex<double>>(start2 + iw2, temp_value));
+													pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, std::complex<double>>(start2 + iw2, temp_value));
 												}
 											}
 										}	
@@ -1958,10 +1958,10 @@ void Gint_k::cal_vlocal_R_sparseMatrix(const int current_spin, const double &spa
 											}
 											else
 											{
-												temp_value = pvpR_reduced[1][iw_nowg] + complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
+												temp_value = pvpR_reduced[1][iw_nowg] + std::complex<double>(0.0,1.0) * pvpR_reduced[2][iw_nowg];
 												if( abs(temp_value) > sparse_threshold )
 												{
-													pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, complex<double>>(start2 + iw2, temp_value));
+													pvpR_soc_sparseMatrix[R_x][R_y][R_z][start1 + iw].insert(pair<size_t, std::complex<double>>(start2 + iw2, temp_value));
 												}
 											}
 										}

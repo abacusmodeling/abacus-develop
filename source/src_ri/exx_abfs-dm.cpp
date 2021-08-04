@@ -12,7 +12,7 @@
 
 void Exx_Abfs::DM::cal_DM(
 	const set<pair<size_t,size_t>> &atom_pairs,
-	const vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes)
+	const std::vector<Abfs::Vector3_Order<int>> &Born_von_Karman_boxes)
 {
 	TITLE("Exx_Abfs::DM::cal_DM");
 	
@@ -27,7 +27,7 @@ void Exx_Abfs::DM::cal_DM(
 
 		for( const Vector3<int> &box : Born_von_Karman_boxes )
 		{
-			DMr[iat1][iat2][box] = vector<matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+			DMr[iat1][iat2][box] = std::vector<matrix>( GlobalV::NSPIN, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
 				DMr[iat1][iat2][box][GlobalC::kv.isk[ik]] += ( DMk[iat1][iat2][ik] * exp( -TWO_PI*IMAG_UNIT* (GlobalC::kv.kvec_c[ik]* (box*GlobalC::ucell.latvec)) ) ).real();
@@ -83,13 +83,13 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 
 
 
-map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const set<pair<size_t,size_t>> &atom_pairs ) const
+std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const set<pair<size_t,size_t>> &atom_pairs ) const
 {
 	TITLE("Exx_Abfs::DM::cal_DMk_raw");
 
 	const double SPIN_multiple = 0.5*GlobalV::NSPIN;
 	
-	map<size_t,map<size_t,vector<ComplexMatrix>>> DMk_raw;
+	std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> DMk_raw;
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs )
 	{
 		const size_t iat1 = atom_pair.first;
@@ -99,7 +99,7 @@ map<size_t,map<size_t,vector<ComplexMatrix>>> Exx_Abfs::DM::cal_DMk_raw( const s
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const size_t ia2 = GlobalC::ucell.iat2ia[iat2];
 
-		DMk_raw[iat1][iat2] = vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
+		DMk_raw[iat1][iat2] = std::vector<ComplexMatrix>( GlobalC::kv.nks, {GlobalC::ucell.atoms[it1].nw,GlobalC::ucell.atoms[it2].nw} );
 		for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 		{
 			for( size_t iw1=0; iw1!=GlobalC::ucell.atoms[it1].nw; ++iw1 )

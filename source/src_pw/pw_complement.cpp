@@ -87,7 +87,7 @@ void PW_complement::get_total_pw(
                 double g2 = f * (GGT * f);  //G2= |f|^2 in the unit of (2Pi/lat0)^2
                 if (g2 < ggcut_end && g2 >= ggcut_start)
                 {
-                    /*** g vector indices f=(i,j,k) ***/
+                    /*** g std::vector indices f=(i,j,k) ***/
                     ig[ng] = f ;
                     gg[ng] = g2;
                     //std::cout<<setw(12)<<f.x<<setw(12)<<f.y<<setw(12)<<f.z<<setw(12)<<g2<<std::endl;
@@ -225,7 +225,7 @@ void PW_complement::get_FFT_dimension(
 // MEMBER FUNCTION :
 // NAME : PW_Basis::setup_GVectors
 // Second part of the initialization : find out all G
-// vectors that |G|^2<=G2max and map it into a one
+// vectors that |G|^2<=G2max and std::map it into a one
 // dimentional array G1d in the increase order of |G|^2.
 // Next generate the indices between the 1D array and
 // the 3D G-grid and the FFT grid.
@@ -241,7 +241,7 @@ void PW_complement::setup_GVectors(
     if (GlobalV::test_pw) TITLE("PW_complement","setup_GVectors");
     timer::tick("PW_complement","setup_GVectors");
 
-    int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G vector index
+    int *ind = new int[ngmc_g_in];// auxiliary array for the 1d G std::vector index
     ZEROS( ind, ngmc_g_in );
     ind[0] = 0;//ind[0]=0, meaning ind[] is not initialized.
 
@@ -256,7 +256,7 @@ void PW_complement::setup_GVectors(
     // adjust G1d[NG] according to the new order.
     // establish the link between the 1d array and 3d grid,
     // i.e. give the position "i" in 1d array,
-    // G1d[i] is the vector in 3d grid, G1d2[i] is its norm.
+    // G1d[i] is the std::vector in 3d grid, G1d2[i] is its norm.
     /***************************************************************/
 
     Vector3<double> *igsort = new Vector3<double>[ngmc_g_in];
@@ -304,7 +304,7 @@ void PW_complement::setup_GVectors(
     for (int i=0; i<ngmc_g_in; i++)
     {
         g[i] = ig[i] * G;
-        // g vector (in 2*pi/lat0), E_k=g*g*(2*pi/lat0)^2
+        // g std::vector (in 2*pi/lat0), E_k=g*g*(2*pi/lat0)^2
 	//	std::cout << i << " " << ig[i].x << " " << ig[i].y << " " << ig[i].z << std::endl;
     }
 

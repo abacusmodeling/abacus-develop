@@ -106,7 +106,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 
     for (int ig=pwb.gstart; ig<pwb.ngmc; ig++)
     {
-        complex<double> rhon = ZERO;
+        std::complex<double> rhon = ZERO;
         for (int it=0; it<cell.ntype; it++)
         {
             rhon += static_cast<double>( cell.atoms[it].zv ) * conj( pwb.strucFac(it, ig));
@@ -227,7 +227,7 @@ void H_Ewald_pw::rgen(
     // output: square modulus of vectors R+tau_s-
     // input: direct lattice vectors
     // input: reciprocal lattice vectors
-    // input: the vector tau_s-tau_s'
+    // input: the std::vector tau_s-tau_s'
     // input: the radius of the sphere in real sp
     //    and here the local variables
 
@@ -252,7 +252,7 @@ void H_Ewald_pw::rgen(
     // buffer contains the actual r
     // buffer cotains the modulus of actual r
     // used for swapping
-    // function to find the norm of a vector
+    // function to find the norm of a std::vector
     // external dnrm2, see myfunc
 
     nrm = 0;

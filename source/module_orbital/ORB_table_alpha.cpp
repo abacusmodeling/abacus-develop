@@ -147,9 +147,9 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	//previous version
 	double *integrated_func = new double[kmesh];
 
-	const vector<vector<double>> &jlm1 = pSB->get_jlx()[l - 1];
-	const vector<vector<double>> &jl = pSB->get_jlx()[l];
-	const vector<vector<double>> &jlp1 = pSB->get_jlx()[l + 1];
+	const std::vector<std::vector<double>> &jlm1 = pSB->get_jlx()[l - 1];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[l];
+	const std::vector<std::vector<double>> &jlp1 = pSB->get_jlx()[l + 1];
 
 	for (int ir = 0; ir < rmesh; ir++)
 	{

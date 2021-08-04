@@ -110,8 +110,8 @@ void Chi0_hilbert::Chi()
 	}
 		
 	int icount = 0;
-	std::vector<int> qc(GlobalC::kv.nks); 			// Peize Lin change ptr to vector at 2020.01.31
-	std::vector<double> ql(GlobalC::kv.nks);			// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<int> qc(GlobalC::kv.nks); 			// Peize Lin change ptr to std::vector at 2020.01.31
+	std::vector<double> ql(GlobalC::kv.nks);			// Peize Lin change ptr to std::vector at 2020.01.31
 	int total_icount=0;
 	int temp1; double temp2;
 	
@@ -493,16 +493,16 @@ void Chi0_hilbert::Chi()
 				}
 			}
 			
-			overlap = new complex<double> ***[GlobalV::NLOCAL];
+			overlap = new std::complex<double> ***[GlobalV::NLOCAL];
 			for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
 			{
-				overlap[iw1] = new complex<double>**[GlobalV::NLOCAL];
+				overlap[iw1] = new std::complex<double>**[GlobalV::NLOCAL];
 				for(int iw2=0; iw2<GlobalV::NLOCAL; iw2++)
 				{
-					overlap[iw1][iw2] = new complex<double>*[dim];
+					overlap[iw1][iw2] = new std::complex<double>*[dim];
 					for(int ig=0; ig<dim; ig++)
 					{
-						overlap[iw1][iw2][ig] = new complex<double>[NR];
+						overlap[iw1][iw2][ig] = new std::complex<double>[NR];
 						ZEROS( overlap[iw1][iw2][ig], NR);
 					}
 				}
@@ -687,130 +687,130 @@ void Chi0_hilbert::Init()
 	//std::cout << "GlobalC::kv.nks = " <<GlobalC::kv.nks <<std::endl;
 	//std::cout << "GlobalC::kv.nmp = " << GlobalC::kv.nmp[0]<<"  "<<GlobalC::kv.nmp[1]<<"  "<<GlobalC::kv.nmp[2]<<std::endl;
 	
-	b_core = new complex<double>[GlobalC::pw.ngmc];  
+	b_core = new std::complex<double>[GlobalC::pw.ngmc];  
 	
-	b_summary = new complex<double>[GlobalC::pw.ngmc_g]; 
+	b_summary = new std::complex<double>[GlobalC::pw.ngmc_g]; 
 	
-	b_order = new complex<double>[GlobalC::pw.ngmc_g];
+	b_order = new std::complex<double>[GlobalC::pw.ngmc_g];
 	
-	/*psi_r = new complex<double>**[GlobalC::kv.nks];
+	/*psi_r = new std::complex<double>**[GlobalC::kv.nks];
 	for(int iq=0; iq<GlobalC::kv.nks; iq++)
 	{
-		psi_r[iq] = new complex<double>*[GlobalV::NBANDS];
+		psi_r[iq] = new std::complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r[iq][ib] = new complex<double>[GlobalC::pw.nrxx];
+			psi_r[iq][ib] = new std::complex<double>[GlobalC::pw.nrxx];
 		}
 	}*/
 	
 	if(GlobalV::BASIS_TYPE == "pw" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 	{
-		psi_r1 = new complex<double>*[GlobalV::NBANDS];
+		psi_r1 = new std::complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r1[ib] = new complex<double>[GlobalC::pw.nrxx];
+			psi_r1[ib] = new std::complex<double>[GlobalC::pw.nrxx];
 		}
 		
-		psi_r2 = new complex<double>*[GlobalV::NBANDS];
+		psi_r2 = new std::complex<double>*[GlobalV::NBANDS];
 		for(int ib=0; ib<GlobalV::NBANDS; ib++)
 		{
-			psi_r2[ib] = new complex<double>[GlobalC::pw.nrxx];
+			psi_r2[ib] = new std::complex<double>[GlobalC::pw.nrxx];
 		}
 	}
 	//std::cout << "psi1 OK" <<std::endl;
 	//std::cout << "psi2 OK" <<std::endl;
 	std::cout << "psi OK" <<std::endl;
 	
-	b = new complex<double>**[dim];
+	b = new std::complex<double>**[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		b[g0] = new complex<double>*[oband];
+		b[g0] = new std::complex<double>*[oband];
 		for(int ib=0; ib<oband; ib++)
 		{
-			b[g0][ib] = new complex<double>[GlobalV::NBANDS];
+			b[g0][ib] = new std::complex<double>[GlobalV::NBANDS];
 		}
 	}
 	std::cout << "b OK" <<std::endl;
 	
-	chi0s = new complex<double>*[dim*dim];       // calculate the chi0s (imagniary part of chi0)
+	chi0s = new std::complex<double>*[dim*dim];       // calculate the chi0s (imagniary part of chi0)
 	for(int g0=0; g0<dim*dim; g0++)
 	{
-		chi0s[g0] = new complex<double>[nomega];
+		chi0s[g0] = new std::complex<double>[nomega];
 	}
 	std::cout << "chi0s OK" <<std::endl;
 	
-	chi0 = new complex<double>*[dim*dim];
+	chi0 = new std::complex<double>*[dim*dim];
 	for(int g0=0; g0<dim*dim; g0++)
 	{
-		chi0[g0] = new complex<double>[nomega];
+		chi0[g0] = new std::complex<double>[nomega];
 	}
 	std::cout << "chi0 OK" <<std::endl;
 	
-	chi0_gg = new complex<double>*[dim];       // split the nomega of chi0
+	chi0_gg = new std::complex<double>*[dim];       // split the nomega of chi0
 	for(int g0=0; g0<dim; g0++)
 	{
-		chi0_gg[g0] = new complex<double> [dim];
+		chi0_gg[g0] = new std::complex<double> [dim];
 	}
 	std::cout << "chi0_gg OK" <<std::endl;
 	
-	T = new complex<double>*[nomega];              // tranaslation  matrix
+	T = new std::complex<double>*[nomega];              // tranaslation  matrix
 	for(int i=0; i<nomega; i++)
 	{
-		T[i] = new complex<double>[nomega];
+		T[i] = new std::complex<double>[nomega];
 	}
 	std::cout << "T OK" <<std::endl;
 		
-	rpa = new complex<double>*[dim];
+	rpa = new std::complex<double>*[dim];
 	for(int g0=0; g0<dim; g0++)
 	{
-		rpa[g0] = new complex<double> [dim];
+		rpa[g0] = new std::complex<double> [dim];
 	}
 	std::cout << "rpa OK" <<std::endl;
 	
 	std::cout <<"system = "<<system<<std::endl;
 	if(system == "surface")
 	{
-		chi0_para = new complex<double>*[dim_para];
+		chi0_para = new std::complex<double>*[dim_para];
 		for(int g0=0; g0<dim_para; g0++)
 		{
-			chi0_para[g0] = new complex<double> [dim_para];
+			chi0_para[g0] = new std::complex<double> [dim_para];
 		}
 		std::cout << "chi0_para OK" <<std::endl;
 		
-		kernel = new complex<double>*[dim_para];
+		kernel = new std::complex<double>*[dim_para];
 		for(int g0=0; g0<dim_para; g0++)
 		{
-			kernel[g0] = new complex<double> [dim_para];
+			kernel[g0] = new std::complex<double> [dim_para];
 		}
 		std::cout << "kernel OK" <<std::endl;
 
-		rpa1 = new complex<double>*[dim_para];
+		rpa1 = new std::complex<double>*[dim_para];
 		for(int g0=0; g0<dim_para; g0++)
 		{
-			rpa1[g0] = new complex<double> [dim_para];
+			rpa1[g0] = new std::complex<double> [dim_para];
 		}
 		std::cout << "rpa1 OK" <<std::endl;
 		
-		chi_para = new complex<double>*[dim_para];
+		chi_para = new std::complex<double>*[dim_para];
 		for(int g0=0; g0<dim_para; g0++)
 		{
-			chi_para[g0] = new complex<double> [dim_para];
+			chi_para[g0] = new std::complex<double> [dim_para];
 		}
 		std::cout << "chi_para" <<std::endl;
 	}
 	else
 	{
-		kernel = new complex<double>*[dim];
+		kernel = new std::complex<double>*[dim];
 		for(int g0=0; g0<dim; g0++)
 		{
-			kernel[g0] = new complex<double> [dim];
+			kernel[g0] = new std::complex<double> [dim];
 		}
 		std::cout << "kernel OK" <<std::endl;
 		
-		chi = new complex<double>*[dim];
+		chi = new std::complex<double>*[dim];
 		for(int g0=0; g0<dim; g0++)
 		{
-			chi[g0] = new complex<double> [dim];
+			chi[g0] = new std::complex<double> [dim];
 		}
 		std::cout << "chi OK" <<std::endl;
 	}
@@ -1042,10 +1042,10 @@ void Chi0_hilbert::Parallel_G()
 	return;
 }
 
-void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
+void Chi0_hilbert::Cal_Psi(int iq, std::complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
-	complex<double> exp_tmp;
+	std::complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
 		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
@@ -1065,7 +1065,7 @@ void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
 					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
-					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
+					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
 				}
@@ -1078,10 +1078,10 @@ void Chi0_hilbert::Cal_Psi(int iq, complex<double> **psi_r)
 }
 
 
-void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
+void Chi0_hilbert::Cal_Psi_down(int iq, std::complex<double> **psi_r)
 {
 	double phase_x, phase_xy, phase_xyz;
-	complex<double> exp_tmp;
+	std::complex<double> exp_tmp;
 	for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 	{
 		ZEROS( GlobalC::UFFT.porter, (GlobalC::pw.nrxx) );
@@ -1101,7 +1101,7 @@ void Chi0_hilbert::Cal_Psi_down(int iq, complex<double> **psi_r)
 				for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 				{
 					phase_xyz = (phase_xy + GlobalC::kv.kvec_d[iq].z*iz/GlobalC::pw.ncz) *TWO_PI;
-					exp_tmp = complex<double>( cos(phase_xyz), sin(phase_xyz) );
+					exp_tmp = std::complex<double>( cos(phase_xyz), sin(phase_xyz) );
 					psi_r[ib][ir] = GlobalC::UFFT.porter[ir]*exp_tmp;
 					ir++;
 				}
@@ -1140,9 +1140,9 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		}
 	}
 	
-	vector<vector<vector<complex<double>>>> phase(GlobalV::NLOCAL,
-		vector<vector<complex<double>>>(GlobalV::NLOCAL,
-			vector<complex<double>>(NR)));	// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<std::vector<std::vector<std::complex<double>>>> phase(GlobalV::NLOCAL,
+		std::vector<std::vector<std::complex<double>>>(GlobalV::NLOCAL,
+			std::vector<std::complex<double>>(NR)));	// Peize Lin change ptr to std::vector at 2020.01.31
 	
 	int MR = 0;
 	for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
@@ -1152,7 +1152,7 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 			for(int ir=0; ir<Rmax[iw1][iw2]; ir++)
 			{
 				arg = qk * Rcar[iw1][iw2][ir] * TWO_PI;
-				phase[iw1][iw2][ir] = complex<double>( cos(arg),  sin(arg) );
+				phase[iw1][iw2][ir] = std::complex<double>( cos(arg),  sin(arg) );
 				MR++;
 				//std::cout << "phase["<<iw1<<"]["<<iw2<<"]["<<ir<<"] = "<<phase[iw1][iw2][ir]<<std::endl;
 			}
@@ -1185,12 +1185,12 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 		}
 	}*/
 
-	vector<vector<complex<double>>> left(oband,
-		vector<complex<double>>(MR));				// Peize Lin change ptr to vector at 2020.01.31
-	vector<vector<complex<double>>> right(MR,
-		vector<complex<double>>(GlobalV::NBANDS));			// Peize Lin change ptr to vector at 2020.01.31
-	vector<vector<complex<double>>> b_single(oband,
-		vector<complex<double>>(GlobalV::NBANDS)); 			// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<std::vector<std::complex<double>>> left(oband,
+		std::vector<std::complex<double>>(MR));				// Peize Lin change ptr to std::vector at 2020.01.31
+	std::vector<std::vector<std::complex<double>>> right(MR,
+		std::vector<std::complex<double>>(GlobalV::NBANDS));			// Peize Lin change ptr to std::vector at 2020.01.31
+	std::vector<std::vector<std::complex<double>>> b_single(oband,
+		std::vector<std::complex<double>>(GlobalV::NBANDS)); 			// Peize Lin change ptr to std::vector at 2020.01.31
 	for(int ig=0; ig<dim; ig++)
 	{
 		for(int ib1=0; ib1<oband; ib1++)
@@ -1225,8 +1225,8 @@ void Chi0_hilbert::Cal_b_lcao(int iq, int ik, int iqk)
 			}
 		}
 		
-		complex<double> alpha=1;
-		complex<double> beta=0;
+		std::complex<double> alpha=1;
+		std::complex<double> beta=0;
 		char transa = 'N';
 		char transb = 'N';
 		int M = GlobalV::NBANDS;
@@ -1260,7 +1260,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	//std::cout <<"qk = "<<qk.x<<" "<<qk.y<<" "<<qk.z<<std::endl;
 	double phase_x, phase_xy, phase_xyz;
 	Vector3<double> q = GlobalC::kv.kvec_d[iq];
-	complex<double> exp_tmp;
+	std::complex<double> exp_tmp;
 	
 	if(ispin == 0)
 	{
@@ -1287,7 +1287,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 					for(int iz=GlobalC::pw.nczp_start; iz<GlobalC::pw.nczp_start+GlobalC::pw.nczp; iz++)
 					{
 						phase_xyz = (phase_xy + q.z*iz/GlobalC::pw.ncz) *TWO_PI;
-						exp_tmp = complex<double>(cos(-phase_xyz), sin(-phase_xyz));
+						exp_tmp = std::complex<double>(cos(-phase_xyz), sin(-phase_xyz));
 						GlobalC::UFFT.porter[ir] = conj(psi_r1[ib1][ir]) * psi_r2[ib2][ir] *exp_tmp;
 						ir++;
 					}
@@ -1330,7 +1330,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
 	//	{
 	//		for(int ib2=0; ib2<GlobalV::NBANDS; ib2++)
 	//		{
-	//			b[i][ib1][ib2] = complex<double>(0.0,0.0);
+	//			b[i][ib1][ib2] = std::complex<double>(0.0,0.0);
 	//		}
 	//	}
 		
@@ -1364,7 +1364,7 @@ void Chi0_hilbert::Cal_b(int iq, int ik, int iqk, int ispin)
         double phase_x, phase_xy, phase_xyz;
         Vector3<double> q = GlobalC::kv.kvec_d[iq];
         std::cout <<"q_in = "<<q.x<<" "<<q.y<<" "<<q.z<<std::endl;
-        complex<double> exp_tmp;
+        std::complex<double> exp_tmp;
         Cal_Psi1(ik);
         Cal_Psi2(iqk);
 
@@ -1450,7 +1450,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 {
 	TITLE("Chi0_hilbert","Cal_Chi0s");
 	double delta_e,e1,e2;
-	complex<double> weight1, weight2;
+	std::complex<double> weight1, weight2;
 	for(int g0=0; g0<dim; g0++)
 	{
 		for(int g1=0; g1<dim; g1++)
@@ -1504,8 +1504,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
-						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight2 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1520,7 +1520,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1563,10 +1563,10 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);                        
-						//weight2 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
-						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
+						//weight1 = std::complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);                        
+						//weight2 = std::complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight2 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1581,8 +1581,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						//weight1 = std::complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1616,10 +1616,10 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
-						//weight2 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);  
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
-						weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);						
+						//weight1 = std::complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						//weight2 = std::complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);  
+						weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight2 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);						
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1634,8 +1634,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 						int n = int(delta_e/domega);
 						e1 = double(n) * domega;
 						e2 = double(n+1) * domega;
-						//weight1 = complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
-						weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						//weight1 = std::complex<double>( (GlobalC::wf.wg(ik,ib1) - GlobalC::wf.wg(iqk,ib2)) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+						weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 						for(int g0=0; g0<dim; g0++)
 						{
 							for(int g1=0; g1<dim; g1++)
@@ -1681,8 +1681,8 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 							int n = int(delta_e/domega);
 							e1 = double(n) * domega;
 							e2 = double(n+1) * domega;
-							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
-							weight2 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
+							weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+							weight2 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (delta_e - e1)/domega/GlobalC::ucell.omega, 0.0);
 							for(int g0=0; g0<dim; g0++)
 							{
 								for(int g1=0; g1<dim; g1++)
@@ -1697,7 +1697,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 							int n = int(delta_e/domega);
 							e1 = double(n) * domega;
 							e2 = double(n+1) * domega;
-							weight1 = complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
+							weight1 = std::complex<double>( (cweight[ik][ib1] - cweight[iqk][ib2]) * (e2 - delta_e)/domega/GlobalC::ucell.omega, 0.0);
 							for(int g0=0; g0<dim; g0++)
 							{
 								for(int g1=0; g1<dim; g1++)
@@ -1719,15 +1719,15 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 void Chi0_hilbert::Cal_T()
 {
 	TITLE("Chi0_hilbert","Cal_T");
-	complex<double> M1, M2;
+	std::complex<double> M1, M2;
 	for(int n1=0; n1<nomega; n1++)
 	{
 		for(int n=0; n<nomega; n++)
 		{
 			double n_e = double(n) * domega;
 			double n1_e = double(n1) * domega;
-			M1 = complex<double>( (n_e - n1_e), eta);
-			M2 = complex<double>( (n_e + n1_e), eta);
+			M1 = std::complex<double>( (n_e - n1_e), eta);
+			M2 = std::complex<double>( (n_e + n1_e), eta);
 			T[n1][n] = 1.0/M1 - 1.0/M2;
 		}
 	}
@@ -1739,12 +1739,12 @@ void Chi0_hilbert::Cal_T()
 void Chi0_hilbert::Cal_Chi0()
 {
 	TITLE("Chi0_hilbert","Cal_Chi0");
-	vector<vector<complex<double>>> chi0s2(dim*dim,
-		vector<complex<double>>(nomega));			// Peize Lin change ptr to vector at 2020.01.31
-	vector<vector<complex<double>>> T2(nomega,
-		vector<complex<double>>(nomega));			// Peize Lin change ptr to vector at 2020.01.31
-	vector<vector<complex<double>>> chi02(dim*dim,
-		vector<complex<double>>(nomega));			// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<std::vector<std::complex<double>>> chi0s2(dim*dim,
+		std::vector<std::complex<double>>(nomega));			// Peize Lin change ptr to std::vector at 2020.01.31
+	std::vector<std::vector<std::complex<double>>> T2(nomega,
+		std::vector<std::complex<double>>(nomega));			// Peize Lin change ptr to std::vector at 2020.01.31
+	std::vector<std::vector<std::complex<double>>> chi02(dim*dim,
+		std::vector<std::complex<double>>(nomega));			// Peize Lin change ptr to std::vector at 2020.01.31
 	for(int i=0;i<dim*dim;i++)
 	{
 		for(int j=0;j<nomega;j++)
@@ -1764,8 +1764,8 @@ void Chi0_hilbert::Cal_Chi0()
 	//---------------------------------------------------------------------------------
 	// use lapack to reduce the time
 	//---------------------------------------------------------------------------------
-	complex<double> alpha=1;
-	complex<double> beta=0;
+	std::complex<double> alpha=1;
+	std::complex<double> beta=0;
 	char transa = 'N';
 	char transb = 'N';
 	int M = nomega;
@@ -1800,11 +1800,11 @@ void Chi0_hilbert::Cal_Chi0()
 	return;
 }
 
-complex<double> Chi0_hilbert::f(int k, int j)
+std::complex<double> Chi0_hilbert::f(int k, int j)
 {
-	complex<double> m,n,l;
-	m = complex<double>( (j - k) * domega, eta);
-	n = complex<double>( (j + k) * domega, eta);
+	std::complex<double> m,n,l;
+	m = std::complex<double>( (j - k) * domega, eta);
+	n = std::complex<double>( (j + k) * domega, eta);
 	l = 1.0/m - 1.0/n;
 	return l; 	            
 }
@@ -1815,7 +1815,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 {
 	TITLE("Chi0_hilbert","Cal_Chi");
 	double q = sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
-	vector<complex<double>> gather_chi(nomega);			// Peize Lin change ptr to vector at 2020.01.31
+	std::vector<std::complex<double>> gather_chi(nomega);			// Peize Lin change ptr to std::vector at 2020.01.31
 	for(int i=0; i<nomega; i++)
 	{
 		for(int g0=0; g0<dim; g0++)
@@ -1843,7 +1843,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		{
 			for(int g1 =0; g1<dim; g1++)
 			{
-				chi[g0][g1] = complex<double>( rpa[g0][g1].real(), rpa[g0][g1].imag());
+				chi[g0][g1] = std::complex<double>( rpa[g0][g1].real(), rpa[g0][g1].imag());
 			}
 		}
 		std::cout <<"iq = "<<iq<< " epsilon["<<i<<"] = "<<chi[0][0].real()<<"  "<<chi[0][0].imag() <<std::endl;*/
@@ -1875,7 +1875,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 		//--------------------------------------------------------------------
 		//  Re{epsilon}  NJP(2014)
 		//--------------------------------------------------------------------
-		//complex<double> M;
+		//std::complex<double> M;
 		//M = 1.0/(8*PI/q/q*chi[0][0]);
 		//std::cout <<"iq = "<<iq<<" epsMreal["<<i<<"] = "<<M.real()<<std::endl;
 		//std::cout <<"iq = "<<iq<<" epsMimag["<<i<<"] = "<<M.imag()<<std::endl; 
@@ -1924,7 +1924,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 void Chi0_hilbert::Cal_Chi_surface(int iq)
 {
 	TITLE("Chi0_hilbert","Cal_Chi_surface");
-	complex<double> g;
+	std::complex<double> g;
 	for(int i=0; i<nomega; i++)
 	{
 		for(int g0=0; g0<dim; g0++)
@@ -1966,7 +1966,7 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 					}
 					else
 					{
-						kernel[g0][g1] = complex<double>(0.0, 0.0);
+						kernel[g0][g1] = std::complex<double>(0.0, 0.0);
 					}
 				}
 		}
@@ -1988,7 +1988,7 @@ void Chi0_hilbert:: Cal_kernel(int iq)
 					}
 					else
 					{
-						kernel[g0][g1] = complex<double>(0.0, 0.0);
+						kernel[g0][g1] = std::complex<double>(0.0, 0.0);
 					}
 				}
 			}			
@@ -2068,7 +2068,7 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 	//  they calculate epsilon not epsilon^-1 to get the peak 
 	//  here we use lapack to get the eigenvalues
 	//-------------------------------------------------------------
-	/*complex<double> a[dim*dim];
+	/*std::complex<double> a[dim*dim];
 	for(int g0=0;g0<dim;g0++)
 	{
 		for(int g1=0;g1<dim;g1++)
@@ -2087,14 +2087,14 @@ void Chi0_hilbert::Cal_Rpa(int iq)
 	char jobvr = 'V';
 	int N = dim;
 	int lda = dim;
-	complex<double>* w = (complex<double>*)malloc( sizeof(complex<double>) * N);
+	std::complex<double>* w = (std::complex<double>*)malloc( sizeof(std::complex<double>) * N);
 	int ldvr = dim;
-	complex<double>* vr = (complex<double>*)malloc( sizeof(complex<double>) * N * ldvr);
+	std::complex<double>* vr = (std::complex<double>*)malloc( sizeof(std::complex<double>) * N * ldvr);
 	int ldvl = dim;
-	complex<double>* vl = (complex<double>*)malloc( sizeof(complex<double>) * N * ldvl);
+	std::complex<double>* vl = (std::complex<double>*)malloc( sizeof(std::complex<double>) * N * ldvl);
 	int lwork = N * 4;
 	double *rwork = (double*)malloc( sizeof(double) * 2 * N);
-	complex<double> *work = (complex<double>*)malloc( sizeof(complex<double>) * lwork);
+	std::complex<double> *work = (std::complex<double>*)malloc( sizeof(std::complex<double>) * lwork);
 	int info;
 
 	zgeev_(&jobvl, &jobvr, &N, a, &lda, w, vl , &ldvl , vr, &ldvr, work, &lwork, rwork, &info);
@@ -2133,13 +2133,13 @@ double Chi0_hilbert::qg2( int iq, int g0)
 }
 
 //-------------------------------------------------------------
-// inverse a complex matrix by Gauss elimination method
+// inverse a std::complex matrix by Gauss elimination method
 //-------------------------------------------------------------
-int Chi0_hilbert::Cinv(int n, complex<double>** a)
+int Chi0_hilbert::Cinv(int n, std::complex<double>** a)
 {
 	int i,j,k;	//l,u,v,w;
 	double p,q,s,d,b,m;
-	complex<double> t;
+	std::complex<double> t;
 	int *is, *js;
 	is = new int[n]; 
 	js = new int[n];
@@ -2182,7 +2182,7 @@ int Chi0_hilbert::Cinv(int n, complex<double>** a)
 		}
 		
 		//l=k*n+k;
-		a[k][k] = complex<double>( a[k][k].real()/d, -a[k][k].imag()/d);
+		a[k][k] = std::complex<double>( a[k][k].real()/d, -a[k][k].imag()/d);
 		
 		for (j=0; j<=n-1; j++)
 		{
@@ -2190,7 +2190,7 @@ int Chi0_hilbert::Cinv(int n, complex<double>** a)
 			{
 				p=a[k][j].real() *a[k][k].real(); q=a[k][j].imag() *a[k][k].imag();
 				s=(a[k][j].real() +a[k][j].imag())*(a[k][k].real() + a[k][k].imag());
-				a[k][j] = complex<double>( p-q, s-p-q);
+				a[k][j] = std::complex<double>( p-q, s-p-q);
 			}
 		}
 		
@@ -2205,7 +2205,7 @@ int Chi0_hilbert::Cinv(int n, complex<double>** a)
 						p=a[k][j].real() * a[i][k].real(); q=a[k][j].imag() *a[i][k].imag();
 						s=(a[k][j].real() +a[k][j].imag())*(a[i][k].real() +a[i][k].imag());
 						m=p-q; b=s-p-q;
-						a[i][j] = complex<double>( a[i][j].real() - m, a[i][j].imag() - b);
+						a[i][j] = std::complex<double>( a[i][j].real() - m, a[i][j].imag() - b);
 					}																				
 				}																
 			}
@@ -2217,7 +2217,7 @@ int Chi0_hilbert::Cinv(int n, complex<double>** a)
 			{
 				p=a[i][k].real() *a[k][k].real(); q=a[i][k].imag() *a[k][k].imag();
 				s=(a[i][k].real() +a[i][k].imag())*(a[k][k].real() +a[k][k].imag());
-				a[i][k] = complex<double>( q-p, p+q-s); 
+				a[i][k] = std::complex<double>( q-p, p+q-s); 
 			}
 		}
 	}
@@ -2250,13 +2250,13 @@ int Chi0_hilbert::Cinv(int n, complex<double>** a)
 //-------------------------------------------------------------
 // Matrix multiplication 
 //-------------------------------------------------------------
-void Chi0_hilbert::CMatrixMul(int m, int n, int l, complex<double>** A, complex<double>** B, complex<double>** C)
+void Chi0_hilbert::CMatrixMul(int m, int n, int l, std::complex<double>** A, std::complex<double>** B, std::complex<double>** C)
 {
 	for(int i=0; i<m; i++)
 	{
 		for(int j=0; j<l; j++)
 		{
-			C[i][j] = complex<double>(0.0,0.0);
+			C[i][j] = std::complex<double>(0.0,0.0);
 			for(int k=0; k<n; k++)
 			{
 				C[i][j] = C[i][j] + A[i][k] * B[k][j] ;
@@ -2378,7 +2378,7 @@ void Chi0_hilbert::Cal_kernel_2D(int iq)
 				}
 				else
 				{
-					kernel[g0][g1] = complex<double>(0.0,0.0);
+					kernel[g0][g1] = std::complex<double>(0.0,0.0);
 				}
 			}
 	}
@@ -2441,14 +2441,14 @@ void Chi0_hilbert::chi_para_g()
 }
 
 
-complex<double> Chi0_hilbert:: Cal_g(int iq)
+std::complex<double> Chi0_hilbert:: Cal_g(int iq)
 {	
-    complex<double> g;
+    std::complex<double> g;
     double L = GlobalC::ucell.latvec.e33 * GlobalC::ucell.lat0;
     double dz = L/GlobalC::pw.ncz;
     double q =  sqrt(((GlobalC::kv.kvec_c[iq])*(TWO_PI/GlobalC::ucell.lat0)).norm2());
     
-    g = complex<double>(0.0,0.0);
+    g = std::complex<double>(0.0,0.0);
 
     for(int z0=0;z0<GlobalC::pw.ncz;z0++)
         for(int z1=0;z1<GlobalC::pw.ncz;z1++)
@@ -2466,12 +2466,12 @@ complex<double> Chi0_hilbert:: Cal_g(int iq)
 //  matrix inverse( exist some bugs!)
 //---------------------------------------------
 
-/*void Chi0_hilbert:: C_inverse(int n, complex<double>** a)
+/*void Chi0_hilbert:: C_inverse(int n, std::complex<double>** a)
 {
          int info;
 
-         //complex<double> M[n][n],N[n][n];
-         complex<double> M[n*n],N[n*n];
+         //std::complex<double> M[n][n],N[n][n];
+         std::complex<double> M[n*n],N[n*n];
 
          for(int i=0; i<n; i++)
          {

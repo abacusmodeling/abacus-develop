@@ -4,8 +4,8 @@
 #ifndef FUNC_EACH_2_H
 #define FUNC_EACH_2_H
 
-#include<vector>
-#include<map>
+#include <vector>
+#include <map>
 #include<functional>
 	
 template<typename Ti, typename... T_tail>

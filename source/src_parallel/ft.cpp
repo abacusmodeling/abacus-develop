@@ -15,11 +15,11 @@ FFT::FFT()
 	this->nxx = 0;
 	this->scale_xyz = 1;
 	this->FFTWsetupwasdone = 0;//mohan modify 2007-11-12
-	this->aux4plan = new complex<double>[1];
+	this->aux4plan = new std::complex<double>[1];
 
 #ifdef __MPI
 	this->plane = new int[1];
-	this->aux = new complex<double>[1];
+	this->aux = new std::complex<double>[1];
 	
 	
 	this->sentc = new int[1];
@@ -50,7 +50,7 @@ FFT::~FFT()
 #endif
 }
 
-void FFT::FFT3D(complex<double> *psi,const int sign)
+void FFT::FFT3D(std::complex<double> *psi,const int sign)
 {
 	/*
 	std::cout << "\n\n do fft3d()  "; // << psi[0] << std::endl;
@@ -135,7 +135,7 @@ void FFT::setupFFT3D_2()
 #elif defined __FFTW3
 
 	delete[] aux4plan; 
-	this->aux4plan = new complex<double>[this->nxx];
+	this->aux4plan = new std::complex<double>[this->nxx];
 
 	//fftw_complex *psiout;
 	//psiout = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * this->nxx );
@@ -170,7 +170,7 @@ void FFT::setupFFT3D_2()
 	return;
 }
 
-void FFT::SFFT3D(complex<double> *psi, const int sign)
+void FFT::SFFT3D(std::complex<double> *psi, const int sign)
 {
 	if(!FFTWsetupwasdone) 
 	{
@@ -273,7 +273,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	*/
 
 	delete[] aux;
-	this->aux = new complex<double>[this->nxx];
+	this->aux = new std::complex<double>[this->nxx];
 
 	delete[] sentc;
 	delete[] sdis;
@@ -330,7 +330,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	*/
 
 	delete[] aux4plan; 
-	this->aux4plan = new complex<double>[this->nxx];
+	this->aux4plan = new std::complex<double>[this->nxx];
 
 	//		                             (rank, *n,			howmany, *in,				  			  *inembed, istride, idist,
 	this->planplus_x  = fftw_plan_many_dft(  1, &plan_nx,	npy,	 (fftw_complex *)aux4plan, 		  &plan_nx, npy,     1,
@@ -399,7 +399,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 }
 
 // parallel 3D FFT.
-void FFT::P3DFFT(complex<double> *psi, const int sign)
+void FFT::P3DFFT(std::complex<double> *psi, const int sign)
 {
 	
 	//timer::tick("FFT","P3DFFT_Init");
@@ -475,7 +475,7 @@ void FFT::P3DFFT(complex<double> *psi, const int sign)
 	return;
 }
 
-void FFT::fftxy(complex<double> *psi, const int sign)
+void FFT::fftxy(std::complex<double> *psi, const int sign)
 {
 	//timer::tick("FFT","fftxy");
 
@@ -580,7 +580,7 @@ void FFT::fftxy(complex<double> *psi, const int sign)
 
 
 
-void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out)
+void FFT::fftz(std::complex<double> *psi_in, const int sign, std::complex<double> *psi_out)
 {
 	//timer::tick("FFT","fftz");
 	// number of sticks in this process.
@@ -643,7 +643,7 @@ void FFT::fftz(complex<double> *psi_in, const int sign, complex<double> *psi_out
 
 
 
-void FFT::scatter(complex<double> *psi, int sign)
+void FFT::scatter(std::complex<double> *psi, int sign)
 {
 	//timer::tick("FFT","scatter");
 

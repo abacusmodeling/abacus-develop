@@ -112,7 +112,7 @@ void Atom_pseudo::set_d_so(
 							{
 								if(is==1||is==2)
 								{
-									this->d_so(is, L1, L2) = complex<double>(0.0,0.0);
+									this->d_so(is, L1, L2) = std::complex<double>(0.0,0.0);
 								}
 								else
 								{

@@ -377,7 +377,7 @@ void Input_Conv::Convert(void)
 	{
 		int count = 0;
 		string pattern("([0-9]+\\*[0-9.]+|[0-9,.]+)");
-		vector<string> str;
+		std::vector<string> str;
 		string::size_type pos1, pos2;
 		string c = " ";
 		pos2 = GlobalV::ocp_set.find(c);
@@ -420,8 +420,8 @@ void Input_Conv::Convert(void)
 				int pos = sub_str.find("*");
 				int num = stoi(sub_str.substr(0, pos));
 				double occ = stof(sub_str.substr(pos+1, sub_str.size()));
-				vector<double> ocp_temp(num, occ);
-				const vector<double>::iterator dest = GlobalV::ocp_kb.begin()+count;
+				std::vector<double> ocp_temp(num, occ);
+				const std::vector<double>::iterator dest = GlobalV::ocp_kb.begin()+count;
 				copy(ocp_temp.begin(), ocp_temp.end(), dest);
 				count += num;
 			}

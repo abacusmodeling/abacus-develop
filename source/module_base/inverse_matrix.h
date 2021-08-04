@@ -19,7 +19,7 @@ class Inverse_Matrix_Complex
 	int dim;
 	double *e;
 	int lwork;
-	complex<double> *work2;
+	std::complex<double> *work2;
 	double* rwork;
 	int info;
 	bool allocate; //mohan add 2012-04-02

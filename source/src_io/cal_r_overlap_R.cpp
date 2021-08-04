@@ -338,7 +338,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	if(GlobalV::DRANK == 0)
 	{
 		out_r.open(ssh.str().c_str());
-		out_r << "Matrix Dimension of vector r(R): " << GlobalV::NLOCAL <<std::endl;
+		out_r << "Matrix Dimension of std::vector r(R): " << GlobalV::NLOCAL <<std::endl;
 	}
 	
 	for(int ix = 0; ix < R_x_num; ix++)
@@ -391,7 +391,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 							if(i==0 && j==0)
 							{
 								out_r << dRx << " " << dRy << " " << dRz  
-								<< "    //R vector(R2 - R1,unit: lattice vector)" <<std::endl;
+								<< "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
 							}
 							
 							out_r << setw(20) << setprecision(9) << setiosflags(ios::scientific) << liner_x[j] << " "

@@ -13,7 +13,7 @@ Vdwd3::Vdwd3(const UnitCell_pseudo &unit_in, Vdwd3_Parameters &para_in):
 	ucell(unit_in),
 	para(para_in){}
 
-void Vdwd3::set_criteria(double &rthr, vector<Vector3<double>> &lat, vector<double> &tau_max)
+void Vdwd3::set_criteria(double &rthr, std::vector<Vector3<double>> &lat, std::vector<double> &tau_max)
 {
     tau_max.resize(3);
 	double r_cutoff = sqrt(rthr);
@@ -35,7 +35,7 @@ void Vdwd3::init(const UnitCell_pseudo &ucell)
     lat[1] = ucell.a2*ucell.lat0;
     lat[2] = ucell.a3*ucell.lat0;
 
-    vector<double>atom_kind = atomkind(ucell);
+    std::vector<double>atom_kind = atomkind(ucell);
     iz.reserve(ucell.nat);
 	xyz.reserve(ucell.nat);
     for(size_t it=0; it!=ucell.ntype; it++)
@@ -45,7 +45,7 @@ void Vdwd3::init(const UnitCell_pseudo &ucell)
 			xyz.push_back(ucell.atoms[it].tau[ia] * ucell.lat0);
 		}
 
-    vector<double> tau_max(3);
+    std::vector<double> tau_max(3);
     if(para.model=="radius")
 	{
         rep_vdw.resize(3);
@@ -61,9 +61,9 @@ void Vdwd3::init(const UnitCell_pseudo &ucell)
         rep_cn[i] = ceil(tau_max[i]);
 }
 
-vector<double> Vdwd3::atomkind (const UnitCell_pseudo &ucell)
+std::vector<double> Vdwd3::atomkind (const UnitCell_pseudo &ucell)
 {
-	vector<double>atom_kind(ucell.ntype);
+	std::vector<double>atom_kind(ucell.ntype);
 	for(size_t i=0 ; i!=ucell.ntype ; i++)
 		for(int j=0; j!=element_name.size(); j++)
 			if (ucell.atoms[i].psd == element_name[j])
@@ -100,7 +100,7 @@ void Vdwd3::getc6(int &iat, int &jat, double &nci, double &ncj, double &c6)
 	c6 = (rsum > 1e-99) ? csum/rsum : c6mem;
 }
 
-void Vdwd3::pbcncoord(vector<double> &cn)
+void Vdwd3::pbcncoord(std::vector<double> &cn)
 {
 	for(size_t i=0; i!=ucell.nat; i++)
 	{
@@ -123,13 +123,13 @@ void Vdwd3::pbcncoord(vector<double> &cn)
 	}
 }
 
-void Vdwd3::pbcthreebody(vector<int> &iz,  vector<Vector3<double>> &lat, vector<Vector3<double>> &xyz, vector<int> &rep_cn, vector<double> &cc6ab, double &eabc)
+void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &lat, std::vector<Vector3<double>> &xyz, std::vector<int> &rep_cn, std::vector<double> &cc6ab, double &eabc)
 {
 	double sr9=0.75, alp9=-16.0;
 	int ij, ik, jk;
 	double r0ij, r0ik, r0jk, c9, rij2, rik2, rjk2, rr0ij, rr0ik, rr0jk, geomean, fdamp, tmp1, tmp2, tmp3, tmp4, ang;
 	Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
-	vector<double> repmin(3), repmax(3);
+	std::vector<double> repmin(3), repmax(3);
 	for(int iat=2; iat!=ucell.nat; iat++)
 		for(int jat=1; jat!=iat; jat++)
 		{
@@ -398,7 +398,7 @@ void Vdwd3::cal_energy()
 	int ij;	
 	double c6 = 0.0, c8 = 0.0, r2 = 0.0, r6 = 0.0, r8 = 0.0, rr = 0.0, damp6 = 0.0, damp8 = 0.0;
 	double e6 = 0.0, e8 = 0.0, eabc = 0.0;
-	vector<double> cc6ab(ucell.nat*ucell.nat), cn(ucell.nat);
+	std::vector<double> cc6ab(ucell.nat*ucell.nat), cn(ucell.nat);
 	pbcncoord(cn);
 	Vector3<double> tau;
 	if(para.version == "d3_0") // DFT-D3(zero-damping)
@@ -589,18 +589,18 @@ void Vdwd3::get_dc6_dcnij(int &mxci, int &mxcj, double &cni, double &cnj, int &i
 	}
 }
 
-void Vdwd3::pbcgdisp(vector<Vector3<double>> &g, matrix &sigma)
+void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, matrix &sigma)
 {
 	init(ucell);
-	vector<double> c6save(ucell.nat*(ucell.nat+1)), dc6_rest_sum(ucell.nat*(ucell.nat+1)/2), dc6i(ucell.nat), cn(ucell.nat);
+	std::vector<double> c6save(ucell.nat*(ucell.nat+1)), dc6_rest_sum(ucell.nat*(ucell.nat+1)/2), dc6i(ucell.nat), cn(ucell.nat);
 	pbcncoord(cn);
-	vector<vector<double>> dc6ij(ucell.nat, vector<double>(ucell.nat));
+	std::vector<std::vector<double>> dc6ij(ucell.nat, std::vector<double>(ucell.nat));
 	double c6 = 0.0, dc6iji = 0.0, dc6ijj = 0.0;
 	double r = 0.0, r0 = 0.0, r2 = 0.0, r6 = 0.0, r7 = 0.0, r8 = 0.0, r9 = 0.0;
 	double r42 = 0.0, rcovij = 0.0, t6 = 0.0, t8 = 0.0, dc6_rest = 0.0;
 	int linii = 0, linij = 0;
 	Vector3<double> tau;
-	vector<vector<vector<vector<double>>>> drij(ucell.nat*(ucell.nat+1)/2, vector<vector<vector<double>>>(2*rep_vdw[0]+1, vector<vector<double>>(2*rep_vdw[1]+1, vector<double>(2*rep_vdw[2]+1))));
+	std::vector<std::vector<std::vector<std::vector<double>>>> drij(ucell.nat*(ucell.nat+1)/2, std::vector<std::vector<std::vector<double>>>(2*rep_vdw[0]+1, std::vector<std::vector<double>>(2*rep_vdw[1]+1, std::vector<double>(2*rep_vdw[2]+1))));
 	if(para.version == "d3_0")
 	{
 		double damp6 = 0.0, damp8 = 0.0;
@@ -774,7 +774,7 @@ void Vdwd3::pbcgdisp(vector<Vector3<double>> &g, matrix &sigma)
 	if(para.abc)
 	{
 		Vector3<double> ijvec, ikvec, jkvec, jtau, ktau;
-		vector<int> repmin(3), repmax(3);
+		std::vector<int> repmin(3), repmax(3);
 		double sr9=0.75, alp9=-16.0;
 		double linik, linjk, rij2, rik2, rjk2, rr0ij, rr0ik, rr0jk, geomean2, geomean, geomean3, r0av, r;
 		double c6ij, c6ik, c6jk, c9, damp9, ang, dfdmp, dang, tmp1, dc9;
@@ -1155,8 +1155,8 @@ void Vdwd3::pbcgdisp(vector<Vector3<double>> &g, matrix &sigma)
 						g[iat] += vec3;
 						g[jat] -= vec3;
 
-						vector<double> vec = {vec3.x, vec3.y, vec3.z};
-						vector<double> rij_vec = {rij.x, rij.y, rij.z};
+						std::vector<double> vec = {vec3.x, vec3.y, vec3.z};
+						std::vector<double> rij_vec = {rij.x, rij.y, rij.z};
 						for(size_t i=0; i!=3; i++)
 							for(size_t j=0; j!=3; j++)
 							{
@@ -1186,8 +1186,8 @@ void Vdwd3::pbcgdisp(vector<Vector3<double>> &g, matrix &sigma)
 					x1 = drij[linii][taux+rep_vdw[0]][tauy+rep_vdw[1]][tauz+rep_vdw[2]]+dcnn*dc6i[iat];
 
 					vec3 = x1*tau/r;
-					vector<double> vec = {vec3.x, vec3.y, vec3.z};
-					vector<double> tau_vec = {tau.x, tau.y, tau.z};
+					std::vector<double> vec = {vec3.x, vec3.y, vec3.z};
+					std::vector<double> tau_vec = {tau.x, tau.y, tau.z};
 					for(size_t i=0; i!=3; i++)
 						for(size_t j=0; j!=3; j++)
 						{
@@ -1204,7 +1204,7 @@ void Vdwd3::cal_force()
 	force.clear();
 	force.resize(ucell.nat);
 
-	vector<Vector3<double>> g;
+	std::vector<Vector3<double>> g;
 	g.clear();
 	g.resize(ucell.nat);
 	matrix sigma(3, 3);
@@ -1220,7 +1220,7 @@ void Vdwd3::cal_stress()
 {
 	TITLE("Vdwd3","cal_stress");
 
-	vector<Vector3<double>> g;
+	std::vector<Vector3<double>> g;
 	g.clear();
 	g.resize(ucell.nat);
 	matrix sigma(3, 3);

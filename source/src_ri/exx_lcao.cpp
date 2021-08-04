@@ -211,7 +211,7 @@ void Exx_Lcao::init()
 	
 	auto test_rk = []()
 	{
-		auto pr_v = []( const string & file, const vector<double> & v )
+		auto pr_v = []( const string & file, const std::vector<double> & v )
 		{
 			ofstream ofs(file);
 			for( size_t i=0; i!=v.size(); ++i )
@@ -405,7 +405,7 @@ void Exx_Lcao::init()
 		}
 
 		const Vector3<int>BvK_period( GlobalC::kv.nmp[0], GlobalC::kv.nmp[1], GlobalC::kv.nmp[2] );
-		vector<Vector3<double>> boxes;
+		std::vector<Vector3<double>> boxes;
 		for( int x=0; x!=BvK_period.x; ++x )
 		{
 			for( int y=0; y!=BvK_period.y; ++y )
@@ -506,11 +506,11 @@ void Exx_Lcao::init()
 
 	auto test_nrm2 = []()
 	{
-		vector<double> x = {1,2,3};
+		std::vector<double> x = {1,2,3};
 		std::cout<<LapackConnector::nrm2( x.size(), VECTOR_TO_PTR(x), 1 )<<std::endl;
-		vector<complex<double>> y = { {1.1,2.2}, {3.3,-4.4}, {-5.5,-6.6} };
+		std::vector<std::complex<double>> y = { {1.1,2.2}, {3.3,-4.4}, {-5.5,-6.6} };
 		std::cout<<LapackConnector::nrm2( y.size(), VECTOR_TO_PTR(y), 1 )<<std::endl;
-		vector<double> z = {1,2,3,4,5,6};
+		std::vector<double> z = {1,2,3,4,5,6};
 		std::cout<<LapackConnector::nrm2( 3, VECTOR_TO_PTR(z), 2 )<<std::endl;
 	};
 
@@ -556,7 +556,7 @@ ofs_mpi<<info.files_abfs<<std::endl;
 ofs_mpi<<info.files_abfs<<std::endl;
 
 gettimeofday( &t_start, NULL);
-	const vector<vector<vector<Numerical_Orbital_Lm>>>
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>>
 		abfs_same_atom = Exx_Abfs::Construct_Orbs::abfs_same_atom( lcaos, this->kmesh_times, info.pca_threshold );		// Peize Lin test
 	if(info.files_abfs.empty())
 	{
@@ -569,7 +569,7 @@ gettimeofday( &t_start, NULL);
 //	this->abfs = Exx_Abfs::Construct_Orbs::orth_orbs( abfs_origin );		// Peize Lin test
 ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::endl;
 
-	auto print_psi1 = [](const vector<vector<vector<Numerical_Orbital_Lm>>> &orbs)
+	auto print_psi1 = [](const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs)
 	{
 		for(size_t N=0; N!=orbs[0][0].size(); ++N)
 		{
@@ -602,7 +602,7 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::en
 
 	auto print_psi2 = [](
 		const string & file_name,
-		const vector<vector<vector<Numerical_Orbital_Lm>>> &orbs)
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs)
 	{
 		ofstream ofs(file_name);
 		for( size_t T=0; T!=orbs.size(); ++T )
@@ -645,7 +645,7 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::
 
 	auto print_psik = [](
 		const string & file_name,
-		const vector<vector<vector<Numerical_Orbital_Lm>>> & orbs,
+		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> & orbs,
 		const int power )
 	{
 		for( size_t i=0; i!=orbs.size(); ++i )
@@ -741,8 +741,8 @@ ofs_mpi.close();
 		pthread_rwlock_t rwlock_Cw;	pthread_rwlock_init(&rwlock_Cw,NULL);
 		pthread_rwlock_t rwlock_Vw;	pthread_rwlock_init(&rwlock_Vw,NULL);
 
-		map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Cws;
-		map<size_t,map<size_t,map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Vws;
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Cws;
+		std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<double>,weak_ptr<matrix>>>> Vws;
 		shared_ptr<matrix> C = Abfs::DPcal_C(
 			0,
 			0,
@@ -772,7 +772,7 @@ ofs_mpi.close();
 		m_lcaos_lcaos.init_radial_table();
 		const matrix m_overlap = m_lcaos_lcaos.cal_overlap_matrix( 0,0, {0,0,0},{0,0,0}, index_lcaos,index_lcaos );
 
-		vector<vector<vector<Numerical_Orbital_Lm>>> lcaos_ccp;
+		std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> lcaos_ccp;
 		Conv_Coulomb_Pot::cal_orbs_ccp( lcaos, lcaos_ccp );
 		Exx_Abfs::Matrix_Orbs11 m_lcaos_ccp;
 		m_lcaos_ccp.init(1,1,1);
@@ -793,7 +793,7 @@ ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
 
-	auto cal_atom_centres_core = [](const vector<pair<size_t,size_t>> &atom_pairs_core) -> set<size_t>
+	auto cal_atom_centres_core = [](const std::vector<pair<size_t,size_t>> &atom_pairs_core) -> set<size_t>
 	{
 		set<size_t> atom_centres_core;
 		for( const pair<size_t,size_t> & atom_pair : atom_pairs_core )
@@ -951,7 +951,7 @@ ofs_mpi<<"sizeof_DM\t"<<get_sizeof(DM_para.DMr)<<std::endl;
 
 gettimeofday( &t_start, NULL);
 	// HexxR[is][iat1][iat2][box2]
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR = cal_Hexx();
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR = cal_Hexx();
 ofs_mpi<<"TIME@ Exx_Lcao::cal_Hexx\t"<<time_during(t_start)<<std::endl;
 
 ofs_mpi<<"sizeof_HexxR\t"<<get_sizeof(HexxR)<<std::endl;
@@ -1164,7 +1164,7 @@ ofs_mpi.close();
 
 void Exx_Lcao::cal_exx_elec_nscf()
 {
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR;
 	Hexx_para.Rexx_to_Km2D( HexxR, {GlobalC::pot.start_pot=="file",GlobalC::CHR.out_charge} );
 }
 
@@ -1178,8 +1178,8 @@ void Exx_Lcao::cal_Hexx_gamma( const set<pair<size_t,size_t>> &atom_pairs )
 		const size_t it1 = GlobalC::ucell.iat2it[iat1];
 		const size_t it2 = GlobalC::ucell.iat2it[iat2];
 
-		const vector<Abfs::Atom_Info> adj1s = Abfs::get_adjs( GlobalC::ucell.atoms[it1].tau[GlobalC::ucell.iat2ia[iat2]] );
-		const vector<Abfs::Atom_Info> adj2s = Abfs::get_adjs( GlobalC::ucell.atoms[it2].tau[GlobalC::ucell.iat2ia[iat2]] );
+		const std::vector<Abfs::Atom_Info> adj1s = Abfs::get_adjs( GlobalC::ucell.atoms[it1].tau[GlobalC::ucell.iat2ia[iat2]] );
+		const std::vector<Abfs::Atom_Info> adj2s = Abfs::get_adjs( GlobalC::ucell.atoms[it2].tau[GlobalC::ucell.iat2ia[iat2]] );
 		for( const Abfs::Atom_Info & atom3 : adj1s )
 		{
 			const size_t iat3 = GlobalC::ucell.itia2iat( atom3.T, atom3.I );
@@ -1209,7 +1209,7 @@ void Exx_Lcao::cal_Hexx_gamma( const set<pair<size_t,size_t>> &atom_pairs )
 */
 
 double Exx_Lcao::cal_energy( 
-	const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const
+	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const
 {
 	TITLE("Exx_Lcao","cal_energy");
 ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
@@ -1239,7 +1239,7 @@ gettimeofday( &t_start, NULL);
 			}
 		}
 	}
-	const map<int,double> SPIN_multiple = {{1,2}, {2,1}, {4,1}};							// ???
+	const std::map<int,double> SPIN_multiple = {{1,2}, {2,1}, {4,1}};							// ???
 	energy *= SPIN_multiple.at(GlobalV::NSPIN);			// ?
 	energy /= 2;					// /2 for Ry
 	
@@ -1273,14 +1273,14 @@ void Exx_Lcao::add_Hexx( const size_t ik, const double alpha ) const
 }
 
 
-void Exx_Lcao::init_radial_table_ions( const set<size_t> &atom_centres_core, const vector<pair<size_t,size_t>> &atom_pairs_core )
+void Exx_Lcao::init_radial_table_ions( const set<size_t> &atom_centres_core, const std::vector<pair<size_t,size_t>> &atom_pairs_core )
 {
 	TITLE("Exx_Lcao::init_radial_table_ions");
 	
 ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 
-	map<size_t,map<size_t,set<double>>> radial_R;
+	std::map<size_t,std::map<size_t,set<double>>> radial_R;
 	
 	auto print_atom = [&](ostream &os)
 	{
@@ -1332,7 +1332,7 @@ gettimeofday( &t_start, NULL);
 		const size_t ia1 = GlobalC::ucell.iat2ia[iat1];
 		const Vector3<double> tau1 = GlobalC::ucell.atoms[it1].tau[ia1];
 
-		const map<size_t,vector<Abfs::Vector3_Order<int>>> adjs = Abfs::get_adjs(iat1);
+		const std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> adjs = Abfs::get_adjs(iat1);
 		for( const auto & atom2 : adjs )
 		{
 			const size_t iat2 = atom2.first;
@@ -1377,7 +1377,7 @@ ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<st
 		#error "TEST_EXX_LCAO"
 	#endif
 gettimeofday( &t_start, NULL);
-	vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(info.ccp_rmesh_times);
+	std::vector<Abfs::Vector3_Order<int>> Coulomb_potential_boxes = Abfs::get_Coulomb_potential_boxes(info.ccp_rmesh_times);
 	for( const pair<size_t,size_t> & atom_pair : atom_pairs_core )
 	{
 		const size_t iat1 = atom_pair.first;
@@ -1434,14 +1434,14 @@ ofs_mpi.close();
 }
 
 
-vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::cal_Hexx() const
+std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::cal_Hexx() const
 {
 #ifdef __MKL
     const int mkl_threads = mkl_get_max_threads();
 	mkl_set_num_threads(std::max(1UL,mkl_threads/atom_pairs_core.size()));
 #endif
 	
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR(GlobalV::NSPIN);
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR(GlobalV::NSPIN);
 	omp_lock_t Hexx_lock;
 	omp_init_lock(&Hexx_lock);
 	
@@ -1491,8 +1491,8 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::c
 
 		// insert m_tmp into m_all
 		auto insert_matrixes = []( 
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> & m_all,
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> & m_tmp)
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & m_all,
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & m_tmp)
 		{
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
@@ -1520,7 +1520,7 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::c
 			}
 		};
 
-		auto vector_empty = []( const vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> & v ) -> bool
+		auto vector_empty = []( const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> & v ) -> bool
 		{
 			for( const auto &i : v )
 			{
@@ -1529,7 +1529,7 @@ vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> Exx_Lcao::c
 			return true;
 		};
 		
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> HexxR_tmp(GlobalV::NSPIN);
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> HexxR_tmp(GlobalV::NSPIN);
 	
 		#pragma omp for
 		for(size_t i_atom_pair=0; i_atom_pair<atom_pairs_core.size(); ++i_atom_pair)

@@ -118,11 +118,11 @@ double Optical::element_cvk(const int &ik, const int &iv, const int &ic)
 {
 	double v=0.0;
 
-	complex<double> tmp[3];
+	std::complex<double> tmp[3];
 	ZEROS(tmp, 3);
 	for(int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 	{
-		const complex<double> uvc = conj( GlobalC::wf.evc[ik](ic,ig) ) * GlobalC::wf.evc[ik](iv, ig);
+		const std::complex<double> uvc = conj( GlobalC::wf.evc[ik](ic,ig) ) * GlobalC::wf.evc[ik](iv, ig);
 		tmp[0] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 0);
 		tmp[1] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 1);
 		tmp[2] += uvc * GlobalC::pw.get_GPlusK_cartesian_projection(ik, GlobalC::wf.igk(ik, ig), 2);

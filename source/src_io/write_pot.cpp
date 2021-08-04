@@ -205,7 +205,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     v_elecstat = new double[GlobalC::pw.nrxx];
     ZEROS(v_elecstat, GlobalC::pw.nrxx);
 
-    complex<double> *Porter = GlobalC::UFFT.porter;
+    std::complex<double> *Porter = GlobalC::UFFT.porter;
     ZEROS( Porter, GlobalC::pw.nrxx );
     
     int nspin0 = 1;
@@ -214,7 +214,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     {
         for(int ir=0; ir<GlobalC::pw.nrxx; ir++)
         {
-            Porter[ir] += complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
+            Porter[ir] += std::complex<double>( GlobalC::CHR.rho[is][ir], 0.0 );
         }
     }
 
@@ -226,7 +226,7 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     //=======================================================
     // calculate hartree potential in G-space (NB: V(G=0)=0 )
     //=======================================================
-    complex<double> *vh_g  = new complex<double>[GlobalC::pw.ngmc];
+    std::complex<double> *vh_g  = new std::complex<double>[GlobalC::pw.ngmc];
     ZEROS(vh_g, GlobalC::pw.ngmc);
 
     for(int ig = GlobalC::pw.gstart; ig<GlobalC::pw.ngmc; ig++)

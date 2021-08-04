@@ -368,7 +368,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
 }
 
 //LiuXh, 2017-03-21
-void HS_Matrix::saving_HS_complex(complex<double> *Hloc, complex<double>* Sloc, bool bit, const int &out_hs)
+void HS_Matrix::saving_HS_complex(std::complex<double> *Hloc, std::complex<double>* Sloc, bool bit, const int &out_hs)
 {   
     if(out_hs==1)
     {
@@ -386,7 +386,7 @@ void HS_Matrix::saving_HS_complex(complex<double> *Hloc, complex<double>* Sloc, 
 }
 
 //LiuXh, 2017-03-21
-void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit)
+void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S, bool bit)
 {
     TITLE("HS_Matrix","save_HS_bit");
     timer::tick("HS_Matrix","save_HS_bit");
@@ -423,8 +423,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         int ir,ic;
         for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            complex<double>* lineH = new complex<double>[GlobalV::NLOCAL-i];
-            complex<double>* lineS = new complex<double>[GlobalV::NLOCAL-i];
+            std::complex<double>* lineH = new std::complex<double>[GlobalV::NLOCAL-i];
+            std::complex<double>* lineS = new std::complex<double>[GlobalV::NLOCAL-i];
             ZEROS(lineH, GlobalV::NLOCAL-i);
             ZEROS(lineS, GlobalV::NLOCAL-i);
 
@@ -465,8 +465,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
             {
                 for (int j=i; j<GlobalV::NLOCAL; j++)
                 {
-                    fwrite(&lineH[j-i],sizeof(complex<double>),1,g1);
-                    fwrite(&lineS[j-i],sizeof(complex<double>),1,g2);
+                    fwrite(&lineH[j-i],sizeof(std::complex<double>),1,g1);
+                    fwrite(&lineS[j-i],sizeof(std::complex<double>),1,g2);
                 }
             }
             delete[] lineH;
@@ -491,8 +491,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         {
             for (int j=i; j<GlobalV::NLOCAL; j++)
             {
-                fwrite(&H[i*GlobalV::NLOCAL+j],sizeof(complex<double>),1,g1);
-                fwrite(&S[i*GlobalV::NLOCAL+j],sizeof(complex<double>),1,g2);
+                fwrite(&H[i*GlobalV::NLOCAL+j],sizeof(std::complex<double>),1,g1);
+                fwrite(&S[i*GlobalV::NLOCAL+j],sizeof(std::complex<double>),1,g2);
             }
         }
         fclose(g1);
@@ -516,8 +516,8 @@ void HS_Matrix::save_HS_complex(complex<double> *H, complex<double> *S, bool bit
         int ir,ic;
         for (int i=0; i<GlobalV::NLOCAL; i++)
         {
-            complex<double>* lineH = new complex<double>[GlobalV::NLOCAL-i];
-            complex<double>* lineS = new complex<double>[GlobalV::NLOCAL-i];
+            std::complex<double>* lineH = new std::complex<double>[GlobalV::NLOCAL-i];
+            std::complex<double>* lineS = new std::complex<double>[GlobalV::NLOCAL-i];
             ZEROS(lineH, GlobalV::NLOCAL-i);
             ZEROS(lineS, GlobalV::NLOCAL-i);
 
@@ -706,8 +706,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                     //double* lineS = new double[GlobalV::NLOCAL-i];
                     double* lineH = nullptr;
                     double* lineS = nullptr;
-                    complex<double>* lineH_soc = nullptr;
-                    complex<double>* lineS_soc = nullptr;
+                    std::complex<double>* lineH_soc = nullptr;
+                    std::complex<double>* lineS_soc = nullptr;
                     if(GlobalV::NSPIN!=4)
                     {
                         lineH = new double[GlobalV::NLOCAL];
@@ -717,8 +717,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                     }
                     else
                     {
-                        lineH_soc = new complex<double>[GlobalV::NLOCAL];
-                        lineS_soc = new complex<double>[GlobalV::NLOCAL];
+                        lineH_soc = new std::complex<double>[GlobalV::NLOCAL];
+                        lineS_soc = new std::complex<double>[GlobalV::NLOCAL];
                         ZEROS(lineH_soc, GlobalV::NLOCAL);
                         ZEROS(lineS_soc, GlobalV::NLOCAL);
                     }
@@ -785,8 +785,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                         {
                             if(i==0 && j==0)
                             {
-                                g1 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<std::endl;
-                                g2 << dRx << " " << dRy << " " << dRz  << "    //R vector(R2 - R1,unit: lattice vector)" <<std::endl;
+                                g1 << dRx << " " << dRy << " " << dRz  << "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
+                                g2 << dRx << " " << dRy << " " << dRz  << "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
                             }
                             //g1 << " " << lineH[j-i];
                             //g2 << " " << lineS[j-i];
@@ -799,10 +799,10 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
                             }
                             else
                             {
-                if(abs(lineH_soc[j].real()) < 1.0e-12) lineH_soc[j]= complex<double> (0.0, lineH_soc[j].imag());
-                                if(abs(lineH_soc[j].imag()) < 1.0e-12) lineH_soc[j]= complex<double> (lineH_soc[j].real(), 0.0);
-                                if(abs(lineS_soc[j].real()) < 1.0e-12) lineS_soc[j]= complex<double> (0.0, lineS_soc[j].imag());
-                                if(abs(lineS_soc[j].imag()) < 1.0e-12) lineS_soc[j]= complex<double> (lineS_soc[j].real() , 0.0);
+                if(abs(lineH_soc[j].real()) < 1.0e-12) lineH_soc[j]= std::complex<double> (0.0, lineH_soc[j].imag());
+                                if(abs(lineH_soc[j].imag()) < 1.0e-12) lineH_soc[j]= std::complex<double> (lineH_soc[j].real(), 0.0);
+                                if(abs(lineS_soc[j].real()) < 1.0e-12) lineS_soc[j]= std::complex<double> (0.0, lineS_soc[j].imag());
+                                if(abs(lineS_soc[j].imag()) < 1.0e-12) lineS_soc[j]= std::complex<double> (lineS_soc[j].real() , 0.0);
                                 g1 << " " << lineH_soc[j];
                                 g2 << " " << lineS_soc[j];
                             }
@@ -1081,10 +1081,10 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
     return;
 }
 
-void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, double>> &XR, const double &sparse_threshold, const bool &binary)
+void HS_Matrix::output_single_R(ofstream &ofs, const std::map<size_t, std::map<size_t, double>> &XR, const double &sparse_threshold, const bool &binary)
 {
     double *line = nullptr;
-    vector<int> indptr;
+    std::vector<int> indptr;
     indptr.reserve(GlobalV::NLOCAL + 1);
     indptr.push_back(0);
 
@@ -1190,10 +1190,10 @@ void HS_Matrix::output_single_R(ofstream &ofs, const map<size_t, map<size_t, dou
 
 }
 
-void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t, complex<double>>> &XR, const double &sparse_threshold, const bool &binary)
+void HS_Matrix::output_soc_single_R(ofstream &ofs, const std::map<size_t, std::map<size_t, std::complex<double>>> &XR, const double &sparse_threshold, const bool &binary)
 {
-    complex<double> *line = nullptr;
-    vector<int> indptr;
+    std::complex<double> *line = nullptr;
+    std::vector<int> indptr;
     indptr.reserve(GlobalV::NLOCAL + 1);
     indptr.push_back(0);
 
@@ -1216,7 +1216,7 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
 
     for(int row = 0; row < GlobalV::NLOCAL; ++row)
     {
-        line = new complex<double>[GlobalV::NLOCAL];
+        line = new std::complex<double>[GlobalV::NLOCAL];
         ZEROS(line, GlobalV::NLOCAL);
 
         if(GlobalC::ParaO.trace_loc_row[row] >= 0)
@@ -1242,7 +1242,7 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const map<size_t, map<size_t,
                 {
                     if (binary)
                     {
-                        ofs.write(reinterpret_cast<char *>(&line[col]), sizeof(complex<double>));
+                        ofs.write(reinterpret_cast<char *>(&line[col]), sizeof(std::complex<double>));
                         ofs_tem1.write(reinterpret_cast<char *>(&col), sizeof(int));
                     }
                     else

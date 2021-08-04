@@ -472,18 +472,18 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	}
 	pSB->set_dx( this->dk * dr );
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
-	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
-	vector<double> integrated_func( this->nr );
+	std::vector<double> integrated_func( this->nr );
 	const double pref = sqrt( 2.0 / PI );
 
-	vector<double> psir2(nr);
+	std::vector<double> psir2(nr);
 	for( size_t ir=0; ir!=nr; ++ir )
 		psir2[ir] = this->psir[ir] * this->r_radial[ir];
 
 	for (int ik = 0; ik < nk; ik++)
 	{
-		const vector<double> &jlk = jl[ik];
+		const std::vector<double> &jlk = jl[ik];
 		for (int ir = 0; ir < nr; ir++)
 			integrated_func[ir] = psir2[ir] * jlk[ir];
 		Integral::Simpson_Integral(
@@ -527,11 +527,11 @@ void Numerical_Orbital_Lm::cal_kradial_sbpool(void)
 	}
 	pSB->set_dx( this->dk * dr );
 	pSB->cal_jlx( this->angular_momentum_l, this->nk, this->nr );
-	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	const double pref = sqrt( 2.0 / PI );
 
-	vector<double> r_tmp(nr);
+	std::vector<double> r_tmp(nr);
 	for( int ir=0; ir!=nr; ++ir )
 	{
 		r_tmp[ir] = this->psir[ir] * this->r_radial[ir] * this->rab[ir];
@@ -604,11 +604,11 @@ void Numerical_Orbital_Lm::cal_rradial_sbpool(void)
 	pSB->set_dx( dr * dk );
 	pSB->cal_jlx( this->angular_momentum_l, this->nr, this->nk );
 
-	const vector<vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
+	const std::vector<std::vector<double>> &jl = pSB->get_jlx()[this->angular_momentum_l];
 
 	const double pref = sqrt(2.0/PI);
 
-	vector<double> k_tmp(nk);
+	std::vector<double> k_tmp(nk);
 
 	for( int ik=0; ik!=nk; ++ik )
 	{

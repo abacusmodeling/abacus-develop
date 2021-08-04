@@ -188,36 +188,36 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 			read_q_pack();
 		}
 
-		phi = new complex<double>*[GlobalV::NLOCAL];
+		phi = new std::complex<double>*[GlobalV::NLOCAL];
 		for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
 		{
-			phi[iw] = new complex<double>[pw_ptr->nrxx];
+			phi[iw] = new std::complex<double>[pw_ptr->nrxx];
 		}
 
-		psi = new complex<double>**[q_pack->kv_ptr->nks];
+		psi = new std::complex<double>**[q_pack->kv_ptr->nks];
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 		{
-			psi[iq] = new complex<double> *[GlobalV::NBANDS];
+			psi[iq] = new std::complex<double> *[GlobalV::NBANDS];
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
-				psi[iq][ib] = new complex<double>[pw_ptr->nrxx];
+				psi[iq][ib] = new std::complex<double>[pw_ptr->nrxx];
 			}
 		}
 
 		recip_qkg2 = new double [pw_ptr->ngmc];
 
-		b = new complex<double> [GlobalV::NLOCAL*pw_ptr->ngmc];
+		b = new std::complex<double> [GlobalV::NLOCAL*pw_ptr->ngmc];
 
-		sum1 = new complex<double> [GlobalV::NLOCAL*GlobalV::NLOCAL];
+		sum1 = new std::complex<double> [GlobalV::NLOCAL*GlobalV::NLOCAL];
 
 		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
 			if(gzero_rank_in_pool==GlobalV::RANK_IN_POOL)
 			{
-				b0 = new complex<double> [GlobalV::NLOCAL];
-				sum3 = new complex<double> *[GlobalV::NLOCAL];
+				b0 = new std::complex<double> [GlobalV::NLOCAL];
+				sum3 = new std::complex<double> *[GlobalV::NLOCAL];
 				for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 				{
-					sum3[iw_l] = new complex<double> [GlobalV::NLOCAL];
+					sum3[iw_l] = new std::complex<double> [GlobalV::NLOCAL];
 				}
 			}
 			else
@@ -231,13 +231,13 @@ void Exx_Lip::init(K_Vectors *kv_ptr_in, wavefunc *wf_ptr_in, PW_Basis *pw_ptr_i
 			sum3 = NULL;
 		}
 
-		exx_matrix = new complex<double> **[k_pack->kv_ptr->nks];
+		exx_matrix = new std::complex<double> **[k_pack->kv_ptr->nks];
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
 		{
-			exx_matrix[ik] = new complex<double>*[GlobalV::NLOCAL];
+			exx_matrix[ik] = new std::complex<double>*[GlobalV::NLOCAL];
 			for( int iw_l=0; iw_l<GlobalV::NLOCAL; ++iw_l)
 			{
-				exx_matrix[ik][iw_l] = new complex<double>[GlobalV::NLOCAL];
+				exx_matrix[ik][iw_l] = new std::complex<double>[GlobalV::NLOCAL];
 			}
 		}
 	}
@@ -345,7 +345,7 @@ void Exx_Lip::phi_cal(k_package *kq_pack, int ikq)
 				for( int iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 				{
 					const double phase_xyz = phase_xy + kq_pack->kv_ptr->kvec_d[ikq].z * iz / pw_ptr->ncz;
-					const complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
+					const std::complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
 					phi[iw][ir] = UFFT_ptr->porter[ir]*exp_tmp;
 					++ir;
 				}
@@ -379,7 +379,7 @@ void Exx_Lip::psi_cal()
 						for( int iz=pw_ptr->nczp_start; iz<pw_ptr->nczp_start+pw_ptr->nczp; ++iz)
 						{
 							const double phase_xyz = phase_xy + q_pack->kv_ptr->kvec_d[iq].z * iz / pw_ptr->ncz;
-							const complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
+							const std::complex<double> exp_tmp = exp(phase_xyz*TWO_PI*IMAG_UNIT);
 							psi[iq][ib][ir] = UFFT_ptr->porter[ir]*exp_tmp;
 							++ir;
 						}
@@ -461,7 +461,7 @@ void Exx_Lip::qkg2_exp(int ik, int iq)
 void Exx_Lip::b_cal( int ik, int iq, int ib)
 {
 	const Vector3<double> q_minus_k = q_pack->kv_ptr->kvec_d[iq] - k_pack->kv_ptr->kvec_d[ik];
-	vector<complex<double> > mul_tmp(pw_ptr->nrxx);
+	std::vector<std::complex<double> > mul_tmp(pw_ptr->nrxx);
 	for( size_t ir=0,ix=0; ix<pw_ptr->ncx; ++ix)
 	{
 		const double phase_x = q_minus_k.x*ix/pw_ptr->ncx;
@@ -478,11 +478,11 @@ void Exx_Lip::b_cal( int ik, int iq, int ib)
 		}
 	}
 
-	complex<double> * const porter = UFFT_ptr->porter;
+	std::complex<double> * const porter = UFFT_ptr->porter;
 	const int * const ig2fftc = pw_ptr->ig2fftc;
 	for(size_t iw=0; iw< GlobalV::NLOCAL; ++iw)
 	{
-		const complex<double> * const phi_w = phi[iw];
+		const std::complex<double> * const phi_w = phi[iw];
 		for( size_t ir=0; ir<pw_ptr->nrxx; ++ir)
 		{
 			porter[ir] = conj(phi_w[ir]) * mul_tmp[ir] ;
@@ -492,7 +492,7 @@ void Exx_Lip::b_cal( int ik, int iq, int ib)
 		if( Exx_Global::Hybrid_Type::HF==info.hybrid_type || Exx_Global::Hybrid_Type::PBE0==info.hybrid_type )
 			if((iq==iq_vecik) && (gzero_rank_in_pool==GlobalV::RANK_IN_POOL))							/// need to check while use k_point parallel
 				b0[iw] = porter[ pw_ptr->ig2fftc[0] ];
-		complex<double> * const b_w = b+iw*pw_ptr->ngmc;
+		std::complex<double> * const b_w = b+iw*pw_ptr->ngmc;
 		for( size_t ig=0; ig<pw_ptr->ngmc; ++ig)
 			b_w[ig] = porter[ ig2fftc[ig] ] * recip_qkg2[ig];
 	}
@@ -601,7 +601,7 @@ void Exx_Lip::exx_energy_cal()
 			{
 				for( int iw_r=0; iw_r<GlobalV::NLOCAL; ++iw_r)
 				{
-					complex<double> DM = {0,0};
+					std::complex<double> DM = {0,0};
 					for( int ib=0; ib<GlobalV::NBANDS; ++ib )
 						DM += conj(k_pack->hvec_array[ik](iw_l,ib)) *k_pack->hvec_array[ik](iw_r,ib) *k_pack->wf_wg(ik,ib);
 					ofs<<DM<<"\t";

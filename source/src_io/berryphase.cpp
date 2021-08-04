@@ -219,7 +219,7 @@ void berryphase::set_kpoints(const int direction)
 
 double berryphase::stringPhase(int index_str, int nbands)
 {
-	complex<double> zeta(1.0, 0.0);
+	std::complex<double> zeta(1.0, 0.0);
 	ComplexMatrix mat(nbands,nbands);
 	int ik_1;
 	int ik_2;
@@ -297,7 +297,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 				
 			} // mb
 			
-			complex<double> det(1.0,0.0);
+			std::complex<double> det(1.0,0.0);
 			int info = 0;
 			int *ipiv = new int[nbands];
 			LapackConnector::zgetrf(nbands, nbands, mat, nbands, ipiv, &info);				
@@ -316,7 +316,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 		{
 			if(GlobalV::NSPIN!=4)
 			{
-				//complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
+				//std::complex<double> my_det = lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
 				zeta = zeta * lcao_method.det_berryphase(ik_1,ik_2,dk,nbands);
 				// test by jingan
 				//GlobalV::ofs_running << "methon 1: det = " << my_det << std::endl;
@@ -339,7 +339,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 				}
 			}
 			
-			complex<double> det(1.0,0.0);
+			std::complex<double> det(1.0,0.0);
 			int info = 0;
 			int *ipiv = new int[nbands];
 			LapackConnector::zgetrf(nbands, nbands, mat, nbands, ipiv, &info);				
@@ -368,10 +368,10 @@ double berryphase::stringPhase(int index_str, int nbands)
 
 void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot)
 {		
-	complex<double> cave = 0.0;
+	std::complex<double> cave = 0.0;
 	double *phik = new double[total_string];
 	double phik_ave = 0.0;
-	complex<double> *cphik = new complex<double>[total_string];
+	std::complex<double> *cphik = new std::complex<double>[total_string];
 	double *wistring = new double[total_string];
 	
 	
@@ -388,8 +388,8 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	{
 		phik[istring] = stringPhase(istring,nbands);
 		// 将相位转换成复数形式
-		cphik[istring] = complex<double>(cos(phik[istring]),sin(phik[istring]));	
-		cave = cave + complex<double>(wistring[istring],0.0) * cphik[istring];
+		cphik[istring] = std::complex<double>(cos(phik[istring]),sin(phik[istring]));	
+		cave = cave + std::complex<double>(wistring[istring],0.0) * cphik[istring];
 		
 	}
 	

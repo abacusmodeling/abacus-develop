@@ -132,9 +132,9 @@ void Grid_BigCell::init_grid_expansion(void)
 	
 	// mohan fixed serious bug 2010-03-06
 	// G = GT^T
-	// g1 = the norm of first vector of G 
-	// g2 = the norm of second vector of G 
-	// g3 = the norm of third vector of G 
+	// g1 = the norm of first std::vector of G 
+	// g2 = the norm of second std::vector of G 
+	// g3 = the norm of third std::vector of G 
 	double g1 = sqrt(bigcell_GT.e11 * bigcell_GT.e11 
 	+ bigcell_GT.e21 * bigcell_GT.e21 
 	+ bigcell_GT.e31 * bigcell_GT.e31);

@@ -51,10 +51,10 @@ ofs.close();
 }
 
 void Exx_Abfs::Matrix_Orbs22::init_radial(
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A1,
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_A2,
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_B1,
-	const vector<vector<vector<Numerical_Orbital_Lm>>> &orb_B2 )
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A1,
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A2,
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B1,
+	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B2 )
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
@@ -140,7 +140,7 @@ ofs<<"TIME@Exx_Abfs::Matrix_Orbs22::init_radial_table\t"<<time_during(t_start)<<
 ofs.close();
 }
 
-void Exx_Abfs::Matrix_Orbs22::init_radial_table( const map<size_t,map<size_t,set<double>>> &Rs )
+void Exx_Abfs::Matrix_Orbs22::init_radial_table( const std::map<size_t,std::map<size_t,set<double>>> &Rs )
 {
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
@@ -150,7 +150,7 @@ gettimeofday( &t_start, NULL);
 	for( const auto &RsA : Rs )
 		for( const auto &RsB : RsA.second )
 		{
-			if( auto* center2_orb22_sAB = static_cast<map<int,map<size_t,map<int,map<size_t,map<int,map<size_t,map<int,map<size_t,Center2_Orb::Orb22>>>>>>>>*>(
+			if( auto* center2_orb22_sAB = static_cast<std::map<int,std::map<size_t,std::map<int,std::map<size_t,std::map<int,std::map<size_t,std::map<int,std::map<size_t,Center2_Orb::Orb22>>>>>>>>*>(
 						MAP_EXIST(center2_orb22_s, RsA.first, RsB.first)) )
 			{
 timeval t_small;
@@ -267,7 +267,7 @@ matrix Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 }
 
 
-map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
+std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs22::cal_overlap_matrix(
 	const Element_Basis_Index::IndexLNM &index_A1,
 	const Element_Basis_Index::IndexLNM &index_A2,
 	const Element_Basis_Index::IndexLNM &index_B1,
@@ -276,7 +276,7 @@ map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> Exx_Abfs::Matrix_Orbs22::
 ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
-	map<size_t,map<size_t,map<size_t,map<size_t,matrix>>>> matrixes;
+	std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> matrixes;
 
 	for( const auto &co1 : center2_orb22_s )
 	{

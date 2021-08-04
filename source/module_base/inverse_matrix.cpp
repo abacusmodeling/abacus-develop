@@ -33,7 +33,7 @@ void Inverse_Matrix_Complex::init(const int &dim_in)
 	this->lwork = 2*dim;
 
 	assert(lwork>0);
-	this->work2 = new complex<double>[lwork];
+	this->work2 = new std::complex<double>[lwork];
 
 	assert(3*dim-2>0);
 	this->rwork = new double[3*dim-2];

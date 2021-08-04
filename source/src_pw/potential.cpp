@@ -241,7 +241,7 @@ void Potential::set_local_pot(
     TITLE("Potential","set_local_pot");
     timer::tick("Potential","set_local_pot");
 
-    complex<double> *vg = new complex<double>[ngmc];
+    std::complex<double> *vg = new std::complex<double>[ngmc];
 
     ZEROS( vg, ngmc );
 
@@ -406,13 +406,13 @@ void Potential::newd(void)
 						}
 						else if(is==1)
 						{
-							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = std::complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = std::complex<double>(0.0 , 0.0);
 						}
 						else if(is==2)
 						{
-							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = complex<double>(0.0 , 0.0);
-							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, ih, jh) = std::complex<double>(0.0 , 0.0);
+							GlobalC::ppcell.deeq_nc(is, iat, jh, ih) = std::complex<double>(0.0 , 0.0);
 						}
 						else if(is==3)
 						{

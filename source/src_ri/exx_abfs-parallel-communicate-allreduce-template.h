@@ -30,7 +30,7 @@ ofstream ofs_mpi( "allreduce_"+TO_STRING(my_rank), ofstream::app );
 timeval t_start;
 double t_probe=0, t_recv=0;
 	
-	vector<std::thread> threads;
+	std::vector<std::thread> threads;
 	atomic_flag insert_lock = ATOMIC_FLAG_INIT;
 	atomic<int> rank_delta=1;
 	for( int i=0; i<2; ++i )
@@ -42,7 +42,7 @@ gettimeofday(&t_start,NULL);
 ofs_mpi<<"sizeof_oar:\t"<<get_sizeof(data_local)<<"\t"<<oar.size()<<std::endl;
 ofs_mpi<<"oar<<\t"<<time_during(t_start)<<std::endl;
 
-	vector<MPI_Request> request_isends(comm_sz);
+	std::vector<MPI_Request> request_isends(comm_sz);
 	boost::dynamic_bitset<> flag_isends(comm_sz,false);
 	flag_isends[my_rank] = true;
 
@@ -53,7 +53,7 @@ gettimeofday(&t_start,NULL);
 	flag_irecvs[my_rank] = true;
 ofs_mpi<<"insert\t"<<time_during(t_start)<<std::endl;
 
-	vector<boost::mpi::packed_iarchive*> iarps( comm_sz );
+	std::vector<boost::mpi::packed_iarchive*> iarps( comm_sz );
 	for( auto &iarp : iarps )
 		iarp = new boost::mpi::packed_iarchive{MPI_COMM_WORLD};
 

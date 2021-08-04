@@ -30,14 +30,14 @@ public:
     double** rho;
     double** rho_save;
 
-    complex<double>** rhog;
-    complex<double>** rhog_save;
+    std::complex<double>** rhog;
+    std::complex<double>** rhog_save;
 
 	double** kin_r; //kinetic energy density in real space, for meta-GGA
 						     //wenfei 2021-07-28
 
     double *rho_core;
-	complex<double> *rhog_core;
+	std::complex<double> *rhog_core;
 
 	//  output charge if out_charge > 0, and output every "out_charge" elec step.
     int out_charge;

@@ -102,7 +102,7 @@ void Charge_Broyden::mix_rho
 
     }
 
-	NOTE("Calculate the norm of the Residual vector: < R[rho] | R[rho_save] >");
+	NOTE("Calculate the norm of the Residual std::vector: < R[rho] | R[rho_save] >");
     dr2 = this->rhog_dot_product( this->rhog, this->rhog);
 	
 	if(GlobalV::test_charge)GlobalV::ofs_running << " dr2 from rhog_dot_product is " << dr2 << std::endl;
@@ -403,17 +403,17 @@ void Charge_Broyden::allocate_Broyden()
 		if(broyden_type==0)
 		{
 			int npdim = mixing_ndim + 1; // another array is used for temporarily store
-			this->dF = new complex<double>**[npdim];
-    		this->dn = new complex<double>**[npdim];
+			this->dF = new std::complex<double>**[npdim];
+    		this->dn = new std::complex<double>**[npdim];
 			
 			for (int i=0; i<npdim; i++)
     		{
-				dF[i] = new complex<double>*[GlobalV::NSPIN]; 
-    	    	dn[i] = new complex<double>*[GlobalV::NSPIN]; 
+				dF[i] = new std::complex<double>*[GlobalV::NSPIN]; 
+    	    	dn[i] = new std::complex<double>*[GlobalV::NSPIN]; 
 				for (int is=0; is<GlobalV::NSPIN; is++)
     	    	{
-    	        	dF[i][is] = new complex<double>[GlobalC::pw.ngmc];
-    	        	dn[i][is] = new complex<double>[GlobalC::pw.ngmc];
+    	        	dF[i][is] = new std::complex<double>[GlobalC::pw.ngmc];
+    	        	dn[i][is] = new std::complex<double>[GlobalC::pw.ngmc];
     	    	}
 			}
 			Memory::record("Charge_Broyden","dF", GlobalV::NSPIN*npdim*GlobalC::pw.ngmc,"cdouble");

@@ -7,7 +7,7 @@ static void test_adjs( ostream & os )
 		for( size_t ia=0; ia!=GlobalC::ucell.atoms[it].na; ++ia )
 		{
 			const int iat = GlobalC::ucell.itia2iat(it,ia);
-			const map<size_t,vector<Abfs::Vector3_Order<int>>> adjs = Abfs::get_adjs(iat);
+			const std::map<size_t,std::vector<Abfs::Vector3_Order<int>>> adjs = Abfs::get_adjs(iat);
 			os<<"@@@\t"<<iat<<std::endl;
 			for( const auto & atom2 : adjs )
 			{

@@ -211,16 +211,16 @@ void ELEC_scf::scf(const int &istep)
 		// somewhere else
 		if(ELEC_evolve::tddft == 1 && iter == 2)
 		{
-			this->WFC_init = new complex<double>**[GlobalC::kv.nks];
+			this->WFC_init = new std::complex<double>**[GlobalC::kv.nks];
 			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
-				this->WFC_init[ik] = new complex<double>*[GlobalV::NBANDS];
+				this->WFC_init[ik] = new std::complex<double>*[GlobalV::NBANDS];
 			}
 			for(int ik=0; ik<GlobalC::kv.nks; ik++)
 			{
 				for(int ib=0; ib<GlobalV::NBANDS; ib++)
 				{
-					this->WFC_init[ik][ib] = new complex<double>[GlobalV::NLOCAL];
+					this->WFC_init[ik][ib] = new std::complex<double>[GlobalV::NLOCAL];
 				}
 			}
 			if(istep>=1)
@@ -244,7 +244,7 @@ void ELEC_scf::scf(const int &istep)
 					{
 						for (int i=0; i<GlobalV::NLOCAL; i++)
 						{
-							WFC_init[ik][ib][i] = complex<double>(0.0,0.0);
+							WFC_init[ik][ib][i] = std::complex<double>(0.0,0.0);
 						}
 					}
 				}

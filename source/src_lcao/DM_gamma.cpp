@@ -476,7 +476,7 @@ void Local_Orbital_Charge::cal_dk_gamma(void)
 
 
 	// GlobalV::DSIZE: number of processors in diag world
-	vector<int> bands_local(GlobalV::DSIZE);
+	std::vector<int> bands_local(GlobalV::DSIZE);
 	for (int id=0; id<GlobalV::DSIZE; id++)
 	{
 		bands_local[id] = (id<GlobalV::NBANDS%GlobalV::DSIZE) ? GlobalV::NBANDS/GlobalV::DSIZE+1 : GlobalV::NBANDS/GlobalV::DSIZE;

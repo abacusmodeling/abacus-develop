@@ -32,7 +32,7 @@ class Charge_Mixing: public Charge
     );//mohan add mixing_gg0_in 2014-09-27
 	
 	// also be used by namespace: GGA_pw
-    void set_rhog(const double *rho_in, complex<double> *rhog_in)const;
+    void set_rhog(const double *rho_in, std::complex<double> *rhog_in)const;
 	
 	protected:
 
@@ -42,11 +42,11 @@ class Charge_Mixing: public Charge
 	// Kerker mixing method.
 	// Kerker method must use plane wave basis, change the high energy plane wave 
 	// more than low energy plane wave.
-	void Kerker_mixing( double *rho, const complex<double> *residual_g, double *rho_save);
+	void Kerker_mixing( double *rho, const std::complex<double> *residual_g, double *rho_save);
 	
 	// tools
-	void set_rhor(complex<double> *rhog, double *rho)const;
-	double rhog_dot_product(const complex<double>*const*const rhog1, const complex<double>*const*const rhog2) const;		// Peize Lin add const 2019-05-01
+	void set_rhor(std::complex<double> *rhog, double *rho)const;
+	double rhog_dot_product(const std::complex<double>*const*const rhog1, const std::complex<double>*const*const rhog2) const;		// Peize Lin add const 2019-05-01
 	
 };
 

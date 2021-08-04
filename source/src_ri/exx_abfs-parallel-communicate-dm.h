@@ -24,11 +24,11 @@ public:
 		const set<pair<size_t,size_t>> &H_atom_pairs_core,
 		const double threshold );
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> DMr;
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DMr;
 	
 private:
 
-	vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> LOC_to_grid( 
+	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> LOC_to_grid( 
 		const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 		const double threshold ) const;
 
@@ -37,27 +37,27 @@ private:
 	public:
 		Allreduce( 
 			const MPI_Comm & mpi_comm_in, 
-			vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in,
+			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in,
 			const Abfs::Vector3_Order<int> &Born_von_Karman_period,
 			const set<pair<size_t,size_t>> &H_atom_pairs_core);
 		~Allreduce();
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> grid_to_exx();
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> grid_to_exx();
 		
 	private:
 		void ask( const int rank_delta_now );
 		void recv_data_process( const int rank_data );
-		void insert_data( vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank );
-		void insert_data( vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank );
+		void insert_data( std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank );
+		void insert_data( std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank );
 		void send_data_process( const int rank_asked );
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper( const map<size_t,map<size_t,set<Abfs::Vector3_Order<int>>>> & atom_asked ) const;
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper() const;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper( const std::map<size_t,std::map<size_t,set<Abfs::Vector3_Order<int>>>> & atom_asked ) const;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper() const;
 
 	private:
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> data_all;
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,matrix>>>> &data_local;
-		vector<map<size_t,map<size_t,map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> data_localw;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> data_all;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> data_localw;
 		
-		map<size_t,map<size_t,set<Abfs::Vector3_Order<int>>>> atom_unset;
+		std::map<size_t,std::map<size_t,set<Abfs::Vector3_Order<int>>>> atom_unset;
 		
 		const MPI_Comm & mpi_comm;
 		int comm_sz;
@@ -70,13 +70,13 @@ private:
 		atomic<int> lock_atom_unset_read;
 		atomic<int> rank_delta;
 		
-		vector<boost::mpi::packed_oarchive*> oarps_isend_data;
-		vector<boost::mpi::packed_oarchive*> oarps_atom_unset;
-		vector<boost::mpi::packed_iarchive*> iarps_recv_data;
-		vector<boost::mpi::packed_iarchive*> iarps_atom_asked;
+		std::vector<boost::mpi::packed_oarchive*> oarps_isend_data;
+		std::vector<boost::mpi::packed_oarchive*> oarps_atom_unset;
+		std::vector<boost::mpi::packed_iarchive*> iarps_recv_data;
+		std::vector<boost::mpi::packed_iarchive*> iarps_atom_asked;
 				
-		vector<atomic<int>*> flags_isend_data;
-		vector<atomic<int>*> flags_ask_atom;
+		std::vector<atomic<int>*> flags_isend_data;
+		std::vector<atomic<int>*> flags_ask_atom;
 		boost::dynamic_bitset<> flags_recv_data;
 	};
 		
@@ -85,8 +85,8 @@ private:
 private:
 	struct
 	{
-		vector<bool> row;
-		vector<bool> col;
+		std::vector<bool> row;
+		std::vector<bool> col;
 	}atom_in_exx;
 	void set_atom_in_exx( const set<pair<size_t,size_t>> &H_atom_pairs_core );	
 */

@@ -9,7 +9,7 @@
 Evolve_LCAO_Matrix::Evolve_LCAO_Matrix(){}
 Evolve_LCAO_Matrix::~Evolve_LCAO_Matrix(){}
 
-void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, complex<double>** cc, complex<double>** cc_init)const
+void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, std::complex<double>** cc, std::complex<double>** cc_init)const
 {
 	TITLE("Evolve_LCAO_Matrix","evolve_complex_matrix");
 	time_t time_start = time(NULL);
@@ -32,12 +32,12 @@ void Evolve_LCAO_Matrix::evolve_complex_matrix(const int &ik, complex<double>** 
 	}
 
 	time_t time_end = time(NULL);
-	OUT_TIME("evolve(complex)", time_start, time_end);
+	OUT_TIME("evolve(std::complex)", time_start, time_end);
 	
 	return;
 }
 
-void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c, complex<double>** c_init)const
+void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
 	                                                                                                                     TITLE("Evolve_LCAO_Matrix","using_LAPACK_complex");
 
@@ -91,7 +91,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 */
 
         int LWORK=3*GlobalV::NLOCAL-1; //tmp
-        complex<double> * WORK = new complex<double>[LWORK];
+        std::complex<double> * WORK = new std::complex<double>[LWORK];
         ZEROS(WORK, LWORK);
         int IPIV[GlobalV::NLOCAL];
 
@@ -143,8 +143,8 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
         {
                 for(int j=0; j<GlobalV::NLOCAL; j++)
                 {
-                        if(i==j) Idmat(i,j) = complex<double>(1.0, 0.0);
-                       	else Idmat(i,j) = complex<double>(0.0, 0.0);
+                        if(i==j) Idmat(i,j) = std::complex<double>(1.0, 0.0);
+                       	else Idmat(i,j) = std::complex<double>(0.0, 0.0);
                 }
         }
         //double delta_t;
@@ -155,7 +155,7 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 
 	int info;
         int lwork=3*GlobalV::NLOCAL-1; //tmp
-        complex<double> * work = new complex<double>[lwork];
+        std::complex<double> * work = new std::complex<double>[lwork];
         ZEROS(work, lwork);
         int ipiv[GlobalV::NLOCAL];
         
@@ -229,10 +229,10 @@ void Evolve_LCAO_Matrix::using_LAPACK_complex(const int &ik, complex<double>** c
 
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		complex<double> ccc[GlobalV::NLOCAL];
+		std::complex<double> ccc[GlobalV::NLOCAL];
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{	
-			ccc[j] = complex<double>(0.0,0.0);
+			ccc[j] = std::complex<double>(0.0,0.0);
 			for(int k=0; k<GlobalV::NLOCAL; k++)
 			{
 				 ccc[j] += U_operator(j,k)*c_init[i][k];
@@ -296,7 +296,7 @@ extern "C"
 }
 #include "../module_base/blas_connector.h"
 
-int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, complex<double>** c, complex<double>** c_init)const
+int Evolve_LCAO_Matrix::using_ScaLAPACK_complex(const int &ik, std::complex<double>** c, std::complex<double>** c_init)const
 {
 	TITLE("Evolve_LCAO_Matrix", "using_scalapack_complex");
 	ComplexMatrix Htmp(GlobalV::NLOCAL,GlobalV::NLOCAL);

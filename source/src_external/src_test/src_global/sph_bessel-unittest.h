@@ -15,21 +15,21 @@ static void Sph_Bessel_timetest(
 {
 	std::cout<<Lmax<<"\t"<<dR<<"\t"<<Rmesh<<"\t"<<dk<<"\t"<<kmesh<<std::endl;
 	
-	auto generate_point = []( const double d, const size_t mesh ) -> vector<double>
+	auto generate_point = []( const double d, const size_t mesh ) -> std::vector<double>
 	{
-		vector<double> point(mesh);
+		std::vector<double> point(mesh);
 		for( size_t i=0; i!=mesh; ++i )
 			point[i] = i*d;
 		return point;
 	};
 
-	const vector<double> rpoint = generate_point( dR, Rmesh );
-	const vector<double> kpoint = generate_point( dk, kmesh );
+	const std::vector<double> rpoint = generate_point( dR, Rmesh );
+	const std::vector<double> kpoint = generate_point( dk, kmesh );
 	
 	Sph_Bessel SB;
 	for (int l = 0; l < Lmax+1; l++)
 	{
-		vector<vector<double>> jlx( Rmesh, vector<double>(kmesh) );
+		std::vector<std::vector<double>> jlx( Rmesh, std::vector<double>(kmesh) );
 		timeval t_start;	gettimeofday( &t_start, NULL);
 		for (int ir = 0; ir < Rmesh; ir++)
 		{

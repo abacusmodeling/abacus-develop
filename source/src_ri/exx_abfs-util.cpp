@@ -2,7 +2,7 @@
 #include <numeric>
 #include <deque>
 
-void Exx_Abfs::Util::bcast( vector<string> &v, const int rank_src, const MPI_Comm &mpi_comm )
+void Exx_Abfs::Util::bcast( std::vector<string> &v, const int rank_src, const MPI_Comm &mpi_comm )
 {
 	int my_rank;	MPI_Comm_rank( mpi_comm, &my_rank );
 	if(my_rank==rank_src)
@@ -10,7 +10,7 @@ void Exx_Abfs::Util::bcast( vector<string> &v, const int rank_src, const MPI_Com
 		int size_v = v.size();
 		MPI_Bcast( &size_v, 1, MPI_INT, rank_src, mpi_comm );
 		
-		vector<int> size_s(size_v);
+		std::vector<int> size_s(size_v);
 		transform( v.begin(), v.end(), size_s.begin(), [](const string &s){return s.size();} );
 		MPI_Bcast( VECTOR_TO_PTR(size_s), size_s.size(), MPI_INT, rank_src, mpi_comm );
 		
@@ -23,7 +23,7 @@ void Exx_Abfs::Util::bcast( vector<string> &v, const int rank_src, const MPI_Com
 		MPI_Bcast( &size_v, 1, MPI_INT, rank_src, mpi_comm );
 		v.resize(size_v);
 		
-		vector<int> size_s(size_v);
+		std::vector<int> size_s(size_v);
 		MPI_Bcast( VECTOR_TO_PTR(size_s), size_s.size(), MPI_INT, rank_src, mpi_comm );
 		
 		const int size_all = accumulate( size_s.begin(), size_s.end(), 0 );

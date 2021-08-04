@@ -13,7 +13,7 @@
 namespace GGA_PW
 {
 	void gradcorr(double &etxc, double &vtxc, matrix &v);
-	void grad_rho( const complex<double> *rhog, Vector3<double> *gdr );
+	void grad_rho( const std::complex<double> *rhog, Vector3<double> *gdr );
 	void grad_dot( const Vector3<double> *h, double *dh);
 	void noncolin_rho(double *rhoout1,double *rhoout2,double *seg);
 }

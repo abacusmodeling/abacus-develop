@@ -62,7 +62,7 @@ void daxpy(const int n, const double &alpha, const double *x, const int incx, do
     return;
 }
 
-void zaxpy(int n, double alpha, complex < double> *x, int incx, complex < double> *y, int incy)
+void zaxpy(int n, double alpha, std::complex < double> *x, int incx, std::complex < double> *y, int incy)
 {
 
     if (n < 1 || incy <= 0 || incx <= 0)
@@ -79,8 +79,8 @@ void zaxpy(int n, double alpha, complex < double> *x, int incx, complex < double
 
 
 //-------------------------------------------------------------
-void zaxpy(int n, complex < double> alpha,  complex < double> *x,
-           int incx, complex < double> *y, int incy)
+void zaxpy(int n, std::complex < double> alpha,  std::complex < double> *x,
+           int incx, std::complex < double> *y, int incy)
 {
     // zaxpy compute y := alpha * x + y where alpha is a scalar and
     // x and y are n-vectors.
@@ -92,7 +92,7 @@ void zaxpy(int n, complex < double> alpha,  complex < double> *x,
 
     // N (input)
     //		On entry, N specifies the number  of  elements  in
-    //		the  vector.   N must be at least one for the sub-
+    //		the  std::vector.   N must be at least one for the sub-
     //		routine to have any visible effect.  Unchanged  on
     //		exit.
 
@@ -103,7 +103,7 @@ void zaxpy(int n, complex < double> alpha,  complex < double> *x,
     // X (input)
     //		array of DIMENSION at least ( 1 + ( n -  1  )*abs(
     //		INCX  )  ).  Before entry, the incremented array X
-    //		must contain the vector x.  Unchanged on exit.
+    //		must contain the std::vector x.  Unchanged on exit.
 
     // INCX (input)
     //		On entry, INCX specifies  the  increment  for  the
@@ -112,8 +112,8 @@ void zaxpy(int n, complex < double> alpha,  complex < double> *x,
     // Y (input/output)
     //		array of DIMENSION at least ( 1 + ( n -  1  )*abs(
     //		INCY  ) ).  On entry, the incremented array Y must
-    //		contain the vector y. On exit, Y is overwritten by
-    //		the updated vector y.
+    //		contain the std::vector y. On exit, Y is overwritten by
+    //		the updated std::vector y.
 
     // INCY (input)
     //		On entry, INCY specifies  the  increment  for  the
@@ -134,7 +134,7 @@ void zaxpy(int n, complex < double> alpha,  complex < double> *x,
 
 // y(i,:) = alpha * x + y(i,:) where y is a matrix
 void zaxpy(double alpha,
-           complex < double> *x,
+           std::complex < double> *x,
            ComplexMatrix &y,
            int i)
 {
@@ -160,7 +160,7 @@ void zaxpy(double alpha,
 void zaxpy(double alpha,
            const ComplexMatrix &x,
            int i,
-           complex < double> *y)
+           std::complex < double> *y)
 {
     int nr, nc;
     nr = x.nr;
@@ -178,10 +178,10 @@ void zaxpy(double alpha,
     }
 }
 
-void zaxpy(complex < double> alpha,
+void zaxpy(std::complex < double> alpha,
            const ComplexMatrix &x,
            int i,
-           complex < double> *y)
+           std::complex < double> *y)
 {
     int nr, nc;
     nr = x.nr;
@@ -200,7 +200,7 @@ void zaxpy(complex < double> alpha,
 }
 
 // y(j,:) = alpha * x(i,:) + y(j,:)
-void zaxpy(complex < double> alpha,
+void zaxpy(std::complex < double> alpha,
            const ComplexMatrix &x,
            int i,
            ComplexMatrix &y,
@@ -239,7 +239,7 @@ void dcopy(int n, double *x, int incx, double *y, int incy)
 } // end dcopy
 
 //------------------------------------------------------------------
-void dcopy(int n, complex < double> *x, int incx, complex < double> *y, int incy)
+void dcopy(int n, std::complex < double> *x, int incx, std::complex < double> *y, int incy)
 {
     // zcopy Copy x to y where x and y are n-vectors.
     if (n < 1 || incx <= 0 || incy <= 0)
@@ -318,15 +318,15 @@ void dcopy(const matrix &a,
 //-----------------------------------------------------------------
 void dcopy(const ComplexMatrix &a,
            int i,
-           complex < double> *y)
+           std::complex < double> *y)
 {
-    // dcopy Copy a(i,:) to y where a is complex matrix, and y are n-vectors.
+    // dcopy Copy a(i,:) to y where a is std::complex matrix, and y are n-vectors.
     const int nr = a.nr;
     const int nc = a.nc;
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy(ComplexMatrix a, int i, complex < double> *),"
+        cerr << "\n error in dcopy(ComplexMatrix a, int i, std::complex < double> *),"
              << " nr or nc < 1 or i out of range ";
         return;
     }
@@ -340,7 +340,7 @@ void dcopy(const ComplexMatrix &a,
 // ------------------------------------
 void dcopy(double *x, matrix &b, int i)
 {
-    // copy x to ith row of b where b is a matrix and x is a vector
+    // copy x to ith row of b where b is a matrix and x is a std::vector
     int nr, nc;
     nr = b.nr;
     nc = b.nc;
@@ -358,9 +358,9 @@ void dcopy(double *x, matrix &b, int i)
     }
 }
 
-void dcopy(complex < double> *x, ComplexMatrix &b, int i)
+void dcopy(std::complex < double> *x, ComplexMatrix &b, int i)
 {
-    // copy x to ith row of b where b is a complex matrix and x is a vector
+    // copy x to ith row of b where b is a std::complex matrix and x is a std::vector
     int nr, nc;
     nr = b.nr;
     nc = b.nc;
@@ -647,15 +647,15 @@ double ddot(int n,
 } // end ddot
 
 //-----------------------------------------------------------------------
-complex < double> ddot(int n,
-                       complex < double> *x,
+std::complex < double> ddot(int n,
+                       std::complex < double> *x,
                        int incx,
-                       complex < double> *y,
+                       std::complex < double> *y,
                        int incy)
 {
     // zdotc compute the dot product of conjg(x) and y where x  and
     // y are n-vectors.
-    complex < double> prod;
+    std::complex < double> prod;
 
     if (n < 1 || incx <= 0 || incy <= 0)
     {
@@ -663,7 +663,7 @@ complex < double> ddot(int n,
         return 0;
     }
 
-    prod = complex < double>(0.0, 0.0);
+    prod = std::complex < double>(0.0, 0.0);
 
     for (int ix = 0, iy = 0;ix < n && iy < n;ix += incx, iy += incy)
     {
@@ -674,12 +674,12 @@ complex < double> ddot(int n,
 } // end zdotc
 
 // -----------------------------------------------------------------------
-complex < double> ddot(const ComplexMatrix &a,
+std::complex < double> ddot(const ComplexMatrix &a,
                        int i,
-                       complex < double> *y)
+                       std::complex < double> *y)
 {
     //compute the dot product of i_th row of matrix a and y where
-    // y are a vector.
+    // y are a std::vector.
     int nr, nc;
     nr = a.nr;
     nc = a.nc;
@@ -690,9 +690,9 @@ complex < double> ddot(const ComplexMatrix &a,
         return 0;
     }
 
-    complex < double> z;
+    std::complex < double> z;
 
-    z = complex < double> (0, 0);
+    z = std::complex < double> (0, 0);
 
     for (int k = 0; k < nc; k++)
     {
@@ -755,7 +755,7 @@ double ddot(const matrix &a,
 
 double dnrm2(const int n, const double *x, const int incx)
 {
-    // compute Euclidean length (12 norm) of vector x,
+    // compute Euclidean length (12 norm) of std::vector x,
     if (n < 0 || incx <= 0)
     {
         cerr << "\n error in dnrm2, n < 0 or incx <= 0, ";
@@ -804,13 +804,13 @@ void zgemm(char tra,
            int m,
            int n,
            int k,
-           complex < double> alpha,
-           const complex<double> *a,
+           std::complex < double> alpha,
+           const std::complex<double> *a,
            int lda,
            const ComplexMatrix &b,
            int ldb,
-           complex < double> beta,
-           complex<double> *c,
+           std::complex < double> beta,
+           std::complex<double> *c,
            int ldc)
 {
 	TITLE("myfunc5","zgemm1");
@@ -867,7 +867,7 @@ void zgemm(char tra,
     for (i = 0; i < ncc; i++)
     {
         ij = 2 *  i * ldc;
-        c[i] = cux[ij] + complex< double>(0, 1) * cux[ij+1];
+        c[i] = cux[ij] + std::complex< double>(0, 1) * cux[ij+1];
     }
 
     delete [] aux;
@@ -881,12 +881,12 @@ void zgemm(char tra,
            int m,
            int n,
            int k,
-           complex < double> alpha,
-           const complex<double> *a,
+           std::complex < double> alpha,
+           const std::complex<double> *a,
            int lda,
            const ComplexMatrix &b,
            int ldb,
-           complex < double> beta,
+           std::complex < double> beta,
            ComplexMatrix &c,
            int ldc)
 {
@@ -946,7 +946,7 @@ void zgemm(char tra,
         for (j = 0; j < nrc; j++)
         {
             ij = 2*(j+i*ldc);
-            c(j,i) = cux[ij] + complex< double>(0,1) * cux[ij+1];
+            c(j,i) = cux[ij] + std::complex< double>(0,1) * cux[ij+1];
             //		std::cout<<setw(12)<<c(j,i);
         }
         //	std::cout<<std::endl;
@@ -964,12 +964,12 @@ void zgemm(char tra,
            int m,
            int n,
            int k,
-           complex < double> alpha,
+           std::complex < double> alpha,
            const ComplexMatrix &a,
            int lda,
            const ComplexMatrix &b,
            int ldb,
-           complex < double> beta,
+           std::complex < double> beta,
            ComplexMatrix &c,
            int ldc)
 {
@@ -1031,7 +1031,7 @@ void zgemm(char tra,
         for (j = 0; j < nrc; j++)
         {
             ij = 2 * (j + i * ldc);
-            c(j, i) = cux[ij] + complex< double>(0, 1) * cux[ij+1];
+            c(j, i) = cux[ij] + std::complex< double>(0, 1) * cux[ij+1];
         }
     }
 
@@ -1083,21 +1083,21 @@ int ILAENV(int ispec, char *name, char *opts,
 }
 
 void ZHPEV(int ,
-           complex < double> *hp,
+           std::complex < double> *hp,
            double *e,
            ComplexMatrix &v,
            int ldh,
            int n,
-           complex < double> *aux,
+           std::complex < double> *aux,
            int naux)
 {
     std::cout << "\n do nothing, in ZHPEV() ";
 }
 
-complex < double> ZDOTU(int nstart,
-                        complex < double>,
+std::complex < double> ZDOTU(int nstart,
+                        std::complex < double>,
                         int	,
-                        complex < double> *psi,
+                        std::complex < double> *psi,
                         int npwx)
 {
     std::cout << "\n do nothing in ZDOTU(), only return ZERO,";
@@ -1107,12 +1107,12 @@ complex < double> ZDOTU(int nstart,
 void zgemv(char ,
            int ,
            int ,
-           complex < double> alpha ,
+           std::complex < double> alpha ,
            ComplexMatrix overlap,
            int ,
-           complex < double> swfcatom ,
+           std::complex < double> swfcatom ,
            int npwx,
-           complex < double>  ,
+           std::complex < double>  ,
            ComplexMatrix work, int)
 {
     std::cout << "\n do nothing, in dgemv () ";
@@ -1181,7 +1181,7 @@ void ZHEGVX(int itype,
     {
         for (j = 0;j < ldz;j++)
         {
-            z(j, i) = zux[2*(j+i*ldz)] + complex< double>(0, 1) * zux[2*(j+i*ldz)+1];
+            z(j, i) = zux[2*(j+i*ldz)] + std::complex< double>(0, 1) * zux[2*(j+i*ldz)+1];
         }
     }
     delete[] aux;
