@@ -58,7 +58,6 @@ void Cell_PW::opt_cells_pw()
         GlobalC::wf.wfcinit();
     }
     
-    cout<<"wf init SUCCESS"<<endl;
 #ifdef __LCAO
     switch (GlobalC::exx_global.info.hybrid_type) // Peize Lin add 2019-03-09
     {
