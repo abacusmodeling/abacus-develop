@@ -7,9 +7,20 @@
 #include <torch/script.h>
 #include "../src_pw/global.h"
 
-//caoyu add 2021-03-29
+//------------------------------------------------------------------------------
+// This class computes the descriptors for each atom from LCAO basis set,
+// interfaces with pytorch to obtain the correction potential in LCAO basis,
+// and computes the forces according to the correction potential
+//------------------------------------------------------------------------------
+//
+// caoyu add 2021-03-29
+//
 class LCAO_Descriptor
 {
+
+//-------------------
+// public functions 
+//-------------------
 public:
 
     explicit LCAO_Descriptor();
@@ -21,53 +32,73 @@ public:
 	// cal S_alpha_mu: overlap between lcao basis Phi and descriptor basis Al
     void build_S_descriptor(const bool &calc_deri);
 
-	// cal pdm: S_alpha_mu * inv(Sloc) * DM * inv(Sloc) * S_nu_beta
-    void cal_projected_DM(const matrix& dm);
-
-	// cal d: EIGENVALUE of pdm in block of I_n_l
-    void cal_descriptor(void);
-
-	// print descriptors
-	void print_descriptor(void);
 
 	// 1. Load DeePKS model
 	// 2. Initialize the deltaV Hamiltonian matrix
 	void deepks_pre_scf(const string& model_file);
 
-	// compute <psi|deltaV|psi>
-	void cal_v_delta(matrix& dm);
 
-	// add <psi|deltaV|psi> to the Hamiltonian matrix
+	//------------------------------------------------------------------------------
+	// cal_projected_DM: pdm = S_alpha_mu * inv(Sloc) * DM * inv(Sloc) * S_nu_beta
+	// cal_descriptor: EIGENVALUE of pdm in block of I_n_l
+	// cal_v_delta: compute <psi|deltaV|psi>
+	// add_v_delta: add <psi|deltaV|psi> to the Hamiltonian matrix
+	// cal_f_delta: compute the force related to deltaV, input dm is density matrix
+	//------------------------------------------------------------------------------
+    void cal_projected_DM(const matrix& dm);
+    void cal_descriptor(void);
+	void cal_v_delta(const matrix& dm);
 	void add_v_delta(void);
-
-	// compute the force related to deltaV, input dm is density matrix
 	void cal_f_delta(const matrix& dm);
 
-	// print the deltaV matrix in LCAO basis set
-	void print_H_V_delta(void);
 
-	// print the force related to deltaV for each atom
+	//----------------------------------------------------------------------
+	// print_descriptors: print descriptors based on LCAO basis
+	// print_H_V_delta: print the deltaV matrix in LCAO basis
+	// print_F_delta: print the force related to deltaV for each atom
+	//----------------------------------------------------------------------
+	void print_descriptor(void);
+	void print_H_V_delta(void);
 	void print_F_delta(void);
 
-	/*These 3 func save the [dm_eig], [e_base], [f_base]
+
+	//----------------------------------------------------------------------
+	/*These 3 functions save the [dm_eig], [e_base], [f_base]
 	of current configuration as .npy file, when deepks_scf = 1.
 	After a full group of consfigurations are calculated,
     we need a python script to 'load' and 'torch.cat' these .npy files,
     and get l_e_delta and l_f_delta corresponding to the exact e,f data.*/
-	void save_npy_d();
-	void save_npy_e(double& ebase);	//Ry
-	void save_npy_f(matrix& fbase);//Ry
+	//----------------------------------------------------------------------
+	void save_npy_d(void);
+	void save_npy_e(const double &ebase);	//Ry
+	void save_npy_f(const matrix &fbase);//Ry
 
-	//deepks E_delta(Ry)
+
+//-------------------
+// public variables 
+//-------------------
+public:
+
+	//------------------------------------------------------
+	//E_delta: in Ry
+	//H_V_delta: correction term to the Hamiltonian matrix 
+	//F_delta: in Ry/Bohr, force due to the correction term
+	//------------------------------------------------------
 	double E_delta = 0.0;
-
-	//deepks V_delta, to be added to Hamiltonian matrix
 	double* H_V_delta;
-
-	//deepks F_delta(Ry/Bohr), to be added to atom force
 	matrix	F_delta;
 
+//-------------------
+// private variables
+//-------------------
 private:
+
+	int lmaxd = 0;
+	int nmaxd = 0;
+	int inlmax = 0;
+
+	// deep neural network module that provides corrected Hamiltonian term and
+	// related derivatives.
 	torch::jit::script::Module module;
 	
 	//density matrix: dm_gamma
@@ -104,13 +135,15 @@ private:
 	// \sum_L{Nchi(L)*(2L+1)}
 	int des_per_atom;
 
-	int lmaxd = 0;
-	int nmaxd = 0;
-	int inlmax = 0;
 
 	IntArray* alpha_index;
 	IntArray* inl_index;	//caoyu add 2021-05-07
 	int* inl_l;	//inl_l[inl_index] = l of descriptor with inl_index
+
+//-------------------
+// private functions
+//-------------------
+private:
 
 	void init_index(void);	// index of descriptor in all atoms
 

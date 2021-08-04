@@ -70,10 +70,11 @@ LCAO_Descriptor::~LCAO_Descriptor()
 void LCAO_Descriptor::init(
 	const int lm, // max L for descriptor 
 	const int nm, // max n for descriptor
-	const int tot_inl) // 
+	const int tot_inl) // total number of atomic orbital basis for all of the atoms 
 {
     TITLE("LCAO_Descriptor", "init");
-    ofs_running << " Initialize the descriptor index for deepks (lcao line)" << endl;
+
+    ofs_running << " Initialize the descriptor index for DeePKS (lcao line)" << endl;
 
     assert(lm >= 0);
     assert(nm >= 0);
@@ -84,6 +85,7 @@ void LCAO_Descriptor::init(
     this->inlmax = tot_inl;
     ofs_running << " lmax of descriptor = " << this->lmaxd << endl;
     ofs_running << " nmax of descriptor= " << nmaxd << endl;
+	ofs_running << " total basis (all atoms) for descriptor= " << endl;
     
     //initialize the density matrix (dm)
     delete[] this->dm_double;
@@ -348,6 +350,7 @@ void LCAO_Descriptor::cal_projected_DM(const matrix &dm)
     return;
 }
 
+
 void LCAO_Descriptor::cal_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "cal_descriptor");
@@ -500,6 +503,7 @@ void LCAO_Descriptor::set_DS_mu_alpha(
     return;
 }
 
+
 void LCAO_Descriptor::getdm_double(const matrix &dm)
 {
     for (int i = 0; i < dm.nr; i++)
@@ -631,7 +635,7 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 }
 
 
-void LCAO_Descriptor::cal_v_delta(matrix& dm)
+void LCAO_Descriptor::cal_v_delta(const matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv> (descriptor changes in every scf iter)
@@ -673,7 +677,7 @@ void LCAO_Descriptor::cal_v_delta(matrix& dm)
     }
     delete[] tmp_v1;
     delete[] tmp_v2;
-    ofs_running << "finish calculating H_V_delta" << endl;
+    ofs_running << " Finish calculating H_V_delta" << endl;
     return;
 }
 
@@ -700,6 +704,7 @@ void LCAO_Descriptor::add_v_delta(void)
 		WARNING_QUIT("add_v_delta","not implemented yet.");
         //call set_HSk, complex Matrix
     }
+	return;
 }
 
 
@@ -882,8 +887,7 @@ void LCAO_Descriptor::print_H_V_delta(void)
         ofs << endl;
     }
 
-    ofs_running << "H_delta is printed" << endl;
-
+    ofs_running << " H_delta is printed" << endl;
     return;
 }
 
@@ -951,7 +955,7 @@ void LCAO_Descriptor::save_npy_d(void)
 }
 
 
-void LCAO_Descriptor::save_npy_e(double& ebase)
+void LCAO_Descriptor::save_npy_e(const double &ebase)
 {
     TITLE("LCAO_Descriptor", "save_npy_e");
     //save e_base
@@ -963,7 +967,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
 }
 
 
-void LCAO_Descriptor::save_npy_f(matrix& fbase)
+void LCAO_Descriptor::save_npy_f(const matrix &fbase)
 {
     TITLE("LCAO_Descriptor", "save_npy_f");
     //save f_base
