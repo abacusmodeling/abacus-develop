@@ -29,7 +29,7 @@ CellSet::CellSet()
 int Grid::Hash_one_hit = 0;
 const double Grid::TOLERATE_ERROR = 1.0E-5;
 
-const boost::hash<int> Grid::INT_HASHER = boost::hash<int>();
+const std::hash<int> Grid::INT_HASHER;
 
 const char* const Grid::ERROR[3] =
 {

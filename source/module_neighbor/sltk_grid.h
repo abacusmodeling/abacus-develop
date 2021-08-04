@@ -2,7 +2,7 @@
 #define GRID_H
 
 #include <stdexcept>
-#include <boost/functional/hash/hash.hpp>
+#include <functional>
 #include "sltk_util.h"
 #include "sltk_atom.h"
 #include "sltk_atom_input.h"
@@ -71,7 +71,7 @@ public:
 
 	//Static data
 	static const double TOLERATE_ERROR;
-	static const boost::hash<int> INT_HASHER;
+	static const std::hash<int> INT_HASHER;
 	static const char* const ERROR[3];
 
 	//Data
