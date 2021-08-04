@@ -3,6 +3,8 @@
 //#include "../src_pw/global.h"
 //#include "symm_other.h"
 
+namespace ModuleSymmetry
+{
 Symmetry::Symmetry()
 {
     this->epsilon = 1e-6;
@@ -1768,4 +1770,5 @@ void Symmetry::print_pos(const double* pos, const int &nat)
         GlobalV::ofs_running << " pos " << i+1 << ": " << pos[i*3+0] << " " << pos[i*3+1] << " " << pos[i*3+2] << endl;
     }
     return;
+}
 }

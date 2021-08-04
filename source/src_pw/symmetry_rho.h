@@ -12,11 +12,11 @@ class Symmetry_rho
 	Symmetry_rho();
 	~Symmetry_rho();
 
-	void begin(const int &spin_now, const Charge_Broyden &CHR, const PW_Basis &pw, Parallel_Grid &Pgrid, Symmetry &symm) const;
+	void begin(const int &spin_now, const Charge_Broyden &CHR, const PW_Basis &pw, Parallel_Grid &Pgrid, ModuleSymmetry::Symmetry &symm) const;
 
 	private:
 
-	void psymm(double *rho_part, const PW_Basis &pw, Parallel_Grid &Pgrid, Symmetry &symm) const;
+	void psymm(double *rho_part, const PW_Basis &pw, Parallel_Grid &Pgrid, ModuleSymmetry::Symmetry &symm) const;
 
 };
 

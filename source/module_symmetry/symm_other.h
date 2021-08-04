@@ -4,6 +4,8 @@
 //#include "../src_pw/tools.h"
 #include "../module_base/vector3.h"
 #include "../module_base/global_function.h"
+namespace ModuleSymmetry
+{
 namespace Symm_Other
 {
 	void print1(const int &ibrav, const double *cel_const, ofstream &ofs_running);
@@ -12,6 +14,7 @@ namespace Symm_Other
 		const Vector3<double> &b, const Vector3<double> &c);
 
 
+}
 }
 
 #endif

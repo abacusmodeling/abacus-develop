@@ -60,7 +60,7 @@ void Run_lcao::lcao_line(void)
     DONE(GlobalV::ofs_running, "SETUP UNITCELL");
 
     // symmetry analysis should be performed every time the cell is changed
-    if (Symmetry::symm_flag)
+    if (ModuleSymmetry::Symmetry::symm_flag)
     {
         GlobalC::symm.analy_sys(GlobalC::ucell, GlobalC::out, GlobalV::ofs_running);
         DONE(GlobalV::ofs_running, "SYMMETRY");

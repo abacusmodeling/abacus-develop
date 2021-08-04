@@ -7,6 +7,8 @@
 #include "../module_base/mymath.h"
 //#include "symm_other.h"
 
+namespace ModuleSymmetry
+{
 Symmetry_Basic::Symmetry_Basic()
 {
 	this->epsilon = 1e-6;
@@ -1172,4 +1174,5 @@ void Symmetry_Basic::rotate( Matrix3 &gmatrix, Vector3<double> &gtrans,
 	}
 	rk = rk%nr3;
 	return;
+}
 }

@@ -32,7 +32,7 @@ void calculate()
 	ofstream ofs_warning("warning.txt");
 	ifstream ifs("INPUT");
 	UnitCell_pseudo ucell;
-	Symmetry symm;
+	ModuleSymmetry::Symmetry symm;
 	ifs >> ucell.ntype;
 	ucell.latName = "test";
 	ifs.close();

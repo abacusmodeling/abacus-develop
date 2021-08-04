@@ -94,7 +94,7 @@ void Stress_PW::cal_stress(matrix& sigmatot)
         }
     }
     
-	if(Symmetry::symm_flag)                          
+	if(ModuleSymmetry::Symmetry::symm_flag)                          
 	{
 		GlobalC::symm.stress_symmetry(sigmatot, GlobalC::ucell);
 	}

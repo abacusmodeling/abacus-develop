@@ -115,7 +115,7 @@ void Forces::init(matrix& force)
 		}	
 	}
 	
-	if(Symmetry::symm_flag)
+	if(ModuleSymmetry::Symmetry::symm_flag)
 	{
 		double *pos;
 		double d1,d2,d3;
