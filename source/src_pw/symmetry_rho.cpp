@@ -11,11 +11,11 @@ Symmetry_rho::~Symmetry_rho()
 
 }
 
-void Symmetry_rho::begin(const int &spin_now, const Charge_Broyden &CHR, const PW_Basis &pw, Parallel_Grid &Pgrid, Symmetry &symm) const
+void Symmetry_rho::begin(const int &spin_now, const Charge_Broyden &CHR, const PW_Basis &pw, Parallel_Grid &Pgrid, ModuleSymmetry::Symmetry &symm) const
 {
 	assert(spin_now < 4);//added by zhengdy-soc
 
-	if(!Symmetry::symm_flag) return;
+	if(!ModuleSymmetry::Symmetry::symm_flag) return;
 #ifdef __MPI
 	// parallel version
 	psymm(CHR.rho[spin_now], pw, Pgrid, symm);
@@ -26,7 +26,7 @@ void Symmetry_rho::begin(const int &spin_now, const Charge_Broyden &CHR, const P
 	return;
 }
 
-void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pgrid, Symmetry &symm) const
+void Symmetry_rho::psymm(double* rho_part, const PW_Basis &pw, Parallel_Grid &Pgrid, ModuleSymmetry::Symmetry &symm) const
 {
 #ifdef __MPI
 	// (1) reduce all rho from the first pool.

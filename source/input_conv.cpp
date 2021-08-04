@@ -140,7 +140,7 @@ void Input_Conv::Convert(void)
 	GlobalV::OUT_LEVEL = INPUT.out_level;
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
 
-    Symmetry::symm_flag = INPUT.symmetry;						// 9
+    ModuleSymmetry::Symmetry::symm_flag = INPUT.symmetry;						// 9
 	GlobalV::BASIS_TYPE = INPUT.basis_type;
 	GlobalV::KS_SOLVER = INPUT.ks_solver;
 	GlobalV::SEARCH_RADIUS = INPUT.search_radius;

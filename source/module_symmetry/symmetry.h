@@ -5,6 +5,8 @@
 #include "../module_cell/unitcell_pseudo.h"
 #include "symmetry_basic.h"
 
+namespace ModuleSymmetry
+{
 class Symmetry : public Symmetry_Basic
 {
 public:
@@ -101,5 +103,6 @@ public:
 	Vector3<double> sptmin;
 
 };
+}
 
 #endif

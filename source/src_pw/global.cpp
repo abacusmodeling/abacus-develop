@@ -21,7 +21,7 @@ UnitCell_pseudo ucell;
 xcfunc xcf;
 Charge_Broyden CHR;
 Potential pot;
-Symmetry symm;
+ModuleSymmetry::Symmetry symm;
 Parallel_Grid Pgrid; //mohan add 2010-06-06 
 Parallel_Kpoints Pkpoints; // mohan add 2010-06-07
 Vdwd2_Parameters vdwd2_para;	// Peize Lin add 2021-03-09

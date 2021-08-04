@@ -29,16 +29,16 @@ public:
     ~K_Vectors();
 
     void set(
-        const Symmetry &symm,
+        const ModuleSymmetry::Symmetry &symm,
         const string &k_file_name,
         const int& nspin,
         const Matrix3 &reciprocal_vec,
         const Matrix3 &latvec);
 
-    void ibz_kpoint( const Symmetry &symm);
+    void ibz_kpoint( const ModuleSymmetry::Symmetry &symm);
     //LiuXh add 20180515
     void set_after_vc(
-            const Symmetry &symm,
+            const ModuleSymmetry::Symmetry &symm,
             const string &k_file_name,
             const int& nspin,
             const Matrix3 &reciprocal_vec,
