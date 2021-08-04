@@ -449,8 +449,7 @@ bool Electrons::check_stop_now(void)
 void Electrons::c_bands(const int &istep)
 {
     if (GlobalV::test_elec) TITLE("Electrons","c_bands");
-    timer::tick("Electrons", "c_bands"
-    );
+    timer::tick("Electrons", "c_bands");
 
     int precondition_type = 2;
 
@@ -508,7 +507,6 @@ void Electrons::c_bands(const int &istep)
         // only use diagH_subspace.
         //=============================================================
         double avg_iter_k = 0.0;
-        cout<<"SUCCESS 111 fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
         GlobalC::hm.diagH_pw(istep, this->iter, ik, h_diag, avg_iter_k);
 
         avg_iter += avg_iter_k;
@@ -532,7 +530,7 @@ void Electrons::c_bands(const int &istep)
         avg_iter /= static_cast<double>(GlobalC::kv.nkstot);
     }
     delete [] h_diag;
-    timer::tick("electrons","c_bands");
+    timer::tick("Electrons","c_bands");
     return;
 } // END SUBROUTINE c_bands_k
 

@@ -97,7 +97,7 @@ void Diago_CG_GPU::diag
 )
 {
 
-    cout<<"begin diago fft dim"<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
+    // cout<<"begin diago fft dim"<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
     // cout << &GlobalC::pw << endl;
     if (test_cg==1) TITLE("Diago_CG_GPU","ccgdiagg");
     timer::tick("Diago_CG_GPU","diag");
@@ -124,8 +124,8 @@ void Diago_CG_GPU::diag
     CUFFT_COMPLEX *lagrange;
     CUFFT_COMPLEX *phi_m;
 
-    cout << "Hello, CG!" << endl;
-    cout << "CG Dim = " << dim << " & " << dmx << endl;
+    // cout << "Hello, CG!" << endl;
+    // cout << "CG Dim = " << dim << " & " << dmx << endl;
 
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
@@ -142,6 +142,8 @@ void Diago_CG_GPU::diag
     cudaMalloc((void**)&pphi, dim * sizeof(CUFFT_COMPLEX));
     cudaMalloc((void**)&lagrange, n_band * sizeof(CUFFT_COMPLEX));
     cudaMalloc((void**)&phi_m, dim * sizeof(CUFFT_COMPLEX));
+
+    // timer::tick("Diago_CG_GPU","diag");
 
     err = cudaGetLastError();
     if (err != cudaSuccess)
@@ -186,8 +188,8 @@ void Diago_CG_GPU::diag
         // pw.h_1psi(dim, phi_m, hphi, sphi);
 
         // GlobalC::hm.hpw.h_1psi(dim, phi_m_cpu, hphi_cpu, sphi_cpu);
-        cout<<"fft dim before hpsi: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
-        cout<<"dim SUCCESS !!!!!!"<<dim<<endl;
+        // cout<<"fft dim before hpsi: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
+        // cout<<"dim SUCCESS !!!!!!"<<dim<<endl;
         GlobalC::hm.hpw_gpu.h_1psi(dim, phi_m, hphi, sphi);
 
         err = cudaGetLastError();
@@ -196,19 +198,19 @@ void Diago_CG_GPU::diag
             cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
         }
 
-        cout<<"hpsi end"<<endl;
+        // cout<<"hpsi end"<<endl;
 
-        cout<<"before ddot"<<endl;
+        // cout<<"before ddot"<<endl;
 
         double em_host = 0;
-        cout<<"EM_host1: "<<em_host<<endl;
+        // cout<<"EM_host1: "<<em_host<<endl;
         em_host = ddot_real(dim, phi_m, hphi);
-        cout<<"EM_host2: "<<em_host<<endl;
+        // cout<<"EM_host2: "<<em_host<<endl;
 
         // cout<<"ddot!"<<endl;
         // cudaMemcpyToSymbol(&e[m], &em_host, sizeof(double));
         cudaMemcpy(&e[m], &em_host, sizeof(double), cudaMemcpyHostToDevice);
-        cout<<"ddot real end"<<endl;
+        // cout<<"ddot real end"<<endl;
 
         int iter = 0;
         double gg_last = 0.0;
@@ -302,6 +304,7 @@ void Diago_CG_GPU::diag
 
     avg_iter /= n_band;
 
+    // timer::tick("Diago_CG_GPU","diag");
     cudaFree(lagrange);
     cudaFree(pphi);
     cudaFree(g0);
@@ -323,7 +326,7 @@ void Diago_CG_GPU::calculate_gradient(
     CUFFT_COMPLEX *g, CUFFT_COMPLEX *ppsi)
 {
     if (test_cg==1) TITLE("Diago_CG_GPU","calculate_gradient");
-    //timer::tick("Diago_CG_GPU","grad");
+    timer::tick("Diago_CG_GPU","calculate_grad");
 
     int thread = 512;
     int block = dim / thread + 1;
@@ -344,7 +347,7 @@ void Diago_CG_GPU::calculate_gradient(
     // Update g !
     kernel_get_gredient<<<block, thread>>>(g, ppsi, dim, lambda);
     // kernel_multi_add<<<block, thread>>>(g, g, 1, ppsi, -lambda, dim);
-    //timer::tick("Diago_CG_GPU","grad");
+    timer::tick("Diago_CG_GPU","calculate_grad");
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
     {
@@ -359,7 +362,7 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
                                     const CUFFT_COMPLEX *eigenfunction, const int m)
 {
     if (test_cg==1) TITLE("Diago_CG_GPU","orthogonal_gradient");
-    //timer::tick("Diago_CG_GPU","orth_grad");
+    timer::tick("Diago_CG_GPU","orth_grad");
 
     GlobalC::hm.hpw_gpu.s_1psi(dim, g, sg);
 
@@ -406,7 +409,7 @@ void Diago_CG_GPU::orthogonal_gradient( const int &dim, const int &dmx,
         }
     }*/
 
-    //timer::tick("Diago_CG_GPU","orth_grad");
+    timer::tick("Diago_CG_GPU","orth_grad");
     cublasDestroy(handle);
     return;
 }
@@ -425,7 +428,7 @@ void Diago_CG_GPU::calculate_gamma_cg(
     const CUFFT_COMPLEX *psi_m)
 {
     if (test_cg==1) TITLE("Diago_CG_GPU","calculate_gamma_cg");
-    //timer::tick("Diago_CG_GPU","gamma_cg");
+    timer::tick("Diago_CG_GPU","gamma_cg");
     double gg_inter;
     if (iter>0)
     {
@@ -497,7 +500,7 @@ void Diago_CG_GPU::calculate_gamma_cg(
 
         kernel_get_normacg<<<block, thread>>>(dim, cg, psi_m, norma);
     }
-    //timer::tick("Diago_CG_GPU","gamma_cg");
+    timer::tick("Diago_CG_GPU","gamma_cg");
     return;
 }
 
@@ -516,7 +519,7 @@ bool Diago_CG_GPU::update_psi(
     CUFFT_COMPLEX *sphi)
 {
     if (test_cg==1) TITLE("Diago_CG_GPU","update_psi");
-    //timer::tick("Diago_CG_GPU","update");
+    timer::tick("Diago_CG_GPU","update_psi");
     int thread = 512;
     int block = dim / 512 + 1;
     // pw.h_1psi(dim, cg, hcg, scg); // TODO
@@ -527,9 +530,7 @@ bool Diago_CG_GPU::update_psi(
     {
         cout << "Cuda error: "<< cudaGetErrorString(err) <<" in "<< __LINE__ << endl;
     }
-
     GlobalC::hm.hpw_gpu.h_1psi(dim, cg, hcg, scg);
-
     // hpsi end
     err = cudaGetLastError();
     if (err != cudaSuccess)
@@ -564,8 +565,8 @@ bool Diago_CG_GPU::update_psi(
     }
 
     eigenvalue = min( e1, e2 );
-    cout<<"====== Get E:========"<<endl;
-    cout<<eigenvalue <<endl;
+    // cout<<"====== Get E:========"<<endl;
+    // cout<<eigenvalue <<endl;
 
     const double cost = cos(theta);
     const double sint_norm = sin(theta)/cg_norm;
@@ -585,7 +586,7 @@ bool Diago_CG_GPU::update_psi(
 
     if ( abs(eigenvalue-e0)< threshold)
     {
-        //timer::tick("Diago_CG_GPU","update");
+        timer::tick("Diago_CG_GPU","update_psi");
         return 1;
     }
     else
@@ -597,7 +598,7 @@ bool Diago_CG_GPU::update_psi(
         // }
         kernel_multi_add<<<block, thread>>>(sphi, sphi, cost, scg, sint_norm, dim);
         kernel_multi_add<<<block, thread>>>(hpsi, hpsi, cost, hcg, sint_norm, dim);
-        //timer::tick("Diago_CG_GPU","update");
+        timer::tick("Diago_CG_GPU","update_psi");
         return 0;
     }
 }
@@ -612,6 +613,7 @@ void Diago_CG_GPU::schmit_orth
     CUFFT_COMPLEX *psi_m
 )
 {
+    timer::tick("Diago_CG_GPU","schmit_orth");
     assert( m >= 0 );
     // cout<<"orth, dim="<<dim<<endl;
 
@@ -653,15 +655,15 @@ void Diago_CG_GPU::schmit_orth
     cublasOperation_t trans2 = CUBLAS_OP_N;
     cublasZgemv(handle, trans2, dim, m, &NEG_ONE, psi, dmx, lagrange, inc, &ONE, psi_m, inc);
 
-    cout<<psi_norm<<endl;
+    // cout<<psi_norm<<endl;
 
     psi_norm -= ddot_real(m, lagrange, lagrange); //next
 
-    cout<<"Psi norm before sqrt:"<<psi_norm<<endl;
+    // cout<<"Psi norm before sqrt:"<<psi_norm<<endl;
 
     psi_norm = sqrt(psi_norm); // 
 
-    cout<<"Psi norm after sqrt:"<<psi_norm<<endl;
+    // cout<<"Psi norm after sqrt:"<<psi_norm<<endl;
 
     int thread = 512;
     int block = dim / 512 + 1;
@@ -672,7 +674,7 @@ void Diago_CG_GPU::schmit_orth
     GlobalC::hm.hpw_gpu.s_1psi(dim, psi_m, sphi);
 
     cublasDestroy(handle);
-    //timer::tick("Diago_CG_GPU","schmit_orth");
+    timer::tick("Diago_CG_GPU","schmit_orth");
     cudaFree(lagrange);
     return ;
 }

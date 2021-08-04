@@ -36,7 +36,7 @@ __global__ void kernel_normalization(int size, CUFFT_COMPLEX *data, double norm)
 void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *fft_index, CUFFT_COMPLEX *psic)
 {
     // cout<<"fft dim before ufft: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
-    cout<<"rounftrip on GPU!"<<endl;
+    // cout<<"rounftrip on GPU!"<<endl;
 
     // cout<<"before set"<<endl;
     // complex<double> *psic_inside = new complex<double>[15];
@@ -146,8 +146,8 @@ void UfftRoundtripKernel(const CUFFT_COMPLEX *psi, const double *vr, const int *
     // }
     // delete [] tmp1;
 
-    cout<<"rounftrip end"<<endl;
+    // cout<<"rounftrip end"<<endl;
 
-    cout<<"fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
+    // cout<<"fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
     return;
 }

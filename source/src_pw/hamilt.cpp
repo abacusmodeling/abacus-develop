@@ -89,7 +89,7 @@ void Hamilt::diagH_pw(
     	        Diago_CG_GPU cg_gpu;
 				bool reorder = true;
 
-                cout << "Create CG_GPU !" <<endl;
+                // cout << "Create CG_GPU !" <<endl;
 
                 CUFFT_COMPLEX *d_wf_evc;
                 double *d_wf_ekb;
@@ -97,7 +97,7 @@ void Hamilt::diagH_pw(
                 int DIM_CG_GPU2 = GlobalC::wf.npwx * GlobalV::NPOL;
                 double *d_precondition;
 
-                cout << "Do diag begin ... " <<endl;
+                // cout << "Do diag begin ... " <<endl;
 				if(GlobalV::NPOL==1) 
 				{
 					// cg.diag(wf.evc[ik0], wf.ekb[ik], kv.ngk[ik], wf.npwx,
@@ -115,8 +115,9 @@ void Hamilt::diagH_pw(
                     // delete [] test_cuda;
                     // cout<<" **  * *   **  **  *  *!!!NBAND="<<NBANDS<<endl;
                     // cout<<"dim="<<DIM_CG_GPU<<endl;
-                    // cout<<"evc-dim="<<wf.evc[ik0].nr<<" "<<wf.evc[ik0].nc<<endl;
-                    // cout<<"real dim"<<NBANDS<<" "<<wf.npwx<<endl;
+                    // cout<<"evc-dim="<<GlobalC::wf.evc[ik0].nr<<" "<<GlobalC::wf.evc[ik0].nc<<endl;
+                    // cout<<"real dim"<<GlobalV::NBANDS<<" "<<GlobalC::wf.npwx<<endl;
+                    // cout<<"dmx="<<DIM_CG_GPU2<<endl;
                     // cout<<NBANDS<<endl;
                     cudaMalloc((void**)&d_wf_evc, GlobalV::NBANDS * GlobalC::wf.npwx * sizeof(CUFFT_COMPLEX));
                     cudaMalloc((void**)&d_wf_ekb, GlobalV::NBANDS * sizeof(double));
@@ -141,7 +142,7 @@ void Hamilt::diagH_pw(
                     // clock_t test_t1, test_t2;
 
                     // test_t1 = clock();
-                    cout<<"inside diagH_pw fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
+                    // cout<<"inside diagH_pw fft dim: "<<GlobalC::pw.nx<<" "<<GlobalC::pw.ny<<" "<<GlobalC::pw.nz<<endl;
                     // cout << &GlobalC::pw << endl;
 
                     cg_gpu.diag(d_wf_evc, d_wf_ekb, DIM_CG_GPU, GlobalC::wf.npwx, 
@@ -175,7 +176,7 @@ void Hamilt::diagH_pw(
                     cudaMalloc((void**)&d_precondition, DIM_CG_GPU2 * sizeof(double));
 
                     cudaMemcpy(d_wf_evc, GlobalC::wf.evc[ik0].c, GlobalV::NBANDS * DIM_CG_GPU2 * sizeof(CUFFT_COMPLEX), cudaMemcpyHostToDevice);
-                    cudaMemcpy(d_wf_ekb, GlobalC::wf.ekb[ik], GlobalV::NBANDS * sizeof(double), cudaMemcpyHostToDevice);
+                    // cudaMemcpy(d_wf_ekb, GlobalC::wf.ekb[ik], GlobalV::NBANDS * sizeof(double), cudaMemcpyHostToDevice);
                     cudaMemcpy(d_precondition, precondition, DIM_CG_GPU2 * sizeof(double), cudaMemcpyHostToDevice);
                     // do things
                     // clock_t test_t1, test_t2;
@@ -226,6 +227,11 @@ void Hamilt::diagH_pw(
         	}
             avg_iter += avg;
             ++ntry;
+            // if(this->test_exit_cond(ntry, notconv))
+            // {
+            //     cout<<"retry"<<endl;
+            // }
+            // else cout<<"success"<<endl;
         }
         while ( this->test_exit_cond(ntry, notconv) );
 

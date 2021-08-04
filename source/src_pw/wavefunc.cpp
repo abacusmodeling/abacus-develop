@@ -265,7 +265,6 @@ void wavefunc::LCAO_in_pw_k_q(const int &ik, ComplexMatrix &wvf, Vector3<double>
 void wavefunc::diago_PAO_in_pw_k(const int &ik, ComplexMatrix &wvf)
 {
 	TITLE("wavefunc","diago_PAO_in_pw_k");
-	cout<<"before hpw.init nrxx="<<GlobalC::pw.nrxx<<endl;
 	GlobalC::hm.hpw.init_k(ik);
 	GlobalC::hm.hpw_gpu.init_k(ik);
     this->diago_PAO_in_pw_k2(ik, wvf);
