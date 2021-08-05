@@ -146,18 +146,19 @@ void Run_MD_LCAO::opt_ions(void)
 		CE.update_all_pos(GlobalC::ucell);
 
         this->callInteraction_LCAO(GlobalC::ucell.nat, force, stress);
+        double potential = GlobalC::en.etot/2;
 
 		if(mdtype==1||mdtype==2)   
 		{
-			mdb.runNVT(istep, force, stress);
+			mdb.runNVT(istep, potential, force, stress);
 		}
 		else if(mdtype==0)  
 		{
-			mdb.runNVE(istep, force, stress);
+			mdb.runNVE(istep, potential, force, stress);
 		}
         else if(mdtype==-1)
         {
-            stop = mdb.runFIRE(istep, force, stress);
+            stop = mdb.runFIRE(istep, potential, force, stress);
         }
         else
         {

@@ -24,7 +24,7 @@ double LJ_potential::Lennard_Jones(UnitCell_pseudo &ucell_c,
             for(int ad=0; ad<grid_neigh.getAdjacentNum(); ++ad)
             {
                 tau2 = grid_neigh.getAdjacentTau(ad);
-                dtau = (tau2 - tau1) * ucell_c.lat0;
+                dtau = (tau1 - tau2) * ucell_c.lat0;
                 distance = dtau.norm();
                 if(distance <= INPUT.mdp.rcut_lj)
 			    {

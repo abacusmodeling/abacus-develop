@@ -306,7 +306,6 @@ void UnitCell_pseudo::setup_cell_classic(
 	const string &fn,
 	ofstream &ofs_running,
 	ofstream &ofs_warning)
-
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
 

@@ -1,9 +1,5 @@
 #include "MD_basic.h"
-#ifdef __CMD
 #include "../input.h"
-#else
-#include "../src_pw/global.h"
-#endif
 
 //define in MD_basic.h
 //class MD_basic
@@ -43,12 +39,6 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	allmass=new double[ucell.nat];
 	ionmbl=new Vector3<int>[ucell.nat];
 	//force=new Vector3<double>[ucell.nat];
-
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
 
 	//MD starting setup
 	if(!mdp.rstMD){
@@ -113,7 +103,7 @@ MD_basic::~MD_basic()
     delete []allmass;
 }
 
-void MD_basic::runNVT(int step1, Vector3<double> *force, const matrix &stress)
+void MD_basic::runNVT(int step1, double potential, Vector3<double> *force, const matrix &stress)
 {
 //------------------------------------------------------------------------------
 // DESCRIPTION:
@@ -162,11 +152,7 @@ void MD_basic::runNVT(int step1, Vector3<double> *force, const matrix &stress)
 	}
 	double maxForce = mdf.MAXVALF(ucell.nat, force);
 
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
+	energy_=potential;
 
     double hamiltonian;
 	//----------------------------------------------
@@ -184,7 +170,6 @@ void MD_basic::runNVT(int step1, Vector3<double> *force, const matrix &stress)
         GlobalV::ofs_running<<" Molecular Dynamics (NVT) STEP "<< step_<<endl;
         GlobalV::ofs_running<< " --------------------------------------------------"<<endl;
 	}
-	
 	
 	// Calculate the Mean-Square-Displacement.
 	if(step_==1&&mdp.rstMD==0)
@@ -275,7 +260,7 @@ void MD_basic::runNVT(int step1, Vector3<double> *force, const matrix &stress)
     return;
 }
 
-void MD_basic::runNVE(int step1, Vector3<double> *force, const matrix &stress)
+void MD_basic::runNVE(int step1, double potential, Vector3<double> *force, const matrix &stress)
 {
 //-------------------------------------------------------------------------------
 // Adiabatic ensemble 
@@ -329,11 +314,7 @@ void MD_basic::runNVE(int step1, Vector3<double> *force, const matrix &stress)
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
 
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
+    energy_=potential;
 
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
@@ -411,7 +392,7 @@ void MD_basic::runNVE(int step1, Vector3<double> *force, const matrix &stress)
     return;
 }
 
-bool MD_basic::runFIRE(int step1, Vector3<double> *force, const matrix &stress)
+bool MD_basic::runFIRE(int step1, double potential, Vector3<double> *force, const matrix &stress)
 {
 //-------------------------------------------------------------------------------
 // REFERENCES:
@@ -462,11 +443,7 @@ bool MD_basic::runFIRE(int step1, Vector3<double> *force, const matrix &stress)
     double maxForce = mdf.MAXVALF(ucell.nat, force);
     cout<<"maxForce: "<<sqrt(maxForce)<<endl; 
     
-#ifdef __CMD
-    energy_=0;
-#else
-	energy_=GlobalC::en.etot/2;
-#endif
+    energy_=potential;
 
     double conservedE = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 

@@ -12,7 +12,8 @@ Run_MD_CLASSIC::Run_MD_CLASSIC():grid_neigh(GlobalV::test_deconstructor, GlobalV
 	pos_old2 = new double[1];
 	pos_now = new double[1];
 	pos_next = new double[1];
-	force=new Vector3<double>[ucell_c.nat];
+	force=new Vector3<double>[1];
+	stress.create(3,3);
 }
 
 Run_MD_CLASSIC::~Run_MD_CLASSIC()
@@ -66,37 +67,36 @@ void Run_MD_CLASSIC::md_cells_classic(void)
         }
 
 		// search adjent atoms
-		if((istep-1)%INPUT.mdp.list_step==0)
-		{
-			atom_arrange::search(
-					GlobalV::SEARCH_PBC,
-					GlobalV::ofs_running,
-					this->grid_neigh,
-					this->ucell_c, 
-					GlobalV::SEARCH_RADIUS, 
-					GlobalV::test_atom_input,
-					INPUT.test_just_neighbor);
-		}
+		atom_arrange::search(
+				GlobalV::SEARCH_PBC,
+				GlobalV::ofs_running,
+				this->grid_neigh,
+				this->ucell_c, 
+				GlobalV::SEARCH_RADIUS, 
+				GlobalV::test_atom_input,
+				INPUT.test_just_neighbor);
 
-		/*double potential = LJ_potential::Lennard_Jones(
-									this->ucell_c,
-									this->grid_neigh,
-									mdb.force,
-									mdb.stress);*/
+		LJ_potential LJ_CMD;
+
+		double potential = LJ_CMD.Lennard_Jones(
+								this->ucell_c,
+								this->grid_neigh,
+								this->force,
+								this->stress);
 
 		this->update_pos_classic();
 
 		if (mdtype == 1 || mdtype == 2)
         {
-            mdb.runNVT(istep, force, stress);
+            mdb.runNVT(istep, potential, force, stress);
         }
         else if (mdtype == 0)
         {
-            mdb.runNVE(istep, force, stress);
+            mdb.runNVE(istep, potential, force, stress);
         }
         else if (mdtype == -1)
         {
-            stop = mdb.runFIRE(istep, force, stress);
+            stop = mdb.runFIRE(istep, potential, force, stress);
         }
         else
         {
@@ -122,11 +122,13 @@ void Run_MD_CLASSIC::md_allocate_ions(void)
 	delete[] this->pos_old2;
 	delete[] this->pos_now;
 	delete[] this->pos_next;
+	delete[] this->force;
 
 	this->pos_old1 = new double[pos_dim];
 	this->pos_old2 = new double[pos_dim];
 	this->pos_now = new double[pos_dim];
 	this->pos_next = new double[pos_dim];
+	this->force = new Vector3<double>[ucell_c.nat];
 
 	ZEROS(pos_old1, pos_dim);
 	ZEROS(pos_old2, pos_dim);
@@ -141,6 +143,6 @@ void Run_MD_CLASSIC::update_pos_classic(void)
 		this->pos_old2[i] = this->pos_old1[i];
 		this->pos_old1[i] = this->pos_now[i];
 	}
-	ucell_c.save_cartesian_position(this->pos_now);
+	this->ucell_c.save_cartesian_position(this->pos_now);
 	return;
 }

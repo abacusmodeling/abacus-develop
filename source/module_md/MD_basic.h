@@ -15,9 +15,9 @@ class MD_basic
 	MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in);
 	~MD_basic();
 
-	void runNVT(int step1, Vector3<double> *force, const matrix &stress);//NVT ensemble MD
-	void runNVE(int step1, Vector3<double> *force, const matrix &stress); //NVE ensemble MD
-	bool runFIRE(int step1, Vector3<double> *force, const matrix &stress); //relax method FIRE
+	void runNVT(int step1, double potential, Vector3<double> *force, const matrix &stress);//NVT ensemble MD
+	void runNVE(int step1, double potential, Vector3<double> *force, const matrix &stress); //NVE ensemble MD
+	bool runFIRE(int step1, double potential, Vector3<double> *force, const matrix &stress); //relax method FIRE
 	int getRealStep();
 
 	private:

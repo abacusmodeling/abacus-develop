@@ -1,6 +1,8 @@
 #ifndef MD_PARAMETERS_H
 #define MD_PARAMETERS_H
 
+#include "../module_base/constants.h"
+
 class MD_parameters
 {
 public:
@@ -21,10 +23,9 @@ public:
 		ediffg=1e-3;
 		MNHC=4;
 
-		rcut_lj = 16.0;     // Bohr
-		epsilon_lj = 0.01032;  // eV
-		sigma_lj = 3.405;      // Angstrom
-		list_step = 5;
+		rcut_lj = 8.5*ANGSTROM_AU;
+		epsilon_lj = 0.01032/Ry_to_eV;
+		sigma_lj = 3.405*ANGSTROM_AU;
 	};
     ~MD_parameters(){};
 
@@ -48,7 +49,6 @@ public:
 	double rcut_lj;     // cutoff radius of LJ potential (Bohr)
 	double epsilon_lj;  // the value of epsilon for LJ potential
 	double sigma_lj;    // the value of sigma for LJ potential
-	int list_step;      // update neighbor list every list_step
 };
 
 

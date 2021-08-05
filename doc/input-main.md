@@ -47,7 +47,7 @@
 
     - [Molecular dynamics](#molecular-dynamics)
 
-        [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [md_potential](#md-potential) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj) | [list_step](#list_step)
+        [md_type](#md-type) | [md_rstmd](#md-rstmd) | [md_dt](#md-dt) | [md_t](#md-t) | [md_qmass](#md-qmass) | [md_dumpmdfred](#md-dumpmdfred) | [md_fixtemperature](#md-fixtemperature) | [NVT_control](#nvt-control) | [NVT_tau](#nvt-tau) | [MNHC](#mnhc) | [md_ediff](#md-ediff) | [md_ediffg](#md-ediffg) | [rcut_lj](#rcut_lj) | [epsilon_lj](#epsilon_lj) | [sigma_lj](#sigma_lj)
 
     - [VdW correction](#vdw-correction)
 
@@ -1090,13 +1090,6 @@ This part of variables are used to control the molecular dynamics calculations.
 
     [back to top](#input-file)
 
-- md_potential<a id="md-potential"></a>
-    - *Type*: Boolean
-    - *Description*: If set to 1, then ab-initio MD is carried out; if set to 0, then classi MD. Currently, only ab-initio MD is implemented.
-    - *Default*: 1
-
-    [back to top](#input-file)
-
 - NVT_control<a id="nvt-control"></a> 
     - *Type*: Integer
     - *Description*: Specifies which type of thermostat is used.
@@ -1137,29 +1130,22 @@ This part of variables are used to control the molecular dynamics calculations.
 
 - rcut_lj<a id="rcut_lj"></a>
     - *Type*: Real
-    - *Description*: Cut-off radius for Leonard Jones potential (a.u.).
-    - *Default*: 16.0
+    - *Description*: Cut-off radius for Leonard Jones potential (angstrom).
+    - *Default*: 8.5 (for He)
 
     [back to top](#input-file)
 
 - epsilon_lj<a id="epsilon_lj"></a>
     - *Type*: Real
     - *Description*: The value of epsilon for Leonard Jones potential (eV).
-    - *Default*: 0.01032
+    - *Default*: 0.01032 (for He)
 
     [back to top](#input-file)
 
 - sigma_lj<a id="sigma_lj"></a>
     - *Type*: Real
     - *Description*: The value of sigma for Leonard Jones potential (angstrom).
-    - *Default*: 3.405
-
-    [back to top](#input-file)
-
-- list_step<a id="list_step"></a>
-    - *Type*: Integer
-    - *Description*: Interval steps to update the neighbor list for Leonard Jones potential.
-    - *Default*: 5
+    - *Default*: 3.405 (for He)
 
     [back to top](#input-file)
 
