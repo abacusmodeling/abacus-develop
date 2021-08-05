@@ -7,7 +7,55 @@
     - [Link LIBXC](#link-libxc)
 - [Structure of the package](#structure-of-the-package)
   - [Structure of source code](#structure-of-source-code)
-  [back to main page](../README.md)
+  
+  - [Building the program](#building-the-program)
+- [Installation with DeePKS](#installation-with-deepks)
+  - [Extra prerequisites](#extra-prerequisites)
+  - [Extra settings for building](#extra-settings-for-building)
+  [back to main page](../README.md) 
+
+# Structure of the package
+Under the ABACUS directory, there are the following subdirectories:
+
+- cmake/
+
+  which contains relevant files for compiling the code with cmake
+- documents/
+
+  which contains a copy of the manual in pdf format
+- examples/
+
+  which contains some examples
+- source/
+
+  which contains the source code and makefiles
+- tests/
+
+  which contains test examples
+- tools/
+
+  which currently contains the script for generating the numerical atomic orbitals
+
+[back to top](#download-and-install)
+
+## Structure of source code
+The source directory further contains the following folders, where the source files of ABACUS are located:
+- module_base
+- module_cell
+- module_grid
+- module_grid
+- module_neighbor
+- module_orbital
+- obj
+- src_external
+- src_global
+- src_io
+- src_ions
+- src_lcao
+- src_parallel
+- src_pdiag
+- src_pw
+- src_ri
 
 ## Installation
 
@@ -165,50 +213,47 @@ HONG=${HONG_MPI_SELINV_20210523}
 
 [back to top](#download-and-install)
 
-## Structure of the package
 
-Under the ABACUS directory, there are the following subdirectories:
+# Installation with DeePKS
 
-- cmake/
+This part of installation is based on [Installation](#installation). If DeePKS feature is requied for [DeePKS-kit](https://github.com/deepmodeling/deepks-kit), the following prerequisites and steps are needed:
 
-  which contains relevant files for compiling the code with cmake
-- documents/
+## Extra prerequisites
+- C++ compiler, supporting **C++14**. For example, Intel C++ compiler 18
+- [LibTorch](https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.9.0%2Bcpu.zip) for cpu, with c++11 ABI;
+- [Libnpy](https://github.com.cnpmjs.org/llohse/libnpy/);
 
-  which contains a copy of the manual in pdf format
-- examples/
+## Extra settings for building
 
-  which contains some examples
-- source/
+### Using Cmake
 
-  which contains the source code and makefiles
-- tests/
+```
+cmake -B build -DENABLE_DEEPKS=1
+``` 
 
-  which contains test examples
-- tools/
+### Using Makefile
+Set `LIBTORCH_DIR`and `LIBNPY_DIR`in `Makefile.vars`. For example: 
+```
+LIBTORCH_DIR = /opt/libtorch/
+LIBNPY_DIR = /opt/libnpy/
+```
 
-  which currently contains the script for generating the numerical atomic orbitals
+In `Makefile.system`, add `LIBTORCH_LIB` to  `LIBS`, then set `-std=c++14` in `OPTS`:
+```
+LIBS = -lifcore -lm -lpthread ${LIBTORCH_LIB} ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}	#for DeePKS
+#LIBS = -lifcore -lm -lpthread ${LAPACK_LIB} ${FFTW_LIB} ${ELPA_LIB}
+```
+```
+OPTS = ${INCLUDES} -Ofast -traceback -std=c++14 -simd -march=native -xHost -m64 -qopenmp -Werror -Wall -pedantic -g
+```
 
-[back to top](#download-and-install)
-
-### Structure of source code
-
-The source directory further contains the following folders, where the source files of ABACUS are located:
-
-- module_base
-- module_cell
-- module_grid
-- module_grid
-- module_neighbor
-- module_orbital
-- obj
-- src_external
-- src_global
-- src_io
-- src_ions
-- src_lcao
-- src_parallel
-- src_pdiag
-- src_pw
-- src_ri
+In `Makefile`, set the Macro as `HONG_DEEPKS`:
+```
+#!!!!!!!!!!!!!!!!!!!! CHANE HERE IF YOU LIKE !!!!!!!!!!!!!!
+#! change series version or parallel version~~~
+#HONG=${HONG_MPI_SELINV_20210523}
+#HONG=${HONG_SER_SELINV}
+HONG=${HONG_DEEPKS}
+```
 
 [back to top](#download-and-install)

@@ -261,6 +261,13 @@ void Force_Stress_LCAO::getForceStress(
 				{
 					fcs(iat, i) += force_dftu(iat, i);
 				}
+#ifdef __DEEPKS
+				// mohan add 2021-08-04
+				if (INPUT.deepks_scf)
+				{
+					fcs(iat, i) += ld.F_delta(iat, i);
+				}
+#endif
 				//sum total force for correction
 				sum += fcs(iat, i);
 			}
@@ -283,6 +290,7 @@ void Force_Stress_LCAO::getForceStress(
 		{
 			this->forceSymmetry(fcs);
 		}
+
 #ifdef __DEEPKS
 		//DeePKS force, caoyu add 2021-06-03
 		if (INPUT.deepks_scf)
@@ -575,7 +583,9 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 
  	if(istestf)
 	{
-		cout << setprecision(6) << setiosflags(ios::showpos) << setiosflags(ios::fixed) << endl;
+		cout << setprecision(6);
+		//cout << setiosflags(ios::showpos);
+		//cout << setiosflags(ios::fixed) << endl;
 		cout << " ------------------- TOTAL      FORCE --------------------" << endl;
     	cout << " " << setw(8) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
     	GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << endl;
