@@ -99,7 +99,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	delete[] els;
 	this->oc = new double[nwfc];
 	els = new std::string[nwfc];
-	// std::set the value of occupations
+	// set the value of occupations
 	delete[] lchi;
 	lchi = new int[nwfc];
 	int iwfc=0;
@@ -218,7 +218,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	// information, in order to make all the processors to stop
 	// the job, we need to return the error information first.
 	// we need to choose a threshold for the deviation of the
-	// norm of pseudo atomic orbitals, I std::set 0.2
+	// norm of pseudo atomic orbitals, I set 0.2
 	// mohan 2013-06-28
 	if( abs(units-1.0) > 0.2 && (iTB_s==1 || iref_s==1)) {return 3;}
 	if( abs(unitp-1.0) > 0.2 && (iTB_p==1 || iref_p==1)) {return 3;}

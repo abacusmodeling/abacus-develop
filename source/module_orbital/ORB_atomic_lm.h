@@ -38,7 +38,7 @@ class Numerical_Orbital_Lm
 	// Peize Lin add 2017-12-12
 	enum class Psi_Type{ Psi, Psif, Psik, Psik2 };
 
-	/// EXPLAIN : std::set information about Numerical_Orbital_Lm
+	/// EXPLAIN : set information about Numerical_Orbital_Lm
 	void set_orbital_info
 	(
  		const std::string &label_in,

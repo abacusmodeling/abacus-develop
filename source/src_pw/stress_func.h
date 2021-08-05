@@ -26,7 +26,7 @@
 //-------------------------------------------------------------------
 
 //----------------------------------------------------------------
-// compute the stress terms in terms of the plane wave basis std::set
+// compute the stress terms in terms of the plane wave basis set
 // the stress terms include: 
 // 1) the stress from the electron kinetic energy 
 // 2) the stress from the local pseudopotentials

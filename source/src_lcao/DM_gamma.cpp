@@ -138,7 +138,7 @@ int Local_Orbital_Charge::setAlltoallvParameter(MPI_Comm comm_2D, int blacs_ctxt
         for(int j=0; j<lgd_now; ++j)
         {
             int src_col=trace_2D_col[j];
-            int src_idx=src_row*GlobalV::NLOCAL+src_col; // leanding dimension is std::set to GlobalV::NLOCAL for all processes
+            int src_idx=src_row*GlobalV::NLOCAL+src_col; // leanding dimension is set to GlobalV::NLOCAL for all processes
 
             int src_pcol=trace_2D_pcol[j];
             int src_proc=Cblacs_pnum(blacs_ctxt, src_prow, src_pcol);

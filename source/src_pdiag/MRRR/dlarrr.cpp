@@ -39,7 +39,7 @@
 
 	/*  E       (input/output) DOUBLE PRECISION array, dimension (N) */
 	/*          On entry, the first (N-1) entries contain the subdiagonal */
-	/*          elements of the tridiagonal matrix T; E(N) is std::set to ZERO. */
+	/*          elements of the tridiagonal matrix T; E(N) is set to ZERO. */
 
 	/*  INFO    (output) int */
 	/*          INFO = 0(default) : the matrix warrants computations preserving */
@@ -93,7 +93,7 @@
 	/*     We don't think it is worth going into "sdd mode" unless the relative */
 	/*     condition number is reasonable, not 1/macheps. */
 	/*     The threshold should be compatible with other thresholds used in the */
-	/*     code. We std::set  OFFDIG + OFFDIG2 <= .999 =: RELCOND, it corresponds */
+	/*     code. We set  OFFDIG + OFFDIG2 <= .999 =: RELCOND, it corresponds */
 	/*     to losing at most 3 decimal digits: 1 / (1 - (OFFDIG + OFFDIG2)) <= 1000 */
 	/*     instead of the current OFFDIG + OFFDIG2 < 1 */
 

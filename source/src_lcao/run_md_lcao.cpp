@@ -267,7 +267,7 @@ void Run_MD_LCAO::final_scf(void)
         GlobalC::LNNR.cal_nnrg(GlobalC::GridT);
     }
 
-    // (4) std::set the augmented orbitals index.
+    // (4) set the augmented orbitals index.
     // after ParaO and GridT, 
     // this information is used to calculate
     // the force.

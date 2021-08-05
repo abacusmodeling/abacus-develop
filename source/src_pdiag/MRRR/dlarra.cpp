@@ -37,16 +37,16 @@
 
 	/*  E       (input/output) DOUBLE PRECISION array, dimension (N) */
 	/*          On entry, the first (N-1) entries contain the subdiagonal */
-	/*          elements of the tridiagonal matrix T; E(N) need not be std::set. */
+	/*          elements of the tridiagonal matrix T; E(N) need not be set. */
 	/*          On exit, the entries E( ISPLIT( I ) ), 1 <= I <= NSPLIT, */
-	/*          are std::set to zero, the other entries of E are untouched. */
+	/*          are set to zero, the other entries of E are untouched. */
 
 	/*  E2      (input/output) DOUBLE PRECISION array, dimension (N) */
 	/*          On entry, the first (N-1) entries contain the SQUARES of the */
 	/*          subdiagonal elements of the tridiagonal matrix T; */
-	/*          E2(N) need not be std::set. */
+	/*          E2(N) need not be set. */
 	/*          On exit, the entries E2( ISPLIT( I ) ), */
-	/*          1 <= I <= NSPLIT, have been std::set to zero */
+	/*          1 <= I <= NSPLIT, have been set to zero */
 
 	/*  SPLTOL (input) DOUBLE PRECISION */
 	/*          The threshold for splitting. Two criteria can be used: */

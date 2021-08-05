@@ -31,12 +31,12 @@ void Numerical_Orbital::set_orbital_info
 	//what is GlobalV::test_overlap
 	TITLE("Numerical_Orbital", "set_type_info");
 
-	// (1) std::set type,label,lmax
+	// (1) set type,label,lmax
 	this->type = type_in;
 	this->label = label_in;
 	this->lmax = lmax_in;
 
-	// (2) std::set nchi and total nchi.
+	// (2) set nchi and total nchi.
 	delete[] this->nchi;
 	this->nchi = new int[this->lmax+1];
 	for (int i = 0; i < this->lmax + 1; i++)
@@ -54,7 +54,7 @@ void Numerical_Orbital::set_orbital_info
 		this->total_nchi = total_nchi_in;
 	}
 
-	// (3) std::set the rcut and check the rcut
+	// (3) set the rcut and check the rcut
 	this->rcut = 0.0;
 	for (int i=0; i< total_nchi_in; i++)
 	{
@@ -66,14 +66,14 @@ void Numerical_Orbital::set_orbital_info
 	}
 	assert(rcut > 0.0);
 
-	// (4) std::set max_nchi
+	// (4) set max_nchi
 	this->max_nchi=0;
 	for(int L=0; L<lmax+1; L++)
 	{
 		max_nchi = std::max( max_nchi, nchi[L] ); 
 	}
 
-	// (8) std::set find_chi
+	// (8) set find_chi
 	assert( lmax+1 > 0 );
 	this->find_chi.create( lmax+1, max_nchi );
 	int ichi=0;

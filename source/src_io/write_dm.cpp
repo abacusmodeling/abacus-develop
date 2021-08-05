@@ -25,7 +25,7 @@
 // 4.2 no  3.2 2.4
 // now we want to reduce them and print out,
 // we plan to reduce them one row by one row,
-// then for the first row, we need to std::set the
+// then for the first row, we need to set the
 // temparary array to 4 (GlobalV::NLOCAL in code),
 // then we reduce first row, it will become
 // 2.2 2.3 3.6 8.4,

@@ -29,7 +29,7 @@ void Ions_Move_BFGS::allocate()
 	this->allocate_basic();
 
 	//initialize data members
-	//be std::set in save_bfgs() function.
+	//be set in save_bfgs() function.
 	this->save_flag = false;
 	this->init_done = true;
 	return;
@@ -39,7 +39,7 @@ void Ions_Move_BFGS::start(const matrix& force, const double &energy_in)
 {
 	TITLE("Ions_Move_BFGS","start");
 	
-	// istep must be std::set eariler.
+	// istep must be set eariler.
 
 	// use force to setup gradient.
 	Ions_Move_Basic::setup_gradient(this->pos, this->grad, force);
@@ -66,7 +66,7 @@ void Ions_Move_BFGS::start(const matrix& force, const double &energy_in)
 		// interpolation
 		//[ if etot<etot_p ]
 		// calculate the new step -> the new move using hessian
-		// matrix, and std::set the new trust radius.
+		// matrix, and set the new trust radius.
 		// [compute the move at last]
 		this->bfgs_routine();
 
@@ -124,7 +124,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 		
 		Ions_Move_Basic::update_iter = 0;
 
-		// std::set the trust radius old as the initial trust radius.
+		// set the trust radius old as the initial trust radius.
 		trust_radius_old = trust_radius_ini;
 		this->reset_hessian();
 

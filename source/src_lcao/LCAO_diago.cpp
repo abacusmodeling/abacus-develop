@@ -95,7 +95,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>
 
 	//GlobalC::ParaO.out_hs=1;//zhengdy-soc-test
 	bool bit = false; //LiuXh, 2017-03-21
-	//if std::set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
+	//if set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
 	HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
 	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 

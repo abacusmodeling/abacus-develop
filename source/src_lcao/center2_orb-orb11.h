@@ -7,11 +7,8 @@
 #define CENTER2_ORB_ORB11_H
 
 #include <vector>
-using std::vector;
 #include <map>
-using std::map;
 #include <set>
-using std::set;
 
 #include "center2_orb.h"
 

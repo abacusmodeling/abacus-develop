@@ -18,7 +18,7 @@ void Hamilt::diagH_pw(
     timer::tick("Hamilt", "diagH_pw");
     double avg = 0.0;
 
-	// std::set ik0 because of mem_saver.
+	// set ik0 because of mem_saver.
 	// if mem_saver is not used, ik0=ik, as usual.
 	// but if mem_saver is used, ik0=0.
 	int ik0 = ik;

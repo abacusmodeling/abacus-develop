@@ -310,7 +310,7 @@ void Input_Conv::Convert(void)
 		GlobalV::NONCOLIN = INPUT.noncolin;
 		//wavefunctions are spinors with 2 components
 		GlobalV::NPOL = 2;
-		//std::set the domag variable to make a spin-orbit calculation with zero magnetization
+		//set the domag variable to make a spin-orbit calculation with zero magnetization
 		if(GlobalV::NONCOLIN)
 		{
 			GlobalV::DOMAG = true;

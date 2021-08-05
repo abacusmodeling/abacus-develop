@@ -239,7 +239,7 @@ void Input::Print(const std::string &fn)const
 		ofs << std::setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << std::endl;
 	}
 	OUTP(ofs,"ocp",GlobalV::ocp,"change occupation or not");
-	OUTP(ofs,"ocp_set",GlobalV::ocp_set,"std::set occupation");
+	OUTP(ofs,"ocp_set",GlobalV::ocp_set,"set occupation");
 	//OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
 	// for(int i=0; i<ocp_n; i++)
 	// {

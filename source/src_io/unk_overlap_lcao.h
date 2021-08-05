@@ -2,11 +2,8 @@
 #define UNKOVERLAP_LCAO
 
 #include <vector>
-using std::vector;
 #include <map>
-using std::map;
 #include <set>
-using std::set;
 
 #include "../src_lcao/center2_orb.h"
 #include "../src_lcao/center2_orb-orb11.h"

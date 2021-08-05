@@ -46,7 +46,7 @@ bool plsame(char *ca, char *cb) {
 	zcode = 'Z';
 
 	/*     Use 'Z' rather than 'A' so that ASCII can be detected on Prime */
-	/*     machines, on which ICHAR returns a value with bit 8 std::set. */
+	/*     machines, on which ICHAR returns a value with bit 8 set. */
 	/*     ICHAR('A') on Prime machines returns 193 which is the same as */
 	/*     ICHAR('A') on an EBCDIC machine. */
 

@@ -295,7 +295,7 @@ void FFT::setup_MPI_FFT3D(const int nx, const int ny, const int nz, const int nx
 	// > first processor
 	for (i = 1;i < nproc_use;i++) this->sum[i] = this->sum[i-1] + this->npps[i-1];
 
-	// Each processor has a std::set of full sticks,
+	// Each processor has a set of full sticks,
 	// 'rank_use' processor send a piece(npps[i]) of these sticks(nst_per[rank_use])
 	// to all the other processors in this pool
 	for (i = 0;i < nproc_use;i++) this->sentc[i] = this->nst_per[rank_use] * this->npps[i];

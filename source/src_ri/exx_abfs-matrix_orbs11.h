@@ -2,11 +2,8 @@
 #define EXX_ABFS_MATRIX_ORBS11_H
 
 #include <vector>
-using std::vector;
 #include <map>
-using std::map;
 #include <set>
-using std::set;
 
 #include "exx_abfs.h"
 #include "../module_orbital/ORB_table_phi.h"

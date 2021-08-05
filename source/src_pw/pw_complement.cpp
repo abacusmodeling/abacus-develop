@@ -359,10 +359,10 @@ void PW_complement::get_ig2fftc(const int &ngmc, const int &ncx, const int &ncy,
                                 const Vector3<double> *ig, int* ig1, int *ig2, int *ig3, int *ig2fftc)
 {
     //=================================================================
-    // std::set ig2fftc & ig2fftw with the correct fft correspondence
+    // set ig2fftc & ig2fftw with the correct fft correspondence
     //=================================================================
     if (GlobalV::test_pw) TITLE("PW_Basis","get_ig2fftc");
-    // see ggen.f90, std::set ig2fftc ith the correct fft correspondence Page 4/6
+    // see ggen.f90, set ig2fftc ith the correct fft correspondence Page 4/6
 
     ZEROS(ig2fftc, ngmc);
     ZEROS(ig1, ngmc);

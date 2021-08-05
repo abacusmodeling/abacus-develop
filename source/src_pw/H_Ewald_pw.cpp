@@ -80,7 +80,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
 	if(GlobalV::test_energy)OUT(GlobalV::ofs_running,"Upper bound",upperbound);
 
     // G-space sum here.
-    // Determine if this processor contains G=0 and std::set the constant term
+    // Determine if this processor contains G=0 and set the constant term
     if (pwb.gstart == 1)
     {
         ewaldg = - charge * charge / alpha / 4.0;
@@ -193,7 +193,7 @@ void H_Ewald_pw::compute_ewald(const UnitCell &cell, const PW_Basis &pwb)
     delete[] r;
     delete[] r2;
 
-	// std::set the Ewald energy, mohan add 2021-02-25
+	// set the Ewald energy, mohan add 2021-02-25
 	H_Ewald_pw::ewald_energy = ewalds; 
 
     timer::tick("H_Ewald_pw","compute_ewald");

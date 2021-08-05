@@ -14,7 +14,7 @@ using namespace std;
 ///
 ///Note : contain information about atoms
 ///
-///Feature : std::set and store information about atoms
+///Feature : set and store information about atoms
 ///
 class Numerical_Orbital
 {
@@ -52,7 +52,7 @@ public:
 	static Vector3<double>& getdR() { return dR; }
 
 	///
-	/// std::set information about Numerical Orbital
+	/// set information about Numerical Orbital
 	///
 	void set_orbital_info(
 			const int& type_in,
@@ -93,7 +93,7 @@ private:
 	Numerical_Orbital_Lm* phiLN;// length: total_nchi (only store radial function )
 
 	//==========================================================
-	// It's about two atoms, so here we std::set static variables 
+	// It's about two atoms, so here we set static variables 
 	//==========================================================
 	static double distance; 
 	static Vector3<double> R1;

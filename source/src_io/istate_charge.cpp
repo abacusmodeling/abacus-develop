@@ -159,7 +159,7 @@ void IState_Charge::idmatrix(const int &ib)
 			const int mu_local = GlobalC::GridT.trace_lo[i];
 			if ( mu_local >= 0)
 			{
-				// std::set a pointer.
+				// set a pointer.
 				//double *alpha = GlobalC::LOC.DM[is][mu_local];
 				for (int j=i; j<GlobalV::NLOCAL; j++)
 				{

@@ -109,7 +109,7 @@ void Parallel_PW::columns_map(void)
 		
 	int ibox[3];
 	
-	// std::set the center at origin point.
+	// set the center at origin point.
 	ibox[0] = int(n1 / 2.0) + 1;
 	ibox[1] = int(n2 / 2.0) + 1;
 	ibox[2] = int(n3 / 2.0) + 1;
@@ -437,7 +437,7 @@ void Parallel_PW::fft_map(
 				this->ig_l2g[ngm_i] = ig;
 				if(this->gcut == GlobalC::pw.ggchg) // for charge, not for wave functions.
 				{
-					// std::set 
+					// set 
 					GlobalC::pw.gdirect[ngm_i] = GlobalC::pw.gdirect_global[ig];
 					GlobalC::pw.gcar[ngm_i] = GlobalC::pw.gdirect[ngm_i]*GlobalC::ucell.G;
 					GlobalC::pw.gg[ngm_i] = GlobalC::pw.gg_global[ig];
@@ -617,7 +617,7 @@ void Parallel_PW::fft_map_final_scf(
 				this->ig_l2g[ngm_i_final_scf] = ig;
 				if(this->gcut == GlobalC::pw.ggchg) // for charge, not for wave functions.
 				{
-					// std::set 
+					// set 
 					GlobalC::pw.gdirect[ngm_i_final_scf] = GlobalC::pw.gdirect_global[ig];
 					GlobalC::pw.gcar[ngm_i_final_scf] = GlobalC::pw.gdirect[ngm_i_final_scf]*GlobalC::ucell.G;
 					GlobalC::pw.gg[ngm_i_final_scf] = GlobalC::pw.gg_global[ig];

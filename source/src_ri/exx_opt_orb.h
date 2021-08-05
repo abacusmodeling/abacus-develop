@@ -29,7 +29,7 @@ private:
 		const size_t TA, const size_t IA, const size_t TB, const size_t IB,
 		const Element_Basis_Index::Range &range_jles, 
 		const Element_Basis_Index::IndexLNM &index_jles) const;
-	std::map<size_t,std::map<size_t,std::set<double>>> get_radial_R() const;
+	std::map<size_t,std::map<size_t,set<double>>> get_radial_R() const;
 		
 	int kmesh_times = 4;
 };

@@ -33,9 +33,9 @@
  *                               The smallest nev eigenvalues/eigenvectors are calculated.
  *  \param  a                    Distributed matrix for which eigenvalues are to be computed.
  *                               Distribution is like in Scalapack.
- *                               The full matrix must be std::set (not only one half like in scalapack).
+ *                               The full matrix must be set (not only one half like in scalapack).
  *  \param lda                   Leading dimension of a
- *  \param ev(na)                On output: eigenvalues of a, every processor gets the complete std::set
+ *  \param ev(na)                On output: eigenvalues of a, every processor gets the complete set
  *  \param q                     On output: Eigenvectors of a
  *                               Distribution is like in Scalapack.
  *                               Must be always dimensioned to the full size (corresponding to (na,na))
@@ -56,9 +56,9 @@
  *                               The smallest nev eigenvalues/eigenvectors are calculated.
  *  \param  a                    Distributed matrix for which eigenvalues are to be computed.
  *                               Distribution is like in Scalapack.
- *                               The full matrix must be std::set (not only one half like in scalapack).
+ *                               The full matrix must be set (not only one half like in scalapack).
  *  \param lda                   Leading dimension of a
- *  \param ev(na)                On output: eigenvalues of a, every processor gets the complete std::set
+ *  \param ev(na)                On output: eigenvalues of a, every processor gets the complete set
  *  \param q                     On output: Eigenvectors of a
  *                               Distribution is like in Scalapack.
  *                               Must be always dimensioned to the full size (corresponding to (na,na))
@@ -79,9 +79,9 @@
  *                                    The smallest nev eigenvalues/eigenvectors are calculated.
  *  \param  a                         Distributed matrix for which eigenvalues are to be computed.
  *                                    Distribution is like in Scalapack.
- *                                    The full matrix must be std::set (not only one half like in scalapack).
+ *                                    The full matrix must be set (not only one half like in scalapack).
  *  \param lda                        Leading dimension of a
- *  \param ev(na)                     On output: eigenvalues of a, every processor gets the complete std::set
+ *  \param ev(na)                     On output: eigenvalues of a, every processor gets the complete set
  *  \param q                          On output: Eigenvectors of a
  *                                    Distribution is like in Scalapack.
  *                                    Must be always dimensioned to the full size (corresponding to (na,na))
@@ -91,7 +91,7 @@
  *  \param matrixCols                 distributed number of matrix columns
  *  \param mpi_comm_rows              MPI-Communicator for rows
  *  \param mpi_comm_cols              MPI-Communicator for columns
- *  \param mpi_coll_all               MPI communicator for the total processor std::set
+ *  \param mpi_coll_all               MPI communicator for the total processor set
  *  \param THIS_REAL_ELPA_KERNEL_API  specify used ELPA2 kernel via API
  *  \param use_qr                     use QR decomposition 1 = yes, 0 = no
  *
@@ -105,9 +105,9 @@
  *                                    The smallest nev eigenvalues/eigenvectors are calculated.
  *  \param  a                         Distributed matrix for which eigenvalues are to be computed.
  *                                    Distribution is like in Scalapack.
- *                                    The full matrix must be std::set (not only one half like in scalapack).
+ *                                    The full matrix must be set (not only one half like in scalapack).
  *  \param lda                        Leading dimension of a
- *  \param ev(na)                     On output: eigenvalues of a, every processor gets the complete std::set
+ *  \param ev(na)                     On output: eigenvalues of a, every processor gets the complete set
  *  \param q                          On output: Eigenvectors of a
  *                                    Distribution is like in Scalapack.
  *                                    Must be always dimensioned to the full size (corresponding to (na,na))
@@ -117,7 +117,7 @@
  *  \param matrixCols                 distributed number of matrix columns
  *  \param mpi_comm_rows              MPI-Communicator for rows
  *  \param mpi_comm_cols              MPI-Communicator for columns
- *  \param mpi_coll_all               MPI communicator for the total processor std::set
+ *  \param mpi_coll_all               MPI communicator for the total processor set
  *  \param THIS_COMPLEX_ELPA_KERNEL_API  specify used ELPA2 kernel via API
  *
  *  \result                     int: 1 if error occured, otherwise 0
@@ -130,9 +130,9 @@
  *                                    The smallest nev eigenvalues/eigenvectors are calculated.
  *  \param  a                         Distributed matrix for which eigenvalues are to be computed.
  *                                    Distribution is like in Scalapack.
- *                                    The full matrix must be std::set (not only one half like in scalapack).
+ *                                    The full matrix must be set (not only one half like in scalapack).
  *  \param lda                        Leading dimension of a
- *  \param ev(na)                     On output: eigenvalues of a, every processor gets the complete std::set
+ *  \param ev(na)                     On output: eigenvalues of a, every processor gets the complete set
  *  \param q                          On output: Eigenvectors of a
  *                                    Distribution is like in Scalapack.
  *                                    Must be always dimensioned to the full size (corresponding to (na,na))
@@ -142,7 +142,7 @@
  *  \param matrixCols                 distributed number of matrix columns
  *  \param mpi_comm_rows              MPI-Communicator for rows
  *  \param mpi_comm_cols              MPI-Communicator for columns
- *  \param mpi_coll_all               MPI communicator for the total processor std::set
+ *  \param mpi_coll_all               MPI communicator for the total processor set
  *  \param THIS_REAL_ELPA_KERNEL_API  specify used ELPA2 kernel via API
  *  \param use_qr                     use QR decomposition 1 = yes, 0 = no
  *  \param method                      choose whether to use ELPA 1stage or 2stage solver
@@ -160,9 +160,9 @@
  *                                       The smallest nev eigenvalues/eigenvectors are calculated.
  *  \param  a                            Distributed matrix for which eigenvalues are to be computed.
  *                                       Distribution is like in Scalapack.
- *                                       The full matrix must be std::set (not only one half like in scalapack).
+ *                                       The full matrix must be set (not only one half like in scalapack).
  *  \param lda                           Leading dimension of a
- *  \param ev(na)                        On output: eigenvalues of a, every processor gets the complete std::set
+ *  \param ev(na)                        On output: eigenvalues of a, every processor gets the complete set
  *  \param q                             On output: Eigenvectors of a
  *                                       Distribution is like in Scalapack.
  *                                       Must be always dimensioned to the full size (corresponding to (na,na))
@@ -172,7 +172,7 @@
  *  \param matrixCols                    distributed number of matrix columns
  *  \param mpi_comm_rows                 MPI-Communicator for rows
  *  \param mpi_comm_cols                 MPI-Communicator for columns
- *  \param mpi_coll_all                  MPI communicator for the total processor std::set
+ *  \param mpi_coll_all                  MPI communicator for the total processor set
  *  \param THIS_COMPLEX_ELPA_KERNEL_API  specify used ELPA2 kernel via API
  *  \param method                        choose whether to use ELPA 1stage or 2stage solver
  *                                       possible values: "1stage" => use ELPA 1stage solver
@@ -209,7 +209,7 @@
  *\param  uplo_a               'U' if A is upper triangular
  *                             'L' if A is lower triangular
  *                             anything else if A is a full matrix
- *                             Please note: This pertains to the original A (as std::set in the calling program)
+ *                             Please note: This pertains to the original A (as set in the calling program)
  *                                          whereas the transpose of A is used for calculations
  *                             If uplo_a is 'U' or 'L', the other triangle is not used at all,
  *                             i.e. it may contain arbitrary numbers
@@ -245,7 +245,7 @@
  *\param  uplo_a               'U' if A is upper triangular
  *                             'L' if A is lower triangular
  *                             anything else if A is a full matrix
- *                             Please note: This pertains to the original A (as std::set in the calling program)
+ *                             Please note: This pertains to the original A (as set in the calling program)
  *                                          whereas the transpose of A is used for calculations
  *                             If uplo_a is 'U' or 'L', the other triangle is not used at all,
  *                             i.e. it may contain arbitrary numbers
@@ -276,7 +276,7 @@
  *\param  na                   Order of matrix
  *\param  a(lda,matrixCols)    Distributed matrix which should be inverted
  *                             Distribution is like in Scalapack.
- *                             Only upper triangle is needs to be std::set.
+ *                             Only upper triangle is needs to be set.
  *                             The lower triangle is not referenced.
  *\param  lda                  Leading dimension of a
  *\param                       matrixCols  local columns of matrix a
@@ -292,7 +292,7 @@
  *\param  na                   Order of matrix
  *\param  a(lda,matrixCols)    Distributed matrix which should be inverted
  *                             Distribution is like in Scalapack.
- *                             Only upper triangle is needs to be std::set.
+ *                             Only upper triangle is needs to be set.
  *                             The lower triangle is not referenced.
  *\param  lda                  Leading dimension of a
  *\param                       matrixCols  local columns of matrix a
@@ -309,9 +309,9 @@
  *\param  na                   Order of matrix
  *\param  a(lda,matrixCols)    Distributed matrix which should be factorized.
  *                             Distribution is like in Scalapack.
- *                             Only upper triangle is needs to be std::set.
+ *                             Only upper triangle is needs to be set.
  *                             On return, the upper triangle contains the Cholesky factor
- *                             and the lower triangle is std::set to 0.
+ *                             and the lower triangle is set to 0.
  *\param  lda                  Leading dimension of a
  *\param  matrixCols           local columns of matrix a
  *\param  nblk                 blocksize of cyclic distribution, must be the same in both directions!
@@ -326,9 +326,9 @@
  *\param  na                   Order of matrix
  *\param  a(lda,matrixCols)    Distributed matrix which should be factorized.
  *                             Distribution is like in Scalapack.
- *                             Only upper triangle is needs to be std::set.
+ *                             Only upper triangle is needs to be set.
  *                             On return, the upper triangle contains the Cholesky factor
- *                             and the lower triangle is std::set to 0.
+ *                             and the lower triangle is set to 0.
  *\param  lda                  Leading dimension of a
  *\param                       matrixCols  local columns of matrix a
  *\param  nblk                 blocksize of cyclic distribution, must be the same in both directions!

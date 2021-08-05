@@ -23,7 +23,7 @@ int ELEC_evolve::td_vexttype;
 int ELEC_evolve::td_vextout;
 int ELEC_evolve::td_dipoleout;
 
-// this routine only serves for TDDFT using LCAO basis std::set
+// this routine only serves for TDDFT using LCAO basis set
 void ELEC_evolve::evolve_psi(
 	const int &istep, 
 	LCAO_Hamilt &uhm, 

@@ -45,9 +45,9 @@ int pilaenv(int *ispec, char *name__, char *opts, int *n1, int *n2, int *n3,
 	/*  if ILAENV >= 0: ILAENV returns the value of the parameter specified by ISPEC */
 	/*  if ILAENV < 0:  if ILAENV = -k, the k-th argument had an illegal value. */
 
-	/*  This version provides a std::set of parameters which should give good, */
+	/*  This version provides a set of parameters which should give good, */
 	/*  but not optimal, performance on many of the currently available */
-	/*  computers.  Users are encouraged to modify this subroutine to std::set */
+	/*  computers.  Users are encouraged to modify this subroutine to set */
 	/*  the tuning parameters for their particular machine using the option */
 	/*  and problem size information in the arguments. */
 
@@ -185,7 +185,7 @@ int pilaenv(int *ispec, char *name__, char *opts, int *n1, int *n2, int *n3,
 	iz = 'Z';
 	if (iz == 90 || iz == 122) {
 
-		/*        ASCII character std::set */
+		/*        ASCII character set */
 
 		if (ic >= 97 && ic <= 122) {
 			*(unsigned char *) subnam = (char) (ic - 32);
@@ -200,7 +200,7 @@ int pilaenv(int *ispec, char *name__, char *opts, int *n1, int *n2, int *n3,
 
 	} else if (iz == 233 || iz == 169) {
 
-		/*        EBCDIC character std::set */
+		/*        EBCDIC character set */
 
 		if (ic >= 129 && ic <= 137 || ic >= 145 && ic <= 153
 				|| ic >= 162 && ic <= 169) {

@@ -136,7 +136,7 @@ void ELEC_scf::scf(const int &istep)
 			GlobalC::CHR.set_new_e_iteration(false);
 		}
 
-		// std::set converged threshold,
+		// set converged threshold,
 		// automatically updated during self consistency, only for CG.
         this->update_ethr(iter);
         if(GlobalV::FINAL_SCF && iter==1)

@@ -60,7 +60,7 @@ private:
     double Monkhorst_Pack_formula( const int &k_type, const double &offset,
                                    const int& n, const int &dim);
 
-    // step 2 : std::set both kvec and kved; normalize weight
+    // step 2 : set both kvec and kved; normalize weight
     void update_use_ibz( void );
     void set_both_kvec(const Matrix3 &G,const Matrix3 &R);
     void normalize_wk( const int &degspin );

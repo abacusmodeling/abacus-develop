@@ -76,8 +76,8 @@ void Driver::atomic_world(void)
 
 	//--------------------------------------------------
 	// choose basis sets:
-	// pw: plane wave basis std::set
-	// lcao_in_pw: LCAO expaned by plane wave basis std::set
+	// pw: plane wave basis set
+	// lcao_in_pw: LCAO expaned by plane wave basis set
 	// lcao: linear combination of atomic orbitals
 	//--------------------------------------------------
 	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")

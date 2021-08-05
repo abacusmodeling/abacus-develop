@@ -18,7 +18,7 @@ Input::Input()
 {
 	angle1 = new double[1];
 	angle2 = new double[1];
-// all values std::set in Default	
+// all values set in Default	
 }
 
 Input::~Input() 
@@ -2537,8 +2537,8 @@ void Input::Check(void)
 
         //deal with input parameters , 2019-04-30
         //if(basis_type == "pw" ) WARNING_QUIT("Input::Check","calculate = MD is only availble for LCAO.");
-        if(mdp.dt < 0) WARNING_QUIT("Input::Check","time interval of MD calculation should be std::set!");
-        if(mdp.tfirst < 0) WARNING_QUIT("Input::Check","temperature of MD calculation should be std::set!");
+        if(mdp.dt < 0) WARNING_QUIT("Input::Check","time interval of MD calculation should be set!");
+        if(mdp.tfirst < 0) WARNING_QUIT("Input::Check","temperature of MD calculation should be set!");
         if(mdp.tlast  < 0.0) mdp.tlast = mdp.tfirst;
         if(mdp.tfirst!=mdp.tlast)
         {
@@ -2951,7 +2951,7 @@ void Input::Check(void)
 	//2015-06-15, xiaohui
 	if(mixing_mode == "pulay" && mixing_gg0 > 0.0)
 	{
-		WARNING("Input","To use pulay-kerker mixing method, please std::set mixing_type=pulay-kerker");
+		WARNING("Input","To use pulay-kerker mixing method, please set mixing_type=pulay-kerker");
 	}
 	
 	if(berry_phase)
@@ -2959,21 +2959,21 @@ void Input::Check(void)
 		if(basis_type == "pw")
 		{
 			if( !(calculation=="nscf") )
-				WARNING_QUIT("Input","calculate berry phase, please std::set calculation = nscf");
+				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
 		}
 		else if(basis_type == "lcao" && (ks_solver == "genelpa" || ks_solver == "scalapack_gvx"))
 		{
 			if( !(calculation=="nscf") )
-				WARNING_QUIT("Input","calculate berry phase, please std::set calculation = nscf");
+				WARNING_QUIT("Input","calculate berry phase, please set calculation = nscf");
 		}
 		else
 		{
-			WARNING_QUIT("Input","calculate berry phase, please std::set basis_type = pw or lcao");
+			WARNING_QUIT("Input","calculate berry phase, please set basis_type = pw or lcao");
 		}
 		
 		if( !(gdir==1||gdir==2||gdir==3) )
 		{
-			WARNING_QUIT("Input","calculate berry phase, please std::set gdir = 1 or 2 or 3");
+			WARNING_QUIT("Input","calculate berry phase, please set gdir = 1 or 2 or 3");
 		}
 	}
 	
@@ -2982,18 +2982,18 @@ void Input::Check(void)
 		if(basis_type == "pw" || basis_type == "lcao")
 		{
 			if( !(calculation=="nscf") )
-				WARNING_QUIT("Input","to use towannier90, please std::set calculation = nscf");
+				WARNING_QUIT("Input","to use towannier90, please set calculation = nscf");
 		}
 		else
 		{
-			WARNING_QUIT("Input","to use towannier90, please std::set basis_type = pw or lcao");
+			WARNING_QUIT("Input","to use towannier90, please set basis_type = pw or lcao");
 		}
 		
 		if(nspin == 2)
 		{
 			if( !(wannier_spin=="up"||wannier_spin=="down") )
 			{
-				WARNING_QUIT("Input","to use towannier90, please std::set wannier_spin = up or down");
+				WARNING_QUIT("Input","to use towannier90, please set wannier_spin = up or down");
 			}
 		}
 	}
@@ -3005,7 +3005,7 @@ void Input::Check(void)
 	}
 	else if( system( ss.c_str() ))
 	{
-		WARNING_QUIT("Input","please std::set right files directory for reading in.");
+		WARNING_QUIT("Input","please set right files directory for reading in.");
 	}
 	else
 	{

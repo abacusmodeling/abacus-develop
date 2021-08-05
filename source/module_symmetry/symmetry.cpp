@@ -801,7 +801,7 @@ void Symmetry::lattice_type(
             v2 = s2;
             v3 = s3;
         	change=0;
-			GlobalV::ofs_running<<" The lattice vectors have been std::set back!"<<std::endl;
+			GlobalV::ofs_running<<" The lattice vectors have been set back!"<<std::endl;
         }
     }*/
     brav = pre_brav;
@@ -912,7 +912,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     {
         //	std::cout << "\n ia=" << ia;
         //	std::cout << " dirpos:" << dirpos[ia*3] << " " << dirpos[ia*3+1] << " " << dirpos[ia*3+2];
-        //std::set up the current test std::vector "trans"
+        //set up the current test std::vector "trans"
         //and "trans" could possibly contain trivial translations:
         trans[0] = this->get_translation_vector(dirpos[ia*3+0], sptmin.x);
         trans[1] = this->get_translation_vector(dirpos[ia*3+1], sptmin.y);
@@ -1308,7 +1308,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
     sptmin.z = pos[itmin_start*3+2];
     for (int i = itmin_start; i < itmin_start + na[itmin_type]; ++i)
     {
-        //std::set up the current test std::vector "gtrans"
+        //set up the current test std::vector "gtrans"
         //and "gtrans" could possibly contain trivial translations:
         gtrans.x = this->get_translation_vector( pos[i*3+0], sptmin.x);
         gtrans.y = this->get_translation_vector( pos[i*3+1], sptmin.y);

@@ -39,11 +39,11 @@ void Diago_David::diag
     //In strictly speaking, it shoule be order*nband < npw sum of all pools. We roughly estimate it here.
     //However, in most cases, total number of plane waves should be much larger than nband*order
 
-    int nbase_x = order * nband ;				// maximum dimension of the reduced basis std::set
+    int nbase_x = order * nband ;				// maximum dimension of the reduced basis set
 
-    ComplexMatrix basis( nbase_x, npw );		// the reduced basis std::set
-    ComplexMatrix hp( nbase_x, npw );			// the product of H and psi in the reduced basis std::set
-    ComplexMatrix sp( nbase_x, npw );			// the Product of S and psi in the reduced basis std::set
+    ComplexMatrix basis( nbase_x, npw );		// the reduced basis set
+    ComplexMatrix hp( nbase_x, npw );			// the product of H and psi in the reduced basis set
+    ComplexMatrix sp( nbase_x, npw );			// the Product of S and psi in the reduced basis set
 
     ComplexMatrix hc( nbase_x, nbase_x );		// Hamiltonian on the reduced basis
     ComplexMatrix sc( nbase_x, nbase_x );		// Overlap on the reduced basis
@@ -67,7 +67,7 @@ void Diago_David::diag
     int* unconv = new int[nband] ;		// unconv[m] store the number of the m th unconvergent band
     assert(unconv != 0) ;
 
-    int nbase = 0;						// the dimension of the reduced basis std::set
+    int nbase = 0;						// the dimension of the reduced basis set
     notconv = nband;					// the number of the unconvergent bands
     ZEROS( convflag, nband );
     for ( int m = 0 ; m < nband; m++ ) unconv[m] = m;
@@ -173,9 +173,9 @@ void Diago_David::diag
             }
             else
             {
-                // if the dimension of the reduced basis std::set is becoming too large,
+                // if the dimension of the reduced basis set is becoming too large,
                 // then replace the first N (=nband) basis vectors with the current
-                // estimate of the eigenvectors and std::set the basis dimension to N;
+                // estimate of the eigenvectors and set the basis dimension to N;
 
                 this->refresh( npw, nband, nbase, en, psi, basis, hp, sp, hc, sc, vc );
                 timer::tick("Diago_David","last");
@@ -231,7 +231,7 @@ void Diago_David::cal_grad
     timer::tick("Diago_David", "cal_grad"
     );
 
-    // expand the reduced basis std::set with the new basis vectors P|R(psi)>...
+    // expand the reduced basis set with the new basis vectors P|R(psi)>...
     // in which psi are the last eigenvectors
     // we define |R(psi)> as (H-ES)*|Psi>, E = <psi|H|psi>/<psi|S|psi>
     for ( int m = 0; m < notconv; m++ )

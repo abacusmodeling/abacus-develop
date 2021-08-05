@@ -43,7 +43,7 @@ void calculate()
 	ofs,
 	ofs_running,
 	ofs_warning);
-	std::cout << "std::set up cell classic done." << std::endl;
+	std::cout << "set up cell classic done." << std::endl;
 	symm.analy_sys(ucell, out, ofs_running);
 	ofs_running.close();
 //	ooo.set_orb_tables();

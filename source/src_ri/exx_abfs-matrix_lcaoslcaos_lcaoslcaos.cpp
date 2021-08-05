@@ -86,12 +86,12 @@ void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table()
 							co6.second.init_radial_table();
 }
 
-void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( std::map<size_t,std::map<size_t,std::set<double>>> &Rs )
+void Exx_Abfs::Matrix_Lcaoslcaos_Lcaoslcaos::init_radial_table( std::map<size_t,std::map<size_t,set<double>>> &Rs )
 {
 	for( auto &co1 : center2_orb22_s )
 		for( auto &co2 : co1.second )
 		{
-			std::set<size_t> radials;
+			set<size_t> radials;
 			for( const double &R : Rs[co1.first][co2.first] )
 			{
 				const double position = R * GlobalC::ucell.lat0 / MOT.dr;

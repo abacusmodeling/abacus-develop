@@ -133,7 +133,7 @@ void Charge_Mixing::Kerker_mixing( double *rho, const std::complex<double> *resi
 	// charge density. " rhog = FFT^{-1}(rho_save) "
     this->set_rhog(rho_save, rhog);
 
-    // (2) std::set up filter
+    // (2) set up filter
     //const double a = 0.8; // suggested by VASP.
 
 	// mohan fixed bug 2010/03/25

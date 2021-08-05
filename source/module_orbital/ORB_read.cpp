@@ -161,7 +161,7 @@ void LCAO_Orbitals::Read_Orbitals(
 	this->lmax = lmax_in;
 
 	//////////////////////////////////////////////////////////
-	/// (2) std::set the kmesh according to ecutwfc and dk. 
+	/// (2) set the kmesh according to ecutwfc and dk. 
 	//////////////////////////////////////////////////////////
 
 	//-----------------------------------------------------------------
@@ -282,7 +282,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 {
 	TITLE("LCAO_Orbitals","Set_NonLocal");
 
-	// std::set a pointer
+	// set a pointer
 	Atom* atom = &GlobalC::ucell.atoms[it];
 
 	// get the number of non-local projectors
@@ -290,7 +290,7 @@ void LCAO_Orbitals::Set_NonLocal(const int &it, int &n_projectors)
 
 	const int nh = atom->nh;//zhengdy-soc
 
-	// std::set the nonlocal projector objects
+	// set the nonlocal projector objects
 	Numerical_Nonlocal_Lm* tmpBeta_lm = new Numerical_Nonlocal_Lm[n_projectors];
 
 	ComplexMatrix coefficient_D_nc_in(nh*2, nh*2);//zhengdy-soc
@@ -932,7 +932,7 @@ void LCAO_Orbitals::read_orb_file(
 			double* psir;// psi * r
 			double* rab;// dr
 
-			// std::set the number of mesh and the interval distance.
+			// set the number of mesh and the interval distance.
 			ofs_in << std::setw(8) << meshr << std::setw(8) << dr;
 
 			radial = new double[meshr];
@@ -956,7 +956,7 @@ void LCAO_Orbitals::read_orb_file(
 				radial[ir] = ir * dr; //mohan 2010-04-19
 			}
 
-			// std::set the length of orbital
+			// set the length of orbital
 			ofs_in << std::setw(8) << radial[meshr - 1];
 
 			// mohan update 2010-09-07

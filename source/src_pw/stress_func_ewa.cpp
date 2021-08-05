@@ -28,7 +28,7 @@ void Stress_Func::stress_ewa(matrix& sigma, const bool is_pw)
     while(upperbound>1e-7);
 
     //G-space sum here
-    //Determine if this processor contains G=0 and std::set the constant term 
+    //Determine if this processor contains G=0 and set the constant term 
     double sdewald;
     if(GlobalC::pw.gstart == 1)
 	{

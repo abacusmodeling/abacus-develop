@@ -57,7 +57,7 @@ void LCAO_Matrix::divide_HS_in_frag(const bool isGamma, Parallel_Orbitals &po)
 		po.nloc = GlobalV::NLOCAL * GlobalV::NLOCAL;
 	}
 
-	// (2) std::set the trace, then we can calculate the nnr.
+	// (2) set the trace, then we can calculate the nnr.
 	// for 2d: calculate po.nloc first, then trace_loc_row and trace_loc_col
 	// for O(N): calculate the three together.
 	po.set_trace();
@@ -169,7 +169,7 @@ void LCAO_Matrix::allocate_HS_R(const int &nnR)
 
 void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const double &v, const char &dtype)
 {
-    // use iw1_all and iw2_all to std::set Hloc
+    // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
     const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
@@ -218,7 +218,7 @@ void LCAO_Matrix::set_HSgamma(const int &iw1_all, const int &iw2_all, const doub
 
 void LCAO_Matrix::set_HSk(const int &iw1_all, const int &iw2_all, const std::complex<double> &v, const char &dtype, const int spin)
 {
-    // use iw1_all and iw2_all to std::set Hloc
+    // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
     const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
@@ -263,7 +263,7 @@ void LCAO_Matrix::set_force
     const double& vz,
     const char &dtype)
 {
-    // use iw1_all and iw2_all to std::set Hloc
+    // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
     const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];
@@ -313,7 +313,7 @@ void LCAO_Matrix::set_stress
     const char &dtype,
     const Vector3<double> &dtau)
 {
-    // use iw1_all and iw2_all to std::set Hloc
+    // use iw1_all and iw2_all to set Hloc
     // becareful! The ir and ic may < 0!!!!!!!!!!!!!!!!
     const int ir = GlobalC::ParaO.trace_loc_row[ iw1_all ];
     const int ic = GlobalC::ParaO.trace_loc_col[ iw2_all ];

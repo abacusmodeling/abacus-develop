@@ -81,7 +81,7 @@ public:
     int nrxx_start;
 
 private:
-    void setup_FFT_dimension(void);	// std::set up FFT dimensions
+    void setup_FFT_dimension(void);	// set up FFT dimensions
 
 
 

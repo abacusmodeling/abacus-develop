@@ -131,7 +131,7 @@ void Cal_Test::test_memory(void)
 int Cal_Test::cal_np(const double &ggcut, const int &n1, const int &n2, const int &n3)
 {
 	int ibox[3];
-	// std::set the center at origin point.
+	// set the center at origin point.
 	ibox[0] = int(n1 / 2.0) + 1;
 	ibox[1] = int(n2 / 2.0) + 1;
 	ibox[2] = int(n3 / 2.0) + 1;

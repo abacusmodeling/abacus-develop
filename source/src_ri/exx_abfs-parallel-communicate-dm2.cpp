@@ -3,7 +3,7 @@
 
 
 void Exx_Abfs::Parallel::Communicate::DM2::init( 
-	const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold_in)
 {
 	threshold = threshold_in;
@@ -86,7 +86,7 @@ void Exx_Abfs::Parallel::Communicate::DM2::set_DM_gamma( const matrix &DM_2D, co
 
 void Exx_Abfs::Parallel::Communicate::DM2::cal_DM_k( 
 	const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-	const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+	const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 	const double threshold )
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");

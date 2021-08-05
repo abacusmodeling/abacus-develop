@@ -108,7 +108,7 @@ void DONE(std::ofstream &ofs,const std::string &description, bool only_rank0 = f
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : ZEROS
-// std::set elements of u as zero which u is 1_d std::complex array
+// set elements of u as zero which u is 1_d std::complex array
 //==========================================================
 template<class T, class TI>
 inline void ZEROS(std::complex<T> *u,const TI n)		// Peize Lin change int to TI at 2020.03.03

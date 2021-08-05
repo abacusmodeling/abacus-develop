@@ -178,7 +178,7 @@ void hcth(double rho, double grho, double &sx, double &v1x, double &v2x)
 {
     //     ===============================================================
     //     HCTH/120, JCP 109, p. 6264 (1998)
-    //     Parameters std::set-up after N.L. Doltsisnis & M. Sprik (1999)
+    //     Parameters set-up after N.L. Doltsisnis & M. Sprik (1999)
     //     Present release: Mauro Boero, Tsukuba, 11/05/2004
     //--------------------------------------------------------------------------
     //     rhoa = rhob = 0.5 * rho

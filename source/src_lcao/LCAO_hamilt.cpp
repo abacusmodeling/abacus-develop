@@ -148,7 +148,7 @@ void LCAO_Hamilt::calculate_STNR_gamma(void)
 	// GlobalC::LM.print_HSk('S','R',1.0e-5);
 	//-------------------------------------
 
-	// std::set T and Vnl matrix to zero.
+	// set T and Vnl matrix to zero.
 	// 2 stands for GlobalC::LM.Hloc_fixed matrix.
 	GlobalC::LM.zeros_HSgamma('T'); 
 
@@ -189,13 +189,13 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 	timer::tick("LCAO_Hamilt","calculate_Hk");
 
 	// whether you want to calculate the local potential
-	// or not, you need to std::set this matrix to 0.
+	// or not, you need to set this matrix to 0.
 	GlobalC::LM.zeros_HSk('H');
 
 	if(GlobalV::VL_IN_H)
 	{
 		//-------------------------
-		// std::set the local potential
+		// set the local potential
 		// in plane wave basis.
 		//-------------------------
 //		Build_ST_pw bsp;
@@ -203,7 +203,7 @@ void LCAO_Hamilt::calculate_Hk(const int &ik)
 //		GlobalC::LM.print_HSk('H','C',1.0e-5);
 
 		//--------------------------
-		// std::set the local potential
+		// set the local potential
 		// in LCAO basis.
 		//--------------------------
 		GlobalC::LM.zeros_HSR('H', GlobalC::LNNR.nnr);
@@ -269,7 +269,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     TITLE("Hamilt_Linear","calculate_STBR_k");
 
 	//--------------------------------------------
-	// std::set S(R) to zero.
+	// set S(R) to zero.
 	// the total value of S(R) in this processor
 	// is GlobalC::LNNR.nnr.
 	// and store in GlobalC::LM.SlocR.
@@ -278,7 +278,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
     this->genH.calculate_S_no();	
 
 	//------------------------------
-	// std::set T(R) and Vnl(R) to zero.
+	// set T(R) and Vnl(R) to zero.
 	// and then calculate it
 	// and store in GlobalC::LM.Hloc_fixedR.
 	//------------------------------

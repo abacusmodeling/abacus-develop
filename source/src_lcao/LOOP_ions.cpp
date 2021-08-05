@@ -266,9 +266,9 @@ bool LOOP_ions::force_stress(
     }
     timer::tick("LOOP_ions","force_stress");
 
-	// std::set force matrix
+	// set force matrix
 	matrix fcs;
-	// std::set stress matrix
+	// set stress matrix
 	matrix scs;
 	Force_Stress_LCAO FSL;
 	FSL.allocate ();
@@ -500,7 +500,7 @@ void LOOP_ions::final_scf(void)
 
 	//------------------------------------------------------------------
 	// THIS PART IS THE SAME AS LOOP_elec::before_solver
-    // (4) std::set the augmented orbitals index.
+    // (4) set the augmented orbitals index.
     // after ParaO and GridT,
     // this information is used to calculate
     // the force.

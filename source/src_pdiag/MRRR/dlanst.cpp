@@ -56,7 +56,7 @@ double pdlanst(char *norm, int *n, double *d__, double *e) {
 
 	/*  N       (input) int */
 	/*          The order of the matrix A.  N >= 0.  When N = 0, DLANST is */
-	/*          std::set to zero. */
+	/*          set to zero. */
 
 	/*  D       (input) DOUBLE PRECISION array, dimension (N) */
 	/*          The diagonal elements of A. */

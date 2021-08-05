@@ -87,7 +87,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
         start=std::clock();
 		
 		
-		//(1) std::set converged threshold, 
+		//(1) set converged threshold, 
 		// automatically updated during self consistency.
         //this->update_ethr(iter);
         if(GlobalV::FINAL_SCF && iter==1) 

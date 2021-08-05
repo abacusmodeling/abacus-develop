@@ -43,7 +43,7 @@ class BFGS_Basic
 	protected:
 
 	bool save_flag;
-	bool tr_min_hit;			//.TRUE. if the trust_radius has already been std::set
+	bool tr_min_hit;			//.TRUE. if the trust_radius has already been set
 								// to the minimum value at the previous step
 
 	// mohan add 2010-07-27

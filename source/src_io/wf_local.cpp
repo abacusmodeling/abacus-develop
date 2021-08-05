@@ -440,7 +440,7 @@ void WF_Local::distri_lowf_new(double **ctot, const int &is)
     TITLE("WF_Local","distri_lowf_new");
 #ifdef __MPI
 
-//1. alloc work array; std::set some parameters
+//1. alloc work array; set some parameters
 
 	long maxnloc; // maximum number of elements in local matrix
 	MPI_Reduce(&GlobalC::ParaO.nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, GlobalC::ParaO.comm_2D);
@@ -512,7 +512,7 @@ void WF_Local::distri_lowf_complex_new(std::complex<double> **ctot, const int &i
     TITLE("WF_Local","distri_lowf_complex_new");
 #ifdef __MPI
 
-//1. alloc work array; std::set some parameters
+//1. alloc work array; set some parameters
 
 	long maxnloc; // maximum number of elements in local matrix
 	MPI_Reduce(&GlobalC::ParaO.nloc, &maxnloc, 1, MPI_LONG, MPI_MAX, 0, GlobalC::ParaO.comm_2D);

@@ -809,7 +809,7 @@ void Gint_k::folding_vl_k(const int &ik)
 			{
 				continue;
 			}
-			// std::set the matrix value.
+			// set the matrix value.
 			GlobalC::LM.set_HSk(i,j,tmp[j],'L');
 		}
 		delete[] tmp;
@@ -1123,7 +1123,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 			{
 				continue;
 			}
-			// std::set the matrix value.
+			// set the matrix value.
 			GlobalC::LM.set_HSk(i,j,tmp[j],'L');
 		}
 		delete[] tmp;

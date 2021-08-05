@@ -653,7 +653,7 @@ void Force_LCAO_gamma::cal_foverlap(
     TITLE("Force_LCAO_gamma","cal_foverlap");
     timer::tick("Force_LCAO_gamma","cal_foverlap");
 
-    // std::set energy density matrix.
+    // set energy density matrix.
     if(INPUT.new_dm>0)
     {
         timer::tick("Force_LCAO_gamma","cal_edm_2d");

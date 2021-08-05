@@ -134,7 +134,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 								if(GlobalV::GAMMA_ONLY_LOCAL)
 								{
 									// mohan add 2010-06-29
-									// std::set the value in Hloc and Sloc
+									// set the value in Hloc and Sloc
 									// according to trace_loc_row and trace_loc_col
 									// the last paramete: 1 for Sloc, 2 for Hloc
 									// and 3 for Hloc_fixed.
@@ -143,7 +143,7 @@ void LCAO_gen_fixedH::build_ST_new(const char& dtype, const bool& calc_deri)
 								else // k point algorithm
 								{
 									// mohan add 2010-10
-									// std::set the values in SlocR and Hloc_fixedR.
+									// set the values in SlocR and Hloc_fixedR.
 									// which is a 1D array.
 									if(dtype=='S')
 									{

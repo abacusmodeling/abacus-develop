@@ -108,7 +108,7 @@ int pdlarre(char *range, int *n, double *vl, double *vu, int *il, int *iu,
 
 	/*  E       (input/output) DOUBLE PRECISION array, dimension (N) */
 	/*          On entry, the first (N-1) entries contain the subdiagonal */
-	/*          elements of the tridiagonal matrix T; E(N) need not be std::set. */
+	/*          elements of the tridiagonal matrix T; E(N) need not be set. */
 	/*          On exit, E contains the subdiagonal elements of the unit */
 	/*          bidiagonal matrices L_i. The entries E( ISPLIT( I ) ), */
 	/*          1 <= I <= NSPLIT, contain the base points sigma_i on output. */
@@ -116,9 +116,9 @@ int pdlarre(char *range, int *n, double *vl, double *vu, int *il, int *iu,
 	/*  E2      (input/output) DOUBLE PRECISION array, dimension (N) */
 	/*          On entry, the first (N-1) entries contain the SQUARES of the */
 	/*          subdiagonal elements of the tridiagonal matrix T; */
-	/*          E2(N) need not be std::set. */
+	/*          E2(N) need not be set. */
 	/*          On exit, the entries E2( ISPLIT( I ) ), */
-	/*          1 <= I <= NSPLIT, have been std::set to zero */
+	/*          1 <= I <= NSPLIT, have been set to zero */
 
 	/*  RTOL1   (input) DOUBLE PRECISION */
 	/*  RTOL2   (input) DOUBLE PRECISION */
@@ -386,7 +386,7 @@ int pdlarre(char *range, int *n, double *vl, double *vu, int *il, int *iu,
 
 		/*        Blocks of size larger than 1x1 */
 
-		/*        E( IEND ) will hold the shift for the initial RRR, for now std::set it =0 */
+		/*        E( IEND ) will hold the shift for the initial RRR, for now set it =0 */
 		e[iend] = 0.;
 
 		/*        Find local outer bounds GL,GU for the block */

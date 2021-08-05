@@ -58,7 +58,7 @@ void Run_pw::plane_wave_line(void)
     Print_Info PI;
     PI.setup_parameters();
 
-    // Initalize the plane wave basis std::set
+    // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;

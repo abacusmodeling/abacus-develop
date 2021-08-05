@@ -21,7 +21,7 @@ public:
 
 	void cal_DM( 
 		const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-		const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core,
+		const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 		const double threshold );
 
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> DMr;
@@ -39,7 +39,7 @@ private:
 			const MPI_Comm & mpi_comm_in, 
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local_in,
 			const Abfs::Vector3_Order<int> &Born_von_Karman_period,
-			const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core);
+			const set<std::pair<size_t,size_t>> &H_atom_pairs_core);
 		~Allreduce();
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> grid_to_exx();
 		
@@ -49,7 +49,7 @@ private:
 		void insert_data( std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank );
 		void insert_data( std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> &data_rank );
 		void send_data_process( const int rank_asked );
-		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper( const std::map<size_t,std::map<size_t,std::set<Abfs::Vector3_Order<int>>>> & atom_asked ) const;
+		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper( const std::map<size_t,std::map<size_t,set<Abfs::Vector3_Order<int>>>> & atom_asked ) const;
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> get_data_local_wrapper() const;
 
 	private:
@@ -57,7 +57,7 @@ private:
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local;
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,Matrix_Wrapper>>>> data_localw;
 		
-		std::map<size_t,std::map<size_t,std::set<Abfs::Vector3_Order<int>>>> atom_unset;
+		std::map<size_t,std::map<size_t,set<Abfs::Vector3_Order<int>>>> atom_unset;
 		
 		const MPI_Comm & mpi_comm;
 		int comm_sz;
@@ -88,7 +88,7 @@ private:
 		std::vector<bool> row;
 		std::vector<bool> col;
 	}atom_in_exx;
-	void set_atom_in_exx( const std::set<std::pair<size_t,size_t>> &H_atom_pairs_core );	
+	void set_atom_in_exx( const set<std::pair<size_t,size_t>> &H_atom_pairs_core );	
 */
 };
 

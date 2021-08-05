@@ -35,7 +35,7 @@ std::tuple<double,double,matrix> Potential_Libxc::v_xc(
 	//----------------------------------------------------------
 	std::vector<xc_func_type> funcs = init_func();
 
-	// the type of rho_sigma_gdr is automatically std::set to 'tuple'
+	// the type of rho_sigma_gdr is automatically set to 'tuple'
 	// [rho, sigma, gdr] = cal_input( funcs, rho_in );
 	const auto rho_sigma_gdr = cal_input( funcs, rho_in, rho_core_in );
 	const std::vector<double> &rho = std::get<0>(rho_sigma_gdr);

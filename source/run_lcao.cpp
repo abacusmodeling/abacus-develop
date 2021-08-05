@@ -96,14 +96,14 @@ void Run_lcao::lcao_line(void)
 		GlobalV::MY_RANK);
 
 	// * allocate H and S matrices according to computational resources
-	// * std::set the 'trace' between local H/S and global H/S
+	// * set the 'trace' between local H/S and global H/S
 	GlobalC::LM.divide_HS_in_frag(GlobalV::GAMMA_ONLY_LOCAL, GlobalC::ParaO);
 
 //--------------------------------------
 // cell relaxation should begin here
 //--------------------------------------
 
-    // Initalize the plane wave basis std::set
+    // Initalize the plane wave basis set
     GlobalC::pw.gen_pw(GlobalV::ofs_running, GlobalC::ucell, GlobalC::kv);
     DONE(GlobalV::ofs_running,"INIT PLANEWAVE");
     std::cout << " UNIFORM GRID DIM     : " << GlobalC::pw.nx <<" * " << GlobalC::pw.ny <<" * "<< GlobalC::pw.nz << std::endl;

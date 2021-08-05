@@ -123,7 +123,7 @@ void hpsort(int n, double *ra, int *ind)
 
         i = k;               // wheter in hiring or promotion phase, we
 
-        j = k + k;           // std::set up to place rra in its proper level
+        j = k + k;           // set up to place rra in its proper level
 
         while (j <= ir)
         {
@@ -157,10 +157,10 @@ void hpsort(int n, double *ra, int *ind)
                     j = j + j;
                 }
                 else
-                    j = ir + 1;         // std::set j to terminate do-while loop
+                    j = ir + 1;         // set j to terminate do-while loop
             }
             else                   // this is the right place for rra
-                j = ir + 1;           // std::set j to terminate do-while loop
+                j = ir + 1;           // set j to terminate do-while loop
         }
 
         ra[i] = rra;

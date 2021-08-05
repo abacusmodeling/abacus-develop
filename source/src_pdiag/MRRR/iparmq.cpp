@@ -35,7 +35,7 @@ int piparmq(int *ispec, char *name__, char *opts, int *n, int *ilo, int *ihi,
 	/*                        at least 11. */
 
 	/*              ISPEC=13: (INWIN)  Size of the deflation window. */
-	/*                        This is best std::set greater than or equal to */
+	/*                        This is best set greater than or equal to */
 	/*                        the number of simultaneous shifts NS. */
 	/*                        Larger matrices benefit from larger deflation */
 	/*                        windows. */
@@ -58,7 +58,7 @@ int piparmq(int *ispec, char *name__, char *opts, int *n, int *ilo, int *ihi,
 	/*              ISPEC=15: (NSHFTS) The number of simultaneous shifts in */
 	/*                        a multi-shift QR iteration. */
 
-	/*              ISPEC=16: (IACC22) IPARMQ is std::set to 0, 1 or 2 with the */
+	/*              ISPEC=16: (IACC22) IPARMQ is set to 0, 1 or 2 with the */
 	/*                        following meanings. */
 	/*                        0:  During the multi-shift QR sweep, */
 	/*                            xLAQR5 does not accumulate reflections and */

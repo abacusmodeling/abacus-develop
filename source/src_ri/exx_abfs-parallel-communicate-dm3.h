@@ -10,8 +10,6 @@
 #include <memory>
 #include <atomic>
 
-using namespace std;
-
 class Exx_Abfs::Parallel::Communicate::DM3
 {
 public:

@@ -197,7 +197,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 	Vector3<double> tau1, dtau;
 
 	//----------------------------------------------------------
-	// RA will std::set the adjacent information for each atom
+	// RA will set the adjacent information for each atom
 	// 2d means this adjacent information is for HPSEPS's kind
 	// of division of H matrix.
 	//----------------------------------------------------------
@@ -238,7 +238,7 @@ void Force_LCAO_k::set_EDM_k(double** dm2d, const bool with_energy)
 			//----------------
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				// std::set the spin direction
+				// set the spin direction
 				if(GlobalV::NSPIN==2)
 				{
 					ispin = GlobalC::kv.isk[ik];
@@ -944,7 +944,7 @@ void Force_LCAO_k::cal_fvl_dphi_k(
 		//--------------------------------
 		// Grid integration here.
 		//--------------------------------
-		// fvl_dphi can not be std::set to zero here if Vna is used
+		// fvl_dphi can not be set to zero here if Vna is used
 		if(isstress&&isforce) 
 		{
 			GlobalC::UHM.GK.svl_k_RealSpace(fvl_dphi,svl_dphi,GlobalC::pot.vr_eff1);

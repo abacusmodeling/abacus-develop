@@ -78,7 +78,7 @@
 	/*          On input, the (estimated) gaps between consecutive */
 	/*          eigenvalues of L D L^T, i.e., WGAP(I-OFFSET) is the gap between */
 	/*          eigenvalues I and I+1. Note that if IFIRST.EQ.ILAST */
-	/*          then WGAP(IFIRST-OFFSET) must be std::set to ZERO. */
+	/*          then WGAP(IFIRST-OFFSET) must be set to ZERO. */
 	/*          On output, these gaps are refined. */
 
 	/*  WERR    (input/output) DOUBLE PRECISION array, dimension (N) */
@@ -154,9 +154,9 @@
 	/*     Initialize unconverged intervals in [ WORK(2*I-1), WORK(2*I) ]. */
 	/*     The Sturm Count, Count( WORK(2*I-1) ) is arranged to be I-1, while */
 	/*     Count( WORK(2*I) ) is stored in IWORK( 2*I ). The int IWORK( 2*I-1 ) */
-	/*     for an unconverged interval is std::set to the index of the next unconverged */
+	/*     for an unconverged interval is set to the index of the next unconverged */
 	/*     interval, and is -1 or 0 for a converged interval. Thus a linked */
-	/*     list of unconverged intervals is std::set up. */
+	/*     list of unconverged intervals is set up. */
 
 	i1 = *ifirst;
 	/*     The number of unconverged intervals */
