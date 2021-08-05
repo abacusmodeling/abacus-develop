@@ -79,8 +79,8 @@ private:
 		double &dc6j);
 
 	int lin(int &i1, int &i2) {
-		int idum1 = max(i1+1, i2+1); 
-		int idum2 = min(i1+1, i2+1); 
+		int idum1 = std::max(i1+1, i2+1); 
+		int idum2 = std::min(i1+1, i2+1); 
 		int res = idum2+idum1*(idum1-1)/2-1; 
 		return res;}
 };

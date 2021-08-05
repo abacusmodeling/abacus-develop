@@ -474,7 +474,7 @@ void Electrons::c_bands(const int &istep)
         {
             for (int ig = 0;ig < GlobalC::wf.npw; ig++)
             {
-                h_diag[ig] = max(1.0, GlobalC::wf.g2kin[ig]);
+                h_diag[ig] = std::max(1.0, GlobalC::wf.g2kin[ig]);
                 if(GlobalV::NPOL==2) h_diag[ig+GlobalC::wf.npwx] = h_diag[ig];
             }
         }

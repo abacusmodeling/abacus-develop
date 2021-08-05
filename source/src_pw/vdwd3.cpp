@@ -149,16 +149,16 @@ void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &la
 
 				for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 				{
-					repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-					repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+					repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+					repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 					for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 					{
-						repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-						repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+						repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+						repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 						for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 						{
-							repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-							repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+							repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+							repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 							jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 							rij2 = (ijvec+jtau).norm2();
 							if(rij2>para.cn_thr2) continue;
@@ -213,16 +213,16 @@ void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &la
 			r0jk = para.r0ab[iz[kat]][iz[jat]];
 			for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 			{
-				repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-				repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+				repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+				repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 				for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 				{
-					repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-					repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+					repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+					repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 					for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 					{
-						repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-						repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+						repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+						repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 						if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
 						jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 						rij2 = (ijvec+jtau).norm2();
@@ -277,16 +277,16 @@ void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &la
 
 			for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 			{
-				repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-				repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+				repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+				repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 				for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 				{
-					repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-					repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+					repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+					repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 					for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 					{
-						repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-						repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+						repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+						repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 						jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 						rij2 = (ijvec+jtau).norm2();
 						if(rij2>para.cn_thr2) continue;
@@ -341,16 +341,16 @@ void Vdwd3::pbcthreebody(std::vector<int> &iz,  std::vector<Vector3<double>> &la
 
 		for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 		{
-			repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-			repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+			repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+			repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 			for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 			{
-				repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-				repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+				repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+				repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 				for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 				{
-					repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-					repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+					repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+					repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 					jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 					if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
 					rij2 = jtau.norm2();
@@ -798,16 +798,16 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, matrix &sigma)
 
 					for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 					{
-						repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-						repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+						repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+						repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 						for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 						{
-							repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-							repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+							repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+							repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 							for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 							{
-								repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-								repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+								repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+								repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 								jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 								rij2 = (ijvec+jtau).norm2();
 								if(rij2>para.cn_thr2) continue;
@@ -885,16 +885,16 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, matrix &sigma)
 
 				for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 				{
-					repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-					repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+					repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+					repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 					for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 					{
-						repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-						repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+						repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+						repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 						for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 						{
-							repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-							repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+							repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+							repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 							if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
 							jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 							rij2 = jtau.norm2();
@@ -971,16 +971,16 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, matrix &sigma)
 
 				for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 				{
-					repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-					repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+					repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+					repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 					for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 					{
-						repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-						repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+						repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+						repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 						for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 						{
-							repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-							repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+							repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+							repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 							jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 							rij2 = (ijvec+jtau).norm2();
 							if(rij2>para.cn_thr2) continue;
@@ -1056,16 +1056,16 @@ void Vdwd3::pbcgdisp(std::vector<Vector3<double>> &g, matrix &sigma)
 
 			for(int jtaux=-rep_cn[0]; jtaux<=rep_cn[0]; jtaux++)
 			{
-				repmin[0] = max(-rep_cn[0], jtaux-rep_cn[0]);
-				repmax[0] = min(rep_cn[0], jtaux+rep_cn[0]);
+				repmin[0] = std::max(-rep_cn[0], jtaux-rep_cn[0]);
+				repmax[0] = std::min(rep_cn[0], jtaux+rep_cn[0]);
 				for(int jtauy=-rep_cn[1]; jtauy<=rep_cn[1]; jtauy++)
 				{
-					repmin[1] = max(-rep_cn[1], jtauy-rep_cn[1]);
-					repmax[1] = min(rep_cn[1], jtauy+rep_cn[1]);
+					repmin[1] = std::max(-rep_cn[1], jtauy-rep_cn[1]);
+					repmax[1] = std::min(rep_cn[1], jtauy+rep_cn[1]);
 					for(int jtauz=-rep_cn[2]; jtauz<=rep_cn[2]; jtauz++)
 					{
-						repmin[2] = max(-rep_cn[2], jtauz-rep_cn[2]);
-						repmax[2] = min(rep_cn[2], jtauz+rep_cn[2]);
+						repmin[2] = std::max(-rep_cn[2], jtauz-rep_cn[2]);
+						repmax[2] = std::min(rep_cn[2], jtauz+rep_cn[2]);
 						if(jtaux == 0 && jtauy == 0 && jtauz == 0) continue;
 						jtau = static_cast<double>(jtaux)*lat[0]+static_cast<double>(jtauy)*lat[1]+static_cast<double>(jtauz)*lat[2];
 						rij2 = jtau.norm2();

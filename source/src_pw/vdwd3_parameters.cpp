@@ -32453,8 +32453,8 @@ void Vdwd3_Parameters::init_C6()
             iatcn = limit(iat);
             jatcn = limit(jat);
 
-		mxc[iat] = max(mxc[iat], iatcn);
-		mxc[jat] = max(mxc[jat], jatcn);
+		mxc[iat] = std::max(mxc[iat], iatcn);
+		mxc[jat] = std::max(mxc[jat], jatcn);
 
 		c6ab[0][jatcn-1][iatcn-1][jat][iat] = C6_tmp[k];
 		c6ab[1][jatcn-1][iatcn-1][jat][iat] = C6_tmp[k+3];

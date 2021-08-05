@@ -40,7 +40,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 		for (int ibeta = 0; ibeta < GlobalC::ucell.atoms[it].nbeta; ibeta++) 
 		{
 			GlobalV::ofs_running << " projector " << ibeta+1 << " L=" << GlobalC::ucell.atoms[it].lll[ibeta] <<  std::endl;
-			this->lmaxkb = max( this->lmaxkb, GlobalC::ucell.atoms[it].lll[ibeta]);
+			this->lmaxkb = std::max( this->lmaxkb, GlobalC::ucell.atoms[it].lll[ibeta]);
 		}
 	}
 
