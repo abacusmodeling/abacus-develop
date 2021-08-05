@@ -135,7 +135,7 @@ template<typename Tmatrix>
 void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 	std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D,
 	std::vector<Tmatrix> &HK_m2D,
-	std::vector<deque<Tmatrix>> &HK_m2D_pulay_seq) const
+	std::vector<std::deque<Tmatrix>> &HK_m2D_pulay_seq) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing");
 
@@ -172,7 +172,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Ra2D_to_Km2D_mixing(
 
 template<typename Tmatrix>
 Tmatrix Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing(
-	const Tmatrix &H_pulay_old, deque<Tmatrix> &H_seq, const Tmatrix &H_new ) const
+	const Tmatrix &H_pulay_old, std::deque<Tmatrix> &H_seq, const Tmatrix &H_new ) const
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::pulay_mixing");
 

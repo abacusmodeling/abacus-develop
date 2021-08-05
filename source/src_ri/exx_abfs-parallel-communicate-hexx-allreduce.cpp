@@ -41,12 +41,12 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::Allreduce(
 	// 0: undo		1: thread finish		2: MPI begin
 	flags_isend_data.resize(comm_sz);
 	for( int irank=0; irank!=comm_sz; ++irank )
-		flags_isend_data[irank] = new atomic<int>(0);
+		flags_isend_data[irank] = new std::atomic<int>(0);
 	*flags_isend_data[my_rank] = 2;
 
 	flags_ask_atom.resize(comm_sz);
 	for( int irank=0; irank!=comm_sz; ++irank )
-		flags_ask_atom[irank] = new atomic<int>(0);
+		flags_ask_atom[irank] = new std::atomic<int>(0);
 	*flags_ask_atom[my_rank] = 2;
 
 	flags_recv_data.resize(comm_sz,false);
@@ -96,7 +96,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 		}
 	};
 
-	auto if_finish = []( const std::vector<atomic<int>*> &flags ) -> bool
+	auto if_finish = []( const std::vector<std::atomic<int>*> &flags ) -> bool
 	{
 		int sum=0;
 		for( size_t i=0; i<flags.size(); ++i )

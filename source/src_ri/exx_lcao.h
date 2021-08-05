@@ -24,7 +24,7 @@
 #include<set>
 #include <vector>
 #include <map>
-#include<deque>
+#include <deque>
 #include<memory>
 #include<limits>
 #include<omp.h>

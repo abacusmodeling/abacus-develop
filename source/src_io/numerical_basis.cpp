@@ -15,7 +15,7 @@ Numerical_Basis::~Numerical_Basis() {}
 // Firstly, use check(1) to call bessel_basis.init
 // to generate TableOne.
 // Secondly readin C4 from file.
-// Thirdly generate 3D atomic wfc in G space, put the
+// Thirdly generate 3D std::atomic wfc in G space, put the
 // results in psi.
 //
 // (2) If output overlap Q, start_from_file = false;

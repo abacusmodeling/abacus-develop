@@ -30,7 +30,7 @@ public:
 
     int stapos_wf; // start position of wave functions
 
-    std::string label; // atomic symbol
+    std::string label; // std::atomic symbol
     Vector3<double> *tau;// Cartesian coordinates of each atom in this type.
 	Vector3<double> *taud;// Direct coordinates of each atom in this type.
     Vector3<double> *vel;// velocities of each atom in this type.

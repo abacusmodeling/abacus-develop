@@ -21,7 +21,7 @@
 energy::energy()
 {
     // the maximum number of R vectors included in r
-    // the square of the electron charge (Ry atomic units)
+    // the square of the electron charge (Ry std::atomic units)
     this->etot   = 0;          // the total energy of the solid
 	this->etot_harris = 0;	   // total energy of harris functional
     this->eband  = 0;          // the band energy

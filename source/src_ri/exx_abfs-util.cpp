@@ -32,7 +32,7 @@ void Exx_Abfs::Util::bcast( std::vector<std::string> &v, const int rank_src, con
 		std::string s_all(s_all_tmp, size_all);
 		delete[]s_all_tmp;
 		
-		deque<int> index_begin(size_v);
+		std::deque<int> index_begin(size_v);
 		partial_sum( size_s.begin(), size_s.end(), index_begin.begin() );
 		index_begin.push_front(0);
 		

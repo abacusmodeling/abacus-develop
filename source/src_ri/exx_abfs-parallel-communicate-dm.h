@@ -67,16 +67,16 @@ private:
 		static constexpr int tag_data = 2;
 		
 		std::atomic_flag lock_insert;
-		atomic<int> lock_atom_unset_read;
-		atomic<int> rank_delta;
+		std::atomic<int> lock_atom_unset_read;
+		std::atomic<int> rank_delta;
 		
 		std::vector<boost::mpi::packed_oarchive*> oarps_isend_data;
 		std::vector<boost::mpi::packed_oarchive*> oarps_atom_unset;
 		std::vector<boost::mpi::packed_iarchive*> iarps_recv_data;
 		std::vector<boost::mpi::packed_iarchive*> iarps_atom_asked;
 				
-		std::vector<atomic<int>*> flags_isend_data;
-		std::vector<atomic<int>*> flags_ask_atom;
+		std::vector<std::atomic<int>*> flags_isend_data;
+		std::vector<std::atomic<int>*> flags_ask_atom;
 		boost::dynamic_bitset<> flags_recv_data;
 	};
 		

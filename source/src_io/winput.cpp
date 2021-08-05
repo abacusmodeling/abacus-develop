@@ -21,7 +21,7 @@ bool winput::b_out_wf;
 bool winput::b_fftwan;//add 2008-07-20
 bool winput::b_plot_build;//add 2008-06-04
 bool winput::b_plot_atomic;//add 2008-06-04
-std::string winput::trial;//"atomic" or "gauss" 
+std::string winput::trial;//"std::atomic" or "gauss" 
 double winput::bs;//parameters for gauss orbit
 double winput::bp;
 double winput::px;
@@ -34,7 +34,7 @@ double winput::fermi_t;
 double winput::clm2_lowest;
 int winput::bloch_begin;
 int winput::bloch_end;
-int winput::sph_proj;//"1" spherical project,"2": first minus atomic orbitals
+int winput::sph_proj;//"1" spherical project,"2": first minus std::atomic orbitals
 bool winput::sph_type;//0:Rewrite 1:Skip
 bool winput::b_recon;//"1" reconstruction of wannier function
 bool winput::b_mix_wf;// add 2008-06-15
@@ -258,7 +258,7 @@ void winput::Default()
 		//=========================
 		// part2.1 select trial wf
 		//=========================
-		trial 		= "atomic";//atomic || gauss
+		trial 		= "std::atomic";//std::atomic || gauss
 		bs			= 2.5; // 
 		bp			= 2.0; //  gausss para,eters 
 		px			= 2.0; // 
@@ -515,7 +515,7 @@ void winput::Check(void)
 	{
 		if(b_plot_build == true && b_plot_atomic == true)
 		{
-			WARNING_QUIT("winput::Check()","Plot atomic or plot build wannier functions?");
+			WARNING_QUIT("winput::Check()","Plot std::atomic or plot build wannier functions?");
 		}
 		else
 		{

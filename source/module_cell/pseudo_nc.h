@@ -50,10 +50,10 @@ class pseudo_nc
 	double *rho_atc;  // radial core charge density, rho_atc[0:mesh-1]
 
 	//<PP_RHOATOM>
-	double *rho_at;   // radial atomic charge density, rho_at[0:mesh-1]
+	double *rho_at;   // radial std::atomic charge density, rho_at[0:mesh-1]
 
 	// <PP_PSWFC>
-	matrix chi;	  // radial atomic orbitals, chi(nchi, mesh)
+	matrix chi;	  // radial std::atomic orbitals, chi(nchi, mesh)
 
 	//other
 	int msh;          // number of points up to rcut
@@ -69,7 +69,7 @@ class pseudo_nc
 	matrix betar;	// (nbeta, mesh), radial beta_{mu} functions
 
 	// other
-	int nh;         // number of beta functions per atomic type
+	int nh;         // number of beta functions per std::atomic type
 
 	void set_pseudo_h(const Pseudopot_upf &upf);
 	void set_pseudo_atom(const Pseudopot_upf &upf);

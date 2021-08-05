@@ -37,7 +37,7 @@ public: // member functions
 	std::ofstream &ofs_running,
 	std::ofstream &ofs_warning); // Yu Liu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
 	void read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running); // read in the atom information for each type of atom
-	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in atomic positions
+	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in std::atomic positions
 	int find_type(const std::string &label);
 	void print_tau(void)const;
 	void print_stru_file(const std::string &fn, const int &type=1)const; // mohan add 2011-03-22
@@ -50,7 +50,7 @@ public: // member functions
 	void read_cell_pseudopots(const std::string &fn);
 
 	//================================================================
-	// cal_natomwfc : calculate total number of atomic wavefunctions
+	// cal_natomwfc : calculate total number of std::atomic wavefunctions
 	// cal_nwfc     : calculate total number of local basis and lmax
 	// cal_nelec    : calculate total number of electrons
 	// cal_meshx	: calculate max number of mesh points in pp file

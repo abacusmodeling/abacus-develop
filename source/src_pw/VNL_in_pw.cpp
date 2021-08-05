@@ -117,7 +117,7 @@ void pseudopot_cell_vnl::init(const int ntype, const bool allocate_vkb)
 	// mohan update 2021-02-22
 	int nchix = 10;
 	int nchix_nc = 20;
-	// nchix : max number of atomic wavefunctions per atom
+	// nchix : max number of std::atomic wavefunctions per atom
 	if(GlobalV::NSPIN!=4) 
 	{
 		this->tab_at.create(ntype, nchix, GlobalV::NQX);
@@ -241,7 +241,7 @@ void pseudopot_cell_vnl::init_vnl(UnitCell_pseudo &cell)
 
 	// For each pseudopotential we initialize the indices nhtol, nhtolm,
 	// nhtoj, indv, and if the pseudopotential is of KB type we initialize
-	// the atomic D terms
+	// the std::atomic D terms
 
 	this->dvan.zero_out();
 	this->dvan_so.zero_out();//added by zhengdy-soc

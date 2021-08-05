@@ -51,9 +51,9 @@ void Input::Print(const std::string &fn)const
 	}
 	OUTP(ofs,"ethr",ethr,"threshold for eigenvalues is cg electron iterations");
 	OUTP(ofs,"dr2",dr2,"charge density error");
-	OUTP(ofs,"start_wfc",start_wfc,"start wave functions are from 'atomic' or 'file'");
-	OUTP(ofs,"start_charge",start_pot,"start charge is from 'atomic' or file");
-	OUTP(ofs,"charge_extrap",charge_extrap,"atomic; first-order; second-order; dm:coefficients of SIA");
+	OUTP(ofs,"start_wfc",start_wfc,"start wave functions are from 'std::atomic' or 'file'");
+	OUTP(ofs,"start_charge",start_pot,"start charge is from 'std::atomic' or file");
+	OUTP(ofs,"charge_extrap",charge_extrap,"std::atomic; first-order; second-order; dm:coefficients of SIA");
 	OUTP(ofs,"out_charge",out_charge,">0 output charge density for selected electron steps");
 	OUTP(ofs,"out_potential",out_potential,"output realspace potential");
 	OUTP(ofs,"out_wf",out_wf,"output wave functions");

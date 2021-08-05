@@ -855,7 +855,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
                 this->check_boundary( this->dirpos[ia*3+k] );
             }
         }
-        //order original atomic positions for current species
+        //order original std::atomic positions for current species
         //std::cout << "\n -----------------------------------------";
         //std::cout << "\nCarpos it=" << it << " na=" << na[it];
         //std::cout << "\nBefore dirpos:" << std::endl;
@@ -920,7 +920,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 
         //	std::cout << "\n Trans std::vector = " << trans[0] << " " << trans[1] << " " << trans[2];
 
-        //translate all the atomic coordinates by "trans"
+        //translate all the std::atomic coordinates by "trans"
         for (int it = 0; it < ntype; it++)
         {
             for (int ia2=istart[it]; ia2<na[it]+istart[it]; ia2++)
@@ -931,7 +931,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
                     this->check_boundary( rotpos[ia2*3+k] );
                 }
             }
-            //order translated atomic positions for current species
+            //order translated std::atomic positions for current species
             //    std::cout << "\n rotpos it=" << it << " na=" << na[it];
             //   std::cout << "\n before rotpos:" << std::endl;
             // print_pos(rotpos+istart[it]*3, na[it]);
@@ -1248,7 +1248,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
          //for( int iat =0 ; iat < ucell.nat ; iat++)
          //std::cout << " newpos_now1 = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
 
-        //order original atomic positions for current species
+        //order original std::atomic positions for current species
         this->atom_ordering(pos + istart[it] * 3, na[it], index + istart[it]);
          //for( int iat =0 ; iat < ucell.nat ; iat++)
          //std::cout << " newpos_now2 = " << newpos[3*iat] << " " << newpos[3*iat+1] << " " << newpos[3*iat+2] << std::endl;
@@ -1282,7 +1282,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
             this->check_boundary(rotpos[yy]);
             this->check_boundary(rotpos[zz]);
         }
-        //order rotated atomic positions for current species
+        //order rotated std::atomic positions for current species
         this->atom_ordering(rotpos + istart[it] * 3, na[it], index + istart[it]);
     }
 
@@ -1325,7 +1325,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
             continue;
         }
 
-        //translate all the atomic coordinates by "gtran"
+        //translate all the std::atomic coordinates by "gtran"
         for (int it = 0; it < ntype; it++)
         {
             for (int ia = istart[it]; ia < na[it] + istart[it]; ia++)
@@ -1338,7 +1338,7 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
                 this->check_translation( rotpos[ia*3+1], gtrans.y );
                 this->check_translation( rotpos[ia*3+2], gtrans.z );
             }
-            //order translated atomic positions for current species
+            //order translated std::atomic positions for current species
             this->atom_ordering(rotpos + istart[it] * 3, na[it], index + istart[it]);
         }
 

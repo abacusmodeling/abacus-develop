@@ -73,7 +73,7 @@ class LCAO_Orbitals
 	const double& get_rcutmax_Phi(void) const { return rcutmax_Phi; }
 	const double& get_rcutmax_Beta(void) const { return rcutmax_Beta; }
 
-	/// numerical atomic orbitals
+	/// numerical std::atomic orbitals
 	Numerical_Orbital* Phi;
 	
 	/// nonlocal projectors (1-dimension array)

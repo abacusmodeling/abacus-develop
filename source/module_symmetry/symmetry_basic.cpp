@@ -133,7 +133,7 @@ void Symmetry_Basic::order_atoms(double* pos, const int &nat, const int *index)
 // atom ordering for each atom type.
 void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 {
-	//order the atomic positions inside a supercell by a unique ordering scheme	
+	//order the std::atomic positions inside a supercell by a unique ordering scheme	
 	subindex[0] = 0;
 
 	if(natom == 1)
@@ -142,7 +142,7 @@ void Symmetry_Basic::atom_ordering(double *posi, const int natom, int *subindex)
 		return;
 	}
 
-	//order the x-dimension of the atomic position, 
+	//order the x-dimension of the std::atomic position, 
 	//only get a permutation table, data in momery are not changed
 	//this->heapsort_pos(natom, posi, subindex);
 
@@ -700,7 +700,7 @@ void Symmetry_Basic::matrigen(Matrix3 *symgen, const int ngen, Matrix3* symop, i
 // set up all possible space group operators 
 // (integer rotation matrices and nontrivial translations
 // given in crystal coordinates) 
-// of a lattice with some arbitrary basis (atomic arrangement).
+// of a lattice with some arbitrary basis (std::atomic arrangement).
 //--------------------------------------------------------------
 void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 {

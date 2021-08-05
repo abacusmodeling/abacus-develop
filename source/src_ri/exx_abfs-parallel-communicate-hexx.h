@@ -41,9 +41,9 @@ private:
 	void Ra2D_to_Km2D_mixing(
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HR_a2D,
 		std::vector<Tmatrix> &HK_m2D,
-		std::vector<deque<Tmatrix>> &HK_m2D_pulay_seq) const;
+		std::vector<std::deque<Tmatrix>> &HK_m2D_pulay_seq) const;
 	template<typename T>
-	T pulay_mixing( const T &H_pulay_old, deque<T> &H_seq, const T &H_new ) const;
+	T pulay_mixing( const T &H_pulay_old, std::deque<T> &H_seq, const T &H_new ) const;
 
 	#if EXX_H_COMM==1
 	class Allreduce
@@ -79,15 +79,15 @@ private:
 		static constexpr int tag_data = 2;
 
 		std::atomic_flag lock_insert;
-		atomic<int> rank_delta;
+		std::atomic<int> rank_delta;
 
 		boost::mpi::packed_oarchive *oarp_atom_in_2D;
 		std::vector<boost::mpi::packed_oarchive*> oarps_isend_data;
 		std::vector<boost::mpi::packed_iarchive*> iarps_recv_data;
 		std::vector<boost::mpi::packed_iarchive*> iarps_atom_asked;
 
-		std::vector<atomic<int>*> flags_isend_data;
-		std::vector<atomic<int>*> flags_ask_atom;
+		std::vector<std::atomic<int>*> flags_isend_data;
+		std::vector<std::atomic<int>*> flags_ask_atom;
 		boost::dynamic_bitset<> flags_recv_data;
 	};
 	#elif EXX_H_COMM==2
@@ -109,24 +109,24 @@ private:
 			const set<std::pair<size_t,size_t>> &H_atom_pairs_core,
 			const std::vector<std::pair<std::vector<bool>,std::vector<bool>>> &atom_in_2D_list) const;
 		void init_flags(
-			std::vector<atomic<Flag_Send>> &flags_send,
-			std::vector<atomic<Flag_Recv>> &flags_recv) const;
+			std::vector<std::atomic<Flag_Send>> &flags_send,
+			std::vector<std::atomic<Flag_Recv>> &flags_recv) const;
 		bool finish_judge(
-			const std::vector<atomic<Flag_Send>> &flags_send,
-			const std::vector<atomic<Flag_Recv>> &flags_recv) const;
+			const std::vector<std::atomic<Flag_Send>> &flags_send,
+			const std::vector<std::atomic<Flag_Recv>> &flags_recv) const;
 		bool memory_enough(
 			const int rank_send_next,
-			const std::vector<atomic<Flag_Send>> &flags_send) const;
+			const std::vector<std::atomic<Flag_Send>> &flags_send) const;
 		void send_data_process(
 			const int rank_send_now,
 			const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
-			std::vector<valarray<double>> &oars_isend,
-			std::vector<atomic<Flag_Send>> &flags_send) const;
+			std::vector<std::valarray<double>> &oars_isend,
+			std::vector<std::atomic<Flag_Send>> &flags_send) const;
 		void recv_data_process(
 			const int rank_recv,
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
-			std::vector<valarray<double>> &iarps_irecv,
-			std::vector<atomic<Flag_Recv>> &flags_recv,
+			std::vector<std::valarray<double>> &iarps_irecv,
+			std::vector<std::atomic<Flag_Recv>> &flags_recv,
 			std::atomic_flag &lock_insert) const;			
 		void insert_data(
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_rank,
@@ -146,8 +146,8 @@ private:
 public:
 	std::vector<matrix>        HK_Gamma_m2D;
 	std::vector<ComplexMatrix> HK_K_m2D;
-	std::vector<deque<matrix>>        HK_Gamma_m2D_pulay_seq;
-	std::vector<deque<ComplexMatrix>> HK_K_m2D_pulay_seq;
+	std::vector<std::deque<matrix>>        HK_Gamma_m2D_pulay_seq;
+	std::vector<std::deque<ComplexMatrix>> HK_K_m2D_pulay_seq;
 
 	enum class Mixing_Mode{ No, Plain, Pulay };
 	Mixing_Mode mixing_mode;

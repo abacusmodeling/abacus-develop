@@ -96,7 +96,7 @@ void Hamilt_PW::init_k(const int ik)
 
 //----------------------------------------------------------------------
 // Hamiltonian diagonalization in the subspace spanned
-// by nstart states psi (atomic or random wavefunctions).
+// by nstart states psi (std::atomic or random wavefunctions).
 // Produces on output n_band eigenvectors (n_band <= nstart) in evc.
 //----------------------------------------------------------------------
 void Hamilt_PW::diagH_subspace(

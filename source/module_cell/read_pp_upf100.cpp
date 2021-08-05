@@ -97,7 +97,7 @@ int Pseudopot_upf::read_pseudo_upf(std::ifstream &ifs)
 	read_pseudo_nl(ifs);
 	SCAN_END(ifs, "</PP_NONLOCAL>");
 
-	// Search for atomic wavefunctions
+	// Search for std::atomic wavefunctions
 	SCAN_BEGIN(ifs, "<PP_PSWFC>");
 	//---------------------
 	// call member function
@@ -105,7 +105,7 @@ int Pseudopot_upf::read_pseudo_upf(std::ifstream &ifs)
 	read_pseudo_pswfc(ifs);
 	SCAN_END(ifs, "</PP_PSWFC>");
 
-	// Search for atomic charge
+	// Search for std::atomic charge
 	SCAN_BEGIN(ifs, "<PP_RHOATOM>");
 	//---------------------
 	// call member function

@@ -21,7 +21,7 @@ public:
 	// used for a specific group of C4 coefficients.
 	// mohan updated 2021-01-04, 
 	// mohan added a new input parameter lmax_in,
-	// if we only generate numerical atomic orbitals based on
+	// if we only generate numerical std::atomic orbitals based on
 	// spherical Bessel functions, lmax_in = ucell.lmax
 	// However, if we want to generate spherical Bessel functions for descriptor,
 	// then the lmax_in is controlled by user.

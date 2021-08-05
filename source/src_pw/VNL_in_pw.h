@@ -63,7 +63,7 @@ private:
 
 	int lmaxq;
 
-	matrix indv;		// indes linking  atomic beta's to beta's in the solid
+	matrix indv;		// indes linking  std::atomic beta's to beta's in the solid
 	matrix nhtol;      	// correspondence n <-> angular momentum l
 	matrix nhtolm;     	// correspondence n <-> combined lm index for (l,m)
 	matrix nhtoj;		// new added
@@ -73,7 +73,7 @@ private:
 
 	realArray tab;		//(:,:,:), interpolation table for PPs
 	realArray tab_alpha;
-	realArray tab_at;	//(:,:,:), interpolation table for atomic wfc
+	realArray tab_at;	//(:,:,:), interpolation table for std::atomic wfc
 
 	realArray deeq;		//(:,:,:,:), the integral of V_eff and Q_{nm}
 	ComplexArray deeq_nc;	//(:,:,:,:), the spin-orbit case

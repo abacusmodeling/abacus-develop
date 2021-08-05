@@ -21,7 +21,7 @@ extern "C"
     void Cblacs_pcoord(int icontxt, int pnum, int *prow, int *pcol);
 }
 
-// atomic basis sets
+// std::atomic basis sets
 // psir_vlbr3[GlobalC::pw.bxyz][LD_pool]
 Gint_Tools::Array_Pool<double> get_psir_vlbr3(
 	const int na_grid,  					    // how many atoms on this (i,j,k) grid
@@ -386,7 +386,7 @@ Gint_Tools::Array_Pool<double> Gint_Gamma::gamma_vlocal(const double*const vloca
 						bool **cal_flag = Gint_Tools::get_cal_flag(na_grid, grid_index);
 						
 						//------------------------------------------------------------------
-						// compute atomic basis phi(r) with both radial and angular parts
+						// compute std::atomic basis phi(r) with both radial and angular parts
 						//------------------------------------------------------------------
 						const Gint_Tools::Array_Pool<double> psir_ylm = Gint_Tools::cal_psir_ylm(
 							na_grid, LD_pool, grid_index, delta_r,

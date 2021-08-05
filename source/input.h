@@ -26,7 +26,7 @@ class Input
 //==========================================================
 
     std::string suffix;			// suffix of out put dir
-    std::string atom_file;		// file contains atomic positions -- xiaohui modify 2015-02-01
+    std::string atom_file;		// file contains std::atomic positions -- xiaohui modify 2015-02-01
     std::string pseudo_dir;      // directory of pseudopotential
 	std::string read_file_dir;   // directory of files for reading
     std::string pseudo_type;     // the type of pseudopotential, mohan add 2013-05-20, ABACUS supports
@@ -197,8 +197,8 @@ class Input
 //==========================================================
     std::string restart_mode;	//
 
-    std::string start_wfc;		// "file","atomic","random"
-    std::string start_pot;		// "file","atomic"
+    std::string start_wfc;		// "file","std::atomic","random"
+    std::string start_pot;		// "file","std::atomic"
 
 	std::string charge_extrap;	// xiaohui modify 2015-02-01
 

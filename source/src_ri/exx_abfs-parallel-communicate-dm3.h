@@ -56,19 +56,19 @@ private:
 				const std::map<set<size_t>,set<size_t>> &H_atom_pairs_group,
 				std::vector<size_t> &send_size_list, size_t &recv_size) const;
 			void init_flags(
-				std::vector<atomic<Flag_Send>> &flags_send,
-				std::vector<atomic<Flag_Recv>> &flags_recv) const;
+				std::vector<std::atomic<Flag_Send>> &flags_send,
+				std::vector<std::atomic<Flag_Recv>> &flags_recv) const;
 			bool finish_judge(
-				const std::vector<atomic<Flag_Send>> &flags_send,
-				const std::vector<atomic<Flag_Recv>> &flags_recv) const;
+				const std::vector<std::atomic<Flag_Send>> &flags_send,
+				const std::vector<std::atomic<Flag_Recv>> &flags_recv) const;
 			bool memory_enough(
 				const int rank_send_next,
-				const std::vector<atomic<Flag_Send>> &flags_send) const;
+				const std::vector<std::atomic<Flag_Send>> &flags_send) const;
 			void send_data_process(
 				const int rank_send_now,
 				const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local,
 				std::vector<std::vector<double>> &oarps_isend,
-				std::vector<atomic<Flag_Send>> &flags_send) const;
+				std::vector<std::atomic<Flag_Send>> &flags_send) const;
 			std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix*>>>> get_intersection(
 				const int rank_send_now,
 				std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const;				
@@ -76,7 +76,7 @@ private:
 				const int rank_recv,
 				std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_all,
 				std::vector<std::vector<double>> &iarps_irecv,
-				std::vector<atomic<Flag_Recv>> &flags_recv,
+				std::vector<std::atomic<Flag_Recv>> &flags_recv,
 				std::atomic_flag &lock_insert) const;
 			template<typename M> void insert_data(
 				std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,M>>>> &data_rank,

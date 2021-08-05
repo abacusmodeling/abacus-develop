@@ -23,7 +23,7 @@ void Driver::init()
 	// (1) read the input parameters.
 	this->reading();
 
-	// (2) welcome to the atomic world!
+	// (2) welcome to the std::atomic world!
 	this->atomic_world();
 
 	// (3) close all of the running logs 
@@ -78,7 +78,7 @@ void Driver::atomic_world(void)
 	// choose basis sets:
 	// pw: plane wave basis set
 	// lcao_in_pw: LCAO expaned by plane wave basis set
-	// lcao: linear combination of atomic orbitals
+	// lcao: linear combination of std::atomic orbitals
 	//--------------------------------------------------
 	if(GlobalV::BASIS_TYPE=="pw" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 	{

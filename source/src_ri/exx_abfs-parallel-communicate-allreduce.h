@@ -33,7 +33,7 @@ private:
 		boost::mpi::packed_iarchive &iar, 
 		std::function<void(T&,T&)> & insert_function, 
 		T &data_all,
-		atomic<int> &rank_delta, 
+		std::atomic<int> &rank_delta, 
 		std::atomic_flag &insert_lock );
 		
 	int comm_sz;

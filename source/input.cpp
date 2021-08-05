@@ -244,11 +244,11 @@ void Input::Default(void)
 // potential / charge / wavefunction / energy
 //----------------------------------------------------------
     restart_mode = "new";
-    start_wfc = "atomic";
+    start_wfc = "std::atomic";
 	mem_saver = 0;
 	printe = 100; // must > 0
-    start_pot = "atomic";
-	charge_extrap = "atomic";//xiaohui modify 2015-02-01
+    start_pot = "std::atomic";
+	charge_extrap = "std::atomic";//xiaohui modify 2015-02-01
     out_charge = 0;
 	out_dm = 0;
 
@@ -2496,8 +2496,8 @@ void Input::Check(void)
                 out_band = 0;
 		force=0;
 		start_wfc = "file";
-		start_pot = "atomic"; // useless, 
-		charge_extrap = "atomic"; //xiaohui modify 2015-02-01
+		start_pot = "std::atomic"; // useless, 
+		charge_extrap = "std::atomic"; //xiaohui modify 2015-02-01
 		out_charge = 1; // this leads to the calculation of state charge.
 		out_dm = 0;
 		out_potential = 0;
@@ -2517,8 +2517,8 @@ void Input::Check(void)
                 out_band = 0;
 		force = 0;
 		start_wfc = "file";
-		start_pot = "atomic";
-		charge_extrap = "atomic"; //xiaohui modify 2015-02-01
+		start_pot = "std::atomic";
+		charge_extrap = "std::atomic"; //xiaohui modify 2015-02-01
 		out_charge = 1;
 		out_dm = 0;
 		out_potential = 0;
@@ -2571,9 +2571,9 @@ void Input::Check(void)
     {
         WARNING_QUIT("Input","check 'calculation' !");
     }
-    if (start_pot != "atomic" && start_pot != "file")
+    if (start_pot != "std::atomic" && start_pot != "file")
     {
-        WARNING_QUIT("Input","wrong 'start_pot',not 'atomic', 'file',please check");
+        WARNING_QUIT("Input","wrong 'start_pot',not 'std::atomic', 'file',please check");
     }
 	//xiaohui modify 2014-05-10, extra_pot value changes to 0~7	
 	//if (extra_pot <0 ||extra_pot > 7)
@@ -2616,10 +2616,10 @@ void Input::Check(void)
         AUTO_SET("start_pot",start_pot);
     }
 
-    if (start_wfc != "atomic" && start_wfc != "atomic+random" && start_wfc != "random" &&
+    if (start_wfc != "std::atomic" && start_wfc != "std::atomic+random" && start_wfc != "random" &&
             start_wfc != "file")
     {
-        WARNING_QUIT("Input","wrong start_wfc, please use 'atomic' or 'random' or 'file' ");
+        WARNING_QUIT("Input","wrong start_wfc, please use 'std::atomic' or 'random' or 'file' ");
     }
 
     if (nbands > 100000)

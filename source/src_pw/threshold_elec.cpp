@@ -45,7 +45,7 @@ void Threshold_Elec::set_ethr(void) const
             else
             {
                 //=======================================================
-                // starting atomic potential is probably far from scf
+                // starting std::atomic potential is probably far from scf
                 // don't waste iterations in the first diagonalization
                 //=======================================================
                 GlobalV::ETHR = 1.0e-2;
