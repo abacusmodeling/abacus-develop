@@ -70,10 +70,11 @@ LCAO_Descriptor::~LCAO_Descriptor()
 void LCAO_Descriptor::init(
 	const int lm, // max L for descriptor 
 	const int nm, // max n for descriptor
-	const int tot_inl) // 
+	const int tot_inl) // total number of atomic orbital basis for all of the atoms 
 {
     TITLE("LCAO_Descriptor", "init");
-    ofs_running << " Initialize the descriptor index for deepks (lcao line)" << endl;
+
+    ofs_running << " Initialize the descriptor index for DeePKS (lcao line)" << endl;
 
     assert(lm >= 0);
     assert(nm >= 0);
@@ -84,6 +85,7 @@ void LCAO_Descriptor::init(
     this->inlmax = tot_inl;
     ofs_running << " lmax of descriptor = " << this->lmaxd << endl;
     ofs_running << " nmax of descriptor= " << nmaxd << endl;
+	ofs_running << " total basis (all atoms) for descriptor= " << endl;
     
     //initialize the density matrix (dm)
     delete[] this->dm_double;
@@ -171,7 +173,7 @@ void LCAO_Descriptor::init_index(void)
             this->lmaxd + 1,
             this->nmaxd); 
 
-        ofs_running << "Type " << it + 1
+        ofs_running << " Type " << it + 1
                     << " number_of_atoms " << ucell.atoms[it].na << endl;
 
         for (int ia = 0; ia < ucell.atoms[it].na; ia++)
@@ -195,8 +197,8 @@ void LCAO_Descriptor::init_index(void)
     }//end it
     assert(this->n_descriptor == alpha);
     assert(ucell.nat * ORB.Alpha[0].getTotal_nchi() == inl);
-    ofs_running << "descriptors_per_atom " << this->des_per_atom << endl;
-    ofs_running << "total_descriptors " << this->n_descriptor << endl;
+    ofs_running << " descriptors_per_atom " << this->des_per_atom << endl;
+    ofs_running << " total_descriptors " << this->n_descriptor << endl;
 	return;
 }
 
@@ -310,7 +312,29 @@ void LCAO_Descriptor::set_S_mu_alpha(
 }
 
 
-void LCAO_Descriptor::cal_projected_DM(matrix& dm)
+
+// compute the full projected density matrix for each atom
+// save the matrix for each atom in order to minimize the usage of memory
+// --mohan 2021-08-04
+void LCAO_Descriptor::cal_dm_as_descriptor(const matrix &dm)
+{
+	TITLE("LCAO_Descriptor", "cal_proj_dm");
+
+	for(int it=0; it<ucell.ntype; ++it)
+	{
+		for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+		{
+			// compute S^T * dm * S to obtain descriptor
+			// of each atom 
+			// and then diagonalize it
+		}
+	}
+
+	return;
+}
+
+
+void LCAO_Descriptor::cal_projected_DM(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_projected_DM");
     //step 1: get dm: the coefficient of wfc, not charge density
@@ -347,6 +371,7 @@ void LCAO_Descriptor::cal_projected_DM(matrix& dm)
     delete[] tmp_pdm;
     return;
 }
+
 
 void LCAO_Descriptor::cal_descriptor(void)
 {
@@ -465,7 +490,7 @@ void LCAO_Descriptor::print_descriptor(void)
             ofs << endl << endl;
         }
     }
-    ofs_running << "descriptors are printed" << endl;
+    ofs_running << " Descriptors have been printed to " << ss.str() << endl;
 
     return;
 }
@@ -500,7 +525,8 @@ void LCAO_Descriptor::set_DS_mu_alpha(
     return;
 }
 
-void LCAO_Descriptor::getdm_double(matrix& dm)
+
+void LCAO_Descriptor::getdm_double(const matrix &dm)
 {
     for (int i = 0; i < dm.nr; i++)
     {
@@ -513,7 +539,7 @@ void LCAO_Descriptor::getdm_double(matrix& dm)
 }
 
 
-void LCAO_Descriptor::cal_gdmx(matrix &dm)
+void LCAO_Descriptor::cal_gdmx(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_gdmx");
     //get DS_alpha_mu and S_nu_beta
@@ -631,7 +657,7 @@ void LCAO_Descriptor::deepks_pre_scf(const string& model_file)
 }
 
 
-void LCAO_Descriptor::cal_v_delta(matrix& dm)
+void LCAO_Descriptor::cal_v_delta(const matrix& dm)
 {
     TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv> (descriptor changes in every scf iter)
@@ -673,7 +699,9 @@ void LCAO_Descriptor::cal_v_delta(matrix& dm)
     }
     delete[] tmp_v1;
     delete[] tmp_v2;
-    ofs_running << "finish calculating H_V_delta" << endl;
+
+    ofs_running << " Finish calculating H_V_delta" << endl;
+
     return;
 }
 
@@ -681,6 +709,7 @@ void LCAO_Descriptor::cal_v_delta(matrix& dm)
 void LCAO_Descriptor::add_v_delta(void)
 {
     TITLE("LCAO_DESCRIPTOR", "add_v_delta");
+
     if (GAMMA_ONLY_LOCAL)
     {
         for (int iw1 = 0;iw1 < NLOCAL;++iw1)
@@ -700,10 +729,11 @@ void LCAO_Descriptor::add_v_delta(void)
 		WARNING_QUIT("add_v_delta","not implemented yet.");
         //call set_HSk, complex Matrix
     }
+	return;
 }
 
 
-void LCAO_Descriptor::cal_f_delta(matrix& dm)
+void LCAO_Descriptor::cal_f_delta(const matrix &dm)
 {
     TITLE("LCAO_Descriptor", "cal_f_delta");
     int iat = 0;    //check if the index same as ucell.iw2iat or not !!
@@ -804,7 +834,7 @@ void LCAO_Descriptor::load_model(const string& model_file)
 }
 
 
-void LCAO_Descriptor::cal_gedm(matrix& dm)
+void LCAO_Descriptor::cal_gedm(const matrix &dm)
 {
     //using this->pdm_tensor
     TITLE("LCAO_Descriptor", "cal_gedm");
@@ -882,8 +912,7 @@ void LCAO_Descriptor::print_H_V_delta(void)
         ofs << endl;
     }
 
-    ofs_running << "H_delta is printed" << endl;
-
+    ofs_running << " H_delta has been printed to " << ss.str() << endl;
     return;
 }
 
@@ -931,7 +960,8 @@ void LCAO_Descriptor::print_F_delta(void)
                 << setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << endl;
         }
     }
-    ofs_running << "F_delta is printed" << endl;
+
+    ofs_running << " F_delta has been printed to " << ss.str() << endl;
     return;
 }
 
@@ -951,7 +981,7 @@ void LCAO_Descriptor::save_npy_d(void)
 }
 
 
-void LCAO_Descriptor::save_npy_e(double& ebase)
+void LCAO_Descriptor::save_npy_e(const double &ebase)
 {
     TITLE("LCAO_Descriptor", "save_npy_e");
     //save e_base
@@ -963,7 +993,7 @@ void LCAO_Descriptor::save_npy_e(double& ebase)
 }
 
 
-void LCAO_Descriptor::save_npy_f(matrix& fbase)
+void LCAO_Descriptor::save_npy_f(const matrix &fbase)
 {
     TITLE("LCAO_Descriptor", "save_npy_f");
     //save f_base

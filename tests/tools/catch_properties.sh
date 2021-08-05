@@ -29,6 +29,7 @@ has_band=`grep -En '(^|[[:space:]])out_band($|[[:space:]])' INPUT | awk '{print 
 has_dos=`grep -En '(^|[[:space:]])out_dos($|[[:space:]])' INPUT | awk '{print $2}'`
 has_hs=`grep -En '(^|[[:space:]])out_hs($|[[:space:]])' INPUT | awk '{print $2}'`
 has_r=`grep -En '(^|[[:space:]])out_r($|[[:space:]])' INPUT | awk '{print $2}'`
+out_descriptor=`grep out_descriptor INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 #echo $running_path
 base=`grep -En '(^|[[:space:]])basis_type($|[[:space:]])' INPUT | awk '{print $2}' | sed s/[[:space:]]//g`
 if [ $base == "pw" ]; then word="plane_wave_line" 
@@ -98,6 +99,23 @@ if ! test -z "$has_hs"  && [  $has_hs -eq 1 ]; then
         echo "totalHmatrix $total_h" >>$1
 	total_s=`sum_file OUT.autotest/data-S`
 	echo "totalSmatrix $total_s" >>$1
+fi
+
+#echo descriptor.dat and jle.orb
+if [ $out_descriptor -eq 1 -a $base == "pw" ]; then
+	echo "descriptor 1" >> $1
+	echo "jle 1" >> $1
+	if [ $1 == "result.ref" ]; then
+		mv descriptor.dat descriptor.dat.ref
+		mv OUT.autotest/jle.orb jle.orb.ref
+	fi
+else 
+	if [ $out_descriptor -eq 1 -a $base == "lcao" ]; then
+		echo "descriptor 1" >> $1
+		if [ $1 == "result.ref" ]; then
+			mv descriptor.dat descriptor.dat.ref
+		fi
+	fi
 fi
 
 #echo $total_band

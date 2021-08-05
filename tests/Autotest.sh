@@ -1,15 +1,16 @@
 #!/bin/bash
 
 # ABACUS executable path
-abacus=abacus
+abacus=/home/mohan/Liuyu/DeePKS/abacus-develop/bin/ABACUS.mpi
 # number of mpi processes
-np=4
+np=1
 # threshold with unit: eV
 threshold=0.0000001
 # check accuracy
 ca=8
 # regex of case name
-case="^[^#].*01_PW_.*$"
+case="601_PW_deepks_s_H2O"
+#case="^[^#].*01_PW_.*$"
 # enable AddressSanitizer
 sanitize=false
 
@@ -66,12 +67,11 @@ check_out(){
 		#--------------------------------------------------
 		# calculated value
 		#--------------------------------------------------
-		cal=`grep "$key" $outfile | awk '{printf "%.'$ca'f\n",$2}'`
+		cal=`grep "$key" result.out | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
 		# reference value
 		#--------------------------------------------------
-
 		ref=`grep "$key" result.ref | awk '{printf "%.'$ca'f\n",$2}'`
 
 		#--------------------------------------------------
@@ -81,10 +81,32 @@ check_out(){
 		deviation=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",x-y}'`
 		deviation1=`awk 'BEGIN {x='$ref';y='$cal';printf "%.'$ca'f\n",y-x}'`
 
+		#--------------------------------------------------
+		# computed the deviation between the calculated
+		# and reference value for descriptors in DeePKS
+		#--------------------------------------------------
+		if [ $key == "descriptor" ]; then
+			../check_file descriptor.dat.ref descriptor.dat $threshold
+			state=`echo $?`
+			if [ $state == "0" ]; then
+				let failed++
+				break
+			fi
+		fi
+
+		if [ $key == "jle" ]; then
+			../check_file jle.orb.ref OUT.autotest/jle.orb $threshold
+			state=`echo $?`
+			if [ $state == "0" ]; then
+				let failed++
+				break
+			fi
+		fi
+
 		if [ $key == "totaltimeref" ]; then
 			# echo "time=$cal ref=$ref"
 			break
-		fi
+		fi		
 
 
 		#--------------------------------------------------
@@ -134,6 +156,8 @@ if [ "$sanitize" == true ]; then
 	echo -e "# Address Sanitizer Diagnostics\n" > ../html/README.md
 	report=$(realpath ../html/README.md)
 fi
+
+g++ check_file.cpp -o check_file
 
 for dir in $testdir; do
 	cd $dir
