@@ -250,6 +250,7 @@ write_HS.o\
 write_HS_R.o\
 write_dm.o\
 potential_libxc.o \
+potential_libxc_meta.o \
 efield.o \
 magnetism.o\
 optical.o\

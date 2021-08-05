@@ -35,6 +35,7 @@ extern bool		DFT_META;		// whether is meta-GGA
 extern int 		NSPIN;				// 7
 extern bool		TWO_EFERMI; 		// 7.5 mohan add 2011-04-03, two fermi energy, exist if magnetization is fixed.
 extern int 		CURRENT_SPIN;		// 8
+extern int 		CURRENT_K;		// 8
 
 extern int 		FORCE;				// 8.1
 extern double	FORCE_THR;			// 8.2

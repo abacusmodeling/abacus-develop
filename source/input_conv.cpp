@@ -140,7 +140,7 @@ void Input_Conv::Convert(void)
 	GlobalV::OUT_LEVEL = INPUT.out_level;
 	Ions_Move_CG::CG_THRESHOLD = INPUT.cg_threshold; // pengfei add 2013-09-09
 
-    Symmetry::symm_flag = INPUT.symmetry;						// 9
+    ModuleSymmetry::Symmetry::symm_flag = INPUT.symmetry;						// 9
 	GlobalV::BASIS_TYPE = INPUT.basis_type;
 	GlobalV::KS_SOLVER = INPUT.ks_solver;
 	GlobalV::SEARCH_RADIUS = INPUT.search_radius;
@@ -594,6 +594,10 @@ void Input_Conv::Convert(void)
 	// wenfei 2021-7-28
 	if(GlobalV::DFT_FUNCTIONAL == "scan")
 	{
+		if(GlobalV::BASIS_TYPE != "pw")
+		{
+			 WARNING_QUIT("Input_conv","add metaGGA for pw first");
+		}
 		GlobalV::DFT_META = 1;
 	}
 

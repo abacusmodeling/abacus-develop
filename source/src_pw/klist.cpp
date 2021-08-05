@@ -57,7 +57,7 @@ K_Vectors::~K_Vectors()
 }
 
 void K_Vectors::set(
-    const Symmetry &symm,
+    const ModuleSymmetry::Symmetry &symm,
     const string &k_file_name,
     const int& nspin_in,
     const Matrix3 &reciprocal_vec,
@@ -96,7 +96,7 @@ void K_Vectors::set(
 	}
 
     // (2)
-	if(Symmetry::symm_flag)
+	if(ModuleSymmetry::Symmetry::symm_flag)
     {
         this->ibz_kpoint(symm);
         this->update_use_ibz();
@@ -284,7 +284,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 		else if (kword == "Line_Cartesian" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(Symmetry::symm_flag)
+			if(ModuleSymmetry::Symmetry::symm_flag)
 			{
 				WARNING("K_Vectors::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;
@@ -372,7 +372,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 		else if (kword == "Line_Direct" || kword == "L" || kword == "Line" )
 		{
 			//cout << " kword = " << kword << endl;
-			if(Symmetry::symm_flag)
+			if(ModuleSymmetry::Symmetry::symm_flag)
 			{
 				WARNING("K_Vectors::read_kpoints","Line mode of k-points is open, please set symmetry to 0.");
 				return 0;
@@ -548,7 +548,7 @@ void K_Vectors::update_use_ibz( void )
     return;
 }
 
-void K_Vectors::ibz_kpoint(const Symmetry &symm)
+void K_Vectors::ibz_kpoint(const ModuleSymmetry::Symmetry &symm)
 {
     if (GlobalV::MY_RANK!=0) return;
     TITLE("K_Vectors", "ibz_kpoint");
@@ -1018,7 +1018,7 @@ void K_Vectors::print_klists(ofstream &ofs)
 //LiuXh add a new function here,
 //20180515
 void K_Vectors::set_after_vc(
-        const Symmetry &symm,
+        const ModuleSymmetry::Symmetry &symm,
         const string &k_file_name,
         const int& nspin_in,
         const Matrix3 &reciprocal_vec,

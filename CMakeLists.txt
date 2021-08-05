@@ -33,7 +33,7 @@ if(ENABLE_ASAN)
     -fsanitize=address
   )
 else()
-  add_compile_options(-O2 -g)
+  add_compile_options(-O2 -g -Wno-write-strings)
 endif()
 
 set(ABACUS_BIN_NAME abacus)

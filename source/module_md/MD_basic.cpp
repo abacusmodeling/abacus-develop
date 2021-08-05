@@ -22,18 +22,7 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
     step_=0;
 //	ucell.latvec=ucell.latvec;
 
-    vel=new Vector3<double>[ucell.nat]; //initialize velocity of atoms from STRU  Yu Liu 2021-07-14
-    int iat=0;
-    for(int it=0; it<ucell.ntype; ++it)
-    {
-        for(int ia=0; ia<ucell.atoms[it].na; ++ia)
-        {
-            vel[iat] = ucell.atoms[it].vel[ia];
-            ++iat;
-        }
-    }
-    assert(iat==ucell.nat);
-
+    vel=new Vector3<double>[ucell.nat]; 
 	cart_change=new Vector3<double>[ucell.nat];
 	tauDirectChange=new Vector3<double>[ucell.nat];
 	allmass=new double[ucell.nat];
@@ -71,6 +60,21 @@ MD_basic::MD_basic(MD_parameters& MD_para_in, UnitCell_pseudo &unit_in):
 	}
 	//tau = 1.0/(NVT_tau*fundamentalTime*1e15);
 	// Q=KbT*tau**2
+        
+    if (ucell.set_vel)    //  Yuanbo Li 2021-08-01
+    {
+        int iat=0;    //initialize velocity of atoms from STRU  Yu Liu 2021-07-14
+        for(int it=0; it<ucell.ntype; ++it)
+        {
+            for(int ia=0; ia<ucell.atoms[it].na; ++ia)
+            {
+                vel[iat] = ucell.atoms[it].vel[ia];
+                ++iat;
+            }
+        }
+        assert(iat==ucell.nat);
+    }   
+        
     mdp.Qmass=mdp.Qmass/6.02/9.109*1e5;
 	if(mdp.Qmass<1e-10)//Qmass=dt*fundamentalTime*1e15/6.02/9.109*1e5;
 	mdp.Qmass = pow(mdp.NVT_tau,2)*temperature_;///beta;
@@ -580,11 +584,13 @@ int MD_basic::getRealStep()
 void MD_basic::outStressMD(const matrix& stress, const double& twiceKE)
 {
     GlobalV::ofs_running<<"output Pressure for check!"<<endl;
-    double press;
+    double press = 0.0;
     for(int i=0;i<3;i++)
+    {
         press += stress(i,i)/3;
+    }
     press += twiceKE/3/ucell.omega; //output virtual press = 2/3 *Ek/V + sum(sigma[i][i])/3
-    double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8 ;
+    const double unit_transform = RYDBERG_SI / pow(BOHR_RADIUS_SI,3) * 1.0e-8 ;
     GlobalV::ofs_running<<"Virtual Pressure is "<<press*unit_transform<<" Kbar "<<endl;
 }
 

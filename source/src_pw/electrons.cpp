@@ -75,7 +75,7 @@ void Electrons::non_self_consistent(const int &istep)
     // Do a Berry phase polarization calculation if required
     //=======================================================
 
-    if (berryphase::berry_phase_flag && Symmetry::symm_flag == 0)
+    if (berryphase::berry_phase_flag && ModuleSymmetry::Symmetry::symm_flag == 0)
     {
         berryphase bp;
         bp.Macroscopic_polarization();

@@ -108,13 +108,11 @@ double MD_func::GetAtomKE(const int& numIon, const Vector3<double>* vel, const d
 //   This function calculates the classical kinetic energy of a group of atoms.
 //----------------------------------------------------------------------------
 
-	double mass;
 	double ke = 0.0;
 
 	// kinetic energy = \sum_{i} 1/2*m_{i}*(vx^2+vy^2+vz^2)
 	for(int ion=0;ion<numIon;ion++){
-		mass = allmass[ion];
-		ke +=   0.5 * mass * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
+		ke +=   0.5 * allmass[ion] * (vel[ion].x*vel[ion].x+vel[ion].y*vel[ion].y+vel[ion].z*vel[ion].z);
 	}
 	//cout<<"in GetAtomKE KE="<< ke<<endl;
 	return ke;
