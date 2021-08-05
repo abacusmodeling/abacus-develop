@@ -326,7 +326,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 		std::cout << " --> PW T" << std::endl;
 		GlobalC::LM.print_HSk('T','R',1.0e-5);
 
-		string fn = "Sloc2pw.dat";
+		std::string fn = "Sloc2pw.dat";
 		GlobalC::LM.output_HSk('S', fn);
 		
 		//------------------------------------------
@@ -341,7 +341,7 @@ void LCAO_Hamilt::calculate_STNR_k(void)
 		std::cout << " --> LCAO T+Vnl" << std::endl;
 		GlobalC::LM.print_HSk('T','R',1.0e-5);	
 
-		string fn2 = "Sloc2lcao.dat";
+		std::string fn2 = "Sloc2lcao.dat";
 		GlobalC::LM.output_HSk('S',fn2);
 
 		//----------------

@@ -18,14 +18,14 @@ class Charge_Mixing: public Charge
 	Charge_Mixing();
 	~Charge_Mixing();
 
-    string mixing_mode;
+    std::string mixing_mode;
     double mixing_beta;
     int mixing_ndim;
 	double mixing_gg0; //mohan add 2014-09-27
 
     void set_mixing
     (
-        const string &mixing_mode_in,
+        const std::string &mixing_mode_in,
         const double &mixing_beta_in,
         const int &mixing_ndim_in,
 	const double &mixing_gg0_in

@@ -90,7 +90,7 @@ void toWannier90::read_nnkp()
 
 	GlobalV::ofs_running << "reading the " << wannier_file_name << ".nnkp file." << std::endl;
 	
-	ifstream nnkp_read(INPUT.NNKP.c_str(), ios::in);
+	std::ifstream nnkp_read(INPUT.NNKP.c_str(), ios::in);
 	
 	if(!nnkp_read) WARNING_QUIT("toWannier90::read_nnkp","Error during readin parameters.");
 	
@@ -325,8 +325,8 @@ void toWannier90::outEIG()
 {
 	if(GlobalV::MY_RANK == 0)
 	{
-		string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".eig";
-		ofstream eig_file( fileaddress.c_str() );
+		std::string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".eig";
+		std::ofstream eig_file( fileaddress.c_str() );
 		for(int ik = start_k_index; ik < (cal_num_kpts+start_k_index); ik++)
 		{
 			int index_band = 0;
@@ -364,7 +364,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 			else if(wannier_spin=="down") name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1-start_k_index << ".2" ;
 		}
 		
-		ofstream unkfile(name.str());
+		std::ofstream unkfile(name.str());
 		
 		unkfile << setw(12) << GlobalC::pw.ncx << setw(12) << GlobalC::pw.ncy << setw(12) << GlobalC::pw.ncz << setw(12) << ik+1 << setw(12) << num_bands << std::endl;
 		
@@ -467,7 +467,7 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 	{
 		for(int ik = start_k_index; ik < (cal_num_kpts+start_k_index); ik++)
 		{
-			ofstream unkfile;
+			std::ofstream unkfile;
 			
 			if(GlobalV::MY_RANK == 0)
 			{
@@ -581,12 +581,12 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 	// ����������ȡ��̽�����ĳ��k����ƽ�沨�����µ�ͶӰ
 	const int pwNumberMax = GlobalC::wf.npwx;
 	
-	ofstream Amn_file;
+	std::ofstream Amn_file;
 	
 	if(GlobalV::MY_RANK == 0)
 	{
 		time_t  time_now = time(NULL);
-		string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".amn";
+		std::string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".amn";
 		Amn_file.open( fileaddress.c_str() , ios::out);
 		Amn_file << " Created on " << ctime(&time_now);
 		Amn_file << setw(12) << num_bands << setw(12) << cal_num_kpts << setw(12) << num_wannier << std::endl;
@@ -653,11 +653,11 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 	//GlobalV::ofs_running << __FILE__ << __LINE__ << " cal_num_kpts = " << cal_num_kpts << std::endl;
 	// test by jingan
 	
-	ofstream mmn_file;
+	std::ofstream mmn_file;
 	
 	if(GlobalV::MY_RANK == 0)
 	{
-		string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".mmn";
+		std::string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".mmn";
 		mmn_file.open( fileaddress.c_str() , ios::out);	
 		
 		time_t  time_now = time(NULL);

@@ -353,8 +353,8 @@ void Diago_David::diag_zhegvx
     int lwork ;
     int info = 0;
     int mm = m;
-    string name1 = "ZHETRD";
-    string name2 = "L";
+    std::string name1 = "ZHETRD";
+    std::string name2 = "L";
 
     int nb = LapackConnector::ilaenv(1, name1.c_str(), name2.c_str(), n, -1, -1, -1);
     if (nb < 1)

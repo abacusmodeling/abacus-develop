@@ -311,7 +311,7 @@ void Pdiag_Basic::mat_2d(MPI_Comm vu,
 // A : contains total matrix element in processor.
 void Pdiag_Basic::data_distribution(
     MPI_Comm comm_2D,
-    const string &file,
+    const std::string &file,
     const int &n,
     const int &nb,
     double *A,

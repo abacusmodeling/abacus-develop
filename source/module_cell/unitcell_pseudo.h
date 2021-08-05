@@ -31,23 +31,23 @@ public: // member variables
 public: // member functions
 	UnitCell_pseudo();
 	~UnitCell_pseudo();
-	void setup_cell(const string &s_pseudopot_dir, output &outp, const string &fn, ofstream &log);
+	void setup_cell(const std::string &s_pseudopot_dir, output &outp, const std::string &fn, std::ofstream &log);
 	void setup_cell_classic(
-	const string &fn, 
-	ofstream &ofs_running,
-	ofstream &ofs_warning); // Yu Liu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
-	void read_atom_species(ifstream &ifa, ofstream &ofs_running); // read in the atom information for each type of atom
-	bool read_atom_positions(ifstream &ifpos, ofstream &ofs_running, ofstream &ofs_warning); // read in atomic positions
-	int find_type(const string &label);
+	const std::string &fn, 
+	std::ofstream &ofs_running,
+	std::ofstream &ofs_warning); // Yu Liu 2021-07-13, RX changed ofs_running and ofs_warning from globalV to inputs. 2021-07-24
+	void read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running); // read in the atom information for each type of atom
+	bool read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning); // read in atomic positions
+	int find_type(const std::string &label);
 	void print_tau(void)const;
-	void print_stru_file(const string &fn, const int &type=1)const; // mohan add 2011-03-22
+	void print_stru_file(const std::string &fn, const int &type=1)const; // mohan add 2011-03-22
 	void check_dtau(void);
-    void setup_cell_after_vc(const string &s_pseudopot_dir, output &outp, const string &fn, ofstream &log); //LiuXh add 20180515
+    void setup_cell_after_vc(const std::string &s_pseudopot_dir, output &outp, const std::string &fn, std::ofstream &log); //LiuXh add 20180515
 
 	bool set_atom_flag;//added on 2009-3-8 by mohan
 
 	// read in pseudopotential from files for each type of atom
-	void read_cell_pseudopots(const string &fn);
+	void read_cell_pseudopots(const std::string &fn);
 
 	//================================================================
 	// cal_natomwfc : calculate total number of atomic wavefunctions
@@ -59,7 +59,7 @@ public: // member functions
 	//void cal_nelec();
 	void cal_meshx();
 	void cal_natomwfc(); 
-	void print_unitcell_pseudo(const string &fn, output &outp);
+	void print_unitcell_pseudo(const std::string &fn, output &outp);
 	bool check_tau(void)const; //mohan add 2011-03-03
 
 #ifdef __MPI

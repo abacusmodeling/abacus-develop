@@ -17,9 +17,9 @@ using namespace std;
 //----------------------------------------------------------
 bool timer::disabled = false;
 size_t timer::n_now = 0;
-std::map<string,std::map<string,timer::Timer_One>> timer::timer_pool;
+std::map<std::string,std::map<std::string,timer::Timer_One>> timer::timer_pool;
 
-void timer::finish(ofstream &ofs,const bool print_flag)
+void timer::finish(std::ofstream &ofs,const bool print_flag)
 {
 	timer::tick("","total");
 	if(print_flag)
@@ -48,7 +48,7 @@ double timer::cpu_time(void)
 		// mohan add, abandon the cross point time 2^32 ~ -2^32 .
 }
 
-void timer::tick(const string &class_name,const string &name)
+void timer::tick(const std::string &class_name,const std::string &name)
 {
 //----------------------------------------------------------
 // EXPLAIN : if timer is disabled , return
@@ -98,23 +98,23 @@ long double timer::print_until_now(void)
 	return timer_pool[""]["total"].cpu_second;
 }
 
-void timer::print_all(ofstream &ofs)
+void timer::print_all(std::ofstream &ofs)
 {
 	constexpr double small = 0.1; // cpu = 10^6
 	// if want to print > 1s , set small = 10^6
 	
-	std::vector<pair<pair<string,string>,Timer_One>> timer_pool_order;
+	std::vector<pair<pair<std::string,std::string>,Timer_One>> timer_pool_order;
 	for(auto &timer_pool_A : timer_pool)
 	{
-		const string class_name = timer_pool_A.first;
+		const std::string class_name = timer_pool_A.first;
 		for(auto &timer_pool_B : timer_pool_A.second)
 		{
-			const string name = timer_pool_B.first;
+			const std::string name = timer_pool_B.first;
 			const Timer_One timer_one = timer_pool_B.second;
 			if(timer_pool_order.size() < timer_one.order+1)
 				timer_pool_order.resize(timer_one.order+1);
 			//timer_pool_order[timer_one.order] = {{class_name, name}, timer_one}; //qianrui change it to make it compatible with old compiler version
-			timer_pool_order[timer_one.order] = pair<pair<string,string>, Timer_One> {pair<string,string >{class_name,name}, timer_one};
+			timer_pool_order[timer_one.order] = pair<pair<std::string,std::string>, Timer_One> {pair<std::string,std::string >{class_name,name}, timer_one};
 		}
 	}
 	
@@ -124,8 +124,8 @@ void timer::print_all(ofstream &ofs)
 	ofs <<"\n\n\n\n  |CLASS_NAME---------|NAME---------------|TIME(Sec)-----|CALLS----|AVG------|PER%-------" << std::endl;
 	for(auto &timer_pool_order_A : timer_pool_order)
 	{
-		const string &class_name = timer_pool_order_A.first.first;
-		const string &name = timer_pool_order_A.first.second;
+		const std::string &class_name = timer_pool_order_A.first.first;
+		const std::string &name = timer_pool_order_A.first.second;
 		const Timer_One &timer_one = timer_pool_order_A.second;
 		
 		if(timer_one.cpu_second < small)
@@ -158,7 +158,7 @@ void timer::print_all(ofstream &ofs)
 }
 
 /*
-void timer::print_all(ofstream &ofs)
+void timer::print_all(std::ofstream &ofs)
 {
 //	std::cout<<"\n timer::print_all()"<<std::endl;
 	const double small = 0.1; // cpu = 10^6

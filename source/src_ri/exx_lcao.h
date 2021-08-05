@@ -32,7 +32,7 @@
 class Exx_Lcao
 {
 public:
-	struct{ string process; string thread; string matrix; } test_dir;	// Peize Lin test
+	struct{ std::string process; std::string thread; std::string matrix; } test_dir;	// Peize Lin test
 	Exx_Lcao( const Exx_Global::Exx_Info &info_global );				// Peize Lin test
 public:
 	void init();
@@ -98,7 +98,7 @@ public:
 		const double &hse_omega;
 		
 		double pca_threshold = 0;
-		std::vector<string> files_abfs;
+		std::vector<std::string> files_abfs;
 		double c_threshold  = 0;
 		double v_threshold  = 0;
 		double dm_threshold = 0;

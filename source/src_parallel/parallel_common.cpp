@@ -2,19 +2,19 @@
 #include <cstring>
 
 #ifdef __MPI
-void Parallel_Common::bcast_string(string &object)					// Peize Lin fix bug 2019-03-18
+void Parallel_Common::bcast_string(std::string &object)					// Peize Lin fix bug 2019-03-18
 {
 	int size = object.size();
 	MPI_Bcast(&size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	char *swap = new char[size+1];
 	if(0==GlobalV::MY_RANK) strcpy(swap, object.c_str());
 	MPI_Bcast(swap, size+1, MPI_CHAR, 0, MPI_COMM_WORLD);
-	if(0!=GlobalV::MY_RANK) object = static_cast<string>(swap);
+	if(0!=GlobalV::MY_RANK) object = static_cast<std::string>(swap);
 	delete[] swap;
 	return;
 }
 
-void Parallel_Common::bcast_string(string *object,const int n)		// Peize Lin fix bug 2019-03-18
+void Parallel_Common::bcast_string(std::string *object,const int n)		// Peize Lin fix bug 2019-03-18
 {
 	for(int i=0;i<n;i++)
 		bcast_string(object[i]);

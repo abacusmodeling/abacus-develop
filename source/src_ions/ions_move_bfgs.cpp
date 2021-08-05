@@ -129,7 +129,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 		this->reset_hessian();
 
 		/*	
-		ifstream hess_file("hess_in");
+		std::ifstream hess_file("hess_in");
 		if(hess_file)
 		{
 			int rank1,rank2;

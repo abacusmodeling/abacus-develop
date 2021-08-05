@@ -420,7 +420,7 @@ void ORB_table_alpha::print_Table_DSR(void)
 	TITLE("ORB_table_alpha", "print_Table_DSR");
 	NEW_PART("Overlap table S between lcao orbital and descriptor basis : S_{I_mu_alpha}");
 
-	ofstream ofs;
+	std::ofstream ofs;
 	stringstream ss;
 	// the parameter 'winput::spillage_outdir' is read from INPUTw.
 	ss << "./S_I_mu_alpha.dat";

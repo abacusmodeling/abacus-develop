@@ -144,7 +144,7 @@ void UnitCell::bcast_unitcell2(void)
 }
 #endif
 
-void UnitCell::print_cell(ofstream &ofs, output &outp)const
+void UnitCell::print_cell(std::ofstream &ofs, output &outp)const
 {
     if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell");
 
@@ -167,7 +167,7 @@ void UnitCell::print_cell(ofstream &ofs, output &outp)const
     return;
 }
 
-void UnitCell::print_cell_cif(const string &fn)const
+void UnitCell::print_cell_cif(const std::string &fn)const
 {
 	if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_cif");
 	
@@ -176,7 +176,7 @@ void UnitCell::print_cell_cif(const string &fn)const
 	stringstream ss;
 	ss << GlobalV::global_out_dir << fn;
 	
-	ofstream ofs( ss.str().c_str() );
+	std::ofstream ofs( ss.str().c_str() );
 	ofs << "data_" << latName << std::endl;
 	ofs << std::endl;
 	//xiaohui modify 2015-03-25
@@ -220,7 +220,7 @@ void UnitCell::print_cell_cif(const string &fn)const
     ofs.close();
 }
 
-void UnitCell::print_cell_xyz(const string &fn)const
+void UnitCell::print_cell_xyz(const std::string &fn)const
 {
     if (GlobalV::test_unitcell) TITLE("UnitCell","print_cell_xyz");
 
@@ -229,7 +229,7 @@ void UnitCell::print_cell_xyz(const string &fn)const
     stringstream ss;
     ss << GlobalV::global_out_dir << fn;
 
-    ofstream ofs( ss.str().c_str() );
+    std::ofstream ofs( ss.str().c_str() );
 
     ofs << nat << std::endl;
     ofs << latName << std::endl;

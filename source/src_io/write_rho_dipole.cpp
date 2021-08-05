@@ -4,7 +4,7 @@
 #include "../src_lcao/ELEC_evolve.h"
 
 //fuxiang add 2017-03-15
-void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const string &fn, const int &precision, const bool for_plot)
+void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &iter, const std::string &fn, const int &precision, const bool for_plot)
 {
     TITLE("Charge","write_rho_dipole");
     if (out_charge==0) 
@@ -17,7 +17,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 	}
 	
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
 	{

@@ -77,7 +77,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::~Allreduce()
 std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>>
 Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 {
-	auto clear_oars = [&]( std::vector<MPI_Request> &requests, boost::dynamic_bitset<> &flags, std::vector<boost::mpi::packed_oarchive*> &oarps, const string &s )
+	auto clear_oars = [&]( std::vector<MPI_Request> &requests, boost::dynamic_bitset<> &flags, std::vector<boost::mpi::packed_oarchive*> &oarps, const std::string &s )
 	{
 		if( flags.none() )	return;
 		for( int irank=0; irank!=comm_sz; ++irank )
@@ -156,7 +156,7 @@ Exx_Abfs::Parallel::Communicate::Hexx::Allreduce::exx_to_a2D()
 					break;
 				}
 				default:
-					throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+					throw std::invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 			}
 		}
 

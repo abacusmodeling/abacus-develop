@@ -97,7 +97,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
 	{
 		stringstream ss;
 		ss << GlobalV::global_out_dir << "PW_GK" << GlobalV::MY_RANK+1 << ".dat";
-		ofstream ofs( ss.str().c_str() );
+		std::ofstream ofs( ss.str().c_str() );
 		ofs << GlobalC::pw.ggpsi << " (ggpsi, Ry)" << std::endl;
 		ofs << GlobalC::pw.ggwfc << " (ggwfc, Ry)" << std::endl;
 		ofs << GlobalC::pw.ggwfc2 << " (ggwfc2, Ry)" << std::endl;

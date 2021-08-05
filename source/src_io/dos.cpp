@@ -1,10 +1,10 @@
 #include "dos.h"
 #include "../src_pw/global.h"
 #ifdef __LCAO
-void Dos::calculate_Mulliken(const string &fa)
+void Dos::calculate_Mulliken(const std::string &fa)
 {
 	TITLE("Dos","calculate_Mulliken");
-	ofstream ofs;
+	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
 	{
@@ -142,7 +142,7 @@ bool Dos::calculate_dos
 (
 	const int &is,
 	const int *isk,
-	const string &fa, //file address
+	const std::string &fa, //file address
 	const double &de_ev, // delta energy in ev
 	const double &emax_ev,
 	const double &emin_ev,// minimal energy in ev.
@@ -155,7 +155,7 @@ bool Dos::calculate_dos
 )
 {
 	TITLE("Dos","calculae_dos");
-	ofstream ofs;
+	std::ofstream ofs;
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(fa.c_str());//make the file clear!!
@@ -247,7 +247,7 @@ bool Dos::calculate_dos
 }
 
 
-void Dos::nscf_fermi_surface(const string &out_band_dir,
+void Dos::nscf_fermi_surface(const std::string &out_band_dir,
 	const int &nks,
 	const int &nband,
 	double **ekb)
@@ -259,7 +259,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 
 	assert(GlobalC::wf.allocate_ekb);
 
-	ofstream ofs;
+	std::ofstream ofs;
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(out_band_dir.c_str());//make the file clear!!
@@ -273,7 +273,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 		{
 			if( GlobalV::RANK_IN_POOL == 0)
 			{
-				ofstream ofs(out_band_dir.c_str(),ios::app);
+				std::ofstream ofs(out_band_dir.c_str(),ios::app);
 				ofs << setprecision(8);
 
 				if(ik==0)
@@ -331,7 +331,7 @@ void Dos::nscf_fermi_surface(const string &out_band_dir,
 
 void Dos::nscf_band(
 	const int &is,
-	const string &out_band_dir, 
+	const std::string &out_band_dir, 
 	const int &nks, 
 	const int &nband,
 	const double &fermie,
@@ -342,7 +342,7 @@ void Dos::nscf_band(
 #ifdef __MPI
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream ofs(out_band_dir.c_str());//make the file clear!!
+		std::ofstream ofs(out_band_dir.c_str());//make the file clear!!
 		ofs.close();
 	}
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -356,7 +356,7 @@ void Dos::nscf_band(
 			{ 
 				if ( GlobalV::RANK_IN_POOL == 0)
 				{
-					ofstream ofs(out_band_dir.c_str(),ios::app);
+					std::ofstream ofs(out_band_dir.c_str(),ios::app);
 					ofs << setprecision(8);
 					//start from 1
 					ofs << ik+1;
@@ -378,7 +378,7 @@ void Dos::nscf_band(
 	{
 		if(GlobalV::MY_POOL == ip && GlobalV::RANK_IN_POOL == 0)
 		{
-			ofstream ofs(out_band_dir.c_str(),ios::app);
+			std::ofstream ofs(out_band_dir.c_str(),ios::app);
 			for(int ik=0;ik<nks;ik++)
 			{
 				ofs<<setw(12)<<ik;
@@ -397,7 +397,7 @@ void Dos::nscf_band(
 //	std::cout<<"\n nband = "<<nband<<std::endl;
 //	std::cout<<out_band_dir<<std::endl;
 
-	ofstream ofs(out_band_dir.c_str());
+	std::ofstream ofs(out_band_dir.c_str());
 	for(int ik=0;ik<nks;ik++)
 	{
 		if( GlobalC::kv.isk[ik] == is)

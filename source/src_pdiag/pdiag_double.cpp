@@ -506,9 +506,9 @@ void Pdiag_Double::diago_double_begin(
 	#ifdef TEST_DIAG
 	{
 		static int istep = 0;
-		auto print_matrix_C = [&](const string &file_name, double*m)
+		auto print_matrix_C = [&](const std::string &file_name, double*m)
 		{
-			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
 				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
@@ -522,9 +522,9 @@ void Pdiag_Double::diago_double_begin(
 				ofs<<std::endl;
 			}
 		};
-		auto print_matrix_F = [&](const string &file_name, double*m)
+		auto print_matrix_F = [&](const std::string &file_name, double*m)
 		{
-			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
 				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
@@ -880,18 +880,18 @@ void Pdiag_Double::diago_double_begin(
 	{
 		static int istep = 0;
 		{
-			ofstream ofs("ekb_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("ekb_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				ofs<<ekb[ib]<<std::endl;
 			}
 		}
 		{
-			ofstream ofs("wfc-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("wfc-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			ofs<<wfc_2d<<std::endl;
 		}
 		{
-			ofstream ofs("wfc-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("wfc-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			ofs<<transpose(wfc_2d)<<std::endl;
 		}
 		++istep;
@@ -913,9 +913,9 @@ void Pdiag_Double::diago_complex_begin(
     #ifdef TEST_DIAG
    	{
 		static int istep = 0;
-		auto print_matrix_C = [&](const string &file_name, std::complex<double>*m)
+		auto print_matrix_C = [&](const std::string &file_name, std::complex<double>*m)
 		{
-			ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-C_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
 			{
 				for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
@@ -940,9 +940,9 @@ void Pdiag_Double::diago_complex_begin(
 				ofs<<std::endl;
 			}
 		};
-		auto print_matrix_F = [&](const string &file_name, std::complex<double>*m)
+		auto print_matrix_F = [&](const std::string &file_name, std::complex<double>*m)
 		{
-			ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs(file_name+"-F_"+TO_STRING(istep)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int ir=0; ir<GlobalC::ParaO.nrow; ++ir)
 			{
 				for(int ic=0; ic<GlobalC::ParaO.ncol; ++ic)
@@ -1254,8 +1254,8 @@ void Pdiag_Double::diago_complex_begin(
 
 #ifdef __MPI
 void Pdiag_Double::readin(
-	const string &fa,
-	const string &fb,
+	const std::string &fa,
+	const std::string &fb,
 	const int &nlocal_tot,
 	double *eigen,
 	double *eigvr)

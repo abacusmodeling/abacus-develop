@@ -123,7 +123,7 @@ extern int GRANK;
 extern int GSIZE;
 
 //==========================================================
-// EXPLAIN : readin file dir, output file ofstream
+// EXPLAIN : readin file dir, output file std::ofstream
 // GLOBAL VARIABLES :
 // NAME : global_in_card
 // NAME : global_atom_card

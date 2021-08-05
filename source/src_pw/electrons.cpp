@@ -139,7 +139,7 @@ void Electrons::self_consistent(const int &istep)
     // iteration && dr2.
     // stringstream ss;
     // ss << GlobalV::global_out_dir << "ChargeMixing.dat"; 
-    // ofstream ofs_mix;
+    // std::ofstream ofs_mix;
 
     // if(GlobalV::MY_RANK==0)
     // {

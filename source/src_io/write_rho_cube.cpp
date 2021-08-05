@@ -5,13 +5,13 @@
 void Charge::write_rho_cube(
 	const double* rho_save, 
 	const int &is, 
-	const string &fn, 
+	const std::string &fn, 
 	const int &precision) 
 {
     TITLE("Charge","write_rho_cube");
 
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
 	{

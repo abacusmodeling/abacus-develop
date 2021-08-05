@@ -407,7 +407,7 @@ void wavefunc::wfcinit_k(void)
 		// store the overlap relationship to "nearest.dat"
 		stringstream ss;
 		ss << GlobalV::global_out_dir <<"nearest.dat";
-		ofstream ofs(ss.str().c_str());
+		std::ofstream ofs(ss.str().c_str());
 		ofs << NR << std::endl;
 		std::cout <<"NR = "<<NR<<std::endl;    // Max
 		for(int iw1=0; iw1<GlobalV::NLOCAL; iw1++)
@@ -587,7 +587,7 @@ void wavefunc::wfcinit_k(void)
 			//------------------------------
 			stringstream ss1;
 			ss1 << GlobalV::global_out_dir <<"q_"<<iq;
-			ofstream ofs1(ss1.str().c_str());
+			std::ofstream ofs1(ss1.str().c_str());
 			ofs1<<NG<<std::endl;
 			for(int g=0; g<NG; g++)
 			{

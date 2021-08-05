@@ -104,7 +104,7 @@ void Exx_Abfs::Parallel::Communicate::DM::cal_DM(
 {
 	TITLE("Exx_Abfs::Parallel::Communicate::DM::cal_DM");
 	
-ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 //gettimeofday( &t_start, NULL);
 #if false
@@ -171,7 +171,7 @@ Exx_Abfs::Parallel::Communicate::DM::LOC_to_grid(
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 {
-	ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(GlobalV::MY_RANK));
+	std::ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(GlobalV::MY_RANK));
 	for( int is=0; is!=GlobalV::NSPIN; ++is )
 	{
 		for( int i1=0; i1!=GlobalC::GridT.lgd; ++i1 )
@@ -242,7 +242,7 @@ std::cout<<"\t"<<iwt2_grid<<"\t"<<iwt2<<"\t"<<iat2<<"\t"<<iw2<<std::endl;
 	}
 	else
 	{	
-ofstream ofs_LOC_DM("GlobalC::LOC.DM_R_"+TO_STRING(GlobalV::MY_RANK));
+std::ofstream ofs_LOC_DM("GlobalC::LOC.DM_R_"+TO_STRING(GlobalV::MY_RANK));
 for( int i=0; i<100; ++i )
 	ofs_LOC_DM<<GlobalC::LOC.DM_R[0][i]<<"\t";
 ofs_LOC_DM<<std::endl<<std::endl;

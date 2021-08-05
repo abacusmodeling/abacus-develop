@@ -140,7 +140,7 @@ void Atom_pseudo::set_d_so(
 	return;
 }
 
-void Atom_pseudo::print_atom(ofstream &ofs)
+void Atom_pseudo::print_atom(std::ofstream &ofs)
 {
 	if(GlobalV::test_atom) TITLE("atom_pseudo","print_atom");
 
@@ -194,7 +194,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 	Parallel_Common::bcast_bool( nlcc );
 	Parallel_Common::bcast_bool( has_so );
 
-//string
+//std::string
 	Parallel_Common::bcast_string( psd );
 	Parallel_Common::bcast_string( pp_type );
 	Parallel_Common::bcast_string( dft, 4 );
@@ -208,7 +208,7 @@ void Atom_pseudo::bcast_atom_pseudo2(void)
 		delete[] jchi;
 		delete[] nn;
 		jjj = new double [nbeta];
-		els = new string[nchi];
+		els = new std::string[nchi];
 		lchi = new int [nchi];
 		oc = new double[nchi];
 		jchi = new double[nchi];

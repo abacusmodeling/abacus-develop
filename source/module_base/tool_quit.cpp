@@ -21,7 +21,7 @@
 // NAME : WARNING_QUIT( write information into
 // 		  GlobalV::ofs_warning , and then quit)
 //==========================================================
-void WARNING(const string &file,const string &description)
+void WARNING(const std::string &file,const std::string &description)
 {
 #ifdef __NORMAL
 
@@ -60,7 +60,7 @@ void QUIT(void)
 }
 
 
-void WARNING_QUIT(const string &file,const string &description)
+void WARNING_QUIT(const std::string &file,const std::string &description)
 {
 #ifdef __NORMAL
 

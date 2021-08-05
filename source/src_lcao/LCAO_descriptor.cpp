@@ -384,7 +384,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 
     //==========print preparation=============
     GlobalV::ofs_running << " print out each DM_inl" << std::endl;
-    ofstream ofs;
+    std::ofstream ofs;
     stringstream ss;
     ss << winput::spillage_outdir << "/"
        << "projected_DM.dat";
@@ -466,7 +466,7 @@ void LCAO_Descriptor::cal_descriptor(void)
 
 
 void LCAO_Descriptor::print_projected_DM(
-	ofstream& ofs, 
+	std::ofstream& ofs, 
 	ComplexMatrix& des, 
 	const int& it, 
 	const int& ia, 
@@ -488,7 +488,7 @@ void LCAO_Descriptor::print_projected_DM(
 void LCAO_Descriptor::print_descriptor(void)
 {
     TITLE("LCAO_Descriptor", "print_descriptor");
-    ofstream ofs;
+    std::ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
@@ -654,7 +654,7 @@ void LCAO_Descriptor::del_gdmx(void)
     return;
 }
 
-void LCAO_Descriptor::cal_v_delta(const string& model_file)
+void LCAO_Descriptor::cal_v_delta(const std::string& model_file)
 {
     TITLE("LCAO_Descriptor", "cal_v_delta");
     //1.  (dE/dD)<alpha_m'|psi_nv>
@@ -771,7 +771,7 @@ void LCAO_Descriptor::cal_descriptor_tensor()
     return;
 }
 
-void LCAO_Descriptor::load_model(const string& model_file)
+void LCAO_Descriptor::load_model(const std::string& model_file)
 {
     try {
         module = torch::jit::load(model_file);
@@ -817,7 +817,7 @@ void LCAO_Descriptor::cal_gedm()
 void LCAO_Descriptor::print_H_V_delta()
 {
     TITLE("LCAO_Descriptor", "print_H_V_delta");
-    ofstream ofs;
+    std::ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"
@@ -853,7 +853,7 @@ void LCAO_Descriptor::print_H_V_delta()
 void LCAO_Descriptor::print_F_delta()
 {
     TITLE("LCAO_Descriptor", "print_F_delta");
-    ofstream ofs;
+    std::ofstream ofs;
     stringstream ss;
     // the parameter 'winput::spillage_outdir' is read from INPUTw.
     ss << winput::spillage_outdir << "/"

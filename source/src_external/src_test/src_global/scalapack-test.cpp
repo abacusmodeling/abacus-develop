@@ -66,7 +66,7 @@ void test_pblas()
 
 		auto ofs_pro = [&]()
 		{
-			ofstream ofs("ofs_"+TO_STRING(my_rank));
+			std::ofstream ofs("ofs_"+TO_STRING(my_rank));
 			ofs<<comm_sz<<"\t"<<dim[0]<<"\t"<<dim[1]<<"\t"<<nprow<<"\t"<<npcol<<"\t"<<myprow<<"\t"<<mypcol<<"\t"<<std::endl;
 			ofs.close();
 		};
@@ -86,14 +86,14 @@ void test_pblas()
 
 	auto ofs_matrix = [&](const std::vector<double>& v)
 	{
-		ofstream ofs("matrix_"+TO_STRING(my_rank));
+		std::ofstream ofs("matrix_"+TO_STRING(my_rank));
 		for(const double i : v )
 			ofs<<i<<std::endl;
 		ofs.close();
 	};
 	auto ofs_desc = [&](const std::vector<int> &descv)
 	{
-		ofstream ofs("desc_"+TO_STRING(my_rank));
+		std::ofstream ofs("desc_"+TO_STRING(my_rank));
 		for(int i=0; i<9; ++i)
 			ofs<<descv[i]<<"\t";
 		ofs<<std::endl;

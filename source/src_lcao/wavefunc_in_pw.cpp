@@ -7,7 +7,7 @@
 #include "../src_pw/soc.h"
 
 void Wavefunc_in_pw::make_table_q(
-	std::vector<string> &fn, 
+	std::vector<std::string> &fn, 
 	realArray &table_local)
 {
 	TITLE("Wavefunc_in_pw","make_table_q");
@@ -19,7 +19,7 @@ void Wavefunc_in_pw::make_table_q(
 
 	for(int it=0; it<GlobalC::ucell.ntype; it++)
 	{
-		ifstream in(fn[it].c_str());
+		std::ifstream in(fn[it].c_str());
 		if(!in)
 		{
 			GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
@@ -43,7 +43,7 @@ void Wavefunc_in_pw::make_table_q(
 			for(int N=0; N<GlobalC::ucell.atoms[it].l_nchi[L]; N++)
 			{
 				GlobalV::ofs_running << " L=" << L << " N=" << N;
-				ifstream in(fn[it].c_str());
+				std::ifstream in(fn[it].c_str());
 				if (!in)
 				{
 					GlobalV::ofs_warning << " File name : " << fn[it] << std::endl;
@@ -91,9 +91,9 @@ void Wavefunc_in_pw::make_table_q(
 				}
 				GlobalV::ofs_running << " Rmax(Angstrom)=" << radial[meshr-1] << std::endl;
 
-				string name1;
-				string name2;
-				string name3;
+				std::string name1;
+				std::string name2;
+				std::string name3;
 				int tmp_it=0;
 				int tmp_l=0;
 				int tmp_n=0;
@@ -154,7 +154,7 @@ void Wavefunc_in_pw::make_table_q(
 		{
 			stringstream ss;
 			ss << GlobalV::global_out_dir << GlobalC::ucell.atoms[it].label << "/LOCAL_G.dat";
-			ofstream ofs(ss.str().c_str());
+			std::ofstream ofs(ss.str().c_str());
 			for(int iq=0; iq<GlobalV::NQX; iq++)
 			{
 				int ic=0;

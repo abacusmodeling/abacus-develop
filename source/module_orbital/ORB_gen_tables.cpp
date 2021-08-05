@@ -14,7 +14,7 @@ ORB_gen_tables::~ORB_gen_tables() {}
 
 /// call in hamilt_linear::init_before_ions.
 void ORB_gen_tables::gen_tables(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const int &job0,
 	LCAO_Orbitals &orb,
 	const int &Lmax_exx,

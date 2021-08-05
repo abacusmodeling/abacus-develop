@@ -227,7 +227,7 @@ std::map<Abfs::Vector3_Order<int>,shared_ptr<matrix>> Abfs::cal_mps(
 	#if TEST_EXX_LCAO==1
 	{
 		static int istep=0;
-		ofstream ofs( "mps_index_"+TO_STRING(iat1)+"_"+TO_STRING(iat2)+"_"+TO_STRING(istep++) );
+		std::ofstream ofs( "mps_index_"+TO_STRING(iat1)+"_"+TO_STRING(iat2)+"_"+TO_STRING(istep++) );
 		for( const auto index : indexs )
 		{
 			ofs<<index.first<<std::endl;
@@ -593,7 +593,7 @@ shared_ptr<matrix> Abfs::cal_I( const shared_ptr<matrix> &m )
 	I.input( m );
 	
 	#if TEST_EXX_LCAO==1
-		ofstream ofs("I.dat",ofstream::app);
+		std::ofstream ofs("I.dat",std::ofstream::app);
 		ofs<<"@"<<std::endl<<I.A<<std::endl;
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
@@ -621,7 +621,7 @@ std::vector<std::vector<shared_ptr<matrix>>> Abfs::cal_I( const std::vector<std:
 	I.input( ms[0][0], ms[0][1], ms[1][0], ms[1][1] );
 
 	#if TEST_EXX_LCAO==1
-		ofstream ofs("I.dat",ofstream::app);
+		std::ofstream ofs("I.dat",std::ofstream::app);
 		ofs<<"@"<<std::endl<<I.A<<std::endl;
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"

@@ -807,7 +807,7 @@ void ORB_table_phi::init_Lmax (
 					Lmax_used = 2*Lmax + 1;
 					break;
 				default:
-					throw invalid_argument("ORB_table_phi::init_Lmax orb_num=2, mode error");
+					throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num=2, mode error");
 					break;
 			}
 			break;
@@ -821,7 +821,7 @@ void ORB_table_phi::init_Lmax (
 					Lmax_used += Lmax_exx;
 					break;
 				default:
-					throw invalid_argument("ORB_table_phi::init_Lmax orb_num=3, mode error");
+					throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num=3, mode error");
 					break;
 			}
 			break;
@@ -833,12 +833,12 @@ void ORB_table_phi::init_Lmax (
 					Lmax_used = 2*( 2*Lmax + 1 );
 					break;
 				default:
-					throw invalid_argument("ORB_table_phi::init_Lmax orb_num=4, mode error");
+					throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num=4, mode error");
 					break;
 			}
 			break;
 		default:
-			throw invalid_argument("ORB_table_phi::init_Lmax orb_num error");
+			throw std::invalid_argument("ORB_table_phi::init_Lmax orb_num error");
 			break;
 	}
 

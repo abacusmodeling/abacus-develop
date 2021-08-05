@@ -154,7 +154,7 @@ void Efield::add_efield(const double*const rho, double* v_in)
 	{
 		stringstream ss;
 		ss << GlobalV::global_out_dir << "EFIELD.dat";
-		ofstream ofs(ss.str().c_str());
+		std::ofstream ofs(ss.str().c_str());
 		
 		int npoi;
 		if(edir==1) npoi = GlobalC::pw.ncx;

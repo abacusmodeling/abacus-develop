@@ -44,13 +44,13 @@ public:
 	int *rvalue;																			//��̽����ľ��򲿷ֺ�����ʽ,ֻ��������ʽ,����Ϊnum_wannier
 	double *alfa;																			//��̽����ľ��򲿷ֺ����еĵ��ڲ���,����Ϊnum_wannier
 	Vector3<double> *R_centre;																//��̽�����������,����Ϊnum_wannier,cartesian����
-	string wannier_file_name = "seedname";                                                  // .mmn,.amn�ļ���
+	std::string wannier_file_name = "seedname";                                                  // .mmn,.amn�ļ���
 	int num_exclude_bands = 0;																// �ų�������ܴ���Ŀ��-1��ʾû����Ҫ�ų����ܴ�
 	int *exclude_bands;                                                                     // �ų��ܴ���index
 	bool *tag_cal_band;																		// �ж�GlobalV::NBANDS�ܴ���һ����Ҫ����
 	int num_bands;																		   	// wannier90 �е�num_bands
 	bool gamma_only_wannier = false;														// ֻ��gamma������wannier����
-	string wannier_spin = "up";                                                             // spin��������up,down��������
+	std::string wannier_spin = "up";                                                             // spin��������up,down��������
 	int start_k_index = 0;                                                                  // ����forѭ��Ѱ��k��ָ�꣬spin=2ʱ��ʼ��index�ǲ�һ����
 
 	

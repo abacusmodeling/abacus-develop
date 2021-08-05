@@ -5,7 +5,7 @@
 using std::vector;
 #include <map>
 using std::map;
-#include<string>
+#include <string>
 
 #include "../module_orbital/ORB_atomic_lm.h"
 #include "../module_base/element_basis_index.h"

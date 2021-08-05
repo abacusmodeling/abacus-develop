@@ -5,7 +5,7 @@
 #include<fstream>
 #include <vector>
 #include<set>
-#include<string>
+#include <string>
 #ifdef __MPI
 #include<mpi.h>
 #endif
@@ -85,8 +85,8 @@ static double cut_time( timeval &t )
 static std::vector<double> get_memory(const int N)
 {
 	std::vector<double> m;
-	string s;
-	ifstream ifs("/proc/meminfo");
+	std::string s;
+	std::ifstream ifs("/proc/meminfo");
 	ifs>>s>>s;
 	m.push_back(stoi(s)/1024);
 	for(int i=1; i<N; ++i)

@@ -6,7 +6,7 @@
 #include "../src_global/complexmatrix-test.h"
 #include "../src_global/matrix-test.h"
 #include <map>
-#include<string>
+#include <string>
 #include<memory>
 #include<fstream>
 #include<iomanip>
@@ -54,61 +54,61 @@ template<typename T1,typename T2> static size_t get_sizeof( const std::map<T1,T2
 
 
 template<typename T1,typename T2>
-static void ofs_matrixes( const string & file_name, const std::map<T1,T2> &ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,T2> &ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m : ms )
 	{
 			ofs<<fixed;
 			const auto precision_old = ofs.precision(15);
 		ofs<<"@\t"<<m.first<<std::endl;
 			ofs.precision(precision_old);
-			ofs.unsetf(ostream::floatfield);
+			ofs.unsetf(std::ostream::floatfield);
 		ofs_matrixes( file_name, m.second, flag_print_content );		
 	}
 	ofs.close();
 }
 template<typename T>
-static void ofs_matrixes( const string & file_name, const std::vector<T> &ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::vector<T> &ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	for( size_t i=0; i<ms.size(); ++i )
 	{
 			ofs<<fixed;
 			const auto precision_old = ofs.precision(15);
 		ofs<<"@\t"<<i<<std::endl;
 			ofs.precision(precision_old);
-			ofs.unsetf(ostream::floatfield);
+			ofs.unsetf(std::ostream::floatfield);
 		ofs_matrixes( file_name, ms[i], flag_print_content );		
 	}
 	ofs.close();
 }
 template<typename T>
-static void ofs_matrixes( const string & file_name, const weak_ptr<T> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const weak_ptr<T> & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
 		ofs<<*ms.lock()<<std::endl;
 	ofs.close();
 }
 template<typename T>
-static void ofs_matrixes( const string & file_name, const shared_ptr<T> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const shared_ptr<T> & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
 		ofs<<*ms<<std::endl;
 	ofs.close();
 }
-static void ofs_matrixes( const string & file_name, const matrix & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const matrix & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
 		ofs<<ms<<std::endl;	
 	ofs.close();
 }
-static void ofs_matrixes( const string & file_name, const ComplexMatrix & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const ComplexMatrix & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	if(flag_print_content)
 		ofs<<ms<<std::endl;	
 	ofs.close();
@@ -116,9 +116,9 @@ static void ofs_matrixes( const string & file_name, const ComplexMatrix & ms, co
 
 /*
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,weak_ptr<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,weak_ptr<M>>>> & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m1 : ms )
 	{
 		const auto i1 = m1.first;
@@ -132,7 +132,7 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 					const auto precision_old = ofs.precision(15);
 				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
-					ofs.unsetf(ostream::floatfield);
+					ofs.unsetf(std::ostream::floatfield);
 				if(flag_print_content)
 					ofs<<*m3.second.lock()<<std::endl;
 			}
@@ -142,9 +142,9 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 }
 
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,shared_ptr<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,shared_ptr<M>>>> & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m1 : ms )
 	{
 		const auto i1 = m1.first;
@@ -158,7 +158,7 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 					const auto precision_old = ofs.precision(15);
 				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
-					ofs.unsetf(ostream::floatfield);
+					ofs.unsetf(std::ostream::floatfield);
 				if(flag_print_content)
 					ofs<<*m3.second<<std::endl;
 			}
@@ -168,9 +168,9 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 }
 
 template<typename T1, typename T2, typename M>
-static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::vector<M>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::vector<M>>> & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m1 : ms )
 	{
 		const auto i1 = m1.first;
@@ -183,7 +183,7 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 					const auto precision_old = ofs.precision(15);
 				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
-					ofs.unsetf(ostream::floatfield);
+					ofs.unsetf(std::ostream::floatfield);
 				if(flag_print_content)
 					ofs<<m2.second[i3]<<std::endl;
 			}
@@ -193,9 +193,9 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 }
 
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,std::vector<M>>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,std::vector<M>>>> & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m1 : ms )
 	{
 		const auto i1 = m1.first;
@@ -211,7 +211,7 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 						const auto precision_old = ofs.precision(15);
 					ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<"\t"<<i4<<std::endl;
 						ofs.precision(precision_old);
-						ofs.unsetf(ostream::floatfield);
+						ofs.unsetf(std::ostream::floatfield);
 					if(flag_print_content)
 						ofs<<m3.second[i4]<<std::endl;
 				}
@@ -222,9 +222,9 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 }
 
 template<typename T1, typename T2, typename T3, typename M>
-static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T2,std::map<T3,M>>> & ms, const bool flag_print_content=true )
+static void ofs_matrixes( const std::string & file_name, const std::map<T1,std::map<T2,std::map<T3,M>>> & ms, const bool flag_print_content=true )
 {
-	ofstream ofs(file_name,ofstream::app);
+	std::ofstream ofs(file_name,std::ofstream::app);
 	for( const auto &m1 : ms )
 	{
 		const auto i1 = m1.first;
@@ -238,7 +238,7 @@ static void ofs_matrixes( const string & file_name, const std::map<T1,std::map<T
 					const auto precision_old = ofs.precision(15);
 				ofs<<"@\t"<<i1<<"\t"<<i2<<"\t"<<i3<<std::endl;
 					ofs.precision(precision_old);
-					ofs.unsetf(ostream::floatfield);
+					ofs.unsetf(std::ostream::floatfield);
 				if(flag_print_content)
 					ofs<<m3.second<<std::endl;
 			}

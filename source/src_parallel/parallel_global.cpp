@@ -168,9 +168,9 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
 		GlobalV::ofs_warning<<"MPI_Init_thread request "<<MPI_THREAD_FUNNELED<<" but provide "<<provided<<std::endl;
 //----------------------------------------------------------
 // int atoi ( const char * str );
-// atoi : Convert string to int type
-// atof : Convert string to double type
-// atol : Convert string to long int type
+// atoi : Convert std::string to int type
+// atof : Convert std::string to double type
+// atol : Convert std::string to long int type
 //----------------------------------------------------------
 //  GlobalV::NPOOL = atoi(argv[1]); // mohan abandon 2010-06-09
 

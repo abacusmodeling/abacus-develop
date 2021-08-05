@@ -17,7 +17,7 @@ void Exx_Abfs::Inverse_Matrix_Double::cal_inverse( const Method &method )
 {
 	#if TEST_EXX_LCAO==1
 		static int i=0;
-		ofstream ofs("inverse_matrix_"+TO_STRING(i));
+		std::ofstream ofs("inverse_matrix_"+TO_STRING(i));
 		ofs<<A<<std::endl;
 		ofs.close();
 		++i;

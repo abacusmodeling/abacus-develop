@@ -3,7 +3,7 @@
 #include "../module_base/blas_connector.h"
 
 
-void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
+void Local_Orbital_Charge::read_dm(const int &is, const std::string &fn)
 {
     TITLE("Local_Orbital_Charge","read_dm");
     timer::tick("Local_Orbital_Charge","read_dm");
@@ -13,7 +13,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
     //bool quit_mesia = false;
     bool quit_abacus = false;
 
-    ifstream ifs;
+    std::ifstream ifs;
     if(GlobalV::MY_RANK==0)
     {
         ifs.open(fn.c_str());
@@ -29,7 +29,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
             // quit the program or not.
             bool quit=false;
 
-            string name;
+            std::string name;
             ifs >> name;
 
             // check lattice constant, unit is Angstrom
@@ -54,7 +54,7 @@ void Local_Orbital_Charge::read_dm(const int &is, const string &fn)
                 CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
             }
 
-            string coordinate;
+            std::string coordinate;
             ifs >> coordinate;
 
             for(int it=0; it<GlobalC::ucell.ntype; it++)

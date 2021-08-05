@@ -52,7 +52,7 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 		}
 		else if ( charge.mixing_mode == "kerker" )
 		{
-			throw invalid_argument("mixing density matrix can't be kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix can't be kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 		else if ( charge.mixing_mode == "pulay" )
 		{
@@ -60,11 +60,11 @@ void Exx_Abfs::DM::cal_DMk_mixing(
 		}
 		else if ( charge.mixing_mode == "pulay-kerker" )
 		{
-			throw invalid_argument("mixing density matrix can't be pulay-kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix can't be pulay-kerker. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 		else
 		{
-			throw invalid_argument("mixing density matrix error. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("mixing density matrix error. In "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		}
 	}
 	else

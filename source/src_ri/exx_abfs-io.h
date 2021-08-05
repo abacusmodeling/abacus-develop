@@ -15,7 +15,7 @@ class Exx_Abfs::IO
 {
 public:
 	static void print_matrix( 
-		const string &file_name_prefix, 
+		const std::string &file_name_prefix, 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
@@ -26,29 +26,29 @@ public:
 		
 	static std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> construct_abfs( 
 		const LCAO_Orbitals &orbs,
-		const std::vector<string> &files_abfs,
+		const std::vector<std::string> &files_abfs,
 		const double kmesh_times=1 );				// close dK, keep Kcut	
 		
 	static std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> construct_abfs( 
 		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &abfs_pre, 	
 		const LCAO_Orbitals &orbs,
-		const std::vector<string> &files_abfs,
+		const std::vector<std::string> &files_abfs,
 		const double kmesh_times=1 );				// close dK, keep Kcut
 		
 	template<typename T>
-	static void output_binary( const T &data, const string &file_name );
+	static void output_binary( const T &data, const std::string &file_name );
 	template<typename T>
-	static T input_binary( const string &file_name );
+	static T input_binary( const std::string &file_name );
 	template<typename T>
-	static void output_text( const T &data, const string &file_name );
+	static void output_text( const T &data, const std::string &file_name );
 	template<typename T>
-	static T input_text( const string &file_name );
+	static T input_text( const std::string &file_name );
 	template<typename T>
 	static void bcast( T &data, const int rank_src, MPI_Comm mpi_comm );
 	
 private:
 	static std::vector<std::vector<Numerical_Orbital_Lm>> construct_abfs_T(
-		const string & file_name,
+		const std::string & file_name,
 		const int &T,
 		const int &nk,
 		const double &dk,

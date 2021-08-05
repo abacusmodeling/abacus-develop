@@ -11,13 +11,13 @@
 
 void Restart::write_file1(const std::string &file_name, const void*const ptr, const size_t size) const
 {
-	ofstream ofs(file_name, ofstream::binary|ofstream::trunc);
+	std::ofstream ofs(file_name, std::ofstream::binary|std::ofstream::trunc);
 	ofs.write(static_cast<const char*>(ptr),size);
 }
 
 void Restart::read_file1(const std::string &file_name, void*const ptr, const size_t size) const
 {
-	ifstream ifs(file_name, ifstream::binary);
+	std::ifstream ifs(file_name, std::ifstream::binary);
 	ifs.read(static_cast<char*>(ptr),size);
 }
 

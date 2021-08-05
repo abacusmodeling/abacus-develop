@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <map>
-#include<string>
+#include <string>
 
 class Conv_Coulomb_Pot_K
 {

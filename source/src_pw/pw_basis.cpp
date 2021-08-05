@@ -122,7 +122,7 @@ void PW_Basis::set
 
 
 // initialize of plane wave basis.
-void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vectors &Klist_in)
+void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_Vectors &Klist_in)
 {
     TITLE("PW_Basis","gen_pw");
     timer::tick("PW_Basis","gen_pw");
@@ -297,7 +297,7 @@ void PW_Basis::gen_pw(ofstream &runlog, const UnitCell &Ucell_in, const K_Vector
         /*
         stringstream ss;
         ss << "./out_data/ig2fftc.dat" << cutgg_delta;
-        ofstream ofsc( ss.str().c_str() );
+        std::ofstream ofsc( ss.str().c_str() );
 
         ofsc << "\n ig2fftc" << std::endl;
         for(int ig=0; ig<ngmc; ig++)
@@ -593,8 +593,8 @@ void PW_Basis::get_MPI_GVectors(void)
 //        stringstream ssc,ssw;
 //        ssc << GlobalV::global_out_dir << "test.FFT_chg";
 //        ssw << GlobalV::global_out_dir << "test.FFT_wfc";
-//        ofstream charge_data( ssc.str().c_str() );
-//        ofstream wavefun_data( ssw.str().c_str() );
+//        std::ofstream charge_data( ssc.str().c_str() );
+//        std::ofstream wavefun_data( ssw.str().c_str() );
 //        FFT_chg.print_data(charge_data);
 //        FFT_wfc.print_data(wavefun_data);
 //        charge_data.close();
@@ -739,9 +739,9 @@ void PW_Basis::setup_structure_factor(void)			// Peize Lin optimize and add Open
     this->strucFac.create(Ucell->ntype, this->ngmc);
     Memory::record("PW_Basis","struc_fac", Ucell->ntype*this->ngmc,"complexmatrix");
 
-//	string outstr;
+//	std::string outstr;
 //	outstr = GlobalV::global_out_dir + "strucFac.dat"; 
-//	ofstream ofs( outstr.c_str() ) ;
+//	std::ofstream ofs( outstr.c_str() ) ;
 
     for (int it=0; it<Ucell->ntype; it++)
     {
@@ -1030,7 +1030,7 @@ void PW_Basis::columns_and_pw_distribution_2(void)
 
 //LiuXh add a new function here,
 //20180515
-void PW_Basis::update_gvectors(ofstream &runlog, const UnitCell &Ucell_in)
+void PW_Basis::update_gvectors(std::ofstream &runlog, const UnitCell &Ucell_in)
 {
     TITLE("PW_Basis","update_gvectors");
     timer::tick("PW_Basis","update_gvectors");

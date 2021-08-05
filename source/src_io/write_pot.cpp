@@ -5,7 +5,7 @@
 void Potential::write_potential(
 	const int &is, 
 	const int &iter, 
-	const string &fn, 
+	const std::string &fn, 
 	const matrix &v, 
 	const int &precision, 
 	const int &hartree)const
@@ -26,7 +26,7 @@ void Potential::write_potential(
     }
     timer::tick("potential","write_potential");
 
-    ofstream ofs;
+    std::ofstream ofs;
 
     if(GlobalV::MY_RANK==0)
     {
@@ -196,7 +196,7 @@ void Potential::write_potential(
 }
 
 
-void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
+void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_ave)
 {
     TITLE("Potential","write_elecstat_pot");
     timer::tick("Potential","write_elecstat_pot");
@@ -261,8 +261,8 @@ void Potential::write_elecstat_pot(const string &fn, const string &fn_ave)
     //-------------------------------------------
     // output the electrostatic potential into a file.
     //-------------------------------------------
-    ofstream ofs;
-    ofstream ofs_ave;
+    std::ofstream ofs;
+    std::ofstream ofs_ave;
 
     if(GlobalV::MY_RANK==0)
     {

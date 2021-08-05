@@ -275,7 +275,7 @@ void Chi0_standard:: Chi()
 		{
 			stringstream sseps;
 			sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
-			ofstream ofseps(sseps.str().c_str());
+			std::ofstream ofseps(sseps.str().c_str());
 			ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<std::endl;
 			for(int i=0; i<nomega; i++)
 			{

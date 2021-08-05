@@ -235,7 +235,7 @@ void Lattice_Change_Basic::terminate(void)
 		OUT(GlobalV::ofs_running,"update iteration", Lattice_Change_Basic::update_iter);
 		/*
 		GlobalV::ofs_running<<"Saving the approximate inverse hessian"<<std::endl;
-		ofstream hess("hess.out");
+		std::ofstream hess("hess.out");
 		for(int i=0;i<dim;i++)
 		{
 			for(int j=0;j<dim;j++)

@@ -68,8 +68,8 @@ void HS_Matrix::save_HS_ccf(const int &iter, const int &Hnnz, const int *colptr_
         
     if(!bit)
     {
-        ofstream g1(ssh.str().c_str());
-        ofstream g2(sss.str().c_str());
+        std::ofstream g1(ssh.str().c_str());
+        std::ofstream g2(sss.str().c_str());
 
         g1 << GlobalV::NLOCAL << " " << Hnnz << std::endl;
         g2 << GlobalV::NLOCAL << " " << Hnnz << std::endl;
@@ -223,8 +223,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     else
     {
 #ifdef __MPI
-        ofstream g1;
-        ofstream g2;
+        std::ofstream g1;
+        std::ofstream g2;
 
         if (GlobalV::DRANK==0)
         {
@@ -302,19 +302,19 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     //MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
     //MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
-    string H_fn;
+    std::string H_fn;
     stringstream H_fn2;
     H_fn2<< "data-H-"  << GlobalV::DRANK ;
     H_fn=H_fn2.str();
-    ofstream ofs_H;
+    std::ofstream ofs_H;
     ofs_H.open(H_fn.c_str());
     ofs_H<<setprecision(8) << setw(12);
 
-    string S_fn;
+    std::string S_fn;
     stringstream S_fn2;
     S_fn2<< "data-S-"  << GlobalV::DRANK ;
     S_fn=S_fn2.str();
-    ofstream ofs_S;
+    std::ofstream ofs_S;
     ofs_S.open(S_fn.c_str());
     ofs_S<<setprecision(8) << setw(12);
 
@@ -342,8 +342,8 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
          }
 //LiuXH add 2015-12-17,end*/
 #else
-        ofstream g1(ssh.str().c_str());
-        ofstream g2(sss.str().c_str());
+        std::ofstream g1(ssh.str().c_str());
+        std::ofstream g2(sss.str().c_str());
 
         g1 << GlobalV::NLOCAL;
         g2 << GlobalV::NLOCAL;
@@ -502,8 +502,8 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
     else
     {
 #ifdef __MPI
-        ofstream g1;
-        ofstream g2;
+        std::ofstream g1;
+        std::ofstream g2;
 
         if (GlobalV::DRANK==0)
         {
@@ -581,19 +581,19 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
         //MPI_Comm_size(DIAG_HPSEPS_WORLD,&nprocs);
         //MPI_Comm_rank(DIAG_HPSEPS_WORLD,&myid);
 
-        string H_fn;
+        std::string H_fn;
         stringstream H_fn2;
         H_fn2<< "data-H-"  << GlobalV::DRANK ;
         H_fn=H_fn2.str();
-        ofstream ofs_H;
+        std::ofstream ofs_H;
         ofs_H.open(H_fn.c_str());
         ofs_H<<setprecision(8) << setw(12);
 
-        string S_fn;
+        std::string S_fn;
         stringstream S_fn2;
         S_fn2<< "data-S-"  << GlobalV::DRANK ;
         S_fn=S_fn2.str();
-        ofstream ofs_S;
+        std::ofstream ofs_S;
         ofs_S.open(S_fn.c_str());
         ofs_S<<setprecision(8) << setw(12);
 
@@ -621,8 +621,8 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
          }
 //LiuXH add 2015-12-17,end*/
 #else
-        ofstream g1(ssh.str().c_str());
-        ofstream g2(sss.str().c_str());
+        std::ofstream g1(ssh.str().c_str());
+        std::ofstream g2(sss.str().c_str());
 
         g1 << GlobalV::NLOCAL;
         g2 << GlobalV::NLOCAL;
@@ -662,8 +662,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     //sss << GlobalV::global_out_dir << "data-SR-tr_SPIN";
 
 #ifdef __MPI
-    ofstream g1;
-    ofstream g2;
+    std::ofstream g1;
+    std::ofstream g2;
 
     if(GlobalV::DRANK==0)
     {
@@ -839,8 +839,8 @@ void HS_Matrix::save_HSR_tr(const int current_spin)
     }
 
 #else
-    ofstream g1(ssh.str().c_str());
-    ofstream g2(sss.str().c_str());
+    std::ofstream g1(ssh.str().c_str());
+    std::ofstream g2(sss.str().c_str());
 
     g1 << GlobalV::NLOCAL;
     g2 << GlobalV::NLOCAL;
@@ -939,8 +939,8 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
     stringstream sss;
     ssh << GlobalV::global_out_dir << "data-HR-sparse_SPIN" << current_spin << ".csr";
     sss << GlobalV::global_out_dir << "data-SR-sparse_SPIN" << current_spin << ".csr";
-    ofstream g1;
-    ofstream g2;
+    std::ofstream g1;
+    std::ofstream g2;
 
     if(GlobalV::DRANK==0)
     {
@@ -1081,7 +1081,7 @@ void HS_Matrix::save_HSR_sparse(const int &current_spin, const double &sparse_th
     return;
 }
 
-void HS_Matrix::output_single_R(ofstream &ofs, const std::map<size_t, std::map<size_t, double>> &XR, const double &sparse_threshold, const bool &binary)
+void HS_Matrix::output_single_R(std::ofstream &ofs, const std::map<size_t, std::map<size_t, double>> &XR, const double &sparse_threshold, const bool &binary)
 {
     double *line = nullptr;
     std::vector<int> indptr;
@@ -1090,8 +1090,8 @@ void HS_Matrix::output_single_R(ofstream &ofs, const std::map<size_t, std::map<s
 
     stringstream tem1;
     tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
-    ofstream ofs_tem1;
-    ifstream ifs_tem1;
+    std::ofstream ofs_tem1;
+    std::ifstream ifs_tem1;
 
     if (GlobalV::DRANK == 0)
     {
@@ -1190,7 +1190,7 @@ void HS_Matrix::output_single_R(ofstream &ofs, const std::map<size_t, std::map<s
 
 }
 
-void HS_Matrix::output_soc_single_R(ofstream &ofs, const std::map<size_t, std::map<size_t, std::complex<double>>> &XR, const double &sparse_threshold, const bool &binary)
+void HS_Matrix::output_soc_single_R(std::ofstream &ofs, const std::map<size_t, std::map<size_t, std::complex<double>>> &XR, const double &sparse_threshold, const bool &binary)
 {
     std::complex<double> *line = nullptr;
     std::vector<int> indptr;
@@ -1199,8 +1199,8 @@ void HS_Matrix::output_soc_single_R(ofstream &ofs, const std::map<size_t, std::m
 
     stringstream tem1;
     tem1 << GlobalV::global_out_dir << "temp_sparse_indices.dat";
-    ofstream ofs_tem1;
-    ifstream ifs_tem1;
+    std::ofstream ofs_tem1;
+    std::ifstream ifs_tem1;
 
     if (GlobalV::DRANK == 0)
     {

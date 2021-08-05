@@ -32,8 +32,8 @@ public:
 	double rs6;
 	double s18;
 	double rs18;
-    string version;
-    string model;
+    std::string version;
+    std::string model;
 	Vector3<int> period;
 
     // internal used

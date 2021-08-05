@@ -425,7 +425,7 @@ void Chi0_hilbert::Chi()
 			stringstream ss;
 			ss << GlobalV::global_out_dir <<"nearest.dat";
 			std::cout << ss.str().c_str() << std::endl;
-			ifstream ifsn(ss.str().c_str());
+			std::ifstream ifsn(ss.str().c_str());
 			if(!ifsn)
 			{
 				WARNING_QUIT("chi0_hilbert", "Can't find the nearest.dat file!");
@@ -516,7 +516,7 @@ void Chi0_hilbert::Chi()
 				//std::cout << "begin overlap"<<std::endl;
 				stringstream ssq;
 				ssq << GlobalV::global_out_dir <<"q_"<<icount;
-				ifstream ifso(ssq.str().c_str());
+				std::ifstream ifso(ssq.str().c_str());
 				if (!ifso)
 				{
 					WARNING_QUIT("chi0_hilbert", "Can't find the overlap_q file!");
@@ -1463,7 +1463,7 @@ void Chi0_hilbert::Cal_Chi0s(int iq)
 	// some test(use our program's wavefunction and other program's occupation to check)
 	//---------------------------------------------------------------------------------
 	/*double Q[GlobalC::kv.nks][GlobalV::NBANDS];
-	ifstream ifs("band.dat");
+	std::ifstream ifs("band.dat");
 	if(!ifs)
 	{
 		WARNING_QUIT("chi0_hilbert","Can't find band.dat");
@@ -1885,7 +1885,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 	{
 		stringstream sschi;
 		sschi << GlobalV::global_out_dir << "chi_"<<iq<<".dat";
-		ofstream ofschi(sschi.str().c_str());
+		std::ofstream ofschi(sschi.str().c_str());
 		for(int i=0;i<nomega;i++)
 		{
 			ofschi << i * domega <<"   "<<gather_chi[i].real()<<"   "<<gather_chi[i].imag() <<std::endl;
@@ -1897,7 +1897,7 @@ void Chi0_hilbert::Cal_Chi(int iq)
 	{
 		stringstream sseps;
 		sseps << GlobalV::global_out_dir << "Imeps^-1_"<<iq<<".dat";
-		ofstream ofseps(sseps.str().c_str());
+		std::ofstream ofseps(sseps.str().c_str());
 		ofseps<<"Energy(Ry)"<<"   "<<"-Im{epsilon^-1}"<<std::endl;
 		if(!coulomb_cutoff)
 		{
@@ -2544,7 +2544,7 @@ void Chi0_hilbert::plot_chi0(int iq)
 {
 	stringstream ss;
 	ss << GlobalV::global_out_dir <<"chi0"<<"_"<<iq<<".dat";
-	ofstream ofs(ss.str().c_str());
+	std::ofstream ofs(ss.str().c_str());
 	for(int i=0;i<nomega;i++)
 	{
 		ofs <<i*domega<<"    "<<chi0[0][i].real()<<"    "<<chi0[0][i].imag()<<std::endl;

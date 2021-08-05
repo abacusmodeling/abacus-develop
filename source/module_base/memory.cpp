@@ -20,8 +20,8 @@ int Memory::n_memory = 500;
 int Memory::n_now = 0;
 bool Memory::init_flag =  false;
 
-string *Memory::name;
-string *Memory::class_name;
+std::string *Memory::name;
+std::string *Memory::class_name;
 double *Memory::consume;
 
 Memory::Memory()
@@ -32,7 +32,7 @@ Memory::~Memory()
 {
 }
 
-double Memory::calculate_mem(const long &n_in,const string &type)
+double Memory::calculate_mem(const long &n_in,const std::string &type)
 {
 	double n = static_cast<double>(n_in);
 	double mem = 0.0;
@@ -88,17 +88,17 @@ double Memory::calculate_mem(const long &n_in,const string &type)
 
 double Memory::record
 (
- 	const string &class_name_in,
-	const string &name_in,
+ 	const std::string &class_name_in,
+	const std::string &name_in,
 	const long &n_in,
-	const string &type,
+	const std::string &type,
 	const bool accumulate
 )
 {
 	if(!Memory::init_flag)
 	{
-		name = new string[n_memory];
-		class_name = new string[n_memory];
+		name = new std::string[n_memory];
+		class_name = new std::string[n_memory];
 		consume = new double[n_memory];
 		for(int i=0;i<n_memory;i++)
 		{
@@ -146,7 +146,7 @@ void Memory::print(const int find)
 }
 
 
-void Memory::finish(ofstream &ofs)
+void Memory::finish(std::ofstream &ofs)
 {
 	print_all(ofs);
 	if(init_flag)
@@ -159,7 +159,7 @@ void Memory::finish(ofstream &ofs)
 	return;
 }
 
-void Memory::print_all(ofstream &ofs)
+void Memory::print_all(std::ofstream &ofs)
 {
 //	std::cout<<"\n init_flag="<<init_flag;
 	if(!init_flag) return;

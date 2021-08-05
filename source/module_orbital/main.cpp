@@ -21,7 +21,7 @@ void calculate()
 {
 	ORB_control ooo;
 
-	ofstream ofs("log.txt");
+	std::ofstream ofs("log.txt");
 
 //	ooo.set_orb_tables();
 

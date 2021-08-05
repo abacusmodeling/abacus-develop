@@ -2,17 +2,17 @@
 //int Number[2]; // added by zhangwenshuai
 
 //qianrui rewrite it 2021-5-10
-int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
+int Pseudopot_upf::read_pseudo_upf201(std::ifstream &ifs)
 {
 
-    string word;
+    std::string word;
     int ONCVPSP;
 	//--------------------------------------
 	//-              PP_HEADER             - 
 	//--------------------------------------
 	if(!SCAN_BEGIN(ifs,"<PP_HEADER"))	WARNING_QUIT("read_pseudo_upf201","Found no PP_HEADER");
-	string *name=new string[50];
-	string *val=new string[50];
+	std::string *name=new std::string[50];
+	std::string *val=new std::string[50];
 	int nparameter;
 	this->getnameval(ifs, nparameter, name, val);
 	ONCVPSP = 1;
@@ -98,7 +98,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 		}
 		else
 		{
-			string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+			std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
 			WARNING("PP_HEADRER reading", warningstr);
 		}
 	}
@@ -119,7 +119,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="zmesh"){}
 			else
 			{
-				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
 				WARNING("PP_MESH reading", warningstr);
 			}
 
@@ -219,7 +219,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="ultrasoft_cutoff_radius"){}
 			else
 			{
-				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
 				WARNING("PP_BETA reading", warningstr);
 			}
 		}
@@ -256,7 +256,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 	delete[] els;
 	delete[] lchi;
 	delete[] oc;
-	this->els = new string[nwfc];
+	this->els = new std::string[nwfc];
 	this->lchi = new int[nwfc];
 	this->oc = new double[nwfc];
 	ZEROS(lchi, nwfc); // angular momentum of each orbital
@@ -287,7 +287,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			else if(name[ip]=="ultrasoft_cutoff_radius"){}
 			else
 			{
-				string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+				std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
 				WARNING("PP_CHI reading", warningstr);
 			}
 		}
@@ -348,7 +348,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					}
 					else
 					{
-						string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+						std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
 						WARNING("PP_RELBETA reading", warningstr);
 					}
 				}
@@ -380,7 +380,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 					}
 					else
 					{
-						string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
+						std::string warningstr = name[ip] + " is not read in. Please add this parameter in read_pp_upf201.cpp if needed.";
 						WARNING("PP_RELWFC reading", warningstr);
 					}
 				}
@@ -467,7 +467,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 
 			READ_VALUE(ifs, word);   // is_coulomb
 			ifs >> word;   // has_so
-			string so;
+			std::string so;
 
 			if(word == "has_so=\"")
 			{
@@ -493,7 +493,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			READ_VALUE(ifs, word);   // has_wfc
 			READ_VALUE(ifs, word);   // has_gipaw
 
-			string nlc;
+			std::string nlc;
 			//char p[13] = "paw_as_gipaw";
 			ifs >> word;             // paw_as_gipaw?
 			//std::cout << "word.substr(0,30) = " << word.substr(0,30) << "."<< std::endl;
@@ -548,7 +548,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			//                        this->dft[2]="NOGX";
 			//                        this->dft[3]="NOGC";
 
-			string funcstr;  //{zws 01-06-16
+			std::string funcstr;  //{zws 01-06-16
 			wdsstream.str("");
 			wdsstream.clear();
 			wdsstream << word;
@@ -993,7 +993,7 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 			delete[] els;
 			delete[] lchi;
 			delete[] oc;
-			this->els = new string[nwfc];
+			this->els = new std::string[nwfc];
 			this->lchi = new int[nwfc];
 			this->oc = new double[nwfc];
 			ZEROS(lchi, nwfc); // angular momentum of each orbital
@@ -1176,9 +1176,9 @@ int Pseudopot_upf::read_pseudo_upf201(ifstream &ifs)
 	}
 	return 0;*/
 }
-void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val)
+void Pseudopot_upf:: getnameval(std::ifstream& ifs,int &n, std::string * name, std::string *val)
 {
-	string txt,word;
+	std::string txt,word;
 	//get long txt
 	ifs>>txt;
 	while(ifs>>word)
@@ -1197,7 +1197,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 	while(1)
 	{
 		pos = txt.find("=",pos);
-		if(pos == string::npos) break;
+		if(pos == std::string::npos) break;
 		pos++;
 		n++;
 	}
@@ -1215,7 +1215,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 		ll=pos2-pos;
 		name[i] = txt.substr(pos,ll);
 		//std::cout<<i<<" "<<name[i]<<std::endl;
-		string mark;
+		std::string mark;
 		bool findmark=false;
 		for(int j = 0; j < 100; ++j)//The mark can be ' or " or .
 		{
@@ -1232,7 +1232,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 		pos = pos2;
 		pos2 = txt.find(mark,pos);
 		ll=pos2-pos;
-		string tmpval = txt.substr(pos,ll);
+		std::string tmpval = txt.substr(pos,ll);
 		tmpval = trim(tmpval);
 		val[i]=tmpval;
 		pos=pos2+1;
@@ -1248,7 +1248,7 @@ void Pseudopot_upf:: getnameval(ifstream& ifs,int &n, string * name, string *val
 	return;
 }
 
-/*void Pseudopot_upf::get_char( string ss)
+/*void Pseudopot_upf::get_char( std::string ss)
 {
     int i, q;
     //char b[1]; //LiuXh 20171109

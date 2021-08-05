@@ -89,7 +89,7 @@ private:
 
 	double CG(int l1, int m1, int l2, int m2, int L, int M);
 
-	void print_vnl(ofstream &ofs);
+	void print_vnl(std::ofstream &ofs);
 	#ifdef __LCAO
 	ORB_gaunt_table MGT;
 	#endif

@@ -87,7 +87,7 @@ Func_Type Gram_Schmidt_Orth<Func_Type,R_Type>::cal_norm( const std::vector<Func_
 		}
 		default:
 		{
-			throw invalid_argument("coordinate must be Cartesian or Sphere "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument("coordinate must be Cartesian or Sphere "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 			break;
 		}
 	}

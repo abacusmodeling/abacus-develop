@@ -27,7 +27,7 @@ Input::~Input()
 	delete[] angle2;
 }
 
-void Input::Init(const string &fn)
+void Input::Init(const std::string &fn)
 {
 	timer::tick("Input","Init");
     this->Default();
@@ -474,13 +474,13 @@ void Input::Default(void)
     return;
 }
 
-bool Input::Read(const string &fn)
+bool Input::Read(const std::string &fn)
 {
     TITLE("Input","Read");
 
     if (GlobalV::MY_RANK!=0) return false;
 
-    ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
+    std::ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
 
     if (!ifs) 
 	{
@@ -1796,7 +1796,7 @@ bool Input::Read(const string &fn)
     	while (ifs.good())
     	{
   			ifs >> word1;
-  			strtolower(word1, word);     //convert uppercase string to lower case; word1 --> word
+  			strtolower(word1, word);     //convert uppercase std::string to lower case; word1 --> word
 	
 			if(strcmp("dftu_type",word)==0)
 			{	
@@ -2542,11 +2542,11 @@ void Input::Check(void)
         if(mdp.tlast  < 0.0) mdp.tlast = mdp.tfirst;
         if(mdp.tfirst!=mdp.tlast)
         {
-            ifstream file1;
+            std::ifstream file1;
             file1.open("ChangeTemp.dat");
             if(!file1)                      // Peize Lin fix bug 2016-08-06
            {
-                ofstream file;
+                std::ofstream file;
                 file.open("ChangeTemp.dat");
                 for(int ii=0;ii<30;ii++)
                 {
@@ -2998,7 +2998,7 @@ void Input::Check(void)
 		}
 	}
 
-	const string ss = "test -d " + read_file_dir;
+	const std::string ss = "test -d " + read_file_dir;
 	if(read_file_dir=="auto")
 	{
 		GlobalV::global_readin_dir = GlobalV::global_out_dir;
@@ -3021,9 +3021,9 @@ void Input::close_log(void)const
     Global_File::close_all_log(GlobalV::MY_RANK, this->out_alllog);
 }
 
-void Input::readbool(ifstream &ifs, bool &var)
+void Input::readbool(std::ifstream &ifs, bool &var)
 {
-    string str;
+    std::string str;
     ifs >> str;
     if (str == "true")
     {

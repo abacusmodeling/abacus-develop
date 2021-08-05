@@ -463,7 +463,7 @@ void YlmReal::Ylm_Real
             {
             	if(my_rank==0)
             	{
-            		ofstream ofs("Log2.txt");
+            		std::ofstream ofs("Log2.txt");
             		for(int ig=0; ig<ng; ig++)
             		{
             			if(ig%1==0) ofs << "\n";
@@ -494,7 +494,7 @@ void YlmReal::Ylm_Real
     			{
     				if(my_rank==0)
     				{
-    					ofstream ofs("Log1.txt");
+    					std::ofstream ofs("Log1.txt");
     					for(int ig=0; ig<ng; ig++)
     					{
     						if(ig%6==0) ofs << "\n";

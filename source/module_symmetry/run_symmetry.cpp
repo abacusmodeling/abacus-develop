@@ -26,11 +26,11 @@ int main(int argc, char **argv)
 
 void calculate()
 {
-	//ofstream ofs("log.txt");
-	ofstream ofs_running("log.txt");
-	ofstream ofs("useless.txt");
-	ofstream ofs_warning("warning.txt");
-	ifstream ifs("INPUT");
+	//std::ofstream ofs("log.txt");
+	std::ofstream ofs_running("log.txt");
+	std::ofstream ofs("useless.txt");
+	std::ofstream ofs_warning("warning.txt");
+	std::ifstream ifs("INPUT");
 	UnitCell_pseudo ucell;
 	Symmetry symm;
 	ifs >> ucell.ntype;

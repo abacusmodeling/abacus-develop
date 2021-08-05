@@ -20,7 +20,7 @@ void MD_thermo::init_NHC(
     const double &NVT_tau_in, 
     const double &dt_in,
     const int &NVT_control, 
-    ofstream &ofs, 
+    std::ofstream &ofs, 
     const int &numIon,
     const double &temperature,
     const Vector3<double>* vel,
@@ -493,7 +493,7 @@ void MD_thermo::NHC_info_out(const int& step, const int& recordFreq, const int& 
 	if(!GlobalV::MY_RANK){
 		stringstream ssc;
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
-		ofstream file(ssc.str().c_str(), ios::app);
+		std::ofstream file(ssc.str().c_str(), ios::app);
         file<<'\n';
 		file<<"MD_THERMOSTAT"<<std::endl;
 		file<<"MNHC: "<<MNHC_<<std::endl;
@@ -526,7 +526,7 @@ void MD_thermo::NHC_restart()
 	{
 		stringstream ssc;
 		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
-		ifstream file(ssc.str().c_str());
+		std::ifstream file(ssc.str().c_str());
 
         char word[80];
         int mnhc;

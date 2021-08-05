@@ -199,10 +199,10 @@ void berryphase::set_kpoints(const int direction)
 	/*
 	GlobalV::ofs_running << "direction is " << direction << std::endl;
 	GlobalV::ofs_running << "nppstr = " << nppstr << std::endl;
-	GlobalV::ofs_running << "total string is " << total_string << std::endl;
+	GlobalV::ofs_running << "total std::string is " << total_string << std::endl;
 	for(int istring = 0; istring < total_string; istring++)
 	{
-		GlobalV::ofs_running << " the string is " << istring << std::endl;
+		GlobalV::ofs_running << " the std::string is " << istring << std::endl;
 		for(int count = 0; count < nppstr; count++)
 		{
 			GlobalV::ofs_running << "(" << GlobalC::kv.kvec_c[ k_index[istring][count] ].x << ","
@@ -225,7 +225,7 @@ double berryphase::stringPhase(int index_str, int nbands)
 	int ik_2;
 	Vector3<double> G(0.0,0.0,0.0);
 	Vector3<double> dk = GlobalC::kv.kvec_c[ k_index[index_str][1] ] - GlobalC::kv.kvec_c[ k_index[index_str][0] ];
-	//GlobalV::ofs_running << "the string index is " << index_str << std::endl;
+	//GlobalV::ofs_running << "the std::string index is " << index_str << std::endl;
 	
 	for(int k_start = 0; k_start < (nppstr-1); k_start++)
 	{
@@ -377,7 +377,7 @@ void berryphase::Berry_Phase(int nbands, double &pdl_elec_tot, int &mod_elec_tot
 	
 	// electron polarization
 	
-	// get weight of every string 
+	// get weight of every std::string 
 	for(int istring = 0; istring < total_string; istring++)
 	{
 		wistring[istring] = 1.0 / total_string;
@@ -672,7 +672,7 @@ void berryphase::Macroscopic_polarization()
 	return;
 }
 
-string berryphase::outFormat(const double polarization, const double modulus, const Vector3<double> project)
+std::string berryphase::outFormat(const double polarization, const double modulus, const Vector3<double> project)
 {
 	stringstream outStr;
 	outStr << setw(12) << fixed << setprecision(7) << polarization << "  (mod " ;

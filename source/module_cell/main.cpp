@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 void calculate()
 {
 
-	ofstream ofs("log.txt");
+	std::ofstream ofs("log.txt");
 
 //	ooo.set_orb_tables();
 

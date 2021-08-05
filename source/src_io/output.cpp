@@ -2,7 +2,7 @@
 
 #include "output.h"
 
-void output::printrm(ofstream &ofs,const string &s, const matrix &m, const double &limit) const
+void output::printrm(std::ofstream &ofs,const std::string &s, const matrix &m, const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -29,7 +29,7 @@ void output::printrm(ofstream &ofs,const string &s, const matrix &m, const doubl
     return;
 }
 
-void output::printrm(const string &s, const matrix &m, const double &limit) const
+void output::printrm(const std::string &s, const matrix &m, const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -55,7 +55,7 @@ void output::printrm(const string &s, const matrix &m, const double &limit) cons
     return;
 }
 
-void output::printcm_norm(ofstream &ofs, const string &s, const ComplexMatrix &m, const double &limit)const
+void output::printcm_norm(std::ofstream &ofs, const std::string &s, const ComplexMatrix &m, const double &limit)const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -75,7 +75,7 @@ void output::printcm_norm(ofstream &ofs, const string &s, const ComplexMatrix &m
     return;
 }
 
-void output::printcm_norm(const string &s, const ComplexMatrix &m, const double &limit)const
+void output::printcm_norm(const std::string &s, const ComplexMatrix &m, const double &limit)const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -96,7 +96,7 @@ void output::printcm_norm(const string &s, const ComplexMatrix &m, const double 
 }
 
 
-void output::printcm(ofstream &ofs, const string &s, const ComplexMatrix &m) const
+void output::printcm(std::ofstream &ofs, const std::string &s, const ComplexMatrix &m) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -117,7 +117,7 @@ void output::printcm(ofstream &ofs, const string &s, const ComplexMatrix &m) con
     return;
 }//end print cm
 
-void output::printcm(const string &s, const ComplexMatrix &m) const
+void output::printcm(const std::string &s, const ComplexMatrix &m) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -136,7 +136,7 @@ void output::printcm(const string &s, const ComplexMatrix &m) const
     return;
 }
 
-void output::printcm_real_limit_hermit(const string &s, const ComplexMatrix &m,const double &limit) const
+void output::printcm_real_limit_hermit(const std::string &s, const ComplexMatrix &m,const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -157,7 +157,7 @@ void output::printcm_real_limit_hermit(const string &s, const ComplexMatrix &m,c
     return;
 }
 
-void output::printcm_real(const string &s, const ComplexMatrix &m,const double &limit) const
+void output::printcm_real(const std::string &s, const ComplexMatrix &m,const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -180,7 +180,7 @@ void output::printcm_real(const string &s, const ComplexMatrix &m,const double &
 
 
 
-void output::printcm_imag(const string &s, const ComplexMatrix &m,const double &limit) const
+void output::printcm_imag(const std::string &s, const ComplexMatrix &m,const double &limit) const
 {
     const int b1 = m.nr;
     const int b2 = m.nc;
@@ -205,7 +205,7 @@ void output::printcm_imag(const string &s, const ComplexMatrix &m,const double &
 
 
 
-void output::printr3_d(ofstream &ofs, const string &s,const realArray &u) const
+void output::printr3_d(std::ofstream &ofs, const std::string &s,const realArray &u) const
 {
     const int b1 = u.getBound1();
     const int b2 = u.getBound2();
@@ -228,7 +228,7 @@ void output::printr3_d(ofstream &ofs, const string &s,const realArray &u) const
     return;
 }//end printr3_d
 
-void output::printr4_d(ofstream &ofs, const string &s,const realArray &u) const
+void output::printr4_d(std::ofstream &ofs, const std::string &s,const realArray &u) const
 {
     const int b1 = u.getBound1();
     const int b2 = u.getBound2();
@@ -252,7 +252,7 @@ void output::printr4_d(ofstream &ofs, const string &s,const realArray &u) const
                 }
 }//end print4_d
 
-void output::printM3(ofstream &ofs,const string &description, const Matrix3 &m)const
+void output::printM3(std::ofstream &ofs,const std::string &description, const Matrix3 &m)const
 {
     ofs << " " << description << std::endl;
 	ofs << setiosflags(ios::showpos);
@@ -263,7 +263,7 @@ void output::printM3(ofstream &ofs,const string &description, const Matrix3 &m)c
     return;
 }
 
-void output::printM3(const string &description, const Matrix3 &m)const
+void output::printM3(const std::string &description, const Matrix3 &m)const
 {
     std::cout << "\n " << description << std::endl;
     std::cout << setw(20) << m.e11 << setw(20) << m.e12 << setw(20) << m.e13 << "\n"

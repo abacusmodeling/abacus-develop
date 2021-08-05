@@ -13,7 +13,7 @@
 // Then compare the two results.
 // mohan 2013-05-25
 //-----------------------------------------------------------
-int Pseudopot_upf::read_pseudo_vwr(ifstream &ifs)
+int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 {
 	GlobalV::ofs_running << " -------------------------------------------------" << std::endl;
 	std::cout << " READ IN VWR TYPE PSEUDOPOTENTIALS." << std::endl;
@@ -33,7 +33,7 @@ int Pseudopot_upf::read_pseudo_vwr(ifstream &ifs)
 	
 
 	// (1) read in mesh
-	string value;
+	std::string value;
 	int length=0;
 	ifs >> value; length = value.find(","); value.erase(length,1);
 	mesh = std::atoi( value.c_str() );
@@ -98,7 +98,7 @@ int Pseudopot_upf::read_pseudo_vwr(ifstream &ifs)
 	delete[] this->oc;
 	delete[] els;
 	this->oc = new double[nwfc];
-	els = new string[nwfc];
+	els = new std::string[nwfc];
 	// set the value of occupations
 	delete[] lchi;
 	lchi = new int[nwfc];
@@ -140,7 +140,7 @@ int Pseudopot_upf::read_pseudo_vwr(ifstream &ifs)
 	ZEROS(ws,mesh);
 	ZEROS(wp,mesh);
 	ZEROS(wd,mesh);
-	string line;
+	std::string line;
 	if(spd_loc>0 && nlcc==0)
 	{
 		for(int ir=0; ir<mesh; ++ir)

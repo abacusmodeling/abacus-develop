@@ -300,11 +300,11 @@ void Mulliken_Charge::stdout_mulliken(void)
 	if(GlobalV::MY_RANK == 0)
 	{
 		TITLE("Dos","calculate_Mulliken");
-		ofstream fout;
+		std::ofstream fout;
 		const char * fn= "mulliken.txt";
 		fout.open(fn);
-		// ofstream fout;
-		// string wordqf="mulliken.txt";
+		// std::ofstream fout;
+		// std::string wordqf="mulliken.txt";
 		// wordqf += char(GlobalV::MY_RANK + 48);
 		//  wordqf += ".txt";
 		//   fout.open(wordqf.c_str(),ios::app);     
@@ -313,7 +313,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 		double*   sum_l = new double[2];
 		double*   sum_mul = new double[2];
 
-		string Name_Angular[5][11];
+		std::string Name_Angular[5][11];
 		/* decomposed Mulliken charge */
 
 		Name_Angular[0][0] = "s          ";

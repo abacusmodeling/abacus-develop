@@ -12,7 +12,7 @@
 
 std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs(
 	const LCAO_Orbitals &orbs,
-	const std::vector<string> &files_abfs,
+	const std::vector<std::string> &files_abfs,
 	const double kmesh_times )
 {
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> abfs( files_abfs.size() );
@@ -31,7 +31,7 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::constr
 std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::construct_abfs( 
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> & abfs_pre,
 	const LCAO_Orbitals &orbs,
-	const std::vector<string> &files_abfs,
+	const std::vector<std::string> &files_abfs,
 	const double kmesh_times )
 {
 	std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> 
@@ -52,13 +52,13 @@ std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> Exx_Abfs::IO::constr
 }
 
 std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T( 
-	const string & file_name,
+	const std::string & file_name,
 	const int &T,
 	const int &nk,
 	const double &dk,
 	const double &dr_uniform)
 {
-	string label;
+	std::string label;
 	size_t L_size;
 	std::map<size_t,size_t> N_size;
 	size_t meshr;
@@ -68,9 +68,9 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 	/*----------------------
 	  1.read abfs
 	----------------------*/
-	string word;
+	std::string word;
 	
-	ifstream ifs( file_name.c_str() );
+	std::ifstream ifs( file_name.c_str() );
 	if(!ifs)
 		throw runtime_error(" Can't find the abfs ORBITAL file.");	
 	
@@ -90,7 +90,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 			{
 				stringstream ss;
 				ss<<"Lmax>=9 error in "<<__FILE__<<" line "<<__LINE__;
-				throw invalid_argument(ss.str());
+				throw std::invalid_argument(ss.str());
 			}
 		}
 		else if ( "Sorbital-->"==word )
@@ -146,7 +146,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 		ifs >> word;
 		if(word=="Type")
 		{
-			string s_L, s_N;
+			std::string s_L, s_N;
 			ifs >> s_L >> s_N;
 			
 			size_t T,L,N;
@@ -255,7 +255,7 @@ std::vector<std::vector<Numerical_Orbital_Lm>> Exx_Abfs::IO::construct_abfs_T(
 }
 
 void Exx_Abfs::IO::print_matrix( 
-		const string &file_name_prefix, 
+		const std::string &file_name_prefix, 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &matrixes_Q, 
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_S,
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &matrixes_V,
@@ -264,7 +264,7 @@ void Exx_Abfs::IO::print_matrix(
 		const Element_Basis_Index::Range &range_lcaos,
 		const Element_Basis_Index::IndexLNM &index_lcaos )
 {
-	auto print_header = [&]( ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
+	auto print_header = [&]( std::ofstream &ofs, size_t TA, size_t IA, size_t TB, size_t IB )
 	{
 		ofs << GlobalC::ucell.lat0 << std::endl;
 
@@ -355,7 +355,7 @@ void Exx_Abfs::IO::print_matrix(
 		ofs << std::endl;
 	};
 	
-	auto print_Q = [&]( ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
+	auto print_Q = [&]( std::ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
 	{
 		/*---------------------
 		  < jY | Psi >
@@ -405,7 +405,7 @@ void Exx_Abfs::IO::print_matrix(
 	};
 
 
-	auto print_S = [&]( ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
+	auto print_S = [&]( std::ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
 	{
 		/*---------------------
 		  < jY | jY >
@@ -461,7 +461,7 @@ void Exx_Abfs::IO::print_matrix(
 	};
 
 
-	auto print_V = [&]( ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
+	auto print_V = [&]( std::ofstream &ofs, const size_t TA, const size_t IA, const size_t TB, const size_t IB, const double scale=1 )
 	{
 		/*---------------------
 		  < Psi | Psi >
@@ -499,7 +499,7 @@ void Exx_Abfs::IO::print_matrix(
 			{
 				for( size_t IB=((TB==TA)?IA:0); IB!=GlobalC::ucell.atoms[TB].na; ++IB )
 				{
-					ofstream ofs(( file_name_prefix+"matrix_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB) ).c_str());
+					std::ofstream ofs(( file_name_prefix+"matrix_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB) ).c_str());
 					print_header( ofs, TA, IA, TB, IB );
 //					const double scale = 1.0 / max( matrixes_V.at(TA).at(IA).at(TB).at(IB) );
 					const double scale = 1;		// Peize Lin test

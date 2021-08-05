@@ -74,7 +74,7 @@ int WF_Local::read_lowf_complex(std::complex<double> **c, const int &ik, const b
     ss << GlobalV::global_out_dir << "LOWF_K_" << ik+1 <<".dat";
 //	std::cout << " name is = " << ss.str() << std::endl;
 
-    ifstream ifs;
+    std::ifstream ifs;
 
     int error = 0;
 
@@ -245,7 +245,7 @@ int WF_Local::read_lowf(double **c, const int &is)
 		ss << GlobalV::global_out_dir << "LOWF_K.dat";
 	}
 
-    ifstream ifs;
+    std::ifstream ifs;
 
     int error = 0;
 
@@ -357,12 +357,12 @@ int WF_Local::read_lowf(double **c, const int &is)
     return 0;
 }
 
-void WF_Local::write_lowf(const string &name, double **ctot)
+void WF_Local::write_lowf(const std::string &name, double **ctot)
 {
     TITLE("WF_Local","write_lowf");
     timer::tick("WF_Local","write_lowf");
 
-    ofstream ofs;
+    std::ofstream ofs;
     if (GlobalV::DRANK==0)
     {
         ofs.open(name.c_str());
@@ -395,12 +395,12 @@ void WF_Local::write_lowf(const string &name, double **ctot)
     return;
 }
 
-void WF_Local::write_lowf_complex(const string &name, std::complex<double> **ctot, const int &ik)
+void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> **ctot, const int &ik)
 {
     TITLE("WF_Local","write_lowf_complex");
     timer::tick("WF_Local","write_lowf_complex");
 
-    ofstream ofs;
+    std::ofstream ofs;
     if (GlobalV::DRANK==0)
     {
         ofs.open(name.c_str());

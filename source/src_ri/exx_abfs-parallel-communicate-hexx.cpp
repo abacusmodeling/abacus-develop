@@ -20,13 +20,13 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 {
 	/*{
 		static int istep=0;
-		ofstream ofs("HR_exx_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("HR_exx_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		ofs<<HR_exx<<std::endl;
 	}*/
 
 	TITLE("Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D");
 	
-//ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+//std::ofstream ofs_time("time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;	
 
 //gettimeofday( &t_start, NULL);	
@@ -57,7 +57,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 
 	/*{
 		static int istep=0;
-		ofstream ofs("HR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("HR_a2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		ofs<<HR_a2D<<std::endl;
 	}*/
 
@@ -68,7 +68,7 @@ void Exx_Abfs::Parallel::Communicate::Hexx::Rexx_to_Km2D(
 
 	/*{
 		static int istep=0;
-		ofstream ofs("HK_m2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("HK_m2D_"+TO_STRING(istep++)+"_"+TO_STRING(GlobalV::MY_RANK));
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 			ofs<<HK_Gamma_m2D<<std::endl;
 		else

@@ -9,7 +9,7 @@
 // GLOBAL FUNCTION :
 // NAME : TITLE( title for each function )
 //==========================================================
-void TITLE(const string &class_function_name)
+void TITLE(const std::string &class_function_name)
 {
 	return;//no output
 
@@ -23,7 +23,7 @@ void TITLE(const string &class_function_name)
 #endif
 }
 
-void TITLE(const string &class_name,const string &function_name)
+void TITLE(const std::string &class_name,const std::string &function_name)
 {
 	return;//no output
 #ifdef __NORMAL
@@ -37,7 +37,7 @@ void TITLE(const string &class_name,const string &function_name)
     return;
 }
 
-void TITLE(ofstream &ofs,const string &class_name,const string &function_name)
+void TITLE(std::ofstream &ofs,const std::string &class_name,const std::string &function_name)
 {
 	return;// no output
 #ifdef __NORMAL

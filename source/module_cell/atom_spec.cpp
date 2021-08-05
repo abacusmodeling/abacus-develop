@@ -78,7 +78,7 @@ void Atom::set_index(void)
     return;
 }
 
-void Atom::print_Atom(ofstream &ofs, output &outp)
+void Atom::print_Atom(std::ofstream &ofs, output &outp)
 {
     //OUT(ofs,"print_Atom()");
     OUT(ofs,"label",label);

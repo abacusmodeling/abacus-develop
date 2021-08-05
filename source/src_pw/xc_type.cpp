@@ -12,18 +12,18 @@ xcfunc::~xcfunc()
 }
 
 // mohan update 2009-12-15
-const string exc[8] = { "NOX", "SLA", "SL1", "RXC", "OEP", "HF", "PB0X", "B3LP"};
-const string corr[11] = { "NOC", "PZ", "VWN", "LYP", "PW", "WIG", "HL", "OBZ",
+const std::string exc[8] = { "NOX", "SLA", "SL1", "RXC", "OEP", "HF", "PB0X", "B3LP"};
+const std::string corr[11] = { "NOC", "PZ", "VWN", "LYP", "PW", "WIG", "HL", "OBZ",
                           "OBW", "GL", "B3LP" };
-const string gradx[10] = { "NOGX", "B88", "GGX", "PBX",  "RPB", "HCTH", "OPTX", "META", "PB0X", "B3LP"};
-const string gradc[8] = { "NOGC", "P86", "GGC", "BLYP", "PBC", "HCTH", "META", "B3LP"};
+const std::string gradx[10] = { "NOGX", "B88", "GGX", "PBX",  "RPB", "HCTH", "OPTX", "META", "PB0X", "B3LP"};
+const std::string gradc[8] = { "NOGC", "P86", "GGC", "BLYP", "PBC", "HCTH", "META", "B3LP"};
 
 // from function.f90
 //-----------------------------------------------------------------------
-void xcfunc::which_dft(const string *dft)
+void xcfunc::which_dft(const std::string *dft)
 {
 	//-----------------------------------------------------------------------
-	// translates a string containing the exchange-correlation name
+	// translates a std::string containing the exchange-correlation name
 	// into internal indices iexch, icorr, igcx, igcc
 
 	const int nxc = 8; // number of exchange functional
@@ -229,7 +229,7 @@ void xcfunc::set_dft_value(int &m,const int i)
 	return;
 } //  end subroutine set_dft_value
 
-void xcfunc::printdft(ofstream &ofs)
+void xcfunc::printdft(std::ofstream &ofs)
 {
 	ofs << "\n iexch = " << iexch
 	<< "  -> " << exc [iexch];
@@ -242,7 +242,7 @@ void xcfunc::printdft(ofstream &ofs)
 }
 
 
-void xcfunc::ostreamdft(ostream &ofs) // zws add 20150108
+void xcfunc::ostreamdft(std::ostream &ofs) // zws add 20150108
 {
 	if ( iexch == 1 && icorr == 1 && igcx == 0 && igcc == 0 )
 	{ 
@@ -262,11 +262,11 @@ void xcfunc::ostreamdft(ostream &ofs) // zws add 20150108
 }
 
 
-bool xcfunc::match_one(const string* dft, const string &name)const
+bool xcfunc::match_one(const std::string* dft, const std::string &name)const
 {
 	for(int i=0; i<4; i++)
 	{
-		if(dft[i]==name) return 1; // match one of the four string.
+		if(dft[i]==name) return 1; // match one of the four std::string.
 	}
 	return 0; // no one match
 }

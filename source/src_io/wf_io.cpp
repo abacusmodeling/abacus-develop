@@ -18,11 +18,11 @@
     
 }*/
 
-void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
+void WF_io::write_wfc(const std::string &fn, const ComplexMatrix *psi)
 {
     if (GlobalV::test_wf) TITLE("WF_io","write_wfc");
 
-    ofstream ofs( fn.c_str() );
+    std::ofstream ofs( fn.c_str() );
 
     //eximport exi;
     //exi.out_input(ofs);
@@ -53,12 +53,12 @@ void WF_io::write_wfc(const string &fn, const ComplexMatrix *psi)
     return;
 }
 
-void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3<double> *gkk)
+void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Vector3<double> *gkk)
 {
     if (GlobalV::test_wf) TITLE("WF_io","write_wfc2"); 
 
-    string * wfilename;
-    wfilename=new string[GlobalC::kv.nkstot];
+    std::string * wfilename;
+    wfilename=new std::string[GlobalC::kv.nkstot];
     for(int ik=0;ik<GlobalC::kv.nkstot;ik++)
     {
         stringstream wfss;
@@ -73,7 +73,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
         {
             if(GlobalC::wf.out_wf==1)
             {
-                ofstream ofs(wfss.str().c_str()); //clear all wavefunc files.
+                std::ofstream ofs(wfss.str().c_str()); //clear all wavefunc files.
                 ofs.close();
             }
             else
@@ -119,7 +119,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 #endif
                     if(GlobalC::wf.out_wf==1)
                     {
-                        ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
+                        std::ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
                         if(id==0)
                         {
                             ofs2<<setprecision(6);
@@ -190,7 +190,7 @@ void WF_io::write_wfc2(const string &fn, const ComplexMatrix *psi, const Vector3
 #endif
                         if(GlobalC::wf.out_wf==1)
                         {
-                            ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
+                            std::ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
                             if(id==0)   ofs2 << "\n< Band "<<ib+1 <<" >" <<std::endl; 
 							ofs2 << scientific;
 							

@@ -50,7 +50,7 @@ void Vdwd2_Parameters::C6_input(const std::string &file, const std::string &unit
 {
 	if( file != "default" )
 	{
-		ifstream ifs(file);
+		std::ifstream ifs(file);
 		if(!ifs)
 			WARNING_QUIT("Vdwd2::C6_input", "Can not find the file "+TO_STRING(file));
 		std::string element;
@@ -75,7 +75,7 @@ void Vdwd2_Parameters::R0_input(const std::string &file, const std::string &unit
 {
 	if( file != "default" )
 	{
-		ifstream ifs(file.c_str());
+		std::ifstream ifs(file.c_str());
 		if(!ifs)
 			WARNING_QUIT("Vdwd2::R0_input", "Can not find the file "+TO_STRING(file));
 		std::string element;

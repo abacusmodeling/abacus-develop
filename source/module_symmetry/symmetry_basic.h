@@ -59,8 +59,8 @@ class Symmetry_Basic
 
 	protected:
 
-	string get_brav_name(const int ibrav);
-	void pointgroup(const int &nrot,int &pgnumber,string &pgname, const Matrix3* gmatrix, ofstream &ofs_running);
+	std::string get_brav_name(const int ibrav);
+	void pointgroup(const int &nrot,int &pgnumber,std::string &pgname, const Matrix3* gmatrix, std::ofstream &ofs_running);
 	void atom_ordering(double *posi, const int natom, int *subindex);
 
 	private:

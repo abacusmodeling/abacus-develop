@@ -11,7 +11,7 @@
 
 #include "export.h"
 
-void IF_MATCH(const string &name,const string &name2)
+void IF_MATCH(const std::string &name,const std::string &name2)
 {
 	if(name!=name2)
 	{

@@ -6,8 +6,8 @@
 // mohan add 2010-09-09
 namespace WF_Local
 {
-	void write_lowf(const string &name, double** ctot);
-	void write_lowf_complex(const string &name, std::complex<double>** ctot, const int &ik);
+	void write_lowf(const std::string &name, double** ctot);
+	void write_lowf_complex(const std::string &name, std::complex<double>** ctot, const int &ik);
 
 	void distri_lowf(double** ctot, double **c);
 	void distri_lowf_complex(std::complex<double>** ctot, std::complex<double> **cc);

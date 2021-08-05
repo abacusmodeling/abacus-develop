@@ -29,7 +29,7 @@ class Pdiag_Basic
 
 	void data_distribution(
 		MPI_Comm comm_2D, 
-		const string &file,
+		const std::string &file,
 		const int &n,
 		const int &NB,
 		double *A,

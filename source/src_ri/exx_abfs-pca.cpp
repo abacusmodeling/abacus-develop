@@ -22,7 +22,7 @@ std::vector<std::vector<pair<std::vector<double>,matrix>>> Exx_Abfs::PCA::cal_PC
 	const double kmesh_times )
 {
 	TITLE("Exx_Abfs::PCA::cal_PCA");
-ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 	
 	const Element_Basis_Index::Range

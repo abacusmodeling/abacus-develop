@@ -39,7 +39,7 @@ public:
 
 	void Macroscopic_polarization();
 
-	string outFormat(const double polarization, const double modulus, const Vector3<double> project);
+	std::string outFormat(const double polarization, const double modulus, const Vector3<double> project);
 	
 };
 

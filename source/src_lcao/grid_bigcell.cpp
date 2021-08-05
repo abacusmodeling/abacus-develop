@@ -323,7 +323,7 @@ void Grid_BigCell::grid_expansion_index(bool f2normal, int *target)const
 //	std::cout << " ncx=" << ncx << " ncy=" << ncy << " ncz=" << ncz << std::endl;
 //	stringstream ss;
 //	ss << GlobalV::global_out_dir << "expand_grid.dat";
-//	ofstream ofs(ss.str().c_str());
+//	std::ofstream ofs(ss.str().c_str());
 	
 	int ii,jj,kk,in_ext,in_normal;
 	for(int i=0; i<this->nxe; i++)

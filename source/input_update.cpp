@@ -17,7 +17,7 @@
 Update_input::Update_input() {}
 Update_input::~Update_input() {}
 
-void Update_input::init(const string &fn)
+void Update_input::init(const std::string &fn)
 {
 	GlobalV::ofs_warning << "\n CHECK UPDATE INPUT INFORMATION" << std::endl;
     this->Read(fn);
@@ -28,11 +28,11 @@ void Update_input::init(const string &fn)
     return;
 }
 
-bool Update_input::Read(const string &fn)
+bool Update_input::Read(const std::string &fn)
 {
     if (GlobalV::MY_RANK!=0) return false;
 
-    ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
+    std::ifstream ifs(fn.c_str(), ios::in);	// "in_datas/input_parameters"
 
     if (!ifs) 
 	{

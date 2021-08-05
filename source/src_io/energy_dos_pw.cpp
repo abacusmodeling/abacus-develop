@@ -28,7 +28,7 @@ void energy::perform_dos_pw(void)
 		ss << GlobalV::global_out_dir << "istate.info" ;
 		if(GlobalV::MY_RANK==0)
 		{
-			ofstream ofsi( ss.str().c_str() ); // clear istate.info
+			std::ofstream ofsi( ss.str().c_str() ); // clear istate.info
 			ofsi.close();
 		}
 #ifdef __MPI
@@ -39,7 +39,7 @@ void energy::perform_dos_pw(void)
 			{
 				if( GlobalV::RANK_IN_POOL != 0 ) continue;
 #endif
-				ofstream ofsi2( ss.str().c_str(), ios::app );
+				std::ofstream ofsi2( ss.str().c_str(), ios::app );
 				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 				{
 					for (int ik = 0;ik < GlobalC::kv.nks;ik++)
@@ -156,7 +156,7 @@ void energy::perform_dos_pw(void)
 					 emax, 
 					 emin, 
 					 GlobalC::kv.nks, GlobalC::kv.nkstot, GlobalC::kv.wk, GlobalC::wf.wg, GlobalV::NBANDS, GlobalC::wf.ekb );
-			 ifstream in(ss.str().c_str());
+			 std::ifstream in(ss.str().c_str());
 			 if(!in)
 			 {
 				       //std::cout<<"\n Can't find file : "<< name << std::endl;
@@ -225,7 +225,7 @@ void energy::perform_dos_pw(void)
 		 //----------------------------------------------------------
 		 stringstream sss;
 		 sss << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
-		 ofstream out(sss.str().c_str());
+		 std::ofstream out(sss.str().c_str());
 		 double sum2=0.0;
 		 for(int i=0;i<number;i++)
 		 {

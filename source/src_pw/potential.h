@@ -25,8 +25,8 @@ class Potential
 	// out_potential: options to print out potentials 
     //==========================================================
 
-    string start_pot;
-	string extra_pot;
+    std::string start_pot;
+	std::string extra_pot;
     matrix vr;
     matrix vr_eff;
     matrix vnew;
@@ -56,10 +56,10 @@ class Potential
 
 	// mohan add 2011-02-28
 	// here vh is std::complex because the array is got after std::complex FFT.
-	void write_potential(const int &is, const int &iter, const string &fn,
+	void write_potential(const int &is, const int &iter, const std::string &fn,
 		const matrix &v, const int &precision, const int &hartree = 0)const;
 
-    void write_elecstat_pot(const string &fn, const string &fn_ave);
+    void write_elecstat_pot(const std::string &fn, const std::string &fn_ave);
 	
 	private:
 

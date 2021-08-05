@@ -31,7 +31,7 @@ class Pdiag_Double : public Pdiag_Basic
 		std::complex<double> *ch_mat, std::complex<double> *cs_mat, double *ekb);			// Peize Lin add wfc_2d 2019-01-17
 
 #ifdef __MPI
-	void readin(const string &fa, const string &fb, const int &nlocal, double *eigen, double *eigvr);
+	void readin(const std::string &fa, const std::string &fb, const int &nlocal, double *eigen, double *eigvr);
 #endif
 
 	// be called

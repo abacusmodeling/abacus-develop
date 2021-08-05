@@ -619,7 +619,7 @@ void Force_LCAO_k::cal_ftvnl_dphi_k(
 }
 
 	
-void Force_LCAO_k::test(double* mmm, const string &name)
+void Force_LCAO_k::test(double* mmm, const std::string &name)
 {
 	if(GlobalV::NPROC!=1)return;
 	std::cout << "test!" << std::endl;

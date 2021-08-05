@@ -57,7 +57,7 @@ class Force_LCAO_k : public Force_LCAO_gamma
 	void cal_fvnl_dbeta_k(double** dm2d, const bool isforce, const bool isstress, matrix& fvnl_dbeta, matrix& svnl_dbeta);
 
 
-	void test(double* mm, const string &name);
+	void test(double* mm, const std::string &name);
 
 };
 #endif

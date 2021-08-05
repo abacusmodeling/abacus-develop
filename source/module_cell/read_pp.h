@@ -27,11 +27,11 @@ public:
 	bool has_so;        // if .true. includes spin-orbit
 
 	int nv;             // header_1 // UPF file version number
-	string psd;			// header_2 // Element label
-	string pp_type;		// header_3 // Pseudo type ( NC or US )
+	std::string psd;			// header_2 // Element label
+	std::string pp_type;		// header_3 // Pseudo type ( NC or US )
 	bool tvanp;         // header_4 // .true. if Ultrasoft 
 	bool nlcc;		    // header_5 // Non linear core corrections
-	string dft[4];		// header_6 // Exch-Corr type
+	std::string dft[4];		// header_6 // Exch-Corr type
 	int  zp;            // header_7 // z valence 
 	double etotps;		// header_8 // total energy
 	double ecutwfc;		// header_9 // suggested cut-off for wfc
@@ -40,7 +40,7 @@ public:
 	int mesh;			// header_12 // number of point in the radial mesh
 	int nwfc;			// header_13 // number of wavefunctions
 	int nbeta;			// header_14 // number of projectors
-	string *els;		// header_15 // els(nwfc):label for the i-th atomic orbital (4s, 4p, etc)
+	std::string *els;		// header_15 // els(nwfc):label for the i-th atomic orbital (4s, 4p, etc)
 	int *lchi;			// header_16 // lchi(nwfc):angular momentum
 	double *oc;			// header_17 // oc(nwfc)
 
@@ -78,8 +78,8 @@ public:
 	double* wd;// wave function for d
 
 	// return error
-	int init_pseudo_reader(const string &fn);
-	void print_pseudo_upf(ofstream &ofs);
+	int init_pseudo_reader(const std::string &fn);
+	void print_pseudo_upf(std::ofstream &ofs);
 
 	bool functional_error;//xiaohui add 2015-03-24
 	int average_p(); //zhengdy add 2020-10-20
@@ -87,27 +87,27 @@ public:
 
 private:
 
-	int set_pseudo_type(const string &fn);
-	string& trim(string &in_str);
-	string  trimend(string &in_str);
+	int set_pseudo_type(const std::string &fn);
+	std::string& trim(std::string &in_str);
+	std::string  trimend(std::string &in_str);
 
-	int read_pseudo_upf(ifstream &ifs);
-	int read_pseudo_vwr(ifstream &ifs);
-	int read_pseudo_upf201(ifstream &ifs);
-	void read_pseudo_header(ifstream &ifs);
-	void read_pseudo_mesh(ifstream &ifs);
-	void read_pseudo_nlcc(ifstream &ifs);
-	void read_pseudo_local(ifstream &ifs);
-	void read_pseudo_nl(ifstream &ifs);
-	void read_pseudo_pswfc(ifstream &ifs);
-	void read_pseudo_rhoatom(ifstream &ifs);
-	void read_pseudo_addinfo(ifstream &ifs);
-	void read_pseudo_so(ifstream &ifs);
-	//string get_string( char ss[]);
+	int read_pseudo_upf(std::ifstream &ifs);
+	int read_pseudo_vwr(std::ifstream &ifs);
+	int read_pseudo_upf201(std::ifstream &ifs);
+	void read_pseudo_header(std::ifstream &ifs);
+	void read_pseudo_mesh(std::ifstream &ifs);
+	void read_pseudo_nlcc(std::ifstream &ifs);
+	void read_pseudo_local(std::ifstream &ifs);
+	void read_pseudo_nl(std::ifstream &ifs);
+	void read_pseudo_pswfc(std::ifstream &ifs);
+	void read_pseudo_rhoatom(std::ifstream &ifs);
+	void read_pseudo_addinfo(std::ifstream &ifs);
+	void read_pseudo_so(std::ifstream &ifs);
+	//std::string get_string( char ss[]);
 	//int get_int( char ss[]);
 	//double get_double( char ss[]);
-	//void get_char( string ss);
-	void getnameval(ifstream&, int&, string * , string *);
+	//void get_char( std::string ss);
+	void getnameval(std::ifstream&, int&, std::string * , std::string *);
 };
 
 #endif //pseudopot_upf class

@@ -1,5 +1,5 @@
 #include"mrrr.h"
-#include "string.h"
+#include <string.h>
 
 /* Table of constant values */
 
@@ -94,7 +94,7 @@ int pilaenv(int *ispec, char *name__, char *opts, int *n1, int *n2, int *n3,
 
 	/*  OPTS    (input) CHARACTER*(*) */
 	/*          The character options to the subroutine NAME, concatenated */
-	/*          into a single character string.  For example, UPLO = 'U', */
+	/*          into a single character std::string.  For example, UPLO = 'U', */
 	/*          TRANS = 'T', and DIAG = 'N' for a triangular routine would */
 	/*          be specified as OPTS = 'UTN'. */
 

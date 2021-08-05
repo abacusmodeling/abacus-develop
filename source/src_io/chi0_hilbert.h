@@ -17,8 +17,8 @@ class Chi0_hilbert
 	~Chi0_hilbert();
 	
 	bool epsilon;           // calculate epsilon or not
-	string kernel_type;      // the type of kernel
-	string system;          // bulk or surface
+	std::string kernel_type;      // the type of kernel
+	std::string system;          // bulk or surface
 	double eta;             // unit(Ry)
 	double domega;          // unit(Ry)
 	int nomega;

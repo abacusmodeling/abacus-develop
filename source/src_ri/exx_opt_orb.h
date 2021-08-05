@@ -22,7 +22,7 @@ private:
 		const std::vector<std::vector<matrix>> & m_middle, 
 		const std::vector<matrix> & m_right ) const;
 	void print_matrix(
-		const string &file_name,
+		const std::string &file_name,
 		const std::vector<matrix> &matrix_Q, 
 		const std::vector<std::vector<matrix>> &matrix_S,
 		const matrix &matrix_V,

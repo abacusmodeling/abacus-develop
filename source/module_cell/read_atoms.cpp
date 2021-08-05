@@ -8,15 +8,15 @@
 #endif
 #include <cstring>		// Peize Lin fix bug about strcmp 2016-08-02
 
-void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
+void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_running)
 {
 	TITLE("UnitCell_pseudo","read_atom_species");
 
 	this->atom_mass  = new double[ntype]; //atom masses
-	this->atom_label = new string[ntype]; //atom labels
-	this->pseudo_fn  = new string[ntype]; //file name of pseudopotential
+	this->atom_label = new std::string[ntype]; //atom labels
+	this->pseudo_fn  = new std::string[ntype]; //file name of pseudopotential
 
-	string word;
+	std::string word;
 	//==========================================
 	// read in information of each type of atom
 	//==========================================
@@ -39,7 +39,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 			}
 
 			// Peize Lin test for bsse 2021.04.07
-			const string bsse_label = "empty";
+			const std::string bsse_label = "empty";
 			this->atoms[i].flag_empty_element = 
 				(search( atom_label[i].begin(), atom_label[i].end(), bsse_label.begin(), bsse_label.end() ) != atom_label[i].end())
 				? true : false;
@@ -53,13 +53,13 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 			GlobalC::ORB.read_in_flag = true;
 			for(int i=0; i<ntype; i++)
 			{
-				string ofile;
+				std::string ofile;
 
 				//-----------------------------------
 				// Turn off the read in NONLOCAL file
 				// function since 2013-08-02 by mohan
 				//-----------------------------------
-				//string nfile;
+				//std::string nfile;
 
 				ifa >> ofile;
 				//-----------------------------------
@@ -97,7 +97,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 		{
 			for(int i=0; i<ntype; i++)
 			{
-				string ofile;
+				std::string ofile;
 				ifa >> ofile;
 				GlobalC::exx_lcao.info.files_abfs.push_back(ofile);
 			}
@@ -333,7 +333,7 @@ void UnitCell_pseudo::read_atom_species(ifstream &ifa, ofstream &ofs_running)
 // Read atomic positions
 // return 1: no problem.
 // return 0: some problems.
-bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running, ofstream &ofs_warning)
+bool UnitCell_pseudo::read_atom_positions(std::ifstream &ifpos, std::ofstream &ofs_running, std::ofstream &ofs_warning)
 {
 	TITLE("UnitCell_pseudo","read_atom_positions");
 
@@ -451,7 +451,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 #ifdef __LCAO
 			if (GlobalV::BASIS_TYPE == "lcao" || GlobalV::BASIS_TYPE == "lcao_in_pw")
 			{    
-				ifstream ifs(GlobalC::ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
+				std::ifstream ifs(GlobalC::ORB.orbital_file[it].c_str(), ios::in);  // pengfei 2014-10-13
 
 				// mohan add return 2021-04-26
 				if (!ifs)
@@ -593,7 +593,7 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 				{
 					if(use_xyz)
 					{
-						string tmpid;
+						std::string tmpid;
 						ifpos >> tmpid;
 						if(tmpid != atoms[it].label)
 						{
@@ -608,9 +608,9 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 							mv.y = true;
 							mv.z = true;
 							
-							string mags;
+							std::string mags;
 							std::getline( ifpos, mags );
-							// change string to double.
+							// change std::string to double.
 							//atoms[it].mag[ia] = std::atof(mags.c_str());
 							atoms[it].mag[ia] = 0.0;
 						}
@@ -627,9 +627,9 @@ bool UnitCell_pseudo::read_atom_positions(ifstream &ifpos, ofstream &ofs_running
 						{
 							atoms[it].vel[ia].set(0,0,0);
 						}
-						string mags;
+						std::string mags;
 						std::getline( ifpos, mags );
-						// change string to double.
+						// change std::string to double.
 						//atoms[it].mag[ia] = std::atof(mags.c_str());
 						atoms[it].mag[ia] = 0.0;
 					}	
@@ -802,13 +802,13 @@ bool UnitCell_pseudo::check_tau(void)const
 	return 1;
 }
 
-void UnitCell_pseudo::print_stru_file(const string &fn, const int &type)const
+void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)const
 {
 	TITLE("UnitCell_pseudo","print_stru_file");
 	
 	if(GlobalV::MY_RANK!=0) return;
 
-	ofstream ofs(fn.c_str());
+	std::ofstream ofs(fn.c_str());
 
 	ofs << "ATOMIC_SPECIES" << std::endl;
 	ofs << setprecision(12);
@@ -1014,7 +1014,7 @@ void UnitCell_pseudo::print_tau(void)const
 }	
 
 
-int UnitCell_pseudo::find_type(const string &label)
+int UnitCell_pseudo::find_type(const std::string &label)
 {
 	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","find_type");
 	assert(ntype>0);

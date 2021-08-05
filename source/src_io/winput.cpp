@@ -7,21 +7,21 @@
 #include "../src_pw/global.h"
 
 
-string winput::target;//add 2008-06-04
-string winput::wlmr_dir;
+std::string winput::target;//add 2008-06-04
+std::string winput::wlmr_dir;
 double winput::rcut;//a.u.
 bool winput::before_iter;//"1" stop before iteration
 bool winput::after_iter;
 bool winput::begin_stop_flag;
 bool winput::end_flag;
-string winput::wf_type;
+std::string winput::wf_type;
 bool winput::build_wf;
 int winput::imp_pao;
 bool winput::b_out_wf;
 bool winput::b_fftwan;//add 2008-07-20
 bool winput::b_plot_build;//add 2008-06-04
 bool winput::b_plot_atomic;//add 2008-06-04
-string winput::trial;//"atomic" or "gauss" 
+std::string winput::trial;//"atomic" or "gauss" 
 double winput::bs;//parameters for gauss orbit
 double winput::bp;
 double winput::px;
@@ -49,11 +49,11 @@ int winput::L_end;
 int winput::atom_start;
 int winput::atom_end;
 bool winput::plot_wanq;//add 2008-01-26
-string winput::plot_option;//(110),[110] etc.
+std::string winput::plot_option;//(110),[110] etc.
 int winput::n_unitcell;//number of unitcell to plot
 bool winput::out_all;
 bool winput::out_charge;
-string winput::charge_type;
+std::string winput::charge_type;
 bool winput::cal_bands; //for wan  	   wan basis + wan charge
 bool winput::cal_bands2;//for semi-wan ;pw basis + wan charge add 2008-4-11
 bool winput::cal_dos;
@@ -64,7 +64,7 @@ bool winput::no_center;
 int winput::sum_lm;
 bool winput::compare_atomic;
 int winput::out_spillage;
-string winput::spillage_outdir = "./"; // mohan add 2010-06-07
+std::string winput::spillage_outdir = "./"; // mohan add 2010-06-07
 	
 winput::winput()
 {
@@ -76,7 +76,7 @@ winput::~winput()
 }
 
 
-void winput::Init(const string &fn)
+void winput::Init(const std::string &fn)
 {
 	Default();
 	if(GlobalV::test_winput) TITLE("winput","Init");
@@ -93,13 +93,13 @@ void winput::Init(const string &fn)
 	return;
 }
 
-void winput::Read(const string &fn)
+void winput::Read(const std::string &fn)
 {
 	TITLE("winput","Read");
 	
 	if(GlobalV::MY_RANK!=0) return;
 
-	ifstream ifs(fn.c_str(), ios::in);
+	std::ifstream ifs(fn.c_str(), ios::in);
 	if (!ifs)
 	{
 		//xiaohui move warning 2015-09-30
@@ -527,13 +527,13 @@ void winput::Check(void)
 	return;
 }
 
-void winput::Print(const string &fn)
+void winput::Print(const std::string &fn)
 {
 	if(GlobalV::test_winput) TITLE("winput","Print");
 
 	if(GlobalV::MY_RANK!=0) return;
  
-	ofstream ofs(fn.c_str());
+	std::ofstream ofs(fn.c_str());
 	ofs << setiosflags(ios::left);
 	ofs << "WANNIER_PARAMETERS" << std::endl;
 

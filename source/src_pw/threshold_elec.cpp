@@ -89,7 +89,7 @@ void Threshold_Elec::update_ethr(const int &iter)
     return;
 }
 
-void Threshold_Elec::iter_end(ofstream &ofs)
+void Threshold_Elec::iter_end(std::ofstream &ofs)
 {
 	if(GlobalV::OUT_LEVEL != "m") 
 	{
@@ -99,7 +99,7 @@ void Threshold_Elec::iter_end(ofstream &ofs)
 }
 
 
-void Threshold_Elec::print_eigenvalue(ofstream &ofs)
+void Threshold_Elec::print_eigenvalue(std::ofstream &ofs)
 {
 	bool wrong = false;
 	for(int ik=0; ik<GlobalC::kv.nks; ++ik)

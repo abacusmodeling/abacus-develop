@@ -24,7 +24,7 @@ void Optical::cal_epsilon2(const int &nbands)
 
 	std::cout << " begin to calculate the epsilon2." << std::endl;
 	
-	ofstream ofs;
+	std::ofstream ofs;
 
 	if(GlobalV::MY_RANK==0)
 	{

@@ -1,9 +1,9 @@
 #include "tool_check.h"
 #include "tool_quit.h"
 
-void CHECK_NAME(ifstream &ifs,const string &name_in,bool quit)
+void CHECK_NAME(std::ifstream &ifs,const std::string &name_in,bool quit)
 {
-    string name;
+    std::string name;
     ifs >> name;
     if ( name != name_in)
     {
@@ -23,7 +23,7 @@ void CHECK_NAME(ifstream &ifs,const string &name_in,bool quit)
     return;
 }
 
-void CHECK_INT(ifstream &ifs,const int &v,bool quit)
+void CHECK_INT(std::ifstream &ifs,const int &v,bool quit)
 {
 	int v_in;
 	ifs >> v_in;
@@ -43,7 +43,7 @@ void CHECK_INT(ifstream &ifs,const int &v,bool quit)
 	return;
 }
 
-void CHECK_DOUBLE(ifstream &ifs,const double &v,bool quit)
+void CHECK_DOUBLE(std::ifstream &ifs,const double &v,bool quit)
 {
 	const double tiny = 1.0e-5;
 	double v_in;
@@ -64,9 +64,9 @@ void CHECK_DOUBLE(ifstream &ifs,const double &v,bool quit)
 	return;
 }
 
-void CHECK_STRING(ifstream &ifs,const string &v,bool quit)
+void CHECK_STRING(std::ifstream &ifs,const std::string &v,bool quit)
 {
-	string v_in;
+	std::string v_in;
 	ifs >> v_in;
 	if( v_in != v )
 	{

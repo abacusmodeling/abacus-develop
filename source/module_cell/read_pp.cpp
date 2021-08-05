@@ -11,7 +11,7 @@ using namespace std;
 
 Pseudopot_upf::Pseudopot_upf()
 {
-	this->els = new string[1];
+	this->els = new std::string[1];
 	this->lchi = new int[1];
 	this->oc = new double[1];
 
@@ -53,11 +53,11 @@ Pseudopot_upf::~Pseudopot_upf()
 	delete [] jchi;
 }
 
-int Pseudopot_upf::init_pseudo_reader(const string &fn)
+int Pseudopot_upf::init_pseudo_reader(const std::string &fn)
 {
     TITLE("Pseudopot_upf","init");
     // First check if this pseudo-potential has spin-orbit information
-    ifstream ifs(fn.c_str(), ios::in);
+    std::ifstream ifs(fn.c_str(), ios::in);
 
 	// can't find the file.
 	if (!ifs)
@@ -95,11 +95,11 @@ int Pseudopot_upf::init_pseudo_reader(const string &fn)
 //----------------------------------------------------------
 // setting the type of the pseudopotential file
 //----------------------------------------------------------
-int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
+int Pseudopot_upf::set_pseudo_type(const std::string &fn) //zws add
 {
-    ifstream pptype_ifs(fn.c_str(), ios::in);
-    string dummy;
-	string strversion;
+    std::ifstream pptype_ifs(fn.c_str(), ios::in);
+    std::string dummy;
+	std::string strversion;
 
 	if (pptype_ifs.good())
 	{
@@ -121,22 +121,22 @@ int Pseudopot_upf::set_pseudo_type(const string &fn) //zws add
 	return 0;
 }
 
-string& Pseudopot_upf::trim(string &in_str)
+std::string& Pseudopot_upf::trim(std::string &in_str)
 {
-    static const string deltri = " \t" ; // delete tab or space
-    string::size_type position = in_str.find_first_of(deltri, 0);
-    if (position == string::npos)
+    static const std::string deltri = " \t" ; // delete tab or space
+    std::string::size_type position = in_str.find_first_of(deltri, 0);
+    if (position == std::string::npos)
 	{
         return in_str;
 	}
     return trim(in_str.erase(position, 1) );
 }
 
-string Pseudopot_upf::trimend(string &in_str)
+std::string Pseudopot_upf::trimend(std::string &in_str)
 {
-    const string &deltri =" \t" ;
-    string::size_type position = in_str.find_last_not_of(deltri)+1;
-    string tmpstr=in_str.erase(position);
+    const std::string &deltri =" \t" ;
+    std::string::size_type position = in_str.find_last_not_of(deltri)+1;
+    std::string tmpstr=in_str.erase(position);
     return tmpstr.erase(0,tmpstr.find_first_not_of(deltri));
 } //zws
 

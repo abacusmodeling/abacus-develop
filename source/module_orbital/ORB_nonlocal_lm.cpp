@@ -111,7 +111,7 @@ Numerical_Nonlocal_Lm& Numerical_Nonlocal_Lm::operator=
 }
 
 void Numerical_Nonlocal_Lm::set_NL_proj(
- 	const string &label_in,
+ 	const std::string &label_in,
     const int &index_atom_type_in,
     const int &angular_momentum_l_in,
     const int &nr_in,
@@ -267,7 +267,7 @@ void Numerical_Nonlocal_Lm::get_kradial(void)
 
 void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 {
-	string orbital_type;
+	std::string orbital_type;
 	switch( this->angular_momentum_l )
 	{
 		case 0: orbital_type = "s"; break;
@@ -293,9 +293,9 @@ void Numerical_Nonlocal_Lm::plot(const int &my_rank)const
 		ssru << GlobalV::global_out_dir << this->label << "/"
 			<< this->label << "-" << orbital_type << "-proj-ru.dat";
 
-		ofstream ofsr(ssr.str().c_str());
-		ofstream ofsk(ssk.str().c_str());
-		ofstream ofsru(ssru.str().c_str());
+		std::ofstream ofsr(ssr.str().c_str());
+		std::ofstream ofsk(ssk.str().c_str());
+		std::ofstream ofsru(ssru.str().c_str());
 
 		if (!ofsk || !ofsr || !ofsru)
 		{

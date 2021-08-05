@@ -16,7 +16,7 @@ public:
     PW_Basis();
     ~PW_Basis();
 
-    void gen_pw(ofstream &log, const UnitCell &Ucell_in, const K_Vectors &Klist_in);
+    void gen_pw(std::ofstream &log, const UnitCell &Ucell_in, const K_Vectors &Klist_in);
 
     void set
     (
@@ -256,6 +256,6 @@ public:
     int *cutgg_num_table;
     int ggchg_time_global;
 
-    void update_gvectors(ofstream &log, const UnitCell &Ucell_in);
+    void update_gvectors(std::ofstream &log, const UnitCell &Ucell_in);
 };
 #endif //PlaneWave class

@@ -61,7 +61,7 @@ public:
 	~Grid();
 
 	void init(
-		ofstream &ofs,
+		std::ofstream &ofs,
 		const UnitCell &ucell, 
 		const Atom_input &input);
 
@@ -128,7 +128,7 @@ private:
 // 			condition , if expand_case)
 //==========================================================
 	void setMemberVariables(
-		ofstream &ofs_in, 
+		std::ofstream &ofs_in, 
 		const Atom_input &input);
 
 	void setAtomLinkArray(
@@ -136,7 +136,7 @@ private:
 		const Atom_input &input);
 
 	void setBoundaryAdjacent(
-		ofstream &ofs_in, 
+		std::ofstream &ofs_in, 
 		const Atom_input &input);
 
 //==========================================================

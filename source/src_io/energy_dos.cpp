@@ -50,7 +50,7 @@ void energy::perform_dos(void)
 		{
 			stringstream ss;
 			ss << GlobalV::global_out_dir << "istate.info" ;
-			ofstream ofsi( ss.str().c_str() );
+			std::ofstream ofsi( ss.str().c_str() );
 			*for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 			{
 				ofsi << "0 " << ib+1;
@@ -113,7 +113,7 @@ void energy::perform_dos(void)
 		ss << GlobalV::global_out_dir << "istate.info" ;
 		if(GlobalV::MY_RANK==0)
 		{
-			ofstream ofsi( ss.str().c_str() ); // clear istate.info
+			std::ofstream ofsi( ss.str().c_str() ); // clear istate.info
 			ofsi.close();
 		}
 		for(int ip=0; ip<GlobalV::NPOOL; ip++)
@@ -122,7 +122,7 @@ void energy::perform_dos(void)
 			if( GlobalV::MY_POOL == ip )
 			{
 				if( GlobalV::RANK_IN_POOL != 0 ) continue;
-				ofstream ofsi2( ss.str().c_str(), ios::app );
+				std::ofstream ofsi2( ss.str().c_str(), ios::app );
 				if(GlobalV::NSPIN == 1||GlobalV::NSPIN == 4)
 				{
 					for (int ik = 0;ik < GlobalC::kv.nks;ik++)
@@ -461,7 +461,7 @@ void energy::perform_dos(void)
 	 {
 		 {  stringstream ps;
 			 ps << GlobalV::global_out_dir << "TDOS";
-			 ofstream out(ps.str().c_str());
+			 std::ofstream out(ps.str().c_str());
 			 if (GlobalV::NSPIN==1)
 			 {
 
@@ -495,7 +495,7 @@ void energy::perform_dos(void)
 			 out.close();
 		 }
 
-		 string Name_Angular[5][11];
+		 std::string Name_Angular[5][11];
 		 /* decomposed Mulliken charge */
 
 		 Name_Angular[0][0] = "s          ";
@@ -526,7 +526,7 @@ void energy::perform_dos(void)
 
 		 {stringstream as;
 			 as << GlobalV::global_out_dir << "PDOS";
-			 ofstream out(as.str().c_str());
+			 std::ofstream out(as.str().c_str());
 
 			 out << "<"<<"pdos"<<">" <<std::endl;
 			 out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< std::endl;
@@ -587,7 +587,7 @@ void energy::perform_dos(void)
 			 out.close();}
 		 {  stringstream os;
 			 os<<GlobalV::global_out_dir<<"Orbital";
-			 ofstream out(os.str().c_str());
+			 std::ofstream out(os.str().c_str());
 			 out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<std::endl;
 
 
@@ -631,7 +631,7 @@ void energy::perform_dos(void)
 				 emax, 
 				 emin, 
 				 GlobalC::kv.nks, GlobalC::kv.nkstot, GlobalC::kv.wk, GlobalC::wf.wg, GlobalV::NBANDS, GlobalC::wf.ekb );
-		 ifstream in(ss.str().c_str());
+		 std::ifstream in(ss.str().c_str());
 		 if(!in)
 		 {
 			 //      std::cout<<"\n Can't find file : "<< name << std::endl;
@@ -698,7 +698,7 @@ void energy::perform_dos(void)
 		 //----------------------------------------------------------
 		 stringstream sss;
 		 sss << GlobalV::global_out_dir << "DOS" << is+1 << "_smearing" << ".dat" ;
-		 ofstream out(sss.str().c_str());
+		 std::ofstream out(sss.str().c_str());
 		 double sum2=0.0;
 		 for(int i=0;i<number;i++)
 		 {

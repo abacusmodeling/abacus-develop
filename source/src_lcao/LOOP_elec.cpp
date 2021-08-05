@@ -170,7 +170,7 @@ void LOOP_elec::solver(const int &istep)
 			case Exx_Global::Hybrid_Type::Generate_Matrix:
 				break;
 			default:
-				throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+				throw std::invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 
 		// No exx

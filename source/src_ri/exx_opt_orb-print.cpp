@@ -3,7 +3,7 @@
 #include "exx_abfs-jle.h"
 
 void Exx_Opt_Orb::print_matrix(
-	const string &file_name,
+	const std::string &file_name,
 	const std::vector<matrix> &matrix_Q, 
 	const std::vector<std::vector<matrix>> &matrix_S,
 	const matrix &matrix_V,
@@ -11,7 +11,7 @@ void Exx_Opt_Orb::print_matrix(
 	const Element_Basis_Index::Range &range_jles, 
 	const Element_Basis_Index::IndexLNM &index_jles) const
 {
-	auto print_header = [&]( ofstream &ofs )
+	auto print_header = [&]( std::ofstream &ofs )
 	{
 		ofs << GlobalC::ucell.lat0 << std::endl;
 
@@ -108,7 +108,7 @@ void Exx_Opt_Orb::print_matrix(
 	};
 	
 	
-	auto print_Q = [&]( ofstream &ofs )
+	auto print_Q = [&]( std::ofstream &ofs )
 	{
 		//---------------------
 		//  < Psi | jY >
@@ -137,7 +137,7 @@ void Exx_Opt_Orb::print_matrix(
 	};
 	
 	
-	auto print_S = [&]( ofstream &ofs, const double scale=1 )
+	auto print_S = [&]( std::ofstream &ofs, const double scale=1 )
 	{
 		//---------------------
 		//  < jY | jY >
@@ -176,7 +176,7 @@ void Exx_Opt_Orb::print_matrix(
 	};
 	
 	
-	auto print_V = [&]( ofstream &ofs, const double scale=1 )
+	auto print_V = [&]( std::ofstream &ofs, const double scale=1 )
 	{
 		//---------------------
 		//  < Psi | Psi >
@@ -195,7 +195,7 @@ void Exx_Opt_Orb::print_matrix(
 		ofs << "</OVERLAP_V>" << std::endl << std::endl;
 	};
 	
-	ofstream ofs(file_name+"_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB));
+	std::ofstream ofs(file_name+"_"+TO_STRING(TA)+"_"+TO_STRING(IA)+"_"+TO_STRING(TB)+"_"+TO_STRING(IB));
 	print_header(ofs);
 	print_Q(ofs);
 	print_S(ofs);

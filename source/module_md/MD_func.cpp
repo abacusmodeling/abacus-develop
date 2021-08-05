@@ -16,7 +16,7 @@ bool MD_func::RestartMD(const int& numIon, Vector3<double>* vel, int& step_rst)
 	{
 		stringstream ssc;
 		ssc << GlobalV::global_readin_dir << "Restart_md.dat";
-		ifstream file(ssc.str().c_str());
+		std::ifstream file(ssc.str().c_str());
 
 		if(!file)
 		{
@@ -89,7 +89,7 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 	if(!GlobalV::MY_RANK){
 		stringstream ssc;
 		ssc << GlobalV::global_out_dir << "Restart_md.dat";
-		ofstream file(ssc.str().c_str());
+		std::ofstream file(ssc.str().c_str());
 		file<<"MD_RESTART"<<std::endl;
 		file<<"ATOM_NUMBERS: "<<numIon<<std::endl;
 		file<<"ION_VELOCITIES_(a.u.): "<<std::endl;
@@ -204,7 +204,7 @@ void MD_func::InitVelocity(
 		{
 			
 			// Read in new temperature from file.
-			ifstream file;
+			std::ifstream file;
 			file.open("ChangeTemp.dat");
 			if (!file){
 				std::cout<<"ERROR IN OPENING ChangeTemp.dat, CODE STOP!"<<std::endl;
@@ -234,8 +234,8 @@ void MD_func::InitVelocity(
 	return;
 }*/
 
-//int to string and add to output path
-string MD_func::intTurnTostring(long int iter, string path)
+//int to std::string and add to output path
+std::string MD_func::intTurnTostring(long int iter, std::string path)
 {
 	long int i[10],k=0;
 	if(iter>9999999999) return "error!";
@@ -323,7 +323,7 @@ void MD_func::callInteraction_PW(const int& numIon, Vector3<double>* force, matr
 }
 #endif
 
-void MD_func::printpos(const string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
+void MD_func::printpos(const std::string& file, const int& iter, const int& recordFreq, const UnitCell_pseudo& unit_in)
 {
 //intend to output the positions of atoms to ordered file
 	bool pass;
@@ -333,8 +333,8 @@ void MD_func::printpos(const string& file, const int& iter, const int& recordFre
 		pass =1;
 	if (!pass) return;
 
-	string file1=file+".xyz";
-	string file2=file+".cif";
+	std::string file1=file+".xyz";
+	std::string file2=file+".cif";
 
 	//xiaohui add 'GlobalV::OUT_LEVEL', 2015-09-16
 	if(GlobalV::OUT_LEVEL == "i"||GlobalV::OUT_LEVEL == "ie") unit_in.print_tau();

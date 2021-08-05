@@ -3,7 +3,7 @@
 pseudo_nc::pseudo_nc()
 {
 // pseudo_h
-	els = new string[1];
+	els = new std::string[1];
 	lchi = new int[1];
 	oc = new double[1];
 	jjj = new double[1];
@@ -99,7 +99,7 @@ void pseudo_nc::set_pseudo_nc(const Pseudopot_upf &upf)
 } // end subroutine set_pseudo_upf
 
 
-void pseudo_nc::print_pseudo_nc(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_nc(std::ofstream &ofs, output &outp)
 {
 	print_pseudo_vl(ofs, outp);
 	ofs << "\n pseudo_nc : ";
@@ -150,7 +150,7 @@ void pseudo_nc::set_pseudo_h(const Pseudopot_upf &upf)
 	this->nbeta = upf.nbeta;
 
 	delete[] els;
-	this->els = new string[nchi];
+	this->els = new std::string[nchi];
 	assert(this->els != 0);
 
 	delete[] lchi;
@@ -345,7 +345,7 @@ void pseudo_nc::set_pseudo_vl(const Pseudopot_upf &upf)
 } 
 
 
-void pseudo_nc::print_pseudo_atom(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_atom(std::ofstream &ofs, output &outp)
 {
 	print_pseudo_h(ofs, outp);
 	ofs << "\n pseudo_atom : ";
@@ -361,7 +361,7 @@ void pseudo_nc::print_pseudo_atom(ofstream &ofs, output &outp)
 }
 
 
-void pseudo_nc::print_pseudo_vl(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_vl(std::ofstream &ofs, output &outp)
 {
 	ofs << "\n pseudo_vl:";
 	print_pseudo_atom(ofs, outp);
@@ -369,7 +369,7 @@ void pseudo_nc::print_pseudo_vl(ofstream &ofs, output &outp)
 	ofs << "\n ----------------------------------- ";
 }
 
-void pseudo_nc::print_pseudo_h(ofstream &ofs, output &outp)
+void pseudo_nc::print_pseudo_h(std::ofstream &ofs, output &outp)
 {
     ofs << "\n pseudo_info :";
     ofs << "\n nv       " << nv;

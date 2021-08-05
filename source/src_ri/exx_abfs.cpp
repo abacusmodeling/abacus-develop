@@ -133,7 +133,7 @@ std::cout<<Exx_Abfs::Lmax<<std::endl;
 
 /*
 	// Peize Lin test
-	ofstream ofsN("N_orbital.dat");
+	std::ofstream ofsN("N_orbital.dat");
 	for( size_t T=0; T!=abfs_same_atom.size(); ++T )
 		for( size_t L=0; L!=abfs_same_atom[T].size(); ++L )
 			for( size_t N=0; N!=abfs_same_atom[T][L].size(); ++N )
@@ -286,7 +286,7 @@ std::cout<<"G7"<<std::endl;
 
 std::cout<<"H"<<std::endl;
 
-	const string file_name_prefix = "";			// Peize Lin test
+	const std::string file_name_prefix = "";			// Peize Lin test
 	IO::print_matrix(
 		file_name_prefix,
 		ms_lcaos2_jys,
@@ -340,7 +340,7 @@ std::cout<<Exx_Abfs::Lmax<<std::endl;
 	// Peize Lin test
 	auto ofs_N_orbital = [&]()
 	{
-		ofstream ofsN("N_orbital.dat");
+		std::ofstream ofsN("N_orbital.dat");
 		for( size_t T=0; T!=abfs_same_atom.size(); ++T )
 			for( size_t L=0; L!=abfs_same_atom[T].size(); ++L )
 				for( size_t N=0; N!=abfs_same_atom[T][L].size(); ++N )
@@ -545,7 +545,7 @@ std::cout<<"D"<<std::endl;
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 			&&matrix_V = m_lcaos_lcaos.cal_overlap_matrix(index_lcaos,index_lcaos);
 
-		ofstream ofs("S_matrix.dat");
+		std::ofstream ofs("S_matrix.dat");
 		for( const auto & m1 : matrix_V )
 		{
 			const size_t TA = m1.first;
@@ -578,7 +578,7 @@ std::cout<<"D"<<std::endl;
 		const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>>
 			&&matrix_V = m_lcaos_lcaos.cal_overlap_matrix(index_lcaos,index_lcaos);
 
-		ofstream ofs("S_matrix.dat");
+		std::ofstream ofs("S_matrix.dat");
 		for( const auto & m1 : matrix_V )
 		{
 			const size_t TA = m1.first;
@@ -824,7 +824,7 @@ void Exx_Abfs::cal_CVC(
 	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matrix>>>>> &ms_C,
 	const std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,matrix>>>> &ms_abfs_abfs ) const
 {
-	ofstream ofs("ms_CVC");
+	std::ofstream ofs("ms_CVC");
 
 	for( const auto & m11 : ms_C )
 	{

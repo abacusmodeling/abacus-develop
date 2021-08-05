@@ -39,7 +39,7 @@
 void Local_Orbital_Charge::write_dm(
 	const int &is, 
 	const int &iter, 
-	const string &fn, 
+	const std::string &fn, 
 	const int &precision)
 {
     TITLE("Local_Orbital_Charge","write_dm");
@@ -55,7 +55,7 @@ void Local_Orbital_Charge::write_dm(
 	timer::tick("Local_Orbital_Charge","write_dm");
 
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 
 	if(GlobalV::MY_RANK==0)
 	{

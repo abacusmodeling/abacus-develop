@@ -36,7 +36,7 @@ public:
     int NVT_control;
     double NVT_tau;
     int MNHC;
-    string mdoutputpath;// output directory of md files: .ion .vel
+    std::string mdoutputpath;// output directory of md files: .ion .vel
 	double ediff;       //parameter for constrain 
 	double ediffg;      //parameter for constrain
     int fixTemperature;

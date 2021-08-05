@@ -24,10 +24,10 @@ UnitCell_pseudo::~UnitCell_pseudo()
 //Calculate various lattice related quantities for given latvec
 //==============================================================
 void UnitCell_pseudo::setup_cell(
-		const string &s_pseudopot_dir,
+		const std::string &s_pseudopot_dir,
 		output &outp,  
-		const string &fn,
-		ofstream &log)
+		const std::string &fn,
+		std::ofstream &log)
 {
 	TITLE("UnitCell_pseudo","setup_cell");	
 	// (1) init mag
@@ -49,7 +49,7 @@ void UnitCell_pseudo::setup_cell(
 	if(GlobalV::MY_RANK == 0)
 	{
 		// open "atom_unitcell" file.
-		ifstream ifa(fn.c_str(), ios::in);
+		std::ifstream ifa(fn.c_str(), ios::in);
 		if (!ifa)
 		{
 			GlobalV::ofs_warning << fn;
@@ -193,7 +193,7 @@ void UnitCell_pseudo::setup_cell(
 			ss << GlobalV::global_out_dir << atom->label 
 				<< "/" << atom->label
 				<< ".NONLOCAL";
-			ofstream ofs(ss.str().c_str());
+			std::ofstream ofs(ss.str().c_str());
 
 			ofs << "<HEADER>" << std::endl;
 			ofs << setw(10) << atom->label << "\t" << "label" << std::endl;
@@ -303,9 +303,9 @@ void UnitCell_pseudo::setup_cell(
 }
 
 void UnitCell_pseudo::setup_cell_classic(
-	const string &fn,
-	ofstream &ofs_running,
-	ofstream &ofs_warning)
+	const std::string &fn,
+	std::ofstream &ofs_running,
+	std::ofstream &ofs_warning)
 
 {
 	TITLE("UnitCell_pseudo","setup_cell_classic");
@@ -322,7 +322,7 @@ void UnitCell_pseudo::setup_cell_classic(
 	// (3) read in atom information
 	if(GlobalV::MY_RANK == 0)
 	{
-		ifstream ifa(fn.c_str(), ios::in);
+		std::ifstream ifa(fn.c_str(), ios::in);
 		if (!ifa)
 		{
 			ofs_warning << fn;
@@ -638,13 +638,13 @@ void UnitCell_pseudo::cal_natomwfc(void)
 //LiuXh add a new function here,
 //20180515
 void UnitCell_pseudo::setup_cell_after_vc(
-        const string &s_pseudopot_dir,
+        const std::string &s_pseudopot_dir,
 		output &outp,
-        const string &fn, ofstream &log)
+        const std::string &fn, std::ofstream &log)
 {
     if(GlobalV::MY_RANK == 0)
     {
-        //ifstream ifa(fn.c_str(), ios::in);
+        //std::ifstream ifa(fn.c_str(), ios::in);
         //this->read_atom_species_after_vc(ifa);
     }
 

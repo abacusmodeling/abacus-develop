@@ -38,8 +38,8 @@ public:
     void cal_occup_m_k(const int iter);
     void cal_occup_m_gamma(const int iter);
 
-    void write_occup_m(const string &fn);
-    void read_occup_m(const string &fn);
+    void write_occup_m(const std::string &fn);
+    void read_occup_m(const std::string &fn);
     void local_occup_bcast();
     
     //calculate the energy correction: en_cor

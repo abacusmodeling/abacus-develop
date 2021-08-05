@@ -58,7 +58,7 @@ K_Vectors::~K_Vectors()
 
 void K_Vectors::set(
     const Symmetry &symm,
-    const string &k_file_name,
+    const std::string &k_file_name,
     const int& nspin_in,
     const Matrix3 &reciprocal_vec,
     const Matrix3 &latvec)
@@ -161,7 +161,7 @@ void K_Vectors::renew(const int &kpoint_number)
     return;
 }
 
-bool K_Vectors::read_kpoints(const string &fn)
+bool K_Vectors::read_kpoints(const std::string &fn)
 {
     TITLE("K_Vectors", "read_kpoints");
     if (GlobalV::MY_RANK != 0) return 1;
@@ -170,7 +170,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
 		GlobalV::ofs_warning << " Auto generating k-points file: " << fn << std::endl;
-		ofstream ofs(fn.c_str());
+		std::ofstream ofs(fn.c_str());
 		ofs << "K_POINTS" << std::endl;
 		ofs << "0" << std::endl;
 		ofs << "Gamma" << std::endl;
@@ -178,7 +178,7 @@ bool K_Vectors::read_kpoints(const string &fn)
 		ofs.close();
 	}
 
-    ifstream ifk(fn.c_str());
+    std::ifstream ifk(fn.c_str());
     if (!ifk) 
 	{
 		GlobalV::ofs_warning << " Can't find File name : " << fn << std::endl;
@@ -190,8 +190,8 @@ bool K_Vectors::read_kpoints(const string &fn)
     ifk.clear();
     ifk.seekg(0);
 
-    string word;
-    string kword;
+    std::string word;
+    std::string kword;
 
     int ierr = 0;
 
@@ -971,7 +971,7 @@ void K_Vectors::set_kup_and_kdw(void)
 } // end subroutine set_kup_and_kdw
 
 
-void K_Vectors::print_klists(ofstream &ofs)
+void K_Vectors::print_klists(std::ofstream &ofs)
 {
     TITLE("K_Vectors", "print_klists");
 
@@ -1019,7 +1019,7 @@ void K_Vectors::print_klists(ofstream &ofs)
 //20180515
 void K_Vectors::set_after_vc(
         const Symmetry &symm,
-        const string &k_file_name,
+        const std::string &k_file_name,
         const int& nspin_in,
         const Matrix3 &reciprocal_vec,
         const Matrix3 &latvec)

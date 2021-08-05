@@ -197,7 +197,7 @@ void Force_LCAO_gamma::finish_ftable_gamma(void)
 }
 
 
-void Force_LCAO_gamma::test_gamma(double* mm, const string &name)
+void Force_LCAO_gamma::test_gamma(double* mm, const std::string &name)
 {
     std::cout << "\n PRINT " << name << std::endl;
     std::cout << setprecision(6) << std::endl;

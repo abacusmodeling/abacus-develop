@@ -5,7 +5,7 @@ void Charge::write_rho(
 	const double* rho_save, 
 	const int &is, 
 	const int &iter, 
-	const string &fn, 
+	const std::string &fn, 
 	const int &precision, 
 	const bool for_plot)
 {
@@ -21,7 +21,7 @@ void Charge::write_rho(
 	}
 	
 	time_t start, end;
-	ofstream ofs;
+	std::ofstream ofs;
 	
 	if(GlobalV::MY_RANK==0)
 	{

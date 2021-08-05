@@ -499,7 +499,7 @@ void Parallel_PW::fft_map(
 }
 
 
-void Parallel_PW::print_data(ofstream &print)const
+void Parallel_PW::print_data(std::ofstream &print)const
 {
 	print<<setw(12)<<"gcut"<<setw(12)<<this->gcut<<std::endl;
 	print<<setw(12)<<"nst"<<setw(12)<<this->nst<<std::endl;

@@ -27,7 +27,7 @@ void Global_File::make_dir_out(
 // NAME : system
 //----------------------------------------------------------
 
-    string prefix ;
+    std::string prefix ;
 
 #ifdef __EPM
 #ifdef __MPI
@@ -46,7 +46,7 @@ void Global_File::make_dir_out(
 #endif
     int make_dir = 0;
 	// mohan update 2011-05-03
-	string command0 =  "test -d " + GlobalV::global_out_dir + " || mkdir " + GlobalV::global_out_dir;	
+	std::string command0 =  "test -d " + GlobalV::global_out_dir + " || mkdir " + GlobalV::global_out_dir;	
 
 	int times = 0;
 	while(times<GlobalV::NPROC)
@@ -112,7 +112,7 @@ void Global_File::make_dir_atom(const std::string &label)
     stringstream ss;
     ss << GlobalV::global_out_dir << label << "/";
 
-    string command1 = "test -d " + ss.str() + " || mkdir " + ss.str();
+    std::string command1 = "test -d " + ss.str() + " || mkdir " + ss.str();
     std::system( command1.c_str() );
     return;
 }

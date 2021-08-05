@@ -18,7 +18,7 @@ Symmetry_Basic::~Symmetry_Basic()
 
 
 // Find the type of bravais lattice.
-string Symmetry_Basic::get_brav_name(const int ibrav)
+std::string Symmetry_Basic::get_brav_name(const int ibrav)
 {
 	switch(ibrav)
 	{
@@ -834,7 +834,7 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 	return;
 }	
 
-void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, string &pgname, const Matrix3* gmatrix, ofstream &ofs_running)
+void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgname, const Matrix3* gmatrix, std::ofstream &ofs_running)
 {
 	//-------------------------------------------------------------------------
 	//PGROUP (L1760 symlib.f VASP)

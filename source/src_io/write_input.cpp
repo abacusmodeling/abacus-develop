@@ -1,13 +1,13 @@
 #include "../input.h"
 #include "../src_pw/tools.h"
 
-void Input::Print(const string &fn)const
+void Input::Print(const std::string &fn)const
 {
     if (GlobalV::MY_RANK!=0) return;
 
     TITLE("Input","Print");
 
-    ofstream ofs(fn.c_str());
+    std::ofstream ofs(fn.c_str());
 
 	//----------------------------------
 	// output the information in INPUT.

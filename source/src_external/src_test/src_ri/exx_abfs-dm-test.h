@@ -10,8 +10,8 @@ class Exx_Abfs_DM_Test
 {
 public:
 	static std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pairs );
-	static std::vector<std::vector<std::complex<double>>> read_wfc( const string &file_name );
-	static matrix read_wg( const string &file_name );
+	static std::vector<std::vector<std::complex<double>>> read_wfc( const std::string &file_name );
+	static matrix read_wg( const std::string &file_name );
 };
 
 std::map<size_t,std::map<size_t,std::vector<ComplexMatrix>>> 
@@ -58,10 +58,10 @@ Exx_Abfs_DM_Test::cal_DMk_raw_readfile( const set<pair<size_t,size_t>> &atom_pai
 
 
 
-std::vector<std::vector<std::complex<double>>> Exx_Abfs_DM_Test::read_wfc( const string &file_name )
+std::vector<std::vector<std::complex<double>>> Exx_Abfs_DM_Test::read_wfc( const std::string &file_name )
 {
 	std::vector<std::vector<std::complex<double>>> wfc(GlobalV::NBANDS,std::vector<std::complex<double>>(GlobalV::NLOCAL));
-	ifstream ifs(file_name);
+	std::ifstream ifs(file_name);
 	for( size_t iw=0; iw!=GlobalV::NLOCAL; ++iw )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
@@ -77,10 +77,10 @@ std::vector<std::vector<std::complex<double>>> Exx_Abfs_DM_Test::read_wfc( const
 
 
 
-matrix Exx_Abfs_DM_Test::read_wg( const string &file_name )
+matrix Exx_Abfs_DM_Test::read_wg( const std::string &file_name )
 {
 	matrix wf_wg(GlobalC::kv.nks,GlobalV::NBANDS);
-	ifstream ifs(file_name);
+	std::ifstream ifs(file_name);
 	for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 	{
 		for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )

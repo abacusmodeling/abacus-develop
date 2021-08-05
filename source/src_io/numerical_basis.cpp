@@ -55,13 +55,13 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
         this->init_label = true;
     }
 
-    const string command0 =  "test -d " + winput::spillage_outdir + " || mkdir " + winput::spillage_outdir;
+    const std::string command0 =  "test -d " + winput::spillage_outdir + " || mkdir " + winput::spillage_outdir;
     if(GlobalV::MY_RANK==0)
         system( command0.c_str() );
 
 	for(int derivative_order=0; derivative_order<=1; ++derivative_order)            // Peize Lin add 2020.04.23
 	{
-        ofstream ofs;
+        std::ofstream ofs;
         stringstream ss;
         // the parameter 'winput::spillage_outdir' is read from INPUTw.
         ss << winput::spillage_outdir << "/" << GlobalC::ucell.latName << "." << derivative_order << ".dat";
@@ -450,7 +450,7 @@ void Numerical_Basis::numerical_atomic_wfc(
 }
 
 void Numerical_Basis::output_info(
-    ofstream &ofs,
+    std::ofstream &ofs,
     const Bessel_Basis &bessel_basis)
 {
     // only print out to the information by the first processor
@@ -506,7 +506,7 @@ void Numerical_Basis::output_info(
 }
 
 void Numerical_Basis::output_k(
-    ofstream &ofs)
+    std::ofstream &ofs)
 {
     // (1)
     if (GlobalV::MY_RANK==0)
@@ -578,7 +578,7 @@ void Numerical_Basis::output_k(
 }
 
 void Numerical_Basis::output_overlap_Q(
-    ofstream &ofs,
+    std::ofstream &ofs,
     const std::vector<ComplexArray> &overlap_Q)
 {
     // (3)
@@ -644,8 +644,8 @@ void Numerical_Basis::output_overlap_Q(
 }
 
 void Numerical_Basis::output_overlap_Sq(
-    const string &name,
-    ofstream &ofs,
+    const std::string &name,
+    std::ofstream &ofs,
     const std::vector<ComplexArray> &overlap_Sq)
 {
     if (GlobalV::MY_RANK==0)
@@ -704,7 +704,7 @@ void Numerical_Basis::output_overlap_Sq(
 
 // Peize Lin add 2020.04.23
 void Numerical_Basis::output_overlap_V(
-    ofstream &ofs,
+    std::ofstream &ofs,
 	const matrix &overlap_V)
 {
 	if (GlobalV::MY_RANK==0)

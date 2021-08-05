@@ -134,7 +134,7 @@ void Occupy::calculate_weights(void)
 }
 
 
-void Occupy::decision(const string &name,const string &smearing,const double &degauss)
+void Occupy::decision(const std::string &name,const std::string &smearing,const double &degauss)
 {
 	TITLE("Occupy","decision");
     use_gaussian_broadening = false;

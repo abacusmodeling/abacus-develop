@@ -30,7 +30,7 @@ void Exx_Abfs::Parallel::Communicate::DM3::Allreduce::init(
 	H_atom_pairs_group_rank = get_H_atom_pairs_group_rank(H_atom_pairs_group);
 	get_send_recv_size(H_atom_pairs_group_rank, H_atom_pairs_group, send_size_list, recv_size);
 
-ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank));
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank));
 //ofs<<H_atom_pairs_group<<std::endl;
 //ofs<<atom_in_2D<<std::endl;
 //for(int rank=0; rank!=comm_sz; ++rank)
@@ -48,7 +48,7 @@ std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,ma
 	Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx(
 		std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &data_local) const
 {
-ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"dm3_"+TO_STRING(my_rank), std::ofstream::app);
 //ofs<<data_local<<std::endl<<"@@@"<<std::endl;;
 
 	TITLE("Exx_Abfs::Parallel::Communicate::DM3::Allreduce::a2D_to_exx");
@@ -274,7 +274,7 @@ std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::
 	const std::vector<pair<std::vector<bool>,std::vector<bool>>> atom_in_2D_list = Exx_Abfs::Parallel::Communicate::Function::get_atom_in_2D_list(mpi_comm);
 
 	std::vector<MPI_Request> request(comm_sz);
-	std::vector<string> atom_send_str(comm_sz);
+	std::vector<std::string> atom_send_str(comm_sz);
 	for(int rank_tmp=my_rank; rank_tmp!=comm_sz+my_rank; ++rank_tmp)
 	{
 		const int rank = rank_tmp%comm_sz;
@@ -294,7 +294,7 @@ std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::
 			atom_send_str[rank] = atom_send_ss.str();
 		}
 		#else
-			throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		#endif
 		if( MPI_Isend( atom_send_str[rank].c_str(), atom_send_str[rank].size(), MPI_CHAR, rank, tag, mpi_comm, &request[rank] ) !=MPI_SUCCESS)	throw runtime_error(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 	}
@@ -317,7 +317,7 @@ std::vector<std::map<size_t,set<size_t>>> Exx_Abfs::Parallel::Communicate::DM3::
 			ar(H_atom_pairs_group_rank[status.MPI_SOURCE]);
 		}	
 		#else
-			throw invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
+			throw std::invalid_argument(TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__));
 		#endif
 	}
 

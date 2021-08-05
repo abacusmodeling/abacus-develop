@@ -1,7 +1,7 @@
 #include "../../../src_ri/abfs.h"
 #include <iostream>
 
-static void test_adjs( ostream & os )
+static void test_adjs( std::ostream & os )
 {
 	for( size_t it=0; it!=GlobalC::ucell.ntype; ++it )
 		for( size_t ia=0; ia!=GlobalC::ucell.atoms[it].na; ++ia )

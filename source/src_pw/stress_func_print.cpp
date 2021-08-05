@@ -3,7 +3,7 @@
 static double output_acc = 1.0e-8;
 
 //print target stress term 
-void Stress_Func::print_stress(const string &name, const matrix& f, const bool screen, bool ry)const
+void Stress_Func::print_stress(const std::string &name, const matrix& f, const bool screen, bool ry)const
 {
 	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << std::endl;
 	

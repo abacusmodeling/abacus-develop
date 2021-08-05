@@ -60,7 +60,7 @@ Grid::~Grid()
 }
 
 void Grid::init(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const UnitCell &ucell, 
 	const Atom_input &input)
 {
@@ -78,7 +78,7 @@ void Grid::init(
 // NAME : setMemberVariables(read in data from Atom_input)
 //==========================================================
 void Grid::setMemberVariables(
-	ofstream &ofs_in, //  output data to ofs
+	std::ofstream &ofs_in, //  output data to ofs
 	const Atom_input &input)
 {
 	TITLE("SLTK_Grid", "setMemberVariables");
@@ -249,7 +249,7 @@ void Grid::setAtomLinkArray(const UnitCell &ucell, const Atom_input &input)
 }
 
 void Grid::setBoundaryAdjacent(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const Atom_input &input)
 {
 	if (test_grid) TITLE(ofs_in, "Grid", "setBoundaryAdjacent");

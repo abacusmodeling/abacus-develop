@@ -103,7 +103,7 @@ void Run_MD_PW::md_ions_pw(void)
             }
             else if (Exx_Global::Hybrid_Type::Generate_Matrix == GlobalC::exx_global.info.hybrid_type)
             {
-                throw invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+                throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
             }
             else // Peize Lin add 2019-03-09
             {
@@ -279,7 +279,7 @@ void Run_MD_PW::md_cells_pw()
         break;
     case Exx_Global::Hybrid_Type::Generate_Matrix:
     default:
-        throw invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
+        throw std::invalid_argument(TO_STRING(__FILE__) + TO_STRING(__LINE__));
     }
 #endif
 

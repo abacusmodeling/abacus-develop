@@ -194,9 +194,9 @@ void Exx_Lcao::init()
 {
 	auto mkdir_test_dir = [&]()
 	{
-		auto mkdir_one = [](const string &dir)
+		auto mkdir_one = [](const std::string &dir)
 		{
-			const string command0 =  "test -d " + dir + " || mkdir " + dir;
+			const std::string command0 =  "test -d " + dir + " || mkdir " + dir;
 			if(GlobalV::MY_RANK==0)
 			{
 				system( command0.c_str() );
@@ -211,23 +211,23 @@ void Exx_Lcao::init()
 	
 	auto test_rk = []()
 	{
-		auto pr_v = []( const string & file, const std::vector<double> & v )
+		auto pr_v = []( const std::string & file, const std::vector<double> & v )
 		{
-			ofstream ofs(file);
+			std::ofstream ofs(file);
 			for( size_t i=0; i!=v.size(); ++i )
 			{
 				ofs<<v[i]<<std::endl;
 			}
 			ofs.close();
 		};
-		auto pr_orb = [&pr_v]( const string & file, const Numerical_Orbital_Lm & orb )
+		auto pr_orb = [&pr_v]( const std::string & file, const Numerical_Orbital_Lm & orb )
 		{
 			pr_v( file+"-psi", orb.get_psi() );
 			pr_v( file+"-psi_f", orb.get_psif() );
 			pr_v( file+"-psi_k", orb.get_psi_k() );
 			pr_v( file+"-psi_k2", orb.get_psi_k2() );
 		};
-		auto pr_orb_all = [&pr_orb]( const string & file, const Numerical_Orbital_Lm & orb )
+		auto pr_orb_all = [&pr_orb]( const std::string & file, const Numerical_Orbital_Lm & orb )
 		{
 			Numerical_Orbital_Lm orb_psi_T, orb_psi_F, orb_psif_T, orb_psik_T, orb_psik2_T;
 			orb_psi_T.set_orbital_info
@@ -322,7 +322,7 @@ void Exx_Lcao::init()
 			pr_orb( file+"-orb_psik_T",orb_psik_T );
 			pr_orb( file+"-orb_psik2_T",orb_psik2_T );
 		};
-		auto pr_orb_all_kmesh = [&pr_orb]( const string & file, const Numerical_Orbital_Lm & orb, const int kmesh_times )
+		auto pr_orb_all_kmesh = [&pr_orb]( const std::string & file, const Numerical_Orbital_Lm & orb, const int kmesh_times )
 		{
 			const int Nk =orb.getNk() * kmesh_times | 1;
 			Numerical_Orbital_Lm orb_psi_T, orb_kmesh;
@@ -518,7 +518,7 @@ void Exx_Lcao::init()
 
 mkdir_test_dir();
 
-ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start,t_start_all;
 gettimeofday( &t_start_all, NULL);
 
@@ -542,7 +542,7 @@ gettimeofday( &t_start_all, NULL);
 		}
 		else
 		{
-			throw invalid_argument("exx mixing error. exx_separate_loop==false, mixing_mode!=plain or pulay");
+			throw std::invalid_argument("exx mixing error. exx_separate_loop==false, mixing_mode!=plain or pulay");
 		}
 		Hexx_para.mixing_beta = GlobalC::CHR.mixing_beta;
 	}
@@ -601,10 +601,10 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::en
 	};
 
 	auto print_psi2 = [](
-		const string & file_name,
+		const std::string & file_name,
 		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orbs)
 	{
-		ofstream ofs(file_name);
+		std::ofstream ofs(file_name);
 		for( size_t T=0; T!=orbs.size(); ++T )
 		{
 			for( size_t L=0; L!=orbs[T].size(); ++L )
@@ -625,7 +625,7 @@ ofs_mpi<<"TIME@ Exx_Abfs::Construct_Orbs::abfs\t"<<time_during(t_start)<<std::en
 
 //	Conv_Coulomb_Pot::cal_orbs_ccp( abfs, abfs_ccp, info.ccp_rmesh_times, 1 );
 //{
-//	ofstream ofs("exx_lcao"+TO_STRING(GlobalV::MY_RANK));
+//	std::ofstream ofs("exx_lcao"+TO_STRING(GlobalV::MY_RANK));
 //	ofs<<static_cast<std::underlying_type<Exx_Lcao::Hybrid_Type>::type>(exx_lcao.info.hybrid_type)<<std::endl;
 //	ofs.close();
 //}
@@ -644,7 +644,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::endl;
 
 	auto print_psik = [](
-		const string & file_name,
+		const std::string & file_name,
 		const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> & orbs,
 		const int power )
 	{
@@ -655,7 +655,7 @@ ofs_mpi<<"TIME@ Conv_Coulomb_Pot_K::cal_orbs_ccp\t"<<time_during(t_start)<<std::
 				for( size_t k=0; k!=orbs[i][j].size(); ++k )
 				{
 					const Numerical_Orbital_Lm & orb = orbs[i][j][k];
-					ofstream ofs(file_name+"_"+TO_STRING(i)+"_"+TO_STRING(j)+"_"+TO_STRING(k));
+					std::ofstream ofs(file_name+"_"+TO_STRING(i)+"_"+TO_STRING(j)+"_"+TO_STRING(k));
 					for( size_t ik=0; ik!=orb.getNk(); ++ik )
 					{
 						ofs<<orb.getPsi_k(ik) / pow(orb.getKpoint(ik),power)<<std::endl;
@@ -697,7 +697,7 @@ ofs_mpi<<range_abfs<<std::endl;
 		mll.init(2,1,1);
 		mll.init_radial(GlobalC::ORB, GlobalC::ORB);
 		mll.init_radial_table();
-		ofstream ofsS("S.dat");
+		std::ofstream ofsS("S.dat");
 		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[0],index_lcaos,index_lcaos)<<std::endl<<std::endl;
 		ofsS<<mll.cal_overlap_matrix(0,0,GlobalC::ucell.atoms[0].tau[0],GlobalC::ucell.atoms[0].tau[1],index_lcaos,index_lcaos)<<std::endl<<std::endl;
 	};
@@ -780,7 +780,7 @@ ofs_mpi.close();
 		m_lcaos_ccp.init_radial_table();
 		const matrix m_overlap_coulomb = m_lcaos_ccp.cal_overlap_matrix( 0,0, {0,0,0},{0,0,0}, index_lcaos,index_lcaos );
 
-		ofstream ofs("matrix_overlap.dat");
+		std::ofstream ofs("matrix_overlap.dat");
 		ofs<<m_overlap<<std::endl<<m_overlap_coulomb<<std::endl;
 		ofs.close();
 	};
@@ -789,7 +789,7 @@ ofs_mpi.close();
 void Exx_Lcao::cal_exx_ions()
 {
 	TITLE("Exx_Lcao","cal_exx_ions");
-ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
 
@@ -822,13 +822,13 @@ gettimeofday( &t_start, NULL);
 		}
 ofs_mpi<<"atom_pairs_core_origin\t"<<atom_pairs_core_origin.size()<<std::endl;
 ofs_mpi<<"TIME@ Htime::distribute\t"<<time_during(t_start)<<std::endl;
-//ofstream ofs_atom_pair("atom_pair+"+TO_STRING(GlobalV::MY_RANK));
+//std::ofstream ofs_atom_pair("atom_pair+"+TO_STRING(GlobalV::MY_RANK));
 //for( const auto & i : atom_pairs_core_origin )
 //	ofs_atom_pair<<i.first<<"\t"<<i.second<<std::endl;
 //ofs_atom_pair.close();
 	
 	#if TEST_EXX_LCAO==1
-		ofstream ofs_adjs("adjs.dat");
+		std::ofstream ofs_adjs("adjs.dat");
 		test_adjs(ofs_adjs);
 		ofs_adjs.close();
 	#elif TEST_EXX_LCAO==-1
@@ -925,7 +925,7 @@ static int istep=0;
 
 //	if( exx_lcao.cal_DM_delta() < exx_lcao.get_DM_threshold() )	break;
 
-ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start, t_start_all;
 gettimeofday( &t_start_all, NULL);
 
@@ -971,7 +971,7 @@ ofs_mpi.close();
 
 	auto print_Hexxk = [&]()
 	{
-		ofstream ofs("Hexxk_"+TO_STRING(GlobalV::MY_RANK));
+		std::ofstream ofs("Hexxk_"+TO_STRING(GlobalV::MY_RANK));
 		for(int ik=0; ik!=Hexx_para.HK_K_m2D.size(); ++ik)
 		{
 			ofs<<"@\t"<<ik<<std::endl;
@@ -992,7 +992,7 @@ ofs_mpi.close();
 	{
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
-			ofstream ofs("GlobalC::LOC.DM.dat",ofstream::app);
+			std::ofstream ofs("GlobalC::LOC.DM.dat",std::ofstream::app);
 			const int it1=0, it2=0;
 			for( size_t ia1=0; ia1!=GlobalC::ucell.atoms[it1].na; ++ia1 )
 				for( size_t ia2=0; ia2!=GlobalC::ucell.atoms[it2].na; ++ia2 )
@@ -1016,7 +1016,7 @@ ofs_mpi.close();
 			static int istep=0;
 			for( size_t is=0; is!=GlobalV::NSPIN; ++is )
 			{
-				ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
+				std::ofstream ofs("GlobalC::LOC.DM_"+TO_STRING(istep++)+"_"+TO_STRING(is));
 				for(int T1=0; T1<GlobalC::ucell.ntype; T1++)
 				{
 					for(int I1=0; I1<GlobalC::ucell.atoms[T1].na; I1++)
@@ -1056,7 +1056,7 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("GlobalC::LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				std::ofstream ofs("GlobalC::LOWF.WFC_GAMMA_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
@@ -1078,7 +1078,7 @@ ofs_mpi.close();
 		{
 			for( size_t ik=0; ik!=GlobalC::kv.nks; ++ik )
 			{
-				ofstream ofs("GlobalC::LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
+				std::ofstream ofs("GlobalC::LOWF.WFC_K_"+TO_STRING(istep)+"_"+TO_STRING(ik));
 				for( size_t ib=0; ib!=GlobalV::NBANDS; ++ib )
 				{
 					for( size_t iwt=0; iwt!=GlobalV::NLOCAL; ++iwt )
@@ -1096,7 +1096,7 @@ ofs_mpi.close();
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
-				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
 				ofs<<this->Hexx_para.HK_Gamma_m2D[is]<<std::endl;
 			}
 		}
@@ -1104,7 +1104,7 @@ ofs_mpi.close();
 		{
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("Hexx_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
 				ofs<<this->Hexx_para.HK_K_m2D[ik]<<std::endl;
 			}
 		}
@@ -1116,7 +1116,7 @@ ofs_mpi.close();
 		{
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{		
-				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(is)+"_"+TO_STRING(GlobalV::MY_RANK));
 				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[is]<<std::endl;
 			}
 		}
@@ -1124,7 +1124,7 @@ ofs_mpi.close();
 		{
 			for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 			{
-				ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
+				std::ofstream ofs("wfc_"+TO_STRING(istep)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
 				ofs<<GlobalC::LOC.wfc_dm_2d.wfc_gamma[ik]<<std::endl;
 			}
 		}
@@ -1134,7 +1134,7 @@ ofs_mpi.close();
 	{
 		for(int ik=0; ik<GlobalC::kv.nks; ++ik)
 		{
-			ofstream ofs("ekb_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
+			std::ofstream ofs("ekb_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK), std::ofstream::app);
 			for(int ib=0; ib<GlobalV::NBANDS; ++ib)
 				ofs<<GlobalC::wf.ekb[ik][ib]<<"\t";
 			ofs<<std::endl;
@@ -1212,7 +1212,7 @@ double Exx_Lcao::cal_energy(
 	const std::vector<std::map<size_t,std::map<size_t,std::map<Abfs::Vector3_Order<int>,matrix>>>> &HexxR ) const
 {
 	TITLE("Exx_Lcao","cal_energy");
-ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday( &t_start, NULL);
 
@@ -1277,12 +1277,12 @@ void Exx_Lcao::init_radial_table_ions( const set<size_t> &atom_centres_core, con
 {
 	TITLE("Exx_Lcao::init_radial_table_ions");
 	
-ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs_mpi(test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 
 	std::map<size_t,std::map<size_t,set<double>>> radial_R;
 	
-	auto print_atom = [&](ostream &os)
+	auto print_atom = [&](std::ostream &os)
 	{
 		os<<"atom_centres_core:"<<"\t";
 		for(const auto &a : atom_centres_core)
@@ -1297,7 +1297,7 @@ timeval t_start;
 		}
 		os<<std::endl;
 	};
-	auto print_radial_R = [&](ostream &os)
+	auto print_radial_R = [&](std::ostream &os)
 	{
 		os<<"radial_R"<<std::endl;
 		for(const auto &rA : radial_R)
@@ -1320,7 +1320,7 @@ timeval t_start;
 	}
 
 	#if TEST_EXX_LCAO==1
-		ofstream ofs_C("delta_R_C.dat");
+		std::ofstream ofs_C("delta_R_C.dat");
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -1372,7 +1372,7 @@ gettimeofday( &t_start, NULL);
 ofs_mpi<<"TIME@ m_abfslcaos_lcaos.init_radial_table\t"<<time_during(t_start)<<std::endl;
 
 	#if TEST_EXX_LCAO==1
-		ofstream ofs_V("delta_R_V.dat");
+		std::ofstream ofs_V("delta_R_V.dat");
 	#elif TEST_EXX_LCAO==-1
 		#error "TEST_EXX_LCAO"
 	#endif
@@ -1415,7 +1415,7 @@ ofs_mpi<<"TIME@ radial_R_V\t"<<time_during(t_start)<<std::endl;
 	#endif
 	
 	#if TEST_EXX_LCAO==1
-		ofstream ofs_V("delta_R_V.dat");
+		std::ofstream ofs_V("delta_R_V.dat");
 		for( const double & r : radial_R[0][0] )
 			ofs_V<<r<<std::endl;
 		ofs_V.close();

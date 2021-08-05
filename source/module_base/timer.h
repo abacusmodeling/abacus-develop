@@ -32,7 +32,7 @@ class timer
 		bool start_flag = true;
 	};
 	
-	static std::map<string,std::map<string,Timer_One>> timer_pool;
+	static std::map<std::string,std::map<std::string,Timer_One>> timer_pool;
 //==========================================================
 // MEMBER FUNCTIONS :
 // NAME : tick(use twice at a time)
@@ -42,15 +42,15 @@ class timer
 // NAME : disable
 // NAME : print_all
 //==========================================================
-	static void tick(const string &class_name_in,const string &name_in);
+	static void tick(const std::string &class_name_in,const std::string &name_in);
 
 	static void start(void);
-	static void finish(ofstream &ofs,const bool print_flag = 1);
+	static void finish(std::ofstream &ofs,const bool print_flag = 1);
 
 	static void enable(void){ disabled = false; }
 	static void disable(void){ disabled = true; }
 
-	static void print_all(ofstream &ofs);
+	static void print_all(std::ofstream &ofs);
 	static long double print_until_now(void);
 
 	private:

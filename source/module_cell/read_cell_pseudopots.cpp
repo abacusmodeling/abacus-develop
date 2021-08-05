@@ -12,7 +12,7 @@
 //==========================================================
 // Read pseudopotential according to the dir
 //==========================================================
-void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
+void UnitCell_pseudo::read_cell_pseudopots(const std::string &pp_dir)
 {
 	TITLE("UnitCell_pseudo","read_cell_pseudopots");
 	// setup reading log for pseudopot_upf
@@ -20,7 +20,7 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 	ss << GlobalV::global_out_dir << "atom_pseudo.log";
 	
 	// Read in the atomic pseudo potentials
-	string pp_address;
+	std::string pp_address;
 	for (int i = 0;i < ntype;i++)
 	{
 		Pseudopot_upf upf;
@@ -129,10 +129,10 @@ void UnitCell_pseudo::read_cell_pseudopots(const string &pp_dir)
 }
 
 
-void UnitCell_pseudo::print_unitcell_pseudo(const string &fn, output &outp)
+void UnitCell_pseudo::print_unitcell_pseudo(const std::string &fn, output &outp)
 {
 	if(GlobalV::test_pseudo_cell) TITLE("UnitCell_pseudo","print_unitcell_pseudo");
-	ofstream ofs( fn.c_str() );
+	std::ofstream ofs( fn.c_str() );
 
 	this->print_cell(ofs, outp);
 	for (int i = 0;i < ntype;i++)

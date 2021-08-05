@@ -23,7 +23,7 @@ void Exx_Abfs::Matrix_Orbs21::init(
 	//=========================================
 	// (1) MOT: make overlap table.
 	//=========================================
-//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+//std::ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;
 //gettimeofday( &t_start, NULL);
 	MOT.allocate(
@@ -66,7 +66,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial(
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_A2,
 	const std::vector<std::vector<std::vector<Numerical_Orbital_Lm>>> &orb_B )
 {
-//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+//std::ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;
 //gettimeofday( &t_start, NULL);
 
@@ -97,7 +97,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial(
 	const LCAO_Orbitals &orb_A2,
 	const LCAO_Orbitals &orb_B )
 {
-//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+//std::ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;
 //gettimeofday( &t_start, NULL);
 
@@ -125,7 +125,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial(
 
 void Exx_Abfs::Matrix_Orbs21::init_radial_table()
 {
-//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+//std::ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;
 //gettimeofday( &t_start, NULL);
 
@@ -146,7 +146,7 @@ void Exx_Abfs::Matrix_Orbs21::init_radial_table()
 
 void Exx_Abfs::Matrix_Orbs21::init_radial_table( const std::map<size_t,std::map<size_t,set<double>>> &Rs )
 {
-ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+std::ofstream ofs(GlobalC::exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 timeval t_start;
 gettimeofday(&t_start, NULL);
 
@@ -269,7 +269,7 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 	{
 		case Matrix_Order::A2B_A1:	m.create( index_A2[TA].count_size*index_B [TB].count_size, index_A1[TA].count_size );	break;
 		case Matrix_Order::BA2_A1:	m.create( index_B [TB].count_size*index_A2[TA].count_size, index_A1[TA].count_size );	break;
-		default:	throw invalid_argument( "Matrix_Order wrong in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );
+		default:	throw std::invalid_argument( "Matrix_Order wrong in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );
 	}
 
 	for( const auto &co3 : center2_orb21_s.at(TA).at(TB) )
@@ -316,7 +316,7 @@ matrix Exx_Abfs::Matrix_Orbs21::cal_overlap_matrix(
 													index_A1[TA][LA1][NA1][MA1] )
 												= overlap;
 												break;
-											default:	throw invalid_argument( "Matrix_Order wrong in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );
+											default:	throw std::invalid_argument( "Matrix_Order wrong in "+TO_STRING(__FILE__)+" line "+TO_STRING(__LINE__) );
 										}
 									}
 								}
@@ -396,7 +396,7 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matr
 	const Element_Basis_Index::IndexLNM &index_A2,
 	const Element_Basis_Index::IndexLNM &index_B) const
 {
-//ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),ofstream::app);
+//std::ofstream ofs(exx_lcao.test_dir.process+"time_"+TO_STRING(GlobalV::MY_RANK),std::ofstream::app);
 //timeval t_start;
 //gettimeofday( &t_start, NULL);
 
@@ -456,27 +456,27 @@ std::map<size_t,std::map<size_t,std::map<size_t,std::map<size_t,std::vector<matr
 
 														// Peize Lin test											// Peize Lin test
 //														{
-//															ofstream ofs("orb11-i_exp",ofstream::app);
+//															std::ofstream ofs("orb11-i_exp",std::ofstream::app);
 //															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
-//															ofstream ofs("orb11-Gaunt_solid_A_B_AB",ofstream::app);
+//															std::ofstream ofs("orb11-Gaunt_solid_A_B_AB",std::ofstream::app);
 //															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
-//															ofstream ofs("orb11-Gaunt_A_B_AB",ofstream::app);
+//															std::ofstream ofs("orb11-Gaunt_A_B_AB",std::ofstream::app);
 //															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
-//															ofstream ofs("orb11-Interp_Tlm",ofstream::app);
+//															std::ofstream ofs("orb11-Interp_Tlm",std::ofstream::app);
 //															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}
 //														{
-//															ofstream ofs("orb11-rly",ofstream::app);
+//															std::ofstream ofs("orb11-rly",std::ofstream::app);
 //															ofs<<IA<<"\t"<<IB<<"\t"<<LA1<<"\t"<<MA1<<"\t"<<NA1<<"\t"<<LA2<<"\t"<<MA2<<"\t"<<NA2<<"\t"<<LB<<"\t"<<MB<<"\t"<<NB<<std::endl;
 //															ofs.close();
 //														}

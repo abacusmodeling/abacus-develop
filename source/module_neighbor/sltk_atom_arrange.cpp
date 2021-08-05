@@ -15,8 +15,8 @@ atom_arrange::~atom_arrange()
 }
 
 double atom_arrange::set_sr_NL(
-	ofstream &ofs_in,
-	string &output_level,
+	std::ofstream &ofs_in,
+	std::string &output_level,
 	const double &rcutmax_Phi, 
 	const double &rcutmax_Beta, 
 	const bool gamma_only_local)
@@ -88,7 +88,7 @@ void atom_arrange::set_sr_OV(void)
 
 void atom_arrange::search(
 	const bool pbc_flag,
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 
 	const double &search_radius_bohr, 
@@ -167,7 +167,7 @@ void atom_arrange::search(
 
 //2015-05-07
 void atom_arrange::delete_vector(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const bool pbc_flag, // GlobalV::SEARCH_PBC
 	Grid_Driver &grid_d, 
 	const UnitCell &ucell, 

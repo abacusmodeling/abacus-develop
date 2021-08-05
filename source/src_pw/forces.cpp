@@ -180,7 +180,7 @@ void Forces::init(matrix& force)
 	
 	if(INPUT.force_set)                                                   // pengfei 2016-12-20
 	{
-		ofstream ofs("FORCE.dat");
+		std::ofstream ofs("FORCE.dat");
 		if(!ofs)
 		{
 			std::cout << "open FORCE.dat error !" <<std::endl;
@@ -212,7 +212,7 @@ void Forces::init(matrix& force)
     return;
 }
 
-void Forces::print_to_files(ofstream &ofs, const string &name, const matrix &f)
+void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const matrix &f)
 {
     int iat = 0;
     ofs << " " << name;
@@ -257,7 +257,7 @@ void Forces::print_to_files(ofstream &ofs, const string &name, const matrix &f)
 
 
 
-void Forces::print(const string &name, const matrix &f, bool ry)
+void Forces::print(const std::string &name, const matrix &f, bool ry)
 {
 	NEW_PART(name);
 

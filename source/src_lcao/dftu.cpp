@@ -653,7 +653,7 @@ void DFTU::cal_occup_m_gamma(const int iter)
 
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream ofs_elec("nelec.dat", ios_base::app);
+		std::ofstream ofs_elec("nelec.dat", ios_base::app);
 		ofs_elec << "Total number of electrons of the system " << Nele << std::endl;
 	}
 	*/
@@ -662,13 +662,13 @@ void DFTU::cal_occup_m_gamma(const int iter)
 	return;
 }
 
-void DFTU::write_occup_m(const string &fn)
+void DFTU::write_occup_m(const std::string &fn)
 {
 	TITLE("DFTU", "write_occup_m");
 
 	if(GlobalV::MY_RANK!=0) return;
 
-	ofstream ofdftu;
+	std::ofstream ofdftu;
 	ofdftu.open(fn.c_str());
     if (!ofdftu)
     {
@@ -752,13 +752,13 @@ void DFTU::write_occup_m(const string &fn)
 	return;
 }
 
-void DFTU::read_occup_m(const string &fn)
+void DFTU::read_occup_m(const std::string &fn)
 {
 	TITLE("DFTU", "read_occup_m");
 
 	if(GlobalV::MY_RANK!=0) return;
 
-	ifstream ifdftu(fn.c_str(), ios::in);	
+	std::ifstream ifdftu(fn.c_str(), ios::in);	
 
 	if (!ifdftu) 
 	{
@@ -1122,7 +1122,7 @@ void DFTU::cal_energy_correction(const int istep)
 	/*
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream of_eu("energy_correction", ios_base::app);
+		std::ofstream of_eu("energy_correction", ios_base::app);
 		double e=EU*Ry_to_eV;
 		of_eu << "ITERATION STEP " << setw(3) << this->iter_dftu <<"      " << setw(15) << e << "ev" << std::endl;
 	}
@@ -1134,7 +1134,7 @@ void DFTU::cal_energy_correction(const int istep)
 	/*
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream of_en("energy_correction.dat",ios_base::app);
+		std::ofstream of_en("energy_correction.dat",ios_base::app);
 		double val = this->EU*Ry_to_eV;
 
 		of_en << fixed << setprecision(8) << val << "eV" << std::endl;
@@ -1217,7 +1217,7 @@ void DFTU::cal_eff_pot_mat_complex(const int ik, const int istep, std::complex<d
 
 	if(MY_RANK==0)
 	{
-		ofstream of_potH("Hermitian_pot.dat",ios_base::app);
+		std::ofstream of_potH("Hermitian_pot.dat",ios_base::app);
 		of_potH << "Hermitian  " << pot_Hermitian << std::endl;
 	}
 	*/
@@ -1300,7 +1300,7 @@ void DFTU::cal_eff_pot_mat_real(const int ik, const int istep, double* eff_pot)
 
 	if(GlobalV::MY_RANK==0)
 	{
-		ofstream of_potH("Hermitian_pot.dat",ios_base::app);
+		std::ofstream of_potH("Hermitian_pot.dat",ios_base::app);
 		of_potH << "Hermitian  " << pot_Hermitian << std::endl;
 	}
 	*/

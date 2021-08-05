@@ -477,7 +477,7 @@ void Force_Stress_LCAO::getForceStress(
 }
 
 //print force term for test
-void Force_Stress_LCAO::print_force(const string &name, matrix& f, const bool screen, bool ry)const
+void Force_Stress_LCAO::print_force(const std::string &name, matrix& f, const bool screen, bool ry)const
 {
 	GlobalV::ofs_running << " --------------------------- " << name << " ----------------------------" << std::endl;
 	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
@@ -558,7 +558,7 @@ void Force_Stress_LCAO::printforce_total (const bool ry, const bool istestf, mat
 	// print out forces
 	if(INPUT.force_set == 1)
 	{
-		ofstream ofs("FORCE.dat");
+		std::ofstream ofs("FORCE.dat");
 		if(!ofs)
 		{
 			std::cout << "open FORCE.dat error !" <<std::endl;

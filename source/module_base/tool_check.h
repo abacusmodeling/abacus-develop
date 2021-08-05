@@ -18,9 +18,9 @@ using namespace std;
 // GLOBAL FUNCTIONS :
 // Check the input variables
 //==========================================================
-void CHECK_NAME(ifstream &ifs, const string &name_in, bool quit=true);
-void CHECK_INT(ifstream &ifs, const int &v, bool quit=true);
-void CHECK_DOUBLE(ifstream &ifs, const double &v, bool quit=true);
-void CHECK_STRING(ifstream &ifs, const string &v, bool quit=true);
+void CHECK_NAME(std::ifstream &ifs, const std::string &name_in, bool quit=true);
+void CHECK_INT(std::ifstream &ifs, const int &v, bool quit=true);
+void CHECK_DOUBLE(std::ifstream &ifs, const double &v, bool quit=true);
+void CHECK_STRING(std::ifstream &ifs, const std::string &v, bool quit=true);
 
 #endif

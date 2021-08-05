@@ -16,13 +16,13 @@ class Rwstream
 		Rwstream(){
 			fileptr=NULL;
 		};
-		Rwstream(const string,const char*);
+		Rwstream(const std::string,const char*);
 		Rwstream(FILE* &ptr);
 		~Rwstream(){};
 		void setptr(FILE* &ptr);
 		FILE* fileptr;
 		void close();
-		void open(const string,const char*);
+		void open(const std::string,const char*);
 		bool operator!() const;
 		operator bool() const;
 };

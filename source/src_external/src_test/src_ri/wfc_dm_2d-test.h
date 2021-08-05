@@ -10,7 +10,7 @@
 #include <iostream>
 #include <fstream>
 
-static void os_wfc_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
+static void os_wfc_2d(std::ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 {
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -32,7 +32,7 @@ static void os_wfc_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 	}
 }
 
-static void os_dm_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
+static void os_dm_2d(std::ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 {
 	if(GlobalV::GAMMA_ONLY_LOCAL)
 	{
@@ -56,14 +56,14 @@ static void os_dm_2d(ostream &os, const Wfc_Dm_2d & wfc_dm_2d)
 
 static void ofs_wfc_2d(const Wfc_Dm_2d & wfc_dm_2d)
 {
-	ofstream ofs("wfc_2d_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
+	std::ofstream ofs("wfc_2d_"+TO_STRING(GlobalV::MY_RANK), std::ofstream::app);
 	os_wfc_2d(ofs,wfc_dm_2d);
 	ofs.close();
 }
 
 static void ofs_dm_2d(const Wfc_Dm_2d & wfc_dm_2d)
 {
-	ofstream ofs("dm_2d_"+TO_STRING(GlobalV::MY_RANK), ofstream::app);
+	std::ofstream ofs("dm_2d_"+TO_STRING(GlobalV::MY_RANK), std::ofstream::app);
 	os_dm_2d(ofs,wfc_dm_2d);
 	ofs.close();
 }

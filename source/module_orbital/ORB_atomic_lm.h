@@ -41,7 +41,7 @@ class Numerical_Orbital_Lm
 	/// EXPLAIN : set information about Numerical_Orbital_Lm
 	void set_orbital_info
 	(
- 		const string &label_in,
+ 		const std::string &label_in,
 	 	const int &index_atom_type_in,
 		const int &angular_momentum_l_in,
 		const int &index_chi_in,
@@ -62,7 +62,7 @@ class Numerical_Orbital_Lm
 private:
 
 	void copy_parameter(
-		const string &label_in,
+		const std::string &label_in,
 		const int &index_atom_type_in,
 		const int &angular_momentum_l_in,
 		const int &index_chi_in,
@@ -81,7 +81,7 @@ private:
 	void use_uniform(const double &dr_uniform_in);
 	void extra_uniform(const double &dr_uniform_in, const bool &force_flag);
 
-	string label;
+	std::string label;
 	int index_atom_type;
 	int angular_momentum_l;
 	int index_chi;
@@ -106,7 +106,7 @@ private:
 
 public:
 
-	const string& getLabel() const { return label; }
+	const std::string& getLabel() const { return label; }
 	const int& getType() const     { return index_atom_type; }
 	const int& getL() const        { return angular_momentum_l; }
 	const int& getChi() const      { return index_chi; }

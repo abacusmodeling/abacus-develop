@@ -163,7 +163,7 @@ void WF_atomic::print_PAOs(void)const
         {
             int ic = icc;
             if(GlobalV::NSPIN==4) ic = icc/2;
-            string orbital_type;
+            std::string orbital_type;
             if (ic == 0)  orbital_type = "S";
             else if (ic == 1) orbital_type = "P";
             else if (ic == 2) orbital_type = "D";
@@ -181,7 +181,7 @@ void WF_atomic::print_PAOs(void)const
             << GlobalC::ucell.atoms[it].label << "-"
             << orbital_type << ".ORBITAL";
 
-            ofstream ofs(ss.str().c_str());
+            std::ofstream ofs(ss.str().c_str());
             ofs << "Mesh " << GlobalC::ucell.atoms[it].msh;
             ofs << "\n" << setw(15) << "Radial"
             << setw(15) << "Psi"

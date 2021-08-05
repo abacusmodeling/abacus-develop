@@ -8,7 +8,7 @@
 //==========================================================
 Atom_input::Atom_input
 (
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const UnitCell &ucell,
 	const int amount,
 	const int ntype,

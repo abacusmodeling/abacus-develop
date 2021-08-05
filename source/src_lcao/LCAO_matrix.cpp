@@ -396,7 +396,7 @@ void LCAO_Matrix::zeros_HSR(const char &mtype, const int &nnr)
 }
 
 // Peize Lin add vtype='A' 2018-11-30
-void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &accuracy, ostream &os)
+void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &accuracy, std::ostream &os)
 {
 	TITLE("LCAO_Matrix","print_HSk");
 	if(mtype=='S') os << "Sloc2 matrix" << std::endl;
@@ -471,7 +471,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 }
 
 
-void LCAO_Matrix::print_HSgamma(const char &mtype, ostream &os)
+void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 {
 	TITLE("Parallel_Orbitals","print_HSgamma");
 
@@ -565,12 +565,12 @@ void LCAO_Matrix::update_Hloc2(void)
 }
 
 
-void LCAO_Matrix::output_HSk(const char &mtype, string &fn)
+void LCAO_Matrix::output_HSk(const char &mtype, std::string &fn)
 {
 	TITLE("LCAO_Matrix","output_HSk");
 	stringstream ss;
 	ss << GlobalV::global_out_dir << fn;
-	ofstream ofs(ss.str().c_str());
+	std::ofstream ofs(ss.str().c_str());
 	ofs << GlobalV::NLOCAL << std::endl;
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{

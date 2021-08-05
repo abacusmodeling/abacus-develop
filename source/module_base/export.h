@@ -17,7 +17,7 @@ using namespace std;
 #endif
 
 template <class T>
-void AUTO_SET(ofstream &ofs,const string &name,const T &a)
+void AUTO_SET(std::ofstream &ofs,const std::string &name,const T &a)
 {
 	ofs<<" AUTO_SET "<<name<<" : "<<a << std::endl;
 	return;
@@ -45,7 +45,7 @@ void IF_MATCH(const T &a,const T &b)
 	return;
 }
 
-void IF_MATCH(const string &name,const string &name2);
+void IF_MATCH(const std::string &name,const std::string &name2);
 
 
 #endif 

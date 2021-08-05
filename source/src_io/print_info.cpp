@@ -111,7 +111,7 @@ void Print_Info::setup_parameters(void)
 		{
 			if(GlobalV::COLOUR && GlobalV::MY_RANK==0)
 			{
-				string a = "Use Systematically Improvable Atomic bases";
+				std::string a = "Use Systematically Improvable Atomic bases";
 				printf( " \e[36m%-45s\e[0m\n", a.c_str());
 				//printf( " [36m%-45s[0m\n", a.c_str());
 			}

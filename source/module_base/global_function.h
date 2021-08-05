@@ -20,8 +20,8 @@
 
 using namespace std;
 
-void NOTE(const string &words);
-void NEW_PART(const string &words);
+void NOTE(const std::string &words);
+void NEW_PART(const std::string &words);
 
 //==========================================================
 // GLOBAL FUNCTION :
@@ -29,10 +29,10 @@ void NEW_PART(const string &words);
 // NAME : OUT( output date into file "ofs")
 // NAME : OUTP( output parameters )
 //==========================================================
-void OUT(ofstream &ofs,const string &name);
+void OUT(std::ofstream &ofs,const std::string &name);
 
 template <class T>
-void OUT(ofstream &ofs,const string &name,const T &a)
+void OUT(std::ofstream &ofs,const std::string &name,const T &a)
 {
 	stringstream name2;
 	name2 << name ;
@@ -42,7 +42,7 @@ void OUT(ofstream &ofs,const string &name,const T &a)
 }
 
 template <class T>
-void OUT(ofstream &ofs,const string &name,const T &x, const T&y)
+void OUT(std::ofstream &ofs,const std::string &name,const T &x, const T&y)
 {
 	stringstream name2;
 	name2 << "[" << name << "]";
@@ -52,7 +52,7 @@ void OUT(ofstream &ofs,const string &name,const T &x, const T&y)
 }
 
 template <class T>
-void OUT(ofstream &ofs,const string &name,const T &x, const T &y, const T &z)
+void OUT(std::ofstream &ofs,const std::string &name,const T &x, const T &y, const T &z)
 {
 	stringstream name2;
 	name2 << "[" << name << "]";
@@ -65,13 +65,13 @@ void OUT(ofstream &ofs,const string &name,const T &x, const T &y, const T &z)
 
 // output parameters and explanations
 template <class T>
-void OUTP(ofstream &ofs, const string &name, const T &a, const string &explanation="")
+void OUTP(std::ofstream &ofs, const std::string &name, const T &a, const std::string &explanation="")
 {
 	ofs << setw(20) << name << a << " #" << explanation << std::endl;
 }
 
 template <class T>
-void OUT(const string &name,const T &a)
+void OUT(const std::string &name,const T &a)
 {
     std::cout << " " << setw(40) << name << " = " << a;
 //	std::cout << " " << name << a << std::endl;
@@ -79,20 +79,20 @@ void OUT(const string &name,const T &a)
 }
 
 
-void OUT_TIME(const string &name, time_t &start, time_t &end);
+void OUT_TIME(const std::string &name, time_t &start, time_t &end);
 
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : MAKE_DIR( make dir ,using system function)
 //==========================================================
-void MAKE_DIR( const string &file );
+void MAKE_DIR( const std::string &file );
 
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : AUTO_SET( auto_set variables )
 //==========================================================
 template <class T>
-void AUTO_SET(const string &name,const T &a)
+void AUTO_SET(const std::string &name,const T &a)
 {
     GlobalV::ofs_warning <<" AUTO_SET "<<name<<" to "<<a << std::endl;
     return;
@@ -103,7 +103,7 @@ void AUTO_SET(const string &name,const T &a)
 // NAME : DONE( ouput information(time) on screen and log)
 // 		  we can regard it as a milestone.
 //==========================================================
-void DONE(ofstream &ofs,const string &description, bool only_rank0 = false);
+void DONE(std::ofstream &ofs,const std::string &description, bool only_rank0 = false);
 
 //==========================================================
 // GLOBAL FUNCTION :
@@ -137,25 +137,25 @@ inline void ZEROS(T *u,const TI n)		// Peize Lin change int to TI at 2020.03.03
 // NAME : TEST_LEVEL
 // control the test_level
 //==========================================================
-void TEST_LEVEL(const string &name);
+void TEST_LEVEL(const std::string &name);
 
 
 //==========================================================
 // GLOBAL FUNCTION :
 //==========================================================
 template <class T>
-static void READ_VALUE(ifstream &ifs, T &v)
+static void READ_VALUE(std::ifstream &ifs, T &v)
 {
     ifs >> v;
     ifs.ignore(150, '\n');
     return;
 }
 
-bool SCAN_BEGIN(ifstream &ifs, const string &TargetName, const bool restart=1);
+bool SCAN_BEGIN(std::ifstream &ifs, const std::string &TargetName, const bool restart=1);
 // Mohan warning : the last term can't be written as const bool &restart,
 // I don't know why.
 
-void SCAN_END(ifstream &ifs, const string &TargetName);
+void SCAN_END(std::ifstream &ifs, const std::string &TargetName);
 
 template<class T>
 static inline void DCOPY( const T &a, T &b, const int &dim)
@@ -163,7 +163,7 @@ static inline void DCOPY( const T &a, T &b, const int &dim)
     for (int i=0; i<dim; ++i) b[i] = a[i];
 }
 
-void BLOCK_HERE( const string &description );
+void BLOCK_HERE( const std::string &description );
 
 //==========================================================
 // GLOBAL FUNCTION :
@@ -196,7 +196,7 @@ static inline const T * VECTOR_TO_PTR( const std::valarray<T> & v )
 //==========================================================
 // GLOBAL FUNCTION :
 // NAME : TO_STRING
-// change number to string
+// change number to std::string
 // example: 233 -> "233"
 // Peize Lin add 2016-07-18
 //==========================================================

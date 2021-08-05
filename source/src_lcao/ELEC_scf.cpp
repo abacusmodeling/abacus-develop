@@ -116,7 +116,7 @@ void ELEC_scf::scf(const int &istep)
 		//time_t time_start, time_finish;
 		clock_t clock_start;
 
-		string ufile = "CHANGE";
+		std::string ufile = "CHANGE";
 		Update_input UI;
 		UI.init(ufile);
 

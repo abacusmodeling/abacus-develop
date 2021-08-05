@@ -2,9 +2,9 @@
 
 //  read pseudopot_upf potential "upf" in the Unified
 //  Pseudopot_upfpotential Format
-int Pseudopot_upf::read_pseudo_upf(ifstream &ifs)
+int Pseudopot_upf::read_pseudo_upf(std::ifstream &ifs)
 {
-	string dummy;
+	std::string dummy;
 	int ierr = 0;
 	this->has_so = false;
 
@@ -132,7 +132,7 @@ int Pseudopot_upf::read_pseudo_upf(ifstream &ifs)
 }// end subroutine read_pseudopot_upf
 
 
-void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_header(std::ifstream &ifs)
 {
 	READ_VALUE(ifs, this->nv);// Version number
 	READ_VALUE(ifs, this->psd);// Element label
@@ -155,7 +155,7 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 	}
 
 	// If use nlcc
-	string nlc;
+	std::string nlc;
 	READ_VALUE(ifs, nlc);
 
 	if (nlc == "T")
@@ -173,7 +173,7 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 	//dft[i](i=0-3) gives the four components of xc functional:
 	//local X, local C, semilocal X, semilocal C
 	//dft_tot is the name of the combination
-	string dft_tot;
+	std::string dft_tot;
 	READ_VALUE(ifs, dft_tot);
 	
 	// dft functional enforced to modify
@@ -189,7 +189,7 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 
 		//xiaohui add 2015-03-23
 		
-		string dft_functional;
+		std::string dft_functional;
 		if(dft[1] == "PZ")
 		{
 			dft_functional = "lda";
@@ -231,7 +231,7 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 	delete[] els;
 	delete[] lchi;
 	delete[] oc;
-	this->els = new string[nwfc];
+	this->els = new std::string[nwfc];
 	this->lchi = new int[nwfc];
 	this->oc = new double[nwfc];
 
@@ -245,7 +245,7 @@ void Pseudopot_upf::read_pseudo_header(ifstream &ifs)
 	return;
 }
 
-void Pseudopot_upf::read_pseudo_mesh(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_mesh(std::ifstream &ifs)
 {
 	assert(mesh>0);
 
@@ -278,7 +278,7 @@ void Pseudopot_upf::read_pseudo_mesh(ifstream &ifs)
 	return;
 }
 
-void Pseudopot_upf::read_pseudo_nlcc(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_nlcc(std::ifstream &ifs)
 {
 	assert(mesh>0);
 	delete[] rho_atc;
@@ -291,7 +291,7 @@ void Pseudopot_upf::read_pseudo_nlcc(ifstream &ifs)
 	return;
 }
 
-void Pseudopot_upf::read_pseudo_local(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_local(std::ifstream &ifs)
 {
 	assert(mesh>0);
 	delete[] vloc;
@@ -306,7 +306,7 @@ void Pseudopot_upf::read_pseudo_local(ifstream &ifs)
 	return;
 }
 
-void Pseudopot_upf::read_pseudo_nl(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_nl(std::ifstream &ifs)
 {
 //	int nb, mb, n, ir, idum, ldum, lp, i, ikk;
 	int nb, mb, ir, idum;
@@ -381,15 +381,15 @@ void Pseudopot_upf::read_pseudo_nl(ifstream &ifs)
 	return;
 }
 
-void Pseudopot_upf::read_pseudo_pswfc(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_pswfc(std::ifstream &ifs)
 {
 	this->chi.create(this->nwfc, this->mesh);
 	for (int i=0;i<nwfc;i++)
 	{
-		string OrbitalName;
+		std::string OrbitalName;
 		int BelongToL = 0;
 		double occupation = 0.0;
-		string dummy;
+		std::string dummy;
 		ifs >> OrbitalName >> BelongToL >> occupation >> dummy;
 		for (int ir = 0;ir < mesh;ir++)
 		{
@@ -399,7 +399,7 @@ void Pseudopot_upf::read_pseudo_pswfc(ifstream &ifs)
 	return;
 }
 
-void Pseudopot_upf::read_pseudo_rhoatom(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_rhoatom(std::ifstream &ifs)
 {
 	delete[] rho_at;
 	this->rho_at = new double[mesh];
@@ -411,7 +411,7 @@ void Pseudopot_upf::read_pseudo_rhoatom(ifstream &ifs)
 	return;
 }
 
-void Pseudopot_upf::read_pseudo_so(ifstream &ifs)
+void Pseudopot_upf::read_pseudo_so(std::ifstream &ifs)
 {
        //read soc info from upf, added by zhengdy-soc
        if(!this->has_so) return;
@@ -448,7 +448,7 @@ void Pseudopot_upf::read_pseudo_so(ifstream &ifs)
 }
 
 
-void Pseudopot_upf::print_pseudo_upf(ofstream &ofs)
+void Pseudopot_upf::print_pseudo_upf(std::ofstream &ofs)
 {
 	TITLE("Pseudopot_upf","print_pseudo_upf");
 	ofs << " ==== read_pseudo_upf === " << std::endl;

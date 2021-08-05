@@ -62,8 +62,8 @@ void LCAO_Orbitals::bcast_files(
 	GlobalV::ofs_running << "\n READING ORBITAL FILE NAMES FOR LCAO" << std::endl;
 	for(int it=0; it<ntype_in; it++)
 	{
-		string ofile;
-		string nfile;
+		std::string ofile;
+		std::string nfile;
 
 		if(my_rank==0)
 		{
@@ -103,7 +103,7 @@ void LCAO_Orbitals::bcast_files(
 
 
 void LCAO_Orbitals::Read_Orbitals(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const int &ntype_in, 
 	const int &lmax_in,
 	const int &out_descriptor,
@@ -477,7 +477,7 @@ void LCAO_Orbitals::Read_NonLocal(
 {
 	TITLE("LCAO_Orbitals","Read_NonLocal");
 
-	ifstream ifs;
+	std::ifstream ifs;
 
 	// mohan add 2010-09-08.
 	// check if the non-local pseudopotential file exist.
@@ -504,8 +504,8 @@ void LCAO_Orbitals::Read_NonLocal(
 	}
 
 
-	string label;
-	string ps_type;
+	std::string label;
+	std::string ps_type;
 
 	// maximal lmax allowed in this calculation
 	int nlmax = 0;
@@ -731,14 +731,14 @@ void LCAO_Orbitals::Read_NonLocal(
 // be careful! nchi[l] may be different for differnt phi
 //-------------------------------------------------------
 void LCAO_Orbitals::Read_PAO(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const int& it, 
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank) // mohan add 2021-04-26
 {
 	TITLE("LCAO_Orbitals","Read_PAO");
 
-	ifstream in_ao;
+	std::ifstream in_ao;
 	bool open=false;
 	if(my_rank==0)
 	{
@@ -779,13 +779,13 @@ void LCAO_Orbitals::Read_PAO(
 
 //caoyu add 2021-3-16
 void LCAO_Orbitals::Read_Descriptor(
-	ofstream &ofs_in,
+	std::ofstream &ofs_in,
 	const bool &force_flag, // mohan add 2021-05-07
 	const int &my_rank)	//read descriptor basis
 {
 	TITLE("LCAO_Orbitals", "Read_Descriptor");
 
-	ifstream in_de;
+	std::ifstream in_de;
 	ofs_in << " " << setw(12) << "DESCRIPTOR" << setw(3) << "L"
 		<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
 		<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
@@ -822,8 +822,8 @@ void LCAO_Orbitals::Read_Descriptor(
 
 
 void LCAO_Orbitals::read_orb_file(
-	ofstream &ofs_in, // GlobalV::ofs_running
-	ifstream &ifs,
+	std::ofstream &ofs_in, // GlobalV::ofs_running
+	std::ifstream &ifs,
 	const int &it, 
 	int &lmax, 
 	int &nchimax, 
@@ -833,7 +833,7 @@ void LCAO_Orbitals::read_orb_file(
 {
 	TITLE("LCAO_Orbitals","read_orb_file");
 	char word[80];
-	string orb_label;
+	std::string orb_label;
 	if (my_rank == 0)
 	{
 		while (ifs.good())
@@ -914,9 +914,9 @@ void LCAO_Orbitals::read_orb_file(
 #endif		
 
 	int count = 0;
-	string name1;
-	string name2;
-	string name3;
+	std::string name1;
+	std::string name2;
+	std::string name3;
 	int tmp_it=0;
 	int tmp_l=0;
 	int tmp_n=0;

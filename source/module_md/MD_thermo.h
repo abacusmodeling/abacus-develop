@@ -21,7 +21,7 @@ class MD_thermo
         const double &NVT_tau_in, 
         const double &dt_in,
         const int &NVT_control, 
-        ofstream &ofs, 
+        std::ofstream &ofs, 
         const int &numIon,
         const double &temperature,
         const Vector3<double>* vel,

@@ -12,7 +12,7 @@ public:
 	  ~Chi0_standard();
 	  
 	  bool epsilon;
-	  string system;
+	  std::string system;
 	  double eta;
 	  double domega;
 	  int nomega;

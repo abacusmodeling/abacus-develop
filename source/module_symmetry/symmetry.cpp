@@ -18,7 +18,7 @@ Symmetry::~Symmetry()
 bool Symmetry::symm_flag=false;
 
 
-void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, ofstream &ofs_running)
+void Symmetry::analy_sys(const UnitCell_pseudo &ucell, const output &out, std::ofstream &ofs_running)
 {
     if (available == false) return;
     TITLE("Symmetry","init");
@@ -489,7 +489,7 @@ void Symmetry::lattice_type(
     Vector3<double> &v3,
     int &brav,
     double *cel_const,
-    string &bravname,
+    std::string &bravname,
     const UnitCell_pseudo &ucell
 )
 {
@@ -743,7 +743,7 @@ void Symmetry::lattice_type(
         stringstream ss;
         ss << GlobalV::global_out_dir << "STRU_SIMPLE.cif";
 
-        ofstream ofs( ss.str().c_str() );
+        std::ofstream ofs( ss.str().c_str() );
         ofs << "Lattice std::vector  : " << std::endl;
         ofs << q1.x <<"   "<<q1.y<<"  "<<q1.z<< std::endl;
         ofs << q2.x <<"   "<<q2.y<<"  "<<q2.z<< std::endl;
@@ -1121,7 +1121,7 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 }*/
 
 
-void Symmetry::getgroup(int &nrot, int &nrotk, ofstream &ofs_running)
+void Symmetry::getgroup(int &nrot, int &nrotk, std::ofstream &ofs_running)
 {
     TITLE("Symmetry","getgroup");
 

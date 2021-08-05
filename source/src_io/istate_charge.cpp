@@ -79,7 +79,7 @@ void IState_Charge::begin(void)
 		std::cout << " Open the file : " << ss.str() << std::endl; 
 		if(GlobalV::MY_RANK==0)
 		{
-			ifstream ifs(ss.str().c_str());
+			std::ifstream ifs(ss.str().c_str());
 			if(!ifs)
 			{
 				stop = true;

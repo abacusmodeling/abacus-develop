@@ -17,7 +17,7 @@
 #include <iostream>
 using namespace std;
 
-void NOTE(const string &words)
+void NOTE(const std::string &words)
 {
 	return;
 	if(GlobalV::ofs_running)
@@ -29,7 +29,7 @@ void NOTE(const string &words)
 	}
 }
 
-void NEW_PART(const string &words)
+void NEW_PART(const std::string &words)
 {
 	GlobalV::ofs_running << "\n ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
 	GlobalV::ofs_running << "\n " << words << std::endl;
@@ -42,7 +42,7 @@ void NEW_PART(const string &words)
 // GLOBAL FUNCTION :
 // NAME : OUT( output date for checking )
 //==========================================================
-void OUT(ofstream &ofs,const string &name)
+void OUT(std::ofstream &ofs,const std::string &name)
 {
     ofs<<"\n"<<setw(18)<<name<<std::endl;
     return;
@@ -52,7 +52,7 @@ void OUT(ofstream &ofs,const string &name)
 // GLOBAL FUNCTION :
 // NAME : MAKE_DIR( make dir ,using system function)
 //==========================================================
-void MAKE_DIR(const string &fn)
+void MAKE_DIR(const std::string &fn)
 {
 //	TITLE("global_function","MAKE_DIR");
     if (GlobalV::MY_RANK==0)
@@ -74,7 +74,7 @@ void MAKE_DIR(const string &fn)
 }
 
 
-void DONE(ofstream &ofs,const string &description, const bool only_rank0)
+void DONE(std::ofstream &ofs,const std::string &description, const bool only_rank0)
 {
     if (only_rank0)
     {
@@ -106,7 +106,7 @@ void DONE(ofstream &ofs,const string &description, const bool only_rank0)
 // NAME : TEST_LEVEL
 // control the test_level
 //==========================================================
-void TEST_LEVEL(const string &name)
+void TEST_LEVEL(const std::string &name)
 {
     bool disable = true;
     if (disable) return;
@@ -146,9 +146,9 @@ void TEST_LEVEL(const string &name)
 }
 
 
-bool SCAN_BEGIN(ifstream &ifs, const string &TargetName, const bool restart)
+bool SCAN_BEGIN(std::ifstream &ifs, const std::string &TargetName, const bool restart)
 {
-    string SearchName;
+    std::string SearchName;
     bool find = false;
     if (restart)
     {
@@ -173,9 +173,9 @@ bool SCAN_BEGIN(ifstream &ifs, const string &TargetName, const bool restart)
 }
 
 
-void SCAN_END(ifstream &ifs, const string &TargetName)
+void SCAN_END(std::ifstream &ifs, const std::string &TargetName)
 {
-    string SearchName;
+    std::string SearchName;
     ifs >> SearchName;
     if ( SearchName != TargetName)
     {
@@ -184,7 +184,7 @@ void SCAN_END(ifstream &ifs, const string &TargetName)
     return;
 }
 
-void BLOCK_HERE( const string &description)
+void BLOCK_HERE( const std::string &description)
 {
 //	return;
 	std::cout << "\n********************************************";
@@ -214,7 +214,7 @@ void BLOCK_HERE( const string &description)
 }
 
 
-void OUT_TIME(const string &name, time_t &start, time_t &end)
+void OUT_TIME(const std::string &name, time_t &start, time_t &end)
 {
 	double mini = difftime(end, start)/60.0;
 	if(mini>0.1)
@@ -233,10 +233,10 @@ size_t MemAvailable()
 {
 	size_t mem_sum = 0;
 	int i=0;
-	ifstream ifs("/proc/meminfo");
+	std::ifstream ifs("/proc/meminfo");
 	while(ifs.good())
 	{
-		string label, size, kB;
+		std::string label, size, kB;
 		ifs>>label>>size>>kB;
 		if(label=="MemAvailable:")
 			return std::stol(size);

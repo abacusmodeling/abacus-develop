@@ -35,7 +35,7 @@ void Exx_Lip::cal_exx()
 		gettimeofday(&t_begin, NULL);
 		return time_during;
 	};
-	auto cout_t = [](const string &name, const double t)
+	auto cout_t = [](const std::string &name, const double t)
 	{
 		std::cout<<name<<"\t"<<t<<std::endl;
 	};
@@ -99,7 +99,7 @@ cout_t("sum_all",t_sum_all);
 		static int istep=1;
 		for(int ik=0; ik!=GlobalC::kv.nks; ++ik)
 		{
-			ofstream ofs("Hexxk_"+TO_STRING(istep++)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
+			std::ofstream ofs("Hexxk_"+TO_STRING(istep++)+"_"+TO_STRING(ik)+"_"+TO_STRING(GlobalV::MY_RANK));
 			for(int i=0; i!=GlobalV::NLOCAL; ++i)
 			{
 				for(int j=0; j!=GlobalV::NLOCAL; ++j)
@@ -572,7 +572,7 @@ void Exx_Lip::exx_energy_cal()
 
 	#if TEST_EXX==1
 	{
-		ofstream ofs("exx_matrix.dat",ofstream::app);
+		std::ofstream ofs("exx_matrix.dat",std::ofstream::app);
 		static int istep=0;
 		ofs<<"istep:\t"<<istep++<<std::endl;
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
@@ -591,7 +591,7 @@ void Exx_Lip::exx_energy_cal()
 		ofs.close();
 	}
 	{
-		ofstream ofs("DM.dat",ofstream::app);
+		std::ofstream ofs("DM.dat",std::ofstream::app);
 		static int istep=0;
 		ofs<<"istep:\t"<<istep++<<std::endl;
 		for( int ik=0; ik<k_pack->kv_ptr->nks; ++ik)
@@ -626,17 +626,17 @@ void Exx_Lip::write_q_pack() const
 
 	if(!GlobalV::RANK_IN_POOL)
 	{
-		const string exx_q_pack = "exx_q_pack/";
+		const std::string exx_q_pack = "exx_q_pack/";
 
-		const string command_mkdir = "test -d " + GlobalV::global_out_dir + exx_q_pack + " || mkdir " + GlobalV::global_out_dir + exx_q_pack;
+		const std::string command_mkdir = "test -d " + GlobalV::global_out_dir + exx_q_pack + " || mkdir " + GlobalV::global_out_dir + exx_q_pack;
 		system( command_mkdir.c_str() );	// Need to check
 
-		const string command_kpoint = "test -f " + GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card + " || cp " + GlobalV::global_kpoint_card + " " + GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card;
+		const std::string command_kpoint = "test -f " + GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card + " || cp " + GlobalV::global_kpoint_card + " " + GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card;
 		system( command_kpoint.c_str() );	// Need to check
 
 		stringstream ss_wf_wg;
 		ss_wf_wg << GlobalV::global_out_dir << exx_q_pack << "wf_wg_" << GlobalV::MY_POOL;
-		ofstream ofs_wf_wg(ss_wf_wg.str().c_str());
+		std::ofstream ofs_wf_wg(ss_wf_wg.str().c_str());
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -649,7 +649,7 @@ void Exx_Lip::write_q_pack() const
 
 		stringstream ss_hvec;
 		ss_hvec	<< GlobalV::global_out_dir << exx_q_pack << "hvec_" << GlobalV::MY_POOL;
-		ofstream ofs_hvec(ss_hvec.str().c_str());
+		std::ofstream ofs_hvec(ss_hvec.str().c_str());
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
@@ -668,12 +668,12 @@ void Exx_Lip::write_q_pack() const
 
 void Exx_Lip::read_q_pack()
 {
-	const string exx_q_pack = "exx_q_pack/";
+	const std::string exx_q_pack = "exx_q_pack/";
 
 	q_pack = new k_package();
 
 	q_pack->kv_ptr = new K_Vectors();
-	const string exx_kpoint_card = GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card;
+	const std::string exx_kpoint_card = GlobalV::global_out_dir + exx_q_pack + GlobalV::global_kpoint_card;
 	q_pack->kv_ptr->set( GlobalC::symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec );
 //	q_pack->kv_ptr->set( GlobalC::symm, exx_kpoint_card, GlobalV::NSPIN, ucell_ptr->G, ucell_ptr->latvec, &Pkpoints );
 
@@ -696,7 +696,7 @@ void Exx_Lip::read_q_pack()
 	{
 		stringstream ss_wf_wg;
 		ss_wf_wg << GlobalV::global_out_dir << exx_q_pack << "wf_wg_" << GlobalV::MY_POOL;
-		ifstream ifs_wf_wg(ss_wf_wg.str().c_str());
+		std::ifstream ifs_wf_wg(ss_wf_wg.str().c_str());
 		for( int iq = 0; iq < q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int ib=0; ib<GlobalV::NBANDS; ++ib)
@@ -717,7 +717,7 @@ void Exx_Lip::read_q_pack()
 	{
 		stringstream ss_hvec;
 		ss_hvec	<< GlobalV::global_out_dir << exx_q_pack << "hvec_" << GlobalV::MY_POOL;
-		ifstream ifs_hvec(ss_hvec.str().c_str());
+		std::ifstream ifs_hvec(ss_hvec.str().c_str());
 		for( int iq=0; iq<q_pack->kv_ptr->nks; ++iq)
 		{
 			for( int iw=0; iw<GlobalV::NLOCAL; ++iw)
@@ -748,7 +748,7 @@ void Exx_Lip::write_q_pack() const
 	{
        	stringstream ssc;
         ssc << GlobalV::global_out_dir << "exx_q_pack_" << GlobalV::MY_POOL;
-		ofstream ofs(ssc.str().c_str());
+		std::ofstream ofs(ssc.str().c_str());
     	if (!ofs)
     	{
         	WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");
@@ -796,7 +796,7 @@ void Exx_Lip::write_q_pack() const
 void Exx_Lip::read_q_pack()
 {
 
-	ifstream ifs;
+	std::ifstream ifs;
 	if( !GlobalV::RANK_IN_POOL )
 	{
        	stringstream ssc;
@@ -883,7 +883,7 @@ void Exx_Lip::read_q_pack()
 	{
 		stringstream sss;
 		sss << GlobalV::global_out_dir << "exx_q_pack_tmp" << GlobalV::MY_RANK;
-		ofstream ofs(sss.str().c_str());
+		std::ofstream ofs(sss.str().c_str());
 		if (!ofs)
 		{
 			WARNING("Exx_Lip::write_q_pack","Can't create Exx_Lip File!");

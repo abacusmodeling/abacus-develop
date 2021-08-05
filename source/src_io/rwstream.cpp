@@ -6,7 +6,7 @@ Rwstream::Rwstream(FILE* &ptr)
 	fileptr=ptr;
 }
 
-Rwstream::Rwstream(const string filename,const char *op)
+Rwstream::Rwstream(const std::string filename,const char *op)
 {
 	fileptr=fopen(filename.c_str(),op);
 }
@@ -17,7 +17,7 @@ void Rwstream:: setptr(FILE* &ptr)
 	return;
 }
 
-void Rwstream::open(const string filename,const char *op)
+void Rwstream::open(const std::string filename,const char *op)
 {
 	fileptr=fopen(filename.c_str(),op);
 }

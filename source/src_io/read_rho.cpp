@@ -1,10 +1,10 @@
 #include "../src_pw/charge.h"
 #include "../src_pw/global.h"
 
-bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwan
+bool Charge::read_rho(const int &is, const std::string &fn, double* rho) //add by dwan
 {
     TITLE("Charge","read_rho");
-    ifstream ifs(fn.c_str());
+    std::ifstream ifs(fn.c_str());
     if (!ifs) 
 	{
 		GlobalV::ofs_running << " !!! Couldn't find the charge file !!!" << std::endl;
@@ -17,7 +17,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 
 	bool quit=false;
 
-    string name;
+    std::string name;
 	ifs >> name;
     
 	// check lattice constant, unit is Angstrom
@@ -42,7 +42,7 @@ bool Charge::read_rho(const int &is, const string &fn, double* rho) //add by dwa
 		CHECK_DOUBLE(ifs,GlobalC::ucell.atoms[it].na,quit);
 	}
 
-	string coordinate;
+	std::string coordinate;
 	ifs >> coordinate;
 
 	for(int it=0; it<GlobalC::ucell.ntype; it++)

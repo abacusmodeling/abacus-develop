@@ -332,7 +332,7 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 	}
 	
 	// out r_overlap_R file
-	ofstream out_r;
+	std::ofstream out_r;
 	stringstream ssh;
 	ssh << GlobalV::global_out_dir << "data-rR-tr_SPIN" << nspin;
 	if(GlobalV::DRANK == 0)

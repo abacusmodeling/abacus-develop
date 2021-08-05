@@ -209,7 +209,7 @@ void Bessel_Basis::init_TableOne(
 	//=========output .orb format=============
 	stringstream ss;
 	ss << GlobalV::global_out_dir << "jle.orb";
-	ofstream ofs(ss.str().c_str());
+	std::ofstream ofs(ss.str().c_str());
 	ofs << "---------------------------------------------------------------------------"<< std::endl;
 	ofs << setiosflags(ios::left) << setw(28) << "Energy Cutoff(Ry)" << ecut << std::endl;
 	ofs << setiosflags(ios::left) << setw(28) << "Radius Cutoff(a.u.)" << rcut << std::endl;
@@ -280,7 +280,7 @@ void Bessel_Basis::init_TableOne(
 			//====== output ========
 //			stringstream ss;
 //			ss << GlobalV::global_out_dir << l << "." << ie << ".txt";
-//			ofstream ofs(ss.str().c_str());
+//			std::ofstream ofs(ss.str().c_str());
 
 //			for(int ir=0; ir<rmesh; ir++) ofs << r[ir] << " " << jle[ir] << " " << jle[ir]*g[ir] << std::endl; 
 
@@ -331,7 +331,7 @@ void Bessel_Basis::init_TableOne(
 }
 
 void Bessel_Basis::readin_C4(
-	const string &name,
+	const std::string &name,
 	const int &ntype,
 	const int &ecut,
 	const int &rcut,
@@ -342,7 +342,7 @@ void Bessel_Basis::readin_C4(
 
 	if(GlobalV::MY_RANK != 0) return;
 
-	ifstream ifs( name.c_str() );
+	std::ifstream ifs( name.c_str() );
 
 	if(!ifs) 
 	{
@@ -355,7 +355,7 @@ void Bessel_Basis::readin_C4(
 		// mohan modify 2009-11-29
 		for (int it = 0; it < ntype; it++)
 		{
-			string filec4;
+			std::string filec4;
 			ifs >> filec4;
 			for(int il=0; il< GlobalC::ucell.atoms[it].nwl+1; il++)
 			{
@@ -364,7 +364,7 @@ void Bessel_Basis::readin_C4(
 					//for tests
 					//std::cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
 					//std::cout << "\n file=" << filec4;
-					ifstream inc4( filec4.c_str() );
+					std::ifstream inc4( filec4.c_str() );
 					
 					if(!inc4) 
 					{
@@ -396,7 +396,7 @@ void Bessel_Basis::readin_C4(
 
 						for(int ichi=0; ichi<total_nchi; ichi++)
 						{
-							string title1, title2, title3;
+							std::string title1, title2, title3;
 							inc4 >> title1 >> title2 >> title3;
 
 							int tmp_type, tmp_l, tmp_n;
@@ -478,12 +478,12 @@ void Bessel_Basis::bcast(void)
 #endif
 }
 
-void Bessel_Basis::readin(const string &name)
+void Bessel_Basis::readin(const std::string &name)
 {
 	TITLE("Bessel_Basis", "readin");
 	if (GlobalV::MY_RANK == 0)
 	{
-		ifstream ifs(name.c_str());
+		std::ifstream ifs(name.c_str());
 		GlobalV::ofs_running << " File name : " << name << std::endl;
 		if (!ifs)
 		{

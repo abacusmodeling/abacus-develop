@@ -179,7 +179,7 @@ void energy::print_etot(
 	stringstream ss;
 
 	//xiaohui add 2013-09-02, Peize Lin update 2020.11.14
-    string label;
+    std::string label;
 	if(GlobalV::KS_SOLVER=="cg")
 	{
 		label = "CG";
@@ -325,7 +325,7 @@ void energy::print_etot(
 	return;
 }
 
-void energy::print_format(const string &name, const double &value)
+void energy::print_format(const std::string &name, const double &value)
 {
 	GlobalV::ofs_running << setiosflags(ios::showpos);
 	stringstream name2;
@@ -487,7 +487,7 @@ void energy::set_exx()
 		}
 		else
 		{
-			throw invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
+			throw std::invalid_argument(TO_STRING(__FILE__)+TO_STRING(__LINE__));
 		}
 	};
 	if( 5==GlobalC::xcf.iexch_now && 0==GlobalC::xcf.igcx_now )				// HF

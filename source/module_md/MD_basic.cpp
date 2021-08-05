@@ -634,7 +634,7 @@ void MD_basic::update_half_direct(const bool is_restart)
 //output Structure information for each MD step
 void MD_basic::save_output_position()
 {
-    string posOutName("md_pos_");
+    std::string posOutName("md_pos_");
 	posOutName=mdf.intTurnTostring(step_,posOutName);
 	ucell.update_pos_taud(tauDirectChange);
 	mdf.printpos(posOutName, step_, mdp.recordFreq, ucell);
