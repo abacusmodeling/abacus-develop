@@ -372,7 +372,7 @@ void WF_Local::write_lowf(const std::string &name, double **ctot)
         }
         ofs << GlobalV::NBANDS << " (number of bands)" << std::endl;
         ofs << GlobalV::NLOCAL << " (number of orbitals)";
-        ofs << setprecision(8);
+        ofs << std::setprecision(8);
         ofs << scientific;
 
         for (int i=0; i<GlobalV::NBANDS; i++)
@@ -408,7 +408,7 @@ void WF_Local::write_lowf_complex(const std::string &name, std::complex<double> 
         {
             WARNING("Pdiag_Basic::write_lowf","Can't write local orbital wave functions.");
         }
-        ofs << setprecision(25);
+        ofs << std::setprecision(25);
 		ofs << ik+1 << " (index of k points)" << std::endl;
 		ofs << GlobalC::kv.kvec_c[ik].x << " " << GlobalC::kv.kvec_c[ik].y << " " << GlobalC::kv.kvec_c[ik].z << std::endl;
         ofs << GlobalV::NBANDS << " (number of bands)" << std::endl;
@@ -693,11 +693,11 @@ void WF_Local::distri_lowf(double **ctot, double **c)
             if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c[i][j];
+                GlobalV::ofs_running << std::setw(15) << c[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }
@@ -825,11 +825,11 @@ void WF_Local::distri_lowf_complex(std::complex<double> **ctot, std::complex<dou
             if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c[i][j];
+                GlobalV::ofs_running << std::setw(15) << c[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }
@@ -994,11 +994,11 @@ void WF_Local::distri_lowf_aug(double **ctot, double **c_aug)
             if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c[i][j];
+                GlobalV::ofs_running << std::setw(15) << c[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }
@@ -1166,11 +1166,11 @@ void WF_Local::distri_lowf_aug_complex(std::complex<double> **ctot, std::complex
             if(j%8==0) GlobalV::ofs_running << std::endl;
             if( abs(c_aug[i][j]) > 1.0e-5  )
             {
-                GlobalV::ofs_running << setw(15) << c_aug[i][j];
+                GlobalV::ofs_running << std::setw(15) << c_aug[i][j];
             }
             else
             {
-                GlobalV::ofs_running << setw(15) << "0";
+                GlobalV::ofs_running << std::setw(15) << "0";
             }
         }
     }

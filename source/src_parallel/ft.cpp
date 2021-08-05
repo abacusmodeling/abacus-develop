@@ -59,9 +59,9 @@ void FFT::FFT3D(std::complex<double> *psi,const int sign)
 	std::cout.setf(ios::scientific);
 	std::cout.precision(15);
 	std::cout << "\n before FFTW, dim: " << plan_nx <<"*"<< plan_ny <<"*"<< plan_nz <<"="<< plan_nx*plan_ny*plan_nz  << "|" << this->nxx << std::endl;
-	for(int i=0; i<3 ; i++) std::cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	for(int i=0; i<3 ; i++) std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
 	std::cout << "\n ... " ;
-	for(int i=nxx-3; i<(nxx) ; i++) std::cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	for(int i=nxx-3; i<(nxx) ; i++) std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
 	std::cout << std::endl;
 	*/
 
@@ -78,9 +78,9 @@ void FFT::FFT3D(std::complex<double> *psi,const int sign)
 
 	/*
 	std::cout << "\n\n after FFTW:  \n ";
-	for(int i=0; i<3 ; i++) 			std::cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	for(int i=0; i<3 ; i++) 			std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
 	std::cout << "\n ... " ;
-	for(int i=nxx-3; i<(nxx) ; i++)  std::cout<<"\n"<<setw(25)<<psi[i].real()<<setw(25)<<psi[i].imag();
+	for(int i=nxx-3; i<(nxx) ; i++)  std::cout<<"\n"<<std::setw(25)<<psi[i].real()<<std::setw(25)<<psi[i].imag();
 	std::cout << "\n ---------------------- :FFT3D sign: " << sign << std::endl;
 	sleep(5);
 	*/

@@ -106,7 +106,7 @@ void Stress_PW::cal_stress(matrix& sigmatot)
 	{               
 		GlobalV::ofs_running << "\n PARTS OF STRESS: " << std::endl;
 		GlobalV::ofs_running << std::setiosflags(ios::showpos);
-		GlobalV::ofs_running << std::setiosflags(ios::fixed) << setprecision(10) << std::endl;
+		GlobalV::ofs_running << std::setiosflags(ios::fixed) << std::setprecision(10) << std::endl;
 		this->print_stress("KINETIC    STRESS",sigmakin,GlobalV::TEST_STRESS,ry);
 		this->print_stress("LOCAL    STRESS",sigmaloc,GlobalV::TEST_STRESS,ry);
 		this->print_stress("HARTREE    STRESS",sigmahar,GlobalV::TEST_STRESS,ry);

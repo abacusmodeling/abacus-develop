@@ -15,7 +15,7 @@ void Stress_Func::print_stress(const std::string &name, const matrix& f, const b
 	 //	fac = Ry_to_eV / 0.529177;
 	}
 
-	std::cout << setprecision(5);
+	std::cout << std::setprecision(5);
 	std::cout << std::setiosflags(ios::showpos);
 
 	if(screen)
@@ -26,30 +26,30 @@ void Stress_Func::print_stress(const std::string &name, const matrix& f, const b
 
 	for (int i=0;i<3;i++)
 	{
-		GlobalV::ofs_running << setw(15)<< " ";
-		if( abs(f(i,0)) >output_acc) GlobalV::ofs_running << setw(15) << f(i,0) * fac;
-		else GlobalV::ofs_running << setw(15) << "0";
-		if( abs(f(i,1)) >output_acc) GlobalV::ofs_running << setw(15) << f(i,1) * fac;
-		else GlobalV::ofs_running << setw(15) << "0";
-		if( abs(f(i,2)) >output_acc) GlobalV::ofs_running << setw(15) << f(i,2) * fac;
-		else GlobalV::ofs_running << setw(15) << "0";
+		GlobalV::ofs_running << std::setw(15)<< " ";
+		if( abs(f(i,0)) >output_acc) GlobalV::ofs_running << std::setw(15) << f(i,0) * fac;
+		else GlobalV::ofs_running << std::setw(15) << "0";
+		if( abs(f(i,1)) >output_acc) GlobalV::ofs_running << std::setw(15) << f(i,1) * fac;
+		else GlobalV::ofs_running << std::setw(15) << "0";
+		if( abs(f(i,2)) >output_acc) GlobalV::ofs_running << std::setw(15) << f(i,2) * fac;
+		else GlobalV::ofs_running << std::setw(15) << "0";
 		GlobalV::ofs_running << std::endl;
 
 		if(screen)
 		{
 			std::cout<<fixed;
-			if( abs(f(i,0)) >output_acc) std::cout << setw(15) << f(i,0)*fac;
-			else std::cout << setw(15) << "0";
-			if( abs(f(i,1)) >output_acc) std::cout << setw(15) << f(i,1)*fac;
-			else std::cout << setw(15) << "0";
-			if( abs(f(i,2)) >output_acc) std::cout << setw(15) << f(i,2)*fac;
-			else std::cout << setw(15) << "0";
+			if( abs(f(i,0)) >output_acc) std::cout << std::setw(15) << f(i,0)*fac;
+			else std::cout << std::setw(15) << "0";
+			if( abs(f(i,1)) >output_acc) std::cout << std::setw(15) << f(i,1)*fac;
+			else std::cout << std::setw(15) << "0";
+			if( abs(f(i,2)) >output_acc) std::cout << std::setw(15) << f(i,2)*fac;
+			else std::cout << std::setw(15) << "0";
 			std::cout << std::endl;
 		}	
 	}
 
 
-	std::cout << resetiosflags(ios::showpos);
+	std::cout << std::resetiosflags(ios::showpos);
 
     return;
 }
@@ -68,7 +68,7 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 
 
 	//GlobalV::ofs_running << std::setiosflags(ios::right);
- 	GlobalV::ofs_running << setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
+ 	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::showpos) << std::setiosflags(ios::fixed) << std::endl;
 	NEW_PART("TOTAL-STRESS (KBAR)");//Ryd/(a.u.)^3
     std::cout << " ><><><><><><><><><><><><><><><><><><><><><><" << std::endl;
     std::cout << " TOTAL-STRESS (KBAR):" << std::endl;
@@ -79,11 +79,11 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 
  	if(GlobalV::TEST_STRESS) 
 	{
-		std::cout << std::setiosflags(ios::fixed) << setprecision(6);
+		std::cout << std::setiosflags(ios::fixed) << std::setprecision(6);
 		std::cout << std::setiosflags(ios::showpos);
 		std::cout << " ------------------- TOTAL      STRESS --------------------" << std::endl;
-    	std::cout << " " << setw(8) << "STRESS" << std::endl;
-    	GlobalV::ofs_running << " " << setw(12) << "STRESS" << std::endl;
+    	std::cout << " " << std::setw(8) << "STRESS" << std::endl;
+    	GlobalV::ofs_running << " " << std::setw(12) << "STRESS" << std::endl;
 	}
 
     
@@ -91,15 +91,15 @@ void Stress_Func::printstress_total(const matrix& scs, bool ry)
 	{
 
 		//if(GlobalV::TEST_STRESS)
-		std::cout << " " << setw(15) << scs(i,0)*unit_transform << setw(15)
-			<< scs(i,1)*unit_transform << setw(15) << scs(i,2)*unit_transform << std::endl;
+		std::cout << " " << std::setw(15) << scs(i,0)*unit_transform << std::setw(15)
+			<< scs(i,1)*unit_transform << std::setw(15) << scs(i,2)*unit_transform << std::endl;
 
-		GlobalV::ofs_running << " " << setw(15) << scs(i,0)*unit_transform << setw(15)
-			<< scs(i,1)*unit_transform << setw(15) << scs(i,2)*unit_transform << std::endl;
+		GlobalV::ofs_running << " " << std::setw(15) << scs(i,0)*unit_transform << std::setw(15)
+			<< scs(i,1)*unit_transform << std::setw(15) << scs(i,2)*unit_transform << std::endl;
 
 	}
 	GlobalV::ofs_running << std::setiosflags(ios::left);
-	std::cout << resetiosflags(ios::showpos);
+	std::cout << std::resetiosflags(ios::showpos);
 
     return;
 }

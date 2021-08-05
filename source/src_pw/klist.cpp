@@ -696,18 +696,18 @@ void K_Vectors::ibz_kpoint(const Symmetry &symm)
     }
 	OUT(GlobalV::ofs_running,"nkstot_ibz",nkstot_ibz);
 
-	GlobalV::ofs_running << " " << setw(8) << "IBZ" << setw(20) << "DirectX"
-	<< setw(20) << "DirectY" << setw(20) << "DirectZ" 
-	<< setw(20) << "Weight" << setw(10) << "ibz2bz" << std::endl;
+	GlobalV::ofs_running << " " << std::setw(8) << "IBZ" << std::setw(20) << "DirectX"
+	<< std::setw(20) << "DirectY" << std::setw(20) << "DirectZ" 
+	<< std::setw(20) << "Weight" << std::setw(10) << "ibz2bz" << std::endl;
     for (int ik=0; ik<nkstot_ibz; ik++)
     {
         GlobalV::ofs_running << " "
-			<< setw(8) << ik+1
-            << setw(20) << this->kvec_d_ibz[ik].x
-            << setw(20) << this->kvec_d_ibz[ik].y
-            << setw(20) << this->kvec_d_ibz[ik].z
-            << setw(20) << this->wk_ibz[ik]
-            << setw(10) << this->ibz2bz[ik] << std::endl;
+			<< std::setw(8) << ik+1
+            << std::setw(20) << this->kvec_d_ibz[ik].x
+            << std::setw(20) << this->kvec_d_ibz[ik].y
+            << std::setw(20) << this->kvec_d_ibz[ik].z
+            << std::setw(20) << this->wk_ibz[ik]
+            << std::setw(10) << this->ibz2bz[ik] << std::endl;
     }
     delete[] kgmatrix;
 
@@ -782,20 +782,20 @@ void K_Vectors::set_both_kvec(const Matrix3 &G, const Matrix3 &R)
         kd_done = true;
     }
 
-	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
-	<< setw(20) << "DIRECT_X"
-	<< setw(20) << "DIRECT_Y"
-	<< setw(20) << "DIRECT_Z"
-	<< setw(20) << "WEIGHT" << std::endl;
+	GlobalV::ofs_running << "\n " << std::setw(8) << "KPOINTS" 
+	<< std::setw(20) << "DIRECT_X"
+	<< std::setw(20) << "DIRECT_Y"
+	<< std::setw(20) << "DIRECT_Z"
+	<< std::setw(20) << "WEIGHT" << std::endl;
 
 	for(int i=0; i<nkstot; i++)
 	{
         GlobalV::ofs_running << " "
-			<< setw(8) << i+1
-             << setw(20) << this->kvec_d[i].x
-             << setw(20) << this->kvec_d[i].y
-             << setw(20) << this->kvec_d[i].z
-             << setw(20) << this->wk[i] << std::endl;
+			<< std::setw(8) << i+1
+             << std::setw(20) << this->kvec_d[i].x
+             << std::setw(20) << this->kvec_d[i].y
+             << std::setw(20) << this->kvec_d[i].z
+             << std::setw(20) << this->wk[i] << std::endl;
 	}
 
     return;
@@ -982,34 +982,34 @@ void K_Vectors::print_klists(std::ofstream &ofs)
         WARNING_QUIT("print_klists","nkstot < nks");
     }
 
-	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
-	<< setw(20) << "CARTESIAN_X"
-	<< setw(20) << "CARTESIAN_Y"
-	<< setw(20) << "CARTESIAN_Z"
-	<< setw(20) << "WEIGHT" << std::endl;
+	GlobalV::ofs_running << "\n " << std::setw(8) << "KPOINTS" 
+	<< std::setw(20) << "CARTESIAN_X"
+	<< std::setw(20) << "CARTESIAN_Y"
+	<< std::setw(20) << "CARTESIAN_Z"
+	<< std::setw(20) << "WEIGHT" << std::endl;
 	for(int i=0; i<nks; i++)
 	{
         GlobalV::ofs_running << " "
-			<< setw(8) << i+1
-             << setw(20) << this->kvec_c[i].x
-             << setw(20) << this->kvec_c[i].y
-             << setw(20) << this->kvec_c[i].z
-             << setw(20) << this->wk[i] << std::endl;
+			<< std::setw(8) << i+1
+             << std::setw(20) << this->kvec_c[i].x
+             << std::setw(20) << this->kvec_c[i].y
+             << std::setw(20) << this->kvec_c[i].z
+             << std::setw(20) << this->wk[i] << std::endl;
 	}
 
-	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
-	<< setw(20) << "DIRECT_X"
-	<< setw(20) << "DIRECT_Y"
-	<< setw(20) << "DIRECT_Z"
-	<< setw(20) << "WEIGHT" << std::endl;
+	GlobalV::ofs_running << "\n " << std::setw(8) << "KPOINTS" 
+	<< std::setw(20) << "DIRECT_X"
+	<< std::setw(20) << "DIRECT_Y"
+	<< std::setw(20) << "DIRECT_Z"
+	<< std::setw(20) << "WEIGHT" << std::endl;
 	for(int i=0; i<nks; i++)
 	{
         GlobalV::ofs_running << " "
-			<< setw(8) << i+1
-             << setw(20) << this->kvec_d[i].x
-             << setw(20) << this->kvec_d[i].y
-             << setw(20) << this->kvec_d[i].z
-             << setw(20) << this->wk[i] << std::endl;
+			<< std::setw(8) << i+1
+             << std::setw(20) << this->kvec_d[i].x
+             << std::setw(20) << this->kvec_d[i].y
+             << std::setw(20) << this->kvec_d[i].z
+             << std::setw(20) << this->wk[i] << std::endl;
 	}
 
     return;
@@ -1160,20 +1160,20 @@ void K_Vectors::set_both_kvec_after_vc(const Matrix3 &G, const Matrix3 &R)
         kd_done = true;
     }
 
-	GlobalV::ofs_running << "\n " << setw(8) << "KPOINTS" 
-	<< setw(20) << "DIRECT_X"
-	<< setw(20) << "DIRECT_Y"
-	<< setw(20) << "DIRECT_Z"
-	<< setw(20) << "WEIGHT" << std::endl;
+	GlobalV::ofs_running << "\n " << std::setw(8) << "KPOINTS" 
+	<< std::setw(20) << "DIRECT_X"
+	<< std::setw(20) << "DIRECT_Y"
+	<< std::setw(20) << "DIRECT_Z"
+	<< std::setw(20) << "WEIGHT" << std::endl;
 
 	for(int i=0; i<nkstot; i++)
 	{
         GlobalV::ofs_running << " "
-			<< setw(8) << i+1
-             << setw(20) << this->kvec_d[i].x
-             << setw(20) << this->kvec_d[i].y
-             << setw(20) << this->kvec_d[i].z
-             << setw(20) << this->wk[i] << std::endl;
+			<< std::setw(8) << i+1
+             << std::setw(20) << this->kvec_d[i].x
+             << std::setw(20) << this->kvec_d[i].y
+             << std::setw(20) << this->kvec_d[i].z
+             << std::setw(20) << this->wk[i] << std::endl;
 	}
 
     return;

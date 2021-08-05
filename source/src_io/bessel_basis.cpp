@@ -211,33 +211,33 @@ void Bessel_Basis::init_TableOne(
 	ss << GlobalV::global_out_dir << "jle.orb";
 	std::ofstream ofs(ss.str().c_str());
 	ofs << "---------------------------------------------------------------------------"<< std::endl;
-	ofs << std::setiosflags(ios::left) << setw(28) << "Energy Cutoff(Ry)" << ecut << std::endl;
-	ofs << std::setiosflags(ios::left) << setw(28) << "Radius Cutoff(a.u.)" << rcut << std::endl;
-	ofs << std::setiosflags(ios::left) << setw(28) << "Lmax" << lmax << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Energy Cutoff(Ry)" << ecut << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Radius Cutoff(a.u.)" << rcut << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Lmax" << lmax << std::endl;
 	for (int l = 0; l < lmax + 1; l++) 
 	{
 		switch (l) 
 		{
 			case 0:
-			ofs << std::setiosflags(ios::left) << setw(28) << "Number of Sorbitals-->" << ecut_number << std::endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Sorbitals-->" << ecut_number << std::endl;
 			break;
 			case 1:
-			ofs << std::setiosflags(ios::left) << setw(28) << "Number of Porbitals-->" << ecut_number << std::endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Porbitals-->" << ecut_number << std::endl;
 			break;
 			case 2:
-			ofs << std::setiosflags(ios::left) << setw(28) << "Number of Dorbitals-->" << ecut_number << std::endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Dorbitals-->" << ecut_number << std::endl;
 			break;
 			case 3:
-			ofs << std::setiosflags(ios::left) << setw(28) << "Number of Forbitals-->" << ecut_number << std::endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Forbitals-->" << ecut_number << std::endl;
 			break;
 			default:
-			ofs << std::setiosflags(ios::left) << setw(28) << "Number of Gorbitals-->" << ecut_number << std::endl;
+			ofs << std::setiosflags(ios::left) << std::setw(28) << "Number of Gorbitals-->" << ecut_number << std::endl;
 		}
 	}
 	ofs << "---------------------------------------------------------------------------"<< std::endl;
 	ofs << "SUMMARY END" << std::endl << std::endl;
-	ofs << std::setiosflags(ios::left) << setw(28) << "Mesh" << rmesh << std::endl;
-	ofs << std::setiosflags(ios::left) << setw(28) << "dr" << dr << std::endl ;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "Mesh" << rmesh << std::endl;
+	ofs << std::setiosflags(ios::left) << std::setw(28) << "dr" << dr << std::endl ;
 	//=========output	 .orb format=============
 
 	// init eigenvalue of Jl
@@ -262,12 +262,12 @@ void Bessel_Basis::init_TableOne(
 
 			//caoyu add 2021-3-10
 			//=========output .orb format=============
-			ofs << std::setiosflags(ios::right) << setw(20) << "Type"<< setw(20) << "L" << setw(20) << "N" << std::endl;
-			ofs << std::setiosflags(ios::right) << setw(20) << "0"<< setw(20) << l << setw(20) << ie << std::endl;
+			ofs << std::setiosflags(ios::right) << std::setw(20) << "Type"<< std::setw(20) << "L" << std::setw(20) << "N" << std::endl;
+			ofs << std::setiosflags(ios::right) << std::setw(20) << "0"<< std::setw(20) << l << std::setw(20) << ie << std::endl;
 			for (int ir = 0; ir < rmesh; ir++) 
 			{ 
 				ofs << std::setiosflags(ios::scientific) 
-				<< setprecision(12) << jle[ir]<< " "; if ((ir+1) % 4 == 0) ofs << std::endl; 
+				<< std::setprecision(12) << jle[ir]<< " "; if ((ir+1) % 4 == 0) ofs << std::endl; 
 			}
 			ofs << std::endl;
 			//=========output .orb format=============
@@ -362,7 +362,7 @@ void Bessel_Basis::readin_C4(
 				for(int in=0; in< GlobalC::ucell.atoms[it].l_nchi[il]; in++)
 				{
 					//for tests
-					//std::cout << "\n" << setw(5) << it << setw(5) << il << setw(5) << in;
+					//std::cout << "\n" << std::setw(5) << it << std::setw(5) << il << std::setw(5) << in;
 					//std::cout << "\n file=" << filec4;
 					std::ifstream inc4( filec4.c_str() );
 					
@@ -411,7 +411,7 @@ void Bessel_Basis::readin_C4(
 								{
 									inc4 >> this->C4(it, il, in, ie);
 									// for tests
-									//std::cout << "\n" << setw(5) << ie << setw(25) << this->C4(it, il, in, ie);
+									//std::cout << "\n" << std::setw(5) << ie << std::setw(25) << this->C4(it, il, in, ie);
 								}
 							}
 							else

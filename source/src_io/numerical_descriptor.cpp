@@ -84,8 +84,8 @@ void Numerical_Descriptor::output_descriptor(const ComplexMatrix *psi, const int
         const int npw= GlobalC::kv.ngk[ik];
 		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
 		GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint";
-        GlobalV::ofs_running << "\n " << setw(8) << "ik" << setw(8) << "npw";
-        GlobalV::ofs_running << "\n " << setw(8) << ik+1 << setw(8) << npw << std::endl;
+        GlobalV::ofs_running << "\n " << std::setw(8) << "ik" << std::setw(8) << "npw";
+        GlobalV::ofs_running << "\n " << std::setw(8) << ik+1 << std::setw(8) << npw << std::endl;
 		GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
         // search for all k-points.
         this->jlq3d_overlap(overlap_Q1, overlap_Q2, ik, ik, npw, psi[ik]);
@@ -183,7 +183,7 @@ const int &it, const int &ia, double *d, const int &nd)
 										std::complex<double> c2(overlap_Q1(ik, ib, jj), -overlap_Q2(ik, ib, jj));
 										des(m,m2) += c1*c2;
 								}
-			//					GlobalV::ofs_running << setw(15) << des(m,m2);
+			//					GlobalV::ofs_running << std::setw(15) << des(m,m2);
 						}
 			//			GlobalV::ofs_running << std::endl;
 				}
@@ -252,10 +252,10 @@ void Numerical_Descriptor::jlq3d_overlap(
 
     YlmReal::Ylm_Real(total_lm, np, gk, ylm);
 
-    GlobalV::ofs_running << "\n " << setw(5) << "ik"
-    << setw(8) << "Type1"
-    << setw(8) << "Atom1" 
-	<< setw(8) << "L"
+    GlobalV::ofs_running << "\n " << std::setw(5) << "ik"
+    << std::setw(8) << "Type1"
+    << std::setw(8) << "Atom1" 
+	<< std::setw(8) << "L"
 	<< std::endl;
 
     double *flq = new double[np];
@@ -267,10 +267,10 @@ void Numerical_Descriptor::jlq3d_overlap(
             std::complex<double> *sk = GlobalC::wf.get_sk(ik, T1, I1);
             for (int L=0; L< lmax+1; L++)
             {
-                GlobalV::ofs_running << " " << setw(5) << ik+1
-                            << setw(8) << GlobalC::ucell.atoms[T1].label
-                            << setw(8) << I1+1 
-							<< setw(8) << L
+                GlobalV::ofs_running << " " << std::setw(5) << ik+1
+                            << std::setw(8) << GlobalC::ucell.atoms[T1].label
+                            << std::setw(8) << I1+1 
+							<< std::setw(8) << L
 							<< std::endl;
                 //OUT("l",l);
                 std::complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29

@@ -307,7 +307,7 @@ void H_Ewald_pw::rgen(
                 {
                     if (nrm > mxr)
                     {
-                        cerr << "\n rgen, too many r-vectors," << nrm;
+                        std::cerr << "\n rgen, too many r-vectors," << nrm;
                     }
                     r[nrm] = t;
                     r2[nrm] = tt;

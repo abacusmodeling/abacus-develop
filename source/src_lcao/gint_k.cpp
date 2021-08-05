@@ -759,7 +759,7 @@ void Gint_k::folding_vl_k(const int &ik)
 	{
 		for(int j=0; j<GlobalC::GridT.lgd; j++)
 		{
-			std::cout << setw(15) << pvp[i][j].real();
+			std::cout << std::setw(15) << pvp[i][j].real();
 		}
 		std::cout << std::endl;
 	}
@@ -1017,7 +1017,7 @@ void Gint_k::folding_vl_k_nc(const int &ik)
 	{
 		for(int j=0; j<GlobalC::GridT.lgd; j++)
 		{
-			std::cout << setw(15) << pvp[i][j].real();
+			std::cout << std::setw(15) << pvp[i][j].real();
 		}
 		std::cout << std::endl;
 	}

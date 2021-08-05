@@ -45,17 +45,17 @@ void energy::perform_dos_pw(void)
 					for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 					{
 						ofsi2<<"BAND"
-						<<setw(25)<<"Energy(ev)"
-						<<setw(25)<<"Occupation"
+						<<std::setw(25)<<"Energy(ev)"
+						<<std::setw(25)<<"Occupation"
 #ifdef __MPI
-						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
+						<<std::setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
 #else
-						<<setw(25)<<"Kpoint = "<<ik+1
+						<<std::setw(25)<<"Kpoint = "<<ik+1
 #endif
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
+						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<setw(6)<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -66,24 +66,24 @@ void energy::perform_dos_pw(void)
 					for (int ik = 0;ik < GlobalC::kv.nks/2;ik++)
 					{
 						ofsi2<<"BAND"
-						<<setw(25)<<"Spin up Energy(ev)"
-						<<setw(25)<<"Occupation"
-						<<setw(25)<<"Spin down Energy(ev)"
-						<<setw(25)<<"Occupation"
+						<<std::setw(25)<<"Spin up Energy(ev)"
+						<<std::setw(25)<<"Occupation"
+						<<std::setw(25)<<"Spin down Energy(ev)"
+						<<std::setw(25)<<"Occupation"
 #ifdef __MPI
-						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
+						<<std::setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
 #else
-						<<setw(25)<<"Kpoint = "<<ik+1
+						<<std::setw(25)<<"Kpoint = "<<ik+1
 #endif
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
+						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<setw(6)<<ib+1
-							<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
-							<<setw(25)<<GlobalC::wf.wg(ik,ib)
-							<<setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
-							<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1
+							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.wg(ik,ib)
+							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -234,9 +234,9 @@ void energy::perform_dos_pw(void)
 			 //            {
 			 //                    dos2[i] = 0.00;
 			 //            }
-			 out <<setw(20)<<energy[i]
-				 <<setw(20)<<dos2[i]
-				 <<setw(20)<<sum2<<"\n";
+			 out <<std::setw(20)<<energy[i]
+				 <<std::setw(20)<<dos2[i]
+				 <<std::setw(20)<<sum2<<"\n";
 		 }
 		 out.close();
 

@@ -33,13 +33,13 @@ void LOOP_ions::opt_ions(void)
 
     if(GlobalV::OUT_LEVEL=="i")
     {
-        std::cout << setprecision(12);
-        std::cout<< " " << setw(7)<< "ISTEP"
-        <<setw(5)<< "NE"
-        <<setw(18)<< "ETOT(eV)"
-        <<setw(10)<< "dE(meV)"
-        <<setw(10)<< "F(eV/A)"
-        <<setw(10)<< "T(MIN)"
+        std::cout << std::setprecision(12);
+        std::cout<< " " << std::setw(7)<< "ISTEP"
+        <<std::setw(5)<< "NE"
+        <<std::setw(18)<< "ETOT(eV)"
+        <<std::setw(10)<< "dE(meV)"
+        <<std::setw(10)<< "F(eV/A)"
+        <<std::setw(10)<< "T(MIN)"
         <<std::endl;
     }
 
@@ -212,18 +212,18 @@ void LOOP_ions::opt_ions(void)
             ss << GlobalV::MOVE_IONS << istep;
 
             std::cout << std::setiosflags(ios::scientific)
-            << " " << setw(7) << ss.str()
-            << setw(5) << ELEC_scf::iter
-            << setw(18) << setprecision(6) << GlobalC::en.etot * Ry_to_eV;
+            << " " << std::setw(7) << ss.str()
+            << std::setw(5) << ELEC_scf::iter
+            << std::setw(18) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV;
 
-            std::cout << setprecision(2) << std::setiosflags(ios::scientific)
-            << setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
-            << setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
-            //<< setw(12) << IMM.get_trust_radius();
+            std::cout << std::setprecision(2) << std::setiosflags(ios::scientific)
+            << std::setw(10) << IMM.get_ediff() * Ry_to_eV * 1000
+            << std::setw(10) << IMM.get_largest_grad() * Ry_to_eV / BOHR_TO_A;
+            //<< std::setw(12) << IMM.get_trust_radius();
 
-            std::cout << resetiosflags(ios::scientific)
-//            << setw(8) << IMM.get_update_iter()
-            << setprecision(2) << setw(10) << etime_min + ftime_min;
+            std::cout << std::resetiosflags(ios::scientific)
+//            << std::setw(8) << IMM.get_update_iter()
+            << std::setprecision(2) << std::setw(10) << etime_min + ftime_min;
             std::cout << std::endl;
         }
 
@@ -241,7 +241,7 @@ void LOOP_ions::opt_ions(void)
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-        GlobalV::ofs_running << setprecision(16);
+        GlobalV::ofs_running << std::setprecision(16);
         GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
 
@@ -535,7 +535,7 @@ void LOOP_ions::final_scf(void)
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-        GlobalV::ofs_running << setprecision(16);
+        GlobalV::ofs_running << std::setprecision(16);
         GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl;
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }

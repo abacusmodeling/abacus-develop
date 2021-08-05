@@ -60,7 +60,7 @@ int WF_igk::setupIndGk(const PW_Basis &pwb,const int nks)
         {
             npw_max = ng;
         }
-//		GlobalV::ofs_running << " " << setw(8) << ik << setw(10) << GlobalC::kv.ngk[ik] << std::endl;
+//		GlobalV::ofs_running << " " << std::setw(8) << ik << std::setw(10) << GlobalC::kv.ngk[ik] << std::endl;
     }
 
     if (GlobalV::test_wf > 1) OUT("npw_max",npw_max);

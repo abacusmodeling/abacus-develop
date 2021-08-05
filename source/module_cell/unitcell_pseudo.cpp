@@ -196,19 +196,19 @@ void UnitCell_pseudo::setup_cell(
 			std::ofstream ofs(ss.str().c_str());
 
 			ofs << "<HEADER>" << std::endl;
-			ofs << setw(10) << atom->label << "\t" << "label" << std::endl;
-			ofs << setw(10) << atom->pp_type << "\t" << "pseudopotential type" << std::endl;
-			ofs << setw(10) << atom->lmax << "\t" << "lmax" << std::endl;
+			ofs << std::setw(10) << atom->label << "\t" << "label" << std::endl;
+			ofs << std::setw(10) << atom->pp_type << "\t" << "pseudopotential type" << std::endl;
+			ofs << std::setw(10) << atom->lmax << "\t" << "lmax" << std::endl;
 			ofs << "</HEADER>" << std::endl;
 
 			ofs << "\n<DIJ>" << std::endl;
-			ofs << setw(10) << atom->nbeta << "\t" << "nummber of projectors." << std::endl;
+			ofs << std::setw(10) << atom->nbeta << "\t" << "nummber of projectors." << std::endl;
 			
 			for(int ib=0; ib<atom->nbeta; ib++)
 			{
 				for(int ib2=0; ib2<atom->nbeta; ib2++)
 				{
-					ofs<<setw(10) << atom->lll[ib] 
+					ofs<<std::setw(10) << atom->lll[ib] 
 						<< " " << atom->lll[ib2]
 						<< " " << atom->dion(ib,ib2)<<std::endl;
 				}
@@ -218,8 +218,8 @@ void UnitCell_pseudo::setup_cell(
 			for(int i=0; i<atom->nbeta; i++)
 			{
 				ofs << "<PP_BETA>" << std::endl;
-				ofs << setw(10) << i << "\t" << "the index of projectors." <<std::endl;
-				ofs << setw(10) << atom->lll[i] << "\t" << "the angular momentum." <<std::endl;
+				ofs << std::setw(10) << i << "\t" << "the index of projectors." <<std::endl;
+				ofs << std::setw(10) << atom->lll[i] << "\t" << "the angular momentum." <<std::endl;
 
 				// mohan add
 				// only keep the nonzero part.
@@ -234,14 +234,14 @@ void UnitCell_pseudo::setup_cell(
 				}
 				if(cut_mesh %2 == 0) ++cut_mesh;
 
-				ofs << setw(10) << cut_mesh << "\t" << "the number of mesh points." << std::endl;
+				ofs << std::setw(10) << cut_mesh << "\t" << "the number of mesh points." << std::endl;
 
 
 				for(int j=0; j<cut_mesh; ++j)
 				{
-					ofs << setw(15) << atom->r[j]
-						<< setw(15) << atom->betar(i, j)
-						<< setw(15) << atom->rab[j] << std::endl;
+					ofs << std::setw(15) << atom->r[j]
+						<< std::setw(15) << atom->betar(i, j)
+						<< std::setw(15) << atom->rab[j] << std::endl;
 				}
 				ofs << "</PP_BETA>" << std::endl;
 			}
@@ -461,7 +461,7 @@ void UnitCell_pseudo::cal_nwfc(void)
 	}
 	
 	//OUT(GlobalV::ofs_running,"NLOCAL",GlobalV::NLOCAL);
-	GlobalV::ofs_running << " " << setw(40) << "NLOCAL" << " = " << GlobalV::NLOCAL <<std::endl;
+	GlobalV::ofs_running << " " << std::setw(40) << "NLOCAL" << " = " << GlobalV::NLOCAL <<std::endl;
 	//========================================================
 	// (4) std::set index for iat2it, iat2ia, itia2iat, itiaiw2iwt
 	//========================================================

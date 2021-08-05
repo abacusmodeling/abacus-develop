@@ -112,7 +112,7 @@ void Ions_Move_BFGS::restart_bfgs(void)
 			// mohan add 2010-07-26.
 			// there must be one of the two has the correct sign and value.
 			this->move_p[i] = this->check_move(pos[i], pos_p[i])/trust_radius_old;
-			//std::cout << " " << setw(20) << move_p[i] << setw(20) << dpmin << std::endl;
+			//std::cout << " " << std::setw(20) << move_p[i] << std::setw(20) << dpmin << std::endl;
 		}
 	}
 	else

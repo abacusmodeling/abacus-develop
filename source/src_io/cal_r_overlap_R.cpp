@@ -394,9 +394,9 @@ center2_orb21_r[it1][it2][L1][N1][L2].at(N2).cal_overlap( origin_point, r_distan
 								<< "    //R std::vector(R2 - R1,unit: lattice std::vector)" <<std::endl;
 							}
 							
-							out_r << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << liner_x[j] << " "
-							      << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << liner_y[j] << " "
-								  << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << liner_z[j] << " "
+							out_r << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_x[j] << " "
+							      << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_y[j] << " "
+								  << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << liner_z[j] << " "
 								  << std::endl;
 						}
 						

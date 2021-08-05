@@ -99,9 +99,9 @@ void Atom::print_Atom(std::ofstream &ofs, output &outp)
     /*
     for (int i = 0;i < na;i++)
     {
-    	ofs << setw(15) << this->tau[i].x
-    		<< setw(15) << this->tau[i].y
-    		<< setw(15) << this->tau[i].z << std::endl;
+    	ofs << std::setw(15) << this->tau[i].x
+    		<< std::setw(15) << this->tau[i].y
+    		<< std::setw(15) << this->tau[i].z << std::endl;
     }
     */
     ofs << std::endl;

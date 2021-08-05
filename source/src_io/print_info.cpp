@@ -52,20 +52,20 @@ void Print_Info::setup_parameters(void)
 		std::cout << " ---------------------------------------------------------" << std::endl;
 
 
-		std::cout << " " << setw(8) << "SPIN"
-		     << setw(16) << "KPOINTS"
-		     << setw(12) << "PROCESSORS";
+		std::cout << " " << std::setw(8) << "SPIN"
+		     << std::setw(16) << "KPOINTS"
+		     << std::setw(12) << "PROCESSORS";
 
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			std::cout << setw(12) << "NBASE";
+			std::cout << std::setw(12) << "NBASE";
 		}
 
 		std::cout << std::endl;
 
 
 
-		std::cout << " " << setw(8) << GlobalV::NSPIN;
+		std::cout << " " << std::setw(8) << GlobalV::NSPIN;
 
 		if(GlobalV::GAMMA_ONLY_LOCAL)
 		{
@@ -77,7 +77,7 @@ void Print_Info::setup_parameters(void)
 			}
 			else
 			{
-				std::cout << setw(16) << "Gamma";
+				std::cout << std::setw(16) << "Gamma";
 			}
 		}
 		else
@@ -90,15 +90,15 @@ void Print_Info::setup_parameters(void)
 			}
 			else
 			{
-				std::cout << setw(16) << GlobalC::kv.nkstot;
+				std::cout << std::setw(16) << GlobalC::kv.nkstot;
 			}
 		}
 
-		std::cout << setw(12) << GlobalV::NPROC;
+		std::cout << std::setw(12) << GlobalV::NPROC;
 
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			std::cout << setw(12) << GlobalV::NLOCAL;
+			std::cout << std::setw(12) << GlobalV::NLOCAL;
 		}
 
 		std::cout << std::endl;
@@ -136,16 +136,16 @@ void Print_Info::setup_parameters(void)
 		// second part
 		//----------------------------------
 
-		std::cout << " " << setw(8) << "ELEMENT";
+		std::cout << " " << std::setw(8) << "ELEMENT";
 
 		if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
 		{
-			std::cout << setw(16) << "ORBITALS";
-			std::cout << setw(12) << "NBASE";
+			std::cout << std::setw(16) << "ORBITALS";
+			std::cout << std::setw(12) << "NBASE";
 		}
-		std::cout << setw(12) << "NATOM";
+		std::cout << std::setw(12) << "NATOM";
 
-		std::cout << setw(12) << "XC";
+		std::cout << std::setw(12) << "XC";
 		std::cout << std::endl;
 
 
@@ -158,7 +158,7 @@ void Print_Info::setup_parameters(void)
 			}
 			else
 			{
-				std::cout << " " << setw(8) << GlobalC::ucell.atoms[it].label;
+				std::cout << " " << std::setw(8) << GlobalC::ucell.atoms[it].label;
 			}
 
 			if(GlobalV::BASIS_TYPE=="lcao" || GlobalV::BASIS_TYPE=="lcao_in_pw")
@@ -204,26 +204,26 @@ void Print_Info::setup_parameters(void)
 				}
 				else
 				{
-					std::cout << setw(16) << orb.str();
-					std::cout << setw(12) << norb;
+					std::cout << std::setw(16) << orb.str();
+					std::cout << std::setw(12) << norb;
 				}
 			}
 
 
-			std::cout << setw(12) << GlobalC::ucell.atoms[it].na;
+			std::cout << std::setw(12) << GlobalC::ucell.atoms[it].na;
 
 //				if(GlobalC::ucell.atoms[it].dft[1]=="PZ")    // pengfei Li added 2015-1-31 cancelled by zws
 //				{
-//					//std::cout << setw(12) << "PZ-LDA";
+//					//std::cout << std::setw(12) << "PZ-LDA";
 //
 //				}
 //				else
 //				{
-//					//std::cout << setw(12) << GlobalC::ucell.atoms[it].dft[0];
-//                                        std::cout << setw(12) << "PBE";
+//					//std::cout << std::setw(12) << GlobalC::ucell.atoms[it].dft[0];
+//                                        std::cout << std::setw(12) << "PBE";
 //				}
 			GlobalC::xcf.ostreamdft(std::cout); // zws add 20150108
-			//std::cout << " ( "  << setw(3) << GlobalC::xcf.iexch << setw(3) << GlobalC::xcf.icorr << setw(3) << GlobalC::xcf.igcx << setw(3) << GlobalC::xcf.igcc << ")";
+			//std::cout << " ( "  << std::setw(3) << GlobalC::xcf.iexch << std::setw(3) << GlobalC::xcf.icorr << std::setw(3) << GlobalC::xcf.igcx << std::setw(3) << GlobalC::xcf.igcc << ")";
 			std::cout << std::endl;
 		}
 

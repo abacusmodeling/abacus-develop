@@ -217,8 +217,8 @@ void Stochastic_Iter::itermu(int &iter)
             mu2 = mu3;
         }
         Dne = abs(targetne - ne3);
-        //std::cout<<setw(20)<<"targetne"<<setw(20)<<"ne"<<setw(20)<<"mu"<<setw(20)<<"Dne"<<std::endl;
-        //std::cout<<setw(20)<<targetne<<setw(20)<<ne3<<setw(20)<<mu3<<setw(20)<<Dne<<std::endl;
+        //std::cout<<std::setw(20)<<"targetne"<<std::setw(20)<<"ne"<<std::setw(20)<<"mu"<<std::setw(20)<<"Dne"<<std::endl;
+        //std::cout<<std::setw(20)<<targetne<<std::setw(20)<<ne3<<std::setw(20)<<mu3<<std::setw(20)<<Dne<<std::endl;
         count++;
         if(count > 60)
         {

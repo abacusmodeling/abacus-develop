@@ -413,7 +413,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 	else if(vtype=='A') os << " Output std::complex." << std::endl;
 
 
-	os << setprecision(8) << std::endl;
+	os << std::setprecision(8) << std::endl;
 	for(int i=0; i<GlobalC::ParaO.nrow; i++)
 	{
 		os << " " ;
@@ -453,12 +453,12 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 
 				if( abs(v) > accuracy )
 				{
-	//				os << setw(15) << v;
+	//				os << std::setw(15) << v;
 					os << v << "\t";
 				}
 				else
 				{
-	//				os << setw(15) << "0"; 
+	//				os << std::setw(15) << "0"; 
 					os << "0" << "\t"; 
 				}
 			}
@@ -466,7 +466,7 @@ void LCAO_Matrix::print_HSk(const char &mtype, const char &vtype, const double &
 		os << std::endl;
 	}
 	os << std::endl;
-	os << setprecision(6) << std::endl;
+	os << std::setprecision(6) << std::endl;
 	return;
 }
 
@@ -482,7 +482,7 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 
 	if (mtype=='S')
 	{
-		os << setprecision(8);
+		os << std::setprecision(8);
 		os << " print Sloc" << std::endl;
 		for(int i=0; i<GlobalV::NLOCAL; ++i)
 		{
@@ -491,11 +491,11 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 				double v = Sloc[i*GlobalC::ParaO.ncol+j];
 				if( abs(v) > 1.0e-8)
 				{
-					os << setw(15) << v;
+					os << std::setw(15) << v;
 				}
 				else
 				{
-					os << setw(15) << "0";
+					os << std::setw(15) << "0";
 				}
 			}//end j
 			os << std::endl;
@@ -511,11 +511,11 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 				double v = Hloc_fixed[i*GlobalC::ParaO.ncol+j];
 				if( abs(v) > 1.0e-8)
 				{
-					os << setw(15) << v;
+					os << std::setw(15) << v;
 				}
 				else
 				{
-					os << setw(15) << "0";
+					os << std::setw(15) << "0";
 				}
 			}//end j
 			os << std::endl;
@@ -531,11 +531,11 @@ void LCAO_Matrix::print_HSgamma(const char &mtype, std::ostream &os)
 				double v = Hloc[i*GlobalC::ParaO.ncol+j];
 				if( abs(v) > 1.0e-8)
 				{
-					os << setw(15) << v;
+					os << std::setw(15) << v;
 				}
 				else
 				{
-					os << setw(15) << "0";
+					os << std::setw(15) << "0";
 				}
 			}//end j
 			os << std::endl;

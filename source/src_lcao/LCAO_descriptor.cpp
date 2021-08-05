@@ -833,7 +833,7 @@ void LCAO_Descriptor::print_H_V_delta()
     {
         for (int j = 0;j < GlobalV::NLOCAL;++j)
         {
-            ofs<< setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] << " ";
+            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] << " ";
         }
         ofs << std::endl;
     }
@@ -842,7 +842,7 @@ void LCAO_Descriptor::print_H_V_delta()
     {
         for (int j = 0;j < GlobalV::NLOCAL;++j)
         {
-            ofs<< setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *Hartree_to_eV<< " ";
+            ofs<< std::setw(12)<< this->H_V_delta[i * GlobalV::NLOCAL + j] *Hartree_to_eV<< " ";
         }
         ofs << std::endl;
     }
@@ -863,28 +863,28 @@ void LCAO_Descriptor::print_F_delta()
         ofs.open(ss.str().c_str());
     }
     ofs << "F_delta(Hatree/Bohr) from deepks model: " << std::endl;
-    ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << std::endl;
+    ofs << std::setw(12) << "type" << std::setw(12) << "atom" << std::setw(15) << "dF_x" << std::setw(15) << "dF_y" << std::setw(15) << "dF_z" << std::endl;
     for (int it = 0;it < GlobalC::ucell.ntype;++it)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;++ia)
         {
             int iat = GlobalC::ucell.itia2iat(it, ia);
-            ofs << setw(12) << GlobalC::ucell.atoms[it].label << setw(12) << ia
-                << setw(15) << this->F_delta(iat, 0) / 2 << setw(15) << this->F_delta(iat, 1) / 2
-                << setw(15) << this->F_delta(iat, 2) / 2 << std::endl;
+            ofs << std::setw(12) << GlobalC::ucell.atoms[it].label << std::setw(12) << ia
+                << std::setw(15) << this->F_delta(iat, 0) / 2 << std::setw(15) << this->F_delta(iat, 1) / 2
+                << std::setw(15) << this->F_delta(iat, 2) / 2 << std::endl;
         }
     }
     ofs << "F_delta(eV/Angstrom) from deepks model: " << std::endl;
-    ofs << setw(12) << "type" << setw(12) << "atom" << setw(15) << "dF_x" << setw(15) << "dF_y" << setw(15) << "dF_z" << std::endl;
+    ofs << std::setw(12) << "type" << std::setw(12) << "atom" << std::setw(15) << "dF_x" << std::setw(15) << "dF_y" << std::setw(15) << "dF_z" << std::endl;
     for (int it = 0;it < GlobalC::ucell.ntype;++it)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;++ia)
         {
             int iat = GlobalC::ucell.itia2iat(it, ia);
-            ofs << setw(12) << GlobalC::ucell.atoms[it].label << setw(12)
-                << ia << setw(15) << this->F_delta(iat, 0) * Ry_to_eV/BOHR_TO_A
-                << setw(15) << this->F_delta(iat, 1) * Ry_to_eV/BOHR_TO_A
-                << setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << std::endl;
+            ofs << std::setw(12) << GlobalC::ucell.atoms[it].label << std::setw(12)
+                << ia << std::setw(15) << this->F_delta(iat, 0) * Ry_to_eV/BOHR_TO_A
+                << std::setw(15) << this->F_delta(iat, 1) * Ry_to_eV/BOHR_TO_A
+                << std::setw(15) << this->F_delta(iat, 2) * Ry_to_eV/BOHR_TO_A << std::endl;
         }
     }
     GlobalV::ofs_running << "F_delta is printed" << std::endl;

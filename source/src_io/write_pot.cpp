@@ -60,7 +60,7 @@ void Potential::write_potential(
             }
         }
         ofs << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
-        ofs << setprecision(precision);
+        ofs << std::setprecision(precision);
         ofs << scientific; 
         if(!ofs)
         {
@@ -317,9 +317,9 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
         ofs_ave << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz;
 
         int precision = 9;
-        ofs << setprecision(precision);
+        ofs << std::setprecision(precision);
         ofs << scientific; 
-        ofs_ave << setprecision(precision);
+        ofs_ave << std::setprecision(precision);
         ofs_ave << scientific; 
         if(!ofs)
         {
@@ -449,7 +449,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
                     //if(count%8==0) ofs << "\n";
                     if(count%5==0) ofs << "\n";
                     //ofs << " " << zpiece[ir];
-                    ofs << setw(17) << zpiece[ir];
+                    ofs << std::setw(17) << zpiece[ir];
                     ave += zpiece[ir];
                     ++count;
                 }
@@ -462,7 +462,7 @@ void Potential::write_elecstat_pot(const std::string &fn, const std::string &fn_
                         //if(count%8==0) ofs << "\n";
                         if(count%5==0) ofs << "\n";
                         //ofs << " " << zpiece[ir];
-                        ofs << setw(17) << zpiece[ix*GlobalC::pw.ncy+iy];
+                        ofs << std::setw(17) << zpiece[ix*GlobalC::pw.ncy+iy];
                         ave += zpiece[ix*GlobalC::pw.ncy+iy];
                         ++count;
                     }

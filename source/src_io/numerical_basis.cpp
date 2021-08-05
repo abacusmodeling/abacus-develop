@@ -87,8 +87,8 @@ void Numerical_Basis::output_overlap( const ComplexMatrix *psi)
             const int npw= GlobalC::kv.ngk[ik];
             GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
             GlobalV::ofs_running << " Print the overlap matrixs Q and S for this kpoint" << std::endl;
-            GlobalV::ofs_running << setw(8) << "ik" << setw(8) << "npw" << std::endl;
-            GlobalV::ofs_running << setw(8) << ik+1 << setw(8) << npw << std::endl;
+            GlobalV::ofs_running << std::setw(8) << "ik" << std::setw(8) << "npw" << std::endl;
+            GlobalV::ofs_running << std::setw(8) << ik+1 << std::setw(8) << npw << std::endl;
             GlobalV::ofs_running << " --------------------------------------------------------" << std::endl;
 
             // search for all k-points.
@@ -157,10 +157,10 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
 
     const matrix ylm = Numerical_Basis::cal_ylm(gk);
 
-    GlobalV::ofs_running << "\n " << setw(5)
-        << "ik" << setw(8) 
-        << "Type1" << setw(8) 
-        << "Atom1" << setw(8) 
+    GlobalV::ofs_running << "\n " << std::setw(5)
+        << "ik" << std::setw(8) 
+        << "Type1" << std::setw(8) 
+        << "Atom1" << std::setw(8) 
         << "L" << std::endl;
 
     for (int T = 0; T < GlobalC::ucell.ntype; T++)
@@ -172,10 +172,10 @@ ComplexArray Numerical_Basis::cal_overlap_Q(
             std::complex<double> *sk = GlobalC::wf.get_sk(ik, T, I);
             for (int L=0; L< GlobalC::ucell.atoms[T].nwl+1; L++)
             {
-                GlobalV::ofs_running << " " << setw(5) << ik+1
-                            << setw(8) << GlobalC::ucell.atoms[T].label
-                            << setw(8) << I+1 
-							<< setw(8) << L
+                GlobalV::ofs_running << " " << std::setw(5) << ik+1
+                            << std::setw(8) << GlobalC::ucell.atoms[T].label
+                            << std::setw(8) << I+1 
+							<< std::setw(8) << L
 							<< std::endl;
                 //OUT("l",l);
                 std::complex<double> lphase = normalization * pow(IMAG_UNIT, L);			// Peize Lin add normalization 2015-12-29
@@ -233,13 +233,13 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
 
     const matrix ylm = Numerical_Basis::cal_ylm(gk);
 
-    GlobalV::ofs_running << "\n " << setw(5)
-        << "ik" << setw(8) 
-        << "Type1" << setw(8) 
-        << "Atom1" << setw(8) 
-        << "L1" << setw(8) 
-        << "Type2" << setw(8) 
-        << "Atom2" << setw(8) 
+    GlobalV::ofs_running << "\n " << std::setw(5)
+        << "ik" << std::setw(8) 
+        << "Type1" << std::setw(8) 
+        << "Atom1" << std::setw(8) 
+        << "L1" << std::setw(8) 
+        << "Type2" << std::setw(8) 
+        << "Atom2" << std::setw(8) 
         << "L2" << std::endl;
 
     for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++) // 1.1
@@ -257,14 +257,14 @@ ComplexArray Numerical_Basis::cal_overlap_Sq(
                         const std::complex<double> lphase1 = normalization * pow(IMAG_UNIT, l1);			// Peize Lin add normalization 2015-12-29
                         for (int l2 = 0; l2 < GlobalC::ucell.atoms[T2].nwl+1; l2++) // 2.3
                         {
-                            GlobalV::ofs_running << " " << setw(5)
-                                << ik+1 << setw(8)
-                                << GlobalC::ucell.atoms[T1].label << setw(8)
-                                << I1+1 << setw(8)
-                                << l1 << setw(8)
-                                << GlobalC::ucell.atoms[T2].label << setw(8)
-                                << I2+1 << setw(8)
-                                << l2 << setw(8) << std::endl;
+                            GlobalV::ofs_running << " " << std::setw(5)
+                                << ik+1 << std::setw(8)
+                                << GlobalC::ucell.atoms[T1].label << std::setw(8)
+                                << I1+1 << std::setw(8)
+                                << l1 << std::setw(8)
+                                << GlobalC::ucell.atoms[T2].label << std::setw(8)
+                                << I2+1 << std::setw(8)
+                                << l2 << std::setw(8) << std::endl;
 
                             const std::complex<double> lphase2 = pow(IMAG_UNIT, l2);
                             for (int ic1=0; ic1 < GlobalC::ucell.nmax; ic1++) // 1.5
@@ -493,7 +493,7 @@ void Numerical_Basis::output_info(
 
     ofs << scientific;
 
-    ofs << setprecision(8);
+    ofs << std::setprecision(8);
     // NOTICE: ofs_warning << "\n The precison may affect the optimize result.";
     
     if (GlobalV::MY_RANK==0)

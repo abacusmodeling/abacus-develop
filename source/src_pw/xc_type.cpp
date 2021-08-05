@@ -173,7 +173,7 @@ void xcfunc::which_dft(const std::string *dft)
 
 	if (igcx == 6)
 	{
-		cerr << "\n which_dft,OPTX untested please test,";	//-igcx);
+		std::cerr << "\n which_dft,OPTX untested please test,";	//-igcx);
 	}
 
 	if (iexch == notset)
@@ -223,7 +223,7 @@ void xcfunc::set_dft_value(int &m,const int i)
 
 	if (m != notset && m != i)
 	{
-		cerr << "\n set_dft_value, two conflicting matching values,";	// 1);
+		std::cerr << "\n set_dft_value, two conflicting matching values,";	// 1);
 	}
 	m = i;
 	return;

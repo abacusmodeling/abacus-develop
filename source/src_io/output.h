@@ -61,7 +61,7 @@ public:
         for (int i=0;i<n1;i++)
         {
             if (i%8==0)ofs<<"\n";
-            ofs<< setw(12)<<u[i];
+            ofs<< std::setw(12)<<u[i];
         }
         //	ofs.unsetf(ios::scientific);
     }
@@ -79,7 +79,7 @@ public:
         for (int i = 0;i < n1;i++)
         {
             if (i % 8 == 0) std::cout << "\n";
-            std::cout << setw(12) << u[i];
+            std::cout << std::setw(12) << u[i];
         }
         std::cout<<std::endl;
         //std::cout.unsetf(ios::scientific);
@@ -93,14 +93,14 @@ public:
     void printV3(std::ofstream &ofs, const Vector3 <T> v)const
     {
         ofs << " ";
-        ofs << setw(18) << v.x << setw(18) << v.y << setw(18) << v.z << std::endl;
+        ofs << std::setw(18) << v.x << std::setw(18) << v.y << std::setw(18) << v.z << std::endl;
     }
 
     template <class T>
     void printV3(const Vector3 <T> v)const
     {
         std::cout << " ";
-        std::cout << setw(18) << v.x << setw(18) << v.y << setw(18) << v.z << std::endl;
+        std::cout << std::setw(18) << v.x << std::setw(18) << v.y << std::setw(18) << v.z << std::endl;
     }
 
     template <class T>

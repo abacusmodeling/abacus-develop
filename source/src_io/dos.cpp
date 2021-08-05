@@ -39,7 +39,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 
 			// calculate the total charge of the system.
 			double sch = 0.0;
-			ofs << setprecision(8);
+			ofs << std::setprecision(8);
 			for(int is=0; is<GlobalV::NSPIN; ++is)
 			{
 				double sss = 0.0;
@@ -57,21 +57,21 @@ void Dos::calculate_Mulliken(const std::string &fa)
 			for(int it=0; it<GlobalC::ucell.ntype; ++it)
 			{
 				Atom* atom = &GlobalC::ucell.atoms[it];
-				ofs << setw(5) << "TYPE" << setw(8) << "ATOM" << setw(5) << "SPIN";
-				ofs << setprecision(3);
+				ofs << std::setw(5) << "TYPE" << std::setw(8) << "ATOM" << std::setw(5) << "SPIN";
+				ofs << std::setprecision(3);
 				for(int l=0; l<= atom->nwl; ++l)
 				{
 					for(int m=0; m<2*l+1; ++m)
 					{
-						if(l==0) ofs << setw(12) << "s";
-						else if(l==1){ std::stringstream ss;ss << "p" << m+1;ofs << setw(12) << ss.str(); }
-						else if(l==2){ std::stringstream ss;ss << "d" << m+1;ofs << setw(12) << ss.str(); }
-						else if(l==3){ std::stringstream ss;ss << "f" << m+1;ofs << setw(12) << ss.str(); }
-						else if(l==4){ std::stringstream ss;ss << "g" << m+1;ofs << setw(12) << ss.str(); }
+						if(l==0) ofs << std::setw(12) << "s";
+						else if(l==1){ std::stringstream ss;ss << "p" << m+1;ofs << std::setw(12) << ss.str(); }
+						else if(l==2){ std::stringstream ss;ss << "d" << m+1;ofs << std::setw(12) << ss.str(); }
+						else if(l==3){ std::stringstream ss;ss << "f" << m+1;ofs << std::setw(12) << ss.str(); }
+						else if(l==4){ std::stringstream ss;ss << "g" << m+1;ofs << std::setw(12) << ss.str(); }
 					}
 				} 
 
-				ofs << setw(12) << "sum/zv";
+				ofs << std::setw(12) << "sum/zv";
 				ofs << std::endl;
 
 				double scht = 0.0;
@@ -82,8 +82,8 @@ void Dos::calculate_Mulliken(const std::string &fa)
 						int iw_alllll = iw_all;
 						
 						double sum = 0.0;
-						ofs << setw(5) << atom->label 
-							<< setw(8) << ia+1 << setw(5) << is+1;
+						ofs << std::setw(5) << atom->label 
+							<< std::setw(8) << ia+1 << std::setw(5) << is+1;
 						for(int l=0; l<=atom->nwl; ++l)
 						{
 							// sum up the multi-zeta charge.
@@ -100,7 +100,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 
 							for(int m=0; m<2*l+1; ++m)
 							{
-								ofs << setw(12) << mmm[m];
+								ofs << std::setw(12) << mmm[m];
 								sum += mmm[m];
 							}
 							delete[] mmm;
@@ -115,7 +115,7 @@ void Dos::calculate_Mulliken(const std::string &fa)
 					iw_all += atom->nw;
 				}
 
-				ofs << setprecision(8);
+				ofs << std::setprecision(8);
 				ofs << scht << " (Total charge of atom species " << atom->label << ")" << std::endl;
 			}
 		}
@@ -263,7 +263,7 @@ void Dos::nscf_fermi_surface(const std::string &out_band_dir,
 	if(GlobalV::MY_RANK==0)
 	{
 		ofs.open(out_band_dir.c_str());//make the file clear!!
-		ofs << setprecision(6);
+		ofs << std::setprecision(6);
 		ofs.close();	
 	}
 
@@ -274,7 +274,7 @@ void Dos::nscf_fermi_surface(const std::string &out_band_dir,
 			if( GlobalV::RANK_IN_POOL == 0)
 			{
 				std::ofstream ofs(out_band_dir.c_str(),ios::app);
-				ofs << setprecision(8);
+				ofs << std::setprecision(8);
 
 				if(ik==0)
 				{
@@ -357,7 +357,7 @@ void Dos::nscf_band(
 				if ( GlobalV::RANK_IN_POOL == 0)
 				{
 					std::ofstream ofs(out_band_dir.c_str(),ios::app);
-					ofs << setprecision(8);
+					ofs << std::setprecision(8);
 					//start from 1
 					ofs << ik+1;
 					for(int ib = 0; ib < nband; ib++)
@@ -381,10 +381,10 @@ void Dos::nscf_band(
 			std::ofstream ofs(out_band_dir.c_str(),ios::app);
 			for(int ik=0;ik<nks;ik++)
 			{
-				ofs<<setw(12)<<ik;
+				ofs<<std::setw(12)<<ik;
 				for(int ib = 0; ib < nband; ib++)
 				{
-					ofs <<setw(12)<< ekb[ik][ib] * Ry_to_eV;
+					ofs <<std::setw(12)<< ekb[ik][ib] * Ry_to_eV;
 				}
 				ofs<<std::endl;
 			}
@@ -402,10 +402,10 @@ void Dos::nscf_band(
 	{
 		if( GlobalC::kv.isk[ik] == is)
 		{
-			ofs<<setw(12)<<ik;
+			ofs<<std::setw(12)<<ik;
 			for(int ibnd = 0; ibnd < nband; ibnd++)
 			{
-				ofs <<setw(15) << (ekb[ik][ibnd]-fermie) * Ry_to_eV;
+				ofs <<std::setw(15) << (ekb[ik][ibnd]-fermie) * Ry_to_eV;
 			}
 			ofs<<std::endl;
 		}

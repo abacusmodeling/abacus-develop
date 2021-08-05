@@ -44,7 +44,7 @@ void NEW_PART(const std::string &words)
 //==========================================================
 void OUT(std::ofstream &ofs,const std::string &name)
 {
-    ofs<<"\n"<<setw(18)<<name<<std::endl;
+    ofs<<"\n"<<std::setw(18)<<name<<std::endl;
     return;
 }
 
@@ -96,7 +96,7 @@ void DONE(std::ofstream &ofs,const std::string &description, const bool only_ran
      //   ofs << "\n ---------------------------------------------------------------------------------\n";
     }
 //   	std::cout << "\n---------------------------------------------------------------------------------\n";
-    std::cout << " DONE(" << setw(10) << timer::print_until_now() <<" SEC) : "<< description << std::endl;
+    std::cout << " DONE(" << std::setw(10) << timer::print_until_now() <<" SEC) : "<< description << std::endl;
 //   	std::cout << "\n---------------------------------------------------------------------------------\n";
     return;
 }
@@ -219,13 +219,13 @@ void OUT_TIME(const std::string &name, time_t &start, time_t &end)
 	double mini = difftime(end, start)/60.0;
 	if(mini>0.1)
 	{
-		GlobalV::ofs_warning << setprecision(2);
+		GlobalV::ofs_warning << std::setprecision(2);
 		GlobalV::ofs_warning << " -------------------------------------------------------" << std::endl;
 		GlobalV::ofs_warning << " NAME < " << name << " > = " << std::endl;
 		GlobalV::ofs_warning << " -> " << ctime(&start) << " -> " << ctime(&end);	
 		GlobalV::ofs_warning << " TIME = " << mini << " [Minutes]" << std::endl;
 		GlobalV::ofs_warning << " -------------------------------------------------------" << std::endl;
-		GlobalV::ofs_warning << setprecision(6);
+		GlobalV::ofs_warning << std::setprecision(6);
 	}
 }
 

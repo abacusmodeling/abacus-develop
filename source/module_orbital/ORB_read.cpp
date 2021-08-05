@@ -757,10 +757,10 @@ void LCAO_Orbitals::Read_PAO(
 		WARNING_QUIT("LCAO_Orbitals::Read_PAO","Couldn't find orbital files");
 	}
 
-	ofs_in << " " << setw(12) << "ORBITAL" << setw(3) << "L" 
-	<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
-	<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
-		<< setw(12) << "NEW_UNIT" << std::endl;
+	ofs_in << " " << std::setw(12) << "ORBITAL" << std::setw(3) << "L" 
+	<< std::setw(3) << "N" << std::setw(8) << "nr" << std::setw(8) << "dr"
+	<< std::setw(8) << "RCUT" << std::setw(12) << "CHECK_UNIT"
+		<< std::setw(12) << "NEW_UNIT" << std::endl;
 	
 	//lmax and nchimax for type it
 	int lmaxt=0;
@@ -786,10 +786,10 @@ void LCAO_Orbitals::Read_Descriptor(
 	TITLE("LCAO_Orbitals", "Read_Descriptor");
 
 	std::ifstream in_de;
-	ofs_in << " " << setw(12) << "DESCRIPTOR" << setw(3) << "L"
-		<< setw(3) << "N" << setw(8) << "nr" << setw(8) << "dr"
-		<< setw(8) << "RCUT" << setw(12) << "CHECK_UNIT"
-		<< setw(12) << "NEW_UNIT" << std::endl;
+	ofs_in << " " << std::setw(12) << "DESCRIPTOR" << std::setw(3) << "L"
+		<< std::setw(3) << "N" << std::setw(8) << "nr" << std::setw(8) << "dr"
+		<< std::setw(8) << "RCUT" << std::setw(12) << "CHECK_UNIT"
+		<< std::setw(12) << "NEW_UNIT" << std::endl;
 
 	// check if the descriptor file exists.
 	bool open = false;
@@ -925,7 +925,7 @@ void LCAO_Orbitals::read_orb_file(
 	{
 		for (int N = 0; N < nchi[L]; N++)
 		{
-			ofs_in << " " << setw(12) << count + 1 << setw(3) << L << setw(3) << N;
+			ofs_in << " " << std::setw(12) << count + 1 << std::setw(3) << L << std::setw(3) << N;
 
 			double* radial; // radial mesh
 			double* psi; // radial local orbital
@@ -933,7 +933,7 @@ void LCAO_Orbitals::read_orb_file(
 			double* rab;// dr
 
 			// std::set the number of mesh and the interval distance.
-			ofs_in << setw(8) << meshr << setw(8) << dr;
+			ofs_in << std::setw(8) << meshr << std::setw(8) << dr;
 
 			radial = new double[meshr];
 			psi = new double[meshr];
@@ -957,7 +957,7 @@ void LCAO_Orbitals::read_orb_file(
 			}
 
 			// std::set the length of orbital
-			ofs_in << setw(8) << radial[meshr - 1];
+			ofs_in << std::setw(8) << radial[meshr - 1];
 
 			// mohan update 2010-09-07
 			bool find = false;
@@ -1022,7 +1022,7 @@ void LCAO_Orbitals::read_orb_file(
 			assert(unit>0.0);
 
 			// check unit: \sum ( psi[r] * r )^2 = 1
-			ofs_in << setprecision(3) << setw(12) << unit;
+			ofs_in << std::setprecision(3) << std::setw(12) << unit;
 
 			for (int ir = 0; ir < meshr; ir++)
 			{
@@ -1036,7 +1036,7 @@ void LCAO_Orbitals::read_orb_file(
 			}
 			Integral::Simpson_Integral(meshr, inner, rab, unit);
 			delete[] inner;
-			ofs_in << setw(12) << unit << std::endl;
+			ofs_in << std::setw(12) << unit << std::endl;
 
 			ao[it].phiLN[count].set_orbital_info(
                 orb_label,

@@ -215,8 +215,8 @@ void pseudopot_cell_vl::print_vloc(void)const
 			std::ofstream ofs_vg( ss.str().c_str() );
 			for(int ig=0;ig<GlobalC::pw.nggm;ig++)
 			{
-				ofs_vg << setw(15) << GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2 
-				   	<< setw(15) << this->vloc(it, ig) << std::endl;
+				ofs_vg << std::setw(15) << GlobalC::pw.ggs [ig] * GlobalC::ucell.tpiba2 
+				   	<< std::setw(15) << this->vloc(it, ig) << std::endl;
 			}
 			ofs_vg.close();
 		}

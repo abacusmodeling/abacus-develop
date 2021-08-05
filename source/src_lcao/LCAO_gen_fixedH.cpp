@@ -390,11 +390,11 @@ void LCAO_gen_fixedH::test_Nonlocal()
 			double a = vnltest[i*GlobalC::ParaO.ncol+j];
 			if( abs(a) > 1.0e-6 )
 			{
-				std::cout << setw(15) << vnltest[i*GlobalC::ParaO.ncol+j];
+				std::cout << std::setw(15) << vnltest[i*GlobalC::ParaO.ncol+j];
 			}
 			else
 			{
-				std::cout << setw(15) << "0";
+				std::cout << std::setw(15) << "0";
 			}
 		}
 		std::cout << std::endl;
@@ -565,8 +565,8 @@ void LCAO_gen_fixedH::build_Nonlocal_mu(const bool &calc_deri)
 											// mohan add 2010-12-20
 											if( nlm[0]!=0.0 )
 											{
-												// GlobalV::ofs_running << setw(10) << iw1_all << setw(10) 
-												// << iw2_all << setw(20) << nlm[0] << std::endl; 
+												// GlobalV::ofs_running << std::setw(10) << iw1_all << std::setw(10) 
+												// << iw2_all << std::setw(20) << nlm[0] << std::endl; 
 												GlobalC::LM.set_HSgamma(iw1_all,iw2_all,nlm[0],'N');//N stands for nonlocal.
 											}
 										}

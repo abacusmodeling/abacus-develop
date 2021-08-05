@@ -379,7 +379,7 @@ void Numerical_Orbital_Lm::use_uniform(const double &dr_uniform_in)
 
 		for(int i=0; i<nr_uniform; i++)
 		{
-			ofs << setw(15) << i*dr_uniform << setw(20) << psi_uniform[i] << std::endl;
+			ofs << std::setw(15) << i*dr_uniform << std::setw(20) << psi_uniform[i] << std::endl;
 		}
 		ofs.close();
 	}
@@ -674,7 +674,7 @@ void Numerical_Orbital_Lm::norm_test(void)const
 //	Integral::Simpson_Integral(this->nk, f, this->k_radial, sumk);
 	
 	//means nothing.
-	//GlobalV::ofs_running << setw(12) << sumk << std::endl;
+	//GlobalV::ofs_running << std::setw(12) << sumk << std::endl;
 
 	delete[] f;
 	return;

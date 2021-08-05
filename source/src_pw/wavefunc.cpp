@@ -326,7 +326,7 @@ void wavefunc::diago_PAO_in_pw_k2(const int &ik, ComplexMatrix &wvf)
 	GlobalV::ofs_running << " " << "ik = " << ik << " Bands(eV)" << std::endl;
 	for (int ib=0;ib<starting_nw;ib++)
 	{
-		GlobalV::ofs_running << " " << setw(15) << etatom[ib]*Ry_to_eV << std::endl;
+		GlobalV::ofs_running << " " << std::setw(15) << etatom[ib]*Ry_to_eV << std::endl;
 	}
 	*/
 

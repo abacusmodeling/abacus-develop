@@ -158,7 +158,7 @@ void Charge::renormalize_rho(void)
     TITLE("Charge","renormalize_rho");
 
     const double sr = this->sum_rho();
-	GlobalV::ofs_warning << setprecision(15);
+	GlobalV::ofs_warning << std::setprecision(15);
 	OUT(GlobalV::ofs_warning,"charge before normalized",sr);
     const double normalize_factor = nelec / sr;
 
@@ -172,7 +172,7 @@ void Charge::renormalize_rho(void)
 
 	OUT(GlobalV::ofs_warning,"charge after normalized",this->sum_rho());
 
-	GlobalV::ofs_running << setprecision(6);
+	GlobalV::ofs_running << std::setprecision(6);
     return;
 }
 
@@ -1017,9 +1017,9 @@ double Charge::check_ne(const double *rho_in) const
 	}
 	Parallel_Reduce::reduce_double_pool( ne );
 	ne = ne * GlobalC::ucell.omega / (double)GlobalC::pw.ncxyz;
-	std::cout << setprecision(10);
+	std::cout << std::setprecision(10);
 	std::cout << " check the electrons number from rho, ne =" << ne << std::endl;
-	std::cout << setprecision(6);
+	std::cout << std::setprecision(6);
 	return ne;
 }
 

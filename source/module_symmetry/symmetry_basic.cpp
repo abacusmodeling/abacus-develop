@@ -816,16 +816,16 @@ void Symmetry_Basic::setgroup(Matrix3* symop, int &nop, const int &ibrav)
 		for(int i = 0; i < nop; ++i)
 		{
 			GlobalV::ofs_running << " " 
-			<< setw(3) << i + 1
-			<< setw(4) << symop[i].e11
-			<< setw(4) << symop[i].e12
-			<< setw(4) << symop[i].e13
-			<< setw(4) << symop[i].e21
-			<< setw(4) << symop[i].e22
-			<< setw(4) << symop[i].e23
-			<< setw(4) << symop[i].e31
-			<< setw(4) << symop[i].e32
-			<< setw(4) << symop[i].e33 << std::endl;
+			<< std::setw(3) << i + 1
+			<< std::setw(4) << symop[i].e11
+			<< std::setw(4) << symop[i].e12
+			<< std::setw(4) << symop[i].e13
+			<< std::setw(4) << symop[i].e21
+			<< std::setw(4) << symop[i].e22
+			<< std::setw(4) << symop[i].e23
+			<< std::setw(4) << symop[i].e31
+			<< std::setw(4) << symop[i].e32
+			<< std::setw(4) << symop[i].e33 << std::endl;
 //			out.printM3("",symop[i]);
 //			GlobalV::ofs_running<<std::endl;
 		}
@@ -905,7 +905,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgn
 	int ns4 = 0;
 	int ns6 = 0; //mohan add 2012-01-15
 
-//	GlobalV::ofs_running << " " << setw(5) << "NROT" << setw(15) << "TRACE" << setw(15) << "DET" << std::endl;
+//	GlobalV::ofs_running << " " << std::setw(5) << "NROT" << std::setw(15) << "TRACE" << std::setw(15) << "DET" << std::endl;
 	for(int i = 0; i < nrot; ++i)
 	{
 		//calculate the trace of a matrix
@@ -913,7 +913,7 @@ void Symmetry_Basic::pointgroup(const int &nrot, int &pgnumber, std::string &pgn
 		//calculate the determinant of a matrix
 		det = int(gmatrix[i].Det());
 
-//		GlobalV::ofs_running << " " << setw(5) << i+1 << setw(15) << trace << setw(15) << det << std::endl;
+//		GlobalV::ofs_running << " " << std::setw(5) << i+1 << std::setw(15) << trace << std::setw(15) << det << std::endl;
 
 		if(trace == 3)
 		{

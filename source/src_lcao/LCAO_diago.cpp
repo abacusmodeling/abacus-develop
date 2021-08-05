@@ -79,7 +79,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_double(const int &ik, double**wfc, matrix &
 	// save H and S matrix to disk.
 	bool bit = false;
 	HS_Matrix::saving_HS(GlobalC::LM.Hloc, GlobalC::LM.Sloc, bit, GlobalC::ParaO.out_hs);
-	GlobalV::ofs_running << setprecision(6);
+	GlobalV::ofs_running << std::setprecision(6);
 
 	// Distribution of matrix for 
 	// prallel eigensolver.
@@ -97,7 +97,7 @@ void Diago_LCAO_Matrix::using_HPSEPS_complex(const int &ik, std::complex<double>
 	bool bit = false; //LiuXh, 2017-03-21
 	//if std::set bit = true, there would be error in soc-multi-core calculation, noted by zhengdy-soc
 	HS_Matrix::saving_HS_complex(GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, bit, GlobalC::ParaO.out_hs); //LiuXh, 2017-03-21
-	GlobalV::ofs_running << setprecision(6); //LiuXh, 2017-03-21
+	GlobalV::ofs_running << std::setprecision(6); //LiuXh, 2017-03-21
 
 	GlobalC::ParaO.diago_complex_begin(ik, wfc, wfc_2d, GlobalC::LM.Hloc2, GlobalC::LM.Sloc2, GlobalC::wf.ekb[ik]);
 
@@ -226,11 +226,11 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	clock_end = std::clock();
 	double duration = (double)(clock_end - clock_start) / CLOCKS_PER_SEC;
 
-	GlobalV::ofs_running << std::setiosflags(ios::fixed) << setprecision(20);
+	GlobalV::ofs_running << std::setiosflags(ios::fixed) << std::setprecision(20);
 //	GlobalV::ofs_running << " clock_start = " << clock_start << std::endl;
 //	GlobalV::ofs_running << " clock_end = " << clock_end << std::endl;
 	GlobalV::ofs_running << " Time using dsygv in LAPACK (seconds) is " << duration << std::endl;
-	GlobalV::ofs_running << resetiosflags(ios::fixed) << setprecision(10);
+	GlobalV::ofs_running << std::resetiosflags(ios::fixed) << std::setprecision(10);
 
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
@@ -250,11 +250,11 @@ void Diago_LCAO_Matrix::using_LAPACK(const int &ik, double** wfc)const
 	std::cout << "\n Lapack, wfc after diago:" << std::endl;
 	for(int i=0; i<GlobalV::NBANDS; i++)
 	{
-		std::cout << " Eigenvalue from LAPACK : " << setw(5) << setw(12) << GlobalC::wf.ekb[ik][i] << std::endl;
+		std::cout << " Eigenvalue from LAPACK : " << std::setw(5) << std::setw(12) << GlobalC::wf.ekb[ik][i] << std::endl;
 		std::cout << " Eigenfunctions" << std::endl;
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
-			std::cout << setw(12) << wfc[i][j];
+			std::cout << std::setw(12) << wfc[i][j];
 		}
 		std::cout << std::endl;
 	}

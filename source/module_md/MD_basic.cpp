@@ -188,9 +188,9 @@ void MD_basic::runNVT(int step1){
 	//----------------------------------------------
 	// big loop
 	//-----------------------------------------------
-	std::cout<<" "<<std::left<<setw(12)<<"MD_STEP"<<std::left<<setw(12)<< "SystemE"<<std::left<<setw(12)<< "Conserved"<<std::left<<setw(12)<< "DeltaE"<<std::left<<setw(12)<< "Temperature"<<std::endl;
+	std::cout<<" "<<std::left<<std::setw(12)<<"MD_STEP"<<std::left<<std::setw(12)<< "SystemE"<<std::left<<std::setw(12)<< "Conserved"<<std::left<<std::setw(12)<< "DeltaE"<<std::left<<std::setw(12)<< "Temperature"<<std::endl;
 	
-	std::cout<<" "<<std::left<<setw(12)<<step_<<std::left<<setw(12)<< energy_<<std::left<<setw(12)<< hamiltonian<<std::left<<setw(12)<< energy_-oldEtot_<<std::left<<setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
+	std::cout<<" "<<std::left<<std::setw(12)<<step_<<std::left<<std::setw(12)<< energy_<<std::left<<std::setw(12)<< hamiltonian<<std::left<<std::setw(12)<< energy_-oldEtot_<<std::left<<std::setw(12)<<twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
 	
 	oldEtot_=energy_;
 
@@ -268,8 +268,8 @@ void MD_basic::runNVT(int step1){
 	maxStep = sqrt(maxStep)*mdp.dt;
 
     if (!GlobalV::MY_RANK){
-        GlobalV::ofs_running<<setw(15)<<"maxForce=     "<<setw(15)<<"maxstep=      "<<setw(15)<<"step=     "<<std::endl;
-        GlobalV::ofs_running<<setw(15)<<maxForce<<setw(15)<<maxStep<<setw(15)<<step_<<std::endl;
+        GlobalV::ofs_running<<std::setw(15)<<"maxForce=     "<<std::setw(15)<<"maxstep=      "<<std::setw(15)<<"step=     "<<std::endl;
+        GlobalV::ofs_running<<std::setw(15)<<maxForce<<std::setw(15)<<maxStep<<std::setw(15)<<step_<<std::endl;
         GlobalV::ofs_running<<step_<<" "<< energy_<<" "<< hamiltonian<<" "<< energy_-oldEtot_<<" "<< twiceKE/(3*double(ucell.nat-nfrozen_))/K_BOLTZMAN_AU<<std::endl;
     }
     oldEtot_=energy_;
@@ -410,7 +410,7 @@ void MD_basic::runNVE(int step1){
     // calculate the conserved quantity during MD 
     double hamiltonian = mdf.Conserved(twiceKE/2, energy_, ucell.nat-nfrozen_);
 
-    std::cout<< setprecision (9)<<hamiltonian<<" "<< setprecision (9)<<twiceKE/2<<std::endl;
+    std::cout<< std::setprecision (9)<<hamiltonian<<" "<< std::setprecision (9)<<twiceKE/2<<std::endl;
 
     
     // Output the message to the screen.

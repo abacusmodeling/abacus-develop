@@ -302,7 +302,7 @@ void PW_Basis::gen_pw(std::ofstream &runlog, const UnitCell &Ucell_in, const K_V
         ofsc << "\n ig2fftc" << std::endl;
         for(int ig=0; ig<ngmc; ig++)
         {
-        	ofsc << setw(10) << ig << setw(20) << ig2fftc[ig] << std::endl;
+        	ofsc << std::setw(10) << ig << std::setw(20) << ig2fftc[ig] << std::endl;
         }
         */
 
@@ -926,10 +926,10 @@ void PW_Basis::columns_and_pw_distribution_2(void)
         {
             FFT_wfc.nst_per[ip1]++;
             FFT_wfc.npw_per[ip1]+=pw_wf;
-            //std::cout<<setw(12)<<"time"<<setw(12)<<"Cols"<<setw(12)<<"PWs"<<std::endl;
+            //std::cout<<std::setw(12)<<"time"<<std::setw(12)<<"Cols"<<std::setw(12)<<"PWs"<<std::endl;
             //for(int i=0;i<GlobalV::NPROC_IN_POOL;i++)
             //{
-            //	std::cout<<setw(12)<<time<<setw(12)<<FFT_wfc.nst_per[i]<<setw(12)<<FFT_wfc.npw_per[i]<<std::endl;
+            //	std::cout<<std::setw(12)<<time<<std::setw(12)<<FFT_wfc.nst_per[i]<<std::setw(12)<<FFT_wfc.npw_per[i]<<std::endl;
             //}
             
 			//----------------------------------------------------------
@@ -948,46 +948,46 @@ void PW_Basis::columns_and_pw_distribution_2(void)
     {
 		GlobalV::ofs_running << "\n PARALLEL PW FOR CHARGE/POTENTIAL" << std::endl;
         GlobalV::ofs_running << " "
-        << setw(8)  << "PROC"
-        << setw(15) << "COLUMNS(POT)"
-        << setw(15) << "PW" << std::endl;
+        << std::setw(8)  << "PROC"
+        << std::setw(15) << "COLUMNS(POT)"
+        << std::setw(15) << "PW" << std::endl;
 // charge
         for (i = 0;i < GlobalV::NPROC_IN_POOL;i++)
         {
             GlobalV::ofs_running << " "
-            << setw(8)  << i+1
-            << setw(15) << FFT_chg.nst_per[i]
-            << setw(15) << FFT_chg.npw_per[i] << std::endl;
+            << std::setw(8)  << i+1
+            << std::setw(15) << FFT_chg.nst_per[i]
+            << std::setw(15) << FFT_chg.npw_per[i] << std::endl;
             sum_pw += FFT_chg.npw_per[i];
         }
         GlobalV::ofs_running << " --------------- sum -------------------" << std::endl;
         GlobalV::ofs_running << " "
-        << setw(8)  << GlobalV::NPROC_IN_POOL
-        << setw(15) << FFT_chg.nst
-        << setw(15) << sum_pw << std::endl;
+        << std::setw(8)  << GlobalV::NPROC_IN_POOL
+        << std::setw(15) << FFT_chg.nst
+        << std::setw(15) << sum_pw << std::endl;
 // wavefunction
 
 
 		GlobalV::ofs_running << "\n PARALLEL PW FOR WAVE FUNCTIONS" << std::endl;
         sum_pw=0;
         GlobalV::ofs_running << " "
-        << setw(8)  << "PROC"
-        << setw(15) << "COLUMNS(W)"
-        << setw(15) << "PW" << std::endl;
+        << std::setw(8)  << "PROC"
+        << std::setw(15) << "COLUMNS(W)"
+        << std::setw(15) << "PW" << std::endl;
 
         for (i = 0;i < GlobalV::NPROC_IN_POOL;i++)
         {
             GlobalV::ofs_running << " "
-            << setw(8)  << i+1
-            << setw(15) << FFT_wfc.nst_per[i]
-            << setw(15) << FFT_wfc.npw_per[i] << std::endl;
+            << std::setw(8)  << i+1
+            << std::setw(15) << FFT_wfc.nst_per[i]
+            << std::setw(15) << FFT_wfc.npw_per[i] << std::endl;
             sum_pw += FFT_wfc.npw_per[i];
         }
         GlobalV::ofs_running << " --------------- sum -------------------" << std::endl;
         GlobalV::ofs_running << " "
-        << setw(8)  << GlobalV::NPROC_IN_POOL
-        << setw(15) << FFT_wfc.nst
-        << setw(15) << sum_pw << std::endl;
+        << std::setw(8)  << GlobalV::NPROC_IN_POOL
+        << std::setw(15) << FFT_wfc.nst
+        << std::setw(15) << sum_pw << std::endl;
     }
 
     for (int ip=0;ip<GlobalV::NPROC_IN_POOL;ip++)

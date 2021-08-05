@@ -334,8 +334,8 @@ void toWannier90::outEIG()
 			{
 				if(!tag_cal_band[ib]) continue;
 				index_band++;
-				eig_file << setw(5) << index_band << setw(5) << ik+1-start_k_index
-						 << setw(18) << showpoint << fixed << setprecision(12) 
+				eig_file << std::setw(5) << index_band << std::setw(5) << ik+1-start_k_index
+						 << std::setw(18) << showpoint << fixed << std::setprecision(12) 
 						 << GlobalC::wf.ekb[ik][ib] * Ry_to_eV << std::endl;
 			}
 		}
@@ -356,17 +356,17 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 		std::stringstream name;
 		if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 		{
-			name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1 << ".1" ;
+			name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1 << ".1" ;
 		}
 		else if(GlobalV::NSPIN==2)
 		{
-			if(wannier_spin=="up") name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1-start_k_index << ".1" ;
-			else if(wannier_spin=="down") name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1-start_k_index << ".2" ;
+			if(wannier_spin=="up") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".1" ;
+			else if(wannier_spin=="down") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".2" ;
 		}
 		
 		std::ofstream unkfile(name.str());
 		
-		unkfile << setw(12) << GlobalC::pw.ncx << setw(12) << GlobalC::pw.ncy << setw(12) << GlobalC::pw.ncz << setw(12) << ik+1 << setw(12) << num_bands << std::endl;
+		unkfile << std::setw(12) << GlobalC::pw.ncx << std::setw(12) << GlobalC::pw.ncy << std::setw(12) << GlobalC::pw.ncz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
 		
 		for(int ib = 0; ib < GlobalV::NBANDS; ib++)
 		{
@@ -388,19 +388,19 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 					{
 						if(!gamma_only_wannier)
 						{
-							unkfile << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].real()
-									<< setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
+							unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].real()
+									<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k].imag() 
 									//jingan test
-									//<< "       " << setw(12) << setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+									//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
 									<< std::endl;
 						}
 						else
 						{
 							double zero = 0.0;
-							unkfile << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << abs( porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k] )
-									<< setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << zero
+							unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs( porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k] )
+									<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zero
 									//jingan test
-									//<< "       " << setw(12) << setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
+									//<< "       " << std::setw(12) << std::setprecision(9) << std::setiosflags(ios::scientific) << abs(porter[i*GlobalC::pw.ncy*GlobalC::pw.ncz + j*GlobalC::pw.ncz + k])
 									<< std::endl;
 						}
 					}
@@ -474,17 +474,17 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 				std::stringstream name;
 				if(GlobalV::NSPIN==1 || GlobalV::NSPIN==4)
 				{
-					name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1 << ".1" ;
+					name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1 << ".1" ;
 				}
 				else if(GlobalV::NSPIN==2)
 				{
-					if(wannier_spin=="up") name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1-start_k_index << ".1" ;
-					else if(wannier_spin=="down") name << GlobalV::global_out_dir << "UNK" << setw(5) << setfill('0') << ik+1-start_k_index << ".2" ;
+					if(wannier_spin=="up") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".1" ;
+					else if(wannier_spin=="down") name << GlobalV::global_out_dir << "UNK" << std::setw(5) << setfill('0') << ik+1-start_k_index << ".2" ;
 				}
 				
 				unkfile.open(name.str(),ios::out);
 				
-				unkfile << setw(12) << GlobalC::pw.ncx << setw(12) << GlobalC::pw.ncy << setw(12) << GlobalC::pw.ncz << setw(12) << ik+1 << setw(12) << num_bands << std::endl;
+				unkfile << std::setw(12) << GlobalC::pw.ncx << std::setw(12) << GlobalC::pw.ncy << std::setw(12) << GlobalC::pw.ncz << std::setw(12) << ik+1 << std::setw(12) << num_bands << std::endl;
 			}
 			
 			for(int ib = 0; ib < GlobalV::NBANDS; ib++)
@@ -539,8 +539,8 @@ void toWannier90::writeUNK(const ComplexMatrix *wfc_pw)
 						{
 							for(int ix=0; ix<GlobalC::pw.ncx; ix++)
 							{
-								unkfile << setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].real()
-										<< setw(20) << setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].imag() 
+								unkfile << std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].real()
+										<< std::setw(20) << std::setprecision(9) << std::setiosflags(ios::scientific) << zpiece[ix*GlobalC::pw.ncy+iy].imag() 
 										<< std::endl;
 							}
 						}
@@ -589,7 +589,7 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 		std::string fileaddress = GlobalV::global_out_dir + wannier_file_name + ".amn";
 		Amn_file.open( fileaddress.c_str() , ios::out);
 		Amn_file << " Created on " << ctime(&time_now);
-		Amn_file << setw(12) << num_bands << setw(12) << cal_num_kpts << setw(12) << num_wannier << std::endl;
+		Amn_file << std::setw(12) << num_bands << std::setw(12) << cal_num_kpts << std::setw(12) << num_wannier << std::endl;
 	}
 	
 	ComplexMatrix *trial_orbitals = new ComplexMatrix[cal_num_kpts];
@@ -626,11 +626,11 @@ void toWannier90::cal_Amn(const ComplexMatrix *wfc_pw)
 #endif
 				if(GlobalV::MY_RANK == 0)
 				{
-					Amn_file << setw(5) << index_band << setw(5) << iw+1 << setw(5) << ik+1-start_k_index 
-							 << setw(18) << showpoint << fixed << setprecision(12) << amn.real() 
-							 << setw(18) << showpoint << fixed << setprecision(12) << amn.imag()
+					Amn_file << std::setw(5) << index_band << std::setw(5) << iw+1 << std::setw(5) << ik+1-start_k_index 
+							 << std::setw(18) << showpoint << fixed << std::setprecision(12) << amn.real() 
+							 << std::setw(18) << showpoint << fixed << std::setprecision(12) << amn.imag()
 							 //jingan test
-							 //<< "   " << setw(18) << setprecision(13) << abs(amn)
+							 //<< "   " << std::setw(18) << std::setprecision(13) << abs(amn)
 							 << std::endl;
 				}
 			}
@@ -662,7 +662,7 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 		
 		time_t  time_now = time(NULL);
 		mmn_file << " Created on " << ctime(&time_now);
-		mmn_file << setw(12) << num_bands << setw(12) << cal_num_kpts << setw(12) << nntot << std::endl;
+		mmn_file << std::setw(12) << num_bands << std::setw(12) << cal_num_kpts << std::setw(12) << nntot << std::endl;
 	}
 	
 	/*
@@ -697,8 +697,8 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 			
 			if(GlobalV::MY_RANK == 0)
 			{
-				mmn_file << setw(5) << ik+1 << setw(5) << ikb+1 << setw(5) 
-						 << int(phase_G.x) << setw(5) << int(phase_G.y) << setw(5) << int(phase_G.z) 
+				mmn_file << std::setw(5) << ik+1 << std::setw(5) << ikb+1 << std::setw(5) 
+						 << int(phase_G.x) << std::setw(5) << int(phase_G.y) << std::setw(5) << int(phase_G.z) 
 						 << std::endl;
 			}
 		
@@ -731,10 +731,10 @@ void toWannier90::cal_Mmn(const ComplexMatrix *wfc_pw)
 					
 					if(GlobalV::MY_RANK == 0)
 					{
-						mmn_file << setw(18) << setprecision(12) << showpoint << fixed << mmn.real() 
-								 << setw(18) << setprecision(12) << showpoint << fixed << mmn.imag()
+						mmn_file << std::setw(18) << std::setprecision(12) << showpoint << fixed << mmn.real() 
+								 << std::setw(18) << std::setprecision(12) << showpoint << fixed << mmn.imag()
 								 // jingan test
-								 //<< "    " << setw(12) << setprecision(9) << abs(mmn)
+								 //<< "    " << std::setw(12) << std::setprecision(9) << abs(mmn)
 								 << std::endl;				
 					}
 				}

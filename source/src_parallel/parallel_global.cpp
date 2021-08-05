@@ -222,7 +222,7 @@ void Parallel_Global::read_mpi_parameters(int argc,char **argv)
     			time_t  time_now = time(NULL);
     			std::cout << " " << ctime(&time_now);
 			}
-//            std::cout << " PROCESSOR " << setw(4) << GlobalV::MY_RANK+1 << " IS READY." << std::endl;
+//            std::cout << " PROCESSOR " << std::setw(4) << GlobalV::MY_RANK+1 << " IS READY." << std::endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }

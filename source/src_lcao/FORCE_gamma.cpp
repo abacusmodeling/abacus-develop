@@ -200,18 +200,18 @@ void Force_LCAO_gamma::finish_ftable_gamma(void)
 void Force_LCAO_gamma::test_gamma(double* mm, const std::string &name)
 {
     std::cout << "\n PRINT " << name << std::endl;
-    std::cout << setprecision(6) << std::endl;
+    std::cout << std::setprecision(6) << std::endl;
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
         for(int j=0; j<GlobalV::NLOCAL; j++)
         {
             if( abs(mm[i*GlobalV::NLOCAL+j])>1.0e-5)
             {
-                std::cout << setw(12) << mm[i*GlobalV::NLOCAL+j];
+                std::cout << std::setw(12) << mm[i*GlobalV::NLOCAL+j];
             }
             else
             {
-                std::cout << setw(12) << "0";
+                std::cout << std::setw(12) << "0";
             }
         }
         std::cout << std::endl;

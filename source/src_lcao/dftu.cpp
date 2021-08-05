@@ -718,7 +718,7 @@ void DFTU::write_occup_m(const std::string &fn)
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
-									ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
+									ofdftu << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
 								}
 								ofdftu << std::endl;
 							}
@@ -737,7 +737,7 @@ void DFTU::write_occup_m(const std::string &fn)
 									for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
 									{
 										int m1_all = m1 + (2*l+1)*ipol1;
-										ofdftu << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
+										ofdftu << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
 									}
 								}
 								ofdftu << std::endl;
@@ -1124,7 +1124,7 @@ void DFTU::cal_energy_correction(const int istep)
 	{
 		std::ofstream of_eu("energy_correction", ios_base::app);
 		double e=EU*Ry_to_eV;
-		of_eu << "ITERATION STEP " << setw(3) << this->iter_dftu <<"      " << setw(15) << e << "ev" << std::endl;
+		of_eu << "ITERATION STEP " << std::setw(3) << this->iter_dftu <<"      " << std::setw(15) << e << "ev" << std::endl;
 	}
 	*/
 	
@@ -1137,7 +1137,7 @@ void DFTU::cal_energy_correction(const int istep)
 		std::ofstream of_en("energy_correction.dat",ios_base::app);
 		double val = this->EU*Ry_to_eV;
 
-		of_en << fixed << setprecision(8) << val << "eV" << std::endl;
+		of_en << fixed << std::setprecision(8) << val << "eV" << std::endl;
 	}
 	*/
 
@@ -1390,7 +1390,7 @@ void DFTU::output()
 							{
 								for(int m1=0; m1<2*l+1; m1++)
 								{
-									GlobalV::ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
+									GlobalV::ofs_running << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(is)(m0, m1);
 								}
 								GlobalV::ofs_running << std::endl;
 							}
@@ -1409,7 +1409,7 @@ void DFTU::output()
 									for(int ipol1=0; ipol1<GlobalV::NPOL; ipol1++)
 									{
 										int m1_all = m1 + (2*l+1)*ipol1;
-										GlobalV::ofs_running << fixed << setw(12) << setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
+										GlobalV::ofs_running << fixed << std::setw(12) << std::setprecision(8) << locale.at(iat).at(l).at(n).at(0)(m0_all, m1_all);
 									}
 								}
 								GlobalV::ofs_running << std::endl;

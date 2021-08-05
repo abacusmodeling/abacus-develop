@@ -618,10 +618,10 @@ void Symmetry::lattice_type(
 											{
 												++nif;
 												GlobalV::ofs_running << " " << std::endl;
-												GlobalV::ofs_running << setw(8) << nif << setw(5) << n11 << setw(5) << n12
-													<< setw(5) << n13 << setw(5) << n21 << setw(5) << n22
-													<< setw(5) << n23 << setw(5) << n31 << setw(5) << n32
-													<< setw(5) << n33 << setw(5) << ibrav << std::endl;
+												GlobalV::ofs_running << std::setw(8) << nif << std::setw(5) << n11 << std::setw(5) << n12
+													<< std::setw(5) << n13 << std::setw(5) << n21 << std::setw(5) << n22
+													<< std::setw(5) << n23 << std::setw(5) << n31 << std::setw(5) << n32
+													<< std::setw(5) << n33 << std::setw(5) << ibrav << std::endl;
 												GlobalV::ofs_running << " r1: " << r1.x << " " << r1.y << " " << r1.z << std::endl;
 												GlobalV::ofs_running << " r2: " << r2.x << " " << r2.y << " " << r2.z << std::endl;
 												GlobalV::ofs_running << " r3: " << r3.x << " " << r3.y << " " << r3.z << std::endl;
@@ -693,9 +693,9 @@ void Symmetry::lattice_type(
     //then we compare it with the original symmetry
 	
 //	GlobalV::ofs_running << " w1" << std::endl;
-//	GlobalV::ofs_running << " " << setw(15) << w1.x << setw(15) << w1.y << setw(15) << w1.z << std::endl;
-//	GlobalV::ofs_running << " " << setw(15) << w2.x << setw(15) << w2.y << setw(15) << w2.z << std::endl;
-//	GlobalV::ofs_running << " " << setw(15) << w3.x << setw(15) << w3.y << setw(15) << w3.z << std::endl;
+//	GlobalV::ofs_running << " " << std::setw(15) << w1.x << std::setw(15) << w1.y << std::setw(15) << w1.z << std::endl;
+//	GlobalV::ofs_running << " " << std::setw(15) << w2.x << std::setw(15) << w2.y << std::setw(15) << w2.z << std::endl;
+//	GlobalV::ofs_running << " " << std::setw(15) << w3.x << std::setw(15) << w3.y << std::setw(15) << w3.z << std::endl;
 //	GlobalV::ofs_running << " pre_brav=" << pre_brav << std::endl;
 //	GlobalV::ofs_running << " temp_brav=" << temp_brav << std::endl;
 
@@ -1051,17 +1051,17 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
     p3.y = b3.x * a1.y + b3.y * a2.y + b3.z * a3.y;
     p3.z = b3.x * a1.z + b3.y * a2.z + b3.z * a3.z;
 
-    GlobalV::ofs_running << " a1:" << setw(20) << a1.x << setw(20) << a1.y << setw(20) << a1.z << std::endl;
-    GlobalV::ofs_running << " a2:" << setw(20) << a2.x << setw(20) << a2.y << setw(20) << a2.z << std::endl;
-    GlobalV::ofs_running << " a3:" << setw(20) << a3.x << setw(20) << a3.y << setw(20) << a3.z << std::endl;
+    GlobalV::ofs_running << " a1:" << std::setw(20) << a1.x << std::setw(20) << a1.y << std::setw(20) << a1.z << std::endl;
+    GlobalV::ofs_running << " a2:" << std::setw(20) << a2.x << std::setw(20) << a2.y << std::setw(20) << a2.z << std::endl;
+    GlobalV::ofs_running << " a3:" << std::setw(20) << a3.x << std::setw(20) << a3.y << std::setw(20) << a3.z << std::endl;
 
-    GlobalV::ofs_running << " b1:" << setw(20) << b1.x << setw(20) << b1.y << setw(20) << b1.z << std::endl;
-    GlobalV::ofs_running << " b2:" << setw(20) << b2.x << setw(20) << b2.y << setw(20) << b2.z << std::endl;
-    GlobalV::ofs_running << " b3:" << setw(20) << b3.x << setw(20) << b3.y << setw(20) << b3.z << std::endl;
+    GlobalV::ofs_running << " b1:" << std::setw(20) << b1.x << std::setw(20) << b1.y << std::setw(20) << b1.z << std::endl;
+    GlobalV::ofs_running << " b2:" << std::setw(20) << b2.x << std::setw(20) << b2.y << std::setw(20) << b2.z << std::endl;
+    GlobalV::ofs_running << " b3:" << std::setw(20) << b3.x << std::setw(20) << b3.y << std::setw(20) << b3.z << std::endl;
 
-    GlobalV::ofs_running << " p1:" << setw(20) << p1.x << setw(20) << p1.y << setw(20) << p1.z << std::endl;
-    GlobalV::ofs_running << " p2:" << setw(20) << p2.x << setw(20) << p2.y << setw(20) << p2.z << std::endl;
-    GlobalV::ofs_running << " p3:" << setw(20) << p3.x << setw(20) << p3.y << setw(20) << p3.z << std::endl;
+    GlobalV::ofs_running << " p1:" << std::setw(20) << p1.x << std::setw(20) << p1.y << std::setw(20) << p1.z << std::endl;
+    GlobalV::ofs_running << " p2:" << std::setw(20) << p2.x << std::setw(20) << p2.y << std::setw(20) << p2.z << std::endl;
+    GlobalV::ofs_running << " p3:" << std::setw(20) << p3.x << std::setw(20) << p3.y << std::setw(20) << p3.z << std::endl;
 
     //analyse the data and get the symmetry infomation
 //	std::cout<<"calculating the properties!"<<std::endl;
@@ -1094,25 +1094,25 @@ void Symmetry::pricell(const UnitCell_pseudo &ucell)
 	OUT(GlobalV::ofs_running,"LATTICE NAME OF SUPERCELL",ilattname);
 
     GlobalV::ofs_running<<" LATTICE VECTORS OF SUPERCELL" << std::endl;
-    GlobalV::ofs_running<<" S1:" << setw(20) << a1.x << setw(20) << a1.y << setw(20) << a1.z << std::endl;
-    GlobalV::ofs_running<<" S2:" << setw(20) << a2.x << setw(20) << a2.y << setw(20) << a2.z << std::endl;
-    GlobalV::ofs_running<<" S3:" << setw(20) << a3.x << setw(20) << a3.y << setw(20) << a3.z << std::endl;
+    GlobalV::ofs_running<<" S1:" << std::setw(20) << a1.x << std::setw(20) << a1.y << std::setw(20) << a1.z << std::endl;
+    GlobalV::ofs_running<<" S2:" << std::setw(20) << a2.x << std::setw(20) << a2.y << std::setw(20) << a2.z << std::endl;
+    GlobalV::ofs_running<<" S3:" << std::setw(20) << a3.x << std::setw(20) << a3.y << std::setw(20) << a3.z << std::endl;
 
 	OUT(GlobalV::ofs_running,"BRAVAIS OF PRIMITIVE CELL",pbrav);
 	OUT(GlobalV::ofs_running,"LATTICE NAME OF PRIMITIVE CELL",plattname);
 
     GlobalV::ofs_running<<" LATTICE VECTORS OF PRIMITIVE CELL:" << std::endl;
-    GlobalV::ofs_running<<" P1:" << setw(20) << p1.x << setw(20) << p1.y << setw(20) << p1.z << std::endl;
-    GlobalV::ofs_running<<" P2:" << setw(20) << p2.x << setw(20) << p2.y << setw(20) << p2.z << std::endl;
-    GlobalV::ofs_running<<" P3:" << setw(20) << p3.x << setw(20) << p3.y << setw(20) << p3.z << std::endl;
+    GlobalV::ofs_running<<" P1:" << std::setw(20) << p1.x << std::setw(20) << p1.y << std::setw(20) << p1.z << std::endl;
+    GlobalV::ofs_running<<" P2:" << std::setw(20) << p2.x << std::setw(20) << p2.y << std::setw(20) << p2.z << std::endl;
+    GlobalV::ofs_running<<" P3:" << std::setw(20) << p3.x << std::setw(20) << p3.y << std::setw(20) << p3.z << std::endl;
 
 	OUT(GlobalV::ofs_running,"PRIMITIVE CELLS",ncell);
     GlobalV::ofs_running<<" PRIMITIVE TRANSLATION VECTORS:"<<std::endl;
     for (int i = 0; i < itrans; ++i)
     {
-        GlobalV::ofs_running << " " << setw(20) << ptrans[i*3]
-		<< " " << setw(20) << ptrans[i*3+1]
-		<< " " << setw(20) << ptrans[i*3+2]
+        GlobalV::ofs_running << " " << std::setw(20) << ptrans[i*3]
+		<< " " << std::setw(20) << ptrans[i*3+1]
+		<< " " << std::setw(20) << ptrans[i*3+2]
 		<< std::endl;
         //std::cout<<"n = "<<i*3+k<<std::endl;
     }
@@ -1289,9 +1289,9 @@ void Symmetry::checksym(Matrix3 &s, Vector3<double> &gtrans, double* pos)
 	/*
 	GlobalV::ofs_running << " ============================================= " << std::endl;
 	GlobalV::ofs_running << " Matrix S " << std::endl;
-	GlobalV::ofs_running << setw(5) << s.e11 << setw(5) << s.e12 << setw(5) << s.e13 << std::endl;
-	GlobalV::ofs_running << setw(5) << s.e21 << setw(5) << s.e22 << setw(5) << s.e32 << std::endl;
-	GlobalV::ofs_running << setw(5) << s.e23 << setw(5) << s.e23 << setw(5) << s.e33 << std::endl;
+	GlobalV::ofs_running << std::setw(5) << s.e11 << std::setw(5) << s.e12 << std::setw(5) << s.e13 << std::endl;
+	GlobalV::ofs_running << std::setw(5) << s.e21 << std::setw(5) << s.e22 << std::setw(5) << s.e32 << std::endl;
+	GlobalV::ofs_running << std::setw(5) << s.e23 << std::setw(5) << s.e23 << std::setw(5) << s.e33 << std::endl;
 	GlobalV::ofs_running << " pos" << std::endl;
 	print_pos(pos, nat);
 	GlobalV::ofs_running << " rotpos" << std::endl;
@@ -1725,16 +1725,16 @@ void Symmetry::write(void)
     GlobalV::ofs_running<<"    E11 E12 E13 E21 E22 E23 E31 E32 E33"<<std::endl;
     for (int i = 0; i < nrot; ++i)
     {
-        GlobalV::ofs_running << setw(2) <<i + 1<<" "
-        << setw(4) << gmatrix[i].e11
-        << setw(4) << gmatrix[i].e12
-        << setw(4) << gmatrix[i].e13
-        << setw(4) << gmatrix[i].e21
-        << setw(4) << gmatrix[i].e22
-        << setw(4) << gmatrix[i].e23
-        << setw(4) << gmatrix[i].e31
-        << setw(4) << gmatrix[i].e32
-        << setw(4) << gmatrix[i].e33 << std::endl;
+        GlobalV::ofs_running << std::setw(2) <<i + 1<<" "
+        << std::setw(4) << gmatrix[i].e11
+        << std::setw(4) << gmatrix[i].e12
+        << std::setw(4) << gmatrix[i].e13
+        << std::setw(4) << gmatrix[i].e21
+        << std::setw(4) << gmatrix[i].e22
+        << std::setw(4) << gmatrix[i].e23
+        << std::setw(4) << gmatrix[i].e31
+        << std::setw(4) << gmatrix[i].e32
+        << std::setw(4) << gmatrix[i].e33 << std::endl;
 
     }
     GlobalV::ofs_running<<std::endl;
@@ -1742,17 +1742,17 @@ void Symmetry::write(void)
     GlobalV::ofs_running<<"    e11 e12 e13 e21 e22 e23 e31 e32 e33"<<std::endl;
     for (int i = 0; i < nrotk; ++i)
     {
-        GlobalV::ofs_running << setw(2) <<i + 1<<" "
-        << setw(4) << gmatrix[i].e11
-        << setw(4) << gmatrix[i].e12
-        << setw(4) << gmatrix[i].e13
-        << setw(4) << gmatrix[i].e21
-        << setw(4) << gmatrix[i].e22
-        << setw(4) << gmatrix[i].e23
-        << setw(4) << gmatrix[i].e31
-        << setw(4) << gmatrix[i].e32
-        << setw(4) << gmatrix[i].e33
-        << setw(4) << "+"
+        GlobalV::ofs_running << std::setw(2) <<i + 1<<" "
+        << std::setw(4) << gmatrix[i].e11
+        << std::setw(4) << gmatrix[i].e12
+        << std::setw(4) << gmatrix[i].e13
+        << std::setw(4) << gmatrix[i].e21
+        << std::setw(4) << gmatrix[i].e22
+        << std::setw(4) << gmatrix[i].e23
+        << std::setw(4) << gmatrix[i].e31
+        << std::setw(4) << gmatrix[i].e32
+        << std::setw(4) << gmatrix[i].e33
+        << std::setw(4) << "+"
         << gtrans[i].x << " "
         << gtrans[i].y << " "
         << gtrans[i].z << std::endl;

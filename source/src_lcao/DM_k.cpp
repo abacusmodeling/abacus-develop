@@ -365,7 +365,7 @@ void Local_Orbital_Charge::cal_dk_k(const Grid_Technique &gt)
     //------------
     // for test
     //------------
-/*  std::cout << setprecision(3);
+/*  std::cout << std::setprecision(3);
     for(int i=0; i<nnrg_now; i++)
 
     for(int ik=0; ik<GlobalC::kv.nkstot; ++ik)

@@ -70,7 +70,7 @@ inline int find_offset(const int size, const int grid_index,
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 //						<< " nbxyz (" << i << " " << j << " " << k << ") "
 						<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
-						<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
+						<< " smaller than cutoff = " << std::setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
 						<< std::endl;
 					}
 					else
@@ -645,7 +645,7 @@ void Gint_k::evaluate_pvpR_reduced(
 //									<< " = " << iii << " " << jjj << " " << kkk <<") "
 									<< " nbxyz (" << i << " " << j << " " << k << ") "
 									<< " bxyz  (" << ii << " " << jj << " " << kk << ") "
-									<< " smaller than cutoff = " << setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
+									<< " smaller than cutoff = " << std::setprecision(20) << distance[bindex][ia1] - GlobalC::ORB.Phi[T1].getRcut()
 									<< std::endl;
 								}
 								else

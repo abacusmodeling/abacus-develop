@@ -94,7 +94,7 @@ void MD_func::mdRestartOut(const int& step, const int& recordFreq, const int& nu
 		file<<"ATOM_NUMBERS: "<<numIon<<std::endl;
 		file<<"ION_VELOCITIES_(a.u.): "<<std::endl;
 		for(int i=0;i<numIon;i++){
-			file<<setprecision (12)<<vel[i].x<<" "<<setprecision (12)<<vel[i].y<<" "<<setprecision (12)<<vel[i].z<<std::endl;
+			file<<std::setprecision (12)<<vel[i].x<<" "<<std::setprecision (12)<<vel[i].y<<" "<<std::setprecision (12)<<vel[i].z<<std::endl;
 		}
 		file<<"step: "<<step<<std::endl;                
 		file.close();

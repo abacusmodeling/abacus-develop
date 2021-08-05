@@ -78,7 +78,7 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 	{
 		int iat=0;
 		GlobalV::ofs_running << "\n movement of ions (unit is Bohr) : " << std::endl;
-		GlobalV::ofs_running << " " << setw(12) << "Atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
+		GlobalV::ofs_running << " " << std::setw(12) << "Atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 		for(int it = 0;it < GlobalC::ucell.ntype;it++)
 		{
 			for(int ia =0;ia< GlobalC::ucell.atoms[it].na;ia++)
@@ -86,10 +86,10 @@ void Ions_Move_Basic::move_atoms(double *move, double *pos)
 				std::stringstream ss;
 				ss << "move_" << GlobalC::ucell.atoms[it].label << ia+1;
 				GlobalV::ofs_running << " " 
-					<< setw(12) << ss.str().c_str()
-					<< setw(15) << move[3*iat+0] 
-					<< setw(15) << move[3*iat+1] 
-					<< setw(15) << move[3*iat+2] << std::endl;
+					<< std::setw(12) << ss.str().c_str()
+					<< std::setw(15) << move[3*iat+0] 
+					<< std::setw(15) << move[3*iat+1] 
+					<< std::setw(15) << move[3*iat+2] << std::endl;
 				iat++;
 			}
 		}

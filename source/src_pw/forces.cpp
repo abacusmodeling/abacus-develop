@@ -164,7 +164,7 @@ void Forces::init(matrix& force)
 		
 	}
 
- 	GlobalV::ofs_running << std::setiosflags(ios::fixed) << setprecision(6) << std::endl;
+ 	GlobalV::ofs_running << std::setiosflags(ios::fixed) << std::setprecision(6) << std::endl;
 	if(GlobalV::TEST_FORCE)
 	{
 		Forces::print("LOCAL    FORCE (Ry/Bohr)", forcelc);
@@ -216,7 +216,7 @@ void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const m
 {
     int iat = 0;
     ofs << " " << name;
-    ofs << setprecision(8);
+    ofs << std::setprecision(8);
 	//ofs << std::setiosflags(ios::showpos);
    
 	double fac = Ry_to_eV / 0.529177;// (eV/A)
@@ -225,33 +225,33 @@ void Forces::print_to_files(std::ofstream &ofs, const std::string &name, const m
 	{
 		std::cout << std::setiosflags(ios::showpos);
 		std::cout << " " << name;
-		std::cout << setprecision(8);
+		std::cout << std::setprecision(8);
 	}
 
     for (int it = 0;it < GlobalC::ucell.ntype;it++)
     {
         for (int ia = 0;ia < GlobalC::ucell.atoms[it].na;ia++)
         {
-            ofs << " " << setw(5) << it
-            << setw(8) << ia+1
-            << setw(20) << f(iat, 0)*fac
-            << setw(20) << f(iat, 1)*fac
-            << setw(20) << f(iat, 2)*fac << std::endl;
+            ofs << " " << std::setw(5) << it
+            << std::setw(8) << ia+1
+            << std::setw(20) << f(iat, 0)*fac
+            << std::setw(20) << f(iat, 1)*fac
+            << std::setw(20) << f(iat, 2)*fac << std::endl;
 			
 			if(GlobalV::TEST_FORCE)
 			{
-            	std::cout << " " << setw(5) << it
-            	<< setw(8) << ia+1
-            	<< setw(20) << f(iat, 0)*fac
-            	<< setw(20) << f(iat, 1)*fac
-            	<< setw(20) << f(iat, 2)*fac << std::endl;
+            	std::cout << " " << std::setw(5) << it
+            	<< std::setw(8) << ia+1
+            	<< std::setw(20) << f(iat, 0)*fac
+            	<< std::setw(20) << f(iat, 1)*fac
+            	<< std::setw(20) << f(iat, 2)*fac << std::endl;
 			}
             iat++;
         }
     }
 
-	GlobalV::ofs_running << resetiosflags(ios::showpos);
-	std::cout << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << std::resetiosflags(ios::showpos);
+	std::cout << std::resetiosflags(ios::showpos);
     return;
 }
 
@@ -261,7 +261,7 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
 {
 	NEW_PART(name);
 
-	GlobalV::ofs_running << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
+	GlobalV::ofs_running << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 	GlobalV::ofs_running << std::setiosflags(ios::showpos);
 
 	const double fac = Ry_to_eV / 0.529177;
@@ -269,9 +269,9 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
 	if(GlobalV::TEST_FORCE)
 	{
 		std::cout << " --------------- " << name << " ---------------" << std::endl;
-		std::cout << " " << setw(8) << "atom" << setw(15) << "x" << setw(15) << "y" << setw(15) << "z" << std::endl;
+		std::cout << " " << std::setw(8) << "atom" << std::setw(15) << "x" << std::setw(15) << "y" << std::setw(15) << "z" << std::endl;
 		std::cout << std::setiosflags(ios::showpos);
-		std::cout << setprecision(6);
+		std::cout << std::setprecision(6);
 		std::cout << std::setiosflags(ios::fixed);
 	}
 
@@ -285,49 +285,49 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
 
 			if(ry) // output Rydberg Unit
 			{
-				GlobalV::ofs_running << " " << setw(8) << ss.str();
-				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,0);
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,1);
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,2);
-				else GlobalV::ofs_running << setw(15) << "0";
+				GlobalV::ofs_running << " " << std::setw(8) << ss.str();
+				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,0);
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,1);
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,2);
+				else GlobalV::ofs_running << std::setw(15) << "0";
 				GlobalV::ofs_running << std::endl;
 			}
 			else
 			{
-				GlobalV::ofs_running << " " << setw(8) << ss.str();
-				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,0)*fac;
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,1)*fac;
-				else GlobalV::ofs_running << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << setw(15) << f(iat,2)*fac;
-				else GlobalV::ofs_running << setw(15) << "0";
+				GlobalV::ofs_running << " " << std::setw(8) << ss.str();
+				if( abs(f(iat,0)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,0)*fac;
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,1)*fac;
+				else GlobalV::ofs_running << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) GlobalV::ofs_running << std::setw(15) << f(iat,2)*fac;
+				else GlobalV::ofs_running << std::setw(15) << "0";
 				GlobalV::ofs_running << std::endl;
 			}
 
 			if(GlobalV::TEST_FORCE && ry)
 			{
-				std::cout << " " << setw(8) << ss.str();
+				std::cout << " " << std::setw(8) << ss.str();
                 std::cout<<fixed;
-				if( abs(f(iat,0)) > Forces::output_acc) std::cout << setw(15) << f(iat,0);
-				else std::cout << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) std::cout << setw(15) << f(iat,1);
-				else std::cout << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) std::cout << setw(15) << f(iat,2);
-				else std::cout << setw(15) << "0";
+				if( abs(f(iat,0)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,0);
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,1);
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,2);
+				else std::cout << std::setw(15) << "0";
 				std::cout << std::endl;
 			}
 			else if (GlobalV::TEST_FORCE)
 			{
-				std::cout << " " << setw(8) << ss.str();
+				std::cout << " " << std::setw(8) << ss.str();
                 std::cout<<fixed;
-				if( abs(f(iat,0)) > Forces::output_acc) std::cout << setw(15) << f(iat,0)*fac;
-				else std::cout << setw(15) << "0";
-				if( abs(f(iat,1)) > Forces::output_acc) std::cout << setw(15) << f(iat,1)*fac;
-				else std::cout << setw(15) << "0";
-				if( abs(f(iat,2)) > Forces::output_acc) std::cout << setw(15) << f(iat,2)*fac;
-				else std::cout << setw(15) << "0";
+				if( abs(f(iat,0)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,0)*fac;
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,1)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,1)*fac;
+				else std::cout << std::setw(15) << "0";
+				if( abs(f(iat,2)) > Forces::output_acc) std::cout << std::setw(15) << f(iat,2)*fac;
+				else std::cout << std::setw(15) << "0";
 				std::cout << std::endl;
 			}	
 				
@@ -335,8 +335,8 @@ void Forces::print(const std::string &name, const matrix &f, bool ry)
         }
     }
 
-	GlobalV::ofs_running << resetiosflags(ios::showpos);
-	std::cout << resetiosflags(ios::showpos);
+	GlobalV::ofs_running << std::resetiosflags(ios::showpos);
+	std::cout << std::resetiosflags(ios::showpos);
     return;
 }
 
@@ -470,7 +470,7 @@ void Forces::cal_force_ew(matrix& forceion)
             }
 
 	//		std::cout << " atom" << iat << std::endl;
-	//		std::cout << setw(15) << forceion(iat, 0) << setw(15) << forceion(iat,1) << setw(15) << forceion(iat,2) << std::endl; 
+	//		std::cout << std::setw(15) << forceion(iat, 0) << std::setw(15) << forceion(iat,1) << std::setw(15) << forceion(iat,2) << std::endl; 
             iat++;
         }
     }
@@ -534,7 +534,7 @@ void Forces::cal_force_ew(matrix& forceion)
                 }//atom b
 
 //				std::cout << " atom" << iat1 << std::endl;
-//				std::cout << setw(15) << forceion(iat1, 0) << setw(15) << forceion(iat1,1) << setw(15) << forceion(iat1,2) << std::endl; 
+//				std::cout << std::setw(15) << forceion(iat1, 0) << std::setw(15) << forceion(iat1,1) << std::setw(15) << forceion(iat1,2) << std::endl; 
 
                 ++iat1;
             }

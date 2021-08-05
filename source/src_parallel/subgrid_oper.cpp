@@ -291,7 +291,7 @@ void SubGrid_oper::dis_subwfc()
 				GlobalV::ofs_running << " Proc " << i << std::endl;
 				for(int i=0; i<GlobalV::NLOCAL; ++i)
 				{
-					GlobalV::ofs_running << setw(5) << i << setw(10) << trace_lo2[i] << std::endl;
+					GlobalV::ofs_running << std::setw(5) << i << std::setw(10) << trace_lo2[i] << std::endl;
 				}
 				*/
 
@@ -389,8 +389,8 @@ void SubGrid_oper::dis_subwfc()
 			if(mu>=0)
 			{
 				//				if( abs(GlobalC::LOWF.WFC_GAMMA[0][i][mu] > 1.0e-8) )
-				GlobalV::ofs_running << setw(5) << i+1 << setw(8) << j+1 
-					<< setw(15) << GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][i][mu] << std::endl; 
+				GlobalV::ofs_running << std::setw(5) << i+1 << std::setw(8) << j+1 
+					<< std::setw(15) << GlobalC::LOWF.WFC_GAMMA[GlobalV::CURRENT_SPIN][i][mu] << std::endl; 
 			}
 		}
 	}

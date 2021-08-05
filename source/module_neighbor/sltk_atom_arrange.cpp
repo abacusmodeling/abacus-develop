@@ -41,7 +41,7 @@ double atom_arrange::set_sr_NL(
 	
 	//xiaohui add 'output_level' line, 2015-09-16
 	if(output_level != "m") ofs_in << "\n SETUP SEARCHING RADIUS FOR PROGRAM TO SEARCH ADJACENT ATOMS" << std::endl;
-	if(output_level != "m") ofs_in << setprecision(3);
+	if(output_level != "m") ofs_in << std::setprecision(3);
 	if(output_level != "m") OUT(ofs_in,"longest orb rcut (Bohr)",rcutmax_Phi);
 
 //	std::cout << " LONGEST NL PROJ RCUT : " << longest_nl_proj_rcut << std::endl;
@@ -138,21 +138,21 @@ void atom_arrange::search(
 	// test the adjacent atoms and the box.
 	if(test_only)
 	{
-		ofs_in << " " << setw(5) << "Type" << setw(5) << "Atom" << setw(8) << "AdjNum" << std::endl;
+		ofs_in << " " << std::setw(5) << "Type" << std::setw(5) << "Atom" << std::setw(8) << "AdjNum" << std::endl;
 		for (int it = 0;it < ucell.ntype;it++)
 		{
 			for (int ia = 0;ia < ucell.atoms[it].na;ia++)
 			{
 				grid_d.Find_atom(ucell, ucell.atoms[it].tau[ia], it, ia);
 				
-				ofs_in << " " << setw(5) << it << setw(5) << ia << setw(8) << grid_d.getAdjacentNum()+1 << std::endl;
+				ofs_in << " " << std::setw(5) << it << std::setw(5) << ia << std::setw(8) << grid_d.getAdjacentNum()+1 << std::endl;
 				
 				for(int ad=0; ad < grid_d.getAdjacentNum()+1; ad++)
 				{
 					Vector3<double> tau = grid_d.getAdjacentTau(ad);
 					Vector3<int> box = grid_d.getBox(ad);
-					std::cout << setw(15) << tau.x << " " << setw(15) << tau.y << " " << setw(15) << tau.z << " " 
-					<< setw(8) << box.x << setw(8) << box.y << setw(8) << box.z << std::endl;
+					std::cout << std::setw(15) << tau.x << " " << std::setw(15) << tau.y << " " << std::setw(15) << tau.z << " " 
+					<< std::setw(8) << box.x << std::setw(8) << box.y << std::setw(8) << box.z << std::endl;
 				}
 			}
 		}

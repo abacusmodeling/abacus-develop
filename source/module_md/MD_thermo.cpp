@@ -119,10 +119,10 @@ double MD_thermo::NHChamiltonian(
         GlobalV::ofs_running<< " --------------------------------------------------"<<std::endl;
         GlobalV::ofs_running<< " SUMMARY OF NVT GlobalV::CALCULATION"<<std::endl;
         GlobalV::ofs_running<<" --------------------------------------------------"<<std::endl;
-        GlobalV::ofs_running<<" NVT Conservation     : "<<setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<std::endl;
-        GlobalV::ofs_running<<" NVT Temperature      : "<<setw(10)<< KE*2/(3*double(numIon_-nfrozen))/K_BOLTZMAN_AU<<" (K)"<<std::endl;
-        GlobalV::ofs_running<<" NVT Kinetic energy   : "<<setw(10)<< KE*2<<" (Rydberg)"<<std::endl;
-        GlobalV::ofs_running<<" NVT Potential energy : "<<setw(10)<< PE*2<<" (Rydberg)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Conservation     : "<<std::setw(10)<< NHChamiltonian0*2<<" (Rydberg)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Temperature      : "<<std::setw(10)<< KE*2/(3*double(numIon_-nfrozen))/K_BOLTZMAN_AU<<" (K)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Kinetic energy   : "<<std::setw(10)<< KE*2<<" (Rydberg)"<<std::endl;
+        GlobalV::ofs_running<<" NVT Potential energy : "<<std::setw(10)<< PE*2<<" (Rydberg)"<<std::endl;
     }
 //	std::cout << "hamiltonian1 =    "<< NHChamiltonian0 <<std::endl;
    
@@ -499,15 +499,15 @@ void MD_thermo::NHC_info_out(const int& step, const int& recordFreq, const int& 
 		file<<"MNHC: "<<MNHC_<<std::endl;
 		file<<"G: "<<std::endl;
 		for(int i=0;i<numIon_*MNHC_;i++){
-			file<<setprecision (12)<<G[i].x<<" "<<setprecision (12)<<G[i].y<<" "<<setprecision (12)<<G[i].z<<std::endl;
+			file<<std::setprecision (12)<<G[i].x<<" "<<std::setprecision (12)<<G[i].y<<" "<<std::setprecision (12)<<G[i].z<<std::endl;
 		}
         file<<"NHCeta: "<<std::endl;
 		for(int i=0;i<numIon_*MNHC_;i++){
-			file<<setprecision (12)<<NHCeta[i].x<<" "<<setprecision (12)<<NHCeta[i].y<<" "<<setprecision (12)<<NHCeta[i].z<<std::endl;
+			file<<std::setprecision (12)<<NHCeta[i].x<<" "<<std::setprecision (12)<<NHCeta[i].y<<" "<<std::setprecision (12)<<NHCeta[i].z<<std::endl;
 		}
         file<<"NHCpeta: "<<std::endl;
 		for(int i=0;i<numIon_*MNHC_;i++){
-			file<<setprecision (12)<<NHCpeta[i].x<<" "<<setprecision (12)<<NHCpeta[i].y<<" "<<setprecision (12)<<NHCpeta[i].z<<std::endl;
+			file<<std::setprecision (12)<<NHCpeta[i].x<<" "<<std::setprecision (12)<<NHCpeta[i].y<<" "<<std::setprecision (12)<<NHCpeta[i].z<<std::endl;
 		}                
 		file.close();
 	}

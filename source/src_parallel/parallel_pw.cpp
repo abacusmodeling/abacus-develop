@@ -161,7 +161,7 @@ void Parallel_PW::columns_map(void)
 
 					this->st[m1][m2]++;
 
-					//std::cout<<setw(12)<<m1+m2*this->n1<<setw(12)<<this->st[m1][m2]++<<std::endl;
+					//std::cout<<std::setw(12)<<m1+m2*this->n1<<std::setw(12)<<this->st[m1][m2]++<<std::endl;
 					ng++;
 					// ng: plane wave number if spheri.
 				}
@@ -228,8 +228,8 @@ void Parallel_PW::restore_st(void)
 				this->st_j[k] = j; //i1 y
 				this->st_n[k] = this->st[i][j]; 
 
-				//std::cout<<setw(12)<<i<<setw(12)<<j<<setw(12)<<st_n[k]<<std::endl;
-				//std::cout<<setw(12)<<i+j*this->n1<<setw(12)<<st_n[k]<<std::endl;
+				//std::cout<<std::setw(12)<<i<<std::setw(12)<<j<<std::setw(12)<<st_n[k]<<std::endl;
+				//std::cout<<std::setw(12)<<i+j*this->n1<<std::setw(12)<<st_n[k]<<std::endl;
 				k++;
 			}
 		}
@@ -307,7 +307,7 @@ void Parallel_PW::max_pw_column(int &pw, int &max_i, int &max_j)
 	// means the index stick has been used 
 	this->index[use] = 1;
 
-	//std::cout<<setw(24)<<"End max_pw_column()"<<std::endl;
+	//std::cout<<std::setw(24)<<"End max_pw_column()"<<std::endl;
 	return;
 }
 
@@ -346,8 +346,8 @@ void Parallel_PW::fft_dlay_set(void)
 		//so -1 has illegal meaning.
 	}
 
-//	std::cout << setw(12) << "isind dim" << setw(12) << nxy << std::endl;
-//	std::cout << setw(12) << "ismap dim" << setw(12) << this->nst << std::endl;
+//	std::cout << std::setw(12) << "isind dim" << std::setw(12) << nxy << std::endl;
+//	std::cout << std::setw(12) << "ismap dim" << std::setw(12) << this->nst << std::endl;
 
 	int *st_move = new int[nproc_use];
 	ZEROS(st_move,nproc_use);
@@ -360,7 +360,7 @@ void Parallel_PW::fft_dlay_set(void)
 
 		if (ip >= 0)
 		{
-			//std::cout<<setw(12)<<i<<setw(12)<<ip<<setw(12)<<nst[ip]<<std::endl;
+			//std::cout<<std::setw(12)<<i<<std::setw(12)<<ip<<std::setw(12)<<nst[ip]<<std::endl;
 			int is = st_move[ip] + this->st_start[ip] ;
 			this->ismap[ is ] = i;
 			
@@ -382,18 +382,18 @@ void Parallel_PW::fft_dlay_set(void)
 	// Don't delete this test below,it's useful !
 		/*
 		std::cout<<"========================================"<<std::endl;
-		std::cout<<setw(12)<<"col"<<setw(12)<<"nxy"<<std::endl;
+		std::cout<<std::setw(12)<<"col"<<std::setw(12)<<"nxy"<<std::endl;
 		for(i=0;i<this->nst;i++)
 		{
-			std::cout<<setw(12)<<i<<setw(12)<<ismap[i]<<std::endl;
+			std::cout<<std::setw(12)<<i<<std::setw(12)<<ismap[i]<<std::endl;
 		}
 		std::cout<<"========================================"<<std::endl;
-		std::cout<<setw(12)<<"nxy"<<setw(12)<<"col(per)"<<std::endl;
+		std::cout<<std::setw(12)<<"nxy"<<std::setw(12)<<"col(per)"<<std::endl;
 		for(i=0;i<nxy;i++)
 		{
 			if(this->isind[i]>=0)
 			{
-				std::cout<<setw(12)<<i<<setw(12)<<isind[i]<<std::endl;
+				std::cout<<std::setw(12)<<i<<std::setw(12)<<isind[i]<<std::endl;
 			}
 		}
 		*/	
@@ -452,13 +452,13 @@ void Parallel_PW::fft_map(
 	/*
 	if (ngm_i != this->npw_per[rank_use])
 	{
-		std::cout << setw(12) << "ngm_i = " << setw(12) << ngm_i << std::endl;
-		std::cout << setw(12) << "npw_per = " << this->npw_per[rank_use] << std::endl;
+		std::cout << std::setw(12) << "ngm_i = " << std::setw(12) << ngm_i << std::endl;
+		std::cout << std::setw(12) << "npw_per = " << this->npw_per[rank_use] << std::endl;
 		WARNING_QUIT("Parallel_PW::fft_map","ngm_i !=npw_per[rank_use]");
 	}
 	*/
 	
-//	std::cout<<setw(12)<<"i"<<setw(12)<<"x"<<setw(12)<<"y"<<setw(12)<<"z"<<std::endl;
+//	std::cout<<std::setw(12)<<"i"<<std::setw(12)<<"x"<<std::setw(12)<<"y"<<std::setw(12)<<"z"<<std::endl;
 	for (int ig=ngm_i_record; ig<ngm_i; ig++)
 	{
 		//  Mohan fix the bug 2008-4-3 17:19
@@ -477,14 +477,14 @@ void Parallel_PW::fft_map(
 
 		const int index_now = y+x*n2;
 		
-	//	std::cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
+	//	std::cout<<std::setw(12)<<x+y*n1<<std::setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
 		if(this->isind[index_now]==-1)
 		{
-			cerr<<"I don't know this grid !"<<std::endl;
-			std::cout<<setw(12)<<"xy"
-				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<std::endl;
-			std::cout<<setw(12)<<index_now
-				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<std::endl;
+			std::cerr<<"I don't know this grid !"<<std::endl;
+			std::cout<<std::setw(12)<<"xy"
+				<<std::setw(12)<<"isind"<<std::setw(12)<<"ig2fft"<<std::endl;
+			std::cout<<std::setw(12)<<index_now
+				<<std::setw(12)<<this->isind[index_now]<<std::setw(12)<<ig2fft[ig]<<std::endl;
 			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
@@ -493,7 +493,7 @@ void Parallel_PW::fft_map(
 
 	ngm_i_record = ngm_i;
 //	std::cout << "\n ngm_i_record = " << ngm_i_record;
-	//std::cout << setw(12) << "ngm_i" << setw(12) << ngm_i << std::endl;
+	//std::cout << std::setw(12) << "ngm_i" << std::setw(12) << ngm_i << std::endl;
 
 	return;
 }
@@ -501,24 +501,24 @@ void Parallel_PW::fft_map(
 
 void Parallel_PW::print_data(std::ofstream &print)const
 {
-	print<<setw(12)<<"gcut"<<setw(12)<<this->gcut<<std::endl;
-	print<<setw(12)<<"nst"<<setw(12)<<this->nst<<std::endl;
-	print<<setw(12)<<"n1"<<setw(12)<<this->n1<<std::endl;
-	print<<setw(12)<<"n2"<<setw(12)<<this->n2<<std::endl;
-	print<<setw(12)<<"n3"<<setw(12)<<this->n3<<std::endl;
+	print<<std::setw(12)<<"gcut"<<std::setw(12)<<this->gcut<<std::endl;
+	print<<std::setw(12)<<"nst"<<std::setw(12)<<this->nst<<std::endl;
+	print<<std::setw(12)<<"n1"<<std::setw(12)<<this->n1<<std::endl;
+	print<<std::setw(12)<<"n2"<<std::setw(12)<<this->n2<<std::endl;
+	print<<std::setw(12)<<"n3"<<std::setw(12)<<this->n3<<std::endl;
 
-	print<<setw(12)<<"Processor"<<setw(12)<<"Planes"<<setw(12)<<"Columns"
-		 <<setw(12)<<"st_start"<<setw(12)<<"PWs"<<std::endl;
+	print<<std::setw(12)<<"Processor"<<std::setw(12)<<"Planes"<<std::setw(12)<<"Columns"
+		 <<std::setw(12)<<"st_start"<<std::setw(12)<<"PWs"<<std::endl;
 	for(int i=0;i<nproc_use;i++)
 	{
-		print<<setw(12)<<i<<setw(12)<<this->npps[i]<<setw(12)<<this->nst_per[i]
-			 <<setw(12)<<this->st_start[i]<<setw(12)<<this->npw_per[i]<<std::endl;
+		print<<std::setw(12)<<i<<std::setw(12)<<this->npps[i]<<std::setw(12)<<this->nst_per[i]
+			 <<std::setw(12)<<this->st_start[i]<<std::setw(12)<<this->npw_per[i]<<std::endl;
 	}
 
 
 	print<<"\n";
 	print<<"====== ismap ======="<<std::endl;
-	print<<setw(12)<<"Columns"<<setw(12)<<"nxy"<<std::endl;
+	print<<std::setw(12)<<"Columns"<<std::setw(12)<<"nxy"<<std::endl;
 	for(int i=0;i<this->nst;i++)
 	{
 		if(i>0)
@@ -528,17 +528,17 @@ void Parallel_PW::print_data(std::ofstream &print)const
 				print<<"--------------------------"<<std::endl;
 			}
 		}
-		print<<setw(12)<<i<<setw(12)<<this->ismap[i]<<std::endl;
+		print<<std::setw(12)<<i<<std::setw(12)<<this->ismap[i]<<std::endl;
 	}
 
 	print<<"\n";
 	print<<"====== isind ======"<<std::endl;
-	print<<setw(12)<<"nxy"<<setw(12)<<"Columns"<<std::endl;
+	print<<std::setw(12)<<"nxy"<<std::setw(12)<<"Columns"<<std::endl;
 	for(int i=0;i<this->n1*this->n2;i++)
 	{	
 		if(this->isind[i]>=0)
 		{
-			print<<setw(12)<<i<<setw(12)<<this->isind[i]<<std::endl;
+			print<<std::setw(12)<<i<<std::setw(12)<<this->isind[i]<<std::endl;
 		}
 	}
 
@@ -645,14 +645,14 @@ void Parallel_PW::fft_map_final_scf(
 
 		const int index_now = y+x*n2;
 		
-	//	std::cout<<setw(12)<<x+y*n1<<setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
+	//	std::cout<<std::setw(12)<<x+y*n1<<std::setw(12)<<this->index_ip[x+y*this->n1]<<std::endl;
 		if(this->isind[index_now]==-1)
 		{
-			cerr<<"I don't know this grid !"<<std::endl;
-			std::cout<<setw(12)<<"xy"
-				<<setw(12)<<"isind"<<setw(12)<<"ig2fft"<<std::endl;
-			std::cout<<setw(12)<<index_now
-				<<setw(12)<<this->isind[index_now]<<setw(12)<<ig2fft[ig]<<std::endl;
+			std::cerr<<"I don't know this grid !"<<std::endl;
+			std::cout<<std::setw(12)<<"xy"
+				<<std::setw(12)<<"isind"<<std::setw(12)<<"ig2fft"<<std::endl;
+			std::cout<<std::setw(12)<<index_now
+				<<std::setw(12)<<this->isind[index_now]<<std::setw(12)<<ig2fft[ig]<<std::endl;
 			WARNING_QUIT("Parallel_PW::fft_map","isind == -1 !");
 		}
 		ig2fft[ig] = z + this->isind[index_now] * this->n3;
@@ -661,7 +661,7 @@ void Parallel_PW::fft_map_final_scf(
 
 	ngm_i_record_final_scf = ngm_i_final_scf;
 //	std::cout << "\n ngm_i_record = " << ngm_i_record;
-	//std::cout << setw(12) << "ngm_i" << setw(12) << ngm_i << std::endl;
+	//std::cout << std::setw(12) << "ngm_i" << std::setw(12) << ngm_i << std::endl;
 
 	return;
 }

@@ -17,16 +17,16 @@ void Ions::opt_ions_pw(void)
 	
 	if(GlobalV::OUT_LEVEL=="i")
 	{
-		std::cout << setprecision(12);
-    	std::cout<< " " << setw(7)<< "ISTEP" 
-		<<setw(5)<< "NE"
-		<<setw(15)<< "ETOT(eV)"
-		<<setw(15)<< "EDIFF(eV)"
-        <<setw(15)<< "MAX_F(eV/A)"
-        <<setw(15)<< "TRADIUS(Bohr)"
-		<<setw(8)<< "UPDATE"
-		<<setw(11)<< "ETIME(MIN)"
-		<<setw(11)<< "FTIME(MIN)"
+		std::cout << std::setprecision(12);
+    	std::cout<< " " << std::setw(7)<< "ISTEP" 
+		<<std::setw(5)<< "NE"
+		<<std::setw(15)<< "ETOT(eV)"
+		<<std::setw(15)<< "EDIFF(eV)"
+        <<std::setw(15)<< "MAX_F(eV/A)"
+        <<std::setw(15)<< "TRADIUS(Bohr)"
+		<<std::setw(8)<< "UPDATE"
+		<<std::setw(11)<< "ETIME(MIN)"
+		<<std::setw(11)<< "FTIME(MIN)"
         <<std::endl;
 	}
 
@@ -206,16 +206,16 @@ void Ions::opt_ions_pw(void)
 			std::stringstream ss;
 			ss << GlobalV::MOVE_IONS << istep;
 			
-			std::cout << " " << setw(7) << ss.str() 
-			<< setw(5) << eiter 
-			<< setw(15) << setprecision(6) << GlobalC::en.etot * Ry_to_eV 
-			<< setw(15) << IMM.get_ediff() * Ry_to_eV
-			<< setprecision(3)
-			<< setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
-			<< setw(15) << IMM.get_trust_radius()
-			<< setw(8) << IMM.get_update_iter()
-			<< setprecision(2) << setw(11) << etime_min
-			<< setw(11) << ftime_min << std::endl;
+			std::cout << " " << std::setw(7) << ss.str() 
+			<< std::setw(5) << eiter 
+			<< std::setw(15) << std::setprecision(6) << GlobalC::en.etot * Ry_to_eV 
+			<< std::setw(15) << IMM.get_ediff() * Ry_to_eV
+			<< std::setprecision(3)
+			<< std::setw(15) << IMM.get_largest_grad() * Ry_to_eV / 0.529177
+			<< std::setw(15) << IMM.get_trust_radius()
+			<< std::setw(8) << IMM.get_update_iter()
+			<< std::setprecision(2) << std::setw(11) << etime_min
+			<< std::setw(11) << ftime_min << std::endl;
 		}
 
 		++istep;
@@ -225,7 +225,7 @@ void Ions::opt_ions_pw(void)
     if(GlobalV::CALCULATION=="scf" || GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
     {
         GlobalV::ofs_running << "\n\n --------------------------------------------" << std::endl;
-        GlobalV::ofs_running << setprecision(16);
+        GlobalV::ofs_running << std::setprecision(16);
         GlobalV::ofs_running << " !FINAL_ETOT_IS " << GlobalC::en.etot * Ry_to_eV << " eV" << std::endl; 
         GlobalV::ofs_running << " --------------------------------------------\n\n" << std::endl;
     }

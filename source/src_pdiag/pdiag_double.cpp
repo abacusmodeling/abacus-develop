@@ -1315,10 +1315,10 @@ void Pdiag_Double::readin(
 
     //this->gath_eig(comm,n,eigvr,Z);
 
-    GlobalV::ofs_running << "\n " << setw(6) << "Band" << setw(25) << "Ry" << setw(25) << " eV" << std::endl;
+    GlobalV::ofs_running << "\n " << std::setw(6) << "Band" << std::setw(25) << "Ry" << std::setw(25) << " eV" << std::endl;
     for(int i=0; i<nlocal_tot; i++)
     {
-        GlobalV::ofs_running << " " << setw(6) << i << setw(25) << eigen[i] << setw(25)<< eigen[i] * 13.6058 << std::endl;
+        GlobalV::ofs_running << " " << std::setw(6) << i << std::setw(25) << eigen[i] << std::setw(25)<< eigen[i] * 13.6058 << std::endl;
     }
 
     delete[] A;

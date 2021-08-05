@@ -1597,7 +1597,7 @@ void Ylm::test(void)
 			ylm[i] *= pow(R.norm(), 7);
 		}
 		
-		std::cout << grly[i][0] << setw(20) << grly[i][1] << setw(20) << grly[i][2] << std::endl;
+		std::cout << grly[i][0] << std::setw(20) << grly[i][1] << std::setw(20) << grly[i][2] << std::endl;
 	}
 
 	return;

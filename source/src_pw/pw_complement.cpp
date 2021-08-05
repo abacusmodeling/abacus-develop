@@ -90,7 +90,7 @@ void PW_complement::get_total_pw(
                     /*** g std::vector indices f=(i,j,k) ***/
                     ig[ng] = f ;
                     gg[ng] = g2;
-                    //std::cout<<setw(12)<<f.x<<setw(12)<<f.y<<setw(12)<<f.z<<setw(12)<<g2<<std::endl;
+                    //std::cout<<std::setw(12)<<f.x<<std::setw(12)<<f.y<<std::setw(12)<<f.z<<std::setw(12)<<g2<<std::endl;
                     ++ng;
                 }
             }

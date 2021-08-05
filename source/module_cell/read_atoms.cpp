@@ -33,9 +33,9 @@ void UnitCell_pseudo::read_atom_species(std::ifstream &ifa, std::ofstream &ofs_r
 			READ_VALUE(ifa, pseudo_fn[i]);
 			if(GlobalV::test_pseudo_cell==2) 
 			{
-				ofs_running << "\n" << setw(6) << atom_label[i] 
-						<< setw(12) << atom_mass[i] 
-						<< setw(18) << pseudo_fn[i];
+				ofs_running << "\n" << std::setw(6) << atom_label[i] 
+						<< std::setw(12) << atom_mass[i] 
+						<< std::setw(18) << pseudo_fn[i];
 			}
 
 			// Peize Lin test for bsse 2021.04.07
@@ -750,9 +750,9 @@ bool UnitCell_pseudo::check_tau(void)const
 	double tolerence_bohr = 1.0e-3;
 
 	//GlobalV::ofs_running << "\n Output nearest atom not considering periodic boundary condition" << std::endl;
-	//GlobalV::ofs_running << " " << setw(5) << "TYPE" << setw(6) << "INDEX" 
-	//<< setw(20) << "NEAREST(Bohr)" 
-	//<< setw(20) << "NEAREST(Angstrom)" << std::endl; 
+	//GlobalV::ofs_running << " " << std::setw(5) << "TYPE" << std::setw(6) << "INDEX" 
+	//<< std::setw(20) << "NEAREST(Bohr)" 
+	//<< std::setw(20) << "NEAREST(Angstrom)" << std::endl; 
 	for(int T1=0; T1< this->ntype; T1++)
 	{
 		for(int I1=0; I1< this->atoms[T1].na; I1++)
@@ -792,9 +792,9 @@ bool UnitCell_pseudo::check_tau(void)const
 					}
 				}
 			}
-			//GlobalV::ofs_running << " " << setw(5) << atoms[T1].label << setw(6) << I1+1 
-			//<< setw(20) << shortest_norm  
-			//<< setw(20) << shortest_norm * BOHR_TO_A << std::endl;
+			//GlobalV::ofs_running << " " << std::setw(5) << atoms[T1].label << std::setw(6) << I1+1 
+			//<< std::setw(20) << shortest_norm  
+			//<< std::setw(20) << shortest_norm * BOHR_TO_A << std::endl;
 		}
 	}
 
@@ -811,7 +811,7 @@ void UnitCell_pseudo::print_stru_file(const std::string &fn, const int &type)con
 	std::ofstream ofs(fn.c_str());
 
 	ofs << "ATOMIC_SPECIES" << std::endl;
-	ofs << setprecision(12);
+	ofs << std::setprecision(12);
 
 	for(int it=0; it<ntype; it++)
 	{
@@ -915,20 +915,20 @@ void UnitCell_pseudo::print_tau(void)const
     if(Coordinate == "Cartesian" || Coordinate == "Cartesian_angstrom")
     {
         GlobalV::ofs_running << "\n CARTESIAN COORDINATES ( UNIT = " << lat0 << " Bohr )." << std::endl;
-        GlobalV::ofs_running << setw(13) << " atom"
-        //<< setw(20) << "x" 
-        //<< setw(20) << "y" 
-        //<< setw(20) << "z" 
+        GlobalV::ofs_running << std::setw(13) << " atom"
+        //<< std::setw(20) << "x" 
+        //<< std::setw(20) << "y" 
+        //<< std::setw(20) << "z" 
         //<< " mag"
-        << setw(20) << "x"
-        << setw(20) << "y"
-        << setw(20) << "z"
-        << setw(20) << "mag"
-		<< setw(20) << "vx"
-        << setw(20) << "vy"
-        << setw(20) << "vz"
+        << std::setw(20) << "x"
+        << std::setw(20) << "y"
+        << std::setw(20) << "z"
+        << std::setw(20) << "mag"
+		<< std::setw(20) << "vx"
+        << std::setw(20) << "vy"
+        << std::setw(20) << "vz"
         << std::endl;
-        GlobalV::ofs_running << setprecision(12);
+        GlobalV::ofs_running << std::setprecision(12);
 
         int iat=0;
         for(int it=0; it<ntype; it++)
@@ -938,22 +938,22 @@ void UnitCell_pseudo::print_tau(void)const
                 std::stringstream ss;
                 ss << "tauc_" << atoms[it].label << ia+1;
 
-                GlobalV::ofs_running << " " << setw(12) << ss.str()
-                //<< setw(20) << atoms[it].tau[ia].x 
-                //<< setw(20) << atoms[it].tau[ia].y
-                //<< setw(20) << atoms[it].tau[ia].z
+                GlobalV::ofs_running << " " << std::setw(12) << ss.str()
+                //<< std::setw(20) << atoms[it].tau[ia].x 
+                //<< std::setw(20) << atoms[it].tau[ia].y
+                //<< std::setw(20) << atoms[it].tau[ia].z
                 //<< " " << atoms[it].mag[ia]
-                << setw(20) << atoms[it].tau[ia].x
-                << setw(20) << atoms[it].tau[ia].y
-                << setw(20) << atoms[it].tau[ia].z
+                << std::setw(20) << atoms[it].tau[ia].x
+                << std::setw(20) << atoms[it].tau[ia].y
+                << std::setw(20) << atoms[it].tau[ia].z
 #ifndef __CMD
-				<< setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << magnet.start_magnetization[it]
 #else
-				<< setw(20) << 0
+				<< std::setw(20) << 0
 #endif
-				<< setw(20) << atoms[it].vel[ia].x
-                << setw(20) << atoms[it].vel[ia].y
-                << setw(20) << atoms[it].vel[ia].z
+				<< std::setw(20) << atoms[it].vel[ia].x
+                << std::setw(20) << atoms[it].vel[ia].y
+                << std::setw(20) << atoms[it].vel[ia].z
                 << std::endl;
 
                 ++iat;
@@ -964,18 +964,18 @@ void UnitCell_pseudo::print_tau(void)const
     if(Coordinate == "Direct")
     {
         GlobalV::ofs_running << "\n DIRECT COORDINATES" << std::endl;
-        GlobalV::ofs_running << setw(13) << " atom"
-        //<< setw(20) << "x"
-        //<< setw(20) << "y"
-        //<< setw(20) << "z"
+        GlobalV::ofs_running << std::setw(13) << " atom"
+        //<< std::setw(20) << "x"
+        //<< std::setw(20) << "y"
+        //<< std::setw(20) << "z"
         //<< " mag"
-        << setw(20) << "x"
-        << setw(20) << "y"
-        << setw(20) << "z"
-        << setw(20) << "mag"
-		<< setw(20) << "vx"
-        << setw(20) << "vy"
-        << setw(20) << "vz"
+        << std::setw(20) << "x"
+        << std::setw(20) << "y"
+        << std::setw(20) << "z"
+        << std::setw(20) << "mag"
+		<< std::setw(20) << "vx"
+        << std::setw(20) << "vy"
+        << std::setw(20) << "vz"
         << std::endl;
 
         int iat=0;
@@ -986,22 +986,22 @@ void UnitCell_pseudo::print_tau(void)const
                 std::stringstream ss;
                 ss << "taud_" << atoms[it].label << ia+1;
 
-                GlobalV::ofs_running << " " << setw(12) << ss.str()
-                //<< setw(20) << atoms[it].taud[ia].x
-                //<< setw(20) << atoms[it].taud[ia].y
-                //<< setw(20) << atoms[it].taud[ia].z
+                GlobalV::ofs_running << " " << std::setw(12) << ss.str()
+                //<< std::setw(20) << atoms[it].taud[ia].x
+                //<< std::setw(20) << atoms[it].taud[ia].y
+                //<< std::setw(20) << atoms[it].taud[ia].z
                 //<< " " << atoms[it].mag[ia]
-                << setw(20) << atoms[it].taud[ia].x
-                << setw(20) << atoms[it].taud[ia].y
-                << setw(20) << atoms[it].taud[ia].z
+                << std::setw(20) << atoms[it].taud[ia].x
+                << std::setw(20) << atoms[it].taud[ia].y
+                << std::setw(20) << atoms[it].taud[ia].z
 #ifndef __CMD
-				<< setw(20) << magnet.start_magnetization[it]
+				<< std::setw(20) << magnet.start_magnetization[it]
 #else
-				<< setw(20) << 0
+				<< std::setw(20) << 0
 #endif
-				<< setw(20) << atoms[it].vel[ia].x
-                << setw(20) << atoms[it].vel[ia].y
-                << setw(20) << atoms[it].vel[ia].z
+				<< std::setw(20) << atoms[it].vel[ia].x
+                << std::setw(20) << atoms[it].vel[ia].y
+                << std::setw(20) << atoms[it].vel[ia].z
                 << std::endl;
 
                 ++iat;
@@ -1091,8 +1091,8 @@ void UnitCell_pseudo::check_dtau(void)
 			atom1->tau[ia].y = cy2;
 			atom1->tau[ia].z = cz2;
 
-	//		std::cout << setw(15) << dx2 << setw(15) << dy2 << setw(15) << dz2 
-	//		<< setw(15) << cx2 << setw(15) << cy2 << setw(15) << cz2
+	//		std::cout << std::setw(15) << dx2 << std::setw(15) << dy2 << std::setw(15) << dz2 
+	//		<< std::setw(15) << cx2 << std::setw(15) << cy2 << std::setw(15) << cz2
 	//		<< std::endl;
 			
 		}

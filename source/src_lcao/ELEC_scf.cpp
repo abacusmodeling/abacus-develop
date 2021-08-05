@@ -60,18 +60,18 @@ void ELEC_scf::scf(const int &istep)
 		}
 		else
 		{
-			std::cout << " " << setw(7)<< "ITER";
+			std::cout << " " << std::setw(7)<< "ITER";
 
 			if(GlobalV::NSPIN==2)
 			{
-				std::cout<<setw(10)<<"TMAG";
-				std::cout<<setw(10)<<"AMAG";
+				std::cout<<std::setw(10)<<"TMAG";
+				std::cout<<std::setw(10)<<"AMAG";
 			}
 
-			std::cout << setw(15) << "ETOT(eV)";
-			std::cout << setw(15) << "EDIFF(eV)";
-			std::cout << setw(11) << "DRHO2";
-			std::cout << setw(11) << "TIME(s)" << std::endl;
+			std::cout << std::setw(15) << "ETOT(eV)";
+			std::cout << std::setw(15) << "EDIFF(eV)";
+			std::cout << std::setw(11) << "DRHO2";
+			std::cout << std::setw(11) << "TIME(s)" << std::endl;
 		}
 	}// end GlobalV::OUT_LEVEL
 
@@ -81,35 +81,35 @@ void ELEC_scf::scf(const int &istep)
         if(GlobalV::CALCULATION=="scf")
         {
             GlobalV::ofs_running
-            << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
+            << "\n LCAO ALGORITHM ------------- ELEC=" << std::setw(4) << iter
             << "--------------------------------\n";
 
             GlobalV::ofs_warning
-            << "\n LCAO ALGORITHM ------------- ELEC=" << setw(4) << iter
+            << "\n LCAO ALGORITHM ------------- ELEC=" << std::setw(4) << iter
             << "--------------------------------\n";
         }
         else if(GlobalV::CALCULATION=="relax" || GlobalV::CALCULATION=="cell-relax")
 		{
 			GlobalV::ofs_running
-			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- ION=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 
 			GlobalV::ofs_warning
-			<< "\n LCAO ALGORITHM ------------- ION=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- ION=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 		}
 		else if(GlobalV::CALCULATION=="md")
 		{
 			GlobalV::ofs_running
-			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- MD=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 
 			GlobalV::ofs_warning
-			<< "\n LCAO ALGORITHM ------------- MD=" << setw(4) << istep+1
-			<< "  ELEC=" << setw(4) << iter
+			<< "\n LCAO ALGORITHM ------------- MD=" << std::setw(4) << istep+1
+			<< "  ELEC=" << std::setw(4) << iter
 			<< "--------------------------------\n";
 		}
 
@@ -568,7 +568,7 @@ void ELEC_scf::scf(const int &istep)
 			if(conv_elec)
 			{
  				//xiaohui add "OUT_LEVEL", 2015-09-16
-				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << setprecision(16);
+				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << std::setprecision(16);
 				if(GlobalV::OUT_LEVEL != "m") GlobalV::ofs_running << " EFERMI = " << GlobalC::en.ef * Ry_to_eV << " eV" << std::endl;
 				if(GlobalV::OUT_LEVEL=="ie")
 				{

@@ -67,9 +67,9 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 
 /*
 	std::cout<<" LATTICE CONSTANT  OLD:"<<std::endl;
-	std::cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<std::endl;
-	std::cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<std::endl;
-	std::cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<std::endl;
+	std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<std::endl;
+	std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<std::endl;
+	std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<std::endl;
 */
 	
 	if(GlobalC::ucell.lc[0] != 0)
@@ -133,9 +133,9 @@ void Lattice_Change_Basic::change_lattice(double *move, double *lat)
 #endif
 /*
         std::cout<<" LATTICE CONSTANT NEW: "<<std::endl;
-        std::cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<std::endl;
-        std::cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<std::endl;
-        std::cout<<" "<<setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<std::endl;
+        std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e11<<"   "<<GlobalC::ucell.latvec.e12<<"   "<<GlobalC::ucell.latvec.e13<<std::endl;
+        std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e21<<"   "<<GlobalC::ucell.latvec.e22<<"   "<<GlobalC::ucell.latvec.e23<<std::endl;
+        std::cout<<" "<<std::setprecision(12)<<GlobalC::ucell.latvec.e31<<"   "<<GlobalC::ucell.latvec.e32<<"   "<<GlobalC::ucell.latvec.e33<<std::endl;
 */
 
 	

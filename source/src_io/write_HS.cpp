@@ -308,7 +308,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     H_fn=H_fn2.str();
     std::ofstream ofs_H;
     ofs_H.open(H_fn.c_str());
-    ofs_H<<setprecision(8) << setw(12);
+    ofs_H<<std::setprecision(8) << std::setw(12);
 
     std::string S_fn;
     std::stringstream S_fn2;
@@ -316,7 +316,7 @@ void HS_Matrix::save_HS(const double *H, const double *S, bool bit)
     S_fn=S_fn2.str();
     std::ofstream ofs_S;
     ofs_S.open(S_fn.c_str());
-    ofs_S<<setprecision(8) << setw(12);
+    ofs_S<<std::setprecision(8) << std::setw(12);
 
         int irr,icc;
         for (int i=0; i<GlobalV::NLOCAL; i++)
@@ -587,7 +587,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
         H_fn=H_fn2.str();
         std::ofstream ofs_H;
         ofs_H.open(H_fn.c_str());
-        ofs_H<<setprecision(8) << setw(12);
+        ofs_H<<std::setprecision(8) << std::setw(12);
 
         std::string S_fn;
         std::stringstream S_fn2;
@@ -595,7 +595,7 @@ void HS_Matrix::save_HS_complex(std::complex<double> *H, std::complex<double> *S
         S_fn=S_fn2.str();
         std::ofstream ofs_S;
         ofs_S.open(S_fn.c_str());
-        ofs_S<<setprecision(8) << setw(12);
+        ofs_S<<std::setprecision(8) << std::setw(12);
 
         int irr,icc;
         for (int i=0; i<GlobalV::NLOCAL; i++)
@@ -1138,7 +1138,7 @@ void HS_Matrix::output_single_R(std::ofstream &ofs, const std::map<size_t, std::
                     }
                     else
                     {
-                        ofs << " " << fixed << scientific << setprecision(8) << line[col];
+                        ofs << " " << fixed << scientific << std::setprecision(8) << line[col];
                         ofs_tem1 << " " << col;
                     }
 
@@ -1247,8 +1247,8 @@ void HS_Matrix::output_soc_single_R(std::ofstream &ofs, const std::map<size_t, s
                     }
                     else
                     {
-                        ofs << " (" << fixed << scientific << setprecision(8) << line[col].real() << "," 
-                                    << fixed << scientific << setprecision(8) << line[col].imag() << ")";
+                        ofs << " (" << fixed << scientific << std::setprecision(8) << line[col].real() << "," 
+                                    << fixed << scientific << std::setprecision(8) << line[col].imag() << ")";
                         ofs_tem1 << " " << col;
                     }
 

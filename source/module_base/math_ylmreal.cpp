@@ -467,10 +467,10 @@ void YlmReal::Ylm_Real
             		for(int ig=0; ig<ng; ig++)
             		{
             			if(ig%1==0) ofs << "\n";
-            			ofs << setw(20) << same
-            				<< setw(20) << Fact(l - m)
-            				<< setw(20) << Fact(l + m)
-            				<< setw(20) << ylm(lm, ig);
+            			ofs << std::setw(20) << same
+            				<< std::setw(20) << Fact(l - m)
+            				<< std::setw(20) << Fact(l + m)
+            				<< std::setw(20) << ylm(lm, ig);
             		}
             	}
             	MPI_Barrier(MPI_COMM_WORLD);
@@ -498,7 +498,7 @@ void YlmReal::Ylm_Real
     					for(int ig=0; ig<ng; ig++)
     					{
     						if(ig%6==0) ofs << "\n";
-    						ofs << setw(20) << ylm(count, ig);
+    						ofs << std::setw(20) << ylm(count, ig);
     					}
     				}
     				MPI_Barrier(MPI_COMM_WORLD);
@@ -510,7 +510,7 @@ void YlmReal::Ylm_Real
     				sum_before += ylm(count, ig) * ylm(count, ig);
     			}
     			sum_before *= FOUR_PI/ng;
-    			GlobalV::ofs_running<<setw(5)<<l<<setw(5)<<m<<setw(15)<<sum_before;
+    			GlobalV::ofs_running<<std::setw(5)<<l<<std::setw(5)<<m<<std::setw(15)<<sum_before;
 
 
     //			for(int ig=0; ig<ng; ig++)
@@ -523,7 +523,7 @@ void YlmReal::Ylm_Real
     //				sum += ylm(count, ig) * ylm(count, ig);
     //			}
     //			count++;
-    //			GlobalV::ofs_running<<setw(15)<<sum*FOUR_PI/ng;
+    //			GlobalV::ofs_running<<std::setw(15)<<sum*FOUR_PI/ng;
 
     			GlobalV::ofs_running<<std::endl;
     		}

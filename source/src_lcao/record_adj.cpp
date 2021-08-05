@@ -138,7 +138,7 @@ void Record_adj::for_2d(void)
 	this->info = new int**[na_proc];
 	for(int i=0; i<na_proc; i++)
 	{
-//		GlobalV::ofs_running << " atom" << setw(5) << i << setw(10) << na_each[i] << std::endl;
+//		GlobalV::ofs_running << " atom" << std::setw(5) << i << std::setw(10) << na_each[i] << std::endl;
 		if( na_each[i] > 0)
 		{
 			info[i] = new int*[ na_each[i] ];

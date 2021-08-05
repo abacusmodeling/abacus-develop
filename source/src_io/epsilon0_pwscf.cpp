@@ -152,18 +152,18 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 			
 		GlobalV::ofs_running<<std::endl;
 		GlobalV::ofs_running<<" The real part of the macroscopic dielectric constant:"<<std::endl;
-		GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<std::endl; 
+		GlobalV::ofs_running<<std::setw(15)<<"omega"<<std::setw(15)<<"XX"<<std::setw(15)<<"XY"<<std::setw(15)<<"XZ"<<std::setw(15)<<"YX"<<std::setw(15)<<"YY"<<std::setw(15)<<"YZ"<<std::setw(15)<<"ZX"<<std::setw(15)<<"ZY"<<std::setw(15)<<"ZZ"<<std::endl; 
 		for(int i=0; i<nomega; i++)
 		{
-			GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<epsr[0][i]<<setprecision(2)<<setw(15)<<epsr[1][i]<<setprecision(2)<<setw(15)<<epsr[2][i]<<setprecision(2)<<setw(15)<<epsr[3][i]<<setprecision(2)<<setw(15)<<epsr[4][i]<<setprecision(2)<<setw(15)<<epsr[5][i]<<setprecision(2)<<setw(15)<<epsr[6][i]<<setprecision(2)<<setw(15)<<epsr[7][i]<<setprecision(2)<<setw(15)<<epsr[8][i]<<std::endl;
+			GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<(i*domega)<<std::setprecision(2)<<std::setw(15)<<epsr[0][i]<<std::setprecision(2)<<std::setw(15)<<epsr[1][i]<<std::setprecision(2)<<std::setw(15)<<epsr[2][i]<<std::setprecision(2)<<std::setw(15)<<epsr[3][i]<<std::setprecision(2)<<std::setw(15)<<epsr[4][i]<<std::setprecision(2)<<std::setw(15)<<epsr[5][i]<<std::setprecision(2)<<std::setw(15)<<epsr[6][i]<<std::setprecision(2)<<std::setw(15)<<epsr[7][i]<<std::setprecision(2)<<std::setw(15)<<epsr[8][i]<<std::endl;
 		}
 
 		GlobalV::ofs_running<<std::endl; 
 		GlobalV::ofs_running<<" The imag part of the macroscopic dielectric constant:"<<std::endl;
-		GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<std::endl;  
+		GlobalV::ofs_running<<std::setw(15)<<"omega"<<std::setw(15)<<"XX"<<std::setw(15)<<"XY"<<std::setw(15)<<"XZ"<<std::setw(15)<<"YX"<<std::setw(15)<<"YY"<<std::setw(15)<<"YZ"<<std::setw(15)<<"ZX"<<std::setw(15)<<"ZY"<<std::setw(15)<<"ZZ"<<std::endl;  
 		for(int i=0; i<nomega; i++)
 		{
-			GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<epsi[0][i]<<setprecision(2)<<setw(15)<<epsi[1][i]<<setprecision(2)<<setw(15)<<epsi[2][i]<<setprecision(2)<<setw(15)<<epsi[3][i]<<setprecision(2)<<setw(15)<<epsi[4][i]<<setprecision(2)<<setw(15)<<epsi[5][i]<<setprecision(2)<<setw(15)<<epsi[6][i]<<setprecision(2)<<setw(15)<<epsi[7][i]<<setprecision(2)<<setw(15)<<epsi[8][i]<<std::endl;
+			GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<(i*domega)<<std::setprecision(2)<<std::setw(15)<<epsi[0][i]<<std::setprecision(2)<<std::setw(15)<<epsi[1][i]<<std::setprecision(2)<<std::setw(15)<<epsi[2][i]<<std::setprecision(2)<<std::setw(15)<<epsi[3][i]<<std::setprecision(2)<<std::setw(15)<<epsi[4][i]<<std::setprecision(2)<<std::setw(15)<<epsi[5][i]<<std::setprecision(2)<<std::setw(15)<<epsi[6][i]<<std::setprecision(2)<<std::setw(15)<<epsi[7][i]<<std::setprecision(2)<<std::setw(15)<<epsi[8][i]<<std::endl;
 		}					
 		
 		/*for(int iw=0; iw<nomega; iw++)
@@ -173,9 +173,9 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 		}*/
 
 		GlobalV::ofs_running<<" Macroscopic dielectric constant matrix :"<<std::endl;
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<epsr[0][0]<<setprecision(2)<<setw(15)<<epsr[1][0]<<setprecision(2)<<setw(15)<<epsr[2][0]<<std::endl;
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<epsr[3][0]<<setprecision(2)<<setw(15)<<epsr[4][0]<<setprecision(2)<<setw(15)<<epsr[5][0]<<std::endl;
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<epsr[6][0]<<setprecision(2)<<setw(15)<<epsr[7][0]<<setprecision(2)<<setw(15)<<epsr[8][0]<<std::endl;	
+		GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<epsr[0][0]<<std::setprecision(2)<<std::setw(15)<<epsr[1][0]<<std::setprecision(2)<<std::setw(15)<<epsr[2][0]<<std::endl;
+		GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<epsr[3][0]<<std::setprecision(2)<<std::setw(15)<<epsr[4][0]<<std::setprecision(2)<<std::setw(15)<<epsr[5][0]<<std::endl;
+		GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<epsr[6][0]<<std::setprecision(2)<<std::setw(15)<<epsr[7][0]<<std::setprecision(2)<<std::setw(15)<<epsr[8][0]<<std::endl;	
 		
 		//std::cout <<"Macroscopic dielectric constant matrix :"<<std::endl;
 		//std::cout << epsr[0][0] <<"  "<<epsr[1][0] <<"  "<<epsr[2][0]<<"  "<<std::endl;
@@ -273,18 +273,18 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 			
 		GlobalV::ofs_running<<std::endl;
 		GlobalV::ofs_running<<" The real part of the macroscopic dielectric constant:"<<std::endl;
-		GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<std::endl; 
+		GlobalV::ofs_running<<std::setw(15)<<"omega"<<std::setw(15)<<"XX"<<std::setw(15)<<"XY"<<std::setw(15)<<"XZ"<<std::setw(15)<<"YX"<<std::setw(15)<<"YY"<<std::setw(15)<<"YZ"<<std::setw(15)<<"ZX"<<std::setw(15)<<"ZY"<<std::setw(15)<<"ZZ"<<std::endl; 
 		for(int i=0; i<nomega; i++)
 		{
-			GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<epsr[0][i]<<setprecision(2)<<setw(15)<<epsr[1][i]<<setprecision(2)<<setw(15)<<epsr[2][i]<<setprecision(2)<<setw(15)<<epsr[3][i]<<setprecision(2)<<setw(15)<<epsr[4][i]<<setprecision(2)<<setw(15)<<epsr[5][i]<<setprecision(2)<<setw(15)<<epsr[6][i]<<setprecision(2)<<setw(15)<<epsr[7][i]<<setprecision(2)<<setw(15)<<epsr[8][i]<<std::endl;
+			GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<(i*domega)<<std::setprecision(2)<<std::setw(15)<<epsr[0][i]<<std::setprecision(2)<<std::setw(15)<<epsr[1][i]<<std::setprecision(2)<<std::setw(15)<<epsr[2][i]<<std::setprecision(2)<<std::setw(15)<<epsr[3][i]<<std::setprecision(2)<<std::setw(15)<<epsr[4][i]<<std::setprecision(2)<<std::setw(15)<<epsr[5][i]<<std::setprecision(2)<<std::setw(15)<<epsr[6][i]<<std::setprecision(2)<<std::setw(15)<<epsr[7][i]<<std::setprecision(2)<<std::setw(15)<<epsr[8][i]<<std::endl;
 		}		
 
 		GlobalV::ofs_running<<std::endl; 
 		GlobalV::ofs_running<<" The imag part of the macroscopic dielectric constant:"<<std::endl;
-		GlobalV::ofs_running<<setw(15)<<"omega"<<setw(15)<<"XX"<<setw(15)<<"XY"<<setw(15)<<"XZ"<<setw(15)<<"YX"<<setw(15)<<"YY"<<setw(15)<<"YZ"<<setw(15)<<"ZX"<<setw(15)<<"ZY"<<setw(15)<<"ZZ"<<std::endl;  
+		GlobalV::ofs_running<<std::setw(15)<<"omega"<<std::setw(15)<<"XX"<<std::setw(15)<<"XY"<<std::setw(15)<<"XZ"<<std::setw(15)<<"YX"<<std::setw(15)<<"YY"<<std::setw(15)<<"YZ"<<std::setw(15)<<"ZX"<<std::setw(15)<<"ZY"<<std::setw(15)<<"ZZ"<<std::endl;  
 		for(int i=0; i<nomega; i++)
 		{
-			GlobalV::ofs_running<<setprecision(2)<<setw(15)<<(i*domega)<<setprecision(2)<<setw(15)<<epsi[0][i]<<setprecision(2)<<setw(15)<<epsi[1][i]<<setprecision(2)<<setw(15)<<epsi[2][i]<<setprecision(2)<<setw(15)<<epsi[3][i]<<setprecision(2)<<setw(15)<<epsi[4][i]<<setprecision(2)<<setw(15)<<epsi[5][i]<<setprecision(2)<<setw(15)<<epsi[6][i]<<setprecision(2)<<setw(15)<<epsi[7][i]<<setprecision(2)<<setw(15)<<epsi[8][i]<<std::endl;
+			GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<(i*domega)<<std::setprecision(2)<<std::setw(15)<<epsi[0][i]<<std::setprecision(2)<<std::setw(15)<<epsi[1][i]<<std::setprecision(2)<<std::setw(15)<<epsi[2][i]<<std::setprecision(2)<<std::setw(15)<<epsi[3][i]<<std::setprecision(2)<<std::setw(15)<<epsi[4][i]<<std::setprecision(2)<<std::setw(15)<<epsi[5][i]<<std::setprecision(2)<<std::setw(15)<<epsi[6][i]<<std::setprecision(2)<<std::setw(15)<<epsi[7][i]<<std::setprecision(2)<<std::setw(15)<<epsi[8][i]<<std::endl;
 		}		
 		
 		/*for(int iw=0; iw<nomega; iw++)
@@ -294,9 +294,9 @@ void Epsilon0_pwscf:: Cal_epsilon0()
 		}*/
 
 		GlobalV::ofs_running<<" Macroscopic dielectric constant matrix :"<<std::endl;
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<epsr[0][0]<<setprecision(2)<<setw(15)<<epsr[1][0]<<setprecision(2)<<setw(15)<<epsr[2][0]<<std::endl;
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<epsr[3][0]<<setprecision(2)<<setw(15)<<epsr[4][0]<<setprecision(2)<<setw(15)<<epsr[5][0]<<std::endl;
-		GlobalV::ofs_running<<setprecision(2)<<setw(15)<<epsr[6][0]<<setprecision(2)<<setw(15)<<epsr[7][0]<<setprecision(2)<<setw(15)<<epsr[8][0]<<std::endl;	
+		GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<epsr[0][0]<<std::setprecision(2)<<std::setw(15)<<epsr[1][0]<<std::setprecision(2)<<std::setw(15)<<epsr[2][0]<<std::endl;
+		GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<epsr[3][0]<<std::setprecision(2)<<std::setw(15)<<epsr[4][0]<<std::setprecision(2)<<std::setw(15)<<epsr[5][0]<<std::endl;
+		GlobalV::ofs_running<<std::setprecision(2)<<std::setw(15)<<epsr[6][0]<<std::setprecision(2)<<std::setw(15)<<epsr[7][0]<<std::setprecision(2)<<std::setw(15)<<epsr[8][0]<<std::endl;	
 			
 		//std::cout <<"Macroscopic dielectric constant matrix :"<<std::endl;
 		//std::cout << epsr[0][0] <<"  "<<epsr[1][0] <<"  "<<epsr[2][0]<<"  "<<std::endl;

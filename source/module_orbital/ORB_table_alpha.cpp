@@ -442,9 +442,9 @@ void ORB_table_alpha::print_Table_DSR(void)
 					for (int N2 = 0; N2 < GlobalC::ORB.Alpha[0].getNchi(L2); N2++)
 					{
 						const int Opair = this->DS_Opair(T1, L1, L2, N1, N2);	//Opair
-						//ofs <<setw(20)<< "atom_type: " << label << std::endl;
-						ofs <<setw(20)<< "lcao basis: " << "L1=" << L1 << ", N1=" << N1 << std::endl;
-						ofs <<setw(20)<< "descriptor basis: " << "L2=" << L2 << ", N2=" << N2 << std::endl;
+						//ofs <<std::setw(20)<< "atom_type: " << label << std::endl;
+						ofs <<std::setw(20)<< "lcao basis: " << "L1=" << L1 << ", N1=" << N1 << std::endl;
+						ofs <<std::setw(20)<< "descriptor basis: " << "L2=" << L2 << ", N2=" << N2 << std::endl;
 						for (int il = 0; il < this-> DS_2Lplus1[T1]; il++)
 						{
 							ofs << "L=" << il << std::endl;

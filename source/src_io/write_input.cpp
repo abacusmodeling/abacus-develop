@@ -207,7 +207,7 @@ void Input::Print(const std::string &fn)const
     OUTP(ofs,"vdw_radius_unit",vdw_radius_unit,"unit of radius cutoff for periodic structure");
     OUTP(ofs,"vdw_cn_thr",vdw_cn_thr,"radius cutoff for cn");
     OUTP(ofs,"vdw_cn_thr_unit",vdw_cn_thr_unit,"unit of cn_thr, Bohr or Angstrom");
-	ofs << setw(20) << "vdw_period" << vdw_period.x 
+	ofs << std::setw(20) << "vdw_period" << vdw_period.x 
 			<< " " << vdw_period.y << " " 
 			<< vdw_period.z<< " #periods of periodic structure" << std::endl;
 	
@@ -223,10 +223,10 @@ void Input::Print(const std::string &fn)const
 	OUTP(ofs,"domega",domega,"domega(Ry)");
 	OUTP(ofs,"nomega",nomega,"nomega");
 	OUTP(ofs,"ecut_chi",ecut_chi,"the dimension of chi matrix");
-	ofs << setw(20) <<"q_start"<<q_start[0]<<"   "
+	ofs << std::setw(20) <<"q_start"<<q_start[0]<<"   "
 		<<q_start[1]<<"   "<<q_start[2]
 		<<"  #the position of the first q point in direct coordinate" <<std::endl;
-	ofs << setw(20) <<"q_direction"<<q_direct[0]<<"   "<<q_direct[1]<<"   "<<q_direct[2]<<"  #the q direction" <<std::endl;
+	ofs << std::setw(20) <<"q_direction"<<q_direct[0]<<"   "<<q_direct[1]<<"   "<<q_direct[2]<<"  #the q direction" <<std::endl;
 	OUTP(ofs,"nq",nq,"the total number of qpoints for calculation");
 	OUTP(ofs,"out_epsilon",out_epsilon,"output epsilon or not");
 	OUTP(ofs,"out_chi",out_chi,"output chi or not");
@@ -236,16 +236,16 @@ void Input::Print(const std::string &fn)const
 	OUTP(ofs,"kmesh_interpolation",kmesh_interpolation,"calculting <i,0|j,R>");
 	for(int i=0; i<nq; i++)
 	{
-		ofs << setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << std::endl;
+		ofs << std::setw(20) <<"qcar" << qcar[i][0] <<"   "<< qcar[i][1] <<"   "<<qcar[i][2]<<"  #(unit: 2PI/lat0)" << std::endl;
 	}
 	OUTP(ofs,"ocp",GlobalV::ocp,"change occupation or not");
 	OUTP(ofs,"ocp_set",GlobalV::ocp_set,"std::set occupation");
 	//OUTP(ofs,"ocp_n",ocp_n,"number of occupation");
 	// for(int i=0; i<ocp_n; i++)
 	// {
-		// ofs << setw(20) <<"ocp_kb" << GlobalV::ocp_kb[i]<< std::endl;
+		// ofs << std::setw(20) <<"ocp_kb" << GlobalV::ocp_kb[i]<< std::endl;
 	// }
-	ofs << setw(20) <<"lcao_box"<<lcao_box[0]
+	ofs << std::setw(20) <<"lcao_box"<<lcao_box[0]
 		<<"   "<<lcao_box[1]<<"   "
 		<<lcao_box[2]<<"  #the scale for searching the existence of the overlap <i,0|j,R>" <<std::endl;
 	OUTP(ofs," mulliken", GlobalV::mulliken," mulliken  charge or not");//qifeng add 2019/9/10

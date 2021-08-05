@@ -62,7 +62,7 @@ void Charge::write_rho_cube(
 
 //		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 
 	}

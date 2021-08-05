@@ -113,17 +113,17 @@ void Parallel_Orbitals::set_trace(void)
     // print the trace for test.
     //---------------------------
     /*
-    GlobalV::ofs_running << " " << setw(10) << "GlobalRow" << setw(10) << "LocalRow" << std::endl;
+    GlobalV::ofs_running << " " << std::setw(10) << "GlobalRow" << std::setw(10) << "LocalRow" << std::endl;
     for(int i=0; i<GlobalV::NLOCAL; i++)
     {
-        GlobalV::ofs_running << " " << setw(10) << i << setw(10) << trace_loc_row[i] << std::endl;
+        GlobalV::ofs_running << " " << std::setw(10) << i << std::setw(10) << trace_loc_row[i] << std::endl;
 
     }
 
-    GlobalV::ofs_running << " " << setw(10) << "GlobalCol" << setw(10) << "LocalCol" << std::endl;
+    GlobalV::ofs_running << " " << std::setw(10) << "GlobalCol" << std::setw(10) << "LocalCol" << std::endl;
     for(int j=0; j<GlobalV::NLOCAL; j++)
     {
-        GlobalV::ofs_running << " " << setw(10) << j << setw(10) << trace_loc_col[j] << std::endl;
+        GlobalV::ofs_running << " " << std::setw(10) << j << std::setw(10) << trace_loc_col[j] << std::endl;
     }
     */
 

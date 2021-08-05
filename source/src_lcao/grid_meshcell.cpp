@@ -121,21 +121,21 @@ void Grid_MeshCell::init_latvec(void)
 	{
 		GlobalV::ofs_running << " the VECTORS of MESHCELL are (Bohr): " << std::endl;
 		GlobalV::ofs_running << " vec1( " 
-			<< setw(15) << meshcell_vec1[0]
-			<< setw(15) << meshcell_vec1[1]
-			<< setw(15) << meshcell_vec1[2] 
+			<< std::setw(15) << meshcell_vec1[0]
+			<< std::setw(15) << meshcell_vec1[1]
+			<< std::setw(15) << meshcell_vec1[2] 
 			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec2( " 
-			<< setw(15) << meshcell_vec2[0]
-			<< setw(15) << meshcell_vec2[1]
-			<< setw(15) << meshcell_vec2[2]
+			<< std::setw(15) << meshcell_vec2[0]
+			<< std::setw(15) << meshcell_vec2[1]
+			<< std::setw(15) << meshcell_vec2[2]
 			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec3( " 
-			<< setw(15) << meshcell_vec3[0]
-			<< setw(15) << meshcell_vec3[1]
-			<< setw(15) << meshcell_vec3[2]
+			<< std::setw(15) << meshcell_vec3[0]
+			<< std::setw(15) << meshcell_vec3[1]
+			<< std::setw(15) << meshcell_vec3[2]
 			<< ")" << std::endl;
 	}
 	
@@ -167,11 +167,11 @@ void Grid_MeshCell::init_meshcell_pos(void)
 		{
 			for(int k=0; k<bz; k++)
 			{
-//				std::cout << setw(5) << i << setw(5) << j << setw(5) << k;
+//				std::cout << std::setw(5) << i << std::setw(5) << j << std::setw(5) << k;
 				for(int p=0; p<3; p++)
 				{
 					meshcell_pos[index][p] = i*meshcell_vec1[p] + j*meshcell_vec2[p] + k*meshcell_vec3[p];
-					//std::cout << setw(15) << meshcell_pos[index][p]; 
+					//std::cout << std::setw(15) << meshcell_pos[index][p]; 
 				}
 //				std::cout << std::endl;
 				++index;

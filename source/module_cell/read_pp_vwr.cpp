@@ -43,23 +43,23 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 		mesh=mesh-1;
 		GlobalV::ofs_running << " Mesh number - 1, we need odd number, \n this may affect some polar std::atomic orbitals." << std::endl;
 	}
-	GlobalV::ofs_running << setw(15) << "MESH" << setw(15) << mesh << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "MESH" << std::setw(15) << mesh << std::endl;
 	// (2) read in nlcc: nonlinear core correction
 	ifs >> value; length = value.find(","); value.erase(length,1);
 	nlcc = std::atoi( value.c_str() );
-	GlobalV::ofs_running << setw(15) << "NLCC" << setw(15) << nlcc << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "NLCC" << std::setw(15) << nlcc << std::endl;
 	// (3) iatom : index for atom 
 	ifs >> value; length = value.find(","); value.erase(length,1);
 	psd = value;
-	GlobalV::ofs_running << setw(15) << "ATOM" << setw(15) << psd << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "ATOM" << std::setw(15) << psd << std::endl;
 	// (4) valence electron number
 	ifs >> value; length = value.find(","); value.erase(length,1);
 	zp = std::atoi( value.c_str() );
-	GlobalV::ofs_running << setw(15) << "Z(VALENCE)" << setw(15) << zp << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "Z(VALENCE)" << std::setw(15) << zp << std::endl;
 	// (5) spd_loc, which local pseudopotential should I choose
 	ifs >> value; length = value.find(","); value.erase(length,1);
 	spd_loc = std::atoi( value.c_str() );
-	GlobalV::ofs_running << setw(15) << "LOC(spd)" << setw(15) << spd_loc << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "LOC(spd)" << std::setw(15) << spd_loc << std::endl;
 	// (6) read in the occupations
 	double* tmp_oc = new double[3];
 	ifs >> value; length = value.find(","); value.erase(length,1);
@@ -68,8 +68,8 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	tmp_oc[1]= std::atoi( value.c_str() );
 	ifs >> value; length = value.find(","); value.erase(length,1);
 	tmp_oc[2]= std::atoi( value.c_str() );
-	GlobalV::ofs_running << setw(15) << "OCCUPATION" << setw(15) << tmp_oc[0] 
-	<< setw(15) << tmp_oc[1] << setw(15) << tmp_oc[2] << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "OCCUPATION" << std::setw(15) << tmp_oc[0] 
+	<< std::setw(15) << tmp_oc[1] << std::setw(15) << tmp_oc[2] << std::endl;
 	// (7) spin orbital
 	ifs >> has_so;
 
@@ -78,14 +78,14 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	getline(ifs,value);
 	int iref_s, iref_p, iref_d;
 	ifs >> iref_s >> iref_p >> iref_d;
-	GlobalV::ofs_running << setw(15) << "Vnl_USED" << setw(15) << iref_s 
-	<< setw(15) << iref_p << setw(15) << iref_d << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "Vnl_USED" << std::setw(15) << iref_s 
+	<< std::setw(15) << iref_p << std::setw(15) << iref_d << std::endl;
 	if(spd_loc==1) iref_s=0;
 	else if(spd_loc==2) iref_p=0;
 	else if(spd_loc==3) iref_d=0;
 	ifs >> iTB_s >> iTB_p >> iTB_d;
-	GlobalV::ofs_running << setw(15) << "Orb_USED" << setw(15) << iTB_s 
-	<< setw(15) << iTB_p << setw(15) << iTB_d << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "Orb_USED" << std::setw(15) << iTB_s 
+	<< std::setw(15) << iTB_p << std::setw(15) << iTB_d << std::endl;
 	
 	
 	// calculate the number of wave functions
@@ -93,7 +93,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	if(iTB_s) ++nwfc;
 	if(iTB_p) ++nwfc;
 	if(iTB_d) ++nwfc;
-	GlobalV::ofs_running << setw(15) << "NWFC" << setw(15) << nwfc << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "NWFC" << std::setw(15) << nwfc << std::endl;
 	// allocate occupation number array for wave functions
 	delete[] this->oc;
 	delete[] els;
@@ -210,8 +210,8 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 		unitp += wp[ir] * wp[ir] * r[ir] * r[ir] * dr;
 		unitd += wd[ir] * wd[ir] * r[ir] * r[ir] * dr;
 	}
-	GlobalV::ofs_running << setw(15) << "WFC_UNIT" << setw(15) << units 
-	<< setw(15) << unitp << setw(15) << unitd << std::endl; 
+	GlobalV::ofs_running << std::setw(15) << "WFC_UNIT" << std::setw(15) << units 
+	<< std::setw(15) << unitp << std::setw(15) << unitd << std::endl; 
 
 
 	// because only the rank=0 procesor read the pseudopotential
@@ -281,9 +281,9 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	if(iref_s==1) ++nbeta; // add one s projector
 	if(iref_p==1) ++nbeta; // add one p projector
 	if(iref_d==1) ++nbeta; // add one p projector
-	GlobalV::ofs_running << setw(15) << "NPROJ" << setw(15) << nbeta << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "NPROJ" << std::setw(15) << nbeta << std::endl;
 	this->nd = this->nbeta;
-	GlobalV::ofs_running << setw(15) << "N-Dij" << setw(15) << nd << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "N-Dij" << std::setw(15) << nd << std::endl;
 	// calculate the angular momentum for each beta
 	delete[] lll;
 	lll = new int[nbeta]; 
@@ -321,7 +321,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	ZEROS(vl, mesh);
 	ZEROS(wlr, mesh);
 	double rcut = 5.0/1.03;
-	GlobalV::ofs_running << setw(15) << "RCUT_NL" << setw(15) << rcut << std::endl;
+	GlobalV::ofs_running << std::setw(15) << "RCUT_NL" << std::setw(15) << rcut << std::endl;
 	for(int ib=0; ib<nbeta; ++ib)
 	{
 		double coef = 0.0;
@@ -355,7 +355,7 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 		// suppose wave function have sqrt(4pi) already
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         coef=1.0/sqrt(abs(coef));
-		GlobalV::ofs_running << setw(25) << "1/sqrt(<phi|deltaV|phi>)" << setw(15) << coef << std::endl;
+		GlobalV::ofs_running << std::setw(25) << "1/sqrt(<phi|deltaV|phi>)" << std::setw(15) << coef << std::endl;
 		for(int ir=0; ir<mesh; ++ir)
 		{
 			beta(ib,ir) *= coef;
@@ -376,10 +376,10 @@ int Pseudopot_upf::read_pseudo_vwr(std::ifstream &ifs)
 	{
 		if(r[ir]<rcut)
 		{
-			GlobalV::ofs_running << " " << setw(15) << r[ir]; 
+			GlobalV::ofs_running << " " << std::setw(15) << r[ir]; 
 			for(int ib=0; ib<nbeta; ++ib)
 			{
-				GlobalV::ofs_running << setw(25) << beta(ib,ir);
+				GlobalV::ofs_running << std::setw(25) << beta(ib,ir);
 			}
 			GlobalV::ofs_running << std::endl;
 		}

@@ -167,8 +167,8 @@ void Memory::print_all(std::ofstream &ofs)
 	const double small = 1.0; 
 //    std::cout<<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------";
     ofs <<"\n CLASS_NAME---------|NAME---------------|MEMORY(MB)--------" << std::endl;
-//	std::cout<<"\n"<<setw(41)<< " " <<setprecision(4)<<total;
-	ofs <<setw(41)<< " " <<setprecision(4)<<total << std::endl;
+//	std::cout<<"\n"<<std::setw(41)<< " " <<std::setprecision(4)<<total;
+	ofs <<std::setw(41)<< " " <<std::setprecision(4)<<total << std::endl;
     
 	bool *print_flag = new bool[n_memory];
 	for(int i=0; i<n_memory; i++) print_flag[i] = false;
@@ -198,14 +198,14 @@ void Memory::print_all(std::ofstream &ofs)
   		else
   		{
         	ofs  << " "
-             << setw(20) << class_name[k]
-             << setw(20) << name[k]
-             << setw(15) << consume[k] << std::endl;
+             << std::setw(20) << class_name[k]
+             << std::setw(20) << name[k]
+             << std::setw(15) << consume[k] << std::endl;
 
 //        	std::cout  << "\n "
-//             << setw(20) << class_name[k]
-//             << setw(20) << name[k]
-//             << setw(15) << consume[k];
+//             << std::setw(20) << class_name[k]
+//             << std::setw(20) << name[k]
+//             << std::setw(15) << consume[k];
 		}
     }
 //    std::cout<<"\n ----------------------------------------------------------"<<std::endl;

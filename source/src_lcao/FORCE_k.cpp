@@ -89,8 +89,8 @@ void Force_LCAO_k::ftable_k (
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
 		const double fac = Ry_to_eV / 0.529177;
-		std::cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
-		setw(15) << foverlap[iat][2]*fac << std::endl;
+		std::cout << std::setw(5) << iat+1 << std::setw(15) << foverlap[iat][0] *fac<< std::setw(15) << foverlap[iat][1]*fac << 
+		std::setw(15) << foverlap[iat][2]*fac << std::endl;
 	}
 	*/
 
@@ -493,8 +493,8 @@ void Force_LCAO_k::cal_foverlap_k(
 	for(int iat=0; iat<GlobalC::ucell.nat; ++iat)
 	{
 		const double fac = Ry_to_eV / 0.529177;
-		std::cout << setw(5) << iat+1 << setw(15) << foverlap[iat][0] *fac<< setw(15) << foverlap[iat][1]*fac << 
-		setw(15) << foverlap[iat][2]*fac << std::endl;
+		std::cout << std::setw(5) << iat+1 << std::setw(15) << foverlap[iat][0] *fac<< std::setw(15) << foverlap[iat][1]*fac << 
+		std::setw(15) << foverlap[iat][2]*fac << std::endl;
 	}
 	*/
 	if(isstress){
@@ -667,15 +667,15 @@ void Force_LCAO_k::test(double* mmm, const std::string &name)
 	}
 		
 	std::cout << "\n " << name << std::endl;
-	std::cout << setprecision(4);
+	std::cout << std::setprecision(4);
 	for(int i=0; i<GlobalV::NLOCAL; i++)
 	{
 		for(int j=0; j<GlobalV::NLOCAL; j++)
 		{
 			if( abs(test[i*GlobalV::NLOCAL+j]) > 1.0e-5)
-			std::cout << setw(12) << test[i*GlobalV::NLOCAL+j];
+			std::cout << std::setw(12) << test[i*GlobalV::NLOCAL+j];
 			else
-			std::cout << setw(12) << "0";
+			std::cout << std::setw(12) << "0";
 		}
 		std::cout << std::endl;
 	}

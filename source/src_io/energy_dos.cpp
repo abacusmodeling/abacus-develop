@@ -66,13 +66,13 @@ void energy::perform_dos(void)
 				for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 				{                       
 					ofsi<<"BAND"
-					<<setw(25)<<"Energy(ev)"
-					<<setw(25)<<"Occupation"
-					<<setw(25)<<"Kpoint = "<<ik+1
-					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
+					<<std::setw(25)<<"Energy(ev)"
+					<<std::setw(25)<<"Occupation"
+					<<std::setw(25)<<"Kpoint = "<<ik+1
+					<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
-						ofsi<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
+						ofsi<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 					}
 					ofsi <<std::endl; 
 					ofsi <<std::endl;                              
@@ -82,18 +82,18 @@ void energy::perform_dos(void)
 			{
 				for (int ik = 0;ik < GlobalC::kv.nks/2;ik++)
 				{
-					ofsi<<"BAND"<<setw(25)<<"Spin up Energy(ev)"
-					<<setw(25)<<"Occupation"
-					<<setw(25)<<"Spin down Energy(ev)"
-					<<setw(25)<<"Occupation"
-					<<setw(25)<<"Kpoint = "<<ik+1
-					<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
+					ofsi<<"BAND"<<std::setw(25)<<"Spin up Energy(ev)"
+					<<std::setw(25)<<"Occupation"
+					<<std::setw(25)<<"Spin down Energy(ev)"
+					<<std::setw(25)<<"Occupation"
+					<<std::setw(25)<<"Kpoint = "<<ik+1
+					<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 					for(int ib=0;ib<GlobalV::NBANDS;ib++)
 					{
-						ofsi<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
-						<<setw(25)<<GlobalC::wf.wg(ik,ib)
-						<<setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
-						<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
+						ofsi<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+						<<std::setw(25)<<GlobalC::wf.wg(ik,ib)
+						<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+						<<std::setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 					}
 					ofsi <<std::endl;
 					ofsi <<std::endl;
@@ -128,13 +128,13 @@ void energy::perform_dos(void)
 					for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 					{
 						ofsi2<<"BAND"
-						<<setw(25)<<"Energy(ev)"
-						<<setw(25)<<"Occupation"
-						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
+						<<std::setw(25)<<"Energy(ev)"
+						<<std::setw(25)<<"Occupation"
+						<<std::setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
+						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<setw(6)<<ib+1<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV<<std::setw(25)<<GlobalC::wf.wg(ik,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -145,20 +145,20 @@ void energy::perform_dos(void)
 					for (int ik = 0;ik < GlobalC::kv.nks/2;ik++)
 					{
 						ofsi2<<"BAND"
-						<<setw(25)<<"Spin up Energy(ev)"
-						<<setw(25)<<"Occupation"
-						<<setw(25)<<"Spin down Energy(ev)"
-						<<setw(25)<<"Occupation"
-						<<setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
-						<<setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
+						<<std::setw(25)<<"Spin up Energy(ev)"
+						<<std::setw(25)<<"Occupation"
+						<<std::setw(25)<<"Spin down Energy(ev)"
+						<<std::setw(25)<<"Occupation"
+						<<std::setw(25)<<"Kpoint = "<<GlobalC::Pkpoints.startk_pool[ip]+ik+1
+						<<std::setw(25)<<"("<<GlobalC::kv.kvec_d[ik].x<<" "<<GlobalC::kv.kvec_d[ik].y<<" "<<GlobalC::kv.kvec_d[ik].z<<")"<<std::endl;
 
 						for(int ib=0;ib<GlobalV::NBANDS;ib++)
 						{
-							ofsi2<<setw(6)<<ib+1
-							<<setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
-							<<setw(25)<<GlobalC::wf.wg(ik,ib)
-							<<setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
-							<<setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
+							ofsi2<<std::setw(6)<<ib+1
+							<<std::setw(25)<<GlobalC::wf.ekb[ik][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.wg(ik,ib)
+							<<std::setw(25)<<GlobalC::wf.ekb[(ik+GlobalC::kv.nks/2)][ib]* Ry_to_eV
+							<<std::setw(25)<<GlobalC::wf.wg(ik+GlobalC::kv.nks/2,ib)<<std::endl;
 						}
 						ofsi2 <<std::endl;
 						ofsi2 <<std::endl;
@@ -473,7 +473,7 @@ void energy::perform_dos(void)
 						 y +=  pdos[0](i,n);
 					 }  
 
-					 out <<setw(20)<< en <<setw(30)<< y << std::endl;
+					 out <<std::setw(20)<< en <<std::setw(30)<< y << std::endl;
 				 }
 			 }
 			 else if (GlobalV::NSPIN==2)
@@ -489,7 +489,7 @@ void energy::perform_dos(void)
 
 					 }  
 
-					 out <<setw(20)<< en <<setw(30)<< y << setw(30)<< z<< std::endl;
+					 out <<std::setw(20)<< en <<std::setw(30)<< y << std::setw(30)<< z<< std::endl;
 				 }
 			 }
 			 out.close();
@@ -530,13 +530,13 @@ void energy::perform_dos(void)
 
 			 out << "<"<<"pdos"<<">" <<std::endl;
 			 out << "<"<<"nspin"<<">" << GlobalV::NSPIN<< "<"<<"/"<<"nspin"<<">"<< std::endl;
-			 out << "<"<<"norbitals"<<">" <<setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
+			 out << "<"<<"norbitals"<<">" <<std::setw(2) <<GlobalV::NLOCAL<< "<"<<"/"<<"norbitals"<<">"<< std::endl;
 			 out << "<"<<"energy"<<"_"<<"values units"<<"="<<"\""<<"eV"<<"\""<<">"<<std::endl;
 
 			 for (int n=0; n<npoints; ++n)
 			 { double y=0.0;
 				 double en=emin + n * de_ev;
-				 out <<setw(20)<< en << std::endl;
+				 out <<std::setw(20)<< en << std::endl;
 			 }
 			 out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<std::endl;
 			 for (int i=0; i<GlobalC::ucell.nat; i++)
@@ -553,12 +553,12 @@ void energy::perform_dos(void)
 
 					 //out << "<"<<"/"<<"energy"<<"_"<<"values"<<">" <<std::endl;
 					 out << "<"<<"orbital" <<std::endl;
-					 out <<setw(6)<< "index"<<"="<<"\""<<setw(40) <<w+1<<"\""<<std::endl;
-					 out <<setw(5)<< "atom"<<"_"<<"index"<<"="<<"\""<<setw(40) <<i+1<<"\""<<std::endl;
-					 out <<setw(8)<< "species"<<"="<<"\""<<GlobalC::ucell.atoms[t].label<<"\""<<std::endl;
-					 out<<setw(2)<< "l"<<"="<<"\""<<setw(40)<<L1<<"\""<<std::endl;
-					 out <<setw(2)<< "m"<<"="<<"\""<<setw(40)<<m1<<"\""<<std::endl;
-					 out <<setw(2)<< "z"<<"="<<"\""<<setw(40)<<N1+1<<"\""<<std::endl;
+					 out <<std::setw(6)<< "index"<<"="<<"\""<<std::setw(40) <<w+1<<"\""<<std::endl;
+					 out <<std::setw(5)<< "atom"<<"_"<<"index"<<"="<<"\""<<std::setw(40) <<i+1<<"\""<<std::endl;
+					 out <<std::setw(8)<< "species"<<"="<<"\""<<GlobalC::ucell.atoms[t].label<<"\""<<std::endl;
+					 out<<std::setw(2)<< "l"<<"="<<"\""<<std::setw(40)<<L1<<"\""<<std::endl;
+					 out <<std::setw(2)<< "m"<<"="<<"\""<<std::setw(40)<<m1<<"\""<<std::endl;
+					 out <<std::setw(2)<< "z"<<"="<<"\""<<std::setw(40)<<N1+1<<"\""<<std::endl;
 					 out << ">" <<std::endl;
 					 out << "<"<<"data"<<">" <<std::endl;
 					 if (GlobalV::NSPIN==1)
@@ -567,14 +567,14 @@ void energy::perform_dos(void)
 						 {
 
 
-							 out <<setw(13)<< pdos[0](w,n)<<std::endl;
+							 out <<std::setw(13)<< pdos[0](w,n)<<std::endl;
 						 }//n
 					 }
 					 else if (GlobalV::NSPIN==2)
 					 {
 						 for (int n=0; n<npoints; ++n)
 						 {
-							 out <<setw(20)<< pdos[0](w,n)<< setw(30)<< pdos[1](w,n)<<std::endl;
+							 out <<std::setw(20)<< pdos[0](w,n)<< std::setw(30)<< pdos[1](w,n)<<std::endl;
 						 }//n
 					 }
 
@@ -588,7 +588,7 @@ void energy::perform_dos(void)
 		 {  std::stringstream os;
 			 os<<GlobalV::global_out_dir<<"Orbital";
 			 std::ofstream out(os.str().c_str());
-			 out<< setw(5)<<"io"<< setw(8) <<"spec" <<setw(5)<<"l"<<setw(5)<<"m"<<setw(5)<<"z"<<setw(5)<<"sym"<<std::endl;
+			 out<< std::setw(5)<<"io"<< std::setw(8) <<"spec" <<std::setw(5)<<"l"<<std::setw(5)<<"m"<<std::setw(5)<<"z"<<std::setw(5)<<"sym"<<std::endl;
 
 
 			 for (int i=0; i<GlobalC::ucell.nat; i++)
@@ -600,18 +600,18 @@ void energy::perform_dos(void)
 					 const int L1 = atom1->iw2l[j];
 					 const int N1 = atom1->iw2n[j];
 					 const int m1 = atom1->iw2m[j];
-					 out <<setw(5) << i << setw(8) 
-						<< GlobalC::ucell.atoms[t].label <<setw(5)
-							<<L1<<setw(5) <<m1<<setw(5)<<N1+1<<setw(15)<< Name_Angular[L1][m1] << std::endl;
+					 out <<std::setw(5) << i << std::setw(8) 
+						<< GlobalC::ucell.atoms[t].label <<std::setw(5)
+							<<L1<<std::setw(5) <<m1<<std::setw(5)<<N1+1<<std::setw(15)<< Name_Angular[L1][m1] << std::endl;
 				 }
 			 }
 			 out <<std::endl<<std::endl;
-			 out <<setw(5)<< "io"<<setw(2)<<"="<<setw(2)<<"Orbital index in supercell"<<std::endl;
-			 out <<setw(5)<< "spec"<<setw(2)<<"="<<setw(2)<<"Atomic species label"<<std::endl;
-			 out <<setw(5)<< "l"<<setw(2)<<"="<<setw(2)<<"Angular mumentum quantum number"<<std::endl;
-			 out <<setw(5)<< "m"<<setw(2)<<"="<<setw(2)<<"Magnetic quantum number"<<std::endl;
-			 out <<setw(5)<< "z"<<setw(2)<<"="<<setw(2)<<"Zeta index of orbital"<<std::endl;
-			 out <<setw(5)<< "sym"<<setw(2)<<"="<<setw(2)<<"Symmetry name of real orbital"<<std::endl;
+			 out <<std::setw(5)<< "io"<<std::setw(2)<<"="<<std::setw(2)<<"Orbital index in supercell"<<std::endl;
+			 out <<std::setw(5)<< "spec"<<std::setw(2)<<"="<<std::setw(2)<<"Atomic species label"<<std::endl;
+			 out <<std::setw(5)<< "l"<<std::setw(2)<<"="<<std::setw(2)<<"Angular mumentum quantum number"<<std::endl;
+			 out <<std::setw(5)<< "m"<<std::setw(2)<<"="<<std::setw(2)<<"Magnetic quantum number"<<std::endl;
+			 out <<std::setw(5)<< "z"<<std::setw(2)<<"="<<std::setw(2)<<"Zeta index of orbital"<<std::endl;
+			 out <<std::setw(5)<< "sym"<<std::setw(2)<<"="<<std::setw(2)<<"Symmetry name of real orbital"<<std::endl;
 			 out.close();}
 
 	 }       
@@ -707,9 +707,9 @@ void energy::perform_dos(void)
 			 //            {
 			 //                    dos2[i] = 0.00;
 			 //            }
-			 out <<setw(20)<<energy[i]
-				 <<setw(20)<<dos2[i]
-				 <<setw(20)<<sum2<<"\n";
+			 out <<std::setw(20)<<energy[i]
+				 <<std::setw(20)<<dos2[i]
+				 <<std::setw(20)<<sum2<<"\n";
 		 }
 		 out.close();
 

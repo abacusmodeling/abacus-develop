@@ -89,7 +89,7 @@ void Local_Orbital_Charge::write_dm(
 		for(int it=0; it<GlobalC::ucell.ntype; it++)
 		{
 			Atom* atom = &GlobalC::ucell.atoms[it];
-			ofs << setprecision(15);
+			ofs << std::setprecision(15);
 			for(int ia=0; ia<GlobalC::ucell.atoms[it].na; ia++)
 			{
 				ofs << " " << atom->taud[ia].x
@@ -116,7 +116,7 @@ void Local_Orbital_Charge::write_dm(
 
 		ofs << "\n  " << GlobalV::NLOCAL << " " << GlobalV::NLOCAL << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 
 	}

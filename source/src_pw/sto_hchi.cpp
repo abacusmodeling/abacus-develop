@@ -415,7 +415,7 @@ void Stochastic_hchi::hchi_real(std::complex<double>*chi_in, std::complex<double
 	//	sum1 += norm(chi_in[i]);
 	//	sum2 += real(conj(chi_in[i]) * hchi[i]);
 	//}
-	//std::cout<<setw(15)<<sum2 <<setw(15)<<sum1<<setw(15)<<sum2/sum1<<std::endl;
+	//std::cout<<std::setw(15)<<sum2 <<std::setw(15)<<sum1<<std::setw(15)<<sum2/sum1<<std::endl;
 	//------------------------------------------------------------
 
 	//test hermit property

@@ -37,7 +37,7 @@ void dscal(const double &alpha,matrix &a,const int i)
 
     if (nc <= 0 || nr <= 0 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dscal,nc <= 0 or nr <= 0 or i < 0 or i >= nr, ";
+        std::cerr << "\n error in dscal,nc <= 0 or nr <= 0 or i < 0 or i >= nr, ";
         return;
     }
 
@@ -52,7 +52,7 @@ void daxpy(const int n, const double &alpha, const double *x, const int incx, do
 {
     if (n < 1 || incy <= 0 || incx <= 0)
     {
-        cerr << "\n error in daxpy, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in daxpy, n < 1 or incx <= 0 or incy <= 0, ";
         return;
     }
     for (int ix = 0, iy = 0;ix < n && iy < n;ix += incx, iy += incy)
@@ -67,7 +67,7 @@ void zaxpy(int n, double alpha, std::complex < double> *x, int incx, std::comple
 
     if (n < 1 || incy <= 0 || incx <= 0)
     {
-        cerr << "\n error in daxpy, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in daxpy, n < 1 or incx <= 0 or incy <= 0, ";
         return;
     }
 
@@ -121,7 +121,7 @@ void zaxpy(int n, std::complex < double> alpha,  std::complex < double> *x,
 
     if (n < 1 || incy <= 0 || incx <= 0)
     {
-        cerr << "\n error in daxpy, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in daxpy, n < 1 or incx <= 0 or incy <= 0, ";
         return;
     }
 
@@ -144,7 +144,7 @@ void zaxpy(double alpha,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in daxpy, nr < 1 or nc < 1 or i out of range, ";
+        std::cerr << "\n error in daxpy, nr < 1 or nc < 1 or i out of range, ";
         return;
     }
 
@@ -168,7 +168,7 @@ void zaxpy(double alpha,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in daxpy, nr < 1 or nc < 1 or i out of range, ";
+        std::cerr << "\n error in daxpy, nr < 1 or nc < 1 or i out of range, ";
         return;
     }
 
@@ -189,7 +189,7 @@ void zaxpy(std::complex < double> alpha,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in daxpy, nr < 1 or nc < 1 or i out of range, ";
+        std::cerr << "\n error in daxpy, nr < 1 or nc < 1 or i out of range, ";
         return;
     }
 
@@ -212,7 +212,7 @@ void zaxpy(std::complex < double> alpha,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr || j < 0 || j >= nr)
     {
-        cerr << "\n error in daxpy, nr < 1 or nc < 1 or i or j out of range, ";
+        std::cerr << "\n error in daxpy, nr < 1 or nc < 1 or i or j out of range, ";
         return;
     }
 
@@ -228,7 +228,7 @@ void dcopy(int n, double *x, int incx, double *y, int incy)
     // dcopy Copy x to y where x and y are n-vectors.
     if (n < 1 || incx <= 0 || incy <= 0)
     {
-        cerr << "\n error in dcopy, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in dcopy, n < 1 or incx <= 0 or incy <= 0, ";
         return;
     }
 
@@ -244,7 +244,7 @@ void dcopy(int n, std::complex < double> *x, int incx, std::complex < double> *y
     // zcopy Copy x to y where x and y are n-vectors.
     if (n < 1 || incx <= 0 || incy <= 0)
     {
-        cerr << "\n error in dcopy, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in dcopy, n < 1 or incx <= 0 or incy <= 0, ";
         return;
     }
 
@@ -259,7 +259,7 @@ void dcopy(int n, int *x, int incx, int *y, int incy)
 {
     if (n < 1 || incx <= 0 || incy <= 0)
     {
-        cerr << "\n error in dcopy, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in dcopy, n < 1 or incx <= 0 or incy <= 0, ";
         return;
     }
 
@@ -280,7 +280,7 @@ void dcopy(const matrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy((matrix a, int i, double *y)), "
+        std::cerr << "\n error in dcopy((matrix a, int i, double *y)), "
              << "nr or nc < 1 or i out of range ";
         return;
     }
@@ -303,7 +303,7 @@ void dcopy(const matrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy(matrix a, int i, int *y),"
+        std::cerr << "\n error in dcopy(matrix a, int i, int *y),"
              << " nr or nc < 1 or i out of range ";
         return;
     }
@@ -326,7 +326,7 @@ void dcopy(const ComplexMatrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy(ComplexMatrix a, int i, std::complex < double> *),"
+        std::cerr << "\n error in dcopy(ComplexMatrix a, int i, std::complex < double> *),"
              << " nr or nc < 1 or i out of range ";
         return;
     }
@@ -347,7 +347,7 @@ void dcopy(double *x, matrix &b, int i)
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy(double *x, matrix &b, int i), "
+        std::cerr << "\n error in dcopy(double *x, matrix &b, int i), "
              << "nr or nc < 1 or i out of range ";
         return;
     }
@@ -367,7 +367,7 @@ void dcopy(std::complex < double> *x, ComplexMatrix &b, int i)
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy(double> *x, ComplexMatrix &b, int i), "
+        std::cerr << "\n error in dcopy(double> *x, ComplexMatrix &b, int i), "
              << "nr or nc < 1 or i out of range ";
         return;
     }
@@ -390,7 +390,7 @@ void dcopy(const matrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy(matrix a, int i,matrix &b, int ), "
+        std::cerr << "\n error in dcopy(matrix a, int i,matrix &b, int ), "
              << "nr or nc < 1 or i out of range ";
         return;
     }
@@ -412,7 +412,7 @@ void dcopy(const ComplexMatrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dcopy(ComplexMatrix a, int i,ComplexMatrix &b, int j), "
+        std::cerr << "\n error in dcopy(ComplexMatrix a, int i,ComplexMatrix &b, int j), "
              << " nr or nc < 1 or i out of range ";
         return;
     }
@@ -632,7 +632,7 @@ double ddot(int n,
 
     if (n < 1 || incx <= 0 || incy <= 0)
     {
-        cerr << "\n error in ddot, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in ddot, n < 1 or incx <= 0 or incy <= 0, ";
         return 0;
     }
 
@@ -659,7 +659,7 @@ std::complex < double> ddot(int n,
 
     if (n < 1 || incx <= 0 || incy <= 0)
     {
-        cerr << "\n error in ddot, n < 1 or incx <= 0 or incy <= 0, ";
+        std::cerr << "\n error in ddot, n < 1 or incx <= 0 or incy <= 0, ";
         return 0;
     }
 
@@ -758,7 +758,7 @@ double dnrm2(const int n, const double *x, const int incx)
     // compute Euclidean length (12 norm) of std::vector x,
     if (n < 0 || incx <= 0)
     {
-        cerr << "\n error in dnrm2, n < 0 or incx <= 0, ";
+        std::cerr << "\n error in dnrm2, n < 0 or incx <= 0, ";
         return 0;
     }
     if (n == 0)
@@ -787,7 +787,7 @@ double dnrm2(const matrix &a,
 
     if (nr < 1 || nc < 1 || i < 0 || i >= nr)
     {
-        cerr << "\n error in dnrm2, nr or nc < 1 or i out of range ";
+        std::cerr << "\n error in dnrm2, nr or nc < 1 or i out of range ";
         return 0;
     }
 
@@ -947,7 +947,7 @@ void zgemm(char tra,
         {
             ij = 2*(j+i*ldc);
             c(j,i) = cux[ij] + std::complex< double>(0,1) * cux[ij+1];
-            //		std::cout<<setw(12)<<c(j,i);
+            //		std::cout<<std::setw(12)<<c(j,i);
         }
         //	std::cout<<std::endl;
     }

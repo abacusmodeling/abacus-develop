@@ -100,23 +100,23 @@ void Electrons::self_consistent(const int &istep)
 
     if(GlobalV::OUT_LEVEL=="ie")
     {
-        std::cout << setprecision(12);
-        std::cout<< " " << setw(7)<< "ITER"; // pengfei Li added 2015-1-31 
+        std::cout << std::setprecision(12);
+        std::cout<< " " << std::setw(7)<< "ITER"; // pengfei Li added 2015-1-31 
 
         if(GlobalV::NSPIN==2)
         {
-            std::cout<<setw(10)<<"TMAG";
-            std::cout<<setw(10)<<"AMAG";
+            std::cout<<std::setw(10)<<"TMAG";
+            std::cout<<std::setw(10)<<"AMAG";
         }
 
-        std::cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
+        std::cout<<std::setw(15)<< "ETOT(eV)"<<std::setw(15)<< "EDIFF(eV)"<<std::setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
         //if(GlobalV::DIAGO_TYPE=="cg") xiaohui modify 2013-09-02
         if(GlobalV::KS_SOLVER=="cg") //xiaohui add 2013-09-02
         {
-            std::cout<<setw(11)<<"CG_ITER";
+            std::cout<<std::setw(11)<<"CG_ITER";
         }
 
-        std::cout<<setw(11)<< "TIME(S)";
+        std::cout<<std::setw(11)<< "TIME(S)";
         std::cout<<std::endl;
     }
     else
@@ -150,8 +150,8 @@ void Electrons::self_consistent(const int &istep)
     for (this->iter = 1;iter <= GlobalV::NITER;iter++)
     {
         GlobalV::ofs_running 
-        << "\n PW ALGORITHM --------------- ION=" << setw(4) << istep + 1
-        << "  ELEC=" << setw(4) << iter 
+        << "\n PW ALGORITHM --------------- ION=" << std::setw(4) << istep + 1
+        << "  ELEC=" << std::setw(4) << iter 
         << "--------------------------------\n";
         // mohan add 2010-07-16
         if(iter==1) GlobalC::CHR.set_new_e_iteration(true);
@@ -272,7 +272,7 @@ void Electrons::self_consistent(const int &istep)
 
             //if(GlobalV::MY_RANK==0)
             //{
-            //    ofs_mix << setw(5) << iter << setw(20) << dr2 << std::endl; 
+            //    ofs_mix << std::setw(5) << iter << std::setw(20) << dr2 << std::endl; 
             //}
 
             if (iter==1 && !onescf)
@@ -459,8 +459,8 @@ void Electrons::c_bands(const int &istep)
 
     avg_iter = 0.0;
 
-    GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< std::endl;
-    GlobalV::ofs_running << setprecision(6) << std::setiosflags(ios::fixed) << std::setiosflags(ios::showpoint);
+    GlobalV::ofs_running << " "  <<std::setw(8) << "K-point" << std::setw(15) << "CG iter num" << std::setw(15) << "Time(Sec)"<< std::endl;
+    GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::fixed) << std::setiosflags(ios::showpoint);
     for (int ik = 0;ik < GlobalC::kv.nks;ik++)
     {
         GlobalC::hm.hpw.init_k(ik);
@@ -516,9 +516,9 @@ void Electrons::c_bands(const int &istep)
         clock_t finish=clock();
         const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
-        GlobalV::ofs_running << " " << setw(8) 
-        << ik+1 << setw(15) 
-        << avg_iter_k << setw(15) << duration << std::endl;
+        GlobalV::ofs_running << " " << std::setw(8) 
+        << ik+1 << std::setw(15) 
+        << avg_iter_k << std::setw(15) << duration << std::endl;
     }//End K Loop
 	
     //if (!LOCAL_BASIS) xiaohui modify 2013-09-02

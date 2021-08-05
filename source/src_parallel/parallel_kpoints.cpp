@@ -28,23 +28,23 @@ void Parallel_Kpoints::init_pools(void)
 /*
     if (GlobalV::MY_RANK==0)
     {
-        std::cout << "\n     " << setw(8) << "MY_RANK"
-             << setw(8) << "MY_POOL"
-             << setw(13) << "RANK_IN_POOL"
-             << setw(6) << "NPROC"
-             << setw(6) << "NPOOL"
-             << setw(14) << "NPROC_IN_POOL" << std::endl;
+        std::cout << "\n     " << std::setw(8) << "MY_RANK"
+             << std::setw(8) << "MY_POOL"
+             << std::setw(13) << "RANK_IN_POOL"
+             << std::setw(6) << "NPROC"
+             << std::setw(6) << "NPOOL"
+             << std::setw(14) << "NPROC_IN_POOL" << std::endl;
     }
     for (int i=0; i<GlobalV::NPROC; i++)
     {
         if (GlobalV::MY_RANK == i)
         {
-            std::cout << " I'm " << setw(8) << GlobalV::MY_RANK
-                 << setw(8) << GlobalV::MY_POOL
-                 << setw(13) << GlobalV::RANK_IN_POOL
-                 << setw(6) << GlobalV::NPROC
-                 << setw(6) << GlobalV::NPOOL
-                 << setw(14) << GlobalV::NPROC_IN_POOL << std::endl;
+            std::cout << " I'm " << std::setw(8) << GlobalV::MY_RANK
+                 << std::setw(8) << GlobalV::MY_POOL
+                 << std::setw(13) << GlobalV::RANK_IN_POOL
+                 << std::setw(6) << GlobalV::NPROC
+                 << std::setw(6) << GlobalV::NPOOL
+                 << std::setw(14) << GlobalV::NPROC_IN_POOL << std::endl;
         }
         MPI_Barrier(MPI_COMM_WORLD);
     }

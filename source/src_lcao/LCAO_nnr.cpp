@@ -270,11 +270,11 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							++count;
 
 							/*
-							   ofs << setw(10) << iat << setw(10) << iat2
-							   << setw(10) << GlobalC::GridD.getBox(ad).x 
-							   << setw(10) << GlobalC::GridD.getBox(ad).y 
-							   << setw(10) << GlobalC::GridD.getBox(ad).z 
-							   << setw(20) << distance << std::endl;
+							   ofs << std::setw(10) << iat << std::setw(10) << iat2
+							   << std::setw(10) << GlobalC::GridD.getBox(ad).x 
+							   << std::setw(10) << GlobalC::GridD.getBox(ad).y 
+							   << std::setw(10) << GlobalC::GridD.getBox(ad).z 
+							   << std::setw(20) << distance << std::endl;
 							 */
 						}
 						// there is another possibility that i and j are adjacent atoms.
@@ -363,9 +363,9 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 	}
 	allocate_find_R2 = true;
 
-//	GlobalV::ofs_running << setw(5) << "b1" << setw(5) << "b2" << setw(5) << "b3"
-//	<< setw(8) << "iat" << setw(8) << "ad" << setw(8) << "iat2"
-//	<< setw(8) << "find_R2" << setw(8) << "find_R2st" << setw(8) << "dis" << std::endl;
+//	GlobalV::ofs_running << std::setw(5) << "b1" << std::setw(5) << "b2" << std::setw(5) << "b3"
+//	<< std::setw(8) << "iat" << std::setw(8) << "ad" << std::setw(8) << "iat2"
+//	<< std::setw(8) << "find_R2" << std::setw(8) << "find_R2st" << std::setw(8) << "dis" << std::endl;
 	for (int T1 = 0; T1 < GlobalC::ucell.ntype; T1++)
 	{
 		for (int I1 = 0; I1 < GlobalC::ucell.atoms[T1].na; I1++)
@@ -410,7 +410,7 @@ void LCAO_nnr::cal_nnrg(const Grid_Technique &GT)
 							std::cout << " R2 = " << GlobalC::GridD.getAdjacentTau(ad).x 
 							<< " " << GlobalC::GridD.getAdjacentTau(ad).y 
 							<< " " << GlobalC::GridD.getAdjacentTau(ad).z << std::endl;
-							std::cout << setprecision(25);
+							std::cout << std::setprecision(25);
 							std::cout << " distance = " << distance << std::endl;
 							std::cout << " box = " << b1 << " " << b2 << " " << b3 << std::endl;
 							std::cout << " rcut = " << rcut << std::endl;

@@ -137,7 +137,7 @@ void WF_atomic::init_at_1(void)
                     //				{
                     //
                     //					for (ir = 0;ir < GlobalC::ucell.atoms[it].msh;ir++)
-                    //						GlobalV::ofs_running << setprecision(20) << "\n vchi(" << ir << ")=" << vchi[ir];
+                    //						GlobalV::ofs_running << std::setprecision(20) << "\n vchi(" << ir << ")=" << vchi[ir];
                     //					GlobalV::ofs_running<<"\n aux[0] = "<<aux[0];
                     //					GlobalV::ofs_running<<"\n msh = "<< GlobalC::ucell.atoms[it].msh;
                     //					GlobalV::ofs_running<<"\n tab_at : "<<ppcell.tab_at(it, ic, iq) ;
@@ -183,15 +183,15 @@ void WF_atomic::print_PAOs(void)const
 
             std::ofstream ofs(ss.str().c_str());
             ofs << "Mesh " << GlobalC::ucell.atoms[it].msh;
-            ofs << "\n" << setw(15) << "Radial"
-            << setw(15) << "Psi"
-            << setw(15) << "Rab";
+            ofs << "\n" << std::setw(15) << "Radial"
+            << std::setw(15) << "Psi"
+            << std::setw(15) << "Rab";
 
             for (int i=0;i<GlobalC::ucell.atoms[it].msh;i++)
             {
-                ofs << "\n" << setw(15) << GlobalC::ucell.atoms[it].r[i]
-                << setw(15) << GlobalC::ucell.atoms[it].chi(icc,i)
-                << setw(15) << GlobalC::ucell.atoms[it].rab[i];
+                ofs << "\n" << std::setw(15) << GlobalC::ucell.atoms[it].r[i]
+                << std::setw(15) << GlobalC::ucell.atoms[it].chi(icc,i)
+                << std::setw(15) << GlobalC::ucell.atoms[it].rab[i];
             }
             ofs.close();
         }

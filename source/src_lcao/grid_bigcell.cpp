@@ -82,21 +82,21 @@ void Grid_BigCell::init_big_latvec(void)
 	{
 		GlobalV::ofs_running << " the VECTORS of BIGCELL are (Bohr): " << std::endl;
 		GlobalV::ofs_running << " vec1( " 
-			<< setw(15) << bigcell_vec1[0]
-			<< setw(15) << bigcell_vec1[1]
-			<< setw(15) << bigcell_vec1[2] 
+			<< std::setw(15) << bigcell_vec1[0]
+			<< std::setw(15) << bigcell_vec1[1]
+			<< std::setw(15) << bigcell_vec1[2] 
 			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec2( " 
-			<< setw(15) << bigcell_vec2[0]
-			<< setw(15) << bigcell_vec2[1]
-			<< setw(15) << bigcell_vec2[2]
+			<< std::setw(15) << bigcell_vec2[0]
+			<< std::setw(15) << bigcell_vec2[1]
+			<< std::setw(15) << bigcell_vec2[2]
 			<< ")" << std::endl;
 
 		GlobalV::ofs_running << " vec3( " 
-			<< setw(15) << bigcell_vec3[0]
-			<< setw(15) << bigcell_vec3[1]
-			<< setw(15) << bigcell_vec3[2]
+			<< std::setw(15) << bigcell_vec3[0]
+			<< std::setw(15) << bigcell_vec3[1]
+			<< std::setw(15) << bigcell_vec3[2]
 			<< ")" << std::endl;
 	}
 	return;

@@ -342,10 +342,10 @@ void Grid_Technique::cal_grid_integration_index(void)
 	Parallel_Reduce::gather_int_all(max_atom,all);
 	if(GlobalV::MY_RANK==0)
 	{
-		GlobalV::ofs_warning << setw(15) << "Processor" << setw(15) << "Atom" << std::endl;
+		GlobalV::ofs_warning << std::setw(15) << "Processor" << std::setw(15) << "Atom" << std::endl;
 		for(int i=0; i<GlobalV::NPROC; i++)
 		{
-			GlobalV::ofs_warning << setw(15) << i+1 << setw(15) << all[i] << std::endl; 
+			GlobalV::ofs_warning << std::setw(15) << i+1 << std::setw(15) << all[i] << std::endl; 
 		}
 	}
 	delete[] all;
@@ -385,7 +385,7 @@ void Grid_Technique::cal_trace_beta(void)
 				for(int ih=0; ih<atom->nh; ih++)
 				{
 					this->trace_beta[ih_all] = ih_local;
-					GlobalV::ofs_running << setw(5) << ih_all << setw(15) << trace_beta[ih_all] << std::endl;
+					GlobalV::ofs_running << std::setw(5) << ih_all << std::setw(15) << trace_beta[ih_all] << std::endl;
 					++ih_local;
 					++ih_all;
 				}

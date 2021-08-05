@@ -80,9 +80,9 @@ void Efield::add_efield(const double*const rho, double* v_in)
 					{
 						fdip(iat, jj) = e2 *(eamp - tot_dipole)*GlobalC::ucell.atoms[it].zv*bvec[jj]/bmod;
 					}
-//					std::cout << setw(15) << fdip(iat, 0) 
-//					<< setw(15) << fdip(iat, 1)
-//					<< setw(15) << fdip(iat, 2) << std::endl;
+//					std::cout << std::setw(15) << fdip(iat, 0) 
+//					<< std::setw(15) << fdip(iat, 1)
+//					<< std::setw(15) << fdip(iat, 2) << std::endl;
 					++iat;
 				}
 			}
@@ -107,9 +107,9 @@ void Efield::add_efield(const double*const rho, double* v_in)
 					{
 						fdip(iat, jj) = e2 *eamp * GlobalC::ucell.atoms[it].zv * bvec[jj]/bmod;
 					}
-//					std::cout << setw(15) << fdip(iat, 0) 
-//					<< setw(15) << fdip(iat, 1)
-//					<< setw(15) << fdip(iat, 2) << std::endl;
+//					std::cout << std::setw(15) << fdip(iat, 0) 
+//					<< std::setw(15) << fdip(iat, 1)
+//					<< std::setw(15) << fdip(iat, 2) << std::endl;
 					++iat;
 				}
 			}

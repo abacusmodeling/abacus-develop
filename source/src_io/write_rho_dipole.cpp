@@ -81,7 +81,7 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		}
 		ofs << "\n  " << GlobalC::pw.ncx << " " << GlobalC::pw.ncy << " " << GlobalC::pw.ncz << std::endl;
 
-		ofs << setprecision(precision);
+		ofs << std::setprecision(precision);
 		ofs << scientific;
 	}
 
@@ -250,9 +250,9 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 		dipole_elec_x *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 		dipole_elec_y *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
 		dipole_elec_z *= GlobalC::ucell.omega / static_cast<double>( GlobalC::pw.ncxyz );
-		//std::cout << setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<std::endl;
-		//std::cout << setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<std::endl;
-		//std::cout << setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<std::endl;
+		//std::cout << std::setprecision(8) << "dipole_elec_x: " << dipole_elec_x <<std::endl;
+		//std::cout << std::setprecision(8) << "dipole_elec_y: " << dipole_elec_y <<std::endl;
+		//std::cout << std::setprecision(8) << "dipole_elec_z: " << dipole_elec_z <<std::endl;
 
 	
 		ofs << " " << "dipole_elec_x: " << dipole_elec_x << std::endl;
@@ -340,19 +340,19 @@ void Charge::write_rho_dipole(const double* rho_save, const int &is, const int &
 
 /* 
 
-		std::cout << setprecision(8) << "dipole_ion_x: " << dipole_ion_x <<std::endl;
-		std::cout << setprecision(8) << "dipole_ion_y: " << dipole_ion_y <<std::endl;
-		std::cout << setprecision(8) << "dipole_ion_z: " << dipole_ion_z <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_ion_x: " << dipole_ion_x <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_ion_y: " << dipole_ion_y <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_ion_z: " << dipole_ion_z <<std::endl;
 
 		double dipole_x=0.0, dipole_y=0.0, dipole_z=0.0;
 		dipole_x = dipole_ion_x - dipole_elec_x;
 		dipole_y = dipole_ion_y - dipole_elec_y;
 		dipole_z = dipole_ion_z - dipole_elec_z;
-		std::cout << setprecision(8) << "dipole_x: " << dipole_x <<std::endl;
-		std::cout << setprecision(8) << "dipole_y: " << dipole_y <<std::endl;
-		std::cout << setprecision(8) << "dipole_z: " << dipole_z <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_x: " << dipole_x <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_y: " << dipole_y <<std::endl;
+		std::cout << std::setprecision(8) << "dipole_z: " << dipole_z <<std::endl;
 		dipole_sum = sqrt(dipole_x*dipole_x + dipole_y*dipole_y + dipole_z*dipole_z);
-		std::cout << setprecision(8) << "dipole_sum: " << dipole_sum << std::endl;
+		std::cout << std::setprecision(8) << "dipole_sum: " << dipole_sum << std::endl;
 
 */
 

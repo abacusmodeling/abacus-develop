@@ -28,22 +28,22 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
     
 	if(GlobalV::OUT_LEVEL=="ie")
 	{
-		std::cout << setprecision(12);
-    	std::cout<< " " << setw(7)<< "ITER"; 
+		std::cout << std::setprecision(12);
+    	std::cout<< " " << std::setw(7)<< "ITER"; 
 
 		if(GlobalV::NSPIN==2)
 		{
-			std::cout<<setw(10)<<"TMAG";
-			std::cout<<setw(10)<<"AMAG";
+			std::cout<<std::setw(10)<<"TMAG";
+			std::cout<<std::setw(10)<<"AMAG";
 		}
 	
-        std::cout<<setw(15)<< "ETOT(eV)"<<setw(15)<< "EDIFF(eV)"<<setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
+        std::cout<<std::setw(15)<< "ETOT(eV)"<<std::setw(15)<< "EDIFF(eV)"<<std::setw(11)<< "DRHO2"; // pengfei Li added 2015-1-31
 		if(GlobalV::KS_SOLVER=="cg") 
 		{
-			std::cout<<setw(11)<<"CG_ITER";
+			std::cout<<std::setw(11)<<"CG_ITER";
 		}
 
-		std::cout<<setw(11)<< "TIME(S)";
+		std::cout<<std::setw(11)<< "TIME(S)";
 
         std::cout<<std::endl;
 	}
@@ -65,8 +65,8 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 	for (this->iter = 1;iter <= GlobalV::NITER;iter++)
     {
 		GlobalV::ofs_running 
-		<< "\n PW-STOCHASTIC ALGO --------- ION=" << setw(4) << istep + 1
-		<< "  ELEC=" << setw(4) << iter 
+		<< "\n PW-STOCHASTIC ALGO --------- ION=" << std::setw(4) << istep + 1
+		<< "  ELEC=" << std::setw(4) << iter 
 		<< "--------------------------------\n";
 		if(iter==1) 
 		{
@@ -254,7 +254,7 @@ void Stochastic_Elec::scf_stochastic(const int &istep)
 
 		//			if(GlobalV::MY_RANK==0)
 		//			{
-		//				ofs_mix << setw(5) << iter << setw(20) << dr2 << std::endl; 
+		//				ofs_mix << std::setw(5) << iter << std::setw(20) << dr2 << std::endl; 
 		//			}
 
 		if (iter==1)
@@ -388,8 +388,8 @@ void Stochastic_Elec::c_bands(const int &istep)
     
 	avg_iter = 0.0;
        
-	GlobalV::ofs_running << " "  <<setw(8) << "K-point" << setw(15) << "CG iter num" << setw(15) << "Time(Sec)"<< std::endl;
-	GlobalV::ofs_running << setprecision(6) << std::setiosflags(ios::fixed) << std::setiosflags(ios::showpoint);
+	GlobalV::ofs_running << " "  <<std::setw(8) << "K-point" << std::setw(15) << "CG iter num" << std::setw(15) << "Time(Sec)"<< std::endl;
+	GlobalV::ofs_running << std::setprecision(6) << std::setiosflags(ios::fixed) << std::setiosflags(ios::showpoint);
 
 	for (int ik = 0;ik < GlobalC::kv.nks;ik++)
 	{
@@ -439,9 +439,9 @@ void Stochastic_Elec::c_bands(const int &istep)
 		const double duration = static_cast<double>(finish - start) / CLOCKS_PER_SEC;
 
 
-		GlobalV::ofs_running << " " << setw(8) 
-			<< ik+1 << setw(15) 
-			<< avg_iter_k << setw(15) << duration << std::endl;
+		GlobalV::ofs_running << " " << std::setw(8) 
+			<< ik+1 << std::setw(15) 
+			<< avg_iter_k << std::setw(15) << duration << std::endl;
 	}//End K Loop
 
 

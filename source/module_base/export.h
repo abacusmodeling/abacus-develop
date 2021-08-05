@@ -41,7 +41,7 @@ void IF_MATCH(const T &a,const T &b)
 #endif
 		exit(0);
 	}
-	//std::cout<<setw(12)<<a<<std::endl;
+	//std::cout<<std::setw(12)<<a<<std::endl;
 	return;
 }
 

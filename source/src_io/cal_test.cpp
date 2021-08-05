@@ -180,34 +180,34 @@ void Cal_Test::print_mem(const int &nproc)
 	}
 
 	std::cout << " If you use " << nproc << " processors: " << std::endl;
-	std::cout << " MEMORY FOR porter       : " << setw(15) << mporter/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR rho          : " << setw(15) << mrho/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR rho_save     : " << setw(15) << mrho_save/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR rho_core     : " << setw(15) << mrho_core/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR Rrho         : " << setw(15) << mRrho/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR dRrho        : " << setw(15) << mdRrho/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR drho         : " << setw(15) << mdrho/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR rho_save2    : " << setw(15) << mrho_save2/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR vltot        : " << setw(15) << mvltot/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR vr           : " << setw(15) << mvr/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR vrs          : " << setw(15) << mvrs/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR vrs1         : " << setw(15) << mvrs1/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR vrnew        : " << setw(15) << mvnew/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR rhog         : " << setw(15) << mrhog/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR rhog_save    : " << setw(15) << mrhog_save/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR rhog_core    : " << setw(15) << mrhog_core/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR H, S matrix  : " << setw(15) << mhs/nproc  << " MB" << std::endl;
-	std::cout << " MEMORY FOR wave function: " << setw(15) << mwf/nproc  << " MB" << std::endl;
-	std::cout << " MEMORY FOR spar H,S,rho : " << setw(15) << mspar_hsrho  << " MB" << std::endl;
-	std::cout << " MEMORY FOR nonzero      : " << setw(15) << mnonzero << " MB" << std::endl;
-	std::cout << " MEMORY FOR g vectors    : " << setw(15) << mgvec/nproc  << " MB" << std::endl;
-	std::cout << " MEMORY FOR gg           : " << setw(15) << mgg/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR fftw index   : " << setw(15) << mig2fftw/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR fftc index   : " << setw(15) << mig2fftc/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR ig123        : " << setw(15) << mig123/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR strucFac     : " << setw(15) << mstrucFac/nproc << " MB" << std::endl;
-	std::cout << " MEMORY FOR eigts1,2,3   : " << setw(15) << meigts123/nproc << " MB" << std::endl;
-	std::cout << " TOTAL MEMORY            : " << setw(15) << mtot/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR porter       : " << std::setw(15) << mporter/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR rho          : " << std::setw(15) << mrho/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR rho_save     : " << std::setw(15) << mrho_save/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR rho_core     : " << std::setw(15) << mrho_core/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR Rrho         : " << std::setw(15) << mRrho/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR dRrho        : " << std::setw(15) << mdRrho/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR drho         : " << std::setw(15) << mdrho/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR rho_save2    : " << std::setw(15) << mrho_save2/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR vltot        : " << std::setw(15) << mvltot/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR vr           : " << std::setw(15) << mvr/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR vrs          : " << std::setw(15) << mvrs/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR vrs1         : " << std::setw(15) << mvrs1/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR vrnew        : " << std::setw(15) << mvnew/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR rhog         : " << std::setw(15) << mrhog/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR rhog_save    : " << std::setw(15) << mrhog_save/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR rhog_core    : " << std::setw(15) << mrhog_core/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR H, S matrix  : " << std::setw(15) << mhs/nproc  << " MB" << std::endl;
+	std::cout << " MEMORY FOR wave function: " << std::setw(15) << mwf/nproc  << " MB" << std::endl;
+	std::cout << " MEMORY FOR spar H,S,rho : " << std::setw(15) << mspar_hsrho  << " MB" << std::endl;
+	std::cout << " MEMORY FOR nonzero      : " << std::setw(15) << mnonzero << " MB" << std::endl;
+	std::cout << " MEMORY FOR g vectors    : " << std::setw(15) << mgvec/nproc  << " MB" << std::endl;
+	std::cout << " MEMORY FOR gg           : " << std::setw(15) << mgg/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR fftw index   : " << std::setw(15) << mig2fftw/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR fftc index   : " << std::setw(15) << mig2fftc/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR ig123        : " << std::setw(15) << mig123/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR strucFac     : " << std::setw(15) << mstrucFac/nproc << " MB" << std::endl;
+	std::cout << " MEMORY FOR eigts1,2,3   : " << std::setw(15) << meigts123/nproc << " MB" << std::endl;
+	std::cout << " TOTAL MEMORY            : " << std::setw(15) << mtot/nproc << " MB" << std::endl;
 	
-	std::cout << " MEMORY FOR nonzero      : " << setw(15) << (double)GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/1028/1028/2.0/nproc << " MB" << std::endl; //mohan for tmp 
+	std::cout << " MEMORY FOR nonzero      : " << std::setw(15) << (double)GlobalV::NLOCAL*(GlobalV::NLOCAL+1)/1028/1028/2.0/nproc << " MB" << std::endl; //mohan for tmp 
 }

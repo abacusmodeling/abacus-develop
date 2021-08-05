@@ -210,7 +210,7 @@ void Hamilt_PW::diagH_subspace(
 
 // for tests
 /*
-		std::cout << setprecision(3);
+		std::cout << std::setprecision(3);
 		out.printV3(GlobalV::ofs_running,GlobalC::kv.kvec_c[ik]);
 		out.printcm_norm("sc",sc,1.0e-4);
 		out.printcm_norm("hvec",hvec,1.0e-4);
@@ -218,7 +218,7 @@ void Hamilt_PW::diagH_subspace(
 		std::cout << std::endl;
 */
 
-	std::cout << setprecision(5);
+	std::cout << std::setprecision(5);
 
 //--------------------------
 // KEEP THIS BLOCK FOR TESTS
@@ -231,7 +231,7 @@ void Hamilt_PW::diagH_subspace(
 		{
 			double a = hc(i,j).real();
 			if(abs(a) < 1.0e-5) a = 0;
-			std::cout << setw(6) << a;
+			std::cout << std::setw(6) << a;
 		}
 		std::cout << std::endl;
 	}
@@ -243,7 +243,7 @@ void Hamilt_PW::diagH_subspace(
 		{
 			double a = sc(i,j).real();
 			if(abs(a) < 1.0e-5) a = 0;
-			std::cout << setw(6) << a;
+			std::cout << std::setw(6) << a;
 		}
 		std::cout << std::endl;
 	}
@@ -855,17 +855,17 @@ void Hamilt_PW::diag_zheev(const int &npw_in, ComplexMatrix &psi, const int &nba
 
 
     // out put the results.
-    std::cout<<setw(6)<<"Bands"
-        <<setw(12)<<"energy(ev)"
-        <<setw(12)<<"err"
-        <<setw(25)<<"||H * psi - E * psi ||\n";
+    std::cout<<std::setw(6)<<"Bands"
+        <<std::setw(12)<<"energy(ev)"
+        <<std::setw(12)<<"err"
+        <<std::setw(25)<<"||H * psi - E * psi ||\n";
 
     for (int m = 0; m < 5; m++)
     {
-        std::cout << setw(6) << m
-             << setw(12) << em[m] * Ry_to_eV
-             << setw(12) << err[m]
-             << setw(25) << tmpen[m] * Ry_to_eV << std::endl ;
+        std::cout << std::setw(6) << m
+             << std::setw(12) << em[m] * Ry_to_eV
+             << std::setw(12) << err[m]
+             << std::setw(25) << tmpen[m] * Ry_to_eV << std::endl ;
     }
 
     std::cout << " end of diag_zheev " << std::endl ;

@@ -345,7 +345,7 @@ void Mulliken_Charge::stdout_mulliken(void)
 
 		// calculate the total charge of the system.
 		double sch = 0.0;
-		fout << setprecision(8);
+		fout << std::setprecision(8);
 		for(int is=0; is<GlobalV::NSPIN; ++is)
 		{
 			double sss = 0.0;
@@ -382,12 +382,12 @@ void Mulliken_Charge::stdout_mulliken(void)
 			int t = GlobalC::ucell.iat2it[i];
 			if (GlobalV::NSPIN==1 || GlobalV::NSPIN==2)
 			{
-				fout << i << setw(25) << GlobalC::ucell.atoms[t].label 
-					<< setw(30) << "Up spin" 
-					<< setw(30) << "Down spin" 
-					<< setw(30) << "Sum"<< setw(30) << "Diff"<< std::endl;
+				fout << i << std::setw(25) << GlobalC::ucell.atoms[t].label 
+					<< std::setw(30) << "Up spin" 
+					<< std::setw(30) << "Down spin" 
+					<< std::setw(30) << "Sum"<< std::setw(30) << "Diff"<< std::endl;
 			}
-			fout << setw(29) << "multiple" <<std::endl;
+			fout << std::setw(29) << "multiple" <<std::endl;
 
 			num = 0;
 			int lm = GlobalC::ucell.atoms[t].nwl;
@@ -424,22 +424,22 @@ void Mulliken_Charge::stdout_mulliken(void)
 					{     
 						if (GlobalV::NSPIN==1){
 							ADecMulP[0][i][num] = 0.5*ADecMulP[0][i][num]; 
-							fout << Name_Angular[l][m] << setw(14) 
-							<< mul << setw(32)<< ADecMulP[0][i][num] 
-							<< setw(30)<< ADecMulP[0][i][num] 
-							<< setw(30)<< ADecMulP[0][i][num]
+							fout << Name_Angular[l][m] << std::setw(14) 
+							<< mul << std::setw(32)<< ADecMulP[0][i][num] 
+							<< std::setw(30)<< ADecMulP[0][i][num] 
+							<< std::setw(30)<< ADecMulP[0][i][num]
 							+ ADecMulP[0][i][num]
-							<< setw(28) << ADecMulP[0][i][num]-ADecMulP[0][i][num]<< std::endl;
+							<< std::setw(28) << ADecMulP[0][i][num]-ADecMulP[0][i][num]<< std::endl;
 							sum_mul[0] += ADecMulP[0][i][num];
 						}
 						else if (GlobalV::NSPIN==2)
 						{
 							fout << Name_Angular[l][m] 
-								<< setw(14) << mul 
-								<< setw(32) << ADecMulP[0][i][num] 
-								<< setw(30) << ADecMulP[1][i][num] 
-								<< setw(30) << ADecMulP[0][i][num]
-								+ ADecMulP[1][i][num]<< setw(28) 
+								<< std::setw(14) << mul 
+								<< std::setw(32) << ADecMulP[0][i][num] 
+								<< std::setw(30) << ADecMulP[1][i][num] 
+								<< std::setw(30) << ADecMulP[0][i][num]
+								+ ADecMulP[1][i][num]<< std::setw(28) 
 								<< ADecMulP[0][i][num]-ADecMulP[1][i][num]<< std::endl;
 							sum_mul[0] += ADecMulP[0][i][num];
 							sum_mul[1] += ADecMulP[1][i][num];
@@ -449,17 +449,17 @@ void Mulliken_Charge::stdout_mulliken(void)
 
 					if (GlobalV::NSPIN==1)
 					{
-						fout <<"  sum over m "<< setw(43) 
-							<<sum_mul[0]<< setw(30) <<sum_mul[0]
-							<< setw(35) <<sum_mul[0]+sum_mul[0]
-							<< setw(25) <<sum_mul[0]-sum_mul[0]<<std::endl;
+						fout <<"  sum over m "<< std::setw(43) 
+							<<sum_mul[0]<< std::setw(30) <<sum_mul[0]
+							<< std::setw(35) <<sum_mul[0]+sum_mul[0]
+							<< std::setw(25) <<sum_mul[0]-sum_mul[0]<<std::endl;
 						sum_l[0] += sum_mul[0];
 					}
 					else if (GlobalV::NSPIN==2)
 					{
-						fout <<"  sum over m "<< setw(43) <<sum_mul[0]
-						<< setw(30) <<sum_mul[0]
-						<< setw(35) <<sum_mul[0]+sum_mul[1]<< setw(25) <<sum_mul[0]-sum_mul[1]<<std::endl;
+						fout <<"  sum over m "<< std::setw(43) <<sum_mul[0]
+						<< std::setw(30) <<sum_mul[0]
+						<< std::setw(35) <<sum_mul[0]+sum_mul[1]<< std::setw(25) <<sum_mul[0]-sum_mul[1]<<std::endl;
 						sum_l[0] += sum_mul[0];
 						sum_l[1] += sum_mul[1];
 					}
@@ -470,23 +470,23 @@ void Mulliken_Charge::stdout_mulliken(void)
 				{
 					if (GlobalV::NSPIN==1)
 					{
-						fout <<"  sum over m+mul "<< setw(36) 
-							<<sum_l[0]<< setw(30) <<sum_l[0]
-							<< setw(33) <<sum_l[0]+sum_l[0]
-							<< setw(29) <<sum_l[0]-sum_l[0]<<std::endl;
+						fout <<"  sum over m+mul "<< std::setw(36) 
+							<<sum_l[0]<< std::setw(30) <<sum_l[0]
+							<< std::setw(33) <<sum_l[0]+sum_l[0]
+							<< std::setw(29) <<sum_l[0]-sum_l[0]<<std::endl;
 						Tcharge =  Tcharge+ sum_l[0]+sum_l[0];
 					}
 					else if (GlobalV::NSPIN==2)
 					{
-						fout <<"  sum over m+mul "<< setw(36) 
-							<<sum_l[0]<< setw(30) <<sum_l[1]
-							<< setw(33) <<sum_l[0]+sum_l[1]
-							<< setw(29) <<sum_l[0]-sum_l[1]<<std::endl;
+						fout <<"  sum over m+mul "<< std::setw(36) 
+							<<sum_l[0]<< std::setw(30) <<sum_l[1]
+							<< std::setw(33) <<sum_l[0]+sum_l[1]
+							<< std::setw(29) <<sum_l[0]-sum_l[1]<<std::endl;
 						Tcharge =  Tcharge+sum_l[0]+sum_l[1];
 					}
 				}
 			}
-			fout <<"Total Charge on atom  "<< GlobalC::ucell.atoms[t].label <<  setw(20) << Tcharge <<std::endl<<std::endl<<std::endl;
+			fout <<"Total Charge on atom  "<< GlobalC::ucell.atoms[t].label <<  std::setw(20) << Tcharge <<std::endl<<std::endl<<std::endl;
 		}
 		fout.close();
 		delete[] sum_l;

@@ -140,14 +140,14 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 	{
 /*
 		GlobalV::ofs_running << " "
-		<< setw(15) << "Box"
-		<< setw(8) << "Offset"
-		<< setw(5) << "Type"
-		<< setw(8) << "Natom"
-		<< setw(10) << "X"
-		<< setw(10) << "Y"
-		<< setw(10) << "Z"
-		<< setw(10) << "Distance" << std::endl;
+		<< std::setw(15) << "Box"
+		<< std::setw(8) << "Offset"
+		<< std::setw(5) << "Type"
+		<< std::setw(8) << "Natom"
+		<< std::setw(10) << "X"
+		<< std::setw(10) << "Y"
+		<< std::setw(10) << "Z"
+		<< std::setw(10) << "Distance" << std::endl;
 */
 	}
 
@@ -175,12 +175,12 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 			{
 /*
 				GlobalV::ofs_running << " "
-				<< setw(5) << box[i].x
-				<< setw(5) << box[i].y
-				<< setw(5) << box[i].z
-				<< setw(8) << offset_i
-				<< setw(5) << ntype[i]
-				<< setw(8) << natom[i];
+				<< std::setw(5) << box[i].x
+				<< std::setw(5) << box[i].y
+				<< std::setw(5) << box[i].z
+				<< std::setw(8) << offset_i
+				<< std::setw(5) << ntype[i]
+				<< std::setw(8) << natom[i];
 */
 			}
 		}
@@ -204,10 +204,10 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 				{
 					const double distance = Distance(this->atomlink[offset], this->atomlink[offset_i]);
 /*
-					GlobalV::ofs_running << setw(10) << this->atomlink[offset_i].fatom.x()
-					<< setw(10) << this->atomlink[offset_i].fatom.y()
-					<< setw(10) << this->atomlink[offset_i].fatom.z()
-					<< setw(10) << distance << std::endl;
+					GlobalV::ofs_running << std::setw(10) << this->atomlink[offset_i].fatom.x()
+					<< std::setw(10) << this->atomlink[offset_i].fatom.y()
+					<< std::setw(10) << this->atomlink[offset_i].fatom.z()
+					<< std::setw(10) << distance << std::endl;
 */
 					assert(distance <= this->sradius);
 				}
@@ -235,10 +235,10 @@ void Grid_Driver::Find_adjacent_atom(const int offset, std::shared_ptr<AdjacentS
 				{
 					const double distance = this->Distance(this->atomlink[offset], adjacent_tau[i]);
 /*
-					GlobalV::ofs_running << setw(10) << adjacent_tau[i].x
-					<< setw(10) << adjacent_tau[i].y
-					<< setw(10) << adjacent_tau[i].z
-					<< setw(10) << distance;
+					GlobalV::ofs_running << std::setw(10) << adjacent_tau[i].x
+					<< std::setw(10) << adjacent_tau[i].y
+					<< std::setw(10) << adjacent_tau[i].z
+					<< std::setw(10) << distance;
 */
 					assert(distance <= this->sradius);
 				}

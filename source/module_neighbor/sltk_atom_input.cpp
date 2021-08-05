@@ -79,18 +79,18 @@ Atom_input::Atom_input
 	if(GlobalV::test_grid)
 	{
 		ofs_in << " Output lattice vectors now (unit:lat0):" << std::endl;
-		ofs_in << " " << setw(5) << "Vec1" 
-			<< setw(10) << vec1[0]
-			<< setw(10) << vec1[1]
-			<< setw(10) << vec1[2] << std::endl;
-		ofs_in << " " << setw(5) << "Vec2" 
-			<< setw(10) << vec2[0]
-			<< setw(10) << vec2[1]
-			<< setw(10) << vec2[2] << std::endl;
-		ofs_in << " " << setw(5) << "Vec3" 
-			<< setw(10) << vec3[0]
-			<< setw(10) << vec3[1]
-			<< setw(10) << vec3[2];
+		ofs_in << " " << std::setw(5) << "Vec1" 
+			<< std::setw(10) << vec1[0]
+			<< std::setw(10) << vec1[1]
+			<< std::setw(10) << vec1[2] << std::endl;
+		ofs_in << " " << std::setw(5) << "Vec2" 
+			<< std::setw(10) << vec2[0]
+			<< std::setw(10) << vec2[1]
+			<< std::setw(10) << vec2[2] << std::endl;
+		ofs_in << " " << std::setw(5) << "Vec3" 
+			<< std::setw(10) << vec3[0]
+			<< std::setw(10) << vec3[1]
+			<< std::setw(10) << vec3[2];
 		ofs_in << std::endl;
 	}
 
@@ -486,16 +486,16 @@ void Atom_input::Expand_Grid(const UnitCell &ucell, const int ntype)
 					{
 						if (d_amount_expand < 1000)
 						{
-							GlobalV::ofs_running << "\n" << setw(6) << ia_all
-							<< setw(10) << x_old[ia]
-							<< setw(10) << y_old[ia]
-							<< setw(10) << z_old[ia]
-							<< setw(10) << store_x[ia_all]
-							<< setw(10) << store_y[ia_all]
-							<< setw(10) << store_z[ia_all]
-							<< setw(6) << store_cell_x[ia_all]
-							<< setw(6) << store_cell_y[ia_all]
-							<< setw(6) << store_cell_z[ia_all];
+							GlobalV::ofs_running << "\n" << std::setw(6) << ia_all
+							<< std::setw(10) << x_old[ia]
+							<< std::setw(10) << y_old[ia]
+							<< std::setw(10) << z_old[ia]
+							<< std::setw(10) << store_x[ia_all]
+							<< std::setw(10) << store_y[ia_all]
+							<< std::setw(10) << store_z[ia_all]
+							<< std::setw(6) << store_cell_x[ia_all]
+							<< std::setw(6) << store_cell_y[ia_all]
+							<< std::setw(6) << store_cell_z[ia_all];
 						}
 					}
 

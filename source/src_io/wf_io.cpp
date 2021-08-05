@@ -32,7 +32,7 @@ void WF_io::write_wfc(const std::string &fn, const ComplexMatrix *psi)
 
     ofs << "\n<WAVEFUNC>";
     ofs << "\n" << GlobalV::NBANDS << " Number of bands." << std::endl;
-    ofs << setprecision(6);
+    ofs << std::setprecision(6);
     for (int i=0; i<GlobalV::NBANDS; i++)
     {
         for (int ik=0; ik<GlobalC::kv.nks; ik++)
@@ -41,8 +41,8 @@ void WF_io::write_wfc(const std::string &fn, const ComplexMatrix *psi)
             for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
             {
                 if (ig%4==0) ofs << "\n";
-                ofs << setw(15) << psi[ik](i, ig).real()
-                << setw(15) << psi[ik](i, ig).imag();
+                ofs << std::setw(15) << psi[ik](i, ig).real()
+                << std::setw(15) << psi[ik](i, ig).imag();
             }
             ofs << "\n";
         }
@@ -122,23 +122,23 @@ void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Ve
                         std::ofstream ofs2( wfilename[ikstot].c_str(),ios::app);
                         if(id==0)
                         {
-                            ofs2<<setprecision(6);
-                            ofs2<<setw(10)<<"Kpoint"<<setw(10)<<"nKpoint"<<setw(10)<<"GlobalC::kv.x"<<setw(10)
-                            <<"GlobalC::kv.y"<<setw(10)<<"GlobalC::kv.z"<<setw(10)<<"weight"<<setw(10)
-                            <<"ngtot"<<setw(10)<<"nband"<<setw(10)<<"ecut"<<setw(10)<<"lat0"<<setw(10)<<"2pi/lat0"<<std::endl;
-                            ofs2<<setw(10)<<ikstot+1<<setw(10)<<GlobalC::kv.nkstot<<setw(10)<<GlobalC::kv.kvec_c[ik].x<<setw(10)
-                            <<GlobalC::kv.kvec_c[ik].y<<setw(10)<<GlobalC::kv.kvec_c[ik].z<<setw(10)<<GlobalC::kv.wk[ik]<<setw(10)
-                            <<ikngtot<<setw(10)<<GlobalV::NBANDS<<setw(10)<<GlobalC::pw.ecutwfc<<setw(10)<<GlobalC::ucell.lat0<<setw(10)<<GlobalC::ucell.tpiba<<std::endl;
+                            ofs2<<std::setprecision(6);
+                            ofs2<<std::setw(10)<<"Kpoint"<<std::setw(10)<<"nKpoint"<<std::setw(10)<<"GlobalC::kv.x"<<std::setw(10)
+                            <<"GlobalC::kv.y"<<std::setw(10)<<"GlobalC::kv.z"<<std::setw(10)<<"weight"<<std::setw(10)
+                            <<"ngtot"<<std::setw(10)<<"nband"<<std::setw(10)<<"ecut"<<std::setw(10)<<"lat0"<<std::setw(10)<<"2pi/lat0"<<std::endl;
+                            ofs2<<std::setw(10)<<ikstot+1<<std::setw(10)<<GlobalC::kv.nkstot<<std::setw(10)<<GlobalC::kv.kvec_c[ik].x<<std::setw(10)
+                            <<GlobalC::kv.kvec_c[ik].y<<std::setw(10)<<GlobalC::kv.kvec_c[ik].z<<std::setw(10)<<GlobalC::kv.wk[ik]<<std::setw(10)
+                            <<ikngtot<<std::setw(10)<<GlobalV::NBANDS<<std::setw(10)<<GlobalC::pw.ecutwfc<<std::setw(10)<<GlobalC::ucell.lat0<<std::setw(10)<<GlobalC::ucell.tpiba<<std::endl;
                             ofs2<<"\n<Reciprocal Lattice Vector>"<<std::endl;
-                            ofs2<<setw(10)<<GlobalC::ucell.G.e11<<setw(10)<<GlobalC::ucell.G.e12<<setw(10)<<GlobalC::ucell.G.e13<<std::endl;
-                            ofs2<<setw(10)<<GlobalC::ucell.G.e21<<setw(10)<<GlobalC::ucell.G.e22<<setw(10)<<GlobalC::ucell.G.e23<<std::endl;
-                            ofs2<<setw(10)<<GlobalC::ucell.G.e31<<setw(10)<<GlobalC::ucell.G.e32<<setw(10)<<GlobalC::ucell.G.e33<<std::endl;
+                            ofs2<<std::setw(10)<<GlobalC::ucell.G.e11<<std::setw(10)<<GlobalC::ucell.G.e12<<std::setw(10)<<GlobalC::ucell.G.e13<<std::endl;
+                            ofs2<<std::setw(10)<<GlobalC::ucell.G.e21<<std::setw(10)<<GlobalC::ucell.G.e22<<std::setw(10)<<GlobalC::ucell.G.e23<<std::endl;
+                            ofs2<<std::setw(10)<<GlobalC::ucell.G.e31<<std::setw(10)<<GlobalC::ucell.G.e32<<std::setw(10)<<GlobalC::ucell.G.e33<<std::endl;
                             ofs2<<"<Reciprocal Lattice Vector>\n"<<std::endl;
                             ofs2<<"<G vectors>"<<std::endl;
                         }
                         for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 					    {
-                            ofs2<<setw(10)<<gkk[ig].x<<setw(10)<<gkk[ig].y<<setw(10)<<gkk[ig].z<<std::endl;
+                            ofs2<<std::setw(10)<<gkk[ig].x<<std::setw(10)<<gkk[ig].y<<std::setw(10)<<gkk[ig].z<<std::endl;
 						}
                         if(id==GlobalV::NPROC_IN_POOL-1)
                         {
@@ -197,8 +197,8 @@ void WF_io::write_wfc2(const std::string &fn, const ComplexMatrix *psi, const Ve
                             for (int ig=0; ig<GlobalC::kv.ngk[ik]; ig++)
 							{
 								if (ig%4==0&&(ig!=0||id!=0)) ofs2 << "\n";
-								ofs2 << setw(15) << psi[ik](ib, ig).real()
-									<< setw(15) << psi[ik](ib, ig).imag();
+								ofs2 << std::setw(15) << psi[ik](ib, ig).real()
+									<< std::setw(15) << psi[ik](ib, ig).imag();
 							} // end ig
                             if(id==GlobalV::NPROC_IN_POOL-1)   ofs2 << "\n< Band "<<ib+1 <<" >" <<std::endl; 
 							ofs2.close();
