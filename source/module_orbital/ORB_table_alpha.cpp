@@ -132,6 +132,7 @@ void ORB_table_alpha::cal_S_PhiAlpha_R(
 	double *rs,
 	double *drs)
 {
+	TITLE("ORB_table_alpha", "cal_S_PhiAlpha_R");
 	timer::tick("ORB_table_alpha", "S_PhiAlpha_R");
 
 	assert(kmesh > 0);

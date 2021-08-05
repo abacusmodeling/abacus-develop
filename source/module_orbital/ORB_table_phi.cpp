@@ -783,7 +783,13 @@ void ORB_table_phi::init_Lmax (
 			Lmax = std::max(Lmax, ORB.Beta[it].getLmax());
 		}
 	};
+	auto cal_Lmax_Alpha = [](int &Lmax)
+	{
+		//caoyu add 2021-08-05 for descriptor basis
+		Lmax = std::max(Lmax, ORB.get_lmax_d());
+	};
 
+	
 	Lmax = -1;
 	
 	switch( orb_num )
@@ -794,6 +800,7 @@ void ORB_table_phi::init_Lmax (
 				case 1:			// used in <Phi|Phi> or <Beta|Phi>
 					cal_Lmax_Phi(Lmax);
 					cal_Lmax_Beta(Lmax);
+					cal_Lmax_Alpha(Lmax);
 					//use 2lmax+1 in dS
 					Lmax_used = 2*Lmax + 1;
 					break;
